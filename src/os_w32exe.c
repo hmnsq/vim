@@ -13,41 +13,41 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
-#ifdef VIMDLL
+#నిర్వచితమైతే VIMDLL
 __declspec(dllimport)
-#endif
-int VimMain(int argc, char **argv);
+#అయితే_ముగింపు
+పూర్ణాంకం VimMain(పూర్ణాంకం argc, అక్షరం **argv);
 
-#ifdef VIMDLL
+#నిర్వచితమైతే VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
-#endif
+#లేకపోతే
+శూన్య SaveInst(HINSTANCE hInst);
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
-    int WINAPI
+#నిర్వచితమైతే FEAT_GUI
+    పూర్ణాంకం WINAPI
 wWinMain(
     HINSTANCE	hInstance,
-    HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    HINSTANCE	hPrevInst వాడని,
+    LPWSTR	lpsz_Cmd_పంక్తి వాడని,
+    పూర్ణాంకం		nCmdShow వాడని)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    తిరిగి VimMain(0, ఖాళీ);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#లేకపోతే
+    పూర్ణాంకం
+wmain(పూర్ణాంకం argc వాడని, wchar_t **argv వాడని)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(ఖాళీ));
+    తిరిగి VimMain(0, ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_OWNSTARTUP
+#నిర్వచితమైతే USE_OWNSTARTUP
 // Use our own entry point and don't use the default CRT startup code to
 // reduce the size of (g)vim.exe.  This works only when VIMDLL is defined.
 //
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    శూన్య WINAPI
+wWinMainCRTStartup(శూన్య)
 {
-    VimMain(0, NULL);
+    VimMain(0, ఖాళీ);
 }
-# else
-    void
-wmainCRTStartup(void)
+# లేకపోతే
+    శూన్య
+wmainCRTStartup(శూన్య)
 {
-    VimMain(0, NULL);
+    VimMain(0, ఖాళీ);
 }
 # endif
-#endif	// USE_OWNSTARTUP
+#అయితే_ముగింపు	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#ఒకవేళ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# ఒకవేళ defined(_MSC_VER)
+స్థిర __declspec(thread) శూన్య *tls_space;
+బాహ్య intptr_t tls_సూచీ;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+స్థిర __thread శూన్య *tls_space;
+బాహ్య intptr_t tls_సూచీ;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) శూన్య
+get_tls_info(శూన్య ***ptls_space, intptr_t *ptls_సూచీ)
 {
     *ptls_space = &tls_space;
-    *ptls_index = _tls_index;
-    return;
+    *ptls_సూచీ = tls_సూచీ;
+    తిరిగి;
 }
-#endif
+#అయితే_ముగింపు

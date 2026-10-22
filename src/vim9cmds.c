@@ -11,67 +11,67 @@
  * vim9cmds.c: Dealing with commands of a compiled function
  */
 
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#నిర్వచించు USING_FLOAT_STUFF
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * Get the index of the current instruction.
  * This compensates for a preceding ISN_CMDMOD and ISN_PROF_START.
  */
-    static int
+    స్థిర పూర్ణాంకం
 current_instr_idx(cctx_T *cctx)
 {
     garray_T	*instr = &cctx->ctx_instr;
-    int		idx = instr->ga_len;
+    పూర్ణాంకం		idx = instr->ga_len;
 
-    while (idx > 0)
+    అయితే (idx > 0)
     {
-	if (cctx->ctx_has_cmdmod && ((isn_T *)instr->ga_data)[idx - 1]
+	ఒకవేళ (cctx->ctx_has_cmdmod && ((isn_T *)instr->ga_దత్తాంశం)[idx - 1]
 						       .isn_type == ISN_CMDMOD)
 	{
 	    --idx;
-	    continue;
+	    కొనసాగు;
 	}
-#ifdef FEAT_PROFILE
-	if (((isn_T *)instr->ga_data)[idx - 1].isn_type == ISN_PROF_START)
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (((isn_T *)instr->ga_దత్తాంశం)[idx - 1].isn_type == ISN_PROF_ప్రారంభం)
 	{
 	    --idx;
-	    continue;
+	    కొనసాగు;
 	}
-#endif
-	if (((isn_T *)instr->ga_data)[idx - 1].isn_type == ISN_DEBUG)
+#అయితే_ముగింపు
+	ఒకవేళ (((isn_T *)instr->ga_దత్తాంశం)[idx - 1].isn_type == ISN_DEBUG)
 	{
 	    --idx;
-	    continue;
+	    కొనసాగు;
 	}
-	break;
+	ఆపు;
     }
-    return idx;
+    తిరిగి idx;
 }
 /*
  * Remove local variables above "new_top".
  * Do this by clearing the name.  If "keep" is TRUE do not reset the length, a
  * closure may still need location of the variable.
  */
-    static void
-unwind_locals(cctx_T *cctx, int new_top, int keep)
+    స్థిర శూన్య
+unwind_locals(cctx_T *cctx, పూర్ణాంకం new_శిఖరం, పూర్ణాంకం keep)
 {
-    if (cctx->ctx_locals.ga_len > new_top)
-	for (int idx = new_top; idx < cctx->ctx_locals.ga_len; ++idx)
+    ఒకవేళ (cctx->ctx_locals.ga_len > new_శిఖరం)
+	కొరకు (పూర్ణాంకం idx = new_శిఖరం; idx < cctx->ctx_locals.ga_len; ++idx)
 	{
-	    lvar_T *lvar = ((lvar_T *)cctx->ctx_locals.ga_data) + idx;
+	    lvar_T *lvar = ((lvar_T *)cctx->ctx_locals.ga_దత్తాంశం) + idx;
 	    VIM_CLEAR(lvar->lv_name);
 	}
-    if (!keep)
-	cctx->ctx_locals.ga_len = new_top;
+    ఒకవేళ (!keep)
+	cctx->ctx_locals.ga_len = new_శిఖరం;
 }
 
 /*
  * Free all local variables.
  */
-    void
+    శూన్య
 free_locals(cctx_T *cctx)
 {
     unwind_locals(cctx, 0, FALSE);
@@ -82,52 +82,52 @@ free_locals(cctx_T *cctx)
 /*
  * Check if "name" can be "unlet".
  */
-    int
+    పూర్ణాంకం
 check_vim9_unlet(char_u *name)
 {
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
-	semsg(_(e_argument_required_for_str), "unlet");
-	return FAIL;
+	semsg(_(e_వాదం_required_for_str), "unlet");
+	తిరిగి FAIL;
     }
 
-    if (name[1] != ':' || vim_strchr((char_u *)"gwtb", *name) == NULL)
+    ఒకవేళ (name[1] != ':' || vim_strchr((char_u *)"gwtb", *name) == ఖాళీ)
     {
 	// "unlet s:var" is allowed in legacy script.
-	if (*name == 's' && !in_vim9script())
-	    return OK;
+	ఒకవేళ (*name == 's' && !లోపల_vim9script())
+	    తిరిగి OK;
 	semsg(_(e_cannot_unlet_str), name);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Callback passed to ex_unletlock().
  */
-    static int
+    స్థిర పూర్ణాంకం
 compile_unlet(
     lval_T  *lvp,
-    char_u  *name_end,
+    char_u  *name_చివర,
     exarg_T *eap,
-    int	    deep UNUSED,
-    void    *coookie)
+    పూర్ణాంకం	    deep వాడని,
+    శూన్య    *coookie)
 {
     cctx_T	*cctx = coookie;
     char_u	*p = lvp->ll_name;
-    int		cc = *name_end;
-    int		ret = OK;
+    పూర్ణాంకం		cc = *name_చివర;
+    పూర్ణాంకం		ret = OK;
 
-    if (cctx->ctx_skip == SKIP_YES)
-	return OK;
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
+	తిరిగి OK;
 
-    *name_end = NUL;
-    if (*p == '$')
+    *name_చివర = NUL;
+    ఒకవేళ (*p == '$')
     {
 	// :unlet $ENV_VAR
 	ret = generate_UNLET(cctx, ISN_UNLETENV, p + 1, eap->forceit);
     }
-    else if (vim_strchr(p, '.') != NULL || vim_strchr(p, '[') != NULL)
+    లేకపోతే ఒకవేళ (vim_strchr(p, '.') != ఖాళీ || vim_strchr(p, '[') != ఖాళీ)
     {
 	lhs_T	    lhs;
 
@@ -142,71 +142,71 @@ compile_unlet(
 
 	// Use the info in "lhs" to unlet the item at the index in the
 	// list or dict.
-	if (ret == OK)
+	ఒకవేళ (ret == OK)
 	{
-	    if (!lhs.lhs_has_index)
+	    ఒకవేళ (!lhs.lhs_has_సూచీ)
 	    {
-		semsg(_(e_cannot_unlet_imported_item_str), p);
+		semsg(_(e_cannot_unlet_imported_అంశం_str), p);
 		ret = FAIL;
 	    }
-	    else
-		ret = compile_assign_unlet(p, &lhs, FALSE, &t_void, cctx);
+	    లేకపోతే
+		ret = compile_కేటాయించు_unlet(p, &lhs, FALSE, &t_void, cctx);
 	}
 
 	vim_free(lhs.lhs_name);
     }
-    else if (check_vim9_unlet(p) == FAIL)
+    లేకపోతే ఒకవేళ (check_vim9_unlet(p) == FAIL)
     {
 	ret = FAIL;
     }
-    else
+    లేకపోతే
     {
 	// Normal name.  Only supports g:, w:, t: and b: namespaces.
 	ret = generate_UNLET(cctx, ISN_UNLET, p, eap->forceit);
     }
 
-    *name_end = cc;
-    return ret;
+    *name_చివర = cc;
+    తిరిగి ret;
 }
 
 /*
  * Callback passed to ex_unletlock().
  */
-    static int
-compile_lock_unlock(
+    స్థిర పూర్ణాంకం
+compile_తాళం_unlock(
     lval_T  *lvp,
-    char_u  *name_end,
+    char_u  *name_చివర,
     exarg_T *eap,
-    int	    deep,
-    void    *coookie)
+    పూర్ణాంకం	    deep,
+    శూన్య    *coookie)
 {
     cctx_T	*cctx = coookie;
-    int		cc = *name_end;
+    పూర్ణాంకం		cc = *name_చివర;
     char_u	*p = lvp->ll_name;
-    int		ret = OK;
+    పూర్ణాంకం		ret = OK;
     char_u	*buf;
     isntype_T	isn = ISN_EXEC;
-    char	*cmd = eap->cmdidx == CMD_lockvar ? "lockvar" : "unlockvar";
-    int		is_arg = FALSE;
+    అక్షరం	*cmd = eap->cmdidx == CMD_lockvar ? "lockvar" : "unlockvar";
+    పూర్ణాంకం		is_arg = FALSE;
 
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: compile_lock_unlock(): cookie %p, name %s",
+#నిర్వచితమైతే LOG_LOCKVAR
+    ch_log(ఖాళీ, "LKVAR: compile_lock_unlock(): cookie %p, name %s",
 								coookie, p);
-#endif
+#అయితే_ముగింపు
 
-    if (cctx->ctx_skip == SKIP_YES)
-	return OK;
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
+	తిరిగి OK;
 
-    if (*p == NUL)
+    ఒకవేళ (*p == NUL)
     {
-	semsg(_(e_argument_required_for_str), cmd);
-	return FAIL;
+	semsg(_(e_వాదం_required_for_str), cmd);
+	తిరిగి FAIL;
     }
 
     // Cannot use :lockvar and :unlockvar on local variables.
-    if (p[1] != ':')
+    ఒకవేళ (p[1] != ':')
     {
-	char_u *end = find_name_end(p, NULL, NULL, FNE_CHECK_START);
+	char_u *చివర = కనుగొను_name_చివర(p, ఖాళీ, ఖాళీ, FNE_CHECK_ప్రారంభం);
 
 	// The most important point is that something like
 	// name[idx].member... needs to be resolved at runtime, get_lval(),
@@ -222,101 +222,101 @@ compile_lock_unlock(
 	// to ex_lockvar() indirectly and be used as the root for get_lval.
 	// A bare script variable name needs no special handling.
 
-	char_u	*name = NULL;
-	int	len = end - p;
+	char_u	*name = ఖాళీ;
+	పూర్ణాంకం	len = చివర - p;
 
-	if (lookup_local(p, len, NULL, cctx) == OK)
+	ఒకవేళ (lookup_local(p, len, ఖాళీ, cctx) == OK)
 	{
 	    // Handle "this", "this.val", "anyvar[idx]"
-	    if (*end != '.' && *end != '['
+	    ఒకవేళ (*చివర != '.' && *చివర != '['
 				&& (len != 4 || STRNCMP("this", p, len) != 0))
 	    {
-		emsg(_(e_cannot_lock_unlock_local_variable));
-		return FAIL;
+		emsg(_(e_cannot_తాళం_unlock_local_variable));
+		తిరిగి FAIL;
 	    }
 	    // Push the local on the stack, could be "this".
 	    name = p;
-#ifdef LOG_LOCKVAR
-	    ch_log(NULL, "LKVAR:    ... lookup_local: name %s", name);
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+	    ch_log(ఖాళీ, "LKVAR:    ... lookup_local: name %s", name);
+#అయితే_ముగింపు
 	}
-	if (name == NULL)
+	ఒకవేళ (name == ఖాళీ)
 	{
 	    class_T *cl;
-	    if (cctx_class_member_idx(cctx, p, len, &cl) >= 0)
+	    ఒకవేళ (cctx_class_member_idx(cctx, p, len, &cl) >= 0)
 	    {
-		if (*end != '.' && *end != '[')
+		ఒకవేళ (*చివర != '.' && *చివర != '[')
 		{
 		    // Push the class of the bare class variable name
 		    name = cl->class_name.string;
-		    len = (int)cl->class_name.length;
-#ifdef LOG_LOCKVAR
-		    ch_log(NULL, "LKVAR:    ... cctx_class_member: name %s",
+		    len = (పూర్ణాంకం)cl->class_name.నిడివి;
+#నిర్వచితమైతే LOG_LOCKVAR
+		    ch_log(ఖాళీ, "LKVAR:    ... cctx_class_member: name %s",
 			   name);
-#endif
+#అయితే_ముగింపు
 		}
 	    }
 	}
-	if (name == NULL)
+	ఒకవేళ (name == ఖాళీ)
 	{
 	    // Can lockvar any function arg.
-	    if (arg_exists(p, len, NULL, NULL, NULL, cctx) == OK)
+	    ఒకవేళ (arg_exists(p, len, ఖాళీ, ఖాళీ, ఖాళీ, cctx) == OK)
 	    {
 		name = p;
 		is_arg = TRUE;
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... arg_exists: name %s", name);
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+		ch_log(ఖాళీ, "LKVAR:    ... arg_exists: name %s", name);
+#అయితే_ముగింపు
 	    }
 	}
-	if (name == NULL)
+	ఒకవేళ (name == ఖాళీ)
 	{
 	    // No special handling for a bare script variable; but
 	    // if followed by '[' or '.', it's a root for get_lval().
-	    if (script_var_exists(p, len, cctx, NULL) == OK
-		&& (*end == '.' || *end == '['))
+	    ఒకవేళ (script_var_exists(p, len, cctx, ఖాళీ) == OK
+		&& (*చివర == '.' || *చివర == '['))
 	    {
 		name = p;
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... script_var_exists: name %s", name);
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+		ch_log(ఖాళీ, "LKVAR:    ... script_var_exists: name %s", name);
+#అయితే_ముగింపు
 	    }
 	}
-	if (name != NULL)
+	ఒకవేళ (name != ఖాళీ)
 	{
-#ifdef LOG_LOCKVAR
-	    ch_log(NULL, "LKVAR:    ... INS_LOCKUNLOCK %s", name);
-#endif
-	    if (compile_load(&name, len, name + len, cctx, FALSE, FALSE) == FAIL)
-		return FAIL;
+#నిర్వచితమైతే LOG_LOCKVAR
+	    ch_log(ఖాళీ, "LKVAR:    ... INS_LOCKUNLOCK %s", name);
+#అయితే_ముగింపు
+	    ఒకవేళ (compile_ఎక్కించు(&name, len, name + len, cctx, FALSE, FALSE) == FAIL)
+		తిరిగి FAIL;
 	    isn = ISN_LOCKUNLOCK;
 	}
     }
 
     // Checking is done at runtime.
-    *name_end = NUL;
-    size_t len = name_end - p + 20;
+    *name_చివర = NUL;
+    size_t len = name_చివర - p + 20;
     buf = alloc(len);
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
 	ret = FAIL;
-    else
+    లేకపోతే
     {
-	if (deep < 0)
-	    vim_snprintf((char *)buf, len, "%s! %s", cmd, p);
-	else
-	    vim_snprintf((char *)buf, len, "%s %d %s", cmd, deep, p);
-#ifdef LOG_LOCKVAR
-	ch_log(NULL, "LKVAR:    ... buf %s", buf);
-#endif
-	if (isn == ISN_LOCKUNLOCK)
+	ఒకవేళ (deep < 0)
+	    vim_snprintf((అక్షరం *)buf, len, "%s! %s", cmd, p);
+	లేకపోతే
+	    vim_snprintf((అక్షరం *)buf, len, "%s %d %s", cmd, deep, p);
+#నిర్వచితమైతే LOG_LOCKVAR
+	ch_log(ఖాళీ, "LKVAR:    ... buf %s", buf);
+#అయితే_ముగింపు
+	ఒకవేళ (isn == ISN_LOCKUNLOCK)
 	    ret = generate_LOCKUNLOCK(cctx, buf, is_arg);
-	else
+	లేకపోతే
 	    ret = generate_EXEC_copy(cctx, isn, buf);
 
 	vim_free(buf);
-	*name_end = cc;
+	*name_చివర = cc;
     }
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -326,80 +326,80 @@ compile_lock_unlock(
     char_u *
 compile_unletlock(char_u *arg, exarg_T *eap, cctx_T *cctx)
 {
-    int	    deep = 0;
+    పూర్ణాంకం	    deep = 0;
     char_u  *p = arg;
 
-    if (eap->cmdidx != CMD_unlet)
+    ఒకవేళ (eap->cmdidx != CMD_unlet)
     {
-	if (eap->forceit)
+	ఒకవేళ (eap->forceit)
 	    deep = -1;
-	else if (vim_isdigit(*p))
+	లేకపోతే ఒకవేళ (vim_isdigit(*p))
 	{
 	    deep = getdigits(&p);
 	    p = skipwhite(p);
 	}
-	else
+	లేకపోతే
 	    deep = 2;
     }
 
     ex_unletlock(eap, p, deep, GLV_NO_AUTOLOAD | GLV_COMPILING,
-	    eap->cmdidx == CMD_unlet ? compile_unlet : compile_lock_unlock,
+	    eap->cmdidx == CMD_unlet ? compile_unlet : compile_తాళం_unlock,
 	    cctx);
-    return eap->nextcmd == NULL ? (char_u *)"" : eap->nextcmd;
+    తిరిగి eap->nextcmd == ఖాళీ ? (char_u *)"" : eap->nextcmd;
 }
 
 /*
  * Generate a jump to the ":endif"/":endfor"/":endwhile"/":finally"/":endtry".
  * "funcref_idx" is used for JUMP_WHILE_FALSE
  */
-    static int
-compile_jump_to_end(
+    స్థిర పూర్ణాంకం
+compile_jump_గమ్యం_చివర(
 	endlabel_T  **el,
 	jumpwhen_T  when,
-	int	    funcref_idx,
+	పూర్ణాంకం	    funcref_idx,
 	cctx_T	    *cctx)
 {
     garray_T	*instr = &cctx->ctx_instr;
     endlabel_T  *endlabel = ALLOC_CLEAR_ONE(endlabel_T);
 
-    if (endlabel == NULL)
-	return FAIL;
-    endlabel->el_next = *el;
+    ఒకవేళ (endlabel == ఖాళీ)
+	తిరిగి FAIL;
+    endlabel->el_తదుపరి = *el;
     *el = endlabel;
-    endlabel->el_end_label = instr->ga_len;
+    endlabel->el_చివర_label = instr->ga_len;
 
-    if (when == JUMP_WHILE_FALSE)
+    ఒకవేళ (when == JUMP_WHILE_FALSE)
 	generate_WHILE(cctx, funcref_idx);
-    else
+    లేకపోతే
 	generate_JUMP(cctx, when, 0);
-    return OK;
+    తిరిగి OK;
 }
 
-    static void
-compile_fill_jump_to_end(endlabel_T **el, int jump_where, cctx_T *cctx)
+    స్థిర శూన్య
+compile_fill_jump_గమ్యం_చివర(endlabel_T **el, పూర్ణాంకం jump_where, cctx_T *cctx)
 {
     garray_T	*instr = &cctx->ctx_instr;
 
-    while (*el != NULL)
+    అయితే (*el != ఖాళీ)
     {
 	endlabel_T  *cur = (*el);
 	isn_T	    *isn;
 
-	isn = ((isn_T *)instr->ga_data) + cur->el_end_label;
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + cur->el_చివర_label;
 	isn->isn_arg.jump.jump_where = jump_where;
-	*el = cur->el_next;
+	*el = cur->el_తదుపరి;
 	vim_free(cur);
     }
 }
 
-    static void
-compile_free_jump_to_end(endlabel_T **el)
+    స్థిర శూన్య
+compile_free_jump_గమ్యం_చివర(endlabel_T **el)
 {
-    while (*el != NULL)
+    అయితే (*el != ఖాళీ)
     {
 	endlabel_T  *cur = (*el);
 
-	*el = cur->el_next;
+	*el = cur->el_తదుపరి;
 	vim_free(cur);
     }
 }
@@ -407,66 +407,66 @@ compile_free_jump_to_end(endlabel_T **el)
 /*
  * Create a new scope and set up the generic items.
  */
-    static scope_T *
+    స్థిర scope_T *
 new_scope(cctx_T *cctx, scopetype_T type)
 {
     scope_T *scope = ALLOC_CLEAR_ONE(scope_T);
 
-    if (scope == NULL)
-	return NULL;
+    ఒకవేళ (scope == ఖాళీ)
+	తిరిగి ఖాళీ;
     scope->se_outer = cctx->ctx_scope;
     cctx->ctx_scope = scope;
     scope->se_type = type;
-    scope->se_local_count = cctx->ctx_locals.ga_len;
-    if (scope->se_outer != NULL)
-	scope->se_loop_depth = scope->se_outer->se_loop_depth;
-    return scope;
+    scope->se_local_లెక్క = cctx->ctx_locals.ga_len;
+    ఒకవేళ (scope->se_outer != ఖాళీ)
+	scope->se_loop_లోతు = scope->se_outer->se_loop_లోతు;
+    తిరిగి scope;
 }
 
 /*
  * Free the current scope and go back to the outer scope.
  */
-    void
+    శూన్య
 drop_scope(cctx_T *cctx)
 {
     scope_T *scope = cctx->ctx_scope;
 
-    if (scope == NULL)
+    ఒకవేళ (scope == ఖాళీ)
     {
 	iemsg("calling drop_scope() without a scope");
-	return;
+	తిరిగి;
     }
     cctx->ctx_scope = scope->se_outer;
-    switch (scope->se_type)
+    ఎంపిక (scope->se_type)
     {
-	case IF_SCOPE:
-	    compile_free_jump_to_end(&scope->se_u.se_if.is_end_label); break;
-	case FOR_SCOPE:
-	    compile_free_jump_to_end(&scope->se_u.se_for.fs_end_label); break;
-	case WHILE_SCOPE:
-	    compile_free_jump_to_end(&scope->se_u.se_while.ws_end_label); break;
-	case TRY_SCOPE:
-	    compile_free_jump_to_end(&scope->se_u.se_try.ts_end_label); break;
-	case NO_SCOPE:
-	case BLOCK_SCOPE:
-	    break;
+	స్థితి IF_SCOPE:
+	    compile_free_jump_గమ్యం_చివర(&scope->se_u.se_if.is_చివర_label); ఆపు;
+	స్థితి FOR_SCOPE:
+	    compile_free_jump_గమ్యం_చివర(&scope->se_u.se_for.fs_చివర_label); ఆపు;
+	స్థితి WHILE_SCOPE:
+	    compile_free_jump_గమ్యం_చివర(&scope->se_u.se_while.ws_చివర_label); ఆపు;
+	స్థితి TRY_SCOPE:
+	    compile_free_jump_గమ్యం_చివర(&scope->se_u.se_try.ts_చివర_label); ఆపు;
+	స్థితి NO_SCOPE:
+	స్థితి ఖండం_SCOPE:
+	    ఆపు;
     }
     vim_free(scope);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 misplaced_cmdmod(cctx_T *cctx)
 {
     garray_T	*instr = &cctx->ctx_instr;
 
-    if (cctx->ctx_has_cmdmod
-	    && ((isn_T *)instr->ga_data)[instr->ga_len - 1].isn_type
+    ఒకవేళ (cctx->ctx_has_cmdmod
+	    && ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1].isn_type
 								 == ISN_CMDMOD)
     {
 	emsg(_(e_misplaced_command_modifier));
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -506,78 +506,78 @@ compile_if(char_u *arg, cctx_T *cctx)
 {
     char_u	*p = arg;
     garray_T	*instr = &cctx->ctx_instr;
-    int		instr_count = instr->ga_len;
+    పూర్ణాంకం		instr_లెక్క = instr->ga_len;
     scope_T	*scope;
     skip_T	skip_save = cctx->ctx_skip;
     ppconst_T	ppconst;
 
-    CLEAR_FIELD(ppconst);
-    if (compile_expr1(&p, cctx, &ppconst) == FAIL)
+    CLEAR_క్షేత్రం(ppconst);
+    ఒకవేళ (compile_expr1(&p, cctx, &ppconst) == FAIL)
     {
 	clear_ppconst(&ppconst);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (!ends_excmd2(arg, skipwhite(p)))
+    ఒకవేళ (!చివర్లు_excmd2(arg, skipwhite(p)))
     {
 	semsg(_(e_trailing_characters_str), p);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (cctx->ctx_skip == SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
 	clear_ppconst(&ppconst);
-    else if (instr->ga_len == instr_count && ppconst.pp_used == 1)
+    లేకపోతే ఒకవేళ (instr->ga_len == instr_లెక్క && ppconst.pp_వాడిన == 1)
     {
-	int error = FALSE;
-	int v;
+	పూర్ణాంకం error = FALSE;
+	పూర్ణాంకం v;
 
 	// The expression results in a constant.
 	v = tv_get_bool_chk(&ppconst.pp_tv[0], &error);
 	clear_ppconst(&ppconst);
-	if (error)
-	    return NULL;
+	ఒకవేళ (error)
+	    తిరిగి ఖాళీ;
 	cctx->ctx_skip = v ? SKIP_NOT : SKIP_YES;
     }
-    else
+    లేకపోతే
     {
 	// Not a constant, generate instructions for the expression.
 	cctx->ctx_skip = SKIP_UNKNOWN;
-	if (generate_ppconst(cctx, &ppconst) == FAIL)
-	    return NULL;
-	if (bool_on_stack(cctx) == FAIL)
-	    return NULL;
+	ఒకవేళ (generate_ppconst(cctx, &ppconst) == FAIL)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (bool_on_దొంతర(cctx) == FAIL)
+	    తిరిగి ఖాళీ;
     }
 
     // CMDMOD_REV must come before the jump
     generate_undo_cmdmods(cctx);
 
     scope = new_scope(cctx, IF_SCOPE);
-    if (scope == NULL)
-	return NULL;
+    ఒకవేళ (scope == ఖాళీ)
+	తిరిగి ఖాళీ;
     scope->se_skip_save = skip_save;
     // "is_had_return" will be reset if any block does not end in :return
     scope->se_u.se_if.is_had_return = TRUE;
 
-    if (cctx->ctx_skip == SKIP_UNKNOWN)
+    ఒకవేళ (cctx->ctx_skip == SKIP_UNKNOWN)
     {
 	// "where" is set when ":elseif", "else" or ":endif" is found
 	scope->se_u.se_if.is_if_label = instr->ga_len;
 	generate_JUMP(cctx, JUMP_IF_FALSE, 0);
     }
-    else
+    లేకపోతే
 	scope->se_u.se_if.is_if_label = -1;
 
-#ifdef FEAT_PROFILE
-    if (cctx->ctx_compile_type == CT_PROFILE && cctx->ctx_skip == SKIP_YES
+#నిర్వచితమైతే FEAT_PROFILE
+    ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE && cctx->ctx_skip == SKIP_YES
 						      && skip_save != SKIP_YES)
     {
 	// generated a profile start, need to generate a profile end, since it
 	// won't be done after returning
 	cctx->ctx_skip = SKIP_NOT;
-	generate_instr(cctx, ISN_PROF_END);
+	generate_instr(cctx, ISN_PROF_చివర);
 	cctx->ctx_skip = SKIP_YES;
     }
-#endif
+#అయితే_ముగింపు
 
-    return p;
+    తిరిగి p;
 }
 
     char_u *
@@ -585,153 +585,153 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 {
     char_u	*p = arg;
     garray_T	*instr = &cctx->ctx_instr;
-    int		instr_count;
+    పూర్ణాంకం		instr_లెక్క;
     isn_T	*isn;
     scope_T	*scope = cctx->ctx_scope;
     ppconst_T	ppconst;
     skip_T	save_skip = cctx->ctx_skip;
 
-    if (scope == NULL || scope->se_type != IF_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != IF_SCOPE)
     {
 	emsg(_(e_elseif_without_if));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (scope->se_u.se_if.is_seen_else)
+    ఒకవేళ (scope->se_u.se_if.is_చూసిన_else)
     {
 	emsg(_(e_elseif_after_else));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    unwind_locals(cctx, scope->se_local_count, TRUE);
-    if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
+    unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
+    ఒకవేళ (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
 	scope->se_u.se_if.is_had_return = FALSE;
 
-    if (cctx->ctx_skip == SKIP_NOT)
+    ఒకవేళ (cctx->ctx_skip == SKIP_NOT)
     {
 	// previous block was executed, this one and following will not
 	cctx->ctx_skip = SKIP_YES;
-	scope->se_u.se_if.is_seen_skip_not = TRUE;
+	scope->se_u.se_if.is_చూసిన_skip_not = TRUE;
     }
-    if (scope->se_u.se_if.is_seen_skip_not)
+    ఒకవేళ (scope->se_u.se_if.is_చూసిన_skip_not)
     {
 	// A previous block was executed, skip over expression and bail out.
 	// Do not count the "elseif" for profiling and cmdmod
 	instr->ga_len = current_instr_idx(cctx);
 
-	skip_expr_cctx(&p, cctx);
-	return p;
+	skip_సమాసం_cctx(&p, cctx);
+	తిరిగి p;
     }
 
-    if (scope->se_skip_save == SKIP_YES)
+    ఒకవేళ (scope->se_skip_save == SKIP_YES)
     {
 	// Enclosing outer block is dead, skip this elseif
-	skip_expr_cctx(&p, cctx);
-	return p;
+	skip_సమాసం_cctx(&p, cctx);
+	తిరిగి p;
     }
 
-    if (cctx->ctx_skip == SKIP_UNKNOWN)
+    ఒకవేళ (cctx->ctx_skip == SKIP_UNKNOWN)
     {
-	int	    moved_cmdmod = FALSE;
-	int	    saved_debug = FALSE;
+	పూర్ణాంకం	    moved_cmdmod = FALSE;
+	పూర్ణాంకం	    saved_debug = FALSE;
 	isn_T	    debug_isn;
 
 	// Move any CMDMOD instruction to after the jump
-	if (((isn_T *)instr->ga_data)[instr->ga_len - 1].isn_type == ISN_CMDMOD)
+	ఒకవేళ (((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1].isn_type == ISN_CMDMOD)
 	{
-	    if (GA_GROW_FAILS(instr, 1))
-		return NULL;
-	    ((isn_T *)instr->ga_data)[instr->ga_len] =
-				  ((isn_T *)instr->ga_data)[instr->ga_len - 1];
+	    ఒకవేళ (GA_GROW_FAILS(instr, 1))
+		తిరిగి ఖాళీ;
+	    ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len] =
+				  ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1];
 	    --instr->ga_len;
 	    moved_cmdmod = TRUE;
 	}
 
 	// Remove the already generated ISN_DEBUG, it is written below the
 	// ISN_FOR instruction.
-	if (cctx->ctx_compile_type == CT_DEBUG && instr->ga_len > 0
-		&& ((isn_T *)instr->ga_data)[instr->ga_len - 1]
+	ఒకవేళ (cctx->ctx_compile_type == CT_DEBUG && instr->ga_len > 0
+		&& ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
 							.isn_type == ISN_DEBUG)
 	{
 	    --instr->ga_len;
-	    debug_isn = ((isn_T *)instr->ga_data)[instr->ga_len];
+	    debug_isn = ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len];
 	    saved_debug = TRUE;
 	}
 
-	if (compile_jump_to_end(&scope->se_u.se_if.is_end_label,
+	ఒకవేళ (compile_jump_గమ్యం_చివర(&scope->se_u.se_if.is_చివర_label,
 						 JUMP_ALWAYS, 0, cctx) == FAIL)
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	// previous "if" or "elseif" jumps here
-	isn = ((isn_T *)instr->ga_data) + scope->se_u.se_if.is_if_label;
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_if.is_if_label;
 	isn->isn_arg.jump.jump_where = instr->ga_len;
 
-	if (moved_cmdmod)
+	ఒకవేళ (moved_cmdmod)
 	    ++instr->ga_len;
 
-	if (saved_debug)
+	ఒకవేళ (saved_debug)
 	{
 	    // move the debug instruction here
-	    if (GA_GROW_FAILS(instr, 1))
-		return NULL;
-	    ((isn_T *)instr->ga_data)[instr->ga_len] = debug_isn;
+	    ఒకవేళ (GA_GROW_FAILS(instr, 1))
+		తిరిగి ఖాళీ;
+	    ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len] = debug_isn;
 	    ++instr->ga_len;
 	}
     }
 
     // compile "expr"; if we know it evaluates to FALSE skip the block
-    CLEAR_FIELD(ppconst);
-    if (cctx->ctx_skip == SKIP_YES)
+    CLEAR_క్షేత్రం(ppconst);
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
     {
 	cctx->ctx_skip = SKIP_UNKNOWN;
-#ifdef FEAT_PROFILE
-	if (cctx->ctx_compile_type == CT_PROFILE)
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE)
 	    // the previous block was skipped, need to profile this line
-	    generate_instr(cctx, ISN_PROF_START);
-#endif
-	if (cctx->ctx_compile_type == CT_DEBUG)
+	    generate_instr(cctx, ISN_PROF_ప్రారంభం);
+#అయితే_ముగింపు
+	ఒకవేళ (cctx->ctx_compile_type == CT_DEBUG)
 	    // the previous block was skipped, may want to debug this line
 	    generate_instr_debug(cctx);
     }
 
-    instr_count = instr->ga_len;
-    if (compile_expr1(&p, cctx, &ppconst) == FAIL)
+    instr_లెక్క = instr->ga_len;
+    ఒకవేళ (compile_expr1(&p, cctx, &ppconst) == FAIL)
     {
 	clear_ppconst(&ppconst);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     cctx->ctx_skip = save_skip;
-    if (!ends_excmd2(arg, skipwhite(p)))
+    ఒకవేళ (!చివర్లు_excmd2(arg, skipwhite(p)))
     {
 	clear_ppconst(&ppconst);
 	semsg(_(e_trailing_characters_str), p);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (scope->se_skip_save == SKIP_YES)
+    ఒకవేళ (scope->se_skip_save == SKIP_YES)
 	clear_ppconst(&ppconst);
-    else if (instr->ga_len == instr_count && ppconst.pp_used == 1)
+    లేకపోతే ఒకవేళ (instr->ga_len == instr_లెక్క && ppconst.pp_వాడిన == 1)
     {
-	int error = FALSE;
-	int v;
+	పూర్ణాంకం error = FALSE;
+	పూర్ణాంకం v;
 
 	// The expression result is a constant.
 	v = tv_get_bool_chk(&ppconst.pp_tv[0], &error);
-	if (error)
+	ఒకవేళ (error)
 	{
 	    clear_ppconst(&ppconst);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	cctx->ctx_skip = v ? SKIP_NOT : SKIP_YES;
 	clear_ppconst(&ppconst);
 	scope->se_u.se_if.is_if_label = -1;
     }
-    else
+    లేకపోతే
     {
 	// Not a constant, generate instructions for the expression.
 	cctx->ctx_skip = SKIP_UNKNOWN;
-	if (generate_ppconst(cctx, &ppconst) == FAIL)
-	    return NULL;
-	if (bool_on_stack(cctx) == FAIL)
-	    return NULL;
+	ఒకవేళ (generate_ppconst(cctx, &ppconst) == FAIL)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (bool_on_దొంతర(cctx) == FAIL)
+	    తిరిగి ఖాళీ;
 
 	// CMDMOD_REV must come before the jump
 	generate_undo_cmdmods(cctx);
@@ -741,7 +741,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 	generate_JUMP(cctx, JUMP_IF_FALSE, 0);
     }
 
-    return p;
+    తిరిగి p;
 }
 
     char_u *
@@ -752,71 +752,71 @@ compile_else(char_u *arg, cctx_T *cctx)
     isn_T	*isn;
     scope_T	*scope = cctx->ctx_scope;
 
-    if (scope == NULL || scope->se_type != IF_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != IF_SCOPE)
     {
 	emsg(_(e_else_without_if));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (scope->se_u.se_if.is_seen_else)
+    ఒకవేళ (scope->se_u.se_if.is_చూసిన_else)
     {
-	emsg(_(e_multiple_else));
-	return NULL;
+	emsg(_(e_గుణిజం_else));
+	తిరిగి ఖాళీ;
     }
-    unwind_locals(cctx, scope->se_local_count, TRUE);
-    if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
+    unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
+    ఒకవేళ (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
 	scope->se_u.se_if.is_had_return = FALSE;
-    scope->se_u.se_if.is_seen_else = TRUE;
+    scope->se_u.se_if.is_చూసిన_else = TRUE;
 
-#ifdef FEAT_PROFILE
-    if (cctx->ctx_compile_type == CT_PROFILE)
+#నిర్వచితమైతే FEAT_PROFILE
+    ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE)
     {
-	if (cctx->ctx_skip == SKIP_NOT
-		&& ((isn_T *)instr->ga_data)[instr->ga_len - 1]
-						   .isn_type == ISN_PROF_START)
+	ఒకవేళ (cctx->ctx_skip == SKIP_NOT
+		&& ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
+						   .isn_type == ISN_PROF_ప్రారంభం)
 	    // the previous block was executed, do not count "else" for
 	    // profiling
 	    --instr->ga_len;
-	if (cctx->ctx_skip == SKIP_YES && !scope->se_u.se_if.is_seen_skip_not)
+	ఒకవేళ (cctx->ctx_skip == SKIP_YES && !scope->se_u.se_if.is_చూసిన_skip_not)
 	{
 	    // the previous block was not executed, this one will, do count the
 	    // "else" for profiling
 	    cctx->ctx_skip = SKIP_NOT;
-	    generate_instr(cctx, ISN_PROF_END);
-	    generate_instr(cctx, ISN_PROF_START);
+	    generate_instr(cctx, ISN_PROF_చివర);
+	    generate_instr(cctx, ISN_PROF_ప్రారంభం);
 	    cctx->ctx_skip = SKIP_YES;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    if (!scope->se_u.se_if.is_seen_skip_not && scope->se_skip_save != SKIP_YES)
+    ఒకవేళ (!scope->se_u.se_if.is_చూసిన_skip_not && scope->se_skip_save != SKIP_YES)
     {
 	// jump from previous block to the end, unless the else block is empty
-	if (cctx->ctx_skip == SKIP_UNKNOWN)
+	ఒకవేళ (cctx->ctx_skip == SKIP_UNKNOWN)
 	{
-	    if (!cctx->ctx_had_return
-		    && compile_jump_to_end(&scope->se_u.se_if.is_end_label,
+	    ఒకవేళ (!cctx->ctx_had_return
+		    && compile_jump_గమ్యం_చివర(&scope->se_u.se_if.is_చివర_label,
 						 JUMP_ALWAYS, 0, cctx) == FAIL)
-		return NULL;
+		తిరిగి ఖాళీ;
 	}
 
-	if (cctx->ctx_skip == SKIP_UNKNOWN)
+	ఒకవేళ (cctx->ctx_skip == SKIP_UNKNOWN)
 	{
-	    if (scope->se_u.se_if.is_if_label >= 0)
+	    ఒకవేళ (scope->se_u.se_if.is_if_label >= 0)
 	    {
 		// previous "if" or "elseif" jumps here
-		isn = ((isn_T *)instr->ga_data) + scope->se_u.se_if.is_if_label;
+		isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_if.is_if_label;
 		isn->isn_arg.jump.jump_where = instr->ga_len;
 		scope->se_u.se_if.is_if_label = -1;
 	    }
 	}
 
-	if (cctx->ctx_skip != SKIP_UNKNOWN)
+	ఒకవేళ (cctx->ctx_skip != SKIP_UNKNOWN)
 	    cctx->ctx_skip = cctx->ctx_skip == SKIP_YES ? SKIP_NOT : SKIP_YES;
     }
 
-    return p;
+    తిరిగి p;
 }
 
     char_u *
@@ -827,93 +827,93 @@ compile_endif(char_u *arg, cctx_T *cctx)
     garray_T	*instr = &cctx->ctx_instr;
     isn_T	*isn;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
-    if (scope == NULL || scope->se_type != IF_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != IF_SCOPE)
     {
 	emsg(_(e_endif_without_if));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     ifscope = &scope->se_u.se_if;
-    unwind_locals(cctx, scope->se_local_count, TRUE);
-    if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
+    unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
+    ఒకవేళ (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
 	ifscope->is_had_return = FALSE;
 
-    if (scope->se_u.se_if.is_if_label >= 0)
+    ఒకవేళ (scope->se_u.se_if.is_if_label >= 0)
     {
 	// previous "if" or "elseif" jumps here
-	isn = ((isn_T *)instr->ga_data) + scope->se_u.se_if.is_if_label;
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_if.is_if_label;
 	isn->isn_arg.jump.jump_where = instr->ga_len;
     }
     // Fill in the "end" label in jumps at the end of the blocks.
-    compile_fill_jump_to_end(&ifscope->is_end_label, instr->ga_len, cctx);
+    compile_fill_jump_గమ్యం_చివర(&ifscope->is_చివర_label, instr->ga_len, cctx);
 
-#ifdef FEAT_PROFILE
+#నిర్వచితమైతే FEAT_PROFILE
     // even when skipping we count the endif as executed, unless the block it's
     // in is skipped
-    if (cctx->ctx_compile_type == CT_PROFILE && cctx->ctx_skip == SKIP_YES
+    ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE && cctx->ctx_skip == SKIP_YES
 					    && scope->se_skip_save != SKIP_YES)
     {
 	cctx->ctx_skip = SKIP_NOT;
-	generate_instr(cctx, ISN_PROF_START);
+	generate_instr(cctx, ISN_PROF_ప్రారంభం);
     }
-#endif
+#అయితే_ముగింపు
     cctx->ctx_skip = scope->se_skip_save;
 
     // If all the blocks end in :return and there is an :else then the
     // had_return flag is set.
-    cctx->ctx_had_return = ifscope->is_had_return && ifscope->is_seen_else;
+    cctx->ctx_had_return = ifscope->is_had_return && ifscope->is_చూసిన_else;
 
     drop_scope(cctx);
-    return arg;
+    తిరిగి arg;
 }
 
 /*
  * Save the info needed for ENDLOOP.  Used by :for and :while.
  */
-    static void
-compile_fill_loop_info(loop_info_T *loop_info, int funcref_idx, cctx_T *cctx)
+    స్థిర శూన్య
+compile_fill_loop_info(loop_info_T *loop_info, పూర్ణాంకం funcref_idx, cctx_T *cctx)
 {
     loop_info->li_funcref_idx = funcref_idx;
-    loop_info->li_local_count = cctx->ctx_locals.ga_len;
-    loop_info->li_closure_count = cctx->ctx_closure_count;
+    loop_info->li_local_లెక్క = cctx->ctx_locals.ga_len;
+    loop_info->li_సంవృతం_లెక్క = cctx->ctx_సంవృతం_లెక్క;
 }
 
 /*
  * When compiling a for loop to iterate over a tuple, get the type of the loop
  * variable to use.
  */
-    static type_T *
-compile_for_tuple_get_vartype(type_T *vartype, int var_list)
+    స్థిర type_T *
+compile_for_tuple_get_vartype(type_T *vartype, పూర్ణాంకం var_list)
 {
     // If this is not a variadic tuple, or all the tuple items don't have
     // the same type, then use t_any
-    if (!(vartype->tt_flags & TTFLAG_VARARGS) || vartype->tt_argcount != 1)
-	return &t_any;
+    ఒకవేళ (!(vartype->tt_flags & TTFLAG_VARARGS) || vartype->tt_argcount != 1)
+	తిరిగి &t_any;
 
     // variadic tuple
-    type_T *member_type = vartype->tt_args[0]->tt_member;
-    if (member_type->tt_type == VAR_ANY)
-	return &t_any;
+    type_T *member_type = vartype->tt_వాదనలు[0]->tt_member;
+    ఒకవేళ (member_type->tt_type == VAR_ANY)
+	తిరిగి &t_any;
 
-    if (!var_list)
+    ఒకవేళ (!var_list)
 	// for x in tuple<...list<xxx>>
-	return member_type;
+	తిరిగి member_type;
 
-    if (member_type->tt_type == VAR_LIST
+    ఒకవేళ (member_type->tt_type == VAR_LIST
 	    && member_type->tt_member->tt_type != VAR_ANY)
 	// for [x, y] in tuple<...list<list<xxx>>>
-	return member_type->tt_member;
-    else if (member_type->tt_type == VAR_TUPLE
+	తిరిగి member_type->tt_member;
+    లేకపోతే ఒకవేళ (member_type->tt_type == VAR_TUPLE
 				&& member_type->tt_flags & TTFLAG_VARARGS
 				&& member_type->tt_argcount == 1)
 	// for [x, y] in tuple<...list<tuple<...list<xxx>>>>
-	return member_type->tt_args[0]->tt_member;
+	తిరిగి member_type->tt_వాదనలు[0]->tt_member;
 
-    return &t_any;
+    తిరిగి &t_any;
 }
 
 /*
@@ -938,82 +938,82 @@ compile_for_tuple_get_vartype(type_T *vartype, int var_list)
  *       STORE var2		Store item in "var2"
  */
     char_u *
-compile_for(char_u *arg_start, cctx_T *cctx)
+compile_for(char_u *arg_ప్రారంభం, cctx_T *cctx)
 {
     char_u	*arg;
-    char_u	*arg_end;
-    char_u	*name = NULL;
+    char_u	*arg_చివర;
+    char_u	*name = ఖాళీ;
     char_u	*p;
     char_u	*wp;
-    int		var_count = 0;
-    int		var_list = FALSE;
-    int		semicolon = FALSE;
+    పూర్ణాంకం		var_లెక్క = 0;
+    పూర్ణాంకం		var_list = FALSE;
+    పూర్ణాంకం		semicolon = FALSE;
     size_t	varlen;
     garray_T	*instr = &cctx->ctx_instr;
     scope_T	*scope;
     forscope_T	*forscope;
     lvar_T	*loop_lvar;	// loop iteration variable
-    int		loop_lvar_idx;
+    పూర్ణాంకం		loop_lvar_idx;
     lvar_T	*funcref_lvar;
-    int		funcref_lvar_idx;
+    పూర్ణాంకం		funcref_lvar_idx;
     lvar_T	*var_lvar;	// variable for "var"
     type_T	*vartype;
-    type_T	*item_type = &t_any;
-    int		idx;
-    int		prev_lnum = cctx->ctx_prev_lnum;
+    type_T	*అంశం_type = &t_any;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		prev_lnum = cctx->ctx_prev_lnum;
 
-    p = skip_var_list(arg_start, TRUE, &var_count, &semicolon, FALSE);
-    if (p == NULL)
-	return NULL;
-    if (var_count == 0)
-	var_count = 1;
-    else
+    p = skip_var_list(arg_ప్రారంభం, TRUE, &var_లెక్క, &semicolon, FALSE);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (var_లెక్క == 0)
+	var_లెక్క = 1;
+    లేకపోతే
 	var_list = TRUE;  // can also be a list of one variable
 
     // consume "in"
     wp = p;
-    if (may_get_next_line_error(wp, &p, cctx) == FAIL)
-	return NULL;
-    if (STRNCMP(p, "in", 2) != 0 || !IS_WHITE_OR_NUL(p[2]))
+    ఒకవేళ (may_get_తదుపరి_పంక్తి_error(wp, &p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (STRNCMP(p, "in", 2) != 0 || !IS_WHITE_OR_NUL(p[2]))
     {
-	if (*p == ':' && wp != p)
+	ఒకవేళ (*p == ':' && wp != p)
 	    semsg(_(e_no_white_space_allowed_before_colon_str), p);
-	else
-	    emsg(_(e_missing_in_after_for));
-	return NULL;
+	లేకపోతే
+	    emsg(_(e_missing_లోపల_after_for));
+	తిరిగి ఖాళీ;
     }
     wp = p + 2;
-    if (may_get_next_line_error(wp, &p, cctx) == FAIL)
-	return NULL;
+    ఒకవేళ (may_get_తదుపరి_పంక్తి_error(wp, &p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
 
     // Find the already generated ISN_DEBUG to get the line number for the
     // instruction written below the ISN_FOR instruction.
-    if (cctx->ctx_compile_type == CT_DEBUG && instr->ga_len > 0
-	    && ((isn_T *)instr->ga_data)[instr->ga_len - 1]
+    ఒకవేళ (cctx->ctx_compile_type == CT_DEBUG && instr->ga_len > 0
+	    && ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
 							.isn_type == ISN_DEBUG)
     {
-	prev_lnum = ((isn_T *)instr->ga_data)[instr->ga_len - 1]
+	prev_lnum = ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
 						 .isn_arg.debug.dbg_break_lnum;
     }
 
     scope = new_scope(cctx, FOR_SCOPE);
-    if (scope == NULL)
-	return NULL;
-    if (scope->se_loop_depth == MAX_LOOP_DEPTH)
+    ఒకవేళ (scope == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (scope->se_loop_లోతు == MAX_LOOP_లోతు)
     {
 	emsg(_(e_loop_nesting_too_deep));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    ++scope->se_loop_depth;
+    ++scope->se_loop_లోతు;
     forscope = &scope->se_u.se_for;
 
     // Reserve a variable to store the loop iteration counter and initialize it
     // to -1.
-    loop_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
-    if (loop_lvar == NULL)
+    loop_lvar = reserve_local(cctx, (char_u *)"", 0, కేటాయించు_VAR, &t_సంఖ్య);
+    ఒకవేళ (loop_lvar == ఖాళీ)
     {
 	drop_scope(cctx);
-	return NULL;  // out of memory
+	తిరిగి ఖాళీ;  // out of memory
     }
     // get the index before a following reserve_local() makes the lval invalid
     loop_lvar_idx = loop_lvar->lv_idx;
@@ -1022,30 +1022,30 @@ compile_for(char_u *arg_start, cctx_T *cctx)
     // Reserve a variable to store ec_funcrefs.ga_len, used in ISN_ENDLOOP.
     // The variable index is always the loop var index plus one.
     // It is not used when no closures are encountered, we don't know yet.
-    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
-    if (funcref_lvar == NULL)
+    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, కేటాయించు_VAR, &t_సంఖ్య);
+    ఒకవేళ (funcref_lvar == ఖాళీ)
     {
 	drop_scope(cctx);
-	return NULL;  // out of memory
+	తిరిగి ఖాళీ;  // out of memory
     }
     // get the index before a following reserve_local() makes the lval invalid
     funcref_lvar_idx = funcref_lvar->lv_idx;
 
     // compile "expr", it remains on the stack until "endfor"
     arg = p;
-    if (compile_expr0(&arg, cctx) == FAIL)
+    ఒకవేళ (compile_expr0(&arg, cctx) == FAIL)
     {
 	drop_scope(cctx);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    arg_end = arg;
+    arg_చివర = arg;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	// If we know the type of "var" and it is not a supported type we can
 	// give an error now.
-	vartype = get_type_on_stack(cctx, 0);
-	if (vartype->tt_type != VAR_LIST
+	vartype = get_type_on_దొంతర(cctx, 0);
+	ఒకవేళ (vartype->tt_type != VAR_LIST
 		&& vartype->tt_type != VAR_TUPLE
 		&& vartype->tt_type != VAR_STRING
 		&& vartype->tt_type != VAR_BLOB
@@ -1055,34 +1055,34 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	    semsg(_(e_for_loop_on_str_not_supported),
 					       vartype_name(vartype->tt_type));
 	    drop_scope(cctx);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	if (vartype->tt_type == VAR_STRING)
-	    item_type = &t_string;
-	else if (vartype->tt_type == VAR_BLOB)
-	    item_type = &t_number;
-	else if (vartype->tt_type == VAR_LIST
+	ఒకవేళ (vartype->tt_type == VAR_STRING)
+	    అంశం_type = &t_string;
+	లేకపోతే ఒకవేళ (vartype->tt_type == VAR_BLOB)
+	    అంశం_type = &t_సంఖ్య;
+	లేకపోతే ఒకవేళ (vartype->tt_type == VAR_LIST
 				     && vartype->tt_member->tt_type != VAR_ANY)
 	{
-	    if (!var_list)
-		item_type = vartype->tt_member;
-	    else if (vartype->tt_member->tt_type == VAR_LIST
+	    ఒకవేళ (!var_list)
+		అంశం_type = vartype->tt_member;
+	    లేకపోతే ఒకవేళ (vartype->tt_member->tt_type == VAR_LIST
 			  && vartype->tt_member->tt_member->tt_type != VAR_ANY)
-		item_type = vartype->tt_member->tt_member;
+		అంశం_type = vartype->tt_member->tt_member;
 	}
-	else if (vartype->tt_type == VAR_TUPLE)
-	    item_type = compile_for_tuple_get_vartype(vartype, var_list);
+	లేకపోతే ఒకవేళ (vartype->tt_type == VAR_TUPLE)
+	    అంశం_type = compile_for_tuple_get_vartype(vartype, var_list);
 
 	// CMDMOD_REV must come before the FOR instruction.
 	generate_undo_cmdmods(cctx);
 
 	// "for_end" is set when ":endfor" is found
-	forscope->fs_top_label = current_instr_idx(cctx);
+	forscope->fs_శిఖరం_label = current_instr_idx(cctx);
 
-	if (cctx->ctx_compile_type == CT_DEBUG)
+	ఒకవేళ (cctx->ctx_compile_type == CT_DEBUG)
 	{
-	    int		save_prev_lnum = cctx->ctx_prev_lnum;
+	    పూర్ణాంకం		save_prev_lnum = cctx->ctx_prev_lnum;
 	    isn_T	*isn;
 
 	    // Add ISN_DEBUG here, before deciding to end the loop.  There will
@@ -1092,39 +1092,39 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	    // inspected.
 	    cctx->ctx_prev_lnum = prev_lnum;
 	    isn = generate_instr_debug(cctx);
-	    ++isn->isn_arg.debug.dbg_var_names_len;
+	    ++isn->isn_arg.debug.dbg_var_పేర్లు_len;
 	    cctx->ctx_prev_lnum = save_prev_lnum;
 	}
 
 	generate_FOR(cctx, loop_lvar_idx);
 
-	arg = arg_start;
-	if (var_list)
+	arg = arg_ప్రారంభం;
+	ఒకవేళ (var_list)
 	{
-	    generate_UNPACK(cctx, var_count, semicolon);
+	    generate_UNPACK(cctx, var_లెక్క, semicolon);
 	    arg = skipwhite(arg + 1);	// skip white after '['
 
 	    // drop the list item
-	    --cctx->ctx_type_stack.ga_len;
+	    --cctx->ctx_type_దొంతర.ga_len;
 
 	    // add type of the items
-	    for (idx = 0; idx < var_count; ++idx)
+	    కొరకు (idx = 0; idx < var_లెక్క; ++idx)
 	    {
-		type_T *type = (semicolon && idx == 0) ? vartype : item_type;
+		type_T *type = (semicolon && idx == 0) ? vartype : అంశం_type;
 
-		if (push_type_stack(cctx, type) == FAIL)
+		ఒకవేళ (నెట్టు_type_దొంతర(cctx, type) == FAIL)
 		{
 		    drop_scope(cctx);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 	    }
 	}
 
-	for (idx = 0; idx < var_count; ++idx)
+	కొరకు (idx = 0; idx < var_లెక్క; ++idx)
 	{
-	    assign_dest_T	dest = dest_local;
-	    int			opt_flags = 0;
-	    int			vimvaridx = -1;
+	    కేటాయించు_dest_T	dest = dest_local;
+	    పూర్ణాంకం			opt_flags = 0;
+	    పూర్ణాంకం			vimvaridx = -1;
 	    type_T		*type = &t_any;
 	    type_T		*lhs_type = &t_any;
 	    where_T		where = WHERE_INIT;
@@ -1132,78 +1132,78 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	    p = skip_var_one(arg, FALSE);
 	    varlen = p - arg;
 	    name = vim_strnsave(arg, varlen);
-	    if (name == NULL)
-		goto failed;
-	    if (*skipwhite(p) == ':')
+	    ఒకవేళ (name == ఖాళీ)
+		వెళ్ళు failed;
+	    ఒకవేళ (*skipwhite(p) == ':')
 	    {
-		if (VIM_ISWHITE(*p))
+		ఒకవేళ (VIM_ISWHITE(*p))
 		{
 		    semsg(_(e_no_white_space_allowed_before_colon_str), p);
-		    goto failed;
+		    వెళ్ళు failed;
 		}
 		p = skipwhite(p + 1);
 		lhs_type = parse_type(&p, cctx->ctx_type_list, cctx->ctx_ufunc,
 								cctx, TRUE);
-		if (lhs_type == NULL || !valid_declaration_type(lhs_type))
-		    goto failed;
+		ఒకవేళ (lhs_type == ఖాళీ || !valid_declaration_type(lhs_type))
+		    వెళ్ళు failed;
 	    }
 
-	    if (get_var_dest(name, &dest, CMD_for, FALSE, &opt_flags,
+	    ఒకవేళ (get_var_dest(name, &dest, CMD_for, FALSE, &opt_flags,
 					      &vimvaridx, &type, cctx) == FAIL)
-		goto failed;
-	    if (dest != dest_local)
+		వెళ్ళు failed;
+	    ఒకవేళ (dest != dest_local)
 	    {
-		if (generate_store_var(cctx, dest, opt_flags, vimvaridx,
-						     type, name, NULL) == FAIL)
-		    goto failed;
+		ఒకవేళ (generate_store_var(cctx, dest, opt_flags, vimvaridx,
+						     type, name, ఖాళీ) == FAIL)
+		    వెళ్ళు failed;
 	    }
-	    else if (varlen == 1 && *arg == '_')
+	    లేకపోతే ఒకవేళ (varlen == 1 && *arg == '_')
 	    {
 		// Assigning to "_": drop the value.
-		if (generate_instr_drop(cctx, ISN_DROP, 1) == NULL)
-		    goto failed;
+		ఒకవేళ (generate_instr_drop(cctx, ISN_DROP, 1) == ఖాళీ)
+		    వెళ్ళు failed;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Script var is not supported.
-		if (STRNCMP(name, "s:", 2) == 0)
+		ఒకవేళ (STRNCMP(name, "s:", 2) == 0)
 		{
-		    emsg(_(e_cannot_use_script_variable_in_for_loop));
-		    goto failed;
+		    emsg(_(e_cannot_use_script_variable_లోపల_for_loop));
+		    వెళ్ళు failed;
 		}
 
-		if (!valid_varname(arg, (int)varlen, FALSE))
-		    goto failed;
-		if (lookup_local(arg, varlen, NULL, cctx) == OK)
+		ఒకవేళ (!valid_varname(arg, (పూర్ణాంకం)varlen, FALSE))
+		    వెళ్ళు failed;
+		ఒకవేళ (lookup_local(arg, varlen, ఖాళీ, cctx) == OK)
 		{
 		    semsg(_(e_variable_already_declared_str), arg);
-		    goto failed;
+		    వెళ్ళు failed;
 		}
 
 		// Reserve a variable to store "var".
-		if (var_list)
+		ఒకవేళ (var_list)
 		{
-		    where.wt_index = idx + 1;
-		    where.wt_kind = WT_VARIABLE;
+		    where.wt_సూచీ = idx + 1;
+		    where.wt_రకం = WT_VARIABLE;
 		}
-		if (lhs_type == &t_any)
-		    lhs_type = item_type;
-		else if (item_type != &t_unknown
-			&& need_type_where(item_type, lhs_type, 0, -1,
+		ఒకవేళ (lhs_type == &t_any)
+		    lhs_type = అంశం_type;
+		లేకపోతే ఒకవేళ (అంశం_type != &t_unknown
+			&& need_type_where(అంశం_type, lhs_type, 0, -1,
 					    where, cctx, FALSE, FALSE) == FAIL)
-		    goto failed;
-		var_lvar = reserve_local(cctx, arg, varlen, ASSIGN_FINAL,
+		    వెళ్ళు failed;
+		var_lvar = reserve_local(cctx, arg, varlen, కేటాయించు_FINAL,
 								     lhs_type);
-		if (var_lvar == NULL)
+		ఒకవేళ (var_lvar == ఖాళీ)
 		    // out of memory or used as an argument
-		    goto failed;
+		    వెళ్ళు failed;
 
-		if (semicolon && idx == var_count - 1)
+		ఒకవేళ (semicolon && idx == var_లెక్క - 1)
 		    var_lvar->lv_type = vartype;
-		generate_STORE(cctx, ISN_STORE, var_lvar->lv_idx, NULL);
+		generate_STORE(cctx, ISN_STORE, var_lvar->lv_idx, ఖాళీ);
 	    }
 
-	    if (*p == ',' || *p == ';')
+	    ఒకవేళ (*p == ',' || *p == ';')
 		++p;
 	    arg = skipwhite(p);
 	    vim_free(name);
@@ -1211,15 +1211,15 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 
 	// remember the number of variables and closures, used for ENDLOOP
 	compile_fill_loop_info(&forscope->fs_loop_info, funcref_lvar_idx, cctx);
-	forscope->fs_loop_info.li_depth = scope->se_loop_depth - 1;
+	forscope->fs_loop_info.li_లోతు = scope->se_loop_లోతు - 1;
     }
 
-    return arg_end;
+    తిరిగి arg_చివర;
 
 failed:
     vim_free(name);
     drop_scope(cctx);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -1227,13 +1227,13 @@ failed:
  * instruction if any variable was declared that could be used by a new
  * closure.
  */
-    static int
-compile_loop_end(loop_info_T *loop_info, cctx_T *cctx)
+    స్థిర పూర్ణాంకం
+compile_loop_చివర(loop_info_T *loop_info, cctx_T *cctx)
 {
-    if (cctx->ctx_locals.ga_len > loop_info->li_local_count
-	    && cctx->ctx_closure_count > loop_info->li_closure_count)
-	return generate_ENDLOOP(cctx, loop_info);
-    return OK;
+    ఒకవేళ (cctx->ctx_locals.ga_len > loop_info->li_local_లెక్క
+	    && cctx->ctx_సంవృతం_లెక్క > loop_info->li_సంవృతం_లెక్క)
+	తిరిగి generate_ENDLOOP(cctx, loop_info);
+    తిరిగి OK;
 }
 
 /*
@@ -1247,45 +1247,45 @@ compile_endfor(char_u *arg, cctx_T *cctx)
     forscope_T	*forscope;
     isn_T	*isn;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
-    if (scope == NULL || scope->se_type != FOR_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != FOR_SCOPE)
     {
 	emsg(_(e_endfor_without_for));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     forscope = &scope->se_u.se_for;
     cctx->ctx_scope = scope->se_outer;
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	// Handle the case that any local variables were declared that might be
 	// used in a closure.
-	if (compile_loop_end(&forscope->fs_loop_info, cctx) == FAIL)
-	    return NULL;
+	ఒకవేళ (compile_loop_చివర(&forscope->fs_loop_info, cctx) == FAIL)
+	    తిరిగి ఖాళీ;
 
-	unwind_locals(cctx, scope->se_local_count, TRUE);
+	unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
 
 	// At end of ":for" scope jump back to the FOR instruction.
-	generate_JUMP(cctx, JUMP_ALWAYS, forscope->fs_top_label);
+	generate_JUMP(cctx, JUMP_ALWAYS, forscope->fs_శిఖరం_label);
 
 	// Fill in the "end" label in the FOR statement so it can jump here.
 	// In debug mode an ISN_DEBUG was inserted.
-	isn = ((isn_T *)instr->ga_data) + forscope->fs_top_label
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + forscope->fs_శిఖరం_label
 				+ (cctx->ctx_compile_type == CT_DEBUG ? 1 : 0);
-	isn->isn_arg.forloop.for_end = instr->ga_len;
+	isn->isn_arg.forloop.for_చివర = instr->ga_len;
 
 	// Fill in the "end" label any BREAK statements
-	compile_fill_jump_to_end(&forscope->fs_end_label, instr->ga_len, cctx);
+	compile_fill_jump_గమ్యం_చివర(&forscope->fs_చివర_label, instr->ga_len, cctx);
 
 	// Below the ":for" scope drop the "expr" list from the stack.
-	if (generate_instr_drop(cctx, ISN_DROP, 1) == NULL)
-	    return NULL;
+	ఒకవేళ (generate_instr_drop(cctx, ISN_DROP, 1) == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
 
     vim_free(scope);
 
-    return arg;
+    తిరిగి arg;
 }
 
 /*
@@ -1307,62 +1307,62 @@ compile_while(char_u *arg, cctx_T *cctx)
     scope_T	    *scope;
     whilescope_T    *whilescope;
     lvar_T	    *funcref_lvar;
-    int		    funcref_lvar_idx;
+    పూర్ణాంకం		    funcref_lvar_idx;
 
     scope = new_scope(cctx, WHILE_SCOPE);
-    if (scope == NULL)
-	return NULL;
-    if (scope->se_loop_depth == MAX_LOOP_DEPTH)
+    ఒకవేళ (scope == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (scope->se_loop_లోతు == MAX_LOOP_లోతు)
     {
 	emsg(_(e_loop_nesting_too_deep));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    ++scope->se_loop_depth;
+    ++scope->se_loop_లోతు;
     whilescope = &scope->se_u.se_while;
 
     // "endwhile" jumps back here, one before when profiling or using cmdmods
-    whilescope->ws_top_label = current_instr_idx(cctx);
+    whilescope->ws_శిఖరం_label = current_instr_idx(cctx);
 
     // Reserve a variable to store ec_funcrefs.ga_len, used in ISN_ENDLOOP.
     // It is not used when no closures are encountered, we don't know yet.
-    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
-    if (funcref_lvar == NULL)
+    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, కేటాయించు_VAR, &t_సంఖ్య);
+    ఒకవేళ (funcref_lvar == ఖాళీ)
     {
 	drop_scope(cctx);
-	return NULL;  // out of memory
+	తిరిగి ఖాళీ;  // out of memory
     }
     // get the index before a following reserve_local() makes the lval invalid
     funcref_lvar_idx = funcref_lvar->lv_idx;
 
     // remember the number of variables and closures, used for ENDLOOP
     compile_fill_loop_info(&whilescope->ws_loop_info, funcref_lvar_idx, cctx);
-    whilescope->ws_loop_info.li_depth = scope->se_loop_depth - 1;
+    whilescope->ws_loop_info.li_లోతు = scope->se_loop_లోతు - 1;
 
     // compile "expr"
-    if (compile_expr0(&p, cctx) == FAIL)
-	return NULL;
+    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
 
-    if (!ends_excmd2(arg, skipwhite(p)))
+    ఒకవేళ (!చివర్లు_excmd2(arg, skipwhite(p)))
     {
 	semsg(_(e_trailing_characters_str), p);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
-	if (bool_on_stack(cctx) == FAIL)
-	    return FAIL;
+	ఒకవేళ (bool_on_దొంతర(cctx) == FAIL)
+	    తిరిగి FAIL;
 
 	// CMDMOD_REV must come before the jump
 	generate_undo_cmdmods(cctx);
 
 	// "while_end" is set when ":endwhile" is found
-	if (compile_jump_to_end(&whilescope->ws_end_label,
+	ఒకవేళ (compile_jump_గమ్యం_చివర(&whilescope->ws_చివర_label,
 			     JUMP_WHILE_FALSE, funcref_lvar_idx, cctx) == FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
     }
 
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -1374,121 +1374,121 @@ compile_endwhile(char_u *arg, cctx_T *cctx)
     scope_T	*scope = cctx->ctx_scope;
     garray_T	*instr = &cctx->ctx_instr;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
-    if (scope == NULL || scope->se_type != WHILE_SCOPE)
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != WHILE_SCOPE)
     {
 	emsg(_(e_endwhile_without_while));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     cctx->ctx_scope = scope->se_outer;
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	whilescope_T	*whilescope = &scope->se_u.se_while;
 
 	// Handle the case that any local variables were declared that might be
 	// used in a closure.
-	if (compile_loop_end(&whilescope->ws_loop_info, cctx) == FAIL)
-	    return NULL;
+	ఒకవేళ (compile_loop_చివర(&whilescope->ws_loop_info, cctx) == FAIL)
+	    తిరిగి ఖాళీ;
 
-	unwind_locals(cctx, scope->se_local_count, TRUE);
+	unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
 
-#ifdef FEAT_PROFILE
+#నిర్వచితమైతే FEAT_PROFILE
 	// count the endwhile before jumping
-	may_generate_prof_end(cctx, cctx->ctx_lnum);
-#endif
+	may_generate_prof_చివర(cctx, cctx->ctx_lnum);
+#అయితే_ముగింపు
 
 	// At end of ":for" scope jump back to the FOR instruction.
-	generate_JUMP(cctx, JUMP_ALWAYS, scope->se_u.se_while.ws_top_label);
+	generate_JUMP(cctx, JUMP_ALWAYS, scope->se_u.se_while.ws_శిఖరం_label);
 
 	// Fill in the "end" label in the WHILE statement so it can jump here.
 	// And in any jumps for ":break"
-	compile_fill_jump_to_end(&scope->se_u.se_while.ws_end_label,
+	compile_fill_jump_గమ్యం_చివర(&scope->se_u.se_while.ws_చివర_label,
 							  instr->ga_len, cctx);
     }
 
     vim_free(scope);
 
-    return arg;
+    తిరిగి arg;
 }
 
 /*
  * Get the current information about variables declared inside a loop.
  * Returns TRUE if there are any and fills "lvi".
  */
-    int
+    పూర్ణాంకం
 get_loop_var_info(cctx_T *cctx, loopvarinfo_T *lvi)
 {
     scope_T	*scope = cctx->ctx_scope;
-    int		prev_local_count = 0;
+    పూర్ణాంకం		prev_local_లెక్క = 0;
 
-    CLEAR_POINTER(lvi);
-    for (;;)
+    CLEAR_సూచిక(lvi);
+    కొరకు (;;)
     {
 	loop_info_T	*loopinfo;
-	int		cur_local_last;
-	int		start_local_count;
+	పూర్ణాంకం		cur_local_చివరి;
+	పూర్ణాంకం		ప్రారంభం_local_లెక్క;
 
-	while (scope != NULL && scope->se_type != WHILE_SCOPE
+	అయితే (scope != ఖాళీ && scope->se_type != WHILE_SCOPE
 						&& scope->se_type != FOR_SCOPE)
 	    scope = scope->se_outer;
-	if (scope == NULL)
-	    break;
+	ఒకవేళ (scope == ఖాళీ)
+	    ఆపు;
 
-	if (scope->se_type == WHILE_SCOPE)
+	ఒకవేళ (scope->se_type == WHILE_SCOPE)
 	{
 	    loopinfo = &scope->se_u.se_while.ws_loop_info;
 	    // :while reserves one variable for funcref count
-	    cur_local_last = loopinfo->li_local_count - 1;
+	    cur_local_చివరి = loopinfo->li_local_లెక్క - 1;
 	}
-	else
+	లేకపోతే
 	{
 	    loopinfo = &scope->se_u.se_for.fs_loop_info;
 	    // :for reserves three variable: loop count, funcref count and loop
 	    // var
-	    cur_local_last = loopinfo->li_local_count - 3;
+	    cur_local_చివరి = loopinfo->li_local_లెక్క - 3;
 	}
 
-	start_local_count = loopinfo->li_local_count;
-	if (cctx->ctx_locals.ga_len > start_local_count)
+	ప్రారంభం_local_లెక్క = loopinfo->li_local_లెక్క;
+	ఒకవేళ (cctx->ctx_locals.ga_len > ప్రారంభం_local_లెక్క)
 	{
-	    lvi->lvi_loop[loopinfo->li_depth].var_idx =
-						      (short)start_local_count;
-	    lvi->lvi_loop[loopinfo->li_depth].var_count =
-			  (short)(cctx->ctx_locals.ga_len - start_local_count
-							   - prev_local_count);
-	    if (lvi->lvi_depth == 0)
-		lvi->lvi_depth = loopinfo->li_depth + 1;
+	    lvi->lvi_loop[loopinfo->li_లోతు].var_idx =
+						      (పొట్టి)ప్రారంభం_local_లెక్క;
+	    lvi->lvi_loop[loopinfo->li_లోతు].var_లెక్క =
+			  (పొట్టి)(cctx->ctx_locals.ga_len - ప్రారంభం_local_లెక్క
+							   - prev_local_లెక్క);
+	    ఒకవేళ (lvi->lvi_లోతు == 0)
+		lvi->lvi_లోతు = loopinfo->li_లోతు + 1;
 	}
 
 	scope = scope->se_outer;
-	prev_local_count = cctx->ctx_locals.ga_len - cur_local_last;
+	prev_local_లెక్క = cctx->ctx_locals.ga_len - cur_local_చివరి;
     }
-    return lvi->lvi_depth > 0;
+    తిరిగి lvi->lvi_లోతు > 0;
 }
 
 /*
  * Get the index of the variable "idx" in a loop, if any.
  */
-    void
-get_loop_var_idx(cctx_T *cctx, int idx, lvar_T *lvar)
+    శూన్య
+get_loop_var_idx(cctx_T *cctx, పూర్ణాంకం idx, lvar_T *lvar)
 {
     loopvarinfo_T lvi;
 
-    lvar->lv_loop_depth = -1;
+    lvar->lv_loop_లోతు = -1;
     lvar->lv_loop_idx = -1;
-    if (get_loop_var_info(cctx, &lvi))
+    ఒకవేళ (get_loop_var_info(cctx, &lvi))
     {
-	int depth;
+	పూర్ణాంకం లోతు;
 
-	for (depth = lvi.lvi_depth - 1; depth >= 0; --depth)
-	    if (idx >= lvi.lvi_loop[depth].var_idx
-		    && idx < lvi.lvi_loop[depth].var_idx
-					       + lvi.lvi_loop[depth].var_count)
+	కొరకు (లోతు = lvi.lvi_లోతు - 1; లోతు >= 0; --లోతు)
+	    ఒకవేళ (idx >= lvi.lvi_loop[లోతు].var_idx
+		    && idx < lvi.lvi_loop[లోతు].var_idx
+					       + lvi.lvi_loop[లోతు].var_లెక్క)
 	    {
-		lvar->lv_loop_depth = depth;
-		lvar->lv_loop_idx = lvi.lvi_loop[depth].var_idx;
-		return;
+		lvar->lv_loop_లోతు = లోతు;
+		lvar->lv_loop_idx = lvi.lvi_loop[లోతు].var_idx;
+		తిరిగి;
 	    }
     }
 }
@@ -1496,51 +1496,51 @@ get_loop_var_idx(cctx_T *cctx, int idx, lvar_T *lvar)
 /*
  * Common for :break, :continue and :return
  */
-    static int
-compile_find_scope(
-	int	    *loop_label,    // where to jump to or NULL
+    స్థిర పూర్ణాంకం
+compile_కనుగొను_scope(
+	పూర్ణాంకం	    *loop_label,    // where to jump to or NULL
 	endlabel_T  ***el,	    // end label or NULL
-	int	    *try_scopes,    // :try scopes encountered or NULL
-	char	    *error,	    // error to use when no scope found
+	పూర్ణాంకం	    *try_scopes,    // :try scopes encountered or NULL
+	అక్షరం	    *error,	    // error to use when no scope found
 	cctx_T	    *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (scope == NULL)
+	ఒకవేళ (scope == ఖాళీ)
 	{
-	    if (error != NULL)
+	    ఒకవేళ (error != ఖాళీ)
 		emsg(_(error));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (scope->se_type == FOR_SCOPE)
+	ఒకవేళ (scope->se_type == FOR_SCOPE)
 	{
-	    if (compile_loop_end(&scope->se_u.se_for.fs_loop_info, cctx)
+	    ఒకవేళ (compile_loop_చివర(&scope->se_u.se_for.fs_loop_info, cctx)
 								       == FAIL)
-		return FAIL;
-	    if (loop_label != NULL)
-		*loop_label = scope->se_u.se_for.fs_top_label;
-	    if (el != NULL)
-		*el = &scope->se_u.se_for.fs_end_label;
-	    break;
+		తిరిగి FAIL;
+	    ఒకవేళ (loop_label != ఖాళీ)
+		*loop_label = scope->se_u.se_for.fs_శిఖరం_label;
+	    ఒకవేళ (el != ఖాళీ)
+		*el = &scope->se_u.se_for.fs_చివర_label;
+	    ఆపు;
 	}
-	if (scope->se_type == WHILE_SCOPE)
+	ఒకవేళ (scope->se_type == WHILE_SCOPE)
 	{
-	    if (compile_loop_end(&scope->se_u.se_while.ws_loop_info, cctx)
+	    ఒకవేళ (compile_loop_చివర(&scope->se_u.se_while.ws_loop_info, cctx)
 								       == FAIL)
-		return FAIL;
-	    if (loop_label != NULL)
-		*loop_label = scope->se_u.se_while.ws_top_label;
-	    if (el != NULL)
-		*el = &scope->se_u.se_while.ws_end_label;
-	    break;
+		తిరిగి FAIL;
+	    ఒకవేళ (loop_label != ఖాళీ)
+		*loop_label = scope->se_u.se_while.ws_శిఖరం_label;
+	    ఒకవేళ (el != ఖాళీ)
+		*el = &scope->se_u.se_while.ws_చివర_label;
+	    ఆపు;
 	}
-	if (try_scopes != NULL && scope->se_type == TRY_SCOPE)
+	ఒకవేళ (try_scopes != ఖాళీ && scope->se_type == TRY_SCOPE)
 	    ++*try_scopes;
 	scope = scope->se_outer;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1549,21 +1549,21 @@ compile_find_scope(
     char_u *
 compile_continue(char_u *arg, cctx_T *cctx)
 {
-    int		try_scopes = 0;
-    int		loop_label;
+    పూర్ణాంకం		try_scopes = 0;
+    పూర్ణాంకం		loop_label;
 
-    if (compile_find_scope(&loop_label, NULL, &try_scopes,
+    ఒకవేళ (compile_కనుగొను_scope(&loop_label, ఖాళీ, &try_scopes,
 				e_continue_without_while_or_for, cctx) == FAIL)
-	return NULL;
-    if (try_scopes > 0)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (try_scopes > 0)
 	// Inside one or more try/catch blocks we first need to jump to the
 	// "finally" or "endtry" to cleanup.
 	generate_TRYCONT(cctx, try_scopes, loop_label);
-    else
+    లేకపోతే
 	// Jump back to the FOR or WHILE instruction.
 	generate_JUMP(cctx, JUMP_ALWAYS, loop_label);
 
-    return arg;
+    తిరిగి arg;
 }
 
 /*
@@ -1572,17 +1572,17 @@ compile_continue(char_u *arg, cctx_T *cctx)
     char_u *
 compile_break(char_u *arg, cctx_T *cctx)
 {
-    int		try_scopes = 0;
+    పూర్ణాంకం		try_scopes = 0;
     endlabel_T	**el;
 
-    if (compile_find_scope(NULL, &el, &try_scopes,
+    ఒకవేళ (compile_కనుగొను_scope(ఖాళీ, &el, &try_scopes,
 				   e_break_without_while_or_for, cctx) == FAIL)
-	return NULL;
+	తిరిగి ఖాళీ;
 
-    if (cctx->ctx_skip == SKIP_YES)
-	return arg;
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
+	తిరిగి arg;
 
-    if (try_scopes > 0)
+    ఒకవేళ (try_scopes > 0)
 	// Inside one or more try/catch blocks we first need to jump to the
 	// "finally" or "endtry" to cleanup.  Then come to the next JUMP
 	// instruction, which we don't know the index of yet.
@@ -1590,33 +1590,33 @@ compile_break(char_u *arg, cctx_T *cctx)
 
     // Jump to the end of the FOR or WHILE loop.  The instruction index will be
     // filled in later.
-    if (compile_jump_to_end(el, JUMP_ALWAYS, 0, cctx) == FAIL)
-	return NULL;
+    ఒకవేళ (compile_jump_గమ్యం_చివర(el, JUMP_ALWAYS, 0, cctx) == FAIL)
+	తిరిగి ఖాళీ;
 
-    return arg;
+    తిరిగి arg;
 }
 
 /*
  * compile "{" start of block
  */
     char_u *
-compile_block(char_u *arg, cctx_T *cctx)
+compile_ఖండం(char_u *arg, cctx_T *cctx)
 {
-    if (new_scope(cctx, BLOCK_SCOPE) == NULL)
-	return NULL;
-    return skipwhite(arg + 1);
+    ఒకవేళ (new_scope(cctx, ఖండం_SCOPE) == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి skipwhite(arg + 1);
 }
 
 /*
  * compile end of block: drop one scope
  */
-    void
+    శూన్య
 compile_endblock(cctx_T *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
     cctx->ctx_scope = scope->se_outer;
-    unwind_locals(cctx, scope->se_local_count, TRUE);
+    unwind_locals(cctx, scope->se_local_లెక్క, TRUE);
     vim_free(scope);
 }
 
@@ -1659,15 +1659,15 @@ compile_try(char_u *arg, cctx_T *cctx)
     scope_T	*try_scope;
     scope_T	*scope;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
     // scope that holds the jumps that go to catch/finally/endtry
     try_scope = new_scope(cctx, TRY_SCOPE);
-    if (try_scope == NULL)
-	return NULL;
+    ఒకవేళ (try_scope == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	isn_T	*isn;
 
@@ -1676,19 +1676,19 @@ compile_try(char_u *arg, cctx_T *cctx)
 	// "try_finally" is set when ":finally" is found
 	// "try_endtry" is set when ":endtry" is found
 	try_scope->se_u.se_try.ts_try_label = instr->ga_len;
-	if ((isn = generate_instr(cctx, ISN_TRY)) == NULL)
-	    return NULL;
+	ఒకవేళ ((isn = generate_instr(cctx, ISN_TRY)) == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	isn->isn_arg.tryref.try_ref = ALLOC_CLEAR_ONE(tryref_T);
-	if (isn->isn_arg.tryref.try_ref == NULL)
-	    return NULL;
+	ఒకవేళ (isn->isn_arg.tryref.try_ref == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
 
     // scope for the try block itself
-    scope = new_scope(cctx, BLOCK_SCOPE);
-    if (scope == NULL)
-	return NULL;
+    scope = new_scope(cctx, ఖండం_SCOPE);
+    ఒకవేళ (scope == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    return arg;
+    తిరిగి arg;
 }
 
 /*
@@ -1702,118 +1702,118 @@ compile_catch(char_u *arg, cctx_T *cctx)
     char_u	*p;
     isn_T	*isn;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
     // end block scope from :try or :catch
-    if (scope != NULL && scope->se_type == BLOCK_SCOPE)
+    ఒకవేళ (scope != ఖాళీ && scope->se_type == ఖండం_SCOPE)
 	compile_endblock(cctx);
     scope = cctx->ctx_scope;
 
     // Error if not in a :try scope
-    if (scope == NULL || scope->se_type != TRY_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != TRY_SCOPE)
     {
 	emsg(_(e_catch_without_try));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (scope->se_u.se_try.ts_caught_all
-				       && !ignore_unreachable_code_for_testing)
+    ఒకవేళ (scope->se_u.se_try.ts_caught_all
+				       && !ignore_unreachable_సంకేతం_for_testing)
     {
 	emsg(_(e_catch_unreachable_after_catch_all));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
+    ఒకవేళ (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	scope->se_u.se_try.ts_no_return = TRUE;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
-#ifdef FEAT_PROFILE
+#నిర్వచితమైతే FEAT_PROFILE
 	// the profile-start should be after the jump
-	if (cctx->ctx_compile_type == CT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE
 		&& instr->ga_len > 0
-		&& ((isn_T *)instr->ga_data)[instr->ga_len - 1]
-						   .isn_type == ISN_PROF_START)
+		&& ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
+						   .isn_type == ISN_PROF_ప్రారంభం)
 	    --instr->ga_len;
-#endif
+#అయితే_ముగింపు
 	// Jump from end of previous block to :finally or :endtry
-	if (compile_jump_to_end(&scope->se_u.se_try.ts_end_label,
+	ఒకవేళ (compile_jump_గమ్యం_చివర(&scope->se_u.se_try.ts_చివర_label,
 						 JUMP_ALWAYS, 0, cctx) == FAIL)
-	    return NULL;
+	    తిరిగి ఖాళీ;
 
 	// End :try or :catch scope: set value in ISN_TRY instruction
-	isn = ((isn_T *)instr->ga_data) + scope->se_u.se_try.ts_try_label;
-	if (isn->isn_arg.tryref.try_ref->try_catch == 0)
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_try.ts_try_label;
+	ఒకవేళ (isn->isn_arg.tryref.try_ref->try_catch == 0)
 	    isn->isn_arg.tryref.try_ref->try_catch = instr->ga_len;
-	if (scope->se_u.se_try.ts_catch_label != 0)
+	ఒకవేళ (scope->se_u.se_try.ts_catch_label != 0)
 	{
 	    // Previous catch without match jumps here
-	    isn = ((isn_T *)instr->ga_data) + scope->se_u.se_try.ts_catch_label;
+	    isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_try.ts_catch_label;
 	    isn->isn_arg.jump.jump_where = instr->ga_len;
 	}
-#ifdef FEAT_PROFILE
-	if (cctx->ctx_compile_type == CT_PROFILE)
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE)
 	{
 	    // a "throw" that jumps here needs to be counted
-	    generate_instr(cctx, ISN_PROF_END);
+	    generate_instr(cctx, ISN_PROF_చివర);
 	    // the "catch" is also counted
-	    generate_instr(cctx, ISN_PROF_START);
+	    generate_instr(cctx, ISN_PROF_ప్రారంభం);
 	}
-#endif
-	if (cctx->ctx_compile_type == CT_DEBUG)
+#అయితే_ముగింపు
+	ఒకవేళ (cctx->ctx_compile_type == CT_DEBUG)
 	    generate_instr_debug(cctx);
     }
 
     p = skipwhite(arg);
-    if (ends_excmd2(arg, p))
+    ఒకవేళ (చివర్లు_excmd2(arg, p))
     {
 	scope->se_u.se_try.ts_caught_all = TRUE;
 	scope->se_u.se_try.ts_catch_label = 0;
     }
-    else
+    లేకపోతే
     {
-	char_u *end;
+	char_u *చివర;
 	char_u *pat;
-	char_u *tofree = NULL;
-	int	dropped = 0;
-	int	len;
+	char_u *tofree = ఖాళీ;
+	పూర్ణాంకం	dropped = 0;
+	పూర్ణాంకం	len;
 
 	// Push v:exception, push {expr} and MATCH
 	generate_instr_type(cctx, ISN_PUSHEXC, &t_string);
 
-	end = skip_regexp_ex(p + 1, *p, TRUE, &tofree, &dropped, NULL);
-	if (*end != *p)
+	చివర = skip_regexp_ex(p + 1, *p, TRUE, &tofree, &dropped, ఖాళీ);
+	ఒకవేళ (*చివర != *p)
 	{
 	    semsg(_(e_separator_mismatch_str), p);
 	    vim_free(tofree);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	if (tofree == NULL)
-	    len = (int)(end - (p + 1));
-	else
-	    len = (int)(end - tofree);
-	pat = vim_strnsave(tofree == NULL ? p + 1 : tofree, len);
+	ఒకవేళ (tofree == ఖాళీ)
+	    len = (పూర్ణాంకం)(చివర - (p + 1));
+	లేకపోతే
+	    len = (పూర్ణాంకం)(చివర - tofree);
+	pat = vim_strnsave(tofree == ఖాళీ ? p + 1 : tofree, len);
 	vim_free(tofree);
 	p += len + 2 + dropped;
-	if (pat == NULL)
-	    return NULL;
-	if (generate_PUSHS(cctx, &pat) == FAIL)
-	    return NULL;
+	ఒకవేళ (pat == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (generate_PUSHS(cctx, &pat) == FAIL)
+	    తిరిగి ఖాళీ;
 
-	if (generate_COMPARE(cctx, EXPR_MATCH, FALSE) == FAIL)
-	    return NULL;
+	ఒకవేళ (generate_COMPARE(cctx, సమాసం_సరిపోలిక, FALSE) == FAIL)
+	    తిరిగి ఖాళీ;
 
 	scope->se_u.se_try.ts_catch_label = instr->ga_len;
-	if (generate_JUMP(cctx, JUMP_IF_FALSE, 0) == FAIL)
-	    return NULL;
+	ఒకవేళ (generate_JUMP(cctx, JUMP_IF_FALSE, 0) == FAIL)
+	    తిరిగి ఖాళీ;
     }
 
-    if (cctx->ctx_skip != SKIP_YES && generate_instr(cctx, ISN_CATCH) == NULL)
-	return NULL;
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES && generate_instr(cctx, ISN_CATCH) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (new_scope(cctx, BLOCK_SCOPE) == NULL)
-	return NULL;
-    return p;
+    ఒకవేళ (new_scope(cctx, ఖండం_SCOPE) == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి p;
 }
 
     char_u *
@@ -1822,76 +1822,76 @@ compile_finally(char_u *arg, cctx_T *cctx)
     scope_T	*scope = cctx->ctx_scope;
     garray_T	*instr = &cctx->ctx_instr;
     isn_T	*isn;
-    int		this_instr;
+    పూర్ణాంకం		this_instr;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
     // end block scope from :try or :catch
-    if (scope != NULL && scope->se_type == BLOCK_SCOPE)
+    ఒకవేళ (scope != ఖాళీ && scope->se_type == ఖండం_SCOPE)
 	compile_endblock(cctx);
     scope = cctx->ctx_scope;
 
     // Error if not in a :try scope
-    if (scope == NULL || scope->se_type != TRY_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != TRY_SCOPE)
     {
 	emsg(_(e_finally_without_try));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // If the preceding "try" or "catch" block didn't end in a "return" or a
     // "throw" statement, a pending return/throw from before "finally" cannot
     // be relied on to terminate the try statement.
-    if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
+    ఒకవేళ (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	scope->se_u.se_try.ts_no_return = TRUE;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	// End :catch or :finally scope: set value in ISN_TRY instruction
-	isn = ((isn_T *)instr->ga_data) + scope->se_u.se_try.ts_try_label;
-	if (isn->isn_arg.tryref.try_ref->try_finally != 0)
+	isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_try.ts_try_label;
+	ఒకవేళ (isn->isn_arg.tryref.try_ref->try_finally != 0)
 	{
-	    emsg(_(e_multiple_finally));
-	    return NULL;
+	    emsg(_(e_గుణిజం_finally));
+	    తిరిగి ఖాళీ;
 	}
 
 	this_instr = instr->ga_len;
-#ifdef FEAT_PROFILE
-	if (cctx->ctx_compile_type == CT_PROFILE
-		&& ((isn_T *)instr->ga_data)[this_instr - 1]
-						   .isn_type == ISN_PROF_START)
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE
+		&& ((isn_T *)instr->ga_దత్తాంశం)[this_instr - 1]
+						   .isn_type == ISN_PROF_ప్రారంభం)
 	{
 	    // jump to the profile start of the "finally"
 	    --this_instr;
 
 	    // jump to the profile end above it
-	    if (this_instr > 0 && ((isn_T *)instr->ga_data)[this_instr - 1]
-						     .isn_type == ISN_PROF_END)
+	    ఒకవేళ (this_instr > 0 && ((isn_T *)instr->ga_దత్తాంశం)[this_instr - 1]
+						     .isn_type == ISN_PROF_చివర)
 		--this_instr;
 	}
-#endif
+#అయితే_ముగింపు
 
 	// Fill in the "end" label in jumps at the end of the blocks.
-	compile_fill_jump_to_end(&scope->se_u.se_try.ts_end_label,
+	compile_fill_jump_గమ్యం_చివర(&scope->se_u.se_try.ts_చివర_label,
 							     this_instr, cctx);
 
 	// If there is no :catch then an exception jumps to :finally.
-	if (isn->isn_arg.tryref.try_ref->try_catch == 0)
+	ఒకవేళ (isn->isn_arg.tryref.try_ref->try_catch == 0)
 	    isn->isn_arg.tryref.try_ref->try_catch = this_instr;
 	isn->isn_arg.tryref.try_ref->try_finally = this_instr;
-	if (scope->se_u.se_try.ts_catch_label != 0)
+	ఒకవేళ (scope->se_u.se_try.ts_catch_label != 0)
 	{
 	    // Previous catch without match jumps here
-	    isn = ((isn_T *)instr->ga_data) + scope->se_u.se_try.ts_catch_label;
+	    isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_try.ts_catch_label;
 	    isn->isn_arg.jump.jump_where = this_instr;
 	    scope->se_u.se_try.ts_catch_label = 0;
 	}
 	scope->se_u.se_try.ts_has_finally = TRUE;
-	if (generate_instr(cctx, ISN_FINALLY) == NULL)
-	    return NULL;
+	ఒకవేళ (generate_instr(cctx, ISN_FINALLY) == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
 
-    return arg;
+    తిరిగి arg;
 }
 
     char_u *
@@ -1901,56 +1901,56 @@ compile_endtry(char_u *arg, cctx_T *cctx)
     garray_T	*instr = &cctx->ctx_instr;
     isn_T	*try_isn;
 
-    if (misplaced_cmdmod(cctx))
-	return NULL;
+    ఒకవేళ (misplaced_cmdmod(cctx))
+	తిరిగి ఖాళీ;
 
     // end block scope from :catch or :finally
-    if (scope != NULL && scope->se_type == BLOCK_SCOPE)
+    ఒకవేళ (scope != ఖాళీ && scope->se_type == ఖండం_SCOPE)
 	compile_endblock(cctx);
     scope = cctx->ctx_scope;
 
     // Error if not in a :try scope
-    if (scope == NULL || scope->se_type != TRY_SCOPE)
+    ఒకవేళ (scope == ఖాళీ || scope->se_type != TRY_SCOPE)
     {
-	if (scope == NULL)
+	ఒకవేళ (scope == ఖాళీ)
 	    emsg(_(e_endtry_without_try));
-	else if (scope->se_type == WHILE_SCOPE)
+	లేకపోతే ఒకవేళ (scope->se_type == WHILE_SCOPE)
 	    emsg(_(e_missing_endwhile));
-	else if (scope->se_type == FOR_SCOPE)
+	లేకపోతే ఒకవేళ (scope->se_type == FOR_SCOPE)
 	    emsg(_(e_missing_endfor));
-	else
+	లేకపోతే
 	    emsg(_(e_missing_endif));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    try_isn = ((isn_T *)instr->ga_data) + scope->se_u.se_try.ts_try_label;
-    if (cctx->ctx_skip != SKIP_YES)
+    try_isn = ((isn_T *)instr->ga_దత్తాంశం) + scope->se_u.se_try.ts_try_label;
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
-	if (try_isn->isn_arg.tryref.try_ref->try_catch == 0
+	ఒకవేళ (try_isn->isn_arg.tryref.try_ref->try_catch == 0
 			  && try_isn->isn_arg.tryref.try_ref->try_finally == 0)
 	{
 	    emsg(_(e_missing_catch_or_finally));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-#ifdef FEAT_PROFILE
-	if (cctx->ctx_compile_type == CT_PROFILE
-		&& ((isn_T *)instr->ga_data)[instr->ga_len - 1]
-						.isn_type == ISN_PROF_START)
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE
+		&& ((isn_T *)instr->ga_దత్తాంశం)[instr->ga_len - 1]
+						.isn_type == ISN_PROF_ప్రారంభం)
 	    // move the profile start after "endtry" so that it's not counted when
 	    // the exception is rethrown.
 	    --instr->ga_len;
-#endif
+#అయితే_ముగింపు
 
 	// Fill in the "end" label in jumps at the end of the blocks, if not
 	// done by ":finally".
-	compile_fill_jump_to_end(&scope->se_u.se_try.ts_end_label,
+	compile_fill_jump_గమ్యం_చివర(&scope->se_u.se_try.ts_చివర_label,
 							  instr->ga_len, cctx);
 
-	if (scope->se_u.se_try.ts_catch_label != 0)
+	ఒకవేళ (scope->se_u.se_try.ts_catch_label != 0)
 	{
 	    // Last catch without match jumps here
-	    isn_T *isn = ((isn_T *)instr->ga_data)
+	    isn_T *isn = ((isn_T *)instr->ga_దత్తాంశం)
 					   + scope->se_u.se_try.ts_catch_label;
 	    isn->isn_arg.jump.jump_where = instr->ga_len;
 	}
@@ -1973,19 +1973,19 @@ compile_endtry(char_u *arg, cctx_T *cctx)
 
     compile_endblock(cctx);
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	// End :catch or :finally scope: set instruction index in ISN_TRY
 	// instruction
 	try_isn->isn_arg.tryref.try_ref->try_endtry = instr->ga_len;
-	if (generate_instr(cctx, ISN_ENDTRY) == NULL)
-	    return NULL;
-#ifdef FEAT_PROFILE
-	if (cctx->ctx_compile_type == CT_PROFILE)
-	    generate_instr(cctx, ISN_PROF_START);
-#endif
+	ఒకవేళ (generate_instr(cctx, ISN_ENDTRY) == ఖాళీ)
+	    తిరిగి ఖాళీ;
+#నిర్వచితమైతే FEAT_PROFILE
+	ఒకవేళ (cctx->ctx_compile_type == CT_PROFILE)
+	    generate_instr(cctx, ISN_PROF_ప్రారంభం);
+#అయితే_ముగింపు
     }
-    return arg;
+    తిరిగి arg;
 }
 
 /*
@@ -1996,16 +1996,16 @@ compile_throw(char_u *arg, cctx_T *cctx)
 {
     char_u *p = skipwhite(arg);
 
-    if (compile_expr0(&p, cctx) == FAIL)
-	return NULL;
-    if (cctx->ctx_skip == SKIP_YES)
-	return p;
-    if (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL)
-	return NULL;
-    if (generate_instr_drop(cctx, ISN_THROW, 1) == NULL)
-	return NULL;
+    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
+	తిరిగి p;
+    ఒకవేళ (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (generate_instr_drop(cctx, ISN_THROW, 1) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2015,27 +2015,27 @@ compile_throw(char_u *arg, cctx_T *cctx)
 compile_eval(char_u *arg, cctx_T *cctx)
 {
     char_u	*p = arg;
-    int		name_only;
-    long	lnum = SOURCING_LNUM;
+    పూర్ణాంకం		name_only;
+    దీర్ఘ	lnum = SOURCING_LNUM;
 
     // find_ex_command() will consider a variable name an expression, assuming
     // that something follows on the next line.  Check that something actually
     // follows, otherwise it's probably a misplaced command.
     name_only = cmd_is_name_only(arg);
 
-    if (compile_expr0(&p, cctx) == FAIL)
-	return NULL;
+    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
 
-    if (name_only && lnum == SOURCING_LNUM)
+    ఒకవేళ (name_only && lnum == SOURCING_LNUM)
     {
-	semsg(_(e_expression_without_effect_str), arg);
-	return NULL;
+	semsg(_(e_వ్యక్తీకరణ_without_effect_str), arg);
+	తిరిగి ఖాళీ;
     }
 
     // drop the result
     generate_instr_drop(cctx, ISN_DROP, 1);
 
-    return skipwhite(p);
+    తిరిగి skipwhite(p);
 }
 
 /*
@@ -2043,107 +2043,107 @@ compile_eval(char_u *arg, cctx_T *cctx)
  * Reserve it when not done already.
  * Returns zero for failure.
  */
-    int
+    పూర్ణాంకం
 get_defer_var_idx(cctx_T *cctx)
 {
-    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
+    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_దత్తాంశం)
 					       + cctx->ctx_ufunc->uf_dfunc_idx;
-    if (dfunc->df_defer_var_idx == 0)
+    ఒకవేళ (dfunc->df_defer_var_idx == 0)
     {
 	lvar_T *lvar = reserve_local(cctx, (char_u *)"@defer@", 7,
 							    TRUE, &t_list_any);
-	if (lvar == NULL)
-	    return 0;
+	ఒకవేళ (lvar == ఖాళీ)
+	    తిరిగి 0;
 	dfunc->df_defer_var_idx = lvar->lv_idx + 1;
     }
-    return dfunc->df_defer_var_idx;
+    తిరిగి dfunc->df_defer_var_idx;
 }
 
 /*
  * Compile "defer func(arg)".
  */
     char_u *
-compile_defer(char_u *arg_start, cctx_T *cctx)
+compile_defer(char_u *arg_ప్రారంభం, cctx_T *cctx)
 {
     char_u	*paren;
-    char_u	*arg = arg_start;
-    int		argcount = 0;
-    int		defer_var_idx;
-    type_T	*type = NULL;
-    int		func_idx = -1;
+    char_u	*arg = arg_ప్రారంభం;
+    పూర్ణాంకం		argcount = 0;
+    పూర్ణాంకం		defer_var_idx;
+    type_T	*type = ఖాళీ;
+    పూర్ణాంకం		func_idx = -1;
 
-    if (*arg == '(')
+    ఒకవేళ (*arg == '(')
     {
 	// a lambda function
-	if (compile_lambda(&arg, cctx, NULL) != OK)
-	    return NULL;
+	ఒకవేళ (compile_lambda(&arg, cctx, ఖాళీ) != OK)
+	    తిరిగి ఖాళీ;
 	paren = vim_strchr(arg, '(');
-	if (paren == NULL)
+	ఒకవేళ (paren == ఖాళీ)
 	{
 	    semsg(_(e_missing_parenthesis_str), arg);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Get a funcref for the function name.
 	// TODO: better way to find the "(".
 	paren = vim_strchr(arg, '(');
-	if (paren == NULL)
+	ఒకవేళ (paren == ఖాళీ)
 	{
 	    semsg(_(e_missing_parenthesis_str), arg);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	*paren = NUL;
-	func_idx = find_internal_func(arg);
-	if (func_idx >= 0)
+	func_idx = కనుగొను_అంతర్గత_func(arg);
+	ఒకవేళ (func_idx >= 0)
 	    // TODO: better type
-	    generate_PUSHFUNC(cctx, (char_u *)internal_func_name(func_idx),
+	    generate_PUSHFUNC(cctx, (char_u *)అంతర్గత_func_name(func_idx),
 		    &t_func_any, FALSE);
-	else if (compile_expr0(&arg, cctx) == FAIL)
-	    return NULL;
+	లేకపోతే ఒకవేళ (compile_expr0(&arg, cctx) == FAIL)
+	    తిరిగి ఖాళీ;
 	*paren = '(';
     }
 
     // check for function type
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
-	type = get_type_on_stack(cctx, 0);
-	if (type->tt_type != VAR_FUNC)
+	type = get_type_on_దొంతర(cctx, 0);
+	ఒకవేళ (type->tt_type != VAR_FUNC)
 	{
 	    emsg(_(e_function_name_required));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
 
     // compile the arguments
     arg = skipwhite(paren + 1);
-    if (compile_arguments(&arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
-	return NULL;
+    ఒకవేళ (compile_arguments(&arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
+	తిరిగి ఖాళీ;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
-	if (func_idx >= 0)
+	ఒకవేళ (func_idx >= 0)
 	{
-	    type2_T	*argtypes = NULL;
-	    type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
+	    type2_T	*argtypes = ఖాళీ;
+	    type2_T	shuffled_argtypes[MAX_FUNC_వాదనలు];
 
-	    if (check_internal_func_args(cctx, func_idx, argcount, FALSE,
+	    ఒకవేళ (check_అంతర్గత_func_వాదనలు(cctx, func_idx, argcount, FALSE,
 			&argtypes, shuffled_argtypes) == FAIL)
-		return NULL;
+		తిరిగి ఖాళీ;
 	}
-	else if (check_func_args_from_type(cctx, type, argcount, TRUE,
-		    arg_start) == FAIL)
-	    return NULL;
+	లేకపోతే ఒకవేళ (check_func_వాదనలు_from_type(cctx, type, argcount, TRUE,
+		    arg_ప్రారంభం) == FAIL)
+	    తిరిగి ఖాళీ;
 
 	defer_var_idx = get_defer_var_idx(cctx);
-	if (defer_var_idx == 0)
-	    return NULL;
-	if (generate_DEFER(cctx, defer_var_idx - 1, argcount) == FAIL)
-	    return NULL;
+	ఒకవేళ (defer_var_idx == 0)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (generate_DEFER(cctx, defer_var_idx - 1, argcount) == FAIL)
+	    తిరిగి ఖాళీ;
     }
 
-    return skipwhite(arg);
+    తిరిగి skipwhite(arg);
 }
 
 /*
@@ -2155,69 +2155,69 @@ compile_defer(char_u *arg_start, cctx_T *cctx)
  * compile "execute expr"
  */
     char_u *
-compile_mult_expr(
+compile_mult_సమాసం(
 	char_u	*arg,
-	int	cmdidx,
-	long	cmd_count UNUSED,
+	పూర్ణాంకం	cmdidx,
+	దీర్ఘ	cmd_లెక్క వాడని,
 	cctx_T	*cctx)
 {
     char_u	*p = arg;
     char_u	*prev = arg;
-    char_u	*expr_start;
-    int		count = 0;
-    int		start_ctx_lnum = cctx->ctx_lnum;
+    char_u	*సమాసం_ప్రారంభం;
+    పూర్ణాంకం		లెక్క = 0;
+    పూర్ణాంకం		ప్రారంభం_ctx_lnum = cctx->ctx_lnum;
     type_T	*type;
-    int		r = OK;
+    పూర్ణాంకం		r = OK;
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (ends_excmd2(prev, p))
-	    break;
-	expr_start = p;
-	if (compile_expr0(&p, cctx) == FAIL)
-	    return NULL;
+	ఒకవేళ (చివర్లు_excmd2(prev, p))
+	    ఆపు;
+	సమాసం_ప్రారంభం = p;
+	ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	    తిరిగి ఖాళీ;
 
-	if (cctx->ctx_skip != SKIP_YES)
+	ఒకవేళ (cctx->ctx_skip != SKIP_YES)
 	{
 	    // check for non-void type
-	    type = get_type_on_stack(cctx, 0);
-	    if (type->tt_type == VAR_VOID)
+	    type = get_type_on_దొంతర(cctx, 0);
+	    ఒకవేళ (type->tt_type == VAR_VOID)
 	    {
-		semsg(_(e_expression_does_not_result_in_value_str), expr_start);
-		return NULL;
+		semsg(_(e_వ్యక్తీకరణ_does_not_ఫలితం_లోపల_విలువ_str), సమాసం_ప్రారంభం);
+		తిరిగి ఖాళీ;
 	    }
 	}
 
-	++count;
+	++లెక్క;
 	prev = p;
 	p = skipwhite(p);
     }
 
-    if (count > 0)
+    ఒకవేళ (లెక్క > 0)
     {
-	long save_lnum = cctx->ctx_lnum;
+	దీర్ఘ save_lnum = cctx->ctx_lnum;
 
 	// Use the line number where the command started.
-	cctx->ctx_lnum = start_ctx_lnum;
+	cctx->ctx_lnum = ప్రారంభం_ctx_lnum;
 
-	if (cmdidx == CMD_echo || cmdidx == CMD_echon)
-	    r = generate_ECHO(cctx, cmdidx == CMD_echo, count);
-	else if (cmdidx == CMD_execute)
-	    r = generate_MULT_EXPR(cctx, ISN_EXECUTE, count);
-	else if (cmdidx == CMD_echomsg)
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOMSG, count);
-#ifdef HAS_MESSAGE_WINDOW
-	else if (cmdidx == CMD_echowindow)
-	    r = generate_ECHOWINDOW(cctx, count, cmd_count);
-#endif
-	else if (cmdidx == CMD_echoconsole)
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOCONSOLE, count);
-	else
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOERR, count);
+	ఒకవేళ (cmdidx == CMD_echo || cmdidx == CMD_echon)
+	    r = generate_ECHO(cctx, cmdidx == CMD_echo, లెక్క);
+	లేకపోతే ఒకవేళ (cmdidx == CMD_execute)
+	    r = generate_MULT_సమాసం(cctx, ISN_EXECUTE, లెక్క);
+	లేకపోతే ఒకవేళ (cmdidx == CMD_echomsg)
+	    r = generate_MULT_సమాసం(cctx, ISN_ECHOMSG, లెక్క);
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	లేకపోతే ఒకవేళ (cmdidx == CMD_echowindow)
+	    r = generate_ECHOWINDOW(cctx, లెక్క, cmd_లెక్క);
+#అయితే_ముగింపు
+	లేకపోతే ఒకవేళ (cmdidx == CMD_echoconsole)
+	    r = generate_MULT_సమాసం(cctx, ISN_ECHOCONSOLE, లెక్క);
+	లేకపోతే
+	    r = generate_MULT_సమాసం(cctx, ISN_ECHOERR, లెక్క);
 
 	cctx->ctx_lnum = save_lnum;
     }
-    return r == OK ? p : NULL;
+    తిరిగి r == OK ? p : ఖాళీ;
 }
 
 /*
@@ -2225,15 +2225,15 @@ compile_mult_expr(
  * instruction to compute it and return OK.
  * Otherwise return FAIL, the caller must deal with any range.
  */
-    static int
+    స్థిర పూర్ణాంకం
 compile_variable_range(exarg_T *eap, cctx_T *cctx)
 {
-    char_u *range_end = skip_range(eap->cmd, TRUE, NULL);
+    char_u *range_చివర = skip_range(eap->cmd, TRUE, ఖాళీ);
     char_u *p = skipdigits(eap->cmd);
 
-    if (p == range_end)
-	return FAIL;
-    return generate_RANGE(cctx, vim_strnsave(eap->cmd, range_end - eap->cmd));
+    ఒకవేళ (p == range_చివర)
+	తిరిగి FAIL;
+    తిరిగి generate_RANGE(cctx, vim_strnsave(eap->cmd, range_చివర - eap->cmd));
 }
 
 /*
@@ -2244,74 +2244,74 @@ compile_variable_range(exarg_T *eap, cctx_T *cctx)
  * :iput ={expr}
  */
     char_u *
-compile_put(char_u *arg, exarg_T *eap, cctx_T *cctx, int fixindent)
+compile_put(char_u *arg, exarg_T *eap, cctx_T *cctx, పూర్ణాంకం fixindent)
 {
-    char_u	*line = arg;
+    char_u	*పంక్తి = arg;
     linenr_T	lnum;
-    char	*errormsg;
-    int		above = eap->forceit;
+    అక్షరం	*errormsg;
+    పూర్ణాంకం		above = eap->forceit;
 
-    eap->regname = *line;
+    eap->regname = *పంక్తి;
 
-    if (eap->regname == '=')
+    ఒకవేళ (eap->regname == '=')
     {
-	char_u *p = skipwhite(line + 1);
+	char_u *p = skipwhite(పంక్తి + 1);
 
-	if (compile_expr0(&p, cctx) == FAIL)
-	    return NULL;
-	line = p;
+	ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	    తిరిగి ఖాళీ;
+	పంక్తి = p;
     }
-    else if (eap->regname != NUL)
-	++line;
+    లేకపోతే ఒకవేళ (eap->regname != NUL)
+	++పంక్తి;
 
-    if (compile_variable_range(eap, cctx) == OK)
+    ఒకవేళ (compile_variable_range(eap, cctx) == OK)
     {
 	lnum = above ? LNUM_VARIABLE_RANGE_ABOVE : LNUM_VARIABLE_RANGE;
     }
-    else
+    లేకపోతే
     {
 	// Either no range or a number.
 	// "errormsg" will not be set because the range is ADDR_LINES.
-	if (parse_cmd_address(eap, &errormsg, FALSE) == FAIL)
+	ఒకవేళ (parse_cmd_చిరునామా(eap, &errormsg, FALSE) == FAIL)
 	    // cannot happen
-	    return NULL;
-	if (eap->addr_count == 0)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (eap->addr_లెక్క == 0)
 	    lnum = -1;
-	else
+	లేకపోతే
 	    lnum = eap->line2;
-	if (above)
+	ఒకవేళ (above)
 	    --lnum;
     }
 
     generate_PUT(cctx, eap->regname, lnum, fixindent);
 
-    return line;
+    తిరిగి పంక్తి;
 }
 
 /*
  * A command that is not compiled, execute with legacy code.
  */
     char_u *
-compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
+compile_exec(char_u *పంక్తి_arg, exarg_T *eap, cctx_T *cctx)
 {
-    char_u	*line = line_arg;
+    char_u	*పంక్తి = పంక్తి_arg;
     char_u	*p;
-    int		has_expr = FALSE;
+    పూర్ణాంకం		has_సమాసం = FALSE;
     char_u	*nextcmd = (char_u *)"";
-    char_u	*tofree = NULL;
-    char_u	*cmd_arg = NULL;
+    char_u	*tofree = ఖాళీ;
+    char_u	*cmd_arg = ఖాళీ;
 
-    if (cctx->ctx_skip == SKIP_YES)
-	goto theend;
+    ఒకవేళ (cctx->ctx_skip == SKIP_YES)
+	వెళ్ళు theend;
 
     // If there was a prececing command modifier, drop it and include it in the
     // EXEC command.
-    if (cctx->ctx_has_cmdmod)
+    ఒకవేళ (cctx->ctx_has_cmdmod)
     {
 	garray_T	*instr = &cctx->ctx_instr;
-	isn_T		*isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
+	isn_T		*isn = ((isn_T *)instr->ga_దత్తాంశం) + instr->ga_len - 1;
 
-	if (isn->isn_type == ISN_CMDMOD)
+	ఒకవేళ (isn->isn_type == ISN_CMDMOD)
 	{
 	    vim_regfree(isn->isn_arg.cmdmod.cf_cmdmod
 					       ->cmod_filter_regmatch.regprog);
@@ -2321,100 +2321,100 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 	}
     }
 
-    if (eap->cmdidx >= 0 && eap->cmdidx < CMD_SIZE)
+    ఒకవేళ (eap->cmdidx >= 0 && eap->cmdidx < CMD_కొలత)
     {
-	long	argt = eap->argt;
-	int	usefilter = FALSE;
+	దీర్ఘ	argt = eap->argt;
+	పూర్ణాంకం	usefilter = FALSE;
 
-	has_expr = argt & (EX_XFILE | EX_EXPAND);
+	has_సమాసం = argt & (EX_XFILE | EX_EXPAND);
 
 	// If the command can be followed by a bar, find the bar and truncate
 	// it, so that the following command can be compiled.
 	// The '|' is overwritten with a NUL, it is put back below.
-	if ((eap->cmdidx == CMD_write || eap->cmdidx == CMD_read)
+	ఒకవేళ ((eap->cmdidx == CMD_write || eap->cmdidx == CMD_read)
 							   && *eap->arg == '!')
 	    // :w !filter or :r !filter or :r! filter
 	    usefilter = TRUE;
-	if ((argt & EX_TRLBAR) && !usefilter)
+	ఒకవేళ ((argt & EX_TRLBAR) && !usefilter)
 	{
 	    eap->argt = argt;
 	    separate_nextcmd(eap, TRUE);
-	    if (eap->nextcmd != NULL)
+	    ఒకవేళ (eap->nextcmd != ఖాళీ)
 		nextcmd = eap->nextcmd;
 	}
-	else if (eap->cmdidx == CMD_wincmd)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_wincmd)
 	{
 	    p = eap->arg;
-	    if (*p != NUL)
+	    ఒకవేళ (*p != NUL)
 		++p;
-	    if (*p == 'g' || *p == Ctrl_G)
+	    ఒకవేళ (*p == 'g' || *p == Ctrl_G)
 		++p;
 	    p = skipwhite(p);
-	    if (*p == '|')
+	    ఒకవేళ (*p == '|')
 	    {
 		*p = NUL;
 		nextcmd = p + 1;
 	    }
 	}
-	else if (eap->cmdidx == CMD_command || eap->cmdidx == CMD_autocmd)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_command || eap->cmdidx == CMD_autocmd)
 	{
 	    exarg_T ea;
-	    int	    flags = 0;  // unused
-	    int	    start_lnum = SOURCING_LNUM;
+	    పూర్ణాంకం	    flags = 0;  //వాడని
+	    పూర్ణాంకం	    ప్రారంభం_lnum = SOURCING_LNUM;
 
-	    CLEAR_FIELD(ea);
+	    CLEAR_క్షేత్రం(ea);
 	    ea.arg = eap->arg;
 	    fill_exarg_from_cctx(&ea, cctx);
-	    p = may_get_cmd_block(&ea, line, &tofree, &flags);
-	    if (tofree != NULL)
+	    p = may_get_cmd_ఖండం(&ea, పంక్తి, &tofree, &flags);
+	    ఒకవేళ (tofree != ఖాళీ)
 	    {
-		line = p;
-		SOURCING_LNUM = start_lnum;
+		పంక్తి = p;
+		SOURCING_LNUM = ప్రారంభం_lnum;
 	    }
 	}
     }
 
-    if (eap->cmdidx == CMD_syntax && STRNCMP(eap->arg, "include ", 8) == 0)
+    ఒకవేళ (eap->cmdidx == CMD_syntax && STRNCMP(eap->arg, "include ", 8) == 0)
     {
 	// expand filename in "syntax include [@group] filename"
-	has_expr = TRUE;
+	has_సమాసం = TRUE;
 	eap->arg = skipwhite(eap->arg + 7);
-	if (*eap->arg == '@')
+	ఒకవేళ (*eap->arg == '@')
 	    eap->arg = skiptowhite(eap->arg);
     }
 
-    if ((eap->cmdidx == CMD_global || eap->cmdidx == CMD_vglobal)
+    ఒకవేళ ((eap->cmdidx == CMD_global || eap->cmdidx == CMD_vglobal)
 						       && STRLEN(eap->arg) > 4)
     {
-	int delim = *eap->arg;
+	పూర్ణాంకం delim = *eap->arg;
 
-	p = skip_regexp_ex(eap->arg + 1, delim, TRUE, NULL, NULL, NULL);
-	if (*p == delim)
+	p = skip_regexp_ex(eap->arg + 1, delim, TRUE, ఖాళీ, ఖాళీ, ఖాళీ);
+	ఒకవేళ (*p == delim)
 	    cmd_arg = p + 1;
     }
 
-    if (eap->cmdidx == CMD_folddoopen || eap->cmdidx == CMD_folddoclosed)
+    ఒకవేళ (eap->cmdidx == CMD_folddoopen || eap->cmdidx == CMD_folddoclosed)
 	cmd_arg = eap->arg;
 
-    if (cmd_arg != NULL)
+    ఒకవేళ (cmd_arg != ఖాళీ)
     {
 	exarg_T nea;
 
-	CLEAR_FIELD(nea);
+	CLEAR_క్షేత్రం(nea);
 	nea.cmd = cmd_arg;
-	p = find_ex_command(&nea, NULL, lookup_scriptitem, NULL);
-	if (nea.cmdidx < CMD_SIZE)
+	p = కనుగొను_ex_command(&nea, ఖాళీ, lookup_scriptitem, ఖాళీ);
+	ఒకవేళ (nea.cmdidx < CMD_కొలత)
 	{
-	    has_expr = excmd_get_argt(nea.cmdidx) & (EX_XFILE | EX_EXPAND);
-	    if (has_expr)
+	    has_సమాసం = excmd_get_argt(nea.cmdidx) & (EX_XFILE | EX_EXPAND);
+	    ఒకవేళ (has_సమాసం)
 		eap->arg = skiptowhite(eap->arg);
 	}
     }
 
-    if (has_expr && (p = (char_u *)strstr((char *)eap->arg, "`=")) != NULL)
+    ఒకవేళ (has_సమాసం && (p = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)eap->arg, "`=")) != ఖాళీ)
     {
-	int	count = 0;
-	char_u	*start = skipwhite(line);
+	పూర్ణాంకం	లెక్క = 0;
+	char_u	*ప్రారంభం = skipwhite(పంక్తి);
 
 	// :cmd xxx`=expr1`yyy`=expr2`zzz
 	// PUSHS ":cmd xxx"
@@ -2423,48 +2423,48 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 	// eval expr2
 	// PUSHS "zzz"
 	// EXECCONCAT 5
-	for (;;)
+	కొరకు (;;)
 	{
-	    if (p > start)
+	    ఒకవేళ (p > ప్రారంభం)
 	    {
-		char_u *val = vim_strnsave(start, p - start);
+		char_u *val = vim_strnsave(ప్రారంభం, p - ప్రారంభం);
 
 		generate_PUSHS(cctx, &val);
-		++count;
+		++లెక్క;
 	    }
 	    p += 2;
-	    if (compile_expr0(&p, cctx) == FAIL)
-		return NULL;
+	    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+		తిరిగి ఖాళీ;
 	    may_generate_2STRING(-1, TOSTRING_TOLERANT, cctx);
-	    ++count;
+	    ++లెక్క;
 	    p = skipwhite(p);
-	    if (*p != '`')
+	    ఒకవేళ (*p != '`')
 	    {
 		emsg(_(e_missing_backtick));
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    start = p + 1;
+	    ప్రారంభం = p + 1;
 
-	    p = (char_u *)strstr((char *)start, "`=");
-	    if (p == NULL)
+	    p = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)ప్రారంభం, "`=");
+	    ఒకవేళ (p == ఖాళీ)
 	    {
-		if (*skipwhite(start) != NUL)
+		ఒకవేళ (*skipwhite(ప్రారంభం) != NUL)
 		{
-		    char_u *val = vim_strsave(start);
+		    char_u *val = vim_strsave(ప్రారంభం);
 
 		    generate_PUSHS(cctx, &val);
-		    ++count;
+		    ++లెక్క;
 		}
-		break;
+		ఆపు;
 	    }
 	}
-	generate_EXECCONCAT(cctx, count);
+	generate_EXECCONCAT(cctx, లెక్క);
     }
-    else
-	generate_EXEC_copy(cctx, ISN_EXEC, line);
+    లేకపోతే
+	generate_EXEC_copy(cctx, ISN_EXEC, పంక్తి);
 
 theend:
-    if (*nextcmd != NUL)
+    ఒకవేళ (*nextcmd != NUL)
     {
 	// the parser expects a pointer to the bar, put it back
 	--nextcmd;
@@ -2472,7 +2472,7 @@ theend:
     }
     vim_free(tofree);
 
-    return nextcmd;
+    తిరిగి nextcmd;
 }
 
 /*
@@ -2485,17 +2485,17 @@ theend:
  *	ruby << EOF<NL>   command<NL>EOF
  */
     char_u *
-compile_script(char_u *line, cctx_T *cctx)
+compile_script(char_u *పంక్తి, cctx_T *cctx)
 {
-    if (cctx->ctx_skip != SKIP_YES)
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
     {
 	isn_T	*isn;
 
-	if ((isn = generate_instr(cctx, ISN_EXEC_SPLIT)) == NULL)
-	    return NULL;
-	isn->isn_arg.string = vim_strsave(line);
+	ఒకవేళ ((isn = generate_instr(cctx, ISN_EXEC_విభజించు)) == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	isn->isn_arg.string = vim_strsave(పంక్తి);
     }
-    return (char_u *)"";
+    తిరిగి (char_u *)"";
 }
 
 
@@ -2506,316 +2506,316 @@ compile_script(char_u *line, cctx_T *cctx)
 compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 {
     char_u  *cmd = eap->arg;
-    char_u  *expr = (char_u *)strstr((char *)cmd, "\\=");
+    char_u  *సమాసం = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)cmd, "\\=");
 
-    if (expr != NULL)
+    ఒకవేళ (సమాసం != ఖాళీ)
     {
-	int delimiter = *cmd++;
+	పూర్ణాంకం delimiter = *cmd++;
 
 	// There is a \=expr, find it in the substitute part.
-	cmd = skip_regexp_ex(cmd, delimiter, magic_isset(), NULL, NULL, NULL);
-	if (cmd[0] == delimiter && cmd[1] == '\\' && cmd[2] == '=')
+	cmd = skip_regexp_ex(cmd, delimiter, magic_isset(), ఖాళీ, ఖాళీ, ఖాళీ);
+	ఒకవేళ (cmd[0] == delimiter && cmd[1] == '\\' && cmd[2] == '=')
 	{
 	    garray_T	save_ga = cctx->ctx_instr;
-	    char_u	*end;
-	    int		expr_res;
-	    int		trailing_error;
-	    int		instr_count;
+	    char_u	*చివర;
+	    పూర్ణాంకం		సమాసం_res;
+	    పూర్ణాంకం		trailing_error;
+	    పూర్ణాంకం		instr_లెక్క;
 	    isn_T	*instr;
 	    isn_T	*isn;
 
 	    cmd += 3;
-	    end = skip_substitute(cmd, delimiter);
+	    చివర = skip_substitute(cmd, delimiter);
 
 	    // Temporarily reset the list of instructions so that the jump
 	    // labels are correct.
 	    cctx->ctx_instr.ga_len = 0;
 	    cctx->ctx_instr.ga_maxlen = 0;
-	    cctx->ctx_instr.ga_data = NULL;
-	    expr_res = compile_expr0(&cmd, cctx);
-	    if (end[-1] == NUL)
-		end[-1] = delimiter;
+	    cctx->ctx_instr.ga_దత్తాంశం = ఖాళీ;
+	    సమాసం_res = compile_expr0(&cmd, cctx);
+	    ఒకవేళ (చివర[-1] == NUL)
+		చివర[-1] = delimiter;
 	    cmd = skipwhite(cmd);
 	    trailing_error = *cmd != delimiter && *cmd != NUL;
 
-	    if (expr_res == FAIL || trailing_error
+	    ఒకవేళ (సమాసం_res == FAIL || trailing_error
 				       || GA_GROW_FAILS(&cctx->ctx_instr, 1))
 	    {
-		if (trailing_error)
+		ఒకవేళ (trailing_error)
 		    semsg(_(e_trailing_characters_str), cmd);
 		clear_instr_ga(&cctx->ctx_instr);
 		cctx->ctx_instr = save_ga;
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 
 	    // Move the generated instructions into the ISN_SUBSTITUTE
 	    // instructions, then restore the list of instructions before
 	    // adding the ISN_SUBSTITUTE instruction.
-	    instr_count = cctx->ctx_instr.ga_len;
-	    instr = cctx->ctx_instr.ga_data;
-	    instr[instr_count].isn_type = ISN_FINISH;
+	    instr_లెక్క = cctx->ctx_instr.ga_len;
+	    instr = cctx->ctx_instr.ga_దత్తాంశం;
+	    instr[instr_లెక్క].isn_type = ISN_ముగింపు;
 
 	    cctx->ctx_instr = save_ga;
-	    if ((isn = generate_instr(cctx, ISN_SUBSTITUTE)) == NULL)
+	    ఒకవేళ ((isn = generate_instr(cctx, ISN_SUBSTITUTE)) == ఖాళీ)
 	    {
-		int idx;
+		పూర్ణాంకం idx;
 
-		for (idx = 0; idx < instr_count; ++idx)
+		కొరకు (idx = 0; idx < instr_లెక్క; ++idx)
 		    delete_instr(instr + idx);
 		vim_free(instr);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 	    isn->isn_arg.subs.subs_cmd = vim_strsave(arg);
 	    isn->isn_arg.subs.subs_instr = instr;
 
 	    // skip over flags
-	    if (*end == '&')
-		++end;
-	    while (ASCII_ISALPHA(*end) || *end == '#')
-		++end;
-	    return end;
+	    ఒకవేళ (*చివర == '&')
+		++చివర;
+	    అయితే (ASCII_ISALPHA(*చివర) || *చివర == '#')
+		++చివర;
+	    తిరిగి చివర;
 	}
     }
 
-    return compile_exec(arg, eap, cctx);
+    తిరిగి compile_exec(arg, eap, cctx);
 }
 
     char_u *
-compile_redir(char_u *line, exarg_T *eap, cctx_T *cctx)
+compile_redir(char_u *పంక్తి, exarg_T *eap, cctx_T *cctx)
 {
     char_u  *arg = eap->arg;
     lhs_T   *lhs = &cctx->ctx_redir_lhs;
 
-    if (lhs->lhs_name != NULL)
+    ఒకవేళ (lhs->lhs_name != ఖాళీ)
     {
-	if (STRNCMP(arg, "END", 3) == 0)
+	ఒకవేళ (STRNCMP(arg, "END", 3) == 0)
 	{
-	    if (cctx->ctx_skip != SKIP_YES)
+	    ఒకవేళ (cctx->ctx_skip != SKIP_YES)
 	    {
-		if (lhs->lhs_append)
+		ఒకవేళ (lhs->lhs_append)
 		{
 		    // First load the current variable value.
-		    if (compile_load_lhs_with_index(lhs, lhs->lhs_whole,
+		    ఒకవేళ (compile_ఎక్కించు_lhs_with_సూచీ(lhs, lhs->lhs_సంపూర్ణ,
 								 cctx) == FAIL)
-			return NULL;
+			తిరిగి ఖాళీ;
 		}
 
 		// Gets the redirected text and put it on the stack, then store
 		// it in the variable.
 		generate_instr_type(cctx, ISN_REDIREND, &t_string);
 
-		if (lhs->lhs_append)
+		ఒకవేళ (lhs->lhs_append)
 		    generate_CONCAT(cctx, 2);
 
-		if (lhs->lhs_has_index)
+		ఒకవేళ (lhs->lhs_has_సూచీ)
 		{
 		    // Use the info in "lhs" to store the value at the index in
 		    // the list or dict.
-		    if (compile_assign_unlet(lhs->lhs_whole, lhs, TRUE,
+		    ఒకవేళ (compile_కేటాయించు_unlet(lhs->lhs_సంపూర్ణ, lhs, TRUE,
 						      &t_string, cctx) == FAIL)
-			return NULL;
+			తిరిగి ఖాళీ;
 		}
-		else if (generate_store_lhs(cctx, lhs, -1, FALSE) == FAIL)
-		    return NULL;
+		లేకపోతే ఒకవేళ (generate_store_lhs(cctx, lhs, -1, FALSE) == FAIL)
+		    తిరిగి ఖాళీ;
 
 		VIM_CLEAR(lhs->lhs_name);
-		VIM_CLEAR(lhs->lhs_whole);
+		VIM_CLEAR(lhs->lhs_సంపూర్ణ);
 	    }
-	    return arg + 3;
+	    తిరిగి arg + 3;
 	}
 	emsg(_(e_cannot_nest_redir));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (arg[0] == '=' && arg[1] == '>')
+    ఒకవేళ (arg[0] == '=' && arg[1] == '>')
     {
-	int	    append = FALSE;
+	పూర్ణాంకం	    append = FALSE;
 
 	// redirect to a variable is compiled
 	arg += 2;
-	if (*arg == '>')
+	ఒకవేళ (*arg == '>')
 	{
 	    ++arg;
 	    append = TRUE;
 	}
 	arg = skipwhite(arg);
 
-	if (compile_assign_lhs(arg, lhs, CMD_redir,
+	ఒకవేళ (compile_కేటాయించు_lhs(arg, lhs, CMD_redir,
 					 FALSE, FALSE, FALSE, 1, cctx) == FAIL)
-	    return NULL;
-	if (need_type(&t_string, lhs->lhs_member_type, 0,
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (need_type(&t_string, lhs->lhs_member_type, 0,
 					    -1, 0, cctx, FALSE, FALSE) == FAIL)
-	    return NULL;
-	if (cctx->ctx_skip == SKIP_YES)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (cctx->ctx_skip == SKIP_YES)
 	{
 	    VIM_CLEAR(lhs->lhs_name);
 	}
-	else
+	లేకపోతే
 	{
 	    generate_instr(cctx, ISN_REDIRSTART);
 	    lhs->lhs_append = append;
-	    if (lhs->lhs_has_index)
+	    ఒకవేళ (lhs->lhs_has_సూచీ)
 	    {
-		lhs->lhs_whole = vim_strnsave(arg, lhs->lhs_varlen_total);
-		if (lhs->lhs_whole == NULL)
-		    return NULL;
+		lhs->lhs_సంపూర్ణ = vim_strnsave(arg, lhs->lhs_varlen_మొత్తం);
+		ఒకవేళ (lhs->lhs_సంపూర్ణ == ఖాళీ)
+		    తిరిగి ఖాళీ;
 	    }
 	}
 
-	return arg + lhs->lhs_varlen_total;
+	తిరిగి arg + lhs->lhs_varlen_మొత్తం;
     }
 
     // other redirects are handled like at script level
-    return compile_exec(line, eap, cctx);
+    తిరిగి compile_exec(పంక్తి, eap, cctx);
 }
 
-#if defined(FEAT_QUICKFIX)
+#ఒకవేళ defined(FEAT_QUICKFIX)
     char_u *
-compile_cexpr(char_u *line, exarg_T *eap, cctx_T *cctx)
+compile_cexpr(char_u *పంక్తి, exarg_T *eap, cctx_T *cctx)
 {
     isn_T	*isn;
     char_u	*p;
 
     isn = generate_instr(cctx, ISN_CEXPR_AUCMD);
-    if (isn == NULL)
-	return NULL;
-    isn->isn_arg.number = eap->cmdidx;
+    ఒకవేళ (isn == ఖాళీ)
+	తిరిగి ఖాళీ;
+    isn->isn_arg.సంఖ్య = eap->cmdidx;
 
     p = eap->arg;
-    if (compile_expr0(&p, cctx) == FAIL)
-	return NULL;
+    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+	తిరిగి ఖాళీ;
 
     isn = generate_instr(cctx, ISN_CEXPR_CORE);
-    if (isn == NULL)
-	return NULL;
+    ఒకవేళ (isn == ఖాళీ)
+	తిరిగి ఖాళీ;
     isn->isn_arg.cexpr.cexpr_ref = ALLOC_ONE(cexprref_T);
-    if (isn->isn_arg.cexpr.cexpr_ref == NULL)
-	return NULL;
+    ఒకవేళ (isn->isn_arg.cexpr.cexpr_ref == ఖాళీ)
+	తిరిగి ఖాళీ;
     isn->isn_arg.cexpr.cexpr_ref->cer_cmdidx = eap->cmdidx;
     isn->isn_arg.cexpr.cexpr_ref->cer_forceit = eap->forceit;
-    isn->isn_arg.cexpr.cexpr_ref->cer_cmdline = vim_strsave(skipwhite(line));
+    isn->isn_arg.cexpr.cexpr_ref->cer_cmdline = vim_strsave(skipwhite(పంక్తి));
 
-    return p;
+    తిరిగి p;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Compile "return [expr]".
  * When "legacy" is TRUE evaluate [expr] with legacy syntax
  */
     char_u *
-compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
+compile_return(char_u *arg, పూర్ణాంకం check_return_type, పూర్ణాంకం legacy, cctx_T *cctx)
 {
     char_u	*p = arg;
-    type_T	*stack_type;
+    type_T	*దొంతర_type;
 
-    if (*p != NUL && *p != '|' && *p != '\n'
-					&& (legacy || !vim9_comment_start(p)))
+    ఒకవేళ (*p != NUL && *p != '|' && *p != '\n'
+					&& (legacy || !vim9_comment_ప్రారంభం(p)))
     {
 	// For a lambda, "return expr" is always used, also when "expr" results
 	// in a void.
-	if (cctx->ctx_ufunc->uf_ret_type->tt_type == VAR_VOID
+	ఒకవేళ (cctx->ctx_ufunc->uf_ret_type->tt_type == VAR_VOID
 		&& (cctx->ctx_ufunc->uf_flags & FC_LAMBDA) == 0)
 	{
-	    emsg(_(e_returning_value_in_function_without_return_type));
-	    return NULL;
+	    emsg(_(e_returning_విలువ_లోపల_function_without_return_type));
+	    తిరిగి ఖాళీ;
 	}
-	if (legacy)
+	ఒకవేళ (legacy)
 	{
-	    int save_flags = cmdmod.cmod_flags;
+	    పూర్ణాంకం save_flags = cmdmod.cmod_flags;
 
 	    generate_LEGACY_EVAL(cctx, p);
-	    if (need_type(&t_any, cctx->ctx_ufunc->uf_ret_type, 0, -1,
+	    ఒకవేళ (need_type(&t_any, cctx->ctx_ufunc->uf_ret_type, 0, -1,
 						0, cctx, FALSE, FALSE) == FAIL)
-		return NULL;
+		తిరిగి ఖాళీ;
 	    cmdmod.cmod_flags |= CMOD_LEGACY;
-	    (void)skip_expr(&p, NULL);
+	    (శూన్య)skip_సమాసం(&p, ఖాళీ);
 	    cmdmod.cmod_flags = save_flags;
 	}
-	else
+	లేకపోతే
 	{
 	    // compile return argument into instructions
-	    if (compile_expr0(&p, cctx) == FAIL)
-		return NULL;
+	    ఒకవేళ (compile_expr0(&p, cctx) == FAIL)
+		తిరిగి ఖాళీ;
 	}
 
-	if (cctx->ctx_skip != SKIP_YES)
+	ఒకవేళ (cctx->ctx_skip != SKIP_YES)
 	{
 	    // "check_return_type" with uf_ret_type set to &t_unknown is used
 	    // for an inline function without a specified return type.  Set the
 	    // return type here.
-	    stack_type = get_type_on_stack(cctx, 0);
-	    if (check_type_is_value(stack_type) == FAIL)
-		return NULL;
-	    if ((check_return_type && (cctx->ctx_ufunc->uf_ret_type == NULL
+	    దొంతర_type = get_type_on_దొంతర(cctx, 0);
+	    ఒకవేళ (check_type_is_విలువ(దొంతర_type) == FAIL)
+		తిరిగి ఖాళీ;
+	    ఒకవేళ ((check_return_type && (cctx->ctx_ufunc->uf_ret_type == ఖాళీ
 				|| cctx->ctx_ufunc->uf_ret_type == &t_unknown))
 		    || (!check_return_type
 				&& cctx->ctx_ufunc->uf_ret_type == &t_unknown))
 	    {
-		cctx->ctx_ufunc->uf_ret_type = stack_type;
+		cctx->ctx_ufunc->uf_ret_type = దొంతర_type;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (need_type(stack_type, cctx->ctx_ufunc->uf_ret_type, 0,
+		ఒకవేళ (need_type(దొంతర_type, cctx->ctx_ufunc->uf_ret_type, 0,
 					    -1, 0, cctx, FALSE, FALSE) == FAIL)
-		    return NULL;
+		    తిరిగి ఖాళీ;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	// "check_return_type" cannot be TRUE, only used for a lambda which
 	// always has an argument.
-	if (cctx->ctx_ufunc->uf_ret_type->tt_type != VAR_VOID
+	ఒకవేళ (cctx->ctx_ufunc->uf_ret_type->tt_type != VAR_VOID
 		&& cctx->ctx_ufunc->uf_ret_type->tt_type != VAR_UNKNOWN)
 	{
-	    emsg(_(e_missing_return_value));
-	    return NULL;
+	    emsg(_(e_missing_return_విలువ));
+	    తిరిగి ఖాళీ;
 	}
 
-	if (IS_CONSTRUCTOR_METHOD(cctx->ctx_ufunc))
+	ఒకవేళ (IS_CONSTRUCTOR_పద్ధతి(cctx->ctx_ufunc))
 	{
 	    // For a class new() constructor, return an object of the class.
 	    generate_instr(cctx, ISN_RETURN_OBJECT);
 	    cctx->ctx_ufunc->uf_ret_type =
 		&cctx->ctx_ufunc->uf_class->class_object_type;
 	}
-	else
+	లేకపోతే
 	    // No argument, return zero.
 	    generate_PUSHNR(cctx, 0);
     }
 
     // may need ENDLOOP when inside a :for or :while loop
-    if (compile_find_scope(NULL, NULL, NULL, NULL, cctx) == FAIL)
+    ఒకవేళ (compile_కనుగొను_scope(ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, cctx) == FAIL)
 
     // Undo any command modifiers.
     generate_undo_cmdmods(cctx);
 
-    if (cctx->ctx_skip != SKIP_YES && generate_instr(cctx, ISN_RETURN) == NULL)
-	return NULL;
+    ఒకవేళ (cctx->ctx_skip != SKIP_YES && generate_instr(cctx, ISN_RETURN) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // "return val | endif" is possible
-    return skipwhite(p);
+    తిరిగి skipwhite(p);
 }
 
 /*
  * Check if the separator for a :global or :substitute command is OK.
  */
-    int
+    పూర్ణాంకం
 check_global_and_subst(char_u *cmd, char_u *arg)
 {
-    if (arg == cmd + 1 && vim_strchr((char_u *)":-.", *arg) != NULL)
+    ఒకవేళ (arg == cmd + 1 && vim_strchr((char_u *)":-.", *arg) != ఖాళీ)
     {
 	semsg(_(e_separator_not_supported_str), arg);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    if (VIM_ISWHITE(cmd[1]))
+    ఒకవేళ (VIM_ISWHITE(cmd[1]))
     {
 	semsg(_(e_no_white_space_allowed_before_separator_str), cmd);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 
-#endif  // defined(FEAT_EVAL)
+#అయితే_ముగింపు  // defined(FEAT_EVAL)

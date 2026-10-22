@@ -10,20 +10,20 @@
  * Implements communication through a socket or any file handle.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
 
 // TRUE when netbeans is running with a GUI.
-#ifdef FEAT_GUI
-# define CH_HAS_GUI (gui.in_use || gui.starting)
-#endif
+#నిర్వచితమైతే FEAT_GUI
+# define CH_HAS_GUI (gui.లోపల_use || gui.starting)
+#అయితే_ముగింపు
 
 // Note: when making changes here also adjust configure.ac.
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 // WinSock API is separated from C API, thus we can't use read(), write(),
 // errno...
-# define SOCK_ERRNO errno = WSAGetLastError()
+# define SOCK_ERRNO errno = WSAGet_చివరి_Error()
 # undef ECONNREFUSED
 # define ECONNREFUSED WSAECONNREFUSED
 # undef EWOULDBLOCK
@@ -38,12 +38,12 @@
 # define sock_read(sd, buf, len) recv((SOCKET)sd, buf, len, 0)
 # define sock_close(sd) closesocket((SOCKET)sd)
 // Support for Unix-domain sockets was added in Windows SDK 17061.
-# define UNIX_PATH_MAX 108
-typedef struct sockaddr_un {
-    ADDRESS_FAMILY sun_family;
-    char sun_path[UNIX_PATH_MAX];
+# define UNIX_మార్గం_MAX 108
+రకనిర్వచనం నిర్మాణం sockaddr_un {
+    చిరునామా_FAMILY sun_family;
+    అక్షరం sun_మార్గం[UNIX_మార్గం_MAX];
 } SOCKADDR_UN, *PSOCKADDR_UN;
-#else
+#లేకపోతే
 # include <netdb.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -53,138 +53,138 @@ typedef struct sockaddr_un {
 #  include <libgen.h>
 # endif
 # define SOCK_ERRNO
-# define sock_write(sd, buf, len) write(sd, buf, len)
-# define sock_read(sd, buf, len) read(sd, buf, len)
+# define sock_write(sd, buf, len) లిఖ(sd, buf, len)
+# define sock_read(sd, buf, len) పఠ(sd, buf, len)
 # define sock_close(sd) close(sd)
-# define fd_read(fd, buf, len) read(fd, buf, len)
-# define fd_write(sd, buf, len) write(sd, buf, len)
+# define fd_read(fd, buf, len) పఠ(fd, buf, len)
+# define fd_write(sd, buf, len) లిఖ(sd, buf, len)
 # define fd_close(sd) close(sd)
-#endif
+#అయితే_ముగింపు
 
-static void channel_read(channel_T *channel, ch_part_T part, char *func);
-static void channel_wait_any(long msec);
-static ch_mode_T channel_get_mode(channel_T *channel, ch_part_T part);
-static int channel_get_timeout(channel_T *channel, ch_part_T part);
-static channel_T *channel_open_stdio(void);
-static ch_part_T channel_part_send(channel_T *channel);
-static ch_part_T channel_part_read(channel_T *channel);
+స్థిర శూన్య channel_read(channel_T *channel, ch_part_T part, అక్షరం *func);
+స్థిర శూన్య channel_wait_any(దీర్ఘ msec);
+స్థిర ch_బహుళకం_T channel_get_బహుళకం(channel_T *channel, ch_part_T part);
+స్థిర పూర్ణాంకం channel_get_timeout(channel_T *channel, ch_part_T part);
+స్థిర channel_T *channel_open_stdio(శూన్య);
+స్థిర ch_part_T channel_part_send(channel_T *channel);
+స్థిర ch_part_T channel_part_read(channel_T *channel);
 
-#define FOR_ALL_CHANNELS(ch) \
-    for ((ch) = first_channel; (ch) != NULL; (ch) = (ch)->ch_next)
+#నిర్వచించు FOR_ALL_CHANNELS(ch) \
+    కొరకు ((ch) = మొదటి_channel; (ch) != ఖాళీ; (ch) = (ch)->ch_తదుపరి)
 
 // Whether we are inside channel_parse_messages() or another situation where it
 // is safe to invoke callbacks.
-static int safe_to_invoke_callback = 0;
+స్థిర పూర్ణాంకం సురక్షిత_గమ్యం_invoke_callback = 0;
 
-#ifdef MSWIN
-    static int
-fd_read(sock_T fd, char *buf, size_t len)
+#నిర్వచితమైతే MSWIN
+    స్థిర పూర్ణాంకం
+fd_read(sock_T fd, అక్షరం *buf, size_t len)
 {
     HANDLE h = (HANDLE)fd;
     DWORD nread;
 
-    if (!ReadFile(h, buf, (DWORD)len, &nread, NULL))
-	return -1;
-    return (int)nread;
+    ఒకవేళ (!ReadFile(h, buf, (DWORD)len, &nread, ఖాళీ))
+	తిరిగి -1;
+    తిరిగి (పూర్ణాంకం)nread;
 }
 
-    static int
-fd_write(sock_T fd, char *buf, size_t len)
+    స్థిర పూర్ణాంకం
+fd_write(sock_T fd, అక్షరం *buf, size_t len)
 {
     size_t	todo = len;
     HANDLE	h = (HANDLE)fd;
-    DWORD	nwrite, size, done = 0;
+    DWORD	nwrite, కొలత, పూర్తి = 0;
     OVERLAPPED	ov;
 
-    while (todo > 0)
+    అయితే (todo > 0)
     {
-	if (todo > MAX_NAMED_PIPE_SIZE)
-	    size = MAX_NAMED_PIPE_SIZE;
-	else
-	    size = (DWORD)todo;
+	ఒకవేళ (todo > MAX_NAMED_PIPE_కొలత)
+	    కొలత = MAX_NAMED_PIPE_కొలత;
+	లేకపోతే
+	    కొలత = (DWORD)todo;
 	// If the pipe overflows while the job does not read the data,
 	// WriteFile() will block forever. This abandons the write.
-	CLEAR_FIELD(ov);
+	CLEAR_క్షేత్రం(ov);
 	nwrite = 0;
-	if (!WriteFile(h, buf + done, size, &nwrite, &ov))
+	ఒకవేళ (!WriteFile(h, buf + పూర్తి, కొలత, &nwrite, &ov))
 	{
-	    DWORD err = GetLastError();
+	    DWORD err = Get_చివరి_Error();
 
-	    if (err != ERROR_IO_PENDING)
-		return -1;
-	    if (!GetOverlappedResult(h, &ov, &nwrite, FALSE))
-		return -1;
+	    ఒకవేళ (err != ERROR_IO_PENDING)
+		తిరిగి -1;
+	    ఒకవేళ (!Get_Overlapped_ఫలితం(h, &ov, &nwrite, FALSE))
+		తిరిగి -1;
 	    FlushFileBuffers(h);
 	}
-	else if (nwrite == 0)
+	లేకపోతే ఒకవేళ (nwrite == 0)
 	    // WriteFile() returns TRUE but did not write anything. This causes
 	    // a hang, so bail out.
-	    break;
+	    ఆపు;
 	todo -= nwrite;
-	done += nwrite;
+	పూర్తి += nwrite;
     }
-    return (int)done;
+    తిరిగి (పూర్ణాంకం)పూర్తి;
 }
 
-    static void
+    స్థిర శూన్య
 fd_close(sock_T fd)
 {
     HANDLE h = (HANDLE)fd;
 
     CloseHandle(h);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 # undef PERROR
-# define PERROR(msg) (void)semsg("%s: %s", msg, strerror_win32(errno))
+# define PERROR(సందేశం) (శూన్య)semsg("%s: %s", సందేశం, strerror_win32(errno))
 
-    static char *
-strerror_win32(int eno)
+    స్థిర అక్షరం *
+strerror_win32(పూర్ణాంకం eno)
 {
-    static LPVOID msgbuf = NULL;
+    స్థిర LPVOID msgbuf = ఖాళీ;
     char_u *ptr;
 
-    if (msgbuf)
+    ఒకవేళ (msgbuf)
     {
 	LocalFree(msgbuf);
-	msgbuf = NULL;
+	msgbuf = ఖాళీ;
     }
-    FormatMessage(
-	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-	FORMAT_MESSAGE_FROM_SYSTEM |
-	FORMAT_MESSAGE_IGNORE_INSERTS,
-	NULL,
+    Format_సందేశం(
+	FORMAT_సందేశం_ALLOCATE_బఫరు |
+	FORMAT_సందేశం_FROM_SYSTEM |
+	FORMAT_సందేశం_IGNORE_INSERTS,
+	ఖాళీ,
 	eno,
 	MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
 	(LPTSTR) &msgbuf,
 	0,
-	NULL);
-    if (msgbuf != NULL)
+	ఖాళీ);
+    ఒకవేళ (msgbuf != ఖాళీ)
 	// chomp \r or \n
-	for (ptr = (char_u *)msgbuf; *ptr; ptr++)
-	    switch (*ptr)
+	కొరకు (ptr = (char_u *)msgbuf; *ptr; ptr++)
+	    ఎంపిక (*ptr)
 	    {
-		case '\r':
+		స్థితి '\r':
 		    STRMOVE(ptr, ptr + 1);
 		    ptr--;
-		    break;
-		case '\n':
-		    if (*(ptr + 1) == '\0')
+		    ఆపు;
+		స్థితి '\n':
+		    ఒకవేళ (*(ptr + 1) == '\0')
 			*ptr = '\0';
-		    else
+		    లేకపోతే
 			*ptr = ' ';
-		    break;
+		    ఆపు;
 	    }
-    return msgbuf;
+    తిరిగి msgbuf;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * The list of all allocated channels.
  */
-static channel_T *first_channel = NULL;
-static int next_ch_id = 0;
+స్థిర channel_T *మొదటి_channel = ఖాళీ;
+స్థిర పూర్ణాంకం తదుపరి_ch_id = 0;
 
 /*
  * Allocate a new channel.  The refcount is set to 1.
@@ -192,44 +192,44 @@ static int next_ch_id = 0;
  * Returns NULL if out of memory.
  */
     channel_T *
-add_channel(void)
+కూడు_channel(శూన్య)
 {
     ch_part_T	part;
     channel_T	*channel = ALLOC_CLEAR_ONE(channel_T);
 
-    if (channel == NULL)
-	return NULL;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    channel->ch_id = next_ch_id++;
+    channel->ch_id = తదుపరి_ch_id++;
     ch_log(channel, "Created channel");
 
-    for (part = PART_SOCK; part < PART_COUNT; ++part)
+    కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
     {
 	channel->ch_part[part].ch_fd = INVALID_FD;
-#ifdef FEAT_GUI_X11
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
-#endif
-#ifdef FEAT_GUI_GTK
-	channel->ch_part[part].ch_inputHandler = 0;
-#endif
+#నిర్వచితమైతే FEAT_GUI_X11
+	channel->ch_part[part].ch_ఆదానం_Handler = (Xt_ఆదానం_Id)ఖాళీ;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_GTK
+	channel->ch_part[part].ch_ఆదానం_Handler = 0;
+#అయితే_ముగింపు
 	channel->ch_part[part].ch_timeout = 2000;
     }
 
-    if (first_channel != NULL)
+    ఒకవేళ (మొదటి_channel != ఖాళీ)
     {
-	first_channel->ch_prev = channel;
-	channel->ch_next = first_channel;
+	మొదటి_channel->ch_prev = channel;
+	channel->ch_తదుపరి = మొదటి_channel;
     }
-    first_channel = channel;
+    మొదటి_channel = channel;
 
     channel->ch_refcount = 1;
-    return channel;
+    తిరిగి channel;
 }
 
-    int
-has_any_channel(void)
+    పూర్ణాంకం
+has_any_channel(శూన్య)
 {
-    return first_channel != NULL;
+    తిరిగి మొదటి_channel != ఖాళీ;
 }
 
 /*
@@ -237,60 +237,60 @@ has_any_channel(void)
  * Return TRUE if "channel" has a callback and the associated job wasn't
  * killed.
  */
-    int
+    పూర్ణాంకం
 channel_still_useful(channel_T *channel)
 {
-    int has_sock_msg;
-    int	has_out_msg;
-    int	has_err_msg;
+    పూర్ణాంకం has_sock_సందేశం;
+    పూర్ణాంకం	has_బహిర్గతం_సందేశం;
+    పూర్ణాంకం	has_err_సందేశం;
 
     // If the job was killed the channel is not expected to work anymore.
-    if (channel->ch_job_killed && channel->ch_job == NULL)
-	return FALSE;
+    ఒకవేళ (channel->ch_పని_killed && channel->ch_పని == ఖాళీ)
+	తిరిగి FALSE;
 
     // If there is a close callback it may still need to be invoked.
-    if (channel->ch_close_cb.cb_name != NULL)
-	return TRUE;
+    ఒకవేళ (channel->ch_close_cb.cb_name != ఖాళీ)
+	తిరిగి TRUE;
 
     // If reading from or a buffer it's still useful.
-    if (channel->ch_part[PART_IN].ch_bufref.br_buf != NULL)
-	return TRUE;
+    ఒకవేళ (channel->ch_part[PART_లోపల].ch_bufref.br_buf != ఖాళీ)
+	తిరిగి TRUE;
 
     // If there is no callback then nobody can get readahead.  If the fd is
     // closed and there is no readahead then the callback won't be called.
-    has_sock_msg = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
-		|| channel->ch_part[PART_SOCK].ch_head.rq_next != NULL
-		|| channel->ch_part[PART_SOCK].ch_json_head.jq_next != NULL;
-    has_out_msg = channel->ch_part[PART_OUT].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_OUT].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_OUT].ch_json_head.jq_next != NULL;
-    has_err_msg = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_ERR].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_ERR].ch_json_head.jq_next != NULL;
-    return (channel->ch_callback.cb_name != NULL && (has_sock_msg
-		|| has_out_msg || has_err_msg))
-	    || ((channel->ch_part[PART_OUT].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_OUT].ch_bufref.br_buf != NULL)
-		    && has_out_msg)
-	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != NULL)
-		    && has_err_msg);
+    has_sock_సందేశం = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
+		|| channel->ch_part[PART_SOCK].ch_తల.rq_తదుపరి != ఖాళీ
+		|| channel->ch_part[PART_SOCK].ch_json_తల.jq_తదుపరి != ఖాళీ;
+    has_బహిర్గతం_సందేశం = channel->ch_part[PART_బహిర్గతం].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_బహిర్గతం].ch_తల.rq_తదుపరి != ఖాళీ
+		  || channel->ch_part[PART_బహిర్గతం].ch_json_తల.jq_తదుపరి != ఖాళీ;
+    has_err_సందేశం = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_ERR].ch_తల.rq_తదుపరి != ఖాళీ
+		  || channel->ch_part[PART_ERR].ch_json_తల.jq_తదుపరి != ఖాళీ;
+    తిరిగి (channel->ch_callback.cb_name != ఖాళీ && (has_sock_సందేశం
+		|| has_బహిర్గతం_సందేశం || has_err_సందేశం))
+	    || ((channel->ch_part[PART_బహిర్గతం].ch_callback.cb_name != ఖాళీ
+		       || channel->ch_part[PART_బహిర్గతం].ch_bufref.br_buf != ఖాళీ)
+		    && has_బహిర్గతం_సందేశం)
+	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != ఖాళీ
+		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != ఖాళీ)
+		    && has_err_సందేశం);
 }
 
 /*
  * Return TRUE if "channel" is closeable (i.e. all readable fds are closed).
  */
-    int
+    పూర్ణాంకం
 channel_can_close(channel_T *channel)
 {
-    return channel->ch_to_be_closed == 0;
+    తిరిగి channel->ch_గమ్యం_be_closed == 0;
 }
 
 /*
  * Close a channel and free all its resources.
  * The "channel" pointer remains valid.
  */
-    static void
+    స్థిర శూన్య
 channel_free_contents(channel_T *channel)
 {
     channel_close(channel, TRUE);
@@ -301,27 +301,27 @@ channel_free_contents(channel_T *channel)
 /*
  * Unlink "channel" from the list of channels and free it.
  */
-    static void
+    స్థిర శూన్య
 channel_free_channel(channel_T *channel)
 {
-    if (channel->ch_next != NULL)
-	channel->ch_next->ch_prev = channel->ch_prev;
-    if (channel->ch_prev == NULL)
-	first_channel = channel->ch_next;
-    else
-	channel->ch_prev->ch_next = channel->ch_next;
+    ఒకవేళ (channel->ch_తదుపరి != ఖాళీ)
+	channel->ch_తదుపరి->ch_prev = channel->ch_prev;
+    ఒకవేళ (channel->ch_prev == ఖాళీ)
+	మొదటి_channel = channel->ch_తదుపరి;
+    లేకపోతే
+	channel->ch_prev->ch_తదుపరి = channel->ch_తదుపరి;
     vim_free(channel);
 }
 
-    static void
+    స్థిర శూన్య
 channel_free(channel_T *channel)
 {
-    if (in_free_unref_items)
-	return;
+    ఒకవేళ (లోపల_free_unref_వస్తువులు)
+	తిరిగి;
 
-    if (safe_to_invoke_callback == 0)
-	channel->ch_to_be_freed = TRUE;
-    else
+    ఒకవేళ (సురక్షిత_గమ్యం_invoke_callback == 0)
+	channel->ch_గమ్యం_be_freed = TRUE;
+    లేకపోతే
     {
 	channel_free_contents(channel);
 	channel_free_channel(channel);
@@ -334,15 +334,15 @@ channel_free(channel_T *channel)
  * killed.
  * Return TRUE if the channel was freed.
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_may_free(channel_T *channel)
 {
-    if (!channel_still_useful(channel))
+    ఒకవేళ (!channel_still_useful(channel))
     {
 	channel_free(channel);
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -350,27 +350,27 @@ channel_may_free(channel_T *channel)
  * down to zero.  Don't free it if there is a pending action.
  * Returns TRUE when the channel is no longer referenced.
  */
-    int
+    పూర్ణాంకం
 channel_unref(channel_T *channel)
 {
-    if (channel != NULL && --channel->ch_refcount <= 0)
-	return channel_may_free(channel);
-    return FALSE;
+    ఒకవేళ (channel != ఖాళీ && --channel->ch_refcount <= 0)
+	తిరిగి channel_may_free(channel);
+    తిరిగి FALSE;
 }
 
-    int
-free_unused_channels_contents(int copyID, int mask)
+    పూర్ణాంకం
+free_వాడని_channels_contents(పూర్ణాంకం copyID, పూర్ణాంకం ముసుగు)
 {
-    int		did_free = FALSE;
+    పూర్ణాంకం		did_free = FALSE;
     channel_T	*ch;
 
     // This is invoked from the garbage collector, which only runs at a safe
     // point.
-    ++safe_to_invoke_callback;
+    ++సురక్షిత_గమ్యం_invoke_callback;
 
     FOR_ALL_CHANNELS(ch)
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	ఒకవేళ (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ముసుగు) != (copyID & ముసుగు))
 	{
 	    // Free the channel and ordinary items it contains, but don't
 	    // recurse into Lists, Dictionaries etc.
@@ -378,64 +378,64 @@ free_unused_channels_contents(int copyID, int mask)
 	    did_free = TRUE;
 	}
 
-    --safe_to_invoke_callback;
-    return did_free;
+    --సురక్షిత_గమ్యం_invoke_callback;
+    తిరిగి did_free;
 }
 
-    void
-free_unused_channels(int copyID, int mask)
+    శూన్య
+free_వాడని_channels(పూర్ణాంకం copyID, పూర్ణాంకం ముసుగు)
 {
     channel_T	*ch;
-    channel_T	*ch_next;
+    channel_T	*ch_తదుపరి;
 
-    for (ch = first_channel; ch != NULL; ch = ch_next)
+    కొరకు (ch = మొదటి_channel; ch != ఖాళీ; ch = ch_తదుపరి)
     {
-	ch_next = ch->ch_next;
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	ch_తదుపరి = ch->ch_తదుపరి;
+	ఒకవేళ (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ముసుగు) != (copyID & ముసుగు))
 	    // Free the channel struct itself.
 	    channel_free_channel(ch);
     }
 }
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+# ఒకవేళ defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
 /*
  * Lookup the channel from the socket.  Set "partp" to the fd index.
  * Returns NULL when the socket isn't found.
  */
-    static channel_T *
+    స్థిర channel_T *
 channel_fd2channel(sock_T fd, ch_part_T *partp)
 {
     channel_T	*channel;
     ch_part_T	part;
 
-    if (fd == INVALID_FD)
-	return NULL;
+    ఒకవేళ (fd == INVALID_FD)
+	తిరిగి ఖాళీ;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel->ch_part[part].ch_fd == fd)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
+	    ఒకవేళ (channel->ch_part[part].ch_fd == fd)
 	    {
 		*partp = part;
-		return channel;
+		తిరిగి channel;
 	    }
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static void
-channel_read_fd(int fd)
+    స్థిర శూన్య
+channel_read_fd(పూర్ణాంకం fd)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     channel = channel_fd2channel(fd, &part);
-    if (channel == NULL)
-	ch_error(NULL, "Channel for fd %d not found", fd);
-    else
+    ఒకవేళ (channel == ఖాళీ)
+	ch_error(ఖాళీ, "Channel for fd %d not found", fd);
+    లేకపోతే
 	channel_read(channel, part, "channel_read_fd");
 }
 # endif
@@ -444,206 +444,206 @@ channel_read_fd(int fd)
  * Read a command from netbeans.
  */
 # ifdef FEAT_GUI_X11
-    static void
-messageFromServerX11(XtPointer clientData,
-		  int *unused1 UNUSED,
-		  XtInputId *unused2 UNUSED)
+    స్థిర శూన్య
+సందేశం_From_Server_X11(Xt_సూచిక client_దత్తాంశం,
+		  పూర్ణాంకం *unused1 వాడని,
+		  Xt_ఆదానం_Id *unused2 వాడని)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((పూర్ణాంకం)(దీర్ఘ)client_దత్తాంశం);
 }
 # endif
 
 # ifdef FEAT_GUI_GTK
-#  if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
-messageFromServerGtk3(GIOChannel *unused1 UNUSED,
-		  GIOCondition unused2 UNUSED,
-		  gpointer clientData)
+#  ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    స్థిర gboolean
+సందేశం_From_Server_Gtk3(GIOChannel *unused1 వాడని,
+		  GIOCondition unused2 వాడని,
+		  gpointer client_దత్తాంశం)
 {
-    channel_read_fd(GPOINTER_TO_INT(clientData));
-    return TRUE; // Return FALSE instead in case the event source is to
+    channel_read_fd(GPOINTER_గమ్యం_INT(client_దత్తాంశం));
+    తిరిగి TRUE; // Return FALSE instead in case the event source is to
 		 // be removed after this function returns.
 }
-#  else
-    static void
-messageFromServerGtk2(gpointer clientData,
-		  gint unused1 UNUSED,
-		  GdkInputCondition unused2 UNUSED)
+#  లేకపోతే
+    స్థిర శూన్య
+సందేశం_From_Server_Gtk2(gpointer client_దత్తాంశం,
+		  gint unused1 వాడని,
+		  Gdk_ఆదానం_Condition unused2 వాడని)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((పూర్ణాంకం)(దీర్ఘ)client_దత్తాంశం);
 }
 #  endif
 # endif
 
-    static void
-channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
+    స్థిర శూన్య
+channel_gui_రిజిస్టరు_one(channel_T *channel, ch_part_T part వాడని)
 {
-    if (!CH_HAS_GUI)
-	return;
+    ఒకవేళ (!CH_HAS_GUI)
+	తిరిగి;
 
     // gets stuck in handling events for a not connected channel
-    if (channel->ch_keep_open)
-	return;
+    ఒకవేళ (channel->ch_keep_open)
+	తిరిగి;
 
 # ifdef FEAT_GUI_X11
     // Tell notifier we are interested in being called when there is input on
     // the editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
+    ఒకవేళ (channel->ch_part[part].ch_ఆదానం_Handler == (Xt_ఆదానం_Id)ఖాళీ)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
+		ch_part_పేర్లు[part], channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = XtAppAddInput(
+	channel->ch_part[part].ch_ఆదానం_Handler = Xt_App_కూడు_ఆదానం(
 		(XtAppContext)app_context,
 		channel->ch_part[part].ch_fd,
-		(XtPointer)(XtInputReadMask + XtInputExceptMask),
-		messageFromServerX11,
-		(XtPointer)(long)channel->ch_part[part].ch_fd);
+		(Xt_సూచిక)(Xt_ఆదానం_Read_ముసుగు + Xt_ఆదానం_Except_ముసుగు),
+		సందేశం_From_Server_X11,
+		(Xt_సూచిక)(దీర్ఘ)channel->ch_part[part].ch_fd);
     }
-# else
+# లేకపోతే
 #  ifdef FEAT_GUI_GTK
     // Tell gdk we are interested in being called when there is input on the
     // editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == 0)
+    ఒకవేళ (channel->ch_part[part].ch_ఆదానం_Handler == 0)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
-#   if GTK_CHECK_VERSION(3,0,0)
+		ch_part_పేర్లు[part], channel->ch_part[part].ch_fd);
+#   ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
 	GIOChannel *chnnl = g_io_channel_unix_new(
 		(gint)channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = g_io_add_watch(
+	channel->ch_part[part].ch_ఆదానం_Handler = g_io_కూడు_watch(
 		chnnl,
-		G_IO_IN|G_IO_HUP|G_IO_ERR|G_IO_PRI,
-		messageFromServerGtk3,
-		GINT_TO_POINTER(channel->ch_part[part].ch_fd));
+		G_IO_లోపల|G_IO_HUP|G_IO_ERR|G_IO_PRI,
+		సందేశం_From_Server_Gtk3,
+		GINT_గమ్యం_సూచిక(channel->ch_part[part].ch_fd));
 
 	g_io_channel_unref(chnnl);
-#   else
-	channel->ch_part[part].ch_inputHandler = gdk_input_add(
+#   లేకపోతే
+	channel->ch_part[part].ch_ఆదానం_Handler = gdk_ఆదానం_కూడు(
 		(gint)channel->ch_part[part].ch_fd,
-		(GdkInputCondition)
-			     ((int)GDK_INPUT_READ + (int)GDK_INPUT_EXCEPTION),
-		messageFromServerGtk2,
-		(gpointer)(long)channel->ch_part[part].ch_fd);
+		(Gdk_ఆదానం_Condition)
+			     ((పూర్ణాంకం)GDK_ఆదానం_READ + (పూర్ణాంకం)GDK_ఆదానం_EXCEPTION),
+		సందేశం_From_Server_Gtk2,
+		(gpointer)(దీర్ఘ)channel->ch_part[part].ch_fd);
 #   endif
     }
 #  endif
 # endif
 }
 
-    static void
-channel_gui_register(channel_T *channel)
+    స్థిర శూన్య
+channel_gui_రిజిస్టరు(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD != INVALID_FD)
-	channel_gui_register_one(channel, PART_SOCK);
-    if (channel->CH_OUT_FD != INVALID_FD
-	    && channel->CH_OUT_FD != channel->CH_SOCK_FD)
-	channel_gui_register_one(channel, PART_OUT);
-    if (channel->CH_ERR_FD != INVALID_FD
+    ఒకవేళ (channel->CH_SOCK_FD != INVALID_FD)
+	channel_gui_రిజిస్టరు_one(channel, PART_SOCK);
+    ఒకవేళ (channel->CH_బహిర్గతం_FD != INVALID_FD
+	    && channel->CH_బహిర్గతం_FD != channel->CH_SOCK_FD)
+	channel_gui_రిజిస్టరు_one(channel, PART_బహిర్గతం);
+    ఒకవేళ (channel->CH_ERR_FD != INVALID_FD
 	    && channel->CH_ERR_FD != channel->CH_SOCK_FD
-	    && channel->CH_ERR_FD != channel->CH_OUT_FD)
-	channel_gui_register_one(channel, PART_ERR);
+	    && channel->CH_ERR_FD != channel->CH_బహిర్గతం_FD)
+	channel_gui_రిజిస్టరు_one(channel, PART_ERR);
 }
 
 /*
  * Register any of our file descriptors with the GUI event handling system.
  * Called when the GUI has started.
  */
-    void
-channel_gui_register_all(void)
+    శూన్య
+channel_gui_రిజిస్టరు_all(శూన్య)
 {
     channel_T *channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_gui_register(channel);
+	channel_gui_రిజిస్టరు(channel);
 }
 
-    static void
-channel_gui_unregister_one(channel_T *channel UNUSED, ch_part_T part UNUSED)
+    స్థిర శూన్య
+channel_gui_unregister_one(channel_T *channel వాడని, ch_part_T part వాడని)
 {
 # ifdef FEAT_GUI_X11
-    if (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
+    ఒకవేళ (channel->ch_part[part].ch_ఆదానం_Handler != (Xt_ఆదానం_Id)ఖాళీ)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-	XtRemoveInput(channel->ch_part[part].ch_inputHandler);
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
+	ch_log(channel, "Unregistering part %s", ch_part_పేర్లు[part]);
+	Xt_Remove_ఆదానం(channel->ch_part[part].ch_ఆదానం_Handler);
+	channel->ch_part[part].ch_ఆదానం_Handler = (Xt_ఆదానం_Id)ఖాళీ;
     }
-# else
+# లేకపోతే
 #  ifdef FEAT_GUI_GTK
-    if (channel->ch_part[part].ch_inputHandler != 0)
+    ఒకవేళ (channel->ch_part[part].ch_ఆదానం_Handler != 0)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-#   if GTK_CHECK_VERSION(3,0,0)
-	g_source_remove(channel->ch_part[part].ch_inputHandler);
-#   else
-	gdk_input_remove(channel->ch_part[part].ch_inputHandler);
+	ch_log(channel, "Unregistering part %s", ch_part_పేర్లు[part]);
+#   ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+	g_ఆధారం_remove(channel->ch_part[part].ch_ఆదానం_Handler);
+#   లేకపోతే
+	gdk_ఆదానం_remove(channel->ch_part[part].ch_ఆదానం_Handler);
 #   endif
-	channel->ch_part[part].ch_inputHandler = 0;
+	channel->ch_part[part].ch_ఆదానం_Handler = 0;
     }
 #  endif
 # endif
 }
 
-    static void
+    స్థిర శూన్య
 channel_gui_unregister(channel_T *channel)
 {
     ch_part_T	part;
 
-    for (part = PART_SOCK; part < PART_IN; ++part)
+    కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	channel_gui_unregister_one(channel, part);
 }
 
-#endif  // FEAT_GUI
+#అయితే_ముగింపు  // FEAT_GUI
 
 /*
  * For Unix we need to call connect() again after connect() failed.
  * On Win32 one time is sufficient.
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_connect(
 	channel_T *channel,
-	const struct sockaddr *server_addr,
-	int server_addrlen,
-	int *waittime)
+	స్థిరరాశి నిర్మాణం sockaddr *server_addr,
+	పూర్ణాంకం server_addrlen,
+	పూర్ణాంకం *waittime)
 {
-    int		sd = -1;
-#ifdef MSWIN
+    పూర్ణాంకం		sd = -1;
+#నిర్వచితమైతే MSWIN
     u_long	val = 1;
-#endif
+#అయితే_ముగింపు
 
-    while (TRUE)
+    అయితే (TRUE)
     {
-	long	elapsed_msec = 0;
-	int	waitnow;
-	int	ret;
+	దీర్ఘ	elapsed_msec = 0;
+	పూర్ణాంకం	waitnow;
+	పూర్ణాంకం	ret;
 
-	if (sd >= 0)
+	ఒకవేళ (sd >= 0)
 	    sock_close(sd);
 	sd = socket(server_addr->sa_family, SOCK_STREAM, 0);
-	if (sd == -1)
+	ఒకవేళ (sd == -1)
 	{
 	    ch_error(channel, "in socket() in channel_connect().");
-	    PERROR(_(e_socket_in_channel_connect));
-	    return -1;
+	    PERROR(_(e_socket_లోపల_channel_connect));
+	    తిరిగి -1;
 	}
 
-	if (*waittime >= 0)
+	ఒకవేళ (*waittime >= 0)
 	{
 	    // Make connect() non-blocking.
-	    if (
-#ifdef MSWIN
+	    ఒకవేళ (
+#నిర్వచితమైతే MSWIN
 		ioctlsocket(sd, FIONBIO, &val) < 0
-#else
+#లేకపోతే
 		fcntl(sd, F_SETFL, O_NONBLOCK) < 0
-#endif
+#అయితే_ముగింపు
 	       )
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
 		sock_close(sd);
-		return -1;
+		తిరిగి -1;
 	    }
 	}
 
@@ -651,29 +651,29 @@ channel_connect(
 	ch_log(channel, "Connecting...");
 
 	ret = connect(sd, server_addr, server_addrlen);
-	if (ret == 0)
+	ఒకవేళ (ret == 0)
 	    // The connection could be established.
-	    break;
+	    ఆపు;
 
 	SOCK_ERRNO;
-	if (*waittime < 0 || (errno != EWOULDBLOCK
+	ఒకవేళ (*waittime < 0 || (errno != EWOULDBLOCK
 		&& errno != ECONNREFUSED
-#ifdef EINPROGRESS
+#నిర్వచితమైతే EINPROGRESS
 		&& errno != EINPROGRESS
-#endif
+#అయితే_ముగింపు
 		))
 	{
 	    ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-	    PERROR(_(e_cannot_connect_to_port));
+	    PERROR(_(e_cannot_connect_గమ్యం_పోర్టు));
 	    sock_close(sd);
-	    return -1;
+	    తిరిగి -1;
 	}
-	else if (errno == ECONNREFUSED)
+	లేకపోతే ఒకవేళ (errno == ECONNREFUSED)
 	{
 	    ch_error(channel, "channel_connect: Connection refused");
 	    sock_close(sd);
-	    return -1;
+	    తిరిగి -1;
 	}
 
 	// Limit the waittime to 50 msec.  If it doesn't work within this
@@ -683,15 +683,15 @@ channel_connect(
 	// If connect() didn't finish then try using select() to wait for the
 	// connection to be made. For Win32 always use select() to wait.
 	{
-	    struct timeval	tv;
+	    నిర్మాణం timeval	tv;
 	    fd_set		rfds;
 	    fd_set		wfds;
-#ifndef MSWIN
-	    int			so_error = 0;
-	    socklen_t		so_error_len = sizeof(so_error);
-	    struct timeval	start_tv;
-	    struct timeval	end_tv;
-#endif
+#నిర్వచితం_కాకపోతే MSWIN
+	    పూర్ణాంకం			so_error = 0;
+	    socklen_t		so_error_len = పరిమాణం(so_error);
+	    నిర్మాణం timeval	ప్రారంభం_tv;
+	    నిర్మాణం timeval	చివర_tv;
+#అయితే_ముగింపు
 	    FD_ZERO(&rfds);
 	    FD_SET(sd, &rfds);
 	    FD_ZERO(&wfds);
@@ -699,35 +699,35 @@ channel_connect(
 
 	    tv.tv_sec = waitnow / 1000;
 	    tv.tv_usec = (waitnow % 1000) * 1000;
-#ifndef MSWIN
-	    gettimeofday(&start_tv, NULL);
-#endif
+#నిర్వచితం_కాకపోతే MSWIN
+	    gettimeofday(&ప్రారంభం_tv, ఖాళీ);
+#అయితే_ముగింపు
 	    ch_log(channel,
 		      "Waiting for connection (waiting %d msec)...", waitnow);
 
-	    ret = select(sd + 1, &rfds, &wfds, NULL, &tv);
-	    if (ret < 0)
+	    ret = select(sd + 1, &rfds, &wfds, ఖాళీ, &tv);
+	    ఒకవేళ (ret < 0)
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-		PERROR(_(e_cannot_connect_to_port));
+		PERROR(_(e_cannot_connect_గమ్యం_పోర్టు));
 		sock_close(sd);
-		return -1;
+		తిరిగి -1;
 	    }
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	    // On Win32: select() is expected to work and wait for up to
 	    // "waitnow" msec for the socket to be open.
-	    if (FD_ISSET(sd, &wfds))
-		break;
+	    ఒకవేళ (FD_ISSET(sd, &wfds))
+		ఆపు;
 	    elapsed_msec = waitnow;
-	    if (*waittime > 1 && elapsed_msec < *waittime)
+	    ఒకవేళ (*waittime > 1 && elapsed_msec < *waittime)
 	    {
 		*waittime -= elapsed_msec;
-		continue;
+		కొనసాగు;
 	    }
-#else
+#లేకపోతే
 	    // On Linux-like systems: See socket(7) for the behavior
 	    // After putting the socket in non-blocking mode, connect() will
 	    // return EINPROGRESS, select() will not wait (as if writing is
@@ -735,11 +735,11 @@ channel_connect(
 	    // actually able to connect.
 	    // We detect a failure to connect when either read and write fds
 	    // are set.  Use getsockopt() to find out what kind of failure.
-	    if (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
+	    ఒకవేళ (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
 	    {
 		ret = getsockopt(sd,
 			      SOL_SOCKET, SO_ERROR, &so_error, &so_error_len);
-		if (ret < 0 || (so_error != 0
+		ఒకవేళ (ret < 0 || (so_error != 0
 			&& so_error != EWOULDBLOCK
 			&& so_error != ECONNREFUSED
 # ifdef EINPROGRESS
@@ -750,30 +750,30 @@ channel_connect(
 		    ch_error(channel,
 			    "channel_connect: Connect failed with errno %d",
 			    so_error);
-		    PERROR(_(e_cannot_connect_to_port));
+		    PERROR(_(e_cannot_connect_గమ్యం_పోర్టు));
 		    sock_close(sd);
-		    return -1;
+		    తిరిగి -1;
 		}
-		else if (errno == ECONNREFUSED)
+		లేకపోతే ఒకవేళ (errno == ECONNREFUSED)
 		{
 		    ch_error(channel, "channel_connect: Connection refused");
 		    sock_close(sd);
-		    return -1;
+		    తిరిగి -1;
 		}
 	    }
 
-	    if (FD_ISSET(sd, &wfds) && so_error == 0)
+	    ఒకవేళ (FD_ISSET(sd, &wfds) && so_error == 0)
 		// Did not detect an error, connection is established.
-		break;
+		ఆపు;
 
-	    gettimeofday(&end_tv, NULL);
-	    elapsed_msec = (end_tv.tv_sec - start_tv.tv_sec) * 1000
-				 + (end_tv.tv_usec - start_tv.tv_usec) / 1000;
-#endif
+	    gettimeofday(&చివర_tv, ఖాళీ);
+	    elapsed_msec = (చివర_tv.tv_sec - ప్రారంభం_tv.tv_sec) * 1000
+				 + (చివర_tv.tv_usec - ప్రారంభం_tv.tv_usec) / 1000;
+#అయితే_ముగింపు
 	}
 
-#ifndef MSWIN
-	if (*waittime > 1 && elapsed_msec < *waittime)
+#నిర్వచితం_కాకపోతే MSWIN
+	ఒకవేళ (*waittime > 1 && elapsed_msec < *waittime)
 	{
 	    // The port isn't ready but we also didn't get an error.
 	    // This happens when the server didn't open the socket
@@ -781,40 +781,40 @@ channel_connect(
 	    // "waitnow"  and try again.
 	    waitnow -= elapsed_msec;
 	    *waittime -= elapsed_msec;
-	    if (waitnow > 0)
+	    ఒకవేళ (waitnow > 0)
 	    {
-		mch_delay((long)waitnow, MCH_DELAY_IGNOREINPUT);
+		mch_delay((దీర్ఘ)waitnow, MCH_DELAY_IGNOREINPUT);
 		ui_breakcheck();
 		*waittime -= waitnow;
 	    }
-	    if (!got_int)
+	    ఒకవేళ (!got_int)
 	    {
-		if (*waittime <= 0)
+		ఒకవేళ (*waittime <= 0)
 		    // give it one more try
 		    *waittime = 1;
-		continue;
+		కొనసాగు;
 	    }
 	    // we were interrupted, behave as if timed out
 	}
-#endif
+#అయితే_ముగింపు
 
 	// We timed out.
 	ch_error(channel, "Connection timed out");
 	sock_close(sd);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (*waittime >= 0)
+    ఒకవేళ (*waittime >= 0)
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	val = 0;
 	ioctlsocket(sd, FIONBIO, &val);
-#else
-	(void)fcntl(sd, F_SETFL, 0);
-#endif
+#లేకపోతే
+	(శూన్య)fcntl(sd, F_SETFL, 0);
+#అయితే_ముగింపు
     }
 
-    return sd;
+    తిరిగి sd;
 }
 
 /*
@@ -824,62 +824,62 @@ channel_connect(
  */
     channel_T *
 channel_open_unix(
-	const char *path,
-	void (*nb_close_cb)(void))
+	స్థిరరాశి అక్షరం *మార్గం,
+	శూన్య (*nb_close_cb)(శూన్య))
 {
-    channel_T		*channel = NULL;
-    int			sd = -1;
-    size_t		path_len = STRLEN(path);
-    struct sockaddr_un	server;
+    channel_T		*channel = ఖాళీ;
+    పూర్ణాంకం			sd = -1;
+    size_t		మార్గం_len = STRLEN(మార్గం);
+    నిర్మాణం sockaddr_un	server;
     size_t		server_len;
-    int			waittime = -1;
+    పూర్ణాంకం			waittime = -1;
 
-    if (*path == NUL || path_len >= sizeof(server.sun_path))
+    ఒకవేళ (*మార్గం == NUL || మార్గం_len >= పరిమాణం(server.sun_మార్గం))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), మార్గం);
+	తిరిగి ఖాళీ;
     }
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     channel_init_winsock();
-#endif
+#అయితే_ముగింపు
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ఖాళీ, "Cannot allocate channel.");
+	తిరిగి ఖాళీ;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_క్షేత్రం(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_మార్గం, మార్గం, పరిమాణం(server.sun_మార్గం) - 1);
 
-    ch_log(channel, "Trying to connect to %s", path);
+    ch_log(channel, "Trying to connect to %s", మార్గం);
 
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    sd = channel_connect(channel, (struct sockaddr *)&server, (int)server_len,
+    server_len = offsetof(నిర్మాణం sockaddr_un, sun_మార్గం) + మార్గం_len + 1;
+    sd = channel_connect(channel, (నిర్మాణం sockaddr *)&server, (పూర్ణాంకం)server_len,
 								   &waittime);
 
-    if (sd < 0)
+    ఒకవేళ (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (అక్షరం *)vim_strsave((char_u *)మార్గం);
+    channel->ch_పోర్టు = 0;
+    channel->ch_గమ్యం_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#నిర్వచితమైతే FEAT_GUI
+    channel_gui_రిజిస్టరు_one(channel, PART_SOCK);
+#అయితే_ముగింపు
 
-    return channel;
+    తిరిగి channel;
 }
 
 /*
@@ -891,41 +891,41 @@ channel_open_unix(
  */
     channel_T *
 channel_open(
-	const char *hostname,
-	int port,
-	int waittime,
-	void (*nb_close_cb)(void))
+	స్థిరరాశి అక్షరం *hostname,
+	పూర్ణాంకం పోర్టు,
+	పూర్ణాంకం waittime,
+	శూన్య (*nb_close_cb)(శూన్య))
 {
-    int			sd = -1;
-    channel_T		*channel = NULL;
-#ifdef FEAT_IPV6
-    int			err;
-    struct addrinfo	hints;
-    struct addrinfo	*res = NULL;
-    struct addrinfo	*addr = NULL;
-#else
-    struct sockaddr_in	server;
-    struct hostent	*host = NULL;
-#endif
+    పూర్ణాంకం			sd = -1;
+    channel_T		*channel = ఖాళీ;
+#నిర్వచితమైతే FEAT_IPV6
+    పూర్ణాంకం			err;
+    నిర్మాణం addrinfo	hints;
+    నిర్మాణం addrinfo	*res = ఖాళీ;
+    నిర్మాణం addrinfo	*addr = ఖాళీ;
+#లేకపోతే
+    నిర్మాణం sockaddr_లోపల	server;
+    నిర్మాణం hostent	*host = ఖాళీ;
+#అయితే_ముగింపు
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     channel_init_winsock();
-#endif
+#అయితే_ముగింపు
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ఖాళీ, "Cannot allocate channel.");
+	తిరిగి ఖాళీ;
     }
 
     // Get the server internet address and put into addr structure fill in the
     // socket address structure and connect to server.
-#ifdef FEAT_IPV6
-    CLEAR_FIELD(hints);
+#నిర్వచితమైతే FEAT_IPV6
+    CLEAR_క్షేత్రం(hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-# if defined(__ANDROID__)
+# ఒకవేళ defined(__ANDROID__)
     hints.ai_flags = AI_ADDRCONFIG;
 # elif defined(AI_ADDRCONFIG) && defined(AI_V4MAPPED)
     hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
@@ -933,192 +933,192 @@ channel_open(
     // Set port number manually in order to prevent name resolution services
     // from being invoked in the environment where AI_NUMERICSERV is not
     // defined.
-    if ((err = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+    ఒకవేళ ((err = getaddrinfo(hostname, ఖాళీ, &hints, &res)) != 0)
     {
 	ch_error(channel, "in getaddrinfo() in channel_open()");
-	semsg(_(e_getaddrinfo_in_channel_open_str), gai_strerror(err));
+	semsg(_(e_getaddrinfo_లోపల_channel_open_str), gai_strerror(err));
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // Count the number of addresses for timeout distribution
-    int addr_count = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next)
-	addr_count++;
+    పూర్ణాంకం addr_లెక్క = 0;
+    కొరకు (addr = res; addr != ఖాళీ; addr = addr->ai_తదుపరి)
+	addr_లెక్క++;
 
     // On Mac and Solaris a zero timeout almost never works.  Waiting for
     // one millisecond already helps a lot.  Later Mac systems (using IPv6)
     // need more time, 15 milliseconds appears to work well.
     // Let's do it for all systems, because we don't know why this is
     // needed.
-    if (waittime == 0)
+    ఒకవేళ (waittime == 0)
 	waittime = 15;
 
-    int addr_index = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next, addr_index++)
+    పూర్ణాంకం addr_సూచీ = 0;
+    కొరకు (addr = res; addr != ఖాళీ; addr = addr->ai_తదుపరి, addr_సూచీ++)
     {
-	const char  *dst = hostname;
+	స్థిరరాశి అక్షరం  *dst = hostname;
 # ifdef HAVE_INET_NTOP
-	const void  *src = NULL;
-	char	    buf[NUMBUFLEN];
+	స్థిరరాశి శూన్య  *src = ఖాళీ;
+	అక్షరం	    buf[NUMBUFLEN];
 # endif
-	int	    try_waittime;
-	int	    before_waittime;
-	int	    consumed;
-	int	    remaining_addrs;
+	పూర్ణాంకం	    try_waittime;
+	పూర్ణాంకం	    before_waittime;
+	పూర్ణాంకం	    consumed;
+	పూర్ణాంకం	    మిగిలిన_addrs;
 
-	if (addr->ai_family == AF_INET6)
+	ఒకవేళ (addr->ai_family == AF_INET6)
 	{
-	    struct sockaddr_in6 *sai = (struct sockaddr_in6 *)addr->ai_addr;
+	    నిర్మాణం sockaddr_in6 *sai = (నిర్మాణం sockaddr_in6 *)addr->ai_addr;
 
-	    sai->sin6_port = htons(port);
+	    sai->sin6_పోర్టు = htons(పోర్టు);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin6_addr;
 # endif
 	}
-	else if (addr->ai_family == AF_INET)
+	లేకపోతే ఒకవేళ (addr->ai_family == AF_INET)
 	{
-	    struct sockaddr_in *sai = (struct sockaddr_in *)addr->ai_addr;
+	    నిర్మాణం sockaddr_లోపల *sai = (నిర్మాణం sockaddr_లోపల *)addr->ai_addr;
 
-	    sai->sin_port = htons(port);
+	    sai->sin_పోర్టు = htons(పోర్టు);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin_addr;
 # endif
 	}
 # ifdef HAVE_INET_NTOP
-	if (src != NULL)
+	ఒకవేళ (src != ఖాళీ)
 	{
-	    dst = inet_ntop(addr->ai_family, src, buf, sizeof(buf));
-	    if (dst == NULL)
+	    dst = inet_ntop(addr->ai_family, src, buf, పరిమాణం(buf));
+	    ఒకవేళ (dst == ఖాళీ)
 		dst = hostname;
-	    else if (STRCMP(hostname, dst) != 0)
+	    లేకపోతే ఒకవేళ (STRCMP(hostname, dst) != 0)
 		ch_log(channel, "Resolved %s to %s", hostname, dst);
 	}
 # endif
 
-	ch_log(channel, "Trying to connect to %s port %d", dst, port);
+	ch_log(channel, "Trying to connect to %s port %d", dst, పోర్టు);
 
 	// Distribute the timeout across addresses for better fallback behavior.
 	// This implements a simplified version of Happy Eyeballs (RFC 8305).
-	if (addr->ai_next == NULL)
+	ఒకవేళ (addr->ai_తదుపరి == ఖాళీ)
 	    try_waittime = waittime;
-	else if (addr_index == 0)
+	లేకపోతే ఒకవేళ (addr_సూచీ == 0)
 	{
-	    if (waittime > 500)
+	    ఒకవేళ (waittime > 500)
 		try_waittime = 250;
-	    else if (waittime > 30)
+	    లేకపోతే ఒకవేళ (waittime > 30)
 		try_waittime = waittime / 2;
-	    else
+	    లేకపోతే
 		try_waittime = waittime;
 	}
-	else
+	లేకపోతే
 	{
-	    remaining_addrs = addr_count - addr_index;
-	    try_waittime = waittime / remaining_addrs;
+	    మిగిలిన_addrs = addr_లెక్క - addr_సూచీ;
+	    try_waittime = waittime / మిగిలిన_addrs;
 	}
 
 	before_waittime = try_waittime;
-	sd = channel_connect(channel, addr->ai_addr, (int)addr->ai_addrlen,
+	sd = channel_connect(channel, addr->ai_addr, (పూర్ణాంకం)addr->ai_addrlen,
 							   &try_waittime);
 
 	// Update the overall waittime based on consumed time
 	consumed = before_waittime - try_waittime;
 	waittime -= consumed;
-	if (waittime < 0)
+	ఒకవేళ (waittime < 0)
 	    waittime = 0;
 
-	if (sd >= 0)
-	    break;
+	ఒకవేళ (sd >= 0)
+	    ఆపు;
 
 	// If we have no time left, stop trying
-	if (waittime <= 0 && addr->ai_next != NULL)
+	ఒకవేళ (waittime <= 0 && addr->ai_తదుపరి != ఖాళీ)
 	{
 	    ch_log(channel, "Out of time, stopping connection attempts");
-	    break;
+	    ఆపు;
 	}
     }
 
     freeaddrinfo(res);
-#else
-    CLEAR_FIELD(server);
+#లేకపోతే
+    CLEAR_క్షేత్రం(server);
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    if ((host = gethostbyname(hostname)) == NULL)
+    server.sin_పోర్టు = htons(పోర్టు);
+    ఒకవేళ ((host = gethostbyname(hostname)) == ఖాళీ)
     {
 	ch_error(channel, "in gethostbyname() in channel_open()");
-	PERROR(_(e_gethostbyname_in_channel_open));
+	PERROR(_(e_gethostbyname_లోపల_channel_open));
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     {
-	char *p;
+	అక్షరం *p;
 
 	// When using host->h_addr_list[0] directly ubsan warns for it to not
 	// be aligned.  First copy the pointer to avoid that.
-	memcpy(&p, &host->h_addr_list[0], sizeof(p));
-	memcpy((char *)&server.sin_addr, p, host->h_length);
+	జ్ఞాపకం_నకలు(&p, &host->h_addr_list[0], పరిమాణం(p));
+	జ్ఞాపకం_నకలు((అక్షరం *)&server.sin_addr, p, host->h_నిడివి);
     }
 
-    ch_log(channel, "Trying to connect to %s port %d", hostname, port);
+    ch_log(channel, "Trying to connect to %s port %d", hostname, పోర్టు);
 
     // On Mac and Solaris a zero timeout almost never works.  At least wait one
     // millisecond.  Let's do it for all systems, because we don't know why
     // this is needed.
-    if (waittime == 0)
+    ఒకవేళ (waittime == 0)
 	waittime = 1;
 
-    sd = channel_connect(channel, (struct sockaddr *)&server, sizeof(server),
+    sd = channel_connect(channel, (నిర్మాణం sockaddr *)&server, పరిమాణం(server),
 								   &waittime);
-#endif
+#అయితే_ముగింపు
 
-    if (sd < 0)
+    ఒకవేళ (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)hostname);
-    channel->ch_port = port;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (అక్షరం *)vim_strsave((char_u *)hostname);
+    channel->ch_పోర్టు = పోర్టు;
+    channel->ch_గమ్యం_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#నిర్వచితమైతే FEAT_GUI
+    channel_gui_రిజిస్టరు_one(channel, PART_SOCK);
+#అయితే_ముగింపు
 
-    return channel;
+    తిరిగి channel;
 }
 
-    static void
-free_set_callback(callback_T *cbp, callback_T *callback)
+    స్థిర శూన్య
+free_సమితి_callback(callback_T *cbp, callback_T *callback)
 {
     free_callback(cbp);
 
-    if (callback->cb_name != NULL && *callback->cb_name != NUL)
+    ఒకవేళ (callback->cb_name != ఖాళీ && *callback->cb_name != NUL)
 	copy_callback(cbp, callback);
-    else
-	cbp->cb_name = NULL;
+    లేకపోతే
+	cbp->cb_name = ఖాళీ;
 }
 
 /*
  * Prepare buffer "buf" for writing channel output to.
  */
-	static void
-prepare_buffer(buf_T *buf)
+	స్థిర శూన్య
+prepare_బఫరు(buf_T *buf)
 {
     buf_T *save_curbuf = curbuf;
 
     buf_copy_options(buf, BCO_ENTER);
     curbuf = buf;
-#ifdef FEAT_QUICKFIX
-    set_option_value_give_err((char_u *)"bt",
+#నిర్వచితమైతే FEAT_QUICKFIX
+    సమితి_option_విలువ_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
-#endif
-    if (curbuf->b_ml.ml_mfp == NULL)
+    సమితి_option_విలువ_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+#అయితే_ముగింపు
+    ఒకవేళ (curbuf->b_ml.ml_mfp == ఖాళీ)
 	ml_open(curbuf);
     curbuf = save_curbuf;
 }
@@ -1127,173 +1127,173 @@ prepare_buffer(buf_T *buf)
  * Find a buffer matching "name" or create a new one.
  * Returns NULL if there is something very wrong (error already reported).
  */
-    static buf_T *
-channel_find_buffer(char_u *name, int err, int msg)
+    స్థిర buf_T *
+channel_కనుగొను_బఫరు(char_u *name, పూర్ణాంకం err, పూర్ణాంకం సందేశం)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = ఖాళీ;
     buf_T *save_curbuf = curbuf;
 
-    if (name != NULL && *name != NUL)
+    ఒకవేళ (name != ఖాళీ && *name != NUL)
     {
 	buf = buflist_findname(name);
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	    buf = buflist_findname_exp(name);
     }
 
-    if (buf != NULL)
-	return buf;
+    ఒకవేళ (buf != ఖాళీ)
+	తిరిగి buf;
 
-    buf = buflist_new(name == NULL || *name == NUL ? NULL : name,
-	    NULL, (linenr_T)0, BLN_LISTED | BLN_NEW);
-    if (buf == NULL)
-	return NULL;
-    prepare_buffer(buf);
+    buf = buflist_new(name == ఖాళీ || *name == NUL ? ఖాళీ : name,
+	    ఖాళీ, (linenr_T)0, BLN_LISTED | BLN_NEW);
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి ఖాళీ;
+    prepare_బఫరు(buf);
 
     curbuf = buf;
-    if (msg)
+    ఒకవేళ (సందేశం)
 	ml_replace(1, (char_u *)(err ? "Reading from channel error..."
 		    : "Reading from channel output..."), TRUE);
-    changed_bytes(1, 0);
+    మారింది_బైట్లు(1, 0);
     curbuf = save_curbuf;
 
-    return buf;
+    తిరిగి buf;
 }
 
 /*
  * Set various properties from an "opt" argument.
  */
-    static void
-channel_set_options(channel_T *channel, jobopt_T *opt)
+    స్థిర శూన్య
+channel_సమితి_options(channel_T *channel, jobopt_T *opt)
 {
     ch_part_T	part;
 
-    if (opt->jo_set & JO_MODE)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
-	    channel->ch_part[part].ch_mode = opt->jo_mode;
-    if (opt->jo_set & JO_IN_MODE)
-	channel->ch_part[PART_IN].ch_mode = opt->jo_in_mode;
-    if (opt->jo_set & JO_OUT_MODE)
-	channel->ch_part[PART_OUT].ch_mode = opt->jo_out_mode;
-    if (opt->jo_set & JO_ERR_MODE)
-	channel->ch_part[PART_ERR].ch_mode = opt->jo_err_mode;
+    ఒకవేళ (opt->jo_సమితి & JO_బహుళకం)
+	కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
+	    channel->ch_part[part].ch_బహుళకం = opt->jo_బహుళకం;
+    ఒకవేళ (opt->jo_సమితి & JO_లోపల_బహుళకం)
+	channel->ch_part[PART_లోపల].ch_బహుళకం = opt->jo_లోపల_బహుళకం;
+    ఒకవేళ (opt->jo_సమితి & JO_బహిర్గతం_బహుళకం)
+	channel->ch_part[PART_బహిర్గతం].ch_బహుళకం = opt->jo_బహిర్గతం_బహుళకం;
+    ఒకవేళ (opt->jo_సమితి & JO_ERR_బహుళకం)
+	channel->ch_part[PART_ERR].ch_బహుళకం = opt->jo_err_బహుళకం;
     channel->ch_nonblock = opt->jo_noblock;
 
-    if (opt->jo_set & JO_TIMEOUT)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+    ఒకవేళ (opt->jo_సమితి & JO_TIMEOUT)
+	కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
 	    channel->ch_part[part].ch_timeout = opt->jo_timeout;
-    if (opt->jo_set & JO_OUT_TIMEOUT)
-	channel->ch_part[PART_OUT].ch_timeout = opt->jo_out_timeout;
-    if (opt->jo_set & JO_ERR_TIMEOUT)
+    ఒకవేళ (opt->jo_సమితి & JO_బహిర్గతం_TIMEOUT)
+	channel->ch_part[PART_బహిర్గతం].ch_timeout = opt->jo_బహిర్గతం_timeout;
+    ఒకవేళ (opt->jo_సమితి & JO_ERR_TIMEOUT)
 	channel->ch_part[PART_ERR].ch_timeout = opt->jo_err_timeout;
-    if (opt->jo_set & JO_BLOCK_WRITE)
-	channel->ch_part[PART_IN].ch_block_write = 1;
+    ఒకవేళ (opt->jo_సమితి & JO_ఖండం_WRITE)
+	channel->ch_part[PART_లోపల].ch_ఖండం_write = 1;
 
-    if (opt->jo_set & JO_CALLBACK)
-	free_set_callback(&channel->ch_callback, &opt->jo_callback);
-    if (opt->jo_set & JO_OUT_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_OUT].ch_callback,
-							      &opt->jo_out_cb);
-    if (opt->jo_set & JO_ERR_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_ERR].ch_callback,
+    ఒకవేళ (opt->jo_సమితి & JO_CALLBACK)
+	free_సమితి_callback(&channel->ch_callback, &opt->jo_callback);
+    ఒకవేళ (opt->jo_సమితి & JO_బహిర్గతం_CALLBACK)
+	free_సమితి_callback(&channel->ch_part[PART_బహిర్గతం].ch_callback,
+							      &opt->jo_బహిర్గతం_cb);
+    ఒకవేళ (opt->jo_సమితి & JO_ERR_CALLBACK)
+	free_సమితి_callback(&channel->ch_part[PART_ERR].ch_callback,
 							      &opt->jo_err_cb);
-    if (opt->jo_set & JO_CLOSE_CALLBACK)
-	free_set_callback(&channel->ch_close_cb, &opt->jo_close_cb);
+    ఒకవేళ (opt->jo_సమితి & JO_CLOSE_CALLBACK)
+	free_సమితి_callback(&channel->ch_close_cb, &opt->jo_close_cb);
     channel->ch_drop_never = opt->jo_drop_never;
 
-    if ((opt->jo_set & JO_OUT_IO) && opt->jo_io[PART_OUT] == JIO_BUFFER)
+    ఒకవేళ ((opt->jo_సమితి & JO_బహిర్గతం_IO) && opt->jo_io[PART_బహిర్గతం] == JIO_బఫరు)
     {
 	buf_T *buf;
 
 	// writing output to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_OUT_MODE))
-	    channel->ch_part[PART_OUT].ch_mode = CH_MODE_NL;
-	if (opt->jo_set & JO_OUT_BUF)
+	ఒకవేళ (!(opt->jo_సమితి & JO_బహిర్గతం_బహుళకం))
+	    channel->ch_part[PART_బహిర్గతం].ch_బహుళకం = CH_బహుళకం_NL;
+	ఒకవేళ (opt->jo_సమితి & JO_బహిర్గతం_BUF)
 	{
-	    buf = buflist_findnr(opt->jo_io_buf[PART_OUT]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_OUT]);
+	    buf = buflist_findnr(opt->jo_io_buf[PART_బహిర్గతం]);
+	    ఒకవేళ (buf == ఖాళీ)
+		semsg(_(e_బఫరు_nr_does_not_exist),
+					       (దీర్ఘ)opt->jo_io_buf[PART_బహిర్గతం]);
 	}
-	else
+	లేకపోతే
 	{
-	    int msg = TRUE;
+	    పూర్ణాంకం సందేశం = TRUE;
 
-	    if (opt->jo_set2 & JO2_OUT_MSG)
-		msg = opt->jo_message[PART_OUT];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, msg);
+	    ఒకవేళ (opt->jo_set2 & JO2_బహిర్గతం_సందేశం)
+		సందేశం = opt->jo_సందేశం[PART_బహిర్గతం];
+	    buf = channel_కనుగొను_బఫరు(opt->jo_io_name[PART_బహిర్గతం], FALSE, సందేశం);
 	}
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
-	    if (opt->jo_set & JO_OUT_MODIFIABLE)
-		channel->ch_part[PART_OUT].ch_nomodifiable =
-						!opt->jo_modifiable[PART_OUT];
+	    ఒకవేళ (opt->jo_సమితి & JO_బహిర్గతం_MODIFIABLE)
+		channel->ch_part[PART_బహిర్గతం].ch_nomodifiable =
+						!opt->jo_modifiable[PART_బహిర్గతం];
 
-	    if (!buf->b_p_ma && !channel->ch_part[PART_OUT].ch_nomodifiable)
+	    ఒకవేళ (!buf->b_p_ma && !channel->ch_part[PART_బహిర్గతం].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    లేకపోతే
 	    {
 		ch_log(channel, "writing out to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_OUT].ch_bufref, buf);
+						       (అక్షరం *)buf->b_ffname);
+		సమితి_bufref(&channel->ch_part[PART_బహిర్గతం].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
+		    prepare_బఫరు(buf);
 	    }
 	}
     }
 
-    if ((opt->jo_set & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_BUFFER
-	 || (opt->jo_io[PART_ERR] == JIO_OUT && (opt->jo_set & JO_OUT_IO)
-				       && opt->jo_io[PART_OUT] == JIO_BUFFER)))
+    ఒకవేళ ((opt->jo_సమితి & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_బఫరు
+	 || (opt->jo_io[PART_ERR] == JIO_బహిర్గతం && (opt->jo_సమితి & JO_బహిర్గతం_IO)
+				       && opt->jo_io[PART_బహిర్గతం] == JIO_బఫరు)))
     {
 	buf_T *buf;
 
 	// writing err to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_ERR_MODE))
-	    channel->ch_part[PART_ERR].ch_mode = CH_MODE_NL;
-	if (opt->jo_io[PART_ERR] == JIO_OUT)
-	    buf = channel->ch_part[PART_OUT].ch_bufref.br_buf;
-	else if (opt->jo_set & JO_ERR_BUF)
+	ఒకవేళ (!(opt->jo_సమితి & JO_ERR_బహుళకం))
+	    channel->ch_part[PART_ERR].ch_బహుళకం = CH_బహుళకం_NL;
+	ఒకవేళ (opt->jo_io[PART_ERR] == JIO_బహిర్గతం)
+	    buf = channel->ch_part[PART_బహిర్గతం].ch_bufref.br_buf;
+	లేకపోతే ఒకవేళ (opt->jo_సమితి & JO_ERR_BUF)
 	{
 	    buf = buflist_findnr(opt->jo_io_buf[PART_ERR]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_ERR]);
+	    ఒకవేళ (buf == ఖాళీ)
+		semsg(_(e_బఫరు_nr_does_not_exist),
+					       (దీర్ఘ)opt->jo_io_buf[PART_ERR]);
 	}
-	else
+	లేకపోతే
 	{
-	    int msg = TRUE;
+	    పూర్ణాంకం సందేశం = TRUE;
 
-	    if (opt->jo_set2 & JO2_ERR_MSG)
-		msg = opt->jo_message[PART_ERR];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, msg);
+	    ఒకవేళ (opt->jo_set2 & JO2_ERR_సందేశం)
+		సందేశం = opt->jo_సందేశం[PART_ERR];
+	    buf = channel_కనుగొను_బఫరు(opt->jo_io_name[PART_ERR], TRUE, సందేశం);
 	}
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
-	    if (opt->jo_set & JO_ERR_MODIFIABLE)
+	    ఒకవేళ (opt->jo_సమితి & JO_ERR_MODIFIABLE)
 		channel->ch_part[PART_ERR].ch_nomodifiable =
 						!opt->jo_modifiable[PART_ERR];
-	    if (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
+	    ఒకవేళ (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    లేకపోతే
 	    {
 		ch_log(channel, "writing err to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
+						       (అక్షరం *)buf->b_ffname);
+		సమితి_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
+		    prepare_బఫరు(buf);
 	    }
 	}
     }
 
-    channel->ch_part[PART_OUT].ch_io = opt->jo_io[PART_OUT];
+    channel->ch_part[PART_బహిర్గతం].ch_io = opt->jo_io[PART_బహిర్గతం];
     channel->ch_part[PART_ERR].ch_io = opt->jo_io[PART_ERR];
-    channel->ch_part[PART_IN].ch_io = opt->jo_io[PART_IN];
+    channel->ch_part[PART_లోపల].ch_io = opt->jo_io[PART_లోపల];
 }
 
 /*
@@ -1301,159 +1301,159 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
  * "unix_path" if it is a unix domain socket. Returns OK on success and FAIL on
  * failure.
  */
-    int
-channel_parse_socketserver_address(
-	char_u	*address,
-	int	*port,
-	char_u	**unix_path,
+    పూర్ణాంకం
+channel_parse_socketserver_చిరునామా(
+	char_u	*చిరునామా,
+	పూర్ణాంకం	*పోర్టు,
+	char_u	**unix_మార్గం,
 	bool	quiet)
 {
-    char    *rest;
-    long    val;
+    అక్షరం    *rest;
+    దీర్ఘ    val;
 
-    if (*address == NUL)
-	goto fail;
+    ఒకవేళ (*చిరునామా == NUL)
+	వెళ్ళు fail;
 
-    if (STRNCMP(address, "unix:", 5) == 0)
+    ఒకవేళ (STRNCMP(చిరునామా, "unix:", 5) == 0)
     {
-	*unix_path = vim_strsave(address + 5);
-	return OK;
+	*unix_మార్గం = vim_strsave(చిరునామా + 5);
+	తిరిగి OK;
     }
 
-    val = strtol((char *)(address), &rest, 10);
-    if (val < 0 || val >= 65536 || *rest != NUL)
+    val = strtol((అక్షరం *)(చిరునామా), &rest, 10);
+    ఒకవేళ (val < 0 || val >= 65536 || *rest != NUL)
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), address);
-	return FAIL;
+	ఒకవేళ (!quiet)
+	    semsg(_(e_invalid_వాదం_str), చిరునామా);
+	తిరిగి FAIL;
     }
-    *port = (int)val;
+    *పోర్టు = (పూర్ణాంకం)val;
 
-    return OK;
+    తిరిగి OK;
 fail:
-    if (!quiet)
-	semsg(_(e_invalid_argument_str), address);
-    return FAIL;
+    ఒకవేళ (!quiet)
+	semsg(_(e_invalid_వాదం_str), చిరునామా);
+    తిరిగి FAIL;
 }
 
 /*
  * Implements ch_open().
  */
-    static channel_T *
+    స్థిర channel_T *
 channel_open_func(typval_T *argvars)
 {
-    char_u	*address;
+    char_u	*చిరునామా;
     char_u	*p;
-    char	*rest;
-    int		port = 0;
-    int		is_ipv6 = FALSE;
-    int		is_unix = FALSE;
-    int		is_stdio = FALSE;
+    అక్షరం	*rest;
+    పూర్ణాంకం		పోర్టు = 0;
+    పూర్ణాంకం		is_ipv6 = FALSE;
+    పూర్ణాంకం		is_unix = FALSE;
+    పూర్ణాంకం		is_stdio = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return NULL;
+	తిరిగి ఖాళీ;
 
-    address = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN
+    చిరునామా = tv_get_string(&argvars[0]);
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN
 	    && check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return NULL;
+	తిరిగి ఖాళీ;
 
-    if (*address == NUL)
+    ఒకవేళ (*చిరునామా == NUL)
     {
-	semsg(_(e_invalid_argument_str), address);
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), చిరునామా);
+	తిరిగి ఖాళీ;
     }
 
-    if (STRCMP(address, "stdio") == 0)
+    ఒకవేళ (STRCMP(చిరునామా, "stdio") == 0)
 	is_stdio = TRUE;
-    else if (STRNCMP(address, "unix:", 5) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(చిరునామా, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
-	address += 5;
+	చిరునామా += 5;
     }
-    else if (*address == '[')
+    లేకపోతే ఒకవేళ (*చిరునామా == '[')
     {
 	// ipv6 address
 	is_ipv6 = TRUE;
-	p = vim_strchr(address + 1, ']');
-	if (p == NULL || *++p != ':')
+	p = vim_strchr(చిరునామా + 1, ']');
+	ఒకవేళ (p == ఖాళీ || *++p != ':')
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_వాదం_str), చిరునామా);
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
+    లేకపోతే
     {
 	// ipv4 address
-	p = vim_strchr(address, ':');
-	if (p == NULL)
+	p = vim_strchr(చిరునామా, ':');
+	ఒకవేళ (p == ఖాళీ)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_వాదం_str), చిరునామా);
+	    తిరిగి ఖాళీ;
 	}
     }
 
-    if (!is_unix && !is_stdio)
+    ఒకవేళ (!is_unix && !is_stdio)
     {
-	port = strtol((char *)(p + 1), &rest, 10);
-	if (port <= 0 || port >= 65536 || *rest != NUL)
+	పోర్టు = strtol((అక్షరం *)(p + 1), &rest, 10);
+	ఒకవేళ (పోర్టు <= 0 || పోర్టు >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_వాదం_str), చిరునామా);
+	    తిరిగి ఖాళీ;
 	}
-	if (is_ipv6)
+	ఒకవేళ (is_ipv6)
 	{
 	    // strip '[' and ']'
-	    ++address;
+	    ++చిరునామా;
 	    *(p - 1) = NUL;
 	}
-	else
+	లేకపోతే
 	    *p = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_పని_options(&opt);
+    opt.jo_బహుళకం = CH_బహుళకం_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
+    ఒకవేళ (get_పని_options(&argvars[1], &opt,
+	    JO_బహుళకం_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
 		+ (is_unix || is_stdio ? 0 : JO_WAITTIME), 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+	వెళ్ళు theend;
+    ఒకవేళ (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_వాదం));
+	వెళ్ళు theend;
     }
 
-    if (is_stdio)
+    ఒకవేళ (is_stdio)
 	channel = channel_open_stdio();
-    else if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel = channel_open((char *)address, port, opt.jo_waittime, NULL);
-    if (channel != NULL)
+    లేకపోతే ఒకవేళ (is_unix)
+	channel = channel_open_unix((అక్షరం *)చిరునామా, ఖాళీ);
+    లేకపోతే
+	channel = channel_open((అక్షరం *)చిరునామా, పోర్టు, opt.jo_waittime, ఖాళీ);
+    ఒకవేళ (channel != ఖాళీ)
     {
-	int	user_set = opt.jo_set;
+	పూర్ణాంకం	user_సమితి = opt.jo_సమితి;
 
-	opt.jo_set = JO_ALL;
-	if (is_stdio)
+	opt.jo_సమితి = JO_ALL;
+	ఒకవేళ (is_stdio)
 	    // "mode" and "timeout" apply to both reading and writing, unless
 	    // given for a part specifically.
-	    opt.jo_set &= ~((JO_IN_MODE | JO_OUT_MODE | JO_ERR_MODE
-				| JO_OUT_TIMEOUT | JO_ERR_TIMEOUT) & ~user_set);
-	channel_set_options(channel, &opt);
+	    opt.jo_సమితి &= ~((JO_లోపల_బహుళకం | JO_బహిర్గతం_బహుళకం | JO_ERR_బహుళకం
+				| JO_బహిర్గతం_TIMEOUT | JO_ERR_TIMEOUT) & ~user_సమితి);
+	channel_సమితి_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_పని_options(&opt);
+    తిరిగి channel;
 }
 
 // The channel on the stdin and stdout of Vim, see --stdio-channel.
-static channel_T *stdio_channel = NULL;
+స్థిర channel_T *stdio_channel = ఖాళీ;
 
 /*
  * Open a channel that reads from the stdin of Vim and writes to its stdout.
@@ -1461,107 +1461,107 @@ static channel_T *stdio_channel = NULL;
  * Returns the channel for success.
  * Returns NULL for failure.
  */
-    static channel_T *
-channel_open_stdio(void)
+    స్థిర channel_T *
+channel_open_stdio(శూన్య)
 {
     channel_T	*channel;
-    sock_T	in_fd;		// our stdin, the channel reads from it
-    sock_T	out_fd;		// our stdout, the channel writes to it
+    sock_T	లోపల_fd;		// our stdin, the channel reads from it
+    sock_T	బహిర్గతం_fd;		// our stdout, the channel writes to it
 
-    if (!use_stdio_channel)
+    ఒకవేళ (!use_stdio_channel)
     {
 	emsg(_(e_not_started_with_stdio_channel));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (stdio_channel != NULL)
+    ఒకవేళ (stdio_channel != ఖాళీ)
     {
 	emsg(_(e_cannot_open_stdio_channel));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // Point the original stdin and stdout at the null device, so that neither
     // Vim nor the commands it starts can use the channel.
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     {
 	HANDLE	proc = GetCurrentProcess();
 	HANDLE	hin;
 	HANDLE	hout;
 	HANDLE	hnul;
-	int	nul_fd;
+	పూర్ణాంకం	nul_fd;
 
-	if (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
+	ఒకవేళ (!DuplicateHandle(proc, GetStdHandle(STD_ఆదానం_HANDLE), proc, &hin,
 					      0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	if (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
+	ఒకవేళ (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
 				       &hout, 0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    CloseHandle(hin);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	hnul = CreateFile("NUL", GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,
-		NULL);
-	if (hnul != INVALID_HANDLE_VALUE)
+		FILE_SHARE_READ | FILE_SHARE_WRITE, ఖాళీ, OPEN_EXISTING, 0,
+		ఖాళీ);
+	ఒకవేళ (hnul != INVALID_HANDLE_విలువ)
 	{
-	    SetStdHandle(STD_INPUT_HANDLE, hnul);
-	    SetStdHandle(STD_OUTPUT_HANDLE, hnul);
+	    సమితి_Std_Handle(STD_ఆదానం_HANDLE, hnul);
+	    సమితి_Std_Handle(STD_OUTPUT_HANDLE, hnul);
 	}
 	// The C runtime keeps its own stdout, used for messages.
 	nul_fd = _open("NUL", _O_RDWR);
-	if (nul_fd >= 0)
+	ఒకవేళ (nul_fd >= 0)
 	{
 	    _dup2(nul_fd, 1);
 	    _close(nul_fd);
 	}
-	in_fd = (sock_T)hin;
-	out_fd = (sock_T)hout;
+	లోపల_fd = (sock_T)hin;
+	బహిర్గతం_fd = (sock_T)hout;
     }
-#else
+#లేకపోతే
     {
-	int	nul_fd;
+	పూర్ణాంకం	nul_fd;
 
-	in_fd = dup(0);
-	out_fd = dup(1);
-	if (in_fd < 0 || out_fd < 0)
+	లోపల_fd = dup(0);
+	బహిర్గతం_fd = dup(1);
+	ఒకవేళ (లోపల_fd < 0 || బహిర్గతం_fd < 0)
 	{
-	    if (in_fd >= 0)
-		close(in_fd);
-	    if (out_fd >= 0)
-		close(out_fd);
+	    ఒకవేళ (లోపల_fd >= 0)
+		close(లోపల_fd);
+	    ఒకవేళ (బహిర్గతం_fd >= 0)
+		close(బహిర్గతం_fd);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	(void)fcntl(in_fd, F_SETFD, FD_CLOEXEC);
-	(void)fcntl(out_fd, F_SETFD, FD_CLOEXEC);
+	(శూన్య)fcntl(లోపల_fd, F_SETFD, FD_CLOEXEC);
+	(శూన్య)fcntl(బహిర్గతం_fd, F_SETFD, FD_CLOEXEC);
 	nul_fd = open("/dev/null", O_RDWR);
-	if (nul_fd >= 0)
+	ఒకవేళ (nul_fd >= 0)
 	{
 	    dup2(nul_fd, 0);
 	    dup2(nul_fd, 1);
 	    close(nul_fd);
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	fd_close(in_fd);
-	fd_close(out_fd);
-	return NULL;
+	ch_error(ఖాళీ, "Cannot allocate channel.");
+	fd_close(లోపల_fd);
+	fd_close(బహిర్గతం_fd);
+	తిరిగి ఖాళీ;
     }
-    channel_set_pipes(channel, out_fd, in_fd, INVALID_FD);
+    channel_సమితి_pipes(channel, బహిర్గతం_fd, లోపల_fd, INVALID_FD);
     ch_log(channel, "Using stdin and stdout as a channel");
 
     // Keep a reference for channel_stdio_loop().
     ++channel->ch_refcount;
     stdio_channel = channel;
-    return channel;
+    తిరిగి channel;
 }
 
 /*
@@ -1571,65 +1571,65 @@ channel_open_stdio(void)
 channel_listen_func(typval_T *argvars)
 {
     char_u	*arg;
-    char	*rest;
-    int		port;
-    int		is_unix = FALSE;
+    అక్షరం	*rest;
+    పూర్ణాంకం		పోర్టు;
+    పూర్ణాంకం		is_unix = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && check_for_string_arg(argvars, 0) == FAIL)
-	return NULL;
+	తిరిగి ఖాళీ;
 
     arg = tv_get_string(&argvars[0]);
-    if (*arg == NUL)
+    ఒకవేళ (*arg == NUL)
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), arg);
+	తిరిగి ఖాళీ;
     }
 
-    if (STRNCMP(arg, "unix:", 5) == 0)
+    ఒకవేళ (STRNCMP(arg, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
 	arg += 5;
-	port = 0;
+	పోర్టు = 0;
     }
-    else
+    లేకపోతే
     {
-	port = strtol((char *)(arg), &rest, 10);
-	if (port < 0 || port >= 65536 || *rest != NUL)
+	పోర్టు = strtol((అక్షరం *)(arg), &rest, 10);
+	ఒకవేళ (పోర్టు < 0 || పోర్టు >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), arg);
-	    return NULL;
+	    semsg(_(e_invalid_వాదం_str), arg);
+	    తిరిగి ఖాళీ;
 	}
 	*arg = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_పని_options(&opt);
+    opt.jo_బహుళకం = CH_బహుళకం_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+    ఒకవేళ (get_పని_options(&argvars[1], &opt,
+	    JO_బహుళకం_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
+	వెళ్ళు theend;
+    ఒకవేళ (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_వాదం));
+	వెళ్ళు theend;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)arg, NULL, true);
-    else
-	channel = channel_listen(port, NULL);
-    if (channel != NULL)
+    ఒకవేళ (is_unix)
+	channel = channel_listen_unix((అక్షరం *)arg, ఖాళీ, true);
+    లేకపోతే
+	channel = channel_listen(పోర్టు, ఖాళీ);
+    ఒకవేళ (channel != ఖాళీ)
     {
-	opt.jo_set = JO_ALL;
-	channel_set_options(channel, &opt);
+	opt.jo_సమితి = JO_ALL;
+	channel_సమితి_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_పని_options(&opt);
+    తిరిగి channel;
 }
 
 /*
@@ -1639,104 +1639,104 @@ theend:
  */
     channel_T *
 channel_listen(
-	int port_in,
-	void (*nb_close_cb)(void))
+	పూర్ణాంకం పోర్టు_లోపల,
+	శూన్య (*nb_close_cb)(శూన్య))
 {
-    int			sd = -1;
-    struct sockaddr_in	server;
-#ifndef FEAT_IPV6
-    struct hostent	*host;
-#endif
-    int			val = 1;
+    పూర్ణాంకం			sd = -1;
+    నిర్మాణం sockaddr_లోపల	server;
+#నిర్వచితం_కాకపోతే FEAT_IPV6
+    నిర్మాణం hostent	*host;
+#అయితే_ముగింపు
+    పూర్ణాంకం			val = 1;
     channel_T		*channel;
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     channel_init_winsock();
-#endif
+#అయితే_ముగింపు
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ఖాళీ, "Cannot allocate channel.");
+	తిరిగి ఖాళీ;
     }
 
     // Get the server internet address and put into addr structure
     // fill in the socket address structure and bind to port
-    vim_memset((char *)&server, 0, sizeof(server));
+    vim_memset((అక్షరం *)&server, 0, పరిమాణం(server));
     server.sin_family = AF_INET;
-    server.sin_port = htons(port_in);
+    server.sin_పోర్టు = htons(పోర్టు_లోపల);
     server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     sd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sd == -1)
+    ఒకవేళ (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-#ifdef MSWIN
-    if (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-				    (const char *)&val, sizeof(val)) < 0)
-#else
-    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
-				    &val, sizeof(val)) < 0)
-#endif
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+				    (స్థిరరాశి అక్షరం *)&val, పరిమాణం(val)) < 0)
+#లేకపోతే
+    ఒకవేళ (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
+				    &val, పరిమాణం(val)) < 0)
+#అయితే_ముగింపు
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in setsockopt() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // Bind the socket to the port
-    if (bind(sd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    ఒకవేళ (bind(sd, (నిర్మాణం sockaddr *)&server, పరిమాణం(server)) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (listen(sd, 5) < 0)
+    ఒకవేళ (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // When port 0 was specified, retrieve the actual port assigned by the OS.
-    if (port_in == 0)
+    ఒకవేళ (పోర్టు_లోపల == 0)
     {
-	struct sockaddr_in	addr;
-	socklen_t		addr_len = sizeof(addr);
+	నిర్మాణం sockaddr_లోపల	addr;
+	socklen_t		addr_len = పరిమాణం(addr);
 
-	if (getsockname(sd, (struct sockaddr *)&addr, &addr_len) == 0)
-	    port_in = ntohs(addr.sin_port);
+	ఒకవేళ (getsockname(sd, (నిర్మాణం sockaddr *)&addr, &addr_len) == 0)
+	    పోర్టు_లోపల = ntohs(addr.sin_పోర్టు);
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)"");
-    channel->ch_port = port_in;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (అక్షరం *)vim_strsave((char_u *)"");
+    channel->ch_పోర్టు = పోర్టు_లోపల;
+    channel->ch_గమ్యం_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#నిర్వచితమైతే FEAT_GUI
+    channel_gui_రిజిస్టరు_one(channel, PART_SOCK);
+#అయితే_ముగింపు
 
-    return channel;
+    తిరిగి channel;
 }
 
 /*
@@ -1747,162 +1747,162 @@ channel_listen(
  */
     channel_T *
 channel_listen_unix(
-	char *path,
-	void (*nb_close_cb)(void),
+	అక్షరం *మార్గం,
+	శూన్య (*nb_close_cb)(శూన్య),
 	bool replace)
 {
-    int			sd = -1;
-    struct sockaddr_un	server;
+    పూర్ణాంకం			sd = -1;
+    నిర్మాణం sockaddr_un	server;
     channel_T		*channel;
-    size_t		path_len;
+    size_t		మార్గం_len;
     size_t		server_len;
 
-    if (path == NULL || *path == NUL)
+    ఒకవేళ (మార్గం == ఖాళీ || *మార్గం == NUL)
     {
-	semsg(_(e_invalid_argument_str), path == NULL ? (char *)"" : path);
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), మార్గం == ఖాళీ ? (అక్షరం *)"" : మార్గం);
+	తిరిగి ఖాళీ;
     }
 
-    path_len = STRLEN(path);
-    if (path_len >= sizeof(server.sun_path))
+    మార్గం_len = STRLEN(మార్గం);
+    ఒకవేళ (మార్గం_len >= పరిమాణం(server.sun_మార్గం))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), మార్గం);
+	తిరిగి ఖాళీ;
     }
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     channel_init_winsock();
-#endif
+#అయితే_ముగింపు
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ఖాళీ, "Cannot allocate channel.");
+	తిరిగి ఖాళీ;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_క్షేత్రం(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_మార్గం, మార్గం, పరిమాణం(server.sun_మార్గం) - 1);
 
     sd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sd == -1)
+    ఒకవేళ (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (replace)
+    ఒకవేళ (replace)
 	// Unlink the socket in case it already exists
-	unlink(server.sun_path);
+	unlink(server.sun_మార్గం);
 
     // Bind the socket to the path
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    if (bind(sd, (struct sockaddr *)&server, (int)server_len) < 0)
+    server_len = offsetof(నిర్మాణం sockaddr_un, sun_మార్గం) + మార్గం_len + 1;
+    ఒకవేళ (bind(sd, (నిర్మాణం sockaddr *)&server, (పూర్ణాంకం)server_len) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (listen(sd, 5) < 0)
+    ఒకవేళ (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_పోర్టు));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (అక్షరం *)vim_strsave((char_u *)మార్గం);
+    channel->ch_పోర్టు = 0;
+    channel->ch_గమ్యం_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#నిర్వచితమైతే FEAT_GUI
+    channel_gui_రిజిస్టరు_one(channel, PART_SOCK);
+#అయితే_ముగింపు
 
-    return channel;
+    తిరిగి channel;
 }
 
-     void
+     శూన్య
 ch_close_part(channel_T *channel, ch_part_T part)
 {
     sock_T *fd = &channel->ch_part[part].ch_fd;
 
-    if (*fd == INVALID_FD)
-	return;
+    ఒకవేళ (*fd == INVALID_FD)
+	తిరిగి;
 
-    if (part == PART_SOCK)
+    ఒకవేళ (part == PART_SOCK)
 	sock_close(*fd);
-    else
+    లేకపోతే
     {
 	// When using a pty the same FD is set on multiple parts, only
 	// close it when the last reference is closed.
-	if ((part == PART_IN || channel->CH_IN_FD != *fd)
-		&& (part == PART_OUT || channel->CH_OUT_FD != *fd)
+	ఒకవేళ ((part == PART_లోపల || channel->CH_లోపల_FD != *fd)
+		&& (part == PART_బహిర్గతం || channel->CH_బహిర్గతం_FD != *fd)
 		&& (part == PART_ERR || channel->CH_ERR_FD != *fd))
 	{
-#ifdef MSWIN
-	    if (channel->ch_named_pipe)
+#నిర్వచితమైతే MSWIN
+	    ఒకవేళ (channel->ch_named_pipe)
 		DisconnectNamedPipe((HANDLE)fd);
-#endif
+#అయితే_ముగింపు
 	    fd_close(*fd);
 	}
     }
     *fd = INVALID_FD;
 
     // channel is closed, may want to end the job if it was the last
-    channel->ch_to_be_closed &= ~(1U << part);
+    channel->ch_గమ్యం_be_closed &= ~(1U << part);
 }
 
-    void
-channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
+    శూన్య
+channel_సమితి_pipes(channel_T *channel, sock_T లోపల, sock_T బహిర్గతం, sock_T err)
 {
-    if (in != INVALID_FD)
+    ఒకవేళ (లోపల != INVALID_FD)
     {
-	ch_close_part(channel, PART_IN);
-	channel->CH_IN_FD = in;
-#if defined(UNIX)
+	ch_close_part(channel, PART_లోపల);
+	channel->CH_లోపల_FD = లోపల;
+#ఒకవేళ defined(UNIX)
 	// Do not end the job when all output channels are closed, wait until
 	// the job ended.
-	if (mch_isatty(in))
-	    channel->ch_to_be_closed |= (1U << PART_IN);
-#endif
+	ఒకవేళ (mch_isatty(లోపల))
+	    channel->ch_గమ్యం_be_closed |= (1U << PART_లోపల);
+#అయితే_ముగింపు
     }
-    if (out != INVALID_FD)
+    ఒకవేళ (బహిర్గతం != INVALID_FD)
     {
-#if defined(FEAT_GUI)
-	channel_gui_unregister_one(channel, PART_OUT);
-#endif
-	ch_close_part(channel, PART_OUT);
-	channel->CH_OUT_FD = out;
-	channel->ch_to_be_closed |= (1U << PART_OUT);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_OUT);
-#endif
+#ఒకవేళ defined(FEAT_GUI)
+	channel_gui_unregister_one(channel, PART_బహిర్గతం);
+#అయితే_ముగింపు
+	ch_close_part(channel, PART_బహిర్గతం);
+	channel->CH_బహిర్గతం_FD = బహిర్గతం;
+	channel->ch_గమ్యం_be_closed |= (1U << PART_బహిర్గతం);
+#ఒకవేళ defined(FEAT_GUI)
+	channel_gui_రిజిస్టరు_one(channel, PART_బహిర్గతం);
+#అయితే_ముగింపు
     }
-    if (err != INVALID_FD)
+    ఒకవేళ (err != INVALID_FD)
     {
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 	channel_gui_unregister_one(channel, PART_ERR);
-#endif
+#అయితే_ముగింపు
 	ch_close_part(channel, PART_ERR);
 	channel->CH_ERR_FD = err;
-	channel->ch_to_be_closed |= (1U << PART_ERR);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_ERR);
-#endif
+	channel->ch_గమ్యం_be_closed |= (1U << PART_ERR);
+#ఒకవేళ defined(FEAT_GUI)
+	channel_gui_రిజిస్టరు_one(channel, PART_ERR);
+#అయితే_ముగింపు
     }
 }
 
@@ -1910,95 +1910,95 @@ channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
  * Sets the job the channel is associated with and associated options.
  * This does not keep a refcount, when the job is freed ch_job is cleared.
  */
-    void
-channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
+    శూన్య
+channel_సమితి_పని(channel_T *channel, పని_T *పని, jobopt_T *options)
 {
-    channel->ch_job = job;
+    channel->ch_పని = పని;
 
-    channel_set_options(channel, options);
+    channel_సమితి_options(channel, options);
 
-    if (job->jv_in_buf == NULL)
-	return;
+    ఒకవేళ (పని->jv_లోపల_buf == ఖాళీ)
+	తిరిగి;
 
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *లోపల_part = &channel->ch_part[PART_లోపల];
 
-    set_bufref(&in_part->ch_bufref, job->jv_in_buf);
+    సమితి_bufref(&లోపల_part->ch_bufref, పని->jv_లోపల_buf);
     ch_log(channel, "reading from buffer '%s'",
-	    (char *)in_part->ch_bufref.br_buf->b_ffname);
-    if (options->jo_set & JO_IN_TOP)
+	    (అక్షరం *)లోపల_part->ch_bufref.br_buf->b_ffname);
+    ఒకవేళ (options->jo_సమితి & JO_లోపల_శిఖరం)
     {
-	if (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
+	ఒకవేళ (options->jo_లోపల_శిఖరం == 0 && !(options->jo_సమితి & JO_లోపల_BOT))
 	{
 	    // Special mode: send last-but-one line when appending a line
 	    // to the buffer.
-	    in_part->ch_bufref.br_buf->b_write_to_channel = true;
-	    in_part->ch_buf_append = TRUE;
-	    in_part->ch_buf_top =
-		in_part->ch_bufref.br_buf->b_ml.ml_line_count + 1;
+	    లోపల_part->ch_bufref.br_buf->b_write_గమ్యం_channel = true;
+	    లోపల_part->ch_buf_append = TRUE;
+	    లోపల_part->ch_buf_శిఖరం =
+		లోపల_part->ch_bufref.br_buf->b_ml.ml_పంక్తి_లెక్క + 1;
 	}
-	else
-	    in_part->ch_buf_top = options->jo_in_top;
+	లేకపోతే
+	    లోపల_part->ch_buf_శిఖరం = options->jo_లోపల_శిఖరం;
     }
-    else
-	in_part->ch_buf_top = 1;
-    if (options->jo_set & JO_IN_BOT)
-	in_part->ch_buf_bot = options->jo_in_bot;
-    else
-	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_line_count;
+    లేకపోతే
+	లోపల_part->ch_buf_శిఖరం = 1;
+    ఒకవేళ (options->jo_సమితి & JO_లోపల_BOT)
+	లోపల_part->ch_buf_bot = options->jo_లోపల_bot;
+    లేకపోతే
+	లోపల_part->ch_buf_bot = లోపల_part->ch_bufref.br_buf->b_ml.ml_పంక్తి_లెక్క;
 }
 
 /*
  * Set the callback for "channel"/"part" for the response with "id".
  */
-    static void
-channel_set_req_callback(
+    స్థిర శూన్య
+channel_సమితి_req_callback(
 	channel_T   *channel,
 	ch_part_T   part,
 	callback_T  *callback,
-	int	    id)
+	పూర్ణాంకం	    id)
 {
-    cbq_T *head = &channel->ch_part[part].ch_cb_head;
-    cbq_T *item = ALLOC_ONE(cbq_T);
+    cbq_T *తల = &channel->ch_part[part].ch_cb_తల;
+    cbq_T *అంశం = ALLOC_ONE(cbq_T);
 
-    if (item == NULL)
-	return;
+    ఒకవేళ (అంశం == ఖాళీ)
+	తిరిగి;
 
-    copy_callback(&item->cq_callback, callback);
-    item->cq_seq_nr = id;
-    item->cq_prev = head->cq_prev;
-    head->cq_prev = item;
-    item->cq_next = NULL;
-    if (item->cq_prev == NULL)
-	head->cq_next = item;
-    else
-	item->cq_prev->cq_next = item;
+    copy_callback(&అంశం->cq_callback, callback);
+    అంశం->cq_seq_nr = id;
+    అంశం->cq_prev = తల->cq_prev;
+    తల->cq_prev = అంశం;
+    అంశం->cq_తదుపరి = ఖాళీ;
+    ఒకవేళ (అంశం->cq_prev == ఖాళీ)
+	తల->cq_తదుపరి = అంశం;
+    లేకపోతే
+	అంశం->cq_prev->cq_తదుపరి = అంశం;
 }
 
-    static void
-write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
+    స్థిర శూన్య
+write_buf_పంక్తి(buf_T *buf, linenr_T lnum, channel_T *channel)
 {
-    char_u  *line = ml_get_buf(buf, lnum, FALSE);
-    int	    len = ml_get_buf_len(buf, lnum);
+    char_u  *పంక్తి = ml_get_buf(buf, lnum, FALSE);
+    పూర్ణాంకం	    len = ml_get_buf_len(buf, lnum);
     char_u  *p;
-    int	    i;
+    పూర్ణాంకం	    i;
 
     // Need to make a copy to be able to append a NL.
-    if ((p = alloc(len + 2)) == NULL)
-	return;
-    memcpy((char *)p, (char *)line, len);
+    ఒకవేళ ((p = alloc(len + 2)) == ఖాళీ)
+	తిరిగి;
+    జ్ఞాపకం_నకలు((అక్షరం *)p, (అక్షరం *)పంక్తి, len);
 
-    if (channel->ch_write_text_mode)
+    ఒకవేళ (channel->ch_write_పాఠ్యం_బహుళకం)
 	p[len] = CAR;
-    else
+    లేకపోతే
     {
-	for (i = 0; i < len; ++i)
-	    if (p[i] == NL)
+	కొరకు (i = 0; i < len; ++i)
+	    ఒకవేళ (p[i] == NL)
 		p[i] = NUL;
 
 	p[len] = NL;
     }
     p[len + 1] = NUL;
-    channel_send(channel, PART_IN, p, len + 1, "write_buf_line");
+    channel_send(channel, PART_లోపల, p, len + 1, "write_buf_line");
     vim_free(p);
 }
 
@@ -2006,153 +2006,153 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
  * Return TRUE if "channel" can be written to.
  * Returns FALSE if the input is closed or the write would block.
  */
-    static int
-can_write_buf_line(channel_T *channel)
+    స్థిర పూర్ణాంకం
+can_write_buf_పంక్తి(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *లోపల_part = &channel->ch_part[PART_లోపల];
 
-    if (in_part->ch_fd == INVALID_FD)
-	return FALSE;  // pipe was closed
+    ఒకవేళ (లోపల_part->ch_fd == INVALID_FD)
+	తిరిగి FALSE;  // pipe was closed
 
     // for testing: block every other attempt to write
-    if (in_part->ch_block_write == 1)
-	in_part->ch_block_write = -1;
-    else if (in_part->ch_block_write == -1)
-	in_part->ch_block_write = 1;
+    ఒకవేళ (లోపల_part->ch_ఖండం_write == 1)
+	లోపల_part->ch_ఖండం_write = -1;
+    లేకపోతే ఒకవేళ (లోపల_part->ch_ఖండం_write == -1)
+	లోపల_part->ch_ఖండం_write = 1;
 
     // TODO: Win32 implementation, probably using WaitForMultipleObjects()
-#ifndef MSWIN
+#నిర్వచితం_కాకపోతే MSWIN
     {
-# if defined(HAVE_SELECT)
-	struct timeval	tval;
+# ఒకవేళ defined(HAVE_SELECT)
+	నిర్మాణం timeval	tval;
 	fd_set		wfds;
-	int		ret;
+	పూర్ణాంకం		ret;
 
 	FD_ZERO(&wfds);
-	FD_SET((int)in_part->ch_fd, &wfds);
+	FD_SET((పూర్ణాంకం)లోపల_part->ch_fd, &wfds);
 	tval.tv_sec = 0;
 	tval.tv_usec = 0;
-	for (;;)
+	కొరకు (;;)
 	{
-	    ret = select((int)in_part->ch_fd + 1, NULL, &wfds, NULL, &tval);
+	    ret = select((పూర్ణాంకం)లోపల_part->ch_fd + 1, ఖాళీ, &wfds, ఖాళీ, &tval);
 #  ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    ఒకవేళ (ret == -1 && errno == EINTR)
+		కొనసాగు;
 #  endif
-	    if (ret <= 0 || in_part->ch_block_write == 1)
+	    ఒకవేళ (ret <= 0 || లోపల_part->ch_ఖండం_write == 1)
 	    {
-		if (ret > 0)
+		ఒకవేళ (ret > 0)
 		    ch_log(channel, "FAKED Input not ready for writing");
-		else
+		లేకపోతే
 		    ch_log(channel, "Input not ready for writing");
-		return FALSE;
+		తిరిగి FALSE;
 	    }
-	    break;
+	    ఆపు;
 	}
-# else
-	struct pollfd	fds;
+# లేకపోతే
+	నిర్మాణం pollfd	fds;
 
-	fds.fd = in_part->ch_fd;
+	fds.fd = లోపల_part->ch_fd;
 	fds.events = POLLOUT;
-	if (poll(&fds, 1, 0) <= 0)
+	ఒకవేళ (poll(&fds, 1, 0) <= 0)
 	{
 	    ch_log(channel, "Input not ready for writing");
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
-	if (in_part->ch_block_write == 1)
+	ఒకవేళ (లోపల_part->ch_ఖండం_write == 1)
 	{
 	    ch_log(channel, "FAKED Input not ready for writing");
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
 # endif
     }
-#endif
-    return TRUE;
+#అయితే_ముగింపు
+    తిరిగి TRUE;
 }
 
 /*
  * Write any buffer lines to the input channel.
  */
-    void
-channel_write_in(channel_T *channel)
+    శూన్య
+channel_write_లోపల(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *లోపల_part = &channel->ch_part[PART_లోపల];
     linenr_T    lnum;
-    buf_T	*buf = in_part->ch_bufref.br_buf;
-    int		written = 0;
+    buf_T	*buf = లోపల_part->ch_bufref.br_buf;
+    పూర్ణాంకం		written = 0;
 
-    if (buf == NULL || in_part->ch_buf_append)
-	return;  // no buffer or using appending
-    if (!bufref_valid(&in_part->ch_bufref) || buf->b_ml.ml_mfp == NULL)
+    ఒకవేళ (buf == ఖాళీ || లోపల_part->ch_buf_append)
+	తిరిగి;  // no buffer or using appending
+    ఒకవేళ (!bufref_valid(&లోపల_part->ch_bufref) || buf->b_ml.ml_mfp == ఖాళీ)
     {
 	// buffer was wiped out or unloaded
 	ch_log(channel, "input buffer has been wiped out");
-	in_part->ch_bufref.br_buf = NULL;
-	return;
+	లోపల_part->ch_bufref.br_buf = ఖాళీ;
+	తిరిగి;
     }
 
-    for (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
-				   && lnum <= buf->b_ml.ml_line_count; ++lnum)
+    కొరకు (lnum = లోపల_part->ch_buf_శిఖరం; lnum <= లోపల_part->ch_buf_bot
+				   && lnum <= buf->b_ml.ml_పంక్తి_లెక్క; ++lnum)
     {
-	if (!can_write_buf_line(channel))
-	    break;
-	write_buf_line(buf, lnum, channel);
+	ఒకవేళ (!can_write_buf_పంక్తి(channel))
+	    ఆపు;
+	write_buf_పంక్తి(buf, lnum, channel);
 	++written;
     }
 
-    if (written == 1)
-	ch_log(channel, "written line %d to channel", (int)lnum - 1);
-    else if (written > 1)
+    ఒకవేళ (written == 1)
+	ch_log(channel, "written line %d to channel", (పూర్ణాంకం)lnum - 1);
+    లేకపోతే ఒకవేళ (written > 1)
 	ch_log(channel, "written %d lines to channel", written);
 
-    in_part->ch_buf_top = lnum;
-    if (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
+    లోపల_part->ch_buf_శిఖరం = lnum;
+    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క || lnum > లోపల_part->ch_buf_bot)
     {
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 	// Send CTRL-D or "eof_chars" to close stdin on MS-Windows.
-	if (channel->ch_job != NULL)
-	    term_send_eof(channel);
-#endif
+	ఒకవేళ (channel->ch_పని != ఖాళీ)
+	    పదం_send_eof(channel);
+#అయితే_ముగింపు
 
 	// Writing is done, no longer need the buffer.
-	in_part->ch_bufref.br_buf = NULL;
+	లోపల_part->ch_bufref.br_buf = ఖాళీ;
 	ch_log(channel, "Finished writing all lines to channel");
 
 	// Close the pipe/socket, so that the other side gets EOF.
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// At this point, the input part of the conpty channel must not be
 	// closed.  If it is closed, the pipe will be destroyed, the console
 	// that was using it will be destroyed, and the process running within
 	// it will be forcibly terminated, so this needs to be prevented.
-	if (!channel->ch_anonymous_pipe)
-#endif
-	    ch_close_part(channel, PART_IN);
+	ఒకవేళ (!channel->ch_anonymous_pipe)
+#అయితే_ముగింపు
+	    ch_close_part(channel, PART_లోపల);
     }
-    else
+    లేకపోతే
 	ch_log(channel, "Still %ld more lines to write",
-				   (long)(buf->b_ml.ml_line_count - lnum + 1));
+				   (దీర్ఘ)(buf->b_ml.ml_పంక్తి_లెక్క - lnum + 1));
 }
 
 /*
  * Handle buffer "buf" being freed, remove it from any channels.
  */
-    void
-channel_buffer_free(buf_T *buf)
+    శూన్య
+channel_బఫరు_free(buf_T *buf)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
 	{
 	    chanpart_T  *ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_bufref.br_buf == buf)
+	    ఒకవేళ (ch_part->ch_bufref.br_buf == buf)
 	    {
 		ch_log(channel, "%s buffer has been wiped out",
-							  ch_part_names[part]);
-		ch_part->ch_bufref.br_buf = NULL;
+							  ch_part_పేర్లు[part]);
+		ch_part->ch_bufref.br_buf = ఖాళీ;
 	    }
 	}
 }
@@ -2160,90 +2160,90 @@ channel_buffer_free(buf_T *buf)
 /*
  * Write any lines waiting to be written to "channel".
  */
-    void
-channel_write_input(channel_T *channel)
+    శూన్య
+channel_write_ఆదానం(channel_T *channel)
 {
-    chanpart_T	*in_part = &channel->ch_part[PART_IN];
+    chanpart_T	*లోపల_part = &channel->ch_part[PART_లోపల];
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	channel_send(channel, PART_IN, (char_u *)"", 0, "channel_write_input");
-    else if (in_part->ch_bufref.br_buf != NULL)
+    ఒకవేళ (లోపల_part->ch_writeque.wq_తదుపరి != ఖాళీ)
+	channel_send(channel, PART_లోపల, (char_u *)"", 0, "channel_write_input");
+    లేకపోతే ఒకవేళ (లోపల_part->ch_bufref.br_buf != ఖాళీ)
     {
-	if (in_part->ch_buf_append)
-	    channel_write_new_lines(in_part->ch_bufref.br_buf);
-	else
-	    channel_write_in(channel);
+	ఒకవేళ (లోపల_part->ch_buf_append)
+	    channel_write_new_పంక్తులు(లోపల_part->ch_bufref.br_buf);
+	లేకపోతే
+	    channel_write_లోపల(channel);
     }
 }
 
 /*
  * Write any lines waiting to be written to a channel.
  */
-    void
-channel_write_any_lines(void)
+    శూన్య
+channel_write_any_పంక్తులు(శూన్య)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_write_input(channel);
+	channel_write_ఆదానం(channel);
 }
 
 /*
  * Write appended lines above the last one in "buf" to the channel.
  */
-    void
-channel_write_new_lines(buf_T *buf)
+    శూన్య
+channel_write_new_పంక్తులు(buf_T *buf)
 {
     channel_T	*channel;
-    int		found_one = FALSE;
+    పూర్ణాంకం		దొరికింది_one = FALSE;
 
     // There could be more than one channel for the buffer, loop over all of
     // them.
     FOR_ALL_CHANNELS(channel)
     {
-	chanpart_T  *in_part = &channel->ch_part[PART_IN];
+	chanpart_T  *లోపల_part = &channel->ch_part[PART_లోపల];
 	linenr_T    lnum;
-	int	    written = 0;
+	పూర్ణాంకం	    written = 0;
 
-	if (in_part->ch_bufref.br_buf == buf && in_part->ch_buf_append)
+	ఒకవేళ (లోపల_part->ch_bufref.br_buf == buf && లోపల_part->ch_buf_append)
 	{
-	    if (in_part->ch_fd == INVALID_FD)
-		continue;  // pipe was closed
-	    found_one = TRUE;
-	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
+	    ఒకవేళ (లోపల_part->ch_fd == INVALID_FD)
+		కొనసాగు;  // pipe was closed
+	    దొరికింది_one = TRUE;
+	    కొరకు (lnum = లోపల_part->ch_buf_bot; lnum < buf->b_ml.ml_పంక్తి_లెక్క;
 								       ++lnum)
 	    {
-		if (!can_write_buf_line(channel))
-		    break;
-		write_buf_line(buf, lnum, channel);
+		ఒకవేళ (!can_write_buf_పంక్తి(channel))
+		    ఆపు;
+		write_buf_పంక్తి(buf, lnum, channel);
 		++written;
 	    }
 
-	    if (written == 1)
-		ch_log(channel, "written line %d to channel", (int)lnum - 1);
-	    else if (written > 1)
+	    ఒకవేళ (written == 1)
+		ch_log(channel, "written line %d to channel", (పూర్ణాంకం)lnum - 1);
+	    లేకపోతే ఒకవేళ (written > 1)
 		ch_log(channel, "written %d lines to channel", written);
-	    if (lnum < buf->b_ml.ml_line_count)
+	    ఒకవేళ (lnum < buf->b_ml.ml_పంక్తి_లెక్క)
 		ch_log(channel, "Still %ld more lines to write",
-				       (long)(buf->b_ml.ml_line_count - lnum));
+				       (దీర్ఘ)(buf->b_ml.ml_పంక్తి_లెక్క - lnum));
 
-	    in_part->ch_buf_bot = lnum;
+	    లోపల_part->ch_buf_bot = lnum;
 	}
     }
-    if (!found_one)
-	buf->b_write_to_channel = false;
+    ఒకవేళ (!దొరికింది_one)
+	buf->b_write_గమ్యం_channel = false;
 }
 
 /*
  * Invoke the "callback" on channel "channel".
  * This does not redraw but sets channel_need_redraw;
  */
-    static void
+    స్థిర శూన్య
 invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
 {
     typval_T	rettv;
 
-    if (safe_to_invoke_callback == 0)
+    ఒకవేళ (సురక్షిత_గమ్యం_invoke_callback == 0)
 	iemsg("Invoking callback when it is not safe");
 
     argv[0].v_type = VAR_CHANNEL;
@@ -2261,9 +2261,9 @@ invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
     readq_T *
 channel_peek(channel_T *channel, ch_part_T part)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *తల = &channel->ch_part[part].ch_తల;
 
-    return head->rq_next;
+    తిరిగి తల->rq_తదుపరి;
 }
 
 /*
@@ -2272,15 +2272,15 @@ channel_peek(channel_T *channel, ch_part_T part)
  * Returns NULL if there is no NL.
  */
     char_u *
-channel_first_nl(readq_T *node)
+channel_మొదటి_nl(readq_T *కణుపు)
 {
-    char_u  *buffer = node->rq_buffer;
+    char_u  *బఫరు = కణుపు->rq_బఫరు;
     long_u  i;
 
-    for (i = 0; i < node->rq_buflen; ++i)
-	if (buffer[i] == NL)
-	    return buffer + i;
-    return NULL;
+    కొరకు (i = 0; i < కణుపు->rq_buflen; ++i)
+	ఒకవేళ (బఫరు[i] == NL)
+	    తిరిగి బఫరు + i;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -2289,115 +2289,115 @@ channel_first_nl(readq_T *node)
  * Returns NULL if there is nothing.
  */
     char_u *
-channel_get(channel_T *channel, ch_part_T part, int *outlen)
+channel_get(channel_T *channel, ch_part_T part, పూర్ణాంకం *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
+    readq_T *తల = &channel->ch_part[part].ch_తల;
+    readq_T *కణుపు = తల->rq_తదుపరి;
     char_u *p;
 
-    if (node == NULL)
-	return NULL;
-    if (outlen != NULL)
-	*outlen += node->rq_buflen;
+    ఒకవేళ (కణుపు == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (outlen != ఖాళీ)
+	*outlen += కణుపు->rq_buflen;
     // dispose of the node but keep the buffer
-    p = node->rq_buffer;
-    head->rq_next = node->rq_next;
-    if (node->rq_next == NULL)
-	head->rq_prev = NULL;
-    else
-	node->rq_next->rq_prev = NULL;
-    vim_free(node);
-    return p;
+    p = కణుపు->rq_బఫరు;
+    తల->rq_తదుపరి = కణుపు->rq_తదుపరి;
+    ఒకవేళ (కణుపు->rq_తదుపరి == ఖాళీ)
+	తల->rq_prev = ఖాళీ;
+    లేకపోతే
+	కణుపు->rq_తదుపరి->rq_prev = ఖాళీ;
+    vim_free(కణుపు);
+    తిరిగి p;
 }
 
 /*
  * Returns the whole buffer contents concatenated for "channel"/"part".
  * Replaces NUL bytes with NL.
  */
-    static char_u *
-channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
+    స్థిర char_u *
+channel_get_all(channel_T *channel, ch_part_T part, పూర్ణాంకం *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node;
+    readq_T *తల = &channel->ch_part[part].ch_తల;
+    readq_T *కణుపు;
     long_u  len = 0;
     char_u  *res;
     char_u  *p;
 
     // Concatenate everything into one buffer.
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
-	len += node->rq_buflen;
+    కొరకు (కణుపు = తల->rq_తదుపరి; కణుపు != ఖాళీ; కణుపు = కణుపు->rq_తదుపరి)
+	len += కణుపు->rq_buflen;
     res = alloc(len + 1);
-    if (res == NULL)
-	return NULL;
+    ఒకవేళ (res == ఖాళీ)
+	తిరిగి ఖాళీ;
     p = res;
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    కొరకు (కణుపు = తల->rq_తదుపరి; కణుపు != ఖాళీ; కణుపు = కణుపు->rq_తదుపరి)
     {
-	mch_memmove(p, node->rq_buffer, node->rq_buflen);
-	p += node->rq_buflen;
+	mch_memmove(p, కణుపు->rq_బఫరు, కణుపు->rq_buflen);
+	p += కణుపు->rq_buflen;
     }
     *p = NUL;
 
     // Free all buffers
-    do
+    చేయి
     {
-	p = channel_get(channel, part, NULL);
+	p = channel_get(channel, part, ఖాళీ);
 	vim_free(p);
-    } while (p != NULL);
+    } అయితే (p != ఖాళీ);
 
-    if (outlen != NULL)
+    ఒకవేళ (outlen != ఖాళీ)
     {
 	// Returning the length, keep NUL characters.
 	*outlen += len;
-	return res;
+	తిరిగి res;
     }
 
     // Turn all NUL into NL, so that the result can be used as a string.
     p = res;
-    while (p < res + len)
+    అయితే (p < res + len)
     {
-	if (*p == NUL)
+	ఒకవేళ (*p == NUL)
 	    *p = NL;
-#ifdef MSWIN
-	else if (*p == 0x1b)
+#నిర్వచితమైతే MSWIN
+	లేకపోతే ఒకవేళ (*p == 0x1b)
 	{
 	    // crush the escape sequence OSC 0/1/2: ESC ]0;
-	    if (p + 3 < res + len
+	    ఒకవేళ (p + 3 < res + len
 		    && p[1] == ']'
 		    && (p[2] == '0' || p[2] == '1' || p[2] == '2')
 		    && p[3] == ';')
 	    {
 		// '\a' becomes a NL
-		while (p < res + (len - 1) && *p != '\a')
+		అయితే (p < res + (len - 1) && *p != '\a')
 		    ++p;
 		// BEL is zero width characters, suppress display mistake
 		// ConPTY (after 10.0.18317) requires advance checking
-		if (p[-1] == NUL)
+		ఒకవేళ (p[-1] == NUL)
 		    p[-1] = 0x07;
 	    }
 	}
-#endif
+#అయితే_ముగింపు
 	++p;
     }
 
-    return res;
+    తిరిగి res;
 }
 
 /*
  * Consume "len" bytes from the head of "node".
  * Caller must check these bytes are available.
  */
-    void
-channel_consume(channel_T *channel, ch_part_T part, int len)
+    శూన్య
+channel_consume(channel_T *channel, ch_part_T part, పూర్ణాంకం len)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
-    char_u *buf = node->rq_buffer;
+    readq_T *తల = &channel->ch_part[part].ch_తల;
+    readq_T *కణుపు = తల->rq_తదుపరి;
+    char_u *buf = కణుపు->rq_బఫరు;
 
-    if (len < 0 || (long_u)len > node->rq_buflen)
-	return;
-    mch_memmove(buf, buf + len, node->rq_buflen - len);
-    node->rq_buflen -= len;
-    node->rq_buffer[node->rq_buflen] = NUL;
+    ఒకవేళ (len < 0 || (long_u)len > కణుపు->rq_buflen)
+	తిరిగి;
+    mch_memmove(buf, buf + len, కణుపు->rq_buflen - len);
+    కణుపు->rq_buflen -= len;
+    కణుపు->rq_బఫరు[కణుపు->rq_buflen] = NUL;
 }
 
 /*
@@ -2407,62 +2407,62 @@ channel_consume(channel_T *channel, ch_part_T part, int len)
  * When the channel part mode is "lsp", collapse all the buffers as the http
  * header and the JSON content can be present in multiple buffers.
  */
-    int
-channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
+    పూర్ణాంకం
+channel_collapse(channel_T *channel, ch_part_T part, పూర్ణాంకం want_nl)
 {
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    readq_T	*head = &channel->ch_part[part].ch_head;
-    readq_T	*node = head->rq_next;
-    readq_T	*last_node;
+    ch_బహుళకం_T	బహుళకం = channel->ch_part[part].ch_బహుళకం;
+    readq_T	*తల = &channel->ch_part[part].ch_తల;
+    readq_T	*కణుపు = తల->rq_తదుపరి;
+    readq_T	*చివరి_కణుపు;
     readq_T	*n;
     char_u	*newbuf;
     char_u	*p;
     long_u	len;
 
-    if (node == NULL || node->rq_next == NULL)
-	return FAIL;
+    ఒకవేళ (కణుపు == ఖాళీ || కణుపు->rq_తదుపరి == ఖాళీ)
+	తిరిగి FAIL;
 
-    last_node = node->rq_next;
-    len = node->rq_buflen + last_node->rq_buflen;
-    if (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
-	while (last_node->rq_next != NULL
-		&& (mode == CH_MODE_LSP || mode == CH_MODE_DAP
-		    || channel_first_nl(last_node) == NULL))
+    చివరి_కణుపు = కణుపు->rq_తదుపరి;
+    len = కణుపు->rq_buflen + చివరి_కణుపు->rq_buflen;
+    ఒకవేళ (want_nl || బహుళకం == CH_బహుళకం_LSP || బహుళకం == CH_బహుళకం_DAP)
+	అయితే (చివరి_కణుపు->rq_తదుపరి != ఖాళీ
+		&& (బహుళకం == CH_బహుళకం_LSP || బహుళకం == CH_బహుళకం_DAP
+		    || channel_మొదటి_nl(చివరి_కణుపు) == ఖాళీ))
 	{
-	    last_node = last_node->rq_next;
-	    len += last_node->rq_buflen;
+	    చివరి_కణుపు = చివరి_కణుపు->rq_తదుపరి;
+	    len += చివరి_కణుపు->rq_buflen;
 	}
 
     p = newbuf = alloc(len + 1);
-    if (newbuf == NULL)
-	return FAIL;	    // out of memory
-    mch_memmove(p, node->rq_buffer, node->rq_buflen);
-    p += node->rq_buflen;
-    vim_free(node->rq_buffer);
-    node->rq_buffer = newbuf;
-    for (n = node; n != last_node; )
+    ఒకవేళ (newbuf == ఖాళీ)
+	తిరిగి FAIL;	    // out of memory
+    mch_memmove(p, కణుపు->rq_బఫరు, కణుపు->rq_buflen);
+    p += కణుపు->rq_buflen;
+    vim_free(కణుపు->rq_బఫరు);
+    కణుపు->rq_బఫరు = newbuf;
+    కొరకు (n = కణుపు; n != చివరి_కణుపు; )
     {
-	n = n->rq_next;
-	mch_memmove(p, n->rq_buffer, n->rq_buflen);
+	n = n->rq_తదుపరి;
+	mch_memmove(p, n->rq_బఫరు, n->rq_buflen);
 	p += n->rq_buflen;
-	vim_free(n->rq_buffer);
+	vim_free(n->rq_బఫరు);
     }
     *p = NUL;
-    node->rq_buflen = (long_u)(p - newbuf);
+    కణుపు->rq_buflen = (long_u)(p - newbuf);
 
     // dispose of the collapsed nodes and their buffers
-    for (n = node->rq_next; n != last_node; )
+    కొరకు (n = కణుపు->rq_తదుపరి; n != చివరి_కణుపు; )
     {
-	n = n->rq_next;
+	n = n->rq_తదుపరి;
 	vim_free(n->rq_prev);
     }
-    node->rq_next = last_node->rq_next;
-    if (last_node->rq_next == NULL)
-	head->rq_prev = node;
-    else
-	last_node->rq_next->rq_prev = node;
-    vim_free(last_node);
-    return OK;
+    కణుపు->rq_తదుపరి = చివరి_కణుపు->rq_తదుపరి;
+    ఒకవేళ (చివరి_కణుపు->rq_తదుపరి == ఖాళీ)
+	తల->rq_prev = కణుపు;
+    లేకపోతే
+	చివరి_కణుపు->rq_తదుపరి->rq_prev = కణుపు;
+    vim_free(చివరి_కణుపు);
+    తిరిగి OK;
 }
 
 /*
@@ -2470,110 +2470,110 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
  * When "prepend" is TRUE put in front, otherwise append at the end.
  * Returns OK or FAIL.
  */
-    static int
-channel_save(channel_T *channel, ch_part_T part, char_u *buf, int len,
-						      int prepend, char *lead)
+    స్థిర పూర్ణాంకం
+channel_save(channel_T *channel, ch_part_T part, char_u *buf, పూర్ణాంకం len,
+						      పూర్ణాంకం prepend, అక్షరం *lead)
 {
-    readq_T *node;
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *కణుపు;
+    readq_T *తల = &channel->ch_part[part].ch_తల;
     char_u  *p;
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    node = ALLOC_ONE(readq_T);
-    if (node == NULL)
-	return FAIL;	    // out of memory
+    కణుపు = ALLOC_ONE(readq_T);
+    ఒకవేళ (కణుపు == ఖాళీ)
+	తిరిగి FAIL;	    // out of memory
     // A NUL is added at the end, because netbeans code expects that.
     // Otherwise a NUL may appear inside the text.
-    node->rq_buffer = alloc(len + 1);
-    if (node->rq_buffer == NULL)
+    కణుపు->rq_బఫరు = alloc(len + 1);
+    ఒకవేళ (కణుపు->rq_బఫరు == ఖాళీ)
     {
-	vim_free(node);
-	return FAIL;	    // out of memory
+	vim_free(కణుపు);
+	తిరిగి FAIL;	    // out of memory
     }
 
-    if (channel->ch_part[part].ch_mode == CH_MODE_NL)
+    ఒకవేళ (channel->ch_part[part].ch_బహుళకం == CH_బహుళకం_NL)
     {
 	// Drop any CR before a NL.
-	p = node->rq_buffer;
-	for (i = 0; i < len; ++i)
-	    if (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
+	p = కణుపు->rq_బఫరు;
+	కొరకు (i = 0; i < len; ++i)
+	    ఒకవేళ (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
 		*p++ = buf[i];
 	*p = NUL;
-	node->rq_buflen = (long_u)(p - node->rq_buffer);
+	కణుపు->rq_buflen = (long_u)(p - కణుపు->rq_బఫరు);
     }
-    else
+    లేకపోతే
     {
-	mch_memmove(node->rq_buffer, buf, len);
-	node->rq_buffer[len] = NUL;
-	node->rq_buflen = (long_u)len;
+	mch_memmove(కణుపు->rq_బఫరు, buf, len);
+	కణుపు->rq_బఫరు[len] = NUL;
+	కణుపు->rq_buflen = (long_u)len;
     }
 
-    if (prepend)
+    ఒకవేళ (prepend)
     {
 	// prepend node to the head of the queue
-	node->rq_next = head->rq_next;
-	node->rq_prev = NULL;
-	if (head->rq_next == NULL)
-	    head->rq_prev = node;
-	else
-	    head->rq_next->rq_prev = node;
-	head->rq_next = node;
+	కణుపు->rq_తదుపరి = తల->rq_తదుపరి;
+	కణుపు->rq_prev = ఖాళీ;
+	ఒకవేళ (తల->rq_తదుపరి == ఖాళీ)
+	    తల->rq_prev = కణుపు;
+	లేకపోతే
+	    తల->rq_తదుపరి->rq_prev = కణుపు;
+	తల->rq_తదుపరి = కణుపు;
     }
-    else
+    లేకపోతే
     {
 	// append node to the tail of the queue
-	node->rq_next = NULL;
-	node->rq_prev = head->rq_prev;
-	if (head->rq_prev == NULL)
-	    head->rq_next = node;
-	else
-	    head->rq_prev->rq_next = node;
-	head->rq_prev = node;
+	కణుపు->rq_తదుపరి = ఖాళీ;
+	కణుపు->rq_prev = తల->rq_prev;
+	ఒకవేళ (తల->rq_prev == ఖాళీ)
+	    తల->rq_తదుపరి = కణుపు;
+	లేకపోతే
+	    తల->rq_prev->rq_తదుపరి = కణుపు;
+	తల->rq_prev = కణుపు;
     }
 
-    if (ch_log_active() && lead != NULL)
+    ఒకవేళ (ch_log_చురుకైన() && lead != ఖాళీ)
 	ch_log_literal(lead, channel, part, buf, len);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Try to fill the buffer of "reader".
  * Returns FALSE when nothing was added.
  */
-    int
+    పూర్ణాంకం
 channel_fill(js_read_T *reader)
 {
     channel_T	*channel = (channel_T *)reader->js_cookie;
     ch_part_T	part = reader->js_cookie_arg;
-    char_u	*next = channel_get(channel, part, NULL);
-    int		keeplen;
-    int		addlen;
+    char_u	*తదుపరి = channel_get(channel, part, ఖాళీ);
+    పూర్ణాంకం		keeplen;
+    పూర్ణాంకం		addlen;
     char_u	*p;
 
-    if (next == NULL)
-	return FALSE;
+    ఒకవేళ (తదుపరి == ఖాళీ)
+	తిరిగి FALSE;
 
-    keeplen = reader->js_end - reader->js_buf;
-    if (keeplen > 0)
+    keeplen = reader->js_చివర - reader->js_buf;
+    ఒకవేళ (keeplen > 0)
     {
 	// Prepend unused text.
-	addlen = (int)STRLEN(next);
+	addlen = (పూర్ణాంకం)STRLEN(తదుపరి);
 	p = alloc(keeplen + addlen + 1);
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	{
-	    vim_free(next);
-	    return FALSE;
+	    vim_free(తదుపరి);
+	    తిరిగి FALSE;
 	}
 	mch_memmove(p, reader->js_buf, keeplen);
-	mch_memmove(p + keeplen, next, addlen + 1);
-	vim_free(next);
-	next = p;
+	mch_memmove(p + keeplen, తదుపరి, addlen + 1);
+	vim_free(తదుపరి);
+	తదుపరి = p;
     }
 
     vim_free(reader->js_buf);
-    reader->js_buf = next;
-    return TRUE;
+    reader->js_buf = తదుపరి;
+    తిరిగి TRUE;
 }
 
 /*
@@ -2599,64 +2599,64 @@ channel_fill(js_read_T *reader)
  * header are not correct. Returns MAYBE if a partial header is received and
  * need to wait for more data to arrive.
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_process_lspdap_http_hdr(js_read_T *reader)
 {
-    char_u	*line_start;
+    char_u	*పంక్తి_ప్రారంభం;
     char_u	*p;
     int_u	hdr_len;
-    int		payload_len = -1;
+    పూర్ణాంకం		payload_len = -1;
     int_u	jsbuf_len;
 
     // We find the end once, to avoid calling strlen() many times.
     jsbuf_len = (int_u)STRLEN(reader->js_buf);
-    reader->js_end = reader->js_buf + jsbuf_len;
+    reader->js_చివర = reader->js_buf + jsbuf_len;
 
     p = reader->js_buf;
 
     // Process each line in the header till an empty line is read (header
     // separator).
-    while (TRUE)
+    అయితే (TRUE)
     {
-	line_start = p;
-	while (*p != NUL && *p != '\n')
+	పంక్తి_ప్రారంభం = p;
+	అయితే (*p != NUL && *p != '\n')
 	    p++;
-	if (*p == NUL)			// partial header
-	    return MAYBE;
+	ఒకవేళ (*p == NUL)			// partial header
+	    తిరిగి MAYBE;
 	p++;
 
 	// process the content length field (if present)
-	if ((p - line_start > 16)
-		&& STRNICMP(line_start, "Content-Length: ", 16) == 0)
+	ఒకవేళ ((p - పంక్తి_ప్రారంభం > 16)
+		&& STRNICMP(పంక్తి_ప్రారంభం, "Content-Length: ", 16) == 0)
 	{
 	    errno = 0;
-	    payload_len = strtol((char *)line_start + 16, NULL, 10);
-	    if (errno == ERANGE || payload_len < 0)
+	    payload_len = strtol((అక్షరం *)పంక్తి_ప్రారంభం + 16, ఖాళీ, 10);
+	    ఒకవేళ (errno == ERANGE || payload_len < 0)
 		// invalid length, discard the payload
-		return FAIL;
+		తిరిగి FAIL;
 	}
 
-	if ((p - line_start) == 2 && line_start[0] == '\r' &&
-		line_start[1] == '\n')
+	ఒకవేళ ((p - పంక్తి_ప్రారంభం) == 2 && పంక్తి_ప్రారంభం[0] == '\r' &&
+		పంక్తి_ప్రారంభం[1] == '\n')
 	    // reached the empty line
-	    break;
+	    ఆపు;
     }
 
-    if (payload_len == -1)
+    ఒకవేళ (payload_len == -1)
 	// Content-Length field is not present in the header
-	return FAIL;
+	తిరిగి FAIL;
 
     hdr_len = p - reader->js_buf;
 
     // if the entire payload is not received, wait for more data to arrive
-    if (jsbuf_len < hdr_len + payload_len)
-	return MAYBE;
+    ఒకవేళ (jsbuf_len < hdr_len + payload_len)
+	తిరిగి MAYBE;
 
-    reader->js_used += hdr_len;
+    reader->js_వాడిన += hdr_len;
     // recalculate the end based on the length read from the header.
-    reader->js_end = reader->js_buf + hdr_len + payload_len;
+    reader->js_చివర = reader->js_buf + hdr_len + payload_len;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2665,216 +2665,216 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
  * then ignore the channel mode.
  * Return TRUE if there is more to read.
  */
-    int
+    పూర్ణాంకం
 channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 {
     js_read_T	reader;
     typval_T	listtv;
-    jsonq_T	*item;
+    jsonq_T	*అంశం;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    jsonq_T	*head = &chanpart->ch_json_head;
-    int		status = OK;
-    int		ret;
+    jsonq_T	*తల = &chanpart->ch_json_తల;
+    పూర్ణాంకం		స్థితి_2 = OK;
+    పూర్ణాంకం		ret;
 
-    if (channel_peek(channel, part) == NULL)
-	return FALSE;
+    ఒకవేళ (channel_peek(channel, part) == ఖాళీ)
+	తిరిగి FALSE;
 
-    reader.js_buf = channel_get(channel, part, NULL);
-    reader.js_used = 0;
+    reader.js_buf = channel_get(channel, part, ఖాళీ);
+    reader.js_వాడిన = 0;
     reader.js_fill = channel_fill;
     reader.js_cookie = channel;
     reader.js_cookie_arg = part;
 
-    if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-	    || chanpart->ch_mode == CH_MODE_DAP))
-	status = channel_process_lspdap_http_hdr(&reader);
+    ఒకవేళ (!socketserver && (chanpart->ch_బహుళకం == CH_బహుళకం_LSP
+	    || chanpart->ch_బహుళకం == CH_బహుళకం_DAP))
+	స్థితి_2 = channel_process_lspdap_http_hdr(&reader);
 
     // When a message is incomplete we wait for a short while for more to
     // arrive.  After the delay drop the input, otherwise a truncated string
     // or list will make us hang.
     // Do not generate error messages, they will be written in a channel log.
-    if (status == OK)
+    ఒకవేళ (స్థితి_2 == OK)
     {
 	++emsg_silent;
-	status = json_decode(&reader, &listtv,
-				chanpart->ch_mode == CH_MODE_JS ? JSON_JS : 0);
+	స్థితి_2 = json_decode(&reader, &listtv,
+				chanpart->ch_బహుళకం == CH_బహుళకం_JS ? JSON_JS : 0);
 	--emsg_silent;
     }
-    if (status == OK)
+    ఒకవేళ (స్థితి_2 == OK)
     {
 	// Only accept the response when it is a list with at least two
 	// items.
-	if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-		    || chanpart->ch_mode == CH_MODE_DAP)
+	ఒకవేళ (!socketserver && (chanpart->ch_బహుళకం == CH_బహుళకం_LSP
+		    || chanpart->ch_బహుళకం == CH_బహుళకం_DAP)
 		&& listtv.v_type != VAR_DICT)
 	{
 	    ch_error(channel, "Did not receive a LSP dict, discarding");
 	    clear_tv(&listtv);
 	}
-	else if (!socketserver && chanpart->ch_mode != CH_MODE_LSP
-		&& chanpart->ch_mode != CH_MODE_DAP
+	లేకపోతే ఒకవేళ (!socketserver && chanpart->ch_బహుళకం != CH_బహుళకం_LSP
+		&& chanpart->ch_బహుళకం != CH_బహుళకం_DAP
 		&& (listtv.v_type != VAR_LIST || listtv.vval.v_list->lv_len < 2))
 	{
-	    if (listtv.v_type != VAR_LIST)
+	    ఒకవేళ (listtv.v_type != VAR_LIST)
 		ch_error(channel, "Did not receive a list, discarding");
-	    else
+	    లేకపోతే
 		ch_error(channel, "Expected list with two items, got %d",
 						  listtv.vval.v_list->lv_len);
 	    clear_tv(&listtv);
 	}
-	else
+	లేకపోతే
 	{
-	    item = ALLOC_ONE(jsonq_T);
-	    if (item == NULL)
+	    అంశం = ALLOC_ONE(jsonq_T);
+	    ఒకవేళ (అంశం == ఖాళీ)
 		clear_tv(&listtv);
-	    else
+	    లేకపోతే
 	    {
-		item->jq_no_callback = FALSE;
-		item->jq_value = alloc_tv();
-		if (item->jq_value == NULL)
+		అంశం->jq_no_callback = FALSE;
+		అంశం->jq_విలువ = alloc_tv();
+		ఒకవేళ (అంశం->jq_విలువ == ఖాళీ)
 		{
-		    vim_free(item);
+		    vim_free(అంశం);
 		    clear_tv(&listtv);
 		}
-		else
+		లేకపోతే
 		{
-		    *item->jq_value = listtv;
-		    item->jq_prev = head->jq_prev;
-		    head->jq_prev = item;
-		    item->jq_next = NULL;
-		    if (item->jq_prev == NULL)
-			head->jq_next = item;
-		    else
-			item->jq_prev->jq_next = item;
+		    *అంశం->jq_విలువ = listtv;
+		    అంశం->jq_prev = తల->jq_prev;
+		    తల->jq_prev = అంశం;
+		    అంశం->jq_తదుపరి = ఖాళీ;
+		    ఒకవేళ (అంశం->jq_prev == ఖాళీ)
+			తల->jq_తదుపరి = అంశం;
+		    లేకపోతే
+			అంశం->jq_prev->jq_తదుపరి = అంశం;
 		}
 	    }
 	}
     }
 
-    if (status == OK)
+    ఒకవేళ (స్థితి_2 == OK)
 	chanpart->ch_wait_len = 0;
-    else if (status == MAYBE)
+    లేకపోతే ఒకవేళ (స్థితి_2 == MAYBE)
     {
 	size_t buflen = STRLEN(reader.js_buf);
 
-	if (chanpart->ch_wait_len < buflen)
+	ఒకవేళ (chanpart->ch_wait_len < buflen)
 	{
 	    // First time encountering incomplete message or after receiving
 	    // more (but still incomplete): set a deadline of 100 msec.
 	    ch_log(channel,
 		    "Incomplete message (%d bytes) - wait 100 msec for more",
-		    (int)buflen);
-	    reader.js_used = 0;
+		    (పూర్ణాంకం)buflen);
+	    reader.js_వాడిన = 0;
 	    chanpart->ch_wait_len = buflen;
-#ifdef MSWIN
-	    chanpart->ch_deadline = GetTickCount() + 100L;
-#else
-	    gettimeofday(&chanpart->ch_deadline, NULL);
+#నిర్వచితమైతే MSWIN
+	    chanpart->ch_deadline = Get_Tick_లెక్క() + 100L;
+#లేకపోతే
+	    gettimeofday(&chanpart->ch_deadline, ఖాళీ);
 	    chanpart->ch_deadline.tv_usec += 100 * 1000;
-	    if (chanpart->ch_deadline.tv_usec > 1000 * 1000)
+	    ఒకవేళ (chanpart->ch_deadline.tv_usec > 1000 * 1000)
 	    {
 		chanpart->ch_deadline.tv_usec -= 1000 * 1000;
 		++chanpart->ch_deadline.tv_sec;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-	else
+	లేకపోతే
 	{
-	    int timeout;
-#ifdef MSWIN
-	    timeout = (int)(GetTickCount() - chanpart->ch_deadline) > 0;
-#else
+	    పూర్ణాంకం timeout;
+#నిర్వచితమైతే MSWIN
+	    timeout = (పూర్ణాంకం)(Get_Tick_లెక్క() - chanpart->ch_deadline) > 0;
+#లేకపోతే
 	    {
-		struct timeval now_tv;
+		నిర్మాణం timeval now_tv;
 
-		gettimeofday(&now_tv, NULL);
+		gettimeofday(&now_tv, ఖాళీ);
 		timeout = now_tv.tv_sec > chanpart->ch_deadline.tv_sec
 		      || (now_tv.tv_sec == chanpart->ch_deadline.tv_sec
 			   && now_tv.tv_usec > chanpart->ch_deadline.tv_usec);
 	    }
-#endif
-	    if (timeout)
+#అయితే_ముగింపు
+	    ఒకవేళ (timeout)
 	    {
-		status = FAIL;
+		స్థితి_2 = FAIL;
 		chanpart->ch_wait_len = 0;
 		ch_log(channel, "timed out");
 	    }
-	    else
+	    లేకపోతే
 	    {
-		reader.js_used = 0;
+		reader.js_వాడిన = 0;
 		ch_log(channel, "still waiting on incomplete message");
 	    }
 	}
     }
 
-    if (status == FAIL)
+    ఒకవేళ (స్థితి_2 == FAIL)
     {
 	ch_error(channel, "Decoding failed - discarding input");
 	ret = FALSE;
 	chanpart->ch_wait_len = 0;
     }
-    else if (reader.js_buf[reader.js_used] != NUL)
+    లేకపోతే ఒకవేళ (reader.js_buf[reader.js_వాడిన] != NUL)
     {
 	// Put the unread part back into the channel.
-	channel_save(channel, part, reader.js_buf + reader.js_used,
-			(int)(reader.js_end - reader.js_buf) - reader.js_used,
-								  TRUE, NULL);
-	ret = status == MAYBE ? FALSE: TRUE;
+	channel_save(channel, part, reader.js_buf + reader.js_వాడిన,
+			(పూర్ణాంకం)(reader.js_చివర - reader.js_buf) - reader.js_వాడిన,
+								  TRUE, ఖాళీ);
+	ret = స్థితి_2 == MAYBE ? FALSE: TRUE;
     }
-    else
+    లేకపోతే
 	ret = FALSE;
 
     vim_free(reader.js_buf);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Remove "node" from the queue that it is in.  Does not free it.
  */
-    static void
-remove_cb_node(cbq_T *head, cbq_T *node)
+    స్థిర శూన్య
+remove_cb_కణుపు(cbq_T *తల, cbq_T *కణుపు)
 {
-    if (node->cq_prev == NULL)
-	head->cq_next = node->cq_next;
-    else
-	node->cq_prev->cq_next = node->cq_next;
-    if (node->cq_next == NULL)
-	head->cq_prev = node->cq_prev;
-    else
-	node->cq_next->cq_prev = node->cq_prev;
+    ఒకవేళ (కణుపు->cq_prev == ఖాళీ)
+	తల->cq_తదుపరి = కణుపు->cq_తదుపరి;
+    లేకపోతే
+	కణుపు->cq_prev->cq_తదుపరి = కణుపు->cq_తదుపరి;
+    ఒకవేళ (కణుపు->cq_తదుపరి == ఖాళీ)
+	తల->cq_prev = కణుపు->cq_prev;
+    లేకపోతే
+	కణుపు->cq_తదుపరి->cq_prev = కణుపు->cq_prev;
 }
 
 /*
  * Remove "node" from the queue that it is in and free it.
  * Caller should have freed or used node->jq_value.
  */
-    void
-remove_json_node(jsonq_T *head, jsonq_T *node)
+    శూన్య
+remove_json_కణుపు(jsonq_T *తల, jsonq_T *కణుపు)
 {
-    if (node->jq_prev == NULL)
-	head->jq_next = node->jq_next;
-    else
-	node->jq_prev->jq_next = node->jq_next;
-    if (node->jq_next == NULL)
-	head->jq_prev = node->jq_prev;
-    else
-	node->jq_next->jq_prev = node->jq_prev;
-    vim_free(node);
+    ఒకవేళ (కణుపు->jq_prev == ఖాళీ)
+	తల->jq_తదుపరి = కణుపు->jq_తదుపరి;
+    లేకపోతే
+	కణుపు->jq_prev->jq_తదుపరి = కణుపు->jq_తదుపరి;
+    ఒకవేళ (కణుపు->jq_తదుపరి == ఖాళీ)
+	తల->jq_prev = కణుపు->jq_prev;
+    లేకపోతే
+	కణుపు->jq_తదుపరి->jq_prev = కణుపు->jq_prev;
+    vim_free(కణుపు);
 }
 
 /*
  * Add "id" to the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_add_block_id(chanpart_T *chanpart, int id)
+    స్థిర శూన్య
+channel_కూడు_ఖండం_id(chanpart_T *chanpart, పూర్ణాంకం id)
 {
-    garray_T *gap = &chanpart->ch_block_ids;
+    garray_T *gap = &chanpart->ch_ఖండం_ids;
 
-    if (gap->ga_growsize == 0)
-	ga_init2(gap, sizeof(int), 10);
-    if (ga_grow(gap, 1) == OK)
+    ఒకవేళ (gap->ga_growsize == 0)
+	ga_init2(gap, పరిమాణం(పూర్ణాంకం), 10);
+    ఒకవేళ (ga_grow(gap, 1) == OK)
     {
-	((int *)gap->ga_data)[gap->ga_len] = id;
+	((పూర్ణాంకం *)gap->ga_దత్తాంశం)[gap->ga_len] = id;
 	++gap->ga_len;
     }
 }
@@ -2882,23 +2882,23 @@ channel_add_block_id(chanpart_T *chanpart, int id)
 /*
  * Remove "id" from the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_remove_block_id(chanpart_T *chanpart, int id)
+    స్థిర శూన్య
+channel_remove_ఖండం_id(chanpart_T *chanpart, పూర్ణాంకం id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_ఖండం_ids;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
+    కొరకు (i = 0; i < gap->ga_len; ++i)
+	ఒకవేళ (((పూర్ణాంకం *)gap->ga_దత్తాంశం)[i] == id)
 	{
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    ఒకవేళ (i < gap->ga_len)
 	    {
-		int *p = ((int *)gap->ga_data) + i;
+		పూర్ణాంకం *p = ((పూర్ణాంకం *)gap->ga_దత్తాంశం) + i;
 
-		mch_memmove(p, p + 1, (gap->ga_len - i) * sizeof(int));
+		mch_memmove(p, p + 1, (gap->ga_len - i) * పరిమాణం(పూర్ణాంకం));
 	    }
-	    return;
+	    తిరిగి;
 	}
     siemsg("channel_remove_block_id(): cannot find id %d", id);
 }
@@ -2906,16 +2906,16 @@ channel_remove_block_id(chanpart_T *chanpart, int id)
 /*
  * Return TRUE if "id" is in the list of JSON message IDs we are waiting on.
  */
-    static int
-channel_has_block_id(chanpart_T *chanpart, int id)
+    స్థిర పూర్ణాంకం
+channel_has_ఖండం_id(chanpart_T *chanpart, పూర్ణాంకం id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_ఖండం_ids;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
-	    return TRUE;
-    return FALSE;
+    కొరకు (i = 0; i < gap->ga_len; ++i)
+	ఒకవేళ (((పూర్ణాంకం *)gap->ga_దత్తాంశం)[i] == id)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -2927,294 +2927,294 @@ channel_has_block_id(chanpart_T *chanpart, int id)
  * Return OK when found and return the value in "rettv".
  * Return FAIL otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_get_json(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    id,
-	int	    without_callback,
+	పూర్ణాంకం	    id,
+	పూర్ణాంకం	    without_callback,
 	typval_T    **rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *తల = &channel->ch_part[part].ch_json_తల;
+    jsonq_T   *అంశం = తల->jq_తదుపరి;
 
-    while (item != NULL)
+    అయితే (అంశం != ఖాళీ)
     {
 	list_T	    *l;
 	typval_T    *tv;
 
-	if (channel->ch_part[part].ch_mode != CH_MODE_LSP
-		&& channel->ch_part[part].ch_mode != CH_MODE_DAP)
+	ఒకవేళ (channel->ch_part[part].ch_బహుళకం != CH_బహుళకం_LSP
+		&& channel->ch_part[part].ch_బహుళకం != CH_బహుళకం_DAP)
 	{
-	    l = item->jq_value->vval.v_list;
+	    l = అంశం->jq_విలువ->vval.v_list;
 	    CHECK_LIST_MATERIALIZE(l);
-	    tv = &l->lv_first->li_tv;
+	    tv = &l->lv_మొదటి->li_tv;
 	}
-	else
+	లేకపోతే
 	{
 	    dict_T	*d;
 	    dictitem_T	*di;
 
-	    if (channel->ch_part[part].ch_mode == CH_MODE_LSP)
+	    ఒకవేళ (channel->ch_part[part].ch_బహుళకం == CH_బహుళకం_LSP)
 	    {
 		// LSP message payload is a JSON-RPC dict. For RPC requests and
 		// responses, the 'id' item will be present. For notifications,
 		// it will not be present.
-		if (id > 0)
+		ఒకవేళ (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
+		    ఒకవేళ (అంశం->jq_విలువ->v_type != VAR_DICT)
+			వెళ్ళు nextitem;
+		    d = అంశం->jq_విలువ->vval.v_dict;
+		    ఒకవేళ (d == ఖాళీ)
+			వెళ్ళు nextitem;
 		    // When looking for a response message from the LSP server,
 		    // ignore new LSP request and notification messages.  LSP
 		    // request and notification messages have the "method" field
 		    // in the header and the response messages do not have this
 		    // field.
-		    if (dict_has_key(d, "method"))
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"id", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    ఒకవేళ (dict_has_కీలకం(d, "method"))
+			వెళ్ళు nextitem;
+		    di = dict_కనుగొను(d, (char_u *)"id", -1);
+		    ఒకవేళ (di == ఖాళీ)
+			వెళ్ళు nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		లేకపోతే
+		    tv = అంశం->jq_విలువ;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (id > 0)
+		ఒకవేళ (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    ఒకవేళ (అంశం->jq_విలువ->v_type != VAR_DICT)
+			వెళ్ళు nextitem;
+		    d = అంశం->jq_విలువ->vval.v_dict;
+		    ఒకవేళ (d == ఖాళీ)
+			వెళ్ళు nextitem;
+		    di = dict_కనుగొను(d, (char_u *)"request_seq", -1);
+		    ఒకవేళ (di == ఖాళీ)
+			వెళ్ళు nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		లేకపోతే
+		    tv = అంశం->jq_విలువ;
 	    }
 	}
 
-	if ((without_callback || !item->jq_no_callback)
-	    && ((id > 0 && tv->v_type == VAR_NUMBER && tv->vval.v_number == id)
-	      || (id <= 0 && (tv->v_type != VAR_NUMBER
-		 || tv->vval.v_number == 0
-		 || !channel_has_block_id(
-				&channel->ch_part[part], tv->vval.v_number)))))
+	ఒకవేళ ((without_callback || !అంశం->jq_no_callback)
+	    && ((id > 0 && tv->v_type == VAR_సంఖ్య && tv->vval.v_సంఖ్య == id)
+	      || (id <= 0 && (tv->v_type != VAR_సంఖ్య
+		 || tv->vval.v_సంఖ్య == 0
+		 || !channel_has_ఖండం_id(
+				&channel->ch_part[part], tv->vval.v_సంఖ్య)))))
 	{
-	    *rettv = item->jq_value;
-	    if (tv->v_type == VAR_NUMBER)
+	    *rettv = అంశం->jq_విలువ;
+	    ఒకవేళ (tv->v_type == VAR_సంఖ్య)
 		ch_log(channel, "Getting JSON message %ld",
-						      (long)tv->vval.v_number);
-	    remove_json_node(head, item);
-	    return OK;
+						      (దీర్ఘ)tv->vval.v_సంఖ్య);
+	    remove_json_కణుపు(తల, అంశం);
+	    తిరిగి OK;
 	}
 nextitem:
-	item = item->jq_next;
+	అంశం = అంశం->jq_తదుపరి;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Put back "rettv" into the JSON queue, there was no callback for it.
  * Takes over the values in "rettv".
  */
-    static void
-channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
+    స్థిర శూన్య
+channel_నెట్టు_json(channel_T *channel, ch_part_T part, typval_T *rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *తల = &channel->ch_part[part].ch_json_తల;
+    jsonq_T   *అంశం = తల->jq_తదుపరి;
     jsonq_T   *newitem;
 
-    if (head->jq_prev != NULL && head->jq_prev->jq_no_callback)
+    ఒకవేళ (తల->jq_prev != ఖాళీ && తల->jq_prev->jq_no_callback)
 	// last item was pushed back, append to the end
-	item = NULL;
-    else while (item != NULL && item->jq_no_callback)
+	అంశం = ఖాళీ;
+    లేకపోతే అయితే (అంశం != ఖాళీ && అంశం->jq_no_callback)
 	// append after the last item that was pushed back
-	item = item->jq_next;
+	అంశం = అంశం->jq_తదుపరి;
 
     newitem = ALLOC_ONE(jsonq_T);
-    if (newitem == NULL)
+    ఒకవేళ (newitem == ఖాళీ)
     {
 	clear_tv(rettv);
-	return;
+	తిరిగి;
     }
 
-    newitem->jq_value = alloc_tv();
-    if (newitem->jq_value == NULL)
+    newitem->jq_విలువ = alloc_tv();
+    ఒకవేళ (newitem->jq_విలువ == ఖాళీ)
     {
 	vim_free(newitem);
 	clear_tv(rettv);
-	return;
+	తిరిగి;
     }
 
     newitem->jq_no_callback = FALSE;
-    *newitem->jq_value = *rettv;
-    if (item == NULL)
+    *newitem->jq_విలువ = *rettv;
+    ఒకవేళ (అంశం == ఖాళీ)
     {
 	// append to the end
-	newitem->jq_prev = head->jq_prev;
-	head->jq_prev = newitem;
-	newitem->jq_next = NULL;
-	if (newitem->jq_prev == NULL)
-	    head->jq_next = newitem;
-	else
-	    newitem->jq_prev->jq_next = newitem;
+	newitem->jq_prev = తల->jq_prev;
+	తల->jq_prev = newitem;
+	newitem->jq_తదుపరి = ఖాళీ;
+	ఒకవేళ (newitem->jq_prev == ఖాళీ)
+	    తల->jq_తదుపరి = newitem;
+	లేకపోతే
+	    newitem->jq_prev->jq_తదుపరి = newitem;
     }
-    else
+    లేకపోతే
     {
 	// append after "item"
-	newitem->jq_prev = item;
-	newitem->jq_next = item->jq_next;
-	item->jq_next = newitem;
-	if (newitem->jq_next == NULL)
-	    head->jq_prev = newitem;
-	else
-	    newitem->jq_next->jq_prev = newitem;
+	newitem->jq_prev = అంశం;
+	newitem->jq_తదుపరి = అంశం->jq_తదుపరి;
+	అంశం->jq_తదుపరి = newitem;
+	ఒకవేళ (newitem->jq_తదుపరి == ఖాళీ)
+	    తల->jq_prev = newitem;
+	లేకపోతే
+	    newitem->jq_తదుపరి->jq_prev = newitem;
     }
 }
 
-#define CH_JSON_MAX_ARGS 4
+#నిర్వచించు CH_JSON_MAX_వాదనలు 4
 
 /*
  * Execute a command received over "channel"/"part"
  * "argv[0]" is the command string.
  * "argv[1]" etc. have further arguments, type is VAR_UNKNOWN if missing.
  */
-    static void
+    స్థిర శూన్య
 channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 {
     char_u  *cmd = argv[0].vval.v_string;
     char_u  *arg;
-    int	    options = channel->ch_part[part].ch_mode == CH_MODE_JS
+    పూర్ణాంకం	    options = channel->ch_part[part].ch_బహుళకం == CH_బహుళకం_JS
 								 ? JSON_JS : 0;
 
-    if (argv[1].v_type != VAR_STRING)
+    ఒకవేళ (argv[1].v_type != VAR_STRING)
     {
 	ch_error(channel, "received command with non-string argument");
-	if (p_verbose > 2)
-	    emsg(_(e_received_command_with_non_string_argument));
-	return;
+	ఒకవేళ (p_verbose > 2)
+	    emsg(_(e_received_command_with_non_string_వాదం));
+	తిరిగి;
     }
     arg = argv[1].vval.v_string;
-    if (arg == NULL)
+    ఒకవేళ (arg == ఖాళీ)
 	arg = (char_u *)"";
 
-    if (STRCMP(cmd, "ex") == 0)
+    ఒకవేళ (STRCMP(cmd, "ex") == 0)
     {
-	int	called_emsg_before = called_emsg;
+	పూర్ణాంకం	called_emsg_before = called_emsg;
 	char_u	*p = arg;
-	int	do_emsg_silent;
+	పూర్ణాంకం	do_emsg_silent;
 
-	ch_log(channel, "Executing ex command '%s'", (char *)arg);
+	ch_log(channel, "Executing ex command '%s'", (అక్షరం *)arg);
 	do_emsg_silent = !checkforcmd(&p, "echoerr", 5);
-	if (do_emsg_silent)
+	ఒకవేళ (do_emsg_silent)
 	    ++emsg_silent;
 	do_cmdline_cmd(arg);
-	if (do_emsg_silent)
+	ఒకవేళ (do_emsg_silent)
 	    --emsg_silent;
-	if (called_emsg > called_emsg_before)
+	ఒకవేళ (called_emsg > called_emsg_before)
 	    ch_log(channel, "Ex command error: '%s'",
-					  (char *)get_vim_var_str(VV_ERRMSG));
+					  (అక్షరం *)get_vim_var_str(VV_ERRMSG));
     }
-    else if (STRCMP(cmd, "normal") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(cmd, "normal") == 0)
     {
 	exarg_T ea;
 
-	ch_log(channel, "Executing normal command '%s'", (char *)arg);
-	CLEAR_FIELD(ea);
+	ch_log(channel, "Executing normal command '%s'", (అక్షరం *)arg);
+	CLEAR_క్షేత్రం(ea);
 	ea.arg = arg;
-	ea.addr_count = 0;
+	ea.addr_లెక్క = 0;
 	ea.forceit = TRUE; // no mapping
-	ex_normal(&ea);
+	ex_సాధారణ(&ea);
     }
-    else if (STRCMP(cmd, "redraw") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(cmd, "redraw") == 0)
     {
 	ch_log(channel, "redraw");
 	redraw_cmd(*arg != NUL);
 	showruler(FALSE);
 	setcursor();
-	out_flush_cursor(TRUE, FALSE);
+	బహిర్గతం_flush_cursor(TRUE, FALSE);
     }
-    else if (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
     {
-	int is_call = cmd[0] == 'c';
-	int id_idx = is_call ? 3 : 2;
+	పూర్ణాంకం is_call = cmd[0] == 'c';
+	పూర్ణాంకం id_idx = is_call ? 3 : 2;
 
-	if (argv[id_idx].v_type != VAR_UNKNOWN
-					 && argv[id_idx].v_type != VAR_NUMBER)
+	ఒకవేళ (argv[id_idx].v_type != VAR_UNKNOWN
+					 && argv[id_idx].v_type != VAR_సంఖ్య)
 	{
 	    ch_error(channel, "last argument for expr/call must be a number");
-	    if (p_verbose > 2)
-		emsg(_(e_last_argument_for_expr_call_must_be_number));
+	    ఒకవేళ (p_verbose > 2)
+		emsg(_(e_చివరి_వాదం_for_సమాసం_call_must_be_సంఖ్య));
 	}
-	else if (is_call && argv[2].v_type != VAR_LIST)
+	లేకపోతే ఒకవేళ (is_call && argv[2].v_type != VAR_LIST)
 	{
 	    ch_error(channel, "third argument for call must be a list");
-	    if (p_verbose > 2)
-		emsg(_(e_third_argument_for_call_must_be_list));
+	    ఒకవేళ (p_verbose > 2)
+		emsg(_(e_మూడవ_వాదం_for_call_must_be_list));
 	}
-	else
+	లేకపోతే
 	{
-	    typval_T	*tv = NULL;
+	    typval_T	*tv = ఖాళీ;
 	    typval_T	res_tv;
 	    typval_T	err_tv;
-	    char_u	*json = NULL;
+	    char_u	*json = ఖాళీ;
 
 	    // Don't pollute the display with errors.
 	    // Do generate the errors so that try/catch works.
 	    ++emsg_silent;
-	    if (!is_call)
+	    ఒకవేళ (!is_call)
 	    {
-		ch_log(channel, "Evaluating expression '%s'", (char *)arg);
-		tv = eval_expr(arg, NULL);
+		ch_log(channel, "Evaluating expression '%s'", (అక్షరం *)arg);
+		tv = eval_సమాసం(arg, ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		ch_log(channel, "Calling '%s'", (char *)arg);
-		if (func_call(arg, &argv[2], NULL, NULL, &res_tv) == OK)
+		ch_log(channel, "Calling '%s'", (అక్షరం *)arg);
+		ఒకవేళ (func_call(arg, &argv[2], ఖాళీ, ఖాళీ, &res_tv) == OK)
 		    tv = &res_tv;
 	    }
 
-	    if (argv[id_idx].v_type == VAR_NUMBER)
+	    ఒకవేళ (argv[id_idx].v_type == VAR_సంఖ్య)
 	    {
-		int id = argv[id_idx].vval.v_number;
+		పూర్ణాంకం id = argv[id_idx].vval.v_సంఖ్య;
 
-		if (tv != NULL)
-		    json = json_encode_nr_expr(id, tv, options | JSON_NL);
-		if (tv == NULL || (json != NULL && *json == NUL))
+		ఒకవేళ (tv != ఖాళీ)
+		    json = json_encode_nr_సమాసం(id, tv, options | JSON_NL);
+		ఒకవేళ (tv == ఖాళీ || (json != ఖాళీ && *json == NUL))
 		{
 		    // If evaluation failed or the result can't be encoded
 		    // then return the string "ERROR".
 		    vim_free(json);
 		    err_tv.v_type = VAR_STRING;
 		    err_tv.vval.v_string = (char_u *)"ERROR";
-		    json = json_encode_nr_expr(id, &err_tv, options | JSON_NL);
+		    json = json_encode_nr_సమాసం(id, &err_tv, options | JSON_NL);
 		}
-		if (json != NULL)
+		ఒకవేళ (json != ఖాళీ)
 		{
 		    channel_send(channel,
-				 part == PART_SOCK ? PART_SOCK : PART_IN,
-				 json, (int)STRLEN(json), (char *)cmd);
+				 part == PART_SOCK ? PART_SOCK : PART_లోపల,
+				 json, (పూర్ణాంకం)STRLEN(json), (అక్షరం *)cmd);
 		    vim_free(json);
 		}
 	    }
 	    --emsg_silent;
-	    if (tv == &res_tv)
+	    ఒకవేళ (tv == &res_tv)
 		clear_tv(tv);
-	    else
+	    లేకపోతే
 		free_tv(tv);
 	}
     }
-    else if (p_verbose > 2)
+    లేకపోతే ఒకవేళ (p_verbose > 2)
     {
-	ch_error(channel, "Received unknown command: %s", (char *)cmd);
+	ch_error(channel, "Received unknown command: %s", (అక్షరం *)cmd);
 	semsg(_(e_received_unknown_command_str), cmd);
     }
 }
@@ -3223,165 +3223,165 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
  * Invoke the callback at "cbhead".
  * Does not redraw but sets channel_need_redraw.
  */
-    static void
-invoke_one_time_callback(
+    స్థిర శూన్య
+invoke_one_సమయం_callback(
 	channel_T   *channel,
 	cbq_T	    *cbhead,
-	cbq_T	    *item,
+	cbq_T	    *అంశం,
 	typval_T    *argv)
 {
     ch_log(channel, "Invoking one-time callback %s",
-					    (char *)item->cq_callback.cb_name);
+					    (అక్షరం *)అంశం->cq_callback.cb_name);
     // Remove the item from the list first, if the callback
     // invokes ch_close() the list will be cleared.
-    remove_cb_node(cbhead, item);
-    invoke_callback(channel, &item->cq_callback, argv);
-    free_callback(&item->cq_callback);
-    vim_free(item);
+    remove_cb_కణుపు(cbhead, అంశం);
+    invoke_callback(channel, &అంశం->cq_callback, argv);
+    free_callback(&అంశం->cq_callback);
+    vim_free(అంశం);
 }
 
-    static void
-append_to_buffer(
-    buf_T	*buffer,
-    char_u	*msg,
+    స్థిర శూన్య
+append_గమ్యం_బఫరు(
+    buf_T	*బఫరు,
+    char_u	*సందేశం,
     channel_T	*channel,
     ch_part_T	part)
 {
     aco_save_T	aco;
-    linenr_T    lnum = buffer->b_ml.ml_line_count;
-    bool	save_write_to = buffer->b_write_to_channel;
+    linenr_T    lnum = బఫరు->b_ml.ml_పంక్తి_లెక్క;
+    bool	save_write_గమ్యం = బఫరు->b_write_గమ్యం_channel;
     chanpart_T  *ch_part = &channel->ch_part[part];
-    int		save_p_ma = buffer->b_p_ma;
-    int		empty = (buffer->b_ml.ml_flags & ML_EMPTY) ? 1 : 0;
+    పూర్ణాంకం		save_p_ma = బఫరు->b_p_ma;
+    పూర్ణాంకం		ఖాళీలు_2 = (బఫరు->b_ml.ml_flags & ML_ఖాళీలు) ? 1 : 0;
 
-    if (!buffer->b_p_ma && !ch_part->ch_nomodifiable)
+    ఒకవేళ (!బఫరు->b_p_ma && !ch_part->ch_nomodifiable)
     {
-	if (!ch_part->ch_nomod_error)
+	ఒకవేళ (!ch_part->ch_nomod_error)
 	{
 	    ch_error(channel, "Buffer is not modifiable, cannot append");
 	    ch_part->ch_nomod_error = TRUE;
 	}
-	return;
+	తిరిగి;
     }
 
     // If the buffer is also used as input insert above the last
     // line. Don't write these lines.
-    if (save_write_to)
+    ఒకవేళ (save_write_గమ్యం)
     {
 	--lnum;
-	buffer->b_write_to_channel = false;
+	బఫరు->b_write_గమ్యం_channel = false;
     }
 
     // Append to the buffer
     ch_log(channel, "appending line %d to buffer %s",
-				       (int)lnum + 1 - empty, buffer->b_fname);
+				       (పూర్ణాంకం)lnum + 1 - ఖాళీలు_2, బఫరు->b_fname);
 
-    buffer->b_p_ma = TRUE;
+    బఫరు->b_p_ma = TRUE;
 
     // Set curbuf to "buffer", temporarily.
-    aucmd_prepbuf(&aco, buffer);
-    if (curbuf != buffer)
+    aucmd_prepbuf(&aco, బఫరు);
+    ఒకవేళ (curbuf != బఫరు)
     {
 	// Could not find a window for this buffer, the following might cause
 	// trouble, better bail out.
-	return;
+	తిరిగి;
     }
 
     u_sync(TRUE);
     // ignore undo failure, undo is not very useful here
-    vim_ignored = u_save(lnum - empty, lnum + 1);
+    vim_ignored = u_save(lnum - ఖాళీలు_2, lnum + 1);
 
-    if (empty)
+    ఒకవేళ (ఖాళీలు_2)
     {
 	// The buffer is empty, replace the first (dummy) line.
-	ml_replace(lnum, msg, TRUE);
+	ml_replace(lnum, సందేశం, TRUE);
 	lnum = 0;
     }
-    else
-	ml_append(lnum, msg, 0, FALSE);
-    appended_lines_mark(lnum, 1L);
+    లేకపోతే
+	ml_append(lnum, సందేశం, 0, FALSE);
+    appended_పంక్తులు_mark(lnum, 1L);
 
     // reset notion of buffer
     aucmd_restbuf(&aco);
 
-    if (ch_part->ch_nomodifiable)
-	buffer->b_p_ma = FALSE;
-    else
-	buffer->b_p_ma = save_p_ma;
+    ఒకవేళ (ch_part->ch_nomodifiable)
+	బఫరు->b_p_ma = FALSE;
+    లేకపోతే
+	బఫరు->b_p_ma = save_p_ma;
 
-    if (buffer->b_nwindows > 0)
+    ఒకవేళ (బఫరు->b_nwindows > 0)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == buffer)
+	    ఒకవేళ (wp->w_బఫరు == బఫరు)
 	    {
-		int move_cursor = save_write_to
+		పూర్ణాంకం move_cursor = save_write_గమ్యం
 			    ? wp->w_cursor.lnum == lnum + 1
 			    : (wp->w_cursor.lnum == lnum
-				&& wp->w_cursor.col == 0);
+				&& wp->w_cursor.నిలువు == 0);
 
 		// If the cursor is at or above the new line, move it one line
 		// down.  If the topline is outdated update it now.
-		if (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
+		ఒకవేళ (move_cursor || wp->w_topline > బఫరు->b_ml.ml_పంక్తి_లెక్క)
 		{
 		    win_T *save_curwin = curwin;
 
-		    if (move_cursor)
+		    ఒకవేళ (move_cursor)
 			++wp->w_cursor.lnum;
 		    curwin = wp;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_బఫరు;
 		    scroll_cursor_bot(0, FALSE);
 		    curwin = save_curwin;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_బఫరు;
 		}
 	    }
 	}
-	redraw_buf_and_status_later(buffer, UPD_VALID);
+	redraw_buf_and_స్థితి_later(బఫరు, UPD_VALID);
 	channel_need_redraw = TRUE;
     }
 
-    if (save_write_to)
+    ఒకవేళ (save_write_గమ్యం)
     {
 	channel_T *ch;
 
 	// Find channels reading from this buffer and adjust their
 	// next-to-read line number.
-	buffer->b_write_to_channel = true;
+	బఫరు->b_write_గమ్యం_channel = true;
 	FOR_ALL_CHANNELS(ch)
 	{
-	    chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	    chanpart_T  *లోపల_part = &ch->ch_part[PART_లోపల];
 
-	    if (in_part->ch_bufref.br_buf == buffer)
-		in_part->ch_buf_bot = buffer->b_ml.ml_line_count;
+	    ఒకవేళ (లోపల_part->ch_bufref.br_buf == బఫరు)
+		లోపల_part->ch_buf_bot = బఫరు->b_ml.ml_పంక్తి_లెక్క;
 	}
     }
 }
 
-    static void
+    స్థిర శూన్య
 drop_messages(channel_T *channel, ch_part_T part)
 {
-    char_u *msg;
+    char_u *సందేశం;
 
-    while ((msg = channel_get(channel, part, NULL)) != NULL)
+    అయితే ((సందేశం = channel_get(channel, part, ఖాళీ)) != ఖాళీ)
     {
-	ch_log(channel, "Dropping message '%s'", (char *)msg);
-	vim_free(msg);
+	ch_log(channel, "Dropping message '%s'", (అక్షరం *)సందేశం);
+	vim_free(సందేశం);
     }
 }
 
 /*
  * Return TRUE if for "channel" / "part" ch_json_head should be used.
  */
-    static int
-channel_use_json_head(channel_T *channel, ch_part_T part)
+    స్థిర పూర్ణాంకం
+channel_use_json_తల(channel_T *channel, ch_part_T part)
 {
-    ch_mode_T	ch_mode = channel->ch_part[part].ch_mode;
+    ch_బహుళకం_T	ch_బహుళకం = channel->ch_part[part].ch_బహుళకం;
 
-    return ch_mode == CH_MODE_JSON || ch_mode == CH_MODE_JS
-						     || ch_mode == CH_MODE_LSP
-						     || ch_mode == CH_MODE_DAP;
+    తిరిగి ch_బహుళకం == CH_బహుళకం_JSON || ch_బహుళకం == CH_బహుళకం_JS
+						     || ch_బహుళకం == CH_బహుళకం_LSP
+						     || ch_బహుళకం == CH_బహుళకం_DAP;
 }
 
 /*
@@ -3389,379 +3389,379 @@ channel_use_json_head(channel_T *channel, ch_part_T part)
  * This does not redraw but sets channel_need_redraw when redraw is needed.
  * Return TRUE when a message was handled, there might be another one.
  */
-    static int
+    స్థిర పూర్ణాంకం
 may_invoke_callback(channel_T *channel, ch_part_T part)
 {
-    char_u	*msg = NULL;
-    blob_T	*blob = NULL;
-    typval_T	*listtv = NULL;
-    typval_T	argv[CH_JSON_MAX_ARGS];
-    int		seq_nr = -1;
+    char_u	*సందేశం = ఖాళీ;
+    blob_T	*blob = ఖాళీ;
+    typval_T	*listtv = ఖాళీ;
+    typval_T	argv[CH_JSON_MAX_వాదనలు];
+    పూర్ణాంకం		seq_nr = -1;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    ch_mode_T	ch_mode = ch_part->ch_mode;
-    cbq_T	*cbhead = &ch_part->ch_cb_head;
+    ch_బహుళకం_T	ch_బహుళకం = ch_part->ch_బహుళకం;
+    cbq_T	*cbhead = &ch_part->ch_cb_తల;
     cbq_T	*cbitem;
-    callback_T	*callback = NULL;
-    buf_T	*buffer = NULL;
+    callback_T	*callback = ఖాళీ;
+    buf_T	*బఫరు = ఖాళీ;
     char_u	*p;
-    int		called_otc;		// one time callbackup
-    int		raw_len = 0;
+    పూర్ణాంకం		called_otc;		// one time callbackup
+    పూర్ణాంకం		raw_len = 0;
 
-    if (channel->ch_nb_close_cb != NULL
-#ifdef FEAT_SOCKETSERVER
+    ఒకవేళ (channel->ch_nb_close_cb != ఖాళీ
+#నిర్వచితమైతే FEAT_SOCKETSERVER
 	    || channel->ch_socketserver
-#endif
+#అయితే_ముగింపు
 	    )
 	// this channel is handled elsewhere (netbeans or socketserver)
-	return FALSE;
+	తిరిగి FALSE;
 
     // Use a message-specific callback, part callback or channel callback
-    for (cbitem = cbhead->cq_next; cbitem != NULL; cbitem = cbitem->cq_next)
-	if (cbitem->cq_seq_nr == 0)
-	    break;
-    if (cbitem != NULL)
+    కొరకు (cbitem = cbhead->cq_తదుపరి; cbitem != ఖాళీ; cbitem = cbitem->cq_తదుపరి)
+	ఒకవేళ (cbitem->cq_seq_nr == 0)
+	    ఆపు;
+    ఒకవేళ (cbitem != ఖాళీ)
 	callback = &cbitem->cq_callback;
-    else if (ch_part->ch_callback.cb_name != NULL)
+    లేకపోతే ఒకవేళ (ch_part->ch_callback.cb_name != ఖాళీ)
 	callback = &ch_part->ch_callback;
-    else if (channel->ch_callback.cb_name != NULL)
+    లేకపోతే ఒకవేళ (channel->ch_callback.cb_name != ఖాళీ)
 	callback = &channel->ch_callback;
 
-    buffer = ch_part->ch_bufref.br_buf;
-    if (buffer != NULL && (!bufref_valid(&ch_part->ch_bufref)
-					       || buffer->b_ml.ml_mfp == NULL))
+    బఫరు = ch_part->ch_bufref.br_buf;
+    ఒకవేళ (బఫరు != ఖాళీ && (!bufref_valid(&ch_part->ch_bufref)
+					       || బఫరు->b_ml.ml_mfp == ఖాళీ))
     {
 	// buffer was wiped out or unloaded
-	ch_log(channel, "%s buffer has been wiped out", ch_part_names[part]);
-	ch_part->ch_bufref.br_buf = NULL;
-	buffer = NULL;
+	ch_log(channel, "%s buffer has been wiped out", ch_part_పేర్లు[part]);
+	ch_part->ch_bufref.br_buf = ఖాళీ;
+	బఫరు = ఖాళీ;
     }
 
-    if (channel_use_json_head(channel, part))
+    ఒకవేళ (channel_use_json_తల(channel, part))
     {
-	listitem_T	*item;
-	int		argc = 0;
+	listitem_T	*అంశం;
+	పూర్ణాంకం		argc = 0;
 
 	// Get any json message in the queue.
-	if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+	ఒకవేళ (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP || ch_బహుళకం == CH_బహుళకం_DAP)
 		// In the "lsp" or "dap" mode, the http header and the json
 		// payload may be received in multiple messages. So concatenate
 		// all the received messages.
-		(void)channel_collapse(channel, part, FALSE);
+		(శూన్య)channel_collapse(channel, part, FALSE);
 
 	    // Parse readahead, return when there is still no message.
 	    channel_parse_json(channel, part, false);
-	    if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
-		return FALSE;
+	    ఒకవేళ (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+		తిరిగి FALSE;
 	}
 
-	if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP || ch_బహుళకం == CH_బహుళకం_DAP)
 	{
 	    dict_T	*d = listtv->vval.v_dict;
 	    dictitem_T	*di;
 
 	    seq_nr = 0;
-	    if (d != NULL)
+	    ఒకవేళ (d != ఖాళీ)
 	    {
-		if (ch_mode == CH_MODE_LSP)
-		    di = dict_find(d, (char_u *)"id", -1);
-		else
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		    seq_nr = di->di_tv.vval.v_number;
+		ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP)
+		    di = dict_కనుగొను(d, (char_u *)"id", -1);
+		లేకపోతే
+		    di = dict_కనుగొను(d, (char_u *)"request_seq", -1);
+		ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_సంఖ్య)
+		    seq_nr = di->di_tv.vval.v_సంఖ్య;
 	    }
 
 	    argv[1] = *listtv;
 	}
-	else
+	లేకపోతే
 	{
-	    for (item = listtv->vval.v_list->lv_first;
-		    item != NULL && argc < CH_JSON_MAX_ARGS;
-		    item = item->li_next)
-		argv[argc++] = item->li_tv;
-	    while (argc < CH_JSON_MAX_ARGS)
+	    కొరకు (అంశం = listtv->vval.v_list->lv_మొదటి;
+		    అంశం != ఖాళీ && argc < CH_JSON_MAX_వాదనలు;
+		    అంశం = అంశం->li_తదుపరి)
+		argv[argc++] = అంశం->li_tv;
+	    అయితే (argc < CH_JSON_MAX_వాదనలు)
 		argv[argc++].v_type = VAR_UNKNOWN;
 
-	    if (argv[0].v_type == VAR_STRING)
+	    ఒకవేళ (argv[0].v_type == VAR_STRING)
 	    {
 		// ["cmd", arg] or ["cmd", arg, arg] or ["cmd", arg, arg, arg]
 		channel_exe_cmd(channel, part, argv);
 		free_tv(listtv);
-		return TRUE;
+		తిరిగి TRUE;
 	    }
 
-	    if (argv[0].v_type != VAR_NUMBER)
+	    ఒకవేళ (argv[0].v_type != VAR_సంఖ్య)
 	    {
 		ch_error(channel,
 			"Dropping message with invalid sequence number type");
 		free_tv(listtv);
-		return FALSE;
+		తిరిగి FALSE;
 	    }
-	    seq_nr = argv[0].vval.v_number;
+	    seq_nr = argv[0].vval.v_సంఖ్య;
 	}
     }
-    else if (channel_peek(channel, part) == NULL)
+    లేకపోతే ఒకవేళ (channel_peek(channel, part) == ఖాళీ)
     {
 	// nothing to read on RAW or NL channel
-	return FALSE;
+	తిరిగి FALSE;
     }
-    else
+    లేకపోతే
     {
 	// If there is no callback or buffer drop the message.
-	if (callback == NULL && buffer == NULL)
+	ఒకవేళ (callback == ఖాళీ && బఫరు == ఖాళీ)
 	{
 	    // If there is a close callback it may use ch_read() to get the
 	    // messages.
-	    if (channel->ch_close_cb.cb_name == NULL && !channel->ch_drop_never)
+	    ఒకవేళ (channel->ch_close_cb.cb_name == ఖాళీ && !channel->ch_drop_never)
 		drop_messages(channel, part);
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
 
-	if (ch_mode == CH_MODE_NL)
+	ఒకవేళ (ch_బహుళకం == CH_బహుళకం_NL)
 	{
-	    char_u  *nl = NULL;
+	    char_u  *nl = ఖాళీ;
 	    char_u  *buf;
-	    readq_T *node;
+	    readq_T *కణుపు;
 
 	    // See if we have a message ending in NL in the first buffer.  If
 	    // not try to concatenate the first and the second buffer.
-	    while (TRUE)
+	    అయితే (TRUE)
 	    {
-		node = channel_peek(channel, part);
-		nl = channel_first_nl(node);
-		if (nl != NULL)
-		    break;
-		if (channel_collapse(channel, part, TRUE) == FAIL)
+		కణుపు = channel_peek(channel, part);
+		nl = channel_మొదటి_nl(కణుపు);
+		ఒకవేళ (nl != ఖాళీ)
+		    ఆపు;
+		ఒకవేళ (channel_collapse(channel, part, TRUE) == FAIL)
 		{
-		    if (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
-			break;
-		    return FALSE; // incomplete message
+		    ఒకవేళ (ch_part->ch_fd == INVALID_FD && కణుపు->rq_buflen > 0)
+			ఆపు;
+		    తిరిగి FALSE; // incomplete message
 		}
 	    }
-	    buf = node->rq_buffer;
+	    buf = కణుపు->rq_బఫరు;
 
 	    // Convert NUL to NL, the internal representation.
-	    for (p = buf; (nl == NULL || p < nl)
-					    && p < buf + node->rq_buflen; ++p)
-		if (*p == NUL)
+	    కొరకు (p = buf; (nl == ఖాళీ || p < nl)
+					    && p < buf + కణుపు->rq_buflen; ++p)
+		ఒకవేళ (*p == NUL)
 		    *p = NL;
 
-	    if (nl == NULL)
+	    ఒకవేళ (nl == ఖాళీ)
 	    {
 		// get the whole buffer, drop the NL
-		msg = channel_get(channel, part, NULL);
+		సందేశం = channel_get(channel, part, ఖాళీ);
 	    }
-	    else if (nl + 1 == buf + node->rq_buflen)
+	    లేకపోతే ఒకవేళ (nl + 1 == buf + కణుపు->rq_buflen)
 	    {
 		// get the whole buffer
-		msg = channel_get(channel, part, NULL);
+		సందేశం = channel_get(channel, part, ఖాళీ);
 		*nl = NUL;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Copy the message into allocated memory (excluding the NL)
 		// and remove it from the buffer (including the NL).
-		msg = vim_strnsave(buf, nl - buf);
-		channel_consume(channel, part, (int)(nl - buf) + 1);
+		సందేశం = vim_strnsave(buf, nl - buf);
+		channel_consume(channel, part, (పూర్ణాంకం)(nl - buf) + 1);
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // For a raw channel we don't know where the message ends, just
 	    // get everything we have.
 	    raw_len = 0;
-	    msg = channel_get_all(channel, part,
-			ch_mode == CH_MODE_BLOB ? &raw_len : NULL);
+	    సందేశం = channel_get_all(channel, part,
+			ch_బహుళకం == CH_బహుళకం_BLOB ? &raw_len : ఖాళీ);
 	}
 
-	if (msg == NULL)
-	    return FALSE; // out of memory (and avoids Coverity warning)
+	ఒకవేళ (సందేశం == ఖాళీ)
+	    తిరిగి FALSE; // out of memory (and avoids Coverity warning)
 
-	if (ch_mode == CH_MODE_BLOB)
+	ఒకవేళ (ch_బహుళకం == CH_బహుళకం_BLOB)
 	{
 	    blob = blob_alloc();
-	    if (blob == NULL)
+	    ఒకవేళ (blob == ఖాళీ)
 	    {
-		vim_free(msg);
-		return FALSE;
+		vim_free(సందేశం);
+		తిరిగి FALSE;
 	    }
-	    if (ga_grow(&blob->bv_ga, raw_len) == FAIL)
+	    ఒకవేళ (ga_grow(&blob->bv_ga, raw_len) == FAIL)
 	    {
 		blob_free(blob);
-		vim_free(msg);
-		return FALSE;
+		vim_free(సందేశం);
+		తిరిగి FALSE;
 	    }
-	    if (raw_len > 0)
+	    ఒకవేళ (raw_len > 0)
 	    {
-		mch_memmove(blob->bv_ga.ga_data, msg, (size_t)raw_len);
+		mch_memmove(blob->bv_ga.ga_దత్తాంశం, సందేశం, (size_t)raw_len);
 		blob->bv_ga.ga_len = raw_len;
 	    }
 	    argv[1].v_type = VAR_BLOB;
 	    argv[1].vval.v_blob = blob;
 	    ++blob->bv_refcount;
 	}
-	else
+	లేకపోతే
 	{
 	    argv[1].v_type = VAR_STRING;
-	    argv[1].vval.v_string = msg;
+	    argv[1].vval.v_string = సందేశం;
 	}
     }
 
     called_otc = FALSE;
-    if (seq_nr > 0)
+    ఒకవేళ (seq_nr > 0)
     {
 	// JSON or JS or LSP or DAP mode: invoke the one-time callback with the
 	// matching nr
-	int lsp_req_msg = FALSE;
+	పూర్ణాంకం lsp_req_సందేశం = FALSE;
 
 	// Don't use a LSP/DAP server request message with the same sequence
 	// number as the client request message as the response message.
-	if ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ఒకవేళ ((ch_బహుళకం == CH_బహుళకం_LSP || ch_బహుళకం == CH_బహుళకం_DAP)
 		&& argv[1].v_type == VAR_DICT
-		&& dict_has_key(argv[1].vval.v_dict, "method"))
-	    lsp_req_msg = TRUE;
+		&& dict_has_కీలకం(argv[1].vval.v_dict, "method"))
+	    lsp_req_సందేశం = TRUE;
 
-	if (!lsp_req_msg)
+	ఒకవేళ (!lsp_req_సందేశం)
 	{
-	    for (cbitem = cbhead->cq_next; cbitem != NULL;
-		    cbitem = cbitem->cq_next)
+	    కొరకు (cbitem = cbhead->cq_తదుపరి; cbitem != ఖాళీ;
+		    cbitem = cbitem->cq_తదుపరి)
 	    {
-		if (cbitem->cq_seq_nr == seq_nr)
+		ఒకవేళ (cbitem->cq_seq_nr == seq_nr)
 		{
-		    invoke_one_time_callback(channel, cbhead, cbitem, argv);
+		    invoke_one_సమయం_callback(channel, cbhead, cbitem, argv);
 		    called_otc = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
     }
 
-    if (seq_nr > 0 && ((ch_mode != CH_MODE_LSP && ch_mode != CH_MODE_DAP)
+    ఒకవేళ (seq_nr > 0 && ((ch_బహుళకం != CH_బహుళకం_LSP && ch_బహుళకం != CH_బహుళకం_DAP)
 		|| called_otc))
     {
-	if (!called_otc)
+	ఒకవేళ (!called_otc)
 	{
 	    // If the 'drop' channel attribute is set to 'never' or if
 	    // ch_evalexpr() is waiting for this response message, then don't
 	    // drop this message.
-	    if (channel->ch_drop_never)
+	    ఒకవేళ (channel->ch_drop_never)
 	    {
 		// message must be read with ch_read()
-		channel_push_json(channel, part, listtv);
+		channel_నెట్టు_json(channel, part, listtv);
 
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_సంఖ్య;
 		free_tv(listtv);
-		listtv = NULL;
+		listtv = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 		ch_log(channel, "Dropping message %d without callback",
 								       seq_nr);
 	}
     }
-    else if (callback != NULL || buffer != NULL)
+    లేకపోతే ఒకవేళ (callback != ఖాళీ || బఫరు != ఖాళీ)
     {
-	if (buffer != NULL)
+	ఒకవేళ (బఫరు != ఖాళీ)
 	{
-	    if (msg == NULL)
+	    ఒకవేళ (సందేశం == ఖాళీ)
 		// JSON or JS mode: re-encode the message.
-		msg = json_encode(listtv, ch_mode);
-	    if (msg != NULL)
+		సందేశం = json_encode(listtv, ch_బహుళకం);
+	    ఒకవేళ (సందేశం != ఖాళీ)
 	    {
-#ifdef FEAT_TERMINAL
-		if (buffer->b_term != NULL)
+#నిర్వచితమైతే FEAT_TERMINAL
+		ఒకవేళ (బఫరు->b_పదం != ఖాళీ)
 		{
 		    // PART_ERR data arrives from a pipe without PTY ONLCR
 		    // conversion, so lone NL must be converted to CR+NL to
 		    // prevent unexpected indentation in the terminal display.
-		    if (part == PART_ERR)
+		    ఒకవేళ (part == PART_ERR)
 		    {
 			char_u *cp;
-			int    extra = 0;
+			పూర్ణాంకం    extra = 0;
 
-			for (cp = msg; *cp != NUL; ++cp)
-			    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+			కొరకు (cp = సందేశం; *cp != NUL; ++cp)
+			    ఒకవేళ (*cp == NL && (cp == సందేశం || cp[-1] != CAR))
 				++extra;
-			if (extra > 0)
+			ఒకవేళ (extra > 0)
 			{
-			    char_u *crlf_msg = alloc(STRLEN(msg) + extra + 1);
+			    char_u *crlf_సందేశం = alloc(STRLEN(సందేశం) + extra + 1);
 
-			    if (crlf_msg != NULL)
+			    ఒకవేళ (crlf_సందేశం != ఖాళీ)
 			    {
-				char_u *q = crlf_msg;
+				char_u *q = crlf_సందేశం;
 
-				for (cp = msg; *cp != NUL; ++cp)
+				కొరకు (cp = సందేశం; *cp != NUL; ++cp)
 				{
-				    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+				    ఒకవేళ (*cp == NL && (cp == సందేశం || cp[-1] != CAR))
 					*q++ = CAR;
 				    *q++ = *cp;
 				}
 				*q = NUL;
-				write_to_term(buffer, crlf_msg, channel);
-				vim_free(crlf_msg);
+				write_గమ్యం_పదం(బఫరు, crlf_సందేశం, channel);
+				vim_free(crlf_సందేశం);
 			    }
 			}
-			else
-			    write_to_term(buffer, msg, channel);
+			లేకపోతే
+			    write_గమ్యం_పదం(బఫరు, సందేశం, channel);
 		    }
-		    else
-			write_to_term(buffer, msg, channel);
+		    లేకపోతే
+			write_గమ్యం_పదం(బఫరు, సందేశం, channel);
 		}
-		else
-#endif
-		    append_to_buffer(buffer, msg, channel, part);
+		లేకపోతే
+#అయితే_ముగింపు
+		    append_గమ్యం_బఫరు(బఫరు, సందేశం, channel, part);
 	    }
 	}
 
-	if (callback != NULL)
+	ఒకవేళ (callback != ఖాళీ)
 	{
-	    if (cbitem != NULL)
-		invoke_one_time_callback(channel, cbhead, cbitem, argv);
-	    else
+	    ఒకవేళ (cbitem != ఖాళీ)
+		invoke_one_సమయం_callback(channel, cbhead, cbitem, argv);
+	    లేకపోతే
 	    {
 		// invoke the channel callback
 		ch_log(channel, "Invoking channel callback %s",
-						    (char *)callback->cb_name);
+						    (అక్షరం *)callback->cb_name);
 		invoke_callback(channel, callback, argv);
 	    }
 	}
     }
-    else
+    లేకపోతే
 	ch_log(channel, "Dropping message %d", seq_nr);
 
-    if (listtv != NULL)
+    ఒకవేళ (listtv != ఖాళీ)
 	free_tv(listtv);
-    if (blob != NULL)
+    ఒకవేళ (blob != ఖాళీ)
 	blob_unref(blob);
-    vim_free(msg);
+    vim_free(సందేశం);
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-#if defined(FEAT_NETBEANS_INTG)
+#ఒకవేళ defined(FEAT_NETBEANS_INTG)
 /*
  * Return TRUE when channel "channel" is open for writing to.
  * Also returns FALSE or invalid "channel".
  */
-    int
-channel_can_write_to(channel_T *channel)
+    పూర్ణాంకం
+channel_can_write_గమ్యం(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD);
+    తిరిగి channel != ఖాళీ && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_లోపల_FD != INVALID_FD);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE when channel "channel" is open for reading or writing.
  * Also returns FALSE for invalid "channel".
  */
-    int
+    పూర్ణాంకం
 channel_is_open(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD
-			  || channel->CH_OUT_FD != INVALID_FD
+    తిరిగి channel != ఖాళీ && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_లోపల_FD != INVALID_FD
+			  || channel->CH_బహిర్గతం_FD != INVALID_FD
 			  || channel->CH_ERR_FD != INVALID_FD);
 }
 
@@ -3769,177 +3769,177 @@ channel_is_open(channel_T *channel)
  * Return a pointer indicating the readahead.  Can only be compared between
  * calls.  Returns NULL if there is no readahead.
  */
-    static void *
-channel_readahead_pointer(channel_T *channel, ch_part_T part)
+    స్థిర శూన్య *
+channel_readahead_సూచిక(channel_T *channel, ch_part_T part)
 {
-    if (channel_use_json_head(channel, part))
+    ఒకవేళ (channel_use_json_తల(channel, part))
     {
-	jsonq_T   *head = &channel->ch_part[part].ch_json_head;
+	jsonq_T   *తల = &channel->ch_part[part].ch_json_తల;
 
-	if (head->jq_next == NULL)
+	ఒకవేళ (తల->jq_తదుపరి == ఖాళీ)
 	    // Parse json from readahead, there might be a complete message to
 	    // process.
 	    channel_parse_json(channel, part, false);
 
-	return head->jq_next;
+	తిరిగి తల->jq_తదుపరి;
     }
-    return channel_peek(channel, part);
+    తిరిగి channel_peek(channel, part);
 }
 
 /*
  * Return TRUE if "channel" has JSON or other typeahead.
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_has_readahead(channel_T *channel, ch_part_T part)
 {
-    return channel_readahead_pointer(channel, part) != NULL;
+    తిరిగి channel_readahead_సూచిక(channel, part) != ఖాళీ;
 }
 
 /*
  * Return a string indicating the status of the channel.
  * If "req_part" is not negative check that part.
  */
-    static char *
-channel_status(channel_T *channel, int req_part)
+    స్థిర అక్షరం *
+channel_స్థితి(channel_T *channel, పూర్ణాంకం req_part)
 {
     ch_part_T part;
-    int has_readahead = FALSE;
+    పూర్ణాంకం has_readahead = FALSE;
 
-    if (channel == NULL)
-	 return "fail";
-    if (req_part == PART_OUT)
+    ఒకవేళ (channel == ఖాళీ)
+	 తిరిగి "fail";
+    ఒకవేళ (req_part == PART_బహిర్గతం)
     {
-	if (channel->CH_OUT_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_OUT))
+	ఒకవేళ (channel->CH_బహిర్గతం_FD != INVALID_FD)
+	    తిరిగి "open";
+	ఒకవేళ (channel_has_readahead(channel, PART_బహిర్గతం))
 	    has_readahead = TRUE;
     }
-    else if (req_part == PART_ERR)
+    లేకపోతే ఒకవేళ (req_part == PART_ERR)
     {
-	if (channel->CH_ERR_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_ERR))
+	ఒకవేళ (channel->CH_ERR_FD != INVALID_FD)
+	    తిరిగి "open";
+	ఒకవేళ (channel_has_readahead(channel, PART_ERR))
 	    has_readahead = TRUE;
     }
-    else
+    లేకపోతే
     {
-	if (channel_is_open(channel))
-	    return "open";
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel_has_readahead(channel, part))
+	ఒకవేళ (channel_is_open(channel))
+	    తిరిగి "open";
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
+	    ఒకవేళ (channel_has_readahead(channel, part))
 	    {
 		has_readahead = TRUE;
-		break;
+		ఆపు;
 	    }
     }
 
-    if (has_readahead)
-	return "buffered";
-    return "closed";
+    ఒకవేళ (has_readahead)
+	తిరిగి "buffered";
+    తిరిగి "closed";
 }
 
-    static void
-channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
+    స్థిర శూన్య
+channel_part_info(channel_T *channel, dict_T *dict, అక్షరం *name, ch_part_T part)
 {
     chanpart_T *chanpart = &channel->ch_part[part];
-    char	namebuf[20];  // longest is "sock_timeout"
-    size_t	tail;
+    అక్షరం	namebuf[20];  // longest is "sock_timeout"
+    size_t	తోక;
     string_T	s;
 
     vim_strncpy((char_u *)namebuf, (char_u *)name, 4);
-    tail = STRLEN(namebuf);
-    STRCPY(namebuf + tail, "_");
-    tail += STRLEN_LITERAL("_");
+    తోక = STRLEN(namebuf);
+    STRCPY(namebuf + తోక, "_");
+    తోక += STRLEN_LITERAL("_");
 
-    STRCPY(namebuf + tail, "status");
-    if (chanpart->ch_fd != INVALID_FD)
-	STR_LITERAL_SET(s, "open");
-    else if (channel_has_readahead(channel, part))
-	STR_LITERAL_SET(s, "buffered");
-    else
-	STR_LITERAL_SET(s, "closed");
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    STRCPY(namebuf + తోక, "status");
+    ఒకవేళ (chanpart->ch_fd != INVALID_FD)
+	STR_LITERAL_సమితి(s, "open");
+    లేకపోతే ఒకవేళ (channel_has_readahead(channel, part))
+	STR_LITERAL_సమితి(s, "buffered");
+    లేకపోతే
+	STR_LITERAL_సమితి(s, "closed");
+    dict_కూడు_string_len(dict, namebuf, s.string, (పూర్ణాంకం)s.నిడివి);
 
-    STRCPY(namebuf + tail, "mode");
-    switch (chanpart->ch_mode)
+    STRCPY(namebuf + తోక, "mode");
+    ఎంపిక (chanpart->ch_బహుళకం)
     {
-	case CH_MODE_NL:
-	    STR_LITERAL_SET(s, "NL");
-	    break;
-	case CH_MODE_RAW:
-	    STR_LITERAL_SET(s, "RAW");
-	    break;
-	case CH_MODE_BLOB:
-	    STR_LITERAL_SET(s, "BLOB");
-	    break;
-	case CH_MODE_JSON:
-	    STR_LITERAL_SET(s, "JSON");
-	    break;
-	case CH_MODE_JS:
-	    STR_LITERAL_SET(s, "JS");
-	    break;
-	case CH_MODE_LSP:
-	    STR_LITERAL_SET(s, "LSP");
-	    break;
-	case CH_MODE_DAP:
-	    STR_LITERAL_SET(s, "DAP");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	స్థితి CH_బహుళకం_NL:
+	    STR_LITERAL_సమితి(s, "NL");
+	    ఆపు;
+	స్థితి CH_బహుళకం_RAW:
+	    STR_LITERAL_సమితి(s, "RAW");
+	    ఆపు;
+	స్థితి CH_బహుళకం_BLOB:
+	    STR_LITERAL_సమితి(s, "BLOB");
+	    ఆపు;
+	స్థితి CH_బహుళకం_JSON:
+	    STR_LITERAL_సమితి(s, "JSON");
+	    ఆపు;
+	స్థితి CH_బహుళకం_JS:
+	    STR_LITERAL_సమితి(s, "JS");
+	    ఆపు;
+	స్థితి CH_బహుళకం_LSP:
+	    STR_LITERAL_సమితి(s, "LSP");
+	    ఆపు;
+	స్థితి CH_బహుళకం_DAP:
+	    STR_LITERAL_సమితి(s, "DAP");
+	    ఆపు;
+	అప్రమేయ:
+	    STR_LITERAL_సమితి(s, "");
+	    ఆపు;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_కూడు_string_len(dict, namebuf, s.string, (పూర్ణాంకం)s.నిడివి);
 
-    STRCPY(namebuf + tail, "io");
-    if (part == PART_SOCK)
-	STR_LITERAL_SET(s, "socket");
-    else switch (chanpart->ch_io)
+    STRCPY(namebuf + తోక, "io");
+    ఒకవేళ (part == PART_SOCK)
+	STR_LITERAL_సమితి(s, "socket");
+    లేకపోతే ఎంపిక (chanpart->ch_io)
     {
-	case JIO_NULL:
-	    STR_LITERAL_SET(s, "null");
-	    break;
-	case JIO_PIPE:
-	    STR_LITERAL_SET(s, "pipe");
-	    break;
-	case JIO_FILE:
-	    STR_LITERAL_SET(s, "file");
-	    break;
-	case JIO_BUFFER:
-	    STR_LITERAL_SET(s, "buffer");
-	    break;
-	case JIO_OUT:
-	    STR_LITERAL_SET(s, "out");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	స్థితి JIO_NULL:
+	    STR_LITERAL_సమితి(s, "null");
+	    ఆపు;
+	స్థితి JIO_PIPE:
+	    STR_LITERAL_సమితి(s, "pipe");
+	    ఆపు;
+	స్థితి JIO_FILE:
+	    STR_LITERAL_సమితి(s, "file");
+	    ఆపు;
+	స్థితి JIO_బఫరు:
+	    STR_LITERAL_సమితి(s, "buffer");
+	    ఆపు;
+	స్థితి JIO_బహిర్గతం:
+	    STR_LITERAL_సమితి(s, "out");
+	    ఆపు;
+	అప్రమేయ:
+	    STR_LITERAL_సమితి(s, "");
+	    ఆపు;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_కూడు_string_len(dict, namebuf, s.string, (పూర్ణాంకం)s.నిడివి);
 
-    STRCPY(namebuf + tail, "timeout");
-    dict_add_number(dict, namebuf, chanpart->ch_timeout);
+    STRCPY(namebuf + తోక, "timeout");
+    dict_కూడు_సంఖ్య(dict, namebuf, chanpart->ch_timeout);
 }
 
-    static void
+    స్థిర శూన్య
 channel_info(channel_T *channel, dict_T *dict)
 {
-    dict_add_number(dict, "id", channel->ch_id);
-    dict_add_string(dict, "status", (char_u *)channel_status(channel, -1));
+    dict_కూడు_సంఖ్య(dict, "id", channel->ch_id);
+    dict_కూడు_string(dict, "status", (char_u *)channel_స్థితి(channel, -1));
 
-    if (channel->ch_hostname != NULL)
+    ఒకవేళ (channel->ch_hostname != ఖాళీ)
     {
-	if (channel->ch_port)
-	    dict_add_number(dict, "port", channel->ch_port);
-	else
+	ఒకవేళ (channel->ch_పోర్టు)
+	    dict_కూడు_సంఖ్య(dict, "port", channel->ch_పోర్టు);
+	లేకపోతే
 	    // Unix-domain socket.
-	    dict_add_string(dict, "path", (char_u *)channel->ch_hostname);
+	    dict_కూడు_string(dict, "path", (char_u *)channel->ch_hostname);
 	channel_part_info(channel, dict, "sock", PART_SOCK);
     }
-    else
+    లేకపోతే
     {
-	channel_part_info(channel, dict, "out", PART_OUT);
+	channel_part_info(channel, dict, "out", PART_బహిర్గతం);
 	channel_part_info(channel, dict, "err", PART_ERR);
-	channel_part_info(channel, dict, "in", PART_IN);
+	channel_part_info(channel, dict, "in", PART_లోపల);
     }
 }
 
@@ -3948,50 +3948,50 @@ channel_info(channel_T *channel, dict_T *dict)
  * Trigger the close callback if "invoke_close_cb" is TRUE.
  * Does not clear the buffers.
  */
-    void
-channel_close(channel_T *channel, int invoke_close_cb)
+    శూన్య
+channel_close(channel_T *channel, పూర్ణాంకం invoke_close_cb)
 {
     ch_log(channel, "Closing channel");
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     channel_gui_unregister(channel);
-#endif
+#అయితే_ముగింపు
 
     ch_close_part(channel, PART_SOCK);
-    ch_close_part(channel, PART_IN);
-    ch_close_part(channel, PART_OUT);
+    ch_close_part(channel, PART_లోపల);
+    ch_close_part(channel, PART_బహిర్గతం);
     ch_close_part(channel, PART_ERR);
 
-    if (invoke_close_cb)
+    ఒకవేళ (invoke_close_cb)
     {
 	ch_part_T	part;
 
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
 	// let the terminal know it is closing to avoid getting stuck
-	term_channel_closing(channel);
-#endif
+	పదం_channel_closing(channel);
+#అయితే_ముగింపు
 	// Invoke callbacks and flush buffers before the close callback.
-	if (channel->ch_close_cb.cb_name != NULL)
+	ఒకవేళ (channel->ch_close_cb.cb_name != ఖాళీ)
 	    ch_log(channel,
 		     "Invoking callbacks and flushing buffers before closing");
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
-	    if (channel->ch_close_cb.cb_name != NULL
-			    || channel->ch_part[part].ch_bufref.br_buf != NULL)
+	    ఒకవేళ (channel->ch_close_cb.cb_name != ఖాళీ
+			    || channel->ch_part[part].ch_bufref.br_buf != ఖాళీ)
 	    {
 		// Increment the refcount to avoid the channel being freed
 		// halfway.
 		++channel->ch_refcount;
-		if (channel->ch_close_cb.cb_name == NULL)
+		ఒకవేళ (channel->ch_close_cb.cb_name == ఖాళీ)
 		    ch_log(channel, "flushing %s buffers before closing",
-							  ch_part_names[part]);
-		while (may_invoke_callback(channel, part))
+							  ch_part_పేర్లు[part]);
+		అయితే (may_invoke_callback(channel, part))
 		    ;
 		--channel->ch_refcount;
 	    }
 	}
 
-	if (channel->ch_close_cb.cb_name != NULL)
+	ఒకవేళ (channel->ch_close_cb.cb_name != ఖాళీ)
 	{
 	      typval_T	argv[1];
 	      typval_T	rettv;
@@ -4000,7 +4000,7 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // halfway.
 	      ++channel->ch_refcount;
 	      ch_log(channel, "Invoking close callback %s",
-					 (char *)channel->ch_close_cb.cb_name);
+					 (అక్షరం *)channel->ch_close_cb.cb_name);
 	      argv[0].v_type = VAR_CHANNEL;
 	      argv[0].vval.v_channel = channel;
 	      call_callback(&channel->ch_close_cb, -1, &rettv, 1, argv);
@@ -4010,204 +4010,204 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // the callback is only called once
 	      free_callback(&channel->ch_close_cb);
 
-	      if (channel_need_redraw)
+	      ఒకవేళ (channel_need_redraw)
 	      {
 		  channel_need_redraw = FALSE;
 		  redraw_after_callback(TRUE, FALSE);
 	      }
 
-	      if (!channel->ch_drop_never)
+	      ఒకవేళ (!channel->ch_drop_never)
 		  // any remaining messages are useless now
-		  for (part = PART_SOCK; part < PART_IN; ++part)
+		  కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 		      drop_messages(channel, part);
 
 	      --channel->ch_refcount;
 	}
     }
 
-    channel->ch_nb_close_cb = NULL;
-#ifdef FEAT_SOCKETSERVER
+    channel->ch_nb_close_cb = ఖాళీ;
+#నిర్వచితమైతే FEAT_SOCKETSERVER
     channel->ch_socketserver = false;
-    channel->ch_ss_accept_cb = NULL;
-    channel->ch_ss_close_cb = NULL;
-#endif
+    channel->ch_ss_accept_cb = ఖాళీ;
+    channel->ch_ss_close_cb = ఖాళీ;
+#అయితే_ముగింపు
 
-#ifdef FEAT_TERMINAL
-    term_channel_closed(channel);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    పదం_channel_closed(channel);
+#అయితే_ముగింపు
 }
 
 /*
  * Close the "in" part channel "channel".
  */
-    static void
-channel_close_in(channel_T *channel)
+    స్థిర శూన్య
+channel_close_లోపల(channel_T *channel)
 {
-    ch_close_part(channel, PART_IN);
+    ch_close_part(channel, PART_లోపల);
 }
 
-    static void
-remove_from_writeque(writeq_T *wq, writeq_T *entry)
+    స్థిర శూన్య
+remove_from_writeque(writeq_T *wq, writeq_T *నమోదు_2)
 {
-    ga_clear(&entry->wq_ga);
-    wq->wq_next = entry->wq_next;
-    if (wq->wq_next == NULL)
-	wq->wq_prev = NULL;
-    else
-	wq->wq_next->wq_prev = NULL;
-    vim_free(entry);
+    ga_clear(&నమోదు_2->wq_ga);
+    wq->wq_తదుపరి = నమోదు_2->wq_తదుపరి;
+    ఒకవేళ (wq->wq_తదుపరి == ఖాళీ)
+	wq->wq_prev = ఖాళీ;
+    లేకపోతే
+	wq->wq_తదుపరి->wq_prev = ఖాళీ;
+    vim_free(నమోదు_2);
 }
 
 /*
  * Clear the read buffer on "channel"/"part".
  */
-    static void
+    స్థిర శూన్య
 channel_clear_one(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    jsonq_T *json_head = &ch_part->ch_json_head;
-    cbq_T   *cb_head = &ch_part->ch_cb_head;
+    jsonq_T *json_తల = &ch_part->ch_json_తల;
+    cbq_T   *cb_తల = &ch_part->ch_cb_తల;
 
-    while (channel_peek(channel, part) != NULL)
-	vim_free(channel_get(channel, part, NULL));
+    అయితే (channel_peek(channel, part) != ఖాళీ)
+	vim_free(channel_get(channel, part, ఖాళీ));
 
-    while (cb_head->cq_next != NULL)
+    అయితే (cb_తల->cq_తదుపరి != ఖాళీ)
     {
-	cbq_T *node = cb_head->cq_next;
+	cbq_T *కణుపు = cb_తల->cq_తదుపరి;
 
-	remove_cb_node(cb_head, node);
-	free_callback(&node->cq_callback);
-	vim_free(node);
+	remove_cb_కణుపు(cb_తల, కణుపు);
+	free_callback(&కణుపు->cq_callback);
+	vim_free(కణుపు);
     }
 
-    while (json_head->jq_next != NULL)
+    అయితే (json_తల->jq_తదుపరి != ఖాళీ)
     {
-	free_tv(json_head->jq_next->jq_value);
-	remove_json_node(json_head, json_head->jq_next);
+	free_tv(json_తల->jq_తదుపరి->jq_విలువ);
+	remove_json_కణుపు(json_తల, json_తల->jq_తదుపరి);
     }
 
     free_callback(&ch_part->ch_callback);
-    ga_clear(&ch_part->ch_block_ids);
+    ga_clear(&ch_part->ch_ఖండం_ids);
 
-    while (ch_part->ch_writeque.wq_next != NULL)
+    అయితే (ch_part->ch_writeque.wq_తదుపరి != ఖాళీ)
 	remove_from_writeque(&ch_part->ch_writeque,
-						 ch_part->ch_writeque.wq_next);
+						 ch_part->ch_writeque.wq_తదుపరి);
 }
 
 /*
  * Clear all the read buffers on "channel".
  */
-    void
+    శూన్య
 channel_clear(channel_T *channel)
 {
     ch_log(channel, "Clearing channel");
     VIM_CLEAR(channel->ch_hostname);
     channel_clear_one(channel, PART_SOCK);
-    channel_clear_one(channel, PART_OUT);
+    channel_clear_one(channel, PART_బహిర్గతం);
     channel_clear_one(channel, PART_ERR);
-    channel_clear_one(channel, PART_IN);
+    channel_clear_one(channel, PART_లోపల);
     free_callback(&channel->ch_callback);
     free_callback(&channel->ch_close_cb);
 }
 
-#if defined(EXITFREE)
-    void
-channel_free_all(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+channel_free_all(శూన్య)
 {
     channel_T *channel;
 
-    ch_log(NULL, "channel_free_all()");
+    ch_log(ఖాళీ, "channel_free_all()");
     FOR_ALL_CHANNELS(channel)
 	channel_clear(channel);
 }
-#endif
+#అయితే_ముగింపు
 
 
 // Sent when the netbeans channel is found closed when reading.
-#define DETACH_MSG_RAW "DETACH\n"
+#నిర్వచించు DETACH_సందేశం_RAW "DETACH\n"
 
 // Buffer size for reading incoming messages.
-#define MAXMSGSIZE 4096
+#నిర్వచించు MAXMSGSIZE 4096
 
 /*
  * Check if there are remaining data that should be written for "in_part".
  */
-    static int
-is_channel_write_remaining(chanpart_T *in_part)
+    స్థిర పూర్ణాంకం
+is_channel_write_మిగిలిన(chanpart_T *లోపల_part)
 {
-    buf_T *buf = in_part->ch_bufref.br_buf;
+    buf_T *buf = లోపల_part->ch_bufref.br_buf;
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	return TRUE;
-    if (buf == NULL)
-	return FALSE;
-    return in_part->ch_buf_append
-	    ? (in_part->ch_buf_bot < buf->b_ml.ml_line_count)
-	    : (in_part->ch_buf_top <= in_part->ch_buf_bot
-			    && in_part->ch_buf_top <= buf->b_ml.ml_line_count);
+    ఒకవేళ (లోపల_part->ch_writeque.wq_తదుపరి != ఖాళీ)
+	తిరిగి TRUE;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి FALSE;
+    తిరిగి లోపల_part->ch_buf_append
+	    ? (లోపల_part->ch_buf_bot < buf->b_ml.ml_పంక్తి_లెక్క)
+	    : (లోపల_part->ch_buf_శిఖరం <= లోపల_part->ch_buf_bot
+			    && లోపల_part->ch_buf_శిఖరం <= buf->b_ml.ml_పంక్తి_లెక్క);
 }
 
-#if defined(HAVE_SELECT)
+#ఒకవేళ defined(HAVE_SELECT)
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_wfds(int maxfd_arg, fd_set *wfds)
+    స్థిర పూర్ణాంకం
+channel_fill_wfds(పూర్ణాంకం maxfd_arg, fd_set *wfds)
 {
-    int		maxfd = maxfd_arg;
+    పూర్ణాంకం		maxfd = maxfd_arg;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *లోపల_part = &ch->ch_part[PART_లోపల];
 
-	if (in_part->ch_fd != INVALID_FD
+	ఒకవేళ (లోపల_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		&& (int)in_part->ch_fd < FD_SETSIZE
+		&& (పూర్ణాంకం)లోపల_part->ch_fd < FD_SETSIZE
 # endif
-		&& is_channel_write_remaining(in_part))
+		&& is_channel_write_మిగిలిన(లోపల_part))
 	{
-	    FD_SET((int)in_part->ch_fd, wfds);
-	    if ((int)in_part->ch_fd >= maxfd)
-		maxfd = (int)in_part->ch_fd + 1;
+	    FD_SET((పూర్ణాంకం)లోపల_part->ch_fd, wfds);
+	    ఒకవేళ ((పూర్ణాంకం)లోపల_part->ch_fd >= maxfd)
+		maxfd = (పూర్ణాంకం)లోపల_part->ch_fd + 1;
 	}
     }
-    return maxfd;
+    తిరిగి maxfd;
 }
-#else
+#లేకపోతే
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_poll_write(int nfd_in, struct pollfd *fds)
+    స్థిర పూర్ణాంకం
+channel_fill_poll_write(పూర్ణాంకం nfd_లోపల, నిర్మాణం pollfd *fds)
 {
-    int		nfd = nfd_in;
+    పూర్ణాంకం		nfd = nfd_లోపల;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *లోపల_part = &ch->ch_part[PART_లోపల];
 
-	if (in_part->ch_fd != INVALID_FD
-		&& is_channel_write_remaining(in_part))
+	ఒకవేళ (లోపల_part->ch_fd != INVALID_FD
+		&& is_channel_write_మిగిలిన(లోపల_part))
 	{
-	    in_part->ch_poll_idx = nfd;
-	    fds[nfd].fd = in_part->ch_fd;
+	    లోపల_part->ch_poll_idx = nfd;
+	    fds[nfd].fd = లోపల_part->ch_fd;
 	    fds[nfd].events = POLLOUT;
 	    ++nfd;
 	}
-	else
-	    in_part->ch_poll_idx = -1;
+	లేకపోతే
+	    లోపల_part->ch_poll_idx = -1;
     }
-    return nfd;
+    తిరిగి nfd;
 }
-#endif
+#అయితే_ముగింపు
 
-typedef enum {
+రకనిర్వచనం గణన {
     CW_READY,
     CW_NOT_READY,
     CW_ERROR
-} channel_wait_result;
+} channel_wait_ఫలితం;
 
 /*
  * Check for reading from "fd" with "timeout" msec.
@@ -4215,124 +4215,124 @@ typedef enum {
  * Return CW_NOT_READY when there is nothing to read.
  * Return CW_ERROR when there is an error.
  */
-    static channel_wait_result
-channel_wait(channel_T *channel, sock_T fd, int timeout)
+    స్థిర channel_wait_ఫలితం
+channel_wait(channel_T *channel, sock_T fd, పూర్ణాంకం timeout)
 {
-    if (timeout > 0)
+    ఒకవేళ (timeout > 0)
 	ch_log(channel, "Waiting for up to %d msec", timeout);
 
-#ifdef MSWIN
-    if (fd != channel->CH_SOCK_FD)
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (fd != channel->CH_SOCK_FD)
     {
 	DWORD	nread;
-	int	sleep_time;
-	DWORD	deadline = GetTickCount() + timeout;
-	int	delay = 1;
+	పూర్ణాంకం	sleep_సమయం;
+	DWORD	deadline = Get_Tick_లెక్క() + timeout;
+	పూర్ణాంకం	delay = 1;
 
 	// reading from a pipe, not a socket
-	while (TRUE)
+	అయితే (TRUE)
 	{
-	    int r = PeekNamedPipe((HANDLE)fd, NULL, 0, NULL, &nread, NULL);
+	    పూర్ణాంకం r = PeekNamedPipe((HANDLE)fd, ఖాళీ, 0, ఖాళీ, &nread, ఖాళీ);
 
-	    if (r && nread > 0)
-		return CW_READY;
+	    ఒకవేళ (r && nread > 0)
+		తిరిగి CW_READY;
 
-	    if (channel->ch_named_pipe)
+	    ఒకవేళ (channel->ch_named_pipe)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, ఖాళీ);
 	    }
-	    else if (r == 0)
-		return CW_ERROR;
+	    లేకపోతే ఒకవేళ (r == 0)
+		తిరిగి CW_ERROR;
 
 	    // perhaps write some buffer lines
-	    channel_write_any_lines();
+	    channel_write_any_పంక్తులు();
 
-	    sleep_time = deadline - GetTickCount();
-	    if (sleep_time <= 0)
-		break;
+	    sleep_సమయం = deadline - Get_Tick_లెక్క();
+	    ఒకవేళ (sleep_సమయం <= 0)
+		ఆపు;
 	    // Wait for a little while.  Very short at first, up to 10 msec
 	    // after looping a few times.
-	    if (sleep_time > delay)
-		sleep_time = delay;
-	    Sleep(sleep_time);
+	    ఒకవేళ (sleep_సమయం > delay)
+		sleep_సమయం = delay;
+	    Sleep(sleep_సమయం);
 	    delay = delay * 2;
-	    if (delay > 10)
+	    ఒకవేళ (delay > 10)
 		delay = 10;
 	}
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-#if defined(HAVE_SELECT)
-	struct timeval	tval;
+#ఒకవేళ defined(HAVE_SELECT)
+	నిర్మాణం timeval	tval;
 	fd_set		rfds;
 	fd_set		wfds;
-	int		ret;
-	int		maxfd;
+	పూర్ణాంకం		ret;
+	పూర్ణాంకం		maxfd;
 
 	tval.tv_sec = timeout / 1000;
 	tval.tv_usec = (timeout % 1000) * 1000;
-	for (;;)
+	కొరకు (;;)
 	{
 	    FD_ZERO(&rfds);
-	    FD_SET((int)fd, &rfds);
+	    FD_SET((పూర్ణాంకం)fd, &rfds);
 
 	    // Write lines to a pipe when a pipe can be written to.  Need to
 	    // set this every time, some buffers may be done.
-	    maxfd = (int)fd + 1;
+	    maxfd = (పూర్ణాంకం)fd + 1;
 	    FD_ZERO(&wfds);
 	    maxfd = channel_fill_wfds(maxfd, &wfds);
 
-	    ret = select(maxfd, &rfds, &wfds, NULL, &tval);
+	    ret = select(maxfd, &rfds, &wfds, ఖాళీ, &tval);
 # ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    ఒకవేళ (ret == -1 && errno == EINTR)
+		కొనసాగు;
 # endif
-	    if (ret > 0)
+	    ఒకవేళ (ret > 0)
 	    {
-		if (FD_ISSET(fd, &rfds))
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		ఒకవేళ (FD_ISSET(fd, &rfds))
+		    తిరిగి CW_READY;
+		channel_write_any_పంక్తులు();
+		కొనసాగు;
 	    }
-	    break;
+	    ఆపు;
 	}
-#else
-	for (;;)
+#లేకపోతే
+	కొరకు (;;)
 	{
-	    struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	    int		    nfd = 1;
+	    నిర్మాణం pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	    పూర్ణాంకం		    nfd = 1;
 
 	    fds[0].fd = fd;
 	    fds[0].events = POLLIN;
 	    nfd = channel_fill_poll_write(nfd, fds);
-	    if (poll(fds, nfd, timeout) > 0)
+	    ఒకవేళ (poll(fds, nfd, timeout) > 0)
 	    {
-		if (fds[0].revents & POLLIN)
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		ఒకవేళ (fds[0].revents & POLLIN)
+		    తిరిగి CW_READY;
+		channel_write_any_పంక్తులు();
+		కొనసాగు;
 	    }
-	    break;
+	    ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
-    return CW_NOT_READY;
+    తిరిగి CW_NOT_READY;
 }
 
-    static void
+    స్థిర శూన్య
 ch_close_part_on_error(
-	channel_T *channel, ch_part_T part, int is_err, char *func)
+	channel_T *channel, ch_part_T part, పూర్ణాంకం is_err, అక్షరం *func)
 {
-    char	msg[] = "%s(): Read %s from ch_part[%d], closing";
+    అక్షరం	సందేశం[] = "%s(): Read %s from ch_part[%d], closing";
 
-    if (is_err)
+    ఒకవేళ (is_err)
 	// Do not call emsg(), most likely the other end just exited.
-	ch_error(channel, msg, func, "error", part);
-    else
-	ch_log(channel, msg, func, "EOF", part);
+	ch_error(channel, సందేశం, func, "error", part);
+    లేకపోతే
+	ch_log(channel, సందేశం, func, "EOF", part);
 
     // Queue a "DETACH" netbeans message in the command queue in order to
     // terminate the netbeans session later. Do not end the session here
@@ -4344,39 +4344,39 @@ ch_close_part_on_error(
     //		    -> gui event loop or select loop
     //			-> channel_read()
     // Only send "DETACH" for a netbeans channel.
-    if (channel->ch_nb_close_cb != NULL)
-	channel_save(channel, PART_SOCK, (char_u *)DETACH_MSG_RAW,
-			      (int)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
+    ఒకవేళ (channel->ch_nb_close_cb != ఖాళీ)
+	channel_save(channel, PART_SOCK, (char_u *)DETACH_సందేశం_RAW,
+			      (పూర్ణాంకం)STRLEN_LITERAL(DETACH_సందేశం_RAW), FALSE, "PUT ");
 
     // When reading is not possible close this part of the channel.  Don't
     // close the channel yet, there may be something to read on another part.
     // When stdout and stderr use the same FD we get the error only on one of
     // them, also close the other.
-    if (part == PART_OUT || part == PART_ERR)
+    ఒకవేళ (part == PART_బహిర్గతం || part == PART_ERR)
     {
-	ch_part_T other = part == PART_OUT ? PART_ERR : PART_OUT;
+	ch_part_T other = part == PART_బహిర్గతం ? PART_ERR : PART_బహిర్గతం;
 
-	if (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
+	ఒకవేళ (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
 	    ch_close_part(channel, other);
     }
     ch_close_part(channel, part);
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Stop listening to GUI events right away.
     channel_gui_unregister_one(channel, part);
-#endif
+#అయితే_ముగింపు
 }
 
-    static void
+    స్థిర శూన్య
 channel_close_now(channel_T *channel)
 {
     ch_log(channel, "Closing channel because all readable fds are closed");
-    if (channel->ch_nb_close_cb != NULL)
+    ఒకవేళ (channel->ch_nb_close_cb != ఖాళీ)
 	(*channel->ch_nb_close_cb)();
-#ifdef FEAT_SOCKETSERVER
-    if (channel->ch_ss_close_cb != NULL)
+#నిర్వచితమైతే FEAT_SOCKETSERVER
+    ఒకవేళ (channel->ch_ss_close_cb != ఖాళీ)
 	channel->ch_ss_close_cb(channel);
-#endif
+#అయితే_ముగింపు
     channel_close(channel, TRUE);
 }
 
@@ -4385,129 +4385,129 @@ channel_close_now(channel_T *channel)
  * "part" is PART_SOCK, PART_OUT or PART_ERR.
  * The data is put in the read queue.  No callbacks are invoked here.
  */
-    static void
-channel_read(channel_T *channel, ch_part_T part, char *func)
+    స్థిర శూన్య
+channel_read(channel_T *channel, ch_part_T part, అక్షరం *func)
 {
-    static char_u	*buf = NULL;
-    int			len = 0;
-    int			readlen = 0;
+    స్థిర char_u	*buf = ఖాళీ;
+    పూర్ణాంకం			len = 0;
+    పూర్ణాంకం			readlen = 0;
     sock_T		fd;
-    int			use_socket = FALSE;
+    పూర్ణాంకం			use_socket = FALSE;
 
     fd = channel->ch_part[part].ch_fd;
-    if (fd == INVALID_FD)
+    ఒకవేళ (fd == INVALID_FD)
     {
 	ch_error(channel, "channel_read() called while %s part is closed",
-							  ch_part_names[part]);
-	return;
+							  ch_part_పేర్లు[part]);
+	తిరిగి;
     }
     use_socket = fd == channel->CH_SOCK_FD;
 
     // Allocate a buffer to read into.
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
 	buf = alloc(MAXMSGSIZE);
-	if (buf == NULL)
-	    return;	// out of memory!
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి;	// out of memory!
     }
 
     // Keep on reading for as long as there is something to read.
     // Use select() or poll() to avoid blocking on a message that is exactly
     // MAXMSGSIZE long.
-    for (;;)
+    కొరకు (;;)
     {
-	if (channel_wait(channel, fd, 0) != CW_READY)
-	    break;
-	if (channel->ch_listen)
+	ఒకవేళ (channel_wait(channel, fd, 0) != CW_READY)
+	    ఆపు;
+	ఒకవేళ (channel->ch_listen)
 	{
 	    sock_T		newfd;
 	    socklen_t		socklen;
 	    channel_T		*newchannel;
 	    typval_T		argv[2];
 	    char_u		namebuf[256];
-	    struct sockaddr_storage	client;
+	    నిర్మాణం sockaddr_storage	client;
 
-	    newchannel = add_channel();
-	    if (newchannel == NULL)
+	    newchannel = కూడు_channel();
+	    ఒకవేళ (newchannel == ఖాళీ)
 	    {
-		ch_error(NULL, "Cannot allocate channel.");
-		return;
+		ch_error(ఖాళీ, "Cannot allocate channel.");
+		తిరిగి;
 	    }
-	    socklen = sizeof(client);
-	    newfd = accept(fd, (struct sockaddr*)&client, &socklen);
-	    if (newfd < 0)
+	    socklen = పరిమాణం(client);
+	    newfd = accept(fd, (నిర్మాణం sockaddr*)&client, &socklen);
+	    ఒకవేళ (newfd < 0)
 	    {
-		ch_error(NULL, "Cannot accept channel.");
+		ch_error(ఖాళీ, "Cannot accept channel.");
 		channel_free(newchannel);
-		return;
+		తిరిగి;
 	    }
 	    newchannel->CH_SOCK_FD = (sock_T)newfd;
-	    newchannel->ch_to_be_closed |= (1U << PART_SOCK);
+	    newchannel->ch_గమ్యం_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-	    channel_gui_register_one(newchannel, PART_SOCK);
-#endif
+#నిర్వచితమైతే FEAT_GUI
+	    channel_gui_రిజిస్టరు_one(newchannel, PART_SOCK);
+#అయితే_ముగింపు
 
-#ifdef FEAT_SOCKETSERVER
-	    if (channel->ch_ss_accept_cb != NULL)
+#నిర్వచితమైతే FEAT_SOCKETSERVER
+	    ఒకవేళ (channel->ch_ss_accept_cb != ఖాళీ)
 	    {
 		channel->ch_ss_accept_cb(newchannel);
-		return;
+		తిరిగి;
 	    }
-#endif
+#అయితే_ముగింపు
 
-	    if (client.ss_family == AF_INET)
+	    ఒకవేళ (client.ss_family == AF_INET)
 	    {
-#ifdef HAVE_INET_NTOP
-		char addr[INET_ADDRSTRLEN];
+#నిర్వచితమైతే HAVE_INET_NTOP
+		అక్షరం addr[INET_ADDRSTRLEN];
 
 		inet_ntop(AF_INET,
-			&((struct sockaddr_in*)&client)->sin_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
+			&((నిర్మాణం sockaddr_లోపల*)&client)->sin_addr,
+			addr, పరిమాణం(addr));
+		vim_snprintf((అక్షరం *)namebuf, పరిమాణం(namebuf), "%s:%d",
 			addr,
-			ntohs(((struct sockaddr_in*)&client)->sin_port));
-#else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
-		    inet_ntoa(((struct sockaddr_in*)&client)->sin_addr),
-		    ntohs(((struct sockaddr_in*)&client)->sin_port));
-#endif
+			ntohs(((నిర్మాణం sockaddr_లోపల*)&client)->sin_పోర్టు));
+#లేకపోతే
+		vim_snprintf((అక్షరం *)namebuf, పరిమాణం(namebuf), "%s:%d",
+		    inet_ntoa(((నిర్మాణం sockaddr_లోపల*)&client)->sin_addr),
+		    ntohs(((నిర్మాణం sockaddr_లోపల*)&client)->sin_పోర్టు));
+#అయితే_ముగింపు
 	    }
-#ifdef HAVE_INET_NTOP
-	    else if (client.ss_family == AF_INET6)
+#నిర్వచితమైతే HAVE_INET_NTOP
+	    లేకపోతే ఒకవేళ (client.ss_family == AF_INET6)
 	    {
-		char addr[INET6_ADDRSTRLEN];
+		అక్షరం addr[INET6_ADDRSTRLEN];
 
 		inet_ntop(AF_INET6,
-			&((struct sockaddr_in6*)&client)->sin6_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "[%s]:%d",
+			&((నిర్మాణం sockaddr_in6*)&client)->sin6_addr,
+			addr, పరిమాణం(addr));
+		vim_snprintf((అక్షరం *)namebuf, పరిమాణం(namebuf), "[%s]:%d",
 			addr,
-			ntohs(((struct sockaddr_in6*)&client)->sin6_port));
+			ntohs(((నిర్మాణం sockaddr_in6*)&client)->sin6_పోర్టు));
 	    }
-#endif
-	    else if (client.ss_family == AF_UNIX)
-		vim_snprintf((char *)namebuf, sizeof(namebuf),
+#అయితే_ముగింపు
+	    లేకపోతే ఒకవేళ (client.ss_family == AF_UNIX)
+		vim_snprintf((అక్షరం *)namebuf, పరిమాణం(namebuf),
 							    "unix:anonymous");
-	    else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "unknown");
-	    ++safe_to_invoke_callback;
+	    లేకపోతే
+		vim_snprintf((అక్షరం *)namebuf, పరిమాణం(namebuf), "unknown");
+	    ++సురక్షిత_గమ్యం_invoke_callback;
 	    ++newchannel->ch_refcount;
 	    argv[0].v_type = VAR_CHANNEL;
 	    argv[0].vval.v_channel = newchannel;
 	    argv[1].v_type = VAR_STRING;
 	    argv[1].vval.v_string = vim_strsave(namebuf);
 	    invoke_callback(newchannel, &channel->ch_callback, argv);
-	    --safe_to_invoke_callback;
+	    --సురక్షిత_గమ్యం_invoke_callback;
 	    clear_tv(&argv[1]);
-	    return;
+	    తిరిగి;
 	}
-	if (use_socket)
-	    len = sock_read(fd, (char *)buf, MAXMSGSIZE);
-	else
-	    len = fd_read(fd, (char *)buf, MAXMSGSIZE);
-	if (len <= 0)
-	    break;	// error or nothing more to read
+	ఒకవేళ (use_socket)
+	    len = sock_read(fd, (అక్షరం *)buf, MAXMSGSIZE);
+	లేకపోతే
+	    len = fd_read(fd, (అక్షరం *)buf, MAXMSGSIZE);
+	ఒకవేళ (len <= 0)
+	    ఆపు;	// error or nothing more to read
 
 	// Store the read message in the queue.
 	channel_save(channel, part, buf, len, FALSE, "RECV ");
@@ -4515,27 +4515,27 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
     }
 
     // Reading a disconnection (readlen == 0), or an error.
-    if (readlen <= 0)
+    ఒకవేళ (readlen <= 0)
     {
-	if (!channel->ch_keep_open)
+	ఒకవేళ (!channel->ch_keep_open)
 	    ch_close_part_on_error(channel, part, (len < 0), func);
     }
-#if defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
-    else if (CH_HAS_GUI && gtk_main_level() > 0)
+#ఒకవేళ defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
+    లేకపోతే ఒకవేళ (CH_HAS_GUI && gtk_main_level() > 0)
 	// signal the main loop that there is something to read
 	gtk_main_quit();
-#endif
+#అయితే_ముగింపు
 }
 
-#ifdef FEAT_SOCKETSERVER
+#నిర్వచితమైతే FEAT_SOCKETSERVER
 
-    void
+    శూన్య
 channel_check(channel_T *channel, ch_part_T part)
 {
     channel_read(channel, part, "channel_check");
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Read from RAW or NL "channel"/"part".  Blocks until there is something to
@@ -4545,118 +4545,118 @@ channel_check(channel_T *channel, ch_part_T part)
  * Returns what was read in allocated memory.
  * Returns NULL in case of error or timeout.
  */
-    static char_u *
-channel_read_block(
-	channel_T *channel, ch_part_T part, int timeout, int raw, int *outlen)
+    స్థిర char_u *
+channel_read_ఖండం(
+	channel_T *channel, ch_part_T part, పూర్ణాంకం timeout, పూర్ణాంకం raw, పూర్ణాంకం *outlen)
 {
     char_u	*buf;
-    char_u	*msg;
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
+    char_u	*సందేశం;
+    ch_బహుళకం_T	బహుళకం = channel->ch_part[part].ch_బహుళకం;
     sock_T	fd = channel->ch_part[part].ch_fd;
     char_u	*nl;
-    readq_T	*node;
+    readq_T	*కణుపు;
 
     ch_log(channel, "Blocking %s read, timeout: %d msec",
-				  mode == CH_MODE_RAW ? "RAW"
-				: mode == CH_MODE_BLOB ? "BLOB" : "NL", timeout);
+				  బహుళకం == CH_బహుళకం_RAW ? "RAW"
+				: బహుళకం == CH_బహుళకం_BLOB ? "BLOB" : "NL", timeout);
 
-    while (TRUE)
+    అయితే (TRUE)
     {
-	node = channel_peek(channel, part);
-	if (node != NULL)
+	కణుపు = channel_peek(channel, part);
+	ఒకవేళ (కణుపు != ఖాళీ)
 	{
-	    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
-		    || (mode == CH_MODE_NL
-					   && channel_first_nl(node) != NULL))
+	    ఒకవేళ (బహుళకం == CH_బహుళకం_RAW || బహుళకం == CH_బహుళకం_BLOB
+		    || (బహుళకం == CH_బహుళకం_NL
+					   && channel_మొదటి_nl(కణుపు) != ఖాళీ))
 		// got a complete message
-		break;
-	    if (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
-		continue;
+		ఆపు;
+	    ఒకవేళ (channel_collapse(channel, part, బహుళకం == CH_బహుళకం_NL) == OK)
+		కొనసాగు;
 	    // If not blocking or nothing more is coming then return what we
 	    // have.
-	    if (raw || fd == INVALID_FD)
-		break;
+	    ఒకవేళ (raw || fd == INVALID_FD)
+		ఆపు;
 	}
 
 	// Wait for up to the channel timeout.
-	if (fd == INVALID_FD)
-	    return NULL;
-	if (channel_wait(channel, fd, timeout) != CW_READY)
+	ఒకవేళ (fd == INVALID_FD)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (channel_wait(channel, fd, timeout) != CW_READY)
 	{
 	    ch_log(channel, "Timed out");
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	channel_read(channel, part, "channel_read_block");
     }
 
     // We have a complete message now.
-    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
+    ఒకవేళ (బహుళకం == CH_బహుళకం_RAW || బహుళకం == CH_బహుళకం_BLOB || outlen != ఖాళీ)
     {
-	msg = channel_get_all(channel, part, outlen);
+	సందేశం = channel_get_all(channel, part, outlen);
     }
-    else
+    లేకపోతే
     {
 	char_u *p;
 
-	buf = node->rq_buffer;
-	nl = channel_first_nl(node);
+	buf = కణుపు->rq_బఫరు;
+	nl = channel_మొదటి_nl(కణుపు);
 
 	// Convert NUL to NL, the internal representation.
-	for (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
-	    if (*p == NUL)
+	కొరకు (p = buf; (nl == ఖాళీ || p < nl) && p < buf + కణుపు->rq_buflen; ++p)
+	    ఒకవేళ (*p == NUL)
 		*p = NL;
 
-	if (nl == NULL)
+	ఒకవేళ (nl == ఖాళీ)
 	{
 	    // must be a closed channel with missing NL
-	    msg = channel_get(channel, part, NULL);
+	    సందేశం = channel_get(channel, part, ఖాళీ);
 	}
-	else if (nl + 1 == buf + node->rq_buflen)
+	లేకపోతే ఒకవేళ (nl + 1 == buf + కణుపు->rq_buflen)
 	{
 	    // get the whole buffer
-	    msg = channel_get(channel, part, NULL);
+	    సందేశం = channel_get(channel, part, ఖాళీ);
 	    *nl = NUL;
 	}
-	else
+	లేకపోతే
 	{
 	    // Copy the message into allocated memory and remove it from the
 	    // buffer.
-	    msg = vim_strnsave(buf, nl - buf);
-	    channel_consume(channel, part, (int)(nl - buf) + 1);
+	    సందేశం = vim_strnsave(buf, nl - buf);
+	    channel_consume(channel, part, (పూర్ణాంకం)(nl - buf) + 1);
 	}
     }
-    if (ch_log_active())
+    ఒకవేళ (ch_log_చురుకైన())
 	ch_log(channel, "Returning %d bytes",
-		outlen != NULL ? *outlen : (int)STRLEN(msg));
-    return msg;
+		outlen != ఖాళీ ? *outlen : (పూర్ణాంకం)STRLEN(సందేశం));
+    తిరిగి సందేశం;
 }
 
-static int channel_blocking_wait = 0;
+స్థిర పూర్ణాంకం channel_blocking_wait = 0;
 
 /*
  * Return TRUE if in a blocking wait that might trigger callbacks.
  */
-    int
-channel_in_blocking_wait(void)
+    పూర్ణాంకం
+channel_లోపల_blocking_wait(శూన్య)
 {
-    return channel_blocking_wait > 0;
+    తిరిగి channel_blocking_wait > 0;
 }
 
 /*
  * Wait up to "timeout" msec for something to read on "fd" of "channel", and
  * read what arrives on any channel meanwhile.
  */
-    static void
-channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
+    స్థిర శూన్య
+channel_wait_reading(channel_T *channel వాడని, sock_T fd వాడని, పూర్ణాంకం timeout)
 {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     // A pipe cannot be waited for, channel_wait() polls it; the other
     // channels are looked at every 10 msec.
-    (void)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
+    (శూన్య)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
     channel_handle_events(FALSE);
-#else
+#లేకపోతే
     channel_wait_any(timeout);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -4667,114 +4667,114 @@ channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
  * In corner cases this can be called recursively, that is why ch_block_ids is
  * a list.
  */
-    static int
-channel_read_json_block(
+    స్థిర పూర్ణాంకం
+channel_read_json_ఖండం(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    timeout_arg,
-	int	    id,
+	పూర్ణాంకం	    timeout_arg,
+	పూర్ణాంకం	    id,
 	typval_T    **rettv)
 {
-    int		more;
+    పూర్ణాంకం		మరిన్ని;
     sock_T	fd;
-    int		timeout;
+    పూర్ణాంకం		timeout;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    int		retval = FAIL;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    ch_బహుళకం_T	బహుళకం = channel->ch_part[part].ch_బహుళకం;
+    పూర్ణాంకం		retval = FAIL;
+#నిర్వచితమైతే ELAPSED_FUNC
+    elapsed_T	ప్రారంభం_tv;
 
-    ELAPSED_INIT(start_tv);
-#endif
+    ELAPSED_INIT(ప్రారంభం_tv);
+#అయితే_ముగింపు
 
     ch_log(channel, "Blocking read JSON for id %d", id);
     ++channel_blocking_wait;
 
-    if (id >= 0)
-	channel_add_block_id(chanpart, id);
+    ఒకవేళ (id >= 0)
+	channel_కూడు_ఖండం_id(chanpart, id);
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (mode == CH_MODE_LSP || mode == CH_MODE_DAP)
+	ఒకవేళ (బహుళకం == CH_బహుళకం_LSP || బహుళకం == CH_బహుళకం_DAP)
 	    // In the "lsp" or "dap" mode, the http header and the json payload
 	    // may be received in multiple messages. So concatenate all the
 	    // received messages.
-	    (void)channel_collapse(channel, part, FALSE);
+	    (శూన్య)channel_collapse(channel, part, FALSE);
 
-	more = channel_parse_json(channel, part, false);
+	మరిన్ని = channel_parse_json(channel, part, false);
 
 	// search for message "id"
-	if (channel_get_json(channel, part, id, TRUE, rettv) == OK)
+	ఒకవేళ (channel_get_json(channel, part, id, TRUE, rettv) == OK)
 	{
 	    ch_log(channel, "Received JSON for id %d", id);
 	    retval = OK;
-	    break;
+	    ఆపు;
 	}
 
-	if (!more)
+	ఒకవేళ (!మరిన్ని)
 	{
-	    void *prev_readahead_ptr = channel_readahead_pointer(channel, part);
-	    void *readahead_ptr;
+	    శూన్య *prev_readahead_ptr = channel_readahead_సూచిక(channel, part);
+	    శూన్య *readahead_ptr;
 
 	    // Handle any other messages in the queue.  If done some more
 	    // messages may have arrived.
-	    if (channel_parse_messages())
-		continue;
+	    ఒకవేళ (channel_parse_messages())
+		కొనసాగు;
 
 	    // channel_parse_messages() may fill the queue with new data to
 	    // process.  Only loop when the readahead changed, otherwise we
 	    // would busy-loop.
-	    readahead_ptr = channel_readahead_pointer(channel, part);
-	    if (readahead_ptr != NULL && readahead_ptr != prev_readahead_ptr)
-		continue;
+	    readahead_ptr = channel_readahead_సూచిక(channel, part);
+	    ఒకవేళ (readahead_ptr != ఖాళీ && readahead_ptr != prev_readahead_ptr)
+		కొనసాగు;
 
 	    // Wait for up to what is left of the timeout.
 	    timeout = timeout_arg;
-#ifdef ELAPSED_FUNC
-	    timeout -= (int)ELAPSED_FUNC(start_tv);
-#endif
+#నిర్వచితమైతే ELAPSED_FUNC
+	    timeout -= (పూర్ణాంకం)ELAPSED_FUNC(ప్రారంభం_tv);
+#అయితే_ముగింపు
 	    fd = chanpart->ch_fd;
-	    if (timeout <= 0 || fd == INVALID_FD)
+	    ఒకవేళ (timeout <= 0 || fd == INVALID_FD)
 	    {
-		if (fd != INVALID_FD)
+		ఒకవేళ (fd != INVALID_FD)
 		    ch_log(channel, "Timed out on id %d", id);
-		break;
+		ఆపు;
 	    }
 	    // If there was an incomplete message use the deadline for that.
-	    if (chanpart->ch_wait_len > 0)
+	    ఒకవేళ (chanpart->ch_wait_len > 0)
 	    {
-		int	left;
-#ifdef MSWIN
-		left = chanpart->ch_deadline - GetTickCount() + 1;
-#else
+		పూర్ణాంకం	ఎడమ_2;
+#నిర్వచితమైతే MSWIN
+		ఎడమ_2 = chanpart->ch_deadline - Get_Tick_లెక్క() + 1;
+#లేకపోతే
 		{
-		    struct timeval now_tv;
+		    నిర్మాణం timeval now_tv;
 
-		    gettimeofday(&now_tv, NULL);
-		    left = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
+		    gettimeofday(&now_tv, ఖాళీ);
+		    ఎడమ_2 = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
 			+ (chanpart->ch_deadline.tv_usec - now_tv.tv_usec)
 								    / 1000 + 1;
 		}
-#endif
-		if (left < 0)
+#అయితే_ముగింపు
+		ఒకవేళ (ఎడమ_2 < 0)
 		    // Something went wrong, channel_parse_json() didn't
 		    // discard message.  Cancel waiting.
 		    chanpart->ch_wait_len = 0;
-		else if (left < timeout)
-		    timeout = left;
+		లేకపోతే ఒకవేళ (ఎడమ_2 < timeout)
+		    timeout = ఎడమ_2;
 	    }
 	    channel_wait_reading(channel, fd, timeout);
-#ifndef ELAPSED_FUNC
+#నిర్వచితం_కాకపోతే ELAPSED_FUNC
 	    // Without a clock the wait counts as the whole timeout.
 	    timeout_arg = 0;
-#endif
+#అయితే_ముగింపు
 	}
     }
-    if (id >= 0)
-	channel_remove_block_id(chanpart, id);
+    ఒకవేళ (id >= 0)
+	channel_remove_ఖండం_id(chanpart, id);
     --channel_blocking_wait;
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -4785,134 +4785,134 @@ channel_read_json_block(
  * "part" is used to check typeahead, when PART_COUNT use the default part.
  */
     channel_T *
-get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
+get_channel_arg(typval_T *tv, పూర్ణాంకం check_open, పూర్ణాంకం reading, ch_part_T part)
 {
-    channel_T	*channel = NULL;
-    int		has_readahead = FALSE;
+    channel_T	*channel = ఖాళీ;
+    పూర్ణాంకం		has_readahead = FALSE;
 
-    if (tv->v_type == VAR_JOB)
+    ఒకవేళ (tv->v_type == VAR_పని)
     {
-	if (tv->vval.v_job != NULL)
-	    channel = tv->vval.v_job->jv_channel;
+	ఒకవేళ (tv->vval.v_పని != ఖాళీ)
+	    channel = tv->vval.v_పని->jv_channel;
     }
-    else if (tv->v_type == VAR_CHANNEL)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_CHANNEL)
     {
 	channel = tv->vval.v_channel;
     }
-    else
+    లేకపోతే
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	semsg(_(e_invalid_వాదం_str), tv_get_string(tv));
+	తిరిగి ఖాళీ;
     }
-    if (channel != NULL && reading)
+    ఒకవేళ (channel != ఖాళీ && reading)
 	has_readahead = channel_has_readahead(channel,
-		       part != PART_COUNT ? part : channel_part_read(channel));
+		       part != PART_లెక్క ? part : channel_part_read(channel));
 
-    if (check_open && (channel == NULL || (!channel_is_open(channel)
+    ఒకవేళ (check_open && (channel == ఖాళీ || (!channel_is_open(channel)
 					     && !(reading && has_readahead))))
     {
 	emsg(_(e_not_an_open_channel));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    return channel;
+    తిరిగి channel;
 }
 
 /*
  * Common for ch_read() and ch_readraw().
  */
-    static void
-common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
+    స్థిర శూన్య
+common_channel_read(typval_T *argvars, typval_T *rettv, పూర్ణాంకం raw, పూర్ణాంకం blob)
 {
     channel_T	*channel;
-    ch_part_T	part = PART_COUNT;
+    ch_part_T	part = PART_లెక్క;
     jobopt_T	opt;
-    int		mode;
-    int		timeout;
-    int		id = -1;
-    typval_T	*listtv = NULL;
+    పూర్ణాంకం		బహుళకం;
+    పూర్ణాంకం		timeout;
+    పూర్ణాంకం		id = -1;
+    typval_T	*listtv = ఖాళీ;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
+    clear_పని_options(&opt);
+    ఒకవేళ (get_పని_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
 								      == FAIL)
-	goto theend;
+	వెళ్ళు theend;
 
-    if (opt.jo_set & JO_PART)
+    ఒకవేళ (opt.jo_సమితి & JO_PART)
 	part = opt.jo_part;
     channel = get_channel_arg(&argvars[0], TRUE, TRUE, part);
-    if (channel == NULL)
-	goto theend;
+    ఒకవేళ (channel == ఖాళీ)
+	వెళ్ళు theend;
 
-    if (part == PART_COUNT)
+    ఒకవేళ (part == PART_లెక్క)
 	part = channel_part_read(channel);
-    mode = channel_get_mode(channel, part);
+    బహుళకం = channel_get_బహుళకం(channel, part);
     timeout = channel_get_timeout(channel, part);
-    if (opt.jo_set & JO_TIMEOUT)
+    ఒకవేళ (opt.jo_సమితి & JO_TIMEOUT)
 	timeout = opt.jo_timeout;
 
-    if (blob || mode == CH_MODE_BLOB)
+    ఒకవేళ (blob || బహుళకం == CH_బహుళకం_BLOB)
     {
-	int	    outlen = 0;
-	char_u  *p = channel_read_block(channel, part,
+	పూర్ణాంకం	    outlen = 0;
+	char_u  *p = channel_read_ఖండం(channel, part,
 		timeout, TRUE, &outlen);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    blob_T	*b = blob_alloc();
 
-	    if (b != NULL)
+	    ఒకవేళ (b != ఖాళీ)
 	    {
 		b->bv_ga.ga_len = outlen;
-		if (ga_grow(&b->bv_ga, outlen) == FAIL)
+		ఒకవేళ (ga_grow(&b->bv_ga, outlen) == FAIL)
 		    blob_free(b);
-		else
+		లేకపోతే
 		{
-		    memcpy(b->bv_ga.ga_data, p, outlen);
-		    rettv_blob_set(rettv, b);
+		    జ్ఞాపకం_నకలు(b->bv_ga.ga_దత్తాంశం, p, outlen);
+		    rettv_blob_సమితి(rettv, b);
 		}
 	    }
 	    vim_free(p);
 	}
     }
-    else if (raw || mode == CH_MODE_RAW || mode == CH_MODE_NL)
-	rettv->vval.v_string = channel_read_block(channel, part,
-		timeout, raw, NULL);
-    else
+    లేకపోతే ఒకవేళ (raw || బహుళకం == CH_బహుళకం_RAW || బహుళకం == CH_బహుళకం_NL)
+	rettv->vval.v_string = channel_read_ఖండం(channel, part,
+		timeout, raw, ఖాళీ);
+    లేకపోతే
     {
-	if (opt.jo_set & JO_ID)
+	ఒకవేళ (opt.jo_సమితి & JO_ID)
 	    id = opt.jo_id;
-	channel_read_json_block(channel, part, timeout, id, &listtv);
-	if (listtv != NULL)
+	channel_read_json_ఖండం(channel, part, timeout, id, &listtv);
+	ఒకవేళ (listtv != ఖాళీ)
 	{
 	    *rettv = *listtv;
 	    vim_free(listtv);
 	}
-	else
+	లేకపోతే
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NONE;
+	    rettv->vval.v_సంఖ్య = VVAL_NONE;
 	}
     }
 
 theend:
-    free_job_options(&opt);
+    free_పని_options(&opt);
 }
 
-#if defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
+#ఒకవేళ defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
 /*
  * Check the channels for anything that is ready to be read.
  * The data is put in the read queue.
  * if "only_keep_open" is TRUE only check channels where ch_keep_open is set.
  */
-    void
-channel_handle_events(int only_keep_open)
+    శూన్య
+channel_handle_events(పూర్ణాంకం only_keep_open)
 {
     channel_T	*channel;
     ch_part_T	part;
@@ -4920,15 +4920,15 @@ channel_handle_events(int only_keep_open)
 
     FOR_ALL_CHANNELS(channel)
     {
-	if (only_keep_open && !channel->ch_keep_open)
-	    continue;
+	ఒకవేళ (only_keep_open && !channel->ch_keep_open)
+	    కొనసాగు;
 
 	// check the socket and pipes
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
 	    fd = channel->ch_part[part].ch_fd;
-	    if (fd == INVALID_FD)
-		continue;
+	    ఒకవేళ (fd == INVALID_FD)
+		కొనసాగు;
 
 	    // In normal cases, a timeout of 0 is sufficient.
 	    //
@@ -4939,12 +4939,12 @@ channel_handle_events(int only_keep_open)
 	    // received by calling Sleep() once within channel_wait().  Note
 	    // that ch_killing can only be TRUE in conpty terminals, so it has
 	    // no side effects in environments other than conpty.
-	    int r = channel_wait(channel, fd, (channel->ch_killing &&
-			(part == PART_OUT || part == PART_ERR)) ? 1 : 0);
+	    పూర్ణాంకం r = channel_wait(channel, fd, (channel->ch_killing &&
+			(part == PART_బహిర్గతం || part == PART_ERR)) ? 1 : 0);
 
-	    if (r == CW_READY)
+	    ఒకవేళ (r == CW_READY)
 		channel_read(channel, part, "channel_handle_events");
-	    else if (r == CW_ERROR)
+	    లేకపోతే ఒకవేళ (r == CW_ERROR)
 		ch_close_part_on_error(channel, part, TRUE,
 			"channel_handle_events");
 	}
@@ -4953,55 +4953,55 @@ channel_handle_events(int only_keep_open)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ఒకవేళ (channel->ch_పని != ఖాళీ)
 	{
-	    job_T *job = channel->ch_job;
+	    పని_T *పని = channel->ch_పని;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ఒకవేళ (పని->jv_tty_బహిర్గతం != ఖాళీ && పని->jv_స్థితి == పని_ముగిసిన)
+		కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 /*
  * Return TRUE when there is any channel with a keep_open flag.
  */
-    int
-channel_any_keep_open(void)
+    పూర్ణాంకం
+channel_any_keep_open(శూన్య)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	if (channel->ch_keep_open)
-	    return TRUE;
-    return FALSE;
+	ఒకవేళ (channel->ch_keep_open)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set "channel"/"part" to non-blocking.
  * Only works for sockets and pipes.
  */
-    void
-channel_set_nonblock(channel_T *channel, ch_part_T part)
+    శూన్య
+channel_సమితి_nonblock(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    int		fd = ch_part->ch_fd;
+    పూర్ణాంకం		fd = ch_part->ch_fd;
 
-    if (fd == INVALID_FD)
-	return;
+    ఒకవేళ (fd == INVALID_FD)
+	తిరిగి;
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     u_long	val = 1;
 
     ioctlsocket(fd, FIONBIO, &val);
-#else
-    (void)fcntl(fd, F_SETFL, O_NONBLOCK);
-#endif
+#లేకపోతే
+    (శూన్య)fcntl(fd, F_SETFL, O_NONBLOCK);
+#అయితే_ముగింపు
     ch_part->ch_nonblocking = TRUE;
 }
 
@@ -5010,117 +5010,117 @@ channel_set_nonblock(channel_T *channel, ch_part_T part)
  * When "fun" is not NULL an error message might be given.
  * Return FAIL or OK.
  */
-    int
+    పూర్ణాంకం
 channel_send(
 	channel_T *channel,
 	ch_part_T part,
 	char_u	  *buf_arg,
-	int	  len_arg,
-	char	  *fun)
+	పూర్ణాంకం	  len_arg,
+	అక్షరం	  *fun)
 {
-    int		res;
+    పూర్ణాంకం		res;
     sock_T	fd;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    int		did_use_queue = FALSE;
+    పూర్ణాంకం		did_use_వరుస = FALSE;
 
     fd = ch_part->ch_fd;
-    if (fd == INVALID_FD)
+    ఒకవేళ (fd == INVALID_FD)
     {
-	if (!channel->ch_error && fun != NULL)
+	ఒకవేళ (!channel->ch_error && fun != ఖాళీ)
 	{
 	    ch_error(channel, "%s(): write while not connected", fun);
 	    semsg(_(e_str_write_while_not_connected), fun);
 	}
 	channel->ch_error = TRUE;
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (channel->ch_nonblock && !ch_part->ch_nonblocking)
-	channel_set_nonblock(channel, part);
+    ఒకవేళ (channel->ch_nonblock && !ch_part->ch_nonblocking)
+	channel_సమితి_nonblock(channel, part);
 
-    if (ch_log_active())
+    ఒకవేళ (ch_log_చురుకైన())
     {
 	ch_log_literal("SEND ", channel, part, buf_arg, len_arg);
-	did_repeated_msg = 0;
+	did_repeated_సందేశం = 0;
     }
 
-    for (;;)
+    కొరకు (;;)
     {
 	writeq_T    *wq = &ch_part->ch_writeque;
 	char_u	    *buf;
-	int	    len;
+	పూర్ణాంకం	    len;
 
-	if (wq->wq_next != NULL)
+	ఒకవేళ (wq->wq_తదుపరి != ఖాళీ)
 	{
 	    // first write what was queued
-	    buf = wq->wq_next->wq_ga.ga_data;
-	    len = wq->wq_next->wq_ga.ga_len;
-	    did_use_queue = TRUE;
+	    buf = wq->wq_తదుపరి->wq_ga.ga_దత్తాంశం;
+	    len = wq->wq_తదుపరి->wq_ga.ga_len;
+	    did_use_వరుస = TRUE;
 	}
-	else
+	లేకపోతే
 	{
-	    if (len_arg == 0)
+	    ఒకవేళ (len_arg == 0)
 		// nothing to write, called from channel_select_check()
-		return OK;
+		తిరిగి OK;
 	    buf = buf_arg;
 	    len = len_arg;
 	}
 
-	if (part == PART_SOCK)
-	    res = sock_write(fd, (char *)buf, len);
-	else
+	ఒకవేళ (part == PART_SOCK)
+	    res = sock_write(fd, (అక్షరం *)buf, len);
+	లేకపోతే
 	{
-	    res = fd_write(fd, (char *)buf, len);
-#ifdef MSWIN
-	    if (channel->ch_named_pipe && res < 0)
+	    res = fd_write(fd, (అక్షరం *)buf, len);
+#నిర్వచితమైతే MSWIN
+	    ఒకవేళ (channel->ch_named_pipe && res < 0)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, ఖాళీ);
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-	if (res < 0 && (errno == EWOULDBLOCK
-#ifdef EAGAIN
+	ఒకవేళ (res < 0 && (errno == EWOULDBLOCK
+#నిర్వచితమైతే EAGAIN
 			|| errno == EAGAIN
-#endif
+#అయితే_ముగింపు
 		    ))
 	    res = 0; // nothing got written
 
-	if (res >= 0 && ch_part->ch_nonblocking)
+	ఒకవేళ (res >= 0 && ch_part->ch_nonblocking)
 	{
-	    writeq_T *entry = wq->wq_next;
+	    writeq_T *నమోదు_2 = wq->wq_తదుపరి;
 
-	    if (did_use_queue)
+	    ఒకవేళ (did_use_వరుస)
 		ch_log(channel, "Sent %d bytes now", res);
-	    if (res == len)
+	    ఒకవేళ (res == len)
 	    {
 		// Wrote all the buf[len] bytes.
-		if (entry != NULL)
+		ఒకవేళ (నమోదు_2 != ఖాళీ)
 		{
 		    // Remove the entry from the write queue.
-		    remove_from_writeque(wq, entry);
-		    continue;
+		    remove_from_writeque(wq, నమోదు_2);
+		    కొనసాగు;
 		}
-		if (did_use_queue)
+		ఒకవేళ (did_use_వరుస)
 		    ch_log(channel, "Write queue empty");
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Wrote only buf[res] bytes, can't write more now.
-		if (entry != NULL)
+		ఒకవేళ (నమోదు_2 != ఖాళీ)
 		{
-		    if (res > 0)
+		    ఒకవేళ (res > 0)
 		    {
 			// Remove the bytes that were written.
-			mch_memmove(entry->wq_ga.ga_data,
-				    (char *)entry->wq_ga.ga_data + res,
+			mch_memmove(నమోదు_2->wq_ga.ga_దత్తాంశం,
+				    (అక్షరం *)నమోదు_2->wq_ga.ga_దత్తాంశం + res,
 				    len - res);
-			entry->wq_ga.ga_len -= res;
+			నమోదు_2->wq_ga.ga_len -= res;
 		    }
 		    buf = buf_arg;
 		    len = len_arg;
 		}
-		else
+		లేకపోతే
 		{
 		    buf += res;
 		    len -= res;
@@ -5129,56 +5129,56 @@ channel_send(
 
 		// Append the not written bytes of the argument to the write
 		// buffer.  Limit entries to 4000 bytes.
-		if (wq->wq_prev != NULL
+		ఒకవేళ (wq->wq_prev != ఖాళీ
 			&& wq->wq_prev->wq_ga.ga_len + len < 4000)
 		{
-		    writeq_T *last = wq->wq_prev;
+		    writeq_T *చివరి = wq->wq_prev;
 
 		    // append to the last entry
-		    if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+		    ఒకవేళ (len > 0 && ga_grow(&చివరి->wq_ga, len) == OK)
 		    {
-			mch_memmove((char *)last->wq_ga.ga_data
-							  + last->wq_ga.ga_len,
+			mch_memmove((అక్షరం *)చివరి->wq_ga.ga_దత్తాంశం
+							  + చివరి->wq_ga.ga_len,
 				    buf, len);
-			last->wq_ga.ga_len += len;
+			చివరి->wq_ga.ga_len += len;
 		    }
 		}
-		else
+		లేకపోతే
 		{
-		    writeq_T *last = ALLOC_ONE(writeq_T);
+		    writeq_T *చివరి = ALLOC_ONE(writeq_T);
 
-		    if (last != NULL)
+		    ఒకవేళ (చివరి != ఖాళీ)
 		    {
-			last->wq_prev = wq->wq_prev;
-			last->wq_next = NULL;
-			if (wq->wq_prev == NULL)
-			    wq->wq_next = last;
-			else
-			    wq->wq_prev->wq_next = last;
-			wq->wq_prev = last;
-			ga_init2(&last->wq_ga, 1, 1000);
-			if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+			చివరి->wq_prev = wq->wq_prev;
+			చివరి->wq_తదుపరి = ఖాళీ;
+			ఒకవేళ (wq->wq_prev == ఖాళీ)
+			    wq->wq_తదుపరి = చివరి;
+			లేకపోతే
+			    wq->wq_prev->wq_తదుపరి = చివరి;
+			wq->wq_prev = చివరి;
+			ga_init2(&చివరి->wq_ga, 1, 1000);
+			ఒకవేళ (len > 0 && ga_grow(&చివరి->wq_ga, len) == OK)
 			{
-			    mch_memmove(last->wq_ga.ga_data, buf, len);
-			    last->wq_ga.ga_len = len;
+			    mch_memmove(చివరి->wq_ga.ga_దత్తాంశం, buf, len);
+			    చివరి->wq_ga.ga_len = len;
 			}
 		    }
 		}
 	    }
 	}
-	else if (res != len)
+	లేకపోతే ఒకవేళ (res != len)
 	{
-	    if (!channel->ch_error && fun != NULL)
+	    ఒకవేళ (!channel->ch_error && fun != ఖాళీ)
 	    {
 		ch_error(channel, "%s(): write failed", fun);
 		semsg(_(e_str_write_failed), fun);
 	    }
 	    channel->ch_error = TRUE;
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
 	channel->ch_error = FALSE;
-	return OK;
+	తిరిగి OK;
     }
 }
 
@@ -5188,285 +5188,285 @@ channel_send(
  * Sets "part_read" to the read fd.
  * Otherwise returns NULL.
  */
-    static channel_T *
+    స్థిర channel_T *
 send_common(
 	typval_T    *argvars,
-	char_u	    *text,
-	int	    len,
-	int	    id,
-	int	    eval,
+	char_u	    *పాఠ్యం,
+	పూర్ణాంకం	    len,
+	పూర్ణాంకం	    id,
+	పూర్ణాంకం	    eval,
 	jobopt_T    *opt,
-	char	    *fun,
+	అక్షరం	    *fun,
 	ch_part_T   *part_read)
 {
     channel_T	*channel;
     ch_part_T	part_send;
 
-    clear_job_options(opt);
+    clear_పని_options(opt);
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return NULL;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి ఖాళీ;
     part_send = channel_part_send(channel);
     *part_read = channel_part_read(channel);
 
-    if (get_job_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
-	return NULL;
+    ఒకవేళ (get_పని_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
+	తిరిగి ఖాళీ;
 
     // Set the callback. An empty callback means no callback and not reading
     // the response. With "ch_evalexpr()" and "ch_evalraw()" a callback is not
     // allowed.
-    if (opt->jo_callback.cb_name != NULL && *opt->jo_callback.cb_name != NUL)
+    ఒకవేళ (opt->jo_callback.cb_name != ఖాళీ && *opt->jo_callback.cb_name != NUL)
     {
-	if (eval)
+	ఒకవేళ (eval)
 	{
 	    semsg(_(e_cannot_use_callback_with_str), fun);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	channel_set_req_callback(channel, *part_read, &opt->jo_callback, id);
+	channel_సమితి_req_callback(channel, *part_read, &opt->jo_callback, id);
     }
 
-    if (channel_send(channel, part_send, text, len, fun) == OK
-					   && opt->jo_callback.cb_name == NULL)
-	return channel;
-    return NULL;
+    ఒకవేళ (channel_send(channel, part_send, పాఠ్యం, len, fun) == OK
+					   && opt->jo_callback.cb_name == ఖాళీ)
+	తిరిగి channel;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * common for "ch_evalexpr()" and "ch_sendexpr()"
  */
-    static void
-ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
+    స్థిర శూన్య
+ch_సమాసం_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం eval)
 {
-    char_u	*text;
+    char_u	*పాఠ్యం;
     typval_T	*listtv;
     channel_T	*channel;
-    int		id;
-    ch_mode_T	ch_mode;
+    పూర్ణాంకం		id;
+    ch_బహుళకం_T	ch_బహుళకం;
     ch_part_T	part_send;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
-    int		callback_present = FALSE;
+    పూర్ణాంకం		timeout;
+    పూర్ణాంకం		callback_present = FALSE;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి;
     part_send = channel_part_send(channel);
 
-    ch_mode = channel_get_mode(channel, part_send);
-    if (ch_mode == CH_MODE_RAW || ch_mode == CH_MODE_BLOB
-	    || ch_mode == CH_MODE_NL)
+    ch_బహుళకం = channel_get_బహుళకం(channel, part_send);
+    ఒకవేళ (ch_బహుళకం == CH_బహుళకం_RAW || ch_బహుళకం == CH_బహుళకం_BLOB
+	    || ch_బహుళకం == CH_బహుళకం_NL)
     {
 	emsg(_(e_cannot_use_evalexpr_sendexpr_with_raw_nl_or_blob_channel));
-	return;
+	తిరిగి;
     }
 
-    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+    ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP || ch_బహుళకం == CH_బహుళకం_DAP)
     {
 	dict_T		*d;
 	dictitem_T	*di;
-	char		*key = ch_mode == CH_MODE_LSP ? "id" : "seq";
+	అక్షరం		*కీలకం = ch_బహుళకం == CH_బహుళకం_LSP ? "id" : "seq";
 
 	// return an empty dict by default
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	ఒకవేళ (rettv_dict_alloc(rettv) == FAIL)
+	    తిరిగి;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	ఒకవేళ (check_for_dict_arg(argvars, 1) == FAIL)
+	    తిరిగి;
 
 	d = argvars[1].vval.v_dict;
-	di = dict_find(d, (char_u *)key, -1);
-	if (argvars[2].v_type == VAR_DICT
-		&& dict_has_key(argvars[2].vval.v_dict, "callback"))
+	di = dict_కనుగొను(d, (char_u *)కీలకం, -1);
+	ఒకవేళ (argvars[2].v_type == VAR_DICT
+		&& dict_has_కీలకం(argvars[2].vval.v_dict, "callback"))
 	    callback_present = TRUE;
 
 	// The id is what a reply is matched by, so it must be a number when
 	// one is waited for.
-	if (di != NULL && di->di_tv.v_type != VAR_NUMBER
-		&& (ch_mode == CH_MODE_DAP || eval || callback_present))
+	ఒకవేళ (di != ఖాళీ && di->di_tv.v_type != VAR_సంఖ్య
+		&& (ch_బహుళకం == CH_బహుళకం_DAP || eval || callback_present))
 	{
-	    semsg(_(e_invalid_value_for_argument_str), key);
-	    return;
+	    semsg(_(e_invalid_విలువ_for_వాదం_str), కీలకం);
+	    తిరిగి;
 	}
 
-	if (ch_mode == CH_MODE_DAP)
+	ఒకవేళ (ch_బహుళకం == CH_బహుళకం_DAP)
 	{
 	    // DAP message always has a sequence number (id)
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "seq", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_చివరి_సందేశం_id;
+	    ఒకవేళ (di == ఖాళీ)
+		dict_కూడు_సంఖ్య(d, "seq", id);
+	    లేకపోతే
+		di->di_tv.vval.v_సంఖ్య = id;
 	}
-	else if (eval || callback_present)
+	లేకపోతే ఒకవేళ (eval || callback_present)
 	{
 	    // When evaluating an expression or sending an expression with a
 	    // callback, always assign a generated ID
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "id", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_చివరి_సందేశం_id;
+	    ఒకవేళ (di == ఖాళీ)
+		dict_కూడు_సంఖ్య(d, "id", id);
+	    లేకపోతే
+		di->di_tv.vval.v_సంఖ్య = id;
 	}
-	else
+	లేకపోతే
 	{
 	    // When sending an expression, if the message has an 'id' item,
 	    // then use it.
 	    id = 0;
-	    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		id = di->di_tv.vval.v_number;
+	    ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_సంఖ్య)
+		id = di->di_tv.vval.v_సంఖ్య;
 	}
-	if (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
-	    dict_add_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
-	text = json_encode_lsp_msg(&argvars[1]);
+	ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP && !dict_has_కీలకం(d, "jsonrpc"))
+	    dict_కూడు_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
+	పాఠ్యం = json_encode_lsp_సందేశం(&argvars[1]);
     }
-    else
+    లేకపోతే
     {
-	id = ++channel->ch_last_msg_id;
-	text = json_encode_nr_expr(id, &argvars[1],
-			      (ch_mode == CH_MODE_JS ? JSON_JS : 0) | JSON_NL);
+	id = ++channel->ch_చివరి_సందేశం_id;
+	పాఠ్యం = json_encode_nr_సమాసం(id, &argvars[1],
+			      (ch_బహుళకం == CH_బహుళకం_JS ? JSON_JS : 0) | JSON_NL);
     }
-    if (text == NULL)
-	return;
+    ఒకవేళ (పాఠ్యం == ఖాళీ)
+	తిరిగి;
 
-    channel = send_common(argvars, text, (int)STRLEN(text), id, eval, &opt,
+    channel = send_common(argvars, పాఠ్యం, (పూర్ణాంకం)STRLEN(పాఠ్యం), id, eval, &opt,
 			    eval ? "ch_evalexpr" : "ch_sendexpr", &part_read);
-    vim_free(text);
-    if (channel != NULL && eval)
+    vim_free(పాఠ్యం);
+    ఒకవేళ (channel != ఖాళీ && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ఒకవేళ (opt.jo_సమితి & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	లేకపోతే
 	    timeout = channel_get_timeout(channel, part_read);
-	if (channel_read_json_block(channel, part_read, timeout, id, &listtv)
+	ఒకవేళ (channel_read_json_ఖండం(channel, part_read, timeout, id, &listtv)
 									== OK)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP || ch_బహుళకం == CH_బహుళకం_DAP)
 	    {
 		*rettv = *listtv;
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_సంఖ్య;
 		free_tv(listtv);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		list_T *list = listtv->vval.v_list;
 
 		// Move the item from the list and then change the type to
 		// avoid the value being freed.
-		*rettv = list->lv_u.mat.lv_last->li_tv;
-		list->lv_u.mat.lv_last->li_tv.v_type = VAR_NUMBER;
+		*rettv = list->lv_u.mat.lv_చివరి->li_tv;
+		list->lv_u.mat.lv_చివరి->li_tv.v_type = VAR_సంఖ్య;
 		free_tv(listtv);
 	    }
 	}
     }
-    free_job_options(&opt);
-    if (ch_mode == CH_MODE_DAP && !eval)
+    free_పని_options(&opt);
+    ఒకవేళ (ch_బహుళకం == CH_బహుళకం_DAP && !eval)
     {
 	// A DAP message always has a sequence number.
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "seq", id);
+	ఒకవేళ (rettv->vval.v_dict != ఖాళీ)
+	    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "seq", id);
     }
-    else if (ch_mode == CH_MODE_LSP && !eval && callback_present)
+    లేకపోతే ఒకవేళ (ch_బహుళకం == CH_బహుళకం_LSP && !eval && callback_present)
     {
 	// if ch_sendexpr() is used to send a LSP message and a callback
 	// function is specified, then return the generated identifier for the
 	// message.  The user can use this to cancel the request (if needed).
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "id", id);
+	ఒకవేళ (rettv->vval.v_dict != ఖాళీ)
+	    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "id", id);
     }
 }
 
 /*
  * common for "ch_evalraw()" and "ch_sendraw()"
  */
-    static void
-ch_raw_common(typval_T *argvars, typval_T *rettv, int eval)
+    స్థిర శూన్య
+ch_raw_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం eval)
 {
     char_u	buf[NUMBUFLEN];
-    char_u	*text;
-    int		len;
+    char_u	*పాఠ్యం;
+    పూర్ణాంకం		len;
     channel_T	*channel;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
+    పూర్ణాంకం		timeout;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_string_or_blob_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[1].v_type == VAR_BLOB)
+    ఒకవేళ (argvars[1].v_type == VAR_BLOB)
     {
-	text = argvars[1].vval.v_blob->bv_ga.ga_data;
+	పాఠ్యం = argvars[1].vval.v_blob->bv_ga.ga_దత్తాంశం;
 	len = argvars[1].vval.v_blob->bv_ga.ga_len;
     }
-    else
+    లేకపోతే
     {
-	text = tv_get_string_buf(&argvars[1], buf);
-	len = (int)STRLEN(text);
+	పాఠ్యం = tv_get_string_buf(&argvars[1], buf);
+	len = (పూర్ణాంకం)STRLEN(పాఠ్యం);
     }
-    channel = send_common(argvars, text, len, 0, eval, &opt,
+    channel = send_common(argvars, పాఠ్యం, len, 0, eval, &opt,
 			      eval ? "ch_evalraw" : "ch_sendraw", &part_read);
-    if (channel != NULL && eval)
+    ఒకవేళ (channel != ఖాళీ && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ఒకవేళ (opt.jo_సమితి & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	లేకపోతే
 	    timeout = channel_get_timeout(channel, part_read);
-	rettv->vval.v_string = channel_read_block(channel, part_read,
-							timeout, TRUE, NULL);
+	rettv->vval.v_string = channel_read_ఖండం(channel, part_read,
+							timeout, TRUE, ఖాళీ);
     }
-    free_job_options(&opt);
+    free_పని_options(&opt);
 }
 
-#define KEEP_OPEN_TIME 20  // msec
+#నిర్వచించు KEEP_OPEN_సమయం 20  // msec
 
-#if defined(UNIX) && !defined(HAVE_SELECT)
+#ఒకవేళ defined(UNIX) && !defined(HAVE_SELECT)
 /*
  * Add open channels to the poll struct.
  * Return the adjusted struct index.
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_setup(int nfd_in, void *fds_in, int *towait)
+    పూర్ణాంకం
+channel_poll_అమరిక(పూర్ణాంకం nfd_లోపల, శూన్య *fds_లోపల, పూర్ణాంకం *towait)
 {
-    int		nfd = nfd_in;
+    పూర్ణాంకం		nfd = nfd_లోపల;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    నిర్మాణం	pollfd *fds = fds_లోపల;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
 	    chanpart_T	*ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_fd != INVALID_FD)
+	    ఒకవేళ (ch_part->ch_fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ఒకవేళ (channel->ch_keep_open)
 		{
 		    // For unknown reason poll() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the fds add
 		    // a short timeout and check, like polling.
-		    if (*towait < 0 || *towait > KEEP_OPEN_TIME)
-			*towait = KEEP_OPEN_TIME;
+		    ఒకవేళ (*towait < 0 || *towait > KEEP_OPEN_సమయం)
+			*towait = KEEP_OPEN_సమయం;
 		}
-		else
+		లేకపోతే
 		{
 		    ch_part->ch_poll_idx = nfd;
 		    fds[nfd].fd = ch_part->ch_fd;
@@ -5474,41 +5474,41 @@ channel_poll_setup(int nfd_in, void *fds_in, int *towait)
 		    nfd++;
 		}
 	    }
-	    else
+	    లేకపోతే
 		channel->ch_part[part].ch_poll_idx = -1;
 	}
     }
 
     nfd = channel_fill_poll_write(nfd, fds);
 
-    return nfd;
+    తిరిగి nfd;
 }
 
 /*
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_check(int ret_in, void *fds_in)
+    పూర్ణాంకం
+channel_poll_check(పూర్ణాంకం ret_లోపల, శూన్య *fds_లోపల)
 {
-    int		ret = ret_in;
+    పూర్ణాంకం		ret = ret_లోపల;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    నిర్మాణం	pollfd *fds = fds_లోపల;
     ch_part_T	part;
-    int		idx;
-    chanpart_T	*in_part;
+    పూర్ణాంకం		idx;
+    chanpart_T	*లోపల_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
 	    idx = channel->ch_part[part].ch_poll_idx;
 
-	    if (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
+	    ఒకవేళ (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
 	    {
 		channel_read(channel, part, "channel_poll_check");
 		--ret;
 	    }
-	    else if (channel->ch_part[part].ch_fd != INVALID_FD
+	    లేకపోతే ఒకవేళ (channel->ch_part[part].ch_fd != INVALID_FD
 						      && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
@@ -5516,70 +5516,70 @@ channel_poll_check(int ret_in, void *fds_in)
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	idx = in_part->ch_poll_idx;
-	if (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
+	లోపల_part = &channel->ch_part[PART_లోపల];
+	idx = లోపల_part->ch_poll_idx;
+	ఒకవేళ (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
 	{
-	    channel_write_input(channel);
+	    channel_write_ఆదానం(channel);
 	    --ret;
 	}
     }
 
-    return ret;
+    తిరిగి ret;
 }
-#endif // UNIX && !HAVE_SELECT
+#అయితే_ముగింపు // UNIX && !HAVE_SELECT
 
-#if !defined(MSWIN) && defined(HAVE_SELECT)
+#ఒకవేళ !defined(MSWIN) && defined(HAVE_SELECT)
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_setup(
-	int maxfd_in,
-	void *rfds_in,
-	void *wfds_in,
-	struct timeval *tv,
-	struct timeval **tvp)
+    పూర్ణాంకం
+channel_select_అమరిక(
+	పూర్ణాంకం maxfd_లోపల,
+	శూన్య *rfds_లోపల,
+	శూన్య *wfds_లోపల,
+	నిర్మాణం timeval *tv,
+	నిర్మాణం timeval **tvp)
 {
-    int		maxfd = maxfd_in;
+    పూర్ణాంకం		maxfd = maxfd_లోపల;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_లోపల;
+    fd_set	*wfds = wfds_లోపల;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (fd != INVALID_FD)
+	    ఒకవేళ (fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ఒకవేళ (channel->ch_keep_open)
 		{
 		    // For unknown reason select() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the rfds add
 		    // a short timeout and check, like polling.
-		    if (*tvp == NULL || tv->tv_sec > 0
-					|| tv->tv_usec > KEEP_OPEN_TIME * 1000)
+		    ఒకవేళ (*tvp == ఖాళీ || tv->tv_sec > 0
+					|| tv->tv_usec > KEEP_OPEN_సమయం * 1000)
 		    {
 			*tvp = tv;
 			tv->tv_sec = 0;
-			tv->tv_usec = KEEP_OPEN_TIME * 1000;
+			tv->tv_usec = KEEP_OPEN_సమయం * 1000;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 # ifdef FD_SETSIZE
 		    // An fd that does not fit in the fd_set cannot be watched
 		    // with select(); skip it rather than overflow the set.
-		    if ((int)fd >= FD_SETSIZE)
-			continue;
+		    ఒకవేళ ((పూర్ణాంకం)fd >= FD_SETSIZE)
+			కొనసాగు;
 # endif
-		    FD_SET((int)fd, rfds);
-		    if (maxfd < (int)fd)
-			maxfd = (int)fd;
+		    FD_SET((పూర్ణాంకం)fd, rfds);
+		    ఒకవేళ (maxfd < (పూర్ణాంకం)fd)
+			maxfd = (పూర్ణాంకం)fd;
 		}
 	    }
 	}
@@ -5587,31 +5587,31 @@ channel_select_setup(
 
     maxfd = channel_fill_wfds(maxfd, wfds);
 
-    return maxfd;
+    తిరిగి maxfd;
 }
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
+    పూర్ణాంకం
+channel_select_check(పూర్ణాంకం ret_లోపల, శూన్య *rfds_లోపల, శూన్య *wfds_లోపల)
 {
-    int		ret = ret_in;
+    పూర్ణాంకం		ret = ret_లోపల;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_లోపల;
+    fd_set	*wfds = wfds_లోపల;
     ch_part_T	part;
-    chanpart_T	*in_part;
+    chanpart_T	*లోపల_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	కొరకు (part = PART_SOCK; part < PART_లోపల; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (ret > 0 && fd != INVALID_FD
+	    ఒకవేళ (ret > 0 && fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)fd < FD_SETSIZE
+		    && (పూర్ణాంకం)fd < FD_SETSIZE
 # endif
 		    && FD_ISSET(fd, rfds))
 	    {
@@ -5619,23 +5619,23 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 		FD_CLR(fd, rfds);
 		--ret;
 	    }
-	    else if (fd != INVALID_FD && channel->ch_keep_open)
+	    లేకపోతే ఒకవేళ (fd != INVALID_FD && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
 		channel_read(channel, part, "channel_select_check_keep_open");
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	if (ret > 0 && in_part->ch_fd != INVALID_FD
+	లోపల_part = &channel->ch_part[PART_లోపల];
+	ఒకవేళ (ret > 0 && లోపల_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)in_part->ch_fd < FD_SETSIZE
+		    && (పూర్ణాంకం)లోపల_part->ch_fd < FD_SETSIZE
 # endif
-					    && FD_ISSET(in_part->ch_fd, wfds))
+					    && FD_ISSET(లోపల_part->ch_fd, wfds))
 	{
 	    // Clear the flag first, ch_fd may change in channel_write_input().
-	    FD_CLR(in_part->ch_fd, wfds);
-	    channel_write_input(channel);
+	    FD_CLR(లోపల_part->ch_fd, wfds);
+	    channel_write_ఆదానం(channel);
 	    --ret;
 	}
 
@@ -5643,79 +5643,79 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ఒకవేళ (channel->ch_పని != ఖాళీ)
 	{
-	    job_T *job = channel->ch_job;
+	    పని_T *పని = channel->ch_పని;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ఒకవేళ (పని->jv_tty_బహిర్గతం != ఖాళీ && పని->jv_స్థితి == పని_ముగిసిన)
+		కొరకు (part = PART_SOCK; part < PART_లెక్క; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 
-    return ret;
+    తిరిగి ret;
 }
-#endif // !MSWIN && HAVE_SELECT
+#అయితే_ముగింపు // !MSWIN && HAVE_SELECT
 
 /*
  * Wait up to "msec" for something to read on any channel and read it.
  * For channel_stdio_loop(), which has no terminal to wait for.
  */
-    static void
-channel_wait_any(long msec)
+    స్థిర శూన్య
+channel_wait_any(దీర్ఘ msec)
 {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     // A pipe cannot be waited for, channel_wait() polls it.
-    if (stdio_channel->CH_OUT_FD != INVALID_FD)
-	(void)channel_wait(stdio_channel, stdio_channel->CH_OUT_FD,
-						(int)(msec > 20 ? 20 : msec));
+    ఒకవేళ (stdio_channel->CH_బహిర్గతం_FD != INVALID_FD)
+	(శూన్య)channel_wait(stdio_channel, stdio_channel->CH_బహిర్గతం_FD,
+						(పూర్ణాంకం)(msec > 20 ? 20 : msec));
     channel_handle_events(FALSE);
-#elif defined(HAVE_SELECT)
+#లేదావేళ defined(HAVE_SELECT)
     fd_set		rfds;
     fd_set		wfds;
-    struct timeval	tv;
-    struct timeval	*tvp = &tv;
-    int			maxfd;
-    int			ret;
+    నిర్మాణం timeval	tv;
+    నిర్మాణం timeval	*tvp = &tv;
+    పూర్ణాంకం			maxfd;
+    పూర్ణాంకం			ret;
 
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
     tv.tv_sec = msec / 1000;
     tv.tv_usec = (msec % 1000) * 1000;
-    maxfd = channel_select_setup(-1, &rfds, &wfds, &tv, &tvp);
-    ret = select(maxfd + 1, &rfds, &wfds, NULL, tvp);
-    if (ret >= 0)
-	(void)channel_select_check(ret, &rfds, &wfds);
-#else
-    struct pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
-    int			nfd;
-    int			towait = (int)msec;
-    int			ret;
+    maxfd = channel_select_అమరిక(-1, &rfds, &wfds, &tv, &tvp);
+    ret = select(maxfd + 1, &rfds, &wfds, ఖాళీ, tvp);
+    ఒకవేళ (ret >= 0)
+	(శూన్య)channel_select_check(ret, &rfds, &wfds);
+#లేకపోతే
+    నిర్మాణం pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
+    పూర్ణాంకం			nfd;
+    పూర్ణాంకం			towait = (పూర్ణాంకం)msec;
+    పూర్ణాంకం			ret;
 
-    nfd = channel_poll_setup(0, fds, &towait);
+    nfd = channel_poll_అమరిక(0, fds, &towait);
     ret = poll(fds, nfd, towait);
-    if (ret >= 0)
-	(void)channel_poll_check(ret, fds);
-#endif
+    ఒకవేళ (ret >= 0)
+	(శూన్య)channel_poll_check(ret, fds);
+#అయితే_ముగింపు
 }
 
 /*
  * Wait for messages on the stdio channel and handle them, until the channel
  * is closed.  Takes the place of the main loop with --stdio-channel.
  */
-    void
-channel_stdio_loop(void)
+    శూన్య
+channel_stdio_loop(శూన్య)
 {
-    while (stdio_channel != NULL && channel_is_open(stdio_channel))
+    అయితే (stdio_channel != ఖాళీ && channel_is_open(stdio_channel))
     {
-	long	msec = 1000;
-#ifdef FEAT_TIMERS
-	long	due_time = check_due_timer();
+	దీర్ఘ	msec = 1000;
+#నిర్వచితమైతే FEAT_TIMERS
+	దీర్ఘ	due_సమయం = check_due_timer();
 
-	if (due_time > 0 && due_time < msec)
-	    msec = due_time;
-#endif
+	ఒకవేళ (due_సమయం > 0 && due_సమయం < msec)
+	    msec = due_సమయం;
+#అయితే_ముగింపు
 	channel_wait_any(msec);
 	parse_queued_messages();
     }
@@ -5727,249 +5727,249 @@ channel_stdio_loop(void)
  * and during a blocking wait for ch_evalexpr().
  * Return TRUE when something was done.
  */
-    int
-channel_parse_messages(void)
+    పూర్ణాంకం
+channel_parse_messages(శూన్య)
 {
-    channel_T	*channel = first_channel;
-    int		ret = FALSE;
-    int		r;
+    channel_T	*channel = మొదటి_channel;
+    పూర్ణాంకం		ret = FALSE;
+    పూర్ణాంకం		r;
     ch_part_T	part = PART_SOCK;
-    static int	recursive = 0;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
-#endif
+    స్థిర పూర్ణాంకం	recursive = 0;
+#నిర్వచితమైతే ELAPSED_FUNC
+    elapsed_T	ప్రారంభం_tv;
+#అయితే_ముగింపు
 
     // The code below may invoke callbacks, which might call us back.
     // In a recursive call channels will not be closed.
     ++recursive;
-    ++safe_to_invoke_callback;
+    ++సురక్షిత_గమ్యం_invoke_callback;
 
-#ifdef ELAPSED_FUNC
-    ELAPSED_INIT(start_tv);
-#endif
+#నిర్వచితమైతే ELAPSED_FUNC
+    ELAPSED_INIT(ప్రారంభం_tv);
+#అయితే_ముగింపు
 
     // Only do this message when another message was given, otherwise we get
     // lots of them.
-    if ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
+    ఒకవేళ ((did_repeated_సందేశం & REPEATED_సందేశం_LOOKING) == 0)
     {
-	ch_log(NULL, "looking for messages on channels");
+	ch_log(ఖాళీ, "looking for messages on channels");
 	// now we should also give the message for SafeState
-	did_repeated_msg = REPEATED_MSG_LOOKING;
+	did_repeated_సందేశం = REPEATED_సందేశం_LOOKING;
     }
-    while (channel != NULL)
+    అయితే (channel != ఖాళీ)
     {
-	if (recursive == 1)
+	ఒకవేళ (recursive == 1)
 	{
-	    if (channel_can_close(channel))
+	    ఒకవేళ (channel_can_close(channel))
 	    {
-		channel->ch_to_be_closed = (1U << PART_COUNT);
+		channel->ch_గమ్యం_be_closed = (1U << PART_లెక్క);
 		channel_close_now(channel);
 		// channel may have been freed, start over
-		channel = first_channel;
-		continue;
+		channel = మొదటి_channel;
+		కొనసాగు;
 	    }
-	    if (channel->ch_to_be_freed || channel->ch_killing)
+	    ఒకవేళ (channel->ch_గమ్యం_be_freed || channel->ch_killing)
 	    {
 		channel_free_contents(channel);
-		if (channel->ch_job != NULL)
-		    channel->ch_job->jv_channel = NULL;
+		ఒకవేళ (channel->ch_పని != ఖాళీ)
+		    channel->ch_పని->jv_channel = ఖాళీ;
 
 		// free the channel and then start over
 		channel_free_channel(channel);
-		channel = first_channel;
-		continue;
+		channel = మొదటి_channel;
+		కొనసాగు;
 	    }
-	    if (channel->ch_refcount == 0 && !channel_still_useful(channel))
+	    ఒకవేళ (channel->ch_refcount == 0 && !channel_still_useful(channel))
 	    {
 		// channel is no longer useful, free it
 		channel_free(channel);
-		channel = first_channel;
+		channel = మొదటి_channel;
 		part = PART_SOCK;
-		continue;
+		కొనసాగు;
 	    }
 	}
 
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
 	// For a terminal job with a separate stderr pipe, defer processing
 	// PART_OUT until PART_ERR is drained.  Both are filled by
 	// channel_select_check() in the same select() pass, so when both
 	// have readahead the child's write order (stderr before stdout) is
 	// preserved by handling PART_ERR first.
-	if (part == PART_OUT
-		&& channel->ch_job != NULL
-		&& channel->ch_job->jv_tty_out != NULL
+	ఒకవేళ (part == PART_బహిర్గతం
+		&& channel->ch_పని != ఖాళీ
+		&& channel->ch_పని->jv_tty_బహిర్గతం != ఖాళీ
 		&& channel_has_readahead(channel, PART_ERR))
 	{
 	    part = PART_ERR;
-	    continue;
+	    కొనసాగు;
 	}
-#endif
-	if (channel->ch_part[part].ch_fd != INVALID_FD
+#అయితే_ముగింపు
+	ఒకవేళ (channel->ch_part[part].ch_fd != INVALID_FD
 				      || channel_has_readahead(channel, part))
 	{
 	    // Increase the refcount, in case the handler causes the channel
 	    // to be unreferenced or closed.
 	    ++channel->ch_refcount;
 	    r = may_invoke_callback(channel, part);
-	    if (r == OK)
+	    ఒకవేళ (r == OK)
 		ret = TRUE;
-	    if (channel_unref(channel) || (r == OK
-#ifdef ELAPSED_FUNC
+	    ఒకవేళ (channel_unref(channel) || (r == OK
+#నిర్వచితమైతే ELAPSED_FUNC
 			// Limit the time we loop here to 100 msec, otherwise
 			// Vim becomes unresponsive when the callback takes
 			// more than a bit of time.
-			&& ELAPSED_FUNC(start_tv) < 100L
-#endif
+			&& ELAPSED_FUNC(ప్రారంభం_tv) < 100L
+#అయితే_ముగింపు
 			))
 	    {
 		// channel was freed or something was done, start over
-		channel = first_channel;
+		channel = మొదటి_channel;
 		part = PART_SOCK;
-		continue;
+		కొనసాగు;
 	    }
 	}
-	if (part < PART_ERR)
+	ఒకవేళ (part < PART_ERR)
 	    ++part;
-	else
+	లేకపోతే
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_తదుపరి;
 	    part = PART_SOCK;
 	}
     }
 
-    if (channel_need_redraw)
+    ఒకవేళ (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
     }
 
-    --safe_to_invoke_callback;
+    --సురక్షిత_గమ్యం_invoke_callback;
     --recursive;
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Return TRUE if any channel has readahead.  That means we should not block on
  * waiting for input.
  */
-    int
-channel_any_readahead(void)
+    పూర్ణాంకం
+channel_any_readahead(శూన్య)
 {
-    channel_T	*channel = first_channel;
+    channel_T	*channel = మొదటి_channel;
     ch_part_T	part = PART_SOCK;
 
-    while (channel != NULL)
+    అయితే (channel != ఖాళీ)
     {
-	if (channel_has_readahead(channel, part))
-	    return TRUE;
-	if (part < PART_ERR)
+	ఒకవేళ (channel_has_readahead(channel, part))
+	    తిరిగి TRUE;
+	ఒకవేళ (part < PART_ERR)
 	    ++part;
-	else
+	లేకపోతే
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_తదుపరి;
 	    part = PART_SOCK;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Mark references to lists used in channels.
  */
-    int
-set_ref_in_channel(int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_channel(పూర్ణాంకం copyID)
 {
-    int		abort = FALSE;
+    పూర్ణాంకం		abort = FALSE;
     channel_T	*channel;
     typval_T	tv;
 
-    for (channel = first_channel; !abort && channel != NULL;
-						   channel = channel->ch_next)
-	if (channel_still_useful(channel))
+    కొరకు (channel = మొదటి_channel; !abort && channel != ఖాళీ;
+						   channel = channel->ch_తదుపరి)
+	ఒకవేళ (channel_still_useful(channel))
 	{
 	    tv.v_type = VAR_CHANNEL;
 	    tv.vval.v_channel = channel;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    abort = abort || సమితి_ref_లోపల_అంశం(&tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 	}
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Return the "part" to write to for "channel".
  */
-    static ch_part_T
+    స్థిర ch_part_T
 channel_part_send(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_IN;
-    return PART_SOCK;
+    ఒకవేళ (channel->CH_SOCK_FD == INVALID_FD)
+	తిరిగి PART_లోపల;
+    తిరిగి PART_SOCK;
 }
 
 /*
  * Return the default "part" to read from for "channel".
  */
-    static ch_part_T
+    స్థిర ch_part_T
 channel_part_read(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_OUT;
-    return PART_SOCK;
+    ఒకవేళ (channel->CH_SOCK_FD == INVALID_FD)
+	తిరిగి PART_బహిర్గతం;
+    తిరిగి PART_SOCK;
 }
 
 /*
  * Return the mode of "channel"/"part"
  * If "channel" is invalid returns CH_MODE_JSON.
  */
-    static ch_mode_T
-channel_get_mode(channel_T *channel, ch_part_T part)
+    స్థిర ch_బహుళకం_T
+channel_get_బహుళకం(channel_T *channel, ch_part_T part)
 {
-    if (channel == NULL)
-	return CH_MODE_JSON;
-    return channel->ch_part[part].ch_mode;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి CH_బహుళకం_JSON;
+    తిరిగి channel->ch_part[part].ch_బహుళకం;
 }
 
 /*
  * Return the timeout of "channel"/"part"
  */
-    static int
+    స్థిర పూర్ణాంకం
 channel_get_timeout(channel_T *channel, ch_part_T part)
 {
-    return channel->ch_part[part].ch_timeout;
+    తిరిగి channel->ch_part[part].ch_timeout;
 }
 
 /*
  * "ch_canread()" function
  */
-    void
+    శూన్య
 f_ch_canread(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    rettv->vval.v_number = 0;
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    rettv->vval.v_సంఖ్య = 0;
+    ఒకవేళ (లోపల_vim9script() && check_for_chan_or_పని_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL)
-	rettv->vval.v_number = channel_has_readahead(channel, PART_SOCK)
-			    || channel_has_readahead(channel, PART_OUT)
+    ఒకవేళ (channel != ఖాళీ)
+	rettv->vval.v_సంఖ్య = channel_has_readahead(channel, PART_SOCK)
+			    || channel_has_readahead(channel, PART_బహిర్గతం)
 			    || channel_has_readahead(channel, PART_ERR);
 }
 
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_close(typval_T *argvars, typval_T *rettv వాడని)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_chan_or_పని_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
+    ఒకవేళ (channel != ఖాళీ)
     {
 	channel_close(channel, FALSE);
 	channel_clear(channel);
@@ -5979,118 +5979,118 @@ f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close_in(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_close_లోపల(typval_T *argvars, typval_T *rettv వాడని)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_chan_or_పని_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
-	channel_close_in(channel);
+    ఒకవేళ (channel != ఖాళీ)
+	channel_close_లోపల(channel);
 }
 
 /*
  * "ch_getbufnr()" function
  */
-    void
+    శూన్య
 f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి;
 
     char_u	*what = tv_get_string(&argvars[1]);
-    int		part;
-    if (STRCMP(what, "err") == 0)
+    పూర్ణాంకం		part;
+    ఒకవేళ (STRCMP(what, "err") == 0)
 	part = PART_ERR;
-    else if (STRCMP(what, "out") == 0)
-	part = PART_OUT;
-    else if (STRCMP(what, "in") == 0)
-	part = PART_IN;
-    else
+    లేకపోతే ఒకవేళ (STRCMP(what, "out") == 0)
+	part = PART_బహిర్గతం;
+    లేకపోతే ఒకవేళ (STRCMP(what, "in") == 0)
+	part = PART_లోపల;
+    లేకపోతే
 	part = PART_SOCK;
-    if (channel->ch_part[part].ch_bufref.br_buf != NULL)
-	rettv->vval.v_number =
+    ఒకవేళ (channel->ch_part[part].ch_bufref.br_buf != ఖాళీ)
+	rettv->vval.v_సంఖ్య =
 	    channel->ch_part[part].ch_bufref.br_buf->b_fnum;
 }
 
 /*
  * "ch_getjob()" function
  */
-    void
+    శూన్య
 f_ch_getjob(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_chan_or_పని_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి;
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = channel->ch_job;
-    if (channel->ch_job != NULL)
-	++channel->ch_job->jv_refcount;
+    rettv->v_type = VAR_పని;
+    rettv->vval.v_పని = channel->ch_పని;
+    ఒకవేళ (channel->ch_పని != ఖాళీ)
+	++channel->ch_పని->jv_refcount;
 }
 
 /*
  * "ch_info()" function
  */
-    void
-f_ch_info(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_info(typval_T *argvars, typval_T *rettv వాడని)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_chan_or_పని_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL && rettv_dict_alloc(rettv) == OK)
+    ఒకవేళ (channel != ఖాళీ && rettv_dict_alloc(rettv) == OK)
 	channel_info(channel, rettv->vval.v_dict);
 }
 
 /*
  * "ch_listen()" function
  */
-    void
+    శూన్య
 f_ch_listen(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
     rettv->vval.v_channel = channel_listen_func(argvars);
 }
 
 /*
  * "ch_open()" function
  */
-    void
+    శూన్య
 f_ch_open(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
     rettv->vval.v_channel = channel_open_func(argvars);
 }
 
 /*
  * "ch_read()" function
  */
-    void
+    శూన్య
 f_ch_read(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, FALSE, FALSE);
@@ -6099,7 +6099,7 @@ f_ch_read(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readblob()" function
  */
-    void
+    శూన్య
 f_ch_readblob(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, TRUE);
@@ -6108,7 +6108,7 @@ f_ch_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readraw()" function
  */
-    void
+    శూన్య
 f_ch_readraw(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, FALSE);
@@ -6117,25 +6117,25 @@ f_ch_readraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_evalexpr()" function
  */
-    void
+    శూన్య
 f_ch_evalexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, TRUE);
+    ch_సమాసం_common(argvars, rettv, TRUE);
 }
 
 /*
  * "ch_sendexpr()" function
  */
-    void
+    శూన్య
 f_ch_sendexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, FALSE);
+    ch_సమాసం_common(argvars, rettv, FALSE);
 }
 
 /*
  * "ch_evalraw()" function
  */
-    void
+    శూన్య
 f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, TRUE);
@@ -6144,7 +6144,7 @@ f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_sendraw()" function
  */
-    void
+    శూన్య
 f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, FALSE);
@@ -6153,60 +6153,60 @@ f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_setoptions()" function
  */
-    void
-f_ch_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_setoptions(typval_T *argvars, typval_T *rettv వాడని)
 {
     channel_T	*channel;
     jobopt_T	opt;
 
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt,
-			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_MODE_ALL, 0) == OK)
-	channel_set_options(channel, &opt);
-    free_job_options(&opt);
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి;
+    clear_పని_options(&opt);
+    ఒకవేళ (get_పని_options(&argvars[1], &opt,
+			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_బహుళకం_ALL, 0) == OK)
+	channel_సమితి_options(channel, &opt);
+    free_పని_options(&opt);
 }
 
 /*
  * "ch_status()" function
  */
-    void
-f_ch_status(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_ch_స్థితి(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
     jobopt_T	opt;
-    int		part = -1;
+    పూర్ణాంకం		part = -1;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_chan_or_పని_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	clear_job_options(&opt);
-	if (get_job_options(&argvars[1], &opt, JO_PART, 0) == OK
-						     && (opt.jo_set & JO_PART))
+	clear_పని_options(&opt);
+	ఒకవేళ (get_పని_options(&argvars[1], &opt, JO_PART, 0) == OK
+						     && (opt.jo_సమితి & JO_PART))
 	    part = opt.jo_part;
     }
 
-    rettv->vval.v_string = vim_strsave((char_u *)channel_status(channel, part));
+    rettv->vval.v_string = vim_strsave((char_u *)channel_స్థితి(channel, part));
 }
 
 /*
@@ -6214,30 +6214,30 @@ f_ch_status(typval_T *argvars, typval_T *rettv)
  * "buf" must be at least NUMBUFLEN long.
  */
     char_u *
-channel_to_string_buf(typval_T *varp, char_u *buf)
+channel_గమ్యం_string_buf(typval_T *varp, char_u *buf)
 {
     channel_T *channel = varp->vval.v_channel;
-    char      *status = channel_status(channel, -1);
+    అక్షరం      *స్థితి_2 = channel_స్థితి(channel, -1);
 
-    if (channel == NULL)
-	vim_snprintf((char *)buf, NUMBUFLEN, "channel %s", status);
-    else
-	vim_snprintf((char *)buf, NUMBUFLEN,
-				      "channel %d %s", channel->ch_id, status);
-    return buf;
+    ఒకవేళ (channel == ఖాళీ)
+	vim_snprintf((అక్షరం *)buf, NUMBUFLEN, "channel %s", స్థితి_2);
+    లేకపోతే
+	vim_snprintf((అక్షరం *)buf, NUMBUFLEN,
+				      "channel %d %s", channel->ch_id, స్థితి_2);
+    తిరిగి buf;
 }
 
 /*
  * Return the channel with the given ID. Returns NULL if not found.
  */
     channel_T *
-channel_find(int ch_id)
+channel_కనుగొను(పూర్ణాంకం ch_id)
 {
     channel_T *ch;
     FOR_ALL_CHANNELS(ch)
-	if (ch->ch_id == ch_id)
-	    return ch;
-    return NULL;
+	ఒకవేళ (ch->ch_id == ch_id)
+	    తిరిగి ch;
+    తిరిగి ఖాళీ;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#అయితే_ముగింపు // FEAT_JOB_CHANNEL

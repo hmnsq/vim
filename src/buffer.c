@@ -25,217 +25,217 @@
  * The current implementation remembers all file names ever used.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 // Determines how deeply nested %{} blocks will be evaluated in statusline.
-# define MAX_STL_EVAL_DEPTH 100
-#endif
+# define MAX_STL_EVAL_లోతు 100
+#అయితే_ముగింపు
 
-static void	enter_buffer(buf_T *buf);
-static void	buflist_getfpos(void);
-static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, int ignore_case);
-static char_u	*fname_match(regmatch_T *rmp, char_u *name, int ignore_case);
-#ifdef UNIX
-static buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
-static int	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
-static int	buf_same_ino(buf_T *buf, stat_T *stp);
-#else
-static int	otherfile_buf(buf_T *buf, char_u *ffname);
-#endif
-static int	value_changed(char_u *str, char_u **last);
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
-static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
-		char_u *out, size_t outlen, char_u **fmt_arg,
-		char_u *opt_name, int opt_scope, int fillchar, int maxwidth,
+స్థిర శూన్య	enter_బఫరు(buf_T *buf);
+స్థిర శూన్య	buflist_getfpos(శూన్య);
+స్థిర char_u	*buflist_సరిపోలిక(regmatch_T *rmp, buf_T *buf, పూర్ణాంకం ignore_case);
+స్థిర char_u	*fname_సరిపోలిక(regmatch_T *rmp, char_u *name, పూర్ణాంకం ignore_case);
+#నిర్వచితమైతే UNIX
+స్థిర buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
+స్థిర పూర్ణాంకం	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
+స్థిర పూర్ణాంకం	buf_same_ino(buf_T *buf, stat_T *stp);
+#లేకపోతే
+స్థిర పూర్ణాంకం	otherfile_buf(buf_T *buf, char_u *ffname);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం	విలువ_మారింది(char_u *str, char_u **చివరి);
+#ఒకవేళ defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+స్థిర పూర్ణాంకం build_stl_str_hl_local(stl_బహుళకం_T బహుళకం, win_T *wp,
+		char_u *బహిర్గతం, size_t outlen, char_u **fmt_arg,
+		char_u *opt_name, పూర్ణాంకం opt_scope, పూర్ణాంకం fillchar, పూర్ణాంకం maxwidth,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
-		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
-#endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
-static void	free_buffer(buf_T *);
-static void	free_buffer_stuff(buf_T *buf, int free_options);
-static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+		stl_clickrec_T **clicktab, పూర్ణాంకం *lbreaks, పూర్ణాంకం *వాహకం_hl);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం	append_arg_సంఖ్య(win_T *wp, char_u *buf, size_t buflen, పూర్ణాంకం కూడు_file);
+స్థిర శూన్య	free_బఫరు(buf_T *);
+స్థిర శూన్య	free_బఫరు_stuff(buf_T *buf, పూర్ణాంకం free_options);
+స్థిర పూర్ణాంకం	bt_nofileread(buf_T *buf);
+స్థిర పూర్ణాంకం	do_బఫరు_ext(పూర్ణాంకం action, పూర్ణాంకం ప్రారంభం, పూర్ణాంకం dir, పూర్ణాంకం లెక్క, పూర్ణాంకం flags);
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 # define dev_T dev_t
-#else
-# define dev_T unsigned
-#endif
+#లేకపోతే
+# define dev_T గుర్తులేని
+#అయితే_ముగింపు
 
-#define FOR_ALL_BUFS_FROM_LAST(buf) \
-    for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
+#నిర్వచించు FOR_ALL_BUFS_FROM_చివరి(buf) \
+    కొరకు ((buf) = lastbuf; (buf) != ఖాళీ; (buf) = (buf)->b_prev)
 
-#if defined(FEAT_QUICKFIX)
-static char *msg_loclist = N_("[Location List]");
-static char *msg_qflist = N_("[Quickfix List]");
-#endif
+#ఒకవేళ defined(FEAT_QUICKFIX)
+స్థిర అక్షరం *సందేశం_loclist = N_("[Location List]");
+స్థిర అక్షరం *సందేశం_qflist = N_("[Quickfix List]");
+#అయితే_ముగింపు
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+స్థిర పూర్ణాంకం	buf_free_లెక్క = 0;
 
-static int	top_file_num = 1;	// highest file number
-static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
+స్థిర పూర్ణాంకం	శిఖరం_file_అంకె = 1;	// highest file number
+స్థిర garray_T buf_reuse = GA_ఖాళీలు;	// file numbers to recycle
 
-    static void
+    స్థిర శూన్య
 trigger_undo_ftplugin(buf_T *buf, win_T *win)
 {
-    window_layout_lock();
+    కిటికీ_layout_తాళం();
     ++buf->b_locked;
     ++win->w_locked;
     // b:undo_ftplugin may be set, undo it
-    do_cmdline_cmd((char_u*)"if exists('b:undo_ftplugin') | :legacy :exe \
+    do_cmdline_cmd((char_u*)"ఒకవేళ exists('b:undo_ftplugin') | :legacy :exe \
 	    b:undo_ftplugin | endif");
     --buf->b_locked;
     --win->w_locked;
-    window_layout_unlock();
+    కిటికీ_layout_unlock();
 }
 
 /*
  * Calculate the percentage that `part` is of the `whole`.
  */
-    static int
-calc_percentage(long part, long whole)
+    స్థిర పూర్ణాంకం
+calc_percentage(దీర్ఘ part, దీర్ఘ సంపూర్ణ)
 {
     // With 32 bit longs and more than 21,474,836 lines multiplying by 100
     // causes an overflow, thus for large numbers divide instead.
-    return (part > 1000000L)
-	? (int)(part / (whole / 100L))
-	: (int)((part * 100L) / whole);
+    తిరిగి (part > 1000000L)
+	? (పూర్ణాంకం)(part / (సంపూర్ణ / 100L))
+	: (పూర్ణాంకం)((part * 100L) / సంపూర్ణ);
 }
 
 /*
  * Return the highest possible buffer number.
  */
-    int
-get_highest_fnum(void)
+    పూర్ణాంకం
+get_highest_fnum(శూన్య)
 {
-    return top_file_num - 1;
+    తిరిగి శిఖరం_file_అంకె - 1;
 }
 
 /*
  * Read data from buffer for retrying.
  */
-    static int
-read_buffer(
-    int		read_stdin,	    // read file from stdin, otherwise fifo
+    స్థిర పూర్ణాంకం
+read_బఫరు(
+    పూర్ణాంకం		read_stdin,	    // read file from stdin, otherwise fifo
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags)		    // extra flags for readfile()
+    పూర్ణాంకం		flags)		    // extra flags for readfile()
 {
-    int		retval = OK;
-    linenr_T	line_count;
+    పూర్ణాంకం		retval = OK;
+    linenr_T	పంక్తి_లెక్క;
 
     // Read from the buffer which the text is already filled in and append at
     // the end.  This makes it possible to retry when 'fileformat' or
     // 'fileencoding' was guessed wrong.
-    line_count = curbuf->b_ml.ml_line_count;
+    పంక్తి_లెక్క = curbuf->b_ml.ml_పంక్తి_లెక్క;
     retval = readfile(
-	    read_stdin ? NULL : curbuf->b_ffname,
-	    read_stdin ? NULL : curbuf->b_fname,
-	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
-	    flags | READ_BUFFER);
-    if (retval == OK)
+	    read_stdin ? ఖాళీ : curbuf->b_ffname,
+	    read_stdin ? ఖాళీ : curbuf->b_fname,
+	    పంక్తి_లెక్క, (linenr_T)0, (linenr_T)MAXLNUM, eap,
+	    flags | READ_బఫరు);
+    ఒకవేళ (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	అయితే (--పంక్తి_లెక్క >= 0)
 	    ml_delete((linenr_T)1);
     }
-    else
+    లేకపోతే
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
-	    ml_delete(line_count);
+	అయితే (curbuf->b_ml.ml_పంక్తి_లెక్క > పంక్తి_లెక్క)
+	    ml_delete(పంక్తి_లెక్క);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
 
-    if (read_stdin)
+    ఒకవేళ (read_stdin)
     {
 	// Set or reset 'modified' before executing autocommands, so that
 	// it can be changed there.
-	if (!readonlymode && !BUFEMPTY())
-	    changed();
-	else if (retval == OK)
+	ఒకవేళ (!readonlymode && !BUFEMPTY())
+	    మారింది();
+	లేకపోతే ఒకవేళ (retval == OK)
 	    unchanged(curbuf, FALSE, TRUE);
 
-	if (retval == OK)
+	ఒకవేళ (retval == OK)
 	{
-#ifdef FEAT_EVAL
-	    apply_autocmds_retval(EVENT_STDINREADPOST, NULL, NULL, FALSE,
+#నిర్వచితమైతే FEAT_EVAL
+	    apply_autocmds_retval(EVENT_STDINREADPOST, ఖాళీ, ఖాళీ, FALSE,
 							      curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_STDINREADPOST, NULL, NULL, FALSE, curbuf);
-#endif
+#లేకపోతే
+	    apply_autocmds(EVENT_STDINREADPOST, ఖాళీ, ఖాళీ, FALSE, curbuf);
+#అయితే_ముగింపు
 	}
     }
-    return retval;
+    తిరిగి retval;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Ensure buffer "buf" is loaded.  Does not trigger the swap-exists action.
  */
-    void
-buffer_ensure_loaded(buf_T *buf)
+    శూన్య
+బఫరు_ensure_loaded(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL)
-	return;
+    ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ)
+	తిరిగి;
 
     aco_save_T	aco;
 
     // Make sure the buffer is in a window.  If not then skip it.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ఒకవేళ (curbuf == buf)
     {
-	if (swap_exists_action != SEA_READONLY)
-	    swap_exists_action = SEA_NONE;
-	open_buffer(FALSE, NULL, 0);
+	ఒకవేళ (మార్పిడి_exists_action != SEA_READONLY)
+	    మార్పిడి_exists_action = SEA_NONE;
+	open_బఫరు(FALSE, ఖాళీ, 0);
 	aucmd_restbuf(&aco);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Open current buffer, that is: open the memfile and read the file into
  * memory.
  * Return FAIL for failure, OK otherwise.
  */
-    int
-open_buffer(
-    int		read_stdin,	    // read file from stdin
+    పూర్ణాంకం
+open_బఫరు(
+    పూర్ణాంకం		read_stdin,	    // read file from stdin
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags_arg)	    // extra flags for readfile()
+    పూర్ణాంకం		flags_arg)	    // extra flags for readfile()
 {
-    int		flags = flags_arg;
-    int		retval = OK;
+    పూర్ణాంకం		flags = flags_arg;
+    పూర్ణాంకం		retval = OK;
     bufref_T	old_curbuf;
-#ifdef FEAT_SYN_HL
-    long	old_tw = curbuf->b_p_tw;
-#endif
-    int		read_fifo = FALSE;
+#నిర్వచితమైతే FEAT_SYN_HL
+    దీర్ఘ	old_tw = curbuf->b_p_tw;
+#అయితే_ముగింపు
+    పూర్ణాంకం		read_fifo = FALSE;
 
     // The 'readonly' flag is only set when BF_NEVERLOADED is being reset.
     // When re-entering the same buffer, it should not change, because the
     // user may have reset the flag by hand.
-    if (readonlymode && curbuf->b_ffname != NULL
+    ఒకవేళ (readonlymode && curbuf->b_ffname != ఖాళీ
 					&& (curbuf->b_flags & BF_NEVERLOADED))
 	curbuf->b_p_ro = TRUE;
 
-    if (ml_open(curbuf) == FAIL)
+    ఒకవేళ (ml_open(curbuf) == FAIL)
     {
 	// There MUST be a memfile, otherwise we can't do anything
 	// If we can't create one for the current buffer, take another buffer
-	close_buffer(curwin, curbuf, 0, FALSE, FALSE, FALSE);
+	close_బఫరు(curwin, curbuf, 0, FALSE, FALSE, FALSE);
 	FOR_ALL_BUFFERS(curbuf)
-	    if (curbuf->b_ml.ml_mfp != NULL)
-		break;
+	    ఒకవేళ (curbuf->b_ml.ml_mfp != ఖాళీ)
+		ఆపు;
 	// If there is no memfile at all, exit.
 	// This is OK, since there are no changes to lose.
-	if (curbuf == NULL)
+	ఒకవేళ (curbuf == ఖాళీ)
 	{
-	    emsg(_(e_cannot_allocate_any_buffer_exiting));
+	    emsg(_(e_cannot_allocate_any_బఫరు_exiting));
 
 	    // Don't try to do any saving, with "curbuf" NULL almost nothing
 	    // will work.
@@ -243,110 +243,110 @@ open_buffer(
 	    getout(2);
 	}
 
-	emsg(_(e_cannot_allocate_buffer_using_other_one));
-	enter_buffer(curbuf);
-#ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
-#endif
-	return FAIL;
+	emsg(_(e_cannot_allocate_బఫరు_using_other_one));
+	enter_బఫరు(curbuf);
+#నిర్వచితమైతే FEAT_SYN_HL
+	ఒకవేళ (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(ఖాళీ, curwin);
+#అయితే_ముగింపు
+	తిరిగి FAIL;
     }
 
     // Do not sync this buffer yet, may first want to read the file.
-    if (curbuf->b_ml.ml_mfp != NULL)
+    ఒకవేళ (curbuf->b_ml.ml_mfp != ఖాళీ)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
 
     // The autocommands in readfile() may change the buffer, but only AFTER
     // reading the file.
-    set_bufref(&old_curbuf, curbuf);
-    curbuf->b_modified_was_set = false;
+    సమితి_bufref(&old_curbuf, curbuf);
+    curbuf->b_modified_was_సమితి = false;
 
     // mark cursor position as being invalid
     curwin->w_valid = 0;
 
     // A buffer without an actual file should not use the buffer name to read a
     // file.
-    if (bt_nofileread(curbuf))
+    ఒకవేళ (bt_nofileread(curbuf))
 	flags |= READ_NOFILE;
 
     // Read the file if there is one.
-    if (curbuf->b_ffname != NULL
-#ifdef FEAT_NETBEANS_INTG
+    ఒకవేళ (curbuf->b_ffname != ఖాళీ
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
 	    && netbeansReadFile
-#endif
+#అయితే_ముగింపు
        )
     {
-	int old_msg_silent = msg_silent;
-#ifdef UNIX
-	int	save_bin = curbuf->b_p_bin;
-	int perm;
-#endif
-#ifdef FEAT_NETBEANS_INTG
-	int oldFire = netbeansFireChanges;
+	పూర్ణాంకం old_సందేశం_silent = సందేశం_silent;
+#నిర్వచితమైతే UNIX
+	పూర్ణాంకం	save_bin = curbuf->b_p_bin;
+	పూర్ణాంకం perm;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	పూర్ణాంకం oldFire = netbeansFireChanges;
 
 	netbeansFireChanges = 0;
-#endif
-#ifdef UNIX
+#అయితే_ముగింపు
+#నిర్వచితమైతే UNIX
 	perm = mch_getperm(curbuf->b_ffname);
-	if (perm >= 0 && (S_ISFIFO(perm)
+	ఒకవేళ (perm >= 0 && (S_ISFIFO(perm)
 		      || S_ISSOCK(perm)
 # ifdef OPEN_CHR_FILES
 		      || (S_ISCHR(perm) && is_dev_fd_file(curbuf->b_ffname))
 # endif
 		    ))
 		read_fifo = TRUE;
-	if (read_fifo)
+	ఒకవేళ (read_fifo)
 	    curbuf->b_p_bin = TRUE;
-#endif
-	if (shortmess(SHM_FILEINFO))
-	    msg_silent = 1;
+#అయితే_ముగింపు
+	ఒకవేళ (shortmess(SHM_FILEINFO))
+	    సందేశం_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
-#ifdef UNIX
-	if (read_fifo)
+#నిర్వచితమైతే UNIX
+	ఒకవేళ (read_fifo)
 	{
 	    curbuf->b_p_bin = save_bin;
-	    if (retval == OK)
+	    ఒకవేళ (retval == OK)
 		// don't add READ_FIFO here, otherwise we won't be able to
 		// detect the encoding
-		retval = read_buffer(FALSE, eap, flags);
+		retval = read_బఫరు(FALSE, eap, flags);
 	}
-#endif
-	msg_silent = old_msg_silent;
-#ifdef FEAT_NETBEANS_INTG
+#అయితే_ముగింపు
+	సందేశం_silent = old_సందేశం_silent;
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
 	netbeansFireChanges = oldFire;
-#endif
+#అయితే_ముగింపు
 	// Help buffer is filtered.
-	if (bt_help(curbuf))
-	    fix_help_buffer();
+	ఒకవేళ (bt_help(curbuf))
+	    fix_help_బఫరు();
     }
-    else if (read_stdin)
+    లేకపోతే ఒకవేళ (read_stdin)
     {
-	int	save_bin = curbuf->b_p_bin;
+	పూర్ణాంకం	save_bin = curbuf->b_p_bin;
 
 	// First read the text in binary mode into the buffer.
 	// Then read from that same buffer and append at the end.  This makes
 	// it possible to retry when 'fileformat' or 'fileencoding' was
 	// guessed wrong.
 	curbuf->b_p_bin = TRUE;
-	retval = readfile(NULL, NULL, (linenr_T)0,
-		  (linenr_T)0, (linenr_T)MAXLNUM, NULL,
+	retval = readfile(ఖాళీ, ఖాళీ, (linenr_T)0,
+		  (linenr_T)0, (linenr_T)MAXLNUM, ఖాళీ,
 		  flags | (READ_NEW + READ_STDIN));
 	curbuf->b_p_bin = save_bin;
-	if (retval == OK)
-	    retval = read_buffer(TRUE, eap, flags);
+	ఒకవేళ (retval == OK)
+	    retval = read_బఫరు(TRUE, eap, flags);
     }
 
     // Can now sync this buffer in ml_sync_all().
-    if (curbuf->b_ml.ml_mfp != NULL
+    ఒకవేళ (curbuf->b_ml.ml_mfp != ఖాళీ
 	    && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
     // if first time loading this buffer, init b_chartab[]
-    if (curbuf->b_flags & BF_NEVERLOADED)
+    ఒకవేళ (curbuf->b_flags & BF_NEVERLOADED)
     {
-	(void)buf_init_chartab(curbuf, FALSE);
+	(శూన్య)buf_init_chartab(curbuf, FALSE);
 	parse_cino(curbuf);
     }
 
@@ -357,94 +357,94 @@ open_buffer(
     // When reading stdin, the buffer contents always needs writing, so set
     // the changed flag.  Unless in readonly mode: "ls | gview -".
     // When interrupted and 'cpoptions' contains 'i' set changed flag.
-    if ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
-		|| curbuf->b_modified_was_set	// autocmd did ":set modified"
-#ifdef FEAT_EVAL
-		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
-#endif
+    ఒకవేళ ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != ఖాళీ)
+		|| curbuf->b_modified_was_సమితి	// autocmd did ":set modified"
+#నిర్వచితమైతే FEAT_EVAL
+		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != ఖాళీ)
+#అయితే_ముగింపు
        )
-	changed();
-    else if (retval == OK && !read_stdin && !read_fifo)
+	మారింది();
+    లేకపోతే ఒకవేళ (retval == OK && !read_stdin && !read_fifo)
 	unchanged(curbuf, FALSE, TRUE);
     save_file_ff(curbuf);		// keep this fileformat
 
     // Set last_changedtick to avoid triggering a TextChanged autocommand right
     // after it was added.
-    curbuf->b_last_changedtick = CHANGEDTICK(curbuf);
-    curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-    curbuf->b_last_changedtick_pum = CHANGEDTICK(curbuf);
+    curbuf->b_చివరి_changedtick = CHANGEDTICK(curbuf);
+    curbuf->b_చివరి_changedtick_i = CHANGEDTICK(curbuf);
+    curbuf->b_చివరి_changedtick_pum = CHANGEDTICK(curbuf);
 
     // require "!" to overwrite the file, because it wasn't read completely
-#ifdef FEAT_EVAL
-    if (aborting())
-#else
-    if (got_int)
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (aborting())
+#లేకపోతే
+    ఒకవేళ (got_int)
+#అయితే_ముగింపు
 	curbuf->b_flags |= BF_READERR;
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // Need to update automatic folding.  Do this before the autocommands,
     // they may use the fold info.
     foldUpdateAll(curwin);
-#endif
+#అయితే_ముగింపు
 
     // need to set w_topline, unless some autocommand already did that.
-    if (!(curwin->w_valid & VALID_TOPLINE))
+    ఒకవేళ (!(curwin->w_valid & VALID_TOPLINE))
     {
 	curwin->w_topline = 1;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	curwin->w_topfill = 0;
-#endif
+#అయితే_ముగింపు
     }
-#ifdef FEAT_EVAL
-    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf, &retval);
-#else
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    apply_autocmds_retval(EVENT_BUFENTER, ఖాళీ, ఖాళీ, FALSE, curbuf, &retval);
+#లేకపోతే
+    apply_autocmds(EVENT_BUFENTER, ఖాళీ, ఖాళీ, FALSE, curbuf);
+#అయితే_ముగింపు
 
-    if (retval != OK)
-	return retval;
+    ఒకవేళ (retval != OK)
+	తిరిగి retval;
 
     // The autocommands may have changed the current buffer.  Apply the
     // modelines to the correct buffer, if it still exists and is loaded.
-    if (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
+    ఒకవేళ (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != ఖాళీ)
     {
 	aco_save_T	aco;
 
 	// Go to the buffer that was opened, make sure it is in a window.
 	// If not then skip it.
 	aucmd_prepbuf(&aco, old_curbuf.br_buf);
-	if (curbuf == old_curbuf.br_buf)
+	ఒకవేళ (curbuf == old_curbuf.br_buf)
 	{
 	    do_modelines(0);
 	    curbuf->b_flags &= ~(BF_CHECK_RO | BF_NEVERLOADED);
 
-	    if ((flags & READ_NOWINENTER) == 0)
-#ifdef FEAT_EVAL
-		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL,
+	    ఒకవేళ ((flags & READ_NOWINENTER) == 0)
+#నిర్వచితమైతే FEAT_EVAL
+		apply_autocmds_retval(EVENT_BUFWINENTER, ఖాళీ, ఖాళీ,
 			FALSE, curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_BUFWINENTER, NULL, NULL,
+#లేకపోతే
+	    apply_autocmds(EVENT_BUFWINENTER, ఖాళీ, ఖాళీ,
 		    FALSE, curbuf);
-#endif
+#అయితే_ముగింపు
 
 	    // restore curwin/curbuf and a few other things
 	    aucmd_restbuf(&aco);
 	}
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Store "buf" in "bufref" and set the free count.
  */
-    void
-set_bufref(bufref_T *bufref, buf_T *buf)
+    శూన్య
+సమితి_bufref(bufref_T *bufref, buf_T *buf)
 {
     bufref->br_buf = buf;
-    bufref->br_fnum = buf == NULL ? 0 : buf->b_fnum;
-    bufref->br_buf_free_count = buf_free_count;
+    bufref->br_fnum = buf == ఖాళీ ? 0 : buf->b_fnum;
+    bufref->br_buf_free_లెక్క = buf_free_లెక్క;
 }
 
 /*
@@ -454,10 +454,10 @@ set_bufref(bufref_T *bufref, buf_T *buf)
  * Also checks if b_fnum is still the same, a :bwipe followed by :new might get
  * the same allocated memory, but it's a different buffer.
  */
-    int
+    పూర్ణాంకం
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    తిరిగి bufref->br_buf_free_లెక్క == buf_free_లెక్క
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -466,38 +466,38 @@ bufref_valid(bufref_T *bufref)
  * Return TRUE if "buf" points to a valid buffer (in the buffer list).
  * This can be slow if there are many buffers, prefer using bufref_valid().
  */
-    int
+    పూర్ణాంకం
 buf_valid(buf_T *buf)
 {
     buf_T	*bp;
 
     // Assume that we more often have a recent buffer, start with the last
     // one.
-    FOR_ALL_BUFS_FROM_LAST(bp)
-	if (bp == buf)
-	    return TRUE;
-    return FALSE;
+    FOR_ALL_BUFS_FROM_చివరి(bp)
+	ఒకవేళ (bp == buf)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * A hash table used to quickly lookup a buffer by its number.
  */
-static hashtab_T buf_hashtab;
+స్థిర hashtab_T buf_hashtab;
 
-    static void
-buf_hashtab_add(buf_T *buf)
+    స్థిర శూన్య
+buf_hashtab_కూడు(buf_T *buf)
 {
-    vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
-	emsg(_(e_buffer_cannot_be_registered));
+    vim_snprintf((అక్షరం *)buf->b_కీలకం, పరిమాణం(buf->b_కీలకం), "%x", buf->b_fnum);
+    ఒకవేళ (hash_కూడు(&buf_hashtab, buf->b_కీలకం, "create buffer") == FAIL)
+	emsg(_(e_బఫరు_cannot_be_registered));
 }
 
-    static void
+    స్థిర శూన్య
 buf_hashtab_remove(buf_T *buf)
 {
-    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
+    hashitem_T *hi = hash_కనుగొను(&buf_hashtab, buf->b_కీలకం);
 
-    if (!HASHITEM_EMPTY(hi))
+    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
 }
 
@@ -506,34 +506,34 @@ buf_hashtab_remove(buf_T *buf)
  * Give an error message and return FALSE when the buffer is locked or the
  * screen is being redrawn and the buffer is in a window.
  */
-    static int
-can_unload_buffer(buf_T *buf)
+    స్థిర పూర్ణాంకం
+can_unload_బఫరు(buf_T *buf)
 {
-    int	    can_unload = !buf->b_locked;
+    పూర్ణాంకం	    can_unload = !buf->b_locked;
 
-    if (can_unload && updating_screen)
+    ఒకవేళ (can_unload && updating_screen)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
+	    ఒకవేళ (wp->w_బఫరు == buf)
 	    {
 		can_unload = FALSE;
-		break;
+		ఆపు;
 	    }
     }
     // Don't unload the buffer while it's still being saved
-    if (can_unload && buf->b_saving)
+    ఒకవేళ (can_unload && buf->b_saving)
 	can_unload = FALSE;
 
-    if (!can_unload)
+    ఒకవేళ (!can_unload)
     {
-	char_u *fname = buf->b_fname != NULL ? buf->b_fname : buf->b_ffname;
+	char_u *fname = buf->b_fname != ఖాళీ ? buf->b_fname : buf->b_ffname;
 
-	semsg(_(e_attempt_to_delete_buffer_that_is_in_use_str),
-				fname != NULL ? fname : (char_u *)"[No Name]");
+	semsg(_(e_attempt_గమ్యం_delete_బఫరు_that_is_లోపల_use_str),
+				fname != ఖాళీ ? fname : (char_u *)"[No Name]");
     }
-    return can_unload;
+    తిరిగి can_unload;
 }
 
 /*
@@ -568,60 +568,60 @@ can_unload_buffer(buf_T *buf)
  *
  * Return TRUE when we got to the end and unloaded "buf".
  */
-    int
-close_buffer(
+    పూర్ణాంకం
+close_బఫరు(
     win_T	*win,
     buf_T	*buf,
-    int		action,
-    int		abort_if_last,
-    int		ignore_abort,
-    int		set_context)
+    పూర్ణాంకం		action,
+    పూర్ణాంకం		abort_if_చివరి,
+    పూర్ణాంకం		ignore_abort,
+    పూర్ణాంకం		సమితి_context)
 {
-    int		hiding_buf;
+    పూర్ణాంకం		hiding_buf;
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin == win
-				&& curwin->w_buffer == buf);
+    పూర్ణాంకం		is_curwin = (curwin != ఖాళీ && curwin == win
+				&& curwin->w_బఫరు == buf);
     tabpage_T	*the_curtab = curtab;
-    int		unload_buf = (action != 0);
-    int		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-    int		del_buf = (action == DOBUF_DEL || wipe_buf);
-    int		win_valid = win_valid_any_tab(win);
+    పూర్ణాంకం		unload_buf = (action != 0);
+    పూర్ణాంకం		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
+    పూర్ణాంకం		del_buf = (action == DOBUF_DEL || wipe_buf);
+    పూర్ణాంకం		win_valid = win_valid_any_tab(win);
     // win_valid is FALSE for closing popups, as they're first removed from the
     // window list.  If so, skip some side-effects, but treat win as valid.
     // Shouldn't be possible for autocmds to prematurely free win then, as it's
     // not in the window list.
-    int		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
+    పూర్ణాంకం		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
 
     CHECK_CURBUF;
 
     // Force unloading or deleting when 'bufhidden' says so.
     // The caller must take care of NOT deleting/freeing when 'bufhidden' is
     // "hide" (otherwise we could never free or delete a buffer).
-    if (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
+    ఒకవేళ (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
+    లేకపోతే ఒకవేళ (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
 	wipe_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
+    లేకపోతే ఒకవేళ (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
 	unload_buf = TRUE;
 
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
     // depending on how we get here b_nwindows may already be zero
-    if (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
+    ఒకవేళ (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
     {
 	CHECK_CURBUF;
-	if (term_job_running(buf->b_term))
+	ఒకవేళ (పదం_పని_running(buf->b_పదం))
 	{
-	    if (wipe_buf || unload_buf)
+	    ఒకవేళ (wipe_buf || unload_buf)
 	    {
-		if (!can_unload_buffer(buf))
-		    return FALSE;
+		ఒకవేళ (!can_unload_బఫరు(buf))
+		    తిరిగి FALSE;
 
 		// Wiping out or unloading a terminal buffer kills the job.
 		free_terminal(buf);
@@ -631,21 +631,21 @@ close_buffer(
 		unload_buf = TRUE;
 		wipe_buf = TRUE;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// The job keeps running, hide the buffer.
 		del_buf = FALSE;
 		unload_buf = FALSE;
 	    }
 	}
-	else if (buf->b_p_bh[0] == 'h' && !del_buf)
+	లేకపోతే ఒకవేళ (buf->b_p_bh[0] == 'h' && !del_buf)
 	{
 	    // Hide a terminal buffer.
 	    unload_buf = FALSE;
 	}
-	else
+	లేకపోతే
 	{
-	    if (del_buf || unload_buf)
+	    ఒకవేళ (del_buf || unload_buf)
 	    {
 		// A terminal buffer is wiped out if the job has finished.
 		// We only do this when there's an intention to unload the
@@ -658,121 +658,121 @@ close_buffer(
 	}
 	CHECK_CURBUF;
     }
-#endif
+#అయితే_ముగింపు
 
     // Disallow deleting the buffer when it is locked (already being closed or
     // halfway a command that relies on it). Unloading is allowed.
-    if ((del_buf || wipe_buf) && !can_unload_buffer(buf))
-	return FALSE;
+    ఒకవేళ ((del_buf || wipe_buf) && !can_unload_బఫరు(buf))
+	తిరిగి FALSE;
 
-    if (set_context && win_valid && win->w_buffer == buf)
+    ఒకవేళ (సమితి_context && win_valid && win->w_బఫరు == buf)
     {
 	// Set b_last_cursor when closing the last window for the buffer.
 	// Remember the last cursor position and window options of the buffer.
 	// This used to be only for the current window, but then options like
 	// 'foldmethod' may be lost with a ":only" command.
-	if (buf->b_nwindows == 1)
-	    set_last_cursor(win);
+	ఒకవేళ (buf->b_nwindows == 1)
+	    సమితి_చివరి_cursor(win);
 	buflist_setfpos(buf, win,
 		    win->w_cursor.lnum == 1 ? 0 : win->w_cursor.lnum,
-		    win->w_cursor.col, TRUE);
+		    win->w_cursor.నిలువు, TRUE);
     }
 
-    set_bufref(&bufref, buf);
+    సమితి_bufref(&bufref, buf);
 
     // When the buffer is no longer in a window, trigger BufWinLeave
-    if ((win_valid || closed_popup) && win->w_buffer == buf
+    ఒకవేళ ((win_valid || closed_popup) && win->w_బఫరు == buf
 	    && buf->b_nwindows == 1)
     {
 	++buf->b_locked;
-	++buf->b_locked_split;
-	if (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
+	++buf->b_locked_విభజించు;
+	ఒకవేళ (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	{
 	    // Autocommands deleted the buffer.
 aucmd_abort:
-	    emsg(_(e_autocommands_caused_command_to_abort));
-	    return FALSE;
+	    emsg(_(e_autocommands_caused_command_గమ్యం_abort));
+	    తిరిగి FALSE;
 	}
 	--buf->b_locked;
-	--buf->b_locked_split;
-	if (abort_if_last && one_window())
+	--buf->b_locked_విభజించు;
+	ఒకవేళ (abort_if_చివరి && one_కిటికీ())
 	    // Autocommands made this the only window.
-	    goto aucmd_abort;
+	    వెళ్ళు aucmd_abort;
 
 	// When the buffer becomes hidden, but is not unloaded, trigger
 	// BufHidden
-	if (!unload_buf)
+	ఒకవేళ (!unload_buf)
 	{
 	    ++buf->b_locked;
-	    ++buf->b_locked_split;
-	    if (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
+	    ++buf->b_locked_విభజించు;
+	    ఒకవేళ (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		    && !bufref_valid(&bufref))
 		// Autocommands deleted the buffer.
-		goto aucmd_abort;
+		వెళ్ళు aucmd_abort;
 	    --buf->b_locked;
-	    --buf->b_locked_split;
-	    if (abort_if_last && one_window())
+	    --buf->b_locked_విభజించు;
+	    ఒకవేళ (abort_if_చివరి && one_కిటికీ())
 		// Autocommands made this the only window.
-		goto aucmd_abort;
+		వెళ్ళు aucmd_abort;
 	}
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// autocmds may abort script processing
-	if (!ignore_abort && aborting())
-	    return FALSE;
-#endif
+	ఒకవేళ (!ignore_abort && aborting())
+	    తిరిగి FALSE;
+#అయితే_ముగింపు
 	win_valid = win_valid && win_valid_any_tab(win);
     }
 
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != win && win_valid)
+    ఒకవేళ (is_curwin && curwin != win && win_valid)
     {
-	block_autocmds();
+	ఖండం_autocmds();
 	goto_tabpage_win(the_curtab, win);
 	unblock_autocmds();
     }
 
     // When a quickfix buffer is deleted from a window, clear the
     // 'winfixheight' option.
-    if (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
+    ఒకవేళ (bt_quickfix(buf) && win_valid && win->w_బఫరు == buf)
 	win->w_p_wfh = FALSE;
 
     // Remember if the buffer may be hidden soon, or is already hidden.
     hiding_buf = buf->b_nwindows <= 0 || ((win_valid || closed_popup)
-	    && win->w_buffer == buf && buf->b_nwindows == 1);
+	    && win->w_బఫరు == buf && buf->b_nwindows == 1);
 
-#ifdef FEAT_DIFF
-    if (diffopt_hiddenoff() && !unload_buf && hiding_buf)
+#నిర్వచితమైతే FEAT_DIFF
+    ఒకవేళ (diffopt_hiddenoff() && !unload_buf && hiding_buf)
 	diff_buf_delete(buf);	// Clear 'diff' for hidden buffer.
-#endif
+#అయితే_ముగింపు
 
     // Return when another window is displaying the buffer or when not unloaded.
-    if (!hiding_buf || !unload_buf)
-	return FALSE;
+    ఒకవేళ (!hiding_buf || !unload_buf)
+	తిరిగి FALSE;
 
     // Always remove the buffer when there is no file name.
-    if (buf->b_ffname == NULL)
+    ఒకవేళ (buf->b_ffname == ఖాళీ)
 	del_buf = TRUE;
 
     // Free all things allocated for this buffer.
     // Also calls the "BufDelete" autocommands when del_buf is TRUE.
     // Abort if nothing was freed, or if autocommands delete the buffer.
-    if (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
+    ఒకవేళ (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
 		   + (wipe_buf ? BFA_WIPE : 0)
 		   + (ignore_abort ? BFA_IGNORE_ABORT : 0)))
-	return FALSE;
+	తిరిగి FALSE;
 
     win_valid = win_valid && win_valid_any_tab(win);
-    if ((win_valid || closed_popup) && win->w_buffer == buf)
+    ఒకవేళ ((win_valid || closed_popup) && win->w_బఫరు == buf)
     {
 	// Autocommands may have opened (despite b_locked_split) or closed
 	// windows for this buffer.  Decrement for the close we do here.
 	--buf->b_nwindows;
-	win->w_buffer = NULL;  // make sure we don't use the buffer now
+	win->w_బఫరు = ఖాళీ;  // make sure we don't use the buffer now
     }
 
     /*
@@ -781,11 +781,11 @@ aucmd_abort:
      * wiped out all other buffers (unless when inside free_all_mem() where all
      * buffers need to be freed and autocommands are blocked).
      */
-    if (wipe_buf && buf->b_nwindows <= 0
-			    && (buf->b_prev != NULL || buf->b_next != NULL
-#if defined(EXITFREE)
+    ఒకవేళ (wipe_buf && buf->b_nwindows <= 0
+			    && (buf->b_prev != ఖాళీ || buf->b_తదుపరి != ఖాళీ
+#ఒకవేళ defined(EXITFREE)
 				|| entered_free_all_mem
-#endif
+#అయితే_ముగింపు
 				))
     {
 	tabpage_T	*tp;
@@ -794,36 +794,36 @@ aucmd_abort:
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    mark_forget_file(wp, buf->b_fnum);
 
-	if (action == DOBUF_WIPE_REUSE)
+	ఒకవేళ (action == DOBUF_WIPE_REUSE)
 	{
 	    // we can re-use this buffer number, store it
-	    if (buf_reuse.ga_itemsize == 0)
-		ga_init2(&buf_reuse, sizeof(int), 50);
-	    if (ga_grow(&buf_reuse, 1) == OK)
-		((int *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
+	    ఒకవేళ (buf_reuse.ga_itemsize == 0)
+		ga_init2(&buf_reuse, పరిమాణం(పూర్ణాంకం), 50);
+	    ఒకవేళ (ga_grow(&buf_reuse, 1) == OK)
+		((పూర్ణాంకం *)buf_reuse.ga_దత్తాంశం)[buf_reuse.ga_len++] = buf->b_fnum;
 	}
-	if (buf->b_sfname != buf->b_ffname)
+	ఒకవేళ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	లేకపోతే
+	    buf->b_sfname = ఖాళీ;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf->b_prev == NULL)
-	    firstbuf = buf->b_next;
-	else
-	    buf->b_prev->b_next = buf->b_next;
-	if (buf->b_next == NULL)
+	ఒకవేళ (buf->b_prev == ఖాళీ)
+	    firstbuf = buf->b_తదుపరి;
+	లేకపోతే
+	    buf->b_prev->b_తదుపరి = buf->b_తదుపరి;
+	ఒకవేళ (buf->b_తదుపరి == ఖాళీ)
 	    lastbuf = buf->b_prev;
-	else
-	    buf->b_next->b_prev = buf->b_prev;
-	free_buffer(buf);
+	లేకపోతే
+	    buf->b_తదుపరి->b_prev = buf->b_prev;
+	free_బఫరు(buf);
     }
-    else
+    లేకపోతే
     {
-	if (del_buf)
+	ఒకవేళ (del_buf)
 	{
 	    // Free all internal variables and reset option values, to make
 	    // ":bdel" compatible with Vim 5.7.
-	    free_buffer_stuff(buf, TRUE);
+	    free_బఫరు_stuff(buf, TRUE);
 
 	    // Make it look like a new buffer.
 	    buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
@@ -832,7 +832,7 @@ aucmd_abort:
 	    buf->b_p_initialized = false;
 	}
 	buf_clear_file(buf);
-	if (del_buf)
+	ఒకవేళ (del_buf)
 	    buf->b_p_bl = FALSE;
     }
     // NOTE: at this point "curbuf" may be invalid!
@@ -840,30 +840,30 @@ aucmd_abort:
     // When closing curbuf for curwin, is_curwin checks should've ensured
     // autocmds don't switch windows, unless they closed curwin.  Otherwise
     // callers may leave the window open to a NULL buffer!
-    assert(!win_valid || !is_curwin || win == curwin);
-    return TRUE;
+    ప్రతిజ్ఞా(!win_valid || !is_curwin || win == curwin);
+    తిరిగి TRUE;
 }
 
 /*
  * Make buffer not contain a file.
  */
-    void
+    శూన్య
 buf_clear_file(buf_T *buf)
 {
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_పంక్తి_లెక్క = 1;
     unchanged(buf, TRUE, TRUE);
     buf->b_shortname = false;
     buf->b_p_eof = FALSE;
-    buf->b_start_eof = FALSE;
+    buf->b_ప్రారంభం_eof = FALSE;
     buf->b_p_eol = TRUE;
-    buf->b_start_eol = TRUE;
+    buf->b_ప్రారంభం_eol = TRUE;
     buf->b_p_bomb = FALSE;
-    buf->b_start_bomb = FALSE;
-    buf->b_ml.ml_mfp = NULL;
-    buf->b_ml.ml_flags = ML_EMPTY;		// empty buffer
-#ifdef FEAT_NETBEANS_INTG
-    netbeans_deleted_all_lines(buf);
-#endif
+    buf->b_ప్రారంభం_bomb = FALSE;
+    buf->b_ml.ml_mfp = ఖాళీ;
+    buf->b_ml.ml_flags = ML_ఖాళీలు;		// empty buffer
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+    netbeans_deleted_all_పంక్తులు(buf);
+#అయితే_ముగింపు
 }
 
 /*
@@ -877,213 +877,213 @@ buf_clear_file(buf_T *buf)
  *
  * Return TRUE when we got to the end.
  */
-    int
-buf_freeall(buf_T *buf, int flags)
+    పూర్ణాంకం
+buf_freeall(buf_T *buf, పూర్ణాంకం flags)
 {
-    int		is_curbuf = (buf == curbuf);
+    పూర్ణాంకం		is_curbuf = (buf == curbuf);
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
+    పూర్ణాంకం		is_curwin = (curwin != ఖాళీ && curwin->w_బఫరు == buf);
     win_T	*the_curwin = curwin;
     tabpage_T	*the_curtab = curtab;
 
     // Make sure the buffer isn't closed by autocommands.
     ++buf->b_locked;
-    ++buf->b_locked_split;
-    set_bufref(&bufref, buf);
-    if (buf->b_ml.ml_mfp != NULL)
+    ++buf->b_locked_విభజించు;
+    సమితి_bufref(&bufref, buf);
+    ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ)
     {
-	if (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
+	ఒకవేళ (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    తిరిగి FALSE;
     }
-    if ((flags & BFA_DEL) && buf->b_p_bl)
+    ఒకవేళ ((flags & BFA_DEL) && buf->b_p_bl)
     {
-	if (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
+	ఒకవేళ (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
 								   FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    తిరిగి FALSE;
     }
-    if (flags & BFA_WIPE)
+    ఒకవేళ (flags & BFA_WIPE)
     {
-	if (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
+	ఒకవేళ (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    తిరిగి FALSE;
     }
     --buf->b_locked;
-    --buf->b_locked_split;
+    --buf->b_locked_విభజించు;
 
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
+    ఒకవేళ (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
     {
-	block_autocmds();
+	ఖండం_autocmds();
 	goto_tabpage_win(the_curtab, the_curwin);
 	unblock_autocmds();
     }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // autocmds may abort script processing
-    if ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
-	return FALSE;
-#endif
+    ఒకవేళ ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
+	తిరిగి FALSE;
+#అయితే_ముగింపు
 
     // It's possible that autocommands change curbuf to the one being deleted.
     // This might cause curbuf to be deleted unexpectedly.  But in some cases
     // it's OK to delete the curbuf, because a new one is obtained anyway.
     // Therefore only return if curbuf changed to the deleted buffer.
-    if (buf == curbuf && !is_curbuf)
-	return FALSE;
+    ఒకవేళ (buf == curbuf && !is_curbuf)
+	తిరిగి FALSE;
 
     // If curbuf, stop Visual mode just before freeing, but after autocmds that
     // may restart it.  May trigger TextYankPost, but with textlock set.
-    if (buf == curbuf && VIsual_active
-#if defined(EXITFREE)
+    ఒకవేళ (buf == curbuf && VIsual_చురుకైన
+#ఒకవేళ defined(EXITFREE)
 	    && !entered_free_all_mem
-#endif
+#అయితే_ముగింపు
 	    )
-	end_visual_mode();
+	చివర_visual_బహుళకం();
 
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     diff_buf_delete(buf);	    // Can't use 'diff' for unloaded buffer.
-#endif
-#ifdef FEAT_SYN_HL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SYN_HL
     // Remove any ownsyntax, unless exiting.
-    if (curwin != NULL && curwin->w_buffer == buf)
+    ఒకవేళ (curwin != ఖాళీ && curwin->w_బఫరు == buf)
 	reset_synblock(curwin);
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // No folds in an empty buffer.
     {
 	win_T		*win;
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, win)
-	    if (win->w_buffer == buf)
+	    ఒకవేళ (win->w_బఫరు == buf)
 		clearFolding(win);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_TCL
-    tcl_buffer_free(buf);
-#endif
+#నిర్వచితమైతే FEAT_TCL
+    tcl_బఫరు_free(buf);
+#అయితే_ముగింపు
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
-    buf->b_ml.ml_line_count = 0;    // no lines in buffer
-    if ((flags & BFA_KEEP_UNDO) == 0)
+    buf->b_ml.ml_పంక్తి_లెక్క = 0;    // no lines in buffer
+    ఒకవేళ ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
 	u_clearallandblockfree(buf);
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     syntax_clear(&buf->b_s);	    // reset syntax info
-#endif
-#ifdef FEAT_PROP_POPUP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
     clear_buf_prop_types(buf);
-#endif
+#అయితే_ముగింపు
     buf->b_flags &= ~BF_READERR;    // a read error is no longer relevant
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Free a buffer structure and the things it contains related to the buffer
  * itself (not the file, that must have been done already).
  */
-    static void
-free_buffer(buf_T *buf)
+    స్థిర శూన్య
+free_బఫరు(buf_T *buf)
 {
-    ++buf_free_count;
-    free_buffer_stuff(buf, TRUE);
-#ifdef FEAT_EVAL
+    ++buf_free_లెక్క;
+    free_బఫరు_stuff(buf, TRUE);
+#నిర్వచితమైతే FEAT_EVAL
     // b:changedtick uses an item in buf_T, remove it now
     dictitem_remove(buf->b_vars, (dictitem_T *)&buf->b_ct_di, "free buffer");
     unref_var_dict(buf->b_vars);
     remove_listeners(buf);
-#endif
-#ifdef FEAT_LUA
-    lua_buffer_free(buf);
-#endif
-#ifdef FEAT_MZSCHEME
-    mzscheme_buffer_free(buf);
-#endif
-#ifdef FEAT_PERL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_LUA
+    lua_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MZSCHEME
+    mzscheme_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PERL
     perl_buf_free(buf);
-#endif
-#ifdef FEAT_PYTHON
-    python_buffer_free(buf);
-#endif
-#ifdef FEAT_PYTHON3
-    python3_buffer_free(buf);
-#endif
-#ifdef FEAT_RUBY
-    ruby_buffer_free(buf);
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    channel_buffer_free(buf);
-#endif
-#ifdef FEAT_TERMINAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PYTHON
+    python_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PYTHON3
+    python3_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RUBY
+    ruby_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    channel_బఫరు_free(buf);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMINAL
     free_terminal(buf);
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    vim_free(buf->b_prompt_text);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    vim_free(buf->b_prompt_పాఠ్యం);
     free_callback(&buf->b_prompt_callback);
-    free_callback(&buf->b_prompt_interrupt);
-#endif
+    free_callback(&buf->b_prompt_అంతరాయం);
+#అయితే_ముగింపు
 
     buf_hashtab_remove(buf);
 
     aubuflocal_remove(buf);
 
-    if (autocmd_busy)
+    ఒకవేళ (autocmd_busy)
     {
 	// Do not free the buffer structure while autocommands are executing,
 	// it's still needed. Free it when autocmd_busy is reset.
-	buf->b_next = au_pending_free_buf;
+	buf->b_తదుపరి = au_pending_free_buf;
 	au_pending_free_buf = buf;
     }
-    else
+    లేకపోతే
     {
 	vim_free(buf);
-	if (curbuf == buf)
-	    curbuf = NULL;  // make clear it's not to be used
+	ఒకవేళ (curbuf == buf)
+	    curbuf = ఖాళీ;  // make clear it's not to be used
     }
 }
 
 /*
  * Initializes b:changedtick.
  */
-    static void
+    స్థిర శూన్య
 init_changedtick(buf_T *buf)
 {
     dictitem_T *di = (dictitem_T *)&buf->b_ct_di;
 
     di->di_flags = DI_FLAGS_FIX | DI_FLAGS_RO;
-    di->di_tv.v_type = VAR_NUMBER;
-    di->di_tv.v_lock = VAR_FIXED;
-    di->di_tv.vval.v_number = 0;
+    di->di_tv.v_type = VAR_సంఖ్య;
+    di->di_tv.v_తాళం = VAR_FIXED;
+    di->di_tv.vval.v_సంఖ్య = 0;
 
-#ifdef FEAT_EVAL
-    STRCPY(buf->b_ct_di.di_key, "changedtick");
-    (void)dict_add(buf->b_vars, di);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    STRCPY(buf->b_ct_di.di_కీలకం, "changedtick");
+    (శూన్య)dict_కూడు(buf->b_vars, di);
+#అయితే_ముగింపు
 }
 
 /*
  * Free the b_wininfo list for buffer "buf".
  */
-    static void
+    స్థిర శూన్య
 clear_wininfo(buf_T *buf)
 {
     wininfo_T	*wip;
 
-    while (buf->b_wininfo != NULL)
+    అయితే (buf->b_wininfo != ఖాళీ)
     {
 	wip = buf->b_wininfo;
-	buf->b_wininfo = wip->wi_next;
+	buf->b_wininfo = wip->wi_తదుపరి;
 	free_wininfo(wip);
     }
 }
@@ -1091,20 +1091,20 @@ clear_wininfo(buf_T *buf)
 /*
  * Free stuff in the buffer for ":bdel" and when wiping out the buffer.
  */
-    static void
-free_buffer_stuff(
+    స్థిర శూన్య
+free_బఫరు_stuff(
     buf_T	*buf,
-    int		free_options)		// free options as well
+    పూర్ణాంకం		free_options)		// free options as well
 {
-    if (free_options)
+    ఒకవేళ (free_options)
     {
 	clear_wininfo(buf);		// including window-local options
 	free_buf_options(buf, TRUE);
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
 	ga_clear(&buf->b_s.b_langp);
-#endif
+#అయితే_ముగింపు
     }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     {
 	varnumber_T tick = CHANGEDTICK(buf);
 
@@ -1114,31 +1114,31 @@ free_buffer_stuff(
 	CHANGEDTICK(buf) = tick;
 	remove_listeners(buf);
     }
-#endif
+#అయితే_ముగింపు
     uc_clear(&buf->b_ucmds);		// clear local user commands
-#ifdef FEAT_SIGNS
+#నిర్వచితమైతే FEAT_SIGNS
     buf_delete_signs(buf, (char_u *)"*");	// delete any signs
-#endif
-#ifdef FEAT_NETBEANS_INTG
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     netbeans_file_killed(buf);
-#endif
-    map_clear_mode(buf, MAP_ALL_MODES, TRUE, FALSE);  // clear local mappings
-    map_clear_mode(buf, MAP_ALL_MODES, TRUE, TRUE);   // clear local abbrevs
-    VIM_CLEAR(buf->b_start_fenc);
+#అయితే_ముగింపు
+    map_clear_బహుళకం(buf, MAP_ALL_MODES, TRUE, FALSE);  // clear local mappings
+    map_clear_బహుళకం(buf, MAP_ALL_MODES, TRUE, TRUE);   // clear local abbrevs
+    VIM_CLEAR(buf->b_ప్రారంభం_fenc);
 }
 
 /*
  * Free one wininfo_T.
  */
-    void
+    శూన్య
 free_wininfo(wininfo_T *wip)
 {
-    if (wip->wi_optset)
+    ఒకవేళ (wip->wi_optset)
     {
 	clear_winopt(&wip->wi_opt);
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	deleteFoldRecurse(&wip->wi_folds);
-#endif
+#అయితే_ముగింపు
     }
     vim_free(wip);
 }
@@ -1146,190 +1146,190 @@ free_wininfo(wininfo_T *wip)
 /*
  * Go to another buffer.  Handles the result of the ATTENTION dialog.
  */
-    void
-goto_buffer(
+    శూన్య
+goto_బఫరు(
     exarg_T	*eap,
-    int		start,
-    int		dir,
-    int		count)
+    పూర్ణాంకం		ప్రారంభం,
+    పూర్ణాంకం		dir,
+    పూర్ణాంకం		లెక్క)
 {
     bufref_T	old_curbuf;
-    int		save_sea = swap_exists_action;
-    int		skip_help_buf;
+    పూర్ణాంకం		save_sea = మార్పిడి_exists_action;
+    పూర్ణాంకం		skip_help_buf;
 
-    switch (eap->cmdidx)
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_bnext:
-	case CMD_sbnext:
-	case CMD_bNext:
-	case CMD_bprevious:
-	case CMD_sbNext:
-	case CMD_sbprevious:
+	స్థితి CMD_bnext:
+	స్థితి CMD_sbnext:
+	స్థితి CMD_b_తదుపరి:
+	స్థితి CMD_bprevious:
+	స్థితి CMD_sb_తదుపరి:
+	స్థితి CMD_sbprevious:
 	    skip_help_buf = TRUE;
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 	    skip_help_buf = FALSE;
-	    break;
+	    ఆపు;
     }
 
-    set_bufref(&old_curbuf, curbuf);
+    సమితి_bufref(&old_curbuf, curbuf);
 
-    if (swap_exists_action == SEA_NONE)
-	swap_exists_action = SEA_DIALOG;
-    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
+    ఒకవేళ (మార్పిడి_exists_action == SEA_NONE)
+	మార్పిడి_exists_action = SEA_DIALOG;
+    (శూన్య)do_బఫరు_ext(*eap->cmd == 's' ? DOBUF_విభజించు : DOBUF_GOTO, ప్రారంభం, dir, లెక్క,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
-    if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
+    ఒకవేళ (మార్పిడి_exists_action == SEA_QUIT && *eap->cmd == 's')
     {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a window.
 	enter_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 
 	// Quitting means closing the split window, nothing else.
 	win_close(curwin, TRUE);
-	swap_exists_action = save_sea;
-	swap_exists_did_quit = TRUE;
+	మార్పిడి_exists_action = save_sea;
+	మార్పిడి_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
     }
-    else
-	handle_swap_exists(&old_curbuf);
+    లేకపోతే
+	handle_మార్పిడి_exists(&old_curbuf);
 }
 
 /*
  * Handle the situation of swap_exists_action being set.
  * It is allowed for "old_curbuf" to be NULL or invalid.
  */
-    void
-handle_swap_exists(bufref_T *old_curbuf)
+    శూన్య
+handle_మార్పిడి_exists(bufref_T *old_curbuf)
 {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
     cleanup_T	cs;
-#endif
-#ifdef FEAT_SYN_HL
-    long	old_tw = curbuf->b_p_tw;
-#endif
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SYN_HL
+    దీర్ఘ	old_tw = curbuf->b_p_tw;
+#అయితే_ముగింపు
     buf_T	*buf;
 
-    if (swap_exists_action == SEA_QUIT)
+    ఒకవేళ (మార్పిడి_exists_action == SEA_QUIT)
     {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 
 	// User selected Quit at ATTENTION prompt.  Go back to previous
 	// buffer.  If that buffer is gone or the same as the current one,
 	// open a new, empty buffer.
-	swap_exists_action = SEA_NONE;	// don't want it again
-	swap_exists_did_quit = TRUE;
-	close_buffer(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
-	if (old_curbuf == NULL || !bufref_valid(old_curbuf)
+	మార్పిడి_exists_action = SEA_NONE;	// don't want it again
+	మార్పిడి_exists_did_quit = TRUE;
+	close_బఫరు(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
+	ఒకవేళ (old_curbuf == ఖాళీ || !bufref_valid(old_curbuf)
 					      || old_curbuf->br_buf == curbuf)
 	{
 	    // Block autocommands here because curwin->w_buffer may be NULL.
-	    block_autocmds();
-	    buf = buflist_new(NULL, NULL, 1L, BLN_CURBUF | BLN_LISTED);
+	    ఖండం_autocmds();
+	    buf = buflist_new(ఖాళీ, ఖాళీ, 1L, BLN_CURBUF | BLN_LISTED);
 	    unblock_autocmds();
 	}
-	else
+	లేకపోతే
 	    buf = old_curbuf->br_buf;
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
-	    int old_msg_silent = msg_silent;
+	    పూర్ణాంకం old_సందేశం_silent = సందేశం_silent;
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;  // prevent fileinfo message
-	    enter_buffer(buf);
+	    ఒకవేళ (shortmess(SHM_FILEINFO))
+		సందేశం_silent = 1;  // prevent fileinfo message
+	    enter_బఫరు(buf);
 	    // restore msg_silent, so that the command line will be shown
-	    msg_silent = old_msg_silent;
+	    సందేశం_silent = old_సందేశం_silent;
 
-#ifdef FEAT_SYN_HL
-	    if (old_tw != curbuf->b_p_tw)
-		check_colorcolumn(NULL, curwin);
-#endif
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (old_tw != curbuf->b_p_tw)
+		check_colorcolumn(ఖాళీ, curwin);
+#అయితే_ముగింపు
 	}
 	// If "old_curbuf" is NULL we are in big trouble here...
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
     }
-    else if (swap_exists_action == SEA_RECOVER)
+    లేకపోతే ఒకవేళ (మార్పిడి_exists_action == SEA_RECOVER)
     {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 
 	// User selected Recover at ATTENTION prompt.
-	msg_scroll = TRUE;
+	సందేశం_scroll = TRUE;
 	ml_recover(FALSE);
-	msg_puts("\n");	// don't overwrite the last message
-	cmdline_row = msg_row;
+	సందేశం_puts("\n");	// don't overwrite the last message
+	cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	do_modelines(0);
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
     }
-    swap_exists_action = SEA_NONE;
+    మార్పిడి_exists_action = SEA_NONE;
 }
 
 /*
  * Make the current buffer empty.
  * Used when it is wiped out and it's the last buffer.
  */
-    static int
-empty_curbuf(
-    int close_others,
-    int forceit,
-    int action)
+    స్థిర పూర్ణాంకం
+ఖాళీలు_curbuf(
+    పూర్ణాంకం close_others,
+    పూర్ణాంకం forceit,
+    పూర్ణాంకం action)
 {
-    int	    retval;
+    పూర్ణాంకం	    retval;
     buf_T   *buf = curbuf;
     bufref_T bufref;
 
-    if (action == DOBUF_UNLOAD)
+    ఒకవేళ (action == DOBUF_UNLOAD)
     {
-	emsg(_(e_cannot_unload_last_buffer));
-	return FAIL;
+	emsg(_(e_cannot_unload_చివరి_బఫరు));
+	తిరిగి FAIL;
     }
 
-    set_bufref(&bufref, buf);
-    if (close_others)
+    సమితి_bufref(&bufref, buf);
+    ఒకవేళ (close_others)
 	// Close any other windows on this buffer, then make it empty.
 	close_windows(buf, TRUE);
 
     setpcmark();
-    retval = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE,
+    retval = do_ecmd(0, ఖాళీ, ఖాళీ, ఖాళీ, ECMD_ONE,
 					  forceit ? ECMD_FORCEIT : 0, curwin);
 
     // do_ecmd() may create a new buffer, then we have to delete
     // the old one.  But do_ecmd() may have done that already, check
     // if the buffer still exists.
-    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
-	close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-    if (!close_others)
+    ఒకవేళ (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
+	close_బఫరు(ఖాళీ, buf, action, FALSE, FALSE, FALSE);
+    ఒకవేళ (!close_others)
 	need_fileinfo = FALSE;
-    else if (retval == OK && !shortmess(SHM_FILEINFO))
+    లేకపోతే ఒకవేళ (retval == OK && !shortmess(SHM_FILEINFO))
 	// do_ecmd() does not display file info for a new empty buffer.
 	need_fileinfo = TRUE;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1349,210 +1349,210 @@ empty_curbuf(
  *
  * Return FAIL or OK.
  */
-    static int
-do_buffer_ext(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		flags)		// DOBUF_FORCEIT etc.
+    స్థిర పూర్ణాంకం
+do_బఫరు_ext(
+    పూర్ణాంకం		action,
+    పూర్ణాంకం		ప్రారంభం,
+    పూర్ణాంకం		dir,		// FORWARD or BACKWARD
+    పూర్ణాంకం		లెక్క,		// buffer number or number of buffers
+    పూర్ణాంకం		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
     buf_T	*bp;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    పూర్ణాంకం		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 
-    switch (start)
+    ఎంపిక (ప్రారంభం)
     {
-	case DOBUF_FIRST:   buf = firstbuf; break;
-	case DOBUF_LAST:    buf = lastbuf;  break;
-	default:	    buf = curbuf;   break;
+	స్థితి DOBUF_మొదటి:   buf = firstbuf; ఆపు;
+	స్థితి DOBUF_చివరి:    buf = lastbuf;  ఆపు;
+	అప్రమేయ:	    buf = curbuf;   ఆపు;
     }
-    if (start == DOBUF_MOD)	    // find next modified buffer
+    ఒకవేళ (ప్రారంభం == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	అయితే (లెక్క-- > 0)
 	{
-	    do
+	    చేయి
 	    {
-		buf = buf->b_next;
-		if (buf == NULL)
+		buf = buf->b_తదుపరి;
+		ఒకవేళ (buf == ఖాళీ)
 		    buf = firstbuf;
 	    }
-	    while (buf != curbuf && !bufIsChanged(buf));
+	    అయితే (buf != curbuf && !buf_Is_మారింది(buf));
 	}
-	if (!bufIsChanged(buf))
+	ఒకవేళ (!buf_Is_మారింది(buf))
 	{
-	    emsg(_(e_no_modified_buffer_found));
-	    return FAIL;
+	    emsg(_(e_no_modified_బఫరు_దొరికింది));
+	    తిరిగి FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    లేకపోతే ఒకవేళ (ప్రారంభం == DOBUF_మొదటి && లెక్క) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
-	    buf = buf->b_next;
+	అయితే (buf != ఖాళీ && buf->b_fnum != లెక్క)
+	    buf = buf->b_తదుపరి;
     }
-    else
+    లేకపోతే
     {
-	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
+	పూర్ణాంకం help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
-	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	bp = ఖాళీ;
+	అయితే (లెక్క > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
 	    // buffers are unlisted.
-	    if (bp == NULL)
+	    ఒకవేళ (bp == ఖాళీ)
 		bp = buf;
-	    if (dir == FORWARD)
+	    ఒకవేళ (dir == FORWARD)
 	    {
-		buf = buf->b_next;
-		if (buf == NULL)
+		buf = buf->b_తదుపరి;
+		ఒకవేళ (buf == ఖాళీ)
 		    buf = firstbuf;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		buf = buf->b_prev;
-		if (buf == NULL)
+		ఒకవేళ (buf == ఖాళీ)
 		    buf = lastbuf;
 	    }
 	    // Avoid non-help buffers if the starting point was a help buffer
 	    // and vice-versa.
 	    // Don't count unlisted buffers.
-	    if (unload
+	    ఒకవేళ (unload
 		    || (help_only
 			? buf->b_help
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
 							    || !buf->b_help))))
 	    {
-		--count;
-		bp = NULL;	// use this buffer as new starting point
+		--లెక్క;
+		bp = ఖాళీ;	// use this buffer as new starting point
 	    }
-	    if (bp == buf)
+	    ఒకవేళ (bp == buf)
 	    {
 		// back where we started, didn't find anything.
-		emsg(_(e_there_is_no_listed_buffer));
-		return FAIL;
+		emsg(_(e_there_is_no_listed_బఫరు));
+		తిరిగి FAIL;
 	    }
 	}
     }
 
-    if (buf == NULL)	    // could not find it
+    ఒకవేళ (buf == ఖాళీ)	    // could not find it
     {
-	if (start == DOBUF_FIRST)
+	ఒకవేళ (ప్రారంభం == DOBUF_మొదటి)
 	{
 	    // don't warn when deleting
-	    if (!unload)
-		semsg(_(e_buffer_nr_does_not_exist), count);
+	    ఒకవేళ (!unload)
+		semsg(_(e_బఫరు_nr_does_not_exist), లెక్క);
 	}
-	else if (dir == FORWARD)
-	    emsg(_(e_cannot_go_beyond_last_buffer));
-	else
-	    emsg(_(e_cannot_go_before_first_buffer));
-	return FAIL;
+	లేకపోతే ఒకవేళ (dir == FORWARD)
+	    emsg(_(e_cannot_go_beyond_చివరి_బఫరు));
+	లేకపోతే
+	    emsg(_(e_cannot_go_before_మొదటి_బఫరు));
+	తిరిగి FAIL;
     }
-#ifdef FEAT_PROP_POPUP
-    if ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
-	return OK;
-#endif
-    if (action == DOBUF_GOTO && buf != curbuf
-	    && !check_can_set_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
+	తిరిగి OK;
+#అయితే_ముగింపు
+    ఒకవేళ (action == DOBUF_GOTO && buf != curbuf
+	    && !check_can_సమితి_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
 	// disallow navigating to another buffer when 'winfixbuf' is applied
-	return FAIL;
+	తిరిగి FAIL;
 
-    if ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
+    ఒకవేళ ((action == DOBUF_GOTO || action == DOBUF_విభజించు)
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
-	semsg(_(e_buffer_nr_does_not_exist), count);
-	return FAIL;
+	semsg(_(e_బఫరు_nr_does_not_exist), లెక్క);
+	తిరిగి FAIL;
     }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 
     /*
      * delete buffer "buf" from memory and/or the list
      */
-    if (unload)
+    ఒకవేళ (unload)
     {
-	int	forward;
+	పూర్ణాంకం	forward;
 	bufref_T bufref;
 
-	if (!can_unload_buffer(buf))
-	    return FAIL;
+	ఒకవేళ (!can_unload_బఫరు(buf))
+	    తిరిగి FAIL;
 
-	set_bufref(&bufref, buf);
+	సమితి_bufref(&bufref, buf);
 
 	// When unloading or deleting a buffer that's already unloaded and
 	// unlisted: fail silently.
-	if (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
-				   && buf->b_ml.ml_mfp == NULL && !buf->b_p_bl)
-	    return FAIL;
+	ఒకవేళ (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
+				   && buf->b_ml.ml_mfp == ఖాళీ && !buf->b_p_bl)
+	    తిరిగి FAIL;
 
-	if ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
+	ఒకవేళ ((flags & DOBUF_FORCEIT) == 0 && buf_Is_మారింది(buf))
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ఒకవేళ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 # ifdef FEAT_TERMINAL
-		if (term_job_running(buf->b_term))
+		ఒకవేళ (పదం_పని_running(buf->b_పదం))
 		{
-		    if (term_confirm_stop(buf) == FAIL)
-			return FAIL;
+		    ఒకవేళ (పదం_confirm_stop(buf) == FAIL)
+			తిరిగి FAIL;
 		}
-		else
+		లేకపోతే
 # endif
 		{
-		    dialog_changed(buf, FALSE);
-		    if (!bufref_valid(&bufref))
+		    dialog_మారింది(buf, FALSE);
+		    ఒకవేళ (!bufref_valid(&bufref))
 			// Autocommand deleted buffer, oops!  It's not changed
 			// now.
-			return FAIL;
+			తిరిగి FAIL;
 		    // If it's still changed fail silently, the dialog already
 		    // mentioned why it fails.
-		    if (bufIsChanged(buf))
-			return FAIL;
+		    ఒకవేళ (buf_Is_మారింది(buf))
+			తిరిగి FAIL;
 		}
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
-		no_write_message_buf(buf);
-		return FAIL;
+		no_write_సందేశం_buf(buf);
+		తిరిగి FAIL;
 	    }
 	}
 
 	// When closing the current buffer stop Visual mode.
-	if (buf == curbuf && VIsual_active)
-	    end_visual_mode();
+	ఒకవేళ (buf == curbuf && VIsual_చురుకైన)
+	    చివర_visual_బహుళకం();
 
 	// If deleting the last (listed) buffer, make it empty.
 	// The last (listed) buffer cannot be unloaded.
 	FOR_ALL_BUFFERS(bp)
-	    if (bp->b_p_bl && bp != buf)
-		break;
-	if (bp == NULL && buf == curbuf)
-	    return empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
+	    ఒకవేళ (bp->b_p_bl && bp != buf)
+		ఆపు;
+	ఒకవేళ (bp == ఖాళీ && buf == curbuf)
+	    తిరిగి ఖాళీలు_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
 
 	// If the deleted buffer is the current one, close the current window
 	// (unless it's the only window).  Repeat this so long as we end up in
 	// a window with this buffer.
-	while (buf == curbuf
-		   && !(win_locked(curwin) || curwin->w_buffer->b_locked > 0)
-		   && (!ONE_WINDOW || first_tabpage->tp_next != NULL))
+	అయితే (buf == curbuf
+		   && !(win_locked(curwin) || curwin->w_బఫరు->b_locked > 0)
+		   && (!ONE_కిటికీ || మొదటి_tabpage->tp_తదుపరి != ఖాళీ))
 	{
-	    if (win_close(curwin, FALSE) == FAIL)
-		break;
+	    ఒకవేళ (win_close(curwin, FALSE) == FAIL)
+		ఆపు;
 	}
 
 	// If the buffer to be deleted is not the current one, delete it here.
-	if (buf != curbuf)
+	ఒకవేళ (buf != curbuf)
 	{
 	    close_windows(buf, FALSE);
-	    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
-		    close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-	    return OK;
+	    ఒకవేళ (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
+		    close_బఫరు(ఖాళీ, buf, action, FALSE, FALSE, FALSE);
+	    తిరిగి OK;
 	}
 
 	/*
@@ -1565,190 +1565,190 @@ do_buffer_ext(
 	 * then before the current buffer.
 	 * Finally use any buffer.  Skip buffers that are closing throughout.
 	 */
-	buf = NULL;	// selected buffer
-	bp = NULL;	// used when no loaded buffer found
-	if (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
-		&& !au_new_curbuf.br_buf->b_locked_split)
+	buf = ఖాళీ;	// selected buffer
+	bp = ఖాళీ;	// used when no loaded buffer found
+	ఒకవేళ (au_new_curbuf.br_buf != ఖాళీ && bufref_valid(&au_new_curbuf)
+		&& !au_new_curbuf.br_buf->b_locked_విభజించు)
 	    buf = au_new_curbuf.br_buf;
-	else if (curwin->w_jumplistlen > 0)
+	లేకపోతే ఒకవేళ (curwin->w_jumplistlen > 0)
 	{
-	    int     jumpidx;
+	    పూర్ణాంకం     jumpidx;
 
 	    jumpidx = curwin->w_jumplistidx - 1;
-	    if (jumpidx < 0)
+	    ఒకవేళ (jumpidx < 0)
 		jumpidx = curwin->w_jumplistlen - 1;
 
 	    forward = jumpidx;
-	    while (jumpidx != curwin->w_jumplistidx)
+	    అయితే (jumpidx != curwin->w_jumplistidx)
 	    {
 		buf = buflist_findnr(curwin->w_jumplist[jumpidx].fmark.fnum);
-		if (buf != NULL)
+		ఒకవేళ (buf != ఖాళీ)
 		{
 		    // Skip current and unlisted bufs.  Also skip a quickfix
 		    // or closing buffer, it might be deleted soon.
-		    if (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
-			    || buf->b_locked_split)
-			buf = NULL;
-		    else if (buf->b_ml.ml_mfp == NULL)
+		    ఒకవేళ (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
+			    || buf->b_locked_విభజించు)
+			buf = ఖాళీ;
+		    లేకపోతే ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
 		    {
 			// skip unloaded buf, but may keep it for later
-			if (bp == NULL)
+			ఒకవేళ (bp == ఖాళీ)
 			    bp = buf;
-			buf = NULL;
+			buf = ఖాళీ;
 		    }
 		}
-		if (buf != NULL)   // found a valid buffer: stop searching
-		    break;
+		ఒకవేళ (buf != ఖాళీ)   // found a valid buffer: stop searching
+		    ఆపు;
 		// advance to older entry in jump list
-		if (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
-		    break;
-		if (--jumpidx < 0)
+		ఒకవేళ (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
+		    ఆపు;
+		ఒకవేళ (--jumpidx < 0)
 		    jumpidx = curwin->w_jumplistlen - 1;
-		if (jumpidx == forward)		// List exhausted for sure
-		    break;
+		ఒకవేళ (jumpidx == forward)		// List exhausted for sure
+		    ఆపు;
 	    }
 	}
 
-	if (buf == NULL)	// No previous buffer, Try 2'nd approach
+	ఒకవేళ (buf == ఖాళీ)	// No previous buffer, Try 2'nd approach
 	{
 	    forward = TRUE;
-	    buf = curbuf->b_next;
-	    for (;;)
+	    buf = curbuf->b_తదుపరి;
+	    కొరకు (;;)
 	    {
-		if (buf == NULL)
+		ఒకవేళ (buf == ఖాళీ)
 		{
-		    if (!forward)	// tried both directions
-			break;
+		    ఒకవేళ (!forward)	// tried both directions
+			ఆపు;
 		    buf = curbuf->b_prev;
 		    forward = FALSE;
-		    continue;
+		    కొనసాగు;
 		}
 		// in non-help buffer, try to skip help buffers, and vv
-		if (buf->b_help == curbuf->b_help && buf->b_p_bl
-			    && !bt_quickfix(buf) && !buf->b_locked_split)
+		ఒకవేళ (buf->b_help == curbuf->b_help && buf->b_p_bl
+			    && !bt_quickfix(buf) && !buf->b_locked_విభజించు)
 		{
-		    if (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
-			break;
-		    if (bp == NULL)	// remember unloaded buf for later
+		    ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ)   // found loaded buffer
+			ఆపు;
+		    ఒకవేళ (bp == ఖాళీ)	// remember unloaded buf for later
 			bp = buf;
 		}
-		if (forward)
-		    buf = buf->b_next;
-		else
+		ఒకవేళ (forward)
+		    buf = buf->b_తదుపరి;
+		లేకపోతే
 		    buf = buf->b_prev;
 	    }
 	}
-	if (buf == NULL)	// No loaded buffer, use unloaded one
+	ఒకవేళ (buf == ఖాళీ)	// No loaded buffer, use unloaded one
 	    buf = bp;
-	if (buf == NULL)	// No loaded buffer, find listed one
+	ఒకవేళ (buf == ఖాళీ)	// No loaded buffer, find listed one
 	{
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
-			&& !buf->b_locked_split)
-		    break;
+		ఒకవేళ (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
+			&& !buf->b_locked_విభజించు)
+		    ఆపు;
 	}
-	if (buf == NULL)	// Still no buffer, just take one
+	ఒకవేళ (buf == ఖాళీ)	// Still no buffer, just take one
 	{
-	    if (curbuf->b_next != NULL)
-		buf = curbuf->b_next;
-	    else
+	    ఒకవేళ (curbuf->b_తదుపరి != ఖాళీ)
+		buf = curbuf->b_తదుపరి;
+	    లేకపోతే
 		buf = curbuf->b_prev;
-	    if (bt_quickfix(buf)
-		    || (buf != NULL && buf != curbuf && buf->b_locked_split))
-		buf = NULL;
+	    ఒకవేళ (bt_quickfix(buf)
+		    || (buf != ఖాళీ && buf != curbuf && buf->b_locked_విభజించు))
+		buf = ఖాళీ;
 	}
     }
 
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
 	// Autocommands must have wiped out all other buffers.  Only option
 	// now is to make the current buffer empty.
-	return empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
+	తిరిగి ఖాళీలు_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
     }
 
     /*
      * make "buf" the current buffer
      */
     // If 'switchbuf' is set jump to the window containing "buf".
-    if (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
-	return OK;
+    ఒకవేళ (action == DOBUF_విభజించు && swbuf_goto_win_with_buf(buf) != ఖాళీ)
+	తిరిగి OK;
     // Whether splitting or not, don't open a closing buffer in more windows.
-    if (buf != curbuf && buf->b_locked_split)
+    ఒకవేళ (buf != curbuf && buf->b_locked_విభజించు)
     {
-	emsg(_(e_cannot_switch_to_a_closing_buffer));
-	return FAIL;
+	emsg(_(e_cannot_switch_గమ్యం_a_closing_బఫరు));
+	తిరిగి FAIL;
     }
-    if (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
-	return FAIL;
+    ఒకవేళ (action == DOBUF_విభజించు && win_విభజించు(0, 0) == FAIL) // split window first
+	తిరిగి FAIL;
 
     // go to current buffer - nothing to do
-    if (buf == curbuf)
-	return OK;
+    ఒకవేళ (buf == curbuf)
+	తిరిగి OK;
 
     // Check if the current buffer may be abandoned.
-    if (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
+    ఒకవేళ (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	ఒకవేళ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(curbuf->b_term))
+	    ఒకవేళ (పదం_పని_running(curbuf->b_పదం))
 	    {
-		if (term_confirm_stop(curbuf) == FAIL)
-		    return FAIL;
+		ఒకవేళ (పదం_confirm_stop(curbuf) == FAIL)
+		    తిరిగి FAIL;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(curbuf);
 	    }
-	    else
+	    లేకపోతే
 # endif
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
-		dialog_changed(curbuf, FALSE);
-		if (!bufref_valid(&bufref))
+		సమితి_bufref(&bufref, buf);
+		dialog_మారింది(curbuf, FALSE);
+		ఒకవేళ (!bufref_valid(&bufref))
 		    // Autocommand deleted buffer, oops!
-		    return FAIL;
+		    తిరిగి FAIL;
 
-		if (bufIsChanged(curbuf))
+		ఒకవేళ (buf_Is_మారింది(curbuf))
 		{
-		    no_write_message();
-		    return FAIL;
+		    no_write_సందేశం();
+		    తిరిగి FAIL;
 		}
 	    }
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-	    no_write_message();
-	    return FAIL;
+	    no_write_సందేశం();
+	    తిరిగి FAIL;
 	}
     }
 
     // Go to the other buffer.
-    set_curbuf(buf, action);
+    సమితి_curbuf(buf, action);
 
-    if (action == DOBUF_SPLIT)
+    ఒకవేళ (action == DOBUF_విభజించు)
 	RESET_BINDING(curwin);	// reset 'scrollbind' and 'cursorbind'
 
-#if defined(FEAT_EVAL)
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
-#endif
+#ఒకవేళ defined(FEAT_EVAL)
+    ఒకవేళ (aborting())	    // autocmds may abort script processing
+	తిరిగి FAIL;
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
-    int
-do_buffer(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		forceit)	// TRUE when using !
+    పూర్ణాంకం
+do_బఫరు(
+    పూర్ణాంకం		action,
+    పూర్ణాంకం		ప్రారంభం,
+    పూర్ణాంకం		dir,		// FORWARD or BACKWARD
+    పూర్ణాంకం		లెక్క,		// buffer number or number of buffers
+    పూర్ణాంకం		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    తిరిగి do_బఫరు_ext(action, ప్రారంభం, dir, లెక్క,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1765,102 +1765,102 @@ do_buffer(
  *
  * Returns error message or NULL
  */
-    char *
+    అక్షరం *
 do_bufdel(
-    int		command,
+    పూర్ణాంకం		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
-    int		start_bnr,	// first buffer number in a range
-    int		end_bnr,	// buffer nr or last buffer nr in a range
-    int		forceit)
+    పూర్ణాంకం		addr_లెక్క,
+    పూర్ణాంకం		ప్రారంభం_bnr,	// first buffer number in a range
+    పూర్ణాంకం		చివర_bnr,	// buffer nr or last buffer nr in a range
+    పూర్ణాంకం		forceit)
 {
-    int		do_current = 0;	// delete current buffer?
-    int		deleted = 0;	// number of buffers deleted
-    char	*errormsg = NULL; // return value
-    int		bnr;		// buffer number
+    పూర్ణాంకం		do_current = 0;	// delete current buffer?
+    పూర్ణాంకం		deleted = 0;	// number of buffers deleted
+    అక్షరం	*errormsg = ఖాళీ; // return value
+    పూర్ణాంకం		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    ఒకవేళ (addr_లెక్క == 0)
     {
-	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
+	(శూన్య)do_బఫరు(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
-    else
+    లేకపోతే
     {
-	if (addr_count == 2)
+	ఒకవేళ (addr_లెక్క == 2)
 	{
-	    if (*arg)		// both range and argument is not allowed
-		return ex_errmsg(e_trailing_characters_str, arg);
-	    bnr = start_bnr;
+	    ఒకవేళ (*arg)		// both range and argument is not allowed
+		తిరిగి ex_errmsg(e_trailing_characters_str, arg);
+	    bnr = ప్రారంభం_bnr;
 	}
-	else	// addr_count == 1
-	    bnr = end_bnr;
+	లేకపోతే	// addr_count == 1
+	    bnr = చివర_bnr;
 
-	for ( ;!got_int; ui_breakcheck())
+	కొరకు ( ;!got_int; ui_breakcheck())
 	{
 	    // Delete the current buffer last, otherwise when the
 	    // current buffer is deleted, the next buffer becomes
 	    // the current one and will be loaded, which may then
 	    // also be deleted, etc.
-	    if (bnr == curbuf->b_fnum)
+	    ఒకవేళ (bnr == curbuf->b_fnum)
 		do_current = bnr;
-	    else if (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
+	    లేకపోతే ఒకవేళ (do_బఫరు_ext(command, DOBUF_మొదటి, FORWARD, bnr,
 			  DOBUF_NOPOPUP | (forceit ? DOBUF_FORCEIT : 0)) == OK)
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    ఒకవేళ (addr_లెక్క == 2)
 	    {
-		if (++bnr > end_bnr)
-		    break;
+		ఒకవేళ (++bnr > చివర_bnr)
+		    ఆపు;
 	    }
-	    else    // addr_count == 1
+	    లేకపోతే    // addr_count == 1
 	    {
 		arg = skipwhite(arg);
-		if (*arg == NUL)
-		    break;
-		if (!VIM_ISDIGIT(*arg))
+		ఒకవేళ (*arg == NUL)
+		    ఆపు;
+		ఒకవేళ (!VIM_ISDIGIT(*arg))
 		{
 		    p = skiptowhite_esc(arg);
 		    bnr = buflist_findpat(arg, p,
 			  command == DOBUF_WIPE || command == DOBUF_WIPE_REUSE,
 								FALSE, FALSE);
-		    if (bnr < 0)	    // failed
-			break;
+		    ఒకవేళ (bnr < 0)	    // failed
+			ఆపు;
 		    arg = p;
 		}
-		else
+		లేకపోతే
 		    bnr = getdigits(&arg);
 	    }
 	}
-	if (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
+	ఒకవేళ (!got_int && do_current && do_బఫరు(command, DOBUF_మొదటి,
 					  FORWARD, do_current, forceit) == OK)
 	    ++deleted;
 
-	if (deleted == 0)
+	ఒకవేళ (deleted == 0)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    ఒకవేళ (command == DOBUF_UNLOAD)
 		STRCPY(IObuff, _(e_no_buffers_were_unloaded));
-	    else if (command == DOBUF_DEL)
+	    లేకపోతే ఒకవేళ (command == DOBUF_DEL)
 		STRCPY(IObuff, _(e_no_buffers_were_deleted));
-	    else
-		STRCPY(IObuff, _(e_no_buffers_were_wiped_out));
-	    errormsg = (char *)IObuff;
+	    లేకపోతే
+		STRCPY(IObuff, _(e_no_buffers_were_wiped_బహిర్గతం));
+	    errormsg = (అక్షరం *)IObuff;
 	}
-	else if (deleted >= p_report)
+	లేకపోతే ఒకవేళ (deleted >= p_report)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    ఒకవేళ (command == DOBUF_UNLOAD)
 		smsg(NGETTEXT("%d buffer unloaded",
 			    "%d buffers unloaded", deleted), deleted);
-	    else if (command == DOBUF_DEL)
+	    లేకపోతే ఒకవేళ (command == DOBUF_DEL)
 		smsg(NGETTEXT("%d buffer deleted",
 			    "%d buffers deleted", deleted), deleted);
-	    else
+	    లేకపోతే
 		smsg(NGETTEXT("%d buffer wiped out",
 			    "%d buffers wiped out", deleted), deleted);
 	}
     }
 
-    return errormsg;
+    తిరిగి errormsg;
 }
 
 /*
@@ -1873,21 +1873,21 @@ do_bufdel(
  * DOBUF_WIPE	    wipe it out
  * DOBUF_WIPE_REUSE wipe it out and add to "buf_reuse"
  */
-    void
-set_curbuf(buf_T *buf, int action)
+    శూన్య
+సమితి_curbuf(buf_T *buf, పూర్ణాంకం action)
 {
     buf_T	*prevbuf;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    పూర్ణాంకం		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-#ifdef FEAT_SYN_HL
-    long	old_tw = curbuf->b_p_tw;
-#endif
+#నిర్వచితమైతే FEAT_SYN_HL
+    దీర్ఘ	old_tw = curbuf->b_p_tw;
+#అయితే_ముగింపు
     bufref_T	newbufref;
     bufref_T	prevbufref;
-    int		valid;
+    పూర్ణాంకం		valid;
 
     setpcmark();
-    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    ఒకవేళ ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = curbuf->b_fnum; // remember alternate file
     buflist_altfpos(curwin);			 // remember curpos
 
@@ -1896,41 +1896,41 @@ set_curbuf(buf_T *buf, int action)
 
     // close_windows() or apply_autocmds() may change curbuf and wipe out "buf"
     prevbuf = curbuf;
-    set_bufref(&prevbufref, prevbuf);
-    set_bufref(&newbufref, buf);
+    సమితి_bufref(&prevbufref, prevbuf);
+    సమితి_bufref(&newbufref, buf);
 
     // Autocommands may delete the current buffer and/or the buffer we want to
     // go to.  In those cases don't close the buffer.
-    if (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
+    ఒకవేళ (!apply_autocmds(EVENT_BUFLEAVE, ఖాళీ, ఖాళీ, FALSE, curbuf)
 	    || (bufref_valid(&prevbufref)
 		&& bufref_valid(&newbufref)
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		&& !aborting()
-#endif
+#అయితే_ముగింపు
 	       ))
     {
-#ifdef FEAT_SYN_HL
-	if (prevbuf == curwin->w_buffer)
+#నిర్వచితమైతే FEAT_SYN_HL
+	ఒకవేళ (prevbuf == curwin->w_బఫరు)
 	    reset_synblock(curwin);
-#endif
-	if (unload)
+#అయితే_ముగింపు
+	ఒకవేళ (unload)
 	    close_windows(prevbuf, FALSE);
-#if defined(FEAT_EVAL)
-	if (bufref_valid(&prevbufref) && !aborting())
-#else
-	if (bufref_valid(&prevbufref))
-#endif
+#ఒకవేళ defined(FEAT_EVAL)
+	ఒకవేళ (bufref_valid(&prevbufref) && !aborting())
+#లేకపోతే
+	ఒకవేళ (bufref_valid(&prevbufref))
+#అయితే_ముగింపు
 	{
 	    // Do not sync when in Insert mode and the buffer is open in
 	    // another window, might be a timer doing something in another
 	    // window.
-	    if (prevbuf == curbuf
-		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
+	    ఒకవేళ (prevbuf == curbuf
+		    && ((State & బహుళకం_చొప్పించు) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
-	    close_buffer(curwin, prevbuf,
+	    close_బఫరు(curwin, prevbuf,
 		    unload ? action : (action == DOBUF_GOTO
 			&& !buf_hide(prevbuf)
-			&& !bufIsChanged(prevbuf)) ? DOBUF_UNLOAD : 0,
+			&& !buf_Is_మారింది(prevbuf)) ? DOBUF_UNLOAD : 0,
 		    FALSE, FALSE, TRUE);
 	}
     }
@@ -1938,22 +1938,22 @@ set_curbuf(buf_T *buf, int action)
     // it did ":bunload") or aborted the script processing.
     // If curwin->w_buffer is null, enter_buffer() will make it valid again
     valid = buf_valid(buf);
-    if ((valid && buf != curbuf
-#ifdef FEAT_EVAL
+    ఒకవేళ ((valid && buf != curbuf
+#నిర్వచితమైతే FEAT_EVAL
 		&& !aborting()
-#endif
-	) || curwin->w_buffer == NULL)
+#అయితే_ముగింపు
+	) || curwin->w_బఫరు == ఖాళీ)
     {
 	// If the buffer is not valid but curwin->w_buffer is NULL we must
 	// enter some buffer.  Using the last one is hopefully OK.
-	if (!valid)
-	    enter_buffer(lastbuf);
-	else
-	    enter_buffer(buf);
-#ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
-#endif
+	ఒకవేళ (!valid)
+	    enter_బఫరు(lastbuf);
+	లేకపోతే
+	    enter_బఫరు(buf);
+#నిర్వచితమైతే FEAT_SYN_HL
+	ఒకవేళ (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(ఖాళీ, curwin);
+#అయితే_ముగింపు
     }
 }
 
@@ -1962,170 +1962,170 @@ set_curbuf(buf_T *buf, int action)
  * Old curbuf must have been abandoned already!  This also means "curbuf" may
  * be pointing to freed memory.
  */
-    static void
-enter_buffer(buf_T *buf)
+    స్థిర శూన్య
+enter_బఫరు(buf_T *buf)
 {
     // Stop Visual mode before changing curbuf.  May trigger TextYankPost, but
     // with textlock set.  Assumes curbuf and curwin->w_buffer is valid; if not,
     // buf_freeall() should've done this already!
-    if (VIsual_active
-#if defined(EXITFREE)
+    ఒకవేళ (VIsual_చురుకైన
+#ఒకవేళ defined(EXITFREE)
 	    && !entered_free_all_mem
-#endif
+#అయితే_ముగింపు
 	    )
-	end_visual_mode();
+	చివర_visual_బహుళకం();
 
-    if (curwin->w_buffer != NULL)
-	--curwin->w_buffer->b_nwindows;
+    ఒకవేళ (curwin->w_బఫరు != ఖాళీ)
+	--curwin->w_బఫరు->b_nwindows;
 
     // Get the buffer in the current window.
-    curwin->w_buffer = buf;
+    curwin->w_బఫరు = buf;
     curbuf = buf;
     ++curbuf->b_nwindows;
 
     // Copy buffer and window local option values.  Not for a help buffer.
     buf_copy_options(buf, BCO_ENTER | BCO_NOHELP);
-    if (!buf->b_help)
+    ఒకవేళ (!buf->b_help)
 	get_winopts(buf);
-#ifdef FEAT_FOLDING
-    else
+#నిర్వచితమైతే FEAT_FOLDING
+    లేకపోతే
 	// Remove all folds in the window.
 	clearFolding(curwin);
     foldUpdateAll(curwin);	// update folds (later).
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_DIFF
-    if (curwin->w_p_diff)
-	diff_buf_add(curbuf);
-#endif
+#నిర్వచితమైతే FEAT_DIFF
+    ఒకవేళ (curwin->w_p_diff)
+	diff_buf_కూడు(curbuf);
+#అయితే_ముగింపు
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     curwin->w_s = &(curbuf->b_s);
-#endif
+#అయితే_ముగింపు
 
     // Cursor on first line by default.
     curwin->w_cursor.lnum = 1;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
     curwin->w_cursor.coladd = 0;
-    curwin->w_set_curswant = true;
-    curwin->w_topline_was_set = false;
+    curwin->w_సమితి_curswant = true;
+    curwin->w_topline_was_సమితి = false;
 
     // mark cursor position as being invalid
     curwin->w_valid = 0;
 
     // Make sure the buffer is loaded.
-    if (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
+    ఒకవేళ (curbuf->b_ml.ml_mfp == ఖాళీ)	// need to load the file
     {
 	// If there is no filetype, allow for detecting one.  Esp. useful for
 	// ":ball" used in an autocommand.  If there already is a filetype we
 	// might prefer to keep it.
-	if (*curbuf->b_p_ft == NUL)
+	ఒకవేళ (*curbuf->b_p_ft == NUL)
 	    curbuf->b_did_filetype = false;
 
-	open_buffer(FALSE, NULL, 0);
+	open_బఫరు(FALSE, ఖాళీ, 0);
     }
-    else
+    లేకపోతే
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	ఒకవేళ (!సందేశం_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
-	(void)buf_check_timestamp(curbuf, FALSE);
+	(శూన్య)buf_check_timestamp(curbuf, FALSE);
 
 	curwin->w_topline = 1;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	curwin->w_topfill = 0;
-#endif
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, NULL, FALSE, curbuf);
+#అయితే_ముగింపు
+	apply_autocmds(EVENT_BUFENTER, ఖాళీ, ఖాళీ, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, ఖాళీ, ఖాళీ, FALSE, curbuf);
     }
 
     // If autocommands did not change the cursor position, restore cursor lnum
     // and possibly cursor col.
-    if (curwin->w_cursor.lnum == 1 && inindent(0))
+    ఒకవేళ (curwin->w_cursor.lnum == 1 && inindent(0))
 	buflist_getfpos();
 
     check_arg_idx(curwin);		// check for valid arg_idx
     maketitle();
 	// when autocmds didn't change it
-    if (curwin->w_topline == 1 && !curwin->w_topline_was_set)
+    ఒకవేళ (curwin->w_topline == 1 && !curwin->w_topline_was_సమితి)
 	scroll_cursor_halfway(FALSE, FALSE);	// redisplay at correct position
 
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     // Send fileOpened event because we've changed buffers.
     netbeans_file_activated(curbuf);
-#endif
+#అయితే_ముగింపు
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
 
-#ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
-	(void)keymap_init();
-#endif
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_KEYMAP
+    ఒకవేళ (curbuf->b_kmap_state & KEYMAP_INIT)
+	(శూన్య)keymap_init();
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SPELL
     // May need to set the spell language.  Can only do this after the buffer
     // has been properly setup.
-    if (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
-	(void)parse_spelllang(curwin);
-#endif
-#ifdef FEAT_VIMINFO
-    curbuf->b_last_used = vim_time();
-#endif
+    ఒకవేళ (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+	(శూన్య)parse_spelllang(curwin);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_VIMINFO
+    curbuf->b_చివరి_వాడిన = vim_సమయం();
+#అయితే_ముగింపు
 
     redraw_later(UPD_NOT_VALID);
 }
 
-#if defined(FEAT_AUTOCHDIR)
+#ఒకవేళ defined(FEAT_AUTOCHDIR)
 /*
  * Change to the directory of the current buffer.
  * Don't do this while still starting up.
  */
-    void
-do_autochdir(void)
+    శూన్య
+do_autochdir(శూన్య)
 {
-    if ((starting == 0 || test_autochdir)
-	    && curbuf->b_ffname != NULL
+    ఒకవేళ ((starting == 0 || test_autochdir)
+	    && curbuf->b_ffname != ఖాళీ
 	    && vim_chdirfile(curbuf->b_ffname, "auto") == OK)
     {
 	shorten_fnames(TRUE);
-	last_chdir_reason = "autochdir";
+	చివరి_chdir_reason = "autochdir";
     }
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-no_write_message_buf(buf_T *buf)
+    శూన్య
+no_write_సందేశం_buf(buf_T *buf)
 {
-#ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
-	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
-#endif
-	semsg(_(e_no_write_since_last_change_for_buffer_nr_add_bang_to_override),
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (పదం_పని_running(buf->b_పదం))
+	emsg(_(e_పని_still_running_కూడు_bang_గమ్యం_చివర_the_పని));
+    లేకపోతే
+#అయితే_ముగింపు
+	semsg(_(e_no_write_since_చివరి_change_for_బఫరు_nr_కూడు_bang_గమ్యం_override),
 		buf->b_fnum);
 }
 
-    void
-no_write_message(void)
+    శూన్య
+no_write_సందేశం(శూన్య)
 {
-#ifdef FEAT_TERMINAL
-    if (term_job_running(curbuf->b_term))
-	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
-#endif
-	emsg(_(e_no_write_since_last_change_add_bang_to_override));
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (పదం_పని_running(curbuf->b_పదం))
+	emsg(_(e_పని_still_running_కూడు_bang_గమ్యం_చివర_the_పని));
+    లేకపోతే
+#అయితే_ముగింపు
+	emsg(_(e_no_write_since_చివరి_change_కూడు_bang_గమ్యం_override));
 }
 
-    void
-no_write_message_nobang(buf_T *buf UNUSED)
+    శూన్య
+no_write_సందేశం_nobang(buf_T *buf వాడని)
 {
-#ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
-	emsg(_(e_job_still_running));
-    else
-#endif
-	emsg(_(e_no_write_since_last_change));
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (పదం_పని_running(buf->b_పదం))
+	emsg(_(e_పని_still_running));
+    లేకపోతే
+#అయితే_ముగింపు
+	emsg(_(e_no_write_since_చివరి_change));
 }
 
 /*
@@ -2136,15 +2136,15 @@ no_write_message_nobang(buf_T *buf UNUSED)
  * Return TRUE if the current buffer is empty, unnamed, unmodified and used in
  * only one window.  That means it can be re-used.
  */
-    int
-curbuf_reusable(void)
+    పూర్ణాంకం
+curbuf_reusable(శూన్య)
 {
-    return (curbuf != NULL
-	&& curbuf->b_ffname == NULL
+    తిరిగి (curbuf != ఖాళీ
+	&& curbuf->b_ffname == ఖాళీ
 	&& curbuf->b_nwindows <= 1
-	&& (curbuf->b_ml.ml_mfp == NULL || BUFEMPTY())
+	&& (curbuf->b_ml.ml_mfp == ఖాళీ || BUFEMPTY())
 	&& !bt_quickfix(curbuf)
-	&& !curbufIsChanged());
+	&& !curbuf_Is_మారింది());
 }
 
 /*
@@ -2165,16 +2165,16 @@ buflist_new(
     char_u	*ffname_arg,	// full path of fname or relative
     char_u	*sfname_arg,	// short fname or NULL
     linenr_T	lnum,		// preferred cursor line
-    int		flags)		// BLN_ defines
+    పూర్ణాంకం		flags)		// BLN_ defines
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
     buf_T	*buf;
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     stat_T	st;
-#endif
+#అయితే_ముగింపు
 
-    if (top_file_num == 1)
+    ఒకవేళ (శిఖరం_file_అంకె == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2182,44 +2182,44 @@ buflist_new(
     /*
      * If the file name already exists in the list, update the entry.
      */
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     // On Unix we can use inode numbers when the file exists.  Works better
     // for hard links.
-    if (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
+    ఒకవేళ (sfname == ఖాళీ || mch_stat((అక్షరం *)sfname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-#endif
-    if (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
-#ifdef UNIX
+#అయితే_ముగింపు
+    ఒకవేళ (ffname != ఖాళీ && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
+#నిర్వచితమైతే UNIX
 		buflist_findname_stat(ffname, &st)
-#else
+#లేకపోతే
 		buflist_findname(ffname)
-#endif
-		) != NULL)
+#అయితే_ముగింపు
+		) != ఖాళీ)
     {
 	vim_free(ffname);
-	if (lnum != 0)
-	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? NULL : curwin,
+	ఒకవేళ (lnum != 0)
+	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? ఖాళీ : curwin,
 						      lnum, (colnr_T)0, FALSE);
 
-	if ((flags & BLN_NOOPT) == 0)
+	ఒకవేళ ((flags & BLN_NOOPT) == 0)
 	    // copy the options now, if 'cpo' doesn't have 's' and not done
 	    // already
 	    buf_copy_options(buf, 0);
 
-	if ((flags & BLN_LISTED) && !buf->b_p_bl)
+	ఒకవేళ ((flags & BLN_LISTED) && !buf->b_p_bl)
 	{
 	    bufref_T bufref;
 
 	    buf->b_p_bl = TRUE;
-	    set_bufref(&bufref, buf);
-	    if (!(flags & BLN_DUMMY))
+	    సమితి_bufref(&bufref, buf);
+	    ఒకవేళ (!(flags & BLN_DUMMY))
 	    {
-		if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+		ఒకవేళ (apply_autocmds(EVENT_BUFADD, ఖాళీ, ఖాళీ, FALSE, buf)
 			&& !bufref_valid(&bufref))
-		    return NULL;
+		    తిరిగి ఖాళీ;
 	    }
 	}
-	return buf;
+	తిరిగి buf;
     }
 
     /*
@@ -2230,50 +2230,50 @@ buflist_new(
      * (A spell file buffer is allocated in spell.c, but that's not a normal
      * buffer.)
      */
-    buf = NULL;
-    if ((flags & BLN_CURBUF) && curbuf_reusable())
+    buf = ఖాళీ;
+    ఒకవేళ ((flags & BLN_CURBUF) && curbuf_reusable())
     {
 	bufref_T bufref;
 
 	buf = curbuf;
-	set_bufref(&bufref, buf);
+	సమితి_bufref(&bufref, buf);
 	trigger_undo_ftplugin(buf, curwin);
 	// It's like this buffer is deleted.  Watch out for autocommands that
 	// change curbuf!  If that happens, allocate a new buffer anyway.
 	buf_freeall(buf, BFA_WIPE | BFA_DEL);
-#ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (aborting())		// autocmds may abort script processing
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-#endif
-	if (!bufref_valid(&bufref))
-	    buf = NULL;		// buf was deleted; allocate a new buffer
+#అయితే_ముగింపు
+	ఒకవేళ (!bufref_valid(&bufref))
+	    buf = ఖాళీ;		// buf was deleted; allocate a new buffer
     }
-    if (buf != curbuf || curbuf == NULL)
+    ఒకవేళ (buf != curbuf || curbuf == ఖాళీ)
     {
 	buf = ALLOC_CLEAR_ONE(buf_T);
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// init b: variables
 	buf->b_vars = dict_alloc_id(aid_newbuf_bvars);
-	if (buf->b_vars == NULL)
+	ఒకవేళ (buf->b_vars == ఖాళీ)
 	{
 	    vim_free(ffname);
 	    vim_free(buf);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	init_var_dict(buf->b_vars, &buf->b_bufvar, VAR_SCOPE);
-#endif
+#అయితే_ముగింపు
 	init_changedtick(buf);
     }
 
-    if (ffname != NULL)
+    ఒకవేళ (ffname != ఖాళీ)
     {
 	buf->b_ffname = ffname;
 	buf->b_sfname = vim_strsave(sfname);
@@ -2282,88 +2282,88 @@ buflist_new(
     clear_wininfo(buf);
     buf->b_wininfo = ALLOC_CLEAR_ONE(wininfo_T);
 
-    if ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
-	    || buf->b_wininfo == NULL)
+    ఒకవేళ ((ffname != ఖాళీ && (buf->b_ffname == ఖాళీ || buf->b_sfname == ఖాళీ))
+	    || buf->b_wininfo == ఖాళీ)
     {
-	if (buf->b_sfname != buf->b_ffname)
+	ఒకవేళ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	లేకపోతే
+	    buf->b_sfname = ఖాళీ;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf != curbuf)
-	    free_buffer(buf);
-	return NULL;
+	ఒకవేళ (buf != curbuf)
+	    free_బఫరు(buf);
+	తిరిగి ఖాళీ;
     }
 
-    if (buf == curbuf)
+    ఒకవేళ (buf == curbuf)
     {
-	free_buffer_stuff(buf, FALSE);	// delete local variables et al.
+	free_బఫరు_stuff(buf, FALSE);	// delete local variables et al.
 
 	// Init the options.
 	buf->b_p_initialized = false;
 	buf_copy_options(buf, BCO_ENTER);
 
-#ifdef FEAT_KEYMAP
+#నిర్వచితమైతే FEAT_KEYMAP
 	// need to reload lmaps and set b:keymap_name
 	curbuf->b_kmap_state |= KEYMAP_INIT;
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
 	// put the new buffer at the end of the buffer list
-	buf->b_next = NULL;
-	if (firstbuf == NULL)		// buffer list is empty
+	buf->b_తదుపరి = ఖాళీ;
+	ఒకవేళ (firstbuf == ఖాళీ)		// buffer list is empty
 	{
-	    buf->b_prev = NULL;
+	    buf->b_prev = ఖాళీ;
 	    firstbuf = buf;
 	}
-	else				// append new buffer at end of list
+	లేకపోతే				// append new buffer at end of list
 	{
-	    lastbuf->b_next = buf;
+	    lastbuf->b_తదుపరి = buf;
 	    buf->b_prev = lastbuf;
 	}
 	lastbuf = buf;
 
-	if ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
+	ఒకవేళ ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
 	{
 	    // Recycle a previously used buffer number.  Used for buffers which
 	    // are normally hidden, e.g. in a popup window.  Avoids that the
 	    // buffer number grows rapidly.
 	    --buf_reuse.ga_len;
-	    buf->b_fnum = ((int *)buf_reuse.ga_data)[buf_reuse.ga_len];
+	    buf->b_fnum = ((పూర్ణాంకం *)buf_reuse.ga_దత్తాంశం)[buf_reuse.ga_len];
 
 	    // Move buffer to the right place in the buffer list.
-	    while (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
+	    అయితే (buf->b_prev != ఖాళీ && buf->b_fnum < buf->b_prev->b_fnum)
 	    {
 		buf_T	*prev = buf->b_prev;
 
-		prev->b_next = buf->b_next;
-		if (prev->b_next != NULL)
-		    prev->b_next->b_prev = prev;
-		buf->b_next = prev;
+		prev->b_తదుపరి = buf->b_తదుపరి;
+		ఒకవేళ (prev->b_తదుపరి != ఖాళీ)
+		    prev->b_తదుపరి->b_prev = prev;
+		buf->b_తదుపరి = prev;
 		buf->b_prev = prev->b_prev;
-		if (buf->b_prev != NULL)
-		    buf->b_prev->b_next = buf;
+		ఒకవేళ (buf->b_prev != ఖాళీ)
+		    buf->b_prev->b_తదుపరి = buf;
 		prev->b_prev = buf;
-		if (lastbuf == buf)
+		ఒకవేళ (lastbuf == buf)
 		    lastbuf = prev;
-		if (firstbuf == prev)
+		ఒకవేళ (firstbuf == prev)
 		    firstbuf = buf;
 	    }
 	}
-	else
-	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	లేకపోతే
+	    buf->b_fnum = శిఖరం_file_అంకె++;
+	ఒకవేళ (శిఖరం_file_అంకె < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
-	    if (emsg_silent == 0 && !in_assert_fails)
+	    ఒకవేళ (emsg_silent == 0 && !లోపల_assert_fails)
 	    {
-		out_flush();
+		బహిర్గతం_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
 	    }
-	    top_file_num = 1;
+	    శిఖరం_file_అంకె = 1;
 	}
-	buf_hashtab_add(buf);
+	buf_hashtab_కూడు(buf);
 
 	// Always copy the options from the current buffer.
 	buf_copy_options(buf, BCO_ALWAYS);
@@ -2372,54 +2372,54 @@ buflist_new(
     buf->b_wininfo->wi_fpos.lnum = lnum;
     buf->b_wininfo->wi_win = curwin;
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     hash_init(&buf->b_s.b_keywtab);
     hash_init(&buf->b_s.b_keywtab_ic);
-#endif
+#అయితే_ముగింపు
 
     buf->b_fname = buf->b_sfname;
-#ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+#నిర్వచితమైతే UNIX
+    ఒకవేళ (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    లేకపోతే
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-#endif
+#అయితే_ముగింపు
     buf->b_u_synced = true;
     buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
-    if (flags & BLN_DUMMY)
+    ఒకవేళ (flags & BLN_DUMMY)
 	buf->b_flags |= BF_DUMMY;
     buf_clear_file(buf);
     clrallmarks(buf);			// clear marks
-    fmarks_check_names(buf);		// check file marks for this file
+    fmarks_check_పేర్లు(buf);		// check file marks for this file
     buf->b_p_bl = (flags & BLN_LISTED) ? TRUE : FALSE;	// init 'buflisted'
-    if (!(flags & BLN_DUMMY))
+    ఒకవేళ (!(flags & BLN_DUMMY))
     {
 	bufref_T bufref;
 
 	// Tricky: these autocommands may change the buffer list.  They could
 	// also split the window with re-using the one empty buffer. This may
 	// result in unexpectedly losing the empty buffer.
-	set_bufref(&bufref, buf);
-	if (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
+	సమితి_bufref(&bufref, buf);
+	ఒకవేళ (apply_autocmds(EVENT_BUFNEW, ఖాళీ, ఖాళీ, FALSE, buf)
 		&& !bufref_valid(&bufref))
-	    return NULL;
-	if (flags & BLN_LISTED)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (flags & BLN_LISTED)
 	{
-	    if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+	    ఒకవేళ (apply_autocmds(EVENT_BUFADD, ఖాళీ, ఖాళీ, FALSE, buf)
 		    && !bufref_valid(&bufref))
-		return NULL;
+		తిరిగి ఖాళీ;
 	}
-#ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
-	    return NULL;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (aborting())		// autocmds may abort script processing
+	    తిరిగి ఖాళీ;
+#అయితే_ముగింపు
     }
 
-    return buf;
+    తిరిగి buf;
 }
 
 /*
@@ -2427,79 +2427,79 @@ buflist_new(
  * If "free_p_ff" is TRUE also free 'fileformat', 'buftype' and
  * 'fileencoding'.
  */
-    void
+    శూన్య
 free_buf_options(
     buf_T	*buf,
-    int		free_p_ff)
+    పూర్ణాంకం		free_p_ff)
 {
-    if (free_p_ff)
+    ఒకవేళ (free_p_ff)
     {
 	clear_string_option(&buf->b_p_fenc);
 	clear_string_option(&buf->b_p_ff);
 	clear_string_option(&buf->b_p_bh);
 	clear_string_option(&buf->b_p_bt);
     }
-#ifdef FEAT_FIND_ID
+#నిర్వచితమైతే FEAT_కనుగొను_ID
     clear_string_option(&buf->b_p_def);
     clear_string_option(&buf->b_p_inc);
 # ifdef FEAT_EVAL
     clear_string_option(&buf->b_p_inex);
 # endif
-#endif
-#if defined(FEAT_EVAL)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_inde);
     clear_string_option(&buf->b_p_indk);
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_bexpr);
-#endif
-#if defined(FEAT_CRYPT)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_CRYPT)
     clear_string_option(&buf->b_p_cm);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_fex);
-#endif
-#ifdef FEAT_CRYPT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
-			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
-	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
+    ఒకవేళ (buf->b_p_కీలకం != ఖాళీ && *buf->b_p_కీలకం != NUL
+			   && crypt_పద్ధతి_is_sodium(crypt_get_పద్ధతి_nr(buf)))
+	crypt_sodium_munlock(buf->b_p_కీలకం, STRLEN(buf->b_p_కీలకం));
 # endif
-    clear_string_option(&buf->b_p_key);
-#endif
+    clear_string_option(&buf->b_p_కీలకం);
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_kp);
     clear_string_option(&buf->b_p_mps);
     clear_string_option(&buf->b_p_fo);
     clear_string_option(&buf->b_p_flp);
     clear_string_option(&buf->b_p_isk);
-#ifdef FEAT_VARTABS
+#నిర్వచితమైతే FEAT_VARTABS
     clear_string_option(&buf->b_p_vsts);
     VIM_CLEAR(buf->b_p_vsts_nopaste);
     VIM_CLEAR(buf->b_p_vsts_array);
     clear_string_option(&buf->b_p_vts);
     VIM_CLEAR(buf->b_p_vts_array);
-#endif
-#ifdef FEAT_KEYMAP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_KEYMAP
     clear_string_option(&buf->b_p_keymap);
     keymap_clear(&buf->b_kmap_ga);
     ga_clear(&buf->b_kmap_ga);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_com);
     clear_string_option(&buf->b_p_cms);
     clear_string_option(&buf->b_p_nf);
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     clear_string_option(&buf->b_p_syn);
     clear_string_option(&buf->b_s.b_syn_isk);
-#endif
-#ifdef FEAT_SPELL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SPELL
     clear_string_option(&buf->b_s.b_p_spc);
     clear_string_option(&buf->b_s.b_p_spf);
     vim_regfree(buf->b_s.b_cap_prog);
-    buf->b_s.b_cap_prog = NULL;
+    buf->b_s.b_cap_prog = ఖాళీ;
     clear_string_option(&buf->b_s.b_p_spl);
     clear_string_option(&buf->b_s.b_p_spo);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_sua);
     clear_string_option(&buf->b_p_ft);
     clear_string_option(&buf->b_p_cink);
@@ -2509,46 +2509,46 @@ free_buf_options(
     clear_string_option(&buf->b_p_cinw);
     clear_string_option(&buf->b_p_cot);
     clear_string_option(&buf->b_p_cpt);
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
     clear_string_option(&buf->b_p_csl);
-#endif
-#ifdef FEAT_COMPL_FUNC
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_COMPL_FUNC
     clear_string_option(&buf->b_p_cfu);
     free_callback(&buf->b_cfu_cb);
     clear_string_option(&buf->b_p_ofu);
     free_callback(&buf->b_ofu_cb);
     clear_string_option(&buf->b_p_tsrfu);
     free_callback(&buf->b_tsrfu_cb);
-    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_count);
-    buf->b_p_cpt_count = 0;
-#endif
-#ifdef FEAT_QUICKFIX
+    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_లెక్క);
+    buf->b_p_cpt_లెక్క = 0;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_QUICKFIX
     clear_string_option(&buf->b_p_gefm);
     clear_string_option(&buf->b_p_gp);
     clear_string_option(&buf->b_p_mp);
     clear_string_option(&buf->b_p_efm);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_ep);
-    clear_string_option(&buf->b_p_path);
-    clear_string_option(&buf->b_p_tags);
+    clear_string_option(&buf->b_p_మార్గం);
+    clear_string_option(&buf->b_p_ట్యాగులు);
     clear_string_option(&buf->b_p_tc);
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     clear_string_option(&buf->b_p_tfu);
     free_callback(&buf->b_tfu_cb);
     clear_string_option(&buf->b_p_ffu);
     free_callback(&buf->b_ffu_cb);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_dict);
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     clear_string_option(&buf->b_p_dia);
-#endif
+#అయితే_ముగింపు
     clear_string_option(&buf->b_p_tsr);
     clear_string_option(&buf->b_p_qe);
     buf->b_p_ac = -1;
     buf->b_p_ar = -1;
-#ifdef HAVE_FSYNC
+#నిర్వచితమైతే HAVE_FSYNC
     buf->b_p_fs = -1;
-#endif
+#అయితే_ముగింపు
     buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
     clear_string_option(&buf->b_p_lw);
     clear_string_option(&buf->b_p_bkc);
@@ -2565,90 +2565,90 @@ free_buf_options(
  *
  * Return FAIL for failure, OK for success.
  */
-    int
+    పూర్ణాంకం
 buflist_getfile(
-    int		n,
+    పూర్ణాంకం		n,
     linenr_T	lnum,
-    int		options,
-    int		forceit)
+    పూర్ణాంకం		options,
+    పూర్ణాంకం		forceit)
 {
     buf_T	*buf;
-    win_T	*wp = NULL;
+    win_T	*wp = ఖాళీ;
     pos_T	*fpos;
-    colnr_T	col;
+    colnr_T	నిలువు;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
-	if ((options & GETF_ALT) && n == 0)
+	ఒకవేళ ((options & GETF_ALT) && n == 0)
 	    emsg(_(e_no_alternate_file));
-	else
-	    semsg(_(e_buffer_nr_not_found), n);
-	return FAIL;
+	లేకపోతే
+	    semsg(_(e_బఫరు_nr_not_దొరికింది), n);
+	తిరిగి FAIL;
     }
 
     // if alternate file is the current buffer, nothing to do
-    if (buf == curbuf)
-	return OK;
+    ఒకవేళ (buf == curbuf)
+	తిరిగి OK;
 
-    if (text_or_buf_locked())
-	return FAIL;
+    ఒకవేళ (పాఠ్యం_or_buf_locked())
+	తిరిగి FAIL;
 
     // altfpos may be changed by getfile(), get it now
-    if (lnum == 0)
+    ఒకవేళ (lnum == 0)
     {
 	fpos = buflist_findfpos(buf);
 	lnum = fpos->lnum;
-	col = fpos->col;
+	నిలువు = fpos->నిలువు;
     }
-    else
-	col = 0;
+    లేకపోతే
+	నిలువు = 0;
 
-    if (options & GETF_SWITCH)
+    ఒకవేళ (options & GETF_SWITCH)
     {
 	// If 'switchbuf' is set jump to the window containing "buf".
 	wp = swbuf_goto_win_with_buf(buf);
 
 	// If 'switchbuf' contains "split", "vsplit" or "newtab" and the
 	// current buffer isn't empty: open new tab or window
-	if (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
+	ఒకవేళ (wp == ఖాళీ && (swb_flags & (SWB_VSPLIT | SWB_విభజించు | SWB_NEWTAB))
 							       && !BUFEMPTY())
 	{
-	    if (swb_flags & SWB_NEWTAB)
+	    ఒకవేళ (swb_flags & SWB_NEWTAB)
 		tabpage_new();
-	    else if (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
+	    లేకపోతే ఒకవేళ (win_విభజించు(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
 								      == FAIL)
-		return FAIL;
+		తిరిగి FAIL;
 	    RESET_BINDING(curwin);
 	}
     }
 
     ++RedrawingDisabled;
-    int retval = FAIL;
-    if (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
+    పూర్ణాంకం retval = FAIL;
+    ఒకవేళ (GETFILE_SUCCESS(getfile(buf->b_fnum, ఖాళీ, ఖాళీ,
 				     (options & GETF_SETMARK), lnum, forceit)))
     {
 	// cursor is at to BOL and w_cursor.lnum is checked due to getfile()
-	if (!p_sol && col != 0)
+	ఒకవేళ (!p_sol && నిలువు != 0)
 	{
-	    curwin->w_cursor.col = col;
-	    check_cursor_col();
+	    curwin->w_cursor.నిలువు = నిలువు;
+	    check_cursor_నిలువు();
 	    curwin->w_cursor.coladd = 0;
-	    curwin->w_set_curswant = true;
+	    curwin->w_సమితి_curswant = true;
 	}
 	retval = OK;
     }
 
-    if (RedrawingDisabled > 0)
+    ఒకవేళ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * go to the last know line number for the current buffer
  */
-    static void
-buflist_getfpos(void)
+    స్థిర శూన్య
+buflist_getfpos(శూన్య)
 {
     pos_T	*fpos;
 
@@ -2657,14 +2657,14 @@ buflist_getfpos(void)
     curwin->w_cursor.lnum = fpos->lnum;
     check_cursor_lnum();
 
-    if (p_sol)
-	curwin->w_cursor.col = 0;
-    else
+    ఒకవేళ (p_sol)
+	curwin->w_cursor.నిలువు = 0;
+    లేకపోతే
     {
-	curwin->w_cursor.col = fpos->col;
-	check_cursor_col();
+	curwin->w_cursor.నిలువు = fpos->నిలువు;
+	check_cursor_నిలువు();
 	curwin->w_cursor.coladd = 0;
-	curwin->w_set_curswant = true;
+	curwin->w_సమితి_curswant = true;
     }
 }
 
@@ -2676,22 +2676,22 @@ buflist_getfpos(void)
 buflist_findname_exp(char_u *fname)
 {
     char_u	*ffname;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
 
     // First make the name into a full path name
-    ffname = FullName_save(fname,
-#ifdef UNIX
+    ffname = నిండిన_Name_save(fname,
+#నిర్వచితమైతే UNIX
 	    TRUE	    // force expansion, get rid of symbolic links
-#else
+#లేకపోతే
 	    FALSE
-#endif
+#అయితే_ముగింపు
 	    );
-    if (ffname != NULL)
+    ఒకవేళ (ffname != ఖాళీ)
     {
 	buf = buflist_findname(ffname);
 	vim_free(ffname);
     }
-    return buf;
+    తిరిగి buf;
 }
 
 /*
@@ -2703,12 +2703,12 @@ buflist_findname_exp(char_u *fname)
     buf_T *
 buflist_findname(char_u *ffname)
 {
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     stat_T	st;
 
-    if (mch_stat((char *)ffname, &st) < 0)
+    ఒకవేళ (mch_stat((అక్షరం *)ffname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-    return buflist_findname_stat(ffname, &st);
+    తిరిగి buflist_findname_stat(ffname, &st);
 }
 
 /*
@@ -2716,23 +2716,23 @@ buflist_findname(char_u *ffname)
  * twice for the same file.
  * Returns NULL if not found.
  */
-    static buf_T *
+    స్థిర buf_T *
 buflist_findname_stat(
     char_u	*ffname,
     stat_T	*stp)
 {
-#endif
+#అయితే_ముగింపు
     buf_T	*buf;
 
     // Start at the last buffer, expect to find a match sooner.
-    FOR_ALL_BUFS_FROM_LAST(buf)
-	if ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
-#ifdef UNIX
+    FOR_ALL_BUFS_FROM_చివరి(buf)
+	ఒకవేళ ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
+#నిర్వచితమైతే UNIX
 		    , stp
-#endif
+#అయితే_ముగింపు
 		    ))
-	    return buf;
-    return NULL;
+	    తిరిగి buf;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -2740,36 +2740,36 @@ buflist_findname_stat(
  * Return fnum of the found buffer.
  * Return < 0 for error.
  */
-    int
+    పూర్ణాంకం
 buflist_findpat(
-    char_u	*pattern,
-    char_u	*pattern_end,	// pointer to first char after pattern
-    int		unlisted,	// find unlisted buffers
-    int		diffmode UNUSED, // find diff-mode buffers only
-    int		curtab_only)	// find buffers in current tab only
+    char_u	*నమూనా,
+    char_u	*నమూనా_చివర,	// pointer to first char after pattern
+    పూర్ణాంకం		unlisted,	// find unlisted buffers
+    పూర్ణాంకం		diffmode వాడని, // find diff-mode buffers only
+    పూర్ణాంకం		curtab_only)	// find buffers in current tab only
 {
     buf_T	*buf;
-    int		match = -1;
-    int		find_listed;
+    పూర్ణాంకం		సరిపోలిక = -1;
+    పూర్ణాంకం		కనుగొను_listed;
     char_u	*pat;
     char_u	*patend;
-    int		attempt;
+    పూర్ణాంకం		attempt;
     char_u	*p;
-    int		toggledollar;
+    పూర్ణాంకం		toggledollar;
 
     // "%" is current file, "%%" or "#" is alternate file
-    if ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
-	    || (in_vim9script() && pattern_end == pattern + 2
-				    && pattern[0] == '%' && pattern[1] == '%'))
+    ఒకవేళ ((నమూనా_చివర == నమూనా + 1 && (*నమూనా == '%' || *నమూనా == '#'))
+	    || (లోపల_vim9script() && నమూనా_చివర == నమూనా + 2
+				    && నమూనా[0] == '%' && నమూనా[1] == '%'))
     {
-	if (*pattern == '#' || pattern_end == pattern + 2)
-	    match = curwin->w_alt_fnum;
-	else
-	    match = curbuf->b_fnum;
-#ifdef FEAT_DIFF
-	if (diffmode && !diff_mode_buf(buflist_findnr(match)))
-	    match = -1;
-#endif
+	ఒకవేళ (*నమూనా == '#' || నమూనా_చివర == నమూనా + 2)
+	    సరిపోలిక = curwin->w_alt_fnum;
+	లేకపోతే
+	    సరిపోలిక = curbuf->b_fnum;
+#నిర్వచితమైతే FEAT_DIFF
+	ఒకవేళ (diffmode && !diff_బహుళకం_buf(buflist_findnr(సరిపోలిక)))
+	    సరిపోలిక = -1;
+#అయితే_ముగింపు
     }
 
     /*
@@ -2781,328 +2781,328 @@ buflist_findpat(
      * Repeat this for finding an unlisted buffer if there was no matching
      * listed buffer.
      */
-    else
+    లేకపోతే
     {
-	pat = file_pat_to_reg_pat(pattern, pattern_end, NULL, FALSE);
-	if (pat == NULL)
-	    return -1;
+	pat = file_pat_గమ్యం_reg_pat(నమూనా, నమూనా_చివర, ఖాళీ, FALSE);
+	ఒకవేళ (pat == ఖాళీ)
+	    తిరిగి -1;
 	patend = pat + STRLEN(pat) - 1;
 	toggledollar = (patend > pat && *patend == '$');
 
 	// First try finding a listed buffer.  If not found and "unlisted"
 	// is TRUE, try finding an unlisted buffer.
-	find_listed = TRUE;
-	for (;;)
+	కనుగొను_listed = TRUE;
+	కొరకు (;;)
 	{
-	    for (attempt = 0; attempt <= 3; ++attempt)
+	    కొరకు (attempt = 0; attempt <= 3; ++attempt)
 	    {
 		regmatch_T	regmatch;
 
 		// may add '^' and '$'
-		if (toggledollar)
+		ఒకవేళ (toggledollar)
 		    *patend = (attempt < 2) ? NUL : '$'; // add/remove '$'
 		p = pat;
-		if (*p == '^' && !(attempt & 1))	 // add/remove '^'
+		ఒకవేళ (*p == '^' && !(attempt & 1))	 // add/remove '^'
 		    ++p;
 		regmatch.regprog = vim_regcomp(p, magic_isset() ? RE_MAGIC : 0);
 
-		FOR_ALL_BUFS_FROM_LAST(buf)
+		FOR_ALL_BUFS_FROM_చివరి(buf)
 		{
-		    if (regmatch.regprog == NULL)
+		    ఒకవేళ (regmatch.regprog == ఖాళీ)
 		    {
 			// invalid pattern, possibly after switching engine
 			vim_free(pat);
-			return -1;
+			తిరిగి -1;
 		    }
-		    if (buf->b_p_bl == find_listed
-#ifdef FEAT_DIFF
-			    && (!diffmode || diff_mode_buf(buf))
-#endif
-			    && buflist_match(&regmatch, buf, FALSE) != NULL)
+		    ఒకవేళ (buf->b_p_bl == కనుగొను_listed
+#నిర్వచితమైతే FEAT_DIFF
+			    && (!diffmode || diff_బహుళకం_buf(buf))
+#అయితే_ముగింపు
+			    && buflist_సరిపోలిక(&regmatch, buf, FALSE) != ఖాళీ)
 		    {
-			if (curtab_only)
+			ఒకవేళ (curtab_only)
 			{
 			    // Ignore the match if the buffer is not open in
 			    // the current tab.
 			    win_T	*wp;
 
 			    FOR_ALL_WINDOWS(wp)
-				if (wp->w_buffer == buf)
-				    break;
-			    if (wp == NULL)
-				continue;
+				ఒకవేళ (wp->w_బఫరు == buf)
+				    ఆపు;
+			    ఒకవేళ (wp == ఖాళీ)
+				కొనసాగు;
 			}
-			if (match >= 0)		// already found a match
+			ఒకవేళ (సరిపోలిక >= 0)		// already found a match
 			{
-			    match = -2;
-			    break;
+			    సరిపోలిక = -2;
+			    ఆపు;
 			}
-			match = buf->b_fnum;	// remember first match
+			సరిపోలిక = buf->b_fnum;	// remember first match
 		    }
 		}
 
 		vim_regfree(regmatch.regprog);
-		if (match >= 0)			// found one match
-		    break;
+		ఒకవేళ (సరిపోలిక >= 0)			// found one match
+		    ఆపు;
 	    }
 
 	    // Only search for unlisted buffers if there was no match with
 	    // a listed buffer.
-	    if (!unlisted || !find_listed || match != -1)
-		break;
-	    find_listed = FALSE;
+	    ఒకవేళ (!unlisted || !కనుగొను_listed || సరిపోలిక != -1)
+		ఆపు;
+	    కనుగొను_listed = FALSE;
 	}
 
 	vim_free(pat);
     }
 
-    if (match == -2)
-	semsg(_(e_more_than_one_match_for_str), pattern);
-    else if (match < 0)
-	semsg(_(e_no_matching_buffer_for_str), pattern);
-    return match;
+    ఒకవేళ (సరిపోలిక == -2)
+	semsg(_(e_మరిన్ని_than_one_సరిపోలిక_for_str), నమూనా);
+    లేకపోతే ఒకవేళ (సరిపోలిక < 0)
+	semsg(_(e_no_matching_బఫరు_for_str), నమూనా);
+    తిరిగి సరిపోలిక;
 }
 
-#ifdef FEAT_VIMINFO
-typedef struct {
+#నిర్వచితమైతే FEAT_VIMINFO
+రకనిర్వచనం నిర్మాణం {
     buf_T   *buf;
-    char_u  *match;
+    char_u  *సరిపోలిక;
 } bufmatch_T;
-#endif
+#అయితే_ముగింపు
 
 /*
  * Find all buffer names that match.
  * For command line expansion of ":buf" and ":sbuf".
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    పూర్ణాంకం
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    పూర్ణాంకం		*అంకె_file,
     char_u	***file,
-    int		options)
+    పూర్ణాంకం		options)
 {
-    int		count;
+    పూర్ణాంకం		లెక్క;
     buf_T	*buf;
-    int		round;
+    పూర్ణాంకం		విడత;
     char_u	*p;
-    char_u	*patc = NULL;
-#ifdef FEAT_VIMINFO
-    bufmatch_T	*matches = NULL;
-#endif
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    char_u	*patc = ఖాళీ;
+#నిర్వచితమైతే FEAT_VIMINFO
+    bufmatch_T	*matches = ఖాళీ;
+#అయితే_ముగింపు
+    పూర్ణాంకం		fuzzy;
+    fuzmatch_str_T  *fuzmatch = ఖాళీ;
     regmatch_T	regmatch;
-    int		score = 0;
-    int		to_free = FALSE;
+    పూర్ణాంకం		score = 0;
+    పూర్ణాంకం		గమ్యం_free = FALSE;
 
-    *num_file = 0;		    // return values in case of FAIL
-    *file = NULL;
+    *అంకె_file = 0;		    // return values in case of FAIL
+    *file = ఖాళీ;
 
-#ifdef FEAT_DIFF
-    if ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
-	return FAIL;
-#endif
+#నిర్వచితమైతే FEAT_DIFF
+    ఒకవేళ ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
+	తిరిగి FAIL;
+#అయితే_ముగింపు
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     // Make a copy of "pat" and change "^" to "\(^\|[\/]\)" (if doing regular
     // expression matching)
-    if (!fuzzy)
+    ఒకవేళ (!fuzzy)
     {
-	if (*pat == '^' && pat[1] != NUL)
+	ఒకవేళ (*pat == '^' && pat[1] != NUL)
 	{
-	    int  len = (int)STRLEN(pat);
+	    పూర్ణాంకం  len = (పూర్ణాంకం)STRLEN(pat);
 	    patc = alloc(len);
-	    if (patc == NULL)
-		return FAIL;
+	    ఒకవేళ (patc == ఖాళీ)
+		తిరిగి FAIL;
 	    STRNCPY(patc, pat + 1, len - 1);
 	    patc[len - 1] = NUL;
-	    to_free = TRUE;
+	    గమ్యం_free = TRUE;
 	}
-	else if (*pat == '^')
+	లేకపోతే ఒకవేళ (*pat == '^')
 	    patc = (char_u *)"";
-	else
+	లేకపోతే
 	    patc = pat;
 	regmatch.regprog = vim_regcomp(patc, RE_MAGIC);
     }
 
     // round == 1: Count the matches.
     // round == 2: Build the array to keep the matches.
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
-	count = 0;
+	లెక్క = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (!buf->b_p_bl)	// skip unlisted buffers
-		continue;
-#ifdef FEAT_DIFF
-	    if (options & BUF_DIFF_FILTER)
+	    ఒకవేళ (!buf->b_p_bl)	// skip unlisted buffers
+		కొనసాగు;
+#నిర్వచితమైతే FEAT_DIFF
+	    ఒకవేళ (options & BUF_DIFF_FILTER)
 		// Skip buffers not suitable for
 		// :diffget or :diffput completion.
-		if (buf == curbuf || !diff_mode_buf(buf))
-		    continue;
-#endif
+		ఒకవేళ (buf == curbuf || !diff_బహుళకం_buf(buf))
+		    కొనసాగు;
+#అయితే_ముగింపు
 
-	    if (!fuzzy)
+	    ఒకవేళ (!fuzzy)
 	    {
-		if (regmatch.regprog == NULL)
+		ఒకవేళ (regmatch.regprog == ఖాళీ)
 		{
 		    // invalid pattern, possibly after recompiling
-		    if (to_free)
+		    ఒకవేళ (గమ్యం_free)
 			vim_free(patc);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
-		p = buflist_match(&regmatch, buf, p_wic);
+		p = buflist_సరిపోలిక(&regmatch, buf, p_wic);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		p = NULL;
+		p = ఖాళీ;
 		// first try matching with the short file name
-		if ((score = fuzzy_match_str(buf->b_sfname, pat))
+		ఒకవేళ ((score = fuzzy_సరిపోలిక_str(buf->b_sfname, pat))
 			!= FUZZY_SCORE_NONE)
 		    p = buf->b_sfname;
-		if (p == NULL)
+		ఒకవేళ (p == ఖాళీ)
 		{
 		    // next try matching with the full path file name
-		    if ((score = fuzzy_match_str(buf->b_ffname, pat))
+		    ఒకవేళ ((score = fuzzy_సరిపోలిక_str(buf->b_ffname, pat))
 			    != FUZZY_SCORE_NONE)
 			p = buf->b_ffname;
 		}
 	    }
 
-	    if (p == NULL)
-		continue;
+	    ఒకవేళ (p == ఖాళీ)
+		కొనసాగు;
 
-	    if (round == 1)
+	    ఒకవేళ (విడత == 1)
 	    {
-		++count;
-		continue;
+		++లెక్క;
+		కొనసాగు;
 	    }
 
-	    if (options & WILD_HOME_REPLACE)
+	    ఒకవేళ (options & WILD_HOME_REPLACE)
 		p = home_replace_save(buf, p);
-	    else
+	    లేకపోతే
 		p = vim_strsave(p);
-	    if (p == NULL)
+	    ఒకవేళ (p == ఖాళీ)
 	    {
-		if (fuzzy && round == 2)
-		    fuzmatch_str_free(fuzmatch, count);
-		return FAIL;
+		ఒకవేళ (fuzzy && విడత == 2)
+		    fuzmatch_str_free(fuzmatch, లెక్క);
+		తిరిగి FAIL;
 	    }
 
-	    if (!fuzzy)
+	    ఒకవేళ (!fuzzy)
 	    {
-#ifdef FEAT_VIMINFO
-		if (matches != NULL)
+#నిర్వచితమైతే FEAT_VIMINFO
+		ఒకవేళ (matches != ఖాళీ)
 		{
-		    matches[count].buf = buf;
-		    matches[count].match = p;
-		    count++;
+		    matches[లెక్క].buf = buf;
+		    matches[లెక్క].సరిపోలిక = p;
+		    లెక్క++;
 		}
-		else
-#endif
-		    (*file)[count++] = p;
+		లేకపోతే
+#అయితే_ముగింపు
+		    (*file)[లెక్క++] = p;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		fuzmatch[count].idx = count;
-		fuzmatch[count].str = p;
-		fuzmatch[count].score = score;
-		count++;
+		fuzmatch[లెక్క].idx = లెక్క;
+		fuzmatch[లెక్క].str = p;
+		fuzmatch[లెక్క].score = score;
+		లెక్క++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
-	    break;
-	if (round == 1)
+	ఒకవేళ (లెక్క == 0)	// no match found, break here
+	    ఆపు;
+	ఒకవేళ (విడత == 1)
 	{
-	    if (!fuzzy)
+	    ఒకవేళ (!fuzzy)
 	    {
-		*file = ALLOC_MULT(char_u *, count);
-		if (*file == NULL)
+		*file = ALLOC_MULT(char_u *, లెక్క);
+		ఒకవేళ (*file == ఖాళీ)
 		{
 		    vim_regfree(regmatch.regprog);
-		    if (to_free)
+		    ఒకవేళ (గమ్యం_free)
 			vim_free(patc);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
-#ifdef FEAT_VIMINFO
-		if (options & WILD_BUFLASTUSED)
-		    matches = ALLOC_MULT(bufmatch_T, count);
-#endif
+#నిర్వచితమైతే FEAT_VIMINFO
+		ఒకవేళ (options & WILD_BUFLASTUSED)
+		    matches = ALLOC_MULT(bufmatch_T, లెక్క);
+#అయితే_ముగింపు
 	    }
-	    else
+	    లేకపోతే
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, లెక్క);
+		ఒకవేళ (fuzmatch == ఖాళీ)
 		{
-		    *num_file = 0;
-		    *file = NULL;
-		    return FAIL;
+		    *అంకె_file = 0;
+		    *file = ఖాళీ;
+		    తిరిగి FAIL;
 		}
 	    }
 	}
     }
 
-    if (!fuzzy)
+    ఒకవేళ (!fuzzy)
     {
 	vim_regfree(regmatch.regprog);
-	if (to_free)
+	ఒకవేళ (గమ్యం_free)
 	    vim_free(patc);
     }
 
-    if (!fuzzy)
+    ఒకవేళ (!fuzzy)
     {
-#ifdef FEAT_VIMINFO
-	if (matches != NULL)
+#నిర్వచితమైతే FEAT_VIMINFO
+	ఒకవేళ (matches != ఖాళీ)
 	{
-	    int i;
-	    if (count > 1)
-		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
+	    పూర్ణాంకం i;
+	    ఒకవేళ (లెక్క > 1)
+		qsort(matches, లెక్క, పరిమాణం(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
-	    if (matches[0].buf == curbuf)
+	    ఒకవేళ (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
-		    (*file)[i-1] = matches[i].match;
-		(*file)[count-1] = matches[0].match;
+		కొరకు (i = 1; i < లెక్క; i++)
+		    (*file)[i-1] = matches[i].సరిపోలిక;
+		(*file)[లెక్క-1] = matches[0].సరిపోలిక;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		for (i = 0; i < count; i++)
-		    (*file)[i] = matches[i].match;
+		కొరకు (i = 0; i < లెక్క; i++)
+		    (*file)[i] = matches[i].సరిపోలిక;
 	    }
 	    vim_free(matches);
 	}
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
-	    return FAIL;
+	ఒకవేళ (fuzzymatches_గమ్యం_strmatches(fuzmatch, file, లెక్క, FALSE) == FAIL)
+	    తిరిగి FAIL;
     }
 
-    *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    *అంకె_file = లెక్క;
+    తిరిగి (లెక్క == 0 ? FAIL : OK);
 }
 
 /*
  * Check for a match on the file name for buffer "buf" with regprog "prog".
  * Note that rmp->regprog may become NULL when switching regexp engine.
  */
-    static char_u *
-buflist_match(
+    స్థిర char_u *
+buflist_సరిపోలిక(
     regmatch_T	*rmp,
     buf_T	*buf,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    పూర్ణాంకం		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
-    char_u	*match;
+    char_u	*సరిపోలిక;
 
     // First try the short file name, then the long file name.
-    match = fname_match(rmp, buf->b_sfname, ignore_case);
-    if (match == NULL && rmp->regprog != NULL)
-	match = fname_match(rmp, buf->b_ffname, ignore_case);
+    సరిపోలిక = fname_సరిపోలిక(rmp, buf->b_sfname, ignore_case);
+    ఒకవేళ (సరిపోలిక == ఖాళీ && rmp->regprog != ఖాళీ)
+	సరిపోలిక = fname_సరిపోలిక(rmp, buf->b_ffname, ignore_case);
 
-    return match;
+    తిరిగి సరిపోలిక;
 }
 
 /*
@@ -3110,53 +3110,53 @@ buflist_match(
  * Note that rmp->regprog may become NULL when switching regexp engine.
  * Return "name" when there is a match, NULL when not.
  */
-    static char_u *
-fname_match(
+    స్థిర char_u *
+fname_సరిపోలిక(
     regmatch_T	*rmp,
     char_u	*name,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    పూర్ణాంకం		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
-    char_u	*match = NULL;
+    char_u	*సరిపోలిక = ఖాళీ;
     char_u	*p;
 
     // extra check for valid arguments
-    if (name == NULL || rmp->regprog == NULL)
-	return NULL;
+    ఒకవేళ (name == ఖాళీ || rmp->regprog == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Ignore case when 'fileignorecase' or the argument is set.
     rmp->rm_ic = p_fic || ignore_case;
-    if (vim_regexec(rmp, name, (colnr_T)0))
-	match = name;
-    else if (rmp->regprog != NULL)
+    ఒకవేళ (vim_regexec(rmp, name, (colnr_T)0))
+	సరిపోలిక = name;
+    లేకపోతే ఒకవేళ (rmp->regprog != ఖాళీ)
     {
 	// Replace $(HOME) with '~' and try matching again.
-	p = home_replace_save(NULL, name);
-	if (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
-	    match = name;
+	p = home_replace_save(ఖాళీ, name);
+	ఒకవేళ (p != ఖాళీ && vim_regexec(rmp, p, (colnr_T)0))
+	    సరిపోలిక = name;
 	vim_free(p);
     }
 
-    return match;
+    తిరిగి సరిపోలిక;
 }
 
 /*
  * Find a file in the buffer list by buffer number.
  */
     buf_T *
-buflist_findnr(int nr)
+buflist_findnr(పూర్ణాంకం nr)
 {
-    char_u	key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	కీలకం[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
-    if (nr == 0)
+    ఒకవేళ (nr == 0)
 	nr = curwin->w_alt_fnum;
-    vim_snprintf((char *)key, sizeof(key), "%x", nr);
-    hi = hash_find(&buf_hashtab, key);
+    vim_snprintf((అక్షరం *)కీలకం, పరిమాణం(కీలకం), "%x", nr);
+    hi = hash_కనుగొను(&buf_hashtab, కీలకం);
 
-    if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
-			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
-    return NULL;
+    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
+	తిరిగి (buf_T *)(hi->hi_కీలకం
+			     - ((గుర్తులేని)(curbuf->b_కీలకం - (char_u *)curbuf)));
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -3167,16 +3167,16 @@ buflist_findnr(int nr)
  */
     char_u *
 buflist_nr2name(
-    int		n,
-    int		fullname,
-    int		helptail)	// for help buffers return tail only
+    పూర్ణాంకం		n,
+    పూర్ణాంకం		fullname,
+    పూర్ణాంకం		helptail)	// for help buffers return tail only
 {
     buf_T	*buf;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
-	return NULL;
-    return home_replace_save(helptail ? buf : NULL,
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి home_replace_save(helptail ? buf : ఖాళీ,
 				     fullname ? buf->b_ffname : buf->b_fname);
 }
 
@@ -3185,93 +3185,93 @@ buflist_nr2name(
  * When "copy_options" is TRUE save the local window option values.
  * When "lnum" is 0 only do the options.
  */
-    void
+    శూన్య
 buflist_setfpos(
     buf_T	*buf,
     win_T	*win,		// may be NULL when using :badd
     linenr_T	lnum,
-    colnr_T	col,
-    int		copy_options)
+    colnr_T	నిలువు,
+    పూర్ణాంకం		copy_options)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == win)
-	    break;
-    if (wip == NULL)
+	ఒకవేళ (wip->wi_win == win)
+	    ఆపు;
+    ఒకవేళ (wip == ఖాళీ)
     {
 	// allocate a new entry
 	wip = ALLOC_CLEAR_ONE(wininfo_T);
-	if (wip == NULL)
-	    return;
+	ఒకవేళ (wip == ఖాళీ)
+	    తిరిగి;
 	wip->wi_win = win;
-	if (lnum == 0)		// set lnum even when it's 0
+	ఒకవేళ (lnum == 0)		// set lnum even when it's 0
 	    lnum = 1;
     }
-    else
+    లేకపోతే
     {
 	// remove the entry from the list
-	if (wip->wi_prev)
-	    wip->wi_prev->wi_next = wip->wi_next;
-	else
-	    buf->b_wininfo = wip->wi_next;
-	if (wip->wi_next)
-	    wip->wi_next->wi_prev = wip->wi_prev;
-	if (copy_options && wip->wi_optset)
+	ఒకవేళ (wip->wi_prev)
+	    wip->wi_prev->wi_తదుపరి = wip->wi_తదుపరి;
+	లేకపోతే
+	    buf->b_wininfo = wip->wi_తదుపరి;
+	ఒకవేళ (wip->wi_తదుపరి)
+	    wip->wi_తదుపరి->wi_prev = wip->wi_prev;
+	ఒకవేళ (copy_options && wip->wi_optset)
 	{
 	    clear_winopt(&wip->wi_opt);
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	    deleteFoldRecurse(&wip->wi_folds);
-#endif
+#అయితే_ముగింపు
 	}
     }
-    if (lnum != 0)
+    ఒకవేళ (lnum != 0)
     {
 	wip->wi_fpos.lnum = lnum;
-	wip->wi_fpos.col = col;
+	wip->wi_fpos.నిలువు = నిలువు;
     }
-    if (win != NULL)
+    ఒకవేళ (win != ఖాళీ)
 	wip->wi_changelistidx = win->w_changelistidx;
-    if (copy_options && win != NULL)
+    ఒకవేళ (copy_options && win != ఖాళీ)
     {
 	// Save the window-specific option values.
 	copy_winopt(&win->w_onebuf_opt, &wip->wi_opt);
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	wip->wi_fold_manual = win->w_fold_manual;
 	cloneFoldGrowArray(&win->w_folds, &wip->wi_folds);
-#endif
+#అయితే_ముగింపు
 	wip->wi_optset = TRUE;
     }
 
     // insert the entry in front of the list
-    wip->wi_next = buf->b_wininfo;
+    wip->wi_తదుపరి = buf->b_wininfo;
     buf->b_wininfo = wip;
-    wip->wi_prev = NULL;
-    if (wip->wi_next)
-	wip->wi_next->wi_prev = wip;
+    wip->wi_prev = ఖాళీ;
+    ఒకవేళ (wip->wi_తదుపరి)
+	wip->wi_తదుపరి->wi_prev = wip;
 }
 
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 /*
  * Return TRUE when "wip" has 'diff' set and the diff is only for another tab
  * page.  That's because a diff is local to a tab page.
  */
-    static int
+    స్థిర పూర్ణాంకం
 wininfo_other_tab_diff(wininfo_T *wip)
 {
     win_T	*wp;
 
-    if (!wip->wi_opt.wo_diff)
-	return FALSE;
+    ఒకవేళ (!wip->wi_opt.wo_diff)
+	తిరిగి FALSE;
 
     FOR_ALL_WINDOWS(wp)
 	// return FALSE when it's a window in the current tab page, thus
 	// the buffer was in diff mode here
-	if (wip->wi_win == wp)
-	    return FALSE;
-    return TRUE;
+	ఒకవేళ (wip->wi_win == wp)
+	    తిరిగి FALSE;
+    తిరిగి TRUE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Find info for the current window in buffer "buf".
@@ -3281,45 +3281,45 @@ wininfo_other_tab_diff(wininfo_T *wip)
  * another tab page.
  * Returns NULL when there isn't any info.
  */
-    static wininfo_T *
-find_wininfo(
+    స్థిర wininfo_T *
+కనుగొను_wininfo(
     buf_T	*buf,
-    int		need_options,
-    int		skip_diff_buffer UNUSED)
+    పూర్ణాంకం		need_options,
+    పూర్ణాంకం		skip_diff_బఫరు వాడని)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == curwin
-#ifdef FEAT_DIFF
-		&& (!skip_diff_buffer || !wininfo_other_tab_diff(wip))
-#endif
+	ఒకవేళ (wip->wi_win == curwin
+#నిర్వచితమైతే FEAT_DIFF
+		&& (!skip_diff_బఫరు || !wininfo_other_tab_diff(wip))
+#అయితే_ముగింపు
 
 		&& (!need_options || wip->wi_optset))
-	    break;
+	    ఆపు;
 
-    if (wip != NULL)
-	return wip;
+    ఒకవేళ (wip != ఖాళీ)
+	తిరిగి wip;
 
     // If no wininfo for curwin, use the first in the list (that doesn't have
     // 'diff' set and is in another tab page).
     // If "need_options" is TRUE skip entries that don't have options set,
     // unless the window is editing "buf", so we can copy from the window
     // itself.
-#ifdef FEAT_DIFF
-    if (skip_diff_buffer)
+#నిర్వచితమైతే FEAT_DIFF
+    ఒకవేళ (skip_diff_బఫరు)
     {
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (!wininfo_other_tab_diff(wip)
+	    ఒకవేళ (!wininfo_other_tab_diff(wip)
 		    && (!need_options || wip->wi_optset
-			|| (wip->wi_win != NULL
-			    && wip->wi_win->w_buffer == buf)))
-		break;
+			|| (wip->wi_win != ఖాళీ
+			    && wip->wi_win->w_బఫరు == buf)))
+		ఆపు;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	wip = buf->b_wininfo;
-    return wip;
+    తిరిగి wip;
 }
 
 /*
@@ -3328,73 +3328,73 @@ find_wininfo(
  * the most recently used window.  If the values were never set, use the
  * global values for the window.
  */
-    void
+    శూన్య
 get_winopts(buf_T *buf)
 {
     wininfo_T	*wip;
 
     clear_winopt(&curwin->w_onebuf_opt);
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     clearFolding(curwin);
-#endif
+#అయితే_ముగింపు
 
-    wip = find_wininfo(buf, TRUE, TRUE);
-    if (wip != NULL && wip->wi_win != NULL
-	    && wip->wi_win != curwin && wip->wi_win->w_buffer == buf)
+    wip = కనుగొను_wininfo(buf, TRUE, TRUE);
+    ఒకవేళ (wip != ఖాళీ && wip->wi_win != ఖాళీ
+	    && wip->wi_win != curwin && wip->wi_win->w_బఫరు == buf)
     {
 	// The buffer is currently displayed in the window: use the actual
 	// option values instead of the saved (possibly outdated) values.
 	win_T *wp = wip->wi_win;
 
 	copy_winopt(&wp->w_onebuf_opt, &curwin->w_onebuf_opt);
-#ifdef FEAT_STL_OPT
+#నిర్వచితమైతే FEAT_STL_OPT
 	// w_stl_rendered_height is not in winvar_T; copy it explicitly.
-	curwin->w_stl_rendered_height = wp->w_stl_rendered_height;
-#endif
-#ifdef FEAT_FOLDING
+	curwin->w_stl_rendered_ఎత్తు = wp->w_stl_rendered_ఎత్తు;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_FOLDING
 	curwin->w_fold_manual = wp->w_fold_manual;
 	curwin->w_foldinvalid = true;
 	cloneFoldGrowArray(&wp->w_folds, &curwin->w_folds);
-#endif
+#అయితే_ముగింపు
     }
-    else if (wip != NULL && wip->wi_optset)
+    లేకపోతే ఒకవేళ (wip != ఖాళీ && wip->wi_optset)
     {
 	// the buffer was displayed in the current window earlier
 	copy_winopt(&wip->wi_opt, &curwin->w_onebuf_opt);
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	curwin->w_fold_manual = wip->wi_fold_manual;
 	curwin->w_foldinvalid = true;
 	cloneFoldGrowArray(&wip->wi_folds, &curwin->w_folds);
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
 	copy_winopt(&curwin->w_allbuf_opt, &curwin->w_onebuf_opt);
-    if (wip != NULL)
+    ఒకవేళ (wip != ఖాళీ)
 	curwin->w_changelistidx = wip->wi_changelistidx;
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-    if (p_fdls >= 0)
+    ఒకవేళ (p_fdls >= 0)
 	curwin->w_p_fdl = p_fdls;
-#endif
-#ifdef FEAT_STL_OPT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_STL_OPT
     // Update rendered height for window-local 'statusline'.
-    if (*curwin->w_p_stl != NUL)
-	update_stl_rendered_height(curwin);
+    ఒకవేళ (*curwin->w_p_stl != NUL)
+	update_stl_rendered_ఎత్తు(curwin);
     // If the effective statuslineopt changed, re-adjust all window heights.
-    if (curwin->w_status_height > 0
-	    && curwin->w_status_height != statusline_height(curwin))
+    ఒకవేళ (curwin->w_స్థితి_ఎత్తు > 0
+	    && curwin->w_స్థితి_ఎత్తు != statusline_ఎత్తు(curwin))
     {
-	frame_change_statusline_height();
+	చట్రం_change_statusline_ఎత్తు();
 	// win_split_ins() estimated the new window's stlh from the splitting
 	// window, which may differ from the actual stlh after option
 	// inheritance is resolved here.  frame_change_statusline_height()
 	// redistributes space within the stale fr_height values set during the
 	// split, so the content rows may be unequal.  Re-equalize if needed.
-	if (p_ea)
+	ఒకవేళ (p_ea)
 	    win_equal(curwin, TRUE, 'v');
     }
-#endif
+#అయితే_ముగింపు
     after_copy_winopt(curwin);
 }
 
@@ -3407,13 +3407,13 @@ get_winopts(buf_T *buf)
 buflist_findfpos(buf_T *buf)
 {
     wininfo_T	*wip;
-    static pos_T no_position = {1, 0, 0};
+    స్థిర pos_T no_position = {1, 0, 0};
 
-    wip = find_wininfo(buf, FALSE, FALSE);
-    if (wip != NULL)
-	return &(wip->wi_fpos);
-    else
-	return &no_position;
+    wip = కనుగొను_wininfo(buf, FALSE, FALSE);
+    ఒకవేళ (wip != ఖాళీ)
+	తిరిగి &(wip->wi_fpos);
+    లేకపోతే
+	తిరిగి &no_position;
 }
 
 /*
@@ -3422,143 +3422,143 @@ buflist_findfpos(buf_T *buf)
     linenr_T
 buflist_findlnum(buf_T *buf)
 {
-    return buflist_findfpos(buf)->lnum;
+    తిరిగి buflist_findfpos(buf)->lnum;
 }
 
 /*
  * List all known file names (for :files and :buffers command).
  */
-    void
+    శూన్య
 buflist_list(exarg_T *eap)
 {
     buf_T	*buf = firstbuf;
-    int		len;
-    int		i;
-    int		ro_char;
-    int		changed_char;
-#ifdef FEAT_TERMINAL
-    int		job_running;
-    int		job_none_open;
-#endif
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		ro_char;
+    పూర్ణాంకం		మారింది_char;
+#నిర్వచితమైతే FEAT_TERMINAL
+    పూర్ణాంకం		పని_running;
+    పూర్ణాంకం		పని_none_open;
+#అయితే_ముగింపు
 
-#ifdef FEAT_VIMINFO
+#నిర్వచితమైతే FEAT_VIMINFO
     garray_T	buflist;
-    buf_T	**buflist_data = NULL, **p;
+    buf_T	**buflist_దత్తాంశం = ఖాళీ, **p;
 
-    if (vim_strchr(eap->arg, 't'))
+    ఒకవేళ (vim_strchr(eap->arg, 't'))
     {
-	ga_init2(&buflist, sizeof(buf_T *), 50);
+	ga_init2(&buflist, పరిమాణం(buf_T *), 50);
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (ga_grow(&buflist, 1) == OK)
-		((buf_T **)buflist.ga_data)[buflist.ga_len++] = buf;
+	    ఒకవేళ (ga_grow(&buflist, 1) == OK)
+		((buf_T **)buflist.ga_దత్తాంశం)[buflist.ga_len++] = buf;
 	}
 
-	qsort(buflist.ga_data, (size_t)buflist.ga_len,
-		sizeof(buf_T *), buf_compare);
+	qsort(buflist.ga_దత్తాంశం, (size_t)buflist.ga_len,
+		పరిమాణం(buf_T *), buf_compare);
 
-	buflist_data = (buf_T **)buflist.ga_data;
-	buf = *buflist_data;
+	buflist_దత్తాంశం = (buf_T **)buflist.ga_దత్తాంశం;
+	buf = *buflist_దత్తాంశం;
     }
-    p = buflist_data;
+    p = buflist_దత్తాంశం;
 
-    for (; buf != NULL && !got_int; buf = buflist_data != NULL
-	    ? (++p < buflist_data + buflist.ga_len ? *p : NULL)
-	    : buf->b_next)
-#else
-    for (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
-#endif
+    కొరకు (; buf != ఖాళీ && !got_int; buf = buflist_దత్తాంశం != ఖాళీ
+	    ? (++p < buflist_దత్తాంశం + buflist.ga_len ? *p : ఖాళీ)
+	    : buf->b_తదుపరి)
+#లేకపోతే
+    కొరకు (buf = firstbuf; buf != ఖాళీ && !got_int; buf = buf->b_తదుపరి)
+#అయితే_ముగింపు
     {
 	char_u	*name;
 
-#ifdef FEAT_TERMINAL
-	job_running = term_job_running(buf->b_term);
-	job_none_open = term_none_open(buf->b_term);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+	పని_running = పదం_పని_running(buf->b_పదం);
+	పని_none_open = పదం_none_open(buf->b_పదం);
+#అయితే_ముగింపు
 	// skip unlisted buffers, unless ! was used
-	if ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
+	ఒకవేళ ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
 		|| (vim_strchr(eap->arg, 'u') && buf->b_p_bl)
 		|| (vim_strchr(eap->arg, '+')
-			&& ((buf->b_flags & BF_READERR) || !bufIsChanged(buf)))
+			&& ((buf->b_flags & BF_READERR) || !buf_Is_మారింది(buf)))
 		|| (vim_strchr(eap->arg, 'a')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows == 0))
+			&& (buf->b_ml.ml_mfp == ఖాళీ || buf->b_nwindows == 0))
 		|| (vim_strchr(eap->arg, 'h')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows != 0))
-#ifdef FEAT_TERMINAL
+			&& (buf->b_ml.ml_mfp == ఖాళీ || buf->b_nwindows != 0))
+#నిర్వచితమైతే FEAT_TERMINAL
 		|| (vim_strchr(eap->arg, 'R')
-			&& (!job_running || (job_running && job_none_open)))
+			&& (!పని_running || (పని_running && పని_none_open)))
 		|| (vim_strchr(eap->arg, '?')
-			&& (!job_running || (job_running && !job_none_open)))
+			&& (!పని_running || (పని_running && !పని_none_open)))
 		|| (vim_strchr(eap->arg, 'F')
-			&& (job_running || buf->b_term == NULL))
-#endif
+			&& (పని_running || buf->b_పదం == ఖాళీ))
+#అయితే_ముగింపు
 		|| (vim_strchr(eap->arg, '-') && buf->b_p_ma)
 		|| (vim_strchr(eap->arg, '=') && !buf->b_p_ro)
 		|| (vim_strchr(eap->arg, 'x') && !(buf->b_flags & BF_READERR))
 		|| (vim_strchr(eap->arg, '%') && buf != curbuf)
 		|| (vim_strchr(eap->arg, '#')
 		      && (buf == curbuf || curwin->w_alt_fnum != buf->b_fnum)))
-	    continue;
+	    కొనసాగు;
 	name = buf_spname(buf);
-	if (name != NULL)
+	ఒకవేళ (name != ఖాళీ)
 	    vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	else
+	లేకపోతే
 	    home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
-	if (message_filtered(NameBuff))
-	    continue;
+	ఒకవేళ (సందేశం_filtered(NameBuff))
+	    కొనసాగు;
 
-	changed_char = (buf->b_flags & BF_READERR) ? 'x'
-					     : (bufIsChanged(buf) ? '+' : ' ');
-#ifdef FEAT_TERMINAL
-	if (job_running)
+	మారింది_char = (buf->b_flags & BF_READERR) ? 'x'
+					     : (buf_Is_మారింది(buf) ? '+' : ' ');
+#నిర్వచితమైతే FEAT_TERMINAL
+	ఒకవేళ (పని_running)
 	{
-	    if (job_none_open)
+	    ఒకవేళ (పని_none_open)
 		ro_char = '?';
-	    else
+	    లేకపోతే
 		ro_char = 'R';
-	    changed_char = ' ';  // bufIsChanged() returns TRUE to avoid
+	    మారింది_char = ' ';  // bufIsChanged() returns TRUE to avoid
 				 // closing, but it's not actually changed.
 	}
-	else if (buf->b_term != NULL)
+	లేకపోతే ఒకవేళ (buf->b_పదం != ఖాళీ)
 	    ro_char = 'F';
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
-	msg_putchar('\n');
-	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
+	సందేశం_putchar('\n');
+	len = (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
 		buf == curbuf ? '%' :
 			(curwin->w_alt_fnum == buf->b_fnum ? '#' : ' '),
-		buf->b_ml.ml_mfp == NULL ? ' ' :
+		buf->b_ml.ml_mfp == ఖాళీ ? ' ' :
 			(buf->b_nwindows == 0 ? 'h' : 'a'),
 		ro_char,
-		changed_char,
+		మారింది_char,
 		NameBuff);
 
 	// put "line 999" in column 40 or after the file name
 	i = 40 - vim_strsize(IObuff);
-	do
+	చేయి
 	    IObuff[len++] = ' ';
-	while (--i > 0 && len < IOSIZE - 18);
-#ifdef FEAT_VIMINFO
-	if (vim_strchr(eap->arg, 't') && buf->b_last_used)
-	    add_time(IObuff + len, (size_t)(IOSIZE - len), buf->b_last_used);
-	else
-#endif
-	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
+	అయితే (--i > 0 && len < IOSIZE - 18);
+#నిర్వచితమైతే FEAT_VIMINFO
+	ఒకవేళ (vim_strchr(eap->arg, 't') && buf->b_చివరి_వాడిన)
+	    కూడు_సమయం(IObuff + len, (size_t)(IOSIZE - len), buf->b_చివరి_వాడిన);
+	లేకపోతే
+#అయితే_ముగింపు
+	    vim_snprintf((అక్షరం *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
-					       : (long)buflist_findlnum(buf));
-	msg_outtrans(IObuff);
-	out_flush();	    // output one line at a time
+					       : (దీర్ఘ)buflist_findlnum(buf));
+	సందేశం_outtrans(IObuff);
+	బహిర్గతం_flush();	    // output one line at a time
 	ui_breakcheck();
     }
 
-#ifdef FEAT_VIMINFO
-    if (buflist_data)
+#నిర్వచితమైతే FEAT_VIMINFO
+    ఒకవేళ (buflist_దత్తాంశం)
 	ga_clear(&buflist);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -3567,22 +3567,22 @@ buflist_list(exarg_T *eap)
  * Used by insert_reg() and cmdline_paste() for '#' register.
  * Return FAIL if not found, OK for success.
  */
-    int
+    పూర్ణాంకం
 buflist_name_nr(
-    int		fnum,
+    పూర్ణాంకం		fnum,
     char_u	**fname,
     linenr_T	*lnum)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL || buf->b_fname == NULL)
-	return FAIL;
+    ఒకవేళ (buf == ఖాళీ || buf->b_fname == ఖాళీ)
+	తిరిగి FAIL;
 
     *fname = buf->b_fname;
     *lnum = buflist_findlnum(buf);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3592,127 +3592,127 @@ buflist_name_nr(
  * Returns FAIL for failure (file name already in use by other buffer)
  *	OK otherwise.
  */
-    int
+    పూర్ణాంకం
 setfname(
     buf_T	*buf,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		message)	// give message when buffer already exists
+    పూర్ణాంకం		సందేశం_2)	// give message when buffer already exists
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    buf_T	*obuf = NULL;
-#ifdef UNIX
+    buf_T	*obuf = ఖాళీ;
+#నిర్వచితమైతే UNIX
     stat_T	st;
-#endif
+#అయితే_ముగింపు
 
-    if (ffname == NULL || *ffname == NUL)
+    ఒకవేళ (ffname == ఖాళీ || *ffname == NUL)
     {
 	// Removing the name.
-	if (buf->b_sfname != buf->b_ffname)
+	ఒకవేళ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	లేకపోతే
+	    buf->b_sfname = ఖాళీ;
 	VIM_CLEAR(buf->b_ffname);
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 	st.st_dev = (dev_T)-1;
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
 	fname_expand(buf, &ffname, &sfname); // will allocate ffname
-	if (ffname == NULL)		    // out of memory
-	    return FAIL;
+	ఒకవేళ (ffname == ఖాళీ)		    // out of memory
+	    తిరిగి FAIL;
 
 	/*
 	 * If the file name is already used in another buffer:
 	 * - if the buffer is loaded, fail
 	 * - if the buffer is not loaded, delete it from the list
 	 */
-#ifdef UNIX
-	if (mch_stat((char *)ffname, &st) < 0)
+#నిర్వచితమైతే UNIX
+	ఒకవేళ (mch_stat((అక్షరం *)ffname, &st) < 0)
 	    st.st_dev = (dev_T)-1;
-#endif
-	if (!(buf->b_flags & BF_DUMMY))
-#ifdef UNIX
+#అయితే_ముగింపు
+	ఒకవేళ (!(buf->b_flags & BF_DUMMY))
+#నిర్వచితమైతే UNIX
 	    obuf = buflist_findname_stat(ffname, &st);
-#else
+#లేకపోతే
 	    obuf = buflist_findname(ffname);
-#endif
-	if (obuf != NULL && obuf != buf)
+#అయితే_ముగింపు
+	ఒకవేళ (obuf != ఖాళీ && obuf != buf)
 	{
 	    win_T	*win;
 	    tabpage_T   *tab;
-	    int		in_use = FALSE;
+	    పూర్ణాంకం		లోపల_use = FALSE;
 
 	    // during startup a window may use a buffer that is not loaded yet
 	    FOR_ALL_TAB_WINDOWS(tab, win)
-		if (win->w_buffer == obuf)
-		    in_use = TRUE;
+		ఒకవేళ (win->w_బఫరు == obuf)
+		    లోపల_use = TRUE;
 
 	    // it's loaded or used in a window, fail
-	    if (obuf->b_ml.ml_mfp != NULL || in_use)
+	    ఒకవేళ (obuf->b_ml.ml_mfp != ఖాళీ || లోపల_use)
 	    {
-		if (message)
-		    emsg(_(e_buffer_with_this_name_already_exists));
+		ఒకవేళ (సందేశం_2)
+		    emsg(_(e_బఫరు_with_this_name_already_exists));
 		vim_free(ffname);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    // delete from the list
-	    close_buffer(NULL, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	    close_బఫరు(ఖాళీ, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	}
 	sfname = vim_strsave(sfname);
-	if (ffname == NULL || sfname == NULL)
+	ఒకవేళ (ffname == ఖాళీ || sfname == ఖాళీ)
 	{
 	    vim_free(sfname);
 	    vim_free(ffname);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-#ifdef USE_FNAME_CASE
+#నిర్వచితమైతే USE_FNAME_CASE
 	fname_case(sfname, 0);    // set correct case for short file name
-#endif
-	if (buf->b_sfname != buf->b_ffname)
+#అయితే_ముగింపు
+	ఒకవేళ (buf->b_sfname != buf->b_ffname)
 	    vim_free(buf->b_sfname);
 	vim_free(buf->b_ffname);
 	buf->b_ffname = ffname;
 	buf->b_sfname = sfname;
     }
     buf->b_fname = buf->b_sfname;
-#ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+#నిర్వచితమైతే UNIX
+    ఒకవేళ (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    లేకపోతే
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-#endif
+#అయితే_ముగింపు
 
     buf->b_shortname = false;
 
-    buf_name_changed(buf);
-    return OK;
+    buf_name_మారింది(buf);
+    తిరిగి OK;
 }
 
 /*
  * Crude way of changing the name of a buffer.  Use with care!
  * The name should be relative to the current directory.
  */
-    void
-buf_set_name(int fnum, char_u *name)
+    శూన్య
+buf_సమితి_name(పూర్ణాంకం fnum, char_u *name)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    if (buf->b_sfname != buf->b_ffname)
+    ఒకవేళ (buf->b_sfname != buf->b_ffname)
 	vim_free(buf->b_sfname);
     vim_free(buf->b_ffname);
     buf->b_ffname = vim_strsave(name);
-    buf->b_sfname = NULL;
+    buf->b_sfname = ఖాళీ;
     // Allocate ffname and expand into full path.  Also resolves .lnk
     // files on Win32.
     fname_expand(buf, &buf->b_ffname, &buf->b_sfname);
@@ -3723,25 +3723,25 @@ buf_set_name(int fnum, char_u *name)
  * Take care of what needs to be done when the name of buffer "buf" has
  * changed.
  */
-    void
-buf_name_changed(buf_T *buf)
+    శూన్య
+buf_name_మారింది(buf_T *buf)
 {
     /*
      * If the file name changed, also change the name of the swapfile
      */
-    if (buf->b_ml.ml_mfp != NULL)
+    ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ)
 	ml_setname(buf);
 
-#ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL)
-	term_clear_status_text(buf->b_term);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (buf->b_పదం != ఖాళీ)
+	పదం_clear_స్థితి_పాఠ్యం(buf->b_పదం);
+#అయితే_ముగింపు
 
-    if (curwin->w_buffer == buf)
+    ఒకవేళ (curwin->w_బఫరు == buf)
 	check_arg_idx(curwin);	// check file name for arg list
     maketitle();		// set window title
-    status_redraw_all();	// status lines need to be redrawn
-    fmarks_check_names(buf);	// check named file marks
+    స్థితి_redraw_all();	// status lines need to be redrawn
+    fmarks_check_పేర్లు(buf);	// check named file marks
     ml_timestamp(buf);		// reset timestamp
 }
 
@@ -3761,9 +3761,9 @@ setaltfname(
 
     // Create a buffer.  'buflisted' is not set if it's a new buffer
     buf = buflist_new(ffname, sfname, lnum, 0);
-    if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    ఒకవేళ (buf != ఖాళీ && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = buf->b_fnum;
-    return buf;
+    తిరిగి buf;
 }
 
 /*
@@ -3772,18 +3772,18 @@ setaltfname(
  */
     char_u  *
 getaltfname(
-    int		errmsg)		// give error message
+    పూర్ణాంకం		errmsg)		// give error message
 {
     char_u	*fname;
     linenr_T	dummy;
 
-    if (buflist_name_nr(0, &fname, &dummy) == FAIL)
+    ఒకవేళ (buflist_name_nr(0, &fname, &dummy) == FAIL)
     {
-	if (errmsg)
+	ఒకవేళ (errmsg)
 	    emsg(_(e_no_alternate_file));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    return fname;
+    తిరిగి fname;
 }
 
 /*
@@ -3792,82 +3792,82 @@ getaltfname(
  *
  * used by qf_init(), main() and doarglist()
  */
-    int
-buflist_add(char_u *fname, int flags)
+    పూర్ణాంకం
+buflist_కూడు(char_u *fname, పూర్ణాంకం flags)
 {
     buf_T	*buf;
 
-    buf = buflist_new(fname, NULL, (linenr_T)0, flags);
-    if (buf != NULL)
-	return buf->b_fnum;
-    return 0;
+    buf = buflist_new(fname, ఖాళీ, (linenr_T)0, flags);
+    ఒకవేళ (buf != ఖాళీ)
+	తిరిగి buf->b_fnum;
+    తిరిగి 0;
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ఒకవేళ defined(BACKSLASH_లోపల_FILENAME)
 /*
  * Adjust slashes in file names.  Called after 'shellslash' was set.
  */
-    void
-buflist_slash_adjust(void)
+    శూన్య
+buflist_slash_adjust(శూన్య)
 {
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
-	if (bp->b_ffname != NULL)
+	ఒకవేళ (bp->b_ffname != ఖాళీ)
 	    slash_adjust(bp->b_ffname);
-	if (bp->b_sfname != NULL)
+	ఒకవేళ (bp->b_sfname != ఖాళీ)
 	    slash_adjust(bp->b_sfname);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set alternate cursor position for the current buffer and window "win".
  * Also save the local window option values.
  */
-    void
+    శూన్య
 buflist_altfpos(win_T *win)
 {
-    buflist_setfpos(curbuf, win, win->w_cursor.lnum, win->w_cursor.col, TRUE);
+    buflist_setfpos(curbuf, win, win->w_cursor.lnum, win->w_cursor.నిలువు, TRUE);
 }
 
 /*
  * Return TRUE if 'ffname' is not the same file as current file.
  * Fname must have a full path (expanded by mch_FullName()).
  */
-    int
+    పూర్ణాంకం
 otherfile(char_u *ffname)
 {
-    return otherfile_buf(curbuf, ffname
-#ifdef UNIX
-	    , NULL
-#endif
+    తిరిగి otherfile_buf(curbuf, ffname
+#నిర్వచితమైతే UNIX
+	    , ఖాళీ
+#అయితే_ముగింపు
 	    );
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 otherfile_buf(
     buf_T		*buf,
     char_u		*ffname
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     , stat_T		*stp
-#endif
+#అయితే_ముగింపు
     )
 {
     // no name is different
-    if (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
-	return TRUE;
-    if (fnamecmp(ffname, buf->b_ffname) == 0)
-	return FALSE;
-#ifdef UNIX
+    ఒకవేళ (ffname == ఖాళీ || *ffname == NUL || buf->b_ffname == ఖాళీ)
+	తిరిగి TRUE;
+    ఒకవేళ (fnamecmp(ffname, buf->b_ffname) == 0)
+	తిరిగి FALSE;
+#నిర్వచితమైతే UNIX
     {
 	stat_T	    st;
 
 	// If no stat_T given, get it now
-	if (stp == NULL)
+	ఒకవేళ (stp == ఖాళీ)
 	{
-	    if (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
+	    ఒకవేళ (!buf->b_dev_valid || mch_stat((అక్షరం *)ffname, &st) < 0)
 		st.st_dev = (dev_T)-1;
 	    stp = &st;
 	}
@@ -3880,222 +3880,222 @@ otherfile_buf(
 	// dev/ino again when they appear to match, but not when they appear
 	// to be different: Could skip a buffer when it's actually the same
 	// file.
-	if (buf_same_ino(buf, stp))
+	ఒకవేళ (buf_same_ino(buf, stp))
 	{
 	    buf_setino(buf);
-	    if (buf_same_ino(buf, stp))
-		return FALSE;
+	    ఒకవేళ (buf_same_ino(buf, stp))
+		తిరిగి FALSE;
 	}
     }
-#endif
-    return TRUE;
+#అయితే_ముగింపు
+    తిరిగి TRUE;
 }
 
-#if defined(UNIX)
+#ఒకవేళ defined(UNIX)
 /*
  * Set inode and device number for a buffer.
  * Must always be called when b_fname is changed!.
  */
-    void
+    శూన్య
 buf_setino(buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
+    ఒకవేళ (buf->b_fname != ఖాళీ && mch_stat((అక్షరం *)buf->b_fname, &st) >= 0)
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-    else
+    లేకపోతే
 	buf->b_dev_valid = false;
 }
 
 /*
  * Return TRUE if dev/ino in buffer "buf" matches with "stp".
  */
-    static int
+    స్థిర పూర్ణాంకం
 buf_same_ino(
     buf_T	*buf,
     stat_T	*stp)
 {
-    return (buf->b_dev_valid
+    తిరిగి (buf->b_dev_valid
 	    && stp->st_dev == buf->b_dev
 	    && stp->st_ino == buf->b_ino);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Print info about the current buffer.
  */
-    void
+    శూన్య
 fileinfo(
-    int fullname,	    // when non-zero print full path
-    int shorthelp,
-    int	dont_truncate)
+    పూర్ణాంకం fullname,	    // when non-zero print full path
+    పూర్ణాంకం shorthelp,
+    పూర్ణాంకం	dont_truncate)
 {
     char_u	*name;
-    char	*buffer;
+    అక్షరం	*బఫరు;
     size_t	bufferlen = 0;
 
-    buffer = alloc(IOSIZE);
-    if (buffer == NULL)
-	return;
+    బఫరు = alloc(IOSIZE);
+    ఒకవేళ (బఫరు == ఖాళీ)
+	తిరిగి;
 
-    if (fullname > 1)	    // 2 CTRL-G: include buffer number
-	bufferlen = vim_snprintf_safelen(buffer, IOSIZE, "buf %d: ", curbuf->b_fnum);
+    ఒకవేళ (fullname > 1)	    // 2 CTRL-G: include buffer number
+	bufferlen = vim_snprintf_safelen(బఫరు, IOSIZE, "buf %d: ", curbuf->b_fnum);
 
-    buffer[bufferlen++] = '"';
+    బఫరు[bufferlen++] = '"';
 
     name = buf_spname(curbuf);
-    if (name != NULL)
-	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
+    ఒకవేళ (name != ఖాళీ)
+	bufferlen += vim_snprintf_safelen(బఫరు + bufferlen,
 	    IOSIZE - bufferlen, "%s", name);
-    else
+    లేకపోతే
     {
-	if (!fullname && curbuf->b_fname != NULL)
+	ఒకవేళ (!fullname && curbuf->b_fname != ఖాళీ)
 	    name = curbuf->b_fname;
-	else
+	లేకపోతే
 	    name = curbuf->b_ffname;
-	bufferlen += home_replace(shorthelp ? curbuf : NULL, name,
-	    (char_u *)buffer + bufferlen, IOSIZE - (int)bufferlen, TRUE);
+	bufferlen += home_replace(shorthelp ? curbuf : ఖాళీ, name,
+	    (char_u *)బఫరు + bufferlen, IOSIZE - (పూర్ణాంకం)bufferlen, TRUE);
     }
 
     bufferlen += vim_snprintf_safelen(
-	buffer + bufferlen,
+	బఫరు + bufferlen,
 	IOSIZE - bufferlen,
 	"\"%s%s%s%s%s%s",
-	curbufIsChanged() ? (shortmess(SHM_MOD)
+	curbuf_Is_మారింది() ? (shortmess(SHM_MOD)
 	    ?  " [+]" : _(" [Modified]")) : " ",
 	(curbuf->b_flags & BF_NOTEDITED) && !bt_dontwrite(curbuf)
 	    ? _("[Not edited]") : "",
 	(curbuf->b_flags & BF_NEW) && !bt_dontwrite(curbuf)
-	    ? new_file_message() : "",
+	    ? new_file_సందేశం() : "",
 	(curbuf->b_flags & BF_READERR) ? _("[Read errors]") : "", curbuf->b_p_ro
 	    ? (shortmess(SHM_RO) ? _("[RO]") : _("[readonly]")) : "",
-	(curbufIsChanged() || (curbuf->b_flags & BF_WRITE_MASK) || curbuf->b_p_ro)
+	(curbuf_Is_మారింది() || (curbuf->b_flags & BF_WRITE_ముసుగు) || curbuf->b_p_ro)
 	    ? " " : "");
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
-	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
-    else if (p_ru)
+    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
+	bufferlen += vim_snprintf_safelen(బఫరు + bufferlen,
+	    IOSIZE - bufferlen, "%s", _(no_పంక్తులు_సందేశం));
+    లేకపోతే ఒకవేళ (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
-	    buffer + bufferlen,
+	    బఫరు + bufferlen,
 	    IOSIZE - bufferlen,
-	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
-    else
+	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_పంక్తి_లెక్క),
+	    (దీర్ఘ)curbuf->b_ml.ml_పంక్తి_లెక్క,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_పంక్తి_లెక్క));
+    లేకపోతే
     {
 	bufferlen += vim_snprintf_safelen(
-	    buffer + bufferlen,
+	    బఫరు + bufferlen,
 	    IOSIZE - bufferlen,
 	    _("line %ld of %ld --%d%%-- col "),
-	    (long)curwin->w_cursor.lnum,
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    (దీర్ఘ)curwin->w_cursor.lnum,
+	    (దీర్ఘ)curbuf->b_ml.ml_పంక్తి_లెక్క,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_పంక్తి_లెక్క));
 
 	validate_virtcol();
-	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
-		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
+	bufferlen += నిలువు_print((char_u *)బఫరు + bufferlen, IOSIZE - bufferlen,
+		   (పూర్ణాంకం)curwin->w_cursor.నిలువు + 1, (పూర్ణాంకం)curwin->w_virtcol + 1);
     }
 
-    (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
+    (శూన్య)append_arg_సంఖ్య(curwin, (char_u *)బఫరు + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
-    if (dont_truncate)
+    ఒకవేళ (dont_truncate)
     {
-	int	n;
+	పూర్ణాంకం	n;
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
-	msg_start();
-	n = msg_scroll;
-	msg_scroll = TRUE;
-	msg(buffer);
-	msg_scroll = n;
+	సందేశం_ప్రారంభం();
+	n = సందేశం_scroll;
+	సందేశం_scroll = TRUE;
+	సందేశం(బఫరు);
+	సందేశం_scroll = n;
     }
-    else
+    లేకపోతే
     {
-	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	అక్షరం	*p = సందేశం_trunc_attr(బఫరు, FALSE, 0);
+	ఒకవేళ (restart_edit != 0 || (సందేశం_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg((char_u *)p, 0);
+	    సమితి_keep_సందేశం((char_u *)p, 0);
     }
 
-    vim_free(buffer);
+    vim_free(బఫరు);
 }
 
-    int
-col_print(
+    పూర్ణాంకం
+నిలువు_print(
     char_u  *buf,
     size_t  buflen,
-    int	    col,
-    int	    vcol)
+    పూర్ణాంకం	    నిలువు,
+    పూర్ణాంకం	    vcol)
 {
-    if (col == vcol)
-	return (int)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
+    ఒకవేళ (నిలువు == vcol)
+	తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen, "%d", నిలువు);
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
+    తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen, "%d-%d", నిలువు, vcol);
 }
 
-static char_u *lasttitle = NULL;
-static char_u *lasticon = NULL;
+స్థిర char_u *lasttitle = ఖాళీ;
+స్థిర char_u *lasticon = ఖాళీ;
 
 /*
  * Put the file name in the title bar and icon of the window.
  */
-    void
-maketitle(void)
+    శూన్య
+maketitle(శూన్య)
 {
-    char_u	*title_str = NULL;
-    char_u	*icon_str = NULL;
-    int		mustset;
+    char_u	*title_str = ఖాళీ;
+    char_u	*icon_str = ఖాళీ;
+    పూర్ణాంకం		mustset;
     char_u	buf[IOSIZE];
     size_t	buflen = 0;
 
-    if (!redrawing())
+    ఒకవేళ (!redrawing())
     {
 	// Postpone updating the title when 'lazyredraw' is set.
 	need_maketitle = TRUE;
-	return;
+	తిరిగి;
     }
 
     need_maketitle = FALSE;
-    if (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
-	return;  // nothing to do
+    ఒకవేళ (!p_title && !p_icon && lasttitle == ఖాళీ && lasticon == ఖాళీ)
+	తిరిగి;  // nothing to do
 
-    if (p_title)
+    ఒకవేళ (p_title)
     {
-	int maxlen = 0;
+	పూర్ణాంకం maxlen = 0;
 
-	if (p_titlelen > 0)
+	ఒకవేళ (p_titlelen > 0)
 	{
 	    maxlen = p_titlelen * Columns / 100;
-	    if (maxlen < 10)
+	    ఒకవేళ (maxlen < 10)
 		maxlen = 10;
 	}
 
 	title_str = buf;
-	if (*p_titlestring != NUL)
+	ఒకవేళ (*p_titlestring != NUL)
 	{
-#ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_TITLE)
-		build_stl_str_hl(curwin, title_str, sizeof(buf), p_titlestring,
+#నిర్వచితమైతే FEAT_STL_OPT
+	    ఒకవేళ (stl_syntax & STL_లోపల_TITLE)
+		build_stl_str_hl(curwin, title_str, పరిమాణం(buf), p_titlestring,
 				    (char_u *)"titlestring", 0,
-				    0, maxlen, NULL, NULL, NULL);
-	    else
-#endif
+				    0, maxlen, ఖాళీ, ఖాళీ, ఖాళీ);
+	    లేకపోతే
+#అయితే_ముగింపు
 		title_str = p_titlestring;
 	    buflen = STRLEN(title_str);
 	}
-	else
+	లేకపోతే
 	{
 	    char_u  *p;
 
@@ -4106,191 +4106,191 @@ maketitle(void)
 	    // reserve some space for different parts of the title.
 	    // use sizeof() to introduce 'size_t' so we don't have to
 	    // cast sizes to it.
-#define SPACE_FOR_FNAME (sizeof(buf) - 100)
-#define SPACE_FOR_DIR   (sizeof(buf) - 20)
-#define SPACE_FOR_ARGNR (sizeof(buf) - 10)  // at least room for " - VIM"
+#నిర్వచించు SPACE_FOR_FNAME (పరిమాణం(buf) - 100)
+#నిర్వచించు SPACE_FOR_DIR   (పరిమాణం(buf) - 20)
+#నిర్వచించు SPACE_FOR_ARGNR (పరిమాణం(buf) - 10)  // at least room for " - VIM"
 
 	    // file name
-	    if (curbuf->b_fname == NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    ఒకవేళ (curbuf->b_fname == ఖాళీ)
+		buflen = vim_snprintf_safelen((అక్షరం *)buf,
 		    SPACE_FOR_FNAME, "%s", _("[No Name]"));
-#ifdef FEAT_TERMINAL
-	    else if (curbuf->b_term != NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+#నిర్వచితమైతే FEAT_TERMINAL
+	    లేకపోతే ఒకవేళ (curbuf->b_పదం != ఖాళీ)
+		buflen = vim_snprintf_safelen((అక్షరం *)buf,
 		    SPACE_FOR_FNAME, "%s",
-		    term_get_status_text(curbuf->b_term));
-#endif
-	    else
+		    పదం_get_స్థితి_పాఠ్యం(curbuf->b_పదం));
+#అయితే_ముగింపు
+	    లేకపోతే
 	    {
-		buflen = vim_snprintf_safelen((char *)buf,
+		buflen = vim_snprintf_safelen((అక్షరం *)buf,
 		    SPACE_FOR_FNAME, "%s",
-		    ((p = transstr(gettail(curbuf->b_fname))) != NULL)
+		    ((p = transstr(gettail(curbuf->b_fname))) != ఖాళీ)
 			? p
 			: (char_u *)"");
 		vim_free(p);
 	    }
 
 	    // flags
-#ifdef FEAT_TERMINAL
-	    if (curbuf->b_term == NULL)
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+	    ఒకవేళ (curbuf->b_పదం == ఖాళీ)
+#అయితే_ముగింపు
 	    {
-		switch (bufIsChanged(curbuf)
+		ఎంపిక (buf_Is_మారింది(curbuf)
 			+ (curbuf->b_p_ro * 2)
 			+ (!curbuf->b_p_ma * 4))
 		{
-		    case 1:
+		    స్థితి 1:
 			// file was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " +");
-			break;
-		    case 2:
+			    (అక్షరం *)buf + buflen,
+			    పరిమాణం(buf) - buflen, " +");
+			ఆపు;
+		    స్థితి 2:
 			// file is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =");
-			break;
-		    case 3:
+			    (అక్షరం *)buf + buflen,
+			    పరిమాణం(buf) - buflen, " =");
+			ఆపు;
+		    స్థితి 3:
 			// file was modified and is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =+");
-			break;
-		    case 4:
-		    case 6:
+			    (అక్షరం *)buf + buflen,
+			    పరిమాణం(buf) - buflen, " =+");
+			ఆపు;
+		    స్థితి 4:
+		    స్థితి 6:
 			// file cannot be modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -");
-			break;
-		    case 5:
-		    case 7:
+			    (అక్షరం *)buf + buflen,
+			    పరిమాణం(buf) - buflen, " -");
+			ఆపు;
+		    స్థితి 5:
+		    స్థితి 7:
 			// file cannot be modified but was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -+");
-			break;
-		    default:
-			break;
+			    (అక్షరం *)buf + buflen,
+			    పరిమాణం(buf) - buflen, " -+");
+			ఆపు;
+		    అప్రమేయ:
+			ఆపు;
 		}
 	    }
 
 	    // path (surrounded by '()')
-	    if (curbuf->b_fname != NULL
-#ifdef FEAT_TERMINAL
-		    && curbuf->b_term == NULL
-#endif
+	    ఒకవేళ (curbuf->b_fname != ఖాళీ
+#నిర్వచితమైతే FEAT_TERMINAL
+		    && curbuf->b_పదం == ఖాళీ
+#అయితే_ముగింపు
 		    )
 	    {
 		// Get path of file, replace home dir with ~
-		buflen += vim_snprintf_safelen((char *)buf + buflen,
-		    sizeof(buf) - buflen, " (");
+		buflen += vim_snprintf_safelen((అక్షరం *)buf + buflen,
+		    పరిమాణం(buf) - buflen, " (");
 
 		home_replace(curbuf, curbuf->b_ffname,
-		    buf + buflen, (int)(SPACE_FOR_DIR - buflen), TRUE);
+		    buf + buflen, (పూర్ణాంకం)(SPACE_FOR_DIR - buflen), TRUE);
 
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 		// avoid "c:/name" to be reduced to "c"
-		if (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
+		ఒకవేళ (సురక్షిత_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
 		    buflen += 2;			// step over "c:"
-#endif
+#అయితే_ముగింపు
 
 		// determine if we have a help or normal buffer
 		p = gettail_sep(buf + buflen);
-		if (p == buf + buflen)
+		ఒకవేళ (p == buf + buflen)
 		{
 		    // help buffer
-		    buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    buflen += vim_snprintf_safelen((అక్షరం *)buf + buflen,
 			SPACE_FOR_DIR - buflen, "%s)", _("help"));
 		}
-		else
+		లేకపోతే
 		{
 		    // normal buffer
 
 		    // Translate unprintable chars and concatenate.  Keep some
 		    // room for the server name.  When there is no room (very long
 		    // file name) use (...).
-		    if (buflen < SPACE_FOR_DIR)
+		    ఒకవేళ (buflen < SPACE_FOR_DIR)
 		    {
 			// remove the file name
 			*p = NUL;
 
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+			buflen += vim_snprintf_safelen((అక్షరం *)buf + buflen,
 			    SPACE_FOR_DIR - buflen, "%s)",
-			    ((p = transstr(buf + buflen)) != NULL)
+			    ((p = transstr(buf + buflen)) != ఖాళీ)
 				? p
 				: (char_u *)"");
 			vim_free(p);
 		    }
-		    else
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    లేకపోతే
+			buflen += vim_snprintf_safelen((అక్షరం *)buf + buflen,
 			    SPACE_FOR_ARGNR - buflen, "...)");
 		}
 	    }
 
 	    // argument info
-	    buflen += append_arg_number(curwin, buf + buflen,
+	    buflen += append_arg_సంఖ్య(curwin, buf + buflen,
 		SPACE_FOR_ARGNR - buflen, FALSE);
 
 	    // servername
-	    buflen += vim_snprintf_safelen((char *)buf + buflen,
-		sizeof(buf) - buflen, " - %s",
-#if defined(FEAT_CLIENTSERVER)
-		(serverName != NULL)
+	    buflen += vim_snprintf_safelen((అక్షరం *)buf + buflen,
+		పరిమాణం(buf) - buflen, " - %s",
+#ఒకవేళ defined(FEAT_CLIENTSERVER)
+		(serverName != ఖాళీ)
 		    ? serverName :
-#endif
+#అయితే_ముగింపు
 		    (char_u *)"VIM");
 
-	    if (maxlen > 0)
+	    ఒకవేళ (maxlen > 0)
 	    {
 		// make it shorter by removing a bit in the middle
-		if (vim_strsize(buf) > maxlen)
-		    trunc_string(buf, buf, maxlen, sizeof(buf));
+		ఒకవేళ (vim_strsize(buf) > maxlen)
+		    trunc_string(buf, buf, maxlen, పరిమాణం(buf));
 	    }
 	}
     }
-    mustset = value_changed(title_str, &lasttitle);
+    mustset = విలువ_మారింది(title_str, &lasttitle);
 
-    if (p_icon)
+    ఒకవేళ (p_icon)
     {
 	icon_str = buf;
-	if (*p_iconstring != NUL)
+	ఒకవేళ (*p_iconstring != NUL)
 	{
-#ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_ICON)
-		build_stl_str_hl(curwin, icon_str, sizeof(buf), p_iconstring,
-				 (char_u *)"iconstring", 0, 0, 0, NULL, NULL,
-				 NULL);
-	    else
-#endif
+#నిర్వచితమైతే FEAT_STL_OPT
+	    ఒకవేళ (stl_syntax & STL_లోపల_ICON)
+		build_stl_str_hl(curwin, icon_str, పరిమాణం(buf), p_iconstring,
+				 (char_u *)"iconstring", 0, 0, 0, ఖాళీ, ఖాళీ,
+				 ఖాళీ);
+	    లేకపోతే
+#అయితే_ముగింపు
 		icon_str = p_iconstring;
 	}
-	else
+	లేకపోతే
 	{
 	    char_u  *name;
-	    int	    namelen;
+	    పూర్ణాంకం	    namelen;
 
 	    name = buf_spname(curbuf);
-	    if (name == NULL)
+	    ఒకవేళ (name == ఖాళీ)
 		name = gettail(curbuf->b_ffname);
 	    // Truncate name at 100 bytes.
-	    namelen = (int)STRLEN(name);
-	    if (namelen > 100)
+	    namelen = (పూర్ణాంకం)STRLEN(name);
+	    ఒకవేళ (namelen > 100)
 	    {
 		namelen -= 100;
-		if (has_mbyte)
-		    namelen += (*mb_tail_off)(name, name + namelen) + 1;
+		ఒకవేళ (has_mbyte)
+		    namelen += (*mb_తోక_off)(name, name + namelen) + 1;
 		name += namelen;
 	    }
 	    STRCPY(buf, name);
-	    trans_characters(buf, sizeof(buf));
+	    trans_characters(buf, పరిమాణం(buf));
 	}
     }
 
-    mustset |= value_changed(icon_str, &lasticon);
+    mustset |= విలువ_మారింది(icon_str, &lasticon);
 
-    if (mustset)
+    ఒకవేళ (mustset)
 	resettitle();
 }
 
@@ -4299,77 +4299,77 @@ maketitle(void)
  * from "str" if it does.
  * Return TRUE if resettitle() is to be called.
  */
-    static int
-value_changed(char_u *str, char_u **last)
+    స్థిర పూర్ణాంకం
+విలువ_మారింది(char_u *str, char_u **చివరి)
 {
-    if ((str == NULL) != (*last == NULL)
-	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
+    ఒకవేళ ((str == ఖాళీ) != (*చివరి == ఖాళీ)
+	    || (str != ఖాళీ && *చివరి != ఖాళీ && STRCMP(str, *చివరి) != 0))
     {
-	vim_free(*last);
-	if (str == NULL)
+	vim_free(*చివరి);
+	ఒకవేళ (str == ఖాళీ)
 	{
-	    *last = NULL;
+	    *చివరి = ఖాళీ;
 	    mch_restore_title(
-		  last == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
+		  చివరి == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
 	}
-	else
+	లేకపోతే
 	{
-	    *last = vim_strsave(str);
-	    return TRUE;
+	    *చివరి = vim_strsave(str);
+	    తిరిగి TRUE;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Put current window title back (used after calling a shell)
  */
-    void
-resettitle(void)
+    శూన్య
+resettitle(శూన్య)
 {
     mch_settitle(lasttitle, lasticon);
 }
 
-#if defined(EXITFREE)
-    void
-free_titles(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_titles(శూన్య)
 {
     vim_free(lasttitle);
     vim_free(lasticon);
 }
-#endif
+#అయితే_ముగింపు
 
 
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+#ఒకవేళ defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 
 /*
  * Used for building in the status line.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    char_u	*stl_start;
-    int		stl_minwid;
-    int		stl_maxwid;
-    enum {
-	Normal,
-	Empty,
-	Group,
+    char_u	*stl_ప్రారంభం;
+    పూర్ణాంకం		stl_minwid;
+    పూర్ణాంకం		stl_maxwid;
+    గణన {
+	సాధారణ,
+	ఖాళీలు,
+	సమూహం_2,
 	Separate,
 	Highlight,
-	TabPage,
+	Tab_పుట,
 	ClickFunc,
 	Trunc
     }		stl_type;
     char_u	*stl_clickfunc;	// function name for ClickFunc items
-} stl_item_T;
+} stl_అంశం_T;
 
-static size_t		stl_items_len = 20; // Initial value, grows as needed.
-static stl_item_T      *stl_items = NULL;
-static int	       *stl_groupitem = NULL;
-static stl_hlrec_T     *stl_hltab = NULL;
-static stl_hlrec_T     *stl_tabtab = NULL;
-static stl_clickrec_T  *stl_clicktab = NULL;
-static int		*stl_separator_locations = NULL;
+స్థిర size_t		stl_వస్తువులు_len = 20; // Initial value, grows as needed.
+స్థిర stl_అంశం_T      *stl_వస్తువులు = ఖాళీ;
+స్థిర పూర్ణాంకం	       *stl_groupitem = ఖాళీ;
+స్థిర stl_hlrec_T     *stl_hltab = ఖాళీ;
+స్థిర stl_hlrec_T     *stl_tabtab = ఖాళీ;
+స్థిర stl_clickrec_T  *stl_clicktab = ఖాళీ;
+స్థిర పూర్ణాంకం		*stl_separator_locations = ఖాళీ;
 
 /*
  * Build a string from the status line items in "fmt".
@@ -4385,77 +4385,77 @@ static int		*stl_separator_locations = NULL;
  * If maxwidth is not zero, the string will be filled at any middle marker
  * or truncated if too long, fillchar is used for all whitespace.
  */
-    int
+    పూర్ణాంకం
 build_stl_str_hl(
     win_T	*wp,
-    char_u	*out,		// buffer to write into != NameBuff
+    char_u	*బహిర్గతం,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    పూర్ణాంకం		opt_scope,	// scope for "opt_name"
+    పూర్ణాంకం		fillchar,
+    పూర్ణాంకం		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab)	// return: click func regions (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
+    తిరిగి build_stl_str_hl_local(STL_బహుళకం_SINGLE, wp, బహిర్గతం, outlen, &fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, NULL);
+	    ఖాళీ, ఖాళీ);
 }
 
-    int
+    పూర్ణాంకం
 build_stl_str_hl_mline(
     win_T	*wp,
-    char_u	*out,		// buffer to write into != NameBuff
+    char_u	*బహిర్గతం,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    పూర్ణాంకం		opt_scope,	// scope for "opt_name"
+    పూర్ణాంకం		fillchar,
+    పూర్ణాంకం		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    పూర్ణాంకం		*వాహకం_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
+    తిరిగి build_stl_str_hl_local(STL_బహుళకం_MULTI, wp, బహిర్గతం, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    ఖాళీ, వాహకం_hl);
 }
 
-# ifdef ENABLE_STL_MODE_MULTI_NL
-    int
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
+    పూర్ణాంకం
 build_stl_str_hl_mline_nl(
     win_T	*wp,
-    char_u	*out,		// buffer to write into != NameBuff
+    char_u	*బహిర్గతం,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    పూర్ణాంకం		opt_scope,	// scope for "opt_name"
+    పూర్ణాంకం		fillchar,
+    పూర్ణాంకం		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    పూర్ణాంకం		*వాహకం_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
+    తిరిగి build_stl_str_hl_local(STL_బహుళకం_MULTI_NL, wp, బహిర్గతం, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    ఖాళీ, వాహకం_hl);
 }
 # endif
 
-    int
-get_stl_rendered_height(
+    పూర్ణాంకం
+get_stl_rendered_ఎత్తు(
     win_T	*wp,
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope)	// scope for "opt_name"
+    పూర్ణాంకం		opt_scope)	// scope for "opt_name"
 {
-    int rendered_height = 0;
+    పూర్ణాంకం rendered_ఎత్తు = 0;
     char_u	buf[MAXPATHL] = {0};
 
     // Suppress errors while computing height: expressions (%!expr, %{expr})
@@ -4463,12 +4463,12 @@ get_stl_rendered_height(
     // effects.  Any errors (e.g. E48 in sandbox) will surface properly when
     // the statusline is actually drawn.
     ++emsg_off;
-    (void)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
-	    wp, buf, sizeof(buf), &fmt,
-	    opt_name, opt_scope, 0, 0, NULL, NULL, NULL, &rendered_height,
-	    NULL);
+    (శూన్య)build_stl_str_hl_local(STL_బహుళకం_GET_RENDERED_ఎత్తు,
+	    wp, buf, పరిమాణం(buf), &fmt,
+	    opt_name, opt_scope, 0, 0, ఖాళీ, ఖాళీ, ఖాళీ, &rendered_ఎత్తు,
+	    ఖాళీ);
     --emsg_off;
-    return rendered_height;
+    తిరిగి rendered_ఎత్తు;
 }
 
 /*
@@ -4488,22 +4488,22 @@ get_stl_rendered_height(
  * Therefore, layout decisions must be based on the fully evaluated statusline
  * string, not on pre-evaluation parsing.
  */
-static int
+స్థిర పూర్ణాంకం
 build_stl_str_hl_local(
-    stl_mode_T	mode,
+    stl_బహుళకం_T	బహుళకం,
     win_T	*wp,
-    char_u	*out,		// buffer to write into != NameBuff
+    char_u	*బహిర్గతం,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt_arg,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    పూర్ణాంకం		opt_scope,	// scope for "opt_name"
+    పూర్ణాంకం		fillchar,
+    పూర్ణాంకం		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*rendered_height,   // return: stl rendered height (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    పూర్ణాంకం		*rendered_ఎత్తు,   // return: stl rendered height (can be NULL)
+    పూర్ణాంకం		*వాహకం_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
     linenr_T	lnum;
@@ -4511,356 +4511,356 @@ build_stl_str_hl_local(
     size_t	outputlen;	// length of out[] used (excluding the NUL)
     char_u	*p;
     char_u	*s;
-    int		byteval;
+    పూర్ణాంకం		byteval;
 # ifdef FEAT_EVAL
-    int		use_sandbox;
-    int		save_VIsual_active;
+    పూర్ణాంకం		use_sandbox;
+    పూర్ణాంకం		save_VIsual_చురుకైన;
 # endif
-    int		empty_line;
-    long	l;
-    long	n;
-    int		prevchar_isflag;
-    int		prevchar_isitem;
-    int		itemisflag;
-    int		fillable;
+    పూర్ణాంకం		ఖాళీలు_పంక్తి;
+    దీర్ఘ	l;
+    దీర్ఘ	n;
+    పూర్ణాంకం		prevchar_isflag;
+    పూర్ణాంకం		prevchar_isitem;
+    పూర్ణాంకం		itemisflag;
+    పూర్ణాంకం		fillable;
     char_u	*str;
-    long	num;
-    int		width;
-    int		itemcnt;
-    int		curitem;
-    int		groupdepth;
+    దీర్ఘ	అంకె;
+    పూర్ణాంకం		వెడల్పు;
+    పూర్ణాంకం		itemcnt;
+    పూర్ణాంకం		curitem;
+    పూర్ణాంకం		groupdepth;
 # ifdef FEAT_EVAL
-    int		evaldepth;
+    పూర్ణాంకం		evaldepth;
 # endif
-    int		minwid;
-    int		maxwid;
-    int		zeropad;
-    char_u	base;
+    పూర్ణాంకం		minwid;
+    పూర్ణాంకం		maxwid;
+    పూర్ణాంకం		zeropad;
+    char_u	పునాది;
     char_u	opt;
 # define TMPLEN 70
     char_u	buf_tmp[TMPLEN];
     char_u	*fmt = *fmt_arg;
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
-    int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    పూర్ణాంకం		save_redraw_not_allowed = redraw_not_allowed;
+    పూర్ణాంకం		save_కీలకం_Typed = కీలకం_Typed;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
-    int		did_emsg_before = did_emsg;
-    int		rheight = 1;	// stl rendered height
+    పూర్ణాంకం		did_emsg_before = did_emsg;
+    పూర్ణాంకం		rheight = 1;	// stl rendered height
 
     // When inside update_screen() we do not want redrawing a statusline,
     // ruler, title, etc. to trigger another redraw, it may cause an endless
     // loop.
-    if (updating_screen)
+    ఒకవేళ (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    ఒకవేళ (stl_వస్తువులు == ఖాళీ)
     {
-	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_వస్తువులు = ALLOC_MULT(stl_అంశం_T, stl_వస్తువులు_len);
+	stl_groupitem = ALLOC_MULT(పూర్ణాంకం, stl_వస్తువులు_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
-	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
+	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_వస్తువులు_len + 1);
+	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_వస్తువులు_len + 1);
+	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_వస్తువులు_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(పూర్ణాంకం, stl_వస్తువులు_len);
     }
 
 # ifdef FEAT_EVAL
     // if "fmt" was set insecurely it needs to be evaluated in the sandbox
-    use_sandbox = was_set_insecurely(wp, opt_name, opt_scope);
+    use_sandbox = was_సమితి_insecurely(wp, opt_name, opt_scope);
 
     // When the format starts with "%!" then evaluate it as an expression and
     // use the result as the actual format string.
-    if (fmt[0] == '%' && fmt[1] == '!')
+    ఒకవేళ (fmt[0] == '%' && fmt[1] == '!')
     {
 	typval_T	tv;
 
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = wp->w_id;
-	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
+	tv.v_type = VAR_సంఖ్య;
+	tv.vval.v_సంఖ్య = wp->w_id;
+	సమితి_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
-	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
-	if (usefmt == NULL)
+	usefmt = eval_గమ్యం_string_సురక్షిత(fmt + 2, use_sandbox, FALSE, FALSE);
+	ఒకవేళ (usefmt == ఖాళీ)
 	    usefmt = fmt;
 
 	do_unlet((char_u *)"g:statusline_winid", TRUE);
     }
 # endif
 
-    if (fillchar == 0)
+    ఒకవేళ (fillchar == 0)
 	fillchar = ' ';
 
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    ఒకవేళ (lnum > wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
     {
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 	wp->w_cursor.lnum = lnum;
     }
 
     // Get line & check if empty (cursorpos will show "0-1").  Note that
     // p will become invalid when getting another buffer line.
-    p = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    empty_line = (*p == NUL);
+    p = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
+    ఖాళీలు_పంక్తి = (*p == NUL);
 
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
-    len = ml_get_buf_len(wp->w_buffer, lnum);
-    if (wp->w_cursor.col > len)
+    len = ml_get_buf_len(wp->w_బఫరు, lnum);
+    ఒకవేళ (wp->w_cursor.నిలువు > len)
     {
 	// Line may have changed since checking the cursor column, or the lnum
 	// was adjusted above.
-	wp->w_cursor.col = len;
+	wp->w_cursor.నిలువు = len;
 	wp->w_cursor.coladd = 0;
 	byteval = 0;
     }
-    else
-	byteval = (*mb_ptr2char)(p + wp->w_cursor.col);
+    లేకపోతే
+	byteval = (*mb_ptr2char)(p + wp->w_cursor.నిలువు);
 
     groupdepth = 0;
 # ifdef FEAT_EVAL
     evaldepth = 0;
 # endif
-    p = out;
+    p = బహిర్గతం;
     curitem = 0;
 
     // Pre-insert a Highlight item from carry_hl so that %# / %* set on a
     // previous multi-line statusline row continues to apply on this row.
-    if (carry_hl != NULL && *carry_hl != 0)
+    ఒకవేళ (వాహకం_hl != ఖాళీ && *వాహకం_hl != 0)
     {
-	stl_items[curitem].stl_type = Highlight;
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_minwid = *carry_hl;
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_వస్తువులు[curitem].stl_type = Highlight;
+	stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+	stl_వస్తువులు[curitem].stl_minwid = *వాహకం_hl;
+	stl_వస్తువులు[curitem].stl_clickfunc = ఖాళీ;
 	curitem++;
     }
 
     prevchar_isflag = TRUE;
     prevchar_isitem = FALSE;
-    for (s = usefmt; *s != NUL; )
+    కొరకు (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	ఒకవేళ (curitem == (పూర్ణాంకం)stl_వస్తువులు_len)
 	{
-	    size_t	new_len = stl_items_len * 3 / 2;
+	    size_t	new_len = stl_వస్తువులు_len * 3 / 2;
 
-	    stl_item_T *new_items =
-			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
-		break;
-	    stl_items = new_items;
+	    stl_అంశం_T *new_వస్తువులు =
+			  vim_realloc(stl_వస్తువులు, పరిమాణం(stl_అంశం_T) * new_len);
+	    ఒకవేళ (new_వస్తువులు == ఖాళీ)
+		ఆపు;
+	    stl_వస్తువులు = new_వస్తువులు;
 
-	    int *new_groupitem =
-			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
-	    if (new_groupitem == NULL)
-		break;
+	    పూర్ణాంకం *new_groupitem =
+			     vim_realloc(stl_groupitem, పరిమాణం(పూర్ణాంకం) * new_len);
+	    ఒకవేళ (new_groupitem == ఖాళీ)
+		ఆపు;
 	    stl_groupitem = new_groupitem;
 
 	    stl_hlrec_T	*new_hlrec = vim_realloc(stl_hltab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  పరిమాణం(stl_hlrec_T) * (new_len + 1));
+	    ఒకవేళ (new_hlrec == ఖాళీ)
+		ఆపు;
 	    stl_hltab = new_hlrec;
 	    new_hlrec = vim_realloc(stl_tabtab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  పరిమాణం(stl_hlrec_T) * (new_len + 1));
+	    ఒకవేళ (new_hlrec == ఖాళీ)
+		ఆపు;
 	    stl_tabtab = new_hlrec;
 
 	    stl_clickrec_T *new_clickrec = vim_realloc(stl_clicktab,
-				      sizeof(stl_clickrec_T) * (new_len + 1));
-	    if (new_clickrec == NULL)
-		break;
+				      పరిమాణం(stl_clickrec_T) * (new_len + 1));
+	    ఒకవేళ (new_clickrec == ఖాళీ)
+		ఆపు;
 	    stl_clicktab = new_clickrec;
 
-	    int *new_separator_locs = vim_realloc(stl_separator_locations,
-					    sizeof(int) * new_len);
-	    if (new_separator_locs == NULL)
-		break;
+	    పూర్ణాంకం *new_separator_locs = vim_realloc(stl_separator_locations,
+					    పరిమాణం(పూర్ణాంకం) * new_len);
+	    ఒకవేళ (new_separator_locs == ఖాళీ)
+		ఆపు;
 	    stl_separator_locations = new_separator_locs;
 
-	    stl_items_len = new_len;
+	    stl_వస్తువులు_len = new_len;
 	}
 
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_వస్తువులు[curitem].stl_clickfunc = ఖాళీ;
 
-	if (*s != '%')
+	ఒకవేళ (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
 
 	/*
 	 * Handle up to the next '%' or the end.
 	 */
-	while (*s != NUL && *s != '%' && p + 1 < out + outlen)
-# ifdef ENABLE_STL_MODE_MULTI_NL
+	అయితే (*s != NUL && *s != '%' && p + 1 < బహిర్గతం + outlen)
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
 	{
-	    if (*s == '\n' || *s == '\r')
+	    ఒకవేళ (*s == '\n' || *s == '\r')
 	    {
-		if (mode == STL_MODE_MULTI_NL)
+		ఒకవేళ (బహుళకం == STL_బహుళకం_MULTI_NL)
 		{
 		    s++;
-		    goto find_linebreak;
+		    వెళ్ళు కనుగొను_linebreak;
 		}
-		else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+		లేకపోతే ఒకవేళ (బహుళకం == STL_బహుళకం_GET_RENDERED_ఎత్తు)
 		    rheight++;
 	    }
 # endif
 	    *p++ = *s++;
-# ifdef ENABLE_STL_MODE_MULTI_NL
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
 	}
 # endif
-	if (*s == NUL || p + 1 >= out + outlen)
-	    break;
+	ఒకవేళ (*s == NUL || p + 1 >= బహిర్గతం + outlen)
+	    ఆపు;
 
 	/*
 	 * Handle one '%' item.
 	 */
 	s++;
-	if (*s == NUL)  // ignore trailing %
-	    break;
+	ఒకవేళ (*s == NUL)  // ignore trailing %
+	    ఆపు;
 
-	if (*s == STL_CLICKFUNC)
+	ఒకవేళ (*s == STL_CLICKFUNC)
 	{
 	    // %[] - end click region
-	    if (s[1] == ']')
+	    ఒకవేళ (s[1] == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_వస్తువులు[curitem].stl_type = ClickFunc;
+		stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+		stl_వస్తువులు[curitem].stl_minwid = 0;
+		stl_వస్తువులు[curitem].stl_clickfunc = ఖాళీ;
 		s += 2;
 		curitem++;
-		continue;
+		కొనసాగు;
 	    }
 	    // %[FuncName] - start click region
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    ఒకవేళ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 1, ']');
-		if (rb != NULL)
+		ఒకవేళ (rb != ఖాళీ)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = 0;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_వస్తువులు[curitem].stl_type = ClickFunc;
+		    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+		    stl_వస్తువులు[curitem].stl_minwid = 0;
+		    stl_వస్తువులు[curitem].stl_clickfunc =
 					  vim_strnsave(s + 1, rb - s - 1);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    కొనసాగు;
 		}
 	    }
 	}
-	if (*s == STL_LINEBREAK)
+	ఒకవేళ (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
-	    if (mode == STL_MODE_MULTI
-# ifdef ENABLE_STL_MODE_MULTI_NL
-		    || mode == STL_MODE_MULTI_NL
+	    ఒకవేళ (బహుళకం == STL_బహుళకం_MULTI
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
+		    || బహుళకం == STL_బహుళకం_MULTI_NL
 # endif
 	       )
 	    {
 		s++;
-		break;
+		ఆపు;
 	    }
-	    else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+	    లేకపోతే ఒకవేళ (బహుళకం == STL_బహుళకం_GET_RENDERED_ఎత్తు)
 		rheight++;
 	}
-	if (*s == '%')
+	ఒకవేళ (*s == '%')
 	{
-	    if (p + 1 >= out + outlen)
-		break;
+	    ఒకవేళ (p + 1 >= బహిర్గతం + outlen)
+		ఆపు;
 	    *p++ = *s++;
 	    prevchar_isflag = prevchar_isitem = FALSE;
-	    continue;
+	    కొనసాగు;
 	}
 	// STL_SEPARATE: Separation between items, filled with white space.
-	if (*s == STL_SEPARATE)
+	ఒకవేళ (*s == STL_SEPARATE)
 	{
 	    s++;
-	    if (groupdepth > 0)
-		continue;
-	    stl_items[curitem].stl_type = Separate;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    ఒకవేళ (groupdepth > 0)
+		కొనసాగు;
+	    stl_వస్తువులు[curitem].stl_type = Separate;
+	    stl_వస్తువులు[curitem++].stl_ప్రారంభం = p;
+	    కొనసాగు;
 	}
-	if (*s == STL_TRUNCMARK)
+	ఒకవేళ (*s == STL_TRUNCMARK)
 	{
 	    s++;
-	    stl_items[curitem].stl_type = Trunc;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    stl_వస్తువులు[curitem].stl_type = Trunc;
+	    stl_వస్తువులు[curitem++].stl_ప్రారంభం = p;
+	    కొనసాగు;
 	}
-	if (*s == ')')
+	ఒకవేళ (*s == ')')
 	{
 	    char_u  *t;
 
 	    s++;
-	    if (groupdepth < 1)
-		continue;
+	    ఒకవేళ (groupdepth < 1)
+		కొనసాగు;
 	    groupdepth--;
 
-	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
+	    t = stl_వస్తువులు[stl_groupitem[groupdepth]].stl_ప్రారంభం;
 	    *p = NUL;
 	    l = vim_strsize(t);
-	    if (curitem > stl_groupitem[groupdepth] + 1
-		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
+	    ఒకవేళ (curitem > stl_groupitem[groupdepth] + 1
+		    && stl_వస్తువులు[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
-		int group_start_userhl = 0;
-		int group_end_userhl = 0;
+		పూర్ణాంకం సమూహం_ప్రారంభం_userhl = 0;
+		పూర్ణాంకం సమూహం_చివర_userhl = 0;
 
 		// remove group if all items are empty and highlight group
 		// doesn't change
-		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
+		కొరకు (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    ఒకవేళ (stl_వస్తువులు[n].stl_type == Highlight)
 		    {
-			group_start_userhl = group_end_userhl =
-						       stl_items[n].stl_minwid;
-			break;
+			సమూహం_ప్రారంభం_userhl = సమూహం_చివర_userhl =
+						       stl_వస్తువులు[n].stl_minwid;
+			ఆపు;
 		    }
 		}
-		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		కొరకు (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
-			break;
-		    if (stl_items[n].stl_type == Highlight)
-			group_end_userhl = stl_items[n].stl_minwid;
+		    ఒకవేళ (stl_వస్తువులు[n].stl_type == సాధారణ)
+			ఆపు;
+		    ఒకవేళ (stl_వస్తువులు[n].stl_type == Highlight)
+			సమూహం_చివర_userhl = stl_వస్తువులు[n].stl_minwid;
 		}
-		if (n == curitem && group_start_userhl == group_end_userhl)
+		ఒకవేళ (n == curitem && సమూహం_ప్రారంభం_userhl == సమూహం_చివర_userhl)
 		{
 		    // empty group
 		    p = t;
 		    l = 0;
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    కొరకు (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
-			    stl_items[n].stl_type = Empty;
+			ఒకవేళ (stl_వస్తువులు[n].stl_type == Highlight)
+			    stl_వస్తువులు[n].stl_type = ఖాళీలు;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
-			    stl_items[n].stl_start = p;
+			ఒకవేళ (stl_వస్తువులు[n].stl_type == Tab_పుట)
+			    stl_వస్తువులు[n].stl_ప్రారంభం = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    ఒకవేళ (l > stl_వస్తువులు[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    అయితే (l >= stl_వస్తువులు[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
-		else
-		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
+		లేకపోతే
+		    n = (దీర్ఘ)(p - t) - stl_వస్తువులు[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
 		*t = '<';
@@ -4868,238 +4868,238 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
-				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
-		while (++l < minwid_fixed)
-		    MB_CHAR2BYTES(fillchar, p);
+		పూర్ణాంకం minwid_fixed = MIN(stl_వస్తువులు[stl_groupitem[groupdepth]].stl_minwid,
+				       stl_వస్తువులు[stl_groupitem[groupdepth]].stl_maxwid);
+		అయితే (++l < minwid_fixed)
+		    MB_CHAR2_బైట్లు(fillchar, p);
 
 		// correct the start of the items for the truncation
-		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
+		కొరకు (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
-		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
-			stl_items[l].stl_start = t;
+		    stl_వస్తువులు[l].stl_ప్రారంభం -= n - 1;
+		    ఒకవేళ (stl_వస్తువులు[l].stl_ప్రారంభం < t)
+			stl_వస్తువులు[l].stl_ప్రారంభం = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    లేకపోతే ఒకవేళ (నిరపేక్ష(stl_వస్తువులు[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
-		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
-		int fillchar_len = MB_CHAR2LEN(fillchar);
-		if (n < 0)
+		n = stl_వస్తువులు[stl_groupitem[groupdepth]].stl_minwid;
+		పూర్ణాంకం fillchar_len = MB_CHAR2LEN(fillchar);
+		ఒకవేళ (n < 0)
 		{
 		    // fill by appending characters
 		    n = 0 - n;
-		    while (l++ < n && p + fillchar_len < out + outlen)
-			MB_CHAR2BYTES(fillchar, p);
+		    అయితే (l++ < n && p + fillchar_len < బహిర్గతం + outlen)
+			MB_CHAR2_బైట్లు(fillchar, p);
 		}
-		else
+		లేకపోతే
 		{
 		    // fill by inserting characters
 		    n = n - l;
 		    l = n * fillchar_len;
-		    if (p + l >= out + outlen)
+		    ఒకవేళ (p + l >= బహిర్గతం + outlen)
 		    {
-			n = (long)((out + outlen) - p - 1) / fillchar_len;
+			n = (దీర్ఘ)((బహిర్గతం + outlen) - p - 1) / fillchar_len;
 			l = n * fillchar_len;
 		    }
 		    mch_memmove(t + l, t, (size_t)(p - t));
 		    p += l;
-		    for ( ; n > 0; n--)
-			MB_CHAR2BYTES(fillchar, t);
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
-			stl_items[n].stl_start += l;
+		    కొరకు ( ; n > 0; n--)
+			MB_CHAR2_బైట్లు(fillchar, t);
+		    కొరకు (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+			stl_వస్తువులు[n].stl_ప్రారంభం += l;
 		}
 	    }
-	    continue;
+	    కొనసాగు;
 	}
 	minwid = 0;
 	maxwid = 9999;
 	zeropad = FALSE;
 	l = 1;
-	if (*s == '0')
+	ఒకవేళ (*s == '0')
 	{
 	    s++;
 	    zeropad = TRUE;
 	}
-	if (*s == '-')
+	ఒకవేళ (*s == '-')
 	{
 	    s++;
 	    l = -1;
 	}
-	if (VIM_ISDIGIT(*s))
+	ఒకవేళ (VIM_ISDIGIT(*s))
 	{
-	    minwid = (int)getdigits(&s);
-	    if (minwid < 0)	// overflow
+	    minwid = (పూర్ణాంకం)getdigits(&s);
+	    ఒకవేళ (minwid < 0)	//అధికప్రవాహం
 		minwid = 0;
 	}
-	if (*s == STL_USER_HL)
+	ఒకవేళ (*s == STL_USER_HL)
 	{
-	    stl_items[curitem].stl_type = Highlight;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
+	    stl_వస్తువులు[curitem].stl_type = Highlight;
+	    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+	    stl_వస్తువులు[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    కొనసాగు;
 	}
-	if (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
+	ఒకవేళ (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
 	{
-	    if (*s == STL_TABCLOSENR)
+	    ఒకవేళ (*s == STL_TABCLOSENR)
 	    {
-		if (minwid == 0)
+		ఒకవేళ (minwid == 0)
 		{
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
-		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
-					       && stl_items[n].stl_minwid >= 0)
+		    కొరకు (n = curitem - 1; n >= 0; --n)
+			ఒకవేళ (stl_వస్తువులు[n].stl_type == Tab_పుట
+					       && stl_వస్తువులు[n].stl_minwid >= 0)
 			{
-			    minwid = stl_items[n].stl_minwid;
-			    break;
+			    minwid = stl_వస్తువులు[n].stl_minwid;
+			    ఆపు;
 			}
 		}
-		else
+		లేకపోతే
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
-	    stl_items[curitem].stl_type = TabPage;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
+	    stl_వస్తువులు[curitem].stl_type = Tab_పుట;
+	    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+	    stl_వస్తువులు[curitem].stl_minwid = minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    కొనసాగు;
 	}
-	if (*s == '.')
+	ఒకవేళ (*s == '.')
 	{
 	    s++;
-	    if (VIM_ISDIGIT(*s))
+	    ఒకవేళ (VIM_ISDIGIT(*s))
 	    {
-		maxwid = (int)getdigits(&s);
-		if (maxwid <= 0)	// overflow
+		maxwid = (పూర్ణాంకం)getdigits(&s);
+		ఒకవేళ (maxwid <= 0)	//అధికప్రవాహం
 		    maxwid = 50;
 	    }
 	}
 	// Keep the uncapped value for %N[FuncName] click-region IDs; the 50
 	// cap below applies only when minwid is used as a padding width.
-	int raw_minwid = minwid * l;
+	పూర్ణాంకం raw_minwid = minwid * l;
 	minwid = (minwid > 50 ? 50 : minwid) * l;
-	if (*s == '(')
+	ఒకవేళ (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
-	    stl_items[curitem].stl_type = Group;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
-	    stl_items[curitem].stl_maxwid = maxwid;
+	    stl_వస్తువులు[curitem].stl_type = సమూహం_2;
+	    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+	    stl_వస్తువులు[curitem].stl_minwid = minwid;
+	    stl_వస్తువులు[curitem].stl_maxwid = maxwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    కొనసాగు;
 	}
 # ifdef FEAT_EVAL
 	// Denotes end of expanded %{} block
-	if (*s == '}' && evaldepth > 0)
+	ఒకవేళ (*s == '}' && evaldepth > 0)
 	{
 	    s++;
 	    evaldepth--;
-	    continue;
+	    కొనసాగు;
 	}
 # endif
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	ఒకవేళ (vim_strchr(STL_ALL, *s) == ఖాళీ)
 	{
-	    if (*s == NUL)  // can happen with "%0"
-		break;
+	    ఒకవేళ (*s == NUL)  // can happen with "%0"
+		ఆపు;
 	    s++;
-	    continue;
+	    కొనసాగు;
 	}
 	opt = *s++;
 
 	// OK - now for the real work
-	base = 'D';
+	పునాది = 'D';
 	itemisflag = FALSE;
 	fillable = TRUE;
-	num = -1;
-	str = NULL;
-	switch (opt)
+	అంకె = -1;
+	str = ఖాళీ;
+	ఎంపిక (opt)
 	{
-	case STL_FILEPATH:
-	case STL_FULLPATH:
-	case STL_FILENAME:
+	స్థితి STL_FILEPATH:
+	స్థితి STL_FULLPATH:
+	స్థితి STL_FILENAME:
 	{
 	    char_u  *name;
 
 	    fillable = FALSE;	// don't change ' ' to fillchar
-	    name = buf_spname(wp->w_buffer);
-	    if (name != NULL)
+	    name = buf_spname(wp->w_బఫరు);
+	    ఒకవేళ (name != ఖాళీ)
 		vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	    else
+	    లేకపోతే
 	    {
-		char_u	*t = (opt == STL_FULLPATH) ? wp->w_buffer->b_ffname
-					  : wp->w_buffer->b_fname;
-		home_replace(wp->w_buffer, t, NameBuff, MAXPATHL, TRUE);
+		char_u	*t = (opt == STL_FULLPATH) ? wp->w_బఫరు->b_ffname
+					  : wp->w_బఫరు->b_fname;
+		home_replace(wp->w_బఫరు, t, NameBuff, MAXPATHL, TRUE);
 	    }
 	    trans_characters(NameBuff, MAXPATHL);
-	    if (opt != STL_FILENAME)
+	    ఒకవేళ (opt != STL_FILENAME)
 		str = NameBuff;
-	    else
+	    లేకపోతే
 		str = gettail(NameBuff);
-	    break;
+	    ఆపు;
 	}
 
-	case STL_VIM_EXPR: // '{'
+	స్థితి STL_VIM_సమాసం: // '{'
 	{
 # ifdef FEAT_EVAL
-	    char_u  *block_start = s - 1;
+	    char_u  *ఖండం_ప్రారంభం = s - 1;
 # endif
-	    int	    reevaluate = (*s == '%');
+	    పూర్ణాంకం	    reevaluate = (*s == '%');
 	    char_u  *t;
 	    buf_T   *save_curbuf;
 	    win_T   *save_curwin;
 
-	    if (reevaluate)
+	    ఒకవేళ (reevaluate)
 		s++;
 	    // %0{} keeps the result verbatim
 	    itemisflag = zeropad ? FALSE : TRUE;
 	    t = p;
-	    while ((*s != '}' || (reevaluate && s[-1] != '%'))
-					  && *s != NUL && p + 1 < out + outlen)
+	    అయితే ((*s != '}' || (reevaluate && s[-1] != '%'))
+					  && *s != NUL && p + 1 < బహిర్గతం + outlen)
 		*p++ = *s++;
-	    if (*s != '}')	// missing '}' or out of space
-		break;
+	    ఒకవేళ (*s != '}')	// missing '}' or out of space
+		ఆపు;
 	    s++;
-	    if (reevaluate && p > out)
+	    ఒకవేళ (reevaluate && p > బహిర్గతం)
 		p[-1] = NUL; // remove the % at the end of %{% expr %}
-	    else
+	    లేకపోతే
 		*p = NUL;
 	    p = t;
 # ifdef FEAT_EVAL
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp),
+	    vim_snprintf((అక్షరం *)buf_tmp, పరిమాణం(buf_tmp),
 							 "%d", curbuf->b_fnum);
-	    set_internal_string_var((char_u *)"g:actual_curbuf", buf_tmp);
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "%d", curwin->w_id);
-	    set_internal_string_var((char_u *)"g:actual_curwin", buf_tmp);
+	    సమితి_అంతర్గత_string_var((char_u *)"g:actual_curbuf", buf_tmp);
+	    vim_snprintf((అక్షరం *)buf_tmp, పరిమాణం(buf_tmp), "%d", curwin->w_id);
+	    సమితి_అంతర్గత_string_var((char_u *)"g:actual_curwin", buf_tmp);
 
 	    save_curbuf = curbuf;
 	    save_curwin = curwin;
-	    save_VIsual_active = VIsual_active;
+	    save_VIsual_చురుకైన = VIsual_చురుకైన;
 	    curwin = wp;
-	    curbuf = wp->w_buffer;
+	    curbuf = wp->w_బఫరు;
 	    // Visual mode is only valid in the current window.
-	    if (curwin != save_curwin)
-		VIsual_active = FALSE;
+	    ఒకవేళ (curwin != save_curwin)
+		VIsual_చురుకైన = FALSE;
 
-	    str = eval_to_string_safe(p, use_sandbox, FALSE, FALSE);
+	    str = eval_గమ్యం_string_సురక్షిత(p, use_sandbox, FALSE, FALSE);
 
 	    curwin = save_curwin;
 	    curbuf = save_curbuf;
-	    VIsual_active = save_VIsual_active;
+	    VIsual_చురుకైన = save_VIsual_చురుకైన;
 	    do_unlet((char_u *)"g:actual_curbuf", TRUE);
 	    do_unlet((char_u *)"g:actual_curwin", TRUE);
 
-	    if (!zeropad && str != NULL && *str != NUL)
+	    ఒకవేళ (!zeropad && str != ఖాళీ && *str != NUL)
 	    {
-		if (*skipdigits(str) == NUL)
+		ఒకవేళ (*skipdigits(str) == NUL)
 		{
-		    num = atoi((char *)str);
+		    అంకె = atoi((అక్షరం *)str);
 		    VIM_CLEAR(str);
 		    itemisflag = FALSE;
 		}
@@ -5107,394 +5107,394 @@ build_stl_str_hl_local(
 
 	    // If the output of the expression needs to be evaluated
 	    // replace the %{} block with the result of evaluation
-	    if (reevaluate && str != NULL && *str != NUL
-		    && strchr((const char *)str, '%') != NULL
-		    && evaldepth < MAX_STL_EVAL_DEPTH)
+	    ఒకవేళ (reevaluate && str != ఖాళీ && *str != NUL
+		    && strchr((స్థిరరాశి అక్షరం *)str, '%') != ఖాళీ
+		    && evaldepth < MAX_STL_EVAL_లోతు)
 	    {
-		size_t parsed_usefmt = (size_t)(block_start - usefmt);
-		size_t str_length = strlen((const char *)str);
-		size_t fmt_length = strlen((const char *)s);
+		size_t parsed_usefmt = (size_t)(ఖండం_ప్రారంభం - usefmt);
+		size_t str_నిడివి = అక్షరశ్రేణి_పొడవు((స్థిరరాశి అక్షరం *)str);
+		size_t fmt_నిడివి = అక్షరశ్రేణి_పొడవు((స్థిరరాశి అక్షరం *)s);
 		size_t new_fmt_len = parsed_usefmt
-						 + str_length + fmt_length + 3;
-		char_u *new_fmt = (char_u *)alloc(new_fmt_len * sizeof(char_u));
+						 + str_నిడివి + fmt_నిడివి + 3;
+		char_u *new_fmt = (char_u *)alloc(new_fmt_len * పరిమాణం(char_u));
 
-		if (new_fmt != NULL)
+		ఒకవేళ (new_fmt != ఖాళీ)
 		{
 		    char_u *new_fmt_p = new_fmt;
 
-		    new_fmt_p = (char_u *)memcpy(new_fmt_p, usefmt, parsed_usefmt)
+		    new_fmt_p = (char_u *)జ్ఞాపకం_నకలు(new_fmt_p, usefmt, parsed_usefmt)
 								   + parsed_usefmt;
-		    new_fmt_p = (char_u *)memcpy(new_fmt_p , str, str_length)
-								      + str_length;
-		    new_fmt_p = (char_u *)memcpy(new_fmt_p, "%}", 2) + 2;
-		    new_fmt_p = (char_u *)memcpy(new_fmt_p , s, fmt_length)
-								      + fmt_length;
+		    new_fmt_p = (char_u *)జ్ఞాపకం_నకలు(new_fmt_p , str, str_నిడివి)
+								      + str_నిడివి;
+		    new_fmt_p = (char_u *)జ్ఞాపకం_నకలు(new_fmt_p, "%}", 2) + 2;
+		    new_fmt_p = (char_u *)జ్ఞాపకం_నకలు(new_fmt_p , s, fmt_నిడివి)
+								      + fmt_నిడివి;
 		    *new_fmt_p = 0;
-		    new_fmt_p = NULL;
+		    new_fmt_p = ఖాళీ;
 
-		    if (usefmt != fmt)
+		    ఒకవేళ (usefmt != fmt)
 			vim_free(usefmt);
 		    VIM_CLEAR(str);
 		    usefmt = new_fmt;
 		    s = usefmt + parsed_usefmt;
 		    evaldepth++;
-		    continue;
+		    కొనసాగు;
 		}
 	    }
 # endif
-	    break;
+	    ఆపు;
 	}
-	case STL_LINE:
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
-		  ? 0L : (long)(wp->w_cursor.lnum);
-	    break;
+	స్థితి STL_పంక్తి:
+	    అంకె = (wp->w_బఫరు->b_ml.ml_flags & ML_ఖాళీలు)
+		  ? 0L : (దీర్ఘ)(wp->w_cursor.lnum);
+	    ఆపు;
 
-	case STL_NUMLINES:
-	    num = wp->w_buffer->b_ml.ml_line_count;
-	    break;
+	స్థితి STL_NUMLINES:
+	    అంకె = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
+	    ఆపు;
 
-	case STL_COLUMN:
-	    num = (State & MODE_INSERT) == 0 && empty_line
-					       ? 0 : (int)wp->w_cursor.col + 1;
-	    break;
+	స్థితి STL_స్తంభం:
+	    అంకె = (State & బహుళకం_చొప్పించు) == 0 && ఖాళీలు_పంక్తి
+					       ? 0 : (పూర్ణాంకం)wp->w_cursor.నిలువు + 1;
+	    ఆపు;
 
-	case STL_VIRTCOL:
-	case STL_VIRTCOL_ALT:
+	స్థితి STL_VIRTCOL:
+	స్థితి STL_VIRTCOL_ALT:
 	{
 	    colnr_T virtcol = wp->w_virtcol + 1;
 
 	    // Don't display %V if it's the same as %c.
-	    if (opt == STL_VIRTCOL_ALT
-		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
-		break;
-	    num = (long)virtcol;
-	    break;
+	    ఒకవేళ (opt == STL_VIRTCOL_ALT
+		    && (virtcol == (colnr_T)((State & బహుళకం_చొప్పించు) == 0
+			       && ఖాళీలు_పంక్తి ? 0 : (పూర్ణాంకం)wp->w_cursor.నిలువు + 1)))
+		ఆపు;
+	    అంకె = (దీర్ఘ)virtcol;
+	    ఆపు;
 	}
 
-	case STL_PERCENTAGE:
-	    num = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_line_count);
-	    break;
+	స్థితి STL_PERCENTAGE:
+	    అంకె = calc_percentage((దీర్ఘ)wp->w_cursor.lnum, (దీర్ఘ)wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క);
+	    ఆపు;
 
-	case STL_ALTPERCENT:
+	స్థితి STL_ALTPERCENT:
 	    str = buf_tmp;
-	    (void)get_rel_pos(wp, str, TMPLEN);
-	    break;
+	    (శూన్య)get_rel_pos(wp, str, TMPLEN);
+	    ఆపు;
 
-	case STL_SHOWCMD:
-	    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+	స్థితి STL_SHOWCMD:
+	    ఒకవేళ (p_sc && STRCMP(opt_name, p_sloc) == 0)
 		str = showcmd_buf;
-	    break;
+	    ఆపు;
 
-	case STL_ARGLISTSTAT:
+	స్థితి STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    ఒకవేళ (append_arg_సంఖ్య(wp, buf_tmp, పరిమాణం(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
-	    break;
+	    ఆపు;
 
-	case STL_KEYMAP:
+	స్థితి STL_KEYMAP:
 	    fillable = FALSE;
-	    if (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
+	    ఒకవేళ (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
 		str = buf_tmp;
-	    break;
-	case STL_PAGENUM:
-# if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
-	    num = printer_page_num;
-# else
-	    num = 0;
+	    ఆపు;
+	స్థితి STL_PAGENUM:
+# ఒకవేళ defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
+	    అంకె = printer_పుట_అంకె;
+# లేకపోతే
+	    అంకె = 0;
 # endif
-	    break;
+	    ఆపు;
 
-	case STL_BUFNO:
-	    num = wp->w_buffer->b_fnum;
-	    break;
+	స్థితి STL_BUFNO:
+	    అంకె = wp->w_బఫరు->b_fnum;
+	    ఆపు;
 
-	case STL_OFFSET_X:
-	    base = 'X';
+	స్థితి STL_స్థానభ్రంశం_X:
+	    పునాది = 'X';
 	    // FALLTHROUGH
-	case STL_OFFSET:
+	స్థితి STL_స్థానభ్రంశం:
 # ifdef FEAT_BYTEOFF
-	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
-		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
-				? 0 : (int)wp->w_cursor.col);
+	    l = ml_కనుగొను_పంక్తి_or_స్థానభ్రంశం(wp->w_బఫరు, wp->w_cursor.lnum, ఖాళీ);
+	    అంకె = (wp->w_బఫరు->b_ml.ml_flags & ML_ఖాళీలు) || l < 0
+		       ? 0L : l + 1 + ((State & బహుళకం_చొప్పించు) == 0 && ఖాళీలు_పంక్తి
+				? 0 : (పూర్ణాంకం)wp->w_cursor.నిలువు);
 # endif
-	    break;
+	    ఆపు;
 
-	case STL_BYTEVAL_X:
-	    base = 'X';
+	స్థితి STL_BYTEVAL_X:
+	    పునాది = 'X';
 	    // FALLTHROUGH
-	case STL_BYTEVAL:
-	    num = byteval;
-	    if (num == NL)
-		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
-		num = NL;
-	    break;
+	స్థితి STL_BYTEVAL:
+	    అంకె = byteval;
+	    ఒకవేళ (అంకె == NL)
+		అంకె = 0;
+	    లేకపోతే ఒకవేళ (అంకె == CAR && get_fileformat(wp->w_బఫరు) == EOL_MAC)
+		అంకె = NL;
+	    ఆపు;
 
-	case STL_ROFLAG:
-	case STL_ROFLAG_ALT:
+	స్థితి STL_ROFLAG:
+	స్థితి STL_ROFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_p_ro)
+	    ఒకవేళ (wp->w_బఫరు->b_p_ro)
 		str = (char_u *)((opt == STL_ROFLAG_ALT) ? ",RO" : _("[RO]"));
-	    break;
+	    ఆపు;
 
-	case STL_HELPFLAG:
-	case STL_HELPFLAG_ALT:
+	స్థితి STL_HELPFLAG:
+	స్థితి STL_HELPFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_help)
+	    ఒకవేళ (wp->w_బఫరు->b_help)
 		str = (char_u *)((opt == STL_HELPFLAG_ALT) ? ",HLP"
 							       : _("[Help]"));
-	    break;
+	    ఆపు;
 
-	case STL_FILETYPE:
-	    if (*wp->w_buffer->b_p_ft != NUL
-		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 3)
+	స్థితి STL_FILETYPE:
+	    ఒకవేళ (*wp->w_బఫరు->b_p_ft != NUL
+		    && STRLEN(wp->w_బఫరు->b_p_ft) < TMPLEN - 3)
 	    {
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "[%s]",
-							wp->w_buffer->b_p_ft);
+		vim_snprintf((అక్షరం *)buf_tmp, పరిమాణం(buf_tmp), "[%s]",
+							wp->w_బఫరు->b_p_ft);
 		str = buf_tmp;
 	    }
-	    break;
+	    ఆపు;
 
-	case STL_FILETYPE_ALT:
+	స్థితి STL_FILETYPE_ALT:
 	    itemisflag = TRUE;
-	    if (*wp->w_buffer->b_p_ft != NUL
-		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 2)
+	    ఒకవేళ (*wp->w_బఫరు->b_p_ft != NUL
+		    && STRLEN(wp->w_బఫరు->b_p_ft) < TMPLEN - 2)
 	    {
 		char_u	*t;
 
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), ",%s",
-							wp->w_buffer->b_p_ft);
-		for (t = buf_tmp; *t != 0; t++)
+		vim_snprintf((అక్షరం *)buf_tmp, పరిమాణం(buf_tmp), ",%s",
+							wp->w_బఫరు->b_p_ft);
+		కొరకు (t = buf_tmp; *t != 0; t++)
 		    *t = TOUPPER_LOC(*t);
 		str = buf_tmp;
 	    }
-	    break;
+	    ఆపు;
 
-# if defined(FEAT_QUICKFIX)
-	case STL_PREVIEWFLAG:
-	case STL_PREVIEWFLAG_ALT:
+# ఒకవేళ defined(FEAT_QUICKFIX)
+	స్థితి STL_PREVIEWFLAG:
+	స్థితి STL_PREVIEWFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_p_pvw)
+	    ఒకవేళ (wp->w_p_pvw)
 		str = (char_u *)((opt == STL_PREVIEWFLAG_ALT) ? ",PRV"
 							    : _("[Preview]"));
-	    break;
+	    ఆపు;
 
-	case STL_QUICKFIX:
-	    if (bt_quickfix(wp->w_buffer))
+	స్థితి STL_QUICKFIX:
+	    ఒకవేళ (bt_quickfix(wp->w_బఫరు))
 		str = (char_u *)(wp->w_llist_ref
-			    ? _(msg_loclist)
-			    : _(msg_qflist));
-	    break;
+			    ? _(సందేశం_loclist)
+			    : _(సందేశం_qflist));
+	    ఆపు;
 # endif
 
-	case STL_MODIFIED:
-	case STL_MODIFIED_ALT:
+	స్థితి STL_MODIFIED:
+	స్థితి STL_MODIFIED_ALT:
 	    itemisflag = TRUE;
-	    switch ((opt == STL_MODIFIED_ALT)
-		    + bufIsChanged(wp->w_buffer) * 2
-		    + (!wp->w_buffer->b_p_ma) * 4)
+	    ఎంపిక ((opt == STL_MODIFIED_ALT)
+		    + buf_Is_మారింది(wp->w_బఫరు) * 2
+		    + (!wp->w_బఫరు->b_p_ma) * 4)
 	    {
-		case 2: str = (char_u *)"[+]"; break;
-		case 3: str = (char_u *)",+"; break;
-		case 4: str = (char_u *)"[-]"; break;
-		case 5: str = (char_u *)",-"; break;
-		case 6: str = (char_u *)"[+-]"; break;
-		case 7: str = (char_u *)",+-"; break;
+		స్థితి 2: str = (char_u *)"[+]"; ఆపు;
+		స్థితి 3: str = (char_u *)",+"; ఆపు;
+		స్థితి 4: str = (char_u *)"[-]"; ఆపు;
+		స్థితి 5: str = (char_u *)",-"; ఆపు;
+		స్థితి 6: str = (char_u *)"[+-]"; ఆపు;
+		స్థితి 7: str = (char_u *)",+-"; ఆపు;
 	    }
-	    break;
+	    ఆపు;
 
-	case STL_HIGHLIGHT:
+	స్థితి STL_HIGHLIGHT:
 	    {
 		char_u  *t = s;
 
-		while (*s != '#' && *s != NUL)
+		అయితే (*s != '#' && *s != NUL)
 		    ++s;
-		if (*s == '#')
+		ఒకవేళ (*s == '#')
 		{
-		    stl_items[curitem].stl_type = Highlight;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_వస్తువులు[curitem].stl_type = Highlight;
+		    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+		    stl_వస్తువులు[curitem].stl_minwid = -syn_namen2id(t, (పూర్ణాంకం)(s - t));
 		    curitem++;
 		}
-		if (*s != NUL)
+		ఒకవేళ (*s != NUL)
 		    ++s;
-		continue;
+		కొనసాగు;
 	    }
 
-	case STL_CLICKFUNC:
+	స్థితి STL_CLICKFUNC:
 	    // %N[] - end click region (with minwid, minwid is ignored)
-	    if (*s == ']')
+	    ఒకవేళ (*s == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_వస్తువులు[curitem].stl_type = ClickFunc;
+		stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+		stl_వస్తువులు[curitem].stl_minwid = 0;
+		stl_వస్తువులు[curitem].stl_clickfunc = ఖాళీ;
 		s++;
 		curitem++;
-		continue;
+		కొనసాగు;
 	    }
 	    // %N[FuncName] with minwid
-	    if (ASCII_ISALPHA(*s) || *s == '_')
+	    ఒకవేళ (ASCII_ISALPHA(*s) || *s == '_')
 	    {
 		char_u *rb = vim_strchr(s, ']');
-		if (rb != NULL)
+		ఒకవేళ (rb != ఖాళీ)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
+		    stl_వస్తువులు[curitem].stl_type = ClickFunc;
+		    stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
 		    // The stl_minwid field is overloaded: it may be the
 		    // "min" part of %<min>.<max> used for padding, or an
 		    // identifier passed to the %N[FuncName] callback.  Store
 		    // the uncapped value so IDs above 50 are preserved.
-		    stl_items[curitem].stl_minwid = raw_minwid;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_వస్తువులు[curitem].stl_minwid = raw_minwid;
+		    stl_వస్తువులు[curitem].stl_clickfunc =
 					      vim_strnsave(s, rb - s);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    కొనసాగు;
 		}
 	    }
-	    continue;
+	    కొనసాగు;
 
-	case STL_LINEBREAK:
+	స్థితి STL_LINEBREAK:
 	    // %N@ - line break (already handled above, fallback)
-	    continue;
+	    కొనసాగు;
 	}
 
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_type = Normal;
-	if (str != NULL && *str)
+	stl_వస్తువులు[curitem].stl_ప్రారంభం = p;
+	stl_వస్తువులు[curitem].stl_type = సాధారణ;
+	ఒకవేళ (str != ఖాళీ && *str)
 	{
 	    char_u  *t = str;
 
-	    if (itemisflag)
+	    ఒకవేళ (itemisflag)
 	    {
-		if ((t[0] && t[1])
+		ఒకవేళ ((t[0] && t[1])
 			&& ((!prevchar_isitem && *t == ',')
 			      || (prevchar_isflag && *t == ' ')))
 		    t++;
 		prevchar_isflag = TRUE;
 	    }
 	    l = vim_strsize(t);
-	    if (l > 0)
+	    ఒకవేళ (l > 0)
 		prevchar_isitem = TRUE;
-	    if (l > maxwid)
+	    ఒకవేళ (l > maxwid)
 	    {
-		while (l >= maxwid)
-		    if (has_mbyte)
+		అయితే (l >= maxwid)
+		    ఒకవేళ (has_mbyte)
 		    {
 			l -= ptr2cells(t);
 			t += (*mb_ptr2len)(t);
 		    }
-		    else
+		    లేకపోతే
 			l -= byte2cells(*t++);
-		if (p + 1 >= out + outlen)
-		    break;
+		ఒకవేళ (p + 1 >= బహిర్గతం + outlen)
+		    ఆపు;
 		*p++ = '<';
 	    }
-	    if (minwid > 0)
+	    ఒకవేళ (minwid > 0)
 	    {
-		for (; l < minwid && p + 1 < out + outlen; l++)
+		కొరకు (; l < minwid && p + 1 < బహిర్గతం + outlen; l++)
 		{
 		    // Don't put a "-" in front of a digit.
-		    if (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
+		    ఒకవేళ (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
 			*p++ = ' ';
-		    else
-			MB_CHAR2BYTES(fillchar, p);
+		    లేకపోతే
+			MB_CHAR2_బైట్లు(fillchar, p);
 		}
 		minwid = 0;
 	    }
-	    else
+	    లేకపోతే
 		minwid *= -1;
-	    for (; *t && p + 1 < out + outlen; t++)
+	    కొరకు (; *t && p + 1 < బహిర్గతం + outlen; t++)
 	    {
 		// Change a space by fillchar, unless fillchar is '-' and a
 		// digit follows.
-		if (fillable && *t == ' '
+		ఒకవేళ (fillable && *t == ' '
 				&& (!VIM_ISDIGIT(*(t + 1)) || fillchar != '-'))
-		    MB_CHAR2BYTES(fillchar, p);
-		else
+		    MB_CHAR2_బైట్లు(fillchar, p);
+		లేకపోతే
 		    *p++ = *t;
 	    }
-	    for (; l < minwid && p + 1 < out + outlen; l++)
-		MB_CHAR2BYTES(fillchar, p);
+	    కొరకు (; l < minwid && p + 1 < బహిర్గతం + outlen; l++)
+		MB_CHAR2_బైట్లు(fillchar, p);
 	}
-	else if (num >= 0)
+	లేకపోతే ఒకవేళ (అంకె >= 0)
 	{
-	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
+	    పూర్ణాంకం	    nbase = (పునాది == 'D' ? 10 : (పునాది == 'O' ? 8 : 16));
 	    char_u  nstr[20];
 	    char_u  *t = nstr;
 
-	    if (p + 20 >= out + outlen)
-		break;		// not sufficient space
+	    ఒకవేళ (p + 20 >= బహిర్గతం + outlen)
+		ఆపు;		// not sufficient space
 	    prevchar_isitem = TRUE;
-	    if (opt == STL_VIRTCOL_ALT)
+	    ఒకవేళ (opt == STL_VIRTCOL_ALT)
 	    {
 		*t++ = '-';
 		minwid--;
 	    }
 	    *t++ = '%';
-	    if (zeropad)
+	    ఒకవేళ (zeropad)
 		*t++ = '0';
 	    *t++ = '*';
-	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
+	    *t++ = nbase == 16 ? పునాది : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    కొరకు (n = అంకె, l = 1; n >= nbase; n /= nbase)
 		l++;
-	    if (opt == STL_VIRTCOL_ALT)
+	    ఒకవేళ (opt == STL_VIRTCOL_ALT)
 		l++;
 
-	    if (l > maxwid)
+	    ఒకవేళ (l > maxwid)
 	    {
 		l += 2;
 		n = l - maxwid;
-		while (l-- > maxwid)
-		    num /= nbase;
+		అయితే (l-- > maxwid)
+		    అంకె /= nbase;
 		*t++ = '>';
 		*t++ = '%';
 		*t = t[-3];
 		*++t = NUL;
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, 0, num, n);
+		p += vim_snprintf_safelen((అక్షరం *)p, outlen - (p - బహిర్గతం),
+		    (అక్షరం *)nstr, 0, అంకె, n);
 	    }
-	    else
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, minwid, num);
+	    లేకపోతే
+		p += vim_snprintf_safelen((అక్షరం *)p, outlen - (p - బహిర్గతం),
+		    (అక్షరం *)nstr, minwid, అంకె);
 	}
-	else
-	    stl_items[curitem].stl_type = Empty;
+	లేకపోతే
+	    stl_వస్తువులు[curitem].stl_type = ఖాళీలు;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	ఒకవేళ (అంకె >= 0 || (!itemisflag && str != ఖాళీ && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	ఒకవేళ (opt == STL_VIM_సమాసం)
 	    vim_free(str);
 	curitem++;
     }
-# ifdef ENABLE_STL_MODE_MULTI_NL
-find_linebreak:
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
+కనుగొను_linebreak:
 # endif
     *p = NUL;
-    outputlen = (size_t)(p - out);
+    outputlen = (size_t)(p - బహిర్గతం);
     itemcnt = curitem;
 
     // Remember the most recent %# / %* highlight so the next row of a
     // multi-line statusline can resume it.
-    if (carry_hl != NULL)
+    ఒకవేళ (వాహకం_hl != ఖాళీ)
     {
-	int last_hl = 0;
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
-		last_hl = stl_items[l].stl_minwid;
-	*carry_hl = last_hl;
+	పూర్ణాంకం చివరి_hl = 0;
+	కొరకు (l = 0; l < itemcnt; l++)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == Highlight)
+		చివరి_hl = stl_వస్తువులు[l].stl_minwid;
+	*వాహకం_hl = చివరి_hl;
     }
 
-    if (mode == STL_MODE_MULTI
-# ifdef ENABLE_STL_MODE_MULTI_NL
-		    || mode == STL_MODE_MULTI_NL
+    ఒకవేళ (బహుళకం == STL_బహుళకం_MULTI
+# ifdef ENABLE_STL_బహుళకం_MULTI_NL
+		    || బహుళకం == STL_బహుళకం_MULTI_NL
 # endif
        )
     {
@@ -5506,236 +5506,236 @@ find_linebreak:
 	// "fmt" and shift the remaining format string within "usefmt" for the
 	// caller's next iteration.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	ఒకవేళ (usefmt != fmt)
 	    vim_free(fmt);
 # endif
-	size_t fmt_remain_len = strlen((char *)s);
+	size_t fmt_remain_len = అక్షరశ్రేణి_పొడవు((అక్షరం *)s);
 
 	mch_memmove(usefmt, s, fmt_remain_len);
 	usefmt[fmt_remain_len] = NUL;
 	*fmt_arg = usefmt;
     }
-    else
+    లేకపోతే
     {
 	// In single-line mode, the caller retains ownership of its buffer.
 	// Free the eval result if "%!" was used.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	ఒకవేళ (usefmt != fmt)
 	    vim_free(usefmt);
 # endif
     }
 
-    if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+    ఒకవేళ (బహుళకం == STL_బహుళకం_GET_RENDERED_ఎత్తు)
     {
 	// Free click function names that were allocated during parsing.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
-	if (rendered_height != NULL)
-	    *rendered_height = rheight;
-	return 0;
+	కొరకు (l = 0; l < itemcnt; l++)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == ClickFunc)
+		vim_free(stl_వస్తువులు[l].stl_clickfunc);
+	ఒకవేళ (rendered_ఎత్తు != ఖాళీ)
+	    *rendered_ఎత్తు = rheight;
+	తిరిగి 0;
     }
 
-    width = vim_strsize(out);
-    if (maxwidth > 0 && width > maxwidth)
+    వెడల్పు = vim_strsize(బహిర్గతం);
+    ఒకవేళ (maxwidth > 0 && వెడల్పు > maxwidth)
     {
 	// Result is too long, must truncate somewhere.
 	l = 0;
-	if (itemcnt == 0)
-	    s = out;
-	else
+	ఒకవేళ (itemcnt == 0)
+	    s = బహిర్గతం;
+	లేకపోతే
 	{
-	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+	    కొరకు ( ; l < itemcnt; l++)
+		ఒకవేళ (stl_వస్తువులు[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
-		    s = stl_items[l].stl_start;
-		    break;
+		    s = stl_వస్తువులు[l].stl_ప్రారంభం;
+		    ఆపు;
 		}
-	    if (l == itemcnt)
+	    ఒకవేళ (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
-		s = stl_items[0].stl_start;
+		s = stl_వస్తువులు[0].stl_ప్రారంభం;
 		l = 0;
 	    }
 	}
 
-	if (width - vim_strsize(s) >= maxwidth)
+	ఒకవేళ (వెడల్పు - vim_strsize(s) >= maxwidth)
 	{
 	    // Truncation mark is beyond max length
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
-		s = out;
-		width = 0;
-		for (;;)
+		s = బహిర్గతం;
+		వెడల్పు = 0;
+		కొరకు (;;)
 		{
-		    width += ptr2cells(s);
-		    if (width >= maxwidth)
-			break;
+		    వెడల్పు += ptr2cells(s);
+		    ఒకవేళ (వెడల్పు >= maxwidth)
+			ఆపు;
 		    s += (*mb_ptr2len)(s);
 		}
 		// Fill up for half a double-wide character.
-		while (++width < maxwidth)
-		    MB_CHAR2BYTES(fillchar, s);
+		అయితే (++వెడల్పు < maxwidth)
+		    MB_CHAR2_బైట్లు(fillchar, s);
 	    }
-	    else
-		s = out + maxwidth - 1;
-	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
-		    break;
+	    లేకపోతే
+		s = బహిర్గతం + maxwidth - 1;
+	    కొరకు (l = 0; l < itemcnt; l++)
+		ఒకవేళ (stl_వస్తువులు[l].stl_ప్రారంభం > s)
+		    ఆపు;
 	    itemcnt = l;
 	    *s++ = '>';
 	    *s = NUL;
 	}
-	else
+	లేకపోతే
 	{
-	    char_u  *end = out + outputlen;
+	    char_u  *చివర = బహిర్గతం + outputlen;
 
 	    n = 0;
-	    while (width >= maxwidth)
+	    అయితే (వెడల్పు >= maxwidth)
 	    {
-		width -= ptr2cells(s + n);
+		వెడల్పు -= ptr2cells(s + n);
 		n += (*mb_ptr2len)(s + n);
 	    }
 	    p = s + n;
-	    mch_memmove(s + 1, p, (size_t)(end - p) + 1);	// +1 for NUL
-	    end -= (size_t)(p - (s + 1));
+	    mch_memmove(s + 1, p, (size_t)(చివర - p) + 1);	// +1 for NUL
+	    చివర -= (size_t)(p - (s + 1));
 	    *s = '<';
 
 	    --n;	// count the '<'
-	    for (; l < itemcnt; l++)
+	    కొరకు (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
-		    stl_items[l].stl_start -= n;
-		else
-		    stl_items[l].stl_start = s;
+		ఒకవేళ (stl_వస్తువులు[l].stl_ప్రారంభం - n >= s)
+		    stl_వస్తువులు[l].stl_ప్రారంభం -= n;
+		లేకపోతే
+		    stl_వస్తువులు[l].stl_ప్రారంభం = s;
 	    }
 
 	    // Fill up for half a double-wide character.
-	    while (++width < maxwidth)
+	    అయితే (++వెడల్పు < maxwidth)
 	    {
-		s = end;
-		MB_CHAR2BYTES(fillchar, s);
+		s = చివర;
+		MB_CHAR2_బైట్లు(fillchar, s);
 		*s = NUL;
-		end = s;
+		చివర = s;
 	    }
 	}
-	width = maxwidth;
+	వెడల్పు = maxwidth;
     }
-    else if (width < maxwidth &&
-	    outputlen + (maxwidth - width) * MB_CHAR2LEN(fillchar) + 1 < outlen)
+    లేకపోతే ఒకవేళ (వెడల్పు < maxwidth &&
+	    outputlen + (maxwidth - వెడల్పు) * MB_CHAR2LEN(fillchar) + 1 < outlen)
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	పూర్ణాంకం అంకె_separators = 0;
 
-	for (l = 0; l < itemcnt; l++)
+	కొరకు (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
-		stl_separator_locations[num_separators] = l;
-		num_separators++;
+		stl_separator_locations[అంకె_separators] = l;
+		అంకె_separators++;
 	    }
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	ఒకవేళ (అంకె_separators)
 	{
-	    int standard_spaces;
-	    int final_spaces;
+	    పూర్ణాంకం standard_spaces;
+	    పూర్ణాంకం final_spaces;
 
-	    standard_spaces = (maxwidth - width) / num_separators;
-	    final_spaces = (maxwidth - width) -
-					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+	    standard_spaces = (maxwidth - వెడల్పు) / అంకె_separators;
+	    final_spaces = (maxwidth - వెడల్పు) -
+					standard_spaces * (అంకె_separators - 1);
+	    కొరకు (l = 0; l < అంకె_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		పూర్ణాంకం dislocation = (l == (అంకె_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
-		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
-		char_u *seploc = start + dislocation;
-		STRMOVE(seploc, start);
-		for (s = start; s < seploc;)
-		    MB_CHAR2BYTES(fillchar, s);
+		char_u *ప్రారంభం = stl_వస్తువులు[stl_separator_locations[l]].stl_ప్రారంభం;
+		char_u *seploc = ప్రారంభం + dislocation;
+		STRMOVE(seploc, ప్రారంభం);
+		కొరకు (s = ప్రారంభం; s < seploc;)
+		    MB_CHAR2_బైట్లు(fillchar, s);
 
-		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
-		    stl_items[i].stl_start += dislocation;
+		కొరకు (పూర్ణాంకం i = stl_separator_locations[l] + 1; i < itemcnt; i++)
+		    stl_వస్తువులు[i].stl_ప్రారంభం += dislocation;
 	    }
 
-	    width = maxwidth;
+	    వెడల్పు = maxwidth;
 	}
     }
 
     // Store the info about highlighting.
-    if (hltab != NULL)
+    ఒకవేళ (hltab != ఖాళీ)
     {
 	*hltab = stl_hltab;
 	sp = stl_hltab;
-	for (l = 0; l < itemcnt; l++)
+	కొరకు (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == Highlight)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->ప్రారంభం = stl_వస్తువులు[l].stl_ప్రారంభం;
+		sp->userhl = stl_వస్తువులు[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->ప్రారంభం = ఖాళీ;
 	sp->userhl = 0;
     }
 
     // Store the info about tab pages labels.
-    if (tabtab != NULL)
+    ఒకవేళ (tabtab != ఖాళీ)
     {
 	*tabtab = stl_tabtab;
 	sp = stl_tabtab;
-	for (l = 0; l < itemcnt; l++)
+	కొరకు (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == Tab_పుట)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->ప్రారంభం = stl_వస్తువులు[l].stl_ప్రారంభం;
+		sp->userhl = stl_వస్తువులు[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->ప్రారంభం = ఖాళీ;
 	sp->userhl = 0;
     }
 
     // Store the info about click function regions.
-    if (clicktab != NULL)
+    ఒకవేళ (clicktab != ఖాళీ)
     {
 	stl_clickrec_T *cp;
 
 	*clicktab = stl_clicktab;
 	cp = stl_clicktab;
-	for (l = 0; l < itemcnt; l++)
+	కొరకు (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == ClickFunc)
 	    {
-		cp->start = stl_items[l].stl_start;
-		cp->funcname = stl_items[l].stl_clickfunc;
-		cp->minwid = stl_items[l].stl_minwid;
+		cp->ప్రారంభం = stl_వస్తువులు[l].stl_ప్రారంభం;
+		cp->funcname = stl_వస్తువులు[l].stl_clickfunc;
+		cp->minwid = stl_వస్తువులు[l].stl_minwid;
 		cp++;
 	    }
 	}
-	cp->start = NULL;
-	cp->funcname = NULL;
+	cp->ప్రారంభం = ఖాళీ;
+	cp->funcname = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
 	// Free click function names when caller doesn't need them.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	కొరకు (l = 0; l < itemcnt; l++)
+	    ఒకవేళ (stl_వస్తువులు[l].stl_type == ClickFunc)
+		vim_free(stl_వస్తువులు[l].stl_clickfunc);
     }
 
     redraw_not_allowed = save_redraw_not_allowed;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = save_KeyTyped;
+    కీలకం_Typed = save_కీలకం_Typed;
 
     // Check for an error.  If there is one the display will be messed up and
     // might loop redrawing.  Avoid that by making the corresponding option
@@ -5743,77 +5743,77 @@ find_linebreak:
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // if (called_emsg > called_emsg_before)
-    if (did_emsg > did_emsg_before)
-	set_string_option_direct(opt_name, -1, (char_u *)"",
+    ఒకవేళ (did_emsg > did_emsg_before)
+	సమితి_string_option_ప్రత్యక్ష(opt_name, -1, (char_u *)"",
 					      OPT_FREE | opt_scope, SID_ERROR);
 
-    return width;
+    తిరిగి వెడల్పు;
 }
-#endif // FEAT_STL_OPT
+#అయితే_ముగింపు // FEAT_STL_OPT
 
 /*
  * Get relative cursor position in window into "buf[]", in the localized
  * percentage form like %99, 99%; using "Top", "Bot" or "All" when appropriate.
  */
-    int
+    పూర్ణాంకం
 get_rel_pos(
     win_T	*wp,
     char_u	*buf,
-    int		buflen)
+    పూర్ణాంకం		buflen)
 {
-    long	above; // number of lines above window
-    long	below; // number of lines below window
+    దీర్ఘ	above; // number of lines above window
+    దీర్ఘ	క్రింద; // number of lines below window
 
-    if (buflen < 3) // need at least 3 chars for writing
-	return 0;
+    ఒకవేళ (buflen < 3) // need at least 3 chars for writing
+	తిరిగి 0;
     above = wp->w_topline - 1;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     above += diff_check_fill(wp, wp->w_topline) - wp->w_topfill;
-    if (wp->w_topline == 1 && wp->w_topfill >= 1)
+    ఒకవేళ (wp->w_topline == 1 && wp->w_topfill >= 1)
 	above = 0;  // All buffer lines are displayed and there is an
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
-#endif
-    below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
-    if (below <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+#అయితే_ముగింపు
+    క్రింద = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క - wp->w_botline + 1;
+    ఒకవేళ (క్రింద <= 0)
+	తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
 
-    if (above <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    ఒకవేళ (above <= 0)
+	తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen,
 	    "%s", _("Top"));
 
-    int perc = calc_percentage(above, above + below);
-    char tmp[8];
+    పూర్ణాంకం perc = calc_percentage(above, above + క్రింద);
+    అక్షరం tmp[8];
     // localized percentage value
-    vim_snprintf(tmp, sizeof(tmp), _("%d%%"), perc);
-    return (int)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
+    vim_snprintf(tmp, పరిమాణం(tmp), _("%d%%"), perc);
+    తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen, _("%3s"), tmp);
 }
 
 /*
  * Append (file 2 of 8) to "buf[]", if editing more than one file.
  * Return the number of characters appended.
  */
-    static int
-append_arg_number(
+    స్థిర పూర్ణాంకం
+append_arg_సంఖ్య(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
-    int		add_file)	// Add "file" before the arg number
+    పూర్ణాంకం		కూడు_file)	// Add "file" before the arg number
 {
-    if (ARGCOUNT <= 1)		// nothing to do
-	return 0;
+    ఒకవేళ (ARGCOUNT <= 1)		// nothing to do
+	తిరిగి 0;
 
-    char *msg;
-    switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
+    అక్షరం *సందేశం;
+    ఎంపిక ((wp->w_arg_idx_invalid ? 1 : 0) + (కూడు_file ? 2 : 0))
     {
-	case 0: msg = _(" (%d of %d)"); break;
-	case 1: msg = _(" ((%d) of %d)"); break;
-	case 2: msg = _(" (file %d of %d)"); break;
-	case 3: msg = _(" (file (%d) of %d)"); break;
+	స్థితి 0: సందేశం = _(" (%d of %d)"); ఆపు;
+	స్థితి 1: సందేశం = _(" ((%d) of %d)"); ఆపు;
+	స్థితి 2: సందేశం = _(" (file %d of %d)"); ఆపు;
+	స్థితి 3: సందేశం = _(" (file (%d) of %d)"); ఆపు;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    తిరిగి (పూర్ణాంకం)vim_snprintf_safelen((అక్షరం *)buf, buflen, సందేశం,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5833,32 +5833,32 @@ fix_fname(char_u  *fname)
      * For MS-Windows also expand names like "longna~1" to "longname"
      * and provide drive letter for all absolute paths.
      */
-#ifdef UNIX
-    return FullName_save(fname, TRUE);
-#else
-    if (!vim_isAbsName(fname)
-	    || strstr((char *)fname, "..") != NULL
-	    || strstr((char *)fname, "//") != NULL
-# ifdef BACKSLASH_IN_FILENAME
-	    || strstr((char *)fname, "\\\\") != NULL
+#నిర్వచితమైతే UNIX
+    తిరిగి నిండిన_Name_save(fname, TRUE);
+#లేకపోతే
+    ఒకవేళ (!vim_isAbsName(fname)
+	    || అక్షరశ్రేణి_శోధన((అక్షరం *)fname, "..") != ఖాళీ
+	    || అక్షరశ్రేణి_శోధన((అక్షరం *)fname, "//") != ఖాళీ
+# ifdef BACKSLASH_లోపల_FILENAME
+	    || అక్షరశ్రేణి_శోధన((అక్షరం *)fname, "\\\\") != ఖాళీ
 # endif
-# if defined(MSWIN)
-	    || vim_strchr(fname, '~') != NULL
+# ఒకవేళ defined(MSWIN)
+	    || vim_strchr(fname, '~') != ఖాళీ
 	    || fname[0] == '/'
 	    || fname[0] == '\\'
 # endif
 	    )
-	return FullName_save(fname, FALSE);
+	తిరిగి నిండిన_Name_save(fname, FALSE);
 
     fname = vim_strsave(fname);
 
 # ifdef USE_FNAME_CASE
-    if (fname != NULL)
+    ఒకవేళ (fname != ఖాళీ)
 	fname_case(fname, 0);	// set correct case for file name
 # endif
 
-    return fname;
-#endif
+    తిరిగి fname;
+#అయితే_ముగింపు
 }
 
 /*
@@ -5869,59 +5869,59 @@ fix_fname(char_u  *fname)
  * The "*ffname" and "*sfname" pointer values on call will not be freed.
  * Note that the resulting "*ffname" pointer should be considered not allocated.
  */
-    void
+    శూన్య
 fname_expand(
-    buf_T	*buf UNUSED,
+    buf_T	*buf వాడని,
     char_u	**ffname,
     char_u	**sfname)
 {
-    if (*ffname == NULL)	    // no file name given, nothing to do
-	return;
-    if (*sfname == NULL)	    // no short file name given, use ffname
+    ఒకవేళ (*ffname == ఖాళీ)	    // no file name given, nothing to do
+	తిరిగి;
+    ఒకవేళ (*sfname == ఖాళీ)	    // no short file name given, use ffname
 	*sfname = *ffname;
     *ffname = fix_fname(*ffname);   // expand to full path
 
-#ifdef FEAT_SHORTCUT
-    if (!buf->b_p_bin)
+#నిర్వచితమైతే FEAT_SHORTCUT
+    ఒకవేళ (!buf->b_p_bin)
     {
 	char_u  *rfname;
 
 	// If the file name is a shortcut file, use the file it links to.
-	rfname = mch_resolve_path(*ffname, FALSE);
-	if (rfname != NULL)
+	rfname = mch_resolve_మార్గం(*ffname, FALSE);
+	ఒకవేళ (rfname != ఖాళీ)
 	{
 	    vim_free(*ffname);
 	    *ffname = rfname;
 	    *sfname = rfname;
 	}
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Open a window for a number of buffers.
  */
-    void
-ex_buffer_all(exarg_T *eap)
+    శూన్య
+ex_బఫరు_all(exarg_T *eap)
 {
     buf_T	*buf;
     win_T	*wp, *wpnext;
-    int		split_ret = OK;
-    int		p_ea_save;
-    int		open_wins = 0;
-    int		r;
-    int		count;		// Maximum number of windows to open.
-    int		all;		// When TRUE also load inactive buffers.
-    int		had_tab = cmdmod.cmod_tab;
+    పూర్ణాంకం		విభజించు_ret = OK;
+    పూర్ణాంకం		p_ea_save;
+    పూర్ణాంకం		open_wins = 0;
+    పూర్ణాంకం		r;
+    పూర్ణాంకం		లెక్క;		// Maximum number of windows to open.
+    పూర్ణాంకం		all;		// When TRUE also load inactive buffers.
+    పూర్ణాంకం		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
-	count = 9999;
-    else
-	count = eap->line2;	// make as many windows as specified
-    if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
+    ఒకవేళ (eap->addr_లెక్క == 0)	// make as many windows as possible
+	లెక్క = 9999;
+    లేకపోతే
+	లెక్క = eap->line2;	// make as many windows as specified
+    ఒకవేళ (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
-    else
+    లేకపోతే
 	all = TRUE;
 
     // Stop Visual mode, the cursor and "VIsual" may very well be invalid after
@@ -5930,47 +5930,47 @@ ex_buffer_all(exarg_T *eap)
 
     setpcmark();
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 
     /*
      * Close superfluous windows (two windows for the same buffer).
      * Also close windows that are not full-width.
      */
-    if (had_tab > 0)
-	goto_tabpage_tp(first_tabpage, TRUE, TRUE);
-    for (;;)
+    ఒకవేళ (had_tab > 0)
+	goto_tabpage_tp(మొదటి_tabpage, TRUE, TRUE);
+    కొరకు (;;)
     {
-	tpnext = curtab->tp_next;
-	for (wp = firstwin; wp != NULL; wp = wpnext)
+	tpnext = curtab->tp_తదుపరి;
+	కొరకు (wp = firstwin; wp != ఖాళీ; wp = wpnext)
 	{
-	    wpnext = wp->w_next;
-	    if ((wp->w_buffer->b_nwindows > 1
-			|| ((cmdmod.cmod_split & WSP_VERT)
-			    ? wp->w_height + wp->w_status_height < Rows - p_ch
-							     - tabline_height()
-			    : wp->w_width != Columns)
+	    wpnext = wp->w_తదుపరి;
+	    ఒకవేళ ((wp->w_బఫరు->b_nwindows > 1
+			|| ((cmdmod.cmod_విభజించు & WSP_VERT)
+			    ? wp->w_ఎత్తు + wp->w_స్థితి_ఎత్తు < అడ్డువరుసలు - p_ch
+							     - tabline_ఎత్తు()
+			    : wp->w_వెడల్పు != Columns)
 			|| (had_tab > 0 && wp != firstwin))
-		    && !ONE_WINDOW
-		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0)
+		    && !ONE_కిటికీ
+		    && !(win_locked(wp) || wp->w_బఫరు->b_locked > 0)
 		    && !win_unlisted(wp))
 	    {
-		if (win_close(wp, FALSE) == FAIL)
-		    break;
+		ఒకవేళ (win_close(wp, FALSE) == FAIL)
+		    ఆపు;
 		// Just in case an autocommand does something strange with
 		// windows: start all over...
 		wpnext = firstwin;
-		tpnext = first_tabpage;
+		tpnext = మొదటి_tabpage;
 		open_wins = 0;
 	    }
-	    else
+	    లేకపోతే
 		++open_wins;
 	}
 
 	// Without the ":tab" modifier only do the current tab page.
-	if (had_tab == 0 || tpnext == NULL)
-	    break;
+	ఒకవేళ (had_tab == 0 || tpnext == ఖాళీ)
+	    ఆపు;
 	goto_tabpage_tp(tpnext, TRUE, TRUE);
     }
 
@@ -5983,95 +5983,95 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    కొరకు (buf = firstbuf; buf != ఖాళీ && open_wins < లెక్క; buf = buf->b_తదుపరి)
     {
 	// Check if this buffer needs a window
-	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
-	    continue;
+	ఒకవేళ ((!all && buf->b_ml.ml_mfp == ఖాళీ) || !buf->b_p_bl)
+	    కొనసాగు;
 
-	if (had_tab != 0)
+	ఒకవేళ (had_tab != 0)
 	{
 	    // With the ":tab" modifier don't move the window.
-	    if (buf->b_nwindows > 0)
+	    ఒకవేళ (buf->b_nwindows > 0)
 		wp = lastwin;	    // buffer has a window, skip it
-	    else
-		wp = NULL;
+	    లేకపోతే
+		wp = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
 	    // Check if this buffer already has a window
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
-		    break;
+		ఒకవేళ (wp->w_బఫరు == buf)
+		    ఆపు;
 	    // If the buffer already has a window, move it
-	    if (wp != NULL)
+	    ఒకవేళ (wp != ఖాళీ)
 		win_move_after(wp, curwin);
 	}
 
-	if (wp == NULL && split_ret == OK)
+	ఒకవేళ (wp == ఖాళీ && విభజించు_ret == OK)
 	{
 	    bufref_T	bufref;
 
-	    set_bufref(&bufref, buf);
+	    సమితి_bufref(&bufref, buf);
 
 	    // Split the window and put the buffer in it
 	    p_ea_save = p_ea;
 	    p_ea = TRUE;		// use space from all windows
-	    split_ret = win_split(0, WSP_ROOM | WSP_BELOW);
+	    విభజించు_ret = win_విభజించు(0, WSP_స్థలం | WSP_క్రింద);
 	    ++open_wins;
 	    p_ea = p_ea_save;
-	    if (split_ret == FAIL)
-		continue;
+	    ఒకవేళ (విభజించు_ret == FAIL)
+		కొనసాగు;
 
 	    // Open the buffer in this window.
-	    swap_exists_action = SEA_DIALOG;
-	    set_curbuf(buf, DOBUF_GOTO);
-	    if (!bufref_valid(&bufref))
+	    మార్పిడి_exists_action = SEA_DIALOG;
+	    సమితి_curbuf(buf, DOBUF_GOTO);
+	    ఒకవేళ (!bufref_valid(&bufref))
 	    {
 		// autocommands deleted the buffer!!!
-		swap_exists_action = SEA_NONE;
-		break;
+		మార్పిడి_exists_action = SEA_NONE;
+		ఆపు;
 	    }
-	    if (swap_exists_action == SEA_QUIT)
+	    ఒకవేళ (మార్పిడి_exists_action == SEA_QUIT)
 	    {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 		cleanup_T   cs;
 
 		// Reset the error/interrupt/exception state here so that
 		// aborting() returns FALSE when closing a window.
 		enter_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 
 		// User selected Quit at ATTENTION prompt; close this window.
 		win_close(curwin, TRUE);
 		--open_wins;
-		swap_exists_action = SEA_NONE;
-		swap_exists_did_quit = TRUE;
+		మార్పిడి_exists_action = SEA_NONE;
+		మార్పిడి_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 		// Restore the error/interrupt/exception state if not
 		// discarded by a new aborting error, interrupt, or uncaught
 		// exception.
 		leave_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 	    }
-	    else
-		handle_swap_exists(NULL);
+	    లేకపోతే
+		handle_మార్పిడి_exists(ఖాళీ);
 	}
 
 	ui_breakcheck();
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (శూన్య)vgetc();	// only break the file loading, not the rest
+	    ఆపు;
 	}
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// Autocommands deleted the buffer or aborted script processing!!!
-	if (aborting())
-	    break;
-#endif
+	ఒకవేళ (aborting())
+	    ఆపు;
+#అయితే_ముగింపు
 	// When ":tab" was used open a new tab for a new window repeatedly.
-	if (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
+	ఒకవేళ (had_tab > 0 && tabpage_సూచీ(ఖాళీ) <= p_tpm)
 	    cmdmod.cmod_tab = 9999;
     }
     --autocmd_no_enter;
@@ -6081,32 +6081,32 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    కొరకు (wp = lastwin; open_wins > లెక్క; )
     {
-	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
-				     || autowrite(wp->w_buffer, FALSE) == OK);
-	if (!win_valid(wp))
+	r = (buf_hide(wp->w_బఫరు) || !buf_Is_మారింది(wp->w_బఫరు)
+				     || autowrite(wp->w_బఫరు, FALSE) == OK);
+	ఒకవేళ (!win_valid(wp))
 	{
 	    // BufWrite Autocommands made the window invalid, start over
 	    wp = lastwin;
 	}
-	else if (r)
+	లేకపోతే ఒకవేళ (r)
 	{
-	    win_close(wp, !buf_hide(wp->w_buffer));
+	    win_close(wp, !buf_hide(wp->w_బఫరు));
 	    --open_wins;
 	    wp = lastwin;
 	}
-	else
+	లేకపోతే
 	{
 	    wp = wp->w_prev;
-	    if (wp == NULL)
-		break;
+	    ఒకవేళ (wp == ఖాళీ)
+		ఆపు;
 	}
     }
 }
 
 
-static int  chk_modeline(linenr_T, int);
+స్థిర పూర్ణాంకం  chk_modeline(linenr_T, పూర్ణాంకం);
 
 /*
  * do_modelines() - process mode lines for the current file
@@ -6117,128 +6117,128 @@ static int  chk_modeline(linenr_T, int);
  *
  * Returns immediately if the "ml" option isn't set.
  */
-    void
-do_modelines(int flags)
+    శూన్య
+do_modelines(పూర్ణాంకం flags)
 {
     linenr_T	lnum;
-    int		nmlines;
-    static int	entered = 0;
+    పూర్ణాంకం		nmlines;
+    స్థిర పూర్ణాంకం	entered = 0;
 
-    if (!curbuf->b_p_ml || (nmlines = (int)p_mls) == 0)
-	return;
+    ఒకవేళ (!curbuf->b_p_ml || (nmlines = (పూర్ణాంకం)p_mls) == 0)
+	తిరిగి;
 
     // Disallow recursive entry here.  Can happen when executing a modeline
     // triggers an autocommand, which reloads modelines with a ":do".
-    if (entered)
-	return;
+    ఒకవేళ (entered)
+	తిరిగి;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    కొరకు (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క && lnum <= nmlines;
 								       ++lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	ఒకవేళ (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
-		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+    కొరకు (lnum = curbuf->b_ml.ml_పంక్తి_లెక్క; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+		       && lnum > curbuf->b_ml.ml_పంక్తి_లెక్క - nmlines; --lnum)
+	ఒకవేళ (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
 }
 
-#include "version.h"		// for version number
+#అన్తర్భావ "version.h"		// for version number
 
 /*
  * chk_modeline() - check a single line for a mode string
  * Return FAIL if an error encountered.
  */
-    static int
+    స్థిర పూర్ణాంకం
 chk_modeline(
     linenr_T	lnum,
-    int		flags)		// Same as for do_modelines().
+    పూర్ణాంకం		flags)		// Same as for do_modelines().
 {
     char_u	*s;
-    char_u	*line_end;		// point to the end of the line
+    char_u	*పంక్తి_చివర;		// point to the end of the line
     char_u	*e;
-    int		prev;
-    int		retval = OK;
+    పూర్ణాంకం		prev;
+    పూర్ణాంకం		retval = OK;
     ESTACK_CHECK_DECLARATION;
 
     prev = -1;
     s = ml_get(lnum);
-    line_end = s + ml_get_len(lnum);
-    for (; *s != NUL; ++s)
+    పంక్తి_చివర = s + ml_get_len(lnum);
+    కొరకు (; *s != NUL; ++s)
     {
-	if (prev == -1 || vim_isspace(prev))
+	ఒకవేళ (prev == -1 || vim_isspace(prev))
 	{
-	    if ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
+	    ఒకవేళ ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
 		    || STRNCMP(s, "vi:", (size_t)3) == 0)
-		break;
+		ఆపు;
 	    // Accept both "vim" and "Vim".
-	    if ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
+	    ఒకవేళ ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
 	    {
-		int vers;
+		పూర్ణాంకం vers;
 
-		if (s[3] == '<' || s[3] == '=' || s[3] == '>')
+		ఒకవేళ (s[3] == '<' || s[3] == '=' || s[3] == '>')
 		    e = s + 4;
-		else
+		లేకపోతే
 		    e = s + 3;
 		vers = getdigits(&e);
-		if (*e == ':'
+		ఒకవేళ (*e == ':'
 			&& (s[0] != 'V'
 				  || STRNCMP(skipwhite(e + 1), "set", 3) == 0)
 			&& (s[3] == ':'
-			    || (VIM_VERSION_100 >= vers && SAFE_isdigit(s[3]))
-			    || (VIM_VERSION_100 < vers && s[3] == '<')
-			    || (VIM_VERSION_100 > vers && s[3] == '>')
-			    || (VIM_VERSION_100 == vers && s[3] == '=')))
-		    break;
+			    || (VIM_సంస్కరణ_100 >= vers && సురక్షిత_isdigit(s[3]))
+			    || (VIM_సంస్కరణ_100 < vers && s[3] == '<')
+			    || (VIM_సంస్కరణ_100 > vers && s[3] == '>')
+			    || (VIM_సంస్కరణ_100 == vers && s[3] == '=')))
+		    ఆపు;
 	    }
 	}
 	prev = *s;
     }
 
-    if (*s)
+    ఒకవేళ (*s)
     {
 	size_t	len;
 	char_u	*linecopy;		// local copy of any modeline found
-	int	end;
+	పూర్ణాంకం	చివర;
 
-	do				// skip over "ex:", "vi:" or "vim:"
+	చేయి				// skip over "ex:", "vi:" or "vim:"
 	    ++s;
-	while (s[-1] != ':');
+	అయితే (s[-1] != ':');
 
-	len = (size_t)(line_end - s);		// remember the line length
+	len = (size_t)(పంక్తి_చివర - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
-	if (linecopy == NULL)
-	    return FAIL;
+	ఒకవేళ (linecopy == ఖాళీ)
+	    తిరిగి FAIL;
 
-	line_end = s + len;			// restore 'line_end'
+	పంక్తి_చివర = s + len;			// restore 'line_end'
 
 	// prepare for emsg()
-	estack_push(ETYPE_MODELINE, (char_u *)"modelines", lnum);
-	ESTACK_CHECK_SETUP;
+	estack_నెట్టు(ETYPE_MODELINE, (char_u *)"modelines", lnum);
+	ESTACK_CHECK_అమరిక;
 
-	end = FALSE;
-	while (end == FALSE)
+	చివర = FALSE;
+	అయితే (చివర == FALSE)
 	{
 	    s = skipwhite(s);
-	    if (*s == NUL)
-		break;
+	    ఒకవేళ (*s == NUL)
+		ఆపు;
 
 	    /*
 	     * Find end of set command: ':' or end of line.
 	     * Skip over "\:", replacing it with ":".
 	     */
-	    for (e = s; *e != ':' && *e != NUL; ++e)
-		if (e[0] == '\\' && e[1] == ':')
+	    కొరకు (e = s; *e != ':' && *e != NUL; ++e)
+		ఒకవేళ (e[0] == '\\' && e[1] == ':')
 		{
-		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
-		    --line_end;
+		    mch_memmove(e, e + 1, (size_t)(పంక్తి_చివర - (e + 1)) + 1);	// +1 for NUL
+		    --పంక్తి_చివర;
 		}
-	    if (*e == NUL)
-		end = TRUE;
+	    ఒకవేళ (*e == NUL)
+		చివర = TRUE;
 
 	    /*
 	     * If there is a "set" command, require a terminating ':' and
@@ -6247,123 +6247,123 @@ chk_modeline(
 	     * "vi:opt opt opt: foo" -- foo interpreted
 	     * Accept "se" for compatibility with Elvis.
 	     */
-	    if (STRNCMP(s, "set ", (size_t)4) == 0
+	    ఒకవేళ (STRNCMP(s, "set ", (size_t)4) == 0
 		    || STRNCMP(s, "se ", (size_t)3) == 0)
 	    {
-		if (*e != ':')		// no terminating ':'?
-		    break;
-		end = TRUE;
+		ఒకవేళ (*e != ':')		// no terminating ':'?
+		    ఆపు;
+		చివర = TRUE;
 		s += (*(s + 2) == ' ') ? 3 : 4;
 	    }
 	    *e = NUL;			// truncate the set command
 
-	    if (*s != NUL)		// skip over an empty "::"
+	    ఒకవేళ (*s != NUL)		// skip over an empty "::"
 	    {
-		int secure_save = secure;
+		పూర్ణాంకం secure_save = secure;
 		sctx_T	save_current_sctx = current_sctx;
 
-		current_sctx.sc_version = 1;
-#ifdef FEAT_EVAL
+		current_sctx.sc_సంస్కరణ = 1;
+#నిర్వచితమైతే FEAT_EVAL
 		current_sctx.sc_sid = SID_MODELINE;
 		current_sctx.sc_seq = 0;
 		current_sctx.sc_lnum = lnum;
-#endif
+#అయితే_ముగింపు
 
 		// Make sure no risky things are executed as a side effect.
 		secure = 1;
 
-		retval = do_set(s, OPT_MODELINE | OPT_LOCAL | flags);
+		retval = do_సమితి(s, OPT_MODELINE | OPT_LOCAL | flags);
 
 		secure = secure_save;
 		current_sctx = save_current_sctx;
-		if (retval == FAIL)		// stop if error found
-		    break;
+		ఒకవేళ (retval == FAIL)		// stop if error found
+		    ఆపు;
 	    }
-	    s = (e == line_end) ? e : e + 1;	// advance to next part
+	    s = (e == పంక్తి_చివర) ? e : e + 1;	// advance to next part
 						// careful not to go off the end
 	}
 
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_తీయి();
 	vim_free(linecopy);
     }
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return TRUE if "buf" is a normal buffer, 'buftype' is empty.
  */
-    int
-bt_normal(buf_T *buf)
+    పూర్ణాంకం
+bt_సాధారణ(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == NUL;
+    తిరిగి buf != ఖాళీ && buf->b_p_bt[0] == NUL;
 }
 
 /*
  * Return TRUE if "buf" is the quickfix buffer.
  */
-    int
-bt_quickfix(buf_T *buf UNUSED)
+    పూర్ణాంకం
+bt_quickfix(buf_T *buf వాడని)
 {
-#ifdef FEAT_QUICKFIX
-    return buf != NULL && buf->b_p_bt[0] == 'q';
-#else
-    return FALSE;
-#endif
+#నిర్వచితమైతే FEAT_QUICKFIX
+    తిరిగి buf != ఖాళీ && buf->b_p_bt[0] == 'q';
+#లేకపోతే
+    తిరిగి FALSE;
+#అయితే_ముగింపు
 }
 
 /*
  * Return TRUE if "buf" is a terminal buffer.
  */
-    int
-bt_terminal(buf_T *buf UNUSED)
+    పూర్ణాంకం
+bt_terminal(buf_T *buf వాడని)
 {
-#if defined(FEAT_TERMINAL)
-    return buf != NULL && buf->b_p_bt[0] == 't';
-#else
-    return FALSE;
-#endif
+#ఒకవేళ defined(FEAT_TERMINAL)
+    తిరిగి buf != ఖాళీ && buf->b_p_bt[0] == 't';
+#లేకపోతే
+    తిరిగి FALSE;
+#అయితే_ముగింపు
 }
 
 /*
  * Return TRUE if "buf" is a help buffer.
  */
-    int
+    పూర్ణాంకం
 bt_help(buf_T *buf)
 {
-    return buf != NULL && buf->b_help;
+    తిరిగి buf != ఖాళీ && buf->b_help;
 }
 
 /*
  * Return TRUE if "buf" is a prompt buffer.
  */
-    int
+    పూర్ణాంకం
 bt_prompt(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
+    తిరిగి buf != ఖాళీ && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_PROP_POPUP)
 /*
  * Return TRUE if "buf" is a buffer for a popup window.
  */
-    int
+    పూర్ణాంకం
 bt_popup(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt != NULL
+    తిరిగి buf != ఖాళీ && buf->b_p_bt != ఖాళీ
 	&& buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'o';
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if "buf" is a "nofile", "acwrite", "terminal" or "prompt"
  * buffer.  This means the buffer name may not be a file name, at least not for
  * writing the buffer.
  */
-    int
+    పూర్ణాంకం
 bt_nofilename(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    తిరిగి buf != ఖాళీ && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 'a'
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'p');
@@ -6373,65 +6373,65 @@ bt_nofilename(buf_T *buf)
  * Return TRUE if "buf" is a "nofile", "quickfix", "terminal" or "prompt"
  * buffer.  This means the buffer is not to be read from a file.
  */
-    static int
+    స్థిర పూర్ణాంకం
 bt_nofileread(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    తిరిగి buf != ఖాళీ && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'q'
 	    || buf->b_p_bt[0] == 'p');
 }
 
-#if defined(FEAT_QUICKFIX)
+#ఒకవేళ defined(FEAT_QUICKFIX)
 /*
  * Return TRUE if "buf" has 'buftype' set to "nofile".
  */
-    int
+    పూర్ణాంకం
 bt_nofile(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
+    తిరిగి buf != ఖాళీ && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if "buf" is a "nowrite", "nofile", "terminal", "prompt", or
  * "popup" buffer.
  */
-    int
+    పూర్ణాంకం
 bt_dontwrite(buf_T *buf)
 {
-    return buf != NULL && (buf->b_p_bt[0] == 'n'
+    తిరిగి buf != ఖాళీ && (buf->b_p_bt[0] == 'n'
 		 || buf->b_p_bt[0] == 't'
 		 || buf->b_p_bt[0] == 'p');
 }
 
-    int
-bt_dontwrite_msg(buf_T *buf)
+    పూర్ణాంకం
+bt_dontwrite_సందేశం(buf_T *buf)
 {
-    if (bt_dontwrite(buf))
+    ఒకవేళ (bt_dontwrite(buf))
     {
-	emsg(_(e_cannot_write_buftype_option_is_set));
-	return TRUE;
+	emsg(_(e_cannot_write_buftype_option_is_సమితి));
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Return TRUE if the buffer should be hidden, according to 'hidden', ":hide"
  * and 'bufhidden'.
  */
-    int
+    పూర్ణాంకం
 buf_hide(buf_T *buf)
 {
     // 'bufhidden' overrules 'hidden' and ":hide", check it first
-    switch (buf->b_p_bh[0])
+    ఎంపిక (buf->b_p_bh[0])
     {
-	case 'u':		    // "unload"
-	case 'w':		    // "wipe"
-	case 'd': return FALSE;	    // "delete"
-	case 'h': return TRUE;	    // "hide"
+	స్థితి 'u':		    // "unload"
+	స్థితి 'w':		    // "wipe"
+	స్థితి 'd': తిరిగి FALSE;	    // "delete"
+	స్థితి 'h': తిరిగి TRUE;	    // "hide"
     }
-    return (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
+    తిరిగి (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
 }
 
 /*
@@ -6441,46 +6441,46 @@ buf_hide(buf_T *buf)
     char_u *
 buf_spname(buf_T *buf)
 {
-#if defined(FEAT_QUICKFIX)
-    if (bt_quickfix(buf))
+#ఒకవేళ defined(FEAT_QUICKFIX)
+    ఒకవేళ (bt_quickfix(buf))
     {
 	/*
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
-	else
-	    return (char_u *)_(msg_loclist);
+	ఒకవేళ (buf->b_fnum == qf_దొంతర_get_bufnr())
+	    తిరిగి (char_u *)_(సందేశం_qflist);
+	లేకపోతే
+	    తిరిగి (char_u *)_(సందేశం_loclist);
     }
-#endif
+#అయితే_ముగింపు
 
     // There is no _file_ when 'buftype' is "nofile", b_sfname
     // contains the name as specified by the user.
-    if (bt_nofilename(buf))
+    ఒకవేళ (bt_nofilename(buf))
     {
-#ifdef FEAT_TERMINAL
-	if (buf->b_term != NULL)
-	    return term_get_status_text(buf->b_term);
-#endif
-	if (buf->b_fname != NULL)
-	    return buf->b_fname;
-	if (buf == cmdwin_buf)
-	    return (char_u *)_("[Command Line]");
-#ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(buf))
-	    return (char_u *)_("[Prompt]");
-#endif
-#ifdef FEAT_PROP_POPUP
-	if (bt_popup(buf))
-	    return (char_u *)_("[Popup]");
-#endif
-	return (char_u *)_("[Scratch]");
+#నిర్వచితమైతే FEAT_TERMINAL
+	ఒకవేళ (buf->b_పదం != ఖాళీ)
+	    తిరిగి పదం_get_స్థితి_పాఠ్యం(buf->b_పదం);
+#అయితే_ముగింపు
+	ఒకవేళ (buf->b_fname != ఖాళీ)
+	    తిరిగి buf->b_fname;
+	ఒకవేళ (buf == cmdwin_buf)
+	    తిరిగి (char_u *)_("[Command Line]");
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	ఒకవేళ (bt_prompt(buf))
+	    తిరిగి (char_u *)_("[Prompt]");
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (bt_popup(buf))
+	    తిరిగి (char_u *)_("[Popup]");
+#అయితే_ముగింపు
+	తిరిగి (char_u *)_("[Scratch]");
     }
 
-    if (buf->b_fname == NULL)
-	return buf_get_fname(buf);
-    return NULL;
+    ఒకవేళ (buf->b_fname == ఖాళీ)
+	తిరిగి buf_get_fname(buf);
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -6489,78 +6489,78 @@ buf_spname(buf_T *buf)
     char_u *
 buf_get_fname(buf_T *buf)
 {
-    if (buf->b_fname == NULL)
-	return (char_u *)_("[No Name]");
-    return buf->b_fname;
+    ఒకవేళ (buf->b_fname == ఖాళీ)
+	తిరిగి (char_u *)_("[No Name]");
+    తిరిగి buf->b_fname;
 }
 
 /*
  * Set 'buflisted' for curbuf to "on" and trigger autocommands if it changed.
  */
-    void
-set_buflisted(int on)
+    శూన్య
+సమితి_buflisted(పూర్ణాంకం on)
 {
-    if (on == curbuf->b_p_bl)
-	return;
+    ఒకవేళ (on == curbuf->b_p_bl)
+	తిరిగి;
 
     curbuf->b_p_bl = on;
-    if (on)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
+    ఒకవేళ (on)
+	apply_autocmds(EVENT_BUFADD, ఖాళీ, ఖాళీ, FALSE, curbuf);
+    లేకపోతే
+	apply_autocmds(EVENT_BUFDELETE, ఖాళీ, ఖాళీ, FALSE, curbuf);
 }
 
 /*
  * Read the file for "buf" again and check if the contents changed.
  * Return TRUE if it changed or this could not be checked.
  */
-    int
-buf_contents_changed(buf_T *buf)
+    పూర్ణాంకం
+buf_contents_మారింది(buf_T *buf)
 {
     buf_T	*newbuf;
-    int		differ = TRUE;
+    పూర్ణాంకం		తేడా = TRUE;
     linenr_T	lnum;
     aco_save_T	aco;
     exarg_T	ea;
 
     // Allocate a buffer without putting it in the buffer list.
-    newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return TRUE;
+    newbuf = buflist_new(ఖాళీ, ఖాళీ, (linenr_T)1, BLN_DUMMY);
+    ఒకవేళ (newbuf == ఖాళీ)
+	తిరిగి TRUE;
 
     // Force the 'fileencoding' and 'fileformat' to be equal.
-    if (prep_exarg(&ea, buf) == FAIL)
+    ఒకవేళ (prep_exarg(&ea, buf) == FAIL)
     {
-	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	wipe_బఫరు(newbuf, FALSE);
+	తిరిగి TRUE;
     }
 
     // Set curwin/curbuf to buf and save a few things.
     aucmd_prepbuf(&aco, newbuf);
-    if (curbuf != newbuf)
+    ఒకవేళ (curbuf != newbuf)
     {
 	// Failed to find a window for "newbuf".
-	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	wipe_బఫరు(newbuf, FALSE);
+	తిరిగి TRUE;
     }
 
     // We don't want to trigger autocommands now, they may have nasty
     // side-effects like wiping buffers
-    block_autocmds();
-    if (ml_open(curbuf) == OK
+    ఖండం_autocmds();
+    ఒకవేళ (ml_open(curbuf) == OK
 	    && readfile(buf->b_ffname, buf->b_fname,
 				  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	ఒకవేళ (buf->b_ml.ml_పంక్తి_లెక్క == curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
-		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
+	    తేడా = FALSE;
+	    కొరకు (lnum = 1; lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క; ++lnum)
+		ఒకవేళ (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
-		    differ = TRUE;
-		    break;
+		    తేడా = TRUE;
+		    ఆపు;
 		}
 	}
     }
@@ -6569,12 +6569,12 @@ buf_contents_changed(buf_T *buf)
     // restore curwin/curbuf and a few other things
     aucmd_restbuf(&aco);
 
-    if (curbuf != newbuf)	// safety check
-	wipe_buffer(newbuf, FALSE);
+    ఒకవేళ (curbuf != newbuf)	// safety check
+	wipe_బఫరు(newbuf, FALSE);
 
     unblock_autocmds();
 
-    return differ;
+    తిరిగి తేడా;
 }
 
 /*
@@ -6582,19 +6582,19 @@ buf_contents_changed(buf_T *buf)
  * this buffer.  Call this to wipe out a temp buffer that does not contain any
  * marks.
  */
-    void
-wipe_buffer(
+    శూన్య
+wipe_బఫరు(
     buf_T	*buf,
-    int		aucmd)	    // When TRUE trigger autocommands.
+    పూర్ణాంకం		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
-	--top_file_num;
+    ఒకవేళ (buf->b_fnum == శిఖరం_file_అంకె - 1)
+	--శిఖరం_file_అంకె;
 
-    if (!aucmd)		    // Don't trigger BufDelete autocommands here.
-	block_autocmds();
+    ఒకవేళ (!aucmd)		    // Don't trigger BufDelete autocommands here.
+	ఖండం_autocmds();
 
-    close_buffer(NULL, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
+    close_బఫరు(ఖాళీ, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
 
-    if (!aucmd)
+    ఒకవేళ (!aucmd)
 	unblock_autocmds();
 }

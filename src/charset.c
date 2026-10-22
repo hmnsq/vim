@@ -7,36 +7,36 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(HAVE_WCHAR_H)
+#ఒకవేళ defined(HAVE_WCHAR_H)
 # include <wchar.h>	    // for towupper() and towlower()
-#endif
+#అయితే_ముగింపు
 
-static int parse_isopt(char_u *var, buf_T *buf, int only_check);
-static int win_nolbr_chartabsize(chartabsize_T *cts, int *headp);
-static unsigned nr2hex(unsigned c);
+స్థిర పూర్ణాంకం parse_isopt(char_u *var, buf_T *buf, పూర్ణాంకం only_check);
+స్థిర పూర్ణాంకం win_nolbr_chartabsize(chartabsize_T *cts, పూర్ణాంకం *headp);
+స్థిర గుర్తులేని nr2hex(గుర్తులేని c);
 
-static int    chartab_initialized = FALSE;
+స్థిర పూర్ణాంకం    chartab_initialized = FALSE;
 
 // b_chartab[] is an array of 32 bytes, each bit representing one of the
 // characters 0-255.
-#define SET_CHARTAB(buf, c) (buf)->b_chartab[(unsigned)(c) >> 3] |= (1 << ((c) & 0x7))
-#define RESET_CHARTAB(buf, c) (buf)->b_chartab[(unsigned)(c) >> 3] &= ~(1 << ((c) & 0x7))
-#define GET_CHARTAB(buf, c) ((buf)->b_chartab[(unsigned)(c) >> 3] & (1 << ((c) & 0x7)))
+#నిర్వచించు సమితి_CHARTAB(buf, c) (buf)->b_chartab[(గుర్తులేని)(c) >> 3] |= (1 << ((c) & 0x7))
+#నిర్వచించు RESET_CHARTAB(buf, c) (buf)->b_chartab[(గుర్తులేని)(c) >> 3] &= ~(1 << ((c) & 0x7))
+#నిర్వచించు GET_CHARTAB(buf, c) ((buf)->b_chartab[(గుర్తులేని)(c) >> 3] & (1 << ((c) & 0x7)))
 
 // table used below, see init_chartab() for an explanation
-static char_u	g_chartab[256];
+స్థిర char_u	g_chartab[256];
 
 /*
  * Flags for g_chartab[].
  */
-#define CT_CELL_MASK	0x07	// mask: nr of display cells (1, 2 or 4)
-#define CT_PRINT_CHAR	0x10	// flag: set for printable chars
-#define CT_ID_CHAR	0x20	// flag: set for ID chars
-#define CT_FNAME_CHAR	0x40	// flag: set for file name chars
+#నిర్వచించు CT_CELL_ముసుగు	0x07	// mask: nr of display cells (1, 2 or 4)
+#నిర్వచించు CT_PRINT_CHAR	0x10	// flag: set for printable chars
+#నిర్వచించు CT_ID_CHAR	0x20	// flag: set for ID chars
+#నిర్వచించు CT_FNAME_CHAR	0x40	// flag: set for file name chars
 
-static int in_win_border(win_T *wp, colnr_T vcol);
+స్థిర పూర్ణాంకం లోపల_win_border(win_T *wp, colnr_T vcol);
 
 /*
  * Fill g_chartab[].  Also fills curbuf->b_chartab[] with flags for keyword
@@ -64,22 +64,22 @@ static int in_win_border(win_T *wp, colnr_T vcol);
  * Return FAIL if 'iskeyword', 'isident', 'isfname' or 'isprint' option has an
  * error, OK otherwise.
  */
-    int
-init_chartab(void)
+    పూర్ణాంకం
+init_chartab(శూన్య)
 {
-    return buf_init_chartab(curbuf, TRUE);
+    తిరిగి buf_init_chartab(curbuf, TRUE);
 }
 
-    int
+    పూర్ణాంకం
 buf_init_chartab(
     buf_T	*buf,
-    int		global)		// FALSE: only set buf->b_chartab[]
+    పూర్ణాంకం		global)		// FALSE: only set buf->b_chartab[]
 {
-    int		c;
+    పూర్ణాంకం		c;
     char_u	*p;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (global)
+    ఒకవేళ (global)
     {
 	/*
 	 * Set the default size for printable characters:
@@ -87,29 +87,29 @@ buf_init_chartab(
 	 * This also inits all 'isident' and 'isfname' flags to FALSE.
 	 */
 	c = 0;
-	while (c < ' ')
+	అయితే (c < ' ')
 	    g_chartab[c++] = (dy_flags & DY_UHEX) ? 4 : 2;
-	while (c <= '~')
+	అయితే (c <= '~')
 	    g_chartab[c++] = 1 + CT_PRINT_CHAR;
-	while (c < 256)
+	అయితే (c < 256)
 	{
 	    // UTF-8: bytes 0xa0 - 0xff are printable (latin1)
-	    if (enc_utf8 && c >= 0xa0)
+	    ఒకవేళ (enc_utf8 && c >= 0xa0)
 		g_chartab[c++] = CT_PRINT_CHAR + 1;
 	    // euc-jp characters starting with 0x8e are single width
-	    else if (enc_dbcs == DBCS_JPNU && c == 0x8e)
+	    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU && c == 0x8e)
 		g_chartab[c++] = CT_PRINT_CHAR + 1;
 	    // other double-byte chars can be printable AND double-width
-	    else if (enc_dbcs != 0 && MB_BYTE2LEN(c) == 2)
+	    లేకపోతే ఒకవేళ (enc_dbcs != 0 && MB_BYTE2LEN(c) == 2)
 		g_chartab[c++] = CT_PRINT_CHAR + 2;
-	    else
+	    లేకపోతే
 		// the rest is unprintable by default
 		g_chartab[c++] = (dy_flags & DY_UHEX) ? 4 : 2;
 	}
 
 	// Assume that every multi-byte char is a filename character.
-	for (c = 1; c < 256; ++c)
-	    if ((enc_dbcs != 0 && MB_BYTE2LEN(c) > 1)
+	కొరకు (c = 1; c < 256; ++c)
+	    ఒకవేళ ((enc_dbcs != 0 && MB_BYTE2LEN(c) > 1)
 		    || (enc_dbcs == DBCS_JPNU && c == 0x8e)
 		    || (enc_utf8 && c >= 0xa0))
 		g_chartab[c] |= CT_FNAME_CHAR;
@@ -118,39 +118,39 @@ buf_init_chartab(
     /*
      * Init word char flags all to FALSE
      */
-    CLEAR_FIELD(buf->b_chartab);
-    if (enc_dbcs != 0)
-	for (c = 0; c < 256; ++c)
+    CLEAR_క్షేత్రం(buf->b_chartab);
+    ఒకవేళ (enc_dbcs != 0)
+	కొరకు (c = 0; c < 256; ++c)
 	{
 	    // double-byte characters are probably word characters
-	    if (MB_BYTE2LEN(c) == 2)
-		SET_CHARTAB(buf, c);
+	    ఒకవేళ (MB_BYTE2LEN(c) == 2)
+		సమితి_CHARTAB(buf, c);
 	}
 
     /*
      * In lisp mode the '-' character is included in keywords.
      */
-    if (buf->b_p_lisp)
-	SET_CHARTAB(buf, '-');
+    ఒకవేళ (buf->b_p_lisp)
+	సమితి_CHARTAB(buf, '-');
 
     // Walk through the 'isident', 'iskeyword', 'isfname' and 'isprint' options.
-    for (i = global ? 0 : 3; i <= 3; ++i)
+    కొరకు (i = global ? 0 : 3; i <= 3; ++i)
     {
-	if (i == 0)
+	ఒకవేళ (i == 0)
 	    p = p_isi;		// first round: 'isident'
-	else if (i == 1)
+	లేకపోతే ఒకవేళ (i == 1)
 	    p = p_isp;		// second round: 'isprint'
-	else if (i == 2)
+	లేకపోతే ఒకవేళ (i == 2)
 	    p = p_isf;		// third round: 'isfname'
-	else	// i == 3
+	లేకపోతే	// i == 3
 	    p = buf->b_p_isk;	// fourth round: 'iskeyword'
 
-	if (parse_isopt(p, buf, FALSE) == FAIL)
-	    return FAIL;
+	ఒకవేళ (parse_isopt(p, buf, FALSE) == FAIL)
+	    తిరిగి FAIL;
     }
 
     chartab_initialized = TRUE;
-    return OK;
+    తిరిగి OK;
 }
 
 /**
@@ -158,68 +158,68 @@ buf_init_chartab(
  * or 'isprint'.
  * Returns FAIL if has an error, OK otherwise.
  */
-	int
+	పూర్ణాంకం
 check_isopt(char_u *var)
 {
-    return parse_isopt(var, NULL, TRUE);
+    తిరిగి parse_isopt(var, ఖాళీ, TRUE);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 parse_isopt(
 	char_u	*var,
 	buf_T	*buf,
-	int	only_check)	// FALSE: refill g_chartab[]
+	పూర్ణాంకం	only_check)	// FALSE: refill g_chartab[]
 {
     char_u	*p = var;
-    int		c;
-    int		c2;
-    int		tilde;
-    int		do_isalpha;
-    int		trail_comma;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		c2;
+    పూర్ణాంకం		tilde;
+    పూర్ణాంకం		do_isalpha;
+    పూర్ణాంకం		trail_comma;
 
     // Parses the 'isident', 'iskeyword', 'isfname' and 'isprint' options.
     // Each option is a list of characters, character numbers or ranges,
     // separated by commas, e.g.: "200-210,x,#-178,-"
-    while (*p)
+    అయితే (*p)
     {
 	tilde = FALSE;
 	do_isalpha = FALSE;
-	if (*p == '^' && p[1] != NUL)
+	ఒకవేళ (*p == '^' && p[1] != NUL)
 	{
 	    tilde = TRUE;
 	    ++p;
 	}
-	if (VIM_ISDIGIT(*p))
+	ఒకవేళ (VIM_ISDIGIT(*p))
 	    c = getdigits(&p);
-	else if (has_mbyte)
+	లేకపోతే ఒకవేళ (has_mbyte)
 	    c = mb_ptr2char_adv(&p);
-	else
+	లేకపోతే
 	    c = *p++;
 	c2 = -1;
-	if (*p == '-' && p[1] != NUL)
+	ఒకవేళ (*p == '-' && p[1] != NUL)
 	{
 	    ++p;
-	    if (VIM_ISDIGIT(*p))
+	    ఒకవేళ (VIM_ISDIGIT(*p))
 		c2 = getdigits(&p);
-	    else if (has_mbyte)
+	    లేకపోతే ఒకవేళ (has_mbyte)
 		c2 = mb_ptr2char_adv(&p);
-	    else
+	    లేకపోతే
 		c2 = *p++;
 	}
-	if (c <= 0 || c >= 256 || (c2 < c && c2 != -1) || c2 >= 256
+	ఒకవేళ (c <= 0 || c >= 256 || (c2 < c && c2 != -1) || c2 >= 256
 						  || !(*p == NUL || *p == ','))
-	    return FAIL;
+	    తిరిగి FAIL;
 
 	trail_comma = *p == ',';
-	p = skip_to_option_part(p);
-	if (trail_comma && *p == NUL)
+	p = skip_గమ్యం_option_part(p);
+	ఒకవేళ (trail_comma && *p == NUL)
 	    // Trailing comma is not allowed.
-	    return FAIL;
+	    తిరిగి FAIL;
 
-	if (only_check)
-	    continue;
+	ఒకవేళ (only_check)
+	    కొనసాగు;
 
-	if (c2 == -1)	// not a range
+	ఒకవేళ (c2 == -1)	// not a range
 	{
 	    /*
 	     * A single '@' (not "@-@"):
@@ -227,71 +227,71 @@ parse_isopt(
 	     * standard function isalpha(). This takes care of locale for
 	     * single-byte characters).
 	     */
-	    if (c == '@')
+	    ఒకవేళ (c == '@')
 	    {
 		do_isalpha = TRUE;
 		c = 1;
 		c2 = 255;
 	    }
-	    else
+	    లేకపోతే
 		c2 = c;
 	}
 
-	while (c <= c2)
+	అయితే (c <= c2)
 	{
 	    // Use the MB_ functions here, because isalpha() doesn't
 	    // work properly when 'encoding' is "latin1" and the locale is
 	    // "C".
-	    if (!do_isalpha || MB_ISLOWER(c) || MB_ISUPPER(c))
+	    ఒకవేళ (!do_isalpha || MB_ISLOWER(c) || MB_ISUPPER(c))
 	    {
-		if (var == p_isi)			// (re)set ID flag
+		ఒకవేళ (var == p_isi)			// (re)set ID flag
 		{
-		    if (tilde)
+		    ఒకవేళ (tilde)
 			g_chartab[c] &= ~CT_ID_CHAR;
-		    else
+		    లేకపోతే
 			g_chartab[c] |= CT_ID_CHAR;
 		}
-		else if (var == p_isp)			// (re)set printable
+		లేకపోతే ఒకవేళ (var == p_isp)			// (re)set printable
 		{
-		    if ((c < ' ' || c > '~'
+		    ఒకవేళ ((c < ' ' || c > '~'
 			    // For double-byte we keep the cell width, so
 			    // that we can detect it from the first byte.
 			) && !(enc_dbcs && MB_BYTE2LEN(c) == 2))
 		    {
-			if (tilde)
+			ఒకవేళ (tilde)
 			{
-			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_MASK)
+			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_ముసుగు)
 					 + ((dy_flags & DY_UHEX) ? 4 : 2);
 			    g_chartab[c] &= ~CT_PRINT_CHAR;
 			}
-			else
+			లేకపోతే
 			{
-			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_MASK) + 1;
+			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_ముసుగు) + 1;
 			    g_chartab[c] |= CT_PRINT_CHAR;
 			}
 		    }
 		}
-		else if (var == p_isf)			// (re)set fname flag
+		లేకపోతే ఒకవేళ (var == p_isf)			// (re)set fname flag
 		{
-		    if (tilde)
+		    ఒకవేళ (tilde)
 			g_chartab[c] &= ~CT_FNAME_CHAR;
-		    else
+		    లేకపోతే
 			g_chartab[c] |= CT_FNAME_CHAR;
 		}
-		else // var == p_isk || var == buf->b_p_isk
+		లేకపోతే // var == p_isk || var == buf->b_p_isk
 							// (re)set keyword flag
 		{
-		    if (tilde)
+		    ఒకవేళ (tilde)
 			RESET_CHARTAB(buf, c);
-		    else
-			SET_CHARTAB(buf, c);
+		    లేకపోతే
+			సమితి_CHARTAB(buf, c);
 		}
 	    }
 	    ++c;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -299,32 +299,32 @@ parse_isopt(
  * The result is a string with only printable characters, but if there is not
  * enough room, not all characters will be translated.
  */
-    void
+    శూన్య
 trans_characters(
     char_u	*buf,
-    int		bufsize)
+    పూర్ణాంకం		bufsize)
 {
-    int		len;		// length of string needing translation
-    int		room;		// room in buffer after string
+    పూర్ణాంకం		len;		// length of string needing translation
+    పూర్ణాంకం		స్థలం;		// room in buffer after string
     char_u	*trs;		// translated character
-    int		trs_len;	// length of trs[]
+    పూర్ణాంకం		trs_len;	// length of trs[]
 
-    len = (int)STRLEN(buf);
-    room = bufsize - len;
-    while (*buf != 0)
+    len = (పూర్ణాంకం)STRLEN(buf);
+    స్థలం = bufsize - len;
+    అయితే (*buf != 0)
     {
 	// Assume a multi-byte character doesn't need translation.
-	if (has_mbyte && (trs_len = (*mb_ptr2len)(buf)) > 1)
+	ఒకవేళ (has_mbyte && (trs_len = (*mb_ptr2len)(buf)) > 1)
 	    len -= trs_len;
-	else
+	లేకపోతే
 	{
 	    trs = transchar_byte(*buf);
-	    trs_len = (int)STRLEN(trs);
-	    if (trs_len > 1)
+	    trs_len = (పూర్ణాంకం)STRLEN(trs);
+	    ఒకవేళ (trs_len > 1)
 	    {
-		room -= trs_len - 1;
-		if (room <= 0)
-		    return;
+		స్థలం -= trs_len - 1;
+		ఒకవేళ (స్థలం <= 0)
+		    తిరిగి;
 		mch_memmove(buf + trs_len, buf + 1, (size_t)len);
 	    }
 	    mch_memmove(buf, trs, (size_t)trs_len);
@@ -343,67 +343,67 @@ transstr(char_u *s)
 {
     char_u	*res;
     char_u	*p;
-    int		l, len, c;
+    పూర్ణాంకం		l, len, c;
     char_u	hexbuf[11];
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
 	// Compute the length of the result, taking account of unprintable
 	// multi-byte characters.
 	len = 0;
 	p = s;
-	while (*p != NUL)
+	అయితే (*p != NUL)
 	{
-	    if ((l = (*mb_ptr2len)(p)) > 1)
+	    ఒకవేళ ((l = (*mb_ptr2len)(p)) > 1)
 	    {
 		c = (*mb_ptr2char)(p);
 		p += l;
-		if (vim_isprintc(c))
+		ఒకవేళ (vim_isprintc(c))
 		    len += l;
-		else
+		లేకపోతే
 		{
 		    transchar_hex(hexbuf, c);
-		    len += (int)STRLEN(hexbuf);
+		    len += (పూర్ణాంకం)STRLEN(hexbuf);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		l = byte2cells(*p++);
-		if (l > 0)
+		ఒకవేళ (l > 0)
 		    len += l;
-		else
+		లేకపోతే
 		    len += 4;	// illegal byte sequence
 	    }
 	}
 	res = alloc(len + 1);
     }
-    else
+    లేకపోతే
 	res = alloc(vim_strsize(s) + 1);
 
-    if (res == NULL)
-	return NULL;
+    ఒకవేళ (res == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     char_u *d = res;
 
     p = s;
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    c = (*mb_ptr2char)(p);
-	    if (vim_isprintc(c))
+	    ఒకవేళ (vim_isprintc(c))
 	    {
 		mch_memmove(d, p, (size_t)l);
 		d += l;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		transchar_hex(d, c);
 		d += STRLEN(d);
 	    }
 	    p += l;
 	}
-	else
+	లేకపోతే
 	{
 	    char_u	*trs = transchar_byte(*p++);
 	    size_t	trs_len = STRLEN(trs);
@@ -413,7 +413,7 @@ transstr(char_u *s)
 	}
     }
     *d = NUL;
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -425,65 +425,65 @@ transstr(char_u *s)
     char_u *
 str_foldcase(
     char_u	*str,
-    int		orglen,
+    పూర్ణాంకం		orglen,
     char_u	*buf,
-    int		buflen)
+    పూర్ణాంకం		buflen)
 {
     garray_T	ga;
-    int		i;
-    int		len = orglen;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		len = orglen;
 
-#define GA_CHAR(i)  ((char_u *)ga.ga_data)[i]
-#define GA_PTR(i)   ((char_u *)ga.ga_data + (i))
-#define STR_CHAR(i)  (buf == NULL ? GA_CHAR(i) : buf[i])
-#define STR_PTR(i)   (buf == NULL ? GA_PTR(i) : buf + (i))
+#నిర్వచించు GA_CHAR(i)  ((char_u *)ga.ga_దత్తాంశం)[i]
+#నిర్వచించు GA_PTR(i)   ((char_u *)ga.ga_దత్తాంశం + (i))
+#నిర్వచించు STR_CHAR(i)  (buf == ఖాళీ ? GA_CHAR(i) : buf[i])
+#నిర్వచించు STR_PTR(i)   (buf == ఖాళీ ? GA_PTR(i) : buf + (i))
 
     // Copy "str" into "buf" or allocated memory, unmodified.
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
 	ga_init2(&ga, 1, 10);
-	if (ga_grow(&ga, len + 1) == FAIL)
-	    return NULL;
-	mch_memmove(ga.ga_data, str, (size_t)len);
+	ఒకవేళ (ga_grow(&ga, len + 1) == FAIL)
+	    తిరిగి ఖాళీ;
+	mch_memmove(ga.ga_దత్తాంశం, str, (size_t)len);
 	ga.ga_len = len;
     }
-    else
+    లేకపోతే
     {
-	if (len >= buflen)	    // Ugly!
+	ఒకవేళ (len >= buflen)	    // Ugly!
 	    len = buflen - 1;
 	mch_memmove(buf, str, (size_t)len);
     }
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
 	GA_CHAR(len) = NUL;
-    else
+    లేకపోతే
 	buf[len] = NUL;
 
     // Make each character lower case.
     i = 0;
-    while (STR_CHAR(i) != NUL)
+    అయితే (STR_CHAR(i) != NUL)
     {
-	if (enc_utf8 || (has_mbyte && MB_BYTE2LEN(STR_CHAR(i)) > 1))
+	ఒకవేళ (enc_utf8 || (has_mbyte && MB_BYTE2LEN(STR_CHAR(i)) > 1))
 	{
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		int	c = utf_ptr2char(STR_PTR(i));
-		int	olen = utf_ptr2len(STR_PTR(i));
-		int	lc = utf_tolower(c);
+		పూర్ణాంకం	c = utf_ptr2char(STR_PTR(i));
+		పూర్ణాంకం	olen = utf_ptr2len(STR_PTR(i));
+		పూర్ణాంకం	lc = utf_tolower(c);
 
 		// Only replace the character when it is not an invalid
 		// sequence (ASCII character or more than one byte) and
 		// utf_tolower() doesn't return the original character.
-		if ((c < 0x80 || olen > 1) && c != lc)
+		ఒకవేళ ((c < 0x80 || olen > 1) && c != lc)
 		{
-		    int	    nlen = utf_char2len(lc);
+		    పూర్ణాంకం	    nlen = utf_char2len(lc);
 
 		    // If the byte length changes need to shift the following
 		    // characters forward or backward.
-		    if (olen != nlen)
+		    ఒకవేళ (olen != nlen)
 		    {
-			if (nlen > olen)
+			ఒకవేళ (nlen > olen)
 			{
-			    if (buf == NULL
+			    ఒకవేళ (buf == ఖాళీ
 				    ? ga_grow(&ga, nlen - olen + 1) == FAIL
 				    : len + nlen - olen >= buflen)
 			    {
@@ -492,39 +492,39 @@ str_foldcase(
 				nlen = olen;
 			    }
 			}
-			if (olen != nlen)
+			ఒకవేళ (olen != nlen)
 			{
-			    if (buf == NULL)
+			    ఒకవేళ (buf == ఖాళీ)
 			    {
 				STRMOVE(GA_PTR(i) + nlen, GA_PTR(i) + olen);
 				ga.ga_len += nlen - olen;
 			    }
-			    else
+			    లేకపోతే
 			    {
 				STRMOVE(buf + i + nlen, buf + i + olen);
 				len += nlen - olen;
 			    }
 			}
 		    }
-		    (void)utf_char2bytes(lc, STR_PTR(i));
+		    (శూన్య)utf_char2bytes(lc, STR_PTR(i));
 		}
 	    }
 	    // skip to next multi-byte char
 	    i += (*mb_ptr2len)(STR_PTR(i));
 	}
-	else
+	లేకపోతే
 	{
-	    if (buf == NULL)
+	    ఒకవేళ (buf == ఖాళీ)
 		GA_CHAR(i) = TOLOWER_LOC(GA_CHAR(i));
-	    else
+	    లేకపోతే
 		buf[i] = TOLOWER_LOC(buf[i]);
 	    ++i;
 	}
     }
 
-    if (buf == NULL)
-	return (char_u *)ga.ga_data;
-    return buf;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి (char_u *)ga.ga_దత్తాంశం;
+    తిరిగి buf;
 }
 
 /*
@@ -535,38 +535,38 @@ str_foldcase(
  * Also doesn't work for the first byte of a multi-byte, "c" must be a
  * character!
  */
-static char_u	transchar_charbuf[7];
+స్థిర char_u	transchar_charbuf[7];
 
     char_u *
-transchar(int c)
+transchar(పూర్ణాంకం c)
 {
-    return transchar_buf(curbuf, c);
+    తిరిగి transchar_buf(curbuf, c);
 }
 
     char_u *
-transchar_buf(buf_T *buf, int c)
+transchar_buf(buf_T *buf, పూర్ణాంకం c)
 {
-    int			i;
+    పూర్ణాంకం			i;
 
     i = 0;
-    if (IS_SPECIAL(c))	    // special key code, display as ~@ char
+    ఒకవేళ (IS_SPECIAL(c))	    // special key code, display as ~@ char
     {
 	transchar_charbuf[0] = '~';
 	transchar_charbuf[1] = '@';
 	i = 2;
-	c = K_SECOND(c);
+	c = K_రెండవ(c);
     }
 
-    if ((!chartab_initialized && ((c >= ' ' && c <= '~')))
+    ఒకవేళ ((!chartab_initialized && ((c >= ' ' && c <= '~')))
 					|| (c < 256 && vim_isprintc_strict(c)))
     {
 	// printable character
 	transchar_charbuf[i] = c;
 	transchar_charbuf[i + 1] = NUL;
     }
-    else
+    లేకపోతే
 	transchar_nonprint(buf, transchar_charbuf + i, c);
-    return transchar_charbuf;
+    తిరిగి transchar_charbuf;
 }
 
 /*
@@ -574,9 +574,9 @@ transchar_buf(buf_T *buf, int c)
  * for an illegal UTF-8 byte.  Uses 'fileformat' of the current buffer.
  */
     char_u *
-transchar_byte(int c)
+transchar_byte(పూర్ణాంకం c)
 {
-    return transchar_byte_buf(curbuf, c);
+    తిరిగి transchar_byte_buf(curbuf, c);
 }
 
 /*
@@ -584,48 +584,48 @@ transchar_byte(int c)
  * for an illegal UTF-8 byte.  Uses 'fileformat' of "buf", unless it is NULL.
  */
     char_u *
-transchar_byte_buf(buf_T *buf, int c)
+transchar_byte_buf(buf_T *buf, పూర్ణాంకం c)
 {
-    if (enc_utf8 && c >= 0x80)
+    ఒకవేళ (enc_utf8 && c >= 0x80)
     {
 	transchar_nonprint(buf, transchar_charbuf, c);
-	return transchar_charbuf;
+	తిరిగి transchar_charbuf;
     }
-    return transchar_buf(buf, c);
+    తిరిగి transchar_buf(buf, c);
 }
 /*
  * Convert non-printable character to two or more printable characters in
  * "charbuf[]".  "charbuf" needs to be able to hold five bytes.
  * Does NOT work for multi-byte characters, c must be <= 255.
  */
-    void
-transchar_nonprint(buf_T *buf, char_u *charbuf, int c)
+    శూన్య
+transchar_nonprint(buf_T *buf, char_u *charbuf, పూర్ణాంకం c)
 {
-    if (c == NL)
+    ఒకవేళ (c == NL)
 	c = NUL;		// we use newline in place of a NUL
-    else if (buf != NULL && c == CAR && get_fileformat(buf) == EOL_MAC)
+    లేకపోతే ఒకవేళ (buf != ఖాళీ && c == CAR && get_fileformat(buf) == EOL_MAC)
 	c = NL;			// we use CR in place of  NL in this case
 
-    if (dy_flags & DY_UHEX)		// 'display' has "uhex"
+    ఒకవేళ (dy_flags & DY_UHEX)		// 'display' has "uhex"
 	transchar_hex(charbuf, c);
 
-    else if (c <= 0x7f)			// 0x00 - 0x1f and 0x7f
+    లేకపోతే ఒకవేళ (c <= 0x7f)			// 0x00 - 0x1f and 0x7f
     {
 	charbuf[0] = '^';
 	charbuf[1] = c ^ 0x40;		// DEL displayed as ^?
 	charbuf[2] = NUL;
     }
-    else if (enc_utf8)
+    లేకపోతే ఒకవేళ (enc_utf8)
     {
 	transchar_hex(charbuf, c);
     }
-    else if (c >= ' ' + 0x80 && c <= '~' + 0x80)    // 0xa0 - 0xfe
+    లేకపోతే ఒకవేళ (c >= ' ' + 0x80 && c <= '~' + 0x80)    // 0xa0 - 0xfe
     {
 	charbuf[0] = '|';
 	charbuf[1] = c - 0x80;
 	charbuf[2] = NUL;
     }
-    else					    // 0x80 - 0x9f and 0xff
+    లేకపోతే					    // 0x80 - 0x9f and 0xff
     {
 	charbuf[0] = '~';
 	charbuf[1] = (c - 0x80) ^ 0x40;	// 0xff displayed as ~?
@@ -633,19 +633,19 @@ transchar_nonprint(buf_T *buf, char_u *charbuf, int c)
     }
 }
 
-    void
-transchar_hex(char_u *buf, int c)
+    శూన్య
+transchar_hex(char_u *buf, పూర్ణాంకం c)
 {
-    int		i = 0;
+    పూర్ణాంకం		i = 0;
 
     buf[0] = '<';
-    if (c > 255)
+    ఒకవేళ (c > 255)
     {
-	buf[++i] = nr2hex((unsigned)c >> 12);
-	buf[++i] = nr2hex((unsigned)c >> 8);
+	buf[++i] = nr2hex((గుర్తులేని)c >> 12);
+	buf[++i] = nr2hex((గుర్తులేని)c >> 8);
     }
-    buf[++i] = nr2hex((unsigned)c >> 4);
-    buf[++i] = nr2hex((unsigned)c);
+    buf[++i] = nr2hex((గుర్తులేని)c >> 4);
+    buf[++i] = nr2hex((గుర్తులేని)c);
     buf[++i] = '>';
     buf[++i] = NUL;
 }
@@ -655,12 +655,12 @@ transchar_hex(char_u *buf, int c)
  * Lower case letters are used to avoid the confusion of <F1> being 0xf1 or
  * function key 1.
  */
-    static unsigned
-nr2hex(unsigned c)
+    స్థిర గుర్తులేని
+nr2hex(గుర్తులేని c)
 {
-    if ((c & 0xf) <= 9)
-	return (c & 0xf) + '0';
-    return (c & 0xf) - 10 + 'a';
+    ఒకవేళ ((c & 0xf) <= 9)
+	తిరిగి (c & 0xf) + '0';
+    తిరిగి (c & 0xf) - 10 + 'a';
 }
 
 /*
@@ -671,12 +671,12 @@ nr2hex(unsigned c)
  * For UTF-8 mode this will return 0 for bytes >= 0x80, because the number of
  * cells depends on further bytes.
  */
-    int
-byte2cells(int b)
+    పూర్ణాంకం
+byte2cells(పూర్ణాంకం b)
 {
-    if (enc_utf8 && b >= 0x80)
-	return 0;
-    return (g_chartab[b] & CT_CELL_MASK);
+    ఒకవేళ (enc_utf8 && b >= 0x80)
+	తిరిగి 0;
+    తిరిగి (g_chartab[b] & CT_CELL_ముసుగు);
 }
 
 /*
@@ -684,74 +684,74 @@ byte2cells(int b)
  * "c" can be a special key (negative number) in which case 3 or 4 is returned.
  * A TAB is counted as two cells: "^I" or four: "<09>".
  */
-    int
-char2cells(int c)
+    పూర్ణాంకం
+char2cells(పూర్ణాంకం c)
 {
-    if (IS_SPECIAL(c))
-	return char2cells(K_SECOND(c)) + 2;
-    if (c >= 0x80)
+    ఒకవేళ (IS_SPECIAL(c))
+	తిరిగి char2cells(K_రెండవ(c)) + 2;
+    ఒకవేళ (c >= 0x80)
     {
 	// UTF-8: above 0x80 need to check the value
-	if (enc_utf8)
-	    return utf_char2cells(c);
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_char2cells(c);
 	// DBCS: double-byte means double-width, except for euc-jp with first
 	// byte 0x8e
-	if (enc_dbcs != 0 && c >= 0x100)
+	ఒకవేళ (enc_dbcs != 0 && c >= 0x100)
 	{
-	    if (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
-		return 1;
-	    return 2;
+	    ఒకవేళ (enc_dbcs == DBCS_JPNU && ((గుర్తులేని)c >> 8) == 0x8e)
+		తిరిగి 1;
+	    తిరిగి 2;
 	}
     }
-    return (g_chartab[c & 0xff] & CT_CELL_MASK);
+    తిరిగి (g_chartab[c & 0xff] & CT_CELL_ముసుగు);
 }
 
 /*
  * Return number of display cells occupied by character at "*p".
  * A TAB is counted as two cells: "^I" or four: "<09>".
  */
-    int
+    పూర్ణాంకం
 ptr2cells(char_u *p)
 {
-    if (!has_mbyte)
-	return byte2cells(*p);
+    ఒకవేళ (!has_mbyte)
+	తిరిగి byte2cells(*p);
 
     // For UTF-8 we need to look at more bytes if the first byte is >= 0x80.
-    if (enc_utf8 && *p >= 0x80)
-	return utf_ptr2cells(p);
+    ఒకవేళ (enc_utf8 && *p >= 0x80)
+	తిరిగి utf_ptr2cells(p);
     // For DBCS we can tell the cell count from the first byte.
-    return (g_chartab[*p] & CT_CELL_MASK);
+    తిరిగి (g_chartab[*p] & CT_CELL_ముసుగు);
 }
 
 /*
  * Return the number of character cells string "s" will take on the screen,
  * counting TABs as two characters: "^I".
  */
-    int
+    పూర్ణాంకం
 vim_strsize(char_u *s)
 {
-    return vim_strnsize(s, (int)MAXCOL);
+    తిరిగి vim_strnsize(s, (పూర్ణాంకం)MAXCOL);
 }
 
 /*
  * Return the number of character cells string "s[len]" will take on the
  * screen, counting TABs as two characters: "^I".
  */
-    int
-vim_strnsize(char_u *s, int len)
+    పూర్ణాంకం
+vim_strnsize(char_u *s, పూర్ణాంకం len)
 {
-    int		size = 0;
+    పూర్ణాంకం		కొలత = 0;
 
-    while (*s != NUL && --len >= 0)
+    అయితే (*s != NUL && --len >= 0)
     {
-	int	    l = (*mb_ptr2len)(s);
+	పూర్ణాంకం	    l = (*mb_ptr2len)(s);
 
-	size += ptr2cells(s);
+	కొలత += ptr2cells(s);
 	s += l;
 	len -= l - 1;
     }
 
-    return size;
+    తిరిగి కొలత;
 }
 
 /*
@@ -761,56 +761,56 @@ vim_strnsize(char_u *s, int len)
  * Also see getvcol() below.
  */
 
-#ifdef FEAT_VARTABS
-# define RET_WIN_BUF_CHARTABSIZE(wp, buf, p, col) \
-    if (*(p) == TAB && (!(wp)->w_p_list || (wp)->w_lcs_chars.tab1)) \
+#నిర్వచితమైతే FEAT_VARTABS
+# define RET_WIN_BUF_CHARTABSIZE(wp, buf, p, నిలువు) \
+    ఒకవేళ (*(p) == TAB && (!(wp)->w_p_list || (wp)->w_lcs_chars.tab1)) \
     { \
-	return tabstop_padding(col, (buf)->b_p_ts, (buf)->b_p_vts_array); \
+	తిరిగి tabstop_padding(నిలువు, (buf)->b_p_ts, (buf)->b_p_vts_array); \
     } \
-    else \
-	return ptr2cells(p);
-#else
-# define RET_WIN_BUF_CHARTABSIZE(wp, buf, p, col) \
-    if (*(p) == TAB && (!(wp)->w_p_list || wp->w_lcs_chars.tab1)) \
+    లేకపోతే \
+	తిరిగి ptr2cells(p);
+#లేకపోతే
+# define RET_WIN_BUF_CHARTABSIZE(wp, buf, p, నిలువు) \
+    ఒకవేళ (*(p) == TAB && (!(wp)->w_p_list || wp->w_lcs_chars.tab1)) \
     { \
-	int ts; \
+	పూర్ణాంకం ts; \
 	ts = (buf)->b_p_ts; \
-	return (int)(ts - (col % ts)); \
+	తిరిగి (పూర్ణాంకం)(ts - (నిలువు % ts)); \
     } \
-    else \
-	return ptr2cells(p);
-#endif
+    లేకపోతే \
+	తిరిగి ptr2cells(p);
+#అయితే_ముగింపు
 
-    int
-chartabsize(char_u *p, colnr_T col)
+    పూర్ణాంకం
+chartabsize(char_u *p, colnr_T నిలువు)
 {
-    RET_WIN_BUF_CHARTABSIZE(curwin, curbuf, p, col)
+    RET_WIN_BUF_CHARTABSIZE(curwin, curbuf, p, నిలువు)
 }
 
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
-    int
-win_chartabsize(win_T *wp, char_u *p, colnr_T col)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+    పూర్ణాంకం
+win_chartabsize(win_T *wp, char_u *p, colnr_T నిలువు)
 {
-    RET_WIN_BUF_CHARTABSIZE(wp, wp->w_buffer, p, col)
+    RET_WIN_BUF_CHARTABSIZE(wp, wp->w_బఫరు, p, నిలువు)
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return the number of characters the string "s" will take on the screen,
  * taking into account the size of a tab.
  * Does not handle text properties, since "s" is not a buffer line.
  */
-    int
+    పూర్ణాంకం
 linetabsize_str(char_u *s)
 {
-    return linetabsize_col(0, s);
+    తిరిగి linetabsize_నిలువు(0, s);
 }
 
 /*
  * Like linetabsize_str(), but "s" starts at column "startcol".
  */
-    int
-linetabsize_col(int startcol, char_u *s)
+    పూర్ణాంకం
+linetabsize_నిలువు(పూర్ణాంకం startcol, char_u *s)
 {
     chartabsize_T cts;
     vimlong_T vcol;
@@ -818,34 +818,34 @@ linetabsize_col(int startcol, char_u *s)
     init_chartabsize_arg(&cts, curwin, 0, startcol, s, s);
     vcol = cts.cts_vcol;
 
-    while (*cts.cts_ptr != NUL)
+    అయితే (*cts.cts_ptr != NUL)
     {
 	vcol += lbr_chartabsize_adv(&cts);
-	if (vcol > MAXCOL)
+	ఒకవేళ (vcol > MAXCOL)
 	{
 	    cts.cts_vcol = MAXCOL;
-	    break;
+	    ఆపు;
 	}
-	else
-	    cts.cts_vcol = (int)vcol;
+	లేకపోతే
+	    cts.cts_vcol = (పూర్ణాంకం)vcol;
     }
     clear_chartabsize_arg(&cts);
-    return (int)cts.cts_vcol;
+    తిరిగి (పూర్ణాంకం)cts.cts_vcol;
 }
 
 /*
  * Like linetabsize_str(), but for a given window instead of the current one.
  * Doesn't count the size of 'listchars' "eol".
  */
-    int
-win_linetabsize(win_T *wp, linenr_T lnum, char_u *line, colnr_T len)
+    పూర్ణాంకం
+win_linetabsize(win_T *wp, linenr_T lnum, char_u *పంక్తి, colnr_T len)
 {
     chartabsize_T cts;
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, పంక్తి, పంక్తి);
     win_linetabsize_cts(&cts, len);
     clear_chartabsize_arg(&cts);
-    return (int)cts.cts_vcol;
+    తిరిగి (పూర్ణాంకం)cts.cts_vcol;
 }
 
 /*
@@ -853,20 +853,20 @@ win_linetabsize(win_T *wp, linenr_T lnum, char_u *line, colnr_T len)
  * screen, taking into account the size of a tab and text properties.
  * Doesn't count the size of 'listchars' "eol".
  */
-    int
+    పూర్ణాంకం
 linetabsize(win_T *wp, linenr_T lnum)
 {
-    return win_linetabsize(wp, lnum,
-		       ml_get_buf(wp->w_buffer, lnum, FALSE), (colnr_T)MAXCOL);
+    తిరిగి win_linetabsize(wp, lnum,
+		       ml_get_buf(wp->w_బఫరు, lnum, FALSE), (colnr_T)MAXCOL);
 }
 
 /*
  * Like linetabsize(), but counts the size of 'listchars' "eol".
  */
-    int
+    పూర్ణాంకం
 linetabsize_eol(win_T *wp, linenr_T lnum)
 {
-    return linetabsize(wp, lnum)
+    తిరిగి linetabsize(wp, lnum)
 	+ ((wp->w_p_list && wp->w_lcs_chars.eol != NUL) ? 1 : 0);
 }
 
@@ -874,48 +874,48 @@ linetabsize_eol(win_T *wp, linenr_T lnum)
  * Like linetabsize(), but excludes 'above'/'after'/'right'/'below' aligned
  * virtual text, while keeping inline virtual text.
  */
-    int
+    పూర్ణాంకం
 linetabsize_no_outer(win_T *wp, linenr_T lnum)
 {
-#ifndef FEAT_PROP_POPUP
-    return linetabsize(wp, lnum);
-#else
+#నిర్వచితం_కాకపోతే FEAT_PROP_POPUP
+    తిరిగి linetabsize(wp, lnum);
+#లేకపోతే
     chartabsize_T cts;
-    char_u *line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    char_u *పంక్తి = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, పంక్తి, పంక్తి);
 
-    if (cts.cts_text_prop_count)
+    ఒకవేళ (cts.cts_పాఠ్యం_prop_లెక్క)
     {
-	int write_idx = 0;
-	for (int read_idx = 0; read_idx < cts.cts_text_prop_count; read_idx++)
+	పూర్ణాంకం write_idx = 0;
+	కొరకు (పూర్ణాంకం read_idx = 0; read_idx < cts.cts_పాఠ్యం_prop_లెక్క; read_idx++)
 	{
-	    textprop_T *tp = &cts.cts_text_props[read_idx];
-	    if (tp->tp_col != MAXCOL)
+	    textprop_T *tp = &cts.cts_పాఠ్యం_props[read_idx];
+	    ఒకవేళ (tp->tp_నిలువు != MAXCOL)
 	    {
-		if (read_idx != write_idx)
-		    cts.cts_text_props[write_idx] = *tp;
+		ఒకవేళ (read_idx != write_idx)
+		    cts.cts_పాఠ్యం_props[write_idx] = *tp;
 		write_idx++;
 	    }
 	}
-	cts.cts_text_prop_count = write_idx;
-	if (cts.cts_text_prop_count == 0)
-	    VIM_CLEAR(cts.cts_text_props);
+	cts.cts_పాఠ్యం_prop_లెక్క = write_idx;
+	ఒకవేళ (cts.cts_పాఠ్యం_prop_లెక్క == 0)
+	    VIM_CLEAR(cts.cts_పాఠ్యం_props);
     }
 
     win_linetabsize_cts(&cts, (colnr_T)MAXCOL);
     clear_chartabsize_arg(&cts);
-    return (int)cts.cts_vcol;
-#endif
+    తిరిగి (పూర్ణాంకం)cts.cts_vcol;
+#అయితే_ముగింపు
 }
 
 /*
  * Like linetabsize_no_outer(), but counts the size of 'listchars' "eol".
  */
-    int
+    పూర్ణాంకం
 linetabsize_no_outer_eol(win_T *wp, linenr_T lnum)
 {
-    return linetabsize_no_outer(wp, lnum)
+    తిరిగి linetabsize_no_outer(wp, lnum)
 	+ ((wp->w_p_list && wp->w_lcs_chars.eol != NUL) ? 1 : 0);
 }
 
@@ -924,94 +924,94 @@ linetabsize_no_outer_eol(win_T *wp, linenr_T lnum)
  * win_nolbr_chartabsize(): no 'linebreak', 'breakindent', 'showbreak' and no
  * text properties that insert text.
  */
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
-    static int
-win_lbr_is_simple_width(chartabsize_T *cts)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+    స్థిర పూర్ణాంకం
+win_lbr_is_simple_వెడల్పు(chartabsize_T *cts)
 {
-    return TRUE
+    తిరిగి TRUE
 # ifdef FEAT_LINEBREAK
 	&& !cts->cts_win->w_p_lbr && !cts->cts_win->w_p_bri
-	&& *get_showbreak_value(cts->cts_win) == NUL
+	&& *get_showbreak_విలువ(cts->cts_win) == NUL
 # endif
 # ifdef FEAT_PROP_POPUP
-	&& !cts->cts_has_prop_with_text
+	&& !cts->cts_has_prop_with_పాఠ్యం
 # endif
 	;
 }
-#endif
+#అయితే_ముగింపు
 
-    void
+    శూన్య
 win_linetabsize_cts(chartabsize_T *cts, colnr_T len)
 {
     vimlong_T vcol = cts->cts_vcol;
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
     // Fast path: when win_lbr_chartabsize() would just return
     // win_nolbr_chartabsize() (wrap on; no 'linebreak'/'breakindent'/
     // 'showbreak'/inserted text properties), call it directly.
-    int simple_width = cts->cts_win->w_p_wrap && win_lbr_is_simple_width(cts);
-#endif
-#ifdef FEAT_PROP_POPUP
+    పూర్ణాంకం simple_వెడల్పు = cts->cts_win->w_p_wrap && win_lbr_is_simple_వెడల్పు(cts);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
     cts->cts_with_trailing = len == MAXCOL;
-#endif
-    for ( ; *cts->cts_ptr != NUL && (len == MAXCOL || cts->cts_ptr < cts->cts_line + len);
+#అయితే_ముగింపు
+    కొరకు ( ; *cts->cts_ptr != NUL && (len == MAXCOL || cts->cts_ptr < cts->cts_పంక్తి + len);
 						      MB_PTR_ADV(cts->cts_ptr))
     {
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
-	if (simple_width)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+	ఒకవేళ (simple_వెడల్పు)
 	{
-	    int	c = *cts->cts_ptr;
+	    పూర్ణాంకం	c = *cts->cts_ptr;
 
-	    if (c < 0x80 && c != TAB)
-		vcol += g_chartab[c] & CT_CELL_MASK;
-	    else
-		vcol += win_nolbr_chartabsize(cts, NULL);
+	    ఒకవేళ (c < 0x80 && c != TAB)
+		vcol += g_chartab[c] & CT_CELL_ముసుగు;
+	    లేకపోతే
+		vcol += win_nolbr_chartabsize(cts, ఖాళీ);
 	}
-	else
-#endif
-	    vcol += win_lbr_chartabsize(cts, NULL, NULL);
-	if (vcol > MAXCOL)
+	లేకపోతే
+#అయితే_ముగింపు
+	    vcol += win_lbr_chartabsize(cts, ఖాళీ, ఖాళీ);
+	ఒకవేళ (vcol > MAXCOL)
 	{
 	    cts->cts_vcol = MAXCOL;
-	    break;
+	    ఆపు;
 	}
-	else
-	    cts->cts_vcol = (int)vcol;
+	లేకపోతే
+	    cts->cts_vcol = (పూర్ణాంకం)vcol;
     }
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // check for a virtual text at the end of a line or on an empty line
-    if (len == MAXCOL && cts->cts_has_prop_with_text && *cts->cts_ptr == NUL)
+    ఒకవేళ (len == MAXCOL && cts->cts_has_prop_with_పాఠ్యం && *cts->cts_ptr == NUL)
     {
-	int head = 0;
-	(void)win_lbr_chartabsize(cts, &head, NULL);
-	vcol += cts->cts_cur_text_width + head;
+	పూర్ణాంకం తల = 0;
+	(శూన్య)win_lbr_chartabsize(cts, &తల, ఖాళీ);
+	vcol += cts->cts_cur_పాఠ్యం_వెడల్పు + తల;
 	// When properties are above the empty line must also be counted.  For
 	// a property below the width already includes filling up the line.
-	if (cts->cts_ptr == cts->cts_line && cts->cts_prop_lines > 0
-							 && !cts->cts_has_below)
+	ఒకవేళ (cts->cts_ptr == cts->cts_పంక్తి && cts->cts_prop_పంక్తులు > 0
+							 && !cts->cts_has_క్రింద)
 	    ++vcol;
-	cts->cts_vcol = vcol > MAXCOL ? MAXCOL : (int)vcol;
+	cts->cts_vcol = vcol > MAXCOL ? MAXCOL : (పూర్ణాంకం)vcol;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Return TRUE if 'c' is a normal identifier character:
  * Letters and characters from the 'isident' option.
  */
-    int
-vim_isIDc(int c)
+    పూర్ణాంకం
+vim_isIDc(పూర్ణాంకం c)
 {
-    return (c > 0 && c < 0x100 && (g_chartab[c] & CT_ID_CHAR));
+    తిరిగి (c > 0 && c < 0x100 && (g_chartab[c] & CT_ID_CHAR));
 }
 
 /*
  * Like vim_isIDc() but not using the 'isident' option: letters, numbers and
  * underscore.
  */
-    int
-vim_isNormalIDc(int c)
+    పూర్ణాంకం
+vim_is_సాధారణ_IDc(పూర్ణాంకం c)
 {
-    return ASCII_ISALNUM(c) || c == '_';
+    తిరిగి ASCII_ISALNUM(c) || c == '_';
 }
 
 /*
@@ -1019,43 +1019,43 @@ vim_isNormalIDc(int c)
  * 'iskeyword' option for the current buffer.
  * For multi-byte characters mb_get_class() is used (builtin rules).
  */
-    int
-vim_iswordc(int c)
+    పూర్ణాంకం
+vim_iswordc(పూర్ణాంకం c)
 {
-    return vim_iswordc_buf(c, curbuf);
+    తిరిగి vim_iswordc_buf(c, curbuf);
 }
 
-    int
-vim_iswordc_buf(int c, buf_T *buf)
+    పూర్ణాంకం
+vim_iswordc_buf(పూర్ణాంకం c, buf_T *buf)
 {
-    if (c >= 0x100)
+    ఒకవేళ (c >= 0x100)
     {
-	if (enc_dbcs != 0)
-	    return dbcs_class((unsigned)c >> 8, (unsigned)(c & 0xff)) >= 2;
-	if (enc_utf8)
-	    return utf_class_buf(c, buf) >= 2;
-	return FALSE;
+	ఒకవేళ (enc_dbcs != 0)
+	    తిరిగి dbcs_class((గుర్తులేని)c >> 8, (గుర్తులేని)(c & 0xff)) >= 2;
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_class_buf(c, buf) >= 2;
+	తిరిగి FALSE;
     }
-    return (c > 0 && GET_CHARTAB(buf, c) != 0);
+    తిరిగి (c > 0 && GET_CHARTAB(buf, c) != 0);
 }
 
 /*
  * Just like vim_iswordc() but uses a pointer to the (multi-byte) character.
  */
-    int
+    పూర్ణాంకం
 vim_iswordp(char_u *p)
 {
-    return vim_iswordp_buf(p, curbuf);
+    తిరిగి vim_iswordp_buf(p, curbuf);
 }
 
-    int
+    పూర్ణాంకం
 vim_iswordp_buf(char_u *p, buf_T *buf)
 {
-    int	c = *p;
+    పూర్ణాంకం	c = *p;
 
-    if (has_mbyte && MB_BYTE2LEN(c) > 1)
+    ఒకవేళ (has_mbyte && MB_BYTE2LEN(c) > 1)
 	c = (*mb_ptr2char)(p);
-    return vim_iswordc_buf(c, buf);
+    తిరిగి vim_iswordc_buf(c, buf);
 }
 
 /*
@@ -1064,23 +1064,23 @@ vim_iswordp_buf(char_u *p, buf_T *buf)
  * Assume characters above 0x100 are valid (multi-byte).
  * To be used for commands like "gf".
  */
-    int
-vim_isfilec(int c)
+    పూర్ణాంకం
+vim_isfilec(పూర్ణాంకం c)
 {
-    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_FNAME_CHAR)));
+    తిరిగి (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_FNAME_CHAR)));
 }
 
-#if defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_SPELL)
 /*
  * Return TRUE if 'c' is a valid file-name character, including characters left
  * out of 'isfname' to make "gf" work, such as comma, space, '@', etc.
  */
-    int
-vim_is_fname_char(int c)
+    పూర్ణాంకం
+vim_is_fname_char(పూర్ణాంకం c)
 {
-    return vim_isfilec(c) || c == ',' || c == ' ' || c == '@';
+    తిరిగి vim_isfilec(c) || c == ',' || c == ' ' || c == '@';
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * return TRUE if 'c' is a valid file-name character or a wildcard character
@@ -1088,14 +1088,14 @@ vim_is_fname_char(int c)
  * Explicitly interpret ']' as a wildcard character as mch_has_wildcard("]")
  * returns false.
  */
-    int
-vim_isfilec_or_wc(int c)
+    పూర్ణాంకం
+vim_isfilec_or_wc(పూర్ణాంకం c)
 {
     char_u buf[2];
 
     buf[0] = (char_u)c;
     buf[1] = NUL;
-    return vim_isfilec(c) || c == ']' || mch_has_wildcard(buf);
+    తిరిగి vim_isfilec(c) || c == ']' || mch_has_wildcard(buf);
 }
 
 /*
@@ -1103,26 +1103,26 @@ vim_isfilec_or_wc(int c)
  * Assume characters above 0x100 are printable (multi-byte), except for
  * Unicode.
  */
-    int
-vim_isprintc(int c)
+    పూర్ణాంకం
+vim_isprintc(పూర్ణాంకం c)
 {
-    if (enc_utf8 && c >= 0x100)
-	return utf_printable(c);
-    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
+    ఒకవేళ (enc_utf8 && c >= 0x100)
+	తిరిగి utf_printable(c);
+    తిరిగి (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
 }
 
 /*
  * Strict version of vim_isprintc(c), don't return TRUE if "c" is the head
  * byte of a double-byte character.
  */
-    int
-vim_isprintc_strict(int c)
+    పూర్ణాంకం
+vim_isprintc_strict(పూర్ణాంకం c)
 {
-    if (enc_dbcs != 0 && c < 0x100 && MB_BYTE2LEN(c) > 1)
-	return FALSE;
-    if (enc_utf8 && c >= 0x100)
-	return utf_printable(c);
-    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
+    ఒకవేళ (enc_dbcs != 0 && c < 0x100 && MB_BYTE2LEN(c) > 1)
+	తిరిగి FALSE;
+    ఒకవేళ (enc_utf8 && c >= 0x100)
+	తిరిగి utf_printable(c);
+    తిరిగి (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
 }
 
 /*
@@ -1130,157 +1130,157 @@ vim_isprintc_strict(int c)
  * "line" is the start of the line, "ptr" is the first relevant character.
  * When "lnum" is zero do not use text properties that insert text.
  */
-    void
+    శూన్య
 init_chartabsize_arg(
 	chartabsize_T	*cts,
 	win_T		*wp,
-	linenr_T	lnum UNUSED,
-	colnr_T		col,
-	char_u		*line,
+	linenr_T	lnum వాడని,
+	colnr_T		నిలువు,
+	char_u		*పంక్తి,
 	char_u		*ptr)
 {
-    CLEAR_POINTER(cts);
+    CLEAR_సూచిక(cts);
     cts->cts_win = wp;
-    cts->cts_vcol = col;
-    cts->cts_line = line;
+    cts->cts_vcol = నిలువు;
+    cts->cts_పంక్తి = పంక్తి;
     cts->cts_ptr = ptr;
-#ifdef FEAT_LINEBREAK
-    cts->cts_bri_size = -1;
-#endif
-#ifdef FEAT_PROP_POPUP
-    if (lnum > 0 && !ignore_text_props)
+#నిర్వచితమైతే FEAT_LINEBREAK
+    cts->cts_bri_కొలత = -1;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (lnum > 0 && !ignore_పాఠ్యం_props)
     {
-	char_u	*prop_start;
-	int	count;
+	char_u	*prop_ప్రారంభం;
+	పూర్ణాంకం	లెక్క;
 
-	count = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
-	cts->cts_text_prop_count = count;
-	if (count > 0)
+	లెక్క = get_పాఠ్యం_props(wp->w_బఫరు, lnum, &prop_ప్రారంభం, FALSE);
+	cts->cts_పాఠ్యం_prop_లెక్క = లెక్క;
+	ఒకవేళ (లెక్క > 0)
 	{
 	    // Make a copy of the properties, so that they are properly
 	    // aligned.  Make it twice as long for the sorting below.
-	    cts->cts_text_props = ALLOC_MULT(textprop_T, count * 2);
-	    if (cts->cts_text_props == NULL)
-		cts->cts_text_prop_count = 0;
-	    else
+	    cts->cts_పాఠ్యం_props = ALLOC_MULT(textprop_T, లెక్క * 2);
+	    ఒకవేళ (cts->cts_పాఠ్యం_props == ఖాళీ)
+		cts->cts_పాఠ్యం_prop_లెక్క = 0;
+	    లేకపోతే
 	    {
-		int	i;
+		పూర్ణాంకం	i;
 
-		mch_memmove(cts->cts_text_props + count, prop_start,
-						   count * sizeof(textprop_T));
-		for (i = 0; i < count; ++i)
+		mch_memmove(cts->cts_పాఠ్యం_props + లెక్క, prop_ప్రారంభం,
+						   లెక్క * పరిమాణం(textprop_T));
+		కొరకు (i = 0; i < లెక్క; ++i)
 		{
-		    textprop_T *tp = cts->cts_text_props + i + count;
-		    if (tp->tp_id < 0
-				     && text_prop_type_valid(wp->w_buffer, tp))
+		    textprop_T *tp = cts->cts_పాఠ్యం_props + i + లెక్క;
+		    ఒకవేళ (tp->tp_id < 0
+				     && పాఠ్యం_prop_type_valid(wp->w_బఫరు, tp))
 		    {
-			cts->cts_has_prop_with_text = TRUE;
-			break;
+			cts->cts_has_prop_with_పాఠ్యం = TRUE;
+			ఆపు;
 		    }
 		}
-		if (!cts->cts_has_prop_with_text)
+		ఒకవేళ (!cts->cts_has_prop_with_పాఠ్యం)
 		{
 		    // won't use the text properties, free them
-		    VIM_CLEAR(cts->cts_text_props);
-		    cts->cts_text_prop_count = 0;
+		    VIM_CLEAR(cts->cts_పాఠ్యం_props);
+		    cts->cts_పాఠ్యం_prop_లెక్క = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    int	    *text_prop_idxs;
+		    పూర్ణాంకం	    *పాఠ్యం_prop_idxs;
 
 		    // Need to sort the array to get any truncation right.
 		    // Do the sorting in the second part of the array, then
 		    // move the sorted props to the first part of the array.
-		    text_prop_idxs = ALLOC_MULT(int, count);
-		    if (text_prop_idxs != NULL)
+		    పాఠ్యం_prop_idxs = ALLOC_MULT(పూర్ణాంకం, లెక్క);
+		    ఒకవేళ (పాఠ్యం_prop_idxs != ఖాళీ)
 		    {
-			for (i = 0; i < count; ++i)
-			    text_prop_idxs[i] = i + count;
-			sort_text_props(curbuf, cts->cts_text_props,
-							text_prop_idxs, count);
+			కొరకు (i = 0; i < లెక్క; ++i)
+			    పాఠ్యం_prop_idxs[i] = i + లెక్క;
+			క్రమీకరించు_పాఠ్యం_props(curbuf, cts->cts_పాఠ్యం_props,
+							పాఠ్యం_prop_idxs, లెక్క);
 			// Here we want the reverse order.
-			for (i = 0; i < count; ++i)
-			    cts->cts_text_props[count - i - 1] =
-					cts->cts_text_props[text_prop_idxs[i]];
-			vim_free(text_prop_idxs);
+			కొరకు (i = 0; i < లెక్క; ++i)
+			    cts->cts_పాఠ్యం_props[లెక్క - i - 1] =
+					cts->cts_పాఠ్యం_props[పాఠ్యం_prop_idxs[i]];
+			vim_free(పాఠ్యం_prop_idxs);
 		    }
 
 		    // Convert tp_text_offset to tp_text pointer.
-		    char_u *count_ptr = prop_start - PROP_COUNT_SIZE;
+		    char_u *లెక్క_ptr = prop_ప్రారంభం - PROP_లెక్క_కొలత;
 
-		    for (i = 0; i < count; ++i)
+		    కొరకు (i = 0; i < లెక్క; ++i)
 		    {
-			textprop_T *tp = &cts->cts_text_props[i];
+			textprop_T *tp = &cts->cts_పాఠ్యం_props[i];
 
-			if (tp->tp_id < 0 && tp->u.tp_text_offset > 0)
+			ఒకవేళ (tp->tp_id < 0 && tp->u.tp_పాఠ్యం_స్థానభ్రంశం > 0)
 			{
-			    tp->u.tp_text = count_ptr + tp->u.tp_text_offset;
+			    tp->u.tp_పాఠ్యం = లెక్క_ptr + tp->u.tp_పాఠ్యం_స్థానభ్రంశం;
 			    tp->tp_flags |= TP_FLAG_VTEXT_PTR;
 			}
-			else
-			    tp->u.tp_text = NULL;
+			లేకపోతే
+			    tp->u.tp_పాఠ్యం = ఖాళీ;
 		    }
 		}
 	    }
 	}
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Free any allocated item in "cts".
  */
-    void
-clear_chartabsize_arg(chartabsize_T *cts UNUSED)
+    శూన్య
+clear_chartabsize_arg(chartabsize_T *cts వాడని)
 {
-#ifdef FEAT_PROP_POPUP
-    if (cts->cts_text_prop_count > 0)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (cts->cts_పాఠ్యం_prop_లెక్క > 0)
     {
-	VIM_CLEAR(cts->cts_text_props);
-	cts->cts_text_prop_count = 0;
+	VIM_CLEAR(cts->cts_పాఠ్యం_props);
+	cts->cts_పాఠ్యం_prop_లెక్క = 0;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Like chartabsize(), but also check for line breaks on the screen and text
  * properties that insert text.
  */
-    int
+    పూర్ణాంకం
 lbr_chartabsize(chartabsize_T *cts)
 {
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
-    if (1
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+    ఒకవేళ (1
 # ifdef FEAT_LINEBREAK
-	&& !curwin->w_p_lbr && *get_showbreak_value(curwin) == NUL
+	&& !curwin->w_p_lbr && *get_showbreak_విలువ(curwin) == NUL
 							   && !curwin->w_p_bri
 # endif
 # ifdef FEAT_PROP_POPUP
-	&& !cts->cts_has_prop_with_text
+	&& !cts->cts_has_prop_with_పాఠ్యం
 # endif
        )
     {
-#endif
-	if (curwin->w_p_wrap)
-	    return win_nolbr_chartabsize(cts, NULL);
+#అయితే_ముగింపు
+	ఒకవేళ (curwin->w_p_wrap)
+	    తిరిగి win_nolbr_chartabsize(cts, ఖాళీ);
 	RET_WIN_BUF_CHARTABSIZE(curwin, curbuf, cts->cts_ptr, cts->cts_vcol)
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
     }
-    return win_lbr_chartabsize(cts, NULL, NULL);
-#endif
+    తిరిగి win_lbr_chartabsize(cts, ఖాళీ, ఖాళీ);
+#అయితే_ముగింపు
 }
 
 /*
  * Call lbr_chartabsize() and advance the pointer.
  */
-    int
+    పూర్ణాంకం
 lbr_chartabsize_adv(chartabsize_T *cts)
 {
-    int		retval;
+    పూర్ణాంకం		retval;
 
     retval = lbr_chartabsize(cts);
     MB_PTR_ADV(cts->cts_ptr);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1302,172 +1302,172 @@ lbr_chartabsize_adv(chartabsize_T *cts)
  * Warning: "*headp" and "*tailp" may not be set if the value is 0, init to 0
  * before calling.
  */
-    int
+    పూర్ణాంకం
 win_lbr_chartabsize(
 	chartabsize_T	*cts,
-	int		*headp UNUSED,
-	int		*tailp UNUSED)
+	పూర్ణాంకం		*headp వాడని,
+	పూర్ణాంకం		*tailp వాడని)
 {
     win_T	*wp = cts->cts_win;
-#if defined(FEAT_PROP_POPUP) || defined(FEAT_LINEBREAK)
-    char_u	*line = cts->cts_line; // start of the line
-    int		size;
-#endif
+#ఒకవేళ defined(FEAT_PROP_POPUP) || defined(FEAT_LINEBREAK)
+    char_u	*పంక్తి = cts->cts_పంక్తి; // start of the line
+    పూర్ణాంకం		కొలత;
+#అయితే_ముగింపు
     char_u	*s = cts->cts_ptr;
     colnr_T	vcol = cts->cts_vcol;
-#ifdef FEAT_LINEBREAK
-    int		mb_added = 0;
-    int		n;
+#నిర్వచితమైతే FEAT_LINEBREAK
+    పూర్ణాంకం		mb_added = 0;
+    పూర్ణాంకం		n;
     char_u	*sbr;
-    int		no_sbr = FALSE;
-#endif
+    పూర్ణాంకం		no_sbr = FALSE;
+#అయితే_ముగింపు
 
-#if defined(FEAT_PROP_POPUP)
-    cts->cts_cur_text_width = 0;
-    cts->cts_has_below = false;
-    cts->cts_first_char = 0;
-#endif
+#ఒకవేళ defined(FEAT_PROP_POPUP)
+    cts->cts_cur_పాఠ్యం_వెడల్పు = 0;
+    cts->cts_has_క్రింద = false;
+    cts->cts_మొదటి_char = 0;
+#అయితే_ముగింపు
 
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
     /*
      * No 'linebreak', 'showbreak', 'breakindent' and text properties that
      * insert text: return quickly.
      */
-    if (win_lbr_is_simple_width(cts))
-#endif
+    ఒకవేళ (win_lbr_is_simple_వెడల్పు(cts))
+#అయితే_ముగింపు
     {
-	if (wp->w_p_wrap)
-	    return win_nolbr_chartabsize(cts, headp);
-	RET_WIN_BUF_CHARTABSIZE(wp, wp->w_buffer, s, vcol)
+	ఒకవేళ (wp->w_p_wrap)
+	    తిరిగి win_nolbr_chartabsize(cts, headp);
+	RET_WIN_BUF_CHARTABSIZE(wp, wp->w_బఫరు, s, vcol)
     }
 
-#if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
-    int has_lcs_eol = wp->w_p_list && wp->w_lcs_chars.eol != NUL;
+#ఒకవేళ defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
+    పూర్ణాంకం has_lcs_eol = wp->w_p_list && wp->w_lcs_chars.eol != NUL;
     // Virtual text above the line is on its own screen line, it does not count
     // for the size of a Tab.
     colnr_T tab_vcol = vcol;
 
 # ifdef FEAT_PROP_POPUP
-    tab_vcol -= cts->cts_above_width;
+    tab_vcol -= cts->cts_above_వెడల్పు;
 # endif
 
     /*
      * First get the normal size, without 'linebreak' or text properties
      */
-    size = win_chartabsize(wp, s, tab_vcol);
+    కొలత = win_chartabsize(wp, s, tab_vcol);
 # ifdef FEAT_LINEBREAK
-    if (*s == NUL)
+    ఒకవేళ (*s == NUL)
     {
 	// 1 cell for EOL list char (if present), as opposed to the two cell ^@
 	// for a NUL character in the text.
-	size = has_lcs_eol ? 1 : 0;
+	కొలత = has_lcs_eol ? 1 : 0;
     }
 
-    int is_doublewidth = has_mbyte && size == 2 && MB_BYTE2LEN(*s) > 1;
+    పూర్ణాంకం is_doublewidth = has_mbyte && కొలత == 2 && MB_BYTE2LEN(*s) > 1;
 # endif
 
 # ifdef FEAT_PROP_POPUP
-    if (cts->cts_has_prop_with_text)
+    ఒకవేళ (cts->cts_has_prop_with_పాఠ్యం)
     {
 #  ifdef FEAT_LINEBREAK
-	int	    tab_size = size;
+	పూర్ణాంకం	    tab_కొలత = కొలత;
 #  endif
-	int	    charlen = *s == NUL ? 1 : mb_ptr2len(s);
-	int	    i;
-	int	    col = (int)(s - line);
+	పూర్ణాంకం	    charlen = *s == NUL ? 1 : mb_ptr2len(s);
+	పూర్ణాంకం	    i;
+	పూర్ణాంకం	    నిలువు = (పూర్ణాంకం)(s - పంక్తి);
 
 
 	// The "$" for 'list' mode will go between the EOL and
 	// the text prop, account for that.
-	if (has_lcs_eol)
+	ఒకవేళ (has_lcs_eol)
 	{
 	    ++vcol;
-	    --size;
+	    --కొలత;
 	}
 
-	for (i = 0; i < cts->cts_text_prop_count; ++i)
+	కొరకు (i = 0; i < cts->cts_పాఠ్యం_prop_లెక్క; ++i)
 	{
-	    textprop_T	*tp = cts->cts_text_props + i;
-	    int		col_off = win_col_off(wp);
+	    textprop_T	*tp = cts->cts_పాఠ్యం_props + i;
+	    పూర్ణాంకం		నిలువు_off = win_నిలువు_off(wp);
 
 	    // Watch out for the text being deleted.  "cts_text_props" is a
 	    // copy, the text prop may actually have been removed from the line.
-	    if (tp->tp_id < 0
-		    && ((tp->tp_col - 1 >= col
-					     && tp->tp_col - 1 < col + charlen)
-		       || (tp->tp_col == MAXCOL
+	    ఒకవేళ (tp->tp_id < 0
+		    && ((tp->tp_నిలువు - 1 >= నిలువు
+					     && tp->tp_నిలువు - 1 < నిలువు + charlen)
+		       || (tp->tp_నిలువు == MAXCOL
 			   && ((tp->tp_flags & TP_FLAG_ALIGN_ABOVE)
-				? col == 0
+				? నిలువు == 0
 				: s[0] == NUL && cts->cts_with_trailing)))
-		    && tp->u.tp_text != NULL)
+		    && tp->u.tp_పాఠ్యం != ఖాళీ)
 	    {
-		char_u *p = tp->u.tp_text;
+		char_u *p = tp->u.tp_పాఠ్యం;
 
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    int	cells;
+		    పూర్ణాంకం	cells;
 
-		    if (tp->tp_col == MAXCOL)
+		    ఒకవేళ (tp->tp_నిలువు == MAXCOL)
 		    {
-			int n_extra = (int)STRLEN(p);
+			పూర్ణాంకం n_extra = (పూర్ణాంకం)STRLEN(p);
 
-			cells = text_prop_position(wp, tp, vcol,
-			     (vcol + size) % (wp->w_width - col_off) + col_off,
-					      &n_extra, &p, NULL, NULL, FALSE);
+			cells = పాఠ్యం_prop_position(wp, tp, vcol,
+			     (vcol + కొలత) % (wp->w_వెడల్పు - నిలువు_off) + నిలువు_off,
+					      &n_extra, &p, ఖాళీ, ఖాళీ, FALSE);
 #  ifdef FEAT_LINEBREAK
-			if (text_prop_no_showbreak(tp))
+			ఒకవేళ (పాఠ్యం_prop_no_showbreak(tp))
 			    no_sbr = TRUE;  // don't use 'showbreak' now
 #  endif
 		    }
-		    else
+		    లేకపోతే
 			cells = vim_strsize(p);
-		    if (tp->tp_flags & TP_FLAG_ALIGN_ABOVE)
+		    ఒకవేళ (tp->tp_flags & TP_FLAG_ALIGN_ABOVE)
 		    {
-			cts->cts_first_char += cells;
-			if (!cts->cts_no_above)
-			    cts->cts_cur_text_width += cells;
+			cts->cts_మొదటి_char += cells;
+			ఒకవేళ (!cts->cts_no_above)
+			    cts->cts_cur_పాఠ్యం_వెడల్పు += cells;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			cts->cts_cur_text_width += cells;
-			size += cells;
+			cts->cts_cur_పాఠ్యం_వెడల్పు += cells;
+			కొలత += cells;
 		    }
-		    cts->cts_start_incl = tp->tp_flags & TP_FLAG_START_INCL;
+		    cts->cts_ప్రారంభం_incl = tp->tp_flags & TP_FLAG_ప్రారంభం_INCL;
 #  ifdef FEAT_LINEBREAK
-		    if (*s == TAB)
+		    ఒకవేళ (*s == TAB)
 		    {
 			// tab size changes because of the inserted text
-			size -= tab_size;
-			tab_size = win_chartabsize(wp, s,
-					vcol + size - cts->cts_above_width);
-			size += tab_size;
+			కొలత -= tab_కొలత;
+			tab_కొలత = win_chartabsize(wp, s,
+					vcol + కొలత - cts->cts_above_వెడల్పు);
+			కొలత += tab_కొలత;
 		    }
 #  endif
-		    if (tp->tp_col == MAXCOL && (tp->tp_flags
-				& (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW)))
+		    ఒకవేళ (tp->tp_నిలువు == MAXCOL && (tp->tp_flags
+				& (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_క్రింద)))
 		    {
 			// count extra line for property above/below
-			++cts->cts_prop_lines;
-			if (tp->tp_flags & TP_FLAG_ALIGN_BELOW)
-			    cts->cts_has_below = true;
+			++cts->cts_prop_పంక్తులు;
+			ఒకవేళ (tp->tp_flags & TP_FLAG_ALIGN_క్రింద)
+			    cts->cts_has_క్రింద = true;
 		    }
 		}
 	    }
-	    if (tp->tp_col != MAXCOL && tp->tp_col - 1 > col)
-		break;
+	    ఒకవేళ (tp->tp_నిలువు != MAXCOL && tp->tp_నిలువు - 1 > నిలువు)
+		ఆపు;
 	}
-	if (has_lcs_eol)
+	ఒకవేళ (has_lcs_eol)
 	{
 	    --vcol;
-	    ++size;
+	    ++కొలత;
 	}
     }
 # endif
 
 # ifdef FEAT_LINEBREAK
-    if (is_doublewidth && wp->w_p_wrap && in_win_border(wp, vcol + size - 2))
+    ఒకవేళ (is_doublewidth && wp->w_p_wrap && లోపల_win_border(wp, vcol + కొలత - 2))
     {
-	++size;		// Count the ">" in the last column.
+	++కొలత;		// Count the ">" in the last column.
 	mb_added = 1;
     }
 
@@ -1475,167 +1475,167 @@ win_lbr_chartabsize(
      * May have to add something for 'breakindent' and/or 'showbreak'
      * string at the start of a screen line.
      */
-    int head = mb_added;
-    sbr = no_sbr ? empty_option : get_showbreak_value(wp);
+    పూర్ణాంకం తల = mb_added;
+    sbr = no_sbr ? ఖాళీలు_option : get_showbreak_విలువ(wp);
     // When "size" is 0, no new screen line is started.
-    if (size > 0 && wp->w_p_wrap && (*sbr != NUL || wp->w_p_bri))
+    ఒకవేళ (కొలత > 0 && wp->w_p_wrap && (*sbr != NUL || wp->w_p_bri))
     {
-	int	col_off_prev = win_col_off(wp);
-	int	width2 = wp->w_width - col_off_prev + win_col_off2(wp);
-	colnr_T	wcol = vcol + col_off_prev;
+	పూర్ణాంకం	నిలువు_off_prev = win_నిలువు_off(wp);
+	పూర్ణాంకం	width2 = wp->w_వెడల్పు - నిలువు_off_prev + win_నిలువు_off2(wp);
+	colnr_T	wcol = vcol + నిలువు_off_prev;
 #  ifdef FEAT_PROP_POPUP
-	wcol -= wp->w_virtcol_first_char;
+	wcol -= wp->w_virtcol_మొదటి_char;
 #  endif
-	colnr_T	max_head_vcol = cts->cts_max_head_vcol;
-	int	added = 0;
+	colnr_T	max_తల_vcol = cts->cts_max_తల_vcol;
+	పూర్ణాంకం	added = 0;
 
 	// cells taken by 'showbreak'/'breakindent' before current char
-	int	head_prev = 0;
-	if (wcol >= wp->w_width)
+	పూర్ణాంకం	తల_prev = 0;
+	ఒకవేళ (wcol >= wp->w_వెడల్పు)
 	{
-	    wcol -= wp->w_width;
-	    col_off_prev = wp->w_width - width2;
-	    if (wcol >= width2 && width2 > 0)
+	    wcol -= wp->w_వెడల్పు;
+	    నిలువు_off_prev = wp->w_వెడల్పు - width2;
+	    ఒకవేళ (wcol >= width2 && width2 > 0)
 		wcol %= width2;
-	    if (*sbr != NUL)
-		head_prev += vim_strsize(sbr);
-	    if (wp->w_p_bri)
+	    ఒకవేళ (*sbr != NUL)
+		తల_prev += vim_strsize(sbr);
+	    ఒకవేళ (wp->w_p_bri)
 	    {
-		if (cts->cts_bri_size < 0)
-		    cts->cts_bri_size = get_breakindent_win(wp, line);
-		head_prev += cts->cts_bri_size;
+		ఒకవేళ (cts->cts_bri_కొలత < 0)
+		    cts->cts_bri_కొలత = get_breakindent_win(wp, పంక్తి);
+		తల_prev += cts->cts_bri_కొలత;
 	    }
-	    if (wcol < head_prev)
+	    ఒకవేళ (wcol < తల_prev)
 	    {
-		head_prev -= wcol;
-		wcol += head_prev;
-		added += head_prev;
-		if (max_head_vcol <= 0 || vcol < max_head_vcol)
-		    head += head_prev;
+		తల_prev -= wcol;
+		wcol += తల_prev;
+		added += తల_prev;
+		ఒకవేళ (max_తల_vcol <= 0 || vcol < max_తల_vcol)
+		    తల += తల_prev;
 	    }
-	    else
-		head_prev = 0;
-	    wcol += col_off_prev;
+	    లేకపోతే
+		తల_prev = 0;
+	    wcol += నిలువు_off_prev;
 	}
 
-	if (wcol + size > wp->w_width)
+	ఒకవేళ (wcol + కొలత > wp->w_వెడల్పు)
 	{
 	    // cells taken by 'showbreak'/'breakindent' halfway current char
-	    int	head_mid = 0;
-	    if (*sbr != NUL)
-		head_mid += vim_strsize(sbr);
-	    if (wp->w_p_bri)
+	    పూర్ణాంకం	తల_mid = 0;
+	    ఒకవేళ (*sbr != NUL)
+		తల_mid += vim_strsize(sbr);
+	    ఒకవేళ (wp->w_p_bri)
 	    {
-		if (cts->cts_bri_size < 0)
-		    cts->cts_bri_size = get_breakindent_win(wp, line);
-		head_mid += cts->cts_bri_size;
+		ఒకవేళ (cts->cts_bri_కొలత < 0)
+		    cts->cts_bri_కొలత = get_breakindent_win(wp, పంక్తి);
+		తల_mid += cts->cts_bri_కొలత;
 	    }
-	    if (head_mid > 0)
+	    ఒకవేళ (తల_mid > 0)
 	    {
 		// Calculate effective window width.
-		int prev_rem = wp->w_width - wcol;
-		int width = width2 - head_mid;
+		పూర్ణాంకం prev_rem = wp->w_వెడల్పు - wcol;
+		పూర్ణాంకం వెడల్పు = width2 - తల_mid;
 
-		if (width <= 0)
-		    width = 1;
+		ఒకవేళ (వెడల్పు <= 0)
+		    వెడల్పు = 1;
 		// Divide "size - prev_rem" by "width", rounding up.
-		int cnt = (size - prev_rem + width - 1) / width;
-		added += cnt * head_mid;
+		పూర్ణాంకం cnt = (కొలత - prev_rem + వెడల్పు - 1) / వెడల్పు;
+		added += cnt * తల_mid;
 
-		if (max_head_vcol == 0 || vcol + size + added < max_head_vcol)
-		    head += cnt * head_mid;
-		else if (width2 > 0
-			   && max_head_vcol > vcol + head_prev + prev_rem)
-		    head += (max_head_vcol - (vcol + head_prev + prev_rem)
-					     + width2 - 1) / width2 * head_mid;
-		else if (max_head_vcol < 0)
+		ఒకవేళ (max_తల_vcol == 0 || vcol + కొలత + added < max_తల_vcol)
+		    తల += cnt * తల_mid;
+		లేకపోతే ఒకవేళ (width2 > 0
+			   && max_తల_vcol > vcol + తల_prev + prev_rem)
+		    తల += (max_తల_vcol - (vcol + తల_prev + prev_rem)
+					     + width2 - 1) / width2 * తల_mid;
+		లేకపోతే ఒకవేళ (max_తల_vcol < 0)
 		{
-		    int off = mb_added;
+		    పూర్ణాంకం off = mb_added;
 #  ifdef FEAT_PROP_POPUP
-		    if (*s != NUL
-			     && ((State & MODE_NORMAL) || cts->cts_start_incl))
-			off += cts->cts_cur_text_width;
+		    ఒకవేళ (*s != NUL
+			     && ((State & బహుళకం_సాధారణ) || cts->cts_ప్రారంభం_incl))
+			off += cts->cts_cur_పాఠ్యం_వెడల్పు;
 #  endif
-		    if (off >= prev_rem)
-			head += (1 + (off - prev_rem) / width) * head_mid;
+		    ఒకవేళ (off >= prev_rem)
+			తల += (1 + (off - prev_rem) / వెడల్పు) * తల_mid;
 		}
 	    }
 	}
 
-	size += added;
+	కొలత += added;
     }
 
-    if (headp != NULL)
-	*headp = head;
+    ఒకవేళ (headp != ఖాళీ)
+	*headp = తల;
 
-    int size_before_lbr = size;
-    int need_lbr = FALSE;
+    పూర్ణాంకం కొలత_before_lbr = కొలత;
+    పూర్ణాంకం need_lbr = FALSE;
     /*
      * If 'linebreak' set check at a blank before a non-blank if the line
      * needs a break here.
      */
-    if (wp->w_p_lbr && wp->w_p_wrap && wp->w_width != 0
-	    && VIM_ISBREAK((int)s[0]) && !VIM_ISBREAK((int)s[1]))
+    ఒకవేళ (wp->w_p_lbr && wp->w_p_wrap && wp->w_వెడల్పు != 0
+	    && VIM_ISBREAK((పూర్ణాంకం)s[0]) && !VIM_ISBREAK((పూర్ణాంకం)s[1]))
     {
-	char_u	*t = cts->cts_line;
-	while (VIM_ISBREAK((int)t[0]))
+	char_u	*t = cts->cts_పంక్తి;
+	అయితే (VIM_ISBREAK((పూర్ణాంకం)t[0]))
 	    t++;
 	// 'linebreak' is only needed when not in leading whitespace.
 	need_lbr = s >= t;
     }
-    if (need_lbr)
+    ఒకవేళ (need_lbr)
     {
 	/*
 	 * Count all characters from first non-blank after a blank up to next
 	 * non-blank after a blank.
 	 */
-	int numberextra = win_col_off(wp);
-	colnr_T col_adj = size - 1;
-	colnr_T colmax = (colnr_T)(wp->w_width - numberextra - col_adj);
-	if (vcol >= colmax)
+	పూర్ణాంకం numberextra = win_నిలువు_off(wp);
+	colnr_T నిలువు_adj = కొలత - 1;
+	colnr_T colmax = (colnr_T)(wp->w_వెడల్పు - numberextra - నిలువు_adj);
+	ఒకవేళ (vcol >= colmax)
 	{
-	    colmax += col_adj;
-	    n = colmax +  win_col_off2(wp);
-	    if (n > 0)
-		colmax += (((vcol + col_adj - colmax) / n) + 1) * n - col_adj;
+	    colmax += నిలువు_adj;
+	    n = colmax +  win_నిలువు_off2(wp);
+	    ఒకవేళ (n > 0)
+		colmax += (((vcol + నిలువు_adj - colmax) / n) + 1) * n - నిలువు_adj;
 	}
 
 	colnr_T vcol2 = vcol;
-	for (;;)
+	కొరకు (;;)
 	{
 	    char_u *ps = s;
 	    MB_PTR_ADV(s);
-	    int c = *s;
-	    if (!(c != NUL
+	    పూర్ణాంకం c = *s;
+	    ఒకవేళ (!(c != NUL
 		    && (VIM_ISBREAK(c)
 			|| (!VIM_ISBREAK(c)
-			       && (vcol2 == vcol || !VIM_ISBREAK((int)*ps))))))
-		break;
+			       && (vcol2 == vcol || !VIM_ISBREAK((పూర్ణాంకం)*ps))))))
+		ఆపు;
 
 	    vcol2 += win_chartabsize(wp, s, vcol2);
-	    if (vcol2 >= colmax)		// doesn't fit
+	    ఒకవేళ (vcol2 >= colmax)		// doesn't fit
 	    {
-		size = colmax - vcol + col_adj;
-		break;
+		కొలత = colmax - vcol + నిలువు_adj;
+		ఆపు;
 	    }
 	}
     }
 
-    if (tailp != NULL)
-	*tailp = size - size_before_lbr;
+    ఒకవేళ (tailp != ఖాళీ)
+	*tailp = కొలత - కొలత_before_lbr;
 
 #  ifdef FEAT_PROP_POPUP
-    if (cts->cts_first_char > 0 && !cts->cts_no_above)
+    ఒకవేళ (cts->cts_మొదటి_char > 0 && !cts->cts_no_above)
     {
 	// Remember the width for the size of a Tab later in the line.  Use
 	// assignment, this may be called more than once for a character.
-	cts->cts_above_width = cts->cts_first_char;
-	size += cts->cts_first_char;
+	cts->cts_above_వెడల్పు = cts->cts_మొదటి_char;
+	కొలత += cts->cts_మొదటి_char;
     }
 #  endif
 # endif
-    return size;
-#endif
+    తిరిగి కొలత;
+#అయితే_ముగింపు
 }
 
 /*
@@ -1645,59 +1645,59 @@ win_lbr_chartabsize(
  * line.
  * Only uses "cts_win", "cts_ptr" and "cts_vcol" from "cts".
  */
-    static int
+    స్థిర పూర్ణాంకం
 win_nolbr_chartabsize(
 	chartabsize_T	*cts,
-	int		*headp)
+	పూర్ణాంకం		*headp)
 {
     win_T	*wp = cts->cts_win;
     char_u	*s = cts->cts_ptr;
-    colnr_T	col = cts->cts_vcol;
-    int		n;
+    colnr_T	నిలువు = cts->cts_vcol;
+    పూర్ణాంకం		n;
 
-    if (*s == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
+    ఒకవేళ (*s == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
     {
-#ifdef FEAT_VARTABS
-	return tabstop_padding(col, wp->w_buffer->b_p_ts,
-				    wp->w_buffer->b_p_vts_array);
-#else
-	n = wp->w_buffer->b_p_ts;
-	return (int)(n - (col % n));
-#endif
+#నిర్వచితమైతే FEAT_VARTABS
+	తిరిగి tabstop_padding(నిలువు, wp->w_బఫరు->b_p_ts,
+				    wp->w_బఫరు->b_p_vts_array);
+#లేకపోతే
+	n = wp->w_బఫరు->b_p_ts;
+	తిరిగి (పూర్ణాంకం)(n - (నిలువు % n));
+#అయితే_ముగింపు
     }
     n = ptr2cells(s);
     // Add one cell for a double-width character in the last column of the
     // window, displayed with a ">".
-    if (n == 2 && MB_BYTE2LEN(*s) > 1 && in_win_border(wp, col))
+    ఒకవేళ (n == 2 && MB_BYTE2LEN(*s) > 1 && లోపల_win_border(wp, నిలువు))
     {
-	if (headp != NULL)
+	ఒకవేళ (headp != ఖాళీ)
 	    *headp = 1;
-	return 3;
+	తిరిగి 3;
     }
-    return n;
+    తిరిగి n;
 }
 
 /*
  * Return TRUE if virtual column "vcol" is in the rightmost column of window
  * "wp".
  */
-    static int
-in_win_border(win_T *wp, colnr_T vcol)
+    స్థిర పూర్ణాంకం
+లోపల_win_border(win_T *wp, colnr_T vcol)
 {
-    int		width1;		// width of first line (after line number)
-    int		width2;		// width of further lines
+    పూర్ణాంకం		width1;		// width of first line (after line number)
+    పూర్ణాంకం		width2;		// width of further lines
 
-    if (wp->w_width == 0)	// there is no border
-	return FALSE;
-    width1 = wp->w_width - win_col_off(wp);
-    if ((int)vcol < width1 - 1)
-	return FALSE;
-    if ((int)vcol == width1 - 1)
-	return TRUE;
-    width2 = width1 + win_col_off2(wp);
-    if (width2 <= 0)
-	return FALSE;
-    return ((vcol - width1) % width2 == width2 - 1);
+    ఒకవేళ (wp->w_వెడల్పు == 0)	// there is no border
+	తిరిగి FALSE;
+    width1 = wp->w_వెడల్పు - win_నిలువు_off(wp);
+    ఒకవేళ ((పూర్ణాంకం)vcol < width1 - 1)
+	తిరిగి FALSE;
+    ఒకవేళ ((పూర్ణాంకం)vcol == width1 - 1)
+	తిరిగి TRUE;
+    width2 = width1 + win_నిలువు_off2(wp);
+    ఒకవేళ (width2 <= 0)
+	తిరిగి FALSE;
+    తిరిగి ((vcol - width1) % width2 == width2 - 1);
 }
 
 /*
@@ -1712,39 +1712,39 @@ in_win_border(win_T *wp, colnr_T vcol)
  *
  * This is used very often, keep it fast!
  */
-    void
+    శూన్య
 getvcol(
     win_T	*wp,
     pos_T	*pos,
-    colnr_T	*start,
+    colnr_T	*ప్రారంభం,
     colnr_T	*cursor,
-    colnr_T	*end,
-    int		flags)
+    colnr_T	*చివర,
+    పూర్ణాంకం		flags)
 {
     colnr_T	vcol;
     char_u	*ptr;		// points to current char
-    char_u	*line;		// start of the line
-    int		incr;
-    int		head;
-    int		tail;
-#ifdef FEAT_VARTABS
-    int		*vts = wp->w_buffer->b_p_vts_array;
-#endif
-    int		ts = wp->w_buffer->b_p_ts;
-    int		c;
+    char_u	*పంక్తి;		// start of the line
+    పూర్ణాంకం		incr;
+    పూర్ణాంకం		తల;
+    పూర్ణాంకం		తోక;
+#నిర్వచితమైతే FEAT_VARTABS
+    పూర్ణాంకం		*vts = wp->w_బఫరు->b_p_vts_array;
+#అయితే_ముగింపు
+    పూర్ణాంకం		ts = wp->w_బఫరు->b_p_ts;
+    పూర్ణాంకం		c;
     chartabsize_T cts;
-#ifdef FEAT_PROP_POPUP
-    int		on_NUL = FALSE;
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    పూర్ణాంకం		on_NUL = FALSE;
+#అయితే_ముగింపు
 
     vcol = 0;
-    line = ptr = ml_get_buf(wp->w_buffer, pos->lnum, FALSE);
+    పంక్తి = ptr = ml_get_buf(wp->w_బఫరు, pos->lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, pos->lnum, 0, line, line);
-    cts.cts_max_head_vcol = -1;
-#ifdef FEAT_PROP_POPUP
+    init_chartabsize_arg(&cts, wp, pos->lnum, 0, పంక్తి, పంక్తి);
+    cts.cts_max_తల_vcol = -1;
+#నిర్వచితమైతే FEAT_PROP_POPUP
     cts.cts_no_above = true;
-#endif
+#అయితే_ముగింపు
 
     /*
      * This function is used very often, do some speed optimizations.
@@ -1752,140 +1752,140 @@ getvcol(
      * and there are no text properties with "text" use a simple loop.
      * Also use this when 'list' is set but tabs take their normal size.
      */
-    if ((!wp->w_p_list || wp->w_lcs_chars.tab1 != NUL)
-#ifdef FEAT_LINEBREAK
-	    && !wp->w_p_lbr && *get_showbreak_value(wp) == NUL && !wp->w_p_bri
-#endif
-#ifdef FEAT_PROP_POPUP
-	    && !cts.cts_has_prop_with_text
-#endif
+    ఒకవేళ ((!wp->w_p_list || wp->w_lcs_chars.tab1 != NUL)
+#నిర్వచితమైతే FEAT_LINEBREAK
+	    && !wp->w_p_lbr && *get_showbreak_విలువ(wp) == NUL && !wp->w_p_bri
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    && !cts.cts_has_prop_with_పాఠ్యం
+#అయితే_ముగింపు
        )
     {
-	for (;;)
+	కొరకు (;;)
 	{
-	    head = 0;
+	    తల = 0;
 	    c = *ptr;
 	    // make sure we don't go past the end of the line
-	    if (c == NUL)
+	    ఒకవేళ (c == NUL)
 	    {
 		incr = 1;	// NUL at end of line only takes one column
-		break;
+		ఆపు;
 	    }
 	    // A tab gets expanded, depending on the current column
-	    if (c == TAB)
-#ifdef FEAT_VARTABS
+	    ఒకవేళ (c == TAB)
+#నిర్వచితమైతే FEAT_VARTABS
 		incr = tabstop_padding(vcol, ts, vts);
-#else
+#లేకపోతే
 		incr = ts - (vcol % ts);
-#endif
-	    else
+#అయితే_ముగింపు
+	    లేకపోతే
 	    {
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
 		    // For utf-8, if the byte is >= 0x80, need to look at
 		    // further bytes to find the cell width.
-		    if (enc_utf8 && c >= 0x80)
+		    ఒకవేళ (enc_utf8 && c >= 0x80)
 			incr = utf_ptr2cells(ptr);
-		    else
-			incr = g_chartab[c] & CT_CELL_MASK;
+		    లేకపోతే
+			incr = g_chartab[c] & CT_CELL_ముసుగు;
 
 		    // If a double-cell char doesn't fit at the end of a line
 		    // it wraps to the next line, it's like this char is three
 		    // cells wide.
-		    if (incr == 2 && wp->w_p_wrap && MB_BYTE2LEN(*ptr) > 1
-			    && in_win_border(wp, vcol))
+		    ఒకవేళ (incr == 2 && wp->w_p_wrap && MB_BYTE2LEN(*ptr) > 1
+			    && లోపల_win_border(wp, vcol))
 		    {
 			++incr;
-			head = 1;
+			తల = 1;
 		    }
 		}
-		else
-		    incr = g_chartab[c] & CT_CELL_MASK;
+		లేకపోతే
+		    incr = g_chartab[c] & CT_CELL_ముసుగు;
 	    }
 
-	    char_u *next_ptr = ptr + (*mb_ptr2len)(ptr);
-	    if (next_ptr - line > pos->col) // character at pos->col
-		break;
+	    char_u *తదుపరి_ptr = ptr + (*mb_ptr2len)(ptr);
+	    ఒకవేళ (తదుపరి_ptr - పంక్తి > pos->నిలువు) // character at pos->col
+		ఆపు;
 
 	    vcol += incr;
-	    ptr = next_ptr;
+	    ptr = తదుపరి_ptr;
 	}
 
-	tail = 0;
+	తోక = 0;
     }
-    else
+    లేకపోతే
     {
-	for (;;)
+	కొరకు (;;)
 	{
 	    // A tab gets expanded, depending on the current column.
 	    // Other things also take up space.
-	    head = 0;
-	    tail = 0;
-	    incr = win_lbr_chartabsize(&cts, &head, &tail);
-#ifdef FEAT_PROP_POPUP
-	    if (cts.cts_ptr == cts.cts_line)
+	    తల = 0;
+	    తోక = 0;
+	    incr = win_lbr_chartabsize(&cts, &తల, &తోక);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    ఒకవేళ (cts.cts_ptr == cts.cts_పంక్తి)
 	    {
-		if (flags & GETVCOL_FOR_VIRTCOL)
+		ఒకవేళ (flags & GETVCOL_FOR_VIRTCOL)
 		    // do not count the virtual text above for w_curswant
-		    wp->w_virtcol_first_char = cts.cts_first_char;
-		if ((flags & GETVCOL_NO_ABOVE) == 0)
+		    wp->w_virtcol_మొదటి_char = cts.cts_మొదటి_char;
+		ఒకవేళ ((flags & GETVCOL_NO_ABOVE) == 0)
 		{
-		    cts.cts_vcol += cts.cts_first_char;
-		    cts.cts_above_width = cts.cts_first_char;
+		    cts.cts_vcol += cts.cts_మొదటి_char;
+		    cts.cts_above_వెడల్పు = cts.cts_మొదటి_char;
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	    // make sure we don't go past the end of the line
-	    if (*cts.cts_ptr == NUL)
+	    ఒకవేళ (*cts.cts_ptr == NUL)
 	    {
 		incr = 1;	// NUL at end of line only takes one column
-#ifdef FEAT_PROP_POPUP
-		incr += cts.cts_cur_text_width;
+#నిర్వచితమైతే FEAT_PROP_POPUP
+		incr += cts.cts_cur_పాఠ్యం_వెడల్పు;
 		on_NUL = TRUE;
-#endif
-		break;
+#అయితే_ముగింపు
+		ఆపు;
 	    }
 
-	    char_u *next_ptr = cts.cts_ptr + (*mb_ptr2len)(cts.cts_ptr);
-	    if (next_ptr - line > pos->col) // character at pos->col
-		break;
+	    char_u *తదుపరి_ptr = cts.cts_ptr + (*mb_ptr2len)(cts.cts_ptr);
+	    ఒకవేళ (తదుపరి_ptr - పంక్తి > pos->నిలువు) // character at pos->col
+		ఆపు;
 
 	    cts.cts_vcol += incr;
-	    cts.cts_ptr = next_ptr;
+	    cts.cts_ptr = తదుపరి_ptr;
 	}
 	vcol = cts.cts_vcol;
 	ptr = cts.cts_ptr;
     }
     clear_chartabsize_arg(&cts);
 
-    if (*ptr == NUL && pos->col < MAXCOL && pos->col > ptr - line)
-	pos->col = ptr - line;
+    ఒకవేళ (*ptr == NUL && pos->నిలువు < MAXCOL && pos->నిలువు > ptr - పంక్తి)
+	pos->నిలువు = ptr - పంక్తి;
 
-    if (start != NULL)
-	*start = vcol + head;
-    if (end != NULL)
-	*end = vcol + incr - (flags & GETVCOL_END_EXCL_LBR ? tail : 0) - 1;
-    if (cursor != NULL)
+    ఒకవేళ (ప్రారంభం != ఖాళీ)
+	*ప్రారంభం = vcol + తల;
+    ఒకవేళ (చివర != ఖాళీ)
+	*చివర = vcol + incr - (flags & GETVCOL_చివర_EXCL_LBR ? తోక : 0) - 1;
+    ఒకవేళ (cursor != ఖాళీ)
     {
-	if (*ptr == TAB
-		&& (State & MODE_NORMAL)
+	ఒకవేళ (*ptr == TAB
+		&& (State & బహుళకం_సాధారణ)
 		&& !wp->w_p_list
-		&& !virtual_active()
-		&& !(VIsual_active
+		&& !virtual_చురుకైన()
+		&& !(VIsual_చురుకైన
 				&& (*p_sel == 'e' || LTOREQ_POS(*pos, VIsual)))
 		)
 	    // TODO: subtracting "tail" may lead to better cursor position
 	    *cursor = vcol + incr - 1;	    // cursor at end
-	else
+	లేకపోతే
 	{
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // in Insert mode, if "start_incl" is true the text gets inserted
 	    // after the virtual text, thus add its width
-	    if (((State & MODE_INSERT) == 0 || cts.cts_start_incl) && !on_NUL)
+	    ఒకవేళ (((State & బహుళకం_చొప్పించు) == 0 || cts.cts_ప్రారంభం_incl) && !on_NUL)
 		// cursor is after inserted text, unless on the NUL
-		vcol += cts.cts_cur_text_width;
-#endif
-	    *cursor = vcol + head;	    // cursor at start
+		vcol += cts.cts_cur_పాఠ్యం_వెడల్పు;
+#అయితే_ముగింపు
+	    *cursor = vcol + తల;	    // cursor at start
 	}
     }
 }
@@ -1896,107 +1896,107 @@ getvcol(
     colnr_T
 getvcol_nolist(pos_T *posp)
 {
-    int		list_save = curwin->w_p_list;
+    పూర్ణాంకం		list_save = curwin->w_p_list;
     colnr_T	vcol;
 
     curwin->w_p_list = FALSE;
-    if (posp->coladd)
-	getvvcol(curwin, posp, NULL, &vcol, NULL, 0);
-    else
-	getvcol(curwin, posp, NULL, &vcol, NULL, 0);
+    ఒకవేళ (posp->coladd)
+	getvvcol(curwin, posp, ఖాళీ, &vcol, ఖాళీ, 0);
+    లేకపోతే
+	getvcol(curwin, posp, ఖాళీ, &vcol, ఖాళీ, 0);
     curwin->w_p_list = list_save;
-    return vcol;
+    తిరిగి vcol;
 }
 
 /*
  * Get virtual column in virtual mode.
  */
-    void
+    శూన్య
 getvvcol(
     win_T	*wp,
     pos_T	*pos,
-    colnr_T	*start,
+    colnr_T	*ప్రారంభం,
     colnr_T	*cursor,
-    colnr_T	*end,
-    int		flags)
+    colnr_T	*చివర,
+    పూర్ణాంకం		flags)
 {
-    colnr_T	col;
+    colnr_T	నిలువు;
     colnr_T	coladd;
     colnr_T	endadd;
     char_u	*ptr;
 
-    if (virtual_active())
+    ఒకవేళ (virtual_చురుకైన())
     {
 	// For virtual mode, only want one value
-	getvcol(wp, pos, &col, NULL, NULL, flags);
+	getvcol(wp, pos, &నిలువు, ఖాళీ, ఖాళీ, flags);
 
 	coladd = pos->coladd;
 	endadd = 0;
 	// Cannot put the cursor on part of a wide character.
-	ptr = ml_get_buf(wp->w_buffer, pos->lnum, FALSE);
-	if (pos->col < ml_get_buf_len(wp->w_buffer, pos->lnum))
+	ptr = ml_get_buf(wp->w_బఫరు, pos->lnum, FALSE);
+	ఒకవేళ (pos->నిలువు < ml_get_buf_len(wp->w_బఫరు, pos->lnum))
 	{
-	    int c = (*mb_ptr2char)(ptr + pos->col);
+	    పూర్ణాంకం c = (*mb_ptr2char)(ptr + pos->నిలువు);
 
-	    if (c != TAB && vim_isprintc(c))
+	    ఒకవేళ (c != TAB && vim_isprintc(c))
 	    {
 		endadd = (colnr_T)(char2cells(c) - 1);
-		if (coladd > endadd)	// past end of line
+		ఒకవేళ (coladd > endadd)	// past end of line
 		    endadd = 0;
-		else
+		లేకపోతే
 		    coladd = 0;
 	    }
 	}
-	col += coladd;
-	if (start != NULL)
-	    *start = col;
-	if (cursor != NULL)
-	    *cursor = col;
-	if (end != NULL)
-	    *end = col + endadd;
+	నిలువు += coladd;
+	ఒకవేళ (ప్రారంభం != ఖాళీ)
+	    *ప్రారంభం = నిలువు;
+	ఒకవేళ (cursor != ఖాళీ)
+	    *cursor = నిలువు;
+	ఒకవేళ (చివర != ఖాళీ)
+	    *చివర = నిలువు + endadd;
     }
-    else
-	getvcol(wp, pos, start, cursor, end, flags);
+    లేకపోతే
+	getvcol(wp, pos, ప్రారంభం, cursor, చివర, flags);
 }
 
 /*
  * Get the leftmost and rightmost virtual column of pos1 and pos2.
  * Used for Visual block mode.
  */
-    void
+    శూన్య
 getvcols(
     win_T	*wp,
     pos_T	*pos1,
     pos_T	*pos2,
-    colnr_T	*left,
-    colnr_T	*right,
-    int		flags)
+    colnr_T	*ఎడమ_2,
+    colnr_T	*కుడి_2,
+    పూర్ణాంకం		flags)
 {
     colnr_T	from1, from2, to1, to2;
 
-    if (LT_POSP(pos1, pos2))
+    ఒకవేళ (LT_POSP(pos1, pos2))
     {
-	getvvcol(wp, pos1, &from1, NULL, &to1, flags);
-	getvvcol(wp, pos2, &from2, NULL, &to2, flags);
+	getvvcol(wp, pos1, &from1, ఖాళీ, &to1, flags);
+	getvvcol(wp, pos2, &from2, ఖాళీ, &to2, flags);
     }
-    else
+    లేకపోతే
     {
-	getvvcol(wp, pos2, &from1, NULL, &to1, flags);
-	getvvcol(wp, pos1, &from2, NULL, &to2, flags);
+	getvvcol(wp, pos2, &from1, ఖాళీ, &to1, flags);
+	getvvcol(wp, pos1, &from2, ఖాళీ, &to2, flags);
     }
-    if (from2 < from1)
-	*left = from2;
-    else
-	*left = from1;
-    if (to2 > to1)
+    ఒకవేళ (from2 < from1)
+	*ఎడమ_2 = from2;
+    లేకపోతే
+	*ఎడమ_2 = from1;
+    ఒకవేళ (to2 > to1)
     {
-	if (*p_sel == 'e' && from2 - 1 >= to1)
-	    *right = from2 - 1;
-	else
-	    *right = to2;
+	ఒకవేళ (*p_sel == 'e' && from2 - 1 >= to1)
+	    *కుడి_2 = from2 - 1;
+	లేకపోతే
+	    *కుడి_2 = to2;
     }
-    else
-	*right = to1;
+    లేకపోతే
+	*కుడి_2 = to1;
 }
 
 /*
@@ -2007,12 +2007,12 @@ skipwhite(char_u *q)
 {
     char_u	*p = q;
 
-    while (VIM_ISWHITE(*p))
+    అయితే (VIM_ISWHITE(*p))
 	++p;
-    return p;
+    తిరిగి p;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * skip over ' ', '\t' and '\n'.
  */
@@ -2021,26 +2021,26 @@ skipwhite_and_nl(char_u *q)
 {
     char_u	*p = q;
 
-    while (VIM_ISWHITE(*p) || *p == NL)
+    అయితే (VIM_ISWHITE(*p) || *p == NL)
 	++p;
-    return p;
+    తిరిగి p;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * getwhitecols: return the number of whitespace
  * columns (bytes) at the start of a given line
  */
-    int
-getwhitecols_curline(void)
+    పూర్ణాంకం
+getwhitecols_curline(శూన్య)
 {
-    return getwhitecols(ml_get_curline());
+    తిరిగి getwhitecols(ml_get_curline());
 }
 
-    int
+    పూర్ణాంకం
 getwhitecols(char_u *p)
 {
-    return skipwhite(p) - p;
+    తిరిగి skipwhite(p) - p;
 }
 
 /*
@@ -2051,12 +2051,12 @@ skipdigits(char_u *q)
 {
     char_u	*p = q;
 
-    while (VIM_ISDIGIT(*p))	// skip to next non-digit
+    అయితే (VIM_ISDIGIT(*p))	// skip to next non-digit
 	++p;
-    return p;
+    తిరిగి p;
 }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
 /*
  * skip over binary digits
  */
@@ -2065,9 +2065,9 @@ skipbin(char_u *q)
 {
     char_u	*p = q;
 
-    while (vim_isbdigit(*p))	// skip to next non-digit
+    అయితే (vim_isbdigit(*p))	// skip to next non-digit
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2078,11 +2078,11 @@ skiphex(char_u *q)
 {
     char_u	*p = q;
 
-    while (vim_isxdigit(*p))	// skip to next non-digit
+    అయితే (vim_isxdigit(*p))	// skip to next non-digit
 	++p;
-    return p;
+    తిరిగి p;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * skip to bin digit (or NUL after the string)
@@ -2092,9 +2092,9 @@ skiptobin(char_u *q)
 {
     char_u	*p = q;
 
-    while (*p != NUL && !vim_isbdigit(*p))	// skip to next digit
+    అయితే (*p != NUL && !vim_isbdigit(*p))	// skip to next digit
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2105,9 +2105,9 @@ skiptodigit(char_u *q)
 {
     char_u	*p = q;
 
-    while (*p != NUL && !VIM_ISDIGIT(*p))	// skip to next digit
+    అయితే (*p != NUL && !VIM_ISDIGIT(*p))	// skip to next digit
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2118,9 +2118,9 @@ skiptohex(char_u *q)
 {
     char_u	*p = q;
 
-    while (*p != NUL && !vim_isxdigit(*p))	// skip to next digit
+    అయితే (*p != NUL && !vim_isxdigit(*p))	// skip to next digit
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2129,10 +2129,10 @@ skiptohex(char_u *q)
  * superscript 1 to be a digit.
  * Use the VIM_ISDIGIT() macro for simple arguments.
  */
-    int
-vim_isdigit(int c)
+    పూర్ణాంకం
+vim_isdigit(పూర్ణాంకం c)
 {
-    return (c >= '0' && c <= '9');
+    తిరిగి (c >= '0' && c <= '9');
 }
 
 /*
@@ -2140,10 +2140,10 @@ vim_isdigit(int c)
  * We don't use isxdigit() here, because on some systems it also considers
  * superscript 1 to be a digit.
  */
-    int
-vim_isxdigit(int c)
+    పూర్ణాంకం
+vim_isxdigit(పూర్ణాంకం c)
 {
-    return (c >= '0' && c <= '9')
+    తిరిగి (c >= '0' && c <= '9')
 	|| (c >= 'a' && c <= 'f')
 	|| (c >= 'A' && c <= 'F');
 }
@@ -2152,16 +2152,16 @@ vim_isxdigit(int c)
  * Corollary of vim_isdigit and vim_isxdigit() that can handle
  * characters > 0x100.
  */
-    int
-vim_isbdigit(int c)
+    పూర్ణాంకం
+vim_isbdigit(పూర్ణాంకం c)
 {
-    return (c == '0' || c == '1');
+    తిరిగి (c == '0' || c == '1');
 }
 
-    static int
-vim_isodigit(int c)
+    స్థిర పూర్ణాంకం
+vim_isodigit(పూర్ణాంకం c)
 {
-    return (c >= '0' && c <= '7');
+    తిరిగి (c >= '0' && c <= '7');
 }
 
 /*
@@ -2170,117 +2170,117 @@ vim_isodigit(int c)
  * invalid values or can't handle latin1 when the locale is C.
  * Speed is most important here.
  */
-#define LATIN1LOWER 'l'
-#define LATIN1UPPER 'U'
+#నిర్వచించు LATIN1_క్రింది 'l'
+#నిర్వచించు LATIN1_పై 'U'
 
-static char_u latin1flags[257] = "                                                                 UUUUUUUUUUUUUUUUUUUUUUUUUU      llllllllllllllllllllllllll                                                                     UUUUUUUUUUUUUUUUUUUUUUU UUUUUUUllllllllllllllllllllllll llllllll";
-static char_u latin1upper[257] = "                                 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xf7\xd8\xd9\xda\xdb\xdc\xdd\xde\xff";
-static char_u latin1lower[257] = "                                 !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xd7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff";
+స్థిర char_u latin1flags[257] = "                                                                 UUUUUUUUUUUUUUUUUUUUUUUUUU      llllllllllllllllllllllllll                                                                     UUUUUUUUUUUUUUUUUUUUUUU UUUUUUUllllllllllllllllllllllll llllllll";
+స్థిర char_u latin1upper[257] = "                                 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xf7\xd8\xd9\xda\xdb\xdc\xdd\xde\xff";
+స్థిర char_u latin1lower[257] = "                                 !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xd7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff";
 
-    int
-vim_islower(int c)
+    పూర్ణాంకం
+vim_islower(పూర్ణాంకం c)
 {
-    if (c <= '@')
-	return FALSE;
-    if (c >= 0x80)
+    ఒకవేళ (c <= '@')
+	తిరిగి FALSE;
+    ఒకవేళ (c >= 0x80)
     {
-	if (enc_utf8)
-	    return utf_islower(c);
-	if (c >= 0x100)
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_islower(c);
+	ఒకవేళ (c >= 0x100)
 	{
-#ifdef HAVE_ISWLOWER
-	    if (has_mbyte)
-		return iswlower(c);
-#endif
+#నిర్వచితమైతే HAVE_ISWLOWER
+	    ఒకవేళ (has_mbyte)
+		తిరిగి iswlower(c);
+#అయితే_ముగింపు
 	    // islower() can't handle these chars and may crash
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
-	if (enc_latin1like)
-	    return (latin1flags[c] & LATIN1LOWER) == LATIN1LOWER;
+	ఒకవేళ (enc_latin1like)
+	    తిరిగి (latin1flags[c] & LATIN1_క్రింది) == LATIN1_క్రింది;
     }
-    return SAFE_islower(c);
+    తిరిగి సురక్షిత_islower(c);
 }
 
-    int
-vim_isupper(int c)
+    పూర్ణాంకం
+vim_isupper(పూర్ణాంకం c)
 {
-    if (c <= '@')
-	return FALSE;
-    if (c >= 0x80)
+    ఒకవేళ (c <= '@')
+	తిరిగి FALSE;
+    ఒకవేళ (c >= 0x80)
     {
-	if (enc_utf8)
-	    return utf_isupper(c);
-	if (c >= 0x100)
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_isupper(c);
+	ఒకవేళ (c >= 0x100)
 	{
-#ifdef HAVE_ISWUPPER
-	    if (has_mbyte)
-		return iswupper(c);
-#endif
+#నిర్వచితమైతే HAVE_ISWUPPER
+	    ఒకవేళ (has_mbyte)
+		తిరిగి iswupper(c);
+#అయితే_ముగింపు
 	    // islower() can't handle these chars and may crash
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
-	if (enc_latin1like)
-	    return (latin1flags[c] & LATIN1UPPER) == LATIN1UPPER;
+	ఒకవేళ (enc_latin1like)
+	    తిరిగి (latin1flags[c] & LATIN1_పై) == LATIN1_పై;
     }
-    return SAFE_isupper(c);
+    తిరిగి సురక్షిత_isupper(c);
 }
 
-    int
-vim_isalpha(int c)
+    పూర్ణాంకం
+vim_isalpha(పూర్ణాంకం c)
 {
-    return vim_islower(c) || vim_isupper(c);
+    తిరిగి vim_islower(c) || vim_isupper(c);
 }
 
-    int
-vim_toupper(int c)
+    పూర్ణాంకం
+vim_toupper(పూర్ణాంకం c)
 {
-    if (c <= '@')
-	return c;
-    if (c >= 0x80 || !(cmp_flags & CMP_KEEPASCII))
+    ఒకవేళ (c <= '@')
+	తిరిగి c;
+    ఒకవేళ (c >= 0x80 || !(cmp_flags & CMP_KEEPASCII))
     {
-	if (enc_utf8)
-	    return utf_toupper(c);
-	if (c >= 0x100)
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_toupper(c);
+	ఒకవేళ (c >= 0x100)
 	{
-#ifdef HAVE_TOWUPPER
-	    if (has_mbyte)
-		return towupper(c);
-#endif
+#నిర్వచితమైతే HAVE_TOWUPPER
+	    ఒకవేళ (has_mbyte)
+		తిరిగి towupper(c);
+#అయితే_ముగింపు
 	    // toupper() can't handle these chars and may crash
-	    return c;
+	    తిరిగి c;
 	}
-	if (enc_latin1like)
-	    return latin1upper[c];
+	ఒకవేళ (enc_latin1like)
+	    తిరిగి latin1upper[c];
     }
-    if (c < 0x80 && (cmp_flags & CMP_KEEPASCII))
-	return TOUPPER_ASC(c);
-    return TOUPPER_LOC(c);
+    ఒకవేళ (c < 0x80 && (cmp_flags & CMP_KEEPASCII))
+	తిరిగి TOUPPER_ASC(c);
+    తిరిగి TOUPPER_LOC(c);
 }
 
-    int
-vim_tolower(int c)
+    పూర్ణాంకం
+vim_tolower(పూర్ణాంకం c)
 {
-    if (c <= '@')
-	return c;
-    if (c >= 0x80 || !(cmp_flags & CMP_KEEPASCII))
+    ఒకవేళ (c <= '@')
+	తిరిగి c;
+    ఒకవేళ (c >= 0x80 || !(cmp_flags & CMP_KEEPASCII))
     {
-	if (enc_utf8)
-	    return utf_tolower(c);
-	if (c >= 0x100)
+	ఒకవేళ (enc_utf8)
+	    తిరిగి utf_tolower(c);
+	ఒకవేళ (c >= 0x100)
 	{
-#ifdef HAVE_TOWLOWER
-	    if (has_mbyte)
-		return towlower(c);
-#endif
+#నిర్వచితమైతే HAVE_TOWLOWER
+	    ఒకవేళ (has_mbyte)
+		తిరిగి towlower(c);
+#అయితే_ముగింపు
 	    // tolower() can't handle these chars and may crash
-	    return c;
+	    తిరిగి c;
 	}
-	if (enc_latin1like)
-	    return latin1lower[c];
+	ఒకవేళ (enc_latin1like)
+	    తిరిగి latin1lower[c];
     }
-    if (c < 0x80 && (cmp_flags & CMP_KEEPASCII))
-	return TOLOWER_ASC(c);
-    return TOLOWER_LOC(c);
+    ఒకవేళ (c < 0x80 && (cmp_flags & CMP_KEEPASCII))
+	తిరిగి TOLOWER_ASC(c);
+    తిరిగి TOLOWER_LOC(c);
 }
 
 /*
@@ -2289,9 +2289,9 @@ vim_tolower(int c)
     char_u *
 skiptowhite(char_u *p)
 {
-    while (*p != ' ' && *p != '\t' && *p != NUL)
+    అయితే (*p != ' ' && *p != '\t' && *p != NUL)
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -2300,76 +2300,76 @@ skiptowhite(char_u *p)
     char_u *
 skiptowhite_esc(char_u *p)
 {
-    while (*p != ' ' && *p != '\t' && *p != NUL)
+    అయితే (*p != ' ' && *p != '\t' && *p != NUL)
     {
-	if ((*p == '\\' || *p == Ctrl_V) && *(p + 1) != NUL)
+	ఒకవేళ ((*p == '\\' || *p == Ctrl_V) && *(p + 1) != NUL)
 	    ++p;
 	++p;
     }
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Get a number from a string and skip over it.
  * Note: the argument is a pointer to a char_u pointer!
  */
-    long
+    దీర్ఘ
 getdigits(char_u **pp)
 {
     char_u	*p;
-    long	retval;
+    దీర్ఘ	retval;
 
     p = *pp;
-    retval = strtol((char *)p, NULL, 10);
-    if (*p == '-')		// skip negative sign
+    retval = strtol((అక్షరం *)p, ఖాళీ, 10);
+    ఒకవేళ (*p == '-')		// skip negative sign
 	++p;
     p = skipdigits(p);		// skip to next non-digit
     *pp = p;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Like getdigits() but allow for embedded single quotes.
  */
-    long
+    దీర్ఘ
 getdigits_quoted(char_u **pp)
 {
     char_u	*p = *pp;
-    long	retval = 0;
+    దీర్ఘ	retval = 0;
 
-    if (*p == '-')
+    ఒకవేళ (*p == '-')
 	++p;
-    while (VIM_ISDIGIT(*p))
+    అయితే (VIM_ISDIGIT(*p))
     {
-	if (retval >= LONG_MAX / 10 - 10)
+	ఒకవేళ (retval >= LONG_MAX / 10 - 10)
 	    retval = LONG_MAX;
-	else
+	లేకపోతే
 	    retval = retval * 10 - '0' + *p;
 	++p;
-	if (in_vim9script() && *p == '\'' && VIM_ISDIGIT(p[1]))
+	ఒకవేళ (లోపల_vim9script() && *p == '\'' && VIM_ISDIGIT(p[1]))
 	    ++p;
     }
-    if (**pp == '-')
+    ఒకవేళ (**pp == '-')
     {
-	if (retval == LONG_MAX)
+	ఒకవేళ (retval == LONG_MAX)
 	    retval = LONG_MIN;
-	else
+	లేకపోతే
 	    retval = -retval;
     }
     *pp = p;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return TRUE if "lbuf" is empty or only contains blanks.
  */
-    int
+    పూర్ణాంకం
 vim_isblankline(char_u *lbuf)
 {
     char_u	*p;
 
     p = skipwhite(lbuf);
-    return (*p == NUL || *p == '\r' || *p == '\n');
+    తిరిగి (*p == NUL || *p == '\r' || *p == '\n');
 }
 
 /*
@@ -2395,68 +2395,68 @@ vim_isblankline(char_u *lbuf)
  * If maxlen > 0, check at a maximum maxlen chars.
  * If strict is TRUE, check the number strictly. return *len = 0 if fail.
  */
-    void
+    శూన్య
 vim_str2nr(
-    char_u		*start,
-    int			*prep,	    // return: type of number 0 = decimal, 'x'
+    char_u		*ప్రారంభం,
+    పూర్ణాంకం			*prep,	    // return: type of number 0 = decimal, 'x'
 				    // or 'X' is hex, '0', 'o' or 'O' is octal,
 				    // 'b' or 'B' is bin
-    int			*len,	    // return: detected length of number
-    int			what,	    // what numbers to recognize
+    పూర్ణాంకం			*len,	    // return: detected length of number
+    పూర్ణాంకం			what,	    // what numbers to recognize
     varnumber_T		*nptr,	    // return: signed result
     uvarnumber_T	*unptr,	    // return: unsigned result
-    int			maxlen,     // max length of string to check
-    int			strict,     // check strictly
-    int			*overflow)  // when not NULL set to TRUE for overflow
+    పూర్ణాంకం			maxlen,     // max length of string to check
+    పూర్ణాంకం			strict,     // check strictly
+    పూర్ణాంకం			*అధికప్రవాహం)  // when not NULL set to TRUE for overflow
 {
-    char_u	    *ptr = start;
-    int		    pre = 0;		// default is decimal
-    int		    negative = FALSE;
+    char_u	    *ptr = ప్రారంభం;
+    పూర్ణాంకం		    pre = 0;		// default is decimal
+    పూర్ణాంకం		    negative = FALSE;
     uvarnumber_T    un = 0;
-    int		    n;
+    పూర్ణాంకం		    n;
 
-    if (len != NULL)
+    ఒకవేళ (len != ఖాళీ)
 	*len = 0;
 
-    if (ptr[0] == '-')
+    ఒకవేళ (ptr[0] == '-')
     {
 	negative = TRUE;
 	++ptr;
     }
 
     // Recognize hex, octal, and bin.
-    if (ptr[0] == '0' && ptr[1] != '8' && ptr[1] != '9'
+    ఒకవేళ (ptr[0] == '0' && ptr[1] != '8' && ptr[1] != '9'
 					       && (maxlen == 0 || maxlen > 1))
     {
 	pre = ptr[1];
-	if ((what & STR2NR_HEX)
+	ఒకవేళ ((what & STR2NR_HEX)
 		&& (pre == 'X' || pre == 'x') && vim_isxdigit(ptr[2])
 		&& (maxlen == 0 || maxlen > 2))
 	    // hexadecimal
 	    ptr += 2;
-	else if ((what & STR2NR_BIN)
+	లేకపోతే ఒకవేళ ((what & STR2NR_BIN)
 		&& (pre == 'B' || pre == 'b') && vim_isbdigit(ptr[2])
 		&& (maxlen == 0 || maxlen > 2))
-	    // binary
+	    //ద్విమాన
 	    ptr += 2;
-	else if ((what & STR2NR_OOCT)
+	లేకపోతే ఒకవేళ ((what & STR2NR_OOCT)
 		&& (pre == 'O' || pre == 'o') && vim_isodigit(ptr[2])
 		&& (maxlen == 0 || maxlen > 2))
 	    // octal with prefix "0o"
 	    ptr += 2;
-	else
+	లేకపోతే
 	{
 	    // decimal or octal, default is decimal
 	    pre = 0;
-	    if (what & STR2NR_OCT)
+	    ఒకవేళ (what & STR2NR_OCT)
 	    {
 		// Don't interpret "0", "08" or "0129" as octal.
-		for (n = 1; n != maxlen && VIM_ISDIGIT(ptr[n]); ++n)
+		కొరకు (n = 1; n != maxlen && VIM_ISDIGIT(ptr[n]); ++n)
 		{
-		    if (ptr[n] > '7')
+		    ఒకవేళ (ptr[n] > '7')
 		    {
 			pre = 0;	// can't be octal
-			break;
+			ఆపు;
 		    }
 		    pre = '0';	// assume octal
 		}
@@ -2466,156 +2466,156 @@ vim_str2nr(
 
     // Do the conversion manually to avoid sscanf() quirks.
     n = 1;
-    if (pre == 'B' || pre == 'b'
+    ఒకవేళ (pre == 'B' || pre == 'b'
 			     || ((what & STR2NR_BIN) && (what & STR2NR_FORCE)))
     {
 	// bin
-	if (pre != 0)
+	ఒకవేళ (pre != 0)
 	    n += 2;	    // skip over "0b"
-	while ('0' <= *ptr && *ptr <= '1')
+	అయితే ('0' <= *ptr && *ptr <= '1')
 	{
 	    // avoid ubsan error for overflow
-	    if (un <= UVARNUM_MAX / 2)
+	    ఒకవేళ (un <= UVARNUM_MAX / 2)
 		un = 2 * un + (uvarnumber_T)(*ptr - '0');
-	    else
+	    లేకపోతే
 	    {
 		un = UVARNUM_MAX;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
 	    ++ptr;
-	    if (n++ == maxlen)
-		break;
-	    if ((what & STR2NR_QUOTE) && *ptr == '\''
+	    ఒకవేళ (n++ == maxlen)
+		ఆపు;
+	    ఒకవేళ ((what & STR2NR_QUOTE) && *ptr == '\''
 					     && '0' <= ptr[1] && ptr[1] <= '1')
 	    {
 		++ptr;
-		if (n++ == maxlen)
-		    break;
+		ఒకవేళ (n++ == maxlen)
+		    ఆపు;
 	    }
 	}
     }
-    else if (pre == 'O' || pre == 'o' ||
+    లేకపోతే ఒకవేళ (pre == 'O' || pre == 'o' ||
 		pre == '0' || ((what & STR2NR_OCT) && (what & STR2NR_FORCE)))
     {
 	// octal
-	if (pre != 0 && pre != '0')
+	ఒకవేళ (pre != 0 && pre != '0')
 	    n += 2;	    // skip over "0o"
-	while ('0' <= *ptr && *ptr <= '7')
+	అయితే ('0' <= *ptr && *ptr <= '7')
 	{
 	    // avoid ubsan error for overflow
-	    if (un <= UVARNUM_MAX / 8)
+	    ఒకవేళ (un <= UVARNUM_MAX / 8)
 		un = 8 * un + (uvarnumber_T)(*ptr - '0');
-	    else
+	    లేకపోతే
 	    {
 		un = UVARNUM_MAX;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
 	    ++ptr;
-	    if (n++ == maxlen)
-		break;
-	    if ((what & STR2NR_QUOTE) && *ptr == '\''
+	    ఒకవేళ (n++ == maxlen)
+		ఆపు;
+	    ఒకవేళ ((what & STR2NR_QUOTE) && *ptr == '\''
 					     && '0' <= ptr[1] && ptr[1] <= '7')
 	    {
 		++ptr;
-		if (n++ == maxlen)
-		    break;
+		ఒకవేళ (n++ == maxlen)
+		    ఆపు;
 	    }
 	}
     }
-    else if (pre != 0 || ((what & STR2NR_HEX) && (what & STR2NR_FORCE)))
+    లేకపోతే ఒకవేళ (pre != 0 || ((what & STR2NR_HEX) && (what & STR2NR_FORCE)))
     {
 	// hex
-	if (pre != 0)
+	ఒకవేళ (pre != 0)
 	    n += 2;	    // skip over "0x"
-	while (vim_isxdigit(*ptr))
+	అయితే (vim_isxdigit(*ptr))
 	{
 	    // avoid ubsan error for overflow
-	    if (un <= UVARNUM_MAX / 16)
+	    ఒకవేళ (un <= UVARNUM_MAX / 16)
 		un = 16 * un + (uvarnumber_T)hex2nr(*ptr);
-	    else
+	    లేకపోతే
 	    {
 		un = UVARNUM_MAX;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
 	    ++ptr;
-	    if (n++ == maxlen)
-		break;
-	    if ((what & STR2NR_QUOTE) && *ptr == '\'' && vim_isxdigit(ptr[1]))
+	    ఒకవేళ (n++ == maxlen)
+		ఆపు;
+	    ఒకవేళ ((what & STR2NR_QUOTE) && *ptr == '\'' && vim_isxdigit(ptr[1]))
 	    {
 		++ptr;
-		if (n++ == maxlen)
-		    break;
+		ఒకవేళ (n++ == maxlen)
+		    ఆపు;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	// decimal
-	while (VIM_ISDIGIT(*ptr))
+	అయితే (VIM_ISDIGIT(*ptr))
 	{
 	    uvarnumber_T    digit = (uvarnumber_T)(*ptr - '0');
 
 	    // avoid ubsan error for overflow
-	    if (un < UVARNUM_MAX / 10
+	    ఒకవేళ (un < UVARNUM_MAX / 10
 		    || (un == UVARNUM_MAX / 10 && digit <= UVARNUM_MAX % 10))
 		un = 10 * un + digit;
-	    else
+	    లేకపోతే
 	    {
 		un = UVARNUM_MAX;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
 	    ++ptr;
-	    if (n++ == maxlen)
-		break;
-	    if ((what & STR2NR_QUOTE) && *ptr == '\'' && VIM_ISDIGIT(ptr[1]))
+	    ఒకవేళ (n++ == maxlen)
+		ఆపు;
+	    ఒకవేళ ((what & STR2NR_QUOTE) && *ptr == '\'' && VIM_ISDIGIT(ptr[1]))
 	    {
 		++ptr;
-		if (n++ == maxlen)
-		    break;
+		ఒకవేళ (n++ == maxlen)
+		    ఆపు;
 	    }
 	}
     }
 
     // Check for an alphanumeric character immediately following, that is
     // most likely a typo.
-    if (strict && n - 1 != maxlen && ASCII_ISALNUM(*ptr))
-	return;
+    ఒకవేళ (strict && n - 1 != maxlen && ASCII_ISALNUM(*ptr))
+	తిరిగి;
 
-    if (prep != NULL)
+    ఒకవేళ (prep != ఖాళీ)
 	*prep = pre;
-    if (len != NULL)
-	*len = (int)(ptr - start);
-    if (nptr != NULL)
+    ఒకవేళ (len != ఖాళీ)
+	*len = (పూర్ణాంకం)(ptr - ప్రారంభం);
+    ఒకవేళ (nptr != ఖాళీ)
     {
-	if (negative)   // account for leading '-' for decimal numbers
+	ఒకవేళ (negative)   // account for leading '-' for decimal numbers
 	{
 	    // avoid ubsan error for overflow
-	    if (un > VARNUM_MAX)
+	    ఒకవేళ (un > VARNUM_MAX)
 	    {
 		*nptr = VARNUM_MIN;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
-	    else
+	    లేకపోతే
 		*nptr = -(varnumber_T)un;
 	}
-	else
+	లేకపోతే
 	{
 	    // prevent a large unsigned number to become negative
-	    if (un > VARNUM_MAX)
+	    ఒకవేళ (un > VARNUM_MAX)
 	    {
 		un = VARNUM_MAX;
-		if (overflow != NULL)
-		    *overflow = TRUE;
+		ఒకవేళ (అధికప్రవాహం != ఖాళీ)
+		    *అధికప్రవాహం = TRUE;
 	    }
 	    *nptr = (varnumber_T)un;
 	}
     }
-    if (unptr != NULL)
+    ఒకవేళ (unptr != ఖాళీ)
 	*unptr = un;
 }
 
@@ -2623,26 +2623,26 @@ vim_str2nr(
  * Return the value of a single hex character.
  * Only valid when the argument is '0' - '9', 'A' - 'F' or 'a' - 'f'.
  */
-    int
-hex2nr(int c)
+    పూర్ణాంకం
+hex2nr(పూర్ణాంకం c)
 {
-    if (c >= 'a' && c <= 'f')
-	return c - 'a' + 10;
-    if (c >= 'A' && c <= 'F')
-	return c - 'A' + 10;
-    return c - '0';
+    ఒకవేళ (c >= 'a' && c <= 'f')
+	తిరిగి c - 'a' + 10;
+    ఒకవేళ (c >= 'A' && c <= 'F')
+	తిరిగి c - 'A' + 10;
+    తిరిగి c - '0';
 }
 
 /*
  * Convert two hex characters to a byte.
  * Return -1 if one of the characters is not hex.
  */
-    int
+    పూర్ణాంకం
 hexhex2nr(char_u *p)
 {
-    if (!vim_isxdigit(p[0]) || !vim_isxdigit(p[1]))
-	return -1;
-    return (hex2nr(p[0]) << 4) + hex2nr(p[1]);
+    ఒకవేళ (!vim_isxdigit(p[0]) || !vim_isxdigit(p[1]))
+	తిరిగి -1;
+    తిరిగి (hex2nr(p[0]) << 4) + hex2nr(p[1]);
 }
 
 /*
@@ -2658,20 +2658,20 @@ hexhex2nr(char_u *p)
  * character, assume that all multi-byte characters are valid file name
  * characters.
  */
-    int
+    పూర్ణాంకం
 rem_backslash(char_u *str)
 {
-#ifdef BACKSLASH_IN_FILENAME
-    return (str[0] == '\\'
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
+    తిరిగి (str[0] == '\\'
 	    && str[1] < 0x80
 	    && (str[1] == ' '
 		|| (str[1] != NUL
 		    && str[1] != '*'
 		    && str[1] != '?'
 		    && !vim_isfilec(str[1]))));
-#else
-    return (str[0] == '\\' && str[1] != NUL);
-#endif
+#లేకపోతే
+    తిరిగి (str[0] == '\\' && str[1] != NUL);
+#అయితే_ముగింపు
 }
 
 /*
@@ -2679,11 +2679,11 @@ rem_backslash(char_u *str)
  * For MS-DOS we only do this if the character after the backslash
  * is not a normal file character.
  */
-    void
+    శూన్య
 backslash_halve(char_u *p)
 {
-    for ( ; *p; ++p)
-	if (rem_backslash(p))
+    కొరకు ( ; *p; ++p)
+	ఒకవేళ (rem_backslash(p))
 	    STRMOVE(p, p + 1);
 }
 
@@ -2697,8 +2697,8 @@ backslash_halve_save(char_u *p)
     char_u	*res;
 
     res = vim_strsave(p);
-    if (res == NULL)
-	return p;
+    ఒకవేళ (res == ఖాళీ)
+	తిరిగి p;
     backslash_halve(res);
-    return res;
+    తిరిగి res;
 }

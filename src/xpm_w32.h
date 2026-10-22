@@ -2,6 +2,6 @@
  * Header file for xpm_w32.c
  */
 
-#ifndef XPM_W32__H
-int LoadXpmImage(char *filename, HBITMAP *hImage, HBITMAP *hShape);
-#endif
+#నిర్వచితం_కాకపోతే XPM_W32__H
+పూర్ణాంకం ఎక్కించు_Xpm_Image(అక్షరం *filename, HBITMAP *hImage, HBITMAP *hShape);
+#అయితే_ముగింపు

@@ -11,37 +11,37 @@
  * Text properties implementation.  See ":help text-properties".
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_PROP_POPUP)
 
-static void um_store_changes(unpacked_memline_T *um);
+స్థిర శూన్య um_store_changes(unpacked_memline_T *um);
 
 /*
  * Free virtual text strings in a detached unpacked memline's props.
  */
-    static void
-um_free_vtext(textprop_T *props, int count)
+    స్థిర శూన్య
+um_free_vtext(textprop_T *props, పూర్ణాంకం లెక్క)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
-	    VIM_CLEAR(props[i].u.tp_text);
+    కొరకు (పూర్ణాంకం i = 0; i < లెక్క; ++i)
+	ఒకవేళ (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	    VIM_CLEAR(props[i].u.tp_పాఠ్యం);
 }
 
 /*
  * Free memory used by an unpacked memline.
  */
-    static void
+    స్థిర శూన్య
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    ఒకవేళ (um->detached)
     {
-	VIM_CLEAR(um->text);
-	um_free_vtext(um->props, um->prop_count);
+	VIM_CLEAR(um->పాఠ్యం);
+	um_free_vtext(um->props, um->prop_లెక్క);
     }
     VIM_CLEAR(um->props);
-    um->prop_size = 0;
-    um->prop_count = 0;
+    um->prop_కొలత = 0;
+    um->prop_లెక్క = 0;
     um->lnum = 0;
     um->detached = false;
 }
@@ -55,9 +55,9 @@ um_open(buf_T *buf)
 {
     unpacked_memline_T um;
 
-    CLEAR_FIELD(um);
+    CLEAR_క్షేత్రం(um);
     um.buf = buf;
-    return um;
+    తిరిగి um;
 }
 
 /*
@@ -67,88 +67,88 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_పంక్తి(unpacked_memline_T *um, linenr_T lnum, పూర్ణాంకం extra_props)
 {
-    char_u	*line;
+    char_u	*పంక్తి;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    పూర్ణాంకం		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    ఒకవేళ (um->buf == ఖాళీ)
+	తిరిగి false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    ఒకవేళ (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    ఒకవేళ (lnum == 0)
+	తిరిగి true;	// just unload
 
-    line = ml_get_buf(um->buf, lnum, FALSE);
+    పంక్తి = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
-    propdata_len = um->buf->b_ml.ml_line_len - textlen;
+    propdata_len = um->buf->b_ml.ml_పంక్తి_len - textlen;
 
     um->lnum = lnum;
-    um->text_size = (colnr_T)textlen;
-    um->text = line;
+    um->పాఠ్యం_కొలత_2 = (colnr_T)textlen;
+    um->పాఠ్యం = పంక్తి;
 
-    if (propdata_len == 0)
-	return true;
+    ఒకవేళ (propdata_len == 0)
+	తిరిగి true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    ఒకవేళ (propdata_len < PROP_లెక్క_కొలత + పరిమాణం(textprop_T))
     {
-	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	um->buf = ఖాళీ;
+	తిరిగి false;
     }
 
-    uint16_t    prop_count;
-    char_u	    *count_ptr = line + textlen;
-    char_u	    *props_start;
+    uint16_t    prop_లెక్క;
+    char_u	    *లెక్క_ptr = పంక్తి + textlen;
+    char_u	    *props_ప్రారంభం;
 
-    mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_లెక్క, లెక్క_ptr, PROP_లెక్క_కొలత);
+    ఒకవేళ (!పాఠ్యం_prop_లెక్క_valid(prop_లెక్క, propdata_len))
     {
-	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	um->buf = ఖాళీ;
+	తిరిగి false;
     }
-    proplen = (int)prop_count;
-    props_start = count_ptr + PROP_COUNT_SIZE;
+    proplen = (పూర్ణాంకం)prop_లెక్క;
+    props_ప్రారంభం = లెక్క_ptr + PROP_లెక్క_కొలత;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    ఒకవేళ (!పాఠ్యం_prop_vtext_valid(props_ప్రారంభం, proplen, propdata_len))
     {
-	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	um->buf = ఖాళీ;
+	తిరిగి false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    ఒకవేళ (um->props == ఖాళీ)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = ఖాళీ;
+	తిరిగి false;
     }
-    um->prop_size = proplen + extra_props;
-    um->prop_count = proplen;
-    mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
+    um->prop_కొలత = proplen + extra_props;
+    um->prop_లెక్క = proplen;
+    mch_memmove(um->props, props_ప్రారంభం, proplen * పరిమాణం(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	ఒకవేళ (um->props[i].tp_id < 0 && um->props[i].u.tp_పాఠ్యం_స్థానభ్రంశం > 0)
 	{
-	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
+	    um->props[i].u.tp_పాఠ్యం = లెక్క_ptr + um->props[i].u.tp_పాఠ్యం_స్థానభ్రంశం;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    um->props[i].u.tp_text = NULL;
+	లేకపోతే
+	    um->props[i].u.tp_పాఠ్యం = ఖాళీ;
     }
 
-    return true;
+    తిరిగి true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, పూర్ణాంకం extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
-	um.buf = NULL;
-    return um;
+    ఒకవేళ (!um_goto_పంక్తి(&um, lnum, extra_props))
+	um.buf = ఖాళీ;
+    తిరిగి um;
 }
 
 /*
@@ -170,43 +170,43 @@ um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
  * strings to allocated memory (LOADED -> DETACHED).
  * Returns true on success.
  */
-    static bool
+    స్థిర bool
 um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    ఒకవేళ (um->detached || um->buf == ఖాళీ)
+	తిరిగి um->detached;
 
-    newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    newtext = vim_strnsave(um->పాఠ్యం, um->పాఠ్యం_కొలత_2 - 1);
+    ఒకవేళ (newtext == ఖాళీ)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = ఖాళీ;
+	తిరిగి false;
     }
-    um->text = newtext;
+    um->పాఠ్యం = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < um->prop_లెక్క; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	ఒకవేళ (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
+	    char_u *copy = vim_strsave(um->props[i].u.tp_పాఠ్యం);
 
-	    if (copy == NULL)
+	    ఒకవేళ (copy == ఖాళీ)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
-			VIM_CLEAR(um->props[j].u.tp_text);
-		VIM_CLEAR(um->text);
-		um->buf = NULL;
-		return false;
+		కొరకు (పూర్ణాంకం j = 0; j < i; ++j)
+		    ఒకవేళ (um->props[j].tp_id < 0)
+			VIM_CLEAR(um->props[j].u.tp_పాఠ్యం);
+		VIM_CLEAR(um->పాఠ్యం);
+		um->buf = ఖాళీ;
+		తిరిగి false;
 	    }
-	    um->props[i].u.tp_text = copy;
+	    um->props[i].u.tp_పాఠ్యం = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    తిరిగి true;
 }
 
 /*
@@ -214,66 +214,66 @@ um_detach(unpacked_memline_T *um)
  * ownership is transferred to the unpacked memline.
  */
     bool
-um_set_text(unpacked_memline_T *um, char_u *text)
+um_సమితి_పాఠ్యం(unpacked_memline_T *um, char_u *పాఠ్యం)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
-	vim_free(um->text);
-    um->text = text;
-    um->text_size = (colnr_T)STRLEN(text) + 1;
-    um->text_changed = true;
+    ఒకవేళ (um->buf == ఖాళీ)
+	తిరిగి false;
+    ఒకవేళ (um->detached)
+	vim_free(um->పాఠ్యం);
+    um->పాఠ్యం = పాఠ్యం;
+    um->పాఠ్యం_కొలత_2 = (colnr_T)STRLEN(పాఠ్యం) + 1;
+    um->పాఠ్యం_మారింది = true;
     um->detached = true;
-    return true;
+    తిరిగి true;
 }
 
 /*
  * Ensure there is space for at least "needed" more properties.
  * Returns true on success.
  */
-    static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+    స్థిర bool
+um_grow_props(unpacked_memline_T *um, పూర్ణాంకం needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    ఒకవేళ (um->prop_లెక్క + needed <= um->prop_కొలత)
+	తిరిగి true;
 
-    int	    new_size = um->prop_count + needed;
+    పూర్ణాంకం	    new_కొలత = um->prop_లెక్క + needed;
     textprop_T  *newprops = vim_realloc(um->props,
-					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+					    new_కొలత * పరిమాణం(textprop_T));
+    ఒకవేళ (newprops == ఖాళీ)
+	తిరిగి false;
     um->props = newprops;
-    um->prop_size = new_size;
+    um->prop_కొలత = new_కొలత;
 
-    return true;
+    తిరిగి true;
 }
 
 /*
  * Add a property to the end of the props array without sorting.
  * For virtual text props, u.tp_text ownership is transferred.
  */
-    static void
-um_add_prop(unpacked_memline_T *um, textprop_T *prop)
+    స్థిర శూన్య
+um_కూడు_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    ఒకవేళ (um->buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (!um->detached && !um_detach(um))
+	తిరిగి;
+    ఒకవేళ (!um_grow_props(um, 1))
     {
-	um->buf = NULL;
-	return;
+	um->buf = ఖాళీ;
+	తిరిగి;
     }
-    um->props[um->prop_count++] = *prop;
+    um->props[um->prop_లెక్క++] = *prop;
 }
 
 /*
  * Reverse the order of all properties.
  */
-    void
-um_reverse_props(unpacked_memline_T *um)
+    శూన్య
+um_తిరగేయి_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    కొరకు (పూర్ణాంకం i = 0, j = um->prop_లెక్క - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, పూర్ణాంకం prop_లెక్క)
 {
     unpacked_memline_T um;
 
-    CLEAR_FIELD(um);
+    CLEAR_క్షేత్రం(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    ఒకవేళ (lnum < 1 || lnum > buf->b_ml.ml_పంక్తి_లెక్క)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = ఖాళీ;
+	తిరిగి um;
     }
 
-    char_u *line = ml_get_buf(buf, lnum, FALSE);
-    char_u *text_copy = vim_strsave(line);
+    char_u *పంక్తి = ml_get_buf(buf, lnum, FALSE);
+    char_u *పాఠ్యం_copy = vim_strsave(పంక్తి);
 
-    if (text_copy == NULL)
+    ఒకవేళ (పాఠ్యం_copy == ఖాళీ)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = ఖాళీ;
+	తిరిగి um;
     }
     um.lnum = lnum;
-    um.text = text_copy;
-    um.text_size = (colnr_T)STRLEN(text_copy) + 1;
+    um.పాఠ్యం = పాఠ్యం_copy;
+    um.పాఠ్యం_కొలత_2 = (colnr_T)STRLEN(పాఠ్యం_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    ఒకవేళ (prop_లెక్క > 0)
     {
-	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	um.props = ALLOC_MULT(textprop_T, prop_లెక్క);
+	ఒకవేళ (um.props == ఖాళీ)
 	{
-	    vim_free(um.text);
-	    um.buf = NULL;
-	    return um;
+	    vim_free(um.పాఠ్యం);
+	    um.buf = ఖాళీ;
+	    తిరిగి um;
 	}
-	um.prop_size = prop_count;
+	um.prop_కొలత = prop_లెక్క;
     }
 
-    return um;
+    తిరిగి um;
 }
 
 /*
@@ -333,31 +333,31 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  * Find a property on "lnum" in "buf" that matches "tp_id" and "tp_type",
  * and clear "flag_to_clear" (TP_FLAG_CONT_NEXT or TP_FLAG_CONT_PREV).
  */
-    static void
+    స్థిర శూన్య
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					పూర్ణాంకం tp_id, పూర్ణాంకం tp_type, పూర్ణాంకం flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    ఒకవేళ (lnum < 1 || lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    ఒకవేళ (neighbor.buf == ఖాళీ)
+	తిరిగి;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < neighbor.prop_లెక్క; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	ఒకవేళ (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
-		break;
+	    ఒకవేళ (!neighbor.detached && !um_detach(&neighbor))
+		ఆపు;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
 	    p->tp_flags &= ~flag;
-	    break;
+	    ఆపు;
 	}
     }
     um_close(&neighbor);
@@ -368,28 +368,28 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Automatically detaches if needed.
  * Also adjusts continuation flags on neighboring lines.
  */
-    void
-um_delete_prop(unpacked_memline_T *um, int index)
+    శూన్య
+um_delete_prop(unpacked_memline_T *um, పూర్ణాంకం సూచీ)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    ఒకవేళ (um->buf == ఖాళీ || సూచీ < 0 || సూచీ >= um->prop_లెక్క)
+	తిరిగి;
+    ఒకవేళ (!um->detached && !um_detach(um))
+	తిరిగి;
 
-    prop = &um->props[index];
+    prop = &um->props[సూచీ];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    ఒకవేళ (prop->tp_flags & TP_FLAG_CONT_PREV)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
-			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_తదుపరి);
+    ఒకవేళ (prop->tp_flags & TP_FLAG_CONT_తదుపరి)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
-	VIM_CLEAR(prop->u.tp_text);
+    ఒకవేళ (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	VIM_CLEAR(prop->u.tp_పాఠ్యం);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
 
@@ -402,147 +402,147 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * NOTE: Currently packs in the OLD format (no inline vtext) because
  * the read side has not been converted yet.
  */
-    static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+    స్థిర char_u *
+um_pack(unpacked_memline_T *um, పూర్ణాంకం *packed_len)
 {
-    uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    uint16_t	సజీవ_లెక్క = 0;
+    పూర్ణాంకం		vtext_కొలత = 0;
+    పూర్ణాంకం		మొత్తం_len;
     char_u	*buf;
-    char_u	*count_dest;
+    char_u	*లెక్క_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < um->prop_లెక్క; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
-	    continue;
-	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
-	    vtext_size += prop->tp_len + 1;
+	ఒకవేళ (prop->tp_flags & TP_FLAG_DELETED)
+	    కొనసాగు;
+	++సజీవ_లెక్క;
+	ఒకవేళ (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	    vtext_కొలత += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    ఒకవేళ (సజీవ_లెక్క == 0)
     {
 	// No properties: just text, no prop_count header.
-	total_len = um->text_size;
-	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
-	*packed_len = total_len;
-	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	మొత్తం_len = um->పాఠ్యం_కొలత_2;
+	buf = alloc(మొత్తం_len);
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	*packed_len = మొత్తం_len;
+	mch_memmove(buf, um->పాఠ్యం, um->పాఠ్యం_కొలత_2);
+	తిరిగి buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
-    buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
-    *packed_len = total_len;
+    మొత్తం_len = um->పాఠ్యం_కొలత_2 + (పూర్ణాంకం)PROP_లెక్క_కొలత
+		+ సజీవ_లెక్క * (పూర్ణాంకం)పరిమాణం(textprop_T) + vtext_కొలత;
+    buf = alloc(మొత్తం_len);
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి ఖాళీ;
+    *packed_len = మొత్తం_len;
 
-    mch_memmove(buf, um->text, um->text_size);
+    mch_memmove(buf, um->పాఠ్యం, um->పాఠ్యం_కొలత_2);
 
-    count_dest = buf + um->text_size;
-    mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
+    లెక్క_dest = buf + um->పాఠ్యం_కొలత_2;
+    mch_memmove(లెక్క_dest, &సజీవ_లెక్క, PROP_లెక్క_కొలత);
 
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    prop_dest = లెక్క_dest + PROP_లెక్క_కొలత;
+    vtext_dest = prop_dest + సజీవ_లెక్క * పరిమాణం(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < um->prop_లెక్క; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
-	    continue;
+	ఒకవేళ (prop.tp_flags & TP_FLAG_DELETED)
+	    కొనసాగు;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	ఒకవేళ (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    పూర్ణాంకం copysize = prop.tp_len + 1;
 
-	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    mch_memmove(vtext_dest, prop.u.tp_పాఠ్యం, copysize);
+	    prop.u.tp_పాఠ్యం_స్థానభ్రంశం = (colnr_T)(vtext_dest - లెక్క_dest);
 	    vtext_dest += copysize;
 	}
-	else
-	    prop.u.tp_text_offset = 0;
+	లేకపోతే
+	    prop.u.tp_పాఠ్యం_స్థానభ్రంశం = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
-	mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	prop_dest += sizeof(textprop_T);
+	mch_memmove(prop_dest, &prop, పరిమాణం(textprop_T));
+	prop_dest += పరిమాణం(textprop_T);
     }
 
-    return buf;
+    తిరిగి buf;
 }
 
 /*
  * Store changes to the current line back into the buffer's memline.
  */
-    static void
+    స్థిర శూన్య
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    పూర్ణాంకం	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    ఒకవేళ (!um->detached || um->buf == ఖాళీ || um->lnum == 0)
+	తిరిగి;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    ఒకవేళ (packed == ఖాళీ)
     {
-	um->buf = NULL;
-	return;
+	um->buf = ఖాళీ;
+	తిరిగి;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    ఒకవేళ (um->buf->b_ml.ml_పంక్తి_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
-	(void)ml_get_buf(um->buf, um->lnum, TRUE);
+    లేకపోతే ఒకవేళ (!(um->buf->b_ml.ml_flags & ML_పంక్తి_DIRTY))
+	(శూన్య)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
-    vim_free(um->text);
-    um_free_vtext(um->props, um->prop_count);
+    vim_free(um->పాఠ్యం);
+    um_free_vtext(um->props, um->prop_లెక్క);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(um->buf->b_ml.ml_line_ptr);
-    um->buf->b_ml.ml_line_ptr = packed;
-    um->buf->b_ml.ml_line_len = packed_len;
-    um->buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+    ఒకవేళ (um->buf->b_ml.ml_flags & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+	vim_free(um->buf->b_ml.ml_పంక్తి_ptr);
+    um->buf->b_ml.ml_పంక్తి_ptr = packed;
+    um->buf->b_ml.ml_పంక్తి_len = packed_len;
+    um->buf->b_ml.ml_flags |= ML_పంక్తి_DIRTY;
 
     um->detached = false;
-    um->text = packed;
-    um->text_size = (colnr_T)STRLEN(packed) + 1;
-    um->buf->b_ml.ml_line_textlen = um->text_size;
+    um->పాఠ్యం = packed;
+    um->పాఠ్యం_కొలత_2 = (colnr_T)STRLEN(packed) + 1;
+    um->buf->b_ml.ml_పంక్తి_textlen = um->పాఠ్యం_కొలత_2;
 }
 
 /*
  * Close an unpacked memline, storing any changes.
  */
-    void
+    శూన్య
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    ఒకవేళ (um->buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
-    um->buf = NULL;
+    um->buf = ఖాళీ;
 }
 
 /*
  * Abort an unpacked memline, discarding any changes.
  */
-    void
+    శూన్య
 um_abort(unpacked_memline_T *um)
 {
     um_free(um);
-    um->buf = NULL;
+    um->buf = ఖాళీ;
 }
 
 /*
@@ -552,67 +552,67 @@ um_abort(unpacked_memline_T *um)
  * HIKEY2PT() converts a hashitem key pointer to a proptype pointer.
  * HI2PT() converts a hashitem pointer to a proptype pointer.
  */
-#define PT2HIKEY(p)  ((p)->pt_name)
-#define HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
-#define HI2PT(hi)      HIKEY2PT((hi)->hi_key)
+#నిర్వచించు PT2HIKEY(p)  ((p)->pt_name)
+#నిర్వచించు HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
+#నిర్వచించు HI2PT(hi)      HIKEY2PT((hi)->hi_కీలకం)
 
 // The global text property types.
-static hashtab_T *global_proptypes = NULL;
-static proptype_T **global_proparray = NULL;
+స్థిర hashtab_T *global_proptypes = ఖాళీ;
+స్థిర proptype_T **global_proparray = ఖాళీ;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+స్థిర పూర్ణాంకం proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
  * Returns NULL if the item can't be found.
  */
-    static hashitem_T *
-find_prop_type_hi(char_u *name, buf_T *buf)
+    స్థిర hashitem_T *
+కనుగొను_prop_type_hi(char_u *name, buf_T *buf)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    ఒకవేళ (*name == NUL)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (buf == ఖాళీ)
 	ht = global_proptypes;
-    else
+    లేకపోతే
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
-    hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    ఒకవేళ (ht == ఖాళీ)
+	తిరిగి ఖాళీ;
+    hi = hash_కనుగొను(ht, name);
+    ఒకవేళ (HASHITEM_ఖాళీలు(hi))
+	తిరిగి ఖాళీ;
+    తిరిగి hi;
 }
 
 /*
  * Like find_prop_type_hi() but return the property type.
  */
-    static proptype_T *
-find_prop_type(char_u *name, buf_T *buf)
+    స్థిర proptype_T *
+కనుగొను_prop_type(char_u *name, buf_T *buf)
 {
-    hashitem_T	*hi = find_prop_type_hi(name, buf);
+    hashitem_T	*hi = కనుగొను_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    ఒకవేళ (hi == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
-find_prop_type_id(char_u *name, buf_T *buf)
+    పూర్ణాంకం
+కనుగొను_prop_type_id(char_u *name, buf_T *buf)
 {
-    proptype_T *pt = find_prop_type(name, buf);
+    proptype_T *pt = కనుగొను_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    ఒకవేళ (pt == ఖాళీ)
+	తిరిగి 0;
+    తిరిగి pt->pt_id;
 }
 
 /*
@@ -620,16 +620,16 @@ find_prop_type_id(char_u *name, buf_T *buf)
  * global types.
  * When not found gives an error message and returns NULL.
  */
-    static proptype_T *
+    స్థిర proptype_T *
 lookup_prop_type(char_u *name, buf_T *buf)
 {
-    proptype_T *type = find_prop_type(name, buf);
+    proptype_T *type = కనుగొను_prop_type(name, buf);
 
-    if (type == NULL)
-	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    ఒకవేళ (type == ఖాళీ)
+	type = కనుగొను_prop_type(name, ఖాళీ);
+    ఒకవేళ (type == ఖాళీ)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    తిరిగి type;
 }
 
 /*
@@ -639,50 +639,50 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    ఒకవేళ (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
-    di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
-					      || di->di_tv.vval.v_number != 0))
+    ఒకవేళ (arg->vval.v_dict == ఖాళీ)
+	తిరిగి OK;  // NULL dict is like an empty dict
+    di = dict_కనుగొను(arg->vval.v_dict, (char_u *)"bufnr", -1);
+    ఒకవేళ (di != ఖాళీ && (di->di_tv.v_type != VAR_సంఖ్య
+					      || di->di_tv.vval.v_సంఖ్య != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	ఒకవేళ (*buf == ఖాళీ)
+	    తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * prop_add({lnum}, {col}, {props})
  */
-    void
-f_prop_add(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_prop_కూడు(typval_T *argvars, typval_T *rettv)
 {
-    linenr_T	start_lnum;
-    colnr_T	start_col;
+    linenr_T	ప్రారంభం_lnum;
+    colnr_T	ప్రారంభం_నిలువు;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
-    start_lnum = tv_get_number(&argvars[0]);
-    start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    ప్రారంభం_lnum = tv_get_సంఖ్య(&argvars[0]);
+    ప్రారంభం_నిలువు = tv_get_సంఖ్య(&argvars[1]);
+    ఒకవేళ (check_for_dict_arg(argvars, 2) == FAIL)
+	తిరిగి;
 
-    rettv->vval.v_number = prop_add_common(start_lnum, start_col,
+    rettv->vval.v_సంఖ్య = prop_కూడు_common(ప్రారంభం_lnum, ప్రారంభం_నిలువు,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
 }
 
@@ -692,242 +692,242 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
-prop_add_one(
+    స్థిర పూర్ణాంకం
+prop_కూడు_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
-	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
-	linenr_T	start_lnum,
-	linenr_T	end_lnum,
-	colnr_T		start_col,
-	colnr_T		end_col)
+	పూర్ణాంకం		id,
+	char_u		*పాఠ్యం_arg,
+	పూర్ణాంకం		పాఠ్యం_padding_ఎడమ,
+	పూర్ణాంకం		పాఠ్యం_flags,
+	linenr_T	ప్రారంభం_lnum,
+	linenr_T	చివర_lnum,
+	colnr_T		ప్రారంభం_నిలువు,
+	colnr_T		చివర_నిలువు)
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
-    char_u	*props = NULL;
+    పూర్ణాంకం		proplen;
+    char_u	*props = ఖాళీ;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    పూర్ణాంకం		i;
     textprop_T	tmp_prop;
-    char_u	*text = text_arg;
-    int		res = FAIL;
+    char_u	*పాఠ్యం = పాఠ్యం_arg;
+    పూర్ణాంకం		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
-	goto theend;
+    ఒకవేళ (type == ఖాళీ)
+	వెళ్ళు theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    ఒకవేళ (ప్రారంభం_lnum < 1 || ప్రారంభం_lnum > buf->b_ml.ml_పంక్తి_లెక్క)
     {
-	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
-	goto theend;
+	semsg(_(e_invalid_పంక్తి_సంఖ్య_nr), (దీర్ఘ)ప్రారంభం_lnum);
+	వెళ్ళు theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    ఒకవేళ (చివర_lnum < ప్రారంభం_lnum || చివర_lnum > buf->b_ml.ml_పంక్తి_లెక్క)
     {
-	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
-	goto theend;
-    }
-
-    if (buf->b_ml.ml_mfp == NULL)
-    {
-	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
-	goto theend;
+	semsg(_(e_invalid_పంక్తి_సంఖ్య_nr), (దీర్ఘ)చివర_lnum);
+	వెళ్ళు theend;
     }
 
-    if (text != NULL)
+    ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
+    {
+	emsg(_(e_cannot_కూడు_పాఠ్యం_property_గమ్యం_unloaded_బఫరు));
+	వెళ్ళు theend;
+    }
+
+    ఒకవేళ (పాఠ్యం != ఖాళీ)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	కొరకు (p = పాఠ్యం; *p != NUL; MB_PTR_ADV(p))
+	    ఒకవేళ (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    కొరకు (lnum = ప్రారంభం_lnum; lnum <= చివర_lnum; ++lnum)
     {
-	colnr_T col;	    // start column use in tp_col
-	colnr_T sort_col;   // column where it appears
-	long	length;	    // in bytes
+	colnr_T నిలువు;	    // start column use in tp_col
+	colnr_T క్రమీకరించు_నిలువు;   // column where it appears
+	దీర్ఘ	నిడివి;	    // in bytes
 
 	// Fetch the line to get the ml_line_len field updated.
-	proplen = get_text_props(buf, lnum, &props, TRUE);
+	proplen = get_పాఠ్యం_props(buf, lnum, &props, TRUE);
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	ఒకవేళ (proplen >= 0xffff)
 	{
-	    emsg(_(e_too_many_text_properties_on_a_single_line));
-	    goto theend;
+	    emsg(_(e_too_many_పాఠ్యం_properties_on_a_single_పంక్తి));
+	    వెళ్ళు theend;
 	}
 
-	if (lnum == start_lnum)
-	    col = start_col;
-	else
-	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	ఒకవేళ (lnum == ప్రారంభం_lnum)
+	    నిలువు = ప్రారంభం_నిలువు;
+	లేకపోతే
+	    నిలువు = 1;
+	ఒకవేళ (నిలువు - 1 > (colnr_T)textlen && !(నిలువు == 0 && పాఠ్యం_arg != ఖాళీ))
 	{
-	    semsg(_(e_invalid_column_number_nr), (long)start_col);
-	    goto theend;
+	    semsg(_(e_invalid_స్తంభం_సంఖ్య_nr), (దీర్ఘ)ప్రారంభం_నిలువు);
+	    వెళ్ళు theend;
 	}
-	sort_col = col;
+	క్రమీకరించు_నిలువు = నిలువు;
 
-	if (lnum == end_lnum)
-	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
-	    length = 0;		// zero-width property
+	ఒకవేళ (lnum == చివర_lnum)
+	    నిడివి = చివర_నిలువు - నిలువు;
+	లేకపోతే
+	    నిడివి = (పూర్ణాంకం)textlen - నిలువు + 1;
+	ఒకవేళ (నిడివి > (దీర్ఘ)textlen)
+	    నిడివి = (పూర్ణాంకం)textlen;	// can include the end-of-line
+	ఒకవేళ (నిడివి < 0)
+	    నిడివి = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	ఒకవేళ (పాఠ్యం_arg != ఖాళీ)
 	{
-	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    నిడివి = (దీర్ఘ)STRLEN(పాఠ్యం_arg);
+	    ఒకవేళ (నిలువు == 0)
 	    {
-		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
-		    sort_col = MAXCOL;
+		నిలువు = MAXCOL;	// before or after the line
+		ఒకవేళ ((పాఠ్యం_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		    క్రమీకరించు_నిలువు = MAXCOL;
 	    }
 	}
 
 	// Build the new property.
-	CLEAR_FIELD(tmp_prop);
-	tmp_prop.tp_col = col;
-	tmp_prop.tp_len = length;
+	CLEAR_క్షేత్రం(tmp_prop);
+	tmp_prop.tp_నిలువు = నిలువు;
+	tmp_prop.tp_len = నిడివి;
 	tmp_prop.tp_id = id;
 	tmp_prop.tp_type = type->pt_id;
-	tmp_prop.tp_flags = text_flags
-			    | (lnum > start_lnum ? TP_FLAG_CONT_PREV : 0)
-			    | (lnum < end_lnum ? TP_FLAG_CONT_NEXT : 0)
-			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
-						     ? TP_FLAG_START_INCL : 0);
-	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
-	    tmp_prop.u.tp_text = text_arg;
+	tmp_prop.tp_flags = పాఠ్యం_flags
+			    | (lnum > ప్రారంభం_lnum ? TP_FLAG_CONT_PREV : 0)
+			    | (lnum < చివర_lnum ? TP_FLAG_CONT_తదుపరి : 0)
+			    | ((type->pt_flags & PT_FLAG_INS_ప్రారంభం_INCL)
+						     ? TP_FLAG_ప్రారంభం_INCL : 0);
+	tmp_prop.tp_padleft = పాఠ్యం_padding_ఎడమ;
+	ఒకవేళ (పాఠ్యం_arg != ఖాళీ)
+	    tmp_prop.u.tp_పాఠ్యం = పాఠ్యం_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	కొరకు (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
-	    colnr_T	prop_col;
+	    colnr_T	prop_నిలువు;
 
-	    mch_memmove(&existing, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
-				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
-		break;
+	    mch_memmove(&existing, props + i * పరిమాణం(textprop_T),
+							   పరిమాణం(textprop_T));
+	    prop_నిలువు = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
+				? 0 : existing.tp_నిలువు;
+	    ఒకవేళ (prop_నిలువు >= క్రమీకరించు_నిలువు)
+		ఆపు;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
-	char_u	*count_dest;
+	పూర్ణాంకం		vtext_మొత్తం = 0;
+	పూర్ణాంకం		new_పంక్తి_len;
+	char_u	*లెక్క_dest;
 	char_u	*vtext_dest;
-	int		j;
+	పూర్ణాంకం		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	కొరకు (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
-	    mch_memmove(&ep, props + j * sizeof(textprop_T),
-							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
-		vtext_total += ep.tp_len + 1;
+	    mch_memmove(&ep, props + j * పరిమాణం(textprop_T),
+							పరిమాణం(textprop_T));
+	    ఒకవేళ (ep.tp_id < 0 && ep.tp_len > 0)
+		vtext_మొత్తం += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
-	    vtext_total += length + 1;
+	ఒకవేళ (పాఠ్యం_arg != ఖాళీ)
+	    vtext_మొత్తం += నిడివి + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
-			+ vtext_total;
-	newtext = alloc(new_line_len);
-	if (newtext == NULL)
-	    goto theend;
+	new_పంక్తి_len = (పూర్ణాంకం)textlen + (పూర్ణాంకం)PROP_లెక్క_కొలత
+			+ new_propcount * (పూర్ణాంకం)పరిమాణం(textprop_T)
+			+ vtext_మొత్తం;
+	newtext = alloc(new_పంక్తి_len);
+	ఒకవేళ (newtext == ఖాళీ)
+	    వెళ్ళు theend;
 
 	// Copy line text.
-	mch_memmove(newtext, buf->b_ml.ml_line_ptr, textlen);
+	mch_memmove(newtext, buf->b_ml.ml_పంక్తి_ptr, textlen);
 
 	// Write prop_count.
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &new_propcount, PROP_COUNT_SIZE);
+	లెక్క_dest = newtext + textlen;
+	mch_memmove(లెక్క_dest, &new_propcount, PROP_లెక్క_కొలత);
 
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
-	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
-	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
+	newprops = లెక్క_dest + PROP_లెక్క_కొలత;
+	ఒకవేళ (i > 0)
+	    mch_memmove(newprops, props, పరిమాణం(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
-	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
-					props + i * sizeof(textprop_T),
-					sizeof(textprop_T) * (proplen - i));
+	ఒకవేళ (i < proplen)
+	    mch_memmove(newprops + (i + 1) * పరిమాణం(textprop_T),
+					props + i * పరిమాణం(textprop_T),
+					పరిమాణం(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
-	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	vtext_dest = newprops + new_propcount * పరిమాణం(textprop_T);
+	కొరకు (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
-		continue;  // handle new prop separately below
-	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
-		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    ఒకవేళ (j == i)
+		కొనసాగు;  // handle new prop separately below
+	    mch_memmove(&ep, newprops + j * పరిమాణం(textprop_T),
+		    పరిమాణం(textprop_T));
+	    ఒకవేళ (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
-		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
-		char_u *old_vtext = old_count + ep.u.tp_text_offset;
+		char_u *old_లెక్క_2 = (char_u *)props - PROP_లెక్క_కొలత;
+		char_u *old_vtext = old_లెక్క_2 + ep.u.tp_పాఠ్యం_స్థానభ్రంశం;
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
-		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
-		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
-			sizeof(textprop_T));
+		ep.u.tp_పాఠ్యం_స్థానభ్రంశం = (colnr_T)(vtext_dest - లెక్క_dest);
+		mch_memmove(newprops + j * పరిమాణం(textprop_T), &ep,
+			పరిమాణం(textprop_T));
 		vtext_dest += ep.tp_len + 1;
 	    }
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	ఒకవేళ (పాఠ్యం_arg != ఖాళీ)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    పూర్ణాంకం copysize = tmp_prop.tp_len + 1;
 
-	    mch_memmove(vtext_dest, text_arg, copysize);
-	    tmp_prop.u.tp_text_offset =
-				    (colnr_T)(vtext_dest - count_dest);
+	    mch_memmove(vtext_dest, పాఠ్యం_arg, copysize);
+	    tmp_prop.u.tp_పాఠ్యం_స్థానభ్రంశం =
+				    (colnr_T)(vtext_dest - లెక్క_dest);
 	    vtext_dest += copysize;
 	}
-	else
-	    tmp_prop.u.tp_text_offset = 0;
+	లేకపోతే
+	    tmp_prop.u.tp_పాఠ్యం_స్థానభ్రంశం = 0;
 
-	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
-							sizeof(textprop_T));
+	mch_memmove(newprops + i * పరిమాణం(textprop_T), &tmp_prop,
+							పరిమాణం(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(buf->b_ml.ml_line_ptr);
-	buf->b_ml.ml_line_ptr = newtext;
-	buf->b_ml.ml_line_len = new_line_len;
-	buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	ఒకవేళ (buf->b_ml.ml_flags & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+	    vim_free(buf->b_ml.ml_పంక్తి_ptr);
+	buf->b_ml.ml_పంక్తి_ptr = newtext;
+	buf->b_ml.ml_పంక్తి_len = new_పంక్తి_len;
+	buf->b_ml.ml_flags |= ML_పంక్తి_DIRTY;
     }
 
-    changed_line_display_buf(buf);
-    changed_lines_buf(buf, start_lnum, end_lnum + 1, 0);
+    మారింది_పంక్తి_display_buf(buf);
+    మారింది_పంక్తులు_buf(buf, ప్రారంభం_lnum, చివర_lnum + 1, 0);
     res = OK;
 
 theend:
-    vim_free(text);
-    return res;
+    vim_free(పాఠ్యం);
+    తిరిగి res;
 }
 
 /*
@@ -937,102 +937,102 @@ theend:
  * Second argument is a List where each item is a List with the following
  * entries: [lnum, start_col, end_col]
  */
-    void
-f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_prop_కూడు_list(typval_T *argvars, typval_T *rettv వాడని)
 {
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    పూర్ణాంకం		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
-    linenr_T	start_lnum;
-    colnr_T	start_col;
-    linenr_T	end_lnum;
-    colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    linenr_T	ప్రారంభం_lnum;
+    colnr_T	ప్రారంభం_నిలువు;
+    linenr_T	చివర_lnum;
+    colnr_T	చివర_నిలువు;
+    పూర్ణాంకం		error = FALSE;
+    పూర్ణాంకం		prev_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	తిరిగి;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    ఒకవేళ (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	తిరిగి;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    ఒకవేళ (dict == ఖాళీ || !dict_has_కీలకం(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	తిరిగి;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    ఒకవేళ (dict_has_కీలకం(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_సంఖ్య(dict, "id");
+	ఒకవేళ (x > గరిష్ఠ_పూర్ణాంకం || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    తిరిగి;
 	}
-	id = (int)x;
+	id = (పూర్ణాంకం)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    ఒకవేళ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	తిరిగి;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
     // to be correctly set.
     buf->b_has_textprop = true;  // this is never reset
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_వస్తువులు(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	ఒకవేళ (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == ఖాళీ)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    తిరిగి;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
-	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
-	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
-	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
-	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
-	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
-		  || end_lnum <= 0 || end_col <= 0)
+	ప్రారంభం_lnum = list_కనుగొను_nr(pos_list, 0L, &error);
+	ఒకవేళ (!error)
+	    ప్రారంభం_నిలువు = list_కనుగొను_nr(pos_list, 1L, &error);
+	ఒకవేళ (!error)
+	    చివర_lnum = list_కనుగొను_nr(pos_list, 2L, &error);
+	ఒకవేళ (!error)
+	    చివర_నిలువు = list_కనుగొను_nr(pos_list, 3L, &error);
+	పూర్ణాంకం this_id = id;
+	ఒకవేళ (!error && pos_list->lv_len > 4)
+	    this_id = list_కనుగొను_nr(pos_list, 4L, &error);
+	ఒకవేళ (error || ప్రారంభం_lnum <= 0 || ప్రారంభం_నిలువు <= 0
+		  || చివర_lnum <= 0 || చివర_నిలువు <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
-		emsg(_(e_invalid_argument));
-	    return;
+	    ఒకవేళ (prev_did_emsg == did_emsg)
+		emsg(_(e_invalid_వాదం));
+	    తిరిగి;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
-			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	ఒకవేళ (prop_కూడు_one(buf, type_name, this_id, ఖాళీ, 0, 0,
+			     ప్రారంభం_lnum, చివర_lnum, ప్రారంభం_నిలువు, చివర_నిలువు) == FAIL)
+	    తిరిగి;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+స్థిర పూర్ణాంకం vt_id_counter = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
-get_textprop_id(void)
+    స్థిర పూర్ణాంకం
+get_textprop_id(శూన్య)
 {
-    if (vt_id_counter > 0)
+    ఒకవేళ (vt_id_counter > 0)
 	vt_id_counter = 0;
-    return --vt_id_counter;
+    తిరిగి --vt_id_counter;
 }
 
 /*
@@ -1041,168 +1041,168 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
-prop_add_common(
-	linenr_T    start_lnum,
-	colnr_T	    start_col,
+    పూర్ణాంకం
+prop_కూడు_common(
+	linenr_T    ప్రారంభం_lnum,
+	colnr_T	    ప్రారంభం_నిలువు,
 	dict_T	    *dict,
 	buf_T	    *default_buf,
 	typval_T    *dict_arg)
 {
-    linenr_T	end_lnum;
-    colnr_T	end_col;
+    linenr_T	చివర_lnum;
+    colnr_T	చివర_నిలువు;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
-    char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    పూర్ణాంకం		id = 0;
+    char_u	*పాఠ్యం = ఖాళీ;
+    పూర్ణాంకం		పాఠ్యం_padding_ఎడమ = 0;
+    పూర్ణాంకం		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    ఒకవేళ (dict == ఖాళీ || !dict_has_కీలకం(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	goto theend;
+	వెళ్ళు theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    ఒకవేళ (dict_has_కీలకం(dict, "end_lnum"))
     {
-	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	చివర_lnum = dict_get_సంఖ్య(dict, "end_lnum");
+	ఒకవేళ (చివర_lnum < ప్రారంభం_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	    goto theend;
+	    semsg(_(e_invalid_విలువ_for_వాదం_str), "end_lnum");
+	    వెళ్ళు theend;
 	}
     }
-    else
-	end_lnum = start_lnum;
+    లేకపోతే
+	చివర_lnum = ప్రారంభం_lnum;
 
-    if (dict_has_key(dict, "length"))
+    ఒకవేళ (dict_has_కీలకం(dict, "length"))
     {
-	long length = dict_get_number(dict, "length");
+	దీర్ఘ నిడివి = dict_get_సంఖ్య(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	ఒకవేళ (నిడివి < 0 || చివర_lnum > ప్రారంభం_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "length");
-	    goto theend;
+	    semsg(_(e_invalid_విలువ_for_వాదం_str), "length");
+	    వెళ్ళు theend;
 	}
-	end_col = start_col + length;
+	చివర_నిలువు = ప్రారంభం_నిలువు + నిడివి;
     }
-    else if (dict_has_key(dict, "end_col"))
+    లేకపోతే ఒకవేళ (dict_has_కీలకం(dict, "end_col"))
     {
-	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	చివర_నిలువు = dict_get_సంఖ్య(dict, "end_col");
+	ఒకవేళ (చివర_నిలువు <= 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_col");
-	    goto theend;
+	    semsg(_(e_invalid_విలువ_for_వాదం_str), "end_col");
+	    వెళ్ళు theend;
 	}
     }
-    else if (start_lnum == end_lnum)
-	end_col = start_col;
-    else
-	end_col = 1;
+    లేకపోతే ఒకవేళ (ప్రారంభం_lnum == చివర_lnum)
+	చివర_నిలువు = ప్రారంభం_నిలువు;
+    లేకపోతే
+	చివర_నిలువు = 1;
 
-    if (dict_has_key(dict, "id"))
+    ఒకవేళ (dict_has_కీలకం(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_సంఖ్య(dict, "id");
+	ఒకవేళ (x > గరిష్ఠ_పూర్ణాంకం || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    goto theend;
+	    వెళ్ళు theend;
 	}
-	id = (int)x;
+	id = (పూర్ణాంకం)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    ఒకవేళ (dict_has_కీలకం(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
-		|| dict_has_key(dict, "end_col")
-		|| dict_has_key(dict, "end_lnum"))
+	ఒకవేళ (dict_has_కీలకం(dict, "length")
+		|| dict_has_కీలకం(dict, "end_col")
+		|| dict_has_కీలకం(dict, "end_lnum"))
 	{
-	    emsg(_(e_cannot_use_length_endcol_and_endlnum_with_text));
-	    goto theend;
+	    emsg(_(e_cannot_use_నిడివి_endcol_and_endlnum_with_పాఠ్యం));
+	    వెళ్ళు theend;
 	}
 
-	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
-	    goto theend;
+	పాఠ్యం = dict_get_string(dict, "text", TRUE);
+	ఒకవేళ (పాఠ్యం == ఖాళీ)
+	    వెళ్ళు theend;
 	// use a default length of 1 to make multiple props show up
-	end_col = start_col + 1;
+	చివర_నిలువు = ప్రారంభం_నిలువు + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	ఒకవేళ (dict_has_కీలకం(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (start_col != 0)
+	    ఒకవేళ (p == ఖాళీ)
+		వెళ్ళు theend;
+	    ఒకవేళ (ప్రారంభం_నిలువు != 0)
 	    {
-		emsg(_(e_can_only_use_text_align_when_column_is_zero));
-		goto theend;
+		emsg(_(e_can_only_use_పాఠ్యం_align_when_స్తంభం_is_zero));
+		వెళ్ళు theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
-		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    ఒకవేళ (STRCMP(p, "right") == 0)
+		flags |= TP_FLAG_ALIGN_కుడి;
+	    లేకపోతే ఒకవేళ (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
-		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    లేకపోతే ఒకవేళ (STRCMP(p, "below") == 0)
+		flags |= TP_FLAG_ALIGN_క్రింద;
+	    లేకపోతే ఒకవేళ (STRCMP(p, "after") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
-		goto theend;
+		semsg(_(e_invalid_విలువ_for_వాదం_str_str), "text_align", p);
+		వెళ్ళు theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	ఒకవేళ (dict_has_కీలకం(dict, "text_padding_left"))
 	{
-	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    పాఠ్యం_padding_ఎడమ = dict_get_సంఖ్య(dict, "text_padding_left");
+	    ఒకవేళ (పాఠ్యం_padding_ఎడమ < 0)
 	    {
-		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
-		goto theend;
+		semsg(_(e_వాదం_must_be_ధనాత్మక_str), "text_padding_left");
+		వెళ్ళు theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	ఒకవేళ (dict_has_కీలకం(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    ఒకవేళ (p == ఖాళీ)
+		వెళ్ళు theend;
+	    ఒకవేళ (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    లేకపోతే ఒకవేళ (STRCMP(p, "truncate") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
-		goto theend;
+		semsg(_(e_invalid_విలువ_for_వాదం_str_str), "text_wrap", p);
+		వెళ్ళు theend;
 	    }
 	}
     }
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    ఒకవేళ (ప్రారంభం_నిలువు < (పాఠ్యం == ఖాళీ ? 1 : 0))
     {
-	semsg(_(e_invalid_column_number_nr), (long)start_col);
-	goto theend;
+	semsg(_(e_invalid_స్తంభం_సంఖ్య_nr), (దీర్ఘ)ప్రారంభం_నిలువు);
+	వెళ్ళు theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    ఒకవేళ (ప్రారంభం_నిలువు > 0 && పాఠ్యం_padding_ఎడమ > 0)
     {
-	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
-	goto theend;
+	emsg(_(e_can_only_use_ఎడమ_padding_when_స్తంభం_is_zero));
+	వెళ్ళు theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
-	goto theend;
+    ఒకవేళ (dict_arg != ఖాళీ && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+	వెళ్ళు theend;
 
-    if (text != NULL)
+    ఒకవేళ (పాఠ్యం != ఖాళీ)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    లేకపోతే ఒకవేళ (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
-	goto theend;
+	వెళ్ళు theend;
     }
 
     // This must be done _before_ we add the property because property changes
@@ -1210,15 +1210,15 @@ prop_add_common(
     // correctly set.
     buf->b_has_textprop = true;  // this is never reset
 
-    prop_add_one(buf, type_name, id, text, text_padding_left, flags,
-				    start_lnum, end_lnum, start_col, end_col);
-    text = NULL;
+    prop_కూడు_one(buf, type_name, id, పాఠ్యం, పాఠ్యం_padding_ఎడమ, flags,
+				    ప్రారంభం_lnum, చివర_lnum, ప్రారంభం_నిలువు, చివర_నిలువు);
+    పాఠ్యం = ఖాళీ;
 
     redraw_buf_later(buf, UPD_VALID);
 
 theend:
-    vim_free(text);
-    return id;
+    vim_free(పాఠ్యం);
+    తిరిగి id;
 }
 
 /*
@@ -1227,48 +1227,48 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    పూర్ణాంకం
+get_పాఠ్యం_props(buf_T *buf, linenr_T lnum, char_u **props, పూర్ణాంకం will_change)
 {
-    char_u	*text;
+    char_u	*పాఠ్యం;
     size_t	textlen;
     size_t	propdata_len;
-    uint16_t	prop_count;
+    uint16_t	prop_లెక్క;
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    ఒకవేళ ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == ఖాళీ)
+	తిరిగి 0;
 
     // Fetch the line to get the ml_line_len field updated.
-    text = ml_get_buf(buf, lnum, will_change);
+    పాఠ్యం = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
-    propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    propdata_len = buf->b_ml.ml_పంక్తి_len - textlen;
+    ఒకవేళ (propdata_len == 0)
+	తిరిగి 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    ఒకవేళ (propdata_len < PROP_లెక్క_కొలత + పరిమాణం(textprop_T))
     {
-	emsg(e_text_property_info_corrupted);
-	return 0;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	తిరిగి 0;
     }
-    mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_లెక్క, పాఠ్యం + textlen, PROP_లెక్క_కొలత);
+    ఒకవేళ (!పాఠ్యం_prop_లెక్క_valid(prop_లెక్క, propdata_len))
     {
-	emsg(e_text_property_info_corrupted);
-	return 0;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	తిరిగి 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    ఒకవేళ (!పాఠ్యం_prop_vtext_valid(పాఠ్యం + textlen + PROP_లెక్క_కొలత,
+					   (పూర్ణాంకం)prop_లెక్క, propdata_len))
     {
-	emsg(e_text_property_info_corrupted);
-	return 0;
+	emsg(e_పాఠ్యం_property_info_corrupted);
+	తిరిగి 0;
     }
-    *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    *props = పాఠ్యం + textlen + PROP_లెక్క_కొలత;
+    తిరిగి (పూర్ణాంకం)prop_లెక్క;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
-prop_count_above_below(buf_T *buf, linenr_T lnum)
+    పూర్ణాంకం
+prop_లెక్క_above_క్రింద(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    పూర్ణాంకం		లెక్క = get_పాఠ్యం_props(buf, lnum, &props, FALSE);
+    పూర్ణాంకం		ఫలితం = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		తదుపరి_కుడి_goes_క్రింద = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    ఒకవేళ (లెక్క == 0)
+	తిరిగి 0;
+    కొరకు (i = 0; i < లెక్క; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	mch_memmove(&prop, props + i * పరిమాణం(prop), పరిమాణం(prop));
+	ఒకవేళ (prop.tp_నిలువు == MAXCOL && పాఠ్యం_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
-		    || (next_right_goes_below
-				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
+	    ఒకవేళ ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_క్రింద))
+		    || (తదుపరి_కుడి_goes_క్రింద
+				     && (prop.tp_flags & TP_FLAG_ALIGN_కుడి)))
 	    {
-		++result;
+		++ఫలితం;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
-		next_right_goes_below = TRUE;
+	    లేకపోతే ఒకవేళ (prop.tp_flags & TP_FLAG_ALIGN_కుడి)
+		తదుపరి_కుడి_goes_క్రింద = TRUE;
 	}
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /**
@@ -1313,44 +1313,44 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    పూర్ణాంకం
+లెక్క_props(linenr_T lnum, పూర్ణాంకం only_starting, పూర్ణాంకం చివరి_పంక్తి)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    పూర్ణాంకం		proplen = get_పాఠ్యం_props(curbuf, lnum, &props, 0);
+    పూర్ణాంకం		ఫలితం = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < proplen; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
+	mch_memmove(&prop, props + i * పరిమాణం(prop), పరిమాణం(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
-		|| (!last_line && prop.tp_col == MAXCOL))
-	    --result;
+	ఒకవేళ ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
+		|| (!చివరి_పంక్తి && prop.tp_నిలువు == MAXCOL))
+	    --ఫలితం;
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
-static textprop_T	*text_prop_compare_props;
-static buf_T		*text_prop_compare_buf;
+స్థిర textprop_T	*పాఠ్యం_prop_compare_props;
+స్థిర buf_T		*పాఠ్యం_prop_compare_buf;
 
 /*
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    స్థిర పూర్ణాంకం
+పాఠ్యం_prop_క్రమం(పూర్ణాంకం flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    ఒకవేళ (flags & TP_FLAG_ALIGN_ABOVE)
+	తిరిగి 0;
+    ఒకవేళ (flags & TP_FLAG_ALIGN_కుడి)
+	తిరిగి 2;
+    ఒకవేళ (flags & TP_FLAG_ALIGN_క్రింద)
+	తిరిగి 3;
+    తిరిగి 1;
 }
 
 /*
@@ -1358,73 +1358,73 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
-text_prop_compare(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+పాఠ్యం_prop_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
-    int  idx1, idx2;
+    పూర్ణాంకం  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
-    tp1 = &text_prop_compare_props[idx1];
-    tp2 = &text_prop_compare_props[idx2];
-    col1 = tp1->tp_col;
-    col2 = tp2->tp_col;
+    idx1 = *(పూర్ణాంకం *)s1;
+    idx2 = *(పూర్ణాంకం *)s2;
+    tp1 = &పాఠ్యం_prop_compare_props[idx1];
+    tp2 = &పాఠ్యం_prop_compare_props[idx2];
+    col1 = tp1->tp_నిలువు;
+    col2 = tp2->tp_నిలువు;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    ఒకవేళ ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	తిరిగి tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    ఒకవేళ (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	పూర్ణాంకం order1 = పాఠ్యం_prop_క్రమం(tp1->tp_flags);
+	పూర్ణాంకం order2 = పాఠ్యం_prop_క్రమం(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	ఒకవేళ (order1 != order2)
+	    తిరిగి order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
-    pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
-    pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    pt1 = పాఠ్యం_prop_type_by_id(పాఠ్యం_prop_compare_buf, tp1->tp_type);
+    pt2 = పాఠ్యం_prop_type_by_id(పాఠ్యం_prop_compare_buf, tp2->tp_type);
+    ఒకవేళ (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	ఒకవేళ (pt1 == ఖాళీ)
+	    తిరిగి -1;
+	ఒకవేళ (pt2 == ఖాళీ)
+	    తిరిగి 1;
+	ఒకవేళ (pt1->pt_ప్రాధాన్యత != pt2->pt_ప్రాధాన్యత)
+	    తిరిగి pt1->pt_ప్రాధాన్యత > pt2->pt_ప్రాధాన్యత ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    ఒకవేళ (col1 != col2)
+	తిరిగి col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    ఒకవేళ (tp1->tp_id < 0)
+	తిరిగి tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Sort "count" text properties using an array if indexes "idxs" into the list
  * of text props "props" for buffer "buf".
  */
-    void
-sort_text_props(
+    శూన్య
+క్రమీకరించు_పాఠ్యం_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	పూర్ణాంకం	    *idxs,
+	పూర్ణాంకం	    లెక్క)
 {
-    text_prop_compare_buf = buf;
-    text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    పాఠ్యం_prop_compare_buf = buf;
+    పాఠ్యం_prop_compare_props = props;
+    qsort((శూన్య *)idxs, (size_t)లెక్క, పరిమాణం(పూర్ణాంకం), పాఠ్యం_prop_compare);
 }
 
 /*
@@ -1432,39 +1432,39 @@ sort_text_props(
  * "wp"'s buffer.  Match "id" when it is > 0.  Returns false when not found.
  */
     bool
-find_prop_in_lines(
+కనుగొను_prop_లోపల_పంక్తులు(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	పూర్ణాంకం	    type_id,
+	పూర్ణాంకం	    id,
 	textprop_T  *prop,
-	linenr_T    *found_lnum,
-	linenr_T    first_lnum,
-	linenr_T    last_lnum)
+	linenr_T    *దొరికింది_lnum,
+	linenr_T    మొదటి_lnum,
+	linenr_T    చివరి_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    ఒకవేళ (పాఠ్యం_prop_type_by_id(wp->w_బఫరు, type_id) == ఖాళీ)
+	తిరిగి false;
 
-    if (first_lnum < 1)
-	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
-	last_lnum = wp->w_buffer->b_ml.ml_line_count;
+    ఒకవేళ (మొదటి_lnum < 1)
+	మొదటి_lnum = 1;
+    ఒకవేళ (చివరి_lnum > wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
+	చివరి_lnum = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    కొరకు (linenr_T lnum = మొదటి_lnum; lnum <= చివరి_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	పూర్ణాంకం	లెక్క = get_పాఠ్యం_props(wp->w_బఫరు, lnum, &props, FALSE);
+	కొరకు (పూర్ణాంకం i = 0; i < లెక్క; ++i)
 	{
-	    mch_memmove(prop, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    mch_memmove(prop, props + i * పరిమాణం(textprop_T),
+							   పరిమాణం(textprop_T));
+	    ఒకవేళ (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
-		*found_lnum = lnum;
-		return true;
+		*దొరికింది_lnum = lnum;
+		తిరిగి true;
 	    }
 	}
     }
-    return false;
+    తిరిగి false;
 }
 
 /*
@@ -1473,16 +1473,16 @@ find_prop_in_lines(
  * Returns false when not found.
  */
     bool
-find_visible_prop(
+కనుగొను_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	పూర్ణాంకం	    type_id,
+	పూర్ణాంకం	    id,
 	textprop_T  *prop,
-	linenr_T    *found_lnum)
+	linenr_T    *దొరికింది_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    తిరిగి కనుగొను_prop_లోపల_పంక్తులు(wp, type_id, id, prop, దొరికింది_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1493,82 +1493,82 @@ find_visible_prop(
  * For virtual text props, u.tp_text must point to the vtext string.
  * Only works for the current buffer.
  */
-    static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+    స్థిర శూన్య
+సమితి_పాఠ్యం_props(linenr_T lnum, textprop_T *tps, పూర్ణాంకం లెక్క)
 {
-    char_u  *text;
+    char_u  *పాఠ్యం;
     char_u  *newtext;
-    int	    textlen;
+    పూర్ణాంకం	    textlen;
 
-    text = ml_get(lnum);
+    పాఠ్యం = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    ఒకవేళ (లెక్క == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
-	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = textlen;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	ఒకవేళ (newtext == ఖాళీ)
+	    తిరిగి;
+	mch_memmove(newtext, పాఠ్యం, textlen);
+	ఒకవేళ (curbuf->b_ml.ml_flags & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_పంక్తి_ptr);
+	curbuf->b_ml.ml_పంక్తి_ptr = newtext;
+	curbuf->b_ml.ml_పంక్తి_len = textlen;
+	curbuf->b_ml.ml_flags |= ML_పంక్తి_DIRTY;
     }
-    else
+    లేకపోతే
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
-	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
-	char_u	    *count_dest;
+	uint16_t    prop_లెక్క = (uint16_t)లెక్క;
+	పూర్ణాంకం	    vtext_కొలత = 0;
+	పూర్ణాంకం	    మొత్తం_len;
+	char_u	    *లెక్క_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	పూర్ణాంకం	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
-		vtext_size += tps[i].tp_len + 1;
+	కొరకు (i = 0; i < లెక్క; ++i)
+	    ఒకవేళ (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+		vtext_కొలత += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
-	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
-	mch_memmove(newtext, text, textlen);
+	మొత్తం_len = textlen + (పూర్ణాంకం)PROP_లెక్క_కొలత
+		    + లెక్క * (పూర్ణాంకం)పరిమాణం(textprop_T) + vtext_కొలత;
+	newtext = alloc(మొత్తం_len);
+	ఒకవేళ (newtext == ఖాళీ)
+	    తిరిగి;
+	mch_memmove(newtext, పాఠ్యం, textlen);
 
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
+	లెక్క_dest = newtext + textlen;
+	mch_memmove(లెక్క_dest, &prop_లెక్క, PROP_లెక్క_కొలత);
 
-	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	prop_dest = లెక్క_dest + PROP_లెక్క_కొలత;
+	vtext_dest = prop_dest + లెక్క * పరిమాణం(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	కొరకు (i = 0; i < లెక్క; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    ఒకవేళ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		పూర్ణాంకం copysize = prop.tp_len + 1;
 
-		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-		vim_free(tps[i].u.tp_text);
-		tps[i].u.tp_text = NULL;
-		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		mch_memmove(vtext_dest, prop.u.tp_పాఠ్యం, copysize);
+		vim_free(tps[i].u.tp_పాఠ్యం);
+		tps[i].u.tp_పాఠ్యం = ఖాళీ;
+		prop.u.tp_పాఠ్యం_స్థానభ్రంశం = (colnr_T)(vtext_dest - లెక్క_dest);
 		vtext_dest += copysize;
 	    }
-	    else
-		prop.u.tp_text_offset = 0;
-	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	    prop_dest += sizeof(textprop_T);
+	    లేకపోతే
+		prop.u.tp_పాఠ్యం_స్థానభ్రంశం = 0;
+	    mch_memmove(prop_dest, &prop, పరిమాణం(textprop_T));
+	    prop_dest += పరిమాణం(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = total_len;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	ఒకవేళ (curbuf->b_ml.ml_flags & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_పంక్తి_ptr);
+	curbuf->b_ml.ml_పంక్తి_ptr = newtext;
+	curbuf->b_ml.ml_పంక్తి_len = మొత్తం_len;
+	curbuf->b_ml.ml_flags |= ML_పంక్తి_DIRTY;
     }
 }
 
@@ -1583,105 +1583,105 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_కూడు_లెక్క_శీర్షిక(char_u *పంక్తి, పూర్ణాంకం పంక్తి_len, పూర్ణాంకం textlen, పూర్ణాంకం *new_len)
 {
-    int		prop_bytes = line_len - textlen;
-    uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    పూర్ణాంకం		prop_బైట్లు = పంక్తి_len - textlen;
+    uint16_t	prop_లెక్క;
+    పూర్ణాంకం		vtext_కొలత = 0;
+    పూర్ణాంకం		మొత్తం;
     char_u	*newline;
-    char_u	*count_dest;
+    char_u	*లెక్క_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    ఒకవేళ (prop_బైట్లు <= 0 || prop_బైట్లు % పరిమాణం(textprop_T) != 0)
     {
-	*new_len = line_len;
-	return NULL;
+	*new_len = పంక్తి_len;
+	తిరిగి ఖాళీ;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_లెక్క = (uint16_t)(prop_బైట్లు / పరిమాణం(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)prop_లెక్క; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
-	    vtext_size += prop.tp_len + 1;
+	mch_memmove(&prop, పంక్తి + textlen + i * పరిమాణం(textprop_T),
+							పరిమాణం(textprop_T));
+	ఒకవేళ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    vtext_కొలత += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
-    newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
-    *new_len = total;
+    మొత్తం = textlen + (పూర్ణాంకం)PROP_లెక్క_కొలత + prop_బైట్లు + vtext_కొలత;
+    newline = alloc(మొత్తం);
+    ఒకవేళ (newline == ఖాళీ)
+	తిరిగి ఖాళీ;
+    *new_len = మొత్తం;
 
-    mch_memmove(newline, line, textlen);
-    count_dest = newline + textlen;
-    mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + prop_bytes;
+    mch_memmove(newline, పంక్తి, textlen);
+    లెక్క_dest = newline + textlen;
+    mch_memmove(లెక్క_dest, &prop_లెక్క, PROP_లెక్క_కొలత);
+    prop_dest = లెక్క_dest + PROP_లెక్క_కొలత;
+    vtext_dest = prop_dest + prop_బైట్లు;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)prop_లెక్క; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, పంక్తి + textlen + i * పరిమాణం(textprop_T),
+							పరిమాణం(textprop_T));
+	ఒకవేళ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    పూర్ణాంకం copysize = prop.tp_len + 1;
 
-	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    vim_free(prop.u.tp_text);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    mch_memmove(vtext_dest, prop.u.tp_పాఠ్యం, copysize);
+	    vim_free(prop.u.tp_పాఠ్యం);
+	    prop.u.tp_పాఠ్యం_స్థానభ్రంశం = (colnr_T)(vtext_dest - లెక్క_dest);
 	    vtext_dest += copysize;
 	}
-	else
-	    prop.u.tp_text_offset = 0;
-	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
-							sizeof(textprop_T));
+	లేకపోతే
+	    prop.u.tp_పాఠ్యం_స్థానభ్రంశం = 0;
+	mch_memmove(prop_dest + i * పరిమాణం(textprop_T), &prop,
+							పరిమాణం(textprop_T));
     }
-    return newline;
+    తిరిగి newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
-    void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+    శూన్య
+కూడు_పాఠ్యం_props(linenr_T lnum, textprop_T *పాఠ్యం_props, పూర్ణాంకం పాఠ్యం_prop_లెక్క)
 {
     unpacked_memline_T	um;
-    int			i;
+    పూర్ణాంకం			i;
 
-    um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    um = um_open_at(curbuf, lnum, పాఠ్యం_prop_లెక్క);
+    ఒకవేళ (um.buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	తిరిగి;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    ఒకవేళ (um.prop_లెక్క + పాఠ్యం_prop_లెక్క > um.prop_కొలత)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+		(um.prop_లెక్క + పాఠ్యం_prop_లెక్క) * పరిమాణం(textprop_T));
+	ఒకవేళ (newprops == ఖాళీ)
 	{
 	    um_abort(&um);
-	    return;
+	    తిరిగి;
 	}
 	um.props = newprops;
-	um.prop_size = um.prop_count + text_prop_count;
+	um.prop_కొలత = um.prop_లెక్క + పాఠ్యం_prop_లెక్క;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
-	um.props[um.prop_count++] = text_props[i];
+    కొరకు (i = 0; i < పాఠ్యం_prop_లెక్క; ++i)
+	um.props[um.prop_లెక్క++] = పాఠ్యం_props[i];
 
     um_close(&um);
 }
@@ -1689,120 +1689,120 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
-compare_pt(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+compare_pt(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    తిరిగి tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
-    static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+    స్థిర proptype_T *
+కనుగొను_type_by_id(hashtab_T *ht, proptype_T ***array, పూర్ణాంకం id)
 {
-    int low = 0;
-    int high;
+    పూర్ణాంకం దిగువ = 0;
+    పూర్ణాంకం ఎగువ;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    ఒకవేళ (ht == ఖాళీ || ht->ht_వాడిన == 0)
+	తిరిగి ఖాళీ;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    ఒకవేళ (*array == ఖాళీ)
     {
-	long	    todo;
+	దీర్ఘ	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	పూర్ణాంకం	    i = 0;
 
-	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
-	todo = (long)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	*array = ALLOC_MULT(proptype_T *, ht->ht_వాడిన);
+	ఒకవేళ (*array == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	todo = (దీర్ఘ)ht->ht_వాడిన;
+	FOR_ALL_HASHTAB_వస్తువులు(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
 	    }
 	}
-	qsort((void *)*array, ht->ht_used, sizeof(proptype_T *), compare_pt);
+	qsort((శూన్య *)*array, ht->ht_వాడిన, పరిమాణం(proptype_T *), compare_pt);
     }
 
     // binary search in the sorted array
-    high = ht->ht_used;
-    while (high > low)
+    ఎగువ = ht->ht_వాడిన;
+    అయితే (ఎగువ > దిగువ)
     {
-	int m = (high + low) / 2;
+	పూర్ణాంకం m = (ఎగువ + దిగువ) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
-	    high = m;
-	else
-	    low = m + 1;
+	ఒకవేళ ((*array)[m]->pt_id == id)
+	    తిరిగి (*array)[m];
+	ఒకవేళ ((*array)[m]->pt_id > id)
+	    ఎగువ = m;
+	లేకపోతే
+	    దిగువ = m + 1;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Fill 'dict' with text properties in 'prop'.
  */
-    static void
+    స్థిర శూన్య
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    పూర్ణాంకం buflocal = TRUE;
+    పూర్ణాంకం virtualtext_prop = prop->tp_id < 0;
 
-    dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    dict_కూడు_సంఖ్య(dict, "col", (prop->tp_నిలువు == MAXCOL) ? 0 : prop->tp_నిలువు);
+    ఒకవేళ (!virtualtext_prop)
     {
-	dict_add_number(dict, "length", prop->tp_len);
-	dict_add_number(dict, "id", prop->tp_id);
+	dict_కూడు_సంఖ్య(dict, "length", prop->tp_len);
+	dict_కూడు_సంఖ్య(dict, "id", prop->tp_id);
     }
-    dict_add_number(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
-    dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
+    dict_కూడు_సంఖ్య(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
+    dict_కూడు_సంఖ్య(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_తదుపరి));
 
-    pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    pt = కనుగొను_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
+    ఒకవేళ (pt == ఖాళీ)
     {
-	pt = find_type_by_id(global_proptypes, &global_proparray,
+	pt = కనుగొను_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
-	dict_add_string(dict, "type", pt->pt_name);
+    ఒకవేళ (pt != ఖాళీ)
+	dict_కూడు_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
-	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
-	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    ఒకవేళ (buflocal)
+	dict_కూడు_సంఖ్య(dict, "type_bufnr", buf->b_fnum);
+    లేకపోతే
+	dict_కూడు_సంఖ్య(dict, "type_bufnr", 0);
+    ఒకవేళ (virtualtext_prop)
     {
-	string_T    text_align = {NULL, 0};
+	string_T    పాఠ్యం_align = {ఖాళీ, 0};
 
 	// virtual text property - u.tp_text must be set by caller
-	dict_add_string(dict, "text", prop->u.tp_text);
+	dict_కూడు_string(dict, "text", prop->u.tp_పాఠ్యం);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
-	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
-	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
-	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
-	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+	ఒకవేళ (prop->tp_flags & TP_FLAG_ALIGN_కుడి)
+	    STR_LITERAL_సమితి(పాఠ్యం_align, "right");
+	లేకపోతే ఒకవేళ (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	    STR_LITERAL_సమితి(పాఠ్యం_align, "above");
+	లేకపోతే ఒకవేళ (prop->tp_flags & TP_FLAG_ALIGN_క్రింద)
+	    STR_LITERAL_సమితి(పాఠ్యం_align, "below");
+	ఒకవేళ (పాఠ్యం_align.string != ఖాళీ)
+	    dict_కూడు_string_len(dict, "text_align",
+		పాఠ్యం_align.string, (పూర్ణాంకం)పాఠ్యం_align.నిడివి);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
-	    dict_add_string_len(dict, "text_wrap",
+	ఒకవేళ (prop->tp_flags & TP_FLAG_WRAP)
+	    dict_కూడు_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
-	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
+	ఒకవేళ (prop->tp_padleft != 0)
+	    dict_కూడు_సంఖ్య(dict, "text_padding_left", prop->tp_padleft);
     }
 }
 
@@ -1811,283 +1811,283 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+పాఠ్యం_prop_type_by_id(buf_T *buf, పూర్ణాంకం id)
 {
     proptype_T *type;
 
-    type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
-	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    type = కనుగొను_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
+    ఒకవేళ (type == ఖాళీ)
+	type = కనుగొను_type_by_id(global_proptypes, &global_proparray, id);
+    తిరిగి type;
 }
 
 /*
  * Return true if "prop" is a valid text property type.
  */
     bool
-text_prop_type_valid(buf_T *buf, textprop_T *prop)
+పాఠ్యం_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    తిరిగి పాఠ్యం_prop_type_by_id(buf, prop->tp_type) != ఖాళీ;
 }
 
 /*
  * prop_clear({lnum} [, {lnum_end} [, {bufnr}]])
  */
-    void
-f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_prop_clear(typval_T *argvars, typval_T *rettv వాడని)
 {
-    linenr_T start;
-    linenr_T end;
+    linenr_T ప్రారంభం;
+    linenr_T చివర;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    పూర్ణాంకం	    did_clear = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	తిరిగి;
 
-    start = tv_get_number(&argvars[0]);
-    end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ప్రారంభం = tv_get_సంఖ్య(&argvars[0]);
+    చివర = ప్రారంభం;
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	చివర = tv_get_సంఖ్య(&argvars[1]);
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    ఒకవేళ (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		తిరిగి;
 	}
     }
-    if (start < 1 || end < 1)
+    ఒకవేళ (ప్రారంభం < 1 || చివర < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	తిరిగి;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	కొరకు (lnum = ప్రారంభం; lnum <= చివర; ++lnum)
 	{
-	    int idx;
+	    పూర్ణాంకం idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
-	    if (um.prop_count > 0)
+	    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+		ఆపు;
+	    ఒకవేళ (!um_goto_పంక్తి(&um, lnum, 0))
+		ఆపు;
+	    ఒకవేళ (um.prop_లెక్క > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		కొరకు (idx = um.prop_లెక్క - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    ఒకవేళ (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
 /*
  * prop_find({props} [, {direction}])
  */
-    void
-f_prop_find(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_prop_కనుగొను(typval_T *argvars, typval_T *rettv)
 {
     pos_T       *cursor = &curwin->w_cursor;
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    పూర్ణాంకం		lnum_ప్రారంభం;
+    పూర్ణాంకం		ప్రారంభం_pos_has_prop = 0;
+    పూర్ణాంకం		చూసిన_చివర = FALSE;
+    పూర్ణాంకం		id = 0;
+    పూర్ణాంకం		id_దొరికింది = FALSE;
+    పూర్ణాంకం		type_id = -1;
+    పూర్ణాంకం		skipstart = FALSE;
+    పూర్ణాంకం		lnum = -1;
+    పూర్ణాంకం		నిలువు = -1;
+    పూర్ణాంకం		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    పూర్ణాంకం		both;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    ఒకవేళ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	తిరిగి;
+    ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	ఒకవేళ (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	లేకపోతే ఒకవేళ (*dir_s != 'f')
 	{
-	    emsg(_(e_invalid_argument));
-	    return;
+	    emsg(_(e_invalid_వాదం));
+	    తిరిగి;
 	}
     }
 
-    di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
-	lnum = tv_get_number(&di->di_tv);
+    di = dict_కనుగొను(dict, (char_u *)"lnum", -1);
+    ఒకవేళ (di != ఖాళీ)
+	lnum = tv_get_సంఖ్య(&di->di_tv);
 
-    di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
-	col = tv_get_number(&di->di_tv);
+    di = dict_కనుగొను(dict, (char_u *)"col", -1);
+    ఒకవేళ (di != ఖాళీ)
+	నిలువు = tv_get_సంఖ్య(&di->di_tv);
 
-    if (lnum == -1)
+    ఒకవేళ (lnum == -1)
     {
 	lnum = cursor->lnum;
-	col = cursor->col + 1;
+	నిలువు = cursor->నిలువు + 1;
     }
-    else if (col == -1)
-	col = 1;
+    లేకపోతే ఒకవేళ (నిలువు == -1)
+	నిలువు = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    ఒకవేళ (lnum < 1 || lnum > buf->b_ml.ml_పంక్తి_లెక్క)
     {
 	emsg(_(e_invalid_range));
-	return;
+	తిరిగి;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    ఒకవేళ (dict_has_కీలకం(dict, "id"))
     {
-	id = dict_get_number(dict, "id");
-	id_found = TRUE;
+	id = dict_get_సంఖ్య(dict, "id");
+	id_దొరికింది = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    ఒకవేళ (dict_has_కీలకం(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	ఒకవేళ (type == ఖాళీ)
+	    తిరిగి;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    ఒకవేళ (!id_దొరికింది && type_id == -1)
     {
-	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	emsg(_(e_need_at_కనిష్ఠ_one_యొక్క_id_or_type));
+	తిరిగి;
     }
-    if (both && (!id_found || type_id == -1))
+    ఒకవేళ (both && (!id_దొరికింది || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	తిరిగి;
     }
 
-    lnum_start = lnum;
+    lnum_ప్రారంభం = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_dict_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    while (1)
+    అయితే (1)
     {
-	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	char_u	*prop_ప్రారంభం_ptr;
+	పూర్ణాంకం	లెక్క = get_పాఠ్యం_props(buf, lnum, &prop_ప్రారంభం_ptr, FALSE);
+	పూర్ణాంకం	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	పూర్ణాంకం	    prop_ప్రారంభం;
+	పూర్ణాంకం	    prop_చివర;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	కొరకు (i = dir == BACKWARD ? లెక్క - 1 : 0; i >= 0 && i < లెక్క; i += dir)
 	{
-	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&prop, prop_ప్రారంభం_ptr + i * పరిమాణం(textprop_T),
+							   పరిమాణం(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    ఒకవేళ (prop.tp_id < 0 && prop.u.tp_పాఠ్యం_స్థానభ్రంశం > 0)
 	    {
-		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
-						    + prop.u.tp_text_offset;
+		prop.u.tp_పాఠ్యం = (prop_ప్రారంభం_ptr - PROP_లెక్క_కొలత)
+						    + prop.u.tp_పాఠ్యం_స్థానభ్రంశం;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
-		prop.u.tp_text = NULL;
+	    లేకపోతే
+		prop.u.tp_పాఠ్యం = ఖాళీ;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    ఒకవేళ (lnum == lnum_ప్రారంభం)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
-		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		    && prop.tp_నిలువు == MAXCOL;
+		ఒకవేళ (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
-			continue;
+		    ఒకవేళ (!is_floating_vtext && prop.tp_నిలువు > నిలువు)
+			కొనసాగు;
 		}
-		else if (!is_floating_vtext
-		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
-		    continue;
+		లేకపోతే ఒకవేళ (!is_floating_vtext
+		    && prop.tp_నిలువు + prop.tp_len - (prop.tp_len != 0) < నిలువు)
+		    కొనసాగు;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
-		     : (id_found && prop.tp_id == id)
+	    ఒకవేళ (both ? prop.tp_id == id && prop.tp_type == type_id
+		     : (id_దొరికింది && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
-			&& col >= prop.tp_col
-			&& (col <= prop.tp_col + prop.tp_len
+		ఒకవేళ (lnum_ప్రారంభం == lnum
+			&& నిలువు >= prop.tp_నిలువు
+			&& (నిలువు <= prop.tp_నిలువు + prop.tp_len
 							 - (prop.tp_len != 0)))
-		    start_pos_has_prop = 1;
+		    ప్రారంభం_pos_has_prop = 1;
 
 		// The property was not continued from last line, it starts on
 		// this line.
-		prop_start = !(prop.tp_flags & TP_FLAG_CONT_PREV);
+		prop_ప్రారంభం = !(prop.tp_flags & TP_FLAG_CONT_PREV);
 		// The property does not continue on the next line, it ends on
 		// this line.
-		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
-		    seen_end = 1;
+		prop_చివర = !(prop.tp_flags & TP_FLAG_CONT_తదుపరి);
+		ఒకవేళ (!prop_ప్రారంభం && prop_చివర && dir == FORWARD)
+		    చూసిన_చివర = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		ఒకవేళ (!prop_ప్రారంభం)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    ఒకవేళ (ప్రారంభం_pos_has_prop && !skipstart)
 			dir = BACKWARD;
-		    continue;
+		    కొనసాగు;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		ఒకవేళ (ప్రారంభం_pos_has_prop && skipstart && !చూసిన_చివర)
 		{
-		    start_pos_has_prop = 0;
-		    continue;
+		    ప్రారంభం_pos_has_prop = 0;
+		    కొనసాగు;
 		}
 
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
-		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
+		dict_కూడు_సంఖ్య(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		తిరిగి;
 	    }
 	}
 
-	if (dir > 0)
+	ఒకవేళ (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
-		break;
+	    ఒకవేళ (lnum >= buf->b_ml.ml_పంక్తి_లెక్క)
+		ఆపు;
 	    lnum++;
 	}
-	else
+	లేకపోతే
 	{
-	    if (lnum <= 1)
-		break;
+	    ఒకవేళ (lnum <= 1)
+		ఆపు;
 	    lnum--;
 	}
     }
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    స్థిర పూర్ణాంకం
+prop_type_or_id_లోపల_list(పూర్ణాంకం *types_or_ids, పూర్ణాంకం len, పూర్ణాంకం type_or_id)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    కొరకు (i = 0; i < len; i++)
+	ఒకవేళ (types_or_ids[i] == type_or_id)
+	    తిరిగి TRUE;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -2117,51 +2117,51 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
  * If 'add_lnum' is TRUE, then add the line number also to the text property
  * dictionary.
  */
-    static void
-get_props_in_line(
+    స్థిర శూన్య
+get_props_లోపల_పంక్తి(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	పూర్ణాంకం		*prop_types,
+	పూర్ణాంకం		prop_types_len,
+	పూర్ణాంకం		*prop_ids,
+	పూర్ణాంకం		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	పూర్ణాంకం		కూడు_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    పూర్ణాంకం		లెక్క;
+    పూర్ణాంకం		i;
     textprop_T	prop;
 
-    count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    లెక్క = get_పాఠ్యం_props(buf, lnum, &props, FALSE);
+    కొరకు (i = 0; i < లెక్క; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(textprop_T),
-		sizeof(textprop_T));
+	mch_memmove(&prop, props + i * పరిమాణం(textprop_T),
+		పరిమాణం(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	ఒకవేళ (prop.tp_id < 0 && prop.u.tp_పాఠ్యం_స్థానభ్రంశం > 0)
 	{
-	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
-						+ prop.u.tp_text_offset;
+	    prop.u.tp_పాఠ్యం = (props - PROP_లెక్క_కొలత)
+						+ prop.u.tp_పాఠ్యం_స్థానభ్రంశం;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
-		    || prop_type_or_id_in_list(prop_types, prop_types_len,
+	లేకపోతే
+	    prop.u.tp_పాఠ్యం = ఖాళీ;
+	ఒకవేళ ((prop_types == ఖాళీ
+		    || prop_type_or_id_లోపల_list(prop_types, prop_types_len,
 			prop.tp_type))
-		&& (prop_ids == NULL
-		    || prop_type_or_id_in_list(prop_ids, prop_ids_len,
+		&& (prop_ids == ఖాళీ
+		    || prop_type_or_id_లోపల_list(prop_ids, prop_ids_len,
 								 prop.tp_id)))
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
-		break;
+	    ఒకవేళ (d == ఖాళీ)
+		ఆపు;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
-		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    ఒకవేళ (కూడు_lnum)
+		dict_కూడు_సంఖ్య(d, "lnum", lnum);
+	    ఒకవేళ (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    స్థిర పూర్ణాంకం *
+get_prop_types_from_పేర్లు(list_T *l, buf_T *buf, పూర్ణాంకం *అంకె_types)
 {
-    int		*prop_types;
+    పూర్ణాంకం		*prop_types;
     listitem_T	*li;
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*name;
     proptype_T	*type;
 
-    *num_types = 0;
+    *అంకె_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(పూర్ణాంకం, list_len(l));
+    ఒకవేళ (prop_types == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     i = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	ఒకవేళ (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
-	    goto errret;
+	    వెళ్ళు errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
-	    goto errret;
+	ఒకవేళ (name == ఖాళీ)
+	    వెళ్ళు errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
-	    goto errret;
+	ఒకవేళ (type == ఖాళీ)
+	    వెళ్ళు errret;
 	prop_types[i++] = type->pt_id;
     }
 
-    *num_types = i;
-    return prop_types;
+    *అంకె_types = i;
+    తిరిగి prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -2218,137 +2218,137 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    స్థిర పూర్ణాంకం *
+get_prop_ids_from_list(list_T *l, పూర్ణాంకం *అంకె_ids)
 {
-    int		*prop_ids;
+    పూర్ణాంకం		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    పూర్ణాంకం		i = 0;
+    పూర్ణాంకం		id;
+    పూర్ణాంకం		error;
 
-    *num_ids = 0;
+    *అంకె_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(పూర్ణాంకం, list_len(l));
+    ఒకవేళ (prop_ids == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
 	error = FALSE;
-	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
-	    goto errret;
+	id = tv_get_సంఖ్య_chk(&li->li_tv, &error);
+	ఒకవేళ (error)
+	    వెళ్ళు errret;
 
 	prop_ids[i++] = id;
     }
 
-    *num_ids = i;
-    return prop_ids;
+    *అంకె_ids = i;
+    తిరిగి prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * prop_list({lnum} [, {bufnr}])
  */
-    void
+    శూన్య
 f_prop_list(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
-    linenr_T	start_lnum;
-    linenr_T	end_lnum;
+    linenr_T	ప్రారంభం_lnum;
+    linenr_T	చివర_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    పూర్ణాంకం		కూడు_lnum = FALSE;
+    పూర్ణాంకం		*prop_types = ఖాళీ;
+    పూర్ణాంకం		prop_types_len = 0;
+    పూర్ణాంకం		*prop_ids = ఖాళీ;
+    పూర్ణాంకం		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
     // default: get text properties on current line
-    start_lnum = tv_get_number(&argvars[0]);
-    end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ప్రారంభం_lnum = tv_get_సంఖ్య(&argvars[0]);
+    చివర_lnum = ప్రారంభం_lnum;
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	ఒకవేళ (check_for_dict_arg(argvars, 1) == FAIL)
+	    తిరిగి;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	ఒకవేళ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    తిరిగి;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	ఒకవేళ (d != ఖాళీ && (di = dict_కనుగొను(d, (char_u *)"end_lnum", -1)) != ఖాళీ)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    ఒకవేళ (di->di_tv.v_type != VAR_సంఖ్య)
 	    {
-		emsg(_(e_number_required));
-		return;
+		emsg(_(e_సంఖ్య_required));
+		తిరిగి;
 	    }
-	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    చివర_lnum = tv_get_సంఖ్య(&di->di_tv);
+	    ఒకవేళ (చివర_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
-		// line
-		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
-		end_lnum = buf->b_ml.ml_line_count;
-	    add_lnum = TRUE;
+		//పంక్తి
+		చివర_lnum = buf->b_ml.ml_పంక్తి_లెక్క + చివర_lnum + 1;
+	    లేకపోతే ఒకవేళ (చివర_lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+		చివర_lnum = buf->b_ml.ml_పంక్తి_లెక్క;
+	    కూడు_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	ఒకవేళ (d != ఖాళీ && (di = dict_కనుగొను(d, (char_u *)"types", -1)) != ఖాళీ)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    ఒకవేళ (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		తిరిగి;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    ఒకవేళ (l != ఖాళీ && list_len(l) > 0)
 	    {
-		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		prop_types = get_prop_types_from_పేర్లు(l, buf, &prop_types_len);
+		ఒకవేళ (prop_types == ఖాళీ)
+		    తిరిగి;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	ఒకవేళ (d != ఖాళీ && (di = dict_కనుగొను(d, (char_u *)"ids", -1)) != ఖాళీ)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    ఒకవేళ (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		goto errret;
+		వెళ్ళు errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    ఒకవేళ (l != ఖాళీ && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
-		    goto errret;
+		ఒకవేళ (prop_ids == ఖాళీ)
+		    వెళ్ళు errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
-		|| end_lnum < 1 || end_lnum < start_lnum)
+    ఒకవేళ (ప్రారంభం_lnum < 1 || ప్రారంభం_lnum > buf->b_ml.ml_పంక్తి_లెక్క
+		|| చివర_lnum < 1 || చివర_lnum < ప్రారంభం_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
-	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
+    లేకపోతే
+	కొరకు (lnum = ప్రారంభం_lnum; lnum <= చివర_lnum; lnum++)
+	    get_props_లోపల_పంక్తి(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
-		    rettv->vval.v_list, add_lnum);
+		    rettv->vval.v_list, కూడు_lnum);
 
 errret:
     VIM_CLEAR(prop_types);
@@ -2358,171 +2358,171 @@ errret:
 /*
  * prop_remove({props} [, {lnum} [, {lnum_end}]])
  */
-    void
+    శూన్య
 f_prop_remove(typval_T *argvars, typval_T *rettv)
 {
-    linenr_T	start = 1;
-    linenr_T	end = 0;
+    linenr_T	ప్రారంభం = 1;
+    linenr_T	చివర = 0;
     linenr_T	lnum;
-    linenr_T	first_changed = 0;
-    linenr_T	last_changed = 0;
+    linenr_T	మొదటి_మారింది = 0;
+    linenr_T	చివరి_మారింది = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    పూర్ణాంకం		do_all;
+    పూర్ణాంకం		id = -MAXCOL;
+    పూర్ణాంకం		type_id = -1;	    // for a single "type"
+    పూర్ణాంకం		*type_ids = ఖాళీ;   // array, for a list of "types", allocated
+    పూర్ణాంకం		అంకె_type_ids = 0;   // number of elements in "type_ids"
+    పూర్ణాంకం		both;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_సంఖ్య = 0;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL)))
+	తిరిగి;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number(&argvars[1]);
-	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	ప్రారంభం = tv_get_సంఖ్య(&argvars[1]);
+	చివర = ప్రారంభం;
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
+	    చివర = tv_get_సంఖ్య(&argvars[2]);
+	ఒకవేళ (ప్రారంభం < 1 || చివర < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    తిరిగి;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    ఒకవేళ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	తిరిగి;
+    ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
+	తిరిగి;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
-	id = dict_get_number(dict, "id");
+    ఒకవేళ (dict_has_కీలకం(dict, "id"))
+	id = dict_get_సంఖ్య(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    ఒకవేళ (dict_has_కీలకం(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	ఒకవేళ (type == ఖాళీ)
+	    తిరిగి;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    ఒకవేళ (dict_has_కీలకం(dict, "types"))
     {
 	typval_T types;
-	listitem_T *li = NULL;
+	listitem_T *li = ఖాళీ;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	ఒకవేళ (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( పరిమాణం(పూర్ణాంకం) * types.vval.v_list->lv_len );
 
-	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
+	    FOR_ALL_LIST_వస్తువులు(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
-		    continue;
+		ఒకవేళ (li->li_tv.v_type != VAR_STRING)
+		    కొనసాగు;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
-		    goto cleanup_prop_remove;
+		ఒకవేళ (!prop_type)
+		    వెళ్ళు cleanup_prop_remove;
 
-		type_ids[num_type_ids++] = prop_type->pt_id;
+		type_ids[అంకె_type_ids++] = prop_type->pt_id;
 	    }
 	}
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    ఒకవేళ (id == -MAXCOL && (type_id == -1 && అంకె_type_ids == 0))
     {
-	emsg(_(e_need_at_least_one_of_id_or_type));
-	goto cleanup_prop_remove;
+	emsg(_(e_need_at_కనిష్ఠ_one_యొక్క_id_or_type));
+	వెళ్ళు cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    ఒకవేళ (both && (id == -MAXCOL || (type_id == -1 && అంకె_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	goto cleanup_prop_remove;
+	వెళ్ళు cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    ఒకవేళ (type_id != -1 && అంకె_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
-	goto cleanup_prop_remove;
+	వెళ్ళు cleanup_prop_remove;
     }
 
-    if (end == 0)
-	end = buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == 0)
+	చివర = buf->b_ml.ml_పంక్తి_లెక్క;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	కొరకు (lnum = ప్రారంభం; lnum <= చివర; ++lnum)
 	{
-	    int idx;
+	    పూర్ణాంకం idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
+	    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+		ఆపు;
+	    ఒకవేళ (!um_goto_పంక్తి(&um, lnum, 0))
+		ఆపు;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    కొరకు (idx = 0; idx < um.prop_లెక్క; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		పూర్ణాంకం	    matches_id = 0;
+		పూర్ణాంకం	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
-		    continue;
+		ఒకవేళ (prop->tp_flags & TP_FLAG_DELETED)
+		    కొనసాగు;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		ఒకవేళ (అంకె_type_ids > 0)
 		{
-		    int idx2;
+		    పూర్ణాంకం idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    కొరకు (idx2 = 0; !matches_type && idx2 < అంకె_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		లేకపోతే
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		ఒకవేళ (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
-			first_changed = lnum;
-		    last_changed = lnum;
-		    ++rettv->vval.v_number;
-		    if (!do_all)
-			break;
+		    ఒకవేళ (మొదటి_మారింది == 0)
+			మొదటి_మారింది = lnum;
+		    చివరి_మారింది = lnum;
+		    ++rettv->vval.v_సంఖ్య;
+		    ఒకవేళ (!do_all)
+			ఆపు;
 		}
 	    }
 	}
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    ఒకవేళ (మొదటి_మారింది > 0)
     {
-	changed_line_display_buf(buf);
-	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
+	మారింది_పంక్తి_display_buf(buf);
+	మారింది_పంక్తులు_buf(buf, మొదటి_మారింది, చివరి_మారింది + 1, 0);
 	redraw_buf_later(buf, UPD_VALID);
     }
 
@@ -2533,136 +2533,136 @@ cleanup_prop_remove:
 /*
  * Common for f_prop_type_add() and f_prop_type_change().
  */
-    static void
-prop_type_set(typval_T *argvars, int add)
+    స్థిర శూన్య
+prop_type_సమితి(typval_T *argvars, పూర్ణాంకం కూడు)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
     dict_T	*dict;
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
-	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	semsg(_(e_invalid_వాదం_str), "\"\"");
+	తిరిగి;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    ఒకవేళ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	తిరిగి;
     dict = argvars[1].vval.v_dict;
 
-    prop = find_prop_type(name, buf);
-    if (add)
+    prop = కనుగొను_prop_type(name, buf);
+    ఒకవేళ (కూడు)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	ఒకవేళ (prop != ఖాళీ)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    తిరిగి;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	ఒకవేళ (prop == ఖాళీ)
+	    తిరిగి;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	లేకపోతే
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	ఒకవేళ (*htp == ఖాళీ)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    ఒకవేళ (*htp == ఖాళీ)
 	    {
 		vim_free(prop);
-		return;
+		తిరిగి;
 	    }
 	    hash_init(*htp);
 	}
-	hash_add(*htp, PT2HIKEY(prop), "prop type");
+	hash_కూడు(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    లేకపోతే
     {
-	if (prop == NULL)
+	ఒకవేళ (prop == ఖాళీ)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    తిరిగి;
 	}
     }
 
-    if (dict != NULL)
+    ఒకవేళ (dict != ఖాళీ)
     {
-	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"highlight", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    పూర్ణాంకం		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    ఒకవేళ (highlight != ఖాళీ && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    ఒకవేళ (hl_id <= 0)
 	    {
-		semsg(_(e_unknown_highlight_group_name_str),
-			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+		semsg(_(e_unknown_highlight_సమూహం_name_str),
+			highlight == ఖాళీ ? (char_u *)"" : highlight);
+		తిరిగి;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
-	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"combine", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    ఒకవేళ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    లేకపోతే
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
-	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"override", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    ఒకవేళ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    లేకపోతే
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
-	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
-	    prop->pt_priority = tv_get_number(&di->di_tv);
+	di = dict_కనుగొను(dict, (char_u *)"priority", -1);
+	ఒకవేళ (di != ఖాళీ)
+	    prop->pt_ప్రాధాన్యత = tv_get_సంఖ్య(&di->di_tv);
 
-	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"start_incl", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (tv_get_bool(&di->di_tv))
-		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
-		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
+	    ఒకవేళ (tv_get_bool(&di->di_tv))
+		prop->pt_flags |= PT_FLAG_INS_ప్రారంభం_INCL;
+	    లేకపోతే
+		prop->pt_flags &= ~PT_FLAG_INS_ప్రారంభం_INCL;
 	}
 
-	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"end_incl", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (tv_get_bool(&di->di_tv))
-		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
-		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
+	    ఒకవేళ (tv_get_bool(&di->di_tv))
+		prop->pt_flags |= PT_FLAG_INS_చివర_INCL;
+	    లేకపోతే
+		prop->pt_flags &= ~PT_FLAG_INS_చివర_INCL;
 	}
     }
 }
@@ -2670,62 +2670,62 @@ prop_type_set(typval_T *argvars, int add)
 /*
  * prop_type_add({name}, {props})
  */
-    void
-f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_prop_type_కూడు(typval_T *argvars, typval_T *rettv వాడని)
 {
-    prop_type_set(argvars, TRUE);
+    prop_type_సమితి(argvars, TRUE);
 }
 
 /*
  * prop_type_change({name}, {props})
  */
-    void
-f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_prop_type_change(typval_T *argvars, typval_T *rettv వాడని)
 {
-    prop_type_set(argvars, FALSE);
+    prop_type_సమితి(argvars, FALSE);
 }
 
 /*
  * prop_type_delete({name} [, {bufnr}])
  */
-    void
-f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_prop_type_delete(typval_T *argvars, typval_T *rettv వాడని)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
-	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	semsg(_(e_invalid_వాదం_str), "\"\"");
+	తిరిగి;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	ఒకవేళ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    తిరిగి;
     }
 
-    hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    hi = కనుగొను_prop_type_hi(name, buf);
+    ఒకవేళ (hi == ఖాళీ)
+	తిరిగి;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    లేకపోతే
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2735,72 +2735,72 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 
     // currently visible text properties will disappear
     redraw_all_later(UPD_CLEAR);
-    changed_window_setting_buf(buf == NULL ? curbuf : buf);
+    మారింది_కిటికీ_setting_buf(buf == ఖాళీ ? curbuf : buf);
 }
 
 /*
  * prop_type_get({name} [, {props}])
  */
-    void
+    శూన్య
 f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
-	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	semsg(_(e_invalid_వాదం_str), "\"\"");
+	తిరిగి;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_dict_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    proptype_T  *prop = NULL;
-    buf_T	    *buf = NULL;
+    proptype_T  *prop = ఖాళీ;
+    buf_T	    *buf = ఖాళీ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	ఒకవేళ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    తిరిగి;
     }
 
-    prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    prop = కనుగొను_prop_type(name, buf);
+    ఒకవేళ (prop == ఖాళీ)
+	తిరిగి;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
-	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
-    dict_add_number(d, "priority", prop->pt_priority);
-    dict_add_number(d, "combine",
+    ఒకవేళ (prop->pt_hl_id > 0)
+	dict_కూడు_string(d, "highlight", syn_id2name(prop->pt_hl_id));
+    dict_కూడు_సంఖ్య(d, "priority", prop->pt_ప్రాధాన్యత);
+    dict_కూడు_సంఖ్య(d, "combine",
 	    (prop->pt_flags & PT_FLAG_COMBINE) ? 1 : 0);
-    dict_add_number(d, "override",
+    dict_కూడు_సంఖ్య(d, "override",
 	    (prop->pt_flags & PT_FLAG_OVERRIDE) ? 1 : 0);
-    dict_add_number(d, "start_incl",
-	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
-    dict_add_number(d, "end_incl",
-	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
-	dict_add_number(d, "bufnr", buf->b_fnum);
+    dict_కూడు_సంఖ్య(d, "start_incl",
+	    (prop->pt_flags & PT_FLAG_INS_ప్రారంభం_INCL) ? 1 : 0);
+    dict_కూడు_సంఖ్య(d, "end_incl",
+	    (prop->pt_flags & PT_FLAG_INS_చివర_INCL) ? 1 : 0);
+    ఒకవేళ (buf != ఖాళీ)
+	dict_కూడు_సంఖ్య(d, "bufnr", buf->b_fnum);
 }
 
-    static void
+    స్థిర శూన్య
 list_types(hashtab_T *ht, list_T *l)
 {
-    long	todo;
+    దీర్ఘ	todo;
     hashitem_T	*hi;
 
-    todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (దీర్ఘ)ht->ht_వాడిన;
+    FOR_ALL_HASHTAB_వస్తువులు(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2813,47 +2813,47 @@ list_types(hashtab_T *ht, list_T *l)
 /*
  * prop_type_list([{bufnr}])
  */
-    void
+    శూన్య
 f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = ఖాళీ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	ఒకవేళ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    తిరిగి;
     }
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
-	if (global_proptypes != NULL)
+	ఒకవేళ (global_proptypes != ఖాళీ)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    లేకపోతే ఒకవేళ (buf->b_proptypes != ఖాళీ)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
 /*
  * Free all property types in "ht".
  */
-    static void
+    స్థిర శూన్య
 clear_ht_prop_types(hashtab_T *ht)
 {
-    long	todo;
+    దీర్ఘ	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    ఒకవేళ (ht == ఖాళీ)
+	తిరిగి;
 
-    todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (దీర్ఘ)ht->ht_వాడిన;
+    FOR_ALL_HASHTAB_వస్తువులు(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,35 +2866,35 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#ఒకవేళ defined(EXITFREE)
 /*
  * Free all global property types.
  */
-    void
-clear_global_prop_types(void)
+    శూన్య
+clear_global_prop_types(శూన్య)
 {
     clear_ht_prop_types(global_proptypes);
-    global_proptypes = NULL;
+    global_proptypes = ఖాళీ;
     VIM_CLEAR(global_proparray);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Free all property types for "buf".
  */
-    void
+    శూన్య
 clear_buf_prop_types(buf_T *buf)
 {
     clear_ht_prop_types(buf->b_proptypes);
-    buf->b_proptypes = NULL;
+    buf->b_proptypes = ఖాళీ;
     VIM_CLEAR(buf->b_proparray);
 }
 
 // Struct used to return two values from adjust_prop().
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    పూర్ణాంకం dirty;	    // if the property was changed
+    పూర్ణాంకం can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2906,101 +2906,101 @@ typedef struct
  * APC_SUBSTITUTE:	Text is replaced, not inserted.
  * APC_INDENT:		Text is inserted before virtual text prop
  */
-    static adjustres_T
+    స్థిర adjustres_T
 adjust_prop(
 	textprop_T  *prop,
-	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	colnr_T	    నిలువు,
+	పూర్ణాంకం	    added,
+	పూర్ణాంకం	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    పూర్ణాంకం		ప్రారంభం_incl;
+    పూర్ణాంకం		చివర_incl;
+    పూర్ణాంకం		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    ఒకవేళ (prop->tp_నిలువు == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	తిరిగి res;
     }
 
-    pt = text_prop_type_by_id(curbuf, prop->tp_type);
-    start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
+    pt = పాఠ్యం_prop_type_by_id(curbuf, prop->tp_type);
+    ప్రారంభం_incl = (pt != ఖాళీ && (pt->pt_flags & PT_FLAG_INS_ప్రారంభం_INCL))
 				|| (flags & APC_SUBSTITUTE)
 				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+    ఒకవేళ (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
-	start_incl = FALSE;
-    end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL))
-				|| (prop->tp_flags & TP_FLAG_CONT_NEXT);
+	ప్రారంభం_incl = FALSE;
+    చివర_incl = (pt != ఖాళీ && (pt->pt_flags & PT_FLAG_INS_చివర_INCL))
+				|| (prop->tp_flags & TP_FLAG_CONT_తదుపరి);
     // do not drop zero-width props if they later can increase in size
-    droppable = !(start_incl || end_incl);
+    droppable = !(ప్రారంభం_incl || చివర_incl);
 
-    if (added > 0)
+    ఒకవేళ (added > 0)
     {
-	if (col + 1 <= prop->tp_col
-		- (start_incl || (prop->tp_len == 0 && end_incl)))
+	ఒకవేళ (నిలువు + 1 <= prop->tp_నిలువు
+		- (ప్రారంభం_incl || (prop->tp_len == 0 && చివర_incl)))
 	    // Change is entirely before the text property: Only shift
-	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	    prop->tp_నిలువు += added;
+	లేకపోతే ఒకవేళ (నిలువు + 1 < prop->tp_నిలువు + prop->tp_len + చివర_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    లేకపోతే ఒకవేళ (prop->tp_నిలువు > నిలువు + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	ఒకవేళ (prop->tp_నిలువు + added < నిలువు + 1)
 	{
-	    if (prop->tp_id < 0)
+	    ఒకవేళ (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		prop->tp_len += (prop->tp_col - 1 - col) + added;
-		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		prop->tp_len += (prop->tp_నిలువు - 1 - నిలువు) + added;
+		prop->tp_నిలువు = నిలువు + 1;
+		ఒకవేళ (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
 		    // also be dropped.
 		    res.can_drop = droppable
 			|| (prop->tp_flags
-				& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
+				& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_తదుపరి));
 		}
 	    }
 	}
-	else
-	    prop->tp_col += added;
+	లేకపోతే
+	    prop->tp_నిలువు += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    లేకపోతే ఒకవేళ (prop->tp_len > 0 && prop->tp_నిలువు + prop->tp_len > నిలువు
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	ఒకవేళ (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
-	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	    prop->tp_len = నిలువు - (prop->tp_నిలువు - 1);
+	లేకపోతే
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    పూర్ణాంకం after = నిలువు - added - (prop->tp_నిలువు - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	ఒకవేళ (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_తదుపరి)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
-			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
+			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_తదుపరి));
     }
-    else
+    లేకపోతే
 	res.dirty = FALSE;
 
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    పూర్ణాంకం
 adjust_prop_columns(
 	linenr_T    lnum,
-	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	colnr_T	    నిలువు,
+	పూర్ణాంకం	    బైట్లు_added,
+	పూర్ణాంకం	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    పూర్ణాంకం		dirty = FALSE;
+    పూర్ణాంకం		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    ఒకవేళ (పాఠ్యం_prop_frozen > 0)
+	తిరిగి FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    ఒకవేళ (um.buf == ఖాళీ || um.prop_లెక్క == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    కొరకు (ri = 0; ri < um.prop_లెక్క; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
-	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	res = adjust_prop(prop, నిలువు, బైట్లు_added, flags);
+	ఒకవేళ (res.dirty)
 	{
-	    if (!dirty)
+	    ఒకవేళ (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		ఒకవేళ (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    తిరిగి FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		ఒకవేళ ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    తిరిగి FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	ఒకవేళ (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
-	    continue;
+	    కొనసాగు;
 	}
     }
-    if (dirty)
+    ఒకవేళ (dirty)
 	um_close(&um);
-    else
+    లేకపోతే
 	um_abort(&um);
-    return dirty;
+    తిరిగి dirty;
 }
 
 /*
@@ -3087,127 +3087,127 @@ adjust_prop_columns(
  * "deleted" is the number of bytes deleted.
  * "at_eol" is true if the split is after the end of the line.
  */
-    void
-adjust_props_for_split(
+    శూన్య
+adjust_props_for_విభజించు(
 	linenr_T    lnum_props,
-	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	linenr_T    lnum_శిఖరం,
+	పూర్ణాంకం	    kept,
+	పూర్ణాంకం	    deleted,
+	పూర్ణాంకం	    at_eol)
 {
     char_u	*props;
-    int		count;
+    పూర్ణాంకం		లెక్క;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    పూర్ణాంకం		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    ఒకవేళ (!curbuf->b_has_textprop)
+	తిరిగి;
 
     // Get the text properties from "lnum_props".
-    count = get_text_props(curbuf, lnum_props, &props, FALSE);
-    ga_init2(&prevprop, sizeof(textprop_T), 10);
-    ga_init2(&nextprop, sizeof(textprop_T), 10);
+    లెక్క = get_పాఠ్యం_props(curbuf, lnum_props, &props, FALSE);
+    ga_init2(&prevprop, పరిమాణం(textprop_T), 10);
+    ga_init2(&nextprop, పరిమాణం(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
-    char_u *count_ptr = props - PROP_COUNT_SIZE;
+    char_u *లెక్క_ptr = props - PROP_లెక్క_కొలత;
 
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < లెక్క; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	పూర్ణాంకం	    ప్రారంభం_incl, చివర_incl;
+	పూర్ణాంకం	    cont_prev, cont_తదుపరి;
+	పూర్ణాంకం	    prop_నిలువు;
 
 	// copy the prop to an aligned structure
-	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
+	mch_memmove(&prop, props + i * పరిమాణం(textprop_T), పరిమాణం(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	ఒకవేళ (prop.tp_id < 0 && prop.u.tp_పాఠ్యం_స్థానభ్రంశం > 0)
 	{
-	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
+	    prop.u.tp_పాఠ్యం = vim_strsave(లెక్క_ptr + prop.u.tp_పాఠ్యం_స్థానభ్రంశం);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
+	లేకపోతే
+	    prop.u.tp_పాఠ్యం = ఖాళీ;
 
-	pt = text_prop_type_by_id(curbuf, prop.tp_type);
-	start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL));
-	end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL));
+	pt = పాఠ్యం_prop_type_by_id(curbuf, prop.tp_type);
+	ప్రారంభం_incl = (pt != ఖాళీ && (pt->pt_flags & PT_FLAG_INS_ప్రారంభం_INCL));
+	చివర_incl = (pt != ఖాళీ && (pt->pt_flags & PT_FLAG_INS_చివర_INCL));
 
 	// a text prop "above" behaves like it is on the first text column
-	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
+	prop_నిలువు = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_నిలువు;
 
-	if (prop_col == MAXCOL)
+	ఒకవేళ (prop_నిలువు == MAXCOL)
 	{
 	    cont_prev = at_eol;
-	    cont_next = !at_eol;
+	    cont_తదుపరి = !at_eol;
 	}
-	else
+	లేకపోతే
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
-						&& prop.tp_col == MAXCOL);
+	    పూర్ణాంకం is_floating_vtext = (prop.tp_id < 0
+						&& prop.tp_నిలువు == MAXCOL);
 
-	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
-		cont_next = FALSE;
-	    else
-		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
+	    cont_prev = prop_నిలువు + !ప్రారంభం_incl <= kept;
+	    ఒకవేళ (is_floating_vtext)
+		cont_తదుపరి = FALSE;
+	    లేకపోతే
+		cont_తదుపరి = skipped <= prop_నిలువు + prop.tp_len - !చివర_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
+	ఒకవేళ (prop.tp_id < 0 && cont_తదుపరి)
 	    cont_prev = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	ఒకవేళ (cont_prev && ga_grow(&prevprop, 1) == OK)
 	{
-	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    textprop_T *p = ((textprop_T *)prevprop.ga_దత్తాంశం) + prevprop.ga_len;
+	    పూర్ణాంకం is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
-		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
-		p->tp_flags |= TP_FLAG_CONT_NEXT;
+	    ఒకవేళ (!is_vtext && p->tp_నిలువు + p->tp_len >= kept)
+		p->tp_len = kept - p->tp_నిలువు;
+	    ఒకవేళ (cont_తదుపరి)
+		p->tp_flags |= TP_FLAG_CONT_తదుపరి;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	ఒకవేళ (cont_తదుపరి && ga_grow(&nextprop, 1) == OK)
 	{
-	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    textprop_T *p = ((textprop_T *)nextprop.ga_దత్తాంశం) + nextprop.ga_len;
+	    పూర్ణాంకం is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    ఒకవేళ (p->tp_నిలువు != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
-		    p->tp_col -= skipped - 1;
-		else
+		ఒకవేళ (p->tp_నిలువు > skipped)
+		    p->tp_నిలువు -= skipped - 1;
+		లేకపోతే
 		{
-		    if (!is_vtext)
-			p->tp_len -= skipped - p->tp_col;
-		    p->tp_col = 1;
+		    ఒకవేళ (!is_vtext)
+			p->tp_len -= skipped - p->tp_నిలువు;
+		    p->tp_నిలువు = 1;
 		}
 	    }
-	    if (cont_prev)
+	    ఒకవేళ (cont_prev)
 		p->tp_flags |= TP_FLAG_CONT_PREV;
 	}
     }
 
-    set_text_props(lnum_top, (textprop_T *)prevprop.ga_data,
+    సమితి_పాఠ్యం_props(lnum_శిఖరం, (textprop_T *)prevprop.ga_దత్తాంశం,
 							    prevprop.ga_len);
     ga_clear(&prevprop);
-    set_text_props(lnum_top + 1, (textprop_T *)nextprop.ga_data,
+    సమితి_పాఠ్యం_props(lnum_శిఖరం + 1, (textprop_T *)nextprop.ga_దత్తాంశం,
 							    nextprop.ga_len);
     ga_clear(&nextprop);
 }
@@ -3217,67 +3217,67 @@ adjust_props_for_split(
  * Properties are added in reverse order; caller should call
  * um_reverse_props() after all lines are processed.
  */
-    void
+    శూన్య
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
-	long		    col,
-	int		    removed)
+	పూర్ణాంకం		    చివరి_పంక్తి,
+	దీర్ఘ		    నిలువు,
+	పూర్ణాంకం		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    ఒకవేళ (um->buf == ఖాళీ)
+	తిరిగి;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    ఒకవేళ (r_um.buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	తిరిగి;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    కొరకు (పూర్ణాంకం i = r_um.prop_లెక్క - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	పూర్ణాంకం	    చివర;
 
-	if (prop->tp_col == MAXCOL && !last_line)
-	    continue;  // drop floating text for non-last lines
-	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
+	ఒకవేళ (prop->tp_నిలువు == MAXCOL && !చివరి_పంక్తి)
+	    కొనసాగు;  // drop floating text for non-last lines
+	చివర = !(prop->tp_flags & TP_FLAG_CONT_తదుపరి);
 
 	adjust_prop(prop, 0, -removed, 0);
-	adjust_prop(prop, -1, col, 0);
+	adjust_prop(prop, -1, నిలువు, 0);
 
-	if (last_line || end)
+	ఒకవేళ (చివరి_పంక్తి || చివర)
 	{
-	    um_add_prop(um, prop);
-	    prop->u.tp_text = NULL;  // ownership transferred
+	    um_కూడు_prop(um, prop);
+	    prop->u.tp_పాఠ్యం = ఖాళీ;  // ownership transferred
 	}
-	else
+	లేకపోతే
 	{
 	    // Search for continuing prop in um.
-	    bool    found = false;
+	    bool    దొరికింది = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    కొరకు (పూర్ణాంకం j = 0; j < um->prop_లెక్క; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		ఒకవేళ ((op->tp_flags & TP_FLAG_CONT_PREV)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
-		    found = true;
-		    op->tp_len += op->tp_col - prop->tp_col;
-		    op->tp_col = prop->tp_col;
+		    దొరికింది = true;
+		    op->tp_len += op->tp_నిలువు - prop->tp_నిలువు;
+		    op->tp_నిలువు = prop->tp_నిలువు;
 		    op->tp_flags = prop->tp_flags;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    if (!found)
-		internal_error("text property above joined line not found");
+	    ఒకవేళ (!దొరికింది)
+		అంతర్గత_error("text property above joined line not found");
 	}
     }
     um_abort(&r_um);
@@ -3286,23 +3286,23 @@ prepend_joined_props(
 /*
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
-    static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+    స్థిర శూన్య
+remember_cleared_prop(garray_T *gap, పూర్ణాంకం which, textprop_T *prop, పూర్ణాంకం flag)
 {
-    undoprop_T	*up;
+    undoprop_T	*పైకి;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
-	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
-    up = (undoprop_T *)gap->ga_data + gap->ga_len++;
-    up->up_which = which;
-    up->up_type = prop->tp_type;
-    up->up_id = prop->tp_id;
-    up->up_col = prop->tp_col;
-    up->up_flag = flag;
+    ఒకవేళ (which == UNDOPROP_NONE)
+	తిరిగి;
+    ఒకవేళ (gap->ga_itemsize == 0)
+	ga_init2(gap, పరిమాణం(undoprop_T), 4);
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి;
+    పైకి = (undoprop_T *)gap->ga_దత్తాంశం + gap->ga_len++;
+    పైకి->పైకి_which = which;
+    పైకి->పైకి_type = prop->tp_type;
+    పైకి->పైకి_id = prop->tp_id;
+    పైకి->పైకి_నిలువు = prop->tp_నిలువు;
+    పైకి->పైకి_flag = flag;
 }
 
 /*
@@ -3311,99 +3311,99 @@ remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
  * is cleared on the line above is remembered in "gap" as "above_which", on
  * the line below as "below_which".
  */
-    void
+    శూన్య
 adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	పూర్ణాంకం	    above_which,
+	పూర్ణాంకం	    క్రింద_which)
 {
     unpacked_memline_T	above;
-    unpacked_memline_T	below;
-    bool		*paired = NULL;
-    bool		above_changed = false;
-    bool		below_changed = false;
-    bool		cont_next = false;
+    unpacked_memline_T	క్రింద;
+    bool		*paired = ఖాళీ;
+    bool		above_మారింది = false;
+    bool		క్రింద_మారింది = false;
+    bool		cont_తదుపరి = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    ఒకవేళ (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
-	    cont_next = true;
+    ఒకవేళ (above.buf == ఖాళీ)
+	తిరిగి;
+    కొరకు (పూర్ణాంకం i = 0; i < above.prop_లెక్క; ++i)
+	ఒకవేళ (above.props[i].tp_flags & TP_FLAG_CONT_తదుపరి)
+	    cont_తదుపరి = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    ఒకవేళ (cont_తదుపరి && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	తిరిగి;
     }
 
-    below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    క్రింద = um_open_at(buf, lnum + 1, 0);
+    ఒకవేళ (క్రింద.buf == ఖాళీ)
     {
 	um_abort(&above);
-	return;
+	తిరిగి;
     }
-    if (below.prop_count > 0)
+    ఒకవేళ (క్రింద.prop_లెక్క > 0)
     {
-	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
-	    goto theend;
+	paired = ALLOC_CLEAR_MULT(bool, క్రింద.prop_లెక్క);
+	ఒకవేళ (paired == ఖాళీ)
+	    వెళ్ళు theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < above.prop_లెక్క; ++i)
     {
 	textprop_T  *prop = &above.props[i];
-	bool	    found = false;
+	bool	    దొరికింది = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
-	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	ఒకవేళ (!(prop->tp_flags & TP_FLAG_CONT_తదుపరి))
+	    కొనసాగు;
+	కొరకు (పూర్ణాంకం j = 0; j < క్రింద.prop_లెక్క; ++j)
 	{
-	    textprop_T *next = &below.props[j];
+	    textprop_T *తదుపరి = &క్రింద.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
-		    && next->tp_id == prop->tp_id
-		    && next->tp_type == prop->tp_type)
+	    ఒకవేళ (!paired[j] && (తదుపరి->tp_flags & TP_FLAG_CONT_PREV)
+		    && తదుపరి->tp_id == prop->tp_id
+		    && తదుపరి->tp_type == prop->tp_type)
 	    {
 		paired[j] = true;
-		found = true;
-		break;
+		దొరికింది = true;
+		ఆపు;
 	    }
 	}
-	if (!found)
+	ఒకవేళ (!దొరికింది)
 	{
-	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
-	    above_changed = true;
-	    remember_cleared_prop(gap, above_which, prop, TP_FLAG_CONT_NEXT);
+	    prop->tp_flags &= ~TP_FLAG_CONT_తదుపరి;
+	    above_మారింది = true;
+	    remember_cleared_prop(gap, above_which, prop, TP_FLAG_CONT_తదుపరి);
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    కొరకు (పూర్ణాంకం j = 0; j < క్రింద.prop_లెక్క; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
-	    continue;
-	if (!below.detached && !um_detach(&below))
-	    break;
-	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
-	below_changed = true;
-	remember_cleared_prop(gap, below_which, &below.props[j],
+	ఒకవేళ (!(క్రింద.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
+	    కొనసాగు;
+	ఒకవేళ (!క్రింద.detached && !um_detach(&క్రింద))
+	    ఆపు;
+	క్రింద.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
+	క్రింద_మారింది = true;
+	remember_cleared_prop(gap, క్రింద_which, &క్రింద.props[j],
 							   TP_FLAG_CONT_PREV);
     }
 
 theend:
-    if (below_changed)
-	um_close(&below);
-    else
-	um_abort(&below);
-    if (above_changed)
+    ఒకవేళ (క్రింద_మారింది)
+	um_close(&క్రింద);
+    లేకపోతే
+	um_abort(&క్రింద);
+    ఒకవేళ (above_మారింది)
 	um_close(&above);
-    else
+    లేకపోతే
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3413,58 +3413,58 @@ theend:
  * those cleared when the undo block was applied the other way.  A property
  * that is no longer there is skipped.
  */
-    void
+    శూన్య
 restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	పూర్ణాంకం	    which)
 {
     unpacked_memline_T	um;
-    bool		changed = false;
+    bool		మారింది = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
-					  || lnum > buf->b_ml.ml_line_count)
-	return;
+    ఒకవేళ (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+					  || lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    ఒకవేళ (um.buf == ఖాళీ)
+	తిరిగి;
+    కొరకు (పూర్ణాంకం r = 0; r < gap->ga_len; ++r)
     {
-	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
+	undoprop_T  *పైకి = (undoprop_T *)gap->ga_దత్తాంశం + r;
 
-	if (up->up_which != which)
-	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	ఒకవేళ (పైకి->పైకి_which != which)
+	    కొనసాగు;
+	కొరకు (పూర్ణాంకం i = 0; i < um.prop_లెక్క; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
-		    || prop->tp_col != up->up_col
-		    || (prop->tp_flags & up->up_flag))
-		continue;
-	    if (!um.detached && !um_detach(&um))
-		goto theend;
-	    um.props[i].tp_flags |= up->up_flag;
-	    changed = true;
-	    break;
+	    ఒకవేళ (prop->tp_type != పైకి->పైకి_type || prop->tp_id != పైకి->పైకి_id
+		    || prop->tp_నిలువు != పైకి->పైకి_నిలువు
+		    || (prop->tp_flags & పైకి->పైకి_flag))
+		కొనసాగు;
+	    ఒకవేళ (!um.detached && !um_detach(&um))
+		వెళ్ళు theend;
+	    um.props[i].tp_flags |= పైకి->పైకి_flag;
+	    మారింది = true;
+	    ఆపు;
 	}
     }
 
 theend:
-    if (changed)
+    ఒకవేళ (మారింది)
 	um_close(&um);
-    else
+    లేకపోతే
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+పాఠ్యం_prop_లెక్క_valid(పూర్ణాంకం prop_లెక్క, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
-		    <= propdata_len - PROP_COUNT_SIZE;
+    ఒకవేళ (propdata_len < PROP_లెక్క_కొలత)
+	తిరిగి false;
+    తిరిగి (size_t)prop_లెక్క * పరిమాణం(textprop_T)
+		    <= propdata_len - PROP_లెక్క_కొలత;
 }
 
 /*
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+పాఠ్యం_prop_vtext_valid(char_u *props, పూర్ణాంకం prop_లెక్క, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < prop_లెక్క; ++i)
     {
 	textprop_T  prop;
 
-	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
-							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
-	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	mch_memmove(&prop, props + (size_t)i * పరిమాణం(textprop_T),
+							  పరిమాణం(textprop_T));
+	ఒకవేళ (prop.tp_id >= 0 || prop.u.tp_పాఠ్యం_స్థానభ్రంశం <= 0)
+	    కొనసాగు;
+	ఒకవేళ (prop.tp_len < 0 || (size_t)prop.u.tp_పాఠ్యం_స్థానభ్రంశం
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    తిరిగి false;
     }
-    return true;
+    తిరిగి true;
 }
 
-#endif // FEAT_PROP_POPUP
+#అయితే_ముగింపు // FEAT_PROP_POPUP

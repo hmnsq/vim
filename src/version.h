@@ -12,43 +12,43 @@
  */
 
 // Trick to turn a number into a string.
-#define VIM_TOSTR_(a)			#a
-#define VIM_TOSTR(a)			VIM_TOSTR_(a)
+#నిర్వచించు VIM_TOSTR_(a)			#a
+#నిర్వచించు VIM_TOSTR(a)			VIM_TOSTR_(a)
 
 // Values that change for a new release.
-#define VIM_VERSION_MAJOR		9
-#define VIM_VERSION_MINOR		2
-#define VIM_VERSION_BUILD		286
-#define VIM_VERSION_BUILD_BCD		0x11e
-#define VIM_VERSION_DATE_ONLY		"2026 Feb 14"
+#నిర్వచించు VIM_సంస్కరణ_MAJOR		9
+#నిర్వచించు VIM_సంస్కరణ_MINOR		2
+#నిర్వచించు VIM_సంస్కరణ_BUILD		286
+#నిర్వచించు VIM_సంస్కరణ_BUILD_BCD		0x11e
+#నిర్వచించు VIM_సంస్కరణ_DATE_ONLY		"2026 Feb 14"
 
 // Values based on the above
-#define VIM_VERSION_MAJOR_STR		VIM_TOSTR(VIM_VERSION_MAJOR)
-#define VIM_VERSION_MINOR_STR		VIM_TOSTR(VIM_VERSION_MINOR)
-#define VIM_VERSION_100	    (VIM_VERSION_MAJOR * 100 + VIM_VERSION_MINOR)
+#నిర్వచించు VIM_సంస్కరణ_MAJOR_STR		VIM_TOSTR(VIM_సంస్కరణ_MAJOR)
+#నిర్వచించు VIM_సంస్కరణ_MINOR_STR		VIM_TOSTR(VIM_సంస్కరణ_MINOR)
+#నిర్వచించు VIM_సంస్కరణ_100	    (VIM_సంస్కరణ_MAJOR * 100 + VIM_సంస్కరణ_MINOR)
 
-#define VIM_VERSION_BUILD_STR		VIM_TOSTR(VIM_VERSION_BUILD)
-#ifndef VIM_VERSION_PATCHLEVEL
-# define VIM_VERSION_PATCHLEVEL		0
-#endif
+#నిర్వచించు VIM_సంస్కరణ_BUILD_STR		VIM_TOSTR(VIM_సంస్కరణ_BUILD)
+#నిర్వచితం_కాకపోతే VIM_సంస్కరణ_PATCHLEVEL
+# define VIM_సంస్కరణ_PATCHLEVEL		0
+#అయితే_ముగింపు
 
 // Patchlevel with leading zeros
 // For compatibility with the installer from "vim-win32-installer" and WinGet.
 // For details see https://github.com/vim/vim-win32-installer/pull/277
 // and https://github.com/vim/vim-win32-installer/pull/285
-#if VIM_VERSION_PATCHLEVEL < 10
+#ఒకవేళ VIM_సంస్కరణ_PATCHLEVEL < 10
 # define LEADZERO(x) 000 ## x
-#elif VIM_VERSION_PATCHLEVEL < 100
+#లేదావేళ VIM_సంస్కరణ_PATCHLEVEL < 100
 # define LEADZERO(x) 00 ## x
-#elif VIM_VERSION_PATCHLEVEL < 1000
+#లేదావేళ VIM_సంస్కరణ_PATCHLEVEL < 1000
 # define LEADZERO(x) 0 ## x
-#else
+#లేకపోతే
 # define LEADZERO(x) x
-#endif
+#అయితే_ముగింపు
 
-#define VIM_VERSION_PATCHLEVEL_STR	VIM_TOSTR(LEADZERO(VIM_VERSION_PATCHLEVEL))
+#నిర్వచించు VIM_సంస్కరణ_PATCHLEVEL_STR	VIM_TOSTR(LEADZERO(VIM_సంస్కరణ_PATCHLEVEL))
 // Used by MacOS port; should be one of: development, alpha, beta, final
-#define VIM_VERSION_RELEASE		final
+#నిర్వచించు VIM_సంస్కరణ_RELEASE		final
 
 /*
  * VIM_VERSION_NODOT is used for the runtime directory name.
@@ -56,10 +56,10 @@
  * VIM_VERSION_MEDIUM is used for the startup-screen.
  * VIM_VERSION_LONG is used for the ":version" command and "Vim -h".
  */
-#define VIM_VERSION_NODOT     "vim" VIM_VERSION_MAJOR_STR VIM_VERSION_MINOR_STR
-#define VIM_VERSION_SHORT     VIM_VERSION_MAJOR_STR "." VIM_VERSION_MINOR_STR
-#define VIM_VERSION_MEDIUM    VIM_VERSION_SHORT
-#define VIM_VERSION_LONG_ONLY "VIM - Vi IMproved " VIM_VERSION_MEDIUM
-#define VIM_VERSION_LONG_HEAD VIM_VERSION_LONG_ONLY " (" VIM_VERSION_DATE_ONLY
-#define VIM_VERSION_LONG      VIM_VERSION_LONG_HEAD ")"
-#define VIM_VERSION_LONG_DATE VIM_VERSION_LONG_HEAD ", compiled "
+#నిర్వచించు VIM_సంస్కరణ_NODOT     "vim" VIM_సంస్కరణ_MAJOR_STR VIM_సంస్కరణ_MINOR_STR
+#నిర్వచించు VIM_సంస్కరణ_SHORT     VIM_సంస్కరణ_MAJOR_STR "." VIM_సంస్కరణ_MINOR_STR
+#నిర్వచించు VIM_సంస్కరణ_MEDIUM    VIM_సంస్కరణ_SHORT
+#నిర్వచించు VIM_సంస్కరణ_LONG_ONLY "VIM - Vi IMproved " VIM_సంస్కరణ_MEDIUM
+#నిర్వచించు VIM_సంస్కరణ_LONG_తల VIM_సంస్కరణ_LONG_ONLY " (" VIM_సంస్కరణ_DATE_ONLY
+#నిర్వచించు VIM_సంస్కరణ_LONG      VIM_సంస్కరణ_LONG_తల ")"
+#నిర్వచించు VIM_సంస్కరణ_LONG_DATE VIM_సంస్కరణ_LONG_తల ", compiled "

@@ -11,7 +11,7 @@
  * autocmd.c: Autocommand related functions
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * The autocommands are stored in a list for each event.
@@ -48,30 +48,30 @@
  *   The order of AutoCmds is important, this is the order in which they were
  *   defined and will have to be executed.
  */
-typedef struct AutoCmd
+రకనిర్వచనం నిర్మాణం AutoCmd
 {
     char_u	    *cmd;		// The command to be executed (NULL
 					// when command has been removed).
-    char	    once;		// "One shot": removed after execution
-    char	    nested;		// If autocommands nest here.
-    char	    last;		// last command in list
+    అక్షరం	    once;		// "One shot": removed after execution
+    అక్షరం	    nested;		// If autocommands nest here.
+    అక్షరం	    చివరి;		// last command in list
     sctx_T	    script_ctx;		// script context where it is defined
-    struct AutoCmd  *next;		// next AutoCmd in list
+    నిర్మాణం AutoCmd  *తదుపరి;		// next AutoCmd in list
 } AutoCmd;
 
-typedef struct AutoPat
+రకనిర్వచనం నిర్మాణం AutoPat
 {
-    struct AutoPat  *next;		// Next AutoPat in AutoPat list; MUST
+    నిర్మాణం AutoPat  *తదుపరి;		// Next AutoPat in AutoPat list; MUST
 					// be the first entry.
     char_u	    *pat;		// pattern as typed (NULL when pattern
 					// has been removed)
     regprog_T	    *reg_prog;		// compiled regprog for pattern
     AutoCmd	    *cmds;		// list of commands to do
-    int		    group;		// group ID
-    int		    patlen;		// strlen() of pat
-    int		    buflocal_nr;	// !=0 for buffer-local AutoPat
-    char	    allow_dirs;		// Pattern may match whole path
-    char	    last;		// last pattern for apply_autocmds()
+    పూర్ణాంకం		    సమూహం;		// group ID
+    పూర్ణాంకం		    patlen;		// strlen() of pat
+    పూర్ణాంకం		    buflocal_nr;	// !=0 for buffer-local AutoPat
+    అక్షరం	    allow_dirs;		// Pattern may match whole path
+    అక్షరం	    చివరి;		// last pattern for apply_autocmds()
 } AutoPat;
 
 //
@@ -79,279 +79,279 @@ typedef struct AutoPat
 // BufNewFile and BufRead are searched for ALOT (especially at startup)
 // so we pre-determine their index into the event_tab[] table for fast access.
 // Keep these values in sync with event_tab[]!
-#define BUFNEWFILE_INDEX 9
-#define BUFREAD_INDEX 10
+#నిర్వచించు BUFNEWFILE_సూచీ 9
+#నిర్వచించు BUFREAD_సూచీ 10
 
 // Must be sorted by the 'value' field because it is used by bsearch()!
 // Events with positive keys aren't allowed in 'eventignorewin'.
-static keyvalue_T event_tab[NUM_EVENTS] = {
-    KEYVALUE_ENTRY(-EVENT_BUFADD, "BufAdd"),
-    KEYVALUE_ENTRY(-EVENT_BUFADD, "BufCreate"),
-    KEYVALUE_ENTRY(-EVENT_BUFDELETE, "BufDelete"),
-    KEYVALUE_ENTRY(-EVENT_BUFENTER, "BufEnter"),
-    KEYVALUE_ENTRY(-EVENT_BUFFILEPOST, "BufFilePost"),
-    KEYVALUE_ENTRY(-EVENT_BUFFILEPRE, "BufFilePre"),
-    KEYVALUE_ENTRY(-EVENT_BUFHIDDEN, "BufHidden"),
-    KEYVALUE_ENTRY(-EVENT_BUFLEAVE, "BufLeave"),
-    KEYVALUE_ENTRY(-EVENT_BUFNEW, "BufNew"),
-    KEYVALUE_ENTRY(-EVENT_BUFNEWFILE, "BufNewFile"),	// BUFNEWFILE_INDEX
-    KEYVALUE_ENTRY(-EVENT_BUFREADPOST, "BufRead"),	// BUFREAD_INDEX
-    KEYVALUE_ENTRY(-EVENT_BUFREADCMD, "BufReadCmd"),
-    KEYVALUE_ENTRY(-EVENT_BUFREADPOST, "BufReadPost"),
-    KEYVALUE_ENTRY(-EVENT_BUFREADPRE, "BufReadPre"),
-    KEYVALUE_ENTRY(-EVENT_BUFUNLOAD, "BufUnload"),
-    KEYVALUE_ENTRY(-EVENT_BUFWINENTER, "BufWinEnter"),
-    KEYVALUE_ENTRY(-EVENT_BUFWINLEAVE, "BufWinLeave"),
-    KEYVALUE_ENTRY(-EVENT_BUFWIPEOUT, "BufWipeout"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPRE, "BufWrite"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITECMD, "BufWriteCmd"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPOST, "BufWritePost"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPRE, "BufWritePre"),
-    KEYVALUE_ENTRY(EVENT_CMDLINECHANGED, "CmdlineChanged"),
-    KEYVALUE_ENTRY(EVENT_CMDLINEENTER, "CmdlineEnter"),
-    KEYVALUE_ENTRY(EVENT_CMDLINELEAVE, "CmdlineLeave"),
-    KEYVALUE_ENTRY(EVENT_CMDLINELEAVEPRE, "CmdlineLeavePre"),
-    KEYVALUE_ENTRY(EVENT_CMDUNDEFINED, "CmdUndefined"),
-    KEYVALUE_ENTRY(EVENT_CMDWINENTER, "CmdwinEnter"),
-    KEYVALUE_ENTRY(EVENT_CMDWINLEAVE, "CmdwinLeave"),
-    KEYVALUE_ENTRY(EVENT_COLORSCHEME, "ColorScheme"),
-    KEYVALUE_ENTRY(EVENT_COLORSCHEMEPRE, "ColorSchemePre"),
-    KEYVALUE_ENTRY(EVENT_COMPLETECHANGED, "CompleteChanged"),
-    KEYVALUE_ENTRY(EVENT_COMPLETEDONE, "CompleteDone"),
-    KEYVALUE_ENTRY(EVENT_COMPLETEDONEPRE, "CompleteDonePre"),
-    KEYVALUE_ENTRY(-EVENT_CURSORHOLD, "CursorHold"),
-    KEYVALUE_ENTRY(-EVENT_CURSORHOLDI, "CursorHoldI"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVED, "CursorMoved"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVEDC, "CursorMovedC"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVEDI, "CursorMovedI"),
-    KEYVALUE_ENTRY(EVENT_DIFFUPDATED, "DiffUpdated"),
-    KEYVALUE_ENTRY(EVENT_DIRCHANGED, "DirChanged"),
-    KEYVALUE_ENTRY(EVENT_DIRCHANGEDPRE, "DirChangedPre"),
-    KEYVALUE_ENTRY(EVENT_ENCODINGCHANGED, "EncodingChanged"),
-    KEYVALUE_ENTRY(EVENT_EXITPRE, "ExitPre"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDCMD, "FileAppendCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDPOST, "FileAppendPost"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDPRE, "FileAppendPre"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDRO, "FileChangedRO"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDSHELL, "FileChangedShell"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDSHELLPOST, "FileChangedShellPost"),
-    KEYVALUE_ENTRY(EVENT_ENCODINGCHANGED, "FileEncoding"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADCMD, "FileReadCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADPOST, "FileReadPost"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADPRE, "FileReadPre"),
-    KEYVALUE_ENTRY(-EVENT_FILETYPE, "FileType"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITECMD, "FileWriteCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITEPOST, "FileWritePost"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITEPRE, "FileWritePre"),
-    KEYVALUE_ENTRY(-EVENT_FILTERREADPOST, "FilterReadPost"),
-    KEYVALUE_ENTRY(-EVENT_FILTERREADPRE, "FilterReadPre"),
-    KEYVALUE_ENTRY(-EVENT_FILTERWRITEPOST, "FilterWritePost"),
-    KEYVALUE_ENTRY(-EVENT_FILTERWRITEPRE, "FilterWritePre"),
-    KEYVALUE_ENTRY(EVENT_FOCUSGAINED, "FocusGained"),
-    KEYVALUE_ENTRY(EVENT_FOCUSLOST, "FocusLost"),
-    KEYVALUE_ENTRY(EVENT_FUNCUNDEFINED, "FuncUndefined"),
-    KEYVALUE_ENTRY(EVENT_GUIENTER, "GUIEnter"),
-    KEYVALUE_ENTRY(EVENT_GUIFAILED, "GUIFailed"),
-    KEYVALUE_ENTRY(-EVENT_INSERTCHANGE, "InsertChange"),
-    KEYVALUE_ENTRY(-EVENT_INSERTCHARPRE, "InsertCharPre"),
-    KEYVALUE_ENTRY(-EVENT_INSERTENTER, "InsertEnter"),
-    KEYVALUE_ENTRY(-EVENT_INSERTLEAVE, "InsertLeave"),
-    KEYVALUE_ENTRY(-EVENT_INSERTLEAVEPRE, "InsertLeavePre"),
-    KEYVALUE_ENTRY(EVENT_KEYINPUTPRE, "KeyInputPre"),
-    KEYVALUE_ENTRY(EVENT_MENUPOPUP, "MenuPopup"),
-    KEYVALUE_ENTRY(EVENT_MODECHANGED, "ModeChanged"),
-    KEYVALUE_ENTRY(EVENT_OPTIONSET, "OptionSet"),
-    KEYVALUE_ENTRY(EVENT_QUICKFIXCMDPOST, "QuickFixCmdPost"),
-    KEYVALUE_ENTRY(EVENT_QUICKFIXCMDPRE, "QuickFixCmdPre"),
-    KEYVALUE_ENTRY(EVENT_QUITPRE, "QuitPre"),
-    KEYVALUE_ENTRY(EVENT_REMOTEREPLY, "RemoteReply"),
-    KEYVALUE_ENTRY(EVENT_SAFESTATE, "SafeState"),
-    KEYVALUE_ENTRY(EVENT_SAFESTATEAGAIN, "SafeStateAgain"),
-    KEYVALUE_ENTRY(EVENT_SESSIONLOADPOST, "SessionLoadPost"),
-    KEYVALUE_ENTRY(EVENT_SESSIONLOADPRE, "SessionLoadPre"),
-    KEYVALUE_ENTRY(EVENT_SESSIONWRITEPOST, "SessionWritePost"),
-    KEYVALUE_ENTRY(EVENT_SHELLCMDPOST, "ShellCmdPost"),
-    KEYVALUE_ENTRY(-EVENT_SHELLFILTERPOST, "ShellFilterPost"),
-    KEYVALUE_ENTRY(EVENT_SIGUSR1, "SigUSR1"),
-    KEYVALUE_ENTRY(EVENT_SOURCECMD, "SourceCmd"),
-    KEYVALUE_ENTRY(EVENT_SOURCEPOST, "SourcePost"),
-    KEYVALUE_ENTRY(EVENT_SOURCEPRE, "SourcePre"),
-    KEYVALUE_ENTRY(EVENT_SPELLFILEMISSING, "SpellFileMissing"),
-    KEYVALUE_ENTRY(EVENT_STDINREADPOST, "StdinReadPost"),
-    KEYVALUE_ENTRY(EVENT_STDINREADPRE, "StdinReadPre"),
-    KEYVALUE_ENTRY(EVENT_SWAPEXISTS, "SwapExists"),
-    KEYVALUE_ENTRY(EVENT_SYNTAX, "Syntax"),
-    KEYVALUE_ENTRY(EVENT_TABCLOSED, "TabClosed"),
-    KEYVALUE_ENTRY(EVENT_TABCLOSEDPRE, "TabClosedPre"),
-    KEYVALUE_ENTRY(EVENT_TABENTER, "TabEnter"),
-    KEYVALUE_ENTRY(EVENT_TABLEAVE, "TabLeave"),
-    KEYVALUE_ENTRY(EVENT_TABNEW, "TabNew"),
-    KEYVALUE_ENTRY(EVENT_TERMCHANGED, "TermChanged"),
-    KEYVALUE_ENTRY(EVENT_TERMINALOPEN, "TerminalOpen"),
-    KEYVALUE_ENTRY(EVENT_TERMINALWINOPEN, "TerminalWinOpen"),
-    KEYVALUE_ENTRY(EVENT_TERMRESPONSE, "TermResponse"),
-    KEYVALUE_ENTRY(EVENT_TERMRESPONSEALL, "TermResponseAll"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGED, "TextChanged"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDI, "TextChangedI"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDP, "TextChangedP"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDT, "TextChangedT"),
-    KEYVALUE_ENTRY(-EVENT_TEXTPUTPOST, "TextPutPost"),
-    KEYVALUE_ENTRY(-EVENT_TEXTPUTPRE, "TextPutPre"),
-    KEYVALUE_ENTRY(-EVENT_TEXTYANKPOST, "TextYankPost"),
-    KEYVALUE_ENTRY(EVENT_USER, "User"),
-    KEYVALUE_ENTRY(EVENT_VIMENTER, "VimEnter"),
-    KEYVALUE_ENTRY(EVENT_VIMLEAVE, "VimLeave"),
-    KEYVALUE_ENTRY(EVENT_VIMLEAVEPRE, "VimLeavePre"),
-    KEYVALUE_ENTRY(EVENT_VIMRESIZED, "VimResized"),
-    KEYVALUE_ENTRY(EVENT_VIMRESUME, "VimResume"),
-    KEYVALUE_ENTRY(EVENT_VIMSUSPEND, "VimSuspend"),
-    KEYVALUE_ENTRY(-EVENT_WINCLOSED, "WinClosed"),
-    KEYVALUE_ENTRY(-EVENT_WINENTER, "WinEnter"),
-    KEYVALUE_ENTRY(-EVENT_WINLEAVE, "WinLeave"),
-    KEYVALUE_ENTRY(EVENT_WINNEW, "WinNew"),
-    KEYVALUE_ENTRY(EVENT_WINNEWPRE, "WinNewPre"),
-    KEYVALUE_ENTRY(-EVENT_WINRESIZED, "WinResized"),
-    KEYVALUE_ENTRY(-EVENT_WINSCROLLED, "WinScrolled"),
+స్థిర keyvalue_T event_tab[అంకె_EVENTS] = {
+    KEYVALUE_నమోదు(-EVENT_BUFADD, "BufAdd"),
+    KEYVALUE_నమోదు(-EVENT_BUFADD, "BufCreate"),
+    KEYVALUE_నమోదు(-EVENT_BUFDELETE, "BufDelete"),
+    KEYVALUE_నమోదు(-EVENT_BUFENTER, "BufEnter"),
+    KEYVALUE_నమోదు(-EVENT_BUFFILEPOST, "BufFilePost"),
+    KEYVALUE_నమోదు(-EVENT_BUFFILEPRE, "BufFilePre"),
+    KEYVALUE_నమోదు(-EVENT_BUFHIDDEN, "BufHidden"),
+    KEYVALUE_నమోదు(-EVENT_BUFLEAVE, "BufLeave"),
+    KEYVALUE_నమోదు(-EVENT_BUFNEW, "BufNew"),
+    KEYVALUE_నమోదు(-EVENT_BUFNEWFILE, "BufNewFile"),	// BUFNEWFILE_INDEX
+    KEYVALUE_నమోదు(-EVENT_BUFREADPOST, "BufRead"),	// BUFREAD_INDEX
+    KEYVALUE_నమోదు(-EVENT_BUFREADCMD, "BufReadCmd"),
+    KEYVALUE_నమోదు(-EVENT_BUFREADPOST, "BufReadPost"),
+    KEYVALUE_నమోదు(-EVENT_BUFREADPRE, "BufReadPre"),
+    KEYVALUE_నమోదు(-EVENT_BUFUNLOAD, "BufUnload"),
+    KEYVALUE_నమోదు(-EVENT_BUFWINENTER, "BufWinEnter"),
+    KEYVALUE_నమోదు(-EVENT_BUFWINLEAVE, "BufWinLeave"),
+    KEYVALUE_నమోదు(-EVENT_BUFWIPEOUT, "BufWipeout"),
+    KEYVALUE_నమోదు(-EVENT_BUFWRITEPRE, "BufWrite"),
+    KEYVALUE_నమోదు(-EVENT_BUFWRITECMD, "BufWriteCmd"),
+    KEYVALUE_నమోదు(-EVENT_BUFWRITEPOST, "BufWritePost"),
+    KEYVALUE_నమోదు(-EVENT_BUFWRITEPRE, "BufWritePre"),
+    KEYVALUE_నమోదు(EVENT_CMDLINECHANGED, "CmdlineChanged"),
+    KEYVALUE_నమోదు(EVENT_CMDLINEENTER, "CmdlineEnter"),
+    KEYVALUE_నమోదు(EVENT_CMDLINELEAVE, "CmdlineLeave"),
+    KEYVALUE_నమోదు(EVENT_CMDLINELEAVEPRE, "CmdlineLeavePre"),
+    KEYVALUE_నమోదు(EVENT_CMDUNDEFINED, "CmdUndefined"),
+    KEYVALUE_నమోదు(EVENT_CMDWINENTER, "CmdwinEnter"),
+    KEYVALUE_నమోదు(EVENT_CMDWINLEAVE, "CmdwinLeave"),
+    KEYVALUE_నమోదు(EVENT_COLORSCHEME, "ColorScheme"),
+    KEYVALUE_నమోదు(EVENT_COLORSCHEMEPRE, "ColorSchemePre"),
+    KEYVALUE_నమోదు(EVENT_COMPLETECHANGED, "CompleteChanged"),
+    KEYVALUE_నమోదు(EVENT_COMPLETEDONE, "CompleteDone"),
+    KEYVALUE_నమోదు(EVENT_COMPLETEDONEPRE, "CompleteDonePre"),
+    KEYVALUE_నమోదు(-EVENT_CURSORHOLD, "CursorHold"),
+    KEYVALUE_నమోదు(-EVENT_CURSORHOLDI, "CursorHoldI"),
+    KEYVALUE_నమోదు(-EVENT_CURSORMOVED, "CursorMoved"),
+    KEYVALUE_నమోదు(-EVENT_CURSORMOVEDC, "CursorMovedC"),
+    KEYVALUE_నమోదు(-EVENT_CURSORMOVEDI, "CursorMovedI"),
+    KEYVALUE_నమోదు(EVENT_DIFFUPDATED, "DiffUpdated"),
+    KEYVALUE_నమోదు(EVENT_DIRCHANGED, "DirChanged"),
+    KEYVALUE_నమోదు(EVENT_DIRCHANGEDPRE, "DirChangedPre"),
+    KEYVALUE_నమోదు(EVENT_ENCODINGCHANGED, "EncodingChanged"),
+    KEYVALUE_నమోదు(EVENT_EXITPRE, "ExitPre"),
+    KEYVALUE_నమోదు(-EVENT_FILEAPPENDCMD, "FileAppendCmd"),
+    KEYVALUE_నమోదు(-EVENT_FILEAPPENDPOST, "FileAppendPost"),
+    KEYVALUE_నమోదు(-EVENT_FILEAPPENDPRE, "FileAppendPre"),
+    KEYVALUE_నమోదు(-EVENT_FILECHANGEDRO, "FileChangedRO"),
+    KEYVALUE_నమోదు(-EVENT_FILECHANGEDSHELL, "FileChangedShell"),
+    KEYVALUE_నమోదు(-EVENT_FILECHANGEDSHELLPOST, "FileChangedShellPost"),
+    KEYVALUE_నమోదు(EVENT_ENCODINGCHANGED, "FileEncoding"),
+    KEYVALUE_నమోదు(-EVENT_FILEREADCMD, "FileReadCmd"),
+    KEYVALUE_నమోదు(-EVENT_FILEREADPOST, "FileReadPost"),
+    KEYVALUE_నమోదు(-EVENT_FILEREADPRE, "FileReadPre"),
+    KEYVALUE_నమోదు(-EVENT_FILETYPE, "FileType"),
+    KEYVALUE_నమోదు(-EVENT_FILEWRITECMD, "FileWriteCmd"),
+    KEYVALUE_నమోదు(-EVENT_FILEWRITEPOST, "FileWritePost"),
+    KEYVALUE_నమోదు(-EVENT_FILEWRITEPRE, "FileWritePre"),
+    KEYVALUE_నమోదు(-EVENT_FILTERREADPOST, "FilterReadPost"),
+    KEYVALUE_నమోదు(-EVENT_FILTERREADPRE, "FilterReadPre"),
+    KEYVALUE_నమోదు(-EVENT_FILTERWRITEPOST, "FilterWritePost"),
+    KEYVALUE_నమోదు(-EVENT_FILTERWRITEPRE, "FilterWritePre"),
+    KEYVALUE_నమోదు(EVENT_FOCUSGAINED, "FocusGained"),
+    KEYVALUE_నమోదు(EVENT_FOCUSLOST, "FocusLost"),
+    KEYVALUE_నమోదు(EVENT_FUNCUNDEFINED, "FuncUndefined"),
+    KEYVALUE_నమోదు(EVENT_GUIENTER, "GUIEnter"),
+    KEYVALUE_నమోదు(EVENT_GUIFAILED, "GUIFailed"),
+    KEYVALUE_నమోదు(-EVENT_INSERTCHANGE, "InsertChange"),
+    KEYVALUE_నమోదు(-EVENT_INSERTCHARPRE, "InsertCharPre"),
+    KEYVALUE_నమోదు(-EVENT_INSERTENTER, "InsertEnter"),
+    KEYVALUE_నమోదు(-EVENT_INSERTLEAVE, "InsertLeave"),
+    KEYVALUE_నమోదు(-EVENT_INSERTLEAVEPRE, "InsertLeavePre"),
+    KEYVALUE_నమోదు(EVENT_KEYINPUTPRE, "KeyInputPre"),
+    KEYVALUE_నమోదు(EVENT_MENUPOPUP, "MenuPopup"),
+    KEYVALUE_నమోదు(EVENT_MODECHANGED, "ModeChanged"),
+    KEYVALUE_నమోదు(EVENT_OPTIONSET, "OptionSet"),
+    KEYVALUE_నమోదు(EVENT_QUICKFIXCMDPOST, "QuickFixCmdPost"),
+    KEYVALUE_నమోదు(EVENT_QUICKFIXCMDPRE, "QuickFixCmdPre"),
+    KEYVALUE_నమోదు(EVENT_QUITPRE, "QuitPre"),
+    KEYVALUE_నమోదు(EVENT_REMOTEREPLY, "RemoteReply"),
+    KEYVALUE_నమోదు(EVENT_SAFESTATE, "SafeState"),
+    KEYVALUE_నమోదు(EVENT_SAFESTATEAGAIN, "SafeStateAgain"),
+    KEYVALUE_నమోదు(EVENT_SESSIONLOADPOST, "SessionLoadPost"),
+    KEYVALUE_నమోదు(EVENT_SESSIONLOADPRE, "SessionLoadPre"),
+    KEYVALUE_నమోదు(EVENT_SESSIONWRITEPOST, "SessionWritePost"),
+    KEYVALUE_నమోదు(EVENT_SHELLCMDPOST, "ShellCmdPost"),
+    KEYVALUE_నమోదు(-EVENT_SHELLFILTERPOST, "ShellFilterPost"),
+    KEYVALUE_నమోదు(EVENT_SIGUSR1, "SigUSR1"),
+    KEYVALUE_నమోదు(EVENT_SOURCECMD, "SourceCmd"),
+    KEYVALUE_నమోదు(EVENT_SOURCEPOST, "SourcePost"),
+    KEYVALUE_నమోదు(EVENT_SOURCEPRE, "SourcePre"),
+    KEYVALUE_నమోదు(EVENT_SPELLFILEMISSING, "SpellFileMissing"),
+    KEYVALUE_నమోదు(EVENT_STDINREADPOST, "StdinReadPost"),
+    KEYVALUE_నమోదు(EVENT_STDINREADPRE, "StdinReadPre"),
+    KEYVALUE_నమోదు(EVENT_SWAPEXISTS, "SwapExists"),
+    KEYVALUE_నమోదు(EVENT_SYNTAX, "Syntax"),
+    KEYVALUE_నమోదు(EVENT_TABCLOSED, "TabClosed"),
+    KEYVALUE_నమోదు(EVENT_TABCLOSEDPRE, "TabClosedPre"),
+    KEYVALUE_నమోదు(EVENT_TABENTER, "TabEnter"),
+    KEYVALUE_నమోదు(EVENT_TABLEAVE, "TabLeave"),
+    KEYVALUE_నమోదు(EVENT_TABNEW, "TabNew"),
+    KEYVALUE_నమోదు(EVENT_TERMCHANGED, "TermChanged"),
+    KEYVALUE_నమోదు(EVENT_TERMINALOPEN, "TerminalOpen"),
+    KEYVALUE_నమోదు(EVENT_TERMINALWINOPEN, "TerminalWinOpen"),
+    KEYVALUE_నమోదు(EVENT_TERMRESPONSE, "TermResponse"),
+    KEYVALUE_నమోదు(EVENT_TERMRESPONSEALL, "TermResponseAll"),
+    KEYVALUE_నమోదు(-EVENT_TEXTCHANGED, "TextChanged"),
+    KEYVALUE_నమోదు(-EVENT_TEXTCHANGEDI, "TextChangedI"),
+    KEYVALUE_నమోదు(-EVENT_TEXTCHANGEDP, "TextChangedP"),
+    KEYVALUE_నమోదు(-EVENT_TEXTCHANGEDT, "TextChangedT"),
+    KEYVALUE_నమోదు(-EVENT_TEXTPUTPOST, "TextPutPost"),
+    KEYVALUE_నమోదు(-EVENT_TEXTPUTPRE, "TextPutPre"),
+    KEYVALUE_నమోదు(-EVENT_TEXTYANKPOST, "TextYankPost"),
+    KEYVALUE_నమోదు(EVENT_USER, "User"),
+    KEYVALUE_నమోదు(EVENT_VIMENTER, "VimEnter"),
+    KEYVALUE_నమోదు(EVENT_VIMLEAVE, "VimLeave"),
+    KEYVALUE_నమోదు(EVENT_VIMLEAVEPRE, "VimLeavePre"),
+    KEYVALUE_నమోదు(EVENT_VIMRESIZED, "VimResized"),
+    KEYVALUE_నమోదు(EVENT_VIMRESUME, "VimResume"),
+    KEYVALUE_నమోదు(EVENT_VIMSUSPEND, "VimSuspend"),
+    KEYVALUE_నమోదు(-EVENT_WINCLOSED, "WinClosed"),
+    KEYVALUE_నమోదు(-EVENT_WINENTER, "WinEnter"),
+    KEYVALUE_నమోదు(-EVENT_WINLEAVE, "WinLeave"),
+    KEYVALUE_నమోదు(EVENT_WINNEW, "WinNew"),
+    KEYVALUE_నమోదు(EVENT_WINNEWPRE, "WinNewPre"),
+    KEYVALUE_నమోదు(-EVENT_WINRESIZED, "WinResized"),
+    KEYVALUE_నమోదు(-EVENT_WINSCROLLED, "WinScrolled"),
 };
 
-static AutoPat *first_autopat[NUM_EVENTS] = { NULL };
-static AutoPat *last_autopat[NUM_EVENTS] = { NULL };
+స్థిర AutoPat *మొదటి_autopat[అంకె_EVENTS] = { ఖాళీ };
+స్థిర AutoPat *చివరి_autopat[అంకె_EVENTS] = { ఖాళీ };
 
-#define AUGROUP_DEFAULT    (-1)	    // default autocmd group
-#define AUGROUP_ERROR	   (-2)	    // erroneous autocmd group
-#define AUGROUP_ALL	   (-3)	    // all autocmd groups
+#నిర్వచించు AUGROUP_DEFAULT    (-1)	    // default autocmd group
+#నిర్వచించు AUGROUP_ERROR	   (-2)	    // erroneous autocmd group
+#నిర్వచించు AUGROUP_ALL	   (-3)	    // all autocmd groups
 
 /*
  * struct used to keep status while executing autocommands for an event.
  */
-struct AutoPatCmd_S
+నిర్మాణం AutoPatCmd_S
 {
     AutoPat	*curpat;	// next AutoPat to examine
     AutoCmd	*nextcmd;	// next AutoCmd to execute
-    int		group;		// group being used
+    పూర్ణాంకం		సమూహం;		// group being used
     char_u	*fname;		// fname to match with
     char_u	*sfname;	// sfname to match with
-    char_u	*tail;		// tail of fname
+    char_u	*తోక;		// tail of fname
     event_T	event;		// current event
     sctx_T	script_ctx;	// script context where it is defined
-    int		arg_bufnr;	// Initially equal to <abuf>, set to zero when
+    పూర్ణాంకం		arg_bufnr;	// Initially equal to <abuf>, set to zero when
 				// buf is deleted.
-    AutoPatCmd_T *next;		// chain of active apc-s for auto-invalidation
+    AutoPatCmd_T *తదుపరి;		// chain of active apc-s for auto-invalidation
 };
 
-static AutoPatCmd_T *active_apc_list = NULL; // stack of active autocommands
+స్థిర AutoPatCmd_T *చురుకైన_apc_list = ఖాళీ; // stack of active autocommands
 
 // Macro to loop over all the patterns for an autocmd event
-#define FOR_ALL_AUTOCMD_PATTERNS(event, ap) \
-    for ((ap) = first_autopat[(int)(event)]; (ap) != NULL; (ap) = (ap)->next)
+#నిర్వచించు FOR_ALL_AUTOCMD_PATTERNS(event, ap) \
+    కొరకు ((ap) = మొదటి_autopat[(పూర్ణాంకం)(event)]; (ap) != ఖాళీ; (ap) = (ap)->తదుపరి)
 
 /*
  * augroups stores a list of autocmd group names.
  */
-static garray_T augroups = {0, 0, sizeof(char_u *), 10, NULL};
-#define AUGROUP_NAME(i) (((char_u **)augroups.ga_data)[i])
+స్థిర garray_T augroups = {0, 0, పరిమాణం(char_u *), 10, ఖాళీ};
+#నిర్వచించు AUGROUP_NAME(i) (((char_u **)augroups.ga_దత్తాంశం)[i])
 // use get_deleted_augroup() to get this
-static char_u *deleted_augroup = NULL;
+స్థిర char_u *deleted_augroup = ఖాళీ;
 
 /*
  * The ID of the current group.  Group 0 is the default one.
  */
-static int current_augroup = AUGROUP_DEFAULT;
+స్థిర పూర్ణాంకం current_augroup = AUGROUP_DEFAULT;
 
-static int au_need_clean = FALSE;   // need to delete marked patterns
+స్థిర పూర్ణాంకం au_need_clean = FALSE;   // need to delete marked patterns
 
-static event_T event_name2nr(char_u *start, char_u **end);
-static string_T *event_nr2name(event_T event);
-static int au_get_grouparg(char_u **argp);
-static int do_autocmd_event(event_T event, char_u *pat, int once, int nested, char_u *cmd, int forceit, int group, int flags);
-static int apply_autocmds_group(event_T event, char_u *fname, char_u *fname_io, int force, int group, buf_T *buf, exarg_T *eap);
-static void auto_next_pat(AutoPatCmd_T *apc, int stop_at_last);
-static int au_find_group(char_u *name);
+స్థిర event_T event_name2nr(char_u *ప్రారంభం, char_u **చివర);
+స్థిర string_T *event_nr2name(event_T event);
+స్థిర పూర్ణాంకం au_get_grouparg(char_u **argp);
+స్థిర పూర్ణాంకం do_autocmd_event(event_T event, char_u *pat, పూర్ణాంకం once, పూర్ణాంకం nested, char_u *cmd, పూర్ణాంకం forceit, పూర్ణాంకం సమూహం, పూర్ణాంకం flags);
+స్థిర పూర్ణాంకం apply_autocmds_సమూహం(event_T event, char_u *fname, char_u *fname_io, పూర్ణాంకం force, పూర్ణాంకం సమూహం, buf_T *buf, exarg_T *eap);
+స్థిర శూన్య auto_తదుపరి_pat(AutoPatCmd_T *apc, పూర్ణాంకం stop_at_చివరి);
+స్థిర పూర్ణాంకం au_కనుగొను_సమూహం(char_u *name);
 
-static event_T	last_event;
-static int	last_group;
-static int	autocmd_blocked = 0;	// block all autocmds
+స్థిర event_T	చివరి_event;
+స్థిర పూర్ణాంకం	చివరి_సమూహం;
+స్థిర పూర్ణాంకం	autocmd_blocked = 0;	// block all autocmds
 
-    static char_u *
-get_deleted_augroup(void)
+    స్థిర char_u *
+get_deleted_augroup(శూన్య)
 {
-    if (deleted_augroup == NULL)
+    ఒకవేళ (deleted_augroup == ఖాళీ)
 	deleted_augroup = (char_u *)_("--Deleted--");
-    return deleted_augroup;
+    తిరిగి deleted_augroup;
 }
 
 /*
  * Show the autocommands for one AutoPat.
  */
-    static void
+    స్థిర శూన్య
 show_autocmd(AutoPat *ap, event_T event)
 {
     AutoCmd *ac;
 
     // Check for "got_int" (here and at various places below), which is set
     // when "q" has been hit for the "--more--" prompt
-    if (got_int)
-	return;
-    if (ap->pat == NULL)		// pattern has been removed
-	return;
+    ఒకవేళ (got_int)
+	తిరిగి;
+    ఒకవేళ (ap->pat == ఖాళీ)		// pattern has been removed
+	తిరిగి;
 
     // Make sure no info referenced by "ap" is cleared, e.g. when a timer
     // clears an augroup.  Jump to "theend" after this!
     // "ap->pat" may be cleared anyway.
     ++autocmd_busy;
 
-    msg_putchar('\n');
-    if (got_int)
-	goto theend;
-    if (event != last_event || ap->group != last_group)
+    సందేశం_putchar('\n');
+    ఒకవేళ (got_int)
+	వెళ్ళు theend;
+    ఒకవేళ (event != చివరి_event || ap->సమూహం != చివరి_సమూహం)
     {
 	string_T    *event_name;
 
-	if (ap->group != AUGROUP_DEFAULT)
+	ఒకవేళ (ap->సమూహం != AUGROUP_DEFAULT)
 	{
-	    if (AUGROUP_NAME(ap->group) == NULL)
-		msg_puts_attr((char *)get_deleted_augroup(), HL_ATTR(HLF_E));
-	    else
-		msg_puts_attr((char *)AUGROUP_NAME(ap->group), HL_ATTR(HLF_T));
-	    msg_puts("  ");
+	    ఒకవేళ (AUGROUP_NAME(ap->సమూహం) == ఖాళీ)
+		సందేశం_puts_attr((అక్షరం *)get_deleted_augroup(), HL_ATTR(HLF_E));
+	    లేకపోతే
+		సందేశం_puts_attr((అక్షరం *)AUGROUP_NAME(ap->సమూహం), HL_ATTR(HLF_T));
+	    సందేశం_puts("  ");
 	}
 	event_name = event_nr2name(event);
-	msg_puts_attr((char *)event_name->string, HL_ATTR(HLF_T));
-	last_event = event;
-	last_group = ap->group;
-	msg_putchar('\n');
-	if (got_int)
-	    goto theend;
+	సందేశం_puts_attr((అక్షరం *)event_name->string, HL_ATTR(HLF_T));
+	చివరి_event = event;
+	చివరి_సమూహం = ap->సమూహం;
+	సందేశం_putchar('\n');
+	ఒకవేళ (got_int)
+	    వెళ్ళు theend;
     }
 
-    if (ap->pat == NULL)
-	goto theend;  // timer might have cleared the pattern or group
+    ఒకవేళ (ap->pat == ఖాళీ)
+	వెళ్ళు theend;  // timer might have cleared the pattern or group
 
-    msg_col = 4;
-    msg_outtrans(ap->pat);
+    సందేశం_నిలువు = 4;
+    సందేశం_outtrans(ap->pat);
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    కొరకు (ac = ap->cmds; ac != ఖాళీ; ac = ac->తదుపరి)
     {
-	if (ac->cmd == NULL)		// skip removed commands
-	    continue;
+	ఒకవేళ (ac->cmd == ఖాళీ)		// skip removed commands
+	    కొనసాగు;
 
-	if (msg_col >= 14)
-	    msg_putchar('\n');
-	msg_col = 14;
-	if (got_int)
-	    goto theend;
-	msg_outtrans(ac->cmd);
-#ifdef FEAT_EVAL
-	if (p_verbose > 0)
-	    last_set_msg(ac->script_ctx);
-#endif
-	if (got_int)
-	    goto theend;
-	if (ac->next != NULL)
+	ఒకవేళ (సందేశం_నిలువు >= 14)
+	    సందేశం_putchar('\n');
+	సందేశం_నిలువు = 14;
+	ఒకవేళ (got_int)
+	    వెళ్ళు theend;
+	సందేశం_outtrans(ac->cmd);
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (p_verbose > 0)
+	    చివరి_సమితి_సందేశం(ac->script_ctx);
+#అయితే_ముగింపు
+	ఒకవేళ (got_int)
+	    వెళ్ళు theend;
+	ఒకవేళ (ac->తదుపరి != ఖాళీ)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		goto theend;
+	    సందేశం_putchar('\n');
+	    ఒకవేళ (got_int)
+		వెళ్ళు theend;
 	}
     }
 
@@ -362,7 +362,7 @@ theend:
 /*
  * Mark an autocommand pattern for deletion.
  */
-    static void
+    స్థిర శూన్య
 au_remove_pat(AutoPat *ap)
 {
     VIM_CLEAR(ap->pat);
@@ -373,18 +373,18 @@ au_remove_pat(AutoPat *ap)
 /*
  * Mark all commands for a pattern for deletion.
  */
-    static void
+    స్థిర శూన్య
 au_remove_cmds(AutoPat *ap)
 {
     AutoCmd *ac;
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    కొరకు (ac = ap->cmds; ac != ఖాళీ; ac = ac->తదుపరి)
 	VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
 }
 
 // Delete one command from an autocmd pattern.
-static void au_del_cmd(AutoCmd *ac)
+స్థిర శూన్య au_del_cmd(AutoCmd *ac)
 {
     VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
@@ -394,68 +394,68 @@ static void au_del_cmd(AutoCmd *ac)
  * Cleanup autocommands and patterns that have been deleted.
  * This is only done when not executing autocommands.
  */
-    static void
-au_cleanup(void)
+    స్థిర శూన్య
+au_cleanup(శూన్య)
 {
     AutoPat	*ap, **prev_ap;
     AutoCmd	*ac, **prev_ac;
     event_T	event;
 
-    if (autocmd_busy || !au_need_clean)
-	return;
+    ఒకవేళ (autocmd_busy || !au_need_clean)
+	తిరిగి;
 
     // loop over all events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+					    event = (event_T)((పూర్ణాంకం)event + 1))
     {
 	// loop over all autocommand patterns
-	prev_ap = &(first_autopat[(int)event]);
-	for (ap = *prev_ap; ap != NULL; ap = *prev_ap)
+	prev_ap = &(మొదటి_autopat[(పూర్ణాంకం)event]);
+	కొరకు (ap = *prev_ap; ap != ఖాళీ; ap = *prev_ap)
 	{
-	    int has_cmd = FALSE;
+	    పూర్ణాంకం has_cmd = FALSE;
 
 	    // loop over all commands for this pattern
 	    prev_ac = &(ap->cmds);
-	    for (ac = *prev_ac; ac != NULL; ac = *prev_ac)
+	    కొరకు (ac = *prev_ac; ac != ఖాళీ; ac = *prev_ac)
 	    {
 		// remove the command if the pattern is to be deleted or when
 		// the command has been marked for deletion
-		if (ap->pat == NULL || ac->cmd == NULL)
+		ఒకవేళ (ap->pat == ఖాళీ || ac->cmd == ఖాళీ)
 		{
-		    *prev_ac = ac->next;
+		    *prev_ac = ac->తదుపరి;
 		    vim_free(ac->cmd);
 		    vim_free(ac);
 		}
-		else
+		లేకపోతే
 		{
 		    has_cmd = TRUE;
-		    prev_ac = &(ac->next);
+		    prev_ac = &(ac->తదుపరి);
 		}
 	    }
 
-	    if (ap->pat != NULL && !has_cmd)
+	    ఒకవేళ (ap->pat != ఖాళీ && !has_cmd)
 		// Pattern was not marked for deletion, but all of its
 		// commands were.  So mark the pattern for deletion.
 		au_remove_pat(ap);
 
 	    // remove the pattern if it has been marked for deletion
-	    if (ap->pat == NULL)
+	    ఒకవేళ (ap->pat == ఖాళీ)
 	    {
-		if (ap->next == NULL)
+		ఒకవేళ (ap->తదుపరి == ఖాళీ)
 		{
-		    if (prev_ap == &(first_autopat[(int)event]))
-			last_autopat[(int)event] = NULL;
-		    else
+		    ఒకవేళ (prev_ap == &(మొదటి_autopat[(పూర్ణాంకం)event]))
+			చివరి_autopat[(పూర్ణాంకం)event] = ఖాళీ;
+		    లేకపోతే
 			// this depends on the "next" field being the first in
 			// the struct
-			last_autopat[(int)event] = (AutoPat *)prev_ap;
+			చివరి_autopat[(పూర్ణాంకం)event] = (AutoPat *)prev_ap;
 		}
-		*prev_ap = ap->next;
+		*prev_ap = ap->తదుపరి;
 		vim_regfree(ap->reg_prog);
 		vim_free(ap);
 	    }
-	    else
-		prev_ap = &(ap->next);
+	    లేకపోతే
+		prev_ap = &(ap->తదుపరి);
 	}
     }
 
@@ -466,7 +466,7 @@ au_cleanup(void)
  * Called when buffer is freed, to remove/invalidate related buffer-local
  * autocmds.
  */
-    void
+    శూన్య
 aubuflocal_remove(buf_T *buf)
 {
     AutoPat	    *ap;
@@ -474,19 +474,19 @@ aubuflocal_remove(buf_T *buf)
     AutoPatCmd_T    *apc;
 
     // invalidate currently executing autocommands
-    for (apc = active_apc_list; apc; apc = apc->next)
-	if (buf->b_fnum == apc->arg_bufnr)
+    కొరకు (apc = చురుకైన_apc_list; apc; apc = apc->తదుపరి)
+	ఒకవేళ (buf->b_fnum == apc->arg_bufnr)
 	    apc->arg_bufnr = 0;
 
     // invalidate buflocals looping through events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+					    event = (event_T)((పూర్ణాంకం)event + 1))
 	// loop over all autocommand patterns
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->buflocal_nr == buf->b_fnum)
+	    ఒకవేళ (ap->buflocal_nr == buf->b_fnum)
 	    {
 		au_remove_pat(ap);
-		if (p_verbose >= 6)
+		ఒకవేళ (p_verbose >= 6)
 		{
 		    string_T	*event_name;
 
@@ -504,173 +504,173 @@ aubuflocal_remove(buf_T *buf)
  * Add an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
-au_new_group(char_u *name)
+    స్థిర పూర్ణాంకం
+au_new_సమూహం(char_u *name)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    i = au_find_group(name);
-    if (i != AUGROUP_ERROR)
-	return i;
+    i = au_కనుగొను_సమూహం(name);
+    ఒకవేళ (i != AUGROUP_ERROR)
+	తిరిగి i;
 
     // the group doesn't exist yet, add it.  First try using a free entry.
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) == NULL)
-	    break;
-    if (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
-	return AUGROUP_ERROR;
+    కొరకు (i = 0; i < augroups.ga_len; ++i)
+	ఒకవేళ (AUGROUP_NAME(i) == ఖాళీ)
+	    ఆపు;
+    ఒకవేళ (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
+	తిరిగి AUGROUP_ERROR;
 
     AUGROUP_NAME(i) = vim_strsave(name);
-    if (AUGROUP_NAME(i) == NULL)
-	return AUGROUP_ERROR;
-    if (i == augroups.ga_len)
+    ఒకవేళ (AUGROUP_NAME(i) == ఖాళీ)
+	తిరిగి AUGROUP_ERROR;
+    ఒకవేళ (i == augroups.ga_len)
 	++augroups.ga_len;
 
-    return i;
+    తిరిగి i;
 }
 
-    static void
-au_del_group(char_u *name)
+    స్థిర శూన్య
+au_del_సమూహం(char_u *name)
 {
-    int		i;
+    పూర్ణాంకం		i;
     event_T	event;
     AutoPat	*ap;
-    int		in_use = FALSE;
+    పూర్ణాంకం		లోపల_use = FALSE;
 
 
-    i = au_find_group(name);
-    if (i == AUGROUP_ERROR)	// the group doesn't exist
+    i = au_కనుగొను_సమూహం(name);
+    ఒకవేళ (i == AUGROUP_ERROR)	// the group doesn't exist
     {
-	semsg(_(e_no_such_group_str), name);
-	return;
+	semsg(_(e_no_such_సమూహం_str), name);
+	తిరిగి;
     }
-    if (i == current_augroup)
+    ఒకవేళ (i == current_augroup)
     {
-	emsg(_(e_cannot_delete_current_group));
-	return;
+	emsg(_(e_cannot_delete_current_సమూహం));
+	తిరిగి;
     }
 
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+	    event = (event_T)((పూర్ణాంకం)event + 1))
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->group == i && ap->pat != NULL)
+	    ఒకవేళ (ap->సమూహం == i && ap->pat != ఖాళీ)
 	    {
 		give_warning((char_u *)_("W19: Deleting augroup that is still in use"), TRUE);
-		in_use = TRUE;
-		event = NUM_EVENTS;
-		break;
+		లోపల_use = TRUE;
+		event = అంకె_EVENTS;
+		ఆపు;
 	    }
     }
     vim_free(AUGROUP_NAME(i));
-    if (in_use)
+    ఒకవేళ (లోపల_use)
 	AUGROUP_NAME(i) = get_deleted_augroup();
-    else
-	AUGROUP_NAME(i) = NULL;
+    లేకపోతే
+	AUGROUP_NAME(i) = ఖాళీ;
 }
 
 /*
  * Find the ID of an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
-au_find_group(char_u *name)
+    స్థిర పూర్ణాంకం
+au_కనుగొను_సమూహం(char_u *name)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) != NULL && AUGROUP_NAME(i) != get_deleted_augroup()
+    కొరకు (i = 0; i < augroups.ga_len; ++i)
+	ఒకవేళ (AUGROUP_NAME(i) != ఖాళీ && AUGROUP_NAME(i) != get_deleted_augroup()
 		&& STRCMP(AUGROUP_NAME(i), name) == 0)
-	    return i;
-    return AUGROUP_ERROR;
+	    తిరిగి i;
+    తిరిగి AUGROUP_ERROR;
 }
 
 /*
  * Return TRUE if augroup "name" exists.
  */
-    int
-au_has_group(char_u *name)
+    పూర్ణాంకం
+au_has_సమూహం(char_u *name)
 {
-    return au_find_group(name) != AUGROUP_ERROR;
+    తిరిగి au_కనుగొను_సమూహం(name) != AUGROUP_ERROR;
 }
 
 /*
  * ":augroup {name}".
  */
-    void
-do_augroup(char_u *arg, int del_group)
+    శూన్య
+do_augroup(char_u *arg, పూర్ణాంకం del_సమూహం)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    if (del_group)
+    ఒకవేళ (del_సమూహం)
     {
-	if (*arg == NUL)
-	    emsg(_(e_argument_required));
-	else
-	    au_del_group(arg);
+	ఒకవేళ (*arg == NUL)
+	    emsg(_(e_వాదం_required));
+	లేకపోతే
+	    au_del_సమూహం(arg);
     }
-    else if (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
+    లేకపోతే ఒకవేళ (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
 	current_augroup = AUGROUP_DEFAULT;
-    else if (*arg)		    // ":aug xxx": switch to group xxx
+    లేకపోతే ఒకవేళ (*arg)		    // ":aug xxx": switch to group xxx
     {
-	i = au_new_group(arg);
-	if (i != AUGROUP_ERROR)
+	i = au_new_సమూహం(arg);
+	ఒకవేళ (i != AUGROUP_ERROR)
 	    current_augroup = i;
     }
-    else			    // ":aug": list the group names
+    లేకపోతే			    // ":aug": list the group names
     {
-	msg_start();
-	for (i = 0; i < augroups.ga_len; ++i)
+	సందేశం_ప్రారంభం();
+	కొరకు (i = 0; i < augroups.ga_len; ++i)
 	{
-	    if (AUGROUP_NAME(i) != NULL)
+	    ఒకవేళ (AUGROUP_NAME(i) != ఖాళీ)
 	    {
-		msg_puts((char *)AUGROUP_NAME(i));
-		msg_puts("  ");
+		సందేశం_puts((అక్షరం *)AUGROUP_NAME(i));
+		సందేశం_puts("  ");
 	    }
 	}
-	msg_clr_eos();
-	msg_end();
+	సందేశం_clr_eos();
+	సందేశం_చివర();
     }
 }
 
-    void
-autocmd_init(void)
+    శూన్య
+autocmd_init(శూన్య)
 {
-    CLEAR_FIELD(aucmd_win);
+    CLEAR_క్షేత్రం(aucmd_win);
 }
 
-#if defined(EXITFREE)
-    void
-free_all_autocmds(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_all_autocmds(శూన్య)
 {
     char_u	*s;
 
-    for (current_augroup = -1; current_augroup < augroups.ga_len;
+    కొరకు (current_augroup = -1; current_augroup < augroups.ga_len;
 							    ++current_augroup)
-	do_autocmd(NULL, (char_u *)"", TRUE);
+	do_autocmd(ఖాళీ, (char_u *)"", TRUE);
 
-    for (int i = 0; i < augroups.ga_len; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < augroups.ga_len; ++i)
     {
-	s = ((char_u **)(augroups.ga_data))[i];
-	if (s != get_deleted_augroup())
+	s = ((char_u **)(augroups.ga_దత్తాంశం))[i];
+	ఒకవేళ (s != get_deleted_augroup())
 	    vim_free(s);
     }
     ga_clear(&augroups);
 
     // aucmd_win[] is freed in win_free_all()
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if "win" is an active entry in aucmd_win[].
  */
-    int
+    పూర్ణాంకం
 is_aucmd_win(win_T *win)
 {
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win_used && aucmd_win[i].auc_win == win)
-	    return TRUE;
-    return FALSE;
+    కొరకు (పూర్ణాంకం i = 0; i < AUCMD_WIN_లెక్క; ++i)
+	ఒకవేళ (aucmd_win[i].auc_win_వాడిన && aucmd_win[i].auc_win == win)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -678,132 +678,132 @@ is_aucmd_win(win_T *win)
  * Return NUM_EVENTS if the event name was not found.
  * Return a pointer to the next event name in "end".
  */
-    static event_T
-event_name2nr(char_u *start, char_u **end)
+    స్థిర event_T
+event_name2nr(char_u *ప్రారంభం, char_u **చివర)
 {
     char_u	*p;
-    keyvalue_T target;
-    keyvalue_T *entry;
-    static keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_INDEX];
-    static keyvalue_T *bufread = &event_tab[BUFREAD_INDEX];
+    keyvalue_T లక్ష్యం;
+    keyvalue_T *నమోదు_2;
+    స్థిర keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_సూచీ];
+    స్థిర keyvalue_T *bufread = &event_tab[BUFREAD_సూచీ];
 
     // the event name ends with end of line, '|', a blank or a comma
-    for (p = start; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
+    కొరకు (p = ప్రారంభం; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
 	;
 
-    target.key = 0;
-    target.value.string = start;
-    target.value.length = (size_t)(p - start);
+    లక్ష్యం.కీలకం = 0;
+    లక్ష్యం.విలువ.string = ప్రారంభం;
+    లక్ష్యం.విలువ.నిడివి = (size_t)(p - ప్రారంభం);
 
     // special cases:
     // BufNewFile and BufRead are searched for ALOT (especially at startup)
     // so we check for them first.
-    if (cmp_keyvalue_value_ni(&target, bufnewfile) == 0)
-	entry = bufnewfile;
-    else if (cmp_keyvalue_value_ni(&target, bufread) == 0)
-	entry = bufread;
-    else
-	entry = (keyvalue_T *)bsearch(&target, &event_tab, NUM_EVENTS,
-				sizeof(event_tab[0]), cmp_keyvalue_value_ni);
+    ఒకవేళ (cmp_keyvalue_విలువ_ni(&లక్ష్యం, bufnewfile) == 0)
+	నమోదు_2 = bufnewfile;
+    లేకపోతే ఒకవేళ (cmp_keyvalue_విలువ_ni(&లక్ష్యం, bufread) == 0)
+	నమోదు_2 = bufread;
+    లేకపోతే
+	నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &event_tab, అంకె_EVENTS,
+				పరిమాణం(event_tab[0]), cmp_keyvalue_విలువ_ni);
 
-    if (*p == ',')
+    ఒకవేళ (*p == ',')
 	++p;
-    *end = p;
+    *చివర = p;
 
-    return (entry == NULL) ? NUM_EVENTS : (event_T)abs(entry->key);
+    తిరిగి (నమోదు_2 == ఖాళీ) ? అంకె_EVENTS : (event_T)నిరపేక్ష(నమోదు_2->కీలకం);
 }
 
 /*
  * Return the name for event "event".
  */
-    static string_T *
+    స్థిర string_T *
 event_nr2name(event_T event)
 {
-    int	    i;
-    enum {CACHE_SIZE = 12};
-    static int cache_tab[CACHE_SIZE];
-    static int cache_last_index = -1;
-    static string_T unknown = STR_LITERAL_INIT("Unknown");
+    పూర్ణాంకం	    i;
+    గణన {CACHE_కొలత = 12};
+    స్థిర పూర్ణాంకం cache_tab[CACHE_కొలత];
+    స్థిర పూర్ణాంకం cache_చివరి_సూచీ = -1;
+    స్థిర string_T unknown = STR_LITERAL_INIT("Unknown");
 
-    if (cache_last_index < 0)
+    ఒకవేళ (cache_చివరి_సూచీ < 0)
     {
-	for (i = 0; i < CACHE_SIZE; ++i)
+	కొరకు (i = 0; i < CACHE_కొలత; ++i)
 	    cache_tab[i] = -1;
-	cache_last_index = CACHE_SIZE - 1;
+	cache_చివరి_సూచీ = CACHE_కొలత - 1;
     }
 
     // first look in the cache
     // the cache is circular. to search it we start at the most recent entry
     // and go backwards wrapping around when we get to index 0.
-    for (i = cache_last_index; cache_tab[i] >= 0; )
+    కొరకు (i = cache_చివరి_సూచీ; cache_tab[i] >= 0; )
     {
-	if ((event_T)abs(event_tab[cache_tab[i]].key) == event)
-	    return &event_tab[cache_tab[i]].value;
+	ఒకవేళ ((event_T)నిరపేక్ష(event_tab[cache_tab[i]].కీలకం) == event)
+	    తిరిగి &event_tab[cache_tab[i]].విలువ;
 
-	if (i == 0)
-	    i = CACHE_SIZE - 1;
-	else
+	ఒకవేళ (i == 0)
+	    i = CACHE_కొలత - 1;
+	లేకపోతే
 	    --i;
 
 	// are we back at the start?
-	if (i == cache_last_index)
-	    break;
+	ఒకవేళ (i == cache_చివరి_సూచీ)
+	    ఆపు;
     }
 
     // look in the event table itself
-    for (i = 0; i < NUM_EVENTS; ++i)
+    కొరకు (i = 0; i < అంకె_EVENTS; ++i)
     {
-	if ((event_T)abs(event_tab[i].key) == event)
+	ఒకవేళ ((event_T)నిరపేక్ష(event_tab[i].కీలకం) == event)
 	{
 	    // store the found entry in the next position in the cache,
 	    // wrapping around when we get to the maximum index.
-	    if (cache_last_index == CACHE_SIZE - 1)
-		cache_last_index = 0;
-	    else
-		++cache_last_index;
-	    cache_tab[cache_last_index] = i;
-	    return &event_tab[i].value;
+	    ఒకవేళ (cache_చివరి_సూచీ == CACHE_కొలత - 1)
+		cache_చివరి_సూచీ = 0;
+	    లేకపోతే
+		++cache_చివరి_సూచీ;
+	    cache_tab[cache_చివరి_సూచీ] = i;
+	    తిరిగి &event_tab[i].విలువ;
 	}
     }
 
-    return &unknown;
+    తిరిగి &unknown;
 }
 
 /*
  * Scan over the events.  "*" stands for all events.
  */
-    static char_u *
-find_end_event(
+    స్థిర char_u *
+కనుగొను_చివర_event(
     char_u  *arg,
-    int	    have_group)	    // TRUE when group name was found
+    పూర్ణాంకం	    have_సమూహం)	    // TRUE when group name was found
 {
     char_u  *pat;
     char_u  *p;
 
-    if (*arg == '*')
+    ఒకవేళ (*arg == '*')
     {
-	if (arg[1] && !VIM_ISWHITE(arg[1]))
+	ఒకవేళ (arg[1] && !VIM_ISWHITE(arg[1]))
 	{
-	    semsg(_(e_illegal_character_after_star_str), arg);
-	    return NULL;
+	    semsg(_(e_illegal_character_after_నక్షత్రం_str), arg);
+	    తిరిగి ఖాళీ;
 	}
 	pat = arg + 1;
     }
-    else
+    లేకపోతే
     {
-	for (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
+	కొరకు (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
 	{
-	    if ((int)event_name2nr(pat, &p) >= NUM_EVENTS)
+	    ఒకవేళ ((పూర్ణాంకం)event_name2nr(pat, &p) >= అంకె_EVENTS)
 	    {
-		if (have_group)
+		ఒకవేళ (have_సమూహం)
 		    semsg(_(e_no_such_event_str), pat);
-		else
-		    semsg(_(e_no_such_group_or_event_str), pat);
-		return NULL;
+		లేకపోతే
+		    semsg(_(e_no_such_సమూహం_or_event_str), pat);
+		తిరిగి ఖాళీ;
 	    }
 	}
     }
-    return pat;
+    తిరిగి pat;
 }
 
 /*
@@ -812,104 +812,104 @@ find_end_event(
  * no command.  Does not modify "arg" and gives no error messages.
  */
     char_u *
-au_find_cmd_arg(char_u *arg)
+au_కనుగొను_cmd_arg(char_u *arg)
 {
     char_u	*pat;
     char_u	*cmd;
-    int		group;
+    పూర్ణాంకం		సమూహం;
 
-    if (*arg == '|')
-	return NULL;
+    ఒకవేళ (*arg == '|')
+	తిరిగి ఖాళీ;
 
     // Errors are reported when the autocommand is actually defined.
     ++emsg_off;
-    group = au_get_grouparg(&arg);
-    pat = group == AUGROUP_ERROR
-			  ? NULL : find_end_event(arg, group != AUGROUP_ALL);
+    సమూహం = au_get_grouparg(&arg);
+    pat = సమూహం == AUGROUP_ERROR
+			  ? ఖాళీ : కనుగొను_చివర_event(arg, సమూహం != AUGROUP_ALL);
     --emsg_off;
-    if (pat == NULL)
-	return NULL;
+    ఒకవేళ (pat == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     pat = skipwhite(pat);
-    if (*pat == NUL || *pat == '|')
-	return NULL;
+    ఒకవేళ (*pat == NUL || *pat == '|')
+	తిరిగి ఖాళీ;
 
     // White space in the pattern can be escaped with a backslash.
     cmd = pat;
-    while (*cmd != NUL
+    అయితే (*cmd != NUL
 	    && (!VIM_ISWHITE(*cmd) || (cmd > pat && *(cmd - 1) == '\\')))
 	++cmd;
     cmd = skipwhite(cmd);
 
     // "++once" and "++nested" can come in any order.
-    for (int i = 0; i < 2; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < 2; ++i)
     {
-	if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	ఒకవేళ (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
-	if (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
+	ఒకవేళ (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
 	    cmd = skipwhite(cmd + 8);
-	if (!in_vim9script() && STRNCMP(cmd, "nested", 6) == 0
+	ఒకవేళ (!లోపల_vim9script() && STRNCMP(cmd, "nested", 6) == 0
 						       && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
     }
 
-    return *cmd == NUL ? NULL : cmd;
+    తిరిగి *cmd == NUL ? ఖాళీ : cmd;
 }
 
 /*
  * Return TRUE if "event" is included in 'eventignore(win)'.
  */
-    int
+    పూర్ణాంకం
 event_ignored(event_T event, char_u *ei)
 {
-    int ignored = FALSE;
-    while (*ei != NUL)
+    పూర్ణాంకం ignored = FALSE;
+    అయితే (*ei != NUL)
     {
-	int unignore = *ei == '-';
+	పూర్ణాంకం unignore = *ei == '-';
 	ei += unignore;
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	ఒకవేళ (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	{
-	    ignored = ei == p_ei || (event_tab[event].key <= 0);
+	    ignored = ei == p_ei || (event_tab[event].కీలకం <= 0);
 	    ei += 3 + (ei[3] == ',');
 	}
-	else if (event_name2nr(ei, &ei) == event)
+	లేకపోతే ఒకవేళ (event_name2nr(ei, &ei) == event)
 	{
-	    if (unignore)
-		return FALSE;
-	    else
+	    ఒకవేళ (unignore)
+		తిరిగి FALSE;
+	    లేకపోతే
 		ignored = TRUE;
 	}
     }
 
-    return ignored;
+    తిరిగి ignored;
 }
 
 /*
  * Return OK when the contents of 'eventignore' or 'eventignorewin' is valid,
  * FAIL otherwise.
  */
-    int
+    పూర్ణాంకం
 check_ei(char_u *ei)
 {
-    int	win = ei != p_ei;
+    పూర్ణాంకం	win = ei != p_ei;
 
-    while (*ei)
+    అయితే (*ei)
     {
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	ఒకవేళ (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	    ei += 3 + (ei[3] == ',');
-	else
+	లేకపోతే
 	{
 	    ei += (*ei == '-');
 	    event_T event = event_name2nr(ei, &ei);
-	    if (event == NUM_EVENTS || (win && event_tab[event].key > 0))
-		return FAIL;
+	    ఒకవేళ (event == అంకె_EVENTS || (win && event_tab[event].కీలకం > 0))
+		తిరిగి FAIL;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 
 /*
  * Add "what" to 'eventignore' to skip loading syntax highlighting for every
@@ -917,7 +917,7 @@ check_ei(char_u *ei)
  * Returns the old value of 'eventignore' in allocated memory.
  */
     char_u *
-au_event_disable(char *what)
+au_event_disable(అక్షరం *what)
 {
     char_u	*new_ei;
     char_u	*save_ei;
@@ -925,37 +925,37 @@ au_event_disable(char *what)
 
     p_ei_len = STRLEN(p_ei);
     save_ei = vim_strnsave(p_ei, p_ei_len);
-    if (save_ei == NULL)
-	return NULL;
+    ఒకవేళ (save_ei == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     new_ei = vim_strnsave(p_ei, p_ei_len + STRLEN(what));
-    if (new_ei == NULL)
+    ఒకవేళ (new_ei == ఖాళీ)
     {
 	vim_free(save_ei);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (*what == ',' && *p_ei == NUL)
+    ఒకవేళ (*what == ',' && *p_ei == NUL)
 	STRCPY(new_ei, what + 1);
-    else
+    లేకపోతే
 	STRCPY(new_ei + p_ei_len, what);
-    set_string_option_direct((char_u *)"ei", -1, new_ei,
+    సమితి_string_option_ప్రత్యక్ష((char_u *)"ei", -1, new_ei,
 	    OPT_FREE, SID_NONE);
     vim_free(new_ei);
-    return save_ei;
+    తిరిగి save_ei;
 }
 
-    void
+    శూన్య
 au_event_restore(char_u *old_ei)
 {
-    if (old_ei != NULL)
+    ఒకవేళ (old_ei != ఖాళీ)
     {
-	set_string_option_direct((char_u *)"ei", -1, old_ei,
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ei", -1, old_ei,
 							  OPT_FREE, SID_NONE);
 	vim_free(old_ei);
     }
 }
-#endif  // FEAT_SYN_HL
+#అయితే_ముగింపు  // FEAT_SYN_HL
 
 /*
  * do_autocmd() -- implements the :autocmd command.  Can be used in the
@@ -990,126 +990,126 @@ au_event_restore(char_u *old_ei)
  * Mostly a {group} argument can optionally appear before <event>.
  * "eap" can be NULL.
  */
-    void
-do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
+    శూన్య
+do_autocmd(exarg_T *eap, char_u *arg_లోపల, పూర్ణాంకం forceit)
 {
-    char_u	*arg = arg_in;
+    char_u	*arg = arg_లోపల;
     char_u	*pat;
-    char_u	*envpat = NULL;
+    char_u	*envpat = ఖాళీ;
     char_u	*cmd;
-    int		cmd_need_free = FALSE;
+    పూర్ణాంకం		cmd_need_free = FALSE;
     event_T	event;
-    char_u	*tofree = NULL;
-    int		nested = FALSE;
-    int		once = FALSE;
-    int		group;
-    int		i;
-    int		flags = 0;
+    char_u	*tofree = ఖాళీ;
+    పూర్ణాంకం		nested = FALSE;
+    పూర్ణాంకం		once = FALSE;
+    పూర్ణాంకం		సమూహం;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		flags = 0;
 
-    if (*arg == '|')
+    ఒకవేళ (*arg == '|')
     {
 	eap->nextcmd = arg + 1;
 	arg = (char_u *)"";
-	group = AUGROUP_ALL;	// no argument, use all groups
+	సమూహం = AUGROUP_ALL;	// no argument, use all groups
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Check for a legal group name.  If not, use AUGROUP_ALL.
 	 */
-	group = au_get_grouparg(&arg);
-	if (arg == NULL)	    // out of memory
-	    return;
+	సమూహం = au_get_grouparg(&arg);
+	ఒకవేళ (arg == ఖాళీ)	    // out of memory
+	    తిరిగి;
     }
 
     /*
      * Scan over the events.
      * If we find an illegal name, return here, don't do anything.
      */
-    pat = find_end_event(arg, group != AUGROUP_ALL);
-    if (pat == NULL)
-	return;
+    pat = కనుగొను_చివర_event(arg, సమూహం != AUGROUP_ALL);
+    ఒకవేళ (pat == ఖాళీ)
+	తిరిగి;
 
     pat = skipwhite(pat);
-    if (*pat == '|')
+    ఒకవేళ (*pat == '|')
     {
 	eap->nextcmd = pat + 1;
 	pat = (char_u *)"";
 	cmd = (char_u *)"";
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Scan over the pattern.  Put a NUL at the end.
 	 */
 	cmd = pat;
-	while (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
+	అయితే (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
 	    cmd++;
-	if (*cmd)
+	ఒకవేళ (*cmd)
 	    *cmd++ = NUL;
 
 	// Expand environment variables in the pattern.  Set 'shellslash', we
 	// want forward slashes here.
-	if (vim_strchr(pat, '$') != NULL || vim_strchr(pat, '~') != NULL)
+	ఒకవేళ (vim_strchr(pat, '$') != ఖాళీ || vim_strchr(pat, '~') != ఖాళీ)
 	{
-#ifdef BACKSLASH_IN_FILENAME
-	    int	p_ssl_save = p_ssl;
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
+	    పూర్ణాంకం	p_ssl_save = p_ssl;
 
 	    p_ssl = TRUE;
-#endif
+#అయితే_ముగింపు
 	    envpat = expand_env_save(pat);
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 	    p_ssl = p_ssl_save;
-#endif
-	    if (envpat != NULL)
+#అయితే_ముగింపు
+	    ఒకవేళ (envpat != ఖాళీ)
 		pat = envpat;
 	}
 
 	cmd = skipwhite(cmd);
-	for (i = 0; i < 2; i++)
+	కొరకు (i = 0; i < 2; i++)
 	{
-	    if (*cmd == NUL)
-		continue;
+	    ఒకవేళ (*cmd == NUL)
+		కొనసాగు;
 
 	    // Check for "++once" flag.
-	    if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    ఒకవేళ (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (once)
+		ఒకవేళ (once)
 		{
-		    semsg(_(e_duplicate_argument_str), "++once");
-		    goto err_exit;
+		    semsg(_(e_duplicate_వాదం_str), "++once");
+		    వెళ్ళు err_exit;
 		}
 		once = TRUE;
 		cmd = skipwhite(cmd + 6);
 	    }
 
 	    // Check for "++nested" flag.
-	    if ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
+	    ఒకవేళ ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
 	    {
-		if (nested)
+		ఒకవేళ (nested)
 		{
-		    semsg(_(e_duplicate_argument_str), "++nested");
-		    goto err_exit;
+		    semsg(_(e_duplicate_వాదం_str), "++nested");
+		    వెళ్ళు err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 8);
 	    }
 
 	    // Check for the old "nested" flag in legacy script.
-	    if (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    ఒకవేళ (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (in_vim9script())
+		ఒకవేళ (లోపల_vim9script())
 		{
 		    // If there ever is a :nested command this error should
 		    // be removed and "nested" accepted as the start of the
 		    // command.
-		    emsg(_(e_invalid_command_nested_did_you_mean_plusplus_nested));
-		    goto err_exit;
+		    emsg(_(e_invalid_command_nested_did_you_సగటు_plusplus_nested));
+		    వెళ్ళు err_exit;
 		}
-		if (nested)
+		ఒకవేళ (nested)
 		{
-		    semsg(_(e_duplicate_argument_str), "nested");
-		    goto err_exit;
+		    semsg(_(e_duplicate_వాదం_str), "nested");
+		    వెళ్ళు err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 6);
@@ -1120,15 +1120,15 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
 	 * Find the start of the commands.
 	 * Expand <sfile> in it.
 	 */
-	if (*cmd != NUL)
+	ఒకవేళ (*cmd != NUL)
 	{
-	    if (eap != NULL)
+	    ఒకవేళ (eap != ఖాళీ)
 		// Read a {} block if it follows.
-		cmd = may_get_cmd_block(eap, cmd, &tofree, &flags);
+		cmd = may_get_cmd_ఖండం(eap, cmd, &tofree, &flags);
 
 	    cmd = expand_sfile(cmd);
-	    if (cmd == NULL)	    // some error
-		goto err_exit;
+	    ఒకవేళ (cmd == ఖాళీ)	    // some error
+		వెళ్ళు err_exit;
 	    cmd_need_free = TRUE;
 	}
     }
@@ -1136,36 +1136,36 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
     /*
      * Print header when showing autocommands.
      */
-    if (!forceit && *cmd == NUL)
+    ఒకవేళ (!forceit && *cmd == NUL)
 	// Highlight title
-	msg_puts_title(_("\n--- Autocommands ---"));
+	సందేశం_puts_title(_("\n--- Autocommands ---"));
 
     /*
      * Loop over the events.
      */
-    last_event = (event_T)-1;		// for listing the event name
-    last_group = AUGROUP_ERROR;		// for listing the group name
-    if (*arg == '*' || *arg == NUL || *arg == '|')
+    చివరి_event = (event_T)-1;		// for listing the event name
+    చివరి_సమూహం = AUGROUP_ERROR;		// for listing the group name
+    ఒకవేళ (*arg == '*' || *arg == NUL || *arg == '|')
     {
-	if (*cmd != NUL)
+	ఒకవేళ (*cmd != NUL)
 	    emsg(_(e_cannot_define_autocommands_for_all_events));
-	else
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					     event = (event_T)((int)event + 1))
-		if (do_autocmd_event(event, pat,
-			     once, nested, cmd, forceit, group, flags) == FAIL)
-		    break;
+	లేకపోతే
+	    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+					     event = (event_T)((పూర్ణాంకం)event + 1))
+		ఒకవేళ (do_autocmd_event(event, pat,
+			     once, nested, cmd, forceit, సమూహం, flags) == FAIL)
+		    ఆపు;
     }
-    else
+    లేకపోతే
     {
-	while (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
-	    if (do_autocmd_event(event_name2nr(arg, &arg), pat,
-			  once, nested,	cmd, forceit, group, flags) == FAIL)
-		break;
+	అయితే (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
+	    ఒకవేళ (do_autocmd_event(event_name2nr(arg, &arg), pat,
+			  once, nested,	cmd, forceit, సమూహం, flags) == FAIL)
+		ఆపు;
     }
 
 err_exit:
-    if (cmd_need_free)
+    ఒకవేళ (cmd_need_free)
 	vim_free(cmd);
     vim_free(tofree);
     vim_free(envpat);
@@ -1177,29 +1177,29 @@ err_exit:
  *
  * Returns the group ID, AUGROUP_ERROR for error (out of memory).
  */
-    static int
+    స్థిర పూర్ణాంకం
 au_get_grouparg(char_u **argp)
 {
-    char_u	*group_name;
+    char_u	*సమూహం_name;
     char_u	*p;
     char_u	*arg = *argp;
-    int		group = AUGROUP_ALL;
+    పూర్ణాంకం		సమూహం = AUGROUP_ALL;
 
-    for (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
+    కొరకు (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
 	;
-    if (p <= arg)
-	return AUGROUP_ALL;
+    ఒకవేళ (p <= arg)
+	తిరిగి AUGROUP_ALL;
 
-    group_name = vim_strnsave(arg, p - arg);
-    if (group_name == NULL)		// out of memory
-	return AUGROUP_ERROR;
-    group = au_find_group(group_name);
-    if (group == AUGROUP_ERROR)
-	group = AUGROUP_ALL;	// no match, use all groups
-    else
+    సమూహం_name = vim_strnsave(arg, p - arg);
+    ఒకవేళ (సమూహం_name == ఖాళీ)		// out of memory
+	తిరిగి AUGROUP_ERROR;
+    సమూహం = au_కనుగొను_సమూహం(సమూహం_name);
+    ఒకవేళ (సమూహం == AUGROUP_ERROR)
+	సమూహం = AUGROUP_ALL;	// no match, use all groups
+    లేకపోతే
 	*argp = skipwhite(p);	// match, skip over group name
-    vim_free(group_name);
-    return group;
+    vim_free(సమూహం_name);
+    తిరిగి సమూహం;
 }
 
 /*
@@ -1209,49 +1209,49 @@ au_get_grouparg(char_u **argp)
  * If forceit == TRUE delete entries.
  * If group is not AUGROUP_ALL, only use this group.
  */
-    static int
+    స్థిర పూర్ణాంకం
 do_autocmd_event(
     event_T	event,
     char_u	*pat,
-    int		once,
-    int		nested,
+    పూర్ణాంకం		once,
+    పూర్ణాంకం		nested,
     char_u	*cmd,
-    int		forceit,
-    int		group,
-    int		flags)
+    పూర్ణాంకం		forceit,
+    పూర్ణాంకం		సమూహం,
+    పూర్ణాంకం		flags)
 {
     AutoPat	*ap;
     AutoPat	**prev_ap;
     AutoCmd	*ac;
     AutoCmd	**prev_ac;
-    int		brace_level;
+    పూర్ణాంకం		brace_level;
     char_u	*endpat;
-    int		findgroup;
-    int		allgroups;
-    int		patlen;
-    int		is_buflocal;
-    int		buflocal_nr;
+    పూర్ణాంకం		findgroup;
+    పూర్ణాంకం		allgroups;
+    పూర్ణాంకం		patlen;
+    పూర్ణాంకం		is_buflocal;
+    పూర్ణాంకం		buflocal_nr;
     char_u	buflocal_pat[25];	// for "<buffer=X>"
 
-    if (group == AUGROUP_ALL)
+    ఒకవేళ (సమూహం == AUGROUP_ALL)
 	findgroup = current_augroup;
-    else
-	findgroup = group;
-    allgroups = (group == AUGROUP_ALL && !forceit && *cmd == NUL);
+    లేకపోతే
+	findgroup = సమూహం;
+    allgroups = (సమూహం == AUGROUP_ALL && !forceit && *cmd == NUL);
 
     /*
      * Show or delete all patterns for an event.
      */
-    if (*pat == NUL)
+    ఒకవేళ (*pat == NUL)
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
 	{
-	    if (forceit)  // delete the AutoPat, if it's in the current group
+	    ఒకవేళ (forceit)  // delete the AutoPat, if it's in the current group
 	    {
-		if (ap->group == findgroup)
+		ఒకవేళ (ap->సమూహం == findgroup)
 		    au_remove_pat(ap);
 	    }
-	    else if (group == AUGROUP_ALL || ap->group == group)
+	    లేకపోతే ఒకవేళ (సమూహం == AUGROUP_ALL || ap->సమూహం == సమూహం)
 		show_autocmd(ap, event);
 	}
     }
@@ -1259,24 +1259,24 @@ do_autocmd_event(
     /*
      * Loop through all the specified patterns.
      */
-    for ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
+    కొరకు ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
     {
 	/*
 	 * Find end of the pattern.
 	 * Watch out for a comma in braces, like "*.\{obj,o\}".
 	 */
 	brace_level = 0;
-	for (endpat = pat; *endpat && (*endpat != ',' || brace_level
+	కొరకు (endpat = pat; *endpat && (*endpat != ',' || brace_level
 			   || (endpat > pat && endpat[-1] == '\\')); ++endpat)
 	{
-	    if (*endpat == '{')
+	    ఒకవేళ (*endpat == '{')
 		brace_level++;
-	    else if (*endpat == '}')
+	    లేకపోతే ఒకవేళ (*endpat == '}')
 		brace_level--;
 	}
-	if (pat == endpat)		// ignore single comma
-	    continue;
-	patlen = (int)(endpat - pat);
+	ఒకవేళ (pat == endpat)		// ignore single comma
+	    కొనసాగు;
+	patlen = (పూర్ణాంకం)(endpat - pat);
 
 	/*
 	 * detect special <buflocal[=X]> buffer-local patterns
@@ -1284,45 +1284,45 @@ do_autocmd_event(
 	is_buflocal = FALSE;
 	buflocal_nr = 0;
 
-	if (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
+	ఒకవేళ (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
 						    && pat[patlen - 1] == '>')
 	{
 	    // "<buffer...>": Error will be printed only for addition.
 	    // printing and removing will proceed silently.
 	    is_buflocal = TRUE;
-	    if (patlen == 8)
+	    ఒకవేళ (patlen == 8)
 		// "<buffer>"
 		buflocal_nr = curbuf->b_fnum;
-	    else if (patlen > 9 && pat[7] == '=')
+	    లేకపోతే ఒకవేళ (patlen > 9 && pat[7] == '=')
 	    {
-		if (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
+		ఒకవేళ (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
 		    // "<buffer=abuf>"
 		    buflocal_nr = autocmd_bufnr;
-		else if (skipdigits(pat + 8) == pat + patlen - 1)
+		లేకపోతే ఒకవేళ (skipdigits(pat + 8) == pat + patlen - 1)
 		    // "<buffer=123>"
-		    buflocal_nr = atoi((char *)pat + 8);
+		    buflocal_nr = atoi((అక్షరం *)pat + 8);
 	    }
 	}
 
-	if (is_buflocal)
+	ఒకవేళ (is_buflocal)
 	{
 	    // normalize pat into standard "<buffer>#N" form
-	    sprintf((char *)buflocal_pat, "<buffer=%d>", buflocal_nr);
+	    sprintf((అక్షరం *)buflocal_pat, "<buffer=%d>", buflocal_nr);
 	    pat = buflocal_pat;			// can modify pat and patlen
-	    patlen = (int)STRLEN(buflocal_pat);	//   but not endpat
+	    patlen = (పూర్ణాంకం)STRLEN(buflocal_pat);	//   but not endpat
 	}
 
 	/*
 	 * Find AutoPat entries with this pattern.  When adding a command it
 	 * always goes at or after the last one, so start at the end.
 	 */
-	if (!forceit && *cmd != NUL && last_autopat[(int)event] != NULL)
-	    prev_ap = &last_autopat[(int)event];
-	else
-	    prev_ap = &first_autopat[(int)event];
-	while ((ap = *prev_ap) != NULL)
+	ఒకవేళ (!forceit && *cmd != NUL && చివరి_autopat[(పూర్ణాంకం)event] != ఖాళీ)
+	    prev_ap = &చివరి_autopat[(పూర్ణాంకం)event];
+	లేకపోతే
+	    prev_ap = &మొదటి_autopat[(పూర్ణాంకం)event];
+	అయితే ((ap = *prev_ap) != ఖాళీ)
 	{
-	    if (ap->pat != NULL)
+	    ఒకవేళ (ap->pat != ఖాళీ)
 	    {
 		/*
 		 * Accept a pattern when:
@@ -1334,7 +1334,7 @@ do_autocmd_event(
 		 * For <buffer[=X]>, this condition works because we normalize
 		 * all buffer-local patterns.
 		 */
-		if ((allgroups || ap->group == findgroup)
+		ఒకవేళ ((allgroups || ap->సమూహం == findgroup)
 			&& ap->patlen == patlen
 			&& STRNCMP(pat, ap->pat, patlen) == 0)
 		{
@@ -1344,12 +1344,12 @@ do_autocmd_event(
 		     * delete the pattern from the autopat list, append to
 		     * this list.
 		     */
-		    if (forceit)
+		    ఒకవేళ (forceit)
 		    {
-			if (*cmd != NUL && ap->next == NULL)
+			ఒకవేళ (*cmd != NUL && ap->తదుపరి == ఖాళీ)
 			{
 			    au_remove_cmds(ap);
-			    break;
+			    ఆపు;
 			}
 			au_remove_pat(ap);
 		    }
@@ -1357,60 +1357,60 @@ do_autocmd_event(
 		    /*
 		     * Show autocmd's for this autopat, or buflocals <buffer=X>
 		     */
-		    else if (*cmd == NUL)
+		    లేకపోతే ఒకవేళ (*cmd == NUL)
 			show_autocmd(ap, event);
 
 		    /*
 		     * Add autocmd to this autopat, if it's the last one.
 		     */
-		    else if (ap->next == NULL)
-			break;
+		    లేకపోతే ఒకవేళ (ap->తదుపరి == ఖాళీ)
+			ఆపు;
 		}
 	    }
-	    prev_ap = &ap->next;
+	    prev_ap = &ap->తదుపరి;
 	}
 
 	/*
 	 * Add a new command.
 	 */
-	if (*cmd != NUL)
+	ఒకవేళ (*cmd != NUL)
 	{
 	    /*
 	     * If the pattern we want to add a command to does appear at the
 	     * end of the list (or not is not in the list at all), add the
 	     * pattern at the end of the list.
 	     */
-	    if (ap == NULL)
+	    ఒకవేళ (ap == ఖాళీ)
 	    {
 		// refuse to add buffer-local ap if buffer number is invalid
-		if (is_buflocal && (buflocal_nr == 0
-				      || buflist_findnr(buflocal_nr) == NULL))
+		ఒకవేళ (is_buflocal && (buflocal_nr == 0
+				      || buflist_findnr(buflocal_nr) == ఖాళీ))
 		{
-		    semsg(_(e_buffer_nr_invalid_buffer_number), buflocal_nr);
-		    return FAIL;
+		    semsg(_(e_బఫరు_nr_invalid_బఫరు_సంఖ్య), buflocal_nr);
+		    తిరిగి FAIL;
 		}
 
 		ap = ALLOC_ONE(AutoPat);
-		if (ap == NULL)
-		    return FAIL;
+		ఒకవేళ (ap == ఖాళీ)
+		    తిరిగి FAIL;
 		ap->pat = vim_strnsave(pat, patlen);
 		ap->patlen = patlen;
-		if (ap->pat == NULL)
+		ఒకవేళ (ap->pat == ఖాళీ)
 		{
 		    vim_free(ap);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		// need to initialize last_mode for the first ModeChanged
 		// autocmd
-		if (event == EVENT_MODECHANGED && !has_modechanged())
-		    get_mode(last_mode);
-#endif
+		ఒకవేళ (event == EVENT_MODECHANGED && !has_modechanged())
+		    get_బహుళకం(చివరి_బహుళకం);
+#అయితే_ముగింపు
 		// Initialize the fields checked by the WinScrolled and
 		// WinResized trigger to prevent them from firing right after
 		// the first autocmd is defined.
-		if ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
+		ఒకవేళ ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
 			&& !(has_winscrolled() || has_winresized()))
 		{
 		    tabpage_T *save_curtab = curtab;
@@ -1419,66 +1419,66 @@ do_autocmd_event(
 		    {
 			unuse_tabpage(curtab);
 			use_tabpage(tp);
-			snapshot_windows_scroll_size();
+			snapshot_windows_scroll_కొలత();
 		    }
 		    unuse_tabpage(curtab);
 		    use_tabpage(save_curtab);
 		}
 
-		if (is_buflocal)
+		ఒకవేళ (is_buflocal)
 		{
 		    ap->buflocal_nr = buflocal_nr;
-		    ap->reg_prog = NULL;
+		    ap->reg_prog = ఖాళీ;
 		}
-		else
+		లేకపోతే
 		{
 		    char_u	*reg_pat;
 
 		    ap->buflocal_nr = 0;
-		    reg_pat = file_pat_to_reg_pat(pat, endpat,
+		    reg_pat = file_pat_గమ్యం_reg_pat(pat, endpat,
 							 &ap->allow_dirs, TRUE);
-		    if (reg_pat != NULL)
+		    ఒకవేళ (reg_pat != ఖాళీ)
 			ap->reg_prog = vim_regcomp(reg_pat, RE_MAGIC);
 		    vim_free(reg_pat);
-		    if (reg_pat == NULL || ap->reg_prog == NULL)
+		    ఒకవేళ (reg_pat == ఖాళీ || ap->reg_prog == ఖాళీ)
 		    {
 			vim_free(ap->pat);
 			vim_free(ap);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		}
-		ap->cmds = NULL;
+		ap->cmds = ఖాళీ;
 		*prev_ap = ap;
-		last_autopat[(int)event] = ap;
-		ap->next = NULL;
-		if (group == AUGROUP_ALL)
-		    ap->group = current_augroup;
-		else
-		    ap->group = group;
+		చివరి_autopat[(పూర్ణాంకం)event] = ap;
+		ap->తదుపరి = ఖాళీ;
+		ఒకవేళ (సమూహం == AUGROUP_ALL)
+		    ap->సమూహం = current_augroup;
+		లేకపోతే
+		    ap->సమూహం = సమూహం;
 	    }
 
 	    /*
 	     * Add the autocmd at the end of the AutoCmd list.
 	     */
 	    prev_ac = &(ap->cmds);
-	    while ((ac = *prev_ac) != NULL)
-		prev_ac = &ac->next;
+	    అయితే ((ac = *prev_ac) != ఖాళీ)
+		prev_ac = &ac->తదుపరి;
 	    ac = ALLOC_ONE(AutoCmd);
-	    if (ac == NULL)
-		return FAIL;
+	    ఒకవేళ (ac == ఖాళీ)
+		తిరిగి FAIL;
 	    ac->cmd = vim_strsave(cmd);
 	    ac->script_ctx = current_sctx;
-	    if (flags & UC_VIM9)
-		ac->script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-#ifdef FEAT_EVAL
+	    ఒకవేళ (flags & UC_VIM9)
+		ac->script_ctx.sc_సంస్కరణ = SCRIPT_సంస్కరణ_VIM9;
+#నిర్వచితమైతే FEAT_EVAL
 	    ac->script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
-	    if (ac->cmd == NULL)
+#అయితే_ముగింపు
+	    ఒకవేళ (ac->cmd == ఖాళీ)
 	    {
 		vim_free(ac);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    ac->next = NULL;
+	    ac->తదుపరి = ఖాళీ;
 	    *prev_ac = ac;
 	    ac->once = once;
 	    ac->nested = nested;
@@ -1486,87 +1486,87 @@ do_autocmd_event(
     }
 
     au_cleanup();	// may really delete removed patterns/commands now
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Implementation of ":doautocmd [group] event [fname]".
  * Return OK for success, FAIL for failure;
  */
-    int
+    పూర్ణాంకం
 do_doautocmd(
-    char_u	*arg_start,
-    int		do_msg,	    // give message for no matching autocmds?
-    int		*did_something)
+    char_u	*arg_ప్రారంభం,
+    పూర్ణాంకం		do_సందేశం,	    // give message for no matching autocmds?
+    పూర్ణాంకం		*did_something)
 {
-    char_u	*arg = arg_start;
+    char_u	*arg = arg_ప్రారంభం;
     char_u	*fname;
-    int		nothing_done = TRUE;
-    int		group;
+    పూర్ణాంకం		nothing_పూర్తి = TRUE;
+    పూర్ణాంకం		సమూహం;
 
-    if (did_something != NULL)
+    ఒకవేళ (did_something != ఖాళీ)
 	*did_something = FALSE;
 
     /*
      * Check for a legal group name.  If not, use AUGROUP_ALL.
      */
-    group = au_get_grouparg(&arg);
-    if (arg == NULL)	    // out of memory
-	return FAIL;
+    సమూహం = au_get_grouparg(&arg);
+    ఒకవేళ (arg == ఖాళీ)	    // out of memory
+	తిరిగి FAIL;
 
-    if (*arg == '*')
+    ఒకవేళ (*arg == '*')
     {
 	emsg(_(e_cant_execute_autocommands_for_all_events));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     /*
      * Scan over the events.
      * If we find an illegal name, return here, don't do anything.
      */
-    fname = find_end_event(arg, group != AUGROUP_ALL);
-    if (fname == NULL)
-	return FAIL;
+    fname = కనుగొను_చివర_event(arg, సమూహం != AUGROUP_ALL);
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి FAIL;
 
     fname = skipwhite(fname);
 
     /*
      * Loop over the events.
      */
-    while (*arg && !ends_excmd(*arg) && !VIM_ISWHITE(*arg))
-	if (apply_autocmds_group(event_name2nr(arg, &arg),
-				      fname, NULL, TRUE, group, curbuf, NULL))
-	    nothing_done = FALSE;
+    అయితే (*arg && !చివర్లు_excmd(*arg) && !VIM_ISWHITE(*arg))
+	ఒకవేళ (apply_autocmds_సమూహం(event_name2nr(arg, &arg),
+				      fname, ఖాళీ, TRUE, సమూహం, curbuf, ఖాళీ))
+	    nothing_పూర్తి = FALSE;
 
-    if (nothing_done && do_msg
-#ifdef FEAT_EVAL
+    ఒకవేళ (nothing_పూర్తి && do_సందేశం
+#నిర్వచితమైతే FEAT_EVAL
 		&& !aborting()
-#endif
+#అయితే_ముగింపు
 	       )
-	smsg(_("No matching autocommands: %s"), arg_start);
-    if (did_something != NULL)
-	*did_something = !nothing_done;
+	smsg(_("No matching autocommands: %s"), arg_ప్రారంభం);
+    ఒకవేళ (did_something != ఖాళీ)
+	*did_something = !nothing_పూర్తి;
 
-#ifdef FEAT_EVAL
-    return aborting() ? FAIL : OK;
-#else
-    return OK;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    తిరిగి aborting() ? FAIL : OK;
+#లేకపోతే
+    తిరిగి OK;
+#అయితే_ముగింపు
 }
 
 /*
  * ":doautoall": execute autocommands for each loaded buffer.
  */
-    void
+    శూన్య
 ex_doautoall(exarg_T *eap)
 {
-    int		retval = OK;
+    పూర్ణాంకం		retval = OK;
     aco_save_T	aco;
     buf_T	*buf;
     bufref_T	bufref;
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    పూర్ణాంకం		call_do_modelines = check_nomodeline(&arg);
+    పూర్ణాంకం		did_aucmd;
 
     /*
      * This is a bit tricky: For some commands curwin->w_buffer needs to be
@@ -1578,25 +1578,25 @@ ex_doautoall(exarg_T *eap)
     FOR_ALL_BUFFERS(buf)
     {
 	// Only do loaded buffers and skip the current buffer, it's done last.
-	if (buf->b_ml.ml_mfp == NULL || buf == curbuf)
-	    continue;
+	ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ || buf == curbuf)
+	    కొనసాగు;
 
 	// Find a window for this buffer and save some values.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	ఒకవేళ (curbuf != buf)
 	{
 	    // Failed to find a window for this buffer.  Better not execute
 	    // autocommands then.
 	    retval = FAIL;
-	    break;
+	    ఆపు;
 	}
 
-	set_bufref(&bufref, buf);
+	సమితి_bufref(&bufref, buf);
 
 	// execute the autocommands for this buffer
 	retval = do_doautocmd(arg, FALSE, &did_aucmd);
 
-	if (call_do_modelines && did_aucmd)
+	ఒకవేళ (call_do_modelines && did_aucmd)
 	    // Execute the modeline settings, but don't set window-local
 	    // options if we are using the current window for another
 	    // buffer.
@@ -1606,18 +1606,18 @@ ex_doautoall(exarg_T *eap)
 	aucmd_restbuf(&aco);
 
 	// stop if there is some error or buffer was deleted
-	if (retval == FAIL || !bufref_valid(&bufref))
+	ఒకవేళ (retval == FAIL || !bufref_valid(&bufref))
 	{
 	    retval = FAIL;
-	    break;
+	    ఆపు;
 	}
     }
 
     // Execute autocommands for the current buffer last.
-    if (retval == OK)
+    ఒకవేళ (retval == OK)
     {
 	do_doautocmd(arg, FALSE, &did_aucmd);
-	if (call_do_modelines && did_aucmd)
+	ఒకవేళ (call_do_modelines && did_aucmd)
 	    do_modelines(0);
     }
 }
@@ -1627,15 +1627,15 @@ ex_doautoall(exarg_T *eap)
  * return TRUE and advance *argp to after it.
  * Thus return TRUE when do_modelines() should be called.
  */
-    int
+    పూర్ణాంకం
 check_nomodeline(char_u **argp)
 {
-    if (STRNCMP(*argp, "<nomodeline>", 12) == 0)
+    ఒకవేళ (STRNCMP(*argp, "<nomodeline>", 12) == 0)
     {
 	*argp = skipwhite(*argp + 12);
-	return FALSE;
+	తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1645,57 +1645,57 @@ check_nomodeline(char_u **argp)
  * Set "curbuf" and "curwin" to match "buf".
  * When this fails "curbuf" is not equal "buf".
  */
-    void
+    శూన్య
 aucmd_prepbuf(
     aco_save_T	*aco,		// structure to save values in
     buf_T	*buf)		// new curbuf
 {
     win_T	*win;
-    int		save_ea;
-#ifdef FEAT_AUTOCHDIR
-    int		save_acd;
-#endif
-    int		same_buffer = buf == curbuf;
+    పూర్ణాంకం		save_ea;
+#నిర్వచితమైతే FEAT_AUTOCHDIR
+    పూర్ణాంకం		save_acd;
+#అయితే_ముగింపు
+    పూర్ణాంకం		same_బఫరు = buf == curbuf;
 
     // Find a window that is for the new buffer
-    if (same_buffer)		// be quick when buf is curbuf
+    ఒకవేళ (same_బఫరు)		// be quick when buf is curbuf
 	win = curwin;
-    else
+    లేకపోతే
 	FOR_ALL_WINDOWS(win)
-	    if (win->w_buffer == buf)
-		break;
+	    ఒకవేళ (win->w_బఫరు == buf)
+		ఆపు;
 
     // Allocate a window when needed.
-    win_T *auc_win = NULL;
-    int auc_idx = AUCMD_WIN_COUNT;
-    if (win == NULL)
+    win_T *auc_win = ఖాళీ;
+    పూర్ణాంకం auc_idx = AUCMD_WIN_లెక్క;
+    ఒకవేళ (win == ఖాళీ)
     {
-	for (auc_idx = 0; auc_idx < AUCMD_WIN_COUNT; ++auc_idx)
-	    if (!aucmd_win[auc_idx].auc_win_used)
+	కొరకు (auc_idx = 0; auc_idx < AUCMD_WIN_లెక్క; ++auc_idx)
+	    ఒకవేళ (!aucmd_win[auc_idx].auc_win_వాడిన)
 	    {
-		if (aucmd_win[auc_idx].auc_win == NULL)
+		ఒకవేళ (aucmd_win[auc_idx].auc_win == ఖాళీ)
 		    aucmd_win[auc_idx].auc_win = win_alloc_popup_win();
 		auc_win = aucmd_win[auc_idx].auc_win;
-		if (auc_win != NULL)
-		    aucmd_win[auc_idx].auc_win_used = TRUE;
-		break;
+		ఒకవేళ (auc_win != ఖాళీ)
+		    aucmd_win[auc_idx].auc_win_వాడిన = TRUE;
+		ఆపు;
 	    }
 
 	// If this fails (out of memory or using all AUCMD_WIN_COUNT
 	// entries) then we can't reliable execute the autocmd, return with
 	// "curbuf" unequal "buf".
-	if (auc_win == NULL)
-	    return;
+	ఒకవేళ (auc_win == ఖాళీ)
+	    తిరిగి;
     }
 
     aco->save_curwin_id = curwin->w_id;
-    aco->save_prevwin_id = prevwin == NULL ? 0 : prevwin->w_id;
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
-	aco->save_prompt_insert = curbuf->b_prompt_insert;
-#endif
+    aco->save_prevwin_id = prevwin == ఖాళీ ? 0 : prevwin->w_id;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    ఒకవేళ (bt_prompt(curbuf))
+	aco->save_prompt_చొప్పించు = curbuf->b_prompt_చొప్పించు;
+#అయితే_ముగింపు
 
-    if (win != NULL)
+    ఒకవేళ (win != ఖాళీ)
     {
 	// There is a window for "buf" in the current tab page, make it the
 	// curwin.  This is preferred, it has the least side effects (esp. if
@@ -1703,7 +1703,7 @@ aucmd_prepbuf(
 	aco->use_aucmd_win_idx = -1;
 	curwin = win;
     }
-    else
+    లేకపోతే
     {
 	// There is no window for "buf", use "auc_win".  To minimize the side
 	// effects, insert it in the current tab page.
@@ -1717,88 +1717,88 @@ aucmd_prepbuf(
 	// chdir() in win_enter_ext().
 	// win_init_popup_win() has already set w_localdir to NULL.
 	aco->tp_localdir = curtab->tp_localdir;
-	curtab->tp_localdir = NULL;
+	curtab->tp_localdir = ఖాళీ;
 	aco->globaldir = globaldir;
-	globaldir = NULL;
+	globaldir = ఖాళీ;
 
 	// Split the current window, put the auc_win in the upper half.
 	// We don't want the BufEnter or WinEnter autocommands.
-	block_autocmds();
+	ఖండం_autocmds();
 	make_snapshot(SNAP_AUCMD_IDX);
 	save_ea = p_ea;
 	p_ea = FALSE;
 
-#ifdef FEAT_AUTOCHDIR
+#నిర్వచితమైతే FEAT_AUTOCHDIR
 	// Prevent chdir() call in win_enter_ext(), through do_autochdir().
 	save_acd = p_acd;
 	p_acd = FALSE;
-#endif
+#అయితే_ముగింపు
 
-	(void)win_split_ins(0, WSP_TOP | WSP_FORCE_ROOM, auc_win, 0, NULL);
+	(శూన్య)win_విభజించు_ins(0, WSP_శిఖరం | WSP_FORCE_స్థలం, auc_win, 0, ఖాళీ);
 	win_comp_pos();   // recompute window positions
 	p_ea = save_ea;
-#ifdef FEAT_AUTOCHDIR
+#నిర్వచితమైతే FEAT_AUTOCHDIR
 	p_acd = save_acd;
-#endif
+#అయితే_ముగింపు
 	unblock_autocmds();
 	curwin = auc_win;
     }
     curbuf = buf;
     aco->new_curwin_id = curwin->w_id;
-    set_bufref(&aco->new_curbuf, curbuf);
+    సమితి_bufref(&aco->new_curbuf, curbuf);
 
-    aco->save_VIsual_active = VIsual_active;
-    if (!same_buffer)
+    aco->save_VIsual_చురుకైన = VIsual_చురుకైన;
+    ఒకవేళ (!same_బఫరు)
 	// disable the Visual area, position may be invalid in another buffer
-	VIsual_active = FALSE;
+	VIsual_చురుకైన = FALSE;
 }
 
 /*
  * Cleanup after executing autocommands for a (hidden) buffer.
  * Restore the window as it was (if possible).
  */
-    void
+    శూన్య
 aucmd_restbuf(
     aco_save_T	*aco)		// structure holding saved values
 {
-    int	    dummy;
+    పూర్ణాంకం	    dummy;
     win_T   *save_curwin;
 
-    if (aco->use_aucmd_win_idx >= 0)
+    ఒకవేళ (aco->use_aucmd_win_idx >= 0)
     {
 	win_T *awp = aucmd_win[aco->use_aucmd_win_idx].auc_win;
 
 	// Find "awp", it can't be closed, but it may be in another tab
 	// page. Do not trigger autocommands here.
-	block_autocmds();
-	if (curwin != awp)
+	ఖండం_autocmds();
+	ఒకవేళ (curwin != awp)
 	{
 	    tabpage_T	*tp;
 	    win_T	*wp;
 
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
 	    {
-		if (wp == awp)
+		ఒకవేళ (wp == awp)
 		{
-		    if (tp != curtab)
+		    ఒకవేళ (tp != curtab)
 			goto_tabpage_tp(tp, TRUE, TRUE);
 		    win_goto(awp);
-		    goto win_found;
+		    వెళ్ళు win_దొరికింది;
 		}
 	    }
 	}
-win_found:
+win_దొరికింది:
 	--curbuf->b_nwindows;
 	// Remove the window and frame from the tree of frames.
-	(void)winframe_remove(curwin, &dummy, NULL, NULL);
-	win_remove(curwin, NULL);
+	(శూన్య)winframe_remove(curwin, &dummy, ఖాళీ, ఖాళీ);
+	win_remove(curwin, ఖాళీ);
 
 	// The window is marked as not used, but it is not freed, it can be
 	// used again.
-	aucmd_win[aco->use_aucmd_win_idx].auc_win_used = FALSE;
-	last_status(FALSE);	    // may need to remove last status line
+	aucmd_win[aco->use_aucmd_win_idx].auc_win_వాడిన = FALSE;
+	చివరి_స్థితి(FALSE);	    // may need to remove last status line
 
-	if (!valid_tabpage_win(curtab))
+	ఒకవేళ (!valid_tabpage_win(curtab))
 	    // no valid window in current tabpage
 	    close_tabpage(curtab);
 
@@ -1806,27 +1806,27 @@ win_found:
 	win_comp_pos();   // recompute window positions
 	unblock_autocmds();
 
-	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	save_curwin = win_కనుగొను_by_id(aco->save_curwin_id);
+	ఒకవేళ (save_curwin != ఖాళీ)
 	    curwin = save_curwin;
-	else
+	లేకపోతే
 	    // Hmm, original window disappeared.  Just use the first one.
 	    curwin = firstwin;
-	curbuf = curwin->w_buffer;
-#ifdef FEAT_JOB_CHANNEL
+	curbuf = curwin->w_బఫరు;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 	// May need to restore insert mode for a prompt buffer.
-	entering_window(curwin);
-	if (bt_prompt(curbuf))
-	    curbuf->b_prompt_insert = aco->save_prompt_insert;
-#endif
-	prevwin = win_find_by_id(aco->save_prevwin_id);
-#ifdef FEAT_EVAL
+	entering_కిటికీ(curwin);
+	ఒకవేళ (bt_prompt(curbuf))
+	    curbuf->b_prompt_చొప్పించు = aco->save_prompt_చొప్పించు;
+#అయితే_ముగింపు
+	prevwin = win_కనుగొను_by_id(aco->save_prevwin_id);
+#నిర్వచితమైతే FEAT_EVAL
 	vars_clear(&awp->w_vars->dv_hashtab);  // free all w: variables
 	hash_init(&awp->w_vars->dv_hashtab);   // re-use the hashtab
-#endif
+#అయితే_ముగింపు
 	// If :lcd has been used in the autocommand window, correct current
 	// directory before restoring tp_localdir and globaldir.
-	if (awp->w_localdir != NULL)
+	ఒకవేళ (awp->w_localdir != ఖాళీ)
 	    win_fix_current_dir();
 	vim_free(curtab->tp_localdir);
 	curtab->tp_localdir = aco->tp_localdir;
@@ -1834,99 +1834,99 @@ win_found:
 	globaldir = aco->globaldir;
 
 	// the buffer contents may have changed
-	VIsual_active = aco->save_VIsual_active;
+	VIsual_చురుకైన = aco->save_VIsual_చురుకైన;
 	check_cursor();
-	if (curwin->w_topline > curbuf->b_ml.ml_line_count)
+	ఒకవేళ (curwin->w_topline > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
-#ifdef FEAT_DIFF
+	    curwin->w_topline = curbuf->b_ml.ml_పంక్తి_లెక్క;
+#నిర్వచితమైతే FEAT_DIFF
 	    curwin->w_topfill = 0;
-#endif
+#అయితే_ముగింపు
 	}
-#if defined(FEAT_GUI)
-	if (gui.in_use)
+#ఒకవేళ defined(FEAT_GUI)
+	ఒకవేళ (gui.లోపల_use)
 	{
 	    // Hide the scrollbars from the "awp" and update.
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_LEFT], FALSE);
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_RIGHT], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_ఎడమ], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_కుడి], FALSE);
 	    gui_may_update_scrollbars();
 	}
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
 	// Restore curwin.  Use the window ID, a window may have been closed
 	// and the memory re-used for another one.
-	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	save_curwin = win_కనుగొను_by_id(aco->save_curwin_id);
+	ఒకవేళ (save_curwin != ఖాళీ)
 	{
 	    // Restore the buffer which was previously edited by curwin, if
 	    // it was changed, we are still the same window and the buffer is
 	    // valid.
-	    if (curwin->w_id == aco->new_curwin_id
+	    ఒకవేళ (curwin->w_id == aco->new_curwin_id
 		    && curbuf != aco->new_curbuf.br_buf
 		    && bufref_valid(&aco->new_curbuf)
-		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != NULL)
+		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != ఖాళీ)
 	    {
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
-		if (curwin->w_s == &curbuf->b_s)
+#ఒకవేళ defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+		ఒకవేళ (curwin->w_s == &curbuf->b_s)
 		    curwin->w_s = &aco->new_curbuf.br_buf->b_s;
-#endif
+#అయితే_ముగింపు
 		--curbuf->b_nwindows;
 		curbuf = aco->new_curbuf.br_buf;
-		curwin->w_buffer = curbuf;
+		curwin->w_బఫరు = curbuf;
 		++curbuf->b_nwindows;
 	    }
 
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
-	    prevwin = win_find_by_id(aco->save_prevwin_id);
+	    curbuf = curwin->w_బఫరు;
+	    prevwin = win_కనుగొను_by_id(aco->save_prevwin_id);
 
 	    // In case the autocommand moves the cursor to a position that
 	    // does not exist in curbuf.
-	    VIsual_active = aco->save_VIsual_active;
+	    VIsual_చురుకైన = aco->save_VIsual_చురుకైన;
 	    check_cursor();
 	}
     }
 
-    VIsual_active = aco->save_VIsual_active;
+    VIsual_చురుకైన = aco->save_VIsual_చురుకైన;
     check_cursor();	    // just in case lines got deleted
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
 	check_pos(curbuf, &VIsual);
 }
 
-static int	autocmd_nested = FALSE;
+స్థిర పూర్ణాంకం	autocmd_nested = FALSE;
 
 /*
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    int
+    పూర్ణాంకం
 apply_autocmds(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    పూర్ణాంకం		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf)	    // buffer for <abuf>
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
+    తిరిగి apply_autocmds_సమూహం(event, fname, fname_io, force,
+						      AUGROUP_ALL, buf, ఖాళీ);
 }
 
 /*
  * Like apply_autocmds(), but with extra "eap" argument.  This takes care of
  * setting v:filearg.
  */
-    int
+    పూర్ణాంకం
 apply_autocmds_exarg(
     event_T	event,
     char_u	*fname,
     char_u	*fname_io,
-    int		force,
+    పూర్ణాంకం		force,
     buf_T	*buf,
     exarg_T	*eap)
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
+    తిరిగి apply_autocmds_సమూహం(event, fname, fname_io, force,
 						       AUGROUP_ALL, buf, eap);
 }
 
@@ -1936,341 +1936,341 @@ apply_autocmds_exarg(
  * conditional, no autocommands are executed.  If otherwise the autocommands
  * cause the script to be aborted, retval is set to FAIL.
  */
-    int
+    పూర్ణాంకం
 apply_autocmds_retval(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    పూర్ణాంకం		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf,	    // buffer for <abuf>
-    int		*retval)    // pointer to caller's retval
+    పూర్ణాంకం		*retval)    // pointer to caller's retval
 {
-    int		did_cmd;
+    పూర్ణాంకం		did_cmd;
 
-#ifdef FEAT_EVAL
-    if (should_abort(*retval))
-	return FALSE;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (should_abort(*retval))
+	తిరిగి FALSE;
+#అయితే_ముగింపు
 
-    did_cmd = apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
-    if (did_cmd
-#ifdef FEAT_EVAL
+    did_cmd = apply_autocmds_సమూహం(event, fname, fname_io, force,
+						      AUGROUP_ALL, buf, ఖాళీ);
+    ఒకవేళ (did_cmd
+#నిర్వచితమైతే FEAT_EVAL
 	    && aborting()
-#endif
+#అయితే_ముగింపు
 	    )
 	*retval = FAIL;
-    return did_cmd;
+    తిరిగి did_cmd;
 }
 
 /*
  * Return TRUE when there is a CursorHold autocommand defined.
  */
-    static int
-has_cursorhold(void)
+    స్థిర పూర్ణాంకం
+has_cursorhold(శూన్య)
 {
-    return (first_autopat[(int)(get_real_state() == MODE_NORMAL_BUSY
-			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)(get_real_state() == బహుళకం_సాధారణ_BUSY
+			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != ఖాళీ);
 }
 
 /*
  * Return TRUE if the CursorHold event can be triggered.
  */
-    int
-trigger_cursorhold(void)
+    పూర్ణాంకం
+trigger_cursorhold(శూన్య)
 {
-    int		state;
+    పూర్ణాంకం		state;
 
-    if (!did_cursorhold
+    ఒకవేళ (!did_cursorhold
 	    && has_cursorhold()
 	    && reg_recording == 0
 	    && typebuf.tb_len == 0
-	    && !ins_compl_active())
+	    && !ins_compl_చురుకైన())
     {
 	state = get_real_state();
-	if (state == MODE_NORMAL_BUSY || (state & MODE_INSERT) != 0)
-	    return TRUE;
+	ఒకవేళ (state == బహుళకం_సాధారణ_BUSY || (state & బహుళకం_చొప్పించు) != 0)
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Return TRUE when there is a WinResized autocommand defined.
  */
-    int
-has_winresized(void)
+    పూర్ణాంకం
+has_winresized(శూన్య)
 {
-    return (first_autopat[(int)EVENT_WINRESIZED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_WINRESIZED] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a WinScrolled autocommand defined.
  */
-    int
-has_winscrolled(void)
+    పూర్ణాంకం
+has_winscrolled(శూన్య)
 {
-    return (first_autopat[(int)EVENT_WINSCROLLED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_WINSCROLLED] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a CursorMoved autocommand defined.
  */
-    int
-has_cursormoved(void)
+    పూర్ణాంకం
+has_cursormoved(శూన్య)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_CURSORMOVED] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a CursorMovedI autocommand defined.
  */
-    int
-has_cursormovedI(void)
+    పూర్ణాంకం
+has_cursormovedI(శూన్య)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVEDI] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_CURSORMOVEDI] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a TextChanged autocommand defined.
  */
-    int
-has_textchanged(void)
+    పూర్ణాంకం
+has_textchanged(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTCHANGED] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a TextChangedI autocommand defined.
  */
-    int
-has_textchangedI(void)
+    పూర్ణాంకం
+has_textchangedI(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDI] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTCHANGEDI] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a TextChangedP autocommand defined.
  */
-    int
-has_textchangedP(void)
+    పూర్ణాంకం
+has_textchangedP(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDP] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTCHANGEDP] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is an InsertCharPre autocommand defined.
  */
-    int
-has_insertcharpre(void)
+    పూర్ణాంకం
+has_insertcharpre(శూన్య)
 {
-    return (first_autopat[(int)EVENT_INSERTCHARPRE] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_INSERTCHARPRE] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is an KeyInputPre autocommand defined.
  */
-    int
-has_keyinputpre(void)
+    పూర్ణాంకం
+has_keyinputpre(శూన్య)
 {
-    return (first_autopat[(int)EVENT_KEYINPUTPRE] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_KEYINPUTPRE] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is an CmdUndefined autocommand defined.
  */
-    int
-has_cmdundefined(void)
+    పూర్ణాంకం
+has_cmdundefined(శూన్య)
 {
-    return (first_autopat[(int)EVENT_CMDUNDEFINED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_CMDUNDEFINED] != ఖాళీ);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * Return TRUE when there is a TextPutPost autocommand defined.
  */
-    int
-has_textputpost(void)
+    పూర్ణాంకం
+has_textputpost(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPOST] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTPUTPOST] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a TextPutPre autocommand defined.
  */
-    int
-has_textputpre(void)
+    పూర్ణాంకం
+has_textputpre(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPRE] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTPUTPRE] != ఖాళీ);
 }
 
 /*
  * Return TRUE when there is a TextYankPost autocommand defined.
  */
-    int
-has_textyankpost(void)
+    పూర్ణాంకం
+has_textyankpost(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TEXTYANKPOST] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TEXTYANKPOST] != ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a CompleteChanged autocommand defined.
  */
-    int
-has_completechanged(void)
+    పూర్ణాంకం
+has_completechanged(శూన్య)
 {
-    return (first_autopat[(int)EVENT_COMPLETECHANGED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_COMPLETECHANGED] != ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a ModeChanged autocommand defined.
  */
-    int
-has_modechanged(void)
+    పూర్ణాంకం
+has_modechanged(శూన్య)
 {
-    return (first_autopat[(int)EVENT_MODECHANGED] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_MODECHANGED] != ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    static int
-apply_autocmds_group(
+    స్థిర పూర్ణాంకం
+apply_autocmds_సమూహం(
     event_T	event,
     char_u	*fname,	     // NULL or empty means use actual file name
     char_u	*fname_io,   // fname to use for <afile> on cmdline, NULL means
 			     // use fname
-    int		force,	     // when TRUE, ignore autocmd_busy
-    int		group,	     // group ID, or AUGROUP_ALL
+    పూర్ణాంకం		force,	     // when TRUE, ignore autocmd_busy
+    పూర్ణాంకం		సమూహం,	     // group ID, or AUGROUP_ALL
     buf_T	*buf,	     // buffer for <abuf>
-    exarg_T	*eap UNUSED) // command arguments
+    exarg_T	*eap వాడని) // command arguments
 {
-    char_u	*sfname = NULL;	// short file name
-    char_u	*tail;
-    int		save_changed;
+    char_u	*sfname = ఖాళీ;	// short file name
+    char_u	*తోక;
+    పూర్ణాంకం		save_మారింది;
     buf_T	*old_curbuf;
-    int		retval = FALSE;
+    పూర్ణాంకం		retval = FALSE;
     char_u	*save_autocmd_fname;
-    int		save_autocmd_fname_full;
-    int		save_autocmd_bufnr;
-    char_u	*save_autocmd_match;
-    int		save_autocmd_busy;
-    int		save_autocmd_nested;
-    static int	nesting = 0;
+    పూర్ణాంకం		save_autocmd_fname_నిండిన;
+    పూర్ణాంకం		save_autocmd_bufnr;
+    char_u	*save_autocmd_సరిపోలిక;
+    పూర్ణాంకం		save_autocmd_busy;
+    పూర్ణాంకం		save_autocmd_nested;
+    స్థిర పూర్ణాంకం	nesting = 0;
     AutoPatCmd_T patcmd;
     AutoPat	*ap;
     sctx_T	save_current_sctx;
-#ifdef FEAT_EVAL
-    funccal_entry_T funccal_entry;
+#నిర్వచితమైతే FEAT_EVAL
+    funccal_నమోదు_T funccal_నమోదు;
     char_u	*save_cmdarg;
-    long	save_cmdbang;
-#endif
-    static int	filechangeshell_busy = FALSE;
-#ifdef FEAT_PROFILE
-    proftime_T	wait_time;
-#endif
-    int		did_save_redobuff = FALSE;
+    దీర్ఘ	save_cmdbang;
+#అయితే_ముగింపు
+    స్థిర పూర్ణాంకం	filechangeshell_busy = FALSE;
+#నిర్వచితమైతే FEAT_PROFILE
+    proftime_T	wait_సమయం;
+#అయితే_ముగింపు
+    పూర్ణాంకం		did_save_redobuff = FALSE;
     save_redo_T	save_redo;
-    int		save_KeyTyped = KeyTyped;
+    పూర్ణాంకం		save_కీలకం_Typed = కీలకం_Typed;
     ESTACK_CHECK_DECLARATION;
 
     /*
      * Quickly return if there are no autocommands for this event or
      * autocommands are blocked.
      */
-    if (event == NUM_EVENTS || first_autopat[(int)event] == NULL
+    ఒకవేళ (event == అంకె_EVENTS || మొదటి_autopat[(పూర్ణాంకం)event] == ఖాళీ
 	    || autocmd_blocked > 0)
-	goto BYPASS_AU;
+	వెళ్ళు BYPASS_AU;
 
     /*
      * When autocommands are busy, new autocommands are only executed when
      * explicitly enabled with the "nested" flag.
      */
-    if (autocmd_busy && !(force || autocmd_nested))
-	goto BYPASS_AU;
+    ఒకవేళ (autocmd_busy && !(force || autocmd_nested))
+	వెళ్ళు BYPASS_AU;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     /*
      * Quickly return when immediately aborting on error, or when an interrupt
      * occurred or an exception was thrown but not caught.
      */
-    if (aborting())
-	goto BYPASS_AU;
-#endif
+    ఒకవేళ (aborting())
+	వెళ్ళు BYPASS_AU;
+#అయితే_ముగింపు
 
     /*
      * FileChangedShell never nests, because it can create an endless loop.
      */
-    if (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
+    ఒకవేళ (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
 				      || event == EVENT_FILECHANGEDSHELLPOST))
-	goto BYPASS_AU;
+	వెళ్ళు BYPASS_AU;
 
     /*
      * Ignore events in 'eventignore'.
      */
-    if (event_ignored(event, p_ei))
-	goto BYPASS_AU;
+    ఒకవేళ (event_ignored(event, p_ei))
+	వెళ్ళు BYPASS_AU;
 
-    int win_ignore = FALSE;
+    పూర్ణాంకం win_ignore = FALSE;
     // If event is allowed in 'eventignorewin', check if curwin or all windows
     // into "buf" are ignoring the event.
-    if (buf == curbuf && event_tab[event].key <= 0)
+    ఒకవేళ (buf == curbuf && event_tab[event].కీలకం <= 0)
 	win_ignore = event_ignored(event, curwin->w_p_eiw);
-    else if (buf != NULL && event_tab[event].key <= 0 && buf->b_nwindows > 0)
+    లేకపోతే ఒకవేళ (buf != ఖాళీ && event_tab[event].కీలకం <= 0 && buf->b_nwindows > 0)
     {
 	tabpage_T *tp;
 	win_T *wp;
 
 	win_ignore = TRUE;
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf && !event_ignored(event, wp->w_p_eiw))
+	    ఒకవేళ (wp->w_బఫరు == buf && !event_ignored(event, wp->w_p_eiw))
 	    {
 		win_ignore = FALSE;
-		break;
+		ఆపు;
 	    }
     }
-    if (win_ignore)
-	goto BYPASS_AU;
+    ఒకవేళ (win_ignore)
+	వెళ్ళు BYPASS_AU;
 
     /*
      * Allow nesting of autocommands, but restrict the depth, because it's
      * possible to create an endless loop.
      */
-    if (nesting == 10)
+    ఒకవేళ (nesting == 10)
     {
 	emsg(_(e_autocommand_nesting_too_deep));
-	goto BYPASS_AU;
+	వెళ్ళు BYPASS_AU;
     }
 
     /*
      * Check if these autocommands are disabled.  Used when doing ":all" or
      * ":ball".
      */
-    if (       (autocmd_no_enter
+    ఒకవేళ (       (autocmd_no_enter
 		&& (event == EVENT_WINENTER || event == EVENT_BUFENTER))
 	    || (autocmd_no_leave
 		&& (event == EVENT_WINLEAVE || event == EVENT_BUFLEAVE)))
-	goto BYPASS_AU;
+	వెళ్ళు BYPASS_AU;
 
-    if (event == EVENT_CMDLINECHANGED)
-	++aucmd_cmdline_changed_count;
+    ఒకవేళ (event == EVENT_CMDLINECHANGED)
+	++aucmd_cmdline_మారింది_లెక్క;
 
     /*
      * Save the autocmd_* variables and info about the current buffer.
      */
     save_autocmd_fname = autocmd_fname;
-    save_autocmd_fname_full = autocmd_fname_full;
+    save_autocmd_fname_నిండిన = autocmd_fname_నిండిన;
     save_autocmd_bufnr = autocmd_bufnr;
-    save_autocmd_match = autocmd_match;
+    save_autocmd_సరిపోలిక = autocmd_సరిపోలిక;
     save_autocmd_busy = autocmd_busy;
     save_autocmd_nested = autocmd_nested;
-    save_changed = curbuf->b_changed;
+    save_మారింది = curbuf->b_మారింది;
     old_curbuf = curbuf;
 
     /*
@@ -2278,32 +2278,32 @@ apply_autocmds_group(
      * Make a copy to avoid that changing a buffer name or directory makes it
      * invalid.
      */
-    if (fname_io == NULL)
+    ఒకవేళ (fname_io == ఖాళీ)
     {
-	if (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
+	ఒకవేళ (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
 						 || event == EVENT_OPTIONSET
 						 || event == EVENT_MODECHANGED
 						 || event == EVENT_TERMRESPONSEALL)
-	    autocmd_fname = NULL;
-	else if (fname != NULL && !ends_excmd(*fname))
+	    autocmd_fname = ఖాళీ;
+	లేకపోతే ఒకవేళ (fname != ఖాళీ && !చివర్లు_excmd(*fname))
 	    autocmd_fname = fname;
-	else if (buf != NULL)
+	లేకపోతే ఒకవేళ (buf != ఖాళీ)
 	    autocmd_fname = buf->b_ffname;
-	else
-	    autocmd_fname = NULL;
+	లేకపోతే
+	    autocmd_fname = ఖాళీ;
     }
-    else
+    లేకపోతే
 	autocmd_fname = fname_io;
-    if (autocmd_fname != NULL)
+    ఒకవేళ (autocmd_fname != ఖాళీ)
 	autocmd_fname = vim_strsave(autocmd_fname);
-    autocmd_fname_full = FALSE; // call FullName_save() later
+    autocmd_fname_నిండిన = FALSE; // call FullName_save() later
 
     /*
      * Set the buffer number to be used for <abuf>.
      */
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
 	autocmd_bufnr = 0;
-    else
+    లేకపోతే
 	autocmd_bufnr = buf->b_fnum;
 
     /*
@@ -2311,36 +2311,36 @@ apply_autocmds_group(
      * Always use the full path of the file name to match with, in case
      * "allow_dirs" is set.
      */
-    if (fname == NULL || *fname == NUL)
+    ఒకవేళ (fname == ఖాళీ || *fname == NUL)
     {
-	if (buf == NULL)
-	    fname = NULL;
-	else
+	ఒకవేళ (buf == ఖాళీ)
+	    fname = ఖాళీ;
+	లేకపోతే
 	{
-#ifdef FEAT_SYN_HL
-	    if (event == EVENT_SYNTAX)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (event == EVENT_SYNTAX)
 		fname = buf->b_p_syn;
-	    else
-#endif
-		if (event == EVENT_FILETYPE)
+	    లేకపోతే
+#అయితే_ముగింపు
+		ఒకవేళ (event == EVENT_FILETYPE)
 		    fname = buf->b_p_ft;
-		else
+		లేకపోతే
 		{
-		    if (buf->b_sfname != NULL)
+		    ఒకవేళ (buf->b_sfname != ఖాళీ)
 			sfname = vim_strsave(buf->b_sfname);
 		    fname = buf->b_ffname;
 		}
 	}
-	if (fname == NULL)
+	ఒకవేళ (fname == ఖాళీ)
 	    fname = (char_u *)"";
 	fname = vim_strsave(fname);	// make a copy, so we can change it
     }
-    else
+    లేకపోతే
     {
 	sfname = vim_strsave(fname);
 	// Don't try expanding FileType, Syntax, FuncUndefined, WindowID,
 	// ColorScheme, QuickFixCmd*, DirChanged and similar.
-	if (event == EVENT_FILETYPE
+	ఒకవేళ (event == EVENT_FILETYPE
 		|| event == EVENT_SYNTAX
 		|| event == EVENT_CMDLINECHANGED
 		|| event == EVENT_CMDLINEENTER
@@ -2370,67 +2370,67 @@ apply_autocmds_group(
 		|| event == EVENT_TERMRESPONSEALL)
 	{
 	    fname = vim_strsave(fname);
-	    autocmd_fname_full = TRUE; // don't expand it later
+	    autocmd_fname_నిండిన = TRUE; // don't expand it later
 	}
-	else
-	    fname = FullName_save(fname, FALSE);
+	లేకపోతే
+	    fname = నిండిన_Name_save(fname, FALSE);
     }
-    if (fname == NULL)	    // out of memory
+    ఒకవేళ (fname == ఖాళీ)	    // out of memory
     {
 	vim_free(sfname);
 	retval = FALSE;
-	goto BYPASS_AU;
+	వెళ్ళు BYPASS_AU;
     }
 
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
     /*
      * Replace all backslashes with forward slashes.  This makes the
      * autocommand patterns portable between Unix and MS-DOS.
      */
-    if (sfname != NULL)
+    ఒకవేళ (sfname != ఖాళీ)
 	forward_slash(sfname);
     forward_slash(fname);
-#endif
+#అయితే_ముగింపు
 
-#ifdef VMS
+#నిర్వచితమైతే VMS
     // remove version for correct match
-    if (sfname != NULL)
-	vms_remove_version(sfname);
-    vms_remove_version(fname);
-#endif
+    ఒకవేళ (sfname != ఖాళీ)
+	vms_remove_సంస్కరణ(sfname);
+    vms_remove_సంస్కరణ(fname);
+#అయితే_ముగింపు
 
     /*
      * Set the name to be used for <amatch>.
      */
-    autocmd_match = fname;
+    autocmd_సరిపోలిక = fname;
 
 
     // Don't redraw while doing autocommands.
     ++RedrawingDisabled;
 
     // name and lnum are filled in later
-    estack_push(ETYPE_AUCMD, NULL, 0);
-    ESTACK_CHECK_SETUP;
+    estack_నెట్టు(ETYPE_AUCMD, ఖాళీ, 0);
+    ESTACK_CHECK_అమరిక;
 
     save_current_sctx = current_sctx;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_enter(&wait_time); // doesn't count for the caller itself
+    ఒకవేళ (do_profiling == PROF_YES)
+	prof_బిడ్డ_enter(&wait_సమయం); // doesn't count for the caller itself
 # endif
 
     // Don't use local function variables, if called from a function.
-    save_funccal(&funccal_entry);
-#endif
+    save_funccal(&funccal_నమోదు);
+#అయితే_ముగింపు
 
     /*
      * When starting to execute autocommands, save the search patterns.
      */
-    if (!autocmd_busy)
+    ఒకవేళ (!autocmd_busy)
     {
-	save_search_patterns();
-	if (!ins_compl_active())
+	save_శోధన_patterns();
+	ఒకవేళ (!ins_compl_చురుకైన())
 	{
 	    saveRedobuff(&save_redo);
 	    did_save_redobuff = TRUE;
@@ -2446,102 +2446,102 @@ apply_autocmds_group(
     ++nesting;		// see matching decrement below
 
     // Remember that FileType was triggered.  Used for did_filetype().
-    if (event == EVENT_FILETYPE)
+    ఒకవేళ (event == EVENT_FILETYPE)
 	curbuf->b_did_filetype = true;
 
-    tail = gettail(fname);
+    తోక = gettail(fname);
 
     // Find first autocommand that matches
-    CLEAR_FIELD(patcmd);
-    patcmd.curpat = first_autopat[(int)event];
-    patcmd.group = group;
+    CLEAR_క్షేత్రం(patcmd);
+    patcmd.curpat = మొదటి_autopat[(పూర్ణాంకం)event];
+    patcmd.సమూహం = సమూహం;
     patcmd.fname = fname;
     patcmd.sfname = sfname;
-    patcmd.tail = tail;
+    patcmd.తోక = తోక;
     patcmd.event = event;
     patcmd.arg_bufnr = autocmd_bufnr;
-    auto_next_pat(&patcmd, FALSE);
+    auto_తదుపరి_pat(&patcmd, FALSE);
 
     // found one, start executing the autocommands
-    if (patcmd.curpat != NULL)
+    ఒకవేళ (patcmd.curpat != ఖాళీ)
     {
 	// add to active_apc_list
-	patcmd.next = active_apc_list;
-	active_apc_list = &patcmd;
+	patcmd.తదుపరి = చురుకైన_apc_list;
+	చురుకైన_apc_list = &patcmd;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// set v:cmdarg (only when there is a matching pattern)
-	save_cmdbang = (long)get_vim_var_nr(VV_CMDBANG);
-	if (eap != NULL)
+	save_cmdbang = (దీర్ఘ)get_vim_var_nr(VV_CMDBANG);
+	ఒకవేళ (eap != ఖాళీ)
 	{
-	    save_cmdarg = set_cmdarg(eap, NULL);
-	    set_vim_var_nr(VV_CMDBANG, (long)eap->forceit);
+	    save_cmdarg = సమితి_cmdarg(eap, ఖాళీ);
+	    సమితి_vim_var_nr(VV_CMDBANG, (దీర్ఘ)eap->forceit);
 	}
-	else
-	    save_cmdarg = NULL;	// avoid gcc warning
-#endif
+	లేకపోతే
+	    save_cmdarg = ఖాళీ;	// avoid gcc warning
+#అయితే_ముగింపు
 	retval = TRUE;
 	// mark the last pattern, to avoid an endless loop when more patterns
 	// are added when executing autocommands
-	for (ap = patcmd.curpat; ap->next != NULL; ap = ap->next)
-	    ap->last = FALSE;
-	ap->last = TRUE;
+	కొరకు (ap = patcmd.curpat; ap->తదుపరి != ఖాళీ; ap = ap->తదుపరి)
+	    ap->చివరి = FALSE;
+	ap->చివరి = TRUE;
 
 	// Make sure cursor and topline are valid.  The first time the current
 	// values are saved, restored by reset_lnums().  When nested only the
 	// values are corrected when needed.
-	if (nesting == 1)
+	ఒకవేళ (nesting == 1)
 	    check_lnums(TRUE);
-	else
+	లేకపోతే
 	    check_lnums_nested(TRUE);
 
-	int save_did_emsg = did_emsg;
-	int save_ex_pressedreturn = get_pressedreturn();
+	పూర్ణాంకం save_did_emsg = did_emsg;
+	పూర్ణాంకం save_ex_pressedreturn = get_pressedreturn();
 
-	do_cmdline(NULL, getnextac, (void *)&patcmd,
+	do_cmdline(ఖాళీ, getnextac, (శూన్య *)&patcmd,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
 
 	did_emsg += save_did_emsg;
-	set_pressedreturn(save_ex_pressedreturn);
+	సమితి_pressedreturn(save_ex_pressedreturn);
 
-	if (nesting == 1)
+	ఒకవేళ (nesting == 1)
 	    // restore cursor and topline, unless they were changed
 	    reset_lnums();
 
-#ifdef FEAT_EVAL
-	if (eap != NULL)
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (eap != ఖాళీ)
 	{
-	    (void)set_cmdarg(NULL, save_cmdarg);
-	    set_vim_var_nr(VV_CMDBANG, save_cmdbang);
+	    (శూన్య)సమితి_cmdarg(ఖాళీ, save_cmdarg);
+	    సమితి_vim_var_nr(VV_CMDBANG, save_cmdbang);
 	}
-#endif
+#అయితే_ముగింపు
 	// delete from active_apc_list
-	if (active_apc_list == &patcmd)	    // just in case
-	    active_apc_list = patcmd.next;
+	ఒకవేళ (చురుకైన_apc_list == &patcmd)	    // just in case
+	    చురుకైన_apc_list = patcmd.తదుపరి;
     }
 
-    if (RedrawingDisabled > 0)
+    ఒకవేళ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     autocmd_busy = save_autocmd_busy;
     filechangeshell_busy = FALSE;
     autocmd_nested = save_autocmd_nested;
     vim_free(SOURCING_NAME);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_తీయి();
     vim_free(autocmd_fname);
     autocmd_fname = save_autocmd_fname;
-    autocmd_fname_full = save_autocmd_fname_full;
+    autocmd_fname_నిండిన = save_autocmd_fname_నిండిన;
     autocmd_bufnr = save_autocmd_bufnr;
-    autocmd_match = save_autocmd_match;
+    autocmd_సరిపోలిక = save_autocmd_సరిపోలిక;
     current_sctx = save_current_sctx;
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     restore_funccal();
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_exit(&wait_time);
+    ఒకవేళ (do_profiling == PROF_YES)
+	prof_బిడ్డ_exit(&wait_సమయం);
 # endif
-#endif
-    KeyTyped = save_KeyTyped;
+#అయితే_ముగింపు
+    కీలకం_Typed = save_కీలకం_Typed;
     vim_free(fname);
     vim_free(sfname);
     --nesting;		// see matching increment above
@@ -2551,22 +2551,22 @@ apply_autocmds_group(
      * the redo buffer.  Free any buffers in the au_pending_free_buf list and
      * free any windows in the au_pending_free_win list.
      */
-    if (!autocmd_busy)
+    ఒకవేళ (!autocmd_busy)
     {
-	restore_search_patterns();
-	if (did_save_redobuff)
+	restore_శోధన_patterns();
+	ఒకవేళ (did_save_redobuff)
 	    restoreRedobuff(&save_redo);
 	curbuf->b_did_filetype = false;
-	while (au_pending_free_buf != NULL)
+	అయితే (au_pending_free_buf != ఖాళీ)
 	{
-	    buf_T *b = au_pending_free_buf->b_next;
+	    buf_T *b = au_pending_free_buf->b_తదుపరి;
 
 	    vim_free(au_pending_free_buf);
 	    au_pending_free_buf = b;
 	}
-	while (au_pending_free_win != NULL)
+	అయితే (au_pending_free_win != ఖాళీ)
 	{
-	    win_T *w = au_pending_free_win->w_next;
+	    win_T *w = au_pending_free_win->w_తదుపరి;
 
 	    vim_free(au_pending_free_win);
 	    au_pending_free_win = w;
@@ -2577,16 +2577,16 @@ apply_autocmds_group(
      * Some events don't set or reset the Changed flag.
      * Check if still in the same buffer!
      */
-    if (curbuf == old_curbuf
+    ఒకవేళ (curbuf == old_curbuf
 	    && (event == EVENT_BUFREADPOST
 		|| event == EVENT_BUFWRITEPOST
 		|| event == EVENT_FILEAPPENDPOST
 		|| event == EVENT_VIMLEAVE
 		|| event == EVENT_VIMLEAVEPRE))
     {
-	if (curbuf->b_changed != save_changed)
+	ఒకవేళ (curbuf->b_మారింది != save_మారింది)
 	    need_maketitle = TRUE;
-	curbuf->b_changed = save_changed;
+	curbuf->b_మారింది = save_మారింది;
     }
 
     au_cleanup();	// may really delete removed patterns/commands now
@@ -2594,34 +2594,34 @@ apply_autocmds_group(
 BYPASS_AU:
     // When wiping out a buffer make sure all its buffer-local autocommands
     // are deleted.
-    if (event == EVENT_BUFWIPEOUT && buf != NULL)
+    ఒకవేళ (event == EVENT_BUFWIPEOUT && buf != ఖాళీ)
 	aubuflocal_remove(buf);
 
-    if (retval == OK && event == EVENT_FILETYPE)
+    ఒకవేళ (retval == OK && event == EVENT_FILETYPE)
 	curbuf->b_au_did_filetype = true;
 
-    return retval;
+    తిరిగి retval;
 }
 
-#ifdef FEAT_EVAL
-static char_u	*old_termresponse = NULL;
-static char_u	*old_termu7resp = NULL;
-static char_u	*old_termblinkresp = NULL;
-static char_u	*old_termrbgresp = NULL;
-static char_u	*old_termrfgresp = NULL;
-static char_u	*old_termstyleresp = NULL;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర char_u	*old_termresponse = ఖాళీ;
+స్థిర char_u	*old_termu7resp = ఖాళీ;
+స్థిర char_u	*old_termblinkresp = ఖాళీ;
+స్థిర char_u	*old_termrbgresp = ఖాళీ;
+స్థిర char_u	*old_termrfgresp = ఖాళీ;
+స్థిర char_u	*old_termstyleresp = ఖాళీ;
+#అయితే_ముగింపు
 
 /*
  * Block triggering autocommands until unblock_autocmd() is called.
  * Can be used recursively, so long as it's symmetric.
  */
-    void
-block_autocmds(void)
+    శూన్య
+ఖండం_autocmds(శూన్య)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // Remember the value of v:termresponse.
-    if (autocmd_blocked == 0)
+    ఒకవేళ (autocmd_blocked == 0)
     {
 	old_termresponse = get_vim_var_str(VV_TERMRESPONSE);
 	old_termu7resp = get_vim_var_str(VV_TERMU7RESP);
@@ -2630,101 +2630,101 @@ block_autocmds(void)
 	old_termrfgresp = get_vim_var_str(VV_TERMRFGRESP);
 	old_termstyleresp = get_vim_var_str(VV_TERMSTYLERESP);
     }
-#endif
+#అయితే_ముగింపు
     ++autocmd_blocked;
 }
 
-    void
-unblock_autocmds(void)
+    శూన్య
+unblock_autocmds(శూన్య)
 {
     --autocmd_blocked;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // When v:termresponse, etc, were set while autocommands were blocked,
     // trigger the autocommands now.  Esp. useful when executing a shell
     // command during startup (vimdiff).
-    if (autocmd_blocked == 0)
+    ఒకవేళ (autocmd_blocked == 0)
     {
-	if (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
+	ఒకవేళ (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSE, NULL, NULL, FALSE, curbuf);
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSE, ఖాళీ, ఖాళీ, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", ఖాళీ, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
+	ఒకవేళ (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", ఖాళీ, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
+	ఒకవేళ (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", ఖాళీ, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
+	ఒకవేళ (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", ఖాళీ, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
+	ఒకవేళ (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", ఖాళీ, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
+	ఒకవేళ (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", ఖాళీ, FALSE, curbuf);
 	}
     }
-#endif
+#అయితే_ముగింపు
 }
 
-    int
-is_autocmd_blocked(void)
+    పూర్ణాంకం
+is_autocmd_blocked(శూన్య)
 {
-    return autocmd_blocked != 0;
+    తిరిగి autocmd_blocked != 0;
 }
 
 /*
  * Find next autocommand pattern that matches.
  */
-    static void
-auto_next_pat(
+    స్థిర శూన్య
+auto_తదుపరి_pat(
     AutoPatCmd_T *apc,
-    int		stop_at_last)	    // stop when 'last' flag is set
+    పూర్ణాంకం		stop_at_చివరి)	    // stop when 'last' flag is set
 {
     AutoPat	*ap;
-    estack_T	*entry;
+    estack_T	*నమోదు_2;
 
-    entry = ((estack_T *)exestack.ga_data) + exestack.ga_len - 1;
+    నమోదు_2 = ((estack_T *)exestack.ga_దత్తాంశం) + exestack.ga_len - 1;
 
     // Clear the exestack entry for this ETYPE_AUCMD entry.
-    VIM_CLEAR(entry->es_name);
-    entry->es_info.aucmd = NULL;
+    VIM_CLEAR(నమోదు_2->es_name);
+    నమోదు_2->es_info.aucmd = ఖాళీ;
 
-    for (ap = apc->curpat; ap != NULL && !got_int; ap = ap->next)
+    కొరకు (ap = apc->curpat; ap != ఖాళీ && !got_int; ap = ap->తదుపరి)
     {
-	apc->curpat = NULL;
+	apc->curpat = ఖాళీ;
 
 	// Only use a pattern when it has not been removed, has commands and
 	// the group matches. For buffer-local autocommands only check the
 	// buffer number.
-	if (ap->pat != NULL && ap->cmds != NULL
-		&& (apc->group == AUGROUP_ALL || apc->group == ap->group))
+	ఒకవేళ (ap->pat != ఖాళీ && ap->cmds != ఖాళీ
+		&& (apc->సమూహం == AUGROUP_ALL || apc->సమూహం == ap->సమూహం))
 	{
 	    // execution-condition
-	    if (ap->buflocal_nr == 0
-		    ? (match_file_pat(NULL, &ap->reg_prog, apc->fname,
-				      apc->sfname, apc->tail, ap->allow_dirs))
+	    ఒకవేళ (ap->buflocal_nr == 0
+		    ? (సరిపోలిక_file_pat(ఖాళీ, &ap->reg_prog, apc->fname,
+				      apc->sfname, apc->తోక, ap->allow_dirs))
 		    : ap->buflocal_nr == apc->arg_bufnr)
 	    {
 		string_T    *event_name;
-		char	    *fmt;
+		అక్షరం	    *fmt;
 		char_u	    *namep;
 		AutoCmd	    *cp;
 
 		event_name = event_nr2name(apc->event);
 		fmt = _("%s Autocommands for \"%s\"");
-		namep = alloc(STRLEN(fmt) + event_name->length + ap->patlen + 1);
-		if (namep != NULL)
+		namep = alloc(STRLEN(fmt) + event_name->నిడివి + ap->patlen + 1);
+		ఒకవేళ (namep != ఖాళీ)
 		{
-		    sprintf((char *)namep, fmt, (char *)event_name->string, (char *)ap->pat);
-		    if (p_verbose >= 8)
+		    sprintf((అక్షరం *)namep, fmt, (అక్షరం *)event_name->string, (అక్షరం *)ap->pat);
+		    ఒకవేళ (p_verbose >= 8)
 		    {
 			verbose_enter();
 			smsg(_("Executing %s"), namep);
@@ -2733,35 +2733,35 @@ auto_next_pat(
 		}
 
 		// Update the exestack entry for this autocmd.
-		entry->es_name = namep;
-		entry->es_info.aucmd = apc;
+		నమోదు_2->es_name = namep;
+		నమోదు_2->es_info.aucmd = apc;
 
 		apc->curpat = ap;
 		apc->nextcmd = ap->cmds;
 		// mark last command
-		for (cp = ap->cmds; cp->next != NULL; cp = cp->next)
-		    cp->last = FALSE;
-		cp->last = TRUE;
+		కొరకు (cp = ap->cmds; cp->తదుపరి != ఖాళీ; cp = cp->తదుపరి)
+		    cp->చివరి = FALSE;
+		cp->చివరి = TRUE;
 	    }
-	    line_breakcheck();
-	    if (apc->curpat != NULL)	    // found a match
-		break;
+	    పంక్తి_breakcheck();
+	    ఒకవేళ (apc->curpat != ఖాళీ)	    // found a match
+		ఆపు;
 	}
-	if (stop_at_last && ap->last)
-	    break;
+	ఒకవేళ (stop_at_చివరి && ap->చివరి)
+	    ఆపు;
     }
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Get the script context where autocommand "acp" is defined.
  */
     sctx_T *
 acp_script_ctx(AutoPatCmd_T *acp)
 {
-    return &acp->script_ctx;
+    తిరిగి &acp->script_ctx;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get next autocommand command.
@@ -2770,114 +2770,114 @@ acp_script_ctx(AutoPatCmd_T *acp)
  */
     char_u *
 getnextac(
-	int c UNUSED,
-	void *cookie,
-	int indent UNUSED,
-	getline_opt_T options UNUSED)
+	పూర్ణాంకం c వాడని,
+	శూన్య *cookie,
+	పూర్ణాంకం indent వాడని,
+	getline_opt_T options వాడని)
 {
     AutoPatCmd_T    *acp = (AutoPatCmd_T *)cookie;
     char_u	    *retval;
     AutoCmd	    *ac;
 
     // Can be called again after returning the last line.
-    if (acp->curpat == NULL)
-	return NULL;
+    ఒకవేళ (acp->curpat == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // repeat until we find an autocommand to execute
-    for (;;)
+    కొరకు (;;)
     {
 	// skip removed commands
-	while (acp->nextcmd != NULL && acp->nextcmd->cmd == NULL)
-	    if (acp->nextcmd->last)
-		acp->nextcmd = NULL;
-	    else
-		acp->nextcmd = acp->nextcmd->next;
+	అయితే (acp->nextcmd != ఖాళీ && acp->nextcmd->cmd == ఖాళీ)
+	    ఒకవేళ (acp->nextcmd->చివరి)
+		acp->nextcmd = ఖాళీ;
+	    లేకపోతే
+		acp->nextcmd = acp->nextcmd->తదుపరి;
 
-	if (acp->nextcmd != NULL)
-	    break;
+	ఒకవేళ (acp->nextcmd != ఖాళీ)
+	    ఆపు;
 
 	// at end of commands, find next pattern that matches
-	if (acp->curpat->last)
-	    acp->curpat = NULL;
-	else
-	    acp->curpat = acp->curpat->next;
-	if (acp->curpat != NULL)
-	    auto_next_pat(acp, TRUE);
-	if (acp->curpat == NULL)
-	    return NULL;
+	ఒకవేళ (acp->curpat->చివరి)
+	    acp->curpat = ఖాళీ;
+	లేకపోతే
+	    acp->curpat = acp->curpat->తదుపరి;
+	ఒకవేళ (acp->curpat != ఖాళీ)
+	    auto_తదుపరి_pat(acp, TRUE);
+	ఒకవేళ (acp->curpat == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
 
     ac = acp->nextcmd;
 
-    if (p_verbose >= 9)
+    ఒకవేళ (p_verbose >= 9)
     {
 	verbose_enter_scroll();
 	smsg(_("autocommand %s"), ac->cmd);
-	msg_puts("\n");   // don't overwrite this either
+	సందేశం_puts("\n");   // don't overwrite this either
 	verbose_leave_scroll();
     }
     retval = vim_strsave(ac->cmd);
     // Remove one-shot ("once") autocmd in anticipation of its execution.
-    if (ac->once)
+    ఒకవేళ (ac->once)
 	au_del_cmd(ac);
     autocmd_nested = ac->nested;
     current_sctx = ac->script_ctx;
     acp->script_ctx = current_sctx;
-    if (ac->last)
-	acp->nextcmd = NULL;
-    else
-	acp->nextcmd = ac->next;
-    return retval;
+    ఒకవేళ (ac->చివరి)
+	acp->nextcmd = ఖాళీ;
+    లేకపోతే
+	acp->nextcmd = ac->తదుపరి;
+    తిరిగి retval;
 }
 
 /*
  * Implementation of has_autocmd() and has_autocmd_fullname().
  * When "is_full" is TRUE "sfname" is already a full path name.
  */
-    static int
-has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
+    స్థిర పూర్ణాంకం
+has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_నిండిన)
 {
     AutoPat	*ap;
     char_u	*fname;
-    char_u	*tail = gettail(sfname);
-    int		retval = FALSE;
+    char_u	*తోక = gettail(sfname);
+    పూర్ణాంకం		retval = FALSE;
 
-    if (first_autopat[(int)event] == NULL)
-	return FALSE;
+    ఒకవేళ (మొదటి_autopat[(పూర్ణాంకం)event] == ఖాళీ)
+	తిరిగి FALSE;
 
-    fname = is_full ? vim_strsave(sfname) : FullName_save(sfname, FALSE);
-    if (fname == NULL)
-	return FALSE;
+    fname = is_నిండిన ? vim_strsave(sfname) : నిండిన_Name_save(sfname, FALSE);
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి FALSE;
 
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
     /*
      * Replace all backslashes with forward slashes.  This makes the
      * autocommand patterns portable between Unix and MS-DOS.
      */
     sfname = vim_strsave(sfname);
-    if (sfname != NULL)
+    ఒకవేళ (sfname != ఖాళీ)
 	forward_slash(sfname);
     forward_slash(fname);
-#endif
+#అయితే_ముగింపు
 
     FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	if (ap->pat != NULL && ap->cmds != NULL
+	ఒకవేళ (ap->pat != ఖాళీ && ap->cmds != ఖాళీ
 	      && (ap->buflocal_nr == 0
-		? match_file_pat(NULL, &ap->reg_prog,
-					  fname, sfname, tail, ap->allow_dirs)
-		: buf != NULL && ap->buflocal_nr == buf->b_fnum
+		? సరిపోలిక_file_pat(ఖాళీ, &ap->reg_prog,
+					  fname, sfname, తోక, ap->allow_dirs)
+		: buf != ఖాళీ && ap->buflocal_nr == buf->b_fnum
 	   ))
 	{
 	    retval = TRUE;
-	    break;
+	    ఆపు;
 	}
 
     vim_free(fname);
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
     vim_free(sfname);
-#endif
+#అయితే_ముగింపు
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -2885,10 +2885,10 @@ has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
  * To account for buffer-local autocommands, function needs to know
  * in which buffer the file will be opened.
  */
-    int
+    పూర్ణాంకం
 has_autocmd(event_T event, char_u *sfname, buf_T *buf)
 {
-    return has_autocmd_ext(event, sfname, buf, false);
+    తిరిగి has_autocmd_ext(event, sfname, buf, false);
 }
 
 /*
@@ -2896,10 +2896,10 @@ has_autocmd(event_T event, char_u *sfname, buf_T *buf)
  * returned by fix_fname().  Avoids expanding it again, which is slow on
  * MS-Windows.
  */
-    int
+    పూర్ణాంకం
 has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
 {
-    return has_autocmd_ext(event, fname, buf, true);
+    తిరిగి has_autocmd_ext(event, fname, buf, true);
 }
 
 /*
@@ -2907,104 +2907,104 @@ has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
  * names.
  */
     char_u *
-get_augroup_name(expand_T *xp UNUSED, int idx)
+get_augroup_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx == augroups.ga_len)		// add "END" add the end
-	return (char_u *)"END";
-    if (idx < 0 || idx >= augroups.ga_len)	// end of list
-	return NULL;
-    if (AUGROUP_NAME(idx) == NULL || AUGROUP_NAME(idx) == get_deleted_augroup())
+    ఒకవేళ (idx == augroups.ga_len)		// add "END" add the end
+	తిరిగి (char_u *)"END";
+    ఒకవేళ (idx < 0 || idx >= augroups.ga_len)	// end of list
+	తిరిగి ఖాళీ;
+    ఒకవేళ (AUGROUP_NAME(idx) == ఖాళీ || AUGROUP_NAME(idx) == get_deleted_augroup())
 	// skip deleted entries
-	return (char_u *)"";
-    return AUGROUP_NAME(idx);		// return a name
+	తిరిగి (char_u *)"";
+    తిరిగి AUGROUP_NAME(idx);		// return a name
 }
 
-static int include_groups = FALSE;
+స్థిర పూర్ణాంకం include_groups = FALSE;
 
     char_u  *
-set_context_in_autocmd(
+సమితి_context_లోపల_autocmd(
     expand_T	*xp,
     char_u	*arg,
-    int		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
+    పూర్ణాంకం		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
 {
     char_u	*p;
-    int		group;
+    పూర్ణాంకం		సమూహం;
 
     // check for a group name, skip it if present
     include_groups = FALSE;
     p = arg;
-    group = au_get_grouparg(&arg);
-    if (group == AUGROUP_ERROR)
-	return NULL;
+    సమూహం = au_get_grouparg(&arg);
+    ఒకవేళ (సమూహం == AUGROUP_ERROR)
+	తిరిగి ఖాళీ;
     // If there only is a group name that's what we expand.
-    if (*arg == NUL && group != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
+    ఒకవేళ (*arg == NUL && సమూహం != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
     {
 	arg = p;
-	group = AUGROUP_ALL;
+	సమూహం = AUGROUP_ALL;
     }
 
     // skip over event name
-    for (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
-	if (*p == ',')
+    కొరకు (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
+	ఒకవేళ (*p == ',')
 	    arg = p + 1;
-    if (*p == NUL)
+    ఒకవేళ (*p == NUL)
     {
-	if (group == AUGROUP_ALL)
+	ఒకవేళ (సమూహం == AUGROUP_ALL)
 	    include_groups = TRUE;
 	xp->xp_context = EXPAND_EVENTS;	    // expand event name
-	xp->xp_pattern = arg;
-	return NULL;
+	xp->xp_నమూనా = arg;
+	తిరిగి ఖాళీ;
     }
 
     // skip over pattern
     arg = skipwhite(p);
-    while (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
+    అయితే (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
 	arg++;
-    if (*arg)
+    ఒకవేళ (*arg)
     {
 	// skip over "++once", "++nested" and "nested"
 	arg = skipwhite(arg);
-	for (int i = 0; i < 2; i++)
+	కొరకు (పూర్ణాంకం i = 0; i < 2; i++)
 	{
-	    if (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
+	    ఒకవేళ (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
-	    if (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
+	    ఒకవేళ (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
 		arg = skipwhite(arg + 8);
-	    if (!in_vim9script() && STRNCMP(arg, "nested", 6) == 0
+	    ఒకవేళ (!లోపల_vim9script() && STRNCMP(arg, "nested", 6) == 0
 						       && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
 	}
-	return arg;			    // expand (next) command
+	తిరిగి arg;			    // expand (next) command
     }
 
-    if (doautocmd)
+    ఒకవేళ (doautocmd)
 	xp->xp_context = EXPAND_FILES;	    // expand file names
-    else
+    లేకపోతే
 	xp->xp_context = EXPAND_NOTHING;    // pattern is not expanded
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of event names.
  */
     char_u *
-get_event_name(expand_T *xp UNUSED, int idx)
+get_event_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (idx < augroups.ga_len)		// First list group names, if wanted
+    ఒకవేళ (idx < augroups.ga_len)		// First list group names, if wanted
     {
-	if (!include_groups || AUGROUP_NAME(idx) == NULL
+	ఒకవేళ (!include_groups || AUGROUP_NAME(idx) == ఖాళీ
 				 || AUGROUP_NAME(idx) == get_deleted_augroup())
-	    return (char_u *)"";	// skip deleted entries
-	return AUGROUP_NAME(idx);	// return a name
+	    తిరిగి (char_u *)"";	// skip deleted entries
+	తిరిగి AUGROUP_NAME(idx);	// return a name
     }
 
     i = idx - augroups.ga_len;
-    if (i < 0 || i >= NUM_EVENTS)
-	return NULL;
+    ఒకవేళ (i < 0 || i >= అంకె_EVENTS)
+	తిరిగి ఖాళీ;
 
-    return event_tab[i].value.string;
+    తిరిగి event_tab[i].విలువ.string;
 }
 
 /*
@@ -3012,45 +3012,45 @@ get_event_name(expand_T *xp UNUSED, int idx)
  * include groups.
  */
     char_u *
-get_event_name_no_group(expand_T *xp UNUSED, int idx, int win)
+get_event_name_no_సమూహం(expand_T *xp వాడని, పూర్ణాంకం idx, పూర్ణాంకం win)
 {
-    if (idx < 0 || idx >= NUM_EVENTS)
-	return NULL;
+    ఒకవేళ (idx < 0 || idx >= అంకె_EVENTS)
+	తిరిగి ఖాళీ;
 
-    if (!win)
-	return event_tab[idx].value.string;
+    ఒకవేళ (!win)
+	తిరిగి event_tab[idx].విలువ.string;
 
     // Need to check subset of allowed values for 'eventignorewin'.
-    int j = 0;
-    for (int i = 0; i < NUM_EVENTS; ++i)
+    పూర్ణాంకం j = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < అంకె_EVENTS; ++i)
     {
-	j += event_tab[i].key <= 0;
-	if (j == idx + 1)
-	    return event_tab[i].value.string;
+	j += event_tab[i].కీలకం <= 0;
+	ఒకవేళ (j == idx + 1)
+	    తిరిగి event_tab[i].విలువ.string;
     }
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Return TRUE when there is a TabClosedPre autocommand defined.
  */
-    int
-has_tabclosedpre(void)
+    పూర్ణాంకం
+has_tabclosedpre(శూన్య)
 {
-    return (first_autopat[(int)EVENT_TABCLOSEDPRE] != NULL);
+    తిరిగి (మొదటి_autopat[(పూర్ణాంకం)EVENT_TABCLOSEDPRE] != ఖాళీ);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if autocmd is supported.
  */
-    int
+    పూర్ణాంకం
 autocmd_supported(char_u *name)
 {
     char_u *p;
 
-    return (event_name2nr(name, &p) != NUM_EVENTS);
+    తిరిగి (event_name2nr(name, &p) != అంకె_EVENTS);
 }
 
 /*
@@ -3065,248 +3065,248 @@ autocmd_supported(char_u *name)
  *	exists("#Event") or
  *	exists("#Event#pat")
  */
-    int
+    పూర్ణాంకం
 au_exists(char_u *arg)
 {
     char_u	*arg_save;
-    char_u	*pattern = NULL;
+    char_u	*నమూనా = ఖాళీ;
     char_u	*event_name;
     char_u	*p;
     event_T	event;
     AutoPat	*ap;
-    buf_T	*buflocal_buf = NULL;
-    int		group;
-    int		retval = FALSE;
+    buf_T	*buflocal_buf = ఖాళీ;
+    పూర్ణాంకం		సమూహం;
+    పూర్ణాంకం		retval = FALSE;
 
     // Make a copy so that we can change the '#' chars to a NUL.
     arg_save = vim_strsave(arg);
-    if (arg_save == NULL)
-	return FALSE;
+    ఒకవేళ (arg_save == ఖాళీ)
+	తిరిగి FALSE;
     p = vim_strchr(arg_save, '#');
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
 	*p++ = NUL;
 
     // First, look for an autocmd group name
-    group = au_find_group(arg_save);
-    if (group == AUGROUP_ERROR)
+    సమూహం = au_కనుగొను_సమూహం(arg_save);
+    ఒకవేళ (సమూహం == AUGROUP_ERROR)
     {
 	// Didn't match a group name, assume the first argument is an event.
-	group = AUGROUP_ALL;
+	సమూహం = AUGROUP_ALL;
 	event_name = arg_save;
     }
-    else
+    లేకపోతే
     {
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	{
 	    // "Group": group name is present and it's recognized
 	    retval = TRUE;
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 
 	// Must be "Group#Event" or "Group#Event#pat".
 	event_name = p;
 	p = vim_strchr(event_name, '#');
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	    *p++ = NUL;	    // "Group#Event#pat"
     }
 
-    pattern = p;	    // "pattern" is NULL when there is no pattern
+    నమూనా = p;	    // "pattern" is NULL when there is no pattern
 
     // find the index (enum) for the event name
     event = event_name2nr(event_name, &p);
 
     // return FALSE if the event name is not recognized
-    if (event == NUM_EVENTS)
-	goto theend;
+    ఒకవేళ (event == అంకె_EVENTS)
+	వెళ్ళు theend;
 
     // Find the first autocommand for this event.
     // If there isn't any, return FALSE;
     // If there is one and no pattern given, return TRUE;
-    ap = first_autopat[(int)event];
-    if (ap == NULL)
-	goto theend;
+    ap = మొదటి_autopat[(పూర్ణాంకం)event];
+    ఒకవేళ (ap == ఖాళీ)
+	వెళ్ళు theend;
 
     // if pattern is "<buffer>", special handling is needed which uses curbuf
     // for pattern "<buffer=N>, fnamecmp() will work fine
-    if (pattern != NULL && STRICMP(pattern, "<buffer>") == 0)
+    ఒకవేళ (నమూనా != ఖాళీ && STRICMP(నమూనా, "<buffer>") == 0)
 	buflocal_buf = curbuf;
 
     // Check if there is an autocommand with the given pattern.
-    for ( ; ap != NULL; ap = ap->next)
+    కొరకు ( ; ap != ఖాళీ; ap = ap->తదుపరి)
 	// only use a pattern when it has not been removed and has commands.
 	// For buffer-local autocommands, fnamecmp() works fine.
-	if (ap->pat != NULL && ap->cmds != NULL
-	    && (group == AUGROUP_ALL || ap->group == group)
-	    && (pattern == NULL
-		|| (buflocal_buf == NULL
-		    ? fnamecmp(ap->pat, pattern) == 0
+	ఒకవేళ (ap->pat != ఖాళీ && ap->cmds != ఖాళీ
+	    && (సమూహం == AUGROUP_ALL || ap->సమూహం == సమూహం)
+	    && (నమూనా == ఖాళీ
+		|| (buflocal_buf == ఖాళీ
+		    ? fnamecmp(ap->pat, నమూనా) == 0
 		    : ap->buflocal_nr == buflocal_buf->b_fnum)))
 	{
 	    retval = TRUE;
-	    break;
+	    ఆపు;
 	}
 
 theend:
     vim_free(arg_save);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * autocmd_add() and autocmd_delete() functions
  */
-    static void
-autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
+    స్థిర శూన్య
+autocmd_కూడు_or_delete(typval_T *argvars, typval_T *rettv, పూర్ణాంకం delete)
 {
     list_T	*aucmd_list;
     listitem_T	*li;
     dict_T	*event_dict;
     dictitem_T	*di;
-    char_u	*event_name = NULL;
+    char_u	*event_name = ఖాళీ;
     list_T	*event_list;
     listitem_T	*eli;
     event_T	event;
-    char_u	*group_name = NULL;
-    int		group;
-    char_u	*pat = NULL;
+    char_u	*సమూహం_name = ఖాళీ;
+    పూర్ణాంకం		సమూహం;
+    char_u	*pat = ఖాళీ;
     list_T	*pat_list;
     listitem_T	*pli;
-    char_u	*cmd = NULL;
-    char_u	*end;
-    int		once;
-    int		nested;
-    int		replace;		// replace the cmd for a group/event
-    int		retval = VVAL_TRUE;
-    int		save_augroup = current_augroup;
+    char_u	*cmd = ఖాళీ;
+    char_u	*చివర;
+    పూర్ణాంకం		once;
+    పూర్ణాంకం		nested;
+    పూర్ణాంకం		replace;		// replace the cmd for a group/event
+    పూర్ణాంకం		retval = VVAL_TRUE;
+    పూర్ణాంకం		save_augroup = current_augroup;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_సంఖ్య = VVAL_FALSE;
 
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_list_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     aucmd_list = argvars[0].vval.v_list;
-    if (aucmd_list == NULL)
-	return;
+    ఒకవేళ (aucmd_list == ఖాళీ)
+	తిరిగి;
 
-    FOR_ALL_LIST_ITEMS(aucmd_list, li)
+    FOR_ALL_LIST_వస్తువులు(aucmd_list, li)
     {
-	VIM_CLEAR(group_name);
+	VIM_CLEAR(సమూహం_name);
 	VIM_CLEAR(cmd);
-	event_name = NULL;
-	event_list = NULL;
-	pat = NULL;
-	pat_list = NULL;
+	event_name = ఖాళీ;
+	event_list = ఖాళీ;
+	pat = ఖాళీ;
+	pat_list = ఖాళీ;
 
-	if (li->li_tv.v_type != VAR_DICT)
-	    continue;
+	ఒకవేళ (li->li_tv.v_type != VAR_DICT)
+	    కొనసాగు;
 
 	event_dict = li->li_tv.vval.v_dict;
-	if (event_dict == NULL)
-	    continue;
+	ఒకవేళ (event_dict == ఖాళీ)
+	    కొనసాగు;
 
-	di = dict_find(event_dict, (char_u *)"event", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(event_dict, (char_u *)"event", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (di->di_tv.v_type == VAR_STRING)
+	    ఒకవేళ (di->di_tv.v_type == VAR_STRING)
 	    {
 		event_name = di->di_tv.vval.v_string;
-		if (event_name == NULL)
+		ఒకవేళ (event_name == ఖాళీ)
 		{
 		    emsg(_(e_string_required));
-		    continue;
+		    కొనసాగు;
 		}
 	    }
-	    else if (di->di_tv.v_type == VAR_LIST)
+	    లేకపోతే ఒకవేళ (di->di_tv.v_type == VAR_LIST)
 	    {
 		event_list = di->di_tv.vval.v_list;
-		if (event_list == NULL)
+		ఒకవేళ (event_list == ఖాళీ)
 		{
 		    emsg(_(e_list_required));
-		    continue;
+		    కొనసాగు;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		emsg(_(e_string_or_list_expected));
-		continue;
+		కొనసాగు;
 	    }
 	}
 
-	group_name = dict_get_string(event_dict, "group", TRUE);
-	if (group_name == NULL || *group_name == NUL)
+	సమూహం_name = dict_get_string(event_dict, "group", TRUE);
+	ఒకవేళ (సమూహం_name == ఖాళీ || *సమూహం_name == NUL)
 	    // if the autocmd group name is not specified, then use the current
 	    // autocmd group
-	    group = current_augroup;
-	else
+	    సమూహం = current_augroup;
+	లేకపోతే
 	{
-	    group = au_find_group(group_name);
-	    if (group == AUGROUP_ERROR)
+	    సమూహం = au_కనుగొను_సమూహం(సమూహం_name);
+	    ఒకవేళ (సమూహం == AUGROUP_ERROR)
 	    {
-		if (delete)
+		ఒకవేళ (delete)
 		{
-		    semsg(_(e_no_such_group_str), group_name);
+		    semsg(_(e_no_such_సమూహం_str), సమూహం_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    ఆపు;
 		}
 		// group is not found, create it now
-		group = au_new_group(group_name);
-		if (group == AUGROUP_ERROR)
+		సమూహం = au_new_సమూహం(సమూహం_name);
+		ఒకవేళ (సమూహం == AUGROUP_ERROR)
 		{
-		    semsg(_(e_no_such_group_str), group_name);
+		    semsg(_(e_no_such_సమూహం_str), సమూహం_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    ఆపు;
 		}
 
-		current_augroup = group;
+		current_augroup = సమూహం;
 	    }
 	}
 
 	// if a buffer number is specified, then generate a pattern of the form
 	// "<buffer=n>. Otherwise, use the pattern supplied by the user.
-	if (dict_has_key(event_dict, "bufnr"))
+	ఒకవేళ (dict_has_కీలకం(event_dict, "bufnr"))
 	{
 	    varnumber_T	bnum;
 
-	    bnum = dict_get_number_def(event_dict, "bufnr", -1);
-	    if (bnum == -1)
-		continue;
+	    bnum = dict_get_సంఖ్య_def(event_dict, "bufnr", -1);
+	    ఒకవేళ (bnum == -1)
+		కొనసాగు;
 
-	    vim_snprintf((char *)IObuff, IOSIZE, "<buffer=%d>", (int)bnum);
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE, "<buffer=%d>", (పూర్ణాంకం)bnum);
 	    pat = IObuff;
 	}
-	else
+	లేకపోతే
 	{
-	    di = dict_find(event_dict, (char_u *)"pattern", -1);
-	    if (di != NULL)
+	    di = dict_కనుగొను(event_dict, (char_u *)"pattern", -1);
+	    ఒకవేళ (di != ఖాళీ)
 	    {
-		if (di->di_tv.v_type == VAR_STRING)
+		ఒకవేళ (di->di_tv.v_type == VAR_STRING)
 		{
 		    pat = di->di_tv.vval.v_string;
-		    if (pat == NULL)
+		    ఒకవేళ (pat == ఖాళీ)
 		    {
 			emsg(_(e_string_required));
-			continue;
+			కొనసాగు;
 		    }
 		}
-		else if (di->di_tv.v_type == VAR_LIST)
+		లేకపోతే ఒకవేళ (di->di_tv.v_type == VAR_LIST)
 		{
 		    pat_list = di->di_tv.vval.v_list;
-		    if (pat_list == NULL)
+		    ఒకవేళ (pat_list == ఖాళీ)
 		    {
 			emsg(_(e_list_required));
-			continue;
+			కొనసాగు;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    emsg(_(e_string_or_list_expected));
-		    continue;
+		    కొనసాగు;
 		}
 	    }
-	    else if (delete)
+	    లేకపోతే ఒకవేళ (delete)
 		pat = (char_u *)"";
 	}
 
@@ -3317,285 +3317,285 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
 	replace = dict_get_bool(event_dict, "replace", FALSE);
 
 	cmd = dict_get_string(event_dict, "cmd", TRUE);
-	if (cmd == NULL)
+	ఒకవేళ (cmd == ఖాళీ)
 	{
-	    if (delete)
+	    ఒకవేళ (delete)
 		cmd = vim_strsave((char_u *)"");
-	    else
-		continue;
+	    లేకపోతే
+		కొనసాగు;
 	}
 
-	if (delete && (event_name == NULL
+	ఒకవేళ (delete && (event_name == ఖాళీ
 		    || (event_name[0] == '*' && event_name[1] == NUL)))
 	{
 	    // if the event name is not specified or '*', delete all the events
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-		    event = (event_T)((int)event + 1))
+	    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+		    event = (event_T)((పూర్ణాంకం)event + 1))
 	    {
-		if (do_autocmd_event(event, pat, once, nested, cmd, delete,
-							group, 0) == FAIL)
+		ఒకవేళ (do_autocmd_event(event, pat, once, nested, cmd, delete,
+							సమూహం, 0) == FAIL)
 		{
 		    retval = VVAL_FALSE;
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    char_u *p = NULL;
+	    char_u *p = ఖాళీ;
 
-	    eli = NULL;
-	    end = NULL;
-	    while (TRUE)
+	    eli = ఖాళీ;
+	    చివర = ఖాళీ;
+	    అయితే (TRUE)
 	    {
-		if (event_list != NULL)
+		ఒకవేళ (event_list != ఖాళీ)
 		{
-		    if (eli == NULL)
-			eli = event_list->lv_first;
-		    else
-			eli = eli->li_next;
-		    if (eli == NULL)
-			break;
-		    if (eli->li_tv.v_type != VAR_STRING
-			    || (p = eli->li_tv.vval.v_string) == NULL)
+		    ఒకవేళ (eli == ఖాళీ)
+			eli = event_list->lv_మొదటి;
+		    లేకపోతే
+			eli = eli->li_తదుపరి;
+		    ఒకవేళ (eli == ఖాళీ)
+			ఆపు;
+		    ఒకవేళ (eli->li_tv.v_type != VAR_STRING
+			    || (p = eli->li_tv.vval.v_string) == ఖాళీ)
 		    {
 			emsg(_(e_string_required));
-			break;
+			ఆపు;
 		    }
 		}
-		else
+		లేకపోతే
 		{
-		    if (p == NULL)
+		    ఒకవేళ (p == ఖాళీ)
 			p = event_name;
-		    if (p == NULL || *p == NUL)
-			break;
+		    ఒకవేళ (p == ఖాళీ || *p == NUL)
+			ఆపు;
 		}
 
-		event = event_name2nr(p, &end);
-		if (event == NUM_EVENTS || *end != NUL)
+		event = event_name2nr(p, &చివర);
+		ఒకవేళ (event == అంకె_EVENTS || *చివర != NUL)
 		{
 		    // this also catches something following a valid event name
 		    semsg(_(e_no_such_event_str), p);
 		    retval = VVAL_FALSE;
-		    break;
+		    ఆపు;
 		}
-		if (pat != NULL)
+		ఒకవేళ (pat != ఖాళీ)
 		{
-		    if (do_autocmd_event(event, pat, once, nested, cmd,
-				delete | replace, group, 0) == FAIL)
+		    ఒకవేళ (do_autocmd_event(event, pat, once, nested, cmd,
+				delete | replace, సమూహం, 0) == FAIL)
 		    {
 			retval = VVAL_FALSE;
-			break;
+			ఆపు;
 		    }
 		}
-		else if (pat_list != NULL)
+		లేకపోతే ఒకవేళ (pat_list != ఖాళీ)
 		{
-		    FOR_ALL_LIST_ITEMS(pat_list, pli)
+		    FOR_ALL_LIST_వస్తువులు(pat_list, pli)
 		    {
-			if (pli->li_tv.v_type != VAR_STRING
-				|| pli->li_tv.vval.v_string == NULL)
+			ఒకవేళ (pli->li_tv.v_type != VAR_STRING
+				|| pli->li_tv.vval.v_string == ఖాళీ)
 			{
 			    emsg(_(e_string_required));
-			    continue;
+			    కొనసాగు;
 			}
-			if (do_autocmd_event(event,
+			ఒకవేళ (do_autocmd_event(event,
 				    pli->li_tv.vval.v_string, once, nested,
-				    cmd, delete | replace, group, 0) ==
+				    cmd, delete | replace, సమూహం, 0) ==
 				FAIL)
 			{
 			    retval = VVAL_FALSE;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    if (retval == VVAL_FALSE)
-			break;
+		    ఒకవేళ (retval == VVAL_FALSE)
+			ఆపు;
 		}
-		if (event_name != NULL)
-		    p = end;
+		ఒకవేళ (event_name != ఖాళీ)
+		    p = చివర;
 	    }
 	}
 
 	// if only the autocmd group name is specified for delete and the
 	// autocmd event, pattern and cmd are not specified, then delete the
 	// autocmd group.
-	if (delete && group_name != NULL &&
-		(event_name == NULL || event_name[0] == NUL)
-		&& (pat == NULL || pat[0] == NUL)
-		&& (cmd == NULL || cmd[0] == NUL))
-	    au_del_group(group_name);
+	ఒకవేళ (delete && సమూహం_name != ఖాళీ &&
+		(event_name == ఖాళీ || event_name[0] == NUL)
+		&& (pat == ఖాళీ || pat[0] == NUL)
+		&& (cmd == ఖాళీ || cmd[0] == NUL))
+	    au_del_సమూహం(సమూహం_name);
     }
 
-    VIM_CLEAR(group_name);
+    VIM_CLEAR(సమూహం_name);
     VIM_CLEAR(cmd);
 
     current_augroup = save_augroup;
-    rettv->vval.v_number = retval;
+    rettv->vval.v_సంఖ్య = retval;
 }
 
 /*
  * autocmd_add() function
  */
-    void
-f_autocmd_add(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_autocmd_కూడు(typval_T *argvars, typval_T *rettv)
 {
-    autocmd_add_or_delete(argvars, rettv, FALSE);
+    autocmd_కూడు_or_delete(argvars, rettv, FALSE);
 }
 
 /*
  * autocmd_delete() function
  */
-    void
+    శూన్య
 f_autocmd_delete(typval_T *argvars, typval_T *rettv)
 {
-    autocmd_add_or_delete(argvars, rettv, TRUE);
+    autocmd_కూడు_or_delete(argvars, rettv, TRUE);
 }
 
 /*
  * autocmd_get() function
  * Returns a List of autocmds.
  */
-    void
+    శూన్య
 f_autocmd_get(typval_T *argvars, typval_T *rettv)
 {
-    event_T	event_arg = NUM_EVENTS;
+    event_T	event_arg = అంకె_EVENTS;
     event_T	event;
     AutoPat	*ap;
     AutoCmd	*ac;
     list_T	*event_list;
     dict_T	*event_dict;
-    char_u	*pat = NULL;
-    char_u	*name = NULL;
-    int		group = AUGROUP_ALL;
+    char_u	*pat = ఖాళీ;
+    char_u	*name = ఖాళీ;
+    పూర్ణాంకం		సమూహం = AUGROUP_ALL;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
+    ఒకవేళ (check_for_opt_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ఒకవేళ (argvars[0].v_type == VAR_DICT)
     {
 	// return only the autocmds in the specified group
-	if (dict_has_key(argvars[0].vval.v_dict, "group"))
+	ఒకవేళ (dict_has_కీలకం(argvars[0].vval.v_dict, "group"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "group", TRUE);
-	    if (name == NULL)
-		return;
+	    ఒకవేళ (name == ఖాళీ)
+		తిరిగి;
 
-	    if (*name == NUL)
-		group = AUGROUP_DEFAULT;
-	    else
+	    ఒకవేళ (*name == NUL)
+		సమూహం = AUGROUP_DEFAULT;
+	    లేకపోతే
 	    {
-		group = au_find_group(name);
-		if (group == AUGROUP_ERROR)
+		సమూహం = au_కనుగొను_సమూహం(name);
+		ఒకవేళ (సమూహం == AUGROUP_ERROR)
 		{
-		    semsg(_(e_no_such_group_str), name);
+		    semsg(_(e_no_such_సమూహం_str), name);
 		    vim_free(name);
-		    return;
+		    తిరిగి;
 		}
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified event
-	if (dict_has_key(argvars[0].vval.v_dict, "event"))
+	ఒకవేళ (dict_has_కీలకం(argvars[0].vval.v_dict, "event"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "event", TRUE);
-	    if (name == NULL)
-		return;
+	    ఒకవేళ (name == ఖాళీ)
+		తిరిగి;
 
-	    if (name[0] == '*' && name[1] == NUL)
-		event_arg = NUM_EVENTS;
-	    else
+	    ఒకవేళ (name[0] == '*' && name[1] == NUL)
+		event_arg = అంకె_EVENTS;
+	    లేకపోతే
 	    {
-		keyvalue_T target;
-		keyvalue_T *entry;
+		keyvalue_T లక్ష్యం;
+		keyvalue_T *నమోదు_2;
 
-		target.key = 0;
-		target.value.string = name;
-		target.value.length = STRLEN(target.value.string);
-		entry = (keyvalue_T *)bsearch(&target, &event_tab,
-		    NUM_EVENTS, sizeof(event_tab[0]), cmp_keyvalue_value_ni);
-		if (entry == NULL)
+		లక్ష్యం.కీలకం = 0;
+		లక్ష్యం.విలువ.string = name;
+		లక్ష్యం.విలువ.నిడివి = STRLEN(లక్ష్యం.విలువ.string);
+		నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &event_tab,
+		    అంకె_EVENTS, పరిమాణం(event_tab[0]), cmp_keyvalue_విలువ_ni);
+		ఒకవేళ (నమోదు_2 == ఖాళీ)
 		{
 		    semsg(_(e_no_such_event_str), name);
 		    vim_free(name);
-		    return;
+		    తిరిగి;
 		}
-		event_arg = (event_T)abs(entry->key);
+		event_arg = (event_T)నిరపేక్ష(నమోదు_2->కీలకం);
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified pattern
-	if (dict_has_key(argvars[0].vval.v_dict, "pattern"))
+	ఒకవేళ (dict_has_కీలకం(argvars[0].vval.v_dict, "pattern"))
 	{
 	    pat = dict_get_string(argvars[0].vval.v_dict, "pattern", TRUE);
-	    if (pat == NULL)
-		return;
+	    ఒకవేళ (pat == ఖాళీ)
+		తిరిగి;
 	}
     }
 
     event_list = rettv->vval.v_list;
 
     // iterate through all the autocmd events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    కొరకు (event = (event_T)0; (పూర్ణాంకం)event < అంకె_EVENTS;
+	    event = (event_T)((పూర్ణాంకం)event + 1))
     {
 	string_T    *event_name;
 
-	if (event_arg != NUM_EVENTS && event != event_arg)
-	    continue;
+	ఒకవేళ (event_arg != అంకె_EVENTS && event != event_arg)
+	    కొనసాగు;
 
 	event_name = event_nr2name(event);
 
 	// iterate through all the patterns for this autocmd event
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
 	{
-	    string_T	group_name;
+	    string_T	సమూహం_name;
 
-	    if (ap->pat == NULL)		// pattern has been removed
-		continue;
+	    ఒకవేళ (ap->pat == ఖాళీ)		// pattern has been removed
+		కొనసాగు;
 
-	    if (group != AUGROUP_ALL && group != ap->group)
-		continue;
+	    ఒకవేళ (సమూహం != AUGROUP_ALL && సమూహం != ap->సమూహం)
+		కొనసాగు;
 
-	    if (pat != NULL && STRCMP(pat, ap->pat) != 0)
-		continue;
+	    ఒకవేళ (pat != ఖాళీ && STRCMP(pat, ap->pat) != 0)
+		కొనసాగు;
 
-	    group_name.string = get_augroup_name(NULL, ap->group);
-	    if (group_name.string == NULL)
-		STR_LITERAL_SET(group_name, "");
-	    else
-		group_name.length = STRLEN(group_name.string);
+	    సమూహం_name.string = get_augroup_name(ఖాళీ, ap->సమూహం);
+	    ఒకవేళ (సమూహం_name.string == ఖాళీ)
+		STR_LITERAL_సమితి(సమూహం_name, "");
+	    లేకపోతే
+		సమూహం_name.నిడివి = STRLEN(సమూహం_name.string);
 
 	    // iterate through all the commands for this pattern and add one
 	    // item for each cmd.
-	    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+	    కొరకు (ac = ap->cmds; ac != ఖాళీ; ac = ac->తదుపరి)
 	    {
 		event_dict = dict_alloc();
-		if (event_dict == NULL
+		ఒకవేళ (event_dict == ఖాళీ
 			|| list_append_dict(event_list, event_dict) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    తిరిగి;
 		}
 
-		if (dict_add_string_len(event_dict, "event",
-			event_name->string, (int)event_name->length) == FAIL
-			|| dict_add_string_len(event_dict, "group",
-			    group_name.string, (int)group_name.length) == FAIL
+		ఒకవేళ (dict_కూడు_string_len(event_dict, "event",
+			event_name->string, (పూర్ణాంకం)event_name->నిడివి) == FAIL
+			|| dict_కూడు_string_len(event_dict, "group",
+			    సమూహం_name.string, (పూర్ణాంకం)సమూహం_name.నిడివి) == FAIL
 			|| (ap->buflocal_nr != 0
-				&& (dict_add_number(event_dict, "bufnr",
+				&& (dict_కూడు_సంఖ్య(event_dict, "bufnr",
 						    ap->buflocal_nr) == FAIL))
-			|| dict_add_string(event_dict, "pattern",
+			|| dict_కూడు_string(event_dict, "pattern",
 							      ap->pat) == FAIL
-			|| dict_add_string(event_dict, "cmd", ac->cmd) == FAIL
-			|| dict_add_bool(event_dict, "once", ac->once) == FAIL
-			|| dict_add_bool(event_dict, "nested",
+			|| dict_కూడు_string(event_dict, "cmd", ac->cmd) == FAIL
+			|| dict_కూడు_bool(event_dict, "once", ac->once) == FAIL
+			|| dict_కూడు_bool(event_dict, "nested",
 							   ac->nested) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    తిరిగి;
 		}
 	    }
 	}
@@ -3604,4 +3604,4 @@ f_autocmd_get(typval_T *argvars, typval_T *rettv)
     vim_free(pat);
 }
 
-#endif
+#అయితే_ముగింపు

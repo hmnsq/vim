@@ -13,53 +13,53 @@
  * Common code for if_python.c and if_python3.c.
  */
 
-#if PY_VERSION_HEX < 0x02050000
-typedef int Py_ssize_t;  // Python 2.4 and earlier don't have this type.
-#endif
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x02050000
+రకనిర్వచనం పూర్ణాంకం Py_ssize_t;  // Python 2.4 and earlier don't have this type.
+#అయితే_ముగింపు
 
 // Use values that are known to work, others may make Vim crash.
-#define ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (char *)p_enc)
-#define DOPY_FUNC "_vim_pydo"
+#నిర్వచించు ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (అక్షరం *)p_enc)
+#నిర్వచించు DOPY_FUNC "_vim_pydo"
 
-static const char *vim_special_path = "_vim_path_";
+స్థిర స్థిరరాశి అక్షరం *vim_special_మార్గం = "_vim_path_";
 
-#define PyErr_SET_STRING(exc, str) PyErr_SetString(exc, _(str))
-#define PyErr_SetVim(str) PyErr_SetString(VimError, str)
-#define PyErr_SET_VIM(str) PyErr_SET_STRING(VimError, str)
-#define PyErr_FORMAT(exc, str, arg) PyErr_Format(exc, _(str), arg)
-#define PyErr_FORMAT2(exc, str, arg1, arg2) PyErr_Format(exc, _(str), arg1,arg2)
-#define PyErr_VIM_FORMAT(str, arg) PyErr_FORMAT(VimError, str, arg)
+#నిర్వచించు Py_Err_సమితి_STRING(exc, str) Py_Err_సమితి_String(exc, _(str))
+#నిర్వచించు Py_Err_సమితి_Vim(str) Py_Err_సమితి_String(VimError, str)
+#నిర్వచించు Py_Err_సమితి_VIM(str) Py_Err_సమితి_STRING(VimError, str)
+#నిర్వచించు PyErr_FORMAT(exc, str, arg) PyErr_Format(exc, _(str), arg)
+#నిర్వచించు PyErr_FORMAT2(exc, str, arg1, arg2) PyErr_Format(exc, _(str), arg1,arg2)
+#నిర్వచించు PyErr_VIM_FORMAT(str, arg) PyErr_FORMAT(VimError, str, arg)
 
-#ifdef USE_LIMITED_API
+#నిర్వచితమైతే USE_LIMITED_API
 // Limited Python API. Need to call only exposed functions and remap macros.
 // PyTypeObject is an opaque struct.
 
-typedef struct {
-    lenfunc sq_length;
+రకనిర్వచనం నిర్మాణం {
+    lenfunc sq_నిడివి;
     binaryfunc sq_concat;
     ssizeargfunc sq_repeat;
-    ssizeargfunc sq_item;
-    void *was_sq_slice;
-    ssizeobjargproc sq_ass_item;
-    void *was_sq_ass_slice;
-    objobjproc sq_contains;
+    ssizeargfunc sq_అంశం;
+    శూన్య *was_sq_ముక్క;
+    ssizeobjargproc sq_ass_అంశం;
+    శూన్య *was_sq_ass_ముక్క;
+    objobjproc sq_కలిగియుంది;
 
     binaryfunc sq_inplace_concat;
     ssizeargfunc sq_inplace_repeat;
 } PySequenceMethods;
 
-typedef struct {
-    lenfunc mp_length;
+రకనిర్వచనం నిర్మాణం {
+    lenfunc mp_నిడివి;
     binaryfunc mp_subscript;
     objobjargproc mp_ass_subscript;
 } PyMappingMethods;
 
 // This struct emulates the concrete _typeobject struct to allow the code to
 // work the same way in both limited and full Python APIs.
-struct typeobject_wrapper {
-    const char *tp_name;
+నిర్మాణం typeobject_wrapper {
+    స్థిరరాశి అక్షరం *tp_name;
     Py_ssize_t tp_basicsize;
-    unsigned long tp_flags;
+    గుర్తులేని దీర్ఘ tp_flags;
 
     // When adding new slots below, also need to make sure we add ADD_TP_SLOT
     // call in AddHeapType for it.
@@ -74,7 +74,7 @@ struct typeobject_wrapper {
     getattrofunc tp_getattro;
     setattrofunc tp_setattro;
 
-    const char *tp_doc;
+    స్థిరరాశి అక్షరం *tp_doc;
 
     traverseproc tp_traverse;
 
@@ -83,37 +83,37 @@ struct typeobject_wrapper {
     getiterfunc tp_iter;
     iternextfunc tp_iternext;
 
-    struct PyMethodDef *tp_methods;
-    struct _typeobject *tp_base;
+    నిర్మాణం Py_పద్ధతి_Def *tp_methods;
+    నిర్మాణం _typeobject *tp_పునాది;
     allocfunc tp_alloc;
     newfunc tp_new;
     freefunc tp_free;
 };
 
 # define DEFINE_PY_TYPE_OBJECT(type) \
-    static struct typeobject_wrapper type; \
-    static PyTypeObject* type##Ptr = NULL
+    స్థిర నిర్మాణం typeobject_wrapper type; \
+    స్థిర PyTypeObject* type##Ptr = ఖాళీ
 
 // PyObject_HEAD_INIT_TYPE and PyObject_FINISH_INIT_TYPE need to come in pairs
 // We first initialize with NULL because the type is not allocated until
 // init_types() is called later. It's in FINISH_INIT_TYPE where we fill the
 // type in with the newly allocated type.
-# define PyObject_HEAD_INIT_TYPE(type) PyObject_HEAD_INIT(NULL)
-# define PyObject_FINISH_INIT_TYPE(obj, type) obj.ob_base.ob_type = type##Ptr
+# define Py_Object_తల_INIT_TYPE(type) Py_Object_తల_INIT(ఖాళీ)
+# define Py_Object_ముగింపు_INIT_TYPE(obj, type) obj.ob_పునాది.ob_type = type##Ptr
 
-# define Py_TYPE_GET_TP_ALLOC(type) ((allocfunc)PyType_GetSlot(type, Py_tp_alloc))
-# define Py_TYPE_GET_TP_METHODS(type) ((PyMethodDef *)PyType_GetSlot(type, Py_tp_methods))
+# define Py_TYPE_GET_TP_ALLOC(type) ((allocfunc)Py_Type_Get_స్థానం(type, Py_tp_alloc))
+# define Py_TYPE_GET_TP_METHODS(type) ((Py_పద్ధతి_Def *)Py_Type_Get_స్థానం(type, Py_tp_methods))
 
 // PyObject_NEW is not part of stable ABI, but PyObject_Malloc/Init are.
-static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
+స్థిర PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 {
     PyObject *obj = (PyObject *)PyObject_Malloc(objsize);
-    if (obj == NULL)
-	return PyErr_NoMemory();
-    return PyObject_Init(obj, type);
+    ఒకవేళ (obj == ఖాళీ)
+	తిరిగి Py_Err_No_జ్ఞాపకం();
+    తిరిగి PyObject_Init(obj, type);
 }
 # undef PyObject_NEW
-# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, sizeof(type)))
+# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, పరిమాణం(type)))
 
 // This is a somewhat convoluted because limited API doesn't expose an easy way
 // to get the tp_name field, and so we have to manually reconstruct it as
@@ -122,46 +122,46 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 // PyUnicode_AsUTF8AndSize and PyType_GetQualName() are not available until
 // late Python 3 versions, and won't be available if you set Py_LIMITED_API too
 // low.
-# define PyErr_FORMAT_TYPE(msg, obj) \
-    do { \
+# define PyErr_FORMAT_TYPE(సందేశం, obj) \
+    చేయి { \
 	PyObject* qualname = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__qualname__"); \
-	if (qualname == NULL) \
+	ఒకవేళ (qualname == ఖాళీ) \
 	{ \
-	    PyErr_FORMAT(PyExc_TypeError, msg, "(NULL)"); \
-	    break; \
+	    PyErr_FORMAT(PyExc_TypeError, సందేశం, "(NULL)"); \
+	    ఆపు; \
 	} \
 	PyObject* module = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__module__"); \
-	PyObject* full; \
-	if (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
+	PyObject* నిండిన; \
+	ఒకవేళ (module == ఖాళీ || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
 		|| PyUnicode_CompareWithASCIIString(module, "__main__") == 0) \
 	{ \
-	    full = qualname; \
-	    Py_INCREF(full); \
+	    నిండిన = qualname; \
+	    Py_INCREF(నిండిన); \
 	} \
-	else \
-	    full = PyUnicode_FromFormat("%U.%U", module, qualname); \
-	PyObject* full_bytes = PyUnicode_AsUTF8String(full); \
-	const char* full_str = PyBytes_AsString(full_bytes); \
-	full_str = full_str == NULL ? "(NULL)" : full_str; \
-	PyErr_FORMAT(PyExc_TypeError, msg, full_str); \
+	లేకపోతే \
+	    నిండిన = PyUnicode_FromFormat("%U.%U", module, qualname); \
+	PyObject* నిండిన_బైట్లు = PyUnicode_AsUTF8String(నిండిన); \
+	స్థిరరాశి అక్షరం* నిండిన_str = Py_బైట్లు_As_String(నిండిన_బైట్లు); \
+	నిండిన_str = నిండిన_str == ఖాళీ ? "(NULL)" : నిండిన_str; \
+	PyErr_FORMAT(PyExc_TypeError, సందేశం, నిండిన_str); \
 	Py_DECREF(qualname); \
 	Py_XDECREF(module); \
-	Py_XDECREF(full); \
-	Py_XDECREF(full_bytes); \
-    } while (0)
+	Py_XDECREF(నిండిన); \
+	Py_XDECREF(నిండిన_బైట్లు); \
+    } అయితే (0)
 
-# define PyList_GET_ITEM(list, i) PyList_GetItem(list, i)
-# define PyList_GET_SIZE(o) PyList_Size(o)
+# define Py_List_GET_అంశం(list, i) Py_List_Get_అంశం(list, i)
+# define Py_List_GET_కొలత(o) Py_List_కొలత(o)
 
 // PyList_SET_ITEM and PyList_SetItem have slightly different behaviors. The
 // former will leave the old item dangling, and the latter will decref on it.
 // Since we only use this on new lists, this difference doesn't matter.
-# define PyList_SET_ITEM(list, i, item) PyList_SetItem(list, i, item)
+# define Py_List_సమితి_అంశం(list, i, అంశం) Py_List_సమితి_అంశం_2(list, i, అంశం)
 
-# define PyTuple_GET_ITEM(o, pos) PyTuple_GetItem(o, pos)
-# define PyTuple_GET_SIZE(o) PyTuple_Size(o)
+# define Py_Tuple_GET_అంశం(o, pos) Py_Tuple_Get_అంశం(o, pos)
+# define Py_Tuple_GET_కొలత(o) Py_Tuple_కొలత(o)
 
-# if Py_LIMITED_API < 0x03080000
+# ఒకవేళ Py_LIMITED_API < 0x03080000
 // PyIter_check only became part of stable ABI in 3.8, and there is no easy way
 // to check for it in the API. We simply return false as a compromise. This
 // does mean we should avoid compiling with stable ABI < 3.8.
@@ -169,7 +169,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 #  define PyIter_Check(obj) (FALSE)
 # endif
 
-static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
+స్థిర PyTypeObject* కూడు_కుప్ప_Type(నిర్మాణం typeobject_wrapper* type_object)
 {
     PyType_Spec type_spec;
     type_spec.name = type_object->tp_name;
@@ -179,61 +179,61 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 
     // We just need to statically allocate a large enough buffer that can hold
     // all slots. We need to leave a null-terminated slot at the end.
-    PyType_Slot slots[40] = { {0, NULL} };
-    size_t slot_i = 0;
+    Py_Type_స్థానం slots[40] = { {0, ఖాళీ} };
+    size_t స్థానం_i = 0;
 
-# define ADD_TP_SLOT(slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->slot_name != NULL) \
+# define కూడు_TP_స్థానం(స్థానం_name) \
+    ఒకవేళ (స్థానం_i >= 40) తిరిగి ఖాళీ; /* this should never happen */ \
+    ఒకవేళ (type_object->స్థానం_name != ఖాళీ) \
     { \
-	slots[slot_i].slot = Py_##slot_name; \
-	slots[slot_i].pfunc = (void*)type_object->slot_name; \
-	++slot_i; \
+	slots[స్థానం_i].స్థానం = Py_##slot_name; \
+	slots[స్థానం_i].pfunc = (శూన్య*)type_object->స్థానం_name; \
+	++స్థానం_i; \
     }
-# define ADD_TP_SUB_SLOT(sub_slot, slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
+# define కూడు_TP_SUB_స్థానం(sub_స్థానం, స్థానం_name) \
+    ఒకవేళ (స్థానం_i >= 40) తిరిగి ఖాళీ; /* this should never happen */ \
+    ఒకవేళ (type_object->sub_స్థానం != ఖాళీ && type_object->sub_స్థానం->స్థానం_name != ఖాళీ) \
     { \
-	slots[slot_i].slot = Py_##slot_name; \
-	slots[slot_i].pfunc = (void*)type_object->sub_slot->slot_name; \
-	++slot_i; \
+	slots[స్థానం_i].స్థానం = Py_##slot_name; \
+	slots[స్థానం_i].pfunc = (శూన్య*)type_object->sub_స్థానం->స్థానం_name; \
+	++స్థానం_i; \
     }
 
-    ADD_TP_SLOT(tp_dealloc)
-    ADD_TP_SLOT(tp_repr)
-    ADD_TP_SLOT(tp_call)
-    ADD_TP_SLOT(tp_getattro)
-    ADD_TP_SLOT(tp_setattro)
-    ADD_TP_SLOT(tp_doc)
-    ADD_TP_SLOT(tp_traverse)
-    ADD_TP_SLOT(tp_clear)
-    ADD_TP_SLOT(tp_iter)
-    ADD_TP_SLOT(tp_iternext)
-    ADD_TP_SLOT(tp_methods)
-    ADD_TP_SLOT(tp_base)
-    ADD_TP_SLOT(tp_alloc)
-    ADD_TP_SLOT(tp_new)
-    ADD_TP_SLOT(tp_free)
+    కూడు_TP_స్థానం(tp_dealloc)
+    కూడు_TP_స్థానం(tp_repr)
+    కూడు_TP_స్థానం(tp_call)
+    కూడు_TP_స్థానం(tp_getattro)
+    కూడు_TP_స్థానం(tp_setattro)
+    కూడు_TP_స్థానం(tp_doc)
+    కూడు_TP_స్థానం(tp_traverse)
+    కూడు_TP_స్థానం(tp_clear)
+    కూడు_TP_స్థానం(tp_iter)
+    కూడు_TP_స్థానం(tp_iternext)
+    కూడు_TP_స్థానం(tp_methods)
+    కూడు_TP_స్థానం(tp_పునాది)
+    కూడు_TP_స్థానం(tp_alloc)
+    కూడు_TP_స్థానం(tp_new)
+    కూడు_TP_స్థానం(tp_free)
 
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_length)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_concat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_repeat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_item)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_ass_item)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_contains)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_inplace_concat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_inplace_repeat)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_నిడివి)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_concat)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_repeat)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_అంశం)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_ass_అంశం)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_కలిగియుంది)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_inplace_concat)
+    కూడు_TP_SUB_స్థానం(tp_as_sequence, sq_inplace_repeat)
 
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_length)
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_subscript)
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_ass_subscript)
-# undef ADD_TP_SLOT
-# undef ADD_TP_SUB_SLOT
+    కూడు_TP_SUB_స్థానం(tp_as_mapping, mp_నిడివి)
+    కూడు_TP_SUB_స్థానం(tp_as_mapping, mp_subscript)
+    కూడు_TP_SUB_స్థానం(tp_as_mapping, mp_ass_subscript)
+# undef కూడు_TP_స్థానం
+# undef కూడు_TP_SUB_స్థానం
 
     type_spec.slots = slots;
 
     PyObject* newtype = PyType_FromSpec(&type_spec);
-    return (PyTypeObject*)newtype;
+    తిరిగి (PyTypeObject*)newtype;
 }
 
 // Add a heap type, since static types do not work in limited API
@@ -247,137 +247,137 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 // version-specific handling. Vim does not re-start the Python runtime so there
 // will be no long-term leak.
 # define PYTYPE_READY(type) \
-    type##Ptr = AddHeapType(&(type)); \
-    if (type##Ptr == NULL) \
-	return -1;
+    type##Ptr = కూడు_కుప్ప_Type(&(type)); \
+    ఒకవేళ (type##Ptr == ఖాళీ) \
+	తిరిగి -1;
 # define PYTYPE_CLEANUP(type) \
-    type##Ptr = NULL;
+    type##Ptr = ఖాళీ;
 
 // Limited API does not provide PyRun_* functions. Need to implement manually
 // using PyCompile and PyEval.
-static PyObject* Vim_PyRun_String(const char *str, int start, PyObject *globals, PyObject *locals)
+స్థిర PyObject* Vim_Py_నిరంతరం_String(స్థిరరాశి అక్షరం *str, పూర్ణాంకం ప్రారంభం, PyObject *globals, PyObject *locals)
 {
     // Just pass "" for filename for now.
-    PyObject* compiled = Py_CompileString(str, "", start);
-    if (compiled == NULL)
-	return NULL;
+    PyObject* compiled = Py_CompileString(str, "", ప్రారంభం);
+    ఒకవేళ (compiled == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    PyObject* eval_result = PyEval_EvalCode(compiled, globals, locals);
+    PyObject* eval_ఫలితం = Py_Eval_Eval_సంకేతం(compiled, globals, locals);
     Py_DECREF(compiled);
-    return eval_result;
+    తిరిగి eval_ఫలితం;
 }
-static int Vim_PyRun_SimpleString(const char *str)
+స్థిర పూర్ణాంకం Vim_Py_నిరంతరం_Simple_String(స్థిరరాశి అక్షరం *str)
 {
     // This function emulates CPython's implementation.
-    PyObject* m = PyImport_AddModule("__main__");
-    if (m == NULL)
-	return -1;
+    PyObject* m = Py_Import_కూడు_Module("__main__");
+    ఒకవేళ (m == ఖాళీ)
+	తిరిగి -1;
     PyObject* d = PyModule_GetDict(m);
-    PyObject* output = Vim_PyRun_String(str, Py_file_input, d, d);
-    if (output == NULL)
+    PyObject* output = Vim_Py_నిరంతరం_String(str, Py_file_ఆదానం, d, d);
+    ఒకవేళ (output == ఖాళీ)
     {
 	PyErr_PrintEx(TRUE);
-	return -1;
+	తిరిగి -1;
     }
     Py_DECREF(output);
-    return 0;
+    తిరిగి 0;
 }
-# define PyRun_String Vim_PyRun_String
-# define PyRun_SimpleString Vim_PyRun_SimpleString
+# define Py_నిరంతరం_String Vim_Py_నిరంతరం_String
+# define Py_నిరంతరం_Simple_String Vim_Py_నిరంతరం_Simple_String
 
-#else // !defined(USE_LIMITED_API)
+#లేకపోతే // !defined(USE_LIMITED_API)
 
 // Full Python API. Can make use of structs and macros directly.
 # define DEFINE_PY_TYPE_OBJECT(type) \
-    static PyTypeObject type; \
-    static PyTypeObject* type##Ptr = &type
-# define PyObject_HEAD_INIT_TYPE(type) PyObject_HEAD_INIT(&type)
+    స్థిర PyTypeObject type; \
+    స్థిర PyTypeObject* type##Ptr = &type
+# define Py_Object_తల_INIT_TYPE(type) Py_Object_తల_INIT(&type)
 
 # define Py_TYPE_GET_TP_ALLOC(type) type->tp_alloc
 # define Py_TYPE_GET_TP_METHODS(type) type->tp_methods
 
-# define Py_TYPE_NAME(obj) ((obj)->ob_type->tp_name == NULL \
+# define Py_TYPE_NAME(obj) ((obj)->ob_type->tp_name == ఖాళీ \
 	? "(NULL)" \
 	: (obj)->ob_type->tp_name)
-# define PyErr_FORMAT_TYPE(msg, obj) \
-    PyErr_FORMAT(PyExc_TypeError, msg, \
+# define PyErr_FORMAT_TYPE(సందేశం, obj) \
+    PyErr_FORMAT(PyExc_TypeError, సందేశం, \
 	    Py_TYPE_NAME(obj))
 
 // Add a static type
 # define PYTYPE_READY(type) \
-    if (PyType_Ready(type##Ptr)) \
-	return -1;
+    ఒకవేళ (PyType_Ready(type##Ptr)) \
+	తిరిగి -1;
 
-#endif
+#అయితే_ముగింపు
 
 
-#define RAISE_NO_EMPTY_KEYS PyErr_SET_STRING(PyExc_ValueError, \
+#నిర్వచించు RAISE_NO_ఖాళీలు_కీలకాలు Py_Err_సమితి_STRING(Py_Exc_విలువ_Error, \
 					    N_("empty keys are not allowed"))
-#define RAISE_LOCKED_DICTIONARY PyErr_SET_VIM(N_("dictionary is locked"))
-#define RAISE_LOCKED_LIST PyErr_SET_VIM(N_("list is locked"))
-#define RAISE_UNDO_FAIL PyErr_SET_VIM(N_("cannot save undo information"))
-#define RAISE_DELETE_LINE_FAIL PyErr_SET_VIM(N_("cannot delete line"))
-#define RAISE_INSERT_LINE_FAIL PyErr_SET_VIM(N_("cannot insert line"))
-#define RAISE_REPLACE_LINE_FAIL PyErr_SET_VIM(N_("cannot replace line"))
-#define RAISE_KEY_ADD_FAIL(key) \
-    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), key)
-#define RAISE_INVALID_INDEX_TYPE(idx) \
+#నిర్వచించు RAISE_LOCKED_DICTIONARY Py_Err_సమితి_VIM(N_("dictionary is locked"))
+#నిర్వచించు RAISE_LOCKED_LIST Py_Err_సమితి_VIM(N_("list is locked"))
+#నిర్వచించు RAISE_UNDO_FAIL Py_Err_సమితి_VIM(N_("cannot save undo information"))
+#నిర్వచించు RAISE_DELETE_పంక్తి_FAIL Py_Err_సమితి_VIM(N_("cannot delete line"))
+#నిర్వచించు RAISE_చొప్పించు_పంక్తి_FAIL Py_Err_సమితి_VIM(N_("cannot insert line"))
+#నిర్వచించు RAISE_REPLACE_పంక్తి_FAIL Py_Err_సమితి_VIM(N_("cannot replace line"))
+#నిర్వచించు RAISE_కీలకం_కూడు_FAIL(కీలకం) \
+    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), కీలకం)
+#నిర్వచించు RAISE_INVALID_సూచీ_TYPE(idx) \
     PyErr_FORMAT_TYPE(N_("index must be int or slice, not %s"), idx);
 
-#define INVALID_BUFFER_VALUE ((buf_T *)(-1))
-#define INVALID_WINDOW_VALUE ((win_T *)(-1))
-#define INVALID_TABPAGE_VALUE ((tabpage_T *)(-1))
+#నిర్వచించు INVALID_బఫరు_విలువ ((buf_T *)(-1))
+#నిర్వచించు INVALID_కిటికీ_విలువ ((win_T *)(-1))
+#నిర్వచించు INVALID_TABPAGE_విలువ ((tabpage_T *)(-1))
 
-typedef void (*rangeinitializer)(void *);
-typedef void (*runner)(const char *, dict_T *, void *
-#ifdef PY_CAN_RECURSE
+రకనిర్వచనం శూన్య (*rangeinitializer)(శూన్య *);
+రకనిర్వచనం శూన్య (*runner)(స్థిరరాశి అక్షరం *, dict_T *, శూన్య *
+#నిర్వచితమైతే PY_CAN_RECURSE
 	, PyGILState_STATE *
-#endif
+#అయితే_ముగింపు
 	);
 
-static int ConvertFromPyObject(PyObject *, typval_T *);
-static int _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
-static int ConvertFromPyMapping(PyObject *, typval_T *);
-static int ConvertFromPySequence(PyObject *, typval_T *);
-static PyObject *WindowNew(win_T *, tabpage_T *);
-static PyObject *BufferNew (buf_T *);
-static PyObject *LineToString(const char *);
+స్థిర పూర్ణాంకం ConvertFromPyObject(PyObject *, typval_T *);
+స్థిర పూర్ణాంకం _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
+స్థిర పూర్ణాంకం ConvertFromPyMapping(PyObject *, typval_T *);
+స్థిర పూర్ణాంకం ConvertFromPySequence(PyObject *, typval_T *);
+స్థిర PyObject *కిటికీ_New(win_T *, tabpage_T *);
+స్థిర PyObject *బఫరు_New (buf_T *);
+స్థిర PyObject *పంక్తి_గమ్యం_String(స్థిరరాశి అక్షరం *);
 
-static PyInt RangeStart;
-static PyInt RangeEnd;
+స్థిర PyInt Range_ప్రారంభం;
+స్థిర PyInt Range_చివర;
 
-static PyObject *globals;
+స్థిర PyObject *globals;
 
-static PyObject *py_chdir;
-static PyObject *py_fchdir;
-static PyObject *py_getcwd;
-static PyObject *vim_module;
-static PyObject *vim_special_path_object;
+స్థిర PyObject *py_chdir;
+స్థిర PyObject *py_fchdir;
+స్థిర PyObject *py_getcwd;
+స్థిర PyObject *vim_module;
+స్థిర PyObject *vim_special_మార్గం_object;
 
-#if PY_VERSION_HEX >= 0x030700f0
-static PyObject *py_find_spec;
-#else
-static PyObject *py_load_module;
-#endif
-#if PY_VERSION_HEX < 0x30c00a7
-static PyObject *py_find_module;
-#endif
+#ఒకవేళ PY_సంస్కరణ_HEX >= 0x030700f0
+స్థిర PyObject *py_కనుగొను_spec;
+#లేకపోతే
+స్థిర PyObject *py_ఎక్కించు_module;
+#అయితే_ముగింపు
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x30c00a7
+స్థిర PyObject *py_కనుగొను_module;
+#అయితే_ముగింపు
 
-static PyObject *VimError;
+స్థిర PyObject *VimError;
 
 /*
  * obtain a lock on the Vim data structures
  */
-    static void
-Python_Lock_Vim(void)
+    స్థిర శూన్య
+Python_తాళం_Vim(శూన్య)
 {
 }
 
 /*
  * release a lock on the Vim data structures
  */
-    static void
-Python_Release_Vim(void)
+    స్థిర శూన్య
+Python_Release_Vim(శూన్య)
 {
 }
 
@@ -388,267 +388,267 @@ Python_Release_Vim(void)
  *
  * Use Py_XDECREF to decrement reference count.
  */
-    static char_u *
-StringToChars(PyObject *obj, PyObject **todecref)
+    స్థిర char_u *
+String_గమ్యం_Chars(PyObject *obj, PyObject **todecref)
 {
     char_u	*str;
 
-    if (PyBytes_Check(obj))
+    ఒకవేళ (Py_బైట్లు_Check(obj))
     {
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1
-		|| str == NULL)
-	    return NULL;
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(obj, (అక్షరం **) &str, ఖాళీ) == -1
+		|| str == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
-	*todecref = NULL;
+	*todecref = ఖాళీ;
     }
-    else if (PyUnicode_Check(obj))
+    లేకపోతే ఒకవేళ (PyUnicode_Check(obj))
     {
-	PyObject	*bytes;
+	PyObject	*బైట్లు;
 
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	ఒకవేళ (!(బైట్లు = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    తిరిగి ఖాళీ;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1
-		|| str == NULL)
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(బైట్లు, (అక్షరం **) &str, ఖాళీ) == -1
+		|| str == ఖాళీ)
 	{
-	    Py_DECREF(bytes);
-	    return NULL;
+	    Py_DECREF(బైట్లు);
+	    తిరిగి ఖాళీ;
 	}
 
-	*todecref = bytes;
+	*todecref = బైట్లు;
     }
-    else
+    లేకపోతే
     {
-#if PY_MAJOR_VERSION < 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
 	PyErr_FORMAT_TYPE(N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#లేకపోతే
 	PyErr_FORMAT_TYPE(N_("expected bytes() or str() instance, but got %s"),
 		obj);
-#endif
-	return NULL;
+#అయితే_ముగింపు
+	తిరిగి ఖాళీ;
     }
 
-    return (char_u *) str;
+    తిరిగి (char_u *) str;
 }
 
-#define NUMBER_LONG     1
-#define NUMBER_INT      2
-#define NUMBER_NATURAL  4
-#define NUMBER_UNSIGNED 8
+#నిర్వచించు సంఖ్య_LONG     1
+#నిర్వచించు సంఖ్య_INT      2
+#నిర్వచించు సంఖ్య_NATURAL  4
+#నిర్వచించు సంఖ్య_UNSIGNED 8
 
-    static int
-NumberToLong(PyObject *obj, long *result, int flags)
+    స్థిర పూర్ణాంకం
+సంఖ్య_గమ్యం_Long(PyObject *obj, దీర్ఘ *ఫలితం, పూర్ణాంకం flags)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(obj))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    ఒకవేళ (PyInt_Check(obj))
     {
-	*result = PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	*ఫలితం = PyInt_AsLong(obj);
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి -1;
     }
-    else
-#endif
-    if (PyLong_Check(obj))
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (PyLong_Check(obj))
     {
-	*result = PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	*ఫలితం = PyLong_AsLong(obj);
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి -1;
     }
-    else if (PyNumber_Check(obj))
+    లేకపోతే ఒకవేళ (Py_సంఖ్య_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*అంకె;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	ఒకవేళ (!(అంకె = Py_సంఖ్య_Long(obj)))
+	    తిరిగి -1;
 
-	*result = PyLong_AsLong(num);
+	*ఫలితం = PyLong_AsLong(అంకె);
 
-	Py_DECREF(num);
+	Py_DECREF(అంకె);
 
-	if (PyErr_Occurred())
-	    return -1;
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి -1;
     }
-    else
+    లేకపోతే
     {
-#if PY_MAJOR_VERSION < 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected int(), long() or something supporting "
 		   "coercing to long(), but got %s"),
 		obj);
-#else
+#లేకపోతే
 	PyErr_FORMAT_TYPE(
 		N_("expected int() or something supporting coercing to int(), "
 		   "but got %s"),
 		obj);
-#endif
-	return -1;
+#అయితే_ముగింపు
+	తిరిగి -1;
     }
 
-    if (flags & NUMBER_INT)
+    ఒకవేళ (flags & సంఖ్య_INT)
     {
-	if (*result > INT_MAX)
+	ఒకవేళ (*ఫలితం > గరిష్ఠ_పూర్ణాంకం)
 	{
-	    PyErr_SET_STRING(PyExc_OverflowError,
+	    Py_Err_సమితి_STRING(Py_Exc_అధికప్రవాహం_Error,
 		    N_("value is too large to fit into C int type"));
-	    return -1;
+	    తిరిగి -1;
 	}
-	else if (*result < INT_MIN)
+	లేకపోతే ఒకవేళ (*ఫలితం < INT_MIN)
 	{
-	    PyErr_SET_STRING(PyExc_OverflowError,
+	    Py_Err_సమితి_STRING(Py_Exc_అధికప్రవాహం_Error,
 		    N_("value is too small to fit into C int type"));
-	    return -1;
+	    తిరిగి -1;
 	}
     }
 
-    if (flags & NUMBER_NATURAL)
+    ఒకవేళ (flags & సంఖ్య_NATURAL)
     {
-	if (*result <= 0)
+	ఒకవేళ (*ఫలితం <= 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_సమితి_STRING(Py_Exc_విలువ_Error,
 		    N_("number must be greater than zero"));
-	    return -1;
+	    తిరిగి -1;
 	}
     }
-    else if (flags & NUMBER_UNSIGNED)
+    లేకపోతే ఒకవేళ (flags & సంఖ్య_UNSIGNED)
     {
-	if (*result < 0)
+	ఒకవేళ (*ఫలితం < 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_సమితి_STRING(Py_Exc_విలువ_Error,
 		    N_("number must be greater or equal to zero"));
-	    return -1;
+	    తిరిగి -1;
 	}
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-add_string(PyObject *list, char *s)
+    స్థిర పూర్ణాంకం
+కూడు_string(PyObject *list, అక్షరం *s)
 {
     PyObject	*string;
 
-    if (!(string = PyString_FromString(s)))
-	return -1;
+    ఒకవేళ (!(string = PyString_FromString(s)))
+	తిరిగి -1;
 
-    if (PyList_Append(list, string))
+    ఒకవేళ (PyList_Append(list, string))
     {
 	Py_DECREF(string);
-	return -1;
+	తిరిగి -1;
     }
 
     Py_DECREF(string);
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-ObjectDir(PyObject *self, char **attributes)
+    స్థిర PyObject *
+ObjectDir(PyObject *self, అక్షరం **లక్షణాలు)
 {
-    PyMethodDef	*method;
-    char	**attr;
+    Py_పద్ధతి_Def	*పద్ధతి;
+    అక్షరం	**attr;
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    ఒకవేళ (!(ret = PyList_New(0)))
+	తిరిగి ఖాళీ;
 
-    if (self)
-	for (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
-	    if (add_string(ret, (char *)method->ml_name))
+    ఒకవేళ (self)
+	కొరకు (పద్ధతి = Py_TYPE_GET_TP_METHODS(self->ob_type) ; పద్ధతి->ml_name != ఖాళీ ; ++పద్ధతి)
+	    ఒకవేళ (కూడు_string(ret, (అక్షరం *)పద్ధతి->ml_name))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 
-    for (attr = attributes ; *attr ; ++attr)
-	if (add_string(ret, *attr))
+    కొరకు (attr = లక్షణాలు ; *attr ; ++attr)
+	ఒకవేళ (కూడు_string(ret, *attr))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-#if PY_MAJOR_VERSION < 3
-    if (add_string(ret, "__members__"))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    ఒకవేళ (కూడు_string(ret, "__members__"))
     {
 	Py_DECREF(ret);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-#endif
+#అయితే_ముగింపు
 
-    return ret;
+    తిరిగి ret;
 }
 
 // Output buffer management
 
 // Function to write a line, points to either msg() or emsg().
-typedef int (*writefn)(char *);
+రకనిర్వచనం పూర్ణాంకం (*writefn)(అక్షరం *);
 
 DEFINE_PY_TYPE_OBJECT(OutputType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    long softspace;
-    long error;
+    Py_Object_తల
+    దీర్ఘ softspace;
+    దీర్ఘ error;
 } OutputObject;
 
-static char *OutputAttrs[] = {
+స్థిర అక్షరం *OutputAttrs[] = {
     "softspace",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-OutputDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+OutputDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, OutputAttrs);
+    తిరిగి ObjectDir(self, OutputAttrs);
 }
 
-    static int
-OutputSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+OutputSetattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
     OutputObject *self = (OutputObject*)self_obj;
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_సమితి_STRING(PyExc_AttributeError,
 		N_("can't delete OutputObject attributes"));
-	return -1;
+	తిరిగి -1;
     }
 
-    if (strcmp(name, "softspace") == 0)
+    ఒకవేళ (strcmp(name, "softspace") == 0)
     {
-	if (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
-	    return -1;
-	return 0;
+	ఒకవేళ (సంఖ్య_గమ్యం_Long(valObject, &(self->softspace), సంఖ్య_UNSIGNED))
+	    తిరిగి -1;
+	తిరిగి 0;
     }
 
     PyErr_FORMAT(PyExc_AttributeError, N_("invalid attribute: %s"), name);
-    return -1;
+    తిరిగి -1;
 }
 
 // Buffer IO, we write one whole line at a time.
-static garray_T io_ga = {0, 0, 1, 80, NULL};
-static writefn old_fn = NULL;
+స్థిర garray_T io_ga = {0, 0, 1, 80, ఖాళీ};
+స్థిర writefn old_fn = ఖాళీ;
 
-    static void
-PythonIO_Flush(void)
+    స్థిర శూన్య
+PythonIO_Flush(శూన్య)
 {
-    if (old_fn != NULL && io_ga.ga_len > 0)
+    ఒకవేళ (old_fn != ఖాళీ && io_ga.ga_len > 0)
     {
-	((char *)io_ga.ga_data)[io_ga.ga_len] = NUL;
+	((అక్షరం *)io_ga.ga_దత్తాంశం)[io_ga.ga_len] = NUL;
 	// We don't know what emsg_severe should be here, so ... hope?
-	old_fn((char *)io_ga.ga_data);
+	old_fn((అక్షరం *)io_ga.ga_దత్తాంశం);
     }
     io_ga.ga_len = 0;
 }
 
-    static void
-writer(writefn fn, char_u *str, PyInt n, int severe)
+    స్థిర శూన్య
+writer(writefn fn, char_u *str, PyInt n, పూర్ణాంకం severe)
 {
     char_u *ptr;
 
     // Flush when switching output function.
-    if (fn != old_fn)
+    ఒకవేళ (fn != old_fn)
 	PythonIO_Flush();
     old_fn = fn;
 
@@ -657,124 +657,124 @@ writer(writefn fn, char_u *str, PyInt n, int severe)
     // For normal messages: Do not output when "got_int" was set.  This avoids
     // a loop gone crazy flooding the terminal with messages.  Also for when
     // "q" is pressed at the more-prompt.
-    while (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
+    అయితే (n > 0 && (ptr = memchr(str, '\n', n)) != ఖాళీ
 					  && (fn == (writefn)emsg || !got_int))
     {
 	PyInt len = ptr - str;
 
-	if (ga_grow(&io_ga, (int)(len + 1)) == FAIL)
-	    break;
+	ఒకవేళ (ga_grow(&io_ga, (పూర్ణాంకం)(len + 1)) == FAIL)
+	    ఆపు;
 
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)len);
-	((char *)io_ga.ga_data)[io_ga.ga_len + len] = NUL;
+	mch_memmove(((అక్షరం *)io_ga.ga_దత్తాంశం) + io_ga.ga_len, str, (size_t)len);
+	((అక్షరం *)io_ga.ga_దత్తాంశం)[io_ga.ga_len + len] = NUL;
 	emsg_severe = severe;
-	fn((char *)io_ga.ga_data);
+	fn((అక్షరం *)io_ga.ga_దత్తాంశం);
 	str = ptr + 1;
 	n -= len + 1;
 	io_ga.ga_len = 0;
     }
 
     // Put the remaining text into io_ga for later printing.
-    if (n > 0 && (fn == (writefn)emsg || !got_int)
-					&& ga_grow(&io_ga, (int)(n + 1)) == OK)
+    ఒకవేళ (n > 0 && (fn == (writefn)emsg || !got_int)
+					&& ga_grow(&io_ga, (పూర్ణాంకం)(n + 1)) == OK)
     {
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)n);
-	io_ga.ga_len += (int)n;
+	mch_memmove(((అక్షరం *)io_ga.ga_దత్తాంశం) + io_ga.ga_len, str, (size_t)n);
+	io_ga.ga_len += (పూర్ణాంకం)n;
     }
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 write_output(OutputObject *self, PyObject *string)
 {
     Py_ssize_t	len = 0;
-    char	*str = NULL;
-    int		error = self->error;
+    అక్షరం	*str = ఖాళీ;
+    పూర్ణాంకం		error = self->error;
 
-    if (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
-	return -1;
+    ఒకవేళ (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
+	తిరిగి -1;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    writer((writefn)(error ? emsg : msg), (char_u *)str, len, error);
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
+    writer((writefn)(error ? emsg : సందేశం), (char_u *)str, len, error);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
     PyMem_Free(str);
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 OutputWrite(OutputObject *self, PyObject *string)
 {
-    if (write_output(self, string))
-	return NULL;
+    ఒకవేళ (write_output(self, string))
+	తిరిగి ఖాళీ;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 OutputWritelines(OutputObject *self, PyObject *seq)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*అంశం;
 
-    if (!(iterator = PyObject_GetIter(seq)))
-	return NULL;
+    ఒకవేళ (!(iterator = PyObject_GetIter(seq)))
+	తిరిగి ఖాళీ;
 
-    while ((item = PyIter_Next(iterator)))
+    అయితే ((అంశం = Py_Iter_తదుపరి(iterator)))
     {
-	if (write_output(self, item))
+	ఒకవేళ (write_output(self, అంశం))
 	{
 	    Py_DECREF(iterator);
-	    Py_DECREF(item);
-	    return NULL;
+	    Py_DECREF(అంశం);
+	    తిరిగి ఖాళీ;
 	}
-	Py_DECREF(item);
+	Py_DECREF(అంశం);
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return NULL;
+    ఒకవేళ (PyErr_Occurred())
+	తిరిగి ఖాళీ;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
 
-    static PyObject *
-AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
+    స్థిర PyObject *
+AlwaysNone(PyObject *self వాడని, PyObject *వాదనలు వాడని)
 {
     // do nothing
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
-#define ALWAYS_NONE AlwaysNone(NULL, NULL)
+#నిర్వచించు ALWAYS_NONE AlwaysNone(ఖాళీ, ఖాళీ)
 
-    static PyObject *
-AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
+    స్థిర PyObject *
+AlwaysFalse(PyObject *self వాడని, PyObject *వాదనలు వాడని)
 {
     // do nothing
     PyObject	*ret = Py_False;
     Py_INCREF(ret);
-    return ret;
+    తిరిగి ret;
 }
-#define ALWAYS_FALSE AlwaysFalse(NULL, NULL)
+#నిర్వచించు ALWAYS_FALSE AlwaysFalse(ఖాళీ, ఖాళీ)
 
-    static PyObject *
-AlwaysTrue(PyObject *self UNUSED, PyObject *args UNUSED)
+    స్థిర PyObject *
+AlwaysTrue(PyObject *self వాడని, PyObject *వాదనలు వాడని)
 {
     // do nothing
     PyObject	*ret = Py_True;
     Py_INCREF(ret);
-    return ret;
+    తిరిగి ret;
 }
-#define ALWAYS_TRUE AlwaysTrue(NULL, NULL)
+#నిర్వచించు ALWAYS_TRUE AlwaysTrue(ఖాళీ, ఖాళీ)
 
 /***************/
 
-static struct PyMethodDef OutputMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def OutputMethods[] = {
     // name,	    function,				calling,	doc
     {"write",	    (PyCFunction)OutputWrite,		METH_O,		""},
     {"writelines",  (PyCFunction)OutputWritelines,	METH_O,		""},
@@ -786,208 +786,208 @@ static struct PyMethodDef OutputMethods[] = {
     {"writable",    (PyCFunction)AlwaysTrue,		METH_NOARGS,	""},
     {"closed",      (PyCFunction)AlwaysFalse,		METH_NOARGS,	""},
     {"__dir__",	    (PyCFunction)OutputDir,		METH_NOARGS,	""},
-    { NULL,	    NULL,				0,		NULL}
+    { ఖాళీ,	    ఖాళీ,				0,		ఖాళీ}
 };
 
-static OutputObject Output =
+స్థిర OutputObject Output =
 {
-    PyObject_HEAD_INIT_TYPE(OutputType)
+    Py_Object_తల_INIT_TYPE(OutputType)
     0,
     0
 };
 
-static OutputObject Error =
+స్థిర OutputObject Error =
 {
-    PyObject_HEAD_INIT_TYPE(OutputType)
+    Py_Object_తల_INIT_TYPE(OutputType)
     0,
     1
 };
 
-    static int
-PythonIO_Init_io(void)
+    స్థిర పూర్ణాంకం
+PythonIO_Init_io(శూన్య)
 {
-    if (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
-	return -1;
-    if (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
-	return -1;
+    ఒకవేళ (Py_Sys_సమితి_Object("stdout", (PyObject *)(శూన్య *)&Output))
+	తిరిగి -1;
+    ఒకవేళ (Py_Sys_సమితి_Object("stderr", (PyObject *)(శూన్య *)&Error))
+	తిరిగి -1;
 
-    if (PyErr_Occurred())
+    ఒకవేళ (PyErr_Occurred())
     {
 	emsg(_(e_python_error_initialising_io_object));
-	return -1;
+	తిరిగి -1;
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-#if PY_VERSION_HEX < 0x030700f0
-static PyObject *call_load_module(char *name, int len, PyObject *find_module_result);
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x030700f0
+స్థిర PyObject *call_ఎక్కించు_module(అక్షరం *name, పూర్ణాంకం len, PyObject *కనుగొను_module_ఫలితం);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    char	*fullname;
-    PyObject	*result;
+    Py_Object_తల
+    అక్షరం	*fullname;
+    PyObject	*ఫలితం;
 } LoaderObject;
 DEFINE_PY_TYPE_OBJECT(LoaderType);
 
-    static void
+    స్థిర శూన్య
 LoaderDestructor(PyObject *self_obj)
 {
     LoaderObject *self = (LoaderObject*)self_obj;
     vim_free(self->fullname);
-    Py_XDECREF(self->result);
-    DESTRUCTOR_FINISH(self);
+    Py_XDECREF(self->ఫలితం);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-    static PyObject *
-LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Loader_ఎక్కించు_Module(LoaderObject *self, PyObject *వాదనలు వాడని)
 {
-    char	*fullname = self->fullname;
-    PyObject	*result = self->result;
+    అక్షరం	*fullname = self->fullname;
+    PyObject	*ఫలితం = self->ఫలితం;
     PyObject	*module;
 
-    if (!fullname)
+    ఒకవేళ (!fullname)
     {
-	module = result ? result : Py_None;
+	module = ఫలితం ? ఫలితం : Py_None;
 	Py_INCREF(module);
-	return module;
+	తిరిగి module;
     }
 
-    module = call_load_module(fullname, (int)STRLEN(fullname), result);
+    module = call_ఎక్కించు_module(fullname, (పూర్ణాంకం)STRLEN(fullname), ఫలితం);
 
-    self->fullname = NULL;
-    self->result = module;
+    self->fullname = ఖాళీ;
+    self->ఫలితం = module;
 
     vim_free(fullname);
-    Py_DECREF(result);
+    Py_DECREF(ఫలితం);
 
-    if (!module)
+    ఒకవేళ (!module)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి ఖాళీ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	తిరిగి Py_None;
     }
 
     Py_INCREF(module);
-    return module;
+    తిరిగి module;
 }
 
-static struct PyMethodDef LoaderMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def LoaderMethods[] = {
     // name,	    function,				calling,	doc
-    {"load_module", (PyCFunction)LoaderLoadModule,	METH_VARARGS,	""},
-    { NULL,	    NULL,				0,		NULL}
+    {"load_module", (PyCFunction)Loader_ఎక్కించు_Module,	METH_VARARGS,	""},
+    { ఖాళీ,	    ఖాళీ,				0,		ఖాళీ}
 };
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check to see whether a Vim error has been reported, or a keyboard
  * interrupt has been detected.
  */
-    static void
-VimTryStart(void)
+    స్థిర శూన్య
+Vim_Try_ప్రారంభం(శూన్య)
 {
     ++trylevel;
 }
 
-    static int
-VimTryEnd(void)
+    స్థిర పూర్ణాంకం
+Vim_Try_చివర(శూన్య)
 {
     --trylevel;
     // Without this it stops processing all subsequent Vim script commands and
     // generates strange error messages if I e.g. try calling Test() in a cycle
     did_emsg = FALSE;
     // Keyboard interrupt should be preferred over anything else
-    if (got_int)
+    ఒకవేళ (got_int)
     {
-	if (did_throw)
+	ఒకవేళ (did_throw)
 	    discard_current_exception();
 	got_int = FALSE;
-	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return -1;
+	Py_Err_సమితి_None(Py_Exc_Keyboard_అంతరాయం);
+	తిరిగి -1;
     }
-    else if (msg_list != NULL && *msg_list != NULL)
+    లేకపోతే ఒకవేళ (సందేశం_list != ఖాళీ && *సందేశం_list != ఖాళీ)
     {
-	int	should_free;
-	char	*msg;
+	పూర్ణాంకం	should_free;
+	అక్షరం	*సందేశం;
 
-	msg = get_exception_string(*msg_list, ET_ERROR, NULL, &should_free);
+	సందేశం = get_exception_string(*సందేశం_list, ET_ERROR, ఖాళీ, &should_free);
 
-	if (msg == NULL)
+	ఒకవేళ (సందేశం == ఖాళీ)
 	{
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_జ్ఞాపకం();
+	    తిరిగి -1;
 	}
 
-	PyErr_SetVim(msg);
+	Py_Err_సమితి_Vim(సందేశం);
 
 	free_global_msglist();
 
-	if (should_free)
-	    vim_free(msg);
+	ఒకవేళ (should_free)
+	    vim_free(సందేశం);
 
-	return -1;
+	తిరిగి -1;
     }
-    else if (!did_throw)
-	return (PyErr_Occurred() ? -1 : 0);
+    లేకపోతే ఒకవేళ (!did_throw)
+	తిరిగి (PyErr_Occurred() ? -1 : 0);
     // Python exception is preferred over Vim one; unlikely to occur though
-    else if (PyErr_Occurred())
+    లేకపోతే ఒకవేళ (PyErr_Occurred())
     {
 	discard_current_exception();
-	return -1;
+	తిరిగి -1;
     }
     // Finally transform Vim script exception to python one
-    else
+    లేకపోతే
     {
-	PyErr_SetVim((char *)current_exception->value);
+	Py_Err_సమితి_Vim((అక్షరం *)current_exception->విలువ);
 	discard_current_exception();
-	return -1;
+	తిరిగి -1;
     }
 }
 
-    static int
-VimCheckInterrupt(void)
+    స్థిర పూర్ణాంకం
+Vim_Check_అంతరాయం(శూన్య)
 {
-    if (got_int)
+    ఒకవేళ (got_int)
     {
-	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return 1;
+	Py_Err_సమితి_None(Py_Exc_Keyboard_అంతరాయం);
+	తిరిగి 1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 // Vim module - Implementation
 
-    static PyObject *
-VimCommand(PyObject *self UNUSED, PyObject *string)
+    స్థిర PyObject *
+VimCommand(PyObject *self వాడని, PyObject *string)
 {
     char_u	*cmd;
     PyObject	*ret;
     PyObject	*todecref;
 
-    if (!(cmd = StringToChars(string, &todecref)))
-	return NULL;
+    ఒకవేళ (!(cmd = String_గమ్యం_Chars(string, &todecref)))
+	తిరిగి ఖాళీ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
 
-    VimTryStart();
+    Vim_Try_ప్రారంభం();
     do_cmdline_cmd(cmd);
     update_screen(UPD_VALID);
 
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
-    if (VimTryEnd())
-	ret = NULL;
-    else
+    ఒకవేళ (Vim_Try_చివర())
+	ret = ఖాళీ;
+    లేకపోతే
 	ret = Py_None;
 
     Py_XINCREF(ret);
     Py_XDECREF(todecref);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -997,126 +997,126 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
  * The depth parameter is to avoid infinite recursion, set it to 1 when
  * you call VimToPython.
  */
-    static PyObject *
-VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
+    స్థిర PyObject *
+Vim_గమ్యం_Python(typval_T *our_tv, పూర్ణాంకం లోతు, PyObject *lookup_dict)
 {
     PyObject	*ret;
     PyObject	*newObj;
-    char	ptrBuf[sizeof(void *) * 2 + 3];
+    అక్షరం	ptrBuf[పరిమాణం(శూన్య *) * 2 + 3];
 
     // Avoid infinite recursion
-    if (depth > 100)
+    ఒకవేళ (లోతు > 100)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	తిరిగి ret;
     }
 
     // Check if we run into a recursive loop.  The item must be in lookup_dict
     // then and we can use it again.
-    if ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
-	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != NULL)
-	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != NULL))
+    ఒకవేళ ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != ఖాళీ)
+	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != ఖాళీ)
+	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != ఖాళీ))
     {
 	sprintf(ptrBuf, "%p",
-		our_tv->v_type == VAR_LIST ? (void *)our_tv->vval.v_list
+		our_tv->v_type == VAR_LIST ? (శూన్య *)our_tv->vval.v_list
 		    : our_tv->v_type == VAR_TUPLE ?
-			(void *)our_tv->vval.v_tuple
-			: (void *)our_tv->vval.v_dict);
+			(శూన్య *)our_tv->vval.v_tuple
+			: (శూన్య *)our_tv->vval.v_dict);
 
-	if ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
+	ఒకవేళ ((ret = Py_Dict_Get_అంశం_String(lookup_dict, ptrBuf)))
 	{
 	    Py_INCREF(ret);
-	    return ret;
+	    తిరిగి ret;
 	}
     }
 
-    if (our_tv->v_type == VAR_STRING)
-	ret = PyString_FromString(our_tv->vval.v_string == NULL
-					? "" : (char *)our_tv->vval.v_string);
-    else if (our_tv->v_type == VAR_NUMBER)
+    ఒకవేళ (our_tv->v_type == VAR_STRING)
+	ret = PyString_FromString(our_tv->vval.v_string == ఖాళీ
+					? "" : (అక్షరం *)our_tv->vval.v_string);
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_సంఖ్య)
     {
-	char buf[NUMBUFLEN];
+	అక్షరం buf[NUMBUFLEN];
 
 	// For backwards compatibility numbers are stored as strings.
-	sprintf(buf, "%lld", (long long)our_tv->vval.v_number);
-	ret = PyString_FromString((char *)buf);
+	sprintf(buf, "%lld", (దీర్ఘ దీర్ఘ)our_tv->vval.v_సంఖ్య);
+	ret = PyString_FromString((అక్షరం *)buf);
     }
-    else if (our_tv->v_type == VAR_FLOAT)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_FLOAT)
     {
-	char buf[NUMBUFLEN];
+	అక్షరం buf[NUMBUFLEN];
 
 	sprintf(buf, "%f", our_tv->vval.v_float);
-	ret = PyString_FromString((char *)buf);
+	ret = PyString_FromString((అక్షరం *)buf);
     }
-    else if (our_tv->v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_LIST)
     {
 	list_T		*list = our_tv->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL)
-	    return NULL;
+	ఒకవేళ (list == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
-	if (!(ret = PyList_New(0)))
-	    return NULL;
+	ఒకవేళ (!(ret = PyList_New(0)))
+	    తిరిగి ఖాళీ;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ఒకవేళ (Py_Dict_సమితి_అంశం_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, curr)
+	FOR_ALL_LIST_వస్తువులు(list, curr)
 	{
-	    if (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
+	    ఒకవేళ (!(newObj = Vim_గమ్యం_Python(&curr->li_tv, లోతు + 1, lookup_dict)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    if (PyList_Append(ret, newObj))
+	    ఒకవేళ (PyList_Append(ret, newObj))
 	    {
 		Py_DECREF(newObj);
 		Py_DECREF(ret);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 	    Py_DECREF(newObj);
 	}
     }
-    else if (our_tv->v_type == VAR_TUPLE)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_TUPLE)
     {
 	tuple_T	*tuple = our_tv->vval.v_tuple;
-	int	len;
+	పూర్ణాంకం	len;
 
-	if (tuple == NULL)
-	    return NULL;
+	ఒకవేళ (tuple == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
 	len = TUPLE_LEN(tuple);
 
 	ret = PyTuple_New(len);
-	if (ret == NULL)
-	    return NULL;
+	ఒకవేళ (ret == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
-	for (int idx = 0; idx < len; idx++)
+	కొరకు (పూర్ణాంకం idx = 0; idx < len; idx++)
 	{
-	    typval_T	*item_tv = TUPLE_ITEM(tuple, idx);
+	    typval_T	*అంశం_tv = TUPLE_అంశం(tuple, idx);
 
-	    newObj = VimToPython(item_tv, depth + 1, lookup_dict);
-	    if (!newObj)
+	    newObj = Vim_గమ్యం_Python(అంశం_tv, లోతు + 1, lookup_dict);
+	    ఒకవేళ (!newObj)
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    PyTuple_SetItem(ret, idx, newObj);
+	    Py_Tuple_సమితి_అంశం(ret, idx, newObj);
 	}
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ఒకవేళ (Py_Dict_సమితి_అంశం_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    else if (our_tv->v_type == VAR_DICT)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_DICT)
     {
 
 	hashtab_T	*ht;
@@ -1124,225 +1124,225 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	hashitem_T	*hi;
 	dictitem_T	*di;
 
-	if (our_tv->vval.v_dict == NULL)
-	    return NULL;
+	ఒకవేళ (our_tv->vval.v_dict == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	ht = &our_tv->vval.v_dict->dv_hashtab;
 
-	if (!(ret = PyDict_New()))
-	    return NULL;
+	ఒకవేళ (!(ret = PyDict_New()))
+	    తిరిగి ఖాళీ;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ఒకవేళ (Py_Dict_సమితి_అంశం_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	todo = ht->ht_used;
-	for (hi = ht->ht_array; todo > 0; ++hi)
+	todo = ht->ht_వాడిన;
+	కొరకు (hi = ht->ht_array; todo > 0; ++hi)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
 		--todo;
 
 		di = dict_lookup(hi);
-		if (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
+		ఒకవేళ (!(newObj = Vim_గమ్యం_Python(&di->di_tv, లోతు + 1, lookup_dict)))
 		{
 		    Py_DECREF(ret);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
-		if (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
+		ఒకవేళ (Py_Dict_సమితి_అంశం_String(ret, (అక్షరం *)hi->hi_కీలకం, newObj))
 		{
 		    Py_DECREF(ret);
 		    Py_DECREF(newObj);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 	    }
 	}
     }
-    else if (our_tv->v_type == VAR_BOOL)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_BOOL)
     {
-	if (our_tv->vval.v_number == VVAL_FALSE)
+	ఒకవేళ (our_tv->vval.v_సంఖ్య == VVAL_FALSE)
 	{
 	    ret = Py_False;
 	    Py_INCREF(ret);
 	}
-	else
+	లేకపోతే
 	{
 	    ret = Py_True;
 	    Py_INCREF(ret);
 	}
-	return ret;
+	తిరిగి ret;
     }
-    else if (our_tv->v_type == VAR_SPECIAL)
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_SPECIAL)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	తిరిగి ret;
     }
-    else if (our_tv->v_type == VAR_BLOB)
-	ret = PyBytes_FromStringAndSize(
-		(char*) our_tv->vval.v_blob->bv_ga.ga_data,
+    లేకపోతే ఒకవేళ (our_tv->v_type == VAR_BLOB)
+	ret = Py_బైట్లు_From_String_And_కొలత(
+		(అక్షరం*) our_tv->vval.v_blob->bv_ga.ga_దత్తాంశం,
 		(Py_ssize_t) our_tv->vval.v_blob->bv_ga.ga_len);
-    else
+    లేకపోతే
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-VimEval(PyObject *self UNUSED, PyObject *args)
+    స్థిర PyObject *
+VimEval(PyObject *self వాడని, PyObject *వాదనలు)
 {
-    char_u	*expr;
+    char_u	*సమాసం;
     typval_T	*our_tv;
     PyObject	*string;
     PyObject	*todecref;
     PyObject	*ret;
     PyObject	*lookup_dict;
 
-    if (!PyArg_ParseTuple(args, "O", &string))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "O", &string))
+	తిరిగి ఖాళీ;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    ఒకవేళ (!(సమాసం = String_గమ్యం_Chars(string, &todecref)))
+	తిరిగి ఖాళీ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
+    Vim_Try_ప్రారంభం();
+    our_tv = eval_సమాసం(సమాసం, ఖాళీ);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    ఒకవేళ (Vim_Try_చివర())
+	తిరిగి ఖాళీ;
 
-    if (our_tv == NULL)
+    ఒకవేళ (our_tv == ఖాళీ)
     {
-	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("invalid expression"));
+	తిరిగి ఖాళీ;
     }
 
     // Convert the Vim type into a Python type.  Create a dictionary that's
     // used to check for recursive loops.
-    if (!(lookup_dict = PyDict_New()))
-	ret = NULL;
-    else
+    ఒకవేళ (!(lookup_dict = PyDict_New()))
+	ret = ఖాళీ;
+    లేకపోతే
     {
-	ret = VimToPython(our_tv, 1, lookup_dict);
+	ret = Vim_గమ్యం_Python(our_tv, 1, lookup_dict);
 	Py_DECREF(lookup_dict);
     }
 
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
     free_tv(our_tv);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
-    return ret;
+    తిరిగి ret;
 }
 
-static PyObject *ConvertToPyObject(typval_T *);
+స్థిర PyObject *Convert_గమ్యం_Py_Object(typval_T *);
 
-    static PyObject *
-VimEvalPy(PyObject *self UNUSED, PyObject *string)
+    స్థిర PyObject *
+VimEvalPy(PyObject *self వాడని, PyObject *string)
 {
     typval_T	*our_tv;
     PyObject	*ret;
-    char_u	*expr;
+    char_u	*సమాసం;
     PyObject	*todecref;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    ఒకవేళ (!(సమాసం = String_గమ్యం_Chars(string, &todecref)))
+	తిరిగి ఖాళీ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
+    Vim_Try_ప్రారంభం();
+    our_tv = eval_సమాసం(సమాసం, ఖాళీ);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    ఒకవేళ (Vim_Try_చివర())
+	తిరిగి ఖాళీ;
 
-    if (our_tv == NULL)
+    ఒకవేళ (our_tv == ఖాళీ)
     {
-	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("invalid expression"));
+	తిరిగి ఖాళీ;
     }
 
-    ret = ConvertToPyObject(our_tv);
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    ret = Convert_గమ్యం_Py_Object(our_tv);
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
     free_tv(our_tv);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-VimStrwidth(PyObject *self UNUSED, PyObject *string)
+    స్థిర PyObject *
+VimStrwidth(PyObject *self వాడని, PyObject *string)
 {
     char_u	*str;
     PyObject	*todecref;
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (!(str = StringToChars(string, &todecref)))
-	return NULL;
+    ఒకవేళ (!(str = String_గమ్యం_Chars(string, &todecref)))
+	తిరిగి ఖాళీ;
 
-    len = mb_string2cells(str, (int)STRLEN(str));
+    len = mb_string2cells(str, (పూర్ణాంకం)STRLEN(str));
 
     Py_XDECREF(todecref);
 
-    return PyLong_FromLong(len);
+    తిరిగి PyLong_FromLong(len);
 }
 
-    static PyObject *
-_VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+_VimChdir(PyObject *_chdir, PyObject *వాదనలు, PyObject *kwargs)
 {
     PyObject	*ret;
     PyObject	*newwd;
     PyObject	*todecref;
     char_u	*new_dir;
 
-    if (_chdir == NULL)
-	return NULL;
-    if (!(ret = PyObject_Call(_chdir, args, kwargs)))
-	return NULL;
+    ఒకవేళ (_chdir == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (!(ret = PyObject_Call(_chdir, వాదనలు, kwargs)))
+	తిరిగి ఖాళీ;
 
-    if (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
+    ఒకవేళ (!(newwd = Py_Object_Call_Function_Obj_వాదనలు(py_getcwd, ఖాళీ)))
     {
 	Py_DECREF(ret);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (!(new_dir = StringToChars(newwd, &todecref)))
+    ఒకవేళ (!(new_dir = String_గమ్యం_Chars(newwd, &todecref)))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    VimTryStart();
+    Vim_Try_ప్రారంభం();
 
-    if (vim_chdir(new_dir))
+    ఒకవేళ (vim_chdir(new_dir))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
 	Py_XDECREF(todecref);
 
-	if (VimTryEnd())
-	    return NULL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి ఖాళీ;
 
-	PyErr_SET_VIM(N_("failed to change directory"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("failed to change directory"));
+	తిరిగి ఖాళీ;
     }
 
     Py_DECREF(newwd);
@@ -1350,388 +1350,388 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 
     post_chdir(CDSCOPE_GLOBAL);
 
-    if (VimTryEnd())
+    ఒకవేళ (Vim_Try_చివర())
     {
 	Py_DECREF(ret);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-VimChdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+VimChdir(PyObject *self వాడని, PyObject *వాదనలు, PyObject *kwargs)
 {
-    return _VimChdir(py_chdir, args, kwargs);
+    తిరిగి _VimChdir(py_chdir, వాదనలు, kwargs);
 }
 
-    static PyObject *
-VimFchdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+VimFchdir(PyObject *self వాడని, PyObject *వాదనలు, PyObject *kwargs)
 {
-    return _VimChdir(py_fchdir, args, kwargs);
+    తిరిగి _VimChdir(py_fchdir, వాదనలు, kwargs);
 }
 
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     PyObject	*callable;
-    PyObject	*result;
-} map_rtp_data;
+    PyObject	*ఫలితం;
+} map_rtp_దత్తాంశం;
 
-    static void
-map_rtp_callback(char_u *path, void *_data)
+    స్థిర శూన్య
+map_rtp_callback(char_u *మార్గం, శూన్య *దత్తాంశం_3)
 {
-    void	**data = (void **) _data;
-    PyObject	*pathObject;
-    map_rtp_data	*mr_data = *((map_rtp_data **) data);
+    శూన్య	**దత్తాంశం = (శూన్య **) దత్తాంశం_3;
+    PyObject	*మార్గం_Object;
+    map_rtp_దత్తాంశం	*mr_దత్తాంశం = *((map_rtp_దత్తాంశం **) దత్తాంశం);
 
-    if (!(pathObject = PyString_FromString((char *)path)))
+    ఒకవేళ (!(మార్గం_Object = PyString_FromString((అక్షరం *)మార్గం)))
     {
-	*data = NULL;
-	return;
+	*దత్తాంశం = ఖాళీ;
+	తిరిగి;
     }
 
-    mr_data->result = PyObject_CallFunctionObjArgs(mr_data->callable,
-						   pathObject, NULL);
+    mr_దత్తాంశం->ఫలితం = Py_Object_Call_Function_Obj_వాదనలు(mr_దత్తాంశం->callable,
+						   మార్గం_Object, ఖాళీ);
 
-    Py_DECREF(pathObject);
+    Py_DECREF(మార్గం_Object);
 
-    if (!mr_data->result || mr_data->result != Py_None)
-	*data = NULL;
-    else
+    ఒకవేళ (!mr_దత్తాంశం->ఫలితం || mr_దత్తాంశం->ఫలితం != Py_None)
+	*దత్తాంశం = ఖాళీ;
+    లేకపోతే
     {
-	Py_DECREF(mr_data->result);
-	mr_data->result = NULL;
+	Py_DECREF(mr_దత్తాంశం->ఫలితం);
+	mr_దత్తాంశం->ఫలితం = ఖాళీ;
     }
 }
 
-    static PyObject *
-VimForeachRTP(PyObject *self UNUSED, PyObject *callable)
+    స్థిర PyObject *
+VimForeachRTP(PyObject *self వాడని, PyObject *callable)
 {
-    map_rtp_data	data;
+    map_rtp_దత్తాంశం	దత్తాంశం;
 
-    data.callable = callable;
-    data.result = NULL;
+    దత్తాంశం.callable = callable;
+    దత్తాంశం.ఫలితం = ఖాళీ;
 
-    do_in_runtimepath(NULL, 0, &map_rtp_callback, &data);
+    do_లోపల_runtimepath(ఖాళీ, 0, &map_rtp_callback, &దత్తాంశం);
 
-    if (data.result == NULL)
+    ఒకవేళ (దత్తాంశం.ఫలితం == ఖాళీ)
     {
-	if (PyErr_Occurred())
-	    return NULL;
-	else
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి ఖాళీ;
+	లేకపోతే
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    తిరిగి Py_None;
 	}
     }
-    return data.result;
+    తిరిగి దత్తాంశం.ఫలితం;
 }
 
 /*
  * _vim_runtimepath_ special path implementation.
  */
 
-    static void
-map_finder_callback(char_u *path, void *_data)
+    స్థిర శూన్య
+map_finder_callback(char_u *మార్గం, శూన్య *దత్తాంశం_3)
 {
-    void	**data = (void **) _data;
-    PyObject	*list = *((PyObject **) data);
-    PyObject	*pathObject1, *pathObject2;
-    char	*pathbuf;
+    శూన్య	**దత్తాంశం = (శూన్య **) దత్తాంశం_3;
+    PyObject	*list = *((PyObject **) దత్తాంశం);
+    PyObject	*మార్గం_Object1, *మార్గం_Object2;
+    అక్షరం	*pathbuf;
     size_t	pathlen;
 
-    pathlen = STRLEN(path);
+    pathlen = STRLEN(మార్గం);
 
-#if PY_MAJOR_VERSION < 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
 # define PY_MAIN_DIR_STRING "python2"
-#else
+#లేకపోతే
 # define PY_MAIN_DIR_STRING "python3"
-#endif
-#define PY_ALTERNATE_DIR_STRING "pythonx"
+#అయితే_ముగింపు
+#నిర్వచించు PY_ALTERNATE_DIR_STRING "pythonx"
 
-#define PYTHONX_STRING_LENGTH 7 // STRLEN("pythonx")
-    if (!(pathbuf = PyMem_New(char,
-		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_LENGTH + 1)))
+#నిర్వచించు PYTHONX_STRING_నిడివి 7 // STRLEN("pythonx")
+    ఒకవేళ (!(pathbuf = PyMem_New(అక్షరం,
+		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_నిడివి + 1)))
     {
-	PyErr_NoMemory();
-	*data = NULL;
-	return;
+	Py_Err_No_జ్ఞాపకం();
+	*దత్తాంశం = ఖాళీ;
+	తిరిగి;
     }
 
-    mch_memmove(pathbuf, path, pathlen + 1);
-    add_pathsep((char_u *) pathbuf);
+    mch_memmove(pathbuf, మార్గం, pathlen + 1);
+    కూడు_pathsep((char_u *) pathbuf);
 
     pathlen = STRLEN(pathbuf);
     mch_memmove(pathbuf + pathlen, PY_MAIN_DIR_STRING,
-	    PYTHONX_STRING_LENGTH + 1);
+	    PYTHONX_STRING_నిడివి + 1);
 
-    if (!(pathObject1 = PyString_FromString(pathbuf)))
+    ఒకవేళ (!(మార్గం_Object1 = PyString_FromString(pathbuf)))
     {
-	*data = NULL;
+	*దత్తాంశం = ఖాళీ;
 	PyMem_Free(pathbuf);
-	return;
+	తిరిగి;
     }
 
     mch_memmove(pathbuf + pathlen, PY_ALTERNATE_DIR_STRING,
-	    PYTHONX_STRING_LENGTH + 1);
+	    PYTHONX_STRING_నిడివి + 1);
 
-    if (!(pathObject2 = PyString_FromString(pathbuf)))
+    ఒకవేళ (!(మార్గం_Object2 = PyString_FromString(pathbuf)))
     {
-	Py_DECREF(pathObject1);
+	Py_DECREF(మార్గం_Object1);
 	PyMem_Free(pathbuf);
-	*data = NULL;
-	return;
+	*దత్తాంశం = ఖాళీ;
+	తిరిగి;
     }
 
     PyMem_Free(pathbuf);
 
-    if (PyList_Append(list, pathObject1)
-	    || PyList_Append(list, pathObject2))
-	*data = NULL;
+    ఒకవేళ (PyList_Append(list, మార్గం_Object1)
+	    || PyList_Append(list, మార్గం_Object2))
+	*దత్తాంశం = ఖాళీ;
 
-    Py_DECREF(pathObject1);
-    Py_DECREF(pathObject2);
+    Py_DECREF(మార్గం_Object1);
+    Py_DECREF(మార్గం_Object2);
 }
 
-    static PyObject *
-Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
+    స్థిర PyObject *
+Vim_GetPaths(PyObject *self వాడని, PyObject *వాదనలు వాడని)
 {
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    ఒకవేళ (!(ret = PyList_New(0)))
+	తిరిగి ఖాళీ;
 
-    do_in_runtimepath(NULL, 0, &map_finder_callback, ret);
+    do_లోపల_runtimepath(ఖాళీ, 0, &map_finder_callback, ret);
 
-    if (PyErr_Occurred())
+    ఒకవేళ (PyErr_Occurred())
     {
 	Py_DECREF(ret);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
-#if PY_VERSION_HEX >= 0x030700f0
-    static PyObject *
-FinderFindSpec(PyObject *self, PyObject *args)
+#ఒకవేళ PY_సంస్కరణ_HEX >= 0x030700f0
+    స్థిర PyObject *
+Finder_కనుగొను_Spec(PyObject *self, PyObject *వాదనలు)
 {
-    char	*fullname;
+    అక్షరం	*fullname;
     PyObject	*paths;
-    PyObject	*target = Py_None;
+    PyObject	*లక్ష్యం = Py_None;
     PyObject	*spec;
 
-    if (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "s|O", &fullname, &లక్ష్యం))
+	తిరిగి ఖాళీ;
 
-    if (!(paths = Vim_GetPaths(self, NULL)))
-	return NULL;
+    ఒకవేళ (!(paths = Vim_GetPaths(self, ఖాళీ)))
+	తిరిగి ఖాళీ;
 
-    spec = PyObject_CallFunction(py_find_spec, "sOO", fullname, paths, target);
+    spec = PyObject_CallFunction(py_కనుగొను_spec, "sOO", fullname, paths, లక్ష్యం);
 
     Py_DECREF(paths);
 
-    if (!spec)
+    ఒకవేళ (!spec)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి ఖాళీ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	తిరిగి Py_None;
     }
 
-    return spec;
+    తిరిగి spec;
 }
 
-    static PyObject *
-FinderFindModule(PyObject* self UNUSED, PyObject* args UNUSED)
+    స్థిర PyObject *
+Finder_కనుగొను_Module(PyObject* self వాడని, PyObject* వాదనలు వాడని)
 {
     // Apparently returning None works.
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
-#else
-    static PyObject *
-call_load_module(char *name, int len, PyObject *find_module_result)
+#లేకపోతే
+    స్థిర PyObject *
+call_ఎక్కించు_module(అక్షరం *name, పూర్ణాంకం len, PyObject *కనుగొను_module_ఫలితం)
 {
     PyObject	*fd, *pathname, *description;
 
-    if (!PyTuple_Check(find_module_result))
+    ఒకవేళ (!PyTuple_Check(కనుగొను_module_ఫలితం))
     {
 	PyErr_FORMAT_TYPE(
 		N_("expected 3-tuple as imp.find_module() result, but got %s"),
-		find_module_result);
-	return NULL;
+		కనుగొను_module_ఫలితం);
+	తిరిగి ఖాళీ;
     }
-    if (PyTuple_GET_SIZE(find_module_result) != 3)
+    ఒకవేళ (Py_Tuple_GET_కొలత(కనుగొను_module_ఫలితం) != 3)
     {
 	PyErr_FORMAT(PyExc_TypeError,
 		N_("expected 3-tuple as imp.find_module() result, but got "
 		   "tuple of size %d"),
-		(int) PyTuple_GET_SIZE(find_module_result));
-	return NULL;
+		(పూర్ణాంకం) Py_Tuple_GET_కొలత(కనుగొను_module_ఫలితం));
+	తిరిగి ఖాళీ;
     }
 
-    if (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
-	    || !(pathname = PyTuple_GET_ITEM(find_module_result, 1))
-	    || !(description = PyTuple_GET_ITEM(find_module_result, 2)))
+    ఒకవేళ (!(fd = Py_Tuple_GET_అంశం(కనుగొను_module_ఫలితం, 0))
+	    || !(pathname = Py_Tuple_GET_అంశం(కనుగొను_module_ఫలితం, 1))
+	    || !(description = Py_Tuple_GET_అంశం(కనుగొను_module_ఫలితం, 2)))
     {
-	PyErr_SET_STRING(PyExc_RuntimeError,
+	Py_Err_సమితి_STRING(PyExc_RuntimeError,
 		N_("internal error: imp.find_module returned tuple with NULL"));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return PyObject_CallFunction(py_load_module,
+    తిరిగి PyObject_CallFunction(py_ఎక్కించు_module,
 	    "s#OOO", name, len, fd, pathname, description);
 }
 
-    static PyObject *
-find_module(char *fullname, char *tail, PyObject *new_path)
+    స్థిర PyObject *
+కనుగొను_module(అక్షరం *fullname, అక్షరం *తోక, PyObject *new_మార్గం)
 {
-    PyObject	*find_module_result;
+    PyObject	*కనుగొను_module_ఫలితం;
     PyObject	*module;
-    char	*dot;
+    అక్షరం	*dot;
 
-    if ((dot = (char *)vim_strchr((char_u *) tail, '.')))
+    ఒకవేళ ((dot = (అక్షరం *)vim_strchr((char_u *) తోక, '.')))
     {
 	/*
 	 * There is a dot in the name: call find_module recursively without the
 	 * first component
 	 */
-	PyObject	*newest_path;
-	int		partlen = (int) (dot - 1 - tail);
+	PyObject	*newest_మార్గం;
+	పూర్ణాంకం		partlen = (పూర్ణాంకం) (dot - 1 - తోక);
 
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
-			"s#O", tail, partlen, new_path)))
+	ఒకవేళ (!(కనుగొను_module_ఫలితం = PyObject_CallFunction(py_కనుగొను_module,
+			"s#O", తోక, partlen, new_మార్గం)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    ఒకవేళ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	if (!(module = call_load_module(
+	ఒకవేళ (!(module = call_ఎక్కించు_module(
 			fullname,
-			((int) (tail - fullname)) + partlen,
-			find_module_result)))
+			((పూర్ణాంకం) (తోక - fullname)) + partlen,
+			కనుగొను_module_ఫలితం)))
 	{
-	    Py_DECREF(find_module_result);
-	    return NULL;
+	    Py_DECREF(కనుగొను_module_ఫలితం);
+	    తిరిగి ఖాళీ;
 	}
 
-	Py_DECREF(find_module_result);
+	Py_DECREF(కనుగొను_module_ఫలితం);
 
-	if (!(newest_path = PyObject_GetAttrString(module, "__path__")))
+	ఒకవేళ (!(newest_మార్గం = PyObject_GetAttrString(module, "__path__")))
 	{
 	    Py_DECREF(module);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	Py_DECREF(module);
 
-	find_module_result = find_module(fullname, dot + 1, newest_path);
+	కనుగొను_module_ఫలితం = కనుగొను_module(fullname, dot + 1, newest_మార్గం);
 
-	Py_DECREF(newest_path);
+	Py_DECREF(newest_మార్గం);
 
-	return find_module_result;
+	తిరిగి కనుగొను_module_ఫలితం;
     }
-    else
+    లేకపోతే
     {
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
-			"sO", tail, new_path)))
+	ఒకవేళ (!(కనుగొను_module_ఫలితం = PyObject_CallFunction(py_కనుగొను_module,
+			"sO", తోక, new_మార్గం)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    ఒకవేళ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	return find_module_result;
+	తిరిగి కనుగొను_module_ఫలితం;
     }
 }
 
-    static PyObject *
-FinderFindModule(PyObject *self, PyObject *args)
+    స్థిర PyObject *
+Finder_కనుగొను_Module(PyObject *self, PyObject *వాదనలు)
 {
-    char	*fullname;
-    PyObject	*result;
-    PyObject	*new_path;
+    అక్షరం	*fullname;
+    PyObject	*ఫలితం;
+    PyObject	*new_మార్గం;
     LoaderObject	*loader;
 
-    if (!PyArg_ParseTuple(args, "s", &fullname))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "s", &fullname))
+	తిరిగి ఖాళీ;
 
-    if (!(new_path = Vim_GetPaths(self, NULL)))
-	return NULL;
+    ఒకవేళ (!(new_మార్గం = Vim_GetPaths(self, ఖాళీ)))
+	తిరిగి ఖాళీ;
 
-    result = find_module(fullname, fullname, new_path);
+    ఫలితం = కనుగొను_module(fullname, fullname, new_మార్గం);
 
-    Py_DECREF(new_path);
+    Py_DECREF(new_మార్గం);
 
-    if (!result)
+    ఒకవేళ (!ఫలితం)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి ఖాళీ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	తిరిగి Py_None;
     }
 
-    if (!(fullname = (char *)vim_strsave((char_u *)fullname)))
+    ఒకవేళ (!(fullname = (అక్షరం *)vim_strsave((char_u *)fullname)))
     {
-	Py_DECREF(result);
-	PyErr_NoMemory();
-	return NULL;
+	Py_DECREF(ఫలితం);
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
 
-    if (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
+    ఒకవేళ (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
     {
 	vim_free(fullname);
-	Py_DECREF(result);
-	return NULL;
+	Py_DECREF(ఫలితం);
+	తిరిగి ఖాళీ;
     }
 
     loader->fullname = fullname;
-    loader->result = result;
+    loader->ఫలితం = ఫలితం;
 
-    return (PyObject *) loader;
+    తిరిగి (PyObject *) loader;
 }
-#endif
+#అయితే_ముగింపు
 
-    static PyObject *
-VimPathHook(PyObject *self UNUSED, PyObject *args)
+    స్థిర PyObject *
+Vim_మార్గం_Hook(PyObject *self వాడని, PyObject *వాదనలు)
 {
-    char	*path;
+    అక్షరం	*మార్గం;
 
-    if (PyArg_ParseTuple(args, "s", &path)
-	    && STRCMP(path, vim_special_path) == 0)
+    ఒకవేళ (PyArg_ParseTuple(వాదనలు, "s", &మార్గం)
+	    && STRCMP(మార్గం, vim_special_మార్గం) == 0)
     {
 	Py_INCREF(vim_module);
-	return vim_module;
+	తిరిగి vim_module;
     }
 
     PyErr_Clear();
-    PyErr_SetNone(PyExc_ImportError);
-    return NULL;
+    Py_Err_సమితి_None(PyExc_ImportError);
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Vim module - Definitions
  */
 
-static struct PyMethodDef VimMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def VimMethods[] = {
     // name,	    function,			calling,			documentation
     {"command",	    VimCommand,			METH_O,				"Execute a Vim ex-mode command" },
     {"eval",	    VimEval,			METH_VARARGS,			"Evaluate an expression using Vim evaluator" },
     {"bindeval",    VimEvalPy,			METH_O,				"Like eval(), but returns objects attached to Vim ones"},
     {"strwidth",    VimStrwidth,		METH_O,				"Screen string width, counts <Tab> as having width 1"},
-    {"chdir",	    (PyCFunction)(void *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
-    {"fchdir",	    (PyCFunction)(void *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
+    {"chdir",	    (PyCFunction)(శూన్య *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
+    {"fchdir",	    (PyCFunction)(శూన్య *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"foreach_rtp", VimForeachRTP,		METH_O,				"Call given callable for each path in &rtp"},
-#if PY_VERSION_HEX >= 0x030700f0
-    {"find_spec",   FinderFindSpec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
-#endif
-    {"find_module", FinderFindModule,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
-    {"path_hook",   VimPathHook,		METH_VARARGS,			"Hook function to install in sys.path_hooks"},
+#ఒకవేళ PY_సంస్కరణ_HEX >= 0x030700f0
+    {"find_spec",   Finder_కనుగొను_Spec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
+#అయితే_ముగింపు
+    {"find_module", Finder_కనుగొను_Module,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
+    {"path_hook",   Vim_మార్గం_Hook,		METH_VARARGS,			"Hook function to install in sys.path_hooks"},
     {"_get_paths",  (PyCFunction)Vim_GetPaths,	METH_NOARGS,			"Get &rtp-based additions to sys.path"},
-    { NULL,	    NULL,			0,				NULL}
+    { ఖాళీ,	    ఖాళీ,			0,				ఖాళీ}
 };
 
 /*
@@ -1740,796 +1740,796 @@ static struct PyMethodDef VimMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(IterType);
 
-typedef PyObject *(*nextfun)(void **);
-typedef void (*destructorfun)(void *);
-typedef int (*traversefun)(void *, visitproc, void *);
-typedef int (*clearfun)(void **);
+రకనిర్వచనం PyObject *(*nextfun)(శూన్య **);
+రకనిర్వచనం శూన్య (*destructorfun)(శూన్య *);
+రకనిర్వచనం పూర్ణాంకం (*traversefun)(శూన్య *, visitproc, శూన్య *);
+రకనిర్వచనం పూర్ణాంకం (*clearfun)(శూన్య **);
 
 // Main purpose of this object is removing the need for do python
 // initialization (i.e. PyType_Ready and setting type attributes) for a big
 // bunch of objects.
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    void *cur;
-    nextfun next;
+    Py_Object_తల
+    శూన్య *cur;
+    nextfun తదుపరి;
     destructorfun destruct;
     traversefun traverse;
     clearfun clear;
     PyObject *iter_object;
 } IterObject;
 
-    static PyObject *
-IterNew(void *start, destructorfun destruct, nextfun next, traversefun traverse,
+    స్థిర PyObject *
+IterNew(శూన్య *ప్రారంభం, destructorfun destruct, nextfun తదుపరి, traversefun traverse,
 	clearfun clear, PyObject *iter_object)
 {
     IterObject *self;
 
     self = PyObject_GC_New(IterObject, IterTypePtr);
-    self->cur = start;
-    self->next = next;
+    self->cur = ప్రారంభం;
+    self->తదుపరి = తదుపరి;
     self->destruct = destruct;
     self->traverse = traverse;
     self->clear = clear;
     self->iter_object = iter_object;
 
-    if (iter_object)
+    ఒకవేళ (iter_object)
 	Py_INCREF(iter_object);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
+    స్థిర శూన్య
 IterDestructor(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->iter_object)
+    ఒకవేళ (self->iter_object)
 	Py_DECREF(self->iter_object);
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((శూన్య *)(self));
     self->destruct(self->cur);
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((శూన్య *)(self));
 }
 
-    static int
-IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    స్థిర పూర్ణాంకం
+IterTraverse(PyObject *self_obj, visitproc సందర్శించు, శూన్య *arg)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->traverse != NULL)
-	return self->traverse(self->cur, visit, arg);
-    else
-	return 0;
+    ఒకవేళ (self->traverse != ఖాళీ)
+	తిరిగి self->traverse(self->cur, సందర్శించు, arg);
+    లేకపోతే
+	తిరిగి 0;
 }
 
 // Mac OSX defines clear() somewhere.
-#ifdef clear
+#నిర్వచితమైతే clear
 # undef clear
-#endif
+#అయితే_ముగింపు
 
-    static int
+    స్థిర పూర్ణాంకం
 IterClear(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->clear != NULL)
-	return self->clear(&self->cur);
-    else
-	return 0;
+    ఒకవేళ (self->clear != ఖాళీ)
+	తిరిగి self->clear(&self->cur);
+    లేకపోతే
+	తిరిగి 0;
 }
 
-    static PyObject *
-IterNext(PyObject *self_obj)
+    స్థిర PyObject *
+Iter_తదుపరి(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    return self->next(&self->cur);
+    తిరిగి self->తదుపరి(&self->cur);
 }
 
-    static PyObject *
+    స్థిర PyObject *
 IterIter(PyObject *self)
 {
     Py_INCREF(self);
-    return self;
+    తిరిగి self;
 }
 
-typedef struct pylinkedlist_S {
-    struct pylinkedlist_S	*pll_next;
-    struct pylinkedlist_S	*pll_prev;
+రకనిర్వచనం నిర్మాణం pylinkedlist_S {
+    నిర్మాణం pylinkedlist_S	*pll_తదుపరి;
+    నిర్మాణం pylinkedlist_S	*pll_prev;
     PyObject			*pll_obj;
 } pylinkedlist_T;
 
-static pylinkedlist_T *lastdict = NULL;
-static pylinkedlist_T *lastlist = NULL;
-static pylinkedlist_T *lasttuple = NULL;
-static pylinkedlist_T *lastfunc = NULL;
+స్థిర pylinkedlist_T *lastdict = ఖాళీ;
+స్థిర pylinkedlist_T *lastlist = ఖాళీ;
+స్థిర pylinkedlist_T *lasttuple = ఖాళీ;
+స్థిర pylinkedlist_T *lastfunc = ఖాళీ;
 
-    static void
-pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **last)
+    స్థిర శూన్య
+pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **చివరి)
 {
-    if (ref->pll_prev == NULL)
+    ఒకవేళ (ref->pll_prev == ఖాళీ)
     {
-	if (ref->pll_next == NULL)
+	ఒకవేళ (ref->pll_తదుపరి == ఖాళీ)
 	{
-	    *last = NULL;
-	    return;
+	    *చివరి = ఖాళీ;
+	    తిరిగి;
 	}
     }
-    else
-	ref->pll_prev->pll_next = ref->pll_next;
+    లేకపోతే
+	ref->pll_prev->pll_తదుపరి = ref->pll_తదుపరి;
 
-    if (ref->pll_next == NULL)
-	*last = ref->pll_prev;
-    else
-	ref->pll_next->pll_prev = ref->pll_prev;
+    ఒకవేళ (ref->pll_తదుపరి == ఖాళీ)
+	*చివరి = ref->pll_prev;
+    లేకపోతే
+	ref->pll_తదుపరి->pll_prev = ref->pll_prev;
 }
 
-    static void
-pyll_add(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **last)
+    స్థిర శూన్య
+pyll_కూడు(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **చివరి)
 {
-    if (*last == NULL)
-	ref->pll_prev = NULL;
-    else
+    ఒకవేళ (*చివరి == ఖాళీ)
+	ref->pll_prev = ఖాళీ;
+    లేకపోతే
     {
-	(*last)->pll_next = ref;
-	ref->pll_prev = *last;
+	(*చివరి)->pll_తదుపరి = ref;
+	ref->pll_prev = *చివరి;
     }
-    ref->pll_next = NULL;
+    ref->pll_తదుపరి = ఖాళీ;
     ref->pll_obj = self;
-    *last = ref;
+    *చివరి = ref;
 }
 
 DEFINE_PY_TYPE_OBJECT(DictionaryType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     dict_T	*dict;
     pylinkedlist_T	ref;
 } DictionaryObject;
 
-static PyObject *DictionaryUpdate(DictionaryObject *, PyObject *, PyObject *);
+స్థిర PyObject *DictionaryUpdate(DictionaryObject *, PyObject *, PyObject *);
 
-#define NEW_DICTIONARY(dict) DictionaryNew(DictionaryTypePtr, dict)
+#నిర్వచించు NEW_DICTIONARY(dict) DictionaryNew(DictionaryTypePtr, dict)
 
-    static PyObject *
+    స్థిర PyObject *
 DictionaryNew(PyTypeObject *subtype, dict_T *dict)
 {
     DictionaryObject	*self;
 
     self = (DictionaryObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
     self->dict = dict;
     ++dict->dv_refcount;
 
-    pyll_add((PyObject *)(self), &self->ref, &lastdict);
+    pyll_కూడు((PyObject *)(self), &self->ref, &lastdict);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static dict_T *
-py_dict_alloc(void)
+    స్థిర dict_T *
+py_dict_alloc(శూన్య)
 {
     dict_T	*ret;
 
-    if (!(ret = dict_alloc()))
+    ఒకవేళ (!(ret = dict_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
     ++ret->dv_refcount;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+DictionaryConstructor(PyTypeObject *subtype, PyObject *వాదనలు, PyObject *kwargs)
 {
     DictionaryObject	*self;
     dict_T	*dict;
 
-    if (!(dict = py_dict_alloc()))
-	return NULL;
+    ఒకవేళ (!(dict = py_dict_alloc()))
+	తిరిగి ఖాళీ;
 
     self = (DictionaryObject *) DictionaryNew(subtype, dict);
 
     --dict->dv_refcount;
 
-    if (kwargs || PyTuple_Size(args))
+    ఒకవేళ (kwargs || Py_Tuple_కొలత(వాదనలు))
     {
 	PyObject	*tmp;
-	if (!(tmp = DictionaryUpdate(self, args, kwargs)))
+	ఒకవేళ (!(tmp = DictionaryUpdate(self, వాదనలు, kwargs)))
 	{
 	    Py_DECREF(self);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	Py_DECREF(tmp);
     }
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
+    స్థిర శూన్య
 DictionaryDestructor(PyObject *self_obj)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
     pyll_remove(&self->ref, &lastdict);
     dict_unref(self->dict);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-static char *DictionaryAttrs[] = {
+స్థిర అక్షరం *DictionaryAttrs[] = {
     "locked", "scope",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-DictionaryDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+DictionaryDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, DictionaryAttrs);
+    తిరిగి ObjectDir(self, DictionaryAttrs);
 }
 
-    static int
-DictionarySetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+DictionarySetattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_సమితి_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Dictionary attributes"));
-	return -1;
+	తిరిగి -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ఒకవేళ (strcmp(name, "locked") == 0)
     {
-	if (self->dict->dv_lock == VAR_FIXED)
+	ఒకవేళ (self->dict->dv_తాళం == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError,
+	    Py_Err_సమితి_STRING(PyExc_TypeError,
 		    N_("cannot modify fixed dictionary"));
-	    return -1;
+	    తిరిగి -1;
 	}
-	else
+	లేకపోతే
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->dict->dv_lock = VAR_LOCKED;
-	    else
-		self->dict->dv_lock = 0;
+	    పూర్ణాంకం		istrue = PyObject_IsTrue(valObject);
+	    ఒకవేళ (istrue == -1)
+		తిరిగి -1;
+	    లేకపోతే ఒకవేళ (istrue)
+		self->dict->dv_తాళం = VAR_LOCKED;
+	    లేకపోతే
+		self->dict->dv_తాళం = 0;
 	}
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	తిరిగి -1;
     }
 }
 
-    static PyInt
-DictionaryLength(DictionaryObject *self)
+    స్థిర PyInt
+Dictionary_నిడివి(DictionaryObject *self)
 {
-    return ((PyInt) (self->dict->dv_hashtab.ht_used));
+    తిరిగి ((PyInt) (self->dict->dv_hashtab.ht_వాడిన));
 }
 
-#define DICT_FLAG_HAS_DEFAULT	0x01
-#define DICT_FLAG_POP		0x02
-#define DICT_FLAG_NONE_DEFAULT	0x04
-#define DICT_FLAG_RETURN_BOOL	0x08 // Incompatible with DICT_FLAG_POP
-#define DICT_FLAG_RETURN_PAIR	0x10
+#నిర్వచించు DICT_FLAG_HAS_DEFAULT	0x01
+#నిర్వచించు DICT_FLAG_తీయి		0x02
+#నిర్వచించు DICT_FLAG_NONE_DEFAULT	0x04
+#నిర్వచించు DICT_FLAG_RETURN_BOOL	0x08 // Incompatible with DICT_FLAG_POP
+#నిర్వచించు DICT_FLAG_RETURN_PAIR	0x10
 
-    static PyObject *
-_DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
+    స్థిర PyObject *
+Dictionary_అంశం(DictionaryObject *self, PyObject *వాదనలు, పూర్ణాంకం flags)
 {
-    PyObject	*keyObject;
-    PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : NULL);
+    PyObject	*కీలకం_Object;
+    PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : ఖాళీ);
     PyObject	*ret;
-    char_u	*key;
+    char_u	*కీలకం;
     dictitem_T	*di;
     dict_T	*dict = self->dict;
     hashitem_T	*hi;
     PyObject	*todecref;
 
-    if (flags & DICT_FLAG_HAS_DEFAULT)
+    ఒకవేళ (flags & DICT_FLAG_HAS_DEFAULT)
     {
-	if (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
-	    return NULL;
+	ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "O|O", &కీలకం_Object, &defObject))
+	    తిరిగి ఖాళీ;
     }
-    else
-	keyObject = args;
+    లేకపోతే
+	కీలకం_Object = వాదనలు;
 
-    if (flags & DICT_FLAG_RETURN_BOOL)
+    ఒకవేళ (flags & DICT_FLAG_RETURN_BOOL)
 	defObject = Py_False;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
+	తిరిగి ఖాళీ;
 
-    if (*key == NUL)
+    ఒకవేళ (*కీలకం == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ఖాళీలు_కీలకాలు;
 	Py_XDECREF(todecref);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    hi = hash_find(&dict->dv_hashtab, key);
+    hi = hash_కనుగొను(&dict->dv_hashtab, కీలకం);
 
     Py_XDECREF(todecref);
 
-    if (HASHITEM_EMPTY(hi))
+    ఒకవేళ (HASHITEM_ఖాళీలు(hi))
     {
-	if (defObject)
+	ఒకవేళ (defObject)
 	{
 	    Py_INCREF(defObject);
-	    return defObject;
+	    తిరిగి defObject;
 	}
-	else
+	లేకపోతే
 	{
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return NULL;
+	    Py_Err_సమితి_Object(Py_Exc_కీలకం_Error, కీలకం_Object);
+	    తిరిగి ఖాళీ;
 	}
     }
-    else if (flags & DICT_FLAG_RETURN_BOOL)
+    లేకపోతే ఒకవేళ (flags & DICT_FLAG_RETURN_BOOL)
     {
 	ret = Py_True;
 	Py_INCREF(ret);
-	return ret;
+	తిరిగి ret;
     }
 
     di = dict_lookup(hi);
 
-    if (!(ret = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    ఒకవేళ (!(ret = Convert_గమ్యం_Py_Object(&di->di_tv)))
+	తిరిగి ఖాళీ;
 
-    if (flags & DICT_FLAG_POP)
+    ఒకవేళ (flags & DICT_FLAG_తీయి)
     {
-	if (dict->dv_lock)
+	ఒకవేళ (dict->dv_తాళం)
 	{
 	    RAISE_LOCKED_DICTIONARY;
 	    Py_DECREF(ret);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	hash_remove(&dict->dv_hashtab, hi, "Python remove variable");
 	dictitem_free(di);
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-DictionaryItem(DictionaryObject *self, PyObject *keyObject)
+    స్థిర PyObject *
+Dictionary_అంశం_2(DictionaryObject *self, PyObject *కీలకం_Object)
 {
-    return _DictionaryItem(self, keyObject, 0);
+    తిరిగి Dictionary_అంశం(self, కీలకం_Object, 0);
 }
 
-    static int
-DictionaryContains(DictionaryObject *self, PyObject *keyObject)
+    స్థిర పూర్ణాంకం
+Dictionary_కలిగియుంది(DictionaryObject *self, PyObject *కీలకం_Object)
 {
-    PyObject	*rObj = _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
-    int		ret;
+    PyObject	*rObj = Dictionary_అంశం(self, కీలకం_Object, DICT_FLAG_RETURN_BOOL);
+    పూర్ణాంకం		ret;
 
-    if (rObj == NULL)
-	return -1;
+    ఒకవేళ (rObj == ఖాళీ)
+	తిరిగి -1;
 
     ret = (rObj == Py_True);
 
     Py_DECREF(rObj);
 
-    return ret;
+    తిరిగి ret;
 }
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int		dii_changed;
+    పూర్ణాంకం		dii_మారింది;
     hashtab_T	*dii_ht;
     hashitem_T	*dii_hi;
     long_u	dii_todo;
 } dictiterinfo_T;
 
-    static PyObject *
-DictionaryIterNext(void **arg)
+    స్థిర PyObject *
+Dictionary_Iter_తదుపరి(శూన్య **arg)
 {
     PyObject	*ret;
     dictiterinfo_T **dii = (dictiterinfo_T**)arg;
 
-    if (!(*dii)->dii_todo)
-	return NULL;
+    ఒకవేళ (!(*dii)->dii_todo)
+	తిరిగి ఖాళీ;
 
-    if ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
+    ఒకవేళ ((*dii)->dii_ht->ht_మారింది != (*dii)->dii_మారింది)
     {
-	PyErr_SET_STRING(PyExc_RuntimeError,
+	Py_Err_సమితి_STRING(PyExc_RuntimeError,
 		N_("hashtab changed during iteration"));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    while (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
+    అయితే (((*dii)->dii_todo) && HASHITEM_ఖాళీలు((*dii)->dii_hi))
 	++((*dii)->dii_hi);
 
     --((*dii)->dii_todo);
 
-    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
-	return NULL;
+    ఒకవేళ (!(ret = Py_బైట్లు_From_String((అక్షరం *)(*dii)->dii_hi->hi_కీలకం)))
+	తిరిగి ఖాళీ;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 DictionaryIter(PyObject *self_obj)
 {
     DictionaryObject	*self = (DictionaryObject*)self_obj;
     dictiterinfo_T	*dii;
     hashtab_T		*ht;
 
-    if (!(dii = PyMem_New(dictiterinfo_T, 1)))
+    ఒకవేళ (!(dii = PyMem_New(dictiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
 
     ht = &self->dict->dv_hashtab;
-    dii->dii_changed = ht->ht_changed;
+    dii->dii_మారింది = ht->ht_మారింది;
     dii->dii_ht = ht;
     dii->dii_hi = ht->ht_array;
-    dii->dii_todo = ht->ht_used;
+    dii->dii_todo = ht->ht_వాడిన;
 
-    return IterNew(dii,
-	    PyMem_Free, DictionaryIterNext,
-	    NULL, NULL, (PyObject *)self);
+    తిరిగి IterNew(dii,
+	    PyMem_Free, Dictionary_Iter_తదుపరి,
+	    ఖాళీ, ఖాళీ, (PyObject *)self);
 }
 
-    static int
-DictionaryAssItem(
-	DictionaryObject *self, PyObject *keyObject, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+Dictionary_Ass_అంశం(
+	DictionaryObject *self, PyObject *కీలకం_Object, PyObject *valObject)
 {
-    char_u	*key;
+    char_u	*కీలకం;
     typval_T	tv;
     dict_T	*dict = self->dict;
     dictitem_T	*di;
     PyObject	*todecref;
 
-    if (dict->dv_lock)
+    ఒకవేళ (dict->dv_తాళం)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return -1;
+	తిరిగి -1;
     }
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
+	తిరిగి -1;
 
-    if (*key == NUL)
+    ఒకవేళ (*కీలకం == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ఖాళీలు_కీలకాలు;
 	Py_XDECREF(todecref);
-	return -1;
+	తిరిగి -1;
     }
 
-    di = dict_find(dict, key, -1);
+    di = dict_కనుగొను(dict, కీలకం, -1);
 
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
 	hashitem_T	*hi;
 
-	if (di == NULL)
+	ఒకవేళ (di == ఖాళీ)
 	{
 	    Py_XDECREF(todecref);
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return -1;
+	    Py_Err_సమితి_Object(Py_Exc_కీలకం_Error, కీలకం_Object);
+	    తిరిగి -1;
 	}
-	hi = hash_find(&dict->dv_hashtab, di->di_key);
+	hi = hash_కనుగొను(&dict->dv_hashtab, di->di_కీలకం);
 	hash_remove(&dict->dv_hashtab, hi, "Python remove item");
 	dictitem_free(di);
 	Py_XDECREF(todecref);
-	return 0;
+	తిరిగి 0;
     }
 
-    if (ConvertFromPyObject(valObject, &tv) == -1)
+    ఒకవేళ (ConvertFromPyObject(valObject, &tv) == -1)
     {
 	Py_XDECREF(todecref);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (di == NULL)
+    ఒకవేళ (di == ఖాళీ)
     {
-	if (!(di = dictitem_alloc(key)))
+	ఒకవేళ (!(di = dictitem_alloc(కీలకం)))
 	{
 	    Py_XDECREF(todecref);
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_జ్ఞాపకం();
+	    తిరిగి -1;
 	}
 	di->di_tv.v_type = VAR_UNKNOWN;
 
-	if (dict_add(dict, di) == FAIL)
+	ఒకవేళ (dict_కూడు(dict, di) == FAIL)
 	{
 	    dictitem_free(di);
-	    RAISE_KEY_ADD_FAIL(key);
+	    RAISE_కీలకం_కూడు_FAIL(కీలకం);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    తిరిగి -1;
 	}
     }
-    else
+    లేకపోతే
 	clear_tv(&di->di_tv);
 
     Py_XDECREF(todecref);
 
     copy_tv(&tv, &di->di_tv);
     clear_tv(&tv);
-    return 0;
+    తిరిగి 0;
 }
 
-typedef PyObject *(*hi_to_py)(hashitem_T *);
+రకనిర్వచనం PyObject *(*hi_గమ్యం_py)(hashitem_T *);
 
-    static PyObject *
-DictionaryListObjects(DictionaryObject *self, hi_to_py hiconvert)
+    స్థిర PyObject *
+DictionaryListObjects(DictionaryObject *self, hi_గమ్యం_py hiconvert)
 {
     dict_T	*dict = self->dict;
-    long_u	todo = dict->dv_hashtab.ht_used;
+    long_u	todo = dict->dv_hashtab.ht_వాడిన;
     Py_ssize_t	i = 0;
     PyObject	*ret;
     hashitem_T	*hi;
     PyObject	*newObj;
 
     ret = PyList_New(todo);
-    for (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
+    కొరకు (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	{
-	    if (!(newObj = hiconvert(hi)))
+	    ఒకవేళ (!(newObj = hiconvert(hi)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    PyList_SET_ITEM(ret, i, newObj);
+	    Py_List_సమితి_అంశం(ret, i, newObj);
 	    --todo;
 	    ++i;
 	}
     }
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-dict_key(hashitem_T *hi)
+    స్థిర PyObject *
+dict_కీలకం(hashitem_T *hi)
 {
-    return PyBytes_FromString((char *)(hi->hi_key));
+    తిరిగి Py_బైట్లు_From_String((అక్షరం *)(hi->hi_కీలకం));
 }
 
-    static PyObject *
-DictionaryListKeys(DictionaryObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Dictionary_List_కీలకాలు(DictionaryObject *self, PyObject *వాదనలు వాడని)
 {
-    return DictionaryListObjects(self, dict_key);
+    తిరిగి DictionaryListObjects(self, dict_కీలకం);
 }
 
-    static PyObject *
+    స్థిర PyObject *
 dict_val(hashitem_T *hi)
 {
     dictitem_T	*di;
 
     di = dict_lookup(hi);
-    return ConvertToPyObject(&di->di_tv);
+    తిరిగి Convert_గమ్యం_Py_Object(&di->di_tv);
 }
 
-    static PyObject *
-DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Dictionary_List_విలువలు(DictionaryObject *self, PyObject *వాదనలు వాడని)
 {
-    return DictionaryListObjects(self, dict_val);
+    తిరిగి DictionaryListObjects(self, dict_val);
 }
 
-    static PyObject *
-dict_item(hashitem_T *hi)
+    స్థిర PyObject *
+dict_అంశం(hashitem_T *hi)
 {
-    PyObject	*keyObject;
+    PyObject	*కీలకం_Object;
     PyObject	*valObject;
     PyObject	*ret;
 
-    if (!(keyObject = dict_key(hi)))
-	return NULL;
+    ఒకవేళ (!(కీలకం_Object = dict_కీలకం(hi)))
+	తిరిగి ఖాళీ;
 
-    if (!(valObject = dict_val(hi)))
+    ఒకవేళ (!(valObject = dict_val(hi)))
     {
-	Py_DECREF(keyObject);
-	return NULL;
+	Py_DECREF(కీలకం_Object);
+	తిరిగి ఖాళీ;
     }
 
-    ret = Py_BuildValue("(OO)", keyObject, valObject);
+    ret = Py_Build_విలువ("(OO)", కీలకం_Object, valObject);
 
-    Py_DECREF(keyObject);
+    Py_DECREF(కీలకం_Object);
     Py_DECREF(valObject);
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-DictionaryListItems(DictionaryObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Dictionary_List_వస్తువులు(DictionaryObject *self, PyObject *వాదనలు వాడని)
 {
-    return DictionaryListObjects(self, dict_item);
+    తిరిగి DictionaryListObjects(self, dict_అంశం);
 }
 
-    static PyObject *
-DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+DictionaryUpdate(DictionaryObject *self, PyObject *వాదనలు, PyObject *kwargs)
 {
     dict_T	*dict = self->dict;
 
-    if (dict->dv_lock)
+    ఒకవేళ (dict->dv_తాళం)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (kwargs)
+    ఒకవేళ (kwargs)
     {
 	typval_T	tv;
 
-	if (ConvertFromPyMapping(kwargs, &tv) == -1)
-	    return NULL;
+	ఒకవేళ (ConvertFromPyMapping(kwargs, &tv) == -1)
+	    తిరిగి ఖాళీ;
 
-	VimTryStart();
-	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", NULL);
+	Vim_Try_ప్రారంభం();
+	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", ఖాళీ);
 	clear_tv(&tv);
-	if (VimTryEnd())
-	    return NULL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	PyObject	*obj = NULL;
+	PyObject	*obj = ఖాళీ;
 
-	if (!PyArg_ParseTuple(args, "|O", &obj))
-	    return NULL;
+	ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "|O", &obj))
+	    తిరిగి ఖాళీ;
 
-	if (obj == NULL)
+	ఒకవేళ (obj == ఖాళీ)
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    తిరిగి Py_None;
 	}
 
-	if (PyObject_HasAttrString(obj, "keys"))
-	    return DictionaryUpdate(self, NULL, obj);
-	else
+	ఒకవేళ (PyObject_HasAttrString(obj, "keys"))
+	    తిరిగి DictionaryUpdate(self, ఖాళీ, obj);
+	లేకపోతే
 	{
 	    PyObject	*iterator;
-	    PyObject	*item;
+	    PyObject	*అంశం;
 
-	    if (!(iterator = PyObject_GetIter(obj)))
-		return NULL;
+	    ఒకవేళ (!(iterator = PyObject_GetIter(obj)))
+		తిరిగి ఖాళీ;
 
-	    while ((item = PyIter_Next(iterator)))
+	    అయితే ((అంశం = Py_Iter_తదుపరి(iterator)))
 	    {
 		PyObject	*fast;
-		PyObject	*keyObject;
+		PyObject	*కీలకం_Object;
 		PyObject	*valObject;
 		PyObject	*todecref;
-		char_u		*key;
+		char_u		*కీలకం;
 		dictitem_T	*di;
 		hashitem_T	*hi;
 
-		if (!(fast = PySequence_Fast(item, "")))
+		ఒకవేళ (!(fast = PySequence_Fast(అంశం, "")))
 		{
 		    Py_DECREF(iterator);
-		    Py_DECREF(item);
-		    return NULL;
+		    Py_DECREF(అంశం);
+		    తిరిగి ఖాళీ;
 		}
 
-		Py_DECREF(item);
+		Py_DECREF(అంశం);
 
-		if (PySequence_Size(fast) != 2)
+		ఒకవేళ (Py_Sequence_కొలత(fast) != 2)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    PyErr_FORMAT(PyExc_ValueError,
+		    PyErr_FORMAT(Py_Exc_విలువ_Error,
 			    N_("expected sequence element of size 2, "
 			    "but got sequence of size %d"),
-			    (int) PySequence_Size(fast));
-		    return NULL;
+			    (పూర్ణాంకం) Py_Sequence_కొలత(fast));
+		    తిరిగి ఖాళీ;
 		}
 
-		keyObject = PySequence_GetItem(fast, 0);
+		కీలకం_Object = Py_Sequence_Get_అంశం(fast, 0);
 
-		if (!(key = StringToChars(keyObject, &todecref)))
+		ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 
-		di = dictitem_alloc(key);
+		di = dictitem_alloc(కీలకం);
 
 		Py_XDECREF(todecref);
 
-		if (di == NULL)
+		ఒకవేళ (di == ఖాళీ)
 		{
 		    Py_DECREF(fast);
 		    Py_DECREF(iterator);
-		    PyErr_NoMemory();
-		    return NULL;
+		    Py_Err_No_జ్ఞాపకం();
+		    తిరిగి ఖాళీ;
 		}
 		di->di_tv.v_type = VAR_UNKNOWN;
 
-		valObject = PySequence_GetItem(fast, 1);
+		valObject = Py_Sequence_Get_అంశం(fast, 1);
 
-		if (ConvertFromPyObject(valObject, &di->di_tv) == -1)
+		ఒకవేళ (ConvertFromPyObject(valObject, &di->di_tv) == -1)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    dictitem_free(di);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 
 		Py_DECREF(fast);
 
-		hi = hash_find(&dict->dv_hashtab, di->di_key);
-		if (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
+		hi = hash_కనుగొను(&dict->dv_hashtab, di->di_కీలకం);
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi) || dict_కూడు(dict, di) == FAIL)
 		{
-		    RAISE_KEY_ADD_FAIL(di->di_key);
+		    RAISE_కీలకం_కూడు_FAIL(di->di_కీలకం);
 		    Py_DECREF(iterator);
 		    dictitem_free(di);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 	    }
 
 	    Py_DECREF(iterator);
 
 	    // Iterator may have finished due to an exception
-	    if (PyErr_Occurred())
-		return NULL;
+	    ఒకవేళ (PyErr_Occurred())
+		తిరిగి ఖాళీ;
 	}
     }
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
 
-    static PyObject *
-DictionaryGet(DictionaryObject *self, PyObject *args)
+    స్థిర PyObject *
+DictionaryGet(DictionaryObject *self, PyObject *వాదనలు)
 {
-    return _DictionaryItem(self, args,
+    తిరిగి Dictionary_అంశం(self, వాదనలు,
 			    DICT_FLAG_HAS_DEFAULT|DICT_FLAG_NONE_DEFAULT);
 }
 
-    static PyObject *
-DictionaryPop(DictionaryObject *self, PyObject *args)
+    స్థిర PyObject *
+Dictionary_తీయి(DictionaryObject *self, PyObject *వాదనలు)
 {
-    return _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
+    తిరిగి Dictionary_అంశం(self, వాదనలు, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_తీయి);
 }
 
-    static PyObject *
-DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Dictionary_తీయి_అంశం(DictionaryObject *self, PyObject *వాదనలు వాడని)
 {
     hashitem_T	*hi;
     PyObject	*ret;
     PyObject	*valObject;
     dictitem_T	*di;
 
-    if (self->dict->dv_hashtab.ht_used == 0)
+    ఒకవేళ (self->dict->dv_hashtab.ht_వాడిన == 0)
     {
-	PyErr_SetNone(PyExc_KeyError);
-	return NULL;
+	Py_Err_సమితి_None(Py_Exc_కీలకం_Error);
+	తిరిగి ఖాళీ;
     }
 
     hi = self->dict->dv_hashtab.ht_array;
-    while (HASHITEM_EMPTY(hi))
+    అయితే (HASHITEM_ఖాళీలు(hi))
 	++hi;
 
     di = dict_lookup(hi);
 
-    if (!(valObject = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    ఒకవేళ (!(valObject = Convert_గమ్యం_Py_Object(&di->di_tv)))
+	తిరిగి ఖాళీ;
 
-    if (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
+    ఒకవేళ (!(ret = Py_Build_విలువ("(" Py_బైట్లు_fmt "O)", hi->hi_కీలకం, valObject)))
     {
 	Py_DECREF(valObject);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     hash_remove(&self->dict->dv_hashtab, hi, "Python pop item");
     dictitem_free(di);
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-DictionaryHasKey(DictionaryObject *self, PyObject *keyObject)
+    స్థిర PyObject *
+Dictionary_Has_కీలకం(DictionaryObject *self, PyObject *కీలకం_Object)
 {
-    return _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    తిరిగి Dictionary_అంశం(self, కీలకం_Object, DICT_FLAG_RETURN_BOOL);
 }
 
-static PySequenceMethods DictionaryAsSeq = {
+స్థిర PySequenceMethods DictionaryAsSeq = {
     0,					// sq_length
     0,					// sq_concat
     0,					// sq_repeat
@@ -2537,107 +2537,107 @@ static PySequenceMethods DictionaryAsSeq = {
     0,					// sq_slice
     0,					// sq_ass_item
     0,					// sq_ass_slice
-    (objobjproc) DictionaryContains,	// sq_contains
+    (objobjproc) Dictionary_కలిగియుంది,	// sq_contains
     0,					// sq_inplace_concat
     0,					// sq_inplace_repeat
 };
 
-static PyMappingMethods DictionaryAsMapping = {
-    (lenfunc)       DictionaryLength,
-    (binaryfunc)    DictionaryItem,
-    (objobjargproc) DictionaryAssItem,
+స్థిర PyMappingMethods DictionaryAsMapping = {
+    (lenfunc)       Dictionary_నిడివి,
+    (binaryfunc)    Dictionary_అంశం_2,
+    (objobjargproc) Dictionary_Ass_అంశం,
 };
 
-static struct PyMethodDef DictionaryMethods[] = {
-    {"keys",	(PyCFunction)DictionaryListKeys,	METH_NOARGS,	""},
-    {"values",	(PyCFunction)DictionaryListValues,	METH_NOARGS,	""},
-    {"items",	(PyCFunction)DictionaryListItems,	METH_NOARGS,	""},
-    {"update",	(PyCFunction)(void *)DictionaryUpdate,		METH_VARARGS|METH_KEYWORDS, ""},
+స్థిర నిర్మాణం Py_పద్ధతి_Def DictionaryMethods[] = {
+    {"keys",	(PyCFunction)Dictionary_List_కీలకాలు,	METH_NOARGS,	""},
+    {"values",	(PyCFunction)Dictionary_List_విలువలు,	METH_NOARGS,	""},
+    {"items",	(PyCFunction)Dictionary_List_వస్తువులు,	METH_NOARGS,	""},
+    {"update",	(PyCFunction)(శూన్య *)DictionaryUpdate,		METH_VARARGS|METH_KEYWORDS, ""},
     {"get",	(PyCFunction)DictionaryGet,		METH_VARARGS,	""},
-    {"pop",	(PyCFunction)DictionaryPop,		METH_VARARGS,	""},
-    {"popitem",	(PyCFunction)DictionaryPopItem,		METH_NOARGS,	""},
-    {"has_key",	(PyCFunction)DictionaryHasKey,		METH_O,		""},
+    {"pop",	(PyCFunction)Dictionary_తీయి,		METH_VARARGS,	""},
+    {"popitem",	(PyCFunction)Dictionary_తీయి_అంశం,		METH_NOARGS,	""},
+    {"has_key",	(PyCFunction)Dictionary_Has_కీలకం,		METH_O,		""},
     {"__dir__",	(PyCFunction)DictionaryDir,		METH_NOARGS,	""},
-    { NULL,	NULL,					0,		NULL}
+    { ఖాళీ,	ఖాళీ,					0,		ఖాళీ}
 };
 
 DEFINE_PY_TYPE_OBJECT(ListType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     list_T	*list;
     pylinkedlist_T	ref;
 } ListObject;
 
-#define NEW_LIST(list) ListNew(ListTypePtr, list)
+#నిర్వచించు NEW_LIST(list) ListNew(ListTypePtr, list)
 
-    static PyObject *
+    స్థిర PyObject *
 ListNew(PyTypeObject *subtype, list_T *list)
 {
     ListObject	*self;
 
-    if (list == NULL)
-	return NULL;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     self = (ListObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
     self->list = list;
     ++list->lv_refcount;
     CHECK_LIST_MATERIALIZE(list);
 
-    pyll_add((PyObject *)(self), &self->ref, &lastlist);
+    pyll_కూడు((PyObject *)(self), &self->ref, &lastlist);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static list_T *
-py_list_alloc(void)
+    స్థిర list_T *
+py_list_alloc(శూన్య)
 {
     list_T	*ret;
 
-    if (!(ret = list_alloc()))
+    ఒకవేళ (!(ret = list_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
     ++ret->lv_refcount;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*అంశం;
     listitem_T	*li;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    ఒకవేళ (!(iterator = PyObject_GetIter(obj)))
+	తిరిగి -1;
 
-    while ((item = PyIter_Next(iterator)))
+    అయితే ((అంశం = Py_Iter_తదుపరి(iterator)))
     {
-	if (!(li = listitem_alloc()))
+	ఒకవేళ (!(li = listitem_alloc()))
 	{
-	    PyErr_NoMemory();
-	    Py_DECREF(item);
+	    Py_Err_No_జ్ఞాపకం();
+	    Py_DECREF(అంశం);
 	    Py_DECREF(iterator);
-	    return -1;
+	    తిరిగి -1;
 	}
-	li->li_tv.v_lock = 0;
+	li->li_tv.v_తాళం = 0;
 	li->li_tv.v_type = VAR_UNKNOWN;
 
-	if (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
+	ఒకవేళ (_ConvertFromPyObject(అంశం, &li->li_tv, lookup_dict) == -1)
 	{
-	    Py_DECREF(item);
+	    Py_DECREF(అంశం);
 	    Py_DECREF(iterator);
 	    listitem_free(l, li);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	Py_DECREF(item);
+	Py_DECREF(అంశం);
 
 	list_append(l, li);
     }
@@ -2645,494 +2645,494 @@ list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    ఒకవేళ (PyErr_Occurred())
+	తిరిగి -1;
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+ListConstructor(PyTypeObject *subtype, PyObject *వాదనలు, PyObject *kwargs)
 {
     list_T	*list;
-    PyObject	*obj = NULL;
+    PyObject	*obj = ఖాళీ;
 
-    if (kwargs)
+    ఒకవేళ (kwargs)
     {
-	PyErr_SET_STRING(PyExc_TypeError,
+	Py_Err_సమితి_STRING(PyExc_TypeError,
 		N_("list constructor does not accept keyword arguments"));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "|O", &obj))
+	తిరిగి ఖాళీ;
 
-    if (!(list = py_list_alloc()))
-	return NULL;
+    ఒకవేళ (!(list = py_list_alloc()))
+	తిరిగి ఖాళీ;
 
-    if (obj)
+    ఒకవేళ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	ఒకవేళ (!(lookup_dict = PyDict_New()))
 	{
 	    list_unref(list);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	if (list_py_concat(list, obj, lookup_dict) == -1)
+	ఒకవేళ (list_py_concat(list, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    list_unref(list);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return ListNew(subtype, list);
+    తిరిగి ListNew(subtype, list);
 }
 
-    static void
+    స్థిర శూన్య
 ListDestructor(PyObject *self_obj)
 {
     ListObject *self = (ListObject*)self_obj;
     pyll_remove(&self->ref, &lastlist);
     list_unref(self->list);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-    static PyInt
-ListLength(ListObject *self)
+    స్థిర PyInt
+List_నిడివి(ListObject *self)
 {
-    return ((PyInt) (self->list->lv_len));
+    తిరిగి ((PyInt) (self->list->lv_len));
 }
 
-    static PyObject *
-ListIndex(ListObject *self, Py_ssize_t index)
+    స్థిర PyObject *
+List_సూచీ(ListObject *self, Py_ssize_t సూచీ)
 {
     listitem_T	*li;
 
-    if (index >= ListLength(self))
+    ఒకవేళ (సూచీ >= List_నిడివి(self))
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return NULL;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("list index out of range"));
+	తిరిగి ఖాళీ;
     }
-    li = list_find(self->list, (long) index);
-    if (li == NULL)
+    li = list_కనుగొను(self->list, (దీర్ఘ) సూచీ);
+    ఒకవేళ (li == ఖాళీ)
     {
 	// No more suitable format specifications in python-2.3
 	PyErr_VIM_FORMAT(N_("internal error: failed to get Vim list item %d"),
-		(int) index);
-	return NULL;
+		(పూర్ణాంకం) సూచీ);
+	తిరిగి ఖాళీ;
     }
-    return ConvertToPyObject(&li->li_tv);
+    తిరిగి Convert_గమ్యం_Py_Object(&li->li_tv);
 }
 
-    static PyObject *
-ListSlice(ListObject *self, Py_ssize_t first, Py_ssize_t step,
+    స్థిర PyObject *
+List_ముక్క(ListObject *self, Py_ssize_t మొదటి, Py_ssize_t అడుగు,
 	  Py_ssize_t slicelen)
 {
     PyInt	i;
     PyObject	*list;
 
-    if (step == 0)
+    ఒకవేళ (అడుగు == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return NULL;
+	Py_Err_సమితి_STRING(Py_Exc_విలువ_Error, N_("slice step cannot be zero"));
+	తిరిగి ఖాళీ;
     }
 
     list = PyList_New(slicelen);
-    if (list == NULL)
-	return NULL;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (i = 0; i < slicelen; ++i)
+    కొరకు (i = 0; i < slicelen; ++i)
     {
-	PyObject	*item;
+	PyObject	*అంశం;
 
-	item = ListIndex(self, first + i*step);
-	if (item == NULL)
+	అంశం = List_సూచీ(self, మొదటి + i*అడుగు);
+	ఒకవేళ (అంశం == ఖాళీ)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	PyList_SET_ITEM(list, i, item);
+	Py_List_సమితి_అంశం(list, i, అంశం);
     }
 
-    return list;
+    తిరిగి list;
 }
 
-    static PyObject *
-ListItem(ListObject *self, PyObject* idx)
+    స్థిర PyObject *
+List_అంశం(ListObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    ఒకవేళ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return ListIndex(self, _idx);
+	దీర్ఘ _idx = PyInt_AsLong(idx);
+	తిరిగి List_సూచీ(self, _idx);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return ListIndex(self, _idx);
+	దీర్ఘ _idx = PyLong_AsLong(idx);
+	తిరిగి List_సూచీ(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    లేకపోతే ఒకవేళ (Py_ముక్క_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ప్రారంభం, stop, అడుగు, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return ListSlice(self, start, step, slicelen);
+	ఒకవేళ (Py_ముక్క_Get_Indices_Ex((Py_ముక్క_Object_T *)idx, List_నిడివి(self),
+				 &ప్రారంభం, &stop, &అడుగు, &slicelen) < 0)
+	    తిరిగి ఖాళీ;
+	తిరిగి List_ముక్క(self, ప్రారంభం, అడుగు, slicelen);
     }
-    else
+    లేకపోతే
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	RAISE_INVALID_సూచీ_TYPE(idx);
+	తిరిగి ఖాళీ;
     }
 }
 
-    static void
+    స్థిర శూన్య
 list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
 	list_T *l, listitem_T **lis, listitem_T *lastaddedli)
 {
-    while (numreplaced--)
+    అయితే (numreplaced--)
     {
-	list_insert(l, lis[numreplaced], lis[slicelen + numreplaced]);
+	list_చొప్పించు(l, lis[numreplaced], lis[slicelen + numreplaced]);
 	listitem_remove(l, lis[slicelen + numreplaced]);
     }
-    while (numadded--)
+    అయితే (numadded--)
     {
-	listitem_T	*next;
+	listitem_T	*తదుపరి;
 
-	next = lastaddedli->li_prev;
+	తదుపరి = lastaddedli->li_prev;
 	listitem_remove(l, lastaddedli);
-	lastaddedli = next;
+	lastaddedli = తదుపరి;
     }
 }
 
-    static int
-ListAssSlice(ListObject *self, Py_ssize_t first,
-	     Py_ssize_t step, Py_ssize_t slicelen, PyObject *obj)
+    స్థిర పూర్ణాంకం
+List_Ass_ముక్క(ListObject *self, Py_ssize_t మొదటి,
+	     Py_ssize_t అడుగు, Py_ssize_t slicelen, PyObject *obj)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*అంశం;
     listitem_T	*li;
-    listitem_T	*lastaddedli = NULL;
-    listitem_T	*next;
+    listitem_T	*lastaddedli = ఖాళీ;
+    listitem_T	*తదుపరి;
     typval_T	v;
     list_T	*l = self->list;
     PyInt	i;
     PyInt	j;
     PyInt	numreplaced = 0;
     PyInt	numadded = 0;
-    PyInt	size;
-    listitem_T	**lis = NULL;
+    PyInt	కొలత;
+    listitem_T	**lis = ఖాళీ;
 
-    size = ListLength(self);
+    కొలత = List_నిడివి(self);
 
-    if (l->lv_lock)
+    ఒకవేళ (l->lv_తాళం)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	తిరిగి -1;
     }
 
-    if (step == 0)
+    ఒకవేళ (అడుగు == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return -1;
+	Py_Err_సమితి_STRING(Py_Exc_విలువ_Error, N_("slice step cannot be zero"));
+	తిరిగి -1;
     }
 
-    if (step != 1 && slicelen == 0)
+    ఒకవేళ (అడుగు != 1 && slicelen == 0)
     {
 	// Nothing to do. Only error out if obj has some items.
-	int		ret = 0;
+	పూర్ణాంకం		ret = 0;
 
-	if (obj == NULL)
-	    return 0;
+	ఒకవేళ (obj == ఖాళీ)
+	    తిరిగి 0;
 
-	if (!(iterator = PyObject_GetIter(obj)))
-	    return -1;
+	ఒకవేళ (!(iterator = PyObject_GetIter(obj)))
+	    తిరిగి -1;
 
-	if ((item = PyIter_Next(iterator)))
+	ఒకవేళ ((అంశం = Py_Iter_తదుపరి(iterator)))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
 		    N_("attempt to assign sequence of size greater than %d "
 			"to extended slice"), 0);
-	    Py_DECREF(item);
+	    Py_DECREF(అంశం);
 	    ret = -1;
 	}
 	Py_DECREF(iterator);
-	return ret;
+	తిరిగి ret;
     }
 
-    if (obj != NULL)
+    ఒకవేళ (obj != ఖాళీ)
 	// XXX May allocate zero bytes.
-	if (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
+	ఒకవేళ (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
 	{
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_జ్ఞాపకం();
+	    తిరిగి -1;
 	}
 
-    if (first == size)
-	li = NULL;
-    else
+    ఒకవేళ (మొదటి == కొలత)
+	li = ఖాళీ;
+    లేకపోతే
     {
-	li = list_find(l, (long) first);
-	if (li == NULL)
+	li = list_కనుగొను(l, (దీర్ఘ) మొదటి);
+	ఒకవేళ (li == ఖాళీ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: no Vim list item %d"),
-		    (int)first);
-	    if (obj != NULL)
+		    (పూర్ణాంకం)మొదటి);
+	    ఒకవేళ (obj != ఖాళీ)
 		PyMem_Free(lis);
-	    return -1;
+	    తిరిగి -1;
 	}
 	i = slicelen;
-	while (i-- && li != NULL)
+	అయితే (i-- && li != ఖాళీ)
 	{
-	    j = step;
-	    next = li;
-	    if (step > 0)
-		while (next != NULL && ((next = next->li_next) != NULL) && --j);
-	    else
-		while (next != NULL && ((next = next->li_prev) != NULL) && ++j);
+	    j = అడుగు;
+	    తదుపరి = li;
+	    ఒకవేళ (అడుగు > 0)
+		అయితే (తదుపరి != ఖాళీ && ((తదుపరి = తదుపరి->li_తదుపరి) != ఖాళీ) && --j);
+	    లేకపోతే
+		అయితే (తదుపరి != ఖాళీ && ((తదుపరి = తదుపరి->li_prev) != ఖాళీ) && ++j);
 
-	    if (obj == NULL)
+	    ఒకవేళ (obj == ఖాళీ)
 		listitem_remove(l, li);
-	    else
+	    లేకపోతే
 		lis[slicelen - i - 1] = li;
 
-	    li = next;
+	    li = తదుపరి;
 	}
-	if (li == NULL && i != -1)
+	ఒకవేళ (li == ఖాళీ && i != -1)
 	{
-	    PyErr_SET_VIM(N_("internal error: not enough list items"));
-	    if (obj != NULL)
+	    Py_Err_సమితి_VIM(N_("internal error: not enough list items"));
+	    ఒకవేళ (obj != ఖాళీ)
 		PyMem_Free(lis);
-	    return -1;
+	    తిరిగి -1;
 	}
     }
 
-    if (obj == NULL)
-	return 0;
+    ఒకవేళ (obj == ఖాళీ)
+	తిరిగి 0;
 
-    if (!(iterator = PyObject_GetIter(obj)))
+    ఒకవేళ (!(iterator = PyObject_GetIter(obj)))
     {
 	PyMem_Free(lis);
-	return -1;
+	తిరిగి -1;
     }
 
     i = 0;
-    while ((item = PyIter_Next(iterator)))
+    అయితే ((అంశం = Py_Iter_తదుపరి(iterator)))
     {
-	if (ConvertFromPyObject(item, &v) == -1)
+	ఒకవేళ (ConvertFromPyObject(అంశం, &v) == -1)
 	{
 	    Py_DECREF(iterator);
-	    Py_DECREF(item);
+	    Py_DECREF(అంశం);
 	    PyMem_Free(lis);
-	    return -1;
+	    తిరిగి -1;
 	}
-	Py_DECREF(item);
-	if (list_insert_tv(l, &v, numreplaced < slicelen
+	Py_DECREF(అంశం);
+	ఒకవేళ (list_చొప్పించు_tv(l, &v, numreplaced < slicelen
 				    ? lis[numreplaced]
 				    : li) == FAIL)
 	{
 	    clear_tv(&v);
-	    PyErr_SET_VIM(N_("internal error: failed to add item to list"));
+	    Py_Err_సమితి_VIM(N_("internal error: failed to add item to list"));
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    తిరిగి -1;
 	}
-	if (numreplaced < slicelen)
+	ఒకవేళ (numreplaced < slicelen)
 	{
 	    lis[slicelen + numreplaced] = lis[numreplaced]->li_prev;
 	    vimlist_remove(l, lis[numreplaced], lis[numreplaced]);
 	    numreplaced++;
 	}
-	else
+	లేకపోతే
 	{
-	    if (li)
+	    ఒకవేళ (li)
 		lastaddedli = li->li_prev;
-	    else
-		lastaddedli = l->lv_u.mat.lv_last;
+	    లేకపోతే
+		lastaddedli = l->lv_u.mat.lv_చివరి;
 	    numadded++;
 	}
 	clear_tv(&v);
-	if (step != 1 && i >= slicelen)
+	ఒకవేళ (అడుగు != 1 && i >= slicelen)
 	{
 	    Py_DECREF(iterator);
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
 		    N_("attempt to assign sequence of size greater than %d "
-			"to extended slice"), (int) slicelen);
+			"to extended slice"), (పూర్ణాంకం) slicelen);
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    తిరిగి -1;
 	}
 	++i;
     }
     Py_DECREF(iterator);
 
-    if (step != 1 && i != slicelen)
+    ఒకవేళ (అడుగు != 1 && i != slicelen)
     {
-	PyErr_FORMAT2(PyExc_ValueError,
+	PyErr_FORMAT2(Py_Exc_విలువ_Error,
 		N_("attempt to assign sequence of size %d to extended slice "
-		    "of size %d"), (int) i, (int) slicelen);
+		    "of size %d"), (పూర్ణాంకం) i, (పూర్ణాంకం) slicelen);
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (PyErr_Occurred())
+    ఒకవేళ (PyErr_Occurred())
     {
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	తిరిగి -1;
     }
 
-    for (i = 0; i < numreplaced; i++)
+    కొరకు (i = 0; i < numreplaced; i++)
 	listitem_free(l, lis[i]);
-    if (step == 1)
-	for (i = numreplaced; i < slicelen; i++)
+    ఒకవేళ (అడుగు == 1)
+	కొరకు (i = numreplaced; i < slicelen; i++)
 	    listitem_remove(l, lis[i]);
 
     PyMem_Free(lis);
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
+    స్థిర పూర్ణాంకం
+List_Ass_సూచీ(ListObject *self, Py_ssize_t సూచీ, PyObject *obj)
 {
     typval_T	tv;
     list_T	*l = self->list;
     listitem_T	*li;
-    Py_ssize_t	length = ListLength(self);
+    Py_ssize_t	నిడివి = List_నిడివి(self);
 
-    if (l->lv_lock)
+    ఒకవేళ (l->lv_తాళం)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	తిరిగి -1;
     }
-    if (index > length || (index == length && obj == NULL))
+    ఒకవేళ (సూచీ > నిడివి || (సూచీ == నిడివి && obj == ఖాళీ))
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return -1;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("list index out of range"));
+	తిరిగి -1;
     }
 
-    if (obj == NULL)
+    ఒకవేళ (obj == ఖాళీ)
     {
-	li = list_find(l, (long) index);
-	if (li == NULL)
+	li = list_కనుగొను(l, (దీర్ఘ) సూచీ);
+	ఒకవేళ (li == ఖాళీ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (పూర్ణాంకం) సూచీ);
+	    తిరిగి -1;
 	}
 	vimlist_remove(l, li, li);
 	clear_tv(&li->li_tv);
 	vim_free(li);
-	return 0;
+	తిరిగి 0;
     }
 
-    if (ConvertFromPyObject(obj, &tv) == -1)
-	return -1;
+    ఒకవేళ (ConvertFromPyObject(obj, &tv) == -1)
+	తిరిగి -1;
 
-    if (index == length)
+    ఒకవేళ (సూచీ == నిడివి)
     {
-	if (list_append_tv(l, &tv) == FAIL)
+	ఒకవేళ (list_append_tv(l, &tv) == FAIL)
 	{
 	    clear_tv(&tv);
-	    PyErr_SET_VIM(N_("failed to add item to list"));
-	    return -1;
+	    Py_Err_సమితి_VIM(N_("failed to add item to list"));
+	    తిరిగి -1;
 	}
     }
-    else
+    లేకపోతే
     {
-	li = list_find(l, (long) index);
-	if (li == NULL)
+	li = list_కనుగొను(l, (దీర్ఘ) సూచీ);
+	ఒకవేళ (li == ఖాళీ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (పూర్ణాంకం) సూచీ);
+	    తిరిగి -1;
 	}
 	clear_tv(&li->li_tv);
 	copy_tv(&tv, &li->li_tv);
 	clear_tv(&tv);
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-ListAssItem(ListObject *self, PyObject *idx, PyObject *obj)
+    స్థిర పూర్ణాంకం
+List_Ass_అంశం(ListObject *self, PyObject *idx, PyObject *obj)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    ఒకవేళ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	దీర్ఘ _idx = PyInt_AsLong(idx);
+	తిరిగి (పూర్ణాంకం)List_Ass_సూచీ(self, _idx, obj);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	దీర్ఘ _idx = PyLong_AsLong(idx);
+	తిరిగి (పూర్ణాంకం)List_Ass_సూచీ(self, _idx, obj);
     }
-    else if (PySlice_Check(idx))
+    లేకపోతే ఒకవేళ (Py_ముక్క_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ప్రారంభం, stop, అడుగు, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return -1;
-	return (int)ListAssSlice(self, start, step, slicelen,
+	ఒకవేళ (Py_ముక్క_Get_Indices_Ex((Py_ముక్క_Object_T *)idx, List_నిడివి(self),
+				 &ప్రారంభం, &stop, &అడుగు, &slicelen) < 0)
+	    తిరిగి -1;
+	తిరిగి (పూర్ణాంకం)List_Ass_ముక్క(self, ప్రారంభం, అడుగు, slicelen,
 		obj);
     }
-    else
+    లేకపోతే
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	RAISE_INVALID_సూచీ_TYPE(idx);
+	తిరిగి -1;
     }
 }
 
-    static PyObject *
-ListConcatInPlace(ListObject *self, PyObject *obj)
+    స్థిర PyObject *
+List_Concat_లోపల_ఉంచు(ListObject *self, PyObject *obj)
 {
     list_T	*l = self->list;
     PyObject	*lookup_dict;
 
-    if (l->lv_lock)
+    ఒకవేళ (l->lv_తాళం)
     {
 	RAISE_LOCKED_LIST;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (!(lookup_dict = PyDict_New()))
-	return NULL;
+    ఒకవేళ (!(lookup_dict = PyDict_New()))
+	తిరిగి ఖాళీ;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    ఒకవేళ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	Py_DECREF(lookup_dict);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     Py_DECREF(lookup_dict);
 
     Py_INCREF((PyObject *)self);
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     listwatch_T	lw;
     list_T	*list;
 } listiterinfo_T;
 
-    static void
-ListIterDestruct(void *arg)
+    స్థిర శూన్య
+ListIterDestruct(శూన్య *arg)
 {
     listiterinfo_T *lii = (listiterinfo_T*)arg;
     list_rem_watch(lii->list, &lii->lw);
@@ -3140,450 +3140,450 @@ ListIterDestruct(void *arg)
     PyMem_Free(lii);
 }
 
-    static PyObject *
-ListIterNext(void **arg)
+    స్థిర PyObject *
+List_Iter_తదుపరి(శూన్య **arg)
 {
     PyObject	*ret;
     listiterinfo_T **lii = (listiterinfo_T**)arg;
 
-    if (!((*lii)->lw.lw_item))
-	return NULL;
+    ఒకవేళ (!((*lii)->lw.lw_అంశం))
+	తిరిగి ఖాళీ;
 
-    if (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
-	return NULL;
+    ఒకవేళ (!(ret = Convert_గమ్యం_Py_Object(&((*lii)->lw.lw_అంశం->li_tv))))
+	తిరిగి ఖాళీ;
 
-    (*lii)->lw.lw_item = (*lii)->lw.lw_item->li_next;
+    (*lii)->lw.lw_అంశం = (*lii)->lw.lw_అంశం->li_తదుపరి;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 ListIter(PyObject *self_obj)
 {
     ListObject	*self = (ListObject*)self_obj;
     listiterinfo_T	*lii;
     list_T	*l = self->list;
 
-    if (!(lii = PyMem_New(listiterinfo_T, 1)))
+    ఒకవేళ (!(lii = PyMem_New(listiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
 
     CHECK_LIST_MATERIALIZE(l);
-    list_add_watch(l, &lii->lw);
-    lii->lw.lw_item = l->lv_first;
+    list_కూడు_watch(l, &lii->lw);
+    lii->lw.lw_అంశం = l->lv_మొదటి;
     lii->list = l;
     ++l->lv_refcount;
 
-    return IterNew(lii,
-	    ListIterDestruct, ListIterNext,
-	    NULL, NULL, (PyObject *)self);
+    తిరిగి IterNew(lii,
+	    ListIterDestruct, List_Iter_తదుపరి,
+	    ఖాళీ, ఖాళీ, (PyObject *)self);
 }
 
-static char *ListAttrs[] = {
+స్థిర అక్షరం *ListAttrs[] = {
     "locked",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-ListDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+ListDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, ListAttrs);
+    తిరిగి ObjectDir(self, ListAttrs);
 }
 
-    static int
-ListSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+ListSetattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
     ListObject *self = (ListObject*)self_obj;
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_సమితి_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.List attributes"));
-	return -1;
+	తిరిగి -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ఒకవేళ (strcmp(name, "locked") == 0)
     {
-	if (self->list->lv_lock == VAR_FIXED)
+	ఒకవేళ (self->list->lv_తాళం == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
-	    return -1;
+	    Py_Err_సమితి_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
+	    తిరిగి -1;
 	}
-	else
+	లేకపోతే
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->list->lv_lock = VAR_LOCKED;
-	    else
-		self->list->lv_lock = 0;
+	    పూర్ణాంకం		istrue = PyObject_IsTrue(valObject);
+	    ఒకవేళ (istrue == -1)
+		తిరిగి -1;
+	    లేకపోతే ఒకవేళ (istrue)
+		self->list->lv_తాళం = VAR_LOCKED;
+	    లేకపోతే
+		self->list->lv_తాళం = 0;
 	}
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	తిరిగి -1;
     }
 }
 
-static PySequenceMethods ListAsSeq = {
-    (lenfunc)		ListLength,	 // sq_length,	  len(x)
+స్థిర PySequenceMethods ListAsSeq = {
+    (lenfunc)		List_నిడివి,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     0,					 // RangeRepeat, sq_repeat,  x*n
-    (PyIntArgFunc)	ListIndex,	 // sq_item,	  x[i]
+    (PyIntArgFunc)	List_సూచీ,	 // sq_item,	  x[i]
     0,					 // was_sq_slice,     x[i:j]
-    (PyIntObjArgProc)	ListAssIndex,	 // sq_as_item,  x[i]=v
+    (PyIntObjArgProc)	List_Ass_సూచీ,	 // sq_as_item,  x[i]=v
     0,					 // was_sq_ass_slice, x[i:j]=v
     0,					 // sq_contains
-    (binaryfunc)	ListConcatInPlace,// sq_inplace_concat
+    (binaryfunc)	List_Concat_లోపల_ఉంచు,// sq_inplace_concat
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods ListAsMapping = {
-    /* mp_length	*/ (lenfunc) ListLength,
-    /* mp_subscript     */ (binaryfunc) ListItem,
-    /* mp_ass_subscript */ (objobjargproc) ListAssItem,
+స్థిర PyMappingMethods ListAsMapping = {
+    /* mp_length	*/ (lenfunc) List_నిడివి,
+    /* mp_subscript     */ (binaryfunc) List_అంశం,
+    /* mp_ass_subscript */ (objobjargproc) List_Ass_అంశం,
 };
 
-static struct PyMethodDef ListMethods[] = {
-    {"extend",	(PyCFunction)ListConcatInPlace,	METH_O,		""},
+స్థిర నిర్మాణం Py_పద్ధతి_Def ListMethods[] = {
+    {"extend",	(PyCFunction)List_Concat_లోపల_ఉంచు,	METH_O,		""},
     {"__dir__",	(PyCFunction)ListDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ఖాళీ,	ఖాళీ,				0,		ఖాళీ}
 };
 
 DEFINE_PY_TYPE_OBJECT(TupleType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     tuple_T	*tuple;
     pylinkedlist_T	ref;
 } TupleObject;
 
-#define NEW_TUPLE(tuple) TupleNew(TupleTypePtr, tuple)
+#నిర్వచించు NEW_TUPLE(tuple) TupleNew(TupleTypePtr, tuple)
 
-    static PyObject *
+    స్థిర PyObject *
 TupleNew(PyTypeObject *subtype, tuple_T *tuple)
 {
     TupleObject	*self;
 
-    if (tuple == NULL)
-	return NULL;
+    ఒకవేళ (tuple == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     self = (TupleObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
     self->tuple = tuple;
     ++tuple->tv_refcount;
 
-    pyll_add((PyObject *)(self), &self->ref, &lasttuple);
+    pyll_కూడు((PyObject *)(self), &self->ref, &lasttuple);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static tuple_T *
-py_tuple_alloc(void)
+    స్థిర tuple_T *
+py_tuple_alloc(శూన్య)
 {
     tuple_T	*ret;
 
-    if (!(ret = tuple_alloc()))
+    ఒకవేళ (!(ret = tuple_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
     ++ret->tv_refcount;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 tuple_py_concat(tuple_T *t, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*అంశం;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    ఒకవేళ (!(iterator = PyObject_GetIter(obj)))
+	తిరిగి -1;
 
-    while ((item = PyIter_Next(iterator)))
+    అయితే ((అంశం = Py_Iter_తదుపరి(iterator)))
     {
 	typval_T    new_tv;
 
-	if (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
+	ఒకవేళ (_ConvertFromPyObject(అంశం, &new_tv, lookup_dict) == -1)
 	{
-	    Py_DECREF(item);
+	    Py_DECREF(అంశం);
 	    Py_DECREF(iterator);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	Py_DECREF(item);
+	Py_DECREF(అంశం);
 
-	if (tuple_append_tv(t, &new_tv) == FAIL)
+	ఒకవేళ (tuple_append_tv(t, &new_tv) == FAIL)
 	{
 	    Py_DECREF(iterator);
-	    return -1;
+	    తిరిగి -1;
 	}
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    ఒకవేళ (PyErr_Occurred())
+	తిరిగి -1;
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+TupleConstructor(PyTypeObject *subtype, PyObject *వాదనలు, PyObject *kwargs)
 {
     tuple_T	*tuple;
-    PyObject	*obj = NULL;
+    PyObject	*obj = ఖాళీ;
 
-    if (kwargs)
+    ఒకవేళ (kwargs)
     {
-	PyErr_SET_STRING(PyExc_TypeError,
+	Py_Err_సమితి_STRING(PyExc_TypeError,
 		N_("tuple constructor does not accept keyword arguments"));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "|O", &obj))
+	తిరిగి ఖాళీ;
 
-    if (!(tuple = py_tuple_alloc()))
-	return NULL;
+    ఒకవేళ (!(tuple = py_tuple_alloc()))
+	తిరిగి ఖాళీ;
 
-    if (obj)
+    ఒకవేళ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	ఒకవేళ (!(lookup_dict = PyDict_New()))
 	{
 	    tuple_unref(tuple);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	if (tuple_py_concat(tuple, obj, lookup_dict) == -1)
+	ఒకవేళ (tuple_py_concat(tuple, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    tuple_unref(tuple);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return TupleNew(subtype, tuple);
+    తిరిగి TupleNew(subtype, tuple);
 }
 
-    static void
+    స్థిర శూన్య
 TupleDestructor(PyObject *self_obj)
 {
     TupleObject *self = (TupleObject *)self_obj;
     pyll_remove(&self->ref, &lasttuple);
     tuple_unref(self->tuple);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-    static PyInt
-TupleLength(TupleObject *self)
+    స్థిర PyInt
+Tuple_నిడివి(TupleObject *self)
 {
-    return ((PyInt)(tuple_len(self->tuple)));
+    తిరిగి ((PyInt)(tuple_len(self->tuple)));
 }
 
-    static PyObject *
-TupleIndex(TupleObject *self, Py_ssize_t index)
+    స్థిర PyObject *
+Tuple_సూచీ(TupleObject *self, Py_ssize_t సూచీ)
 {
-    PyInt	len = TupleLength(self);
+    PyInt	len = Tuple_నిడివి(self);
 
-    if (index < 0)
-	index = len + index;
+    ఒకవేళ (సూచీ < 0)
+	సూచీ = len + సూచీ;
 
-    if (index < 0 || index >= len)
+    ఒకవేళ (సూచీ < 0 || సూచీ >= len)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("tuple index out of range"));
-	return NULL;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("tuple index out of range"));
+	తిరిగి ఖాళీ;
     }
-    return ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
+    తిరిగి Convert_గమ్యం_Py_Object(TUPLE_అంశం(self->tuple, సూచీ));
 }
 
 /*
  * Return a new tuple object for the tuple slice starting from the index
  * "first" and of length "slicelen" skipping "step" items.
  */
-    static PyObject *
-TupleSlice(
+    స్థిర PyObject *
+Tuple_ముక్క(
     TupleObject		*self,
-    Py_ssize_t		first,
-    Py_ssize_t		step,
+    Py_ssize_t		మొదటి,
+    Py_ssize_t		అడుగు,
     Py_ssize_t		slicelen)
 {
     PyInt	i;
     PyObject	*tuple;
 
     tuple = PyTuple_New(slicelen);
-    if (tuple == NULL)
-	return NULL;
+    ఒకవేళ (tuple == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (i = 0; i < slicelen; ++i)
+    కొరకు (i = 0; i < slicelen; ++i)
     {
-	PyObject	*item;
+	PyObject	*అంశం;
 
-	item = TupleIndex(self, first + i * step);
-	if (item == NULL)
+	అంశం = Tuple_సూచీ(self, మొదటి + i * అడుగు);
+	ఒకవేళ (అంశం == ఖాళీ)
 	{
 	    Py_DECREF(tuple);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	PyTuple_SetItem(tuple, i, item);
+	Py_Tuple_సమితి_అంశం(tuple, i, అంశం);
     }
 
-    return tuple;
+    తిరిగి tuple;
 }
 
-    static PyObject *
-TupleItem(TupleObject *self, PyObject* idx)
+    స్థిర PyObject *
+Tuple_అంశం(TupleObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    ఒకవేళ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return TupleIndex(self, _idx);
+	దీర్ఘ _idx = PyInt_AsLong(idx);
+	తిరిగి Tuple_సూచీ(self, _idx);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return TupleIndex(self, _idx);
+	దీర్ఘ _idx = PyLong_AsLong(idx);
+	తిరిగి Tuple_సూచీ(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    లేకపోతే ఒకవేళ (Py_ముక్క_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ప్రారంభం, stop, అడుగు, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return TupleSlice(self, start, step, slicelen);
+	ఒకవేళ (Py_ముక్క_Get_Indices_Ex((Py_ముక్క_Object_T *)idx, Tuple_నిడివి(self),
+				 &ప్రారంభం, &stop, &అడుగు, &slicelen) < 0)
+	    తిరిగి ఖాళీ;
+	తిరిగి Tuple_ముక్క(self, ప్రారంభం, అడుగు, slicelen);
     }
-    else
+    లేకపోతే
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	RAISE_INVALID_సూచీ_TYPE(idx);
+	తిరిగి ఖాళీ;
     }
 }
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     tuple_T	*tuple;
-    int		index;
+    పూర్ణాంకం		సూచీ;
 } tupleiterinfo_T;
 
-    static void
-TupleIterDestruct(void *arg)
+    స్థిర శూన్య
+TupleIterDestruct(శూన్య *arg)
 {
     tupleiterinfo_T *tii = (tupleiterinfo_T*)arg;
     tuple_unref(tii->tuple);
     PyMem_Free(tii);
 }
 
-    static PyObject *
-TupleIterNext(void **arg)
+    స్థిర PyObject *
+Tuple_Iter_తదుపరి(శూన్య **arg)
 {
     PyObject	*ret;
     tupleiterinfo_T **tii = (tupleiterinfo_T**)arg;
 
-    if ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
-	return NULL;
+    ఒకవేళ ((*tii)->సూచీ >= TUPLE_LEN((*tii)->tuple))
+	తిరిగి ఖాళీ;
 
-    if (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
-	return NULL;
+    ఒకవేళ (!(ret = Convert_గమ్యం_Py_Object(TUPLE_అంశం((*tii)->tuple, (*tii)->సూచీ))))
+	తిరిగి ఖాళీ;
 
-    (*tii)->index++;
+    (*tii)->సూచీ++;
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 TupleIter(PyObject *self_obj)
 {
     TupleObject	*self = (TupleObject*)self_obj;
     tupleiterinfo_T	*tii;
     tuple_T	*t = self->tuple;
 
-    if (!(tii = PyMem_New(tupleiterinfo_T, 1)))
+    ఒకవేళ (!(tii = PyMem_New(tupleiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
 
     tii->tuple = t;
-    tii->index = 0;
+    tii->సూచీ = 0;
     ++t->tv_refcount;
 
-    return IterNew(tii,
-	    TupleIterDestruct, TupleIterNext,
-	    NULL, NULL, (PyObject *)self);
+    తిరిగి IterNew(tii,
+	    TupleIterDestruct, Tuple_Iter_తదుపరి,
+	    ఖాళీ, ఖాళీ, (PyObject *)self);
 }
 
-static char *TupleAttrs[] = {
+స్థిర అక్షరం *TupleAttrs[] = {
     "locked",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-TupleDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+TupleDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, TupleAttrs);
+    తిరిగి ObjectDir(self, TupleAttrs);
 }
 
-    static int
-TupleSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+TupleSetattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
     TupleObject *self = (TupleObject*)self_obj;
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_సమితి_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Tuple attributes"));
-	return -1;
+	తిరిగి -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ఒకవేళ (strcmp(name, "locked") == 0)
     {
-	if (self->tuple->tv_lock == VAR_FIXED)
+	ఒకవేళ (self->tuple->tv_తాళం == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
-	    return -1;
+	    Py_Err_సమితి_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
+	    తిరిగి -1;
 	}
-	else
+	లేకపోతే
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->tuple->tv_lock = VAR_LOCKED;
-	    else
-		self->tuple->tv_lock = 0;
+	    పూర్ణాంకం		istrue = PyObject_IsTrue(valObject);
+	    ఒకవేళ (istrue == -1)
+		తిరిగి -1;
+	    లేకపోతే ఒకవేళ (istrue)
+		self->tuple->tv_తాళం = VAR_LOCKED;
+	    లేకపోతే
+		self->tuple->tv_తాళం = 0;
 	}
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	తిరిగి -1;
     }
 }
 
-static PySequenceMethods TupleAsSeq = {
-    (lenfunc)		TupleLength,	 // sq_length,	  len(x)
+స్థిర PySequenceMethods TupleAsSeq = {
+    (lenfunc)		Tuple_నిడివి,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     0,					 // RangeRepeat, sq_repeat,  x*n
-    (PyIntArgFunc)	TupleIndex,	 // sq_item,	  x[i]
+    (PyIntArgFunc)	Tuple_సూచీ,	 // sq_item,	  x[i]
     0,					 // was_sq_slice,     x[i:j]
     (PyIntObjArgProc)	0,		 // sq_as_item,  x[i]=v
     0,					 // was_sq_ass_slice, x[i:j]=v
@@ -3592,81 +3592,81 @@ static PySequenceMethods TupleAsSeq = {
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods TupleAsMapping = {
-    /* mp_length	*/ (lenfunc) TupleLength,
-    /* mp_subscript     */ (binaryfunc) TupleItem,
+స్థిర PyMappingMethods TupleAsMapping = {
+    /* mp_length	*/ (lenfunc) Tuple_నిడివి,
+    /* mp_subscript     */ (binaryfunc) Tuple_అంశం,
     /* mp_ass_subscript */ (objobjargproc) 0,
 };
 
-static struct PyMethodDef TupleMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def TupleMethods[] = {
     {"__dir__",	(PyCFunction)TupleDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ఖాళీ,	ఖాళీ,				0,		ఖాళీ}
 };
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     char_u	*name;
-    int		argc;
+    పూర్ణాంకం		argc;
     typval_T	*argv;
     dict_T	*self;
     pylinkedlist_T	ref;
-    int		auto_rebind;
+    పూర్ణాంకం		auto_rebind;
 } FunctionObject;
 
 DEFINE_PY_TYPE_OBJECT(FunctionType);
 
-#define NEW_FUNCTION(name, argc, argv, self, pt_auto) \
+#నిర్వచించు NEW_FUNCTION(name, argc, argv, self, pt_auto) \
     FunctionNew(FunctionTypePtr, (name), (argc), (argv), (self), (pt_auto))
 
-    static PyObject *
-FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
-	dict_T *selfdict, int auto_rebind)
+    స్థిర PyObject *
+FunctionNew(PyTypeObject *subtype, char_u *name, పూర్ణాంకం argc, typval_T *argv,
+	dict_T *selfdict, పూర్ణాంకం auto_rebind)
 {
     FunctionObject	*self;
 
     self = (FunctionObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (isdigit((unsigned char)*name))
+    ఒకవేళ (అంకెనా((గుర్తులేని అక్షరం)*name))
     {
-	if (!translated_function_exists(name, FALSE))
+	ఒకవేళ (!translated_function_exists(name, FALSE))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
 		    N_("unnamed function %s does not exist"), name);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	self->name = vim_strsave(name);
     }
-    else
+    లేకపోతే
     {
 	char_u *p;
 
-	if ((p = get_expanded_name(name,
-			    vim_strchr(name, AUTOLOAD_CHAR) == NULL)) == NULL)
+	ఒకవేళ ((p = get_expanded_name(name,
+			    vim_strchr(name, AUTOLOAD_CHAR) == ఖాళీ)) == ఖాళీ)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
 		    N_("function %s does not exist"), name);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	if (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (int)KE_SNR)
+	ఒకవేళ (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (పూర్ణాంకం)KE_SNR)
 	{
 	    char_u *np;
 	    size_t len = STRLEN(p) + 1;
 
-	    if ((np = alloc(len + 2)) == NULL)
+	    ఒకవేళ ((np = alloc(len + 2)) == ఖాళీ)
 	    {
 		vim_free(p);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 	    mch_memmove(np, "<SNR>", 5);
 	    mch_memmove(np + 5, p + 3, len - 3);
 	    vim_free(p);
 	    self->name = np;
 	}
-	else
+	లేకపోతే
 	    self->name = p;
     }
 
@@ -3674,157 +3674,157 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
     self->argc = argc;
     self->argv = argv;
     self->self = selfdict;
-    self->auto_rebind = selfdict == NULL ? TRUE : auto_rebind;
+    self->auto_rebind = selfdict == ఖాళీ ? TRUE : auto_rebind;
 
-    if (self->argv || self->self)
-	pyll_add((PyObject *)(self), &self->ref, &lastfunc);
+    ఒకవేళ (self->argv || self->self)
+	pyll_కూడు((PyObject *)(self), &self->ref, &lastfunc);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static PyObject *
-FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    స్థిర PyObject *
+FunctionConstructor(PyTypeObject *subtype, PyObject *వాదనలు, PyObject *kwargs)
 {
     PyObject	*self;
     PyObject	*selfdictObject;
     PyObject	*autoRebindObject;
-    PyObject	*argsObject = NULL;
+    PyObject	*వాదనలు_Object = ఖాళీ;
     char_u	*name;
     typval_T	selfdicttv;
     typval_T	argstv;
-    list_T	*argslist = NULL;
-    dict_T	*selfdict = NULL;
-    int		argc = 0;
-    int		auto_rebind = TRUE;
-    typval_T	*argv = NULL;
+    list_T	*argslist = ఖాళీ;
+    dict_T	*selfdict = ఖాళీ;
+    పూర్ణాంకం		argc = 0;
+    పూర్ణాంకం		auto_rebind = TRUE;
+    typval_T	*argv = ఖాళీ;
     typval_T	*curtv;
     listitem_T	*li;
 
-    if (kwargs != NULL)
+    ఒకవేళ (kwargs != ఖాళీ)
     {
-	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	selfdictObject = Py_Dict_Get_అంశం_String(kwargs, "self");
+	ఒకవేళ (selfdictObject != ఖాళీ)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
-		return NULL;
+	    ఒకవేళ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+		తిరిగి ఖాళీ;
 	    selfdict = selfdicttv.vval.v_dict;
 	}
-	argsObject = PyDict_GetItemString(kwargs, "args");
-	if (argsObject != NULL)
+	వాదనలు_Object = Py_Dict_Get_అంశం_String(kwargs, "args");
+	ఒకవేళ (వాదనలు_Object != ఖాళీ)
 	{
-	    if (ConvertFromPySequence(argsObject, &argstv) == -1)
+	    ఒకవేళ (ConvertFromPySequence(వాదనలు_Object, &argstv) == -1)
 	    {
 		dict_unref(selfdict);
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 	    argslist = argstv.vval.v_list;
 	    CHECK_LIST_MATERIALIZE(argslist);
 
 	    argc = argslist->lv_len;
-	    if (argc != 0)
+	    ఒకవేళ (argc != 0)
 	    {
 		argv = PyMem_New(typval_T, (size_t) argc);
-		if (argv == NULL)
+		ఒకవేళ (argv == ఖాళీ)
 		{
-		    PyErr_NoMemory();
+		    Py_Err_No_జ్ఞాపకం();
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 		curtv = argv;
-		FOR_ALL_LIST_ITEMS(argslist, li)
+		FOR_ALL_LIST_వస్తువులు(argslist, li)
 		    copy_tv(&li->li_tv, curtv++);
 	    }
 	    list_unref(argslist);
 	}
-	if (selfdict != NULL)
+	ఒకవేళ (selfdict != ఖాళీ)
 	{
 	    auto_rebind = FALSE;
-	    autoRebindObject = PyDict_GetItemString(kwargs, "auto_rebind");
-	    if (autoRebindObject != NULL)
+	    autoRebindObject = Py_Dict_Get_అంశం_String(kwargs, "auto_rebind");
+	    ఒకవేళ (autoRebindObject != ఖాళీ)
 	    {
 		auto_rebind = PyObject_IsTrue(autoRebindObject);
-		if (auto_rebind == -1)
+		ఒకవేళ (auto_rebind == -1)
 		{
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 	    }
 	}
     }
 
-    if (!PyArg_ParseTuple(args, "et", "ascii", &name))
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "et", "ascii", &name))
     {
 	dict_unref(selfdict);
-	while (argc--)
+	అయితే (argc--)
 	    clear_tv(&argv[argc]);
 	PyMem_Free(argv);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     self = FunctionNew(subtype, name, argc, argv, selfdict, auto_rebind);
 
     PyMem_Free(name);
 
-    return self;
+    తిరిగి self;
 }
 
-    static void
+    స్థిర శూన్య
 FunctionDestructor(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
-    int i;
+    పూర్ణాంకం i;
     func_unref(self->name);
     vim_free(self->name);
-    for (i = 0; i < self->argc; ++i)
+    కొరకు (i = 0; i < self->argc; ++i)
 	clear_tv(&self->argv[i]);
     PyMem_Free(self->argv);
     dict_unref(self->self);
-    if (self->argv || self->self)
+    ఒకవేళ (self->argv || self->self)
 	pyll_remove(&self->ref, &lastfunc);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-static char *FunctionAttrs[] = {
+స్థిర అక్షరం *FunctionAttrs[] = {
     "softspace", "args", "self", "auto_rebind",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-FunctionDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+FunctionDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, FunctionAttrs);
+    తిరిగి ObjectDir(self, FunctionAttrs);
 }
 
-    static PyObject *
-FunctionAttr(FunctionObject *self, char *name)
+    స్థిర PyObject *
+FunctionAttr(FunctionObject *self, అక్షరం *name)
 {
     list_T *list;
-    int i;
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((char *)(self->name));
-    else if (strcmp(name, "args") == 0)
+    పూర్ణాంకం i;
+    ఒకవేళ (strcmp(name, "name") == 0)
+	తిరిగి PyString_FromString((అక్షరం *)(self->name));
+    లేకపోతే ఒకవేళ (strcmp(name, "args") == 0)
     {
-	if (self->argv == NULL || (list = list_alloc()) == NULL)
-	    return ALWAYS_NONE;
+	ఒకవేళ (self->argv == ఖాళీ || (list = list_alloc()) == ఖాళీ)
+	    తిరిగి ALWAYS_NONE;
 
-	for (i = 0; i < self->argc; ++i)
+	కొరకు (i = 0; i < self->argc; ++i)
 	    list_append_tv(list, &self->argv[i]);
-	return NEW_LIST(list);
+	తిరిగి NEW_LIST(list);
     }
-    else if (strcmp(name, "self") == 0)
-	return self->self == NULL
+    లేకపోతే ఒకవేళ (strcmp(name, "self") == 0)
+	తిరిగి self->self == ఖాళీ
 	    ? ALWAYS_NONE
 	    : NEW_DICTIONARY(self->self);
-    else if (strcmp(name, "auto_rebind") == 0)
-	return self->auto_rebind
+    లేకపోతే ఒకవేళ (strcmp(name, "auto_rebind") == 0)
+	తిరిగి self->auto_rebind
 	    ? ALWAYS_TRUE
 	    : ALWAYS_FALSE;
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, FunctionAttrs);
-    return NULL;
+    లేకపోతే ఒకవేళ (strcmp(name, "__members__") == 0)
+	తిరిగి ObjectDir(ఖాళీ, FunctionAttrs);
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -3833,129 +3833,129 @@ FunctionAttr(FunctionObject *self, char *name)
  * "exported" should be set to true when it is needed to construct a partial
  * that may be stored in a variable (i.e. may be freed by Vim).
  */
-    static void
-set_partial(FunctionObject *self, partial_T *pt, int exported)
+    స్థిర శూన్య
+సమితి_partial(FunctionObject *self, partial_T *pt, పూర్ణాంకం exported)
 {
-    int i;
+    పూర్ణాంకం i;
 
     pt->pt_name = self->name;
-    if (self->argv)
+    ఒకవేళ (self->argv)
     {
 	pt->pt_argc = self->argc;
-	if (exported)
+	ఒకవేళ (exported)
 	{
 	    pt->pt_argv = ALLOC_CLEAR_MULT(typval_T, self->argc);
-	    for (i = 0; i < pt->pt_argc; ++i)
+	    కొరకు (i = 0; i < pt->pt_argc; ++i)
 		copy_tv(&self->argv[i], &pt->pt_argv[i]);
 	}
-	else
+	లేకపోతే
 	    pt->pt_argv = self->argv;
     }
-    else
+    లేకపోతే
     {
 	pt->pt_argc = 0;
-	pt->pt_argv = NULL;
+	pt->pt_argv = ఖాళీ;
     }
     pt->pt_auto = self->auto_rebind || !exported;
     pt->pt_dict = self->self;
-    if (exported && self->self)
+    ఒకవేళ (exported && self->self)
 	++pt->pt_dict->dv_refcount;
-    if (exported)
+    ఒకవేళ (exported)
 	pt->pt_name = vim_strsave(pt->pt_name);
     pt->pt_refcount = 1;
 }
 
-    static PyObject *
-FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
+    స్థిర PyObject *
+FunctionCall(PyObject *self_obj, PyObject *వాదనలు_Object, PyObject *kwargs)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
     char_u	*name = self->name;
-    typval_T	args;
+    typval_T	వాదనలు;
     typval_T	selfdicttv;
     typval_T	rettv;
-    dict_T	*selfdict = NULL;
+    dict_T	*selfdict = ఖాళీ;
     PyObject	*selfdictObject;
     PyObject	*ret;
-    int		error;
+    పూర్ణాంకం		error;
     partial_T	pt;
-    partial_T	*pt_ptr = NULL;
+    partial_T	*pt_ptr = ఖాళీ;
 
-    if (ConvertFromPySequence(argsObject, &args) == -1)
-	return NULL;
+    ఒకవేళ (ConvertFromPySequence(వాదనలు_Object, &వాదనలు) == -1)
+	తిరిగి ఖాళీ;
 
-    if (kwargs != NULL)
+    ఒకవేళ (kwargs != ఖాళీ)
     {
-	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	selfdictObject = Py_Dict_Get_అంశం_String(kwargs, "self");
+	ఒకవేళ (selfdictObject != ఖాళీ)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+	    ఒకవేళ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
 	    {
-		clear_tv(&args);
-		return NULL;
+		clear_tv(&వాదనలు);
+		తిరిగి ఖాళీ;
 	    }
 	    selfdict = selfdicttv.vval.v_dict;
 	}
     }
 
-    if (self->argv || self->self)
+    ఒకవేళ (self->argv || self->self)
     {
-	CLEAR_FIELD(pt);
-	set_partial(self, &pt, FALSE);
+	CLEAR_క్షేత్రం(pt);
+	సమితి_partial(self, &pt, FALSE);
 	pt_ptr = &pt;
     }
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_దారాలు
+    Python_తాళం_Vim();
 
-    VimTryStart();
-    error = func_call(name, &args, pt_ptr, selfdict, &rettv);
+    Vim_Try_ప్రారంభం();
+    error = func_call(name, &వాదనలు, pt_ptr, selfdict, &rettv);
 
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_చివర_ALLOW_దారాలు
 
-    if (VimTryEnd())
-	ret = NULL;
-    else if (error != OK)
+    ఒకవేళ (Vim_Try_చివర())
+	ret = ఖాళీ;
+    లేకపోతే ఒకవేళ (error != OK)
     {
-	ret = NULL;
-	PyErr_VIM_FORMAT(N_("failed to run function %s"), (char *)name);
+	ret = ఖాళీ;
+	PyErr_VIM_FORMAT(N_("failed to run function %s"), (అక్షరం *)name);
     }
-    else
-	ret = ConvertToPyObject(&rettv);
+    లేకపోతే
+	ret = Convert_గమ్యం_Py_Object(&rettv);
 
-    clear_tv(&args);
+    clear_tv(&వాదనలు);
     clear_tv(&rettv);
-    if (selfdict != NULL)
+    ఒకవేళ (selfdict != ఖాళీ)
 	clear_tv(&selfdicttv);
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 FunctionRepr(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
     PyObject *ret;
     garray_T repr_ga;
-    int i;
-    char_u *tofree = NULL;
+    పూర్ణాంకం i;
+    char_u *tofree = ఖాళీ;
     typval_T tv;
     char_u numbuf[NUMBUFLEN];
 
-    ga_init2(&repr_ga, sizeof(char), 70);
+    ga_init2(&repr_ga, పరిమాణం(అక్షరం), 70);
     ga_concat(&repr_ga, (char_u *)"<vim.Function '");
-    if (self->name)
+    ఒకవేళ (self->name)
 	ga_concat(&repr_ga, self->name);
-    else
+    లేకపోతే
 	ga_concat(&repr_ga, (char_u *)"<NULL>");
     ga_append(&repr_ga, '\'');
-    if (self->argv)
+    ఒకవేళ (self->argv)
     {
 	ga_concat(&repr_ga, (char_u *)", args=[");
 	++emsg_silent;
-	for (i = 0; i < self->argc; i++)
+	కొరకు (i = 0; i < self->argc; i++)
 	{
-	    if (i != 0)
+	    ఒకవేళ (i != 0)
 		ga_concat(&repr_ga, (char_u *)", ");
 	    ga_concat(&repr_ga, tv2string(&self->argv[i], &tofree, numbuf,
 			get_copyID()));
@@ -3964,7 +3964,7 @@ FunctionRepr(PyObject *self_obj)
 	--emsg_silent;
 	ga_append(&repr_ga, ']');
     }
-    if (self->self)
+    ఒకవేళ (self->self)
     {
 	ga_concat(&repr_ga, (char_u *)", self=");
 	tv.v_type = VAR_DICT;
@@ -3973,18 +3973,18 @@ FunctionRepr(PyObject *self_obj)
 	ga_concat(&repr_ga, tv2string(&tv, &tofree, numbuf, get_copyID()));
 	--emsg_silent;
 	vim_free(tofree);
-	if (self->auto_rebind)
+	ఒకవేళ (self->auto_rebind)
 	    ga_concat(&repr_ga, (char_u *)", auto_rebind=True");
     }
     ga_append(&repr_ga, '>');
-    ret = PyString_FromString((char *)repr_ga.ga_data);
+    ret = PyString_FromString((అక్షరం *)repr_ga.ga_దత్తాంశం);
     ga_clear(&repr_ga);
-    return ret;
+    తిరిగి ret;
 }
 
-static struct PyMethodDef FunctionMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def FunctionMethods[] = {
     {"__dir__",	(PyCFunction)FunctionDir,   METH_NOARGS,		""},
-    { NULL,	NULL,			0,				NULL}
+    { ఖాళీ,	ఖాళీ,			0,				ఖాళీ}
 };
 
 /*
@@ -3993,362 +3993,362 @@ static struct PyMethodDef FunctionMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(OptionsType);
 
-typedef int (*checkfun)(void *);
+రకనిర్వచనం పూర్ణాంకం (*checkfun)(శూన్య *);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    int		opt_type;
-    void	*from;
+    Py_Object_తల
+    పూర్ణాంకం		opt_type;
+    శూన్య	*from;
     checkfun	Check;
     PyObject	*fromObj;
 } OptionsObject;
 
-    static int
-dummy_check(void *arg UNUSED)
+    స్థిర పూర్ణాంకం
+dummy_check(శూన్య *arg వాడని)
 {
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-OptionsNew(int opt_type, void *from, checkfun Check, PyObject *fromObj)
+    స్థిర PyObject *
+OptionsNew(పూర్ణాంకం opt_type, శూన్య *from, checkfun Check, PyObject *fromObj)
 {
     OptionsObject	*self;
 
     self = PyObject_GC_New(OptionsObject, OptionsTypePtr);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     self->opt_type = opt_type;
     self->from = from;
     self->Check = Check;
     self->fromObj = fromObj;
-    if (fromObj)
+    ఒకవేళ (fromObj)
 	Py_INCREF(fromObj);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
+    స్థిర శూన్య
 OptionsDestructor(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((శూన్య *)(self));
     Py_XDECREF(self->fromObj);
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((శూన్య *)(self));
 }
 
-    static int
-OptionsTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    స్థిర పూర్ణాంకం
+OptionsTraverse(PyObject *self_obj, visitproc సందర్శించు, శూన్య *arg)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
-    Py_VISIT(self->fromObj);
-    return 0;
+    Py_సందర్శించు(self->fromObj);
+    తిరిగి 0;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 OptionsClear(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_CLEAR(self->fromObj);
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-OptionsItem(OptionsObject *self, PyObject *keyObject)
+    స్థిర PyObject *
+Options_అంశం(OptionsObject *self, PyObject *కీలకం_Object)
 {
-    char_u	*key;
-    int		flags;
-    long	numval;
+    char_u	*కీలకం;
+    పూర్ణాంకం		flags;
+    దీర్ఘ	numval;
     char_u	*stringval;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return NULL;
+    ఒకవేళ (self->Check(self->fromObj))
+	తిరిగి ఖాళీ;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
+	తిరిగి ఖాళీ;
 
-    if (*key == NUL)
+    ఒకవేళ (*కీలకం == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ఖాళీలు_కీలకాలు;
 	Py_XDECREF(todecref);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    flags = get_option_value_strict(key, &numval, &stringval,
+    flags = get_option_విలువ_strict(కీలకం, &numval, &stringval,
 				    self->opt_type, self->from);
 
     Py_XDECREF(todecref);
 
-    if (flags == 0)
+    ఒకవేళ (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	Py_Err_సమితి_Object(Py_Exc_కీలకం_Error, కీలకం_Object);
+	తిరిగి ఖాళీ;
     }
 
-    if (flags & SOPT_UNSET)
+    ఒకవేళ (flags & SOPT_UNSET)
     {
 	Py_INCREF(Py_None);
-	return Py_None;
+	తిరిగి Py_None;
     }
-    else if (flags & SOPT_BOOL)
+    లేకపోతే ఒకవేళ (flags & SOPT_BOOL)
     {
 	PyObject	*ret;
 	ret = numval ? Py_True : Py_False;
 	Py_INCREF(ret);
-	return ret;
+	తిరిగి ret;
     }
-    else if (flags & SOPT_NUM)
-	return PyInt_FromLong(numval);
-    else if (flags & SOPT_STRING)
+    లేకపోతే ఒకవేళ (flags & SOPT_అంకె)
+	తిరిగి PyInt_FromLong(numval);
+    లేకపోతే ఒకవేళ (flags & SOPT_STRING)
     {
-	if (stringval)
+	ఒకవేళ (stringval)
 	{
-	    PyObject	*ret = PyBytes_FromString((char *)stringval);
+	    PyObject	*ret = Py_బైట్లు_From_String((అక్షరం *)stringval);
 	    vim_free(stringval);
-	    return ret;
+	    తిరిగి ret;
 	}
-	else
+	లేకపోతే
 	{
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    Py_Err_సమితి_STRING(PyExc_RuntimeError,
 		    N_("unable to get option value"));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
+    లేకపోతే
     {
-	PyErr_SET_VIM(N_("internal error: unknown option type"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("internal error: unknown option type"));
+	తిరిగి ఖాళీ;
     }
 }
 
-    static int
-OptionsContains(OptionsObject *self, PyObject *keyObject)
+    స్థిర పూర్ణాంకం
+Options_కలిగియుంది(OptionsObject *self, PyObject *కీలకం_Object)
 {
-    char_u	*key;
+    char_u	*కీలకం;
     PyObject	*todecref;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
+	తిరిగి -1;
 
-    if (*key == NUL)
+    ఒకవేళ (*కీలకం == NUL)
     {
 	Py_XDECREF(todecref);
-	return 0;
+	తిరిగి 0;
     }
 
-    if (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
+    ఒకవేళ (get_option_విలువ_strict(కీలకం, ఖాళీ, ఖాళీ, self->opt_type, ఖాళీ))
     {
 	Py_XDECREF(todecref);
-	return 1;
+	తిరిగి 1;
     }
-    else
+    లేకపోతే
     {
 	Py_XDECREF(todecref);
-	return 0;
+	తిరిగి 0;
     }
 }
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    void	*lastoption;
-    int		opt_type;
+    శూన్య	*lastoption;
+    పూర్ణాంకం		opt_type;
 } optiterinfo_T;
 
-    static PyObject *
-OptionsIterNext(void **arg)
+    స్థిర PyObject *
+Options_Iter_తదుపరి(శూన్య **arg)
 {
     char_u	*name;
     optiterinfo_T **oii = (optiterinfo_T**)arg;
 
-    if ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
-	return PyString_FromString((char *)name);
+    ఒకవేళ ((name = option_iter_తదుపరి(&((*oii)->lastoption), (*oii)->opt_type)))
+	తిరిగి PyString_FromString((అక్షరం *)name);
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 OptionsIter(PyObject *self_obj)
 {
     OptionsObject	*self = (OptionsObject*)self_obj;
     optiterinfo_T	*oii;
 
-    if (!(oii = PyMem_New(optiterinfo_T, 1)))
+    ఒకవేళ (!(oii = PyMem_New(optiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి ఖాళీ;
     }
 
     oii->opt_type = self->opt_type;
-    oii->lastoption = NULL;
+    oii->lastoption = ఖాళీ;
 
-    return IterNew(oii,
-	    PyMem_Free, OptionsIterNext,
-	    NULL, NULL, (PyObject *)self);
+    తిరిగి IterNew(oii,
+	    PyMem_Free, Options_Iter_తదుపరి,
+	    ఖాళీ, ఖాళీ, (PyObject *)self);
 }
 
-    static int
-set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
+    స్థిర పూర్ణాంకం
+సమితి_option_విలువ_err(char_u *కీలకం, పూర్ణాంకం numval, char_u *stringval, పూర్ణాంకం opt_flags)
 {
-    char	*errmsg;
+    అక్షరం	*errmsg;
 
-    if ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
+    ఒకవేళ ((errmsg = సమితి_option_విలువ(కీలకం, numval, stringval, opt_flags)))
     {
-	if (VimTryEnd())
-	    return FAIL;
-	PyErr_SetVim(errmsg);
-	return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
+	Py_Err_సమితి_Vim(errmsg);
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-set_option_value_for(
-	char_u *key,
-	int numval,
+    స్థిర పూర్ణాంకం
+సమితి_option_విలువ_for(
+	char_u *కీలకం,
+	పూర్ణాంకం numval,
 	char_u *stringval,
-	int opt_flags,
-	int opt_type,
-	void *from)
+	పూర్ణాంకం opt_flags,
+	పూర్ణాంకం opt_type,
+	శూన్య *from)
 {
     switchwin_T	switchwin;
     bufref_T	save_curbuf;
-    int		set_ret = 0;
+    పూర్ణాంకం		సమితి_ret = 0;
 
-    VimTryStart();
-    switch (opt_type)
+    Vim_Try_ప్రారంభం();
+    ఎంపిక (opt_type)
     {
-	case SREQ_WIN:
-	    if (switch_win(&switchwin, (win_T *)from,
-			      win_find_tabpage((win_T *)from), FALSE) == FAIL)
+	స్థితి SREQ_WIN:
+	    ఒకవేళ (switch_win(&switchwin, (win_T *)from,
+			      win_కనుగొను_tabpage((win_T *)from), FALSE) == FAIL)
 	    {
 		restore_win(&switchwin, TRUE);
-		if (VimTryEnd())
-		    return -1;
-		PyErr_SET_VIM(N_("problem while switching windows"));
-		return -1;
+		ఒకవేళ (Vim_Try_చివర())
+		    తిరిగి -1;
+		Py_Err_సమితి_VIM(N_("problem while switching windows"));
+		తిరిగి -1;
 	    }
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
+	    సమితి_ret = సమితి_option_విలువ_err(కీలకం, numval, stringval, opt_flags);
 	    restore_win(&switchwin, TRUE);
-	    break;
-	case SREQ_BUF:
-	    switch_buffer(&save_curbuf, (buf_T *)from);
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
-	    restore_buffer(&save_curbuf);
-	    break;
-	case SREQ_GLOBAL:
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
-	    break;
+	    ఆపు;
+	స్థితి SREQ_BUF:
+	    switch_బఫరు(&save_curbuf, (buf_T *)from);
+	    సమితి_ret = సమితి_option_విలువ_err(కీలకం, numval, stringval, opt_flags);
+	    restore_బఫరు(&save_curbuf);
+	    ఆపు;
+	స్థితి SREQ_GLOBAL:
+	    సమితి_ret = సమితి_option_విలువ_err(కీలకం, numval, stringval, opt_flags);
+	    ఆపు;
     }
-    if (set_ret == FAIL)
-	return -1;
-    return VimTryEnd();
+    ఒకవేళ (సమితి_ret == FAIL)
+	తిరిగి -1;
+    తిరిగి Vim_Try_చివర();
 }
 
-    static int
-OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+Options_Ass_అంశం(OptionsObject *self, PyObject *కీలకం_Object, PyObject *valObject)
 {
-    char_u	*key;
-    int		flags;
-    int		opt_flags;
-    int		ret = 0;
+    char_u	*కీలకం;
+    పూర్ణాంకం		flags;
+    పూర్ణాంకం		opt_flags;
+    పూర్ణాంకం		ret = 0;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return -1;
+    ఒకవేళ (self->Check(self->fromObj))
+	తిరిగి -1;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
+	తిరిగి -1;
 
-    if (*key == NUL)
+    ఒకవేళ (*కీలకం == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ఖాళీలు_కీలకాలు;
 	Py_XDECREF(todecref);
-	return -1;
+	తిరిగి -1;
     }
 
-    flags = get_option_value_strict(key, NULL, NULL,
+    flags = get_option_విలువ_strict(కీలకం, ఖాళీ, ఖాళీ,
 				    self->opt_type, self->from);
 
-    if (flags == 0)
+    ఒకవేళ (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
+	Py_Err_సమితి_Object(Py_Exc_కీలకం_Error, కీలకం_Object);
 	Py_XDECREF(todecref);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (valObject == NULL)
+    ఒకవేళ (valObject == ఖాళీ)
     {
-	if (self->opt_type == SREQ_GLOBAL)
+	ఒకవేళ (self->opt_type == SREQ_GLOBAL)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
-		    N_("unable to unset global option %s"), key);
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
+		    N_("unable to unset global option %s"), కీలకం);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    తిరిగి -1;
 	}
-	else if (!(flags & SOPT_GLOBAL))
+	లేకపోతే ఒకవేళ (!(flags & SOPT_GLOBAL))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_విలువ_Error,
 		    N_("unable to unset option %s "
-		       "which does not have global value"), key);
+		       "which does not have global value"), కీలకం);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    తిరిగి -1;
 	}
-	else
+	లేకపోతే
 	{
-	    unset_global_local_option(key, self->from);
+	    unset_global_local_option(కీలకం, self->from);
 	    Py_XDECREF(todecref);
-	    return 0;
+	    తిరిగి 0;
 	}
     }
 
     opt_flags = (self->opt_type ? OPT_LOCAL : OPT_GLOBAL);
 
-    if (flags & SOPT_BOOL)
+    ఒకవేళ (flags & SOPT_BOOL)
     {
-	int	istrue = PyObject_IsTrue(valObject);
+	పూర్ణాంకం	istrue = PyObject_IsTrue(valObject);
 
-	if (istrue == -1)
+	ఒకవేళ (istrue == -1)
 	    ret = -1;
-	else
-	    ret = set_option_value_for(key, istrue, NULL,
+	లేకపోతే
+	    ret = సమితి_option_విలువ_for(కీలకం, istrue, ఖాళీ,
 				    opt_flags, self->opt_type, self->from);
     }
-    else if (flags & SOPT_NUM)
+    లేకపోతే ఒకవేళ (flags & SOPT_అంకె)
     {
-	long	val;
+	దీర్ఘ	val;
 
-	if (NumberToLong(valObject, &val, NUMBER_INT))
+	ఒకవేళ (సంఖ్య_గమ్యం_Long(valObject, &val, సంఖ్య_INT))
 	{
 	    Py_XDECREF(todecref);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	ret = set_option_value_for(key, (int) val, NULL, opt_flags,
+	ret = సమితి_option_విలువ_for(కీలకం, (పూర్ణాంకం) val, ఖాళీ, opt_flags,
 				self->opt_type, self->from);
     }
-    else
+    లేకపోతే
     {
 	char_u		*val;
 	PyObject	*todecref2;
 
-	if ((val = StringToChars(valObject, &todecref2)))
+	ఒకవేళ ((val = String_గమ్యం_Chars(valObject, &todecref2)))
 	{
-	    ret = set_option_value_for(key, 0, val, opt_flags,
+	    ret = సమితి_option_విలువ_for(కీలకం, 0, val, opt_flags,
 				    self->opt_type, self->from);
 	    Py_XDECREF(todecref2);
 	}
-	else
+	లేకపోతే
 	    ret = -1;
     }
 
     Py_XDECREF(todecref);
 
-    return ret;
+    తిరిగి ret;
 }
 
-static PySequenceMethods OptionsAsSeq = {
+స్థిర PySequenceMethods OptionsAsSeq = {
     0,					// sq_length
     0,					// sq_concat
     0,					// sq_repeat
@@ -4356,141 +4356,141 @@ static PySequenceMethods OptionsAsSeq = {
     0,					// sq_slice
     0,					// sq_ass_item
     0,					// sq_ass_slice
-    (objobjproc) OptionsContains,	// sq_contains
+    (objobjproc) Options_కలిగియుంది,	// sq_contains
     0,					// sq_inplace_concat
     0,					// sq_inplace_repeat
 };
 
-static PyMappingMethods OptionsAsMapping = {
-    (lenfunc)       NULL,
-    (binaryfunc)    OptionsItem,
-    (objobjargproc) OptionsAssItem,
+స్థిర PyMappingMethods OptionsAsMapping = {
+    (lenfunc)       ఖాళీ,
+    (binaryfunc)    Options_అంశం,
+    (objobjargproc) Options_Ass_అంశం,
 };
 
 // Tabpage object
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     tabpage_T	*tab;
-} TabPageObject;
+} Tab_పుట_Object;
 
-static PyObject *WinListNew(TabPageObject *tabObject);
+స్థిర PyObject *WinListNew(Tab_పుట_Object *tabObject);
 
-DEFINE_PY_TYPE_OBJECT(TabPageType);
+DEFINE_PY_TYPE_OBJECT(Tab_పుట_Type);
 
-    static int
-CheckTabPage(TabPageObject *self)
+    స్థిర పూర్ణాంకం
+Check_Tab_పుట(Tab_పుట_Object *self)
 {
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    ఒకవేళ (self->tab == INVALID_TABPAGE_విలువ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted tab page"));
-	return -1;
+	Py_Err_సమితి_VIM(N_("attempt to refer to deleted tab page"));
+	తిరిగి -1;
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-TabPageNew(tabpage_T *tab)
+    స్థిర PyObject *
+Tab_పుట_New(tabpage_T *tab)
 {
-    TabPageObject *self;
+    Tab_పుట_Object *self;
 
-    if (TAB_PYTHON_REF(tab))
+    ఒకవేళ (TAB_PYTHON_REF(tab))
     {
 	self = TAB_PYTHON_REF(tab);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    లేకపోతే
     {
-	self = PyObject_NEW(TabPageObject, TabPageTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_NEW(Tab_పుట_Object, Tab_పుట_Type_Ptr);
+	ఒకవేళ (self == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	self->tab = tab;
 	TAB_PYTHON_REF(tab) = self;
     }
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
-TabPageDestructor(PyObject *self_obj)
+    స్థిర శూన్య
+Tab_పుట_Destructor(PyObject *self_obj)
 {
-    TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab && self->tab != INVALID_TABPAGE_VALUE)
-	TAB_PYTHON_REF(self->tab) = NULL;
+    Tab_పుట_Object *self = (Tab_పుట_Object*)self_obj;
+    ఒకవేళ (self->tab && self->tab != INVALID_TABPAGE_విలువ)
+	TAB_PYTHON_REF(self->tab) = ఖాళీ;
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-static char *TabPageAttrs[] = {
+స్థిర అక్షరం *Tab_పుట_Attrs[] = {
     "windows", "number", "vars", "window", "valid",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-TabPageDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+Tab_పుట_Dir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, TabPageAttrs);
+    తిరిగి ObjectDir(self, Tab_పుట_Attrs);
 }
 
-    static PyObject *
-TabPageAttrValid(TabPageObject *self, char *name)
+    స్థిర PyObject *
+Tab_పుట_Attr_Valid(Tab_పుట_Object *self, అక్షరం *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ఒకవేళ (strcmp(name, "valid") != 0)
+	తిరిగి ఖాళీ;
 
-    ret = ((self->tab == INVALID_TABPAGE_VALUE) ? Py_False : Py_True);
+    ret = ((self->tab == INVALID_TABPAGE_విలువ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-TabPageAttr(TabPageObject *self, char *name)
+    స్థిర PyObject *
+Tab_పుట_Attr(Tab_పుట_Object *self, అక్షరం *name)
 {
-    if (strcmp(name, "windows") == 0)
-	return WinListNew(self);
-    else if (strcmp(name, "number") == 0)
-	return PyLong_FromLong((long) get_tab_number(self->tab));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->tab->tp_vars);
-    else if (strcmp(name, "window") == 0)
+    ఒకవేళ (strcmp(name, "windows") == 0)
+	తిరిగి WinListNew(self);
+    లేకపోతే ఒకవేళ (strcmp(name, "number") == 0)
+	తిరిగి PyLong_FromLong((దీర్ఘ) get_tab_సంఖ్య(self->tab));
+    లేకపోతే ఒకవేళ (strcmp(name, "vars") == 0)
+	తిరిగి NEW_DICTIONARY(self->tab->tp_vars);
+    లేకపోతే ఒకవేళ (strcmp(name, "window") == 0)
     {
 	// For current tab window.c does not bother to set or update tp_curwin
-	if (self->tab == curtab)
-	    return WindowNew(curwin, curtab);
-	else
-	    return WindowNew(self->tab->tp_curwin, self->tab);
+	ఒకవేళ (self->tab == curtab)
+	    తిరిగి కిటికీ_New(curwin, curtab);
+	లేకపోతే
+	    తిరిగి కిటికీ_New(self->tab->tp_curwin, self->tab);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TabPageAttrs);
-    return NULL;
+    లేకపోతే ఒకవేళ (strcmp(name, "__members__") == 0)
+	తిరిగి ObjectDir(ఖాళీ, Tab_పుట_Attrs);
+    తిరిగి ఖాళీ;
 }
 
-    static PyObject *
-TabPageRepr(PyObject *self_obj)
+    స్థిర PyObject *
+Tab_పుట_Repr(PyObject *self_obj)
 {
-    TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab == INVALID_TABPAGE_VALUE)
-	return PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
-    else
+    Tab_పుట_Object *self = (Tab_పుట_Object*)self_obj;
+    ఒకవేళ (self->tab == INVALID_TABPAGE_విలువ)
+	తిరిగి PyString_FromFormat("<tabpage object (deleted) at %p>", (శూన్య *)self);
+    లేకపోతే
     {
-	int	t = get_tab_number(self->tab);
+	పూర్ణాంకం	t = get_tab_సంఖ్య(self->tab);
 
-	if (t == 0)
-	    return PyString_FromFormat("<tabpage object (unknown) at %p>",
-					(void *)self);
-	else
-	    return PyString_FromFormat("<tabpage %d>", t - 1);
+	ఒకవేళ (t == 0)
+	    తిరిగి PyString_FromFormat("<tabpage object (unknown) at %p>",
+					(శూన్య *)self);
+	లేకపోతే
+	    తిరిగి PyString_FromFormat("<tabpage %d>", t - 1);
     }
 }
 
-static struct PyMethodDef TabPageMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def Tab_పుట_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"__dir__",	    (PyCFunction)TabPageDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"__dir__",	    (PyCFunction)Tab_పుట_Dir,	METH_NOARGS,	""},
+    { ఖాళీ,	    ఖాళీ,			0,		ఖాళీ}
 };
 
 /*
@@ -4498,79 +4498,79 @@ static struct PyMethodDef TabPageMethods[] = {
  */
 
 DEFINE_PY_TYPE_OBJECT(TabListType);
-static PySequenceMethods TabListAsSeq;
+స్థిర PySequenceMethods TabListAsSeq;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
 } TabListObject;
 
-static TabListObject TheTabPageList =
+స్థిర TabListObject The_Tab_పుట_List =
 {
-    PyObject_HEAD_INIT_TYPE(TabListType)
+    Py_Object_తల_INIT_TYPE(TabListType)
 };
 
-    static PyInt
-TabListLength(PyObject *self UNUSED)
+    స్థిర PyInt
+Tab_List_నిడివి(PyObject *self వాడని)
 {
-    tabpage_T	*tp = first_tabpage;
+    tabpage_T	*tp = మొదటి_tabpage;
     PyInt	n = 0;
 
-    while (tp != NULL)
+    అయితే (tp != ఖాళీ)
     {
 	++n;
-	tp = tp->tp_next;
+	tp = tp->tp_తదుపరి;
     }
 
-    return n;
+    తిరిగి n;
 }
 
-    static PyObject *
-TabListItem(PyObject *self UNUSED, PyInt n)
+    స్థిర PyObject *
+Tab_List_అంశం(PyObject *self వాడని, PyInt n)
 {
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
-	if (n == 0)
-	    return TabPageNew(tp);
+    కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ; tp = tp->tp_తదుపరి, --n)
+	ఒకవేళ (n == 0)
+	    తిరిగి Tab_పుట_New(tp);
 
-    PyErr_SET_STRING(PyExc_IndexError, N_("no such tab page"));
-    return NULL;
+    Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("no such tab page"));
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Window object
  */
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     win_T	*win;
-    TabPageObject	*tabObject;
-} WindowObject;
+    Tab_పుట_Object	*tabObject;
+} కిటికీ_Object;
 
-DEFINE_PY_TYPE_OBJECT(WindowType);
+DEFINE_PY_TYPE_OBJECT(కిటికీ_Type);
 
-    static int
-CheckWindow(WindowObject *self)
+    స్థిర పూర్ణాంకం
+Check_కిటికీ(కిటికీ_Object *self)
 {
-    if (self->win == INVALID_WINDOW_VALUE)
+    ఒకవేళ (self->win == INVALID_కిటికీ_విలువ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted window"));
-	return -1;
+	Py_Err_సమితి_VIM(N_("attempt to refer to deleted window"));
+	తిరిగి -1;
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-CheckWindowCb(void *self)
+    స్థిర పూర్ణాంకం
+Check_కిటికీ_Cb(శూన్య *self)
 {
-    return CheckWindow((WindowObject*)self);
+    తిరిగి Check_కిటికీ((కిటికీ_Object*)self);
 }
 
-    static PyObject *
-WindowNew(win_T *win, tabpage_T *tab)
+    స్థిర PyObject *
+కిటికీ_New(win_T *win, tabpage_T *tab)
 {
     /*
      * We need to handle deletion of windows underneath us.
@@ -4588,73 +4588,73 @@ WindowNew(win_T *win, tabpage_T *tab)
      * w_python_ref and w_python3_ref fields respectively.
      */
 
-    WindowObject *self;
+    కిటికీ_Object *self;
 
-    if (WIN_PYTHON_REF(win))
+    ఒకవేళ (WIN_PYTHON_REF(win))
     {
 	self = WIN_PYTHON_REF(win);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    లేకపోతే
     {
-	self = PyObject_GC_New(WindowObject, WindowTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_GC_New(కిటికీ_Object, కిటికీ_Type_Ptr);
+	ఒకవేళ (self == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	self->win = win;
 	WIN_PYTHON_REF(win) = self;
     }
 
-    self->tabObject = ((TabPageObject *)(TabPageNew(tab)));
+    self->tabObject = ((Tab_పుట_Object *)(Tab_పుట_New(tab)));
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
-WindowDestructor(PyObject *self_obj)
+    స్థిర శూన్య
+కిటికీ_Destructor(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
-    if (self->win && self->win != INVALID_WINDOW_VALUE)
-	WIN_PYTHON_REF(self->win) = NULL;
+    కిటికీ_Object *self = (కిటికీ_Object*)self_obj;
+    PyObject_GC_UnTrack((శూన్య *)(self));
+    ఒకవేళ (self->win && self->win != INVALID_కిటికీ_విలువ)
+	WIN_PYTHON_REF(self->win) = ఖాళీ;
     Py_XDECREF(((PyObject *)(self->tabObject)));
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((శూన్య *)(self));
 }
 
-    static int
-WindowTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    స్థిర పూర్ణాంకం
+కిటికీ_Traverse(PyObject *self_obj, visitproc సందర్శించు, శూన్య *arg)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    Py_VISIT(((PyObject *)(self->tabObject)));
-    return 0;
+    కిటికీ_Object *self = (కిటికీ_Object*)self_obj;
+    Py_సందర్శించు(((PyObject *)(self->tabObject)));
+    తిరిగి 0;
 }
 
-    static int
-WindowClear(PyObject *self_obj)
+    స్థిర పూర్ణాంకం
+కిటికీ_Clear(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
+    కిటికీ_Object *self = (కిటికీ_Object*)self_obj;
     Py_CLEAR(self->tabObject);
-    return 0;
+    తిరిగి 0;
 }
 
-    static win_T *
-get_firstwin(TabPageObject *tabObject)
+    స్థిర win_T *
+get_firstwin(Tab_పుట_Object *tabObject)
 {
-    if (tabObject)
+    ఒకవేళ (tabObject)
     {
-	if (CheckTabPage(tabObject))
-	    return NULL;
+	ఒకవేళ (Check_Tab_పుట(tabObject))
+	    తిరిగి ఖాళీ;
 	// For current tab window.c does not bother to set or update tp_firstwin
-	else if (tabObject->tab == curtab)
-	    return firstwin;
-	else
-	    return tabObject->tab->tp_firstwin;
+	లేకపోతే ఒకవేళ (tabObject->tab == curtab)
+	    తిరిగి firstwin;
+	లేకపోతే
+	    తిరిగి tabObject->tab->tp_firstwin;
     }
-    else
-	return firstwin;
+    లేకపోతే
+	తిరిగి firstwin;
 }
 
 // Use the same order as in the WindowAttr() function.
-static char *WindowAttrs[] = {
+స్థిర అక్షరం *కిటికీ_Attrs[] = {
     "buffer",
     "cursor",
     "height",
@@ -4666,187 +4666,187 @@ static char *WindowAttrs[] = {
     "number",
     "tabpage",
     "valid",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-WindowDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+కిటికీ_Dir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, WindowAttrs);
+    తిరిగి ObjectDir(self, కిటికీ_Attrs);
 }
 
-    static PyObject *
-WindowAttrValid(WindowObject *self, char *name)
+    స్థిర PyObject *
+కిటికీ_Attr_Valid(కిటికీ_Object *self, అక్షరం *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ఒకవేళ (strcmp(name, "valid") != 0)
+	తిరిగి ఖాళీ;
 
-    ret = ((self->win == INVALID_WINDOW_VALUE) ? Py_False : Py_True);
+    ret = ((self->win == INVALID_కిటికీ_విలువ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-WindowAttr(WindowObject *self, char *name)
+    స్థిర PyObject *
+కిటికీ_Attr(కిటికీ_Object *self, అక్షరం *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(self->win->w_buffer);
-    else if (strcmp(name, "cursor") == 0)
+    ఒకవేళ (strcmp(name, "buffer") == 0)
+	తిరిగి (PyObject *)బఫరు_New(self->win->w_బఫరు);
+    లేకపోతే ఒకవేళ (strcmp(name, "cursor") == 0)
     {
 	pos_T *pos = &self->win->w_cursor;
 
-	return Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
+	తిరిగి Py_Build_విలువ("(ll)", (దీర్ఘ)(pos->lnum), (దీర్ఘ)(pos->నిలువు));
     }
-    else if (strcmp(name, "height") == 0)
-	return PyLong_FromLong((long)(self->win->w_height));
-    else if (strcmp(name, "row") == 0)
-	return PyLong_FromLong((long)(self->win->w_winrow));
-    else if (strcmp(name, "width") == 0)
-	return PyLong_FromLong((long)(self->win->w_width));
-    else if (strcmp(name, "col") == 0)
-	return PyLong_FromLong((long)(self->win->w_wincol));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->win->w_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
+    లేకపోతే ఒకవేళ (strcmp(name, "height") == 0)
+	తిరిగి PyLong_FromLong((దీర్ఘ)(self->win->w_ఎత్తు));
+    లేకపోతే ఒకవేళ (strcmp(name, "row") == 0)
+	తిరిగి PyLong_FromLong((దీర్ఘ)(self->win->w_winrow));
+    లేకపోతే ఒకవేళ (strcmp(name, "width") == 0)
+	తిరిగి PyLong_FromLong((దీర్ఘ)(self->win->w_వెడల్పు));
+    లేకపోతే ఒకవేళ (strcmp(name, "col") == 0)
+	తిరిగి PyLong_FromLong((దీర్ఘ)(self->win->w_wincol));
+    లేకపోతే ఒకవేళ (strcmp(name, "vars") == 0)
+	తిరిగి NEW_DICTIONARY(self->win->w_vars);
+    లేకపోతే ఒకవేళ (strcmp(name, "options") == 0)
+	తిరిగి OptionsNew(SREQ_WIN, self->win, Check_కిటికీ_Cb,
 			(PyObject *) self);
-    else if (strcmp(name, "number") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "number") == 0)
     {
-	if (CheckTabPage(self->tabObject))
-	    return NULL;
-	return PyLong_FromLong((long)
-		get_win_number(self->win, get_firstwin(self->tabObject)));
+	ఒకవేళ (Check_Tab_పుట(self->tabObject))
+	    తిరిగి ఖాళీ;
+	తిరిగి PyLong_FromLong((దీర్ఘ)
+		get_win_సంఖ్య(self->win, get_firstwin(self->tabObject)));
     }
-    else if (strcmp(name, "tabpage") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "tabpage") == 0)
     {
 	Py_INCREF((PyObject *)self->tabObject);
-	return (PyObject *)(self->tabObject);
+	తిరిగి (PyObject *)(self->tabObject);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, WindowAttrs);
-    else
-	return NULL;
+    లేకపోతే ఒకవేళ (strcmp(name, "__members__") == 0)
+	తిరిగి ObjectDir(ఖాళీ, కిటికీ_Attrs);
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
-    static int
-WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+కిటికీ_Setattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    if (CheckWindow(self))
-	return -1;
+    కిటికీ_Object *self = (కిటికీ_Object*)self_obj;
+    ఒకవేళ (Check_కిటికీ(self))
+	తిరిగి -1;
 
-    if (strcmp(name, "buffer") == 0)
+    ఒకవేళ (strcmp(name, "buffer") == 0)
     {
-	PyErr_SET_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
-	return -1;
+	Py_Err_సమితి_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
+	తిరిగి -1;
     }
-    else if (strcmp(name, "cursor") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "cursor") == 0)
     {
-	long lnum;
-	long col;
+	దీర్ఘ lnum;
+	దీర్ఘ నిలువు;
 
-	if (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
-	    return -1;
+	ఒకవేళ (!PyArg_Parse(valObject, "(ll)", &lnum, &నిలువు))
+	    తిరిగి -1;
 
-	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
+	ఒకవేళ (lnum <= 0 || lnum > self->win->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    PyErr_SET_VIM(N_("cursor position outside buffer"));
-	    return -1;
+	    Py_Err_సమితి_VIM(N_("cursor position outside buffer"));
+	    తిరిగి -1;
 	}
 
 	// Check for keyboard interrupts
-	if (VimCheckInterrupt())
-	    return -1;
+	ఒకవేళ (Vim_Check_అంతరాయం())
+	    తిరిగి -1;
 
 	self->win->w_cursor.lnum = lnum;
-	self->win->w_cursor.col = col;
-	self->win->w_set_curswant = TRUE;
+	self->win->w_cursor.నిలువు = నిలువు;
+	self->win->w_సమితి_curswant = TRUE;
 	self->win->w_cursor.coladd = 0;
 	// When column is out of range silently correct it.
-	check_cursor_col_win(self->win);
+	check_cursor_నిలువు_win(self->win);
 
 	update_screen(UPD_VALID);
-	return 0;
+	తిరిగి 0;
     }
-    else if (strcmp(name, "height") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "height") == 0)
     {
-	long	height;
+	దీర్ఘ	ఎత్తు;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	ఒకవేళ (సంఖ్య_గమ్యం_Long(valObject, &ఎత్తు, సంఖ్య_INT|సంఖ్య_UNSIGNED))
+	    తిరిగి -1;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 	savewin = curwin;
 	curwin = self->win;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
 
-	VimTryStart();
-	win_setheight((int) height);
+	Vim_Try_ప్రారంభం();
+	win_setheight((పూర్ణాంకం) ఎత్తు);
 	curwin = savewin;
-	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	curbuf = curwin->w_బఫరు;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి -1;
 
-	return 0;
+	తిరిగి 0;
     }
-    else if (strcmp(name, "width") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "width") == 0)
     {
-	long	width;
+	దీర్ఘ	వెడల్పు;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	ఒకవేళ (సంఖ్య_గమ్యం_Long(valObject, &వెడల్పు, సంఖ్య_INT|సంఖ్య_UNSIGNED))
+	    తిరిగి -1;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 	savewin = curwin;
 	curwin = self->win;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
 
-	VimTryStart();
-	win_setwidth((int) width);
+	Vim_Try_ప్రారంభం();
+	win_setwidth((పూర్ణాంకం) వెడల్పు);
 	curwin = savewin;
-	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	curbuf = curwin->w_బఫరు;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి -1;
 
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_సమితి_String(PyExc_AttributeError, name);
+	తిరిగి -1;
     }
 }
 
-    static PyObject *
-WindowRepr(PyObject *self_obj)
+    స్థిర PyObject *
+కిటికీ_Repr(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    if (self->win == INVALID_WINDOW_VALUE)
-	return PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
-    else
+    కిటికీ_Object *self = (కిటికీ_Object*)self_obj;
+    ఒకవేళ (self->win == INVALID_కిటికీ_విలువ)
+	తిరిగి PyString_FromFormat("<window object (deleted) at %p>", (శూన్య *)self);
+    లేకపోతే
     {
-	int	w = get_win_number(self->win, firstwin);
+	పూర్ణాంకం	w = get_win_సంఖ్య(self->win, firstwin);
 
-	if (w == 0)
-	    return PyString_FromFormat("<window object (unknown) at %p>",
-								      (void *)self);
-	else
-	    return PyString_FromFormat("<window %d>", w - 1);
+	ఒకవేళ (w == 0)
+	    తిరిగి PyString_FromFormat("<window object (unknown) at %p>",
+								      (శూన్య *)self);
+	లేకపోతే
+	    తిరిగి PyString_FromFormat("<window %d>", w - 1);
     }
 }
 
-static struct PyMethodDef WindowMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def కిటికీ_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"__dir__",	    (PyCFunction)WindowDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"__dir__",	    (PyCFunction)కిటికీ_Dir,	METH_NOARGS,	""},
+    { ఖాళీ,	    ఖాళీ,			0,		ఖాళీ}
 };
 
 /*
@@ -4854,22 +4854,22 @@ static struct PyMethodDef WindowMethods[] = {
  */
 
 DEFINE_PY_TYPE_OBJECT(WinListType);
-static PySequenceMethods WinListAsSeq;
+స్థిర PySequenceMethods WinListAsSeq;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    TabPageObject	*tabObject;
+    Py_Object_తల
+    Tab_పుట_Object	*tabObject;
 } WinListObject;
 
-static WinListObject TheWindowList =
+స్థిర WinListObject The_కిటికీ_List =
 {
-    PyObject_HEAD_INIT_TYPE(WinListType)
-    NULL
+    Py_Object_తల_INIT_TYPE(WinListType)
+    ఖాళీ
 };
 
-    static PyObject *
-WinListNew(TabPageObject *tabObject)
+    స్థిర PyObject *
+WinListNew(Tab_పుట_Object *tabObject)
 {
     WinListObject	*self;
 
@@ -4877,54 +4877,54 @@ WinListNew(TabPageObject *tabObject)
     self->tabObject = tabObject;
     Py_INCREF((PyObject *)tabObject);
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
+    స్థిర శూన్య
 WinListDestructor(WinListObject *self)
 {
-    TabPageObject	*tabObject = self->tabObject;
+    Tab_పుట_Object	*tabObject = self->tabObject;
 
-    if (tabObject)
+    ఒకవేళ (tabObject)
     {
 	Py_DECREF((PyObject *)(tabObject));
     }
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-    static PyInt
-WinListLength(WinListObject *self)
+    స్థిర PyInt
+Win_List_నిడివి(WinListObject *self)
 {
     win_T	*w;
     PyInt	n = 0;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return -1;
+    ఒకవేళ (!(w = get_firstwin(self->tabObject)))
+	తిరిగి -1;
 
-    while (w != NULL)
+    అయితే (w != ఖాళీ)
     {
 	++n;
-	w = W_NEXT(w);
+	w = W_తదుపరి(w);
     }
 
-    return n;
+    తిరిగి n;
 }
 
-    static PyObject *
-WinListItem(WinListObject *self, PyInt n)
+    స్థిర PyObject *
+Win_List_అంశం(WinListObject *self, PyInt n)
 {
     win_T *w;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return NULL;
+    ఒకవేళ (!(w = get_firstwin(self->tabObject)))
+	తిరిగి ఖాళీ;
 
-    for (; w != NULL; w = W_NEXT(w), --n)
-	if (n == 0)
-	    return WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
+    కొరకు (; w != ఖాళీ; w = W_తదుపరి(w), --n)
+	ఒకవేళ (n == 0)
+	    తిరిగి కిటికీ_New(w, self->tabObject? self->tabObject->tab: curtab);
 
-    PyErr_SET_STRING(PyExc_IndexError, N_("no such window"));
-    return NULL;
+    Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("no such window"));
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -4936,47 +4936,47 @@ WinListItem(WinListObject *self, PyInt n)
  *
  * On errors, the Python exception data is set, and NULL is returned.
  */
-    static char *
-StringToLine(PyObject *obj)
+    స్థిర అక్షరం *
+String_గమ్యం_పంక్తి(PyObject *obj)
 {
-    char	*str;
-    char	*save;
-    PyObject	*bytes = NULL;
+    అక్షరం	*str;
+    అక్షరం	*save;
+    PyObject	*బైట్లు = ఖాళీ;
     Py_ssize_t	len = 0;
     PyInt	i;
-    char	*p;
+    అక్షరం	*p;
 
-    if (PyBytes_Check(obj))
+    ఒకవేళ (Py_బైట్లు_Check(obj))
     {
-	if (PyBytes_AsStringAndSize(obj, &str, &len) == -1
-		|| str == NULL)
-	    return NULL;
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(obj, &str, &len) == -1
+		|| str == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
-    else if (PyUnicode_Check(obj))
+    లేకపోతే ఒకవేళ (PyUnicode_Check(obj))
     {
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	ఒకవేళ (!(బైట్లు = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    తిరిగి ఖాళీ;
 
-	if (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
-		|| str == NULL)
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(బైట్లు, &str, &len) == -1
+		|| str == ఖాళీ)
 	{
-	    Py_DECREF(bytes);
-	    return NULL;
+	    Py_DECREF(బైట్లు);
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
+    లేకపోతే
     {
-#if PY_MAJOR_VERSION < 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#లేకపోతే
 	PyErr_FORMAT_TYPE(
 		N_("expected bytes() or str() instance, but got %s"),
 		obj);
-#endif
-	return NULL;
+#అయితే_ముగింపు
+	తిరిగి ఖాళీ;
     }
 
     /*
@@ -4986,15 +4986,15 @@ StringToLine(PyObject *obj)
      * A trailing newline is removed, so that append(f.readlines()) works.
      */
     p = memchr(str, '\n', len);
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	if (p == str + len - 1)
+	ఒకవేళ (p == str + len - 1)
 	    --len;
-	else
+	లేకపోతే
 	{
-	    PyErr_SET_VIM(N_("string cannot contain newlines"));
-	    Py_XDECREF(bytes);
-	    return NULL;
+	    Py_Err_సమితి_VIM(N_("string cannot contain newlines"));
+	    Py_XDECREF(బైట్లు);
+	    తిరిగి ఖాళీ;
 	}
     }
 
@@ -5003,25 +5003,25 @@ StringToLine(PyObject *obj)
      * newline characters, as is the Vim convention.
      */
     save = alloc(len+1);
-    if (save == NULL)
+    ఒకవేళ (save == ఖాళీ)
     {
-	PyErr_NoMemory();
-	Py_XDECREF(bytes);
-	return NULL;
+	Py_Err_No_జ్ఞాపకం();
+	Py_XDECREF(బైట్లు);
+	తిరిగి ఖాళీ;
     }
 
-    for (i = 0; i < len; ++i)
+    కొరకు (i = 0; i < len; ++i)
     {
-	if (str[i] == '\0')
+	ఒకవేళ (str[i] == '\0')
 	    save[i] = '\n';
-	else
+	లేకపోతే
 	    save[i] = str[i];
     }
 
     save[i] = '\0';
-    Py_XDECREF(bytes);  // Python 2 does nothing here
+    Py_XDECREF(బైట్లు);  // Python 2 does nothing here
 
-    return save;
+    తిరిగి save;
 }
 
 /*
@@ -5029,10 +5029,10 @@ StringToLine(PyObject *obj)
  * in Vim format (1-based). The line is returned as a Python
  * string object.
  */
-    static PyObject *
-GetBufferLine(buf_T *buf, PyInt n)
+    స్థిర PyObject *
+Get_బఫరు_పంక్తి(buf_T *buf, PyInt n)
 {
-    return LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
+    తిరిగి పంక్తి_గమ్యం_String((అక్షరం *)ml_get_buf(buf, (linenr_T)n, FALSE));
 }
 
 
@@ -5041,41 +5041,41 @@ GetBufferLine(buf_T *buf, PyInt n)
  * are in Vim format (1-based). The range is from lo up to, but not
  * including, hi. The list is returned as a Python list of string objects.
  */
-    static PyObject *
-GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
+    స్థిర PyObject *
+Get_బఫరు_పంక్తి_List(buf_T *buf, PyInt lo, PyInt hi)
 {
     PyInt	i;
     PyInt	n = hi - lo;
     PyObject	*list = PyList_New(n);
 
-    if (list == NULL)
-	return NULL;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (i = 0; i < n; ++i)
+    కొరకు (i = 0; i < n; ++i)
     {
 	linenr_T	lnum = (linenr_T)(lo + i);
-	char		*text;
+	అక్షరం		*పాఠ్యం;
 	PyObject	*string;
 
-	if (lnum > buf->b_ml.ml_line_count)
-	    text = "";
-	else
-	    text = (char *)ml_get_buf(buf, lnum, FALSE);
-	string = LineToString(text);
-	if (string == NULL)
+	ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	    పాఠ్యం = "";
+	లేకపోతే
+	    పాఠ్యం = (అక్షరం *)ml_get_buf(buf, lnum, FALSE);
+	string = పంక్తి_గమ్యం_String(పాఠ్యం);
+	ఒకవేళ (string == ఖాళీ)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	PyList_SET_ITEM(list, i, string);
+	Py_List_సమితి_అంశం(list, i, string);
     }
 
     // The ownership of the Python list is passed to the caller (ie,
     // the caller should Py_DECREF() the object when it is finished
     // with it).
 
-    return list;
+    తిరిగి list;
 }
 
 /*
@@ -5083,26 +5083,26 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
  * Changed the lines from "lo" to "hi" and added "extra" lines (negative if
  * deleted).
  */
-    static void
+    స్థిర శూన్య
 py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    ఒకవేళ (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	ఒకవేళ (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
-	    check_cursor_col();
+	    check_cursor_నిలువు();
 	}
-	else if (extra < 0)
+	లేకపోతే ఒకవేళ (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
-	    check_cursor_col();
-	changed_cline_bef_curs();
+	లేకపోతే
+	    check_cursor_నిలువు();
+	మారింది_cline_bef_curs();
     }
     invalidate_botline();
 }
@@ -5116,10 +5116,10 @@ py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
+    స్థిర పూర్ణాంకం
+సమితి_బఫరు_పంక్తి_2(buf_T *buf, PyInt n, PyObject *పంక్తి, PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ఖాళీ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
@@ -5127,85 +5127,85 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
     //	  1. NULL, or None - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (line == Py_None || line == NULL)
+    ఒకవేళ (పంక్తి == Py_None || పంక్తి == ఖాళీ)
     {
 	PyErr_Clear();
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switchwin.sw_curwin = ఖాళీ;
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	ఒకవేళ (u_savedel((linenr_T)n, 1L) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_delete((linenr_T)n) == FAIL)
-	    RAISE_DELETE_LINE_FAIL;
-	else
+	లేకపోతే ఒకవేళ (ml_delete((linenr_T)n) == FAIL)
+	    RAISE_DELETE_పంక్తి_FAIL;
+	లేకపోతే
 	{
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
-					   || save_curbuf.br_buf == NULL))
+	    ఒకవేళ (buf == curbuf && (switchwin.sw_curwin != ఖాళీ
+					   || save_curbuf.br_buf == ఖాళీ))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)n, (linenr_T)n + 1, (linenr_T)-1);
-	    if (save_curbuf.br_buf == NULL)
+	    ఒకవేళ (save_curbuf.br_buf == ఖాళీ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)n, 1L);
+		deleted_పంక్తులు_mark((linenr_T)n, 1L);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
+	ఒకవేళ (len_change)
 	    *len_change = -1;
 
-	return OK;
+	తిరిగి OK;
     }
-    else if (PyBytes_Check(line) || PyUnicode_Check(line))
+    లేకపోతే ఒకవేళ (Py_బైట్లు_Check(పంక్తి) || PyUnicode_Check(పంక్తి))
     {
-	char	*save = StringToLine(line);
+	అక్షరం	*save = String_గమ్యం_పంక్తి(పంక్తి);
 
-	if (save == NULL)
-	    return FAIL;
+	ఒకవేళ (save == ఖాళీ)
+	    తిరిగి FAIL;
 
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 
 	// We do not need to free "save" if ml_replace() consumes it.
 	PyErr_Clear();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	ఒకవేళ (u_savesub((linenr_T)n) == FAIL)
 	{
 	    RAISE_UNDO_FAIL;
 	    vim_free(save);
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
+	లేకపోతే ఒకవేళ (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
 	{
-	    RAISE_REPLACE_LINE_FAIL;
+	    RAISE_REPLACE_పంక్తి_FAIL;
 	    vim_free(save);
 	}
-	else
-	    changed_bytes((linenr_T)n, 0);
+	లేకపోతే
+	    మారింది_బైట్లు((linenr_T)n, 0);
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf == curbuf)
-	    check_cursor_col();
+	ఒకవేళ (buf == curbuf)
+	    check_cursor_నిలువు();
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
+	ఒకవేళ (len_change)
 	    *len_change = 0;
 
-	return OK;
+	తిరిగి OK;
     }
-    else
+    లేకపోతే
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_వాదం();
+	తిరిగి FAIL;
     }
 }
 
@@ -5218,15 +5218,15 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-SetBufferLineList(
+    స్థిర పూర్ణాంకం
+సమితి_బఫరు_పంక్తి_List(
 	buf_T *buf,
 	PyInt lo,
 	PyInt hi,
 	PyObject *list,
 	PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ఖాళీ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
@@ -5234,103 +5234,103 @@ SetBufferLineList(
     //	  1. NULL, or None - this is a deletion.
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (list == Py_None || list == NULL)
+    ఒకవేళ (list == Py_None || list == ఖాళీ)
     {
 	PyInt	i;
-	PyInt	n = (int)(hi - lo);
+	PyInt	n = (పూర్ణాంకం)(hi - lo);
 
 	PyErr_Clear();
-	VimTryStart();
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ప్రారంభం();
+	switchwin.sw_curwin = ఖాళీ;
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savedel((linenr_T)lo, (long)n) == FAIL)
+	ఒకవేళ (u_savedel((linenr_T)lo, (దీర్ఘ)n) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	లేకపోతే
 	{
-	    for (i = 0; i < n; ++i)
+	    కొరకు (i = 0; i < n; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		ఒకవేళ (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    RAISE_DELETE_పంక్తి_FAIL;
+		    ఆపు;
 		}
 	    }
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
-					       || save_curbuf.br_buf == NULL))
+	    ఒకవేళ (buf == curbuf && (switchwin.sw_curwin != ఖాళీ
+					       || save_curbuf.br_buf == ఖాళీ))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)-n);
-	    if (save_curbuf.br_buf == NULL)
+	    ఒకవేళ (save_curbuf.br_buf == ఖాళీ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)lo, (long)i);
+		deleted_పంక్తులు_mark((linenr_T)lo, (దీర్ఘ)i);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
+	ఒకవేళ (len_change)
 	    *len_change = -n;
 
-	return OK;
+	తిరిగి OK;
     }
-    else if (PyList_Check(list))
+    లేకపోతే ఒకవేళ (PyList_Check(list))
     {
 	PyInt	i;
-	PyInt	new_len = PyList_Size(list);
+	PyInt	new_len = Py_List_కొలత(list);
 	PyInt	old_len = hi - lo;
 	PyInt	extra = 0;	// lines added to text, can be negative
-	char	**array;
+	అక్షరం	**array;
 
-	if (new_len == 0)	// avoid allocating zero bytes
-	    array = NULL;
-	else
+	ఒకవేళ (new_len == 0)	// avoid allocating zero bytes
+	    array = ఖాళీ;
+	లేకపోతే
 	{
-	    array = PyMem_New(char *, new_len);
-	    if (array == NULL)
+	    array = PyMem_New(అక్షరం *, new_len);
+	    ఒకవేళ (array == ఖాళీ)
 	    {
-		PyErr_NoMemory();
-		return FAIL;
+		Py_Err_No_జ్ఞాపకం();
+		తిరిగి FAIL;
 	    }
 	}
 
-	for (i = 0; i < new_len; ++i)
+	కొరకు (i = 0; i < new_len; ++i)
 	{
-	    PyObject *line;
+	    PyObject *పంక్తి;
 
-	    if (!(line = PyList_GetItem(list, i)) ||
-		!(array[i] = StringToLine(line)))
+	    ఒకవేళ (!(పంక్తి = Py_List_Get_అంశం(list, i)) ||
+		!(array[i] = String_గమ్యం_పంక్తి(పంక్తి)))
 	    {
-		while (i)
+		అయితే (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 	PyErr_Clear();
 
 	// START of region without "return".  Must call restore_buffer()!
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switchwin.sw_curwin = ఖాళీ;
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	ఒకవేళ (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    RAISE_UNDO_FAIL;
 
 	// If the size of the range is reducing (ie, new_len < old_len) we
 	// need to delete some old_len. We do this at the start, by
 	// repeatedly deleting line "lo".
-	if (!PyErr_Occurred())
+	ఒకవేళ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len - new_len; ++i)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    కొరకు (i = 0; i < old_len - new_len; ++i)
+		ఒకవేళ (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    RAISE_DELETE_పంక్తి_FAIL;
+		    ఆపు;
 		}
 	    extra -= i;
 	}
@@ -5338,31 +5338,31 @@ SetBufferLineList(
 	// For as long as possible, replace the existing old_len with the
 	// new old_len. This is a more efficient operation, as it requires
 	// less memory allocation and freeing.
-	if (!PyErr_Occurred())
+	ఒకవేళ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len && i < new_len; ++i)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
+	    కొరకు (i = 0; i < old_len && i < new_len; ++i)
+		ఒకవేళ (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
 								      == FAIL)
 		{
-		    RAISE_REPLACE_LINE_FAIL;
-		    break;
+		    RAISE_REPLACE_పంక్తి_FAIL;
+		    ఆపు;
 		}
 	}
-	else
+	లేకపోతే
 	    i = 0;
 
 	// Now we may need to insert the remaining new old_len. If we do, we
 	// must free the strings as we finish with them (we can't pass the
 	// responsibility to Vim in this case).
-	if (!PyErr_Occurred())
+	ఒకవేళ (!PyErr_Occurred())
 	{
-	    while (i < new_len)
+	    అయితే (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		ఒకవేళ (ml_append((linenr_T)(lo + i - 1),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
-		    break;
+		    RAISE_చొప్పించు_పంక్తి_FAIL;
+		    ఆపు;
 		}
 		vim_free(array[i]);
 		++i;
@@ -5371,7 +5371,7 @@ SetBufferLineList(
 	}
 
 	// Free any left-over old_len, as a result of an error
-	while (i < new_len)
+	అయితే (i < new_len)
 	{
 	    vim_free(array[i]);
 	    ++i;
@@ -5386,15 +5386,15 @@ SetBufferLineList(
 	// changed range, and move any in the remainder of the buffer.
 	// Only adjust marks if we managed to switch to a window that holds
 	// the buffer, otherwise line numbers will be invalid.
-	if (save_curbuf.br_buf == NULL)
+	ఒకవేళ (save_curbuf.br_buf == ఖాళీ)
 	{
 	    mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
-						  (long)MAXLNUM, (long)extra);
-	    changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
+						  (దీర్ఘ)MAXLNUM, (దీర్ఘ)extra);
+	    మారింది_పంక్తులు((linenr_T)lo, 0, (linenr_T)hi, (దీర్ఘ)extra);
 	}
 
-	if (buf == curbuf && (switchwin.sw_curwin != NULL
-					   || save_curbuf.br_buf == NULL))
+	ఒకవేళ (buf == curbuf && (switchwin.sw_curwin != ఖాళీ
+					   || save_curbuf.br_buf == ఖాళీ))
 	    // Using an existing window for the buffer, adjust the cursor
 	    // position.
 	    py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)extra);
@@ -5402,18 +5402,18 @@ SetBufferLineList(
 	// END of region without "return".
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
+	ఒకవేళ (len_change)
 	    *len_change = new_len - old_len;
 
-	return OK;
+	తిరిగి OK;
     }
-    else
+    లేకపోతే
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_వాదం();
+	తిరిగి FAIL;
     }
 }
 
@@ -5426,100 +5426,100 @@ SetBufferLineList(
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
+    స్థిర పూర్ణాంకం
+చొప్పించు_బఫరు_పంక్తులు(buf_T *buf, PyInt n, PyObject *పంక్తులు, PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ఖాళీ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
     // It must be a string or a list, or the call is in error.
-    if (PyBytes_Check(lines) || PyUnicode_Check(lines))
+    ఒకవేళ (Py_బైట్లు_Check(పంక్తులు) || PyUnicode_Check(పంక్తులు))
     {
-	char		*str = StringToLine(lines);
+	అక్షరం		*str = String_గమ్యం_పంక్తి(పంక్తులు);
 
-	if (str == NULL)
-	    return FAIL;
+	ఒకవేళ (str == ఖాళీ)
+	    తిరిగి FAIL;
 
 	PyErr_Clear();
-	VimTryStart();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ప్రారంభం();
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	ఒకవేళ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
-	    RAISE_INSERT_LINE_FAIL;
-	else if (save_curbuf.br_buf == NULL)
+	లేకపోతే ఒకవేళ (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	    RAISE_చొప్పించు_పంక్తి_FAIL;
+	లేకపోతే ఒకవేళ (save_curbuf.br_buf == ఖాళీ)
 	    // Only adjust marks if we managed to switch to a window that
 	    // holds the buffer, otherwise line numbers will be invalid.
-	    appended_lines_mark((linenr_T)n, 1L);
+	    appended_పంక్తులు_mark((linenr_T)n, 1L);
 
 	vim_free(str);
 	restore_win_for_buf(&switchwin, &save_curbuf);
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
+	ఒకవేళ (len_change)
 	    *len_change = 1;
 
-	return OK;
+	తిరిగి OK;
     }
-    else if (PyList_Check(lines))
+    లేకపోతే ఒకవేళ (PyList_Check(పంక్తులు))
     {
 	PyInt	i;
-	PyInt	size = PyList_Size(lines);
-	char	**array;
+	PyInt	కొలత = Py_List_కొలత(పంక్తులు);
+	అక్షరం	**array;
 
-	array = PyMem_New(char *, size);
-	if (array == NULL)
+	array = PyMem_New(అక్షరం *, కొలత);
+	ఒకవేళ (array == ఖాళీ)
 	{
-	    PyErr_NoMemory();
-	    return FAIL;
+	    Py_Err_No_జ్ఞాపకం();
+	    తిరిగి FAIL;
 	}
 
-	for (i = 0; i < size; ++i)
+	కొరకు (i = 0; i < కొలత; ++i)
 	{
-	    PyObject *line;
+	    PyObject *పంక్తి;
 
-	    if (!(line = PyList_GetItem(lines, i)) ||
-		!(array[i] = StringToLine(line)))
+	    ఒకవేళ (!(పంక్తి = Py_List_Get_అంశం(పంక్తులు, i)) ||
+		!(array[i] = String_గమ్యం_పంక్తి(పంక్తి)))
 	    {
-		while (i)
+		అయితే (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
 	PyErr_Clear();
-	VimTryStart();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ప్రారంభం();
+	switch_గమ్యం_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	ఒకవేళ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	లేకపోతే
 	{
-	    for (i = 0; i < size; ++i)
+	    కొరకు (i = 0; i < కొలత; ++i)
 	    {
-		if (ml_append((linenr_T)(n + i),
+		ఒకవేళ (ml_append((linenr_T)(n + i),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
+		    RAISE_చొప్పించు_పంక్తి_FAIL;
 
 		    // Free the rest of the lines
-		    while (i < size)
+		    అయితే (i < కొలత)
 			vim_free(array[i++]);
 
-		    break;
+		    ఆపు;
 		}
 		vim_free(array[i]);
 	    }
-	    if (i > 0 && save_curbuf.br_buf == NULL)
+	    ఒకవేళ (i > 0 && save_curbuf.br_buf == ఖాళీ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		appended_lines_mark((linenr_T)n, (long)i);
+		appended_పంక్తులు_mark((linenr_T)n, (దీర్ఘ)i);
 	}
 
 	// Free the array of lines. All of its contents have now
@@ -5529,18 +5529,18 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి FAIL;
 
-	if (len_change)
-	    *len_change = size;
+	ఒకవేళ (len_change)
+	    *len_change = కొలత;
 
-	return OK;
+	తిరిగి OK;
     }
-    else
+    లేకపోతే
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_వాదం();
+	తిరిగి FAIL;
     }
 }
 
@@ -5549,332 +5549,332 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
  * -------------------------------------------
  */
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
     buf_T *buf;
-} BufferObject;
+} బఫరు_Object;
 
-    static int
-CheckBuffer(BufferObject *self)
+    స్థిర పూర్ణాంకం
+Check_బఫరు(బఫరు_Object *self)
 {
-    if (self->buf == INVALID_BUFFER_VALUE)
+    ఒకవేళ (self->buf == INVALID_బఫరు_విలువ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted buffer"));
-	return -1;
+	Py_Err_సమితి_VIM(N_("attempt to refer to deleted buffer"));
+	తిరిగి -1;
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-CheckBufferCb(void *self)
+    స్థిర పూర్ణాంకం
+Check_బఫరు_Cb(శూన్య *self)
 {
-    return CheckBuffer((BufferObject*)self);
+    తిరిగి Check_బఫరు((బఫరు_Object*)self);
 }
 
-    static PyObject *
-RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
+    స్థిర PyObject *
+RBItem(బఫరు_Object *self, PyInt n, PyInt ప్రారంభం, PyInt చివర)
 {
-    if (CheckBuffer(self))
-	return NULL;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి ఖాళీ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == -1)
+	చివర = self->buf->b_ml.ml_పంక్తి_లెక్క;
 
-    if (n < 0)
-	n += end - start + 1;
+    ఒకవేళ (n < 0)
+	n += చివర - ప్రారంభం + 1;
 
-    if (n < 0 || n > end - start)
+    ఒకవేళ (n < 0 || n > చివర - ప్రారంభం)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("line number out of range"));
+	తిరిగి ఖాళీ;
     }
 
-    return GetBufferLine(self->buf, n+start);
+    తిరిగి Get_బఫరు_పంక్తి(self->buf, n+ప్రారంభం);
 }
 
-    static PyObject *
-RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
+    స్థిర PyObject *
+RBSlice(బఫరు_Object *self, PyInt lo, PyInt hi, PyInt ప్రారంభం, PyInt చివర)
 {
-    PyInt size;
+    PyInt కొలత;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి ఖాళీ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == -1)
+	చివర = self->buf->b_ml.ml_పంక్తి_లెక్క;
 
-    size = end - start + 1;
+    కొలత = చివర - ప్రారంభం + 1;
 
-    if (lo < 0)
+    ఒకవేళ (lo < 0)
 	lo = 0;
-    else if (lo > size)
-	lo = size;
-    if (hi < 0)
+    లేకపోతే ఒకవేళ (lo > కొలత)
+	lo = కొలత;
+    ఒకవేళ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    ఒకవేళ (hi < lo)
 	hi = lo;
-    else if (hi > size)
-	hi = size;
+    లేకపోతే ఒకవేళ (hi > కొలత)
+	hi = కొలత;
 
-    return GetBufferLineList(self->buf, lo+start, hi+start);
+    తిరిగి Get_బఫరు_పంక్తి_List(self->buf, lo+ప్రారంభం, hi+ప్రారంభం);
 }
 
-    static PyInt
-RBAsItem(
-	BufferObject *self,
+    స్థిర PyInt
+RBAs_అంశం(
+	బఫరు_Object *self,
 	PyInt n,
 	PyObject *valObject,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	PyInt ప్రారంభం,
+	PyInt చివర,
+	PyInt *new_చివర)
 {
     PyInt len_change;
 
-    if (CheckBuffer(self))
-	return -1;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి -1;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == -1)
+	చివర = self->buf->b_ml.ml_పంక్తి_లెక్క;
 
-    if (n < 0)
-	n += end - start + 1;
+    ఒకవేళ (n < 0)
+	n += చివర - ప్రారంభం + 1;
 
-    if (n < 0 || n > end - start)
+    ఒకవేళ (n < 0 || n > చివర - ప్రారంభం)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return -1;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("line number out of range"));
+	తిరిగి -1;
     }
 
-    if (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
-	return -1;
+    ఒకవేళ (సమితి_బఫరు_పంక్తి_2(self->buf, n+ప్రారంభం, valObject, &len_change) == FAIL)
+	తిరిగి -1;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ఒకవేళ (new_చివర)
+	*new_చివర = చివర + len_change;
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyInt
-RBAsSlice(
-	BufferObject *self,
+    స్థిర PyInt
+RBAs_ముక్క(
+	బఫరు_Object *self,
 	PyInt lo,
 	PyInt hi,
 	PyObject *valObject,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	PyInt ప్రారంభం,
+	PyInt చివర,
+	PyInt *new_చివర)
 {
-    PyInt size;
+    PyInt కొలత;
     PyInt len_change;
 
     // Self must be a valid buffer
-    if (CheckBuffer(self))
-	return -1;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి -1;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == -1)
+	చివర = self->buf->b_ml.ml_పంక్తి_లెక్క;
 
     // Sort out the slice range
-    size = end - start + 1;
+    కొలత = చివర - ప్రారంభం + 1;
 
-    if (lo < 0)
+    ఒకవేళ (lo < 0)
 	lo = 0;
-    else if (lo > size)
-	lo = size;
-    if (hi < 0)
+    లేకపోతే ఒకవేళ (lo > కొలత)
+	lo = కొలత;
+    ఒకవేళ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    ఒకవేళ (hi < lo)
 	hi = lo;
-    else if (hi > size)
-	hi = size;
+    లేకపోతే ఒకవేళ (hi > కొలత)
+	hi = కొలత;
 
-    if (SetBufferLineList(self->buf, lo + start, hi + start,
+    ఒకవేళ (సమితి_బఫరు_పంక్తి_List(self->buf, lo + ప్రారంభం, hi + ప్రారంభం,
 						valObject, &len_change) == FAIL)
-	return -1;
+	తిరిగి -1;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ఒకవేళ (new_చివర)
+	*new_చివర = చివర + len_change;
 
-    return 0;
+    తిరిగి 0;
 }
 
 
-    static PyObject *
+    స్థిర PyObject *
 RBAppend(
-	BufferObject *self,
-	PyObject *args,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	బఫరు_Object *self,
+	PyObject *వాదనలు,
+	PyInt ప్రారంభం,
+	PyInt చివర,
+	PyInt *new_చివర)
 {
-    PyObject *lines;
+    PyObject *పంక్తులు;
     PyInt len_change;
     PyInt max;
     PyInt n;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి ఖాళీ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర == -1)
+	చివర = self->buf->b_ml.ml_పంక్తి_లెక్క;
 
-    max = n = end - start + 1;
+    max = n = చివర - ప్రారంభం + 1;
 
-    if (!PyArg_ParseTuple(args, "O|n", &lines, &n))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "O|n", &పంక్తులు, &n))
+	తిరిగి ఖాళీ;
 
-    if (n < 0 || n > max)
+    ఒకవేళ (n < 0 || n > max)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	Py_Err_సమితి_STRING(Py_Exc_సూచీ_Error, N_("line number out of range"));
+	తిరిగి ఖాళీ;
     }
 
-    if (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
-	return NULL;
+    ఒకవేళ (చొప్పించు_బఫరు_పంక్తులు(self->buf, n + ప్రారంభం - 1, పంక్తులు, &len_change) == FAIL)
+	తిరిగి ఖాళీ;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ఒకవేళ (new_చివర)
+	*new_చివర = చివర + len_change;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    తిరిగి Py_None;
 }
 
 // Range object
 
 DEFINE_PY_TYPE_OBJECT(RangeType);
-static PySequenceMethods RangeAsSeq;
-static PyMappingMethods RangeAsMapping;
+స్థిర PySequenceMethods RangeAsSeq;
+స్థిర PyMappingMethods RangeAsMapping;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
-    BufferObject *buf;
-    PyInt start;
-    PyInt end;
+    Py_Object_తల
+    బఫరు_Object *buf;
+    PyInt ప్రారంభం;
+    PyInt చివర;
 } RangeObject;
 
-    static PyObject *
-RangeNew(buf_T *buf, PyInt start, PyInt end)
+    స్థిర PyObject *
+RangeNew(buf_T *buf, PyInt ప్రారంభం, PyInt చివర)
 {
-    BufferObject *bufr;
+    బఫరు_Object *bufr;
     RangeObject *self;
     self = PyObject_GC_New(RangeObject, RangeTypePtr);
-    if (self == NULL)
-	return NULL;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    bufr = (BufferObject *)BufferNew(buf);
-    if (bufr == NULL)
+    bufr = (బఫరు_Object *)బఫరు_New(buf);
+    ఒకవేళ (bufr == ఖాళీ)
     {
 	Py_DECREF(self);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     Py_INCREF((PyObject *)bufr);
 
     self->buf = bufr;
-    self->start = start;
-    self->end = end;
+    self->ప్రారంభం = ప్రారంభం;
+    self->చివర = చివర;
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
+    స్థిర శూన్య
 RangeDestructor(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((శూన్య *)(self));
     Py_XDECREF(((PyObject *)(self->buf)));
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((శూన్య *)(self));
 }
 
-    static int
-RangeTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    స్థిర పూర్ణాంకం
+RangeTraverse(PyObject *self_obj, visitproc సందర్శించు, శూన్య *arg)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    Py_VISIT(((PyObject *)(self->buf)));
-    return 0;
+    Py_సందర్శించు(((PyObject *)(self->buf)));
+    తిరిగి 0;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 RangeClear(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_CLEAR(self->buf);
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyInt
-RangeLength(RangeObject *self)
+    స్థిర PyInt
+Range_నిడివి(RangeObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self->buf))
-	return -1; // ???
+    ఒకవేళ (Check_బఫరు(self->buf))
+	తిరిగి -1; // ???
 
-    return (self->end - self->start + 1);
+    తిరిగి (self->చివర - self->ప్రారంభం + 1);
 }
 
-    static PyObject *
-RangeItem(RangeObject *self, PyInt n)
+    స్థిర PyObject *
+Range_అంశం(RangeObject *self, PyInt n)
 {
-    return RBItem(self->buf, n, self->start, self->end);
+    తిరిగి RBItem(self->buf, n, self->ప్రారంభం, self->చివర);
 }
 
-    static PyObject *
-RangeSlice(RangeObject *self, PyInt lo, PyInt hi)
+    స్థిర PyObject *
+Range_ముక్క(RangeObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self->buf, lo, hi, self->start, self->end);
+    తిరిగి RBSlice(self->buf, lo, hi, self->ప్రారంభం, self->చివర);
 }
 
-static char *RangeAttrs[] = {
+స్థిర అక్షరం *RangeAttrs[] = {
     "start", "end",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-RangeDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+RangeDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, RangeAttrs);
+    తిరిగి ObjectDir(self, RangeAttrs);
 }
 
-    static PyObject *
-RangeAppend(RangeObject *self, PyObject *args)
+    స్థిర PyObject *
+RangeAppend(RangeObject *self, PyObject *వాదనలు)
 {
-    return RBAppend(self->buf, args, self->start, self->end, &self->end);
+    తిరిగి RBAppend(self->buf, వాదనలు, self->ప్రారంభం, self->చివర, &self->చివర);
 }
 
-    static PyObject *
+    స్థిర PyObject *
 RangeRepr(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    if (self->buf->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<range object (for deleted buffer) at %p>",
-				    (void *)self);
-    else
+    ఒకవేళ (self->buf->buf == INVALID_బఫరు_విలువ)
+	తిరిగి PyString_FromFormat("<range object (for deleted buffer) at %p>",
+				    (శూన్య *)self);
+    లేకపోతే
     {
-	char *name = (char *)self->buf->buf->b_fname;
+	అక్షరం *name = (అక్షరం *)self->buf->buf->b_fname;
 
-	if (name == NULL)
+	ఒకవేళ (name == ఖాళీ)
 	    name = "";
 
-	return PyString_FromFormat("<range %s (%d:%d)>",
-				    name, (int)self->start, (int)self->end);
+	తిరిగి PyString_FromFormat("<range %s (%d:%d)>",
+				    name, (పూర్ణాంకం)self->ప్రారంభం, (పూర్ణాంకం)self->చివర);
     }
 }
 
-static struct PyMethodDef RangeMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def RangeMethods[] = {
     // name,	function,			calling,	documentation
     {"append",	(PyCFunction)RangeAppend,	METH_VARARGS,	"Append data to the Vim range" },
     {"__dir__",	(PyCFunction)RangeDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ఖాళీ,	ఖాళీ,				0,		ఖాళీ}
 };
 
-DEFINE_PY_TYPE_OBJECT(BufferType);
-static PySequenceMethods BufferAsSeq;
-static PyMappingMethods BufferAsMapping;
+DEFINE_PY_TYPE_OBJECT(బఫరు_Type);
+స్థిర PySequenceMethods బఫరు_As_Seq;
+స్థిర PyMappingMethods బఫరు_As_Mapping;
 
-    static PyObject *
-BufferNew(buf_T *buf)
+    స్థిర PyObject *
+బఫరు_New(buf_T *buf)
 {
     /*
      * We need to handle deletion of buffers underneath us.
@@ -5894,151 +5894,151 @@ BufferNew(buf_T *buf)
      * b_python_ref and b_python3_ref fields respectively.
      */
 
-    BufferObject *self;
+    బఫరు_Object *self;
 
-    if (BUF_PYTHON_REF(buf) != NULL)
+    ఒకవేళ (BUF_PYTHON_REF(buf) != ఖాళీ)
     {
 	self = BUF_PYTHON_REF(buf);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    లేకపోతే
     {
-	self = PyObject_NEW(BufferObject, BufferTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_NEW(బఫరు_Object, బఫరు_Type_Ptr);
+	ఒకవేళ (self == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	self->buf = buf;
 	BUF_PYTHON_REF(buf) = self;
     }
 
-    return (PyObject *)(self);
+    తిరిగి (PyObject *)(self);
 }
 
-    static void
-BufferDestructor(PyObject *self_obj)
+    స్థిర శూన్య
+బఫరు_Destructor(PyObject *self_obj)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf && self->buf != INVALID_BUFFER_VALUE)
-	BUF_PYTHON_REF(self->buf) = NULL;
+    బఫరు_Object *self = (బఫరు_Object*)self_obj;
+    ఒకవేళ (self->buf && self->buf != INVALID_బఫరు_విలువ)
+	BUF_PYTHON_REF(self->buf) = ఖాళీ;
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ముగింపు(self);
 }
 
-    static PyInt
-BufferLength(BufferObject *self)
+    స్థిర PyInt
+బఫరు_నిడివి(బఫరు_Object *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self))
-	return -1; // ???
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి -1; // ???
 
-    return (PyInt)(self->buf->b_ml.ml_line_count);
+    తిరిగి (PyInt)(self->buf->b_ml.ml_పంక్తి_లెక్క);
 }
 
-    static PyObject *
-BufferItem(BufferObject *self, PyInt n)
+    స్థిర PyObject *
+బఫరు_అంశం(బఫరు_Object *self, PyInt n)
 {
-    return RBItem(self, n, 1, -1);
+    తిరిగి RBItem(self, n, 1, -1);
 }
 
-    static PyObject *
-BufferSlice(BufferObject *self, PyInt lo, PyInt hi)
+    స్థిర PyObject *
+బఫరు_ముక్క(బఫరు_Object *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self, lo, hi, 1, -1);
+    తిరిగి RBSlice(self, lo, hi, 1, -1);
 }
 
-static char *BufferAttrs[] = {
+స్థిర అక్షరం *బఫరు_Attrs[] = {
     "name", "number", "vars", "options", "valid",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-BufferDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+బఫరు_Dir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, BufferAttrs);
+    తిరిగి ObjectDir(self, బఫరు_Attrs);
 }
 
-    static PyObject *
-BufferAttrValid(BufferObject *self, char *name)
+    స్థిర PyObject *
+బఫరు_Attr_Valid(బఫరు_Object *self, అక్షరం *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ఒకవేళ (strcmp(name, "valid") != 0)
+	తిరిగి ఖాళీ;
 
-    ret = ((self->buf == INVALID_BUFFER_VALUE) ? Py_False : Py_True);
+    ret = ((self->buf == INVALID_బఫరు_విలువ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
-BufferAttr(BufferObject *self, char *name)
+    స్థిర PyObject *
+బఫరు_Attr(బఫరు_Object *self, అక్షరం *name)
 {
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((self->buf->b_ffname == NULL
-				    ? "" : (char *)self->buf->b_ffname));
-    else if (strcmp(name, "number") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->buf->b_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
+    ఒకవేళ (strcmp(name, "name") == 0)
+	తిరిగి PyString_FromString((self->buf->b_ffname == ఖాళీ
+				    ? "" : (అక్షరం *)self->buf->b_ffname));
+    లేకపోతే ఒకవేళ (strcmp(name, "number") == 0)
+	తిరిగి Py_Build_విలువ(Py_ssize_t_fmt, self->buf->b_fnum);
+    లేకపోతే ఒకవేళ (strcmp(name, "vars") == 0)
+	తిరిగి NEW_DICTIONARY(self->buf->b_vars);
+    లేకపోతే ఒకవేళ (strcmp(name, "options") == 0)
+	తిరిగి OptionsNew(SREQ_BUF, self->buf, Check_బఫరు_Cb,
 			(PyObject *) self);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, BufferAttrs);
-    else
-	return NULL;
+    లేకపోతే ఒకవేళ (strcmp(name, "__members__") == 0)
+	తిరిగి ObjectDir(ఖాళీ, బఫరు_Attrs);
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
-    static int
-BufferSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+బఫరు_Setattr(PyObject *self_obj, అక్షరం *name, PyObject *valObject)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (CheckBuffer(self))
-	return -1;
+    బఫరు_Object *self = (బఫరు_Object*)self_obj;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి -1;
 
-    if (strcmp(name, "name") == 0)
+    ఒకవేళ (strcmp(name, "name") == 0)
     {
 	char_u		*val;
 	aco_save_T	aco;
-	int		ren_ret = OK;
+	పూర్ణాంకం		ren_ret = OK;
 	PyObject	*todecref;
 
-	if (!(val = StringToChars(valObject, &todecref)))
-	    return -1;
+	ఒకవేళ (!(val = String_గమ్యం_Chars(valObject, &todecref)))
+	    తిరిగి -1;
 
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 	// Using aucmd_*: autocommands will be executed by rename_buffer
 	aucmd_prepbuf(&aco, self->buf);
-	if (curbuf == self->buf)
+	ఒకవేళ (curbuf == self->buf)
 	{
-	    ren_ret = rename_buffer(val);
+	    ren_ret = rename_బఫరు(val);
 	    aucmd_restbuf(&aco);
 	}
 	Py_XDECREF(todecref);
-	if (VimTryEnd())
-	    return -1;
+	ఒకవేళ (Vim_Try_చివర())
+	    తిరిగి -1;
 
-	if (ren_ret == FAIL)
+	ఒకవేళ (ren_ret == FAIL)
 	{
-	    PyErr_SET_VIM(N_("failed to rename buffer"));
-	    return -1;
+	    Py_Err_సమితి_VIM(N_("failed to rename buffer"));
+	    తిరిగి -1;
 	}
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_సమితి_String(PyExc_AttributeError, name);
+	తిరిగి -1;
     }
 }
 
-    static PyObject *
-BufferAppend(BufferObject *self, PyObject *args)
+    స్థిర PyObject *
+బఫరు_Append(బఫరు_Object *self, PyObject *వాదనలు)
 {
-    return RBAppend(self, args, 1, -1, NULL);
+    తిరిగి RBAppend(self, వాదనలు, 1, -1, ఖాళీ);
 }
 
-    static PyObject *
-BufferMark(BufferObject *self, PyObject *pmarkObject)
+    స్థిర PyObject *
+బఫరు_Mark(బఫరు_Object *self, PyObject *pmarkObject)
 {
     pos_T	*posp;
     char_u	*pmark;
@@ -6046,86 +6046,86 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     bufref_T	savebuf;
     PyObject	*todecref;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి ఖాళీ;
 
-    if (!(pmark = StringToChars(pmarkObject, &todecref)))
-	return NULL;
+    ఒకవేళ (!(pmark = String_గమ్యం_Chars(pmarkObject, &todecref)))
+	తిరిగి ఖాళీ;
 
-    if (pmark[0] == '\0' || pmark[1] != '\0')
+    ఒకవేళ (pmark[0] == '\0' || pmark[1] != '\0')
     {
-	PyErr_SET_STRING(PyExc_ValueError,
+	Py_Err_సమితి_STRING(Py_Exc_విలువ_Error,
 		N_("mark name must be a single character"));
 	Py_XDECREF(todecref);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     mark = *pmark;
 
     Py_XDECREF(todecref);
 
-    VimTryStart();
-    switch_buffer(&savebuf, self->buf);
+    Vim_Try_ప్రారంభం();
+    switch_బఫరు(&savebuf, self->buf);
     posp = getmark(mark, FALSE);
-    restore_buffer(&savebuf);
-    if (VimTryEnd())
-	return NULL;
+    restore_బఫరు(&savebuf);
+    ఒకవేళ (Vim_Try_చివర())
+	తిరిగి ఖాళీ;
 
-    if (posp == NULL)
+    ఒకవేళ (posp == ఖాళీ)
     {
-	PyErr_SET_VIM(N_("invalid mark name"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("invalid mark name"));
+	తిరిగి ఖాళీ;
     }
 
-    if (posp->lnum <= 0)
+    ఒకవేళ (posp->lnum <= 0)
     {
 	// Or raise an error?
 	Py_INCREF(Py_None);
-	return Py_None;
+	తిరిగి Py_None;
     }
 
-    return Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
+    తిరిగి Py_Build_విలువ("(ll)", (దీర్ఘ)(posp->lnum), (దీర్ఘ)(posp->నిలువు));
 }
 
-    static PyObject *
-BufferRange(BufferObject *self, PyObject *args)
+    స్థిర PyObject *
+బఫరు_Range(బఫరు_Object *self, PyObject *వాదనలు)
 {
-    PyInt start;
-    PyInt end;
+    PyInt ప్రారంభం;
+    PyInt చివర;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ఒకవేళ (Check_బఫరు(self))
+	తిరిగి ఖాళీ;
 
-    if (!PyArg_ParseTuple(args, "nn", &start, &end))
-	return NULL;
+    ఒకవేళ (!PyArg_ParseTuple(వాదనలు, "nn", &ప్రారంభం, &చివర))
+	తిరిగి ఖాళీ;
 
-    return RangeNew(self->buf, start, end);
+    తిరిగి RangeNew(self->buf, ప్రారంభం, చివర);
 }
 
-    static PyObject *
-BufferRepr(PyObject *self_obj)
+    స్థిర PyObject *
+బఫరు_Repr(PyObject *self_obj)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
-    else
+    బఫరు_Object *self = (బఫరు_Object*)self_obj;
+    ఒకవేళ (self->buf == INVALID_బఫరు_విలువ)
+	తిరిగి PyString_FromFormat("<buffer object (deleted) at %p>", (శూన్య *)self);
+    లేకపోతే
     {
-	char	*name = (char *)self->buf->b_fname;
+	అక్షరం	*name = (అక్షరం *)self->buf->b_fname;
 
-	if (name == NULL)
+	ఒకవేళ (name == ఖాళీ)
 	    name = "";
 
-	return PyString_FromFormat("<buffer %s>", name);
+	తిరిగి PyString_FromFormat("<buffer %s>", name);
     }
 }
 
-static struct PyMethodDef BufferMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def బఫరు_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"append",	    (PyCFunction)BufferAppend,	METH_VARARGS,	"Append data to Vim buffer" },
-    {"mark",	    (PyCFunction)BufferMark,	METH_O,		"Return (row,col) representing position of named mark" },
-    {"range",	    (PyCFunction)BufferRange,	METH_VARARGS,	"Return a range object which represents the part of the given buffer between line numbers s and e" },
-    {"__dir__",	    (PyCFunction)BufferDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"append",	    (PyCFunction)బఫరు_Append,	METH_VARARGS,	"Append data to Vim buffer" },
+    {"mark",	    (PyCFunction)బఫరు_Mark,	METH_O,		"Return (row,col) representing position of named mark" },
+    {"range",	    (PyCFunction)బఫరు_Range,	METH_VARARGS,	"Return a range object which represents the part of the given buffer between line numbers s and e" },
+    {"__dir__",	    (PyCFunction)బఫరు_Dir,	METH_NOARGS,	""},
+    { ఖాళీ,	    ఖాళీ,			0,		ఖాళీ}
 };
 
 /*
@@ -6134,832 +6134,832 @@ static struct PyMethodDef BufferMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(BufMapType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
 } BufMapObject;
 
-static BufMapObject TheBufferMap =
+స్థిర BufMapObject The_బఫరు_Map =
 {
-    PyObject_HEAD_INIT_TYPE(BufMapType)
+    Py_Object_తల_INIT_TYPE(BufMapType)
 };
 
-    static PyInt
-BufMapLength(PyObject *self UNUSED)
+    స్థిర PyInt
+Buf_Map_నిడివి(PyObject *self వాడని)
 {
     buf_T	*b = firstbuf;
     PyInt	n = 0;
 
-    while (b)
+    అయితే (b)
     {
 	++n;
-	b = b->b_next;
+	b = b->b_తదుపరి;
     }
 
-    return n;
+    తిరిగి n;
 }
 
-    static PyObject *
-BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
+    స్థిర PyObject *
+Buf_Map_అంశం(PyObject *self వాడని, PyObject *కీలకం_Object)
 {
     buf_T	*b;
-    long	bnr;
+    దీర్ఘ	bnr;
 
-    if (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
-	return NULL;
+    ఒకవేళ (సంఖ్య_గమ్యం_Long(కీలకం_Object, &bnr, సంఖ్య_INT|సంఖ్య_NATURAL))
+	తిరిగి ఖాళీ;
 
-    b = buflist_findnr((int) bnr);
+    b = buflist_findnr((పూర్ణాంకం) bnr);
 
-    if (b)
-	return BufferNew(b);
-    else
+    ఒకవేళ (b)
+	తిరిగి బఫరు_New(b);
+    లేకపోతే
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	Py_Err_సమితి_Object(Py_Exc_కీలకం_Error, కీలకం_Object);
+	తిరిగి ఖాళీ;
     }
 }
 
-    static void
-BufMapIterDestruct(void* arg)
+    స్థిర శూన్య
+BufMapIterDestruct(శూన్య* arg)
 {
-    PyObject *buffer = (PyObject*)arg;
+    PyObject *బఫరు = (PyObject*)arg;
     // Iteration was stopped before all buffers were processed
-    if (buffer)
+    ఒకవేళ (బఫరు)
     {
-	Py_DECREF(buffer);
+	Py_DECREF(బఫరు);
     }
 }
 
-    static int
-BufMapIterTraverse(void *iter, visitproc visit, void *arg)
+    స్థిర పూర్ణాంకం
+BufMapIterTraverse(శూన్య *iter, visitproc సందర్శించు, శూన్య *arg)
 {
-    PyObject *buffer = (PyObject*)iter;
-    if (buffer)
-	Py_VISIT(buffer);
-    return 0;
+    PyObject *బఫరు = (PyObject*)iter;
+    ఒకవేళ (బఫరు)
+	Py_సందర్శించు(బఫరు);
+    తిరిగి 0;
 }
 
-    static int
-BufMapIterClear(void **iter)
+    స్థిర పూర్ణాంకం
+BufMapIterClear(శూన్య **iter)
 {
-    PyObject **buffer = (PyObject**)iter;
-    if (*buffer)
-	Py_CLEAR(*buffer);
-    return 0;
+    PyObject **బఫరు = (PyObject**)iter;
+    ఒకవేళ (*బఫరు)
+	Py_CLEAR(*బఫరు);
+    తిరిగి 0;
 }
 
-    static PyObject *
-BufMapIterNext(void **arg)
+    స్థిర PyObject *
+Buf_Map_Iter_తదుపరి(శూన్య **arg)
 {
-    PyObject	*next;
+    PyObject	*తదుపరి;
     PyObject	*ret;
-    PyObject	**buffer = (PyObject**)arg;
+    PyObject	**బఫరు = (PyObject**)arg;
 
-    if (!*buffer)
-	return NULL;
+    ఒకవేళ (!*బఫరు)
+	తిరిగి ఖాళీ;
 
-    ret = *buffer;
+    ret = *బఫరు;
 
-    if (CheckBuffer((BufferObject *)(ret)))
+    ఒకవేళ (Check_బఫరు((బఫరు_Object *)(ret)))
     {
-	*buffer = NULL;
-	return NULL;
+	*బఫరు = ఖాళీ;
+	తిరిగి ఖాళీ;
     }
 
-    if (!((BufferObject *)(ret))->buf->b_next)
-	next = NULL;
-    else if (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
-	return NULL;
-    *buffer = next;
+    ఒకవేళ (!((బఫరు_Object *)(ret))->buf->b_తదుపరి)
+	తదుపరి = ఖాళీ;
+    లేకపోతే ఒకవేళ (!(తదుపరి = బఫరు_New(((బఫరు_Object *)(ret))->buf->b_తదుపరి)))
+	తిరిగి ఖాళీ;
+    *బఫరు = తదుపరి;
     // Do not increment reference: we no longer hold it (decref), but whoever
     // on other side will hold (incref). Decref+incref = nothing.
-    return ret;
+    తిరిగి ret;
 }
 
-    static PyObject *
+    స్థిర PyObject *
 BufMapIter(PyObject *self)
 {
-    PyObject *buffer;
+    PyObject *బఫరు;
 
-    buffer = BufferNew(firstbuf);
-    return IterNew(buffer,
-	    BufMapIterDestruct, BufMapIterNext,
+    బఫరు = బఫరు_New(firstbuf);
+    తిరిగి IterNew(బఫరు,
+	    BufMapIterDestruct, Buf_Map_Iter_తదుపరి,
 	    BufMapIterTraverse, BufMapIterClear,
 	    self);
 }
 
-static PyMappingMethods BufMapAsMapping = {
-    (lenfunc)       BufMapLength,
-    (binaryfunc)    BufMapItem,
+స్థిర PyMappingMethods BufMapAsMapping = {
+    (lenfunc)       Buf_Map_నిడివి,
+    (binaryfunc)    Buf_Map_అంశం,
     (objobjargproc) 0,
 };
 
 // Current items object
 
-static char *CurrentAttrs[] = {
+స్థిర అక్షరం *CurrentAttrs[] = {
     "buffer", "window", "line", "range", "tabpage",
-    NULL
+    ఖాళీ
 };
 
-    static PyObject *
-CurrentDir(PyObject *self, PyObject *args UNUSED)
+    స్థిర PyObject *
+CurrentDir(PyObject *self, PyObject *వాదనలు వాడని)
 {
-    return ObjectDir(self, CurrentAttrs);
+    తిరిగి ObjectDir(self, CurrentAttrs);
 }
 
-    static PyObject *
-CurrentGetattr(PyObject *self UNUSED, char *name)
+    స్థిర PyObject *
+CurrentGetattr(PyObject *self వాడని, అక్షరం *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(curbuf);
-    else if (strcmp(name, "window") == 0)
-	return (PyObject *)WindowNew(curwin, curtab);
-    else if (strcmp(name, "tabpage") == 0)
-	return (PyObject *)TabPageNew(curtab);
-    else if (strcmp(name, "line") == 0)
-	return GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
-    else if (strcmp(name, "range") == 0)
-	return RangeNew(curbuf, RangeStart, RangeEnd);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, CurrentAttrs);
-    else
-#if PY_MAJOR_VERSION < 3
-	return Py_FindMethod(WindowMethods, self, name);
-#else
-	return NULL;
-#endif
+    ఒకవేళ (strcmp(name, "buffer") == 0)
+	తిరిగి (PyObject *)బఫరు_New(curbuf);
+    లేకపోతే ఒకవేళ (strcmp(name, "window") == 0)
+	తిరిగి (PyObject *)కిటికీ_New(curwin, curtab);
+    లేకపోతే ఒకవేళ (strcmp(name, "tabpage") == 0)
+	తిరిగి (PyObject *)Tab_పుట_New(curtab);
+    లేకపోతే ఒకవేళ (strcmp(name, "line") == 0)
+	తిరిగి Get_బఫరు_పంక్తి(curbuf, (PyInt)curwin->w_cursor.lnum);
+    లేకపోతే ఒకవేళ (strcmp(name, "range") == 0)
+	తిరిగి RangeNew(curbuf, Range_ప్రారంభం, Range_చివర);
+    లేకపోతే ఒకవేళ (strcmp(name, "__members__") == 0)
+	తిరిగి ObjectDir(ఖాళీ, CurrentAttrs);
+    లేకపోతే
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+	తిరిగి Py_కనుగొను_పద్ధతి(కిటికీ_Methods, self, name);
+#లేకపోతే
+	తిరిగి ఖాళీ;
+#అయితే_ముగింపు
 }
 
-    static int
-CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
+    స్థిర పూర్ణాంకం
+CurrentSetattr(PyObject *self వాడని, అక్షరం *name, PyObject *valObject)
 {
-    if (strcmp(name, "line") == 0)
+    ఒకవేళ (strcmp(name, "line") == 0)
     {
-	if (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
-			  NULL) == FAIL)
-	    return -1;
+	ఒకవేళ (సమితి_బఫరు_పంక్తి_2(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
+			  ఖాళీ) == FAIL)
+	    తిరిగి -1;
 
-	return 0;
+	తిరిగి 0;
     }
-    else if (strcmp(name, "buffer") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "buffer") == 0)
     {
-	int count;
+	పూర్ణాంకం లెక్క;
 
-	if (valObject->ob_type != BufferTypePtr)
+	ఒకవేళ (valObject->ob_type != బఫరు_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Buffer object, but got %s"),
 		    valObject);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (CheckBuffer((BufferObject *)(valObject)))
-	    return -1;
-	count = ((BufferObject *)(valObject))->buf->b_fnum;
+	ఒకవేళ (Check_బఫరు((బఫరు_Object *)(valObject)))
+	    తిరిగి -1;
+	లెక్క = ((బఫరు_Object *)(valObject))->buf->b_fnum;
 
-	VimTryStart();
-	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
+	Vim_Try_ప్రారంభం();
+	ఒకవేళ (do_బఫరు(DOBUF_GOTO, DOBUF_మొదటి, FORWARD, లెక్క, 0) == FAIL)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), count);
-	    return -1;
+	    ఒకవేళ (Vim_Try_చివర())
+		తిరిగి -1;
+	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), లెక్క);
+	    తిరిగి -1;
 	}
 
-	return VimTryEnd();
+	తిరిగి Vim_Try_చివర();
     }
-    else if (strcmp(name, "window") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "window") == 0)
     {
-	int count;
+	పూర్ణాంకం లెక్క;
 
-	if (valObject->ob_type != WindowTypePtr)
+	ఒకవేళ (valObject->ob_type != కిటికీ_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Window object, but got %s"),
 		    valObject);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (CheckWindow((WindowObject *)(valObject)))
-	    return -1;
-	count = get_win_number(((WindowObject *)(valObject))->win, firstwin);
+	ఒకవేళ (Check_కిటికీ((కిటికీ_Object *)(valObject)))
+	    తిరిగి -1;
+	లెక్క = get_win_సంఖ్య(((కిటికీ_Object *)(valObject))->win, firstwin);
 
-	if (!count)
+	ఒకవేళ (!లెక్క)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_సమితి_STRING(Py_Exc_విలువ_Error,
 		    N_("failed to find window in the current tab page"));
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	VimTryStart();
-	win_goto(((WindowObject *)(valObject))->win);
-	if (((WindowObject *)(valObject))->win != curwin)
+	Vim_Try_ప్రారంభం();
+	win_goto(((కిటికీ_Object *)(valObject))->win);
+	ఒకవేళ (((కిటికీ_Object *)(valObject))->win != curwin)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    ఒకవేళ (Vim_Try_చివర())
+		తిరిగి -1;
+	    Py_Err_సమితి_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified window"));
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	return VimTryEnd();
+	తిరిగి Vim_Try_చివర();
     }
-    else if (strcmp(name, "tabpage") == 0)
+    లేకపోతే ఒకవేళ (strcmp(name, "tabpage") == 0)
     {
-	if (valObject->ob_type != TabPageTypePtr)
+	ఒకవేళ (valObject->ob_type != Tab_పుట_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.TabPage object, but got %s"),
 		    valObject);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (CheckTabPage((TabPageObject *)(valObject)))
-	    return -1;
+	ఒకవేళ (Check_Tab_పుట((Tab_పుట_Object *)(valObject)))
+	    తిరిగి -1;
 
-	VimTryStart();
-	goto_tabpage_tp(((TabPageObject *)(valObject))->tab, TRUE, TRUE);
-	if (((TabPageObject *)(valObject))->tab != curtab)
+	Vim_Try_ప్రారంభం();
+	goto_tabpage_tp(((Tab_పుట_Object *)(valObject))->tab, TRUE, TRUE);
+	ఒకవేళ (((Tab_పుట_Object *)(valObject))->tab != curtab)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    ఒకవేళ (Vim_Try_చివర())
+		తిరిగి -1;
+	    Py_Err_సమితి_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified tab page"));
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	return VimTryEnd();
+	తిరిగి Vim_Try_చివర();
     }
-    else
+    లేకపోతే
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_సమితి_String(PyExc_AttributeError, name);
+	తిరిగి -1;
     }
 }
 
-static struct PyMethodDef CurrentMethods[] = {
+స్థిర నిర్మాణం Py_పద్ధతి_Def CurrentMethods[] = {
     // name,	    function,			calling,	documentation
     {"__dir__",	    (PyCFunction)CurrentDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    { ఖాళీ,	    ఖాళీ,			0,		ఖాళీ}
 };
 
-    static void
-init_range_cmd(void *arg)
+    స్థిర శూన్య
+init_range_cmd(శూన్య *arg)
 {
     exarg_T *eap = (exarg_T*)arg;
-    RangeStart = eap->line1;
-    RangeEnd = eap->line2;
+    Range_ప్రారంభం = eap->line1;
+    Range_చివర = eap->line2;
 }
 
-    static void
-init_range_eval(void *rettv UNUSED)
+    స్థిర శూన్య
+init_range_eval(శూన్య *rettv వాడని)
 {
-    RangeStart = (PyInt) curwin->w_cursor.lnum;
-    RangeEnd = RangeStart;
+    Range_ప్రారంభం = (PyInt) curwin->w_cursor.lnum;
+    Range_చివర = Range_ప్రారంభం;
 }
 
-    static void
-run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
-#ifdef PY_CAN_RECURSE
-	, PyGILState_STATE *pygilstate UNUSED
-#endif
+    స్థిర శూన్య
+నిరంతరం_cmd(స్థిరరాశి అక్షరం *cmd, dict_T* locals వాడని, శూన్య *arg వాడని
+#నిర్వచితమైతే PY_CAN_RECURSE
+	, PyGILState_STATE *pygilstate వాడని
+#అయితే_ముగింపు
 	)
 {
-    PyObject	*run_ret;
-    run_ret = PyRun_String((char *)cmd, Py_file_input, globals, globals);
-    if (run_ret != NULL)
+    PyObject	*నిరంతరం_ret;
+    నిరంతరం_ret = Py_నిరంతరం_String((అక్షరం *)cmd, Py_file_ఆదానం, globals, globals);
+    ఒకవేళ (నిరంతరం_ret != ఖాళీ)
     {
-	Py_DECREF(run_ret);
+	Py_DECREF(నిరంతరం_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    లేకపోతే ఒకవేళ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
-	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	emsg(_(e_cant_handle_systemexit_యొక్క_python_exception_లోపల_vim));
 	PyErr_Clear();
     }
-    else
+    లేకపోతే
 	PyErr_PrintEx(1);
 }
 
-static const char	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
-static int		code_hdr_len = 30;
+స్థిర స్థిరరాశి అక్షరం	*సంకేతం_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
+స్థిర పూర్ణాంకం		సంకేతం_hdr_len = 30;
 
-    static void
-run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
-#ifdef PY_CAN_RECURSE
+    స్థిర శూన్య
+నిరంతరం_do(స్థిరరాశి అక్షరం *cmd, dict_T* locals వాడని, శూన్య *arg వాడని
+#నిర్వచితమైతే PY_CAN_RECURSE
 	, PyGILState_STATE *pygilstate
-#endif
+#అయితే_ముగింపు
 	)
 {
     PyInt	lnum;
     size_t	len;
-    char	*code;
-    int		status;
+    అక్షరం	*సంకేతం_2;
+    పూర్ణాంకం		స్థితి_2;
     PyObject	*pyfunc, *pymain;
-    PyObject	*run_ret;
+    PyObject	*నిరంతరం_ret;
     buf_T	*was_curbuf = curbuf;
 
-    if (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
+    ఒకవేళ (u_save((linenr_T)Range_ప్రారంభం - 1, (linenr_T)Range_చివర + 1) != OK)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	తిరిగి;
     }
 
-    len = code_hdr_len + STRLEN(cmd);
-    code = PyMem_New(char, len + 1);
-    memcpy(code, code_hdr, code_hdr_len);
-    STRCPY(code + code_hdr_len, cmd);
-    run_ret = PyRun_String(code, Py_file_input, globals, globals);
-    status = -1;
-    if (run_ret != NULL)
+    len = సంకేతం_hdr_len + STRLEN(cmd);
+    సంకేతం_2 = PyMem_New(అక్షరం, len + 1);
+    జ్ఞాపకం_నకలు(సంకేతం_2, సంకేతం_hdr, సంకేతం_hdr_len);
+    STRCPY(సంకేతం_2 + సంకేతం_hdr_len, cmd);
+    నిరంతరం_ret = Py_నిరంతరం_String(సంకేతం_2, Py_file_ఆదానం, globals, globals);
+    స్థితి_2 = -1;
+    ఒకవేళ (నిరంతరం_ret != ఖాళీ)
     {
-	status = 0;
-	Py_DECREF(run_ret);
+	స్థితి_2 = 0;
+	Py_DECREF(నిరంతరం_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    లేకపోతే ఒకవేళ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
-	PyMem_Free(code);
-	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	PyMem_Free(సంకేతం_2);
+	emsg(_(e_cant_handle_systemexit_యొక్క_python_exception_లోపల_vim));
 	PyErr_Clear();
-	return;
+	తిరిగి;
     }
-    else
+    లేకపోతే
 	PyErr_PrintEx(1);
 
-    PyMem_Free(code);
+    PyMem_Free(సంకేతం_2);
 
-    if (status)
+    ఒకవేళ (స్థితి_2)
     {
 	emsg(_("failed to run the code"));
-	return;
+	తిరిగి;
     }
 
-    status = 0;
-    pymain = PyImport_AddModule("__main__");
+    స్థితి_2 = 0;
+    pymain = Py_Import_కూడు_Module("__main__");
     pyfunc = PyObject_GetAttrString(pymain, DOPY_FUNC);
-#ifdef PY_CAN_RECURSE
+#నిర్వచితమైతే PY_CAN_RECURSE
     PyGILState_Release(*pygilstate);
-#endif
+#అయితే_ముగింపు
 
-    for (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
+    కొరకు (lnum = Range_ప్రారంభం; lnum <= Range_చివర; ++lnum)
     {
-	PyObject	*line;
+	PyObject	*పంక్తి;
 	PyObject	*linenr;
 	PyObject	*ret;
 
-#ifdef PY_CAN_RECURSE
+#నిర్వచితమైతే PY_CAN_RECURSE
 	*pygilstate = PyGILState_Ensure();
-#endif
+#అయితే_ముగింపు
 	// Check the line number, the command my have deleted lines.
-	if (lnum > curbuf->b_ml.ml_line_count
-		|| !(line = GetBufferLine(curbuf, lnum)))
-	    goto err;
-	if (!(linenr = PyInt_FromLong((long) lnum)))
+	ఒకవేళ (lnum > curbuf->b_ml.ml_పంక్తి_లెక్క
+		|| !(పంక్తి = Get_బఫరు_పంక్తి(curbuf, lnum)))
+	    వెళ్ళు err;
+	ఒకవేళ (!(linenr = PyInt_FromLong((దీర్ఘ) lnum)))
 	{
-	    Py_DECREF(line);
-	    goto err;
+	    Py_DECREF(పంక్తి);
+	    వెళ్ళు err;
 	}
-	ret = PyObject_CallFunctionObjArgs(pyfunc, line, linenr, NULL);
-	Py_DECREF(line);
+	ret = Py_Object_Call_Function_Obj_వాదనలు(pyfunc, పంక్తి, linenr, ఖాళీ);
+	Py_DECREF(పంక్తి);
 	Py_DECREF(linenr);
-	if (!ret)
-	    goto err;
+	ఒకవేళ (!ret)
+	    వెళ్ళు err;
 
 	// Check that the command didn't switch to another buffer.
 	// Check the line number, the command my have deleted lines.
-	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
+	ఒకవేళ (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    Py_XDECREF(ret);
-	    goto err;
+	    వెళ్ళు err;
 	}
 
-	if (ret != Py_None)
-	    if (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
+	ఒకవేళ (ret != Py_None)
+	    ఒకవేళ (సమితి_బఫరు_పంక్తి_2(curbuf, lnum, ret, ఖాళీ) == FAIL)
 	    {
 		Py_XDECREF(ret);
-		goto err;
+		వెళ్ళు err;
 	    }
 
 	Py_XDECREF(ret);
 	PythonIO_Flush();
-#ifdef PY_CAN_RECURSE
+#నిర్వచితమైతే PY_CAN_RECURSE
 	PyGILState_Release(*pygilstate);
-#endif
+#అయితే_ముగింపు
     }
-    goto out;
+    వెళ్ళు బహిర్గతం;
 err:
-#ifdef PY_CAN_RECURSE
+#నిర్వచితమైతే PY_CAN_RECURSE
     *pygilstate = PyGILState_Ensure();
-#endif
+#అయితే_ముగింపు
     PyErr_PrintEx(0);
     PythonIO_Flush();
-    status = 1;
-out:
-#ifdef PY_CAN_RECURSE
-    if (!status)
+    స్థితి_2 = 1;
+బహిర్గతం:
+#నిర్వచితమైతే PY_CAN_RECURSE
+    ఒకవేళ (!స్థితి_2)
 	*pygilstate = PyGILState_Ensure();
-#endif
+#అయితే_ముగింపు
     Py_DECREF(pyfunc);
-    PyObject_SetAttrString(pymain, DOPY_FUNC, NULL);
-    if (status)
-	return;
+    Py_Object_సమితి_Attr_String(pymain, DOPY_FUNC, ఖాళీ);
+    ఒకవేళ (స్థితి_2)
+	తిరిగి;
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static void
-run_eval(const char *cmd, dict_T *locals, void *arg
-#ifdef PY_CAN_RECURSE
-	, PyGILState_STATE *pygilstate UNUSED
-#endif
+    స్థిర శూన్య
+నిరంతరం_eval(స్థిరరాశి అక్షరం *cmd, dict_T *locals, శూన్య *arg
+#నిర్వచితమైతే PY_CAN_RECURSE
+	, PyGILState_STATE *pygilstate వాడని
+#అయితే_ముగింపు
 	)
 {
-    PyObject	*run_ret;
+    PyObject	*నిరంతరం_ret;
     typval_T	*rettv = (typval_T*)arg;
     PyObject	*pylocals = locals ? NEW_DICTIONARY(locals) : globals;
 
-    run_ret = PyRun_String((char *)cmd, Py_eval_input, globals, pylocals);
-    if (run_ret == NULL)
+    నిరంతరం_ret = Py_నిరంతరం_String((అక్షరం *)cmd, Py_eval_ఆదానం, globals, pylocals);
+    ఒకవేళ (నిరంతరం_ret == ఖాళీ)
     {
-	if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+	ఒకవేళ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
 	{
-	    emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	    emsg(_(e_cant_handle_systemexit_యొక్క_python_exception_లోపల_vim));
 	    PyErr_Clear();
 	}
-	else
+	లేకపోతే
 	{
-	    if (PyErr_Occurred() && !msg_silent)
+	    ఒకవేళ (PyErr_Occurred() && !సందేశం_silent)
 		PyErr_PrintEx(0);
 	    emsg(_(e_eval_did_not_return_valid_python_object));
 	}
     }
-    else
+    లేకపోతే
     {
-	if (ConvertFromPyObject(run_ret, rettv) == -1)
-	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_value));
-	Py_DECREF(run_ret);
+	ఒకవేళ (ConvertFromPyObject(నిరంతరం_ret, rettv) == -1)
+	    emsg(_(e_failed_గమ్యం_convert_returned_python_object_గమ్యం_vim_విలువ));
+	Py_DECREF(నిరంతరం_ret);
     }
     PyErr_Clear();
 }
 
-    static int
-set_ref_in_py(const int copyID)
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_py(స్థిరరాశి పూర్ణాంకం copyID)
 {
     pylinkedlist_T	*cur;
     list_T		*ll;
     tuple_T		*tt;
-    int			i;
-    int			abort = FALSE;
+    పూర్ణాంకం			i;
+    పూర్ణాంకం			abort = FALSE;
     FunctionObject	*func;
 
-    if (lastdict != NULL)
+    ఒకవేళ (lastdict != ఖాళీ)
     {
-	for (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
-	    abort = set_ref_in_dict(((DictionaryObject *)(cur->pll_obj))->dict,
+	కొరకు (cur = lastdict ; !abort && cur != ఖాళీ ; cur = cur->pll_prev)
+	    abort = సమితి_ref_లోపల_dict(((DictionaryObject *)(cur->pll_obj))->dict,
 								       copyID);
     }
 
-    if (lastlist != NULL)
+    ఒకవేళ (lastlist != ఖాళీ)
     {
-	for (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
+	కొరకు (cur = lastlist ; !abort && cur != ఖాళీ ; cur = cur->pll_prev)
 	{
 	    ll = ((ListObject *) (cur->pll_obj))->list;
-	    abort = set_ref_in_list(ll, copyID);
+	    abort = సమితి_ref_లోపల_list(ll, copyID);
 	}
     }
 
-    if (lasttuple != NULL)
+    ఒకవేళ (lasttuple != ఖాళీ)
     {
-	for (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
+	కొరకు (cur = lasttuple ; !abort && cur != ఖాళీ ; cur = cur->pll_prev)
 	{
 	    tt = ((TupleObject *) (cur->pll_obj))->tuple;
-	    abort = set_ref_in_tuple(tt, copyID);
+	    abort = సమితి_ref_లోపల_tuple(tt, copyID);
 	}
     }
 
-    if (lastfunc != NULL)
+    ఒకవేళ (lastfunc != ఖాళీ)
     {
-	for (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
+	కొరకు (cur = lastfunc ; !abort && cur != ఖాళీ ; cur = cur->pll_prev)
 	{
 	    func = (FunctionObject *) cur->pll_obj;
-	    abort = set_ref_in_dict(func->self, copyID);
-	    if (func->argc)
-		for (i = 0; !abort && i < func->argc; ++i)
+	    abort = సమితి_ref_లోపల_dict(func->self, copyID);
+	    ఒకవేళ (func->argc)
+		కొరకు (i = 0; !abort && i < func->argc; ++i)
 		    abort = abort
-			|| set_ref_in_item(&func->argv[i], copyID, NULL, NULL, NULL);
+			|| సమితి_ref_లోపల_అంశం(&func->argv[i], copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 	}
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
-    static int
-set_string_copy(char_u *str, typval_T *tv)
+    స్థిర పూర్ణాంకం
+సమితి_string_copy(char_u *str, typval_T *tv)
 {
     tv->vval.v_string = vim_strsave(str);
-    if (tv->vval.v_string == NULL)
+    ఒకవేళ (tv->vval.v_string == ఖాళీ)
     {
-	PyErr_NoMemory();
-	return -1;
+	Py_Err_No_జ్ఞాపకం();
+	తిరిగి -1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    స్థిర పూర్ణాంకం
+pydict_గమ్యం_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*కీలకం;
     dictitem_T	*di;
-    PyObject	*keyObject;
+    PyObject	*కీలకం_Object;
     PyObject	*valObject;
     Py_ssize_t	iter = 0;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    ఒకవేళ (!(dict = py_dict_alloc()))
+	తిరిగి -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    while (PyDict_Next(obj, &iter, &keyObject, &valObject))
+    అయితే (Py_Dict_తదుపరి(obj, &iter, &కీలకం_Object, &valObject))
     {
-	PyObject	*todecref = NULL;
+	PyObject	*todecref = ఖాళీ;
 
-	if (keyObject == NULL || valObject == NULL)
+	ఒకవేళ (కీలకం_Object == ఖాళీ || valObject == ఖాళీ)
 	{
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
 	{
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (*key == NUL)
+	ఒకవేళ (*కీలకం == NUL)
 	{
 	    dict_unref(dict);
 	    Py_XDECREF(todecref);
-	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    RAISE_NO_ఖాళీలు_కీలకాలు;
+	    తిరిగి -1;
 	}
 
-	di = dictitem_alloc(key);
+	di = dictitem_alloc(కీలకం);
 
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	ఒకవేళ (di == ఖాళీ)
 	{
-	    PyErr_NoMemory();
+	    Py_Err_No_జ్ఞాపకం();
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	ఒకవేళ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (dict_add(dict, di) == FAIL)
+	ఒకవేళ (dict_కూడు(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_కీలకం_కూడు_FAIL(di->di_కీలకం);
 	    clear_tv(&di->di_tv);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
     }
 
     --dict->dv_refcount;
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    స్థిర పూర్ణాంకం
+pymap_గమ్యం_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*కీలకం;
     dictitem_T	*di;
     PyObject	*list;
     PyObject	*iterator;
-    PyObject	*keyObject;
+    PyObject	*కీలకం_Object;
     PyObject	*valObject;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    ఒకవేళ (!(dict = py_dict_alloc()))
+	తిరిగి -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    if (!(list = PyMapping_Keys(obj)))
+    ఒకవేళ (!(list = Py_Mapping_కీలకాలు(obj)))
     {
 	dict_unref(dict);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (!(iterator = PyObject_GetIter(list)))
+    ఒకవేళ (!(iterator = PyObject_GetIter(list)))
     {
 	dict_unref(dict);
 	Py_DECREF(list);
-	return -1;
+	తిరిగి -1;
     }
     Py_DECREF(list);
 
-    while ((keyObject = PyIter_Next(iterator)))
+    అయితే ((కీలకం_Object = Py_Iter_తదుపరి(iterator)))
     {
 	PyObject	*todecref;
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	ఒకవేళ (!(కీలకం = String_గమ్యం_Chars(కీలకం_Object, &todecref)))
 	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(కీలకం_Object);
 	    Py_DECREF(iterator);
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
-	if (*key == NUL)
+	ఒకవేళ (*కీలకం == NUL)
 	{
-	    Py_DECREF(keyObject);
-	    Py_DECREF(iterator);
-	    Py_XDECREF(todecref);
-	    dict_unref(dict);
-	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
-	}
-
-	if (!(valObject = PyObject_GetItem(obj, keyObject)))
-	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(కీలకం_Object);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
-	    return -1;
+	    RAISE_NO_ఖాళీలు_కీలకాలు;
+	    తిరిగి -1;
 	}
 
-	di = dictitem_alloc(key);
+	ఒకవేళ (!(valObject = Py_Object_Get_అంశం(obj, కీలకం_Object)))
+	{
+	    Py_DECREF(కీలకం_Object);
+	    Py_DECREF(iterator);
+	    Py_XDECREF(todecref);
+	    dict_unref(dict);
+	    తిరిగి -1;
+	}
 
-	Py_DECREF(keyObject);
+	di = dictitem_alloc(కీలకం);
+
+	Py_DECREF(కీలకం_Object);
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	ఒకవేళ (di == ఖాళీ)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    dict_unref(dict);
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_జ్ఞాపకం();
+	    తిరిగి -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	ఒకవేళ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
 
 	Py_DECREF(valObject);
 
-	if (dict_add(dict, di) == FAIL)
+	ఒకవేళ (dict_కూడు(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_కీలకం_కూడు_FAIL(di->di_కీలకం);
 	    Py_DECREF(iterator);
 	    dictitem_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    తిరిగి -1;
 	}
     }
     Py_DECREF(iterator);
     --dict->dv_refcount;
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-pyseq_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    స్థిర పూర్ణాంకం
+pyseq_గమ్యం_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     list_T	*l;
 
-    if (!(l = py_list_alloc()))
-	return -1;
+    ఒకవేళ (!(l = py_list_alloc()))
+	తిరిగి -1;
 
     tv->v_type = VAR_LIST;
     tv->vval.v_list = l;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    ఒకవేళ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	list_unref(l);
-	return -1;
+	తిరిగి -1;
     }
 
     --l->lv_refcount;
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-pytuple_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    స్థిర పూర్ణాంకం
+pytuple_గమ్యం_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     tuple_T	*t;
 
-    if (!(t = py_tuple_alloc()))
-	return -1;
+    ఒకవేళ (!(t = py_tuple_alloc()))
+	తిరిగి -1;
 
     tv->v_type = VAR_TUPLE;
     tv->vval.v_tuple = t;
 
-    if (tuple_py_concat(t, obj, lookup_dict) == -1)
+    ఒకవేళ (tuple_py_concat(t, obj, lookup_dict) == -1)
     {
 	tuple_unref(t);
-	return -1;
+	తిరిగి -1;
     }
 
     --t->tv_refcount;
-    return 0;
+    తిరిగి 0;
 }
 
-typedef int (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
+రకనిర్వచనం పూర్ణాంకం (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
 
-    static int
+    స్థిర పూర్ణాంకం
 convert_dl(PyObject *obj, typval_T *tv,
-				    pytotvfunc py_to_tv, PyObject *lookup_dict)
+				    pytotvfunc py_గమ్యం_tv, PyObject *lookup_dict)
 {
     PyObject	*capsule;
-    char	hexBuf[sizeof(void *) * 2 + 3];
+    అక్షరం	hexBuf[పరిమాణం(శూన్య *) * 2 + 3];
 
-    sprintf(hexBuf, "%p", (void *)obj);
+    sprintf(hexBuf, "%p", (శూన్య *)obj);
 
-#ifdef PY_USE_CAPSULE
-    capsule = PyDict_GetItemString(lookup_dict, hexBuf);
-#else
-    capsule = (PyObject *)PyDict_GetItemString(lookup_dict, hexBuf);
-#endif
-    if (capsule == NULL)
+#నిర్వచితమైతే PY_USE_CAPSULE
+    capsule = Py_Dict_Get_అంశం_String(lookup_dict, hexBuf);
+#లేకపోతే
+    capsule = (PyObject *)Py_Dict_Get_అంశం_String(lookup_dict, hexBuf);
+#అయితే_ముగింపు
+    ఒకవేళ (capsule == ఖాళీ)
     {
-#ifdef PY_USE_CAPSULE
-	capsule = PyCapsule_New(tv, NULL, NULL);
-#else
-	capsule = PyCObject_FromVoidPtr(tv, NULL);
-#endif
-	if (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
+#నిర్వచితమైతే PY_USE_CAPSULE
+	capsule = PyCapsule_New(tv, ఖాళీ, ఖాళీ);
+#లేకపోతే
+	capsule = PyCObject_FromVoidPtr(tv, ఖాళీ);
+#అయితే_ముగింపు
+	ఒకవేళ (Py_Dict_సమితి_అంశం_String(lookup_dict, hexBuf, capsule))
 	{
 	    Py_DECREF(capsule);
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    తిరిగి -1;
 	}
 
 	Py_DECREF(capsule);
 
-	if (py_to_tv(obj, tv, lookup_dict) == -1)
+	ఒకవేళ (py_గమ్యం_tv(obj, tv, lookup_dict) == -1)
 	{
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    తిరిగి -1;
 	}
 	// As we are not using copy_tv which increments reference count we must
 	// do it ourself.
-	if (tv->v_type == VAR_DICT)
+	ఒకవేళ (tv->v_type == VAR_DICT)
 	    ++tv->vval.v_dict->dv_refcount;
-	else if (tv->v_type == VAR_LIST)
+	లేకపోతే ఒకవేళ (tv->v_type == VAR_LIST)
 	    ++tv->vval.v_list->lv_refcount;
-	else if (tv->v_type == VAR_TUPLE)
+	లేకపోతే ఒకవేళ (tv->v_type == VAR_TUPLE)
 	    ++tv->vval.v_tuple->tv_refcount;
     }
-    else
+    లేకపోతే
     {
 	typval_T	*v;
 
-#ifdef PY_USE_CAPSULE
-	v = PyCapsule_GetPointer(capsule, NULL);
-#else
+#నిర్వచితమైతే PY_USE_CAPSULE
+	v = Py_Capsule_Get_సూచిక(capsule, ఖాళీ);
+#లేకపోతే
 	v = PyCObject_AsVoidPtr(capsule);
-#endif
+#అయితే_ముగింపు
 	copy_tv(v, tv);
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    పూర్ణాంకం		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ఒకవేళ (!(lookup_dict = PyDict_New()))
+	తిరిగి -1;
 
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    ఒకవేళ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
 	ret = 0;
     }
-    else if (PyDict_Check(obj))
-	ret = convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	ret = convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else
+    లేకపోతే ఒకవేళ (PyDict_Check(obj))
+	ret = convert_dl(obj, tv, pydict_గమ్యం_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (PyMapping_Check(obj))
+	ret = convert_dl(obj, tv, pymap_గమ్యం_tv, lookup_dict);
+    లేకపోతే
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim dictionary"),
@@ -6967,28 +6967,28 @@ ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 ConvertFromPySequence(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    పూర్ణాంకం		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ఒకవేళ (!(lookup_dict = PyDict_New()))
+	తిరిగి -1;
 
-    if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    ఒకవేళ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
 	ret = 0;
     }
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	ret = convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else
+    లేకపోతే ఒకవేళ (PyIter_Check(obj) || PySequence_Check(obj))
+	ret = convert_dl(obj, tv, pyseq_గమ్యం_tv, lookup_dict);
+    లేకపోతే
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim list"),
@@ -6996,256 +6996,256 @@ ConvertFromPySequence(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 ConvertFromPyObject(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    పూర్ణాంకం		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ఒకవేళ (!(lookup_dict = PyDict_New()))
+	తిరిగి -1;
     ret = _ConvertFromPyObject(obj, tv, lookup_dict);
     Py_DECREF(lookup_dict);
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    ఒకవేళ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    లేకపోతే ఒకవేళ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
+    లేకపోతే ఒకవేళ (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
     {
 	tv->v_type = VAR_TUPLE;
 	tv->vval.v_tuple = (((TupleObject *)(obj))->tuple);
 	++tv->vval.v_tuple->tv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
+    లేకపోతే ఒకవేళ (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
     {
 	FunctionObject *func = (FunctionObject *) obj;
-	if (func->self != NULL || func->argv != NULL)
+	ఒకవేళ (func->self != ఖాళీ || func->argv != ఖాళీ)
 	{
 	    partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
 
-	    set_partial(func, pt, TRUE);
+	    సమితి_partial(func, pt, TRUE);
 	    tv->vval.v_partial = pt;
 	    tv->v_type = VAR_PARTIAL;
 	}
-	else
+	లేకపోతే
 	{
-	    if (set_string_copy(func->name, tv) == -1)
-		return -1;
+	    ఒకవేళ (సమితి_string_copy(func->name, tv) == -1)
+		తిరిగి -1;
 
 	    tv->v_type = VAR_FUNC;
 	}
 	func_ref(func->name);
     }
-    else if (PyBytes_Check(obj))
+    లేకపోతే ఒకవేళ (Py_బైట్లు_Check(obj))
     {
 	char_u	*str;
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(obj, (అక్షరం **) &str, ఖాళీ) == -1)
+	    తిరిగి -1;
+	ఒకవేళ (str == ఖాళీ)
+	    తిరిగి -1;
 
-	if (set_string_copy(str, tv) == -1)
-	    return -1;
+	ఒకవేళ (సమితి_string_copy(str, tv) == -1)
+	    తిరిగి -1;
 
 	tv->v_type = VAR_STRING;
     }
-    else if (PyUnicode_Check(obj))
+    లేకపోతే ఒకవేళ (PyUnicode_Check(obj))
     {
-	PyObject	*bytes;
+	PyObject	*బైట్లు;
 	char_u	*str;
 
-	bytes = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
-	if (bytes == NULL)
-	    return -1;
+	బైట్లు = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
+	ఒకవేళ (బైట్లు == ఖాళీ)
+	    తిరిగి -1;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	ఒకవేళ (Py_బైట్లు_As_String_And_కొలత(బైట్లు, (అక్షరం **) &str, ఖాళీ) == -1)
+	    తిరిగి -1;
+	ఒకవేళ (str == ఖాళీ)
+	    తిరిగి -1;
 
-	if (set_string_copy(str, tv))
+	ఒకవేళ (సమితి_string_copy(str, tv))
 	{
-	    Py_XDECREF(bytes);
-	    return -1;
+	    Py_XDECREF(బైట్లు);
+	    తిరిగి -1;
 	}
-	Py_XDECREF(bytes);
+	Py_XDECREF(బైట్లు);
 
 	tv->v_type = VAR_STRING;
     }
-#if PY_MAJOR_VERSION < 3
-    else if (PyInt_Check(obj))
+#ఒకవేళ PY_MAJOR_సంస్కరణ < 3
+    లేకపోతే ఒకవేళ (PyInt_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	tv->v_type = VAR_సంఖ్య;
+	tv->vval.v_సంఖ్య = (varnumber_T) PyInt_AsLong(obj);
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి -1;
     }
-#endif
-    else if (PyLong_Check(obj))
+#అయితే_ముగింపు
+    లేకపోతే ఒకవేళ (PyLong_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	tv->v_type = VAR_సంఖ్య;
+	tv->vval.v_సంఖ్య = (varnumber_T) PyLong_AsLong(obj);
+	ఒకవేళ (PyErr_Occurred())
+	    తిరిగి -1;
     }
-    else if (PyTuple_Check(obj))
-	return convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
-    else if (PyDict_Check(obj))
-	return convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyFloat_Check(obj))
+    లేకపోతే ఒకవేళ (PyTuple_Check(obj))
+	తిరిగి convert_dl(obj, tv, pytuple_గమ్యం_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (PyDict_Check(obj))
+	తిరిగి convert_dl(obj, tv, pydict_గమ్యం_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (PyFloat_Check(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = (float_T) PyFloat_AsDouble(obj);
     }
-    else if (PyObject_HasAttrString(obj, "keys"))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (PyObject_HasAttrString(obj, "keys"))
+	తిరిగి convert_dl(obj, tv, pymap_గమ్యం_tv, lookup_dict);
     // PyObject_GetIter can create built-in iterator for any sequence object
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	return convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else if (PyNumber_Check(obj))
+    లేకపోతే ఒకవేళ (PyIter_Check(obj) || PySequence_Check(obj))
+	తిరిగి convert_dl(obj, tv, pyseq_గమ్యం_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (PyMapping_Check(obj))
+	తిరిగి convert_dl(obj, tv, pymap_గమ్యం_tv, lookup_dict);
+    లేకపోతే ఒకవేళ (Py_సంఖ్య_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*అంకె;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	ఒకవేళ (!(అంకె = Py_సంఖ్య_Long(obj)))
+	    తిరిగి -1;
 
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(num);
+	tv->v_type = VAR_సంఖ్య;
+	tv->vval.v_సంఖ్య = (varnumber_T) PyLong_AsLong(అంకె);
 
-	Py_DECREF(num);
+	Py_DECREF(అంకె);
     }
-    else if (obj == Py_None)
+    లేకపోతే ఒకవేళ (obj == Py_None)
     {
 	tv->v_type = VAR_SPECIAL;
-	tv->vval.v_number = VVAL_NONE;
+	tv->vval.v_సంఖ్య = VVAL_NONE;
     }
-    else
+    లేకపోతే
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim structure"),
 		obj);
-	return -1;
+	తిరిగి -1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static PyObject *
-ConvertToPyObject(typval_T *tv)
+    స్థిర PyObject *
+Convert_గమ్యం_Py_Object(typval_T *tv)
 {
     typval_T *argv;
-    int i;
-    if (tv == NULL)
+    పూర్ణాంకం i;
+    ఒకవేళ (tv == ఖాళీ)
     {
-	PyErr_SET_VIM(N_("internal error: NULL reference passed"));
-	return NULL;
+	Py_Err_సమితి_VIM(N_("internal error: NULL reference passed"));
+	తిరిగి ఖాళీ;
     }
-    switch (tv->v_type)
+    ఎంపిక (tv->v_type)
     {
-	case VAR_STRING:
-	    return PyBytes_FromString(tv->vval.v_string == NULL
-					    ? "" : (char *)tv->vval.v_string);
-	case VAR_NUMBER:
-	    return PyLong_FromLong((long) tv->vval.v_number);
-	case VAR_FLOAT:
-	    return PyFloat_FromDouble((double) tv->vval.v_float);
-	case VAR_LIST:
-	    return NEW_LIST(tv->vval.v_list);
-	case VAR_TUPLE:
-	    return NEW_TUPLE(tv->vval.v_tuple);
-	case VAR_DICT:
-	    return NEW_DICTIONARY(tv->vval.v_dict);
-	case VAR_FUNC:
-	    return NEW_FUNCTION(tv->vval.v_string == NULL
+	స్థితి VAR_STRING:
+	    తిరిగి Py_బైట్లు_From_String(tv->vval.v_string == ఖాళీ
+					    ? "" : (అక్షరం *)tv->vval.v_string);
+	స్థితి VAR_సంఖ్య:
+	    తిరిగి PyLong_FromLong((దీర్ఘ) tv->vval.v_సంఖ్య);
+	స్థితి VAR_FLOAT:
+	    తిరిగి PyFloat_FromDouble((ద్విగుణ) tv->vval.v_float);
+	స్థితి VAR_LIST:
+	    తిరిగి NEW_LIST(tv->vval.v_list);
+	స్థితి VAR_TUPLE:
+	    తిరిగి NEW_TUPLE(tv->vval.v_tuple);
+	స్థితి VAR_DICT:
+	    తిరిగి NEW_DICTIONARY(tv->vval.v_dict);
+	స్థితి VAR_FUNC:
+	    తిరిగి NEW_FUNCTION(tv->vval.v_string == ఖాళీ
 					  ? (char_u *)"" : tv->vval.v_string,
-					  0, NULL, NULL, TRUE);
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial->pt_argc)
+					  0, ఖాళీ, ఖాళీ, TRUE);
+	స్థితి VAR_PARTIAL:
+	    ఒకవేళ (tv->vval.v_partial->pt_argc)
 	    {
 		argv = PyMem_New(typval_T, (size_t)tv->vval.v_partial->pt_argc);
-		for (i = 0; i < tv->vval.v_partial->pt_argc; i++)
+		కొరకు (i = 0; i < tv->vval.v_partial->pt_argc; i++)
 		    copy_tv(&tv->vval.v_partial->pt_argv[i], &argv[i]);
 	    }
-	    else
-		argv = NULL;
-	    if (tv->vval.v_partial->pt_dict != NULL)
+	    లేకపోతే
+		argv = ఖాళీ;
+	    ఒకవేళ (tv->vval.v_partial->pt_dict != ఖాళీ)
 		tv->vval.v_partial->pt_dict->dv_refcount++;
-	    return NEW_FUNCTION(tv->vval.v_partial == NULL
+	    తిరిగి NEW_FUNCTION(tv->vval.v_partial == ఖాళీ
 			     ? (char_u *)"" : partial_name(tv->vval.v_partial),
 				tv->vval.v_partial->pt_argc, argv,
 				tv->vval.v_partial->pt_dict,
 				tv->vval.v_partial->pt_auto);
-	case VAR_BLOB:
-	    return PyBytes_FromStringAndSize(
-		(char*) tv->vval.v_blob->bv_ga.ga_data,
+	స్థితి VAR_BLOB:
+	    తిరిగి Py_బైట్లు_From_String_And_కొలత(
+		(అక్షరం*) tv->vval.v_blob->bv_ga.ga_దత్తాంశం,
 		(Py_ssize_t) tv->vval.v_blob->bv_ga.ga_len);
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_CHANNEL:
-	case VAR_JOB:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_పని:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_CLASS:
+	స్థితి VAR_OBJECT:
+	స్థితి VAR_TYPEALIAS:
 	    Py_INCREF(Py_None);
-	    return Py_None;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    switch (tv->vval.v_number)
+	    తిరిగి Py_None;
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	    ఎంపిక (tv->vval.v_సంఖ్య)
 	    {
-		case VVAL_FALSE: return ALWAYS_FALSE;
-		case VVAL_TRUE:  return ALWAYS_TRUE;
-		case VVAL_NONE:
-		case VVAL_NULL:  return ALWAYS_NONE;
+		స్థితి VVAL_FALSE: తిరిగి ALWAYS_FALSE;
+		స్థితి VVAL_TRUE:  తిరిగి ALWAYS_TRUE;
+		స్థితి VVAL_NONE:
+		స్థితి VVAL_NULL:  తిరిగి ALWAYS_NONE;
 	    }
-	    PyErr_SET_VIM(N_("internal error: invalid value type"));
-	    return NULL;
+	    Py_Err_సమితి_VIM(N_("internal error: invalid value type"));
+	    తిరిగి ఖాళీ;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 DEFINE_PY_TYPE_OBJECT(CurrentType);
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    PyObject_HEAD
+    Py_Object_తల
 } CurrentObject;
 
-static CurrentObject TheCurrent =
+స్థిర CurrentObject TheCurrent =
 {
-    PyObject_HEAD_INIT_TYPE(CurrentType)
+    Py_Object_తల_INIT_TYPE(CurrentType)
 };
 
-    static void
-init_structs(void)
+    స్థిర శూన్య
+init_structs(శూన్య)
 {
-    CLEAR_FIELD(OutputType);
+    CLEAR_క్షేత్రం(OutputType);
     OutputType.tp_name = "vim.message";
-    OutputType.tp_basicsize = sizeof(OutputObject);
+    OutputType.tp_basicsize = పరిమాణం(OutputObject);
     OutputType.tp_flags = Py_TPFLAGS_DEFAULT;
     OutputType.tp_doc = "vim message object";
     OutputType.tp_methods = OutputMethods;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     OutputType.tp_getattro = OutputGetattro;
     OutputType.tp_setattro = OutputSetattro;
     OutputType.tp_alloc = call_PyType_GenericAlloc;
@@ -7254,111 +7254,111 @@ init_structs(void)
 # ifndef USE_LIMITED_API
     // The std printer type is only exposed in full API. It is not essential
     // anyway and so in limited API we don't set it.
-    OutputType.tp_base = &PyStdPrinter_Type;
+    OutputType.tp_పునాది = &PyStdPrinter_Type;
 # endif
-#else
+#లేకపోతే
     OutputType.tp_getattr = OutputGetattr;
     OutputType.tp_setattr = OutputSetattr;
     // Disabled, because this causes a crash in test86
     // OutputType.tp_base = &PyFile_Type;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(IterType);
+    CLEAR_క్షేత్రం(IterType);
     IterType.tp_name = "vim.iter";
-    IterType.tp_basicsize = sizeof(IterObject);
+    IterType.tp_basicsize = పరిమాణం(IterObject);
     IterType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     IterType.tp_doc = "generic iterator object";
     IterType.tp_iter = IterIter;
-    IterType.tp_iternext = IterNext;
+    IterType.tp_iternext = Iter_తదుపరి;
     IterType.tp_dealloc = IterDestructor;
     IterType.tp_traverse = IterTraverse;
     IterType.tp_clear = IterClear;
 
-    CLEAR_FIELD(BufferType);
-    BufferType.tp_name = "vim.buffer";
-    BufferType.tp_basicsize = sizeof(BufferObject);
-    BufferType.tp_dealloc = BufferDestructor;
-    BufferType.tp_repr = BufferRepr;
-    BufferType.tp_as_sequence = &BufferAsSeq;
-    BufferType.tp_as_mapping = &BufferAsMapping;
-    BufferType.tp_flags = Py_TPFLAGS_DEFAULT;
-    BufferType.tp_doc = "vim buffer object";
-    BufferType.tp_methods = BufferMethods;
-#if PY_MAJOR_VERSION >= 3
-    BufferType.tp_getattro = BufferGetattro;
-    BufferType.tp_setattro = BufferSetattro;
-    BufferType.tp_alloc = call_PyType_GenericAlloc;
-    BufferType.tp_new = call_PyType_GenericNew;
-    BufferType.tp_free = call_PyObject_Free;
-#else
-    BufferType.tp_getattr = BufferGetattr;
-    BufferType.tp_setattr = BufferSetattr;
-#endif
+    CLEAR_క్షేత్రం(బఫరు_Type);
+    బఫరు_Type.tp_name = "vim.buffer";
+    బఫరు_Type.tp_basicsize = పరిమాణం(బఫరు_Object);
+    బఫరు_Type.tp_dealloc = బఫరు_Destructor;
+    బఫరు_Type.tp_repr = బఫరు_Repr;
+    బఫరు_Type.tp_as_sequence = &బఫరు_As_Seq;
+    బఫరు_Type.tp_as_mapping = &బఫరు_As_Mapping;
+    బఫరు_Type.tp_flags = Py_TPFLAGS_DEFAULT;
+    బఫరు_Type.tp_doc = "vim buffer object";
+    బఫరు_Type.tp_methods = బఫరు_Methods;
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
+    బఫరు_Type.tp_getattro = బఫరు_Getattro;
+    బఫరు_Type.tp_setattro = బఫరు_Setattro;
+    బఫరు_Type.tp_alloc = call_PyType_GenericAlloc;
+    బఫరు_Type.tp_new = call_PyType_GenericNew;
+    బఫరు_Type.tp_free = call_PyObject_Free;
+#లేకపోతే
+    బఫరు_Type.tp_getattr = బఫరు_Getattr;
+    బఫరు_Type.tp_setattr = బఫరు_Setattr;
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(WindowType);
-    WindowType.tp_name = "vim.window";
-    WindowType.tp_basicsize = sizeof(WindowObject);
-    WindowType.tp_dealloc = WindowDestructor;
-    WindowType.tp_repr = WindowRepr;
-    WindowType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
-    WindowType.tp_doc = "vim Window object";
-    WindowType.tp_methods = WindowMethods;
-    WindowType.tp_traverse = WindowTraverse;
-    WindowType.tp_clear = WindowClear;
-#if PY_MAJOR_VERSION >= 3
-    WindowType.tp_getattro = WindowGetattro;
-    WindowType.tp_setattro = WindowSetattro;
-    WindowType.tp_alloc = call_PyType_GenericAlloc;
-    WindowType.tp_new = call_PyType_GenericNew;
-    WindowType.tp_free = call_PyObject_Free;
-#else
-    WindowType.tp_getattr = WindowGetattr;
-    WindowType.tp_setattr = WindowSetattr;
-#endif
+    CLEAR_క్షేత్రం(కిటికీ_Type);
+    కిటికీ_Type.tp_name = "vim.window";
+    కిటికీ_Type.tp_basicsize = పరిమాణం(కిటికీ_Object);
+    కిటికీ_Type.tp_dealloc = కిటికీ_Destructor;
+    కిటికీ_Type.tp_repr = కిటికీ_Repr;
+    కిటికీ_Type.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
+    కిటికీ_Type.tp_doc = "vim Window object";
+    కిటికీ_Type.tp_methods = కిటికీ_Methods;
+    కిటికీ_Type.tp_traverse = కిటికీ_Traverse;
+    కిటికీ_Type.tp_clear = కిటికీ_Clear;
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
+    కిటికీ_Type.tp_getattro = కిటికీ_Getattro;
+    కిటికీ_Type.tp_setattro = కిటికీ_Setattro;
+    కిటికీ_Type.tp_alloc = call_PyType_GenericAlloc;
+    కిటికీ_Type.tp_new = call_PyType_GenericNew;
+    కిటికీ_Type.tp_free = call_PyObject_Free;
+#లేకపోతే
+    కిటికీ_Type.tp_getattr = కిటికీ_Getattr;
+    కిటికీ_Type.tp_setattr = కిటికీ_Setattr;
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(TabPageType);
-    TabPageType.tp_name = "vim.tabpage";
-    TabPageType.tp_basicsize = sizeof(TabPageObject);
-    TabPageType.tp_dealloc = TabPageDestructor;
-    TabPageType.tp_repr = TabPageRepr;
-    TabPageType.tp_flags = Py_TPFLAGS_DEFAULT;
-    TabPageType.tp_doc = "vim tab page object";
-    TabPageType.tp_methods = TabPageMethods;
-#if PY_MAJOR_VERSION >= 3
-    TabPageType.tp_getattro = TabPageGetattro;
-    TabPageType.tp_alloc = call_PyType_GenericAlloc;
-    TabPageType.tp_new = call_PyType_GenericNew;
-    TabPageType.tp_free = call_PyObject_Free;
-#else
-    TabPageType.tp_getattr = TabPageGetattr;
-#endif
+    CLEAR_క్షేత్రం(Tab_పుట_Type);
+    Tab_పుట_Type.tp_name = "vim.tabpage";
+    Tab_పుట_Type.tp_basicsize = పరిమాణం(Tab_పుట_Object);
+    Tab_పుట_Type.tp_dealloc = Tab_పుట_Destructor;
+    Tab_పుట_Type.tp_repr = Tab_పుట_Repr;
+    Tab_పుట_Type.tp_flags = Py_TPFLAGS_DEFAULT;
+    Tab_పుట_Type.tp_doc = "vim tab page object";
+    Tab_పుట_Type.tp_methods = Tab_పుట_Methods;
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
+    Tab_పుట_Type.tp_getattro = Tab_పుట_Getattro;
+    Tab_పుట_Type.tp_alloc = call_PyType_GenericAlloc;
+    Tab_పుట_Type.tp_new = call_PyType_GenericNew;
+    Tab_పుట_Type.tp_free = call_PyObject_Free;
+#లేకపోతే
+    Tab_పుట_Type.tp_getattr = Tab_పుట_Getattr;
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(BufMapType);
+    CLEAR_క్షేత్రం(BufMapType);
     BufMapType.tp_name = "vim.bufferlist";
-    BufMapType.tp_basicsize = sizeof(BufMapObject);
+    BufMapType.tp_basicsize = పరిమాణం(BufMapObject);
     BufMapType.tp_as_mapping = &BufMapAsMapping;
     BufMapType.tp_flags = Py_TPFLAGS_DEFAULT;
     BufMapType.tp_iter = BufMapIter;
     BufMapType.tp_doc = "vim buffer list";
 
-    CLEAR_FIELD(WinListType);
+    CLEAR_క్షేత్రం(WinListType);
     WinListType.tp_name = "vim.windowlist";
-    WinListType.tp_basicsize = sizeof(WinListObject);
+    WinListType.tp_basicsize = పరిమాణం(WinListObject);
     WinListType.tp_as_sequence = &WinListAsSeq;
     WinListType.tp_flags = Py_TPFLAGS_DEFAULT;
     WinListType.tp_doc = "vim window list";
     WinListType.tp_dealloc = (destructor)WinListDestructor;
 
-    CLEAR_FIELD(TabListType);
+    CLEAR_క్షేత్రం(TabListType);
     TabListType.tp_name = "vim.tabpagelist";
-    TabListType.tp_basicsize = sizeof(TabListObject);
+    TabListType.tp_basicsize = పరిమాణం(TabListObject);
     TabListType.tp_as_sequence = &TabListAsSeq;
     TabListType.tp_flags = Py_TPFLAGS_DEFAULT;
     TabListType.tp_doc = "vim tab page list";
 
-    CLEAR_FIELD(RangeType);
+    CLEAR_క్షేత్రం(RangeType);
     RangeType.tp_name = "vim.range";
-    RangeType.tp_basicsize = sizeof(RangeObject);
+    RangeType.tp_basicsize = పరిమాణం(RangeObject);
     RangeType.tp_dealloc = RangeDestructor;
     RangeType.tp_repr = RangeRepr;
     RangeType.tp_as_sequence = &RangeAsSeq;
@@ -7368,32 +7368,32 @@ init_structs(void)
     RangeType.tp_methods = RangeMethods;
     RangeType.tp_traverse = RangeTraverse;
     RangeType.tp_clear = RangeClear;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     RangeType.tp_getattro = RangeGetattro;
     RangeType.tp_alloc = call_PyType_GenericAlloc;
     RangeType.tp_new = call_PyType_GenericNew;
     RangeType.tp_free = call_PyObject_Free;
-#else
+#లేకపోతే
     RangeType.tp_getattr = RangeGetattr;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(CurrentType);
+    CLEAR_క్షేత్రం(CurrentType);
     CurrentType.tp_name = "vim.currentdata";
-    CurrentType.tp_basicsize = sizeof(CurrentObject);
+    CurrentType.tp_basicsize = పరిమాణం(CurrentObject);
     CurrentType.tp_flags = Py_TPFLAGS_DEFAULT;
     CurrentType.tp_doc = "vim current object";
     CurrentType.tp_methods = CurrentMethods;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     CurrentType.tp_getattro = CurrentGetattro;
     CurrentType.tp_setattro = CurrentSetattro;
-#else
+#లేకపోతే
     CurrentType.tp_getattr = CurrentGetattr;
     CurrentType.tp_setattr = CurrentSetattr;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(DictionaryType);
+    CLEAR_క్షేత్రం(DictionaryType);
     DictionaryType.tp_name = "vim.dictionary";
-    DictionaryType.tp_basicsize = sizeof(DictionaryObject);
+    DictionaryType.tp_basicsize = పరిమాణం(DictionaryObject);
     DictionaryType.tp_dealloc = DictionaryDestructor;
     DictionaryType.tp_as_sequence = &DictionaryAsSeq;
     DictionaryType.tp_as_mapping = &DictionaryAsMapping;
@@ -7403,18 +7403,18 @@ init_structs(void)
     DictionaryType.tp_iter = DictionaryIter;
     DictionaryType.tp_new = DictionaryConstructor;
     DictionaryType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     DictionaryType.tp_getattro = DictionaryGetattro;
     DictionaryType.tp_setattro = DictionarySetattro;
-#else
+#లేకపోతే
     DictionaryType.tp_getattr = DictionaryGetattr;
     DictionaryType.tp_setattr = DictionarySetattr;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(ListType);
+    CLEAR_క్షేత్రం(ListType);
     ListType.tp_name = "vim.list";
     ListType.tp_dealloc = ListDestructor;
-    ListType.tp_basicsize = sizeof(ListObject);
+    ListType.tp_basicsize = పరిమాణం(ListObject);
     ListType.tp_as_sequence = &ListAsSeq;
     ListType.tp_as_mapping = &ListAsMapping;
     ListType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7423,19 +7423,19 @@ init_structs(void)
     ListType.tp_iter = ListIter;
     ListType.tp_new = ListConstructor;
     ListType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     ListType.tp_getattro = ListGetattro;
     ListType.tp_setattro = ListSetattro;
-#else
+#లేకపోతే
     ListType.tp_getattr = ListGetattr;
     ListType.tp_setattr = ListSetattr;
-#endif
+#అయితే_ముగింపు
 
     // Tuple type
-    CLEAR_FIELD(TupleType);
+    CLEAR_క్షేత్రం(TupleType);
     TupleType.tp_name = "vim.tuple";
     TupleType.tp_dealloc = TupleDestructor;
-    TupleType.tp_basicsize = sizeof(TupleObject);
+    TupleType.tp_basicsize = పరిమాణం(TupleObject);
     TupleType.tp_as_sequence = &TupleAsSeq;
     TupleType.tp_as_mapping = &TupleAsMapping;
     TupleType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7444,17 +7444,17 @@ init_structs(void)
     TupleType.tp_iter = TupleIter;
     TupleType.tp_new = TupleConstructor;
     TupleType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     TupleType.tp_getattro = TupleGetattro;
     TupleType.tp_setattro = TupleSetattro;
-#else
+#లేకపోతే
     TupleType.tp_getattr = TupleGetattr;
     TupleType.tp_setattr = TupleSetattr;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(FunctionType);
+    CLEAR_క్షేత్రం(FunctionType);
     FunctionType.tp_name = "vim.function";
-    FunctionType.tp_basicsize = sizeof(FunctionObject);
+    FunctionType.tp_basicsize = పరిమాణం(FunctionObject);
     FunctionType.tp_dealloc = FunctionDestructor;
     FunctionType.tp_call = FunctionCall;
     FunctionType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7463,15 +7463,15 @@ init_structs(void)
     FunctionType.tp_repr = FunctionRepr;
     FunctionType.tp_new = FunctionConstructor;
     FunctionType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
     FunctionType.tp_getattro = FunctionGetattro;
-#else
+#లేకపోతే
     FunctionType.tp_getattr = FunctionGetattr;
-#endif
+#అయితే_ముగింపు
 
-    CLEAR_FIELD(OptionsType);
+    CLEAR_క్షేత్రం(OptionsType);
     OptionsType.tp_name = "vim.options";
-    OptionsType.tp_basicsize = sizeof(OptionsObject);
+    OptionsType.tp_basicsize = పరిమాణం(OptionsObject);
     OptionsType.tp_as_sequence = &OptionsAsSeq;
     OptionsType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     OptionsType.tp_doc = "object for manipulating options";
@@ -7481,33 +7481,33 @@ init_structs(void)
     OptionsType.tp_traverse = OptionsTraverse;
     OptionsType.tp_clear = OptionsClear;
 
-#if PY_VERSION_HEX < 0x030700f0
-    CLEAR_FIELD(LoaderType);
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x030700f0
+    CLEAR_క్షేత్రం(LoaderType);
     LoaderType.tp_name = "vim.Loader";
-    LoaderType.tp_basicsize = sizeof(LoaderObject);
+    LoaderType.tp_basicsize = పరిమాణం(LoaderObject);
     LoaderType.tp_flags = Py_TPFLAGS_DEFAULT;
     LoaderType.tp_doc = "vim message object";
     LoaderType.tp_methods = LoaderMethods;
     LoaderType.tp_dealloc = LoaderDestructor;
-#endif
+#అయితే_ముగింపు
 
-#if PY_MAJOR_VERSION >= 3
-    CLEAR_FIELD(vimmodule);
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
+    CLEAR_క్షేత్రం(vimmodule);
     vimmodule.m_name = "vim";
     vimmodule.m_doc = "Vim Python interface\n";
-    vimmodule.m_size = -1;
+    vimmodule.m_కొలత_2 = -1;
     vimmodule.m_methods = VimMethods;
-#endif
+#అయితే_ముగింపు
 }
 
-    static int
-init_types(void)
+    స్థిర పూర్ణాంకం
+init_types(శూన్య)
 {
     PYTYPE_READY(IterType);
-    PYTYPE_READY(BufferType);
+    PYTYPE_READY(బఫరు_Type);
     PYTYPE_READY(RangeType);
-    PYTYPE_READY(WindowType);
-    PYTYPE_READY(TabPageType);
+    PYTYPE_READY(కిటికీ_Type);
+    PYTYPE_READY(Tab_పుట_Type);
     PYTYPE_READY(BufMapType);
     PYTYPE_READY(WinListType);
     PYTYPE_READY(TabListType);
@@ -7518,34 +7518,34 @@ init_types(void)
     PYTYPE_READY(FunctionType);
     PYTYPE_READY(OptionsType);
     PYTYPE_READY(OutputType);
-#if PY_VERSION_HEX < 0x030700f0
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x030700f0
     PYTYPE_READY(LoaderType);
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_LIMITED_API
+#నిర్వచితమైతే USE_LIMITED_API
     // We need to finish initializing all the static objects because the types
     // are only just allocated on the heap now.
     // Each PyObject_HEAD_INIT_TYPE should correspond to a
     // PyObject_FINISH_INIT_TYPE below.
-    PyObject_FINISH_INIT_TYPE(Output, OutputType);
-    PyObject_FINISH_INIT_TYPE(Error, OutputType);
-    PyObject_FINISH_INIT_TYPE(TheBufferMap, BufMapType);
-    PyObject_FINISH_INIT_TYPE(TheWindowList, WinListType);
-    PyObject_FINISH_INIT_TYPE(TheCurrent, CurrentType);
-    PyObject_FINISH_INIT_TYPE(TheTabPageList, TabListType);
-#endif
-    return 0;
+    Py_Object_ముగింపు_INIT_TYPE(Output, OutputType);
+    Py_Object_ముగింపు_INIT_TYPE(Error, OutputType);
+    Py_Object_ముగింపు_INIT_TYPE(The_బఫరు_Map, BufMapType);
+    Py_Object_ముగింపు_INIT_TYPE(The_కిటికీ_List, WinListType);
+    Py_Object_ముగింపు_INIT_TYPE(TheCurrent, CurrentType);
+    Py_Object_ముగింపు_INIT_TYPE(The_Tab_పుట_List, TabListType);
+#అయితే_ముగింపు
+    తిరిగి 0;
 }
 
-#ifdef USE_LIMITED_API
-    static void
-shutdown_types(void)
+#నిర్వచితమైతే USE_LIMITED_API
+    స్థిర శూన్య
+shutdown_types(శూన్య)
 {
     PYTYPE_CLEANUP(IterType);
-    PYTYPE_CLEANUP(BufferType);
+    PYTYPE_CLEANUP(బఫరు_Type);
     PYTYPE_CLEANUP(RangeType);
-    PYTYPE_CLEANUP(WindowType);
-    PYTYPE_CLEANUP(TabPageType);
+    PYTYPE_CLEANUP(కిటికీ_Type);
+    PYTYPE_CLEANUP(Tab_పుట_Type);
     PYTYPE_CLEANUP(BufMapType);
     PYTYPE_CLEANUP(WinListType);
     PYTYPE_CLEANUP(TabListType);
@@ -7556,87 +7556,87 @@ shutdown_types(void)
     PYTYPE_CLEANUP(FunctionType);
     PYTYPE_CLEANUP(OptionsType);
     PYTYPE_CLEANUP(OutputType);
-# if PY_VERSION_HEX < 0x030700f0
+# ఒకవేళ PY_సంస్కరణ_HEX < 0x030700f0
     PYTYPE_CLEANUP(LoaderType);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-    static int
-init_sys_path(void)
+    స్థిర పూర్ణాంకం
+init_sys_మార్గం(శూన్య)
 {
-    PyObject	*path;
-    PyObject	*path_hook;
-    PyObject	*path_hooks;
+    PyObject	*మార్గం;
+    PyObject	*మార్గం_hook;
+    PyObject	*మార్గం_hooks;
 
-    if (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
-	return -1;
+    ఒకవేళ (!(మార్గం_hook = PyObject_GetAttrString(vim_module, "path_hook")))
+	తిరిగి -1;
 
-    if (!(path_hooks = PySys_GetObject("path_hooks")))
+    ఒకవేళ (!(మార్గం_hooks = PySys_GetObject("path_hooks")))
     {
 	PyErr_Clear();
-	path_hooks = PyList_New(1);
-	PyList_SET_ITEM(path_hooks, 0, path_hook);
-	if (PySys_SetObject("path_hooks", path_hooks))
+	మార్గం_hooks = PyList_New(1);
+	Py_List_సమితి_అంశం(మార్గం_hooks, 0, మార్గం_hook);
+	ఒకవేళ (Py_Sys_సమితి_Object("path_hooks", మార్గం_hooks))
 	{
-	    Py_DECREF(path_hooks);
-	    return -1;
+	    Py_DECREF(మార్గం_hooks);
+	    తిరిగి -1;
 	}
-	Py_DECREF(path_hooks);
+	Py_DECREF(మార్గం_hooks);
     }
-    else if (PyList_Check(path_hooks))
+    లేకపోతే ఒకవేళ (PyList_Check(మార్గం_hooks))
     {
-	if (PyList_Append(path_hooks, path_hook))
+	ఒకవేళ (PyList_Append(మార్గం_hooks, మార్గం_hook))
 	{
-	    Py_DECREF(path_hook);
-	    return -1;
+	    Py_DECREF(మార్గం_hook);
+	    తిరిగి -1;
 	}
-	Py_DECREF(path_hook);
+	Py_DECREF(మార్గం_hook);
     }
-    else
+    లేకపోతే
     {
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 	emsg(_("Failed to set path hook: sys.path_hooks is not a list\n"
 	       "You should now do the following:\n"
 	       "- append vim.path_hook to sys.path_hooks\n"
 	       "- append vim.VIM_SPECIAL_PATH to sys.path\n"));
-	VimTryEnd(); // Discard the error
-	Py_DECREF(path_hook);
-	return 0;
+	Vim_Try_చివర(); // Discard the error
+	Py_DECREF(మార్గం_hook);
+	తిరిగి 0;
     }
 
-    if (!(path = PySys_GetObject("path")))
+    ఒకవేళ (!(మార్గం = PySys_GetObject("path")))
     {
 	PyErr_Clear();
-	path = PyList_New(1);
-	Py_INCREF(vim_special_path_object);
-	PyList_SET_ITEM(path, 0, vim_special_path_object);
-	if (PySys_SetObject("path", path))
+	మార్గం = PyList_New(1);
+	Py_INCREF(vim_special_మార్గం_object);
+	Py_List_సమితి_అంశం(మార్గం, 0, vim_special_మార్గం_object);
+	ఒకవేళ (Py_Sys_సమితి_Object("path", మార్గం))
 	{
-	    Py_DECREF(path);
-	    return -1;
+	    Py_DECREF(మార్గం);
+	    తిరిగి -1;
 	}
-	Py_DECREF(path);
+	Py_DECREF(మార్గం);
     }
-    else if (PyList_Check(path))
+    లేకపోతే ఒకవేళ (PyList_Check(మార్గం))
     {
-	if (PyList_Append(path, vim_special_path_object))
-	    return -1;
+	ఒకవేళ (PyList_Append(మార్గం, vim_special_మార్గం_object))
+	    తిరిగి -1;
     }
-    else
+    లేకపోతే
     {
-	VimTryStart();
+	Vim_Try_ప్రారంభం();
 	emsg(_("Failed to set path: sys.path is not a list\n"
 	       "You should now append vim.VIM_SPECIAL_PATH to sys.path"));
-	VimTryEnd(); // Discard the error
+	Vim_Try_చివర(); // Discard the error
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
-static struct numeric_constant {
-    char	*name;
-    int		val;
+స్థిర నిర్మాణం numeric_constant {
+    అక్షరం	*name;
+    పూర్ణాంకం		val;
 } numeric_constants[] = {
     {"VAR_LOCKED",	VAR_LOCKED},
     {"VAR_FIXED",	VAR_FIXED},
@@ -7644,175 +7644,175 @@ static struct numeric_constant {
     {"VAR_DEF_SCOPE",	VAR_DEF_SCOPE},
 };
 
-struct object_constant {
-    char	*name;
+నిర్మాణం object_constant {
+    అక్షరం	*name;
     PyObject	*valObject;
 };
 
-#define ADD_OBJECT(m, name, obj) \
-    if (PyModule_AddObject(m, name, obj)) \
-	return -1;
+#నిర్వచించు కూడు_OBJECT(m, name, obj) \
+    ఒకవేళ (Py_Module_కూడు_Object(m, name, obj)) \
+	తిరిగి -1;
 
-#define ADD_CHECKED_OBJECT(m, name, obj) \
+#నిర్వచించు కూడు_CHECKED_OBJECT(m, name, obj) \
     { \
 	PyObject	*valObject = obj; \
-	if (!valObject) \
-	    return -1; \
-	ADD_OBJECT(m, name, valObject); \
+	ఒకవేళ (!valObject) \
+	    తిరిగి -1; \
+	కూడు_OBJECT(m, name, valObject); \
     }
 
-    static int
+    స్థిర పూర్ణాంకం
 populate_module(PyObject *m)
 {
-    int		i;
+    పూర్ణాంకం		i;
     PyObject	*other_module;
     PyObject	*attr;
     PyObject	*imp;
-#if PY_VERSION_HEX >= 0x030700f0
+#ఒకవేళ PY_సంస్కరణ_HEX >= 0x030700f0
     PyObject	*dict;
     PyObject	*cls;
-#endif
+#అయితే_ముగింపు
 
-    for (i = 0; i < (int)(sizeof(numeric_constants)
-					   / sizeof(struct numeric_constant));
+    కొరకు (i = 0; i < (పూర్ణాంకం)(పరిమాణం(numeric_constants)
+					   / పరిమాణం(నిర్మాణం numeric_constant));
 	    ++i)
-	ADD_CHECKED_OBJECT(m, numeric_constants[i].name,
+	కూడు_CHECKED_OBJECT(m, numeric_constants[i].name,
 		PyInt_FromLong(numeric_constants[i].val));
 
-    struct object_constant object_constants[] = {
-	{"buffers",  (PyObject *)(void *)&TheBufferMap},
-	{"windows",  (PyObject *)(void *)&TheWindowList},
-	{"tabpages", (PyObject *)(void *)&TheTabPageList},
-	{"current",  (PyObject *)(void *)&TheCurrent},
+    నిర్మాణం object_constant object_constants[] = {
+	{"buffers",  (PyObject *)(శూన్య *)&The_బఫరు_Map},
+	{"windows",  (PyObject *)(శూన్య *)&The_కిటికీ_List},
+	{"tabpages", (PyObject *)(శూన్య *)&The_Tab_పుట_List},
+	{"current",  (PyObject *)(శూన్య *)&TheCurrent},
 
-	{"Buffer",     (PyObject *)BufferTypePtr},
+	{"Buffer",     (PyObject *)బఫరు_Type_Ptr},
 	{"Range",      (PyObject *)RangeTypePtr},
-	{"Window",     (PyObject *)WindowTypePtr},
-	{"TabPage",    (PyObject *)TabPageTypePtr},
+	{"Window",     (PyObject *)కిటికీ_Type_Ptr},
+	{"TabPage",    (PyObject *)Tab_పుట_Type_Ptr},
 	{"Dictionary", (PyObject *)DictionaryTypePtr},
 	{"List",       (PyObject *)ListTypePtr},
 	{"Tuple",      (PyObject *)TupleTypePtr},
 	{"Function",   (PyObject *)FunctionTypePtr},
 	{"Options",    (PyObject *)OptionsTypePtr},
-#if PY_VERSION_HEX < 0x030700f0
+#ఒకవేళ PY_సంస్కరణ_HEX < 0x030700f0
 	{"_Loader",    (PyObject *)LoaderTypePtr},
-#endif
+#అయితే_ముగింపు
     };
 
-    for (i = 0; i < (int)(sizeof(object_constants)
-					    / sizeof(struct object_constant));
+    కొరకు (i = 0; i < (పూర్ణాంకం)(పరిమాణం(object_constants)
+					    / పరిమాణం(నిర్మాణం object_constant));
 	    ++i)
     {
 	PyObject	*valObject;
 
 	valObject = object_constants[i].valObject;
 	Py_INCREF(valObject);
-	ADD_OBJECT(m, object_constants[i].name, valObject);
+	కూడు_OBJECT(m, object_constants[i].name, valObject);
     }
 
-    if (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
-	return -1;
-    ADD_OBJECT(m, "error", VimError);
+    ఒకవేళ (!(VimError = PyErr_NewException("vim.error", ఖాళీ, ఖాళీ)))
+	తిరిగి -1;
+    కూడు_OBJECT(m, "error", VimError);
 
-    ADD_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
-    ADD_CHECKED_OBJECT(m, "vvars", NEW_DICTIONARY(get_vimvar_dict()));
-    ADD_CHECKED_OBJECT(m, "options",
-	    OptionsNew(SREQ_GLOBAL, NULL, dummy_check, NULL));
+    కూడు_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
+    కూడు_CHECKED_OBJECT(m, "vvars", NEW_DICTIONARY(get_vimvar_dict()));
+    కూడు_CHECKED_OBJECT(m, "options",
+	    OptionsNew(SREQ_GLOBAL, ఖాళీ, dummy_check, ఖాళీ));
 
-    if (!(other_module = PyImport_ImportModule("os")))
-	return -1;
-    ADD_OBJECT(m, "os", other_module);
+    ఒకవేళ (!(other_module = PyImport_ImportModule("os")))
+	తిరిగి -1;
+    కూడు_OBJECT(m, "os", other_module);
 
-#if PY_MAJOR_VERSION >= 3
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
-	return -1;
-#else
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
-	return -1;
-#endif
-    ADD_OBJECT(m, "_getcwd", py_getcwd)
+#ఒకవేళ PY_MAJOR_సంస్కరణ >= 3
+    ఒకవేళ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
+	తిరిగి -1;
+#లేకపోతే
+    ఒకవేళ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
+	తిరిగి -1;
+#అయితే_ముగింపు
+    కూడు_OBJECT(m, "_getcwd", py_getcwd)
 
-    if (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
-	return -1;
-    ADD_OBJECT(m, "_chdir", py_chdir);
-    if (!(attr = PyObject_GetAttrString(m, "chdir")))
-	return -1;
-    if (PyObject_SetAttrString(other_module, "chdir", attr))
+    ఒకవేళ (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
+	తిరిగి -1;
+    కూడు_OBJECT(m, "_chdir", py_chdir);
+    ఒకవేళ (!(attr = PyObject_GetAttrString(m, "chdir")))
+	తిరిగి -1;
+    ఒకవేళ (Py_Object_సమితి_Attr_String(other_module, "chdir", attr))
     {
 	Py_DECREF(attr);
-	return -1;
+	తిరిగి -1;
     }
     Py_DECREF(attr);
 
-    if ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
+    ఒకవేళ ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
     {
-	ADD_OBJECT(m, "_fchdir", py_fchdir);
-	if (!(attr = PyObject_GetAttrString(m, "fchdir")))
-	    return -1;
-	if (PyObject_SetAttrString(other_module, "fchdir", attr))
+	కూడు_OBJECT(m, "_fchdir", py_fchdir);
+	ఒకవేళ (!(attr = PyObject_GetAttrString(m, "fchdir")))
+	    తిరిగి -1;
+	ఒకవేళ (Py_Object_సమితి_Attr_String(other_module, "fchdir", attr))
 	{
 	    Py_DECREF(attr);
-	    return -1;
+	    తిరిగి -1;
 	}
 	Py_DECREF(attr);
     }
-    else
+    లేకపోతే
 	PyErr_Clear();
 
-    if (!(vim_special_path_object = PyString_FromString(vim_special_path)))
-	return -1;
+    ఒకవేళ (!(vim_special_మార్గం_object = PyString_FromString(vim_special_మార్గం)))
+	తిరిగి -1;
 
-    ADD_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_path_object);
+    కూడు_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_మార్గం_object);
 
-#if PY_VERSION_HEX >= 0x030700f0
-    if (!(imp = PyImport_ImportModule("importlib.machinery")))
-	return -1;
+#ఒకవేళ PY_సంస్కరణ_HEX >= 0x030700f0
+    ఒకవేళ (!(imp = PyImport_ImportModule("importlib.machinery")))
+	తిరిగి -1;
 
     dict = PyModule_GetDict(imp);
 
-    if (!(cls = PyDict_GetItemString(dict, "PathFinder")))
+    ఒకవేళ (!(cls = Py_Dict_Get_అంశం_String(dict, "PathFinder")))
     {
 	Py_DECREF(imp);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
+    ఒకవేళ (!(py_కనుగొను_spec = PyObject_GetAttrString(cls, "find_spec")))
     {
 	Py_DECREF(imp);
-	return -1;
+	తిరిగి -1;
     }
 
-# if PY_VERSION_HEX < 0x30c00a7
+# ఒకవేళ PY_సంస్కరణ_HEX < 0x30c00a7
     // find_module has been removed as of Python 3.12.0a7
-    if ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
-	ADD_OBJECT(m, "_find_module", py_find_module);
+    ఒకవేళ ((py_కనుగొను_module = PyObject_GetAttrString(cls, "find_module")))
+	కూడు_OBJECT(m, "_find_module", py_కనుగొను_module);
 # endif
 
     Py_DECREF(imp);
 
-    ADD_OBJECT(m, "_find_spec", py_find_spec);
-#else
-    if (!(imp = PyImport_ImportModule("imp")))
-	return -1;
+    కూడు_OBJECT(m, "_find_spec", py_కనుగొను_spec);
+#లేకపోతే
+    ఒకవేళ (!(imp = PyImport_ImportModule("imp")))
+	తిరిగి -1;
 
-    if (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
+    ఒకవేళ (!(py_కనుగొను_module = PyObject_GetAttrString(imp, "find_module")))
     {
 	Py_DECREF(imp);
-	return -1;
+	తిరిగి -1;
     }
 
-    if (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
+    ఒకవేళ (!(py_ఎక్కించు_module = PyObject_GetAttrString(imp, "load_module")))
     {
-	Py_DECREF(py_find_module);
+	Py_DECREF(py_కనుగొను_module);
 	Py_DECREF(imp);
-	return -1;
+	తిరిగి -1;
     }
 
     Py_DECREF(imp);
 
-    ADD_OBJECT(m, "_find_module", py_find_module);
-    ADD_OBJECT(m, "_load_module", py_load_module);
-#endif
+    కూడు_OBJECT(m, "_find_module", py_కనుగొను_module);
+    కూడు_OBJECT(m, "_load_module", py_ఎక్కించు_module);
+#అయితే_ముగింపు
 
-    return 0;
+    తిరిగి 0;
 }

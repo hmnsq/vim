@@ -66,50 +66,50 @@ TODO:
  *  ::vim::buffer new		#   create new buffer + Tcl command
  */
 
-#include "vim.h"
-#undef EXTERN			// tcl.h defines it too
+#అన్తర్భావ "vim.h"
+#నిర్వచనం_రద్దు EXTERN			// tcl.h defines it too
 
-#ifdef DYNAMIC_TCL
+#నిర్వచితమైతే DYNAMIC_TCL
 # define USE_TCL_STUBS // use tcl's stubs mechanism
-#endif
+#అయితే_ముగింపు
 
-#include <tcl.h>
-#include <string.h>
+#అన్తర్భావ <tcl.h>
+#అన్తర్భావ <string.h>
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     Tcl_Interp *interp;
-    int exitvalue;
-    int range_start, range_end;
-    int lbase;
-    char *curbuf, *curwin;
+    పూర్ణాంకం exitvalue;
+    పూర్ణాంకం range_ప్రారంభం, range_చివర;
+    పూర్ణాంకం lbase;
+    అక్షరం *curbuf, *curwin;
 } tcl_info;
 
-static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
+స్థిర tcl_info tclinfo = { ఖాళీ, 0, 0, 0, 0, ఖాళీ, ఖాళీ };
 
-#define VAR_RANGE1	"::vim::range(start)"
-#define VAR_RANGE2	"::vim::range(begin)"
-#define VAR_RANGE3	"::vim::range(end)"
-#define VAR_CURBUF	"::vim::current(buffer)"
-#define VAR_CURWIN	"::vim::current(window)"
-#define VAR_LBASE	"::vim::lbase"
-#define VAR_CURLINE	"line"
-#define VAR_CURLNUM	"lnum"
-#define VARNAME_SIZE	64
+#నిర్వచించు VAR_RANGE1	"::vim::range(start)"
+#నిర్వచించు VAR_RANGE2	"::vim::range(begin)"
+#నిర్వచించు VAR_RANGE3	"::vim::range(end)"
+#నిర్వచించు VAR_CURBUF	"::vim::current(buffer)"
+#నిర్వచించు VAR_CURWIN	"::vim::current(window)"
+#నిర్వచించు VAR_LBASE	"::vim::lbase"
+#నిర్వచించు VAR_CURLINE	"line"
+#నిర్వచించు VAR_CURLNUM	"lnum"
+#నిర్వచించు VARNAME_కొలత	64
 
-#define row2tcl(x)  ((x) - (tclinfo.lbase==0))
-#define row2vim(x)  ((x) + (tclinfo.lbase==0))
-#define col2tcl(x)  ((x) + (tclinfo.lbase!=0))
-#define col2vim(x)  ((x) - (tclinfo.lbase!=0))
+#నిర్వచించు row2tcl(x)  ((x) - (tclinfo.lbase==0))
+#నిర్వచించు row2vim(x)  ((x) + (tclinfo.lbase==0))
+#నిర్వచించు col2tcl(x)  ((x) + (tclinfo.lbase!=0))
+#నిర్వచించు col2vim(x)  ((x) - (tclinfo.lbase!=0))
 
 
-#define VIMOUT	((ClientData)1)
-#define VIMERR	((ClientData)2)
+#నిర్వచించు VIMOUT	((Client_దత్తాంశం)1)
+#నిర్వచించు VIMERR	((Client_దత్తాంశం)2)
 
 // This appears to be new in Tcl 8.4.
-#ifndef CONST84
+#నిర్వచితం_కాకపోతే CONST84
 # define CONST84
-#endif
+#అయితే_ముగింపు
 
 /*
  *  List of Tcl interpreters who reference a vim window or buffer.
@@ -118,37 +118,37 @@ static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
  *  the "interp" command, and each interpreter can reference all windows and
  *  buffers.
  */
-struct ref
+నిర్మాణం ref
 {
-    struct ref	*next;
+    నిర్మాణం ref	*తదుపరి;
 
     Tcl_Interp	*interp;
     Tcl_Command cmd;	    // Tcl command that represents this object
     Tcl_Obj	*delcmd;    // Tcl command to call when object is being del.
-    void	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
+    శూన్య	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
 };
-static char * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
-static char * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
-static int tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
-static int tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, int *valueP, buf_T *buf));
-static win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
-static int tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static void tcldelthisinterp _ANSI_ARGS_ ((void));
+స్థిర అక్షరం * tclgetbuffer ANSI_వాదనలు((Tcl_Interp *interp, buf_T *buf));
+స్థిర అక్షరం * tclgetwindow ANSI_వాదనలు((Tcl_Interp *interp, win_T *win));
+స్థిర పూర్ణాంకం tclsetdelcmd ANSI_వాదనలు((Tcl_Interp *interp, నిర్మాణం ref *reflist, శూన్య *vimobj, Tcl_Obj *delcmd));
+స్థిర పూర్ణాంకం tclgetlinenum ANSI_వాదనలు ((Tcl_Interp *interp, Tcl_Obj *obj, పూర్ణాంకం *విలువ_P, buf_T *buf));
+స్థిర win_T *tclfindwin ANSI_వాదనలు ((buf_T *buf));
+స్థిర పూర్ణాంకం tcldoexcommand ANSI_వాదనలు ((Tcl_Interp *interp, పూర్ణాంకం objc, Tcl_Obj *CONST objv[], పూర్ణాంకం objn));
+స్థిర పూర్ణాంకం tclsetoption ANSI_వాదనలు ((Tcl_Interp *interp, పూర్ణాంకం objc, Tcl_Obj *CONST objv[], పూర్ణాంకం objn));
+స్థిర పూర్ణాంకం tclvimexpr ANSI_వాదనలు ((Tcl_Interp *interp, పూర్ణాంకం objc, Tcl_Obj *CONST objv[], పూర్ణాంకం objn));
+స్థిర శూన్య tcldelthisinterp ANSI_వాదనలు ((శూన్య));
 
-static int vimerror _ANSI_ARGS_((Tcl_Interp *interp));
-static void tclmsg _ANSI_ARGS_((char *text));
-static void tclerrmsg _ANSI_ARGS_((char *text));
-static void tclupdatevars _ANSI_ARGS_((void));
+స్థిర పూర్ణాంకం vimerror ANSI_వాదనలు((Tcl_Interp *interp));
+స్థిర శూన్య tclmsg ANSI_వాదనలు((అక్షరం *పాఠ్యం));
+స్థిర శూన్య tclerrmsg ANSI_వాదనలు((అక్షరం *పాఠ్యం));
+స్థిర శూన్య tclupdatevars ANSI_వాదనలు((శూన్య));
 
-static struct ref refsdeleted;	// dummy object for deleted ref list
+స్థిర నిర్మాణం ref refsdeleted;	// dummy object for deleted ref list
 
 //////////////////////////////////////////////////////////////////////////////
 // TCL interface manager
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(DYNAMIC_TCL)
+#ఒకవేళ defined(DYNAMIC_TCL)
 # ifndef DYNAMIC_TCL_DLL
 #  define DYNAMIC_TCL_DLL "tcl83.dll"
 # endif
@@ -157,42 +157,42 @@ static struct ref refsdeleted;	// dummy object for deleted ref list
 # endif
 
 # ifndef  DYNAMIC_TCL // Just generating prototypes
-typedef int HANDLE;
+రకనిర్వచనం పూర్ణాంకం HANDLE;
 # endif
 
 # ifdef MSWIN
 #  define TCL_PROC FARPROC
-#  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define ఎక్కించు_dll vim_ఎక్కించు_Lib
+#  define చిహ్నం_from_dll Get_Proc_చిరునామా
 #  define close_dll FreeLibrary
-#  define load_dll_error GetWin32Error
-# else
+#  define ఎక్కించు_dll_error GetWin32Error
+# లేకపోతే
 #  include <dlfcn.h>
-#  define HANDLE void*
-#  define TCL_PROC void*
-#  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define HANDLE శూన్య*
+#  define TCL_PROC శూన్య*
+#  define ఎక్కించు_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#  define చిహ్నం_from_dll dlsym
 #  define close_dll dlclose
-#  define load_dll_error dlerror
+#  define ఎక్కించు_dll_error dlerror
 # endif
 
 /*
  * Declare HANDLE for tcl.dll and function pointers.
  */
-static HANDLE hTclLib = NULL;
-Tcl_Interp* (*dll_Tcl_CreateInterp)(void);
-void (*dll_Tcl_FindExecutable)(const void *);
+స్థిర HANDLE hTclLib = ఖాళీ;
+Tcl_Interp* (*dll_Tcl_CreateInterp)(శూన్య);
+శూన్య (*dll_Tcl_కనుగొను_Executable)(స్థిరరాశి శూన్య *);
 
 /*
  * Table of name to function pointer of tcl.
  */
-static struct {
-    char* name;
+స్థిర నిర్మాణం {
+    అక్షరం* name;
     TCL_PROC* ptr;
-} tcl_funcname_table[] = {
+} tcl_funcname_పట్టిక[] = {
     {"Tcl_CreateInterp", (TCL_PROC*)&dll_Tcl_CreateInterp},
-    {"Tcl_FindExecutable", (TCL_PROC*)&dll_Tcl_FindExecutable},
-    {NULL, NULL},
+    {"Tcl_FindExecutable", (TCL_PROC*)&dll_Tcl_కనుగొను_Executable},
+    {ఖాళీ, ఖాళీ},
 };
 
 /*
@@ -205,72 +205,72 @@ static struct {
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-tcl_runtime_link_init(char *libname, int verbose)
+    స్థిర పూర్ణాంకం
+tcl_runtime_link_init(అక్షరం *libname, పూర్ణాంకం verbose)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (hTclLib)
-	return OK;
-    if (!(hTclLib = load_dll(libname)))
+    ఒకవేళ (hTclLib)
+	తిరిగి OK;
+    ఒకవేళ (!(hTclLib = ఎక్కించు_dll(libname)))
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ఒకవేళ (verbose)
+	    semsg(_(e_could_not_ఎక్కించు_library_str_str), libname, ఎక్కించు_dll_error());
+	తిరిగి FAIL;
     }
-    for (i = 0; tcl_funcname_table[i].ptr; ++i)
+    కొరకు (i = 0; tcl_funcname_పట్టిక[i].ptr; ++i)
     {
-	if (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
-						  tcl_funcname_table[i].name)))
+	ఒకవేళ (!(*tcl_funcname_పట్టిక[i].ptr = చిహ్నం_from_dll(hTclLib,
+						  tcl_funcname_పట్టిక[i].name)))
 	{
 	    close_dll(hTclLib);
-	    hTclLib = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str),
-						   tcl_funcname_table[i].name);
-	    return FAIL;
+	    hTclLib = ఖాళీ;
+	    ఒకవేళ (verbose)
+		semsg(_(e_could_not_ఎక్కించు_library_function_str),
+						   tcl_funcname_పట్టిక[i].name);
+	    తిరిగి FAIL;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
-#endif // defined(DYNAMIC_TCL)
+#అయితే_ముగింపు // defined(DYNAMIC_TCL)
 
-#ifdef DYNAMIC_TCL
-static char *find_executable_arg = NULL;
-#endif
+#నిర్వచితమైతే DYNAMIC_TCL
+స్థిర అక్షరం *కనుగొను_executable_arg = ఖాళీ;
+#అయితే_ముగింపు
 
-    void
-vim_tcl_init(char *arg)
+    శూన్య
+vim_tcl_init(అక్షరం *arg)
 {
-#ifdef DYNAMIC_TCL
-    find_executable_arg = arg;
-#else
-    Tcl_FindExecutable(arg);
-#endif
+#నిర్వచితమైతే DYNAMIC_TCL
+    కనుగొను_executable_arg = arg;
+#లేకపోతే
+    Tcl_కనుగొను_Executable(arg);
+#అయితే_ముగింపు
 }
 
-#if defined(DYNAMIC_TCL)
+#ఒకవేళ defined(DYNAMIC_TCL)
 
-static int stubs_initialized = FALSE;
+స్థిర పూర్ణాంకం stubs_initialized = FALSE;
 
 /*
  * Return TRUE if the TCL interface can be used.
  */
-    int
-tcl_enabled(int verbose)
+    పూర్ణాంకం
+tcl_enabled(పూర్ణాంకం verbose)
 {
-    if (!stubs_initialized && find_executable_arg != NULL
-	    && tcl_runtime_link_init((char *)p_tcldll, verbose) == OK)
+    ఒకవేళ (!stubs_initialized && కనుగొను_executable_arg != ఖాళీ
+	    && tcl_runtime_link_init((అక్షరం *)p_tcldll, verbose) == OK)
     {
 	Tcl_Interp *interp;
 
 	// Note: the library will allocate memory to store the executable name,
 	// which will be reported as possibly leaked by valgrind.
-	dll_Tcl_FindExecutable(find_executable_arg);
+	dll_Tcl_కనుగొను_Executable(కనుగొను_executable_arg);
 
-	if ((interp = dll_Tcl_CreateInterp()) != NULL)
+	ఒకవేళ ((interp = dll_Tcl_CreateInterp()) != ఖాళీ)
 	{
-	    if (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != NULL)
+	    ఒకవేళ (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != ఖాళీ)
 	    {
 		Tcl_DeleteInterp(interp);
 		stubs_initialized = TRUE;
@@ -278,26 +278,26 @@ tcl_enabled(int verbose)
 	    // FIXME: When Tcl_InitStubs() was failed, how delete interp?
 	}
     }
-    return stubs_initialized;
+    తిరిగి stubs_initialized;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(EXITFREE)
+#ఒకవేళ defined(EXITFREE)
 /*
  * Called once when exiting.
  */
-    void
-vim_tcl_finalize(void)
+    శూన్య
+vim_tcl_finalize(శూన్య)
 {
 # ifdef DYNAMIC_TCL
-    if (stubs_initialized)
+    ఒకవేళ (stubs_initialized)
 # endif
 	Tcl_Finalize();
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-tcl_end(void)
+    శూన్య
+tcl_చివర(శూన్య)
 {
 }
 
@@ -319,49 +319,49 @@ tcl_end(void)
  * string in the interpreter's result value. Therefore it would be
  * useless for this routine to return the exit code via Tcl_SetResult().
  */
-    static int
+    స్థిర పూర్ణాంకం
 exitcmd(
-    ClientData dummy UNUSED,
+    Client_దత్తాంశం dummy వాడని,
     Tcl_Interp *interp,
-    int objc,
+    పూర్ణాంకం objc,
     Tcl_Obj *CONST objv[])
 {
-    int value = 0;
+    పూర్ణాంకం విలువ = 0;
 
-    switch (objc)
+    ఎంపిక (objc)
     {
-	case 2:
-	    if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
-		break;
+	స్థితి 2:
+	    ఒకవేళ (Tcl_GetIntFromObj(interp, objv[1], &విలువ) != TCL_OK)
+		ఆపు;
 	    // FALLTHROUGH
-	case 1:
-	    tclinfo.exitvalue = value;
+	స్థితి 1:
+	    tclinfo.exitvalue = విలువ;
 
 	    Tcl_DeleteInterp(interp);
-	    break;
-	default:
-	    Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+	    ఆపు;
+	అప్రమేయ:
+	    Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "?returnCode?");
     }
-    return TCL_ERROR;
+    తిరిగి TCL_ERROR;
 }
 
 /*
  *  "::vim::beep" - what Vi[m] does best :-)
  */
-    static int
+    స్థిర పూర్ణాంకం
 beepcmd(
-    ClientData dummy UNUSED,
+    Client_దత్తాంశం dummy వాడని,
     Tcl_Interp *interp,
-    int objc,
+    పూర్ణాంకం objc,
     Tcl_Obj *CONST objv[])
 {
-    if (objc != 1)
+    ఒకవేళ (objc != 1)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, NULL);
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, ఖాళీ);
+	తిరిగి TCL_ERROR;
     }
     vim_beep(BO_LANG);
-    return TCL_OK;
+    తిరిగి TCL_OK;
 }
 
 /*
@@ -370,330 +370,330 @@ beepcmd(
  *  "::vim::buffer exists {N}" - test if buffer N exists.
  *  "::vim::buffer new" - create a new buffer (not implemented)
  */
-    static int
+    స్థిర పూర్ణాంకం
 buffercmd(
-    ClientData dummy UNUSED,
+    Client_దత్తాంశం dummy వాడని,
     Tcl_Interp *interp,
-    int objc,
+    పూర్ణాంకం objc,
     Tcl_Obj *CONST objv[])
 {
-    char	*name;
+    అక్షరం	*name;
     buf_T	*buf;
     Tcl_Obj	*resobj;
-    int		err, n, idx;
-    enum {BCMD_EXISTS, BCMD_LIST};
-    static CONST84 char *bcmdoptions[] =
+    పూర్ణాంకం		err, n, idx;
+    గణన {BCMD_EXISTS, BCMD_LIST};
+    స్థిర CONST84 అక్షరం *bcmdoptions[] =
     {
-	"exists", "list", (char *)0
+	"exists", "list", (అక్షరం *)0
     };
 
-    if (objc < 2)
+    ఒకవేళ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "option");
+	తిరిగి TCL_ERROR;
     }
     err = Tcl_GetIntFromObj(interp, objv[1], &n);
-    if (err == TCL_OK)
+    ఒకవేళ (err == TCL_OK)
     {
-	if (objc != 2)
+	ఒకవేళ (objc != 2)
 	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "bufNumber");
-	    return TCL_ERROR;
+	    Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "bufNumber");
+	    తిరిగి TCL_ERROR;
 	}
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (buf->b_fnum == n)
+	    ఒకవేళ (buf->b_fnum == n)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
-		    return TCL_ERROR;
-		Tcl_SetResult(interp, name, TCL_VOLATILE);
-		return TCL_OK;
+		ఒకవేళ (name == ఖాళీ)
+		    తిరిగి TCL_ERROR;
+		Tcl_సమితి_ఫలితం(interp, name, TCL_VOLATILE);
+		తిరిగి TCL_OK;
 	    }
 	}
-	Tcl_SetResult(interp, _("invalid buffer number"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_సమితి_ఫలితం(interp, _("invalid buffer number"), TCL_STATIC);
+	తిరిగి TCL_ERROR;
     }
-    Tcl_ResetResult(interp); // clear error from Tcl_GetIntFromObj
+    Tcl_Reset_ఫలితం(interp); // clear error from Tcl_GetIntFromObj
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bcmdoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
-    switch (idx)
+    err = Tcl_Get_సూచీ_From_Obj(interp, objv[1], bcmdoptions, "option", 0, &idx);
+    ఒకవేళ (err != TCL_OK)
+	తిరిగి err;
+    ఎంపిక (idx)
     {
-	case BCMD_LIST:
-	    if (objc != 2)
+	స్థితి BCMD_LIST:
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    FOR_ALL_BUFFERS(buf)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
+		ఒకవేళ (name == ఖాళీ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ఆపు;
 		}
 		Tcl_AppendElement(interp, name);
 	    }
-	    break;
+	    ఆపు;
 
-	case BCMD_EXISTS:
-	    if (objc != 3)
+	స్థితి BCMD_EXISTS:
+	    ఒకవేళ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "bufNumber");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "bufNumber");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = Tcl_GetIntFromObj(interp, objv[2], &n);
-	    if (err == TCL_OK)
+	    ఒకవేళ (err == TCL_OK)
 	    {
 		buf = buflist_findnr(n);
-		resobj = Tcl_NewIntObj(buf != NULL);
-		Tcl_SetObjResult(interp, resobj);
+		resobj = Tcl_NewIntObj(buf != ఖాళీ);
+		Tcl_సమితి_Obj_ఫలితం(interp, resobj);
 	    }
-	    break;
+	    ఆపు;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	అప్రమేయ:
+	    Tcl_సమితి_ఫలితం(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
-    return err;
+    తిరిగి err;
 }
 
 /*
  * "::vim::window list" - create list of window commands.
  */
-    static int
+    స్థిర పూర్ణాంకం
 windowcmd(
-    ClientData	dummy UNUSED,
+    Client_దత్తాంశం	dummy వాడని,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    char	*what, *string;
+    అక్షరం	*what, *string;
     win_T	*win;
 
-    if (objc != 2)
+    ఒకవేళ (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "option");
+	తిరిగి TCL_ERROR;
     }
-    what = Tcl_GetStringFromObj(objv[1], NULL);
-    if (strcmp(what, "list") == 0)
+    what = Tcl_GetStringFromObj(objv[1], ఖాళీ);
+    ఒకవేళ (strcmp(what, "list") == 0)
     {
 	FOR_ALL_WINDOWS(win)
 	{
 	    string = tclgetwindow(interp, win);
-	    if (string == NULL)
-		return TCL_ERROR;
+	    ఒకవేళ (string == ఖాళీ)
+		తిరిగి TCL_ERROR;
 	    Tcl_AppendElement(interp, string);
 	}
-	return TCL_OK;
+	తిరిగి TCL_OK;
     }
-    Tcl_SetResult(interp, _("unknown option"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_సమితి_ఫలితం(interp, _("unknown option"), TCL_STATIC);
+    తిరిగి TCL_ERROR;
 }
 
 /*
  * flags for bufselfcmd and winselfcmd to indicate outstanding actions.
  */
-#define FL_UPDATE_SCREEN	(1<<0)
-#define FL_UPDATE_CURBUF	(1<<1)
-#define FL_ADJUST_CURSOR	(1<<2)
+#నిర్వచించు FL_UPDATE_SCREEN	(1<<0)
+#నిర్వచించు FL_UPDATE_CURBUF	(1<<1)
+#నిర్వచించు FL_ADJUST_CURSOR	(1<<2)
 
 /*
  * This function implements the buffer commands.
  */
-    static int
+    స్థిర పూర్ణాంకం
 bufselfcmd(
-    ClientData	ref,
+    Client_దత్తాంశం	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		opt, err, idx, flags;
-    int		val1, val2, n, i;
+    పూర్ణాంకం		opt, err, idx, flags;
+    పూర్ణాంకం		val1, val2, n, i;
     buf_T	*buf, *savebuf;
     win_T	*win, *savewin;
     Tcl_Obj	*resobj;
     pos_T	*pos;
-    char	*line;
+    అక్షరం	*పంక్తి;
 
-    enum
+    గణన
     {
-	BUF_APPEND, BUF_COMMAND, BUF_COUNT, BUF_DELCMD, BUF_DELETE, BUF_EXPR,
-	BUF_GET, BUF_INSERT, BUF_LAST, BUF_MARK, BUF_NAME, BUF_NUMBER,
-	BUF_OPTION, BUF_SET, BUF_WINDOWS
+	BUF_APPEND, BUF_COMMAND, BUF_లెక్క, BUF_DELCMD, BUF_DELETE, BUF_సమాసం,
+	BUF_GET, BUF_చొప్పించు, BUF_చివరి, BUF_MARK, BUF_NAME, BUF_సంఖ్య,
+	BUF_OPTION, BUF_సమితి, BUF_WINDOWS
     };
-    static CONST84 char *bufoptions[] =
+    స్థిర CONST84 అక్షరం *bufoptions[] =
     {
 	"append", "command", "count", "delcmd", "delete", "expr",
 	"get", "insert", "last", "mark", "name", "number",
-	"option", "set", "windows", (char *)0
+	"option", "set", "windows", (అక్షరం *)0
     };
 
-    if (objc < 2)
+    ఒకవేళ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "option ?arg ...?");
+	తిరిగి TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bufoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
+    err = Tcl_Get_సూచీ_From_Obj(interp, objv[1], bufoptions, "option", 0, &idx);
+    ఒకవేళ (err != TCL_OK)
+	తిరిగి err;
 
-    buf = (buf_T *)((struct ref *)ref)->vimobj;
+    buf = (buf_T *)((నిర్మాణం ref *)ref)->vimobj;
     savebuf = curbuf;  curbuf = buf;
     savewin = curwin;  curwin = tclfindwin(buf);
     flags = 0;
     opt = 0;
 
-    switch (idx)
+    ఎంపిక (idx)
     {
-	case BUF_COMMAND:
+	స్థితి BUF_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case BUF_OPTION:
+	స్థితి BUF_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case BUF_EXPR:
+	స్థితి BUF_సమాసం:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    ఆపు;
 
-	case BUF_NAME:
+	స్థితి BUF_NAME:
 	    /*
 	     *	Get filename of buffer.
 	     */
-	    if (objc != 2)
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, ఖాళీ);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    if (buf->b_ffname)
-		Tcl_SetResult(interp, (char *)buf->b_ffname, TCL_VOLATILE);
-	    else
-		Tcl_SetResult(interp, "", TCL_STATIC);
-	    break;
+	    ఒకవేళ (buf->b_ffname)
+		Tcl_సమితి_ఫలితం(interp, (అక్షరం *)buf->b_ffname, TCL_VOLATILE);
+	    లేకపోతే
+		Tcl_సమితి_ఫలితం(interp, "", TCL_STATIC);
+	    ఆపు;
 
-	case BUF_LAST:
+	స్థితి BUF_చివరి:
 	    /*
 	     * Get line number of last line.
 	     */
 	    opt = 1;
 	    // fallthrough
-	case BUF_COUNT:
+	స్థితి BUF_లెక్క:
 	    /*
 	     * Get number of lines in buffer.
 	     */
-	    if (objc != 2)
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, ఖాళీ);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    val1 = (int)buf->b_ml.ml_line_count;
-	    if (opt)
+	    val1 = (పూర్ణాంకం)buf->b_ml.ml_పంక్తి_లెక్క;
+	    ఒకవేళ (opt)
 		val1 = row2tcl(val1);
 
 	    resobj = Tcl_NewIntObj(val1);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    Tcl_సమితి_Obj_ఫలితం(interp, resobj);
+	    ఆపు;
 
-	case BUF_NUMBER:
+	స్థితి BUF_సంఖ్య:
 	    /*
 	     * Get buffer's number.
 	     */
-	    if (objc != 2)
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, ఖాళీ);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    resobj = Tcl_NewIntObj((int)buf->b_fnum);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((పూర్ణాంకం)buf->b_fnum);
+	    Tcl_సమితి_Obj_ఫలితం(interp, resobj);
+	    ఆపు;
 
-	case BUF_GET:
-	    if (objc != 3 && objc != 4)
+	స్థితి BUF_GET:
+	    ఒకవేళ (objc != 3 && objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (objc == 4)
+	    ఒకవేళ (err != TCL_OK)
+		ఆపు;
+	    ఒకవేళ (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
+		ఒకవేళ (val1 > val2)
 		{
 		    n = val1; val1 = val2; val2 = n;
 		}
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ఫలితం(interp);
 
-		for (n = val1; n <= val2 && err == TCL_OK; n++)
+		కొరకు (n = val1; n <= val2 && err == TCL_OK; n++)
 		{
-		    line = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
-		    if (line)
-			Tcl_AppendElement(interp, line);
-		    else
+		    పంక్తి = (అక్షరం *)ml_get_buf(buf, (linenr_T)n, FALSE);
+		    ఒకవేళ (పంక్తి)
+			Tcl_AppendElement(interp, పంక్తి);
+		    లేకపోతే
 			err = TCL_ERROR;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {  // objc == 3
-		line = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
-		Tcl_SetResult(interp, line, TCL_VOLATILE);
+		పంక్తి = (అక్షరం *)ml_get_buf(buf, (linenr_T)val1, FALSE);
+		Tcl_సమితి_ఫలితం(interp, పంక్తి, TCL_VOLATILE);
 	    }
-	    break;
+	    ఆపు;
 
-	case BUF_SET:
-	    if (objc != 4 && objc != 5)
+	స్థితి BUF_సమితి:
+	    ఒకవేళ (objc != 4 && objc != 5)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		return TCL_ERROR;
-	    if (objc == 4)
+	    ఒకవేళ (err != TCL_OK)
+		తిరిగి TCL_ERROR;
+	    ఒకవేళ (objc == 4)
 	    {
 		/*
 		 *  Replace one line with a string.
 		 *	$buf set {n} {string}
 		 */
-		line = Tcl_GetStringFromObj(objv[3], NULL);
-		if (u_savesub((linenr_T)val1) != OK)
+		పంక్తి = Tcl_GetStringFromObj(objv[3], ఖాళీ);
+		ఒకవేళ (u_savesub((linenr_T)val1) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"), TCL_STATIC);
+		    Tcl_సమితి_ఫలితం(interp, _("cannot save undo information"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
-		if (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
+		లేకపోతే
+		ఒకవేళ (ml_replace((linenr_T)val1, (char_u *)పంక్తి, TRUE) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot replace line"), TCL_STATIC);
+		    Tcl_సమితి_ఫలితం(interp, _("cannot replace line"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
+		లేకపోతే
 		{
-		    changed_bytes((linenr_T)val1, 0);
+		    మారింది_బైట్లు((linenr_T)val1, 0);
 		    flags |= FL_UPDATE_CURBUF;
 		}
-		break;
+		ఆపు;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		/*
 		 * Replace several lines with the elements of a Tcl list.
@@ -703,16 +703,16 @@ bufselfcmd(
 		 * elements, * the lines from {n}+length({list}) through {m}
 		 * are deleted.
 		 */
-		int	    lc;
+		పూర్ణాంకం	    lc;
 		Tcl_Obj	    **lv;
 
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 		err = Tcl_ListObjGetElements(interp, objv[4], &lc, &lv);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
+		ఒకవేళ (val1 > val2)
 		{
 		    n = val1;
 		    val1 = val2;
@@ -720,443 +720,443 @@ bufselfcmd(
 		}
 
 		n = val1;
-		if (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
+		ఒకవేళ (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"),
+		    Tcl_సమితి_ఫలితం(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		    err = TCL_ERROR;
-		    break;
+		    ఆపు;
 		}
 		flags |= FL_UPDATE_CURBUF;
 
-		for (i = 0; i < lc && n <= val2; i++)
+		కొరకు (i = 0; i < lc && n <= val2; i++)
 		{
-		    line = Tcl_GetStringFromObj(lv[i], NULL);
-		    if (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
-			goto setListError;
+		    పంక్తి = Tcl_GetStringFromObj(lv[i], ఖాళీ);
+		    ఒకవేళ (ml_replace((linenr_T)n, (char_u *)పంక్తి, TRUE) != OK)
+			వెళ్ళు సమితి_List_Error;
 		    ++n;
 		}
-		if (i < lc)
+		ఒకవేళ (i < lc)
 		{
 		    // append lines
-		    do
+		    చేయి
 		    {
-			line = Tcl_GetStringFromObj(lv[i], NULL);
-			if (ml_append((linenr_T)(n - 1),
-					      (char_u *)line, 0, FALSE) != OK)
-			    goto setListError;
+			పంక్తి = Tcl_GetStringFromObj(lv[i], ఖాళీ);
+			ఒకవేళ (ml_append((linenr_T)(n - 1),
+					      (char_u *)పంక్తి, 0, FALSE) != OK)
+			    వెళ్ళు సమితి_List_Error;
 			++n;
 			++i;
-		    } while (i < lc);
+		    } అయితే (i < lc);
 		}
-		else if (n <= val2)
+		లేకపోతే ఒకవేళ (n <= val2)
 		{
 		    // did not replace all lines, delete
 		    i = n;
-		    do
+		    చేయి
 		    {
-			if (ml_delete((linenr_T)i) != OK)
-			    goto setListError;
+			ఒకవేళ (ml_delete((linenr_T)i) != OK)
+			    వెళ్ళు సమితి_List_Error;
 			++n;
-		    } while (n <= val2);
+		    } అయితే (n <= val2);
 		}
 		lc -= val2 - val1 + 1;	// number of lines to be replaced
-		mark_adjust((linenr_T)val1, (linenr_T)val2, (long)MAXLNUM,
-								    (long)lc);
-		changed_lines((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
-		break;
-    setListError:
+		mark_adjust((linenr_T)val1, (linenr_T)val2, (దీర్ఘ)MAXLNUM,
+								    (దీర్ఘ)lc);
+		మారింది_పంక్తులు((linenr_T)val1, 0, (linenr_T)val2 + 1, (దీర్ఘ)lc);
+		ఆపు;
+    సమితి_List_Error:
 		u_undo(1);  // ???
-		Tcl_SetResult(interp, _("cannot set line(s)"), TCL_STATIC);
+		Tcl_సమితి_ఫలితం(interp, _("cannot set line(s)"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    break;
+	    ఆపు;
 
-	case BUF_DELETE:
-	    if (objc != 3  &&  objc != 4)
+	స్థితి BUF_DELETE:
+	    ఒకవేళ (objc != 3  &&  objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 3, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
+	    ఒకవేళ (err != TCL_OK)
+		ఆపు;
 	    val2 = val1;
-	    if (objc == 4)
+	    ఒకవేళ (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    return err;
-		if (val1 > val2)
+		ఒకవేళ (err != TCL_OK)
+		    తిరిగి err;
+		ఒకవేళ (val1 > val2)
 		{
 		    i = val1; val1 = val2; val2 = i;
 		}
 	    }
 	    n = val2 - val1 + 1;
-	    if (u_savedel((linenr_T)val1, (long)n) != OK)
+	    ఒకవేళ (u_savedel((linenr_T)val1, (దీర్ఘ)n) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_సమితి_ఫలితం(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    for (i = 0; i < n; i++)
+	    కొరకు (i = 0; i < n; i++)
 	    {
 		ml_delete((linenr_T)val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 	    }
-	    if (i > 0)
-		deleted_lines_mark((linenr_T)val1, (long)i);
+	    ఒకవేళ (i > 0)
+		deleted_పంక్తులు_mark((linenr_T)val1, (దీర్ఘ)i);
 	    flags |= FL_ADJUST_CURSOR|FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case BUF_MARK:
-	    if (objc != 3)
+	స్థితి BUF_MARK:
+	    ఒకవేళ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "markName");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "markName");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    line = Tcl_GetStringFromObj(objv[2], NULL);
+	    పంక్తి = Tcl_GetStringFromObj(objv[2], ఖాళీ);
 
-	    pos = NULL;
-	    if (line[0] != '\0'  &&  line[1] == '\0')
-		pos = getmark(line[0], FALSE);
-	    if (pos == NULL)
+	    pos = ఖాళీ;
+	    ఒకవేళ (పంక్తి[0] != '\0'  &&  పంక్తి[1] == '\0')
+		pos = getmark(పంక్తి[0], FALSE);
+	    ఒకవేళ (pos == ఖాళీ)
 	    {
-		Tcl_SetResult(interp, _("invalid mark name"), TCL_STATIC);
+		Tcl_సమితి_ఫలితం(interp, _("invalid mark name"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = vimerror(interp);
-	    if (err != TCL_OK)
-		break;
-	    if (pos->lnum <= 0)
+	    ఒకవేళ (err != TCL_OK)
+		ఆపు;
+	    ఒకవేళ (pos->lnum <= 0)
 	    {
-		Tcl_SetResult(interp, _("mark not set"), TCL_STATIC);
+		Tcl_సమితి_ఫలితం(interp, _("mark not set"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		char rbuf[64];
+		అక్షరం rbuf[64];
 
 		sprintf(rbuf, _("row %d column %d"),
-			     (int)row2tcl(pos->lnum), (int)col2tcl(pos->col));
-		Tcl_SetResult(interp, rbuf, TCL_VOLATILE);
+			     (పూర్ణాంకం)row2tcl(pos->lnum), (పూర్ణాంకం)col2tcl(pos->నిలువు));
+		Tcl_సమితి_ఫలితం(interp, rbuf, TCL_VOLATILE);
 	    }
-	    break;
+	    ఆపు;
 
-	case BUF_INSERT:
+	స్థితి BUF_చొప్పించు:
 	    opt = 1;
 	    // fallthrough
-	case BUF_APPEND:
-	    if (objc != 4)
+	స్థితి BUF_APPEND:
+	    ఒకవేళ (objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNum text");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "lineNum text");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (opt)
+	    ఒకవేళ (err != TCL_OK)
+		ఆపు;
+	    ఒకవేళ (opt)
 		--val1;
-	    if (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
+	    ఒకవేళ (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_సమితి_ఫలితం(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 
-	    line = Tcl_GetStringFromObj(objv[3], NULL);
-	    if (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
+	    పంక్తి = Tcl_GetStringFromObj(objv[3], ఖాళీ);
+	    ఒకవేళ (ml_append((linenr_T)val1, (char_u *)పంక్తి, 0, FALSE) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot insert/append line"),
+		Tcl_సమితి_ఫలితం(interp, _("cannot insert/append line"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    appended_lines_mark((linenr_T)val1, 1L);
+	    appended_పంక్తులు_mark((linenr_T)val1, 1L);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case BUF_WINDOWS:
+	స్థితి BUF_WINDOWS:
 	    /*
 	     * Return list of window commands.
 	     */
-	    if (objc != 2)
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, ఖాళీ);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    Tcl_ResetResult(interp);
+	    Tcl_Reset_ఫలితం(interp);
 	    FOR_ALL_WINDOWS(win)
 	    {
-		if (win->w_buffer == buf)
+		ఒకవేళ (win->w_బఫరు == buf)
 		{
-		    line = tclgetwindow(interp, win);
-		    if (line != NULL)
-			Tcl_AppendElement(interp, line);
-		    else
+		    పంక్తి = tclgetwindow(interp, win);
+		    ఒకవేళ (పంక్తి != ఖాళీ)
+			Tcl_AppendElement(interp, పంక్తి);
+		    లేకపోతే
 		    {
 			err = TCL_ERROR;
-			break;
+			ఆపు;
 		    }
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case BUF_DELCMD:
+	స్థితి BUF_DELCMD:
 	    /*
 	     * Register deletion callback.
 	     * TODO: Should be able to register multiple callbacks
 	     */
-	    if (objc != 3)
+	    ఒకవేళ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (void *)buf, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (శూన్య *)buf, objv[2]);
+	    ఆపు;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	అప్రమేయ:
+	    Tcl_సమితి_ఫలితం(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
 
-    if (flags & FL_UPDATE_CURBUF)
+    ఒకవేళ (flags & FL_UPDATE_CURBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
     curbuf = savebuf;
     curwin = savewin;
-    if (flags & FL_ADJUST_CURSOR)
+    ఒకవేళ (flags & FL_ADJUST_CURSOR)
 	check_cursor();
-    if (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
+    ఒకవేళ (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    తిరిగి err;
 }
 
 /*
  * This function implements the window commands.
  */
-    static int
+    స్థిర పూర్ణాంకం
 winselfcmd(
-    ClientData	ref,
+    Client_దత్తాంశం	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err, idx, flags;
-    int		val1, val2;
+    పూర్ణాంకం		err, idx, flags;
+    పూర్ణాంకం		val1, val2;
     Tcl_Obj	*resobj;
     win_T	*savewin, *win;
     buf_T	*savebuf;
-    char	*str;
+    అక్షరం	*str;
 
-    enum
+    గణన
     {
-	WIN_BUFFER, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_EXPR,
-	WIN_HEIGHT, WIN_OPTION
+	WIN_బఫరు, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_సమాసం,
+	WIN_ఎత్తు, WIN_OPTION
     };
-    static CONST84 char *winoptions[] =
+    స్థిర CONST84 అక్షరం *winoptions[] =
     {
 	"buffer", "command", "cursor", "delcmd", "expr",
-	"height", "option", (char *)0
+	"height", "option", (అక్షరం *)0
     };
 
-    if (objc < 2)
+    ఒకవేళ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, 1, objv, "option ?arg ...?");
+	తిరిగి TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], winoptions, "option", 0,  &idx);
-    if (err != TCL_OK)
-	return TCL_ERROR;
+    err = Tcl_Get_సూచీ_From_Obj(interp, objv[1], winoptions, "option", 0,  &idx);
+    ఒకవేళ (err != TCL_OK)
+	తిరిగి TCL_ERROR;
 
-    win = (win_T *)((struct ref *)ref)->vimobj;
+    win = (win_T *)((నిర్మాణం ref *)ref)->vimobj;
     savewin = curwin;  curwin = win;
-    savebuf = curbuf;  curbuf = win->w_buffer;
+    savebuf = curbuf;  curbuf = win->w_బఫరు;
     flags = 0;
 
-    switch (idx)
+    ఎంపిక (idx)
     {
-	case WIN_OPTION:
+	స్థితి WIN_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case WIN_COMMAND:
+	స్థితి WIN_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	case WIN_EXPR:
+	స్థితి WIN_సమాసం:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    ఆపు;
 
-	case WIN_HEIGHT:
-	    if (objc == 3)
+	స్థితి WIN_ఎత్తు:
+	    ఒకవేళ (objc == 3)
 	    {
 		err = Tcl_GetIntFromObj(interp, objv[2], &val1);
-		if (err != TCL_OK)
-		    break;
-#ifdef FEAT_GUI
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
+#నిర్వచితమైతే FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 		win_setheight(val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 	    }
-	    else
-	    if (objc != 2)
+	    లేకపోతే
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?value?");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "?value?");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
 
-	    resobj = Tcl_NewIntObj((int)(win->w_height));
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((పూర్ణాంకం)(win->w_ఎత్తు));
+	    Tcl_సమితి_Obj_ఫలితం(interp, resobj);
+	    ఆపు;
 
-	case WIN_BUFFER:
-	    if (objc != 2)
+	స్థితి WIN_బఫరు:
+	    ఒకవేళ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, ఖాళీ);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    str = tclgetbuffer(interp, win->w_buffer);
-	    if (str)
-		Tcl_SetResult(interp, str, TCL_VOLATILE);
-	    else
+	    str = tclgetbuffer(interp, win->w_బఫరు);
+	    ఒకవేళ (str)
+		Tcl_సమితి_ఫలితం(interp, str, TCL_VOLATILE);
+	    లేకపోతే
 		err = TCL_ERROR;
-	    break;
+	    ఆపు;
 
-	case WIN_DELCMD:
-	    if (objc != 3)
+	స్థితి WIN_DELCMD:
+	    ఒకవేళ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    err = tclsetdelcmd(interp, win->w_tcl_ref, (void *)win, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, win->w_tcl_ref, (శూన్య *)win, objv[2]);
+	    ఆపు;
 
-	case WIN_CURSOR:
-	    if (objc > 4)
+	స్థితి WIN_CURSOR:
+	    ఒకవేళ (objc > 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?arg1 ?arg2??");
+		Tcl_Wrong_అంకె_వాదనలు(interp, 2, objv, "?arg1 ?arg2??");
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    if (objc == 2)
+	    ఒకవేళ (objc == 2)
 	    {
-		char buf[64];
+		అక్షరం buf[64];
 
-		sprintf(buf, _("row %d column %d"), (int)row2tcl(win->w_cursor.lnum), (int)col2tcl(win->w_cursor.col));
-		Tcl_SetResult(interp, buf, TCL_VOLATILE);
-		break;
+		sprintf(buf, _("row %d column %d"), (పూర్ణాంకం)row2tcl(win->w_cursor.lnum), (పూర్ణాంకం)col2tcl(win->w_cursor.నిలువు));
+		Tcl_సమితి_ఫలితం(interp, buf, TCL_VOLATILE);
+		ఆపు;
 	    }
-	    else if (objc == 3)
+	    లేకపోతే ఒకవేళ (objc == 3)
 	    {
 		Tcl_Obj *part, *var;
 
 		part = Tcl_NewStringObj("row", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_సందేశం);
+		ఒకవేళ (var == ఖాళీ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ఆపు;
 		}
-		err = tclgetlinenum(interp, var, &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, var, &val1, win->w_బఫరు);
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 		part = Tcl_NewStringObj("column", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_సందేశం);
+		ఒకవేళ (var == ఖాళీ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ఆపు;
 		}
 		err = Tcl_GetIntFromObj(interp, var, &val2);
-		if (err != TCL_OK)
-		    break;
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 	    }
-	    else
+	    లేకపోతే
 	    {  // objc == 4
-		err = tclgetlinenum(interp, objv[2], &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, objv[2], &val1, win->w_బఫరు);
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 		err = Tcl_GetIntFromObj(interp, objv[3], &val2);
-		if (err != TCL_OK)
-		    break;
+		ఒకవేళ (err != TCL_OK)
+		    ఆపు;
 	    }
 	    // TODO: should check column
 	    win->w_cursor.lnum = val1;
-	    win->w_cursor.col = col2vim(val2);
-	    win->w_set_curswant = true;
+	    win->w_cursor.నిలువు = col2vim(val2);
+	    win->w_సమితి_curswant = true;
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ఆపు;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
-	    break;
+	అప్రమేయ:
+	    Tcl_సమితి_ఫలితం(interp, _("not implemented yet"), TCL_STATIC);
+	    ఆపు;
     }
 
     curwin = savewin;
     curbuf = savebuf;
-    if (flags & FL_UPDATE_SCREEN)
+    ఒకవేళ (flags & FL_UPDATE_SCREEN)
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    తిరిగి err;
 }
 
 
-    static int
+    స్థిర పూర్ణాంకం
 commandcmd(
-    ClientData	dummy UNUSED,
+    Client_దత్తాంశం	dummy వాడని,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    పూర్ణాంకం		err;
 
     err = tcldoexcommand(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    తిరిగి err;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 optioncmd(
-    ClientData	dummy UNUSED,
+    Client_దత్తాంశం	dummy వాడని,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    పూర్ణాంకం		err;
 
     err = tclsetoption(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    తిరిగి err;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 exprcmd(
-    ClientData	dummy UNUSED,
+    Client_దత్తాంశం	dummy వాడని,
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[])
 {
-    return tclvimexpr(interp, objc, objv, 1);
+    తిరిగి tclvimexpr(interp, objc, objv, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1166,271 +1166,271 @@ exprcmd(
 /*
  * Get a line number from 'obj' and convert it to vim's range.
  */
-    static int
+    స్థిర పూర్ణాంకం
 tclgetlinenum(
     Tcl_Interp	*interp,
     Tcl_Obj	*obj,
-    int		*valueP,
+    పూర్ణాంకం		*విలువ_P,
     buf_T	*buf)
 {
-    int err, i;
+    పూర్ణాంకం err, i;
 
-    enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_TOP };
+    గణన { LN_BEGIN, LN_BOTTOM, LN_చివర, LN_మొదటి, LN_చివరి, LN_ప్రారంభం, LN_శిఖరం };
 
-    static CONST84 char *keyw[] =
+    స్థిర CONST84 అక్షరం *keyw[] =
     {
-	"begin", "bottom", "end", "first", "last", "start", "top", (char *)0
+	"begin", "bottom", "end", "first", "last", "start", "top", (అక్షరం *)0
     };
 
-    err = Tcl_GetIndexFromObj(interp, obj, keyw, "", 0, &i);
-    if (err == TCL_OK)
+    err = Tcl_Get_సూచీ_From_Obj(interp, obj, keyw, "", 0, &i);
+    ఒకవేళ (err == TCL_OK)
     {
-	switch (i)
+	ఎంపిక (i)
 	{
-	    case LN_BEGIN:
-	    case LN_FIRST:
-	    case LN_START:
-	    case LN_TOP:
-		*valueP = 1;
-		break;
-	    case LN_BOTTOM:
-	    case LN_END:
-	    case LN_LAST:
-		*valueP = buf->b_ml.ml_line_count;
-		break;
+	    స్థితి LN_BEGIN:
+	    స్థితి LN_మొదటి:
+	    స్థితి LN_ప్రారంభం:
+	    స్థితి LN_శిఖరం:
+		*విలువ_P = 1;
+		ఆపు;
+	    స్థితి LN_BOTTOM:
+	    స్థితి LN_చివర:
+	    స్థితి LN_చివరి:
+		*విలువ_P = buf->b_ml.ml_పంక్తి_లెక్క;
+		ఆపు;
 	}
-	return TCL_OK;
+	తిరిగి TCL_OK;
     }
-    Tcl_ResetResult(interp);
+    Tcl_Reset_ఫలితం(interp);
 
     err = Tcl_GetIntFromObj(interp, obj, &i);
-    if (err != TCL_OK)
-	return err;
+    ఒకవేళ (err != TCL_OK)
+	తిరిగి err;
     i = row2vim(i);
-    if (i < 1  ||  i > buf->b_ml.ml_line_count)
+    ఒకవేళ (i < 1  ||  i > buf->b_ml.ml_పంక్తి_లెక్క)
     {
-	Tcl_SetResult(interp, _("line number out of range"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_సమితి_ఫలితం(interp, _("line number out of range"), TCL_STATIC);
+	తిరిగి TCL_ERROR;
     }
-    *valueP = i;
-    return TCL_OK;
+    *విలువ_P = i;
+    తిరిగి TCL_OK;
 }
 
 /*
  * Find the first window in the window list that displays the buffer.
  */
-    static win_T *
+    స్థిర win_T *
 tclfindwin(buf_T *buf)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (win->w_buffer == buf)
-	    return win;
+	ఒకవేళ (win->w_బఫరు == buf)
+	    తిరిగి win;
     }
-    return curwin;  // keep current window context
+    తిరిగి curwin;  // keep current window context
 }
 
 /*
  * Do-it-all function for "::vim::command", "$buf command" and "$win command".
  */
-    static int
+    స్థిర పూర్ణాంకం
 tcldoexcommand(
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    పూర్ణాంకం		objn)
 {
     tcl_info	saveinfo;
-    int		err, flag, nobjs;
-    char	*arg;
+    పూర్ణాంకం		err, flag, nobjs;
+    అక్షరం	*arg;
 
     nobjs = objc - objn;
-    if (nobjs < 1 || nobjs > 2)
+    ఒకవేళ (nobjs < 1 || nobjs > 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "?-quiet? exCommand");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, objn, objv, "?-quiet? exCommand");
+	తిరిగి TCL_ERROR;
     }
 
     flag = 0;
-    if (nobjs == 2)
+    ఒకవేళ (nobjs == 2)
     {
-	arg = Tcl_GetStringFromObj(objv[objn], NULL);
-	if (strcmp(arg, "-quiet") == 0)
+	arg = Tcl_GetStringFromObj(objv[objn], ఖాళీ);
+	ఒకవేళ (strcmp(arg, "-quiet") == 0)
 	    flag = 1;
-	else
+	లేకపోతే
 	{
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, _("unknown flag: "), arg, (char *)0);
-	    return TCL_ERROR;
+	    Tcl_Reset_ఫలితం(interp);
+	    Tcl_Append_ఫలితం(interp, _("unknown flag: "), arg, (అక్షరం *)0);
+	    తిరిగి TCL_ERROR;
 	}
 	++objn;
     }
 
-    memcpy(&saveinfo, &tclinfo, sizeof(tcl_info));
-    tclinfo.interp = NULL;
-    tclinfo.curwin = NULL;
-    tclinfo.curbuf = NULL;
+    జ్ఞాపకం_నకలు(&saveinfo, &tclinfo, పరిమాణం(tcl_info));
+    tclinfo.interp = ఖాళీ;
+    tclinfo.curwin = ఖాళీ;
+    tclinfo.curbuf = ఖాళీ;
 
-    arg = Tcl_GetStringFromObj(objv[objn], NULL);
-    if (flag)
+    arg = Tcl_GetStringFromObj(objv[objn], ఖాళీ);
+    ఒకవేళ (flag)
 	++emsg_off;
     do_cmdline_cmd((char_u *)arg);
-    if (flag)
+    ఒకవేళ (flag)
 	--emsg_off;
     err = vimerror(interp);
 
     // If the ex command created a new Tcl interpreter, remove it
-    if (tclinfo.interp)
+    ఒకవేళ (tclinfo.interp)
 	tcldelthisinterp();
-    memcpy(&tclinfo, &saveinfo, sizeof(tcl_info));
+    జ్ఞాపకం_నకలు(&tclinfo, &saveinfo, పరిమాణం(tcl_info));
     tclupdatevars();
 
-    return err;
+    తిరిగి err;
 }
 
 /*
  * Do-it-all function for "::vim::option", "$buf option" and "$win option".
  */
-    static int
+    స్థిర పూర్ణాంకం
 tclsetoption(
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    పూర్ణాంకం		objn)
 {
-    int		err, nobjs, idx;
+    పూర్ణాంకం		err, nobjs, idx;
     char_u	*option;
     getoption_T	gov;
-    long	lval;
+    దీర్ఘ	lval;
     char_u	*sval;
     Tcl_Obj	*resobj;
 
-    enum { OPT_OFF, OPT_ON, OPT_TOGGLE };
-    static CONST84 char *optkw[] = { "off", "on", "toggle", (char *)0 };
+    గణన { OPT_OFF, OPT_ON, OPT_TOGGLE };
+    స్థిర CONST84 అక్షరం *optkw[] = { "off", "on", "toggle", (అక్షరం *)0 };
 
     nobjs = objc - objn;
-    if (nobjs != 1 && nobjs != 2)
+    ఒకవేళ (nobjs != 1 && nobjs != 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimOption ?value?");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, objn, objv, "vimOption ?value?");
+	తిరిగి TCL_ERROR;
     }
 
-    option = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
+    option = (char_u *)Tcl_GetStringFromObj(objv[objn], ఖాళీ);
     ++objn;
-    gov = get_option_value(option, &lval, &sval, NULL, 0);
+    gov = get_option_విలువ(option, &lval, &sval, ఖాళీ, 0);
     err = TCL_OK;
-    switch (gov)
+    ఎంపిక (gov)
     {
-	case gov_string:
-	    Tcl_SetResult(interp, (char *)sval, TCL_VOLATILE);
+	స్థితి gov_string:
+	    Tcl_సమితి_ఫలితం(interp, (అక్షరం *)sval, TCL_VOLATILE);
 	    vim_free(sval);
-	    break;
-	case gov_bool:
-	case gov_number:
+	    ఆపు;
+	స్థితి gov_bool:
+	స్థితి gov_సంఖ్య:
 	    resobj = Tcl_NewLongObj(lval);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
-	default:
-	    Tcl_SetResult(interp, _("unknown vimOption"), TCL_STATIC);
-	    return TCL_ERROR;
+	    Tcl_సమితి_Obj_ఫలితం(interp, resobj);
+	    ఆపు;
+	అప్రమేయ:
+	    Tcl_సమితి_ఫలితం(interp, _("unknown vimOption"), TCL_STATIC);
+	    తిరిగి TCL_ERROR;
     }
-    if (nobjs == 2)
+    ఒకవేళ (nobjs == 2)
     {
-	if (gov != gov_string)
+	ఒకవేళ (gov != gov_string)
 	{
-	    sval = NULL;    // avoid compiler warning
-	    err = Tcl_GetIndexFromObj(interp, objv[objn], optkw, "", 0, &idx);
-	    if (err != TCL_OK)
+	    sval = ఖాళీ;    // avoid compiler warning
+	    err = Tcl_Get_సూచీ_From_Obj(interp, objv[objn], optkw, "", 0, &idx);
+	    ఒకవేళ (err != TCL_OK)
 	    {
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ఫలితం(interp);
 		err = Tcl_GetLongFromObj(interp, objv[objn], &lval);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		switch (idx)
+		ఎంపిక (idx)
 		{
-		    case OPT_ON:
+		    స్థితి OPT_ON:
 			lval = 1;
-			break;
-		    case OPT_OFF:
+			ఆపు;
+		    స్థితి OPT_OFF:
 			lval = 0;
-			break;
-		    case OPT_TOGGLE:
+			ఆపు;
+		    స్థితి OPT_TOGGLE:
 			lval = !lval;
-			break;
+			ఆపు;
 		}
 	    }
 	}
-	else
-	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
-	if (err == TCL_OK)
+	లేకపోతే
+	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], ఖాళీ);
+	ఒకవేళ (err == TCL_OK)
 	{
-	    set_option_value_give_err(option, lval, sval, OPT_LOCAL);
+	    సమితి_option_విలువ_give_err(option, lval, sval, OPT_LOCAL);
 	    err = vimerror(interp);
 	}
     }
-    return err;
+    తిరిగి err;
 }
 
 /*
  * Do-it-all function for "::vim::expr", "$buf expr" and "$win expr".
  */
-    static int
+    స్థిర పూర్ణాంకం
 tclvimexpr(
     Tcl_Interp	*interp,
-    int		objc,
+    పూర్ణాంకం		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    పూర్ణాంకం		objn)
 {
-#ifdef FEAT_EVAL
-    char	*expr, *str;
-#endif
-    int		err;
+#నిర్వచితమైతే FEAT_EVAL
+    అక్షరం	*సమాసం, *str;
+#అయితే_ముగింపు
+    పూర్ణాంకం		err;
 
-    if (objc - objn != 1)
+    ఒకవేళ (objc - objn != 1)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimExpr");
-	return TCL_ERROR;
+	Tcl_Wrong_అంకె_వాదనలు(interp, objn, objv, "vimExpr");
+	తిరిగి TCL_ERROR;
     }
 
-#ifdef FEAT_EVAL
-    expr = Tcl_GetStringFromObj(objv[objn], NULL);
-    str = (char *)eval_to_string((char_u *)expr, TRUE, FALSE);
-    if (str == NULL)
-	Tcl_SetResult(interp, _("invalid expression"), TCL_STATIC);
-    else
+#నిర్వచితమైతే FEAT_EVAL
+    సమాసం = Tcl_GetStringFromObj(objv[objn], ఖాళీ);
+    str = (అక్షరం *)eval_గమ్యం_string((char_u *)సమాసం, TRUE, FALSE);
+    ఒకవేళ (str == ఖాళీ)
+	Tcl_సమితి_ఫలితం(interp, _("invalid expression"), TCL_STATIC);
+    లేకపోతే
     {
-	Tcl_SetResult(interp, str, TCL_VOLATILE);
+	Tcl_సమితి_ఫలితం(interp, str, TCL_VOLATILE);
 	vim_free(str);
     }
     err = vimerror(interp);
-#else
-    Tcl_SetResult(interp, _("expressions disabled at compile time"), TCL_STATIC);
+#లేకపోతే
+    Tcl_సమితి_ఫలితం(interp, _("expressions disabled at compile time"), TCL_STATIC);
     err = TCL_ERROR;
-#endif
+#అయితే_ముగింపు
 
-    return err;
+    తిరిగి err;
 }
 
 /*
  * Check for internal vim errors.
  */
-    static int
+    స్థిర పూర్ణాంకం
 vimerror(Tcl_Interp *interp)
 {
-    if (got_int)
+    ఒకవేళ (got_int)
     {
-	Tcl_SetResult(interp, _("keyboard interrupt"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_సమితి_ఫలితం(interp, _("keyboard interrupt"), TCL_STATIC);
+	తిరిగి TCL_ERROR;
     }
-    else if (did_emsg)
+    లేకపోతే ఒకవేళ (did_emsg)
     {
-	Tcl_SetResult(interp, _("Vim error"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_సమితి_ఫలితం(interp, _("Vim error"), TCL_STATIC);
+	తిరిగి TCL_ERROR;
     }
-    return TCL_OK;
+    తిరిగి TCL_OK;
 }
 
 /*
@@ -1441,120 +1441,120 @@ vimerror(Tcl_Interp *interp)
  *   tclgetbuffer() - buffer frontend for tclgetref()
  *   tclsetdelcmd() - add Tcl callback command to a vim object
  */
-    static void
-delref(ClientData cref)
+    స్థిర శూన్య
+delref(Client_దత్తాంశం cref)
 {
-    struct ref *ref = (struct ref *)cref;
+    నిర్మాణం ref *ref = (నిర్మాణం ref *)cref;
 
-    if (ref->delcmd)
+    ఒకవేళ (ref->delcmd)
     {
-	Tcl_DecrRefCount(ref->delcmd);
-	ref->delcmd = NULL;
+	Tcl_Decr_Ref_లెక్క(ref->delcmd);
+	ref->delcmd = ఖాళీ;
     }
-    ref->interp = NULL;
+    ref->interp = ఖాళీ;
 }
 
-    static char *
+    స్థిర అక్షరం *
 tclgetref(
     Tcl_Interp	*interp,
-    void	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
+    శూన్య	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
 				// win_T/buf_T struct
-    char	*prefix,	// "win" or "buf"
-    void	*vimobj,	// win_T* or buf_T*
+    అక్షరం	*ఉపసర్గ,	// "win" or "buf"
+    శూన్య	*vimobj,	// win_T* or buf_T*
     Tcl_ObjCmdProc *proc)	// winselfcmd or bufselfcmd
 {
-    struct ref *ref, *unused = NULL;
-    static char name[VARNAME_SIZE];
+    నిర్మాణం ref *ref, *వాడని_2 = ఖాళీ;
+    స్థిర అక్షరం name[VARNAME_కొలత];
     Tcl_Command cmd;
 
-    ref = (struct ref *)(*refstartP);
-    if (ref == &refsdeleted)
+    ref = (నిర్మాణం ref *)(*refstartP);
+    ఒకవేళ (ref == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
-	return NULL;
+	Tcl_సమితి_ఫలితం(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
+	తిరిగి ఖాళీ;
     }
 
-    while (ref != NULL)
+    అయితే (ref != ఖాళీ)
     {
-	if (ref->interp == interp)
-	    break;
-	if (ref->interp == NULL)
-	    unused = ref;
-	ref = ref->next;
+	ఒకవేళ (ref->interp == interp)
+	    ఆపు;
+	ఒకవేళ (ref->interp == ఖాళీ)
+	    వాడని_2 = ref;
+	ref = ref->తదుపరి;
     }
 
-    if (ref)
-	vim_snprintf(name, sizeof(name), "::vim::%s",
+    ఒకవేళ (ref)
+	vim_snprintf(name, పరిమాణం(name), "::vim::%s",
 					Tcl_GetCommandName(interp, ref->cmd));
-    else
+    లేకపోతే
     {
-	if (unused)
-	    ref = unused;
-	else
+	ఒకవేళ (వాడని_2)
+	    ref = వాడని_2;
+	లేకపోతే
 	{
-	    ref = (struct ref *)Tcl_Alloc(sizeof(struct ref));
-	    ref->interp = NULL;
-	    ref->next = (struct ref *)(*refstartP);
-	    (*refstartP) = (void *)ref;
+	    ref = (నిర్మాణం ref *)Tcl_Alloc(పరిమాణం(నిర్మాణం ref));
+	    ref->interp = ఖాళీ;
+	    ref->తదుపరి = (నిర్మాణం ref *)(*refstartP);
+	    (*refstartP) = (శూన్య *)ref;
 	}
 
 	// This might break on some exotic systems...
-	vim_snprintf(name, sizeof(name), "::vim::%s_%lx",
-					       prefix, (unsigned long)vimobj);
+	vim_snprintf(name, పరిమాణం(name), "::vim::%s_%lx",
+					       ఉపసర్గ, (గుర్తులేని దీర్ఘ)vimobj);
 	cmd = Tcl_CreateObjCommand(interp, name, proc,
-	    (ClientData)ref, (Tcl_CmdDeleteProc *)delref);
-	if (!cmd)
-	    return NULL;
+	    (Client_దత్తాంశం)ref, (Tcl_CmdDeleteProc *)delref);
+	ఒకవేళ (!cmd)
+	    తిరిగి ఖాళీ;
 
 	ref->interp = interp;
 	ref->cmd = cmd;
-	ref->delcmd = NULL;
+	ref->delcmd = ఖాళీ;
 	ref->vimobj = vimobj;
     }
-    return name;
+    తిరిగి name;
 }
 
-    static char *
+    స్థిర అక్షరం *
 tclgetwindow(Tcl_Interp *interp, win_T *win)
 {
-    return tclgetref(interp, &(win->w_tcl_ref), "win", (void *)win, winselfcmd);
+    తిరిగి tclgetref(interp, &(win->w_tcl_ref), "win", (శూన్య *)win, winselfcmd);
 }
 
-    static char *
+    స్థిర అక్షరం *
 tclgetbuffer(Tcl_Interp *interp, buf_T *buf)
 {
-    return tclgetref(interp, &(buf->b_tcl_ref), "buf", (void *)buf, bufselfcmd);
+    తిరిగి tclgetref(interp, &(buf->b_tcl_ref), "buf", (శూన్య *)buf, bufselfcmd);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 tclsetdelcmd(
     Tcl_Interp	*interp,
-    struct ref	*reflist,
-    void	*vimobj,
+    నిర్మాణం ref	*reflist,
+    శూన్య	*vimobj,
     Tcl_Obj	*delcmd)
 {
-    if (reflist == &refsdeleted)
+    ఒకవేళ (reflist == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_సమితి_ఫలితం(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
+	తిరిగి TCL_ERROR;
     }
 
-    while (reflist != NULL)
+    అయితే (reflist != ఖాళీ)
     {
-	if (reflist->interp == interp && reflist->vimobj == vimobj)
+	ఒకవేళ (reflist->interp == interp && reflist->vimobj == vimobj)
 	{
-	    if (reflist->delcmd)
-		Tcl_DecrRefCount(reflist->delcmd);
-	    Tcl_IncrRefCount(delcmd);
+	    ఒకవేళ (reflist->delcmd)
+		Tcl_Decr_Ref_లెక్క(reflist->delcmd);
+	    Tcl_Incr_Ref_లెక్క(delcmd);
 	    reflist->delcmd = delcmd;
-	    return TCL_OK;
+	    తిరిగి TCL_OK;
 	}
-	reflist = reflist->next;
+	reflist = reflist->తదుపరి;
     }
     // This should never happen.  Famous last word?
     iemsg(e_tcl_fatal_error_reflist_corrupt_please_report_this);
-    Tcl_SetResult(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_సమితి_ఫలితం(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
+    తిరిగి TCL_ERROR;
 }
 
 
@@ -1562,133 +1562,133 @@ tclsetdelcmd(
 //    I/O Channel
 ////////////////////////////////////////////
 
-    static int
-tcl_channel_close(ClientData instance, Tcl_Interp *interp UNUSED)
+    స్థిర పూర్ణాంకం
+tcl_channel_close(Client_దత్తాంశం instance, Tcl_Interp *interp వాడని)
 {
-    int		err = 0;
+    పూర్ణాంకం		err = 0;
 
     // currently does nothing
 
-    if (instance != VIMOUT && instance != VIMERR)
+    ఒకవేళ (instance != VIMOUT && instance != VIMERR)
     {
-	Tcl_SetErrno(EBADF);
+	Tcl_సమితి_Errno(EBADF);
 	err = EBADF;
     }
-    return err;
+    తిరిగి err;
 }
 
-    static int
-tcl_channel_input(
-    ClientData	instance UNUSED,
-    char	*buf UNUSED,
-    int		bufsiz UNUSED,
-    int		*errptr)
+    స్థిర పూర్ణాంకం
+tcl_channel_ఆదానం(
+    Client_దత్తాంశం	instance వాడని,
+    అక్షరం	*buf వాడని,
+    పూర్ణాంకం		bufsiz వాడని,
+    పూర్ణాంకం		*errptr)
 {
 
     // input is currently not supported
 
-    Tcl_SetErrno(EINVAL);
-    if (errptr)
+    Tcl_సమితి_Errno(EINVAL);
+    ఒకవేళ (errptr)
 	*errptr = EINVAL;
-    return -1;
+    తిరిగి -1;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 tcl_channel_output(
-    ClientData	instance,
-    const char	*buf,
-    int		bufsiz,
-    int		*errptr)
+    Client_దత్తాంశం	instance,
+    స్థిరరాశి అక్షరం	*buf,
+    పూర్ణాంకం		bufsiz,
+    పూర్ణాంకం		*errptr)
 {
     char_u	*str;
-    int		result;
+    పూర్ణాంకం		ఫలితం;
 
     // The buffer is not guaranteed to be 0-terminated, and we don't if
     // there is enough room to add a '\0'.  So we have to create a copy
     // of the buffer...
     str = vim_strnsave((char_u *)buf, bufsiz);
-    if (!str)
+    ఒకవేళ (!str)
     {
-	Tcl_SetErrno(ENOMEM);
-	if (errptr)
+	Tcl_సమితి_Errno(ENOMEM);
+	ఒకవేళ (errptr)
 	    *errptr = ENOMEM;
-	return -1;
+	తిరిగి -1;
     }
 
-    result = bufsiz;
-    if (instance == VIMOUT)
-	tclmsg((char *)str);
-    else
-    if (instance == VIMERR)
-	tclerrmsg((char *)str);
-    else
+    ఫలితం = bufsiz;
+    ఒకవేళ (instance == VIMOUT)
+	tclmsg((అక్షరం *)str);
+    లేకపోతే
+    ఒకవేళ (instance == VIMERR)
+	tclerrmsg((అక్షరం *)str);
+    లేకపోతే
     {
-	Tcl_SetErrno(EBADF);
-	if (errptr)
+	Tcl_సమితి_Errno(EBADF);
+	ఒకవేళ (errptr)
 	    *errptr = EBADF;
-	result = -1;
+	ఫలితం = -1;
     }
     vim_free(str);
-    return result;
+    తిరిగి ఫలితం;
 }
 
-    static void
-tcl_channel_watch(ClientData instance UNUSED, int mask UNUSED)
+    స్థిర శూన్య
+tcl_channel_watch(Client_దత్తాంశం instance వాడని, పూర్ణాంకం ముసుగు వాడని)
 {
-    Tcl_SetErrno(EINVAL);
+    Tcl_సమితి_Errno(EINVAL);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 tcl_channel_gethandle(
-    ClientData	instance UNUSED,
-    int		direction UNUSED,
-    ClientData	*handleptr UNUSED)
+    Client_దత్తాంశం	instance వాడని,
+    పూర్ణాంకం		direction వాడని,
+    Client_దత్తాంశం	*handleptr వాడని)
 {
-    Tcl_SetErrno(EINVAL);
-    return EINVAL;
+    Tcl_సమితి_Errno(EINVAL);
+    తిరిగి EINVAL;
 }
 
 
-static Tcl_ChannelType tcl_channel_type =
+స్థిర Tcl_ChannelType tcl_channel_type =
 {
     "vimmessage",	// typeName
-    TCL_CHANNEL_VERSION_2, // version
+    TCL_CHANNEL_సంస్కరణ_2, //సంస్కరణ
     tcl_channel_close,	// closeProc
-    tcl_channel_input,	// inputProc
+    tcl_channel_ఆదానం,	// inputProc
     tcl_channel_output,	// outputProc
-    NULL,		// seekProc
-    NULL,		// setOptionProc
-    NULL,		// getOptionProc
+    ఖాళీ,		// seekProc
+    ఖాళీ,		// setOptionProc
+    ఖాళీ,		// getOptionProc
     tcl_channel_watch,	// watchProc
     tcl_channel_gethandle, // getHandleProc
-    NULL,		// close2Proc
-    NULL,		// blockModeProc
-#ifdef TCL_CHANNEL_VERSION_2
-    NULL,		// flushProc
-    NULL,		// handlerProc
-#endif
+    ఖాళీ,		// close2Proc
+    ఖాళీ,		// blockModeProc
+#నిర్వచితమైతే TCL_CHANNEL_సంస్కరణ_2
+    ఖాళీ,		// flushProc
+    ఖాళీ,		// handlerProc
+#అయితే_ముగింపు
 // The following should not be necessary since TCL_CHANNEL_VERSION_2 was
 // set above
-#ifdef TCL_CHANNEL_VERSION_3
-    NULL,		// wideSeekProc
-#endif
-#ifdef TCL_CHANNEL_VERSION_4
-    NULL,		// threadActionProc
-#endif
-#ifdef TCL_CHANNEL_VERSION_5
-    NULL		// truncateProc
-#endif
+#నిర్వచితమైతే TCL_CHANNEL_సంస్కరణ_3
+    ఖాళీ,		// wideSeekProc
+#అయితే_ముగింపు
+#నిర్వచితమైతే TCL_CHANNEL_సంస్కరణ_4
+    ఖాళీ,		// threadActionProc
+#అయితే_ముగింపు
+#నిర్వచితమైతే TCL_CHANNEL_సంస్కరణ_5
+    ఖాళీ		// truncateProc
+#అయితే_ముగింపు
 };
 
 ///////////////////////////////////
 // Interface to vim
 //////////////////////////////////
 
-    static void
-tclupdatevars(void)
+    స్థిర శూన్య
+tclupdatevars(శూన్య)
 {
-    char varname[VARNAME_SIZE];	// must be writeable
-    char *name;
+    అక్షరం varname[VARNAME_కొలత];	// must be writeable
+    అక్షరం *name;
 
     strcpy(varname, VAR_RANGE1);
     Tcl_UpdateLinkedVar(tclinfo.interp, varname);
@@ -1712,149 +1712,149 @@ tclupdatevars(void)
 }
 
 
-    static int
+    స్థిర పూర్ణాంకం
 tclinit(exarg_T *eap)
 {
-    char varname[VARNAME_SIZE];	// Tcl_LinkVar requires writeable varname
-    char *name;
+    అక్షరం varname[VARNAME_కొలత];	// Tcl_LinkVar requires writeable varname
+    అక్షరం *name;
 
-#ifdef DYNAMIC_TCL
-    if (!tcl_enabled(TRUE))
+#నిర్వచితమైతే DYNAMIC_TCL
+    ఒకవేళ (!tcl_enabled(TRUE))
     {
 	emsg(_(e_sorry_this_command_is_disabled_tcl_library_could_not_be_loaded));
-	return FAIL;
+	తిరిగి FAIL;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (!tclinfo.interp)
+    ఒకవేళ (!tclinfo.interp)
     {
 	Tcl_Interp *interp;
-	static Tcl_Channel ch1, ch2;
+	స్థిర Tcl_Channel ch1, ch2;
 
 	// Create replacement channels for stdout and stderr; this has to be
 	// done each time an interpreter is created since the channels are closed
 	// when the interpreter is deleted
 	ch1 = Tcl_CreateChannel(&tcl_channel_type, "vimout", VIMOUT, TCL_WRITABLE);
 	ch2 = Tcl_CreateChannel(&tcl_channel_type, "vimerr", VIMERR, TCL_WRITABLE);
-	Tcl_SetStdChannel(ch1, TCL_STDOUT);
-	Tcl_SetStdChannel(ch2, TCL_STDERR);
+	Tcl_సమితి_Std_Channel(ch1, TCL_STDOUT);
+	Tcl_సమితి_Std_Channel(ch2, TCL_STDERR);
 
 	interp = Tcl_CreateInterp();
 	Tcl_Preserve(interp);
-	if (Tcl_Init(interp) == TCL_ERROR)
+	ఒకవేళ (Tcl_Init(interp) == TCL_ERROR)
 	{
 	    Tcl_Release(interp);
 	    Tcl_DeleteInterp(interp);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-#if 0
+#ఒకవేళ 0
 	// VIM sure is interactive
-	Tcl_SetVar(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
-#endif
+	Tcl_సమితి_Var(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
+#అయితే_ముగింపు
 
-	Tcl_SetChannelOption(interp, ch1, "-buffering", "line");
-#ifdef MSWIN
-	Tcl_SetChannelOption(interp, ch1, "-translation", "lf");
-#endif
-	Tcl_SetChannelOption(interp, ch2, "-buffering", "line");
-#ifdef MSWIN
-	Tcl_SetChannelOption(interp, ch2, "-translation", "lf");
-#endif
+	Tcl_సమితి_Channel_Option(interp, ch1, "-buffering", "line");
+#నిర్వచితమైతే MSWIN
+	Tcl_సమితి_Channel_Option(interp, ch1, "-translation", "lf");
+#అయితే_ముగింపు
+	Tcl_సమితి_Channel_Option(interp, ch2, "-buffering", "line");
+#నిర్వచితమైతే MSWIN
+	Tcl_సమితి_Channel_Option(interp, ch2, "-translation", "lf");
+#అయితే_ముగింపు
 
 	// replace standard Tcl exit command
 	Tcl_DeleteCommand(interp, "exit");
 	Tcl_CreateObjCommand(interp, "exit", exitcmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 
 	// new commands, in ::vim namespace
 	Tcl_CreateObjCommand(interp, "::vim::buffer", buffercmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 	Tcl_CreateObjCommand(interp, "::vim::window", windowcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 	Tcl_CreateObjCommand(interp, "::vim::command", commandcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 	Tcl_CreateObjCommand(interp, "::vim::beep", beepcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 	Tcl_CreateObjCommand(interp, "::vim::option", optioncmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 	Tcl_CreateObjCommand(interp, "::vim::expr", exprcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_దత్తాంశం)ఖాళీ, (Tcl_CmdDeleteProc *)ఖాళీ);
 
 	// "lbase" variable
 	tclinfo.lbase = 1;
 	strcpy(varname, VAR_LBASE);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.lbase, TCL_LINK_INT);
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.lbase, TCL_LINK_INT);
 
 	// "range" variable
-	tclinfo.range_start = eap->line1;
+	tclinfo.range_ప్రారంభం = eap->line1;
 	strcpy(varname, VAR_RANGE1);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.range_ప్రారంభం, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 	strcpy(varname, VAR_RANGE2);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
-	tclinfo.range_end   = eap->line2;
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.range_ప్రారంభం, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	tclinfo.range_చివర   = eap->line2;
 	strcpy(varname, VAR_RANGE3);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_end, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.range_చివర, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 
 	// "current" variable
-	tclinfo.curbuf = Tcl_Alloc(VARNAME_SIZE);
-	tclinfo.curwin = Tcl_Alloc(VARNAME_SIZE);
+	tclinfo.curbuf = Tcl_Alloc(VARNAME_కొలత);
+	tclinfo.curwin = Tcl_Alloc(VARNAME_కొలత);
 	name = tclgetbuffer(interp, curbuf);
 	strcpy(tclinfo.curbuf, name);
 	strcpy(varname, VAR_CURBUF);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 	name = tclgetwindow(interp, curwin);
 	strcpy(tclinfo.curwin, name);
 	strcpy(varname, VAR_CURWIN);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (అక్షరం *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 
 	tclinfo.interp = interp;
     }
-    else
+    లేకపోతే
     {
 	// Interpreter already exists, just update variables
-	tclinfo.range_start = row2tcl(eap->line1);
-	tclinfo.range_end = row2tcl(eap->line2);
+	tclinfo.range_ప్రారంభం = row2tcl(eap->line1);
+	tclinfo.range_చివర = row2tcl(eap->line2);
 	tclupdatevars();
     }
 
     tclinfo.exitvalue = 0;
-    return OK;
+    తిరిగి OK;
 }
 
-    static void
-tclerrmsg(char *text)
+    స్థిర శూన్య
+tclerrmsg(అక్షరం *పాఠ్యం)
 {
-    char *next;
+    అక్షరం *తదుపరి;
 
-    while ((next=strchr(text, '\n')))
+    అయితే ((తదుపరి=strchr(పాఠ్యం, '\n')))
     {
-	*next++ = '\0';
-	emsg(text);
-	text = next;
+	*తదుపరి++ = '\0';
+	emsg(పాఠ్యం);
+	పాఠ్యం = తదుపరి;
     }
-    if (*text)
-	emsg(text);
+    ఒకవేళ (*పాఠ్యం)
+	emsg(పాఠ్యం);
 }
 
-    static void
-tclmsg(char *text)
+    స్థిర శూన్య
+tclmsg(అక్షరం *పాఠ్యం)
 {
-    char *next;
+    అక్షరం *తదుపరి;
 
-    while ((next=strchr(text, '\n')))
+    అయితే ((తదుపరి=strchr(పాఠ్యం, '\n')))
     {
-	*next++ = '\0';
-	msg(text);
-	text = next;
+	*తదుపరి++ = '\0';
+	సందేశం(పాఠ్యం);
+	పాఠ్యం = తదుపరి;
     }
-    if (*text)
-	msg(text);
+    ఒకవేళ (*పాఠ్యం)
+	సందేశం(పాఠ్యం);
 }
 
-    static void
-tcldelthisinterp(void)
+    స్థిర శూన్య
+tcldelthisinterp(శూన్య)
 {
-    if (!Tcl_InterpDeleted(tclinfo.interp))
+    ఒకవేళ (!Tcl_InterpDeleted(tclinfo.interp))
 	Tcl_DeleteInterp(tclinfo.interp);
     Tcl_Release(tclinfo.interp);
     // The interpreter is now gets deleted.  All registered commands (esp.
@@ -1866,77 +1866,77 @@ tcldelthisinterp(void)
     // the effort.  Unused refs are recycled by other interpreters, and
     // all refs are free'd when the window/buffer gets closed by vim.
 
-    tclinfo.interp = NULL;
+    tclinfo.interp = ఖాళీ;
     Tcl_Free(tclinfo.curbuf);
     Tcl_Free(tclinfo.curwin);
-    tclinfo.curbuf = tclinfo.curwin = NULL;
+    tclinfo.curbuf = tclinfo.curwin = ఖాళీ;
 }
 
-    static int
-tclexit(int error)
+    స్థిర పూర్ణాంకం
+tclexit(పూర్ణాంకం error)
 {
-    int newerr = OK;
+    పూర్ణాంకం newerr = OK;
 
-    if (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
-	|| Tcl_LimitExceeded(tclinfo.interp)  // True if the interpreter cannot continue
-#endif
+    ఒకవేళ (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
+#ఒకవేళ (TCL_MAJOR_సంస్కరణ == 8 && TCL_MINOR_సంస్కరణ >= 5) || TCL_MAJOR_సంస్కరణ > 8
+	|| Tcl_హద్దు_Exceeded(tclinfo.interp)  // True if the interpreter cannot continue
+#అయితే_ముగింపు
 	)
     {
-	char buf[50];
+	అక్షరం buf[50];
 
-	sprintf(buf, _(e_exit_code_nr), tclinfo.exitvalue);
+	sprintf(buf, _(e_exit_సంకేతం_nr), tclinfo.exitvalue);
 	tclerrmsg(buf);
-	if (tclinfo.exitvalue == 0)
+	ఒకవేళ (tclinfo.exitvalue == 0)
 	{
 	    did_emsg = 0;
 	    newerr = OK;
 	}
-	else
+	లేకపోతే
 	    newerr = FAIL;
 
 	tcldelthisinterp();
     }
-    else
+    లేకపోతే
     {
-	char *result;
+	అక్షరం *ఫలితం;
 
-	result = (char *)Tcl_GetStringResult(tclinfo.interp);
-	if (error == TCL_OK)
+	ఫలితం = (అక్షరం *)Tcl_Get_String_ఫలితం(tclinfo.interp);
+	ఒకవేళ (error == TCL_OK)
 	{
-	    tclmsg(result);
+	    tclmsg(ఫలితం);
 	    newerr = OK;
 	}
-	else
+	లేకపోతే
 	{
-	    tclerrmsg(result);
+	    tclerrmsg(ఫలితం);
 	    newerr = FAIL;
 	}
     }
 
-    return newerr;
+    తిరిగి newerr;
 }
 
 /*
  * ":tcl"
  */
-    void
+    శూన్య
 ex_tcl(exarg_T *eap)
 {
     char_u	*script;
-    int		err;
+    పూర్ణాంకం		err;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    ఒకవేళ (!eap->skip)
     {
 	err = tclinit(eap);
-	if (err == OK)
+	ఒకవేళ (err == OK)
 	{
 	    Tcl_AllowExceptions(tclinfo.interp);
-	    if (script == NULL)
-		err = Tcl_Eval(tclinfo.interp, (char *)eap->arg);
-	    else
-		err = Tcl_Eval(tclinfo.interp, (char *)script);
+	    ఒకవేళ (script == ఖాళీ)
+		err = Tcl_Eval(tclinfo.interp, (అక్షరం *)eap->arg);
+	    లేకపోతే
+		err = Tcl_Eval(tclinfo.interp, (అక్షరం *)script);
 	    err = tclexit(err);
 	}
     }
@@ -1946,14 +1946,14 @@ ex_tcl(exarg_T *eap)
 /*
  * ":tclfile"
  */
-    void
+    శూన్య
 ex_tclfile(exarg_T *eap)
 {
-    char *file = (char *)eap->arg;
-    int err;
+    అక్షరం *file = (అక్షరం *)eap->arg;
+    పూర్ణాంకం err;
 
     err = tclinit(eap);
-    if (err == OK)
+    ఒకవేళ (err == OK)
     {
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_EvalFile(tclinfo.interp, file);
@@ -1964,157 +1964,157 @@ ex_tclfile(exarg_T *eap)
 /*
  * ":tcldo"
  */
-    void
+    శూన్య
 ex_tcldo(exarg_T *eap)
 {
-    char	*script, *line;
-    int		err, rs, re, lnum;
-    char	var_lnum[VARNAME_SIZE]; // must be writeable memory
-    char	var_line[VARNAME_SIZE];
-    linenr_T	first_line = 0;
-    linenr_T	last_line = 0;
+    అక్షరం	*script, *పంక్తి;
+    పూర్ణాంకం		err, rs, re, lnum;
+    అక్షరం	var_lnum[VARNAME_కొలత]; // must be writeable memory
+    అక్షరం	var_పంక్తి[VARNAME_కొలత];
+    linenr_T	మొదటి_పంక్తి = 0;
+    linenr_T	చివరి_పంక్తి = 0;
     buf_T	*was_curbuf = curbuf;
 
     rs = eap->line1;
     re = eap->line2;
-    script = (char *)eap->arg;
+    script = (అక్షరం *)eap->arg;
     strcpy(var_lnum, VAR_CURLNUM);
-    strcpy(var_line, VAR_CURLINE);
+    strcpy(var_పంక్తి, VAR_CURLINE);
 
     err = tclinit(eap);
-    if (err != OK)
-	return;
+    ఒకవేళ (err != OK)
+	తిరిగి;
 
     lnum = row2tcl(rs);
-    Tcl_LinkVar(tclinfo.interp, var_lnum, (char *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+    Tcl_LinkVar(tclinfo.interp, var_lnum, (అక్షరం *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
     err = TCL_OK;
-    if (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
+    ఒకవేళ (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
     {
-	Tcl_SetResult(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
+	Tcl_సమితి_ఫలితం(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
 	err = TCL_ERROR;
     }
-    while (err == TCL_OK  &&  rs <= re)
+    అయితే (err == TCL_OK  &&  rs <= re)
     {
-	if ((linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
-	if (!line)
+	ఒకవేళ ((linenr_T)rs > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    ఆపు;
+	పంక్తి = (అక్షరం *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
+	ఒకవేళ (!పంక్తి)
 	{
-	    Tcl_SetResult(tclinfo.interp, _("cannot get line"), TCL_STATIC);
+	    Tcl_సమితి_ఫలితం(tclinfo.interp, _("cannot get line"), TCL_STATIC);
 	    err = TCL_ERROR;
-	    break;
+	    ఆపు;
 	}
-	Tcl_SetVar(tclinfo.interp, var_line, line, 0);
+	Tcl_సమితి_Var(tclinfo.interp, var_పంక్తి, పంక్తి, 0);
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_Eval(tclinfo.interp, script);
-	if (err != TCL_OK
+	ఒకవేళ (err != TCL_OK
 	    || Tcl_InterpDeleted(tclinfo.interp)
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
-	    || Tcl_LimitExceeded(tclinfo.interp)
-#endif
+#ఒకవేళ (TCL_MAJOR_సంస్కరణ == 8 && TCL_MINOR_సంస్కరణ >= 5) || TCL_MAJOR_సంస్కరణ > 8
+	    || Tcl_హద్దు_Exceeded(tclinfo.interp)
+#అయితే_ముగింపు
 	    || curbuf != was_curbuf
-	    || (linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)Tcl_GetVar(tclinfo.interp, var_line, 0);
-	if (line)
+	    || (linenr_T)rs > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    ఆపు;
+	పంక్తి = (అక్షరం *)Tcl_GetVar(tclinfo.interp, var_పంక్తి, 0);
+	ఒకవేళ (పంక్తి)
 	{
-	    if (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
+	    ఒకవేళ (ml_replace((linenr_T)rs, (char_u *)పంక్తి, TRUE) != OK)
 	    {
-		Tcl_SetResult(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
+		Tcl_సమితి_ఫలితం(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ఆపు;
 	    }
-	    if (first_line == 0)
-		first_line = rs;
-	    last_line = rs;
+	    ఒకవేళ (మొదటి_పంక్తి == 0)
+		మొదటి_పంక్తి = rs;
+	    చివరి_పంక్తి = rs;
 	}
 	++rs;
 	++lnum;
 	Tcl_UpdateLinkedVar(tclinfo.interp, var_lnum);
     }
-    if (first_line)
-	changed_lines(first_line, 0, last_line + 1, (long)0);
+    ఒకవేళ (మొదటి_పంక్తి)
+	మారింది_పంక్తులు(మొదటి_పంక్తి, 0, చివరి_పంక్తి + 1, (దీర్ఘ)0);
 
-    Tcl_UnsetVar(tclinfo.interp, var_line, 0);
+    Tcl_UnsetVar(tclinfo.interp, var_పంక్తి, 0);
     Tcl_UnlinkVar(tclinfo.interp, var_lnum);
-    if (err == TCL_OK)
-	Tcl_ResetResult(tclinfo.interp);
+    ఒకవేళ (err == TCL_OK)
+	Tcl_Reset_ఫలితం(tclinfo.interp);
 
-    (void)tclexit(err);
+    (శూన్య)tclexit(err);
 }
 
-    static void
-tcldelallrefs(struct ref *ref)
+    స్థిర శూన్య
+tcldelallrefs(నిర్మాణం ref *ref)
 {
-    struct ref	*next;
-    int		err;
-    char	*result;
+    నిర్మాణం ref	*తదుపరి;
+    పూర్ణాంకం		err;
+    అక్షరం	*ఫలితం;
 
-#ifdef DYNAMIC_TCL
+#నిర్వచితమైతే DYNAMIC_TCL
     // TODO: this code currently crashes Vim on exit
-    if (exiting)
-	return;
-#endif
+    ఒకవేళ (exiting)
+	తిరిగి;
+#అయితే_ముగింపు
 
-    while (ref != NULL)
+    అయితే (ref != ఖాళీ)
     {
-	next = ref->next;
-	if (ref->interp)
+	తదుపరి = ref->తదుపరి;
+	ఒకవేళ (ref->interp)
 	{
-	    if (ref->delcmd)
+	    ఒకవేళ (ref->delcmd)
 	    {
 		err = Tcl_GlobalEvalObj(ref->interp, ref->delcmd);
-		if (err != TCL_OK)
+		ఒకవేళ (err != TCL_OK)
 		{
-		    result = (char *)Tcl_GetStringResult(ref->interp);
-		    if (result)
-			tclerrmsg(result);
+		    ఫలితం = (అక్షరం *)Tcl_Get_String_ఫలితం(ref->interp);
+		    ఒకవేళ (ఫలితం)
+			tclerrmsg(ఫలితం);
 		}
-		Tcl_DecrRefCount(ref->delcmd);
-		ref->delcmd = NULL;
+		Tcl_Decr_Ref_లెక్క(ref->delcmd);
+		ref->delcmd = ఖాళీ;
 	    }
 	    Tcl_DeleteCommandFromToken(ref->interp, ref->cmd);
 	}
-	Tcl_Free((char *)ref);
-	ref = next;
+	Tcl_Free((అక్షరం *)ref);
+	ref = తదుపరి;
     }
 }
 
-    void
-tcl_buffer_free(buf_T *buf)
+    శూన్య
+tcl_బఫరు_free(buf_T *buf)
 {
-    struct ref *reflist;
+    నిర్మాణం ref *reflist;
 
-#ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
-#endif
+#నిర్వచితమైతే DYNAMIC_TCL
+    ఒకవేళ (!stubs_initialized)	// Not using Tcl, nothing to do.
+	తిరిగి;
+#అయితే_ముగింపు
 
-    reflist = (struct ref *)(buf->b_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (నిర్మాణం ref *)(buf->b_tcl_ref);
+    ఒకవేళ (reflist != &refsdeleted)
     {
-	buf->b_tcl_ref = (void *)&refsdeleted;
+	buf->b_tcl_ref = (శూన్య *)&refsdeleted;
 	tcldelallrefs(reflist);
-	buf->b_tcl_ref = NULL;
+	buf->b_tcl_ref = ఖాళీ;
     }
 }
 
-    void
-tcl_window_free(win_T *win)
+    శూన్య
+tcl_కిటికీ_free(win_T *win)
 {
-    struct ref *reflist;
+    నిర్మాణం ref *reflist;
 
-#ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
-#endif
+#నిర్వచితమైతే DYNAMIC_TCL
+    ఒకవేళ (!stubs_initialized)	// Not using Tcl, nothing to do.
+	తిరిగి;
+#అయితే_ముగింపు
 
-    reflist = (struct ref*)(win->w_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (నిర్మాణం ref*)(win->w_tcl_ref);
+    ఒకవేళ (reflist != &refsdeleted)
     {
-	win->w_tcl_ref = (void *)&refsdeleted;
+	win->w_tcl_ref = (శూన్య *)&refsdeleted;
 	tcldelallrefs(reflist);
-	win->w_tcl_ref = NULL;
+	win->w_tcl_ref = ఖాళీ;
     }
 }
 

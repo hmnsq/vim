@@ -27,16 +27,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef _WIN32
+#నిర్వచితమైతే _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#అన్తర్భావ <ctype.h>
+#అన్తర్భావ <io.h>
+#అన్తర్భావ <wchar.h>
+#అన్తర్భావ <windows.h>
 
-#ifdef USE_FILEEXTD
+#నిర్వచితమైతే USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# ఒకవేళ !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,146 +45,146 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#లేకపోతే // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# ఒకవేళ defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  లేకపోతే
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
-#endif // USE_FILEEXTD
+#అయితే_ముగింపు // USE_FILEEXTD
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#నిర్వచితమైతే __MINGW32__
+# define వాడని __attribute__((వాడని_2))
+#లేకపోతే
+# define వాడని
+#అయితే_ముగింపు
 
-#include "iscygpty.h"
+#అన్తర్భావ "iscygpty.h"
 
 //#define USE_DYNFILEID
-#ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+#నిర్వచితమైతే USE_DYNFILEID
+రకనిర్వచనం BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
-		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+		DWORD						dw_బఫరు_కొలత);
+స్థిర pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = ఖాళీ;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
-		HANDLE						hFile UNUSED,
-		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
-		LPVOID						lpFileInformation UNUSED,
-		DWORD						dwBufferSize UNUSED)
+స్థిర BOOL WINAPI stub_GetFileInformationByHandleEx(
+		HANDLE						hFile వాడని,
+		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass వాడని,
+		LPVOID						lpFileInformation వాడని,
+		DWORD						dw_బఫరు_కొలత వాడని)
 {
-	return FALSE;
+	తిరిగి FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+స్థిర శూన్య అమరిక_fileid_api(శూన్య)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	ఒకవేళ (pGetFileInformationByHandleEx != ఖాళీ) {
+		తిరిగి;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
-		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		Get_Proc_చిరునామా(GetModuleHandle(పాఠ్యం_3("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	ఒకవేళ (pGetFileInformationByHandleEx == ఖాళీ) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# లేకపోతే
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#లేకపోతే
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
-# define setup_fileid_api()
-#endif
+# define అమరిక_fileid_api()
+#అయితే_ముగింపు
 
 
-#define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+#నిర్వచించు is_wprefix(s, ఉపసర్గ) \
+	(wcsncmp((s), (ఉపసర్గ), పరిమాణం(ఉపసర్గ) / పరిమాణం(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+పూర్ణాంకం is_cygpty(పూర్ణాంకం fd)
 {
-#ifdef STUB_IMPL
-	return 0;
-#else
+#నిర్వచితమైతే STUB_IMPL
+	తిరిగి 0;
+#లేకపోతే
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	స్థిరరాశి పూర్ణాంకం కొలత = పరిమాణం(FILE_NAME_INFO) + పరిమాణం(WCHAR) * (MAX_మార్గం - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = ఖాళీ;
 
-	setup_fileid_api();
+	అమరిక_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	ఒకవేళ (h == INVALID_HANDLE_విలువ) {
+		తిరిగి 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	ఒకవేళ (GetFileType(h) != FILE_TYPE_PIPE) {
+		తిరిగి 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = జ్ఞాపకం_ఇవ్వు(కొలత + పరిమాణం(WCHAR));
+	ఒకవేళ (nameinfo == ఖాళీ) {
+		తిరిగి 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	ఒకవేళ (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, కొలత)) {
+		nameinfo->FileName[nameinfo->File_Name_నిడివి / పరిమాణం(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		ఒకవేళ (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} లేకపోతే ఒకవేళ (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} లేకపోతే {
+			p = ఖాళీ;
 		}
-		if (p != NULL) {
+		ఒకవేళ (p != ఖాళీ) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			అయితే (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			ఒకవేళ (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} లేకపోతే {
+				p = ఖాళీ;
 			}
 		}
-		if (p != NULL) {
+		ఒకవేళ (p != ఖాళీ) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			అయితే (*p && iswascii(*p) && అంకెనా(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			ఒకవేళ (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} లేకపోతే ఒకవేళ (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} లేకపోతే {
+				p = ఖాళీ;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
-#endif // STUB_IMPL
+	విడుదల(nameinfo);
+	తిరిగి (p != ఖాళీ);
+#అయితే_ముగింపు // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+పూర్ణాంకం is_cygpty_వాడిన(శూన్య)
 {
-	int fd, ret = 0;
+	పూర్ణాంకం fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	కొరకు (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	తిరిగి ret;
 }
 
-#endif // _WIN32
+#అయితే_ముగింపు // _WIN32
 
 // vim: set ts=4 sw=4:

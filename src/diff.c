@@ -16,13 +16,13 @@
  * - Let 'diffexpr' do the work, using files.
  */
 
-#include "vim.h"
-#include "xdiff/xdiff.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "xdiff/xdiff.h"
 
-#if defined(FEAT_DIFF)
+#ఒకవేళ defined(FEAT_DIFF)
 
-static int diff_busy = FALSE;	    // using diff structs, don't change them
-static int diff_need_update = FALSE; // ex_diffupdate needs to be called
+స్థిర పూర్ణాంకం diff_busy = FALSE;	    // using diff structs, don't change them
+స్థిర పూర్ణాంకం diff_need_update = FALSE; // ex_diffupdate needs to be called
 
 // flags obtained from the 'diffopt' option
 # define DIFF_FILLER	0x001	// display filler lines
@@ -34,33 +34,33 @@ static int diff_need_update = FALSE; // ex_diffupdate needs to be called
 # define DIFF_HORIZONTAL	0x040	// horizontal splits
 # define DIFF_VERTICAL	0x080	// vertical splits
 # define DIFF_HIDDEN_OFF	0x100	// diffoff when hidden
-# define DIFF_INTERNAL	0x200	// use internal xdiff algorithm
+# define DIFF_అంతర్గత	0x200	// use internal xdiff algorithm
 # define DIFF_CLOSE_OFF	0x400	// diffoff when closing window
 # define DIFF_FOLLOWWRAP	0x800	// follow the wrap option
 # define DIFF_LINEMATCH  0x1000  // match most similar lines within diff
 # define DIFF_INLINE_NONE    0x2000  // no inline highlight
 # define DIFF_INLINE_SIMPLE  0x4000  // inline highlight with simple algorithm
 # define DIFF_INLINE_CHAR    0x8000  // inline highlight with character diff
-# define DIFF_INLINE_WORD    0x10000 // inline highlight with word diff
+# define DIFF_INLINE_మాట    0x10000 // inline highlight with word diff
 # define DIFF_ANCHOR	0x20000	// use 'diffanchors' to anchor the diff
 # define ALL_WHITE_DIFF (DIFF_IWHITE | DIFF_IWHITEALL | DIFF_IWHITEEOL)
-# define ALL_INLINE (DIFF_INLINE_NONE | DIFF_INLINE_SIMPLE | DIFF_INLINE_CHAR | DIFF_INLINE_WORD)
-# define ALL_INLINE_DIFF (DIFF_INLINE_CHAR | DIFF_INLINE_WORD)
-static int	diff_flags = DIFF_INTERNAL | DIFF_FILLER | DIFF_CLOSE_OFF | DIFF_INLINE_CHAR;
+# define ALL_INLINE (DIFF_INLINE_NONE | DIFF_INLINE_SIMPLE | DIFF_INLINE_CHAR | DIFF_INLINE_మాట)
+# define ALL_INLINE_DIFF (DIFF_INLINE_CHAR | DIFF_INLINE_మాట)
+స్థిర పూర్ణాంకం	diff_flags = DIFF_అంతర్గత | DIFF_FILLER | DIFF_CLOSE_OFF | DIFF_INLINE_CHAR;
 
-static long diff_algorithm = XDF_INDENT_HEURISTIC;
-static int diff_word_gap = 5;  // gap threshold for inline:word
+స్థిర దీర్ఘ diff_algorithm = XDF_INDENT_HEURISTIC;
+స్థిర పూర్ణాంకం diff_మాట_gap = 5;  // gap threshold for inline:word
 
 # define LBUFLEN 50		// length of line in diff file
 
 // Max file size xdiff is equipped to deal with. The value (1GB - 1MB) comes
 // from Git's implementation.
-# define MAX_XDIFF_SIZE (1024L * 1024 * 1023)
+# define MAX_XDIFF_కొలత (1024L * 1024 * 1023)
 
-static int diff_a_works = MAYBE; // TRUE when "diff -a" works, FALSE when it
+స్థిర పూర్ణాంకం diff_a_పనిచేస్తుంది = MAYBE; // TRUE when "diff -a" works, FALSE when it
 				 // doesn't work, MAYBE when not checked yet
-# if defined(MSWIN)
-static int diff_bin_works = MAYBE; // TRUE when "diff --binary" works, FALSE
+# ఒకవేళ defined(MSWIN)
+స్థిర పూర్ణాంకం diff_bin_పనిచేస్తుంది = MAYBE; // TRUE when "diff --binary" works, FALSE
 				   // when it doesn't work, MAYBE when not
 				   // checked yet
 # endif
@@ -68,79 +68,79 @@ static int diff_bin_works = MAYBE; // TRUE when "diff --binary" works, FALSE
 # define MAX_DIFF_ANCHORS 20
 
 // used for diff input
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     char_u	*din_fname;  // used for external diff
     mmfile_t	din_mmfile;  // used for internal diff
 } diffin_T;
 
 // used for diff result
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     char_u	*dout_fname;  // used for external diff
     garray_T	dout_ga;      // used for internal diff
 } diffout_T;
 
 // used for recording hunks from xdiff
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     linenr_T lnum_orig;
-    long     count_orig;
+    దీర్ఘ     లెక్క_orig;
     linenr_T lnum_new;
-    long     count_new;
+    దీర్ఘ     లెక్క_new;
 } diffhunk_T;
 
-typedef enum {
+రకనిర్వచనం గణన {
     DIO_OUTPUT_INDICES = 0,	// default
     DIO_OUTPUT_UNIFIED = 1	// unified diff format
 } dio_outfmt_T;
 
 // two diff inputs and one result
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     diffin_T	    dio_orig;     // original file input
     diffin_T	    dio_new;      // new file input
     diffout_T	    dio_diff;     // diff result
-    int		    dio_internal; // using internal diff
+    పూర్ణాంకం		    dio_అంతర్గత; // using internal diff
     dio_outfmt_T    dio_outfmt;   // internal diff output format
-    int		    dio_ctxlen;   // unified diff context length
+    పూర్ణాంకం		    dio_ctxlen;   // unified diff context length
 } diffio_T;
 
-static int diff_buf_idx(buf_T *buf);
-static int diff_buf_idx_tp(buf_T *buf, tabpage_T *tp);
-static void diff_mark_adjust_tp(tabpage_T *tp, int idx, linenr_T line1, linenr_T line2, long amount, long amount_after);
-static void diff_check_unchanged(tabpage_T *tp, diff_T *dp);
-static int diff_check_sanity(tabpage_T *tp, diff_T *dp);
-static int check_external_diff(diffio_T *diffio);
-static int diff_file(diffio_T *diffio);
-static int diff_equal_entry(diff_T *dp, int idx1, int idx2);
-static int diff_cmp(char_u *s1, char_u *s2);
+స్థిర పూర్ణాంకం diff_buf_idx(buf_T *buf);
+స్థిర పూర్ణాంకం diff_buf_idx_tp(buf_T *buf, tabpage_T *tp);
+స్థిర శూన్య diff_mark_adjust_tp(tabpage_T *tp, పూర్ణాంకం idx, linenr_T line1, linenr_T line2, దీర్ఘ amount, దీర్ఘ amount_after);
+స్థిర శూన్య diff_check_unchanged(tabpage_T *tp, diff_T *dp);
+స్థిర పూర్ణాంకం diff_check_sanity(tabpage_T *tp, diff_T *dp);
+స్థిర పూర్ణాంకం check_external_diff(diffio_T *diffio);
+స్థిర పూర్ణాంకం diff_file(diffio_T *diffio);
+స్థిర పూర్ణాంకం diff_equal_నమోదు(diff_T *dp, పూర్ణాంకం idx1, పూర్ణాంకం idx2);
+స్థిర పూర్ణాంకం diff_cmp(char_u *s1, char_u *s2);
 # ifdef FEAT_FOLDING
-static void diff_fold_update(diff_T *dp, int skip_idx);
+స్థిర శూన్య diff_fold_update(diff_T *dp, పూర్ణాంకం skip_idx);
 # endif
-static void diff_read(int idx_orig, int idx_new, diffio_T *dio);
-static void diff_copy_entry(diff_T *dprev, diff_T *dp, int idx_orig, int idx_new);
-static diff_T *diff_alloc_new(tabpage_T *tp, diff_T *dprev, diff_T *dp);
-static int parse_diff_ed(char_u *line, diffhunk_T *hunk);
-static int parse_diff_unified(char_u *line, diffhunk_T *hunk);
-static int xdiff_out_indices(long start_a, long count_a, long start_b, long count_b, void *priv);
-static int xdiff_out_unified(void *priv, mmbuffer_t *mb, int nbuf);
-static int parse_diffanchors(int check_only, buf_T *buf, linenr_T *anchors, int *num_anchors);
+స్థిర శూన్య diff_read(పూర్ణాంకం idx_orig, పూర్ణాంకం idx_new, diffio_T *dio);
+స్థిర శూన్య diff_copy_నమోదు(diff_T *dprev, diff_T *dp, పూర్ణాంకం idx_orig, పూర్ణాంకం idx_new);
+స్థిర diff_T *diff_alloc_new(tabpage_T *tp, diff_T *dprev, diff_T *dp);
+స్థిర పూర్ణాంకం parse_diff_ed(char_u *పంక్తి, diffhunk_T *hunk);
+స్థిర పూర్ణాంకం parse_diff_unified(char_u *పంక్తి, diffhunk_T *hunk);
+స్థిర పూర్ణాంకం xdiff_బహిర్గతం_indices(దీర్ఘ ప్రారంభం_a, దీర్ఘ లెక్క_a, దీర్ఘ ప్రారంభం_b, దీర్ఘ లెక్క_b, శూన్య *priv);
+స్థిర పూర్ణాంకం xdiff_బహిర్గతం_unified(శూన్య *priv, mmbuffer_t *mb, పూర్ణాంకం nbuf);
+స్థిర పూర్ణాంకం parse_diffanchors(పూర్ణాంకం check_only, buf_T *buf, linenr_T *anchors, పూర్ణాంకం *అంకె_anchors);
 
-# define FOR_ALL_DIFFBLOCKS_IN_TAB(tp, dp) \
-    for ((dp) = (tp)->tp_first_diff; (dp) != NULL; (dp) = (dp)->df_next)
+# define FOR_ALL_DIFFBLOCKS_లోపల_TAB(tp, dp) \
+    కొరకు ((dp) = (tp)->tp_మొదటి_diff; (dp) != ఖాళీ; (dp) = (dp)->df_తదుపరి)
 
 // Cursor into the diff block list for diff_infold() and
 // diff_check_with_linestatus(): both scan blocks in ascending df_lnum order,
 // usually with an increasing "lnum" during redraw.  Remembering the last block
 // at or before "lnum" lets the next call resume there instead of from the head.
 // Cleared when a block is freed, allocated or line-shifted (see below).
-static diff_T	    *diff_finger_dp = NULL;
-static tabpage_T    *diff_finger_tp = NULL;
-static int	    diff_finger_idx = -1;
-static linenr_T	    diff_finger_lnum = 0;
+స్థిర diff_T	    *diff_finger_dp = ఖాళీ;
+స్థిర tabpage_T    *diff_finger_tp = ఖాళీ;
+స్థిర పూర్ణాంకం	    diff_finger_idx = -1;
+స్థిర linenr_T	    diff_finger_lnum = 0;
 
-    static void
+    స్థిర శూన్య
 clear_diffblock(diff_T *dp)
 {
-    if (dp == diff_finger_dp)
-	diff_finger_dp = NULL;		// don't leave a dangling finger
+    ఒకవేళ (dp == diff_finger_dp)
+	diff_finger_dp = ఖాళీ;		// don't leave a dangling finger
     ga_clear(&dp->df_changes);
     vim_free(dp);
 }
@@ -150,47 +150,47 @@ clear_diffblock(diff_T *dp)
  * buffer index "idx".  Resumes from the finger when it is still valid and
  * "lnum" did not move backwards, else starts at the first block.
  */
-    static diff_T *
-diff_scan_start(tabpage_T *tp, int idx, linenr_T lnum)
+    స్థిర diff_T *
+diff_పరిశీలన_ప్రారంభం(tabpage_T *tp, పూర్ణాంకం idx, linenr_T lnum)
 {
-    if (diff_finger_dp != NULL
+    ఒకవేళ (diff_finger_dp != ఖాళీ
 	    && diff_finger_tp == tp
 	    && diff_finger_idx == idx
 	    && lnum >= diff_finger_lnum)
-	return diff_finger_dp;
-    return tp->tp_first_diff;
+	తిరిగి diff_finger_dp;
+    తిరిగి tp->tp_మొదటి_diff;
 }
 
 /*
  * Remember "dp" as the finger for the next scan: the last block with
  * df_lnum[idx] <= "lnum" seen by the scan, or NULL when there is none.
  */
-    static void
-diff_scan_remember(tabpage_T *tp, int idx, linenr_T lnum, diff_T *dp)
+    స్థిర శూన్య
+diff_పరిశీలన_remember(tabpage_T *tp, పూర్ణాంకం idx, linenr_T lnum, diff_T *dp)
 {
     diff_finger_tp = tp;
     diff_finger_idx = idx;
     diff_finger_lnum = lnum;
-    diff_finger_dp = dp != NULL ? dp : tp->tp_first_diff;
+    diff_finger_dp = dp != ఖాళీ ? dp : tp->tp_మొదటి_diff;
 }
 
 /*
  * Called when deleting or unloading a buffer: No longer make a diff with it.
  */
-    void
+    శూన్య
 diff_buf_delete(buf_T *buf)
 {
-    int		i;
+    పూర్ణాంకం		i;
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
     {
 	i = diff_buf_idx_tp(buf, tp);
-	if (i != DB_COUNT)
+	ఒకవేళ (i != DB_లెక్క)
 	{
-	    tp->tp_diffbuf[i] = NULL;
+	    tp->tp_diffbuf[i] = ఖాళీ;
 	    tp->tp_diff_invalid = TRUE;
-	    if (tp == curtab)
+	    ఒకవేళ (tp == curtab)
 	    {
 		// don't redraw right away, more might change or buffer state
 		// is invalid right now
@@ -205,32 +205,32 @@ diff_buf_delete(buf_T *buf)
  * Check if the current buffer should be added to or removed from the list of
  * diff buffers.
  */
-    void
+    శూన్య
 diff_buf_adjust(win_T *win)
 {
     win_T	*wp;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (!win->w_p_diff)
+    ఒకవేళ (!win->w_p_diff)
     {
 	// When there is no window showing a diff for this buffer, remove
 	// it from the diffs.
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == win->w_buffer && wp->w_p_diff)
-		break;
-	if (wp == NULL)
+	    ఒకవేళ (wp->w_బఫరు == win->w_బఫరు && wp->w_p_diff)
+		ఆపు;
+	ఒకవేళ (wp == ఖాళీ)
 	{
-	    i = diff_buf_idx(win->w_buffer);
-	    if (i != DB_COUNT)
+	    i = diff_buf_idx(win->w_బఫరు);
+	    ఒకవేళ (i != DB_లెక్క)
 	    {
-		curtab->tp_diffbuf[i] = NULL;
+		curtab->tp_diffbuf[i] = ఖాళీ;
 		curtab->tp_diff_invalid = TRUE;
 		diff_redraw(TRUE);
 	    }
 	}
     }
-    else
-	diff_buf_add(win->w_buffer);
+    లేకపోతే
+	diff_buf_కూడు(win->w_బఫరు);
 }
 
 /*
@@ -241,38 +241,38 @@ diff_buf_adjust(win_T *win)
  * This must be done before any autocmd, because a command may use info
  * about the screen contents.
  */
-    void
-diff_buf_add(buf_T *buf)
+    శూన్య
+diff_buf_కూడు(buf_T *buf)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (diff_buf_idx(buf) != DB_COUNT)
-	return;		// It's already there.
+    ఒకవేళ (diff_buf_idx(buf) != DB_లెక్క)
+	తిరిగి;		// It's already there.
 
-    for (i = 0; i < DB_COUNT; ++i)
-	if (curtab->tp_diffbuf[i] == NULL)
+    కొరకు (i = 0; i < DB_లెక్క; ++i)
+	ఒకవేళ (curtab->tp_diffbuf[i] == ఖాళీ)
 	{
 	    curtab->tp_diffbuf[i] = buf;
 	    curtab->tp_diff_invalid = TRUE;
 	    diff_redraw(TRUE);
-	    return;
+	    తిరిగి;
 	}
 
-    semsg(_(e_cannot_diff_more_than_nr_buffers), DB_COUNT);
+    semsg(_(e_cannot_diff_మరిన్ని_than_nr_buffers), DB_లెక్క);
 }
 
 /*
  * Remove all buffers to make diffs for.
  */
-    static void
-diff_buf_clear(void)
+    స్థిర శూన్య
+diff_buf_clear(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < DB_COUNT; ++i)
-	if (curtab->tp_diffbuf[i] != NULL)
+    కొరకు (i = 0; i < DB_లెక్క; ++i)
+	ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 	{
-	    curtab->tp_diffbuf[i] = NULL;
+	    curtab->tp_diffbuf[i] = ఖాళీ;
 	    curtab->tp_diff_invalid = TRUE;
 	    diff_redraw(TRUE);
 	}
@@ -282,49 +282,49 @@ diff_buf_clear(void)
  * Find buffer "buf" in the list of diff buffers for the current tab page.
  * Return its index or DB_COUNT if not found.
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_buf_idx(buf_T *buf)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
 
-    for (idx = 0; idx < DB_COUNT; ++idx)
-	if (curtab->tp_diffbuf[idx] == buf)
-	    break;
-    return idx;
+    కొరకు (idx = 0; idx < DB_లెక్క; ++idx)
+	ఒకవేళ (curtab->tp_diffbuf[idx] == buf)
+	    ఆపు;
+    తిరిగి idx;
 }
 
 /*
  * Find buffer "buf" in the list of diff buffers for tab page "tp".
  * Return its index or DB_COUNT if not found.
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_buf_idx_tp(buf_T *buf, tabpage_T *tp)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
 
-    for (idx = 0; idx < DB_COUNT; ++idx)
-	if (tp->tp_diffbuf[idx] == buf)
-	    break;
-    return idx;
+    కొరకు (idx = 0; idx < DB_లెక్క; ++idx)
+	ఒకవేళ (tp->tp_diffbuf[idx] == buf)
+	    ఆపు;
+    తిరిగి idx;
 }
 
 /*
  * Mark the diff info involving buffer "buf" as invalid, it will be updated
  * when info is requested.
  */
-    void
+    శూన్య
 diff_invalidate(buf_T *buf)
 {
     tabpage_T	*tp;
-    int		i;
+    పూర్ణాంకం		i;
 
     FOR_ALL_TABPAGES(tp)
     {
 	i = diff_buf_idx_tp(buf, tp);
-	if (i != DB_COUNT)
+	ఒకవేళ (i != DB_లెక్క)
 	{
 	    tp->tp_diff_invalid = TRUE;
-	    if (tp == curtab)
+	    ఒకవేళ (tp == curtab)
 		diff_redraw(TRUE);
 	}
     }
@@ -333,21 +333,21 @@ diff_invalidate(buf_T *buf)
 /*
  * Called by mark_adjust(): update line numbers in "curbuf".
  */
-    void
+    శూన్య
 diff_mark_adjust(
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    దీర్ఘ	amount,
+    దీర్ఘ	amount_after)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
     tabpage_T	*tp;
 
     // Handle all tab pages that use the current buffer in a diff.
     FOR_ALL_TABPAGES(tp)
     {
 	idx = diff_buf_idx_tp(curbuf, tp);
-	if (idx != DB_COUNT)
+	ఒకవేళ (idx != DB_లెక్క)
 	    diff_mark_adjust_tp(tp, idx, line1, line2, amount, amount_after);
     }
 }
@@ -359,28 +359,28 @@ diff_mark_adjust(
  * new change block and update the line numbers in following blocks.
  * When inserting/deleting lines in existing change blocks, update them.
  */
-    static void
+    స్థిర శూన్య
 diff_mark_adjust_tp(
     tabpage_T	*tp,
-    int		idx,
+    పూర్ణాంకం		idx,
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    దీర్ఘ	amount,
+    దీర్ఘ	amount_after)
 {
     diff_T	*dp;
     diff_T	*dprev;
     diff_T	*dnext;
-    int		i;
-    int		inserted, deleted;
-    int		n, off;
-    linenr_T	last;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		inserted, deleted;
+    పూర్ణాంకం		n, off;
+    linenr_T	చివరి;
     linenr_T	lnum_deleted = line1;	// lnum of remaining deletion
-    int		check_unchanged;
+    పూర్ణాంకం		check_unchanged;
 
-    diff_finger_dp = NULL;		// may shift df_lnum, invalidate the finger
+    diff_finger_dp = ఖాళీ;		// may shift df_lnum, invalidate the finger
 
-    if (diff_internal())
+    ఒకవేళ (diff_అంతర్గత())
     {
 	// Will update diffs before redrawing.  Set _invalid to update the
 	// diffs themselves, set _update to also update folds properly just
@@ -390,60 +390,60 @@ diff_mark_adjust_tp(
 	tp->tp_diff_update = TRUE;
     }
 
-    if (line2 == MAXLNUM)
+    ఒకవేళ (line2 == MAXLNUM)
     {
 	// mark_adjust(99, MAXLNUM, 9, 0): insert lines
 	inserted = amount;
 	deleted = 0;
     }
-    else if (amount_after > 0)
+    లేకపోతే ఒకవేళ (amount_after > 0)
     {
 	// mark_adjust(99, 98, MAXLNUM, 9): a change that inserts lines
 	inserted = amount_after;
 	deleted = 0;
     }
-    else
+    లేకపోతే
     {
 	// mark_adjust(98, 99, MAXLNUM, -2): delete lines
 	inserted = 0;
 	deleted = -amount_after;
     }
 
-    dprev = NULL;
-    dp = tp->tp_first_diff;
-    for (;;)
+    dprev = ఖాళీ;
+    dp = tp->tp_మొదటి_diff;
+    కొరకు (;;)
     {
 	// If the change is after the previous diff block and before the next
 	// diff block, thus not touching an existing change, create a new diff
 	// block.  Don't do this when ex_diffgetput() is busy.
-	if ((dp == NULL || dp->df_lnum[idx] - 1 > line2
+	ఒకవేళ ((dp == ఖాళీ || dp->df_lnum[idx] - 1 > line2
 		    || (line2 == MAXLNUM && dp->df_lnum[idx] > line1))
-		&& (dprev == NULL
-		    || dprev->df_lnum[idx] + dprev->df_count[idx] < line1)
+		&& (dprev == ఖాళీ
+		    || dprev->df_lnum[idx] + dprev->df_లెక్క[idx] < line1)
 		&& !diff_busy)
 	{
 	    dnext = diff_alloc_new(tp, dprev, dp);
-	    if (dnext == NULL)
-		return;
+	    ఒకవేళ (dnext == ఖాళీ)
+		తిరిగి;
 
 	    dnext->df_lnum[idx] = line1;
-	    dnext->df_count[idx] = inserted;
-	    for (i = 0; i < DB_COUNT; ++i)
-		if (tp->tp_diffbuf[i] != NULL && i != idx)
+	    dnext->df_లెక్క[idx] = inserted;
+	    కొరకు (i = 0; i < DB_లెక్క; ++i)
+		ఒకవేళ (tp->tp_diffbuf[i] != ఖాళీ && i != idx)
 		{
-		    if (dprev == NULL)
+		    ఒకవేళ (dprev == ఖాళీ)
 			dnext->df_lnum[i] = line1;
-		    else
+		    లేకపోతే
 			dnext->df_lnum[i] = line1
-			    + (dprev->df_lnum[i] + dprev->df_count[i])
-			    - (dprev->df_lnum[idx] + dprev->df_count[idx]);
-		    dnext->df_count[i] = deleted;
+			    + (dprev->df_lnum[i] + dprev->df_లెక్క[i])
+			    - (dprev->df_lnum[idx] + dprev->df_లెక్క[idx]);
+		    dnext->df_లెక్క[i] = deleted;
 		}
 	}
 
 	// if at end of the list, quit
-	if (dp == NULL)
-	    break;
+	ఒకవేళ (dp == ఖాళీ)
+	    ఆపు;
 
 	/*
 	 * Check for these situations:
@@ -457,121 +457,121 @@ diff_mark_adjust_tp(
 	 *		3     5  6
 	 */
 	// compute last line of this change
-	last = dp->df_lnum[idx] + dp->df_count[idx] - 1;
+	చివరి = dp->df_lnum[idx] + dp->df_లెక్క[idx] - 1;
 
 	// 1. change completely above line1: nothing to do
-	if (last >= line1 - 1)
+	ఒకవేళ (చివరి >= line1 - 1)
 	{
-	    if (diff_busy)
+	    ఒకవేళ (diff_busy)
 	    {
 		// Currently in the middle of updating diff blocks. All we want
 		// is to adjust the line numbers and nothing else.
-		if (dp->df_lnum[idx] > line2)
+		ఒకవేళ (dp->df_lnum[idx] > line2)
 		    dp->df_lnum[idx] += amount_after;
 
 		// Advance to next entry.
 		dprev = dp;
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
 	    // 6. change below line2: only adjust for amount_after; also when
 	    // "deleted" became zero when deleted all lines between two diffs
-	    if (dp->df_lnum[idx] - (deleted + inserted != 0) > line2)
+	    ఒకవేళ (dp->df_lnum[idx] - (deleted + inserted != 0) > line2)
 	    {
-		if (amount_after == 0)
-		    break;	// nothing left to change
+		ఒకవేళ (amount_after == 0)
+		    ఆపు;	// nothing left to change
 		dp->df_lnum[idx] += amount_after;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		check_unchanged = FALSE;
 
 		// 2. 3. 4. 5.: inserted/deleted lines touching this diff.
-		if (deleted > 0)
+		ఒకవేళ (deleted > 0)
 		{
 		    off = 0;
-		    if (dp->df_lnum[idx] >= line1)
+		    ఒకవేళ (dp->df_lnum[idx] >= line1)
 		    {
-			if (last <= line2)
+			ఒకవేళ (చివరి <= line2)
 			{
 			    // 4. delete all lines of diff
-			    if (dp->df_next != NULL
-				    && dp->df_next->df_lnum[idx] - 1 <= line2)
+			    ఒకవేళ (dp->df_తదుపరి != ఖాళీ
+				    && dp->df_తదుపరి->df_lnum[idx] - 1 <= line2)
 			    {
 				// delete continues in next diff, only do
 				// lines until that one
-				n = dp->df_next->df_lnum[idx] - lnum_deleted;
+				n = dp->df_తదుపరి->df_lnum[idx] - lnum_deleted;
 				deleted -= n;
-				n -= dp->df_count[idx];
-				lnum_deleted = dp->df_next->df_lnum[idx];
+				n -= dp->df_లెక్క[idx];
+				lnum_deleted = dp->df_తదుపరి->df_lnum[idx];
 			    }
-			    else
-				n = deleted - dp->df_count[idx];
-			    dp->df_count[idx] = 0;
+			    లేకపోతే
+				n = deleted - dp->df_లెక్క[idx];
+			    dp->df_లెక్క[idx] = 0;
 			}
-			else
+			లేకపోతే
 			{
 			    // 5. delete lines at or just before top of diff
 			    off = dp->df_lnum[idx] - lnum_deleted;
 			    n = off;
-			    dp->df_count[idx] -= line2 - dp->df_lnum[idx] + 1;
+			    dp->df_లెక్క[idx] -= line2 - dp->df_lnum[idx] + 1;
 			    check_unchanged = TRUE;
 			}
 			dp->df_lnum[idx] = line1;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (last < line2)
+			ఒకవేళ (చివరి < line2)
 			{
 			    // 2. delete at end of diff
-			    dp->df_count[idx] -= last - lnum_deleted + 1;
-			    if (dp->df_next != NULL
-				    && dp->df_next->df_lnum[idx] - 1 <= line2)
+			    dp->df_లెక్క[idx] -= చివరి - lnum_deleted + 1;
+			    ఒకవేళ (dp->df_తదుపరి != ఖాళీ
+				    && dp->df_తదుపరి->df_lnum[idx] - 1 <= line2)
 			    {
 				// delete continues in next diff, only do
 				// lines until that one
-				n = dp->df_next->df_lnum[idx] - 1 - last;
-				deleted -= dp->df_next->df_lnum[idx]
+				n = dp->df_తదుపరి->df_lnum[idx] - 1 - చివరి;
+				deleted -= dp->df_తదుపరి->df_lnum[idx]
 							       - lnum_deleted;
-				lnum_deleted = dp->df_next->df_lnum[idx];
+				lnum_deleted = dp->df_తదుపరి->df_lnum[idx];
 			    }
-			    else
-				n = line2 - last;
+			    లేకపోతే
+				n = line2 - చివరి;
 			    check_unchanged = TRUE;
 			}
-			else
+			లేకపోతే
 			{
 			    // 3. delete lines inside the diff
 			    n = 0;
-			    dp->df_count[idx] -= deleted;
+			    dp->df_లెక్క[idx] -= deleted;
 			}
 		    }
 
-		    for (i = 0; i < DB_COUNT; ++i)
-			if (tp->tp_diffbuf[i] != NULL && i != idx)
+		    కొరకు (i = 0; i < DB_లెక్క; ++i)
+			ఒకవేళ (tp->tp_diffbuf[i] != ఖాళీ && i != idx)
 			{
-			    if (dp->df_lnum[i] > off)
+			    ఒకవేళ (dp->df_lnum[i] > off)
 				dp->df_lnum[i] -= off;
-			    else
+			    లేకపోతే
 				dp->df_lnum[i] = 1;
-			    dp->df_count[i] += n;
+			    dp->df_లెక్క[i] += n;
 			}
 		}
-		else
+		లేకపోతే
 		{
-		    if (dp->df_lnum[idx] <= line1)
+		    ఒకవేళ (dp->df_lnum[idx] <= line1)
 		    {
 			// inserted lines somewhere in this diff
-			dp->df_count[idx] += inserted;
+			dp->df_లెక్క[idx] += inserted;
 			check_unchanged = TRUE;
 		    }
-		    else
+		    లేకపోతే
 			// inserted lines somewhere above this diff
 			dp->df_lnum[idx] += inserted;
 		}
 
-		if (check_unchanged)
+		ఒకవేళ (check_unchanged)
 		    // Check if inserted lines are equal, may reduce the
 		    // size of the diff.  TODO: also check for equal lines
 		    // in the middle and perhaps split the block.
@@ -580,53 +580,53 @@ diff_mark_adjust_tp(
 	}
 
 	// check if this block touches the previous one, may merge them.
-	if (dprev != NULL && !dp->is_linematched && !diff_busy
-				&& dprev->df_lnum[idx] + dprev->df_count[idx]
+	ఒకవేళ (dprev != ఖాళీ && !dp->is_linematched && !diff_busy
+				&& dprev->df_lnum[idx] + dprev->df_లెక్క[idx]
 							== dp->df_lnum[idx])
 	{
-	    for (i = 0; i < DB_COUNT; ++i)
-		if (tp->tp_diffbuf[i] != NULL)
-		    dprev->df_count[i] += dp->df_count[i];
-	    dprev->df_next = dp->df_next;
+	    కొరకు (i = 0; i < DB_లెక్క; ++i)
+		ఒకవేళ (tp->tp_diffbuf[i] != ఖాళీ)
+		    dprev->df_లెక్క[i] += dp->df_లెక్క[i];
+	    dprev->df_తదుపరి = dp->df_తదుపరి;
 	    clear_diffblock(dp);
-	    dp = dprev->df_next;
+	    dp = dprev->df_తదుపరి;
 	}
-	else
+	లేకపోతే
 	{
 	    // Advance to next entry.
 	    dprev = dp;
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	}
     }
 
-    dprev = NULL;
-    dp = tp->tp_first_diff;
-    while (dp != NULL)
+    dprev = ఖాళీ;
+    dp = tp->tp_మొదటి_diff;
+    అయితే (dp != ఖాళీ)
     {
 	// All counts are zero, remove this entry.
-	for (i = 0; i < DB_COUNT; ++i)
-	    if (tp->tp_diffbuf[i] != NULL && dp->df_count[i] != 0)
-		break;
-	if (i == DB_COUNT)
+	కొరకు (i = 0; i < DB_లెక్క; ++i)
+	    ఒకవేళ (tp->tp_diffbuf[i] != ఖాళీ && dp->df_లెక్క[i] != 0)
+		ఆపు;
+	ఒకవేళ (i == DB_లెక్క)
 	{
-	    dnext = dp->df_next;
+	    dnext = dp->df_తదుపరి;
 	    clear_diffblock(dp);
 	    dp = dnext;
-	    if (dprev == NULL)
-		tp->tp_first_diff = dnext;
-	    else
-		dprev->df_next = dnext;
+	    ఒకవేళ (dprev == ఖాళీ)
+		tp->tp_మొదటి_diff = dnext;
+	    లేకపోతే
+		dprev->df_తదుపరి = dnext;
 	}
-	else
+	లేకపోతే
 	{
 	    // Advance to next entry.
 	    dprev = dp;
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	}
 
     }
 
-    if (tp == curtab)
+    ఒకవేళ (tp == curtab)
     {
 	// Don't redraw right away, this updates the diffs, which can be slow.
 	need_diff_redraw = TRUE;
@@ -641,26 +641,26 @@ diff_mark_adjust_tp(
 /*
  * Allocate a new diff block and link it between "dprev" and "dp".
  */
-    static diff_T *
+    స్థిర diff_T *
 diff_alloc_new(tabpage_T *tp, diff_T *dprev, diff_T *dp)
 {
     diff_T	*dnew;
 
     dnew = ALLOC_CLEAR_ONE(diff_T);
-    if (dnew == NULL)
-	return NULL;
-    diff_finger_dp = NULL;		// list changed, invalidate the finger
+    ఒకవేళ (dnew == ఖాళీ)
+	తిరిగి ఖాళీ;
+    diff_finger_dp = ఖాళీ;		// list changed, invalidate the finger
 
     dnew->is_linematched = FALSE;
-    dnew->df_next = dp;
-    if (dprev == NULL)
-	tp->tp_first_diff = dnew;
-    else
-	dprev->df_next = dnew;
+    dnew->df_తదుపరి = dp;
+    ఒకవేళ (dprev == ఖాళీ)
+	tp->tp_మొదటి_diff = dnew;
+    లేకపోతే
+	dprev->df_తదుపరి = dnew;
 
     dnew->has_changes = FALSE;
-    ga_init2(&dnew->df_changes, sizeof(diffline_change_T), 20);
-    return dnew;
+    ga_init2(&dnew->df_changes, పరిమాణం(diffline_change_T), 20);
+    తిరిగి dnew;
 }
 
 /*
@@ -669,72 +669,72 @@ diff_alloc_new(tabpage_T *tp, diff_T *dprev, diff_T *dp)
  * This may result in a change where all buffers have zero lines, the caller
  * must take care of removing it.
  */
-    static void
+    స్థిర శూన్య
 diff_check_unchanged(tabpage_T *tp, diff_T *dp)
 {
-    int		i_org;
-    int		i_new;
-    int		off_org, off_new;
-    char_u	*line_org;
-    int		dir = FORWARD;
+    పూర్ణాంకం		i_org;
+    పూర్ణాంకం		i_new;
+    పూర్ణాంకం		off_org, off_new;
+    char_u	*పంక్తి_org;
+    పూర్ణాంకం		dir = FORWARD;
 
     // Find the first buffers, use it as the original, compare the other
     // buffer lines against this one.
-    for (i_org = 0; i_org < DB_COUNT; ++i_org)
-	if (tp->tp_diffbuf[i_org] != NULL)
-	    break;
-    if (i_org == DB_COUNT)	// safety check
-	return;
+    కొరకు (i_org = 0; i_org < DB_లెక్క; ++i_org)
+	ఒకవేళ (tp->tp_diffbuf[i_org] != ఖాళీ)
+	    ఆపు;
+    ఒకవేళ (i_org == DB_లెక్క)	// safety check
+	తిరిగి;
 
-    if (diff_check_sanity(tp, dp) == FAIL)
-	return;
+    ఒకవేళ (diff_check_sanity(tp, dp) == FAIL)
+	తిరిగి;
 
     // First check lines at the top, then at the bottom.
     off_org = 0;
     off_new = 0;
-    for (;;)
+    కొరకు (;;)
     {
 	// Repeat until a line is found which is different or the number of
 	// lines has become zero.
-	while (dp->df_count[i_org] > 0)
+	అయితే (dp->df_లెక్క[i_org] > 0)
 	{
 	    // Copy the line, the next ml_get() will invalidate it.
-	    if (dir == BACKWARD)
-		off_org = dp->df_count[i_org] - 1;
-	    line_org = vim_strsave(ml_get_buf(tp->tp_diffbuf[i_org],
+	    ఒకవేళ (dir == BACKWARD)
+		off_org = dp->df_లెక్క[i_org] - 1;
+	    పంక్తి_org = vim_strsave(ml_get_buf(tp->tp_diffbuf[i_org],
 					dp->df_lnum[i_org] + off_org, FALSE));
-	    if (line_org == NULL)
-		return;
-	    for (i_new = i_org + 1; i_new < DB_COUNT; ++i_new)
+	    ఒకవేళ (పంక్తి_org == ఖాళీ)
+		తిరిగి;
+	    కొరకు (i_new = i_org + 1; i_new < DB_లెక్క; ++i_new)
 	    {
-		if (tp->tp_diffbuf[i_new] == NULL)
-		    continue;
-		if (dir == BACKWARD)
-		    off_new = dp->df_count[i_new] - 1;
+		ఒకవేళ (tp->tp_diffbuf[i_new] == ఖాళీ)
+		    కొనసాగు;
+		ఒకవేళ (dir == BACKWARD)
+		    off_new = dp->df_లెక్క[i_new] - 1;
 		// if other buffer doesn't have this line, it was inserted
-		if (off_new < 0 || off_new >= dp->df_count[i_new])
-		    break;
-		if (diff_cmp(line_org, ml_get_buf(tp->tp_diffbuf[i_new],
+		ఒకవేళ (off_new < 0 || off_new >= dp->df_లెక్క[i_new])
+		    ఆపు;
+		ఒకవేళ (diff_cmp(పంక్తి_org, ml_get_buf(tp->tp_diffbuf[i_new],
 				   dp->df_lnum[i_new] + off_new, FALSE)) != 0)
-		    break;
+		    ఆపు;
 	    }
-	    vim_free(line_org);
+	    vim_free(పంక్తి_org);
 
 	    // Stop when a line isn't equal in all diff buffers.
-	    if (i_new != DB_COUNT)
-		break;
+	    ఒకవేళ (i_new != DB_లెక్క)
+		ఆపు;
 
 	    // Line matched in all buffers, remove it from the diff.
-	    for (i_new = i_org; i_new < DB_COUNT; ++i_new)
-		if (tp->tp_diffbuf[i_new] != NULL)
+	    కొరకు (i_new = i_org; i_new < DB_లెక్క; ++i_new)
+		ఒకవేళ (tp->tp_diffbuf[i_new] != ఖాళీ)
 		{
-		    if (dir == FORWARD)
+		    ఒకవేళ (dir == FORWARD)
 			++dp->df_lnum[i_new];
-		    --dp->df_count[i_new];
+		    --dp->df_లెక్క[i_new];
 		}
 	}
-	if (dir == BACKWARD)
-	    break;
+	ఒకవేళ (dir == BACKWARD)
+	    ఆపు;
 	dir = BACKWARD;
     }
 }
@@ -743,93 +743,93 @@ diff_check_unchanged(tabpage_T *tp, diff_T *dp)
  * Check if a diff block doesn't contain invalid line numbers.
  * This can happen when the diff program returns invalid results.
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_check_sanity(tabpage_T *tp, diff_T *dp)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < DB_COUNT; ++i)
-	if (tp->tp_diffbuf[i] != NULL)
-	    if (dp->df_lnum[i] + dp->df_count[i] - 1
-				      > tp->tp_diffbuf[i]->b_ml.ml_line_count)
-		return FAIL;
-    return OK;
+    కొరకు (i = 0; i < DB_లెక్క; ++i)
+	ఒకవేళ (tp->tp_diffbuf[i] != ఖాళీ)
+	    ఒకవేళ (dp->df_lnum[i] + dp->df_లెక్క[i] - 1
+				      > tp->tp_diffbuf[i]->b_ml.ml_పంక్తి_లెక్క)
+		తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Mark all diff buffers in the current tab page for redraw.
  */
-    void
+    శూన్య
 diff_redraw(
-    int		dofold)	    // also recompute the folds
+    పూర్ణాంకం		dofold)	    // also recompute the folds
 {
     win_T	*wp;
-    win_T	*wp_other = NULL;
-    int		used_max_fill_other = FALSE;
-    int		used_max_fill_curwin = FALSE;
-    int		n;
+    win_T	*wp_other = ఖాళీ;
+    పూర్ణాంకం		వాడిన_max_fill_other = FALSE;
+    పూర్ణాంకం		వాడిన_max_fill_curwin = FALSE;
+    పూర్ణాంకం		n;
 
     need_diff_redraw = FALSE;
     FOR_ALL_WINDOWS(wp)
     {
 	// when closing windows or wiping buffers skip invalid window
-	if (!wp->w_p_diff || !buf_valid(wp->w_buffer))
-	    continue;
+	ఒకవేళ (!wp->w_p_diff || !buf_valid(wp->w_బఫరు))
+	    కొనసాగు;
 
 	redraw_win_later(wp, UPD_SOME_VALID);
-	if (wp != curwin)
+	ఒకవేళ (wp != curwin)
 	    wp_other = wp;
 # ifdef FEAT_FOLDING
-	if (dofold && foldmethodIsDiff(wp))
+	ఒకవేళ (dofold && foldmethodIsDiff(wp))
 	    foldUpdateAll(wp);
 # endif
 	// A change may have made filler lines invalid, need to take care of
 	// that for other windows.
 	n = diff_check_fill(wp, wp->w_topline);
-	if ((wp != curwin && wp->w_topfill > 0) || n > 0)
+	ఒకవేళ ((wp != curwin && wp->w_topfill > 0) || n > 0)
 	{
-	    if (wp->w_topfill > n)
+	    ఒకవేళ (wp->w_topfill > n)
 		wp->w_topfill = (n < 0 ? 0 : n);
-	    else if (n > 0 && n > wp->w_topfill)
+	    లేకపోతే ఒకవేళ (n > 0 && n > wp->w_topfill)
 	    {
 		wp->w_topfill = n;
-		if (wp == curwin)
-		    used_max_fill_curwin = TRUE;
-		else if (wp_other != NULL)
-		    used_max_fill_other = TRUE;
+		ఒకవేళ (wp == curwin)
+		    వాడిన_max_fill_curwin = TRUE;
+		లేకపోతే ఒకవేళ (wp_other != ఖాళీ)
+		    వాడిన_max_fill_other = TRUE;
 	    }
 	    check_topfill(wp, FALSE);
 	}
     }
 
-    if (wp_other != NULL && curwin->w_p_scb)
+    ఒకవేళ (wp_other != ఖాళీ && curwin->w_p_scb)
     {
-	if (used_max_fill_curwin)
+	ఒకవేళ (వాడిన_max_fill_curwin)
 	    // The current window was set to use the maximum number of filler
 	    // lines, may need to reduce them.
-	    diff_set_topline(wp_other, curwin);
-	else if (used_max_fill_other)
+	    diff_సమితి_topline(wp_other, curwin);
+	లేకపోతే ఒకవేళ (వాడిన_max_fill_other)
 	    // The other window was set to use the maximum number of filler
 	    // lines, may need to reduce them.
-	    diff_set_topline(curwin, wp_other);
+	    diff_సమితి_topline(curwin, wp_other);
     }
 }
 
-    static void
+    స్థిర శూన్య
 clear_diffin(diffin_T *din)
 {
-    if (din->din_fname == NULL)
+    ఒకవేళ (din->din_fname == ఖాళీ)
 	VIM_CLEAR(din->din_mmfile.ptr);
-    else
+    లేకపోతే
 	mch_remove(din->din_fname);
 }
 
-    static void
+    స్థిర శూన్య
 clear_diffout(diffout_T *dout)
 {
-    if (dout->dout_fname == NULL)
-	ga_clear_strings(&dout->dout_ga);
-    else
+    ఒకవేళ (dout->dout_fname == ఖాళీ)
+	ga_clear_అక్షరశ్రేణులు(&dout->dout_ga);
+    లేకపోతే
 	mch_remove(dout->dout_fname);
 }
 
@@ -837,61 +837,61 @@ clear_diffout(diffout_T *dout)
  * Write buffer "buf" to a memory buffer.
  * Return FAIL for failure.
  */
-    static int
-diff_write_buffer(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
+    స్థిర పూర్ణాంకం
+diff_write_బఫరు(buf_T *buf, diffin_T *din, linenr_T ప్రారంభం, linenr_T చివర)
 {
     linenr_T	lnum;
     char_u	*s;
-    long	len = 0;
+    దీర్ఘ	len = 0;
     char_u	*ptr;
 
-    if (end < 0)
-	end = buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర < 0)
+	చివర = buf->b_ml.ml_పంక్తి_లెక్క;
 
-    if (buf->b_ml.ml_flags & ML_EMPTY || end < start)
+    ఒకవేళ (buf->b_ml.ml_flags & ML_ఖాళీలు || చివర < ప్రారంభం)
     {
-	din->din_mmfile.ptr = NULL;
-	din->din_mmfile.size = 0;
-	return OK;
+	din->din_mmfile.ptr = ఖాళీ;
+	din->din_mmfile.కొలత = 0;
+	తిరిగి OK;
     }
 
     // xdiff requires one big block of memory with all the text.
-    for (lnum = start; lnum <= end; ++lnum)
+    కొరకు (lnum = ప్రారంభం; lnum <= చివర; ++lnum)
 	len += ml_get_buf_len(buf, lnum) + 1;
     ptr = alloc(len);
-    if (ptr == NULL)
+    ఒకవేళ (ptr == ఖాళీ)
     {
 	// Allocating memory failed.  This can happen, because we try to read
 	// the whole buffer text into memory.  Set the failed flag, the diff
 	// will be retried with external diff.  The flag is never reset.
 	buf->b_diff_failed = true;
-	if (p_verbose > 0)
+	ఒకవేళ (p_verbose > 0)
 	{
 	    verbose_enter();
 	    smsg(_("Not enough memory to use internal diff for buffer \"%s\""),
 								 buf->b_fname);
 	    verbose_leave();
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
-    din->din_mmfile.ptr = (char *)ptr;
-    din->din_mmfile.size = len;
+    din->din_mmfile.ptr = (అక్షరం *)ptr;
+    din->din_mmfile.కొలత = len;
 
     len = 0;
-    for (lnum = start; lnum <= end; ++lnum)
+    కొరకు (lnum = ప్రారంభం; lnum <= చివర; ++lnum)
     {
-	for (s = ml_get_buf(buf, lnum, FALSE); *s != NUL; )
+	కొరకు (s = ml_get_buf(buf, lnum, FALSE); *s != NUL; )
 	{
-	    if (diff_flags & DIFF_ICASE)
+	    ఒకవేళ (diff_flags & DIFF_ICASE)
 	    {
-		int c;
-		int	orig_len;
-		int	c_len = 1;
+		పూర్ణాంకం c;
+		పూర్ణాంకం	orig_len;
+		పూర్ణాంకం	c_len = 1;
 		char_u	cbuf[MB_MAXBYTES + 1];
 
-		if (*s == NL)
+		ఒకవేళ (*s == NL)
 		    c = NUL;
-		else
+		లేకపోతే
 		{
 		    // xdiff doesn't support ignoring case, fold-case the text.
 		    c = PTR2CHAR(s);
@@ -899,14 +899,14 @@ diff_write_buffer(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
 		    c = MB_CASEFOLD(c);
 		}
 		orig_len = mb_ptr2len(s);
-		if (mb_char2bytes(c, cbuf) != c_len)
+		ఒకవేళ (mb_char2bytes(c, cbuf) != c_len)
 		    // TODO: handle byte length difference.
 		    // One example is Å (3 bytes) and å (2 bytes).
 		    mch_memmove(ptr + len, s, orig_len);
-		else
+		లేకపోతే
 		{
 		    mch_memmove(ptr + len, cbuf, c_len);
-		    if (orig_len > c_len)
+		    ఒకవేళ (orig_len > c_len)
 		    {
 			// Copy remaining composing characters
 			mch_memmove(ptr + len + c_len, s + c_len,
@@ -917,7 +917,7 @@ diff_write_buffer(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
 		s += orig_len;
 		len += orig_len;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		ptr[len++] = *s == NL ? NUL : *s;
 		s++;
@@ -925,33 +925,33 @@ diff_write_buffer(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
 	}
 	ptr[len++] = NL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Write buffer "buf" to file or memory buffer.
  * Return FAIL for failure.
  */
-    static int
-diff_write(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
+    స్థిర పూర్ణాంకం
+diff_write(buf_T *buf, diffin_T *din, linenr_T ప్రారంభం, linenr_T చివర)
 {
-    int		r;
-    int		save_ml_flags;
+    పూర్ణాంకం		r;
+    పూర్ణాంకం		save_ml_flags;
     char_u	*save_ff;
-    int		save_cmod_flags;
+    పూర్ణాంకం		save_cmod_flags;
 
-    if (din->din_fname == NULL)
-	return diff_write_buffer(buf, din, start, end);
+    ఒకవేళ (din->din_fname == ఖాళీ)
+	తిరిగి diff_write_బఫరు(buf, din, ప్రారంభం, చివర);
 
     // Writing the diff buffers may trigger changes in the window structure
     // via aucmd_prepbuf()/aucmd_restbuf() commands.
     // This may cause recursively calling winframe_remove() which is not safe and causes
     // use after free, so let's stop it here.
-    if (frames_locked())
-	return FAIL;
+    ఒకవేళ (చట్రాలు_locked())
+	తిరిగి FAIL;
 
-    if (end < 0)
-	end = buf->b_ml.ml_line_count;
+    ఒకవేళ (చివర < 0)
+	చివర = buf->b_ml.ml_పంక్తి_లెక్క;
 
     // Always use 'fileformat' set to "unix".
     save_ml_flags = buf->b_ml.ml_flags;
@@ -961,153 +961,153 @@ diff_write(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
     // Writing the buffer is an implementation detail of performing the diff,
     // so it shouldn't update the '[ and '] marks.
     cmdmod.cmod_flags |= CMOD_LOCKMARKS;
-    if (end < start)
+    ఒకవేళ (చివర < ప్రారంభం)
     {
 	// The line range specifies a completely empty file.
-	end = start;
-	buf->b_ml.ml_flags |= ML_EMPTY;
+	చివర = ప్రారంభం;
+	buf->b_ml.ml_flags |= ML_ఖాళీలు;
     }
-    r = buf_write(buf, din->din_fname, NULL,
-			start, end,
-			NULL, FALSE, FALSE, FALSE, TRUE);
+    r = buf_write(buf, din->din_fname, ఖాళీ,
+			ప్రారంభం, చివర,
+			ఖాళీ, FALSE, FALSE, FALSE, TRUE);
     cmdmod.cmod_flags = save_cmod_flags;
     free_string_option(buf->b_p_ff);
     buf->b_p_ff = save_ff;
     buf->b_ml.ml_flags =
-		(buf->b_ml.ml_flags & ~ML_EMPTY) | (save_ml_flags & ML_EMPTY);
-    return r;
+		(buf->b_ml.ml_flags & ~ML_ఖాళీలు) | (save_ml_flags & ML_ఖాళీలు);
+    తిరిగి r;
 }
 
-    static int
-lnum_compare(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+lnum_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
     linenr_T	lnum1 = *(linenr_T*)s1;
     linenr_T	lnum2 = *(linenr_T*)s2;
-    if (lnum1 < lnum2)
-	return -1;
-    if (lnum1 > lnum2)
-	return 1;
-    return 0;
+    ఒకవేళ (lnum1 < lnum2)
+	తిరిగి -1;
+    ఒకవేళ (lnum1 > lnum2)
+	తిరిగి 1;
+    తిరిగి 0;
 }
 
 /*
  * Update the diffs for all buffers involved.
  */
-    static void
+    స్థిర శూన్య
 diff_try_update(
 	diffio_T    *dio,
-	int	    idx_orig,
+	పూర్ణాంకం	    idx_orig,
 	exarg_T	    *eap)	// "eap" can be NULL
 {
     buf_T	*buf;
-    int		idx_new;
+    పూర్ణాంకం		idx_new;
 
-    if (dio->dio_internal)
+    ఒకవేళ (dio->dio_అంతర్గత)
     {
-	ga_init2(&dio->dio_diff.dout_ga, sizeof(char *), 1000);
+	ga_init2(&dio->dio_diff.dout_ga, పరిమాణం(అక్షరం *), 1000);
     }
-    else
+    లేకపోతే
     {
 	// We need three temp file names.
 	dio->dio_orig.din_fname = vim_tempname('o', TRUE);
 	dio->dio_new.din_fname = vim_tempname('n', TRUE);
 	dio->dio_diff.dout_fname = vim_tempname('d', TRUE);
-	if (dio->dio_orig.din_fname == NULL
-		|| dio->dio_new.din_fname == NULL
-		|| dio->dio_diff.dout_fname == NULL)
-	    goto theend;
+	ఒకవేళ (dio->dio_orig.din_fname == ఖాళీ
+		|| dio->dio_new.din_fname == ఖాళీ
+		|| dio->dio_diff.dout_fname == ఖాళీ)
+	    వెళ్ళు theend;
     }
 
     // Check external diff is actually working.
-    if (!dio->dio_internal && check_external_diff(dio) == FAIL)
-	goto theend;
+    ఒకవేళ (!dio->dio_అంతర్గత && check_external_diff(dio) == FAIL)
+	వెళ్ళు theend;
 
     // :diffupdate!
-    if (eap != NULL && eap->forceit)
-	for (idx_new = idx_orig; idx_new < DB_COUNT; ++idx_new)
+    ఒకవేళ (eap != ఖాళీ && eap->forceit)
+	కొరకు (idx_new = idx_orig; idx_new < DB_లెక్క; ++idx_new)
 	{
 	    buf = curtab->tp_diffbuf[idx_new];
-	    if (buf_valid(buf))
+	    ఒకవేళ (buf_valid(buf))
 		buf_check_timestamp(buf, FALSE);
 	}
 
     // Parse and sort diff anchors if enabled
-    int num_anchors = INT_MAX;
-    linenr_T anchors[DB_COUNT][MAX_DIFF_ANCHORS];
-    CLEAR_FIELD(anchors);
-    if (diff_flags & DIFF_ANCHOR)
+    పూర్ణాంకం అంకె_anchors = గరిష్ఠ_పూర్ణాంకం;
+    linenr_T anchors[DB_లెక్క][MAX_DIFF_ANCHORS];
+    CLEAR_క్షేత్రం(anchors);
+    ఒకవేళ (diff_flags & DIFF_ANCHOR)
     {
-	for (int idx = 0; idx < DB_COUNT; idx++)
+	కొరకు (పూర్ణాంకం idx = 0; idx < DB_లెక్క; idx++)
 	{
-	    if (curtab->tp_diffbuf[idx] == NULL)
-		continue;
-	    int buf_num_anchors = 0;
-	    if (parse_diffanchors(FALSE,
+	    ఒకవేళ (curtab->tp_diffbuf[idx] == ఖాళీ)
+		కొనసాగు;
+	    పూర్ణాంకం buf_అంకె_anchors = 0;
+	    ఒకవేళ (parse_diffanchors(FALSE,
 			curtab->tp_diffbuf[idx],
 			anchors[idx],
-			&buf_num_anchors) != OK)
+			&buf_అంకె_anchors) != OK)
 	    {
-		emsg(_(e_failed_to_find_all_diff_anchors));
-		num_anchors = 0;
-		CLEAR_FIELD(anchors);
-		break;
+		emsg(_(e_failed_గమ్యం_కనుగొను_all_diff_anchors));
+		అంకె_anchors = 0;
+		CLEAR_క్షేత్రం(anchors);
+		ఆపు;
 	    }
-	    if (buf_num_anchors < num_anchors)
-		num_anchors = buf_num_anchors;
+	    ఒకవేళ (buf_అంకె_anchors < అంకె_anchors)
+		అంకె_anchors = buf_అంకె_anchors;
 
-	    if (buf_num_anchors > 0)
-		qsort((void *)anchors[idx],
-			(size_t)buf_num_anchors,
-			sizeof(linenr_T),
+	    ఒకవేళ (buf_అంకె_anchors > 0)
+		qsort((శూన్య *)anchors[idx],
+			(size_t)buf_అంకె_anchors,
+			పరిమాణం(linenr_T),
 			lnum_compare);
 	}
     }
-    if (num_anchors == INT_MAX)
-	num_anchors = 0;
+    ఒకవేళ (అంకె_anchors == గరిష్ఠ_పూర్ణాంకం)
+	అంకె_anchors = 0;
 
     // Split the files into multiple sections by anchors. Each section starts
     // from one anchor (inclusive) and ends at the next anchor (exclusive).
     // Diff each section separately before combining the results. If we don't
     // have any anchors, we will have one big section of the entire file.
-    for (int anchor_i = 0; anchor_i <= num_anchors; anchor_i++)
+    కొరకు (పూర్ణాంకం anchor_i = 0; anchor_i <= అంకె_anchors; anchor_i++)
     {
-	diff_T	*orig_diff = NULL;
-	if (anchor_i != 0)
+	diff_T	*orig_diff = ఖాళీ;
+	ఒకవేళ (anchor_i != 0)
 	{
-	    orig_diff = curtab->tp_first_diff;
-	    curtab->tp_first_diff = NULL;
+	    orig_diff = curtab->tp_మొదటి_diff;
+	    curtab->tp_మొదటి_diff = ఖాళీ;
 	}
-	linenr_T lnum_start = (anchor_i == 0) ? 1 : anchors[idx_orig][anchor_i - 1];
-	linenr_T lnum_end = (anchor_i == num_anchors) ? -1 : anchors[idx_orig][anchor_i] - 1;
+	linenr_T lnum_ప్రారంభం = (anchor_i == 0) ? 1 : anchors[idx_orig][anchor_i - 1];
+	linenr_T lnum_చివర = (anchor_i == అంకె_anchors) ? -1 : anchors[idx_orig][anchor_i] - 1;
 
 	// Write the first buffer to a tempfile or mmfile_t.
 	buf = curtab->tp_diffbuf[idx_orig];
-	if (diff_write(buf, &dio->dio_orig, lnum_start, lnum_end) == FAIL)
+	ఒకవేళ (diff_write(buf, &dio->dio_orig, lnum_ప్రారంభం, lnum_చివర) == FAIL)
 	{
-	    if (orig_diff != NULL)
+	    ఒకవేళ (orig_diff != ఖాళీ)
 	    {
 		// Clean up in-progress diff blocks
-		curtab->tp_first_diff = orig_diff;
+		curtab->tp_మొదటి_diff = orig_diff;
 		diff_clear(curtab);
 	    }
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 
 	// Make a difference between the first buffer and every other.
-	for (idx_new = idx_orig + 1; idx_new < DB_COUNT; ++idx_new)
+	కొరకు (idx_new = idx_orig + 1; idx_new < DB_లెక్క; ++idx_new)
 	{
 	    buf = curtab->tp_diffbuf[idx_new];
-	    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-		continue; // skip buffer that isn't loaded
+	    ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
+		కొనసాగు; // skip buffer that isn't loaded
 
-	    lnum_start = anchor_i == 0 ? 1 : anchors[idx_new][anchor_i - 1];
-	    lnum_end = anchor_i == num_anchors ? -1 : anchors[idx_new][anchor_i] - 1;
+	    lnum_ప్రారంభం = anchor_i == 0 ? 1 : anchors[idx_new][anchor_i - 1];
+	    lnum_చివర = anchor_i == అంకె_anchors ? -1 : anchors[idx_new][anchor_i] - 1;
 
 	    // Write the other buffer and diff with the first one.
-	    if (diff_write(buf, &dio->dio_new, lnum_start, lnum_end) == FAIL)
-		continue;
-	    if (diff_file(dio) == FAIL)
-		continue;
+	    ఒకవేళ (diff_write(buf, &dio->dio_new, lnum_ప్రారంభం, lnum_చివర) == FAIL)
+		కొనసాగు;
+	    ఒకవేళ (diff_file(dio) == FAIL)
+		కొనసాగు;
 
 	    // Read the diff output and add each entry to the diff list.
 	    diff_read(idx_orig, idx_new, dio);
@@ -1117,26 +1117,26 @@ diff_try_update(
 	}
 	clear_diffin(&dio->dio_orig);
 
-	if (anchor_i != 0)
+	ఒకవేళ (anchor_i != 0)
 	{
-	    diff_finger_dp = NULL;	// df_lnum shifted, invalidate the finger
+	    diff_finger_dp = ఖాళీ;	// df_lnum shifted, invalidate the finger
 
 	    // Combine the new diff blocks with the existing ones
-	    for (diff_T *dp = curtab->tp_first_diff; dp != NULL; dp = dp->df_next)
+	    కొరకు (diff_T *dp = curtab->tp_మొదటి_diff; dp != ఖాళీ; dp = dp->df_తదుపరి)
 	    {
-		for (int idx = 0; idx < DB_COUNT; idx++)
+		కొరకు (పూర్ణాంకం idx = 0; idx < DB_లెక్క; idx++)
 		{
-		    if (anchors[idx][anchor_i - 1] > 0)
+		    ఒకవేళ (anchors[idx][anchor_i - 1] > 0)
 			dp->df_lnum[idx] += anchors[idx][anchor_i - 1] - 1;
 		}
 	    }
-	    if (orig_diff != NULL)
+	    ఒకవేళ (orig_diff != ఖాళీ)
 	    {
-		diff_T *last_diff = orig_diff;
-		while (last_diff->df_next != NULL)
-		    last_diff = last_diff->df_next;
-		last_diff->df_next = curtab->tp_first_diff;
-		curtab->tp_first_diff = orig_diff;
+		diff_T *చివరి_diff = orig_diff;
+		అయితే (చివరి_diff->df_తదుపరి != ఖాళీ)
+		    చివరి_diff = చివరి_diff->df_తదుపరి;
+		చివరి_diff->df_తదుపరి = curtab->tp_మొదటి_diff;
+		curtab->tp_మొదటి_diff = orig_diff;
 	    }
 	}
     }
@@ -1152,10 +1152,10 @@ theend:
  * Note that if the internal diff failed for one of the buffers, the external
  * diff will be used anyway.
  */
-    int
-diff_internal(void)
+    పూర్ణాంకం
+diff_అంతర్గత(శూన్య)
 {
-    return (diff_flags & DIFF_INTERNAL) != 0
+    తిరిగి (diff_flags & DIFF_అంతర్గత) != 0
 # ifdef FEAT_EVAL
 	&& *p_dex == NUL
 # endif
@@ -1165,17 +1165,17 @@ diff_internal(void)
 /*
  * Return TRUE if the internal diff failed for one of the diff buffers.
  */
-    static int
-diff_internal_failed(void)
+    స్థిర పూర్ణాంకం
+diff_అంతర్గత_failed(శూన్య)
 {
-    int idx;
+    పూర్ణాంకం idx;
 
     // Only need to do something when there is another buffer.
-    for (idx = 0; idx < DB_COUNT; ++idx)
-	if (curtab->tp_diffbuf[idx] != NULL
+    కొరకు (idx = 0; idx < DB_లెక్క; ++idx)
+	ఒకవేళ (curtab->tp_diffbuf[idx] != ఖాళీ
 		&& curtab->tp_diffbuf[idx]->b_diff_failed)
-	    return TRUE;
-    return FALSE;
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -1184,18 +1184,18 @@ diff_internal_failed(void)
  * also for unmodified buffers (the file could have been produced by
  * autocommands, e.g. the netrw plugin).
  */
-    void
+    శూన్య
 ex_diffupdate(exarg_T *eap)	// "eap" can be NULL
 {
-    int		idx_orig;
-    int		idx_new;
+    పూర్ణాంకం		idx_orig;
+    పూర్ణాంకం		idx_new;
     diffio_T	diffio;
-    int		had_diffs = curtab->tp_first_diff != NULL;
+    పూర్ణాంకం		had_diffs = curtab->tp_మొదటి_diff != ఖాళీ;
 
-    if (diff_busy)
+    ఒకవేళ (diff_busy)
     {
 	diff_need_update = TRUE;
-	return;
+	తిరిగి;
     }
 
     // Delete all diffblocks.
@@ -1203,28 +1203,28 @@ ex_diffupdate(exarg_T *eap)	// "eap" can be NULL
     curtab->tp_diff_invalid = FALSE;
 
     // Use the first buffer as the original text.
-    for (idx_orig = 0; idx_orig < DB_COUNT; ++idx_orig)
-	if (curtab->tp_diffbuf[idx_orig] != NULL)
-	    break;
-    if (idx_orig == DB_COUNT)
-	goto theend;
+    కొరకు (idx_orig = 0; idx_orig < DB_లెక్క; ++idx_orig)
+	ఒకవేళ (curtab->tp_diffbuf[idx_orig] != ఖాళీ)
+	    ఆపు;
+    ఒకవేళ (idx_orig == DB_లెక్క)
+	వెళ్ళు theend;
 
     // Only need to do something when there is another buffer.
-    for (idx_new = idx_orig + 1; idx_new < DB_COUNT; ++idx_new)
-	if (curtab->tp_diffbuf[idx_new] != NULL)
-	    break;
-    if (idx_new == DB_COUNT)
-	goto theend;
+    కొరకు (idx_new = idx_orig + 1; idx_new < DB_లెక్క; ++idx_new)
+	ఒకవేళ (curtab->tp_diffbuf[idx_new] != ఖాళీ)
+	    ఆపు;
+    ఒకవేళ (idx_new == DB_లెక్క)
+	వెళ్ళు theend;
 
     // Only use the internal method if it did not fail for one of the buffers.
-    CLEAR_FIELD(diffio);
-    diffio.dio_internal = diff_internal() && !diff_internal_failed();
+    CLEAR_క్షేత్రం(diffio);
+    diffio.dio_అంతర్గత = diff_అంతర్గత() && !diff_అంతర్గత_failed();
 
     diff_try_update(&diffio, idx_orig, eap);
-    if (diffio.dio_internal && diff_internal_failed())
+    ఒకవేళ (diffio.dio_అంతర్గత && diff_అంతర్గత_failed())
     {
 	// Internal diff failed, use external diff instead.
-	CLEAR_FIELD(diffio);
+	CLEAR_క్షేత్రం(diffio);
 	diff_try_update(&diffio, idx_orig, eap);
     }
 
@@ -1234,12 +1234,12 @@ ex_diffupdate(exarg_T *eap)	// "eap" can be NULL
 theend:
     // A redraw is needed if there were diffs and they were cleared, or there
     // are diffs now, which means they got updated.
-    if (had_diffs || curtab->tp_first_diff != NULL)
+    ఒకవేళ (had_diffs || curtab->tp_మొదటి_diff != ఖాళీ)
     {
 	diff_redraw(TRUE);
-	window_layout_lock();
-	apply_autocmds(EVENT_DIFFUPDATED, NULL, NULL, FALSE, curbuf);
-	window_layout_unlock();
+	కిటికీ_layout_తాళం();
+	apply_autocmds(EVENT_DIFFUPDATED, ఖాళీ, ఖాళీ, FALSE, curbuf);
+	కిటికీ_layout_unlock();
     }
 }
 
@@ -1248,49 +1248,49 @@ theend:
  * are no differences.  Can't use the return value, it's non-zero when
  * there are differences.
  */
-    static int
+    స్థిర పూర్ణాంకం
 check_external_diff(diffio_T *diffio)
 {
     FILE	*fd;
-    int		ok;
-    int		io_error = FALSE;
+    పూర్ణాంకం		ok;
+    పూర్ణాంకం		io_error = FALSE;
 
     // May try twice, first with "-a" and then without.
-    for (;;)
+    కొరకు (;;)
     {
 	ok = FALSE;
-	fd = mch_fopen((char *)diffio->dio_orig.din_fname, "w");
-	if (fd == NULL)
+	fd = mch_fopen((అక్షరం *)diffio->dio_orig.din_fname, "w");
+	ఒకవేళ (fd == ఖాళీ)
 	    io_error = TRUE;
-	else
+	లేకపోతే
 	{
-	    if (fwrite("line1\n", (size_t)6, (size_t)1, fd) != 1)
+	    ఒకవేళ (fwrite("line1\n", (size_t)6, (size_t)1, fd) != 1)
 		io_error = TRUE;
 	    fclose(fd);
-	    fd = mch_fopen((char *)diffio->dio_new.din_fname, "w");
-	    if (fd == NULL)
+	    fd = mch_fopen((అక్షరం *)diffio->dio_new.din_fname, "w");
+	    ఒకవేళ (fd == ఖాళీ)
 		io_error = TRUE;
-	    else
+	    లేకపోతే
 	    {
-		if (fwrite("line2\n", (size_t)6, (size_t)1, fd) != 1)
+		ఒకవేళ (fwrite("line2\n", (size_t)6, (size_t)1, fd) != 1)
 		    io_error = TRUE;
 		fclose(fd);
-		fd = NULL;
-		if (diff_file(diffio) == OK)
-		    fd = mch_fopen((char *)diffio->dio_diff.dout_fname, "r");
-		if (fd == NULL)
+		fd = ఖాళీ;
+		ఒకవేళ (diff_file(diffio) == OK)
+		    fd = mch_fopen((అక్షరం *)diffio->dio_diff.dout_fname, "r");
+		ఒకవేళ (fd == ఖాళీ)
 		    io_error = TRUE;
-		else
+		లేకపోతే
 		{
 		    char_u	linebuf[LBUFLEN];
 
-		    for (;;)
+		    కొరకు (;;)
 		    {
 			// For normal diff there must be a line that contains
 			// "1c1".  For unified diff "@@ -1 +1 @@".
-			if (vim_fgets(linebuf, LBUFLEN, fd))
-			    break;
-			if (STRNCMP(linebuf, "1c1", 3) == 0
+			ఒకవేళ (vim_fgets(linebuf, LBUFLEN, fd))
+			    ఆపు;
+			ఒకవేళ (STRNCMP(linebuf, "1c1", 3) == 0
 				|| STRNCMP(linebuf, "@@ -1 +1 @@", 11) == 0)
 			    ok = TRUE;
 		    }
@@ -1304,101 +1304,101 @@ check_external_diff(diffio_T *diffio)
 
 # ifdef FEAT_EVAL
 	// When using 'diffexpr' break here.
-	if (*p_dex != NUL)
-	    break;
+	ఒకవేళ (*p_dex != NUL)
+	    ఆపు;
 # endif
 
-# if defined(MSWIN)
+# ఒకవేళ defined(MSWIN)
 	// If the "-a" argument works, also check if "--binary" works.
-	if (ok && diff_a_works == MAYBE && diff_bin_works == MAYBE)
+	ఒకవేళ (ok && diff_a_పనిచేస్తుంది == MAYBE && diff_bin_పనిచేస్తుంది == MAYBE)
 	{
-	    diff_a_works = TRUE;
-	    diff_bin_works = TRUE;
-	    continue;
+	    diff_a_పనిచేస్తుంది = TRUE;
+	    diff_bin_పనిచేస్తుంది = TRUE;
+	    కొనసాగు;
 	}
-	if (!ok && diff_a_works == TRUE && diff_bin_works == TRUE)
+	ఒకవేళ (!ok && diff_a_పనిచేస్తుంది == TRUE && diff_bin_పనిచేస్తుంది == TRUE)
 	{
 	    // Tried --binary, but it failed. "-a" works though.
-	    diff_bin_works = FALSE;
+	    diff_bin_పనిచేస్తుంది = FALSE;
 	    ok = TRUE;
 	}
 # endif
 
 	// If we checked if "-a" works already, break here.
-	if (diff_a_works != MAYBE)
-	    break;
-	diff_a_works = ok;
+	ఒకవేళ (diff_a_పనిచేస్తుంది != MAYBE)
+	    ఆపు;
+	diff_a_పనిచేస్తుంది = ok;
 
 	// If "-a" works break here, otherwise retry without "-a".
-	if (ok)
-	    break;
+	ఒకవేళ (ok)
+	    ఆపు;
     }
-    if (!ok)
+    ఒకవేళ (!ok)
     {
-	if (io_error)
-	    emsg(_(e_cannot_read_or_write_temp_files));
+	ఒకవేళ (io_error)
+	    emsg(_(e_cannot_read_or_write_తాత్కాలిక_files));
 	emsg(_(e_cannot_create_diffs));
-	diff_a_works = MAYBE;
-# if defined(MSWIN)
-	diff_bin_works = MAYBE;
+	diff_a_పనిచేస్తుంది = MAYBE;
+# ఒకవేళ defined(MSWIN)
+	diff_bin_పనిచేస్తుంది = MAYBE;
 # endif
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Invoke the xdiff function.
  */
-    static int
-diff_file_internal(diffio_T *diffio)
+    స్థిర పూర్ణాంకం
+diff_file_అంతర్గత(diffio_T *diffio)
 {
     xpparam_t	    param;
     xdemitconf_t    emit_cfg;
     xdemitcb_t	    emit_cb;
 
-    CLEAR_FIELD(param);
-    CLEAR_FIELD(emit_cfg);
-    CLEAR_FIELD(emit_cb);
+    CLEAR_క్షేత్రం(param);
+    CLEAR_క్షేత్రం(emit_cfg);
+    CLEAR_క్షేత్రం(emit_cb);
 
     param.flags = diff_algorithm;
 
-    if (diff_flags & DIFF_IWHITE)
+    ఒకవేళ (diff_flags & DIFF_IWHITE)
 	param.flags |= XDF_IGNORE_WHITESPACE_CHANGE;
-    if (diff_flags & DIFF_IWHITEALL)
+    ఒకవేళ (diff_flags & DIFF_IWHITEALL)
 	param.flags |= XDF_IGNORE_WHITESPACE;
-    if (diff_flags & DIFF_IWHITEEOL)
+    ఒకవేళ (diff_flags & DIFF_IWHITEEOL)
 	param.flags |= XDF_IGNORE_WHITESPACE_AT_EOL;
-    if (diff_flags & DIFF_IBLANK)
-	param.flags |= XDF_IGNORE_BLANK_LINES;
+    ఒకవేళ (diff_flags & DIFF_IBLANK)
+	param.flags |= XDF_IGNORE_BLANK_పంక్తులు;
 
     emit_cfg.ctxlen = diffio->dio_ctxlen;
     emit_cb.priv = &diffio->dio_diff;
-    if (diffio->dio_outfmt == DIO_OUTPUT_INDICES)
-	emit_cfg.hunk_func = xdiff_out_indices;
-    else
-	emit_cb.out_line = xdiff_out_unified;
-    if (diffio->dio_orig.din_mmfile.size > MAX_XDIFF_SIZE ||
-	diffio->dio_new.din_mmfile.size > MAX_XDIFF_SIZE)
+    ఒకవేళ (diffio->dio_outfmt == DIO_OUTPUT_INDICES)
+	emit_cfg.hunk_func = xdiff_బహిర్గతం_indices;
+    లేకపోతే
+	emit_cb.బహిర్గతం_పంక్తి = xdiff_బహిర్గతం_unified;
+    ఒకవేళ (diffio->dio_orig.din_mmfile.కొలత > MAX_XDIFF_కొలత ||
+	diffio->dio_new.din_mmfile.కొలత > MAX_XDIFF_కొలత)
     {
-	emsg(_(e_problem_creating_internal_diff));
-	return FAIL;
+	emsg(_(e_problem_creating_అంతర్గత_diff));
+	తిరిగి FAIL;
     }
-    if (xdl_diff(&diffio->dio_orig.din_mmfile,
+    ఒకవేళ (xdl_diff(&diffio->dio_orig.din_mmfile,
 		&diffio->dio_new.din_mmfile,
 		&param, &emit_cfg, &emit_cb) < 0)
     {
-	emsg(_(e_problem_creating_internal_diff));
-	return FAIL;
+	emsg(_(e_problem_creating_అంతర్గత_diff));
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Make a diff between files "tmp_orig" and "tmp_new", results in "tmp_diff".
  * return OK or FAIL;
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_file(diffio_T *dio)
 {
     char_u	*cmd;
@@ -1408,39 +1408,39 @@ diff_file(diffio_T *dio)
     char_u	*tmp_diff = dio->dio_diff.dout_fname;
 
 # ifdef FEAT_EVAL
-    if (*p_dex != NUL)
+    ఒకవేళ (*p_dex != NUL)
     {
 	// Use 'diffexpr' to generate the diff file.
 	eval_diff(tmp_orig, tmp_new, tmp_diff);
-	return OK;
+	తిరిగి OK;
     }
-    else
+    లేకపోతే
 # endif
     // Use xdiff for generating the diff.
-    if (dio->dio_internal)
-	return diff_file_internal(dio);
+    ఒకవేళ (dio->dio_అంతర్గత)
+	తిరిగి diff_file_అంతర్గత(dio);
 
-    if (check_restricted())
-	return FAIL;
+    ఒకవేళ (check_restricted())
+	తిరిగి FAIL;
 
     len = STRLEN(tmp_orig) + STRLEN(tmp_new)
 				+ STRLEN(tmp_diff) + STRLEN(p_srr) + 27;
     cmd = alloc(len);
-    if (cmd == NULL)
-	return FAIL;
+    ఒకవేళ (cmd == ఖాళీ)
+	తిరిగి FAIL;
 
     // We don't want $DIFF_OPTIONS to get in the way.
-    if (getenv("DIFF_OPTIONS"))
+    ఒకవేళ (getenv("DIFF_OPTIONS"))
 	vim_setenv((char_u *)"DIFF_OPTIONS", (char_u *)"");
 
     // Build the diff command and execute it.  Always use -a, binary
     // differences are of no use.  Ignore errors, diff returns
     // non-zero when differences have been found.
-    vim_snprintf((char *)cmd, len, "diff %s%s%s%s%s%s%s%s %s",
-	    diff_a_works == FALSE ? "" : "-a ",
-# if defined(MSWIN)
-	    diff_bin_works == TRUE ? "--binary " : "",
-# else
+    vim_snprintf((అక్షరం *)cmd, len, "diff %s%s%s%s%s%s%s%s %s",
+	    diff_a_పనిచేస్తుంది == FALSE ? "" : "-a ",
+# ఒకవేళ defined(MSWIN)
+	    diff_bin_పనిచేస్తుంది == TRUE ? "--binary " : "",
+# లేకపోతే
 	    "",
 # endif
 	    (diff_flags & DIFF_IWHITE) ? "-b " : "",
@@ -1449,12 +1449,12 @@ diff_file(diffio_T *dio)
 	    (diff_flags & DIFF_IBLANK) ? "-B " : "",
 	    (diff_flags & DIFF_ICASE) ? "-i " : "",
 	    tmp_orig, tmp_new);
-    append_redir(cmd, (int)len, p_srr, tmp_diff);
-    block_autocmds();	// avoid ShellCmdPost stuff
-    (void)call_shell(cmd, SHELL_FILTER|SHELL_SILENT|SHELL_DOOUT);
+    append_redir(cmd, (పూర్ణాంకం)len, p_srr, tmp_diff);
+    ఖండం_autocmds();	// avoid ShellCmdPost stuff
+    (శూన్య)call_shell(cmd, SHELL_FILTER|SHELL_SILENT|SHELL_DOOUT);
     unblock_autocmds();
     vim_free(cmd);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1462,34 +1462,34 @@ diff_file(diffio_T *dio)
  * The buffer is written to a file, also for unmodified buffers (the file
  * could have been produced by autocommands, e.g. the netrw plugin).
  */
-    void
+    శూన్య
 ex_diffpatch(exarg_T *eap)
 {
     char_u	*tmp_orig;	// name of original temp file
     char_u	*tmp_new;	// name of patched temp file
-    char_u	*buf = NULL;
+    char_u	*buf = ఖాళీ;
     size_t	buflen;
     win_T	*old_curwin = curwin;
-    char_u	*newname = NULL;	// name of patched file buffer
+    char_u	*newname = ఖాళీ;	// name of patched file buffer
 # ifdef UNIX
     char_u	dirbuf[MAXPATHL];
-    char_u	*fullname = NULL;
+    char_u	*fullname = ఖాళీ;
 # endif
 # ifdef FEAT_BROWSE
-    char_u	*browseFile = NULL;
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    char_u	*browseFile = ఖాళీ;
+    పూర్ణాంకం		save_cmod_flags = cmdmod.cmod_flags;
 # endif
     stat_T	st;
-    char_u	*esc_name = NULL;
+    char_u	*esc_name = ఖాళీ;
 
 # ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    ఒకవేళ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	browseFile = do_browse(0, (char_u *)_("Patch file"),
-			 eap->arg, NULL, NULL,
-			 (char_u *)_(BROWSE_FILTER_ALL_FILES), NULL);
-	if (browseFile == NULL)
-	    return;		// operation cancelled
+			 eap->arg, ఖాళీ, ఖాళీ,
+			 (char_u *)_(BROWSE_FILTER_ALL_FILES), ఖాళీ);
+	ఒకవేళ (browseFile == ఖాళీ)
+	    తిరిగి;		// operation cancelled
 	eap->arg = browseFile;
 	cmdmod.cmod_flags &= ~CMOD_BROWSE; // don't let do_ecmd() browse again
     }
@@ -1498,30 +1498,30 @@ ex_diffpatch(exarg_T *eap)
     // We need two temp file names.
     tmp_orig = vim_tempname('o', FALSE);
     tmp_new = vim_tempname('n', FALSE);
-    if (tmp_orig == NULL || tmp_new == NULL)
-	goto theend;
+    ఒకవేళ (tmp_orig == ఖాళీ || tmp_new == ఖాళీ)
+	వెళ్ళు theend;
 
     // Write the current buffer to "tmp_orig".
-    if (buf_write(curbuf, tmp_orig, NULL,
-		(linenr_T)1, curbuf->b_ml.ml_line_count,
-				     NULL, FALSE, FALSE, FALSE, TRUE) == FAIL)
-	goto theend;
+    ఒకవేళ (buf_write(curbuf, tmp_orig, ఖాళీ,
+		(linenr_T)1, curbuf->b_ml.ml_పంక్తి_లెక్క,
+				     ఖాళీ, FALSE, FALSE, FALSE, TRUE) == FAIL)
+	వెళ్ళు theend;
 
 # ifdef UNIX
     // Get the absolute path of the patchfile, changing directory below.
-    fullname = FullName_save(eap->arg, FALSE);
+    fullname = నిండిన_Name_save(eap->arg, FALSE);
 # endif
     esc_name = vim_strsave_shellescape(
 # ifdef UNIX
-		    fullname != NULL ? fullname :
+		    fullname != ఖాళీ ? fullname :
 # endif
 		    eap->arg, TRUE, TRUE);
-    if (esc_name == NULL)
-	goto theend;
+    ఒకవేళ (esc_name == ఖాళీ)
+	వెళ్ళు theend;
     buflen = STRLEN(tmp_orig) + STRLEN(esc_name) + STRLEN(tmp_new) + 16;
     buf = alloc(buflen);
-    if (buf == NULL)
-	goto theend;
+    ఒకవేళ (buf == ఖాళీ)
+	వెళ్ళు theend;
 
 # ifdef UNIX
     // Temporarily chdir to /tmp, to avoid patching files in the current
@@ -1529,14 +1529,14 @@ ex_diffpatch(exarg_T *eap)
     // have our own temp dir use that instead, it will be cleaned up when we
     // exit (any .rej files created).  Don't change directory if we can't
     // return to the current.
-    if (mch_dirname(dirbuf, MAXPATHL) != OK || mch_chdir((char *)dirbuf) != 0)
+    ఒకవేళ (mch_dirname(dirbuf, MAXPATHL) != OK || mch_chdir((అక్షరం *)dirbuf) != 0)
 	dirbuf[0] = NUL;
-    else
+    లేకపోతే
     {
 #  ifdef TEMPDIRNAMES
-	if (vim_tempdir != NULL)
-	    vim_ignored = mch_chdir((char *)vim_tempdir);
-	else
+	ఒకవేళ (vim_tempdir != ఖాళీ)
+	    vim_ignored = mch_chdir((అక్షరం *)vim_tempdir);
+	లేకపోతే
 #  endif
 	    vim_ignored = mch_chdir("/tmp");
 	shorten_fnames(TRUE);
@@ -1544,33 +1544,33 @@ ex_diffpatch(exarg_T *eap)
 # endif
 
 # ifdef FEAT_EVAL
-    if (*p_pex != NUL)
+    ఒకవేళ (*p_pex != NUL)
 	// Use 'patchexpr' to generate the new file.
 	eval_patch(tmp_orig,
 #  ifdef UNIX
-		fullname != NULL ? fullname :
+		fullname != ఖాళీ ? fullname :
 #  endif
 		eap->arg, tmp_new);
-    else
+    లేకపోతే
 # endif
     {
-	if (check_restricted())
-	    goto theend;
+	ఒకవేళ (check_restricted())
+	    వెళ్ళు theend;
 
 	// Build the patch command and execute it.  Ignore errors.  Switch to
 	// cooked mode to allow the user to respond to prompts.
-	vim_snprintf((char *)buf, buflen, "patch -o %s %s < %s",
+	vim_snprintf((అక్షరం *)buf, buflen, "patch -o %s %s < %s",
 						  tmp_new, tmp_orig, esc_name);
-	block_autocmds();	// Avoid ShellCmdPost stuff
-	(void)call_shell(buf, SHELL_FILTER | SHELL_COOKED);
+	ఖండం_autocmds();	// Avoid ShellCmdPost stuff
+	(శూన్య)call_shell(buf, SHELL_FILTER | SHELL_COOKED);
 	unblock_autocmds();
     }
 
 # ifdef UNIX
-    if (dirbuf[0] != NUL)
+    ఒకవేళ (dirbuf[0] != NUL)
     {
-	if (mch_chdir((char *)dirbuf) != 0)
-	    emsg(_(e_cannot_go_back_to_previous_directory));
+	ఒకవేళ (mch_chdir((అక్షరం *)dirbuf) != 0)
+	    emsg(_(e_cannot_go_వెనుక_గమ్యం_మునుపటి_directory));
 	shorten_fnames(TRUE);
     }
 # endif
@@ -1587,15 +1587,15 @@ ex_diffpatch(exarg_T *eap)
     mch_remove(buf);
 
     // Only continue if the output file was created.
-    if (mch_stat((char *)tmp_new, &st) < 0 || st.st_size == 0)
+    ఒకవేళ (mch_stat((అక్షరం *)tmp_new, &st) < 0 || st.st_size == 0)
 	emsg(_(e_cannot_read_patch_output));
-    else
+    లేకపోతే
     {
-	if (curbuf->b_fname != NULL)
+	ఒకవేళ (curbuf->b_fname != ఖాళీ)
 	{
 	    newname = vim_strnsave(curbuf->b_fname,
 						  STRLEN(curbuf->b_fname) + 4);
-	    if (newname != NULL)
+	    ఒకవేళ (newname != ఖాళీ)
 		STRCAT(newname, ".new");
 	}
 
@@ -1605,28 +1605,28 @@ ex_diffpatch(exarg_T *eap)
 	// don't use a new tab page, each tab page has its own diffs
 	cmdmod.cmod_tab = 0;
 
-	if (win_split(0, (diff_flags & DIFF_VERTICAL) ? WSP_VERT : 0) != FAIL)
+	ఒకవేళ (win_విభజించు(0, (diff_flags & DIFF_VERTICAL) ? WSP_VERT : 0) != FAIL)
 	{
 	    // Pretend it was a ":split fname" command
-	    eap->cmdidx = CMD_split;
+	    eap->cmdidx = CMD_విభజించు;
 	    eap->arg = tmp_new;
 	    do_exedit(eap, old_curwin);
 
 	    // check that split worked and editing tmp_new
-	    if (curwin != old_curwin && win_valid(old_curwin))
+	    ఒకవేళ (curwin != old_curwin && win_valid(old_curwin))
 	    {
 		// Set 'diff', 'scrollbind' on and 'wrap' off.
 		diff_win_options(curwin, TRUE);
 		diff_win_options(old_curwin, TRUE);
 
-		if (newname != NULL)
+		ఒకవేళ (newname != ఖాళీ)
 		{
 		    // do a ":file filename.new" on the patched buffer
 		    eap->arg = newname;
 		    ex_file(eap);
 
 		    // Do filetype detection with the new name.
-		    if (au_has_group((char_u *)"filetypedetect"))
+		    ఒకవేళ (au_has_సమూహం((char_u *)"filetypedetect"))
 			do_cmdline_cmd(
 				     (char_u *)":doau filetypedetect BufRead");
 		}
@@ -1635,10 +1635,10 @@ ex_diffpatch(exarg_T *eap)
     }
 
 theend:
-    if (tmp_orig != NULL)
+    ఒకవేళ (tmp_orig != ఖాళీ)
 	mch_remove(tmp_orig);
     vim_free(tmp_orig);
-    if (tmp_new != NULL)
+    ఒకవేళ (tmp_new != ఖాళీ)
 	mch_remove(tmp_new);
     vim_free(tmp_new);
     vim_free(newname);
@@ -1656,81 +1656,81 @@ theend:
 /*
  * Split the window and edit another file, setting options to show the diffs.
  */
-    void
+    శూన్య
 ex_diffsplit(exarg_T *eap)
 {
     win_T	*old_curwin = curwin;
     bufref_T	old_curbuf;
 
-    set_bufref(&old_curbuf, curbuf);
+    సమితి_bufref(&old_curbuf, curbuf);
 # ifdef FEAT_GUI
     need_mouse_correct = TRUE;
 # endif
     // Need to compute w_fraction when no redraw happened yet.
     validate_cursor();
-    set_fraction(curwin);
+    సమితి_fraction(curwin);
 
     // don't use a new tab page, each tab page has its own diffs
     cmdmod.cmod_tab = 0;
 
-    if (win_split(0, (diff_flags & DIFF_VERTICAL) ? WSP_VERT : 0) == FAIL)
-	return;
+    ఒకవేళ (win_విభజించు(0, (diff_flags & DIFF_VERTICAL) ? WSP_VERT : 0) == FAIL)
+	తిరిగి;
 
     // Pretend it was a ":split fname" command
-    eap->cmdidx = CMD_split;
+    eap->cmdidx = CMD_విభజించు;
     curwin->w_p_diff = TRUE;
     do_exedit(eap, old_curwin);
 
-    if (curwin == old_curwin)		// split didn't work
-	return;
+    ఒకవేళ (curwin == old_curwin)		// split didn't work
+	తిరిగి;
 
     // Set 'diff', 'scrollbind' on and 'wrap' off.
     diff_win_options(curwin, TRUE);
-    if (win_valid(old_curwin))
+    ఒకవేళ (win_valid(old_curwin))
     {
 	diff_win_options(old_curwin, TRUE);
 
-	if (bufref_valid(&old_curbuf))
+	ఒకవేళ (bufref_valid(&old_curbuf))
 	    // Move the cursor position to that of the old window.
-	    curwin->w_cursor.lnum = diff_get_corresponding_line(
+	    curwin->w_cursor.lnum = diff_get_corresponding_పంక్తి(
 		    old_curbuf.br_buf, old_curwin->w_cursor.lnum);
     }
     // Now that lines are folded scroll to show the cursor at the same
     // relative position.
-    scroll_to_fraction(curwin, curwin->w_height);
+    scroll_గమ్యం_fraction(curwin, curwin->w_ఎత్తు);
 }
 
 /*
  * Set options to show diffs for the current window.
  */
-    void
-ex_diffthis(exarg_T *eap UNUSED)
+    శూన్య
+ex_diffthis(exarg_T *eap వాడని)
 {
     // Set 'diff', 'scrollbind' on and 'wrap' off.
     diff_win_options(curwin, TRUE);
 }
 
-    static void
-set_diff_option(win_T *wp, int value)
+    స్థిర శూన్య
+సమితి_diff_option(win_T *wp, పూర్ణాంకం విలువ)
 {
     win_T *old_curwin = curwin;
 
     curwin = wp;
-    curbuf = curwin->w_buffer;
-    ++curbuf_lock;
-    set_option_value_give_err((char_u *)"diff", (long)value, NULL, OPT_LOCAL);
-    --curbuf_lock;
+    curbuf = curwin->w_బఫరు;
+    ++curbuf_తాళం;
+    సమితి_option_విలువ_give_err((char_u *)"diff", (దీర్ఘ)విలువ, ఖాళీ, OPT_LOCAL);
+    --curbuf_తాళం;
     curwin = old_curwin;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_బఫరు;
 }
 
 /*
  * Set options in window "wp" for diff mode.
  */
-    void
+    శూన్య
 diff_win_options(
     win_T	*wp,
-    int		addbuf)		// Add buffer to diff.
+    పూర్ణాంకం		addbuf)		// Add buffer to diff.
 {
 # ifdef FEAT_FOLDING
     win_T *old_curwin = curwin;
@@ -1742,29 +1742,29 @@ diff_win_options(
 # endif
 
     // Use 'scrollbind' and 'cursorbind' when available
-    if (!wp->w_p_diff)
+    ఒకవేళ (!wp->w_p_diff)
 	wp->w_p_scb_save = wp->w_p_scb;
     wp->w_p_scb = TRUE;
-    if (!wp->w_p_diff)
+    ఒకవేళ (!wp->w_p_diff)
 	wp->w_p_crb_save = wp->w_p_crb;
     wp->w_p_crb = TRUE;
-    if (!(diff_flags & DIFF_FOLLOWWRAP))
+    ఒకవేళ (!(diff_flags & DIFF_FOLLOWWRAP))
     {
-	if (!wp->w_p_diff)
+	ఒకవేళ (!wp->w_p_diff)
 	    wp->w_p_wrap_save = wp->w_p_wrap;
 	wp->w_p_wrap = FALSE;
 	wp->w_skipcol = 0;
     }
 # ifdef FEAT_FOLDING
-    if (!wp->w_p_diff)
+    ఒకవేళ (!wp->w_p_diff)
     {
-	if (wp->w_p_diff_saved)
+	ఒకవేళ (wp->w_p_diff_saved)
 	    free_string_option(wp->w_p_fdm_save);
 	wp->w_p_fdm_save = vim_strsave(wp->w_p_fdm);
     }
-    set_string_option_direct_in_win(wp, (char_u *)"fdm", -1, (char_u *)"diff",
+    సమితి_string_option_ప్రత్యక్ష_లోపల_win(wp, (char_u *)"fdm", -1, (char_u *)"diff",
 						       OPT_LOCAL|OPT_FREE, 0);
-    if (!wp->w_p_diff)
+    ఒకవేళ (!wp->w_p_diff)
     {
 	wp->w_p_fdc_save = wp->w_p_fdc;
 	wp->w_p_fen_save = wp->w_p_fen;
@@ -1775,17 +1775,17 @@ diff_win_options(
     wp->w_p_fdl = 0;
     foldUpdateAll(wp);
     // make sure topline is not halfway a fold
-    changed_window_setting_win(wp);
+    మారింది_కిటికీ_setting_win(wp);
 # endif
-    if (vim_strchr(p_sbo, 'h') == NULL)
+    ఒకవేళ (vim_strchr(p_sbo, 'h') == ఖాళీ)
 	do_cmdline_cmd((char_u *)"set sbo+=hor");
     // Save the current values, to be restored in ex_diffoff().
     wp->w_p_diff_saved = TRUE;
 
-    set_diff_option(wp, TRUE);
+    సమితి_diff_option(wp, TRUE);
 
-    if (addbuf)
-	diff_buf_add(wp->w_buffer);
+    ఒకవేళ (addbuf)
+	diff_buf_కూడు(wp->w_బఫరు);
     redraw_win_later(wp, UPD_NOT_VALID);
 }
 
@@ -1793,31 +1793,31 @@ diff_win_options(
  * Set options not to show diffs.  For the current window or all windows.
  * Only in the current tab page.
  */
-    void
+    శూన్య
 ex_diffoff(exarg_T *eap)
 {
     win_T	*wp;
-    int		diffwin = FALSE;
+    పూర్ణాంకం		diffwin = FALSE;
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (eap->forceit ? wp->w_p_diff : wp == curwin)
+	ఒకవేళ (eap->forceit ? wp->w_p_diff : wp == curwin)
 	{
 	    // Set 'diff' off. If option values were saved in
 	    // diff_win_options(), restore the ones whose settings seem to have
 	    // been left over from diff mode.
-	    set_diff_option(wp, FALSE);
+	    సమితి_diff_option(wp, FALSE);
 
-	    if (wp->w_p_diff_saved)
+	    ఒకవేళ (wp->w_p_diff_saved)
 	    {
 
-		if (wp->w_p_scb)
+		ఒకవేళ (wp->w_p_scb)
 		    wp->w_p_scb = wp->w_p_scb_save;
-		if (wp->w_p_crb)
+		ఒకవేళ (wp->w_p_crb)
 		    wp->w_p_crb = wp->w_p_crb_save;
-		if (!(diff_flags & DIFF_FOLLOWWRAP))
+		ఒకవేళ (!(diff_flags & DIFF_FOLLOWWRAP))
 		{
-		    if (!wp->w_p_wrap && wp->w_p_wrap_save)
+		    ఒకవేళ (!wp->w_p_wrap && wp->w_p_wrap_save)
 		    {
 			wp->w_p_wrap = TRUE;
 			wp->w_leftcol = 0;
@@ -1828,14 +1828,14 @@ ex_diffoff(exarg_T *eap)
 		wp->w_p_fdm = vim_strsave(
 		    *wp->w_p_fdm_save ? wp->w_p_fdm_save : (char_u*)"manual");
 
-		if (wp->w_p_fdc == diff_foldcolumn)
+		ఒకవేళ (wp->w_p_fdc == diff_foldcolumn)
 		    wp->w_p_fdc = wp->w_p_fdc_save;
-		if (wp->w_p_fdl == 0)
+		ఒకవేళ (wp->w_p_fdl == 0)
 		    wp->w_p_fdl = wp->w_p_fdl_save;
 
 		// Only restore 'foldenable' when 'foldmethod' is not
 		// "manual", otherwise we continue to show the diff folds.
-		if (wp->w_p_fen)
+		ఒకవేళ (wp->w_p_fen)
 		    wp->w_p_fen = foldmethodIsManual(wp) ? FALSE
 							 : wp->w_p_fen_save;
 
@@ -1847,7 +1847,7 @@ ex_diffoff(exarg_T *eap)
 
 	    // make sure topline is not halfway a fold and cursor is
 	    // invalidated
-	    changed_window_setting_win(wp);
+	    మారింది_కిటికీ_setting_win(wp);
 
 	    // Note: 'sbo' is not restored, it's a global option.
 	    diff_buf_adjust(wp);
@@ -1856,10 +1856,10 @@ ex_diffoff(exarg_T *eap)
     }
 
     // Also remove hidden buffers from the list.
-    if (eap->forceit)
+    ఒకవేళ (eap->forceit)
 	diff_buf_clear();
 
-    if (!diffwin)
+    ఒకవేళ (!diffwin)
     {
 	diff_need_update = FALSE;
 	curtab->tp_diff_invalid = FALSE;
@@ -1868,87 +1868,87 @@ ex_diffoff(exarg_T *eap)
     }
 
     // Remove "hor" from 'scrollopt' if there are no diff windows left.
-    if (!diffwin && vim_strchr(p_sbo, 'h') != NULL)
+    ఒకవేళ (!diffwin && vim_strchr(p_sbo, 'h') != ఖాళీ)
 	do_cmdline_cmd((char_u *)"set sbo-=hor");
 }
 
 /*
  * Read the diff output and add each entry to the diff list.
  */
-    static void
+    స్థిర శూన్య
 diff_read(
-    int		idx_orig,	// idx of original file
-    int		idx_new,	// idx of new file
+    పూర్ణాంకం		idx_orig,	// idx of original file
+    పూర్ణాంకం		idx_new,	// idx of new file
     diffio_T   *dio)		// diff output
 {
-    FILE	*fd = NULL;
-    int		line_hunk_idx = 0;  // line or hunk index
-    diff_T	*dprev = NULL;
-    diff_T	*dp = curtab->tp_first_diff;
+    FILE	*fd = ఖాళీ;
+    పూర్ణాంకం		పంక్తి_hunk_idx = 0;  // line or hunk index
+    diff_T	*dprev = ఖాళీ;
+    diff_T	*dp = curtab->tp_మొదటి_diff;
     diff_T	*dn, *dpl;
     diffout_T   *dout = &dio->dio_diff;
     char_u	linebuf[LBUFLEN];   // only need to hold the diff line
-    char_u	*line;
-    long	off;
-    int		i;
-    int		notset = TRUE;	    // block "*dp" not set yet
-    diffhunk_T	*hunk = NULL;	    // init to avoid gcc warning
+    char_u	*పంక్తి;
+    దీర్ఘ	off;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		notset = TRUE;	    // block "*dp" not set yet
+    diffhunk_T	*hunk = ఖాళీ;	    // init to avoid gcc warning
 
-    enum {
+    గణన {
 	DIFF_ED,
 	DIFF_UNIFIED,
 	DIFF_NONE
     } diffstyle = DIFF_NONE;
 
-    if (dout->dout_fname == NULL)
+    ఒకవేళ (dout->dout_fname == ఖాళీ)
     {
 	diffstyle = DIFF_UNIFIED;
     }
-    else
+    లేకపోతే
     {
-	fd = mch_fopen((char *)dout->dout_fname, "r");
-	if (fd == NULL)
+	fd = mch_fopen((అక్షరం *)dout->dout_fname, "r");
+	ఒకవేళ (fd == ఖాళీ)
 	{
 	    emsg(_(e_cannot_read_diff_output));
-	    return;
+	    తిరిగి;
 	}
     }
 
-    if (!dio->dio_internal)
+    ఒకవేళ (!dio->dio_అంతర్గత)
     {
 	hunk = ALLOC_ONE(diffhunk_T);
-	if (hunk == NULL)
+	ఒకవేళ (hunk == ఖాళీ)
 	{
-	    if (fd != NULL)
+	    ఒకవేళ (fd != ఖాళీ)
 		fclose(fd);
-	    return;
+	    తిరిగి;
 	}
     }
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (dio->dio_internal)
+	ఒకవేళ (dio->dio_అంతర్గత)
 	{
-	    if (line_hunk_idx >= dout->dout_ga.ga_len)
-		break;      // did last hunk
-	    hunk = ((diffhunk_T **)dout->dout_ga.ga_data)[line_hunk_idx++];
+	    ఒకవేళ (పంక్తి_hunk_idx >= dout->dout_ga.ga_len)
+		ఆపు;      // did last hunk
+	    hunk = ((diffhunk_T **)dout->dout_ga.ga_దత్తాంశం)[పంక్తి_hunk_idx++];
 	}
-	else
+	లేకపోతే
 	{
-	    if (fd == NULL)
+	    ఒకవేళ (fd == ఖాళీ)
 	    {
-		if (line_hunk_idx >= dout->dout_ga.ga_len)
-		    break;	    // did last line
-		line = ((char_u **)dout->dout_ga.ga_data)[line_hunk_idx++];
+		ఒకవేళ (పంక్తి_hunk_idx >= dout->dout_ga.ga_len)
+		    ఆపు;	    // did last line
+		పంక్తి = ((char_u **)dout->dout_ga.ga_దత్తాంశం)[పంక్తి_hunk_idx++];
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (vim_fgets(linebuf, LBUFLEN, fd))
-		    break;		// end of file
-		line = linebuf;
+		ఒకవేళ (vim_fgets(linebuf, LBUFLEN, fd))
+		    ఆపు;		// end of file
+		పంక్తి = linebuf;
 	    }
 
-	    if (diffstyle == DIFF_NONE)
+	    ఒకవేళ (diffstyle == DIFF_NONE)
 	    {
 		// Determine diff style.
 		// ed like diff looks like this:
@@ -1960,89 +1960,89 @@ diff_read(
 		// --- file1       2018-03-20 13:23:35.783153140 +0100
 		// +++ file2       2018-03-20 13:23:41.183156066 +0100
 		// @@ -1,3 +1,5 @@
-		if (SAFE_isdigit(*line))
+		ఒకవేళ (సురక్షిత_isdigit(*పంక్తి))
 		    diffstyle = DIFF_ED;
-		else if ((STRNCMP(line, "@@ ", 3) == 0))
+		లేకపోతే ఒకవేళ ((STRNCMP(పంక్తి, "@@ ", 3) == 0))
 		    diffstyle = DIFF_UNIFIED;
-		else if ((STRNCMP(line, "--- ", 4) == 0)
+		లేకపోతే ఒకవేళ ((STRNCMP(పంక్తి, "--- ", 4) == 0)
 			&& (vim_fgets(linebuf, LBUFLEN, fd) == 0)
-			&& (STRNCMP(line, "+++ ", 4) == 0)
+			&& (STRNCMP(పంక్తి, "+++ ", 4) == 0)
 			&& (vim_fgets(linebuf, LBUFLEN, fd) == 0)
-			&& (STRNCMP(line, "@@ ", 3) == 0))
+			&& (STRNCMP(పంక్తి, "@@ ", 3) == 0))
 		    diffstyle = DIFF_UNIFIED;
-		else
+		లేకపోతే
 		    // Format not recognized yet, skip over this line.  Cygwin
 		    // diff may put a warning at the start of the file.
-		    continue;
+		    కొనసాగు;
 	    }
 
-	    if (diffstyle == DIFF_ED)
+	    ఒకవేళ (diffstyle == DIFF_ED)
 	    {
-		if (!SAFE_isdigit(*line))
-		    continue;	// not the start of a diff block
-		if (parse_diff_ed(line, hunk) == FAIL)
-		    continue;
+		ఒకవేళ (!సురక్షిత_isdigit(*పంక్తి))
+		    కొనసాగు;	// not the start of a diff block
+		ఒకవేళ (parse_diff_ed(పంక్తి, hunk) == FAIL)
+		    కొనసాగు;
 	    }
-	    else if (diffstyle == DIFF_UNIFIED)
+	    లేకపోతే ఒకవేళ (diffstyle == DIFF_UNIFIED)
 	    {
-		if (STRNCMP(line, "@@ ", 3)  != 0)
-		    continue;	// not the start of a diff block
-		if (parse_diff_unified(line, hunk) == FAIL)
-		    continue;
+		ఒకవేళ (STRNCMP(పంక్తి, "@@ ", 3)  != 0)
+		    కొనసాగు;	// not the start of a diff block
+		ఒకవేళ (parse_diff_unified(పంక్తి, hunk) == FAIL)
+		    కొనసాగు;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		emsg(_(e_invalid_diff_format));
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Go over blocks before the change, for which orig and new are equal.
 	// Copy blocks from orig to new.
-	while (dp != NULL
+	అయితే (dp != ఖాళీ
 		&& hunk->lnum_orig > dp->df_lnum[idx_orig]
-						      + dp->df_count[idx_orig])
+						      + dp->df_లెక్క[idx_orig])
 	{
-	    if (notset)
-		diff_copy_entry(dprev, dp, idx_orig, idx_new);
+	    ఒకవేళ (notset)
+		diff_copy_నమోదు(dprev, dp, idx_orig, idx_new);
 	    dprev = dp;
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	    notset = TRUE;
 	}
 
-	if (dp != NULL
+	ఒకవేళ (dp != ఖాళీ
 		&& hunk->lnum_orig <= dp->df_lnum[idx_orig]
-						       + dp->df_count[idx_orig]
-		&& hunk->lnum_orig + hunk->count_orig >= dp->df_lnum[idx_orig])
+						       + dp->df_లెక్క[idx_orig]
+		&& hunk->lnum_orig + hunk->లెక్క_orig >= dp->df_lnum[idx_orig])
 	{
 	    // New block overlaps with existing block(s).
 	    // First find last block that overlaps.
-	    for (dpl = dp; dpl->df_next != NULL; dpl = dpl->df_next)
-		if (hunk->lnum_orig + hunk->count_orig
-					     < dpl->df_next->df_lnum[idx_orig])
-		    break;
+	    కొరకు (dpl = dp; dpl->df_తదుపరి != ఖాళీ; dpl = dpl->df_తదుపరి)
+		ఒకవేళ (hunk->lnum_orig + hunk->లెక్క_orig
+					     < dpl->df_తదుపరి->df_lnum[idx_orig])
+		    ఆపు;
 
 	    // If the newly found block starts before the old one, set the
 	    // start back a number of lines.
 	    off = dp->df_lnum[idx_orig] - hunk->lnum_orig;
-	    if (off > 0)
+	    ఒకవేళ (off > 0)
 	    {
-		for (i = idx_orig; i < idx_new; ++i)
-		    if (curtab->tp_diffbuf[i] != NULL)
+		కొరకు (i = idx_orig; i < idx_new; ++i)
+		    ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 		    {
 			dp->df_lnum[i] -= off;
-			dp->df_count[i] += off;
+			dp->df_లెక్క[i] += off;
 		    }
 		dp->df_lnum[idx_new] = hunk->lnum_new;
-		dp->df_count[idx_new] = hunk->count_new;
+		dp->df_లెక్క[idx_new] = hunk->లెక్క_new;
 	    }
-	    else if (notset)
+	    లేకపోతే ఒకవేళ (notset)
 	    {
 		// new block inside existing one, adjust new block
 		dp->df_lnum[idx_new] = hunk->lnum_new + off;
-		dp->df_count[idx_new] = hunk->count_new - off;
+		dp->df_లెక్క[idx_new] = hunk->లెక్క_new - off;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// second overlap of new block with existing block
 
@@ -2050,171 +2050,171 @@ diff_read(
 		// the diff block size first. When we handled the first hunk we
 		// would have expanded it to fit, without knowing that this
 		// hunk exists
-		int orig_size_in_dp = MIN(hunk->count_orig,
+		పూర్ణాంకం orig_కొలత_లోపల_dp = MIN(hunk->లెక్క_orig,
 			dp->df_lnum[idx_orig] +
-			dp->df_count[idx_orig] - hunk->lnum_orig);
-		int size_diff = hunk->count_new - orig_size_in_dp;
-		dp->df_count[idx_new] += size_diff;
+			dp->df_లెక్క[idx_orig] - hunk->lnum_orig);
+		పూర్ణాంకం కొలత_diff = hunk->లెక్క_new - orig_కొలత_లోపల_dp;
+		dp->df_లెక్క[idx_new] += కొలత_diff;
 
 		// grow existing block to include the overlap completely
-		off = hunk->lnum_new + hunk->count_new
-		    - (dp->df_lnum[idx_new] + dp->df_count[idx_new]);
-		if (off > 0)
-		    dp->df_count[idx_new] += off;
+		off = hunk->lnum_new + hunk->లెక్క_new
+		    - (dp->df_lnum[idx_new] + dp->df_లెక్క[idx_new]);
+		ఒకవేళ (off > 0)
+		    dp->df_లెక్క[idx_new] += off;
 	    }
 
 	    // Adjust the size of the block to include all the lines to the
 	    // end of the existing block or the new diff, whatever ends last.
-	    off = (hunk->lnum_orig + hunk->count_orig)
-			 - (dpl->df_lnum[idx_orig] + dpl->df_count[idx_orig]);
-	    if (off < 0)
+	    off = (hunk->lnum_orig + hunk->లెక్క_orig)
+			 - (dpl->df_lnum[idx_orig] + dpl->df_లెక్క[idx_orig]);
+	    ఒకవేళ (off < 0)
 	    {
 		// new change ends in existing block, adjust the end. We only
 		// need to do this once per block or we will over-adjust.
-		if (notset || dp != dpl)
+		ఒకవేళ (notset || dp != dpl)
 		{
 		    // adjusting by 'off' here is only correct if
 		    // there is not another hunk in this block. we
 		    // adjust for this when we encounter a second
 		    // overlap later.
-		    dp->df_count[idx_new] += -off;
+		    dp->df_లెక్క[idx_new] += -off;
 		}
 		off = 0;
 	    }
-	    for (i = idx_orig; i < idx_new; ++i)
-		if (curtab->tp_diffbuf[i] != NULL)
-		    dp->df_count[i] = dpl->df_lnum[i] + dpl->df_count[i]
+	    కొరకు (i = idx_orig; i < idx_new; ++i)
+		ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
+		    dp->df_లెక్క[i] = dpl->df_lnum[i] + dpl->df_లెక్క[i]
 						       - dp->df_lnum[i] + off;
 
 	    // Delete the diff blocks that have been merged into one.
-	    dn = dp->df_next;
-	    dp->df_next = dpl->df_next;
-	    while (dn != dp->df_next)
+	    dn = dp->df_తదుపరి;
+	    dp->df_తదుపరి = dpl->df_తదుపరి;
+	    అయితే (dn != dp->df_తదుపరి)
 	    {
-		dpl = dn->df_next;
+		dpl = dn->df_తదుపరి;
 		clear_diffblock(dn);
 		dn = dpl;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // Allocate a new diffblock.
 	    dp = diff_alloc_new(curtab, dprev, dp);
-	    if (dp == NULL)
-		goto done;
+	    ఒకవేళ (dp == ఖాళీ)
+		వెళ్ళు పూర్తి;
 
 	    dp->df_lnum[idx_orig] = hunk->lnum_orig;
-	    dp->df_count[idx_orig] = hunk->count_orig;
+	    dp->df_లెక్క[idx_orig] = hunk->లెక్క_orig;
 	    dp->df_lnum[idx_new] = hunk->lnum_new;
-	    dp->df_count[idx_new] = hunk->count_new;
+	    dp->df_లెక్క[idx_new] = hunk->లెక్క_new;
 
 	    // Set values for other buffers, these must be equal to the
 	    // original buffer, otherwise there would have been a change
 	    // already.
-	    for (i = idx_orig + 1; i < idx_new; ++i)
-		if (curtab->tp_diffbuf[i] != NULL)
-		    diff_copy_entry(dprev, dp, idx_orig, i);
+	    కొరకు (i = idx_orig + 1; i < idx_new; ++i)
+		ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
+		    diff_copy_నమోదు(dprev, dp, idx_orig, i);
 	}
 	notset = FALSE;		// "*dp" has been set
     }
 
     // for remaining diff blocks orig and new are equal
-    while (dp != NULL)
+    అయితే (dp != ఖాళీ)
     {
-	if (notset)
-	    diff_copy_entry(dprev, dp, idx_orig, idx_new);
+	ఒకవేళ (notset)
+	    diff_copy_నమోదు(dprev, dp, idx_orig, idx_new);
 	dprev = dp;
-	dp = dp->df_next;
+	dp = dp->df_తదుపరి;
 	notset = TRUE;
     }
 
-done:
-    if (!dio->dio_internal)
+పూర్తి:
+    ఒకవేళ (!dio->dio_అంతర్గత)
 	vim_free(hunk);
 
-    if (fd != NULL)
+    ఒకవేళ (fd != ఖాళీ)
 	fclose(fd);
 }
 
 /*
  * Copy an entry at "dp" from "idx_orig" to "idx_new".
  */
-    static void
-diff_copy_entry(
+    స్థిర శూన్య
+diff_copy_నమోదు(
     diff_T	*dprev,
     diff_T	*dp,
-    int		idx_orig,
-    int		idx_new)
+    పూర్ణాంకం		idx_orig,
+    పూర్ణాంకం		idx_new)
 {
-    long	off;
+    దీర్ఘ	off;
 
-    if (dprev == NULL)
+    ఒకవేళ (dprev == ఖాళీ)
 	off = 0;
-    else
-	off = (dprev->df_lnum[idx_orig] + dprev->df_count[idx_orig])
-	    - (dprev->df_lnum[idx_new] + dprev->df_count[idx_new]);
+    లేకపోతే
+	off = (dprev->df_lnum[idx_orig] + dprev->df_లెక్క[idx_orig])
+	    - (dprev->df_lnum[idx_new] + dprev->df_లెక్క[idx_new]);
     dp->df_lnum[idx_new] = dp->df_lnum[idx_orig] - off;
-    dp->df_count[idx_new] = dp->df_count[idx_orig];
+    dp->df_లెక్క[idx_new] = dp->df_లెక్క[idx_orig];
 }
 
 /*
  * Clear the list of diffblocks for tab page "tp".
  */
-    void
+    శూన్య
 diff_clear(tabpage_T *tp)
 {
-    diff_T	*p, *next_p;
+    diff_T	*p, *తదుపరి_p;
 
-    for (p = tp->tp_first_diff; p != NULL; p = next_p)
+    కొరకు (p = tp->tp_మొదటి_diff; p != ఖాళీ; p = తదుపరి_p)
     {
-	next_p = p->df_next;
+	తదుపరి_p = p->df_తదుపరి;
 	clear_diffblock(p);
     }
-    tp->tp_first_diff = NULL;
+    tp->tp_మొదటి_diff = ఖాళీ;
 }
 
 /*
  *  return true if the options are set to use diff linematch
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_linematch(diff_T *dp)
 {
-    if (!(diff_flags & DIFF_LINEMATCH))
-	return 0;
+    ఒకవేళ (!(diff_flags & DIFF_LINEMATCH))
+	తిరిగి 0;
 
     // are there more than three diff buffers?
-    int tsize = 0;
-    for (int i = 0; i < DB_COUNT; i++)
+    పూర్ణాంకం tsize = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
     {
-	if (curtab->tp_diffbuf[i] != NULL)
+	ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 	{
 	    // for the rare case (bug?) that the count of a diff block is
 	    // negative, do not run the algorithm because this will try to
 	    // allocate a negative amount of space and crash
-	    if (dp->df_count[i] < 0)
-		return FALSE;
-	    tsize += dp->df_count[i];
+	    ఒకవేళ (dp->df_లెక్క[i] < 0)
+		తిరిగి FALSE;
+	    tsize += dp->df_లెక్క[i];
 	}
     }
 
     // avoid allocating a huge array because it will lag
-    return tsize <= linematch_lines;
+    తిరిగి tsize <= linematch_పంక్తులు;
 }
 
-    static int
-get_max_diff_length(const diff_T *dp)
+    స్థిర పూర్ణాంకం
+get_max_diff_నిడివి(స్థిరరాశి diff_T *dp)
 {
-    int maxlength = 0;
+    పూర్ణాంకం maxlength = 0;
 
-    for (int k = 0; k < DB_COUNT; k++)
+    కొరకు (పూర్ణాంకం k = 0; k < DB_లెక్క; k++)
     {
-	if (curtab->tp_diffbuf[k] != NULL)
+	ఒకవేళ (curtab->tp_diffbuf[k] != ఖాళీ)
 	{
-	    if (dp->df_count[k] > maxlength)
-		maxlength = dp->df_count[k];
+	    ఒకవేళ (dp->df_లెక్క[k] > maxlength)
+		maxlength = dp->df_లెక్క[k];
 	}
     }
-    return maxlength;
+    తిరిగి maxlength;
 }
 
 /*
@@ -2222,23 +2222,23 @@ get_max_diff_length(const diff_T *dp)
  * next diff block that's not in the current chain of adjacent blocks that are
  * all touching each other directly.
  */
-    static void
-find_top_diff_block(
+    స్థిర శూన్య
+కనుగొను_శిఖరం_diff_ఖండం(
     diff_T	**thistopdiff,
-    diff_T	**next_adjacent_blocks,
-    int		fromidx,
-    int		topline)
+    diff_T	**తదుపరి_adjacent_ఖండాలు,
+    పూర్ణాంకం		fromidx,
+    పూర్ణాంకం		topline)
 {
-    diff_T	*topdiff = NULL;
-    diff_T	*localtopdiff = NULL;
-    int		topdiffchange = 0;
+    diff_T	*topdiff = ఖాళీ;
+    diff_T	*localtopdiff = ఖాళీ;
+    పూర్ణాంకం		topdiffchange = 0;
 
-    for (topdiff = curtab->tp_first_diff; topdiff != NULL;
-						topdiff = topdiff->df_next)
+    కొరకు (topdiff = curtab->tp_మొదటి_diff; topdiff != ఖాళీ;
+						topdiff = topdiff->df_తదుపరి)
     {
 	// set the top of the current overlapping diff block set as we
 	// iterate through all of the sets of overlapping diff blocks
-	if (!localtopdiff || topdiffchange)
+	ఒకవేళ (!localtopdiff || topdiffchange)
 	{
 	    localtopdiff = topdiff;
 	    topdiffchange = 0;
@@ -2246,19 +2246,19 @@ find_top_diff_block(
 
 	// check if the fromwin topline is matched by the current diff. if so,
 	// set it to the top of the diff block
-	if (topline >= topdiff->df_lnum[fromidx] && topline <=
-		(topdiff->df_lnum[fromidx] + topdiff->df_count[fromidx]))
+	ఒకవేళ (topline >= topdiff->df_lnum[fromidx] && topline <=
+		(topdiff->df_lnum[fromidx] + topdiff->df_లెక్క[fromidx]))
 	{
 	    // this line is inside the current diff block, so we will save the
 	    // top block of the set of blocks to refer to later
-	    if ((*thistopdiff) == NULL)
+	    ఒకవేళ ((*thistopdiff) == ఖాళీ)
 		(*thistopdiff) = localtopdiff;
 	}
 
 	// check if the next set of overlapping diff blocks is next
-	if (!(topdiff->df_next && (topdiff->df_next->df_lnum[fromidx] ==
+	ఒకవేళ (!(topdiff->df_తదుపరి && (topdiff->df_తదుపరి->df_lnum[fromidx] ==
 			(topdiff->df_lnum[fromidx] +
-						topdiff->df_count[fromidx]))))
+						topdiff->df_లెక్క[fromidx]))))
 	{
 	    // mark that the next diff block is belongs to a different set of
 	    // overlapping diff blocks
@@ -2266,10 +2266,10 @@ find_top_diff_block(
 
 	    // if we already have found that the line number is inside a diff
 	    // block, set the marker of the next block and finish the iteration
-	    if (*thistopdiff)
+	    ఒకవేళ (*thistopdiff)
 	    {
-		(*next_adjacent_blocks) = topdiff->df_next;
-		break;
+		(*తదుపరి_adjacent_ఖండాలు) = topdiff->df_తదుపరి;
+		ఆపు;
 	    }
 	}
     }
@@ -2279,102 +2279,102 @@ find_top_diff_block(
  * Calculates topline/topfill of a target diff window to fit the source diff
  * window.
  */
-    static void
+    స్థిర శూన్య
 calculate_topfill_and_topline(
-    const int	fromidx,
-    const int	toidx,
-    const int	from_topline,
-    const int	from_topfill,
-    int		*topfill,
+    స్థిరరాశి పూర్ణాంకం	fromidx,
+    స్థిరరాశి పూర్ణాంకం	toidx,
+    స్థిరరాశి పూర్ణాంకం	from_topline,
+    స్థిరరాశి పూర్ణాంకం	from_topfill,
+    పూర్ణాంకం		*topfill,
     linenr_T	*topline)
 {
     // find the position from the top of the diff block, and the next diff
     // block that's no longer adjacent to the current block. "Adjacency" means
     // a chain of diff blocks that are directly touching each other, allowed by
     // linematch and diff anchors.
-    diff_T	*thistopdiff = NULL;
-    diff_T	*next_adjacent_blocks = NULL;
-    int		virtual_lines_passed = 0;
-    int		curlinenum_to = 1;
+    diff_T	*thistopdiff = ఖాళీ;
+    diff_T	*తదుపరి_adjacent_ఖండాలు = ఖాళీ;
+    పూర్ణాంకం		virtual_పంక్తులు_passed = 0;
+    పూర్ణాంకం		curlinenum_గమ్యం = 1;
 
-    find_top_diff_block(&thistopdiff, &next_adjacent_blocks, fromidx, from_topline);
+    కనుగొను_శిఖరం_diff_ఖండం(&thistopdiff, &తదుపరి_adjacent_ఖండాలు, fromidx, from_topline);
 
     // count the virtual lines (either filler or concrete line) that have been
     // passed in the source buffer. There could be multiple diff blocks if
     // there are adjacent empty blocks (count == 0 at fromidx).
     diff_T *curdif = thistopdiff;
-    while (curdif && (curdif->df_lnum[fromidx] + curdif->df_count[fromidx])
+    అయితే (curdif && (curdif->df_lnum[fromidx] + curdif->df_లెక్క[fromidx])
 							<= from_topline)
     {
-	virtual_lines_passed += get_max_diff_length(curdif);
+	virtual_పంక్తులు_passed += get_max_diff_నిడివి(curdif);
 
-	curdif = curdif->df_next;
+	curdif = curdif->df_తదుపరి;
     }
 
-    if (curdif != next_adjacent_blocks)
-	virtual_lines_passed += from_topline - curdif->df_lnum[fromidx];
-    virtual_lines_passed -= from_topfill;
+    ఒకవేళ (curdif != తదుపరి_adjacent_ఖండాలు)
+	virtual_పంక్తులు_passed += from_topline - curdif->df_lnum[fromidx];
+    virtual_పంక్తులు_passed -= from_topfill;
 
     // clamp negative values in case from_topfill hasn't been updated yet and
     // is larger than total virtual lines, which could happen when setting
     // diffopt multiple times
-    if (virtual_lines_passed < 0)
-	virtual_lines_passed = 0;
+    ఒకవేళ (virtual_పంక్తులు_passed < 0)
+	virtual_పంక్తులు_passed = 0;
 
     // move the same amount of virtual lines in the target buffer to find the
     // cursor's line number
-    if (thistopdiff != NULL) // this should not be null, but just for safety
-	curlinenum_to = thistopdiff->df_lnum[toidx];
+    ఒకవేళ (thistopdiff != ఖాళీ) // this should not be null, but just for safety
+	curlinenum_గమ్యం = thistopdiff->df_lnum[toidx];
 
-    int virt_lines_left = virtual_lines_passed;
+    పూర్ణాంకం virt_పంక్తులు_ఎడమ = virtual_పంక్తులు_passed;
     curdif = thistopdiff;
-    while (virt_lines_left > 0 && curdif != NULL && curdif != next_adjacent_blocks)
+    అయితే (virt_పంక్తులు_ఎడమ > 0 && curdif != ఖాళీ && curdif != తదుపరి_adjacent_ఖండాలు)
     {
-	curlinenum_to += MIN(virt_lines_left, curdif->df_count[toidx]);
-	virt_lines_left -= MIN(virt_lines_left, get_max_diff_length(curdif));
-	curdif = curdif->df_next;
+	curlinenum_గమ్యం += MIN(virt_పంక్తులు_ఎడమ, curdif->df_లెక్క[toidx]);
+	virt_పంక్తులు_ఎడమ -= MIN(virt_పంక్తులు_ఎడమ, get_max_diff_నిడివి(curdif));
+	curdif = curdif->df_తదుపరి;
     }
 
     // count the total number of virtual lines between the top diff block and
     // the found line in the target buffer
-    int max_virt_lines = 0;
-    for (diff_T *dp = thistopdiff; dp != NULL; dp = dp->df_next)
+    పూర్ణాంకం max_virt_పంక్తులు = 0;
+    కొరకు (diff_T *dp = thistopdiff; dp != ఖాళీ; dp = dp->df_తదుపరి)
     {
-	if (dp->df_lnum[toidx] + dp->df_count[toidx] <= curlinenum_to)
-	    max_virt_lines += get_max_diff_length(dp);
-	else
+	ఒకవేళ (dp->df_lnum[toidx] + dp->df_లెక్క[toidx] <= curlinenum_గమ్యం)
+	    max_virt_పంక్తులు += get_max_diff_నిడివి(dp);
+	లేకపోతే
 	{
-	    if (dp->df_lnum[toidx] <= curlinenum_to)
-		max_virt_lines += curlinenum_to - dp->df_lnum[toidx];
-	    break;
+	    ఒకవేళ (dp->df_lnum[toidx] <= curlinenum_గమ్యం)
+		max_virt_పంక్తులు += curlinenum_గమ్యం - dp->df_lnum[toidx];
+	    ఆపు;
 	}
     }
 
-    if (diff_flags & DIFF_FILLER)
+    ఒకవేళ (diff_flags & DIFF_FILLER)
 	// should always be non-negative as max_virt_lines is larger
-	(*topfill) = max_virt_lines - virtual_lines_passed;
-    (*topline) = curlinenum_to;
+	(*topfill) = max_virt_పంక్తులు - virtual_పంక్తులు_passed;
+    (*topline) = curlinenum_గమ్యం;
 }
 
 // Apply results from the linematch algorithm and apply to 'dp' by splitting it
 // into multiple adjacent diff blocks.
-    static void
+    స్థిర శూన్య
 apply_linematch_results(
     diff_T	*dp,
-    size_t	decisions_length,
-    const int	*decisions)
+    size_t	decisions_నిడివి,
+    స్థిరరాశి పూర్ణాంకం	*decisions)
 {
     // get the start line number here in each diff buffer, and then increment
-    int		line_numbers[DB_COUNT];
-    int		outputmap[DB_COUNT];
+    పూర్ణాంకం		పంక్తి_numbers[DB_లెక్క];
+    పూర్ణాంకం		outputmap[DB_లెక్క];
     size_t	ndiffs = 0;
 
-    for (int i = 0; i < DB_COUNT; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
     {
-	if (curtab->tp_diffbuf[i] != NULL)
+	ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 	{
-	    line_numbers[i] = dp->df_lnum[i];
-	    dp->df_count[i] = 0;
+	    పంక్తి_numbers[i] = dp->df_lnum[i];
+	    dp->df_లెక్క[i] = 0;
 
 	    // Keep track of the index of the diff buffer we are using here.
 	    // We will use this to write the output of the algorithm to
@@ -2386,69 +2386,69 @@ apply_linematch_results(
 
     // write the diffs starting with the current diff block
     diff_T *dp_s = dp;
-    for (size_t i = 0; i < decisions_length; i++)
+    కొరకు (size_t i = 0; i < decisions_నిడివి; i++)
     {
 	// Don't allocate on first iter since we can reuse the initial
 	// diffblock
-	if (i != 0 && (decisions[i - 1] != decisions[i]))
+	ఒకవేళ (i != 0 && (decisions[i - 1] != decisions[i]))
 	{
 	    // create new sub diff blocks to segment the original diff block
 	    // which we further divided by running the linematch algorithm
-	    dp_s = diff_alloc_new(curtab, dp_s, dp_s->df_next);
+	    dp_s = diff_alloc_new(curtab, dp_s, dp_s->df_తదుపరి);
 	    dp_s->is_linematched = TRUE;
-	    for (int j = 0; j < DB_COUNT; j++)
+	    కొరకు (పూర్ణాంకం j = 0; j < DB_లెక్క; j++)
 	    {
-		if (curtab->tp_diffbuf[j] != NULL)
+		ఒకవేళ (curtab->tp_diffbuf[j] != ఖాళీ)
 		{
-		    dp_s->df_lnum[j] = line_numbers[j];
-		    dp_s->df_count[j] = 0;
+		    dp_s->df_lnum[j] = పంక్తి_numbers[j];
+		    dp_s->df_లెక్క[j] = 0;
 		}
 	    }
 	}
-	for (size_t j = 0; j < ndiffs; j++)
+	కొరకు (size_t j = 0; j < ndiffs; j++)
 	{
-	    if (decisions[i] & (1 << j))
+	    ఒకవేళ (decisions[i] & (1 << j))
 	    {
 		// will need to use the map here
-		dp_s->df_count[outputmap[j]]++;
-		line_numbers[outputmap[j]]++;
+		dp_s->df_లెక్క[outputmap[j]]++;
+		పంక్తి_numbers[outputmap[j]]++;
 	    }
 	}
     }
     dp->is_linematched = TRUE;
 }
 
-    static void
-run_linematch_algorithm(diff_T *dp)
+    స్థిర శూన్య
+నిరంతరం_linematch_algorithm(diff_T *dp)
 {
     // define buffers for diff algorithm
-    diffin_T		diffbufs_mm[DB_COUNT];
-    const mmfile_t	*diffbufs[DB_COUNT];
-    int			diff_length[DB_COUNT];
+    diffin_T		diffbufs_mm[DB_లెక్క];
+    స్థిరరాశి mmfile_t	*diffbufs[DB_లెక్క];
+    పూర్ణాంకం			diff_నిడివి[DB_లెక్క];
     size_t		ndiffs = 0;
 
-    for (int i = 0; i < DB_COUNT; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
     {
-	if (curtab->tp_diffbuf[i] != NULL)
+	ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 	{
 	    // write the contents of the entire buffer to
 	    // diffbufs_mm[diffbuffers_count]
-	    if (dp->df_count[i] > 0)
+	    ఒకవేళ (dp->df_లెక్క[i] > 0)
 	    {
-		diff_write_buffer(curtab->tp_diffbuf[i], &diffbufs_mm[ndiffs],
-			dp->df_lnum[i], dp->df_lnum[i] + dp->df_count[i] - 1);
+		diff_write_బఫరు(curtab->tp_diffbuf[i], &diffbufs_mm[ndiffs],
+			dp->df_lnum[i], dp->df_lnum[i] + dp->df_లెక్క[i] - 1);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		diffbufs_mm[ndiffs].din_mmfile.size = 0;
-		diffbufs_mm[ndiffs].din_mmfile.ptr = NULL;
+		diffbufs_mm[ndiffs].din_mmfile.కొలత = 0;
+		diffbufs_mm[ndiffs].din_mmfile.ptr = ఖాళీ;
 	    }
 
 	    diffbufs[ndiffs] = &diffbufs_mm[ndiffs].din_mmfile;
 
 	    // keep track of the length of this diff block to pass it to the
 	    // linematch algorithm
-	    diff_length[ndiffs] = dp->df_count[i];
+	    diff_నిడివి[ndiffs] = dp->df_లెక్క[i];
 
 	    // increment the amount of diff buffers we are passing to the
 	    // algorithm
@@ -2459,17 +2459,17 @@ run_linematch_algorithm(diff_T *dp)
     // we will get the output of the linematch algorithm in the format of an
     // array of integers (*decisions) and the length of that array
     // (decisions_length)
-    int *decisions = NULL;
-    const int iwhite = (diff_flags & (DIFF_IWHITEALL | DIFF_IWHITE)) > 0 ? 1 : 0;
-    size_t decisions_length =
-	linematch_nbuffers(diffbufs, diff_length, ndiffs, &decisions, iwhite);
+    పూర్ణాంకం *decisions = ఖాళీ;
+    స్థిరరాశి పూర్ణాంకం iwhite = (diff_flags & (DIFF_IWHITEALL | DIFF_IWHITE)) > 0 ? 1 : 0;
+    size_t decisions_నిడివి =
+	linematch_nbuffers(diffbufs, diff_నిడివి, ndiffs, &decisions, iwhite);
 
-    for (size_t i = 0; i < ndiffs; i++)
-	free(diffbufs_mm[i].din_mmfile.ptr); // TODO should this be vim_free ?
+    కొరకు (size_t i = 0; i < ndiffs; i++)
+	విడుదల(diffbufs_mm[i].din_mmfile.ptr); // TODO should this be vim_free ?
 
-    apply_linematch_results(dp, decisions_length, decisions);
+    apply_linematch_results(dp, decisions_నిడివి, decisions);
 
-    free(decisions);
+    విడుదల(decisions);
 }
 
 /*
@@ -2488,71 +2488,71 @@ run_linematch_algorithm(diff_T *dp)
  * lines above it. This happens when using linematch or using diff anchors (at
  * the anchored lines).
  */
-    int
-diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
+    పూర్ణాంకం
+diff_check_with_linestatus(win_T *wp, linenr_T lnum, పూర్ణాంకం *linestatus)
 {
-    int		idx;		// index in tp_diffbuf[] for this buffer
+    పూర్ణాంకం		idx;		// index in tp_diffbuf[] for this buffer
     diff_T	*dp;
-    int		maxcount;
-    int		i;
-    buf_T	*buf = wp->w_buffer;
-    int		cmp;
+    పూర్ణాంకం		maxcount;
+    పూర్ణాంకం		i;
+    buf_T	*buf = wp->w_బఫరు;
+    పూర్ణాంకం		cmp;
 
-    if (linestatus != NULL)
+    ఒకవేళ (linestatus != ఖాళీ)
 	*linestatus = 0;
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
-    if (curtab->tp_first_diff == NULL || !wp->w_p_diff)	// no diffs at all
-	return 0;
+    ఒకవేళ (curtab->tp_మొదటి_diff == ఖాళీ || !wp->w_p_diff)	// no diffs at all
+	తిరిగి 0;
 
     // safety check: "lnum" must be a buffer line
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count + 1)
-	return 0;
+    ఒకవేళ (lnum < 1 || lnum > buf->b_ml.ml_పంక్తి_లెక్క + 1)
+	తిరిగి 0;
 
     idx = diff_buf_idx(buf);
-    if (idx == DB_COUNT)
-	return 0;		// no diffs for buffer "buf"
+    ఒకవేళ (idx == DB_లెక్క)
+	తిరిగి 0;		// no diffs for buffer "buf"
 
 # ifdef FEAT_FOLDING
     // A closed fold never has filler lines.
-    if (hasFoldingWin(wp, lnum, NULL, NULL, TRUE, NULL))
-	return 0;
+    ఒకవేళ (hasFoldingWin(wp, lnum, ఖాళీ, ఖాళీ, TRUE, ఖాళీ))
+	తిరిగి 0;
 # endif
 
     // Search for a change that includes "lnum" in the list of diffblocks.
     // Resume from the scan finger to avoid restarting at the first block.
-    diff_T	*le = NULL;		// last block with df_lnum[idx] <= lnum
-    for (dp = diff_scan_start(curtab, idx, lnum); dp != NULL; dp = dp->df_next)
+    diff_T	*le = ఖాళీ;		// last block with df_lnum[idx] <= lnum
+    కొరకు (dp = diff_పరిశీలన_ప్రారంభం(curtab, idx, lnum); dp != ఖాళీ; dp = dp->df_తదుపరి)
     {
-	if (dp->df_lnum[idx] <= lnum)
+	ఒకవేళ (dp->df_lnum[idx] <= lnum)
 	    le = dp;
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
-	    break;
+	ఒకవేళ (lnum <= dp->df_lnum[idx] + dp->df_లెక్క[idx])
+	    ఆపు;
     }
-    diff_scan_remember(curtab, idx, lnum, le);
-    if (dp == NULL || lnum < dp->df_lnum[idx])
-	return 0;
+    diff_పరిశీలన_remember(curtab, idx, lnum, le);
+    ఒకవేళ (dp == ఖాళీ || lnum < dp->df_lnum[idx])
+	తిరిగి 0;
 
     // Don't run linematch when lnum is offscreen.  Useful for scrollbind
     // calculations which need to count all the filler lines above the screen.
-    if (lnum >= wp->w_topline && lnum < wp->w_botline
+    ఒకవేళ (lnum >= wp->w_topline && lnum < wp->w_botline
 				&& !dp->is_linematched && diff_linematch(dp)
 				&& diff_check_sanity(curtab, dp))
-	run_linematch_algorithm(dp);
+	నిరంతరం_linematch_algorithm(dp);
 
     // Insert filler lines above the line just below the change.  Will return 0
     // when this buf had the max count.
-    int num_fill = 0;
-    while (lnum == dp->df_lnum[idx] + dp->df_count[idx])
+    పూర్ణాంకం అంకె_fill = 0;
+    అయితే (lnum == dp->df_lnum[idx] + dp->df_లెక్క[idx])
     {
 	// Only calculate fill lines if 'diffopt' contains "filler". Otherwise
 	// returns 0 filler lines.
-	if (diff_flags & DIFF_FILLER)
+	ఒకవేళ (diff_flags & DIFF_FILLER)
 	{
-	    maxcount = get_max_diff_length(dp);
-	    num_fill += maxcount - dp->df_count[idx];
+	    maxcount = get_max_diff_నిడివి(dp);
+	    అంకె_fill += maxcount - dp->df_లెక్క[idx];
 	}
 
 	// If there are adjacent blocks (e.g. linematch or anchor), loop
@@ -2561,50 +2561,50 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	// This also helps us find the last diff block in the list of adjacent
 	// blocks which is necessary when it is a change/inserted line right
 	// after added lines.
-	if (dp->df_next != NULL
-		&& lnum >= dp->df_next->df_lnum[idx]
-		&& lnum <= dp->df_next->df_lnum[idx] + dp->df_next->df_count[idx])
-	    dp = dp->df_next;
-	else
-	    break;
+	ఒకవేళ (dp->df_తదుపరి != ఖాళీ
+		&& lnum >= dp->df_తదుపరి->df_lnum[idx]
+		&& lnum <= dp->df_తదుపరి->df_lnum[idx] + dp->df_తదుపరి->df_లెక్క[idx])
+	    dp = dp->df_తదుపరి;
+	లేకపోతే
+	    ఆపు;
     }
 
-    if (lnum < dp->df_lnum[idx] + dp->df_count[idx])
+    ఒకవేళ (lnum < dp->df_lnum[idx] + dp->df_లెక్క[idx])
     {
-	int	zero = FALSE;
+	పూర్ణాంకం	zero = FALSE;
 
 	// Changed or inserted line.  If the other buffers have a count of
 	// zero, the lines were inserted.  If the other buffers have the same
 	// count, check if the lines are identical.
 	cmp = FALSE;
-	for (i = 0; i < DB_COUNT; ++i)
-	    if (i != idx && curtab->tp_diffbuf[i] != NULL)
+	కొరకు (i = 0; i < DB_లెక్క; ++i)
+	    ఒకవేళ (i != idx && curtab->tp_diffbuf[i] != ఖాళీ)
 	    {
-		if (dp->df_count[i] == 0)
+		ఒకవేళ (dp->df_లెక్క[i] == 0)
 		    zero = TRUE;
-		else
+		లేకపోతే
 		{
-		    if (dp->df_count[i] != dp->df_count[idx])
+		    ఒకవేళ (dp->df_లెక్క[i] != dp->df_లెక్క[idx])
 		    {
-			if (linestatus)
+			ఒకవేళ (linestatus)
 			    *linestatus = -1;	// nr of lines changed.
-			return num_fill;
+			తిరిగి అంకె_fill;
 		    }
 		    cmp = TRUE;
 		}
 	    }
-	if (cmp)
+	ఒకవేళ (cmp)
 	{
 	    // Compare all lines.  If they are equal the lines were inserted
 	    // in some buffers, deleted in others, but not changed.
-	    for (i = 0; i < DB_COUNT; ++i)
-		if (i != idx && curtab->tp_diffbuf[i] != NULL
-						      && dp->df_count[i] != 0)
-		    if (!diff_equal_entry(dp, idx, i))
+	    కొరకు (i = 0; i < DB_లెక్క; ++i)
+		ఒకవేళ (i != idx && curtab->tp_diffbuf[i] != ఖాళీ
+						      && dp->df_లెక్క[i] != 0)
+		    ఒకవేళ (!diff_equal_నమోదు(dp, idx, i))
 		    {
-			if (linestatus)
+			ఒకవేళ (linestatus)
 			    *linestatus = -1;
-			return num_fill;
+			తిరిగి అంకె_fill;
 		    }
 	}
 	// If there is no buffer with zero lines then there is no difference
@@ -2612,102 +2612,102 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	// the difference.  Can't remove the entry here, we might be halfway
 	// updating the window.  Just report the text as unchanged.  Other
 	// windows might still show the change though.
-	if (zero == FALSE)
-	    return num_fill;
-	if (linestatus)
+	ఒకవేళ (zero == FALSE)
+	    తిరిగి అంకె_fill;
+	ఒకవేళ (linestatus)
 	    *linestatus = -2;
-	return num_fill;
+	తిరిగి అంకె_fill;
     }
-    return num_fill;
+    తిరిగి అంకె_fill;
 }
 
 /*
  * Compare two entries in diff "*dp" and return TRUE if they are equal.
  */
-    static int
-diff_equal_entry(diff_T *dp, int idx1, int idx2)
+    స్థిర పూర్ణాంకం
+diff_equal_నమోదు(diff_T *dp, పూర్ణాంకం idx1, పూర్ణాంకం idx2)
 {
-    int		i;
-    char_u	*line;
-    int		cmp;
+    పూర్ణాంకం		i;
+    char_u	*పంక్తి;
+    పూర్ణాంకం		cmp;
 
-    if (dp->df_count[idx1] != dp->df_count[idx2])
-	return FALSE;
-    if (diff_check_sanity(curtab, dp) == FAIL)
-	return FALSE;
-    for (i = 0; i < dp->df_count[idx1]; ++i)
+    ఒకవేళ (dp->df_లెక్క[idx1] != dp->df_లెక్క[idx2])
+	తిరిగి FALSE;
+    ఒకవేళ (diff_check_sanity(curtab, dp) == FAIL)
+	తిరిగి FALSE;
+    కొరకు (i = 0; i < dp->df_లెక్క[idx1]; ++i)
     {
-	line = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx1],
+	పంక్తి = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx1],
 					       dp->df_lnum[idx1] + i, FALSE));
-	if (line == NULL)
-	    return FALSE;
-	cmp = diff_cmp(line, ml_get_buf(curtab->tp_diffbuf[idx2],
+	ఒకవేళ (పంక్తి == ఖాళీ)
+	    తిరిగి FALSE;
+	cmp = diff_cmp(పంక్తి, ml_get_buf(curtab->tp_diffbuf[idx2],
 					       dp->df_lnum[idx2] + i, FALSE));
-	vim_free(line);
-	if (cmp != 0)
-	    return FALSE;
+	vim_free(పంక్తి);
+	ఒకవేళ (cmp != 0)
+	    తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Compare the characters at "p1" and "p2".  If they are equal (possibly
  * ignoring case) return TRUE and set "len" to the number of bytes.
  */
-    static int
-diff_equal_char(char_u *p1, char_u *p2, int *len)
+    స్థిర పూర్ణాంకం
+diff_equal_char(char_u *p1, char_u *p2, పూర్ణాంకం *len)
 {
-    int l  = (*mb_ptr2len)(p1);
+    పూర్ణాంకం l  = (*mb_ptr2len)(p1);
 
-    if (l != (*mb_ptr2len)(p2))
-	return FALSE;
-    if (l > 1)
+    ఒకవేళ (l != (*mb_ptr2len)(p2))
+	తిరిగి FALSE;
+    ఒకవేళ (l > 1)
     {
-	if (STRNCMP(p1, p2, l) != 0
+	ఒకవేళ (STRNCMP(p1, p2, l) != 0
 		&& (!enc_utf8
 		    || !(diff_flags & DIFF_ICASE)
 		    || utf_fold(utf_ptr2char(p1))
 						!= utf_fold(utf_ptr2char(p2))))
-	    return FALSE;
+	    తిరిగి FALSE;
 	*len = l;
     }
-    else
+    లేకపోతే
     {
-	if ((*p1 != *p2)
+	ఒకవేళ ((*p1 != *p2)
 		&& (!(diff_flags & DIFF_ICASE)
 		    || TOLOWER_LOC(*p1) != TOLOWER_LOC(*p2)))
-	    return FALSE;
+	    తిరిగి FALSE;
 	*len = 1;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Compare strings "s1" and "s2" according to 'diffopt'.
  * Return non-zero when they are different.
  */
-    static int
+    స్థిర పూర్ణాంకం
 diff_cmp(char_u *s1, char_u *s2)
 {
     char_u	*p1, *p2;
-    int		l;
+    పూర్ణాంకం		l;
 
-    if ((diff_flags & DIFF_IBLANK)
+    ఒకవేళ ((diff_flags & DIFF_IBLANK)
 	    && (*skipwhite(s1) == NUL || *skipwhite(s2) == NUL))
-	return 0;
+	తిరిగి 0;
 
-    if ((diff_flags & (DIFF_ICASE | ALL_WHITE_DIFF)) == 0)
-	return STRCMP(s1, s2);
-    if ((diff_flags & DIFF_ICASE) && !(diff_flags & ALL_WHITE_DIFF))
-	return MB_STRICMP(s1, s2);
+    ఒకవేళ ((diff_flags & (DIFF_ICASE | ALL_WHITE_DIFF)) == 0)
+	తిరిగి STRCMP(s1, s2);
+    ఒకవేళ ((diff_flags & DIFF_ICASE) && !(diff_flags & ALL_WHITE_DIFF))
+	తిరిగి MB_STRICMP(s1, s2);
 
     p1 = s1;
     p2 = s2;
 
     // Ignore white space changes and possibly ignore case.
-    while (*p1 != NUL && *p2 != NUL)
+    అయితే (*p1 != NUL && *p2 != NUL)
     {
-	if (((diff_flags & DIFF_IWHITE)
+	ఒకవేళ (((diff_flags & DIFF_IWHITE)
 		    && VIM_ISWHITE(*p1) && VIM_ISWHITE(*p2))
 		|| ((diff_flags & DIFF_IWHITEALL)
 		    && (VIM_ISWHITE(*p1) || VIM_ISWHITE(*p2))))
@@ -2715,10 +2715,10 @@ diff_cmp(char_u *s1, char_u *s2)
 	    p1 = skipwhite(p1);
 	    p2 = skipwhite(p2);
 	}
-	else
+	లేకపోతే
 	{
-	    if (!diff_equal_char(p1, p2, &l))
-		break;
+	    ఒకవేళ (!diff_equal_char(p1, p2, &l))
+		ఆపు;
 	    p1 += l;
 	    p2 += l;
 	}
@@ -2727,71 +2727,71 @@ diff_cmp(char_u *s1, char_u *s2)
     // Ignore trailing white space.
     p1 = skipwhite(p1);
     p2 = skipwhite(p2);
-    if (*p1 != NUL || *p2 != NUL)
-	return 1;
-    return 0;
+    ఒకవేళ (*p1 != NUL || *p2 != NUL)
+	తిరిగి 1;
+    తిరిగి 0;
 }
 
 /*
  * Return the number of filler lines above "lnum".
  */
-    int
+    పూర్ణాంకం
 diff_check_fill(win_T *wp, linenr_T lnum)
 {
-    int		n;
+    పూర్ణాంకం		n;
 
     // be quick when there are no filler lines
-    if (!(diff_flags & DIFF_FILLER))
-	return 0;
-    n = diff_check_with_linestatus(wp, lnum, NULL);
-    if (n <= 0)
-	return 0;
-    return n;
+    ఒకవేళ (!(diff_flags & DIFF_FILLER))
+	తిరిగి 0;
+    n = diff_check_with_linestatus(wp, lnum, ఖాళీ);
+    ఒకవేళ (n <= 0)
+	తిరిగి 0;
+    తిరిగి n;
 }
 
 /*
  * Set the topline of "towin" to match the position in "fromwin", so that they
  * show the same diff'ed lines.
  */
-    void
-diff_set_topline(win_T *fromwin, win_T *towin)
+    శూన్య
+diff_సమితి_topline(win_T *fromwin, win_T *towin)
 {
-    buf_T	*frombuf = fromwin->w_buffer;
+    buf_T	*frombuf = fromwin->w_బఫరు;
     linenr_T	lnum;
-    int		fromidx;
-    int		toidx;
+    పూర్ణాంకం		fromidx;
+    పూర్ణాంకం		toidx;
     diff_T	*dp;
 
     fromidx = diff_buf_idx(frombuf);
-    if (fromidx == DB_COUNT)
-	return;		// safety check
+    ఒకవేళ (fromidx == DB_లెక్క)
+	తిరిగి;		// safety check
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
     lnum = fromwin->w_topline;
     towin->w_topfill = 0;
 
     // search for a change that includes "lnum" in the list of diffblocks.
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[fromidx] + dp->df_count[fromidx])
-	    break;
-    if (dp == NULL)
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
+	ఒకవేళ (lnum <= dp->df_lnum[fromidx] + dp->df_లెక్క[fromidx])
+	    ఆపు;
+    ఒకవేళ (dp == ఖాళీ)
     {
 	// After last change, compute topline relative to end of file; no
 	// filler lines.
-	towin->w_topline = towin->w_buffer->b_ml.ml_line_count
-				       - (frombuf->b_ml.ml_line_count - lnum);
+	towin->w_topline = towin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క
+				       - (frombuf->b_ml.ml_పంక్తి_లెక్క - lnum);
     }
-    else
+    లేకపోతే
     {
 	// Find index for "towin".
-	toidx = diff_buf_idx(towin->w_buffer);
-	if (toidx == DB_COUNT)
-	    return;		// safety check
+	toidx = diff_buf_idx(towin->w_బఫరు);
+	ఒకవేళ (toidx == DB_లెక్క)
+	    తిరిగి;		// safety check
 
 	towin->w_topline = lnum + (dp->df_lnum[toidx] - dp->df_lnum[fromidx]);
-	if (lnum >= dp->df_lnum[fromidx])
+	ఒకవేళ (lnum >= dp->df_lnum[fromidx])
 	{
 	    calculate_topfill_and_topline(fromidx, toidx,
 					    fromwin->w_topline,
@@ -2803,12 +2803,12 @@ diff_set_topline(win_T *fromwin, win_T *towin)
 
     // safety check (if diff info gets outdated strange things may happen)
     towin->w_botfill = false;
-    if (towin->w_topline > towin->w_buffer->b_ml.ml_line_count)
+    ఒకవేళ (towin->w_topline > towin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
     {
-	towin->w_topline = towin->w_buffer->b_ml.ml_line_count;
+	towin->w_topline = towin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 	towin->w_botfill = true;
     }
-    if (towin->w_topline < 1)
+    ఒకవేళ (towin->w_topline < 1)
     {
 	towin->w_topline = 1;
 	towin->w_topfill = 0;
@@ -2816,12 +2816,12 @@ diff_set_topline(win_T *fromwin, win_T *towin)
 
     // When w_topline changes need to recompute w_botline and cursor position
     invalidate_botline_win(towin);
-    changed_line_abv_curs_win(towin);
+    మారింది_పంక్తి_abv_curs_win(towin);
 
     check_topfill(towin, FALSE);
 # ifdef FEAT_FOLDING
-    (void)hasFoldingWin(towin, towin->w_topline, &towin->w_topline,
-							    NULL, TRUE, NULL);
+    (శూన్య)hasFoldingWin(towin, towin->w_topline, &towin->w_topline,
+							    ఖాళీ, TRUE, ఖాళీ);
 # endif
 }
 
@@ -2829,295 +2829,295 @@ diff_set_topline(win_T *fromwin, win_T *towin)
  * Parse the diff anchors. If "check_only" is set, will only make sure the
  * syntax is correct.
  */
-    static int
+    స్థిర పూర్ణాంకం
 parse_diffanchors(
-    int		check_only,
+    పూర్ణాంకం		check_only,
     buf_T	*buf,
     linenr_T	*anchors,
-    int		*num_anchors)
+    పూర్ణాంకం		*అంకె_anchors)
 {
-    int i;
+    పూర్ణాంకం i;
     char_u *dia = (*buf->b_p_dia == NUL) ? p_dia : buf->b_p_dia;
 
     buf_T *orig_curbuf = curbuf;
     win_T *orig_curwin = curwin;
 
-    win_T *bufwin = NULL;
-    if (check_only)
+    win_T *bufwin = ఖాళీ;
+    ఒకవేళ (check_only)
 	bufwin = curwin;
-    else
+    లేకపోతే
     {
 	// Find the first window tied to this buffer and ignore the rest. Will
 	// only matter for window-specific addresses like `.` or `''`.
 	FOR_ALL_WINDOWS(bufwin)
-	    if (bufwin->w_buffer == buf && bufwin->w_p_diff)
-		break;
-	if (bufwin == NULL && *dia != NUL)
+	    ఒకవేళ (bufwin->w_బఫరు == buf && bufwin->w_p_diff)
+		ఆపు;
+	ఒకవేళ (bufwin == ఖాళీ && *dia != NUL)
 	{
 	    // The buffer is hidden. Currently this is not supported due to the
 	    // edge cases of needing to decide if an address is window-specific
 	    // or not. We could add more checks in the future so we can detect
 	    // whether an address relies on curwin to make this more fleixble.
 	    emsg(_(e_diff_anchors_with_hidden_windows));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
     }
 
-    for (i = 0; i < MAX_DIFF_ANCHORS && *dia != NUL; i++)
+    కొరకు (i = 0; i < MAX_DIFF_ANCHORS && *dia != NUL; i++)
     {
-	if (*dia == ',') // don't allow empty values
-	    return FAIL;
+	ఒకవేళ (*dia == ',') // don't allow empty values
+	    తిరిగి FAIL;
 
 	curbuf = buf;
 	curwin = bufwin;
-	linenr_T lnum = get_address(NULL, &dia, ADDR_LINES, check_only, TRUE, FALSE, 1);
+	linenr_T lnum = get_చిరునామా(ఖాళీ, &dia, ADDR_పంక్తులు, check_only, TRUE, FALSE, 1);
 	curbuf = orig_curbuf;
 	curwin = orig_curwin;
 
-	if (dia == NULL) // error detected
-	    return FAIL;
-	if (*dia != ',' && *dia != NUL)
-	    return FAIL;
+	ఒకవేళ (dia == ఖాళీ) // error detected
+	    తిరిగి FAIL;
+	ఒకవేళ (*dia != ',' && *dia != NUL)
+	    తిరిగి FAIL;
 
-	if (!check_only
-		&& (lnum == MAXLNUM || lnum <= 0 || lnum > buf->b_ml.ml_line_count + 1))
+	ఒకవేళ (!check_only
+		&& (lnum == MAXLNUM || lnum <= 0 || lnum > buf->b_ml.ml_పంక్తి_లెక్క + 1))
 	{
 	    emsg(_(e_invalid_range));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	if (anchors != NULL)
+	ఒకవేళ (anchors != ఖాళీ)
 	    anchors[i] = lnum;
 
-	if (*dia == ',')
+	ఒకవేళ (*dia == ',')
 	    dia++;
     }
-    if (i == MAX_DIFF_ANCHORS && *dia != NUL)
+    ఒకవేళ (i == MAX_DIFF_ANCHORS && *dia != NUL)
     {
-	semsg(_(e_cannot_have_more_than_nr_diff_anchors), MAX_DIFF_ANCHORS);
-	return FAIL;
+	semsg(_(e_cannot_have_మరిన్ని_than_nr_diff_anchors), MAX_DIFF_ANCHORS);
+	తిరిగి FAIL;
     }
-    if (num_anchors != NULL)
-	*num_anchors = i;
-    return OK;
+    ఒకవేళ (అంకె_anchors != ఖాళీ)
+	*అంకె_anchors = i;
+    తిరిగి OK;
 }
 
 /*
  * This is called when 'diffanchors' is changed.
  */
-    int
-diffanchors_changed(int buflocal)
+    పూర్ణాంకం
+diffanchors_మారింది(పూర్ణాంకం buflocal)
 {
-    int result = parse_diffanchors(TRUE, curbuf, NULL, NULL);
-    if (result == OK && (diff_flags & DIFF_ANCHOR))
+    పూర్ణాంకం ఫలితం = parse_diffanchors(TRUE, curbuf, ఖాళీ, ఖాళీ);
+    ఒకవేళ (ఫలితం == OK && (diff_flags & DIFF_ANCHOR))
     {
 	tabpage_T	*tp;
 	FOR_ALL_TABPAGES(tp)
 	{
-	    if (!buflocal)
+	    ఒకవేళ (!buflocal)
 		tp->tp_diff_invalid = TRUE;
-	    else
+	    లేకపోతే
 	    {
-		for (int idx = 0; idx < DB_COUNT; ++idx)
-		    if (tp->tp_diffbuf[idx] == curbuf)
+		కొరకు (పూర్ణాంకం idx = 0; idx < DB_లెక్క; ++idx)
+		    ఒకవేళ (tp->tp_diffbuf[idx] == curbuf)
 		    {
 			tp->tp_diff_invalid = TRUE;
-			break;
+			ఆపు;
 		    }
 	    }
 	}
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * This is called when 'diffopt' is changed.
  */
-    int
-diffopt_changed(void)
+    పూర్ణాంకం
+diffopt_మారింది(శూన్య)
 {
     char_u	*p;
-    int		diff_context_new = 6;
-    int		linematch_lines_new = 0;
-    int		diff_flags_new = 0;
-    int		diff_foldcolumn_new = 2;
-    long	diff_algorithm_new = 0;
-    long	diff_indent_heuristic = 0;
+    పూర్ణాంకం		diff_context_new = 6;
+    పూర్ణాంకం		linematch_పంక్తులు_new = 0;
+    పూర్ణాంకం		diff_flags_new = 0;
+    పూర్ణాంకం		diff_foldcolumn_new = 2;
+    దీర్ఘ	diff_algorithm_new = 0;
+    దీర్ఘ	diff_indent_heuristic = 0;
     tabpage_T	*tp;
 
     p = p_dip;
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
 	// Note: Keep this in sync with p_dip_values
-	if (STRNCMP(p, "filler", 6) == 0)
+	ఒకవేళ (STRNCMP(p, "filler", 6) == 0)
 	{
 	    p += 6;
 	    diff_flags_new |= DIFF_FILLER;
 	}
-	else if (STRNCMP(p, "anchor", 6) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "anchor", 6) == 0)
 	{
 	    p += 6;
 	    diff_flags_new |= DIFF_ANCHOR;
 	}
-	else if (STRNCMP(p, "context:", 8) == 0 && VIM_ISDIGIT(p[8]))
+	లేకపోతే ఒకవేళ (STRNCMP(p, "context:", 8) == 0 && VIM_ISDIGIT(p[8]))
 	{
 	    p += 8;
 	    diff_context_new = getdigits(&p);
 	}
-	else if (STRNCMP(p, "iblank", 6) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "iblank", 6) == 0)
 	{
 	    p += 6;
 	    diff_flags_new |= DIFF_IBLANK;
 	}
-	else if (STRNCMP(p, "icase", 5) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "icase", 5) == 0)
 	{
 	    p += 5;
 	    diff_flags_new |= DIFF_ICASE;
 	}
-	else if (STRNCMP(p, "iwhiteall", 9) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "iwhiteall", 9) == 0)
 	{
 	    p += 9;
 	    diff_flags_new |= DIFF_IWHITEALL;
 	}
-	else if (STRNCMP(p, "iwhiteeol", 9) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "iwhiteeol", 9) == 0)
 	{
 	    p += 9;
 	    diff_flags_new |= DIFF_IWHITEEOL;
 	}
-	else if (STRNCMP(p, "iwhite", 6) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "iwhite", 6) == 0)
 	{
 	    p += 6;
 	    diff_flags_new |= DIFF_IWHITE;
 	}
-	else if (STRNCMP(p, "horizontal", 10) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "horizontal", 10) == 0)
 	{
 	    p += 10;
 	    diff_flags_new |= DIFF_HORIZONTAL;
 	}
-	else if (STRNCMP(p, "vertical", 8) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "vertical", 8) == 0)
 	{
 	    p += 8;
 	    diff_flags_new |= DIFF_VERTICAL;
 	}
-	else if (STRNCMP(p, "foldcolumn:", 11) == 0 && VIM_ISDIGIT(p[11]))
+	లేకపోతే ఒకవేళ (STRNCMP(p, "foldcolumn:", 11) == 0 && VIM_ISDIGIT(p[11]))
 	{
 	    p += 11;
 	    diff_foldcolumn_new = getdigits(&p);
 	}
-	else if (STRNCMP(p, "hiddenoff", 9) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "hiddenoff", 9) == 0)
 	{
 	    p += 9;
 	    diff_flags_new |= DIFF_HIDDEN_OFF;
 	}
-	else if (STRNCMP(p, "closeoff", 8) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "closeoff", 8) == 0)
 	{
 	    p += 8;
 	    diff_flags_new |= DIFF_CLOSE_OFF;
 	}
-	else if (STRNCMP(p, "followwrap", 10) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "followwrap", 10) == 0)
 	{
 	    p += 10;
 	    diff_flags_new |= DIFF_FOLLOWWRAP;
 	}
-	else if (STRNCMP(p, "indent-heuristic", 16) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "indent-heuristic", 16) == 0)
 	{
 	    p += 16;
 	    diff_indent_heuristic = XDF_INDENT_HEURISTIC;
 	}
-	else if (STRNCMP(p, "internal", 8) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "internal", 8) == 0)
 	{
 	    p += 8;
-	    diff_flags_new |= DIFF_INTERNAL;
+	    diff_flags_new |= DIFF_అంతర్గత;
 	}
-	else if (STRNCMP(p, "algorithm:", 10) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "algorithm:", 10) == 0)
 	{
 	    // Note: Keep this in sync with p_dip_algorithm_values.
 	    p += 10;
-	    if (STRNCMP(p, "myers", 5) == 0)
+	    ఒకవేళ (STRNCMP(p, "myers", 5) == 0)
 	    {
 		p += 5;
 		diff_algorithm_new = 0;
 	    }
-	    else if (STRNCMP(p, "minimal", 7) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "minimal", 7) == 0)
 	    {
 		p += 7;
-		diff_algorithm_new = XDF_NEED_MINIMAL;
+		diff_algorithm_new = XDF_NEED_కనీస;
 	    }
-	    else if (STRNCMP(p, "patience", 8) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "patience", 8) == 0)
 	    {
 		p += 8;
 		diff_algorithm_new = XDF_PATIENCE_DIFF;
 	    }
-	    else if (STRNCMP(p, "histogram", 9) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "histogram", 9) == 0)
 	    {
 		p += 9;
 		diff_algorithm_new = XDF_HISTOGRAM_DIFF;
 	    }
-	    else
-		return FAIL;
+	    లేకపోతే
+		తిరిగి FAIL;
 	}
-	else if (STRNCMP(p, "inline:", 7) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "inline:", 7) == 0)
 	{
 	    // Note: Keep this in sync with p_dip_inline_values.
 	    p += 7;
-	    if (STRNCMP(p, "none", 4) == 0)
+	    ఒకవేళ (STRNCMP(p, "none", 4) == 0)
 	    {
 		p += 4;
 		diff_flags_new &= ~(ALL_INLINE);
 		diff_flags_new |= DIFF_INLINE_NONE;
 	    }
-	    else if (STRNCMP(p, "simple", 6) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "simple", 6) == 0)
 	    {
 		p += 6;
 		diff_flags_new &= ~(ALL_INLINE);
 		diff_flags_new |= DIFF_INLINE_SIMPLE;
 	    }
-	    else if (STRNCMP(p, "char", 4) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "char", 4) == 0)
 	    {
 		p += 4;
 		diff_flags_new &= ~(ALL_INLINE);
 		diff_flags_new |= DIFF_INLINE_CHAR;
 	    }
-	    else if (STRNCMP(p, "word", 4) == 0)
+	    లేకపోతే ఒకవేళ (STRNCMP(p, "word", 4) == 0)
 	    {
 		p += 4;
 		diff_flags_new &= ~(ALL_INLINE);
-		diff_flags_new |= DIFF_INLINE_WORD;
+		diff_flags_new |= DIFF_INLINE_మాట;
 	    }
-	    else
-		return FAIL;
+	    లేకపోతే
+		తిరిగి FAIL;
 	}
-	else if (STRNCMP(p, "linematch:", 10) == 0 && VIM_ISDIGIT(p[10]))
+	లేకపోతే ఒకవేళ (STRNCMP(p, "linematch:", 10) == 0 && VIM_ISDIGIT(p[10]))
 	{
 	    p += 10;
-	    linematch_lines_new = getdigits(&p);
+	    linematch_పంక్తులు_new = getdigits(&p);
 	    diff_flags_new |= DIFF_LINEMATCH;
 
 	    // linematch does not make sense without filler set
 	    diff_flags_new |= DIFF_FILLER;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ఒకవేళ (*p != ',' && *p != NUL)
+	    తిరిగి FAIL;
+	ఒకవేళ (*p == ',')
 	    ++p;
     }
 
     diff_algorithm_new |= diff_indent_heuristic;
 
     // Can't have both "horizontal" and "vertical".
-    if ((diff_flags_new & DIFF_HORIZONTAL) && (diff_flags_new & DIFF_VERTICAL))
-	return FAIL;
+    ఒకవేళ ((diff_flags_new & DIFF_HORIZONTAL) && (diff_flags_new & DIFF_VERTICAL))
+	తిరిగి FAIL;
 
     // If flags were added or removed, or the algorithm was changed, need to
     // update the diff.
-    if (diff_flags != diff_flags_new || diff_algorithm != diff_algorithm_new)
+    ఒకవేళ (diff_flags != diff_flags_new || diff_algorithm != diff_algorithm_new)
 	FOR_ALL_TABPAGES(tp)
 	    tp->tp_diff_invalid = TRUE;
 
     diff_flags = diff_flags_new;
     diff_context = diff_context_new == 0 ? 1 : diff_context_new;
-    linematch_lines = linematch_lines_new;
+    linematch_పంక్తులు = linematch_పంక్తులు_new;
     diff_foldcolumn = diff_foldcolumn_new;
     diff_algorithm = diff_algorithm_new;
 
@@ -3127,110 +3127,110 @@ diffopt_changed(void)
     // remove or add filler lines
     check_scrollbind((linenr_T)0, 0L);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE if 'diffopt' contains "horizontal".
  */
-    int
-diffopt_horizontal(void)
+    పూర్ణాంకం
+diffopt_horizontal(శూన్య)
 {
-    return (diff_flags & DIFF_HORIZONTAL) != 0;
+    తిరిగి (diff_flags & DIFF_HORIZONTAL) != 0;
 }
 
 /*
  * Return TRUE if 'diffopt' contains "hiddenoff".
  */
-    int
-diffopt_hiddenoff(void)
+    పూర్ణాంకం
+diffopt_hiddenoff(శూన్య)
 {
-    return (diff_flags & DIFF_HIDDEN_OFF) != 0;
+    తిరిగి (diff_flags & DIFF_HIDDEN_OFF) != 0;
 }
 
 /*
  * Return TRUE if 'diffopt' contains "closeoff".
  */
-    int
-diffopt_closeoff(void)
+    పూర్ణాంకం
+diffopt_closeoff(శూన్య)
 {
-    return (diff_flags & DIFF_CLOSE_OFF) != 0;
+    తిరిగి (diff_flags & DIFF_CLOSE_OFF) != 0;
 }
 
 /*
  * Called when a line has been updated. Used for updating inline diff in Insert
  * mode without waiting for global diff update later.
  */
-    void
-diff_update_line(linenr_T lnum)
+    శూన్య
+diff_update_పంక్తి(linenr_T lnum)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
     diff_T	*dp;
 
-    if (!(diff_flags & ALL_INLINE_DIFF))
+    ఒకవేళ (!(diff_flags & ALL_INLINE_DIFF))
 	// We only care if we are doing inline-diff where we cache the diff results
-	return;
+	తిరిగి;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT)
-	return;
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
-	    break;
+    ఒకవేళ (idx == DB_లెక్క)
+	తిరిగి;
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
+	ఒకవేళ (lnum <= dp->df_lnum[idx] + dp->df_లెక్క[idx])
+	    ఆపు;
 
     // clear the inline change cache as it's invalid
-    if (dp != NULL)
+    ఒకవేళ (dp != ఖాళీ)
     {
 	dp->has_changes = FALSE;
 	dp->df_changes.ga_len = 0;
     }
 }
 
-static diffline_change_T simple_diffline_change; // used for simple inline diff algorithm
+స్థిర diffline_change_T simple_diffline_change; // used for simple inline diff algorithm
 
 /*
  * Parse a diffline struct and returns the [start,end] byte offsets
  *
  * Returns TRUE if this change was added, no other buffer has it.
  */
-    int
+    పూర్ణాంకం
 diff_change_parse(
     diffline_T *diffline,
     diffline_change_T *change,
-    int *change_start,
-    int *change_end)
+    పూర్ణాంకం *change_ప్రారంభం,
+    పూర్ణాంకం *change_చివర)
 {
-    if (change->dc_start_lnum_off[diffline->bufidx] < diffline->lineoff)
-	*change_start = 0;
-    else
-	*change_start = change->dc_start[diffline->bufidx];
-    if (change->dc_end_lnum_off[diffline->bufidx] > diffline->lineoff)
-	*change_end = INT_MAX;
-    else
-	*change_end = change->dc_end[diffline->bufidx];
+    ఒకవేళ (change->dc_ప్రారంభం_lnum_off[diffline->bufidx] < diffline->lineoff)
+	*change_ప్రారంభం = 0;
+    లేకపోతే
+	*change_ప్రారంభం = change->dc_ప్రారంభం[diffline->bufidx];
+    ఒకవేళ (change->dc_చివర_lnum_off[diffline->bufidx] > diffline->lineoff)
+	*change_చివర = గరిష్ఠ_పూర్ణాంకం;
+    లేకపోతే
+	*change_చివర = change->dc_చివర[diffline->bufidx];
 
-    if (change == &simple_diffline_change)
+    ఒకవేళ (change == &simple_diffline_change)
     {
 	// This is what we returned from simple inline diff. We always consider
 	// the range to be changed, rather than added for now.
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // Find out whether this is an addition. Note that for multi buffer diff,
     // to tell whether lines are additions we check whether all the other diff
     // lines are identical (in diff_check_with_linestatus). If so, we mark them
     // as add. We don't do that for inline diff here for simplicity.
-    for (int i = 0; i < DB_COUNT; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
     {
-	if (i == diffline->bufidx)
-	    continue;
-	if (change->dc_start[i] != change->dc_end[i]
-		|| change->dc_end_lnum_off[i] != change->dc_start_lnum_off[i])
+	ఒకవేళ (i == diffline->bufidx)
+	    కొనసాగు;
+	ఒకవేళ (change->dc_ప్రారంభం[i] != change->dc_చివర[i]
+		|| change->dc_చివర_lnum_off[i] != change->dc_ప్రారంభం_lnum_off[i])
 	{
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3243,139 +3243,139 @@ diff_change_parse(
  *
  * Returns TRUE if the line was added, no other buffer has it.
  */
-    static int
-diff_find_change_simple(
+    స్థిర పూర్ణాంకం
+diff_కనుగొను_change_simple(
     win_T	*wp,
     linenr_T	lnum,
     diff_T	*dp,
-    int		idx,
-    int		*startp,	// first char of the change
-    int		*endp)		// last char of the change
+    పూర్ణాంకం		idx,
+    పూర్ణాంకం		*startp,	// first char of the change
+    పూర్ణాంకం		*endp)		// last char of the change
 {
-    char_u	*line_org;
-    char_u	*line_new;
-    int		i;
-    int		si_org, si_new;
-    int		ei_org, ei_new;
-    int		off;
-    int		added = TRUE;
+    char_u	*పంక్తి_org;
+    char_u	*పంక్తి_new;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		si_org, si_new;
+    పూర్ణాంకం		ei_org, ei_new;
+    పూర్ణాంకం		off;
+    పూర్ణాంకం		added = TRUE;
     char_u	*p1, *p2;
-    int		l;
+    పూర్ణాంకం		l;
 
-    if (diff_flags & DIFF_INLINE_NONE)
+    ఒకవేళ (diff_flags & DIFF_INLINE_NONE)
     {
 	// We only care about the return value, not the actual string comparisons.
-	line_org = NULL;
+	పంక్తి_org = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
 	// Make a copy of the line, the next ml_get() will invalidate it.
-	line_org = vim_strsave(ml_get_buf(wp->w_buffer, lnum, FALSE));
-	if (line_org == NULL)
-	    return FALSE;
+	పంక్తి_org = vim_strsave(ml_get_buf(wp->w_బఫరు, lnum, FALSE));
+	ఒకవేళ (పంక్తి_org == ఖాళీ)
+	    తిరిగి FALSE;
     }
 
     off = lnum - dp->df_lnum[idx];
 
-    for (i = 0; i < DB_COUNT; ++i)
-	if (curtab->tp_diffbuf[i] != NULL && i != idx)
+    కొరకు (i = 0; i < DB_లెక్క; ++i)
+	ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ && i != idx)
 	{
 	    // Skip lines that are not in the other change (filler lines).
-	    if (off >= dp->df_count[i])
-		continue;
+	    ఒకవేళ (off >= dp->df_లెక్క[i])
+		కొనసాగు;
 	    added = FALSE;
-	    if (diff_flags & DIFF_INLINE_NONE)
-		break; // early terminate as we only care about the return value
+	    ఒకవేళ (diff_flags & DIFF_INLINE_NONE)
+		ఆపు; // early terminate as we only care about the return value
 
-	    line_new = ml_get_buf(curtab->tp_diffbuf[i],
+	    పంక్తి_new = ml_get_buf(curtab->tp_diffbuf[i],
 						 dp->df_lnum[i] + off, FALSE);
 
 	    // Search for start of difference
 	    si_org = si_new = 0;
-	    while (line_org[si_org] != NUL)
+	    అయితే (పంక్తి_org[si_org] != NUL)
 	    {
-		if (((diff_flags & DIFF_IWHITE)
-			    && VIM_ISWHITE(line_org[si_org])
-					      && VIM_ISWHITE(line_new[si_new]))
+		ఒకవేళ (((diff_flags & DIFF_IWHITE)
+			    && VIM_ISWHITE(పంక్తి_org[si_org])
+					      && VIM_ISWHITE(పంక్తి_new[si_new]))
 			|| ((diff_flags & DIFF_IWHITEALL)
-			    && (VIM_ISWHITE(line_org[si_org])
-					    || VIM_ISWHITE(line_new[si_new]))))
+			    && (VIM_ISWHITE(పంక్తి_org[si_org])
+					    || VIM_ISWHITE(పంక్తి_new[si_new]))))
 		{
-		    si_org = (int)(skipwhite(line_org + si_org) - line_org);
-		    si_new = (int)(skipwhite(line_new + si_new) - line_new);
+		    si_org = (పూర్ణాంకం)(skipwhite(పంక్తి_org + si_org) - పంక్తి_org);
+		    si_new = (పూర్ణాంకం)(skipwhite(పంక్తి_new + si_new) - పంక్తి_new);
 		}
-		else
+		లేకపోతే
 		{
-		    if (!diff_equal_char(line_org + si_org, line_new + si_new,
+		    ఒకవేళ (!diff_equal_char(పంక్తి_org + si_org, పంక్తి_new + si_new,
 									   &l))
-			break;
+			ఆపు;
 		    si_org += l;
 		    si_new += l;
 		}
 	    }
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		// Move back to first byte of character in both lines (may
 		// have "nn^" in line_org and "n^ in line_new).
-		si_org -= (*mb_head_off)(line_org, line_org + si_org);
-		si_new -= (*mb_head_off)(line_new, line_new + si_new);
+		si_org -= (*mb_తల_off)(పంక్తి_org, పంక్తి_org + si_org);
+		si_new -= (*mb_తల_off)(పంక్తి_new, పంక్తి_new + si_new);
 	    }
-	    if (*startp > si_org)
+	    ఒకవేళ (*startp > si_org)
 		*startp = si_org;
 
 	    // Search for end of difference, if any.
-	    if (line_org[si_org] != NUL || line_new[si_new] != NUL)
+	    ఒకవేళ (పంక్తి_org[si_org] != NUL || పంక్తి_new[si_new] != NUL)
 	    {
-		ei_org = (int)STRLEN(line_org);
-		ei_new = (int)STRLEN(line_new);
-		while (ei_org >= *startp && ei_new >= si_new
+		ei_org = (పూర్ణాంకం)STRLEN(పంక్తి_org);
+		ei_new = (పూర్ణాంకం)STRLEN(పంక్తి_new);
+		అయితే (ei_org >= *startp && ei_new >= si_new
 						&& ei_org >= 0 && ei_new >= 0)
 		{
-		    if (((diff_flags & DIFF_IWHITE)
-				&& VIM_ISWHITE(line_org[ei_org])
-					      && VIM_ISWHITE(line_new[ei_new]))
+		    ఒకవేళ (((diff_flags & DIFF_IWHITE)
+				&& VIM_ISWHITE(పంక్తి_org[ei_org])
+					      && VIM_ISWHITE(పంక్తి_new[ei_new]))
 			    || ((diff_flags & DIFF_IWHITEALL)
-				&& (VIM_ISWHITE(line_org[ei_org])
-					    || VIM_ISWHITE(line_new[ei_new]))))
+				&& (VIM_ISWHITE(పంక్తి_org[ei_org])
+					    || VIM_ISWHITE(పంక్తి_new[ei_new]))))
 		    {
-			while (ei_org >= *startp
-					     && VIM_ISWHITE(line_org[ei_org]))
+			అయితే (ei_org >= *startp
+					     && VIM_ISWHITE(పంక్తి_org[ei_org]))
 			    --ei_org;
-			while (ei_new >= si_new
-					     && VIM_ISWHITE(line_new[ei_new]))
+			అయితే (ei_new >= si_new
+					     && VIM_ISWHITE(పంక్తి_new[ei_new]))
 			    --ei_new;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			p1 = line_org + ei_org;
-			p2 = line_new + ei_new;
-			p1 -= (*mb_head_off)(line_org, p1);
-			p2 -= (*mb_head_off)(line_new, p2);
-			if (!diff_equal_char(p1, p2, &l))
-			    break;
+			p1 = పంక్తి_org + ei_org;
+			p2 = పంక్తి_new + ei_new;
+			p1 -= (*mb_తల_off)(పంక్తి_org, p1);
+			p2 -= (*mb_తల_off)(పంక్తి_new, p2);
+			ఒకవేళ (!diff_equal_char(p1, p2, &l))
+			    ఆపు;
 			ei_org -= l;
 			ei_new -= l;
 		    }
 		}
-		if (*endp < ei_org)
+		ఒకవేళ (*endp < ei_org)
 		    *endp = ei_org;
 	    }
 	}
 
-    vim_free(line_org);
-    return added;
+    vim_free(పంక్తి_org);
+    తిరిగి added;
 }
 
 /*
  * Mapping used for mapping from temporary mmfile created for inline diff back
  * to original buffer's line/col.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    long byte_start;
-    long num_bytes;
-    int lineoff;
-} linemap_entry_T;
+    దీర్ఘ byte_ప్రారంభం;
+    దీర్ఘ అంకె_బైట్లు;
+    పూర్ణాంకం lineoff;
+} linemap_నమోదు_T;
 
 /*
  * Refine inline character-wise diff blocks to create a more human readable
@@ -3385,200 +3385,200 @@ typedef struct
  * by a couple characters.
  * These are done by heuristics and can be further tuned.
  */
-    static void
-diff_refine_inline_char_highlight(diff_T *dp_orig, garray_T *linemap, int idx1)
+    స్థిర శూన్య
+diff_refine_inline_char_highlight(diff_T *dp_orig, garray_T *linemap, పూర్ణాంకం idx1)
 {
     // Perform multiple passes so that newly merged blocks will now be long
     // enough which may cause other previously unmerged gaps to be merged as
     // well.
-    int pass = 1;
-    do
+    పూర్ణాంకం pass = 1;
+    చేయి
     {
-	int has_unmerged_gaps = FALSE;
-	int has_merged_gaps = FALSE;
+	పూర్ణాంకం has_unmerged_gaps = FALSE;
+	పూర్ణాంకం has_merged_gaps = FALSE;
 	diff_T *dp = dp_orig;
-	while (dp!= NULL && dp->df_next != NULL)
+	అయితే (dp!= ఖాళీ && dp->df_తదుపరి != ఖాళీ)
 	{
 	    // Only use first buffer to calculate the gap because the gap is
 	    // unchanged text, which would be the same in all buffers.
-	    if (dp->df_lnum[idx1] + dp->df_count[idx1] - 1 >= linemap[idx1].ga_len
-		    || dp->df_next->df_lnum[idx1] - 1 >= linemap[idx1].ga_len)
+	    ఒకవేళ (dp->df_lnum[idx1] + dp->df_లెక్క[idx1] - 1 >= linemap[idx1].ga_len
+		    || dp->df_తదుపరి->df_lnum[idx1] - 1 >= linemap[idx1].ga_len)
 	    {
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
 	    // If the gap occurs over different lines, don't consider it
-	    linemap_entry_T *entry1 = &((linemap_entry_T*)linemap[idx1].ga_data)[dp->df_lnum[idx1] + dp->df_count[idx1] - 1];
-	    linemap_entry_T *entry2 = &((linemap_entry_T*)linemap[idx1].ga_data)[dp->df_next->df_lnum[idx1] - 1];
-	    if (entry1->lineoff != entry2->lineoff)
+	    linemap_నమోదు_T *entry1 = &((linemap_నమోదు_T*)linemap[idx1].ga_దత్తాంశం)[dp->df_lnum[idx1] + dp->df_లెక్క[idx1] - 1];
+	    linemap_నమోదు_T *entry2 = &((linemap_నమోదు_T*)linemap[idx1].ga_దత్తాంశం)[dp->df_తదుపరి->df_lnum[idx1] - 1];
+	    ఒకవేళ (entry1->lineoff != entry2->lineoff)
 	    {
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
-	    linenr_T gap = dp->df_next->df_lnum[idx1] - (dp->df_lnum[idx1] + dp->df_count[idx1]);
-	    if (gap <= 3)
+	    linenr_T gap = dp->df_తదుపరి->df_lnum[idx1] - (dp->df_lnum[idx1] + dp->df_లెక్క[idx1]);
+	    ఒకవేళ (gap <= 3)
 	    {
-		linenr_T max_df_count = 0;
-		for (int i = 0; i < DB_COUNT; i++)
-		    max_df_count = MAX(max_df_count, dp->df_count[i] + dp->df_next->df_count[i]);
+		linenr_T max_df_లెక్క = 0;
+		కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
+		    max_df_లెక్క = MAX(max_df_లెక్క, dp->df_లెక్క[i] + dp->df_తదుపరి->df_లెక్క[i]);
 
-		if (max_df_count >= gap * 4)
+		ఒకవేళ (max_df_లెక్క >= gap * 4)
 		{
 		    // Merge current block with the next one. Don't advance the
 		    // pointer so we try the same merged block against the next
 		    // one.
-		    for (int i = 0; i < DB_COUNT; i++)
+		    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 		    {
-			dp->df_count[i] = dp->df_next->df_lnum[i]
-			    + dp->df_next->df_count[i] - dp->df_lnum[i];
+			dp->df_లెక్క[i] = dp->df_తదుపరి->df_lnum[i]
+			    + dp->df_తదుపరి->df_లెక్క[i] - dp->df_lnum[i];
 		    }
-		    diff_T *dp_next = dp->df_next;
-		    dp->df_next = dp_next->df_next;
-		    clear_diffblock(dp_next);
+		    diff_T *dp_తదుపరి = dp->df_తదుపరి;
+		    dp->df_తదుపరి = dp_తదుపరి->df_తదుపరి;
+		    clear_diffblock(dp_తదుపరి);
 		    has_merged_gaps = TRUE;
-		    continue;
+		    కొనసాగు;
 		}
-		else
+		లేకపోతే
 		    has_unmerged_gaps = TRUE;
 	    }
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	}
-	if (!has_unmerged_gaps || !has_merged_gaps)
-	    break;
-    } while (pass++ < 4); // use limited number of passes to avoid excessive looping
+	ఒకవేళ (!has_unmerged_gaps || !has_merged_gaps)
+	    ఆపు;
+    } అయితే (pass++ < 4); // use limited number of passes to avoid excessive looping
 }
 
 /*
  * Refine inline word diff blocks by merging blocks that are only separated
  * by whitespace or punctuation. This creates more coherent highlighting.
  */
-    static void
-diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
-				  linenr_T start_lnum)
+    స్థిర శూన్య
+diff_refine_inline_మాట_highlight(diff_T *dp_orig, garray_T *linemap, పూర్ణాంకం idx1,
+				  linenr_T ప్రారంభం_lnum)
 {
-    int pass = 1;
-    do
+    పూర్ణాంకం pass = 1;
+    చేయి
     {
 	diff_T *dp = dp_orig;
 
-	while (dp != NULL && dp->df_next != NULL)
+	అయితే (dp != ఖాళీ && dp->df_తదుపరి != ఖాళీ)
 	{
 	    // Index of the last line of this block and of the first line of the
 	    // next one.  When this block is empty, which happens for inserted
 	    // lines, it has no last line and "idx_entry1" is negative.
-	    linenr_T	idx_entry1 = dp->df_lnum[idx1] + dp->df_count[idx1] - 2;
-	    linenr_T	idx_entry2 = dp->df_next->df_lnum[idx1] - 1;
+	    linenr_T	idx_entry1 = dp->df_lnum[idx1] + dp->df_లెక్క[idx1] - 2;
+	    linenr_T	idx_entry2 = dp->df_తదుపరి->df_lnum[idx1] - 1;
 
 	    // Only merge blocks on the same line
-	    if (idx_entry1 < 0 || idx_entry1 >= linemap[idx1].ga_len
+	    ఒకవేళ (idx_entry1 < 0 || idx_entry1 >= linemap[idx1].ga_len
 		    || idx_entry2 < 0 || idx_entry2 >= linemap[idx1].ga_len)
 	    {
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
-	    linemap_entry_T *entry1 =
-		&((linemap_entry_T *)linemap[idx1].ga_data)[idx_entry1];
-	    linemap_entry_T *entry2 =
-		&((linemap_entry_T *)linemap[idx1].ga_data)[idx_entry2];
+	    linemap_నమోదు_T *entry1 =
+		&((linemap_నమోదు_T *)linemap[idx1].ga_దత్తాంశం)[idx_entry1];
+	    linemap_నమోదు_T *entry2 =
+		&((linemap_నమోదు_T *)linemap[idx1].ga_దత్తాంశం)[idx_entry2];
 
 	    // Skip if blocks are on different lines
-	    if (entry1->lineoff != entry2->lineoff)
+	    ఒకవేళ (entry1->lineoff != entry2->lineoff)
 	    {
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
 	    // Calculate the gap between blocks
-	    int gap_start = entry1->byte_start + entry1->num_bytes;
-	    int gap_end = entry2->byte_start;
-	    int gap_size = gap_end - gap_start;
+	    పూర్ణాంకం gap_ప్రారంభం = entry1->byte_ప్రారంభం + entry1->అంకె_బైట్లు;
+	    పూర్ణాంకం gap_చివర = entry2->byte_ప్రారంభం;
+	    పూర్ణాంకం gap_కొలత = gap_చివర - gap_ప్రారంభం;
 
 	    // Merge adjacent diff blocks separated by small gaps to reduce visual
 	    // fragmentation. Gap threshold is set to 5 bytes which handles most
 	    // common separators (spaces, punctuation, short variable names) while
 	    // still preserving visually distinct changes.
-	    if (gap_size <= 0 || gap_size > diff_word_gap)
+	    ఒకవేళ (gap_కొలత <= 0 || gap_కొలత > diff_మాట_gap)
 	    {
-		dp = dp->df_next;
-		continue;
+		dp = dp->df_తదుపరి;
+		కొనసాగు;
 	    }
 
 	    // Get the text between the two blocks
-	    char_u *line = ml_get_buf(curtab->tp_diffbuf[idx1],
-		    start_lnum + entry1->lineoff, FALSE);
-	    char_u *gap_text = line + gap_start;
+	    char_u *పంక్తి = ml_get_buf(curtab->tp_diffbuf[idx1],
+		    ప్రారంభం_lnum + entry1->lineoff, FALSE);
+	    char_u *gap_పాఠ్యం = పంక్తి + gap_ప్రారంభం;
 
 	    // Check if gap contains only whitespace and/or punctuation
-	    bool only_non_word = true;
+	    bool only_non_మాట = true;
 	    bool has_content = false;
 
-	    for (int i = 0; i < gap_size && gap_text[i] != NUL; i++)
+	    కొరకు (పూర్ణాంకం i = 0; i < gap_కొలత && gap_పాఠ్యం[i] != NUL; i++)
 	    {
 		has_content = true;
-		int char_class = mb_get_class_buf(gap_text + i,
+		పూర్ణాంకం char_class = mb_get_class_buf(gap_పాఠ్యం + i,
 				curtab->tp_diffbuf[idx1]);
 		// class 2 is word characters, if we find any, don't merge
-		if (char_class == 2)
+		ఒకవేళ (char_class == 2)
 		{
-		    only_non_word = false;
-		    break;
+		    only_non_మాట = false;
+		    ఆపు;
 		}
 	    }
 
 	    // Merge if the gap is small and contains only non-word characters
-	    if (has_content && only_non_word)
+	    ఒకవేళ (has_content && only_non_మాట)
 	    {
-		long total_change_bytes = 0;
-		for (int i = 0; i < DB_COUNT; i++)
+		దీర్ఘ మొత్తం_change_బైట్లు = 0;
+		కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 		{
-		    if (curtab->tp_diffbuf[i] != NULL)
+		    ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 		    {
 			// count bytes in the first block
-			for (int k = 0; k < dp->df_count[i]; k++)
+			కొరకు (పూర్ణాంకం k = 0; k < dp->df_లెక్క[i]; k++)
 			{
-			    int idx = dp->df_lnum[i] + k - 1;
-			    if (idx < linemap[i].ga_len)
-				total_change_bytes +=
-				    ((linemap_entry_T *)linemap[i].ga_data)[idx].num_bytes;
+			    పూర్ణాంకం idx = dp->df_lnum[i] + k - 1;
+			    ఒకవేళ (idx < linemap[i].ga_len)
+				మొత్తం_change_బైట్లు +=
+				    ((linemap_నమోదు_T *)linemap[i].ga_దత్తాంశం)[idx].అంకె_బైట్లు;
 			}
 			// count bytes in the next block
-			for (int k = 0; k < dp->df_next->df_count[i]; k++)
+			కొరకు (పూర్ణాంకం k = 0; k < dp->df_తదుపరి->df_లెక్క[i]; k++)
 			{
-			    int idx = dp->df_next->df_lnum[i] + k - 1;
-			    if (idx < linemap[i].ga_len)
-				total_change_bytes +=
-				    ((linemap_entry_T *)linemap[i].ga_data)[idx].num_bytes;
+			    పూర్ణాంకం idx = dp->df_తదుపరి->df_lnum[i] + k - 1;
+			    ఒకవేళ (idx < linemap[i].ga_len)
+				మొత్తం_change_బైట్లు +=
+				    ((linemap_నమోదు_T *)linemap[i].ga_దత్తాంశం)[idx].అంకె_బైట్లు;
 			}
 		    }
 		}
 
-		if (total_change_bytes >= gap_size * 2)
+		ఒకవేళ (మొత్తం_change_బైట్లు >= gap_కొలత * 2)
 		{
 		    // Merge the blocks by extending the first block to include the next
-		    for (int i = 0; i < DB_COUNT; i++)
+		    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 		    {
-			if (curtab->tp_diffbuf[i] != NULL)
+			ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 			{
-			    dp->df_count[i] = dp->df_next->df_lnum[i]
-				+ dp->df_next->df_count[i] - dp->df_lnum[i];
+			    dp->df_లెక్క[i] = dp->df_తదుపరి->df_lnum[i]
+				+ dp->df_తదుపరి->df_లెక్క[i] - dp->df_lnum[i];
 			}
 		    }
 
-		    diff_T *dp_next = dp->df_next;
-		    dp->df_next = dp_next->df_next;
-		    clear_diffblock(dp_next);
+		    diff_T *dp_తదుపరి = dp->df_తదుపరి;
+		    dp->df_తదుపరి = dp_తదుపరి->df_తదుపరి;
+		    clear_diffblock(dp_తదుపరి);
 
 		    // Don't advance dp, check if can merge with the next block too
-		    continue;
+		    కొనసాగు;
 		}
 	    }
 
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	}
-    } while (pass++ < 4);  // use limited number of passes to avoid excessive looping
+    } అయితే (pass++ < 4);  // use limited number of passes to avoid excessive looping
 }
 
 /*
@@ -3587,36 +3587,36 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
  * use internal xdiff to calculate the per-character/word diff.  The result is
  * stored in dp instead of returned by the function.
  */
-    static void
-diff_find_change_inline_diff(
+    స్థిర శూన్య
+diff_కనుగొను_change_inline_diff(
     diff_T	*dp)
 {
     diffio_T	dio;
-    garray_T	linemap[DB_COUNT];
+    garray_T	linemap[DB_లెక్క];
     garray_T	file1_str;
     garray_T	file2_str;
-    int		file1_idx = -1;
+    పూర్ణాంకం		file1_idx = -1;
 
-    long	save_diff_algorithm = diff_algorithm;
+    దీర్ఘ	save_diff_algorithm = diff_algorithm;
 
-    CLEAR_FIELD(dio);
-    ga_init2(&dio.dio_diff.dout_ga, sizeof(char *), 1000);
+    CLEAR_క్షేత్రం(dio);
+    ga_init2(&dio.dio_diff.dout_ga, పరిమాణం(అక్షరం *), 1000);
 
     // inline diff only supports internal algo
-    dio.dio_internal = TRUE;
+    dio.dio_అంతర్గత = TRUE;
 
     // always use indent-heuristics to slide diff splits along
     // whitespace
     diff_algorithm |= XDF_INDENT_HEURISTIC;
 
     // diff_read() has an implicit dependency on curtab->tp_first_diff
-    diff_T	*orig_diff = curtab->tp_first_diff;
-    curtab->tp_first_diff = NULL;
+    diff_T	*orig_diff = curtab->tp_మొదటి_diff;
+    curtab->tp_మొదటి_diff = ఖాళీ;
 
     // diff_read() also uses curtab->tp_diffbuf to determine what's an active
-    // buffer
-    buf_T	*(orig_diffbuf[DB_COUNT]);
-    memcpy(orig_diffbuf, curtab->tp_diffbuf, sizeof(orig_diffbuf));
+    //బఫరు
+    buf_T	*(orig_diffbuf[DB_లెక్క]);
+    జ్ఞాపకం_నకలు(orig_diffbuf, curtab->tp_diffbuf, పరిమాణం(orig_diffbuf));
 
     // Buffers to populate mmfile 1/2 that would be passed to xdiff as memory
     // files. Use a grow array as it is not obvious how much exact space we
@@ -3627,26 +3627,26 @@ diff_find_change_inline_diff(
     // Line map to map from generated mmfiles' line numbers back to original
     // diff blocks' locations. Need this even for char diff because not all
     // characters are 1-byte long / ASCII.
-    for (int i = 0; i < DB_COUNT; i++)
-	ga_init2(&linemap[i], sizeof(linemap_entry_T), 128);
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
+	ga_init2(&linemap[i], పరిమాణం(linemap_నమోదు_T), 128);
 
-    for (int i = 0; i < DB_COUNT; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
     {
 	dio.dio_diff.dout_ga.ga_len = 0;
 
 	buf_T *buf = curtab->tp_diffbuf[i];
-	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	    continue; // skip buffer that isn't loaded
+	ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
+	    కొనసాగు; // skip buffer that isn't loaded
 
-	if (dp->df_count[i] == 0)
+	ఒకవేళ (dp->df_లెక్క[i] == 0)
 	{
 	    // skip buffers that don't have any texts in this block so we don't
 	    // end up marking the entire block as modified in multi-buffer diff
-	    curtab->tp_diffbuf[i] = NULL;
-	    continue;
+	    curtab->tp_diffbuf[i] = ఖాళీ;
+	    కొనసాగు;
 	}
 
-	if (file1_idx == -1)
+	ఒకవేళ (file1_idx == -1)
 	    file1_idx = i;
 
 	garray_T	*curstr = (file1_idx != i) ? &file2_str : &file1_str;
@@ -3656,24 +3656,24 @@ diff_find_change_inline_diff(
 
 	// Split each line into chars/words and populate fake file buffer as
 	// newline-delimited tokens as that's what xdiff requires.
-	for (int off = 0; off < dp->df_count[i]; off++)
+	కొరకు (పూర్ణాంకం off = 0; off < dp->df_లెక్క[i]; off++)
 	{
 	    char_u *curline = ml_get_buf(curtab->tp_diffbuf[i],
 		    dp->df_lnum[i] + off, FALSE);
 
-	    int in_keyword = FALSE;
+	    పూర్ణాంకం లోపల_keyword = FALSE;
 
 	    // iwhiteeol support vars
-	    int last_white = FALSE;
-	    int eol_ga_len = -1;
-	    int eol_linemap_len = -1;
-	    int eol_numlines = -1;
+	    పూర్ణాంకం చివరి_white = FALSE;
+	    పూర్ణాంకం eol_ga_len = -1;
+	    పూర్ణాంకం eol_linemap_len = -1;
+	    పూర్ణాంకం eol_numlines = -1;
 
 	    char_u *s;
-	    for (s = curline; *s != NUL;)
+	    కొరకు (s = curline; *s != NUL;)
 	    {
-		int new_in_keyword = FALSE;
-		if (diff_flags & DIFF_INLINE_WORD)
+		పూర్ణాంకం new_లోపల_keyword = FALSE;
+		ఒకవేళ (diff_flags & DIFF_INLINE_మాట)
 		{
 		    // Always use the first buffer's 'iskeyword' to have a
 		    // consistent diff.
@@ -3681,120 +3681,120 @@ diff_find_change_inline_diff(
 		    // (class 2) as "word", as other classes such as emojis and
 		    // CJK ideographs do not usually benefit from word diff as
 		    // Vim doesn't have a good way to segment them.
-		    new_in_keyword = (mb_get_class_buf(s, curtab->tp_diffbuf[file1_idx]) == 2);
+		    new_లోపల_keyword = (mb_get_class_buf(s, curtab->tp_diffbuf[file1_idx]) == 2);
 		}
-		if (in_keyword && !new_in_keyword)
+		ఒకవేళ (లోపల_keyword && !new_లోపల_keyword)
 		{
 		    ga_append(curstr, NL);
 		    numlines++;
 		}
 
-		if (VIM_ISWHITE(*s))
+		ఒకవేళ (VIM_ISWHITE(*s))
 		{
-		    if (diff_flags & DIFF_IWHITEALL)
+		    ఒకవేళ (diff_flags & DIFF_IWHITEALL)
 		    {
-			in_keyword = FALSE;
+			లోపల_keyword = FALSE;
 			s = skipwhite(s);
-			continue;
+			కొనసాగు;
 		    }
-		    else if ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
+		    లేకపోతే ఒకవేళ ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
 		    {
-			if (!last_white)
+			ఒకవేళ (!చివరి_white)
 			{
 			    eol_ga_len = curstr->ga_len;
 			    eol_linemap_len = linemap[i].ga_len;
 			    eol_numlines = numlines;
-			    last_white = TRUE;
+			    చివరి_white = TRUE;
 			}
 		    }
 		}
-		else
+		లేకపోతే
 		{
-		    if ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
+		    ఒకవేళ ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
 		    {
-			last_white = FALSE;
+			చివరి_white = FALSE;
 			eol_ga_len = -1;
 			eol_linemap_len = -1;
 			eol_numlines = -1;
 		    }
 		}
 
-		int char_len = 1;
-		if (*s == NL)
+		పూర్ణాంకం char_len = 1;
+		ఒకవేళ (*s == NL)
 		    // NL is internal substitute for NUL
 		    ga_append(curstr, NUL);
-		else
+		లేకపోతే
 		{
 		    char_len = mb_ptr2len(s);
 
-		    if (VIM_ISWHITE(*s) && (diff_flags & DIFF_IWHITE))
+		    ఒకవేళ (VIM_ISWHITE(*s) && (diff_flags & DIFF_IWHITE))
 			// Treat the entire white space span as a single char.
 			char_len = skipwhite(s) - s;
 
-		    if (diff_flags & DIFF_ICASE)
+		    ఒకవేళ (diff_flags & DIFF_ICASE)
 		    {
-			int c;
+			పూర్ణాంకం c;
 			char_u cbuf[MB_MAXBYTES + 1];
 			// xdiff doesn't support ignoring case, fold-case the text manually.
 			c = PTR2CHAR(s);
-			int c_len = MB_CHAR2LEN(c);
+			పూర్ణాంకం c_len = MB_CHAR2LEN(c);
 			c = MB_CASEFOLD(c);
-			int c_fold_len = mb_char2bytes(c, cbuf);
+			పూర్ణాంకం c_fold_len = mb_char2bytes(c, cbuf);
 			ga_concat_len(curstr, cbuf, c_fold_len);
-			if (char_len > c_len)
+			ఒకవేళ (char_len > c_len)
 			{
 			    // There may be remaining composing characters. Write those back in.
 			    // Composing characters don't need case folding.
 			    ga_concat_len(curstr, s + c_len, char_len - c_len);
 			}
 		    }
-		    else
+		    లేకపోతే
 			ga_concat_len(curstr, s, char_len);
 		}
 
-		if (!new_in_keyword)
+		ఒకవేళ (!new_లోపల_keyword)
 		{
 		    ga_append(curstr, NL);
 		    numlines++;
 		}
 
-		if (!new_in_keyword || (new_in_keyword && !in_keyword))
+		ఒకవేళ (!new_లోపల_keyword || (new_లోపల_keyword && !లోపల_keyword))
 		{
 		    // create a new mapping entry from the xdiff mmfile back to
 		    // original line/col.
-		    linemap_entry_T linemap_entry;
-		    linemap_entry.lineoff = off;
-		    linemap_entry.byte_start = s - curline;
-		    linemap_entry.num_bytes = char_len;
-		    if (ga_grow(&linemap[i], 1) != OK)
-			goto done;
-		    ((linemap_entry_T*)(linemap[i].ga_data))[linemap[i].ga_len]
-			= linemap_entry;
+		    linemap_నమోదు_T linemap_నమోదు;
+		    linemap_నమోదు.lineoff = off;
+		    linemap_నమోదు.byte_ప్రారంభం = s - curline;
+		    linemap_నమోదు.అంకె_బైట్లు = char_len;
+		    ఒకవేళ (ga_grow(&linemap[i], 1) != OK)
+			వెళ్ళు పూర్తి;
+		    ((linemap_నమోదు_T*)(linemap[i].ga_దత్తాంశం))[linemap[i].ga_len]
+			= linemap_నమోదు;
 		    linemap[i].ga_len += 1;
 		}
-		else
+		లేకపోతే
 		{
 		    // Still inside a keyword. Just increment byte count but
 		    // don't make a new entry.
 		    // linemap always has at least one entry here
-		    ((linemap_entry_T*)linemap[i].ga_data)[linemap[i].ga_len-1].num_bytes
+		    ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[linemap[i].ga_len-1].అంకె_బైట్లు
 			+= char_len;
 		}
 
-		in_keyword = new_in_keyword;
+		లోపల_keyword = new_లోపల_keyword;
 		s += char_len;
 	    }
-	    if (in_keyword)
+	    ఒకవేళ (లోపల_keyword)
 	    {
 		ga_append(curstr, NL);
 		numlines++;
 	    }
 
-	    if ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
+	    ఒకవేళ ((diff_flags & DIFF_IWHITEEOL) || (diff_flags & DIFF_IWHITE))
 	    {
 		// Need to trim trailing whitespace. Do this simply by
 		// resetting arrays back to before we encountered them.
-		if (eol_ga_len != -1)
+		ఒకవేళ (eol_ga_len != -1)
 		{
 		    curstr->ga_len = eol_ga_len;
 		    linemap[i].ga_len = eol_linemap_len;
@@ -3802,7 +3802,7 @@ diff_find_change_inline_diff(
 		}
 	    }
 
-	    if (!(diff_flags & DIFF_IWHITEALL))
+	    ఒకవేళ (!(diff_flags & DIFF_IWHITEALL))
 	    {
 		// Add an empty line token mapped to the end-of-line in the
 		// original file. This helps diff newline differences among
@@ -3811,112 +3811,112 @@ diff_find_change_inline_diff(
 		ga_append(curstr, NL);
 		numlines++;
 
-		linemap_entry_T linemap_entry;
-		linemap_entry.lineoff = off;
-		linemap_entry.byte_start = s - curline;
-		linemap_entry.num_bytes = sizeof(NL);
-		if (ga_grow(&linemap[i], 1) != OK)
-		    goto done;
-		((linemap_entry_T*)(linemap[i].ga_data))[linemap[i].ga_len]
-		    = linemap_entry;
+		linemap_నమోదు_T linemap_నమోదు;
+		linemap_నమోదు.lineoff = off;
+		linemap_నమోదు.byte_ప్రారంభం = s - curline;
+		linemap_నమోదు.అంకె_బైట్లు = పరిమాణం(NL);
+		ఒకవేళ (ga_grow(&linemap[i], 1) != OK)
+		    వెళ్ళు పూర్తి;
+		((linemap_నమోదు_T*)(linemap[i].ga_దత్తాంశం))[linemap[i].ga_len]
+		    = linemap_నమోదు;
 		linemap[i].ga_len += 1;
 	    }
 	}
 
-	if (file1_idx != i)
+	ఒకవేళ (file1_idx != i)
 	{
-	    dio.dio_new.din_mmfile.ptr = (char *)curstr->ga_data;
-	    dio.dio_new.din_mmfile.size = curstr->ga_len;
+	    dio.dio_new.din_mmfile.ptr = (అక్షరం *)curstr->ga_దత్తాంశం;
+	    dio.dio_new.din_mmfile.కొలత = curstr->ga_len;
 	}
-	else
+	లేకపోతే
 	{
-	    dio.dio_orig.din_mmfile.ptr = (char *)curstr->ga_data;
-	    dio.dio_orig.din_mmfile.size = curstr->ga_len;
+	    dio.dio_orig.din_mmfile.ptr = (అక్షరం *)curstr->ga_దత్తాంశం;
+	    dio.dio_orig.din_mmfile.కొలత = curstr->ga_len;
 	}
-	if (file1_idx != i)
+	ఒకవేళ (file1_idx != i)
 	{
 	    // Perform diff with first file and read the results
-	    int diff_status = diff_file_internal(&dio);
-	    if (diff_status == FAIL)
-		goto done;
+	    పూర్ణాంకం diff_స్థితి = diff_file_అంతర్గత(&dio);
+	    ఒకవేళ (diff_స్థితి == FAIL)
+		వెళ్ళు పూర్తి;
 
 	    diff_read(0, i, &dio);
 	    clear_diffout(&dio.dio_diff);
 	}
     }
-    diff_T *new_diff = curtab->tp_first_diff;
+    diff_T *new_diff = curtab->tp_మొదటి_diff;
 
-    if (diff_flags & DIFF_INLINE_WORD && file1_idx != -1)
-	diff_refine_inline_word_highlight(new_diff, linemap, file1_idx, dp->df_lnum[file1_idx]);
-    else if (diff_flags & DIFF_INLINE_CHAR && file1_idx != -1)
+    ఒకవేళ (diff_flags & DIFF_INLINE_మాట && file1_idx != -1)
+	diff_refine_inline_మాట_highlight(new_diff, linemap, file1_idx, dp->df_lnum[file1_idx]);
+    లేకపోతే ఒకవేళ (diff_flags & DIFF_INLINE_CHAR && file1_idx != -1)
 	diff_refine_inline_char_highlight(new_diff, linemap, file1_idx);
 
     // After the diff, use the linemap to obtain the original line/col of the
     // changes and cache them in dp.
     dp->df_changes.ga_len = 0; // this should already be zero
-    for (; new_diff != NULL; new_diff = new_diff->df_next)
+    కొరకు (; new_diff != ఖాళీ; new_diff = new_diff->df_తదుపరి)
     {
 	diffline_change_T change;
-	CLEAR_FIELD(change);
-	for (int i = 0; i < DB_COUNT; i++)
+	CLEAR_క్షేత్రం(change);
+	కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 	{
-	    if (new_diff->df_lnum[i] <= 0) // should never be < 0. Checking just for safety.
-		continue;
+	    ఒకవేళ (new_diff->df_lnum[i] <= 0) // should never be < 0. Checking just for safety.
+		కొనసాగు;
 	    linenr_T diff_lnum = new_diff->df_lnum[i] - 1; // use zero-index
-	    linenr_T diff_lnum_end = diff_lnum + new_diff->df_count[i];
+	    linenr_T diff_lnum_చివర = diff_lnum + new_diff->df_లెక్క[i];
 
-	    if (diff_lnum >= linemap[i].ga_len)
+	    ఒకవేళ (diff_lnum >= linemap[i].ga_len)
 	    {
-		change.dc_start[i] = MAXCOL;
-		change.dc_start_lnum_off[i] = INT_MAX;
+		change.dc_ప్రారంభం[i] = MAXCOL;
+		change.dc_ప్రారంభం_lnum_off[i] = గరిష్ఠ_పూర్ణాంకం;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		change.dc_start[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum].byte_start;
-		change.dc_start_lnum_off[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum].lineoff;
+		change.dc_ప్రారంభం[i] = ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[diff_lnum].byte_ప్రారంభం;
+		change.dc_ప్రారంభం_lnum_off[i] = ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[diff_lnum].lineoff;
 	    }
 
-	    if (diff_lnum == diff_lnum_end)
+	    ఒకవేళ (diff_lnum == diff_lnum_చివర)
 	    {
-		change.dc_end[i] = change.dc_start[i];
-		change.dc_end_lnum_off[i] = change.dc_start_lnum_off[i];
+		change.dc_చివర[i] = change.dc_ప్రారంభం[i];
+		change.dc_చివర_lnum_off[i] = change.dc_ప్రారంభం_lnum_off[i];
 	    }
-	    else if (diff_lnum_end - 1 >= linemap[i].ga_len)
+	    లేకపోతే ఒకవేళ (diff_lnum_చివర - 1 >= linemap[i].ga_len)
 	    {
-		change.dc_end[i] = MAXCOL;
-		change.dc_end_lnum_off[i] = INT_MAX;
+		change.dc_చివర[i] = MAXCOL;
+		change.dc_చివర_lnum_off[i] = గరిష్ఠ_పూర్ణాంకం;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		change.dc_end[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].byte_start +
-		    ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].num_bytes;
-		change.dc_end_lnum_off[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].lineoff;
+		change.dc_చివర[i] = ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[diff_lnum_చివర-1].byte_ప్రారంభం +
+		    ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[diff_lnum_చివర-1].అంకె_బైట్లు;
+		change.dc_చివర_lnum_off[i] = ((linemap_నమోదు_T*)linemap[i].ga_దత్తాంశం)[diff_lnum_చివర-1].lineoff;
 	    }
 	}
-	if (ga_grow(&dp->df_changes, 1) != OK)
+	ఒకవేళ (ga_grow(&dp->df_changes, 1) != OK)
 	{
 	    dp->df_changes.ga_len = 0;
-	    goto done;
+	    వెళ్ళు పూర్తి;
 	}
-	((diffline_change_T*)(dp->df_changes.ga_data))[dp->df_changes.ga_len] = change;
+	((diffline_change_T*)(dp->df_changes.ga_దత్తాంశం))[dp->df_changes.ga_len] = change;
 	dp->df_changes.ga_len += 1;
     }
 
-done:
+పూర్తి:
     diff_algorithm = save_diff_algorithm;
 
     dp->has_changes = TRUE;
 
     diff_clear(curtab);
-    curtab->tp_first_diff = orig_diff;
-    memcpy(curtab->tp_diffbuf, orig_diffbuf, sizeof(orig_diffbuf));
+    curtab->tp_మొదటి_diff = orig_diff;
+    జ్ఞాపకం_నకలు(curtab->tp_diffbuf, orig_diffbuf, పరిమాణం(orig_diffbuf));
 
     ga_clear(&file1_str);
     ga_clear(&file2_str);
     // No need to clear dio.dio_orig/dio_new because they were referencing
     // strings that are now cleared.
     clear_diffout(&dio.dio_diff);
-    for (int i = 0; i < DB_COUNT; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 	ga_clear(&linemap[i]);
 }
 
@@ -3924,63 +3924,63 @@ done:
  * Find the difference within a changed line.
  * Returns TRUE if the line was added, no other buffer has it.
  */
-    int
-diff_find_change(
+    పూర్ణాంకం
+diff_కనుగొను_change(
     win_T	*wp,
     linenr_T	lnum,
     diffline_T	*diffline)
 {
     diff_T	*dp;
-    int		idx;
-    int		off;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		off;
 
-    idx = diff_buf_idx(wp->w_buffer);
-    if (idx == DB_COUNT)	// cannot happen
-	return FALSE;
+    idx = diff_buf_idx(wp->w_బఫరు);
+    ఒకవేళ (idx == DB_లెక్క)	// cannot happen
+	తిరిగి FALSE;
 
     // search for a change that includes "lnum" in the list of diffblocks.
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum < dp->df_lnum[idx] + dp->df_count[idx])
-	    break;
-    if (dp == NULL || diff_check_sanity(curtab, dp) == FAIL)
-	return FALSE;
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
+	ఒకవేళ (lnum < dp->df_lnum[idx] + dp->df_లెక్క[idx])
+	    ఆపు;
+    ఒకవేళ (dp == ఖాళీ || diff_check_sanity(curtab, dp) == FAIL)
+	తిరిగి FALSE;
 
-    if (lnum - dp->df_lnum[idx] > INT_MAX)
+    ఒకవేళ (lnum - dp->df_lnum[idx] > గరిష్ఠ_పూర్ణాంకం)
 	// Integer overflow protection
-	return FALSE;
+	తిరిగి FALSE;
     off = lnum - dp->df_lnum[idx];
 
-    if (!(diff_flags & ALL_INLINE_DIFF) || diff_internal_failed())
+    ఒకవేళ (!(diff_flags & ALL_INLINE_DIFF) || diff_అంతర్గత_failed())
     {
 	// Use simple algorithm
-	int	change_start = MAXCOL;	// first col of changed area
-	int	change_end = -1;	// last col of changed area
-	int	ret;
+	పూర్ణాంకం	change_ప్రారంభం = MAXCOL;	// first col of changed area
+	పూర్ణాంకం	change_చివర = -1;	// last col of changed area
+	పూర్ణాంకం	ret;
 
-	ret = diff_find_change_simple(wp, lnum, dp, idx, &change_start, &change_end);
+	ret = diff_కనుగొను_change_simple(wp, lnum, dp, idx, &change_ప్రారంభం, &change_చివర);
 
 	// convert from inclusive end to exclusive end per diffline's contract
-	change_end += 1;
+	change_చివర += 1;
 
 	// Create a mock diffline struct. We always only have one so no need to
 	// allocate memory.
-	CLEAR_FIELD(simple_diffline_change);
+	CLEAR_క్షేత్రం(simple_diffline_change);
 	diffline->changes = &simple_diffline_change;
-	diffline->num_changes = 1;
+	diffline->అంకె_changes = 1;
 	diffline->bufidx = idx;
 	diffline->lineoff = lnum - dp->df_lnum[idx];
 
-	simple_diffline_change.dc_start[idx] = change_start;
-	simple_diffline_change.dc_end[idx] = change_end;
-	simple_diffline_change.dc_start_lnum_off[idx] = off;
-	simple_diffline_change.dc_end_lnum_off[idx] = off;
-	return ret;
+	simple_diffline_change.dc_ప్రారంభం[idx] = change_ప్రారంభం;
+	simple_diffline_change.dc_చివర[idx] = change_చివర;
+	simple_diffline_change.dc_ప్రారంభం_lnum_off[idx] = off;
+	simple_diffline_change.dc_చివర_lnum_off[idx] = off;
+	తిరిగి ret;
     }
 
     // Use inline diff algorithm.
     // The diff changes are usually cached so we check that first.
-    if (!dp->has_changes)
-	diff_find_change_inline_diff(dp);
+    ఒకవేళ (!dp->has_changes)
+	diff_కనుగొను_change_inline_diff(dp);
 
     garray_T *changes = &dp->df_changes;
 
@@ -3988,21 +3988,21 @@ diff_find_change(
     // optimize this to use binary search, but there should usually be a
     // limited number of inline changes per diff block, and limited number of
     // diff blocks shown on screen, so it is not necessary.
-    int num_changes = 0;
-    int change_idx = 0;
-    diffline->changes = NULL;
-    for (change_idx = 0; change_idx < changes->ga_len; change_idx++)
+    పూర్ణాంకం అంకె_changes = 0;
+    పూర్ణాంకం change_idx = 0;
+    diffline->changes = ఖాళీ;
+    కొరకు (change_idx = 0; change_idx < changes->ga_len; change_idx++)
     {
-	diffline_change_T *change = &((diffline_change_T*)dp->df_changes.ga_data)[change_idx];
-	if (change->dc_end_lnum_off[idx] < off)
-	    continue;
-	if (change->dc_start_lnum_off[idx] > off)
-	    break;
-	if (diffline->changes == NULL)
+	diffline_change_T *change = &((diffline_change_T*)dp->df_changes.ga_దత్తాంశం)[change_idx];
+	ఒకవేళ (change->dc_చివర_lnum_off[idx] < off)
+	    కొనసాగు;
+	ఒకవేళ (change->dc_ప్రారంభం_lnum_off[idx] > off)
+	    ఆపు;
+	ఒకవేళ (diffline->changes == ఖాళీ)
 	    diffline->changes = change;
-	num_changes++;
+	అంకె_changes++;
     }
-    diffline->num_changes = num_changes;
+    diffline->అంకె_changes = అంకె_changes;
     diffline->bufidx = idx;
     diffline->lineoff = off;
 
@@ -4010,114 +4010,114 @@ diff_find_change(
     // has to be the last change of this diff block, and all other buffers are
     // considering this to be an addition past their last line. Other scenarios
     // will be considered a changed line instead.
-    int added = FALSE;
-    if (num_changes == 1 && change_idx == dp->df_changes.ga_len)
+    పూర్ణాంకం added = FALSE;
+    ఒకవేళ (అంకె_changes == 1 && change_idx == dp->df_changes.ga_len)
     {
 	added = TRUE;
-	for (int i = 0; i < DB_COUNT; i++)
+	కొరకు (పూర్ణాంకం i = 0; i < DB_లెక్క; i++)
 	{
-	    if (idx == i)
-		continue;
-	    if (curtab->tp_diffbuf[i] == NULL)
-		continue;
-	    diffline_change_T *change = &((diffline_change_T*)dp->df_changes.ga_data)[dp->df_changes.ga_len-1];
-	    if (change->dc_start_lnum_off[i] != INT_MAX)
+	    ఒకవేళ (idx == i)
+		కొనసాగు;
+	    ఒకవేళ (curtab->tp_diffbuf[i] == ఖాళీ)
+		కొనసాగు;
+	    diffline_change_T *change = &((diffline_change_T*)dp->df_changes.ga_దత్తాంశం)[dp->df_changes.ga_len-1];
+	    ఒకవేళ (change->dc_ప్రారంభం_lnum_off[i] != గరిష్ఠ_పూర్ణాంకం)
 	    {
 		added = FALSE;
-		break;
+		ఆపు;
 	    }
 	}
     }
-    return added;
+    తిరిగి added;
 }
 
-# if defined(FEAT_FOLDING)
+# ఒకవేళ defined(FEAT_FOLDING)
 /*
  * Return TRUE if line "lnum" is not close to a diff block, this line should
  * be in a fold.
  * Return FALSE if there are no diff blocks at all in this window.
  */
-    int
+    పూర్ణాంకం
 diff_infold(win_T *wp, linenr_T lnum)
 {
-    int		i;
-    int		idx = -1;
-    int		other = FALSE;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx = -1;
+    పూర్ణాంకం		other = FALSE;
     diff_T	*dp;
 
     // Return if 'diff' isn't set.
-    if (!wp->w_p_diff)
-	return FALSE;
+    ఒకవేళ (!wp->w_p_diff)
+	తిరిగి FALSE;
 
-    for (i = 0; i < DB_COUNT; ++i)
+    కొరకు (i = 0; i < DB_లెక్క; ++i)
     {
-	if (curtab->tp_diffbuf[i] == wp->w_buffer)
+	ఒకవేళ (curtab->tp_diffbuf[i] == wp->w_బఫరు)
 	    idx = i;
-	else if (curtab->tp_diffbuf[i] != NULL)
+	లేకపోతే ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ)
 	    other = TRUE;
     }
 
     // return here if there are no diffs in the window
-    if (idx == -1 || !other)
-	return FALSE;
+    ఒకవేళ (idx == -1 || !other)
+	తిరిగి FALSE;
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
     // Return if there are no diff blocks.  All lines will be folded.
-    if (curtab->tp_first_diff == NULL)
-	return TRUE;
+    ఒకవేళ (curtab->tp_మొదటి_diff == ఖాళీ)
+	తిరిగి TRUE;
 
     // Resume from the scan finger to avoid restarting at the first block.
-    diff_T	*le = NULL;		// last block with df_lnum[idx] <= lnum
-    int		result = TRUE;
-    for (dp = diff_scan_start(curtab, idx, lnum); dp != NULL; dp = dp->df_next)
+    diff_T	*le = ఖాళీ;		// last block with df_lnum[idx] <= lnum
+    పూర్ణాంకం		ఫలితం = TRUE;
+    కొరకు (dp = diff_పరిశీలన_ప్రారంభం(curtab, idx, lnum); dp != ఖాళీ; dp = dp->df_తదుపరి)
     {
-	if (dp->df_lnum[idx] <= lnum)
+	ఒకవేళ (dp->df_lnum[idx] <= lnum)
 	    le = dp;
 	// If this change is below the line there can't be any further match.
-	if (dp->df_lnum[idx] - diff_context > lnum)
-	    break;
+	ఒకవేళ (dp->df_lnum[idx] - diff_context > lnum)
+	    ఆపు;
 	// If this change ends before the line we have a match.
-	if (dp->df_lnum[idx] + dp->df_count[idx] + diff_context > lnum)
+	ఒకవేళ (dp->df_lnum[idx] + dp->df_లెక్క[idx] + diff_context > lnum)
 	{
-	    result = FALSE;
-	    break;
+	    ఫలితం = FALSE;
+	    ఆపు;
 	}
     }
-    diff_scan_remember(curtab, idx, lnum, le);
-    return result;
+    diff_పరిశీలన_remember(curtab, idx, lnum, le);
+    తిరిగి ఫలితం;
 }
 # endif
 
 /*
  * "dp" and "do" commands.
  */
-    void
-nv_diffgetput(int put, long count)
+    శూన్య
+nv_diffgetput(పూర్ణాంకం put, దీర్ఘ లెక్క)
 {
     exarg_T	ea;
     char_u	buf[30];
 
-# ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
+# ifdef FEAT_పని_CHANNEL
+    ఒకవేళ (bt_prompt(curbuf))
     {
 	vim_beep(BO_OPER);
-	return;
+	తిరిగి;
     }
 # endif
-    if (count == 0)
+    ఒకవేళ (లెక్క == 0)
 	ea.arg = (char_u *)"";
-    else
+    లేకపోతే
     {
-	vim_snprintf((char *)buf, 30, "%ld", count);
+	vim_snprintf((అక్షరం *)buf, 30, "%ld", లెక్క);
 	ea.arg = buf;
     }
-    if (put)
+    ఒకవేళ (put)
 	ea.cmdidx = CMD_diffput;
-    else
+    లేకపోతే
 	ea.cmdidx = CMD_diffget;
-    ea.addr_count = 0;
+    ea.addr_లెక్క = 0;
     ea.line1 = curwin->w_cursor.lnum;
     ea.line2 = curwin->w_cursor.lnum;
     ex_diffgetput(&ea);
@@ -4126,397 +4126,397 @@ nv_diffgetput(int put, long count)
 /*
  * Return TRUE if "diff" appears in the list of diff blocks of the current tab.
  */
-    static int
+    స్థిర పూర్ణాంకం
 valid_diff(diff_T *diff)
 {
     diff_T	*dp;
 
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (dp == diff)
-	    return TRUE;
-    return FALSE;
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
+	ఒకవేళ (dp == diff)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * ":diffget"
  * ":diffput"
  */
-    void
+    శూన్య
 ex_diffgetput(exarg_T *eap)
 {
     linenr_T	lnum;
-    int		count;
+    పూర్ణాంకం		లెక్క;
     linenr_T	off = 0;
     diff_T	*dp;
     diff_T	*dprev;
     diff_T	*dfree;
-    int		idx_cur;
-    int		idx_other;
-    int		idx_from;
-    int		idx_to;
-    int		i;
-    int		added;
+    పూర్ణాంకం		idx_cur;
+    పూర్ణాంకం		idx_other;
+    పూర్ణాంకం		idx_from;
+    పూర్ణాంకం		idx_గమ్యం;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		added;
     char_u	*p;
     aco_save_T	aco;
     buf_T	*buf;
-    int		start_skip, end_skip;
-    int		new_count;
-    int		buf_empty;
-    int		found_not_ma = FALSE;
+    పూర్ణాంకం		ప్రారంభం_skip, చివర_skip;
+    పూర్ణాంకం		new_లెక్క;
+    పూర్ణాంకం		buf_ఖాళీలు;
+    పూర్ణాంకం		దొరికింది_not_ma = FALSE;
 
     // Find the current buffer in the list of diff buffers.
     idx_cur = diff_buf_idx(curbuf);
-    if (idx_cur == DB_COUNT)
+    ఒకవేళ (idx_cur == DB_లెక్క)
     {
-	emsg(_(e_current_buffer_is_not_in_diff_mode));
-	return;
+	emsg(_(e_current_బఫరు_is_not_లోపల_diff_బహుళకం));
+	తిరిగి;
     }
 
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
     {
 	// No argument: Find the other buffer in the list of diff buffers.
-	for (idx_other = 0; idx_other < DB_COUNT; ++idx_other)
-	    if (curtab->tp_diffbuf[idx_other] != curbuf
-		    && curtab->tp_diffbuf[idx_other] != NULL)
+	కొరకు (idx_other = 0; idx_other < DB_లెక్క; ++idx_other)
+	    ఒకవేళ (curtab->tp_diffbuf[idx_other] != curbuf
+		    && curtab->tp_diffbuf[idx_other] != ఖాళీ)
 	    {
-		if (eap->cmdidx != CMD_diffput
+		ఒకవేళ (eap->cmdidx != CMD_diffput
 				     || curtab->tp_diffbuf[idx_other]->b_p_ma)
-		    break;
-		found_not_ma = TRUE;
+		    ఆపు;
+		దొరికింది_not_ma = TRUE;
 	    }
-	if (idx_other == DB_COUNT)
+	ఒకవేళ (idx_other == DB_లెక్క)
 	{
-	    if (found_not_ma)
-		emsg(_(e_no_other_buffer_in_diff_mode_is_modifiable));
-	    else
-		emsg(_(e_no_other_buffer_in_diff_mode));
-	    return;
+	    ఒకవేళ (దొరికింది_not_ma)
+		emsg(_(e_no_other_బఫరు_లోపల_diff_బహుళకం_is_modifiable));
+	    లేకపోతే
+		emsg(_(e_no_other_బఫరు_లోపల_diff_బహుళకం));
+	    తిరిగి;
 	}
 
 	// Check that there isn't a third buffer in the list
-	for (i = idx_other + 1; i < DB_COUNT; ++i)
-	    if (curtab->tp_diffbuf[i] != curbuf
-		    && curtab->tp_diffbuf[i] != NULL
+	కొరకు (i = idx_other + 1; i < DB_లెక్క; ++i)
+	    ఒకవేళ (curtab->tp_diffbuf[i] != curbuf
+		    && curtab->tp_diffbuf[i] != ఖాళీ
 		    && (eap->cmdidx != CMD_diffput || curtab->tp_diffbuf[i]->b_p_ma))
 	    {
-		emsg(_(e_more_than_two_buffers_in_diff_mode_dont_know_which_one_to_use));
-		return;
+		emsg(_(e_మరిన్ని_than_two_buffers_లోపల_diff_బహుళకం_dont_know_which_one_గమ్యం_use));
+		తిరిగి;
 	    }
     }
-    else
+    లేకపోతే
     {
 	// Buffer number or pattern given.  Ignore trailing white space.
 	p = eap->arg + STRLEN(eap->arg);
-	while (p > eap->arg && VIM_ISWHITE(p[-1]))
+	అయితే (p > eap->arg && VIM_ISWHITE(p[-1]))
 	    --p;
-	for (i = 0; vim_isdigit(eap->arg[i]) && eap->arg + i < p; ++i)
+	కొరకు (i = 0; vim_isdigit(eap->arg[i]) && eap->arg + i < p; ++i)
 	    ;
-	if (eap->arg + i == p)	    // digits only
-	    i = atol((char *)eap->arg);
-	else
+	ఒకవేళ (eap->arg + i == p)	    // digits only
+	    i = atol((అక్షరం *)eap->arg);
+	లేకపోతే
 	{
 	    i = buflist_findpat(eap->arg, p, FALSE, TRUE, FALSE);
-	    if (i < 0)
-		return;		// error message already given
+	    ఒకవేళ (i < 0)
+		తిరిగి;		// error message already given
 	}
 	buf = buflist_findnr(i);
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	{
-	    semsg(_(e_cant_find_buffer_str), eap->arg);
-	    return;
+	    semsg(_(e_cant_కనుగొను_బఫరు_str), eap->arg);
+	    తిరిగి;
 	}
-	if (buf == curbuf)
-	    return;		// nothing to do
+	ఒకవేళ (buf == curbuf)
+	    తిరిగి;		// nothing to do
 	idx_other = diff_buf_idx(buf);
-	if (idx_other == DB_COUNT)
+	ఒకవేళ (idx_other == DB_లెక్క)
 	{
-	    semsg(_(e_buffer_str_is_not_in_diff_mode), eap->arg);
-	    return;
+	    semsg(_(e_బఫరు_str_is_not_లోపల_diff_బహుళకం), eap->arg);
+	    తిరిగి;
 	}
     }
 
     diff_busy = TRUE;
 
     // When no range given include the line above or below the cursor.
-    if (eap->addr_count == 0)
+    ఒకవేళ (eap->addr_లెక్క == 0)
     {
 	// Make it possible that ":diffget" on the last line gets line below
 	// the cursor line when there is no difference above the cursor.
-	int linestatus = 0;
-	if (eap->line1 == curbuf->b_ml.ml_line_count
+	పూర్ణాంకం linestatus = 0;
+	ఒకవేళ (eap->line1 == curbuf->b_ml.ml_పంక్తి_లెక్క
 		&& (diff_check_with_linestatus(curwin, eap->line1, &linestatus) == 0
 		    && linestatus == 0)
 		&& (eap->line1 == 1 ||
 		    (diff_check_with_linestatus(curwin, eap->line1 - 1, &linestatus) >= 0
 		     && linestatus == 0)))
 	    ++eap->line2;
-	else if (eap->line1 > 0)
+	లేకపోతే ఒకవేళ (eap->line1 > 0)
 	    --eap->line1;
     }
 
-    if (eap->cmdidx == CMD_diffget)
+    ఒకవేళ (eap->cmdidx == CMD_diffget)
     {
 	idx_from = idx_other;
-	idx_to = idx_cur;
+	idx_గమ్యం = idx_cur;
     }
-    else
+    లేకపోతే
     {
 	idx_from = idx_cur;
-	idx_to = idx_other;
+	idx_గమ్యం = idx_other;
 	// Need to make the other buffer the current buffer to be able to make
 	// changes in it.
 	// Set curwin/curbuf to buf and save a few things.
 	aucmd_prepbuf(&aco, curtab->tp_diffbuf[idx_other]);
-	if (curbuf != curtab->tp_diffbuf[idx_other])
+	ఒకవేళ (curbuf != curtab->tp_diffbuf[idx_other])
 	    // Could not find a window for this buffer, the rest is likely to
 	    // fail.
-	    goto theend;
+	    వెళ్ళు theend;
     }
 
     // May give the warning for a changed buffer here, which can trigger the
     // FileChangedRO autocommand, which may do nasty things and mess
     // everything up.
-    if (!curbuf->b_changed)
+    ఒకవేళ (!curbuf->b_మారింది)
     {
 	change_warning(0);
-	if (diff_buf_idx(curbuf) != idx_to)
+	ఒకవేళ (diff_buf_idx(curbuf) != idx_గమ్యం)
 	{
-	    emsg(_(e_buffer_changed_unexpectedly));
-	    goto theend;
+	    emsg(_(e_బఫరు_మారింది_unexpectedly));
+	    వెళ్ళు theend;
 	}
     }
 
-    dprev = NULL;
-    for (dp = curtab->tp_first_diff; dp != NULL; )
+    dprev = ఖాళీ;
+    కొరకు (dp = curtab->tp_మొదటి_diff; dp != ఖాళీ; )
     {
-	if (!eap->addr_count)
+	ఒకవేళ (!eap->addr_లెక్క)
 	{
 	    // Handle the case with adjacent diff blocks (e.g. using linematch
 	    // or anchors) at/above the cursor. Since a range wasn't specified,
 	    // we just want to grab one diff block rather than all of them in
 	    // the vicinity.
-	    while (dp->df_next
-		    && dp->df_next->df_lnum[idx_cur] == dp->df_lnum[idx_cur] +
-							dp->df_count[idx_cur]
-		    && dp->df_next->df_lnum[idx_cur] == eap->line1 + off + 1)
+	    అయితే (dp->df_తదుపరి
+		    && dp->df_తదుపరి->df_lnum[idx_cur] == dp->df_lnum[idx_cur] +
+							dp->df_లెక్క[idx_cur]
+		    && dp->df_తదుపరి->df_lnum[idx_cur] == eap->line1 + off + 1)
 	    {
 		dprev = dp;
-		dp = dp->df_next;
+		dp = dp->df_తదుపరి;
 	    }
 	}
-	if (dp->df_lnum[idx_cur] > eap->line2 + off)
-	    break;	// past the range that was specified
+	ఒకవేళ (dp->df_lnum[idx_cur] > eap->line2 + off)
+	    ఆపు;	// past the range that was specified
 
-	dfree = NULL;
-	lnum = dp->df_lnum[idx_to];
-	count = dp->df_count[idx_to];
+	dfree = ఖాళీ;
+	lnum = dp->df_lnum[idx_గమ్యం];
+	లెక్క = dp->df_లెక్క[idx_గమ్యం];
 	// The empty line of an empty buffer is deleted below, include it in
 	// the undo information, otherwise undo leaves a line behind.
-	linenr_T undo_bot = lnum + count + (count == 0 && BUFEMPTY() ? 1 : 0);
+	linenr_T undo_bot = lnum + లెక్క + (లెక్క == 0 && BUFEMPTY() ? 1 : 0);
 
-	if (dp->df_lnum[idx_cur] + dp->df_count[idx_cur] > eap->line1 + off
+	ఒకవేళ (dp->df_lnum[idx_cur] + dp->df_లెక్క[idx_cur] > eap->line1 + off
 		&& u_save(lnum - 1, undo_bot) != FAIL)
 	{
 	    // Inside the specified range and saving for undo worked.
-	    start_skip = 0;
-	    end_skip = 0;
-	    if (eap->addr_count > 0)
+	    ప్రారంభం_skip = 0;
+	    చివర_skip = 0;
+	    ఒకవేళ (eap->addr_లెక్క > 0)
 	    {
 		// A range was specified: check if lines need to be skipped.
-		start_skip = eap->line1 + off - dp->df_lnum[idx_cur];
-		if (start_skip > 0)
+		ప్రారంభం_skip = eap->line1 + off - dp->df_lnum[idx_cur];
+		ఒకవేళ (ప్రారంభం_skip > 0)
 		{
 		    // range starts below start of current diff block
-		    if (start_skip > count)
+		    ఒకవేళ (ప్రారంభం_skip > లెక్క)
 		    {
-			lnum += count;
-			count = 0;
+			lnum += లెక్క;
+			లెక్క = 0;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			count -= start_skip;
-			lnum += start_skip;
+			లెక్క -= ప్రారంభం_skip;
+			lnum += ప్రారంభం_skip;
 		    }
 		}
-		else
-		    start_skip = 0;
+		లేకపోతే
+		    ప్రారంభం_skip = 0;
 
-		end_skip = dp->df_lnum[idx_cur] + dp->df_count[idx_cur] - 1
+		చివర_skip = dp->df_lnum[idx_cur] + dp->df_లెక్క[idx_cur] - 1
 							 - (eap->line2 + off);
-		if (end_skip > 0)
+		ఒకవేళ (చివర_skip > 0)
 		{
 		    // range ends above end of current/from diff block
-		    if (idx_cur == idx_from)	// :diffput
+		    ఒకవేళ (idx_cur == idx_from)	// :diffput
 		    {
-			i = dp->df_count[idx_cur] - start_skip - end_skip;
-			if (count > i)
-			    count = i;
+			i = dp->df_లెక్క[idx_cur] - ప్రారంభం_skip - చివర_skip;
+			ఒకవేళ (లెక్క > i)
+			    లెక్క = i;
 		    }
-		    else			// :diffget
+		    లేకపోతే			// :diffget
 		    {
-			count -= end_skip;
-			end_skip = dp->df_count[idx_from] - start_skip - count;
-			if (end_skip < 0)
-			    end_skip = 0;
+			లెక్క -= చివర_skip;
+			చివర_skip = dp->df_లెక్క[idx_from] - ప్రారంభం_skip - లెక్క;
+			ఒకవేళ (చివర_skip < 0)
+			    చివర_skip = 0;
 		    }
 		}
-		else
-		    end_skip = 0;
+		లేకపోతే
+		    చివర_skip = 0;
 	    }
 
-	    buf_empty = BUFEMPTY();
+	    buf_ఖాళీలు = BUFEMPTY();
 	    added = 0;
-	    for (i = 0; i < count; ++i)
+	    కొరకు (i = 0; i < లెక్క; ++i)
 	    {
 		// remember deleting the last line of the buffer
-		buf_empty = curbuf->b_ml.ml_line_count == 1;
-		if (ml_delete(lnum) == OK)
+		buf_ఖాళీలు = curbuf->b_ml.ml_పంక్తి_లెక్క == 1;
+		ఒకవేళ (ml_delete(lnum) == OK)
 		    --added;
 	    }
-	    for (i = 0; i < dp->df_count[idx_from] - start_skip - end_skip; ++i)
+	    కొరకు (i = 0; i < dp->df_లెక్క[idx_from] - ప్రారంభం_skip - చివర_skip; ++i)
 	    {
 		linenr_T nr;
 
-		nr = dp->df_lnum[idx_from] + start_skip + i;
-		if (nr > curtab->tp_diffbuf[idx_from]->b_ml.ml_line_count)
-		    break;
+		nr = dp->df_lnum[idx_from] + ప్రారంభం_skip + i;
+		ఒకవేళ (nr > curtab->tp_diffbuf[idx_from]->b_ml.ml_పంక్తి_లెక్క)
+		    ఆపు;
 		p = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx_from],
 								  nr, FALSE));
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
 		    ml_append(lnum + i - 1, p, 0, FALSE);
 		    vim_free(p);
 		    ++added;
-		    if (buf_empty && curbuf->b_ml.ml_line_count == 2)
+		    ఒకవేళ (buf_ఖాళీలు && curbuf->b_ml.ml_పంక్తి_లెక్క == 2)
 		    {
 			// Added the first line into an empty buffer, need to
 			// delete the dummy empty line.
-			buf_empty = FALSE;
+			buf_ఖాళీలు = FALSE;
 			ml_delete((linenr_T)2);
 		    }
 		}
 	    }
-	    new_count = dp->df_count[idx_to] + added;
-	    dp->df_count[idx_to] = new_count;
+	    new_లెక్క = dp->df_లెక్క[idx_గమ్యం] + added;
+	    dp->df_లెక్క[idx_గమ్యం] = new_లెక్క;
 
-	    if (start_skip == 0 && end_skip == 0)
+	    ఒకవేళ (ప్రారంభం_skip == 0 && చివర_skip == 0)
 	    {
 		// Check if there are any other buffers and if the diff is
 		// equal in them.
-		for (i = 0; i < DB_COUNT; ++i)
-		    if (curtab->tp_diffbuf[i] != NULL && i != idx_from
-								&& i != idx_to
-			    && !diff_equal_entry(dp, idx_from, i))
-			break;
-		if (i == DB_COUNT)
+		కొరకు (i = 0; i < DB_లెక్క; ++i)
+		    ఒకవేళ (curtab->tp_diffbuf[i] != ఖాళీ && i != idx_from
+								&& i != idx_గమ్యం
+			    && !diff_equal_నమోదు(dp, idx_from, i))
+			ఆపు;
+		ఒకవేళ (i == DB_లెక్క)
 		{
 		    // delete the diff entry, the buffers are now equal here
 		    dfree = dp;
-		    dp = dp->df_next;
-		    if (dprev == NULL)
-			curtab->tp_first_diff = dp;
-		    else
-			dprev->df_next = dp;
+		    dp = dp->df_తదుపరి;
+		    ఒకవేళ (dprev == ఖాళీ)
+			curtab->tp_మొదటి_diff = dp;
+		    లేకపోతే
+			dprev->df_తదుపరి = dp;
 		}
 	    }
 
-	    if (added != 0)
+	    ఒకవేళ (added != 0)
 	    {
 		// Adjust marks.  This will change the following entries!
-		mark_adjust(lnum, lnum + count - 1, (long)MAXLNUM, (long)added);
-		if (curwin->w_cursor.lnum >= lnum)
+		mark_adjust(lnum, lnum + లెక్క - 1, (దీర్ఘ)MAXLNUM, (దీర్ఘ)added);
+		ఒకవేళ (curwin->w_cursor.lnum >= lnum)
 		{
 		    // Adjust the cursor position if it's in/after the changed
 		    // lines.
-		    if (curwin->w_cursor.lnum >= lnum + count)
+		    ఒకవేళ (curwin->w_cursor.lnum >= lnum + లెక్క)
 		    {
 			curwin->w_cursor.lnum += added;
 			// When the buffer was previously empty, the cursor may
 			// now be beyond the last line, so clamp cursor lnum.
 			curwin->w_cursor.lnum = MIN(curwin->w_cursor.lnum,
-						curbuf->b_ml.ml_line_count);
+						curbuf->b_ml.ml_పంక్తి_లెక్క);
 		    }
-		    else if (added < 0)
+		    లేకపోతే ఒకవేళ (added < 0)
 			curwin->w_cursor.lnum = lnum;
 		}
 	    }
-	    changed_lines(lnum, 0, lnum + count, (long)added);
+	    మారింది_పంక్తులు(lnum, 0, lnum + లెక్క, (దీర్ఘ)added);
 
-	    if (dfree != NULL)
+	    ఒకవేళ (dfree != ఖాళీ)
 	    {
 		// Diff is deleted, update folds in other windows.
 # ifdef FEAT_FOLDING
-		diff_fold_update(dfree, idx_to);
+		diff_fold_update(dfree, idx_గమ్యం);
 # endif
 		clear_diffblock(dfree);
 	    }
 
 	    // mark_adjust() may have made "dp" invalid.  We don't know where
 	    // to continue then, bail out.
-	    if (added != 0 && !valid_diff(dp))
-		break;
+	    ఒకవేళ (added != 0 && !valid_diff(dp))
+		ఆపు;
 
-	    if (dfree == NULL)
+	    ఒకవేళ (dfree == ఖాళీ)
 		// mark_adjust() may have changed the count in a wrong way
-		dp->df_count[idx_to] = new_count;
+		dp->df_లెక్క[idx_గమ్యం] = new_లెక్క;
 
 	    // When changing the current buffer, keep track of line numbers
-	    if (idx_cur == idx_to)
+	    ఒకవేళ (idx_cur == idx_గమ్యం)
 		off += added;
 	}
 
 	// If before the range or not deleted, go to next diff.
-	if (dfree == NULL)
+	ఒకవేళ (dfree == ఖాళీ)
 	{
 	    dprev = dp;
-	    dp = dp->df_next;
+	    dp = dp->df_తదుపరి;
 	}
     }
 
     // restore curwin/curbuf and a few other things
-    if (eap->cmdidx != CMD_diffget)
+    ఒకవేళ (eap->cmdidx != CMD_diffget)
     {
 	// Syncing undo only works for the current buffer, but we change
 	// another buffer.  Sync undo if the command was typed.  This isn't
 	// 100% right when ":diffput" is used in a function or mapping.
-	if (KeyTyped)
+	ఒకవేళ (కీలకం_Typed)
 	    u_sync(FALSE);
 	aucmd_restbuf(&aco);
     }
 
 theend:
     diff_busy = FALSE;
-    if (diff_need_update)
-	ex_diffupdate(NULL);
+    ఒకవేళ (diff_need_update)
+	ex_diffupdate(ఖాళీ);
 
     // Check that the cursor is on a valid character and update its
     // position.  When there were filler lines the topline has become
     // invalid.
     check_cursor();
-    changed_line_abv_curs();
+    మారింది_పంక్తి_abv_curs();
 
 # ifdef FEAT_FOLDING
     // If all diffs are gone, update folds in all diff windows.
-    if (curtab->tp_first_diff == NULL)
+    ఒకవేళ (curtab->tp_మొదటి_diff == ఖాళీ)
     {
 	win_T	*wp;
 
-	FOR_ALL_WINDOWS_IN_TAB(curtab, wp)
-	    if (wp->w_p_diff && wp->w_p_fdm[0] == 'd' && wp->w_p_fen)
+	FOR_ALL_WINDOWS_లోపల_TAB(curtab, wp)
+	    ఒకవేళ (wp->w_p_diff && wp->w_p_fdm[0] == 'd' && wp->w_p_fen)
 		foldUpdateAll(wp);
     }
 # endif
 
-    if (diff_need_update)
+    ఒకవేళ (diff_need_update)
 	// redraw already done by ex_diffupdate()
 	diff_need_update = FALSE;
-    else
+    లేకపోతే
     {
 	// Also need to redraw the other buffers.
 	diff_redraw(FALSE);
-	window_layout_lock();
-	apply_autocmds(EVENT_DIFFUPDATED, NULL, NULL, FALSE, curbuf);
-	window_layout_unlock();
+	కిటికీ_layout_తాళం();
+	apply_autocmds(EVENT_DIFFUPDATED, ఖాళీ, ఖాళీ, FALSE, curbuf);
+	కిటికీ_layout_unlock();
     }
 }
 
@@ -4526,133 +4526,133 @@ theend:
  * Skip buffer with index "skip_idx".
  * When there are no diffs, all folds are removed.
  */
-    static void
-diff_fold_update(diff_T *dp, int skip_idx)
+    స్థిర శూన్య
+diff_fold_update(diff_T *dp, పూర్ణాంకం skip_idx)
 {
-    int		i;
+    పూర్ణాంకం		i;
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	for (i = 0; i < DB_COUNT; ++i)
-	    if (curtab->tp_diffbuf[i] == wp->w_buffer && i != skip_idx)
+	కొరకు (i = 0; i < DB_లెక్క; ++i)
+	    ఒకవేళ (curtab->tp_diffbuf[i] == wp->w_బఫరు && i != skip_idx)
 		foldUpdate(wp, dp->df_lnum[i],
-					    dp->df_lnum[i] + dp->df_count[i]);
+					    dp->df_lnum[i] + dp->df_లెక్క[i]);
 }
 # endif
 
 /*
  * Return TRUE if buffer "buf" is in diff-mode.
  */
-    int
-diff_mode_buf(buf_T *buf)
+    పూర్ణాంకం
+diff_బహుళకం_buf(buf_T *buf)
 {
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
-	if (diff_buf_idx_tp(buf, tp) != DB_COUNT)
-	    return TRUE;
-    return FALSE;
+	ఒకవేళ (diff_buf_idx_tp(buf, tp) != DB_లెక్క)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * Move "count" times in direction "dir" to the next diff block.
  * Return FAIL if there isn't such a diff block.
  */
-    int
-diff_move_to(int dir, long count)
+    పూర్ణాంకం
+diff_move_గమ్యం(పూర్ణాంకం dir, దీర్ఘ లెక్క)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
     linenr_T	lnum = curwin->w_cursor.lnum;
     diff_T	*dp;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT || curtab->tp_first_diff == NULL)
-	return FAIL;
+    ఒకవేళ (idx == DB_లెక్క || curtab->tp_మొదటి_diff == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
-    if (curtab->tp_first_diff == NULL)		// no diffs today
-	return FAIL;
+    ఒకవేళ (curtab->tp_మొదటి_diff == ఖాళీ)		// no diffs today
+	తిరిగి FAIL;
 
-    while (--count >= 0)
+    అయితే (--లెక్క >= 0)
     {
 	// Check if already before first diff.
-	if (dir == BACKWARD && lnum <= curtab->tp_first_diff->df_lnum[idx])
-	    break;
+	ఒకవేళ (dir == BACKWARD && lnum <= curtab->tp_మొదటి_diff->df_lnum[idx])
+	    ఆపు;
 
-	for (dp = curtab->tp_first_diff; ; dp = dp->df_next)
+	కొరకు (dp = curtab->tp_మొదటి_diff; ; dp = dp->df_తదుపరి)
 	{
-	    if (dp == NULL)
-		break;
-	    if ((dir == FORWARD && lnum < dp->df_lnum[idx])
+	    ఒకవేళ (dp == ఖాళీ)
+		ఆపు;
+	    ఒకవేళ ((dir == FORWARD && lnum < dp->df_lnum[idx])
 		    || (dir == BACKWARD
-			&& (dp->df_next == NULL
-			    || lnum <= dp->df_next->df_lnum[idx])))
+			&& (dp->df_తదుపరి == ఖాళీ
+			    || lnum <= dp->df_తదుపరి->df_lnum[idx])))
 	    {
 		lnum = dp->df_lnum[idx];
-		break;
+		ఆపు;
 	    }
 	}
     }
 
     // don't end up past the end of the file
-    if (lnum > curbuf->b_ml.ml_line_count)
-	lnum = curbuf->b_ml.ml_line_count;
+    ఒకవేళ (lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
 
     // When the cursor didn't move at all we fail.
-    if (lnum == curwin->w_cursor.lnum)
-	return FAIL;
+    ఒకవేళ (lnum == curwin->w_cursor.lnum)
+	తిరిగి FAIL;
 
     setpcmark();
     curwin->w_cursor.lnum = lnum;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return the line number in the current window that is closest to "lnum1" in
  * "buf1" in diff mode.
  */
-    static linenr_T
-diff_get_corresponding_line_int(
+    స్థిర linenr_T
+diff_get_corresponding_పంక్తి_int(
     buf_T	*buf1,
     linenr_T	lnum1)
 {
-    int		idx1;
-    int		idx2;
+    పూర్ణాంకం		idx1;
+    పూర్ణాంకం		idx2;
     diff_T	*dp;
-    int		baseline = 0;
+    పూర్ణాంకం		baseline = 0;
 
     idx1 = diff_buf_idx(buf1);
     idx2 = diff_buf_idx(curbuf);
-    if (idx1 == DB_COUNT || idx2 == DB_COUNT || curtab->tp_first_diff == NULL)
-	return lnum1;
+    ఒకవేళ (idx1 == DB_లెక్క || idx2 == DB_లెక్క || curtab->tp_మొదటి_diff == ఖాళీ)
+	తిరిగి lnum1;
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
-    if (curtab->tp_first_diff == NULL)		// no diffs today
-	return lnum1;
+    ఒకవేళ (curtab->tp_మొదటి_diff == ఖాళీ)		// no diffs today
+	తిరిగి lnum1;
 
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
     {
-	if (dp->df_lnum[idx1] > lnum1)
-	    return lnum1 - baseline;
-	if ((dp->df_lnum[idx1] + dp->df_count[idx1]) > lnum1)
+	ఒకవేళ (dp->df_lnum[idx1] > lnum1)
+	    తిరిగి lnum1 - baseline;
+	ఒకవేళ ((dp->df_lnum[idx1] + dp->df_లెక్క[idx1]) > lnum1)
 	{
 	    // Inside the diffblock
 	    baseline = lnum1 - dp->df_lnum[idx1];
-	    if (baseline > dp->df_count[idx2])
-		baseline = dp->df_count[idx2];
+	    ఒకవేళ (baseline > dp->df_లెక్క[idx2])
+		baseline = dp->df_లెక్క[idx2];
 
-	    return dp->df_lnum[idx2] + baseline;
+	    తిరిగి dp->df_lnum[idx2] + baseline;
 	}
-	if (    (dp->df_lnum[idx1] == lnum1)
-	     && (dp->df_count[idx1] == 0)
+	ఒకవేళ (    (dp->df_lnum[idx1] == lnum1)
+	     && (dp->df_లెక్క[idx1] == 0)
 	     && (dp->df_lnum[idx2] <= curwin->w_cursor.lnum)
-	     && ((dp->df_lnum[idx2] + dp->df_count[idx2])
+	     && ((dp->df_lnum[idx2] + dp->df_లెక్క[idx2])
 						      > curwin->w_cursor.lnum))
 	    /*
 	     * Special case: if the cursor is just after a zero-count
@@ -4661,13 +4661,13 @@ diff_get_corresponding_line_int(
 	     * unmoved. This makes repeated CTRL-W W operations work
 	     * as expected.
 	     */
-	    return curwin->w_cursor.lnum;
-	baseline = (dp->df_lnum[idx1] + dp->df_count[idx1])
-				   - (dp->df_lnum[idx2] + dp->df_count[idx2]);
+	    తిరిగి curwin->w_cursor.lnum;
+	baseline = (dp->df_lnum[idx1] + dp->df_లెక్క[idx1])
+				   - (dp->df_lnum[idx2] + dp->df_లెక్క[idx2]);
     }
 
     // If we get here then the cursor is after the last diff
-    return lnum1 - baseline;
+    తిరిగి lnum1 - baseline;
 }
 
 /*
@@ -4675,14 +4675,14 @@ diff_get_corresponding_line_int(
  * "buf1" in diff mode.  Checks the line number to be valid.
  */
     linenr_T
-diff_get_corresponding_line(buf_T *buf1, linenr_T lnum1)
+diff_get_corresponding_పంక్తి(buf_T *buf1, linenr_T lnum1)
 {
-    linenr_T lnum = diff_get_corresponding_line_int(buf1, lnum1);
+    linenr_T lnum = diff_get_corresponding_పంక్తి_int(buf1, lnum1);
 
     // don't end up past the end of the file
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return curbuf->b_ml.ml_line_count;
-    return lnum;
+    ఒకవేళ (lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి curbuf->b_ml.ml_పంక్తి_లెక్క;
+    తిరిగి lnum;
 }
 
 /*
@@ -4693,254 +4693,254 @@ diff_get_corresponding_line(buf_T *buf1, linenr_T lnum1)
 diff_lnum_win(linenr_T lnum, win_T *wp)
 {
     diff_T	*dp;
-    int		idx;
-    int		i;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		i;
     linenr_T	n;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT)		// safety check
-	return (linenr_T)0;
+    ఒకవేళ (idx == DB_లెక్క)		// safety check
+	తిరిగి (linenr_T)0;
 
-    if (curtab->tp_diff_invalid)
-	ex_diffupdate(NULL);		// update after a big change
+    ఒకవేళ (curtab->tp_diff_invalid)
+	ex_diffupdate(ఖాళీ);		// update after a big change
 
     // search for a change that includes "lnum" in the list of diffblocks.
-    FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
-	    break;
+    FOR_ALL_DIFFBLOCKS_లోపల_TAB(curtab, dp)
+	ఒకవేళ (lnum <= dp->df_lnum[idx] + dp->df_లెక్క[idx])
+	    ఆపు;
 
     // When after the last change, compute relative to the last line number.
-    if (dp == NULL)
-	return wp->w_buffer->b_ml.ml_line_count
-					- (curbuf->b_ml.ml_line_count - lnum);
+    ఒకవేళ (dp == ఖాళీ)
+	తిరిగి wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క
+					- (curbuf->b_ml.ml_పంక్తి_లెక్క - lnum);
 
     // Find index for "wp".
-    i = diff_buf_idx(wp->w_buffer);
-    if (i == DB_COUNT)			// safety check
-	return (linenr_T)0;
+    i = diff_buf_idx(wp->w_బఫరు);
+    ఒకవేళ (i == DB_లెక్క)			// safety check
+	తిరిగి (linenr_T)0;
 
     n = lnum + (dp->df_lnum[i] - dp->df_lnum[idx]);
-    if (n > dp->df_lnum[i] + dp->df_count[i])
-	n = dp->df_lnum[i] + dp->df_count[i];
-    return n;
+    ఒకవేళ (n > dp->df_lnum[i] + dp->df_లెక్క[i])
+	n = dp->df_lnum[i] + dp->df_లెక్క[i];
+    తిరిగి n;
 }
 
 /*
  * Handle an ED style diff line.
  * Return FAIL if the line does not contain diff info.
  */
-    static int
+    స్థిర పూర్ణాంకం
 parse_diff_ed(
-	char_u	    *line,
+	char_u	    *పంక్తి,
 	diffhunk_T  *hunk)
 {
     char_u *p;
-    long    f1, l1, f2, l2;
-    int	    difftype;
+    దీర్ఘ    f1, l1, f2, l2;
+    పూర్ణాంకం	    difftype;
 
     // The line must be one of three formats:
     // change: {first}[,{last}]c{first}[,{last}]
     // append: {first}a{first}[,{last}]
     // delete: {first}[,{last}]d{first}
-    p = line;
+    p = పంక్తి;
     f1 = getdigits(&p);
-    if (*p == ',')
+    ఒకవేళ (*p == ',')
     {
 	++p;
 	l1 = getdigits(&p);
     }
-    else
+    లేకపోతే
 	l1 = f1;
-    if (*p != 'a' && *p != 'c' && *p != 'd')
-	return FAIL;		// invalid diff format
+    ఒకవేళ (*p != 'a' && *p != 'c' && *p != 'd')
+	తిరిగి FAIL;		// invalid diff format
     difftype = *p++;
     f2 = getdigits(&p);
-    if (*p == ',')
+    ఒకవేళ (*p == ',')
     {
 	++p;
 	l2 = getdigits(&p);
     }
-    else
+    లేకపోతే
 	l2 = f2;
-    if (l1 < f1 || l2 < f2)
-	return FAIL;
+    ఒకవేళ (l1 < f1 || l2 < f2)
+	తిరిగి FAIL;
 
-    if (difftype == 'a')
+    ఒకవేళ (difftype == 'a')
     {
 	hunk->lnum_orig = f1 + 1;
-	hunk->count_orig = 0;
+	hunk->లెక్క_orig = 0;
     }
-    else
+    లేకపోతే
     {
 	hunk->lnum_orig = f1;
-	hunk->count_orig = l1 - f1 + 1;
+	hunk->లెక్క_orig = l1 - f1 + 1;
     }
-    if (difftype == 'd')
+    ఒకవేళ (difftype == 'd')
     {
 	hunk->lnum_new = f2 + 1;
-	hunk->count_new = 0;
+	hunk->లెక్క_new = 0;
     }
-    else
+    లేకపోతే
     {
 	hunk->lnum_new = f2;
-	hunk->count_new = l2 - f2 + 1;
+	hunk->లెక్క_new = l2 - f2 + 1;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Parses unified diff with zero(!) context lines.
  * Return FAIL if there is no diff information in "line".
  */
-    static int
+    స్థిర పూర్ణాంకం
 parse_diff_unified(
-	char_u	    *line,
+	char_u	    *పంక్తి,
 	diffhunk_T  *hunk)
 {
     char_u *p;
-    long    oldline, oldcount, newline, newcount;
+    దీర్ఘ    oldline, oldcount, newline, newcount;
 
     // Parse unified diff hunk header:
     // @@ -oldline,oldcount +newline,newcount @@
-    p = line;
-    if (*p++ == '@' && *p++ == '@' && *p++ == ' ' && *p++ == '-')
+    p = పంక్తి;
+    ఒకవేళ (*p++ == '@' && *p++ == '@' && *p++ == ' ' && *p++ == '-')
     {
 	oldline = getdigits(&p);
-	if (*p == ',')
+	ఒకవేళ (*p == ',')
 	{
 	    ++p;
 	    oldcount = getdigits(&p);
 	}
-	else
+	లేకపోతే
 	    oldcount = 1;
-	if (*p++ == ' ' && *p++ == '+')
+	ఒకవేళ (*p++ == ' ' && *p++ == '+')
 	{
 	    newline = getdigits(&p);
-	    if (*p == ',')
+	    ఒకవేళ (*p == ',')
 	    {
 		++p;
 		newcount = getdigits(&p);
 	    }
-	    else
+	    లేకపోతే
 		newcount = 1;
 	}
-	else
-	    return FAIL;	// invalid diff format
+	లేకపోతే
+	    తిరిగి FAIL;	// invalid diff format
 
-	if (oldcount == 0)
+	ఒకవేళ (oldcount == 0)
 	    oldline += 1;
-	if (newcount == 0)
+	ఒకవేళ (newcount == 0)
 	    newline += 1;
-	if (newline == 0)
+	ఒకవేళ (newline == 0)
 	    newline = 1;
 
 	hunk->lnum_orig = oldline;
-	hunk->count_orig = oldcount;
+	hunk->లెక్క_orig = oldcount;
 	hunk->lnum_new = newline;
-	hunk->count_new = newcount;
+	hunk->లెక్క_new = newcount;
 
-	return OK;
+	తిరిగి OK;
     }
 
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Callback function for the xdl_diff() function.
  * Stores the diff output (indices) in a grow array.
  */
-    static int
-xdiff_out_indices(
-	long start_a,
-	long count_a,
-	long start_b,
-	long count_b,
-	void *priv)
+    స్థిర పూర్ణాంకం
+xdiff_బహిర్గతం_indices(
+	దీర్ఘ ప్రారంభం_a,
+	దీర్ఘ లెక్క_a,
+	దీర్ఘ ప్రారంభం_b,
+	దీర్ఘ లెక్క_b,
+	శూన్య *priv)
 {
     diffout_T	*dout = (diffout_T *)priv;
     diffhunk_T *p = ALLOC_ONE(diffhunk_T);
 
-    if (p == NULL)
-	return -1;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
 
-    if (ga_grow(&dout->dout_ga, 1) == FAIL)
+    ఒకవేళ (ga_grow(&dout->dout_ga, 1) == FAIL)
     {
 	vim_free(p);
-	return -1;
+	తిరిగి -1;
     }
 
-    p->lnum_orig  = start_a + 1;
-    p->count_orig = count_a;
-    p->lnum_new   = start_b + 1;
-    p->count_new  = count_b;
-    ((diffhunk_T **)dout->dout_ga.ga_data)[dout->dout_ga.ga_len++] = p;
-    return 0;
+    p->lnum_orig  = ప్రారంభం_a + 1;
+    p->లెక్క_orig = లెక్క_a;
+    p->lnum_new   = ప్రారంభం_b + 1;
+    p->లెక్క_new  = లెక్క_b;
+    ((diffhunk_T **)dout->dout_ga.ga_దత్తాంశం)[dout->dout_ga.ga_len++] = p;
+    తిరిగి 0;
 }
 
 /*
  * Callback function for the xdl_diff() function.
  * Stores the unified diff output in a grow array.
  */
-    static int
-xdiff_out_unified(
-	void *priv,
+    స్థిర పూర్ణాంకం
+xdiff_బహిర్గతం_unified(
+	శూన్య *priv,
 	mmbuffer_t *mb,
-	int nbuf)
+	పూర్ణాంకం nbuf)
 {
     diffout_T	*dout = (diffout_T *)priv;
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < nbuf; i++)
-	ga_concat_len(&dout->dout_ga, (char_u *)mb[i].ptr, mb[i].size);
+    కొరకు (i = 0; i < nbuf; i++)
+	ga_concat_len(&dout->dout_ga, (char_u *)mb[i].ptr, mb[i].కొలత);
 
-    return 0;
+    తిరిగి 0;
 }
 
-#endif	// FEAT_DIFF
+#అయితే_ముగింపు	// FEAT_DIFF
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * "diff_filler()" function
  */
-    void
-f_diff_filler(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_diff_filler(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
 # ifdef FEAT_DIFF
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    rettv->vval.v_number = diff_check_fill(curwin, tv_get_lnum(argvars));
+    rettv->vval.v_సంఖ్య = diff_check_fill(curwin, tv_get_lnum(argvars));
 # endif
 }
 
 /*
  * "diff_hlID()" function
  */
-    void
-f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_diff_hlID(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
 # ifdef FEAT_DIFF
     linenr_T		lnum;
-    static linenr_T	prev_lnum = 0;
-    static varnumber_T	changedtick = 0;
-    static int		fnum = 0;
-    static int		prev_diff_flags = 0;
-    static int		change_start = 0;
-    static int		change_end = 0;
-    static hlf_T	hlID = (hlf_T)0;
-    int			cache_results = TRUE;
-    int			col;
+    స్థిర linenr_T	prev_lnum = 0;
+    స్థిర varnumber_T	changedtick = 0;
+    స్థిర పూర్ణాంకం		fnum = 0;
+    స్థిర పూర్ణాంకం		prev_diff_flags = 0;
+    స్థిర పూర్ణాంకం		change_ప్రారంభం = 0;
+    స్థిర పూర్ణాంకం		change_చివర = 0;
+    స్థిర hlf_T	hlID = (hlf_T)0;
+    పూర్ణాంకం			cache_results = TRUE;
+    పూర్ణాంకం			నిలువు;
     diffline_T		diffline;
 
-    CLEAR_FIELD(diffline);
+    CLEAR_క్షేత్రం(diffline);
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_lnum_arg(argvars,0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
-    if (diff_flags & ALL_INLINE_DIFF)
+    ఒకవేళ (diff_flags & ALL_INLINE_DIFF)
     {
 	// Remember the results if using simple since it's recalculated per
 	// call. Otherwise just call diff_find_change() every time since
@@ -4949,42 +4949,42 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     }
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 0)	// ignore type error in {lnum} arg
+    ఒకవేళ (lnum < 0)	// ignore type error in {lnum} arg
 	lnum = 0;
-    if (!cache_results
+    ఒకవేళ (!cache_results
 	    || lnum != prev_lnum
 	    || changedtick != CHANGEDTICK(curbuf)
 	    || fnum != curbuf->b_fnum
 	    || diff_flags != prev_diff_flags)
     {
 	// New line, buffer, change: need to get the values.
-	int linestatus = 0;
+	పూర్ణాంకం linestatus = 0;
 	diff_check_with_linestatus(curwin, lnum, &linestatus);
-	if (linestatus < 0)
+	ఒకవేళ (linestatus < 0)
 	{
-	    if (linestatus == -1)
+	    ఒకవేళ (linestatus == -1)
 	    {
-		change_start = MAXCOL;
-		change_end = -1;
-		if (diff_find_change(curwin, lnum, &diffline))
-		    hlID = HLF_ADD;	// added line
-		else
+		change_ప్రారంభం = MAXCOL;
+		change_చివర = -1;
+		ఒకవేళ (diff_కనుగొను_change(curwin, lnum, &diffline))
+		    hlID = HLF_కూడు;	// added line
+		లేకపోతే
 		{
 		    hlID = HLF_CHD;	// changed line
-		    if (diffline.num_changes > 0 && cache_results)
+		    ఒకవేళ (diffline.అంకె_changes > 0 && cache_results)
 		    {
-			change_start = diffline.changes[0].dc_start[diffline.bufidx];
-			change_end = diffline.changes[0].dc_end[diffline.bufidx];
+			change_ప్రారంభం = diffline.changes[0].dc_ప్రారంభం[diffline.bufidx];
+			change_చివర = diffline.changes[0].dc_చివర[diffline.bufidx];
 		    }
 		}
 	    }
-	    else
-		hlID = HLF_ADD;	// added line
+	    లేకపోతే
+		hlID = HLF_కూడు;	// added line
 	}
-	else
+	లేకపోతే
 	    hlID = (hlf_T)0;
 
-	if (cache_results)
+	ఒకవేళ (cache_results)
 	{
 	    prev_lnum = lnum;
 	    changedtick = CHANGEDTICK(curbuf);
@@ -4993,35 +4993,35 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	}
     }
 
-    if (hlID == HLF_CHD || hlID == HLF_TXD)
+    ఒకవేళ (hlID == HLF_CHD || hlID == HLF_TXD)
     {
-	col = tv_get_number(&argvars[1]) - 1; // ignore type error in {col}
-	if (cache_results)
+	నిలువు = tv_get_సంఖ్య(&argvars[1]) - 1; // ignore type error in {col}
+	ఒకవేళ (cache_results)
 	{
-	    if (col >= change_start && col < change_end)
+	    ఒకవేళ (నిలువు >= change_ప్రారంభం && నిలువు < change_చివర)
 		hlID = HLF_TXD;			// changed text
-	    else
+	    లేకపోతే
 		hlID = HLF_CHD;			// changed line
 	}
-	else
+	లేకపోతే
 	{
 	    hlID = HLF_CHD;
-	    for (int i = 0; i < diffline.num_changes; i++)
+	    కొరకు (పూర్ణాంకం i = 0; i < diffline.అంకె_changes; i++)
 	    {
-		int added = diff_change_parse(&diffline, &diffline.changes[i],
-			&change_start, &change_end);
-		if (col >= change_start && col < change_end)
+		పూర్ణాంకం added = diff_change_parse(&diffline, &diffline.changes[i],
+			&change_ప్రారంభం, &change_చివర);
+		ఒకవేళ (నిలువు >= change_ప్రారంభం && నిలువు < change_చివర)
 		{
 		    hlID = added ? HLF_TXA : HLF_TXD;
-		    break;
+		    ఆపు;
 		}
-		if (col < change_start)
+		ఒకవేళ (నిలువు < change_ప్రారంభం)
 		    // the remaining changes are past this column and not relevant
-		    break;
+		    ఆపు;
 	    }
 	}
     }
-    rettv->vval.v_number = hlID == (hlf_T)0 ? 0 : (int)hlID;
+    rettv->vval.v_సంఖ్య = hlID == (hlf_T)0 ? 0 : (పూర్ణాంకం)hlID;
 # endif
 }
 
@@ -5030,69 +5030,69 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
  * Parse the diff options passed in "optarg" to the diff() function and return
  * the options in "diffopts" and the diff algorithm in "diffalgo".
  */
-    static int
+    స్థిర పూర్ణాంకం
 parse_diff_optarg(
     typval_T	    *opts,
-    int		    *diffopts,
-    long	    *diffalgo,
+    పూర్ణాంకం		    *diffopts,
+    దీర్ఘ	    *diffalgo,
     dio_outfmt_T    *diff_output_fmt,
-    int		    *diff_ctxlen)
+    పూర్ణాంకం		    *diff_ctxlen)
 {
     dict_T *d = opts->vval.v_dict;
 
     char_u  *algo = dict_get_string(d, "algorithm", FALSE);
-    if (algo != NULL)
+    ఒకవేళ (algo != ఖాళీ)
     {
-	if (STRNCMP(algo, "myers", 5) == 0)
+	ఒకవేళ (STRNCMP(algo, "myers", 5) == 0)
 	    *diffalgo = 0;
-	else if (STRNCMP(algo, "minimal", 7) == 0)
-	    *diffalgo = XDF_NEED_MINIMAL;
-	else if (STRNCMP(algo, "patience", 8) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(algo, "minimal", 7) == 0)
+	    *diffalgo = XDF_NEED_కనీస;
+	లేకపోతే ఒకవేళ (STRNCMP(algo, "patience", 8) == 0)
 	    *diffalgo = XDF_PATIENCE_DIFF;
-	else if (STRNCMP(algo, "histogram", 9) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(algo, "histogram", 9) == 0)
 	    *diffalgo = XDF_HISTOGRAM_DIFF;
     }
 
     char_u  *output_fmt = dict_get_string(d, "output", FALSE);
-    if (output_fmt != NULL)
+    ఒకవేళ (output_fmt != ఖాళీ)
     {
-	if (STRNCMP(output_fmt, "unified", 7) == 0)
+	ఒకవేళ (STRNCMP(output_fmt, "unified", 7) == 0)
 	    *diff_output_fmt = DIO_OUTPUT_UNIFIED;
-	else if (STRNCMP(output_fmt, "indices", 7) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(output_fmt, "indices", 7) == 0)
 	    *diff_output_fmt = DIO_OUTPUT_INDICES;
-	else
+	లేకపోతే
 	{
 	    semsg(_(e_unsupported_diff_output_format_str), output_fmt);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
     }
 
-    *diff_ctxlen = dict_get_number_def(d, "context", 0);
-    if (*diff_ctxlen < 0)
+    *diff_ctxlen = dict_get_సంఖ్య_def(d, "context", 0);
+    ఒకవేళ (*diff_ctxlen < 0)
 	*diff_ctxlen = 0;
 
-    if (dict_get_bool(d, "iblank", FALSE))
+    ఒకవేళ (dict_get_bool(d, "iblank", FALSE))
 	*diffopts |= DIFF_IBLANK;
-    if (dict_get_bool(d, "icase", FALSE))
+    ఒకవేళ (dict_get_bool(d, "icase", FALSE))
 	*diffopts |= DIFF_ICASE;
-    if (dict_get_bool(d, "iwhite", FALSE))
+    ఒకవేళ (dict_get_bool(d, "iwhite", FALSE))
 	*diffopts |= DIFF_IWHITE;
-    if (dict_get_bool(d, "iwhiteall", FALSE))
+    ఒకవేళ (dict_get_bool(d, "iwhiteall", FALSE))
 	*diffopts |= DIFF_IWHITEALL;
-    if (dict_get_bool(d, "iwhiteeol", FALSE))
+    ఒకవేళ (dict_get_bool(d, "iwhiteeol", FALSE))
 	*diffopts |= DIFF_IWHITEEOL;
-    if (dict_get_bool(d, "indent-heuristic", FALSE))
+    ఒకవేళ (dict_get_bool(d, "indent-heuristic", FALSE))
 	*diffalgo |= XDF_INDENT_HEURISTIC;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Concatenate the List of strings in "l" and store the result in
  * "din->din_mmfile.ptr" and the length in "din->din_mmfile.size".
  */
-    static void
-list_to_diffin(list_T *l, diffin_T *din, int icase)
+    స్థిర శూన్య
+list_గమ్యం_diffin(list_T *l, diffin_T *din, పూర్ణాంకం icase)
 {
     garray_T	ga;
     listitem_T	*li;
@@ -5100,139 +5100,139 @@ list_to_diffin(list_T *l, diffin_T *din, int icase)
 
     ga_init2(&ga, 1, 2048);
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
 	str = tv_get_string(&li->li_tv);
-	if (icase)
+	ఒకవేళ (icase)
 	{
 	    str = strlow_save(str);
-	    if (str == NULL)
-		continue;
+	    ఒకవేళ (str == ఖాళీ)
+		కొనసాగు;
 	}
 	ga_concat(&ga, str);
 	ga_append(&ga, NL);
-	if (icase)
+	ఒకవేళ (icase)
 	    vim_free(str);
     }
 
-    din->din_mmfile.ptr = (char *)ga.ga_data;
-    din->din_mmfile.size = ga.ga_len;
+    din->din_mmfile.ptr = (అక్షరం *)ga.ga_దత్తాంశం;
+    din->din_mmfile.కొలత = ga.ga_len;
 }
 
 /*
  * Get the start and end indices from the diff "hunk".
  */
-    static dict_T *
+    స్థిర dict_T *
 get_diff_hunk_indices(diffhunk_T *hunk)
 {
     dict_T	*hunk_dict;
 
     hunk_dict = dict_alloc();
-    if (hunk_dict == NULL)
-	return NULL;
+    ఒకవేళ (hunk_dict == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    dict_add_number(hunk_dict, "from_idx", hunk->lnum_orig - 1);
-    dict_add_number(hunk_dict, "from_count", hunk->count_orig);
-    dict_add_number(hunk_dict, "to_idx", hunk->lnum_new  - 1);
-    dict_add_number(hunk_dict, "to_count", hunk->count_new);
+    dict_కూడు_సంఖ్య(hunk_dict, "from_idx", hunk->lnum_orig - 1);
+    dict_కూడు_సంఖ్య(hunk_dict, "from_count", hunk->లెక్క_orig);
+    dict_కూడు_సంఖ్య(hunk_dict, "to_idx", hunk->lnum_new  - 1);
+    dict_కూడు_సంఖ్య(hunk_dict, "to_count", hunk->లెక్క_new);
 
-    return hunk_dict;
+    తిరిగి hunk_dict;
 }
 # endif
 
 /*
  * "diff()" function
  */
-    void
-f_diff(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_diff(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
 # ifdef FEAT_DIFF
     diffio_T dio;
 
-    if (check_for_nonnull_list_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_nonnull_list_arg(argvars, 0) == FAIL
 	    || check_for_nonnull_list_arg(argvars, 1) == FAIL
 	    || check_for_opt_nonnull_dict_arg(argvars, 2) == FAIL)
-	return;
+	తిరిగి;
 
-    CLEAR_FIELD(dio);
-    dio.dio_internal = TRUE;
-    ga_init2(&dio.dio_diff.dout_ga, sizeof(char *), 1000);
+    CLEAR_క్షేత్రం(dio);
+    dio.dio_అంతర్గత = TRUE;
+    ga_init2(&dio.dio_diff.dout_ga, పరిమాణం(అక్షరం *), 1000);
 
     list_T *orig_list = argvars[0].vval.v_list;
     list_T *new_list = argvars[1].vval.v_list;
 
     // Save the 'diffopt' option value and restore it after getting the diff.
-    int		save_diff_flags = diff_flags;
-    long	save_diff_algorithm = diff_algorithm;
-    diff_flags = DIFF_INTERNAL;
+    పూర్ణాంకం		save_diff_flags = diff_flags;
+    దీర్ఘ	save_diff_algorithm = diff_algorithm;
+    diff_flags = DIFF_అంతర్గత;
     diff_algorithm = 0;
     dio.dio_outfmt = DIO_OUTPUT_UNIFIED;
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	if (parse_diff_optarg(&argvars[2], &diff_flags, &diff_algorithm,
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
+	ఒకవేళ (parse_diff_optarg(&argvars[2], &diff_flags, &diff_algorithm,
 			&dio.dio_outfmt, &dio.dio_ctxlen) == FAIL)
-	    return;
+	    తిరిగి;
 
     // Concatenate the List of strings into a single string using newline
     // separator.  Internal diff library expects a single string.
-    list_to_diffin(orig_list, &dio.dio_orig, diff_flags & DIFF_ICASE);
-    list_to_diffin(new_list, &dio.dio_new, diff_flags & DIFF_ICASE);
+    list_గమ్యం_diffin(orig_list, &dio.dio_orig, diff_flags & DIFF_ICASE);
+    list_గమ్యం_diffin(new_list, &dio.dio_new, diff_flags & DIFF_ICASE);
 
     // If 'diffexpr' is set, then the internal diff is not used.  Set
     // 'diffexpr' to an empty string temporarily.
-    int	    restore_diffexpr = FALSE;
+    పూర్ణాంకం	    restore_diffexpr = FALSE;
     char_u  cc = *p_dex;
-    if (*p_dex != NUL)
+    ఒకవేళ (*p_dex != NUL)
     {
 	restore_diffexpr = TRUE;
 	*p_dex = NUL;
     }
 
     // Compute the diff
-    int diff_status = diff_file(&dio);
+    పూర్ణాంకం diff_స్థితి = diff_file(&dio);
 
     // restore 'diffexpr'
-    if (restore_diffexpr)
+    ఒకవేళ (restore_diffexpr)
 	*p_dex = cc;
 
-    if (diff_status == FAIL)
-	goto done;
+    ఒకవేళ (diff_స్థితి == FAIL)
+	వెళ్ళు పూర్తి;
 
-    int		hunk_idx = 0;
+    పూర్ణాంకం		hunk_idx = 0;
     dict_T	*hunk_dict;
 
-    if (dio.dio_outfmt == DIO_OUTPUT_INDICES)
+    ఒకవేళ (dio.dio_outfmt == DIO_OUTPUT_INDICES)
     {
-	if (rettv_list_alloc(rettv) != OK)
-	    goto done;
+	ఒకవేళ (rettv_list_alloc(rettv) != OK)
+	    వెళ్ళు పూర్తి;
 	list_T	*l = rettv->vval.v_list;
 
 	// Process each diff hunk
-	diffhunk_T	*hunk = NULL;
-	while (hunk_idx < dio.dio_diff.dout_ga.ga_len)
+	diffhunk_T	*hunk = ఖాళీ;
+	అయితే (hunk_idx < dio.dio_diff.dout_ga.ga_len)
 	{
-	    hunk = ((diffhunk_T **)dio.dio_diff.dout_ga.ga_data)[hunk_idx++];
+	    hunk = ((diffhunk_T **)dio.dio_diff.dout_ga.ga_దత్తాంశం)[hunk_idx++];
 
 	    hunk_dict = get_diff_hunk_indices(hunk);
-	    if (hunk_dict == NULL)
-		goto done;
+	    ఒకవేళ (hunk_dict == ఖాళీ)
+		వెళ్ళు పూర్తి;
 
-	    if (list_append_dict(l, hunk_dict) == FAIL)
+	    ఒకవేళ (list_append_dict(l, hunk_dict) == FAIL)
 		dict_unref(hunk_dict);
 	}
     }
-    else
+    లేకపోతే
     {
 	ga_append(&dio.dio_diff.dout_ga, NUL);
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string =
-			vim_strsave((char_u *)dio.dio_diff.dout_ga.ga_data);
+			vim_strsave((char_u *)dio.dio_diff.dout_ga.ga_దత్తాంశం);
     }
 
-done:
+పూర్తి:
     clear_diffin(&dio.dio_new);
-    if (dio.dio_outfmt == DIO_OUTPUT_INDICES)
+    ఒకవేళ (dio.dio_outfmt == DIO_OUTPUT_INDICES)
 	clear_diffout(&dio.dio_diff);
-    else
+    లేకపోతే
 	ga_clear(&dio.dio_diff.dout_ga);
     clear_diffin(&dio.dio_orig);
     // Restore the 'diffopt' option value.
@@ -5241,4 +5241,4 @@ done:
 # endif
 }
 
-#endif
+#అయితే_ముగింపు

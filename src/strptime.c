@@ -53,86 +53,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 
 /* Constants lifted from NetBSD's <tzfile.h>. */
-#define TM_YEAR_BASE	1900
-#define TM_SUNDAY	0
-#define TM_MONDAY	1
-#define SECSPERHOUR	3600
-#define SECSPERMIN	60
-#define HOURSPERDAY	24
+#నిర్వచించు TM_YEAR_పునాది	1900
+#నిర్వచించు TM_SUNDAY	0
+#నిర్వచించు TM_MONDAY	1
+#నిర్వచించు SECSPERHOUR	3600
+#నిర్వచించు SECSPERMIN	60
+#నిర్వచించు HOURSPERDAY	24
 
-#define isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
+#నిర్వచించు isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
 /* isleap_sum avoids integer overflow when adding the 1900 base. */
-#define isleap_sum(a, b) \
-			isleap(((unsigned)(a) + (unsigned)(b)) % 400)
+#నిర్వచించు isleap_కూడిక(a, b) \
+			isleap(((గుర్తులేని)(a) + (గుర్తులేని)(b)) % 400)
 
 /*
  * _get_tzname() is provided by the UCRT and by the MSVC CRT.  Older MinGW
  * builds linking against msvcrt.dll fall back to the deprecated tzname[]
  * global (mingw-w64 already exposes the POSIX-named tzname[]).
  */
-#if defined(_UCRT) || defined(_MSC_VER)
+#ఒకవేళ defined(_UCRT) || defined(_MSC_VER)
 # define USE_GET_TZNAME
-#endif
+#అయితే_ముగింపు
 
 /* Locale tables (English / "C" locale). */
-static const char *const c_day[] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి c_day[] = {
     "Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday"
 };
-static const char *const c_abday[] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి c_abday[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
-static const char *const c_mon[] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి c_mon[] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
-static const char *const c_abmon[] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి c_abmon[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
-static const char *const c_am_pm[] = { "AM", "PM" };
-static const char c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
-static const char c_d_fmt[] = "%m/%d/%y";
-static const char c_t_fmt[] = "%H:%M:%S";
-static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి c_am_pm[] = { "AM", "PM" };
+స్థిర స్థిరరాశి అక్షరం c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
+స్థిర స్థిరరాశి అక్షరం c_d_fmt[] = "%m/%d/%y";
+స్థిర స్థిరరాశి అక్షరం c_t_fmt[] = "%H:%M:%S";
+స్థిర స్థిరరాశి అక్షరం c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
-						unsigned int, unsigned int);
-static const unsigned char *find_string(const unsigned char *, int *,
-			const char * const *, const char * const *, int);
+స్థిర స్థిరరాశి గుర్తులేని అక్షరం *conv_అంకె(స్థిరరాశి గుర్తులేని అక్షరం *, పూర్ణాంకం *,
+						గుర్తులేని పూర్ణాంకం, గుర్తులేని పూర్ణాంకం);
+స్థిర స్థిరరాశి గుర్తులేని అక్షరం *కనుగొను_string(స్థిరరాశి గుర్తులేని అక్షరం *, పూర్ణాంకం *,
+			స్థిరరాశి అక్షరం * స్థిరరాశి *, స్థిరరాశి అక్షరం * స్థిరరాశి *, పూర్ణాంకం);
 
 /*
  * We do not implement alternate representations. However, we always
  * check whether a given modifier is allowed for a certain conversion.
  */
-#define ALT_E			0x01
-#define ALT_O			0x02
-#define LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
+#నిర్వచించు ALT_E			0x01
+#నిర్వచించు ALT_O			0x02
+#నిర్వచించు LEGAL_ALT(x)		{ ఒకవేళ (alt_format & ~(x)) తిరిగి ఖాళీ; }
 
-#define S_YEAR			(1 << 0)
-#define S_MON			(1 << 1)
-#define S_YDAY			(1 << 2)
-#define S_MDAY			(1 << 3)
-#define S_WDAY			(1 << 4)
-#define S_HOUR			(1 << 5)
+#నిర్వచించు S_YEAR			(1 << 0)
+#నిర్వచించు S_MON			(1 << 1)
+#నిర్వచించు S_YDAY			(1 << 2)
+#నిర్వచించు S_MDAY			(1 << 3)
+#నిర్వచించు S_WDAY			(1 << 4)
+#నిర్వచించు S_HOUR			(1 << 5)
 
-#define HAVE_MDAY(s)		(s & S_MDAY)
-#define HAVE_MON(s)		(s & S_MON)
-#define HAVE_WDAY(s)		(s & S_WDAY)
-#define HAVE_YDAY(s)		(s & S_YDAY)
-#define HAVE_YEAR(s)		(s & S_YEAR)
-#define HAVE_HOUR(s)		(s & S_HOUR)
+#నిర్వచించు HAVE_MDAY(s)		(s & S_MDAY)
+#నిర్వచించు HAVE_MON(s)		(s & S_MON)
+#నిర్వచించు HAVE_WDAY(s)		(s & S_WDAY)
+#నిర్వచించు HAVE_YDAY(s)		(s & S_YDAY)
+#నిర్వచించు HAVE_YEAR(s)		(s & S_YEAR)
+#నిర్వచించు HAVE_HOUR(s)		(s & S_HOUR)
 
 /* RFC-822/RFC-2822 */
-static const char *const nast[5] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి nast[5] = {
     "EST",    "CST",    "MST",    "PST",    "\0\0\0"
 };
-static const char *const nadt[5] = {
+స్థిర స్థిరరాశి అక్షరం *స్థిరరాశి nadt[5] = {
     "EDT",    "CDT",    "MDT",    "PDT",    "\0\0\0"
 };
 
@@ -140,7 +140,7 @@ static const char *const nadt[5] = {
  * Table to determine the ordinal date for the start of a month.
  * Ref: http://en.wikipedia.org/wiki/ISO_week_date
  */
-static const int start_of_month[2][13] = {
+స్థిర స్థిరరాశి పూర్ణాంకం ప్రారంభం_యొక్క_month[2][13] = {
     /* non-leap year */
     { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
     /* leap year */
@@ -153,14 +153,14 @@ static const int start_of_month[2][13] = {
  * and its colonies. Ref:
  * http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
  */
-    static int
-first_wday_of(int yr)
+    స్థిర పూర్ణాంకం
+మొదటి_wday_యొక్క(పూర్ణాంకం yr)
 {
-    return ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
+    తిరిగి ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
 	    (isleap(yr) ? 6 : 0) + 1) % 7;
 }
 
-#define delim(p)	((p) == '\0' || isspace((unsigned char)(p)))
+#నిర్వచించు delim(p)	((p) == '\0' || ఖాళీనా((గుర్తులేని అక్షరం)(p)))
 
 /*
  * Stub replacing NetBSD's fromzone(): the Windows CRT does not provide
@@ -168,325 +168,325 @@ first_wday_of(int yr)
  * we simply decline to recognize arbitrary timezone names.  The %Z / %z
  * numeric and RFC-822/2822 forms are still handled by the caller.
  */
-    static int
-fromzone(const unsigned char **bp UNUSED, struct tm *tm UNUSED,
-						    int mandatory UNUSED)
+    స్థిర పూర్ణాంకం
+fromzone(స్థిరరాశి గుర్తులేని అక్షరం **bp వాడని, నిర్మాణం tm *tm వాడని,
+						    పూర్ణాంకం mandatory వాడని)
 {
-    return 0;
+    తిరిగి 0;
 }
 
-    char *
-strptime(const char *buf, const char *fmt, struct tm *tm)
+    అక్షరం *
+strptime(స్థిరరాశి అక్షరం *buf, స్థిరరాశి అక్షరం *fmt, నిర్మాణం tm *tm)
 {
-    unsigned char c;
-    const unsigned char *bp, *ep, *zname;
-    int alt_format, i, split_year = 0, neg = 0, state = 0,
-	day_offset = -1, week_offset = 0, offs, mandatory;
-    const char *new_fmt;
+    గుర్తులేని అక్షరం c;
+    స్థిరరాశి గుర్తులేని అక్షరం *bp, *ep, *zname;
+    పూర్ణాంకం alt_format, i, విభజించు_year = 0, neg = 0, state = 0,
+	day_స్థానభ్రంశం = -1, week_స్థానభ్రంశం = 0, offs, mandatory;
+    స్థిరరాశి అక్షరం *new_fmt;
 
-    bp = (const unsigned char *)buf;
+    bp = (స్థిరరాశి గుర్తులేని అక్షరం *)buf;
 
-    while (bp != NULL && (c = *fmt++) != '\0')
+    అయితే (bp != ఖాళీ && (c = *fmt++) != '\0')
     {
 	/* Clear `alternate' modifier prior to new conversion. */
 	alt_format = 0;
 	i = 0;
 
 	/* Eat up white-space. */
-	if (isspace(c))
+	ఒకవేళ (ఖాళీనా(c))
 	{
-	    while (isspace(*bp))
+	    అయితే (ఖాళీనా(*bp))
 		bp++;
-	    continue;
+	    కొనసాగు;
 	}
 
-	if (c != '%')
-	    goto literal;
+	ఒకవేళ (c != '%')
+	    వెళ్ళు literal;
 
 
-again:	switch (c = *fmt++)
+again:	ఎంపిక (c = *fmt++)
 	{
-	case '%':	/* "%%" is converted to "%". */
+	స్థితి '%':	/* "%%" is converted to "%". */
 literal:
-	    if (c != *bp++)
-		return NULL;
+	    ఒకవేళ (c != *bp++)
+		తిరిగి ఖాళీ;
 	    LEGAL_ALT(0);
-	    continue;
+	    కొనసాగు;
 
 	/*
 	 * "Alternative" modifiers. Just set the appropriate flag
 	 * and start over again.
 	 */
-	case 'E':	/* "%E?" alternative conversion modifier. */
+	స్థితి 'E':	/* "%E?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_E;
-	    goto again;
+	    వెళ్ళు again;
 
-	case 'O':	/* "%O?" alternative conversion modifier. */
+	స్థితి 'O':	/* "%O?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_O;
-	    goto again;
+	    వెళ్ళు again;
 
 	/*
 	 * "Complex" conversion rules, implemented through recursion.
 	 */
-	case 'c':	/* Date and time, using the locale's format. */
+	స్థితి 'c':	/* Date and time, using the locale's format. */
 	    new_fmt = c_d_t_fmt;
 	    state |= S_WDAY | S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'D':	/* The date as "%m/%d/%y". */
+	స్థితి 'D':	/* The date as "%m/%d/%y". */
 	    new_fmt = "%m/%d/%y";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'F':	/* The date as "%Y-%m-%d". */
+	స్థితి 'F':	/* The date as "%Y-%m-%d". */
 	    new_fmt = "%Y-%m-%d";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'R':	/* The time as "%H:%M". */
+	స్థితి 'R':	/* The time as "%H:%M". */
 	    new_fmt = "%H:%M";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'r':	/* The time in 12-hour clock representation. */
+	స్థితి 'r':	/* The time in 12-hour clock representation. */
 	    new_fmt = c_t_fmt_ampm;
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'T':	/* The time as "%H:%M:%S". */
+	స్థితి 'T':	/* The time as "%H:%M:%S". */
 	    new_fmt = "%H:%M:%S";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'X':	/* The time, using the locale's format. */
+	స్థితి 'X':	/* The time, using the locale's format. */
 	    new_fmt = c_t_fmt;
-	    goto recurse;
+	    వెళ్ళు recurse;
 
-	case 'x':	/* The date, using the locale's format. */
+	స్థితి 'x':	/* The date, using the locale's format. */
 	    new_fmt = c_d_fmt;
 	    state |= S_MON | S_MDAY | S_YEAR;
 	recurse:
-	    bp = (const unsigned char *)strptime((const char *)bp,
+	    bp = (స్థిరరాశి గుర్తులేని అక్షరం *)strptime((స్థిరరాశి అక్షరం *)bp,
 							new_fmt, tm);
 	    LEGAL_ALT(ALT_E);
-	    continue;
+	    కొనసాగు;
 
 	/*
 	 * "Elementary" conversion rules.
 	 */
-	case 'A':	/* The day of week, using the locale's form. */
-	case 'a':
-	    bp = find_string(bp, &tm->tm_wday, c_day, c_abday, 7);
+	స్థితి 'A':	/* The day of week, using the locale's form. */
+	స్థితి 'a':
+	    bp = కనుగొను_string(bp, &tm->tm_wday, c_day, c_abday, 7);
 	    LEGAL_ALT(0);
 	    state |= S_WDAY;
-	    continue;
+	    కొనసాగు;
 
-	case 'B':	/* The month, using the locale's form. */
-	case 'b':
-	case 'h':
-	    bp = find_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
+	స్థితి 'B':	/* The month, using the locale's form. */
+	స్థితి 'b':
+	స్థితి 'h':
+	    bp = కనుగొను_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
 	    LEGAL_ALT(0);
 	    state |= S_MON;
-	    continue;
+	    కొనసాగు;
 
-	case 'C':	/* The century number. */
+	స్థితి 'C':	/* The century number. */
 	    i = 20;
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_అంకె(bp, &i, 0, 99);
 
-	    i = i * 100 - TM_YEAR_BASE;
-	    if (split_year)
+	    i = i * 100 - TM_YEAR_పునాది;
+	    ఒకవేళ (విభజించు_year)
 		i += tm->tm_year % 100;
-	    split_year = 1;
+	    విభజించు_year = 1;
 	    tm->tm_year = i;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    కొనసాగు;
 
-	case 'd':	/* The day of month. */
-	case 'e':
-	    bp = conv_num(bp, &tm->tm_mday, 1, 31);
+	స్థితి 'd':	/* The day of month. */
+	స్థితి 'e':
+	    bp = conv_అంకె(bp, &tm->tm_mday, 1, 31);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MDAY;
-	    continue;
+	    కొనసాగు;
 
-	case 'k':	/* The hour (24-hour clock representation). */
+	స్థితి 'k':	/* The hour (24-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'H':
-	    bp = conv_num(bp, &tm->tm_hour, 0, 23);
+	స్థితి 'H':
+	    bp = conv_అంకె(bp, &tm->tm_hour, 0, 23);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    కొనసాగు;
 
-	case 'l':	/* The hour (12-hour clock representation). */
+	స్థితి 'l':	/* The hour (12-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'I':
-	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
-	    if (tm->tm_hour == 12)
+	స్థితి 'I':
+	    bp = conv_అంకె(bp, &tm->tm_hour, 1, 12);
+	    ఒకవేళ (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    కొనసాగు;
 
-	case 'j':	/* The day of year. */
+	స్థితి 'j':	/* The day of year. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 366);
+	    bp = conv_అంకె(bp, &i, 1, 366);
 	    tm->tm_yday = i - 1;
 	    LEGAL_ALT(0);
 	    state |= S_YDAY;
-	    continue;
+	    కొనసాగు;
 
-	case 'M':	/* The minute. */
-	    bp = conv_num(bp, &tm->tm_min, 0, 59);
+	స్థితి 'M':	/* The minute. */
+	    bp = conv_అంకె(bp, &tm->tm_min, 0, 59);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    కొనసాగు;
 
-	case 'm':	/* The month. */
+	స్థితి 'm':	/* The month. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 12);
+	    bp = conv_అంకె(bp, &i, 1, 12);
 	    tm->tm_mon = i - 1;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MON;
-	    continue;
+	    కొనసాగు;
 
-	case 'p':	/* The locale's equivalent of AM/PM. */
-	    bp = find_string(bp, &i, c_am_pm, NULL, 2);
-	    if (HAVE_HOUR(state) && tm->tm_hour > 11)
-		return NULL;
+	స్థితి 'p':	/* The locale's equivalent of AM/PM. */
+	    bp = కనుగొను_string(bp, &i, c_am_pm, ఖాళీ, 2);
+	    ఒకవేళ (HAVE_HOUR(state) && tm->tm_hour > 11)
+		తిరిగి ఖాళీ;
 	    tm->tm_hour += i * 12;
 	    LEGAL_ALT(0);
-	    continue;
+	    కొనసాగు;
 
-	case 'S':	/* The seconds. */
-	    bp = conv_num(bp, &tm->tm_sec, 0, 61);
+	స్థితి 'S':	/* The seconds. */
+	    bp = conv_అంకె(bp, &tm->tm_sec, 0, 61);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    కొనసాగు;
 
-	case 's':	/* seconds since the epoch */
+	స్థితి 's':	/* seconds since the epoch */
 	    {
-		const time_t TIME_MAX = (time_t)((sizeof(time_t) == 8)
-					? LLONG_MAX : INT_MAX);
+		స్థిరరాశి time_t సమయం_MAX = (time_t)((పరిమాణం(time_t) == 8)
+					? LLONG_MAX : గరిష్ఠ_పూర్ణాంకం);
 		time_t sse, d;
 
-		if (*bp < '0' || *bp > '9')
+		ఒకవేళ (*bp < '0' || *bp > '9')
 		{
-		    bp = NULL;
-		    continue;
+		    bp = ఖాళీ;
+		    కొనసాగు;
 		}
 
 		sse = *bp++ - '0';
-		while (*bp >= '0' && *bp <= '9')
+		అయితే (*bp >= '0' && *bp <= '9')
 		{
 		    d = *bp++ - '0';
-		    if (sse > TIME_MAX / 10)
+		    ఒకవేళ (sse > సమయం_MAX / 10)
 		    {
-			bp = NULL;
-			break;
+			bp = ఖాళీ;
+			ఆపు;
 		    }
 		    sse *= 10;
-		    if (sse > TIME_MAX - d)
+		    ఒకవేళ (sse > సమయం_MAX - d)
 		    {
-			bp = NULL;
-			break;
+			bp = ఖాళీ;
+			ఆపు;
 		    }
 		    sse += d;
 		}
-		if (bp == NULL)
-		    continue;
+		ఒకవేళ (bp == ఖాళీ)
+		    కొనసాగు;
 
 		{
-		    struct tm *lt = localtime(&sse);
+		    నిర్మాణం tm *lt = localtime(&sse);
 
-		    if (lt == NULL)
-			bp = NULL;
-		    else
+		    ఒకవేళ (lt == ఖాళీ)
+			bp = ఖాళీ;
+		    లేకపోతే
 		    {
 			*tm = *lt;
 			state |= S_YDAY | S_WDAY |
 				S_MON | S_MDAY | S_YEAR;
 		    }
 		}
-		continue;
+		కొనసాగు;
 	    }
 
-	case 'U':	/* The week of year, beginning on sunday. */
-	case 'W':	/* The week of year, beginning on monday. */
+	స్థితి 'U':	/* The week of year, beginning on sunday. */
+	స్థితి 'W':	/* The week of year, beginning on monday. */
 	    /*
 	     * This is bogus, as we can not assume any valid
 	     * information present in the tm structure at this
 	     * point to calculate a real value, so save the
 	     * week for now in case it can be used later.
 	     */
-	    bp = conv_num(bp, &i, 0, 53);
+	    bp = conv_అంకె(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
-	    if (c == 'U')
-		day_offset = TM_SUNDAY;
-	    else
-		day_offset = TM_MONDAY;
-	    week_offset = i;
-	    continue;
+	    ఒకవేళ (c == 'U')
+		day_స్థానభ్రంశం = TM_SUNDAY;
+	    లేకపోతే
+		day_స్థానభ్రంశం = TM_MONDAY;
+	    week_స్థానభ్రంశం = i;
+	    కొనసాగు;
 
-	case 'w':	/* The day of week, beginning on sunday. */
-	    bp = conv_num(bp, &tm->tm_wday, 0, 6);
+	స్థితి 'w':	/* The day of week, beginning on sunday. */
+	    bp = conv_అంకె(bp, &tm->tm_wday, 0, 6);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    కొనసాగు;
 
-	case 'u':	/* The day of week, monday = 1. */
-	    bp = conv_num(bp, &i, 1, 7);
+	స్థితి 'u':	/* The day of week, monday = 1. */
+	    bp = conv_అంకె(bp, &i, 1, 7);
 	    tm->tm_wday = i % 7;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    కొనసాగు;
 
-	case 'g':	/* ISO week year without century (parsed, ignored). */
-	    bp = conv_num(bp, &i, 0, 99);
-	    continue;
+	స్థితి 'g':	/* ISO week year without century (parsed, ignored). */
+	    bp = conv_అంకె(bp, &i, 0, 99);
+	    కొనసాగు;
 
-	case 'G':	/* ISO week year with century (parsed, ignored). */
-	    do
+	స్థితి 'G':	/* ISO week year with century (parsed, ignored). */
+	    చేయి
 		bp++;
-	    while (isdigit(*bp));
-	    continue;
+	    అయితే (అంకెనా(*bp));
+	    కొనసాగు;
 
-	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
-	    bp = conv_num(bp, &i, 1, 53);
-	    continue;
+	స్థితి 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
+	    bp = conv_అంకె(bp, &i, 1, 53);
+	    కొనసాగు;
 
-	case 'Y':	/* The year. */
-	    i = TM_YEAR_BASE;	/* just for data sanity... */
-	    bp = conv_num(bp, &i, 0, 9999);
-	    tm->tm_year = i - TM_YEAR_BASE;
+	స్థితి 'Y':	/* The year. */
+	    i = TM_YEAR_పునాది;	/* just for data sanity... */
+	    bp = conv_అంకె(bp, &i, 0, 9999);
+	    tm->tm_year = i - TM_YEAR_పునాది;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    కొనసాగు;
 
-	case 'y':	/* The year within 100 years of the epoch. */
+	స్థితి 'y':	/* The year within 100 years of the epoch. */
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_అంకె(bp, &i, 0, 99);
 
-	    if (split_year)
+	    ఒకవేళ (విభజించు_year)
 		/* preserve century */
 		i += (tm->tm_year / 100) * 100;
-	    else
+	    లేకపోతే
 	    {
-		split_year = 1;
-		if (i <= 68)
-		    i = i + 2000 - TM_YEAR_BASE;
-		else
-		    i = i + 1900 - TM_YEAR_BASE;
+		విభజించు_year = 1;
+		ఒకవేళ (i <= 68)
+		    i = i + 2000 - TM_YEAR_పునాది;
+		లేకపోతే
+		    i = i + 1900 - TM_YEAR_పునాది;
 	    }
 	    tm->tm_year = i;
 	    state |= S_YEAR;
-	    continue;
+	    కొనసాగు;
 
-	case 'Z':
-	case 'z':
+	స్థితి 'Z':
+	స్థితి 'z':
 	    tzset();
 	    mandatory = c == 'z';
 	    /*
@@ -508,299 +508,299 @@ literal:
 	     * Note: J maybe used to denote non-nautical
 	     *       local time
 	     */
-	    if (mandatory)
-		while (isspace(*bp))
+	    ఒకవేళ (mandatory)
+		అయితే (ఖాళీనా(*bp))
 		    bp++;
 
 	    zname = bp;
-	    switch (*bp++)
+	    ఎంపిక (*bp++)
 	    {
-	    case 'G':
-		if (*bp++ != 'M')
-		    goto namedzone;
+	    స్థితి 'G':
+		ఒకవేళ (*bp++ != 'M')
+		    వెళ్ళు namedzone;
 		/*FALLTHROUGH*/
-	    case 'U':
-		if (*bp++ != 'T')
-		    goto namedzone;
-		else if (!delim(*bp) && *bp++ != 'C')
-		    goto namedzone;
+	    స్థితి 'U':
+		ఒకవేళ (*bp++ != 'T')
+		    వెళ్ళు namedzone;
+		లేకపోతే ఒకవేళ (!delim(*bp) && *bp++ != 'C')
+		    వెళ్ళు namedzone;
 		/*FALLTHROUGH*/
-	    case 'Z':
-		if (!delim(*bp))
-		    goto namedzone;
+	    స్థితి 'Z':
+		ఒకవేళ (!delim(*bp))
+		    వెళ్ళు namedzone;
 		tm->tm_isdst = 0;
-		continue;
-	    case '+':
+		కొనసాగు;
+	    స్థితి '+':
 		neg = 0;
-		break;
-	    case '-':
+		ఆపు;
+	    స్థితి '-':
 		neg = 1;
-		break;
-	    default:
+		ఆపు;
+	    అప్రమేయ:
 namedzone:
 		bp = zname;
 
 		/* Nautical / Military style */
-		if (delim(bp[1]) &&
+		ఒకవేళ (delim(bp[1]) &&
 			((*bp >= 'A' && *bp <= 'I') ||
 			 (*bp >= 'L' && *bp <= 'Y')))
 		{
 		    bp++;
-		    continue;
+		    కొనసాగు;
 		}
 		/* 'J' is local time */
-		if (delim(bp[1]) && *bp == 'J')
+		ఒకవేళ (delim(bp[1]) && *bp == 'J')
 		{
 		    bp++;
-		    continue;
+		    కొనసాగు;
 		}
 
 		/*
 		 * From our 3 letter hard-coded table.
 		 */
-		if (delim(bp[0]) || delim(bp[1]) ||
+		ఒకవేళ (delim(bp[0]) || delim(bp[1]) ||
 			delim(bp[2]) || !delim(bp[3]))
-		    goto loadzone;
-		ep = find_string(bp, &i, nast, NULL, 4);
-		if (ep != NULL)
+		    వెళ్ళు loadzone;
+		ep = కనుగొను_string(bp, &i, nast, ఖాళీ, 4);
+		ఒకవేళ (ep != ఖాళీ)
 		{
 		    bp = ep;
-		    continue;
+		    కొనసాగు;
 		}
-		ep = find_string(bp, &i, nadt, NULL, 4);
-		if (ep != NULL)
+		ep = కనుగొను_string(bp, &i, nadt, ఖాళీ, 4);
+		ఒకవేళ (ep != ఖాళీ)
 		{
 		    tm->tm_isdst = 1;
 		    bp = ep;
-		    continue;
+		    కొనసాగు;
 		}
 		/*
 		 * Our current timezone.  Prefer _get_tzname() over the
 		 * tzname[] global, which UCRT marks deprecated because it
 		 * may be inaccurate after locale changes.
 		 */
-#ifdef USE_GET_TZNAME
+#నిర్వచితమైతే USE_GET_TZNAME
 		{
-		    char tzbuf[2][32];
-		    const char *tznames[2] = { tzbuf[0], tzbuf[1] };
+		    అక్షరం tzbuf[2][32];
+		    స్థిరరాశి అక్షరం *tznames[2] = { tzbuf[0], tzbuf[1] };
 		    size_t tzlen;
 
 		    _tzset();
-		    if (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
+		    ఒకవేళ (_get_tzname(&tzlen, tzbuf[0], పరిమాణం(tzbuf[0]), 0) != 0)
 			tzbuf[0][0] = NUL;
-		    if (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
+		    ఒకవేళ (_get_tzname(&tzlen, tzbuf[1], పరిమాణం(tzbuf[1]), 1) != 0)
 			tzbuf[1][0] = NUL;
-		    ep = find_string(bp, &i, tznames, NULL, 2);
+		    ep = కనుగొను_string(bp, &i, tznames, ఖాళీ, 2);
 		}
-#else
-		ep = find_string(bp, &i,
-			(const char *const *)tzname, NULL, 2);
-#endif
-		if (ep != NULL)
+#లేకపోతే
+		ep = కనుగొను_string(bp, &i,
+			(స్థిరరాశి అక్షరం *స్థిరరాశి *)tzname, ఖాళీ, 2);
+#అయితే_ముగింపు
+		ఒకవేళ (ep != ఖాళీ)
 		{
 		    tm->tm_isdst = i;
 		    bp = ep;
-		    continue;
+		    కొనసాగు;
 		}
 loadzone:
 		/*
 		 * The hard way, load the zone!
 		 */
-		if (fromzone(&bp, tm, mandatory))
-		    continue;
-		goto out;
+		ఒకవేళ (fromzone(&bp, tm, mandatory))
+		    కొనసాగు;
+		వెళ్ళు బహిర్గతం;
 	    }
 	    offs = 0;
-	    for (i = 0; i < 4; )
+	    కొరకు (i = 0; i < 4; )
 	    {
-		if (isdigit(*bp))
+		ఒకవేళ (అంకెనా(*bp))
 		{
 		    offs = offs * 10 + (*bp++ - '0');
 		    i++;
-		    continue;
+		    కొనసాగు;
 		}
-		if (i == 2 && *bp == ':')
+		ఒకవేళ (i == 2 && *bp == ':')
 		{
 		    bp++;
-		    continue;
+		    కొనసాగు;
 		}
-		break;
+		ఆపు;
 	    }
-	    if (isdigit(*bp))
-		goto out;
-	    switch (i)
+	    ఒకవేళ (అంకెనా(*bp))
+		వెళ్ళు బహిర్గతం;
+	    ఎంపిక (i)
 	    {
-	    case 2:
+	    స్థితి 2:
 		offs *= SECSPERHOUR;
-		break;
-	    case 4:
+		ఆపు;
+	    స్థితి 4:
 		i = offs % 100;
 		offs /= 100;
-		if (i >= SECSPERMIN)
-		    goto out;
+		ఒకవేళ (i >= SECSPERMIN)
+		    వెళ్ళు బహిర్గతం;
 		/* Convert minutes into decimal */
 		offs = offs * SECSPERHOUR + i * SECSPERMIN;
-		break;
-	    default:
-out:
-		if (mandatory)
-		    return NULL;
+		ఆపు;
+	    అప్రమేయ:
+బహిర్గతం:
+		ఒకవేళ (mandatory)
+		    తిరిగి ఖాళీ;
 		bp = zname;
-		continue;
+		కొనసాగు;
 	    }
 	    /* ISO 8601 & RFC 3339 limit to 23:59 max */
-	    if (offs >= (HOURSPERDAY * SECSPERHOUR))
-		goto out;
-	    if (neg)
+	    ఒకవేళ (offs >= (HOURSPERDAY * SECSPERHOUR))
+		వెళ్ళు బహిర్గతం;
+	    ఒకవేళ (neg)
 		offs = -offs;
 	    tm->tm_isdst = 0;	/* XXX */
-	    continue;
+	    కొనసాగు;
 
 	/*
 	 * Miscellaneous conversions.
 	 */
-	case 'n':	/* Any kind of white-space. */
-	case 't':
-	    while (isspace(*bp))
+	స్థితి 'n':	/* Any kind of white-space. */
+	స్థితి 't':
+	    అయితే (ఖాళీనా(*bp))
 		bp++;
 	    LEGAL_ALT(0);
-	    continue;
+	    కొనసాగు;
 
 
-	default:	/* Unknown/unsupported conversion. */
-	    return NULL;
+	అప్రమేయ:	/* Unknown/unsupported conversion. */
+	    తిరిగి ఖాళీ;
 	}
     }
 
-    if (!HAVE_YDAY(state) && HAVE_YEAR(state))
+    ఒకవేళ (!HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	if (HAVE_MON(state) && HAVE_MDAY(state))
+	ఒకవేళ (HAVE_MON(state) && HAVE_MDAY(state))
 	{
 	    /* calculate day of year (ordinal date) */
-	    tm->tm_yday =  start_of_month[isleap_sum(tm->tm_year,
-			    TM_YEAR_BASE)][tm->tm_mon] + (tm->tm_mday - 1);
+	    tm->tm_yday =  ప్రారంభం_యొక్క_month[isleap_కూడిక(tm->tm_year,
+			    TM_YEAR_పునాది)][tm->tm_mon] + (tm->tm_mday - 1);
 	    state |= S_YDAY;
 	}
-	else if (day_offset != -1)
+	లేకపోతే ఒకవేళ (day_స్థానభ్రంశం != -1)
 	{
 	    /*
 	     * Set the date to the first Sunday (or Monday)
 	     * of the specified week of the year.
 	     */
-	    if (!HAVE_WDAY(state))
+	    ఒకవేళ (!HAVE_WDAY(state))
 	    {
-		tm->tm_wday = day_offset;
+		tm->tm_wday = day_స్థానభ్రంశం;
 		state |= S_WDAY;
 	    }
 	    tm->tm_yday = (7 -
-		    first_wday_of(tm->tm_year + TM_YEAR_BASE) +
-		    day_offset) % 7 + (week_offset - 1) * 7 +
-		    tm->tm_wday  - day_offset;
+		    మొదటి_wday_యొక్క(tm->tm_year + TM_YEAR_పునాది) +
+		    day_స్థానభ్రంశం) % 7 + (week_స్థానభ్రంశం - 1) * 7 +
+		    tm->tm_wday  - day_స్థానభ్రంశం;
 	    state |= S_YDAY;
 	}
     }
 
-    if (HAVE_YDAY(state) && HAVE_YEAR(state))
+    ఒకవేళ (HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	int leap;
+	పూర్ణాంకం leap;
 
-	if (!HAVE_MON(state))
+	ఒకవేళ (!HAVE_MON(state))
 	{
 	    /* calculate month of day of year */
 	    i = 0;
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
-	    while (tm->tm_yday >= start_of_month[leap][i])
+	    leap = isleap_కూడిక(tm->tm_year, TM_YEAR_పునాది);
+	    అయితే (tm->tm_yday >= ప్రారంభం_యొక్క_month[leap][i])
 		i++;
-	    if (i > 12)
+	    ఒకవేళ (i > 12)
 	    {
 		i = 1;
-		tm->tm_yday -= start_of_month[leap][12];
+		tm->tm_yday -= ప్రారంభం_యొక్క_month[leap][12];
 		tm->tm_year++;
 	    }
 	    tm->tm_mon = i - 1;
 	    state |= S_MON;
 	}
 
-	if (!HAVE_MDAY(state))
+	ఒకవేళ (!HAVE_MDAY(state))
 	{
 	    /* calculate day of month */
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
+	    leap = isleap_కూడిక(tm->tm_year, TM_YEAR_పునాది);
 	    tm->tm_mday = tm->tm_yday -
-		start_of_month[leap][tm->tm_mon] + 1;
+		ప్రారంభం_యొక్క_month[leap][tm->tm_mon] + 1;
 	    state |= S_MDAY;
 	}
 
-	if (!HAVE_WDAY(state))
+	ఒకవేళ (!HAVE_WDAY(state))
 	{
 	    /* calculate day of week */
 	    i = 0;
-	    week_offset = first_wday_of(tm->tm_year);
-	    while (i++ <= tm->tm_yday)
+	    week_స్థానభ్రంశం = మొదటి_wday_యొక్క(tm->tm_year);
+	    అయితే (i++ <= tm->tm_yday)
 	    {
-		if (week_offset++ >= 6)
-		    week_offset = 0;
+		ఒకవేళ (week_స్థానభ్రంశం++ >= 6)
+		    week_స్థానభ్రంశం = 0;
 	    }
-	    tm->tm_wday = week_offset;
+	    tm->tm_wday = week_స్థానభ్రంశం;
 	    state |= S_WDAY;
 	}
     }
 
-    return (char *)bp;
+    తిరిగి (అక్షరం *)bp;
 }
 
 
-    static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
-						    unsigned int ulim)
+    స్థిర స్థిరరాశి గుర్తులేని అక్షరం *
+conv_అంకె(స్థిరరాశి గుర్తులేని అక్షరం *buf, పూర్ణాంకం *dest, గుర్తులేని పూర్ణాంకం llim,
+						    గుర్తులేని పూర్ణాంకం ulim)
 {
-    unsigned int result = 0;
-    unsigned char ch;
+    గుర్తులేని పూర్ణాంకం ఫలితం = 0;
+    గుర్తులేని అక్షరం ch;
 
     /* The limit also determines the number of valid digits. */
-    unsigned int rulim = ulim;
+    గుర్తులేని పూర్ణాంకం rulim = ulim;
 
     ch = *buf;
-    if (ch < '0' || ch > '9')
-	return NULL;
+    ఒకవేళ (ch < '0' || ch > '9')
+	తిరిగి ఖాళీ;
 
-    do
+    చేయి
     {
-	result *= 10;
-	result += ch - '0';
+	ఫలితం *= 10;
+	ఫలితం += ch - '0';
 	rulim /= 10;
 	ch = *++buf;
-    } while ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
+    } అయితే ((ఫలితం * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
 
-    if (result < llim || result > ulim)
-	return NULL;
+    ఒకవేళ (ఫలితం < llim || ఫలితం > ulim)
+	తిరిగి ఖాళీ;
 
-    *dest = result;
-    return buf;
+    *dest = ఫలితం;
+    తిరిగి buf;
 }
 
-    static const unsigned char *
-find_string(const unsigned char *bp, int *tgt, const char *const *n1,
-					    const char *const *n2, int c)
+    స్థిర స్థిరరాశి గుర్తులేని అక్షరం *
+కనుగొను_string(స్థిరరాశి గుర్తులేని అక్షరం *bp, పూర్ణాంకం *tgt, స్థిరరాశి అక్షరం *స్థిరరాశి *n1,
+					    స్థిరరాశి అక్షరం *స్థిరరాశి *n2, పూర్ణాంకం c)
 {
-    int		i;
+    పూర్ణాంకం		i;
     size_t	len;
 
     /* check full name - then abbreviated ones */
-    for (; n1 != NULL; n1 = n2, n2 = NULL)
+    కొరకు (; n1 != ఖాళీ; n1 = n2, n2 = ఖాళీ)
     {
-	for (i = 0; i < c; i++, n1++)
+	కొరకు (i = 0; i < c; i++, n1++)
 	{
-	    len = strlen(*n1);
-	    if (STRNICMP(*n1, bp, len) == 0)
+	    len = అక్షరశ్రేణి_పొడవు(*n1);
+	    ఒకవేళ (STRNICMP(*n1, bp, len) == 0)
 	    {
 		*tgt = i;
-		return bp + len;
+		తిరిగి bp + len;
 	    }
 	}
     }
 
     /* Nothing matched */
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-#endif // MSWIN
+#అయితే_ముగింపు // MSWIN

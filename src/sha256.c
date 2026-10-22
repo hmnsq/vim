@@ -21,9 +21,9 @@
  *  sha256_self_test() is implicitly called once.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 
 # define GET_UINT32(n, b, i)		    \
 {					    \
@@ -41,11 +41,11 @@
     (b)[(i) + 3] = (char_u)((n)      );   \
 }
 
-    void
-sha256_start(context_sha256_T *ctx)
+    శూన్య
+sha256_ప్రారంభం(context_sha256_T *ctx)
 {
-    ctx->total[0] = 0;
-    ctx->total[1] = 0;
+    ctx->మొత్తం[0] = 0;
+    ctx->మొత్తం[1] = 0;
 
     ctx->state[0] = 0x6A09E667;
     ctx->state[1] = 0xBB67AE85;
@@ -57,28 +57,28 @@ sha256_start(context_sha256_T *ctx)
     ctx->state[7] = 0x5BE0CD19;
 }
 
-    static void
-sha256_process(context_sha256_T *ctx, char_u data[64])
+    స్థిర శూన్య
+sha256_process(context_sha256_T *ctx, char_u దత్తాంశం[64])
 {
     UINT32_T temp1, temp2, W[64];
     UINT32_T A, B, C, D, E, F, G, H;
 
-    GET_UINT32(W[0],  data,  0);
-    GET_UINT32(W[1],  data,  4);
-    GET_UINT32(W[2],  data,  8);
-    GET_UINT32(W[3],  data, 12);
-    GET_UINT32(W[4],  data, 16);
-    GET_UINT32(W[5],  data, 20);
-    GET_UINT32(W[6],  data, 24);
-    GET_UINT32(W[7],  data, 28);
-    GET_UINT32(W[8],  data, 32);
-    GET_UINT32(W[9],  data, 36);
-    GET_UINT32(W[10], data, 40);
-    GET_UINT32(W[11], data, 44);
-    GET_UINT32(W[12], data, 48);
-    GET_UINT32(W[13], data, 52);
-    GET_UINT32(W[14], data, 56);
-    GET_UINT32(W[15], data, 60);
+    GET_UINT32(W[0],  దత్తాంశం,  0);
+    GET_UINT32(W[1],  దత్తాంశం,  4);
+    GET_UINT32(W[2],  దత్తాంశం,  8);
+    GET_UINT32(W[3],  దత్తాంశం, 12);
+    GET_UINT32(W[4],  దత్తాంశం, 16);
+    GET_UINT32(W[5],  దత్తాంశం, 20);
+    GET_UINT32(W[6],  దత్తాంశం, 24);
+    GET_UINT32(W[7],  దత్తాంశం, 28);
+    GET_UINT32(W[8],  దత్తాంశం, 32);
+    GET_UINT32(W[9],  దత్తాంశం, 36);
+    GET_UINT32(W[10], దత్తాంశం, 40);
+    GET_UINT32(W[11], దత్తాంశం, 44);
+    GET_UINT32(W[12], దత్తాంశం, 48);
+    GET_UINT32(W[13], దత్తాంశం, 52);
+    GET_UINT32(W[14], దత్తాంశం, 56);
+    GET_UINT32(W[15], దత్తాంశం, 60);
 
 # define  SHR(x, n) (((x) & 0xFFFFFFFF) >> (n))
 # define ROTR(x, n) (SHR(x, n) | ((x) << (32 - (n))))
@@ -189,65 +189,65 @@ sha256_process(context_sha256_T *ctx, char_u data[64])
     ctx->state[7] += H;
 }
 
-    void
-sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
+    శూన్య
+sha256_update(context_sha256_T *ctx, char_u *ఆదానం, UINT32_T నిడివి)
 {
-    UINT32_T left, fill;
+    UINT32_T ఎడమ_2, fill;
 
-    if (length == 0)
-	return;
+    ఒకవేళ (నిడివి == 0)
+	తిరిగి;
 
-    left = ctx->total[0] & 0x3F;
-    fill = 64 - left;
+    ఎడమ_2 = ctx->మొత్తం[0] & 0x3F;
+    fill = 64 - ఎడమ_2;
 
-    ctx->total[0] += length;
-    ctx->total[0] &= 0xFFFFFFFF;
+    ctx->మొత్తం[0] += నిడివి;
+    ctx->మొత్తం[0] &= 0xFFFFFFFF;
 
-    if (ctx->total[0] < length)
-	ctx->total[1]++;
+    ఒకవేళ (ctx->మొత్తం[0] < నిడివి)
+	ctx->మొత్తం[1]++;
 
-    if (left && length >= fill)
+    ఒకవేళ (ఎడమ_2 && నిడివి >= fill)
     {
-	memcpy((void *)(ctx->buffer + left), (void *)input, fill);
-	sha256_process(ctx, ctx->buffer);
-	length -= fill;
-	input  += fill;
-	left = 0;
+	జ్ఞాపకం_నకలు((శూన్య *)(ctx->బఫరు + ఎడమ_2), (శూన్య *)ఆదానం, fill);
+	sha256_process(ctx, ctx->బఫరు);
+	నిడివి -= fill;
+	ఆదానం  += fill;
+	ఎడమ_2 = 0;
     }
 
-    while (length >= 64)
+    అయితే (నిడివి >= 64)
     {
-	sha256_process(ctx, input);
-	length -= 64;
-	input  += 64;
+	sha256_process(ctx, ఆదానం);
+	నిడివి -= 64;
+	ఆదానం  += 64;
     }
 
-    if (length)
-	memcpy((void *)(ctx->buffer + left), (void *)input, length);
+    ఒకవేళ (నిడివి)
+	జ్ఞాపకం_నకలు((శూన్య *)(ctx->బఫరు + ఎడమ_2), (శూన్య *)ఆదానం, నిడివి);
 }
 
-static char_u sha256_padding[64] = {
+స్థిర char_u sha256_padding[64] = {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-    void
-sha256_finish(context_sha256_T *ctx, char_u digest[32])
+    శూన్య
+sha256_ముగింపు(context_sha256_T *ctx, char_u digest[32])
 {
-    UINT32_T last, padn;
-    UINT32_T high, low;
+    UINT32_T చివరి, padn;
+    UINT32_T ఎగువ, దిగువ;
     char_u   msglen[8];
 
-    high = (ctx->total[0] >> 29) | (ctx->total[1] <<  3);
-    low  = (ctx->total[0] <<  3);
+    ఎగువ = (ctx->మొత్తం[0] >> 29) | (ctx->మొత్తం[1] <<  3);
+    దిగువ  = (ctx->మొత్తం[0] <<  3);
 
-    PUT_UINT32(high, msglen, 0);
-    PUT_UINT32(low,  msglen, 4);
+    PUT_UINT32(ఎగువ, msglen, 0);
+    PUT_UINT32(దిగువ,  msglen, 4);
 
-    last = ctx->total[0] & 0x3F;
-    padn = (last < 56) ? (56 - last) : (120 - last);
+    చివరి = ctx->మొత్తం[0] & 0x3F;
+    padn = (చివరి < 56) ? (56 - చివరి) : (120 - చివరి);
 
     sha256_update(ctx, sha256_padding, padn);
     sha256_update(ctx, msglen, 8);
@@ -261,65 +261,65 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
     PUT_UINT32(ctx->state[6], digest, 24);
     PUT_UINT32(ctx->state[7], digest, 28);
 }
-#endif // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
+#అయితే_ముగింపు // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
 
-#if defined(FEAT_CRYPT)
+#ఒకవేళ defined(FEAT_CRYPT)
 /*
  * Returns hex digest of "buf[buf_len]" in a static array.
  * if "salt" is not NULL also do "salt[salt_len]".
  */
     char_u *
-sha256_bytes(
+sha256_బైట్లు(
     char_u *buf,
-    int    buf_len,
+    పూర్ణాంకం    buf_len,
     char_u *salt,
-    int    salt_len)
+    పూర్ణాంకం    salt_len)
 {
     char_u	     sha256sum[32];
-    static char_u    hexit[65];
-    int		     j;
+    స్థిర char_u    hexit[65];
+    పూర్ణాంకం		     j;
     context_sha256_T ctx;
 
     sha256_self_test();
 
-    sha256_start(&ctx);
+    sha256_ప్రారంభం(&ctx);
     sha256_update(&ctx, buf, buf_len);
-    if (salt != NULL)
+    ఒకవేళ (salt != ఖాళీ)
 	sha256_update(&ctx, salt, salt_len);
-    sha256_finish(&ctx, sha256sum);
-    for (j = 0; j < 32; j++)
-	sprintf((char *)hexit + j * 2, "%02x", sha256sum[j]);
-    hexit[sizeof(hexit) - 1] = '\0';
-    return hexit;
+    sha256_ముగింపు(&ctx, sha256sum);
+    కొరకు (j = 0; j < 32; j++)
+	sprintf((అక్షరం *)hexit + j * 2, "%02x", sha256sum[j]);
+    hexit[పరిమాణం(hexit) - 1] = '\0';
+    తిరిగి hexit;
 }
 
 /*
  * Returns sha256(buf) as 64 hex chars in static array.
  */
     char_u *
-sha256_key(
+sha256_కీలకం(
     char_u *buf,
     char_u *salt,
-    int    salt_len)
+    పూర్ణాంకం    salt_len)
 {
     // No passwd means don't encrypt
-    if (buf == NULL || *buf == NUL)
-	return (char_u *)"";
+    ఒకవేళ (buf == ఖాళీ || *buf == NUL)
+	తిరిగి (char_u *)"";
 
-    return sha256_bytes(buf, (int)STRLEN(buf), salt, salt_len);
+    తిరిగి sha256_బైట్లు(buf, (పూర్ణాంకం)STRLEN(buf), salt, salt_len);
 }
 
 /*
  * These are the standard FIPS-180-2 test vectors
  */
 
-static char *sha_self_test_msg[] = {
+స్థిర అక్షరం *sha_self_test_సందేశం[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-    NULL
+    ఖాళీ
 };
 
-static char *sha_self_test_vector[] = {
+స్థిర అక్షరం *sha_self_test_సదిశ[] = {
     "ba7816bf8f01cfea414140de5dae2223" \
     "b00361a396177a9cb410ff61f20015ad",
     "248d6a61d20638b8e5c026930c3e6039" \
@@ -332,62 +332,62 @@ static char *sha_self_test_vector[] = {
  * Perform a test on the SHA256 algorithm.
  * Return FAIL or OK.
  */
-    int
-sha256_self_test(void)
+    పూర్ణాంకం
+sha256_self_test(శూన్య)
 {
-    int		     i, j;
-    char	     output[65];
+    పూర్ణాంకం		     i, j;
+    అక్షరం	     output[65];
     context_sha256_T ctx;
     char_u	     buf[1000];
     char_u	     sha256sum[32];
-    static int	     failures = 0;
+    స్థిర పూర్ణాంకం	     failures = 0;
     char_u	     *hexit;
-    static int	     sha256_self_tested = 0;
+    స్థిర పూర్ణాంకం	     sha256_self_tested = 0;
 
-    if (sha256_self_tested > 0)
-	return failures > 0 ? FAIL : OK;
+    ఒకవేళ (sha256_self_tested > 0)
+	తిరిగి failures > 0 ? FAIL : OK;
     sha256_self_tested = 1;
 
-    for (i = 0; i < 3; i++)
+    కొరకు (i = 0; i < 3; i++)
     {
-	if (i < 2)
+	ఒకవేళ (i < 2)
 	{
-	    hexit = sha256_bytes((char_u *)sha_self_test_msg[i],
-		    (int)STRLEN(sha_self_test_msg[i]),
-		    NULL, 0);
+	    hexit = sha256_బైట్లు((char_u *)sha_self_test_సందేశం[i],
+		    (పూర్ణాంకం)STRLEN(sha_self_test_సందేశం[i]),
+		    ఖాళీ, 0);
 	    STRCPY(output, hexit);
 	}
-	else
+	లేకపోతే
 	{
-	    sha256_start(&ctx);
+	    sha256_ప్రారంభం(&ctx);
 	    vim_memset(buf, 'a', 1000);
-	    for (j = 0; j < 1000; j++)
+	    కొరకు (j = 0; j < 1000; j++)
 		sha256_update(&ctx, (char_u *)buf, 1000);
-	    sha256_finish(&ctx, sha256sum);
-	    for (j = 0; j < 32; j++)
+	    sha256_ముగింపు(&ctx, sha256sum);
+	    కొరకు (j = 0; j < 32; j++)
 		sprintf(output + j * 2, "%02x", sha256sum[j]);
 	}
-	if (memcmp(output, sha_self_test_vector[i], 64))
+	ఒకవేళ (memcmp(output, sha_self_test_సదిశ[i], 64))
 	{
 	    failures++;
-	    output[sizeof(output) - 1] = '\0';
+	    output[పరిమాణం(output) - 1] = '\0';
 	    // printf("sha256_self_test %d failed %s\n", i, output);
 	}
     }
-    return failures > 0 ? FAIL : OK;
+    తిరిగి failures > 0 ? FAIL : OK;
 }
 
-    static unsigned int
-get_some_time(void)
+    స్థిర గుర్తులేని పూర్ణాంకం
+get_some_సమయం(శూన్య)
 {
 # ifdef HAVE_GETTIMEOFDAY
-    struct timeval tv;
+    నిర్మాణం timeval tv;
 
     // Using usec makes it less predictable.
-    gettimeofday(&tv, NULL);
-    return (unsigned int)(tv.tv_sec + tv.tv_usec);
-# else
-    return (unsigned int)time(NULL);
+    gettimeofday(&tv, ఖాళీ);
+    తిరిగి (గుర్తులేని పూర్ణాంకం)(tv.tv_sec + tv.tv_usec);
+# లేకపోతే
+    తిరిగి (గుర్తులేని పూర్ణాంకం)సమయం(ఖాళీ);
 # endif
 }
 
@@ -395,34 +395,34 @@ get_some_time(void)
  * Fill "header[header_len]" with random_data.
  * Also "salt[salt_len]" when "salt" is not NULL.
  */
-    void
-sha2_seed(
-    char_u *header,
-    int    header_len,
+    శూన్య
+sha2_విత్తనం(
+    char_u *శీర్షిక,
+    పూర్ణాంకం    శీర్షిక_len,
     char_u *salt,
-    int    salt_len)
+    పూర్ణాంకం    salt_len)
 {
-    int		     i;
-    static char_u    random_data[1000];
+    పూర్ణాంకం		     i;
+    స్థిర char_u    random_data[1000];
     char_u	     sha256sum[32];
     context_sha256_T ctx;
 
-    srand(get_some_time());
+    srand(get_some_సమయం());
 
-    for (i = 0; i < (int)sizeof(random_data) - 1; i++)
-	random_data[i] = (char_u)((get_some_time() ^ rand()) & 0xff);
-    sha256_start(&ctx);
-    sha256_update(&ctx, (char_u *)random_data, sizeof(random_data));
-    sha256_finish(&ctx, sha256sum);
+    కొరకు (i = 0; i < (పూర్ణాంకం)పరిమాణం(random_data) - 1; i++)
+	random_data[i] = (char_u)((get_some_సమయం() ^ rand()) & 0xff);
+    sha256_ప్రారంభం(&ctx);
+    sha256_update(&ctx, (char_u *)random_data, పరిమాణం(random_data));
+    sha256_ముగింపు(&ctx, sha256sum);
 
     // put first block into header.
-    for (i = 0; i < header_len; i++)
-	header[i] = sha256sum[i % sizeof(sha256sum)];
+    కొరకు (i = 0; i < శీర్షిక_len; i++)
+	శీర్షిక[i] = sha256sum[i % పరిమాణం(sha256sum)];
 
     // put remaining block into salt.
-    if (salt != NULL)
-	for (i = 0; i < salt_len; i++)
-	    salt[i] = sha256sum[(i + header_len) % sizeof(sha256sum)];
+    ఒకవేళ (salt != ఖాళీ)
+	కొరకు (i = 0; i < salt_len; i++)
+	    salt[i] = sha256sum[(i + శీర్షిక_len) % పరిమాణం(sha256sum)];
 }
 
-#endif // FEAT_CRYPT
+#అయితే_ముగింపు // FEAT_CRYPT

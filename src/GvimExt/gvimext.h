@@ -11,12 +11,12 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
-#define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
+#ఒకవేళ !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#నిర్వచించు AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
-#pragma once
-#endif
+#ఒకవేళ defined(_MSC_VER) && _MSC_VER > 1000
+#సూచన once
+#అయితే_ముగింపు
 
 // Insert your headers here
 // #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -27,30 +27,30 @@
 //
 //--------------------------------------------------------------
 
-#ifndef STRICT
+#నిర్వచితం_కాకపోతే STRICT
 # define STRICT
-#endif
+#అయితే_ముగింపు
 
-#define INC_OLE2	// MS-Windows, get ole2 from windows.h
+#నిర్వచించు INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ఒకవేళ defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
+#అయితే_ముగింపు
 
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
+#అన్తర్భావ <windows.h>
+#అన్తర్భావ <windowsx.h>
+#అన్తర్భావ <shlobj.h>
+#అన్తర్భావ <wchar.h>
 
-#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
+#నిర్వచించు ఫలితం_From_Short(i)  ఫలితం_From_Scode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // Initialize GUIDs (should be done only and at-least once per DLL/EXE)
 //
-#pragma data_seg(".text")
-#define INITGUID
-#include <initguid.h>
+#సూచన దత్తాంశం_seg(".text")
+#నిర్వచించు INITGUID
+#అన్తర్భావ <initguid.h>
 
 //
 // The class ID of this Shell extension class.
@@ -78,73 +78,73 @@
 DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0x90, 0x27, 0x8b, 0xbd, 0x99);
 
 // this class factory object creates context menu handlers for windows 32 shell
-class CShellExtClassFactory : public IClassFactory
+class CShellExtClassFactory : బహిరంగ IClassFactory
 {
-protected:
+రక్షిత:
     ULONG	m_cRef;
 
-public:
+బహిరంగ:
     CShellExtClassFactory();
-    virtual ~CShellExtClassFactory();
+    మాయా ~CShellExtClassFactory();
 
     //IUnknown members
     STDMETHODIMP		QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG)	AddRef();
+    STDMETHODIMP_(ULONG)	కూడు_Ref();
     STDMETHODIMP_(ULONG)	Release();
 
     //IClassFactory members
     STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
-    STDMETHODIMP		LockServer(BOOL);
+    STDMETHODIMP		తాళం_Server(BOOL);
 };
-typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
-#define MAX_HWND 100
+రకనిర్వచనం CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+#నిర్వచించు MAX_HWND 100
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu,
+class CShellExt : బహిరంగ IContextMenu,
 			 IShellExtInit
 {
-private:
-    BOOL LoadMenuIcon();
+అంతరంగ:
+    BOOL ఎక్కించు_Menu_Icon();
 
-protected:
+రక్షిత:
     ULONG	 m_cRef;
-    LPDATAOBJECT m_pDataObj;
+    LPDATAOBJECT m_p_దత్తాంశం_Obj;
     UINT	 m_edit_existing_off;
     HBITMAP	 m_hVimIconBitmap;
 
     // For some reason, this callback must be static
-    static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
+    స్థిర BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP నెట్టు_గమ్యం_కిటికీ(HWND h_మాతృ,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    పూర్ణాంకం iShowCmd,
+	    పూర్ణాంకం idHWnd);
 
-    STDMETHODIMP InvokeSingleGvim(HWND hParent,
+    STDMETHODIMP InvokeSingleGvim(HWND h_మాతృ,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    పూర్ణాంకం iShowCmd,
+	    పూర్ణాంకం gvimExtraOptions);
 
-public:
-    int		 m_cntOfHWnd;
+బహిరంగ:
+    పూర్ణాంకం		 m_cnt_యొక్క_HWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
-    virtual ~CShellExt();
+    మాయా ~CShellExt();
 
     //IUnknown members
     STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG) AddRef();
+    STDMETHODIMP_(ULONG) కూడు_Ref();
     STDMETHODIMP_(ULONG) Release();
 
     //IShell members
     STDMETHODIMP QueryContextMenu(HMENU hMenu,
-	    UINT indexMenu,
-	    UINT idCmdFirst,
-	    UINT idCmdLast,
+	    UINT సూచీ_Menu,
+	    UINT id_Cmd_మొదటి,
+	    UINT id_Cmd_చివరి,
 	    UINT uFlags);
 
     STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
@@ -157,11 +157,11 @@ public:
 
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
-	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    LPDATAOBJECT p_దత్తాంశం_Obj,
+	    HKEY h_కీలకం_ID);
 };
 
-typedef CShellExt *LPCSHELLEXT;
-#pragma data_seg()
+రకనిర్వచనం CShellExt *LPCSHELLEXT;
+#సూచన దత్తాంశం_seg()
 
-#endif
+#అయితే_ముగింపు

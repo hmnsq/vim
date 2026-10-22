@@ -10,26 +10,26 @@
  * THIS FILE IS DISTRIBUTED UNDER THE VIM LICENSE.
  */
 
-#ifndef GUI_DWRITE_H
-#define GUI_DWRITE_H
+#నిర్వచితం_కాకపోతే GUI_DWRITE_H
+#నిర్వచించు GUI_DWRITE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#నిర్వచితమైతే __cplusplus
+బాహ్య "C" {
+#అయితే_ముగింపు
 
-typedef struct DWriteContext DWriteContext;
+రకనిర్వచనం నిర్మాణం DWriteContext DWriteContext;
 
-typedef struct DWriteRenderingParams {
-    float gamma;
-    float enhancedContrast;
-    float clearTypeLevel;
+రకనిర్వచనం నిర్మాణం DWriteRenderingParams {
+    దశాంశం gamma;
+    దశాంశం enhancedContrast;
+    దశాంశం clearTypeLevel;
     /*
      * pixelGeometry:
      *	0 - DWRITE_PIXEL_GEOMETRY_FLAT
      *	1 - DWRITE_PIXEL_GEOMETRY_RGB
      *	2 - DWRITE_PIXEL_GEOMETRY_BGR
      */
-    int pixelGeometry;
+    పూర్ణాంకం pixelGeometry;
     /*
      * renderingMode:
      *	0 - DWRITE_RENDERING_MODE_DEFAULT
@@ -40,7 +40,7 @@ typedef struct DWriteRenderingParams {
      *	5 - DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC
      *	6 - DWRITE_RENDERING_MODE_OUTLINE
      */
-    int renderingMode;
+    పూర్ణాంకం rendering_బహుళకం;
     /*
      * antialiasMode:
      *	0 - D2D1_TEXT_ANTIALIAS_MODE_DEFAULT
@@ -48,57 +48,57 @@ typedef struct DWriteRenderingParams {
      *	2 - D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE
      *	3 - D2D1_TEXT_ANTIALIAS_MODE_ALIASED
      */
-    int textAntialiasMode;
+    పూర్ణాంకం పాఠ్యం_Antialias_బహుళకం;
 } DWriteRenderingParams;
 
-#define DWRITE_MAX_FONT_FEATURES 32
+#నిర్వచించు DWRITE_MAX_FONT_FEATURES 32
 
-typedef struct DWriteFontFeature {
-    unsigned int tag;	    // OpenType feature tag (4 bytes)
-    unsigned int parameter; // Feature parameter (0 = disable, 1 = enable)
+రకనిర్వచనం నిర్మాణం DWriteFontFeature {
+    గుర్తులేని పూర్ణాంకం ట్యాగ్;	    // OpenType feature tag (4 bytes)
+    గుర్తులేని పూర్ణాంకం parameter; // Feature parameter (0 = disable, 1 = enable)
 } DWriteFontFeature;
 
-void DWrite_Init(void);
-void DWrite_Final(void);
+శూన్య DWrite_Init(శూన్య);
+శూన్య DWrite_Final(శూన్య);
 
-DWriteContext *DWriteContext_Open(void);
-void DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect);
-void DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont);
-void DWriteContext_DrawText(
+DWriteContext *DWriteContext_Open(శూన్య);
+శూన్య DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, స్థిరరాశి RECT *rect);
+శూన్య DWrite_Context_సమితి_Font(DWriteContext *ctx, HFONT hFont);
+శూన్య DWrite_Context_Draw_పాఠ్యం(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	స్థిరరాశి WCHAR *పాఠ్యం,
+	పూర్ణాంకం len,
+	పూర్ణాంకం x,
+	పూర్ణాంకం y,
+	పూర్ణాంకం w,
+	పూర్ణాంకం h,
+	పూర్ణాంకం cell_వెడల్పు_2,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx);
-void DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color);
-void DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+	స్థిరరాశి RECT *lprc,
+	స్థిరరాశి INT *lpDx);
+శూన్య DWriteContext_FillRect(DWriteContext *ctx, స్థిరరాశి RECT *rc, COLORREF color);
+శూన్య DWrite_Context_Draw_పంక్తి(DWriteContext *ctx, పూర్ణాంకం x1, పూర్ణాంకం y1, పూర్ణాంకం x2, పూర్ణాంకం y2,
 	COLORREF color);
-void DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color);
-void DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc);
-void DWriteContext_Flush(DWriteContext *ctx);
-void DWriteContext_Close(DWriteContext *ctx);
+శూన్య DWrite_Context_సమితి_Pixel(DWriteContext *ctx, పూర్ణాంకం x, పూర్ణాంకం y, COLORREF color);
+శూన్య DWriteContext_Scroll(DWriteContext *ctx, పూర్ణాంకం x, పూర్ణాంకం y, స్థిరరాశి RECT *rc);
+శూన్య DWriteContext_Flush(DWriteContext *ctx);
+శూన్య DWriteContext_Close(DWriteContext *ctx);
 
-void DWriteContext_SetRenderingParams(
+శూన్య DWrite_Context_సమితి_Rendering_Params(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params);
+	స్థిరరాశి DWriteRenderingParams *params);
 
 DWriteRenderingParams *DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params);
 
-void DWriteContext_SetFontFeatures(
+శూన్య DWrite_Context_సమితి_Font_Features(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count);
+	స్థిరరాశి DWriteFontFeature *features,
+	పూర్ణాంకం లెక్క);
 
-#ifdef __cplusplus
+#నిర్వచితమైతే __cplusplus
 }
-#endif
-#endif/*GUI_DWRITE_H*/
+#అయితే_ముగింపు
+#అయితే_ముగింపు/*GUI_DWRITE_H*/

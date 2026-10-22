@@ -18,328 +18,328 @@
  */
 
 // Include common code for dosinst.c and uninstall.c.
-#include "dosinst.h"
+#అన్తర్భావ "dosinst.h"
 
 /*
  * Return TRUE if the user types a 'y' or 'Y', FALSE otherwise.
  */
-    static int
-confirm(void)
+    స్థిర పూర్ణాంకం
+confirm(శూన్య)
 {
-    char	answer[10];
+    అక్షరం	answer[10];
 
     fflush(stdout);
-    return (scanf(" %c", answer) == 1 && toupper((unsigned char)answer[0]) == 'Y');
+    తిరిగి (scanf(" %c", answer) == 1 && పెద్ద_అక్షరం((గుర్తులేని అక్షరం)answer[0]) == 'Y');
 }
 
-    static int
-reg_delete_key(HKEY hRootKey, const char *key, DWORD flag)
+    స్థిర పూర్ణాంకం
+reg_delete_కీలకం(HKEY h_మూలం_కీలకం, స్థిరరాశి అక్షరం *కీలకం, DWORD flag)
 {
-    static int did_load = FALSE;
-    static HANDLE advapi_lib = NULL;
-    static LONG (WINAPI *delete_key_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = NULL;
+    స్థిర పూర్ణాంకం did_ఎక్కించు = FALSE;
+    స్థిర HANDLE advapi_lib = ఖాళీ;
+    స్థిర LONG (WINAPI *delete_కీలకం_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = ఖాళీ;
 
-    if (!did_load)
+    ఒకవేళ (!did_ఎక్కించు)
     {
 	// The RegDeleteKeyEx() function is only available on new systems.  It
 	// is required for 64-bit registry access.  For other systems fall
 	// back to RegDeleteKey().
-	did_load = TRUE;
-	advapi_lib = LoadLibrary("ADVAPI32.DLL");
-	if (advapi_lib != NULL)
-	    delete_key_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))GetProcAddress(advapi_lib, "RegDeleteKeyExA");
+	did_ఎక్కించు = TRUE;
+	advapi_lib = ఎక్కించు_Library("ADVAPI32.DLL");
+	ఒకవేళ (advapi_lib != ఖాళీ)
+	    delete_కీలకం_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))Get_Proc_చిరునామా(advapi_lib, "RegDeleteKeyExA");
     }
-    if (delete_key_ex != NULL)
+    ఒకవేళ (delete_కీలకం_ex != ఖాళీ)
     {
-	return (*delete_key_ex)(hRootKey, key, flag, 0);
+	తిరిగి (*delete_కీలకం_ex)(h_మూలం_కీలకం, కీలకం, flag, 0);
     }
-    return RegDeleteKey(hRootKey, key);
+    తిరిగి Reg_Delete_కీలకం(h_మూలం_కీలకం, కీలకం);
 }
 
 /*
  * Check if the popup menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-popup_gvim_path(char *buf, DWORD bufsize)
+    స్థిర పూర్ణాంకం
+popup_gvim_మార్గం(అక్షరం *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	కీలకం_handle;
+    DWORD	విలువ_type;
+    పూర్ణాంకం		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_32KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	    return 0;
+    ఒకవేళ (Reg_Open_కీలకం_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    కీలకం_WOW64_64_కీలకం | కీలకం_READ, &కీలకం_handle) != ERROR_SUCCESS)
+	ఒకవేళ (Reg_Open_కీలకం_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    కీలకం_WOW64_32_కీలకం | కీలకం_READ, &కీలకం_handle) != ERROR_SUCCESS)
+	    తిరిగి 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "path", 0,
-					  &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_విలువ_Ex(కీలకం_handle, "path", 0,
+					  &విలువ_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_కీలకం(కీలకం_handle);
 
-    return (r == ERROR_SUCCESS);
+    తిరిగి (r == ERROR_SUCCESS);
 }
 
 /*
  * Check if the "Open With..." menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-openwith_gvim_path(char *buf, DWORD bufsize)
+    స్థిర పూర్ణాంకం
+openwith_gvim_మార్గం(అక్షరం *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	కీలకం_handle;
+    DWORD	విలువ_type;
+    పూర్ణాంకం		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_CLASSES_ROOT,
+    ఒకవేళ (Reg_Open_కీలకం_Ex(HKEY_CLASSES_మూలం,
 		"Applications\\gvim.exe\\shell\\edit\\command", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	return 0;
+		    కీలకం_WOW64_64_కీలకం | కీలకం_READ, &కీలకం_handle) != ERROR_SUCCESS)
+	తిరిగి 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "", 0, &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_విలువ_Ex(కీలకం_handle, "", 0, &విలువ_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_కీలకం(కీలకం_handle);
 
-    return (r == ERROR_SUCCESS);
+    తిరిగి (r == ERROR_SUCCESS);
 }
 
-    static void
-remove_popup(void)
+    స్థిర శూన్య
+remove_popup(శూన్య)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 6;
+    పూర్ణాంకం		fail = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		loop = is_64bit_os() ? 2 : 1;
+    పూర్ణాంకం		maxfail = loop * 6;
     DWORD	flag;
     HKEY	kh;
 
-    for (i = 0; i < loop; i++)
+    కొరకు (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	ఒకవేళ (i == 0)
+	    flag = కీలకం_WOW64_32_కీలకం;
+	లేకపోతే
+	    flag = కీలకం_WOW64_64_కీలకం;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
-		    flag | KEY_ALL_ACCESS, &kh) != ERROR_SUCCESS)
+	ఒకవేళ (Reg_Open_కీలకం_Ex(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
+		    flag | కీలకం_ALL_ACCESS, &kh) != ERROR_SUCCESS)
 	    ++fail;
-	else
+	లేకపోతే
 	{
-	    if (RegDeleteValue(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
+	    ఒకవేళ (Reg_Delete_విలువ(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
 		++fail;
-	    RegCloseKey(kh);
+	    Reg_Close_కీలకం(kh);
 	}
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
-	printf("No Vim popup registry entries could be removed\n");
-    else if (fail > 0)
-	printf("Some Vim popup registry entries could not be removed\n");
-    else
-	printf("The Vim popup registry entries have been removed\n");
+    ఒకవేళ (fail == maxfail)
+	రాయి("No Vim popup registry entries could be removed\n");
+    లేకపోతే ఒకవేళ (fail > 0)
+	రాయి("Some Vim popup registry entries could not be removed\n");
+    లేకపోతే
+	రాయి("The Vim popup registry entries have been removed\n");
 }
 
-    static void
-remove_openwith(void)
+    స్థిర శూన్య
+remove_openwith(శూన్య)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 7;
+    పూర్ణాంకం		fail = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		loop = is_64bit_os() ? 2 : 1;
+    పూర్ణాంకం		maxfail = loop * 7;
     DWORD	flag;
 
-    for (i = 0; i < loop; i++)
+    కొరకు (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	ఒకవేళ (i == 0)
+	    flag = కీలకం_WOW64_32_కీలకం;
+	లేకపోతే
+	    flag = కీలకం_WOW64_64_కీలకం;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	ఒకవేళ (reg_delete_కీలకం(HKEY_CLASSES_మూలం, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
-	printf("No Vim open-with registry entries could be removed\n");
-    else if (fail > 0)
-	printf("Some Vim open-with registry entries could not be removed\n");
-    else
-	printf("The Vim open-with registry entries have been removed\n");
+    ఒకవేళ (fail == maxfail)
+	రాయి("No Vim open-with registry entries could be removed\n");
+    లేకపోతే ఒకవేళ (fail > 0)
+	రాయి("Some Vim open-with registry entries could not be removed\n");
+    లేకపోతే
+	రాయి("The Vim open-with registry entries have been removed\n");
 }
 
 /*
  * Check if a batch file is really for the current version.  Don't delete a
  * batch file that was written for another (possibly newer) version.
  */
-    static int
-batfile_thisversion(char *path)
+    స్థిర పూర్ణాంకం
+batfile_thisversion(అక్షరం *మార్గం)
 {
     FILE	*fd;
-    char	line[BUFSIZE];
-    int		key_len = strlen(VIMBAT_UNINSTKEY);
-    int		found = FALSE;
+    అక్షరం	పంక్తి[BUFSIZE];
+    పూర్ణాంకం		కీలకం_len = అక్షరశ్రేణి_పొడవు(VIMBAT_UNINSTKEY);
+    పూర్ణాంకం		దొరికింది = FALSE;
 
-    fd = fopen(path, "r");
-    if (fd == NULL)
-	return FALSE;
+    fd = fopen(మార్గం, "r");
+    ఒకవేళ (fd == ఖాళీ)
+	తిరిగి FALSE;
 
-    while (fgets(line, sizeof(line), fd) != NULL)
+    అయితే (fgets(పంక్తి, పరిమాణం(పంక్తి), fd) != ఖాళీ)
     {
-	if (strncmp(line, VIMBAT_UNINSTKEY, key_len) == 0)
+	ఒకవేళ (అక్షరశ్రేణి_పోలిక(పంక్తి, VIMBAT_UNINSTKEY, కీలకం_len) == 0)
 	{
-	    found = TRUE;
-	    break;
+	    దొరికింది = TRUE;
+	    ఆపు;
 	}
     }
     fclose(fd);
-    return found;
+    తిరిగి దొరికింది;
 }
 
-    static int
-remove_batfiles(int doit)
+    స్థిర పూర్ణాంకం
+remove_batfiles(పూర్ణాంకం doit)
 {
-    char *batfile_path;
-    int	 i;
-    int	 found = 0;
+    అక్షరం *batfile_మార్గం;
+    పూర్ణాంకం	 i;
+    పూర్ణాంకం	 దొరికింది = 0;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    కొరకు (i = 1; i < లక్ష్యం_లెక్క; ++i)
     {
-	batfile_path = searchpath_save(targets[i].batname);
-	if (batfile_path != NULL && batfile_thisversion(batfile_path))
+	batfile_మార్గం = searchpath_save(targets[i].batname);
+	ఒకవేళ (batfile_మార్గం != ఖాళీ && batfile_thisversion(batfile_మార్గం))
 	{
-	    ++found;
-	    if (doit)
+	    ++దొరికింది;
+	    ఒకవేళ (doit)
 	    {
-		printf("removing %s\n", batfile_path);
-		remove(batfile_path);
+		రాయి("removing %s\n", batfile_మార్గం);
+		remove(batfile_మార్గం);
 	    }
-	    else
-		printf(" - the batch file %s\n", batfile_path);
-	    free(batfile_path);
+	    లేకపోతే
+		రాయి(" - the batch file %s\n", batfile_మార్గం);
+	    విడుదల(batfile_మార్గం);
 	}
     }
 
     mch_chdir(installdir);
-    return found;
+    తిరిగి దొరికింది;
 }
 
-    static void
-remove_if_exists(char *path, char *filename)
+    స్థిర శూన్య
+remove_if_exists(అక్షరం *మార్గం, అక్షరం *filename)
 {
-    char buf[BUFSIZE];
+    అక్షరం buf[BUFSIZE];
     FILE *fd;
 
-    sprintf(buf, "%s\\%s", path, filename);
+    sprintf(buf, "%s\\%s", మార్గం, filename);
 
     fd = fopen(buf, "r");
-    if (fd == NULL)
-	return;
+    ఒకవేళ (fd == ఖాళీ)
+	తిరిగి;
 
     fclose(fd);
-    printf("removing %s\n", buf);
+    రాయి("removing %s\n", buf);
     remove(buf);
 }
 
-    static void
-remove_icons(void)
+    స్థిర శూన్య
+remove_icons(శూన్య)
 {
-    char	path[BUFSIZE];
-    int		i;
+    అక్షరం	మార్గం[BUFSIZE];
+    పూర్ణాంకం		i;
 
-    if (get_shell_folder_path(path, "desktop"))
-	for (i = 0; i < ICON_COUNT; ++i)
-	    remove_if_exists(path, icon_link_names[i]);
+    ఒకవేళ (get_shell_folder_మార్గం(మార్గం, "desktop"))
+	కొరకు (i = 0; i < ICON_లెక్క; ++i)
+	    remove_if_exists(మార్గం, icon_link_పేర్లు[i]);
 }
 
-    static void
-remove_start_menu(void)
+    స్థిర శూన్య
+remove_ప్రారంభం_menu(శూన్య)
 {
-    char	path[BUFSIZE];
-    int		i;
-    struct stat st;
+    అక్షరం	మార్గం[BUFSIZE];
+    పూర్ణాంకం		i;
+    నిర్మాణం stat st;
 
-    if (get_shell_folder_path(path, VIM_STARTMENU) == FAIL)
-	return;
+    ఒకవేళ (get_shell_folder_మార్గం(మార్గం, VIM_STARTMENU) == FAIL)
+	తిరిగి;
 
-    for (i = 1; i < TARGET_COUNT; ++i)
-	remove_if_exists(path, targets[i].lnkname);
-    remove_if_exists(path, "uninstall.lnk");
-    remove_if_exists(path, "Help.lnk");
+    కొరకు (i = 1; i < లక్ష్యం_లెక్క; ++i)
+	remove_if_exists(మార్గం, targets[i].lnkname);
+    remove_if_exists(మార్గం, "uninstall.lnk");
+    remove_if_exists(మార్గం, "Help.lnk");
     // Win95 uses .pif, WinNT uses .lnk
-    remove_if_exists(path, "Vim tutor.pif");
-    remove_if_exists(path, "Vim tutor.lnk");
-    remove_if_exists(path, "Vim online.url");
-    if (stat(path, &st) == 0)
+    remove_if_exists(మార్గం, "Vim tutor.pif");
+    remove_if_exists(మార్గం, "Vim tutor.lnk");
+    remove_if_exists(మార్గం, "Vim online.url");
+    ఒకవేళ (stat(మార్గం, &st) == 0)
     {
-	printf("removing %s\n", path);
-	rmdir(path);
+	రాయి("removing %s\n", మార్గం);
+	rmdir(మార్గం);
     }
 }
 
-    static void
-delete_uninstall_key(void)
+    స్థిర శూన్య
+delete_uninstall_కీలకం(శూన్య)
 {
-    reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT, KEY_WOW64_64KEY);
+    reg_delete_కీలకం(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_సంస్కరణ_SHORT, కీలకం_WOW64_64_కీలకం);
 }
 
-    int
-main(int argc, char *argv[])
+    పూర్ణాంకం
+ప్రధాన(పూర్ణాంకం argc, అక్షరం *argv[])
 {
-    int		found = 0;
+    పూర్ణాంకం		దొరికింది = 0;
     FILE	*fd;
-    int		i;
-    struct stat st;
-    char	icon[BUFSIZE];
-    char	path[MAX_PATH];
-    char	popup_path[MAX_PATH];
+    పూర్ణాంకం		i;
+    నిర్మాణం stat st;
+    అక్షరం	icon[BUFSIZE];
+    అక్షరం	మార్గం[MAX_మార్గం];
+    అక్షరం	popup_మార్గం[MAX_మార్గం];
 
     // The nsis uninstaller calls us with a "-nsis" argument.
-    if (argc == 2 && stricmp(argv[1], "-nsis") == 0)
+    ఒకవేళ (argc == 2 && stricmp(argv[1], "-nsis") == 0)
 	interactive = FALSE;
-    else
+    లేకపోతే
 	interactive = TRUE;
 
     // Initialize this program.
     do_inits(argv);
 
-    printf("This program will remove the following items:\n");
+    రాయి("This program will remove the following items:\n");
 
-    if (popup_gvim_path(popup_path, sizeof(popup_path)))
+    ఒకవేళ (popup_gvim_మార్గం(popup_మార్గం, పరిమాణం(popup_మార్గం)))
     {
-	printf(" - the \"Edit with Vim\" entry in the popup menu\n");
-	printf("   which uses \"%s\"\n", popup_path);
-	if (interactive)
-	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
+	రాయి(" - the \"Edit with Vim\" entry in the popup menu\n");
+	రాయి("   which uses \"%s\"\n", popup_మార్గం);
+	ఒకవేళ (interactive)
+	    రాయి("\nRemove it (y/n)? ");
+	ఒకవేళ (!interactive || confirm())
 	{
 	    remove_popup();
 	    // Assume the "Open With" entry can be removed as well, don't
@@ -347,80 +347,80 @@ main(int argc, char *argv[])
 	    remove_openwith();
 	}
     }
-    else if (openwith_gvim_path(popup_path, sizeof(popup_path)))
+    లేకపోతే ఒకవేళ (openwith_gvim_మార్గం(popup_మార్గం, పరిమాణం(popup_మార్గం)))
     {
-	printf(" - the Vim \"Open With...\" entry in the popup menu\n");
-	printf("   which uses \"%s\"\n", popup_path);
-	printf("\nRemove it (y/n)? ");
-	if (confirm())
+	రాయి(" - the Vim \"Open With...\" entry in the popup menu\n");
+	రాయి("   which uses \"%s\"\n", popup_మార్గం);
+	రాయి("\nRemove it (y/n)? ");
+	ఒకవేళ (confirm())
 	    remove_openwith();
     }
 
-    if (get_shell_folder_path(path, "desktop"))
+    ఒకవేళ (get_shell_folder_మార్గం(మార్గం, "desktop"))
     {
-	printf("\n");
-	for (i = 0; i < ICON_COUNT; ++i)
+	రాయి("\n");
+	కొరకు (i = 0; i < ICON_లెక్క; ++i)
 	{
-	    sprintf(icon, "%s\\%s", path, icon_link_names[i]);
-	    if (stat(icon, &st) == 0)
+	    sprintf(icon, "%s\\%s", మార్గం, icon_link_పేర్లు[i]);
+	    ఒకవేళ (stat(icon, &st) == 0)
 	    {
-		printf(" - the \"%s\" icon on the desktop\n", icon_names[i]);
-		++found;
+		రాయి(" - the \"%s\" icon on the desktop\n", icon_పేర్లు[i]);
+		++దొరికింది;
 	    }
 	}
-	if (found > 0)
+	ఒకవేళ (దొరికింది > 0)
 	{
-	    if (interactive)
-		printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	    if (!interactive || confirm())
+	    ఒకవేళ (interactive)
+		రాయి("\nRemove %s (y/n)? ", దొరికింది > 1 ? "them" : "it");
+	    ఒకవేళ (!interactive || confirm())
 		remove_icons();
 	}
     }
 
-    if (get_shell_folder_path(path, VIM_STARTMENU)
-	    && stat(path, &st) == 0)
+    ఒకవేళ (get_shell_folder_మార్గం(మార్గం, VIM_STARTMENU)
+	    && stat(మార్గం, &st) == 0)
     {
-	printf("\n - the \"%s\" entry in the Start Menu\n", VIM_STARTMENU);
-	if (interactive)
-	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
-	    remove_start_menu();
+	రాయి("\n - the \"%s\" entry in the Start Menu\n", VIM_STARTMENU);
+	ఒకవేళ (interactive)
+	    రాయి("\nRemove it (y/n)? ");
+	ఒకవేళ (!interactive || confirm())
+	    remove_ప్రారంభం_menu();
     }
 
-    printf("\n");
-    found = remove_batfiles(0);
-    if (found > 0)
+    రాయి("\n");
+    దొరికింది = remove_batfiles(0);
+    ఒకవేళ (దొరికింది > 0)
     {
-	if (interactive)
-	    printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	if (!interactive || confirm())
+	ఒకవేళ (interactive)
+	    రాయి("\nRemove %s (y/n)? ", దొరికింది > 1 ? "them" : "it");
+	ఒకవేళ (!interactive || confirm())
 	    remove_batfiles(1);
     }
 
     fd = fopen("gvim.exe", "r");
-    if (fd != NULL)
+    ఒకవేళ (fd != ఖాళీ)
     {
 	fclose(fd);
-	printf("gvim.exe detected.  Attempting to unregister gvim with OLE\n");
+	రాయి("gvim.exe detected.  Attempting to unregister gvim with OLE\n");
 	system("gvim.exe -silent -unregister");
     }
 
-    delete_uninstall_key();
+    delete_uninstall_కీలకం();
 
-    if (interactive)
+    ఒకవేళ (interactive)
     {
-	printf("\nYou may now want to delete the Vim executables and runtime files.\n");
-	printf("(They are still where you unpacked them.)\n");
+	రాయి("\nYou may now want to delete the Vim executables and runtime files.\n");
+	రాయి("(They are still where you unpacked them.)\n");
     }
 
-    if (interactive)
+    ఒకవేళ (interactive)
     {
 	rewind(stdin);
-	printf("\nPress Enter to exit...");
-	(void)getchar();
+	రాయి("\nPress Enter to exit...");
+	(శూన్య)getchar();
     }
-    else
+    లేకపోతే
 	sleep(3);
 
-    return 0;
+    తిరిగి 0;
 }

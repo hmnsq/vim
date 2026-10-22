@@ -7,18 +7,18 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_FORM_H
-#define GUI_GTK4_FORM_H
+#నిర్వచితం_కాకపోతే GUI_GTK4_FORM_H
+#నిర్వచించు GUI_GTK4_FORM_H
 
-#include <gtk/gtk.h>
+#అన్తర్భావ <gtk/gtk.h>
 
-#define VIM_TYPE_FORM (vim_form_get_type())
+#నిర్వచించు VIM_TYPE_FORM (vim_form_get_type())
 G_DECLARE_FINAL_TYPE(VimForm, vim_form, VIM, FORM, GtkWidget)
 
-GtkWidget *vim_form_new(void);
-void vim_form_put(VimForm *self, GtkWidget *widget, int x, int y);
-void vim_form_move(VimForm *self, GtkWidget *widget, int x, int y);
-void vim_form_move_resize(VimForm *self, GtkWidget *widget, gint x, gint y, gint w, gint h);
-void vim_form_remove(VimForm *self, GtkWidget *widget);
+GtkWidget *vim_form_new(శూన్య);
+శూన్య vim_form_put(VimForm *self, GtkWidget *widget, పూర్ణాంకం x, పూర్ణాంకం y);
+శూన్య vim_form_move(VimForm *self, GtkWidget *widget, పూర్ణాంకం x, పూర్ణాంకం y);
+శూన్య vim_form_move_resize(VimForm *self, GtkWidget *widget, gint x, gint y, gint w, gint h);
+శూన్య vim_form_remove(VimForm *self, GtkWidget *widget);
 
-#endif
+#అయితే_ముగింపు

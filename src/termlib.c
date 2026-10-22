@@ -10,27 +10,27 @@
 
 // TERMLIB: Terminal independent database.
 
-#include "vim.h"
-#include "termlib.pro"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#ఒకవేళ !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
-#endif
+#అయితే_ముగింపు
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+స్థిర పూర్ణాంకం  getent(అక్షరం *, అక్షరం *, FILE *, పూర్ణాంకం);
+స్థిర పూర్ణాంకం  nextent(అక్షరం *, FILE *, పూర్ణాంకం);
+స్థిర పూర్ణాంకం  సరిపోలిక_3(అక్షరం *, అక్షరం *);
+స్థిర అక్షరం *_addfmt(అక్షరం *, అక్షరం *, పూర్ణాంకం);
+స్థిర అక్షరం *కనుగొను_3(అక్షరం *, అక్షరం *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
-short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
+అక్షరం	*tent;		      // Pointer to terminal entry, set by tgetent
+అక్షరం	PC = 0;		      // Pad character, default NULL
+అక్షరం	*పైకి_2 = 0, *BC = 0;     // Pointers to UP and BC strings from database
+పొట్టి	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
  * Module: tgetent
@@ -53,154 +53,154 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
  * - This could be simplified considerably for non-UNIX systems.
  */
 
-#ifndef TERMCAPFILE
+#నిర్వచితం_కాకపోతే TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# లేకపోతే
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  లేకపోతే
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
-#endif
+#అయితే_ముగింపు
 
-    int
+    పూర్ణాంకం
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    అక్షరం    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    అక్షరం    *పదం)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    అక్షరం    tcbuf[32];		// Temp buffer to handle
+    అక్షరం    *tcptr = tcbuf;	// extended entries
+    అక్షరం    *tcap = TERMCAPFILE; // Default termcap file
+    అక్షరం    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    పూర్ణాంకం	    retval = 0;
+    పూర్ణాంకం	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    ఒకవేళ ((tmp = (అక్షరం *)mch_getenv((char_u *)"TERMCAP")) != ఖాళీ)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	ఒకవేళ (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#ఒకవేళ defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    ఒకవేళ (tmp)
 		*tmp = ':';
-#endif
+#అయితే_ముగింపు
 	}
-	else				// TERMCAP = termcap entry itself
+	లేకపోతే				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    పూర్ణాంకం tlen = అక్షరశ్రేణి_పొడవు(పదం);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    అయితే (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		అక్షరం *nexttmp;
 
-		while (*tmp == '|')
+		అయితే (*tmp == '|')
 		    tmp++;
-		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		nexttmp  = కనుగొను_3(tmp, ":|");	// Rhialto
+		ఒకవేళ (tmp+tlen == nexttmp && సరిపోలిక_3(tmp, పదం) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    తిరిగి 1;
 		}
-		else
+		లేకపోతే
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    ఒకవేళ (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	తిరిగి -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    అయితే (getent(tbuf + len, పదం, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	ఒకవేళ ((పదం = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
-	    len = strlen(tbuf);
+	    len = అక్షరశ్రేణి_పొడవు(tbuf);
 	}
-	else
+	లేకపోతే
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    ఆపు;
 	}
     }
     fclose(termcap);
-    return retval;
+    తిరిగి retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    స్థిర పూర్ణాంకం
+getent(అక్షరం *tbuf, అక్షరం *పదం, FILE *termcap, పూర్ణాంకం buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    అక్షరం    *tptr;
+    పూర్ణాంకం	    tlen = అక్షరశ్రేణి_పొడవు(పదం);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    అయితే (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	అయితే (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    అక్షరం    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    అయితే (*tptr == '|')		// | separates names
 		tptr++;
-	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
-		_match(tptr, term) == tlen)	// FOUND!
+	    nexttptr = కనుగొను_3(tptr, ":|");	// Rhialto
+	    ఒకవేళ (tptr + tlen == nexttptr &&
+		సరిపోలిక_3(tptr, పదం) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		తిరిగి 1;
 	    }
-	    else				// Look for next name
+	    లేకపోతే				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    స్థిర పూర్ణాంకం
+nextent(అక్షరం *tbuf, FILE *termcap, పూర్ణాంకం buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    అక్షరం *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    అయితే (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (పూర్ణాంకం)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	పూర్ణాంకం llen = అక్షరశ్రేణి_పొడవు(lbuf);
 
-	if (*lbuf == '#')			// eat comments
-	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	ఒకవేళ (*lbuf == '#')			// eat comments
+	    కొనసాగు;
+	ఒకవేళ (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	ఒకవేళ (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	లేకపోతే
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    తిరిగి 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    తిరిగి 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    పూర్ణాంకం
+tgetflag(అక్షరం *id)
 {
-    char    buf[256], *ptr = buf;
+    అక్షరం    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    తిరిగి tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    పూర్ణాంకం
+tgetnum(అక్షరం *id)
 {
-    char *ptr, buf[256];
+    అక్షరం *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    ఒకవేళ (tgetstr(id, &ptr))
+	తిరిగి atoi(buf);
+    లేకపోతే
+	తిరిగి 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    అక్షరం *
+tgetstr(అక్షరం *id, అక్షరం **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    పూర్ణాంకం		len = అక్షరశ్రేణి_పొడవు(id);
+    అక్షరం	*tmp=tent;
+    అక్షరం	*hold;
+    పూర్ణాంకం		i;
 
-    do
+    చేయి
     {
-	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	tmp = కనుగొను_3(tmp, ":");			// For each field
+	అయితే (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	ఒకవేళ (!*tmp)
+	    ఆపు;
 
-	if (_match(id, tmp) == len)
+	ఒకవేళ (సరిపోలిక_3(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    ఒకవేళ (*tmp == '@')			// :xx@: entry for tc
+		తిరిగి 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    అయితే (*++tmp && *tmp != ':')	// not at end of field
 		{
-		switch(*tmp)
+		ఎంపిక(*tmp)
 		{
-		case '\\':			// Expand escapes here
-		    switch(*++tmp)
+		స్థితి '\\':			// Expand escapes here
+		    ఎంపిక(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    స్థితి 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			ఆపు;			// shouldn't happen
+		    స్థితి 'e':
+		    స్థితి 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			ఆపు;
+		    స్థితి 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			ఆపు;
+		    స్థితి 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			ఆపు;
+		    స్థితి 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			ఆపు;
+		    స్థితి 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			ఆపు;
+		    స్థితి 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			ఆపు;
+		    స్థితి '0':			// \nnn
+		    స్థితి '1':
+		    స్థితి '2':
+		    స్థితి '3':
+		    స్థితి '4':
+		    స్థితి '5':
+		    స్థితి '6':
+		    స్థితి '7':
+		    స్థితి '8':
+		    స్థితి '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			కొరకు (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
-		    default:			// \x, for all other x
+			ఆపు;
+		    అప్రమేయ:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    ఆపు;
+		స్థితి '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
-		default:
+		    ఆపు;
+		అప్రమేయ:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    తిరిగి hold;
 	}
-    } while (*tmp);
+    } అయితే (*tmp);
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    అక్షరం *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    అక్షరం    *cm,				// cm string, from termcap
+    పూర్ణాంకం	    నిలువు,				// column, x position
+    పూర్ణాంకం	    పంక్తి)				// line, y position
 {
-    char    gx, gy,				// x, y
+    అక్షరం    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
-	reverse = 0,				// reverse flag
+	తిరగేయి = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    స్థిర అక్షరం బఫరు[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    ఒకవేళ (!cm)
+	తిరిగి "OOPS";				// Kludge, but standard
 
-    bufp = buffer;
+    bufp = బఫరు;
     ptr = cm;
 
-    while (*ptr)
+    అయితే (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	ఒకవేళ ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	లేకపోతే
 	{				// % escape
-	    switch(c = *ptr++)
+	    ఎంపిక(c = *ptr++)
 	    {
-	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
-		break;
-	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
-		break;
-	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+	    స్థితి 'd':				// decimal
+		bufp = _addfmt(bufp, "%d", పంక్తి);
+		పంక్తి = నిలువు;
+		ఆపు;
+	    స్థితి '2':				// 2 digit decimal
+		bufp = _addfmt(bufp, "%02d", పంక్తి);
+		పంక్తి = నిలువు;
+		ఆపు;
+	    స్థితి '3':				// 3 digit decimal
+		bufp = _addfmt(bufp, "%03d", పంక్తి);
+		పంక్తి = నిలువు;
+		ఆపు;
+	    స్థితి '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
-		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		ఒకవేళ (నిలువు>gx) నిలువు += gy;
+		ఒకవేళ (పంక్తి>gx) పంక్తి += gy;
+		ఆపు;
+	    స్థితి '+':				// %+c: add c
+		పంక్తి += *ptr++;
+	    స్థితి '.':				// print x/y
+		ఒకవేళ (పంక్తి == '\t' ||		// these are
+		   పంక్తి == '\n' ||		// chars that
+		   పంక్తి == '\004' ||		// UNIX hates
+		   పంక్తి == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    పంక్తి++;			// so go to next pos
+		    ఒకవేళ (తిరగేయి == (పంక్తి == నిలువు))
 			addup=1;		// and mark UP
-		    else
+		    లేకపోతే
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
-		break;
-	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
-		col = gx;
-		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
-		col++;
-		line++;
-		break;
-	    case '%':				// %%=% literally
+		*bufp++=పంక్తి;
+		పంక్తి = నిలువు;
+		ఆపు;
+	    స్థితి 'r':				// r: reverse
+		gx = పంక్తి;
+		పంక్తి = నిలువు;
+		నిలువు = gx;
+		తిరగేయి = 1;
+		ఆపు;
+	    స్థితి 'i':			// increment (1-origin screen)
+		నిలువు++;
+		పంక్తి++;
+		ఆపు;
+	    స్థితి '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
-		line ^= 0140;
-		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
-		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
-		col = col-2*(col&15);
-		break;
-	    default:				// Unknown escape
-		return "OOPS";
+		ఆపు;
+	    స్థితి 'n':				// magic DM2500 code
+		పంక్తి ^= 0140;
+		నిలువు ^= 0140;
+		ఆపు;
+	    స్థితి 'B':				// bcd encoding
+		పంక్తి = పంక్తి/10<<4+పంక్తి%10;
+		నిలువు = నిలువు/10<<4+నిలువు%10;
+		ఆపు;
+	    స్థితి 'D':				// magic Delta Data code
+		పంక్తి = పంక్తి-2*(పంక్తి&15);
+		నిలువు = నిలువు-2*(నిలువు&15);
+		ఆపు;
+	    అప్రమేయ:				// Unknown escape
+		తిరిగి "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    ఒకవేళ (addup)					// add upline
+	ఒకవేళ (పైకి_2)
 	{
-	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ptr=పైకి_2;
+	    అయితే (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    ఒకవేళ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    అయితే (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    ఒకవేళ (addbak)					// add backspace
+	ఒకవేళ (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    అయితే (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    ఒకవేళ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    అయితే (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	లేకపోతే
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    తిరిగి(బఫరు);
 }
 
 /*
@@ -533,55 +533,55 @@ tgoto(
  *
  */
 
-long _bauds[16]={
+దీర్ఘ _bauds[16]={
     0,	50, 75,	110,
     134,    150,    200,    300,
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    పూర్ణాంకం
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    అక్షరం *cp,				// string to print
+    పూర్ణాంకం affcnt,				// Number of lines affected
+    శూన్య (*outc)(గుర్తులేని పూర్ణాంకం))		// routine to output 1 character
 {
-    long    frac,			// 10^(#digits after decimal point)
+    దీర్ఘ    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(స్థిరరాశి అక్షరం *);
 
-    if (VIM_ISDIGIT(*cp))
+    ఒకవేళ (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
-	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	అయితే (VIM_ISDIGIT(*cp))
+	    counter = counter * 10L + (దీర్ఘ)(*cp++ - '0');
+	ఒకవేళ (*cp == '.')
+	    అయితే (VIM_ISDIGIT(*++cp))
 	    {
-		counter = counter * 10L + (long)(*cp++ - '0');
+		counter = counter * 10L + (దీర్ఘ)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	ఒకవేళ (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    ఒకవేళ (affcnt>1) affcnt = 1;
 	}
-	else
+	లేకపోతే
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
-	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
+	ఒకవేళ (ospeed)
+	    counter = (counter * _bauds[ospeed] * (దీర్ఘ)affcnt) / frac;
 
-	while (*cp)			// output string
+	అయితే (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	ఒకవేళ (ospeed)
+	    అయితే (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    లేకపోతే
+	అయితే (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    స్థిర పూర్ణాంకం
+సరిపోలిక_3(అక్షరం *s1, అక్షరం *s2)
 {
-    int i = 0;
+    పూర్ణాంకం i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    అయితే (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    తిరిగి i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    స్థిర అక్షరం *
+కనుగొను_3(అక్షరం *s, అక్షరం *సమితి_2)
 {
-    for (; *s; s++)
+    కొరకు (; *s; s++)
     {
-	char	*ptr = set;
+	అక్షరం	*ptr = సమితి_2;
 
-	while (*ptr && *s != *ptr)
+	అయితే (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	ఒకవేళ (*ptr)
+	    తిరిగి s;
     }
 
-    return s;
+    తిరిగి s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    స్థిర అక్షరం *
+_addfmt(అక్షరం *buf, అక్షరం *fmt, పూర్ణాంకం val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    అయితే (*buf)
 	buf++;
-    return buf;
+    తిరిగి buf;
 }

@@ -55,93 +55,93 @@
  * See ":help develop-spell".
  */
 
-#define IN_SPELL_C
-#include "vim.h"
+#నిర్వచించు లోపల_SPELL_C
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_SPELL)
 
-#include <time.h>
+#అన్తర్భావ <time.h>
 
-#define REGION_ALL 0xff		// word valid in all regions
+#నిర్వచించు REGION_ALL 0xff		// word valid in all regions
 
 // Result values.  Lower number is accepted over higher one.
-#define SP_BANNED	(-1)
-#define SP_OK		0
-#define SP_RARE		1
-#define SP_LOCAL	2
-#define SP_BAD		3
+#నిర్వచించు SP_BANNED	(-1)
+#నిర్వచించు SP_OK		0
+#నిర్వచించు SP_RARE		1
+#నిర్వచించు SP_LOCAL	2
+#నిర్వచించు SP_BAD		3
 
 /*
  * Structure to store info for word matching.
  */
-typedef struct matchinf_S
+రకనిర్వచనం నిర్మాణం matchinf_S
 {
     langp_T	*mi_lp;			// info for language and region
 
     // pointers to original text to be checked
-    char_u	*mi_word;		// start of word being checked
-    char_u	*mi_end;		// end of matching word so far
+    char_u	*mi_మాట;		// start of word being checked
+    char_u	*mi_చివర;		// end of matching word so far
     char_u	*mi_fend;		// next char to be added to mi_fword
     char_u	*mi_cend;		// char after what was used for
 					// mi_capflags
 
     // case-folded text
     char_u	mi_fword[MAXWLEN + 1];	// mi_word case-folded
-    int		mi_fwordlen;		// nr of valid bytes in mi_fword
+    పూర్ణాంకం		mi_fwordlen;		// nr of valid bytes in mi_fword
 
     // for when checking word after a prefix
-    int		mi_prefarridx;		// index in sl_pidxs with list of
+    పూర్ణాంకం		mi_prefarridx;		// index in sl_pidxs with list of
 					// affixID/condition
-    int		mi_prefcnt;		// number of entries at mi_prefarridx
-    int		mi_prefixlen;		// byte length of prefix
-    int		mi_cprefixlen;		// byte length of prefix in original
+    పూర్ణాంకం		mi_prefcnt;		// number of entries at mi_prefarridx
+    పూర్ణాంకం		mi_prefixlen;		// byte length of prefix
+    పూర్ణాంకం		mi_cprefixlen;		// byte length of prefix in original
 					// case
 
     // for when checking a compound word
-    int		mi_compoff;		// start of following word offset
+    పూర్ణాంకం		mi_compoff;		// start of following word offset
     char_u	mi_compflags[MAXWLEN];	// flags for compound words used
-    int		mi_complen;		// nr of compound words used
-    int		mi_compextra;		// nr of COMPOUNDROOT words
+    పూర్ణాంకం		mi_complen;		// nr of compound words used
+    పూర్ణాంకం		mi_compextra;		// nr of COMPOUNDROOT words
 
     // others
-    int		mi_result;		// result so far: SP_BAD, SP_OK, etc.
-    int		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
+    పూర్ణాంకం		mi_ఫలితం;		// result so far: SP_BAD, SP_OK, etc.
+    పూర్ణాంకం		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
     win_T	*mi_win;		// buffer being checked
 
     // for NOBREAK
-    int		mi_result2;		// "mi_result" without following word
+    పూర్ణాంకం		mi_result2;		// "mi_result" without following word
     char_u	*mi_end2;		// "mi_end" without following word
 } matchinf_T;
 
 
-static int spell_mb_isword_class(int cl, win_T *wp);
+స్థిర పూర్ణాంకం spell_mb_isword_class(పూర్ణాంకం cl, win_T *wp);
 
 // mode values for find_word
-#define FIND_FOLDWORD	    0	// find word case-folded
-#define FIND_KEEPWORD	    1	// find keep-case word
-#define FIND_PREFIX	    2	// find word after prefix
-#define FIND_COMPOUND	    3	// find case-folded compound word
-#define FIND_KEEPCOMPOUND   4	// find keep-case compound word
+#నిర్వచించు కనుగొను_FOLDWORD	    0	// find word case-folded
+#నిర్వచించు కనుగొను_KEEPWORD	    1	// find keep-case word
+#నిర్వచించు కనుగొను_ఉపసర్గ	    2	// find word after prefix
+#నిర్వచించు కనుగొను_COMPOUND	    3	// find case-folded compound word
+#నిర్వచించు కనుగొను_KEEPCOMPOUND   4	// find keep-case compound word
 
 // type values for get_char_type
-#define CHAR_OTHER	0
-#define CHAR_UPPER	1
-#define CHAR_DIGIT	2
+#నిర్వచించు CHAR_OTHER	0
+#నిర్వచించు CHAR_పై	1
+#నిర్వచించు CHAR_DIGIT	2
 
-static void find_word(matchinf_T *mip, int mode);
-static void find_prefix(matchinf_T *mip, int mode);
-static int fold_more(matchinf_T *mip);
-static void spell_load_cb(char_u *fname, void *cookie);
-static int count_syllables(slang_T *slang, char_u *word);
-static void clear_midword(win_T *buf);
-static void use_midword(slang_T *lp, win_T *buf);
-static int find_region(char_u *rp, char_u *region);
-static void spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
-static void dump_word(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T lnum);
-static linenr_T dump_prefixes(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T startlnum);
-static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
+స్థిర శూన్య కనుగొను_మాట(matchinf_T *mip, పూర్ణాంకం బహుళకం);
+స్థిర శూన్య కనుగొను_ఉపసర్గ_2(matchinf_T *mip, పూర్ణాంకం బహుళకం);
+స్థిర పూర్ణాంకం fold_మరిన్ని(matchinf_T *mip);
+స్థిర శూన్య spell_ఎక్కించు_cb(char_u *fname, శూన్య *cookie);
+స్థిర పూర్ణాంకం లెక్క_syllables(slang_T *slang, char_u *మాట);
+స్థిర శూన్య clear_midword(win_T *buf);
+స్థిర శూన్య use_midword(slang_T *lp, win_T *buf);
+స్థిర పూర్ణాంకం కనుగొను_region(char_u *rp, char_u *region);
+స్థిర శూన్య spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
+స్థిర శూన్య spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
+స్థిర శూన్య spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
+స్థిర శూన్య dump_మాట(slang_T *slang, char_u *మాట, char_u *pat, పూర్ణాంకం *dir, పూర్ణాంకం విడత, పూర్ణాంకం flags, linenr_T lnum);
+స్థిర linenr_T dump_prefixes(slang_T *slang, char_u *మాట, char_u *pat, పూర్ణాంకం *dir, పూర్ణాంకం విడత, పూర్ణాంకం flags, linenr_T startlnum);
+స్థిర char_u *advance_camelcase_మాట(char_u *p, win_T *wp, పూర్ణాంకం *is_camel_case);
 
 /*
  * Main spell-checking function.
@@ -158,99 +158,99 @@ static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
  * Returns the length of the word in bytes, also when it's OK, so that the
  * caller can skip over the word.
  */
-    int
+    పూర్ణాంకం
 spell_check(
     win_T	*wp,		// current window
     char_u	*ptr,
     hlf_T	*attrp,
-    int		*capcol,	// column to check for Capital
-    int		docount)	// count good words
+    పూర్ణాంకం		*capcol,	// column to check for Capital
+    పూర్ణాంకం		docount)	// count good words
 {
     matchinf_T	mi;		// Most things are put in "mi" so that it can
 				// be passed to functions quickly.
-    int		nrlen = 0;	// found a number first
-    int		c;
-    int		wrongcaplen = 0;
-    int		lpi;
-    int		count_word = docount;
-    int		use_camel_case = *wp->w_s->b_p_spo != NUL;
-    int		is_camel_case = FALSE;
+    పూర్ణాంకం		nrlen = 0;	// found a number first
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		wrongcaplen = 0;
+    పూర్ణాంకం		lpi;
+    పూర్ణాంకం		లెక్క_మాట = docount;
+    పూర్ణాంకం		use_camel_case = *wp->w_s->b_p_spo != NUL;
+    పూర్ణాంకం		is_camel_case = FALSE;
 
     // A word never starts at a space or a control character.  Return quickly
     // then, skipping over the character.
-    if (*ptr <= ' ')
-	return 1;
+    ఒకవేళ (*ptr <= ' ')
+	తిరిగి 1;
 
     // Return here when loading language files failed.
-    if (wp->w_s->b_langp.ga_len == 0)
-	return 1;
+    ఒకవేళ (wp->w_s->b_langp.ga_len == 0)
+	తిరిగి 1;
 
-    CLEAR_FIELD(mi);
+    CLEAR_క్షేత్రం(mi);
 
     // A number is always OK.  Also skip hexadecimal numbers 0xFF99 and
     // 0X99FF.  But always do check spelling to find "3GPP" and "11
     // julifeest".
-    if (*ptr >= '0' && *ptr <= '9')
+    ఒకవేళ (*ptr >= '0' && *ptr <= '9')
     {
-	if (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
-	    mi.mi_end = skipbin(ptr + 2);
-	else if (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
-	    mi.mi_end = skiphex(ptr + 2);
-	else
-	    mi.mi_end = skipdigits(ptr);
-	nrlen = (int)(mi.mi_end - ptr);
+	ఒకవేళ (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
+	    mi.mi_చివర = skipbin(ptr + 2);
+	లేకపోతే ఒకవేళ (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
+	    mi.mi_చివర = skiphex(ptr + 2);
+	లేకపోతే
+	    mi.mi_చివర = skipdigits(ptr);
+	nrlen = (పూర్ణాంకం)(mi.mi_చివర - ptr);
     }
 
     // Find the normal end of the word (until the next non-word character).
-    mi.mi_word = ptr;
+    mi.mi_మాట = ptr;
     mi.mi_fend = ptr;
-    if (spell_iswordp(mi.mi_fend, wp))
+    ఒకవేళ (spell_iswordp(mi.mi_fend, wp))
     {
-	if (use_camel_case)
-	    mi.mi_fend = advance_camelcase_word(ptr, wp, &is_camel_case);
-	else
+	ఒకవేళ (use_camel_case)
+	    mi.mi_fend = advance_camelcase_మాట(ptr, wp, &is_camel_case);
+	లేకపోతే
 	{
-	    do
+	    చేయి
 	    {
 		MB_PTR_ADV(mi.mi_fend);
-	    } while (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
+	    } అయితే (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
 	}
 
-	if (capcol != NULL && *capcol == 0 && wp->w_s->b_cap_prog != NULL)
+	ఒకవేళ (capcol != ఖాళీ && *capcol == 0 && wp->w_s->b_cap_prog != ఖాళీ)
 	{
 	    // Check word starting with capital letter.
 	    c = PTR2CHAR(ptr);
-	    if (!SPELL_ISUPPER(c))
-		wrongcaplen = (int)(mi.mi_fend - ptr);
+	    ఒకవేళ (!SPELL_ISUPPER(c))
+		wrongcaplen = (పూర్ణాంకం)(mi.mi_fend - ptr);
 	}
     }
-    if (capcol != NULL)
+    ఒకవేళ (capcol != ఖాళీ)
 	*capcol = -1;
 
     // We always use the characters up to the next non-word character,
     // also for bad words.
-    mi.mi_end = mi.mi_fend;
+    mi.mi_చివర = mi.mi_fend;
 
     // Check caps type later.
     mi.mi_capflags = 0;
-    mi.mi_cend = NULL;
+    mi.mi_cend = ఖాళీ;
     mi.mi_win = wp;
 
     // case-fold the word with one non-word character, so that we can check
     // for the word end.
-    if (*mi.mi_fend != NUL)
+    ఒకవేళ (*mi.mi_fend != NUL)
 	MB_PTR_ADV(mi.mi_fend);
 
-    (void)spell_casefold(wp, ptr, (int)(mi.mi_fend - ptr), mi.mi_fword,
+    (శూన్య)spell_casefold(wp, ptr, (పూర్ణాంకం)(mi.mi_fend - ptr), mi.mi_fword,
 							     MAXWLEN + 1);
-    mi.mi_fwordlen = (int)STRLEN(mi.mi_fword);
+    mi.mi_fwordlen = (పూర్ణాంకం)STRLEN(mi.mi_fword);
 
-    if (is_camel_case && mi.mi_fwordlen > 0)
+    ఒకవేళ (is_camel_case && mi.mi_fwordlen > 0)
 	// Introduce a fake word end space into the folded word.
 	mi.mi_fword[mi.mi_fwordlen - 1] = ' ';
 
     // The word is bad unless we recognize it.
-    mi.mi_result = SP_BAD;
+    mi.mi_ఫలితం = SP_BAD;
     mi.mi_result2 = SP_BAD;
 
     /*
@@ -258,194 +258,194 @@ spell_check(
      * We check them all, because a word may be matched longer in another
      * language.
      */
-    for (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
+    కొరకు (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
     {
-	mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, lpi);
+	mi.mi_lp = LANGP_నమోదు(wp->w_s->b_langp, lpi);
 
 	// If reloading fails the language is still in the list but everything
 	// has been cleared.
-	if (mi.mi_lp->lp_slang->sl_fidxs == NULL)
-	    continue;
+	ఒకవేళ (mi.mi_lp->lp_slang->sl_fidxs == ఖాళీ)
+	    కొనసాగు;
 
 	// Check for a matching word in case-folded words.
-	find_word(&mi, FIND_FOLDWORD);
+	కనుగొను_మాట(&mi, కనుగొను_FOLDWORD);
 
 	// Check for a matching word in keep-case words.
-	find_word(&mi, FIND_KEEPWORD);
+	కనుగొను_మాట(&mi, కనుగొను_KEEPWORD);
 
 	// Check for matching prefixes.
-	find_prefix(&mi, FIND_FOLDWORD);
+	కనుగొను_ఉపసర్గ_2(&mi, కనుగొను_FOLDWORD);
 
 	// For a NOBREAK language, may want to use a word without a following
 	// word as a backup.
-	if (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
+	ఒకవేళ (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_ఫలితం == SP_BAD
 						   && mi.mi_result2 != SP_BAD)
 	{
-	    mi.mi_result = mi.mi_result2;
-	    mi.mi_end = mi.mi_end2;
+	    mi.mi_ఫలితం = mi.mi_result2;
+	    mi.mi_చివర = mi.mi_end2;
 	}
 
 	// Count the word in the first language where it's found to be OK.
-	if (count_word && mi.mi_result == SP_OK)
+	ఒకవేళ (లెక్క_మాట && mi.mi_ఫలితం == SP_OK)
 	{
-	    count_common_word(mi.mi_lp->lp_slang, ptr,
-						   (int)(mi.mi_end - ptr), 1);
-	    count_word = FALSE;
+	    లెక్క_common_మాట(mi.mi_lp->lp_slang, ptr,
+						   (పూర్ణాంకం)(mi.mi_చివర - ptr), 1);
+	    లెక్క_మాట = FALSE;
 	}
     }
 
-    if (mi.mi_result != SP_OK)
+    ఒకవేళ (mi.mi_ఫలితం != SP_OK)
     {
 	// If we found a number skip over it.  Allows for "42nd".  Do flag
 	// rare and local words, e.g., "3GPP".
-	if (nrlen > 0)
+	ఒకవేళ (nrlen > 0)
 	{
-	    if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
-		return nrlen;
+	    ఒకవేళ (mi.mi_ఫలితం == SP_BAD || mi.mi_ఫలితం == SP_BANNED)
+		తిరిగి nrlen;
 	}
 
 	// When we are at a non-word character there is no error, just
 	// skip over the character (try looking for a word after it).
-	else if (!spell_iswordp_nmw(ptr, wp))
+	లేకపోతే ఒకవేళ (!spell_iswordp_nmw(ptr, wp))
 	{
-	    if (capcol != NULL && wp->w_s->b_cap_prog != NULL)
+	    ఒకవేళ (capcol != ఖాళీ && wp->w_s->b_cap_prog != ఖాళీ)
 	    {
 		regmatch_T	regmatch;
-		int		r;
+		పూర్ణాంకం		r;
 
 		// Check for end of sentence.
 		regmatch.regprog = wp->w_s->b_cap_prog;
 		regmatch.rm_ic = FALSE;
 		r = vim_regexec(&regmatch, ptr, 0);
 		wp->w_s->b_cap_prog = regmatch.regprog;
-		if (r)
-		    *capcol = (int)(regmatch.endp[0] - ptr);
+		ఒకవేళ (r)
+		    *capcol = (పూర్ణాంకం)(regmatch.endp[0] - ptr);
 	    }
 
-	    if (has_mbyte)
-		return (*mb_ptr2len)(ptr);
-	    return 1;
+	    ఒకవేళ (has_mbyte)
+		తిరిగి (*mb_ptr2len)(ptr);
+	    తిరిగి 1;
 	}
-	else if (mi.mi_end == ptr)
+	లేకపోతే ఒకవేళ (mi.mi_చివర == ptr)
 	    // Always include at least one character.  Required for when there
 	    // is a mixup in "midword".
-	    MB_PTR_ADV(mi.mi_end);
-	else if (mi.mi_result == SP_BAD
-		&& LANGP_ENTRY(wp->w_s->b_langp, 0)->lp_slang->sl_nobreak)
+	    MB_PTR_ADV(mi.mi_చివర);
+	లేకపోతే ఒకవేళ (mi.mi_ఫలితం == SP_BAD
+		&& LANGP_నమోదు(wp->w_s->b_langp, 0)->lp_slang->sl_nobreak)
 	{
 	    char_u	*p, *fp;
-	    int		save_result = mi.mi_result;
+	    పూర్ణాంకం		save_ఫలితం = mi.mi_ఫలితం;
 
 	    // First language in 'spelllang' is NOBREAK.  Find first position
 	    // at which any word would be valid.
-	    mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, 0);
-	    if (mi.mi_lp->lp_slang->sl_fidxs != NULL)
+	    mi.mi_lp = LANGP_నమోదు(wp->w_s->b_langp, 0);
+	    ఒకవేళ (mi.mi_lp->lp_slang->sl_fidxs != ఖాళీ)
 	    {
-		p = mi.mi_word;
+		p = mi.mi_మాట;
 		fp = mi.mi_fword;
-		for (;;)
+		కొరకు (;;)
 		{
 		    MB_PTR_ADV(p);
 		    MB_PTR_ADV(fp);
-		    if (p >= mi.mi_end)
-			break;
-		    mi.mi_compoff = (int)(fp - mi.mi_fword);
-		    find_word(&mi, FIND_COMPOUND);
-		    if (mi.mi_result != SP_BAD)
+		    ఒకవేళ (p >= mi.mi_చివర)
+			ఆపు;
+		    mi.mi_compoff = (పూర్ణాంకం)(fp - mi.mi_fword);
+		    కనుగొను_మాట(&mi, కనుగొను_COMPOUND);
+		    ఒకవేళ (mi.mi_ఫలితం != SP_BAD)
 		    {
-			mi.mi_end = p;
-			break;
+			mi.mi_చివర = p;
+			ఆపు;
 		    }
 		}
-		mi.mi_result = save_result;
+		mi.mi_ఫలితం = save_ఫలితం;
 	    }
 	}
 
-	if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
+	ఒకవేళ (mi.mi_ఫలితం == SP_BAD || mi.mi_ఫలితం == SP_BANNED)
 	    *attrp = HLF_SPB;
-	else if (mi.mi_result == SP_RARE)
+	లేకపోతే ఒకవేళ (mi.mi_ఫలితం == SP_RARE)
 	    *attrp = HLF_SPR;
-	else
+	లేకపోతే
 	    *attrp = HLF_SPL;
     }
 
-    if (wrongcaplen > 0 && (mi.mi_result == SP_OK || mi.mi_result == SP_RARE))
+    ఒకవేళ (wrongcaplen > 0 && (mi.mi_ఫలితం == SP_OK || mi.mi_ఫలితం == SP_RARE))
     {
 	// Report SpellCap only when the word isn't badly spelled.
 	*attrp = HLF_SPC;
-	return wrongcaplen;
+	తిరిగి wrongcaplen;
     }
 
-    return (int)(mi.mi_end - ptr);
+    తిరిగి (పూర్ణాంకం)(mi.mi_చివర - ptr);
 }
 
 /*
  * Determine the type of character 'c'.
  */
-    static int
-get_char_type(int c)
+    స్థిర పూర్ణాంకం
+get_char_type(పూర్ణాంకం c)
 {
-    if (VIM_ISDIGIT(c))
-	return CHAR_DIGIT;
-    if (SPELL_ISUPPER(c))
-	return CHAR_UPPER;
-    return CHAR_OTHER;
+    ఒకవేళ (VIM_ISDIGIT(c))
+	తిరిగి CHAR_DIGIT;
+    ఒకవేళ (SPELL_ISUPPER(c))
+	తిరిగి CHAR_పై;
+    తిరిగి CHAR_OTHER;
 }
 
 /*
  * Returns a pointer to the end of the word starting at "str".
  * Supports camelCase words.
  */
-    static char_u *
-advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
+    స్థిర char_u *
+advance_camelcase_మాట(char_u *str, win_T *wp, పూర్ణాంకం *is_camel_case)
 {
-    int last_type, last_last_type, this_type;
-    int c;
-    char_u *end = str;
+    పూర్ణాంకం చివరి_type, చివరి_చివరి_type, this_type;
+    పూర్ణాంకం c;
+    char_u *చివర = str;
 
     *is_camel_case = FALSE;
 
-    if (*str == NUL)
-	return str;
+    ఒకవేళ (*str == NUL)
+	తిరిగి str;
 
-    c = PTR2CHAR(end);
-    MB_PTR_ADV(end);
+    c = PTR2CHAR(చివర);
+    MB_PTR_ADV(చివర);
     // We need at most the types of the type of the last two chars.
-    last_last_type = -1;
-    last_type = get_char_type(c);
+    చివరి_చివరి_type = -1;
+    చివరి_type = get_char_type(c);
 
-    while (*end != NUL && spell_iswordp(end, wp))
+    అయితే (*చివర != NUL && spell_iswordp(చివర, wp))
     {
-	c = PTR2CHAR(end);
+	c = PTR2CHAR(చివర);
 	this_type = get_char_type(c);
 
-	if (last_last_type == CHAR_UPPER && last_type == CHAR_UPPER
+	ఒకవేళ (చివరి_చివరి_type == CHAR_పై && చివరి_type == CHAR_పై
 		&& this_type == CHAR_OTHER)
 	{
 	    // Handle the following cases:
 	    // UpperUpperLower
 	    *is_camel_case = TRUE;
 	    // Back up by one char.
-	    MB_PTR_BACK(str, end);
-	    break;
+	    MB_PTR_వెనుక(str, చివర);
+	    ఆపు;
 	}
-	else if ((this_type == CHAR_UPPER && last_type == CHAR_OTHER)
-		|| (this_type != last_type
-		    && (this_type == CHAR_DIGIT || last_type == CHAR_DIGIT)))
+	లేకపోతే ఒకవేళ ((this_type == CHAR_పై && చివరి_type == CHAR_OTHER)
+		|| (this_type != చివరి_type
+		    && (this_type == CHAR_DIGIT || చివరి_type == CHAR_DIGIT)))
 	{
 	    // Handle the following cases:
 	    // LowerUpper LowerDigit UpperDigit DigitUpper DigitLower
 	    *is_camel_case = TRUE;
-	    break;
+	    ఆపు;
 	}
 
-	last_last_type = last_type;
-	last_type = this_type;
+	చివరి_చివరి_type = చివరి_type;
+	చివరి_type = this_type;
 
-	MB_PTR_ADV(end);
+	MB_PTR_ADV(చివర);
     }
 
-    return end;
+    తిరిగి చివర;
 }
 
 /*
@@ -457,43 +457,43 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_word(matchinf_T *mip, int mode)
+    స్థిర శూన్య
+కనుగొను_మాట(matchinf_T *mip, పూర్ణాంకం బహుళకం)
 {
     idx_T	arridx = 0;
-    int		endlen[MAXWLEN];    // length at possible word endings
+    పూర్ణాంకం		endlen[MAXWLEN];    // length at possible word endings
     idx_T	endidx[MAXWLEN];    // possible word endings
-    int		endidxcnt = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    పూర్ణాంకం		endidxcnt = 0;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		wlen = 0;
+    పూర్ణాంకం		flen;
+    పూర్ణాంకం		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     char_u	*s;
     char_u	*p;
-    int		res = SP_BAD;
+    పూర్ణాంకం		res = SP_BAD;
     slang_T	*slang = mip->mi_lp->lp_slang;
-    unsigned	flags;
+    గుర్తులేని	flags;
     char_u	*byts;
     idx_T	*idxs;
-    int		word_ends;
-    int		prefix_found;
-    int		nobreak_result;
+    పూర్ణాంకం		మాట_చివర్లు;
+    పూర్ణాంకం		ఉపసర్గ_దొరికింది;
+    పూర్ణాంకం		nobreak_ఫలితం;
 
-    if (mode == FIND_KEEPWORD || mode == FIND_KEEPCOMPOUND)
+    ఒకవేళ (బహుళకం == కనుగొను_KEEPWORD || బహుళకం == కనుగొను_KEEPCOMPOUND)
     {
 	// Check for word with matching case in keep-case tree.
-	ptr = mip->mi_word;
+	ptr = mip->mi_మాట;
 	flen = 9999;		    // no case folding, always enough bytes
 	byts = slang->sl_kbyts;
 	idxs = slang->sl_kidxs;
 
-	if (mode == FIND_KEEPCOMPOUND)
+	ఒకవేళ (బహుళకం == కనుగొను_KEEPCOMPOUND)
 	    // Skip over the previously found word(s).
 	    wlen += mip->mi_compoff;
     }
-    else
+    లేకపోతే
     {
 	// Check for case-folded in case-folded tree.
 	ptr = mip->mi_fword;
@@ -501,13 +501,13 @@ find_word(matchinf_T *mip, int mode)
 	byts = slang->sl_fbyts;
 	idxs = slang->sl_fidxs;
 
-	if (mode == FIND_PREFIX)
+	ఒకవేళ (బహుళకం == కనుగొను_ఉపసర్గ)
 	{
 	    // Skip over the prefix.
 	    wlen = mip->mi_prefixlen;
 	    flen -= mip->mi_prefixlen;
 	}
-	else if (mode == FIND_COMPOUND)
+	లేకపోతే ఒకవేళ (బహుళకం == కనుగొను_COMPOUND)
 	{
 	    // Skip over the previously found word(s).
 	    wlen = mip->mi_compoff;
@@ -516,8 +516,8 @@ find_word(matchinf_T *mip, int mode)
 
     }
 
-    if (byts == NULL)
-	return;			// array is empty
+    ఒకవేళ (byts == ఖాళీ)
+	తిరిగి;			// array is empty
 
     /*
      * Repeat advancing in the tree until:
@@ -525,22 +525,22 @@ find_word(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	if (flen <= 0 && *mip->mi_fend != NUL)
-	    flen = fold_more(mip);
+	ఒకవేళ (flen <= 0 && *mip->mi_fend != NUL)
+	    flen = fold_మరిన్ని(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the word could end here.
 	// Remember this index, we first check for the longest word.
-	if (byts[arridx] == 0)
+	ఒకవేళ (byts[arridx] == 0)
 	{
-	    if (endidxcnt == MAXWLEN)
+	    ఒకవేళ (endidxcnt == MAXWLEN)
 	    {
 		// Must be a corrupted spell file.
-		emsg(_(e_format_error_in_spell_file));
-		return;
+		emsg(_(e_format_error_లోపల_spell_file));
+		తిరిగి;
 	    }
 	    endlen[endidxcnt] = wlen;
 	    endidx[endidxcnt++] = arridx++;
@@ -548,42 +548,42 @@ find_word(matchinf_T *mip, int mode)
 
 	    // Skip over the zeros, there can be several flag/region
 	    // combinations.
-	    while (len > 0 && byts[arridx] == 0)
+	    అయితే (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
 	    }
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    ఒకవేళ (len == 0)
+		ఆపు;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	ఒకవేళ (ptr[wlen] == NUL)
+	    ఆపు;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
-	if (c == TAB)	    // <Tab> is handled like <Space>
+	ఒకవేళ (c == TAB)	    // <Tab> is handled like <Space>
 	    c = ' ';
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	అయితే (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    ఒకవేళ (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    లేకపోతే ఒకవేళ (byts[m] < c)
 		lo = m + 1;
-	    else
+	    లేకపోతే
 	    {
 		lo = hi = m;
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	ఒకవేళ (hi < lo || byts[lo] != c)
+	    ఆపు;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -592,14 +592,14 @@ find_word(matchinf_T *mip, int mode)
 
 	// One space in the good word may stand for several spaces in the
 	// checked word.
-	if (c == ' ')
+	ఒకవేళ (c == ' ')
 	{
-	    for (;;)
+	    కొరకు (;;)
 	    {
-		if (flen <= 0 && *mip->mi_fend != NUL)
-		    flen = fold_more(mip);
-		if (ptr[wlen] != ' ' && ptr[wlen] != TAB)
-		    break;
+		ఒకవేళ (flen <= 0 && *mip->mi_fend != NUL)
+		    flen = fold_మరిన్ని(mip);
+		ఒకవేళ (ptr[wlen] != ' ' && ptr[wlen] != TAB)
+		    ఆపు;
 		++wlen;
 		--flen;
 	    }
@@ -610,37 +610,37 @@ find_word(matchinf_T *mip, int mode)
      * Verify that one of the possible endings is valid.  Try the longest
      * first.
      */
-    while (endidxcnt > 0)
+    అయితే (endidxcnt > 0)
     {
 	--endidxcnt;
 	arridx = endidx[endidxcnt];
 	wlen = endlen[endidxcnt];
 
-	if ((*mb_head_off)(ptr, ptr + wlen) > 0)
-	    continue;	    // not at first byte of character
-	if (spell_iswordp(ptr + wlen, mip->mi_win))
+	ఒకవేళ ((*mb_తల_off)(ptr, ptr + wlen) > 0)
+	    కొనసాగు;	    // not at first byte of character
+	ఒకవేళ (spell_iswordp(ptr + wlen, mip->mi_win))
 	{
-	    if (slang->sl_compprog == NULL && !slang->sl_nobreak)
-		continue;	    // next char is a word character
-	    word_ends = FALSE;
+	    ఒకవేళ (slang->sl_compprog == ఖాళీ && !slang->sl_nobreak)
+		కొనసాగు;	    // next char is a word character
+	    మాట_చివర్లు = FALSE;
 	}
-	else
-	    word_ends = TRUE;
+	లేకపోతే
+	    మాట_చివర్లు = TRUE;
 	// The prefix flag is before compound flags.  Once a valid prefix flag
 	// has been found we try compound flags.
-	prefix_found = FALSE;
+	ఉపసర్గ_దొరికింది = FALSE;
 
-	if (mode != FIND_KEEPWORD && has_mbyte)
+	ఒకవేళ (బహుళకం != కనుగొను_KEEPWORD && has_mbyte)
 	{
 	    // Compute byte length in original word, length may change
 	    // when folding case.  This can be slow, take a shortcut when the
 	    // case-folded word is equal to the keep-case word.
-	    p = mip->mi_word;
-	    if (STRNCMP(ptr, p, wlen) != 0)
+	    p = mip->mi_మాట;
+	    ఒకవేళ (STRNCMP(ptr, p, wlen) != 0)
 	    {
-		for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+		కొరకు (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 		    MB_PTR_ADV(p);
-		wlen = (int)(p - mip->mi_word);
+		wlen = (పూర్ణాంకం)(p - mip->mi_మాట);
 	    }
 	}
 
@@ -649,7 +649,7 @@ find_word(matchinf_T *mip, int mode)
 	// Repeat this if there are more flags/region alternatives until there
 	// is a match.
 	res = SP_BAD;
-	for (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
+	కొరకు (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
 							      --len, ++arridx)
 	{
 	    flags = idxs[arridx];
@@ -658,304 +658,304 @@ find_word(matchinf_T *mip, int mode)
 	    // matches with what the word in the tree requires.
 	    // For keep-case tree the case is always right.  For prefixes we
 	    // don't bother to check.
-	    if (mode == FIND_FOLDWORD)
+	    ఒకవేళ (బహుళకం == కనుగొను_FOLDWORD)
 	    {
-		if (mip->mi_cend != mip->mi_word + wlen)
+		ఒకవేళ (mip->mi_cend != mip->mi_మాట + wlen)
 		{
 		    // mi_capflags was set for a different word length, need
 		    // to do it again.
-		    mip->mi_cend = mip->mi_word + wlen;
-		    mip->mi_capflags = captype(mip->mi_word, mip->mi_cend);
+		    mip->mi_cend = mip->mi_మాట + wlen;
+		    mip->mi_capflags = captype(mip->mi_మాట, mip->mi_cend);
 		}
 
-		if (mip->mi_capflags == WF_KEEPCAP
+		ఒకవేళ (mip->mi_capflags == WF_KEEPCAP
 				|| !spell_valid_case(mip->mi_capflags, flags))
-		    continue;
+		    కొనసాగు;
 	    }
 
 	    // When mode is FIND_PREFIX the word must support the prefix:
 	    // check the prefix ID and the condition.  Do that for the list at
 	    // mip->mi_prefarridx that find_prefix() filled.
-	    else if (mode == FIND_PREFIX && !prefix_found)
+	    లేకపోతే ఒకవేళ (బహుళకం == కనుగొను_ఉపసర్గ && !ఉపసర్గ_దొరికింది)
 	    {
-		c = valid_word_prefix(mip->mi_prefcnt, mip->mi_prefarridx,
+		c = valid_మాట_ఉపసర్గ(mip->mi_prefcnt, mip->mi_prefarridx,
 				    flags,
-				    mip->mi_word + mip->mi_cprefixlen, slang,
+				    mip->mi_మాట + mip->mi_cprefixlen, slang,
 				    FALSE);
-		if (c == 0)
-		    continue;
+		ఒకవేళ (c == 0)
+		    కొనసాగు;
 
 		// Use the WF_RARE flag for a rare prefix.
-		if (c & WF_RAREPFX)
+		ఒకవేళ (c & WF_RAREPFX)
 		    flags |= WF_RARE;
-		prefix_found = TRUE;
+		ఉపసర్గ_దొరికింది = TRUE;
 	    }
 
-	    if (slang->sl_nobreak)
+	    ఒకవేళ (slang->sl_nobreak)
 	    {
-		if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND)
+		ఒకవేళ ((బహుళకం == కనుగొను_COMPOUND || బహుళకం == కనుగొను_KEEPCOMPOUND)
 			&& (flags & WF_BANNED) == 0)
 		{
 		    // NOBREAK: found a valid following word.  That's all we
 		    // need to know, so return.
-		    mip->mi_result = SP_OK;
-		    break;
+		    mip->mi_ఫలితం = SP_OK;
+		    ఆపు;
 		}
 	    }
 
-	    else if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND
-								|| !word_ends))
+	    లేకపోతే ఒకవేళ ((బహుళకం == కనుగొను_COMPOUND || బహుళకం == కనుగొను_KEEPCOMPOUND
+								|| !మాట_చివర్లు))
 	    {
 		// If there is no compound flag or the word is shorter than
 		// COMPOUNDMIN reject it quickly.
 		// Makes you wonder why someone puts a compound flag on a word
 		// that's too short...  Myspell compatibility requires this
 		// anyway.
-		if (((unsigned)flags >> 24) == 0
+		ఒకవేళ (((గుర్తులేని)flags >> 24) == 0
 			     || wlen - mip->mi_compoff < slang->sl_compminlen)
-		    continue;
+		    కొనసాగు;
 		// For multi-byte chars check character length against
 		// COMPOUNDMIN.
-		if (has_mbyte
+		ఒకవేళ (has_mbyte
 			&& slang->sl_compminlen > 0
-			&& mb_charlen_len(mip->mi_word + mip->mi_compoff,
+			&& mb_charlen_len(mip->mi_మాట + mip->mi_compoff,
 				wlen - mip->mi_compoff) < slang->sl_compminlen)
-			continue;
+			కొనసాగు;
 
 		// Limit the number of compound words to COMPOUNDWORDMAX if no
 		// maximum for syllables is specified.
-		if (!word_ends && mip->mi_complen + mip->mi_compextra + 2
+		ఒకవేళ (!మాట_చివర్లు && mip->mi_complen + mip->mi_compextra + 2
 							   > slang->sl_compmax
 					   && slang->sl_compsylmax == MAXWLEN)
-		    continue;
+		    కొనసాగు;
 
 		// Don't allow compounding on a side where an affix was added,
 		// unless COMPOUNDPERMITFLAG was used.
-		if (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
-		    continue;
-		if (!word_ends && (flags & WF_NOCOMPAFT))
-		    continue;
+		ఒకవేళ (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
+		    కొనసాగు;
+		ఒకవేళ (!మాట_చివర్లు && (flags & WF_NOCOMPAFT))
+		    కొనసాగు;
 
 		// Quickly check if compounding is possible with this flag.
-		if (!byte_in_str(mip->mi_complen == 0
+		ఒకవేళ (!byte_లోపల_str(mip->mi_complen == 0
 					? slang->sl_compstartflags
 					: slang->sl_compallflags,
-					    ((unsigned)flags >> 24)))
-		    continue;
+					    ((గుర్తులేని)flags >> 24)))
+		    కొనసాగు;
 
 		// If there is a match with a CHECKCOMPOUNDPATTERN rule
 		// discard the compound word.
-		if (match_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
-		    continue;
+		ఒకవేళ (సరిపోలిక_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
+		    కొనసాగు;
 
-		if (mode == FIND_COMPOUND)
+		ఒకవేళ (బహుళకం == కనుగొను_COMPOUND)
 		{
-		    int	    capflags;
+		    పూర్ణాంకం	    capflags;
 
 		    // Need to check the caps type of the appended compound
 		    // word.
-		    if (has_mbyte && STRNCMP(ptr, mip->mi_word,
+		    ఒకవేళ (has_mbyte && STRNCMP(ptr, mip->mi_మాట,
 							mip->mi_compoff) != 0)
 		    {
 			// case folding may have changed the length
-			p = mip->mi_word;
-			for (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
+			p = mip->mi_మాట;
+			కొరకు (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
 		    }
-		    else
-			p = mip->mi_word + mip->mi_compoff;
-		    capflags = captype(p, mip->mi_word + wlen);
-		    if (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
+		    లేకపోతే
+			p = mip->mi_మాట + mip->mi_compoff;
+		    capflags = captype(p, mip->mi_మాట + wlen);
+		    ఒకవేళ (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
 						 && (flags & WF_FIXCAP) != 0))
-			continue;
+			కొనసాగు;
 
-		    if (capflags != WF_ALLCAP)
+		    ఒకవేళ (capflags != WF_ALLCAP)
 		    {
 			// When the character before the word is a word
 			// character we do not accept a Onecap word.  We do
 			// accept a no-caps word, even when the dictionary
 			// word specifies ONECAP.
-			MB_PTR_BACK(mip->mi_word, p);
-			if (spell_iswordp_nmw(p, mip->mi_win)
+			MB_PTR_వెనుక(mip->mi_మాట, p);
+			ఒకవేళ (spell_iswordp_nmw(p, mip->mi_win)
 				? capflags == WF_ONECAP
 				: (flags & WF_ONECAP) != 0
 						     && capflags != WF_ONECAP)
-			    continue;
+			    కొనసాగు;
 		    }
 		}
 
 		// If the word ends the sequence of compound flags of the
 		// words must match with one of the COMPOUNDRULE items and
 		// the number of syllables must not be too large.
-		mip->mi_compflags[mip->mi_complen] = ((unsigned)flags >> 24);
+		mip->mi_compflags[mip->mi_complen] = ((గుర్తులేని)flags >> 24);
 		mip->mi_compflags[mip->mi_complen + 1] = NUL;
-		if (word_ends)
+		ఒకవేళ (మాట_చివర్లు)
 		{
 		    char_u	fword[MAXWLEN];
 
-		    if (slang->sl_compsylmax < MAXWLEN)
+		    ఒకవేళ (slang->sl_compsylmax < MAXWLEN)
 		    {
 			// "fword" is only needed for checking syllables.
-			if (ptr == mip->mi_word)
-			    (void)spell_casefold(mip->mi_win,
+			ఒకవేళ (ptr == mip->mi_మాట)
+			    (శూన్య)spell_casefold(mip->mi_win,
 						    ptr, wlen, fword, MAXWLEN);
-			else
+			లేకపోతే
 			    vim_strncpy(fword, ptr, endlen[endidxcnt]);
 		    }
-		    if (!can_compound(slang, fword, mip->mi_compflags))
-			continue;
+		    ఒకవేళ (!can_compound(slang, fword, mip->mi_compflags))
+			కొనసాగు;
 		}
-		else if (slang->sl_comprules != NULL
-			     && !match_compoundrule(slang, mip->mi_compflags))
+		లేకపోతే ఒకవేళ (slang->sl_comprules != ఖాళీ
+			     && !సరిపోలిక_compoundrule(slang, mip->mi_compflags))
 		    // The compound flags collected so far do not match any
 		    // COMPOUNDRULE, discard the compounded word.
-		    continue;
+		    కొనసాగు;
 	    }
 
 	    // Check NEEDCOMPOUND: can't use word without compounding.
-	    else if (flags & WF_NEEDCOMP)
-		continue;
+	    లేకపోతే ఒకవేళ (flags & WF_NEEDCOMP)
+		కొనసాగు;
 
-	    nobreak_result = SP_OK;
+	    nobreak_ఫలితం = SP_OK;
 
-	    if (!word_ends)
+	    ఒకవేళ (!మాట_చివర్లు)
 	    {
-		int	save_result = mip->mi_result;
-		char_u	*save_end = mip->mi_end;
+		పూర్ణాంకం	save_ఫలితం = mip->mi_ఫలితం;
+		char_u	*save_చివర = mip->mi_చివర;
 		langp_T	*save_lp = mip->mi_lp;
-		int	lpi;
+		పూర్ణాంకం	lpi;
 
 		// Check that a valid word follows.  If there is one and we
 		// are compounding, it will set "mi_result", thus we are
 		// always finished here.  For NOBREAK we only check that a
 		// valid word follows.
 		// Recursive!
-		if (slang->sl_nobreak)
-		    mip->mi_result = SP_BAD;
+		ఒకవేళ (slang->sl_nobreak)
+		    mip->mi_ఫలితం = SP_BAD;
 
 		// Find following word in case-folded tree.
 		mip->mi_compoff = endlen[endidxcnt];
-		if (has_mbyte && mode == FIND_KEEPWORD)
+		ఒకవేళ (has_mbyte && బహుళకం == కనుగొను_KEEPWORD)
 		{
 		    // Compute byte length in case-folded word from "wlen":
 		    // byte length in keep-case word.  Length may change when
 		    // folding case.  This can be slow, take a shortcut when
 		    // the case-folded word is equal to the keep-case word.
 		    p = mip->mi_fword;
-		    if (STRNCMP(ptr, p, wlen) != 0)
+		    ఒకవేళ (STRNCMP(ptr, p, wlen) != 0)
 		    {
-			for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+			కొరకు (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
-			mip->mi_compoff = (int)(p - mip->mi_fword);
+			mip->mi_compoff = (పూర్ణాంకం)(p - mip->mi_fword);
 		    }
 		}
-#if 0 // Disabled, see below
+#ఒకవేళ 0 // Disabled, see below
 		c = mip->mi_compoff;
-#endif
+#అయితే_ముగింపు
 		++mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		ఒకవేళ (flags & WF_COMPROOT)
 		    ++mip->mi_compextra;
 
 		// For NOBREAK we need to try all NOBREAK languages, at least
 		// to find the ".add" file(s).
-		for (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
+		కొరకు (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
 		{
-		    if (slang->sl_nobreak)
+		    ఒకవేళ (slang->sl_nobreak)
 		    {
-			mip->mi_lp = LANGP_ENTRY(mip->mi_win->w_s->b_langp, lpi);
-			if (mip->mi_lp->lp_slang->sl_fidxs == NULL
+			mip->mi_lp = LANGP_నమోదు(mip->mi_win->w_s->b_langp, lpi);
+			ఒకవేళ (mip->mi_lp->lp_slang->sl_fidxs == ఖాళీ
 					 || !mip->mi_lp->lp_slang->sl_nobreak)
-			    continue;
+			    కొనసాగు;
 		    }
 
-		    find_word(mip, FIND_COMPOUND);
+		    కనుగొను_మాట(mip, కనుగొను_COMPOUND);
 
 		    // When NOBREAK any word that matches is OK.  Otherwise we
 		    // need to find the longest match, thus try with keep-case
 		    // and prefix too.
-		    if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+		    ఒకవేళ (!slang->sl_nobreak || mip->mi_ఫలితం == SP_BAD)
 		    {
 			// Find following word in keep-case tree.
 			mip->mi_compoff = wlen;
-			find_word(mip, FIND_KEEPCOMPOUND);
+			కనుగొను_మాట(mip, కనుగొను_KEEPCOMPOUND);
 
-#if 0	    // Disabled, a prefix must not appear halfway a compound word,
+#ఒకవేళ 0	    // Disabled, a prefix must not appear halfway a compound word,
 	    // unless the COMPOUNDPERMITFLAG is used and then it can't be a
 	    // postponed prefix.
-			if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+			ఒకవేళ (!slang->sl_nobreak || mip->mi_ఫలితం == SP_BAD)
 			{
 			    // Check for following word with prefix.
 			    mip->mi_compoff = c;
-			    find_prefix(mip, FIND_COMPOUND);
+			    కనుగొను_ఉపసర్గ_2(mip, కనుగొను_COMPOUND);
 			}
-#endif
+#అయితే_ముగింపు
 		    }
 
-		    if (!slang->sl_nobreak)
-			break;
+		    ఒకవేళ (!slang->sl_nobreak)
+			ఆపు;
 		}
 		--mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		ఒకవేళ (flags & WF_COMPROOT)
 		    --mip->mi_compextra;
 		mip->mi_lp = save_lp;
 
-		if (slang->sl_nobreak)
+		ఒకవేళ (slang->sl_nobreak)
 		{
-		    nobreak_result = mip->mi_result;
-		    mip->mi_result = save_result;
-		    mip->mi_end = save_end;
+		    nobreak_ఫలితం = mip->mi_ఫలితం;
+		    mip->mi_ఫలితం = save_ఫలితం;
+		    mip->mi_చివర = save_చివర;
 		}
-		else
+		లేకపోతే
 		{
-		    if (mip->mi_result == SP_OK)
-			break;
-		    continue;
+		    ఒకవేళ (mip->mi_ఫలితం == SP_OK)
+			ఆపు;
+		    కొనసాగు;
 		}
 	    }
 
-	    if (flags & WF_BANNED)
+	    ఒకవేళ (flags & WF_BANNED)
 		res = SP_BANNED;
-	    else if (flags & WF_REGION)
+	    లేకపోతే ఒకవేళ (flags & WF_REGION)
 	    {
 		// Check region.
-		if ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
+		ఒకవేళ ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
 		    res = SP_OK;
-		else
+		లేకపోతే
 		    res = SP_LOCAL;
 	    }
-	    else if (flags & WF_RARE)
+	    లేకపోతే ఒకవేళ (flags & WF_RARE)
 		res = SP_RARE;
-	    else
+	    లేకపోతే
 		res = SP_OK;
 
 	    // Always use the longest match and the best result.  For NOBREAK
 	    // we separately keep the longest match without a following good
 	    // word as a fall-back.
-	    if (nobreak_result == SP_BAD)
+	    ఒకవేళ (nobreak_ఫలితం == SP_BAD)
 	    {
-		if (mip->mi_result2 > res)
+		ఒకవేళ (mip->mi_result2 > res)
 		{
 		    mip->mi_result2 = res;
-		    mip->mi_end2 = mip->mi_word + wlen;
+		    mip->mi_end2 = mip->mi_మాట + wlen;
 		}
-		else if (mip->mi_result2 == res
-					&& mip->mi_end2 < mip->mi_word + wlen)
-		    mip->mi_end2 = mip->mi_word + wlen;
+		లేకపోతే ఒకవేళ (mip->mi_result2 == res
+					&& mip->mi_end2 < mip->mi_మాట + wlen)
+		    mip->mi_end2 = mip->mi_మాట + wlen;
 	    }
-	    else if (mip->mi_result > res)
+	    లేకపోతే ఒకవేళ (mip->mi_ఫలితం > res)
 	    {
-		mip->mi_result = res;
-		mip->mi_end = mip->mi_word + wlen;
+		mip->mi_ఫలితం = res;
+		mip->mi_చివర = mip->mi_మాట + wlen;
 	    }
-	    else if (mip->mi_result == res && mip->mi_end < mip->mi_word + wlen)
-		mip->mi_end = mip->mi_word + wlen;
+	    లేకపోతే ఒకవేళ (mip->mi_ఫలితం == res && mip->mi_చివర < mip->mi_మాట + wlen)
+		mip->mi_చివర = mip->mi_మాట + wlen;
 
-	    if (mip->mi_result == SP_OK)
-		break;
+	    ఒకవేళ (mip->mi_ఫలితం == SP_OK)
+		ఆపు;
 	}
 
-	if (mip->mi_result == SP_OK)
-	    break;
+	ఒకవేళ (mip->mi_ఫలితం == SP_OK)
+	    ఆపు;
     }
 }
 
@@ -966,66 +966,66 @@ find_word(matchinf_T *mip, int mode)
  * A match means that the first part of CHECKCOMPOUNDPATTERN matches at the
  * end of ptr[wlen] and the second part matches after it.
  */
-    int
-match_checkcompoundpattern(
+    పూర్ణాంకం
+సరిపోలిక_checkcompoundpattern(
     char_u	*ptr,
-    int		wlen,
+    పూర్ణాంకం		wlen,
     garray_T	*gap)  // &sl_comppat
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
 
-    for (i = 0; i + 1 < gap->ga_len; i += 2)
+    కొరకు (i = 0; i + 1 < gap->ga_len; i += 2)
     {
-	p = ((char_u **)gap->ga_data)[i + 1];
-	if (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
+	p = ((char_u **)gap->ga_దత్తాంశం)[i + 1];
+	ఒకవేళ (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
 	{
 	    // Second part matches at start of following compound word, now
 	    // check if first part matches at end of previous word.
-	    p = ((char_u **)gap->ga_data)[i];
-	    len = (int)STRLEN(p);
-	    if (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
-		return TRUE;
+	    p = ((char_u **)gap->ga_దత్తాంశం)[i];
+	    len = (పూర్ణాంకం)STRLEN(p);
+	    ఒకవేళ (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
+		తిరిగి TRUE;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Return TRUE if "flags" is a valid sequence of compound flags and "word"
  * does not have too many syllables.
  */
-    int
-can_compound(slang_T *slang, char_u *word, char_u *flags)
+    పూర్ణాంకం
+can_compound(slang_T *slang, char_u *మాట, char_u *flags)
 {
     char_u	uflags[MAXWLEN * 2];
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p;
 
-    if (slang->sl_compprog == NULL)
-	return FALSE;
-    if (enc_utf8)
+    ఒకవేళ (slang->sl_compprog == ఖాళీ)
+	తిరిగి FALSE;
+    ఒకవేళ (enc_utf8)
     {
 	// Need to convert the single byte flags to utf8 characters.
 	p = uflags;
-	for (i = 0; flags[i] != NUL; ++i)
+	కొరకు (i = 0; flags[i] != NUL; ++i)
 	    p += utf_char2bytes(flags[i], p);
 	*p = NUL;
 	p = uflags;
     }
-    else
+    లేకపోతే
 	p = flags;
-    if (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
-	return FALSE;
+    ఒకవేళ (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
+	తిరిగి FALSE;
 
     // Count the number of syllables.  This may be slow, do it last.  If there
     // are too many syllables AND the number of compound words is above
     // COMPOUNDWORDMAX then compounding is not allowed.
-    if (slang->sl_compsylmax < MAXWLEN
-		       && count_syllables(slang, word) > slang->sl_compsylmax)
-	return (int)STRLEN(flags) < slang->sl_compmax;
-    return TRUE;
+    ఒకవేళ (slang->sl_compsylmax < MAXWLEN
+		       && లెక్క_syllables(slang, మాట) > slang->sl_compsylmax)
+	తిరిగి (పూర్ణాంకం)STRLEN(flags) < slang->sl_compmax;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1034,52 +1034,52 @@ can_compound(slang_T *slang, char_u *word, char_u *flags)
  * collected so far can't possibly match any compound rule.
  * Caller must check that slang->sl_comprules is not NULL.
  */
-    int
-match_compoundrule(slang_T *slang, char_u *compflags)
+    పూర్ణాంకం
+సరిపోలిక_compoundrule(slang_T *slang, char_u *compflags)
 {
     char_u	*p;
-    int		i;
-    int		c;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
 
     // loop over all the COMPOUNDRULE entries
-    for (p = slang->sl_comprules; *p != NUL; ++p)
+    కొరకు (p = slang->sl_comprules; *p != NUL; ++p)
     {
 	// loop over the flags in the compound word we have made, match
 	// them against the current rule entry
-	for (i = 0; ; ++i)
+	కొరకు (i = 0; ; ++i)
 	{
 	    c = compflags[i];
-	    if (c == NUL)
+	    ఒకవేళ (c == NUL)
 		// found a rule that matches for the flags we have so far
-		return TRUE;
-	    if (*p == '/' || *p == NUL)
-		break;  // end of rule, it's too short
-	    if (*p == '[')
+		తిరిగి TRUE;
+	    ఒకవేళ (*p == '/' || *p == NUL)
+		ఆపు;  // end of rule, it's too short
+	    ఒకవేళ (*p == '[')
 	    {
-		int match = FALSE;
+		పూర్ణాంకం సరిపోలిక = FALSE;
 
 		// compare against all the flags in []
 		++p;
-		while (*p != ']' && *p != NUL)
-		    if (*p++ == c)
-			match = TRUE;
-		if (!match)
-		    break;  // none matches
+		అయితే (*p != ']' && *p != NUL)
+		    ఒకవేళ (*p++ == c)
+			సరిపోలిక = TRUE;
+		ఒకవేళ (!సరిపోలిక)
+		    ఆపు;  // none matches
 	    }
-	    else if (*p != c)
-		break;  // flag of word doesn't match flag in pattern
+	    లేకపోతే ఒకవేళ (*p != c)
+		ఆపు;  // flag of word doesn't match flag in pattern
 	    ++p;
 	}
 
 	// Skip to the next "/", where the next pattern starts.
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    break;
+	ఒకవేళ (p == ఖాళీ)
+	    ఆపు;
     }
 
     // Checked all the rules and none of them match the flags, so there
     // can't possibly be a compound starting with these flags.
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -1087,49 +1087,49 @@ match_compoundrule(slang_T *slang, char_u *compflags)
  * ID in "flags" for the word "word".
  * The WF_RAREPFX flag is included in the return value for a rare prefix.
  */
-    int
-valid_word_prefix(
-    int		totprefcnt,	// nr of prefix IDs
-    int		arridx,		// idx in sl_pidxs[]
-    int		flags,
-    char_u	*word,
+    పూర్ణాంకం
+valid_మాట_ఉపసర్గ(
+    పూర్ణాంకం		totprefcnt,	// nr of prefix IDs
+    పూర్ణాంకం		arridx,		// idx in sl_pidxs[]
+    పూర్ణాంకం		flags,
+    char_u	*మాట,
     slang_T	*slang,
-    int		cond_req)	// only use prefixes with a condition
+    పూర్ణాంకం		cond_req)	// only use prefixes with a condition
 {
-    int		prefcnt;
-    int		pidx;
+    పూర్ణాంకం		prefcnt;
+    పూర్ణాంకం		pidx;
     regprog_T	**rp;
-    int		prefid;
+    పూర్ణాంకం		prefid;
 
-    prefid = (unsigned)flags >> 24;
-    for (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
+    prefid = (గుర్తులేని)flags >> 24;
+    కొరకు (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
     {
 	pidx = slang->sl_pidxs[arridx + prefcnt];
 
 	// Check the prefix ID.
-	if (prefid != (pidx & 0xff))
-	    continue;
+	ఒకవేళ (prefid != (pidx & 0xff))
+	    కొనసాగు;
 
 	// Check if the prefix doesn't combine and the word already has a
 	// suffix.
-	if ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
-	    continue;
+	ఒకవేళ ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
+	    కొనసాగు;
 
 	// Check the condition, if there is one.  The condition index is
 	// stored in the two bytes above the prefix ID byte.
-	rp = &slang->sl_prefprog[((unsigned)pidx >> 8) & 0xffff];
-	if (*rp != NULL)
+	rp = &slang->sl_prefprog[((గుర్తులేని)pidx >> 8) & 0xffff];
+	ఒకవేళ (*rp != ఖాళీ)
 	{
-	    if (!vim_regexec_prog(rp, FALSE, word, 0))
-		continue;
+	    ఒకవేళ (!vim_regexec_prog(rp, FALSE, మాట, 0))
+		కొనసాగు;
 	}
-	else if (cond_req)
-	    continue;
+	లేకపోతే ఒకవేళ (cond_req)
+	    కొనసాగు;
 
 	// It's a match!  Return the WF_ flags.
-	return pidx;
+	తిరిగి pidx;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -1141,14 +1141,14 @@ valid_word_prefix(
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_prefix(matchinf_T *mip, int mode)
+    స్థిర శూన్య
+కనుగొను_ఉపసర్గ_2(matchinf_T *mip, పూర్ణాంకం బహుళకం)
 {
     idx_T	arridx = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		wlen = 0;
+    పూర్ణాంకం		flen;
+    పూర్ణాంకం		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     slang_T	*slang = mip->mi_lp->lp_slang;
@@ -1156,14 +1156,14 @@ find_prefix(matchinf_T *mip, int mode)
     idx_T	*idxs;
 
     byts = slang->sl_pbyts;
-    if (byts == NULL)
-	return;			// array is empty
+    ఒకవేళ (byts == ఖాళీ)
+	తిరిగి;			// array is empty
 
     // We use the case-folded word here, since prefixes are always
     // case-folded.
     ptr = mip->mi_fword;
     flen = mip->mi_fwordlen;    // available case-folded bytes
-    if (mode == FIND_COMPOUND)
+    ఒకవేళ (బహుళకం == కనుగొను_COMPOUND)
     {
 	// Skip over the previously found word(s).
 	ptr += mip->mi_compoff;
@@ -1177,16 +1177,16 @@ find_prefix(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	if (flen == 0 && *mip->mi_fend != NUL)
-	    flen = fold_more(mip);
+	ఒకవేళ (flen == 0 && *mip->mi_fend != NUL)
+	    flen = fold_మరిన్ని(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the prefix could end here.
 	// Check if the following word matches and supports the prefix.
-	if (byts[arridx] == 0)
+	ఒకవేళ (byts[arridx] == 0)
 	{
 	    // There can be several prefixes with different conditions.  We
 	    // try them all, since we don't know which one will give the
@@ -1194,7 +1194,7 @@ find_prefix(matchinf_T *mip, int mode)
 	    // of possible prefixes to find_word().
 	    mip->mi_prefarridx = arridx;
 	    mip->mi_prefcnt = len;
-	    while (len > 0 && byts[arridx] == 0)
+	    అయితే (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
@@ -1203,50 +1203,50 @@ find_prefix(matchinf_T *mip, int mode)
 
 	    // Find the word that comes after the prefix.
 	    mip->mi_prefixlen = wlen;
-	    if (mode == FIND_COMPOUND)
+	    ఒకవేళ (బహుళకం == కనుగొను_COMPOUND)
 		// Skip over the previously found word(s).
 		mip->mi_prefixlen += mip->mi_compoff;
 
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		// Case-folded length may differ from original length.
 		mip->mi_cprefixlen = nofold_len(mip->mi_fword,
-					     mip->mi_prefixlen, mip->mi_word);
+					     mip->mi_prefixlen, mip->mi_మాట);
 	    }
-	    else
+	    లేకపోతే
 		mip->mi_cprefixlen = mip->mi_prefixlen;
-	    find_word(mip, FIND_PREFIX);
+	    కనుగొను_మాట(mip, కనుగొను_ఉపసర్గ);
 
 
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    ఒకవేళ (len == 0)
+		ఆపు;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	ఒకవేళ (ptr[wlen] == NUL)
+	    ఆపు;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	అయితే (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    ఒకవేళ (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    లేకపోతే ఒకవేళ (byts[m] < c)
 		lo = m + 1;
-	    else
+	    లేకపోతే
 	    {
 		lo = hi = m;
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	ఒకవేళ (hi < lo || byts[lo] != c)
+	    ఆపు;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -1260,39 +1260,39 @@ find_prefix(matchinf_T *mip, int mode)
  * for efficiency.  Include the non-word character too.
  * Return the length of the folded chars in bytes.
  */
-    static int
-fold_more(matchinf_T *mip)
+    స్థిర పూర్ణాంకం
+fold_మరిన్ని(matchinf_T *mip)
 {
-    int		flen;
+    పూర్ణాంకం		flen;
     char_u	*p;
 
     p = mip->mi_fend;
-    do
+    చేయి
 	MB_PTR_ADV(mip->mi_fend);
-    while (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
+    అయితే (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
 
     // Include the non-word character so that we can check for the word end.
-    if (*mip->mi_fend != NUL)
+    ఒకవేళ (*mip->mi_fend != NUL)
 	MB_PTR_ADV(mip->mi_fend);
 
-    (void)spell_casefold(mip->mi_win, p, (int)(mip->mi_fend - p),
+    (శూన్య)spell_casefold(mip->mi_win, p, (పూర్ణాంకం)(mip->mi_fend - p),
 			     mip->mi_fword + mip->mi_fwordlen,
 			     MAXWLEN - mip->mi_fwordlen);
-    flen = (int)STRLEN(mip->mi_fword + mip->mi_fwordlen);
+    flen = (పూర్ణాంకం)STRLEN(mip->mi_fword + mip->mi_fwordlen);
     mip->mi_fwordlen += flen;
-    return flen;
+    తిరిగి flen;
 }
 
 /*
  * Check case flags for a word.  Return TRUE if the word has the requested
  * case.
  */
-    int
+    పూర్ణాంకం
 spell_valid_case(
-    int	    wordflags,	    // flags for the checked word.
-    int	    treeflags)	    // flags for the word in the spell tree
+    పూర్ణాంకం	    wordflags,	    // flags for the checked word.
+    పూర్ణాంకం	    treeflags)	    // flags for the word in the spell tree
 {
-    return ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
+    తిరిగి ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
 	    || ((treeflags & (WF_ALLCAP | WF_KEEPCAP)) == 0
 		&& ((treeflags & WF_ONECAP) == 0
 					   || (wordflags & WF_ONECAP) != 0)));
@@ -1301,25 +1301,25 @@ spell_valid_case(
 /*
  * Return TRUE if spell checking is enabled for "wp".
  */
-    int
-spell_check_window(win_T *wp)
+    పూర్ణాంకం
+spell_check_కిటికీ(win_T *wp)
 {
-    return wp->w_p_spell
+    తిరిగి wp->w_p_spell
 		&& *wp->w_s->b_p_spl != NUL
 		&& wp->w_s->b_langp.ga_len > 0
-		&& *(char **)(wp->w_s->b_langp.ga_data) != NULL;
+		&& *(అక్షరం **)(wp->w_s->b_langp.ga_దత్తాంశం) != ఖాళీ;
 }
 
 /*
  * Return TRUE and give an error if spell checking is not enabled.
  */
-    static int
+    స్థిర పూర్ణాంకం
 no_spell_checking(win_T *wp)
 {
-    if (spell_check_window(wp))
-	return FALSE;
+    ఒకవేళ (spell_check_కిటికీ(wp))
+	తిరిగి FALSE;
     emsg(_(e_spell_checking_is_not_possible));
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1330,37 +1330,37 @@ no_spell_checking(win_T *wp)
  * to after badly spelled word before the cursor.
  * Return 0 if not found, length of the badly spelled word otherwise.
  */
-    int
-spell_move_to(
+    పూర్ణాంకం
+spell_move_గమ్యం(
     win_T	*wp,
-    int		dir,		// FORWARD or BACKWARD
+    పూర్ణాంకం		dir,		// FORWARD or BACKWARD
     smt_T	behaviour,	// Behaviour of the function
-    int		curline,
+    పూర్ణాంకం		curline,
     hlf_T	*attrp)		// return: attributes of bad word or NULL
 				// (only when "dir" is FORWARD)
 {
     linenr_T	lnum;
-    pos_T	found_pos;
-    int		found_len = 0;
-    char_u	*line;
+    pos_T	దొరికింది_pos;
+    పూర్ణాంకం		దొరికింది_len = 0;
+    char_u	*పంక్తి;
     char_u	*p;
     char_u	*endp;
     hlf_T	attr = 0;
-    int		len;
-#ifdef FEAT_SYN_HL
-    int		has_syntax = syntax_present(wp);
-#endif
-    int		col;
-    int		can_spell;
-    char_u	*buf = NULL;
-    int		buflen = 0;
-    int		skip = 0;
-    int		capcol = -1;
-    int		found_one = FALSE;
-    int		wrapped = FALSE;
+    పూర్ణాంకం		len;
+#నిర్వచితమైతే FEAT_SYN_HL
+    పూర్ణాంకం		has_syntax = syntax_present(wp);
+#అయితే_ముగింపు
+    పూర్ణాంకం		నిలువు;
+    పూర్ణాంకం		can_spell;
+    char_u	*buf = ఖాళీ;
+    పూర్ణాంకం		buflen = 0;
+    పూర్ణాంకం		skip = 0;
+    పూర్ణాంకం		capcol = -1;
+    పూర్ణాంకం		దొరికింది_one = FALSE;
+    పూర్ణాంకం		wrapped = FALSE;
 
-    if (no_spell_checking(wp))
-	return 0;
+    ఒకవేళ (no_spell_checking(wp))
+	తిరిగి 0;
 
     /*
      * Start looking for bad word at the start of the line, because we can't
@@ -1374,121 +1374,121 @@ spell_move_to(
      * though...
      */
     lnum = wp->w_cursor.lnum;
-    CLEAR_POS(&found_pos);
+    CLEAR_POS(&దొరికింది_pos);
 
-    while (!got_int)
+    అయితే (!got_int)
     {
-	int empty_line;
+	పూర్ణాంకం ఖాళీలు_పంక్తి;
 
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	పంక్తి = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
 
-	len = ml_get_buf_len(wp->w_buffer, lnum);
-	if (buflen < len + MAXWLEN + 2)
+	len = ml_get_buf_len(wp->w_బఫరు, lnum);
+	ఒకవేళ (buflen < len + MAXWLEN + 2)
 	{
 	    vim_free(buf);
 	    buflen = len + MAXWLEN + 2;
 	    buf = alloc(buflen);
-	    if (buf == NULL)
-		break;
+	    ఒకవేళ (buf == ఖాళీ)
+		ఆపు;
 	}
 
 	// In first line check first word for Capital.
-	if (lnum == 1)
+	ఒకవేళ (lnum == 1)
 	    capcol = 0;
 
 	// For checking first word with a capital skip white space.
-	if (capcol == 0)
-	    capcol = getwhitecols(line);
-	else if (curline && wp == curwin)
+	ఒకవేళ (capcol == 0)
+	    capcol = getwhitecols(పంక్తి);
+	లేకపోతే ఒకవేళ (curline && wp == curwin)
 	{
 	    // For spellbadword(): check if first word needs a capital.
-	    col = getwhitecols(line);
-	    if (check_need_cap(curwin, lnum, col))
-		capcol = col;
+	    నిలువు = getwhitecols(పంక్తి);
+	    ఒకవేళ (check_need_cap(curwin, lnum, నిలువు))
+		capcol = నిలువు;
 
 	    // Need to get the line again, may have looked at the previous
 	    // one.
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	    పంక్తి = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
 	}
 
 	// Copy the line into "buf" and append the start of the next line if
 	// possible.  Note: this ml_get_buf() may make "line" invalid, check
 	// for empty line first.
-	empty_line = *skipwhite(line) == NUL;
-	STRCPY(buf, line);
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
-	    spell_cat_line(buf + STRLEN(buf),
-			  ml_get_buf(wp->w_buffer, lnum + 1, FALSE), MAXWLEN);
+	ఖాళీలు_పంక్తి = *skipwhite(పంక్తి) == NUL;
+	STRCPY(buf, పంక్తి);
+	ఒకవేళ (lnum < wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
+	    spell_cat_పంక్తి(buf + STRLEN(buf),
+			  ml_get_buf(wp->w_బఫరు, lnum + 1, FALSE), MAXWLEN);
 
 	p = buf + skip;
 	endp = buf + len;
-	while (p < endp)
+	అయితే (p < endp)
 	{
 	    // When searching backward don't search after the cursor.  Unless
 	    // we wrapped around the end of the buffer.
-	    if (dir == BACKWARD
+	    ఒకవేళ (dir == BACKWARD
 		    && lnum == wp->w_cursor.lnum
 		    && !wrapped
-		    && (colnr_T)(p - buf) >= wp->w_cursor.col)
-		break;
+		    && (colnr_T)(p - buf) >= wp->w_cursor.నిలువు)
+		ఆపు;
 
 	    // start of word
-	    attr = HLF_COUNT;
+	    attr = HLF_లెక్క;
 	    len = spell_check(wp, p, &attr, &capcol, FALSE);
 
-	    if (attr != HLF_COUNT)
+	    ఒకవేళ (attr != HLF_లెక్క)
 	    {
 		// We found a bad word.  Check the attribute.
-		if (behaviour == SMT_ALL
+		ఒకవేళ (behaviour == SMT_ALL
 				|| (behaviour == SMT_BAD && attr == HLF_SPB)
 				|| (behaviour == SMT_RARE && attr == HLF_SPR))
 		{
 		    // When searching forward only accept a bad word after
 		    // the cursor.
-		    if (dir == BACKWARD
+		    ఒకవేళ (dir == BACKWARD
 			    || lnum != wp->w_cursor.lnum
 			    || (wrapped
 				|| (colnr_T)(curline ? p - buf + len
 						     : p - buf)
-						  > wp->w_cursor.col))
+						  > wp->w_cursor.నిలువు))
 		    {
-#ifdef FEAT_SYN_HL
-			if (has_syntax)
+#నిర్వచితమైతే FEAT_SYN_HL
+			ఒకవేళ (has_syntax)
 			{
-			    col = (int)(p - buf);
-			    (void)syn_get_id(wp, lnum, (colnr_T)col,
+			    నిలువు = (పూర్ణాంకం)(p - buf);
+			    (శూన్య)syn_get_id(wp, lnum, (colnr_T)నిలువు,
 						    FALSE, &can_spell, FALSE);
-			    if (!can_spell)
-				attr = HLF_COUNT;
+			    ఒకవేళ (!can_spell)
+				attr = HLF_లెక్క;
 			}
-			else
-#endif
+			లేకపోతే
+#అయితే_ముగింపు
 			    can_spell = TRUE;
 
-			if (can_spell)
+			ఒకవేళ (can_spell)
 			{
-			    found_one = TRUE;
-			    found_pos.lnum = lnum;
-			    found_pos.col = (int)(p - buf);
-			    found_pos.coladd = 0;
-			    if (dir == FORWARD)
+			    దొరికింది_one = TRUE;
+			    దొరికింది_pos.lnum = lnum;
+			    దొరికింది_pos.నిలువు = (పూర్ణాంకం)(p - buf);
+			    దొరికింది_pos.coladd = 0;
+			    ఒకవేళ (dir == FORWARD)
 			    {
 				// No need to search further.
-				wp->w_cursor = found_pos;
+				wp->w_cursor = దొరికింది_pos;
 				vim_free(buf);
-				if (attrp != NULL)
+				ఒకవేళ (attrp != ఖాళీ)
 				    *attrp = attr;
-				return len;
+				తిరిగి len;
 			    }
-			    else if (curline)
+			    లేకపోతే ఒకవేళ (curline)
 				// Insert mode completion: put cursor after
 				// the bad word.
-				found_pos.col += len;
-			    found_len = len;
+				దొరికింది_pos.నిలువు += len;
+			    దొరికింది_len = len;
 			}
 		    }
-		    else
-			found_one = TRUE;
+		    లేకపోతే
+			దొరికింది_one = TRUE;
 		}
 	    }
 
@@ -1497,81 +1497,81 @@ spell_move_to(
 	    capcol -= len;
 	}
 
-	if (dir == BACKWARD && found_pos.lnum != 0)
+	ఒకవేళ (dir == BACKWARD && దొరికింది_pos.lnum != 0)
 	{
 	    // Use the last match in the line (before the cursor).
-	    wp->w_cursor = found_pos;
+	    wp->w_cursor = దొరికింది_pos;
 	    vim_free(buf);
-	    return found_len;
+	    తిరిగి దొరికింది_len;
 	}
 
-	if (curline)
-	    break;	// only check cursor line
+	ఒకవేళ (curline)
+	    ఆపు;	// only check cursor line
 
 	// If we are back at the starting line and searched it again there
 	// is no match, give up.
-	if (lnum == wp->w_cursor.lnum && wrapped)
-	    break;
+	ఒకవేళ (lnum == wp->w_cursor.lnum && wrapped)
+	    ఆపు;
 
 	// Advance to next line.
-	if (dir == BACKWARD)
+	ఒకవేళ (dir == BACKWARD)
 	{
-	    if (lnum > 1)
+	    ఒకవేళ (lnum > 1)
 		--lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    లేకపోతే ఒకవేళ (!p_ws)
+		ఆపు;	    // at first line and 'nowrapscan'
+	    లేకపోతే
 	    {
 		// Wrap around to the end of the buffer.  May search the
 		// starting line again and accept the last match.
-		lnum = wp->w_buffer->b_ml.ml_line_count;
+		lnum = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		ఒకవేళ (!shortmess(SHM_శోధన))
+		    give_warning((char_u *)_(శిఖరం_bot_సందేశం), TRUE);
 	    }
 	    capcol = -1;
 	}
-	else
+	లేకపోతే
 	{
-	    if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	    ఒకవేళ (lnum < wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
 		++lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    లేకపోతే ఒకవేళ (!p_ws)
+		ఆపు;	    // at first line and 'nowrapscan'
+	    లేకపోతే
 	    {
 		// Wrap around to the start of the buffer.  May search the
 		// starting line again and accept the first match.
 		lnum = 1;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		ఒకవేళ (!shortmess(SHM_శోధన))
+		    give_warning((char_u *)_(bot_శిఖరం_సందేశం), TRUE);
 	    }
 
 	    // If we are back at the starting line and there is no match then
 	    // give up.
-	    if (lnum == wp->w_cursor.lnum && !found_one)
-		break;
+	    ఒకవేళ (lnum == wp->w_cursor.lnum && !దొరికింది_one)
+		ఆపు;
 
 	    // Skip the characters at the start of the next line that were
 	    // included in a match crossing line boundaries.
-	    if (attr == HLF_COUNT)
-		skip = (int)(p - endp);
-	    else
+	    ఒకవేళ (attr == HLF_లెక్క)
+		skip = (పూర్ణాంకం)(p - endp);
+	    లేకపోతే
 		skip = 0;
 
 	    // Capcol skips over the inserted space.
 	    --capcol;
 
 	    // But after empty line check first word in next line
-	    if (empty_line)
+	    ఒకవేళ (ఖాళీలు_పంక్తి)
 		capcol = 0;
 	}
 
-	line_breakcheck();
+	పంక్తి_breakcheck();
     }
 
     vim_free(buf);
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -1580,23 +1580,23 @@ spell_move_to(
  * Keep the blanks at the start of the next line, this is used in win_line()
  * to skip those bytes if the word was OK.
  */
-    void
-spell_cat_line(char_u *buf, char_u *line, int maxlen)
+    శూన్య
+spell_cat_పంక్తి(char_u *buf, char_u *పంక్తి, పూర్ణాంకం maxlen)
 {
     char_u	*p;
-    int		n;
+    పూర్ణాంకం		n;
 
-    p = skipwhite(line);
-    while (vim_strchr((char_u *)"*#/\"\t", *p) != NULL)
+    p = skipwhite(పంక్తి);
+    అయితే (vim_strchr((char_u *)"*#/\"\t", *p) != ఖాళీ)
 	p = skipwhite(p + 1);
 
-    if (*p == NUL)
-	return;
+    ఒకవేళ (*p == NUL)
+	తిరిగి;
 
     // Only worth concatenating if there is something else than spaces to
     // concatenate.
-    n = (int)(p - line) + 1;
-    if (n < maxlen - 1)
+    n = (పూర్ణాంకం)(p - పంక్తి) + 1;
+    ఒకవేళ (n < maxlen - 1)
     {
 	vim_memset(buf, ' ', n);
 	vim_strncpy(buf +  n, p, maxlen - 1 - n);
@@ -1606,29 +1606,29 @@ spell_cat_line(char_u *buf, char_u *line, int maxlen)
 /*
  * Structure used for the cookie argument of do_in_runtimepath().
  */
-typedef struct spelload_S
+రకనిర్వచనం నిర్మాణం spelload_S
 {
     char_u  sl_lang[MAXWLEN + 1];	// language name
     slang_T *sl_slang;			// resulting slang_T struct
-    int	    sl_nobreak;			// NOBREAK language found
+    పూర్ణాంకం	    sl_nobreak;			// NOBREAK language found
 } spelload_T;
 
 /*
  * Load word list(s) for "lang" from Vim spell file(s).
  * "lang" must be the language without the region: e.g., "en".
  */
-    static void
-spell_load_lang(char_u *lang)
+    స్థిర శూన్య
+spell_ఎక్కించు_lang(char_u *lang)
 {
     char_u	fname_enc[85];
-    int		r;
+    పూర్ణాంకం		r;
     spelload_T	sl;
-    int		round;
+    పూర్ణాంకం		విడత;
 
     // Copy the language name to pass it to spell_load_cb() as a cookie.
     // It's truncated when an error is detected.
     STRCPY(sl.sl_lang, lang);
-    sl.sl_slang = NULL;
+    sl.sl_slang = ఖాళీ;
     sl.sl_nobreak = FALSE;
 
     // Disallow deleting the current buffer.  Autocommands can do weird things
@@ -1637,56 +1637,56 @@ spell_load_lang(char_u *lang)
 
     // We may retry when no spell file is found for the language, an
     // autocommand may load it then.
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
 	/*
 	 * Find the first spell file for "lang" in 'runtimepath' and load it.
 	 */
-	vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
-#ifdef VMS
+	vim_snprintf((అక్షరం *)fname_enc, పరిమాణం(fname_enc) - 5,
+#నిర్వచితమైతే VMS
 					"spell/%s_%s.spl",
-#else
+#లేకపోతే
 					"spell/%s.%s.spl",
-#endif
+#అయితే_ముగింపు
 							   lang, spell_enc());
-	r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
+	r = do_లోపల_runtimepath(fname_enc, 0, spell_ఎక్కించు_cb, &sl);
 
-	if (r == FAIL && *sl.sl_lang != NUL)
+	ఒకవేళ (r == FAIL && *sl.sl_lang != NUL)
 	{
 	    // Try loading the ASCII version.
-	    vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
-#ifdef VMS
+	    vim_snprintf((అక్షరం *)fname_enc, పరిమాణం(fname_enc) - 5,
+#నిర్వచితమైతే VMS
 						  "spell/%s_ascii.spl",
-#else
+#లేకపోతే
 						  "spell/%s.ascii.spl",
-#endif
+#అయితే_ముగింపు
 									lang);
-	    r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
+	    r = do_లోపల_runtimepath(fname_enc, 0, spell_ఎక్కించు_cb, &sl);
 
-	    if (r == FAIL && *sl.sl_lang != NUL && round == 1
+	    ఒకవేళ (r == FAIL && *sl.sl_lang != NUL && విడత == 1
 		    && apply_autocmds(EVENT_SPELLFILEMISSING, lang,
 					      curbuf->b_fname, FALSE, curbuf))
-		continue;
-	    break;
+		కొనసాగు;
+	    ఆపు;
 	}
-	break;
+	ఆపు;
     }
 
-    if (r == FAIL)
+    ఒకవేళ (r == FAIL)
     {
 	smsg(
-#ifdef VMS
+#నిర్వచితమైతే VMS
 	_("Warning: Cannot find word list \"%s_%s.spl\" or \"%s_ascii.spl\""),
-#else
+#లేకపోతే
 	_("Warning: Cannot find word list \"%s.%s.spl\" or \"%s.ascii.spl\""),
-#endif
+#అయితే_ముగింపు
 						     lang, spell_enc(), lang);
     }
-    else if (sl.sl_slang != NULL)
+    లేకపోతే ఒకవేళ (sl.sl_slang != ఖాళీ)
     {
 	// At least one file was loaded, now load ALL the additions.
 	STRCPY(fname_enc + STRLEN(fname_enc) - 3, "add.spl");
-	do_in_runtimepath(fname_enc, DIP_ALL, spell_load_cb, &sl);
+	do_లోపల_runtimepath(fname_enc, DIP_ALL, spell_ఎక్కించు_cb, &sl);
     }
 
     --curbuf->b_locked;
@@ -1697,22 +1697,22 @@ spell_load_lang(char_u *lang)
  * use "latin1" for "latin9".  And limit to 60 characters (just in case).
  */
     char_u *
-spell_enc(void)
+spell_enc(శూన్య)
 {
 
-    if (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
-	return p_enc;
-    return (char_u *)"latin1";
+    ఒకవేళ (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
+	తిరిగి p_enc;
+    తిరిగి (char_u *)"latin1";
 }
 
 /*
  * Get the name of the .spl file for the internal wordlist into
  * "fname[MAXPATHL]".
  */
-    static void
+    స్థిర శూన్య
 int_wordlist_spl(char_u *fname)
 {
-    vim_snprintf((char *)fname, MAXPATHL, SPL_FNAME_TMPL,
+    vim_snprintf((అక్షరం *)fname, MAXPATHL, SPL_FNAME_TMPL,
 						  int_wordlist, spell_enc());
 }
 
@@ -1726,24 +1726,24 @@ slang_alloc(char_u *lang)
     slang_T *lp;
 
     lp = ALLOC_CLEAR_ONE(slang_T);
-    if (lp != NULL)
+    ఒకవేళ (lp != ఖాళీ)
     {
-	if (lang != NULL)
+	ఒకవేళ (lang != ఖాళీ)
 	    lp->sl_name = vim_strsave(lang);
-	ga_init2(&lp->sl_rep, sizeof(fromto_T), 10);
-	ga_init2(&lp->sl_repsal, sizeof(fromto_T), 10);
+	ga_init2(&lp->sl_rep, పరిమాణం(fromto_T), 10);
+	ga_init2(&lp->sl_repsal, పరిమాణం(fromto_T), 10);
 	lp->sl_compmax = MAXWLEN;
 	lp->sl_compsylmax = MAXWLEN;
 	hash_init(&lp->sl_wordcount);
     }
 
-    return lp;
+    తిరిగి lp;
 }
 
 /*
  * Free the contents of an slang_T and the structure itself.
  */
-    void
+    శూన్య
 slang_free(slang_T *lp)
 {
     vim_free(lp->sl_name);
@@ -1758,20 +1758,20 @@ slang_free(slang_T *lp)
  * clear the garray.  Used by slang_clear() and when set_sofo() reuses
  * sl_sal for the SN_SOFO form.
  */
-    void
-free_sal_items(garray_T *gap)
+    శూన్య
+free_sal_వస్తువులు(garray_T *gap)
 {
     salitem_T	*smp;
 
-    while (gap->ga_len > 0)
+    అయితే (gap->ga_len > 0)
     {
-	smp = &((salitem_T *)gap->ga_data)[--gap->ga_len];
+	smp = &((salitem_T *)gap->ga_దత్తాంశం)[--gap->ga_len];
 	vim_free(smp->sm_lead);
 	// Don't free sm_oneof and sm_rules, they point into sm_lead.
-	vim_free(smp->sm_to);
+	vim_free(smp->sm_గమ్యం);
 	vim_free(smp->sm_lead_w);
 	vim_free(smp->sm_oneof_w);
-	vim_free(smp->sm_to_w);
+	vim_free(smp->sm_గమ్యం_w);
     }
     ga_clear(gap);
 }
@@ -1779,13 +1779,13 @@ free_sal_items(garray_T *gap)
 /*
  * Clear an slang_T so that the file can be reloaded.
  */
-    void
+    శూన్య
 slang_clear(slang_T *lp)
 {
     garray_T	*gap;
     fromto_T	*ftp;
-    int		i;
-    int		round;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		విడత;
 
     VIM_CLEAR(lp->sl_fbyts);
     VIM_CLEAR(lp->sl_kbyts);
@@ -1795,32 +1795,32 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_kidxs);
     VIM_CLEAR(lp->sl_pidxs);
 
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
-	gap = round == 1 ? &lp->sl_rep : &lp->sl_repsal;
-	while (gap->ga_len > 0)
+	gap = విడత == 1 ? &lp->sl_rep : &lp->sl_repsal;
+	అయితే (gap->ga_len > 0)
 	{
-	    ftp = &((fromto_T *)gap->ga_data)[--gap->ga_len];
+	    ftp = &((fromto_T *)gap->ga_దత్తాంశం)[--gap->ga_len];
 	    vim_free(ftp->ft_from);
-	    vim_free(ftp->ft_to);
+	    vim_free(ftp->ft_గమ్యం);
 	}
 	ga_clear(gap);
     }
 
     gap = &lp->sl_sal;
-    if (lp->sl_sofo)
+    ఒకవేళ (lp->sl_sofo)
     {
 	// "ga_len" is set to 1 without adding an item for latin1
-	if (gap->ga_data != NULL)
+	ఒకవేళ (gap->ga_దత్తాంశం != ఖాళీ)
 	    // SOFOFROM and SOFOTO items: free lists of wide characters.
-	    for (i = 0; i < gap->ga_len; ++i)
-		vim_free(((int **)gap->ga_data)[i]);
+	    కొరకు (i = 0; i < gap->ga_len; ++i)
+		vim_free(((పూర్ణాంకం **)gap->ga_దత్తాంశం)[i]);
 	ga_clear(gap);
     }
-    else
-	free_sal_items(gap);
+    లేకపోతే
+	free_sal_వస్తువులు(gap);
 
-    for (i = 0; i < lp->sl_prefixcnt; ++i)
+    కొరకు (i = 0; i < lp->sl_prefixcnt; ++i)
 	vim_regfree(lp->sl_prefprog[i]);
     lp->sl_prefixcnt = 0;
     VIM_CLEAR(lp->sl_prefprog);
@@ -1830,17 +1830,17 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_midword);
 
     vim_regfree(lp->sl_compprog);
-    lp->sl_compprog = NULL;
+    lp->sl_compprog = ఖాళీ;
     VIM_CLEAR(lp->sl_comprules);
     VIM_CLEAR(lp->sl_compstartflags);
     VIM_CLEAR(lp->sl_compallflags);
 
     VIM_CLEAR(lp->sl_syllable);
-    ga_clear(&lp->sl_syl_items);
+    ga_clear(&lp->sl_syl_వస్తువులు);
 
-    ga_clear_strings(&lp->sl_comppat);
+    ga_clear_అక్షరశ్రేణులు(&lp->sl_comppat);
 
-    hash_clear_all(&lp->sl_wordcount, WC_KEY_OFF);
+    hash_clear_all(&lp->sl_wordcount, WC_కీలకం_OFF);
     hash_init(&lp->sl_wordcount);
 
     hash_clear_all(&lp->sl_map_hash, 0);
@@ -1857,13 +1857,13 @@ slang_clear(slang_T *lp)
 /*
  * Clear the info from the .sug file in "lp".
  */
-    void
+    శూన్య
 slang_clear_sug(slang_T *lp)
 {
     VIM_CLEAR(lp->sl_sbyts);
     VIM_CLEAR(lp->sl_sidxs);
     close_spellbuf(lp->sl_sugbuf);
-    lp->sl_sugbuf = NULL;
+    lp->sl_sugbuf = ఖాళీ;
     lp->sl_sugloaded = FALSE;
     lp->sl_sugtime = 0;
 }
@@ -1872,21 +1872,21 @@ slang_clear_sug(slang_T *lp)
  * Load one spell file and store the info into a slang_T.
  * Invoked through do_in_runtimepath().
  */
-    static void
-spell_load_cb(char_u *fname, void *cookie)
+    స్థిర శూన్య
+spell_ఎక్కించు_cb(char_u *fname, శూన్య *cookie)
 {
     spelload_T	*slp = (spelload_T *)cookie;
     slang_T	*slang;
 
-    slang = spell_load_file(fname, slp->sl_lang, NULL, FALSE);
-    if (slang == NULL)
-	return;
+    slang = spell_ఎక్కించు_file(fname, slp->sl_lang, ఖాళీ, FALSE);
+    ఒకవేళ (slang == ఖాళీ)
+	తిరిగి;
 
     // When a previously loaded file has NOBREAK also use it for the
     // ".add" files.
-    if (slp->sl_nobreak && slang->sl_add)
+    ఒకవేళ (slp->sl_nobreak && slang->sl_కూడు)
 	slang->sl_nobreak = TRUE;
-    else if (slang->sl_nobreak)
+    లేకపోతే ఒకవేళ (slang->sl_nobreak)
 	slp->sl_nobreak = TRUE;
 
     slp->sl_slang = slang;
@@ -1897,12 +1897,12 @@ spell_load_cb(char_u *fname, void *cookie)
  * Add a word to the hashtable of common words.
  * If it's already there then the counter is increased.
  */
-    void
-count_common_word(
+    శూన్య
+లెక్క_common_మాట(
     slang_T	*lp,
-    char_u	*word,
-    int		len,	    // word length, -1 for up to NUL
-    int		count)	    // 1 to count once, 10 to init
+    char_u	*మాట,
+    పూర్ణాంకం		len,	    // word length, -1 for up to NUL
+    పూర్ణాంకం		లెక్క)	    // 1 to count once, 10 to init
 {
     hash_T	hash;
     hashitem_T	*hi;
@@ -1910,32 +1910,32 @@ count_common_word(
     char_u	buf[MAXWLEN];
     char_u	*p;
 
-    if (len == -1)
-	p = word;
-    else if (len >= MAXWLEN)
-	return;
-    else
+    ఒకవేళ (len == -1)
+	p = మాట;
+    లేకపోతే ఒకవేళ (len >= MAXWLEN)
+	తిరిగి;
+    లేకపోతే
     {
-	vim_strncpy(buf, word, len);
+	vim_strncpy(buf, మాట, len);
 	p = buf;
     }
 
     hash = hash_hash(p);
     hi = hash_lookup(&lp->sl_wordcount, p, hash);
-    if (HASHITEM_EMPTY(hi))
+    ఒకవేళ (HASHITEM_ఖాళీలు(hi))
     {
-	wc = alloc(offsetof(wordcount_T, wc_word) + STRLEN(p) + 1);
-	if (wc == NULL)
-	    return;
-	STRCPY(wc->wc_word, p);
-	wc->wc_count = count;
-	hash_add_item(&lp->sl_wordcount, hi, wc->wc_word, hash);
+	wc = alloc(offsetof(wordcount_T, wc_మాట) + STRLEN(p) + 1);
+	ఒకవేళ (wc == ఖాళీ)
+	    తిరిగి;
+	STRCPY(wc->wc_మాట, p);
+	wc->wc_లెక్క = లెక్క;
+	hash_కూడు_అంశం(&lp->sl_wordcount, hi, wc->wc_మాట, hash);
     }
-    else
+    లేకపోతే
     {
 	wc = HI2WC(hi);
-	if ((wc->wc_count += count) < (unsigned)count)	// check for overflow
-	    wc->wc_count = MAXWORDCOUNT;
+	ఒకవేళ ((wc->wc_లెక్క += లెక్క) < (గుర్తులేని)లెక్క)	// check for overflow
+	    wc->wc_లెక్క = MAXWORDCOUNT;
     }
 }
 
@@ -1943,59 +1943,59 @@ count_common_word(
  * Return TRUE if byte "n" appears in "str".
  * Like strchr() but independent of locale.
  */
-    int
-byte_in_str(char_u *str, int n)
+    పూర్ణాంకం
+byte_లోపల_str(char_u *str, పూర్ణాంకం n)
 {
     char_u	*p;
 
-    for (p = str; *p != NUL; ++p)
-	if (*p == n)
-	    return TRUE;
-    return FALSE;
+    కొరకు (p = str; *p != NUL; ++p)
+	ఒకవేళ (*p == n)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
-#define SY_MAXLEN   30
-typedef struct syl_item_S
+#నిర్వచించు SY_MAXLEN   30
+రకనిర్వచనం నిర్మాణం syl_అంశం_S
 {
     char_u	sy_chars[SY_MAXLEN];	    // the sequence of chars
-    int		sy_len;
-} syl_item_T;
+    పూర్ణాంకం		sy_len;
+} syl_అంశం_T;
 
 /*
  * Truncate "slang->sl_syllable" at the first slash and put the following items
  * in "slang->sl_syl_items".
  */
-    int
+    పూర్ణాంకం
 init_syl_tab(slang_T *slang)
 {
     char_u	*p;
     char_u	*s;
-    int		l;
-    syl_item_T	*syl;
+    పూర్ణాంకం		l;
+    syl_అంశం_T	*syl;
 
-    ga_init2(&slang->sl_syl_items, sizeof(syl_item_T), 4);
+    ga_init2(&slang->sl_syl_వస్తువులు, పరిమాణం(syl_అంశం_T), 4);
     p = vim_strchr(slang->sl_syllable, '/');
-    while (p != NULL)
+    అయితే (p != ఖాళీ)
     {
 	*p++ = NUL;
-	if (*p == NUL)	    // trailing slash
-	    break;
+	ఒకవేళ (*p == NUL)	    // trailing slash
+	    ఆపు;
 	s = p;
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    l = (int)STRLEN(s);
-	else
-	    l = (int)(p - s);
-	if (l >= SY_MAXLEN)
-	    return SP_FORMERROR;
-	if (ga_grow(&slang->sl_syl_items, 1) == FAIL)
-	    return SP_OTHERERROR;
-	syl = ((syl_item_T *)slang->sl_syl_items.ga_data)
-					       + slang->sl_syl_items.ga_len++;
+	ఒకవేళ (p == ఖాళీ)
+	    l = (పూర్ణాంకం)STRLEN(s);
+	లేకపోతే
+	    l = (పూర్ణాంకం)(p - s);
+	ఒకవేళ (l >= SY_MAXLEN)
+	    తిరిగి SP_FORMERROR;
+	ఒకవేళ (ga_grow(&slang->sl_syl_వస్తువులు, 1) == FAIL)
+	    తిరిగి SP_OTHERERROR;
+	syl = ((syl_అంశం_T *)slang->sl_syl_వస్తువులు.ga_దత్తాంశం)
+					       + slang->sl_syl_వస్తువులు.ga_len++;
 	vim_strncpy(syl->sy_chars, s, l);
 	syl->sy_len = l;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2003,193 +2003,193 @@ init_syl_tab(slang_T *slang)
  * When "word" contains spaces the syllables after the last space are counted.
  * Returns zero if syllables are not defines.
  */
-    static int
-count_syllables(slang_T *slang, char_u *word)
+    స్థిర పూర్ణాంకం
+లెక్క_syllables(slang_T *slang, char_u *మాట)
 {
-    int		cnt = 0;
-    int		skip = FALSE;
+    పూర్ణాంకం		cnt = 0;
+    పూర్ణాంకం		skip = FALSE;
     char_u	*p;
-    int		len;
-    int		i;
-    syl_item_T	*syl;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    syl_అంశం_T	*syl;
+    పూర్ణాంకం		c;
 
-    if (slang->sl_syllable == NULL)
-	return 0;
+    ఒకవేళ (slang->sl_syllable == ఖాళీ)
+	తిరిగి 0;
 
-    for (p = word; *p != NUL; p += len)
+    కొరకు (p = మాట; *p != NUL; p += len)
     {
 	// When running into a space reset counter.
-	if (*p == ' ')
+	ఒకవేళ (*p == ' ')
 	{
 	    len = 1;
 	    cnt = 0;
-	    continue;
+	    కొనసాగు;
 	}
 
 	// Find longest match of syllable items.
 	len = 0;
-	for (i = 0; i < slang->sl_syl_items.ga_len; ++i)
+	కొరకు (i = 0; i < slang->sl_syl_వస్తువులు.ga_len; ++i)
 	{
-	    syl = ((syl_item_T *)slang->sl_syl_items.ga_data) + i;
-	    if (syl->sy_len > len
+	    syl = ((syl_అంశం_T *)slang->sl_syl_వస్తువులు.ga_దత్తాంశం) + i;
+	    ఒకవేళ (syl->sy_len > len
 			       && STRNCMP(p, syl->sy_chars, syl->sy_len) == 0)
 		len = syl->sy_len;
 	}
-	if (len != 0)	// found a match, count syllable
+	ఒకవేళ (len != 0)	// found a match, count syllable
 	{
 	    ++cnt;
 	    skip = FALSE;
 	}
-	else
+	లేకపోతే
 	{
 	    // No recognized syllable item, at least a syllable char then?
 	    c = mb_ptr2char(p);
 	    len = (*mb_ptr2len)(p);
-	    if (vim_strchr(slang->sl_syllable, c) == NULL)
+	    ఒకవేళ (vim_strchr(slang->sl_syllable, c) == ఖాళీ)
 		skip = FALSE;	    // No, search for next syllable
-	    else if (!skip)
+	    లేకపోతే ఒకవేళ (!skip)
 	    {
 		++cnt;		    // Yes, count it
 		skip = TRUE;	    // don't count following syllable chars
 	    }
 	}
     }
-    return cnt;
+    తిరిగి cnt;
 }
 
 /*
  * Parse 'spelllang' and set w_s->b_langp accordingly.
  * Returns NULL if it's OK, an untranslated error message otherwise.
  */
-    char *
+    అక్షరం *
 parse_spelllang(win_T *wp)
 {
     garray_T	ga;
     char_u	*splp;
     char_u	*region;
     char_u	region_cp[3];
-    int		filename;
-    int		region_mask;
+    పూర్ణాంకం		filename;
+    పూర్ణాంకం		region_ముసుగు;
     slang_T	*slang;
-    int		c;
+    పూర్ణాంకం		c;
     char_u	lang[MAXWLEN + 1];
     char_u	spf_name[MAXPATHL];
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*p;
-    int		round;
+    పూర్ణాంకం		విడత;
     char_u	*spf;
-    char_u	*use_region = NULL;
-    int		dont_use_region = FALSE;
-    int		nobreak = FALSE;
-    int		i, j;
+    char_u	*use_region = ఖాళీ;
+    పూర్ణాంకం		dont_use_region = FALSE;
+    పూర్ణాంకం		nobreak = FALSE;
+    పూర్ణాంకం		i, j;
     langp_T	*lp, *lp2;
-    static int	recursive = FALSE;
-    char	*ret_msg = NULL;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
+    అక్షరం	*ret_సందేశం = ఖాళీ;
     char_u	*spl_copy;
     bufref_T	bufref;
 
-    set_bufref(&bufref, wp->w_buffer);
+    సమితి_bufref(&bufref, wp->w_బఫరు);
 
     // We don't want to do this recursively.  May happen when a language is
     // not available and the SpellFileMissing autocommand opens a new buffer
     // in which 'spell' is set.
-    if (recursive)
-	return NULL;
+    ఒకవేళ (recursive)
+	తిరిగి ఖాళీ;
     recursive = TRUE;
 
-    ga_init2(&ga, sizeof(langp_T), 2);
+    ga_init2(&ga, పరిమాణం(langp_T), 2);
     clear_midword(wp);
 
     // Make a copy of 'spelllang', the SpellFileMissing autocommands may change
     // it under our fingers.
     spl_copy = vim_strsave(wp->w_s->b_p_spl);
-    if (spl_copy == NULL)
-	goto theend;
+    ఒకవేళ (spl_copy == ఖాళీ)
+	వెళ్ళు theend;
 
     wp->w_s->b_cjk = 0;
 
     // Loop over comma separated language names.
-    for (splp = spl_copy; *splp != NUL; )
+    కొరకు (splp = spl_copy; *splp != NUL; )
     {
 	// Get one language name.
 	len = copy_option_part(&splp, lang, MAXWLEN, ",");
-	region = NULL;
+	region = ఖాళీ;
 
-	if (!valid_spelllang(lang))
-	    continue;
+	ఒకవేళ (!valid_spelllang(lang))
+	    కొనసాగు;
 
-	if (STRCMP(lang, "cjk") == 0)
+	ఒకవేళ (STRCMP(lang, "cjk") == 0)
 	{
 	    wp->w_s->b_cjk = 1;
-	    continue;
+	    కొనసాగు;
 	}
 
 	// If the name ends in ".spl" use it as the name of the spell file.
 	// If there is a region name let "region" point to it and remove it
 	// from the name.
-	if (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
+	ఒకవేళ (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
 	{
 	    filename = TRUE;
 
 	    // Locate a region and remove it from the file name.
 	    p = vim_strchr(gettail(lang), '_');
-	    if (p != NULL && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
+	    ఒకవేళ (p != ఖాళీ && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
 						      && !ASCII_ISALPHA(p[3]))
 	    {
 		vim_strncpy(region_cp, p + 1, 2);
 		mch_memmove(p, p + 3, len - (p - lang) - 2);
 		region = region_cp;
 	    }
-	    else
+	    లేకపోతే
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-		    break;
+		ఒకవేళ (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+		    ఆపు;
 	}
-	else
+	లేకపోతే
 	{
 	    filename = FALSE;
-	    if (len > 3 && lang[len - 3] == '_')
+	    ఒకవేళ (len > 3 && lang[len - 3] == '_')
 	    {
 		region = lang + len - 2;
 		len -= 3;
 		lang[len] = NUL;
 	    }
-	    else
+	    లేకపోతే
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (STRICMP(lang, slang->sl_name) == 0)
-		    break;
+		ఒకవేళ (STRICMP(lang, slang->sl_name) == 0)
+		    ఆపు;
 	}
 
-	if (region != NULL)
+	ఒకవేళ (region != ఖాళీ)
 	{
 	    // If the region differs from what was used before then don't
 	    // use it for 'spellfile'.
-	    if (use_region != NULL && STRCMP(region, use_region) != 0)
+	    ఒకవేళ (use_region != ఖాళీ && STRCMP(region, use_region) != 0)
 		dont_use_region = TRUE;
 	    use_region = region;
 	}
 
 	// If not found try loading the language now.
-	if (slang == NULL)
+	ఒకవేళ (slang == ఖాళీ)
 	{
-	    if (filename)
-		(void)spell_load_file(lang, lang, NULL, FALSE);
-	    else
+	    ఒకవేళ (filename)
+		(శూన్య)spell_ఎక్కించు_file(lang, lang, ఖాళీ, FALSE);
+	    లేకపోతే
 	    {
-		spell_load_lang(lang);
+		spell_ఎక్కించు_lang(lang);
 		// SpellFileMissing autocommands may do anything, including
 		// destroying the buffer we are using or closing the window.
-		if (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
+		ఒకవేళ (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
 		{
-		    ret_msg = N_(e_spellfilemising_autocommand_deleted_buffer);
-		    goto theend;
+		    ret_సందేశం = N_(e_spellfilemising_autocommand_deleted_బఫరు);
+		    వెళ్ళు theend;
 		}
 	    }
 	}
@@ -2198,46 +2198,46 @@ parse_spelllang(win_T *wp)
 	 * Loop over the languages, there can be several files for "lang".
 	 */
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
+	    ఒకవేళ (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
 								    == FPC_SAME
 			 : STRICMP(lang, slang->sl_name) == 0)
 	    {
-		region_mask = REGION_ALL;
-		if (!filename && region != NULL)
+		region_ముసుగు = REGION_ALL;
+		ఒకవేళ (!filename && region != ఖాళీ)
 		{
 		    // find region in sl_regions
-		    c = find_region(slang->sl_regions, region);
-		    if (c == REGION_ALL)
+		    c = కనుగొను_region(slang->sl_regions, region);
+		    ఒకవేళ (c == REGION_ALL)
 		    {
-			if (slang->sl_add)
+			ఒకవేళ (slang->sl_కూడు)
 			{
-			    if (*slang->sl_regions != NUL)
+			    ఒకవేళ (*slang->sl_regions != NUL)
 				// This addition file is for other regions.
-				region_mask = 0;
+				region_ముసుగు = 0;
 			}
-			else
+			లేకపోతే
 			    // This is probably an error.  Give a warning and
 			    // accept the words anyway.
 			    smsg(_("Warning: region %s not supported"),
 								      region);
 		    }
-		    else
-			region_mask = 1 << c;
+		    లేకపోతే
+			region_ముసుగు = 1 << c;
 		}
 
-		if (region_mask != 0)
+		ఒకవేళ (region_ముసుగు != 0)
 		{
-		    if (ga_grow(&ga, 1) == FAIL)
+		    ఒకవేళ (ga_grow(&ga, 1) == FAIL)
 		    {
 			ga_clear(&ga);
-			ret_msg = e_out_of_memory;
-			goto theend;
+			ret_సందేశం = e_బహిర్గతం_యొక్క_జ్ఞాపకం;
+			వెళ్ళు theend;
 		    }
-		    LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
-		    LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
+		    LANGP_నమోదు(ga, ga.ga_len)->lp_slang = slang;
+		    LANGP_నమోదు(ga, ga.ga_len)->lp_region = region_ముసుగు;
 		    ++ga.ga_len;
 		    use_midword(slang, wp);
-		    if (slang->sl_nobreak)
+		    ఒకవేళ (slang->sl_nobreak)
 			nobreak = TRUE;
 		}
 	    }
@@ -2248,79 +2248,79 @@ parse_spelllang(win_T *wp)
     // round 2: load second name in 'spellfile.
     // etc.
     spf = curwin->w_s->b_p_spf;
-    for (round = 0; round == 0 || *spf != NUL; ++round)
+    కొరకు (విడత = 0; విడత == 0 || *spf != NUL; ++విడత)
     {
-	if (round == 0)
+	ఒకవేళ (విడత == 0)
 	{
 	    // Internal wordlist, if there is one.
-	    if (int_wordlist == NULL)
-		continue;
+	    ఒకవేళ (int_wordlist == ఖాళీ)
+		కొనసాగు;
 	    int_wordlist_spl(spf_name);
 	}
-	else
+	లేకపోతే
 	{
 	    // One entry in 'spellfile'.
 	    len = copy_option_part(&spf, spf_name, MAXPATHL - 4, ",");
 	    STRCPY(spf_name + len, ".spl");
 
 	    // If it was already found above then skip it.
-	    for (c = 0; c < ga.ga_len; ++c)
+	    కొరకు (c = 0; c < ga.ga_len; ++c)
 	    {
-		p = LANGP_ENTRY(ga, c)->lp_slang->sl_fname;
-		if (p != NULL && fullpathcmp(spf_name, p, FALSE, TRUE)
+		p = LANGP_నమోదు(ga, c)->lp_slang->sl_fname;
+		ఒకవేళ (p != ఖాళీ && fullpathcmp(spf_name, p, FALSE, TRUE)
 								== FPC_SAME)
-		    break;
+		    ఆపు;
 	    }
-	    if (c < ga.ga_len)
-		continue;
+	    ఒకవేళ (c < ga.ga_len)
+		కొనసాగు;
 	}
 
 	// Check if it was loaded already.
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
+	    ఒకవేళ (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
 								== FPC_SAME)
-		break;
-	if (slang == NULL)
+		ఆపు;
+	ఒకవేళ (slang == ఖాళీ)
 	{
 	    // Not loaded, try loading it now.  The language name includes the
 	    // region name, the region is ignored otherwise.  for int_wordlist
 	    // use an arbitrary name.
-	    if (round == 0)
+	    ఒకవేళ (విడత == 0)
 		STRCPY(lang, "internal wordlist");
-	    else
+	    లేకపోతే
 	    {
 		vim_strncpy(lang, gettail(spf_name), MAXWLEN);
 		p = vim_strchr(lang, '.');
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		    *p = NUL;	// truncate at ".encoding.add"
 	    }
-	    slang = spell_load_file(spf_name, lang, NULL, TRUE);
+	    slang = spell_ఎక్కించు_file(spf_name, lang, ఖాళీ, TRUE);
 
 	    // If one of the languages has NOBREAK we assume the addition
 	    // files also have this.
-	    if (slang != NULL && nobreak)
+	    ఒకవేళ (slang != ఖాళీ && nobreak)
 		slang->sl_nobreak = TRUE;
 	}
-	if (slang != NULL && ga_grow(&ga, 1) == OK)
+	ఒకవేళ (slang != ఖాళీ && ga_grow(&ga, 1) == OK)
 	{
-	    region_mask = REGION_ALL;
-	    if (use_region != NULL && !dont_use_region)
+	    region_ముసుగు = REGION_ALL;
+	    ఒకవేళ (use_region != ఖాళీ && !dont_use_region)
 	    {
 		// find region in sl_regions
-		c = find_region(slang->sl_regions, use_region);
-		if (c != REGION_ALL)
-		    region_mask = 1 << c;
-		else if (*slang->sl_regions != NUL)
+		c = కనుగొను_region(slang->sl_regions, use_region);
+		ఒకవేళ (c != REGION_ALL)
+		    region_ముసుగు = 1 << c;
+		లేకపోతే ఒకవేళ (*slang->sl_regions != NUL)
 		    // This spell file is for other regions.
-		    region_mask = 0;
+		    region_ముసుగు = 0;
 	    }
 
-	    if (region_mask != 0)
+	    ఒకవేళ (region_ముసుగు != 0)
 	    {
-		LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_sallang = NULL;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_replang = NULL;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
+		LANGP_నమోదు(ga, ga.ga_len)->lp_slang = slang;
+		LANGP_నమోదు(ga, ga.ga_len)->lp_sallang = ఖాళీ;
+		LANGP_నమోదు(ga, ga.ga_len)->lp_replang = ఖాళీ;
+		LANGP_నమోదు(ga, ga.ga_len)->lp_region = region_ముసుగు;
 		++ga.ga_len;
 		use_midword(slang, wp);
 	    }
@@ -2334,43 +2334,43 @@ parse_spelllang(win_T *wp)
     // For each language figure out what language to use for sound folding and
     // REP items.  If the language doesn't support it itself use another one
     // with the same name.  E.g. for "en-math" use "en".
-    for (i = 0; i < ga.ga_len; ++i)
+    కొరకు (i = 0; i < ga.ga_len; ++i)
     {
-	lp = LANGP_ENTRY(ga, i);
+	lp = LANGP_నమోదు(ga, i);
 
 	// sound folding
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	ఒకవేళ (lp->lp_slang->sl_sal.ga_len > 0)
 	    // language does sound folding itself
 	    lp->lp_sallang = lp->lp_slang;
-	else
+	లేకపోతే
 	    // find first similar language that does sound folding
-	    for (j = 0; j < ga.ga_len; ++j)
+	    కొరకు (j = 0; j < ga.ga_len; ++j)
 	    {
-		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_sal.ga_len > 0
+		lp2 = LANGP_నమోదు(ga, j);
+		ఒకవేళ (lp2->lp_slang->sl_sal.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_sallang = lp2->lp_slang;
-		    break;
+		    ఆపు;
 		}
 	    }
 
 	// REP items
-	if (lp->lp_slang->sl_rep.ga_len > 0)
+	ఒకవేళ (lp->lp_slang->sl_rep.ga_len > 0)
 	    // language has REP items itself
 	    lp->lp_replang = lp->lp_slang;
-	else
+	లేకపోతే
 	    // find first similar language that has REP items
-	    for (j = 0; j < ga.ga_len; ++j)
+	    కొరకు (j = 0; j < ga.ga_len; ++j)
 	    {
-		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_rep.ga_len > 0
+		lp2 = LANGP_నమోదు(ga, j);
+		ఒకవేళ (lp2->lp_slang->sl_rep.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_replang = lp2->lp_slang;
-		    break;
+		    ఆపు;
 		}
 	    }
     }
@@ -2379,16 +2379,16 @@ parse_spelllang(win_T *wp)
 theend:
     vim_free(spl_copy);
     recursive = FALSE;
-    return ret_msg;
+    తిరిగి ret_సందేశం;
 }
 
 /*
  * Clear the midword characters for buffer "buf".
  */
-    static void
+    స్థిర శూన్య
 clear_midword(win_T *wp)
 {
-    CLEAR_FIELD(wp->w_s->b_spell_ismw);
+    CLEAR_క్షేత్రం(wp->w_s->b_spell_ismw);
     VIM_CLEAR(wp->w_s->b_spell_ismw_mb);
 }
 
@@ -2396,33 +2396,33 @@ clear_midword(win_T *wp)
  * Use the "sl_midword" field of language "lp" for buffer "buf".
  * They add up to any currently used midword characters.
  */
-    static void
+    స్థిర శూన్య
 use_midword(slang_T *lp, win_T *wp)
 {
     char_u	*p;
 
-    if (lp->sl_midword == NULL)	    // there aren't any
-	return;
+    ఒకవేళ (lp->sl_midword == ఖాళీ)	    // there aren't any
+	తిరిగి;
 
-    for (p = lp->sl_midword; *p != NUL; )
-	if (has_mbyte)
+    కొరకు (p = lp->sl_midword; *p != NUL; )
+	ఒకవేళ (has_mbyte)
 	{
-	    int	    c, l, n;
+	    పూర్ణాంకం	    c, l, n;
 	    char_u  *bp;
 
 	    c = mb_ptr2char(p);
 	    l = (*mb_ptr2len)(p);
-	    if (c < 256 && l <= 2)
+	    ఒకవేళ (c < 256 && l <= 2)
 		wp->w_s->b_spell_ismw[c] = TRUE;
-	    else if (wp->w_s->b_spell_ismw_mb == NULL)
+	    లేకపోతే ఒకవేళ (wp->w_s->b_spell_ismw_mb == ఖాళీ)
 		// First multi-byte char in "b_spell_ismw_mb".
 		wp->w_s->b_spell_ismw_mb = vim_strnsave(p, l);
-	    else
+	    లేకపోతే
 	    {
 		// Append multi-byte chars to "b_spell_ismw_mb".
-		n = (int)STRLEN(wp->w_s->b_spell_ismw_mb);
+		n = (పూర్ణాంకం)STRLEN(wp->w_s->b_spell_ismw_mb);
 		bp = vim_strnsave(wp->w_s->b_spell_ismw_mb, n + l);
-		if (bp != NULL)
+		ఒకవేళ (bp != ఖాళీ)
 		{
 		    vim_free(wp->w_s->b_spell_ismw_mb);
 		    wp->w_s->b_spell_ismw_mb = bp;
@@ -2431,7 +2431,7 @@ use_midword(slang_T *lp, win_T *wp)
 	    }
 	    p += l;
 	}
-	else
+	లేకపోతే
 	    wp->w_s->b_spell_ismw[*p++] = TRUE;
 }
 
@@ -2440,19 +2440,19 @@ use_midword(slang_T *lp, win_T *wp)
  * Each region is simply stored as the two characters of its name.
  * Returns the index if found (first is 0), REGION_ALL if not found.
  */
-    static int
-find_region(char_u *rp, char_u *region)
+    స్థిర పూర్ణాంకం
+కనుగొను_region(char_u *rp, char_u *region)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; ; i += 2)
+    కొరకు (i = 0; ; i += 2)
     {
-	if (rp[i] == NUL)
-	    return REGION_ALL;
-	if (rp[i] == region[0] && rp[i + 1] == region[1])
-	    break;
+	ఒకవేళ (rp[i] == NUL)
+	    తిరిగి REGION_ALL;
+	ఒకవేళ (rp[i] == region[0] && rp[i + 1] == region[1])
+	    ఆపు;
     }
-    return i / 2;
+    తిరిగి i / 2;
 }
 
 /*
@@ -2462,24 +2462,24 @@ find_region(char_u *rp, char_u *region)
  * W WORD	WF_ALLCAP
  * WoRd	wOrd	WF_KEEPCAP
  */
-    int
+    పూర్ణాంకం
 captype(
-    char_u	*word,
-    char_u	*end)	    // When NULL use up to NUL byte.
+    char_u	*మాట,
+    char_u	*చివర)	    // When NULL use up to NUL byte.
 {
     char_u	*p;
-    int		c;
-    int		firstcap;
-    int		allcap;
-    int		past_second = FALSE;	// past second word char
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		firstcap;
+    పూర్ణాంకం		allcap;
+    పూర్ణాంకం		past_రెండవ = FALSE;	// past second word char
 
     // find first letter
-    for (p = word; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
-	if (end == NULL ? *p == NUL : p >= end)
-	    return 0;	    // only non-word characters, illegal word
-    if (has_mbyte)
+    కొరకు (p = మాట; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
+	ఒకవేళ (చివర == ఖాళీ ? *p == NUL : p >= చివర)
+	    తిరిగి 0;	    // only non-word characters, illegal word
+    ఒకవేళ (has_mbyte)
 	c = mb_ptr2char_adv(&p);
-    else
+    లేకపోతే
 	c = *p++;
     firstcap = allcap = SPELL_ISUPPER(c);
 
@@ -2487,40 +2487,40 @@ captype(
      * Need to check all letters to find a word with mixed upper/lower.
      * But a word with an upper char only at start is a ONECAP.
      */
-    for ( ; end == NULL ? *p != NUL : p < end; MB_PTR_ADV(p))
-	if (spell_iswordp_nmw(p, curwin))
+    కొరకు ( ; చివర == ఖాళీ ? *p != NUL : p < చివర; MB_PTR_ADV(p))
+	ఒకవేళ (spell_iswordp_nmw(p, curwin))
 	{
 	    c = PTR2CHAR(p);
-	    if (!SPELL_ISUPPER(c))
+	    ఒకవేళ (!SPELL_ISUPPER(c))
 	    {
 		// UUl -> KEEPCAP
-		if (past_second && allcap)
-		    return WF_KEEPCAP;
+		ఒకవేళ (past_రెండవ && allcap)
+		    తిరిగి WF_KEEPCAP;
 		allcap = FALSE;
 	    }
-	    else if (!allcap)
+	    లేకపోతే ఒకవేళ (!allcap)
 		// UlU -> KEEPCAP
-		return WF_KEEPCAP;
-	    past_second = TRUE;
+		తిరిగి WF_KEEPCAP;
+	    past_రెండవ = TRUE;
 	}
 
-    if (allcap)
-	return WF_ALLCAP;
-    if (firstcap)
-	return WF_ONECAP;
-    return 0;
+    ఒకవేళ (allcap)
+	తిరిగి WF_ALLCAP;
+    ఒకవేళ (firstcap)
+	తిరిగి WF_ONECAP;
+    తిరిగి 0;
 }
 
 /*
  * Delete the internal wordlist and its .spl file.
  */
-    void
-spell_delete_wordlist(void)
+    శూన్య
+spell_delete_wordlist(శూన్య)
 {
     char_u	fname[MAXPATHL];
 
-    if (int_wordlist == NULL)
-	return;
+    ఒకవేళ (int_wordlist == ఖాళీ)
+	తిరిగి;
 
     mch_remove(int_wordlist);
     int_wordlist_spl(fname);
@@ -2531,8 +2531,8 @@ spell_delete_wordlist(void)
 /*
  * Free all languages.
  */
-    void
-spell_free_all(void)
+    శూన్య
+spell_free_all(శూన్య)
 {
     slang_T	*slang;
     buf_T	*buf;
@@ -2541,16 +2541,16 @@ spell_free_all(void)
     FOR_ALL_BUFFERS(buf)
 	ga_clear(&buf->b_s.b_langp);
 
-    while (first_lang != NULL)
+    అయితే (మొదటి_lang != ఖాళీ)
     {
-	slang = first_lang;
-	first_lang = slang->sl_next;
+	slang = మొదటి_lang;
+	మొదటి_lang = slang->sl_తదుపరి;
 	slang_free(slang);
     }
 
     spell_delete_wordlist();
 
-    VIM_CLEAR(repl_to);
+    VIM_CLEAR(repl_గమ్యం);
     VIM_CLEAR(repl_from);
 }
 
@@ -2558,8 +2558,8 @@ spell_free_all(void)
  * Clear all spelling tables and reload them.
  * Used after 'encoding' is set and when ":mkspell" was used.
  */
-    void
-spell_reload(void)
+    శూన్య
+spell_reload(శూన్య)
 {
     win_T	*wp;
 
@@ -2574,12 +2574,12 @@ spell_reload(void)
     {
 	// Only load the wordlists when 'spelllang' is set and there is a
 	// window for this buffer in which 'spell' is set.
-	if (*wp->w_s->b_p_spl != NUL)
+	ఒకవేళ (*wp->w_s->b_p_spl != NUL)
 	{
-		if (wp->w_p_spell)
+		ఒకవేళ (wp->w_p_spell)
 		{
-		    (void)parse_spelllang(wp);
-		    break;
+		    (శూన్య)parse_spelllang(wp);
+		    ఆపు;
 		}
 	}
     }
@@ -2594,32 +2594,32 @@ spell_reload(void)
  * Returns NULL when out of memory.
  */
     buf_T *
-open_spellbuf(void)
+open_spellbuf(శూన్య)
 {
     buf_T	*buf;
 
     buf = ALLOC_CLEAR_ONE(buf_T);
-    if (buf == NULL)
-	return NULL;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     buf->b_spell = true;
     buf->b_p_swf = TRUE;	// may create a swap file
-#ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
-#endif
+#నిర్వచితమైతే FEAT_CRYPT
+    buf->b_p_కీలకం = ఖాళీలు_option;
+#అయితే_ముగింపు
     ml_open(buf);
     ml_open_file(buf);	// create swap file now
-    return buf;
+    తిరిగి buf;
 }
 
 /*
  * Close the buffer used for spell info.
  */
-    void
+    శూన్య
 close_spellbuf(buf_T *buf)
 {
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
     ml_close(buf, TRUE);
     vim_free(buf);
@@ -2628,34 +2628,34 @@ close_spellbuf(buf_T *buf)
 /*
  * Init the chartab used for spelling for ASCII.
  */
-    void
+    శూన్య
 clear_spell_chartab(spelltab_T *sp)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
     // Init everything to FALSE (zero).
-    CLEAR_FIELD(sp->st_isw);
-    CLEAR_FIELD(sp->st_isu);
-    for (i = 0; i < 256; ++i)
+    CLEAR_క్షేత్రం(sp->st_isw);
+    CLEAR_క్షేత్రం(sp->st_isu);
+    కొరకు (i = 0; i < 256; ++i)
     {
 	sp->st_fold[i] = i;
-	sp->st_upper[i] = i;
+	sp->st_పై[i] = i;
     }
 
     // We include digits.  A word shouldn't start with a digit, but handling
     // that is done separately.
-    for (i = '0'; i <= '9'; ++i)
+    కొరకు (i = '0'; i <= '9'; ++i)
 	sp->st_isw[i] = TRUE;
-    for (i = 'A'; i <= 'Z'; ++i)
+    కొరకు (i = 'A'; i <= 'Z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
 	sp->st_isu[i] = TRUE;
 	sp->st_fold[i] = i + 0x20;
     }
-    for (i = 'a'; i <= 'z'; ++i)
+    కొరకు (i = 'a'; i <= 'z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
-	sp->st_upper[i] = i - 0x20;
+	sp->st_పై[i] = i - 0x20;
     }
 }
 
@@ -2666,26 +2666,26 @@ clear_spell_chartab(spelltab_T *sp)
  * characters to make it possible that 'encoding' differs from the current
  * locale.  For utf-8 we don't use isalpha() but our own functions.
  */
-    void
-init_spell_chartab(void)
+    శూన్య
+init_spell_chartab(శూన్య)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    did_set_spelltab = FALSE;
+    did_సమితి_spelltab = FALSE;
     clear_spell_chartab(&spelltab);
-    if (enc_dbcs)
+    ఒకవేళ (enc_dbcs)
     {
 	// DBCS: assume double-wide characters are word characters.
-	for (i = 128; i <= 255; ++i)
-	    if (MB_BYTE2LEN(i) == 2)
+	కొరకు (i = 128; i <= 255; ++i)
+	    ఒకవేళ (MB_BYTE2LEN(i) == 2)
 		spelltab.st_isw[i] = TRUE;
     }
-    else if (enc_utf8)
+    లేకపోతే ఒకవేళ (enc_utf8)
     {
-	for (i = 128; i < 256; ++i)
+	కొరకు (i = 128; i < 256; ++i)
 	{
-	    int f = utf_fold(i);
-	    int u = utf_toupper(i);
+	    పూర్ణాంకం f = utf_fold(i);
+	    పూర్ణాంకం u = utf_toupper(i);
 
 	    spelltab.st_isu[i] = utf_isupper(i);
 	    spelltab.st_isw[i] = spelltab.st_isu[i] || utf_islower(i);
@@ -2693,24 +2693,24 @@ init_spell_chartab(void)
 	    // utf8 for 0xb5, causing E763 for no good reason.  Use the latin1
 	    // value for utf-8 to avoid this.
 	    spelltab.st_fold[i] = (f < 256) ? f : i;
-	    spelltab.st_upper[i] = (u < 256) ? u : i;
+	    spelltab.st_పై[i] = (u < 256) ? u : i;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Rough guess: use locale-dependent library functions.
-	for (i = 128; i < 256; ++i)
+	కొరకు (i = 128; i < 256; ++i)
 	{
-	    if (MB_ISUPPER(i))
+	    ఒకవేళ (MB_ISUPPER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
 		spelltab.st_isu[i] = TRUE;
 		spelltab.st_fold[i] = MB_TOLOWER(i);
 	    }
-	    else if (MB_ISLOWER(i))
+	    లేకపోతే ఒకవేళ (MB_ISLOWER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
-		spelltab.st_upper[i] = MB_TOUPPER(i);
+		spelltab.st_పై[i] = MB_TOUPPER(i);
 	    }
 	}
     }
@@ -2723,60 +2723,60 @@ init_spell_chartab(void)
  * followed by a word character.  This finds they'there but not 'they there'.
  * Thus this only works properly when past the first character of the word.
  */
-    int
+    పూర్ణాంకం
 spell_iswordp(
     char_u	*p,
     win_T	*wp)	    // buffer used
 {
     char_u	*s;
-    int		l;
-    int		c;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		c;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
 	l = mb_ptr2len(p);
 	s = p;
-	if (l == 1)
+	ఒకవేళ (l == 1)
 	{
 	    // be quick for ASCII
-	    if (wp->w_s->b_spell_ismw[*p])
+	    ఒకవేళ (wp->w_s->b_spell_ismw[*p])
 		s = p + 1;		// skip a mid-word character
 	}
-	else
+	లేకపోతే
 	{
 	    c = mb_ptr2char(p);
-	    if (c < 256 ? wp->w_s->b_spell_ismw[c]
-		    : (wp->w_s->b_spell_ismw_mb != NULL
-			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != NULL))
+	    ఒకవేళ (c < 256 ? wp->w_s->b_spell_ismw[c]
+		    : (wp->w_s->b_spell_ismw_mb != ఖాళీ
+			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != ఖాళీ))
 		s = p + l;
 	}
 
 	c = mb_ptr2char(s);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(s), wp);
-	return spelltab.st_isw[c];
+	ఒకవేళ (c > 255)
+	    తిరిగి spell_mb_isword_class(mb_get_class(s), wp);
+	తిరిగి spelltab.st_isw[c];
     }
 
-    return spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
+    తిరిగి spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Unlike spell_iswordp() this doesn't check for "midword" characters.
  */
-    int
+    పూర్ణాంకం
 spell_iswordp_nmw(char_u *p, win_T *wp)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
 	c = mb_ptr2char(p);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(p), wp);
-	return spelltab.st_isw[c];
+	ఒకవేళ (c > 255)
+	    తిరిగి spell_mb_isword_class(mb_get_class(p), wp);
+	తిరిగి spelltab.st_isw[c];
     }
-    return spelltab.st_isw[*p];
+    తిరిగి spelltab.st_isw[*p];
 }
 
 /*
@@ -2785,41 +2785,41 @@ spell_iswordp_nmw(char_u *p, win_T *wp)
  * Unicode subscript and superscript are not considered word characters.
  * See also dbcs_class() and utf_class() in mbyte.c.
  */
-    static int
-spell_mb_isword_class(int cl, win_T *wp)
+    స్థిర పూర్ణాంకం
+spell_mb_isword_class(పూర్ణాంకం cl, win_T *wp)
 {
-    if (wp->w_s->b_cjk)
+    ఒకవేళ (wp->w_s->b_cjk)
 	// East Asian characters are not considered word characters.
-	return cl == 2 || cl == 0x2800;
-    return cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
+	తిరిగి cl == 2 || cl == 0x2800;
+    తిరిగి cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Wide version of spell_iswordp().
  */
-    static int
-spell_iswordp_w(int *p, win_T *wp)
+    స్థిర పూర్ణాంకం
+spell_iswordp_w(పూర్ణాంకం *p, win_T *wp)
 {
-    int		*s;
+    పూర్ణాంకం		*s;
 
-    if (*p < 256 ? wp->w_s->b_spell_ismw[*p]
-		 : (wp->w_s->b_spell_ismw_mb != NULL
-			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != NULL))
+    ఒకవేళ (*p < 256 ? wp->w_s->b_spell_ismw[*p]
+		 : (wp->w_s->b_spell_ismw_mb != ఖాళీ
+			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != ఖాళీ))
 	s = p + 1;
-    else
+    లేకపోతే
 	s = p;
 
-    if (*s > 255)
+    ఒకవేళ (*s > 255)
     {
-	if (enc_utf8)
-	    return spell_mb_isword_class(utf_class(*s), wp);
-	if (enc_dbcs)
-	    return spell_mb_isword_class(
-				dbcs_class((unsigned)*s >> 8, *s & 0xff), wp);
-	return 0;
+	ఒకవేళ (enc_utf8)
+	    తిరిగి spell_mb_isword_class(utf_class(*s), wp);
+	ఒకవేళ (enc_dbcs)
+	    తిరిగి spell_mb_isword_class(
+				dbcs_class((గుర్తులేని)*s >> 8, *s & 0xff), wp);
+	తిరిగి 0;
     }
-    return spelltab.st_isw[*s];
+    తిరిగి spelltab.st_isw[*s];
 }
 
 /*
@@ -2828,211 +2828,211 @@ spell_iswordp_w(int *p, win_T *wp)
  * When using a multi-byte 'encoding' the length may change!
  * Returns FAIL when something wrong.
  */
-    int
+    పూర్ణాంకం
 spell_casefold(
     win_T	*wp,
     char_u	*str,
-    int		len,
+    పూర్ణాంకం		len,
     char_u	*buf,
-    int		buflen)
+    పూర్ణాంకం		buflen)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (len >= buflen)
+    ఒకవేళ (len >= buflen)
     {
 	buf[0] = NUL;
-	return FAIL;		// result will not fit
+	తిరిగి FAIL;		// result will not fit
     }
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	int	outi = 0;
+	పూర్ణాంకం	outi = 0;
 	char_u	*p;
-	int	c;
+	పూర్ణాంకం	c;
 
 	// Fold one character at a time.
-	for (p = str; p < str + len; )
+	కొరకు (p = str; p < str + len; )
 	{
-	    if (outi + MB_MAXBYTES > buflen)
+	    ఒకవేళ (outi + MB_MAXBYTES > buflen)
 	    {
 		buf[outi] = NUL;
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    c = mb_cptr2char_adv(&p);
 
 	    // Exception: greek capital sigma 0x03A3 folds to 0x03C3, except
 	    // when it is the last character in a word, then it folds to
 	    // 0x03C2.
-	    if (c == 0x03a3 || c == 0x03c2)
+	    ఒకవేళ (c == 0x03a3 || c == 0x03c2)
 	    {
-		if (p == str + len || !spell_iswordp(p, wp))
+		ఒకవేళ (p == str + len || !spell_iswordp(p, wp))
 		    c = 0x03c2;
-		else
+		లేకపోతే
 		    c = 0x03c3;
 	    }
-	    else
+	    లేకపోతే
 		c = SPELL_TOFOLD(c);
 
 	    outi += mb_char2bytes(c, buf + outi);
 	}
 	buf[outi] = NUL;
     }
-    else
+    లేకపోతే
     {
 	// Be quick for non-multibyte encodings.
-	for (i = 0; i < len; ++i)
+	కొరకు (i = 0; i < len; ++i)
 	    buf[i] = spelltab.st_fold[str[i]];
 	buf[i] = NUL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Check if the word at line "lnum" column "col" is required to start with a
  * capital.  This uses 'spellcapcheck' of the buffer in window "wp".
  */
-    int
-check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
+    పూర్ణాంకం
+check_need_cap(win_T *wp, linenr_T lnum, colnr_T నిలువు)
 {
-    if (wp->w_s->b_cap_prog == NULL)
-	return FALSE;
+    ఒకవేళ (wp->w_s->b_cap_prog == ఖాళీ)
+	తిరిగి FALSE;
 
-    int		need_cap = FALSE;
-    char_u	*line = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : NULL;
-    char_u	*line_copy = NULL;
+    పూర్ణాంకం		need_cap = FALSE;
+    char_u	*పంక్తి = నిలువు ? ml_get_buf(wp->w_బఫరు, lnum, FALSE) : ఖాళీ;
+    char_u	*పంక్తి_copy = ఖాళీ;
     colnr_T	endcol = 0;
 
-    if (col == 0 || getwhitecols(line) >= col)
+    ఒకవేళ (నిలువు == 0 || getwhitecols(పంక్తి) >= నిలువు)
     {
 	// At start of line, check if previous line is empty or sentence
 	// ends there.
-	if (lnum == 1)
+	ఒకవేళ (lnum == 1)
 	    need_cap = TRUE;
-	else
+	లేకపోతే
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
-	    if (*skipwhite(line) == NUL)
+	    పంక్తి = ml_get_buf(wp->w_బఫరు, lnum - 1, FALSE);
+	    ఒకవేళ (*skipwhite(పంక్తి) == NUL)
 		need_cap = TRUE;
-	    else
+	    లేకపోతే
 	    {
 		// Append a space in place of the line break.
-		line_copy = concat_str(line, (char_u *)" ");
-		if (line_copy == NULL)
-		    return FALSE;
+		పంక్తి_copy = concat_str(పంక్తి, (char_u *)" ");
+		ఒకవేళ (పంక్తి_copy == ఖాళీ)
+		    తిరిగి FALSE;
 
-		line = line_copy;
-		endcol = (colnr_T)STRLEN(line);
+		పంక్తి = పంక్తి_copy;
+		endcol = (colnr_T)STRLEN(పంక్తి);
 	    }
 	}
     }
-    else
-	endcol = col;
+    లేకపోతే
+	endcol = నిలువు;
 
-    if (endcol > 0)
+    ఒకవేళ (endcol > 0)
     {
 	// Check if sentence ends before the bad word.
 	regmatch_T	regmatch;
 	regmatch.regprog = wp->w_s->b_cap_prog;
 	regmatch.rm_ic = FALSE;
-	char_u *p = line + endcol;
-	for (;;)
+	char_u *p = పంక్తి + endcol;
+	కొరకు (;;)
 	{
-	    MB_PTR_BACK(line, p);
-	    if (p == line || spell_iswordp_nmw(p, wp))
-		break;
-	    if (vim_regexec(&regmatch, p, 0)
-					 && regmatch.endp[0] == line + endcol)
+	    MB_PTR_వెనుక(పంక్తి, p);
+	    ఒకవేళ (p == పంక్తి || spell_iswordp_nmw(p, wp))
+		ఆపు;
+	    ఒకవేళ (vim_regexec(&regmatch, p, 0)
+					 && regmatch.endp[0] == పంక్తి + endcol)
 	    {
 		need_cap = TRUE;
-		break;
+		ఆపు;
 	    }
 	}
 	wp->w_s->b_cap_prog = regmatch.regprog;
     }
 
-    vim_free(line_copy);
+    vim_free(పంక్తి_copy);
 
-    return need_cap;
+    తిరిగి need_cap;
 }
 
 
 /*
  * ":spellrepall"
  */
-    void
-ex_spellrepall(exarg_T *eap UNUSED)
+    శూన్య
+ex_spellrepall(exarg_T *eap వాడని)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*frompat;
     size_t	frompatlen;
-    char_u	*line;
+    char_u	*పంక్తి;
     char_u	*p;
-    int		save_ws = p_ws;
+    పూర్ణాంకం		save_ws = p_ws;
     linenr_T	prev_lnum = 0;
 
-    if (repl_from == NULL || repl_to == NULL)
+    ఒకవేళ (repl_from == ఖాళీ || repl_గమ్యం == ఖాళీ)
     {
-	emsg(_(e_no_previous_spell_replacement));
-	return;
+	emsg(_(e_no_మునుపటి_spell_replacement));
+	తిరిగి;
     }
     size_t	repl_from_len = STRLEN(repl_from);
-    size_t	repl_to_len = STRLEN(repl_to);
-    long	addlen = (long)repl_to_len - (long)repl_from_len;
+    size_t	repl_గమ్యం_len = STRLEN(repl_గమ్యం);
+    దీర్ఘ	addlen = (దీర్ఘ)repl_గమ్యం_len - (దీర్ఘ)repl_from_len;
 
     frompat = alloc(repl_from_len + 7);
-    if (frompat == NULL)
-	return;
-    frompatlen = vim_snprintf((char *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
+    ఒకవేళ (frompat == ఖాళీ)
+	తిరిగి;
+    frompatlen = vim_snprintf((అక్షరం *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
     p_ws = FALSE;
 
     sub_nsubs = 0;
     sub_nlines = 0;
     curwin->w_cursor.lnum = 0;
-    while (!got_int)
+    అయితే (!got_int)
     {
-	if (do_search(NULL, '/', '/', frompat, frompatlen, 1L, SEARCH_KEEP, NULL) == 0
+	ఒకవేళ (do_శోధన(ఖాళీ, '/', '/', frompat, frompatlen, 1L, శోధన_KEEP, ఖాళీ) == 0
 						   || u_save_cursor() == FAIL)
-	    break;
+	    ఆపు;
 
 	// Only replace when the right word isn't there yet.  This happens
 	// when changing "etc" to "etc.".
-	line = ml_get_curline();
-	if (addlen <= 0 || STRNCMP(line + curwin->w_cursor.col,
-						   repl_to, repl_to_len) != 0)
+	పంక్తి = ml_get_curline();
+	ఒకవేళ (addlen <= 0 || STRNCMP(పంక్తి + curwin->w_cursor.నిలువు,
+						   repl_గమ్యం, repl_గమ్యం_len) != 0)
 	{
 	    p = alloc(ml_get_curline_len() + addlen + 1);
-	    if (p == NULL)
-		break;
-	    mch_memmove(p, line, curwin->w_cursor.col);
-	    STRCPY(p + curwin->w_cursor.col, repl_to);
-	    STRCAT(p, line + curwin->w_cursor.col + repl_from_len);
+	    ఒకవేళ (p == ఖాళీ)
+		ఆపు;
+	    mch_memmove(p, పంక్తి, curwin->w_cursor.నిలువు);
+	    STRCPY(p + curwin->w_cursor.నిలువు, repl_గమ్యం);
+	    STRCAT(p, పంక్తి + curwin->w_cursor.నిలువు + repl_from_len);
 	    ml_replace(curwin->w_cursor.lnum, p, FALSE);
-	    changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
-#if defined(FEAT_PROP_POPUP)
-	    if (curbuf->b_has_textprop && addlen != 0)
+	    మారింది_బైట్లు(curwin->w_cursor.lnum, curwin->w_cursor.నిలువు);
+#ఒకవేళ defined(FEAT_PROP_POPUP)
+	    ఒకవేళ (curbuf->b_has_textprop && addlen != 0)
 		adjust_prop_columns(curwin->w_cursor.lnum,
-				 curwin->w_cursor.col, (int)addlen, APC_SUBSTITUTE);
-#endif
+				 curwin->w_cursor.నిలువు, (పూర్ణాంకం)addlen, APC_SUBSTITUTE);
+#అయితే_ముగింపు
 
-	    if (curwin->w_cursor.lnum != prev_lnum)
+	    ఒకవేళ (curwin->w_cursor.lnum != prev_lnum)
 	    {
 		++sub_nlines;
 		prev_lnum = curwin->w_cursor.lnum;
 	    }
 	    ++sub_nsubs;
 	}
-	curwin->w_cursor.col += (colnr_T)repl_to_len;
+	curwin->w_cursor.నిలువు += (colnr_T)repl_గమ్యం_len;
     }
 
     p_ws = save_ws;
     curwin->w_cursor = pos;
     vim_free(frompat);
 
-    if (sub_nsubs == 0)
-	semsg(_(e_not_found_str), repl_from);
-    else
-	do_sub_msg(FALSE);
+    ఒకవేళ (sub_nsubs == 0)
+	semsg(_(e_not_దొరికింది_str), repl_from);
+    లేకపోతే
+	do_sub_సందేశం(FALSE);
 }
 
 /*
@@ -3040,28 +3040,28 @@ ex_spellrepall(exarg_T *eap UNUSED)
  * "wcopy[MAXWLEN]".  "word" must not be empty.
  * The result is NUL terminated.
  */
-    void
+    శూన్య
 onecap_copy(
-    char_u	*word,
+    char_u	*మాట,
     char_u	*wcopy,
-    int		upper)	    // TRUE: first letter made upper case
+    పూర్ణాంకం		పై_2)	    // TRUE: first letter made upper case
 {
     char_u	*p;
-    int		c;
-    int		l;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		l;
 
-    p = word;
-    if (has_mbyte)
+    p = మాట;
+    ఒకవేళ (has_mbyte)
 	c = mb_cptr2char_adv(&p);
-    else
+    లేకపోతే
 	c = *p++;
-    if (upper)
+    ఒకవేళ (పై_2)
 	c = SPELL_TOUPPER(c);
-    else
+    లేకపోతే
 	c = SPELL_TOFOLD(c);
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	l = mb_char2bytes(c, wcopy);
-    else
+    లేకపోతే
     {
 	l = 1;
 	wcopy[0] = c;
@@ -3073,43 +3073,43 @@ onecap_copy(
  * Make a copy of "word" with all the letters upper cased into
  * "wcopy[MAXWLEN]".  The result is NUL terminated.
  */
-    void
-allcap_copy(char_u *word, char_u *wcopy)
+    శూన్య
+allcap_copy(char_u *మాట, char_u *wcopy)
 {
     char_u	*s;
     char_u	*d;
-    int		c;
+    పూర్ణాంకం		c;
 
     d = wcopy;
-    for (s = word; *s != NUL; )
+    కొరకు (s = మాట; *s != NUL; )
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    c = mb_cptr2char_adv(&s);
-	else
+	లేకపోతే
 	    c = *s++;
 
 	// We only change 0xdf to SS when we are certain latin1 is used.  It
 	// would cause weird errors in other 8-bit encodings.
-	if (enc_latin1like && c == 0xdf)
+	ఒకవేళ (enc_latin1like && c == 0xdf)
 	{
 	    c = 'S';
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    ఒకవేళ (d - wcopy >= MAXWLEN - 1)
+		ఆపు;
 	    *d++ = c;
 	}
-	else
+	లేకపోతే
 	    c = SPELL_TOUPPER(c);
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    if (d - wcopy >= MAXWLEN - MB_MAXBYTES)
-		break;
+	    ఒకవేళ (d - wcopy >= MAXWLEN - MB_MAXBYTES)
+		ఆపు;
 	    d += mb_char2bytes(c, d);
 	}
-	else
+	లేకపోతే
 	{
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    ఒకవేళ (d - wcopy >= MAXWLEN - 1)
+		ఆపు;
 	    *d++ = c;
 	}
     }
@@ -3120,65 +3120,65 @@ allcap_copy(char_u *word, char_u *wcopy)
  * Case-folding may change the number of bytes: Count nr of chars in
  * fword[flen] and return the byte length of that many chars in "word".
  */
-    int
-nofold_len(char_u *fword, int flen, char_u *word)
+    పూర్ణాంకం
+nofold_len(char_u *fword, పూర్ణాంకం flen, char_u *మాట)
 {
     char_u	*p;
-    int		i = 0;
+    పూర్ణాంకం		i = 0;
 
-    for (p = fword; p < fword + flen; MB_PTR_ADV(p))
+    కొరకు (p = fword; p < fword + flen; MB_PTR_ADV(p))
 	++i;
-    for (p = word; i > 0; MB_PTR_ADV(p))
+    కొరకు (p = మాట; i > 0; MB_PTR_ADV(p))
 	--i;
-    return (int)(p - word);
+    తిరిగి (పూర్ణాంకం)(p - మాట);
 }
 
 /*
  * Copy "fword" to "cword", fixing case according to "flags".
  */
-    void
-make_case_word(char_u *fword, char_u *cword, int flags)
+    శూన్య
+make_case_మాట(char_u *fword, char_u *cword, పూర్ణాంకం flags)
 {
-    if (flags & WF_ALLCAP)
+    ఒకవేళ (flags & WF_ALLCAP)
 	// Make it all upper-case
 	allcap_copy(fword, cword);
-    else if (flags & WF_ONECAP)
+    లేకపోతే ఒకవేళ (flags & WF_ONECAP)
 	// Make the first letter upper-case
 	onecap_copy(fword, cword, TRUE);
-    else
+    లేకపోతే
 	// Use goodword as-is.
 	STRCPY(cword, fword);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Soundfold a string, for soundfold().
  * Result is in allocated memory, NULL for an error.
  */
     char_u *
-eval_soundfold(char_u *word)
+eval_soundfold(char_u *మాట)
 {
     langp_T	*lp;
     char_u	sound[MAXWLEN];
-    int		lpi;
+    పూర్ణాంకం		lpi;
 
-    if (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+    ఒకవేళ (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
 	// Use the sound-folding of the first language that supports it.
-	for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+	కొరకు (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
 	{
-	    lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	    if (lp->lp_slang->sl_sal.ga_len > 0)
+	    lp = LANGP_నమోదు(curwin->w_s->b_langp, lpi);
+	    ఒకవేళ (lp->lp_slang->sl_sal.ga_len > 0)
 	    {
 		// soundfold the word
-		spell_soundfold(lp->lp_slang, word, FALSE, sound);
-		return vim_strsave(sound);
+		spell_soundfold(lp->lp_slang, మాట, FALSE, sound);
+		తిరిగి vim_strsave(sound);
 	    }
 	}
 
     // No language with sound folding, return word as-is.
-    return vim_strsave(word);
+    తిరిగి vim_strsave(మాట);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Turn "inword" into its sound-a-like equivalent in "res[MAXWLEN]".
@@ -3192,35 +3192,35 @@ eval_soundfold(char_u *word)
  * 1. SOFOFROM/SOFOTO do a simple character mapping.
  * 2. SAL items define a more advanced sound-folding (and much slower).
  */
-    void
+    శూన్య
 spell_soundfold(
     slang_T	*slang,
     char_u	*inword,
-    int		folded,	    // "inword" is already case-folded
+    పూర్ణాంకం		folded,	    // "inword" is already case-folded
     char_u	*res)
 {
     char_u	fword[MAXWLEN];
-    char_u	*word;
+    char_u	*మాట;
 
-    if (slang->sl_sofo)
+    ఒకవేళ (slang->sl_sofo)
 	// SOFOFROM and SOFOTO used
 	spell_soundfold_sofo(slang, inword, res);
-    else
+    లేకపోతే
     {
 	// SAL items used.  Requires the word to be case-folded.
-	if (folded)
-	    word = inword;
-	else
+	ఒకవేళ (folded)
+	    మాట = inword;
+	లేకపోతే
 	{
-	    (void)spell_casefold(curwin,
-				  inword, (int)STRLEN(inword), fword, MAXWLEN);
-	    word = fword;
+	    (శూన్య)spell_casefold(curwin,
+				  inword, (పూర్ణాంకం)STRLEN(inword), fword, MAXWLEN);
+	    మాట = fword;
 	}
 
-	if (has_mbyte)
-	    spell_soundfold_wsal(slang, word, res);
-	else
-	    spell_soundfold_sal(slang, word, res);
+	ఒకవేళ (has_mbyte)
+	    spell_soundfold_wsal(slang, మాట, res);
+	లేకపోతే
+	    spell_soundfold_sal(slang, మాట, res);
     }
 }
 
@@ -3228,68 +3228,68 @@ spell_soundfold(
  * Perform sound folding of "inword" into "res" according to SOFOFROM and
  * SOFOTO lines.
  */
-    static void
+    స్థిర శూన్య
 spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
 {
     char_u	*s;
-    int		ri = 0;
-    int		c;
+    పూర్ణాంకం		ri = 0;
+    పూర్ణాంకం		c;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	int	prevc = 0;
-	int	*ip;
+	పూర్ణాంకం	prevc = 0;
+	పూర్ణాంకం	*ip;
 
 	// The sl_sal_first[] table contains the translation for chars up to
 	// 255, sl_sal the rest.
-	for (s = inword; *s != NUL; )
+	కొరకు (s = inword; *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&s);
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    ఒకవేళ (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 		c = ' ';
-	    else if (c < 256)
-		c = slang->sl_sal_first[c];
-	    else
+	    లేకపోతే ఒకవేళ (c < 256)
+		c = slang->sl_sal_మొదటి[c];
+	    లేకపోతే
 	    {
-		ip = ((int **)slang->sl_sal.ga_data)[c & 0xff];
-		if (ip == NULL)		// empty list, can't match
+		ip = ((పూర్ణాంకం **)slang->sl_sal.ga_దత్తాంశం)[c & 0xff];
+		ఒకవేళ (ip == ఖాళీ)		// empty list, can't match
 		    c = NUL;
-		else
-		    for (;;)		// find "c" in the list
+		లేకపోతే
+		    కొరకు (;;)		// find "c" in the list
 		    {
-			if (*ip == 0)	// not found
+			ఒకవేళ (*ip == 0)	// not found
 			{
 			    c = NUL;
-			    break;
+			    ఆపు;
 			}
-			if (*ip == c)	// match!
+			ఒకవేళ (*ip == c)	// match!
 			{
 			    c = ip[1];
-			    break;
+			    ఆపు;
 			}
 			ip += 2;
 		    }
 	    }
 
-	    if (c != NUL && c != prevc)
+	    ఒకవేళ (c != NUL && c != prevc)
 	    {
 		ri += mb_char2bytes(c, res + ri);
-		if (ri + MB_MAXBYTES > MAXWLEN)
-		    break;
+		ఒకవేళ (ri + MB_MAXBYTES > MAXWLEN)
+		    ఆపు;
 		prevc = c;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	// The sl_sal_first[] table contains the translation.
-	for (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
+	కొరకు (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
 	{
-	    if (VIM_ISWHITE(c))
+	    ఒకవేళ (VIM_ISWHITE(c))
 		c = ' ';
-	    else
-		c = slang->sl_sal_first[c];
-	    if (c != NUL && (ri == 0 || res[ri - 1] != c))
+	    లేకపోతే
+		c = slang->sl_sal_మొదటి[c];
+	    ఒకవేళ (c != NUL && (ri == 0 || res[ri - 1] != c))
 		res[ri++] = c;
 	}
     }
@@ -3297,265 +3297,265 @@ spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
     res[ri] = NUL;
 }
 
-    static void
+    స్థిర శూన్య
 spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 {
     salitem_T	*smp;
-    char_u	word[MAXWLEN];
+    char_u	మాట[MAXWLEN];
     char_u	*s = inword;
     char_u	*t;
     char_u	*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
+    పూర్ణాంకం		i, j, z;
+    పూర్ణాంకం		reslen;
+    పూర్ణాంకం		n, k = 0;
+    పూర్ణాంకం		z0;
+    పూర్ణాంకం		k0;
+    పూర్ణాంకం		n0;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		pri;
+    పూర్ణాంకం		p0 = -333;
+    పూర్ణాంకం		c0;
 
     // Remove accents, if wanted.  We actually remove all non-word characters.
     // But keep white space.  We need a copy, the word may be changed here.
-    if (slang->sl_rem_accents)
+    ఒకవేళ (slang->sl_rem_accents)
     {
-	t = word;
-	while (*s != NUL)
+	t = మాట;
+	అయితే (*s != NUL)
 	{
-	    if (VIM_ISWHITE(*s))
+	    ఒకవేళ (VIM_ISWHITE(*s))
 	    {
 		*t++ = ' ';
 		s = skipwhite(s);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (spell_iswordp_nmw(s, curwin))
+		ఒకవేళ (spell_iswordp_nmw(s, curwin))
 		    *t++ = *s;
 		++s;
 	    }
 	}
 	*t = NUL;
     }
-    else
-	vim_strncpy(word, s, MAXWLEN - 1);
+    లేకపోతే
+	vim_strncpy(మాట, s, MAXWLEN - 1);
 
-    smp = (salitem_T *)slang->sl_sal.ga_data;
+    smp = (salitem_T *)slang->sl_sal.ga_దత్తాంశం;
 
     /*
      * This comes from Aspell phonet.cpp.  Converted from C++ to C.
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    అయితే ((c = మాట[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
-	n = slang->sl_sal_first[c];
+	n = slang->sl_sal_మొదటి[c];
 	z0 = 0;
 
-	if (n >= 0)
+	ఒకవేళ (n >= 0)
 	{
 	    // check all rules for the same letter
-	    for (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
+	    కొరకు (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		ఒకవేళ (k > 1)
 		{
-		    if (word[i + 1] != s[1])
-			continue;
-		    if (k > 2)
+		    ఒకవేళ (మాట[i + 1] != s[1])
+			కొనసాగు;
+		    ఒకవేళ (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != s[j])
-				break;
-			if (j < k)
-			    continue;
+			కొరకు (j = 2; j < k; ++j)
+			    ఒకవేళ (మాట[i + j] != s[j])
+				ఆపు;
+			ఒకవేళ (j < k)
+			    కొనసాగు;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof) != NULL)
+		ఒకవేళ ((pf = smp[n].sm_oneof) != ఖాళీ)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    అయితే (*pf != NUL && *pf != మాట[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    ఒకవేళ (*pf == NUL)
+			కొనసాగు;
 		    ++k;
 		}
-		s = smp[n].sm_rules;
+		s = smp[n].sm_నియమాలు;
 		pri = 5;    // default priority
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		అయితే (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		ఒకవేళ (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		ఒకవేళ (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		ఒకవేళ (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		ఒకవేళ (*s == NUL
 			|| (*s == '^'
-			    && (i == 0 || !(word[i - 1] == ' '
-				      || spell_iswordp(word + i - 1, curwin)))
+			    && (i == 0 || !(మాట[i - 1] == ' '
+				      || spell_iswordp(మాట + i - 1, curwin)))
 			    && (*(s + 1) != '$'
-				|| (!spell_iswordp(word + i + k0, curwin))))
+				|| (!spell_iswordp(మాట + i + k0, curwin))))
 			|| (*s == '$' && i > 0
-			    && spell_iswordp(word + i - 1, curwin)
-			    && (!spell_iswordp(word + i + k0, curwin))))
+			    && spell_iswordp(మాట + i - 1, curwin)
+			    && (!spell_iswordp(మాట + i + k0, curwin))))
 		{
 		    // search for followup rules, if:
 		    // followup and k > 1  and  NO '-' in searchstring
-		    c0 = word[i + k - 1];
-		    n0 = slang->sl_sal_first[c0];
+		    c0 = మాట[i + k - 1];
+		    n0 = slang->sl_sal_మొదటి[c0];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
-					   && p0 != '-' && word[i + k] != NUL)
+		    ఒకవేళ (slang->sl_followup && k > 1 && n0 >= 0
+					   && p0 != '-' && మాట[i + k] != NUL)
 		    {
 			// test follow-up rule for "word[i + k]"
-			for ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
+			కొరకు ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
 			    //
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    ఒకవేళ (k0 > 1)
 			    {
-				if (word[i + k] != s[1])
-				    continue;
-				if (k0 > 2)
+				ఒకవేళ (మాట[i + k] != s[1])
+				    కొనసాగు;
+				ఒకవేళ (k0 > 2)
 				{
-				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != s[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    pf = మాట + i + k + 1;
+				    కొరకు (j = 2; j < k0; ++j)
+					ఒకవేళ (*pf++ != s[j])
+					    ఆపు;
+				    ఒకవేళ (j < k0)
+					కొనసాగు;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof) != NULL)
+			    ఒకవేళ ((pf = smp[n0].sm_oneof) != ఖాళీ)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				అయితే (*pf != NUL && *pf != మాట[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				ఒకవేళ (*pf == NUL)
+				    కొనసాగు;
 				++k0;
 			    }
 
 			    p0 = 5;
-			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    s = smp[n0].sm_నియమాలు;
+			    అయితే (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    ఒకవేళ (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    ఒకవేళ (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    ఒకవేళ (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
-					    && !spell_iswordp(word + i + k0,
+					    && !spell_iswordp(మాట + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				ఒకవేళ (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    కొనసాగు;
 
-				if (p0 < pri)
+				ఒకవేళ (p0 < pri)
 				    // priority too low
-				    continue;
+				    కొనసాగు;
 				// rule fits; stop search
-				break;
+				ఆపు;
 			    }
 			}
 
-			if (p0 >= pri && smp[n0].sm_lead[0] == c0)
-			    continue;
+			ఒకవేళ (p0 >= pri && smp[n0].sm_lead[0] == c0)
+			    కొనసాగు;
 		    }
 
 		    // replace string
-		    s = smp[n].sm_to;
-		    if (s == NULL)
+		    s = smp[n].sm_గమ్యం;
+		    ఒకవేళ (s == ఖాళీ)
 			s = (char_u *)"";
-		    pf = smp[n].sm_rules;
-		    p0 = (vim_strchr(pf, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    pf = smp[n].sm_నియమాలు;
+		    p0 = (vim_strchr(pf, '<') != ఖాళీ) ? 1 : 0;
+		    ఒకవేళ (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && *s != NUL && (res[reslen - 1] == c
+			ఒకవేళ (reslen > 0 && *s != NUL && (res[reslen - 1] == c
 						    || res[reslen - 1] == *s))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			while (*s != NUL && word[i + k0] != NUL)
+			అయితే (*s != NUL && మాట[i + k0] != NUL)
 			{
-			    word[i + k0] = *s;
+			    మాట[i + k0] = *s;
 			    k0++;
 			    s++;
 			}
-			if (k > k0)
-			    STRMOVE(word + i + k0, word + i + k);
+			ఒకవేళ (k > k0)
+			    STRMOVE(మాట + i + k0, మాట + i + k);
 
 			// new "actual letter"
-			c = word[i];
+			c = మాట[i];
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			while (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
+			అయితే (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
 			{
-			    if (reslen == 0 || res[reslen - 1] != *s)
+			    ఒకవేళ (reslen == 0 || res[reslen - 1] != *s)
 				res[reslen++] = *s;
 			    s++;
 			}
 			// new "actual letter"
 			c = *s;
-			if (strstr((char *)pf, "^^") != NULL)
+			ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)pf, "^^") != ఖాళీ)
 			{
-			    if (c != NUL && reslen < MAXWLEN - 1)
+			    ఒకవేళ (c != NUL && reslen < MAXWLEN - 1)
 				res[reslen++] = c;
-			    STRMOVE(word, word + i + 1);
+			    STRMOVE(మాట, మాట + i + 1);
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	లేకపోతే ఒకవేళ (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	ఒకవేళ (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
+	    ఒకవేళ (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || res[reslen - 1] != c))
 		// condense only double letters
@@ -3574,29 +3574,29 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
  * Turn "inword" into its sound-a-like equivalent in "res[MAXWLEN]".
  * Multi-byte version of spell_soundfold().
  */
-    static void
+    స్థిర శూన్య
 spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 {
-    salitem_T	*smp = (salitem_T *)slang->sl_sal.ga_data;
-    int		word[MAXWLEN];
-    int		wres[MAXWLEN];
-    int		l;
+    salitem_T	*smp = (salitem_T *)slang->sl_sal.ga_దత్తాంశం;
+    పూర్ణాంకం		మాట[MAXWLEN];
+    పూర్ణాంకం		wres[MAXWLEN];
+    పూర్ణాంకం		l;
     char_u	*s;
-    int		*ws;
+    పూర్ణాంకం		*ws;
     char_u	*t;
-    int		*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
-    int		did_white = FALSE;
-    int		wordlen;
+    పూర్ణాంకం		*pf;
+    పూర్ణాంకం		i, j, z;
+    పూర్ణాంకం		reslen;
+    పూర్ణాంకం		n, k = 0;
+    పూర్ణాంకం		z0;
+    పూర్ణాంకం		k0;
+    పూర్ణాంకం		n0;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		pri;
+    పూర్ణాంకం		p0 = -333;
+    పూర్ణాంకం		c0;
+    పూర్ణాంకం		did_white = FALSE;
+    పూర్ణాంకం		wordlen;
 
 
     /*
@@ -3605,29 +3605,29 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * But keep white space.
      */
     wordlen = 0;
-    for (s = inword; *s != NUL; )
+    కొరకు (s = inword; *s != NUL; )
     {
 	t = s;
 	c = mb_cptr2char_adv(&s);
-	if (slang->sl_rem_accents)
+	ఒకవేళ (slang->sl_rem_accents)
 	{
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    ఒకవేళ (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 	    {
-		if (did_white)
-		    continue;
+		ఒకవేళ (did_white)
+		    కొనసాగు;
 		c = ' ';
 		did_white = TRUE;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		did_white = FALSE;
-		if (!spell_iswordp_nmw(t, curwin))
-		    continue;
+		ఒకవేళ (!spell_iswordp_nmw(t, curwin))
+		    కొనసాగు;
 	    }
 	}
-	word[wordlen++] = c;
+	మాట[wordlen++] = c;
     }
-    word[wordlen] = NUL;
+    మాట[wordlen] = NUL;
 
     /*
      * This algorithm comes from Aspell phonet.cpp.
@@ -3635,232 +3635,232 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    అయితే ((c = మాట[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
-	n = slang->sl_sal_first[c & 0xff];
+	n = slang->sl_sal_మొదటి[c & 0xff];
 	z0 = 0;
 
-	if (n >= 0)
+	ఒకవేళ (n >= 0)
 	{
 	    // Check all rules for the same index byte.
 	    // If c is 0x300 need extra check for the end of the array, as
 	    // (c & 0xff) is NUL.
-	    for (; n < slang->sl_sal.ga_len
+	    కొరకు (; n < slang->sl_sal.ga_len
 			&& ((ws = smp[n].sm_lead_w)[0] & 0xff) == (c & 0xff)
 							 && ws[0] != NUL; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
-		if (c != ws[0])
-		    continue;
+		ఒకవేళ (c != ws[0])
+		    కొనసాగు;
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		ఒకవేళ (k > 1)
 		{
-		    if (word[i + 1] != ws[1])
-			continue;
-		    if (k > 2)
+		    ఒకవేళ (మాట[i + 1] != ws[1])
+			కొనసాగు;
+		    ఒకవేళ (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != ws[j])
-				break;
-			if (j < k)
-			    continue;
+			కొరకు (j = 2; j < k; ++j)
+			    ఒకవేళ (మాట[i + j] != ws[j])
+				ఆపు;
+			ఒకవేళ (j < k)
+			    కొనసాగు;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof_w) != NULL)
+		ఒకవేళ ((pf = smp[n].sm_oneof_w) != ఖాళీ)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    అయితే (*pf != NUL && *pf != మాట[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    ఒకవేళ (*pf == NUL)
+			కొనసాగు;
 		    ++k;
 		}
-		s = smp[n].sm_rules;
+		s = smp[n].sm_నియమాలు;
 		pri = 5;    // default priority
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		అయితే (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		ఒకవేళ (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		ఒకవేళ (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		ఒకవేళ (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		ఒకవేళ (*s == NUL
 			|| (*s == '^'
-			    && (i == 0 || !(word[i - 1] == ' '
-				    || spell_iswordp_w(word + i - 1, curwin)))
+			    && (i == 0 || !(మాట[i - 1] == ' '
+				    || spell_iswordp_w(మాట + i - 1, curwin)))
 			    && (*(s + 1) != '$'
-				|| (!spell_iswordp_w(word + i + k0, curwin))))
+				|| (!spell_iswordp_w(మాట + i + k0, curwin))))
 			|| (*s == '$' && i > 0
-			    && spell_iswordp_w(word + i - 1, curwin)
-			    && (!spell_iswordp_w(word + i + k0, curwin))))
+			    && spell_iswordp_w(మాట + i - 1, curwin)
+			    && (!spell_iswordp_w(మాట + i + k0, curwin))))
 		{
 		    // search for followup rules, if:
 		    // followup and k > 1  and  NO '-' in searchstring
-		    c0 = word[i + k - 1];
-		    n0 = slang->sl_sal_first[c0 & 0xff];
+		    c0 = మాట[i + k - 1];
+		    n0 = slang->sl_sal_మొదటి[c0 & 0xff];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
-					   && p0 != '-' && word[i + k] != NUL)
+		    ఒకవేళ (slang->sl_followup && k > 1 && n0 >= 0
+					   && p0 != '-' && మాట[i + k] != NUL)
 		    {
 			// Test follow-up rule for "word[i + k]"; loop over
 			// all entries with the same index byte.
-			for ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
+			కొరకు ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
 							 == (c0 & 0xff); ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
-			    if (c0 != ws[0])
-				continue;
+			    ఒకవేళ (c0 != ws[0])
+				కొనసాగు;
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    ఒకవేళ (k0 > 1)
 			    {
-				if (word[i + k] != ws[1])
-				    continue;
-				if (k0 > 2)
+				ఒకవేళ (మాట[i + k] != ws[1])
+				    కొనసాగు;
+				ఒకవేళ (k0 > 2)
 				{
-				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != ws[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    pf = మాట + i + k + 1;
+				    కొరకు (j = 2; j < k0; ++j)
+					ఒకవేళ (*pf++ != ws[j])
+					    ఆపు;
+				    ఒకవేళ (j < k0)
+					కొనసాగు;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof_w) != NULL)
+			    ఒకవేళ ((pf = smp[n0].sm_oneof_w) != ఖాళీ)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				అయితే (*pf != NUL && *pf != మాట[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				ఒకవేళ (*pf == NUL)
+				    కొనసాగు;
 				++k0;
 			    }
 
 			    p0 = 5;
-			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    s = smp[n0].sm_నియమాలు;
+			    అయితే (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    ఒకవేళ (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    ఒకవేళ (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    ఒకవేళ (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
-					 && !spell_iswordp_w(word + i + k0,
+					 && !spell_iswordp_w(మాట + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				ఒకవేళ (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    కొనసాగు;
 
-				if (p0 < pri)
+				ఒకవేళ (p0 < pri)
 				    // priority too low
-				    continue;
+				    కొనసాగు;
 				// rule fits; stop search
-				break;
+				ఆపు;
 			    }
 			}
 
-			if (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
+			ఒకవేళ (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
 							       == (c0 & 0xff))
-			    continue;
+			    కొనసాగు;
 		    }
 
 		    // replace string
-		    ws = smp[n].sm_to_w;
-		    s = smp[n].sm_rules;
-		    p0 = (vim_strchr(s, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    ws = smp[n].sm_గమ్యం_w;
+		    s = smp[n].sm_నియమాలు;
+		    p0 = (vim_strchr(s, '<') != ఖాళీ) ? 1 : 0;
+		    ఒకవేళ (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && ws != NULL && *ws != NUL
+			ఒకవేళ (reslen > 0 && ws != ఖాళీ && *ws != NUL
 				&& (wres[reslen - 1] == c
 						    || wres[reslen - 1] == *ws))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && word[i + k0] != NUL)
+			ఒకవేళ (ws != ఖాళీ)
+			    అయితే (*ws != NUL && మాట[i + k0] != NUL)
 			    {
-				word[i + k0] = *ws;
+				మాట[i + k0] = *ws;
 				k0++;
 				ws++;
 			    }
-			if (k > k0)
-			    mch_memmove(word + i + k0, word + i + k,
-				    sizeof(int) * (wordlen - (i + k) + 1));
+			ఒకవేళ (k > k0)
+			    mch_memmove(మాట + i + k0, మాట + i + k,
+				    పరిమాణం(పూర్ణాంకం) * (wordlen - (i + k) + 1));
 
 			// new "actual letter"
-			c = word[i];
+			c = మాట[i];
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && ws[1] != NUL
+			ఒకవేళ (ws != ఖాళీ)
+			    అయితే (*ws != NUL && ws[1] != NUL
 							  && reslen < MAXWLEN)
 			    {
-				if (reslen == 0 || wres[reslen - 1] != *ws)
+				ఒకవేళ (reslen == 0 || wres[reslen - 1] != *ws)
 				    wres[reslen++] = *ws;
 				ws++;
 			    }
 			// new "actual letter"
-			if (ws == NULL)
+			ఒకవేళ (ws == ఖాళీ)
 			    c = NUL;
-			else
+			లేకపోతే
 			    c = *ws;
-			if (strstr((char *)s, "^^") != NULL)
+			ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)s, "^^") != ఖాళీ)
 			{
-			    if (c != NUL && reslen < MAXWLEN)
+			    ఒకవేళ (c != NUL && reslen < MAXWLEN)
 				wres[reslen++] = c;
-			    mch_memmove(word, word + i + 1,
-				       sizeof(int) * (wordlen - (i + 1) + 1));
+			    mch_memmove(మాట, మాట + i + 1,
+				       పరిమాణం(పూర్ణాంకం) * (wordlen - (i + 1) + 1));
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	లేకపోతే ఒకవేళ (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	ఒకవేళ (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN && c != NUL
+	    ఒకవేళ (k && !p0 && reslen < MAXWLEN && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || wres[reslen - 1] != c))
 		// condense only double letters
@@ -3874,11 +3874,11 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 
     // Convert wide characters in "wres" to a multi-byte string in "res".
     l = 0;
-    for (n = 0; n < reslen; ++n)
+    కొరకు (n = 0; n < reslen; ++n)
     {
 	l += mb_char2bytes(wres[n], res + l);
-	if (l + MB_MAXBYTES > MAXWLEN)
-	    break;
+	ఒకవేళ (l + MB_MAXBYTES > MAXWLEN)
+	    ఆపు;
     }
     res[l] = NUL;
 }
@@ -3886,68 +3886,68 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 /*
  * ":spellinfo"
  */
-    void
-ex_spellinfo(exarg_T *eap UNUSED)
+    శూన్య
+ex_spellinfo(exarg_T *eap వాడని)
 {
-    int		lpi;
+    పూర్ణాంకం		lpi;
     langp_T	*lp;
     char_u	*p;
 
-    if (no_spell_checking(curwin))
-	return;
+    ఒకవేళ (no_spell_checking(curwin))
+	తిరిగి;
 
-    msg_start();
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
+    సందేశం_ప్రారంభం();
+    కొరకు (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
     {
-	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	msg_puts("file: ");
-	msg_puts((char *)lp->lp_slang->sl_fname);
-	msg_putchar('\n');
+	lp = LANGP_నమోదు(curwin->w_s->b_langp, lpi);
+	సందేశం_puts("file: ");
+	సందేశం_puts((అక్షరం *)lp->lp_slang->sl_fname);
+	సందేశం_putchar('\n');
 	p = lp->lp_slang->sl_info;
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    msg_puts((char *)p);
-	    msg_putchar('\n');
+	    సందేశం_puts((అక్షరం *)p);
+	    సందేశం_putchar('\n');
 	}
     }
-    msg_end();
+    సందేశం_చివర();
 }
 
-#define DUMPFLAG_KEEPCASE   1	// round 2: keep-case tree
-#define DUMPFLAG_COUNT	    2	// include word count
-#define DUMPFLAG_ICASE	    4	// ignore case when finding matches
-#define DUMPFLAG_ONECAP	    8	// pattern starts with capital
-#define DUMPFLAG_ALLCAP	    16	// pattern is all capitals
+#నిర్వచించు DUMPFLAG_KEEPCASE   1	// round 2: keep-case tree
+#నిర్వచించు DUMPFLAG_లెక్క	    2	// include word count
+#నిర్వచించు DUMPFLAG_ICASE	    4	// ignore case when finding matches
+#నిర్వచించు DUMPFLAG_ONECAP	    8	// pattern starts with capital
+#నిర్వచించు DUMPFLAG_ALLCAP	    16	// pattern is all capitals
 
 /*
  * ":spelldump"
  */
-    void
+    శూన్య
 ex_spelldump(exarg_T *eap)
 {
     char_u  *spl;
-    long    dummy;
+    దీర్ఘ    dummy;
 
-    if (no_spell_checking(curwin))
-	return;
-    (void)get_option_value((char_u*)"spl", &dummy, &spl, NULL, OPT_LOCAL);
+    ఒకవేళ (no_spell_checking(curwin))
+	తిరిగి;
+    (శూన్య)get_option_విలువ((char_u*)"spl", &dummy, &spl, ఖాళీ, OPT_LOCAL);
 
     // Create a new empty buffer in a new window.
     do_cmdline_cmd((char_u *)"new");
 
     // enable spelling locally in the new window
-    set_option_value_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
-    set_option_value_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
+    సమితి_option_విలువ_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
+    సమితి_option_విలువ_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
     vim_free(spl);
 
-    if (!BUFEMPTY())
-	return;
+    ఒకవేళ (!BUFEMPTY())
+	తిరిగి;
 
-    spell_dump_compl(NULL, 0, NULL, eap->forceit ? DUMPFLAG_COUNT : 0);
+    spell_dump_compl(ఖాళీ, 0, ఖాళీ, eap->forceit ? DUMPFLAG_లెక్క : 0);
 
     // Delete the empty line that we started with.
-    if (curbuf->b_ml.ml_line_count > 1)
-	ml_delete(curbuf->b_ml.ml_line_count);
+    ఒకవేళ (curbuf->b_ml.ml_పంక్తి_లెక్క > 1)
+	ml_delete(curbuf->b_ml.ml_పంక్తి_లెక్క);
 
     redraw_later(UPD_NOT_VALID);
 }
@@ -3958,178 +3958,178 @@ ex_spelldump(exarg_T *eap)
  *	"ic" and "dir" are not used.
  * 2. When "pat" is not NULL: add matching words to insert mode completion.
  */
-    void
+    శూన్య
 spell_dump_compl(
     char_u	*pat,	    // leading part of the word
-    int		ic,	    // ignore case
-    int		*dir,	    // direction for adding matches
-    int		dumpflags_arg)	// DUMPFLAG_*
+    పూర్ణాంకం		ic,	    // ignore case
+    పూర్ణాంకం		*dir,	    // direction for adding matches
+    పూర్ణాంకం		dumpflags_arg)	// DUMPFLAG_*
 {
     langp_T	*lp;
     slang_T	*slang;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
-    char_u	word[MAXWLEN];
-    int		c;
+    పూర్ణాంకం		curi[MAXWLEN];
+    char_u	మాట[MAXWLEN];
+    పూర్ణాంకం		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = 0;
-    int		round;
-    int		depth;
-    int		n;
-    int		flags;
-    char_u	*region_names = NULL;	    // region names being used
-    int		do_region = TRUE;	    // dump region names and numbers
+    పూర్ణాంకం		విడత;
+    పూర్ణాంకం		లోతు;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		flags;
+    char_u	*region_పేర్లు = ఖాళీ;	    // region names being used
+    పూర్ణాంకం		do_region = TRUE;	    // dump region names and numbers
     char_u	*p;
-    int		lpi;
-    int		dumpflags = dumpflags_arg;
-    int		patlen;
+    పూర్ణాంకం		lpi;
+    పూర్ణాంకం		dumpflags = dumpflags_arg;
+    పూర్ణాంకం		patlen;
 
     // When ignoring case or when the pattern starts with capital pass this on
     // to dump_word().
-    if (pat != NULL)
+    ఒకవేళ (pat != ఖాళీ)
     {
-	if (ic)
+	ఒకవేళ (ic)
 	    dumpflags |= DUMPFLAG_ICASE;
-	else
+	లేకపోతే
 	{
-	    n = captype(pat, NULL);
-	    if (n == WF_ONECAP)
+	    n = captype(pat, ఖాళీ);
+	    ఒకవేళ (n == WF_ONECAP)
 		dumpflags |= DUMPFLAG_ONECAP;
-	    else if (n == WF_ALLCAP && (int)STRLEN(pat) > mb_ptr2len(pat))
+	    లేకపోతే ఒకవేళ (n == WF_ALLCAP && (పూర్ణాంకం)STRLEN(pat) > mb_ptr2len(pat))
 		dumpflags |= DUMPFLAG_ALLCAP;
 	}
     }
 
     // Find out if we can support regions: All languages must support the same
     // regions or none at all.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    కొరకు (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
-	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
+	lp = LANGP_నమోదు(curwin->w_s->b_langp, lpi);
 	p = lp->lp_slang->sl_regions;
-	if (p[0] != 0)
+	ఒకవేళ (p[0] != 0)
 	{
-	    if (region_names == NULL)	    // first language with regions
-		region_names = p;
-	    else if (STRCMP(region_names, p) != 0)
+	    ఒకవేళ (region_పేర్లు == ఖాళీ)	    // first language with regions
+		region_పేర్లు = p;
+	    లేకపోతే ఒకవేళ (STRCMP(region_పేర్లు, p) != 0)
 	    {
 		do_region = FALSE;	    // region names are different
-		break;
+		ఆపు;
 	    }
 	}
     }
 
-    if (do_region && region_names != NULL && pat == NULL)
+    ఒకవేళ (do_region && region_పేర్లు != ఖాళీ && pat == ఖాళీ)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "/regions=%s", region_names);
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, "/regions=%s", region_పేర్లు);
 	ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
     }
-    else
+    లేకపోతే
 	do_region = FALSE;
 
     /*
      * Loop over all files loaded for the entries in 'spelllang'.
      */
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    కొరకు (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
-	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
+	lp = LANGP_నమోదు(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_fbyts == NULL)	    // reloading failed
-	    continue;
+	ఒకవేళ (slang->sl_fbyts == ఖాళీ)	    // reloading failed
+	    కొనసాగు;
 
-	if (pat == NULL)
+	ఒకవేళ (pat == ఖాళీ)
 	{
-	    vim_snprintf((char *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
 	    ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
 	}
 
 	// When matching with a pattern and there are no prefixes only use
 	// parts of the tree that match "pat".
-	if (pat != NULL && slang->sl_pbyts == NULL)
-	    patlen = (int)STRLEN(pat);
-	else
+	ఒకవేళ (pat != ఖాళీ && slang->sl_pbyts == ఖాళీ)
+	    patlen = (పూర్ణాంకం)STRLEN(pat);
+	లేకపోతే
 	    patlen = -1;
 
 	// round 1: case-folded tree
 	// round 2: keep-case tree
-	for (round = 1; round <= 2; ++round)
+	కొరకు (విడత = 1; విడత <= 2; ++విడత)
 	{
-	    if (round == 1)
+	    ఒకవేళ (విడత == 1)
 	    {
 		dumpflags &= ~DUMPFLAG_KEEPCASE;
 		byts = slang->sl_fbyts;
 		idxs = slang->sl_fidxs;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		dumpflags |= DUMPFLAG_KEEPCASE;
 		byts = slang->sl_kbyts;
 		idxs = slang->sl_kidxs;
 	    }
-	    if (byts == NULL)
-		continue;		// array is empty
+	    ఒకవేళ (byts == ఖాళీ)
+		కొనసాగు;		// array is empty
 
-	    depth = 0;
+	    లోతు = 0;
 	    arridx[0] = 0;
 	    curi[0] = 1;
-	    while (depth >= 0 && !got_int
-				  && (pat == NULL || !ins_compl_interrupted()))
+	    అయితే (లోతు >= 0 && !got_int
+				  && (pat == ఖాళీ || !ins_compl_interrupted()))
 	    {
-		if (curi[depth] > byts[arridx[depth]])
+		ఒకవేళ (curi[లోతు] > byts[arridx[లోతు]])
 		{
 		    // Done all bytes at this node, go up one level.
-		    --depth;
-		    line_breakcheck();
-		    ins_compl_check_keys(50, FALSE);
+		    --లోతు;
+		    పంక్తి_breakcheck();
+		    ins_compl_check_కీలకాలు(50, FALSE);
 		}
-		else
+		లేకపోతే
 		{
 		    // Do one more byte at this node.
-		    n = arridx[depth] + curi[depth];
-		    ++curi[depth];
+		    n = arridx[లోతు] + curi[లోతు];
+		    ++curi[లోతు];
 		    c = byts[n];
-		    if (c == 0 || depth >= MAXWLEN - 1)
+		    ఒకవేళ (c == 0 || లోతు >= MAXWLEN - 1)
 		    {
 			// End of word or reached maximum length, deal with the
 			// word.
 			// Don't use keep-case words in the fold-case tree,
 			// they will appear in the keep-case tree.
 			// Only use the word when the region matches.
-			flags = (int)idxs[n];
-			if ((round == 2 || (flags & WF_KEEPCAP) == 0)
+			flags = (పూర్ణాంకం)idxs[n];
+			ఒకవేళ ((విడత == 2 || (flags & WF_KEEPCAP) == 0)
 				&& (flags & WF_NEEDCOMP) == 0
 				&& (do_region
 				    || (flags & WF_REGION) == 0
-				    || (((unsigned)flags >> 16)
+				    || (((గుర్తులేని)flags >> 16)
 						       & lp->lp_region) != 0))
 			{
-			    word[depth] = NUL;
-			    if (!do_region)
+			    మాట[లోతు] = NUL;
+			    ఒకవేళ (!do_region)
 				flags &= ~WF_REGION;
 
 			    // Dump the basic word if there is no prefix or
 			    // when it's the first one.
-			    c = (unsigned)flags >> 24;
-			    if (c == 0 || curi[depth] == 2)
+			    c = (గుర్తులేని)flags >> 24;
+			    ఒకవేళ (c == 0 || curi[లోతు] == 2)
 			    {
-				dump_word(slang, word, pat, dir,
+				dump_మాట(slang, మాట, pat, dir,
 						      dumpflags, flags, lnum);
-				if (pat == NULL)
+				ఒకవేళ (pat == ఖాళీ)
 				    ++lnum;
 			    }
 
 			    // Apply the prefix, if there is one.
-			    if (c != 0)
-				lnum = dump_prefixes(slang, word, pat, dir,
+			    ఒకవేళ (c != 0)
+				lnum = dump_prefixes(slang, మాట, pat, dir,
 						      dumpflags, flags, lnum);
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Normal char, go one level deeper.
-			word[depth++] = c;
-			arridx[depth] = idxs[n];
-			curi[depth] = 1;
+			మాట[లోతు++] = c;
+			arridx[లోతు] = idxs[n];
+			curi[లోతు] = 1;
 
 			// Check if this character matches with the pattern.
 			// If not skip the whole tree below it.
@@ -4137,9 +4137,9 @@ spell_dump_compl(
 			// proper case later.  This isn't exactly right when
 			// length changes for multi-byte characters with
 			// ignore case...
-			if (depth <= patlen
-					&& MB_STRNICMP(word, pat, depth) != 0)
-			    --depth;
+			ఒకవేళ (లోతు <= patlen
+					&& MB_STRNICMP(మాట, pat, లోతు) != 0)
+			    --లోతు;
 		    }
 		}
 	    }
@@ -4151,86 +4151,86 @@ spell_dump_compl(
  * Dump one word: apply case modifications and append a line to the buffer.
  * When "lnum" is zero add insert mode completion.
  */
-    static void
-dump_word(
+    స్థిర శూన్య
+dump_మాట(
     slang_T	*slang,
-    char_u	*word,
+    char_u	*మాట,
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		wordflags,
+    పూర్ణాంకం		*dir,
+    పూర్ణాంకం		dumpflags,
+    పూర్ణాంకం		wordflags,
     linenr_T	lnum)
 {
-    int		keepcap = FALSE;
+    పూర్ణాంకం		keepcap = FALSE;
     char_u	*p;
     char_u	*tw;
     char_u	cword[MAXWLEN];
     char_u	badword[MAXWLEN + 10];
-    int		i;
-    int		flags = wordflags;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		flags = wordflags;
 
-    if (dumpflags & DUMPFLAG_ONECAP)
+    ఒకవేళ (dumpflags & DUMPFLAG_ONECAP)
 	flags |= WF_ONECAP;
-    if (dumpflags & DUMPFLAG_ALLCAP)
+    ఒకవేళ (dumpflags & DUMPFLAG_ALLCAP)
 	flags |= WF_ALLCAP;
 
-    if ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
+    ఒకవేళ ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
     {
 	// Need to fix case according to "flags".
-	make_case_word(word, cword, flags);
+	make_case_మాట(మాట, cword, flags);
 	p = cword;
     }
-    else
+    లేకపోతే
     {
-	p = word;
-	if ((dumpflags & DUMPFLAG_KEEPCASE)
-		&& ((captype(word, NULL) & WF_KEEPCAP) == 0
+	p = మాట;
+	ఒకవేళ ((dumpflags & DUMPFLAG_KEEPCASE)
+		&& ((captype(మాట, ఖాళీ) & WF_KEEPCAP) == 0
 						 || (flags & WF_FIXCAP) != 0))
 	    keepcap = TRUE;
     }
     tw = p;
 
-    if (pat == NULL)
+    ఒకవేళ (pat == ఖాళీ)
     {
 	// Add flags and regions after a slash.
-	if ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
+	ఒకవేళ ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
 	{
 	    STRCPY(badword, p);
 	    STRCAT(badword, "/");
-	    if (keepcap)
+	    ఒకవేళ (keepcap)
 		STRCAT(badword, "=");
-	    if (flags & WF_BANNED)
+	    ఒకవేళ (flags & WF_BANNED)
 		STRCAT(badword, "!");
-	    else if (flags & WF_RARE)
+	    లేకపోతే ఒకవేళ (flags & WF_RARE)
 		STRCAT(badword, "?");
-	    if (flags & WF_REGION)
-		for (i = 0; i < 7; ++i)
-		    if (flags & (0x10000 << i))
-			sprintf((char *)badword + STRLEN(badword), "%d", i + 1);
+	    ఒకవేళ (flags & WF_REGION)
+		కొరకు (i = 0; i < 7; ++i)
+		    ఒకవేళ (flags & (0x10000 << i))
+			sprintf((అక్షరం *)badword + STRLEN(badword), "%d", i + 1);
 	    p = badword;
 	}
 
-	if (dumpflags & DUMPFLAG_COUNT)
+	ఒకవేళ (dumpflags & DUMPFLAG_లెక్క)
 	{
 	    hashitem_T  *hi;
 
 	    // Include the word count for ":spelldump!".
-	    hi = hash_find(&slang->sl_wordcount, tw);
-	    if (!HASHITEM_EMPTY(hi))
+	    hi = hash_కనుగొను(&slang->sl_wordcount, tw);
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "%s\t%d",
-						     tw, HI2WC(hi)->wc_count);
+		vim_snprintf((అక్షరం *)IObuff, IOSIZE, "%s\t%d",
+						     tw, HI2WC(hi)->wc_లెక్క);
 		p = IObuff;
 	    }
 	}
 
 	ml_append(lnum, p, (colnr_T)0, FALSE);
     }
-    else if (((dumpflags & DUMPFLAG_ICASE)
+    లేకపోతే ఒకవేళ (((dumpflags & DUMPFLAG_ICASE)
 		    ? MB_STRNICMP(p, pat, STRLEN(pat)) == 0
 		    : STRNCMP(p, pat, STRLEN(pat)) == 0)
-		&& ins_compl_add_infercase(p, (int)STRLEN(p),
-					  p_ic, NULL, *dir, FALSE, 0) == OK)
+		&& ins_compl_కూడు_infercase(p, (పూర్ణాంకం)STRLEN(p),
+					  p_ic, ఖాళీ, *dir, FALSE, 0) == OK)
 	// if dir was BACKWARD then honor it just once
 	*dir = FORWARD;
 }
@@ -4241,116 +4241,116 @@ dump_word(
  * When "lnum" is zero add insert mode completion.
  * Return the updated line number.
  */
-    static linenr_T
+    స్థిర linenr_T
 dump_prefixes(
     slang_T	*slang,
-    char_u	*word,	    // case-folded word
+    char_u	*మాట,	    // case-folded word
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		flags,	    // flags with prefix ID
+    పూర్ణాంకం		*dir,
+    పూర్ణాంకం		dumpflags,
+    పూర్ణాంకం		flags,	    // flags with prefix ID
     linenr_T	startlnum)
 {
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
-    char_u	prefix[MAXWLEN];
-    char_u	word_up[MAXWLEN];
-    int		has_word_up = FALSE;
-    int		c;
+    పూర్ణాంకం		curi[MAXWLEN];
+    char_u	ఉపసర్గ[MAXWLEN];
+    char_u	మాట_పైకి[MAXWLEN];
+    పూర్ణాంకం		has_మాట_పైకి = FALSE;
+    పూర్ణాంకం		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = startlnum;
-    int		depth;
-    int		n;
-    int		len;
-    int		i;
+    పూర్ణాంకం		లోతు;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
 
     // If the word starts with a lower-case letter make the word with an
     // upper-case letter in word_up[].
-    c = PTR2CHAR(word);
-    if (SPELL_TOUPPER(c) != c)
+    c = PTR2CHAR(మాట);
+    ఒకవేళ (SPELL_TOUPPER(c) != c)
     {
-	onecap_copy(word, word_up, TRUE);
-	has_word_up = TRUE;
+	onecap_copy(మాట, మాట_పైకి, TRUE);
+	has_మాట_పైకి = TRUE;
     }
 
     byts = slang->sl_pbyts;
     idxs = slang->sl_pidxs;
-    if (byts != NULL)		// array not is empty
+    ఒకవేళ (byts != ఖాళీ)		// array not is empty
     {
 	/*
 	 * Loop over all prefixes, building them byte-by-byte in prefix[].
 	 * When at the end of a prefix check that it supports "flags".
 	 */
-	depth = 0;
+	లోతు = 0;
 	arridx[0] = 0;
 	curi[0] = 1;
-	while (depth >= 0 && !got_int)
+	అయితే (లోతు >= 0 && !got_int)
 	{
-	    n = arridx[depth];
+	    n = arridx[లోతు];
 	    len = byts[n];
-	    if (curi[depth] > len)
+	    ఒకవేళ (curi[లోతు] > len)
 	    {
 		// Done all bytes at this node, go up one level.
-		--depth;
-		line_breakcheck();
+		--లోతు;
+		పంక్తి_breakcheck();
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Do one more byte at this node.
-		n += curi[depth];
-		++curi[depth];
+		n += curi[లోతు];
+		++curi[లోతు];
 		c = byts[n];
-		if (c == 0)
+		ఒకవేళ (c == 0)
 		{
 		    // End of prefix, find out how many IDs there are.
-		    for (i = 1; i < len; ++i)
-			if (byts[n + i] != 0)
-			    break;
-		    curi[depth] += i - 1;
+		    కొరకు (i = 1; i < len; ++i)
+			ఒకవేళ (byts[n + i] != 0)
+			    ఆపు;
+		    curi[లోతు] += i - 1;
 
-		    c = valid_word_prefix(i, n, flags, word, slang, FALSE);
-		    if (c != 0)
+		    c = valid_మాట_ఉపసర్గ(i, n, flags, మాట, slang, FALSE);
+		    ఒకవేళ (c != 0)
 		    {
-			vim_strncpy(prefix + depth, word, MAXWLEN - depth - 1);
-			dump_word(slang, prefix, pat, dir, dumpflags,
+			vim_strncpy(ఉపసర్గ + లోతు, మాట, MAXWLEN - లోతు - 1);
+			dump_మాట(slang, ఉపసర్గ, pat, dir, dumpflags,
 				(c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			if (lnum != 0)
+			ఒకవేళ (lnum != 0)
 			    ++lnum;
 		    }
 
 		    // Check for prefix that matches the word when the
 		    // first letter is upper-case, but only if the prefix has
 		    // a condition.
-		    if (has_word_up)
+		    ఒకవేళ (has_మాట_పైకి)
 		    {
-			c = valid_word_prefix(i, n, flags, word_up, slang,
+			c = valid_మాట_ఉపసర్గ(i, n, flags, మాట_పైకి, slang,
 									TRUE);
-			if (c != 0)
+			ఒకవేళ (c != 0)
 			{
-			    vim_strncpy(prefix + depth, word_up,
-							 MAXWLEN - depth - 1);
-			    dump_word(slang, prefix, pat, dir, dumpflags,
+			    vim_strncpy(ఉపసర్గ + లోతు, మాట_పైకి,
+							 MAXWLEN - లోతు - 1);
+			    dump_మాట(slang, ఉపసర్గ, pat, dir, dumpflags,
 				    (c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			    if (lnum != 0)
+			    ఒకవేళ (lnum != 0)
 				++lnum;
 			}
 		    }
 		}
-		else if (depth < MAXWLEN - 1)
+		లేకపోతే ఒకవేళ (లోతు < MAXWLEN - 1)
 		{
 		    // Normal char, go one level deeper.
-		    prefix[depth++] = c;
-		    arridx[depth] = idxs[n];
-		    curi[depth] = 1;
+		    ఉపసర్గ[లోతు++] = c;
+		    arridx[లోతు] = idxs[n];
+		    curi[లోతు] = 1;
 		}
 	    }
 	}
     }
 
-    return lnum;
+    తిరిగి lnum;
 }
 
 /*
@@ -4358,13 +4358,13 @@ dump_prefixes(
  * Uses the spell-checking word characters.
  */
     char_u *
-spell_to_word_end(char_u *start, win_T *win)
+spell_గమ్యం_మాట_చివర(char_u *ప్రారంభం, win_T *win)
 {
-    char_u  *p = start;
+    char_u  *p = ప్రారంభం;
 
-    while (*p != NUL && spell_iswordp(p, win))
+    అయితే (*p != NUL && spell_iswordp(p, win))
 	MB_PTR_ADV(p);
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -4374,48 +4374,48 @@ spell_to_word_end(char_u *start, win_T *win)
  * the word in front of the cursor.
  * Returns the column number of the word.
  */
-    int
-spell_word_start(int startcol)
+    పూర్ణాంకం
+spell_మాట_ప్రారంభం(పూర్ణాంకం startcol)
 {
-    char_u	*line;
+    char_u	*పంక్తి;
     char_u	*p;
-    int		col = 0;
+    పూర్ణాంకం		నిలువు = 0;
 
-    if (no_spell_checking(curwin))
-	return startcol;
+    ఒకవేళ (no_spell_checking(curwin))
+	తిరిగి startcol;
 
     // Find a word character before "startcol".
-    line = ml_get_curline();
-    for (p = line + startcol; p > line; )
+    పంక్తి = ml_get_curline();
+    కొరకు (p = పంక్తి + startcol; p > పంక్తి; )
     {
-	MB_PTR_BACK(line, p);
-	if (spell_iswordp_nmw(p, curwin))
-	    break;
+	MB_PTR_వెనుక(పంక్తి, p);
+	ఒకవేళ (spell_iswordp_nmw(p, curwin))
+	    ఆపు;
     }
 
     // Go back to start of the word.
-    while (p > line)
+    అయితే (p > పంక్తి)
     {
-	col = (int)(p - line);
-	MB_PTR_BACK(line, p);
-	if (!spell_iswordp(p, curwin))
-	    break;
-	col = 0;
+	నిలువు = (పూర్ణాంకం)(p - పంక్తి);
+	MB_PTR_వెనుక(పంక్తి, p);
+	ఒకవేళ (!spell_iswordp(p, curwin))
+	    ఆపు;
+	నిలువు = 0;
     }
 
-    return col;
+    తిరిగి నిలువు;
 }
 
 /*
  * Need to check for 'spellcapcheck' now, the word is removed before
  * expand_spelling() is called.  Therefore the ugly global variable.
  */
-static int spell_expand_need_cap;
+స్థిర పూర్ణాంకం spell_expand_need_cap;
 
-    void
-spell_expand_check_cap(colnr_T col)
+    శూన్య
+spell_expand_check_cap(colnr_T నిలువు)
 {
-    spell_expand_need_cap = check_need_cap(curwin, curwin->w_cursor.lnum, col);
+    spell_expand_need_cap = check_need_cap(curwin, curwin->w_cursor.lnum, నిలువు);
 }
 
 /*
@@ -4424,102 +4424,102 @@ spell_expand_check_cap(colnr_T col)
  * Returns the number of matches.  The matches are in "matchp[]", array of
  * allocated strings.
  */
-    int
+    పూర్ణాంకం
 expand_spelling(
-    linenr_T	lnum UNUSED,
+    linenr_T	lnum వాడని,
     char_u	*pat,
     char_u	***matchp)
 {
     garray_T	ga;
 
     spell_suggest_list(&ga, pat, 100, spell_expand_need_cap, TRUE);
-    *matchp = ga.ga_data;
-    return ga.ga_len;
+    *matchp = ga.ga_దత్తాంశం;
+    తిరిగి ga.ga_len;
 }
 
 /*
  * Return TRUE if "val" is a valid 'spelllang' value.
  */
-    int
+    పూర్ణాంకం
 valid_spelllang(char_u *val)
 {
-    return valid_name(val, ".-_,@");
+    తిరిగి valid_name(val, ".-_,@");
 }
 
 /*
  * Return TRUE if "val" is a valid 'spellfile' value.
  */
-    int
+    పూర్ణాంకం
 valid_spellfile(char_u *val)
 {
     char_u	spf_name[MAXPATHL];
     char_u	*spf;
     char_u	*s;
-    int		l;
+    పూర్ణాంకం		l;
 
     spf = val;
-    while (*spf != NUL)
+    అయితే (*spf != NUL)
     {
 	l = copy_option_part(&spf, spf_name, MAXPATHL, ",");
-	if (l >= MAXPATHL - 4 || l < 4
+	ఒకవేళ (l >= MAXPATHL - 4 || l < 4
 				  || STRCMP(spf_name + l - 4, ".add") != 0)
-	    return FALSE;
-	for (s = spf_name; *s != NUL; ++s)
-	    if (!vim_is_fname_char(*s))
-		return FALSE;
+	    తిరిగి FALSE;
+	కొరకు (s = spf_name; *s != NUL; ++s)
+	    ఒకవేళ (!vim_is_fname_char(*s))
+		తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Handle side effects of setting 'spell' or 'spellfile'
  * Return an error message or NULL for success.
  */
-    char *
-did_set_spell_option(void)
+    అక్షరం *
+did_సమితి_spell_option(శూన్య)
 {
-    char    *errmsg = NULL;
+    అక్షరం    *errmsg = ఖాళీ;
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == curbuf && wp->w_p_spell)
+	ఒకవేళ (wp->w_బఫరు == curbuf && wp->w_p_spell)
 	{
 	    errmsg = parse_spelllang(wp);
-	    break;
+	    ఆపు;
 	}
-    return errmsg;
+    తిరిగి errmsg;
 }
 
 /*
  * Set curbuf->b_cap_prog to the regexp program for 'spellcapcheck'.
  * Return error message when failed, NULL when OK.
  */
-    char *
+    అక్షరం *
 compile_cap_prog(synblock_T *synblock)
 {
     regprog_T   *rp = synblock->b_cap_prog;
     char_u	*re;
 
-    if (synblock->b_p_spc == NULL || *synblock->b_p_spc == NUL)
-	synblock->b_cap_prog = NULL;
-    else
+    ఒకవేళ (synblock->b_p_spc == ఖాళీ || *synblock->b_p_spc == NUL)
+	synblock->b_cap_prog = ఖాళీ;
+    లేకపోతే
     {
 	// Prepend a ^ so that we only match at one column
 	re = concat_str((char_u *)"^", synblock->b_p_spc);
-	if (re != NULL)
+	ఒకవేళ (re != ఖాళీ)
 	{
 	    synblock->b_cap_prog = vim_regcomp(re, RE_MAGIC);
 	    vim_free(re);
-	    if (synblock->b_cap_prog == NULL)
+	    ఒకవేళ (synblock->b_cap_prog == ఖాళీ)
 	    {
 		synblock->b_cap_prog = rp; // restore the previous program
-		return e_invalid_argument;
+		తిరిగి e_invalid_వాదం;
 	    }
 	}
     }
 
     vim_regfree(rp);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-#endif  // FEAT_SPELL
+#అయితే_ముగింపు  // FEAT_SPELL

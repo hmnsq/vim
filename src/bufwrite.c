@@ -11,65 +11,65 @@
  * bufwrite.c: functions for writing a buffer
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+#ఒకవేళ defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
 # include <utime.h>		// for struct utimbuf
-#endif
+#అయితే_ముగింపు
 
-#define SMALLBUFSIZE	256	// size of emergency write buffer
+#నిర్వచించు SMALLBUFSIZE	256	// size of emergency write buffer
 
 /*
  * Structure to pass arguments from buf_write() to buf_write_bytes().
  */
-struct bw_info
+నిర్మాణం bw_info
 {
-    int		bw_fd;		// file descriptor
+    పూర్ణాంకం		bw_fd;		// file descriptor
     char_u	*bw_buf;	// buffer with data to be written
-    int		bw_len;		// length of data
-    int		bw_flags;	// FIO_ flags
-#ifdef FEAT_CRYPT
-    buf_T	*bw_buffer;	// buffer being written
-    int		bw_finish;	// finish encrypting
-#endif
+    పూర్ణాంకం		bw_len;		// length of data
+    పూర్ణాంకం		bw_flags;	// FIO_ flags
+#నిర్వచితమైతే FEAT_CRYPT
+    buf_T	*bw_బఫరు;	// buffer being written
+    పూర్ణాంకం		bw_ముగింపు;	// finish encrypting
+#అయితే_ముగింపు
     char_u	bw_rest[CONV_RESTLEN]; // not converted bytes
-    int		bw_restlen;	// nr of bytes in bw_rest[]
-    int		bw_first;	// first write call
+    పూర్ణాంకం		bw_restlen;	// nr of bytes in bw_rest[]
+    పూర్ణాంకం		bw_మొదటి;	// first write call
     char_u	*bw_conv_buf;	// buffer for writing converted chars
     size_t	bw_conv_buflen; // size of bw_conv_buf
-    int		bw_conv_error;	// set for conversion error
+    పూర్ణాంకం		bw_conv_error;	// set for conversion error
     linenr_T	bw_conv_error_lnum;  // first line with error or zero
-    linenr_T	bw_start_lnum;	// line number at start of buffer
-#ifdef USE_ICONV
+    linenr_T	bw_ప్రారంభం_lnum;	// line number at start of buffer
+#నిర్వచితమైతే USE_ICONV
     iconv_t	bw_iconv_fd;	// descriptor for iconv() or -1
-#endif
+#అయితే_ముగింపు
 };
 
 /*
  * Convert a Unicode character to bytes.
  * Return TRUE for an error, FALSE when it's OK.
  */
-    static int
+    స్థిర పూర్ణాంకం
 ucs2bytes(
-    unsigned	c,		// in: character
+    గుర్తులేని	c,		// in: character
     char_u	**pp,		// in/out: pointer to result
-    int		flags)		// FIO_ flags
+    పూర్ణాంకం		flags)		// FIO_ flags
 {
     char_u	*p = *pp;
-    int		error = FALSE;
-    int		cc;
+    పూర్ణాంకం		error = FALSE;
+    పూర్ణాంకం		cc;
 
 
-    if (flags & FIO_UCS4)
+    ఒకవేళ (flags & FIO_UCS4)
     {
-	if (flags & FIO_ENDIAN_L)
+	ఒకవేళ (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	    *p++ = (c >> 16);
 	    *p++ = (c >> 24);
 	}
-	else
+	లేకపోతే
 	{
 	    *p++ = (c >> 24);
 	    *p++ = (c >> 16);
@@ -77,57 +77,57 @@ ucs2bytes(
 	    *p++ = c;
 	}
     }
-    else if (flags & (FIO_UCS2 | FIO_UTF16))
+    లేకపోతే ఒకవేళ (flags & (FIO_UCS2 | FIO_UTF16))
     {
-	if (c >= 0x10000)
+	ఒకవేళ (c >= 0x10000)
 	{
-	    if (flags & FIO_UTF16)
+	    ఒకవేళ (flags & FIO_UTF16)
 	    {
 		// Make two words, ten bits of the character in each.  First
 		// word is 0xd800 - 0xdbff, second one 0xdc00 - 0xdfff
 		c -= 0x10000;
-		if (c >= 0x100000)
+		ఒకవేళ (c >= 0x100000)
 		    error = TRUE;
 		cc = ((c >> 10) & 0x3ff) + 0xd800;
-		if (flags & FIO_ENDIAN_L)
+		ఒకవేళ (flags & FIO_ENDIAN_L)
 		{
 		    *p++ = cc;
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((గుర్తులేని)cc >> 8);
 		}
-		else
+		లేకపోతే
 		{
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((గుర్తులేని)cc >> 8);
 		    *p++ = cc;
 		}
 		c = (c & 0x3ff) + 0xdc00;
 	    }
-	    else
+	    లేకపోతే
 		error = TRUE;
 	}
-	if (flags & FIO_ENDIAN_L)
+	ఒకవేళ (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	}
-	else
+	లేకపోతే
 	{
 	    *p++ = (c >> 8);
 	    *p++ = c;
 	}
     }
-    else    // Latin1
+    లేకపోతే    // Latin1
     {
-	if (c >= 0x100)
+	ఒకవేళ (c >= 0x100)
 	{
 	    error = TRUE;
 	    *p++ = 0xBF;
 	}
-	else
+	లేకపోతే
 	    *p++ = c;
     }
 
     *pp = p;
-    return error;
+    తిరిగి error;
 }
 
 /*
@@ -136,72 +136,72 @@ ucs2bytes(
  *
  * Return FAIL for failure, OK otherwise.
  */
-    static int
-buf_write_bytes(struct bw_info *ip)
+    స్థిర పూర్ణాంకం
+buf_write_బైట్లు(నిర్మాణం bw_info *ip)
 {
-    int		wlen;
+    పూర్ణాంకం		wlen;
     char_u	*buf = ip->bw_buf;	// data to write
-    int		len = ip->bw_len;	// length of data
-    int		flags = ip->bw_flags;	// extra flags
+    పూర్ణాంకం		len = ip->bw_len;	// length of data
+    పూర్ణాంకం		flags = ip->bw_flags;	// extra flags
 
     // Skip conversion when writing the crypt magic number or the BOM.
-    if (!(flags & FIO_NOCONVERT))
+    ఒకవేళ (!(flags & FIO_NOCONVERT))
     {
 	char_u		*p;
-	unsigned	c;
-	int		n;
+	గుర్తులేని	c;
+	పూర్ణాంకం		n;
 
-	if (flags & FIO_UTF8)
+	ఒకవేళ (flags & FIO_UTF8)
 	{
 	    // Convert latin1 in the buffer to UTF-8 in the file.
 	    p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; ++wlen)
+	    కొరకు (wlen = 0; wlen < len; ++wlen)
 		p += utf_char2bytes(buf[wlen], p);
 	    buf = ip->bw_conv_buf;
-	    len = (int)(p - ip->bw_conv_buf);
+	    len = (పూర్ణాంకం)(p - ip->bw_conv_buf);
 	}
-	else if (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
+	లేకపోతే ఒకవేళ (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
 	{
 	    // Convert UTF-8 bytes in the buffer to UCS-2, UCS-4, UTF-16 or
 	    // Latin1 chars in the file.
-	    if (flags & FIO_LATIN1)
+	    ఒకవేళ (flags & FIO_LATIN1)
 		p = buf;	// translate in-place (can only get shorter)
-	    else
+	    లేకపోతే
 		p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; wlen += n)
+	    కొరకు (wlen = 0; wlen < len; wlen += n)
 	    {
-		if (wlen == 0 && ip->bw_restlen != 0)
+		ఒకవేళ (wlen == 0 && ip->bw_restlen != 0)
 		{
-		    int		l;
+		    పూర్ణాంకం		l;
 
 		    // Use remainder of previous call.  Append the start of
 		    // buf[] to get a full sequence.  Might still be too
 		    // short!
 		    l = CONV_RESTLEN - ip->bw_restlen;
-		    if (l > len)
+		    ఒకవేళ (l > len)
 			l = len;
 		    mch_memmove(ip->bw_rest + ip->bw_restlen, buf, (size_t)l);
 		    n = utf_ptr2len_len(ip->bw_rest, ip->bw_restlen + l);
-		    if (n > ip->bw_restlen + len)
+		    ఒకవేళ (n > ip->bw_restlen + len)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (ip->bw_restlen + len > CONV_RESTLEN)
-			    return FAIL;
+			ఒకవేళ (ip->bw_restlen + len > CONV_RESTLEN)
+			    తిరిగి FAIL;
 			ip->bw_restlen += len;
-			break;
+			ఆపు;
 		    }
-		    if (n > 1)
+		    ఒకవేళ (n > 1)
 			c = utf_ptr2char(ip->bw_rest);
-		    else
+		    లేకపోతే
 			c = ip->bw_rest[0];
-		    if (n >= ip->bw_restlen)
+		    ఒకవేళ (n >= ip->bw_restlen)
 		    {
 			n -= ip->bw_restlen;
 			ip->bw_restlen = 0;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			ip->bw_restlen -= n;
 			mch_memmove(ip->bw_rest, ip->bw_rest + n,
@@ -209,67 +209,67 @@ buf_write_bytes(struct bw_info *ip)
 			n = 0;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    n = utf_ptr2len_len(buf + wlen, len - wlen);
-		    if (n > len - wlen)
+		    ఒకవేళ (n > len - wlen)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (len - wlen > CONV_RESTLEN)
-			    return FAIL;
+			ఒకవేళ (len - wlen > CONV_RESTLEN)
+			    తిరిగి FAIL;
 			ip->bw_restlen = len - wlen;
 			mch_memmove(ip->bw_rest, buf + wlen,
 						      (size_t)ip->bw_restlen);
-			break;
+			ఆపు;
 		    }
-		    if (n > 1)
+		    ఒకవేళ (n > 1)
 			c = utf_ptr2char(buf + wlen);
-		    else
+		    లేకపోతే
 			c = buf[wlen];
 		}
 		// Check that there is enough space
-		if (!(flags & FIO_LATIN1))
+		ఒకవేళ (!(flags & FIO_LATIN1))
 		{
 		    size_t need = (flags & FIO_UCS4) ? 4 : 2;
-		    if ((flags & FIO_UTF16) && c >= 0x10000)
+		    ఒకవేళ ((flags & FIO_UTF16) && c >= 0x10000)
 			need = 4;
 
-		    if ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
-			return FAIL;
+		    ఒకవేళ ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
+			తిరిగి FAIL;
 		}
 
-		if (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
+		ఒకవేళ (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
 		{
 		    ip->bw_conv_error = TRUE;
-		    ip->bw_conv_error_lnum = ip->bw_start_lnum;
+		    ip->bw_conv_error_lnum = ip->bw_ప్రారంభం_lnum;
 		}
-		if (c == NL)
-		    ++ip->bw_start_lnum;
+		ఒకవేళ (c == NL)
+		    ++ip->bw_ప్రారంభం_lnum;
 	    }
-	    if (flags & FIO_LATIN1)
-		len = (int)(p - buf);
-	    else
+	    ఒకవేళ (flags & FIO_LATIN1)
+		len = (పూర్ణాంకం)(p - buf);
+	    లేకపోతే
 	    {
 		buf = ip->bw_conv_buf;
-		len = (int)(p - ip->bw_conv_buf);
+		len = (పూర్ణాంకం)(p - ip->bw_conv_buf);
 	    }
 	}
 
-#ifdef MSWIN
-	else if (flags & FIO_CODEPAGE)
+#నిర్వచితమైతే MSWIN
+	లేకపోతే ఒకవేళ (flags & FIO_CODEPAGE)
 	{
 	    // Convert UTF-8 or codepage to UCS-2 and then to MS-Windows
 	    // codepage.
 	    char_u	*from;
 	    size_t	fromlen;
-	    char_u	*to;
-	    int		u8c;
+	    char_u	*గమ్యం;
+	    పూర్ణాంకం		u8c;
 	    BOOL	bad = FALSE;
-	    int		needed;
+	    పూర్ణాంకం		needed;
 
-	    if (ip->bw_restlen > 0)
+	    ఒకవేళ (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -279,124 +279,124 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    to = ip->bw_conv_buf;
-	    if (enc_utf8)
+	    గమ్యం = ip->bw_conv_buf;
+	    ఒకవేళ (enc_utf8)
 	    {
 		// Convert from UTF-8 to UCS-2, to the start of the buffer.
 		// The buffer has been allocated to be big enough.
-		while (fromlen > 0)
+		అయితే (fromlen > 0)
 		{
-		    n = (int)utf_ptr2len_len(from, (int)fromlen);
-		    if (n > (int)fromlen)	// incomplete byte sequence
-			break;
+		    n = (పూర్ణాంకం)utf_ptr2len_len(from, (పూర్ణాంకం)fromlen);
+		    ఒకవేళ (n > (పూర్ణాంకం)fromlen)	// incomplete byte sequence
+			ఆపు;
 		    u8c = utf_ptr2char(from);
-		    *to++ = (u8c & 0xff);
-		    *to++ = (u8c >> 8);
+		    *గమ్యం++ = (u8c & 0xff);
+		    *గమ్యం++ = (u8c >> 8);
 		    fromlen -= n;
 		    from += n;
 		}
 
 		// Copy remainder to ip->bw_rest[] to be used for the next
 		// call.
-		if (fromlen > CONV_RESTLEN)
+		ఒకవేళ (fromlen > CONV_RESTLEN)
 		{
 		    // weird overlong sequence
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 		mch_memmove(ip->bw_rest, from, fromlen);
-		ip->bw_restlen = (int)fromlen;
+		ip->bw_restlen = (పూర్ణాంకం)fromlen;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Convert from enc_codepage to UCS-2, to the start of the
 		// buffer.  The buffer has been allocated to be big enough.
 		ip->bw_restlen = 0;
-		needed = MultiByteToWideChar(enc_codepage,
-			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen,
-								     NULL, 0);
-		if (needed == 0)
+		needed = Multi_Byte_గమ్యం_Wide_Char(enc_codepage,
+			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (పూర్ణాంకం)fromlen,
+								     ఖాళీ, 0);
+		ఒకవేళ (needed == 0)
 		{
 		    // When conversion fails there may be a trailing byte.
-		    needed = MultiByteToWideChar(enc_codepage,
-			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen - 1,
-								     NULL, 0);
-		    if (needed == 0)
+		    needed = Multi_Byte_గమ్యం_Wide_Char(enc_codepage,
+			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (పూర్ణాంకం)fromlen - 1,
+								     ఖాళీ, 0);
+		    ఒకవేళ (needed == 0)
 		    {
 			// Conversion doesn't work.
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		    // Save the trailing byte for the next call.
 		    ip->bw_rest[0] = from[fromlen - 1];
 		    ip->bw_restlen = 1;
 		}
-		needed = MultiByteToWideChar(enc_codepage, MB_ERR_INVALID_CHARS,
-				(LPCSTR)from, (int)(fromlen - ip->bw_restlen),
-							  (LPWSTR)to, needed);
-		if (needed == 0)
+		needed = Multi_Byte_గమ్యం_Wide_Char(enc_codepage, MB_ERR_INVALID_CHARS,
+				(LPCSTR)from, (పూర్ణాంకం)(fromlen - ip->bw_restlen),
+							  (LPWSTR)గమ్యం, needed);
+		ఒకవేళ (needed == 0)
 		{
 		    // Safety check: Conversion doesn't work.
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
-		to += needed * 2;
+		గమ్యం += needed * 2;
 	    }
 
-	    fromlen = to - ip->bw_conv_buf;
-	    buf = to;
+	    fromlen = గమ్యం - ip->bw_conv_buf;
+	    buf = గమ్యం;
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	    if (FIO_GET_CP(flags) == CP_UTF8)
+	    ఒకవేళ (FIO_GET_CP(flags) == CP_UTF8)
 	    {
 		// Convert from UCS-2 to UTF-8, using the remainder of the
 		// conversion buffer.  Fails when out of space.
-		for (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
+		కొరకు (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
 		{
 		    u8c = *from++;
 		    u8c += (*from++ << 8);
-		    to += utf_char2bytes(u8c, to);
-		    if (to + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
+		    గమ్యం += utf_char2bytes(u8c, గమ్యం);
+		    ఒకవేళ (గమ్యం + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
 		    {
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		}
-		len = (int)(to - buf);
+		len = (పూర్ణాంకం)(గమ్యం - buf);
 	    }
-	    else
+	    లేకపోతే
 # endif
 	    {
 		// Convert from UCS-2 to the codepage, using the remainder of
 		// the conversion buffer.  If the conversion uses the default
 		// character "0", the data doesn't fit in this encoding, so
 		// fail.
-		len = WideCharToMultiByte(FIO_GET_CP(flags), 0,
-			(LPCWSTR)ip->bw_conv_buf, (int)fromlen / sizeof(WCHAR),
-			(LPSTR)to, (int)(ip->bw_conv_buflen - fromlen), 0,
+		len = Wide_Char_గమ్యం_Multi_Byte(FIO_GET_CP(flags), 0,
+			(LPCWSTR)ip->bw_conv_buf, (పూర్ణాంకం)fromlen / పరిమాణం(WCHAR),
+			(LPSTR)గమ్యం, (పూర్ణాంకం)(ip->bw_conv_buflen - fromlen), 0,
 									&bad);
-		if (bad)
+		ఒకవేళ (bad)
 		{
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 	    }
 	}
-#endif
+#అయితే_ముగింపు
 
-#ifdef MACOS_CONVERT
-	else if (flags & FIO_MACROMAN)
+#నిర్వచితమైతే MACOS_CONVERT
+	లేకపోతే ఒకవేళ (flags & FIO_MACROMAN)
 	{
 	    // Convert UTF-8 or latin1 to Apple MacRoman.
 	    char_u	*from;
 	    size_t	fromlen;
 
-	    if (ip->bw_restlen > 0)
+	    ఒకవేళ (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -406,126 +406,126 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    if (enc2macroman(from, fromlen,
+	    ఒకవేళ (enc2macroman(from, fromlen,
 			ip->bw_conv_buf, &len, ip->bw_conv_buflen,
 			ip->bw_rest, &ip->bw_restlen) == FAIL)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    buf = ip->bw_conv_buf;
 	}
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_ICONV
-	if (ip->bw_iconv_fd != (iconv_t)-1)
+#నిర్వచితమైతే USE_ICONV
+	ఒకవేళ (ip->bw_iconv_fd != (iconv_t)-1)
 	{
-	    const char	*from;
+	    స్థిరరాశి అక్షరం	*from;
 	    size_t	fromlen;
-	    char	*to;
+	    అక్షరం	*గమ్యం;
 	    size_t	tolen;
 
 	    // Convert with iconv().
-	    if (ip->bw_restlen > 0)
+	    ఒకవేళ (ip->bw_restlen > 0)
 	    {
-		char *fp;
+		అక్షరం *fp;
 
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
 		// conversion buffer for this.
 		fromlen = len + ip->bw_restlen;
-		fp = (char *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
+		fp = (అక్షరం *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
 		mch_memmove(fp, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(fp + ip->bw_restlen, buf, (size_t)len);
 		from = fp;
 		tolen = ip->bw_conv_buflen - fromlen;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		from = (const char *)buf;
+		from = (స్థిరరాశి అక్షరం *)buf;
 		fromlen = len;
 		tolen = ip->bw_conv_buflen;
 	    }
-	    to = (char *)ip->bw_conv_buf;
+	    గమ్యం = (అక్షరం *)ip->bw_conv_buf;
 
-	    if (ip->bw_first)
+	    ఒకవేళ (ip->bw_మొదటి)
 	    {
 		size_t	save_len = tolen;
 
 		// output the initial shift state sequence
-		(void)iconv(ip->bw_iconv_fd, NULL, NULL, &to, &tolen);
+		(శూన్య)iconv(ip->bw_iconv_fd, ఖాళీ, ఖాళీ, &గమ్యం, &tolen);
 
 		// There is a bug in iconv() on Linux (which appears to be
 		// wide-spread) which sets "to" to NULL and messes up "tolen".
-		if (to == NULL)
+		ఒకవేళ (గమ్యం == ఖాళీ)
 		{
-		    to = (char *)ip->bw_conv_buf;
+		    గమ్యం = (అక్షరం *)ip->bw_conv_buf;
 		    tolen = save_len;
 		}
-		ip->bw_first = FALSE;
+		ip->bw_మొదటి = FALSE;
 	    }
 
 	    // If iconv() has an error or there is not enough room, fail.
-	    if ((iconv(ip->bw_iconv_fd, (void *)&from, &fromlen, &to, &tolen)
+	    ఒకవేళ ((iconv(ip->bw_iconv_fd, (శూన్య *)&from, &fromlen, &గమ్యం, &tolen)
 			== (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
 						    || fromlen > CONV_RESTLEN)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 
 	    // copy remainder to ip->bw_rest[] to be used for the next call.
-	    if (fromlen > 0)
-		mch_memmove(ip->bw_rest, (void *)from, fromlen);
-	    ip->bw_restlen = (int)fromlen;
+	    ఒకవేళ (fromlen > 0)
+		mch_memmove(ip->bw_rest, (శూన్య *)from, fromlen);
+	    ip->bw_restlen = (పూర్ణాంకం)fromlen;
 
 	    buf = ip->bw_conv_buf;
-	    len = (int)((char_u *)to - ip->bw_conv_buf);
+	    len = (పూర్ణాంకం)((char_u *)గమ్యం - ip->bw_conv_buf);
 	}
-#endif
+#అయితే_ముగింపు
     }
 
-    if (ip->bw_fd < 0)
+    ఒకవేళ (ip->bw_fd < 0)
 	// Only checking conversion, which is OK if we get here.
-	return OK;
+	తిరిగి OK;
 
-#ifdef FEAT_CRYPT
-    if (flags & FIO_ENCRYPTED)
+#నిర్వచితమైతే FEAT_CRYPT
+    ఒకవేళ (flags & FIO_ENCRYPTED)
     {
 	// Encrypt the data. Do it in-place if possible, otherwise use an
 	// allocated buffer.
 # ifdef CRYPT_NOT_INPLACE
-	if (crypt_works_inplace(ip->bw_buffer->b_cryptstate))
+	ఒకవేళ (crypt_పనిచేస్తుంది_inplace(ip->bw_బఫరు->b_cryptstate))
 	{
 # endif
-	    crypt_encode_inplace(ip->bw_buffer->b_cryptstate, buf, len,
-								ip->bw_finish);
+	    crypt_encode_inplace(ip->bw_బఫరు->b_cryptstate, buf, len,
+								ip->bw_ముగింపు);
 # ifdef CRYPT_NOT_INPLACE
 	}
-	else
+	లేకపోతే
 	{
 	    char_u *outbuf;
 
 	    len = crypt_encode_alloc(curbuf->b_cryptstate, buf, len, &outbuf,
-								ip->bw_finish);
-	    if (len == 0)
-		return OK;  // Crypt layer is buffering, will flush later.
+								ip->bw_ముగింపు);
+	    ఒకవేళ (len == 0)
+		తిరిగి OK;  // Crypt layer is buffering, will flush later.
 	    wlen = write_eintr(ip->bw_fd, outbuf, len);
 	    vim_free(outbuf);
-	    return (wlen < len) ? FAIL : OK;
+	    తిరిగి (wlen < len) ? FAIL : OK;
 	}
 # endif
     }
-#endif
+#అయితే_ముగింపు
 
     wlen = write_eintr(ip->bw_fd, buf, len);
-    return (wlen < len) ? FAIL : OK;
+    తిరిగి (wlen < len) ? FAIL : OK;
 }
 
 /*
@@ -533,84 +533,84 @@ buf_write_bytes(struct bw_info *ip)
  * The size isn't checked, because using a tool like "gzip" takes care of
  * using the same timestamp but can't set the size.
  */
-    static int
+    స్థిర పూర్ణాంకం
 check_mtime(buf_T *buf, stat_T *st)
 {
-    if (buf->b_mtime_read != 0
-		  && time_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
+    ఒకవేళ (buf->b_mtime_read != 0
+		  && సమయం_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
     {
-	msg_scroll = TRUE;	    // don't overwrite messages here
-	msg_silent = 0;		    // must give this prompt
+	సందేశం_scroll = TRUE;	    // don't overwrite messages here
+	సందేశం_silent = 0;		    // must give this prompt
 	// don't use emsg() here, don't want to flush the buffers
-	msg_attr(_("WARNING: The file has been changed since reading it!!!"),
+	సందేశం_attr(_("WARNING: The file has been changed since reading it!!!"),
 						       HL_ATTR(HLF_E));
-	if (ask_yesno((char_u *)_("Do you really want to write to it"),
+	ఒకవేళ (ask_yesno((char_u *)_("Do you really want to write to it"),
 								 TRUE) == 'n')
-	    return FAIL;
-	msg_scroll = FALSE;	    // always overwrite the file message now
+	    తిరిగి FAIL;
+	సందేశం_scroll = FALSE;	    // always overwrite the file message now
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Generate a BOM in "buf[4]" for encoding "name".
  * Return the length of the BOM (zero when no BOM).
  */
-    static int
+    స్థిర పూర్ణాంకం
 make_bom(char_u *buf, char_u *name)
 {
-    int		flags;
+    పూర్ణాంకం		flags;
     char_u	*p;
 
     flags = get_fio_flags(name);
 
     // Can't put a BOM in a non-Unicode file.
-    if (flags == FIO_LATIN1 || flags == 0)
-	return 0;
+    ఒకవేళ (flags == FIO_LATIN1 || flags == 0)
+	తిరిగి 0;
 
-    if (flags == FIO_UTF8)	// UTF-8
+    ఒకవేళ (flags == FIO_UTF8)	// UTF-8
     {
 	buf[0] = 0xef;
 	buf[1] = 0xbb;
 	buf[2] = 0xbf;
-	return 3;
+	తిరిగి 3;
     }
     p = buf;
-    (void)ucs2bytes(0xfeff, &p, flags);
-    return (int)(p - buf);
+    (శూన్య)ucs2bytes(0xfeff, &p, flags);
+    తిరిగి (పూర్ణాంకం)(p - buf);
 }
 
-#ifdef UNIX
-    static void
-set_file_time(
+#నిర్వచితమైతే UNIX
+    స్థిర శూన్య
+సమితి_file_సమయం(
     char_u  *fname,
     time_t  atime,	    // access time
     time_t  mtime)	    // modification time
 {
-# if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
-    struct utimbuf  buf;
+# ఒకవేళ defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+    నిర్మాణం utimbuf  buf;
 
     buf.actime	= atime;
     buf.modtime	= mtime;
-    (void)utime((char *)fname, &buf);
-# else
-#  if defined(HAVE_UTIMES)
-    struct timeval  tvp[2];
+    (శూన్య)utime((అక్షరం *)fname, &buf);
+# లేకపోతే
+#  ఒకవేళ defined(HAVE_UTIMES)
+    నిర్మాణం timeval  tvp[2];
 
     tvp[0].tv_sec   = atime;
     tvp[0].tv_usec  = 0;
     tvp[1].tv_sec   = mtime;
     tvp[1].tv_usec  = 0;
-    (void)utimes((char *)fname, (const struct timeval *)&tvp);
+    (శూన్య)utimes((అక్షరం *)fname, (స్థిరరాశి నిర్మాణం timeval *)&tvp);
 #  endif
 # endif
 }
-#endif // UNIX
+#అయితే_ముగింపు // UNIX
 
-    char *
-new_file_message(void)
+    అక్షరం *
+new_file_సందేశం(శూన్య)
 {
-    return shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
+    తిరిగి shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
 }
 
 /*
@@ -629,111 +629,111 @@ new_file_message(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    పూర్ణాంకం
 buf_write(
     buf_T	    *buf,
     char_u	    *fname,
     char_u	    *sfname,
-    linenr_T	    start,
-    linenr_T	    end,
+    linenr_T	    ప్రారంభం,
+    linenr_T	    చివర,
     exarg_T	    *eap,		// for forced 'ff' and 'fenc', can be
 					// NULL!
-    int		    append,		// append to the file
-    int		    forceit,
-    int		    reset_changed,
-    int		    filtering)
+    పూర్ణాంకం		    append,		// append to the file
+    పూర్ణాంకం		    forceit,
+    పూర్ణాంకం		    reset_మారింది,
+    పూర్ణాంకం		    filtering)
 {
-    int		    fd;
-    char_u	    *backup = NULL;
-    int		    backup_copy = FALSE; // copy the original file?
-    int		    dobackup;
+    పూర్ణాంకం		    fd;
+    char_u	    *backup = ఖాళీ;
+    పూర్ణాంకం		    backup_copy = FALSE; // copy the original file?
+    పూర్ణాంకం		    dobackup;
     char_u	    *ffname;
-    char_u	    *wfname = NULL;	// name of file to write to
+    char_u	    *wfname = ఖాళీ;	// name of file to write to
     char_u	    *s;
     char_u	    *ptr;
     char_u	    c;
-    int		    len;
+    పూర్ణాంకం		    len;
     linenr_T	    lnum;
-    long	    nchars;
-    char_u	    *errmsg = NULL;
-    int		    errmsg_allocated = FALSE;
-    char_u	    *errnum = NULL;
-    char_u	    *buffer;
+    దీర్ఘ	    nchars;
+    char_u	    *errmsg = ఖాళీ;
+    పూర్ణాంకం		    errmsg_allocated = FALSE;
+    char_u	    *errnum = ఖాళీ;
+    char_u	    *బఫరు;
     char_u	    smallbuf[SMALLBUFSIZE];
     char_u	    *backup_ext;
-    int		    bufsize;
-    long	    perm;		    // file permissions
-    int		    retval = OK;
-    int		    newfile = FALSE;	    // TRUE if file doesn't exist yet
-    int		    msg_save = msg_scroll;
-    int		    overwriting;	    // TRUE if writing over original
-    int		    no_eol = FALSE;	    // no end-of-line written
-    int		    device = FALSE;	    // writing to a device
+    పూర్ణాంకం		    bufsize;
+    దీర్ఘ	    perm;		    // file permissions
+    పూర్ణాంకం		    retval = OK;
+    పూర్ణాంకం		    newfile = FALSE;	    // TRUE if file doesn't exist yet
+    పూర్ణాంకం		    సందేశం_save = సందేశం_scroll;
+    పూర్ణాంకం		    overwriting;	    // TRUE if writing over original
+    పూర్ణాంకం		    no_eol = FALSE;	    // no end-of-line written
+    పూర్ణాంకం		    device = FALSE;	    // writing to a device
     stat_T	    st_old;
-    int		    prev_got_int = got_int;
-    int		    checking_conversion;
-    int		    file_readonly = FALSE;  // overwritten file is read-only
-#if defined(UNIX)			    // XXX fix me sometime?
-    int		    made_writable = FALSE;  // 'w' bit has been set
-#endif
+    పూర్ణాంకం		    prev_got_int = got_int;
+    పూర్ణాంకం		    checking_conversion;
+    పూర్ణాంకం		    file_readonly = FALSE;  // overwritten file is read-only
+#ఒకవేళ defined(UNIX)			    // XXX fix me sometime?
+    పూర్ణాంకం		    made_writable = FALSE;  // 'w' bit has been set
+#అయితే_ముగింపు
 					// writing everything
-    int		    whole = (start == 1 && end == buf->b_ml.ml_line_count);
-    linenr_T	    old_line_count = buf->b_ml.ml_line_count;
-    int		    attr;
-    int		    fileformat;
-    int		    write_bin;
-    struct bw_info  write_info;		// info for buf_write_bytes()
-    int		    converted = FALSE;
-    int		    notconverted = FALSE;
+    పూర్ణాంకం		    సంపూర్ణ = (ప్రారంభం == 1 && చివర == buf->b_ml.ml_పంక్తి_లెక్క);
+    linenr_T	    old_పంక్తి_లెక్క = buf->b_ml.ml_పంక్తి_లెక్క;
+    పూర్ణాంకం		    attr;
+    పూర్ణాంకం		    fileformat;
+    పూర్ణాంకం		    write_bin;
+    నిర్మాణం bw_info  write_info;		// info for buf_write_bytes()
+    పూర్ణాంకం		    converted = FALSE;
+    పూర్ణాంకం		    notconverted = FALSE;
     char_u	    *fenc;		// effective 'fileencoding'
-    char_u	    *fenc_tofree = NULL; // allocated "fenc"
-    int		    wb_flags = 0;
-#ifdef HAVE_ACL
-    vim_acl_T	    acl = NULL;		// ACL copied from original file to
+    char_u	    *fenc_tofree = ఖాళీ; // allocated "fenc"
+    పూర్ణాంకం		    wb_flags = 0;
+#నిర్వచితమైతే HAVE_ACL
+    vim_acl_T	    acl = ఖాళీ;		// ACL copied from original file to
 					// backup or new file
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
-    int		    write_undo_file = FALSE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
+    పూర్ణాంకం		    write_undo_file = FALSE;
     context_sha256_T sha_ctx;
-#endif
-    unsigned int    bkc = get_bkc_flags(buf);
-    pos_T	    orig_start = buf->b_op_start;
-    pos_T	    orig_end = buf->b_op_end;
+#అయితే_ముగింపు
+    గుర్తులేని పూర్ణాంకం    bkc = get_bkc_flags(buf);
+    pos_T	    orig_ప్రారంభం = buf->b_op_ప్రారంభం;
+    pos_T	    orig_చివర = buf->b_op_చివర;
 
-    if (fname == NULL || *fname == NUL)	// safety check
-	return FAIL;
-    if (buf->b_ml.ml_mfp == NULL)
+    ఒకవేళ (fname == ఖాళీ || *fname == NUL)	// safety check
+	తిరిగి FAIL;
+    ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
     {
 	// This can happen during startup when there is a stray "w" in the
 	// vimrc file.
-	emsg(_(e_empty_buffer));
-	return FAIL;
+	emsg(_(e_ఖాళీలు_బఫరు));
+	తిరిగి FAIL;
     }
 
     // Disallow writing from .exrc and .vimrc in current directory for
     // security reasons.
-    if (check_secure())
-	return FAIL;
+    ఒకవేళ (check_secure())
+	తిరిగి FAIL;
 
     // Avoid a crash for a long name.
-    if (STRLEN(fname) >= MAXPATHL)
+    ఒకవేళ (STRLEN(fname) >= MAXPATHL)
     {
 	emsg(_(e_name_too_long));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // must init bw_conv_buf and bw_iconv_fd before jumping to "fail"
-    write_info.bw_conv_buf = NULL;
+    write_info.bw_conv_buf = ఖాళీ;
     write_info.bw_conv_error = FALSE;
     write_info.bw_conv_error_lnum = 0;
     write_info.bw_restlen = 0;
-#ifdef USE_ICONV
+#నిర్వచితమైతే USE_ICONV
     write_info.bw_iconv_fd = (iconv_t)-1;
-#endif
-#ifdef FEAT_CRYPT
-    write_info.bw_buffer = buf;
-    write_info.bw_finish = FALSE;
-#endif
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CRYPT
+    write_info.bw_బఫరు = buf;
+    write_info.bw_ముగింపు = FALSE;
+#అయితే_ముగింపు
 
     // After writing a file changedtick changes but we don't want to display
     // the line.
@@ -744,107 +744,107 @@ buf_write(
     // Don't do this when the write is for a filter command.
     // Don't do this when appending.
     // Only do this when 'cpoptions' contains the 'F' flag.
-    if (buf->b_ffname == NULL
-	    && reset_changed
-	    && whole
+    ఒకవేళ (buf->b_ffname == ఖాళీ
+	    && reset_మారింది
+	    && సంపూర్ణ
 	    && buf == curbuf
 	    && !bt_nofilename(buf)
 	    && !filtering
-	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != NULL)
-	    && vim_strchr(p_cpo, CPO_FNAMEW) != NULL)
+	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != ఖాళీ)
+	    && vim_strchr(p_cpo, CPO_FNAMEW) != ఖాళీ)
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
-	    return FAIL;
+	ఒకవేళ (సమితి_rw_fname(fname, sfname) == FAIL)
+	    తిరిగి FAIL;
 	buf = curbuf;	    // just in case autocmds made "buf" invalid
     }
 
-    if (sfname == NULL)
+    ఒకవేళ (sfname == ఖాళీ)
 	sfname = fname;
     // For Unix: Use the short file name whenever possible.
     // Avoids problems with networks and when directory names are changed.
     // Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
     // another directory, which we don't detect
     ffname = fname;			    // remember full fname
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     fname = sfname;
-#endif
+#అయితే_ముగింపు
 
-    if (buf->b_ffname != NULL && fnamecmp(ffname, buf->b_ffname) == 0)
+    ఒకవేళ (buf->b_ffname != ఖాళీ && fnamecmp(ffname, buf->b_ffname) == 0)
 	overwriting = TRUE;
-    else
+    లేకపోతే
 	overwriting = FALSE;
 
-    if (exiting)
+    ఒకవేళ (exiting)
 	settmode(TMODE_COOK);	    // when exiting allow typeahead now
 
     ++no_wait_return;		    // don't wait for return yet
 
     // Set '[ and '] marks to the lines to be written.
-    buf->b_op_start.lnum = start;
-    buf->b_op_start.col = 0;
-    buf->b_op_end.lnum = end;
-    buf->b_op_end.col = 0;
+    buf->b_op_ప్రారంభం.lnum = ప్రారంభం;
+    buf->b_op_ప్రారంభం.నిలువు = 0;
+    buf->b_op_చివర.lnum = చివర;
+    buf->b_op_చివర.నిలువు = 0;
 
     {
 	aco_save_T	aco;
-	int		buf_ffname = FALSE;
-	int		buf_sfname = FALSE;
-	int		buf_fname_f = FALSE;
-	int		buf_fname_s = FALSE;
-	int		did_cmd = FALSE;
-	int		nofile_err = FALSE;
-	int		empty_memline = (buf->b_ml.ml_mfp == NULL);
+	పూర్ణాంకం		buf_ffname = FALSE;
+	పూర్ణాంకం		buf_sfname = FALSE;
+	పూర్ణాంకం		buf_fname_f = FALSE;
+	పూర్ణాంకం		buf_fname_s = FALSE;
+	పూర్ణాంకం		did_cmd = FALSE;
+	పూర్ణాంకం		nofile_err = FALSE;
+	పూర్ణాంకం		ఖాళీలు_memline = (buf->b_ml.ml_mfp == ఖాళీ);
 	bufref_T	bufref;
 
 	// Apply PRE autocommands.
 	// Set curbuf to the buffer to be written.
 	// Careful: The autocommands may call buf_write() recursively!
-	if (ffname == buf->b_ffname)
+	ఒకవేళ (ffname == buf->b_ffname)
 	    buf_ffname = TRUE;
-	if (sfname == buf->b_sfname)
+	ఒకవేళ (sfname == buf->b_sfname)
 	    buf_sfname = TRUE;
-	if (fname == buf->b_ffname)
+	ఒకవేళ (fname == buf->b_ffname)
 	    buf_fname_f = TRUE;
-	if (fname == buf->b_sfname)
+	ఒకవేళ (fname == buf->b_sfname)
 	    buf_fname_s = TRUE;
 
 	// Set curwin/curbuf to buf and save a few things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	ఒకవేళ (curbuf != buf)
 	{
 	    // Could not find a window for "buf".  Doing more might cause
 	    // problems, better bail out.
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	set_bufref(&bufref, buf);
+	సమితి_bufref(&bufref, buf);
 
-	if (append)
+	ఒకవేళ (append)
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
+	    ఒకవేళ (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ఒకవేళ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		లేకపోతే
 		    apply_autocmds_exarg(EVENT_FILEAPPENDPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else if (filtering)
+	లేకపోతే ఒకవేళ (filtering)
 	{
 	    apply_autocmds_exarg(EVENT_FILTERWRITEPRE,
-					    NULL, sfname, FALSE, curbuf, eap);
+					    ఖాళీ, sfname, FALSE, curbuf, eap);
 	}
-	else if (reset_changed && whole)
+	లేకపోతే ఒకవేళ (reset_మారింది && సంపూర్ణ)
 	{
-	    int was_changed = curbufIsChanged();
+	    పూర్ణాంకం was_మారింది = curbuf_Is_మారింది();
 
 	    did_cmd = apply_autocmds_exarg(EVENT_BUFWRITECMD,
 					  sfname, sfname, FALSE, curbuf, eap);
-	    if (did_cmd)
+	    ఒకవేళ (did_cmd)
 	    {
-		if (was_changed && !curbufIsChanged())
+		ఒకవేళ (was_మారింది && !curbuf_Is_మారింది())
 		{
 		    // Written everything correctly and BufWriteCmd has reset
 		    // 'modified': Correct the undo information so that an
@@ -853,23 +853,23 @@ buf_write(
 		    u_update_save_nr(curbuf);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ఒకవేళ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		లేకపోతే
 		    apply_autocmds_exarg(EVENT_BUFWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
+	    ఒకవేళ (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ఒకవేళ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		లేకపోతే
 		    apply_autocmds_exarg(EVENT_FILEWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
@@ -882,84 +882,84 @@ buf_write(
 	// 1. the autocommands deleted or unloaded the buffer.
 	// 2. The autocommands abort script processing.
 	// 3. If one of the "Cmd" autocommands was executed.
-	if (!bufref_valid(&bufref))
-	    buf = NULL;
-	if (buf == NULL || (buf->b_ml.ml_mfp == NULL && !empty_memline)
+	ఒకవేళ (!bufref_valid(&bufref))
+	    buf = ఖాళీ;
+	ఒకవేళ (buf == ఖాళీ || (buf->b_ml.ml_mfp == ఖాళీ && !ఖాళీలు_memline)
 				       || did_cmd || nofile_err
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 				       || aborting()
-#endif
+#అయితే_ముగింపు
 				       )
 	{
-	    if (buf != NULL && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
+	    ఒకవేళ (buf != ఖాళీ && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
 	    {
 		// restore the original '[ and '] positions
-		buf->b_op_start = orig_start;
-		buf->b_op_end = orig_end;
+		buf->b_op_ప్రారంభం = orig_ప్రారంభం;
+		buf->b_op_చివర = orig_చివర;
 	    }
 
 	    --no_wait_return;
-	    msg_scroll = msg_save;
-	    if (nofile_err)
-		semsg(_(e_no_matching_autocommands_for_buftype_str_buffer),
+	    సందేశం_scroll = సందేశం_save;
+	    ఒకవేళ (nofile_err)
+		semsg(_(e_no_matching_autocommands_for_buftype_str_బఫరు),
 							       curbuf->b_p_bt);
 
-	    if (nofile_err
-#ifdef FEAT_EVAL
+	    ఒకవేళ (nofile_err
+#నిర్వచితమైతే FEAT_EVAL
 		    || aborting()
-#endif
+#అయితే_ముగింపు
 		    )
 		// An aborting error, interrupt or exception in the
 		// autocommands.
-		return FAIL;
-	    if (did_cmd)
+		తిరిగి FAIL;
+	    ఒకవేళ (did_cmd)
 	    {
-		if (buf == NULL)
+		ఒకవేళ (buf == ఖాళీ)
 		    // The buffer was deleted.  We assume it was written
 		    // (can't retry anyway).
-		    return OK;
-		if (overwriting)
+		    తిరిగి OK;
+		ఒకవేళ (overwriting)
 		{
 		    // Assume the buffer was written, update the timestamp.
 		    ml_timestamp(buf);
-		    if (append)
+		    ఒకవేళ (append)
 			buf->b_flags &= ~BF_NEW;
-		    else
-			buf->b_flags &= ~BF_WRITE_MASK;
+		    లేకపోతే
+			buf->b_flags &= ~BF_WRITE_ముసుగు;
 		}
-		if (reset_changed && buf->b_changed && !append
-			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+		ఒకవేళ (reset_మారింది && buf->b_మారింది && !append
+			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != ఖాళీ))
 		    // Buffer still changed, the autocommands didn't work
 		    // properly.
-		    return FAIL;
-		return OK;
+		    తిరిగి FAIL;
+		తిరిగి OK;
 	    }
-#ifdef FEAT_EVAL
-	    if (!aborting())
-#endif
-		emsg(_(e_autocommands_deleted_or_unloaded_buffer_to_be_written));
-	    return FAIL;
+#నిర్వచితమైతే FEAT_EVAL
+	    ఒకవేళ (!aborting())
+#అయితే_ముగింపు
+		emsg(_(e_autocommands_deleted_or_unloaded_బఫరు_గమ్యం_be_written));
+	    తిరిగి FAIL;
 	}
 
 	// The autocommands may have changed the number of lines in the file.
 	// When writing the whole file, adjust the end.
 	// When writing part of the file, assume that the autocommands only
 	// changed the number of lines that are to be written (tricky!).
-	if (buf->b_ml.ml_line_count != old_line_count)
+	ఒకవేళ (buf->b_ml.ml_పంక్తి_లెక్క != old_పంక్తి_లెక్క)
 	{
-	    if (whole)						// write all
-		end = buf->b_ml.ml_line_count;
-	    else if (buf->b_ml.ml_line_count > old_line_count)	// more lines
-		end += buf->b_ml.ml_line_count - old_line_count;
-	    else						// less lines
+	    ఒకవేళ (సంపూర్ణ)						// write all
+		చివర = buf->b_ml.ml_పంక్తి_లెక్క;
+	    లేకపోతే ఒకవేళ (buf->b_ml.ml_పంక్తి_లెక్క > old_పంక్తి_లెక్క)	// more lines
+		చివర += buf->b_ml.ml_పంక్తి_లెక్క - old_పంక్తి_లెక్క;
+	    లేకపోతే						// less lines
 	    {
-		end -= old_line_count - buf->b_ml.ml_line_count;
-		if (end < start)
+		చివర -= old_పంక్తి_లెక్క - buf->b_ml.ml_పంక్తి_లెక్క;
+		ఒకవేళ (చివర < ప్రారంభం)
 		{
 		    --no_wait_return;
-		    msg_scroll = msg_save;
-		    emsg(_(e_autocommands_changed_number_of_lines_in_unexpected_way));
-		    return FAIL;
+		    సందేశం_scroll = సందేశం_save;
+		    emsg(_(e_autocommands_మారింది_సంఖ్య_యొక్క_పంక్తులు_లోపల_unexpected_way));
+		    తిరిగి FAIL;
 		}
 	    }
 	}
@@ -967,103 +967,103 @@ buf_write(
 	// The autocommands may have changed the name of the buffer, which may
 	// be kept in fname, ffname and sfname.  A ":cd" may also have dropped
 	// the short name, then b_fname is the full name.
-	if (buf_ffname)
+	ఒకవేళ (buf_ffname)
 	    ffname = buf->b_ffname;
-	if (buf_sfname)
+	ఒకవేళ (buf_sfname)
 	    sfname = buf->b_fname;
-	if (buf_fname_f)
+	ఒకవేళ (buf_fname_f)
 	    fname = buf->b_ffname;
-	if (buf_fname_s)
+	ఒకవేళ (buf_fname_s)
 	    fname = buf->b_fname;
     }
 
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    ఒకవేళ (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	// restore the original '[ and '] positions
-	buf->b_op_start = orig_start;
-	buf->b_op_end = orig_end;
+	buf->b_op_ప్రారంభం = orig_ప్రారంభం;
+	buf->b_op_చివర = orig_చివర;
     }
 
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active() && isNetbeansBuffer(buf))
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+    ఒకవేళ (netbeans_చురుకైన() && is_Netbeans_బఫరు(buf))
     {
-	if (whole)
+	ఒకవేళ (సంపూర్ణ)
 	{
 	    // b_changed can be 0 after an undo, but we still need to write
 	    // the buffer to NetBeans.
-	    if (buf->b_changed || isNetbeansModified(buf))
+	    ఒకవేళ (buf->b_మారింది || isNetbeansModified(buf))
 	    {
 		--no_wait_return;		// may wait for return now
-		msg_scroll = msg_save;
-		netbeans_save_buffer(buf);	// no error checking...
-		return retval;
+		సందేశం_scroll = సందేశం_save;
+		netbeans_save_బఫరు(buf);	// no error checking...
+		తిరిగి retval;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		errnum = (char_u *)"E656: ";
-		errmsg = (char_u *)_(e_netbeans_disallows_writes_of_unmodified_buffers);
-		buffer = NULL;
-		goto fail;
+		errmsg = (char_u *)_(e_netbeans_disallows_writes_యొక్క_unmodified_buffers);
+		బఫరు = ఖాళీ;
+		వెళ్ళు fail;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    errnum = (char_u *)"E657: ";
 	    errmsg = (char_u *)_(e_partial_writes_disallowed_for_netbeans_buffers);
-	    buffer = NULL;
-	    goto fail;
+	    బఫరు = ఖాళీ;
+	    వెళ్ళు fail;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    if (shortmess(SHM_OVER) && !exiting)
-	msg_scroll = FALSE;	    // overwrite previous file message
-    else
-	msg_scroll = TRUE;	    // don't overwrite previous file message
-    if (!filtering)
+    ఒకవేళ (shortmess(SHM_OVER) && !exiting)
+	సందేశం_scroll = FALSE;	    // overwrite previous file message
+    లేకపోతే
+	సందేశం_scroll = TRUE;	    // don't overwrite previous file message
+    ఒకవేళ (!filtering)
 	filemess(buf,
-#ifndef UNIX
+#నిర్వచితం_కాకపోతే UNIX
 		sfname,
-#else
+#లేకపోతే
 		fname,
-#endif
+#అయితే_ముగింపు
 		    (char_u *)"", 0);	// show that we are busy
-    msg_scroll = FALSE;		    // always overwrite the file message now
+    సందేశం_scroll = FALSE;		    // always overwrite the file message now
 
-    buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)		    // can't allocate big buffer, use small
+    బఫరు = alloc(WRITEBUFSIZE);
+    ఒకవేళ (బఫరు == ఖాళీ)		    // can't allocate big buffer, use small
 				    // one (to be able to write when out of
 				    // memory)
     {
-	buffer = smallbuf;
+	బఫరు = smallbuf;
 	bufsize = SMALLBUFSIZE;
     }
-    else
+    లేకపోతే
 	bufsize = WRITEBUFSIZE;
 
     // Get information about original file (if there is one).
-#if defined(UNIX)
+#ఒకవేళ defined(UNIX)
     st_old.st_dev = 0;
     st_old.st_ino = 0;
     perm = -1;
-    if (mch_stat((char *)fname, &st_old) < 0)
+    ఒకవేళ (mch_stat((అక్షరం *)fname, &st_old) < 0)
 	newfile = TRUE;
-    else
+    లేకపోతే
     {
-	perm = st_old.st_mode;
-	if (!S_ISREG(st_old.st_mode))		// not a file
+	perm = st_old.st_బహుళకం;
+	ఒకవేళ (!S_ISREG(st_old.st_బహుళకం))		// not a file
 	{
-	    if (S_ISDIR(st_old.st_mode))
+	    ఒకవేళ (S_ISDIR(st_old.st_బహుళకం))
 	    {
 		errnum = (char_u *)"E502: ";
 		errmsg = (char_u *)_(e_is_a_directory);
-		goto fail;
+		వెళ్ళు fail;
 	    }
-	    if (mch_nodetype(fname) != NODE_WRITABLE)
+	    ఒకవేళ (mch_nodetype(fname) != కణుపు_WRITABLE)
 	    {
 		errnum = (char_u *)"E503: ";
 		errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-		goto fail;
+		వెళ్ళు fail;
 	    }
 	    // It's a device of some kind (or a fifo) which we can write to
 	    // but for which we can't make a backup.
@@ -1072,86 +1072,86 @@ buf_write(
 	    perm = -1;
 	}
     }
-#else // !UNIX
+#లేకపోతే // !UNIX
     // Check for a writable device name.
     c = mch_nodetype(fname);
-    if (c == NODE_OTHER)
+    ఒకవేళ (c == కణుపు_OTHER)
     {
 	errnum = (char_u *)"E503: ";
 	errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-	goto fail;
+	వెళ్ళు fail;
     }
-    if (c == NODE_WRITABLE)
+    ఒకవేళ (c == కణుపు_WRITABLE)
     {
-# if defined(MSWIN)
+# ఒకవేళ defined(MSWIN)
 	// MS-Windows allows opening a device, but we will probably get stuck
 	// trying to write to it.
-	if (!p_odev)
+	ఒకవేళ (!p_odev)
 	{
 	    errnum = (char_u *)"E796: ";
-	    errmsg = (char_u *)_(e_writing_to_device_disabled_with_opendevice_option);
-	    goto fail;
+	    errmsg = (char_u *)_(e_writing_గమ్యం_device_disabled_with_opendevice_option);
+	    వెళ్ళు fail;
 	}
 # endif
 	device = TRUE;
 	newfile = TRUE;
 	perm = -1;
     }
-    else
+    లేకపోతే
     {
 	perm = mch_getperm(fname);
-	if (perm < 0)
+	ఒకవేళ (perm < 0)
 	    newfile = TRUE;
-	else if (mch_isdir(fname))
+	లేకపోతే ఒకవేళ (mch_isdir(fname))
 	{
 	    errnum = (char_u *)"E502: ";
 	    errmsg = (char_u *)_(e_is_a_directory);
-	    goto fail;
+	    వెళ్ళు fail;
 	}
-	if (overwriting)
-	    (void)mch_stat((char *)fname, &st_old);
+	ఒకవేళ (overwriting)
+	    (శూన్య)mch_stat((అక్షరం *)fname, &st_old);
     }
-#endif // !UNIX
+#అయితే_ముగింపు // !UNIX
 
-    if (!device && !newfile)
+    ఒకవేళ (!device && !newfile)
     {
 	// Check if the file is really writable (when renaming the file to
 	// make a backup we won't discover it later).
-	file_readonly = check_file_readonly(fname, (int)perm);
+	file_readonly = check_file_readonly(fname, (పూర్ణాంకం)perm);
 
-	if (!forceit && file_readonly)
+	ఒకవేళ (!forceit && file_readonly)
 	{
-	    if (vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    ఒకవేళ (vim_strchr(p_cpo, CPO_FWRITE) != ఖాళీ)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_లోపల_cpoptions);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		errnum = (char_u *)"E505: ";
-		errmsg = (char_u *)_(e_is_read_only_add_bang_to_override);
+		errmsg = (char_u *)_(e_is_read_only_కూడు_bang_గమ్యం_override);
 	    }
-	    goto fail;
+	    వెళ్ళు fail;
 	}
 
 	// Check if the timestamp hasn't changed since reading the file.
-	if (overwriting)
+	ఒకవేళ (overwriting)
 	{
 	    retval = check_mtime(buf, &st_old);
-	    if (retval == FAIL)
-		goto fail;
+	    ఒకవేళ (retval == FAIL)
+		వెళ్ళు fail;
 	}
     }
 
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
     // For systems that support ACL: get the ACL from the original file.
-    if (!newfile)
+    ఒకవేళ (!newfile)
 	acl = mch_get_acl(fname);
-#endif
+#అయితే_ముగింపు
 
     // If 'backupskip' is not empty, don't make a backup for some files.
     dobackup = (p_wb || p_bk || *p_pm != NUL);
-    if (dobackup && *p_bsk != NUL && match_file_list(p_bsk, sfname, ffname))
+    ఒకవేళ (dobackup && *p_bsk != NUL && సరిపోలిక_file_list(p_bsk, sfname, ffname))
 	dobackup = FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
@@ -1169,16 +1169,16 @@ buf_write(
     //
     // Do not make any backup, if 'writebackup' and 'backup' are both switched
     // off.  This helps when editing large files on almost-full disks.
-    if (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
+    ఒకవేళ (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
     {
-#if defined(UNIX) || defined(MSWIN)
+#ఒకవేళ defined(UNIX) || defined(MSWIN)
 	stat_T	    st;
-#endif
+#అయితే_ముగింపు
 
-	if ((bkc & BKC_YES) || append)	// "yes"
+	ఒకవేళ ((bkc & BKC_YES) || append)	// "yes"
 	    backup_copy = TRUE;
-#if defined(UNIX) || defined(MSWIN)
-	else if ((bkc & BKC_AUTO))	// "auto"
+#ఒకవేళ defined(UNIX) || defined(MSWIN)
+	లేకపోతే ఒకవేళ ((bkc & BKC_AUTO))	// "auto"
 	{
 # ifdef UNIX
 	    // Don't rename the file when:
@@ -1186,8 +1186,8 @@ buf_write(
 	    // - it's a symbolic link
 	    // - we don't have write permission in the directory
 	    // - we can't set the owner/group of the new file
-	    if (st_old.st_nlink > 1
-		    || mch_lstat((char *)fname, &st) < 0
+	    ఒకవేళ (st_old.st_nlink > 1
+		    || mch_lstat((అక్షరం *)fname, &st) < 0
 		    || st.st_dev != st_old.st_dev
 		    || st.st_ino != st_old.st_ino
 #  ifndef HAVE_FCHOWN
@@ -1196,19 +1196,19 @@ buf_write(
 #  endif
 		    )
 		backup_copy = TRUE;
-	    else
-# else
+	    లేకపోతే
+# లేకపోతే
 #  ifdef MSWIN
 	    // On NTFS file systems hard links are possible.
-	    if (mch_is_linked(fname))
+	    ఒకవేళ (mch_is_linked(fname))
 		backup_copy = TRUE;
-	    else
+	    లేకపోతే
 #  endif
 # endif
 	    {
 		size_t	dirlen;
 		char_u	tmp_fname[MAXPATHL];
-		int	i;
+		పూర్ణాంకం	i;
 
 		// Check if we can create a file and set the owner/group/mode to
 		// the ones from the original file.
@@ -1218,39 +1218,39 @@ buf_write(
 		dirlen = (size_t)(gettail(fname) - fname);
 		vim_strncpy(tmp_fname, fname, dirlen);
 		fd = -1;
-		for (i = 4913; ; i += 123)
+		కొరకు (i = 4913; ; i += 123)
 		{
-		    vim_snprintf((char *)tmp_fname + dirlen,
-			sizeof(tmp_fname) - dirlen, ".%d.swp", i);
-		    if (mch_lstat((char *)tmp_fname, &st) < 0)
+		    vim_snprintf((అక్షరం *)tmp_fname + dirlen,
+			పరిమాణం(tmp_fname) - dirlen, ".%d.swp", i);
+		    ఒకవేళ (mch_lstat((అక్షరం *)tmp_fname, &st) < 0)
 		    {
-			fd = mch_open((char *)tmp_fname,
+			fd = mch_open((అక్షరం *)tmp_fname,
 				    O_CREAT|O_WRONLY|O_EXCL|O_NOFOLLOW, perm);
-			if (fd < 0 && errno == EEXIST)
+			ఒకవేళ (fd < 0 && errno == EEXIST)
 			    // If the same file name is created by another
 			    // process between lstat() and open(), find another
 			    // name.
-			    continue;
-			break;
+			    కొనసాగు;
+			ఆపు;
 		    }
 		}
-		if (fd < 0)	// can't write in directory
+		ఒకవేళ (fd < 0)	// can't write in directory
 		    backup_copy = TRUE;
-		else
+		లేకపోతే
 		{
 # ifdef UNIX
 #  ifdef HAVE_FCHOWN
 		    vim_ignored = fchown(fd, st_old.st_uid, st_old.st_gid);
 #  endif
 #  ifdef HAVE_FCHMOD
-		    (void)mch_fsetperm(fd, perm);
-#  else
-		    (void)mch_setperm(tmp_fname, perm);
+		    (శూన్య)mch_fsetperm(fd, perm);
+#  లేకపోతే
+		    (శూన్య)mch_setperm(tmp_fname, perm);
 #  endif
-		    if (mch_stat((char *)tmp_fname, &st) < 0
+		    ఒకవేళ (mch_stat((అక్షరం *)tmp_fname, &st) < 0
 			    || st.st_uid != st_old.st_uid
 			    || st.st_gid != st_old.st_gid
-			    || (long)st.st_mode != perm)
+			    || (దీర్ఘ)st.st_బహుళకం != perm)
 			backup_copy = TRUE;
 # endif
 		    // Close the file before removing it, on MS-Windows we
@@ -1262,12 +1262,12 @@ buf_write(
 		    // file, we can't delete it then.  Keep trying for half a
 		    // second.
 		    {
-			int try;
+			పూర్ణాంకం try;
 
-			for (try = 0; try < 10; ++try)
+			కొరకు (try = 0; try < 10; ++try)
 			{
-			    if (mch_lstat((char *)tmp_fname, &st) < 0)
-				break;
+			    ఒకవేళ (mch_lstat((అక్షరం *)tmp_fname, &st) < 0)
+				ఆపు;
 			    ui_delay(50L, TRUE);  // wait 50 msec
 			    mch_remove(tmp_fname);
 			}
@@ -1278,64 +1278,64 @@ buf_write(
 	}
 
 	// Break symlinks and/or hardlinks if we've been asked to.
-	if ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
+	ఒకవేళ ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
 	{
 # ifdef UNIX
-	    int	lstat_res;
+	    పూర్ణాంకం	lstat_res;
 
-	    lstat_res = mch_lstat((char *)fname, &st);
+	    lstat_res = mch_lstat((అక్షరం *)fname, &st);
 
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK)
+	    ఒకవేళ ((bkc & BKC_BREAKSYMLINK)
 		    && lstat_res == 0
 		    && st.st_ino != st_old.st_ino)
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK)
+	    ఒకవేళ ((bkc & BKC_BREAKHARDLINK)
 		    && st_old.st_nlink > 1
 		    && (lstat_res != 0 || st.st_ino == st_old.st_ino))
 		backup_copy = FALSE;
-# else
-#  if defined(MSWIN)
+# లేకపోతే
+#  ఒకవేళ defined(MSWIN)
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
+	    ఒకవేళ ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
+	    ఒకవేళ ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
 		backup_copy = FALSE;
 #  endif
 # endif
 	}
 
-#endif
+#అయితే_ముగింపు
 
 	// make sure we have a valid backup extension to use
-	if (*p_bex == NUL)
+	ఒకవేళ (*p_bex == NUL)
 	    backup_ext = (char_u *)".bak";
-	else
+	లేకపోతే
 	    backup_ext = p_bex;
 
-	if (backup_copy
-		&& (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
+	ఒకవేళ (backup_copy
+		&& (fd = mch_open((అక్షరం *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
 	{
-	    int		bfd;
+	    పూర్ణాంకం		bfd;
 	    char_u	*copybuf;
-	    int		some_error = FALSE;
+	    పూర్ణాంకం		some_error = FALSE;
 	    stat_T	st_new;
 	    char_u	*dirp;
 	    char_u	*rootname;
-#if defined(UNIX)
-	    int		did_set_shortname;
+#ఒకవేళ defined(UNIX)
+	    పూర్ణాంకం		did_సమితి_shortname;
 	    mode_t	umask_save;
-#endif
+#అయితే_ముగింపు
 
 	    copybuf = alloc(WRITEBUFSIZE + 1);
-	    if (copybuf == NULL)
+	    ఒకవేళ (copybuf == ఖాళీ)
 	    {
 		some_error = TRUE;	    // out of memory
-		goto nobackup;
+		వెళ్ళు nobackup;
 	    }
 
 	    // Try to make the backup in each directory in the 'bdir' option.
@@ -1349,192 +1349,192 @@ buf_write(
 	    // For these reasons, the existing writable file must be truncated
 	    // and reused. Creation of a backup COPY will be attempted.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    అయితే (*dirp)
 	    {
-		char_u	*p UNUSED;
-		int	copybuf_len UNUSED;
+		char_u	*p వాడని;
+		పూర్ణాంకం	copybuf_len వాడని;
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		st_new.st_ino = 0;
 		st_new.st_dev = 0;
 		st_new.st_gid = 0;
-#endif
+#అయితే_ముగింపు
 
 		// Isolate one directory name, using an entry in 'bdir'.
 		copybuf_len = copy_option_part(&dirp, copybuf, WRITEBUFSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#ఒకవేళ defined(UNIX) || defined(MSWIN)
 		p = copybuf + copybuf_len;
-		if (after_pathsep(copybuf, p) && p[-1] == p[-2])
+		ఒకవేళ (after_pathsep(copybuf, p) && p[-1] == p[-2])
 		    // Ends with '//', use full path
-		    if ((p = make_percent_swname(copybuf, p, fname)) != NULL)
+		    ఒకవేళ ((p = make_percent_swname(copybuf, p, fname)) != ఖాళీ)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		rootname = get_file_in_dir(fname, copybuf);
-		if (rootname == NULL)
+#అయితే_ముగింపు
+		rootname = get_file_లోపల_dir(fname, copybuf);
+		ఒకవేళ (rootname == ఖాళీ)
 		{
 		    some_error = TRUE;	    // out of memory
-		    goto nobackup;
+		    వెళ్ళు nobackup;
 		}
 
-#if defined(UNIX)
-		did_set_shortname = FALSE;
-#endif
+#ఒకవేళ defined(UNIX)
+		did_సమితి_shortname = FALSE;
+#అయితే_ముగింపు
 
 		// May try twice if 'shortname' not set.
-		for (;;)
+		కొరకు (;;)
 		{
 		    // Make the backup file name.
-		    if (backup == NULL)
+		    ఒకవేళ (backup == ఖాళీ)
 			backup = buf_modname((buf->b_p_sn || buf->b_shortname),
 						 rootname, backup_ext, FALSE);
-		    if (backup == NULL)
+		    ఒకవేళ (backup == ఖాళీ)
 		    {
 			vim_free(rootname);
 			some_error = TRUE;		// out of memory
-			goto nobackup;
+			వెళ్ళు nobackup;
 		    }
 
 		    // Check if backup file already exists.
-		    if (mch_stat((char *)backup, &st_new) >= 0)
+		    ఒకవేళ (mch_stat((అక్షరం *)backup, &st_new) >= 0)
 		    {
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 			// Check if backup file is same as original file.
 			// May happen when modname() gave the same file back.
 			// E.g. silly link, or file name-length reached.
 			// If we don't check here, we either ruin the file
 			// when copying or erase it after writing. jw.
-			if (st_new.st_dev == st_old.st_dev
+			ఒకవేళ (st_new.st_dev == st_old.st_dev
 					    && st_new.st_ino == st_old.st_ino)
 			{
 			    VIM_CLEAR(backup);	// no backup file to delete
 			    // may try again with 'shortname' set
-			    if (!(buf->b_shortname || buf->b_p_sn))
+			    ఒకవేళ (!(buf->b_shortname || buf->b_p_sn))
 			    {
 				buf->b_shortname = true;
-				did_set_shortname = TRUE;
-				continue;
+				did_సమితి_shortname = TRUE;
+				కొనసాగు;
 			    }
 				// setting shortname didn't help
-			    if (did_set_shortname)
+			    ఒకవేళ (did_సమితి_shortname)
 				buf->b_shortname = false;
-			    break;
+			    ఆపు;
 			}
-#endif
+#అయితే_ముగింపు
 
 			// If we are not going to keep the backup file, don't
 			// delete an existing one, try to use another name.
 			// Change one character, just before the extension.
-			if (!p_bk)
+			ఒకవేళ (!p_bk)
 			{
 			    char_u	*wp;
 
 			    wp = backup + STRLEN(backup) - 1
 							 - STRLEN(backup_ext);
-			    if (wp < backup)	// empty file name ???
+			    ఒకవేళ (wp < backup)	// empty file name ???
 				wp = backup;
 			    *wp = 'z';
-			    while (*wp > 'a'
-				    && mch_stat((char *)backup, &st_new) >= 0)
+			    అయితే (*wp > 'a'
+				    && mch_stat((అక్షరం *)backup, &st_new) >= 0)
 				--*wp;
 			    // They all exist??? Must be something wrong.
-			    if (*wp == 'a')
+			    ఒకవేళ (*wp == 'a')
 				VIM_CLEAR(backup);
 			}
 		    }
-		    break;
+		    ఆపు;
 		}
 		vim_free(rootname);
 
 		// Try to create the backup file
-		if (backup != NULL)
+		ఒకవేళ (backup != ఖాళీ)
 		{
 		    // remove old backup, if present
 		    mch_remove(backup);
 		    // Open with O_EXCL to avoid the file being created while
 		    // we were sleeping (symlink hacker attack?). Reset umask
 		    // if possible to avoid mch_setperm() below.
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		    umask_save = umask(0);
-#endif
-		    bfd = mch_open((char *)backup,
+#అయితే_ముగింపు
+		    bfd = mch_open((అక్షరం *)backup,
 				O_WRONLY|O_CREAT|O_EXTRA|O_EXCL|O_NOFOLLOW,
 								 perm & 0777);
-#ifdef UNIX
-		    (void)umask(umask_save);
-#endif
-		    if (bfd < 0)
+#నిర్వచితమైతే UNIX
+		    (శూన్య)umask(umask_save);
+#అయితే_ముగింపు
+		    ఒకవేళ (bfd < 0)
 			VIM_CLEAR(backup);
-		    else
+		    లేకపోతే
 		    {
 			// Set file protection same as original file, but
 			// strip s-bit.  Only needed if umask() wasn't used
 			// above.
-#ifndef UNIX
-			(void)mch_setperm(backup, perm & 0777);
-#else
+#నిర్వచితం_కాకపోతే UNIX
+			(శూన్య)mch_setperm(backup, perm & 0777);
+#లేకపోతే
 			// Try to set the group of the backup same as the
 			// original file. If this fails, set the protection
 			// bits for the group same as the protection bits for
 			// others.
-			if (st_new.st_gid != st_old.st_gid
+			ఒకవేళ (st_new.st_gid != st_old.st_gid
 # ifdef HAVE_FCHOWN  // sequent-ptx lacks fchown()
 				&& fchown(bfd, (uid_t)-1, st_old.st_gid) != 0
 # endif
 						)
 			    mch_setperm(backup,
 					  (perm & 0707) | ((perm & 07) << 3));
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
 # endif
 # ifdef FEAT_XATTR
 			mch_copy_xattr(fname, backup);
 # endif
-#endif
+#అయితే_ముగింపు
 
 			// copy the file.
 			write_info.bw_fd = bfd;
 			write_info.bw_buf = copybuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, copybuf,
+			అయితే ((write_info.bw_len = read_eintr(fd, copybuf,
 							    WRITEBUFSIZE)) > 0)
 			{
-			    if (buf_write_bytes(&write_info) == FAIL)
+			    ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
 			    {
-				errmsg = (char_u *)_(e_cant_write_to_backup_file_add_bang_to_override);
-				break;
+				errmsg = (char_u *)_(e_cant_write_గమ్యం_backup_file_కూడు_bang_గమ్యం_override);
+				ఆపు;
 			    }
 			    ui_breakcheck();
-			    if (got_int)
+			    ఒకవేళ (got_int)
 			    {
 				errmsg = (char_u *)_(e_interrupted);
-				break;
+				ఆపు;
 			    }
 			}
 
-			if (close(bfd) < 0 && errmsg == NULL)
-			    errmsg = (char_u *)_(e_close_error_for_backup_file_add_bang_to_write_anyway);
-			if (write_info.bw_len < 0)
-			    errmsg = (char_u *)_(e_cant_read_file_for_backup_add_bang_to_write_anyway);
-#ifdef UNIX
-			set_file_time(backup, st_old.st_atime, st_old.st_mtime);
-#endif
-#ifdef HAVE_ACL
-			mch_set_acl(backup, acl);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+			ఒకవేళ (close(bfd) < 0 && errmsg == ఖాళీ)
+			    errmsg = (char_u *)_(e_close_error_for_backup_file_కూడు_bang_గమ్యం_write_anyway);
+			ఒకవేళ (write_info.bw_len < 0)
+			    errmsg = (char_u *)_(e_cant_read_file_for_backup_కూడు_bang_గమ్యం_write_anyway);
+#నిర్వచితమైతే UNIX
+			సమితి_file_సమయం(backup, st_old.st_atime, st_old.st_mtime);
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_ACL
+			mch_సమితి_acl(backup, acl);
+#అయితే_ముగింపు
+#ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
-#endif
-#ifdef FEAT_XATTR
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XATTR
 			mch_copy_xattr(fname, backup);
-#endif
-#ifdef MSWIN
-			(void)mch_copy_file_attribute(fname, backup);
-#endif
-			break;
+#అయితే_ముగింపు
+#నిర్వచితమైతే MSWIN
+			(శూన్య)mch_copy_file_attribute(fname, backup);
+#అయితే_ముగింపు
+			ఆపు;
 		    }
 		}
 	    }
@@ -1542,17 +1542,17 @@ buf_write(
 	    close(fd);		// ignore errors for closing read file
 	    vim_free(copybuf);
 
-	    if (backup == NULL && errmsg == NULL)
-		errmsg = (char_u *)_(e_cannot_create_backup_file_add_bang_to_write_anyway);
+	    ఒకవేళ (backup == ఖాళీ && errmsg == ఖాళీ)
+		errmsg = (char_u *)_(e_cannot_create_backup_file_కూడు_bang_గమ్యం_write_anyway);
 	    // ignore errors when forceit is TRUE
-	    if ((some_error || errmsg != NULL) && !forceit)
+	    ఒకవేళ ((some_error || errmsg != ఖాళీ) && !forceit)
 	    {
 		retval = FAIL;
-		goto fail;
+		వెళ్ళు fail;
 	    }
-	    errmsg = NULL;
+	    errmsg = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
 	    char_u	*dirp;
 	    char_u	*p;
@@ -1563,40 +1563,40 @@ buf_write(
 	    // If 'cpoptions' includes the "W" flag, we don't want to
 	    // overwrite a read-only file.  But rename may be possible
 	    // anyway, thus we need an extra check here.
-	    if (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    ఒకవేళ (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != ఖాళీ)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
-		goto fail;
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_లోపల_cpoptions);
+		వెళ్ళు fail;
 	    }
 
 	    // Form the backup file name - change path/fo.o.h to
 	    // path/fo.o.h.bak Try all directories in 'backupdir', first one
 	    // that works is used.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    అయితే (*dirp)
 	    {
-		int IObufflen UNUSED;
+		పూర్ణాంకం IObufflen వాడని;
 
 		// Isolate one directory name and make the backup file name.
 		IObufflen = copy_option_part(&dirp, IObuff, IOSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#ఒకవేళ defined(UNIX) || defined(MSWIN)
 		p = IObuff + IObufflen;
-		if (after_pathsep(IObuff, p) && p[-1] == p[-2])
+		ఒకవేళ (after_pathsep(IObuff, p) && p[-1] == p[-2])
 		    // path ends with '//', use full path
-		    if ((p = make_percent_swname(IObuff, p, fname)) != NULL)
+		    ఒకవేళ ((p = make_percent_swname(IObuff, p, fname)) != ఖాళీ)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		if (backup == NULL)
+#అయితే_ముగింపు
+		ఒకవేళ (backup == ఖాళీ)
 		{
-		    rootname = get_file_in_dir(fname, IObuff);
-		    if (rootname == NULL)
-			backup = NULL;
-		    else
+		    rootname = get_file_లోపల_dir(fname, IObuff);
+		    ఒకవేళ (rootname == ఖాళీ)
+			backup = ఖాళీ;
+		    లేకపోతే
 		    {
 			backup = buf_modname(
 				(buf->b_p_sn || buf->b_shortname),
@@ -1605,25 +1605,25 @@ buf_write(
 		    }
 		}
 
-		if (backup != NULL)
+		ఒకవేళ (backup != ఖాళీ)
 		{
 		    // If we are not going to keep the backup file, don't
 		    // delete an existing one, try to use another name.
 		    // Change one character, just before the extension.
-		    if (!p_bk && mch_getperm(backup) >= 0)
+		    ఒకవేళ (!p_bk && mch_getperm(backup) >= 0)
 		    {
 			p = backup + STRLEN(backup) - 1 - STRLEN(backup_ext);
-			if (p < backup)	// empty file name ???
+			ఒకవేళ (p < backup)	// empty file name ???
 			    p = backup;
 			*p = 'z';
-			while (*p > 'a' && mch_getperm(backup) >= 0)
+			అయితే (*p > 'a' && mch_getperm(backup) >= 0)
 			    --*p;
 			// They all exist??? Must be something wrong!
-			if (*p == 'a')
+			ఒకవేళ (*p == 'a')
 			    VIM_CLEAR(backup);
 		    }
 		}
-		if (backup != NULL)
+		ఒకవేళ (backup != ఖాళీ)
 		{
 		    // Delete any existing backup and move the current version
 		    // to the backup.	For safety, we don't remove the backup
@@ -1632,76 +1632,76 @@ buf_write(
 
 		    // If the renaming of the original file to the backup file
 		    // works, quit here.
-		    if (vim_rename(fname, backup) == 0)
-			break;
+		    ఒకవేళ (vim_rename(fname, backup) == 0)
+			ఆపు;
 
 		    VIM_CLEAR(backup);   // don't do the rename below
 		}
 	    }
-	    if (backup == NULL && !forceit)
+	    ఒకవేళ (backup == ఖాళీ && !forceit)
 	    {
-		errmsg = (char_u *)_(e_cant_make_backup_file_add_bang_to_write_anyway);
-		goto fail;
+		errmsg = (char_u *)_(e_cant_make_backup_file_కూడు_bang_గమ్యం_write_anyway);
+		వెళ్ళు fail;
 	    }
 	}
     }
 
-#if defined(UNIX)
+#ఒకవేళ defined(UNIX)
     // When using ":w!" and the file was read-only: make it writable
-    if (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
-				     && vim_strchr(p_cpo, CPO_FWRITE) == NULL)
+    ఒకవేళ (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
+				     && vim_strchr(p_cpo, CPO_FWRITE) == ఖాళీ)
     {
 	perm |= 0200;
-	(void)mch_setperm(fname, perm);
+	(శూన్య)mch_setperm(fname, perm);
 	made_writable = TRUE;
     }
-#endif
+#అయితే_ముగింపు
 
     // When using ":w!" and writing to the current file, 'readonly' makes no
     // sense, reset it, unless 'Z' appears in 'cpoptions'.
-    if (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == NULL)
+    ఒకవేళ (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == ఖాళీ)
     {
 	buf->b_p_ro = FALSE;
 	need_maketitle = TRUE;	    // set window title later
-	status_redraw_all();	    // redraw status lines later
+	స్థితి_redraw_all();	    // redraw status lines later
     }
 
-    if (end > buf->b_ml.ml_line_count)
-	end = buf->b_ml.ml_line_count;
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	start = end + 1;
+    ఒకవేళ (చివర > buf->b_ml.ml_పంక్తి_లెక్క)
+	చివర = buf->b_ml.ml_పంక్తి_లెక్క;
+    ఒకవేళ (buf->b_ml.ml_flags & ML_ఖాళీలు)
+	ప్రారంభం = చివర + 1;
 
     // If the original file is being overwritten, there is a small chance that
     // we crash in the middle of writing. Therefore the file is preserved now.
     // This makes all block numbers positive so that recovery does not need
     // the original file.
     // Don't do this if there is a backup file and we are exiting.
-    if (reset_changed && !newfile && overwriting
-					      && !(exiting && backup != NULL))
+    ఒకవేళ (reset_మారింది && !newfile && overwriting
+					      && !(exiting && backup != ఖాళీ))
     {
 	ml_preserve(buf, FALSE);
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
 	    errmsg = (char_u *)_(e_interrupted);
-	    goto restore_backup;
+	    వెళ్ళు restore_backup;
 	}
     }
 
-#ifdef VMS
-    vms_remove_version(fname); // remove version
-#endif
+#నిర్వచితమైతే VMS
+    vms_remove_సంస్కరణ(fname); // remove version
+#అయితే_ముగింపు
     // Default: write the file directly.  May write to a temp file for
     // multi-byte conversion.
     wfname = fname;
 
     // Check for forced 'fileencoding' from "++opt=val" argument.
-    if (eap != NULL && eap->force_enc != 0)
+    ఒకవేళ (eap != ఖాళీ && eap->force_enc != 0)
     {
 	fenc = eap->cmd + eap->force_enc;
 	fenc = enc_canonize(fenc);
 	fenc_tofree = fenc;
     }
-    else
+    లేకపోతే
 	fenc = buf->b_p_fenc;
 
     // Check if the file needs to be converted.
@@ -1710,64 +1710,64 @@ buf_write(
     // Check if UTF-8 to UCS-2/4 or Latin1 conversion needs to be done.  Or
     // Latin1 to Unicode conversion.  This is handled in buf_write_bytes().
     // Prepare the flags for it and allocate bw_conv_buf when needed.
-    if (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
+    ఒకవేళ (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
     {
 	wb_flags = get_fio_flags(fenc);
-	if (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
+	ఒకవేళ (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
 	{
 	    // overallocate a bit, in case we read incomplete multi-byte chars
-	    int size = bufsize + CONV_RESTLEN;
+	    పూర్ణాంకం కొలత = bufsize + CONV_RESTLEN;
 	    // Need to allocate a buffer to translate into.
-	    if (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
-		write_info.bw_conv_buflen = size * 2;
-	    else // FIO_UCS4
-		write_info.bw_conv_buflen = size * 4;
+	    ఒకవేళ (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
+		write_info.bw_conv_buflen = కొలత * 2;
+	    లేకపోతే // FIO_UCS4
+		write_info.bw_conv_buflen = కొలత * 4;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
+	    ఒకవేళ (write_info.bw_conv_buf == ఖాళీ)
+		చివర = 0;
 	}
     }
 
-#ifdef MSWIN
-    if (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
     {
 	// Convert UTF-8 -> UCS-2 and UCS-2 -> DBCS.  Worst-case * 4:
 	write_info.bw_conv_buflen = bufsize * 4;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	ఒకవేళ (write_info.bw_conv_buf == ఖాళీ)
+	    చివర = 0;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef MACOS_CONVERT
-    if (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
+#నిర్వచితమైతే MACOS_CONVERT
+    ఒకవేళ (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
     {
 	write_info.bw_conv_buflen = bufsize * 3;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	ఒకవేళ (write_info.bw_conv_buf == ఖాళీ)
+	    చివర = 0;
     }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL) || defined(USE_ICONV)
-    if (converted && wb_flags == 0)
+#ఒకవేళ defined(FEAT_EVAL) || defined(USE_ICONV)
+    ఒకవేళ (converted && wb_flags == 0)
     {
 # ifdef USE_ICONV
 	// Use iconv() conversion when conversion is needed and it's not done
 	// internally.
 	write_info.bw_iconv_fd = (iconv_t)my_iconv_open(fenc,
 					enc_utf8 ? (char_u *)"utf-8" : p_enc);
-	if (write_info.bw_iconv_fd != (iconv_t)-1)
+	ఒకవేళ (write_info.bw_iconv_fd != (iconv_t)-1)
 	{
 	    // We're going to use iconv(), allocate a buffer to convert in.
 	    write_info.bw_conv_buflen = bufsize * ICONV_MULT;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
-	    write_info.bw_first = TRUE;
+	    ఒకవేళ (write_info.bw_conv_buf == ఖాళీ)
+		చివర = 0;
+	    write_info.bw_మొదటి = TRUE;
 	}
 #  ifdef FEAT_EVAL
-	else
+	లేకపోతే
 #  endif
 # endif
 
@@ -1775,31 +1775,31 @@ buf_write(
 	    // When the file needs to be converted with 'charconvert' after
 	    // writing, write to a temp file instead and let the conversion
 	    // overwrite the original file.
-	    if (*p_ccv != NUL)
+	    ఒకవేళ (*p_ccv != NUL)
 	    {
 		wfname = vim_tempname('w', FALSE);
-		if (wfname == NULL)	// Can't write without a tempfile!
+		ఒకవేళ (wfname == ఖాళీ)	// Can't write without a tempfile!
 		{
-		    errmsg = (char_u *)_(e_cant_find_temp_file_for_writing);
-		    goto restore_backup;
+		    errmsg = (char_u *)_(e_cant_కనుగొను_తాత్కాలిక_file_for_writing);
+		    వెళ్ళు restore_backup;
 		}
 	    }
 # endif
     }
-#endif
-    if (converted && wb_flags == 0
-#ifdef USE_ICONV
+#అయితే_ముగింపు
+    ఒకవేళ (converted && wb_flags == 0
+#నిర్వచితమైతే USE_ICONV
 	    && write_info.bw_iconv_fd == (iconv_t)-1
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
 	    && wfname == fname
-#endif
+#అయితే_ముగింపు
 	    )
     {
-	if (!forceit)
+	ఒకవేళ (!forceit)
 	{
-	    errmsg = (char_u *)_(e_cannot_convert_add_bang_to_write_without_conversion);
-	    goto restore_backup;
+	    errmsg = (char_u *)_(e_cannot_convert_కూడు_bang_గమ్యం_write_without_conversion);
+	    వెళ్ళు restore_backup;
 	}
 	notconverted = TRUE;
     }
@@ -1807,28 +1807,28 @@ buf_write(
     // If conversion is taking place, we may first pretend to write and check
     // for conversion errors.  Then loop again to write for real.
     // When not doing conversion this writes for real right away.
-    for (checking_conversion = TRUE; ; checking_conversion = FALSE)
+    కొరకు (checking_conversion = TRUE; ; checking_conversion = FALSE)
     {
 	// There is no need to check conversion when:
 	// - there is no conversion
 	// - we make a backup file, that can be restored in case of conversion
 	//   failure.
-	if (!converted || dobackup)
+	ఒకవేళ (!converted || dobackup)
 	    checking_conversion = FALSE;
 
-	if (checking_conversion)
+	ఒకవేళ (checking_conversion)
 	{
 	    // Make sure we don't write anything.
 	    fd = -1;
 	    write_info.bw_fd = fd;
 	}
-	else
+	లేకపోతే
 	{
-#ifdef HAVE_FTRUNCATE
+#నిర్వచితమైతే HAVE_FTRUNCATE
 # define TRUNC_ON_OPEN 0
-#else
+#లేకపోతే
 # define TRUNC_ON_OPEN O_TRUNC
-#endif
+#అయితే_ముగింపు
 	    // Open the file "wfname" for writing.
 	    // We may try to open the file twice: If we can't write to the file
 	    // and forceit is TRUE we delete the existing file and try to
@@ -1837,7 +1837,7 @@ buf_write(
 	    // quotum for number of files).
 	    // Appending will fail if the file does not exist and forceit is
 	    // FALSE.
-	    while ((fd = mch_open((char *)wfname, O_WRONLY | O_EXTRA | (append
+	    అయితే ((fd = mch_open((అక్షరం *)wfname, O_WRONLY | O_EXTRA | (append
 				? (forceit ? (O_APPEND | O_CREAT) : O_APPEND)
 				: (O_CREAT | TRUNC_ON_OPEN))
 				, perm < 0 ? 0666 : (perm & 0777))) < 0)
@@ -1845,38 +1845,38 @@ buf_write(
 		// A forced write will try to create a new file if the old one
 		// is still readonly. This may also happen when the directory
 		// is read-only. In that case the mch_remove() will fail.
-		if (errmsg == NULL)
+		ఒకవేళ (errmsg == ఖాళీ)
 		{
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		    stat_T	st;
 
 		    // Don't delete the file when it's a hard or symbolic link.
-		    if ((!newfile && st_old.st_nlink > 1)
-			    || (mch_lstat((char *)fname, &st) == 0
+		    ఒకవేళ ((!newfile && st_old.st_nlink > 1)
+			    || (mch_lstat((అక్షరం *)fname, &st) == 0
 				&& (st.st_dev != st_old.st_dev
 				    || st.st_ino != st_old.st_ino)))
 			errmsg =
 			      (char_u *)_(e_cant_open_linked_file_for_writing);
-		    else
-#endif
+		    లేకపోతే
+#అయితే_ముగింపు
 		    {
 			errmsg = (char_u *)_(e_cant_open_file_for_writing);
-			if (forceit && vim_strchr(p_cpo, CPO_FWRITE) == NULL
+			ఒకవేళ (forceit && vim_strchr(p_cpo, CPO_FWRITE) == ఖాళీ
 								  && perm >= 0)
 			{
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 			    // we write to the file, thus it should be marked
 			    // writable after all
-			    if (!(perm & 0200))
+			    ఒకవేళ (!(perm & 0200))
 				made_writable = TRUE;
 			    perm |= 0200;
-			    if (st_old.st_uid != getuid()
+			    ఒకవేళ (st_old.st_uid != getuid()
 						  || st_old.st_gid != getgid())
 				perm &= 0777;
-#endif
-			    if (!append)  // don't remove when appending
+#అయితే_ముగింపు
+			    ఒకవేళ (!append)  // don't remove when appending
 				mch_remove(wfname);
-			    continue;
+			    కొనసాగు;
 			}
 		    }
 		}
@@ -1888,9 +1888,9 @@ restore_backup:
 		    // If we failed to open the file, we don't need a backup.
 		    // Throw it away.  If we moved or removed the original file
 		    // try to put the backup in its place.
-		    if (backup != NULL && wfname == fname)
+		    ఒకవేళ (backup != ఖాళీ && wfname == fname)
 		    {
-			if (backup_copy)
+			ఒకవేళ (backup_copy)
 			{
 			    // There is a small chance that we removed the
 			    // original, try to move the copy in its place.
@@ -1898,14 +1898,14 @@ restore_backup:
 			    // In that case we leave the copy around.
 
 			    // If file does not exist, put the copy in its
-			    // place
-			    if (mch_stat((char *)fname, &st) < 0)
+			    //ఉంచు
+			    ఒకవేళ (mch_stat((అక్షరం *)fname, &st) < 0)
 				vim_rename(backup, fname);
 			    // if original file does exist throw away the copy
-			    if (mch_stat((char *)fname, &st) >= 0)
+			    ఒకవేళ (mch_stat((అక్షరం *)fname, &st) >= 0)
 				mch_remove(backup);
 			}
-			else
+			లేకపోతే
 			{
 			    // try to put the original file back
 			    vim_rename(backup, fname);
@@ -1913,23 +1913,23 @@ restore_backup:
 		    }
 
 		    // if original file no longer exists give an extra warning
-		    if (!newfile && mch_stat((char *)fname, &st) < 0)
-			end = 0;
+		    ఒకవేళ (!newfile && mch_stat((అక్షరం *)fname, &st) < 0)
+			చివర = 0;
 		}
 
-		if (wfname != fname)
+		ఒకవేళ (wfname != fname)
 		    vim_free(wfname);
-		goto fail;
+		వెళ్ళు fail;
 	    }
 	    write_info.bw_fd = fd;
 
-#if defined(UNIX)
+#ఒకవేళ defined(UNIX)
 	    {
 		stat_T	st;
 
 		// Double check we are writing the intended file before making
 		// any changes.
-		if (overwriting
+		ఒకవేళ (overwriting
 			&& (!dobackup || backup_copy)
 			&& fname == wfname
 			&& perm >= 0
@@ -1937,84 +1937,84 @@ restore_backup:
 			&& st.st_ino != st_old.st_ino)
 		{
 		    close(fd);
-		    errmsg = (char_u *)_(e_file_changed_while_writing);
-		    goto fail;
+		    errmsg = (char_u *)_(e_file_మారింది_while_writing);
+		    వెళ్ళు fail;
 		}
 	    }
-#endif
-#ifdef HAVE_FTRUNCATE
-	    if (!append)
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_FTRUNCATE
+	    ఒకవేళ (!append)
 		vim_ignored = ftruncate(fd, (off_t)0);
-#endif
+#అయితే_ముగింపు
 
-#if defined(MSWIN)
-	    if (backup != NULL && overwriting && !append)
-		(void)mch_copy_file_attribute(backup, wfname);
+#ఒకవేళ defined(MSWIN)
+	    ఒకవేళ (backup != ఖాళీ && overwriting && !append)
+		(శూన్య)mch_copy_file_attribute(backup, wfname);
 
-	    if (!overwriting && !append)
+	    ఒకవేళ (!overwriting && !append)
 	    {
-		if (buf->b_ffname != NULL)
-		    (void)mch_copy_file_attribute(buf->b_ffname, wfname);
+		ఒకవేళ (buf->b_ffname != ఖాళీ)
+		    (శూన్య)mch_copy_file_attribute(buf->b_ffname, wfname);
 		// Should copy resource fork
 	    }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_CRYPT
-	    if (*buf->b_p_key != NUL && !filtering)
+#నిర్వచితమైతే FEAT_CRYPT
+	    ఒకవేళ (*buf->b_p_కీలకం != NUL && !filtering)
 	    {
-		char_u		*header;
-		int		header_len;
+		char_u		*శీర్షిక;
+		పూర్ణాంకం		శీర్షిక_len;
 
 		buf->b_cryptstate = crypt_create_for_writing(
-						      crypt_get_method_nr(buf),
-					   buf->b_p_key, &header, &header_len);
-		if (buf->b_cryptstate == NULL || header == NULL)
-		    end = 0;
-		else
+						      crypt_get_పద్ధతి_nr(buf),
+					   buf->b_p_కీలకం, &శీర్షిక, &శీర్షిక_len);
+		ఒకవేళ (buf->b_cryptstate == ఖాళీ || శీర్షిక == ఖాళీ)
+		    చివర = 0;
+		లేకపోతే
 		{
 		    // Write magic number, so that Vim knows how this file is
 		    // encrypted when reading it back.
-		    write_info.bw_buf = header;
-		    write_info.bw_len = header_len;
+		    write_info.bw_buf = శీర్షిక;
+		    write_info.bw_len = శీర్షిక_len;
 		    write_info.bw_flags = FIO_NOCONVERT;
-		    if (buf_write_bytes(&write_info) == FAIL)
-			end = 0;
+		    ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
+			చివర = 0;
 		    wb_flags |= FIO_ENCRYPTED;
-		    vim_free(header);
+		    vim_free(శీర్షిక);
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-	errmsg = NULL;
+	errmsg = ఖాళీ;
 
-	write_info.bw_buf = buffer;
+	write_info.bw_buf = బఫరు;
 	nchars = 0;
 
 	// use "++bin", "++nobin" or 'binary'
-	if (eap != NULL && eap->force_bin != 0)
+	ఒకవేళ (eap != ఖాళీ && eap->force_bin != 0)
 	    write_bin = (eap->force_bin == FORCE_BIN);
-	else
+	లేకపోతే
 	    write_bin = buf->b_p_bin;
 
 	// The BOM is written just after the encryption magic number.
 	// Skip it when appending and the file already existed, the BOM only
 	// makes sense at the start of the file.
-	if (buf->b_p_bomb && !write_bin && (!append || perm < 0))
+	ఒకవేళ (buf->b_p_bomb && !write_bin && (!append || perm < 0))
 	{
-	    write_info.bw_len = make_bom(buffer, fenc);
-	    if (write_info.bw_len > 0)
+	    write_info.bw_len = make_bom(బఫరు, fenc);
+	    ఒకవేళ (write_info.bw_len > 0)
 	    {
 		// don't convert, do encryption
 		write_info.bw_flags = FIO_NOCONVERT | wb_flags;
-		if (buf_write_bytes(&write_info) == FAIL)
-		    end = 0;
-		else
+		ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
+		    చివర = 0;
+		లేకపోతే
 		    nchars += write_info.bw_len;
 	    }
 	}
-	write_info.bw_start_lnum = start;
+	write_info.bw_ప్రారంభం_lnum = ప్రారంభం;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
 	write_undo_file = (buf->b_p_udf
 			    && overwriting
 			    && !append
@@ -2022,122 +2022,122 @@ restore_backup:
 # ifdef CRYPT_NOT_INPLACE
 			    // writing undo file requires
 			    // crypt_encode_inplace()
-			    && (buf->b_cryptstate == NULL
-				|| crypt_works_inplace(buf->b_cryptstate))
+			    && (buf->b_cryptstate == ఖాళీ
+				|| crypt_పనిచేస్తుంది_inplace(buf->b_cryptstate))
 # endif
-			    && reset_changed
+			    && reset_మారింది
 			    && !checking_conversion);
 # ifdef CRYPT_NOT_INPLACE
 	// remove undo file if encrypting it is not possible
-	if (buf->b_p_udf
+	ఒకవేళ (buf->b_p_udf
 		&& overwriting
 		&& !append
 		&& !filtering
 		&& !checking_conversion
-		&& buf->b_cryptstate != NULL
-		&& !crypt_works_inplace(buf->b_cryptstate))
+		&& buf->b_cryptstate != ఖాళీ
+		&& !crypt_పనిచేస్తుంది_inplace(buf->b_cryptstate))
 	    u_undofile_reset_and_delete(buf);
 # endif
-	if (write_undo_file)
+	ఒకవేళ (write_undo_file)
 	    // Prepare for computing the hash value of the text.
-	    sha256_start(&sha_ctx);
-#endif
+	    sha256_ప్రారంభం(&sha_ctx);
+#అయితే_ముగింపు
 
 	write_info.bw_len = bufsize;
 	write_info.bw_flags = wb_flags;
 	fileformat = get_fileformat_force(buf, eap);
-	s = buffer;
+	s = బఫరు;
 	len = 0;
-	for (lnum = start; lnum <= end; ++lnum)
+	కొరకు (lnum = ప్రారంభం; lnum <= చివర; ++lnum)
 	{
 	    // The next while loop is done once for each character written.
 	    // Keep it fast!
 	    ptr = ml_get_buf(buf, lnum, FALSE) - 1;
-#ifdef FEAT_PERSISTENT_UNDO
-	    if (write_undo_file)
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
+	    ఒకవేళ (write_undo_file)
 		sha256_update(&sha_ctx, ptr + 1,
 					      (UINT32_T)(STRLEN(ptr + 1) + 1));
-#endif
-	    while ((c = *++ptr) != NUL)
+#అయితే_ముగింపు
+	    అయితే ((c = *++ptr) != NUL)
 	    {
-		if (c == NL)
+		ఒకవేళ (c == NL)
 		    *s = NUL;		// replace newlines with NULs
-		else if (c == CAR && fileformat == EOL_MAC)
+		లేకపోతే ఒకవేళ (c == CAR && fileformat == EOL_MAC)
 		    *s = NL;		// Mac: replace CRs with NLs
-		else
+		లేకపోతే
 		    *s = c;
 		++s;
-		if (++len != bufsize)
-		    continue;
-#ifdef FEAT_CRYPT
-		if (write_info.bw_fd > 0 && lnum == end
+		ఒకవేళ (++len != bufsize)
+		    కొనసాగు;
+#నిర్వచితమైతే FEAT_CRYPT
+		ఒకవేళ (write_info.bw_fd > 0 && lnum == చివర
 			&& (write_info.bw_flags & FIO_ENCRYPTED)
-			&& *buf->b_p_key != NUL && !filtering
+			&& *buf->b_p_కీలకం != NUL && !filtering
 			&& *ptr == NUL)
-		    write_info.bw_finish = TRUE;
-#endif
-		if (buf_write_bytes(&write_info) == FAIL)
+		    write_info.bw_ముగింపు = TRUE;
+#అయితే_ముగింపు
+		ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    చివర = 0;		// write error: break loop
+		    ఆపు;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = బఫరు;
 		len = 0;
-		write_info.bw_start_lnum = lnum;
+		write_info.bw_ప్రారంభం_lnum = lnum;
 	    }
 	    // write failed or last line has no EOL: stop here
-	    if (end == 0
-		    || (lnum == end
+	    ఒకవేళ (చివర == 0
+		    || (lnum == చివర
 			&& (write_bin || !buf->b_p_fixeol)
 			&& ((write_bin && lnum == buf->b_no_eol_lnum)
-			    || (lnum == buf->b_ml.ml_line_count
+			    || (lnum == buf->b_ml.ml_పంక్తి_లెక్క
 							   && !buf->b_p_eol))))
 	    {
 		++lnum;			// written the line, count it
 		no_eol = TRUE;
-		break;
+		ఆపు;
 	    }
-	    if (fileformat == EOL_UNIX)
+	    ఒకవేళ (fileformat == EOL_UNIX)
 		*s++ = NL;
-	    else
+	    లేకపోతే
 	    {
 		*s++ = CAR;		    // EOL_MAC or EOL_DOS: write CR
-		if (fileformat == EOL_DOS)  // write CR-NL
+		ఒకవేళ (fileformat == EOL_DOS)  // write CR-NL
 		{
-		    if (++len == bufsize)
+		    ఒకవేళ (++len == bufsize)
 		    {
-			if (buf_write_bytes(&write_info) == FAIL)
+			ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
 			{
-			    end = 0;	// write error: break loop
-			    break;
+			    చివర = 0;	// write error: break loop
+			    ఆపు;
 			}
 			nchars += bufsize;
-			s = buffer;
+			s = బఫరు;
 			len = 0;
 		    }
 		    *s++ = NL;
 		}
 	    }
-	    if (++len == bufsize && end)
+	    ఒకవేళ (++len == bufsize && చివర)
 	    {
-		if (buf_write_bytes(&write_info) == FAIL)
+		ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    చివర = 0;		// write error: break loop
+		    ఆపు;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = బఫరు;
 		len = 0;
 
 		ui_breakcheck();
-		if (got_int)
+		ఒకవేళ (got_int)
 		{
-		    end = 0;		// Interrupted, break loop
-		    break;
+		    చివర = 0;		// Interrupted, break loop
+		    ఆపు;
 		}
 	    }
-#ifdef VMS
+#నిర్వచితమైతే VMS
 	    // On VMS there is a problem: newlines get added when writing
 	    // blocks at a time. Fix it by writing a line at a time.
 	    // This is much slower!
@@ -2149,57 +2149,57 @@ restore_backup:
 // Older DECC compiler for VAX doesn't define MIN()
 #  define MIN(a, b) ((a) < (b) ? (a) : (b))
 # endif
-	    if (buf->b_fab_rfm == FAB$C_VFC
+	    ఒకవేళ (buf->b_fab_rfm == FAB$C_VFC
 		    || ((buf->b_fab_rat & (FAB$M_FTN | FAB$M_CR)) != 0))
 	    {
-		int b2write;
+		పూర్ణాంకం b2write;
 
 		buf->b_fab_mrs = (buf->b_fab_mrs == 0
 			? MIN(4096, bufsize)
 			: MIN(buf->b_fab_mrs, bufsize));
 
 		b2write = len;
-		while (b2write > 0)
+		అయితే (b2write > 0)
 		{
 		    write_info.bw_len = MIN(b2write, buf->b_fab_mrs);
-		    if (buf_write_bytes(&write_info) == FAIL)
+		    ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
 		    {
-			end = 0;
-			break;
+			చివర = 0;
+			ఆపు;
 		    }
 		    b2write -= MIN(b2write, buf->b_fab_mrs);
 		}
 		write_info.bw_len = bufsize;
 		nchars += len;
-		s = buffer;
+		s = బఫరు;
 		len = 0;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-	if (len > 0 && end > 0)
+	ఒకవేళ (len > 0 && చివర > 0)
 	{
 	    write_info.bw_len = len;
-#ifdef FEAT_CRYPT
-	    if (write_info.bw_fd > 0 && lnum >= end
+#నిర్వచితమైతే FEAT_CRYPT
+	    ఒకవేళ (write_info.bw_fd > 0 && lnum >= చివర
 		    && (write_info.bw_flags & FIO_ENCRYPTED)
-		    && *buf->b_p_key != NUL && !filtering)
-		write_info.bw_finish = TRUE;
-#endif
-	    if (buf_write_bytes(&write_info) == FAIL)
-		end = 0;		    // write error
+		    && *buf->b_p_కీలకం != NUL && !filtering)
+		write_info.bw_ముగింపు = TRUE;
+#అయితే_ముగింపు
+	    ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
+		చివర = 0;		    // write error
 	    nchars += len;
 	}
 
-	if (!buf->b_p_fixeol && buf->b_p_eof)
+	ఒకవేళ (!buf->b_p_fixeol && buf->b_p_eof)
 	{
 	    // write trailing CTRL-Z
-	    (void)write_eintr(write_info.bw_fd, "\x1a", 1);
+	    (శూన్య)write_eintr(write_info.bw_fd, "\x1a", 1);
 	    nchars++;
 	}
 
 	// Stop when writing done or an error was encountered.
-	if (!checking_conversion || end == 0)
-	    break;
+	ఒకవేళ (!checking_conversion || చివర == 0)
+	    ఆపు;
 
 	// If no error happened until now, writing should be ok, so loop to
 	// really write the buffer.
@@ -2207,9 +2207,9 @@ restore_backup:
 
     // If we started writing, finish writing. Also when an error was
     // encountered.
-    if (!checking_conversion)
+    ఒకవేళ (!checking_conversion)
     {
-#if defined(UNIX) && defined(HAVE_FSYNC)
+#ఒకవేళ defined(UNIX) && defined(HAVE_FSYNC)
 	// On many journaling file systems there is a bug that causes both the
 	// original and the backup file to be lost when halting the system
 	// right after writing the file.  That's because only the meta-data is
@@ -2218,76 +2218,76 @@ restore_backup:
 	// For a device do try the fsync() but don't complain if it does not
 	// work (could be a pipe).
 	// If the 'fsync' option is FALSE, don't fsync().  Useful for laptops.
-	if ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
+	ఒకవేళ ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
 		&& !device)
 	{
 	    errmsg = (char_u *)_(e_fsync_failed);
-	    end = 0;
+	    చివర = 0;
 	}
-#endif
+#అయితే_ముగింపు
 
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
+#ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
 	// Probably need to set the security context.
-	if (!backup_copy)
+	ఒకవేళ (!backup_copy)
 	{
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	    mch_copy_sec(backup, wfname);
 # endif
 # ifdef FEAT_XATTR
 	    mch_copy_xattr(backup, wfname);
 # endif
 	}
-#endif
+#అయితే_ముగింపు
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 	// When creating a new file, set its owner/group to that of the
 	// original file.  Get the new device and inode number.
-	if (backup != NULL && !backup_copy)
+	ఒకవేళ (backup != ఖాళీ && !backup_copy)
 	{
 # ifdef HAVE_FCHOWN
 	    stat_T	st;
 
 	    // Don't change the owner when it's already OK, some systems remove
 	    // permission or ACL stuff.
-	    if (mch_stat((char *)wfname, &st) < 0
+	    ఒకవేళ (mch_stat((అక్షరం *)wfname, &st) < 0
 		    || st.st_uid != st_old.st_uid
 		    || st.st_gid != st_old.st_gid)
 	    {
 		// changing owner might not be possible
 		vim_ignored = fchown(fd, st_old.st_uid, -1);
 		// if changing group fails clear the group permissions
-		if (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
+		ఒకవేళ (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
 		    perm &= ~070;
 	    }
 # endif
 	    buf_setino(buf);
 	}
-	else if (!buf->b_dev_valid)
+	లేకపోతే ఒకవేళ (!buf->b_dev_valid)
 	    // Set the inode when creating a new file.
 	    buf_setino(buf);
-#endif
+#అయితే_ముగింపు
 
-#ifdef UNIX
-	if (made_writable)
+#నిర్వచితమైతే UNIX
+	ఒకవేళ (made_writable)
 	    perm &= ~0200;	// reset 'w' bit for security reasons
-#endif
-#ifdef HAVE_FCHMOD
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_fsetperm(fd, perm);
-#endif
-	if (close(fd) != 0)
+	ఒకవేళ (perm >= 0)
+	    (శూన్య)mch_fsetperm(fd, perm);
+#అయితే_ముగింపు
+	ఒకవేళ (close(fd) != 0)
 	{
 	    errmsg = (char_u *)_(e_close_failed);
-	    end = 0;
+	    చివర = 0;
 	}
 
-#ifndef HAVE_FCHMOD
+#నిర్వచితం_కాకపోతే HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_setperm(wfname, perm);
-#endif
-#ifdef HAVE_ACL
+	ఒకవేళ (perm >= 0)
+	    (శూన్య)mch_setperm(wfname, perm);
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_ACL
 	// Probably need to set the ACL before changing the user (can't set the
 	// ACL on a file the user doesn't own).
 	// On Solaris, with ZFS and the aclmode property set to "discard" (the
@@ -2295,61 +2295,61 @@ restore_backup:
 	// represent the mode of the file.  It's non-trivial for us to discover
 	// whether we're in that situation, so we simply always re-set the ACL.
 # ifndef HAVE_SOLARIS_ZFS_ACL
-	if (!backup_copy)
+	ఒకవేళ (!backup_copy)
 # endif
-	    mch_set_acl(wfname, acl);
-#endif
-#ifdef FEAT_CRYPT
-	if (buf->b_cryptstate != NULL)
+	    mch_సమితి_acl(wfname, acl);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CRYPT
+	ఒకవేళ (buf->b_cryptstate != ఖాళీ)
 	{
 	    crypt_free_state(buf->b_cryptstate);
-	    buf->b_cryptstate = NULL;
+	    buf->b_cryptstate = ఖాళీ;
 	}
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
-	if (wfname != fname)
+#ఒకవేళ defined(FEAT_EVAL)
+	ఒకవేళ (wfname != fname)
 	{
 	    // The file was written to a temp file, now it needs to be
 	    // converted with 'charconvert' to (overwrite) the output file.
-	    if (end != 0)
+	    ఒకవేళ (చివర != 0)
 	    {
-		if (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
+		ఒకవేళ (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						  fenc, wfname, fname) == FAIL)
 		{
 		    write_info.bw_conv_error = TRUE;
-		    end = 0;
+		    చివర = 0;
 		}
 	    }
 	    mch_remove(wfname);
 	    vim_free(wfname);
 	}
-#endif
+#అయితే_ముగింపు
     }
 
-    if (end == 0)
+    ఒకవేళ (చివర == 0)
     {
 	// Error encountered.
-	if (errmsg == NULL)
+	ఒకవేళ (errmsg == ఖాళీ)
 	{
-	    if (write_info.bw_conv_error)
+	    ఒకవేళ (write_info.bw_conv_error)
 	    {
-		if (write_info.bw_conv_error_lnum == 0)
-		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_empty_to_override);
-		else
+		ఒకవేళ (write_info.bw_conv_error_lnum == 0)
+		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_ఖాళీలు_గమ్యం_override);
+		లేకపోతే
 		{
 		    errmsg_allocated = TRUE;
 		    errmsg = alloc(300);
-		    if (errmsg == NULL)
-			goto fail;
-		    vim_snprintf((char *)errmsg, 300, _(e_write_error_conversion_failed_in_line_nr_make_fenc_empty_to_override),
-					 (long)write_info.bw_conv_error_lnum);
+		    ఒకవేళ (errmsg == ఖాళీ)
+			వెళ్ళు fail;
+		    vim_snprintf((అక్షరం *)errmsg, 300, _(e_write_error_conversion_failed_లోపల_పంక్తి_nr_make_fenc_ఖాళీలు_గమ్యం_override),
+					 (దీర్ఘ)write_info.bw_conv_error_lnum);
 		}
 	    }
-	    else if (got_int)
+	    లేకపోతే ఒకవేళ (got_int)
 		errmsg = (char_u *)_(e_interrupted);
-	    else
-		errmsg = (char_u *)_(e_write_error_file_system_full);
+	    లేకపోతే
+		errmsg = (char_u *)_(e_write_error_file_system_నిండిన);
 	}
 
 	// If we have a backup file, try to put it in place of the new file,
@@ -2359,177 +2359,177 @@ restore_backup:
 	// When "backup_copy" is set we need to copy the backup over the new
 	// file.  Otherwise rename the backup file.
 	// If this is OK, don't give the extra warning message.
-	if (backup != NULL)
+	ఒకవేళ (backup != ఖాళీ)
 	{
-	    if (backup_copy)
+	    ఒకవేళ (backup_copy)
 	    {
 		// This may take a while, if we were interrupted let the user
 		// know we got the message.
-		if (got_int)
+		ఒకవేళ (got_int)
 		{
-		    msg(_(e_interrupted));
-		    out_flush();
+		    సందేశం(_(e_interrupted));
+		    బహిర్గతం_flush();
 		}
-		if ((fd = mch_open((char *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
+		ఒకవేళ ((fd = mch_open((అక్షరం *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
 		{
-		    if ((write_info.bw_fd = mch_open((char *)fname,
+		    ఒకవేళ ((write_info.bw_fd = mch_open((అక్షరం *)fname,
 				    O_WRONLY | O_CREAT | O_TRUNC | O_EXTRA,
 							   perm & 0777)) >= 0)
 		    {
 			// copy the file.
 			write_info.bw_buf = smallbuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, smallbuf,
+			అయితే ((write_info.bw_len = read_eintr(fd, smallbuf,
 						      SMALLBUFSIZE)) > 0)
-			    if (buf_write_bytes(&write_info) == FAIL)
-				break;
+			    ఒకవేళ (buf_write_బైట్లు(&write_info) == FAIL)
+				ఆపు;
 
-			if (close(write_info.bw_fd) >= 0
+			ఒకవేళ (close(write_info.bw_fd) >= 0
 						   && write_info.bw_len == 0)
-			    end = 1;		// success
+			    చివర = 1;		// success
 		    }
 		    close(fd);	// ignore errors for closing read file
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (vim_rename(backup, fname) == 0)
-		    end = 1;
+		ఒకవేళ (vim_rename(backup, fname) == 0)
+		    చివర = 1;
 	    }
 	}
-	goto fail;
+	వెళ్ళు fail;
     }
 
-    lnum -= start;	    // compute number of written lines
+    lnum -= ప్రారంభం;	    // compute number of written lines
     --no_wait_return;	    // may wait for return now
 
-#if !(defined(UNIX) || defined(VMS))
+#ఒకవేళ !(defined(UNIX) || defined(VMS))
     fname = sfname;	    // use shortname now, for the messages
-#endif
-    if (!filtering)
+#అయితే_ముగింపు
+    ఒకవేళ (!filtering)
     {
-	msg_add_fname(buf, fname);	// put fname in IObuff with quotes
+	సందేశం_కూడు_fname(buf, fname);	// put fname in IObuff with quotes
 	c = FALSE;
-	if (write_info.bw_conv_error)
+	ఒకవేళ (write_info.bw_conv_error)
 	{
 	    STRCAT(IObuff, _(" CONVERSION ERROR"));
 	    c = TRUE;
-	    if (write_info.bw_conv_error_lnum != 0)
-		vim_snprintf_add((char *)IObuff, IOSIZE, _(" in line %ld;"),
-			(long)write_info.bw_conv_error_lnum);
+	    ఒకవేళ (write_info.bw_conv_error_lnum != 0)
+		vim_snprintf_కూడు((అక్షరం *)IObuff, IOSIZE, _(" in line %ld;"),
+			(దీర్ఘ)write_info.bw_conv_error_lnum);
 	}
-	else if (notconverted)
+	లేకపోతే ఒకవేళ (notconverted)
 	{
 	    STRCAT(IObuff, _("[NOT converted]"));
 	    c = TRUE;
 	}
-	else if (converted)
+	లేకపోతే ఒకవేళ (converted)
 	{
 	    STRCAT(IObuff, _("[converted]"));
 	    c = TRUE;
 	}
-	if (device)
+	ఒకవేళ (device)
 	{
 	    STRCAT(IObuff, _("[Device]"));
 	    c = TRUE;
 	}
-	else if (newfile)
+	లేకపోతే ఒకవేళ (newfile)
 	{
-	    STRCAT(IObuff, new_file_message());
+	    STRCAT(IObuff, new_file_సందేశం());
 	    c = TRUE;
 	}
-	if (no_eol)
+	ఒకవేళ (no_eol)
 	{
-	    msg_add_eol();
+	    సందేశం_కూడు_eol();
 	    c = TRUE;
 	}
 	// may add [unix/dos/mac]
-	if (msg_add_fileformat(fileformat))
+	ఒకవేళ (సందేశం_కూడు_fileformat(fileformat))
 	    c = TRUE;
-#ifdef FEAT_CRYPT
-	if (wb_flags & FIO_ENCRYPTED)
+#నిర్వచితమైతే FEAT_CRYPT
+	ఒకవేళ (wb_flags & FIO_ENCRYPTED)
 	{
-	    crypt_append_msg(buf);
+	    crypt_append_సందేశం(buf);
 	    c = TRUE;
 	}
-#endif
-	msg_add_lines(c, (long)lnum, nchars);	// add line/char count
-	if (!shortmess(SHM_WRITE))
+#అయితే_ముగింపు
+	సందేశం_కూడు_పంక్తులు(c, (దీర్ఘ)lnum, nchars);	// add line/char count
+	ఒకవేళ (!shortmess(SHM_WRITE))
 	{
-	    if (append)
+	    ఒకవేళ (append)
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [a]") : _(" appended"));
-	    else
+	    లేకపోతే
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [w]") : _(" written"));
 	}
 
-	set_keep_msg((char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0), 0);
+	సమితి_keep_సందేశం((char_u *)సందేశం_trunc_attr((అక్షరం *)IObuff, FALSE, 0), 0);
     }
 
     // When written everything correctly: reset 'modified'.  Unless not
     // writing to the original file and '+' is not in 'cpoptions'.
-    if (reset_changed && whole && !append
+    ఒకవేళ (reset_మారింది && సంపూర్ణ && !append
 	    && !write_info.bw_conv_error
-	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != ఖాళీ))
     {
 	unchanged(buf, TRUE, FALSE);
 	// b:changedtick may be incremented in unchanged() but that should not
 	// trigger a TextChanged event.
-	if (buf->b_last_changedtick + 1 == CHANGEDTICK(buf))
-	    buf->b_last_changedtick = CHANGEDTICK(buf);
+	ఒకవేళ (buf->b_చివరి_changedtick + 1 == CHANGEDTICK(buf))
+	    buf->b_చివరి_changedtick = CHANGEDTICK(buf);
 	u_unchanged(buf);
 	u_update_save_nr(buf);
     }
 
     // If written to the current file, update the timestamp of the swap file
     // and reset the BF_WRITE_MASK flags. Also sets buf->b_mtime.
-    if (overwriting)
+    ఒకవేళ (overwriting)
     {
 	ml_timestamp(buf);
-	if (append)
+	ఒకవేళ (append)
 	    buf->b_flags &= ~BF_NEW;
-	else
-	    buf->b_flags &= ~BF_WRITE_MASK;
+	లేకపోతే
+	    buf->b_flags &= ~BF_WRITE_ముసుగు;
     }
 
     // If we kept a backup until now, and we are in patch mode, then we make
     // the backup file our 'original' file.
-    if (*p_pm && dobackup)
+    ఒకవేళ (*p_pm && dobackup)
     {
-	char *org = (char *)buf_modname((buf->b_p_sn || buf->b_shortname),
+	అక్షరం *org = (అక్షరం *)buf_modname((buf->b_p_sn || buf->b_shortname),
 							  fname, p_pm, FALSE);
 
-	if (backup != NULL)
+	ఒకవేళ (backup != ఖాళీ)
 	{
 	    stat_T	st;
 
 	    // If the original file does not exist yet
 	    // the current backup file becomes the original file
-	    if (org == NULL)
+	    ఒకవేళ (org == ఖాళీ)
 		emsg(_(e_patchmode_cant_save_original_file));
-	    else if (mch_stat(org, &st) < 0)
+	    లేకపోతే ఒకవేళ (mch_stat(org, &st) < 0)
 	    {
 		vim_rename(backup, (char_u *)org);
 		VIM_CLEAR(backup);	    // don't delete the file
-#ifdef UNIX
-		set_file_time((char_u *)org, st_old.st_atime, st_old.st_mtime);
-#endif
+#నిర్వచితమైతే UNIX
+		సమితి_file_సమయం((char_u *)org, st_old.st_atime, st_old.st_mtime);
+#అయితే_ముగింపు
 	    }
 	}
 	// If there is no backup file, remember that a (new) file was
 	// created.
-	else
+	లేకపోతే
 	{
-	    int empty_fd;
+	    పూర్ణాంకం ఖాళీలు_fd;
 
-	    if (org == NULL
-		    || (empty_fd = mch_open(org,
+	    ఒకవేళ (org == ఖాళీ
+		    || (ఖాళీలు_fd = mch_open(org,
 				      O_CREAT | O_EXTRA | O_EXCL | O_NOFOLLOW,
 					perm < 0 ? 0666 : (perm & 0777))) < 0)
-	      emsg(_(e_patchmode_cant_touch_empty_original_file));
-	    else
-	      close(empty_fd);
+	      emsg(_(e_patchmode_cant_touch_ఖాళీలు_original_file));
+	    లేకపోతే
+	      close(ఖాళీలు_fd);
 	}
-	if (org != NULL)
+	ఒకవేళ (org != ఖాళీ)
 	{
 	    mch_setperm((char_u *)org, mch_getperm(fname) & 0777);
 	    vim_free(org);
@@ -2538,11 +2538,11 @@ restore_backup:
 
     // Remove the backup unless 'backup' option is set or there was a
     // conversion error.
-    if (!p_bk && backup != NULL && !write_info.bw_conv_error
+    ఒకవేళ (!p_bk && backup != ఖాళీ && !write_info.bw_conv_error
 	    && mch_remove(backup) != 0)
 	emsg(_(e_cant_delete_backup_file));
 
-    goto nofail;
+    వెళ్ళు nofail;
 
     // Finish up.  We get here either after failure or success.
 fail:
@@ -2553,84 +2553,84 @@ nofail:
     buf->b_saving = false;
 
     vim_free(backup);
-    if (buffer != smallbuf)
-	vim_free(buffer);
+    ఒకవేళ (బఫరు != smallbuf)
+	vim_free(బఫరు);
     vim_free(fenc_tofree);
     vim_free(write_info.bw_conv_buf);
-#ifdef USE_ICONV
-    if (write_info.bw_iconv_fd != (iconv_t)-1)
+#నిర్వచితమైతే USE_ICONV
+    ఒకవేళ (write_info.bw_iconv_fd != (iconv_t)-1)
     {
 	iconv_close(write_info.bw_iconv_fd);
 	write_info.bw_iconv_fd = (iconv_t)-1;
     }
-#endif
-#ifdef HAVE_ACL
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_ACL
     mch_free_acl(acl);
-#endif
+#అయితే_ముగింపు
 
-    if (errmsg != NULL)
+    ఒకవేళ (errmsg != ఖాళీ)
     {
-	int numlen = errnum != NULL ? (int)STRLEN(errnum) : 0;
+	పూర్ణాంకం numlen = errnum != ఖాళీ ? (పూర్ణాంకం)STRLEN(errnum) : 0;
 
 	attr = HL_ATTR(HLF_E);	// set highlight for error messages
-	msg_add_fname(buf,
-#ifndef UNIX
+	సందేశం_కూడు_fname(buf,
+#నిర్వచితం_కాకపోతే UNIX
 		sfname
-#else
+#లేకపోతే
 		fname
-#endif
+#అయితే_ముగింపు
 		     );		// put file name in IObuff with quotes
-	if (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
+	ఒకవేళ (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
 	    IObuff[IOSIZE - STRLEN(errmsg) - numlen - 1] = NUL;
 	// If the error message has the form "is ...", put the error number in
 	// front of the file name.
-	if (errnum != NULL)
+	ఒకవేళ (errnum != ఖాళీ)
 	{
 	    STRMOVE(IObuff + numlen, IObuff);
 	    mch_memmove(IObuff, errnum, (size_t)numlen);
 	}
 	STRCAT(IObuff, errmsg);
-	emsg((char *)IObuff);
-	if (errmsg_allocated)
+	emsg((అక్షరం *)IObuff);
+	ఒకవేళ (errmsg_allocated)
 	    vim_free(errmsg);
 
 	retval = FAIL;
-	if (end == 0)
+	ఒకవేళ (చివర == 0)
 	{
-	    msg_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
-		    attr | MSG_HIST);
-	    msg_puts_attr(_("don't quit the editor until the file is successfully written!"),
-		    attr | MSG_HIST);
+	    సందేశం_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
+		    attr | సందేశం_HIST);
+	    సందేశం_puts_attr(_("don't quit the editor until the file is successfully written!"),
+		    attr | సందేశం_HIST);
 
 	    // Update the timestamp to avoid an "overwrite changed file"
 	    // prompt when writing again.
-	    if (mch_stat((char *)fname, &st_old) >= 0)
+	    ఒకవేళ (mch_stat((అక్షరం *)fname, &st_old) >= 0)
 	    {
-		buf_store_time(buf, &st_old, fname);
+		buf_store_సమయం(buf, &st_old, fname);
 		buf->b_mtime_read = buf->b_mtime;
 		buf->b_mtime_read_ns = buf->b_mtime_ns;
 	    }
 	}
     }
-    msg_scroll = msg_save;
+    సందేశం_scroll = సందేశం_save;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
     // When writing the whole file and 'undofile' is set, also write the undo
     // file.
-    if (retval == OK && write_undo_file)
+    ఒకవేళ (retval == OK && write_undo_file)
     {
-	char_u	    hash[UNDO_HASH_SIZE];
+	char_u	    hash[UNDO_HASH_కొలత];
 
-	sha256_finish(&sha_ctx, hash);
-	u_write_undo(NULL, FALSE, buf, hash);
+	sha256_ముగింపు(&sha_ctx, hash);
+	u_write_undo(ఖాళీ, FALSE, buf, hash);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_EVAL
-    if (!should_abort(retval))
-#else
-    if (!got_int)
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (!should_abort(retval))
+#లేకపోతే
+    ఒకవేళ (!got_int)
+#అయితే_ముగింపు
     {
 	aco_save_T	aco;
 
@@ -2640,18 +2640,18 @@ nofail:
 	// Careful: The autocommands may call buf_write() recursively!
 	// Only do this when a window was found for "buf".
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ఒకవేళ (curbuf == buf)
 	{
-	    if (append)
+	    ఒకవేళ (append)
 		apply_autocmds_exarg(EVENT_FILEAPPENDPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else if (filtering)
-		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, NULL, fname,
+	    లేకపోతే ఒకవేళ (filtering)
+		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, ఖాళీ, fname,
 							   FALSE, curbuf, eap);
-	    else if (reset_changed && whole)
+	    లేకపోతే ఒకవేళ (reset_మారింది && సంపూర్ణ)
 		apply_autocmds_exarg(EVENT_BUFWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else
+	    లేకపోతే
 		apply_autocmds_exarg(EVENT_FILEWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
 
@@ -2659,19 +2659,19 @@ nofail:
 	    aucmd_restbuf(&aco);
 	}
 
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (aborting())	    // autocmds may abort script processing
 	    retval = FALSE;
-#endif
+#అయితే_ముగింపు
     }
 
-#ifdef FEAT_VIMINFO
+#నిర్వచితమైతే FEAT_VIMINFO
     // Make sure marks will be written out to the viminfo file later, even when
     // the file is new.
     curbuf->b_marks_read = true;
-#endif
+#అయితే_ముగింపు
 
     got_int |= prev_got_int;
 
-    return retval;
+    తిరిగి retval;
 }

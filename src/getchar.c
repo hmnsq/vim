@@ -12,7 +12,7 @@
  * file, manipulations with redo buffer and stuff buffer.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * These buffers are used for storing:
@@ -34,26 +34,26 @@
  * Un-escaping is done by vgetc().
  */
 
-#define MINIMAL_SIZE 20			// minimal size for b_str
+#నిర్వచించు కనీస_కొలత 20			// minimal size for b_str
 
-static buffheader_T redobuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
-static buffheader_T old_redobuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
-static buffheader_T recordbuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
+స్థిర buffheader_T redobuff = {{ఖాళీ, 0, {NUL}}, ఖాళీ, 0, 0, FALSE};
+స్థిర buffheader_T old_redobuff = {{ఖాళీ, 0, {NUL}}, ఖాళీ, 0, 0, FALSE};
+స్థిర buffheader_T recordbuff = {{ఖాళీ, 0, {NUL}}, ఖాళీ, 0, 0, FALSE};
 
-static int typeahead_char = 0;		// typeahead char that's not flushed
+స్థిర పూర్ణాంకం typeahead_char = 0;		// typeahead char that's not flushed
 
-#ifdef FEAT_EVAL
-static char_u typedchars[MAXMAPLEN + 1] = { NUL };  // typed chars before map
-static int typedchars_pos = 0;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర char_u typedchars[MAXMAPLEN + 1] = { NUL };  // typed chars before map
+స్థిర పూర్ణాంకం typedchars_pos = 0;
+#అయితే_ముగింపు
 
 /*
  * When block_redo is TRUE the redo buffer will not be changed.
  * Used by edit() to repeat insertions.
  */
-static int	block_redo = FALSE;
+స్థిర పూర్ణాంకం	ఖండం_redo = FALSE;
 
-static int	KeyNoremap = 0;	    // remapping flags
+స్థిర పూర్ణాంకం	కీలకం_Noremap = 0;	    // remapping flags
 
 /*
  * Variables used by vgetorpeek() and flush_buffers().
@@ -74,96 +74,96 @@ static int	KeyNoremap = 0;	    // remapping flags
  * typebuf.tb_noremap[typebuf.tb_off] is the first valid flag.
  * (typebuf has been put in globals.h, because check_termcode() needs it).
  */
-#define RM_YES		0	// tb_noremap: remap
-#define RM_NONE		1	// tb_noremap: don't remap
-#define RM_SCRIPT	2	// tb_noremap: remap local script mappings
-#define RM_ABBR		4	// tb_noremap: don't remap, do abbrev.
-#define RM_SIMPLIFIED	8	// tb_noremap: modifiers merged into the key
+#నిర్వచించు RM_YES		0	// tb_noremap: remap
+#నిర్వచించు RM_NONE		1	// tb_noremap: don't remap
+#నిర్వచించు RM_SCRIPT	2	// tb_noremap: remap local script mappings
+#నిర్వచించు RM_ABBR		4	// tb_noremap: don't remap, do abbrev.
+#నిర్వచించు RM_SIMPLIFIED	8	// tb_noremap: modifiers merged into the key
 
 // typebuf.tb_buf has three parts: room in front (for result of mappings), the
 // middle for typeahead and room for new characters (which needs to be 3 *
 // MAXMAPLEN for the Amiga).
-#ifdef FEAT_NORMAL
+#నిర్వచితమైతే FEAT_సాధారణ
 // Add extra space to handle large OSC responses in bigger chunks (improve
 // performance)
 # define TYPELEN_INIT	(5 * (MAXMAPLEN + 3) + 2048)
-#else // Tiny version
+#లేకపోతే // Tiny version
 # define TYPELEN_INIT	(5 * (MAXMAPLEN + 3))
-#endif
-static char_u	typebuf_init[TYPELEN_INIT];	// initial typebuf.tb_buf
-static char_u	noremapbuf_init[TYPELEN_INIT];	// initial typebuf.tb_noremap
+#అయితే_ముగింపు
+స్థిర char_u	typebuf_init[TYPELEN_INIT];	// initial typebuf.tb_buf
+స్థిర char_u	noremapbuf_init[TYPELEN_INIT];	// initial typebuf.tb_noremap
 
-static size_t	last_recorded_len = 0;	// number of last recorded chars
+స్థిర size_t	చివరి_recorded_len = 0;	// number of last recorded chars
 
-#ifdef FEAT_EVAL
-mapblock_T	*last_used_map = NULL;
-int		last_used_sid = -1;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+mapblock_T	*చివరి_వాడిన_map = ఖాళీ;
+పూర్ణాంకం		చివరి_వాడిన_sid = -1;
+#అయితే_ముగింపు
 
-static int	read_readbuf(buffheader_T *buf, int advance);
-static void	init_typebuf(void);
-static void	may_sync_undo(void);
-static void	free_typebuf(void);
-static void	closescript(void);
-static void	updatescript(int c);
-static int	vgetorpeek(int);
-static int	inchar(char_u *buf, int maxlen, long wait_time);
-#ifdef FEAT_EVAL
-static int	do_key_input_pre(int c);
-#endif
+స్థిర పూర్ణాంకం	read_readbuf(buffheader_T *buf, పూర్ణాంకం advance);
+స్థిర శూన్య	init_typebuf(శూన్య);
+స్థిర శూన్య	may_sync_undo(శూన్య);
+స్థిర శూన్య	free_typebuf(శూన్య);
+స్థిర శూన్య	closescript(శూన్య);
+స్థిర శూన్య	updatescript(పూర్ణాంకం c);
+స్థిర పూర్ణాంకం	vgetorpeek(పూర్ణాంకం);
+స్థిర పూర్ణాంకం	inchar(char_u *buf, పూర్ణాంకం maxlen, దీర్ఘ wait_సమయం);
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర పూర్ణాంకం	do_కీలకం_ఆదానం_pre(పూర్ణాంకం c);
+#అయితే_ముగింపు
 
 /*
  * Free and clear a buffer.
  */
-    static void
+    స్థిర శూన్య
 free_buff(buffheader_T *buf)
 {
     buffblock_T	*p, *np;
 
-    for (p = buf->bh_first.b_next; p != NULL; p = np)
+    కొరకు (p = buf->bh_మొదటి.b_తదుపరి; p != ఖాళీ; p = np)
     {
-	np = p->b_next;
+	np = p->b_తదుపరి;
 	vim_free(p);
     }
-    buf->bh_first.b_next = NULL;
-    buf->bh_curr = NULL;
+    buf->bh_మొదటి.b_తదుపరి = ఖాళీ;
+    buf->bh_curr = ఖాళీ;
 }
 
 /*
  * Return the contents of a buffer as a single string.
  * K_SPECIAL and CSI in the returned string are escaped.
  */
-    static char_u *
+    స్థిర char_u *
 get_buffcont(
-    buffheader_T	*buffer,
-    int			dozero,	    // count == zero is not an error
+    buffheader_T	*బఫరు,
+    పూర్ణాంకం			dozero,	    // count == zero is not an error
     size_t		*len)	    // the length of the returned buffer
 {
-    long_u	    count = 0;
-    char_u	    *p = NULL;
+    long_u	    లెక్క = 0;
+    char_u	    *p = ఖాళీ;
     char_u	    *p2;
     char_u	    *str;
     buffblock_T *bp;
     size_t	    i = 0;
 
     // compute the total length of the string
-    for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
-	count += (long_u)bp->b_strlen;
+    కొరకు (bp = బఫరు->bh_మొదటి.b_తదుపరి; bp != ఖాళీ; bp = bp->b_తదుపరి)
+	లెక్క += (long_u)bp->b_strlen;
 
-    if ((count > 0 || dozero) && (p = alloc(count + 1)) != NULL)
+    ఒకవేళ ((లెక్క > 0 || dozero) && (p = alloc(లెక్క + 1)) != ఖాళీ)
     {
 	p2 = p;
-	for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
-	    for (str = bp->b_str; *str; )
+	కొరకు (bp = బఫరు->bh_మొదటి.b_తదుపరి; bp != ఖాళీ; bp = bp->b_తదుపరి)
+	    కొరకు (str = bp->b_str; *str; )
 		*p2++ = *str++;
 	*p2 = NUL;
 	i = (size_t)(p2 - p);
     }
 
-    if (len != NULL)
+    ఒకవేళ (len != ఖాళీ)
 	*len = i;
 
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -172,14 +172,14 @@ get_buffcont(
  * K_SPECIAL and CSI in the returned string are escaped.
  */
     char_u *
-get_recorded(void)
+get_recorded(శూన్య)
 {
     char_u	*p;
     size_t	len;
 
     p = get_buffcont(&recordbuff, TRUE, &len);
-    if (p == NULL)
-	return NULL;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     free_buff(&recordbuff);
 
@@ -187,9 +187,9 @@ get_recorded(void)
      * Remove the characters that were added the last time, these must be the
      * (possibly mapped) characters that stopped the recording.
      */
-    if (len >= last_recorded_len)
+    ఒకవేళ (len >= చివరి_recorded_len)
     {
-	len -= last_recorded_len;
+	len -= చివరి_recorded_len;
 	p[len] = NUL;
     }
 
@@ -197,10 +197,10 @@ get_recorded(void)
      * When stopping recording from Insert mode with CTRL-O q, also remove the
      * CTRL-O.
      */
-    if (len > 0 && restart_edit != 0 && p[len - 1] == Ctrl_O)
+    ఒకవేళ (len > 0 && restart_edit != 0 && p[len - 1] == Ctrl_O)
 	p[len - 1] = NUL;
 
-    return (p);
+    తిరిగి (p);
 }
 
 /*
@@ -208,74 +208,74 @@ get_recorded(void)
  * K_SPECIAL and CSI in the returned string are escaped.
  */
     string_T
-get_inserted(void)
+get_inserted(శూన్య)
 {
     size_t len = 0;
     char_u *str = get_buffcont(&redobuff, FALSE, &len);
     string_T ret = { str, len };
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Add string "s" after the current block of buffer "buf".
  * K_SPECIAL and CSI should have been escaped already.
  */
-    static void
-add_buff(
+    స్థిర శూన్య
+కూడు_buff(
     buffheader_T	*buf,
     char_u		*s,
-    long		slen)	// length of "s" or -1
+    దీర్ఘ		slen)	// length of "s" or -1
 {
-    if (slen < 0)
-	slen = (long)STRLEN(s);
-    if (slen == 0)				// don't add empty strings
-	return;
+    ఒకవేళ (slen < 0)
+	slen = (దీర్ఘ)STRLEN(s);
+    ఒకవేళ (slen == 0)				// don't add empty strings
+	తిరిగి;
 
-    if (buf->bh_first.b_next == NULL)	// first add to list
+    ఒకవేళ (buf->bh_మొదటి.b_తదుపరి == ఖాళీ)	// first add to list
     {
-	buf->bh_curr = &(buf->bh_first);
+	buf->bh_curr = &(buf->bh_మొదటి);
 	buf->bh_create_newblock = TRUE;
     }
-    else if (buf->bh_curr == NULL)	// buffer has already been read
+    లేకపోతే ఒకవేళ (buf->bh_curr == ఖాళీ)	// buffer has already been read
     {
-	iemsg(e_add_to_internal_buffer_that_was_already_read_from);
-	return;
+	iemsg(e_కూడు_గమ్యం_అంతర్గత_బఫరు_that_was_already_read_from);
+	తిరిగి;
     }
-    else if (buf->bh_index != 0)
+    లేకపోతే ఒకవేళ (buf->bh_సూచీ != 0)
     {
-	mch_memmove(buf->bh_first.b_next->b_str,
-		    buf->bh_first.b_next->b_str + buf->bh_index,
-		    (buf->bh_first.b_next->b_strlen - buf->bh_index) + 1);
-	buf->bh_first.b_next->b_strlen -= buf->bh_index;
-	buf->bh_space += buf->bh_index;
+	mch_memmove(buf->bh_మొదటి.b_తదుపరి->b_str,
+		    buf->bh_మొదటి.b_తదుపరి->b_str + buf->bh_సూచీ,
+		    (buf->bh_మొదటి.b_తదుపరి->b_strlen - buf->bh_సూచీ) + 1);
+	buf->bh_మొదటి.b_తదుపరి->b_strlen -= buf->bh_సూచీ;
+	buf->bh_space += buf->bh_సూచీ;
     }
-    buf->bh_index = 0;
+    buf->bh_సూచీ = 0;
 
-    if (!buf->bh_create_newblock && buf->bh_space >= (int)slen)
+    ఒకవేళ (!buf->bh_create_newblock && buf->bh_space >= (పూర్ణాంకం)slen)
     {
 	vim_strncpy(buf->bh_curr->b_str + buf->bh_curr->b_strlen, s, (size_t)slen);
 	buf->bh_curr->b_strlen += slen;
 	buf->bh_space -= slen;
     }
-    else
+    లేకపోతే
     {
 	long_u	    len;
 	buffblock_T *p;
 
-	if (slen < MINIMAL_SIZE)
-	    len = MINIMAL_SIZE;
-	else
+	ఒకవేళ (slen < కనీస_కొలత)
+	    len = కనీస_కొలత;
+	లేకపోతే
 	    len = slen;
 	p = alloc(offsetof(buffblock_T, b_str) + len + 1);
-	if (p == NULL)
-	    return; // no space, just forget it
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి; // no space, just forget it
 	vim_strncpy(p->b_str, s, (size_t)slen);
 	p->b_strlen = slen;
-	buf->bh_space = (int)(len - slen);
+	buf->bh_space = (పూర్ణాంకం)(len - slen);
 	buf->bh_create_newblock = FALSE;
 
-	p->b_next = buf->bh_curr->b_next;
-	buf->bh_curr->b_next = p;
+	p->b_తదుపరి = buf->bh_curr->b_తదుపరి;
+	buf->bh_curr->b_తదుపరి = p;
 	buf->bh_curr = p;
     }
 }
@@ -284,13 +284,13 @@ add_buff(
  * Delete "slen" bytes from the end of "buf".
  * Only works when it was just added.
  */
-    static void
-delete_buff_tail(buffheader_T *buf, int slen)
+    స్థిర శూన్య
+delete_buff_తోక(buffheader_T *buf, పూర్ణాంకం slen)
 {
-    if (buf->bh_curr == NULL)
-	return;  // nothing to delete
-    if (buf->bh_curr->b_strlen < (size_t)slen)
-	return;
+    ఒకవేళ (buf->bh_curr == ఖాళీ)
+	తిరిగి;  // nothing to delete
+    ఒకవేళ (buf->bh_curr->b_strlen < (size_t)slen)
+	తిరిగి;
 
     buf->bh_curr->b_str[buf->bh_curr->b_strlen - (size_t)slen] = NUL;
     buf->bh_curr->b_strlen -= slen;
@@ -300,73 +300,73 @@ delete_buff_tail(buffheader_T *buf, int slen)
 /*
  * Add number "n" to buffer "buf".
  */
-    static void
-add_num_buff(buffheader_T *buf, long n)
+    స్థిర శూన్య
+కూడు_అంకె_buff(buffheader_T *buf, దీర్ఘ n)
 {
-    char_u	number[32];
-    int		numberlen;
+    char_u	సంఖ్య[32];
+    పూర్ణాంకం		numberlen;
 
-    numberlen = vim_snprintf((char *)number, sizeof(number), "%ld", n);
-    add_buff(buf, number, (long)numberlen);
+    numberlen = vim_snprintf((అక్షరం *)సంఖ్య, పరిమాణం(సంఖ్య), "%ld", n);
+    కూడు_buff(buf, సంఖ్య, (దీర్ఘ)numberlen);
 }
 
 /*
  * Add character 'c' to buffer "buf".
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
-    static void
-add_char_buff(buffheader_T *buf, int c)
+    స్థిర శూన్య
+కూడు_char_buff(buffheader_T *buf, పూర్ణాంకం c)
 {
-    char_u	bytes[MB_MAXBYTES + 1];
-    int		len;
-    int		i;
-    char_u	temp[4];
-    long	templen;
+    char_u	బైట్లు[MB_MAXBYTES + 1];
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    char_u	తాత్కాలిక[4];
+    దీర్ఘ	templen;
 
-    if (IS_SPECIAL(c))
+    ఒకవేళ (IS_SPECIAL(c))
 	len = 1;
-    else
-	len = (*mb_char2bytes)(c, bytes);
-    for (i = 0; i < len; ++i)
+    లేకపోతే
+	len = (*mb_char2bytes)(c, బైట్లు);
+    కొరకు (i = 0; i < len; ++i)
     {
-	if (!IS_SPECIAL(c))
-	    c = bytes[i];
+	ఒకవేళ (!IS_SPECIAL(c))
+	    c = బైట్లు[i];
 
-	if (IS_SPECIAL(c) || c == K_SPECIAL || c == NUL)
+	ఒకవేళ (IS_SPECIAL(c) || c == K_SPECIAL || c == NUL)
 	{
 	    // translate special key code into three byte sequence
-	    temp[0] = K_SPECIAL;
-	    temp[1] = K_SECOND(c);
-	    temp[2] = K_THIRD(c);
-	    temp[3] = NUL;
+	    తాత్కాలిక[0] = K_SPECIAL;
+	    తాత్కాలిక[1] = K_రెండవ(c);
+	    తాత్కాలిక[2] = K_మూడవ(c);
+	    తాత్కాలిక[3] = NUL;
 	    templen = 3;
 	}
-#ifdef FEAT_GUI
-	else if (c == CSI)
+#నిర్వచితమైతే FEAT_GUI
+	లేకపోతే ఒకవేళ (c == CSI)
 	{
 	    // Translate a CSI to a CSI - KS_EXTRA - KE_CSI sequence
-	    temp[0] = CSI;
-	    temp[1] = KS_EXTRA;
-	    temp[2] = (int)KE_CSI;
-	    temp[3] = NUL;
+	    తాత్కాలిక[0] = CSI;
+	    తాత్కాలిక[1] = KS_EXTRA;
+	    తాత్కాలిక[2] = (పూర్ణాంకం)KE_CSI;
+	    తాత్కాలిక[3] = NUL;
 	    templen = 3;
 	}
-#endif
-	else
+#అయితే_ముగింపు
+	లేకపోతే
 	{
-	    temp[0] = c;
-	    temp[1] = NUL;
+	    తాత్కాలిక[0] = c;
+	    తాత్కాలిక[1] = NUL;
 	    templen = 1;
 	}
-	add_buff(buf, temp, templen);
+	కూడు_buff(buf, తాత్కాలిక, templen);
     }
 }
 
 // First read ahead buffer. Used for translated commands.
-static buffheader_T readbuf1 = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
+స్థిర buffheader_T readbuf1 = {{ఖాళీ, 0, {NUL}}, ఖాళీ, 0, 0, FALSE};
 
 // Second read ahead buffer. Used for redo.
-static buffheader_T readbuf2 = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
+స్థిర buffheader_T readbuf2 = {{ఖాళీ, 0, {NUL}}, ఖాళీ, 0, 0, FALSE};
 
 /*
  * Get one byte from the read buffers.  Use readbuf1 one first, use readbuf2
@@ -374,55 +374,55 @@ static buffheader_T readbuf2 = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
  * If advance == TRUE go to the next char.
  * No translation is done K_SPECIAL and CSI are escaped.
  */
-    static int
-read_readbuffers(int advance)
+    స్థిర పూర్ణాంకం
+read_readbuffers(పూర్ణాంకం advance)
 {
-    int c;
+    పూర్ణాంకం c;
 
     c = read_readbuf(&readbuf1, advance);
-    if (c == NUL)
+    ఒకవేళ (c == NUL)
 	c = read_readbuf(&readbuf2, advance);
-    return c;
+    తిరిగి c;
 }
 
-    static int
-read_readbuf(buffheader_T *buf, int advance)
+    స్థిర పూర్ణాంకం
+read_readbuf(buffheader_T *buf, పూర్ణాంకం advance)
 {
     char_u	c;
     buffblock_T	*curr;
 
-    if (buf->bh_first.b_next == NULL)  // buffer is empty
-	return NUL;
+    ఒకవేళ (buf->bh_మొదటి.b_తదుపరి == ఖాళీ)  // buffer is empty
+	తిరిగి NUL;
 
-    curr = buf->bh_first.b_next;
-    c = curr->b_str[buf->bh_index];
+    curr = buf->bh_మొదటి.b_తదుపరి;
+    c = curr->b_str[buf->bh_సూచీ];
 
-    if (advance)
+    ఒకవేళ (advance)
     {
-	if (curr->b_str[++buf->bh_index] == NUL)
+	ఒకవేళ (curr->b_str[++buf->bh_సూచీ] == NUL)
 	{
-	    buf->bh_first.b_next = curr->b_next;
+	    buf->bh_మొదటి.b_తదుపరి = curr->b_తదుపరి;
 	    vim_free(curr);
-	    buf->bh_index = 0;
+	    buf->bh_సూచీ = 0;
 	}
     }
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Prepare the read buffers for reading (if they contain something).
  */
-    static void
-start_stuff(void)
+    స్థిర శూన్య
+ప్రారంభం_stuff(శూన్య)
 {
-    if (readbuf1.bh_first.b_next != NULL)
+    ఒకవేళ (readbuf1.bh_మొదటి.b_తదుపరి != ఖాళీ)
     {
-	readbuf1.bh_curr = &(readbuf1.bh_first);
+	readbuf1.bh_curr = &(readbuf1.bh_మొదటి);
 	readbuf1.bh_create_newblock = TRUE;		// force a new block to be created (see add_buff())
     }
-    if (readbuf2.bh_first.b_next != NULL)
+    ఒకవేళ (readbuf2.bh_మొదటి.b_తదుపరి != ఖాళీ)
     {
-	readbuf2.bh_curr = &(readbuf2.bh_first);
+	readbuf2.bh_curr = &(readbuf2.bh_మొదటి);
 	readbuf2.bh_create_newblock = TRUE;		// force a new block to be created (see add_buff())
     }
 }
@@ -430,30 +430,30 @@ start_stuff(void)
 /*
  * Return TRUE if the stuff buffer is empty.
  */
-    int
-stuff_empty(void)
+    పూర్ణాంకం
+stuff_ఖాళీలు(శూన్య)
 {
-    return (readbuf1.bh_first.b_next == NULL
-	 && readbuf2.bh_first.b_next == NULL);
+    తిరిగి (readbuf1.bh_మొదటి.b_తదుపరి == ఖాళీ
+	 && readbuf2.bh_మొదటి.b_తదుపరి == ఖాళీ);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if readbuf1 is empty.  There may still be redo characters in
  * readbuf2.
  */
-    int
-readbuf1_empty(void)
+    పూర్ణాంకం
+readbuf1_ఖాళీలు(శూన్య)
 {
-    return (readbuf1.bh_first.b_next == NULL);
+    తిరిగి (readbuf1.bh_మొదటి.b_తదుపరి == ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set a typeahead character that won't be flushed.
  */
-    void
-typeahead_noflush(int c)
+    శూన్య
+typeahead_noflush(పూర్ణాంకం c)
 {
     typeahead_char = c;
 }
@@ -463,56 +463,56 @@ typeahead_noflush(int c)
  * typeahead buffer (used in case of an error).  If "flush_typeahead" is true,
  * flush all typeahead characters (used when interrupted by a CTRL-C).
  */
-    void
+    శూన్య
 flush_buffers(flush_buffers_T flush_typeahead)
 {
     init_typebuf();
 
-    start_stuff();
-    while (read_readbuffers(TRUE) != NUL)
+    ప్రారంభం_stuff();
+    అయితే (read_readbuffers(TRUE) != NUL)
 	;
 
-    if (flush_typeahead == FLUSH_MINIMAL)
+    ఒకవేళ (flush_typeahead == FLUSH_కనీస)
     {
 	// remove mapped characters at the start only,
 	// but only when enough space left in typebuf
-	if (typebuf.tb_off + typebuf.tb_maplen >= typebuf.tb_buflen)
+	ఒకవేళ (typebuf.tb_off + typebuf.tb_maplen >= typebuf.tb_buflen)
 	{
 	    typebuf.tb_off = MAXMAPLEN;
 	    typebuf.tb_len = 0;
 	}
-	else
+	లేకపోతే
 	{
 	    typebuf.tb_off += typebuf.tb_maplen;
 	    typebuf.tb_len -= typebuf.tb_maplen;
 	}
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
-	if (typebuf.tb_len == 0)
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	ఒకవేళ (typebuf.tb_len == 0)
 	    typebuf_was_filled = FALSE;
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
 	// remove typeahead
-	if (flush_typeahead == FLUSH_INPUT)
+	ఒకవేళ (flush_typeahead == FLUSH_ఆదానం)
 	    // We have to get all characters, because we may delete the first
 	    // part of an escape sequence.  In an xterm we get one char at a
 	    // time and we have to get them all.
-	    while (inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 10L) != 0)
+	    అయితే (inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 10L) != 0)
 		;
 	typebuf.tb_off = MAXMAPLEN;
 	typebuf.tb_len = 0;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	// Reset the flag that text received from a client or from feedkeys()
 	// was inserted in the typeahead buffer.
 	typebuf_was_filled = FALSE;
-#endif
+#అయితే_ముగింపు
     }
     typebuf.tb_maplen = 0;
     typebuf.tb_silent = 0;
     cmd_silent = FALSE;
     typebuf.tb_no_abbr_cnt = 0;
-    if (++typebuf.tb_change_cnt == 0)
+    ఒకవేళ (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 }
 
@@ -520,32 +520,32 @@ flush_buffers(flush_buffers_T flush_typeahead)
  * The previous contents of the redo buffer is kept in old_redobuffer.
  * This is used for the CTRL-O <.> command in insert mode.
  */
-    void
-ResetRedobuff(void)
+    శూన్య
+ResetRedobuff(శూన్య)
 {
-    if (block_redo)
-	return;
+    ఒకవేళ (ఖండం_redo)
+	తిరిగి;
 
     free_buff(&old_redobuff);
     old_redobuff = redobuff;
-    redobuff.bh_first.b_next = NULL;
+    redobuff.bh_మొదటి.b_తదుపరి = ఖాళీ;
 }
 
 /*
  * Discard the contents of the redo buffer and restore the previous redo
  * buffer.
  */
-    void
-CancelRedo(void)
+    శూన్య
+CancelRedo(శూన్య)
 {
-    if (block_redo)
-	return;
+    ఒకవేళ (ఖండం_redo)
+	తిరిగి;
 
     free_buff(&redobuff);
     redobuff = old_redobuff;
-    old_redobuff.bh_first.b_next = NULL;
-    start_stuff();
-    while (read_readbuffers(TRUE) != NUL)
+    old_redobuff.bh_మొదటి.b_తదుపరి = ఖాళీ;
+    ప్రారంభం_stuff();
+    అయితే (read_readbuffers(TRUE) != NUL)
 	;
 }
 
@@ -553,23 +553,23 @@ CancelRedo(void)
  * Save redobuff and old_redobuff to save_redobuff and save_old_redobuff.
  * Used before executing autocommands and user functions.
  */
-    void
+    శూన్య
 saveRedobuff(save_redo_T *save_redo)
 {
     char_u	*s;
     size_t	slen;
 
     save_redo->sr_redobuff = redobuff;
-    redobuff.bh_first.b_next = NULL;
+    redobuff.bh_మొదటి.b_తదుపరి = ఖాళీ;
     save_redo->sr_old_redobuff = old_redobuff;
-    old_redobuff.bh_first.b_next = NULL;
+    old_redobuff.bh_మొదటి.b_తదుపరి = ఖాళీ;
 
     // Make a copy, so that ":normal ." in a function works.
     s = get_buffcont(&save_redo->sr_redobuff, FALSE, &slen);
-    if (s == NULL)
-	return;
+    ఒకవేళ (s == ఖాళీ)
+	తిరిగి;
 
-    add_buff(&redobuff, s, (long)slen);
+    కూడు_buff(&redobuff, s, (దీర్ఘ)slen);
     vim_free(s);
 }
 
@@ -577,7 +577,7 @@ saveRedobuff(save_redo_T *save_redo)
  * Restore redobuff and old_redobuff from save_redobuff and save_old_redobuff.
  * Used after executing autocommands and user functions.
  */
-    void
+    శూన్య
 restoreRedobuff(save_redo_T *save_redo)
 {
     free_buff(&redobuff);
@@ -590,61 +590,61 @@ restoreRedobuff(save_redo_T *save_redo)
  * Append "s" to the redo buffer.
  * K_SPECIAL and CSI should already have been escaped.
  */
-    void
-AppendToRedobuff(char_u *s)
+    శూన్య
+Append_గమ్యం_Redobuff(char_u *s)
 {
-    if (!block_redo)
-	add_buff(&redobuff, s, -1L);
+    ఒకవేళ (!ఖండం_redo)
+	కూడు_buff(&redobuff, s, -1L);
 }
 
 /*
  * Append to Redo buffer literally, escaping special characters with CTRL-V.
  * K_SPECIAL and CSI are escaped as well.
  */
-    void
-AppendToRedobuffLit(
+    శూన్య
+Append_గమ్యం_Redobuff_Lit(
     char_u	*str,
-    int		len)	    // length of "str" or -1 for up to the NUL
+    పూర్ణాంకం		len)	    // length of "str" or -1 for up to the NUL
 {
     char_u	*s = str;
-    int		c;
-    char_u	*start;
+    పూర్ణాంకం		c;
+    char_u	*ప్రారంభం;
 
-    if (block_redo)
-	return;
+    ఒకవేళ (ఖండం_redo)
+	తిరిగి;
 
-    while (len < 0 ? *s != NUL : s - str < len)
+    అయితే (len < 0 ? *s != NUL : s - str < len)
     {
 	// Put a string of normal characters in the redo buffer (that's
 	// faster).
-	start = s;
-	while (*s >= ' ' && *s < DEL && (len < 0 || s - str < len))
+	ప్రారంభం = s;
+	అయితే (*s >= ' ' && *s < DEL && (len < 0 || s - str < len))
 	    ++s;
 
 	// Don't put '0' or '^' as last character, just in case a CTRL-D is
 	// typed next.
-	if (*s == NUL && (s[-1] == '0' || s[-1] == '^'))
+	ఒకవేళ (*s == NUL && (s[-1] == '0' || s[-1] == '^'))
 	    --s;
-	if (s > start)
-	    add_buff(&redobuff, start, (long)(s - start));
+	ఒకవేళ (s > ప్రారంభం)
+	    కూడు_buff(&redobuff, ప్రారంభం, (దీర్ఘ)(s - ప్రారంభం));
 
-	if (*s == NUL || (len >= 0 && s - str >= len))
-	    break;
+	ఒకవేళ (*s == NUL || (len >= 0 && s - str >= len))
+	    ఆపు;
 
 	// Handle a special or multibyte character.
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    // Handle composing chars separately.
 	    c = mb_cptr2char_adv(&s);
-	else
+	లేకపోతే
 	    c = *s++;
-	if (c < ' ' || c == DEL || (*s == NUL && (c == '0' || c == '^')))
-	    add_char_buff(&redobuff, Ctrl_V);
+	ఒకవేళ (c < ' ' || c == DEL || (*s == NUL && (c == '0' || c == '^')))
+	    కూడు_char_buff(&redobuff, Ctrl_V);
 
 	// CTRL-V '0' must be inserted as CTRL-V 048
-	if (*s == NUL && c == '0')
-	    add_buff(&redobuff, (char_u *)"048", 3L);
-	else
-	    add_char_buff(&redobuff, c);
+	ఒకవేళ (*s == NUL && c == '0')
+	    కూడు_buff(&redobuff, (char_u *)"048", 3L);
+	లేకపోతే
+	    కూడు_char_buff(&redobuff, c);
     }
 }
 
@@ -652,22 +652,22 @@ AppendToRedobuffLit(
  * Append "s" to the redo buffer, leaving 3-byte special key codes unmodified
  * and escaping other K_SPECIAL and CSI bytes.
  */
-    void
-AppendToRedobuffSpec(char_u *s)
+    శూన్య
+Append_గమ్యం_Redobuff_Spec(char_u *s)
 {
-    if (block_redo)
-	return;
+    ఒకవేళ (ఖండం_redo)
+	తిరిగి;
 
-    while (*s != NUL)
+    అయితే (*s != NUL)
     {
-	if (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
+	ఒకవేళ (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
 	{
 	    // Insert special key literally.
-	    add_buff(&redobuff, s, 3L);
+	    కూడు_buff(&redobuff, s, 3L);
 	    s += 3;
 	}
-	else
-	    add_char_buff(&redobuff, mb_cptr2char_adv(&s));
+	లేకపోతే
+	    కూడు_char_buff(&redobuff, mb_cptr2char_adv(&s));
     }
 }
 
@@ -675,133 +675,133 @@ AppendToRedobuffSpec(char_u *s)
  * Append a character to the redo buffer.
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
-    void
-AppendCharToRedobuff(int c)
+    శూన్య
+Append_Char_గమ్యం_Redobuff(పూర్ణాంకం c)
 {
-    if (!block_redo)
-	add_char_buff(&redobuff, c);
+    ఒకవేళ (!ఖండం_redo)
+	కూడు_char_buff(&redobuff, c);
 }
 
 /*
  * Append a number to the redo buffer.
  */
-    void
-AppendNumberToRedobuff(long n)
+    శూన్య
+Append_సంఖ్య_గమ్యం_Redobuff(దీర్ఘ n)
 {
-    if (!block_redo)
-	add_num_buff(&redobuff, n);
+    ఒకవేళ (!ఖండం_redo)
+	కూడు_అంకె_buff(&redobuff, n);
 }
 
 /*
  * Append string "s" to the stuff buffer.
  * CSI and K_SPECIAL must already have been escaped.
  */
-    void
+    శూన్య
 stuffReadbuff(char_u *s)
 {
-    add_buff(&readbuf1, s, -1L);
+    కూడు_buff(&readbuf1, s, -1L);
 }
 
 /*
  * Append string "s" to the redo stuff buffer.
  * CSI and K_SPECIAL must already have been escaped.
  */
-    void
+    శూన్య
 stuffRedoReadbuff(char_u *s)
 {
-    add_buff(&readbuf2, s, -1L);
+    కూడు_buff(&readbuf2, s, -1L);
 }
 
-    void
-stuffReadbuffLen(char_u *s, long len)
+    శూన్య
+stuffReadbuffLen(char_u *s, దీర్ఘ len)
 {
-#ifdef FEAT_EVAL
-    if (add_last_insert == 1) // Only add if this is the first call, for
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (కూడు_చివరి_చొప్పించు == 1) // Only add if this is the first call, for
 			      // recursive calls, ignore.
-	ga_concat_len(&last_insert_ga, s, (size_t)len);
-#endif
-    add_buff(&readbuf1, s, len);
+	ga_concat_len(&చివరి_చొప్పించు_ga, s, (size_t)len);
+#అయితే_ముగింపు
+    కూడు_buff(&readbuf1, s, len);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Stuff "s" into the stuff buffer, leaving special key codes unmodified and
  * escaping other K_SPECIAL and CSI bytes.
  * Change CR, LF and ESC into a space.
  */
-    void
+    శూన్య
 stuffReadbuffSpec(char_u *s)
 {
-    int c;
+    పూర్ణాంకం c;
 
-    while (*s != NUL)
+    అయితే (*s != NUL)
     {
-	if (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
+	ఒకవేళ (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
 	{
 	    // Insert special key literally.
 	    stuffReadbuffLen(s, 3L);
 	    s += 3;
 	}
-	else
+	లేకపోతే
 	{
 	    c = mb_cptr2char_adv(&s);
-	    if (c == CAR || c == NL || c == ESC)
+	    ఒకవేళ (c == CAR || c == NL || c == ESC)
 		c = ' ';
 	    stuffcharReadbuff(c);
 	}
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Append a character to the stuff buffer.
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
-    void
-stuffcharReadbuff(int c)
+    శూన్య
+stuffcharReadbuff(పూర్ణాంకం c)
 {
-    add_char_buff(&readbuf1, c);
+    కూడు_char_buff(&readbuf1, c);
 }
 
 /*
  * Append a number to the stuff buffer.
  */
-    void
-stuffnumReadbuff(long n)
+    శూన్య
+stuffnumReadbuff(దీర్ఘ n)
 {
-    add_num_buff(&readbuf1, n);
+    కూడు_అంకె_buff(&readbuf1, n);
 }
 
 /*
  * Stuff a string into the typeahead buffer, such that edit() will insert it
  * literally ("literally" TRUE) or interpret is as typed characters.
  */
-    void
-stuffescaped(char_u *arg, int literally)
+    శూన్య
+stuffescaped(char_u *arg, పూర్ణాంకం literally)
 {
-    int		c;
-    char_u	*start;
+    పూర్ణాంకం		c;
+    char_u	*ప్రారంభం;
 
-    while (*arg != NUL)
+    అయితే (*arg != NUL)
     {
 	// Stuff a sequence of normal ASCII characters, that's fast.  Also
 	// stuff K_SPECIAL to get the effect of a special key when "literally"
 	// is TRUE.
-	start = arg;
-	while ((*arg >= ' ' && *arg < DEL)
+	ప్రారంభం = arg;
+	అయితే ((*arg >= ' ' && *arg < DEL)
 		|| (*arg == K_SPECIAL && !literally))
 	    ++arg;
-	if (arg > start)
-	    stuffReadbuffLen(start, (long)(arg - start));
+	ఒకవేళ (arg > ప్రారంభం)
+	    stuffReadbuffLen(ప్రారంభం, (దీర్ఘ)(arg - ప్రారంభం));
 
 	// stuff a single special character
-	if (*arg != NUL)
+	ఒకవేళ (*arg != NUL)
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		c = mb_cptr2char_adv(&arg);
-	    else
+	    లేకపోతే
 		c = *arg++;
-	    if (literally && ((c < ' ' && c != TAB) || c == DEL))
+	    ఒకవేళ (literally && ((c < ' ' && c != TAB) || c == DEL))
 		stuffcharReadbuff(Ctrl_V);
 	    stuffcharReadbuff(c);
 	}
@@ -816,66 +816,66 @@ stuffescaped(char_u *arg, int literally)
  * otherwise.
  * If old is TRUE, use old_redobuff instead of redobuff.
  */
-    static int
-read_redo(int init, int old_redo)
+    స్థిర పూర్ణాంకం
+read_redo(పూర్ణాంకం init, పూర్ణాంకం old_redo)
 {
-    static buffblock_T	*bp;
-    static char_u	*p;
-    int			c;
-    int			n;
+    స్థిర buffblock_T	*bp;
+    స్థిర char_u	*p;
+    పూర్ణాంకం			c;
+    పూర్ణాంకం			n;
     char_u		buf[MB_MAXBYTES + 1];
-    int			i;
+    పూర్ణాంకం			i;
 
-    if (init)
+    ఒకవేళ (init)
     {
-	if (old_redo)
-	    bp = old_redobuff.bh_first.b_next;
-	else
-	    bp = redobuff.bh_first.b_next;
-	if (bp == NULL)
-	    return FAIL;
+	ఒకవేళ (old_redo)
+	    bp = old_redobuff.bh_మొదటి.b_తదుపరి;
+	లేకపోతే
+	    bp = redobuff.bh_మొదటి.b_తదుపరి;
+	ఒకవేళ (bp == ఖాళీ)
+	    తిరిగి FAIL;
 	p = bp->b_str;
-	return OK;
+	తిరిగి OK;
     }
-    if ((c = *p) != NUL)
+    ఒకవేళ ((c = *p) != NUL)
     {
 	// Reverse the conversion done by add_char_buff()
 	// For a multi-byte character get all the bytes and return the
 	// converted character.
-	if (has_mbyte && (c != K_SPECIAL || p[1] == KS_SPECIAL))
+	ఒకవేళ (has_mbyte && (c != K_SPECIAL || p[1] == KS_SPECIAL))
 	    n = MB_BYTE2LEN_CHECK(c);
-	else
+	లేకపోతే
 	    n = 1;
-	for (i = 0; ; ++i)
+	కొరకు (i = 0; ; ++i)
 	{
-	    if (c == K_SPECIAL) // special key or escaped K_SPECIAL
+	    ఒకవేళ (c == K_SPECIAL) // special key or escaped K_SPECIAL
 	    {
-		c = TO_SPECIAL(p[1], p[2]);
+		c = గమ్యం_SPECIAL(p[1], p[2]);
 		p += 2;
 	    }
-#ifdef FEAT_GUI
-	    if (c == CSI)	// escaped CSI
+#నిర్వచితమైతే FEAT_GUI
+	    ఒకవేళ (c == CSI)	// escaped CSI
 		p += 2;
-#endif
-	    if (*++p == NUL && bp->b_next != NULL)
+#అయితే_ముగింపు
+	    ఒకవేళ (*++p == NUL && bp->b_తదుపరి != ఖాళీ)
 	    {
-		bp = bp->b_next;
+		bp = bp->b_తదుపరి;
 		p = bp->b_str;
 	    }
 	    buf[i] = c;
-	    if (i == n - 1)	// last byte of a character
+	    ఒకవేళ (i == n - 1)	// last byte of a character
 	    {
-		if (n != 1)
+		ఒకవేళ (n != 1)
 		    c = (*mb_ptr2char)(buf);
-		break;
+		ఆపు;
 	    }
 	    c = *p;
-	    if (c == NUL)	// cannot happen?
-		break;
+	    ఒకవేళ (c == NUL)	// cannot happen?
+		ఆపు;
 	}
     }
 
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -883,13 +883,13 @@ read_redo(int init, int old_redo)
  * If old_redo is TRUE, use old_redobuff instead of redobuff.
  * The escaped K_SPECIAL and CSI are copied without translation.
  */
-    static void
-copy_redo(int old_redo)
+    స్థిర శూన్య
+copy_redo(పూర్ణాంకం old_redo)
 {
-    int	    c;
+    పూర్ణాంకం	    c;
 
-    while ((c = read_redo(FALSE, old_redo)) != NUL)
-	add_char_buff(&readbuf2, c);
+    అయితే ((c = read_redo(FALSE, old_redo)) != NUL)
+	కూడు_char_buff(&readbuf2, c);
 }
 
 /*
@@ -901,58 +901,58 @@ copy_redo(int old_redo)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-start_redo(long count, int old_redo)
+    పూర్ణాంకం
+ప్రారంభం_redo(దీర్ఘ లెక్క, పూర్ణాంకం old_redo)
 {
-    int	    c;
+    పూర్ణాంకం	    c;
 
     // init the pointers; return if nothing to redo
-    if (read_redo(TRUE, old_redo) == FAIL)
-	return FAIL;
+    ఒకవేళ (read_redo(TRUE, old_redo) == FAIL)
+	తిరిగి FAIL;
 
     c = read_redo(FALSE, old_redo);
 
-#ifdef FEAT_EVAL
-    if (c == K_SID)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (c == K_SID)
     {
 	// Copy the <SID>{sid}; sequence
-	add_char_buff(&readbuf2, c);
-	for (;;)
+	కూడు_char_buff(&readbuf2, c);
+	కొరకు (;;)
 	{
 	    c = read_redo(FALSE, old_redo);
-	    add_char_buff(&readbuf2, c);
-	    if (!SAFE_isdigit(c))
-		break;
+	    కూడు_char_buff(&readbuf2, c);
+	    ఒకవేళ (!సురక్షిత_isdigit(c))
+		ఆపు;
 	}
 	c = read_redo(FALSE, old_redo);
     }
-#endif
+#అయితే_ముగింపు
 
     // copy the buffer name, if present
-    if (c == '"')
+    ఒకవేళ (c == '"')
     {
-	add_buff(&readbuf2, (char_u *)"\"", 1L);
+	కూడు_buff(&readbuf2, (char_u *)"\"", 1L);
 	c = read_redo(FALSE, old_redo);
 
 	// if a numbered buffer is used, increment the number
-	if (c >= '1' && c < '9')
+	ఒకవేళ (c >= '1' && c < '9')
 	    ++c;
-	add_char_buff(&readbuf2, c);
+	కూడు_char_buff(&readbuf2, c);
 
 	// the expression register should be re-evaluated
-	if (c == '=')
+	ఒకవేళ (c == '=')
 	{
-	    add_char_buff(&readbuf2, CAR);
+	    కూడు_char_buff(&readbuf2, CAR);
 	    cmd_silent = TRUE;
 	}
 
 	c = read_redo(FALSE, old_redo);
     }
 
-    if (c == 'v')   // redo Visual
+    ఒకవేళ (c == 'v')   // redo Visual
     {
 	VIsual = curwin->w_cursor;
-	VIsual_active = TRUE;
+	VIsual_చురుకైన = TRUE;
 	VIsual_select = FALSE;
 	VIsual_reselect = TRUE;
 	redo_VIsual_busy = TRUE;
@@ -960,17 +960,17 @@ start_redo(long count, int old_redo)
     }
 
     // try to enter the count (in place of a previous count)
-    if (count)
+    ఒకవేళ (లెక్క)
     {
-	while (VIM_ISDIGIT(c))	// skip "old" count
+	అయితే (VIM_ISDIGIT(c))	// skip "old" count
 	    c = read_redo(FALSE, old_redo);
-	add_num_buff(&readbuf2, count);
+	కూడు_అంకె_buff(&readbuf2, లెక్క);
     }
 
     // copy the rest from the redo buffer into the stuff buffer
-    add_char_buff(&readbuf2, c);
+    కూడు_char_buff(&readbuf2, c);
     copy_redo(old_redo);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -978,36 +978,36 @@ start_redo(long count, int old_redo)
  * the redo buffer into readbuf2.
  * return FAIL for failure, OK otherwise
  */
-    int
-start_redo_ins(void)
+    పూర్ణాంకం
+ప్రారంభం_redo_ins(శూన్య)
 {
-    int	    c;
+    పూర్ణాంకం	    c;
 
-    if (read_redo(TRUE, FALSE) == FAIL)
-	return FAIL;
-    start_stuff();
+    ఒకవేళ (read_redo(TRUE, FALSE) == FAIL)
+	తిరిగి FAIL;
+    ప్రారంభం_stuff();
 
     // skip the count and the command character
-    while ((c = read_redo(FALSE, FALSE)) != NUL)
+    అయితే ((c = read_redo(FALSE, FALSE)) != NUL)
     {
-	if (vim_strchr((char_u *)"AaIiRrOo", c) != NULL)
+	ఒకవేళ (vim_strchr((char_u *)"AaIiRrOo", c) != ఖాళీ)
 	{
-	    if (c == 'O' || c == 'o')
-		add_buff(&readbuf2, NL_STR, -1L);
-	    break;
+	    ఒకవేళ (c == 'O' || c == 'o')
+		కూడు_buff(&readbuf2, NL_STR, -1L);
+	    ఆపు;
 	}
     }
 
     // copy the typed text from the redo buffer into the stuff buffer
     copy_redo(FALSE);
-    block_redo = TRUE;
-    return OK;
+    ఖండం_redo = TRUE;
+    తిరిగి OK;
 }
 
-    void
-stop_redo_ins(void)
+    శూన్య
+stop_redo_ins(శూన్య)
 {
-    block_redo = FALSE;
+    ఖండం_redo = FALSE;
 }
 
 /*
@@ -1015,11 +1015,11 @@ stop_redo_ins(void)
  * alloc() cannot be used here: In out-of-memory situations it would
  * be impossible to type anything.
  */
-    static void
-init_typebuf(void)
+    స్థిర శూన్య
+init_typebuf(శూన్య)
 {
-    if (typebuf.tb_buf != NULL)
-	return;
+    ఒకవేళ (typebuf.tb_buf != ఖాళీ)
+	తిరిగి;
 
     typebuf.tb_buf = typebuf_init;
     typebuf.tb_noremap = noremapbuf_init;
@@ -1032,10 +1032,10 @@ init_typebuf(void)
 /*
  * Returns TRUE when keys cannot be remapped.
  */
-    int
-noremap_keys(void)
+    పూర్ణాంకం
+noremap_కీలకాలు(శూన్య)
 {
-    return KeyNoremap & (RM_NONE|RM_SCRIPT);
+    తిరిగి కీలకం_Noremap & (RM_NONE|RM_SCRIPT);
 }
 
 /*
@@ -1057,30 +1057,30 @@ noremap_keys(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    పూర్ణాంకం
 ins_typebuf(
     char_u	*str,
-    int		noremap,
-    int		offset,
-    int		nottyped,
-    int		silent)
+    పూర్ణాంకం		noremap,
+    పూర్ణాంకం		స్థానభ్రంశం,
+    పూర్ణాంకం		nottyped,
+    పూర్ణాంకం		silent)
 {
     char_u	*s1, *s2;
-    int		newlen;
-    int		addlen;
-    int		i;
-    int		newoff;
-    int		val;
-    int		nrm;
+    పూర్ణాంకం		newlen;
+    పూర్ణాంకం		addlen;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		newoff;
+    పూర్ణాంకం		val;
+    పూర్ణాంకం		nrm;
 
     init_typebuf();
-    if (++typebuf.tb_change_cnt == 0)
+    ఒకవేళ (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
-    state_no_longer_safe("ins_typebuf()");
+    state_no_longer_సురక్షిత("ins_typebuf()");
 
-    addlen = (int)STRLEN(str);
+    addlen = (పూర్ణాంకం)STRLEN(str);
 
-    if (offset == 0 && addlen <= typebuf.tb_off)
+    ఒకవేళ (స్థానభ్రంశం == 0 && addlen <= typebuf.tb_off)
     {
 	/*
 	 * Easy case: there is room in front of typebuf.tb_buf[typebuf.tb_off]
@@ -1088,7 +1088,7 @@ ins_typebuf(
 	typebuf.tb_off -= addlen;
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off, str, (size_t)addlen);
     }
-    else if (typebuf.tb_len == 0 && typebuf.tb_buflen
+    లేకపోతే ఒకవేళ (typebuf.tb_len == 0 && typebuf.tb_buflen
 					       >= addlen + 3 * (MAXMAPLEN + 4))
     {
 	/*
@@ -1098,9 +1098,9 @@ ins_typebuf(
 	typebuf.tb_off = (typebuf.tb_buflen - addlen - 3 * (MAXMAPLEN + 4)) / 2;
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off, str, (size_t)addlen);
     }
-    else
+    లేకపోతే
     {
-	int extra;
+	పూర్ణాంకం extra;
 
 	/*
 	 * Need to allocate a new buffer.
@@ -1110,45 +1110,45 @@ ins_typebuf(
 	 */
 	newoff = MAXMAPLEN + 4;
 	extra = addlen + newoff + 4 * (MAXMAPLEN + 4);
-	if (typebuf.tb_len > 2147483647 - extra)
+	ఒకవేళ (typebuf.tb_len > 2147483647 - extra)
 	{
 	    // string is getting too long for a 32 bit int
 	    emsg(_(e_command_too_complex));    // also calls flush_buffers
 	    setcursor();
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	newlen = typebuf.tb_len + extra;
 	s1 = alloc(newlen);
-	if (s1 == NULL)		    // out of memory
-	    return FAIL;
+	ఒకవేళ (s1 == ఖాళీ)		    // out of memory
+	    తిరిగి FAIL;
 	s2 = alloc(newlen);
-	if (s2 == NULL)		    // out of memory
+	ఒకవేళ (s2 == ఖాళీ)		    // out of memory
 	{
 	    vim_free(s1);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	typebuf.tb_buflen = newlen;
 
 	// copy the old chars, before the insertion point
 	mch_memmove(s1 + newoff, typebuf.tb_buf + typebuf.tb_off,
-							      (size_t)offset);
+							      (size_t)స్థానభ్రంశం);
 	// copy the new chars
-	mch_memmove(s1 + newoff + offset, str, (size_t)addlen);
+	mch_memmove(s1 + newoff + స్థానభ్రంశం, str, (size_t)addlen);
 	// copy the old chars, after the insertion point, including the	NUL at
 	// the end
-	mch_memmove(s1 + newoff + offset + addlen,
-				     typebuf.tb_buf + typebuf.tb_off + offset,
-				       (size_t)(typebuf.tb_len - offset + 1));
-	if (typebuf.tb_buf != typebuf_init)
+	mch_memmove(s1 + newoff + స్థానభ్రంశం + addlen,
+				     typebuf.tb_buf + typebuf.tb_off + స్థానభ్రంశం,
+				       (size_t)(typebuf.tb_len - స్థానభ్రంశం + 1));
+	ఒకవేళ (typebuf.tb_buf != typebuf_init)
 	    vim_free(typebuf.tb_buf);
 	typebuf.tb_buf = s1;
 
 	mch_memmove(s2 + newoff, typebuf.tb_noremap + typebuf.tb_off,
-							      (size_t)offset);
-	mch_memmove(s2 + newoff + offset + addlen,
-		   typebuf.tb_noremap + typebuf.tb_off + offset,
-					   (size_t)(typebuf.tb_len - offset));
-	if (typebuf.tb_noremap != noremapbuf_init)
+							      (size_t)స్థానభ్రంశం);
+	mch_memmove(s2 + newoff + స్థానభ్రంశం + addlen,
+		   typebuf.tb_noremap + typebuf.tb_off + స్థానభ్రంశం,
+					   (size_t)(typebuf.tb_len - స్థానభ్రంశం));
+	ఒకవేళ (typebuf.tb_noremap != noremapbuf_init)
 	    vim_free(typebuf.tb_noremap);
 	typebuf.tb_noremap = s2;
 
@@ -1157,11 +1157,11 @@ ins_typebuf(
     typebuf.tb_len += addlen;
 
     // If noremap == REMAP_SCRIPT: do remap script-local mappings.
-    if (noremap == REMAP_SCRIPT)
+    ఒకవేళ (noremap == REMAP_SCRIPT)
 	val = RM_SCRIPT;
-    else if (noremap == REMAP_SKIP)
+    లేకపోతే ఒకవేళ (noremap == REMAP_SKIP)
 	val = RM_ABBR;
-    else
+    లేకపోతే
 	val = RM_NONE;
 
     /*
@@ -1172,30 +1172,30 @@ ins_typebuf(
      * If noremap  > 0: "noremap" characters are not remappable, the rest
      *			mappable
      */
-    if (noremap == REMAP_SKIP)
+    ఒకవేళ (noremap == REMAP_SKIP)
 	nrm = 1;
-    else if (noremap < 0)
+    లేకపోతే ఒకవేళ (noremap < 0)
 	nrm = addlen;
-    else
+    లేకపోతే
 	nrm = noremap;
-    for (i = 0; i < addlen; ++i)
-	typebuf.tb_noremap[typebuf.tb_off + i + offset] =
+    కొరకు (i = 0; i < addlen; ++i)
+	typebuf.tb_noremap[typebuf.tb_off + i + స్థానభ్రంశం] =
 						  (--nrm >= 0) ? val : RM_YES;
 
     // tb_maplen and tb_silent only remember the length of mapped and/or
     // silent mappings at the start of the buffer, assuming that a mapped
     // sequence doesn't result in typed characters.
-    if (nottyped || typebuf.tb_maplen > offset)
+    ఒకవేళ (nottyped || typebuf.tb_maplen > స్థానభ్రంశం)
 	typebuf.tb_maplen += addlen;
-    if (silent || typebuf.tb_silent > offset)
+    ఒకవేళ (silent || typebuf.tb_silent > స్థానభ్రంశం)
     {
 	typebuf.tb_silent += addlen;
 	cmd_silent = TRUE;
     }
-    if (typebuf.tb_no_abbr_cnt && offset == 0)	// and not used for abbrev.s
+    ఒకవేళ (typebuf.tb_no_abbr_cnt && స్థానభ్రంశం == 0)	// and not used for abbrev.s
 	typebuf.tb_no_abbr_cnt += addlen;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1205,15 +1205,15 @@ ins_typebuf(
  * the char.
  * Returns the length of what was inserted.
  */
-    int
-ins_char_typebuf(int c, int modifiers)
+    పూర్ణాంకం
+ins_char_typebuf(పూర్ణాంకం c, పూర్ణాంకం modifiers)
 {
     char_u	buf[MB_MAXBYTES * 3 + 4];
-    int		len = special_to_buf(c, modifiers, TRUE, buf);
+    పూర్ణాంకం		len = special_గమ్యం_buf(c, modifiers, TRUE, buf);
 
     buf[len] = NUL;
-    (void)ins_typebuf(buf, KeyNoremap, 0, !KeyTyped, cmd_silent);
-    return len;
+    (శూన్య)ins_typebuf(buf, కీలకం_Noremap, 0, !కీలకం_Typed, cmd_silent);
+    తిరిగి len;
 }
 
 /*
@@ -1225,14 +1225,14 @@ ins_char_typebuf(int c, int modifiers)
  * Or "typebuf.tb_off" may have been changed and we would overwrite characters
  * that was just added.
  */
-    int
-typebuf_changed(
-    int		tb_change_cnt)	// old value of typebuf.tb_change_cnt
+    పూర్ణాంకం
+typebuf_మారింది(
+    పూర్ణాంకం		tb_change_cnt)	// old value of typebuf.tb_change_cnt
 {
-    return (tb_change_cnt != 0 && (typebuf.tb_change_cnt != tb_change_cnt
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    తిరిగి (tb_change_cnt != 0 && (typebuf.tb_change_cnt != tb_change_cnt
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	    || typebuf_was_filled
-#endif
+#అయితే_ముగింపు
 	   ));
 }
 
@@ -1240,149 +1240,149 @@ typebuf_changed(
  * Return TRUE if there are no characters in the typeahead buffer that have
  * not been typed (result from a mapping or come from ":normal").
  */
-    int
-typebuf_typed(void)
+    పూర్ణాంకం
+typebuf_typed(శూన్య)
 {
-    return typebuf.tb_maplen == 0;
+    తిరిగి typebuf.tb_maplen == 0;
 }
 
 /*
  * Return the number of characters that are mapped (or not typed).
  */
-    int
-typebuf_maplen(void)
+    పూర్ణాంకం
+typebuf_maplen(శూన్య)
 {
-    return typebuf.tb_maplen;
+    తిరిగి typebuf.tb_maplen;
 }
 
 /*
  * remove "len" characters from typebuf.tb_buf[typebuf.tb_off + offset]
  */
-    void
-del_typebuf(int len, int offset)
+    శూన్య
+del_typebuf(పూర్ణాంకం len, పూర్ణాంకం స్థానభ్రంశం)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    if (len == 0)
-	return;		// nothing to do
+    ఒకవేళ (len == 0)
+	తిరిగి;		// nothing to do
 
     typebuf.tb_len -= len;
 
     /*
      * Easy case: Just increase typebuf.tb_off.
      */
-    if (offset == 0 && typebuf.tb_buflen - (typebuf.tb_off + len)
+    ఒకవేళ (స్థానభ్రంశం == 0 && typebuf.tb_buflen - (typebuf.tb_off + len)
 							 >= 3 * MAXMAPLEN + 3)
 	typebuf.tb_off += len;
     /*
      * Have to move the characters in typebuf.tb_buf[] and typebuf.tb_noremap[]
      */
-    else
+    లేకపోతే
     {
-	i = typebuf.tb_off + offset;
+	i = typebuf.tb_off + స్థానభ్రంశం;
 	/*
 	 * Leave some extra room at the end to avoid reallocation.
 	 */
-	if (typebuf.tb_off > MAXMAPLEN)
+	ఒకవేళ (typebuf.tb_off > MAXMAPLEN)
 	{
 	    mch_memmove(typebuf.tb_buf + MAXMAPLEN,
-			     typebuf.tb_buf + typebuf.tb_off, (size_t)offset);
+			     typebuf.tb_buf + typebuf.tb_off, (size_t)స్థానభ్రంశం);
 	    mch_memmove(typebuf.tb_noremap + MAXMAPLEN,
-			 typebuf.tb_noremap + typebuf.tb_off, (size_t)offset);
+			 typebuf.tb_noremap + typebuf.tb_off, (size_t)స్థానభ్రంశం);
 	    typebuf.tb_off = MAXMAPLEN;
 	}
 	// adjust typebuf.tb_buf (include the NUL at the end)
-	mch_memmove(typebuf.tb_buf + typebuf.tb_off + offset,
+	mch_memmove(typebuf.tb_buf + typebuf.tb_off + స్థానభ్రంశం,
 						     typebuf.tb_buf + i + len,
-				       (size_t)(typebuf.tb_len - offset + 1));
+				       (size_t)(typebuf.tb_len - స్థానభ్రంశం + 1));
 	// adjust typebuf.tb_noremap[]
-	mch_memmove(typebuf.tb_noremap + typebuf.tb_off + offset,
+	mch_memmove(typebuf.tb_noremap + typebuf.tb_off + స్థానభ్రంశం,
 						 typebuf.tb_noremap + i + len,
-					   (size_t)(typebuf.tb_len - offset));
+					   (size_t)(typebuf.tb_len - స్థానభ్రంశం));
     }
 
-    if (typebuf.tb_maplen > offset)		// adjust tb_maplen
+    ఒకవేళ (typebuf.tb_maplen > స్థానభ్రంశం)		// adjust tb_maplen
     {
-	if (typebuf.tb_maplen < offset + len)
-	    typebuf.tb_maplen = offset;
-	else
+	ఒకవేళ (typebuf.tb_maplen < స్థానభ్రంశం + len)
+	    typebuf.tb_maplen = స్థానభ్రంశం;
+	లేకపోతే
 	    typebuf.tb_maplen -= len;
     }
-    if (typebuf.tb_silent > offset)		// adjust tb_silent
+    ఒకవేళ (typebuf.tb_silent > స్థానభ్రంశం)		// adjust tb_silent
     {
-	if (typebuf.tb_silent < offset + len)
-	    typebuf.tb_silent = offset;
-	else
+	ఒకవేళ (typebuf.tb_silent < స్థానభ్రంశం + len)
+	    typebuf.tb_silent = స్థానభ్రంశం;
+	లేకపోతే
 	    typebuf.tb_silent -= len;
     }
-    if (typebuf.tb_no_abbr_cnt > offset)	// adjust tb_no_abbr_cnt
+    ఒకవేళ (typebuf.tb_no_abbr_cnt > స్థానభ్రంశం)	// adjust tb_no_abbr_cnt
     {
-	if (typebuf.tb_no_abbr_cnt < offset + len)
-	    typebuf.tb_no_abbr_cnt = offset;
-	else
+	ఒకవేళ (typebuf.tb_no_abbr_cnt < స్థానభ్రంశం + len)
+	    typebuf.tb_no_abbr_cnt = స్థానభ్రంశం;
+	లేకపోతే
 	    typebuf.tb_no_abbr_cnt -= len;
     }
 
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     // Reset the flag that text received from a client or from feedkeys()
     // was inserted in the typeahead buffer.
     typebuf_was_filled = FALSE;
-#endif
-    if (++typebuf.tb_change_cnt == 0)
+#అయితే_ముగింపు
+    ఒకవేళ (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 }
 
 /*
  * State for adding bytes to a recording or 'showcmd'.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     char_u	buf[MB_MAXBYTES * 3 + 4];
-    int		prev_c;
+    పూర్ణాంకం		prev_c;
     size_t	buflen;
-    unsigned	pending_special;
-    unsigned	pending_mbyte;
+    గుర్తులేని	pending_special;
+    గుర్తులేని	pending_mbyte;
 } gotchars_state_T;
 
 /*
  * Add a single byte to a recording or 'showcmd'.
  * Return TRUE if a full key has been received, FALSE otherwise.
  */
-    static int
-gotchars_add_byte(gotchars_state_T *state, char_u byte)
+    స్థిర పూర్ణాంకం
+gotchars_కూడు_byte(gotchars_state_T *state, char_u byte)
 {
-    int		c = state->buf[state->buflen++] = byte;
-    int		retval = FALSE;
-    int		in_special = state->pending_special > 0;
-    int		in_mbyte = state->pending_mbyte > 0;
+    పూర్ణాంకం		c = state->buf[state->buflen++] = byte;
+    పూర్ణాంకం		retval = FALSE;
+    పూర్ణాంకం		లోపల_special = state->pending_special > 0;
+    పూర్ణాంకం		లోపల_mbyte = state->pending_mbyte > 0;
 
-    if (in_special)
+    ఒకవేళ (లోపల_special)
 	state->pending_special--;
-    else if (c == K_SPECIAL
-#ifdef FEAT_GUI
+    లేకపోతే ఒకవేళ (c == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		|| c == CSI
-#endif
+#అయితే_ముగింపు
 	    )
 	// When receiving a special key sequence, store it until we have all
 	// the bytes and we can decide what to do with it.
 	state->pending_special = 2;
 
-    if (state->pending_special > 0)
-	goto ret_false;
+    ఒకవేళ (state->pending_special > 0)
+	వెళ్ళు ret_false;
 
-    if (in_mbyte)
+    ఒకవేళ (లోపల_mbyte)
 	state->pending_mbyte--;
-    else
+    లేకపోతే
     {
-	if (in_special)
+	ఒకవేళ (లోపల_special)
 	{
-	    if (state->prev_c == KS_MODIFIER)
+	    ఒకవేళ (state->prev_c == KS_MODIFIER)
 		// When receiving a modifier, wait for the modified key.
-		goto ret_false;
-	    c = TO_SPECIAL(state->prev_c, c);
+		వెళ్ళు ret_false;
+	    c = గమ్యం_SPECIAL(state->prev_c, c);
 	    // Drop K_FOCUSGAINED, K_FOCUSLOST and K_COMPLETE_DELAY, they are
 	    // not useful in a recording.
-	    if (c == K_FOCUSGAINED || c == K_FOCUSLOST || c == K_COMPLETE_DELAY)
+	    ఒకవేళ (c == K_FOCUSGAINED || c == K_FOCUSLOST || c == K_COMPLETE_DELAY)
 		state->buflen = 0;
 	}
 	// When receiving a multibyte character, store it until we have all
@@ -1391,52 +1391,52 @@ gotchars_add_byte(gotchars_state_T *state, char_u byte)
 	state->pending_mbyte = MB_BYTE2LEN_CHECK(c) - 1;
     }
 
-    if (state->pending_mbyte > 0)
-	goto ret_false;
+    ఒకవేళ (state->pending_mbyte > 0)
+	వెళ్ళు ret_false;
 
     retval = TRUE;
 ret_false:
     state->prev_c = c;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Write typed characters to script file.
  * If recording is on put the character in the record buffer.
  */
-    static void
-gotchars(char_u *chars, int len)
+    స్థిర శూన్య
+gotchars(char_u *chars, పూర్ణాంకం len)
 {
     char_u		*s = chars;
     size_t		i;
-    int			todo = len;
-    static gotchars_state_T state;
+    పూర్ణాంకం			todo = len;
+    స్థిర gotchars_state_T state;
 
-    while (todo-- > 0)
+    అయితే (todo-- > 0)
     {
-	if (!gotchars_add_byte(&state, *s++))
-	    continue;
+	ఒకవేళ (!gotchars_కూడు_byte(&state, *s++))
+	    కొనసాగు;
 
 	// Handle one byte at a time; no translation to be done.
-	for (i = 0; i < state.buflen; ++i)
+	కొరకు (i = 0; i < state.buflen; ++i)
 	    updatescript(state.buf[i]);
 
-	if (reg_recording != 0)
+	ఒకవేళ (reg_recording != 0)
 	{
 	    state.buf[state.buflen] = NUL;
-	    add_buff(&recordbuff, state.buf, (long)state.buflen);
+	    కూడు_buff(&recordbuff, state.buf, (దీర్ఘ)state.buflen);
 	    // remember how many chars were last recorded
-	    last_recorded_len += state.buflen;
+	    చివరి_recorded_len += state.buflen;
 	}
 	state.buflen = 0;
     }
 
     may_sync_undo();
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // output "debug mode" message next time in debug mode
-    debug_did_msg = FALSE;
-#endif
+    debug_did_సందేశం = FALSE;
+#అయితే_ముగింపు
 
     // Since characters have been typed, consider the following to be in
     // another mapping.  Search string will be kept in history.
@@ -1446,8 +1446,8 @@ gotchars(char_u *chars, int len)
 /*
  * Record an <Ignore> key.
  */
-    void
-gotchars_ignore(void)
+    శూన్య
+gotchars_ignore(శూన్య)
 {
     char_u nop_buf[3] = { K_SPECIAL, KS_EXTRA, KE_IGNORE };
     gotchars(nop_buf, 3);
@@ -1459,14 +1459,14 @@ gotchars_ignore(void)
  * again.
  * Only affects recorded characters.
  */
-    void
-ungetchars(int len)
+    శూన్య
+ungetchars(పూర్ణాంకం len)
 {
-    if (reg_recording == 0)
-	return;
+    ఒకవేళ (reg_recording == 0)
+	తిరిగి;
 
-    delete_buff_tail(&recordbuff, len);
-    last_recorded_len -= len;
+    delete_buff_తోక(&recordbuff, len);
+    చివరి_recorded_len -= len;
 }
 
 /*
@@ -1477,11 +1477,11 @@ ungetchars(int len)
  * - While reading a script file.
  * - When no_u_sync is non-zero.
  */
-    static void
-may_sync_undo(void)
+    స్థిర శూన్య
+may_sync_undo(శూన్య)
 {
-    if ((!(State & (MODE_INSERT | MODE_CMDLINE)) || arrow_used)
-					       && scriptin[curscript] == NULL)
+    ఒకవేళ ((!(State & (బహుళకం_చొప్పించు | బహుళకం_CMDLINE)) || arrow_వాడిన)
+					       && scriptin[curscript] == ఖాళీ)
 	u_sync(FALSE);
 }
 
@@ -1489,15 +1489,15 @@ may_sync_undo(void)
  * Make "typebuf" empty and allocate new buffers.
  * Returns FAIL when out of memory.
  */
-    static int
-alloc_typebuf(void)
+    స్థిర పూర్ణాంకం
+alloc_typebuf(శూన్య)
 {
     typebuf.tb_buf = alloc(TYPELEN_INIT);
     typebuf.tb_noremap = alloc(TYPELEN_INIT);
-    if (typebuf.tb_buf == NULL || typebuf.tb_noremap == NULL)
+    ఒకవేళ (typebuf.tb_buf == ఖాళీ || typebuf.tb_noremap == ఖాళీ)
     {
 	free_typebuf();
-	return FAIL;
+	తిరిగి FAIL;
     }
     typebuf.tb_buflen = TYPELEN_INIT;
     typebuf.tb_off = MAXMAPLEN + 4;  // can insert without realloc
@@ -1505,27 +1505,27 @@ alloc_typebuf(void)
     typebuf.tb_maplen = 0;
     typebuf.tb_silent = 0;
     typebuf.tb_no_abbr_cnt = 0;
-    if (++typebuf.tb_change_cnt == 0)
+    ఒకవేళ (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     typebuf_was_filled = FALSE;
-#endif
-    return OK;
+#అయితే_ముగింపు
+    తిరిగి OK;
 }
 
 /*
  * Free the buffers of "typebuf".
  */
-    static void
-free_typebuf(void)
+    స్థిర శూన్య
+free_typebuf(శూన్య)
 {
-    if (typebuf.tb_buf == typebuf_init)
-	internal_error("Free typebuf 1");
-    else
+    ఒకవేళ (typebuf.tb_buf == typebuf_init)
+	అంతర్గత_error("Free typebuf 1");
+    లేకపోతే
 	VIM_CLEAR(typebuf.tb_buf);
-    if (typebuf.tb_noremap == noremapbuf_init)
-	internal_error("Free typebuf 2");
-    else
+    ఒకవేళ (typebuf.tb_noremap == noremapbuf_init)
+	అంతర్గత_error("Free typebuf 2");
+    లేకపోతే
 	VIM_CLEAR(typebuf.tb_noremap);
 }
 
@@ -1533,57 +1533,57 @@ free_typebuf(void)
  * When doing ":so! file", the current typeahead needs to be saved, and
  * restored when "file" has been read completely.
  */
-static typebuf_T saved_typebuf[NSCRIPT];
+స్థిర typebuf_T saved_typebuf[NSCRIPT];
 
-    int
-save_typebuf(void)
+    పూర్ణాంకం
+save_typebuf(శూన్య)
 {
     init_typebuf();
     saved_typebuf[curscript] = typebuf;
     // If out of memory: restore typebuf and close file.
-    if (alloc_typebuf() == FAIL)
+    ఒకవేళ (alloc_typebuf() == FAIL)
     {
 	closescript();
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-static int old_char = -1;	// character put back by vungetc()
-static int old_mod_mask;	// mod_mask for ungotten character
-static int old_mouse_row;	// mouse_row related to old_char
-static int old_mouse_col;	// mouse_col related to old_char
-static int old_KeyStuffed;	// whether old_char was stuffed
+స్థిర పూర్ణాంకం old_char = -1;	// character put back by vungetc()
+స్థిర పూర్ణాంకం old_mod_ముసుగు;	// mod_mask for ungotten character
+స్థిర పూర్ణాంకం old_mouse_అడ్డువరుస;	// mouse_row related to old_char
+స్థిర పూర్ణాంకం old_mouse_నిలువు;	// mouse_col related to old_char
+స్థిర పూర్ణాంకం old_కీలకం_Stuffed;	// whether old_char was stuffed
 
-static int can_get_old_char(void)
+స్థిర పూర్ణాంకం can_get_old_char(శూన్య)
 {
     // If the old character was not stuffed and characters have been added to
     // the stuff buffer, need to first get the stuffed characters instead.
-    return old_char != -1 && (old_KeyStuffed || stuff_empty());
+    తిరిగి old_char != -1 && (old_కీలకం_Stuffed || stuff_ఖాళీలు());
 }
 
 /*
  * Save all three kinds of typeahead, so that the user must type at a prompt.
  */
-    void
+    శూన్య
 save_typeahead(tasave_T *tp)
 {
     tp->save_typebuf = typebuf;
     tp->typebuf_valid = (alloc_typebuf() == OK);
-    if (!tp->typebuf_valid)
+    ఒకవేళ (!tp->typebuf_valid)
 	typebuf = tp->save_typebuf;
 
     tp->old_char = old_char;
-    tp->old_mod_mask = old_mod_mask;
+    tp->old_mod_ముసుగు = old_mod_ముసుగు;
     old_char = -1;
 
     tp->save_readbuf1 = readbuf1;
-    readbuf1.bh_first.b_next = NULL;
+    readbuf1.bh_మొదటి.b_తదుపరి = ఖాళీ;
     tp->save_readbuf2 = readbuf2;
-    readbuf2.bh_first.b_next = NULL;
-#ifdef USE_INPUT_BUF
-    tp->save_inputbuf = get_input_buf();
-#endif
+    readbuf2.bh_మొదటి.b_తదుపరి = ఖాళీ;
+#నిర్వచితమైతే USE_ఆదానం_BUF
+    tp->save_inputbuf = get_ఆదానం_buf();
+#అయితే_ముగింపు
 }
 
 /*
@@ -1591,65 +1591,65 @@ save_typeahead(tasave_T *tp)
  * The allocated memory is freed, can only be called once!
  * When "overwrite" is FALSE input typed later is kept.
  */
-    void
-restore_typeahead(tasave_T *tp, int overwrite UNUSED)
+    శూన్య
+restore_typeahead(tasave_T *tp, పూర్ణాంకం overwrite వాడని)
 {
-    if (tp->typebuf_valid)
+    ఒకవేళ (tp->typebuf_valid)
     {
 	free_typebuf();
 	typebuf = tp->save_typebuf;
     }
 
     old_char = tp->old_char;
-    old_mod_mask = tp->old_mod_mask;
+    old_mod_ముసుగు = tp->old_mod_ముసుగు;
 
     free_buff(&readbuf1);
     readbuf1 = tp->save_readbuf1;
     free_buff(&readbuf2);
     readbuf2 = tp->save_readbuf2;
-#ifdef USE_INPUT_BUF
-    set_input_buf(tp->save_inputbuf, overwrite);
-#endif
+#నిర్వచితమైతే USE_ఆదానం_BUF
+    సమితి_ఆదానం_buf(tp->save_inputbuf, overwrite);
+#అయితే_ముగింపు
 }
 
 /*
  * Open a new script file for the ":source!" command.
  */
-    void
+    శూన్య
 openscript(
     char_u	*name,
-    int		directly)	// when TRUE execute directly
+    పూర్ణాంకం		directly)	// when TRUE execute directly
 {
-    if (curscript + 1 == NSCRIPT)
+    ఒకవేళ (curscript + 1 == NSCRIPT)
     {
 	emsg(_(e_scripts_nested_too_deep));
-	return;
+	తిరిగి;
     }
 
     // Disallow sourcing a file in the sandbox, the commands would be executed
     // later, possibly outside of the sandbox.
-    if (check_secure())
-	return;
+    ఒకవేళ (check_secure())
+	తిరిగి;
 
-#ifdef FEAT_EVAL
-    if (ignore_script)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (ignore_script)
 	// Not reading from script, also don't open one.  Warning message?
-	return;
-#endif
+	తిరిగి;
+#అయితే_ముగింపు
 
-    if (scriptin[curscript] != NULL)	// already reading script
+    ఒకవేళ (scriptin[curscript] != ఖాళీ)	// already reading script
 	++curscript;
 				// use NameBuff for expanded name
     expand_env(name, NameBuff, MAXPATHL);
-    if ((scriptin[curscript] = mch_fopen((char *)NameBuff, READBIN)) == NULL)
+    ఒకవేళ ((scriptin[curscript] = mch_fopen((అక్షరం *)NameBuff, READBIN)) == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), name);
-	if (curscript)
+	ఒకవేళ (curscript)
 	    --curscript;
-	return;
+	తిరిగి;
     }
-    if (save_typebuf() == FAIL)
-	return;
+    ఒకవేళ (save_typebuf() == FAIL)
+	తిరిగి;
 
     /*
      * Execute the commands from the file right now when using ":source!"
@@ -1657,88 +1657,88 @@ openscript(
      * follows.  This means the display won't be updated.  Don't do this
      * always, "make test" would fail.
      */
-    if (directly)
+    ఒకవేళ (directly)
     {
 	oparg_T	oa;
-	int	oldcurscript;
-	int	save_State = State;
-	int	save_restart_edit = restart_edit;
-	int	save_insertmode = p_im;
-	int	save_finish_op = finish_op;
-	int	save_msg_scroll = msg_scroll;
+	పూర్ణాంకం	oldcurscript;
+	పూర్ణాంకం	save_State = State;
+	పూర్ణాంకం	save_restart_edit = restart_edit;
+	పూర్ణాంకం	save_insertmode = p_im;
+	పూర్ణాంకం	save_ముగింపు_op = ముగింపు_op;
+	పూర్ణాంకం	save_సందేశం_scroll = సందేశం_scroll;
 
-	State = MODE_NORMAL;
-	msg_scroll = FALSE;	// no msg scrolling in Normal mode
+	State = బహుళకం_సాధారణ;
+	సందేశం_scroll = FALSE;	// no msg scrolling in Normal mode
 	restart_edit = 0;	// don't go to Insert mode
 	p_im = FALSE;		// don't use 'insertmode'
 	clear_oparg(&oa);
-	finish_op = FALSE;
+	ముగింపు_op = FALSE;
 
 	oldcurscript = curscript;
-	do
+	చేయి
 	{
 	    update_topline_cursor();	// update cursor position and topline
-	    normal_cmd(&oa, FALSE);	// execute one command
-	    (void)vpeekc();		// check for end of file
+	    సాధారణ_cmd(&oa, FALSE);	// execute one command
+	    (శూన్య)vpeekc();		// check for end of file
 	}
-	while (scriptin[oldcurscript] != NULL);
+	అయితే (scriptin[oldcurscript] != ఖాళీ);
 
 	State = save_State;
-	msg_scroll = save_msg_scroll;
+	సందేశం_scroll = save_సందేశం_scroll;
 	restart_edit = save_restart_edit;
 	p_im = save_insertmode;
-	finish_op = save_finish_op;
+	ముగింపు_op = save_ముగింపు_op;
     }
 }
 
 /*
  * Close the currently active input script.
  */
-    static void
-closescript(void)
+    స్థిర శూన్య
+closescript(శూన్య)
 {
     free_typebuf();
     typebuf = saved_typebuf[curscript];
 
     fclose(scriptin[curscript]);
-    scriptin[curscript] = NULL;
-    if (curscript > 0)
+    scriptin[curscript] = ఖాళీ;
+    ఒకవేళ (curscript > 0)
 	--curscript;
 }
 
-#if defined(EXITFREE)
-    void
-close_all_scripts(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+close_all_scripts(శూన్య)
 {
-    while (scriptin[0] != NULL)
+    అయితే (scriptin[0] != ఖాళీ)
 	closescript();
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE when reading keys from a script file.
  */
-    int
-using_script(void)
+    పూర్ణాంకం
+using_script(శూన్య)
 {
-    return scriptin[curscript] != NULL;
+    తిరిగి scriptin[curscript] != ఖాళీ;
 }
 
 /*
  * This function is called just before doing a blocking wait.  Thus after
  * waiting 'updatetime' for a character to arrive.
  */
-    void
-before_blocking(void)
+    శూన్య
+before_blocking(శూన్య)
 {
     // Tell terminal to flush screen contents before blocking
-    term_set_sync_output(TERM_SYNC_OUTPUT_FLUSH);
+    పదం_సమితి_sync_output(పదం_SYNC_OUTPUT_FLUSH);
 
     updatescript(0);
-#ifdef FEAT_EVAL
-    if (may_garbage_collect)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (may_garbage_collect)
 	garbage_collect(FALSE);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -1748,125 +1748,125 @@ before_blocking(void)
  * All the changed memfiles are synced if c == 0 or when the number of typed
  * characters reaches 'updatecount' and 'updatecount' is non-zero.
  */
-    static void
-updatescript(int c)
+    స్థిర శూన్య
+updatescript(పూర్ణాంకం c)
 {
-    static int	    count = 0;
+    స్థిర పూర్ణాంకం	    లెక్క = 0;
 
-    if (c && scriptout)
+    ఒకవేళ (c && scriptout)
 	putc(c, scriptout);
-    if (c == 0 || (p_uc > 0 && ++count >= p_uc))
+    ఒకవేళ (c == 0 || (p_uc > 0 && ++లెక్క >= p_uc))
     {
 	ml_sync_all(c == 0, TRUE);
-	count = 0;
+	లెక్క = 0;
     }
-#ifdef FEAT_EVAL
-    if (typedchars_pos < MAXMAPLEN)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (typedchars_pos < MAXMAPLEN)
     {
 	typedchars[typedchars_pos] = c;
 	typedchars_pos++;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Convert "c_arg" plus "modifiers" to merge the effect of modifyOtherKeys into
  * the character.  Also for when the Kitty key protocol is used.
  */
-    int
-merge_modifyOtherKeys(int c_arg, int *modifiers)
+    పూర్ణాంకం
+విలీనం_modify_Other_కీలకాలు(పూర్ణాంకం c_arg, పూర్ణాంకం *modifiers)
 {
-    int c = c_arg;
+    పూర్ణాంకం c = c_arg;
 
     // CTRL only uses the lower 5 bits of the character.
-    if (*modifiers & MOD_MASK_CTRL)
+    ఒకవేళ (*modifiers & MOD_ముసుగు_CTRL)
     {
-	if ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_'))
+	ఒకవేళ ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_'))
 	{
 	    c &= 0x1f;
-	    if (c == NUL)
+	    ఒకవేళ (c == NUL)
 		c = K_ZERO;
 	}
-	else if (c == '6')
+	లేకపోతే ఒకవేళ (c == '6')
 	    // CTRL-6 is equivalent to CTRL-^
 	    c = 0x1e;
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
 	// These mappings look arbitrary at the first glance, but in fact
 	// resemble quite exactly the behaviour of the GTK+ 1.2 GUI on my
 	// machine.  The only difference is BS vs. DEL for CTRL-8 (makes
 	// more sense and is consistent with usual terminal behaviour).
-	else if (c == '2')
+	లేకపోతే ఒకవేళ (c == '2')
 	    c = NUL;
-	else if (c >= '3' && c <= '7')
+	లేకపోతే ఒకవేళ (c >= '3' && c <= '7')
 	    c = c ^ 0x28;
-	else if (c == '8')
+	లేకపోతే ఒకవేళ (c == '8')
 	    c = BS;
-	else if (c == '?')
+	లేకపోతే ఒకవేళ (c == '?')
 	    c = DEL;
-#endif
-	if (c != c_arg)
-	    *modifiers &= ~MOD_MASK_CTRL;
+#అయితే_ముగింపు
+	ఒకవేళ (c != c_arg)
+	    *modifiers &= ~MOD_ముసుగు_CTRL;
     }
 
     // Alt/Meta sets the 8th bit of the character.
-    if ((*modifiers & (MOD_MASK_META | MOD_MASK_ALT))
+    ఒకవేళ ((*modifiers & (MOD_ముసుగు_META | MOD_ముసుగు_ALT))
 	    && c >= 0 && c <= 127)
     {
 	// Some terminals (esp. Kitty) do not include Shift in the character.
 	// Apply it here to get consistency across terminals.  Only do ASCII
 	// letters, for other characters it depends on the keyboard layout.
-	if ((*modifiers & MOD_MASK_SHIFT) && c >= 'a' && c <= 'z')
+	ఒకవేళ ((*modifiers & MOD_ముసుగు_జరుపు) && c >= 'a' && c <= 'z')
 	{
 	    c += 'a' - 'A';
-	    *modifiers &= ~MOD_MASK_SHIFT;
+	    *modifiers &= ~MOD_ముసుగు_జరుపు;
 	}
 	c += 0x80;
-	*modifiers &= ~(MOD_MASK_META | MOD_MASK_ALT);
+	*modifiers &= ~(MOD_ముసుగు_META | MOD_ముసుగు_ALT);
     }
 
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Add a single byte to 'showcmd' for a partially matched mapping.
  * Call add_to_showcmd() if a full key has been received.
  */
-    static void
-add_byte_to_showcmd(char_u byte)
+    స్థిర శూన్య
+కూడు_byte_గమ్యం_showcmd(char_u byte)
 {
-    static gotchars_state_T state;
+    స్థిర gotchars_state_T state;
     char_u	*ptr;
-    int		modifiers = 0;
-    int		c = NUL;
+    పూర్ణాంకం		modifiers = 0;
+    పూర్ణాంకం		c = NUL;
 
-    if (!p_sc || msg_silent != 0)
-	return;
+    ఒకవేళ (!p_sc || సందేశం_silent != 0)
+	తిరిగి;
 
-    if (!gotchars_add_byte(&state, byte))
-	return;
+    ఒకవేళ (!gotchars_కూడు_byte(&state, byte))
+	తిరిగి;
 
     state.buf[state.buflen] = NUL;
     state.buflen = 0;
 
     ptr = state.buf;
-    if (ptr[0] == K_SPECIAL && ptr[1] == KS_MODIFIER && ptr[2] != NUL)
+    ఒకవేళ (ptr[0] == K_SPECIAL && ptr[1] == KS_MODIFIER && ptr[2] != NUL)
     {
 	modifiers = ptr[2];
 	ptr += 3;
     }
 
-    if (*ptr != NUL)
+    ఒకవేళ (*ptr != NUL)
     {
 	char_u		*mb_ptr = mb_unescape(&ptr);
 
-	c = mb_ptr != NULL ? (*mb_ptr2char)(mb_ptr) : *ptr++;
-	if (c <= 0x7f)
+	c = mb_ptr != ఖాళీ ? (*mb_ptr2char)(mb_ptr) : *ptr++;
+	ఒకవేళ (c <= 0x7f)
 	{
 	    // Merge modifiers into the key to make the result more readable.
-	    int		modifiers_after = modifiers;
-	    int		mod_c = merge_modifyOtherKeys(c, &modifiers_after);
+	    పూర్ణాంకం		modifiers_after = modifiers;
+	    పూర్ణాంకం		mod_c = విలీనం_modify_Other_కీలకాలు(c, &modifiers_after);
 
-	    if (modifiers_after == 0)
+	    ఒకవేళ (modifiers_after == 0)
 	    {
 		modifiers = 0;
 		c = mod_c;
@@ -1876,16 +1876,16 @@ add_byte_to_showcmd(char_u byte)
 
     // TODO: is there a more readable and yet compact representation of
     // modifiers and special keys?
-    if (modifiers != 0)
+    ఒకవేళ (modifiers != 0)
     {
-	add_to_showcmd(K_SPECIAL);
-	add_to_showcmd(KS_MODIFIER);
-	add_to_showcmd(modifiers);
+	కూడు_గమ్యం_showcmd(K_SPECIAL);
+	కూడు_గమ్యం_showcmd(KS_MODIFIER);
+	కూడు_గమ్యం_showcmd(modifiers);
     }
-    if (c != NUL)
-	add_to_showcmd(c);
-    while (*ptr != NUL)
-	add_to_showcmd(*ptr++);
+    ఒకవేళ (c != NUL)
+	కూడు_గమ్యం_showcmd(c);
+    అయితే (*ptr != NUL)
+	కూడు_గమ్యం_showcmd(*ptr++);
 }
 
 /*
@@ -1897,144 +1897,144 @@ add_byte_to_showcmd(char_u byte)
  * Collects the bytes of a multibyte character into the whole character.
  * Returns the modifiers in the global "mod_mask".
  */
-    int
-vgetc(void)
+    పూర్ణాంకం
+vgetc(శూన్య)
 {
-    int		c, c2;
-    int		n;
+    పూర్ణాంకం		c, c2;
+    పూర్ణాంకం		n;
     char_u	buf[MB_MAXBYTES + 1];
-    int		i;
+    పూర్ణాంకం		i;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // Do garbage collection when garbagecollect() was called previously and
     // we are now at the toplevel.
-    if (may_garbage_collect && want_garbage_collect)
+    ఒకవేళ (may_garbage_collect && want_garbage_collect)
 	garbage_collect(FALSE);
-#endif
+#అయితే_ముగింపు
 
     /*
      * If a character was put back with vungetc, it was already processed.
      * Return it directly.
      */
-    if (can_get_old_char())
+    ఒకవేళ (can_get_old_char())
     {
 	c = old_char;
 	old_char = -1;
-	mod_mask = old_mod_mask;
-	mouse_row = old_mouse_row;
-	mouse_col = old_mouse_col;
+	mod_ముసుగు = old_mod_ముసుగు;
+	mouse_అడ్డువరుస = old_mouse_అడ్డువరుస;
+	mouse_నిలువు = old_mouse_నిలువు;
     }
-    else
+    లేకపోతే
     {
 	// number of characters recorded from the last vgetc() call
-	static size_t	last_vgetc_recorded_len = 0;
+	స్థిర size_t	చివరి_vgetc_recorded_len = 0;
 
-	mod_mask = 0;
-	vgetc_mod_mask = 0;
+	mod_ముసుగు = 0;
+	vgetc_mod_ముసుగు = 0;
 	vgetc_char = 0;
 
 	// last_recorded_len can be larger than last_vgetc_recorded_len
 	// if peeking records more
-	last_recorded_len -= last_vgetc_recorded_len;
+	చివరి_recorded_len -= చివరి_vgetc_recorded_len;
 
-	for (;;)		// this is done twice if there are modifiers
+	కొరకు (;;)		// this is done twice if there are modifiers
 	{
-	    int did_inc = FALSE;
+	    పూర్ణాంకం did_inc = FALSE;
 
 	    // No mapping after modifier has been read, using an input method
 	    // and when a popup window has disabled mapping.
-	    if (mod_mask
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+	    ఒకవేళ (mod_ముసుగు
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 		    || im_is_preediting()
-#endif
-#if defined(FEAT_PROP_POPUP)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_PROP_POPUP)
 		    || popup_no_mapping()
-#endif
+#అయితే_ముగింపు
 		    )
 	    {
 		++no_mapping;
-		++allow_keys;
+		++allow_కీలకాలు;
 		// mod_mask value may change, remember we did the increment
 		did_inc = TRUE;
 	    }
 	    c = vgetorpeek(TRUE);
-	    if (did_inc)
+	    ఒకవేళ (did_inc)
 	    {
 		--no_mapping;
-		--allow_keys;
+		--allow_కీలకాలు;
 	    }
 
 	    // Get two extra bytes for special keys, handle modifiers.
-	    if (c == K_SPECIAL
-#ifdef FEAT_GUI
+	    ఒకవేళ (c == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		    || c == CSI
-#endif
+#అయితే_ముగింపు
 	       )
 	    {
-		int	    save_allow_keys = allow_keys;
+		పూర్ణాంకం	    save_allow_కీలకాలు = allow_కీలకాలు;
 
 		++no_mapping;
-		allow_keys = 0;		// make sure BS is not found
+		allow_కీలకాలు = 0;		// make sure BS is not found
 		c2 = vgetorpeek(TRUE);	// no mapping for these chars
 		c = vgetorpeek(TRUE);
 		--no_mapping;
-		allow_keys = save_allow_keys;
-		if (c2 == KS_MODIFIER)
+		allow_కీలకాలు = save_allow_కీలకాలు;
+		ఒకవేళ (c2 == KS_MODIFIER)
 		{
-		    mod_mask = c;
-		    continue;
+		    mod_ముసుగు = c;
+		    కొనసాగు;
 		}
-		c = TO_SPECIAL(c2, c);
+		c = గమ్యం_SPECIAL(c2, c);
 
-		if (allow_osc_key == 0 && c == K_OSC)
-		    continue;
+		ఒకవేళ (allow_osc_కీలకం == 0 && c == K_OSC)
+		    కొనసాగు;
 
 		// K_ESC is used to avoid ambiguity with the single Esc
 		// character that might be the start of an escape sequence.
 		// Convert it back to a single Esc here.
-		if (c == K_ESC)
+		ఒకవేళ (c == K_ESC)
 		    c = ESC;
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 		// Handle K_TEAROFF here, the caller of vgetc() doesn't need to
 		// know that a menu was torn off
-		if (
+		ఒకవేళ (
 # ifdef VIMDLL
-		    gui.in_use &&
+		    gui.లోపల_use &&
 # endif
 		    c == K_TEAROFF)
 		{
 		    char_u	name[200];
-		    int		j;
+		    పూర్ణాంకం		j;
 
 		    // get menu path, it ends with a <CR>
-		    for (j = 0; (c = vgetorpeek(TRUE)) != '\r'; )
+		    కొరకు (j = 0; (c = vgetorpeek(TRUE)) != '\r'; )
 		    {
 			name[j] = c;
-			if (j < 199)
+			ఒకవేళ (j < 199)
 			    ++j;
 		    }
 		    name[j] = NUL;
 		    gui_make_tearoff(name);
-		    continue;
+		    కొనసాగు;
 		}
-#endif
-#if defined(FEAT_GUI) && defined(FEAT_GUI_GTK) && !defined(USE_GTK4) && defined(FEAT_MENU)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) && defined(FEAT_GUI_GTK) && !defined(USE_GTK4) && defined(FEAT_MENU)
 		// GTK: <F10> normally selects the menu, but it's passed until
 		// here to allow mapping it.  Intercept and invoke the GTK
 		// behavior if it's not mapped.
-		if (c == K_F10 && gui.menubar != NULL)
+		ఒకవేళ (c == K_F10 && gui.menubar != ఖాళీ)
 		{
-		    gtk_menu_shell_select_first(
+		    gtk_menu_shell_select_మొదటి(
 					   GTK_MENU_SHELL(gui.menubar), FALSE);
-		    continue;
+		    కొనసాగు;
 		}
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
 		// Handle focus event here, so that the caller doesn't need to
 		// know about it.  Return K_IGNORE so that we loop once (needed
 		// if 'lazyredraw' is set).
-		if (c == K_FOCUSGAINED || c == K_FOCUSLOST)
+		ఒకవేళ (c == K_FOCUSGAINED || c == K_FOCUSLOST)
 		{
 		    ui_focus_change(c == K_FOCUSGAINED);
 		    c = K_IGNORE;
@@ -2042,38 +2042,38 @@ vgetc(void)
 
 		// Translate K_CSI to CSI.  The special key is only used to
 		// avoid it being recognized as the start of a special key.
-		if (c == K_CSI)
+		ఒకవేళ (c == K_CSI)
 		    c = CSI;
-#endif
-#ifdef FEAT_EVAL
-		if (c == K_SID)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
+		ఒకవేళ (c == K_SID)
 		{
-		    int	    j;
+		    పూర్ణాంకం	    j;
 
 		    // Handle <SID>{sid};  Do up to 20 digits for safety.
-		    last_used_sid = 0;
-		    for (j = 0; j < 20 && SAFE_isdigit(c = vgetorpeek(TRUE)); ++j)
-			last_used_sid = last_used_sid * 10 + (c - '0');
-		    last_used_map = NULL;
-		    continue;
+		    చివరి_వాడిన_sid = 0;
+		    కొరకు (j = 0; j < 20 && సురక్షిత_isdigit(c = vgetorpeek(TRUE)); ++j)
+			చివరి_వాడిన_sid = చివరి_వాడిన_sid * 10 + (c - '0');
+		    చివరి_వాడిన_map = ఖాళీ;
+		    కొనసాగు;
 		}
-#endif
+#అయితే_ముగింపు
 	    }
 
 	    // For a multi-byte character get all the bytes and return the
 	    // converted character.
 	    // Note: This will loop until enough bytes are received!
-	    if (has_mbyte && (n = MB_BYTE2LEN_CHECK(c)) > 1)
+	    ఒకవేళ (has_mbyte && (n = MB_BYTE2LEN_CHECK(c)) > 1)
 	    {
 		++no_mapping;
 		buf[0] = c;
-		for (i = 1; i < n; ++i)
+		కొరకు (i = 1; i < n; ++i)
 		{
 		    buf[i] = vgetorpeek(TRUE);
-		    if (buf[i] == K_SPECIAL
-#ifdef FEAT_GUI
+		    ఒకవేళ (buf[i] == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 			    || (buf[i] == CSI)
-#endif
+#అయితే_ముగింపు
 			    )
 		    {
 			// Must be a K_SPECIAL - KS_SPECIAL - KE_FILLER
@@ -2083,7 +2083,7 @@ vgetc(void)
 			// or a K_SPECIAL - KS_EXTRA - KE_CSI, which is CSI
 			// too.
 			c = vgetorpeek(TRUE);
-			if (vgetorpeek(TRUE) == KE_CSI && c == KS_EXTRA)
+			ఒకవేళ (vgetorpeek(TRUE) == KE_CSI && c == KS_EXTRA)
 			    buf[i] = CSI;
 		    }
 		}
@@ -2091,171 +2091,171 @@ vgetc(void)
 		c = (*mb_ptr2char)(buf);
 	    }
 
-	    if (vgetc_char == 0)
+	    ఒకవేళ (vgetc_char == 0)
 	    {
-		vgetc_mod_mask = mod_mask;
+		vgetc_mod_ముసుగు = mod_ముసుగు;
 		vgetc_char = c;
 	    }
 
 	    // A keypad or special function key was not mapped, use it like
 	    // its ASCII equivalent.
-	    switch (c)
+	    ఎంపిక (c)
 	    {
-		case K_KPLUS:	c = '+'; break;
-		case K_KMINUS:	c = '-'; break;
-		case K_KDIVIDE:	c = '/'; break;
-		case K_KMULTIPLY: c = '*'; break;
-		case K_KENTER:	c = CAR; break;
-		case K_KPOINT:
-#ifdef MSWIN
+		స్థితి K_KPLUS:	c = '+'; ఆపు;
+		స్థితి K_KMINUS:	c = '-'; ఆపు;
+		స్థితి K_KDIVIDE:	c = '/'; ఆపు;
+		స్థితి K_KMULTIPLY: c = '*'; ఆపు;
+		స్థితి K_KENTER:	c = CAR; ఆపు;
+		స్థితి K_KPOINT:
+#నిర్వచితమైతే MSWIN
 				// Can be either '.' or a ',',
 				// depending on the type of keypad.
-				c = MapVirtualKey(VK_DECIMAL, 2); break;
-#else
-				c = '.'; break;
-#endif
-		case K_K0:	c = '0'; break;
-		case K_K1:	c = '1'; break;
-		case K_K2:	c = '2'; break;
-		case K_K3:	c = '3'; break;
-		case K_K4:	c = '4'; break;
-		case K_K5:	c = '5'; break;
-		case K_K6:	c = '6'; break;
-		case K_K7:	c = '7'; break;
-		case K_K8:	c = '8'; break;
-		case K_K9:	c = '9'; break;
+				c = Map_Virtual_కీలకం(VK_DECIMAL, 2); ఆపు;
+#లేకపోతే
+				c = '.'; ఆపు;
+#అయితే_ముగింపు
+		స్థితి K_K0:	c = '0'; ఆపు;
+		స్థితి K_K1:	c = '1'; ఆపు;
+		స్థితి K_K2:	c = '2'; ఆపు;
+		స్థితి K_K3:	c = '3'; ఆపు;
+		స్థితి K_K4:	c = '4'; ఆపు;
+		స్థితి K_K5:	c = '5'; ఆపు;
+		స్థితి K_K6:	c = '6'; ఆపు;
+		స్థితి K_K7:	c = '7'; ఆపు;
+		స్థితి K_K8:	c = '8'; ఆపు;
+		స్థితి K_K9:	c = '9'; ఆపు;
 
-		case K_XHOME:
-		case K_ZHOME:	if (mod_mask == MOD_MASK_SHIFT)
+		స్థితి K_XHOME:
+		స్థితి K_ZHOME:	ఒకవేళ (mod_ముసుగు == MOD_ముసుగు_జరుపు)
 				{
 				    c = K_S_HOME;
-				    mod_mask = 0;
+				    mod_ముసుగు = 0;
 				}
-				else if (mod_mask == MOD_MASK_CTRL)
+				లేకపోతే ఒకవేళ (mod_ముసుగు == MOD_ముసుగు_CTRL)
 				{
 				    c = K_C_HOME;
-				    mod_mask = 0;
+				    mod_ముసుగు = 0;
 				}
-				else
+				లేకపోతే
 				    c = K_HOME;
-				break;
-		case K_XEND:
-		case K_ZEND:	if (mod_mask == MOD_MASK_SHIFT)
+				ఆపు;
+		స్థితి K_XEND:
+		స్థితి K_ZEND:	ఒకవేళ (mod_ముసుగు == MOD_ముసుగు_జరుపు)
 				{
-				    c = K_S_END;
-				    mod_mask = 0;
+				    c = K_S_చివర;
+				    mod_ముసుగు = 0;
 				}
-				else if (mod_mask == MOD_MASK_CTRL)
+				లేకపోతే ఒకవేళ (mod_ముసుగు == MOD_ముసుగు_CTRL)
 				{
-				    c = K_C_END;
-				    mod_mask = 0;
+				    c = K_C_చివర;
+				    mod_ముసుగు = 0;
 				}
-				else
-				    c = K_END;
-				break;
+				లేకపోతే
+				    c = K_చివర;
+				ఆపు;
 
-		case K_XUP:	c = K_UP; break;
-		case K_XDOWN:	c = K_DOWN; break;
-		case K_XLEFT:	c = K_LEFT; break;
-		case K_XRIGHT:	c = K_RIGHT; break;
+		స్థితి K_XUP:	c = K_పైకి; ఆపు;
+		స్థితి K_XDOWN:	c = K_కిందికి; ఆపు;
+		స్థితి K_XLEFT:	c = K_ఎడమ; ఆపు;
+		స్థితి K_XRIGHT:	c = K_కుడి; ఆపు;
 	    }
 
-	    break;
+	    ఆపు;
 	}
 
-	last_vgetc_recorded_len = last_recorded_len;
+	చివరి_vgetc_recorded_len = చివరి_recorded_len;
     }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     /*
      * In the main loop "may_garbage_collect" can be set to do garbage
      * collection in the first next vgetc().  It's disabled after that to
      * avoid internally used Lists and Dicts to be freed.
      */
     may_garbage_collect = FALSE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_BEVAL_TERM
-    if (c != K_MOUSEMOVE && c != K_IGNORE && c != K_CURSORHOLD
+#నిర్వచితమైతే FEAT_BEVAL_పదం
+    ఒకవేళ (c != K_MOUSEMOVE && c != K_IGNORE && c != K_CURSORHOLD
 	    && c != K_COMPLETE_DELAY)
     {
 	// Don't trigger 'balloonexpr' unless only the mouse was moved.
-	bevalexpr_due_set = FALSE;
+	bevalexpr_due_సమితి = FALSE;
 	ui_remove_balloon();
     }
-#endif
-#ifdef FEAT_PROP_POPUP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // Only filter keys that do not come from ":normal".  Keys from feedkeys()
     // are filtered.
-    if ((!ex_normal_busy || in_feedkeys) && popup_do_filter(c))
+    ఒకవేళ ((!ex_సాధారణ_busy || లోపల_feedkeys) && popup_do_filter(c))
     {
-	if (c == Ctrl_C)
+	ఒకవేళ (c == Ctrl_C)
 	    got_int = FALSE;  // avoid looping
 	c = K_IGNORE;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_EVAL
-    c = do_key_input_pre(c);
+#నిర్వచితమైతే FEAT_EVAL
+    c = do_కీలకం_ఆదానం_pre(c);
 
     // Clear the next typedchars_pos
     typedchars_pos = 0;
-#endif
+#అయితే_ముగింపు
 
     // Need to process the character before we know it's safe to do something
     // else.
-    if (c != K_IGNORE)
-	state_no_longer_safe("key typed");
+    ఒకవేళ (c != K_IGNORE)
+	state_no_longer_సురక్షిత("key typed");
 
-    return c;
+    తిరిగి c;
 }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 /*
  * Handle the KeyInputPre autocommand.
  * "c" is the character that was typed.
  * Return new input character.
  */
-    static int
-do_key_input_pre(int c)
+    స్థిర పూర్ణాంకం
+do_కీలకం_ఆదానం_pre(పూర్ణాంకం c)
 {
-    int		res = c;
+    పూర్ణాంకం		res = c;
     char_u	buf[MB_MAXBYTES + 1];
     size_t	buflen;
-    char_u	curr_mode[MODE_MAX_LENGTH];
-    int		save_State = State;
+    char_u	curr_బహుళకం[బహుళకం_MAX_నిడివి];
+    పూర్ణాంకం		save_State = State;
     save_v_event_T save_v_event;
     dict_T	*v_event;
 
     // Return quickly when there is nothing to do.
-    if (!has_keyinputpre())
-	return res;
+    ఒకవేళ (!has_keyinputpre())
+	తిరిగి res;
 
-    if (IS_SPECIAL(c))
+    ఒకవేళ (IS_SPECIAL(c))
     {
 	buf[0] = K_SPECIAL;
 	buf[1] = KEY2TERMCAP0(c);
 	buf[2] = KEY2TERMCAP1(c);
 	buflen = 3;
     }
-    else
+    లేకపోతే
 	buflen = (*mb_char2bytes)(c, buf);
     buf[buflen] = NUL;
 
     typedchars[typedchars_pos] = NUL;
     vim_unescape_csi(typedchars);
 
-    get_mode(curr_mode);
+    get_బహుళకం(curr_బహుళకం);
 
     // Lock the text to avoid weird things from happening.
     ++textlock;
-    set_vim_var_string(VV_CHAR, buf, (int)buflen);  // set v:char
+    సమితి_vim_var_string(VV_CHAR, buf, (పూర్ణాంకం)buflen);  // set v:char
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_bool(v_event, "typed", KeyTyped);
-    (void)dict_add_string_len(v_event, "typedchar", typedchars, typedchars_pos);
+    (శూన్య)dict_కూడు_bool(v_event, "typed", కీలకం_Typed);
+    (శూన్య)dict_కూడు_string_len(v_event, "typedchar", typedchars, typedchars_pos);
 
-    if (apply_autocmds(EVENT_KEYINPUTPRE, curr_mode, curr_mode, FALSE, curbuf))
+    ఒకవేళ (apply_autocmds(EVENT_KEYINPUTPRE, curr_బహుళకం, curr_బహుళకం, FALSE, curbuf))
     {
 	string_T    v_char;
 
@@ -2263,42 +2263,42 @@ do_key_input_pre(int c)
 	// character.  Only use it when changed, otherwise continue with the
 	// original character.
 	v_char.string = get_vim_var_str(VV_CHAR);
-	if (STRCMP(buf, v_char.string) != 0)
+	ఒకవేళ (STRCMP(buf, v_char.string) != 0)
 	{
-	    v_char.length = STRLEN(v_char.string);
+	    v_char.నిడివి = STRLEN(v_char.string);
 	    // Convert special bytes when it is special string.
-	    if (v_char.length >= 3 && v_char.string[0] == K_SPECIAL)
-		res = TERMCAP2KEY(v_char.string[1], v_char.string[2]);
-	    else if (v_char.length > 0)
+	    ఒకవేళ (v_char.నిడివి >= 3 && v_char.string[0] == K_SPECIAL)
+		res = TERMCAP2_కీలకం(v_char.string[1], v_char.string[2]);
+	    లేకపోతే ఒకవేళ (v_char.నిడివి > 0)
 		res = PTR2CHAR(v_char.string);
 	}
     }
 
     restore_v_event(v_event, &save_v_event);
 
-    set_vim_var_string(VV_CHAR, NULL, -1);  // clear v:char
+    సమితి_vim_var_string(VV_CHAR, ఖాళీ, -1);  // clear v:char
     --textlock;
 
     // Restore the State, it may have been changed.
     State = save_State;
 
-    return res;
+    తిరిగి res;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Like vgetc(), but never return a NUL when called recursively, get a key
  * directly from the user (ignoring typeahead).
  */
-    int
-safe_vgetc(void)
+    పూర్ణాంకం
+సురక్షిత_vgetc(శూన్య)
 {
-    int	c;
+    పూర్ణాంకం	c;
 
     c = vgetc();
-    if (c == NUL)
+    ఒకవేళ (c == NUL)
 	c = get_keystroke();
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -2306,34 +2306,34 @@ safe_vgetc(void)
  * Also ignore scrollbar events.
  * Does not handle bracketed paste - do not use the result for commands.
  */
-    static int
-plain_vgetc_nopaste(void)
+    స్థిర పూర్ణాంకం
+plain_vgetc_nopaste(శూన్య)
 {
-    int c;
+    పూర్ణాంకం c;
 
-    do
-	c = safe_vgetc();
-    while (c == K_IGNORE
+    చేయి
+	c = సురక్షిత_vgetc();
+    అయితే (c == K_IGNORE
 	    || c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR
 	    || c == K_MOUSEMOVE);
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Like safe_vgetc(), but loop to handle K_IGNORE.
  * Also ignore scrollbar events.
  */
-    int
-plain_vgetc(void)
+    పూర్ణాంకం
+plain_vgetc(శూన్య)
 {
-    int c = plain_vgetc_nopaste();
+    పూర్ణాంకం c = plain_vgetc_nopaste();
 
-    if (c == K_PS)
+    ఒకవేళ (c == K_PS)
 	// Only handle the first pasted character.  Drop the rest, since we
 	// don't know what to do with it.
-	c = bracketed_paste(PASTE_ONE_CHAR, FALSE, NULL);
+	c = bracketed_paste(PASTE_ONE_CHAR, FALSE, ఖాళీ);
 
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -2342,239 +2342,239 @@ plain_vgetc(void)
  * character is not valid!.
  * Returns NUL if no character is available.
  */
-    int
-vpeekc(void)
+    పూర్ణాంకం
+vpeekc(శూన్య)
 {
-    if (can_get_old_char())
-	return old_char;
-    return vgetorpeek(FALSE);
+    ఒకవేళ (can_get_old_char())
+	తిరిగి old_char;
+    తిరిగి vgetorpeek(FALSE);
 }
 
-#if defined(FEAT_TERMRESPONSE) || defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMRESPONSE) || defined(FEAT_TERMINAL)
 /*
  * Like vpeekc(), but don't allow mapping.  Do allow checking for terminal
  * codes.
  */
-    int
-vpeekc_nomap(void)
+    పూర్ణాంకం
+vpeekc_nomap(శూన్య)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     c = vpeekc();
     --no_mapping;
-    --allow_keys;
-    return c;
+    --allow_కీలకాలు;
+    తిరిగి c;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check if any character is available, also half an escape sequence.
  * Trick: when no typeahead found, but there is something in the typeahead
  * buffer, it must be an ESC that is recognized as the start of a key code.
  */
-    int
-vpeekc_any(void)
+    పూర్ణాంకం
+vpeekc_any(శూన్య)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
     c = vpeekc();
-    if (c == NUL && typebuf.tb_len > 0)
+    ఒకవేళ (c == NUL && typebuf.tb_len > 0)
 	c = ESC;
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Call vpeekc() without causing anything to be mapped.
  * Return TRUE if a character is available, FALSE otherwise.
  */
-    int
-char_avail(void)
+    పూర్ణాంకం
+char_avail(శూన్య)
 {
-    int	    retval;
+    పూర్ణాంకం	    retval;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // When test_override("char_avail", 1) was called pretend there is no
     // typeahead.
-    if (disable_char_avail_for_testing)
-	return FALSE;
-#endif
+    ఒకవేళ (disable_char_avail_for_testing)
+	తిరిగి FALSE;
+#అయితే_ముగింపు
     ++no_mapping;
     retval = vpeekc();
     --no_mapping;
-    return (retval != NUL);
+    తిరిగి (retval != NUL);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * "getchar()" and "getcharstr()" functions
  */
-    static void
-getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
+    స్థిర శూన్య
+getchar_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం allow_సంఖ్య)
 {
     varnumber_T		n = 0;
-    int			called_emsg_start = called_emsg;
-    int			error = FALSE;
-    int			simplify = TRUE;
+    పూర్ణాంకం			called_emsg_ప్రారంభం = called_emsg;
+    పూర్ణాంకం			error = FALSE;
+    పూర్ణాంకం			simplify = TRUE;
     char_u		cursor_flag = 'm';
 
-    if ((in_vim9script()
-		&& check_for_opt_bool_or_number_arg(argvars, 0) == FAIL)
+    ఒకవేళ ((లోపల_vim9script()
+		&& check_for_opt_bool_or_సంఖ్య_arg(argvars, 0) == FAIL)
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type == VAR_DICT)
+    ఒకవేళ (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type == VAR_DICT)
     {
 	dict_T		*d = argvars[1].vval.v_dict;
 	char_u		*cursor_str;
 
-	if (allow_number)
-	    allow_number = dict_get_bool(d, "number", TRUE);
-	else if (dict_has_key(d, "number"))
-	    semsg(_(e_invalid_argument_str), "number");
+	ఒకవేళ (allow_సంఖ్య)
+	    allow_సంఖ్య = dict_get_bool(d, "number", TRUE);
+	లేకపోతే ఒకవేళ (dict_has_కీలకం(d, "number"))
+	    semsg(_(e_invalid_వాదం_str), "number");
 
 	simplify = dict_get_bool(d, "simplify", TRUE);
 
 	cursor_str = dict_get_string(d, "cursor", FALSE);
-	if (cursor_str != NULL)
+	ఒకవేళ (cursor_str != ఖాళీ)
 	{
-	    if (STRCMP(cursor_str, "hide") != 0
+	    ఒకవేళ (STRCMP(cursor_str, "hide") != 0
 		    && STRCMP(cursor_str, "keep") != 0
 		    && STRCMP(cursor_str, "msg") != 0)
-		semsg(_(e_invalid_value_for_argument_str_str), "cursor",
+		semsg(_(e_invalid_విలువ_for_వాదం_str_str), "cursor",
 								   cursor_str);
-	    else
+	    లేకపోతే
 		cursor_flag = cursor_str[0];
 	}
     }
 
-    if (called_emsg != called_emsg_start)
-	return;
+    ఒకవేళ (called_emsg != called_emsg_ప్రారంభం)
+	తిరిగి;
 
-# ifdef MESSAGE_QUEUE
+# ifdef సందేశం_వరుస
     // vpeekc() used to check for messages, but that caused problems, invoking
     // a callback where it was not expected.  Some plugins use getchar(1) in a
     // loop to await a message, therefore make sure we check for messages here.
     parse_queued_messages();
 # endif
 
-    if (cursor_flag == 'h')
+    ఒకవేళ (cursor_flag == 'h')
 	cursor_sleep();
-    else if (cursor_flag == 'm')
-	windgoto(msg_row, cmdline_col_off + msg_col);
+    లేకపోతే ఒకవేళ (cursor_flag == 'm')
+	windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
 
     ++no_mapping;
-    ++allow_keys;
-    ++allow_osc_key;
-    if (!simplify)
-	++no_reduce_keys;
-    for (;;)
+    ++allow_కీలకాలు;
+    ++allow_osc_కీలకం;
+    ఒకవేళ (!simplify)
+	++no_reduce_కీలకాలు;
+    కొరకు (;;)
     {
-	if (argvars[0].v_type == VAR_UNKNOWN
-		|| (argvars[0].v_type == VAR_NUMBER
-			&& argvars[0].vval.v_number == -1))
+	ఒకవేళ (argvars[0].v_type == VAR_UNKNOWN
+		|| (argvars[0].v_type == VAR_సంఖ్య
+			&& argvars[0].vval.v_సంఖ్య == -1))
 	    // getchar(): blocking wait.
 	    n = plain_vgetc_nopaste();
-	else if (tv_get_bool_chk(&argvars[0], &error))
+	లేకపోతే ఒకవేళ (tv_get_bool_chk(&argvars[0], &error))
 	    // getchar(1): only check if char avail
 	    n = vpeekc_any();
-	else if (error || vpeekc_any() == NUL)
+	లేకపోతే ఒకవేళ (error || vpeekc_any() == NUL)
 	    // illegal argument or getchar(0) and no char avail: return zero
 	    n = 0;
-	else
+	లేకపోతే
 	    // getchar(0) and char avail() != NUL: get a character.
 	    // Note that vpeekc_any() returns K_SPECIAL for K_IGNORE.
-	    n = safe_vgetc();
+	    n = సురక్షిత_vgetc();
 
-	if (n == K_IGNORE || n == K_MOUSEMOVE
+	ఒకవేళ (n == K_IGNORE || n == K_MOUSEMOVE
 		|| n == K_VER_SCROLLBAR || n == K_HOR_SCROLLBAR)
-	    continue;
-	break;
+	    కొనసాగు;
+	ఆపు;
     }
     --no_mapping;
-    --allow_keys;
-    --allow_osc_key;
-    if (!simplify)
-	--no_reduce_keys;
+    --allow_కీలకాలు;
+    --allow_osc_కీలకం;
+    ఒకవేళ (!simplify)
+	--no_reduce_కీలకాలు;
 
-    if (cursor_flag == 'h')
+    ఒకవేళ (cursor_flag == 'h')
 	cursor_unsleep();
 
-    set_vim_var_nr(VV_MOUSE_WIN, 0);
-    set_vim_var_nr(VV_MOUSE_WINID, 0);
-    set_vim_var_nr(VV_MOUSE_LNUM, 0);
-    set_vim_var_nr(VV_MOUSE_COL, 0);
+    సమితి_vim_var_nr(VV_MOUSE_WIN, 0);
+    సమితి_vim_var_nr(VV_MOUSE_WINID, 0);
+    సమితి_vim_var_nr(VV_MOUSE_LNUM, 0);
+    సమితి_vim_var_nr(VV_MOUSE_నిలువు, 0);
 
-    if (n != 0 && (!allow_number || IS_SPECIAL(n) || mod_mask != 0))
+    ఒకవేళ (n != 0 && (!allow_సంఖ్య || IS_SPECIAL(n) || mod_ముసుగు != 0))
     {
-	char_u		temp[10];   // modifier: 3, mbyte-char: 6, NUL: 1
-	int		i = 0;
+	char_u		తాత్కాలిక[10];   // modifier: 3, mbyte-char: 6, NUL: 1
+	పూర్ణాంకం		i = 0;
 
 	// Turn a special key into three bytes, plus modifier.
-	if (mod_mask != 0)
+	ఒకవేళ (mod_ముసుగు != 0)
 	{
-	    temp[i++] = K_SPECIAL;
-	    temp[i++] = KS_MODIFIER;
-	    temp[i++] = mod_mask;
+	    తాత్కాలిక[i++] = K_SPECIAL;
+	    తాత్కాలిక[i++] = KS_MODIFIER;
+	    తాత్కాలిక[i++] = mod_ముసుగు;
 	}
-	if (IS_SPECIAL(n))
+	ఒకవేళ (IS_SPECIAL(n))
 	{
-	    temp[i++] = K_SPECIAL;
-	    temp[i++] = K_SECOND(n);
-	    temp[i++] = K_THIRD(n);
+	    తాత్కాలిక[i++] = K_SPECIAL;
+	    తాత్కాలిక[i++] = K_రెండవ(n);
+	    తాత్కాలిక[i++] = K_మూడవ(n);
 	}
-	else if (has_mbyte)
-	    i += (*mb_char2bytes)(n, temp + i);
-	else
-	    temp[i++] = n;
-	temp[i] = NUL;
+	లేకపోతే ఒకవేళ (has_mbyte)
+	    i += (*mb_char2bytes)(n, తాత్కాలిక + i);
+	లేకపోతే
+	    తాత్కాలిక[i++] = n;
+	తాత్కాలిక[i] = NUL;
 	rettv->v_type = VAR_STRING;
-	rettv->vval.v_string = vim_strnsave(temp, i);
+	rettv->vval.v_string = vim_strnsave(తాత్కాలిక, i);
 
-	if (is_mouse_key(n))
+	ఒకవేళ (is_mouse_కీలకం(n))
 	{
-	    int		row = mouse_row;
-	    int		col = mouse_col;
+	    పూర్ణాంకం		అడ్డువరుస = mouse_అడ్డువరుస;
+	    పూర్ణాంకం		నిలువు = mouse_నిలువు;
 	    win_T	*win;
 	    linenr_T	lnum;
 	    win_T	*wp;
-	    int		winnr = 1;
+	    పూర్ణాంకం		winnr = 1;
 
-	    if (row >= 0 && col >= 0)
+	    ఒకవేళ (అడ్డువరుస >= 0 && నిలువు >= 0)
 	    {
 		// Find the window at the mouse coordinates and compute the
 		// text position.
-		win = mouse_find_win(&row, &col, FIND_POPUP);
-		if (win == NULL)
-		    return;
-		(void)mouse_comp_pos(win, &row, &col, &lnum, NULL);
+		win = mouse_కనుగొను_win(&అడ్డువరుస, &నిలువు, కనుగొను_POPUP);
+		ఒకవేళ (win == ఖాళీ)
+		    తిరిగి;
+		(శూన్య)mouse_comp_pos(win, &అడ్డువరుస, &నిలువు, &lnum, ఖాళీ);
 # ifdef FEAT_PROP_POPUP
-		if (WIN_IS_POPUP(win))
+		ఒకవేళ (WIN_IS_POPUP(win))
 		    winnr = 0;
-		else
+		లేకపోతే
 # endif
-		    for (wp = firstwin; wp != win && wp != NULL;
-							       wp = wp->w_next)
+		    కొరకు (wp = firstwin; wp != win && wp != ఖాళీ;
+							       wp = wp->w_తదుపరి)
 			++winnr;
-		set_vim_var_nr(VV_MOUSE_WIN, winnr);
-		set_vim_var_nr(VV_MOUSE_WINID, win->w_id);
-		set_vim_var_nr(VV_MOUSE_LNUM, lnum);
-		set_vim_var_nr(VV_MOUSE_COL, col + 1);
+		సమితి_vim_var_nr(VV_MOUSE_WIN, winnr);
+		సమితి_vim_var_nr(VV_MOUSE_WINID, win->w_id);
+		సమితి_vim_var_nr(VV_MOUSE_LNUM, lnum);
+		సమితి_vim_var_nr(VV_MOUSE_నిలువు, నిలువు + 1);
 	    }
 	}
     }
-    else if (!allow_number)
+    లేకపోతే ఒకవేళ (!allow_సంఖ్య)
 	rettv->v_type = VAR_STRING;
-    else
-	rettv->vval.v_number = n;
+    లేకపోతే
+	rettv->vval.v_సంఖ్య = n;
 }
 
 /*
  * "getchar()" function
  */
-    void
+    శూన్య
 f_getchar(typval_T *argvars, typval_T *rettv)
 {
     getchar_common(argvars, rettv, TRUE);
@@ -2583,7 +2583,7 @@ f_getchar(typval_T *argvars, typval_T *rettv)
 /*
  * "getcharstr()" function
  */
-    void
+    శూన్య
 f_getcharstr(typval_T *argvars, typval_T *rettv)
 {
     getchar_common(argvars, rettv, FALSE);
@@ -2592,14 +2592,14 @@ f_getcharstr(typval_T *argvars, typval_T *rettv)
 /*
  * "getcharmod()" function
  */
-    void
-f_getcharmod(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcharmod(typval_T *argvars వాడని, typval_T *rettv)
 {
-    rettv->vval.v_number = mod_mask;
+    rettv->vval.v_సంఖ్య = mod_ముసుగు;
 }
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
-#if defined(MESSAGE_QUEUE)
+#ఒకవేళ defined(సందేశం_వరుస)
 # define MAX_REPEAT_PARSE 8
 
 /*
@@ -2608,26 +2608,26 @@ f_getcharmod(typval_T *argvars UNUSED, typval_T *rettv)
  * These functions can call arbitrary Vim script and should only be called when
  * it is safe to do so.
  */
-    void
-parse_queued_messages(void)
+    శూన్య
+parse_queued_messages(శూన్య)
 {
-    int	    old_curwin_id;
-    int	    old_curbuf_fnum;
-    int	    i;
-    int	    save_may_garbage_collect = may_garbage_collect;
-    static int entered = 0;
-    int	    was_safe = get_was_safe_state();
+    పూర్ణాంకం	    old_curwin_id;
+    పూర్ణాంకం	    old_curbuf_fnum;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    save_may_garbage_collect = may_garbage_collect;
+    స్థిర పూర్ణాంకం entered = 0;
+    పూర్ణాంకం	    was_సురక్షిత = get_was_సురక్షిత_state();
 
     // Do not handle messages while redrawing, because it may cause buffers to
     // change or be wiped while they are being redrawn.
     // Also bail out when parsing messages was explicitly disabled.
-    if (updating_screen || dont_parse_messages)
-	return;
+    ఒకవేళ (updating_screen || dont_parse_messages)
+	తిరిగి;
 
     // If memory allocation fails during startup we'll exit but curbuf or
     // curwin could be NULL.
-    if (curbuf == NULL || curwin == NULL)
-	return;
+    ఒకవేళ (curbuf == ఖాళీ || curwin == ఖాళీ)
+	తిరిగి;
 
     old_curbuf_fnum = curbuf->b_fnum;
     old_curwin_id = curwin->w_id;
@@ -2641,10 +2641,10 @@ parse_queued_messages(void)
     may_garbage_collect = FALSE;
 
     // Loop when a job ended, but don't keep looping forever.
-    for (i = 0; i < MAX_REPEAT_PARSE; ++i)
+    కొరకు (i = 0; i < MAX_REPEAT_PARSE; ++i)
     {
 	// For Win32 mch_breakcheck() does not check for input, do it here.
-# if (defined(MSWIN) || defined(__HAIKU__)) && defined(FEAT_JOB_CHANNEL)
+# ఒకవేళ (defined(MSWIN) || defined(__HAIKU__)) && defined(FEAT_పని_CHANNEL)
 	channel_handle_events(FALSE);
 # endif
 
@@ -2655,90 +2655,90 @@ parse_queued_messages(void)
 # ifdef FEAT_SOCKETSERVER
 	socketserver_parse_messages();
 # endif
-# ifdef FEAT_JOB_CHANNEL
+# ifdef FEAT_పని_CHANNEL
 	// Write any buffer lines still to be written.
-	channel_write_any_lines();
+	channel_write_any_పంక్తులు();
 
 	// Process the messages queued on channels.
 	channel_parse_messages();
 # endif
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# ఒకవేళ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 	// Process the queued clientserver messages.
 	server_parse_messages();
 # endif
-# ifdef FEAT_JOB_CHANNEL
+# ifdef FEAT_పని_CHANNEL
 	// Check if any jobs have ended.  If so, repeat the above to handle
 	// changes, e.g. stdin may have been closed.
-	if (job_check_ended())
-	    continue;
+	ఒకవేళ (పని_check_ended())
+	    కొనసాగు;
 # endif
 # ifdef FEAT_TERMINAL
-	free_unused_terminals();
+	free_వాడని_terminals();
 # endif
 
 # ifdef FEAT_SOUND_MACOSX
 	process_cfrunloop();
 # endif
 # ifdef FEAT_SOUND_CANBERRA
-	if (has_sound_callback_in_queue())
+	ఒకవేళ (has_sound_callback_లోపల_వరుస())
 	    invoke_sound_callback();
 # endif
 # ifdef SIGUSR1
-	if (got_sigusr1)
+	ఒకవేళ (got_sigusr1)
 	{
-	    apply_autocmds(EVENT_SIGUSR1, NULL, NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_SIGUSR1, ఖాళీ, ఖాళీ, FALSE, curbuf);
 	    got_sigusr1 = FALSE;
 	}
 # endif
-	break;
+	ఆపు;
     }
 
     // When not nested we'll go back to waiting for a typed character.  If it
     // was safe before then this triggers a SafeStateAgain autocommand event.
-    if (entered == 1 && was_safe)
+    ఒకవేళ (entered == 1 && was_సురక్షిత)
 	may_trigger_safestateagain();
 
     may_garbage_collect = save_may_garbage_collect;
 
     // If the current window or buffer changed we need to bail out of the
     // waiting loop.  E.g. when a job exit callback closes the terminal window.
-    if (curwin->w_id != old_curwin_id || curbuf->b_fnum != old_curbuf_fnum)
+    ఒకవేళ (curwin->w_id != old_curwin_id || curbuf->b_fnum != old_curbuf_fnum)
 	ins_char_typebuf(K_IGNORE, 0);
 
     --entered;
 }
-#endif
+#అయితే_ముగింపు
 
 
-typedef enum {
-    map_result_fail,    // failed, break loop
-    map_result_get,     // get a character from typeahead
-    map_result_retry,   // try to map again
-    map_result_nomatch  // no matching mapping, get char
-} map_result_T;
+రకనిర్వచనం గణన {
+    map_ఫలితం_fail,    // failed, break loop
+    map_ఫలితం_get,     // get a character from typeahead
+    map_ఫలితం_retry,   // try to map again
+    map_ఫలితం_nomatch  // no matching mapping, get char
+} map_ఫలితం_T;
 
 /*
  * Check if the bytes at the start of the typeahead buffer are a character used
  * in Insert mode completion.  This includes the form with a CTRL modifier.
  * During completion started by complete() keys are mapped as usual.
  */
-    static int
-at_ins_compl_key(void)
+    స్థిర పూర్ణాంకం
+at_ins_compl_కీలకం(శూన్య)
 {
     char_u  *p = typebuf.tb_buf + typebuf.tb_off;
-    int	    c = *p;
+    పూర్ణాంకం	    c = *p;
 
-    if (typebuf.tb_len > 3
+    ఒకవేళ (typebuf.tb_len > 3
 	    && (c == K_SPECIAL || c == CSI)  // CSI is used by the GUI
 	    && p[1] == KS_MODIFIER
-	    && (p[2] & MOD_MASK_CTRL)
+	    && (p[2] & MOD_ముసుగు_CTRL)
 	    // CTRL-SHIFT-N/P scroll the info popup, so they must not be folded
 	    // to the CTRL-N/CTRL-P completion keys here.
-	    && !(p[2] & MOD_MASK_SHIFT))
+	    && !(p[2] & MOD_ముసుగు_జరుపు))
 	c = p[3] & 0x1f;
-    return !ctrl_x_mode_eval()
-	    && ((ctrl_x_mode_not_default() && vim_is_ctrl_x_key(c))
-		|| (compl_status_local() && (c == Ctrl_N || c == Ctrl_P)));
+    తిరిగి !ctrl_x_బహుళకం_eval()
+	    && ((ctrl_x_బహుళకం_not_default() && vim_is_ctrl_x_కీలకం(c))
+		|| (compl_స్థితి_local() && (c == Ctrl_N || c == Ctrl_P)));
 }
 
 /*
@@ -2748,73 +2748,73 @@ at_ins_compl_key(void)
  * + "max_offset"].
  * Return the length of the replaced bytes, 0 if nothing changed, -1 for error.
  */
-    static int
-check_simplify_modifier(int max_offset)
+    స్థిర పూర్ణాంకం
+check_simplify_modifier(పూర్ణాంకం max_స్థానభ్రంశం)
 {
-    int		offset;
+    పూర్ణాంకం		స్థానభ్రంశం;
     char_u	*tp;
 
-    for (offset = 0; offset < max_offset; ++offset)
+    కొరకు (స్థానభ్రంశం = 0; స్థానభ్రంశం < max_స్థానభ్రంశం; ++స్థానభ్రంశం)
     {
-	if (offset + 3 >= typebuf.tb_len)
-	    break;
-	tp = typebuf.tb_buf + typebuf.tb_off + offset;
-	if ((tp[0] == K_SPECIAL || tp[0] == CSI) && tp[1] == KS_MODIFIER)
+	ఒకవేళ (స్థానభ్రంశం + 3 >= typebuf.tb_len)
+	    ఆపు;
+	tp = typebuf.tb_buf + typebuf.tb_off + స్థానభ్రంశం;
+	ఒకవేళ ((tp[0] == K_SPECIAL || tp[0] == CSI) && tp[1] == KS_MODIFIER)
 	{
 	    // A modifier was not used for a mapping, apply it to ASCII keys.
 	    // Shift would already have been applied.
-	    int modifier = tp[2];
-	    int	c = tp[3];
-	    int new_c = merge_modifyOtherKeys(c, &modifier);
+	    పూర్ణాంకం modifier = tp[2];
+	    పూర్ణాంకం	c = tp[3];
+	    పూర్ణాంకం new_c = విలీనం_modify_Other_కీలకాలు(c, &modifier);
 
-	    if (new_c != c)
+	    ఒకవేళ (new_c != c)
 	    {
 		char_u	new_string[MB_MAXBYTES];
-		int	len;
-		int	key_offset = offset;
+		పూర్ణాంకం	len;
+		పూర్ణాంకం	కీలకం_స్థానభ్రంశం = స్థానభ్రంశం;
 
-		if (offset == 0)
+		ఒకవేళ (స్థానభ్రంశం == 0)
 		{
 		    // At the start: remember the character and mod_mask before
 		    // merging, in some cases, e.g. at the hit-return prompt,
 		    // they are put back in the typeahead buffer.
 		    vgetc_char = c;
-		    vgetc_mod_mask = tp[2];
+		    vgetc_mod_ముసుగు = tp[2];
 		}
-		if (IS_SPECIAL(new_c))
+		ఒకవేళ (IS_SPECIAL(new_c))
 		{
 		    new_string[0] = K_SPECIAL;
-		    new_string[1] = K_SECOND(new_c);
-		    new_string[2] = K_THIRD(new_c);
+		    new_string[1] = K_రెండవ(new_c);
+		    new_string[2] = K_మూడవ(new_c);
 		    len = 3;
 		}
-		else
+		లేకపోతే
 		    len = mb_char2bytes(new_c, new_string);
-		if (modifier == 0)
+		ఒకవేళ (modifier == 0)
 		{
-		    if (put_string_in_typebuf(offset, 4, new_string, len,
-							NULL, 0, NULL) == FAIL)
-			return -1;
+		    ఒకవేళ (put_string_లోపల_typebuf(స్థానభ్రంశం, 4, new_string, len,
+							ఖాళీ, 0, ఖాళీ) == FAIL)
+			తిరిగి -1;
 		}
-		else
+		లేకపోతే
 		{
 		    tp[2] = modifier;
-		    key_offset = offset + 3;
-		    if (put_string_in_typebuf(key_offset, 1, new_string, len,
-							NULL, 0, NULL) == FAIL)
-			return -1;
+		    కీలకం_స్థానభ్రంశం = స్థానభ్రంశం + 3;
+		    ఒకవేళ (put_string_లోపల_typebuf(కీలకం_స్థానభ్రంశం, 1, new_string, len,
+							ఖాళీ, 0, ఖాళీ) == FAIL)
+			తిరిగి -1;
 		}
 
 		// A mapping for the simplified key can be used for it even
 		// when the key protocol is enabled.
-		for (int i = 0; i < len; ++i)
-		    typebuf.tb_noremap[typebuf.tb_off + key_offset + i]
+		కొరకు (పూర్ణాంకం i = 0; i < len; ++i)
+		    typebuf.tb_noremap[typebuf.tb_off + కీలకం_స్థానభ్రంశం + i]
 							    |= RM_SIMPLIFIED;
-		return len;
+		తిరిగి len;
 	    }
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -2822,14 +2822,14 @@ check_simplify_modifier(int max_offset)
  * modifyOtherKeys level 2 is enabled or the kitty keyboard protocol is
  * enabled.
  */
-    int
-key_protocol_enabled(void)
+    పూర్ణాంకం
+కీలకం_protocol_enabled(శూన్య)
 {
     // If xterm has responded to XTQMODKEYS it overrules seenModifyOtherKeys.
-    int using_mok = modify_otherkeys_state != MOKS_INITIAL
+    పూర్ణాంకం using_mok = modify_otherkeys_state != MOKS_INITIAL
 			? modify_otherkeys_state == MOKS_ENABLED
-			: seenModifyOtherKeys;
-    return using_mok || kitty_protocol_state == KKPS_ENABLED;
+			: చూసిన_Modify_Other_కీలకాలు;
+    తిరిగి using_mok || kitty_protocol_state == KKPS_ENABLED;
 }
 
 /*
@@ -2840,34 +2840,34 @@ key_protocol_enabled(void)
  *   typeahead.
  * - On failure (out of memory) return map_result_fail.
  */
-    static int
+    స్థిర పూర్ణాంకం
 handle_mapping(
-	    int *keylenp,
-	    int *timedout,
-	    int *mapdepth)
+	    పూర్ణాంకం *keylenp,
+	    పూర్ణాంకం *timedout,
+	    పూర్ణాంకం *mapdepth)
 {
-    mapblock_T	*mp = NULL;
+    mapblock_T	*mp = ఖాళీ;
     mapblock_T	*mp2;
-    mapblock_T	*mp_match;
-    int		mp_match_len = 0;
-    int		max_mlen = 0;
-    int		want_termcode = 0;  // 1 if termcode expected after max_mlen
-    int		tb_c1;
-    int		mlen;
-#ifdef FEAT_LANGMAP
-    int		nolmaplen;
-#endif
-    int		keylen = *keylenp;
-    int		i;
-    int		local_State = get_real_state();
-    int		is_plug_map = FALSE;
-    bool	in_osc = in_osc_sequence(); // If we are in an OSC sequence,
+    mapblock_T	*mp_సరిపోలిక;
+    పూర్ణాంకం		mp_సరిపోలిక_len = 0;
+    పూర్ణాంకం		max_mlen = 0;
+    పూర్ణాంకం		want_termcode = 0;  // 1 if termcode expected after max_mlen
+    పూర్ణాంకం		tb_c1;
+    పూర్ణాంకం		mlen;
+#నిర్వచితమైతే FEAT_LANGMAP
+    పూర్ణాంకం		nolmaplen;
+#అయితే_ముగింపు
+    పూర్ణాంకం		keylen = *keylenp;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		local_State = get_real_state();
+    పూర్ణాంకం		is_plug_map = FALSE;
+    bool	లోపల_osc = లోపల_osc_sequence(); // If we are in an OSC sequence,
 					    // then go straight to
 					    // check_termcode() in order to
 					    // consume chars.
 
     // If typeahead starts with <Plug> then remap, even for a "noremap" mapping.
-    if (!in_osc && typebuf.tb_len >= 3
+    ఒకవేళ (!లోపల_osc && typebuf.tb_len >= 3
 	    && typebuf.tb_buf[typebuf.tb_off] == K_SPECIAL
 	    && typebuf.tb_buf[typebuf.tb_off + 1] == KS_EXTRA
 	    && typebuf.tb_buf[typebuf.tb_off + 2] == KE_PLUG)
@@ -2889,45 +2889,45 @@ handle_mapping(
      * - currently receiving OSC sequence
      */
     tb_c1 = typebuf.tb_buf[typebuf.tb_off];
-    if (!in_osc && no_mapping == 0 && is_maphash_valid()
+    ఒకవేళ (!లోపల_osc && no_mapping == 0 && is_maphash_valid()
 	    && (no_zero_mapping == 0 || tb_c1 != '0')
 	    && (typebuf.tb_maplen == 0 || is_plug_map
 		|| (p_remap
 		    && (typebuf.tb_noremap[typebuf.tb_off]
 				    & (RM_NONE|RM_ABBR)) == 0))
-	    && !(p_paste && (State & (MODE_INSERT | MODE_CMDLINE)))
-	    && !(State == MODE_HITRETURN && (tb_c1 == CAR || tb_c1 == ' '))
-	    && State != MODE_ASKMORE
-	    && State != MODE_CONFIRM
-	    && !at_ins_compl_key())
+	    && !(p_paste && (State & (బహుళకం_చొప్పించు | బహుళకం_CMDLINE)))
+	    && !(State == బహుళకం_HITRETURN && (tb_c1 == CAR || tb_c1 == ' '))
+	    && State != బహుళకం_ASKMORE
+	    && State != బహుళకం_CONFIRM
+	    && !at_ins_compl_కీలకం())
     {
-#ifdef FEAT_GUI
-	if (gui.in_use && tb_c1 == CSI && typebuf.tb_len >= 2
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (gui.లోపల_use && tb_c1 == CSI && typebuf.tb_len >= 2
 		&& typebuf.tb_buf[typebuf.tb_off + 1] == KS_MODIFIER)
 	{
 	    // The GUI code sends CSI KS_MODIFIER {flags}, but mappings expect
 	    // K_SPECIAL KS_MODIFIER {flags}.
 	    tb_c1 = K_SPECIAL;
 	}
-#endif
-#ifdef FEAT_LANGMAP
-	if (tb_c1 == K_SPECIAL)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_LANGMAP
+	ఒకవేళ (tb_c1 == K_SPECIAL)
 	    nolmaplen = 2;
-	else
+	లేకపోతే
 	{
-	    LANGMAP_ADJUST(tb_c1, (State & (MODE_CMDLINE | MODE_INSERT)) == 0
-					   && get_real_state() != MODE_SELECT);
+	    LANGMAP_ADJUST(tb_c1, (State & (బహుళకం_CMDLINE | బహుళకం_చొప్పించు)) == 0
+					   && get_real_state() != బహుళకం_SELECT);
 	    nolmaplen = 0;
 	}
-#endif
+#అయితే_ముగింపు
 	// First try buffer-local mappings.
 	mp = get_buf_maphash_list(local_State, tb_c1);
 	mp2 = get_maphash_list(local_State, tb_c1);
-	if (mp == NULL)
+	ఒకవేళ (mp == ఖాళీ)
 	{
 	    // There are no buffer-local mappings.
 	    mp = mp2;
-	    mp2 = NULL;
+	    mp2 = ఖాళీ;
 	}
 
 	/*
@@ -2937,45 +2937,45 @@ handle_mapping(
 	 * A full match is only accepted if there is no partly match, so "aa"
 	 * and "aaa" can both be mapped.
 	 */
-	mp_match = NULL;
-	mp_match_len = 0;
-	for ( ; mp != NULL;
-	       mp->m_next == NULL ? (mp = mp2, mp2 = NULL) : (mp = mp->m_next))
+	mp_సరిపోలిక = ఖాళీ;
+	mp_సరిపోలిక_len = 0;
+	కొరకు ( ; mp != ఖాళీ;
+	       mp->m_తదుపరి == ఖాళీ ? (mp = mp2, mp2 = ఖాళీ) : (mp = mp->m_తదుపరి))
 	{
 	    // Only consider an entry if the first character matches and it is
 	    // for the current state.
 	    // Skip ":lmap" mappings if keys were mapped.
-	    if (mp->m_keys[0] == tb_c1
-		    && (mp->m_mode & local_State)
-		    && !(mp->m_simplified && key_protocol_enabled()
+	    ఒకవేళ (mp->m_కీలకాలు[0] == tb_c1
+		    && (mp->m_బహుళకం & local_State)
+		    && !(mp->m_simplified && కీలకం_protocol_enabled()
 			    && typebuf.tb_maplen == 0
 			    && (typebuf.tb_noremap[typebuf.tb_off]
 							& RM_SIMPLIFIED) == 0)
-		    && ((mp->m_mode & MODE_LANGMAP) == 0
+		    && ((mp->m_బహుళకం & బహుళకం_LANGMAP) == 0
 						    || typebuf.tb_maplen == 0))
 	    {
-#ifdef FEAT_LANGMAP
-		int	nomap = nolmaplen;
-		int	modifiers = 0;
-#endif
+#నిర్వచితమైతే FEAT_LANGMAP
+		పూర్ణాంకం	nomap = nolmaplen;
+		పూర్ణాంకం	modifiers = 0;
+#అయితే_ముగింపు
 		// find the match length of this mapping
-		for (mlen = 1; mlen < typebuf.tb_len; ++mlen)
+		కొరకు (mlen = 1; mlen < typebuf.tb_len; ++mlen)
 		{
-		    int	c2 = typebuf.tb_buf[typebuf.tb_off + mlen];
-#ifdef FEAT_LANGMAP
-		    if (nomap > 0)
+		    పూర్ణాంకం	c2 = typebuf.tb_buf[typebuf.tb_off + mlen];
+#నిర్వచితమైతే FEAT_LANGMAP
+		    ఒకవేళ (nomap > 0)
 		    {
-			if (nomap == 2 && c2 == KS_MODIFIER)
+			ఒకవేళ (nomap == 2 && c2 == KS_MODIFIER)
 			    modifiers = 1;
-			else if (nomap == 1 && modifiers == 1)
+			లేకపోతే ఒకవేళ (nomap == 1 && modifiers == 1)
 			    modifiers = c2;
 			--nomap;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (c2 == K_SPECIAL)
+			ఒకవేళ (c2 == K_SPECIAL)
 			    nomap = 2;
-			else if (merge_modifyOtherKeys(c2, &modifiers) == c2)
+			లేకపోతే ఒకవేళ (విలీనం_modify_Other_కీలకాలు(c2, &modifiers) == c2)
 			    // Only apply 'langmap' if merging modifiers into
 			    // the key will not result in another character,
 			    // so that 'langmap' behaves consistently in
@@ -2983,19 +2983,19 @@ handle_mapping(
 			    LANGMAP_ADJUST(c2, TRUE);
 			modifiers = 0;
 		    }
-#endif
-		    if (mp->m_keys[mlen] != c2)
-			break;
+#అయితే_ముగింపు
+		    ఒకవేళ (mp->m_కీలకాలు[mlen] != c2)
+			ఆపు;
 		}
 
 		// Don't allow mapping the first byte(s) of a multi-byte char.
 		// Happens when mapping <M-a> and then changing 'encoding'.
 		// Beware that 0x80 is escaped.
 		{
-		    char_u *p1 = mp->m_keys;
+		    char_u *p1 = mp->m_కీలకాలు;
 		    char_u *p2 = mb_unescape(&p1);
 
-		    if (has_mbyte && p2 != NULL
+		    ఒకవేళ (has_mbyte && p2 != ఖాళీ
 					&& MB_BYTE2LEN(tb_c1) > mb_ptr2len(p2))
 			mlen = 0;
 		}
@@ -3004,47 +3004,47 @@ handle_mapping(
 		// - Full match: mlen == keylen
 		// - Partly match: mlen == typebuf.tb_len
 		keylen = mp->m_keylen;
-		if (mlen == keylen || (mlen == typebuf.tb_len
+		ఒకవేళ (mlen == keylen || (mlen == typebuf.tb_len
 						   && typebuf.tb_len < keylen))
 		{
 		    char_u  *s;
-		    int	    n;
+		    పూర్ణాంకం	    n;
 
 		    // If only script-local mappings are allowed, check if the
 		    // mapping starts with K_SNR.
 		    s = typebuf.tb_noremap + typebuf.tb_off;
-		    if ((*s & ~RM_SIMPLIFIED) == RM_SCRIPT
-			    && (mp->m_keys[0] != K_SPECIAL
-				|| mp->m_keys[1] != KS_EXTRA
-				|| mp->m_keys[2] != KE_SNR))
-			continue;
+		    ఒకవేళ ((*s & ~RM_SIMPLIFIED) == RM_SCRIPT
+			    && (mp->m_కీలకాలు[0] != K_SPECIAL
+				|| mp->m_కీలకాలు[1] != KS_EXTRA
+				|| mp->m_కీలకాలు[2] != KE_SNR))
+			కొనసాగు;
 
 		    // If one of the typed keys cannot be remapped, skip the
 		    // entry.
-		    for (n = mlen; --n >= 0; )
-			if (*s++ & (RM_NONE|RM_ABBR))
-			    break;
-		    if (!is_plug_map && n >= 0)
-			continue;
+		    కొరకు (n = mlen; --n >= 0; )
+			ఒకవేళ (*s++ & (RM_NONE|RM_ABBR))
+			    ఆపు;
+		    ఒకవేళ (!is_plug_map && n >= 0)
+			కొనసాగు;
 
-		    if (keylen > typebuf.tb_len)
+		    ఒకవేళ (keylen > typebuf.tb_len)
 		    {
-			if (!*timedout && !(mp_match != NULL
-							&& mp_match->m_nowait))
+			ఒకవేళ (!*timedout && !(mp_సరిపోలిక != ఖాళీ
+							&& mp_సరిపోలిక->m_nowait))
 			{
 			    // break at a partly match
 			    keylen = KEYLEN_PART_MAP;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    else if (keylen > mp_match_len)
+		    లేకపోతే ఒకవేళ (keylen > mp_సరిపోలిక_len)
 		    {
 			// found a longer match
-			mp_match = mp;
-			mp_match_len = keylen;
+			mp_సరిపోలిక = mp;
+			mp_సరిపోలిక_len = keylen;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    // No match; may have to check for termcode at next
 		    // character.
@@ -3052,66 +3052,66 @@ handle_mapping(
 		    // If the first character that didn't match is
 		    // K_SPECIAL then check for a termcode.  This isn't perfect
 		    // but should work in most cases.
-		    if (max_mlen < mlen)
+		    ఒకవేళ (max_mlen < mlen)
 		    {
 			max_mlen = mlen;
-			want_termcode = mp->m_keys[mlen] == K_SPECIAL;
+			want_termcode = mp->m_కీలకాలు[mlen] == K_SPECIAL;
 		    }
-		    else if (max_mlen == mlen && mp->m_keys[mlen] == K_SPECIAL)
+		    లేకపోతే ఒకవేళ (max_mlen == mlen && mp->m_కీలకాలు[mlen] == K_SPECIAL)
 			want_termcode = 1;
 
 		    // Check termcode for uppercase character to properly
 		    // process "ESC[27;2;<ascii code>~" control sequences.
-		    if (ASCII_ISUPPER(mp->m_keys[mlen]))
+		    ఒకవేళ (ASCII_ISUPPER(mp->m_కీలకాలు[mlen]))
 			want_termcode = 1;
 		}
 	    }
 	}
 
 	// If no partly match found, use the longest full match.
-	if (keylen != KEYLEN_PART_MAP && mp_match != NULL)
+	ఒకవేళ (keylen != KEYLEN_PART_MAP && mp_సరిపోలిక != ఖాళీ)
 	{
-	    mp = mp_match;
-	    keylen = mp_match_len;
+	    mp = mp_సరిపోలిక;
+	    keylen = mp_సరిపోలిక_len;
 	}
     }
 
     /*
      * Check for match with 'pastetoggle'
      */
-    if (!in_osc && *p_pt != NUL && mp == NULL &&
-	    (State & (MODE_INSERT | MODE_NORMAL)))
+    ఒకవేళ (!లోపల_osc && *p_pt != NUL && mp == ఖాళీ &&
+	    (State & (బహుళకం_చొప్పించు | బహుళకం_సాధారణ)))
     {
-	for (mlen = 0; mlen < typebuf.tb_len && p_pt[mlen]; ++mlen)
-	    if (p_pt[mlen] != typebuf.tb_buf[typebuf.tb_off + mlen])
-		    break;
-	if (p_pt[mlen] == NUL)	// match
+	కొరకు (mlen = 0; mlen < typebuf.tb_len && p_pt[mlen]; ++mlen)
+	    ఒకవేళ (p_pt[mlen] != typebuf.tb_buf[typebuf.tb_off + mlen])
+		    ఆపు;
+	ఒకవేళ (p_pt[mlen] == NUL)	//సరిపోలిక
 	{
 	    // write chars to script file(s)
-	    if (mlen > typebuf.tb_maplen)
+	    ఒకవేళ (mlen > typebuf.tb_maplen)
 		gotchars(typebuf.tb_buf + typebuf.tb_off + typebuf.tb_maplen,
 						     mlen - typebuf.tb_maplen);
 
 	    del_typebuf(mlen, 0); // remove the chars
-	    set_option_value_give_err((char_u *)"paste",
-						      (long)!p_paste, NULL, 0);
-	    if (!(State & MODE_INSERT))
+	    సమితి_option_విలువ_give_err((char_u *)"paste",
+						      (దీర్ఘ)!p_paste, ఖాళీ, 0);
+	    ఒకవేళ (!(State & బహుళకం_చొప్పించు))
 	    {
-		msg_col = 0;
-		msg_row = Rows - 1;
-		msg_clr_eos();		// clear ruler
+		సందేశం_నిలువు = 0;
+		సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
+		సందేశం_clr_eos();		// clear ruler
 	    }
-	    status_redraw_all();
+	    స్థితి_redraw_all();
 	    redraw_statuslines();
 	    showmode();
 	    setcursor();
 	    *keylenp = keylen;
-	    return map_result_retry;
+	    తిరిగి map_ఫలితం_retry;
 	}
 	// Need more chars for partly match.
-	if (mlen == typebuf.tb_len)
-	    keylen = KEYLEN_PART_KEY;
-	else if (max_mlen < mlen)
+	ఒకవేళ (mlen == typebuf.tb_len)
+	    keylen = KEYLEN_PART_కీలకం;
+	లేకపోతే ఒకవేళ (max_mlen < mlen)
 	    // no match, may have to check for termcode at next character
 	    max_mlen = mlen + 1;
     }
@@ -3119,11 +3119,11 @@ handle_mapping(
     // May check for a terminal code when there is no mapping or only a partial
     // mapping.  Also check if there is a full mapping with <Esc>, unless timed
     // out, since that is nearly always a partial match with a terminal code.
-    if (in_osc || ((mp == NULL || max_mlen + want_termcode > mp_match_len
-		    || (mp_match_len == 1 && *mp->m_keys == ESC && !*timedout))
+    ఒకవేళ (లోపల_osc || ((mp == ఖాళీ || max_mlen + want_termcode > mp_సరిపోలిక_len
+		    || (mp_సరిపోలిక_len == 1 && *mp->m_కీలకాలు == ESC && !*timedout))
 	    && keylen != KEYLEN_PART_MAP))
     {
-	int	save_keylen = keylen;
+	పూర్ణాంకం	save_keylen = keylen;
 
 	/*
 	 * When no matching mapping found or found a non-matching mapping that
@@ -3134,148 +3134,148 @@ handle_mapping(
 	 * - and not an ESC sequence, not in insert mode or p_ek is on,
 	 * - and when not timed out,
 	 */
-	if (in_osc || no_mapping == 0 || allow_keys != 0)
+	ఒకవేళ (లోపల_osc || no_mapping == 0 || allow_కీలకాలు != 0)
 	{
-	    if (in_osc || ((typebuf.tb_maplen == 0
+	    ఒకవేళ (లోపల_osc || ((typebuf.tb_maplen == 0
 			    || (p_remap && (typebuf.tb_noremap[typebuf.tb_off]
 						& ~RM_SIMPLIFIED) == RM_YES))
 		    && !*timedout))
-		keylen = check_termcode(max_mlen + 1, NULL, 0, NULL);
-	    else
+		keylen = check_termcode(max_mlen + 1, ఖాళీ, 0, ఖాళీ);
+	    లేకపోతే
 		keylen = 0;
 
 	    // If no termcode matched but 'pastetoggle' matched partially
 	    // it's like an incomplete key sequence.
-	    if (keylen == 0 && save_keylen == KEYLEN_PART_KEY && !*timedout)
-		keylen = KEYLEN_PART_KEY;
+	    ఒకవేళ (keylen == 0 && save_keylen == KEYLEN_PART_కీలకం && !*timedout)
+		keylen = KEYLEN_PART_కీలకం;
 
 	    // If no termcode matched, try to include the modifier into the
 	    // key.  This is for when modifyOtherKeys is working.
-#ifdef FEAT_TERMINAL
-	    check_no_reduce_keys();  // may update the no_reduce_keys flag
-#endif
-	    if (keylen == 0 && !no_reduce_keys)
+#నిర్వచితమైతే FEAT_TERMINAL
+	    check_no_reduce_కీలకాలు();  // may update the no_reduce_keys flag
+#అయితే_ముగింపు
+	    ఒకవేళ (keylen == 0 && !no_reduce_కీలకాలు)
 	    {
 		keylen = check_simplify_modifier(max_mlen + 1);
-		if (keylen < 0)
+		ఒకవేళ (keylen < 0)
 		    // ins_typebuf() failed
-		    return map_result_fail;
+		    తిరిగి map_ఫలితం_fail;
 	    }
 
 	    // When getting a partial match, but the last characters were not
 	    // typed, don't wait for a typed character to complete the
 	    // termcode.  This helps a lot when a ":normal" command ends in an
 	    // ESC.
-	    if (keylen < 0 && typebuf.tb_len == typebuf.tb_maplen)
+	    ఒకవేళ (keylen < 0 && typebuf.tb_len == typebuf.tb_maplen)
 		keylen = 0;
 	}
-	else
+	లేకపోతే
 	    keylen = 0;
-	if (keylen == 0)	// no matching terminal code
+	ఒకవేళ (keylen == 0)	// no matching terminal code
 	{
-#ifdef AMIGA
+#నిర్వచితమైతే AMIGA
 	    // check for window bounds report
-	    if (typebuf.tb_maplen == 0 && (typebuf.tb_buf[
+	    ఒకవేళ (typebuf.tb_maplen == 0 && (typebuf.tb_buf[
 						typebuf.tb_off] & 0xff) == CSI)
 	    {
 		char_u *s;
 
-		for (s = typebuf.tb_buf + typebuf.tb_off + 1;
+		కొరకు (s = typebuf.tb_buf + typebuf.tb_off + 1;
 			   s < typebuf.tb_buf + typebuf.tb_off + typebuf.tb_len
 		   && (VIM_ISDIGIT(*s) || *s == ';' || *s == ' ');
 			++s)
 		    ;
-		if (*s == 'r' || *s == '|') // found one
+		ఒకవేళ (*s == 'r' || *s == '|') // found one
 		{
 		    del_typebuf(
-			  (int)(s + 1 - (typebuf.tb_buf + typebuf.tb_off)), 0);
+			  (పూర్ణాంకం)(s + 1 - (typebuf.tb_buf + typebuf.tb_off)), 0);
 		    // get size and redraw screen
 		    shell_resized();
 		    *keylenp = keylen;
-		    return map_result_retry;
+		    తిరిగి map_ఫలితం_retry;
 		}
-		if (*s == NUL)	    // need more characters
-		    keylen = KEYLEN_PART_KEY;
+		ఒకవేళ (*s == NUL)	    // need more characters
+		    keylen = KEYLEN_PART_కీలకం;
 	    }
-	    if (keylen >= 0)
-#endif
+	    ఒకవేళ (keylen >= 0)
+#అయితే_ముగింపు
 		// When there was a matching mapping and no termcode could be
 		// replaced after another one, use that mapping (loop around).
 		// If there was no mapping at all use the character from the
 		// typeahead buffer right here.
-		if (mp == NULL)
+		ఒకవేళ (mp == ఖాళీ)
 		{
 		    *keylenp = keylen;
-		    return map_result_get;    // get character from typeahead
+		    తిరిగి map_ఫలితం_get;    // get character from typeahead
 		}
 	}
 
-	if (keylen > 0)	    // full matching terminal code
+	ఒకవేళ (keylen > 0)	    // full matching terminal code
 	{
-#if defined(FEAT_GUI) && defined(FEAT_MENU)
-	    if (typebuf.tb_len >= 2
+#ఒకవేళ defined(FEAT_GUI) && defined(FEAT_MENU)
+	    ఒకవేళ (typebuf.tb_len >= 2
 		    && typebuf.tb_buf[typebuf.tb_off] == K_SPECIAL
 			      && typebuf.tb_buf[typebuf.tb_off + 1] == KS_MENU)
 	    {
-		int	idx;
+		పూర్ణాంకం	idx;
 
 		// Using a menu may cause a break in undo!  It's like using
 		// gotchars(), but without recording or writing to a script
 		// file.
 		may_sync_undo();
 		del_typebuf(3, 0);
-		idx = get_menu_index(current_menu, local_State);
-		if (idx != MENU_INDEX_INVALID)
+		idx = get_menu_సూచీ(current_menu, local_State);
+		ఒకవేళ (idx != MENU_సూచీ_INVALID)
 		{
 		    // In Select mode and a Visual mode menu is used:  Switch
 		    // to Visual mode temporarily.  Append K_SELECT to switch
 		    // back to Select mode.
-		    if (VIsual_active && VIsual_select
-					&& (current_menu->modes & MODE_VISUAL))
+		    ఒకవేళ (VIsual_చురుకైన && VIsual_select
+					&& (current_menu->modes & బహుళకం_VISUAL))
 		    {
 			VIsual_select = FALSE;
-			(void)ins_typebuf(K_SELECT_STRING,
+			(శూన్య)ins_typebuf(K_SELECT_STRING,
 						   REMAP_NONE, 0, TRUE, FALSE);
 		    }
-		    ins_typebuf(current_menu->strings[idx],
+		    ins_typebuf(current_menu->అక్షరశ్రేణులు[idx],
 				current_menu->noremap[idx],
 				0, TRUE, current_menu->silent[idx]);
 		}
 	    }
-#endif // FEAT_GUI && FEAT_MENU
+#అయితే_ముగింపు // FEAT_GUI && FEAT_MENU
 	    *keylenp = keylen;
-	    return map_result_retry;	// try mapping again
+	    తిరిగి map_ఫలితం_retry;	// try mapping again
 	}
 
 	// Partial match: get some more characters.  When a matching mapping
 	// was found use that one.
-	if (mp == NULL || keylen < 0)
-	    keylen = KEYLEN_PART_KEY;
-	else
-	    keylen = mp_match_len;
+	ఒకవేళ (mp == ఖాళీ || keylen < 0)
+	    keylen = KEYLEN_PART_కీలకం;
+	లేకపోతే
+	    keylen = mp_సరిపోలిక_len;
     }
 
     /*
      * complete match
      */
-    if (keylen >= 0 && keylen <= typebuf.tb_len)
+    ఒకవేళ (keylen >= 0 && keylen <= typebuf.tb_len)
     {
 	char_u *map_str;
 
-#ifdef FEAT_EVAL
-	int	save_m_expr;
-	int	save_m_noremap;
-	int	save_m_silent;
-	char_u	*save_m_keys;
-	char_u	*save_alt_m_keys;
-	int	save_alt_m_keylen;
-#else
+#నిర్వచితమైతే FEAT_EVAL
+	పూర్ణాంకం	save_m_సమాసం;
+	పూర్ణాంకం	save_m_noremap;
+	పూర్ణాంకం	save_m_silent;
+	char_u	*save_m_కీలకాలు;
+	char_u	*save_alt_m_కీలకాలు;
+	పూర్ణాంకం	save_alt_m_keylen;
+#లేకపోతే
 # define save_m_noremap mp->m_noremap
 # define save_m_silent mp->m_silent
-#endif
+#అయితే_ముగింపు
 
 	// write chars to script file(s)
-	if (keylen > typebuf.tb_maplen)
+	ఒకవేళ (keylen > typebuf.tb_maplen)
 	    gotchars(typebuf.tb_buf + typebuf.tb_off + typebuf.tb_maplen,
 						   keylen - typebuf.tb_maplen);
 
@@ -3286,70 +3286,70 @@ handle_mapping(
 	 * Put the replacement string in front of mapstr.
 	 * The depth check catches ":map x y" and ":map y x".
 	 */
-	if (++*mapdepth >= p_mmd)
+	ఒకవేళ (++*mapdepth >= p_mmd)
 	{
 	    emsg(_(e_recursive_mapping));
-	    if (State & MODE_CMDLINE)
+	    ఒకవేళ (State & బహుళకం_CMDLINE)
 		redrawcmdline();
-	    else
+	    లేకపోతే
 		setcursor();
-	    flush_buffers(FLUSH_MINIMAL);
+	    flush_buffers(FLUSH_కనీస);
 	    *mapdepth = 0;	// for next one
 	    *keylenp = keylen;
-	    return map_result_fail;
+	    తిరిగి map_ఫలితం_fail;
 	}
 
 	/*
 	 * In Select mode and a Visual mode mapping is used: Switch to Visual
 	 * mode temporarily.  Append K_SELECT to switch back to Select mode.
 	 */
-	if (VIsual_active && VIsual_select && (mp->m_mode & MODE_VISUAL))
+	ఒకవేళ (VIsual_చురుకైన && VIsual_select && (mp->m_బహుళకం & బహుళకం_VISUAL))
 	{
 	    VIsual_select = FALSE;
-	    (void)ins_typebuf(K_SELECT_STRING, REMAP_NONE, 0, TRUE, FALSE);
+	    (శూన్య)ins_typebuf(K_SELECT_STRING, REMAP_NONE, 0, TRUE, FALSE);
 	}
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// Copy the values from *mp that are used, because evaluating the
 	// expression may invoke a function that redefines the mapping, thereby
 	// making *mp invalid.
-	save_m_expr = mp->m_expr;
+	save_m_సమాసం = mp->m_సమాసం;
 	save_m_noremap = mp->m_noremap;
 	save_m_silent = mp->m_silent;
-	save_m_keys = NULL;  // only saved when needed
-	save_alt_m_keys = NULL;  // only saved when needed
-	save_alt_m_keylen = mp->m_alt != NULL ? mp->m_alt->m_keylen : 0;
+	save_m_కీలకాలు = ఖాళీ;  // only saved when needed
+	save_alt_m_కీలకాలు = ఖాళీ;  // only saved when needed
+	save_alt_m_keylen = mp->m_alt != ఖాళీ ? mp->m_alt->m_keylen : 0;
 
 	/*
 	 * Handle ":map <expr>": evaluate the {rhs} as an expression.  Also
 	 * save and restore the command line for "normal :".
 	 */
-	if (mp->m_expr)
+	ఒకవేళ (mp->m_సమాసం)
 	{
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_may_garbage_collect = may_garbage_collect;
-	    int was_screen_col = screen_cur_col;
-	    int was_screen_row = screen_cur_row;
-	    int prev_did_emsg = did_emsg;
+	    పూర్ణాంకం save_vgetc_busy = vgetc_busy;
+	    పూర్ణాంకం save_may_garbage_collect = may_garbage_collect;
+	    పూర్ణాంకం was_screen_నిలువు = screen_cur_నిలువు;
+	    పూర్ణాంకం was_screen_అడ్డువరుస = screen_cur_అడ్డువరుస;
+	    పూర్ణాంకం prev_did_emsg = did_emsg;
 
 	    vgetc_busy = 0;
 	    may_garbage_collect = FALSE;
 
-	    save_m_keys = vim_strnsave(mp->m_keys, (size_t)mp->m_keylen);
-	    save_alt_m_keys = mp->m_alt != NULL
-				    ? vim_strnsave(mp->m_alt->m_keys,
-					     (size_t)save_alt_m_keylen) : NULL;
-	    map_str = eval_map_expr(mp, NUL);
+	    save_m_కీలకాలు = vim_strnsave(mp->m_కీలకాలు, (size_t)mp->m_keylen);
+	    save_alt_m_కీలకాలు = mp->m_alt != ఖాళీ
+				    ? vim_strnsave(mp->m_alt->m_కీలకాలు,
+					     (size_t)save_alt_m_keylen) : ఖాళీ;
+	    map_str = eval_map_సమాసం(mp, NUL);
 
 	    // The mapping may do anything, but we expect it to take care of
 	    // redrawing.  Do put the cursor back where it was.
-	    windgoto(was_screen_row, was_screen_col);
-	    out_flush();
+	    windgoto(was_screen_అడ్డువరుస, was_screen_నిలువు);
+	    బహిర్గతం_flush();
 
 	    // If an error was displayed and the expression returns an empty
 	    // string, generate a <Nop> to allow for a redraw.
-	    if (prev_did_emsg != did_emsg
-				       && (map_str == NULL || *map_str == NUL))
+	    ఒకవేళ (prev_did_emsg != did_emsg
+				       && (map_str == ఖాళీ || *map_str == NUL))
 	    {
 		char_u	buf[4];
 
@@ -3359,12 +3359,12 @@ handle_mapping(
 		buf[2] = KE_IGNORE;
 		buf[3] = NUL;
 		map_str = vim_strnsave(buf, 3);
-		if (State & MODE_CMDLINE)
+		ఒకవేళ (State & బహుళకం_CMDLINE)
 		{
 		    // redraw the command below the error
-		    msg_didout = TRUE;
-		    if (msg_row < cmdline_row)
-			msg_row = cmdline_row;
+		    సందేశం_didout = TRUE;
+		    ఒకవేళ (సందేశం_అడ్డువరుస < cmdline_అడ్డువరుస)
+			సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;
 		    redrawcmd();
 		}
 	    }
@@ -3372,8 +3372,8 @@ handle_mapping(
 	    vgetc_busy = save_vgetc_busy;
 	    may_garbage_collect = save_may_garbage_collect;
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    map_str = mp->m_str;
 
 	/*
@@ -3382,53 +3382,53 @@ handle_mapping(
 	 * remap the first character (but do allow abbreviations).
 	 * If m_noremap is set, don't remap the whole 'to' part.
 	 */
-	if (map_str == NULL)
+	ఒకవేళ (map_str == ఖాళీ)
 	    i = FAIL;
-	else
+	లేకపోతే
 	{
-	    int noremap;
+	    పూర్ణాంకం noremap;
 
-#ifdef FEAT_EVAL
-	    last_used_map = mp;
-	    last_used_sid = -1;
-#endif
-	    if (save_m_noremap != REMAP_YES)
+#నిర్వచితమైతే FEAT_EVAL
+	    చివరి_వాడిన_map = mp;
+	    చివరి_వాడిన_sid = -1;
+#అయితే_ముగింపు
+	    ఒకవేళ (save_m_noremap != REMAP_YES)
 		noremap = save_m_noremap;
-	    else if (
-#ifdef FEAT_EVAL
-		save_m_expr ?
-		(save_m_keys != NULL
-			&& STRNCMP(map_str, save_m_keys, (size_t)keylen) == 0)
-		|| (save_alt_m_keys != NULL
-			&& STRNCMP(map_str, save_alt_m_keys,
+	    లేకపోతే ఒకవేళ (
+#నిర్వచితమైతే FEAT_EVAL
+		save_m_సమాసం ?
+		(save_m_కీలకాలు != ఖాళీ
+			&& STRNCMP(map_str, save_m_కీలకాలు, (size_t)keylen) == 0)
+		|| (save_alt_m_కీలకాలు != ఖాళీ
+			&& STRNCMP(map_str, save_alt_m_కీలకాలు,
 					    (size_t)save_alt_m_keylen) == 0) :
-#endif
-		STRNCMP(map_str, mp->m_keys, (size_t)keylen) == 0
-		|| (mp->m_alt != NULL
-			&& STRNCMP(map_str, mp->m_alt->m_keys,
+#అయితే_ముగింపు
+		STRNCMP(map_str, mp->m_కీలకాలు, (size_t)keylen) == 0
+		|| (mp->m_alt != ఖాళీ
+			&& STRNCMP(map_str, mp->m_alt->m_కీలకాలు,
 					    (size_t)mp->m_alt->m_keylen) == 0))
 		noremap = REMAP_SKIP;
-	    else
+	    లేకపోతే
 		noremap = REMAP_YES;
 	    i = ins_typebuf(map_str, noremap,
 					 0, TRUE, cmd_silent || save_m_silent);
-#ifdef FEAT_EVAL
-	    if (save_m_expr)
+#నిర్వచితమైతే FEAT_EVAL
+	    ఒకవేళ (save_m_సమాసం)
 		vim_free(map_str);
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef FEAT_EVAL
-	vim_free(save_m_keys);
-	vim_free(save_alt_m_keys);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	vim_free(save_m_కీలకాలు);
+	vim_free(save_alt_m_కీలకాలు);
+#అయితే_ముగింపు
 	*keylenp = keylen;
-	if (i == FAIL)
-	    return map_result_fail;
-	return map_result_retry;
+	ఒకవేళ (i == FAIL)
+	    తిరిగి map_ఫలితం_fail;
+	తిరిగి map_ఫలితం_retry;
     }
 
     *keylenp = keylen;
-    return map_result_nomatch;
+    తిరిగి map_ఫలితం_nomatch;
 }
 
 /*
@@ -3436,33 +3436,33 @@ handle_mapping(
  * If the character was stuffed, vgetc() will get it next time it is called.
  * Otherwise vgetc() will only get it when the stuff buffer is empty.
  */
-    void
-vungetc(int c)
+    శూన్య
+vungetc(పూర్ణాంకం c)
 {
     old_char = c;
-    old_mod_mask = mod_mask;
-    old_mouse_row = mouse_row;
-    old_mouse_col = mouse_col;
-    old_KeyStuffed = KeyStuffed;
+    old_mod_ముసుగు = mod_ముసుగు;
+    old_mouse_అడ్డువరుస = mouse_అడ్డువరుస;
+    old_mouse_నిలువు = mouse_నిలువు;
+    old_కీలకం_Stuffed = కీలకం_Stuffed;
 }
 
 /*
  * When peeking and not getting a character, reg_executing cannot be cleared
  * yet, so set a flag to clear it later.
  */
-    static void
-check_end_reg_executing(int advance)
+    స్థిర శూన్య
+check_చివర_reg_executing(పూర్ణాంకం advance)
 {
-    if (reg_executing != 0 && (typebuf.tb_maplen == 0
-						|| pending_end_reg_executing))
+    ఒకవేళ (reg_executing != 0 && (typebuf.tb_maplen == 0
+						|| pending_చివర_reg_executing))
     {
-	if (advance)
+	ఒకవేళ (advance)
 	{
 	    reg_executing = 0;
-	    pending_end_reg_executing = FALSE;
+	    pending_చివర_reg_executing = FALSE;
 	}
-	else
-	    pending_end_reg_executing = TRUE;
+	లేకపోతే
+	    pending_చివర_reg_executing = TRUE;
     }
 
 }
@@ -3491,22 +3491,22 @@ check_end_reg_executing(int advance)
  * Only returns one byte (of a multi-byte character).
  * K_SPECIAL and CSI may be escaped, need to get two more bytes then.
  */
-    static int
-vgetorpeek(int advance)
+    స్థిర పూర్ణాంకం
+vgetorpeek(పూర్ణాంకం advance)
 {
-    int		c;
-    int		timedout = FALSE;	// waited for more than 'timeoutlen'
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		timedout = FALSE;	// waited for more than 'timeoutlen'
 					// for mapping to complete or
 					// 'ttimeoutlen' for complete key code
-    int		mapdepth = 0;		// check for recursive mapping
-    int		mode_deleted = FALSE;   // set when mode has been deleted
-    int		new_wcol, new_wrow;
-#ifdef FEAT_GUI
-    int		shape_changed = FALSE;  // adjusted cursor shape
-#endif
-    int		n;
-    int		old_wcol, old_wrow;
-    int		wait_tb_len;
+    పూర్ణాంకం		mapdepth = 0;		// check for recursive mapping
+    పూర్ణాంకం		బహుళకం_deleted = FALSE;   // set when mode has been deleted
+    పూర్ణాంకం		new_wcol, new_wrow;
+#నిర్వచితమైతే FEAT_GUI
+    పూర్ణాంకం		shape_మారింది = FALSE;  // adjusted cursor shape
+#అయితే_ముగింపు
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		old_wcol, old_wrow;
+    పూర్ణాంకం		wait_tb_len;
 
     /*
      * This function doesn't work very well when called recursively.  This may
@@ -3519,46 +3519,46 @@ vgetorpeek(int advance)
      * Using ":normal" can also do this, but it saves the typeahead buffer,
      * thus it should be OK.  But don't get a key from the user then.
      */
-    if (vgetc_busy > 0 && ex_normal_busy == 0)
-	return NUL;
+    ఒకవేళ (vgetc_busy > 0 && ex_సాధారణ_busy == 0)
+	తిరిగి NUL;
 
     ++vgetc_busy;
 
-    if (advance)
+    ఒకవేళ (advance)
     {
-	KeyStuffed = FALSE;
-	typebuf_was_empty = FALSE;
+	కీలకం_Stuffed = FALSE;
+	typebuf_was_ఖాళీలు = FALSE;
     }
 
     init_typebuf();
-    start_stuff();
-    check_end_reg_executing(advance);
-    do
+    ప్రారంభం_stuff();
+    check_చివర_reg_executing(advance);
+    చేయి
     {
 /*
  * get a character: 1. from the stuffbuffer
  */
-	if (typeahead_char != 0)
+	ఒకవేళ (typeahead_char != 0)
 	{
 	    c = typeahead_char;
-	    if (advance)
+	    ఒకవేళ (advance)
 		typeahead_char = 0;
 	}
-	else
+	లేకపోతే
 	    c = read_readbuffers(advance);
-	if (c != NUL && !got_int)
+	ఒకవేళ (c != NUL && !got_int)
 	{
-	    if (advance)
+	    ఒకవేళ (advance)
 	    {
 		// KeyTyped = FALSE;  When the command that stuffed something
 		// was typed, behave like the stuffed command was typed.
 		// needed for CTRL-W CTRL-] to open a fold, for example.
-		KeyStuffed = TRUE;
+		కీలకం_Stuffed = TRUE;
 	    }
-	    if (typebuf.tb_no_abbr_cnt == 0)
+	    ఒకవేళ (typebuf.tb_no_abbr_cnt == 0)
 		typebuf.tb_no_abbr_cnt = 1;	// no abbreviations now
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Loop until we either find a matching mapped key, or we
@@ -3566,22 +3566,22 @@ vgetorpeek(int advance)
 	     * If a mapped key sequence is found we go back to the start to
 	     * try re-mapping.
 	     */
-	    for (;;)
+	    కొరకు (;;)
 	    {
-		long	wait_time;
-		int	keylen = 0;
-		int	showcmd_idx;
-		check_end_reg_executing(advance);
+		దీర్ఘ	wait_సమయం;
+		పూర్ణాంకం	keylen = 0;
+		పూర్ణాంకం	showcmd_idx;
+		check_చివర_reg_executing(advance);
 		/*
 		 * ui_breakcheck() is slow, don't use it too often when
 		 * inside a mapping.  But call it each time for typed
 		 * characters.
 		 */
-		if (typebuf.tb_maplen)
-		    line_breakcheck();
-		else
+		ఒకవేళ (typebuf.tb_maplen)
+		    పంక్తి_breakcheck();
+		లేకపోతే
 		    ui_breakcheck();		// check for CTRL-C
-		if (got_int)
+		ఒకవేళ (got_int)
 		{
 		    // flush all input
 		    c = inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 0L);
@@ -3593,14 +3593,14 @@ vgetorpeek(int advance)
 		     * As a result typing CTRL-C in insert mode will
 		     * really insert a CTRL-C.
 		     */
-		    if ((c || typebuf.tb_maplen)
-				     && (State & (MODE_INSERT | MODE_CMDLINE)))
+		    ఒకవేళ ((c || typebuf.tb_maplen)
+				     && (State & (బహుళకం_చొప్పించు | బహుళకం_CMDLINE)))
 			c = ESC;
-		    else
+		    లేకపోతే
 			c = Ctrl_C;
-		    flush_buffers(FLUSH_INPUT);	// flush all typeahead
+		    flush_buffers(FLUSH_ఆదానం);	// flush all typeahead
 
-		    if (advance)
+		    ఒకవేళ (advance)
 		    {
 			// Also record this character, it might be needed to
 			// get out of Insert mode.
@@ -3609,48 +3609,48 @@ vgetorpeek(int advance)
 		    }
 		    cmd_silent = FALSE;
 
-		    break;
+		    ఆపు;
 		}
-		else if (typebuf.tb_len > 0)
+		లేకపోతే ఒకవేళ (typebuf.tb_len > 0)
 		{
 		    /*
 		     * Check for a mapping in "typebuf".
 		     */
-		    map_result_T result = handle_mapping(
+		    map_ఫలితం_T ఫలితం = handle_mapping(
 						&keylen, &timedout, &mapdepth);
 
-		    if (result == map_result_retry)
+		    ఒకవేళ (ఫలితం == map_ఫలితం_retry)
 			// try mapping again
-			continue;
-		    if (result == map_result_fail)
+			కొనసాగు;
+		    ఒకవేళ (ఫలితం == map_ఫలితం_fail)
 		    {
 			// failed, use the outer loop
 			c = -1;
-			break;
+			ఆపు;
 		    }
-		    if (result == map_result_get)
+		    ఒకవేళ (ఫలితం == map_ఫలితం_get)
 		    {
 /*
  * get a character: 2. from the typeahead buffer
  */
 			c = typebuf.tb_buf[typebuf.tb_off];
-			if (advance)	// remove chars from typebuf
+			ఒకవేళ (advance)	// remove chars from typebuf
 			{
 			    cmd_silent = (typebuf.tb_silent > 0);
-			    if (typebuf.tb_maplen > 0)
-				KeyTyped = FALSE;
-			    else
+			    ఒకవేళ (typebuf.tb_maplen > 0)
+				కీలకం_Typed = FALSE;
+			    లేకపోతే
 			    {
-				KeyTyped = TRUE;
+				కీలకం_Typed = TRUE;
 				// write char to script file(s)
 				gotchars(typebuf.tb_buf
 						 + typebuf.tb_off, 1);
 			    }
-			    KeyNoremap = typebuf.tb_noremap[typebuf.tb_off]
+			    కీలకం_Noremap = typebuf.tb_noremap[typebuf.tb_off]
 							    & ~RM_SIMPLIFIED;
 			    del_typebuf(1, 0);
 			}
-			break;  // got character, break the for loop
+			ఆపు;  // got character, break the for loop
 		    }
 
 		    // not enough characters, get more
@@ -3672,55 +3672,55 @@ vgetorpeek(int advance)
 		c = 0;
 		new_wcol = curwin->w_wcol;
 		new_wrow = curwin->w_wrow;
-		if (	   advance
+		ఒకవేళ (	   advance
 			&& typebuf.tb_len == 1
 			&& typebuf.tb_buf[typebuf.tb_off] == ESC
 			&& !no_mapping
 			&& kitty_protocol_state != KKPS_ENABLED
-			&& ex_normal_busy == 0
+			&& ex_సాధారణ_busy == 0
 			&& typebuf.tb_maplen == 0
-			&& (State & MODE_INSERT)
+			&& (State & బహుళకం_చొప్పించు)
 			&& (p_timeout
-			    || (keylen == KEYLEN_PART_KEY && p_ttimeout))
+			    || (keylen == KEYLEN_PART_కీలకం && p_ttimeout))
 			&& (c = inchar(typebuf.tb_buf + typebuf.tb_off
 					       + typebuf.tb_len, 3, 25L)) == 0)
 		{
-		    colnr_T	col = 0;
+		    colnr_T	నిలువు = 0;
 		    char_u	*ptr;
 
-		    if (mode_displayed)
+		    ఒకవేళ (బహుళకం_displayed)
 		    {
 			unshowmode(TRUE);
-			mode_deleted = TRUE;
+			బహుళకం_deleted = TRUE;
 		    }
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 		    // may show a different cursor shape
-		    if (gui.in_use && State != MODE_NORMAL && !cmd_silent)
+		    ఒకవేళ (gui.లోపల_use && State != బహుళకం_సాధారణ && !cmd_silent)
 		    {
-			int	    save_State;
+			పూర్ణాంకం	    save_State;
 
 			save_State = State;
-			State = MODE_NORMAL;
+			State = బహుళకం_సాధారణ;
 			gui_update_cursor(TRUE, FALSE);
 			State = save_State;
-			shape_changed = TRUE;
+			shape_మారింది = TRUE;
 		    }
-#endif
+#అయితే_ముగింపు
 		    validate_cursor();
 		    old_wcol = curwin->w_wcol;
 		    old_wrow = curwin->w_wrow;
 
 		    // move cursor left, if possible
-		    if (curwin->w_cursor.col != 0)
+		    ఒకవేళ (curwin->w_cursor.నిలువు != 0)
 		    {
-			if (curwin->w_wcol > 0)
+			ఒకవేళ (curwin->w_wcol > 0)
 			{
 			    // After auto-indenting and no text is following,
 			    // we are expecting to truncate the trailing
 			    // white-space, so find the last non-white
 			    // character -- webb
-			    if (did_ai && *skipwhite(ml_get_curline()
-						+ curwin->w_cursor.col) == NUL)
+			    ఒకవేళ (did_ai && *skipwhite(ml_get_curline()
+						+ curwin->w_cursor.నిలువు) == NUL)
 			    {
 				chartabsize_T cts;
 
@@ -3728,81 +3728,81 @@ vgetorpeek(int advance)
 				ptr = ml_get_curline();
 				init_chartabsize_arg(&cts, curwin,
 					  curwin->w_cursor.lnum, 0, ptr, ptr);
-				while (cts.cts_ptr < ptr + curwin->w_cursor.col)
+				అయితే (cts.cts_ptr < ptr + curwin->w_cursor.నిలువు)
 				{
-				    if (!VIM_ISWHITE(*cts.cts_ptr))
+				    ఒకవేళ (!VIM_ISWHITE(*cts.cts_ptr))
 					curwin->w_wcol = cts.cts_vcol;
 				    cts.cts_vcol += lbr_chartabsize(&cts);
-				    if (has_mbyte)
+				    ఒకవేళ (has_mbyte)
 					cts.cts_ptr +=
 						   (*mb_ptr2len)(cts.cts_ptr);
-				    else
+				    లేకపోతే
 					++cts.cts_ptr;
 				}
 				clear_chartabsize_arg(&cts);
 
-				curwin->w_wrow = curwin->w_cline_row
-					   + curwin->w_wcol / curwin->w_width;
-				curwin->w_wcol %= curwin->w_width;
-				curwin->w_wcol += curwin_col_off();
-				col = 0;	// no correction needed
+				curwin->w_wrow = curwin->w_cline_అడ్డువరుస
+					   + curwin->w_wcol / curwin->w_వెడల్పు;
+				curwin->w_wcol %= curwin->w_వెడల్పు;
+				curwin->w_wcol += curwin_నిలువు_off();
+				నిలువు = 0;	// no correction needed
 			    }
-			    else
+			    లేకపోతే
 			    {
 				--curwin->w_wcol;
-				col = curwin->w_cursor.col - 1;
+				నిలువు = curwin->w_cursor.నిలువు - 1;
 			    }
 			}
-			else if (curwin->w_p_wrap && curwin->w_wrow)
+			లేకపోతే ఒకవేళ (curwin->w_p_wrap && curwin->w_wrow)
 			{
 			    --curwin->w_wrow;
-			    curwin->w_wcol = curwin->w_width - 1;
-			    col = curwin->w_cursor.col - 1;
+			    curwin->w_wcol = curwin->w_వెడల్పు - 1;
+			    నిలువు = curwin->w_cursor.నిలువు - 1;
 			}
-			if (has_mbyte && col > 0 && curwin->w_wcol > 0)
+			ఒకవేళ (has_mbyte && నిలువు > 0 && curwin->w_wcol > 0)
 			{
 			    // Correct when the cursor is on the right halve
 			    // of a double-wide character.
 			    ptr = ml_get_curline();
-			    col -= (*mb_head_off)(ptr, ptr + col);
-			    if ((*mb_ptr2cells)(ptr + col) > 1)
+			    నిలువు -= (*mb_తల_off)(ptr, ptr + నిలువు);
+			    ఒకవేళ ((*mb_ptr2cells)(ptr + నిలువు) > 1)
 				--curwin->w_wcol;
 			}
 		    }
 		    setcursor();
-		    out_flush();
+		    బహిర్గతం_flush();
 		    new_wcol = curwin->w_wcol;
 		    new_wrow = curwin->w_wrow;
 		    curwin->w_wcol = old_wcol;
 		    curwin->w_wrow = old_wrow;
 		}
-		if (c < 0)
-		    continue;	// end of input script reached
+		ఒకవేళ (c < 0)
+		    కొనసాగు;	// end of input script reached
 
 		// Allow mapping for just typed characters. When we get here c
 		// is the number of extra bytes and typebuf.tb_len is 1.
-		for (n = 1; n <= c; ++n)
+		కొరకు (n = 1; n <= c; ++n)
 		    typebuf.tb_noremap[typebuf.tb_off + n] = RM_YES;
 		typebuf.tb_len += c;
 
 		// buffer full, don't map
-		if (typebuf.tb_len >= typebuf.tb_maplen + MAXMAPLEN)
+		ఒకవేళ (typebuf.tb_len >= typebuf.tb_maplen + MAXMAPLEN)
 		{
 		    timedout = TRUE;
-		    continue;
+		    కొనసాగు;
 		}
 
-		if (ex_normal_busy > 0)
+		ఒకవేళ (ex_సాధారణ_busy > 0)
 		{
-		    static int tc = 0;
+		    స్థిర పూర్ణాంకం tc = 0;
 
 		    // No typeahead left and inside ":normal".  Must return
 		    // something to avoid getting stuck.  When an incomplete
 		    // mapping is present, behave like it timed out.
-		    if (typebuf.tb_len > 0)
+		    ఒకవేళ (typebuf.tb_len > 0)
 		    {
 			timedout = TRUE;
-			continue;
+			కొనసాగు;
 		    }
 
 		    // When 'insertmode' is set, ESC just beeps in Insert
@@ -3811,30 +3811,30 @@ vgetorpeek(int advance)
 		    // For the cmdline window: Alternate between ESC and
 		    // CTRL-C: ESC for most situations and CTRL-C to close the
 		    // cmdline window.
-		    if (p_im && (State & MODE_INSERT))
+		    ఒకవేళ (p_im && (State & బహుళకం_చొప్పించు))
 			c = Ctrl_L;
-#ifdef FEAT_TERMINAL
-		    else if (terminal_is_active())
+#నిర్వచితమైతే FEAT_TERMINAL
+		    లేకపోతే ఒకవేళ (terminal_is_చురుకైన())
 			c = K_CANCEL;
-#endif
-		    else if ((State & MODE_CMDLINE)
+#అయితే_ముగింపు
+		    లేకపోతే ఒకవేళ ((State & బహుళకం_CMDLINE)
 					     || (cmdwin_type > 0 && tc == ESC))
 			c = Ctrl_C;
-		    else
+		    లేకపోతే
 			c = ESC;
 		    tc = c;
 		    // set a flag to indicate this wasn't a normal char
-		    if (advance)
-			typebuf_was_empty = TRUE;
+		    ఒకవేళ (advance)
+			typebuf_was_ఖాళీలు = TRUE;
 
 		    // return from main_loop()
-		    if (pending_exmode_active)
-			exmode_active = EXMODE_NORMAL;
+		    ఒకవేళ (pending_exmode_చురుకైన)
+			exmode_చురుకైన = EXMODE_సాధారణ;
 
 		    // no chars to block abbreviation for
 		    typebuf.tb_no_abbr_cnt = 0;
 
-		    break;
+		    ఆపు;
 		}
 
 /*
@@ -3847,8 +3847,8 @@ vgetorpeek(int advance)
 		// changed text so far. Also for when 'lazyredraw' is set and
 		// redrawing was postponed because there was something in the
 		// input buffer (e.g., termresponse).
-		if (((State & MODE_INSERT) != 0 || p_lz)
-			&& (State & MODE_CMDLINE) == 0
+		ఒకవేళ (((State & బహుళకం_చొప్పించు) != 0 || p_lz)
+			&& (State & బహుళకం_CMDLINE) == 0
 			&& advance && must_redraw != 0 && !need_wait_return)
 		{
 		    update_screen(0);
@@ -3861,15 +3861,15 @@ vgetorpeek(int advance)
 		 * to the user with showcmd.
 		 */
 		showcmd_idx = 0;
-		int showing_partial = FALSE;
-		if (typebuf.tb_len > 0 && advance && !exmode_active)
+		పూర్ణాంకం showing_partial = FALSE;
+		ఒకవేళ (typebuf.tb_len > 0 && advance && !exmode_చురుకైన)
 		{
-		    if (((State & (MODE_NORMAL | MODE_INSERT))
-						      || State == MODE_LANGMAP)
-			    && State != MODE_HITRETURN)
+		    ఒకవేళ (((State & (బహుళకం_సాధారణ | బహుళకం_చొప్పించు))
+						      || State == బహుళకం_LANGMAP)
+			    && State != బహుళకం_HITRETURN)
 		    {
 			// this looks nice when typing a dead character map
-			if (State & MODE_INSERT
+			ఒకవేళ (State & బహుళకం_చొప్పించు
 			    && ptr2cells(typebuf.tb_buf + typebuf.tb_off
 						   + typebuf.tb_len - 1) == 1)
 			{
@@ -3883,11 +3883,11 @@ vgetorpeek(int advance)
 			old_wrow = curwin->w_wrow;
 			curwin->w_wcol = new_wcol;
 			curwin->w_wrow = new_wrow;
-			push_showcmd();
-			if (typebuf.tb_len > SHOWCMD_COLS)
-			    showcmd_idx = typebuf.tb_len - SHOWCMD_COLS;
-			while (showcmd_idx < typebuf.tb_len)
-			    add_byte_to_showcmd(
+			నెట్టు_showcmd();
+			ఒకవేళ (typebuf.tb_len > SHOWCMD_నిలువుల_సంఖ్య)
+			    showcmd_idx = typebuf.tb_len - SHOWCMD_నిలువుల_సంఖ్య;
+			అయితే (showcmd_idx < typebuf.tb_len)
+			    కూడు_byte_గమ్యం_showcmd(
 			       typebuf.tb_buf[typebuf.tb_off + showcmd_idx++]);
 			curwin->w_wcol = old_wcol;
 			curwin->w_wrow = old_wrow;
@@ -3895,11 +3895,11 @@ vgetorpeek(int advance)
 
 		    // This looks nice when typing a dead character map.
 		    // There is no actual command line for get_number().
-		    if ((State & MODE_CMDLINE)
-			    && get_cmdline_info()->cmdbuff != NULL
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-			    && cmdline_star == 0
-#endif
+		    ఒకవేళ ((State & బహుళకం_CMDLINE)
+			    && get_cmdline_info()->cmdbuff != ఖాళీ
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+			    && cmdline_నక్షత్రం == 0
+#అయితే_ముగింపు
 			    && ptr2cells(typebuf.tb_buf + typebuf.tb_off
 						   + typebuf.tb_len - 1) == 1)
 		    {
@@ -3912,102 +3912,102 @@ vgetorpeek(int advance)
 /*
  * get a character: 3. from the user - get it
  */
-		if (typebuf.tb_len == 0)
+		ఒకవేళ (typebuf.tb_len == 0)
 		    // timedout may have been set if a mapping with empty RHS
 		    // fully matched while longer mappings timed out.
 		    timedout = FALSE;
 
-		if (advance)
+		ఒకవేళ (advance)
 		{
-		    if (typebuf.tb_len == 0
+		    ఒకవేళ (typebuf.tb_len == 0
 			    || !(p_timeout
-				 || (p_ttimeout && keylen == KEYLEN_PART_KEY)))
+				 || (p_ttimeout && keylen == KEYLEN_PART_కీలకం)))
 			// blocking wait
-			wait_time = -1L;
-		    else if (keylen == KEYLEN_PART_KEY && p_ttm >= 0)
-			wait_time = p_ttm;
-		    else
-			wait_time = p_tm;
+			wait_సమయం = -1L;
+		    లేకపోతే ఒకవేళ (keylen == KEYLEN_PART_కీలకం && p_ttm >= 0)
+			wait_సమయం = p_ttm;
+		    లేకపోతే
+			wait_సమయం = p_tm;
 		}
-		else
-		    wait_time = 0;
+		లేకపోతే
+		    wait_సమయం = 0;
 
 		wait_tb_len = typebuf.tb_len;
 		c = inchar(typebuf.tb_buf + typebuf.tb_off + typebuf.tb_len,
 			typebuf.tb_buflen - typebuf.tb_off - typebuf.tb_len - 1,
-			wait_time);
+			wait_సమయం);
 
-		if (showcmd_idx != 0)
-		    pop_showcmd();
-		if (showing_partial)
+		ఒకవేళ (showcmd_idx != 0)
+		    తీయి_showcmd();
+		ఒకవేళ (showing_partial)
 		{
-		    if (State & MODE_INSERT)
+		    ఒకవేళ (State & బహుళకం_చొప్పించు)
 			edit_unputchar();
-		    if ((State & MODE_CMDLINE)
-					&& get_cmdline_info()->cmdbuff != NULL)
+		    ఒకవేళ ((State & బహుళకం_CMDLINE)
+					&& get_cmdline_info()->cmdbuff != ఖాళీ)
 			unputcmdline();
-		    else
+		    లేకపోతే
 			setcursor();	// put cursor back where it belongs
 		}
 
-		if (c < 0)
-		    continue;		// end of input script reached
-		if (c == NUL)		// no character available
+		ఒకవేళ (c < 0)
+		    కొనసాగు;		// end of input script reached
+		ఒకవేళ (c == NUL)		// no character available
 		{
-		    if (!advance)
-			break;
-		    if (wait_tb_len > 0)	// timed out
+		    ఒకవేళ (!advance)
+			ఆపు;
+		    ఒకవేళ (wait_tb_len > 0)	// timed out
 		    {
 			timedout = TRUE;
-			continue;
+			కొనసాగు;
 		    }
 		}
-		else
+		లేకపోతే
 		{	    // allow mapping for just typed characters
-		    while (typebuf.tb_buf[typebuf.tb_off
+		    అయితే (typebuf.tb_buf[typebuf.tb_off
 						     + typebuf.tb_len] != NUL)
 			typebuf.tb_noremap[typebuf.tb_off
 						 + typebuf.tb_len++] = RM_YES;
-#ifdef HAVE_INPUT_METHOD
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
 		    // Get IM status right after getting keys, not after the
 		    // timeout for a mapping (focus may be lost by then).
-		    vgetc_im_active = im_get_status();
-#endif
+		    vgetc_im_చురుకైన = im_get_స్థితి();
+#అయితే_ముగింపు
 		}
 	    }	    // for (;;)
 	}	// if (!character from stuffbuf)
 
 	// if advance is FALSE don't loop on NULs
-    } while ((c < 0 && c != K_CANCEL) || (advance && c == NUL));
+    } అయితే ((c < 0 && c != K_CANCEL) || (advance && c == NUL));
 
     /*
      * The "INSERT" message is taken care of here:
      *	 if we return an ESC to exit insert mode, the message is deleted
      *	 if we don't return an ESC but deleted the message before, redisplay it
      */
-    if (advance && p_smd && msg_silent == 0 && (State & MODE_INSERT))
+    ఒకవేళ (advance && p_smd && సందేశం_silent == 0 && (State & బహుళకం_చొప్పించు))
     {
-	if (c == ESC && !mode_deleted && !no_mapping && mode_displayed)
+	ఒకవేళ (c == ESC && !బహుళకం_deleted && !no_mapping && బహుళకం_displayed)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    ఒకవేళ (typebuf.tb_len && !కీలకం_Typed)
 		redraw_cmdline = TRUE;	    // delete mode later
-	    else
+	    లేకపోతే
 		unshowmode(FALSE);
 	}
-	else if (c != ESC && mode_deleted)
+	లేకపోతే ఒకవేళ (c != ESC && బహుళకం_deleted)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    ఒకవేళ (typebuf.tb_len && !కీలకం_Typed)
 		redraw_cmdline = TRUE;	    // show mode later
-	    else
+	    లేకపోతే
 		showmode();
 	}
     }
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // may unshow different cursor shape
-    if (gui.in_use && shape_changed)
+    ఒకవేళ (gui.లోపల_use && shape_మారింది)
 	gui_update_cursor(TRUE, FALSE);
-#endif
-    if (timedout && c == ESC)
+#అయితే_ముగింపు
+    ఒకవేళ (timedout && c == ESC)
     {
 	// When recording there will be no timeout.  Add an <Ignore> after the
 	// ESC to avoid that it forms a key code with following characters.
@@ -4016,7 +4016,7 @@ vgetorpeek(int advance)
 
     --vgetc_busy;
 
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -4042,25 +4042,25 @@ vgetorpeek(int advance)
  *  Return the number of obtained characters.
  *  Return -1 when end of input script reached.
  */
-    static int
+    స్థిర పూర్ణాంకం
 inchar(
     char_u	*buf,
-    int		maxlen,
-    long	wait_time)	    // milliseconds
+    పూర్ణాంకం		maxlen,
+    దీర్ఘ	wait_సమయం)	    // milliseconds
 {
-    int		len = 0;	    // init for GCC
-    int		retesc = FALSE;	    // return ESC with gotint
-    int		script_char;
-    int		tb_change_cnt = typebuf.tb_change_cnt;
+    పూర్ణాంకం		len = 0;	    // init for GCC
+    పూర్ణాంకం		retesc = FALSE;	    // return ESC with gotint
+    పూర్ణాంకం		script_char;
+    పూర్ణాంకం		tb_change_cnt = typebuf.tb_change_cnt;
 
-    if (wait_time == -1L || wait_time > 100L)  // flush output before waiting
+    ఒకవేళ (wait_సమయం == -1L || wait_సమయం > 100L)  // flush output before waiting
     {
 	cursor_on();
-	out_flush_cursor(FALSE, FALSE);
-#if defined(FEAT_GUI) && defined(FEAT_MOUSESHAPE)
-	if (gui.in_use && postponed_mouseshape)
+	బహిర్గతం_flush_cursor(FALSE, FALSE);
+#ఒకవేళ defined(FEAT_GUI) && defined(FEAT_MOUSESHAPE)
+	ఒకవేళ (gui.లోపల_use && postponed_mouseshape)
 	    update_mouseshape(-1);
-#endif
+#అయితే_ముగింపు
     }
 
     /*
@@ -4068,10 +4068,10 @@ inchar(
      * recursive loop may result (write error in swapfile, hit-return, timeout
      * on char wait, flush swapfile, write error....).
      */
-    if (State != MODE_HITRETURN)
+    ఒకవేళ (State != బహుళకం_HITRETURN)
     {
-	did_outofmem_msg = FALSE;   // display out of memory message (again)
-	did_swapwrite_msg = FALSE;  // display swap file write error again
+	did_outofmem_సందేశం = FALSE;   // display out of memory message (again)
+	did_swapwrite_సందేశం = FALSE;  // display swap file write error again
     }
     undo_off = FALSE;		    // restart undo now
 
@@ -4080,17 +4080,17 @@ inchar(
      * If interrupted: Stop reading script files, close them all.
      */
     script_char = -1;
-    while (scriptin[curscript] != NULL && script_char < 0
-#ifdef FEAT_EVAL
+    అయితే (scriptin[curscript] != ఖాళీ && script_char < 0
+#నిర్వచితమైతే FEAT_EVAL
 	    && !ignore_script
-#endif
+#అయితే_ముగింపు
 	    )
     {
-#ifdef MESSAGE_QUEUE
+#నిర్వచితమైతే సందేశం_వరుస
 	parse_queued_messages();
-#endif
+#అయితే_ముగింపు
 
-	if (got_int || (script_char = getc(scriptin[curscript])) < 0)
+	ఒకవేళ (got_int || (script_char = getc(scriptin[curscript])) < 0)
 	{
 	    // Reached EOF.
 	    // Careful: closescript() frees typebuf.tb_buf[] and buf[] may
@@ -4101,19 +4101,19 @@ inchar(
 	     * back to normal mode.
 	     * Otherwise return -1, because typebuf.tb_buf[] has changed.
 	     */
-	    if (got_int)
+	    ఒకవేళ (got_int)
 		retesc = TRUE;
-	    else
-		return -1;
+	    లేకపోతే
+		తిరిగి -1;
 	}
-	else
+	లేకపోతే
 	{
 	    buf[0] = script_char;
 	    len = 1;
 	}
     }
 
-    if (script_char < 0)	// did not get a character from script
+    ఒకవేళ (script_char < 0)	// did not get a character from script
     {
 	/*
 	 * If we got an interrupt, skip all previously typed characters and
@@ -4123,46 +4123,46 @@ inchar(
 	 * Don't use buf[] here, closescript() may have freed typebuf.tb_buf[]
 	 * and buf may be pointing inside typebuf.tb_buf[].
 	 */
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
-#define DUM_LEN (MAXMAPLEN * 3 + 3)
+#నిర్వచించు DUM_LEN (MAXMAPLEN * 3 + 3)
 	    char_u	dum[DUM_LEN + 1];
 
-	    for (;;)
+	    కొరకు (;;)
 	    {
 		len = ui_inchar(dum, DUM_LEN, 0L, 0);
-		if (len == 0 || (len == 1 && dum[0] == Ctrl_C))
-		    break;
+		ఒకవేళ (len == 0 || (len == 1 && dum[0] == Ctrl_C))
+		    ఆపు;
 	    }
-	    return retesc;
+	    తిరిగి retesc;
 	}
 
 	/*
 	 * Always flush the output characters when getting input characters
 	 * from the user and not just peeking.
 	 */
-	if (wait_time == -1L || wait_time > 10L)
-	    out_flush();
+	ఒకవేళ (wait_సమయం == -1L || wait_సమయం > 10L)
+	    బహిర్గతం_flush();
 
 	/*
 	 * Fill up to a third of the buffer, because each character may be
 	 * tripled below.
 	 */
-	len = ui_inchar(buf, maxlen / 3, wait_time, tb_change_cnt);
+	len = ui_inchar(buf, maxlen / 3, wait_సమయం, tb_change_cnt);
     }
 
     // If the typebuf was changed further down, it is like nothing was added by
     // this call.
-    if (typebuf_changed(tb_change_cnt))
-	return 0;
+    ఒకవేళ (typebuf_మారింది(tb_change_cnt))
+	తిరిగి 0;
 
     // Note the change in the typeahead buffer, this matters for when
     // vgetorpeek() is called recursively, e.g. using getchar(1) in a timer
     // function.
-    if (len > 0 && ++typebuf.tb_change_cnt == 0)
+    ఒకవేళ (len > 0 && ++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 
-    return fix_input_buffer(buf, len);
+    తిరిగి fix_ఆదానం_బఫరు(buf, len);
 }
 
 /*
@@ -4170,10 +4170,10 @@ inchar(
  * "buf[]" must have room to triple the number of bytes!
  * Returns the new length.
  */
-    int
-fix_input_buffer(char_u *buf, int len)
+    పూర్ణాంకం
+fix_ఆదానం_బఫరు(char_u *buf, పూర్ణాంకం len)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p = buf;
 
     /*
@@ -4183,12 +4183,12 @@ fix_input_buffer(char_u *buf, int len)
      * Replace K_SPECIAL by K_SPECIAL KS_SPECIAL KE_FILLER
      * Replace       CSI by K_SPECIAL KS_EXTRA   KE_CSI
      */
-    for (i = len; --i >= 0; ++p)
+    కొరకు (i = len; --i >= 0; ++p)
     {
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	// When the GUI is used any character can come after a CSI, don't
 	// escape it.
-	if (gui.in_use && p[0] == CSI && i >= 2)
+	ఒకవేళ (gui.లోపల_use && p[0] == CSI && i >= 2)
 	{
 	    p += 2;
 	    i -= 2;
@@ -4196,164 +4196,164 @@ fix_input_buffer(char_u *buf, int len)
 # ifndef MSWIN
 	// When not on MS-Windows and the GUI is not used CSI needs to be
 	// escaped.
-	else if (!gui.in_use && p[0] == CSI)
+	లేకపోతే ఒకవేళ (!gui.లోపల_use && p[0] == CSI)
 	{
 	    mch_memmove(p + 3, p + 1, (size_t)i);
 	    *p++ = K_SPECIAL;
 	    *p++ = KS_EXTRA;
-	    *p = (int)KE_CSI;
+	    *p = (పూర్ణాంకం)KE_CSI;
 	    len += 2;
 	}
 # endif
-	else
-#endif
-	if (p[0] == NUL || (p[0] == K_SPECIAL
+	లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (p[0] == NUL || (p[0] == K_SPECIAL
 		    // timeout may generate K_CURSORHOLD,
 		    // 'autocompletedelay' timeout K_COMPLETE_DELAY
 		    && (i < 2 || p[1] != KS_EXTRA
-			|| (p[2] != (int)KE_CURSORHOLD
-			    && p[2] != (int)KE_COMPLETE_DELAY))
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+			|| (p[2] != (పూర్ణాంకం)KE_CURSORHOLD
+			    && p[2] != (పూర్ణాంకం)KE_COMPLETE_DELAY))
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 		    // Win32 console passes modifiers
 		    && (
 # ifdef VIMDLL
-			gui.in_use ||
+			gui.లోపల_use ||
 # endif
 			(i < 2 || p[1] != KS_MODIFIER))
-#endif
+#అయితే_ముగింపు
 		    ))
 	{
 	    mch_memmove(p + 3, p + 1, (size_t)i);
-	    p[2] = K_THIRD(p[0]);
-	    p[1] = K_SECOND(p[0]);
+	    p[2] = K_మూడవ(p[0]);
+	    p[1] = K_రెండవ(p[0]);
 	    p[0] = K_SPECIAL;
 	    p += 2;
 	    len += 2;
 	}
     }
     *p = NUL;		// add trailing NUL
-    return len;
+    తిరిగి len;
 }
 
-#if defined(USE_INPUT_BUF)
+#ఒకవేళ defined(USE_ఆదానం_BUF)
 /*
  * Return TRUE when bytes are in the input buffer or in the typeahead buffer.
  * Normally the input buffer would be sufficient, but the server_to_input_buf()
  * or feedkeys() may insert characters in the typeahead buffer while we are
  * waiting for input to arrive.
  */
-    int
-input_available(void)
+    పూర్ణాంకం
+ఆదానం_అందుబాటు(శూన్య)
 {
-    return (!vim_is_input_buf_empty()
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    తిరిగి (!vim_is_ఆదానం_buf_ఖాళీలు()
+# ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	    || typebuf_was_filled
 # endif
 	    );
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Function passed to do_cmdline() to get the command after a <Cmd> key from
  * typeahead.
  */
-    static char_u *
+    స్థిర char_u *
 getcmdkeycmd(
-	int		promptc UNUSED,
-	void		*cookie UNUSED,
-	int		indent UNUSED,
-	getline_opt_T	do_concat UNUSED)
+	పూర్ణాంకం		promptc వాడని,
+	శూన్య		*cookie వాడని,
+	పూర్ణాంకం		indent వాడని,
+	getline_opt_T	do_concat వాడని)
 {
-    garray_T	line_ga;
-    int		c1 = -1;
-    int		c2;
-    int		cmod = 0;
-    int		aborted = FALSE;
+    garray_T	పంక్తి_ga;
+    పూర్ణాంకం		c1 = -1;
+    పూర్ణాంకం		c2;
+    పూర్ణాంకం		cmod = 0;
+    పూర్ణాంకం		aborted = FALSE;
 
-    ga_init2(&line_ga, 1, 32);
+    ga_init2(&పంక్తి_ga, 1, 32);
 
     // no mapping for these characters
     no_mapping++;
 
     got_int = FALSE;
-    while (c1 != NUL && !aborted)
+    అయితే (c1 != NUL && !aborted)
     {
-	if (ga_grow(&line_ga, 32) == FAIL)
+	ఒకవేళ (ga_grow(&పంక్తి_ga, 32) == FAIL)
 	{
 	    aborted = TRUE;
-	    break;
+	    ఆపు;
 	}
 
-	if (vgetorpeek(FALSE) == NUL)
+	ఒకవేళ (vgetorpeek(FALSE) == NUL)
 	{
 	    // incomplete <Cmd> is an error, because there is not much the user
 	    // could do in this state.
-	    emsg(_(e_cmd_mapping_must_end_with_cr));
+	    emsg(_(e_cmd_mapping_must_చివర_with_cr));
 	    aborted = TRUE;
-	    break;
+	    ఆపు;
 	}
 
 	// Get one character at a time.
 	c1 = vgetorpeek(TRUE);
 
 	// Get two extra bytes for special keys
-	if (c1 == K_SPECIAL)
+	ఒకవేళ (c1 == K_SPECIAL)
 	{
 	    c1 = vgetorpeek(TRUE);
 	    c2 = vgetorpeek(TRUE);
-	    if (c1 == KS_MODIFIER)
+	    ఒకవేళ (c1 == KS_MODIFIER)
 	    {
 		cmod = c2;
-		continue;
+		కొనసాగు;
 	    }
-	    c1 = TO_SPECIAL(c1, c2);
+	    c1 = గమ్యం_SPECIAL(c1, c2);
 
 	    // K_ESC is used to avoid ambiguity with the single Esc character
 	    // that might be the start of an escape sequence.  Convert it back
 	    // to a single Esc here.
-	    if (c1 == K_ESC)
+	    ఒకవేళ (c1 == K_ESC)
 		c1 = ESC;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	    // Translate K_CSI to CSI.  The special key is only used to
 	    // avoid it being recognized as the start of a special key.
-	    if (c1 == K_CSI)
+	    ఒకవేళ (c1 == K_CSI)
 		c1 = CSI;
-#endif
+#అయితే_ముగింపు
 	}
 
-	if (got_int)
+	ఒకవేళ (got_int)
 	    aborted = TRUE;
-	else if (c1 == '\r' || c1 == '\n')
+	లేకపోతే ఒకవేళ (c1 == '\r' || c1 == '\n')
 	    c1 = NUL;  // end the line
-	else if (c1 == ESC)
+	లేకపోతే ఒకవేళ (c1 == ESC)
 	    aborted = TRUE;
-	else if (c1 == K_COMMAND || c1 == K_SCRIPT_COMMAND)
+	లేకపోతే ఒకవేళ (c1 == K_COMMAND || c1 == K_SCRIPT_COMMAND)
 	{
 	    // give a nicer error message for this special case
-	    emsg(_(e_cmd_mapping_must_end_with_cr_before_second_cmd));
+	    emsg(_(e_cmd_mapping_must_చివర_with_cr_before_రెండవ_cmd));
 	    aborted = TRUE;
 	}
-	else if (c1 == K_SNR)
+	లేకపోతే ఒకవేళ (c1 == K_SNR)
 	{
-	    GA_CONCAT_LITERAL(&line_ga, "<SNR>");
+	    GA_CONCAT_LITERAL(&పంక్తి_ga, "<SNR>");
 	}
-	else
+	లేకపోతే
 	{
-	    if (cmod != 0)
+	    ఒకవేళ (cmod != 0)
 	    {
-		ga_append(&line_ga, K_SPECIAL);
-		ga_append(&line_ga, KS_MODIFIER);
-		ga_append(&line_ga, cmod);
+		ga_append(&పంక్తి_ga, K_SPECIAL);
+		ga_append(&పంక్తి_ga, KS_MODIFIER);
+		ga_append(&పంక్తి_ga, cmod);
 	    }
-	    if (IS_SPECIAL(c1))
+	    ఒకవేళ (IS_SPECIAL(c1))
 	    {
-		ga_append(&line_ga, K_SPECIAL);
-		ga_append(&line_ga, K_SECOND(c1));
-		ga_append(&line_ga, K_THIRD(c1));
+		ga_append(&పంక్తి_ga, K_SPECIAL);
+		ga_append(&పంక్తి_ga, K_రెండవ(c1));
+		ga_append(&పంక్తి_ga, K_మూడవ(c1));
 	    }
-	    else
-		ga_append(&line_ga, c1);
+	    లేకపోతే
+		ga_append(&పంక్తి_ga, c1);
 	}
 
 	cmod = 0;
@@ -4361,33 +4361,33 @@ getcmdkeycmd(
 
     no_mapping--;
 
-    if (aborted)
-	ga_clear(&line_ga);
+    ఒకవేళ (aborted)
+	ga_clear(&పంక్తి_ga);
 
-    return (char_u *)line_ga.ga_data;
+    తిరిగి (char_u *)పంక్తి_ga.ga_దత్తాంశం;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * If there was a mapping we get its SID.  Otherwise, use "last_used_sid", it
  * is set when redo'ing.
  * Put this SID in the redo buffer, so that "." will use the same script
  * context.
  */
-    void
-may_add_last_used_map_to_redobuff(void)
+    శూన్య
+may_కూడు_చివరి_వాడిన_map_గమ్యం_redobuff(శూన్య)
 {
     char_u  buf[3 + 20];
-    int	    buflen;
-    int	    sid = -1;
+    పూర్ణాంకం	    buflen;
+    పూర్ణాంకం	    sid = -1;
 
-    if (last_used_map != NULL)
-	sid = last_used_map->m_script_ctx.sc_sid;
-    if (sid < 0)
-	sid = last_used_sid;
+    ఒకవేళ (చివరి_వాడిన_map != ఖాళీ)
+	sid = చివరి_వాడిన_map->m_script_ctx.sc_sid;
+    ఒకవేళ (sid < 0)
+	sid = చివరి_వాడిన_sid;
 
-    if (sid < 0)
-	return;
+    ఒకవేళ (sid < 0)
+	తిరిగి;
 
     // <K_SID>{nr};
     buf[0] = K_SPECIAL;
@@ -4395,51 +4395,51 @@ may_add_last_used_map_to_redobuff(void)
     buf[2] = KE_SID;
     buflen = 3;
 
-    buflen += vim_snprintf((char *)buf + 3, 20, "%d;", sid);
-    add_buff(&redobuff, buf, (long)buflen);
+    buflen += vim_snprintf((అక్షరం *)buf + 3, 20, "%d;", sid);
+    కూడు_buff(&redobuff, buf, (దీర్ఘ)buflen);
 }
-#endif
+#అయితే_ముగింపు
 
-    int
-do_cmdkey_command(int key UNUSED, int flags)
+    పూర్ణాంకం
+do_cmdkey_command(పూర్ణాంకం కీలకం వాడని, పూర్ణాంకం flags)
 {
-    int	    res;
-#ifdef FEAT_EVAL
+    పూర్ణాంకం	    res;
+#నిర్వచితమైతే FEAT_EVAL
     sctx_T  save_current_sctx = {-1, 0, 0, 0};
 
-    if (key == K_SCRIPT_COMMAND
-		  && (last_used_map != NULL || SCRIPT_ID_VALID(last_used_sid)))
+    ఒకవేళ (కీలకం == K_SCRIPT_COMMAND
+		  && (చివరి_వాడిన_map != ఖాళీ || SCRIPT_ID_VALID(చివరి_వాడిన_sid)))
     {
 	save_current_sctx = current_sctx;
-	if (last_used_map != NULL)
-	    current_sctx = last_used_map->m_script_ctx;
-	else
+	ఒకవేళ (చివరి_వాడిన_map != ఖాళీ)
+	    current_sctx = చివరి_వాడిన_map->m_script_ctx;
+	లేకపోతే
 	{
-	    current_sctx.sc_sid = last_used_sid;
+	    current_sctx.sc_sid = చివరి_వాడిన_sid;
 	    current_sctx.sc_lnum = 0;
-	    current_sctx.sc_version = SCRIPT_ITEM(last_used_sid)->sn_version;
+	    current_sctx.sc_సంస్కరణ = SCRIPT_అంశం(చివరి_వాడిన_sid)->sn_సంస్కరణ;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    res = do_cmdline(NULL, getcmdkeycmd, NULL, flags);
+    res = do_cmdline(ఖాళీ, getcmdkeycmd, ఖాళీ, flags);
 
-#ifdef FEAT_EVAL
-    if (save_current_sctx.sc_sid >= 0)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (save_current_sctx.sc_sid >= 0)
 	current_sctx = save_current_sctx;
-#endif
+#అయితే_ముగింపు
 
-    return res;
+    తిరిగి res;
 }
 
-#if defined(FEAT_EVAL)
-    void
-reset_last_used_map(mapblock_T *mp)
+#ఒకవేళ defined(FEAT_EVAL)
+    శూన్య
+reset_చివరి_వాడిన_map(mapblock_T *mp)
 {
-    if (last_used_map != mp)
-	return;
+    ఒకవేళ (చివరి_వాడిన_map != mp)
+	తిరిగి;
 
-    last_used_map = NULL;
-    last_used_sid = -1;
+    చివరి_వాడిన_map = ఖాళీ;
+    చివరి_వాడిన_sid = -1;
 }
-#endif
+#అయితే_ముగింపు

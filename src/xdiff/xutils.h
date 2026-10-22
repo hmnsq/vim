@@ -20,37 +20,37 @@
  *
  */
 
-#if !defined(XUTILS_H)
-#define XUTILS_H
+#ఒకవేళ !defined(XUTILS_H)
+#నిర్వచించు XUTILS_H
 
 
 
-long xdl_bogosqrt(long n);
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+దీర్ఘ xdl_bogosqrt(దీర్ఘ n);
+పూర్ణాంకం xdl_emit_diffrec(అక్షరం స్థిరరాశి *rec, దీర్ఘ కొలత, అక్షరం స్థిరరాశి *pre, దీర్ఘ psize,
 		     xdemitcb_t *ecb);
-int xdl_cha_init(chastore_t *cha, long isize, long icount);
-void xdl_cha_free(chastore_t *cha);
-void *xdl_cha_alloc(chastore_t *cha);
-long xdl_guess_lines(mmfile_t *mf, long sample);
-int xdl_blankline(const char *line, long size, long flags);
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top);
-unsigned long xdl_hash_record_with_whitespace(char const **data, char const *top, long flags);
-static inline unsigned long xdl_hash_record(char const **data, char const *top, long flags)
+పూర్ణాంకం xdl_cha_init(chastore_t *cha, దీర్ఘ isize, దీర్ఘ icount);
+శూన్య xdl_cha_free(chastore_t *cha);
+శూన్య *xdl_cha_alloc(chastore_t *cha);
+దీర్ఘ xdl_guess_పంక్తులు(mmfile_t *mf, దీర్ఘ sample);
+పూర్ణాంకం xdl_blankline(స్థిరరాశి అక్షరం *పంక్తి, దీర్ఘ కొలత, దీర్ఘ flags);
+పూర్ణాంకం xdl_recmatch(స్థిరరాశి అక్షరం *l1, దీర్ఘ s1, స్థిరరాశి అక్షరం *l2, దీర్ఘ s2, దీర్ఘ flags);
+గుర్తులేని దీర్ఘ xdl_hash_రికార్డు_verbatim(అక్షరం స్థిరరాశి **దత్తాంశం, అక్షరం స్థిరరాశి *శిఖరం);
+గుర్తులేని దీర్ఘ xdl_hash_రికార్డు_with_whitespace(అక్షరం స్థిరరాశి **దత్తాంశం, అక్షరం స్థిరరాశి *శిఖరం, దీర్ఘ flags);
+స్థిర అంతఃవరుస గుర్తులేని దీర్ఘ xdl_hash_రికార్డు(అక్షరం స్థిరరాశి **దత్తాంశం, అక్షరం స్థిరరాశి *శిఖరం, దీర్ఘ flags)
 {
-	if (flags & XDF_WHITESPACE_FLAGS)
-		return xdl_hash_record_with_whitespace(data, top, flags);
-	else
-		return xdl_hash_record_verbatim(data, top);
+	ఒకవేళ (flags & XDF_WHITESPACE_FLAGS)
+		తిరిగి xdl_hash_రికార్డు_with_whitespace(దత్తాంశం, శిఖరం, flags);
+	లేకపోతే
+		తిరిగి xdl_hash_రికార్డు_verbatim(దత్తాంశం, శిఖరం);
 }
-unsigned int xdl_hashbits(unsigned int size);
-int xdl_num_out(char *out, long val);
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen, xdemitcb_t *ecb);
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		       int line1, int count1, int line2, int count2);
+గుర్తులేని పూర్ణాంకం xdl_hashbits(గుర్తులేని పూర్ణాంకం కొలత);
+పూర్ణాంకం xdl_అంకె_బహిర్గతం(అక్షరం *బహిర్గతం, దీర్ఘ val);
+పూర్ణాంకం xdl_emit_hunk_hdr(దీర్ఘ s1, దీర్ఘ c1, దీర్ఘ s2, దీర్ఘ c2,
+		      స్థిరరాశి అక్షరం *func, దీర్ఘ funclen, xdemitcb_t *ecb);
+పూర్ణాంకం xdl_fall_వెనుక_diff(xdfenv_t *diff_env, xpparam_t స్థిరరాశి *xpp,
+		       పూర్ణాంకం line1, పూర్ణాంకం count1, పూర్ణాంకం line2, పూర్ణాంకం count2);
 
 /* Do not call this function, use XDL_ALLOC_GROW instead */
-void* xdl_alloc_grow_helper(void* p, long nr, long* alloc, size_t size);
+శూన్య* xdl_alloc_grow_helper(శూన్య* p, దీర్ఘ nr, దీర్ఘ* alloc, size_t కొలత);
 
-#endif /* #if !defined(XUTILS_H) */
+#అయితే_ముగింపు /* #if !defined(XUTILS_H) */

@@ -87,53 +87,53 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#ఒకవేళ _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
-#endif
+#అయితే_ముగింపు
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
-# define _XOPEN_SOURCE 700   /* for fdopen() */
-#endif
+#ఒకవేళ (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+# define XOPEN_ఆధారం 700   /* for fdopen() */
+#అయితే_ముగింపు
 
-#include <stdio.h>
-#ifdef VAXC
+#అన్తర్భావ <stdio.h>
+#నిర్వచితమైతే VAXC
 # include <file.h>
-#else
+#లేకపోతే
 # include <fcntl.h>
-#endif
-#if defined(WIN32) || defined(CYGWIN)
+#అయితే_ముగింపు
+#ఒకవేళ defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
-#endif
-#ifdef WIN32
+#అయితే_ముగింపు
+#నిర్వచితమైతే WIN32
 # include <windows.h>
-#endif
-#ifdef UNIX
+#అయితే_ముగింపు
+#నిర్వచితమైతే UNIX
 # include <unistd.h>
-#endif
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#అయితే_ముగింపు
+#అన్తర్భావ <stdlib.h>
+#అన్తర్భావ <string.h>
+#అన్తర్భావ <ctype.h>
+#అన్తర్భావ <limits.h>
+#ఒకవేళ __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
-#endif
+#అయితే_ముగింపు
 
 
 /*  This corrects the problem of missing prototypes for certain functions
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#ఒకవేళ defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifndef __USE_FIXED_PROTOTYPES__
+#నిర్వచితం_కాకపోతే __USE_FIXED_PROTOTYPES__
 /*
  * This is historic and works only if the compiler really has no prototypes:
  *
@@ -141,119 +141,119 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# ఒకవేళ defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+బాహ్య పూర్ణాంకం fprintf __P((FILE *, అక్షరం *, ...));
+బాహ్య పూర్ణాంకం fputs   __P((అక్షరం *, FILE *));
+బాహ్య పూర్ణాంకం _flsbuf __P((గుర్తులేని అక్షరం, FILE *));
+బాహ్య పూర్ణాంకం _filbuf __P((FILE *));
+బాహ్య పూర్ణాంకం fflush  __P((FILE *));
+బాహ్య పూర్ణాంకం fclose  __P((FILE *));
+బాహ్య పూర్ణాంకం fseek   __P((FILE *, దీర్ఘ, పూర్ణాంకం));
+బాహ్య పూర్ణాంకం rewind  __P((FILE *));
 
-extern void perror __P((char *));
+బాహ్య శూన్య perror __P((అక్షరం *));
 # endif
-#endif
+#అయితే_ముగింపు
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
-#ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
-#endif
+అక్షరం సంస్కరణ_2[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+#నిర్వచితమైతే WIN32
+అక్షరం osver[] = " (Win32)";
+#లేకపోతే
+అక్షరం osver[] = "";
+#అయితే_ముగింపు
 
-#if defined(WIN32)
+#ఒకవేళ defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
-# define PATH_SEP '\\'
-#elif defined(CYGWIN)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ద్విమాన) : O_CREAT)
+# define BIN_కేటాయించు(fp, yes) setmode(fileno(fp), (yes) ? O_ద్విమాన : O_పాఠ్యం_2)
+# define మార్గం_SEP '\\'
+#లేదావేళ defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
-# define PATH_SEP '/'
-#else
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ద్విమాన) : O_CREAT)
+# define BIN_కేటాయించు(fp, yes) ((yes) ? (శూన్య) setmode(fileno(fp), O_ద్విమాన) : (శూన్య) (fp))
+# define మార్గం_SEP '/'
+#లేకపోతే
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
-#  define BIN_ASSIGN(fp, dummy) fp
-#  define PATH_SEP ']'
+#  define BIN_కేటాయించు(fp, dummy) fp
+#  define మార్గం_SEP ']'
 #  define FILE_SEP '.'
-# else
+# లేకపోతే
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
-#  define BIN_ASSIGN(fp, dummy) fp
-#  define PATH_SEP '/'
+#  define BIN_కేటాయించు(fp, dummy) fp
+#  define మార్గం_SEP '/'
 # endif
-#endif
+#అయితే_ముగింపు
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
-# define OPEN(name, mode, umask) open(name, mode)
-#else
-# define OPEN(name, mode, umask) open(name, mode, umask)
-#endif
+#ఒకవేళ __MWERKS__
+# define OPEN(name, బహుళకం, umask) open(name, బహుళకం)
+#లేకపోతే
+# define OPEN(name, బహుళకం, umask) open(name, బహుళకం, umask)
+#అయితే_ముగింపు
 
-#ifdef AMIGA
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
-#endif
+#నిర్వచితమైతే AMIGA
+# define STRNCMP(s1, s2, l) అక్షరశ్రేణి_పోలిక(s1, s2, (size_t)l)
+#లేకపోతే
+# define STRNCMP(s1, s2, l) అక్షరశ్రేణి_పోలిక(s1, s2, l)
+#అయితే_ముగింపు
 
-#ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+#నిర్వచితం_కాకపోతే __P
+# ఒకవేళ defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# లేకపోతే
 #  define __P(a) ()
 # endif
-#endif
+#అయితే_ముగింపు
 
-#define TRY_SEEK	/* attempt to use lseek, or skip forward by reading */
-#define COLS 256	/* change here, if you ever need more columns */
+#నిర్వచించు TRY_SEEK	/* attempt to use lseek, or skip forward by reading */
+#నిర్వచించు నిలువుల_సంఖ్య_2 256	/* change here, if you ever need more columns */
 
 /*
  * LLEN is the maximum length of a line; other than the visible characters
  * we need to consider also the escape color sequence prologue/epilogue ,
  * (11 bytes for each character).
  */
-#define LLEN \
+#నిర్వచించు LLEN \
     (39            /* addr: ⌈log10(ULONG_MAX)⌉ if "-d" flag given. We assume ULONG_MAX = 2**128 */ \
     + 2            /* ": " */ \
-    + 13 * COLS    /* hex dump with colors */ \
-    + (COLS - 1)   /* whitespace between groups if "-g1" option given and "-c" maxed out */ \
+    + 13 * నిలువుల_సంఖ్య_2    /* hex dump with colors */ \
+    + (నిలువుల_సంఖ్య_2 - 1)   /* whitespace between groups if "-g1" option given and "-c" maxed out */ \
     + 2            /* whitespace */ \
-    + 12 * COLS    /* ASCII dump with colors */ \
+    + 12 * నిలువుల_సంఖ్య_2    /* ASCII dump with colors */ \
     + 2)           /* "\n\0" */
 
 /*
  * LLEN_NO_COLOR is the maximum length of a line excluding the colors.
  */
-#define LLEN_NO_COLOR \
+#నిర్వచించు LLEN_NO_COLOR \
     (39            /* addr: ⌈log10(ULONG_MAX)⌉ if "-d" flag given. We assume ULONG_MAX = 2**128 */ \
     + 2            /* ": " */ \
-    + 9 * COLS     /* hex dump, worst case: bitwise output using -b */ \
+    + 9 * నిలువుల_సంఖ్య_2     /* hex dump, worst case: bitwise output using -b */ \
     + 2            /* whitespace */ \
-    + COLS         /* ASCII dump */ \
+    + నిలువుల_సంఖ్య_2         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+అక్షరం hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
-#define HEX_NORMAL         0x00 /* no flags set */
-#define HEX_POSTSCRIPT     0x01
-#define HEX_CINCLUDE       0x02
-#define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
-#define HEX_LITTLEENDIAN   0x08
+#నిర్వచించు HEX_సాధారణ         0x00 /* no flags set */
+#నిర్వచించు HEX_POSTSCRIPT     0x01
+#నిర్వచించు HEX_CINCLUDE       0x02
+#నిర్వచించు HEX_బిట్లు           0x04 /* not hex a dump, but bits: 01111001 */
+#నిర్వచించు HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#నిర్వచించు CONDITIONAL_CAPITALIZE(c) (capitalize ? పెద్ద_అక్షరం((గుర్తులేని అక్షరం)(c)) : (c))
 
-#define COLOR_PROLOGUE(color) \
+#నిర్వచించు COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
 l_colored[c++] = '['; \
 l_colored[c++] = '1'; \
@@ -262,21 +262,21 @@ l_colored[c++] = '3'; \
 l_colored[c++] = (color); \
 l_colored[c++] = 'm';
 
-#define COLOR_EPILOGUE \
+#నిర్వచించు COLOR_EPILOGUE \
 l_colored[c++] = '\033'; \
 l_colored[c++] = '['; \
 l_colored[c++] = '0'; \
 l_colored[c++] = 'm';
-#define COLOR_RED '1'
-#define COLOR_GREEN '2'
-#define COLOR_YELLOW '3'
-#define COLOR_BLUE '4'
-#define COLOR_WHITE '7'
+#నిర్వచించు COLOR_RED '1'
+#నిర్వచించు COLOR_GREEN '2'
+#నిర్వచించు COLOR_YELLOW '3'
+#నిర్వచించు COLOR_BLUE '4'
+#నిర్వచించు COLOR_WHITE '7'
 
-static char *pname;
+స్థిర అక్షరం *pname;
 
-  static void
-exit_with_usage(void)
+  స్థిర శూన్య
+exit_with_usage(శూన్య)
 {
   fprintf(stderr, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
   fprintf(stderr, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
@@ -299,64 +299,64 @@ exit_with_usage(void)
 		  "    -r -s off   revert with <off> added to file positions found in hexdump.\n"
 		  "    -d          show offset in decimal instead of hex.\n");
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
-#ifdef TRY_SEEK
+#నిర్వచితమైతే TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#లేకపోతే
 	  "", "");
-#endif
+#అయితే_ముగింపు
   fprintf(stderr, "    -u          use upper case hex letters.\n"
 		  "    -R when     colorize the output; <when> can be 'always', 'auto' or 'never'. Default: 'auto'.\n"
-		  "    -v          show version: \"%s%s\".\n", version, osver);
-  exit(1);
+		  "    -v          show version: \"%s%s\".\n", సంస్కరణ_2, osver);
+  నిష్క్రమించు(1);
 }
 
-  static void
-perror_exit(int ret)
+  స్థిర శూన్య
+perror_exit(పూర్ణాంకం ret)
 {
   fprintf(stderr, "%s: ", pname);
-  perror(NULL);
-  exit(ret);
+  perror(ఖాళీ);
+  నిష్క్రమించు(ret);
 }
 
-  static void
-error_exit(int ret, char *msg)
+  స్థిర శూన్య
+error_exit(పూర్ణాంకం ret, అక్షరం *సందేశం)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
-  exit(ret);
+  fprintf(stderr, "%s: %s\n", pname, సందేశం);
+  నిష్క్రమించు(ret);
 }
 
-  static int
+  స్థిర పూర్ణాంకం
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  పూర్ణాంకం c = getc(fpi);
+  ఒకవేళ (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  తిరిగి c;
 }
 
-  static void
-putc_or_die(int c, FILE *fpo)
+  స్థిర శూన్య
+putc_or_die(పూర్ణాంకం c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  ఒకవేళ (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
-  static void
-fputs_or_die(char *s, FILE *fpo)
+  స్థిర శూన్య
+fputs_or_die(అక్షరం *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  ఒకవేళ (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#నిర్వచించు FPRINTF_OR_DIE(వాదనలు) ఒకవేళ (fprintf వాదనలు < 0) perror_exit(3)
 
-  static void
+  స్థిర శూన్య
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  ఒకవేళ (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  ఒకవేళ (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  స్థిర పూర్ణాంకం
+parse_hex_digit(పూర్ణాంకం c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  తిరిగి (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  స్థిర పూర్ణాంకం
+parse_bin_digit(పూర్ణాంకం c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  తిరిగి (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  స్థిర పూర్ణాంకం
+skip_గమ్యం_eol(FILE *fpi, పూర్ణాంకం c)
 {
-  while (c != '\n' && c != EOF)
+  అయితే (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  తిరిగి c;
 }
 
 /*
@@ -404,169 +404,169 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  స్థిర పూర్ణాంకం
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
-  long base_off)
+  పూర్ణాంకం నిలువుల_సంఖ్య,
+  పూర్ణాంకం hextype,
+  దీర్ఘ పునాది_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
-  long have_off = 0, want_off = 0;
+  పూర్ణాంకం c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = నిలువుల_సంఖ్య, bt = 0, b = 0, bcnt = 0;
+  దీర్ఘ have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  అయితే ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
-	continue;
+      ఒకవేళ (c == '\r')	/* Doze style input file? */
+	కొనసాగు;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
-	continue;
+      ఒకవేళ (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+	కొనసాగు;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ఒకవేళ (hextype == HEX_సాధారణ || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  ఒకవేళ (n1 == -1 && ign_garb)
+	    కొనసాగు;
 	}
-      else /* HEX_BITS */
+      లేకపోతే /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  ఒకవేళ (n1 == -1 && ign_garb)
+	    కొనసాగు;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  ఒకవేళ (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (పూర్ణాంకం)(((గుర్తులేని)b << 1) | (గుర్తులేని)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      ఒకవేళ ((hextype != HEX_POSTSCRIPT) && (p >= నిలువుల_సంఖ్య))
 	{
-	  if (hextype == HEX_NORMAL)
+	  ఒకవేళ (hextype == HEX_సాధారణ)
 	    {
-	      if (n1 < 0)
+	      ఒకవేళ (n1 < 0)
 		{
 		  p = 0;
-		  continue;
+		  కొనసాగు;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (దీర్ఘ)(((గుర్తులేని దీర్ఘ)want_off << 4) | (గుర్తులేని)n1);
 	    }
-	  else /* HEX_BITS */
+	  లేకపోతే /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      ఒకవేళ (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
-		  continue;
+		  కొనసాగు;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (దీర్ఘ)(((గుర్తులేని దీర్ఘ)want_off << 4) | (గుర్తులేని)n1);
 	    }
-	  continue;
+	  కొనసాగు;
 	}
 
-      if (base_off + want_off != have_off)
+      ఒకవేళ (పునాది_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  ఒకవేళ (fflush(fpo) != 0)
 	    perror_exit(3);
-#ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
-	    have_off = base_off + want_off;
-#endif
-	  if (base_off + want_off < have_off)
+#నిర్వచితమైతే TRY_SEEK
+	  ఒకవేళ (fseek(fpo, పునాది_off + want_off - have_off, SEEK_CUR) >= 0)
+	    have_off = పునాది_off + want_off;
+#అయితే_ముగింపు
+	  ఒకవేళ (పునాది_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  కొరకు (; have_off < పునాది_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ఒకవేళ (hextype == HEX_సాధారణ || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  ఒకవేళ (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      ఒకవేళ (!hextype && (++p >= నిలువుల_సంఖ్య))
 	      /* skip the rest of the line as garbage */
-	      c = skip_to_eol(fpi, c);
+	      c = skip_గమ్యం_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  లేకపోతే ఒకవేళ (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
-	    c = skip_to_eol(fpi, c);
+	    c = skip_గమ్యం_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      లేకపోతే /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  ఒకవేళ (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      ఒకవేళ (++p >= నిలువుల_సంఖ్య)
 		/* skip the rest of the line as garbage */
-		 c = skip_to_eol(fpi, c);
+		 c = skip_గమ్యం_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      ఒకవేళ (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  ఒకవేళ (hextype == HEX_సాధారణ || hextype == HEX_బిట్లు)
 	    want_off = 0;
-	  p = cols;
+	  p = నిలువుల_సంఖ్య;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  ఒకవేళ (fflush(fpo) != 0)
     perror_exit(3);
-#ifdef TRY_SEEK
+#నిర్వచితమైతే TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
-#endif
+#అయితే_ముగింపు
   fclose_or_die(fpi, fpo);
-  return 0;
+  తిరిగి 0;
 }
 
 
 /*
  * Print line l with given colors.
  */
-  static void
-print_colored_line(FILE *fp, char *l, char *colors)
+  స్థిర శూన్య
+print_colored_పంక్తి(FILE *fp, అక్షరం *l, అక్షరం *colors)
 {
-  static char l_colored[LLEN+1];
+  స్థిర అక్షరం l_colored[LLEN+1];
 
-  if (colors)
+  ఒకవేళ (colors)
     {
-      int c = 0;
-      if (colors[0])
+      పూర్ణాంకం c = 0;
+      ఒకవేళ (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      పూర్ణాంకం i;
+      కొరకు (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  ఒకవేళ (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      ఒకవేళ (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      ఒకవేళ (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      ఒకవేళ (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  లేకపోతే
     fputs_or_die(l, fp);
 }
 
@@ -598,47 +598,47 @@ print_colored_line(FILE *fp, char *l, char *colors)
  *
  * If nz is always positive, lines are never suppressed.
  */
-  static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+  స్థిర శూన్య
+xxdline(FILE *fp, అక్షరం *l, అక్షరం *colors, పూర్ణాంకం nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  స్థిర అక్షరం z[LLEN_NO_COLOR+1];
+  స్థిర అక్షరం z_colors[LLEN_NO_COLOR+1];
+  స్థిర గుర్తుగల అక్షరం zero_చూసిన = 0;
 
-  if (!nz && zero_seen == 1)
+  ఒకవేళ (!nz && zero_చూసిన == 1)
     {
       strcpy(z, l);
-      if (colors)
-	  memcpy(z_colors, colors, strlen(z));
+      ఒకవేళ (colors)
+	  జ్ఞాపకం_నకలు(z_colors, colors, అక్షరశ్రేణి_పొడవు(z));
     }
 
-  if (nz || !zero_seen++)
+  ఒకవేళ (nz || !zero_చూసిన++)
     {
-      if (nz)
+      ఒకవేళ (nz)
 	{
-	  if (nz < 0)
-	    zero_seen--;
-	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  ఒకవేళ (nz < 0)
+	    zero_చూసిన--;
+	  ఒకవేళ (zero_చూసిన == 2)
+	    print_colored_పంక్తి(fp, z, z_colors);
+	  ఒకవేళ (zero_చూసిన > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+      ఒకవేళ (nz >= 0 || zero_చూసిన > 0)
+	print_colored_పంక్తి(fp, l, colors);
 
-      if (nz)
-	zero_seen = 0;
+      ఒకవేళ (nz)
+	zero_చూసిన = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
-    zero_seen = 4;
+  ఒకవేళ (zero_చూసిన >= 0x7F)
+    zero_చూసిన = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+స్థిర గుర్తులేని అక్షరం etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,524 +666,524 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  స్థిర అక్షరం
+get_color_char (పూర్ణాంకం e, పూర్ణాంకం ebcdic)
 {
-  if (ebcdic)
+  ఒకవేళ (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      ఒకవేళ ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	తిరిగి COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      లేకపోతే ఒకవేళ (e == 37 || e == 13 || e == 5)
+	తిరిగి COLOR_YELLOW;
+      లేకపోతే ఒకవేళ (e == 0)
+	తిరిగి COLOR_WHITE;
+      లేకపోతే ఒకవేళ (e == 255)
+	తిరిగి COLOR_BLUE;
+      లేకపోతే
+	తిరిగి COLOR_RED;
     }
-  else  /* ASCII */
+  లేకపోతే  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
-#endif
+#ఒకవేళ defined(__MVS__) && __CHARSET_LIB == 0
+      ఒకవేళ (e >= 64)
+	తిరిగి COLOR_GREEN;
+#లేకపోతే
+      ఒకవేళ (e > 31 && e < 127)
+	తిరిగి COLOR_GREEN;
+#అయితే_ముగింపు
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      లేకపోతే ఒకవేళ (e == 9 || e == 10 || e == 13)
+	తిరిగి COLOR_YELLOW;
+      లేకపోతే ఒకవేళ (e == 0)
+	తిరిగి COLOR_WHITE;
+      లేకపోతే ఒకవేళ (e == 255)
+	తిరిగి COLOR_BLUE;
+      లేకపోతే
+	తిరిగి COLOR_RED;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-  static int
-enable_color(void)
+  స్థిర పూర్ణాంకం
+enable_color(శూన్య)
 {
-#ifdef WIN32
-  DWORD   mode;
-  HANDLE  out;
+#నిర్వచితమైతే WIN32
+  DWORD   బహుళకం;
+  HANDLE  బహిర్గతం;
 
-  if (!isatty(1))
-    return 0;
+  ఒకవేళ (!isatty(1))
+    తిరిగి 0;
 
-  out = GetStdHandle(STD_OUTPUT_HANDLE);
-  GetConsoleMode(out, &mode);
-  mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
-#elif defined(UNIX)
-  char *term;
+  బహిర్గతం = GetStdHandle(STD_OUTPUT_HANDLE);
+  Get_Console_బహుళకం(బహిర్గతం, &బహుళకం);
+  బహుళకం |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  తిరిగి (పూర్ణాంకం)సమితి_Console_బహుళకం(బహిర్గతం, బహుళకం);
+#లేదావేళ defined(UNIX)
+  అక్షరం *పదం;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  ఒకవేళ (!isatty(STDOUT_FILENO))
+    తిరిగి 0;
 
-  term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  పదం = getenv("TERM");
+  ఒకవేళ (పదం == ఖాళీ || *పదం == '\0' || !strcmp(పదం, "dumb"))
+    తిరిగి 0;
 
-  return 1;
-#else
-  return 0;
-#endif
+  తిరిగి 1;
+#లేకపోతే
+  తిరిగి 0;
+#అయితే_ముగింపు
 }
 
-  int
-main(int argc, char *argv[])
+  పూర్ణాంకం
+ప్రధాన(పూర్ణాంకం argc, అక్షరం *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
-  long length = -1, n = 0, seekoff = 0;
-  unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  పూర్ణాంకం c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  పూర్ణాంకం నిలువుల_సంఖ్య = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_సాధారణ;
+  పూర్ణాంకం capitalize = 0, decimal_స్థానభ్రంశం = 0;
+  పూర్ణాంకం ebcdic = 0;
+  పూర్ణాంకం termination = 0;
+  పూర్ణాంకం octspergrp = -1;	/* number of octets grouped in output */
+  పూర్ణాంకం grplen;		/* total chars per octet group excluding colors */
+  దీర్ఘ నిడివి = -1, n = 0, seekoff = 0;
+  గుర్తులేని దీర్ఘ displayoff = 0;
+  స్థిర అక్షరం l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  స్థిర అక్షరం colors[LLEN_NO_COLOR+1]; /* color array */
+  అక్షరం *pp;
+  అక్షరం *varname = ఖాళీ;
+  పూర్ణాంకం addrlen = 9;
+  పూర్ణాంకం color = 0;
+  పూర్ణాంకం color_forced = 0;	/* set when -R always is used */
+  అక్షరం *no_color;
+  అక్షరం cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  ఒకవేళ (no_color == ఖాళీ || no_color[0] == '\0')
     color = enable_color();
 
-#ifdef AMIGA
+#నిర్వచితమైతే AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
-    exit(1);
-#endif
+  ఒకవేళ (argc == 0)
+    నిష్క్రమించు(1);
+#అయితే_ముగింపు
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  కొరకు (pp = pname; *pp; )
+    ఒకవేళ (*pp++ == మార్గం_SEP)
       pname = pp;
-#ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+#నిర్వచితమైతే FILE_SEP
+  కొరకు (pp = pname; *pp; pp++)
+    ఒకవేళ (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	ఆపు;
       }
-#endif
+#అయితే_ముగింపు
 
-  while (argc >= 2)
+  అయితే (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   ఒకవేళ (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-b", 2)) hextype |= HEX_బిట్లు;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-d", 2)) decimal_స్థానభ్రంశం = 1;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-r", 2)) revert++;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-t", 2)) termination++;
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-v", 2))
 	{
-	  fprintf(stderr, "%s%s\n", version, osver);
-	  exit(0);
+	  fprintf(stderr, "%s%s\n", సంస్కరణ_2, osver);
+	  నిష్క్రమించు(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  ఒకవేళ (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  లేకపోతే ఒకవేళ (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      నిలువుల_సంఖ్య = (పూర్ణాంకం)strtol(pp + 2, ఖాళీ, 0);
 	    }
-	  else
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      నిలువుల_సంఖ్య = (పూర్ణాంకం)strtol(argv[2], ఖాళీ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  ఒకవేళ (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (పూర్ణాంకం)strtol(pp + 2, ఖాళీ, 0);
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (పూర్ణాంకం)strtol(argv[2], ఖాళీ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
-	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  పూర్ణాంకం reloffset = 0;
+	  పూర్ణాంకం negoffset = 0;
+	  ఒకవేళ (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	    displayoff = strtoul(pp + 2, ఖాళీ, 0);
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      ఒకవేళ (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     ఒకవేళ (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
-	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
-	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
+	     ఒకవేళ (negoffset)
+	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, ఖాళీ, 0) + 1;
+	     లేకపోతే
+	       displayoff = strtoul(argv[2] + reloffset+negoffset, ఖాళీ, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  ఒకవేళ (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
-#ifdef TRY_SEEK
-	      if (pp[2] == '+')
+#నిర్వచితమైతే TRY_SEEK
+	      ఒకవేళ (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      ఒకవేళ (pp[2+relseek] == '-')
 		negseek++;
-#endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+#అయితే_ముగింపు
+	      seekoff = strtol(pp + 2+relseek+negseek, (అక్షరం **)ఖాళీ, 0);
 	    }
-	  else
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
-#ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+#నిర్వచితమైతే TRY_SEEK
+	      ఒకవేళ (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      ఒకవేళ (argv[2][relseek] == '-')
 		negseek++;
-#endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+#అయితే_ముగింపు
+	      seekoff = strtol(argv[2] + relseek+negseek, (అక్షరం **)ఖాళీ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  ఒకవేళ (pp[2] && STRNCMP("en", pp + 2, 2))
+	    నిడివి = strtol(pp + 2, (అక్షరం **)ఖాళీ, 0);
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      నిడివి = strtol(argv[2], (అక్షరం **)ఖాళీ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  ఒకవేళ (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  లేకపోతే
 	    {
-	      if (!argv[2])
+	      ఒకవేళ (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      లేకపోతే ఒకవేళ (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  అక్షరం *pw = pp + 2;
+	  ఒకవేళ (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  ఒకవేళ (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  ఒకవేళ (!STRNCMP(pw, "always", 6))
 	    {
-	      (void)enable_color();
+	      (శూన్య)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  లేకపోతే ఒకవేళ (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  లేకపోతే ఒకవేళ (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  లేకపోతే
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      లేకపోతే ఒకవేళ (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  ఆపు;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      లేకపోతే ఒకవేళ (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      లేకపోతే
+	ఆపు;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  ఒకవేళ (hextype != (HEX_CINCLUDE | HEX_బిట్లు))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	ఒకవేళ (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
-    switch (hextype)
+  ఒకవేళ (!colsgiven || (!నిలువుల_సంఖ్య && hextype != HEX_POSTSCRIPT))
+    ఎంపిక (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      స్థితి HEX_POSTSCRIPT:	నిలువుల_సంఖ్య = 30; ఆపు;
+      స్థితి HEX_CINCLUDE:	నిలువుల_సంఖ్య = 12; ఆపు;
+      స్థితి HEX_CINCLUDE | HEX_బిట్లు:
+      స్థితి HEX_బిట్లు:		నిలువుల_సంఖ్య = 6; ఆపు;
+      స్థితి HEX_సాధారణ:
+      స్థితి HEX_LITTLEENDIAN:
+      అప్రమేయ:			నిలువుల_సంఖ్య = 16; ఆపు;
       }
 
-  if (octspergrp < 0)
-    switch (hextype)
+  ఒకవేళ (octspergrp < 0)
+    ఎంపిక (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      స్థితి HEX_CINCLUDE | HEX_బిట్లు:
+      స్థితి HEX_బిట్లు:		octspergrp = 1; ఆపు;
+      స్థితి HEX_సాధారణ:		octspergrp = 2; ఆపు;
+      స్థితి HEX_LITTLEENDIAN:	octspergrp = 4; ఆపు;
+      స్థితి HEX_POSTSCRIPT:
+      స్థితి HEX_CINCLUDE:
+      అప్రమేయ:			octspergrp = 0; ఆపు;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
-      (hextype != HEX_POSTSCRIPT && cols < 1) ||
-      ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
-							    && (cols > COLS)))
+  ఒకవేళ ((hextype == HEX_POSTSCRIPT && నిలువుల_సంఖ్య < 0) ||
+      (hextype != HEX_POSTSCRIPT && నిలువుల_సంఖ్య < 1) ||
+      ((hextype == HEX_సాధారణ || hextype == HEX_బిట్లు || hextype == HEX_LITTLEENDIAN)
+							    && (నిలువుల_సంఖ్య > నిలువుల_సంఖ్య_2)))
     {
-      fprintf(stderr, "%s: invalid number of columns (max. %d).\n", pname, COLS);
-      exit(1);
+      fprintf(stderr, "%s: invalid number of columns (max. %d).\n", pname, నిలువుల_సంఖ్య_2);
+      నిష్క్రమించు(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
-    octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  ఒకవేళ (octspergrp < 1 || octspergrp > నిలువుల_సంఖ్య)
+    octspergrp = నిలువుల_సంఖ్య;
+  లేకపోతే ఒకవేళ (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  ఒకవేళ (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
-    BIN_ASSIGN(fp = stdin, !revert);
-  else
+  ఒకవేళ (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+    BIN_కేటాయించు(fp = stdin, !revert);
+  లేకపోతే
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      ఒకవేళ ((fp = fopen(argv[1], BIN_READ(!revert))) == ఖాళీ)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  తిరిగి 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
-    BIN_ASSIGN(fpo = stdout, revert);
-  else
+  ఒకవేళ (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+    BIN_కేటాయించు(fpo = stdout, revert);
+  లేకపోతే
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      పూర్ణాంకం fd;
+      పూర్ణాంకం బహుళకం = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
-	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
+      ఒకవేళ (((fd = OPEN(argv[2], బహుళకం | BIN_CREAT(revert), 0666)) < 0) ||
+	  (fpo = fdopen(fd, BIN_WRITE(revert))) == ఖాళీ)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  తిరిగి 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      ఒకవేళ (!color_forced)
 	color = 0;
     }
 
-  if (revert)
-    switch (hextype)
+  ఒకవేళ (revert)
+    ఎంపిక (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      స్థితి HEX_సాధారణ:
+      స్థితి HEX_POSTSCRIPT:
+      స్థితి HEX_బిట్లు:
+	తిరిగి huntype(fp, fpo, నిలువుల_సంఖ్య, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
-      default:
+	ఆపు;
+      అప్రమేయ:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  ఒకవేళ (seekoff || negseek || !relseek)
     {
-#ifdef TRY_SEEK
-      if (relseek)
+#నిర్వచితమైతే TRY_SEEK
+      ఒకవేళ (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      లేకపోతే
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      ఒకవేళ (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      ఒకవేళ (e >= 0)
 	seekoff = ftell(fp);
-      else
-#endif
+      లేకపోతే
+#అయితే_ముగింపు
 	{
-	  long s = seekoff;
+	  దీర్ఘ s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  అయితే (s--)
+	    ఒకవేళ (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  ఒకవేళ (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      ఒకవేళ (varname == ఖాళీ && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      ఒకవేళ (varname != ఖాళీ)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", అంకెనా((గుర్తులేని అక్షరం)varname[0]) ? "__" : ""));
+	  కొరకు (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(అక్షరమా_అంకెనా((గుర్తులేని అక్షరం)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      అయితే ((నిడివి < 0 || p < నిడివి) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  ఒకవేళ (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  ఒకవేళ (hextype & HEX_బిట్లు)
 	    {
-	      if (p == 0)
+	      ఒకవేళ (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      లేకపోతే ఒకవేళ (p % నిలువుల_సంఖ్య == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      లేకపోతే
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      కొరకు (పూర్ణాంకం j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  లేకపోతే
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
-		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
+		(p % నిలువుల_సంఖ్య) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  ఒకవేళ (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      ఆపు ;
 	    }
 	}
 
-      if (p)
+      ఒకవేళ (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      ఒకవేళ (varname != ఖాళీ)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", అంకెనా((గుర్తులేని అక్షరం)varname[0]) ? "__" : ""));
+	  కొరకు (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(అక్షరమా_అంకెనా((గుర్తులేని అక్షరం)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      తిరిగి 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  ఒకవేళ (hextype == HEX_POSTSCRIPT)
     {
-      p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      p = నిలువుల_సంఖ్య;
+      అయితే ((నిడివి < 0 || n < నిడివి) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  ఒకవేళ (నిలువుల_సంఖ్య > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
-	      p = cols;
+	      p = నిలువుల_సంఖ్య;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      ఒకవేళ (నిలువుల_సంఖ్య == 0 || p < నిలువుల_సంఖ్య)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      తిరిగి 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  ఒకవేళ (hextype != HEX_బిట్లు)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  లేకపోతే	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  అయితే ((నిడివి < 0 || n < నిడివి) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      ఒకవేళ (p == 0)
 	{
-	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
-				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  addrlen = sprintf(l, decimal_స్థానభ్రంశం ? "%08lu:" : "%08lx:",
+				  ((గుర్తులేని దీర్ఘ)(n + seekoff + displayoff)));
+	  కొరకు (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      ఒకవేళ (hextype == HEX_సాధారణ || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  ఒకవేళ (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,71 +1193,71 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      లేకపోతే /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  ఒకవేళ (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  కొరకు (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      ఒకవేళ (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      ఒకవేళ (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      ఒకవేళ (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
-	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
-	c = (grplen * cols - 1) / octspergrp;
+	c = grplen * ((నిలువుల_సంఖ్య + octspergrp - 1) / octspergrp);
+      లేకపోతే
+	c = (grplen * నిలువుల_సంఖ్య - 1) / octspergrp;
 
 
-      if (ebcdic)
+      ఒకవేళ (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      ఒకవేళ (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      ఒకవేళ (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#ఒకవేళ defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#లేకపోతే
 	  (e > 31 && e < 127)
-#endif
+#అయితే_ముగింపు
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      ఒకవేళ (++p == నిలువుల_సంఖ్య)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
 
-	  xxdline(fpo, l, color ? colors : NULL, autoskip ? nonzero : 1);
+	  xxdline(fpo, l, color ? colors : ఖాళీ, autoskip ? nonzero : 1);
 	  memset(colors, 0, c);
 	  nonzero = 0;
 	  p = 0;
 	}
     }
-  if (p)
+  ఒకవేళ (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      ఒకవేళ (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  ఒకవేళ (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      పూర్ణాంకం fill = octspergrp - (p % octspergrp);
+	      ఒకవేళ (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      కొరకు (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  ఒకవేళ (hextype != HEX_బిట్లు)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
-	      c += cols - p;
-	      c += (cols - p) / octspergrp;
+	      c += నిలువుల_సంఖ్య - p;
+	      c += (నిలువుల_సంఖ్య - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      కొరకు (i = నిలువుల_సంఖ్య - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
-	xxdline(fpo, l, NULL, 1);
+      లేకపోతే
+	xxdline(fpo, l, ఖాళీ, 1);
     }
-  else if (autoskip)
-    xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
+  లేకపోతే ఒకవేళ (autoskip)
+    xxdline(fpo, l, color ? colors : ఖాళీ, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  తిరిగి 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

@@ -11,28 +11,28 @@
 
 *********************************************************/
 
-#define PROXY_DELEGATION
+#నిర్వచించు PROXY_DELEGATION
 
-#include <rpcproxy.h>
+#అన్తర్భావ <rpcproxy.h>
 
-#ifdef __cplusplus
-extern "C"   {
-#endif
+#నిర్వచితమైతే __cplusplus
+బాహ్య "C"   {
+#అయితే_ముగింపు
 
 EXTERN_PROXY_FILE( if_ole )
 
 
-PROXYFILE_LIST_START
+PROXYFILE_LIST_ప్రారంభం
 /* Start of list */
   REFERENCE_PROXY_FILE( if_ole ),
 /* End of list */
-PROXYFILE_LIST_END
+PROXYFILE_LIST_చివర
 
 
 DLLDATA_ROUTINES( aProxyFileList, GET_DLL_CLSID )
 
-#ifdef __cplusplus
+#నిర్వచితమైతే __cplusplus
 }  /*extern "C" */
-#endif
+#అయితే_ముగింపు
 
 /* end of generated dlldata file */

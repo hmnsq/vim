@@ -68,406 +68,406 @@
  * convenient and necessary.
  */
 
-extern "C" {
+బాహ్య "C" {
 
-#include <assert.h>
-#include <float.h>
-#include <syslog.h>
+#అన్తర్భావ <assert.h>
+#అన్తర్భావ <float.h>
+#అన్తర్భావ <syslog.h>
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
 }   // extern "C"
 
 // ---------------- start of header part ----------------
 
 //#include <Alert.h>
-#include <Application.h>
-#include <Beep.h>
-#include <Bitmap.h>
-#include <Box.h>
-#include <Button.h>
-#include <Clipboard.h>
-#include <Debug.h>
+#అన్తర్భావ <Application.h>
+#అన్తర్భావ <Beep.h>
+#అన్తర్భావ <Bitmap.h>
+#అన్తర్భావ <Box.h>
+#అన్తర్భావ <Button.h>
+#అన్తర్భావ <Clipboard.h>
+#అన్తర్భావ <Debug.h>
 //#include <Directory.h>
 //#include <Entry.h>
-#include <File.h>
-#include <FilePanel.h>
-#include <FindDirectory.h>
+#అన్తర్భావ <File.h>
+#అన్తర్భావ <FilePanel.h>
+#అన్తర్భావ <FindDirectory.h>
 //#include <Font.h>
-#include <IconUtils.h>
-#include <Input.h>
-#include <ListView.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
+#అన్తర్భావ <IconUtils.h>
+#అన్తర్భావ <Input.h>
+#అన్తర్భావ <ListView.h>
+#అన్తర్భావ <MenuBar.h>
+#అన్తర్భావ <MenuItem.h>
 //#include <MessageQueue.h>
 //#include <OS.h>
-#include <Path.h>
-#include <PictureButton.h>
-#include <PopUpMenu.h>
+#అన్తర్భావ <Path.h>
+#అన్తర్భావ <PictureButton.h>
+#అన్తర్భావ <PopUpMenu.h>
 //#include <Region.h>
-#include <Resources.h>
+#అన్తర్భావ <Resources.h>
 //#include <Roster.h>
-#include <Screen.h>
-#include <ScrollBar.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <StringView.h>
+#అన్తర్భావ <Screen.h>
+#అన్తర్భావ <ScrollBar.h>
+#అన్తర్భావ <ScrollView.h>
+#అన్తర్భావ <String.h>
+#అన్తర్భావ <StringView.h>
 //#include <SupportDefs.h>
-#include <TabView.h>
-#include <TextControl.h>
-#include <TextView.h>
-#include <TranslationUtils.h>
-#include <TranslatorFormats.h>
-#include <View.h>
-#include <Window.h>
+#అన్తర్భావ <TabView.h>
+#అన్తర్భావ <TextControl.h>
+#అన్తర్భావ <TextView.h>
+#అన్తర్భావ <TranslationUtils.h>
+#అన్తర్భావ <TranslatorFormats.h>
+#అన్తర్భావ <View.h>
+#అన్తర్భావ <Window.h>
 
-class VimApp;
-class VimFormView;
-class VimTextAreaView;
-class VimWindow;
-class VimToolbar;
-class VimTabLine;
+తరగతి VimApp;
+తరగతి VimFormView;
+తరగతి Vim_పాఠ్యం_Area_View;
+తరగతి Vim_కిటికీ;
+తరగతి VimToolbar;
+తరగతి Vim_Tab_పంక్తి;
 
-extern key_map *keyMap;
-extern char *keyMapChars;
+బాహ్య కీలకం_map *కీలకం_Map;
+బాహ్య అక్షరం *కీలకం_Map_Chars;
 
-extern int main(int argc, char **argv);
+బాహ్య పూర్ణాంకం ప్రధాన(పూర్ణాంకం argc, అక్షరం **argv);
 
-#ifndef B_MAX_PORT_COUNT
-#define B_MAX_PORT_COUNT    255
-#endif
+#నిర్వచితం_కాకపోతే B_MAX_పోర్టు_లెక్క
+#నిర్వచించు B_MAX_పోర్టు_లెక్క    255
+#అయితే_ముగింపు
 
 // VimApp seems comparable to the X "vimShell"
-class VimApp: public BApplication
+తరగతి VimApp: బహిరంగ BApplication
 {
-    typedef BApplication Inherited;
-    public:
-    VimApp(const char *appsig);
+    రకనిర్వచనం BApplication Inherited;
+    బహిరంగ:
+    VimApp(స్థిరరాశి అక్షరం *appsig);
     ~VimApp();
 
     // callbacks:
-#if 0
-    virtual void DispatchMessage(BMessage *m, BHandler *h)
+#ఒకవేళ 0
+    మాయా శూన్య Dispatch_సందేశం(BMessage *m, BHandler *h)
     {
-	m->PrintToStream();
-	Inherited::DispatchMessage(m, h);
+	m->Print_గమ్యం_ప్రవాహం();
+	Inherited::Dispatch_సందేశం(m, h);
     }
-#endif
-    virtual void ReadyToRun();
-    virtual void ArgvReceived(int32 argc, char **argv);
-    virtual void RefsReceived(BMessage *m);
-    virtual bool QuitRequested();
-    virtual void MessageReceived(BMessage *m);
+#అయితే_ముగింపు
+    మాయా శూన్య Ready_గమ్యం_నిరంతరం();
+    మాయా శూన్య ArgvReceived(int32 argc, అక్షరం **argv);
+    మాయా శూన్య RefsReceived(BMessage *m);
+    మాయా తార్కిక QuitRequested();
+    మాయా శూన్య సందేశం_Received(BMessage *m);
 
-    static void SendRefs(BMessage *m, bool changedir);
+    స్థిర శూన్య SendRefs(BMessage *m, తార్కిక changedir);
 
     sem_id	fFilePanelSem;
     BFilePanel*	fFilePanel;
-    BPath	fBrowsedPath;
-    private:
+    BPath	f_Browsed_మార్గం;
+    అంతరంగ:
 };
 
-class VimWindow: public BWindow
+తరగతి Vim_కిటికీ: బహిరంగ BWindow
 {
-    typedef BWindow Inherited;
-    public:
-    VimWindow();
-    ~VimWindow();
+    రకనిర్వచనం BWindow Inherited;
+    బహిరంగ:
+    Vim_కిటికీ();
+    ~Vim_కిటికీ();
 
-    virtual void DispatchMessage(BMessage *m, BHandler *h);
-    virtual void WindowActivated(bool active);
-    virtual bool QuitRequested();
+    మాయా శూన్య Dispatch_సందేశం(BMessage *m, BHandler *h);
+    మాయా శూన్య కిటికీ_Activated(తార్కిక చురుకైన);
+    మాయా తార్కిక QuitRequested();
 
     VimFormView	    *formView;
 
-    private:
-    void init();
+    అంతరంగ:
+    శూన్య init();
 
-    bool is_fullscreen = false;
-    BRect saved_frame;
-    window_look saved_look;
+    తార్కిక is_fullscreen = అబద్ధం;
+    BRect saved_చట్రం;
+    కిటికీ_look saved_look;
 };
 
-class VimFormView: public BView
+తరగతి VimFormView: బహిరంగ BView
 {
-    typedef BView Inherited;
-    public:
-    VimFormView(BRect frame);
+    రకనిర్వచనం BView Inherited;
+    బహిరంగ:
+    VimFormView(BRect చట్రం);
     ~VimFormView();
 
     // callbacks:
-    virtual void AllAttached();
-    virtual void FrameResized(float new_width, float new_height);
+    మాయా శూన్య AllAttached();
+    మాయా శూన్య చట్రం_Resized(దశాంశం new_వెడల్పు, దశాంశం new_ఎత్తు);
 
-#define MENUBAR_MARGIN	1
-    float MenuHeight() const
-    { return menuBar ? menuBar->Frame().Height() + MENUBAR_MARGIN: 0; }
-    BMenuBar *MenuBar() const
-    { return menuBar; }
+#నిర్వచించు MENUBAR_MARGIN	1
+    దశాంశం Menu_ఎత్తు() స్థిరరాశి
+    { తిరిగి menuBar ? menuBar->చట్రం_2().ఎత్తు_2() + MENUBAR_MARGIN: 0; }
+    BMenuBar *MenuBar() స్థిరరాశి
+    { తిరిగి menuBar; }
 
-    private:
-    void init(BRect);
+    అంతరంగ:
+    శూన్య init(BRect);
 
     BMenuBar	    *menuBar;
-    VimTextAreaView *textArea;
+    Vim_పాఠ్యం_Area_View *పాఠ్యం_Area;
 
-#ifdef FEAT_TOOLBAR
-    public:
-    float ToolbarHeight() const;
-    VimToolbar *ToolBar() const
-    { return toolBar; }
-    private:
+#నిర్వచితమైతే FEAT_TOOLBAR
+    బహిరంగ:
+    దశాంశం Toolbar_ఎత్తు() స్థిరరాశి;
+    VimToolbar *ToolBar() స్థిరరాశి
+    { తిరిగి toolBar; }
+    అంతరంగ:
     VimToolbar	    *toolBar;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-    public:
-    VimTabLine *TabLine() const	{ return tabLine; }
-    bool IsShowingTabLine() const { return showingTabLine; }
-    void SetShowingTabLine(bool showing) { showingTabLine = showing;	}
-    float TablineHeight() const;
-    private:
-    VimTabLine	*tabLine;
-    int	showingTabLine;
-#endif
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    బహిరంగ:
+    Vim_Tab_పంక్తి *Tab_పంక్తి() స్థిరరాశి	{ తిరిగి tab_పంక్తి; }
+    తార్కిక Is_Showing_Tab_పంక్తి() స్థిరరాశి { తిరిగి showing_Tab_పంక్తి; }
+    శూన్య సమితి_Showing_Tab_పంక్తి(తార్కిక showing) { showing_Tab_పంక్తి = showing;	}
+    దశాంశం Tabline_ఎత్తు() స్థిరరాశి;
+    అంతరంగ:
+    Vim_Tab_పంక్తి	*tab_పంక్తి;
+    పూర్ణాంకం	showing_Tab_పంక్తి;
+#అయితే_ముగింపు
 };
 
-class VimTextAreaView: public BView
+తరగతి Vim_పాఠ్యం_Area_View: బహిరంగ BView
 {
-    typedef BView Inherited;
-    public:
-    VimTextAreaView(BRect frame);
-    ~VimTextAreaView();
+    రకనిర్వచనం BView Inherited;
+    బహిరంగ:
+    Vim_పాఠ్యం_Area_View(BRect చట్రం);
+    ~Vim_పాఠ్యం_Area_View();
 
     // callbacks:
-    virtual void Draw(BRect updateRect);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
-    virtual void MouseDown(BPoint point);
-    virtual void MouseUp(BPoint point);
-    virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-    virtual void MessageReceived(BMessage *m);
+    మాయా శూన్య Draw(BRect updateRect);
+    మాయా శూన్య కీలకం_కిందికి(స్థిరరాశి అక్షరం *బైట్లు, int32 అంకె_బైట్లు_2);
+    మాయా శూన్య Mouse_కిందికి(BPoint బిందువు);
+    మాయా శూన్య Mouse_పైకి(BPoint బిందువు);
+    మాయా శూన్య MouseMoved(BPoint బిందువు, uint32 transit, స్థిరరాశి BMessage *సందేశం_2);
+    మాయా శూన్య సందేశం_Received(BMessage *m);
 
     // own functions:
-    int mchInitFont(char_u *name);
-    void mchDrawString(int row, int col, char_u *s, int len, int flags);
-    void mchClearBlock(int row1, int col1, int row2, int col2);
-    void mchClearAll();
-    void mchDeleteLines(int row, int num_lines);
-    void mchInsertLines(int row, int num_lines);
+    పూర్ణాంకం mchInitFont(char_u *name);
+    శూన్య mchDrawString(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, char_u *s, పూర్ణాంకం len, పూర్ణాంకం flags);
+    శూన్య mch_Clear_ఖండం(పూర్ణాంకం row1, పూర్ణాంకం col1, పూర్ణాంకం row2, పూర్ణాంకం col2);
+    శూన్య mchClearAll();
+    శూన్య mch_Delete_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు);
+    శూన్య mch_చొప్పించు_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు);
 
-    static void guiSendMouseEvent(int button, int x, int y, int repeated_click, int_u modifiers);
-    static void guiMouseMoved(int x, int y);
-    static void guiBlankMouse(bool should_hide);
-    static int_u mouseModifiersToVim(int32 beModifiers);
+    స్థిర శూన్య guiSendMouseEvent(పూర్ణాంకం button, పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం repeated_click, int_u modifiers);
+    స్థిర శూన్య guiMouseMoved(పూర్ణాంకం x, పూర్ణాంకం y);
+    స్థిర శూన్య guiBlankMouse(తార్కిక should_hide);
+    స్థిర int_u mouse_Modifiers_గమ్యం_Vim(int32 beModifiers);
 
-    int32 mouseDragEventCount;
+    int32 mouse_Drag_Event_లెక్క;
 
-#ifdef FEAT_MBYTE_IME
-    void DrawIMString(void);
-#endif
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    శూన్య DrawIMString(శూన్య);
+#అయితే_ముగింపు
 
-    private:
-    void init(BRect);
+    అంతరంగ:
+    శూన్య init(BRect);
 
     int_u	vimMouseButton;
     int_u	vimMouseModifiers;
 
-#ifdef FEAT_MBYTE_IME
-    struct {
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    నిర్మాణం {
 	BMessenger* messenger;
-	BMessage* message;
+	BMessage* సందేశం_2;
 	BPoint location;
-	int row;
-	int col;
-	int count;
+	పూర్ణాంకం అడ్డువరుస;
+	పూర్ణాంకం నిలువు;
+	పూర్ణాంకం లెక్క;
     } IMData;
-#endif
+#అయితే_ముగింపు
 };
 
-class VimScrollBar: public BScrollBar
+తరగతి VimScrollBar: బహిరంగ BScrollBar
 {
-    typedef BScrollBar Inherited;
-    public:
+    రకనిర్వచనం BScrollBar Inherited;
+    బహిరంగ:
     VimScrollBar(scrollbar_T *gsb, orientation posture);
     ~VimScrollBar();
 
-    virtual void ValueChanged(float newValue);
-    virtual void MouseUp(BPoint where);
-    void SetValue(float newval);
+    మాయా శూన్య విలువ_మారింది_2(దశాంశం new_విలువ);
+    మాయా శూన్య Mouse_పైకి(BPoint where);
+    శూన్య సమితి_విలువ(దశాంశం newval);
     scrollbar_T *getGsb()
-    { return gsb; }
+    { తిరిగి gsb; }
 
-    int32	scrollEventCount;
+    int32	scroll_Event_లెక్క;
 
-    private:
+    అంతరంగ:
     scrollbar_T *gsb;
-    float   ignoreValue;
+    దశాంశం   ignore_విలువ;
 };
 
 
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
 
-class VimToolbar : public BBox
+తరగతి VimToolbar : బహిరంగ BBox
 {
-    static BBitmap *normalButtonsBitmap;
-    static BBitmap *grayedButtonsBitmap;
+    స్థిర BBitmap *సాధారణ_Buttons_Bitmap;
+    స్థిర BBitmap *grayedButtonsBitmap;
 
-    BBitmap *LoadVimBitmap(const char* fileName);
-    bool GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed);
-    bool ModifyBitmapToGrayed(BBitmap *bitmap);
+    BBitmap *ఎక్కించు_Vim_Bitmap(స్థిరరాశి అక్షరం* fileName);
+    తార్కిక GetPictureFromBitmap(BPicture *picture_గమ్యం, int32 సూచీ, BBitmap *bitmapFrom, తార్కిక pressed);
+    తార్కిక Modify_Bitmap_గమ్యం_Grayed(BBitmap *bitmap);
 
     BList fButtonsList;
-    void InvalidateLayout();
+    శూన్య InvalidateLayout();
 
-    public:
-    VimToolbar(BRect frame, const char * name);
+    బహిరంగ:
+    VimToolbar(BRect చట్రం, స్థిరరాశి అక్షరం * name);
     ~VimToolbar();
 
-    bool PrepareButtonBitmaps();
+    తార్కిక PrepareButtonBitmaps();
 
-    bool AddButton(int32 index, vimmenu_T *menu);
-    bool RemoveButton(vimmenu_T *menu);
-    bool GrayButton(vimmenu_T *menu, int grey);
+    తార్కిక కూడు_Button(int32 సూచీ, vimmenu_T *menu);
+    తార్కిక RemoveButton(vimmenu_T *menu);
+    తార్కిక బూడిద_Button(vimmenu_T *menu, పూర్ణాంకం grey);
 
-    float ToolbarHeight() const;
-    virtual void AttachedToWindow();
+    దశాంశం Toolbar_ఎత్తు() స్థిరరాశి;
+    మాయా శూన్య Attached_గమ్యం_కిటికీ();
 };
 
-BBitmap *VimToolbar::normalButtonsBitmap  = NULL;
-BBitmap *VimToolbar::grayedButtonsBitmap  = NULL;
+BBitmap *VimToolbar::సాధారణ_Buttons_Bitmap  = ఖాళీ;
+BBitmap *VimToolbar::grayedButtonsBitmap  = ఖాళీ;
 
-const float ToolbarMargin = 3.;
-const float ButtonMargin  = 3.;
+స్థిరరాశి దశాంశం ToolbarMargin = 3.;
+స్థిరరాశి దశాంశం ButtonMargin  = 3.;
 
-#endif //FEAT_TOOLBAR
+#అయితే_ముగింపు //FEAT_TOOLBAR
 
-#ifdef FEAT_GUI_TABLINE
+#నిర్వచితమైతే FEAT_GUI_TABLINE
 
-class VimTabLine : public BTabView
+తరగతి Vim_Tab_పంక్తి : బహిరంగ BTabView
 {
-    public:
-	class VimTab : public BTab {
-	    public:
-		VimTab() : BTab(new BView(BRect(), "-Empty-", 0, 0)) {}
+    బహిరంగ:
+	తరగతి VimTab : బహిరంగ BTab {
+	    బహిరంగ:
+		VimTab() : BTab(కొత్త BView(BRect(), "-Empty-", 0, 0)) {}
 
-	    virtual void Select(BView* owner);
+	    మాయా శూన్య Select(BView* owner);
 	};
 
-	VimTabLine(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
-	       B_FOLLOW_LEFT | B_FOLLOW_TOP | B_FOLLOW_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS) {}
+	Vim_Tab_పంక్తి(BRect r) : BTabView(r, "vimTabLine", B_వెడల్పు_FROM_LABEL,
+	       B_FOLLOW_ఎడమ | B_FOLLOW_శిఖరం | B_FOLLOW_కుడి, B_WILL_DRAW | B_చట్రం_EVENTS) {}
 
-    float TablineHeight() const;
-    virtual void MouseDown(BPoint point);
+    దశాంశం Tabline_ఎత్తు() స్థిరరాశి;
+    మాయా శూన్య Mouse_కిందికి(BPoint బిందువు);
 };
 
-#endif //FEAT_GUI_TABLINE
+#అయితే_ముగింపు //FEAT_GUI_TABLINE
 
 
 // For caching the fonts that are used;
 // Vim seems rather sloppy in this regard.
-class VimFont: public BFont
+తరగతి VimFont: బహిరంగ BFont
 {
-    typedef BFont Inherited;
-    public:
+    రకనిర్వచనం BFont Inherited;
+    బహిరంగ:
     VimFont();
-    VimFont(const VimFont *rhs);
-    VimFont(const BFont *rhs);
-    VimFont(const VimFont &rhs);
+    VimFont(స్థిరరాశి VimFont *rhs);
+    VimFont(స్థిరరాశి BFont *rhs);
+    VimFont(స్థిరరాశి VimFont &rhs);
     ~VimFont();
 
-    VimFont *next;
-    int refcount;
+    VimFont *తదుపరి;
+    పూర్ణాంకం refcount;
     char_u *name;
 
-    private:
-    void init();
+    అంతరంగ:
+    శూన్య init();
 };
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 
-class VimDialog : public BWindow
+తరగతి VimDialog : బహిరంగ BWindow
 {
-    typedef BWindow Inherited;
+    రకనిర్వచనం BWindow Inherited;
 
-    BButton* _CreateButton(int32 which, const char* label);
+    BButton* _CreateButton(int32 which, స్థిరరాశి అక్షరం* label);
 
-    public:
+    బహిరంగ:
 
-    class View : public BView {
-	typedef BView Inherited;
+    తరగతి View : బహిరంగ BView {
+	రకనిర్వచనం BView Inherited;
 
-	public:
-	View(BRect frame);
+	బహిరంగ:
+	View(BRect చట్రం);
 	~View();
 
-	virtual void Draw(BRect updateRect);
-	void InitIcon(int32 type);
+	మాయా శూన్య Draw(BRect updateRect);
+	శూన్య InitIcon(int32 type);
 
-	private:
+	అంతరంగ:
 	BBitmap*    fIconBitmap;
     };
 
-    VimDialog(int type, const char *title, const char *message,
-	    const char *buttons, int dfltbutton, const char *textfield,
-	    int ex_cmd);
+    VimDialog(పూర్ణాంకం type, స్థిరరాశి అక్షరం *title, స్థిరరాశి అక్షరం *సందేశం_2,
+	    స్థిరరాశి అక్షరం *buttons, పూర్ణాంకం dfltbutton, స్థిరరాశి అక్షరం *textfield,
+	    పూర్ణాంకం ex_cmd);
     ~VimDialog();
 
-    int Go();
+    పూర్ణాంకం Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    మాయా శూన్య సందేశం_Received(BMessage *సందేశం);
 
-    private:
+    అంతరంగ:
     sem_id	    fDialogSem;
-    int		    fDialogValue;
+    పూర్ణాంకం		    f_Dialog_విలువ;
     BList	    fButtonsList;
-    BTextView*	    fMessageView;
-    BTextControl*   fInputControl;
-    const char*	    fInputValue;
+    BTextView*	    f_సందేశం_View;
+    BTextControl*   f_ఆదానం_Control;
+    స్థిరరాశి అక్షరం*	    f_ఆదానం_విలువ;
 };
 
-class VimSelectFontDialog : public BWindow
+తరగతి VimSelectFontDialog : బహిరంగ BWindow
 {
-    typedef BWindow Inherited;
+    రకనిర్వచనం BWindow Inherited;
 
-    void _CleanList(BListView* list);
-    void _UpdateFontStyles();
-    void _UpdateSizeInputPreview();
-    void _UpdateFontPreview();
-    bool _UpdateFromListItem(BListView* list, char* text, int textSize);
-    public:
+    శూన్య _CleanList(BListView* list);
+    శూన్య _UpdateFontStyles();
+    శూన్య Update_కొలత_ఆదానం_Preview();
+    శూన్య _UpdateFontPreview();
+    తార్కిక Update_From_List_అంశం(BListView* list, అక్షరం* పాఠ్యం, పూర్ణాంకం పాఠ్యం_కొలత);
+    బహిరంగ:
 
-    VimSelectFontDialog(font_family* family, font_style* style, float* size);
+    VimSelectFontDialog(font_family* family, font_style* style, దశాంశం* కొలత);
     ~VimSelectFontDialog();
 
-    bool Go();
+    తార్కిక Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    మాయా శూన్య సందేశం_Received(BMessage *సందేశం);
 
-    private:
-    status_t	    fStatus;
+    అంతరంగ:
+    స్థితి_t	    f_స్థితి;
     sem_id	    fDialogSem;
-    bool	    fDialogValue;
+    తార్కిక	    f_Dialog_విలువ;
     font_family*    fFamily;
     font_style*	    fStyle;
-    float*	    fSize;
+    దశాంశం*	    f_కొలత;
     font_family	    fFontFamily;
     font_style	    fFontStyle;
-    float	    fFontSize;
+    దశాంశం	    f_Font_కొలత;
     BStringView*    fPreview;
     BListView*	    fFamiliesList;
     BListView*	    fStylesList;
     BListView*	    fSizesList;
-    BTextControl*   fSizesInput;
+    BTextControl*   f_Sizes_ఆదానం;
 };
 
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
 // ---------------- end of GUI classes ----------------
 
-struct MainArgs {
-    int	     argc;
-    char    **argv;
+నిర్మాణం Main_వాదనలు {
+    పూర్ణాంకం	     argc;
+    అక్షరం    **argv;
 };
 
 // These messages are copied through the VDCMP.
@@ -475,123 +475,123 @@ struct MainArgs {
 // They must be of POD type (Plain Old Data)
 // as the C++ standard calls them.
 
-#define	KEY_MSG_BUFSIZ	7
-#if KEY_MSG_BUFSIZ < MAX_KEY_CODE_LEN
-#error Increase KEY_MSG_BUFSIZ!
-#endif
+#నిర్వచించు	కీలకం_సందేశం_BUFSIZ	7
+#ఒకవేళ కీలకం_సందేశం_BUFSIZ < MAX_కీలకం_సంకేతం_LEN
+#దోషం Increase కీలకం_సందేశం_BUFSIZ!
+#అయితే_ముగింపు
 
-struct VimKeyMsg {
-    char_u  length;
-    char_u  chars[KEY_MSG_BUFSIZ];  // contains Vim encoding
-    bool    csi_escape;
+నిర్మాణం Vim_కీలకం_సందేశం {
+    char_u  నిడివి;
+    char_u  chars[కీలకం_సందేశం_BUFSIZ];  // contains Vim encoding
+    తార్కిక    csi_escape;
 };
 
-struct VimResizeMsg {
-    int	    width;
-    int	    height;
+నిర్మాణం Vim_Resize_సందేశం {
+    పూర్ణాంకం	    వెడల్పు;
+    పూర్ణాంకం	    ఎత్తు;
 };
 
-struct VimScrollBarMsg {
+నిర్మాణం Vim_Scroll_Bar_సందేశం {
     VimScrollBar *sb;
-    long    value;
-    int	    stillDragging;
+    దీర్ఘ    విలువ;
+    పూర్ణాంకం	    stillDragging;
 };
 
-struct VimMenuMsg {
+నిర్మాణం Vim_Menu_సందేశం {
     vimmenu_T	*guiMenu;
 };
 
-struct VimMouseMsg {
-    int	    button;
-    int	    x;
-    int	    y;
-    int	    repeated_click;
+నిర్మాణం Vim_Mouse_సందేశం {
+    పూర్ణాంకం	    button;
+    పూర్ణాంకం	    x;
+    పూర్ణాంకం	    y;
+    పూర్ణాంకం	    repeated_click;
     int_u   modifiers;
 };
 
-struct VimMouseMovedMsg {
-    int	    x;
-    int	    y;
+నిర్మాణం Vim_Mouse_Moved_సందేశం {
+    పూర్ణాంకం	    x;
+    పూర్ణాంకం	    y;
 };
 
-struct VimFocusMsg {
-    bool    active;
+నిర్మాణం Vim_Focus_సందేశం {
+    తార్కిక    చురుకైన;
 };
 
-struct VimRefsMsg {
-    BMessage   *message;
-    bool    changedir;
+నిర్మాణం Vim_Refs_సందేశం {
+    BMessage   *సందేశం_2;
+    తార్కిక    changedir;
 };
 
-struct VimTablineMsg {
-    int	    index;
+నిర్మాణం Vim_Tabline_సందేశం {
+    పూర్ణాంకం	    సూచీ;
 };
 
-struct VimTablineMenuMsg {
-    int	    index;
-    int	    event;
+నిర్మాణం Vim_Tabline_Menu_సందేశం {
+    పూర్ణాంకం	    సూచీ;
+    పూర్ణాంకం	    event;
 };
 
-struct VimMsg {
-    enum VimMsgType {
-	Key, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
+నిర్మాణం Vim_సందేశం {
+    గణన Vim_సందేశం_Type {
+	కీలకం_2, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
     };
 
-    union {
-	struct VimKeyMsg    Key;
-	struct VimResizeMsg NewSize;
-	struct VimScrollBarMsg	Scroll;
-	struct VimMenuMsg   Menu;
-	struct VimMouseMsg  Mouse;
-	struct VimMouseMovedMsg	MouseMoved;
-	struct VimFocusMsg  Focus;
-	struct VimRefsMsg   Refs;
-	struct VimTablineMsg	Tabline;
-	struct VimTablineMenuMsg    TablineMenu;
+    సంఘం {
+	నిర్మాణం Vim_కీలకం_సందేశం    కీలకం_2;
+	నిర్మాణం Vim_Resize_సందేశం New_కొలత;
+	నిర్మాణం Vim_Scroll_Bar_సందేశం	Scroll;
+	నిర్మాణం Vim_Menu_సందేశం   Menu;
+	నిర్మాణం Vim_Mouse_సందేశం  Mouse;
+	నిర్మాణం Vim_Mouse_Moved_సందేశం	MouseMoved;
+	నిర్మాణం Vim_Focus_సందేశం  Focus;
+	నిర్మాణం Vim_Refs_సందేశం   Refs;
+	నిర్మాణం Vim_Tabline_సందేశం	Tabline;
+	నిర్మాణం Vim_Tabline_Menu_సందేశం    TablineMenu;
     } u;
 };
 
-#define RGB(r, g, b)	((char_u)(r) << 16 | (char_u)(g) << 8 | (char_u)(b) << 0)
-#define GUI_TO_RGB(g)	{ (char_u)((g) >> 16), (char_u)((g) >> 8), (char_u)((g) >> 0), 255 }
+#నిర్వచించు RGB(r, g, b)	((char_u)(r) << 16 | (char_u)(g) << 8 | (char_u)(b) << 0)
+#నిర్వచించు GUI_గమ్యం_RGB(g)	{ (char_u)((g) >> 16), (char_u)((g) >> 8), (char_u)((g) >> 0), 255 }
 
 // ---------------- end of header part ----------------
 
-static struct specialkey
+స్థిర నిర్మాణం specialkey
 {
-    uint16  BeKeys;
-#define KEY(a,b)    ((a)<<8|(b))
-#define K(a)	    KEY(0,a)		// for ASCII codes
-#define F(b)	    KEY(1,b)		// for scancodes
+    uint16  Be_కీలకాలు;
+#నిర్వచించు కీలకం_3(a,b)    ((a)<<8|(b))
+#నిర్వచించు K(a)	    కీలకం_3(0,a)		// for ASCII codes
+#నిర్వచించు F(b)	    కీలకం_3(1,b)		// for scancodes
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_కీలకాలు[] =
 {
-    {K(B_UP_ARROW),	'k', 'u'},
-    {K(B_DOWN_ARROW),	    'k', 'd'},
-    {K(B_LEFT_ARROW),	    'k', 'l'},
-    {K(B_RIGHT_ARROW),	    'k', 'r'},
+    {K(B_పైకి_ARROW),	'k', 'u'},
+    {K(B_కిందికి_ARROW),	    'k', 'd'},
+    {K(B_ఎడమ_ARROW),	    'k', 'l'},
+    {K(B_కుడి_ARROW),	    'k', 'r'},
     {K(B_BACKSPACE),	    'k', 'b'},
-    {K(B_INSERT),	'k', 'I'},
+    {K(B_చొప్పించు),	'k', 'I'},
     {K(B_DELETE),	'k', 'D'},
     {K(B_HOME),		'k', 'h'},
-    {K(B_END),		'@', '7'},
-    {K(B_PAGE_UP),	'k', 'P'},	// XK_Prior
-    {K(B_PAGE_DOWN),	    'k', 'N'},	    // XK_Next,
+    {K(B_చివర),		'@', '7'},
+    {K(B_పుట_పైకి),	'k', 'P'},	// XK_Prior
+    {K(B_పుట_కిందికి),	    'k', 'N'},	    // XK_Next,
 
-#define FIRST_FUNCTION_KEY  11
-    {F(B_F1_KEY),	'k', '1'},
-    {F(B_F2_KEY),	'k', '2'},
-    {F(B_F3_KEY),	'k', '3'},
-    {F(B_F4_KEY),	'k', '4'},
-    {F(B_F5_KEY),	'k', '5'},
-    {F(B_F6_KEY),	'k', '6'},
-    {F(B_F7_KEY),	'k', '7'},
-    {F(B_F8_KEY),	'k', '8'},
-    {F(B_F9_KEY),	'k', '9'},
-    {F(B_F10_KEY),	'k', ';'},
+#నిర్వచించు మొదటి_FUNCTION_కీలకం  11
+    {F(B_F1_కీలకం),	'k', '1'},
+    {F(B_F2_కీలకం),	'k', '2'},
+    {F(B_F3_కీలకం),	'k', '3'},
+    {F(B_F4_కీలకం),	'k', '4'},
+    {F(B_F5_కీలకం),	'k', '5'},
+    {F(B_F6_కీలకం),	'k', '6'},
+    {F(B_F7_కీలకం),	'k', '7'},
+    {F(B_F8_కీలకం),	'k', '8'},
+    {F(B_F9_కీలకం),	'k', '9'},
+    {F(B_F10_కీలకం),	'k', ';'},
 
-    {F(B_F11_KEY),	'F', '1'},
-    {F(B_F12_KEY),	'F', '2'},
+    {F(B_F11_కీలకం),	'F', '1'},
+    {F(B_F12_కీలకం),	'F', '2'},
     //	{XK_F13,	    'F', '3'},	// would be print screen
     // sysreq
     {F(0x0F),		'F', '4'},	// scroll lock
@@ -618,9 +618,9 @@ static struct specialkey
     //	{XK_F35,	'F', 'P'},	// keysymdef.h defines up to F35
 
     //	{XK_Help,	'%', '1'},	// XK_Help
-    {F(B_PRINT_KEY),	    '%', '9'},
+    {F(B_PRINT_కీలకం),	    '%', '9'},
 
-#if 0
+#ఒకవేళ 0
     // Keypad keys:
     {F(0x48),	    'k', 'l'},	    // XK_KP_Left
     {F(0x4A),	    'k', 'r'},	    // XK_KP_Right
@@ -633,26 +633,26 @@ static struct specialkey
     {F(0x39),	    'k', 'P'},	    // XK_KP_Prior
     {F(0x60),	    'k', 'N'},	    // XK_KP_Next
     {F(0x49),	    '&', '8'},	    // XK_Undo, keypad 5
-#endif
+#అయితే_ముగింపు
 
     // End of list marker:
     {0,		    0, 0}
 };
 
-#define NUM_SPECIAL_KEYS    ARRAY_LENGTH(special_keys)
+#నిర్వచించు అంకె_SPECIAL_కీలకాలు    ARRAY_నిడివి(special_కీలకాలు)
 
 // ---------------- VimApp ----------------
 
-    static void
-docd(BPath &path)
+    స్థిర శూన్య
+docd(BPath &మార్గం)
 {
-    mch_chdir((char *)path.Path());
+    mch_chdir((అక్షరం *)మార్గం.మార్గం_2());
     // Do this to get the side effects of a :cd command
     do_cmdline_cmd((char_u *)"cd .");
 }
 
-	static void
-drop_callback(void *cookie)
+	స్థిర శూన్య
+drop_callback(శూన్య *cookie)
 {
     // TODO here we could handle going to a specific position in the dropped
     // file (see src/gui_mac.c, deleted in 8.2.1422)
@@ -661,119 +661,119 @@ drop_callback(void *cookie)
 }
 
     // Really handle dropped files and folders.
-	static void
-RefsReceived(BMessage *m, bool changedir)
+	స్థిర శూన్య
+RefsReceived(BMessage *m, తార్కిక changedir)
 {
     uint32 type;
-    int32 count;
+    int32 లెక్క;
 
-    m->PrintToStream();
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
-	    m->GetInfo("refs", &type, &count);
-	    if (type != B_REF_TYPE)
-		goto bad;
-	    break;
-	case B_ARGV_RECEIVED:
-	    m->GetInfo("argv", &type, &count);
-	    if (type != B_STRING_TYPE)
-		goto bad;
-	    if (changedir) {
-		char *dirname;
-		if (m->FindString("cwd", (const char **) &dirname) == B_OK) {
+    m->Print_గమ్యం_ప్రవాహం();
+    ఎంపిక (m->what) {
+	స్థితి B_REFS_RECEIVED:
+	స్థితి B_SIMPLE_దత్తాంశం:
+	    m->GetInfo("refs", &type, &లెక్క);
+	    ఒకవేళ (type != B_REF_TYPE)
+		వెళ్ళు bad;
+	    ఆపు;
+	స్థితి B_ARGV_RECEIVED:
+	    m->GetInfo("argv", &type, &లెక్క);
+	    ఒకవేళ (type != B_STRING_TYPE)
+		వెళ్ళు bad;
+	    ఒకవేళ (changedir) {
+		అక్షరం *dirname;
+		ఒకవేళ (m->కనుగొను_String("cwd", (స్థిరరాశి అక్షరం **) &dirname) == B_OK) {
 		    chdir(dirname);
 		    do_cmdline_cmd((char_u *)"cd .");
 		}
 	    }
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 bad:
 	    /*fprintf(stderr, "bad!\n"); */
-	    delete m;
-	    return;
+	    తొలగించు m;
+	    తిరిగి;
     }
 
-#ifdef FEAT_VISUAL
+#నిర్వచితమైతే FEAT_VISUAL
     reset_VIsual();
-#endif
+#అయితే_ముగింపు
 
     char_u  **fnames;
-    fnames = (char_u **) alloc(count * sizeof(char_u *));
-    int fname_index = 0;
+    fnames = (char_u **) alloc(లెక్క * పరిమాణం(char_u *));
+    పూర్ణాంకం fname_సూచీ = 0;
 
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
+    ఎంపిక (m->what) {
+	స్థితి B_REFS_RECEIVED:
+	స్థితి B_SIMPLE_దత్తాంశం:
 	    // fprintf(stderr, "case B_REFS_RECEIVED\n");
-	    for (int i = 0; i < count; ++i)
+	    కొరకు (పూర్ణాంకం i = 0; i < లెక్క; ++i)
 	    {
-		entry_ref ref;
-		if (m->FindRef("refs", i, &ref) == B_OK) {
-		    BEntry entry(&ref, false);
-		    BPath path;
-		    entry.GetPath(&path);
+		నమోదు_ref ref;
+		ఒకవేళ (m->కనుగొను_Ref("refs", i, &ref) == B_OK) {
+		    BEntry నమోదు_2(&ref, అబద్ధం);
+		    BPath మార్గం;
+		    నమోదు_2.Get_మార్గం(&మార్గం);
 
 		    // Change to parent directory?
-		    if (changedir) {
+		    ఒకవేళ (changedir) {
 			BPath parentpath;
-			path.GetParent(&parentpath);
+			మార్గం.Get_మాతృ(&parentpath);
 			docd(parentpath);
 		    }
 
 		    // Is it a directory? If so, cd into it.
 		    BDirectory bdir(&ref);
-		    if (bdir.InitCheck() == B_OK) {
+		    ఒకవేళ (bdir.InitCheck() == B_OK) {
 			// don't cd if we already did it
-			if (!changedir)
-			    docd(path);
-		    } else {
+			ఒకవేళ (!changedir)
+			    docd(మార్గం);
+		    } లేకపోతే {
 			mch_dirname(IObuff, IOSIZE);
-			char_u *fname = shorten_fname((char_u *)path.Path(), IObuff);
-			if (fname == NULL)
-			    fname = (char_u *)path.Path();
-			fnames[fname_index++] = vim_strsave(fname);
+			char_u *fname = shorten_fname((char_u *)మార్గం.మార్గం_2(), IObuff);
+			ఒకవేళ (fname == ఖాళీ)
+			    fname = (char_u *)మార్గం.మార్గం_2();
+			fnames[fname_సూచీ++] = vim_strsave(fname);
 			// fprintf(stderr, "%s\n", fname);
 		    }
 
 		    // Only do it for the first file/dir
-		    changedir = false;
+		    changedir = అబద్ధం;
 		}
 	    }
-	    break;
-	case B_ARGV_RECEIVED:
+	    ఆపు;
+	స్థితి B_ARGV_RECEIVED:
 	    // fprintf(stderr, "case B_ARGV_RECEIVED\n");
-	    for (int i = 1; i < count; ++i)
+	    కొరకు (పూర్ణాంకం i = 1; i < లెక్క; ++i)
 	    {
-		char *fname;
+		అక్షరం *fname;
 
-		if (m->FindString("argv", i, (const char **) &fname) == B_OK) {
-		    fnames[fname_index++] = vim_strsave((char_u *)fname);
+		ఒకవేళ (m->కనుగొను_String("argv", i, (స్థిరరాశి అక్షరం **) &fname) == B_OK) {
+		    fnames[fname_సూచీ++] = vim_strsave((char_u *)fname);
 		}
 	    }
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 	    // fprintf(stderr, "case default\n");
-	    break;
+	    ఆపు;
     }
 
-    delete m;
+    తొలగించు m;
 
     // Handle the drop, :edit to get to the file
-    if (fname_index > 0) {
-	handle_drop(fname_index, fnames, FALSE, drop_callback, NULL);
+    ఒకవేళ (fname_సూచీ > 0) {
+	handle_drop(fname_సూచీ, fnames, FALSE, drop_callback, ఖాళీ);
 
 	setcursor();
-	out_flush();
-    } else {
+	బహిర్గతం_flush();
+    } లేకపోతే {
 	vim_free(fnames);
     }
 }
 
-VimApp::VimApp(const char *appsig):
+VimApp::VimApp(స్థిరరాశి అక్షరం *appsig):
     BApplication(appsig),
     fFilePanelSem(-1),
-    fFilePanel(NULL)
+    fFilePanel(ఖాళీ)
 {
 }
 
@@ -781,8 +781,8 @@ VimApp::~VimApp()
 {
 }
 
-    void
-VimApp::ReadyToRun()
+    శూన్య
+VimApp::Ready_గమ్యం_నిరంతరం()
 {
     /*
      * Apparently signals are inherited by the created thread -
@@ -792,105 +792,105 @@ VimApp::ReadyToRun()
     mch_signal(SIGQUIT, SIG_IGN);
 }
 
-    void
-VimApp::ArgvReceived(int32 arg_argc, char **arg_argv)
+    శూన్య
+VimApp::ArgvReceived(int32 arg_argc, అక్షరం **arg_argv)
 {
-    if (!IsLaunching()) {
+    ఒకవేళ (!IsLaunching()) {
 	/*
 	 * This can happen if we are set to Single or Exclusive
 	 * Launch. Be nice and open the file(s).
 	 */
-	if (gui.vimWindow)
-	    gui.vimWindow->Minimize(false);
-	BMessage *m = CurrentMessage();
-	DetachCurrentMessage();
-	SendRefs(m, true);
+	ఒకవేళ (gui.vim_కిటికీ)
+	    gui.vim_కిటికీ->Minimize(అబద్ధం);
+	BMessage *m = Current_సందేశం();
+	Detach_Current_సందేశం();
+	SendRefs(m, నిజం);
     }
 }
 
-    void
+    శూన్య
 VimApp::RefsReceived(BMessage *m)
 {
     // Horrible hack!!! XXX XXX XXX
     // The real problem is that b_start_ffc is set too late for
     // the initial empty buffer. As a result the window will be
     // split instead of abandoned.
-    int limit = 15;
-    while (--limit >= 0 && (curbuf == NULL || curbuf->b_start_ffc == 0))
+    పూర్ణాంకం హద్దు = 15;
+    అయితే (--హద్దు >= 0 && (curbuf == ఖాళీ || curbuf->b_ప్రారంభం_ffc == 0))
 	snooze(100000);    //  0.1 s
-    if (gui.vimWindow)
-	gui.vimWindow->Minimize(false);
-    DetachCurrentMessage();
-    SendRefs(m, true);
+    ఒకవేళ (gui.vim_కిటికీ)
+	gui.vim_కిటికీ->Minimize(అబద్ధం);
+    Detach_Current_సందేశం();
+    SendRefs(m, నిజం);
 }
 
 /*
  * Pass a BMessage on to the main() thread.
  * Caller must have detached the message.
  */
-    void
-VimApp::SendRefs(BMessage *m, bool changedir)
+    శూన్య
+VimApp::SendRefs(BMessage *m, తార్కిక changedir)
 {
-    VimRefsMsg rm;
-    rm.message = m;
+    Vim_Refs_సందేశం rm;
+    rm.సందేశం_2 = m;
     rm.changedir = changedir;
 
-    write_port(gui.vdcmp, VimMsg::Refs, &rm, sizeof(rm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::Refs, &rm, పరిమాణం(rm));
     //	calls ::RefsReceived
 }
 
-    void
-VimApp::MessageReceived(BMessage *m)
+    శూన్య
+VimApp::సందేశం_Received(BMessage *m)
 {
-    switch (m->what) {
-	case 'save':
+    ఎంపిక (m->what) {
+	స్థితి 'save':
 	    {
-		entry_ref refDirectory;
-		m->FindRef("directory", &refDirectory);
-		fBrowsedPath.SetTo(&refDirectory);
+		నమోదు_ref refDirectory;
+		m->కనుగొను_Ref("directory", &refDirectory);
+		f_Browsed_మార్గం.సమితి_గమ్యం(&refDirectory);
 		BString strName;
-		m->FindString("name", &strName);
-		fBrowsedPath.Append(strName.String());
+		m->కనుగొను_String("name", &strName);
+		f_Browsed_మార్గం.Append(strName.String());
 	    }
-	    break;
-	case 'open':
+	    ఆపు;
+	స్థితి 'open':
 	    {
-		entry_ref ref;
-		m->FindRef("refs", &ref);
-		fBrowsedPath.SetTo(&ref);
+		నమోదు_ref ref;
+		m->కనుగొను_Ref("refs", &ref);
+		f_Browsed_మార్గం.సమితి_గమ్యం(&ref);
 	    }
-	    break;
-	case B_CANCEL:
+	    ఆపు;
+	స్థితి B_CANCEL:
 	    {
 		BFilePanel *panel;
-		m->FindPointer("source", (void**)&panel);
-		if (fFilePanelSem != -1 && panel == fFilePanel)
+		m->కనుగొను_సూచిక("source", (శూన్య**)&panel);
+		ఒకవేళ (fFilePanelSem != -1 && panel == fFilePanel)
 		{
 		    delete_sem(fFilePanelSem);
 		    fFilePanelSem = -1;
 		}
 
 	    }
-	    break;
-	default:
-	    Inherited::MessageReceived(m);
-	    break;
+	    ఆపు;
+	అప్రమేయ:
+	    Inherited::సందేశం_Received(m);
+	    ఆపు;
     }
 }
 
-    bool
+    తార్కిక
 VimApp::QuitRequested()
 {
-    (void)Inherited::QuitRequested();
-    return false;
+    (శూన్య)Inherited::QuitRequested();
+    తిరిగి అబద్ధం;
 }
 
 // ---------------- VimWindow ----------------
 
-VimWindow::VimWindow():
+Vim_కిటికీ::Vim_కిటికీ():
     BWindow(BRect(40, 40, 150, 150),
 	    "Vim",
-	    B_TITLED_WINDOW,
+	    B_TITLED_కిటికీ,
 	    0,
 	    B_CURRENT_WORKSPACE)
 
@@ -898,214 +898,214 @@ VimWindow::VimWindow():
     init();
 }
 
-VimWindow::~VimWindow()
+Vim_కిటికీ::~Vim_కిటికీ()
 {
-    if (formView) {
-	RemoveChild(formView);
-	delete formView;
+    ఒకవేళ (formView) {
+	Remove_బిడ్డ(formView);
+	తొలగించు formView;
     }
-    gui.vimWindow = NULL;
+    gui.vim_కిటికీ = ఖాళీ;
 }
 
-    void
-VimWindow::init()
+    శూన్య
+Vim_కిటికీ::init()
 {
     // Attach the VimFormView
-    formView = new VimFormView(Bounds());
-    if (formView != NULL) {
-	AddChild(formView);
+    formView = కొత్త VimFormView(Bounds());
+    ఒకవేళ (formView != ఖాళీ) {
+	కూడు_బిడ్డ(formView);
     }
 }
 
-#if 0  //  disabled in zeta patch
-    void
-VimWindow::DispatchMessage(BMessage *m, BHandler *h)
+#ఒకవేళ 0  //  disabled in zeta patch
+    శూన్య
+Vim_కిటికీ::Dispatch_సందేశం(BMessage *m, BHandler *h)
 {
     /*
      * Route B_MOUSE_UP messages to MouseUp(), in
      * a manner that should be compatible with the
      * intended future system behaviour.
      */
-    switch (m->what) {
-	case B_MOUSE_UP:
+    ఎంపిక (m->what) {
+	స్థితి B_MOUSE_పైకి:
 	    //	if (!h) h = PreferredHandler();
 	    //	gcc isn't happy without this extra set of braces, complains about
 	    //	jump to case label crosses init of 'class BView * v'
 	    //	richard@whitequeen.com jul 99
 	    {
 		BView *v = dynamic_cast<BView *>(h);
-		if (v) {
+		ఒకవేళ (v) {
 		    // m->PrintToStream();
 		    BPoint where;
-		    m->FindPoint("where", &where);
-		    v->MouseUp(where);
-		} else {
-		    Inherited::DispatchMessage(m, h);
+		    m->కనుగొను_బిందువు("where", &where);
+		    v->Mouse_పైకి(where);
+		} లేకపోతే {
+		    Inherited::Dispatch_సందేశం(m, h);
 		}
 	    }
-	    break;
-	default:
-	    Inherited::DispatchMessage(m, h);
+	    ఆపు;
+	అప్రమేయ:
+	    Inherited::Dispatch_సందేశం(m, h);
     }
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-VimWindow::WindowActivated(bool active)
+    శూన్య
+Vim_కిటికీ::కిటికీ_Activated(తార్కిక చురుకైన)
 {
-    Inherited::WindowActivated(active);
+    Inherited::కిటికీ_Activated(చురుకైన);
     // the textArea gets the keyboard action
-    if (active && gui.vimTextArea)
-	gui.vimTextArea->MakeFocus(true);
+    ఒకవేళ (చురుకైన && gui.vim_పాఠ్యం_Area)
+	gui.vim_పాఠ్యం_Area->MakeFocus(నిజం);
 
-    struct VimFocusMsg fm;
-    fm.active = active;
+    నిర్మాణం Vim_Focus_సందేశం fm;
+    fm.చురుకైన = చురుకైన;
 
-    write_port(gui.vdcmp, VimMsg::Focus, &fm, sizeof(fm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::Focus, &fm, పరిమాణం(fm));
 }
 
-    bool
-VimWindow::QuitRequested()
+    తార్కిక
+Vim_కిటికీ::QuitRequested()
 {
-    struct VimKeyMsg km;
-    km.length = 5;
-    memcpy((char *)km.chars, "\033:qa\r", km.length);
-    km.csi_escape = false;
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
-    return false;
+    నిర్మాణం Vim_కీలకం_సందేశం km;
+    km.నిడివి = 5;
+    జ్ఞాపకం_నకలు((అక్షరం *)km.chars, "\033:qa\r", km.నిడివి);
+    km.csi_escape = అబద్ధం;
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::కీలకం_2, &km, పరిమాణం(km));
+    తిరిగి అబద్ధం;
 }
-    void
-VimWindow::DispatchMessage(BMessage *m, BHandler *h)
+    శూన్య
+Vim_కిటికీ::Dispatch_సందేశం(BMessage *m, BHandler *h)
 {
-    bool should_propagate = true;
+    తార్కిక should_propagate = నిజం;
 
-    switch (m->what)
+    ఎంపిక (m->what)
     {
-	case B_KEY_DOWN:
+	స్థితి B_కీలకం_కిందికి:
 	    {
 		int32 scancode = 0;
 		int32 beModifiers = 0;
-		m->FindInt32("raw_char", &scancode);
-		m->FindInt32("modifiers", &beModifiers);
+		m->కనుగొను_Int32("raw_char", &scancode);
+		m->కనుగొను_Int32("modifiers", &beModifiers);
 
-		if (scancode == B_ENTER && (beModifiers & B_LEFT_COMMAND_KEY))
+		ఒకవేళ (scancode == B_ENTER && (beModifiers & B_ఎడమ_COMMAND_కీలకం))
 		    {
-			should_propagate = false;
-			if (this->is_fullscreen)
+			should_propagate = అబద్ధం;
+			ఒకవేళ (ఇది->is_fullscreen)
 			    {
-				this->is_fullscreen = false;
-				ResizeTo(this->saved_frame.Width(), this->saved_frame.Height());
-				MoveTo(this->saved_frame.left, this->saved_frame.top);
-				SetLook(this->saved_look);
-				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
-			    } else {
-				this->saved_frame = Frame();
-				this->saved_look = Look();
-				this->is_fullscreen = true;
-				BScreen s(this);
-				SetLook(B_NO_BORDER_WINDOW_LOOK);
-				ResizeTo(s.Frame().Width() + 1, s.Frame().Height() + 1);
-				MoveTo(s.Frame().left, s.Frame().top);
-				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
+				ఇది->is_fullscreen = అబద్ధం;
+				Resize_గమ్యం(ఇది->saved_చట్రం.వెడల్పు_2(), ఇది->saved_చట్రం.ఎత్తు_2());
+				Move_గమ్యం(ఇది->saved_చట్రం.ఎడమ, ఇది->saved_చట్రం.శిఖరం);
+				సమితి_Look(ఇది->saved_look);
+				సమితి_Flags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
+			    } లేకపోతే {
+				ఇది->saved_చట్రం = చట్రం_2();
+				ఇది->saved_look = Look();
+				ఇది->is_fullscreen = నిజం;
+				BScreen s(ఇది);
+				సమితి_Look(B_NO_BORDER_కిటికీ_LOOK);
+				Resize_గమ్యం(s.చట్రం_2().వెడల్పు_2() + 1, s.చట్రం_2().ఎత్తు_2() + 1);
+				Move_గమ్యం(s.చట్రం_2().ఎడమ, s.చట్రం_2().శిఖరం);
+				సమితి_Flags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 			    }
 		    }
 	    }
     }
 
-    if (should_propagate)
-	Inherited::DispatchMessage(m, h);
+    ఒకవేళ (should_propagate)
+	Inherited::Dispatch_సందేశం(m, h);
 }
 
 
 // ---------------- VimFormView ----------------
 
-VimFormView::VimFormView(BRect frame):
-    BView(frame, "VimFormView", B_FOLLOW_ALL_SIDES,
-	    B_WILL_DRAW | B_FRAME_EVENTS),
-    menuBar(NULL),
-#ifdef FEAT_TOOLBAR
-    toolBar(NULL),
-#endif
-#ifdef FEAT_GUI_TABLINE
+VimFormView::VimFormView(BRect చట్రం):
+    BView(చట్రం, "VimFormView", B_FOLLOW_ALL_SIDES,
+	    B_WILL_DRAW | B_చట్రం_EVENTS),
+    menuBar(ఖాళీ),
+#నిర్వచితమైతే FEAT_TOOLBAR
+    toolBar(ఖాళీ),
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
 //  showingTabLine(false),
-    tabLine(NULL),
-#endif
-    textArea(NULL)
+    tab_పంక్తి(ఖాళీ),
+#అయితే_ముగింపు
+    పాఠ్యం_Area(ఖాళీ)
 {
-    init(frame);
+    init(చట్రం);
 }
 
 VimFormView::~VimFormView()
 {
-    if (menuBar) {
-	RemoveChild(menuBar);
-#ifdef never
+    ఒకవేళ (menuBar) {
+	Remove_బిడ్డ(menuBar);
+#నిర్వచితమైతే never
 	//  deleting the menuBar leads to SEGV on exit
 	//  richard@whitequeen.com Jul 99
-	delete menuBar;
-#endif
+	తొలగించు menuBar;
+#అయితే_ముగింపు
     }
 
-#ifdef FEAT_TOOLBAR
-    delete toolBar;
-#endif
+#నిర్వచితమైతే FEAT_TOOLBAR
+    తొలగించు toolBar;
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-    delete tabLine;
-#endif
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    తొలగించు tab_పంక్తి;
+#అయితే_ముగింపు
 
-    if (textArea) {
-	RemoveChild(textArea);
-	delete textArea;
+    ఒకవేళ (పాఠ్యం_Area) {
+	Remove_బిడ్డ(పాఠ్యం_Area);
+	తొలగించు పాఠ్యం_Area;
     }
-    gui.vimForm = NULL;
+    gui.vimForm = ఖాళీ;
 }
 
-    void
-VimFormView::init(BRect frame)
+    శూన్య
+VimFormView::init(BRect చట్రం)
 {
-    menuBar = new BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
+    menuBar = కొత్త BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
 	    "VimMenuBar");
 
-    AddChild(menuBar);
+    కూడు_బిడ్డ(menuBar);
 
-#ifdef FEAT_TOOLBAR
-    toolBar = new VimToolbar(BRect(0,0,0,0), "VimToolBar");
+#నిర్వచితమైతే FEAT_TOOLBAR
+    toolBar = కొత్త VimToolbar(BRect(0,0,0,0), "VimToolBar");
     toolBar->PrepareButtonBitmaps();
-    AddChild(toolBar);
-#endif
+    కూడు_బిడ్డ(toolBar);
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-    tabLine = new VimTabLine(BRect(0,0,0,0));
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    tab_పంక్తి = కొత్త Vim_Tab_పంక్తి(BRect(0,0,0,0));
 //  tabLine->PrepareButtonBitmaps();
-    AddChild(tabLine);
-#endif
+    కూడు_బిడ్డ(tab_పంక్తి);
+#అయితే_ముగింపు
 
-    BRect remaining = frame;
-    textArea = new VimTextAreaView(remaining);
-    AddChild(textArea);
+    BRect మిగిలిన = చట్రం;
+    పాఠ్యం_Area = కొత్త Vim_పాఠ్యం_Area_View(మిగిలిన);
+    కూడు_బిడ్డ(పాఠ్యం_Area);
     // The textArea will be resized later when menus are added
 
-    gui.vimForm = this;
+    gui.vimForm = ఇది;
 }
 
-#ifdef FEAT_TOOLBAR
-    float
-VimFormView::ToolbarHeight() const
+#నిర్వచితమైతే FEAT_TOOLBAR
+    దశాంశం
+VimFormView::Toolbar_ఎత్తు() స్థిరరాశి
 {
-    return toolBar ? toolBar->ToolbarHeight() : 0.;
+    తిరిగి toolBar ? toolBar->Toolbar_ఎత్తు() : 0.;
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-    float
-VimFormView::TablineHeight() const
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    దశాంశం
+VimFormView::Tabline_ఎత్తు() స్థిరరాశి
 {
-    return (tabLine && IsShowingTabLine()) ? tabLine->TablineHeight() : 0.;
+    తిరిగి (tab_పంక్తి && Is_Showing_Tab_పంక్తి()) ? tab_పంక్తి->Tabline_ఎత్తు() : 0.;
 }
-#endif
+#అయితే_ముగింపు
 
-    void
+    శూన్య
 VimFormView::AllAttached()
 {
     /*
@@ -1115,65 +1115,65 @@ VimFormView::AllAttached()
     mch_signal(SIGINT, SIG_IGN);
     mch_signal(SIGQUIT, SIG_IGN);
 
-    if (menuBar && textArea) {
+    ఒకవేళ (menuBar && పాఠ్యం_Area) {
 	/*
 	 * Resize the textArea to fill the space left over by the menu.
 	 * This is somewhat futile since it will be done again once
 	 * menus are added to the menu bar.
 	 */
-	BRect remaining = Bounds();
+	BRect మిగిలిన = Bounds();
 
-#ifdef FEAT_MENU
-	remaining.top += MenuHeight();
-	menuBar->ResizeTo(remaining.right, remaining.top);
-	gui.menu_height = (int) MenuHeight();
-#endif
+#నిర్వచితమైతే FEAT_MENU
+	మిగిలిన.శిఖరం += Menu_ఎత్తు();
+	menuBar->Resize_గమ్యం(మిగిలిన.కుడి, మిగిలిన.శిఖరం);
+	gui.menu_ఎత్తు = (పూర్ణాంకం) Menu_ఎత్తు();
+#అయితే_ముగింపు
 
-#ifdef FEAT_TOOLBAR
-	toolBar->MoveTo(remaining.left, remaining.top);
-	toolBar->ResizeTo(remaining.right, ToolbarHeight());
-	remaining.top += ToolbarHeight();
-	gui.toolbar_height = ToolbarHeight();
-#endif
+#నిర్వచితమైతే FEAT_TOOLBAR
+	toolBar->Move_గమ్యం(మిగిలిన.ఎడమ, మిగిలిన.శిఖరం);
+	toolBar->Resize_గమ్యం(మిగిలిన.కుడి, Toolbar_ఎత్తు());
+	మిగిలిన.శిఖరం += Toolbar_ఎత్తు();
+	gui.toolbar_ఎత్తు = Toolbar_ఎత్తు();
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-	tabLine->MoveTo(remaining.left, remaining.top);
-	tabLine->ResizeTo(remaining.right + 1, TablineHeight());
-	remaining.top += TablineHeight();
-	gui.tabline_height = TablineHeight();
-#endif
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	tab_పంక్తి->Move_గమ్యం(మిగిలిన.ఎడమ, మిగిలిన.శిఖరం);
+	tab_పంక్తి->Resize_గమ్యం(మిగిలిన.కుడి + 1, Tabline_ఎత్తు());
+	మిగిలిన.శిఖరం += Tabline_ఎత్తు();
+	gui.tabline_ఎత్తు = Tabline_ఎత్తు();
+#అయితే_ముగింపు
 
-	textArea->ResizeTo(remaining.Width(), remaining.Height());
-	textArea->MoveTo(remaining.left, remaining.top);
+	పాఠ్యం_Area->Resize_గమ్యం(మిగిలిన.వెడల్పు_2(), మిగిలిన.ఎత్తు_2());
+	పాఠ్యం_Area->Move_గమ్యం(మిగిలిన.ఎడమ, మిగిలిన.శిఖరం);
     }
 
 
     Inherited::AllAttached();
 }
 
-    void
-VimFormView::FrameResized(float new_width, float new_height)
+    శూన్య
+VimFormView::చట్రం_Resized(దశాంశం new_వెడల్పు, దశాంశం new_ఎత్తు)
 {
-    struct VimResizeMsg sm;
-    int adjust_h, adjust_w;
+    నిర్మాణం Vim_Resize_సందేశం sm;
+    పూర్ణాంకం adjust_h, adjust_w;
 
-    new_width += 1;	//  adjust from width to number of pixels occupied
-    new_height += 1;
+    new_వెడల్పు += 1;	//  adjust from width to number of pixels occupied
+    new_ఎత్తు += 1;
 
-    sm.width = (int) new_width;
-    sm.height = (int) new_height;
-    adjust_w = ((int)new_width - gui_get_base_width()) % gui.char_width;
-    adjust_h = ((int)new_height - gui_get_base_height()) % gui.char_height;
+    sm.వెడల్పు = (పూర్ణాంకం) new_వెడల్పు;
+    sm.ఎత్తు = (పూర్ణాంకం) new_ఎత్తు;
+    adjust_w = ((పూర్ణాంకం)new_వెడల్పు - gui_get_పునాది_వెడల్పు()) % gui.char_వెడల్పు;
+    adjust_h = ((పూర్ణాంకం)new_ఎత్తు - gui_get_పునాది_ఎత్తు()) % gui.char_ఎత్తు;
 
-    if (adjust_w > 0 || adjust_h > 0) {
-	sm.width  -= adjust_w;
-	sm.height -= adjust_h;
+    ఒకవేళ (adjust_w > 0 || adjust_h > 0) {
+	sm.వెడల్పు  -= adjust_w;
+	sm.ఎత్తు -= adjust_h;
     }
 
-    write_port(gui.vdcmp, VimMsg::Resize, &sm, sizeof(sm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::Resize, &sm, పరిమాణం(sm));
     //	calls gui_resize_shell(new_width, new_height);
 
-    return;
+    తిరిగి;
 
     /*
      * The area below the vertical scrollbar is erased to the colour
@@ -1185,47 +1185,47 @@ VimFormView::FrameResized(float new_width, float new_height)
 
 // ---------------- VimTextAreaView ----------------
 
-VimTextAreaView::VimTextAreaView(BRect frame):
-    BView(frame, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
-#ifdef FEAT_MBYTE_IME
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INPUT_METHOD_AWARE
-#else
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-#endif
+Vim_పాఠ్యం_Area_View::Vim_పాఠ్యం_Area_View(BRect చట్రం):
+    BView(చట్రం, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
+#నిర్వచితమైతే FEAT_MBYTE_IME
+	B_WILL_DRAW | B_నిండిన_UPDATE_ON_RESIZE | B_ఆదానం_పద్ధతి_AWARE
+#లేకపోతే
+	B_WILL_DRAW | B_నిండిన_UPDATE_ON_RESIZE
+#అయితే_ముగింపు
 	),
-    mouseDragEventCount(0)
+    mouse_Drag_Event_లెక్క(0)
 {
-#ifdef FEAT_MBYTE_IME
-    IMData.messenger = NULL;
-    IMData.message = NULL;
-#endif
-    init(frame);
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    IMData.messenger = ఖాళీ;
+    IMData.సందేశం_2 = ఖాళీ;
+#అయితే_ముగింపు
+    init(చట్రం);
 }
 
-VimTextAreaView::~VimTextAreaView()
+Vim_పాఠ్యం_Area_View::~Vim_పాఠ్యం_Area_View()
 {
-    gui.vimTextArea = NULL;
+    gui.vim_పాఠ్యం_Area = ఖాళీ;
 }
 
-    void
-VimTextAreaView::init(BRect frame)
+    శూన్య
+Vim_పాఠ్యం_Area_View::init(BRect చట్రం)
 {
     // set up global var for fast access
-    gui.vimTextArea = this;
+    gui.vim_పాఠ్యం_Area = ఇది;
 
     /*
      * Tell the app server not to erase the view: we will
      * fill it in completely by ourselves.
      * (Does this really work? Even if not, it won't harm either.)
      */
-    SetViewColor(B_TRANSPARENT_32_BIT);
-#define PEN_WIDTH   1
-    SetPenSize(PEN_WIDTH);
-#define W_WIDTH(curwin)   0
+    సమితి_View_Color(B_TRANSPARENT_32_బిట్టు);
+#నిర్వచించు PEN_వెడల్పు   1
+    సమితి_Pen_కొలత(PEN_వెడల్పు);
+#నిర్వచించు W_వెడల్పు(curwin)   0
 }
 
-    void
-VimTextAreaView::Draw(BRect updateRect)
+    శూన్య
+Vim_పాఠ్యం_Area_View::Draw(BRect updateRect)
 {
     /*
      * XXX Other ports call here:
@@ -1238,43 +1238,43 @@ VimTextAreaView::Draw(BRect updateRect)
      *	No need to use gui.vimWindow->Lock(): we are locked already.
      *	However, it would not hurt.
      */
-    rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
-    SetLowColor(rgb);
-    FillRect(updateRect, B_SOLID_LOW);
-    gui_redraw((int) updateRect.left, (int) updateRect.top,
-	    (int) (updateRect.Width() + PEN_WIDTH), (int) (updateRect.Height() + PEN_WIDTH));
+    rgb_color rgb = GUI_గమ్యం_RGB(gui.వెనుక_pixel);
+    సమితి_దిగువ_Color(rgb);
+    FillRect(updateRect, B_SOLID_దిగువ);
+    gui_redraw((పూర్ణాంకం) updateRect.ఎడమ, (పూర్ణాంకం) updateRect.శిఖరం,
+	    (పూర్ణాంకం) (updateRect.వెడల్పు_2() + PEN_వెడల్పు), (పూర్ణాంకం) (updateRect.ఎత్తు_2() + PEN_వెడల్పు));
 
     // Clear the border areas if needed
-    SetLowColor(rgb);
+    సమితి_దిగువ_Color(rgb);
 
-    if (updateRect.left < FILL_X(0))	//  left border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.top < FILL_Y(0)) //	top border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    updateRect.right, FILL_Y(0)-PEN_WIDTH), B_SOLID_LOW);
-    if (updateRect.right >= FILL_X(Columns)) //  right border
-	FillRect(BRect(FILL_X((int)Columns), updateRect.top,
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.bottom >= FILL_Y(Rows))   //  bottom border
-	FillRect(BRect(updateRect.left, FILL_Y((int)Rows),
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
+    ఒకవేళ (updateRect.ఎడమ < FILL_X(0))	//  left border
+	FillRect(BRect(updateRect.ఎడమ, updateRect.శిఖరం,
+		    FILL_X(0)-PEN_వెడల్పు, updateRect.bottom), B_SOLID_దిగువ);
+    ఒకవేళ (updateRect.శిఖరం < FILL_Y(0)) //	top border
+	FillRect(BRect(updateRect.ఎడమ, updateRect.శిఖరం,
+		    updateRect.కుడి, FILL_Y(0)-PEN_వెడల్పు), B_SOLID_దిగువ);
+    ఒకవేళ (updateRect.కుడి >= FILL_X(Columns)) //  right border
+	FillRect(BRect(FILL_X((పూర్ణాంకం)Columns), updateRect.శిఖరం,
+		    updateRect.కుడి, updateRect.bottom), B_SOLID_దిగువ);
+    ఒకవేళ (updateRect.bottom >= FILL_Y(అడ్డువరుసలు))   //  bottom border
+	FillRect(BRect(updateRect.ఎడమ, FILL_Y((పూర్ణాంకం)అడ్డువరుసలు),
+		    updateRect.కుడి, updateRect.bottom), B_SOLID_దిగువ);
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
     DrawIMString();
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
+    శూన్య
+Vim_పాఠ్యం_Area_View::కీలకం_కిందికి(స్థిరరాశి అక్షరం *బైట్లు, int32 అంకె_బైట్లు_2)
 {
-    struct VimKeyMsg km;
+    నిర్మాణం Vim_కీలకం_సందేశం km;
     char_u *dest = km.chars;
 
-    bool canHaveVimModifiers = false;
+    తార్కిక canHaveVimModifiers = అబద్ధం;
 
-    BMessage *msg = Window()->CurrentMessage();
-    assert(msg);
+    BMessage *సందేశం = కిటికీ()->Current_సందేశం();
+    ప్రతిజ్ఞా(సందేశం);
     // msg->PrintToStream();
 
     /*
@@ -1287,32 +1287,32 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
      * TODO: I'm not quite happy with detection of special
      * keys. Perhaps I should use scan codes after all...
      */
-    if (numBytes > 1) {
+    ఒకవేళ (అంకె_బైట్లు_2 > 1) {
 	// This cannot be a special key
-	if (numBytes > KEY_MSG_BUFSIZ)
-	    numBytes = KEY_MSG_BUFSIZ;	    //	should never happen... ???
-	km.length = numBytes;
-	memcpy((char *)dest, bytes, numBytes);
-	km.csi_escape = true;
-    } else {
+	ఒకవేళ (అంకె_బైట్లు_2 > కీలకం_సందేశం_BUFSIZ)
+	    అంకె_బైట్లు_2 = కీలకం_సందేశం_BUFSIZ;	    //	should never happen... ???
+	km.నిడివి = అంకె_బైట్లు_2;
+	జ్ఞాపకం_నకలు((అక్షరం *)dest, బైట్లు, అంకె_బైట్లు_2);
+	km.csi_escape = నిజం;
+    } లేకపోతే {
 	int32 scancode = 0;
-	msg->FindInt32("key", &scancode);
+	సందేశం->కనుగొను_Int32("key", &scancode);
 
 	int32 beModifiers = 0;
-	msg->FindInt32("modifiers", &beModifiers);
+	సందేశం->కనుగొను_Int32("modifiers", &beModifiers);
 
 	char_u string[3];
-	int len = 0;
-	km.length = 0;
+	పూర్ణాంకం len = 0;
+	km.నిడివి = 0;
 
 	/*
 	 * For normal, printable ASCII characters, don't look them up
 	 * to check if they might be a special key. They aren't.
 	 */
-	assert(B_BACKSPACE <= 0x20);
-	assert(B_DELETE == 0x7F);
-	if (((char_u)bytes[0] <= 0x20 || (char_u)bytes[0] == 0x7F) &&
-		numBytes == 1) {
+	ప్రతిజ్ఞా(B_BACKSPACE <= 0x20);
+	ప్రతిజ్ఞా(B_DELETE == 0x7F);
+	ఒకవేళ (((char_u)బైట్లు[0] <= 0x20 || (char_u)బైట్లు[0] == 0x7F) &&
+		అంకె_బైట్లు_2 == 1) {
 	    /*
 	     * Due to the great nature of Be's mapping of special keys,
 	     * viz. into the range of the control characters,
@@ -1320,10 +1320,10 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	     * if it is special without using ctrl. So, only if ctrl is
 	     * used, we need to check it unmodified.
 	     */
-	    if (beModifiers & B_CONTROL_KEY) {
-		int index = keyMap->normal_map[scancode];
-		int newNumBytes = keyMapChars[index];
-		char_u *newBytes = (char_u *)&keyMapChars[index + 1];
+	    ఒకవేళ (beModifiers & B_CONTROL_కీలకం) {
+		పూర్ణాంకం సూచీ = కీలకం_Map->సాధారణ_map[scancode];
+		పూర్ణాంకం new_అంకె_బైట్లు = కీలకం_Map_Chars[సూచీ];
+		char_u *new_బైట్లు = (char_u *)&కీలకం_Map_Chars[సూచీ + 1];
 
 		/*
 		 * Check if still special without the control key.
@@ -1331,69 +1331,69 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 		 * different values with modifiers (DEL).
 		 * Otherwise we could simply have checked for equality.
 		 */
-		if (newNumBytes != 1 || (*newBytes > 0x20 &&
-			    *newBytes != 0x7F )) {
-		    goto notspecial;
+		ఒకవేళ (new_అంకె_బైట్లు != 1 || (*new_బైట్లు > 0x20 &&
+			    *new_బైట్లు != 0x7F )) {
+		    వెళ్ళు notspecial;
 		}
-		bytes = (char *)newBytes;
+		బైట్లు = (అక్షరం *)new_బైట్లు;
 	    }
-	    canHaveVimModifiers = true;
+	    canHaveVimModifiers = నిజం;
 
 	    uint16 beoskey;
-	    int first, last;
+	    పూర్ణాంకం మొదటి, చివరి;
 
 	    /*
 	     * If numBytes == 0 that probably always indicates a special key.
 	     * (does not happen yet)
 	     */
-	    if (numBytes == 0 || bytes[0] == B_FUNCTION_KEY) {
+	    ఒకవేళ (అంకె_బైట్లు_2 == 0 || బైట్లు[0] == B_FUNCTION_కీలకం) {
 		beoskey = F(scancode);
-		first = FIRST_FUNCTION_KEY;
-		last = NUM_SPECIAL_KEYS;
-	    } else if (*bytes == '\n' && scancode == 0x47) {
+		మొదటి = మొదటి_FUNCTION_కీలకం;
+		చివరి = అంకె_SPECIAL_కీలకాలు;
+	    } లేకపోతే ఒకవేళ (*బైట్లు == '\n' && scancode == 0x47) {
 		// remap the (non-keypad) ENTER key from \n to \r.
 		string[0] = '\r';
 		len = 1;
-		first = last = 0;
-	    } else {
-		beoskey = K(bytes[0]);
-		first = 0;
-		last = FIRST_FUNCTION_KEY;
+		మొదటి = చివరి = 0;
+	    } లేకపోతే {
+		beoskey = K(బైట్లు[0]);
+		మొదటి = 0;
+		చివరి = మొదటి_FUNCTION_కీలకం;
 	    }
 
-	    for (int i = first; i < last; i++) {
-		if (special_keys[i].BeKeys == beoskey) {
+	    కొరకు (పూర్ణాంకం i = మొదటి; i < చివరి; i++) {
+		ఒకవేళ (special_కీలకాలు[i].Be_కీలకాలు == beoskey) {
 		    string[0] = CSI;
-		    string[1] = special_keys[i].vim_code0;
-		    string[2] = special_keys[i].vim_code1;
+		    string[1] = special_కీలకాలు[i].vim_code0;
+		    string[2] = special_కీలకాలు[i].vim_code1;
 		    len = 3;
 		}
 	    }
 	}
 notspecial:
-	if (len == 0) {
-	    string[0] = bytes[0];
+	ఒకవేళ (len == 0) {
+	    string[0] = బైట్లు[0];
 	    len = 1;
 	}
 
 	// Special keys (and a few others) may have modifiers
-#if 0
-	if (len == 3 ||
-		bytes[0] == B_SPACE || bytes[0] == B_TAB ||
-		bytes[0] == B_RETURN || bytes[0] == '\r' ||
-		bytes[0] == B_ESCAPE)
-#else
-	    if (canHaveVimModifiers)
-#endif
+#ఒకవేళ 0
+	ఒకవేళ (len == 3 ||
+		బైట్లు[0] == B_SPACE || బైట్లు[0] == B_TAB ||
+		బైట్లు[0] == B_RETURN || బైట్లు[0] == '\r' ||
+		బైట్లు[0] == B_ESCAPE)
+#లేకపోతే
+	    ఒకవేళ (canHaveVimModifiers)
+#అయితే_ముగింపు
 	    {
-		int modifiers;
+		పూర్ణాంకం modifiers;
 		modifiers = 0;
-		if (beModifiers & B_SHIFT_KEY)
-		    modifiers |= MOD_MASK_SHIFT;
-		if (beModifiers & B_CONTROL_KEY)
-		    modifiers |= MOD_MASK_CTRL;
-		if (beModifiers & B_OPTION_KEY)
-		    modifiers |= MOD_MASK_ALT;
+		ఒకవేళ (beModifiers & B_జరుపు_కీలకం)
+		    modifiers |= MOD_ముసుగు_జరుపు;
+		ఒకవేళ (beModifiers & B_CONTROL_కీలకం)
+		    modifiers |= MOD_ముసుగు_CTRL;
+		ఒకవేళ (beModifiers & B_OPTION_కీలకం)
+		    modifiers |= MOD_ముసుగు_ALT;
 
 		/*
 		 * For some keys a shift modifier is translated into another key
@@ -1401,58 +1401,58 @@ notspecial:
 		 * string[0] != CSI? (Not for BeOS, since len == 3 implies
 		 * string[0] == CSI...)
 		 */
-		int key;
-		if (string[0] == CSI && len == 3)
-		    key = TO_SPECIAL(string[1], string[2]);
-		else
-		    key = string[0];
-		key = simplify_key(key, &modifiers);
-		if (IS_SPECIAL(key))
+		పూర్ణాంకం కీలకం;
+		ఒకవేళ (string[0] == CSI && len == 3)
+		    కీలకం = గమ్యం_SPECIAL(string[1], string[2]);
+		లేకపోతే
+		    కీలకం = string[0];
+		కీలకం = simplify_కీలకం(కీలకం, &modifiers);
+		ఒకవేళ (IS_SPECIAL(కీలకం))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
+		    string[1] = K_రెండవ(కీలకం);
+		    string[2] = K_మూడవ(కీలకం);
 		    len = 3;
 		}
-		else
+		లేకపోతే
 		{
-		    string[0] = key;
+		    string[0] = కీలకం;
 		    len = 1;
 		}
 
-		if (modifiers)
+		ఒకవేళ (modifiers)
 		{
 		    *dest++ = CSI;
 		    *dest++ = KS_MODIFIER;
 		    *dest++ = modifiers;
-		    km.length = 3;
+		    km.నిడివి = 3;
 		}
 	    }
-	memcpy((char *)dest, string, len);
-	km.length += len;
-	km.csi_escape = false;
+	జ్ఞాపకం_నకలు((అక్షరం *)dest, string, len);
+	km.నిడివి += len;
+	km.csi_escape = అబద్ధం;
     }
 
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::కీలకం_2, &km, పరిమాణం(km));
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh && !gui.pointer_hidden)
+    ఒకవేళ (p_mh && !gui.సూచిక_hidden)
     {
-	guiBlankMouse(true);
-	gui.pointer_hidden = TRUE;
+	guiBlankMouse(నిజం);
+	gui.సూచిక_hidden = TRUE;
     }
 }
-void
-VimTextAreaView::guiSendMouseEvent(
-	int	button,
-	int	x,
-	int	y,
-	int	repeated_click,
+శూన్య
+Vim_పాఠ్యం_Area_View::guiSendMouseEvent(
+	పూర్ణాంకం	button,
+	పూర్ణాంకం	x,
+	పూర్ణాంకం	y,
+	పూర్ణాంకం	repeated_click,
 	int_u	modifiers)
 {
-    VimMouseMsg mm;
+    Vim_Mouse_సందేశం mm;
 
     mm.button = button;
     mm.x = x;
@@ -1460,42 +1460,42 @@ VimTextAreaView::guiSendMouseEvent(
     mm.repeated_click = repeated_click;
     mm.modifiers = modifiers;
 
-    write_port(gui.vdcmp, VimMsg::Mouse, &mm, sizeof(mm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::Mouse, &mm, పరిమాణం(mm));
     //	calls gui_send_mouse_event()
 
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    ఒకవేళ (gui.సూచిక_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(అబద్ధం);
+	gui.సూచిక_hidden = FALSE;
     }
 }
 
-void
-VimTextAreaView::guiMouseMoved(
-	int	x,
-	int	y)
+శూన్య
+Vim_పాఠ్యం_Area_View::guiMouseMoved(
+	పూర్ణాంకం	x,
+	పూర్ణాంకం	y)
 {
-    VimMouseMovedMsg mm;
+    Vim_Mouse_Moved_సందేశం mm;
 
     mm.x = x;
     mm.y = y;
 
-    write_port(gui.vdcmp, VimMsg::MouseMoved, &mm, sizeof(mm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::MouseMoved, &mm, పరిమాణం(mm));
 
-    if (gui.pointer_hidden)
+    ఒకవేళ (gui.సూచిక_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(అబద్ధం);
+	gui.సూచిక_hidden = FALSE;
     }
 }
 
-    void
-VimTextAreaView::guiBlankMouse(bool should_hide)
+    శూన్య
+Vim_పాఠ్యం_Area_View::guiBlankMouse(తార్కిక should_hide)
 {
-    if (should_hide) {
+    ఒకవేళ (should_hide) {
 	// gui.vimApp->HideCursor();
 	gui.vimApp->ObscureCursor();
 	/*
@@ -1503,227 +1503,227 @@ VimTextAreaView::guiBlankMouse(bool should_hide)
 	 * Vim's idea of mouse visibility does not necessarily
 	 * correspond to reality.
 	 */
-    } else {
+    } లేకపోతే {
 	// gui.vimApp->ShowCursor();
     }
 }
 
     int_u
-VimTextAreaView::mouseModifiersToVim(int32 beModifiers)
+Vim_పాఠ్యం_Area_View::mouse_Modifiers_గమ్యం_Vim(int32 beModifiers)
 {
     int_u vim_modifiers = 0x0;
 
-    if (beModifiers & B_SHIFT_KEY)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (beModifiers & B_CONTROL_KEY)
+    ఒకవేళ (beModifiers & B_జరుపు_కీలకం)
+	vim_modifiers |= MOUSE_జరుపు;
+    ఒకవేళ (beModifiers & B_CONTROL_కీలకం)
 	vim_modifiers |= MOUSE_CTRL;
-    if (beModifiers & B_OPTION_KEY)	// Alt or Meta key
+    ఒకవేళ (beModifiers & B_OPTION_కీలకం)	// Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
-    return vim_modifiers;
+    తిరిగి vim_modifiers;
 }
 
-    void
-VimTextAreaView::MouseDown(BPoint point)
+    శూన్య
+Vim_పాఠ్యం_Area_View::Mouse_కిందికి(BPoint బిందువు)
 {
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = కిటికీ()->Current_సందేశం();
+    ప్రతిజ్ఞా(m);
 
     int32 buttons = 0;
-    m->FindInt32("buttons", &buttons);
+    m->కనుగొను_Int32("buttons", &buttons);
 
-    int vimButton;
+    పూర్ణాంకం vimButton;
 
-    if (buttons & B_PRIMARY_MOUSE_BUTTON)
-	vimButton = MOUSE_LEFT;
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON)
-	vimButton = MOUSE_RIGHT;
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
-	vimButton = MOUSE_MIDDLE;
-    else
-	return;		// Unknown button
+    ఒకవేళ (buttons & B_PRIMARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ఎడమ;
+    లేకపోతే ఒకవేళ (buttons & B_SECONDARY_MOUSE_BUTTON)
+	vimButton = MOUSE_కుడి;
+    లేకపోతే ఒకవేళ (buttons & B_TERTIARY_MOUSE_BUTTON)
+	vimButton = MOUSE_మధ్య;
+    లేకపోతే
+	తిరిగి;		// Unknown button
 
     vimMouseButton = 1;	    // don't care which one
 
     // Handle multiple clicks
     int32 clicks = 0;
-    m->FindInt32("clicks", &clicks);
+    m->కనుగొను_Int32("clicks", &clicks);
 
     int32 modifiers = 0;
-    m->FindInt32("modifiers", &modifiers);
+    m->కనుగొను_Int32("modifiers", &modifiers);
 
-    vimMouseModifiers = mouseModifiersToVim(modifiers);
+    vimMouseModifiers = mouse_Modifiers_గమ్యం_Vim(modifiers);
 
-    guiSendMouseEvent(vimButton, point.x, point.y,
+    guiSendMouseEvent(vimButton, బిందువు.x, బిందువు.y,
 	    clicks > 1 /* = repeated_click*/, vimMouseModifiers);
 }
 
-    void
-VimTextAreaView::MouseUp(BPoint point)
+    శూన్య
+Vim_పాఠ్యం_Area_View::Mouse_పైకి(BPoint బిందువు)
 {
     vimMouseButton = 0;
 
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = కిటికీ()->Current_సందేశం();
+    ప్రతిజ్ఞా(m);
     // m->PrintToStream();
 
     int32 modifiers = 0;
-    m->FindInt32("modifiers", &modifiers);
+    m->కనుగొను_Int32("modifiers", &modifiers);
 
-    vimMouseModifiers = mouseModifiersToVim(modifiers);
+    vimMouseModifiers = mouse_Modifiers_గమ్యం_Vim(modifiers);
 
-    guiSendMouseEvent(MOUSE_RELEASE, point.x, point.y,
+    guiSendMouseEvent(MOUSE_RELEASE, బిందువు.x, బిందువు.y,
 	    0 /* = repeated_click*/, vimMouseModifiers);
 
-    Inherited::MouseUp(point);
+    Inherited::Mouse_పైకి(బిందువు);
 }
 
-    void
-VimTextAreaView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+    శూన్య
+Vim_పాఠ్యం_Area_View::MouseMoved(BPoint బిందువు, uint32 transit, స్థిరరాశి BMessage *సందేశం_2)
 {
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    ఒకవేళ (gui.సూచిక_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(అబద్ధం);
+	gui.సూచిక_hidden = FALSE;
     }
 
-    if (!vimMouseButton) {    // could also check m->"buttons"
-	guiMouseMoved(point.x, point.y);
-	return;
+    ఒకవేళ (!vimMouseButton) {    // could also check m->"buttons"
+	guiMouseMoved(బిందువు.x, బిందువు.y);
+	తిరిగి;
     }
 
-    atomic_add(&mouseDragEventCount, 1);
+    atomic_కూడు(&mouse_Drag_Event_లెక్క, 1);
 
     // Don't care much about "transit"
-    guiSendMouseEvent(MOUSE_DRAG, point.x, point.y, 0, vimMouseModifiers);
+    guiSendMouseEvent(MOUSE_DRAG, బిందువు.x, బిందువు.y, 0, vimMouseModifiers);
 }
 
-    void
-VimTextAreaView::MessageReceived(BMessage *m)
+    శూన్య
+Vim_పాఠ్యం_Area_View::సందేశం_Received(BMessage *m)
 {
-    switch (m->what) {
-	case 'menu':
+    ఎంపిక (m->what) {
+	స్థితి 'menu':
 	    {
-		VimMenuMsg mm;
-		mm.guiMenu = NULL;  // in case no pointer in msg
-		m->FindPointer("VimMenu", (void **)&mm.guiMenu);
-		write_port(gui.vdcmp, VimMsg::Menu, &mm, sizeof(mm));
+		Vim_Menu_సందేశం mm;
+		mm.guiMenu = ఖాళీ;  // in case no pointer in msg
+		m->కనుగొను_సూచిక("VimMenu", (శూన్య **)&mm.guiMenu);
+		write_పోర్టు(gui.vdcmp, Vim_సందేశం::Menu, &mm, పరిమాణం(mm));
 	    }
-	    break;
-	case B_MOUSE_WHEEL_CHANGED:
+	    ఆపు;
+	స్థితి B_MOUSE_WHEEL_మారింది:
 	    {
 		VimScrollBar* scb = curwin->w_scrollbars[1].id;
-		float small=0, big=0, dy=0;
-		m->FindFloat("be:wheel_delta_y", &dy);
-		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy*3);
-		scb->ValueChanged(scb->Value());
-#if 0
+		దశాంశం small=0, big=0, dy=0;
+		m->కనుగొను_Float("be:wheel_delta_y", &dy);
+		scb->Get_అడుగులు(&small, &big);
+		scb->సమితి_విలువ(scb->విలువ_2()+small*dy*3);
+		scb->విలువ_మారింది_2(scb->విలువ_2());
+#ఒకవేళ 0
 		scb = curwin->w_scrollbars[0].id;
-		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy);
-		scb->ValueChanged(scb->Value());
-#endif
+		scb->Get_అడుగులు(&small, &big);
+		scb->సమితి_విలువ(scb->విలువ_2()+small*dy);
+		scb->విలువ_మారింది_2(scb->విలువ_2());
+#అయితే_ముగింపు
 	    }
-	    break;
-#ifdef FEAT_MBYTE_IME
-	case B_INPUT_METHOD_EVENT:
+	    ఆపు;
+#నిర్వచితమైతే FEAT_MBYTE_IME
+	స్థితి B_ఆదానం_పద్ధతి_EVENT:
 	    {
 		int32 opcode;
-		m->FindInt32("be:opcode", &opcode);
-		switch(opcode)
+		m->కనుగొను_Int32("be:opcode", &opcode);
+		ఎంపిక(opcode)
 		{
-		    case B_INPUT_METHOD_STARTED:
-			if (!IMData.messenger) delete IMData.messenger;
-			IMData.messenger = new BMessenger();
-			m->FindMessenger("be:reply_to", IMData.messenger);
-			break;
-		    case B_INPUT_METHOD_CHANGED:
+		    స్థితి B_ఆదానం_పద్ధతి_STARTED:
+			ఒకవేళ (!IMData.messenger) తొలగించు IMData.messenger;
+			IMData.messenger = కొత్త BMessenger();
+			m->కనుగొను_Messenger("be:reply_to", IMData.messenger);
+			ఆపు;
+		    స్థితి B_ఆదానం_పద్ధతి_మారింది:
 			{
 			    BString str;
-			    bool confirmed;
-			    if (IMData.message) *(IMData.message) = *m;
-			    else	       IMData.message = new BMessage(*m);
+			    తార్కిక confirmed;
+			    ఒకవేళ (IMData.సందేశం_2) *(IMData.సందేశం_2) = *m;
+			    లేకపోతే	       IMData.సందేశం_2 = కొత్త BMessage(*m);
 			    DrawIMString();
-			    m->FindBool("be:confirmed", &confirmed);
-			    if (confirmed)
+			    m->కనుగొను_Bool("be:confirmed", &confirmed);
+			    ఒకవేళ (confirmed)
 			    {
-				m->FindString("be:string", &str);
+				m->కనుగొను_String("be:string", &str);
 				char_u *chars = (char_u*)str.String();
-				struct VimKeyMsg km;
-				km.csi_escape = true;
-				int clen;
-				int i = 0;
-				while (i < str.Length())
+				నిర్మాణం Vim_కీలకం_సందేశం km;
+				km.csi_escape = నిజం;
+				పూర్ణాంకం clen;
+				పూర్ణాంకం i = 0;
+				అయితే (i < str.నిడివి_2())
 				{
 				    clen = utf_ptr2len(chars+i);
-				    memcpy(km.chars, chars+i, clen);
-				    km.length = clen;
-				    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+				    జ్ఞాపకం_నకలు(km.chars, chars+i, clen);
+				    km.నిడివి = clen;
+				    write_పోర్టు(gui.vdcmp, Vim_సందేశం::కీలకం_2, &km, పరిమాణం(km));
 				    i += clen;
 				}
 			    }
 			}
-			break;
-		    case B_INPUT_METHOD_LOCATION_REQUEST:
+			ఆపు;
+		    స్థితి B_ఆదానం_పద్ధతి_LOCATION_REQUEST:
 			{
-			    BMessage msg(B_INPUT_METHOD_EVENT);
-			    msg.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
-			    msg.AddPoint("be:location_reply", IMData.location);
-			    msg.AddFloat("be:height_reply", FILL_Y(1));
-			    IMData.messenger->SendMessage(&msg);
+			    BMessage సందేశం(B_ఆదానం_పద్ధతి_EVENT);
+			    సందేశం.కూడు_Int32("be:opcode", B_ఆదానం_పద్ధతి_LOCATION_REQUEST);
+			    సందేశం.కూడు_బిందువు("be:location_reply", IMData.location);
+			    సందేశం.కూడు_Float("be:height_reply", FILL_Y(1));
+			    IMData.messenger->Send_సందేశం(&సందేశం);
 			}
-			break;
-		    case B_INPUT_METHOD_STOPPED:
-			delete IMData.messenger;
-			delete IMData.message;
-			IMData.messenger = NULL;
-			IMData.message = NULL;
-			break;
+			ఆపు;
+		    స్థితి B_ఆదానం_పద్ధతి_STOPPED:
+			తొలగించు IMData.messenger;
+			తొలగించు IMData.సందేశం_2;
+			IMData.messenger = ఖాళీ;
+			IMData.సందేశం_2 = ఖాళీ;
+			ఆపు;
 		}
 	    }
 	    // TODO: sz: break here???
-#endif
-	default:
-	    if (m->WasDropped()) {
-		BWindow *w = Window();
-		w->DetachCurrentMessage();
-		w->Minimize(false);
-		VimApp::SendRefs(m, (modifiers() & B_SHIFT_KEY) != 0);
-	    } else {
-		Inherited::MessageReceived(m);
+#అయితే_ముగింపు
+	అప్రమేయ:
+	    ఒకవేళ (m->WasDropped()) {
+		BWindow *w = కిటికీ();
+		w->Detach_Current_సందేశం();
+		w->Minimize(అబద్ధం);
+		VimApp::SendRefs(m, (modifiers() & B_జరుపు_కీలకం) != 0);
+	    } లేకపోతే {
+		Inherited::సందేశం_Received(m);
 	    }
-	    break;
+	    ఆపు;
     }
 }
 
-    int
-VimTextAreaView::mchInitFont(char_u *name)
+    పూర్ణాంకం
+Vim_పాఠ్యం_Area_View::mchInitFont(char_u *name)
 {
     VimFont *newFont = (VimFont *)gui_mch_get_font(name, 1);
-    if (newFont != NOFONT) {
+    ఒకవేళ (newFont != NOFONT) {
 	gui.norm_font = (GuiFont)newFont;
-	gui_mch_set_font((GuiFont)newFont);
-	if (name && STRCMP(name, "*") != 0)
-	    hl_set_font_name(name);
+	gui_mch_సమితి_font((GuiFont)newFont);
+	ఒకవేళ (name && STRCMP(name, "*") != 0)
+	    hl_సమితి_font_name(name);
 
-	SetDrawingMode(B_OP_COPY);
+	సమితి_Drawing_బహుళకం(B_OP_COPY);
 
 	/*
 	 * Try to load other fonts for bold, italic, and bold-italic.
 	 * We should also try to work out what font to use for these when they are
 	 * not specified by X resources, but we don't yet.
 	 */
-	return OK;
+	తిరిగి OK;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
-    void
-VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
+    శూన్య
+Vim_పాఠ్యం_Area_View::mchDrawString(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, char_u *s, పూర్ణాంకం len, పూర్ణాంకం flags)
 {
     /*
      * First we must erase the area, because DrawString won't do
@@ -1732,116 +1732,116 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
      * should be set when appropriate!!!
      * (Rectangles include the bottom and right edge)
      */
-    if (!(flags & DRAW_TRANSP)) {
-	int cells;
+    ఒకవేళ (!(flags & DRAW_TRANSP)) {
+	పూర్ణాంకం cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	కొరకు (పూర్ణాంకం i=0; i<len; i++) {
+	    పూర్ణాంకం cn = utf_ptr2cells((char_u *)(s+i));
+	    ఒకవేళ (cn<4) cells += cn;
 	}
 
-	BRect r(FILL_X(col), FILL_Y(row),
-		FILL_X(col + cells) - PEN_WIDTH, FILL_Y(row + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	BRect r(FILL_X(నిలువు), FILL_Y(అడ్డువరుస),
+		FILL_X(నిలువు + cells) - PEN_వెడల్పు, FILL_Y(అడ్డువరుస + 1) - PEN_వెడల్పు);
+	FillRect(r, B_SOLID_దిగువ);
     }
 
     BFont font;
-    this->GetFont(&font);
-    if (!font.IsFixed())
+    ఇది->GetFont(&font);
+    ఒకవేళ (!font.IsFixed())
     {
-	char* p = (char*)s;
+	అక్షరం* p = (అక్షరం*)s;
 	int32 clen, lastpos = 0;
 	BPoint where;
-	int cells;
-	while ((p - (char*)s) < len) {
+	పూర్ణాంకం cells;
+	అయితే ((p - (అక్షరం*)s) < len) {
 	    clen = utf_ptr2len((u_char*)p);
-	    where.Set(TEXT_X(col+lastpos), TEXT_Y(row));
+	    where.సమితి(పాఠ్యం_X(నిలువు+lastpos), పాఠ్యం_Y(అడ్డువరుస));
 	    DrawString(p, clen, where);
-	    if (flags & DRAW_BOLD) {
+	    ఒకవేళ (flags & DRAW_BOLD) {
 		where.x += 1.0;
-		SetDrawingMode(B_OP_BLEND);
+		సమితి_Drawing_బహుళకం(B_OP_BLEND);
 		DrawString(p, clen, where);
-		SetDrawingMode(B_OP_COPY);
+		సమితి_Drawing_బహుళకం(B_OP_COPY);
 	    }
 	    cells = utf_ptr2cells((char_u *)p);
-	    if (cells<4) lastpos += cells;
-	    else	lastpos++;
+	    ఒకవేళ (cells<4) lastpos += cells;
+	    లేకపోతే	lastpos++;
 	    p += clen;
 	}
     }
-    else
+    లేకపోతే
     {
-	BPoint where(TEXT_X(col), TEXT_Y(row));
-	DrawString((char*)s, len, where);
-	if (flags & DRAW_BOLD) {
+	BPoint where(పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస));
+	DrawString((అక్షరం*)s, len, where);
+	ఒకవేళ (flags & DRAW_BOLD) {
 	    where.x += 1.0;
-	    SetDrawingMode(B_OP_BLEND);
-	    DrawString((char*)s, len, where);
-	    SetDrawingMode(B_OP_COPY);
+	    సమితి_Drawing_బహుళకం(B_OP_BLEND);
+	    DrawString((అక్షరం*)s, len, where);
+	    సమితి_Drawing_బహుళకం(B_OP_COPY);
 	}
     }
 
-    if (flags & DRAW_UNDERL) {
-	int cells;
+    ఒకవేళ (flags & DRAW_UNDERL) {
+	పూర్ణాంకం cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	కొరకు (పూర్ణాంకం i=0; i<len; i++) {
+	    పూర్ణాంకం cn = utf_ptr2cells((char_u *)(s+i));
+	    ఒకవేళ (cn<4) cells += cn;
 	}
 
-	BPoint start(FILL_X(col), FILL_Y(row + 1) - PEN_WIDTH);
-	BPoint end(FILL_X(col + cells) - PEN_WIDTH, start.y);
+	BPoint ప్రారంభం(FILL_X(నిలువు), FILL_Y(అడ్డువరుస + 1) - PEN_వెడల్పు);
+	BPoint చివర(FILL_X(నిలువు + cells) - PEN_వెడల్పు, ప్రారంభం.y);
 
-	StrokeLine(start, end);
+	Stroke_పంక్తి(ప్రారంభం, చివర);
     }
 }
 
-void
-VimTextAreaView::mchClearBlock(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+శూన్య
+Vim_పాఠ్యం_Area_View::mch_Clear_ఖండం(
+	పూర్ణాంకం	row1,
+	పూర్ణాంకం	col1,
+	పూర్ణాంకం	row2,
+	పూర్ణాంకం	col2)
 {
     BRect r(FILL_X(col1), FILL_Y(row1),
-	    FILL_X(col2 + 1) - PEN_WIDTH, FILL_Y(row2 + 1) - PEN_WIDTH);
-    gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(r, B_SOLID_LOW);
+	    FILL_X(col2 + 1) - PEN_వెడల్పు, FILL_Y(row2 + 1) - PEN_వెడల్పు);
+    gui_mch_సమితి_bg_color(gui.వెనుక_pixel);
+    FillRect(r, B_SOLID_దిగువ);
 }
 
-    void
-VimTextAreaView::mchClearAll()
+    శూన్య
+Vim_పాఠ్యం_Area_View::mchClearAll()
 {
-    gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(Bounds(), B_SOLID_LOW);
+    gui_mch_సమితి_bg_color(gui.వెనుక_pixel);
+    FillRect(Bounds(), B_SOLID_దిగువ);
 }
 
 /*
  * mchDeleteLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchDeleteLines(int row, int num_lines)
+    శూన్య
+Vim_పాఠ్యం_Area_View::mch_Delete_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు)
 {
-    BRect source, dest;
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row + num_lines);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
+    BRect ఆధారం, dest;
+    ఆధారం.ఎడమ = FILL_X(gui.scroll_region_ఎడమ);
+    ఆధారం.శిఖరం = FILL_Y(అడ్డువరుస + అంకె_పంక్తులు);
+    ఆధారం.కుడి = FILL_X(gui.scroll_region_కుడి + 1) - PEN_వెడల్పు;
+    ఆధారం.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_వెడల్పు;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    dest.ఎడమ = FILL_X(gui.scroll_region_ఎడమ);
+    dest.శిఖరం = FILL_Y(అడ్డువరుస);
+    dest.కుడి = FILL_X(gui.scroll_region_కుడి + 1) - PEN_వెడల్పు;
+    dest.bottom = FILL_Y(gui.scroll_region_bot - అంకె_పంక్తులు + 1) - PEN_వెడల్పు;
 
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	// Clear one column more for when bold has spilled over
-	CopyBits(source, dest);
-	gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-		gui.scroll_region_left,
-		gui.scroll_region_bot, gui.scroll_region_right);
+	Copy_బిట్లు(ఆధారం, dest);
+	gui_clear_ఖండం(gui.scroll_region_bot - అంకె_పంక్తులు + 1,
+		gui.scroll_region_ఎడమ,
+		gui.scroll_region_bot, gui.scroll_region_కుడి);
 
 
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
 	/*
 	 * The Draw() callback will be called now if some of the source
 	 * bits were not in the visible region.
@@ -1854,30 +1854,30 @@ VimTextAreaView::mchDeleteLines(int row, int num_lines)
 /*
  * mchInsertLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchInsertLines(int row, int num_lines)
+    శూన్య
+Vim_పాఠ్యం_Area_View::mch_చొప్పించు_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు)
 {
-    BRect source, dest;
+    BRect ఆధారం, dest;
 
     // XXX Attempt at a hack:
-    gui.vimWindow->UpdateIfNeeded();
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    gui.vim_కిటికీ->UpdateIfNeeded();
+    ఆధారం.ఎడమ = FILL_X(gui.scroll_region_ఎడమ);
+    ఆధారం.శిఖరం = FILL_Y(అడ్డువరుస);
+    ఆధారం.కుడి = FILL_X(gui.scroll_region_కుడి + 1) - PEN_వెడల్పు;
+    ఆధారం.bottom = FILL_Y(gui.scroll_region_bot - అంకె_పంక్తులు + 1) - PEN_వెడల్పు;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row + num_lines);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
+    dest.ఎడమ = FILL_X(gui.scroll_region_ఎడమ);
+    dest.శిఖరం = FILL_Y(అడ్డువరుస + అంకె_పంక్తులు);
+    dest.కుడి = FILL_X(gui.scroll_region_కుడి + 1) - PEN_వెడల్పు;
+    dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_వెడల్పు;
 
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	// Clear one column more for when bold has spilled over
-	CopyBits(source, dest);
-	gui_clear_block(row, gui.scroll_region_left,
-		row + num_lines - 1, gui.scroll_region_right);
+	Copy_బిట్లు(ఆధారం, dest);
+	gui_clear_ఖండం(అడ్డువరుస, gui.scroll_region_ఎడమ,
+		అడ్డువరుస + అంకె_పంక్తులు - 1, gui.scroll_region_కుడి);
 
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
 	/*
 	 * The Draw() callback will be called now if some of the source
 	 * bits were not in the visible region.
@@ -1893,75 +1893,75 @@ VimTextAreaView::mchInsertLines(int row, int num_lines)
     }
 }
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 /*
  * DrawIMString draws string with IMData.message.
  */
-void VimTextAreaView::DrawIMString(void)
+శూన్య Vim_పాఠ్యం_Area_View::DrawIMString(శూన్య)
 {
-    static const rgb_color r_highlight = {255, 152, 152, 255},
+    స్థిర స్థిరరాశి rgb_color r_highlight = {255, 152, 152, 255},
 		 b_highlight = {152, 203, 255, 255};
     BString str;
-    const char* s;
-    int len;
-    BMessage* msg = IMData.message;
-    if (!msg)
-	return;
-    gui_redraw_block(IMData.row, 0,
-	    IMData.row + IMData.count, W_WIDTH(curwin), GUI_MON_NOCLEAR);
-    bool confirmed = false;
-    msg->FindBool("be:confirmed", &confirmed);
-    if (confirmed)
-	return;
-    rgb_color hcolor = HighColor(), lcolor = LowColor();
-    msg->FindString("be:string", &str);
+    స్థిరరాశి అక్షరం* s;
+    పూర్ణాంకం len;
+    BMessage* సందేశం = IMData.సందేశం_2;
+    ఒకవేళ (!సందేశం)
+	తిరిగి;
+    gui_redraw_ఖండం(IMData.అడ్డువరుస, 0,
+	    IMData.అడ్డువరుస + IMData.లెక్క, W_వెడల్పు(curwin), GUI_MON_NOCLEAR);
+    తార్కిక confirmed = అబద్ధం;
+    సందేశం->కనుగొను_Bool("be:confirmed", &confirmed);
+    ఒకవేళ (confirmed)
+	తిరిగి;
+    rgb_color hcolor = ఎగువ_Color(), lcolor = దిగువ_Color();
+    సందేశం->కనుగొను_String("be:string", &str);
     s = str.String();
-    len = str.Length();
-    SetHighColor(0, 0, 0);
-    IMData.row = gui.row;
-    IMData.col = gui.col;
-    int32 sel_start = 0, sel_end = 0;
-    msg->FindInt32("be:selection", 0, &sel_start);
-    msg->FindInt32("be:selection", 1, &sel_end);
-    int clen, cn;
-    BPoint pos(IMData.col, 0);
+    len = str.నిడివి_2();
+    సమితి_ఎగువ_Color(0, 0, 0);
+    IMData.అడ్డువరుస = gui.అడ్డువరుస;
+    IMData.నిలువు = gui.నిలువు;
+    int32 sel_ప్రారంభం = 0, sel_చివర = 0;
+    సందేశం->కనుగొను_Int32("be:selection", 0, &sel_ప్రారంభం);
+    సందేశం->కనుగొను_Int32("be:selection", 1, &sel_చివర);
+    పూర్ణాంకం clen, cn;
+    BPoint pos(IMData.నిలువు, 0);
     BRect r;
     BPoint where;
-    IMData.location = ConvertToScreen(
-	    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
-    for (int i=0; i<len; i+=clen)
+    IMData.location = Convert_గమ్యం_Screen(
+	    BPoint(FILL_X(pos.x), FILL_Y(IMData.అడ్డువరుస + pos.y)));
+    కొరకు (పూర్ణాంకం i=0; i<len; i+=clen)
     {
 	cn = utf_ptr2cells((char_u *)(s+i));
 	clen = utf_ptr2len((char_u *)(s+i));
-	if (pos.x + cn > W_WIDTH(curwin))
+	ఒకవేళ (pos.x + cn > W_వెడల్పు(curwin))
 	{
 	    pos.y++;
 	    pos.x = 0;
 	}
-	if (sel_start<=i && i<sel_end)
+	ఒకవేళ (sel_ప్రారంభం<=i && i<sel_చివర)
 	{
-	    SetLowColor(r_highlight);
-	    IMData.location = ConvertToScreen(
-		    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
+	    సమితి_దిగువ_Color(r_highlight);
+	    IMData.location = Convert_గమ్యం_Screen(
+		    BPoint(FILL_X(pos.x), FILL_Y(IMData.అడ్డువరుస + pos.y)));
 	}
-	else
+	లేకపోతే
 	{
-	    SetLowColor(b_highlight);
+	    సమితి_దిగువ_Color(b_highlight);
 	}
-	r.Set(FILL_X(pos.x), FILL_Y(IMData.row + pos.y),
-		FILL_X(pos.x + cn) - PEN_WIDTH,
-		FILL_Y(IMData.row + pos.y + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
-	where.Set(TEXT_X(pos.x), TEXT_Y(IMData.row + pos.y));
+	r.సమితి(FILL_X(pos.x), FILL_Y(IMData.అడ్డువరుస + pos.y),
+		FILL_X(pos.x + cn) - PEN_వెడల్పు,
+		FILL_Y(IMData.అడ్డువరుస + pos.y + 1) - PEN_వెడల్పు);
+	FillRect(r, B_SOLID_దిగువ);
+	where.సమితి(పాఠ్యం_X(pos.x), పాఠ్యం_Y(IMData.అడ్డువరుస + pos.y));
 	DrawString((s+i), clen, where);
 	pos.x += cn;
     }
-    IMData.count = (int)pos.y;
+    IMData.లెక్క = (పూర్ణాంకం)pos.y;
 
-    SetHighColor(hcolor);
-    SetLowColor(lcolor);
+    సమితి_ఎగువ_Color(hcolor);
+    సమితి_దిగువ_Color(lcolor);
 }
-#endif
+#అయితే_ముగింపు
 // ---------------- VimScrollBar ----------------
 
 /*
@@ -1975,27 +1975,27 @@ void VimTextAreaView::DrawIMString(void)
 VimScrollBar::VimScrollBar(scrollbar_T *g, orientation posture):
     BScrollBar(posture == B_HORIZONTAL ?  BRect(-100,-100,-10,-90) :
 	    BRect(-100,-100,-90,-10),
-	    "vim scrollbar", (BView *)NULL,
+	    "vim scrollbar", (BView *)ఖాళీ,
 	    0.0, 10.0, posture),
-    ignoreValue(-1),
-    scrollEventCount(0)
+    ignore_విలువ(-1),
+    scroll_Event_లెక్క(0)
 {
     gsb = g;
-    SetResizingMode(B_FOLLOW_NONE);
+    సమితి_Resizing_బహుళకం(B_FOLLOW_NONE);
 }
 
 VimScrollBar::~VimScrollBar()
 {
 }
 
-    void
-VimScrollBar::ValueChanged(float newValue)
+    శూన్య
+VimScrollBar::విలువ_మారింది_2(దశాంశం new_విలువ)
 {
-    if (ignoreValue >= 0.0 && newValue == ignoreValue) {
-	ignoreValue = -1;
-	return;
+    ఒకవేళ (ignore_విలువ >= 0.0 && new_విలువ == ignore_విలువ) {
+	ignore_విలువ = -1;
+	తిరిగి;
     }
-    ignoreValue = -1;
+    ignore_విలువ = -1;
     /*
      * We want to throttle the amount of scroll messages generated.
      * Normally I presume you won't get a new message before we've
@@ -2004,15 +2004,15 @@ VimScrollBar::ValueChanged(float newValue)
      * scroll events there are (or will be) in the VDCMP, and the
      * throttling happens at the receiving end.
      */
-    atomic_add(&scrollEventCount, 1);
+    atomic_కూడు(&scroll_Event_లెక్క, 1);
 
-    struct VimScrollBarMsg sm;
+    నిర్మాణం Vim_Scroll_Bar_సందేశం sm;
 
-    sm.sb = this;
-    sm.value = (long) newValue;
+    sm.sb = ఇది;
+    sm.విలువ = (దీర్ఘ) new_విలువ;
     sm.stillDragging = TRUE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::ScrollBar, &sm, పరిమాణం(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, TRUE);
 }
@@ -2024,35 +2024,35 @@ VimScrollBar::ValueChanged(float newValue)
  * is outside... This has some funny effects... XXX
  * So we do special processing when the window de/activates.
  */
-    void
-VimScrollBar::MouseUp(BPoint where)
+    శూన్య
+VimScrollBar::Mouse_పైకి(BPoint where)
 {
     // BMessage *m = Window()->CurrentMessage();
     // m->PrintToStream();
 
-    atomic_add(&scrollEventCount, 1);
+    atomic_కూడు(&scroll_Event_లెక్క, 1);
 
-    struct VimScrollBarMsg sm;
+    నిర్మాణం Vim_Scroll_Bar_సందేశం sm;
 
-    sm.sb = this;
-    sm.value = (long) Value();
+    sm.sb = ఇది;
+    sm.విలువ = (దీర్ఘ) విలువ_2();
     sm.stillDragging = FALSE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::ScrollBar, &sm, పరిమాణం(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, FALSE);
 
-    Inherited::MouseUp(where);
+    Inherited::Mouse_పైకి(where);
 }
 
-    void
-VimScrollBar::SetValue(float newValue)
+    శూన్య
+VimScrollBar::సమితి_విలువ(దశాంశం new_విలువ)
 {
-    if (newValue == Value())
-	return;
+    ఒకవేళ (new_విలువ == విలువ_2())
+	తిరిగి;
 
-    ignoreValue = newValue;
-    Inherited::SetValue(newValue);
+    ignore_విలువ = new_విలువ;
+    Inherited::సమితి_విలువ(new_విలువ);
 }
 
 // ---------------- VimFont ----------------
@@ -2062,17 +2062,17 @@ VimFont::VimFont(): BFont()
     init();
 }
 
-VimFont::VimFont(const VimFont *rhs): BFont(rhs)
+VimFont::VimFont(స్థిరరాశి VimFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const BFont *rhs): BFont(rhs)
+VimFont::VimFont(స్థిరరాశి BFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const VimFont &rhs): BFont(rhs)
+VimFont::VimFont(స్థిరరాశి VimFont &rhs): BFont(rhs)
 {
     init();
 }
@@ -2081,510 +2081,510 @@ VimFont::~VimFont()
 {
 }
 
-    void
+    శూన్య
 VimFont::init()
 {
-    next = NULL;
+    తదుపరి = ఖాళీ;
     refcount = 1;
-    name = NULL;
+    name = ఖాళీ;
 }
 
 // ---------------- VimDialog ----------------
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 
-const unsigned int  kVimDialogButtonMsg = 'VMDB';
-const unsigned int  kVimDialogIconStripeWidth = 30;
-const unsigned int  kVimDialogButtonsSpacingX = 9;
-const unsigned int  kVimDialogButtonsSpacingY = 4;
-const unsigned int  kVimDialogSpacingX = 6;
-const unsigned int  kVimDialogSpacingY = 10;
-const unsigned int  kVimDialogMinimalWidth  = 310;
-const unsigned int  kVimDialogMinimalHeight = 75;
-const BRect	    kDefaultRect =
-BRect(0, 0, kVimDialogMinimalWidth, kVimDialogMinimalHeight);
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_Button_సందేశం = 'VMDB';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_Icon_Stripe_వెడల్పు = 30;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  kVimDialogButtonsSpacingX = 9;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  kVimDialogButtonsSpacingY = 4;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  kVimDialogSpacingX = 6;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  kVimDialogSpacingY = 10;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_కనీస_వెడల్పు  = 310;
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_కనీస_ఎత్తు = 75;
+స్థిరరాశి BRect	    kDefaultRect =
+BRect(0, 0, k_Vim_Dialog_కనీస_వెడల్పు, k_Vim_Dialog_కనీస_ఎత్తు);
 
-VimDialog::VimDialog(int type, const char *title, const char *message,
-	const char *buttons, int dfltbutton, const char *textfield, int ex_cmd)
-: BWindow(kDefaultRect, title, B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+VimDialog::VimDialog(పూర్ణాంకం type, స్థిరరాశి అక్షరం *title, స్థిరరాశి అక్షరం *సందేశం_2,
+	స్థిరరాశి అక్షరం *buttons, పూర్ణాంకం dfltbutton, స్థిరరాశి అక్షరం *textfield, పూర్ణాంకం ex_cmd)
+: BWindow(kDefaultRect, title, B_TITLED_కిటికీ_LOOK, B_MODAL_APP_కిటికీ_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fDialogSem(-1)
-    , fDialogValue(dfltbutton)
-    , fMessageView(NULL)
-    , fInputControl(NULL)
-    , fInputValue(textfield)
+    , f_Dialog_విలువ(dfltbutton)
+    , f_సందేశం_View(ఖాళీ)
+    , f_ఆదానం_Control(ఖాళీ)
+    , f_ఆదానం_విలువ(textfield)
 {
     //	master view
-    VimDialog::View* view = new VimDialog::View(Bounds());
-    if (view == NULL)
-	return;
+    VimDialog::View* view = కొత్త VimDialog::View(Bounds());
+    ఒకవేళ (view == ఖాళీ)
+	తిరిగి;
 
-    if (title == NULL)
-	SetTitle("Vim " VIM_VERSION_MEDIUM);
+    ఒకవేళ (title == ఖాళీ)
+	సమితి_Title("Vim " VIM_సంస్కరణ_MEDIUM);
 
-    AddChild(view);
+    కూడు_బిడ్డ(view);
 
     //	icon
     view->InitIcon(type);
 
     //	buttons
     int32 which = 1;
-    float maxButtonWidth  = 0;
-    float maxButtonHeight = 0;
-    float buttonsWidth	  = 0;
-    float buttonsHeight   = 0;
+    దశాంశం max_Button_వెడల్పు  = 0;
+    దశాంశం max_Button_ఎత్తు = 0;
+    దశాంశం buttons_వెడల్పు	  = 0;
+    దశాంశం buttons_ఎత్తు   = 0;
     BString strButtons(buttons);
     strButtons.RemoveAll("&");
-    do
+    చేయి
     {
-	int32 end = strButtons.FindFirst('\n');
-	if (end != B_ERROR)
-	    strButtons.SetByteAt(end, '\0');
+	int32 చివర = strButtons.కనుగొను_మొదటి('\n');
+	ఒకవేళ (చివర != B_ERROR)
+	    strButtons.సమితి_Byte_At(చివర, '\0');
 
 	BButton *button = _CreateButton(which++, strButtons.String());
-	view->AddChild(button);
-	fButtonsList.AddItem(button);
+	view->కూడు_బిడ్డ(button);
+	fButtonsList.కూడు_అంశం(button);
 
-	maxButtonWidth	= max_c(maxButtonWidth,  button->Bounds().Width());
-	maxButtonHeight = max_c(maxButtonHeight, button->Bounds().Height());
-	buttonsWidth   += button->Bounds().Width();
-	buttonsHeight  += button->Bounds().Height();
+	max_Button_వెడల్పు	= max_c(max_Button_వెడల్పు,  button->Bounds().వెడల్పు_2());
+	max_Button_ఎత్తు = max_c(max_Button_ఎత్తు, button->Bounds().ఎత్తు_2());
+	buttons_వెడల్పు   += button->Bounds().వెడల్పు_2();
+	buttons_ఎత్తు  += button->Bounds().ఎత్తు_2();
 
-	if (end == B_ERROR)
-	    break;
+	ఒకవేళ (చివర == B_ERROR)
+	    ఆపు;
 
-	strButtons.Remove(0, end + 1);
-    } while (true);
+	strButtons.Remove(0, చివర + 1);
+    } అయితే (నిజం);
 
-    int32 buttonsCount = fButtonsList.CountItems();
-    buttonsWidth      += kVimDialogButtonsSpacingX * (buttonsCount - 1);
-    buttonsHeight     += kVimDialogButtonsSpacingY * (buttonsCount - 1);
-    float dialogWidth  = buttonsWidth + kVimDialogIconStripeWidth +
+    int32 buttons_లెక్క = fButtonsList.లెక్క_వస్తువులు();
+    buttons_వెడల్పు      += kVimDialogButtonsSpacingX * (buttons_లెక్క - 1);
+    buttons_ఎత్తు     += kVimDialogButtonsSpacingY * (buttons_లెక్క - 1);
+    దశాంశం dialog_వెడల్పు  = buttons_వెడల్పు + k_Vim_Dialog_Icon_Stripe_వెడల్పు +
 	kVimDialogSpacingX * 2;
-    float dialogHeight = maxButtonHeight + kVimDialogSpacingY * 3;
+    దశాంశం dialog_ఎత్తు = max_Button_ఎత్తు + kVimDialogSpacingY * 3;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    bool vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL) ||
-	dialogWidth >= gui.vimWindow->Bounds().Width();
-    if (vertical) {
-	dialogWidth  -= buttonsWidth;
-	dialogWidth  += maxButtonWidth;
-	dialogHeight -= maxButtonHeight;
-	dialogHeight += buttonsHeight;
+    తార్కిక vertical = (vim_strchr(p_go, GO_VERTICAL) != ఖాళీ) ||
+	dialog_వెడల్పు >= gui.vim_కిటికీ->Bounds().వెడల్పు_2();
+    ఒకవేళ (vertical) {
+	dialog_వెడల్పు  -= buttons_వెడల్పు;
+	dialog_వెడల్పు  += max_Button_వెడల్పు;
+	dialog_ఎత్తు -= max_Button_ఎత్తు;
+	dialog_ఎత్తు += buttons_ఎత్తు;
     }
 
-    dialogWidth  = max_c(dialogWidth,  kVimDialogMinimalWidth);
+    dialog_వెడల్పు  = max_c(dialog_వెడల్పు,  k_Vim_Dialog_కనీస_వెడల్పు);
 
     //	message view
-    BRect rect(0, 0, dialogWidth, 0);
-    rect.left  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
-    rect.top   += kVimDialogSpacingY;
-    rect.right -= kVimDialogSpacingX;
-    rect.bottom = rect.top;
-    fMessageView = new BTextView(rect, "_tv_", rect.OffsetByCopy(B_ORIGIN),
-	    B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+    BRect rect(0, 0, dialog_వెడల్పు, 0);
+    rect.ఎడమ  += k_Vim_Dialog_Icon_Stripe_వెడల్పు + 16 + kVimDialogSpacingX;
+    rect.శిఖరం   += kVimDialogSpacingY;
+    rect.కుడి -= kVimDialogSpacingX;
+    rect.bottom = rect.శిఖరం;
+    f_సందేశం_View = కొత్త BTextView(rect, "_tv_", rect.స్థానభ్రంశం_By_Copy(B_ORIGIN),
+	    B_FOLLOW_ఎడమ | B_FOLLOW_శిఖరం, B_WILL_DRAW);
 
-    fMessageView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-    rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-    fMessageView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
-    fMessageView->SetText(message);
-    fMessageView->MakeEditable(false);
-    fMessageView->MakeSelectable(false);
-    fMessageView->SetWordWrap(true);
-    AddChild(fMessageView);
+    f_సందేశం_View->సమితి_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
+    rgb_color పాఠ్యం_Color = ui_color(B_PANEL_పాఠ్యం_COLOR);
+    f_సందేశం_View->సమితి_Font_And_Color(be_plain_font, B_FONT_ALL, &పాఠ్యం_Color);
+    f_సందేశం_View->సమితి_పాఠ్యం(సందేశం_2);
+    f_సందేశం_View->MakeEditable(అబద్ధం);
+    f_సందేశం_View->MakeSelectable(అబద్ధం);
+    f_సందేశం_View->సమితి_మాట_Wrap(నిజం);
+    కూడు_బిడ్డ(f_సందేశం_View);
 
-    float messageHeight = fMessageView->TextHeight(0, fMessageView->CountLines());
-    fMessageView->ResizeBy(0, messageHeight);
-    fMessageView->SetTextRect(BRect(0, 0, rect.Width(), messageHeight));
+    దశాంశం సందేశం_ఎత్తు = f_సందేశం_View->పాఠ్యం_ఎత్తు(0, f_సందేశం_View->లెక్క_పంక్తులు());
+    f_సందేశం_View->ResizeBy(0, సందేశం_ఎత్తు);
+    f_సందేశం_View->సమితి_పాఠ్యం_Rect(BRect(0, 0, rect.వెడల్పు_2(), సందేశం_ఎత్తు));
 
-    dialogHeight += messageHeight;
+    dialog_ఎత్తు += సందేశం_ఎత్తు;
 
     //	input view
-    if (fInputValue != NULL) {
-	rect.top     =
-	    rect.bottom += messageHeight + kVimDialogSpacingY;
-	fInputControl = new BTextControl(rect, "_iv_", NULL, fInputValue, NULL,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
-	fInputControl->TextView()->SetText(fInputValue);
-	fInputControl->TextView()->SetWordWrap(false);
-	AddChild(fInputControl);
+    ఒకవేళ (f_ఆదానం_విలువ != ఖాళీ) {
+	rect.శిఖరం     =
+	    rect.bottom += సందేశం_ఎత్తు + kVimDialogSpacingY;
+	f_ఆదానం_Control = కొత్త BTextControl(rect, "_iv_", ఖాళీ, f_ఆదానం_విలువ, ఖాళీ,
+		B_FOLLOW_ఎడమ | B_FOLLOW_శిఖరం, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
+	f_ఆదానం_Control->పాఠ్యం_View()->సమితి_పాఠ్యం(f_ఆదానం_విలువ);
+	f_ఆదానం_Control->పాఠ్యం_View()->సమితి_మాట_Wrap(అబద్ధం);
+	కూడు_బిడ్డ(f_ఆదానం_Control);
 
-	float width = 0.f, height = 0.f;
-	fInputControl->GetPreferredSize(&width, &height);
-	fInputControl->MakeFocus(true);
+	దశాంశం వెడల్పు = 0.f, ఎత్తు = 0.f;
+	f_ఆదానం_Control->Get_Preferred_కొలత(&వెడల్పు, &ఎత్తు);
+	f_ఆదానం_Control->MakeFocus(నిజం);
 
-	dialogHeight += height + kVimDialogSpacingY * 1.5;
+	dialog_ఎత్తు += ఎత్తు + kVimDialogSpacingY * 1.5;
     }
 
-    dialogHeight = max_c(dialogHeight, kVimDialogMinimalHeight);
+    dialog_ఎత్తు = max_c(dialog_ఎత్తు, k_Vim_Dialog_కనీస_ఎత్తు);
 
-    ResizeTo(dialogWidth, dialogHeight);
-    MoveTo((gui.vimWindow->Bounds().Width() - dialogWidth) / 2,
-	    (gui.vimWindow->Bounds().Height() - dialogHeight) / 2);
+    Resize_గమ్యం(dialog_వెడల్పు, dialog_ఎత్తు);
+    Move_గమ్యం((gui.vim_కిటికీ->Bounds().వెడల్పు_2() - dialog_వెడల్పు) / 2,
+	    (gui.vim_కిటికీ->Bounds().ఎత్తు_2() - dialog_ఎత్తు) / 2);
 
     //	adjust layout of buttons
-    float buttonWidth = max_c(maxButtonWidth, rect.Width() * 0.66);
-    BPoint origin(dialogWidth, dialogHeight);
-    origin.x -= kVimDialogSpacingX + (vertical ? buttonWidth : buttonsWidth);
-    origin.y -= kVimDialogSpacingY + (vertical ? buttonsHeight	: maxButtonHeight);
+    దశాంశం button_వెడల్పు = max_c(max_Button_వెడల్పు, rect.వెడల్పు_2() * 0.66);
+    BPoint origin(dialog_వెడల్పు, dialog_ఎత్తు);
+    origin.x -= kVimDialogSpacingX + (vertical ? button_వెడల్పు : buttons_వెడల్పు);
+    origin.y -= kVimDialogSpacingY + (vertical ? buttons_ఎత్తు	: max_Button_ఎత్తు);
 
-    for (int32 i = 0 ; i < buttonsCount; i++) {
-	BButton *button = (BButton*)fButtonsList.ItemAt(i);
-	button->MoveTo(origin);
-	if (vertical) {
-	    origin.y += button->Frame().Height() + kVimDialogButtonsSpacingY;
-	    button->ResizeTo(buttonWidth, button->Frame().Height());
-	} else
-	    origin.x += button->Frame().Width() + kVimDialogButtonsSpacingX;
+    కొరకు (int32 i = 0 ; i < buttons_లెక్క; i++) {
+	BButton *button = (BButton*)fButtonsList.అంశం_At(i);
+	button->Move_గమ్యం(origin);
+	ఒకవేళ (vertical) {
+	    origin.y += button->చట్రం_2().ఎత్తు_2() + kVimDialogButtonsSpacingY;
+	    button->Resize_గమ్యం(button_వెడల్పు, button->చట్రం_2().ఎత్తు_2());
+	} లేకపోతే
+	    origin.x += button->చట్రం_2().వెడల్పు_2() + kVimDialogButtonsSpacingX;
 
-	if (dfltbutton == i + 1) {
-	    button->MakeDefault(true);
-	    button->MakeFocus(fInputControl == NULL);
+	ఒకవేళ (dfltbutton == i + 1) {
+	    button->MakeDefault(నిజం);
+	    button->MakeFocus(f_ఆదానం_Control == ఖాళీ);
 	}
     }
 }
 
 VimDialog::~VimDialog()
 {
-    if (fDialogSem > B_OK)
+    ఒకవేళ (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    int
+    పూర్ణాంకం
 VimDialog::Go()
 {
     fDialogSem = create_sem(0, "VimDialogSem");
-    if (fDialogSem < B_OK) {
+    ఒకవేళ (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	తిరిగి f_Dialog_విలువ;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    అయితే (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    int retValue = fDialogValue;
-    if (fInputValue != NULL)
-	vim_strncpy((char_u*)fInputValue, (char_u*)fInputControl->Text(), IOSIZE - 1);
+    పూర్ణాంకం ret_విలువ = f_Dialog_విలువ;
+    ఒకవేళ (f_ఆదానం_విలువ != ఖాళీ)
+	vim_strncpy((char_u*)f_ఆదానం_విలువ, (char_u*)f_ఆదానం_Control->పాఠ్యం_2(), IOSIZE - 1);
 
-    if (Lock())
+    ఒకవేళ (తాళం_2())
 	Quit();
 
-    return retValue;
+    తిరిగి ret_విలువ;
 }
 
-void VimDialog::MessageReceived(BMessage *msg)
+శూన్య VimDialog::సందేశం_Received(BMessage *సందేశం)
 {
     int32 which = 0;
-    if (msg->what != kVimDialogButtonMsg ||
-	    msg->FindInt32("which", &which) != B_OK)
-	return BWindow::MessageReceived(msg);
+    ఒకవేళ (సందేశం->what != k_Vim_Dialog_Button_సందేశం ||
+	    సందేశం->కనుగొను_Int32("which", &which) != B_OK)
+	తిరిగి BWindow::సందేశం_Received(సందేశం);
 
-    fDialogValue = which;
+    f_Dialog_విలువ = which;
     delete_sem(fDialogSem);
     fDialogSem = -1;
 }
 
-BButton* VimDialog::_CreateButton(int32 which, const char* label)
+BButton* VimDialog::_CreateButton(int32 which, స్థిరరాశి అక్షరం* label)
 {
-    BMessage *message = new BMessage(kVimDialogButtonMsg);
-    message->AddInt32("which", which);
+    BMessage *సందేశం_2 = కొత్త BMessage(k_Vim_Dialog_Button_సందేశం);
+    సందేశం_2->కూడు_Int32("which", which);
 
     BRect rect(0, 0, 0, 0);
     BString name;
     name << "_b" << which << "_";
 
-    BButton* button = new BButton(rect, name.String(), label, message,
-	    B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+    BButton* button = కొత్త BButton(rect, name.String(), label, సందేశం_2,
+	    B_FOLLOW_కుడి | B_FOLLOW_BOTTOM);
 
-    float width = 0.f, height = 0.f;
-    button->GetPreferredSize(&width, &height);
-    button->ResizeTo(width, height);
+    దశాంశం వెడల్పు = 0.f, ఎత్తు = 0.f;
+    button->Get_Preferred_కొలత(&వెడల్పు, &ఎత్తు);
+    button->Resize_గమ్యం(వెడల్పు, ఎత్తు);
 
-    return button;
+    తిరిగి button;
 }
 
-VimDialog::View::View(BRect frame)
-    :	BView(frame, "VimDialogView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-    fIconBitmap(NULL)
+VimDialog::View::View(BRect చట్రం)
+    :	BView(చట్రం, "VimDialogView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+    fIconBitmap(ఖాళీ)
 {
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    సమితి_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 VimDialog::View::~View()
 {
-    delete fIconBitmap;
+    తొలగించు fIconBitmap;
 }
 
-void VimDialog::View::Draw(BRect updateRect)
+శూన్య VimDialog::View::Draw(BRect updateRect)
 {
     BRect stripeRect = Bounds();
-    stripeRect.right = kVimDialogIconStripeWidth;
-    SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+    stripeRect.కుడి = k_Vim_Dialog_Icon_Stripe_వెడల్పు;
+    సమితి_ఎగువ_Color(tint_color(ViewColor(), B_DARKEN_1_TINT));
     FillRect(stripeRect);
 
-    if (fIconBitmap == NULL)
-	return;
+    ఒకవేళ (fIconBitmap == ఖాళీ)
+	తిరిగి;
 
-    SetDrawingMode(B_OP_ALPHA);
-    SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+    సమితి_Drawing_బహుళకం(B_OP_ALPHA);
+    సమితి_Blending_బహుళకం(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
     DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
 }
 
-void VimDialog::View::InitIcon(int32 type)
+శూన్య VimDialog::View::InitIcon(int32 type)
 {
-    if (type == VIM_GENERIC)
-	return;
+    ఒకవేళ (type == VIM_GENERIC)
+	తిరిగి;
 
-    BPath path;
-    status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-    if (status != B_OK) {
-	fprintf(stderr, "Cannot retrieve app info:%s\n", strerror(status));
-	return;
+    BPath మార్గం;
+    స్థితి_t స్థితి_2 = కనుగొను_directory(B_BEOS_SERVERS_DIRECTORY, &మార్గం);
+    ఒకవేళ (స్థితి_2 != B_OK) {
+	fprintf(stderr, "Cannot retrieve app info:%s\n", strerror(స్థితి_2));
+	తిరిగి;
     }
 
-    path.Append("app_server");
+    మార్గం.Append("app_server");
 
-    BFile file(path.Path(), O_RDONLY);
-    if (file.InitCheck() != B_OK) {
+    BFile file(మార్గం.మార్గం_2(), O_RDONLY);
+    ఒకవేళ (file.InitCheck() != B_OK) {
 	fprintf(stderr, "App file assignment failed:%s\n",
 		strerror(file.InitCheck()));
-	return;
+	తిరిగి;
     }
 
     BResources resources(&file);
-    if (resources.InitCheck() != B_OK) {
+    ఒకవేళ (resources.InitCheck() != B_OK) {
 	fprintf(stderr, "App server resources assignment failed:%s\n",
 		strerror(resources.InitCheck()));
-	return;
+	తిరిగి;
     }
 
-    const char *name = "";
-    switch(type) {
-	case VIM_ERROR:	    name = "stop"; break;
-	case VIM_WARNING:   name = "warn"; break;
-	case VIM_INFO:	    name = "info"; break;
-	case VIM_QUESTION:  name = "idea"; break;
-	default: return;
+    స్థిరరాశి అక్షరం *name = "";
+    ఎంపిక(type) {
+	స్థితి VIM_ERROR:	    name = "stop"; ఆపు;
+	స్థితి VIM_WARNING:   name = "warn"; ఆపు;
+	స్థితి VIM_INFO:	    name = "info"; ఆపు;
+	స్థితి VIM_QUESTION:  name = "idea"; ఆపు;
+	అప్రమేయ: తిరిగి;
     }
 
-    int32 iconSize = 32;
-    fIconBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-    if (fIconBitmap == NULL || fIconBitmap->InitCheck() != B_OK) {
+    int32 icon_కొలత_2 = 32;
+    fIconBitmap = కొత్త BBitmap(BRect(0, 0, icon_కొలత_2 - 1, icon_కొలత_2 - 1), 0, B_RGBA32);
+    ఒకవేళ (fIconBitmap == ఖాళీ || fIconBitmap->InitCheck() != B_OK) {
 	fprintf(stderr, "Icon bitmap allocation failed:%s\n",
-		(fIconBitmap == NULL) ? "null" : strerror(fIconBitmap->InitCheck()));
-	return;
+		(fIconBitmap == ఖాళీ) ? "null" : strerror(fIconBitmap->InitCheck()));
+	తిరిగి;
     }
 
-    size_t size = 0;
-    const uint8* iconData = NULL;
+    size_t కొలత = 0;
+    స్థిరరాశి uint8* icon_దత్తాంశం = ఖాళీ;
     //	try vector icon first?
-    iconData = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, name, &size);
-    if (iconData != NULL && BIconUtils::GetVectorIcon(iconData, size, fIconBitmap) == B_OK)
-	return;
+    icon_దత్తాంశం = (స్థిరరాశి uint8*)resources.ఎక్కించు_Resource(B_సదిశ_ICON_TYPE, name, &కొలత);
+    ఒకవేళ (icon_దత్తాంశం != ఖాళీ && BIconUtils::Get_సదిశ_Icon(icon_దత్తాంశం, కొలత, fIconBitmap) == B_OK)
+	తిరిగి;
 
     //	try bitmap icon now
-    iconData = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE, name, &size);
-    if (iconData == NULL) {
+    icon_దత్తాంశం = (స్థిరరాశి uint8*)resources.ఎక్కించు_Resource(B_LARGE_ICON_TYPE, name, &కొలత);
+    ఒకవేళ (icon_దత్తాంశం == ఖాళీ) {
 	fprintf(stderr, "Bitmap icon resource not found\n");
-	delete fIconBitmap;
-	fIconBitmap = NULL;
-	return;
+	తొలగించు fIconBitmap;
+	fIconBitmap = ఖాళీ;
+	తిరిగి;
     }
 
-    if (fIconBitmap->ColorSpace() != B_CMAP8)
-	BIconUtils::ConvertFromCMAP8(iconData, iconSize, iconSize, iconSize, fIconBitmap);
+    ఒకవేళ (fIconBitmap->ColorSpace() != B_CMAP8)
+	BIconUtils::ConvertFromCMAP8(icon_దత్తాంశం, icon_కొలత_2, icon_కొలత_2, icon_కొలత_2, fIconBitmap);
 }
 
-const unsigned int  kVimDialogOKButtonMsg = 'FDOK';
-const unsigned int  kVimDialogCancelButtonMsg = 'FDCN';
-const unsigned int  kVimDialogSizeInputMsg = 'SICH';
-const unsigned int  kVimDialogFamilySelectMsg = 'MSFM';
-const unsigned int  kVimDialogStyleSelectMsg = 'MSST';
-const unsigned int  kVimDialogSizeSelectMsg = 'MSSZ';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_OKButton_సందేశం = 'FDOK';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_Cancel_Button_సందేశం = 'FDCN';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_కొలత_ఆదానం_సందేశం = 'SICH';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_Family_Select_సందేశం = 'MSFM';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_Style_Select_సందేశం = 'MSST';
+స్థిరరాశి గుర్తులేని పూర్ణాంకం  k_Vim_Dialog_కొలత_Select_సందేశం = 'MSSZ';
 
-VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, float* size)
-: BWindow(kDefaultRect, "Font Selection", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, దశాంశం* కొలత)
+: BWindow(kDefaultRect, "Font Selection", B_TITLED_కిటికీ_LOOK, B_MODAL_APP_కిటికీ_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
-    , fStatus(B_NO_INIT)
+    , f_స్థితి(B_NO_INIT)
     , fDialogSem(-1)
-    , fDialogValue(false)
+    , f_Dialog_విలువ(అబద్ధం)
     , fFamily(family)
     , fStyle(style)
-    , fSize(size)
-    , fFontSize(*size)
+    , f_కొలత(కొలత)
+    , f_Font_కొలత(*కొలత)
     , fPreview(0)
     , fFamiliesList(0)
     , fStylesList(0)
     , fSizesList(0)
-    , fSizesInput(0)
+    , f_Sizes_ఆదానం(0)
 {
-    strncpy(fFontFamily, *family, B_FONT_FAMILY_LENGTH);
-    strncpy(fFontStyle, *style, B_FONT_STYLE_LENGTH);
+    strncpy(fFontFamily, *family, B_FONT_FAMILY_నిడివి);
+    strncpy(fFontStyle, *style, B_FONT_STYLE_నిడివి);
 
     //	"client" area view
-    BBox *clientBox = new BBox(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
-		    B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
+    BBox *clientBox = కొత్త BBox(Bounds(), B_ఖాళీలు_STRING, B_FOLLOW_ALL_SIDES,
+		    B_WILL_DRAW | B_చట్రం_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
 		    B_PLAIN_BORDER);
-    AddChild(clientBox);
+    కూడు_బిడ్డ(clientBox);
 
     //	client view
     BRect RC = clientBox->Bounds();
     RC.InsetBy(kVimDialogSpacingX, kVimDialogSpacingY);
-    BRect rc(RC.LeftTop(), RC.LeftTop());
+    BRect rc(RC.ఎడమ_శిఖరం(), RC.ఎడమ_శిఖరం());
 
     //	at first create all controls
-    fPreview = new BStringView(rc, "preview", "DejaVu Sans Mono");
-    clientBox->AddChild(fPreview);
+    fPreview = కొత్త BStringView(rc, "preview", "DejaVu Sans Mono");
+    clientBox->కూడు_బిడ్డ(fPreview);
 
-    BBox* boxDivider = new BBox(rc, B_EMPTY_STRING,
+    BBox* boxDivider = కొత్త BBox(rc, B_ఖాళీలు_STRING,
 	    B_FOLLOW_NONE, B_WILL_DRAW, B_FANCY_BORDER);
-    clientBox->AddChild(boxDivider);
+    clientBox->కూడు_బిడ్డ(boxDivider);
 
-    BStringView *labelFamily = new BStringView(rc, "labelFamily", "Family:");
-    clientBox->AddChild(labelFamily);
-    labelFamily->ResizeToPreferred();
+    BStringView *labelFamily = కొత్త BStringView(rc, "labelFamily", "Family:");
+    clientBox->కూడు_బిడ్డ(labelFamily);
+    labelFamily->Resize_గమ్యం_Preferred();
 
-    BStringView *labelStyle = new BStringView(rc, "labelStyle", "Style:");
-    clientBox->AddChild(labelStyle);
-    labelStyle->ResizeToPreferred();
+    BStringView *labelStyle = కొత్త BStringView(rc, "labelStyle", "Style:");
+    clientBox->కూడు_బిడ్డ(labelStyle);
+    labelStyle->Resize_గమ్యం_Preferred();
 
-    BStringView *labelSize = new BStringView(rc, "labelSize", "Size:");
-    clientBox->AddChild(labelSize);
-    labelSize->ResizeToPreferred();
+    BStringView *label_కొలత = కొత్త BStringView(rc, "labelSize", "Size:");
+    clientBox->కూడు_బిడ్డ(label_కొలత);
+    label_కొలత->Resize_గమ్యం_Preferred();
 
-    fFamiliesList = new BListView(rc, "listFamily",
+    fFamiliesList = కొత్త BListView(rc, "listFamily",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollFamilies = new BScrollView("scrollFamily",
-	    fFamiliesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollFamilies);
+    BScrollView *scrollFamilies = కొత్త BScrollView("scrollFamily",
+	    fFamiliesList, B_FOLLOW_ఎడమ_కుడి, 0, అబద్ధం, నిజం);
+    clientBox->కూడు_బిడ్డ(scrollFamilies);
 
-    fStylesList= new BListView(rc, "listStyles",
+    fStylesList= కొత్త BListView(rc, "listStyles",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollStyles = new BScrollView("scrollStyle",
-	    fStylesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollStyles);
+    BScrollView *scrollStyles = కొత్త BScrollView("scrollStyle",
+	    fStylesList, B_FOLLOW_ఎడమ_కుడి, 0, అబద్ధం, నిజం);
+    clientBox->కూడు_బిడ్డ(scrollStyles);
 
-    fSizesInput = new BTextControl(rc, "inputSize", NULL, "???",
-	    new BMessage(kVimDialogSizeInputMsg));
-    clientBox->AddChild(fSizesInput);
-    fSizesInput->ResizeToPreferred();
+    f_Sizes_ఆదానం = కొత్త BTextControl(rc, "inputSize", ఖాళీ, "???",
+	    కొత్త BMessage(k_Vim_Dialog_కొలత_ఆదానం_సందేశం));
+    clientBox->కూడు_బిడ్డ(f_Sizes_ఆదానం);
+    f_Sizes_ఆదానం->Resize_గమ్యం_Preferred();
 
-    fSizesList = new BListView(rc, "listSizes",
+    fSizesList = కొత్త BListView(rc, "listSizes",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollSizes = new BScrollView("scrollSize",
-	    fSizesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollSizes);
+    BScrollView *scrollSizes = కొత్త BScrollView("scrollSize",
+	    fSizesList, B_FOLLOW_ఎడమ_కుడి, 0, అబద్ధం, నిజం);
+    clientBox->కూడు_బిడ్డ(scrollSizes);
 
-    BButton *buttonOK = new BButton(rc, "buttonOK", "OK",
-			new BMessage(kVimDialogOKButtonMsg));
-    clientBox->AddChild(buttonOK);
-    buttonOK->ResizeToPreferred();
+    BButton *buttonOK = కొత్త BButton(rc, "buttonOK", "OK",
+			కొత్త BMessage(k_Vim_Dialog_OKButton_సందేశం));
+    clientBox->కూడు_బిడ్డ(buttonOK);
+    buttonOK->Resize_గమ్యం_Preferred();
 
-    BButton *buttonCancel = new BButton(rc, "buttonCancel", "Cancel",
-			new BMessage(kVimDialogCancelButtonMsg));
-    clientBox->AddChild(buttonCancel);
-    buttonCancel->ResizeToPreferred();
+    BButton *buttonCancel = కొత్త BButton(rc, "buttonCancel", "Cancel",
+			కొత్త BMessage(k_Vim_Dialog_Cancel_Button_సందేశం));
+    clientBox->కూడు_బిడ్డ(buttonCancel);
+    buttonCancel->Resize_గమ్యం_Preferred();
 
     //	layout controls
-    float lineHeight = labelFamily->Bounds().Height();
-    float previewHeight = lineHeight * 3;
-    float offsetYLabels = previewHeight + kVimDialogSpacingY;
-    float offsetYLists = offsetYLabels + lineHeight + kVimDialogSpacingY / 2;
-    float offsetYSizes = offsetYLists + fSizesInput->Bounds().Height() + kVimDialogSpacingY / 2;
-    float listsHeight = lineHeight * 9;
-    float offsetYButtons = offsetYLists + listsHeight +  kVimDialogSpacingY;
-    float maxControlsHeight = offsetYButtons + buttonOK->Bounds().Height();
-    float familiesWidth = labelFamily->Bounds().Width() * 5;
-    float offsetXStyles = familiesWidth + kVimDialogSpacingX;
-    float stylesWidth = labelStyle->Bounds().Width() * 4;
-    float offsetXSizes = offsetXStyles + stylesWidth + kVimDialogSpacingX;
-    float sizesWidth = labelSize->Bounds().Width() * 2;
-    float maxControlsWidth = offsetXSizes + sizesWidth;
+    దశాంశం పంక్తి_ఎత్తు = labelFamily->Bounds().ఎత్తు_2();
+    దశాంశం preview_ఎత్తు = పంక్తి_ఎత్తు * 3;
+    దశాంశం స్థానభ్రంశం_YLabels = preview_ఎత్తు + kVimDialogSpacingY;
+    దశాంశం స్థానభ్రంశం_YLists = స్థానభ్రంశం_YLabels + పంక్తి_ఎత్తు + kVimDialogSpacingY / 2;
+    దశాంశం స్థానభ్రంశం_YSizes = స్థానభ్రంశం_YLists + f_Sizes_ఆదానం->Bounds().ఎత్తు_2() + kVimDialogSpacingY / 2;
+    దశాంశం lists_ఎత్తు = పంక్తి_ఎత్తు * 9;
+    దశాంశం స్థానభ్రంశం_YButtons = స్థానభ్రంశం_YLists + lists_ఎత్తు +  kVimDialogSpacingY;
+    దశాంశం max_Controls_ఎత్తు = స్థానభ్రంశం_YButtons + buttonOK->Bounds().ఎత్తు_2();
+    దశాంశం families_వెడల్పు = labelFamily->Bounds().వెడల్పు_2() * 5;
+    దశాంశం స్థానభ్రంశం_XStyles = families_వెడల్పు + kVimDialogSpacingX;
+    దశాంశం styles_వెడల్పు = labelStyle->Bounds().వెడల్పు_2() * 4;
+    దశాంశం స్థానభ్రంశం_XSizes = స్థానభ్రంశం_XStyles + styles_వెడల్పు + kVimDialogSpacingX;
+    దశాంశం sizes_వెడల్పు = label_కొలత->Bounds().వెడల్పు_2() * 2;
+    దశాంశం max_Controls_వెడల్పు = స్థానభ్రంశం_XSizes + sizes_వెడల్పు;
 
-    ResizeTo(maxControlsWidth + kVimDialogSpacingX * 2,
-	maxControlsHeight + kVimDialogSpacingY * 2);
+    Resize_గమ్యం(max_Controls_వెడల్పు + kVimDialogSpacingX * 2,
+	max_Controls_ఎత్తు + kVimDialogSpacingY * 2);
 
-    BRect rcVim = gui.vimWindow->Frame();
-    MoveTo(rcVim.left + (rcVim.Width() - Frame().Width()) / 2,
-	    rcVim.top + (rcVim.Height() - Frame().Height()) / 2);
+    BRect rcVim = gui.vim_కిటికీ->చట్రం_2();
+    Move_గమ్యం(rcVim.ఎడమ + (rcVim.వెడల్పు_2() - చట్రం_2().వెడల్పు_2()) / 2,
+	    rcVim.శిఖరం + (rcVim.ఎత్తు_2() - చట్రం_2().ఎత్తు_2()) / 2);
 
-    fPreview->ResizeTo(maxControlsWidth, previewHeight);
-    fPreview->SetAlignment(B_ALIGN_CENTER);
+    fPreview->Resize_గమ్యం(max_Controls_వెడల్పు, preview_ఎత్తు);
+    fPreview->సమితి_Alignment(B_ALIGN_CENTER);
 
-    boxDivider->MoveBy(0.f, previewHeight + kVimDialogSpacingY / 2);
-    boxDivider->ResizeTo(maxControlsWidth, 1.f);
+    boxDivider->MoveBy(0.f, preview_ఎత్తు + kVimDialogSpacingY / 2);
+    boxDivider->Resize_గమ్యం(max_Controls_వెడల్పు, 1.f);
 
-    labelFamily->MoveBy(0.f, offsetYLabels);
-    labelStyle->MoveBy(offsetXStyles, offsetYLabels);
-    labelSize->MoveBy(offsetXSizes, offsetYLabels);
+    labelFamily->MoveBy(0.f, స్థానభ్రంశం_YLabels);
+    labelStyle->MoveBy(స్థానభ్రంశం_XStyles, స్థానభ్రంశం_YLabels);
+    label_కొలత->MoveBy(స్థానభ్రంశం_XSizes, స్థానభ్రంశం_YLabels);
 
     //	text control alignment issues
-    float insetX = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
-    float insetY = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
+    దశాంశం insetX = f_Sizes_ఆదానం->పాఠ్యం_View()->Bounds().వెడల్పు_2() - f_Sizes_ఆదానం->Bounds().వెడల్పు_2();
+    దశాంశం insetY = f_Sizes_ఆదానం->పాఠ్యం_View()->Bounds().వెడల్పు_2() - f_Sizes_ఆదానం->Bounds().వెడల్పు_2();
 
-    scrollFamilies->MoveBy(0.f, offsetYLists);
-    scrollStyles->MoveBy(offsetXStyles, offsetYLists);
-    fSizesInput->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
-    scrollSizes->MoveBy(offsetXSizes, offsetYSizes);
+    scrollFamilies->MoveBy(0.f, స్థానభ్రంశం_YLists);
+    scrollStyles->MoveBy(స్థానభ్రంశం_XStyles, స్థానభ్రంశం_YLists);
+    f_Sizes_ఆదానం->MoveBy(స్థానభ్రంశం_XSizes + insetX / 2, స్థానభ్రంశం_YLists + insetY / 2);
+    scrollSizes->MoveBy(స్థానభ్రంశం_XSizes, స్థానభ్రంశం_YSizes);
 
-    fSizesInput->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
+    f_Sizes_ఆదానం->సమితి_Alignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
 
-    scrollFamilies->ResizeTo(familiesWidth, listsHeight);
-    scrollStyles->ResizeTo(stylesWidth, listsHeight);
-    fSizesInput->ResizeTo(sizesWidth, fSizesInput->Bounds().Height());
-    scrollSizes->ResizeTo(sizesWidth,
-	    listsHeight - (offsetYSizes - offsetYLists));
+    scrollFamilies->Resize_గమ్యం(families_వెడల్పు, lists_ఎత్తు);
+    scrollStyles->Resize_గమ్యం(styles_వెడల్పు, lists_ఎత్తు);
+    f_Sizes_ఆదానం->Resize_గమ్యం(sizes_వెడల్పు, f_Sizes_ఆదానం->Bounds().ఎత్తు_2());
+    scrollSizes->Resize_గమ్యం(sizes_వెడల్పు,
+	    lists_ఎత్తు - (స్థానభ్రంశం_YSizes - స్థానభ్రంశం_YLists));
 
-    buttonOK->MoveBy(maxControlsWidth - buttonOK->Bounds().Width(), offsetYButtons);
-    buttonCancel->MoveBy(maxControlsWidth - buttonOK->Bounds().Width()
-	    - buttonCancel->Bounds().Width() - kVimDialogSpacingX, offsetYButtons);
+    buttonOK->MoveBy(max_Controls_వెడల్పు - buttonOK->Bounds().వెడల్పు_2(), స్థానభ్రంశం_YButtons);
+    buttonCancel->MoveBy(max_Controls_వెడల్పు - buttonOK->Bounds().వెడల్పు_2()
+	    - buttonCancel->Bounds().వెడల్పు_2() - kVimDialogSpacingX, స్థానభ్రంశం_YButtons);
 
     //	fill lists
-    int selIndex = -1;
-    int count = count_font_families();
-    for (int i = 0; i < count; i++) {
+    పూర్ణాంకం sel_సూచీ = -1;
+    పూర్ణాంకం లెక్క = లెక్క_font_families();
+    కొరకు (పూర్ణాంకం i = 0; i < లెక్క; i++) {
 	font_family family;
-	if (get_font_family(i, &family ) == B_OK) {
-	    fFamiliesList->AddItem(new BStringItem((const char*)family));
-	    if (strncmp(family, fFontFamily, B_FONT_FAMILY_LENGTH) == 0)
-		selIndex = i;
+	ఒకవేళ (get_font_family(i, &family ) == B_OK) {
+	    fFamiliesList->కూడు_అంశం(కొత్త BString_అంశం((స్థిరరాశి అక్షరం*)family));
+	    ఒకవేళ (అక్షరశ్రేణి_పోలిక(family, fFontFamily, B_FONT_FAMILY_నిడివి) == 0)
+		sel_సూచీ = i;
 	}
     }
 
-    if (selIndex >= 0) {
-	fFamiliesList->Select(selIndex);
-	fFamiliesList->ScrollToSelection();
+    ఒకవేళ (sel_సూచీ >= 0) {
+	fFamiliesList->Select(sel_సూచీ);
+	fFamiliesList->Scroll_గమ్యం_Selection();
     }
 
     _UpdateFontStyles();
 
-    selIndex = -1;
-    for (int size = 8, index = 0; size <= 18; size++, index++) {
+    sel_సూచీ = -1;
+    కొరకు (పూర్ణాంకం కొలత = 8, సూచీ = 0; కొలత <= 18; కొలత++, సూచీ++) {
 	BString str;
-	str << size;
-	fSizesList->AddItem(new BStringItem(str));
-	if (size == fFontSize)
-	    selIndex = index;
+	str << కొలత;
+	fSizesList->కూడు_అంశం(కొత్త BString_అంశం(str));
+	ఒకవేళ (కొలత == f_Font_కొలత)
+	    sel_సూచీ = సూచీ;
 
     }
 
-    if (selIndex >= 0) {
-	fSizesList->Select(selIndex);
-	fSizesList->ScrollToSelection();
+    ఒకవేళ (sel_సూచీ >= 0) {
+	fSizesList->Select(sel_సూచీ);
+	fSizesList->Scroll_గమ్యం_Selection();
     }
 
-    fFamiliesList->SetSelectionMessage(new BMessage(kVimDialogFamilySelectMsg));
-    fStylesList->SetSelectionMessage(new BMessage(kVimDialogStyleSelectMsg));
-    fSizesList->SetSelectionMessage(new BMessage(kVimDialogSizeSelectMsg));
-    fSizesInput->SetModificationMessage(new BMessage(kVimDialogSizeInputMsg));
+    fFamiliesList->సమితి_Selection_సందేశం(కొత్త BMessage(k_Vim_Dialog_Family_Select_సందేశం));
+    fStylesList->సమితి_Selection_సందేశం(కొత్త BMessage(k_Vim_Dialog_Style_Select_సందేశం));
+    fSizesList->సమితి_Selection_సందేశం(కొత్త BMessage(k_Vim_Dialog_కొలత_Select_సందేశం));
+    f_Sizes_ఆదానం->సమితి_Modification_సందేశం(కొత్త BMessage(k_Vim_Dialog_కొలత_ఆదానం_సందేశం));
 
-    _UpdateSizeInputPreview();
+    Update_కొలత_ఆదానం_Preview();
     _UpdateFontPreview();
 
-    fStatus = B_OK;
+    f_స్థితి = B_OK;
 }
 
 VimSelectFontDialog::~VimSelectFontDialog()
@@ -2593,561 +2593,561 @@ VimSelectFontDialog::~VimSelectFontDialog()
     _CleanList(fStylesList);
     _CleanList(fSizesList);
 
-    if (fDialogSem > B_OK)
+    ఒకవేళ (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    void
+    శూన్య
 VimSelectFontDialog::_CleanList(BListView* list)
 {
-    while (0 < list->CountItems())
-	delete (dynamic_cast<BStringItem*>(list->RemoveItem((int32)0)));
+    అయితే (0 < list->లెక్క_వస్తువులు())
+	తొలగించు (dynamic_cast<BString_అంశం*>(list->Remove_అంశం((int32)0)));
 }
 
-    bool
+    తార్కిక
 VimSelectFontDialog::Go()
 {
-    if (fStatus != B_OK) {
+    ఒకవేళ (f_స్థితి != B_OK) {
 	Quit();
-	return NOFONT;
+	తిరిగి NOFONT;
     }
 
     fDialogSem = create_sem(0, "VimFontSelectDialogSem");
-    if (fDialogSem < B_OK) {
+    ఒకవేళ (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	తిరిగి f_Dialog_విలువ;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    అయితే (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    bool retValue = fDialogValue;
+    తార్కిక ret_విలువ = f_Dialog_విలువ;
 
-    if (Lock())
+    ఒకవేళ (తాళం_2())
 	Quit();
 
-    return retValue;
+    తిరిగి ret_విలువ;
 }
 
 
-void VimSelectFontDialog::_UpdateFontStyles()
+శూన్య VimSelectFontDialog::_UpdateFontStyles()
 {
     _CleanList(fStylesList);
 
-    int32 selIndex = -1;
-    int32 count = count_font_styles(fFontFamily);
-    for (int32 i = 0; i < count; i++) {
+    int32 sel_సూచీ = -1;
+    int32 లెక్క = లెక్క_font_styles(fFontFamily);
+    కొరకు (int32 i = 0; i < లెక్క; i++) {
 	font_style style;
 	uint32 flags = 0;
-	if (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
-	    fStylesList->AddItem(new BStringItem((const char*)style));
-	    if (strncmp(style, fFontStyle, B_FONT_STYLE_LENGTH) == 0)
-		selIndex = i;
+	ఒకవేళ (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
+	    fStylesList->కూడు_అంశం(కొత్త BString_అంశం((స్థిరరాశి అక్షరం*)style));
+	    ఒకవేళ (అక్షరశ్రేణి_పోలిక(style, fFontStyle, B_FONT_STYLE_నిడివి) == 0)
+		sel_సూచీ = i;
 	}
     }
 
-    if (selIndex >= 0) {
-	fStylesList->Select(selIndex);
-	fStylesList->ScrollToSelection();
-    } else
+    ఒకవేళ (sel_సూచీ >= 0) {
+	fStylesList->Select(sel_సూచీ);
+	fStylesList->Scroll_గమ్యం_Selection();
+    } లేకపోతే
 	fStylesList->Select(0);
 }
 
 
-void VimSelectFontDialog::_UpdateSizeInputPreview()
+శూన్య VimSelectFontDialog::Update_కొలత_ఆదానం_Preview()
 {
-    char buf[10] = {0};
-    vim_snprintf(buf, sizeof(buf), (char*)"%.0f", fFontSize);
-    fSizesInput->SetText(buf);
+    అక్షరం buf[10] = {0};
+    vim_snprintf(buf, పరిమాణం(buf), (అక్షరం*)"%.0f", f_Font_కొలత);
+    f_Sizes_ఆదానం->సమితి_పాఠ్యం(buf);
 }
 
 
-void VimSelectFontDialog::_UpdateFontPreview()
+శూన్య VimSelectFontDialog::_UpdateFontPreview()
 {
     BFont font;
     fPreview->GetFont(&font);
-    font.SetSize(fFontSize);
-    font.SetFamilyAndStyle(fFontFamily, fFontStyle);
-    fPreview->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
+    font.సమితి_కొలత(f_Font_కొలత);
+    font.సమితి_Family_And_Style(fFontFamily, fFontStyle);
+    fPreview->సమితి_Font(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_కొలత);
 
     BString str;
-    str << fFontFamily << " " << fFontStyle << ", " << (int)fFontSize << " pt.";
-    fPreview->SetText(str);
+    str << fFontFamily << " " << fFontStyle << ", " << (పూర్ణాంకం)f_Font_కొలత << " pt.";
+    fPreview->సమితి_పాఠ్యం(str);
 }
 
 
-    bool
-VimSelectFontDialog::_UpdateFromListItem(BListView* list, char* text, int textSize)
+    తార్కిక
+VimSelectFontDialog::Update_From_List_అంశం(BListView* list, అక్షరం* పాఠ్యం, పూర్ణాంకం పాఠ్యం_కొలత)
 {
-    int32 index = list->CurrentSelection();
-    if (index < 0)
-	return false;
-    BStringItem* item = (BStringItem*)list->ItemAt(index);
-    if (item == NULL)
-	return false;
-    strncpy(text, item->Text(), textSize);
-    return true;
+    int32 సూచీ = list->CurrentSelection();
+    ఒకవేళ (సూచీ < 0)
+	తిరిగి అబద్ధం;
+    BString_అంశం* అంశం = (BString_అంశం*)list->అంశం_At(సూచీ);
+    ఒకవేళ (అంశం == ఖాళీ)
+	తిరిగి అబద్ధం;
+    strncpy(పాఠ్యం, అంశం->పాఠ్యం_2(), పాఠ్యం_కొలత);
+    తిరిగి నిజం;
 }
 
 
-void VimSelectFontDialog::MessageReceived(BMessage *msg)
+శూన్య VimSelectFontDialog::సందేశం_Received(BMessage *సందేశం)
 {
-    switch (msg->what) {
-	case kVimDialogOKButtonMsg:
-	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_LENGTH);
-	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_LENGTH);
-	    *fSize = fFontSize;
-	    fDialogValue = true;
-	case kVimDialogCancelButtonMsg:
+    ఎంపిక (సందేశం->what) {
+	స్థితి k_Vim_Dialog_OKButton_సందేశం:
+	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_నిడివి);
+	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_నిడివి);
+	    *f_కొలత = f_Font_కొలత;
+	    f_Dialog_విలువ = నిజం;
+	స్థితి k_Vim_Dialog_Cancel_Button_సందేశం:
 	    delete_sem(fDialogSem);
 	    fDialogSem = -1;
-	    return;
-	case B_KEY_UP:
+	    తిరిగి;
+	స్థితి B_కీలకం_పైకి:
 	    {
-		int32 key = 0;
-		if (msg->FindInt32("raw_char", &key) == B_OK
-			&& key == B_ESCAPE) {
+		int32 కీలకం = 0;
+		ఒకవేళ (సందేశం->కనుగొను_Int32("raw_char", &కీలకం) == B_OK
+			&& కీలకం == B_ESCAPE) {
 		    delete_sem(fDialogSem);
 		    fDialogSem = -1;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case kVimDialogFamilySelectMsg:
-	    if (_UpdateFromListItem(fFamiliesList,
-		    fFontFamily, B_FONT_FAMILY_LENGTH)) {
+	స్థితి k_Vim_Dialog_Family_Select_సందేశం:
+	    ఒకవేళ (Update_From_List_అంశం(fFamiliesList,
+		    fFontFamily, B_FONT_FAMILY_నిడివి)) {
 		_UpdateFontStyles();
 		_UpdateFontPreview();
 	    }
-	    break;
-	case kVimDialogStyleSelectMsg:
-	    if (_UpdateFromListItem(fStylesList,
-		    fFontStyle, B_FONT_STYLE_LENGTH))
+	    ఆపు;
+	స్థితి k_Vim_Dialog_Style_Select_సందేశం:
+	    ఒకవేళ (Update_From_List_అంశం(fStylesList,
+		    fFontStyle, B_FONT_STYLE_నిడివి))
 		_UpdateFontPreview();
-	    break;
-	case kVimDialogSizeSelectMsg:
+	    ఆపు;
+	స్థితి k_Vim_Dialog_కొలత_Select_సందేశం:
 	    {
-		char buf[10] = {0};
-		if (_UpdateFromListItem(fSizesList, buf, sizeof(buf))) {
-		    float size = atof(buf);
-		    if (size > 0.f) {
-			fFontSize = size;
-			_UpdateSizeInputPreview();
+		అక్షరం buf[10] = {0};
+		ఒకవేళ (Update_From_List_అంశం(fSizesList, buf, పరిమాణం(buf))) {
+		    దశాంశం కొలత = atof(buf);
+		    ఒకవేళ (కొలత > 0.f) {
+			f_Font_కొలత = కొలత;
+			Update_కొలత_ఆదానం_Preview();
 			_UpdateFontPreview();
 		    }
 		}
 	    }
-	    break;
-	case kVimDialogSizeInputMsg:
+	    ఆపు;
+	స్థితి k_Vim_Dialog_కొలత_ఆదానం_సందేశం:
 	    {
-		float size = atof(fSizesInput->Text());
-		if (size > 0.f) {
-		    fFontSize = size;
+		దశాంశం కొలత = atof(f_Sizes_ఆదానం->పాఠ్యం_2());
+		ఒకవేళ (కొలత > 0.f) {
+		    f_Font_కొలత = కొలత;
 		    _UpdateFontPreview();
 		}
 	    }
-	    break;
-	default:
-	    break;
+	    ఆపు;
+	అప్రమేయ:
+	    ఆపు;
     }
-    return BWindow::MessageReceived(msg);
+    తిరిగి BWindow::సందేశం_Received(సందేశం);
 }
 
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
 
 //  some forward declaration required by toolbar functions...
-static BMessage * MenuMessage(vimmenu_T *menu);
+స్థిర BMessage * Menu_సందేశం(vimmenu_T *menu);
 
-VimToolbar::VimToolbar(BRect frame, const char *name) :
-    BBox(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
+VimToolbar::VimToolbar(BRect చట్రం, స్థిరరాశి అక్షరం *name) :
+    BBox(చట్రం, name, B_FOLLOW_ఎడమ | B_FOLLOW_శిఖరం, B_WILL_DRAW | B_చట్రం_EVENTS, B_PLAIN_BORDER)
 {
 }
 
 VimToolbar::~VimToolbar()
 {
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++)
-	delete (BPictureButton*)fButtonsList.ItemAt(i);
-    fButtonsList.MakeEmpty();
+    int32 లెక్క = fButtonsList.లెక్క_వస్తువులు();
+    కొరకు (int32 i = 0; i < లెక్క; i++)
+	తొలగించు (BPictureButton*)fButtonsList.అంశం_At(i);
+    fButtonsList.Make_ఖాళీలు();
 
-    delete normalButtonsBitmap;
-    delete grayedButtonsBitmap;
-    normalButtonsBitmap    = NULL;
-    grayedButtonsBitmap  = NULL;
+    తొలగించు సాధారణ_Buttons_Bitmap;
+    తొలగించు grayedButtonsBitmap;
+    సాధారణ_Buttons_Bitmap    = ఖాళీ;
+    grayedButtonsBitmap  = ఖాళీ;
 }
 
-    void
-VimToolbar::AttachedToWindow()
+    శూన్య
+VimToolbar::Attached_గమ్యం_కిటికీ()
 {
-    BBox::AttachedToWindow();
+    BBox::Attached_గమ్యం_కిటికీ();
 
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    సమితి_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-    float
-VimToolbar::ToolbarHeight() const
+    దశాంశం
+VimToolbar::Toolbar_ఎత్తు() స్థిరరాశి
 {
-    float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
-    return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
+    దశాంశం కొలత = ఖాళీ == సాధారణ_Buttons_Bitmap ? 18. : సాధారణ_Buttons_Bitmap->Bounds().ఎత్తు_2();
+    తిరిగి కొలత + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
 }
 
-    bool
-VimToolbar::ModifyBitmapToGrayed(BBitmap *bitmap)
+    తార్కిక
+VimToolbar::Modify_Bitmap_గమ్యం_Grayed(BBitmap *bitmap)
 {
-    float height = bitmap->Bounds().Height();
-    float width  = bitmap->Bounds().Width();
+    దశాంశం ఎత్తు = bitmap->Bounds().ఎత్తు_2();
+    దశాంశం వెడల్పు  = bitmap->Bounds().వెడల్పు_2();
 
-    rgb_color *bits = (rgb_color*)bitmap->Bits();
-    int32 pixels = bitmap->BitsLength() / 4;
-    for (int32 i = 0; i < pixels; i++) {
-	bits[i].red = bits[i].green =
-	bits[i].blue = ((uint32)bits[i].red + bits[i].green + bits[i].blue) / 3;
-	bits[i].alpha /= 4;
+    rgb_color *బిట్లు = (rgb_color*)bitmap->బిట్లు_2();
+    int32 pixels = bitmap->బిట్లు_నిడివి() / 4;
+    కొరకు (int32 i = 0; i < pixels; i++) {
+	బిట్లు[i].red = బిట్లు[i].green =
+	బిట్లు[i].blue = ((uint32)బిట్లు[i].red + బిట్లు[i].green + బిట్లు[i].blue) / 3;
+	బిట్లు[i].alpha /= 4;
     }
 
-    return true;
+    తిరిగి నిజం;
 }
 
-    bool
+    తార్కిక
 VimToolbar::PrepareButtonBitmaps()
 {
     //	first try to load potentially customized $VIRUNTIME/bitmaps/builtin-tools.png
-    normalButtonsBitmap = LoadVimBitmap("builtin-tools.png");
-    if (normalButtonsBitmap == NULL)
+    సాధారణ_Buttons_Bitmap = ఎక్కించు_Vim_Bitmap("builtin-tools.png");
+    ఒకవేళ (సాధారణ_Buttons_Bitmap == ఖాళీ)
 	//  customized not found? dig application resources for "builtin-tools" one
-	normalButtonsBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "builtin-tools");
+	సాధారణ_Buttons_Bitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "builtin-tools");
 
-    if (normalButtonsBitmap == NULL)
-	return false;
+    ఒకవేళ (సాధారణ_Buttons_Bitmap == ఖాళీ)
+	తిరిగి అబద్ధం;
 
     BMessage archive;
-    normalButtonsBitmap->Archive(&archive);
+    సాధారణ_Buttons_Bitmap->Archive(&archive);
 
-    grayedButtonsBitmap = new BBitmap(&archive);
-    if (grayedButtonsBitmap == NULL)
-	return false;
+    grayedButtonsBitmap = కొత్త BBitmap(&archive);
+    ఒకవేళ (grayedButtonsBitmap == ఖాళీ)
+	తిరిగి అబద్ధం;
 
     //	modify grayed bitmap
-    ModifyBitmapToGrayed(grayedButtonsBitmap);
+    Modify_Bitmap_గమ్యం_Grayed(grayedButtonsBitmap);
 
-    return true;
+    తిరిగి నిజం;
 }
 
-BBitmap *VimToolbar::LoadVimBitmap(const char* fileName)
+BBitmap *VimToolbar::ఎక్కించు_Vim_Bitmap(స్థిరరాశి అక్షరం* fileName)
 {
-    BBitmap *bitmap = NULL;
+    BBitmap *bitmap = ఖాళీ;
 
-    int mustfree = 0;
-    char_u* runtimePath = vim_getenv((char_u*)"VIMRUNTIME", &mustfree);
-    if (runtimePath != NULL && fileName != NULL) {
-	BString strPath((char*)runtimePath);
-	strPath << "/bitmaps/" << fileName;
-	bitmap = BTranslationUtils::GetBitmap(strPath.String());
+    పూర్ణాంకం mustfree = 0;
+    char_u* runtime_మార్గం = vim_getenv((char_u*)"VIMRUNTIME", &mustfree);
+    ఒకవేళ (runtime_మార్గం != ఖాళీ && fileName != ఖాళీ) {
+	BString str_మార్గం((అక్షరం*)runtime_మార్గం);
+	str_మార్గం << "/bitmaps/" << fileName;
+	bitmap = BTranslationUtils::GetBitmap(str_మార్గం.String());
     }
 
-    if (mustfree)
-	vim_free(runtimePath);
+    ఒకవేళ (mustfree)
+	vim_free(runtime_మార్గం);
 
-    return bitmap;
+    తిరిగి bitmap;
 }
 
-    bool
-VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed)
+    తార్కిక
+VimToolbar::GetPictureFromBitmap(BPicture *picture_గమ్యం, int32 సూచీ, BBitmap *bitmapFrom, తార్కిక pressed)
 {
-    float size = bitmapFrom->Bounds().Height() + 1.;
+    దశాంశం కొలత = bitmapFrom->Bounds().ఎత్తు_2() + 1.;
 
-    BView view(BRect(0, 0, size, size), "", 0, 0);
+    BView view(BRect(0, 0, కొలత, కొలత), "", 0, 0);
 
-    AddChild(&view);
-    view.BeginPicture(pictureTo);
+    కూడు_బిడ్డ(&view);
+    view.BeginPicture(picture_గమ్యం);
 
-    view.SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    view.సమితి_ఎగువ_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
     view.FillRect(view.Bounds());
-    view.SetDrawingMode(B_OP_OVER);
+    view.సమితి_Drawing_బహుళకం(B_OP_OVER);
 
-    BRect source(0, 0, size - 1, size - 1);
-    BRect destination(source);
+    BRect ఆధారం(0, 0, కొలత - 1, కొలత - 1);
+    BRect destination(ఆధారం);
 
-    source.OffsetBy(size * index, 0);
-    destination.OffsetBy(ButtonMargin, ButtonMargin);
+    ఆధారం.స్థానభ్రంశం_By(కొలత * సూచీ, 0);
+    destination.స్థానభ్రంశం_By(ButtonMargin, ButtonMargin);
 
-    view.DrawBitmap(bitmapFrom, source, destination);
+    view.DrawBitmap(bitmapFrom, ఆధారం, destination);
 
-    if (pressed)	{
+    ఒకవేళ (pressed)	{
 	rgb_color shineColor  = ui_color(B_SHINE_COLOR);
 	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
-	size += ButtonMargin * 2 - 1;
-	view.BeginLineArray(4);
-	view.AddLine(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
-	view.AddLine(BPoint(size, 0),	 BPoint(size, size), shineColor);
-	view.AddLine(BPoint(size, size), BPoint(0, size),    shineColor);
-	view.AddLine(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
-	view.EndLineArray();
+	కొలత += ButtonMargin * 2 - 1;
+	view.Begin_పంక్తి_Array(4);
+	view.కూడు_పంక్తి(BPoint(0, 0),	 BPoint(కొలత, 0),    shadowColor);
+	view.కూడు_పంక్తి(BPoint(కొలత, 0),	 BPoint(కొలత, కొలత), shineColor);
+	view.కూడు_పంక్తి(BPoint(కొలత, కొలత), BPoint(0, కొలత),    shineColor);
+	view.కూడు_పంక్తి(BPoint(0, కొలత),	 BPoint(0, 0),	     shadowColor);
+	view.చివర_పంక్తి_Array();
     }
 
-    view.EndPicture();
-    RemoveChild(&view);
+    view.చివర_Picture();
+    Remove_బిడ్డ(&view);
 
-    return true;
+    తిరిగి నిజం;
 }
 
-    bool
-VimToolbar::AddButton(int32 index, vimmenu_T *menu)
+    తార్కిక
+VimToolbar::కూడు_Button(int32 సూచీ, vimmenu_T *menu)
 {
-    BPictureButton *button = NULL;
-    if (!menu_is_separator(menu->name)) {
-	float size = normalButtonsBitmap ?
-	    normalButtonsBitmap->Bounds().Height() + 1. + ButtonMargin * 2 : 18.;
-	BRect frame(0, 0, size, size);
+    BPictureButton *button = ఖాళీ;
+    ఒకవేళ (!menu_is_separator(menu->name)) {
+	దశాంశం కొలత = సాధారణ_Buttons_Bitmap ?
+	    సాధారణ_Buttons_Bitmap->Bounds().ఎత్తు_2() + 1. + ButtonMargin * 2 : 18.;
+	BRect చట్రం(0, 0, కొలత, కొలత);
 	BPicture pictureOn;
 	BPicture pictureOff;
-	BPicture pictureGray;
+	BPicture picture_బూడిద;
 
-	if (menu->iconfile == NULL && menu->iconidx >= 0 && normalButtonsBitmap) {
-	    GetPictureFromBitmap(&pictureOn,  menu->iconidx, normalButtonsBitmap, true);
-	    GetPictureFromBitmap(&pictureOff, menu->iconidx, normalButtonsBitmap, false);
-	    GetPictureFromBitmap(&pictureGray, menu->iconidx, grayedButtonsBitmap, false);
-	} else {
+	ఒకవేళ (menu->iconfile == ఖాళీ && menu->iconidx >= 0 && సాధారణ_Buttons_Bitmap) {
+	    GetPictureFromBitmap(&pictureOn,  menu->iconidx, సాధారణ_Buttons_Bitmap, నిజం);
+	    GetPictureFromBitmap(&pictureOff, menu->iconidx, సాధారణ_Buttons_Bitmap, అబద్ధం);
+	    GetPictureFromBitmap(&picture_బూడిద, menu->iconidx, grayedButtonsBitmap, అబద్ధం);
+	} లేకపోతే {
 
-	    char_u buffer[MAXPATHL] = {0};
-	    BBitmap *bitmap = NULL;
+	    char_u బఫరు[MAXPATHL] = {0};
+	    BBitmap *bitmap = ఖాళీ;
 
-	    if (menu->iconfile) {
-		gui_find_iconfile(menu->iconfile, buffer, (char*)"png");
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    ఒకవేళ (menu->iconfile) {
+		gui_కనుగొను_iconfile(menu->iconfile, బఫరు, (అక్షరం*)"png");
+		bitmap = BTranslationUtils::GetBitmap((అక్షరం*)బఫరు);
 	    }
 
-	    if (bitmap == NULL && gui_find_bitmap(menu->name, buffer, (char*)"png") == OK)
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    ఒకవేళ (bitmap == ఖాళీ && gui_కనుగొను_bitmap(menu->name, బఫరు, (అక్షరం*)"png") == OK)
+		bitmap = BTranslationUtils::GetBitmap((అక్షరం*)బఫరు);
 
-	    if (bitmap == NULL)
-		bitmap = new BBitmap(BRect(0, 0, size, size), B_RGB32);
+	    ఒకవేళ (bitmap == ఖాళీ)
+		bitmap = కొత్త BBitmap(BRect(0, 0, కొలత, కొలత), B_RGB32);
 
-	    GetPictureFromBitmap(&pictureOn,   0, bitmap, true);
-	    GetPictureFromBitmap(&pictureOff,  0, bitmap, false);
-	    ModifyBitmapToGrayed(bitmap);
-	    GetPictureFromBitmap(&pictureGray, 0, bitmap, false);
+	    GetPictureFromBitmap(&pictureOn,   0, bitmap, నిజం);
+	    GetPictureFromBitmap(&pictureOff,  0, bitmap, అబద్ధం);
+	    Modify_Bitmap_గమ్యం_Grayed(bitmap);
+	    GetPictureFromBitmap(&picture_బూడిద, 0, bitmap, అబద్ధం);
 
-	    delete bitmap;
+	    తొలగించు bitmap;
 	}
 
-	button = new BPictureButton(frame, (char*)menu->name,
-		    &pictureOff, &pictureOn, MenuMessage(menu));
+	button = కొత్త BPictureButton(చట్రం, (అక్షరం*)menu->name,
+		    &pictureOff, &pictureOn, Menu_సందేశం(menu));
 
-	button->SetDisabledOn(&pictureGray);
-	button->SetDisabledOff(&pictureGray);
+	button->సమితి_Disabled_On(&picture_బూడిద);
+	button->సమితి_Disabled_Off(&picture_బూడిద);
 
-	button->SetTarget(gui.vimTextArea);
+	button->సమితి_లక్ష్యం(gui.vim_పాఠ్యం_Area);
 
-	AddChild(button);
+	కూడు_బిడ్డ(button);
 
 	menu->button = button;
     }
 
-    bool result = fButtonsList.AddItem(button, index);
+    తార్కిక ఫలితం = fButtonsList.కూడు_అంశం(button, సూచీ);
     InvalidateLayout();
-    return result;
+    తిరిగి ఫలితం;
 }
 
-    bool
+    తార్కిక
 VimToolbar::RemoveButton(vimmenu_T *menu)
 {
-    if (menu->button) {
-	if (fButtonsList.RemoveItem(menu->button)) {
-	    delete menu->button;
-	    menu->button = NULL;
+    ఒకవేళ (menu->button) {
+	ఒకవేళ (fButtonsList.Remove_అంశం(menu->button)) {
+	    తొలగించు menu->button;
+	    menu->button = ఖాళీ;
 	}
     }
-    return true;
+    తిరిగి నిజం;
 }
 
-    bool
-VimToolbar::GrayButton(vimmenu_T *menu, int grey)
+    తార్కిక
+VimToolbar::బూడిద_Button(vimmenu_T *menu, పూర్ణాంకం grey)
 {
-    if (menu->button) {
-	int32 index = fButtonsList.IndexOf(menu->button);
-	if (index >= 0)
-	    menu->button->SetEnabled(grey ? false : true);
+    ఒకవేళ (menu->button) {
+	int32 సూచీ = fButtonsList.సూచీ_యొక్క(menu->button);
+	ఒకవేళ (సూచీ >= 0)
+	    menu->button->సమితి_Enabled(grey ? అబద్ధం : నిజం);
     }
-    return true;
+    తిరిగి నిజం;
 }
 
-    void
+    శూన్య
 VimToolbar::InvalidateLayout()
 {
-    int32 offset = ToolbarMargin;
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++) {
-	BPictureButton *button = (BPictureButton *)fButtonsList.ItemAt(i);
-	if (button) {
-	    button->MoveTo(offset, ToolbarMargin);
-	    offset += button->Bounds().Width() + ToolbarMargin;
-	} else
-	    offset += ToolbarMargin * 3;
+    int32 స్థానభ్రంశం = ToolbarMargin;
+    int32 లెక్క = fButtonsList.లెక్క_వస్తువులు();
+    కొరకు (int32 i = 0; i < లెక్క; i++) {
+	BPictureButton *button = (BPictureButton *)fButtonsList.అంశం_At(i);
+	ఒకవేళ (button) {
+	    button->Move_గమ్యం(స్థానభ్రంశం, ToolbarMargin);
+	    స్థానభ్రంశం += button->Bounds().వెడల్పు_2() + ToolbarMargin;
+	} లేకపోతే
+	    స్థానభ్రంశం += ToolbarMargin * 3;
     }
 }
 
-#endif /*FEAT_TOOLBAR*/
+#అయితే_ముగింపు /*FEAT_TOOLBAR*/
 
-#if defined(FEAT_GUI_TABLINE)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
 
-    float
-VimTabLine::TablineHeight() const
+    దశాంశం
+Vim_Tab_పంక్తి::Tabline_ఎత్తు() స్థిరరాశి
 {
 //  float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
 //  return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
-    return TabHeight(); //  + ToolbarMargin;
+    తిరిగి Tab_ఎత్తు(); //  + ToolbarMargin;
 }
 
-void
-VimTabLine::MouseDown(BPoint point)
+శూన్య
+Vim_Tab_పంక్తి::Mouse_కిందికి(BPoint బిందువు)
 {
-    if (!gui_mch_showing_tabline())
-	return;
+    ఒకవేళ (!gui_mch_showing_tabline())
+	తిరిగి;
 
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = కిటికీ()->Current_సందేశం();
+    ప్రతిజ్ఞా(m);
 
     int32 buttons = 0;
-    m->FindInt32("buttons", &buttons);
+    m->కనుగొను_Int32("buttons", &buttons);
 
     int32 clicks = 0;
-    m->FindInt32("clicks", &clicks);
+    m->కనుగొను_Int32("clicks", &clicks);
 
-    int index = 0; //  0 means here - no tab found
-    for (int i = 0; i < CountTabs(); i++) {
-	if (TabFrame(i).Contains(point)) {
-	    index = i + 1; //  indexes are 1-based
-	    break;
+    పూర్ణాంకం సూచీ = 0; //  0 means here - no tab found
+    కొరకు (పూర్ణాంకం i = 0; i < లెక్క_Tabs(); i++) {
+	ఒకవేళ (Tab_చట్రం(i).కలిగియుంది_2(బిందువు)) {
+	    సూచీ = i + 1; //  indexes are 1-based
+	    ఆపు;
 	}
     }
 
-    int event = -1;
+    పూర్ణాంకం event = -1;
 
-    if ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
+    ఒకవేళ ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
 	//  left button double click on - create new tab
 	event = TABLINE_MENU_NEW;
 
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
+    లేకపోతే ఒకవేళ (buttons & B_TERTIARY_MOUSE_BUTTON)
 	//  middle button click - close the pointed tab
 	//  or create new one in case empty space
-	event = index > 0 ? TABLINE_MENU_CLOSE : TABLINE_MENU_NEW;
+	event = సూచీ > 0 ? TABLINE_MENU_CLOSE : TABLINE_MENU_NEW;
 
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+    లేకపోతే ఒకవేళ (buttons & B_SECONDARY_MOUSE_BUTTON) {
 	//  right button click - show context menu
-	BPopUpMenu* popUpMenu = new BPopUpMenu("tabLineContextMenu", false, false);
-	popUpMenu->AddItem(new BMenuItem(_("Close tabi R"), new BMessage(TABLINE_MENU_CLOSE)));
-	popUpMenu->AddItem(new BMenuItem(_("New tab    T"), new BMessage(TABLINE_MENU_NEW)));
-	popUpMenu->AddItem(new BMenuItem(_("Open tab..."), new BMessage(TABLINE_MENU_OPEN)));
+	BPop_పైకి_Menu* తీయి_పైకి_Menu = కొత్త BPop_పైకి_Menu("tabLineContextMenu", అబద్ధం, అబద్ధం);
+	తీయి_పైకి_Menu->కూడు_అంశం(కొత్త BMenu_అంశం(_("Close tabi R"), కొత్త BMessage(TABLINE_MENU_CLOSE)));
+	తీయి_పైకి_Menu->కూడు_అంశం(కొత్త BMenu_అంశం(_("New tab    T"), కొత్త BMessage(TABLINE_MENU_NEW)));
+	తీయి_పైకి_Menu->కూడు_అంశం(కొత్త BMenu_అంశం(_("Open tab..."), కొత్త BMessage(TABLINE_MENU_OPEN)));
 
-	ConvertToScreen(&point);
-	BMenuItem* item = popUpMenu->Go(point);
-	if (item != NULL) {
-	    event = item->Command();
+	Convert_గమ్యం_Screen(&బిందువు);
+	BMenu_అంశం* అంశం = తీయి_పైకి_Menu->Go(బిందువు);
+	ఒకవేళ (అంశం != ఖాళీ) {
+	    event = అంశం->Command();
 	}
 
-	delete popUpMenu;
+	తొలగించు తీయి_పైకి_Menu;
 
-    } else {
+    } లేకపోతే {
 	//  default processing
-	BTabView::MouseDown(point);
-	return;
+	BTabView::Mouse_కిందికి(బిందువు);
+	తిరిగి;
     }
 
-    if (event < 0)
-	return;
+    ఒకవేళ (event < 0)
+	తిరిగి;
 
-    VimTablineMenuMsg tmm;
-    tmm.index = index;
+    Vim_Tabline_Menu_సందేశం tmm;
+    tmm.సూచీ = సూచీ;
     tmm.event = event;
-    write_port(gui.vdcmp, VimMsg::TablineMenu, &tmm, sizeof(tmm));
+    write_పోర్టు(gui.vdcmp, Vim_సందేశం::TablineMenu, &tmm, పరిమాణం(tmm));
 }
 
-void
-VimTabLine::VimTab::Select(BView* owner)
+శూన్య
+Vim_Tab_పంక్తి::VimTab::Select(BView* owner)
 {
     BTab::Select(owner);
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
+    ఒకవేళ (tab_పంక్తి != ఖాళీ) {
 
 	int32 i = 0;
-	for (; i < tabLine->CountTabs(); i++)
-	    if (this == tabLine->TabAt(i))
-		break;
+	కొరకు (; i < tab_పంక్తి->లెక్క_Tabs(); i++)
+	    ఒకవేళ (ఇది == tab_పంక్తి->TabAt(i))
+		ఆపు;
 
 //	printf("%d:%d:%s\n", i, tabLine->CountTabs(), tabLine->TabAt(i)->Label());
-	if (i < tabLine->CountTabs()) {
-	    VimTablineMsg tm;
-	    tm.index = i + 1;
-	    write_port(gui.vdcmp, VimMsg::Tabline, &tm, sizeof(tm));
+	ఒకవేళ (i < tab_పంక్తి->లెక్క_Tabs()) {
+	    Vim_Tabline_సందేశం tm;
+	    tm.సూచీ = i + 1;
+	    write_పోర్టు(gui.vdcmp, Vim_సందేశం::Tabline, &tm, పరిమాణం(tm));
 	}
     }
 }
 
-#endif //  defined(FEAT_GUI_TABLINE)
+#అయితే_ముగింపు //  defined(FEAT_GUI_TABLINE)
 
 // ---------------- ----------------
 
 //  some global variables
-static char appsig[] = "application/x-vnd.Haiku-Vim-8";
-key_map *keyMap;
-char *keyMapChars;
-int main_exitcode = 127;
+స్థిర అక్షరం appsig[] = "application/x-vnd.Haiku-Vim-8";
+కీలకం_map *కీలకం_Map;
+అక్షరం *కీలకం_Map_Chars;
+పూర్ణాంకం main_exitcode = 127;
 
-    status_t
+    స్థితి_t
 gui_haiku_process_event(bigtime_t timeout)
 {
-    struct VimMsg vm;
+    నిర్మాణం Vim_సందేశం vm;
     int32 what;
-    ssize_t size;
+    ssize_t కొలత;
 
-    size = read_port_etc(gui.vdcmp, &what, &vm, sizeof(vm),
+    కొలత = read_పోర్టు_etc(gui.vdcmp, &what, &vm, పరిమాణం(vm),
 	    B_TIMEOUT, timeout);
 
-    if (size >= 0) {
-	switch (what) {
-	    case VimMsg::Key:
+    ఒకవేళ (కొలత >= 0) {
+	ఎంపిక (what) {
+	    స్థితి Vim_సందేశం::కీలకం_2:
 		{
-		    char_u *string = vm.u.Key.chars;
-		    int len = vm.u.Key.length;
-		    if (len == 1 && string[0] == Ctrl_chr('C')) {
-			trash_input_buf();
+		    char_u *string = vm.u.కీలకం_2.chars;
+		    పూర్ణాంకం len = vm.u.కీలకం_2.నిడివి;
+		    ఒకవేళ (len == 1 && string[0] == Ctrl_chr('C')) {
+			trash_ఆదానం_buf();
 			got_int = TRUE;
 		    }
 
-		    if (vm.u.Key.csi_escape)
-#ifndef FEAT_MBYTE_IME
+		    ఒకవేళ (vm.u.కీలకం_2.csi_escape)
+#నిర్వచితం_కాకపోతే FEAT_MBYTE_IME
 		    {
-			int	i;
+			పూర్ణాంకం	i;
 			char_u	buf[2];
 
-			for (i = 0; i < len; ++i)
+			కొరకు (i = 0; i < len; ++i)
 			{
-			    add_to_input_buf(string + i, 1);
-			    if (string[i] == CSI)
+			    కూడు_గమ్యం_ఆదానం_buf(string + i, 1);
+			    ఒకవేళ (string[i] == CSI)
 			    {
 				// Turn CSI into K_CSI.
 				buf[0] = KS_EXTRA;
-				buf[1] = (int)KE_CSI;
-				add_to_input_buf(buf, 2);
+				buf[1] = (పూర్ణాంకం)KE_CSI;
+				కూడు_గమ్యం_ఆదానం_buf(buf, 2);
 			    }
 			}
 		    }
-#else
-			add_to_input_buf_csi(string, len);
-#endif
-		    else
-			add_to_input_buf(string, len);
+#లేకపోతే
+			కూడు_గమ్యం_ఆదానం_buf_csi(string, len);
+#అయితే_ముగింపు
+		    లేకపోతే
+			కూడు_గమ్యం_ఆదానం_buf(string, len);
 		}
-		break;
-	    case VimMsg::Resize:
-		gui_resize_shell(vm.u.NewSize.width, vm.u.NewSize.height);
-		break;
-	    case VimMsg::ScrollBar:
+		ఆపు;
+	    స్థితి Vim_సందేశం::Resize:
+		gui_resize_shell(vm.u.New_కొలత.వెడల్పు, vm.u.New_కొలత.ఎత్తు);
+		ఆపు;
+	    స్థితి Vim_సందేశం::ScrollBar:
 		{
 		    /*
 		     * If loads of scroll messages queue up, use only the last
@@ -3155,66 +3155,66 @@ gui_haiku_process_event(bigtime_t timeout)
 		     * This is not perfect yet anyway: these events are queued
 		     * yet again, this time in the keyboard input buffer.
 		     */
-		    int32 oldCount =
-			atomic_add(&vm.u.Scroll.sb->scrollEventCount, -1);
-		    if (oldCount <= 1 || !vm.u.Scroll.stillDragging)
+		    int32 old_లెక్క =
+			atomic_కూడు(&vm.u.Scroll.sb->scroll_Event_లెక్క, -1);
+		    ఒకవేళ (old_లెక్క <= 1 || !vm.u.Scroll.stillDragging)
 			gui_drag_scrollbar(vm.u.Scroll.sb->getGsb(),
-				vm.u.Scroll.value, vm.u.Scroll.stillDragging);
+				vm.u.Scroll.విలువ, vm.u.Scroll.stillDragging);
 		}
-		break;
-#if defined(FEAT_MENU)
-	    case VimMsg::Menu:
+		ఆపు;
+#ఒకవేళ defined(FEAT_MENU)
+	    స్థితి Vim_సందేశం::Menu:
 		gui_menu_cb(vm.u.Menu.guiMenu);
-		break;
-#endif
-	    case VimMsg::Mouse:
+		ఆపు;
+#అయితే_ముగింపు
+	    స్థితి Vim_సందేశం::Mouse:
 		{
-		    int32 oldCount;
-		    if (vm.u.Mouse.button == MOUSE_DRAG)
-			oldCount =
-			    atomic_add(&gui.vimTextArea->mouseDragEventCount, -1);
-		    else
-			oldCount = 0;
-		    if (oldCount <= 1)
+		    int32 old_లెక్క;
+		    ఒకవేళ (vm.u.Mouse.button == MOUSE_DRAG)
+			old_లెక్క =
+			    atomic_కూడు(&gui.vim_పాఠ్యం_Area->mouse_Drag_Event_లెక్క, -1);
+		    లేకపోతే
+			old_లెక్క = 0;
+		    ఒకవేళ (old_లెక్క <= 1)
 			gui_send_mouse_event(vm.u.Mouse.button, vm.u.Mouse.x,
 				vm.u.Mouse.y, vm.u.Mouse.repeated_click,
 				vm.u.Mouse.modifiers);
 		}
-		break;
-	    case VimMsg::MouseMoved:
+		ఆపు;
+	    స్థితి Vim_సందేశం::MouseMoved:
 		{
 		    gui_mouse_moved(vm.u.MouseMoved.x, vm.u.MouseMoved.y);
 		}
-		break;
-	    case VimMsg::Focus:
-		gui.in_focus = vm.u.Focus.active;
+		ఆపు;
+	    స్థితి Vim_సందేశం::Focus:
+		gui.లోపల_focus = vm.u.Focus.చురుకైన;
 		// XXX Signal that scrollbar dragging has stopped?
 		// This is needed because we don't get a MouseUp if
 		// that happens while outside the window... :-(
-		if (gui.dragged_sb) {
+		ఒకవేళ (gui.dragged_sb) {
 		    gui.dragged_sb = SBAR_NONE;
 		}
 		//  gui_update_cursor(TRUE, FALSE);
-		break;
-	    case VimMsg::Refs:
-		::RefsReceived(vm.u.Refs.message, vm.u.Refs.changedir);
-		break;
-	    case VimMsg::Tabline:
-		send_tabline_event(vm.u.Tabline.index);
-		break;
-	    case VimMsg::TablineMenu:
-		send_tabline_menu_event(vm.u.TablineMenu.index, vm.u.TablineMenu.event);
-		break;
-	    default:
+		ఆపు;
+	    స్థితి Vim_సందేశం::Refs:
+		::RefsReceived(vm.u.Refs.సందేశం_2, vm.u.Refs.changedir);
+		ఆపు;
+	    స్థితి Vim_సందేశం::Tabline:
+		send_tabline_event(vm.u.Tabline.సూచీ);
+		ఆపు;
+	    స్థితి Vim_సందేశం::TablineMenu:
+		send_tabline_menu_event(vm.u.TablineMenu.సూచీ, vm.u.TablineMenu.event);
+		ఆపు;
+	    అప్రమేయ:
 		//  unrecognised message, ignore it
-		break;
+		ఆపు;
 	}
     }
 
     /*
      * If size < B_OK, it is an error code.
      */
-    return size;
+    తిరిగి కొలత;
 }
 
 /*
@@ -3230,79 +3230,79 @@ gui_haiku_process_event(bigtime_t timeout)
  * If there is no window, don't call Lock() but do succeed.
  */
 
-    int
-vim_lock_screen()
+    పూర్ణాంకం
+vim_తాళం_screen()
 {
-    return !gui.vimWindow || gui.vimWindow->Lock();
+    తిరిగి !gui.vim_కిటికీ || gui.vim_కిటికీ->తాళం_2();
 }
 
-    void
+    శూన్య
 vim_unlock_screen()
 {
-    if (gui.vimWindow)
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ)
+	gui.vim_కిటికీ->Unlock();
 }
 
-#define RUN_BAPPLICATION_IN_NEW_THREAD	0
+#నిర్వచించు నిరంతరం_BAPPLICATION_లోపల_NEW_THREAD	0
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#ఒకవేళ నిరంతరం_BAPPLICATION_లోపల_NEW_THREAD
 
     int32
-run_vimapp(void *args)
+నిరంతరం_vimapp(శూన్య *వాదనలు)
 {
     VimApp app(appsig);
 
     gui.vimApp = &app;
-    app.Run();		    // Run until Quit() called
+    app.నిరంతరం_2();		    // Run until Quit() called
 
-    return 0;
+    తిరిగి 0;
 }
 
-#else
+#లేకపోతే
 
     int32
-call_main(void *args)
+call_main(శూన్య *వాదనలు)
 {
-    struct MainArgs *ma = (MainArgs *)args;
+    నిర్మాణం Main_వాదనలు *ma = (Main_వాదనలు *)వాదనలు;
 
-    return main(ma->argc, ma->argv);
+    తిరిగి ప్రధాన(ma->argc, ma->argv);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Parse the GUI related command-line arguments.  Any arguments used are
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
+    శూన్య
 gui_mch_prepare(
-	int	*argc,
-	char	**argv)
+	పూర్ణాంకం	*argc,
+	అక్షరం	**argv)
 {
     /*
      * We don't have any command line arguments for the BeOS GUI yet,
      * but this is an excellent place to create our Application object.
      */
-    if (!gui.vimApp) {
+    ఒకవేళ (!gui.vimApp) {
 	thread_info tinfo;
-	get_thread_info(find_thread(NULL), &tinfo);
+	get_thread_info(కనుగొను_thread(ఖాళీ), &tinfo);
 
 	// May need the port very early on to process RefsReceived()
-	gui.vdcmp = create_port(B_MAX_PORT_COUNT, "vim VDCMP");
+	gui.vdcmp = create_పోర్టు(B_MAX_పోర్టు_లెక్క, "vim VDCMP");
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
-	thread_id tid = spawn_thread(run_vimapp, "vim VimApp",
-		tinfo.priority, NULL);
-	if (tid >= B_OK) {
+#ఒకవేళ నిరంతరం_BAPPLICATION_లోపల_NEW_THREAD
+	thread_id tid = spawn_thread(నిరంతరం_vimapp, "vim VimApp",
+		tinfo.ప్రాధాన్యత, ఖాళీ);
+	ఒకవేళ (tid >= B_OK) {
 	    resume_thread(tid);
-	} else {
+	} లేకపోతే {
 	    getout(1);
 	}
-#else
-	MainArgs ma = { *argc, argv };
+#లేకపోతే
+	Main_వాదనలు ma = { *argc, argv };
 	thread_id tid = spawn_thread(call_main, "vim main()",
-		tinfo.priority, &ma);
-	if (tid >= B_OK) {
+		tinfo.ప్రాధాన్యత, &ma);
+	ఒకవేళ (tid >= B_OK) {
 	    VimApp app(appsig);
 
 	    gui.vimApp = &app;
@@ -3313,19 +3313,19 @@ gui_mch_prepare(
 	     * There will be no infinite recursion since
 	     * gui.vimApp is set now.
 	     */
-	    app.Run();		    // Run until Quit() called
+	    app.నిరంతరం_2();		    // Run until Quit() called
 	    // fprintf(stderr, "app.Run() returned...\n");
-	    status_t dummy_exitcode;
-	    (void)wait_for_thread(tid, &dummy_exitcode);
+	    స్థితి_t dummy_exitcode;
+	    (శూన్య)wait_for_thread(tid, &dummy_exitcode);
 
 	    /*
 	     * This path should be the normal one taken to exit Vim.
 	     * The main() thread calls mch_exit() which calls
 	     * gui_mch_exit() which terminates its thread.
 	     */
-	    exit(main_exitcode);
+	    నిష్క్రమించు(main_exitcode);
 	}
-#endif
+#అయితే_ముగింపు
     }
     // Don't fork() when starting the GUI. Spawned threads are not
     // duplicated with a fork(). The result is a mess.
@@ -3343,10 +3343,10 @@ gui_mch_prepare(
      * too early to see the command line parsing. Tough.
      * On the other hand, it starts the gui for vim file & which is nice.
      */
-    if (!isatty(0)) {
-	struct stat stat_stdin, stat_dev_null;
+    ఒకవేళ (!isatty(0)) {
+	నిర్మాణం stat stat_stdin, stat_dev_null;
 
-	if (fstat(0, &stat_stdin) == -1 ||
+	ఒకవేళ (fstat(0, &stat_stdin) == -1 ||
 		stat("/dev/null", &stat_dev_null) == -1 ||
 		(stat_stdin.st_dev == stat_dev_null.st_dev &&
 		 stat_stdin.st_ino == stat_dev_null.st_ino))
@@ -3358,46 +3358,46 @@ gui_mch_prepare(
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    పూర్ణాంకం
+gui_mch_init_check(శూన్య)
 {
-    return OK;	    // TODO: GUI can always be started?
+    తిరిగి OK;	    // TODO: GUI can always be started?
 }
 
 /*
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
+    పూర్ణాంకం
 gui_mch_init()
 {
     display_errors();
     gui.def_norm_pixel = RGB(0x00, 0x00, 0x00);	//  black
-    gui.def_back_pixel = RGB(0xFF, 0xFF, 0xFF);	//  white
+    gui.def_వెనుక_pixel = RGB(0xFF, 0xFF, 0xFF);	//  white
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.వెనుక_pixel = gui.def_వెనుక_pixel;
 
-    gui.scrollbar_width = (int) B_V_SCROLL_BAR_WIDTH;
-    gui.scrollbar_height = (int) B_H_SCROLL_BAR_HEIGHT;
-#ifdef FEAT_MENU
-    gui.menu_height = 19;   //	initial guess -
+    gui.scrollbar_వెడల్పు = (పూర్ణాంకం) B_V_SCROLL_BAR_వెడల్పు;
+    gui.scrollbar_ఎత్తు = (పూర్ణాంకం) B_H_SCROLL_BAR_ఎత్తు;
+#నిర్వచితమైతే FEAT_MENU
+    gui.menu_ఎత్తు = 19;   //	initial guess -
     //	correct for my default settings
-#endif
-    gui.border_offset = 3;  //	coordinates are inside window borders
+#అయితే_ముగింపు
+    gui.border_స్థానభ్రంశం = 3;  //	coordinates are inside window borders
 
-    if (gui.vdcmp < B_OK)
-	return FAIL;
-    get_key_map(&keyMap, &keyMapChars);
+    ఒకవేళ (gui.vdcmp < B_OK)
+	తిరిగి FAIL;
+    get_కీలకం_map(&కీలకం_Map, &కీలకం_Map_Chars);
 
-    gui.vimWindow = new VimWindow();	// hidden and locked
-    if (!gui.vimWindow)
-	return FAIL;
+    gui.vim_కిటికీ = కొత్త Vim_కిటికీ();	// hidden and locked
+    ఒకవేళ (!gui.vim_కిటికీ)
+	తిరిగి FAIL;
 
-    gui.vimWindow->Run();	// Run() unlocks but does not show
+    gui.vim_కిటికీ->నిరంతరం_2();	// Run() unlocks but does not show
 
     // Get the colors from the "Normal" group (set in syntax.c or in a vimrc
     // file)
-    set_normal_colors();
+    సమితి_సాధారణ_colors();
 
     /*
      * Check that none of the colors are the same as the background color
@@ -3410,82 +3410,82 @@ gui_mch_init()
 
     gui_mch_new_colors();	// window must exist for this
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
+    శూన్య
 gui_mch_new_colors()
 {
-    rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
+    rgb_color rgb = GUI_గమ్యం_RGB(gui.వెనుక_pixel);
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimForm->SetViewColor(rgb);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vimForm->సమితి_View_Color(rgb);
 	//  Does this not have too much effect for those small rectangles?
 	gui.vimForm->Invalidate();
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    పూర్ణాంకం
 gui_mch_open()
 {
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    ఒకవేళ (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_సమితి_winpos(gui_win_x, gui_win_y);
 
     // Actually open the window
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Show();
-	gui.vimWindow->Unlock();
-	return OK;
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->Show();
+	gui.vim_కిటికీ->Unlock();
+	తిరిగి OK;
     }
 
-    return FAIL;
+    తిరిగి FAIL;
 }
 
-    void
-gui_mch_exit(int vim_exitcode)
+    శూన్య
+gui_mch_exit(పూర్ణాంకం vim_exitcode)
 {
-    if (gui.vimWindow) {
-	thread_id tid = gui.vimWindow->Thread();
-	gui.vimWindow->Lock();
-	gui.vimWindow->Quit();
+    ఒకవేళ (gui.vim_కిటికీ) {
+	thread_id tid = gui.vim_కిటికీ->Thread();
+	gui.vim_కిటికీ->తాళం_2();
+	gui.vim_కిటికీ->Quit();
 	// Wait until it is truly gone
 	int32 exitcode;
 	wait_for_thread(tid, &exitcode);
     }
-    delete_port(gui.vdcmp);
-#if !RUN_BAPPLICATION_IN_NEW_THREAD
+    delete_పోర్టు(gui.vdcmp);
+#ఒకవేళ !నిరంతరం_BAPPLICATION_లోపల_NEW_THREAD
     /*
      * We are in the main() thread - quit the App thread and
      * quit ourselves (passing on the exitcode). Use a global since the
      * value from exit_thread() is only used if wait_for_thread() is
      * called in time (race condition).
      */
-#endif
-    if (gui.vimApp) {
-	VimTextAreaView::guiBlankMouse(false);
+#అయితే_ముగింపు
+    ఒకవేళ (gui.vimApp) {
+	Vim_పాఠ్యం_Area_View::guiBlankMouse(అబద్ధం);
 
 	main_exitcode = vim_exitcode;
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#ఒకవేళ నిరంతరం_BAPPLICATION_లోపల_NEW_THREAD
 	thread_id tid = gui.vimApp->Thread();
 	int32 exitcode;
-	gui.vimApp->Lock();
+	gui.vimApp->తాళం_2();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
 	wait_for_thread(tid, &exitcode);
-#else
-	gui.vimApp->Lock();
+#లేకపోతే
+	gui.vimApp->తాళం_2();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
 	// suicide
 	exit_thread(vim_exitcode);
-#endif
+#అయితే_ముగింపు
     }
     // If we are somehow still here, let mch_exit() handle things.
 }
@@ -3493,130 +3493,130 @@ gui_mch_exit(int vim_exitcode)
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    పూర్ణాంకం
+gui_mch_get_winpos(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	BRect r;
-	r = gui.vimWindow->Frame();
-	gui.vimWindow->Unlock();
-	*x = (int)r.left;
-	*y = (int)r.top;
-	return OK;
+	r = gui.vim_కిటికీ->చట్రం_2();
+	gui.vim_కిటికీ->Unlock();
+	*x = (పూర్ణాంకం)r.ఎడమ;
+	*y = (పూర్ణాంకం)r.శిఖరం;
+	తిరిగి OK;
     }
-    else
-	return FAIL;
+    లేకపోతే
+	తిరిగి FAIL;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    శూన్య
+gui_mch_సమితి_winpos(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->MoveTo(x, y);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->Move_గమ్యం(x, y);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-void
-gui_mch_set_shellsize(
-	int	width,
-	int	height,
-	int	min_width,
-	int	min_height,
-	int	base_width,
-	int	base_height,
-	int	direction) // TODO: utilize?
+శూన్య
+gui_mch_సమితి_shellsize(
+	పూర్ణాంకం	వెడల్పు,
+	పూర్ణాంకం	ఎత్తు,
+	పూర్ణాంకం	min_వెడల్పు,
+	పూర్ణాంకం	min_ఎత్తు,
+	పూర్ణాంకం	పునాది_వెడల్పు,
+	పూర్ణాంకం	పునాది_ఎత్తు,
+	పూర్ణాంకం	direction) // TODO: utilize?
 {
     /*
      * We are basically given the size of the VimForm, if I understand
      * correctly. Since it fills the window completely, this will also
      * be the size of the window.
      */
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->ResizeTo(width - PEN_WIDTH, height - PEN_WIDTH);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->Resize_గమ్యం(వెడల్పు - PEN_వెడల్పు, ఎత్తు - PEN_వెడల్పు);
 
 	// set size limits
-	float minWidth, maxWidth, minHeight, maxHeight;
+	దశాంశం min_వెడల్పు_2, max_వెడల్పు, min_ఎత్తు_2, max_ఎత్తు;
 
-	gui.vimWindow->GetSizeLimits(&minWidth, &maxWidth,
-		&minHeight, &maxHeight);
-	gui.vimWindow->SetSizeLimits(min_width, maxWidth,
-		min_height, maxHeight);
+	gui.vim_కిటికీ->Get_కొలత_Limits(&min_వెడల్పు_2, &max_వెడల్పు,
+		&min_ఎత్తు_2, &max_ఎత్తు);
+	gui.vim_కిటికీ->సమితి_కొలత_Limits(min_వెడల్పు, max_వెడల్పు,
+		min_ఎత్తు, max_ఎత్తు);
 
 	/*
 	 * Set the resizing alignment depending on font size.
 	 */
-	gui.vimWindow->SetWindowAlignment(
+	gui.vim_కిటికీ->సమితి_కిటికీ_Alignment(
 		B_PIXEL_ALIGNMENT,	//  window_alignment mode,
 		1,		//  int32 h,
 		0,		//  int32 hOffset = 0,
-		gui.char_width,	    //	int32 width = 0,
-		base_width,	    //	int32 widthOffset = 0,
+		gui.char_వెడల్పు,	    //	int32 width = 0,
+		పునాది_వెడల్పు,	    //	int32 widthOffset = 0,
 		1,		//  int32 v = 0,
 		0,		//  int32 vOffset = 0,
-		gui.char_height,	//  int32 height = 0,
-		base_height	    //	int32 heightOffset = 0
+		gui.char_ఎత్తు,	//  int32 height = 0,
+		పునాది_ఎత్తు	    //	int32 heightOffset = 0
 		);
 
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-void
+శూన్య
 gui_mch_get_screen_dimensions(
-	int	*screen_w,
-	int	*screen_h)
+	పూర్ణాంకం	*screen_w,
+	పూర్ణాంకం	*screen_h)
 {
-    BRect frame;
+    BRect చట్రం;
 
     {
-	BScreen screen(gui.vimWindow);
+	BScreen screen(gui.vim_కిటికీ);
 
-	if (screen.IsValid()) {
-	    frame = screen.Frame();
-	} else {
-	    frame.right = 640;
-	    frame.bottom = 480;
+	ఒకవేళ (screen.IsValid()) {
+	    చట్రం = screen.చట్రం_2();
+	} లేకపోతే {
+	    చట్రం.కుడి = 640;
+	    చట్రం.bottom = 480;
 	}
     }
 
     // XXX approximations...
-    *screen_w = (int) frame.right - 2 * gui.scrollbar_width - 20;
-    *screen_h = (int) frame.bottom - gui.scrollbar_height
-#ifdef FEAT_MENU
-	- gui.menu_height
-#endif
+    *screen_w = (పూర్ణాంకం) చట్రం.కుడి - 2 * gui.scrollbar_వెడల్పు - 20;
+    *screen_h = (పూర్ణాంకం) చట్రం.bottom - gui.scrollbar_ఎత్తు
+#నిర్వచితమైతే FEAT_MENU
+	- gui.menu_ఎత్తు
+#అయితే_ముగింపు
 	- 30;
 }
 
-void
-gui_mch_set_text_area_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+శూన్య
+gui_mch_సమితి_పాఠ్యం_area_pos(
+	పూర్ణాంకం	x,
+	పూర్ణాంకం	y,
+	పూర్ణాంకం	w,
+	పూర్ణాంకం	h)
 {
-    if (!gui.vimTextArea)
-	return;
+    ఒకవేళ (!gui.vim_పాఠ్యం_Area)
+	తిరిగి;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->MoveTo(x, y);
-	gui.vimTextArea->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->Move_గమ్యం(x, y);
+	gui.vim_పాఠ్యం_Area->Resize_గమ్యం(w - PEN_వెడల్పు, h - PEN_వెడల్పు);
 
-#ifdef FEAT_GUI_TABLINE
-	if (gui.vimForm->TabLine() != NULL) {
-	    gui.vimForm->TabLine()->ResizeTo(w, gui.vimForm->TablineHeight());
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	ఒకవేళ (gui.vimForm->Tab_పంక్తి() != ఖాళీ) {
+	    gui.vimForm->Tab_పంక్తి()->Resize_గమ్యం(w, gui.vimForm->Tabline_ఎత్తు());
 	}
-#endif // FEAT_GUI_TABLINE
+#అయితే_ముగింపు // FEAT_GUI_TABLINE
 
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
@@ -3625,49 +3625,49 @@ gui_mch_set_text_area_pos(
  * Scrollbar stuff:
  */
 
-void
+శూన్య
 gui_mch_enable_scrollbar(
 	scrollbar_T *sb,
-	int	flag)
+	పూర్ణాంకం	flag)
 {
     VimScrollBar *vsb = sb->id;
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	/*
 	 * This function is supposed to be idempotent, but Show()/Hide()
 	 * is not. Therefore we test if they are needed.
 	 */
-	if (flag) {
-	    if (vsb->IsHidden()) {
+	ఒకవేళ (flag) {
+	    ఒకవేళ (vsb->IsHidden()) {
 		vsb->Show();
 	    }
-	} else {
-	    if (!vsb->IsHidden()) {
+	} లేకపోతే {
+	    ఒకవేళ (!vsb->IsHidden()) {
 		vsb->Hide();
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-void
-gui_mch_set_scrollbar_thumb(
+శూన్య
+gui_mch_సమితి_scrollbar_thumb(
 	scrollbar_T *sb,
-	int	val,
-	int	size,
-	int	max)
+	పూర్ణాంకం	val,
+	పూర్ణాంకం	కొలత,
+	పూర్ణాంకం	max)
 {
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	VimScrollBar *s = sb->id;
-	if (max == 0) {
-	    s->SetValue(0);
-	    s->SetRange(0.0, 0.0);
-	} else {
-	    s->SetProportion((float)size / (max + 1.0));
-	    s->SetSteps(1.0, size > 5 ? size - 2 : size);
-#ifndef SCROLL_PAST_END	    //	really only defined in gui.c...
-	    max = max + 1 - size;
-#endif
-	    if (max < s->Value()) {
+	ఒకవేళ (max == 0) {
+	    s->సమితి_విలువ(0);
+	    s->సమితి_Range(0.0, 0.0);
+	} లేకపోతే {
+	    s->సమితి_Proportion((దశాంశం)కొలత / (max + 1.0));
+	    s->సమితి_అడుగులు(1.0, కొలత > 5 ? కొలత - 2 : కొలత);
+#నిర్వచితం_కాకపోతే SCROLL_PAST_చివర	    //	really only defined in gui.c...
+	    max = max + 1 - కొలత;
+#అయితే_ముగింపు
+	    ఒకవేళ (max < s->విలువ_2()) {
 		/*
 		 * If the new maximum is lower than the current value,
 		 * setting it would cause the value to be clipped and
@@ -3675,93 +3675,93 @@ gui_mch_set_scrollbar_thumb(
 		 * We avoid this by setting the value first, because
 		 * it presumably is <= max.
 		 */
-		s->SetValue(val);
-		s->SetRange(0.0, max);
-	    } else {
+		s->సమితి_విలువ(val);
+		s->సమితి_Range(0.0, max);
+	    } లేకపోతే {
 		/*
 		 * In the other case, set the range first, since the
 		 * new value might be higher than the current max.
 		 */
-		s->SetRange(0.0, max);
-		s->SetValue(val);
+		s->సమితి_Range(0.0, max);
+		s->సమితి_విలువ(val);
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-void
-gui_mch_set_scrollbar_pos(
+శూన్య
+gui_mch_సమితి_scrollbar_pos(
 	scrollbar_T *sb,
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+	పూర్ణాంకం	x,
+	పూర్ణాంకం	y,
+	పూర్ణాంకం	w,
+	పూర్ణాంకం	h)
 {
-    if (gui.vimWindow->Lock()) {
-	BRect winb = gui.vimWindow->Bounds();
-	float vsbx = x, vsby = y;
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	BRect winb = gui.vim_కిటికీ->Bounds();
+	దశాంశం vsbx = x, vsby = y;
 	VimScrollBar *vsb = sb->id;
-	vsb->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
-	if (winb.right-(x+w)<w) vsbx = winb.right - (w - PEN_WIDTH);
-	vsb->MoveTo(vsbx, vsby);
-	gui.vimWindow->Unlock();
+	vsb->Resize_గమ్యం(w - PEN_వెడల్పు, h - PEN_వెడల్పు);
+	ఒకవేళ (winb.కుడి-(x+w)<w) vsbx = winb.కుడి - (w - PEN_వెడల్పు);
+	vsb->Move_గమ్యం(vsbx, vsby);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_xpadding(శూన్య)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    తిరిగి 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_ypadding(శూన్య)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    తిరిగి 0;
 }
 
-void
+శూన్య
 gui_mch_create_scrollbar(
 	scrollbar_T *sb,
-	int	orient)	    // SBAR_VERT or SBAR_HORIZ
+	పూర్ణాంకం	orient)	    // SBAR_VERT or SBAR_HORIZ
 {
     orientation posture =
 	(orient == SBAR_HORIZ) ? B_HORIZONTAL : B_VERTICAL;
 
-    VimScrollBar *vsb = sb->id = new VimScrollBar(sb, posture);
-    if (gui.vimWindow->Lock()) {
-	vsb->SetTarget(gui.vimTextArea);
+    VimScrollBar *vsb = sb->id = కొత్త VimScrollBar(sb, posture);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	vsb->సమితి_లక్ష్యం(gui.vim_పాఠ్యం_Area);
 	vsb->Hide();
-	gui.vimForm->AddChild(vsb);
-	gui.vimWindow->Unlock();
+	gui.vimForm->కూడు_బిడ్డ(vsb);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-#if defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
-void
+#ఒకవేళ defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
+శూన్య
 gui_mch_destroy_scrollbar(
 	scrollbar_T *sb)
 {
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	sb->id->RemoveSelf();
-	delete sb->id;
-	gui.vimWindow->Unlock();
+	తొలగించు sb->id;
+	gui.vim_కిటికీ->Unlock();
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Cursor does not flash
  */
-    int
-gui_mch_is_blink_off(void)
+    పూర్ణాంకం
+gui_mch_is_blink_off(శూన్య)
 {
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -3773,21 +3773,21 @@ gui_mch_is_blink_off(void)
  * BLINK_ON blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#నిర్వచించు BLINK_NONE  0
+#నిర్వచించు BLINK_OFF   1
+#నిర్వచించు BLINK_ON    2
 
-static int	blink_state = BLINK_NONE;
-static long_u	    blink_waittime = 700;
-static long_u	    blink_ontime = 400;
-static long_u	    blink_offtime = 250;
-static int  blink_timer = 0;
+స్థిర పూర్ణాంకం	blink_state = BLINK_NONE;
+స్థిర long_u	    blink_waittime = 700;
+స్థిర long_u	    blink_ontime = 400;
+స్థిర long_u	    blink_offtime = 250;
+స్థిర పూర్ణాంకం  blink_timer = 0;
 
-void
-gui_mch_set_blinking(
-	long	waittime,
-	long	on,
-	long	off)
+శూన్య
+gui_mch_సమితి_blinking(
+	దీర్ఘ	waittime,
+	దీర్ఘ	on,
+	దీర్ఘ	off)
 {
     // TODO
     blink_waittime = waittime;
@@ -3798,16 +3798,16 @@ gui_mch_set_blinking(
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    శూన్య
+gui_mch_stop_blink(పూర్ణాంకం may_call_gui_update_cursor)
 {
     // TODO
-    if (blink_timer != 0)
+    ఒకవేళ (blink_timer != 0)
     {
 	// XtRemoveTimeOut(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF)
+    ఒకవేళ (blink_state == BLINK_OFF)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -3816,14 +3816,14 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink()
+    శూన్య
+gui_mch_ప్రారంభం_blink()
 {
     // TODO
-    if (blink_timer != 0)
+    ఒకవేళ (blink_timer != 0)
 	;// XtRemoveTimeOut(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ఒకవేళ (blink_waittime && blink_ontime && blink_offtime && gui.లోపల_focus)
     {
 	blink_timer = 1; // XtAppAddTimeOut(app_context, blink_waittime,
 	blink_state = BLINK_ON;
@@ -3835,200 +3835,200 @@ gui_mch_start_blink()
  * Initialise vim to use the font with the given name.	Return FAIL if the font
  * could not be loaded, OK otherwise.
  */
-int
+పూర్ణాంకం
 gui_mch_init_font(
 	char_u	    *font_name,
-	int	    fontset)
+	పూర్ణాంకం	    fontset)
 {
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
-	int rc = gui.vimTextArea->mchInitFont(font_name);
-	gui.vimWindow->Unlock();
+	పూర్ణాంకం rc = gui.vim_పాఠ్యం_Area->mchInitFont(font_name);
+	gui.vim_కిటికీ->Unlock();
 
-	return rc;
+	తిరిగి rc;
     }
 
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 
-    int
+    పూర్ణాంకం
 gui_mch_adjust_charsize()
 {
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 
-    int
-gui_mch_font_dialog(font_family* family, font_style* style, float* size)
+    పూర్ణాంకం
+gui_mch_font_dialog(font_family* family, font_style* style, దశాంశం* కొలత)
 {
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 	// gui.vimWindow->Unlock();
-    VimSelectFontDialog *dialog = new VimSelectFontDialog(family, style, size);
-    bool ret = dialog->Go();
-	delete dialog;
-	return ret;
-#else
-    return NOFONT;
-#endif // FEAT_GUI_DIALOG
+    VimSelectFontDialog *dialog = కొత్త VimSelectFontDialog(family, style, కొలత);
+    తార్కిక ret = dialog->Go();
+	తొలగించు dialog;
+	తిరిగి ret;
+#లేకపోతే
+    తిరిగి NOFONT;
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 }
 
 
 GuiFont
 gui_mch_get_font(
 	char_u	    *name,
-	int	    giveErrorIfMissing)
+	పూర్ణాంకం	    giveErrorIfMissing)
 {
-    static VimFont *fontList = NULL;
+    స్థిర VimFont *fontList = ఖాళీ;
 
-    if (!gui.in_use)	//  can't do this when GUI not running
-	return NOFONT;
+    ఒకవేళ (!gui.లోపల_use)	//  can't do this when GUI not running
+	తిరిగి NOFONT;
 
     //	storage for locally modified name;
-    const int buff_size = B_FONT_FAMILY_LENGTH + B_FONT_STYLE_LENGTH + 20;
-    static char font_name[buff_size] = {0};
+    స్థిరరాశి పూర్ణాంకం buff_కొలత = B_FONT_FAMILY_నిడివి + B_FONT_STYLE_నిడివి + 20;
+    స్థిర అక్షరం font_name[buff_కొలత] = {0};
     font_family family = {0};
     font_style	style  = {0};
-    float size = 0.f;
+    దశాంశం కొలత = 0.f;
 
-    if (name == 0 && be_fixed_font == 0) {
-	if (giveErrorIfMissing)
+    ఒకవేళ (name == 0 && be_fixed_font == 0) {
+	ఒకవేళ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	తిరిగి NOFONT;
     }
 
-    bool useSelectGUI = false;
-    if (name != NULL)
-	if (STRCMP(name, "*") == 0) {
-	    useSelectGUI = true;
-	    STRNCPY(font_name, hl_get_font_name(), buff_size);
-	} else
-	    STRNCPY(font_name, name, buff_size);
+    తార్కిక useSelectGUI = అబద్ధం;
+    ఒకవేళ (name != ఖాళీ)
+	ఒకవేళ (STRCMP(name, "*") == 0) {
+	    useSelectGUI = నిజం;
+	    STRNCPY(font_name, hl_get_font_name(), buff_కొలత);
+	} లేకపోతే
+	    STRNCPY(font_name, name, buff_కొలత);
 
-    if (font_name[0] == 0) {
+    ఒకవేళ (font_name[0] == 0) {
 	be_fixed_font->GetFamilyAndStyle(&family, &style);
-	size = be_fixed_font->Size();
-	vim_snprintf(font_name, buff_size,
-	    (char*)"%s/%s/%.0f", family, style, size);
+	కొలత = be_fixed_font->కొలత_2();
+	vim_snprintf(font_name, buff_కొలత,
+	    (అక్షరం*)"%s/%s/%.0f", family, style, కొలత);
     }
 
     //	replace underscores with spaces
-    char* end = 0;
-    while (end = strchr((char *)font_name, '_'))
-	*end = ' ';
+    అక్షరం* చివర = 0;
+    అయితే (చివర = strchr((అక్షరం *)font_name, '_'))
+	*చివర = ' ';
 
     //	store the name before strtok corrupt the buffer ;-)
-    static char buff[buff_size] = {0};
-    STRNCPY(buff, font_name, buff_size);
-    STRNCPY(family, strtok(buff, "/\0"), B_FONT_FAMILY_LENGTH);
-    char* style_s = strtok(0, "/\0");
-    if (style_s != 0)
-	STRNCPY(style, style_s, B_FONT_STYLE_LENGTH);
-    size = atof((style_s != 0) ? strtok(0, "/\0") : "0");
+    స్థిర అక్షరం buff[buff_కొలత] = {0};
+    STRNCPY(buff, font_name, buff_కొలత);
+    STRNCPY(family, strtok(buff, "/\0"), B_FONT_FAMILY_నిడివి);
+    అక్షరం* style_s = strtok(0, "/\0");
+    ఒకవేళ (style_s != 0)
+	STRNCPY(style, style_s, B_FONT_STYLE_నిడివి);
+    కొలత = atof((style_s != 0) ? strtok(0, "/\0") : "0");
 
-    if (useSelectGUI) {
-	if (gui_mch_font_dialog(&family, &style, &size) == NOFONT)
-	    return FAIL;
+    ఒకవేళ (useSelectGUI) {
+	ఒకవేళ (gui_mch_font_dialog(&family, &style, &కొలత) == NOFONT)
+	    తిరిగి FAIL;
 	//  compose for further processing
-	vim_snprintf(font_name, buff_size,
-		(char*)"%s/%s/%.0f", family, style, size);
-	hl_set_font_name((char_u*)font_name);
+	vim_snprintf(font_name, buff_కొలత,
+		(అక్షరం*)"%s/%s/%.0f", family, style, కొలత);
+	hl_సమితి_font_name((char_u*)font_name);
 
 	//  Set guifont to the name of the selected font.
 	char_u* new_p_guifont = (char_u*)alloc(STRLEN(font_name) + 1);
-	if (new_p_guifont != NULL) {
+	ఒకవేళ (new_p_guifont != ఖాళీ) {
 	    STRCPY(new_p_guifont, font_name);
 	    vim_free(p_guifont);
 	    p_guifont = new_p_guifont;
 	    //	Replace spaces in the font name with underscores.
-	    for ( ; *new_p_guifont; ++new_p_guifont)
-		if (*new_p_guifont == ' ')
+	    కొరకు ( ; *new_p_guifont; ++new_p_guifont)
+		ఒకవేళ (*new_p_guifont == ' ')
 		    *new_p_guifont = '_';
 	}
     }
 
     VimFont *flp;
-    for (flp = fontList; flp; flp = flp->next) {
-	if (STRCMP(font_name, flp->name) == 0) {
+    కొరకు (flp = fontList; flp; flp = flp->తదుపరి) {
+	ఒకవేళ (STRCMP(font_name, flp->name) == 0) {
 	    flp->refcount++;
-	    return (GuiFont)flp;
+	    తిరిగి (GuiFont)flp;
 	}
     }
 
-    VimFont *font = new VimFont();
+    VimFont *font = కొత్త VimFont();
     font->name = vim_strsave((char_u*)font_name);
 
-    if (count_font_styles(family) <= 0) {
-	if (giveErrorIfMissing)
+    ఒకవేళ (లెక్క_font_styles(family) <= 0) {
+	ఒకవేళ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), font->name);
-	delete font;
-	return NOFONT;
+	తొలగించు font;
+	తిరిగి NOFONT;
     }
 
     //	Remember font in the static list for later use
-    font->next = fontList;
+    font->తదుపరి = fontList;
     fontList = font;
 
-    font->SetFamilyAndStyle(family, style);
-    if (size > 0.f)
-	font->SetSize(size);
+    font->సమితి_Family_And_Style(family, style);
+    ఒకవేళ (కొలత > 0.f)
+	font->సమితి_కొలత(కొలత);
 
-    font->SetSpacing(B_FIXED_SPACING);
-    font->SetEncoding(B_UNICODE_UTF8);
+    font->సమితి_Spacing(B_FIXED_SPACING);
+    font->సమితి_Encoding(B_UNICODE_UTF8);
 
-    return (GuiFont)font;
+    తిరిగి (GuiFont)font;
 }
 
 /*
  * Set the current text font.
  */
-void
-gui_mch_set_font(
+శూన్య
+gui_mch_సమితి_font(
 	GuiFont	font)
 {
-    if (gui.vimWindow->Lock()) {
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	VimFont *vf = (VimFont *)font;
 
-	gui.vimTextArea->SetFont(vf);
+	gui.vim_పాఠ్యం_Area->సమితి_Font(vf);
 
-	gui.char_width = (int) vf->StringWidth("n");
-	font_height fh;
-	vf->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + 0.9999)
-	    + (int)(fh.descent + 0.9999) + (int)(fh.leading + 0.9999);
-	gui.char_ascent = (int)(fh.ascent + 0.9999);
+	gui.char_వెడల్పు = (పూర్ణాంకం) vf->String_వెడల్పు("n");
+	font_ఎత్తు fh;
+	vf->Get_ఎత్తు(&fh);
+	gui.char_ఎత్తు = (పూర్ణాంకం)(fh.ascent + 0.9999)
+	    + (పూర్ణాంకం)(fh.descent + 0.9999) + (పూర్ణాంకం)(fh.leading + 0.9999);
+	gui.char_ascent = (పూర్ణాంకం)(fh.ascent + 0.9999);
 
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 // XXX TODO This is apparently never called...
-void
+శూన్య
 gui_mch_free_font(
 	GuiFont	font)
 {
-    if (font == NOFONT)
-	return;
+    ఒకవేళ (font == NOFONT)
+	తిరిగి;
     VimFont *f = (VimFont *)font;
-    if (--f->refcount <= 0) {
-	if (f->refcount < 0)
+    ఒకవేళ (--f->refcount <= 0) {
+	ఒకవేళ (f->refcount < 0)
 	    fprintf(stderr, "VimFont: refcount < 0\n");
-	delete f;
+	తొలగించు f;
     }
 }
 
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి vim_strsave(name);
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
+    పూర్ణాంకం
 gui_mch_adjust_charheight()
 {
 
@@ -4045,16 +4045,16 @@ gui_mch_adjust_charheight()
 // #endif
     {
 	VimFont *font = (VimFont *)gui.norm_font;
-	font_height fh = {0};
-	font->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + fh.descent + 0.5) + p_linespace;
-	gui.char_ascent = (int)(fh.ascent + 0.5) + p_linespace / 2;
+	font_ఎత్తు fh = {0};
+	font->Get_ఎత్తు(&fh);
+	gui.char_ఎత్తు = (పూర్ణాంకం)(fh.ascent + fh.descent + 0.5) + p_linespace;
+	gui.char_ascent = (పూర్ణాంకం)(fh.ascent + 0.5) + p_linespace / 2;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    శూన్య
+gui_mch_getmouse(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
     fprintf(stderr, "gui_mch_getmouse");
 
@@ -4072,8 +4072,8 @@ gui_mch_getmouse(int *x, int *y)
      }
 }
 
-    void
-gui_mch_mousehide(int hide)
+    శూన్య
+gui_mch_mousehide(పూర్ణాంకం hide)
 {
     fprintf(stderr, "gui_mch_getmouse");
     //	TODO
@@ -4089,186 +4089,186 @@ guicolor_T
 gui_mch_get_color(
 	char_u	*name)
 {
-    return gui_get_color_cmn(name);
+    తిరిగి gui_get_color_cmn(name);
 }
 
 /*
  * Set the current text foreground color.
  */
-void
-gui_mch_set_fg_color(
+శూన్య
+gui_mch_సమితి_fg_color(
 	guicolor_T  color)
 {
-    rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetHighColor(rgb);
-	gui.vimWindow->Unlock();
+    rgb_color rgb = GUI_గమ్యం_RGB(color);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->సమితి_ఎగువ_Color(rgb);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Set the current text background color.
  */
-void
-gui_mch_set_bg_color(
+శూన్య
+gui_mch_సమితి_bg_color(
 	guicolor_T  color)
 {
-    rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetLowColor(rgb);
-	gui.vimWindow->Unlock();
+    rgb_color rgb = GUI_గమ్యం_RGB(color);
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->సమితి_దిగువ_Color(rgb);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T	color)
+    శూన్య
+gui_mch_సమితి_sp_color(guicolor_T	color)
 {
     // prev_sp_color = color;
 }
 
-void
+శూన్య
 gui_mch_draw_string(
-	int	row,
-	int	col,
+	పూర్ణాంకం	అడ్డువరుస,
+	పూర్ణాంకం	నిలువు,
 	char_u	*s,
-	int	len,
-	int	flags)
+	పూర్ణాంకం	len,
+	పూర్ణాంకం	flags)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchDrawString(row, col, s, len, flags);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->mchDrawString(అడ్డువరుస, నిలువు, s, len, flags);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 	guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(పూర్ణాంకం r, పూర్ణాంకం g, పూర్ణాంకం b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    తిరిగి gui_get_rgb_color_cmn(r, g, b);
 }
 
 
 // Return OK if the key with the termcap name "name" is supported.
-int
+పూర్ణాంకం
 gui_mch_haskey(
 	char_u	*name)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; special_keys[i].BeKeys != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    కొరకు (i = 0; special_కీలకాలు[i].Be_కీలకాలు != 0; i++)
+	ఒకవేళ (name[0] == special_కీలకాలు[i].vim_code0 &&
+		name[1] == special_కీలకాలు[i].vim_code1)
+	    తిరిగి OK;
+    తిరిగి FAIL;
 }
 
-    void
+    శూన్య
 gui_mch_beep()
 {
     ::beep();
 }
 
-    void
-gui_mch_flash(int msec)
+    శూన్య
+gui_mch_flash(పూర్ణాంకం msec)
 {
     // Do a visual beep by reversing the foreground and background colors
 
-    if (gui.vimWindow->Lock()) {
-	BRect rect = gui.vimTextArea->Bounds();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	BRect rect = gui.vim_పాఠ్యం_Area->Bounds();
 
-	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->Sync();
+	gui.vim_పాఠ్యం_Area->సమితి_Drawing_బహుళకం(B_OP_INVERT);
+	gui.vim_పాఠ్యం_Area->FillRect(rect);
+	gui.vim_పాఠ్యం_Area->Sync();
 	snooze(msec * 1000);	 // wait for a few msec
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->SetDrawingMode(B_OP_COPY);
-	gui.vimTextArea->Flush();
-	gui.vimWindow->Unlock();
+	gui.vim_పాఠ్యం_Area->FillRect(rect);
+	gui.vim_పాఠ్యం_Area->సమితి_Drawing_బహుళకం(B_OP_COPY);
+	gui.vim_పాఠ్యం_Area->Flush();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-void
+శూన్య
 gui_mch_invert_rectangle(
-	int	r,
-	int	c,
-	int	nr,
-	int	nc)
+	పూర్ణాంకం	r,
+	పూర్ణాంకం	c,
+	పూర్ణాంకం	nr,
+	పూర్ణాంకం	nc)
 {
     BRect rect;
-    rect.left = FILL_X(c);
-    rect.top = FILL_Y(r);
-    rect.right = rect.left + nc * gui.char_width - PEN_WIDTH;
-    rect.bottom = rect.top + nr * gui.char_height - PEN_WIDTH;
+    rect.ఎడమ = FILL_X(c);
+    rect.శిఖరం = FILL_Y(r);
+    rect.కుడి = rect.ఎడమ + nc * gui.char_వెడల్పు - PEN_వెడల్పు;
+    rect.bottom = rect.శిఖరం + nr * gui.char_ఎత్తు - PEN_వెడల్పు;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->SetDrawingMode(B_OP_COPY);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->సమితి_Drawing_బహుళకం(B_OP_INVERT);
+	gui.vim_పాఠ్యం_Area->FillRect(rect);
+	gui.vim_పాఠ్యం_Area->సమితి_Drawing_బహుళకం(B_OP_COPY);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
+    శూన్య
 gui_mch_iconify()
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Minimize(true);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->Minimize(నిజం);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    శూన్య
+gui_mch_సమితి_foreground(శూన్య)
 {
     // TODO
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the window title
  */
-void
+శూన్య
 gui_mch_settitle(
 	char_u	*title,
 	char_u	*icon)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->SetTitle((char *)title);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->సమితి_Title((అక్షరం *)title);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    శూన్య
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_సమితి_fg_color(color);
 
     BRect r;
-    r.left = FILL_X(gui.col);
-    r.top = FILL_Y(gui.row);
-    int cells = utf_off2cells(LineOffset[gui.row] + gui.col, 100); // TODO-TODO
-    if (cells>=4) cells = 1;
-    r.right = r.left + cells*gui.char_width - PEN_WIDTH;
-    r.bottom = r.top + gui.char_height - PEN_WIDTH;
+    r.ఎడమ = FILL_X(gui.నిలువు);
+    r.శిఖరం = FILL_Y(gui.అడ్డువరుస);
+    పూర్ణాంకం cells = utf_off2cells(పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు, 100); // TODO-TODO
+    ఒకవేళ (cells>=4) cells = 1;
+    r.కుడి = r.ఎడమ + cells*gui.char_వెడల్పు - PEN_వెడల్పు;
+    r.bottom = r.శిఖరం + gui.char_ఎత్తు - PEN_వెడల్పు;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->StrokeRect(r);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->StrokeRect(r);
+	gui.vim_కిటికీ->Unlock();
 	// gui_mch_flush();
     }
 }
@@ -4276,28 +4276,28 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
 /*
  * Draw part of a cursor, only w pixels wide, and h pixels high.
  */
-void
+శూన్య
 gui_mch_draw_part_cursor(
-	int	w,
-	int	h,
+	పూర్ణాంకం	w,
+	పూర్ణాంకం	h,
 	guicolor_T  color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_సమితి_fg_color(color);
 
     BRect r;
-    r.left =
-#ifdef FEAT_RIGHTLEFT
+    r.ఎడమ =
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	// vertical line should be on the right of current point
-	CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-	FILL_X(gui.col);
-    r.right = r.left + w - PEN_WIDTH;
-    r.bottom = FILL_Y(gui.row + 1) - PEN_WIDTH;
-    r.top = r.bottom - h + PEN_WIDTH;
+	CURSOR_BAR_కుడి ? FILL_X(gui.నిలువు + 1) - w :
+#అయితే_ముగింపు
+	FILL_X(gui.నిలువు);
+    r.కుడి = r.ఎడమ + w - PEN_వెడల్పు;
+    r.bottom = FILL_Y(gui.అడ్డువరుస + 1) - PEN_వెడల్పు;
+    r.శిఖరం = r.bottom - h + PEN_వెడల్పు;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->FillRect(r);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->FillRect(r);
+	gui.vim_కిటికీ->Unlock();
 	// gui_mch_flush();
     }
 }
@@ -4308,12 +4308,12 @@ gui_mch_draw_part_cursor(
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
+    శూన్య
 gui_mch_update()
 {
     gui_mch_flush();
-    while (port_count(gui.vdcmp) > 0 &&
-	    !vim_is_input_buf_full() &&
+    అయితే (పోర్టు_లెక్క(gui.vdcmp) > 0 &&
+	    !vim_is_ఆదానం_buf_నిండిన() &&
 	    gui_haiku_process_event(0) >= B_OK)
 	/* nothing */ ;
 }
@@ -4327,57 +4327,57 @@ gui_mch_update()
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-int
+పూర్ణాంకం
 gui_mch_wait_for_chars(
-	long	wtime)
+	దీర్ఘ	wtime)
 {
-    int		focus;
+    పూర్ణాంకం		focus;
     bigtime_t	until, timeout;
-    status_t	st;
+    స్థితి_t	st;
 
-    if (wtime >= 0)
+    ఒకవేళ (wtime >= 0)
     {
 	timeout = wtime * 1000;
-	until = system_time() + timeout;
+	until = system_సమయం() + timeout;
     }
-    else
+    లేకపోతే
 	timeout = B_INFINITE_TIMEOUT;
 
-    focus = gui.in_focus;
-    for (;;)
+    focus = gui.లోపల_focus;
+    కొరకు (;;)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ఒకవేళ (gui.లోపల_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ఒకవేళ (gui.లోపల_focus)
+		gui_mch_ప్రారంభం_blink();
+	    లేకపోతే
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.లోపల_focus;
 	}
 
 	gui_mch_flush();
 
-#ifdef MESSAGE_QUEUE
+#నిర్వచితమైతే సందేశం_వరుస
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_కూడు_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ఒకవేళ (did_కూడు_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    ఆపు;
 # endif
-# ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+# ifdef FEAT_పని_CHANNEL
+	ఒకవేళ (has_any_channel())
 	{
-	    if (wtime < 0 || timeout > 20000)
+	    ఒకవేళ (wtime < 0 || timeout > 20000)
 		timeout = 20000;
 	}
-	else if (wtime < 0)
+	లేకపోతే ఒకవేళ (wtime < 0)
 	    timeout = B_INFINITE_TIMEOUT;
 # endif
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * Don't use gui_mch_update() because then we will spin-lock until a
@@ -4387,23 +4387,23 @@ gui_mch_wait_for_chars(
 	 */
 	st = gui_haiku_process_event(timeout);
 
-	if (input_available())
-	    return OK;
-	if (st < B_OK)		// includes B_TIMED_OUT
-	    return FAIL;
+	ఒకవేళ (ఆదానం_అందుబాటు())
+	    తిరిగి OK;
+	ఒకవేళ (st < B_OK)		// includes B_TIMED_OUT
+	    తిరిగి FAIL;
 
 	/*
 	 * Calculate how much longer we're willing to wait for the
 	 * next event.
 	 */
-	if (wtime >= 0)
+	ఒకవేళ (wtime >= 0)
 	{
-	    timeout = until - system_time();
-	    if (timeout < 0)
-		break;
+	    timeout = until - system_సమయం();
+	    ఒకవేళ (timeout < 0)
+		ఆపు;
 	}
     }
-    return FAIL;
+    తిరిగి FAIL;
 
 }
 
@@ -4415,40 +4415,40 @@ gui_mch_wait_for_chars(
  * Flush any output to the screen. This is typically called before
  * the app goes to sleep.
  */
-    void
+    శూన్య
 gui_mch_flush()
 {
     //	does this need to lock the window? Apparently not but be safe.
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Flush();
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_కిటికీ->Flush();
+	gui.vim_కిటికీ->Unlock();
     }
-    return;
+    తిరిగి;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-void
-gui_mch_clear_block(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+శూన్య
+gui_mch_clear_ఖండం(
+	పూర్ణాంకం	row1,
+	పూర్ణాంకం	col1,
+	పూర్ణాంకం	row2,
+	పూర్ణాంకం	col2)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchClearBlock(row1, col1, row2, col2);
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->mch_Clear_ఖండం(row1, col1, row2, col2);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-    void
+    శూన్య
 gui_mch_clear_all()
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchClearAll();
-	gui.vimWindow->Unlock();
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	gui.vim_పాఠ్యం_Area->mchClearAll();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
@@ -4456,49 +4456,49 @@ gui_mch_clear_all()
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-void
-gui_mch_delete_lines(
-	int	row,
-	int	num_lines)
+శూన్య
+gui_mch_delete_పంక్తులు(
+	పూర్ణాంకం	అడ్డువరుస,
+	పూర్ణాంకం	అంకె_పంక్తులు)
 {
-    gui.vimTextArea->mchDeleteLines(row, num_lines);
+    gui.vim_పాఠ్యం_Area->mch_Delete_పంక్తులు(అడ్డువరుస, అంకె_పంక్తులు);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-void
-gui_mch_insert_lines(
-	int	row,
-	int	num_lines)
+శూన్య
+gui_mch_చొప్పించు_పంక్తులు(
+	పూర్ణాంకం	అడ్డువరుస,
+	పూర్ణాంకం	అంకె_పంక్తులు)
 {
-    gui.vimTextArea->mchInsertLines(row, num_lines);
+    gui.vim_పాఠ్యం_Area->mch_చొప్పించు_పంక్తులు(అడ్డువరుస, అంకె_పంక్తులు);
 }
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-void
+శూన్య
 gui_mch_enable_menu(
-	int	flag)
+	పూర్ణాంకం	flag)
 {
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
 	BMenuBar *menubar = gui.vimForm->MenuBar();
-	menubar->SetEnabled(flag);
-	gui.vimWindow->Unlock();
+	menubar->సమితి_Enabled(flag);
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-void
-gui_mch_set_menu_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+శూన్య
+gui_mch_సమితి_menu_pos(
+	పూర్ణాంకం	x,
+	పూర్ణాంకం	y,
+	పూర్ణాంకం	w,
+	పూర్ణాంకం	h)
 {
     // It will be in the right place anyway
 }
@@ -4506,26 +4506,26 @@ gui_mch_set_menu_pos(
 /*
  * Add a sub menu to the menu bar.
  */
-void
-gui_mch_add_menu(
+శూన్య
+gui_mch_కూడు_menu(
 	vimmenu_T   *menu,
-	int	idx)
+	పూర్ణాంకం	idx)
 {
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
     //	popup menu - just create it unattached
-    if (menu_is_popup(menu->name) && parent == NULL) {
-	BPopUpMenu* popUpMenu = new BPopUpMenu((const char*)menu->name, false, false);
-	menu->submenu_id = popUpMenu;
-	menu->id = NULL;
-	return;
+    ఒకవేళ (menu_is_popup(menu->name) && మాతృ == ఖాళీ) {
+	BPop_పైకి_Menu* తీయి_పైకి_Menu = కొత్త BPop_పైకి_Menu((స్థిరరాశి అక్షరం*)menu->name, అబద్ధం, అబద్ధం);
+	menu->submenu_id = తీయి_పైకి_Menu;
+	menu->id = ఖాళీ;
+	తిరిగి;
     }
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == NULL))
-	return;
+    ఒకవేళ (!menu_is_menubar(menu->name)
+	    || (మాతృ != ఖాళీ && మాతృ->submenu_id == ఖాళీ))
+	తిరిగి;
 
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
 	// Major re-write of the menu code, it was failing with memory corruption when
 	// we started loading multiple files (the Buffer menu)
@@ -4537,55 +4537,55 @@ gui_mch_add_menu(
 
 	BMenu *tmp;
 
-	if ( parent )
-	    tmp = parent->submenu_id;
-	else
+	ఒకవేళ ( మాతృ )
+	    tmp = మాతృ->submenu_id;
+	లేకపోతే
 	    tmp = gui.vimForm->MenuBar();
 	//  make sure we don't try and add the same menu twice. The Buffers menu tries to
 	//  do this and Be starts to crash...
 
-	if ( ! tmp->FindItem((const char *) menu->dname)) {
+	ఒకవేళ ( ! tmp->కనుగొను_అంశం((స్థిరరాశి అక్షరం *) menu->dname)) {
 
-	    BMenu *bmenu = new BMenu((char *)menu->dname);
+	    BMenu *bmenu = కొత్త BMenu((అక్షరం *)menu->dname);
 
 	    menu->submenu_id = bmenu;
 
 	    //	when we add a BMenu to another Menu, it creates the interconnecting BMenuItem
-	    tmp->AddItem(bmenu);
+	    tmp->కూడు_అంశం(bmenu);
 
 	    //	Now it's safe to query the menu for the associated MenuItem...
-	    menu->id = tmp->FindItem((const char *) menu->dname);
+	    menu->id = tmp->కనుగొను_అంశం((స్థిరరాశి అక్షరం *) menu->dname);
 
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    శూన్య
+gui_mch_toggle_tearoffs(పూర్ణాంకం enable)
 {
     // no tearoff menus
 }
 
-    static BMessage *
-MenuMessage(vimmenu_T *menu)
+    స్థిర BMessage *
+Menu_సందేశం(vimmenu_T *menu)
 {
-    BMessage *m = new BMessage('menu');
-    m->AddPointer("VimMenu", (void *)menu);
+    BMessage *m = కొత్త BMessage('menu');
+    m->కూడు_సూచిక("VimMenu", (శూన్య *)menu);
 
-    return m;
+    తిరిగి m;
 }
 
 /*
  * Add a menu item to a menu
  */
-void
-gui_mch_add_menu_item(
+శూన్య
+gui_mch_కూడు_menu_అంశం(
 	vimmenu_T   *menu,
-	int	idx)
+	పూర్ణాంకం	idx)
 {
-    int	    mnemonic = 0;
-    vimmenu_T	*parent = menu->parent;
+    పూర్ణాంకం	    mnemonic = 0;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
     // TODO: use menu->actext
     // This is difficult, since on Be, an accelerator must be a single char
@@ -4593,57 +4593,57 @@ gui_mch_add_menu_item(
     //
     // Punt for Now...
     // richard@whiequeen.com jul 99
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
-#ifdef FEAT_TOOLBAR
-	if (menu_is_toolbar(parent->name)) {
+#నిర్వచితమైతే FEAT_TOOLBAR
+	ఒకవేళ (menu_is_toolbar(మాతృ->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
-		toolbar->AddButton(idx, menu);
+	    ఒకవేళ (toolbar != ఖాళీ) {
+		toolbar->కూడు_Button(idx, menu);
 	    }
-	} else
-#endif
+	} లేకపోతే
+#అయితే_ముగింపు
 
-	if (parent->submenu_id != NULL || menu_is_popup(parent->name)) {
-	    if (menu_is_separator(menu->name)) {
-		BSeparatorItem *item = new BSeparatorItem();
-		parent->submenu_id->AddItem(item);
-		menu->id = item;
-		menu->submenu_id = NULL;
+	ఒకవేళ (మాతృ->submenu_id != ఖాళీ || menu_is_popup(మాతృ->name)) {
+	    ఒకవేళ (menu_is_separator(menu->name)) {
+		BSeparator_అంశం *అంశం = కొత్త BSeparator_అంశం();
+		మాతృ->submenu_id->కూడు_అంశం(అంశం);
+		menu->id = అంశం;
+		menu->submenu_id = ఖాళీ;
 	    }
-	    else {
-		BMenuItem *item = new BMenuItem((char *)menu->dname,
-			MenuMessage(menu));
-		item->SetTarget(gui.vimTextArea);
-		item->SetTrigger((char) menu->mnemonic);
-		parent->submenu_id->AddItem(item);
-		menu->id = item;
-		menu->submenu_id = NULL;
+	    లేకపోతే {
+		BMenu_అంశం *అంశం = కొత్త BMenu_అంశం((అక్షరం *)menu->dname,
+			Menu_సందేశం(menu));
+		అంశం->సమితి_లక్ష్యం(gui.vim_పాఠ్యం_Area);
+		అంశం->సమితి_Trigger((అక్షరం) menu->mnemonic);
+		మాతృ->submenu_id->కూడు_అంశం(అంశం);
+		menu->id = అంశం;
+		menu->submenu_id = ఖాళీ;
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Destroy the machine specific menu widget.
  */
-void
+శూన్య
 gui_mch_destroy_menu(
 	vimmenu_T   *menu)
 {
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
-#ifdef FEAT_TOOLBAR
-	if (menu->parent && menu_is_toolbar(menu->parent->name)) {
+#నిర్వచితమైతే FEAT_TOOLBAR
+	ఒకవేళ (menu->మాతృ && menu_is_toolbar(menu->మాతృ->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
+	    ఒకవేళ (toolbar != ఖాళీ) {
 		toolbar->RemoveButton(menu);
 	    }
-	} else
-#endif
+	} లేకపోతే
+#అయితే_ముగింపు
 	{
-	    assert(menu->submenu_id == NULL || menu->submenu_id->CountItems() == 0);
+	    ప్రతిజ్ఞా(menu->submenu_id == ఖాళీ || menu->submenu_id->లెక్క_వస్తువులు() == 0);
 	    /*
 	     * Detach this menu from its parent, so that it is not deleted
 	     * twice once we get to delete that parent.
@@ -4652,150 +4652,150 @@ gui_mch_destroy_menu(
 	     * removed and deleted before).
 	     */
 	    BMenu *bmenu = menu->id->Menu();
-	    if (bmenu)
+	    ఒకవేళ (bmenu)
 	    {
-		bmenu->RemoveItem(menu->id);
+		bmenu->Remove_అంశం(menu->id);
 		/*
 		 * If we removed the last item from the menu bar,
 		 * resize it out of sight.
 		 */
-		if (bmenu == gui.vimForm->MenuBar() && bmenu->CountItems() == 0)
+		ఒకవేళ (bmenu == gui.vimForm->MenuBar() && bmenu->లెక్క_వస్తువులు() == 0)
 		{
-		    bmenu->ResizeTo(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
+		    bmenu->Resize_గమ్యం(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
 		}
 	    }
-	    delete menu->id;
-	    menu->id = NULL;
-	    menu->submenu_id = NULL;
+	    తొలగించు menu->id;
+	    menu->id = ఖాళీ;
+	    menu->submenu_id = ఖాళీ;
 
-	    gui.menu_height = (int) gui.vimForm->MenuHeight();
+	    gui.menu_ఎత్తు = (పూర్ణాంకం) gui.vimForm->Menu_ఎత్తు();
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_కిటికీ->Unlock();
     }
 }
 
 /*
  * Make a menu either grey or not grey.
  */
-void
+శూన్య
 gui_mch_menu_grey(
 	vimmenu_T   *menu,
-	int	grey)
+	పూర్ణాంకం	grey)
 {
-#ifdef FEAT_TOOLBAR
-    if (menu->parent && menu_is_toolbar(menu->parent->name)) {
-	if (gui.vimWindow->Lock()) {
+#నిర్వచితమైతే FEAT_TOOLBAR
+    ఒకవేళ (menu->మాతృ && menu_is_toolbar(menu->మాతృ->name)) {
+	ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
-		toolbar->GrayButton(menu, grey);
+	    ఒకవేళ (toolbar != ఖాళీ) {
+		toolbar->బూడిద_Button(menu, grey);
 	    }
-	    gui.vimWindow->Unlock();
+	    gui.vim_కిటికీ->Unlock();
 	}
-    } else
-#endif
-    if (menu->id != NULL)
-	menu->id->SetEnabled(!grey);
+    } లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (menu->id != ఖాళీ)
+	menu->id->సమితి_Enabled(!grey);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-void
+శూన్య
 gui_mch_menu_hidden(
 	vimmenu_T   *menu,
-	int	hidden)
+	పూర్ణాంకం	hidden)
 {
-    if (menu->id != NULL)
-	menu->id->SetEnabled(!hidden);
+    ఒకవేళ (menu->id != ఖాళీ)
+	menu->id->సమితి_Enabled(!hidden);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
+    శూన్య
 gui_mch_draw_menubar()
 {
     // Nothing to do in BeOS
 }
 
-    void
+    శూన్య
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    if (!menu_is_popup(menu->name) || menu->submenu_id == NULL)
-	return;
+    ఒకవేళ (!menu_is_popup(menu->name) || menu->submenu_id == ఖాళీ)
+	తిరిగి;
 
-    BPopUpMenu* popupMenu = dynamic_cast<BPopUpMenu*>(menu->submenu_id);
-    if (popupMenu == NULL)
-	return;
+    BPop_పైకి_Menu* popupMenu = dynamic_cast<BPop_పైకి_Menu*>(menu->submenu_id);
+    ఒకవేళ (popupMenu == ఖాళీ)
+	తిరిగి;
 
-    BPoint point;
-    if (gui.vimWindow->Lock()) {
+    BPoint బిందువు;
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
 	uint32 buttons = 0;
-	gui.vimTextArea->GetMouse(&point, &buttons);
-	gui.vimTextArea->ConvertToScreen(&point);
-	gui.vimWindow->Unlock();
+	gui.vim_పాఠ్యం_Area->GetMouse(&బిందువు, &buttons);
+	gui.vim_పాఠ్యం_Area->Convert_గమ్యం_Screen(&బిందువు);
+	gui.vim_కిటికీ->Unlock();
     }
-    popupMenu->Go(point, true);
+    popupMenu->Go(బిందువు, నిజం);
 }
 
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 // Mouse stuff
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
-char textplain[] = "text/plain";
-char vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
+అక్షరం textplain[] = "text/plain";
+అక్షరం vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
 
 /*
  * Get the current selection and put it in the clipboard register.
  */
-    void
+    శూన్య
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    ఒకవేళ (be_clipboard->తాళం_2())
     {
-	BMessage *m = be_clipboard->Data();
+	BMessage *m = be_clipboard->దత్తాంశం_2();
 	// m->PrintToStream();
 
-	char_u *string = NULL;
+	char_u *string = ఖాళీ;
 	ssize_t stringlen = -1;
 
-	if (m->FindData(textplain, B_MIME_TYPE,
-		    (const void **)&string, &stringlen) == B_OK
-		|| m->FindString("text", (const char **)&string) == B_OK)
+	ఒకవేళ (m->కనుగొను_దత్తాంశం(textplain, B_MIME_TYPE,
+		    (స్థిరరాశి శూన్య **)&string, &stringlen) == B_OK
+		|| m->కనుగొను_String("text", (స్థిరరాశి అక్షరం **)&string) == B_OK)
 	{
-	    if (stringlen == -1)
+	    ఒకవేళ (stringlen == -1)
 		stringlen = STRLEN(string);
 
-	    int type;
-	    char *seltype;
+	    పూర్ణాంకం type;
+	    అక్షరం *seltype;
 	    ssize_t seltypelen;
 
 	    /*
 	     * Try to get the special vim selection type first
 	     */
-	    if (m->FindData(vimselectiontype, B_MIME_TYPE,
-			(const void **)&seltype, &seltypelen) == B_OK)
+	    ఒకవేళ (m->కనుగొను_దత్తాంశం(vimselectiontype, B_MIME_TYPE,
+			(స్థిరరాశి శూన్య **)&seltype, &seltypelen) == B_OK)
 	    {
-		switch (*seltype)
+		ఎంపిక (*seltype)
 		{
-		    default:
-		    case 'L':	type = MLINE;	break;
-		    case 'C':	type = MCHAR;	break;
-#ifdef FEAT_VISUAL
-		    case 'B':	type = MBLOCK;	break;
-#endif
+		    అప్రమేయ:
+		    స్థితి 'L':	type = MLINE;	ఆపు;
+		    స్థితి 'C':	type = MCHAR;	ఆపు;
+#నిర్వచితమైతే FEAT_VISUAL
+		    స్థితి 'B':	type = MBLOCK;	ఆపు;
+#అయితే_ముగింపు
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Otherwise use heuristic as documented
 		type = memchr(string, stringlen, '\n') ? MLINE : MCHAR;
 	    }
-	    clip_yank_selection(type, string, (long)stringlen, cbd);
+	    clip_yank_selection(type, string, (దీర్ఘ)stringlen, cbd);
 	}
 	be_clipboard->Unlock();
     }
@@ -4803,7 +4803,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.
  */
-    void
+    శూన్య
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     // Nothing needs to be done here
@@ -4812,56 +4812,56 @@ clip_mch_lose_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
+    పూర్ణాంకం
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd)
+    శూన్య
+clip_mch_సమితి_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    ఒకవేళ (be_clipboard->తాళం_2())
     {
 	be_clipboard->Clear();
-	BMessage *m = be_clipboard->Data();
-	assert(m);
+	BMessage *m = be_clipboard->దత్తాంశం_2();
+	ప్రతిజ్ఞా(m);
 
 	// If the '*' register isn't already filled in, fill it in now
 	cbd->owned = TRUE;
 	clip_get_selection(cbd);
 	cbd->owned = FALSE;
 
-	char_u	*str = NULL;
-	long_u	count;
-	int type;
+	char_u	*str = ఖాళీ;
+	long_u	లెక్క;
+	పూర్ణాంకం type;
 
-	type = clip_convert_selection(&str, &count, cbd);
+	type = clip_convert_selection(&str, &లెక్క, cbd);
 
-	if (type < 0)
-	    return;
+	ఒకవేళ (type < 0)
+	    తిరిగి;
 
-	m->AddData(textplain, B_MIME_TYPE, (void *)str, count);
+	m->కూడు_దత్తాంశం(textplain, B_MIME_TYPE, (శూన్య *)str, లెక్క);
 
 	// Add type of selection
-	char	vtype;
-	switch (type)
+	అక్షరం	vtype;
+	ఎంపిక (type)
 	{
-	    default:
-	    case MLINE:    vtype = 'L';    break;
-	    case MCHAR:    vtype = 'C';    break;
-#ifdef FEAT_VISUAL
-	    case MBLOCK:   vtype = 'B';    break;
-#endif
+	    అప్రమేయ:
+	    స్థితి MLINE:    vtype = 'L';    ఆపు;
+	    స్థితి MCHAR:    vtype = 'C';    ఆపు;
+#నిర్వచితమైతే FEAT_VISUAL
+	    స్థితి MBLOCK:   vtype = 'B';    ఆపు;
+#అయితే_ముగింపు
 	}
-	m->AddData(vimselectiontype, B_MIME_TYPE, (void *)&vtype, 1);
+	m->కూడు_దత్తాంశం(vimselectiontype, B_MIME_TYPE, (శూన్య *)&vtype, 1);
 
 	vim_free(str);
 
@@ -4870,9 +4870,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
     }
 }
 
-#endif	// FEAT_CLIPBOARD
+#అయితే_ముగింపు	// FEAT_CLIPBOARD
 
-#ifdef FEAT_BROWSE
+#నిర్వచితమైతే FEAT_BROWSE
 /*
  * Pop open a file browser and return the file selected, in allocated memory,
  * or NULL if Cancel is hit.
@@ -4893,47 +4893,47 @@ clip_mch_set_selection(Clipboard_T *cbd)
  */
 char_u *
 gui_mch_browse(
-	int saving,
+	పూర్ణాంకం saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
 	char_u *initdir,
 	char_u *filter)
 {
-    gui.vimApp->fFilePanel = new BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
-	    NULL, NULL, 0, false,
-	    new BMessage((saving == TRUE) ? 'save' : 'open'), NULL, true);
+    gui.vimApp->fFilePanel = కొత్త BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
+	    ఖాళీ, ఖాళీ, 0, అబద్ధం,
+	    కొత్త BMessage((saving == TRUE) ? 'save' : 'open'), ఖాళీ, నిజం);
 
-    gui.vimApp->fBrowsedPath.Unset();
+    gui.vimApp->f_Browsed_మార్గం.Unset();
 
-    gui.vimApp->fFilePanel->Window()->SetTitle((char*)title);
-    gui.vimApp->fFilePanel->SetPanelDirectory((const char*)initdir);
+    gui.vimApp->fFilePanel->కిటికీ()->సమితి_Title((అక్షరం*)title);
+    gui.vimApp->fFilePanel->సమితి_Panel_Directory((స్థిరరాశి అక్షరం*)initdir);
 
     gui.vimApp->fFilePanel->Show();
 
     gui.vimApp->fFilePanelSem = create_sem(0, "FilePanelSem");
 
-    while (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
+    అయితే (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
 
-    char_u *fileName = NULL;
-    status_t result = gui.vimApp->fBrowsedPath.InitCheck();
-    if (result == B_OK) {
-	fileName = vim_strsave((char_u*)gui.vimApp->fBrowsedPath.Path());
-    } else
-	if (result != B_NO_INIT) {
+    char_u *fileName = ఖాళీ;
+    స్థితి_t ఫలితం = gui.vimApp->f_Browsed_మార్గం.InitCheck();
+    ఒకవేళ (ఫలితం == B_OK) {
+	fileName = vim_strsave((char_u*)gui.vimApp->f_Browsed_మార్గం.మార్గం_2());
+    } లేకపోతే
+	ఒకవేళ (ఫలితం != B_NO_INIT) {
 	    fprintf(stderr, "gui_mch_browse: BPath error: %#08x (%s)\n",
-		    result, strerror(result));
+		    ఫలితం, strerror(ఫలితం));
 	}
 
-    delete gui.vimApp->fFilePanel;
-    gui.vimApp->fFilePanel = NULL;
+    తొలగించు gui.vimApp->fFilePanel;
+    gui.vimApp->fFilePanel = ఖాళీ;
 
-    return fileName;
+    తిరిగి fileName;
 }
-#endif // FEAT_BROWSE
+#అయితే_ముగింపు // FEAT_BROWSE
 
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 
 /*
  * Create a dialog dynamically from the parameter strings.
@@ -4952,24 +4952,24 @@ gui_mch_browse(
  * If stubbing out this fn, return 1.
  */
 
-int
+పూర్ణాంకం
 gui_mch_dialog(
-	int	 type,
+	పూర్ణాంకం	 type,
 	char_u	*title,
-	char_u	*message,
+	char_u	*సందేశం_2,
 	char_u	*buttons,
-	int	 dfltbutton,
+	పూర్ణాంకం	 dfltbutton,
 	char_u	*textfield,
-	int ex_cmd)
+	పూర్ణాంకం ex_cmd)
 {
-    VimDialog *dialog = new VimDialog(type, (char*)title, (char*)message,
-	    (char*)buttons, dfltbutton, (char*)textfield, ex_cmd);
-    bool ret = dialog->Go();
-    delete dialog;
-	return ret;
+    VimDialog *dialog = కొత్త VimDialog(type, (అక్షరం*)title, (అక్షరం*)సందేశం_2,
+	    (అక్షరం*)buttons, dfltbutton, (అక్షరం*)textfield, ex_cmd);
+    తార్కిక ret = dialog->Go();
+    తొలగించు dialog;
+	తిరిగి ret;
 }
 
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
 
 /*
@@ -4978,80 +4978,80 @@ gui_mch_dialog(
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    rgb_color rgb = GUI_TO_RGB(pixel);
+    rgb_color rgb = GUI_గమ్యం_RGB(pixel);
 
-    return ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
+    తిరిగి ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
 	+ (rgb.blue & 0xff);
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    శూన్య
+gui_mch_setmouse(పూర్ణాంకం x, పూర్ణాంకం y)
 {
     TRACE();
     // TODO
 }
 
-#ifdef FEAT_MBYTE_IME
-    void
-im_set_position(int row, int col)
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    శూన్య
+im_సమితి_position(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    if (gui.vimWindow->Lock())
+    ఒకవేళ (gui.vim_కిటికీ->తాళం_2())
     {
-	gui.vimTextArea->DrawIMString();
-	gui.vimWindow->Unlock();
+	gui.vim_పాఠ్యం_Area->DrawIMString();
+	gui.vim_కిటికీ->Unlock();
     }
-    return;
+    తిరిగి;
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-gui_mch_show_toolbar(int showit)
+    శూన్య
+gui_mch_show_toolbar(పూర్ణాంకం showit)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
-    gui.toolbar_height = (toolbar && showit) ? toolbar->ToolbarHeight() : 0.;
+    gui.toolbar_ఎత్తు = (toolbar && showit) ? toolbar->Toolbar_ఎత్తు() : 0.;
 }
 
-    void
-gui_mch_set_toolbar_pos(int x, int y, int w, int h)
+    శూన్య
+gui_mch_సమితి_toolbar_pos(పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
-    if (toolbar != NULL) {
-	if (gui.vimWindow->Lock()) {
-	    toolbar->MoveTo(x, y);
-	    toolbar->ResizeTo(w - 1, h - 1);
-	    gui.vimWindow->Unlock();
+    ఒకవేళ (toolbar != ఖాళీ) {
+	ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	    toolbar->Move_గమ్యం(x, y);
+	    toolbar->Resize_గమ్యం(w - 1, h - 1);
+	    gui.vim_కిటికీ->Unlock();
 	}
     }
 }
 
-#if defined(FEAT_GUI_TABLINE)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    శూన్య
+gui_mch_show_tabline(పూర్ణాంకం showit)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
 
-    if (tabLine == NULL)
-	return;
+    ఒకవేళ (tab_పంక్తి == ఖాళీ)
+	తిరిగి;
 
-    if (!showit != !gui.vimForm->IsShowingTabLine()) {
-	gui.vimForm->SetShowingTabLine(showit != 0);
-	gui.tabline_height = gui.vimForm->TablineHeight();
+    ఒకవేళ (!showit != !gui.vimForm->Is_Showing_Tab_పంక్తి()) {
+	gui.vimForm->సమితి_Showing_Tab_పంక్తి(showit != 0);
+	gui.tabline_ఎత్తు = gui.vimForm->Tabline_ఎత్తు();
     }
 }
 
-    void
-gui_mch_set_tabline_pos(int x, int y, int w, int h)
+    శూన్య
+gui_mch_సమితి_tabline_pos(పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
-	if (gui.vimWindow->Lock()) {
-	    tabLine->MoveTo(x, y);
-	    tabLine->ResizeTo(w - 1, h - 1);
-	    gui.vimWindow->Unlock();
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
+    ఒకవేళ (tab_పంక్తి != ఖాళీ) {
+	ఒకవేళ (gui.vim_కిటికీ->తాళం_2()) {
+	    tab_పంక్తి->Move_గమ్యం(x, y);
+	    tab_పంక్తి->Resize_గమ్యం(w - 1, h - 1);
+	    gui.vim_కిటికీ->Unlock();
 	}
     }
 }
@@ -5059,73 +5059,73 @@ gui_mch_set_tabline_pos(int x, int y, int w, int h)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
+    పూర్ణాంకం
 gui_mch_showing_tabline()
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    return tabLine != NULL && gui.vimForm->IsShowingTabLine();
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
+    తిరిగి tab_పంక్తి != ఖాళీ && gui.vimForm->Is_Showing_Tab_పంక్తి();
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
+    శూన్య
 gui_mch_update_tabline()
 {
     tabpage_T	*tp;
-    int	    nr = 0;
-    int	    curtabidx = 0;
+    పూర్ణాంకం	    nr = 0;
+    పూర్ణాంకం	    curtabidx = 0;
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
 
-    if (tabLine == NULL)
-	return;
+    ఒకవేళ (tab_పంక్తి == ఖాళీ)
+	తిరిగి;
 
-    gui.vimWindow->Lock();
+    gui.vim_కిటికీ->తాళం_2();
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr) {
-	if (tp == curtab)
+    కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ; tp = tp->tp_తదుపరి, ++nr) {
+	ఒకవేళ (tp == curtab)
 	    curtabidx = nr;
 
-	BTab* tab = tabLine->TabAt(nr);
+	BTab* tab = tab_పంక్తి->TabAt(nr);
 
-	if (tab == NULL) {
-	    tab = new VimTabLine::VimTab();
-	    tabLine->AddTab(NULL, tab);
+	ఒకవేళ (tab == ఖాళీ) {
+	    tab = కొత్త Vim_Tab_పంక్తి::VimTab();
+	    tab_పంక్తి->కూడు_Tab(ఖాళీ, tab);
 	}
 
 	get_tabline_label(tp, FALSE);
-	tab->SetLabel((const char*)NameBuff);
-	tabLine->Invalidate();
+	tab->సమితి_Label((స్థిరరాశి అక్షరం*)NameBuff);
+	tab_పంక్తి->Invalidate();
     }
 
     // Remove any old labels.
-    while (nr < tabLine->CountTabs())
-	tabLine->RemoveTab(nr);
+    అయితే (nr < tab_పంక్తి->లెక్క_Tabs())
+	tab_పంక్తి->RemoveTab(nr);
 
-    if (tabLine->Selection() != curtabidx)
-	tabLine->Select(curtabidx);
+    ఒకవేళ (tab_పంక్తి->Selection() != curtabidx)
+	tab_పంక్తి->Select(curtabidx);
 
-    gui.vimWindow->Unlock();
+    gui.vim_కిటికీ->Unlock();
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    శూన్య
+gui_mch_సమితి_curtab(పూర్ణాంకం nr)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine == NULL)
-	return;
+    Vim_Tab_పంక్తి *tab_పంక్తి = gui.vimForm->Tab_పంక్తి();
+    ఒకవేళ (tab_పంక్తి == ఖాళీ)
+	తిరిగి;
 
-    gui.vimWindow->Lock();
+    gui.vim_కిటికీ->తాళం_2();
 
-    if (tabLine->Selection() != nr -1)
-	tabLine->Select(nr -1);
+    ఒకవేళ (tab_పంక్తి->Selection() != nr -1)
+	tab_పంక్తి->Select(nr -1);
 
-    gui.vimWindow->Unlock();
+    gui.vim_కిటికీ->Unlock();
 }
 
-#endif // FEAT_GUI_TABLINE
+#అయితే_ముగింపు // FEAT_GUI_TABLINE

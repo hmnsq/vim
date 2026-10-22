@@ -20,357 +20,357 @@
  * Roger Knobbe <rogerk@wonderware.com> did the initial port of Vim 3.0.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_MZSCHEME
+#నిర్వచితమైతే FEAT_MZSCHEME
 # include "if_mzsch.h"
-#endif
+#అయితే_ముగింపు
 
-#include <sys/types.h>
-#include <signal.h>
-#include <limits.h>
+#అన్తర్భావ <sys/types.h>
+#అన్తర్భావ <signal.h>
+#అన్తర్భావ <limits.h>
 
-#include <process.h>
-#include <winternl.h>
-#include <direct.h>
+#అన్తర్భావ <process.h>
+#అన్తర్భావ <winternl.h>
+#అన్తర్భావ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_JOB_CHANNEL
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 # include <tlhelp32.h>
-#endif
+#అయితే_ముగింపు
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#నిర్వచితమైతే MCH_WRITE_DUMP
+FILE* fdDump = ఖాళీ;
+#అయితే_ముగింపు
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
-static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
-static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
+స్థిర HANDLE g_h_Con_లోపల  = INVALID_HANDLE_విలువ;
+స్థిర HANDLE g_h_Con_బహిర్గతం = INVALID_HANDLE_విలువ;
 
 // Win32 Screen buffer,coordinate,console I/O information
-static SMALL_RECT g_srScrollRegion;
+స్థిర SMALL_RECT g_srScrollRegion;
 // This is explicitly initialised to work around a LTCG issue on Windows ARM64
 // (at least of 19.39.33321).  This pushes this into the `.data` rather than
 // `.bss` which corrects code generation in `write_chars` (#13453).
-static COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
+స్థిర COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
 
 // The attribute of the screen when the editor was started
-static WORD  g_attrDefault = 7;  // lightgray text on black background
-static WORD  g_attrCurrent;
+స్థిర మాట_2  g_attrDefault = 7;  // lightgray text on black background
+స్థిర మాట_2  g_attrCurrent;
 
-static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
-static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
-static int g_fForceExit = FALSE;    // set when forcefully exiting
+స్థిర పూర్ణాంకం g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
+స్థిర పూర్ణాంకం g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
+స్థిర పూర్ణాంకం g_fForceExit = FALSE;    // set when forcefully exiting
 
-static void scroll(unsigned cLines);
-static void set_scroll_region(unsigned left, unsigned top,
-			      unsigned right, unsigned bottom);
-static void set_scroll_region_tb(unsigned top, unsigned bottom);
-static void set_scroll_region_lr(unsigned left, unsigned right);
-static void insert_lines(unsigned cLines);
-static void delete_lines(unsigned cLines);
-static void gotoxy(unsigned x, unsigned y);
-static void standout(void);
-static int s_cursor_visible = TRUE;
-static int did_create_conin = FALSE;
+స్థిర శూన్య scroll(గుర్తులేని c_పంక్తులు);
+స్థిర శూన్య సమితి_scroll_region(గుర్తులేని ఎడమ_2, గుర్తులేని శిఖరం,
+			      గుర్తులేని కుడి_2, గుర్తులేని bottom);
+స్థిర శూన్య సమితి_scroll_region_tb(గుర్తులేని శిఖరం, గుర్తులేని bottom);
+స్థిర శూన్య సమితి_scroll_region_lr(గుర్తులేని ఎడమ_2, గుర్తులేని కుడి_2);
+స్థిర శూన్య చొప్పించు_పంక్తులు(గుర్తులేని c_పంక్తులు);
+స్థిర శూన్య delete_పంక్తులు(గుర్తులేని c_పంక్తులు);
+స్థిర శూన్య gotoxy(గుర్తులేని x, గుర్తులేని y);
+స్థిర శూన్య standout(శూన్య);
+స్థిర పూర్ణాంకం s_cursor_visible = TRUE;
+స్థిర పూర్ణాంకం did_create_conin = FALSE;
 // The 'input_record_buffer' is an internal dynamic fifo queue of MS-Windows
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
 // of INPUT_RECORDs.
-typedef struct input_record_buffer_node_S
+రకనిర్వచనం నిర్మాణం ఆదానం_రికార్డు_బఫరు_కణుపు_S
 {
-    INPUT_RECORD ir;
-    struct input_record_buffer_node_S *next;
-} input_record_buffer_node_T;
-typedef struct input_record_buffer_S
+    ఆదానం_రికార్డు ir;
+    నిర్మాణం ఆదానం_రికార్డు_బఫరు_కణుపు_S *తదుపరి;
+} ఆదానం_రికార్డు_బఫరు_కణుపు_T;
+రకనిర్వచనం నిర్మాణం ఆదానం_రికార్డు_బఫరు_S
 {
-    input_record_buffer_node_T *head;
-    input_record_buffer_node_T *tail;
-    int length;
-} input_record_buffer_T;
-static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
-#endif
-#ifdef FEAT_GUI_MSWIN
-static int s_dont_use_vimrun = TRUE;
-static int need_vimrun_warning = FALSE;
-static string_T vimrun_path = {(char_u *)"vimrun ", 7};
-static int vimrun_path_allocated = FALSE;
-#endif
+    ఆదానం_రికార్డు_బఫరు_కణుపు_T *తల;
+    ఆదానం_రికార్డు_బఫరు_కణుపు_T *తోక;
+    పూర్ణాంకం నిడివి;
+} ఆదానం_రికార్డు_బఫరు_T;
+స్థిర ఆదానం_రికార్డు_బఫరు_T ఆదానం_రికార్డు_బఫరు;
+స్థిర పూర్ణాంకం read_ఆదానం_రికార్డు_బఫరు(ఆదానం_రికార్డు* irEvents, పూర్ణాంకం n_Max_నిడివి);
+స్థిర పూర్ణాంకం write_ఆదానం_రికార్డు_బఫరు(ఆదానం_రికార్డు* irEvents, పూర్ణాంకం n_నిడివి);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+స్థిర పూర్ణాంకం s_dont_use_vimrun = TRUE;
+స్థిర పూర్ణాంకం need_vimrun_warning = FALSE;
+స్థిర string_T vimrun_మార్గం = {(char_u *)"vimrun ", 7};
+స్థిర పూర్ణాంకం vimrun_మార్గం_allocated = FALSE;
+#అయితే_ముగింపు
 
-static int win32_getattrs(char_u *name);
-static int win32_setattrs(char_u *name, int attrs);
-static int win32_set_archive(char_u *name);
+స్థిర పూర్ణాంకం win32_getattrs(char_u *name);
+స్థిర పూర్ణాంకం win32_setattrs(char_u *name, పూర్ణాంకం attrs);
+స్థిర పూర్ణాంకం win32_సమితి_archive(char_u *name);
 
-static int conpty_working = 0;
-static int conpty_type = 0;
-static int conpty_stable = 0;
-static int conpty_fix_type = 0;
-static void vtp_flag_init(void);
+స్థిర పూర్ణాంకం conpty_working = 0;
+స్థిర పూర్ణాంకం conpty_type = 0;
+స్థిర పూర్ణాంకం conpty_stable = 0;
+స్థిర పూర్ణాంకం conpty_fix_type = 0;
+స్థిర శూన్య vtp_flag_init(శూన్య);
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int vtp_working = 0;
-static void vtp_init(void);
-static void vtp_exit(void);
-static void vtp_sgr_bulk(int arg);
-static void vtp_sgr_bulks(int argc, int *argv);
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+స్థిర పూర్ణాంకం vtp_working = 0;
+స్థిర శూన్య vtp_init(శూన్య);
+స్థిర శూన్య vtp_exit(శూన్య);
+స్థిర శూన్య vtp_sgr_bulk(పూర్ణాంకం arg);
+స్థిర శూన్య vtp_sgr_bulks(పూర్ణాంకం argc, పూర్ణాంకం *argv);
 
-static int wt_working = 0;
-static void wt_init(void);
+స్థిర పూర్ణాంకం wt_working = 0;
+స్థిర శూన్య wt_init(శూన్య);
 
-static int g_color_index_bg = 0;
-static int g_color_index_fg = 7;
+స్థిర పూర్ణాంకం g_color_సూచీ_bg = 0;
+స్థిర పూర్ణాంకం g_color_సూచీ_fg = 7;
 
 # ifdef FEAT_TERMGUICOLORS
-static guicolor_T save_console_bg_rgb;
-static guicolor_T save_console_fg_rgb;
-static guicolor_T store_console_bg_rgb;
-static guicolor_T store_console_fg_rgb;
-static int default_console_color_bg = 0x000000; // black
-static int default_console_color_fg = 0xc0c0c0; // white
-#  define USE_VTP		(vtp_working && is_term_win32() \
+స్థిర guicolor_T save_console_bg_rgb;
+స్థిర guicolor_T save_console_fg_rgb;
+స్థిర guicolor_T store_console_bg_rgb;
+స్థిర guicolor_T store_console_fg_rgb;
+స్థిర పూర్ణాంకం default_console_color_bg = 0x000000; // black
+స్థిర పూర్ణాంకం default_console_color_fg = 0xc0c0c0; // white
+#  define USE_VTP		(vtp_working && is_పదం_win32() \
 						 && (p_tgc || t_colors >= 256))
 #  define USE_WT		(wt_working)
-# else
+# లేకపోతే
 #  define USE_VTP		0
 #  define USE_WT		0
 # endif
 
-static void set_console_color_rgb(void);
-static void reset_console_color_rgb(void);
-static void restore_console_color_rgb(void);
-#endif  // !FEAT_GUI_MSWIN || VIMDLL
+స్థిర శూన్య సమితి_console_color_rgb(శూన్య);
+స్థిర శూన్య reset_console_color_rgb(శూన్య);
+స్థిర శూన్య restore_console_color_rgb(శూన్య);
+#అయితే_ముగింపు  // !FEAT_GUI_MSWIN || VIMDLL
 
 // This flag is newly created from Windows 10
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#నిర్వచితం_కాకపోతే ENABLE_VIRTUAL_TERMINAL_PROCESSING
 # define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
+#అయితే_ముగింపు
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int suppress_winsize = 1;	// don't fiddle with console
-#endif
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+స్థిర పూర్ణాంకం suppress_winsize = 1;	// don't fiddle with console
+#అయితే_ముగింపు
 
-static WCHAR *exe_pathw = NULL;
+స్థిర WCHAR *exe_pathw = ఖాళీ;
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static BOOL use_alternate_screen_buffer = FALSE;
-#endif
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+స్థిర BOOL use_alternate_screen_బఫరు = FALSE;
+#అయితే_ముగింపు
 
-extern DWORD win_version; // this is in os_mswin.c
+బాహ్య DWORD win_సంస్కరణ; // this is in os_mswin.c
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static BOOL
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    స్థిర BOOL
 is_ambiwidth_event(
-    INPUT_RECORD *ir)
+    ఆదానం_రికార్డు *ir)
 {
-    return ir->EventType == KEY_EVENT
-		&& ir->Event.KeyEvent.bKeyDown
-		&& ir->Event.KeyEvent.wRepeatCount == 1
-		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
-		&& ir->Event.KeyEvent.wVirtualScanCode == 0x38
-		&& ir->Event.KeyEvent.uChar.UnicodeChar == 0
-		&& ir->Event.KeyEvent.dwControlKeyState == 2;
+    తిరిగి ir->EventType == కీలకం_EVENT
+		&& ir->Event.కీలకం_Event_2.b_కీలకం_కిందికి
+		&& ir->Event.కీలకం_Event_2.w_Repeat_లెక్క == 1
+		&& ir->Event.కీలకం_Event_2.w_Virtual_కీలకం_సంకేతం == 0x12
+		&& ir->Event.కీలకం_Event_2.w_Virtual_పరిశీలన_సంకేతం == 0x38
+		&& ir->Event.కీలకం_Event_2.uChar.UnicodeChar == 0
+		&& ir->Event.కీలకం_Event_2.dw_Control_కీలకం_State == 2;
 }
 
-    static void
+    స్థిర శూన్య
 make_ambiwidth_event(
-    INPUT_RECORD *down,
-    INPUT_RECORD *up)
+    ఆదానం_రికార్డు *కిందికి,
+    ఆదానం_రికార్డు *పైకి)
 {
-    down->Event.KeyEvent.wVirtualKeyCode = 0;
-    down->Event.KeyEvent.wVirtualScanCode = 0;
-    down->Event.KeyEvent.uChar.UnicodeChar
-				    = up->Event.KeyEvent.uChar.UnicodeChar;
-    down->Event.KeyEvent.dwControlKeyState = 0;
+    కిందికి->Event.కీలకం_Event_2.w_Virtual_కీలకం_సంకేతం = 0;
+    కిందికి->Event.కీలకం_Event_2.w_Virtual_పరిశీలన_సంకేతం = 0;
+    కిందికి->Event.కీలకం_Event_2.uChar.UnicodeChar
+				    = పైకి->Event.కీలకం_Event_2.uChar.UnicodeChar;
+    కిందికి->Event.కీలకం_Event_2.dw_Control_కీలకం_State = 0;
 }
 
 /*
  * Version of ReadConsoleInput() that works with IME.
  * Works around problems on Windows 8.
  */
-    static BOOL
-read_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    int		    nLength,
+    స్థిర BOOL
+read_console_ఆదానం(
+    HANDLE	    h_ఆదానం,
+    ఆదానం_రికార్డు    *lp_బఫరు,
+    పూర్ణాంకం		    n_నిడివి,
     LPDWORD	    lpEvents)
 {
-    enum
+    గణన
     {
 	IRSIZE = 10
     };
-    static INPUT_RECORD s_irCache[IRSIZE];
-    static DWORD s_dwIndex = 0;
-    static DWORD s_dwMax = 0;
+    స్థిర ఆదానం_రికార్డు s_irCache[IRSIZE];
+    స్థిర DWORD s_dw_సూచీ = 0;
+    స్థిర DWORD s_dwMax = 0;
     DWORD dwEvents;
-    int head;
-    int tail;
-    int i;
-    static INPUT_RECORD s_irPseudo;
+    పూర్ణాంకం తల;
+    పూర్ణాంకం తోక;
+    పూర్ణాంకం i;
+    స్థిర ఆదానం_రికార్డు s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    ఒకవేళ (s_dwMax == 0 && ఆదానం_రికార్డు_బఫరు.నిడివి > 0)
     {
-	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
-	s_dwIndex = 0;
+	dwEvents = read_ఆదానం_రికార్డు_బఫరు(s_irCache, IRSIZE);
+	s_dw_సూచీ = 0;
 	s_dwMax = dwEvents;
     }
 
-    if (nLength == -2)
-	return (s_dwMax > 0) ? TRUE : FALSE;
+    ఒకవేళ (n_నిడివి == -2)
+	తిరిగి (s_dwMax > 0) ? TRUE : FALSE;
 
-    if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
+    ఒకవేళ (win_సంస్కరణ < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
-	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	ఒకవేళ (n_నిడివి == -1)
+	    తిరిగి Peek_Console_ఆదానం_W(h_ఆదానం, lp_బఫరు, 1, lpEvents);
+	తిరిగి Read_Console_ఆదానం_W(h_ఆదానం, lp_బఫరు, 1, &dwEvents);
     }
 
-    if (s_dwMax == 0)
+    ఒకవేళ (s_dwMax == 0)
     {
-	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
-	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
-	s_dwIndex = 0;
+	ఒకవేళ (!vtp_working && n_నిడివి == -1)
+	    తిరిగి Peek_Console_ఆదానం_W(h_ఆదానం, lp_బఫరు, 1, lpEvents);
+	Get_సంఖ్య_యొక్క_Console_ఆదానం_Events(h_ఆదానం, &dwEvents);
+	ఒకవేళ (dwEvents == 0 && n_నిడివి == -1)
+	    తిరిగి Peek_Console_ఆదానం_W(h_ఆదానం, lp_బఫరు, 1, lpEvents);
+	Read_Console_ఆదానం_W(h_ఆదానం, s_irCache, IRSIZE, &dwEvents);
+	s_dw_సూచీ = 0;
 	s_dwMax = dwEvents;
-	if (dwEvents == 0)
+	ఒకవేళ (dwEvents == 0)
 	{
 	    *lpEvents = 0;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 
-	for (i = s_dwIndex; i < (int)s_dwMax - 1; ++i)
-	    if (is_ambiwidth_event(&s_irCache[i]))
+	కొరకు (i = s_dw_సూచీ; i < (పూర్ణాంకం)s_dwMax - 1; ++i)
+	    ఒకవేళ (is_ambiwidth_event(&s_irCache[i]))
 		make_ambiwidth_event(&s_irCache[i], &s_irCache[i + 1]);
 
-	if (s_dwMax > 1)
+	ఒకవేళ (s_dwMax > 1)
 	{
-	    head = 0;
-	    tail = s_dwMax - 1;
-	    while (head != tail)
+	    తల = 0;
+	    తోక = s_dwMax - 1;
+	    అయితే (తల != తోక)
 	    {
-		if (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
-			&& s_irCache[head + 1].EventType
-						  == WINDOW_BUFFER_SIZE_EVENT)
+		ఒకవేళ (s_irCache[తల].EventType == కిటికీ_బఫరు_కొలత_EVENT
+			&& s_irCache[తల + 1].EventType
+						  == కిటికీ_బఫరు_కొలత_EVENT)
 		{
 		    // Remove duplicate event to avoid flicker.
-		    for (i = head; i < tail; ++i)
+		    కొరకు (i = తల; i < తోక; ++i)
 			s_irCache[i] = s_irCache[i + 1];
-		    --tail;
-		    continue;
+		    --తోక;
+		    కొనసాగు;
 		}
-		head++;
+		తల++;
 	    }
-	    s_dwMax = tail + 1;
+	    s_dwMax = తోక + 1;
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    ఒకవేళ (s_irCache[s_dw_సూచీ].EventType == కీలకం_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	ఒకవేళ (s_irCache[s_dw_సూచీ].Event.కీలకం_Event_2.w_Repeat_లెక్క > 1)
 	{
-	    s_irPseudo = s_irCache[s_dwIndex];
-	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
-	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
-	    *lpBuffer = s_irPseudo;
+	    s_irPseudo = s_irCache[s_dw_సూచీ];
+	    s_irPseudo.Event.కీలకం_Event_2.w_Repeat_లెక్క = 1;
+	    s_irCache[s_dw_సూచీ].Event.కీలకం_Event_2.w_Repeat_లెక్క--;
+	    *lp_బఫరు = s_irPseudo;
 	    *lpEvents = 1;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
     }
 
-    *lpBuffer = s_irCache[s_dwIndex];
-    if (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
+    *lp_బఫరు = s_irCache[s_dw_సూచీ];
+    ఒకవేళ (!(n_నిడివి == -1 || n_నిడివి == -2) && ++s_dw_సూచీ >= s_dwMax)
 	s_dwMax = 0;
     *lpEvents = 1;
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Version of PeekConsoleInput() that works with IME.
  */
-    static BOOL
-peek_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    DWORD	    nLength UNUSED,
+    స్థిర BOOL
+peek_console_ఆదానం(
+    HANDLE	    h_ఆదానం,
+    ఆదానం_రికార్డు    *lp_బఫరు,
+    DWORD	    n_నిడివి వాడని,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    తిరిగి read_console_ఆదానం(h_ఆదానం, lp_బఫరు, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
-    static DWORD
-msg_wait_for_multiple_objects(
-    DWORD    nCount,
+    స్థిర DWORD
+సందేశం_wait_for_గుణిజం_objects(
+    DWORD    n_లెక్క,
     LPHANDLE pHandles,
     BOOL     fWaitAll,
     DWORD    dwMilliseconds,
-    DWORD    dwWakeMask)
+    DWORD    dw_Wake_ముసుగు)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
-				     dwMilliseconds, dwWakeMask);
+    ఒకవేళ (read_console_ఆదానం(ఖాళీ, ఖాళీ, -2, ఖాళీ))
+	తిరిగి WAIT_OBJECT_0;
+    తిరిగి సందేశం_Wait_For_గుణిజం_Objects(n_లెక్క, pHandles, fWaitAll,
+				     dwMilliseconds, dw_Wake_ముసుగు);
 }
 # endif
 
 # ifndef FEAT_CLIENTSERVER
-    static DWORD
+    స్థిర DWORD
 wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return WaitForSingleObject(hHandle, dwMilliseconds);
+    ఒకవేళ (read_console_ఆదానం(ఖాళీ, ఖాళీ, -2, ఖాళీ))
+	తిరిగి WAIT_OBJECT_0;
+    తిరిగి WaitForSingleObject(hHandle, dwMilliseconds);
 }
 # endif
-#endif   // !FEAT_GUI_MSWIN || VIMDLL
+#అయితే_ముగింపు   // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_get_exe_name(void)
+    శూన్య
+mch_get_exe_name(శూన్య)
 {
-    int		updated = FALSE;
-    static int	enc_prev = -1;
-    WCHAR	*path;
+    పూర్ణాంకం		updated = FALSE;
+    స్థిర పూర్ణాంకం	enc_prev = -1;
+    WCHAR	*మార్గం;
     size_t	pathlen;
 
-    if (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
+    ఒకవేళ (exe_name == ఖాళీ || exe_pathw == ఖాళీ || enc_prev != enc_codepage)
     {
-	WCHAR	buf[MAX_PATH];
+	WCHAR	buf[MAX_మార్గం];
 	WCHAR	*p;
 
 	// store the name of the executable, may be used for $VIM
-	p = buf + GetModuleFileNameW(NULL, buf, MAX_PATH);
-	if (p > buf)
+	p = buf + GetModuleFileNameW(ఖాళీ, buf, MAX_మార్గం);
+	ఒకవేళ (p > buf)
 	{
-	    if (enc_codepage == -1)
+	    ఒకవేళ (enc_codepage == -1)
 		enc_codepage = GetACP();
 	    vim_free(exe_name);
-	    exe_name = utf16_to_enc(buf, NULL);
+	    exe_name = utf16_గమ్యం_enc(buf, ఖాళీ);
 	    enc_prev = enc_codepage;
 
 	    // truncate the buffer at the last path separator
 	    // to isolate the path.
-	    do
+	    చేయి
 	    {
 		--p;
-		if (*p == L'\\')
+		ఒకవేళ (*p == L'\\')
 		{
 		    *p = L'\0';
-		    break;
+		    ఆపు;
 		}
-	    } while (p > buf);
+	    } అయితే (p > buf);
 
 	    vim_free(exe_pathw);
 	    exe_pathw = _wcsdup(buf);
@@ -378,69 +378,69 @@ mch_get_exe_name(void)
 	}
     }
 
-    if (exe_pathw == NULL || !updated)
-	return;
+    ఒకవేళ (exe_pathw == ఖాళీ || !updated)
+	తిరిగి;
 
     // Append our starting directory to $PATH, so that when doing
     // "!xxd" it's found in our starting directory.  Needed because
     // SearchPath() also looks there.
-    path = _wgetenv(L"PATH");
-    pathlen = (path == NULL) ? 0 : wcslen(path);
+    మార్గం = _wgetenv(L"PATH");
+    pathlen = (మార్గం == ఖాళీ) ? 0 : wcslen(మార్గం);
 
     // Maximum length of $PATH is more than MAXPATHL. 8191 is often mentioned
     // as the maximum length that works. Add an extra 7 characters (5 for
     // "PATH=", 1 for a potential ";" and 1 for the NUL byte).
-#define EXTRA_LEN 7
-#define MAX_ENV_STRING_LEN 8191
+#నిర్వచించు EXTRA_LEN 7
+#నిర్వచించు MAX_ENV_STRING_LEN 8191
 
-    if (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
+    ఒకవేళ (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
     {
-	WCHAR   temp[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
+	WCHAR   తాత్కాలిక[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
 	size_t  templen = 5;
 
-	if (pathlen == 0)
-	    wcscpy(temp + templen, exe_pathw);
-	else
+	ఒకవేళ (pathlen == 0)
+	    wcscpy(తాత్కాలిక + templen, exe_pathw);
+	లేకపోతే
 	{
-	    wcscpy(temp + templen, path);
+	    wcscpy(తాత్కాలిక + templen, మార్గం);
 
 	    // Check if exe_path is already included in $PATH.
-	    if (wcsstr(temp, exe_pathw) == NULL)
+	    ఒకవేళ (wcsstr(తాత్కాలిక, exe_pathw) == ఖాళీ)
 	    {
 		templen += pathlen;
 
 		// Append ';' if $PATH doesn't end with it.
-		if (temp[templen - 1] != L';')
+		ఒకవేళ (తాత్కాలిక[templen - 1] != L';')
 		{
-		    wcscpy(temp + templen, L";");
+		    wcscpy(తాత్కాలిక + templen, L";");
 		    ++templen;
 		}
 
-		wcscpy(temp + templen, exe_pathw);
+		wcscpy(తాత్కాలిక + templen, exe_pathw);
 	    }
 	}
 
-	_wputenv(temp);
-#ifdef libintl_wputenv
-	libintl_wputenv(temp);
-#endif
+	_wputenv(తాత్కాలిక);
+#నిర్వచితమైతే libintl_wputenv
+	libintl_wputenv(తాత్కాలిక);
+#అయితే_ముగింపు
     }
-#undef EXTRA_LEN
-#undef MAX_ENV_PATH_LEN
+#నిర్వచనం_రద్దు EXTRA_LEN
+#నిర్వచనం_రద్దు MAX_ENV_మార్గం_LEN
 }
 
 /*
  * Unescape characters in "p" that appear in "escaped".
  */
-    static void
+    స్థిర శూన్య
 unescape_shellxquote(char_u *p, char_u *escaped)
 {
-    int	    l = (int)STRLEN(p);
-    int	    n;
+    పూర్ణాంకం	    l = (పూర్ణాంకం)STRLEN(p);
+    పూర్ణాంకం	    n;
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	if (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
+	ఒకవేళ (*p == '^' && vim_strchr(escaped, p[1]) != ఖాళీ)
 	    mch_memmove(p, p + 1, l--);
 	n = (*mb_ptr2len)(p);
 	p += n;
@@ -452,60 +452,60 @@ unescape_shellxquote(char_u *p, char_u *escaped)
  * Load library "name".
  */
     HINSTANCE
-vimLoadLib(const char *name)
+vim_ఎక్కించు_Lib(స్థిరరాశి అక్షరం *name)
 {
-    HINSTANCE	dll = NULL;
+    HINSTANCE	dll = ఖాళీ;
 
     // No need to load any library when registering OLE.
-    if (found_register_arg)
-	return NULL;
+    ఒకవేళ (దొరికింది_రిజిస్టరు_arg)
+	తిరిగి ఖాళీ;
 
     // NOTE: Do not use mch_dirname() and mch_chdir() here, they may call
     // vimLoadLib() recursively, which causes a stack overflow.
-    if (exe_pathw == NULL)
+    ఒకవేళ (exe_pathw == ఖాళీ)
     {
 	mch_get_exe_name();
-	if (exe_pathw == NULL)
-	    return NULL;
+	ఒకవేళ (exe_pathw == ఖాళీ)
+	    తిరిగి ఖాళీ;
     }
 
     WCHAR old_dirw[MAXPATHL];
 
-    if (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
-	return NULL;
+    ఒకవేళ (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
+	తిరిగి ఖాళీ;
 
     // Change directory to where the executable is, both to make
     // sure we find a .dll there and to avoid looking for a .dll
     // in the current directory.
-    SetCurrentDirectoryW(exe_pathw);
-    dll = LoadLibrary(name);
-    SetCurrentDirectoryW(old_dirw);
-    return dll;
+    సమితి_Current_Directory_W(exe_pathw);
+    dll = ఎక్కించు_Library(name);
+    సమితి_Current_Directory_W(old_dirw);
+    తిరిగి dll;
 }
 
-#if defined(VIMDLL)
+#ఒకవేళ defined(VIMDLL)
 /*
  * Check if the current executable file is for the GUI subsystem.
  */
-    int
-mch_is_gui_executable(void)
+    పూర్ణాంకం
+mch_is_gui_executable(శూన్య)
 {
-    PBYTE		pImage = (PBYTE)GetModuleHandle(NULL);
-    PIMAGE_DOS_HEADER	pDOS = (PIMAGE_DOS_HEADER)pImage;
-    PIMAGE_NT_HEADERS	pPE;
+    PBYTE		pImage = (PBYTE)GetModuleHandle(ఖాళీ);
+    PIMAGE_DOS_శీర్షిక	pDOS = (PIMAGE_DOS_శీర్షిక)pImage;
+    PIMAGE_NT_శీర్షికలు	pPE;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return FALSE;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return FALSE;
-    if (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
-	return TRUE;
-    return FALSE;
+    ఒకవేళ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	తిరిగి FALSE;
+    pPE = (PIMAGE_NT_శీర్షికలు)(pImage + pDOS->e_lfanew);
+    ఒకవేళ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	తిరిగి FALSE;
+    ఒకవేళ (pPE->Optional_శీర్షిక.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
+#ఒకవేళ defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
     || defined(FEAT_PYTHON3)
 /*
  * Get related information about 'funcname' which is imported by 'hInst'.
@@ -514,106 +514,106 @@ mch_is_gui_executable(void)
  * If 'info' is 2, hook the function with 'ptr', and return the original
  * function address.
  */
-    static void *
-get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
-	const void *ptr)
+    స్థిర శూన్య *
+get_imported_func_info(HINSTANCE hInst, స్థిరరాశి అక్షరం *funcname, పూర్ణాంకం info,
+	స్థిరరాశి శూన్య *ptr)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_శీర్షిక		pDOS = (PIMAGE_DOS_శీర్షిక)hInst;
+    PIMAGE_NT_శీర్షికలు		pPE;
     PIMAGE_IMPORT_DESCRIPTOR	pImpDesc;
-    PIMAGE_THUNK_DATA		pIAT;	    // Import Address Table
-    PIMAGE_THUNK_DATA		pINT;	    // Import Name Table
+    PIMAGE_THUNK_దత్తాంశం		pIAT;	    // Import Address Table
+    PIMAGE_THUNK_దత్తాంశం		pINT;	    // Import Name Table
     PIMAGE_IMPORT_BY_NAME	pImpName;
     DWORD			ImpVA;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ఒకవేళ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	తిరిగి ఖాళీ;
+    pPE = (PIMAGE_NT_శీర్షికలు)(pImage + pDOS->e_lfanew);
+    ఒకవేళ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	తిరిగి ఖాళీ;
 
-    ImpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-    if (ImpVA == 0)
-	return NULL;	// No Import Table
+    ImpVA = pPE->Optional_శీర్షిక
+		.దత్తాంశం_Directory[IMAGE_DIRECTORY_నమోదు_IMPORT].Virtual_చిరునామా;
+    ఒకవేళ (ImpVA == 0)
+	తిరిగి ఖాళీ;	// No Import Table
     pImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pImage + ImpVA);
 
-    for (; pImpDesc->FirstThunk; ++pImpDesc)
+    కొరకు (; pImpDesc->మొదటి_Thunk; ++pImpDesc)
     {
-	if (!pImpDesc->OriginalFirstThunk)
-	    continue;
-	pIAT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->FirstThunk);
-	pINT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->OriginalFirstThunk);
-	for (; pIAT->u1.Function; ++pIAT, ++pINT)
+	ఒకవేళ (!pImpDesc->Original_మొదటి_Thunk)
+	    కొనసాగు;
+	pIAT = (PIMAGE_THUNK_దత్తాంశం)(pImage + pImpDesc->మొదటి_Thunk);
+	pINT = (PIMAGE_THUNK_దత్తాంశం)(pImage + pImpDesc->Original_మొదటి_Thunk);
+	కొరకు (; pIAT->u1.Function; ++pIAT, ++pINT)
 	{
-	    if (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
-		continue;
+	    ఒకవేళ (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
+		కొనసాగు;
 	    pImpName = (PIMAGE_IMPORT_BY_NAME)(pImage
-					+ (UINT_PTR)(pINT->u1.AddressOfData));
-	    if (strcmp((char *)pImpName->Name, funcname) == 0)
+					+ (UINT_PTR)(pINT->u1.చిరునామా_యొక్క_దత్తాంశం));
+	    ఒకవేళ (strcmp((అక్షరం *)pImpName->Name, funcname) == 0)
 	    {
-		void *original;
-		DWORD old, new = PAGE_READWRITE;
+		శూన్య *original;
+		DWORD old, new = పుట_READWRITE;
 
-		switch (info)
+		ఎంపిక (info)
 		{
-		    case 0:
-			return (void *)pIAT->u1.Function;
-		    case 1:
-			return (void *)(pImage + pImpDesc->Name);
-		    case 2:
-			original = (void *)pIAT->u1.Function;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+		    స్థితి 0:
+			తిరిగి (శూన్య *)pIAT->u1.Function;
+		    స్థితి 1:
+			తిరిగి (శూన్య *)(pImage + pImpDesc->Name);
+		    స్థితి 2:
+			original = (శూన్య *)pIAT->u1.Function;
+			VirtualProtect(&pIAT->u1.Function, పరిమాణం(శూన్య *),
 				new, &old);
 			pIAT->u1.Function = (UINT_PTR)ptr;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+			VirtualProtect(&pIAT->u1.Function, పరిమాణం(శూన్య *),
 				old, &new);
-			return original;
-		    default:
-			return NULL;
+			తిరిగి original;
+		    అప్రమేయ:
+			తిరిగి ఖాళీ;
 		}
 	    }
 	}
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Get the module handle which 'funcname' in 'hInst' is imported from.
  */
     HINSTANCE
-find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
+కనుగొను_imported_module_by_funcname(HINSTANCE hInst, స్థిరరాశి అక్షరం *funcname)
 {
-    char    *modulename;
+    అక్షరం    *modulename;
 
-    modulename = (char *)get_imported_func_info(hInst, funcname, 1, NULL);
-    if (modulename != NULL)
-	return GetModuleHandleA(modulename);
-    return NULL;
+    modulename = (అక్షరం *)get_imported_func_info(hInst, funcname, 1, ఖాళీ);
+    ఒకవేళ (modulename != ఖాళీ)
+	తిరిగి GetModuleHandleA(modulename);
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Get the address of 'funcname' which is imported by 'hInst' DLL.
  */
-    void *
-get_dll_import_func(HINSTANCE hInst, const char *funcname)
+    శూన్య *
+get_dll_import_func(HINSTANCE hInst, స్థిరరాశి అక్షరం *funcname)
 {
-    return get_imported_func_info(hInst, funcname, 0, NULL);
+    తిరిగి get_imported_func_info(hInst, funcname, 0, ఖాళీ);
 }
 
 /*
  * Hook the function named 'funcname' which is imported by 'hInst' DLL,
  * and return the original function address.
  */
-    void *
-hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
+    శూన్య *
+hook_dll_import_func(HINSTANCE hInst, స్థిరరాశి అక్షరం *funcname, స్థిరరాశి శూన్య *hook)
 {
-    return get_imported_func_info(hInst, funcname, 2, hook);
+    తిరిగి get_imported_func_info(hInst, funcname, 2, hook);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_PYTHON3)
+#ఒకవేళ defined(FEAT_PYTHON3)
 /*
  * Check if the specified DLL is a function forwarder.
  * If yes, return the instance of the forwarded DLL.
@@ -625,300 +625,300 @@ hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
 get_forwarded_dll(HINSTANCE hInst)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_శీర్షిక		pDOS = (PIMAGE_DOS_శీర్షిక)hInst;
+    PIMAGE_NT_శీర్షికలు		pPE;
     PIMAGE_EXPORT_DIRECTORY	pExpDir;
     DWORD			ExpVA;
-    DWORD			ExpSize;
-    LPDWORD			pFunctionTable;
+    DWORD			Exp_కొలత;
+    LPDWORD			p_Function_పట్టిక;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ఒకవేళ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	తిరిగి ఖాళీ;
+    pPE = (PIMAGE_NT_శీర్షికలు)(pImage + pDOS->e_lfanew);
+    ఒకవేళ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	తిరిగి ఖాళీ;
 
-    ExpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-    ExpSize = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    if (ExpVA == 0)
-	return hInst;	// No Export Directory
+    ExpVA = pPE->Optional_శీర్షిక
+		.దత్తాంశం_Directory[IMAGE_DIRECTORY_నమోదు_EXPORT].Virtual_చిరునామా;
+    Exp_కొలత = pPE->Optional_శీర్షిక
+		.దత్తాంశం_Directory[IMAGE_DIRECTORY_నమోదు_EXPORT].కొలత_2;
+    ఒకవేళ (ExpVA == 0)
+	తిరిగి hInst;	// No Export Directory
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
-    pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
+    p_Function_పట్టిక = (LPDWORD)(pImage + pExpDir->చిరునామా_యొక్క_Functions);
 
-    if (pExpDir->NumberOfNames == 0)
-	return hInst;	// No export names.
+    ఒకవేళ (pExpDir->సంఖ్య_యొక్క_పేర్లు == 0)
+	తిరిగి hInst;	// No export names.
 
     // Check only the first entry.
-    if ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
+    ఒకవేళ ((p_Function_పట్టిక[0] < ExpVA) || (p_Function_పట్టిక[0] >= ExpVA + Exp_కొలత))
 	// The first entry is not a function forwarder.
-	return hInst;
+	తిరిగి hInst;
 
     // The first entry is a function forwarder.
     // The name is represented as "DllName.FunctionName".
-    const char *name = (const char *)(pImage + pFunctionTable[0]);
-    const char *p = strchr(name, '.');
-    if (p == NULL)
-	return hInst;
+    స్థిరరాశి అక్షరం *name = (స్థిరరాశి అక్షరం *)(pImage + p_Function_పట్టిక[0]);
+    స్థిరరాశి అక్షరం *p = strchr(name, '.');
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి hInst;
 
     // Extract DllName.
-    char buf[MAX_PATH];
-    if (p - name + 1 > sizeof(buf))
-	return NULL;
+    అక్షరం buf[MAX_మార్గం];
+    ఒకవేళ (p - name + 1 > పరిమాణం(buf))
+	తిరిగి ఖాళీ;
     strncpy(buf, name, p - name);
     buf[p - name] = NUL;
-    return GetModuleHandleA(buf);
+    తిరిగి GetModuleHandleA(buf);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(DYNAMIC_GETTEXT)
+#ఒకవేళ defined(DYNAMIC_GETTEXT)
 # ifndef GETTEXT_DLL
 #  define GETTEXT_DLL "libintl.dll"
 #  define GETTEXT_DLL_ALT1 "libintl-8.dll"
 #  define GETTEXT_DLL_ALT2 "intl.dll"
 # endif
 // Dummy functions
-static char *null_libintl_gettext(const char *);
-static char *null_libintl_ngettext(const char *, const char *, unsigned long n);
-static char *null_libintl_textdomain(const char *);
-static char *null_libintl_bindtextdomain(const char *, const char *);
-static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int null_libintl_wputenv(const wchar_t *);
+స్థిర అక్షరం *null_libintl_gettext(స్థిరరాశి అక్షరం *);
+స్థిర అక్షరం *null_libintl_ngettext(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *, గుర్తులేని దీర్ఘ n);
+స్థిర అక్షరం *null_libintl_textdomain(స్థిరరాశి అక్షరం *);
+స్థిర అక్షరం *null_libintl_bindtextdomain(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *);
+స్థిర అక్షరం *null_libintl_bind_textdomain_codeset(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *);
+స్థిర పూర్ణాంకం null_libintl_wputenv(స్థిరరాశి wchar_t *);
 
-static HINSTANCE hLibintlDLL = NULL;
-char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
-char *(*dyn_libintl_ngettext)(const char *, const char *, unsigned long n)
+స్థిర HINSTANCE hLibintlDLL = ఖాళీ;
+అక్షరం *(*dyn_libintl_gettext)(స్థిరరాశి అక్షరం *) = null_libintl_gettext;
+అక్షరం *(*dyn_libintl_ngettext)(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *, గుర్తులేని దీర్ఘ n)
 						= null_libintl_ngettext;
-char *(*dyn_libintl_textdomain)(const char *) = null_libintl_textdomain;
-char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
+అక్షరం *(*dyn_libintl_textdomain)(స్థిరరాశి అక్షరం *) = null_libintl_textdomain;
+అక్షరం *(*dyn_libintl_bindtextdomain)(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *)
 						= null_libintl_bindtextdomain;
-char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
+అక్షరం *(*dyn_libintl_bind_textdomain_codeset)(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *)
 				       = null_libintl_bind_textdomain_codeset;
-int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+పూర్ణాంకం (*dyn_libintl_wputenv)(స్థిరరాశి wchar_t *) = null_libintl_wputenv;
+పూర్ణాంకం *dyn_libintl_nl_సందేశం_cat_cntr = ఖాళీ;
 
-    int
-dyn_libintl_init(void)
+    పూర్ణాంకం
+dyn_libintl_init(శూన్య)
 {
-    int i;
-    static struct
+    పూర్ణాంకం i;
+    స్థిర నిర్మాణం
     {
-	char	    *name;
+	అక్షరం	    *name;
 	FARPROC	    *ptr;
-    } libintl_entry[] =
+    } libintl_నమోదు[] =
     {
 	{"gettext", (FARPROC*)&dyn_libintl_gettext},
 	{"ngettext", (FARPROC*)&dyn_libintl_ngettext},
 	{"textdomain", (FARPROC*)&dyn_libintl_textdomain},
 	{"bindtextdomain", (FARPROC*)&dyn_libintl_bindtextdomain},
-	{NULL, NULL}
+	{ఖాళీ, ఖాళీ}
     };
     HINSTANCE hmsvcrt;
 
     // No need to initialize twice.
-    if (hLibintlDLL != NULL)
-	return 1;
+    ఒకవేళ (hLibintlDLL != ఖాళీ)
+	తిరిగి 1;
     // Load gettext library (libintl.dll and other names).
-    hLibintlDLL = vimLoadLib(GETTEXT_DLL);
+    hLibintlDLL = vim_ఎక్కించు_Lib(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT1
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT1);
+    ఒకవేళ (!hLibintlDLL)
+	hLibintlDLL = vim_ఎక్కించు_Lib(GETTEXT_DLL_ALT1);
 # endif
 # ifdef GETTEXT_DLL_ALT2
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT2);
+    ఒకవేళ (!hLibintlDLL)
+	hLibintlDLL = vim_ఎక్కించు_Lib(GETTEXT_DLL_ALT2);
 # endif
-    if (!hLibintlDLL)
+    ఒకవేళ (!hLibintlDLL)
     {
-	if (p_verbose > 0)
+	ఒకవేళ (p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str), GETTEXT_DLL, GetWin32Error());
+	    semsg(_(e_could_not_ఎక్కించు_library_str_str), GETTEXT_DLL, GetWin32Error());
 	    verbose_leave();
 	}
-	return 0;
+	తిరిగి 0;
     }
-    for (i = 0; libintl_entry[i].name != NULL
-					 && libintl_entry[i].ptr != NULL; ++i)
+    కొరకు (i = 0; libintl_నమోదు[i].name != ఖాళీ
+					 && libintl_నమోదు[i].ptr != ఖాళీ; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
-					      libintl_entry[i].name)) == NULL)
+	ఒకవేళ ((*libintl_నమోదు[i].ptr = Get_Proc_చిరునామా(hLibintlDLL,
+					      libintl_నమోదు[i].name)) == ఖాళీ)
 	{
-	    dyn_libintl_end();
-	    if (p_verbose > 0)
+	    dyn_libintl_చివర();
+	    ఒకవేళ (p_verbose > 0)
 	    {
 		verbose_enter();
-		semsg(_(e_could_not_load_library_function_str), libintl_entry[i].name);
+		semsg(_(e_could_not_ఎక్కించు_library_function_str), libintl_నమోదు[i].name);
 		verbose_leave();
 	    }
-	    return 0;
+	    తిరిగి 0;
 	}
     }
 
     // The bind_textdomain_codeset() function is optional.
-    dyn_libintl_bind_textdomain_codeset = (char *(*)(const char *, const char *))
-			GetProcAddress(hLibintlDLL, "bind_textdomain_codeset");
-    if (dyn_libintl_bind_textdomain_codeset == NULL)
+    dyn_libintl_bind_textdomain_codeset = (అక్షరం *(*)(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *))
+			Get_Proc_చిరునామా(hLibintlDLL, "bind_textdomain_codeset");
+    ఒకవేళ (dyn_libintl_bind_textdomain_codeset == ఖాళీ)
 	dyn_libintl_bind_textdomain_codeset =
 					 null_libintl_bind_textdomain_codeset;
 
     // _wputenv() function for the libintl.dll is optional.
-    hmsvcrt = find_imported_module_by_funcname(hLibintlDLL, "getenv");
-    if (hmsvcrt != NULL)
-	dyn_libintl_wputenv = (int (*)(const wchar_t *))
-					GetProcAddress(hmsvcrt, "_wputenv");
-    if (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
+    hmsvcrt = కనుగొను_imported_module_by_funcname(hLibintlDLL, "getenv");
+    ఒకవేళ (hmsvcrt != ఖాళీ)
+	dyn_libintl_wputenv = (పూర్ణాంకం (*)(స్థిరరాశి wchar_t *))
+					Get_Proc_చిరునామా(hmsvcrt, "_wputenv");
+    ఒకవేళ (dyn_libintl_wputenv == ఖాళీ || dyn_libintl_wputenv == _wputenv)
 	dyn_libintl_wputenv = null_libintl_wputenv;
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_సందేశం_cat_cntr = (పూర్ణాంకం *)Get_Proc_చిరునామా(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
-    return 1;
+    తిరిగి 1;
 }
 
-    void
-dyn_libintl_end(void)
+    శూన్య
+dyn_libintl_చివర(శూన్య)
 {
-    if (hLibintlDLL)
+    ఒకవేళ (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
-    hLibintlDLL			= NULL;
+    hLibintlDLL			= ఖాళీ;
     dyn_libintl_gettext		= null_libintl_gettext;
     dyn_libintl_ngettext	= null_libintl_ngettext;
     dyn_libintl_textdomain	= null_libintl_textdomain;
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset = null_libintl_bind_textdomain_codeset;
     dyn_libintl_wputenv		= null_libintl_wputenv;
-    dyn_libintl_nl_msg_cat_cntr	= NULL;
+    dyn_libintl_nl_సందేశం_cat_cntr	= ఖాళీ;
 }
 
-    static char *
-null_libintl_gettext(const char *msgid)
+    స్థిర అక్షరం *
+null_libintl_gettext(స్థిరరాశి అక్షరం *msgid)
 {
-    return (char*)msgid;
+    తిరిగి (అక్షరం*)msgid;
 }
 
-    static char *
+    స్థిర అక్షరం *
 null_libintl_ngettext(
-	const char *msgid,
-	const char *msgid_plural,
-	unsigned long n)
+	స్థిరరాశి అక్షరం *msgid,
+	స్థిరరాశి అక్షరం *msgid_plural,
+	గుర్తులేని దీర్ఘ n)
 {
-    return (char *)(n == 1 ? msgid : msgid_plural);
+    తిరిగి (అక్షరం *)(n == 1 ? msgid : msgid_plural);
 }
 
-    static char *
+    స్థిర అక్షరం *
 null_libintl_bindtextdomain(
-	const char *domainname UNUSED,
-	const char *dirname UNUSED)
+	స్థిరరాశి అక్షరం *domainname వాడని,
+	స్థిరరాశి అక్షరం *dirname వాడని)
 {
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static char *
+    స్థిర అక్షరం *
 null_libintl_bind_textdomain_codeset(
-	const char *domainname UNUSED,
-	const char *codeset UNUSED)
+	స్థిరరాశి అక్షరం *domainname వాడని,
+	స్థిరరాశి అక్షరం *codeset వాడని)
 {
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static char *
-null_libintl_textdomain(const char *domainname UNUSED)
+    స్థిర అక్షరం *
+null_libintl_textdomain(స్థిరరాశి అక్షరం *domainname వాడని)
 {
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static int
-null_libintl_wputenv(const wchar_t *envstring UNUSED)
+    స్థిర పూర్ణాంకం
+null_libintl_wputenv(స్థిరరాశి wchar_t *envstring వాడని)
 {
-    return 0;
+    తిరిగి 0;
 }
 
-#endif // DYNAMIC_GETTEXT
+#అయితే_ముగింపు // DYNAMIC_GETTEXT
 
 // This symbol is not defined in older versions of the SDK or Visual C++
 
-#ifndef VER_PLATFORM_WIN32_WINDOWS
+#నిర్వచితం_కాకపోతే VER_PLATFORM_WIN32_WINDOWS
 # define VER_PLATFORM_WIN32_WINDOWS 1
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
 # include <aclapi.h>
 # ifndef PROTECTED_DACL_SECURITY_INFORMATION
 #  define PROTECTED_DACL_SECURITY_INFORMATION	0x80000000L
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
 /*
  * Enables or disables the specified privilege.
  */
-    static BOOL
+    స్థిర BOOL
 win32_enable_privilege(LPTSTR lpszPrivilege)
 {
     LUID		luid;
     HANDLE		hToken;
     TOKEN_PRIVILEGES	tokenPrivileges;
 
-    if (!OpenProcessToken(GetCurrentProcess(),
+    ఒకవేళ (!OpenProcessToken(GetCurrentProcess(),
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-	return FALSE;
+	తిరిగి FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    ఒకవేళ (!Lookup_Privilege_విలువ(ఖాళీ, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    tokenPrivileges.PrivilegeCount	     = 1;
+    tokenPrivileges.Privilege_లెక్క	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
-    tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+    tokenPrivileges.Privileges[0].లక్షణాలు_2 = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
+    ఒకవేళ (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, ఖాళీ, ఖాళీ))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    if (GetLastError() != ERROR_SUCCESS)
+    ఒకవేళ (Get_చివరి_Error() != ERROR_SUCCESS)
     {
 	CloseHandle(hToken);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     CloseHandle(hToken);
-    return TRUE;
+    తిరిగి TRUE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Fill in "windowsVersion" if possible and enable security privilege for ACL.
  */
-    void
-PlatformId(void)
+    శూన్య
+PlatformId(శూన్య)
 {
-#ifdef FEAT_EVAL
-    DWORD major = (win_version >> 24) & 0xFF;
-    DWORD minor = (win_version >> 16) & 0xFF;
-    vim_snprintf(windowsVersion, sizeof(windowsVersion), "%d.%d", major, minor);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    DWORD major = (win_సంస్కరణ >> 24) & 0xFF;
+    DWORD minor = (win_సంస్కరణ >> 16) & 0xFF;
+    vim_snprintf(windows_సంస్కరణ, పరిమాణం(windows_సంస్కరణ), "%d.%d", major, minor);
+#అయితే_ముగింపు
 
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
     // Enable privilege for getting or setting SACLs.
-    if (!win32_enable_privilege(SE_SECURITY_NAME))
-	return;
-#endif
+    ఒకవేళ (!win32_enable_privilege(SE_SECURITY_NAME))
+	తిరిగి;
+#అయితే_ముగింపు
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SHIFT  (SHIFT_PRESSED)
-# define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
-# define ALT    (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED)
-# define ALT_GR (RIGHT_ALT_PRESSED  | LEFT_CTRL_PRESSED)
+# define జరుపు_2  (జరుపు_PRESSED)
+# define CTRL   (కుడి_CTRL_PRESSED | ఎడమ_CTRL_PRESSED)
+# define ALT    (కుడి_ALT_PRESSED  | ఎడమ_ALT_PRESSED)
+# define ALT_GR (కుడి_ALT_PRESSED  | ఎడమ_CTRL_PRESSED)
 
 
 // When uChar.AsciiChar is 0, then we need to look at wVirtualKeyCode.
@@ -928,15 +928,15 @@ PlatformId(void)
 // so that the user can have access to all SHIFT-, CTRL-, and ALT-
 // combinations of function/arrow/etc keys.
 
-static const struct
+స్థిర స్థిరరాశి నిర్మాణం
 {
-    WORD    wVirtKey;
-    BOOL    fAnsiKey;
-    int	    chAlone;
-    int	    chShift;
-    int	    chCtrl;
-    int	    chAlt;
-} VirtKeyMap[] =
+    మాట_2    w_Virt_కీలకం;
+    BOOL    f_Ansi_కీలకం;
+    పూర్ణాంకం	    chAlone;
+    పూర్ణాంకం	    ch_జరుపు;
+    పూర్ణాంకం	    chCtrl;
+    పూర్ణాంకం	    chAlt;
+} Virt_కీలకం_Map[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
     { VK_ESCAPE,FALSE,	ESC,	ESC,	ESC,	    ESC,    },
@@ -955,20 +955,20 @@ static const struct
     { VK_F12,	TRUE,	'\206',	'\210',	'\212',	    '\214', },
 
     { VK_HOME,	TRUE,	'G',	'\302',	'w',	    '\303', },
-    { VK_UP,	TRUE,	'H',	'\304',	'\305',	    '\306', },
-    { VK_PRIOR,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
-    { VK_LEFT,	TRUE,	'K',	'\311',	's',	    '\312', },
-    { VK_RIGHT,	TRUE,	'M',	'\313',	't',	    '\314', },
-    { VK_END,	TRUE,	'O',	'\315',	'u',	    '\316', },
-    { VK_DOWN,	TRUE,	'P',	'\317',	'\320',	    '\321', },
-    { VK_NEXT,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
-    { VK_INSERT,TRUE,	'R',	'\324',	'\325',	    '\326', },
+    { VK_పైకి,	TRUE,	'H',	'\304',	'\305',	    '\306', },
+    { VK_పూర్వ,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
+    { VK_ఎడమ,	TRUE,	'K',	'\311',	's',	    '\312', },
+    { VK_కుడి,	TRUE,	'M',	'\313',	't',	    '\314', },
+    { VK_చివర,	TRUE,	'O',	'\315',	'u',	    '\316', },
+    { VK_కిందికి,	TRUE,	'P',	'\317',	'\320',	    '\321', },
+    { VK_తదుపరి,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
+    { VK_చొప్పించు,TRUE,	'R',	'\324',	'\325',	    '\326', },
     { VK_DELETE,TRUE,	'S',	'\327',	'\330',	    '\331', },
-    { VK_BACK,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
+    { VK_వెనుక,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
 
     { VK_SNAPSHOT,TRUE,	0,	0,	0,	    'r', }, // PrtScrn
 
-# if 0
+# ఒకవేళ 0
     // Most people don't have F13-F20, but what the hell...
     { VK_F13,	TRUE,	'\332',	'\333',	'\334',	    '\335', },
     { VK_F14,	TRUE,	'\336',	'\337',	'\340',	    '\341', },
@@ -979,8 +979,8 @@ static const struct
     { VK_F19,	TRUE,	'\362',	'\363',	'\364',	    '\365', },
     { VK_F20,	TRUE,	'\366',	'\367',	'\370',	    '\371', },
 # endif
-    { VK_ADD,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
-    { VK_SUBTRACT, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
+    { VK_కూడు,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
+    { VK_వ్యవకలనం, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
  // { VK_DIVIDE,   TRUE,'N',	'N',    'N',	'N',	}, // keyp '/'
     { VK_MULTIPLY, TRUE,'7',	'7',    '7',	'7',	}, // keyp '*'
 
@@ -1001,400 +1001,400 @@ static const struct
 /*
  * The return code indicates key code size.
  */
-    static int
-win32_kbd_patch_key(
-    KEY_EVENT_RECORD *pker)
+    స్థిర పూర్ణాంకం
+win32_kbd_patch_కీలకం(
+    కీలకం_EVENT_రికార్డు *pker)
 {
-    UINT uMods = pker->dwControlKeyState;
-    static int s_iIsDead = 0;
-    static WORD awAnsiCode[2];
-    static BYTE abKeystate[256];
+    UINT uMods = pker->dw_Control_కీలకం_State;
+    స్థిర పూర్ణాంకం s_iIsDead = 0;
+    స్థిర మాట_2 aw_Ansi_సంకేతం[2];
+    స్థిర BYTE abKeystate[256];
 
-    if (s_iIsDead == 2)
+    ఒకవేళ (s_iIsDead == 2)
     {
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[1];
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_సంకేతం[1];
 	s_iIsDead = 0;
-	return 1;
+	తిరిగి 1;
     }
 
     // check if it already has a valid unicode character.
-    if (pker->uChar.UnicodeChar != 0)
-	return 1;
+    ఒకవేళ (pker->uChar.UnicodeChar != 0)
+	తిరిగి 1;
 
-    CLEAR_FIELD(abKeystate);
+    CLEAR_క్షేత్రం(abKeystate);
 
     // Clear any pending dead keys
-    ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
+    గమ్యం_Unicode(VK_SPACE, Map_Virtual_కీలకం(VK_SPACE, 0), abKeystate, aw_Ansi_సంకేతం, 2, 0);
 
-    if (uMods & SHIFT_PRESSED)
-	abKeystate[VK_SHIFT] = 0x80;
-    if (uMods & CAPSLOCK_ON)
+    ఒకవేళ (uMods & జరుపు_PRESSED)
+	abKeystate[VK_జరుపు] = 0x80;
+    ఒకవేళ (uMods & CAPSLOCK_ON)
 	abKeystate[VK_CAPITAL] = 1;
 
-    if ((uMods & ALT_GR) == ALT_GR)
+    ఒకవేళ ((uMods & ALT_GR) == ALT_GR)
     {
 	abKeystate[VK_CONTROL] = abKeystate[VK_LCONTROL] =
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
     }
 
-    s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
-			abKeystate, awAnsiCode, 2, 0);
+    s_iIsDead = గమ్యం_Unicode(pker->w_Virtual_కీలకం_సంకేతం, pker->w_Virtual_పరిశీలన_సంకేతం,
+			abKeystate, aw_Ansi_సంకేతం, 2, 0);
 
-    if (s_iIsDead > 0)
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[0];
+    ఒకవేళ (s_iIsDead > 0)
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_సంకేతం[0];
 
-    return s_iIsDead;
+    తిరిగి s_iIsDead;
 }
 
-static BOOL g_fJustGotFocus = FALSE;
+స్థిర BOOL g_fJustGotFocus = FALSE;
 
 /*
  * Decode a KEY_EVENT into one or two keystrokes
  */
-    static BOOL
-decode_key_event(
-    KEY_EVENT_RECORD	*pker,
+    స్థిర BOOL
+decode_కీలకం_event(
+    కీలకం_EVENT_రికార్డు	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
-    int			*pmodifiers,
-    BOOL		fDoPost UNUSED)
+    పూర్ణాంకం			*pmodifiers,
+    BOOL		fDoPost వాడని)
 {
-    int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    పూర్ణాంకం i;
+    స్థిరరాశి పూర్ణాంకం nModifs = pker->dw_Control_కీలకం_State & (జరుపు_2 | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
-	return FALSE;
+    ఒకవేళ (!pker->b_కీలకం_కిందికి)
+	తిరిగి FALSE;
 
     // ignore some keystrokes
-    switch (pker->wVirtualKeyCode)
+    ఎంపిక (pker->w_Virtual_కీలకం_సంకేతం)
     {
     // modifiers
-    case VK_SHIFT:
-    case VK_CONTROL:
-    case VK_MENU:   // Alt key
-	return FALSE;
+    స్థితి VK_జరుపు:
+    స్థితి VK_CONTROL:
+    స్థితి VK_MENU:   // Alt key
+	తిరిగి FALSE;
 
-    default:
-	break;
+    అప్రమేయ:
+	ఆపు;
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం == VK_TAB && (nModifs & జరుపు_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    కొరకు (i = ARRAY_నిడివి(Virt_కీలకం_Map); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	ఒకవేళ (Virt_కీలకం_Map[i].w_Virt_కీలకం == pker->w_Virtual_కీలకం_సంకేతం)
 	{
-	    *pch = VirtKeyMap[i].chAlone;
-	    if ((nModifs & SHIFT) != 0)
-		*pch = VirtKeyMap[i].chShift;
-	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
-		*pch = VirtKeyMap[i].chCtrl;
-	    else if ((nModifs & ALT) != 0)
-		*pch = VirtKeyMap[i].chAlt;
+	    *pch = Virt_కీలకం_Map[i].chAlone;
+	    ఒకవేళ ((nModifs & జరుపు_2) != 0)
+		*pch = Virt_కీలకం_Map[i].ch_జరుపు;
+	    లేకపోతే ఒకవేళ ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
+		*pch = Virt_కీలకం_Map[i].chCtrl;
+	    లేకపోతే ఒకవేళ ((nModifs & ALT) != 0)
+		*pch = Virt_కీలకం_Map[i].chAlt;
 
-	    if (*pch != 0)
+	    ఒకవేళ (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		ఒకవేళ (Virt_కీలకం_Map[i].f_Ansi_కీలకం)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
-		    if (pmodifiers)
+		    ఒకవేళ (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
-			    && pker->wVirtualKeyCode <= VK_F12)
+			ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం >= VK_F1
+			    && pker->w_Virtual_కీలకం_సంకేతం <= VK_F12)
 			{
-			    if ((nModifs & ALT) != 0)
+			    ఒకవేళ ((nModifs & ALT) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_ముసుగు_ALT;
+				ఒకవేళ ((nModifs & జరుపు_2) == 0)
+				    *pch2 = Virt_కీలకం_Map[i].chAlone;
 			    }
-			    if ((nModifs & CTRL) != 0)
+			    ఒకవేళ ((nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_ముసుగు_CTRL;
+				ఒకవేళ ((nModifs & జరుపు_2) == 0)
+				    *pch2 = Virt_కీలకం_Map[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
-				&& pker->wVirtualKeyCode <= VK_DOWN)
+			లేకపోతే ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం >= VK_చివర
+				&& pker->w_Virtual_కీలకం_సంకేతం <= VK_కిందికి)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
 			    // VK_LEFT, VK_UP, VK_RIGHT, VK_DOWN
 
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0
-						    && (nModifs & ~SHIFT) == 0)
+			    *pch2 = Virt_కీలకం_Map[i].chAlone;
+			    ఒకవేళ ((nModifs & జరుపు_2) != 0
+						    && (nModifs & ~జరుపు_2) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_కీలకం_Map[i].ch_జరుపు;
 			    }
-			    if ((nModifs & CTRL) != 0
+			    ఒకవేళ ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
-				    || pker->wVirtualKeyCode == VK_DOWN)
+				*pch2 = Virt_కీలకం_Map[i].chCtrl;
+				ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం == VK_పైకి
+				    || pker->w_Virtual_కీలకం_సంకేతం == VK_కిందికి)
 				{
-				    *pmodifiers |= MOD_MASK_CTRL;
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pmodifiers |= MOD_ముసుగు_CTRL;
+				    *pch2 = Virt_కీలకం_Map[i].chAlone;
 				}
 			    }
-			    if ((nModifs & SHIFT) != 0
+			    ఒకవేళ ((nModifs & జరుపు_2) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				*pch2 = VirtKeyMap[i].chShift;
+				*pmodifiers |= MOD_ముసుగు_CTRL;
+				*pch2 = Virt_కీలకం_Map[i].ch_జరుపు;
 			    }
-			    if ((nModifs & ALT) != 0)
+			    ఒకవేళ ((nModifs & ALT) != 0)
 			    {
-				*pch2 = VirtKeyMap[i].chAlt;
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & ~ALT) == 0)
+				*pch2 = Virt_కీలకం_Map[i].chAlt;
+				*pmodifiers |= MOD_ముసుగు_ALT;
+				ఒకవేళ ((nModifs & ~ALT) == 0)
 				{
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_కీలకం_Map[i].chAlone;
 				}
-				else if ((nModifs & SHIFT) != 0)
+				లేకపోతే ఒకవేళ ((nModifs & జరుపు_2) != 0)
 				{
-				    *pch2 = VirtKeyMap[i].chShift;
+				    *pch2 = Virt_కీలకం_Map[i].ch_జరుపు;
 				}
-				else if ((nModifs & CTRL) != 0)
+				లేకపోతే ఒకవేళ ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
-					|| pker->wVirtualKeyCode == VK_DOWN)
+				    ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం == VK_పైకి
+					|| pker->w_Virtual_కీలకం_సంకేతం == VK_కిందికి)
 				    {
-					*pmodifiers |= MOD_MASK_CTRL;
-					*pch2 = VirtKeyMap[i].chAlone;
+					*pmodifiers |= MOD_ముసుగు_CTRL;
+					*pch2 = Virt_కీలకం_Map[i].chAlone;
 				    }
-				    else
+				    లేకపోతే
 				    {
-					*pch2 = VirtKeyMap[i].chCtrl;
+					*pch2 = Virt_కీలకం_Map[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
-					&& (nModifs & SHIFT) != 0
-					&& (nModifs & ~SHIFT) == 0)
+			లేకపోతే ఒకవేళ (pker->w_Virtual_కీలకం_సంకేతం == VK_చొప్పించు
+					&& (nModifs & జరుపు_2) != 0
+					&& (nModifs & ~జరుపు_2) == 0)
 			{
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chShift;
+			    *pch2 = Virt_కీలకం_Map[i].ch_జరుపు;
 			}
-			else
+			లేకపోతే
 			{
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0)
-				*pmodifiers |= MOD_MASK_SHIFT;
-			    if ((nModifs & CTRL) != 0)
-				*pmodifiers |= MOD_MASK_CTRL;
-			    if ((nModifs & ALT) != 0)
-				*pmodifiers |= MOD_MASK_ALT;
+			    *pch2 = Virt_కీలకం_Map[i].chAlone;
+			    ఒకవేళ ((nModifs & జరుపు_2) != 0)
+				*pmodifiers |= MOD_ముసుగు_జరుపు;
+			    ఒకవేళ ((nModifs & CTRL) != 0)
+				*pmodifiers |= MOD_ముసుగు_CTRL;
+			    ఒకవేళ ((nModifs & ALT) != 0)
+				*pmodifiers |= MOD_ముసుగు_ALT;
 			}
 		    }
 		}
 
-		return TRUE;
+		తిరిగి TRUE;
 	    }
 	}
     }
 
-    i = win32_kbd_patch_key(pker);
+    i = win32_kbd_patch_కీలకం(pker);
 
-    if (i < 0)
+    ఒకవేళ (i < 0)
 	*pch = NUL;
-    else
+    లేకపోతే
     {
 	*pch = (i > 0) ? pker->uChar.UnicodeChar : NUL;
 
-	if (pmodifiers != NULL)
+	ఒకవేళ (pmodifiers != ఖాళీ)
 	{
 	    // Pass on the ALT key as a modifier, but only when not combined
 	    // with CTRL (which is ALTGR).
-	    if ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
-		*pmodifiers |= MOD_MASK_ALT;
+	    ఒకవేళ ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
+		*pmodifiers |= MOD_ముసుగు_ALT;
 
 	    // Pass on SHIFT only for special keys, because we don't know when
 	    // it's already included with the character.
-	    if ((nModifs & SHIFT) != 0 && *pch <= 0x20)
-		*pmodifiers |= MOD_MASK_SHIFT;
+	    ఒకవేళ ((nModifs & జరుపు_2) != 0 && *pch <= 0x20)
+		*pmodifiers |= MOD_ముసుగు_జరుపు;
 
 	    // Pass on CTRL only for non-special keys, because we don't know
 	    // when it's already included with the character.  And not when
 	    // combined with ALT (which is ALTGR).
-	    if ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
+	    ఒకవేళ ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
 					       && *pch >= 0x20 && *pch < 0x80)
-		*pmodifiers |= MOD_MASK_CTRL;
+		*pmodifiers |= MOD_ముసుగు_CTRL;
 	}
     }
 
-    return (*pch != NUL);
+    తిరిగి (*pch != NUL);
 }
 
-# if defined(FEAT_EVAL)
-    static int
-encode_key_event(dict_T *args, INPUT_RECORD *ir)
+# ఒకవేళ defined(FEAT_EVAL)
+    స్థిర పూర్ణాంకం
+encode_కీలకం_event(dict_T *వాదనలు, ఆదానం_రికార్డు *ir)
 {
-    static int s_dwMods = 0;
+    స్థిర పూర్ణాంకం s_dwMods = 0;
 
-    char_u *action = dict_get_string(args, "event", TRUE);
-    if (action && (STRICMP(action, "keydown") == 0
+    char_u *action = dict_get_string(వాదనలు, "event", TRUE);
+    ఒకవేళ (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
-	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	BOOL is_కీలకం_కిందికి = STRICMP(action, "keydown") == 0;
+	మాట_2 vk_సంకేతం = dict_get_సంఖ్య_def(వాదనలు, "keycode", 0);
+	ఒకవేళ (vk_సంకేతం <= 0 || vk_సంకేతం >= 0xFF)
 	{
-	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    semsg(_(e_invalid_వాదం_nr), (దీర్ఘ)vk_సంకేతం);
+	    తిరిగి FALSE;
 	}
 
-	ir->EventType = KEY_EVENT;
-	KEY_EVENT_RECORD ker;
-	ZeroMemory(&ker, sizeof(ker));
-	ker.bKeyDown = isKeyDown;
-	ker.wRepeatCount = 1;
-	ker.wVirtualScanCode = 0;
-	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ir->EventType = కీలకం_EVENT;
+	కీలకం_EVENT_రికార్డు ker;
+	Zero_జ్ఞాపకం(&ker, పరిమాణం(ker));
+	ker.b_కీలకం_కిందికి = is_కీలకం_కిందికి;
+	ker.w_Repeat_లెక్క = 1;
+	ker.w_Virtual_పరిశీలన_సంకేతం = 0;
+	ker.dw_Control_కీలకం_State = 0;
+	పూర్ణాంకం mods = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
-	if (mods)
+	ఒకవేళ (mods)
 	{
 	    // If "modifiers" is explicitly set in the args, then we reset any
 	    // remembered modifier key state that may have been set from
 	    // earlier mod-key-down events, even if they are not yet unset by
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
-	    if (mods & MOD_MASK_SHIFT)
-		ker.dwControlKeyState |= SHIFT_PRESSED;
-	    if (mods & MOD_MASK_CTRL)
-		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	    if (mods & MOD_MASK_ALT)
-		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
+	    ఒకవేళ (mods & MOD_ముసుగు_జరుపు)
+		ker.dw_Control_కీలకం_State |= జరుపు_PRESSED;
+	    ఒకవేళ (mods & MOD_ముసుగు_CTRL)
+		ker.dw_Control_కీలకం_State |= ఎడమ_CTRL_PRESSED;
+	    ఒకవేళ (mods & MOD_ముసుగు_ALT)
+		ker.dw_Control_కీలకం_State |= ఎడమ_ALT_PRESSED;
 	}
 
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
+	ఒకవేళ (vk_సంకేతం == VK_LSHIFT || vk_సంకేతం == VK_RSHIFT || vk_సంకేతం == VK_జరుపు)
 	{
-	    if (isKeyDown)
-		s_dwMods |= SHIFT_PRESSED;
-	    else
-		s_dwMods &= ~SHIFT_PRESSED;
+	    ఒకవేళ (is_కీలకం_కిందికి)
+		s_dwMods |= జరుపు_PRESSED;
+	    లేకపోతే
+		s_dwMods &= ~జరుపు_PRESSED;
 	}
-	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
+	లేకపోతే ఒకవేళ (vk_సంకేతం == VK_LCONTROL || vk_సంకేతం == VK_CONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_CTRL_PRESSED;
+	    ఒకవేళ (is_కీలకం_కిందికి)
+		s_dwMods |= ఎడమ_CTRL_PRESSED;
+	    లేకపోతే
+		s_dwMods &= ~ఎడమ_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_RCONTROL)
+	లేకపోతే ఒకవేళ (vk_సంకేతం == VK_RCONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_CTRL_PRESSED;
+	    ఒకవేళ (is_కీలకం_కిందికి)
+		s_dwMods |= కుడి_CTRL_PRESSED;
+	    లేకపోతే
+		s_dwMods &= ~కుడి_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
+	లేకపోతే ఒకవేళ (vk_సంకేతం == VK_LMENU || vk_సంకేతం == VK_MENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_ALT_PRESSED;
+	    ఒకవేళ (is_కీలకం_కిందికి)
+		s_dwMods |= ఎడమ_ALT_PRESSED;
+	    లేకపోతే
+		s_dwMods &= ~ఎడమ_ALT_PRESSED;
 	}
-	else if (vkCode == VK_RMENU)
+	లేకపోతే ఒకవేళ (vk_సంకేతం == VK_RMENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_ALT_PRESSED;
+	    ఒకవేళ (is_కీలకం_కిందికి)
+		s_dwMods |= కుడి_ALT_PRESSED;
+	    లేకపోతే
+		s_dwMods &= ~కుడి_ALT_PRESSED;
 	}
-	ker.dwControlKeyState |= s_dwMods;
-	ker.wVirtualKeyCode = vkCode;
+	ker.dw_Control_కీలకం_State |= s_dwMods;
+	ker.w_Virtual_కీలకం_సంకేతం = vk_సంకేతం;
 	ker.uChar.UnicodeChar = 0;
-	ir->Event.KeyEvent = ker;
+	ir->Event.కీలకం_Event_2 = ker;
 	vim_free(action);
     }
-    else
+    లేకపోతే
     {
-	if (action == NULL)
+	ఒకవేళ (action == ఖాళీ)
 	{
-	    semsg(_(e_missing_argument_str), "event");
+	    semsg(_(e_missing_వాదం_str), "event");
 	}
-	else
+	లేకపోతే
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
+	    semsg(_(e_invalid_విలువ_for_వాదం_str_str), "event", action);
 	    vim_free(action);
 	}
-	return FALSE;
+	తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 # endif  // FEAT_EVAL
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#అయితే_ముగింపు // !FEAT_GUI_MSWIN || VIMDLL
 
 
 /*
  * For the GUI the mouse handling is in gui_w32.c.
  */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int g_fMouseAvail = FALSE;   // mouse present
-static int g_fMouseActive = FALSE;  // mouse enabled
-static int g_nMouseClick = -1;	    // mouse status
-static int g_xMouse;		    // mouse x coordinate
-static int g_yMouse;		    // mouse y coordinate
-static DWORD g_cmodein = 0;	    // Original console input mode
-static DWORD g_cmodeout = 0;	    // Original console output mode
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+స్థిర పూర్ణాంకం g_fMouseAvail = FALSE;   // mouse present
+స్థిర పూర్ణాంకం g_f_Mouse_చురుకైన = FALSE;  // mouse enabled
+స్థిర పూర్ణాంకం g_nMouseClick = -1;	    // mouse status
+స్థిర పూర్ణాంకం g_xMouse;		    // mouse x coordinate
+స్థిర పూర్ణాంకం g_yMouse;		    // mouse y coordinate
+స్థిర DWORD g_cmodein = 0;	    // Original console input mode
+స్థిర DWORD g_cmodeout = 0;	    // Original console output mode
 
 /*
  * Enable or disable mouse input
  */
-    void
-mch_setmouse(int on)
+    శూన్య
+mch_setmouse(పూర్ణాంకం on)
 {
     DWORD cmodein;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
-    if (!g_fMouseAvail)
-	return;
+    ఒకవేళ (!g_fMouseAvail)
+	తిరిగి;
 
-    g_fMouseActive = on;
-    GetConsoleMode(g_hConIn, &cmodein);
+    g_f_Mouse_చురుకైన = on;
+    Get_Console_బహుళకం(g_h_Con_లోపల, &cmodein);
 
-    if (g_fMouseActive)
+    ఒకవేళ (g_f_Mouse_చురుకైన)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_ఆదానం;
+	cmodein &= ~ENABLE_శీఘ్ర_EDIT_బహుళకం;
     }
-    else
+    లేకపోతే
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_ఆదానం;
+	cmodein |= g_cmodein & ENABLE_శీఘ్ర_EDIT_బహుళకం;
     }
 
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodein | ENABLE_EXTENDED_FLAGS);
 }
 
 
-# if defined(FEAT_BEVAL_TERM)
+# ఒకవేళ defined(FEAT_BEVAL_పదం)
 /*
  * Called when 'balloonevalterm' changed.
  */
-    void
-mch_bevalterm_changed(void)
+    శూన్య
+mch_bevalterm_మారింది(శూన్య)
 {
-    mch_setmouse(g_fMouseActive);
+    mch_setmouse(g_f_Mouse_చురుకైన);
 }
 # endif
 
@@ -1419,72 +1419,72 @@ mch_bevalterm_changed(void)
  *       the wheel was rotated forward, away from the user.
  *    -  Otherwise, the wheel was rotated backward, toward the user.
  */
-    static void
-decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
+    స్థిర శూన్య
+decode_mouse_wheel(MOUSE_EVENT_రికార్డు *pmer)
 {
-    int	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
-    int	    zDelta = pmer->dwButtonState;
+    పూర్ణాంకం	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
+    పూర్ణాంకం	    zDelta = pmer->dwButtonState;
 
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
 # ifdef FEAT_PROP_POPUP
-    int lcol = g_xMouse;
-    int lrow = g_yMouse;
-    win_T *wp = mouse_find_win(&lrow, &lcol, FIND_POPUP);
-    if (wp != NULL && popup_is_popup(wp))
+    పూర్ణాంకం lcol = g_xMouse;
+    పూర్ణాంకం lrow = g_yMouse;
+    win_T *wp = mouse_కనుగొను_win(&lrow, &lcol, కనుగొను_POPUP);
+    ఒకవేళ (wp != ఖాళీ && popup_is_popup(wp))
     {
 	g_nMouseClick = -1;
 	cmdarg_T cap;
 	oparg_T oa;
-	CLEAR_FIELD(cap);
+	CLEAR_క్షేత్రం(cap);
 	clear_oparg(&oa);
 	cap.oap = &oa;
-	if (horizontal)
+	ఒకవేళ (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_ఎడమ : MSCR_కుడి;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	లేకపోతే
 	{
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
-	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
+	    cap.arg = zDelta < 0 ? MSCR_పైకి : MSCR_కిందికి;
 	}
 
 	// Mouse hovers over popup window, scroll it if possible.
-	mouse_row = wp->w_winrow;
-	mouse_col = wp->w_wincol;
+	mouse_అడ్డువరుస = wp->w_winrow;
+	mouse_నిలువు = wp->w_wincol;
 	nv_mousescroll(&cap);
 	update_screen(0);
 	setcursor();
-	out_flush();
+	బహిర్గతం_flush();
     }
 # endif
-    mouse_col = g_xMouse;
-    mouse_row = g_yMouse;
+    mouse_నిలువు = g_xMouse;
+    mouse_అడ్డువరుస = g_yMouse;
 
     char_u modifiers = 0;
     char_u direction = 0;
 
     // Decode the direction into an event that Vim can process
-    if (horizontal)
+    ఒకవేళ (horizontal)
 	direction = zDelta >= 0 ? KE_MOUSELEFT : KE_MOUSERIGHT;
-    else
+    లేకపోతే
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
-	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
-	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & జరుపు_PRESSED)
+	modifiers |= MOD_ముసుగు_జరుపు; // MOUSE_SHIFT;
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & (కుడి_CTRL_PRESSED | ఎడమ_CTRL_PRESSED))
+	modifiers |= MOD_ముసుగు_CTRL; // MOUSE_CTRL;
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & (కుడి_ALT_PRESSED  | ఎడమ_ALT_PRESSED))
+	modifiers |= MOD_ముసుగు_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
     // together.
     g_nMouseClick = ((direction << 8) | modifiers);
 
-    return;
+    తిరిగి;
 }
 
 /*
@@ -1514,238 +1514,238 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
  * so we need to delay a little.  Also, we tend not to get MOUSE_RELEASE
  * in such cases, if the user is clicking quickly.
  */
-    static BOOL
+    స్థిర BOOL
 decode_mouse_event(
-    MOUSE_EVENT_RECORD *pmer)
+    MOUSE_EVENT_రికార్డు *pmer)
 {
-    static int s_nOldButton = -1;
-    static int s_nOldMouseClick = -1;
-    static int s_xOldMouse = -1;
-    static int s_yOldMouse = -1;
-    static linenr_T s_old_topline = 0;
+    స్థిర పూర్ణాంకం s_nOldButton = -1;
+    స్థిర పూర్ణాంకం s_nOldMouseClick = -1;
+    స్థిర పూర్ణాంకం s_xOldMouse = -1;
+    స్థిర పూర్ణాంకం s_yOldMouse = -1;
+    స్థిర linenr_T s_old_topline = 0;
 # ifdef FEAT_DIFF
-    static int s_old_topfill = 0;
+    స్థిర పూర్ణాంకం s_old_topfill = 0;
 # endif
-    static int s_cClicks = 1;
-    static BOOL s_fReleased = TRUE;
-    static DWORD s_dwLastClickTime = 0;
-    static BOOL s_fNextIsMiddle = FALSE;
+    స్థిర పూర్ణాంకం s_cClicks = 1;
+    స్థిర BOOL s_fReleased = TRUE;
+    స్థిర DWORD s_dw_చివరి_Click_సమయం = 0;
+    స్థిర BOOL s_f_తదుపరి_Is_మధ్య = FALSE;
 
-    static DWORD cButtons = 0;	// number of buttons supported
+    స్థిర DWORD cButtons = 0;	// number of buttons supported
 
-    const DWORD LEFT = FROM_LEFT_1ST_BUTTON_PRESSED;
-    const DWORD MIDDLE = FROM_LEFT_2ND_BUTTON_PRESSED;
-    const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
-    const DWORD LEFT_RIGHT = LEFT | RIGHT;
+    స్థిరరాశి DWORD ఎడమ_3 = FROM_ఎడమ_1_ST_BUTTON_PRESSED;
+    స్థిరరాశి DWORD మధ్య = FROM_ఎడమ_2_ND_BUTTON_PRESSED;
+    స్థిరరాశి DWORD కుడి_3 = RIGHTMOST_BUTTON_PRESSED;
+    స్థిరరాశి DWORD ఎడమ_కుడి = ఎడమ_3 | కుడి_3;
 
-    int nButton;
+    పూర్ణాంకం nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    ఒకవేళ (cButtons == 0 && !Get_సంఖ్య_యొక్క_Console_Mouse_Buttons(&cButtons))
 	cButtons = 2;
 
-    if (!g_fMouseAvail || !g_fMouseActive)
+    ఒకవేళ (!g_fMouseAvail || !g_f_Mouse_చురుకైన)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // get a spurious MOUSE_EVENT immediately after receiving focus; ignore
-    if (g_fJustGotFocus)
+    ఒకవేళ (g_fJustGotFocus)
     {
 	g_fJustGotFocus = FALSE;
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // If there is an unprocessed mouse click drop this one.
-    if (g_nMouseClick != -1)
-	return TRUE;
+    ఒకవేళ (g_nMouseClick != -1)
+	తిరిగి TRUE;
 
-    if (pmer->dwEventFlags == MOUSE_WHEELED
+    ఒకవేళ (pmer->dwEventFlags == MOUSE_WHEELED
 				       || pmer->dwEventFlags == MOUSE_HWHEELED)
     {
 	decode_mouse_wheel(pmer);
-	return TRUE;  // we now should have a mouse scroll in g_nMouseClick
+	తిరిగి TRUE;  // we now should have a mouse scroll in g_nMouseClick
     }
 
     nButton = -1;
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
-    if (pmer->dwEventFlags == MOUSE_MOVED)
+    ఒకవేళ (pmer->dwEventFlags == MOUSE_MOVED)
     {
 	// Ignore MOUSE_MOVED events if (x, y) hasn't changed.	(We get these
 	// events even when the mouse moves only within a char cell.)
-	if (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
-	    return FALSE;
+	ఒకవేళ (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
+	    తిరిగి FALSE;
     }
 
     // If no buttons are pressed...
-    if ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
+    ఒకవేళ ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
     {
 	nButton = MOUSE_RELEASE;
 
 	// If the last thing returned was MOUSE_RELEASE, ignore this
-	if (s_fReleased)
+	ఒకవేళ (s_fReleased)
 	{
-# ifdef FEAT_BEVAL_TERM
+# ifdef FEAT_BEVAL_పదం
 	    // do return mouse move events when we want them
-	    if (p_bevalterm)
+	    ఒకవేళ (p_bevalterm)
 		nButton = MOUSE_DRAG;
-	    else
+	    లేకపోతే
 # endif
-		return FALSE;
+		తిరిగి FALSE;
 	}
 
 	s_fReleased = TRUE;
     }
-    else    // one or more buttons pressed
+    లేకపోతే    // one or more buttons pressed
     {
 	// on a 2-button mouse, hold down left and right buttons
 	// simultaneously to get MIDDLE.
 
-	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
+	ఒకవేళ (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
-	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
+	    DWORD dwLR = (pmer->dwButtonState & ఎడమ_కుడి);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    ఒకవేళ (dwLR == ఎడమ_3 || dwLR == కుడి_3)
 	    {
-		for (;;)
+		కొరకు (;;)
 		{
 		    // wait a short time for next input event
-		    if (WaitForSingleObject(g_hConIn, p_mouset / 3)
+		    ఒకవేళ (WaitForSingleObject(g_h_Con_లోపల, p_mouset / 3)
 							     != WAIT_OBJECT_0)
-			break;
-		    else
+			ఆపు;
+		    లేకపోతే
 		    {
-			DWORD cRecords = 0;
-			INPUT_RECORD ir;
-			MOUSE_EVENT_RECORD* pmer2 = &ir.Event.MouseEvent;
+			DWORD c_రికార్డులు = 0;
+			ఆదానం_రికార్డు ir;
+			MOUSE_EVENT_రికార్డు* pmer2 = &ir.Event.MouseEvent;
 
-			peek_console_input(g_hConIn, &ir, 1, &cRecords);
+			peek_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
-			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
-				|| !(pmer2->dwButtonState & LEFT_RIGHT))
-			    break;
-			else
+			ఒకవేళ (c_రికార్డులు == 0 || ir.EventType != MOUSE_EVENT
+				|| !(pmer2->dwButtonState & ఎడమ_కుడి))
+			    ఆపు;
+			లేకపోతే
 			{
-			    if (pmer2->dwEventFlags != MOUSE_MOVED)
+			    ఒకవేళ (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
-				return decode_mouse_event(pmer2);
+				తిరిగి decode_mouse_event(pmer2);
 			    }
-			    else if (s_xOldMouse == pmer2->dwMousePosition.X &&
+			    లేకపోతే ఒకవేళ (s_xOldMouse == pmer2->dwMousePosition.X &&
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
 				// are there any more mouse events in queue?
-				peek_console_input(g_hConIn, &ir, 1, &cRecords);
+				peek_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
-				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
-				    break;
+				ఒకవేళ (c_రికార్డులు==0 || ir.EventType != MOUSE_EVENT)
+				    ఆపు;
 			    }
-			    else
-				break;
+			    లేకపోతే
+				ఆపు;
 			}
 		    }
 		}
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	ఒకవేళ (s_f_తదుపరి_Is_మధ్య)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
-		? MOUSE_DRAG : MOUSE_MIDDLE;
-	    s_fNextIsMiddle = FALSE;
+		? MOUSE_DRAG : MOUSE_మధ్య;
+	    s_f_తదుపరి_Is_మధ్య = FALSE;
 	}
-	else if (cButtons == 2	&&
-	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
+	లేకపోతే ఒకవేళ (cButtons == 2	&&
+	    ((pmer->dwButtonState & ఎడమ_కుడి) == ఎడమ_కుడి))
 	{
-	    nButton = MOUSE_MIDDLE;
+	    nButton = MOUSE_మధ్య;
 
-	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
+	    ఒకవేళ (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
-		s_fNextIsMiddle = TRUE;
+		s_f_తదుపరి_Is_మధ్య = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
-	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
-	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
-	    nButton = MOUSE_RIGHT;
+	లేకపోతే ఒకవేళ ((pmer->dwButtonState & ఎడమ_3) == ఎడమ_3)
+	    nButton = MOUSE_ఎడమ;
+	లేకపోతే ఒకవేళ ((pmer->dwButtonState & మధ్య) == మధ్య)
+	    nButton = MOUSE_మధ్య;
+	లేకపోతే ఒకవేళ ((pmer->dwButtonState & కుడి_3) == కుడి_3)
+	    nButton = MOUSE_కుడి;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	ఒకవేళ (! s_fReleased && ! s_f_తదుపరి_Is_మధ్య
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
-	    return FALSE;
+	    తిరిగి FALSE;
 
-	s_fReleased = s_fNextIsMiddle;
+	s_fReleased = s_f_తదుపరి_Is_మధ్య;
     }
 
-    if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
+    ఒకవేళ (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
     {
 	// button pressed or released, without mouse moving
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ఒకవేళ (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
-	    DWORD dwCurrentTime = GetTickCount();
+	    DWORD dw_Current_సమయం = Get_Tick_లెక్క();
 
-	    if (s_xOldMouse != g_xMouse
+	    ఒకవేళ (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
 		    || s_nOldButton != nButton
 		    || s_old_topline != curwin->w_topline
 # ifdef FEAT_DIFF
 		    || s_old_topfill != curwin->w_topfill
 # endif
-		    || (int)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
+		    || (పూర్ణాంకం)(dw_Current_సమయం - s_dw_చివరి_Click_సమయం) > p_mouset)
 	    {
 		s_cClicks = 1;
 	    }
-	    else if (++s_cClicks > 4)
+	    లేకపోతే ఒకవేళ (++s_cClicks > 4)
 	    {
 		s_cClicks = 1;
 	    }
 
-	    s_dwLastClickTime = dwCurrentTime;
+	    s_dw_చివరి_Click_సమయం = dw_Current_సమయం;
 	}
     }
-    else if (pmer->dwEventFlags == MOUSE_MOVED)
+    లేకపోతే ఒకవేళ (pmer->dwEventFlags == MOUSE_MOVED)
     {
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ఒకవేళ (nButton != -1 && nButton != MOUSE_RELEASE)
 	    nButton = MOUSE_DRAG;
 
 	s_cClicks = 1;
     }
 
-    if (nButton == -1)
-	return FALSE;
+    ఒకవేళ (nButton == -1)
+	తిరిగి FALSE;
 
-    if (nButton != MOUSE_RELEASE)
+    ఒకవేళ (nButton != MOUSE_RELEASE)
 	s_nOldButton = nButton;
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & జరుపు_PRESSED)
+	g_nMouseClick |= MOUSE_జరుపు;
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & (కుడి_CTRL_PRESSED | ఎడమ_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    ఒకవేళ (pmer->dw_Control_కీలకం_State & (కుడి_ALT_PRESSED  | ఎడమ_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
-    if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
-	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
+    ఒకవేళ (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
+	సమితి_అంకె_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
-    if (s_xOldMouse == g_xMouse
+    ఒకవేళ (s_xOldMouse == g_xMouse
 	    && s_yOldMouse == g_yMouse
 	    && s_nOldMouseClick == g_nMouseClick)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     s_xOldMouse = g_xMouse;
@@ -1756,174 +1756,174 @@ decode_mouse_event(
 # endif
     s_nOldMouseClick = g_nMouseClick;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 # ifdef FEAT_EVAL
-    static int
-encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
+    స్థిర పూర్ణాంకం
+encode_mouse_event(dict_T *వాదనలు, ఆదానం_రికార్డు *ir)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    పూర్ణాంకం		button;
+    పూర్ణాంకం		అడ్డువరుస;
+    పూర్ణాంకం		నిలువు;
+    పూర్ణాంకం		repeated_click;
     int_u	mods = 0;
-    int		move;
+    పూర్ణాంకం		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    ఒకవేళ (!dict_has_కీలకం(వాదనలు, "row") || !dict_has_కీలకం(వాదనలు, "col"))
+	తిరిగి FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    move = (పూర్ణాంకం)dict_get_bool(వాదనలు, "move", FALSE);
+    ఒకవేళ (!move && (!dict_has_కీలకం(వాదనలు, "button")
+	    || !dict_has_కీలకం(వాదనలు, "multiclick")
+	    || !dict_has_కీలకం(వాదనలు, "modifiers")))
+	తిరిగి FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    అడ్డువరుస = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "row") - 1;
+    నిలువు = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
-    MOUSE_EVENT_RECORD mer;
-    ZeroMemory(&mer, sizeof(mer));
-    mer.dwMousePosition.X  = col;
-    mer.dwMousePosition.Y  = row;
+    MOUSE_EVENT_రికార్డు mer;
+    Zero_జ్ఞాపకం(&mer, పరిమాణం(mer));
+    mer.dwMousePosition.X  = నిలువు;
+    mer.dwMousePosition.Y  = అడ్డువరుస;
 
-    if (move)
+    ఒకవేళ (move)
     {
 	mer.dwButtonState = 0;
 	mer.dwEventFlags = MOUSE_MOVED;
     }
-    else
+    లేకపోతే
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "button");
+	repeated_click = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "multiclick");
+	mods = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
-	mouse_set_hor_scroll_step(6);
-	mouse_set_vert_scroll_step(3);
+	mouse_సమితి_hor_scroll_అడుగు(6);
+	mouse_సమితి_vert_scroll_అడుగు(3);
 
-	switch (button)
+	ఎంపిక (button)
 	{
-	    case MOUSE_LEFT:
-		mer.dwButtonState = FROM_LEFT_1ST_BUTTON_PRESSED;
+	    స్థితి MOUSE_ఎడమ:
+		mer.dwButtonState = FROM_ఎడమ_1_ST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_MIDDLE:
-		mer.dwButtonState = FROM_LEFT_2ND_BUTTON_PRESSED;
+		ఆపు;
+	    స్థితి MOUSE_మధ్య:
+		mer.dwButtonState = FROM_ఎడమ_2_ND_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RIGHT:
+		ఆపు;
+	    స్థితి MOUSE_కుడి:
 		mer.dwButtonState = RIGHTMOST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RELEASE:
+		ఆపు;
+	    స్థితి MOUSE_RELEASE:
 		// umm?  Assume Left Release?
 		mer.dwEventFlags = 0;
 
-	    case MOUSE_MOVE:
+	    స్థితి MOUSE_MOVE:
 		mer.dwButtonState = 0;
 		mer.dwEventFlags = MOUSE_MOVED;
-		break;
-	    case MOUSE_X1:
-		mer.dwButtonState = FROM_LEFT_3RD_BUTTON_PRESSED;
-		break;
-	    case MOUSE_X2:
-		mer.dwButtonState = FROM_LEFT_4TH_BUTTON_PRESSED;
-		break;
-	    case MOUSE_4:  // KE_MOUSEDOWN;
+		ఆపు;
+	    స్థితి MOUSE_X1:
+		mer.dwButtonState = FROM_ఎడమ_3_RD_BUTTON_PRESSED;
+		ఆపు;
+	    స్థితి MOUSE_X2:
+		mer.dwButtonState = FROM_ఎడమ_4_TH_BUTTON_PRESSED;
+		ఆపు;
+	    స్థితి MOUSE_4:  // KE_MOUSEDOWN;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_5:  // KE_MOUSEUP;
+		ఆపు;
+	    స్థితి MOUSE_5:  // KE_MOUSEUP;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_6:  // KE_MOUSELEFT;
+		ఆపు;
+	    స్థితి MOUSE_6:  // KE_MOUSELEFT;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    case MOUSE_7:  // KE_MOUSERIGHT;
+		ఆపు;
+	    స్థితి MOUSE_7:  // KE_MOUSERIGHT;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    default:
-		semsg(_(e_invalid_argument_str), "button");
-		return FALSE;
+		ఆపు;
+	    అప్రమేయ:
+		semsg(_(e_invalid_వాదం_str), "button");
+		తిరిగి FALSE;
 	}
     }
 
-    mer.dwControlKeyState = 0;
-    if (mods != 0)
+    mer.dw_Control_కీలకం_State = 0;
+    ఒకవేళ (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
-	if (mods & MOUSE_SHIFT)
-	    mer.dwControlKeyState |= SHIFT_PRESSED;
-	if (mods & MOUSE_CTRL)
-	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	if (mods & MOUSE_ALT)
-	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
+	ఒకవేళ (mods & MOUSE_జరుపు)
+	    mer.dw_Control_కీలకం_State |= జరుపు_PRESSED;
+	ఒకవేళ (mods & MOUSE_CTRL)
+	    mer.dw_Control_కీలకం_State |= ఎడమ_CTRL_PRESSED;
+	ఒకవేళ (mods & MOUSE_ALT)
+	    mer.dw_Control_కీలకం_State |= ఎడమ_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
-    return TRUE;
+    తిరిగి TRUE;
 }
 # endif  // FEAT_EVAL
 
-    static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+    స్థిర పూర్ణాంకం
+write_ఆదానం_రికార్డు_బఫరు(ఆదానం_రికార్డు* irEvents, పూర్ణాంకం n_నిడివి)
 {
-    int				nCount = 0;
-    input_record_buffer_node_T	*event_node;
+    పూర్ణాంకం				n_లెక్క = 0;
+    ఆదానం_రికార్డు_బఫరు_కణుపు_T	*event_కణుపు;
 
-    while (nCount < nLength)
+    అయితే (n_లెక్క < n_నిడివి)
     {
-	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
-	    return -1;
+	event_కణుపు = alloc(పరిమాణం(ఆదానం_రికార్డు_బఫరు_కణుపు_T));
+	ఒకవేళ (event_కణుపు == ఖాళీ)
+	    తిరిగి -1;
 
-	event_node->ir = irEvents[nCount++];
-	event_node->next = NULL;
+	event_కణుపు->ir = irEvents[n_లెక్క++];
+	event_కణుపు->తదుపరి = ఖాళీ;
 
-	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	ఆదానం_రికార్డు_బఫరు.నిడివి++;
+	ఒకవేళ (ఆదానం_రికార్డు_బఫరు.తోక == ఖాళీ)
 	{
-	    input_record_buffer.head = event_node;
-	    input_record_buffer.tail = event_node;
+	    ఆదానం_రికార్డు_బఫరు.తల = event_కణుపు;
+	    ఆదానం_రికార్డు_బఫరు.తోక = event_కణుపు;
 	}
-	else
+	లేకపోతే
 	{
-	    input_record_buffer.tail->next = event_node;
-	    input_record_buffer.tail = input_record_buffer.tail->next;
+	    ఆదానం_రికార్డు_బఫరు.తోక->తదుపరి = event_కణుపు;
+	    ఆదానం_రికార్డు_బఫరు.తోక = ఆదానం_రికార్డు_బఫరు.తోక->తదుపరి;
 	}
     }
-    return nCount;
+    తిరిగి n_లెక్క;
 }
 
-    static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+    స్థిర పూర్ణాంకం
+read_ఆదానం_రికార్డు_బఫరు(ఆదానం_రికార్డు* irEvents, పూర్ణాంకం n_Max_నిడివి)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    పూర్ణాంకం n_లెక్క = 0;
+    అయితే (n_లెక్క < n_Max_నిడివి && ఆదానం_రికార్డు_బఫరు.తల != ఖాళీ)
     {
-	input_record_buffer.length--;
-	input_record_buffer_node_T *pop_head = input_record_buffer.head;
-	irEvents[nCount++] = pop_head->ir;
-	input_record_buffer.head = pop_head->next;
-	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
-	    input_record_buffer.tail = NULL;
+	ఆదానం_రికార్డు_బఫరు.నిడివి--;
+	ఆదానం_రికార్డు_బఫరు_కణుపు_T *తీయి_తల = ఆదానం_రికార్డు_బఫరు.తల;
+	irEvents[n_లెక్క++] = తీయి_తల->ir;
+	ఆదానం_రికార్డు_బఫరు.తల = తీయి_తల->తదుపరి;
+	vim_free(తీయి_తల);
+	ఒకవేళ (ఆదానం_రికార్డు_బఫరు.నిడివి == 0)
+	    ఆదానం_రికార్డు_బఫరు.తోక = ఖాళీ;
     }
-    return nCount;
+    తిరిగి n_లెక్క;
 }
-#else  // FEAT_GUI_MSWIN && !VIMDLL
-    void
-mch_setmouse(int on UNUSED)
+#లేకపోతే  // FEAT_GUI_MSWIN && !VIMDLL
+    శూన్య
+mch_setmouse(పూర్ణాంకం on వాడని)
 {
 }
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#అయితే_ముగింపు // FEAT_GUI_MSWIN && !VIMDLL
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 /*
  * The 'test_mswin_event' function is for testing Vim's low-level handling of
  * user input events.  ie, this manages the encoding of INPUT_RECORD events
@@ -1941,115 +1941,115 @@ mch_setmouse(int on UNUSED)
  * Note: INPUT_RECORDs are only used by the Windows console, not the GUI.  The
  * GUI sends MSG structs instead.
  */
-    int
-test_mswin_event(char_u *event, dict_T *args)
+    పూర్ణాంకం
+test_mswin_event(char_u *event, dict_T *వాదనలు)
 {
-    int lpEventsWritten = 0;
+    పూర్ణాంకం lpEventsWritten = 0;
 
-# if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+# ఒకవేళ defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి test_gui_w32_sendevent(event, వాదనలు);
 # endif
 
-# if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
+# ఒకవేళ defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
 
 // Currently implemented event record types are; KEY_EVENT and MOUSE_EVENT
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
 // Maybe also:  MENU_EVENT
 
-    INPUT_RECORD ir;
-    BOOL input_encoded = FALSE;
+    ఆదానం_రికార్డు ir;
+    BOOL ఆదానం_encoded = FALSE;
     BOOL execute = FALSE;
-    if (STRCMP(event, "key") == 0)
+    ఒకవేళ (STRCMP(event, "key") == 0)
     {
-	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
-	    input_encoded = encode_key_event(args, &ir);
-	else if (!execute)
+	execute = dict_get_bool(వాదనలు, "execute", FALSE);
+	ఒకవేళ (dict_has_కీలకం(వాదనలు, "event"))
+	    ఆదానం_encoded = encode_కీలకం_event(వాదనలు, &ir);
+	లేకపోతే ఒకవేళ (!execute)
 	{
-	    semsg(_(e_missing_argument_str), "event");
-	    return FALSE;
+	    semsg(_(e_missing_వాదం_str), "event");
+	    తిరిగి FALSE;
 	}
     }
-    else if (STRCMP(event, "mouse") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
-	input_encoded = encode_mouse_event(args, &ir);
+	ఆదానం_encoded = encode_mouse_event(వాదనలు, &ir);
     }
-    else
+    లేకపోతే
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_విలువ_for_వాదం_str_str), "event", event);
+	తిరిగి FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    ఒకవేళ (ఆదానం_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	ఒకవేళ ((lpEventsWritten = write_ఆదానం_రికార్డు_బఫరు(&ir, 1)) < 0)
 	{
-	    semsg(_(e_out_of_memory), "event");
-	    return FALSE;
+	    semsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం), "event");
+	    తిరిగి FALSE;
 	}
     }
 
     // Set flags to execute the event, ie. like feedkeys mode X.
-    if (execute)
+    ఒకవేళ (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	పూర్ణాంకం save_సందేశం_scroll = సందేశం_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
-	msg_scroll = FALSE;
-	ch_log(NULL, "test_mswin_event() executing");
-	exec_normal(TRUE, TRUE, TRUE);
-	msg_scroll |= save_msg_scroll;
+	సందేశం_scroll = FALSE;
+	ch_log(ఖాళీ, "test_mswin_event() executing");
+	exec_సాధారణ(TRUE, TRUE, TRUE);
+	సందేశం_scroll |= save_సందేశం_scroll;
     }
 
 # endif
-    return lpEventsWritten;
+    తిరిగి lpEventsWritten;
 }
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
-#if defined(MCH_CURSOR_SHAPE)
+#ఒకవేళ defined(MCH_CURSOR_SHAPE)
 /*
  * Set the shape of the cursor.
  * 'thickness' can be from 1 (thin) to 99 (block)
  */
-    static void
-mch_set_cursor_shape(int thickness)
+    స్థిర శూన్య
+mch_సమితి_cursor_shape(పూర్ణాంకం thickness)
 {
-    if (vtp_working)
+    ఒకవేళ (vtp_working)
     {
-	if (*T_CSI == NUL)
+	ఒకవేళ (*T_CSI == NUL)
 	{
 	    // If 't_SI' is not set, use the default cursor styles.
-	    if (thickness < 50)
+	    ఒకవేళ (thickness < 50)
 		vtp_printf("\033[3 q");	// underline
-	    else
+	    లేకపోతే
 		vtp_printf("\033[0 q");	// default
 	}
     }
-    else
+    లేకపోతే
     {
 	CONSOLE_CURSOR_INFO ConsoleCursorInfo;
-	ConsoleCursorInfo.dwSize = thickness;
+	ConsoleCursorInfo.dw_కొలత = thickness;
 	ConsoleCursorInfo.bVisible = s_cursor_visible;
 
-	SetConsoleCursorInfo(g_hConOut, &ConsoleCursorInfo);
-	if (s_cursor_visible)
-	    SetConsoleCursorPosition(g_hConOut, g_coord);
+	సమితి_Console_Cursor_Info(g_h_Con_బహిర్గతం, &ConsoleCursorInfo);
+	ఒకవేళ (s_cursor_visible)
+	    సమితి_Console_Cursor_Position(g_h_Con_బహిర్గతం, g_coord);
     }
 }
 
-    void
-mch_update_cursor(void)
+    శూన్య
+mch_update_cursor(శూన్య)
 {
-    int		idx;
-    int		thickness;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		thickness;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
 
     /*
@@ -2057,26 +2057,26 @@ mch_update_cursor(void)
      */
     idx = get_shape_idx(FALSE);
 
-    if (shape_table[idx].shape == SHAPE_BLOCK)
+    ఒకవేళ (shape_పట్టిక[idx].shape == SHAPE_ఖండం)
 	thickness = 99;	// 100 doesn't work on W95
-    else
-	thickness = shape_table[idx].percentage;
-    mch_set_cursor_shape(thickness);
+    లేకపోతే
+	thickness = shape_పట్టిక[idx].percentage;
+    mch_సమితి_cursor_shape(thickness);
 }
-#endif
+#అయితే_ముగింపు
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Handle FOCUS_EVENT.
  */
-    static void
-handle_focus_event(INPUT_RECORD ir)
+    స్థిర శూన్య
+handle_focus_event(ఆదానం_రికార్డు ir)
 {
-    g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
-    ui_focus_change((int)g_fJustGotFocus);
+    g_fJustGotFocus = ir.Event.FocusEvent.b_సమితి_Focus;
+    ui_focus_change((పూర్ణాంకం)g_fJustGotFocus);
 }
 
-static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
+స్థిర శూన్య ResizeConBuf(HANDLE hConsole, COORD coordScreen);
 
 /*
  * Wait until console input from keyboard or mouse is available,
@@ -2084,116 +2084,116 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * When "ignore_input" is TRUE even wait when input is available.
  * Return TRUE if something is available FALSE if not.
  */
-    static int
-WaitForChar(long msec, int ignore_input)
+    స్థిర పూర్ణాంకం
+WaitForChar(దీర్ఘ msec, పూర్ణాంకం ignore_ఆదానం)
 {
-    DWORD	    dwNow = 0, dwEndTime = 0;
-    INPUT_RECORD    ir;
-    DWORD	    cRecords;
+    DWORD	    dwNow = 0, dw_చివర_సమయం = 0;
+    ఆదానం_రికార్డు    ir;
+    DWORD	    c_రికార్డులు;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
-    int		    tb_change_cnt = typebuf.tb_change_cnt;
+    పూర్ణాంకం		    tb_change_cnt = typebuf.tb_change_cnt;
 # endif
 
-    if (msec > 0)
+    ఒకవేళ (msec > 0)
 	// Wait until the specified time has elapsed.
-	dwEndTime = GetTickCount() + msec;
-    else if (msec < 0)
+	dw_చివర_సమయం = Get_Tick_లెక్క() + msec;
+    లేకపోతే ఒకవేళ (msec < 0)
 	// Wait forever.
-	dwEndTime = INFINITE;
+	dw_చివర_సమయం = INFINITE;
 
     // We need to loop until the end of the time period, because
     // we might get multiple unusable mouse events in that time.
-    for (;;)
+    కొరకు (;;)
     {
 	// Only process messages when waiting.
-	if (msec != 0)
+	ఒకవేళ (msec != 0)
 	{
-# ifdef MESSAGE_QUEUE
+# ifdef సందేశం_వరుస
 	    parse_queued_messages();
 # endif
 # ifdef FEAT_MZSCHEME
-	    mzvim_check_threads();
+	    mzvim_check_దారాలు();
 # endif
 # ifdef FEAT_CLIENTSERVER
 	    serverProcessPendingMessages();
 # endif
 	}
 
-	if (g_nMouseClick != -1
+	ఒకవేళ (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
-		|| (!ignore_input && input_available())
+		|| (!ignore_ఆదానం && ఆదానం_అందుబాటు())
 # endif
 	   )
-	    return TRUE;
+	    తిరిగి TRUE;
 
-	if (msec > 0)
+	ఒకవేళ (msec > 0)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
-	    dwNow = GetTickCount();
-	    if ((int)(dwNow - dwEndTime) >= 0)
-		break;
+	    dwNow = Get_Tick_లెక్క();
+	    ఒకవేళ ((పూర్ణాంకం)(dwNow - dw_చివర_సమయం) >= 0)
+		ఆపు;
 	}
-	if (msec != 0)
+	ఒకవేళ (msec != 0)
 	{
-	    DWORD dwWaitTime = dwEndTime - dwNow;
+	    DWORD dw_Wait_సమయం = dw_చివర_సమయం - dwNow;
 
 	    // Don't wait for more than 11 msec to avoid dropping characters,
 	    // check channel while waiting for input and handle a callback from
 	    // 'balloonexpr'.
-	    if (dwWaitTime > 11)
-		dwWaitTime = 11;
+	    ఒకవేళ (dw_Wait_సమయం > 11)
+		dw_Wait_సమయం = 11;
 
 # ifdef FEAT_MZSCHEME
-	    if (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
-		dwWaitTime = p_mzq; // don't wait longer than 'mzquantum'
+	    ఒకవేళ (mzthreads_allowed() && p_mzq > 0 && (దీర్ఘ)dw_Wait_సమయం > p_mzq)
+		dw_Wait_సమయం = p_mzq; // don't wait longer than 'mzquantum'
 # endif
 # ifdef FEAT_TIMERS
 	    // When waiting very briefly don't trigger timers.
-	    if (dwWaitTime > 10)
+	    ఒకవేళ (dw_Wait_సమయం > 10)
 	    {
-		long	due_time;
+		దీర్ఘ	due_సమయం;
 
 		// Trigger timers and then get the time in msec until the next
 		// one is due.  Wait up to that time.
-		due_time = check_due_timer();
-		if (typebuf.tb_change_cnt != tb_change_cnt)
+		due_సమయం = check_due_timer();
+		ఒకవేళ (typebuf.tb_change_cnt != tb_change_cnt)
 		{
 		    // timer may have used feedkeys().
-		    return FALSE;
+		    తిరిగి FALSE;
 		}
-		if (due_time > 0 && dwWaitTime > (DWORD)due_time)
-		    dwWaitTime = due_time;
+		ఒకవేళ (due_సమయం > 0 && dw_Wait_సమయం > (DWORD)due_సమయం)
+		    dw_Wait_సమయం = due_సమయం;
 	    }
 # endif
-	    if (
+	    ఒకవేళ (
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
-		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
-				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
-# else
-		    wait_for_single_object(g_hConIn, dwWaitTime)
+		    సందేశం_wait_for_గుణిజం_objects(1, &g_h_Con_లోపల, FALSE,
+				  dw_Wait_సమయం, QS_SENDMESSAGE) != WAIT_OBJECT_0
+# లేకపోతే
+		    wait_for_single_object(g_h_Con_లోపల, dw_Wait_సమయం)
 							      != WAIT_OBJECT_0
 # endif
 		    )
-		continue;
+		కొనసాగు;
 	}
 
-	cRecords = 0;
-	peek_console_input(g_hConIn, &ir, 1, &cRecords);
+	c_రికార్డులు = 0;
+	peek_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	ఒకవేళ (State == బహుళకం_CMDLINE && సందేశం_అడ్డువరుస == అడ్డువరుసలు - 1 && msec != 0)
 	{
-	    CONSOLE_SCREEN_BUFFER_INFO csbi;
+	    CONSOLE_SCREEN_బఫరు_INFO csbi;
 
-	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	    ఒకవేళ (Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		ఒకవేళ (csbi.dwCursorPosition.Y != సందేశం_అడ్డువరుస)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2205,152 +2205,152 @@ WaitForChar(long msec, int ignore_input)
 	}
 # endif
 
-	if (cRecords > 0)
+	ఒకవేళ (c_రికార్డులు > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    ఒకవేళ (ir.EventType == కీలకం_EVENT && ir.Event.కీలకం_Event_2.b_కీలకం_కిందికి)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
-			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
+		ఒకవేళ (ir.Event.కీలకం_Event_2.uChar.UnicodeChar == 0
+			&& ir.Event.కీలకం_Event_2.w_Virtual_కీలకం_సంకేతం == 13)
 		{
-		    read_console_input(g_hConIn, &ir, 1, &cRecords);
-		    continue;
+		    read_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
+		    కొనసాగు;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
-								 NULL, FALSE))
-		    return TRUE;
+		ఒకవేళ (decode_కీలకం_event(&ir.Event.కీలకం_Event_2, &ch, &ch2,
+								 ఖాళీ, FALSE))
+		    తిరిగి TRUE;
 	    }
 
-	    read_console_input(g_hConIn, &ir, 1, &cRecords);
+	    read_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు);
 
-	    if (ir.EventType == FOCUS_EVENT)
+	    ఒకవేళ (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
-	    else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	    లేకపోతే ఒకవేళ (ir.EventType == కిటికీ_బఫరు_కొలత_EVENT)
 	    {
-		COORD dwSize = ir.Event.WindowBufferSizeEvent.dwSize;
+		COORD dw_కొలత = ir.Event.కిటికీ_బఫరు_కొలత_Event.dw_కొలత;
 
 		// Only call shell_resized() when the size actually changed to
 		// avoid the screen is cleared.
-		if (dwSize.X != Columns || dwSize.Y != Rows)
+		ఒకవేళ (dw_కొలత.X != Columns || dw_కొలత.Y != అడ్డువరుసలు)
 		{
-		    CONSOLE_SCREEN_BUFFER_INFO csbi;
-		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-		    if (dwSize.X != Columns || dwSize.Y != Rows)
+		    CONSOLE_SCREEN_బఫరు_INFO csbi;
+		    Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi);
+		    dw_కొలత.X = csbi.sr_కిటికీ.కుడి_4 - csbi.sr_కిటికీ.ఎడమ_4 + 1;
+		    dw_కొలత.Y = csbi.sr_కిటికీ.Bottom - csbi.sr_కిటికీ.శిఖరం_2 + 1;
+		    ఒకవేళ (dw_కొలత.X != Columns || dw_కొలత.Y != అడ్డువరుసలు)
 		    {
-			ResizeConBuf(g_hConOut, dwSize);
+			ResizeConBuf(g_h_Con_బహిర్గతం, dw_కొలత);
 			shell_resized();
 		    }
 		}
 	    }
-	    else if (ir.EventType == MOUSE_EVENT
+	    లేకపోతే ఒకవేళ (ir.EventType == MOUSE_EVENT
 		    && decode_mouse_event(&ir.Event.MouseEvent))
-		return TRUE;
+		తిరిగి TRUE;
 	}
-	else if (msec == 0)
-	    break;
+	లేకపోతే ఒకవేళ (msec == 0)
+	    ఆపు;
     }
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
-	return TRUE;
+    ఒకవేళ (ఆదానం_అందుబాటు())
+	తిరిగి TRUE;
 # endif
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    పూర్ణాంకం
+mch_char_avail(శూన్య)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి TRUE;
 # endif
-    return WaitForChar(0L, FALSE);
+    తిరిగి WaitForChar(0L, FALSE);
 }
 
-# if defined(FEAT_TERMINAL)
+# ఒకవేళ defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    పూర్ణాంకం
+mch_check_messages(శూన్య)
 {
 #  ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి TRUE;
 #  endif
-    return WaitForChar(0L, TRUE);
+    తిరిగి WaitForChar(0L, TRUE);
 }
 # endif
 
 /*
  * Create the console input.  Used when reading stdin doesn't work.
  */
-    static void
-create_conin(void)
+    స్థిర శూన్య
+create_conin(శూన్య)
 {
-    g_hConIn =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
+    g_h_Con_లోపల =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
 			FILE_SHARE_READ|FILE_SHARE_WRITE,
-			(LPSECURITY_ATTRIBUTES) NULL,
-			OPEN_EXISTING, 0, (HANDLE)NULL);
+			(LPSECURITY_లక్షణాలు) ఖాళీ,
+			OPEN_EXISTING, 0, (HANDLE)ఖాళీ);
     did_create_conin = TRUE;
 }
 
 /*
  * Get a keystroke or a mouse event, use a blocking wait.
  */
-    static WCHAR
-tgetch(int *pmodifiers, WCHAR *pch2)
+    స్థిర WCHAR
+tgetch(పూర్ణాంకం *pmodifiers, WCHAR *pch2)
 {
     WCHAR ch;
 
-    for (;;)
+    కొరకు (;;)
     {
-	INPUT_RECORD ir;
-	DWORD cRecords = 0;
+	ఆదానం_రికార్డు ir;
+	DWORD c_రికార్డులు = 0;
 
 # ifdef FEAT_CLIENTSERVER
-	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
-	    return 0;
-	if (g_nMouseClick != -1)
-	    return 0;
+	(శూన్య)WaitForChar(-1L, FALSE);
+	ఒకవేళ (ఆదానం_అందుబాటు())
+	    తిరిగి 0;
+	ఒకవేళ (g_nMouseClick != -1)
+	    తిరిగి 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	ఒకవేళ (read_console_ఆదానం(g_h_Con_లోపల, &ir, 1, &c_రికార్డులు) == 0)
 	{
-	    if (did_create_conin)
+	    ఒకవేళ (did_create_conin)
 		read_error_exit();
 	    create_conin();
-	    continue;
+	    కొనసాగు;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	ఒకవేళ (ir.EventType == కీలకం_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    ఒకవేళ (decode_కీలకం_event(&ir.Event.కీలకం_Event_2, &ch, pch2,
 							    pmodifiers, TRUE))
-		return ch;
+		తిరిగి ch;
 	}
-	else if (ir.EventType == FOCUS_EVENT)
+	లేకపోతే ఒకవేళ (ir.EventType == FOCUS_EVENT)
 	    handle_focus_event(ir);
-	else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	లేకపోతే ఒకవేళ (ir.EventType == కిటికీ_బఫరు_కొలత_EVENT)
 	    shell_resized();
-	else if (ir.EventType == MOUSE_EVENT)
+	లేకపోతే ఒకవేళ (ir.EventType == MOUSE_EVENT)
 	{
-	    if (decode_mouse_event(&ir.Event.MouseEvent))
-		return 0;
+	    ఒకవేళ (decode_mouse_event(&ir.Event.MouseEvent))
+		తిరిగి 0;
 	}
     }
 }
-#endif // !FEAT_GUI_MSWIN
+#అయితే_ముగింపు // !FEAT_GUI_MSWIN
 
 
 /*
@@ -2361,58 +2361,58 @@ tgetch(int *pmodifiers, WCHAR *pch2)
  * If time == -1, wait forever for characters.
  * Returns the number of characters read into buf.
  */
-    int
+    పూర్ణాంకం
 mch_inchar(
-    char_u	*buf UNUSED,
-    int		maxlen UNUSED,
-    long	time UNUSED,
-    int		tb_change_cnt UNUSED)
+    char_u	*buf వాడని,
+    పూర్ణాంకం		maxlen వాడని,
+    దీర్ఘ	సమయం వాడని,
+    పూర్ణాంకం		tb_change_cnt వాడని)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    int		len;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
 # ifdef VIMDLL
 // Extra space for maximum three CSIs. E.g. U+1B6DB -> 0xF0 0x9B 0x9B 0x9B.
 #  define TYPEAHEADSPACE    6
-# else
+# లేకపోతే
 #  define TYPEAHEADSPACE    0
 # endif
 # define TYPEAHEADLEN	    (20 + TYPEAHEADSPACE)
-    static char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
-    static int	    typeaheadlen = 0;
+    స్థిర char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
+    స్థిర పూర్ణాంకం	    typeaheadlen = 0;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return 0;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి 0;
 # endif
 
     // First use any typeahead that was kept because "buf" was too small.
-    if (typeaheadlen > 0)
-	goto theend;
+    ఒకవేళ (typeaheadlen > 0)
+	వెళ్ళు theend;
 
-    if (time >= 0)
+    ఒకవేళ (సమయం >= 0)
     {
-	if (!WaitForChar(time, FALSE))     // no character available
-	    return 0;
+	ఒకవేళ (!WaitForChar(సమయం, FALSE))     // no character available
+	    తిరిగి 0;
     }
-    else    // time == -1, wait forever
+    లేకపోతే    // time == -1, wait forever
     {
-	mch_set_winsize_now();	// Allow winsize changes from now on
+	mch_సమితి_winsize_now();	// Allow winsize changes from now on
 
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (!WaitForChar(p_ut, FALSE))
+	ఒకవేళ (!WaitForChar(p_ut, FALSE))
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    ఒకవేళ (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (పూర్ణాంకం)KE_CURSORHOLD;
+		తిరిగి 3;
 	    }
 	    before_blocking();
 	}
@@ -2426,7 +2426,7 @@ mch_inchar(
     g_fCBrkPressed = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ఒకవేళ (fdDump)
 	fputc('[', fdDump);
 # endif
 
@@ -2434,32 +2434,32 @@ mch_inchar(
     // to get and still room in the buffer.  A mouse event uses up to
     // 10 bytes: 3 (modifier) + 3 (scroll event) + 4 (coordinates), and a
     // keyboard input uses up to 7 bytes: 3 (modifier) + 4 (UTF-8 char).
-    while ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
+    అయితే ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
 			  && typeaheadlen + 10 + TYPEAHEADSPACE <= TYPEAHEADLEN)
     {
-	if (typebuf_changed(tb_change_cnt))
+	ఒకవేళ (typebuf_మారింది(tb_change_cnt))
 	{
 	    // "buf" may be invalid now if a client put something in the
 	    // typeahead buffer and "buf" is in the typeahead buffer.
 	    typeaheadlen = 0;
-	    break;
+	    ఆపు;
 	}
-	if (g_nMouseClick != -1)
+	ఒకవేళ (g_nMouseClick != -1)
 	{
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 		fprintf(fdDump, "{%02x @ %d, %d}",
 			g_nMouseClick, g_xMouse, g_yMouse);
 # endif
 	    char_u modifiers = ((char_u *)(&g_nMouseClick))[0];
 	    char_u scroll_dir = ((char_u *)(&g_nMouseClick))[1];
 
-	    if (scroll_dir == KE_MOUSEDOWN
+	    ఒకవేళ (scroll_dir == KE_MOUSEDOWN
 		    || scroll_dir == KE_MOUSEUP
 		    || scroll_dir == KE_MOUSELEFT
 		    || scroll_dir == KE_MOUSERIGHT)
 	    {
-		if (modifiers > 0)
+		ఒకవేళ (modifiers > 0)
 		{
 		    // use K_SPECIAL instead of CSI to make mappings work
 		    typeahead[typeaheadlen++] = K_SPECIAL;
@@ -2470,7 +2470,7 @@ mch_inchar(
 		typeahead[typeaheadlen++] = KS_EXTRA;
 		typeahead[typeaheadlen++] = scroll_dir;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		typeahead[typeaheadlen++] = ESC + 128;
 		typeahead[typeaheadlen++] = 'M';
@@ -2487,64 +2487,64 @@ mch_inchar(
 
 	    g_nMouseClick = -1;
 	}
-	else
+	లేకపోతే
 	{
 	    WCHAR	ch2 = NUL;
-	    int		modifiers = 0;
+	    పూర్ణాంకం		modifiers = 0;
 
 	    c = tgetch(&modifiers, &ch2);
 
-	    c = simplify_key(c, &modifiers);
+	    c = simplify_కీలకం(c, &modifiers);
 
 	    // Some chars need adjustment when the Ctrl modifier is used.
-	    ++no_reduce_keys;
-	    c = may_adjust_key_for_ctrl(modifiers, c);
-	    --no_reduce_keys;
+	    ++no_reduce_కీలకాలు;
+	    c = may_adjust_కీలకం_for_ctrl(modifiers, c);
+	    --no_reduce_కీలకాలు;
 
 	    // remove the SHIFT modifier for keys where it's already included,
 	    // e.g., '(' and '*'
-	    modifiers = may_remove_shift_modifier(modifiers, c);
+	    modifiers = may_remove_జరుపు_modifier(modifiers, c);
 
-	    if (typebuf_changed(tb_change_cnt))
+	    ఒకవేళ (typebuf_మారింది(tb_change_cnt))
 	    {
 		// "buf" may be invalid now if a client put something in the
 		// typeahead buffer and "buf" is in the typeahead buffer.
 		typeaheadlen = 0;
-		break;
+		ఆపు;
 	    }
 
-	    if (c == Ctrl_C && ctrl_c_interrupts)
+	    ఒకవేళ (c == Ctrl_C && ctrl_c_interrupts)
 	    {
-# if defined(FEAT_CLIENTSERVER)
-		trash_input_buf();
+# ఒకవేళ defined(FEAT_CLIENTSERVER)
+		trash_ఆదానం_buf();
 # endif
 		got_int = TRUE;
 	    }
 
-	    if (g_nMouseClick == -1)
+	    ఒకవేళ (g_nMouseClick == -1)
 	    {
-		int	n = 1;
+		పూర్ణాంకం	n = 1;
 
-		if (ch2 == NUL)
+		ఒకవేళ (ch2 == NUL)
 		{
-		    int	    i, j;
+		    పూర్ణాంకం	    i, j;
 		    char_u  *p;
 		    WCHAR   ch[2];
 
 		    ch[0] = c;
-		    if (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
+		    ఒకవేళ (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
 		    {
 			ch[1] = tgetch(&modifiers, &ch2);
 			n++;
 		    }
-		    p = utf16_to_enc(ch, &n);
-		    if (p != NULL)
+		    p = utf16_గమ్యం_enc(ch, &n);
+		    ఒకవేళ (p != ఖాళీ)
 		    {
-			for (i = 0, j = 0; i < n; i++)
+			కొరకు (i = 0, j = 0; i < n; i++)
 			{
 			    typeahead[typeaheadlen + j++] = p[i];
 # ifdef VIMDLL
-			    if (p[i] == CSI)
+			    ఒకవేళ (p[i] == CSI)
 			    {
 				typeahead[typeaheadlen + j++] = KS_EXTRA;
 				typeahead[typeaheadlen + j++] = KE_CSI;
@@ -2555,11 +2555,11 @@ mch_inchar(
 			vim_free(p);
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    typeahead[typeaheadlen] = c;
 # ifdef VIMDLL
-		    if (c == CSI)
+		    ఒకవేళ (c == CSI)
 		    {
 			typeahead[typeaheadlen + 1] = KS_EXTRA;
 			typeahead[typeaheadlen + 2] = KE_CSI;
@@ -2567,28 +2567,28 @@ mch_inchar(
 		    }
 # endif
 		}
-		if (ch2 != NUL)
+		ఒకవేళ (ch2 != NUL)
 		{
-		    if (c == K_NUL)
+		    ఒకవేళ (c == K_NUL)
 		    {
-			switch (ch2)
+			ఎంపిక (ch2)
 			{
-			case (WCHAR)'\324': // SHIFT+Insert
-			case (WCHAR)'\325': // CTRL+Insert
-			case (WCHAR)'\327': // SHIFT+Delete
-			case (WCHAR)'\330': // CTRL+Delete
+			స్థితి (WCHAR)'\324': // SHIFT+Insert
+			స్థితి (WCHAR)'\325': // CTRL+Insert
+			స్థితి (WCHAR)'\327': // SHIFT+Delete
+			స్థితి (WCHAR)'\330': // CTRL+Delete
 			    typeahead[typeaheadlen + n] = (char_u)ch2;
 			    n++;
-			    break;
+			    ఆపు;
 
-			default:
+			అప్రమేయ:
 			    typeahead[typeaheadlen + n] = 3;
 			    typeahead[typeaheadlen + n + 1] = (char_u)ch2;
 			    n += 2;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
 			typeahead[typeaheadlen + n] = 3;
 			typeahead[typeaheadlen + n + 1] = (char_u)ch2;
@@ -2600,7 +2600,7 @@ mch_inchar(
 		// when it's one byte, the 8th bit isn't set yet and not
 		// using a double-byte encoding (would become a lead
 		// byte).
-		if ((modifiers & MOD_MASK_ALT)
+		ఒకవేళ ((modifiers & MOD_ముసుగు_ALT)
 			&& n == 1
 			&& (typeahead[typeaheadlen] & 0x80) == 0
 			&& !enc_dbcs
@@ -2608,10 +2608,10 @@ mch_inchar(
 		{
 		    n = (*mb_char2bytes)(typeahead[typeaheadlen] | 0x80,
 						    typeahead + typeaheadlen);
-		    modifiers &= ~MOD_MASK_ALT;
+		    modifiers &= ~MOD_ముసుగు_ALT;
 		}
 
-		if (modifiers != 0)
+		ఒకవేళ (modifiers != 0)
 		{
 		    // Prepend modifiers to the character.
 		    mch_memmove(typeahead + typeaheadlen + 3,
@@ -2624,7 +2624,7 @@ mch_inchar(
 		typeaheadlen += n;
 
 # ifdef MCH_WRITE_DUMP
-		if (fdDump)
+		ఒకవేళ (fdDump)
 		    fputc(c, fdDump);
 # endif
 	    }
@@ -2632,7 +2632,7 @@ mch_inchar(
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ఒకవేళ (fdDump)
     {
 	fputs("]\n", fdDump);
 	fflush(fdDump);
@@ -2642,23 +2642,23 @@ mch_inchar(
 theend:
     // Move typeahead to "buf", as much as fits.
     len = 0;
-    while (len < maxlen && typeaheadlen > 0)
+    అయితే (len < maxlen && typeaheadlen > 0)
     {
 	buf[len++] = typeahead[0];
 	mch_memmove(typeahead, typeahead + 1, --typeaheadlen);
     }
 # ifdef FEAT_EVAL
-    if (len > 0)
+    ఒకవేళ (len > 0)
     {
 	buf[len] = NUL;
-	ch_log(NULL, "raw key input: \"%s\"", buf);
+	ch_log(ఖాళీ, "raw key input: \"%s\"", buf);
     }
 # endif
-    return len;
+    తిరిగి len;
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    return 0;
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#లేకపోతే // FEAT_GUI_MSWIN && !VIMDLL
+    తిరిగి 0;
+#అయితే_ముగింపు // FEAT_GUI_MSWIN && !VIMDLL
 }
 
 /*
@@ -2667,32 +2667,32 @@ theend:
  * the allocated memory.
  * TODO: Should somehow check if it's really executable.
  */
-    static int
-executable_file(char *name, char_u **path)
+    స్థిర పూర్ణాంకం
+executable_file(అక్షరం *name, char_u **మార్గం)
 {
-    int attrs = win32_getattrs((char_u *)name);
+    పూర్ణాంకం attrs = win32_getattrs((char_u *)name);
 
     // The file doesn't exist or is a folder.
-    if (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
-	return FALSE;
+    ఒకవేళ (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
+	తిరిగి FALSE;
     // Check if the file is an AppExecLink, a special alias used by Windows
     // Store for its apps.
-    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    ఒకవేళ (attrs & FILE_ATTRIBUTE_REPARSE_బిందువు)
     {
 	char_u	*res = resolve_appexeclink((char_u *)name);
-	if (res == NULL)
-	    res = resolve_reparse_point((char_u *)name);
-	if (res == NULL)
-	    return FALSE;
+	ఒకవేళ (res == ఖాళీ)
+	    res = resolve_reparse_బిందువు((char_u *)name);
+	ఒకవేళ (res == ఖాళీ)
+	    తిరిగి FALSE;
 	// The path is already absolute.
-	if (path != NULL)
-	    *path = res;
-	else
+	ఒకవేళ (మార్గం != ఖాళీ)
+	    *మార్గం = res;
+	లేకపోతే
 	    vim_free(res);
     }
-    else if (path != NULL)
-	*path = FullName_save((char_u *)name, FALSE);
-    return TRUE;
+    లేకపోతే ఒకవేళ (మార్గం != ఖాళీ)
+	*మార్గం = నిండిన_Name_save((char_u *)name, FALSE);
+    తిరిగి TRUE;
 }
 
 /*
@@ -2700,27 +2700,27 @@ executable_file(char *name, char_u **path)
  * An inconclusive search (e.g. a directory which cannot be enumerated) must
  * not skip the normal checks.
  */
-    static bool
-executable_prefix_exists(char_u *name)
+    స్థిర bool
+executable_ఉపసర్గ_exists(char_u *name)
 {
     WCHAR		*wn;
-    WIN32_FIND_DATAW	data;
+    WIN32_కనుగొను_DATAW	దత్తాంశం;
     HANDLE		handle;
     DWORD		error;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return true;
-    handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
-					    FindExSearchNameMatch, NULL, 0);
-    error = GetLastError();
+    wn = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి true;
+    handle = కనుగొను_మొదటి_File_Ex_W(wn, కనుగొను_Ex_Info_Basic, &దత్తాంశం,
+					    కనుగొను_Ex_శోధన_Name_సరిపోలిక, ఖాళీ, 0);
+    error = Get_చివరి_Error();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    ఒకవేళ (handle != INVALID_HANDLE_విలువ)
     {
-	FindClose(handle);
-	return true;
+	కనుగొను_Close(handle);
+	తిరిగి true;
     }
-    return error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
+    తిరిగి error != ERROR_FILE_NOT_దొరికింది && error != ERROR_మార్గం_NOT_దొరికింది;
 }
 
 /*
@@ -2730,48 +2730,48 @@ executable_prefix_exists(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    static int
+    స్థిర పూర్ణాంకం
 executable_exists(
-    char	*name,
+    అక్షరం	*name,
     size_t	namelen,
-    char_u	**path,
-    int		use_path,
-    int		use_pathext)
+    char_u	**మార్గం,
+    పూర్ణాంకం		use_మార్గం,
+    పూర్ణాంకం		use_pathext)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3];
+    char_u	buf[MAX_మార్గం_2 * 3];
     char_u	*p;
-    string_T	pathbuf = {NULL, 0};
-    int		pathbuf_allocated = FALSE;
-    string_T	pathext = {NULL, 0};
-    int		pathext_allocated = FALSE;
-    char_u	*shname = NULL;
-    int		noext = FALSE;
+    string_T	pathbuf = {ఖాళీ, 0};
+    పూర్ణాంకం		pathbuf_allocated = FALSE;
+    string_T	pathext = {ఖాళీ, 0};
+    పూర్ణాంకం		pathext_allocated = FALSE;
+    char_u	*shname = ఖాళీ;
+    పూర్ణాంకం		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
-    int		retval = FALSE;
+    పూర్ణాంకం		ext_లెక్క = 0;
+    పూర్ణాంకం		retval = FALSE;
 
-    if (namelen >= sizeof(buf))	// safety check
-	return FALSE;
+    ఒకవేళ (namelen >= పరిమాణం(buf))	// safety check
+	తిరిగి FALSE;
 
     // Using the name directly when a Unix-shell like 'shell'.
     shname = gettail(p_sh);
-    if (strstr((char *)shname, "sh") != NULL &&
-	!(strstr((char *)shname, "powershell") != NULL
-				    || strstr((char *)shname, "pwsh") != NULL))
+    ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)shname, "sh") != ఖాళీ &&
+	!(అక్షరశ్రేణి_శోధన((అక్షరం *)shname, "powershell") != ఖాళీ
+				    || అక్షరశ్రేణి_శోధన((అక్షరం *)shname, "pwsh") != ఖాళీ))
 	noext = TRUE;
 
-    if (use_pathext)
+    ఒకవేళ (use_pathext)
     {
 	pathext.string = mch_getenv("PATHEXT");
-	if (pathext.string == NULL)
-	    STR_LITERAL_SET(pathext, ".com;.exe;.bat;.cmd");
-	else
-	    pathext.length = STRLEN(pathext.string);
+	ఒకవేళ (pathext.string == ఖాళీ)
+	    STR_LITERAL_సమితి(pathext, ".com;.exe;.bat;.cmd");
+	లేకపోతే
+	    pathext.నిడివి = STRLEN(pathext.string);
 
-	if (noext == FALSE)
+	ఒకవేళ (noext == FALSE)
 	{
 	    char_u  *e;
 	    char_u  *q;
@@ -2782,32 +2782,32 @@ executable_exists(
 	     * Check "name" ends with extension.
 	     */
 	    p = pathext.string;
-	    while (*p)
+	    అయితే (*p)
 	    {
-		if (p[0] == ';'
+		ఒకవేళ (p[0] == ';'
 			    || (p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 		{
 		    // Skip empty or single ".".
-		    if (*p == '.')
+		    ఒకవేళ (*p == '.')
 			simple_pathext = false;
 		    ++p;
-		    continue;
+		    కొనసాగు;
 		}
 		e = vim_strchr(p, ';');
-		if (e == NULL)
-		    e = pathext.string + pathext.length;
+		ఒకవేళ (e == ఖాళీ)
+		    e = pathext.string + pathext.నిడివి;
 		plen = (size_t)(e - p);
-		++ext_count;
-		if (*p != '.')
+		++ext_లెక్క;
+		ఒకవేళ (*p != '.')
 		    simple_pathext = false;
-		for (q = p + 1; q < e; ++q)
-		    if (!ASCII_ISALNUM(*q))
+		కొరకు (q = p + 1; q < e; ++q)
+		    ఒకవేళ (!ASCII_ISALNUM(*q))
 			simple_pathext = false;
 
-		if (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
+		ఒకవేళ (_strnicoll(name + namelen - plen, (అక్షరం *)p, plen) == 0)
 		{
 		    noext = TRUE;
-		    break;
+		    ఆపు;
 		}
 
 		p = e;
@@ -2816,49 +2816,49 @@ executable_exists(
     }
 
     // Prepend single "." to pathext, it means no extension added.
-    if (pathext.string == NULL)
-	STR_LITERAL_SET(pathext, ".");
-    else if (noext == TRUE)
+    ఒకవేళ (pathext.string == ఖాళీ)
+	STR_LITERAL_సమితి(pathext, ".");
+    లేకపోతే ఒకవేళ (noext == TRUE)
     {
 	char_u  *tmp;
 
-	tmp = alloc(pathext.length + 3);
-	if (tmp == NULL)
+	tmp = alloc(pathext.నిడివి + 3);
+	ఒకవేళ (tmp == ఖాళీ)
 	{
 	    retval = FALSE;
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 
 	STRCPY(tmp, ".;");
 	STRCPY(tmp + 2, pathext.string);
 	pathext.string = tmp;
-	pathext.length += 2;
+	pathext.నిడివి += 2;
 	pathext_allocated = TRUE;
     }
 
     // Use $PATH when "use_path" is TRUE and "name" is basename.
-    if (use_path && gettail((char_u *)name) == (char_u *)name)
+    ఒకవేళ (use_మార్గం && gettail((char_u *)name) == (char_u *)name)
     {
 	p = mch_getenv("PATH");
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    size_t  plen = STRLEN(p);
 
 	    pathbuf.string = alloc(plen + 3);
-	    if (pathbuf.string == NULL)
+	    ఒకవేళ (pathbuf.string == ఖాళీ)
 	    {
 		retval = FALSE;
-		goto theend;
+		వెళ్ళు theend;
 	    }
 
-	    if (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
-		    strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+	    ఒకవేళ (mch_getenv("NoDefaultCurrentDirectoryInExePath") == ఖాళీ &&
+		    అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(p_sh), "cmd.exe") != ఖాళీ)
 	    {
 		STRCPY(pathbuf.string, ".;");
-		pathbuf.length = 2;
+		pathbuf.నిడివి = 2;
 	    }
-	    STRCPY(pathbuf.string + pathbuf.length, p);
-	    pathbuf.length += plen;
+	    STRCPY(pathbuf.string + pathbuf.నిడివి, p);
+	    pathbuf.నిడివి += plen;
 	    pathbuf_allocated = TRUE;
 	}
     }
@@ -2867,40 +2867,40 @@ executable_exists(
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    if (pathbuf.string == NULL)
-	STR_LITERAL_SET(pathbuf, ".");
+    ఒకవేళ (pathbuf.string == ఖాళీ)
+	STR_LITERAL_సమితి(pathbuf, ".");
     p = pathbuf.string;
-    while (*p)
+    అయితే (*p)
     {
 	char_u	*e;
 	size_t	buflen;
 
-	if (*p == ';') // Skip empty entry
+	ఒకవేళ (*p == ';') // Skip empty entry
 	{
 	    ++p;
-	    continue;
+	    కొనసాగు;
 	}
 	e = vim_strchr(p, ';');
-	if (e == NULL)
-	    e = pathbuf.string + pathbuf.length;
+	ఒకవేళ (e == ఖాళీ)
+	    e = pathbuf.string + pathbuf.నిడివి;
 
-	if (e - p + namelen + 2 > sizeof(buf))
+	ఒకవేళ (e - p + namelen + 2 > పరిమాణం(buf))
 	{
 	    retval = FALSE;
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 	// A single "." that means current dir.
-	if (e - p == 1 && *p == '.')
+	ఒకవేళ (e - p == 1 && *p == '.')
 	{
 	    STRCPY(buf, name);
 	    buflen = namelen;
 	}
-	else
+	లేకపోతే
 	{
 	    buflen = vim_snprintf_safelen(
-		(char *)buf,
-		sizeof(buf),
-		"%.*s%s%s", (int)(e - p), p,
+		(అక్షరం *)buf,
+		పరిమాణం(buf),
+		"%.*s%s%s", (పూర్ణాంకం)(e - p), p,
 		!after_pathsep(p, e) ? PATHSEPSTR : "",
 		name);
 	}
@@ -2910,22 +2910,22 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
-		&& buflen + 2 <= sizeof(buf)
+	ఒకవేళ (!noext && simple_pathext && ext_లెక్క >= 3 && buflen > 0
+		&& buflen + 2 <= పరిమాణం(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
-		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
-		&& vim_strchr(gettail(buf), ':') == NULL)
+		&& vim_strpbrk(buf, (char_u *)"*?") == ఖాళీ
+		&& vim_strchr(gettail(buf), ':') == ఖాళీ)
 	{
 	    bool exists;
 
 	    buf[buflen] = '*';
 	    buf[buflen + 1] = NUL;
-	    exists = executable_prefix_exists(buf);
+	    exists = executable_ఉపసర్గ_exists(buf);
 	    buf[buflen] = NUL;
-	    if (!exists)
+	    ఒకవేళ (!exists)
 	    {
 		p = e;
-		continue;
+		కొనసాగు;
 	    }
 	}
 
@@ -2934,34 +2934,34 @@ executable_exists(
 	 * Check "name" with extension added.
 	 */
 	p = pathext.string;
-	while (*p)
+	అయితే (*p)
 	{
 	    char_u  *e2;
 
-	    if (*p == ';')
+	    ఒకవేళ (*p == ';')
 	    {
 		// Skip empty entry
 		++p;
-		continue;
+		కొనసాగు;
 	    }
 	    e2 = vim_strchr(p, ';');
-	    if (e2 == NULL)
-		e2 = pathext.string + pathext.length;
+	    ఒకవేళ (e2 == ఖాళీ)
+		e2 = pathext.string + pathext.నిడివి;
 
-	    if (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
+	    ఒకవేళ (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 	    {
 		// Not a single "." that means no extension is added.
-		if (e2 - p + buflen + 1 > sizeof(buf))
+		ఒకవేళ (e2 - p + buflen + 1 > పరిమాణం(buf))
 		{
 		    retval = FALSE;
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 		vim_strncpy(buf + buflen, p, e2 - p);
 	    }
-	    if (executable_file((char *)buf, path))
+	    ఒకవేళ (executable_file((అక్షరం *)buf, మార్గం))
 	    {
 		retval = TRUE;
-		goto theend;
+		వెళ్ళు theend;
 	    }
 
 	    p = e2;
@@ -2971,14 +2971,14 @@ executable_exists(
     }
 
 theend:
-    if (pathbuf_allocated)
-	free(pathbuf.string);
-    if (pathext_allocated)
-	free(pathext.string);
-    return retval;
+    ఒకవేళ (pathbuf_allocated)
+	విడుదల(pathbuf.string);
+    ఒకవేళ (pathext_allocated)
+	విడుదల(pathext.string);
+    తిరిగి retval;
 }
 
-#if (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
+#ఒకవేళ (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
 	(defined(_MSC_VER) && _MSC_VER >= 1400)
 /*
  * Bad parameter handler.
@@ -2992,80 +2992,80 @@ theend:
  * NULL/0.  Debug builds will also produce assert dialogs from the CRT, it is
  * worth allowing these to make debugging of issues easier.
  */
-    static void
-bad_param_handler(const wchar_t *expression UNUSED,
-    const wchar_t *function UNUSED,
-    const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
-    uintptr_t pReserved UNUSED)
+    స్థిర శూన్య
+bad_param_handler(స్థిరరాశి wchar_t *వ్యక్తీకరణ వాడని,
+    స్థిరరాశి wchar_t *function వాడని,
+    స్థిరరాశి wchar_t *file వాడని,
+    గుర్తులేని పూర్ణాంకం పంక్తి వాడని,
+    uintptr_t pReserved వాడని)
 {
 }
 
-# define SET_INVALID_PARAM_HANDLER \
-	((void)_set_invalid_parameter_handler(bad_param_handler))
-#else
-# define SET_INVALID_PARAM_HANDLER
-#endif
+# define సమితి_INVALID_PARAM_HANDLER \
+	((శూన్య)సమితి_invalid_parameter_handler(bad_param_handler))
+#లేకపోతే
+# define సమితి_INVALID_PARAM_HANDLER
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 
 /*
  * GUI version of mch_init().
  */
-    static void
-mch_init_g(void)
+    స్థిర శూన్య
+mch_init_g(శూన్య)
 {
 # ifndef __MINGW32__
-    extern int _fmode;
+    బాహ్య పూర్ణాంకం _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    సమితి_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    సమితి_Error_బహుళకం(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_ద్విమాన;		// we do our own CR-LF translation
 
     // Specify window size.  Is there a place to get the default from?
-    Rows = 25;
+    అడ్డువరుసలు = 25;
     Columns = 80;
 
     // Look for 'vimrun'.
     {
-	char_u	vimrun_location[_MAX_PATH + 4];
+	char_u	vimrun_location[MAX_మార్గం_2 + 4];
 	size_t	exe_pathlen = (size_t)(gettail(exe_name) - exe_name);
 
 	// Note: 10 is length of 'vimrun.exe'.
-	if (exe_pathlen + 10 >= sizeof(vimrun_location))
+	ఒకవేళ (exe_pathlen + 10 >= పరిమాణం(vimrun_location))
 	{
-	    if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    ఒకవేళ (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    ఖాళీ, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
-	else
+	లేకపోతే
 	{
 	    // First try in same directory as gvim.exe.
-	    if (exe_pathlen > 0)
+	    ఒకవేళ (exe_pathlen > 0)
 		vim_strncpy(vimrun_location, exe_name, exe_pathlen);
 	    STRCPY(vimrun_location + exe_pathlen, "vimrun.exe");
 
-	    if (mch_getperm(vimrun_location) >= 0)
+	    ఒకవేళ (mch_getperm(vimrun_location) >= 0)
 	    {
 		char_u  *p;
 		size_t  plen;
 
-		if (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
+		ఒకవేళ (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
 		{
 		    // Enclose path with white space in double quotes.
 		    plen = vim_snprintf_safelen(
-			(char *)vimrun_location,
-			sizeof(vimrun_location),
+			(అక్షరం *)vimrun_location,
+			పరిమాణం(vimrun_location),
 			"\"%.*svimrun\" ",
-			(int)exe_pathlen, exe_name);
+			(పూర్ణాంకం)exe_pathlen, exe_name);
 		}
-		else
+		లేకపోతే
 		{
 		    // Remove the suffix ('.exe').
 		    vimrun_location[exe_pathlen + 6] = ' ';
@@ -3074,23 +3074,23 @@ mch_init_g(void)
 		}
 
 		p = vim_strnsave(vimrun_location, plen);
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    vimrun_path.string = p;
-		    vimrun_path.length = plen;
-		    vimrun_path_allocated = TRUE;
+		    vimrun_మార్గం.string = p;
+		    vimrun_మార్గం.నిడివి = plen;
+		    vimrun_మార్గం_allocated = TRUE;
 		    s_dont_use_vimrun = FALSE;
 		}
 	    }
-	    else if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    లేకపోతే ఒకవేళ (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    ఖాళీ, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
 
 	// Don't give the warning for a missing vimrun.exe right now, but only
 	// when vimrun was supposed to be used.  Don't bother people that do
 	// not need vimrun.exe.
-	if (s_dont_use_vimrun)
+	ఒకవేళ (s_dont_use_vimrun)
 	    need_vimrun_warning = TRUE;
     }
 
@@ -3098,9 +3098,9 @@ mch_init_g(void)
      * If "findstr.exe" doesn't exist, use "grep -n" for 'grepprg'.
      * Otherwise the default "findstr /n" is used.
      */
-    if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
-	    NULL, TRUE, FALSE))
-	set_option_value_give_err((char_u *)"grepprg",
+    ఒకవేళ (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
+	    ఖాళీ, TRUE, FALSE))
+	సమితి_option_విలువ_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
 
 # ifdef FEAT_CLIPBOARD
@@ -3111,12 +3111,12 @@ mch_init_g(void)
 }
 
 
-#endif // FEAT_GUI_MSWIN
+#అయితే_ముగింపు // FEAT_GUI_MSWIN
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
-# define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
+# define SRWIDTH(sr) ((sr).కుడి_4 - (sr).ఎడమ_4 + 1)
+# define SRHEIGHT(sr) ((sr).Bottom - (sr).శిఖరం_2 + 1)
 
 /*
  * ClearConsoleBuffer()
@@ -3126,27 +3126,27 @@ mch_init_g(void)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-ClearConsoleBuffer(WORD wAttribute)
+    స్థిర BOOL
+Clear_Console_బఫరు(మాట_2 wAttribute)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_బఫరు_INFO csbi;
     COORD coord;
-    DWORD NumCells, dummy;
+    DWORD అంకె_Cells, dummy;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ఒకవేళ (!Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
+	తిరిగి FALSE;
 
-    NumCells = csbi.dwSize.X * csbi.dwSize.Y;
+    అంకె_Cells = csbi.dw_కొలత.X * csbi.dw_కొలత.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    ఒకవేళ (!FillConsoleOutputCharacter(g_h_Con_బహిర్గతం, ' ', అంకె_Cells,
 	    coord, &dummy))
-	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+	తిరిగి FALSE;
+    ఒకవేళ (!FillConsoleOutputAttribute(g_h_Con_బహిర్గతం, wAttribute, అంకె_Cells,
 	    coord, &dummy))
-	return FALSE;
+	తిరిగి FALSE;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3157,58 +3157,58 @@ ClearConsoleBuffer(WORD wAttribute)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-FitConsoleWindow(
-    COORD dwBufferSize,
+    స్థిర BOOL
+Fit_Console_కిటికీ(
+    COORD dw_బఫరు_కొలత,
     BOOL WantAdjust)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    COORD dwWindowSize;
+    CONSOLE_SCREEN_బఫరు_INFO csbi;
+    COORD dw_కిటికీ_కొలత;
     BOOL NeedAdjust = FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ఒకవేళ (!Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
+	తిరిగి FALSE;
 
     /*
      * A buffer resize will fail if the current console window does
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    ఒకవేళ (csbi.sr_కిటికీ.కుడి_4 >= dw_బఫరు_కొలత.X)
     {
-	dwWindowSize.X = SRWIDTH(csbi.srWindow);
-	if (dwWindowSize.X > dwBufferSize.X)
-	    dwWindowSize.X = dwBufferSize.X;
-	csbi.srWindow.Right = dwBufferSize.X - 1;
-	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
+	dw_కిటికీ_కొలత.X = SRWIDTH(csbi.sr_కిటికీ);
+	ఒకవేళ (dw_కిటికీ_కొలత.X > dw_బఫరు_కొలత.X)
+	    dw_కిటికీ_కొలత.X = dw_బఫరు_కొలత.X;
+	csbi.sr_కిటికీ.కుడి_4 = dw_బఫరు_కొలత.X - 1;
+	csbi.sr_కిటికీ.ఎడమ_4 = dw_బఫరు_కొలత.X - dw_కిటికీ_కొలత.X;
 	NeedAdjust = TRUE;
     }
-    if (csbi.srWindow.Bottom >= dwBufferSize.Y)
+    ఒకవేళ (csbi.sr_కిటికీ.Bottom >= dw_బఫరు_కొలత.Y)
     {
-	dwWindowSize.Y = SRHEIGHT(csbi.srWindow);
-	if (dwWindowSize.Y > dwBufferSize.Y)
-	    dwWindowSize.Y = dwBufferSize.Y;
-	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
-	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
+	dw_కిటికీ_కొలత.Y = SRHEIGHT(csbi.sr_కిటికీ);
+	ఒకవేళ (dw_కిటికీ_కొలత.Y > dw_బఫరు_కొలత.Y)
+	    dw_కిటికీ_కొలత.Y = dw_బఫరు_కొలత.Y;
+	csbi.sr_కిటికీ.Bottom = dw_బఫరు_కొలత.Y - 1;
+	csbi.sr_కిటికీ.శిఖరం_2 = dw_బఫరు_కొలత.Y - dw_కిటికీ_కొలత.Y;
 	NeedAdjust = TRUE;
     }
-    if (NeedAdjust && WantAdjust)
+    ఒకవేళ (NeedAdjust && WantAdjust)
     {
-	if (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
-	    return FALSE;
+	ఒకవేళ (!సమితి_Console_కిటికీ_Info(g_h_Con_బహిర్గతం, TRUE, &csbi.sr_కిటికీ))
+	    తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-typedef struct ConsoleBufferStruct
+రకనిర్వచనం నిర్మాణం Console_బఫరు_Struct
 {
     BOOL			IsValid;
-    CONSOLE_SCREEN_BUFFER_INFO	Info;
-    PCHAR_INFO			Buffer;
-    COORD			BufferSize;
+    CONSOLE_SCREEN_బఫరు_INFO	Info;
+    PCHAR_INFO			బఫరు_2;
+    COORD			బఫరు_కొలత_2;
     PSMALL_RECT			Regions;
-    int				NumRegions;
-} ConsoleBuffer;
+    పూర్ణాంకం				అంకె_Regions;
+} Console_బఫరు;
 
 /*
  * SaveConsoleBuffer()
@@ -3220,47 +3220,47 @@ typedef struct ConsoleBufferStruct
  *  TRUE if all information was saved; FALSE otherwise
  *  If FALSE, still sets cb->IsValid if buffer characteristics were saved.
  */
-    static BOOL
-SaveConsoleBuffer(
-    ConsoleBuffer *cb)
+    స్థిర BOOL
+Save_Console_బఫరు(
+    Console_బఫరు *cb)
 {
-    DWORD NumCells;
-    COORD BufferCoord;
+    DWORD అంకె_Cells;
+    COORD బఫరు_Coord;
     SMALL_RECT ReadRegion;
-    WORD Y, Y_incr;
-    int i, numregions;
+    మాట_2 Y, Y_incr;
+    పూర్ణాంకం i, numregions;
 
-    if (cb == NULL)
-	return FALSE;
+    ఒకవేళ (cb == ఖాళీ)
+	తిరిగి FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
+    ఒకవేళ (!Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &cb->Info))
     {
 	cb->IsValid = FALSE;
-	return FALSE;
+	తిరిగి FALSE;
     }
     cb->IsValid = TRUE;
 
     // VTP uses alternate screen buffer.
     // No need to save buffer contents for restoration.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి TRUE;
 
     /*
      * Allocate a buffer large enough to hold the entire console screen
      * buffer.  If this ConsoleBuffer structure has already been initialized
      * with a buffer of the correct size, then just use that one.
      */
-    if (!cb->IsValid || cb->Buffer == NULL ||
-	    cb->BufferSize.X != cb->Info.dwSize.X ||
-	    cb->BufferSize.Y != cb->Info.dwSize.Y)
+    ఒకవేళ (!cb->IsValid || cb->బఫరు_2 == ఖాళీ ||
+	    cb->బఫరు_కొలత_2.X != cb->Info.dw_కొలత.X ||
+	    cb->బఫరు_కొలత_2.Y != cb->Info.dw_కొలత.Y)
     {
-	cb->BufferSize.X = cb->Info.dwSize.X;
-	cb->BufferSize.Y = cb->Info.dwSize.Y;
-	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
-	vim_free(cb->Buffer);
-	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
-	if (cb->Buffer == NULL)
-	    return FALSE;
+	cb->బఫరు_కొలత_2.X = cb->Info.dw_కొలత.X;
+	cb->బఫరు_కొలత_2.Y = cb->Info.dw_కొలత.Y;
+	అంకె_Cells = cb->బఫరు_కొలత_2.X * cb->బఫరు_కొలత_2.Y;
+	vim_free(cb->బఫరు_2);
+	cb->బఫరు_2 = ALLOC_MULT(CHAR_INFO, అంకె_Cells);
+	ఒకవేళ (cb->బఫరు_2 == ఖాళీ)
+	    తిరిగి FALSE;
     }
 
     /*
@@ -3272,52 +3272,52 @@ SaveConsoleBuffer(
      * same horizontal characteristics, so initialize them now.  The
      * height of each chunk will be (12000 / width).
      */
-    BufferCoord.X = 0;
-    ReadRegion.Left = 0;
-    ReadRegion.Right = cb->Info.dwSize.X - 1;
-    Y_incr = 12000 / cb->Info.dwSize.X;
+    బఫరు_Coord.X = 0;
+    ReadRegion.ఎడమ_4 = 0;
+    ReadRegion.కుడి_4 = cb->Info.dw_కొలత.X - 1;
+    Y_incr = 12000 / cb->Info.dw_కొలత.X;
 
-    numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    numregions = (cb->Info.dw_కొలత.Y + Y_incr - 1) / Y_incr;
+    ఒకవేళ (cb->Regions == ఖాళీ || numregions != cb->అంకె_Regions)
     {
-	cb->NumRegions = numregions;
+	cb->అంకె_Regions = numregions;
 	vim_free(cb->Regions);
-	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
-	if (cb->Regions == NULL)
+	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->అంకె_Regions);
+	ఒకవేళ (cb->Regions == ఖాళీ)
 	{
-	    VIM_CLEAR(cb->Buffer);
-	    return FALSE;
+	    VIM_CLEAR(cb->బఫరు_2);
+	    తిరిగి FALSE;
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    కొరకు (i = 0, Y = 0; i < cb->అంకె_Regions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
 	 */
-	BufferCoord.Y = Y;
+	బఫరు_Coord.Y = Y;
 	/*
 	 * Read the region whose top left corner is (0, Y) and whose bottom
 	 * right corner is (width - 1, Y + Y_incr - 1).  This should define
 	 * a region of size width by Y_incr.  Don't worry if this region is
 	 * too large for the remaining buffer; it will be cropped.
 	 */
-	ReadRegion.Top = Y;
+	ReadRegion.శిఖరం_2 = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
-	if (!ReadConsoleOutputW(g_hConOut,	// output handle
-		cb->Buffer,			// our buffer
-		cb->BufferSize,			// dimensions of our buffer
-		BufferCoord,			// offset in our buffer
+	ఒకవేళ (!ReadConsoleOutputW(g_h_Con_బహిర్గతం,	// output handle
+		cb->బఫరు_2,			// our buffer
+		cb->బఫరు_కొలత_2,			// dimensions of our buffer
+		బఫరు_Coord,			// offset in our buffer
 		&ReadRegion))			// region to save
 	{
-	    VIM_CLEAR(cb->Buffer);
+	    VIM_CLEAR(cb->బఫరు_2);
 	    VIM_CLEAR(cb->Regions);
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
 	cb->Regions[i] = ReadRegion;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3329,85 +3329,85 @@ SaveConsoleBuffer(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-RestoreConsoleBuffer(
-    ConsoleBuffer   *cb,
+    స్థిర BOOL
+Restore_Console_బఫరు(
+    Console_బఫరు   *cb,
     BOOL	    RestoreScreen)
 {
-    COORD BufferCoord;
+    COORD బఫరు_Coord;
     SMALL_RECT WriteRegion;
-    int i;
+    పూర్ణాంకం i;
 
-    if (cb == NULL || !cb->IsValid)
-	return FALSE;
+    ఒకవేళ (cb == ఖాళీ || !cb->IsValid)
+	తిరిగి FALSE;
 
     /*
      * Before restoring the buffer contents, clear the current buffer, and
      * restore the cursor position and window information.  Doing this now
      * prevents old buffer contents from "flashing" onto the screen.
      */
-    if (RestoreScreen)
-	ClearConsoleBuffer(cb->Info.wAttributes);
+    ఒకవేళ (RestoreScreen)
+	Clear_Console_బఫరు(cb->Info.w_లక్షణాలు);
 
-    FitConsoleWindow(cb->Info.dwSize, TRUE);
-    if (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
-	return FALSE;
-    if (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
-	return FALSE;
+    Fit_Console_కిటికీ(cb->Info.dw_కొలత, TRUE);
+    ఒకవేళ (!సమితి_Console_Screen_బఫరు_కొలత(g_h_Con_బహిర్గతం, cb->Info.dw_కొలత))
+	తిరిగి FALSE;
+    ఒకవేళ (!సమితి_Console_పాఠ్యం_Attribute(g_h_Con_బహిర్గతం, cb->Info.w_లక్షణాలు))
+	తిరిగి FALSE;
 
-    if (!RestoreScreen)
+    ఒకవేళ (!RestoreScreen)
     {
 	/*
 	 * No need to restore the screen buffer contents, so we're done.
 	 */
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    if (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
-	return FALSE;
-    if (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
-	return FALSE;
+    ఒకవేళ (!సమితి_Console_Cursor_Position(g_h_Con_బహిర్గతం, cb->Info.dwCursorPosition))
+	తిరిగి FALSE;
+    ఒకవేళ (!సమితి_Console_కిటికీ_Info(g_h_Con_బహిర్గతం, TRUE, &cb->Info.sr_కిటికీ))
+	తిరిగి FALSE;
 
     // VTP uses alternate screen buffer.
     // No need to restore buffer contents.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి TRUE;
 
     /*
      * Restore the screen buffer contents.
      */
-    if (cb->Buffer != NULL)
+    ఒకవేళ (cb->బఫరు_2 != ఖాళీ)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	కొరకు (i = 0; i < cb->అంకె_Regions; i++)
 	{
-	    BufferCoord.X = cb->Regions[i].Left;
-	    BufferCoord.Y = cb->Regions[i].Top;
+	    బఫరు_Coord.X = cb->Regions[i].ఎడమ_4;
+	    బఫరు_Coord.Y = cb->Regions[i].శిఖరం_2;
 	    WriteRegion = cb->Regions[i];
-	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
-			cb->Buffer,		// our buffer
-			cb->BufferSize,		// dimensions of our buffer
-			BufferCoord,		// offset in our buffer
+	    ఒకవేళ (!WriteConsoleOutputW(g_h_Con_బహిర్గతం,	// output handle
+			cb->బఫరు_2,		// our buffer
+			cb->బఫరు_కొలత_2,		// dimensions of our buffer
+			బఫరు_Coord,		// offset in our buffer
 			&WriteRegion))		// region to restore
-		return FALSE;
+		తిరిగి FALSE;
 	}
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 # define FEAT_RESTORE_ORIG_SCREEN
 # ifdef FEAT_RESTORE_ORIG_SCREEN
-static ConsoleBuffer g_cbOrig = { 0 };
+స్థిర Console_బఫరు g_cbOrig = { 0 };
 # endif
-static ConsoleBuffer g_cbNonTermcap = { 0 };
-static ConsoleBuffer g_cbTermcap = { 0 };
+స్థిర Console_బఫరు g_cbNonTermcap = { 0 };
+స్థిర Console_బఫరు g_cbTermcap = { 0 };
 
-char g_szOrigTitle[256] = { 0 };
-HWND g_hWnd = NULL;	// also used in os_mswin.c
-static HICON g_hOrigIconSmall = NULL;
-static HICON g_hOrigIcon = NULL;
-static HICON g_hVimIcon = NULL;
-static BOOL g_fCanChangeIcon = FALSE;
+అక్షరం g_szOrigTitle[256] = { 0 };
+HWND g_hWnd = ఖాళీ;	// also used in os_mswin.c
+స్థిర HICON g_hOrigIconSmall = ఖాళీ;
+స్థిర HICON g_hOrigIcon = ఖాళీ;
+స్థిర HICON g_hVimIcon = ఖాళీ;
+స్థిర BOOL g_fCanChangeIcon = FALSE;
 
 /*
  * GetConsoleIcon()
@@ -3417,22 +3417,22 @@ static BOOL g_fCanChangeIcon = FALSE;
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    స్థిర BOOL
 GetConsoleIcon(
     HWND	hWnd,
     HICON	*phIconSmall,
     HICON	*phIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ఒకవేళ (hWnd == ఖాళీ)
+	తిరిగి FALSE;
 
-    if (phIconSmall != NULL)
-	*phIconSmall = (HICON)SendMessage(hWnd, WM_GETICON,
+    ఒకవేళ (phIconSmall != ఖాళీ)
+	*phIconSmall = (HICON)Send_సందేశం(hWnd, WM_GETICON,
 					       (WPARAM)ICON_SMALL, (LPARAM)0);
-    if (phIcon != NULL)
-	*phIcon = (HICON)SendMessage(hWnd, WM_GETICON,
+    ఒకవేళ (phIcon != ఖాళీ)
+	*phIcon = (HICON)Send_సందేశం(hWnd, WM_GETICON,
 						 (WPARAM)ICON_BIG, (LPARAM)0);
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3443,22 +3443,22 @@ GetConsoleIcon(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-SetConsoleIcon(
+    స్థిర BOOL
+సమితి_Console_Icon(
     HWND    hWnd,
     HICON   hIconSmall,
     HICON   hIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ఒకవేళ (hWnd == ఖాళీ)
+	తిరిగి FALSE;
 
-    if (hIconSmall != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    ఒకవేళ (hIconSmall != ఖాళీ)
+	Send_సందేశం(hWnd, WM_SETICON,
 			    (WPARAM)ICON_SMALL, (LPARAM)hIconSmall);
-    if (hIcon != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    ఒకవేళ (hIcon != ఖాళీ)
+	Send_సందేశం(hWnd, WM_SETICON,
 			    (WPARAM)ICON_BIG, (LPARAM) hIcon);
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3471,12 +3471,12 @@ SetConsoleIcon(
  *  nor is it possible when running Vim remotely using Telnet (since the
  *  console window the user sees is owned by a remote process).
  */
-    static void
-SaveConsoleTitleAndIcon(void)
+    స్థిర శూన్య
+SaveConsoleTitleAndIcon(శూన్య)
 {
     // Save the original title.
-    if (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
-	return;
+    ఒకవేళ (!GetConsoleTitle(g_szOrigTitle, పరిమాణం(g_szOrigTitle)))
+	తిరిగి;
 
     /*
      * Obtain a handle to the console window using GetConsoleWindow() from
@@ -3485,86 +3485,86 @@ SaveConsoleTitleAndIcon(void)
      * 2000.  On older operating systems, we can't change the window icon
      * anyway.
      */
-    g_hWnd = GetConsoleWindow();
-    if (g_hWnd == NULL)
-	return;
+    g_hWnd = Get_Console_కిటికీ();
+    ఒకవేళ (g_hWnd == ఖాళీ)
+	తిరిగి;
 
     // Save the original console window icon.
     GetConsoleIcon(g_hWnd, &g_hOrigIconSmall, &g_hOrigIcon);
-    if (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
-	return;
+    ఒకవేళ (g_hOrigIconSmall == ఖాళీ || g_hOrigIcon == ఖాళీ)
+	తిరిగి;
 
     // Extract the first icon contained in the Vim executable.
-    if (
+    ఒకవేళ (
 # ifdef FEAT_LIBCALL
-	    mch_icon_load((HANDLE *)&g_hVimIcon) == FAIL ||
+	    mch_icon_ఎక్కించు((HANDLE *)&g_hVimIcon) == FAIL ||
 # endif
-	    g_hVimIcon == NULL)
-	g_hVimIcon = ExtractIcon(NULL, (LPCSTR)exe_name, 0);
-    if (g_hVimIcon != NULL)
+	    g_hVimIcon == ఖాళీ)
+	g_hVimIcon = వెలికితీయి_Icon(ఖాళీ, (LPCSTR)exe_name, 0);
+    ఒకవేళ (g_hVimIcon != ఖాళీ)
 	g_fCanChangeIcon = TRUE;
 }
 
-static int g_fWindInitCalled = FALSE;
-static int g_fTermcapMode = FALSE;
-static CONSOLE_CURSOR_INFO g_cci;
+స్థిర పూర్ణాంకం g_fWindInitCalled = FALSE;
+స్థిర పూర్ణాంకం g_f_Termcap_బహుళకం = FALSE;
+స్థిర CONSOLE_CURSOR_INFO g_cci;
 
 /*
  * non-GUI version of mch_init().
  */
-    static void
-mch_init_c(void)
+    స్థిర శూన్య
+mch_init_c(శూన్య)
 {
 # ifndef FEAT_RESTORE_ORIG_SCREEN
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_బఫరు_INFO csbi;
 # endif
 # ifndef __MINGW32__
-    extern int _fmode;
+    బాహ్య పూర్ణాంకం _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    సమితి_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    సమితి_Error_బహుళకం(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
-    out_flush();
+    _fmode = O_ద్విమాన;		// we do our own CR-LF translation
+    బహిర్గతం_flush();
 
     // Obtain handles for the standard Console I/O devices
-    if (read_cmd_fd == 0)
-	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
-    else
+    ఒకవేళ (read_cmd_fd == 0)
+	g_h_Con_లోపల =  GetStdHandle(STD_ఆదానం_HANDLE);
+    లేకపోతే
 	create_conin();
-    g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    g_h_Con_బహిర్గతం = GetStdHandle(STD_OUTPUT_HANDLE);
 
     wt_init();
     vtp_flag_init();
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     // Save the initial console buffer for later restoration
-    SaveConsoleBuffer(&g_cbOrig);
-    g_attrCurrent = g_attrDefault = g_cbOrig.Info.wAttributes;
-# else
+    Save_Console_బఫరు(&g_cbOrig);
+    g_attrCurrent = g_attrDefault = g_cbOrig.Info.w_లక్షణాలు;
+# లేకపోతే
     // Get current text attributes
-    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-    g_attrCurrent = g_attrDefault = csbi.wAttributes;
+    Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi);
+    g_attrCurrent = g_attrDefault = csbi.w_లక్షణాలు;
 # endif
-    if (cterm_normal_fg_color == 0)
-	cterm_normal_fg_color = (g_attrCurrent & 0xf) + 1;
-    if (cterm_normal_bg_color == 0)
-	cterm_normal_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
+    ఒకవేళ (cterm_సాధారణ_fg_color == 0)
+	cterm_సాధారణ_fg_color = (g_attrCurrent & 0xf) + 1;
+    ఒకవేళ (cterm_సాధారణ_bg_color == 0)
+	cterm_సాధారణ_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
 
     // Fg and Bg color index number at startup
-    g_color_index_fg = g_attrDefault & 0xf;
-    g_color_index_bg = (g_attrDefault >> 4) & 0xf;
+    g_color_సూచీ_fg = g_attrDefault & 0xf;
+    g_color_సూచీ_bg = (g_attrDefault >> 4) & 0xf;
 
     // set termcap codes to current text attributes
     update_tcap(g_attrCurrent);
 
-    GetConsoleCursorInfo(g_hConOut, &g_cci);
-    GetConsoleMode(g_hConIn,  &g_cmodein);
-    GetConsoleMode(g_hConOut, &g_cmodeout);
+    GetConsoleCursorInfo(g_h_Con_బహిర్గతం, &g_cci);
+    Get_Console_బహుళకం(g_h_Con_లోపల,  &g_cmodein);
+    Get_Console_బహుళకం(g_h_Con_బహిర్గతం, &g_cmodeout);
 
     SaveConsoleTitleAndIcon();
     /*
@@ -3572,24 +3572,24 @@ mch_init_c(void)
      * Note that Vim presently only has one size of icon (32x32), but it
      * automatically gets scaled down to 16x16 when setting the small icon.
      */
-    if (g_fCanChangeIcon)
-	SetConsoleIcon(g_hWnd, g_hVimIcon, g_hVimIcon);
+    ఒకవేళ (g_fCanChangeIcon)
+	సమితి_Console_Icon(g_hWnd, g_hVimIcon, g_hVimIcon);
 
     ui_get_shellsize();
 
     vtp_init();
     // Switch to a new alternate screen buffer.
-    if (use_alternate_screen_buffer)
+    ఒకవేళ (use_alternate_screen_బఫరు)
 	vtp_printf("\033[?1049h");
 
 # ifdef MCH_WRITE_DUMP
     fdDump = fopen("dump", "wt");
 
-    if (fdDump)
+    ఒకవేళ (fdDump)
     {
 	time_t t;
 
-	time(&t);
+	సమయం(&t);
 	fputs(ctime(&t), fdDump);
 	fflush(fdDump);
     }
@@ -3609,11 +3609,11 @@ mch_init_c(void)
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    static void
-mch_exit_c(int r)
+    స్థిర శూన్య
+mch_exit_c(పూర్ణాంకం r)
 {
     // Copy flag since stoptermcap() will clear the flag.
-    int fTermcapMode = g_fTermcapMode;
+    పూర్ణాంకం f_Termcap_బహుళకం = g_f_Termcap_బహుళకం;
 
     exiting = TRUE;
 
@@ -3621,15 +3621,15 @@ mch_exit_c(int r)
 
     stoptermcap();
     // Switch back to main screen buffer if TermcapMode was not active.
-    if (!fTermcapMode &&  use_alternate_screen_buffer)
+    ఒకవేళ (!f_Termcap_బహుళకం &&  use_alternate_screen_బఫరు)
 	vtp_printf("\033[?1049l");
 
-    if (g_fWindInitCalled)
+    ఒకవేళ (g_fWindInitCalled)
 	settmode(TMODE_COOK);
 
     ml_close_all(TRUE);		// remove all memfiles
 
-    if (g_fWindInitCalled)
+    ఒకవేళ (g_fWindInitCalled)
     {
 	mch_restore_title(SAVE_RESTORE_BOTH);
 	/*
@@ -3637,130 +3637,130 @@ mch_exit_c(int r)
 	 * what they were at startup.  Don't do this when the window is
 	 * closed, Vim would hang here.
 	 */
-	if (g_fCanChangeIcon && !g_fForceExit)
-	    SetConsoleIcon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
+	ఒకవేళ (g_fCanChangeIcon && !g_fForceExit)
+	    సమితి_Console_Icon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
 
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ఒకవేళ (fdDump)
 	{
 	    time_t t;
 
-	    time(&t);
+	    సమయం(&t);
 	    fputs(ctime(&t), fdDump);
 	    fclose(fdDump);
 	}
-	fdDump = NULL;
+	fdDump = ఖాళీ;
 # endif
     }
 
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    SetConsoleMode(g_hConIn,  g_cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, g_cmodeout);
+    సమితి_Console_Cursor_Info(g_h_Con_బహిర్గతం, &g_cci);
+    సమితి_Console_బహుళకం(g_h_Con_లోపల,  g_cmodein | ENABLE_EXTENDED_FLAGS);
+    సమితి_Console_బహుళకం(g_h_Con_బహిర్గతం, g_cmodeout);
 
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_చివర();
 # endif
 
-    exit(r);
+    నిష్క్రమించు(r);
 }
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#అయితే_ముగింపు // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_init(void)
+    శూన్య
+mch_init(శూన్య)
 {
-#ifdef VIMDLL
-    if (gui.starting)
+#నిర్వచితమైతే VIMDLL
+    ఒకవేళ (gui.starting)
 	mch_init_g();
-    else
+    లేకపోతే
 	mch_init_c();
-#elif defined(FEAT_GUI_MSWIN)
+#లేదావేళ defined(FEAT_GUI_MSWIN)
     mch_init_g();
-#else
+#లేకపోతే
     mch_init_c();
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-mch_exit(int r)
+    శూన్య
+mch_exit(పూర్ణాంకం r)
 {
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
-#endif
+#అయితే_ముగింపు
 
-#ifdef VIMDLL
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#నిర్వచితమైతే VIMDLL
+    ఒకవేళ (vimrun_మార్గం_allocated)
+	vim_free(vimrun_మార్గం.string);
 
-    if (gui.in_use || gui.starting)
+    ఒకవేళ (gui.లోపల_use || gui.starting)
 	mch_exit_g(r);
-    else
+    లేకపోతే
 	mch_exit_c(r);
-#elif defined(FEAT_GUI_MSWIN)
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#లేదావేళ defined(FEAT_GUI_MSWIN)
+    ఒకవేళ (vimrun_మార్గం_allocated)
+	vim_free(vimrun_మార్గం.string);
     mch_exit_g(r);
-#else
+#లేకపోతే
     mch_exit_c(r);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Do we have an interactive window?
  */
-    int
+    పూర్ణాంకం
 mch_check_win(
-    int argc UNUSED,
-    char **argv UNUSED)
+    పూర్ణాంకం argc వాడని,
+    అక్షరం **argv వాడని)
 {
     mch_get_exe_name();
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    return OK;	    // GUI always has a tty
-#else
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    తిరిగి OK;	    // GUI always has a tty
+#లేకపోతే
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి OK;
 # endif
-    if (isatty(1))
-	return OK;
-    return FAIL;
-#endif
+    ఒకవేళ (isatty(1))
+	తిరిగి OK;
+    తిరిగి FAIL;
+#అయితే_ముగింపు
 }
 
 /*
  * Set the case of the file name, if it already exists.
  * When "len" is > 0, also expand short to long filenames.
  */
-    void
+    శూన్య
 fname_case(
     char_u	*name,
-    int		len)
+    పూర్ణాంకం		len)
 {
     WCHAR   *p;
-    WCHAR   buf[_MAX_PATH + 1];
+    WCHAR   buf[MAX_మార్గం_2 + 1];
 
-    if (*name == NUL)
-	return;
+    ఒకవేళ (*name == NUL)
+	తిరిగి;
 
     slash_adjust(name);
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
-    if (GetLongPathNameW(p, buf, _MAX_PATH))
+    ఒకవేళ (Get_Long_మార్గం_Name_W(p, buf, MAX_మార్గం_2))
     {
-	char_u	*q = utf16_to_enc(buf, NULL);
+	char_u	*q = utf16_గమ్యం_enc(buf, ఖాళీ);
 
-	if (q != NULL)
+	ఒకవేళ (q != ఖాళీ)
 	{
-	    if (len > 0)
+	    ఒకవేళ (len > 0)
 		vim_strncpy(name, q, len - 1);
-	    else
+	    లేకపోతే
 	    {
 		size_t  namelen = STRLEN(name);
 
-		if (namelen >= STRLEN(q))
+		ఒకవేళ (namelen >= STRLEN(q))
 		    vim_strncpy(name, q, namelen);
 	    }
 	    vim_free(q);
@@ -3773,47 +3773,47 @@ fname_case(
 /*
  * Insert user name in s[len].
  */
-    int
+    పూర్ణాంకం
 mch_get_user_name(
     char_u  *s,
-    int	    len)
+    పూర్ణాంకం	    len)
 {
     WCHAR wszUserName[256 + 1];	// UNLEN is 256
-    DWORD wcch = ARRAY_LENGTH(wszUserName);
+    DWORD wcch = ARRAY_నిడివి(wszUserName);
 
-    if (GetUserNameW(wszUserName, &wcch))
+    ఒకవేళ (GetUserNameW(wszUserName, &wcch))
     {
-	char_u  *p = utf16_to_enc(wszUserName, NULL);
+	char_u  *p = utf16_గమ్యం_enc(wszUserName, ఖాళీ);
 
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    vim_strncpy(s, p, len - 1);
 	    vim_free(p);
-	    return OK;
+	    తిరిగి OK;
 	}
     }
     s[0] = NUL;
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 
 /*
  * Insert host name in s[len].
  */
-    void
+    శూన్య
 mch_get_host_name(
     char_u	*s,
-    int		len)
+    పూర్ణాంకం		len)
 {
     WCHAR wszHostName[256 + 1];
-    DWORD wcch = ARRAY_LENGTH(wszHostName);
+    DWORD wcch = ARRAY_నిడివి(wszHostName);
 
-    if (!GetComputerNameW(wszHostName, &wcch))
-	return;
+    ఒకవేళ (!GetComputerNameW(wszHostName, &wcch))
+	తిరిగి;
 
-    char_u  *p = utf16_to_enc(wszHostName, NULL);
-    if (p == NULL)
-	return;
+    char_u  *p = utf16_గమ్యం_enc(wszHostName, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
     vim_strncpy(s, p, len - 1);
     vim_free(p);
@@ -3823,40 +3823,40 @@ mch_get_host_name(
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    దీర్ఘ
+mch_get_pid(శూన్య)
 {
-    return (long)GetCurrentProcessId();
+    తిరిగి (దీర్ఘ)GetCurrentProcessId();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
-mch_process_running(long pid)
+    పూర్ణాంకం
+mch_process_running(దీర్ఘ pid)
 {
     HANDLE  hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, (DWORD)pid);
-    DWORD   status = 0;
-    int	    ret = FALSE;
+    DWORD   స్థితి_2 = 0;
+    పూర్ణాంకం	    ret = FALSE;
 
-    if (hProcess == NULL)
-	return FALSE;  // might not have access
-    if (GetExitCodeProcess(hProcess, &status))
-	ret = status == STILL_ACTIVE;
+    ఒకవేళ (hProcess == ఖాళీ)
+	తిరిగి FALSE;  // might not have access
+    ఒకవేళ (Get_Exit_సంకేతం_Process(hProcess, &స్థితి_2))
+	ret = స్థితి_2 == STILL_చురుకైన;
     CloseHandle(hProcess);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
+    పూర్ణాంకం
 mch_dirname(
     char_u	*buf,
-    int		len)
+    పూర్ణాంకం		len)
 {
-    WCHAR   wbuf[_MAX_PATH + 1];
+    WCHAR   wbuf[MAX_మార్గం_2 + 1];
 
     /*
      * Originally this was:
@@ -3864,46 +3864,46 @@ mch_dirname(
      * But the Win32s known bug list says that getcwd() doesn't work
      * so use the Win32 system call instead. <Negri>
      */
-    if (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
-	return FAIL;
+    ఒకవేళ (GetCurrentDirectoryW(MAX_మార్గం_2, wbuf) == 0)
+	తిరిగి FAIL;
 
-    WCHAR   wcbuf[_MAX_PATH + 1];
-    char_u  *p = NULL;
+    WCHAR   wcbuf[MAX_మార్గం_2 + 1];
+    char_u  *p = ఖాళీ;
 
-    if (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
+    ఒకవేళ (Get_Long_మార్గం_Name_W(wbuf, wcbuf, MAX_మార్గం_2) != 0)
     {
-	p = utf16_to_enc(wcbuf, NULL);
-	if (p != NULL)
+	p = utf16_గమ్యం_enc(wcbuf, ఖాళీ);
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    if (STRLEN(p) >= (size_t)len)
+	    ఒకవేళ (STRLEN(p) >= (size_t)len)
 	    {
 		// long path name is too long, fall back to short one
 		VIM_CLEAR(p);
 	    }
 	}
     }
-    if (p == NULL)
-	p = utf16_to_enc(wbuf, NULL);
+    ఒకవేళ (p == ఖాళీ)
+	p = utf16_గమ్యం_enc(wbuf, ఖాళీ);
 
-    if (p == NULL)
-	return FAIL;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి FAIL;
 
     vim_strncpy(buf, p, len - 1);
     vim_free(p);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Get file permissions for "name".
  * Return mode_t or -1 for error.
  */
-    long
+    దీర్ఘ
 mch_getperm(char_u *name)
 {
     stat_T	st;
 
-    return (mch_stat((char *)name, &st) == 0)
-	? (long)(unsigned short)st.st_mode
+    తిరిగి (mch_stat((అక్షరం *)name, &st) == 0)
+	? (దీర్ఘ)(గుర్తులేని పొట్టి)st.st_బహుళకం
 	: -1L;
 }
 
@@ -3913,35 +3913,35 @@ mch_getperm(char_u *name)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_setperm(char_u *name, long perm)
+    పూర్ణాంకం
+mch_setperm(char_u *name, దీర్ఘ perm)
 {
-    long	n;
+    దీర్ఘ	n;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FAIL;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి FAIL;
 
     n = _wchmod(p, perm);
     vim_free(p);
-    if (n == -1)
-	return FAIL;
+    ఒకవేళ (n == -1)
+	తిరిగి FAIL;
 
-    win32_set_archive(name);
+    win32_సమితి_archive(name);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
+    శూన్య
 mch_hide(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return;
+    పూర్ణాంకం attrs = win32_getattrs(name);
+    ఒకవేళ (attrs == -1)
+	తిరిగి;
 
     attrs |= FILE_ATTRIBUTE_HIDDEN;
     win32_setattrs(name, attrs);
@@ -3950,30 +3950,30 @@ mch_hide(char_u *name)
 /*
  * Return TRUE if file "name" exists and is hidden.
  */
-    int
+    పూర్ణాంకం
 mch_ishidden(char_u *name)
 {
-    int f = win32_getattrs(name);
+    పూర్ణాంకం f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ఒకవేళ (f == -1)
+	తిరిగి FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_HIDDEN) != 0;
+    తిరిగి (f & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 /*
  * return TRUE if "name" is a directory
  * return FALSE if "name" is not a directory or upon error
  */
-    int
+    పూర్ణాంకం
 mch_isdir(char_u *name)
 {
-    int f = win32_getattrs(name);
+    పూర్ణాంకం f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ఒకవేళ (f == -1)
+	తిరిగి FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    తిరిగి (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -3981,24 +3981,24 @@ mch_isdir(char_u *name)
  * Return FALSE otherwise, also when the attributes cannot be obtained for
  * another reason.
  */
-    int
+    పూర్ణాంకం
 mch_isdir_or_missing(char_u *name)
 {
     WCHAR	*p;
     DWORD	attr;
     DWORD	error = 0;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FALSE;
-    attr = GetFileAttributesW(p);
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	error = GetLastError();
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి FALSE;
+    attr = Get_File_లక్షణాలు_W(p);
+    ఒకవేళ (attr == INVALID_FILE_లక్షణాలు)
+	error = Get_చివరి_Error();
     vim_free(p);
 
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    ఒకవేళ (attr == INVALID_FILE_లక్షణాలు)
+	తిరిగి error == ERROR_FILE_NOT_దొరికింది || error == ERROR_మార్గం_NOT_దొరికింది;
+    తిరిగి (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -4006,103 +4006,103 @@ mch_isdir_or_missing(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    పూర్ణాంకం
 mch_isrealdir(char_u *name)
 {
-    return mch_isdir(name) && !mch_is_symbolic_link(name);
+    తిరిగి mch_isdir(name) && !mch_is_symbolic_link(name);
 }
 
 /*
  * Create directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    పూర్ణాంకం
 mch_mkdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    పూర్ణాంకం	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
     retval = _wmkdir(p);
     vim_free(p);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Delete directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    పూర్ణాంకం
 mch_rmdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    పూర్ణాంకం	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
     retval = _wrmdir(p);
     vim_free(p);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link.
  */
-    int
+    పూర్ణాంకం
 mch_is_hard_link(char_u *fname)
 {
     BY_HANDLE_FILE_INFORMATION info;
 
-    return win32_fileinfo(fname, &info) == FILEINFO_OK
-						   && info.nNumberOfLinks > 1;
+    తిరిగి win32_fileinfo(fname, &info) == FILEINFO_OK
+						   && info.n_సంఖ్య_యొక్క_Links > 1;
 }
 
 /*
  * Return TRUE if "name" is a symbolic link (or a junction).
  */
-    int
+    పూర్ణాంకం
 mch_is_symbolic_link(char_u *name)
 {
-    HANDLE		hFind;
-    int			res = FALSE;
-    DWORD		fileFlags = 0, reparseTag = 0;
+    HANDLE		h_కనుగొను;
+    పూర్ణాంకం			res = FALSE;
+    DWORD		fileFlags = 0, reparse_ట్యాగ్ = 0;
     WCHAR		*wn;
-    WIN32_FIND_DATAW	findDataW;
+    WIN32_కనుగొను_DATAW	కనుగొను_దత్తాంశం_W;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return FALSE;
+    wn = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి FALSE;
 
-    hFind = FindFirstFileW(wn, &findDataW);
+    h_కనుగొను = కనుగొను_మొదటి_File_W(wn, &కనుగొను_దత్తాంశం_W);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    ఒకవేళ (h_కనుగొను != INVALID_HANDLE_విలువ)
     {
-	fileFlags = findDataW.dwFileAttributes;
-	reparseTag = findDataW.dwReserved0;
-	FindClose(hFind);
+	fileFlags = కనుగొను_దత్తాంశం_W.dw_File_లక్షణాలు;
+	reparse_ట్యాగ్ = కనుగొను_దత్తాంశం_W.dwReserved0;
+	కనుగొను_Close(h_కనుగొను);
     }
 
-    if ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
-	    && (reparseTag == IO_REPARSE_TAG_SYMLINK
-		|| reparseTag == IO_REPARSE_TAG_MOUNT_POINT))
+    ఒకవేళ ((fileFlags & FILE_ATTRIBUTE_REPARSE_బిందువు)
+	    && (reparse_ట్యాగ్ == IO_REPARSE_ట్యాగ్_SYMLINK
+		|| reparse_ట్యాగ్ == IO_REPARSE_ట్యాగ్_MOUNT_బిందువు))
 	res = TRUE;
 
-    return res;
+    తిరిగి res;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link or if it is a symbolic
  * link.
  */
-    int
+    పూర్ణాంకం
 mch_is_linked(char_u *fname)
 {
-    if (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
-	return TRUE;
-    return FALSE;
+    ఒకవేళ (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -4112,36 +4112,36 @@ mch_is_linked(char_u *fname)
  * Returns FILEINFO_READ_FAIL when CreateFile() failed.
  * Returns FILEINFO_INFO_FAIL when GetFileInformationByHandle() failed.
  */
-    int
+    పూర్ణాంకం
 win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 {
     HANDLE	hFile;
-    int		res = FILEINFO_READ_FAIL;
+    పూర్ణాంకం		res = FILEINFO_READ_FAIL;
     WCHAR	*wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return FILEINFO_ENC_FAIL;
+    wn = enc_గమ్యం_utf16(fname, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి FILEINFO_ENC_FAIL;
 
     hFile = CreateFileW(wn,	// file name
 	    GENERIC_READ,	// access mode
 	    FILE_SHARE_READ | FILE_SHARE_WRITE,	// share mode
-	    NULL,		// security descriptor
+	    ఖాళీ,		// security descriptor
 	    OPEN_EXISTING,	// creation disposition
 	    FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-	    NULL);		// handle to template file
+	    ఖాళీ);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
-	return FILEINFO_READ_FAIL;
+    ఒకవేళ (hFile == INVALID_HANDLE_విలువ)
+	తిరిగి FILEINFO_READ_FAIL;
 
-    if (GetFileInformationByHandle(hFile, info) != 0)
+    ఒకవేళ (GetFileInformationByHandle(hFile, info) != 0)
 	res = FILEINFO_OK;
-    else
+    లేకపోతే
 	res = FILEINFO_INFO_FAIL;
     CloseHandle(hFile);
 
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -4149,20 +4149,20 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
  * -1 : error
  * else FILE_ATTRIBUTE_* defined in winnt.h
  */
-    static int
+    స్థిర పూర్ణాంకం
 win32_getattrs(char_u *name)
 {
-    int		attr;
+    పూర్ణాంకం		attr;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return INVALID_FILE_ATTRIBUTES;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి INVALID_FILE_లక్షణాలు;
 
-    attr = GetFileAttributesW(p);
+    attr = Get_File_లక్షణాలు_W(p);
     vim_free(p);
 
-    return attr;
+    తిరిగి attr;
 }
 
 /*
@@ -4170,34 +4170,34 @@ win32_getattrs(char_u *name)
  *
  * return -1 for failure, 0 otherwise
  */
-    static int
-win32_setattrs(char_u *name, int attrs)
+    స్థిర పూర్ణాంకం
+win32_setattrs(char_u *name, పూర్ణాంకం attrs)
 {
-    int	    res;
+    పూర్ణాంకం	    res;
     WCHAR   *p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
 
-    res = SetFileAttributesW(p, attrs);
+    res = సమితి_File_లక్షణాలు_W(p, attrs);
     vim_free(p);
 
-    return res ? 0 : -1;
+    తిరిగి res ? 0 : -1;
 }
 
 /*
  * Set archive flag for "name".
  */
-    static int
-win32_set_archive(char_u *name)
+    స్థిర పూర్ణాంకం
+win32_సమితి_archive(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return -1;
+    పూర్ణాంకం attrs = win32_getattrs(name);
+    ఒకవేళ (attrs == -1)
+	తిరిగి -1;
 
     attrs |= FILE_ATTRIBUTE_ARCHIVE;
-    return win32_setattrs(name, attrs);
+    తిరిగి win32_setattrs(name, attrs);
 }
 
 /*
@@ -4205,12 +4205,12 @@ win32_set_archive(char_u *name)
  * Strange semantics of Win32: a readonly directory is writable, but you can't
  * delete a file.  Let's say this means it is writable.
  */
-    int
+    పూర్ణాంకం
 mch_writable(char_u *name)
 {
-    int attrs = win32_getattrs(name);
+    పూర్ణాంకం attrs = win32_getattrs(name);
 
-    return (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
+    తిరిగి (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
 			  || (attrs & FILE_ATTRIBUTE_DIRECTORY)));
 }
 
@@ -4220,10 +4220,10 @@ mch_writable(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
+    పూర్ణాంకం
+mch_can_exe(char_u *name, char_u **మార్గం, పూర్ణాంకం use_మార్గం వాడని)
 {
-    return executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
+    తిరిగి executable_exists((అక్షరం *)name, STRLEN(name), మార్గం, TRUE, TRUE);
 }
 
 /*
@@ -4232,53 +4232,53 @@ mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    పూర్ణాంకం
 mch_nodetype(char_u *name)
 {
     HANDLE	hFile;
-    int		type;
+    పూర్ణాంకం		type;
     WCHAR	*wn;
 
     // We can't open a file with a name "\\.\con" or "\\.\prn" and trying to
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
-    if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+    ఒకవేళ (STRNCMP(name, "\\\\.\\", 4) == 0)
+	తిరిగి కణుపు_WRITABLE;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NODE_NORMAL;
+    wn = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి కణుపు_సాధారణ;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
 	    0,			    // share mode
-	    NULL,		    // security descriptor
+	    ఖాళీ,		    // security descriptor
 	    OPEN_EXISTING,	    // creation disposition
 	    0,			    // file attributes
-	    NULL);		    // handle to template file
+	    ఖాళీ);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    ఒకవేళ (hFile == INVALID_HANDLE_విలువ)
+	తిరిగి కణుపు_సాధారణ;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
-    if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
-    if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+    ఒకవేళ (type == FILE_TYPE_CHAR)
+	తిరిగి కణుపు_WRITABLE;
+    ఒకవేళ (type == FILE_TYPE_DISK)
+	తిరిగి కణుపు_సాధారణ;
+    తిరిగి కణుపు_OTHER;
 }
 
-#ifdef HAVE_ACL
-struct my_acl
+#నిర్వచితమైతే HAVE_ACL
+నిర్మాణం my_acl
 {
     PSECURITY_DESCRIPTOR    pSecurityDescriptor;
     PSID		    pSidOwner;
-    PSID		    pSidGroup;
+    PSID		    p_Sid_సమూహం;
     PACL		    pDacl;
     PACL		    pSacl;
 };
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return a pointer to the ACL of file "fname" in allocated memory.
@@ -4287,22 +4287,22 @@ struct my_acl
     vim_acl_T
 mch_get_acl(char_u *fname)
 {
-#ifndef HAVE_ACL
-    return (vim_acl_T)NULL;
-#else
-    struct my_acl   *p = NULL;
+#నిర్వచితం_కాకపోతే HAVE_ACL
+    తిరిగి (vim_acl_T)ఖాళీ;
+#లేకపోతే
+    నిర్మాణం my_acl   *p = ఖాళీ;
     DWORD   err;
 
-    p = ALLOC_CLEAR_ONE(struct my_acl);
-    if (p != NULL)
+    p = ALLOC_CLEAR_ONE(నిర్మాణం my_acl);
+    ఒకవేళ (p != ఖాళీ)
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(fname, NULL);
-	if (wn == NULL)
+	wn = enc_గమ్యం_utf16(fname, ఖాళీ);
+	ఒకవేళ (wn == ఖాళీ)
 	{
 	    vim_free(p);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	// Try to retrieve the entire security descriptor.
@@ -4310,167 +4310,167 @@ mch_get_acl(char_u *fname)
 		wn,			// Abstract filename
 		SE_FILE_OBJECT,		// File Object
 		OWNER_SECURITY_INFORMATION |
-		GROUP_SECURITY_INFORMATION |
+		సమూహం_SECURITY_INFORMATION |
 		DACL_SECURITY_INFORMATION |
 		SACL_SECURITY_INFORMATION,
 		&p->pSidOwner,		// Ownership information.
-		&p->pSidGroup,		// Group membership.
+		&p->p_Sid_సమూహం,		// Group membership.
 		&p->pDacl,		// Discretionary information.
 		&p->pSacl,		// For auditing purposes.
 		&p->pSecurityDescriptor);
-	if (err == ERROR_ACCESS_DENIED ||
+	ఒకవేళ (err == ERROR_ACCESS_DENIED ||
 		err == ERROR_PRIVILEGE_NOT_HELD)
 	{
 	    // Retrieve only DACL.
-	    (void)GetNamedSecurityInfoW(
+	    (శూన్య)GetNamedSecurityInfoW(
 		    wn,
 		    SE_FILE_OBJECT,
 		    DACL_SECURITY_INFORMATION,
-		    NULL,
-		    NULL,
+		    ఖాళీ,
+		    ఖాళీ,
 		    &p->pDacl,
-		    NULL,
+		    ఖాళీ,
 		    &p->pSecurityDescriptor);
 	}
-	if (p->pSecurityDescriptor == NULL)
+	ఒకవేళ (p->pSecurityDescriptor == ఖాళీ)
 	{
 	    mch_free_acl((vim_acl_T)p);
-	    p = NULL;
+	    p = ఖాళీ;
 	}
 	vim_free(wn);
     }
 
-    return (vim_acl_T)p;
-#endif
+    తిరిగి (vim_acl_T)p;
+#అయితే_ముగింపు
 }
 
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
 /*
  * Check if "acl" contains inherited ACE.
  */
-    static BOOL
+    స్థిర BOOL
 is_acl_inherited(PACL acl)
 {
     DWORD   i;
-    ACL_SIZE_INFORMATION    acl_info;
+    ACL_కొలత_INFORMATION    acl_info;
     PACCESS_ALLOWED_ACE	    ace;
 
-    acl_info.AceCount = 0;
-    GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    acl_info.Ace_లెక్క = 0;
+    GetAclInformation(acl, &acl_info, పరిమాణం(acl_info), Acl_కొలత_Information);
+    కొరకు (i = 0; i < acl_info.Ace_లెక్క; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
-	if (ace->Header.AceFlags & INHERITED_ACE)
-	    return TRUE;
+	ఒకవేళ (ace->శీర్షిక_2.AceFlags & INHERITED_ACE)
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the ACL of file "fname" to "acl" (unless it's NULL).
  * Errors are ignored.
  * This must only be called with "acl" equal to what mch_get_acl() returned.
  */
-    void
-mch_set_acl(char_u *fname, vim_acl_T acl)
+    శూన్య
+mch_సమితి_acl(char_u *fname, vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#నిర్వచితమైతే HAVE_ACL
+    నిర్మాణం my_acl   *p = (నిర్మాణం my_acl *)acl;
     SECURITY_INFORMATION    sec_info = 0;
     WCHAR	    *wn;
 
-    if (p == NULL)
-	return;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_గమ్యం_utf16(fname, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి;
 
     // Set security flags
-    if (p->pSidOwner)
+    ఒకవేళ (p->pSidOwner)
 	sec_info |= OWNER_SECURITY_INFORMATION;
-    if (p->pSidGroup)
-	sec_info |= GROUP_SECURITY_INFORMATION;
-    if (p->pDacl)
+    ఒకవేళ (p->p_Sid_సమూహం)
+	sec_info |= సమూహం_SECURITY_INFORMATION;
+    ఒకవేళ (p->pDacl)
     {
 	sec_info |= DACL_SECURITY_INFORMATION;
 	// Do not inherit its parent's DACL.
 	// If the DACL is inherited, Cygwin permissions would be changed.
-	if (!is_acl_inherited(p->pDacl))
+	ఒకవేళ (!is_acl_inherited(p->pDacl))
 	    sec_info |= PROTECTED_DACL_SECURITY_INFORMATION;
     }
-    if (p->pSacl)
+    ఒకవేళ (p->pSacl)
 	sec_info |= SACL_SECURITY_INFORMATION;
 
-    (void)SetNamedSecurityInfoW(
+    (శూన్య)సమితి_Named_Security_Info_W(
 	    wn,			// Abstract filename
 	    SE_FILE_OBJECT,	// File Object
 	    sec_info,
 	    p->pSidOwner,	// Ownership information.
-	    p->pSidGroup,	// Group membership.
+	    p->p_Sid_సమూహం,	// Group membership.
 	    p->pDacl,		// Discretionary information.
 	    p->pSacl		// For auditing purposes.
 	    );
     vim_free(wn);
-#endif
+#అయితే_ముగింపు
 }
 
-    void
+    శూన్య
 mch_free_acl(vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#నిర్వచితమైతే HAVE_ACL
+    నిర్మాణం my_acl   *p = (నిర్మాణం my_acl *)acl;
 
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
 	LocalFree(p->pSecurityDescriptor);	// Free the memory just in case
 	vim_free(p);
     }
-#endif
+#అయితే_ముగింపు
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * handler for ctrl-break, ctrl-c interrupts, and fatal events.
  */
-    static BOOL WINAPI
+    స్థిర BOOL WINAPI
 handler_routine(
     DWORD dwCtrlType)
 {
-    INPUT_RECORD ir;
-    DWORD out;
+    ఆదానం_రికార్డు ir;
+    DWORD బహిర్గతం;
 
-    switch (dwCtrlType)
+    ఎంపిక (dwCtrlType)
     {
-    case CTRL_C_EVENT:
-	if (ctrl_c_interrupts)
+    స్థితి CTRL_C_EVENT:
+	ఒకవేళ (ctrl_c_interrupts)
 	    g_fCtrlCPressed = TRUE;
-	return TRUE;
+	తిరిగి TRUE;
 
-    case CTRL_BREAK_EVENT:
+    స్థితి CTRL_BREAK_EVENT:
 	g_fCBrkPressed	= TRUE;
 	ctrl_break_was_pressed = TRUE;
 	// ReadConsoleInput is blocking, send a key event to continue.
-	ir.EventType = KEY_EVENT;
-	ir.Event.KeyEvent.bKeyDown = TRUE;
-	ir.Event.KeyEvent.wRepeatCount = 1;
-	ir.Event.KeyEvent.wVirtualKeyCode = VK_CANCEL;
-	ir.Event.KeyEvent.wVirtualScanCode = 0;
-	ir.Event.KeyEvent.dwControlKeyState = 0;
-	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
-	WriteConsoleInput(g_hConIn, &ir, 1, &out);
-	return TRUE;
+	ir.EventType = కీలకం_EVENT;
+	ir.Event.కీలకం_Event_2.b_కీలకం_కిందికి = TRUE;
+	ir.Event.కీలకం_Event_2.w_Repeat_లెక్క = 1;
+	ir.Event.కీలకం_Event_2.w_Virtual_కీలకం_సంకేతం = VK_CANCEL;
+	ir.Event.కీలకం_Event_2.w_Virtual_పరిశీలన_సంకేతం = 0;
+	ir.Event.కీలకం_Event_2.dw_Control_కీలకం_State = 0;
+	ir.Event.కీలకం_Event_2.uChar.UnicodeChar = 0;
+	Write_Console_ఆదానం(g_h_Con_లోపల, &ir, 1, &బహిర్గతం);
+	తిరిగి TRUE;
 
     // fatal events: shut down gracefully
-    case CTRL_CLOSE_EVENT:
-    case CTRL_LOGOFF_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-	windgoto((int)Rows - 1, cmdline_col_off);
+    స్థితి CTRL_CLOSE_EVENT:
+    స్థితి CTRL_LOGOFF_EVENT:
+    స్థితి CTRL_SHUTDOWN_EVENT:
+	windgoto((పూర్ణాంకం)అడ్డువరుసలు - 1, cmdline_నిలువు_off);
 	g_fForceExit = TRUE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
 		(dwCtrlType == CTRL_CLOSE_EVENT
 		     ? _("close")
 		     : dwCtrlType == CTRL_LOGOFF_EVENT
@@ -4482,10 +4482,10 @@ handler_routine(
 
 	preserve_exit();	// output IObuff, preserve files and exit
 
-	return TRUE;		// not reached
+	తిరిగి TRUE;		// not reached
 
-    default:
-	return FALSE;
+    అప్రమేయ:
+	తిరిగి FALSE;
     }
 }
 
@@ -4493,7 +4493,7 @@ handler_routine(
 /*
  * set the tty in (raw) ? "raw" : "cooked" mode
  */
-    void
+    శూన్య
 mch_settmode(tmode_T tmode)
 {
     DWORD cmodein;
@@ -4501,48 +4501,48 @@ mch_settmode(tmode_T tmode)
     BOOL bEnableHandler;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
-    GetConsoleMode(g_hConIn, &cmodein);
-    GetConsoleMode(g_hConOut, &cmodeout);
-    if (tmode == TMODE_RAW)
+    Get_Console_బహుళకం(g_h_Con_లోపల, &cmodein);
+    Get_Console_బహుళకం(g_h_Con_బహిర్గతం, &cmodeout);
+    ఒకవేళ (tmode == TMODE_RAW)
     {
-	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		     ENABLE_ECHO_INPUT);
-	if (g_fMouseActive)
+	cmodein &= ~(ENABLE_పంక్తి_ఆదానం | ENABLE_PROCESSED_ఆదానం |
+		     ENABLE_ECHO_ఆదానం);
+	ఒకవేళ (g_f_Mouse_చురుకైన)
 	{
-	    cmodein |= ENABLE_MOUSE_INPUT;
-	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= ENABLE_MOUSE_ఆదానం;
+	    cmodein &= ~ENABLE_శీఘ్ర_EDIT_బహుళకం;
 	}
-	else
+	లేకపోతే
 	{
-	    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= g_cmodein & ENABLE_శీఘ్ర_EDIT_బహుళకం;
 	}
 	cmodeout &= ~(
 # ifdef FEAT_TERMGUICOLORS
 	    // Do not turn off the ENABLE_PROCESSED_OUTPUT flag when using
 	    // VTP.
 	    ((vtp_working) ? 0 : ENABLE_PROCESSED_OUTPUT) |
-# else
+# లేకపోతే
 	    ENABLE_PROCESSED_OUTPUT |
 # endif
 	    ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = TRUE;
     }
-    else // cooked
+    లేకపోతే // cooked
     {
-	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		    ENABLE_ECHO_INPUT);
+	cmodein |= (ENABLE_పంక్తి_ఆదానం | ENABLE_PROCESSED_ఆదానం |
+		    ENABLE_ECHO_ఆదానం);
 	cmodeout |= (ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = FALSE;
     }
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, cmodeout);
-    SetConsoleCtrlHandler(handler_routine, bEnableHandler);
+    సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodein | ENABLE_EXTENDED_FLAGS);
+    సమితి_Console_బహుళకం(g_h_Con_బహిర్గతం, cmodeout);
+    సమితి_Console_Ctrl_Handler(handler_routine, bEnableHandler);
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ఒకవేళ (fdDump)
     {
 	fprintf(fdDump, "mch_settmode(%s, in = %x, out = %x)\n",
 		tmode == TMODE_RAW ? "raw" :
@@ -4558,16 +4558,16 @@ mch_settmode(tmode_T tmode)
  * Get the size of the current window in `Rows' and `Columns'
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-mch_get_shellsize(void)
+    పూర్ణాంకం
+mch_get_shellsize(శూన్య)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_బఫరు_INFO csbi;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి OK;
 # endif
-    if (!g_fTermcapMode && g_cbTermcap.IsValid)
+    ఒకవేళ (!g_f_Termcap_బహుళకం && g_cbTermcap.IsValid)
     {
 	/*
 	 * For some reason, we are trying to get the screen dimensions
@@ -4575,40 +4575,40 @@ mch_get_shellsize(void)
 	 * variables are really intended to mean the size of Vim screen
 	 * while in termcap mode.
 	 */
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	అడ్డువరుసలు = g_cbTermcap.Info.dw_కొలత.Y;
+	Columns = g_cbTermcap.Info.dw_కొలత.X;
     }
-    else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    లేకపోతే ఒకవేళ (Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
     {
-	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	అడ్డువరుసలు = csbi.sr_కిటికీ.Bottom - csbi.sr_కిటికీ.శిఖరం_2 + 1;
+	Columns = csbi.sr_కిటికీ.కుడి_4 - csbi.sr_కిటికీ.ఎడమ_4 + 1;
     }
-    else
+    లేకపోతే
     {
-	Rows = 25;
+	అడ్డువరుసలు = 25;
 	Columns = 80;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Resize console buffer to 'COORD'
  */
-    static void
+    స్థిర శూన్య
 ResizeConBuf(
     HANDLE  hConsole,
     COORD   coordScreen)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి;
 
-    if (!SetConsoleScreenBufferSize(hConsole, coordScreen))
+    ఒకవేళ (!సమితి_Console_Screen_బఫరు_కొలత(hConsole, coordScreen))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ఒకవేళ (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleScreenBufferSize failed: %lx\n",
-		    GetLastError());
+		    Get_చివరి_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4618,18 +4618,18 @@ ResizeConBuf(
 /*
  * Resize console window size to 'srWindowRect'
  */
-    static void
-ResizeWindow(
+    స్థిర శూన్య
+Resize_కిటికీ(
     HANDLE     hConsole,
-    SMALL_RECT srWindowRect)
+    SMALL_RECT sr_కిటికీ_Rect)
 {
-    if (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
+    ఒకవేళ (!సమితి_Console_కిటికీ_Info(hConsole, TRUE, &sr_కిటికీ_Rect))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ఒకవేళ (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleWindowInfo failed: %lx\n",
-		    GetLastError());
+		    Get_చివరి_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4639,77 +4639,77 @@ ResizeWindow(
 /*
  * Set a console window to `xSize' * `ySize'
  */
-    static void
-ResizeConBufAndWindow(
+    స్థిర శూన్య
+Resize_Con_Buf_And_కిటికీ(
     HANDLE  hConsole,
-    int	    xSize,
-    int	    ySize)
+    పూర్ణాంకం	    x_కొలత,
+    పూర్ణాంకం	    y_కొలత_2)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;	// hold current console buffer info
-    SMALL_RECT	    srWindowRect;	// hold the new console size
+    CONSOLE_SCREEN_బఫరు_INFO csbi;	// hold current console buffer info
+    SMALL_RECT	    sr_కిటికీ_Rect;	// hold the new console size
     COORD	    coordScreen;
     COORD	    cursor;
-    static int	    resized = FALSE;
+    స్థిర పూర్ణాంకం	    resized = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ఒకవేళ (fdDump)
     {
-	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", xSize, ySize);
+	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", x_కొలత, y_కొలత_2);
 	fflush(fdDump);
     }
 # endif
 
     // get the largest size we can size the console window to
-    coordScreen = GetLargestConsoleWindowSize(hConsole);
+    coordScreen = Get_అతిపెద్ద_Console_కిటికీ_కొలత(hConsole);
 
     // define the new console window size and scroll position
-    srWindowRect.Left = srWindowRect.Top = (SHORT) 0;
-    srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
-    srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
+    sr_కిటికీ_Rect.ఎడమ_4 = sr_కిటికీ_Rect.శిఖరం_2 = (SHORT) 0;
+    sr_కిటికీ_Rect.కుడి_4 =  (SHORT) (min(x_కొలత, coordScreen.X) - 1);
+    sr_కిటికీ_Rect.Bottom = (SHORT) (min(y_కొలత_2, coordScreen.Y) - 1);
 
-    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    ఒకవేళ (Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
     {
-	int sx, sy;
+	పూర్ణాంకం sx, sy;
 
-	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	if (sy < ySize || sx < xSize)
+	sx = csbi.sr_కిటికీ.కుడి_4 - csbi.sr_కిటికీ.ఎడమ_4 + 1;
+	sy = csbi.sr_కిటికీ.Bottom - csbi.sr_కిటికీ.శిఖరం_2 + 1;
+	ఒకవేళ (sy < y_కొలత_2 || sx < x_కొలత)
 	{
 	    /*
 	     * Increasing number of lines/columns, do buffer first.
 	     * Use the maximal size in x and y direction.
 	     */
-	    if (sy < ySize)
-		coordScreen.Y = ySize;
-	    else
+	    ఒకవేళ (sy < y_కొలత_2)
+		coordScreen.Y = y_కొలత_2;
+	    లేకపోతే
 		coordScreen.Y = sy;
-	    if (sx < xSize)
-		coordScreen.X = xSize;
-	    else
+	    ఒకవేళ (sx < x_కొలత)
+		coordScreen.X = x_కొలత;
+	    లేకపోతే
 		coordScreen.X = sx;
-	    SetConsoleScreenBufferSize(hConsole, coordScreen);
+	    సమితి_Console_Screen_బఫరు_కొలత(hConsole, coordScreen);
 	}
     }
 
     // define the new console buffer size
-    coordScreen.X = xSize;
-    coordScreen.Y = ySize;
+    coordScreen.X = x_కొలత;
+    coordScreen.Y = y_కొలత_2;
 
     // In the new console call API, only the first time in reverse order
-    if (!vtp_working || resized)
+    ఒకవేళ (!vtp_working || resized)
     {
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_కిటికీ(hConsole, sr_కిటికీ_Rect);
 	ResizeConBuf(hConsole, coordScreen);
     }
-    else
+    లేకపోతే
     {
 	// Workaround for a Windows 10 bug
-	cursor.X = srWindowRect.Left;
-	cursor.Y = srWindowRect.Top;
-	SetConsoleCursorPosition(hConsole, cursor);
+	cursor.X = sr_కిటికీ_Rect.ఎడమ_4;
+	cursor.Y = sr_కిటికీ_Rect.శిఖరం_2;
+	సమితి_Console_Cursor_Position(hConsole, cursor);
 
 	ResizeConBuf(hConsole, coordScreen);
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_కిటికీ(hConsole, sr_కిటికీ_Rect);
 	resized = TRUE;
     }
 }
@@ -4718,136 +4718,136 @@ ResizeConBufAndWindow(
 /*
  * Set the console window to `Rows' * `Columns'
  */
-    void
-mch_set_shellsize(void)
+    శూన్య
+mch_సమితి_shellsize(శూన్య)
 {
     COORD coordScreen;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
     // Don't change window size while still starting up
-    if (suppress_winsize != 0)
+    ఒకవేళ (suppress_winsize != 0)
     {
 	suppress_winsize = 2;
-	return;
+	తిరిగి;
     }
 
-    if (term_console)
+    ఒకవేళ (పదం_console)
     {
-	coordScreen = GetLargestConsoleWindowSize(g_hConOut);
+	coordScreen = Get_అతిపెద్ద_Console_కిటికీ_కొలత(g_h_Con_బహిర్గతం);
 
 	// Clamp Rows and Columns to reasonable values
-	if (Rows > coordScreen.Y)
-	    Rows = coordScreen.Y;
-	if (Columns > coordScreen.X)
+	ఒకవేళ (అడ్డువరుసలు > coordScreen.Y)
+	    అడ్డువరుసలు = coordScreen.Y;
+	ఒకవేళ (Columns > coordScreen.X)
 	    Columns = coordScreen.X;
 
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Resize_Con_Buf_And_కిటికీ(g_h_Con_బహిర్గతం, Columns, అడ్డువరుసలు);
     }
 }
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    శూన్య
+mch_new_shellsize(శూన్య)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
-    set_scroll_region(0, 0, Columns - 1, Rows - 1);
+    సమితి_scroll_region(0, 0, Columns - 1, అడ్డువరుసలు - 1);
 }
 
 
 /*
  * Called when started up, to set the winsize that was delayed.
  */
-    void
-mch_set_winsize_now(void)
+    శూన్య
+mch_సమితి_winsize_now(శూన్య)
 {
-    if (suppress_winsize == 2)
+    ఒకవేళ (suppress_winsize == 2)
     {
 	suppress_winsize = 0;
-	mch_set_shellsize();
+	mch_సమితి_shellsize();
 	shell_resized();
     }
     suppress_winsize = 0;
 }
 
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
 /*
  * Try to get the current terminal cell size in pixels.
  */
-    void
-mch_calc_cell_size(struct cellsize *cs_out)
+    శూన్య
+mch_calc_cell_కొలత(నిర్మాణం cellsize *cs_బహిర్గతం)
 {
     CONSOLE_FONT_INFOEX cfi;
     DWORD cmodeold;
     DWORD cmodein;
 
-    cs_out->cs_xpixel = -1;
-    cs_out->cs_ypixel = -1;
+    cs_బహిర్గతం->cs_xpixel = -1;
+    cs_బహిర్గతం->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
-	return;
+    ఒకవేళ (g_h_Con_బహిర్గతం == INVALID_HANDLE_విలువ)
+	తిరిగి;
 
-    cfi.cbSize = sizeof(cfi);
-    if (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
-	    && cfi.dwFontSize.X > 0 && cfi.dwFontSize.Y > 0)
+    cfi.cb_కొలత = పరిమాణం(cfi);
+    ఒకవేళ (GetCurrentConsoleFontEx(g_h_Con_బహిర్గతం, FALSE, &cfi)
+	    && cfi.dw_Font_కొలత.X > 0 && cfi.dw_Font_కొలత.Y > 0)
     {
-	cs_out->cs_xpixel = cfi.dwFontSize.X;
-	cs_out->cs_ypixel = cfi.dwFontSize.Y;
-	return;
+	cs_బహిర్గతం->cs_xpixel = cfi.dw_Font_కొలత.X;
+	cs_బహిర్గతం->cs_ypixel = cfi.dw_Font_కొలత.Y;
+	తిరిగి;
     }
 
-    GetConsoleMode(g_hConIn, &cmodein);
+    Get_Console_బహుళకం(g_h_Con_లోపల, &cmodein);
     cmodeold = cmodein;
-    cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-	    | ENABLE_PROCESSED_INPUT);
-    cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    cmodein &= ~(ENABLE_పంక్తి_ఆదానం | ENABLE_ECHO_ఆదానం
+	    | ENABLE_PROCESSED_ఆదానం);
+    cmodein |= ENABLE_VIRTUAL_TERMINAL_ఆదానం;
 
-    if (SetConsoleMode(g_hConIn, cmodein))
+    ఒకవేళ (సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodein))
     {
 	// We will receive the window dimensions later
 	vtp_printf("\033[14t");
-	SetConsoleMode(g_hConIn, cmodeold);
+	సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodeold);
     }
 }
 # endif
 
-#endif
+#అయితే_ముగింపు
 
-    static BOOL
+    స్థిర BOOL
 vim_create_process(
-    char		*cmd,
+    అక్షరం		*cmd,
     BOOL		inherit_handles,
     DWORD		flags,
     STARTUPINFO		*si,
     PROCESS_INFORMATION *pi,
     LPVOID		*env,
-    char		*cwd)
+    అక్షరం		*cwd)
 {
     BOOL	ret = FALSE;
-    WCHAR	*wcmd, *wcwd = NULL;
+    WCHAR	*wcmd, *wcwd = ఖాళీ;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return FALSE;
-    if (cwd != NULL)
+    wcmd = enc_గమ్యం_utf16((char_u *)cmd, ఖాళీ);
+    ఒకవేళ (wcmd == ఖాళీ)
+	తిరిగి FALSE;
+    ఒకవేళ (cwd != ఖాళీ)
     {
-	wcwd = enc_to_utf16((char_u *)cwd, NULL);
-	if (wcwd == NULL)
-	    goto theend;
+	wcwd = enc_గమ్యం_utf16((char_u *)cwd, ఖాళీ);
+	ఒకవేళ (wcwd == ఖాళీ)
+	    వెళ్ళు theend;
     }
 
     ret = CreateProcessW(
-	    NULL,		// Executable name
+	    ఖాళీ,		// Executable name
 	    wcmd,		// Command to execute
-	    NULL,		// Process security attributes
-	    NULL,		// Thread security attributes
+	    ఖాళీ,		// Process security attributes
+	    ఖాళీ,		// Thread security attributes
 	    inherit_handles,	// Inherit handles
 	    flags,		// Creation flags
 	    env,		// Environment
@@ -4857,29 +4857,29 @@ vim_create_process(
 theend:
     vim_free(wcmd);
     vim_free(wcwd);
-    return ret;
+    తిరిగి ret;
 }
 
 
-    static HINSTANCE
+    స్థిర HINSTANCE
 vim_shell_execute(
-    char *cmd,
+    అక్షరం *cmd,
     INT	 n_show_cmd)
 {
     HINSTANCE	ret;
     WCHAR	*wcmd;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return (HINSTANCE) 0;
+    wcmd = enc_గమ్యం_utf16((char_u *)cmd, ఖాళీ);
+    ఒకవేళ (wcmd == ఖాళీ)
+	తిరిగి (HINSTANCE) 0;
 
-    ret = ShellExecuteW(NULL, NULL, wcmd, NULL, NULL, n_show_cmd);
+    ret = ShellExecuteW(ఖాళీ, ఖాళీ, wcmd, ఖాళీ, ఖాళీ, n_show_cmd);
     vim_free(wcmd);
-    return ret;
+    తిరిగి ret;
 }
 
 
-#if defined(FEAT_GUI_MSWIN)
+#ఒకవేళ defined(FEAT_GUI_MSWIN)
 
 /*
  * Specialised version of system() for Win32 GUI mode.
@@ -4889,63 +4889,63 @@ vim_shell_execute(
  *    3. Wait for the subprocess to terminate and get its exit code
  *    4. Prompt the user to press a key to close the console window
  */
-    static int
-mch_system_classic(char *cmd, int options)
+    స్థిర పూర్ణాంకం
+mch_system_classic(అక్షరం *cmd, పూర్ణాంకం options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
     HWND		hwnd = GetFocus();
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = పరిమాణం(si);
+    si.lpReserved = ఖాళీ;
+    si.lpDesktop = ఖాళీ;
+    si.lpTitle = ఖాళీ;
     si.dwFlags = STARTF_USESHOWWINDOW;
     /*
      * It's nicer to run a filter command in a minimized window.
      * Don't activate the window to keep focus on Vim.
      */
-    if (options & SHELL_DOOUT)
-	si.wShowWindow = SW_SHOWMINNOACTIVE;
-    else
-	si.wShowWindow = SW_SHOWNORMAL;
+    ఒకవేళ (options & SHELL_DOOUT)
+	si.w_Show_కిటికీ = SW_SHOWMINNOACTIVE;
+    లేకపోతే
+	si.w_Show_కిటికీ = SW_SHOWNORMAL;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = ఖాళీ;
 
     // Now, run the command
     vim_create_process(cmd, FALSE,
-	    CREATE_DEFAULT_ERROR_MODE |	CREATE_NEW_CONSOLE,
-	    &si, &pi, NULL, NULL);
+	    CREATE_DEFAULT_ERROR_బహుళకం |	CREATE_NEW_CONSOLE,
+	    &si, &pi, ఖాళీ, ఖాళీ);
 
     // Wait for the command to terminate before continuing
     {
-	int	    delay = 1;
+	పూర్ణాంకం	    delay = 1;
 
 	// Keep updating the window while waiting for the shell to finish.
-	for (;;)
+	కొరకు (;;)
 	{
-	    MSG	msg;
+	    సందేశం_3	సందేశం;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    ఒకవేళ (Peek_సందేశం_W(&సందేశం, (HWND)ఖాళీ, 0, 0, PM_REMOVE))
 	    {
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		Translate_సందేశం(&సందేశం);
+		Dispatch_సందేశం_W(&సందేశం);
 		delay = 1;
-		continue;
+		కొనసాగు;
 	    }
-	    if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
-		break;
+	    ఒకవేళ (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+		ఆపు;
 
 	    // We start waiting for a very short time and then increase it, so
 	    // that we respond quickly when the process is quick, and don't
 	    // consume too much overhead when it's slow.
-	    if (delay < 50)
+	    ఒకవేళ (delay < 50)
 		delay += 10;
 	}
 
 	// Get the command exit code
-	GetExitCodeProcess(pi.hProcess, &ret);
+	Get_Exit_సంకేతం_Process(pi.hProcess, &ret);
     }
 
     // Close the handles to the subprocess, so that it goes away
@@ -4953,13 +4953,13 @@ mch_system_classic(char *cmd, int options)
     CloseHandle(pi.hProcess);
 
     // Try to get input focus back.  Doesn't always work though.
-    PostMessage(hwnd, WM_SETFOCUS, 0, 0);
+    Post_సందేశం(hwnd, WM_SETFOCUS, 0, 0);
     // To increase the chances that WM_SETFOCUS will work, run the message loop
     // here.  In addition, it prevents problems caused by delayed WM_SETFOCUS
     // processing.
     gui_mch_update();
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -4967,63 +4967,63 @@ mch_system_classic(char *cmd, int options)
  * process. This way avoid to hang up vim totally if the children
  * process take a long time to process the lines.
  */
-    static unsigned int __stdcall
+    స్థిర గుర్తులేని పూర్ణాంకం __stdcall
 sub_process_writer(LPVOID param)
 {
-    HANDLE	    g_hChildStd_IN_Wr = param;
-    linenr_T	    lnum = curbuf->b_op_start.lnum;
+    HANDLE	    g_h_బిడ్డ_Std_లోపల_Wr = param;
+    linenr_T	    lnum = curbuf->b_op_ప్రారంభం.lnum;
     DWORD	    len = 0;
     DWORD	    l;
     char_u	    *lp = ml_get(lnum);
     char_u	    *s;
-    int		    written = 0;
+    పూర్ణాంకం		    written = 0;
 
-    for (;;)
+    కొరకు (;;)
     {
 	l = (DWORD)STRLEN(lp + written);
-	if (l == 0)
+	ఒకవేళ (l == 0)
 	    len = 0;
-	else if (lp[written] == NL)
+	లేకపోతే ఒకవేళ (lp[written] == NL)
 	{
 	    // NL -> NUL translation
-	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, NULL);
+	    WriteFile(g_h_బిడ్డ_Std_లోపల_Wr, "", 1, &len, ఖాళీ);
 	}
-	else
+	లేకపోతే
 	{
 	    s = vim_strchr(lp + written, NL);
-	    WriteFile(g_hChildStd_IN_Wr, (char *)lp + written,
-		      s == NULL ? l : (DWORD)(s - (lp + written)),
-		      &len, NULL);
+	    WriteFile(g_h_బిడ్డ_Std_లోపల_Wr, (అక్షరం *)lp + written,
+		      s == ఖాళీ ? l : (DWORD)(s - (lp + written)),
+		      &len, ఖాళీ);
 	}
-	if (len == l)
+	ఒకవేళ (len == l)
 	{
 	    // Finished a line, add a NL, unless this line should not have
 	    // one.
-	    if (lnum != curbuf->b_op_end.lnum
+	    ఒకవేళ (lnum != curbuf->b_op_చివర.lnum
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
-		    && (lnum != curbuf->b_ml.ml_line_count
+		    && (lnum != curbuf->b_ml.ml_పంక్తి_లెక్క
 			|| curbuf->b_p_eol)))
 	    {
-		WriteFile(g_hChildStd_IN_Wr, "\n", 1,
-						  (LPDWORD)&vim_ignored, NULL);
+		WriteFile(g_h_బిడ్డ_Std_లోపల_Wr, "\n", 1,
+						  (LPDWORD)&vim_ignored, ఖాళీ);
 	    }
 
 	    ++lnum;
-	    if (lnum > curbuf->b_op_end.lnum)
-		break;
+	    ఒకవేళ (lnum > curbuf->b_op_చివర.lnum)
+		ఆపు;
 
 	    lp = ml_get(lnum);
 	    written = 0;
 	}
-	else if (len > 0)
+	లేకపోతే ఒకవేళ (len > 0)
 	    written += len;
     }
 
     // finished all the lines, close pipe
-    CloseHandle(g_hChildStd_IN_Wr);
-    return 0;
+    CloseHandle(g_h_బిడ్డ_Std_లోపల_Wr);
+    తిరిగి 0;
 }
 
 
@@ -5033,107 +5033,107 @@ sub_process_writer(LPVOID param)
  * This function read from the children's stdout and write the
  * data on screen or in the buffer accordingly.
  */
-    static void
-dump_pipe(int	    options,
-	  HANDLE    g_hChildStd_OUT_Rd,
+    స్థిర శూన్య
+dump_pipe(పూర్ణాంకం	    options,
+	  HANDLE    g_h_బిడ్డ_Std_బహిర్గతం_Rd,
 	  garray_T  *ga,
-	  char_u    buffer[],
-	  DWORD	    *buffer_off)
+	  char_u    బఫరు[],
+	  DWORD	    *బఫరు_off)
 {
-    DWORD	availableBytes = 0;
+    DWORD	అందుబాటు_బైట్లు = 0;
     DWORD	i;
-    int		ret;
+    పూర్ణాంకం		ret;
     DWORD	len;
-    DWORD	toRead;
+    DWORD	గమ్యం_Read;
 
     // we query the pipe to see if there is any data to read
     // to avoid to perform a blocking read
-    ret = PeekNamedPipe(g_hChildStd_OUT_Rd, // pipe to query
-			NULL,		    // optional buffer
+    ret = PeekNamedPipe(g_h_బిడ్డ_Std_బహిర్గతం_Rd, // pipe to query
+			ఖాళీ,		    // optional buffer
 			0,		    // buffer size
-			NULL,		    // number of read bytes
-			&availableBytes,    // available bytes total
-			NULL);		    // byteLeft
+			ఖాళీ,		    // number of read bytes
+			&అందుబాటు_బైట్లు,    // available bytes total
+			ఖాళీ);		    // byteLeft
 
     // We got real data in the pipe, read it
-    while (ret != 0 && availableBytes > 0)
+    అయితే (ret != 0 && అందుబాటు_బైట్లు > 0)
     {
-	toRead = (DWORD)(BUFLEN - *buffer_off);
-	toRead = availableBytes < toRead ? availableBytes : toRead;
-	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, NULL);
+	గమ్యం_Read = (DWORD)(BUFLEN - *బఫరు_off);
+	గమ్యం_Read = అందుబాటు_బైట్లు < గమ్యం_Read ? అందుబాటు_బైట్లు : గమ్యం_Read;
+	ReadFile(g_h_బిడ్డ_Std_బహిర్గతం_Rd, బఫరు + *బఫరు_off, గమ్యం_Read , &len, ఖాళీ);
 
 	// If we haven't read anything, there is a problem
-	if (len == 0)
-	    break;
+	ఒకవేళ (len == 0)
+	    ఆపు;
 
-	availableBytes -= len;
+	అందుబాటు_బైట్లు -= len;
 
-	if (options & SHELL_READ)
+	ఒకవేళ (options & SHELL_READ)
 	{
 	    // Do NUL -> NL translation, append NL separated
 	    // lines to the current buffer.
-	    for (i = 0; i < len; ++i)
+	    కొరకు (i = 0; i < len; ++i)
 	    {
-		if (buffer[i] == NL)
-		    append_ga_line(ga);
-		else if (buffer[i] == NUL)
+		ఒకవేళ (బఫరు[i] == NL)
+		    append_ga_పంక్తి(ga);
+		లేకపోతే ఒకవేళ (బఫరు[i] == NUL)
 		    ga_append(ga, NL);
-		else
-		    ga_append(ga, buffer[i]);
+		లేకపోతే
+		    ga_append(ga, బఫరు[i]);
 	    }
 	}
-	else if (has_mbyte)
+	లేకపోతే ఒకవేళ (has_mbyte)
 	{
-	    int		l;
-	    int		c;
+	    పూర్ణాంకం		l;
+	    పూర్ణాంకం		c;
 	    char_u	*p;
 
-	    len += *buffer_off;
-	    buffer[len] = NUL;
+	    len += *బఫరు_off;
+	    బఫరు[len] = NUL;
 
 	    // Check if the last character in buffer[] is
 	    // incomplete, keep these bytes for the next
 	    // round.
-	    for (p = buffer; p < buffer + len; p += l)
+	    కొరకు (p = బఫరు; p < బఫరు + len; p += l)
 	    {
 		l = MB_CPTR2LEN(p);
-		if (l == 0)
+		ఒకవేళ (l == 0)
 		    l = 1;  // NUL byte?
-		else if (MB_BYTE2LEN(*p) != l)
-		    break;
+		లేకపోతే ఒకవేళ (MB_BYTE2LEN(*p) != l)
+		    ఆపు;
 	    }
-	    if (p == buffer)	// no complete character
+	    ఒకవేళ (p == బఫరు)	// no complete character
 	    {
 		// avoid getting stuck at an illegal byte
-		if (len >= 12)
+		ఒకవేళ (len >= 12)
 		    ++p;
-		else
+		లేకపోతే
 		{
-		    *buffer_off = len;
-		    return;
+		    *బఫరు_off = len;
+		    తిరిగి;
 		}
 	    }
 	    c = *p;
 	    *p = NUL;
-	    msg_puts((char *)buffer);
-	    if (p < buffer + len)
+	    సందేశం_puts((అక్షరం *)బఫరు);
+	    ఒకవేళ (p < బఫరు + len)
 	    {
 		*p = c;
-		*buffer_off = (DWORD)((buffer + len) - p);
-		mch_memmove(buffer, p, *buffer_off);
-		return;
+		*బఫరు_off = (DWORD)((బఫరు + len) - p);
+		mch_memmove(బఫరు, p, *బఫరు_off);
+		తిరిగి;
 	    }
-	    *buffer_off = 0;
+	    *బఫరు_off = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    buffer[len] = NUL;
-	    msg_puts((char *)buffer);
+	    బఫరు[len] = NUL;
+	    సందేశం_puts((అక్షరం *)బఫరు);
 	}
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
 	cursor_on();
-	out_flush();
+	బహిర్గతం_flush();
     }
 }
 
@@ -5141,77 +5141,77 @@ dump_pipe(int	    options,
  * Version of system to use for windows NT > 5.0 (Win2K), use pipe
  * for communication and doesn't open any new window.
  */
-    static int
-mch_system_piped(char *cmd, int options)
+    స్థిర పూర్ణాంకం
+mch_system_piped(అక్షరం *cmd, పూర్ణాంకం options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
 
-    HANDLE g_hChildStd_IN_Rd = NULL;
-    HANDLE g_hChildStd_IN_Wr = NULL;
-    HANDLE g_hChildStd_OUT_Rd = NULL;
-    HANDLE g_hChildStd_OUT_Wr = NULL;
+    HANDLE g_h_బిడ్డ_Std_లోపల_Rd = ఖాళీ;
+    HANDLE g_h_బిడ్డ_Std_లోపల_Wr = ఖాళీ;
+    HANDLE g_h_బిడ్డ_Std_బహిర్గతం_Rd = ఖాళీ;
+    HANDLE g_h_బిడ్డ_Std_బహిర్గతం_Wr = ఖాళీ;
 
-    char_u	buffer[BUFLEN + 1]; // reading buffer + size
+    char_u	బఫరు[BUFLEN + 1]; // reading buffer + size
     DWORD	len;
 
     // buffer used to receive keys
     char_u	ta_buf[BUFLEN + 1];	// TypeAHead
-    int		ta_len = 0;		// valid bytes in ta_buf[]
+    పూర్ణాంకం		ta_len = 0;		// valid bytes in ta_buf[]
 
     DWORD	i;
-    int		noread_cnt = 0;
+    పూర్ణాంకం		noread_cnt = 0;
     garray_T	ga;
-    int		delay = 1;
-    DWORD	buffer_off = 0;	// valid bytes in buffer[]
-    char	*p = NULL;
+    పూర్ణాంకం		delay = 1;
+    DWORD	బఫరు_off = 0;	// valid bytes in buffer[]
+    అక్షరం	*p = ఖాళీ;
 
-    SECURITY_ATTRIBUTES saAttr;
+    SECURITY_లక్షణాలు saAttr;
 
     // Set the bInheritHandle flag so pipe handles are inherited.
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_నిడివి = పరిమాణం(SECURITY_లక్షణాలు);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ఖాళీ;
 
-    if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
+    ఒకవేళ ( ! CreatePipe(&g_h_బిడ్డ_Std_బహిర్గతం_Rd, &g_h_బిడ్డ_Std_బహిర్గతం_Wr, &saAttr, 0)
 	// Ensure the read handle to the pipe for STDOUT is not inherited.
-       || ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)
+       || ! సమితి_Handle_Information(g_h_బిడ్డ_Std_బహిర్గతం_Rd, HANDLE_FLAG_INHERIT, 0)
 	// Create a pipe for the child process's STDIN.
-       || ! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)
+       || ! CreatePipe(&g_h_బిడ్డ_Std_లోపల_Rd, &g_h_బిడ్డ_Std_లోపల_Wr, &saAttr, 0)
 	// Ensure the write handle to the pipe for STDIN is not inherited.
-       || ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
+       || ! సమితి_Handle_Information(g_h_బిడ్డ_Std_లోపల_Wr, HANDLE_FLAG_INHERIT, 0) )
     {
-	CloseHandle(g_hChildStd_IN_Rd);
-	CloseHandle(g_hChildStd_IN_Wr);
-	CloseHandle(g_hChildStd_OUT_Rd);
-	CloseHandle(g_hChildStd_OUT_Wr);
-	msg_puts(_("\nCannot create pipes\n"));
+	CloseHandle(g_h_బిడ్డ_Std_లోపల_Rd);
+	CloseHandle(g_h_బిడ్డ_Std_లోపల_Wr);
+	CloseHandle(g_h_బిడ్డ_Std_బహిర్గతం_Rd);
+	CloseHandle(g_h_బిడ్డ_Std_బహిర్గతం_Wr);
+	సందేశం_puts(_("\nCannot create pipes\n"));
     }
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = పరిమాణం(si);
+    si.lpReserved = ఖాళీ;
+    si.lpDesktop = ఖాళీ;
+    si.lpTitle = ఖాళీ;
     si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
     // set-up our file redirection
-    si.hStdError = g_hChildStd_OUT_Wr;
-    si.hStdOutput = g_hChildStd_OUT_Wr;
-    si.hStdInput = g_hChildStd_IN_Rd;
-    si.wShowWindow = SW_HIDE;
+    si.hStdError = g_h_బిడ్డ_Std_బహిర్గతం_Wr;
+    si.hStdOutput = g_h_బిడ్డ_Std_బహిర్గతం_Wr;
+    si.h_Std_ఆదానం = g_h_బిడ్డ_Std_లోపల_Rd;
+    si.w_Show_కిటికీ = SW_HIDE;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = ఖాళీ;
 
-    if (options & SHELL_READ)
+    ఒకవేళ (options & SHELL_READ)
 	ga_init2(&ga, 1, BUFLEN);
 
-    if (cmd != NULL)
+    ఒకవేళ (cmd != ఖాళీ)
     {
-	p = (char *)vim_strsave((char_u *)cmd);
-	if (p != NULL)
+	p = (అక్షరం *)vim_strsave((char_u *)cmd);
+	ఒకవేళ (p != ఖాళీ)
 	    unescape_shellxquote((char_u *)p, p_sxe);
-	else
+	లేకపోతే
 	    p = cmd;
     }
 
@@ -5219,73 +5219,73 @@ mch_system_piped(char *cmd, int options)
     // About "Inherit handles" being TRUE: this command can be litigious,
     // handle inheritance was deactivated for pending temp file, but, if we
     // deactivate it, the pipes don't work for some reason.
-    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_MODE,
-						&si, &pi, NULL, NULL);
+    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_బహుళకం,
+						&si, &pi, ఖాళీ, ఖాళీ);
 
-    if (p != cmd)
+    ఒకవేళ (p != cmd)
 	vim_free(p);
 
     // Close our unused side of the pipes
-    CloseHandle(g_hChildStd_IN_Rd);
-    CloseHandle(g_hChildStd_OUT_Wr);
+    CloseHandle(g_h_బిడ్డ_Std_లోపల_Rd);
+    CloseHandle(g_h_బిడ్డ_Std_బహిర్గతం_Wr);
 
-    if (options & SHELL_WRITE)
+    ఒకవేళ (options & SHELL_WRITE)
     {
 	HANDLE thread = (HANDLE)
-	 _beginthreadex(NULL,  // security attributes
+	 _beginthreadex(ఖాళీ,  // security attributes
 			0,     // default stack size
 			sub_process_writer, // function to be executed
-			g_hChildStd_IN_Wr,  // parameter
+			g_h_బిడ్డ_Std_లోపల_Wr,  // parameter
 			0,		 // creation flag, start immediately
-			NULL);		    // we don't care about thread id
+			ఖాళీ);		    // we don't care about thread id
 	CloseHandle(thread);
-	g_hChildStd_IN_Wr = NULL;
+	g_h_బిడ్డ_Std_లోపల_Wr = ఖాళీ;
     }
 
     // Keep updating the window while waiting for the shell to finish.
-    for (;;)
+    కొరకు (;;)
     {
-	MSG	msg;
+	సందేశం_3	సందేశం;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	ఒకవేళ (Peek_సందేశం_W(&సందేశం, (HWND)ఖాళీ, 0, 0, PM_REMOVE))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_సందేశం(&సందేశం);
+	    Dispatch_సందేశం_W(&సందేశం);
 	}
 
 	// write pipe information in the window
-	if ((options & (SHELL_READ|SHELL_WRITE))
+	ఒకవేళ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		|| gui.in_use
+		|| gui.లోపల_use
 # endif
 	    )
 	{
 	    len = 0;
-	    if (((options &
+	    ఒకవేళ (((options &
 			(SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 		    != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
-		    || gui.in_use
+		    || gui.లోపల_use
 # endif
 		    )
 		&& (ta_len > 0 || noread_cnt > 4))
 	    {
-		if (ta_len == 0)
+		ఒకవేళ (ta_len == 0)
 		{
 		    // Get extra characters when we don't have any.  Reset the
 		    // counter and timer.
 		    noread_cnt = 0;
 		    len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		}
-		if (ta_len > 0 || len > 0)
+		ఒకవేళ (ta_len > 0 || len > 0)
 		{
 		    /*
 		     * For pipes: Check for CTRL-C: send interrupt signal to
 		     * child.
 		     */
-		    if (len == 1 && cmd != NULL)
+		    ఒకవేళ (len == 1 && cmd != ఖాళీ)
 		    {
-			if (ta_buf[ta_len] == Ctrl_C)
+			ఒకవేళ (ta_buf[ta_len] == Ctrl_C)
 			{
 			    // Learn what exit code is expected, for
 			// now put 9 as SIGKILL
@@ -5297,41 +5297,41 @@ mch_system_piped(char *cmd, int options)
 		     * Check for CTRL-D: EOF, close pipe to child.
 		     * Ctrl_D may be decorated by _OnChar()
 		     */
-		    if ((len == 1 || len == 4 ) && cmd != NULL)
+		    ఒకవేళ ((len == 1 || len == 4 ) && cmd != ఖాళీ)
 		    {
-			if (ta_buf[0] == Ctrl_D
+			ఒకవేళ (ta_buf[0] == Ctrl_D
 			    || (ta_buf[0] == CSI
 				&& ta_buf[1] == KS_MODIFIER
 				&& ta_buf[3] == Ctrl_D))
 			{
-			    CloseHandle(g_hChildStd_IN_Wr);
-			    g_hChildStd_IN_Wr = NULL;
+			    CloseHandle(g_h_బిడ్డ_Std_లోపల_Wr);
+			    g_h_బిడ్డ_Std_లోపల_Wr = ఖాళీ;
 			    len = 0;
 			}
 		    }
 
-		    len = term_replace_keycodes(ta_buf, ta_len, len);
+		    len = పదం_replace_keycodes(ta_buf, ta_len, len);
 
 		    /*
 		     * For pipes: echo the typed characters.  For a pty this
 		     * does not seem to work.
 		     */
-		    for (i = ta_len; i < ta_len + len; ++i)
+		    కొరకు (i = ta_len; i < ta_len + len; ++i)
 		    {
-			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-			    msg_putchar(ta_buf[i]);
-			else if (has_mbyte)
+			ఒకవేళ (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+			    సందేశం_putchar(ta_buf[i]);
+			లేకపోతే ఒకవేళ (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(ta_buf + i);
+			    పూర్ణాంకం l = (*mb_ptr2len)(ta_buf + i);
 
-			    msg_outtrans_len(ta_buf + i, l);
+			    సందేశం_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
-			else
-			    msg_outtrans_len(ta_buf + i, 1);
+			లేకపోతే
+			    సందేశం_outtrans_len(ta_buf + i, 1);
 		    }
-		    windgoto(msg_row, cmdline_col_off + msg_col);
-		    out_flush();
+		    windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
+		    బహిర్గతం_flush();
 
 		    ta_len += len;
 
@@ -5342,15 +5342,15 @@ mch_system_piped(char *cmd, int options)
 		     * lines, drop the typed characters (only check for
 		     * CTRL-C).
 		     */
-		    if (options & SHELL_WRITE)
+		    ఒకవేళ (options & SHELL_WRITE)
 			ta_len = 0;
-		    else if (g_hChildStd_IN_Wr != NULL)
+		    లేకపోతే ఒకవేళ (g_h_బిడ్డ_Std_లోపల_Wr != ఖాళీ)
 		    {
-			WriteFile(g_hChildStd_IN_Wr, (char*)ta_buf,
-				    1, &len, NULL);
+			WriteFile(g_h_బిడ్డ_Std_లోపల_Wr, (అక్షరం*)ta_buf,
+				    1, &len, ఖాళీ);
 			// if we are typing in, we want to keep things reactive
 			delay = 1;
-			if (len > 0)
+			ఒకవేళ (len > 0)
 			{
 			    ta_len -= len;
 			    mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5360,44 +5360,44 @@ mch_system_piped(char *cmd, int options)
 	    }
 	}
 
-	if (ta_len)
+	ఒకవేళ (ta_len)
 	    ui_inchar_undo(ta_buf, ta_len);
 
-	if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	ఒకవేళ (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 	{
-	    dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
-	    break;
+	    dump_pipe(options, g_h_బిడ్డ_Std_బహిర్గతం_Rd, &ga, బఫరు, &బఫరు_off);
+	    ఆపు;
 	}
 
 	++noread_cnt;
-	dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
+	dump_pipe(options, g_h_బిడ్డ_Std_బహిర్గతం_Rd, &ga, బఫరు, &బఫరు_off);
 
 	// We start waiting for a very short time and then increase it, so
 	// that we respond quickly when the process is quick, and don't
 	// consume too much overhead when it's slow.
-	if (delay < 50)
+	ఒకవేళ (delay < 50)
 	    delay += 10;
     }
 
     // Close the pipe
-    CloseHandle(g_hChildStd_OUT_Rd);
-    if (g_hChildStd_IN_Wr != NULL)
-	CloseHandle(g_hChildStd_IN_Wr);
+    CloseHandle(g_h_బిడ్డ_Std_బహిర్గతం_Rd);
+    ఒకవేళ (g_h_బిడ్డ_Std_లోపల_Wr != ఖాళీ)
+	CloseHandle(g_h_బిడ్డ_Std_లోపల_Wr);
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     // Get the command exit code
-    GetExitCodeProcess(pi.hProcess, &ret);
+    Get_Exit_సంకేతం_Process(pi.hProcess, &ret);
 
-    if (options & SHELL_READ)
+    ఒకవేళ (options & SHELL_READ)
     {
-	if (ga.ga_len > 0)
+	ఒకవేళ (ga.ga_len > 0)
 	{
-	    append_ga_line(&ga);
+	    append_ga_పంక్తి(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
-	else
+	లేకపోతే
 	    curbuf->b_no_eol_lnum = 0;
 	ga_clear(&ga);
     }
@@ -5406,25 +5406,25 @@ mch_system_piped(char *cmd, int options)
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static int
-mch_system_g(char *cmd, int options)
+    స్థిర పూర్ణాంకం
+mch_system_g(అక్షరం *cmd, పూర్ణాంకం options)
 {
     // if we can pipe and the shelltemp option is off
-    if (!p_stmp)
-	return mch_system_piped(cmd, options);
-    else
-	return mch_system_classic(cmd, options);
+    ఒకవేళ (!p_stmp)
+	తిరిగి mch_system_piped(cmd, options);
+    లేకపోతే
+	తిరిగి mch_system_classic(cmd, options);
 }
-#endif
+#అయితే_ముగింపు
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static int
-mch_system_c(char *cmd, int options UNUSED)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    స్థిర పూర్ణాంకం
+mch_system_c(అక్షరం *cmd, పూర్ణాంకం options వాడని)
 {
-    int		ret;
+    పూర్ణాంకం		ret;
     WCHAR	*wcmd;
     char_u	*buf;
     size_t	len;
@@ -5432,142 +5432,142 @@ mch_system_c(char *cmd, int options UNUSED)
     // If the command starts and ends with double quotes, enclose the command
     // in parentheses.
     len = STRLEN(cmd);
-    if (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
+    ఒకవేళ (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
     {
 	len += 3;
 	buf = alloc(len);
-	if (buf == NULL)
-	    return -1;
-	vim_snprintf((char *)buf, len, "(%s)", cmd);
-	wcmd = enc_to_utf16(buf, NULL);
-	free(buf);
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి -1;
+	vim_snprintf((అక్షరం *)buf, len, "(%s)", cmd);
+	wcmd = enc_గమ్యం_utf16(buf, ఖాళీ);
+	విడుదల(buf);
     }
-    else
-	wcmd = enc_to_utf16((char_u *)cmd, NULL);
+    లేకపోతే
+	wcmd = enc_గమ్యం_utf16((char_u *)cmd, ఖాళీ);
 
-    if (wcmd == NULL)
-	return -1;
+    ఒకవేళ (wcmd == ఖాళీ)
+	తిరిగి -1;
 
     ret = _wsystem(wcmd);
     vim_free(wcmd);
-    return ret;
+    తిరిగి ret;
 }
 
-#endif
+#అయితే_ముగింపు
 
-    static int
-mch_system(char *cmd, int options)
+    స్థిర పూర్ణాంకం
+mch_system(అక్షరం *cmd, పూర్ణాంకం options)
 {
-#ifdef VIMDLL
-    if (gui.in_use || gui.starting)
-	return mch_system_g(cmd, options);
-    else
-	return mch_system_c(cmd, options);
-#elif defined(FEAT_GUI_MSWIN)
-    return mch_system_g(cmd, options);
-#else
-    return mch_system_c(cmd, options);
-#endif
+#నిర్వచితమైతే VIMDLL
+    ఒకవేళ (gui.లోపల_use || gui.starting)
+	తిరిగి mch_system_g(cmd, options);
+    లేకపోతే
+	తిరిగి mch_system_c(cmd, options);
+#లేదావేళ defined(FEAT_GUI_MSWIN)
+    తిరిగి mch_system_g(cmd, options);
+#లేకపోతే
+    తిరిగి mch_system_c(cmd, options);
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    స్థిర పూర్ణాంకం
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    పూర్ణాంకం		options వాడని)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char_u	*newcmd = NULL;
+    char_u	*newcmd = ఖాళీ;
     typval_T	argvar[2];
     long_u	cmdlen;
-    int		retval = -1;
+    పూర్ణాంకం		retval = -1;
     buf_T	*buf;
-    job_T	*job;
+    పని_T	*పని;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (cmd == NULL)
+    ఒకవేళ (cmd == ఖాళీ)
 	cmdlen = STRLEN(p_sh) + 1;
-    else
+    లేకపోతే
 	cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
     newcmd = alloc(cmdlen);
-    if (newcmd == NULL)
-	return 255;
-    if (cmd == NULL)
+    ఒకవేళ (newcmd == ఖాళీ)
+	తిరిగి 255;
+    ఒకవేళ (cmd == ఖాళీ)
     {
 	STRCPY(newcmd, p_sh);
-	ch_log(NULL, "starting terminal to run a shell");
+	ch_log(ఖాళీ, "starting terminal to run a shell");
     }
-    else
+    లేకపోతే
     {
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
-	ch_log(NULL, "starting terminal for system command '%s'", cmd);
+	vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	ch_log(ఖాళీ, "starting terminal for system command '%s'", cmd);
     }
 
-    init_job_options(&opt);
+    init_పని_options(&opt);
 
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = newcmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    buf = term_start(argvar, NULL, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    buf = పదం_ప్రారంభం(argvar, ఖాళీ, &opt, పదం_ప్రారంభం_SYSTEM);
+    ఒకవేళ (buf == ఖాళీ)
     {
 	vim_free(newcmd);
-	return 255;
+	తిరిగి 255;
     }
 
-    job = term_getjob(buf->b_term);
-    ++job->jv_refcount;
+    పని = పదం_getjob(buf->b_పదం);
+    ++పని->jv_refcount;
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ఒకవేళ (curbuf == buf)
     {
 	// Only do this when a window was found for "buf".
 	clear_oparg(&oa);
-	while (term_use_loop())
+	అయితే (పదం_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    ఒకవేళ (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_చురుకైన)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
-		    normal_cmd(&oa, TRUE);
+		ఒకవేళ (terminal_loop(TRUE) == OK)
+		    సాధారణ_cmd(&oa, TRUE);
 	    }
-	    else
-		normal_cmd(&oa, TRUE);
+	    లేకపోతే
+		సాధారణ_cmd(&oa, TRUE);
 	}
-	retval = job->jv_exitval;
-	ch_log(NULL, "system command finished");
+	retval = పని->jv_exitval;
+	ch_log(ఖాళీ, "system command finished");
 
-	job_unref(job);
+	పని_unref(పని);
 
 	// restore curwin/curbuf and a few other things
 	aucmd_restbuf(&aco);
     }
 
     wait_return(TRUE);
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_బఫరు(DOBUF_WIPE, DOBUF_మొదటి, FORWARD, buf->b_fnum, TRUE);
 
     vim_free(newcmd);
-    return retval;
+    తిరిగి retval;
 }
-#endif
+#అయితే_ముగింపు
 /* Restore a previous environment variable value, or unset it if NULL.
  * 'must_free' indicates whether 'old_value' was allocated.
  */
-    static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+    స్థిర శూన్య
+restore_env_var(char_u *name, char_u *old_విలువ, పూర్ణాంకం must_free)
 {
-    if (old_value != NULL)
+    ఒకవేళ (old_విలువ != ఖాళీ)
     {
-	vim_setenv(name, old_value);
-	if (must_free)
-	    vim_free(old_value);
-	return;
+	vim_setenv(name, old_విలువ);
+	ఒకవేళ (must_free)
+	    vim_free(old_విలువ);
+	తిరిగి;
     }
     vim_unsetenv(name);
 }
@@ -5575,36 +5575,36 @@ restore_env_var(char_u *name, char_u *old_value, int must_free)
 /*
  * Either execute a command by calling the shell or start a new shell
  */
-    int
+    పూర్ణాంకం
 mch_call_shell(
     char_u  *cmd,
-    int	    options)	// SHELL_*, see vim.h
+    పూర్ణాంకం	    options)	// SHELL_*, see vim.h
 {
-    int		x = 0;
-    int		tmode = cur_tmode;
+    పూర్ణాంకం		x = 0;
+    పూర్ణాంకం		tmode = cur_tmode;
     WCHAR	szShellTitle[512];
-    int		must_free;
+    పూర్ణాంకం		must_free;
     char_u	*oldval;
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "executing shell command: %s", cmd);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ch_log(ఖాళీ, "executing shell command: %s", cmd);
+#అయితే_ముగింపు
     // Change the title to reflect that we are in a subshell.
-    if (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
+    ఒకవేళ (GetConsoleTitleW(szShellTitle, ARRAY_నిడివి(szShellTitle) - 4) > 0)
     {
-	if (cmd == NULL)
+	ఒకవేళ (cmd == ఖాళీ)
 	    wcscat(szShellTitle, L" :sh");
-	else
+	లేకపోతే
 	{
-	    WCHAR *wn = enc_to_utf16((char_u *)cmd, NULL);
+	    WCHAR *wn = enc_గమ్యం_utf16((char_u *)cmd, ఖాళీ);
 
-	    if (wn != NULL)
+	    ఒకవేళ (wn != ఖాళీ)
 	    {
 		wcscat(szShellTitle, L" - !");
-		if ((wcslen(szShellTitle) + wcslen(wn) <
-			    ARRAY_LENGTH(szShellTitle)))
+		ఒకవేళ ((wcslen(szShellTitle) + wcslen(wn) <
+			    ARRAY_నిడివి(szShellTitle)))
 		    wcscat(szShellTitle, wn);
-		SetConsoleTitleW(szShellTitle);
+		సమితి_Console_Title_W(szShellTitle);
 		vim_free(wn);
 	    }
 	}
@@ -5615,33 +5615,33 @@ mch_call_shell(
 	    &must_free);
     vim_setenv((char_u *)"NoDefaultCurrentDirectoryInExePath", (char_u *)"1");
 
-    out_flush();
+    బహిర్గతం_flush();
 
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#నిర్వచితమైతే MCH_WRITE_DUMP
+    ఒకవేళ (fdDump)
     {
 	fprintf(fdDump, "mch_call_shell(\"%s\", %d)\n", cmd, options);
 	fflush(fdDump);
     }
-#endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // TODO: make the terminal window work with input or output redirected.
-    if (
+    ఒకవేళ (
 # ifdef VIMDLL
-	    gui.in_use &&
+	    gui.లోపల_use &&
 # endif
-	    vim_strchr(p_go, GO_TERMINAL) != NULL
+	    vim_strchr(p_go, GO_TERMINAL) != ఖాళీ
 	 && (options & (SHELL_FILTER|SHELL_DOOUT|SHELL_WRITE|SHELL_READ)) == 0)
     {
 	char_u	*cmdbase = cmd;
 
-	if (cmdbase != NULL)
+	ఒకవేళ (cmdbase != ఖాళీ)
 	    // Skip a leading quote and (.
-	    while (*cmdbase == '"' || *cmdbase == '(')
+	    అయితే (*cmdbase == '"' || *cmdbase == '(')
 		++cmdbase;
 
 	// Check the command does not begin with "start "
-	if (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
+	ఒకవేళ (cmdbase == ఖాళీ || STRNICMP(cmdbase, "start", 5) != 0
 						   || !VIM_ISWHITE(cmdbase[5]))
 	{
 	    // Use a terminal window to run the command in.
@@ -5649,10 +5649,10 @@ mch_call_shell(
 	    resettitle();
 	    restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 		    oldval, must_free);
-	    return x;
+	    తిరిగి x;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Catch all deadly signals while running the external command, because a
@@ -5666,27 +5666,27 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_IGN);
     mch_signal(SIGABRT, SIG_IGN);
 
-    if (options & SHELL_COOKED)
+    ఒకవేళ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	// set to normal mode
 
-    if (cmd == NULL)
+    ఒకవేళ (cmd == ఖాళీ)
     {
-	x = mch_system((char *)p_sh, options);
+	x = mch_system((అక్షరం *)p_sh, options);
     }
-    else
+    లేకపోతే
     {
 	// we use "command" or "cmd" to start the shell; slow but easy
-	char_u	*newcmd = NULL;
+	char_u	*newcmd = ఖాళీ;
 	char_u	*cmdbase = cmd;
 	long_u	cmdlen;
 
 	// Skip a leading ", ( and "(.
-	if (*cmdbase == '"' )
+	ఒకవేళ (*cmdbase == '"' )
 	    ++cmdbase;
-	if (*cmdbase == '(')
+	ఒకవేళ (*cmdbase == '(')
 	    ++cmdbase;
 
-	if ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
+	ఒకవేళ ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
 	{
 	    STARTUPINFO		si;
 	    PROCESS_INFORMATION	pi;
@@ -5694,49 +5694,49 @@ mch_call_shell(
 	    INT			n_show_cmd = SW_SHOWNORMAL;
 	    char_u		*p;
 
-	    ZeroMemory(&si, sizeof(si));
-	    si.cb = sizeof(si);
-	    si.lpReserved = NULL;
-	    si.lpDesktop = NULL;
-	    si.lpTitle = NULL;
+	    Zero_జ్ఞాపకం(&si, పరిమాణం(si));
+	    si.cb = పరిమాణం(si);
+	    si.lpReserved = ఖాళీ;
+	    si.lpDesktop = ఖాళీ;
+	    si.lpTitle = ఖాళీ;
 	    si.dwFlags = 0;
 	    si.cbReserved2 = 0;
-	    si.lpReserved2 = NULL;
+	    si.lpReserved2 = ఖాళీ;
 
 	    cmdbase = skipwhite(cmdbase + 5);
-	    if ((STRNICMP(cmdbase, "/min", 4) == 0)
+	    ఒకవేళ ((STRNICMP(cmdbase, "/min", 4) == 0)
 		    && VIM_ISWHITE(cmdbase[4]))
 	    {
 		cmdbase = skipwhite(cmdbase + 4);
 		si.dwFlags = STARTF_USESHOWWINDOW;
-		si.wShowWindow = SW_SHOWMINNOACTIVE;
+		si.w_Show_కిటికీ = SW_SHOWMINNOACTIVE;
 		n_show_cmd = SW_SHOWMINNOACTIVE;
 	    }
-	    else if ((STRNICMP(cmdbase, "/b", 2) == 0)
+	    లేకపోతే ఒకవేళ ((STRNICMP(cmdbase, "/b", 2) == 0)
 		    && VIM_ISWHITE(cmdbase[2]))
 	    {
 		cmdbase = skipwhite(cmdbase + 2);
-		flags = CREATE_NO_WINDOW;
+		flags = CREATE_NO_కిటికీ;
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdInput = CreateFile("\\\\.\\NUL",	// File name
+		si.h_Std_ఆదానం = CreateFile("\\\\.\\NUL",	// File name
 		    GENERIC_READ,			// Access flags
 		    0,					// Share flags
-		    NULL,				// Security att.
+		    ఖాళీ,				// Security att.
 		    OPEN_EXISTING,			// Open flags
-		    FILE_ATTRIBUTE_NORMAL,		// File att.
-		    NULL);				// Temp file
-		si.hStdOutput = si.hStdInput;
-		si.hStdError = si.hStdInput;
+		    FILE_ATTRIBUTE_సాధారణ,		// File att.
+		    ఖాళీ);				// Temp file
+		si.hStdOutput = si.h_Std_ఆదానం;
+		si.hStdError = si.h_Std_ఆదానం;
 	    }
 
 	    // Remove a trailing ", ) and )" if they have a match
 	    // at the start of the command.
-	    if (cmdbase > cmd)
+	    ఒకవేళ (cmdbase > cmd)
 	    {
 		p = cmdbase + STRLEN(cmdbase);
-		if (p > cmdbase && p[-1] == '"' && *cmd == '"')
+		ఒకవేళ (p > cmdbase && p[-1] == '"' && *cmd == '"')
 		    *--p = NUL;
-		if (p > cmdbase && p[-1] == ')'
+		ఒకవేళ (p > cmdbase && p[-1] == ')'
 			&& (*cmd =='(' || cmd[1] == '('))
 		    *--p = NUL;
 	    }
@@ -5751,25 +5751,25 @@ mch_call_shell(
 	     * shellxescape except '|' for avoiding to be treated as
 	     * argument to them. Pass the arguments to sub-shell.
 	     */
-	    if (flags != CREATE_NEW_CONSOLE)
+	    ఒకవేళ (flags != CREATE_NEW_CONSOLE)
 	    {
 		char_u	*subcmd;
 		char_u	*cmd_shell = mch_getenv("COMSPEC");
 
-		if (cmd_shell == NULL || *cmd_shell == NUL)
+		ఒకవేళ (cmd_shell == ఖాళీ || *cmd_shell == NUL)
 		    cmd_shell = (char_u *)default_shell();
 
 		subcmd = vim_strsave_escaped_ext(cmdbase,
 			(char_u *)"|", '^', FALSE);
-		if (subcmd != NULL)
+		ఒకవేళ (subcmd != ఖాళీ)
 		{
 		    // make "cmd.exe /c arguments"
 		    cmdlen = STRLEN(cmd_shell) + STRLEN(subcmd) + 5;
 		    newcmd = alloc(cmdlen);
-		    if (newcmd != NULL)
-			vim_snprintf((char *)newcmd, cmdlen, "%s /c %s",
+		    ఒకవేళ (newcmd != ఖాళీ)
+			vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s /c %s",
 						       cmd_shell, subcmd);
-		    else
+		    లేకపోతే
 			newcmd = cmdbase;
 		    vim_free(subcmd);
 		}
@@ -5780,94 +5780,94 @@ mch_call_shell(
 	     * inherit our handles which causes unpleasant dangling swap
 	     * files if we exit before the spawned process
 	     */
-	    if (vim_create_process((char *)newcmd, FALSE, flags,
-			&si, &pi, NULL, NULL))
+	    ఒకవేళ (vim_create_process((అక్షరం *)newcmd, FALSE, flags,
+			&si, &pi, ఖాళీ, ఖాళీ))
 		x = 0;
-	    else if (vim_shell_execute((char *)newcmd, n_show_cmd)
+	    లేకపోతే ఒకవేళ (vim_shell_execute((అక్షరం *)newcmd, n_show_cmd)
 							       > (HINSTANCE)32)
 		x = 0;
-	    else
+	    లేకపోతే
 	    {
 		x = -1;
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 # ifdef VIMDLL
-		if (gui.in_use)
+		ఒకవేళ (gui.లోపల_use)
 # endif
-		    emsg(_(e_command_not_found));
-#endif
+		    emsg(_(e_command_not_దొరికింది));
+#అయితే_ముగింపు
 	    }
 
-	    if (newcmd != cmdbase)
+	    ఒకవేళ (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    ఒకవేళ (si.dwFlags == STARTF_USESTDHANDLES && si.h_Std_ఆదానం != ఖాళీ)
 	    {
 		// Close the handle to \\.\NUL created above.
-		CloseHandle(si.hStdInput);
+		CloseHandle(si.h_Std_ఆదానం);
 	    }
 	    // Close the handles to the subprocess, so that it goes away
 	    CloseHandle(pi.hThread);
 	    CloseHandle(pi.hProcess);
 	}
-	else
+	లేకపోతే
 	{
 	    cmdlen =
-#ifdef FEAT_GUI_MSWIN
-		((gui.in_use || gui.starting) ?
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+		((gui.లోపల_use || gui.starting) ?
 		    (!s_dont_use_vimrun && p_stmp ?
-			vimrun_path.length : STRLEN(p_sh) + STRLEN(p_shcf))
+			vimrun_మార్గం.నిడివి : STRLEN(p_sh) + STRLEN(p_shcf))
 		    : 0) +
-#endif
+#అయితే_ముగింపు
 		STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 
 	    newcmd = alloc(cmdlen);
-	    if (newcmd != NULL)
+	    ఒకవేళ (newcmd != ఖాళీ)
 	    {
-#if defined(FEAT_GUI_MSWIN)
-		if (
+#ఒకవేళ defined(FEAT_GUI_MSWIN)
+		ఒకవేళ (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.లోపల_use || gui.starting) &&
 # endif
 		    need_vimrun_warning)
 		{
-		    char *msg = _("VIMRUN.EXE not found in your $PATH.\n"
+		    అక్షరం *సందేశం = _("VIMRUN.EXE not found in your $PATH.\n"
 			"External commands will not pause after completion.\n"
 			"See  :help win32-vimrun  for more information.");
-		    char *title = _("Vim Warning");
-		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
-		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
+		    అక్షరం *title = _("Vim Warning");
+		    WCHAR *wmsg = enc_గమ్యం_utf16((char_u *)సందేశం, ఖాళీ);
+		    WCHAR *wtitle = enc_గమ్యం_utf16((char_u *)title, ఖాళీ);
 
-		    if (wmsg != NULL && wtitle != NULL)
-			MessageBoxW(NULL, wmsg, wtitle, MB_ICONWARNING);
+		    ఒకవేళ (wmsg != ఖాళీ && wtitle != ఖాళీ)
+			సందేశం_Box_W(ఖాళీ, wmsg, wtitle, MB_ICONWARNING);
 		    vim_free(wmsg);
 		    vim_free(wtitle);
 		    need_vimrun_warning = FALSE;
 		}
-		if (
+		ఒకవేళ (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.లోపల_use || gui.starting) &&
 # endif
 		    !s_dont_use_vimrun && p_stmp)
 		    // Use vimrun to execute the command.  It opens a console
 		    // window, which can be closed without killing Vim.
-		    vim_snprintf((char *)newcmd, cmdlen, "%s%s%s %s %s",
-			    vimrun_path.string,
-			    (msg_silent != 0 || (options & SHELL_DOOUT))
+		    vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s%s%s %s %s",
+			    vimrun_మార్గం.string,
+			    (సందేశం_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
-		else if (
+		లేకపోతే ఒకవేళ (
 # ifdef VIMDLL
-			(gui.in_use || gui.starting) &&
+			(gui.లోపల_use || gui.starting) &&
 # endif
 			s_dont_use_vimrun && STRCMP(p_shcf, "/c") == 0)
 		    // workaround for the case that "vimrun" does not exist
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s %s %s",
+		    vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s %s %s %s %s",
 					   p_sh, p_shcf, p_sh, p_shcf, cmd);
-		else
-#endif
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s",
+		లేకపోతే
+#అయితే_ముగింపు
+		    vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s %s %s",
 							   p_sh, p_shcf, cmd);
-		x = mch_system((char *)newcmd, options);
+		x = mch_system((అక్షరం *)newcmd, options);
 		vim_free(newcmd);
 	    }
 	}
@@ -5877,7 +5877,7 @@ mch_call_shell(
     restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 	    oldval, must_free);
 
-    if (tmode == TMODE_RAW)
+    ఒకవేళ (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
@@ -5885,15 +5885,15 @@ mch_call_shell(
     }
 
     // Print the return value, unless "vimrun" was used.
-    if (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
-#if defined(FEAT_GUI_MSWIN)
-	    && ((gui.in_use || gui.starting) ?
+    ఒకవేళ (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
+#ఒకవేళ defined(FEAT_GUI_MSWIN)
+	    && ((gui.లోపల_use || gui.starting) ?
 		((options & SHELL_DOOUT) || s_dont_use_vimrun || !p_stmp) : 1)
-#endif
+#అయితే_ముగింపు
 	    )
     {
 	smsg(_("shell returned %d"), x);
-	msg_putchar('\n');
+	సందేశం_putchar('\n');
     }
     resettitle();
 
@@ -5905,72 +5905,72 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_DFL);
     mch_signal(SIGABRT, SIG_DFL);
 
-    return x;
+    తిరిగి x;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    static HANDLE
-job_io_file_open(
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
+    స్థిర HANDLE
+పని_io_file_open(
 	char_u *fname,
 	DWORD dwDesiredAccess,
-	DWORD dwShareMode,
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+	DWORD dw_Share_బహుళకం,
+	LPSECURITY_లక్షణాలు lp_Security_లక్షణాలు,
 	DWORD dwCreationDisposition,
-	DWORD dwFlagsAndAttributes)
+	DWORD dw_Flags_And_లక్షణాలు)
 {
     HANDLE h;
     WCHAR *wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+    wn = enc_గమ్యం_utf16(fname, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి INVALID_HANDLE_విలువ;
 
-    h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
-	    lpSecurityAttributes, dwCreationDisposition,
-	    dwFlagsAndAttributes, NULL);
+    h = CreateFileW(wn, dwDesiredAccess, dw_Share_బహుళకం,
+	    lp_Security_లక్షణాలు, dwCreationDisposition,
+	    dw_Flags_And_లక్షణాలు, ఖాళీ);
     vim_free(wn);
-    return h;
+    తిరిగి h;
 }
 
 /*
  * Turn the dictionary "env" into a NUL separated list that can be used as the
  * environment argument of vim_create_process().
  */
-    void
-win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
+    శూన్య
+win32_build_env(dict_T *env, garray_T *gap, పూర్ణాంకం is_terminal)
 {
     hashitem_T	*hi;
-    long_u	todo = env != NULL ? env->dv_hashtab.ht_used : 0;
-    LPVOID	base = GetEnvironmentStringsW();
+    long_u	todo = env != ఖాళీ ? env->dv_hashtab.ht_వాడిన : 0;
+    LPVOID	పునాది = Get_Environment_అక్షరశ్రేణులు_W();
 
     // for last \0
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి;
 
-    if (env != NULL)
+    ఒకవేళ (env != ఖాళీ)
     {
-	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_వస్తువులు(&env->dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
-		typval_T *item = &dict_lookup(hi)->di_tv;
-		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
-		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
+		typval_T *అంశం = &dict_lookup(hi)->di_tv;
+		WCHAR   *wkey = enc_గమ్యం_utf16((char_u *)hi->hi_కీలకం, ఖాళీ);
+		WCHAR   *wval = enc_గమ్యం_utf16(tv_get_string(అంశం), ఖాళీ);
 		--todo;
-		if (wkey != NULL && wval != NULL)
+		ఒకవేళ (wkey != ఖాళీ && wval != ఖాళీ)
 		{
 		    size_t	n;
 		    size_t	lkey = wcslen(wkey);
 		    size_t	lval = wcslen(wval);
 
-		    if (ga_grow(gap, (int)(lkey + lval + 2)) == FAIL)
-			continue;
-		    for (n = 0; n < lkey; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wkey[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'=';
-		    for (n = 0; n < lval; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wval[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		    ఒకవేళ (ga_grow(gap, (పూర్ణాంకం)(lkey + lval + 2)) == FAIL)
+			కొనసాగు;
+		    కొరకు (n = 0; n < lkey; n++)
+			*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = wkey[n];
+		    *((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = L'=';
+		    కొరకు (n = 0; n < lval; n++)
+			*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = wval[n];
+		    *((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = L'\0';
 		}
 		vim_free(wkey);
 		vim_free(wval);
@@ -5978,33 +5978,33 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	}
     }
 
-    if (base)
+    ఒకవేళ (పునాది)
     {
-	WCHAR	*p = (WCHAR*) base;
+	WCHAR	*p = (WCHAR*) పునాది;
 
 	// for last \0
-	if (ga_grow(gap, 1) == FAIL)
-	    return;
+	ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	    తిరిగి;
 
-	while (*p != 0 || *(p + 1) != 0)
+	అయితే (*p != 0 || *(p + 1) != 0)
 	{
-	    if (ga_grow(gap, 1) == OK)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = *p;
+	    ఒకవేళ (ga_grow(gap, 1) == OK)
+		*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = *p;
 	    p++;
 	}
-	FreeEnvironmentStringsW(base);
-	*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	Free_Environment_అక్షరశ్రేణులు_W(పునాది);
+	*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = L'\0';
     }
 
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
+# ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
     {
 #  ifdef FEAT_CLIENTSERVER
 	char_u	*servername = get_vim_var_str(VV_SEND_SERVER);
 	size_t	servername_len = STRLEN(servername);
 #  endif
 #  ifdef FEAT_TERMINAL
-	char_u	*version = get_vim_var_str(VV_VERSION);
-	size_t	version_len = STRLEN(version);
+	char_u	*సంస్కరణ_2 = get_vim_var_str(VV_సంస్కరణ);
+	size_t	సంస్కరణ_len = STRLEN(సంస్కరణ_2);
 #  endif
 	// size of "VIM_SERVERNAME=" and value,
 	// plus "VIM_TERMINAL=" and value,
@@ -6014,31 +6014,31 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 		    + 15 + servername_len
 #  endif
 #  ifdef FEAT_TERMINAL
-		    + 13 + version_len + 2
+		    + 13 + సంస్కరణ_len + 2
 #  endif
 		    ;
 
-	if (ga_grow(gap, (int)n) == OK)
+	ఒకవేళ (ga_grow(gap, (పూర్ణాంకం)n) == OK)
 	{
 #  ifdef FEAT_CLIENTSERVER
-	    for (n = 0; n < 15; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    కొరకు (n = 0; n < 15; n++)
+		*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) =
 		    (WCHAR)"VIM_SERVERNAME="[n];
-	    for (n = 0; n < servername_len; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    కొరకు (n = 0; n < servername_len; n++)
+		*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) =
 		    (WCHAR)servername[n];
-	    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	    *((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = L'\0';
 #  endif
 #  ifdef FEAT_TERMINAL
-	    if (is_terminal)
+	    ఒకవేళ (is_terminal)
 	    {
-		for (n = 0; n < 13; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
+		కొరకు (n = 0; n < 13; n++)
+		    *((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) =
 			(WCHAR)"VIM_TERMINAL="[n];
-		for (n = 0; n < version_len; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
-			(WCHAR)version[n];
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		కొరకు (n = 0; n < సంస్కరణ_len; n++)
+		    *((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) =
+			(WCHAR)సంస్కరణ_2[n];
+		*((WCHAR*)gap->ga_దత్తాంశం + gap->ga_len++) = L'\0';
 	    }
 #  endif
 	}
@@ -6050,12 +6050,12 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
  * Create a pair of pipes.
  * Return TRUE for success, FALSE for failure.
  */
-    static BOOL
+    స్థిర BOOL
 create_pipe_pair(HANDLE handles[2])
 {
-    static LONG		s;
-    char		name[64];
-    SECURITY_ATTRIBUTES sa;
+    స్థిర LONG		s;
+    అక్షరం		name[64];
+    SECURITY_లక్షణాలు sa;
 
     sprintf(name, "\\\\?\\pipe\\vim-%08lx-%08lx",
 	    GetCurrentProcessId(),
@@ -6066,32 +6066,32 @@ create_pipe_pair(HANDLE handles[2])
 	    name,
 	    PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
-	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
+	    1, MAX_NAMED_PIPE_కొలత, 0, 0, ఖాళీ);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
-	return FALSE;
+    ఒకవేళ (handles[1] == INVALID_HANDLE_విలువ)
+	తిరిగి FALSE;
 
-    sa.nLength = sizeof(sa);
+    sa.n_నిడివి = పరిమాణం(sa);
     sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
+    sa.lpSecurityDescriptor = ఖాళీ;
 
     handles[0] = CreateFile(name,
 	    FILE_GENERIC_READ,
 	    FILE_SHARE_READ, &sa,
-	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	    OPEN_EXISTING, FILE_ATTRIBUTE_సాధారణ, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    ఒకవేళ (handles[0] == INVALID_HANDLE_విలువ)
     {
 	CloseHandle(handles[1]);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#అయితే_ముగింపు // FEAT_JOB_CHANNEL
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -6101,72 +6101,72 @@ create_pipe_pair(HANDLE handles[2])
  * Sets v:shell_error to the exit status.
  */
     char_u *
-mch_get_cmd_output_direct(
-    char	**argv,
+mch_get_cmd_output_ప్రత్యక్ష(
+    అక్షరం	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    పూర్ణాంకం		flags వాడని,
+    పూర్ణాంకం		*ret_len)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
-    SECURITY_ATTRIBUTES saAttr;
-    HANDLE		hChildStdoutRd = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdoutWr = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdinRd = INVALID_HANDLE_VALUE;
+    SECURITY_లక్షణాలు saAttr;
+    HANDLE		h_బిడ్డ_Stdout_Rd = INVALID_HANDLE_విలువ;
+    HANDLE		h_బిడ్డ_Stdout_Wr = INVALID_HANDLE_విలువ;
+    HANDLE		h_బిడ్డ_Stdin_Rd = INVALID_HANDLE_విలువ;
     garray_T		cmd_ga;
-    garray_T		out_ga;
-    char_u		*buffer = NULL;
-    DWORD		exit_code = (DWORD)-1;
-    int			i;
+    garray_T		బహిర్గతం_ga;
+    char_u		*బఫరు = ఖాళీ;
+    DWORD		exit_సంకేతం = (DWORD)-1;
+    పూర్ణాంకం			i;
 
     // Build a command string from argv.
     ga_init2(&cmd_ga, 1, 256);
-    for (i = 0; argv[i] != NULL; i++)
+    కొరకు (i = 0; argv[i] != ఖాళీ; i++)
     {
 	char_u	*arg = (char_u *)argv[i];
 	char_u	*s = arg;
-	int	has_spaces = FALSE;
-	int	j;
+	పూర్ణాంకం	has_spaces = FALSE;
+	పూర్ణాంకం	j;
 
-	for (j = 0; s[j] != NUL; j++)
-	    if (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
+	కొరకు (j = 0; s[j] != NUL; j++)
+	    ఒకవేళ (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
 	    {
 		has_spaces = TRUE;
-		break;
+		ఆపు;
 	    }
 
-	if (i > 0)
+	ఒకవేళ (i > 0)
 	    ga_append(&cmd_ga, ' ');
 
-	if (has_spaces)
+	ఒకవేళ (has_spaces)
 	{
-	    int	num_bs;
+	    పూర్ణాంకం	అంకె_bs;
 
 	    ga_append(&cmd_ga, '"');
-	    for (j = 0; arg[j] != NUL; j++)
+	    కొరకు (j = 0; arg[j] != NUL; j++)
 	    {
-		num_bs = 0;
-		while (arg[j] == '\\')
+		అంకె_bs = 0;
+		అయితే (arg[j] == '\\')
 		{
-		    num_bs++;
+		    అంకె_bs++;
 		    j++;
 		}
 
-		if (arg[j] == NUL)
+		ఒకవేళ (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    అయితే (అంకె_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
 		    }
-		    break;
+		    ఆపు;
 		}
-		else if (arg[j] == '"')
+		లేకపోతే ఒకవేళ (arg[j] == '"')
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    అయితే (అంకె_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6174,310 +6174,310 @@ mch_get_cmd_output_direct(
 		    ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, '"');
 		}
-		else
+		లేకపోతే
 		{
-		    while (num_bs-- > 0)
+		    అయితే (అంకె_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
 	    }
 	    ga_append(&cmd_ga, '"');
 	}
-	else
+	లేకపోతే
 	    ga_concat(&cmd_ga, arg);
     }
     ga_append(&cmd_ga, NUL);
 
-    ga_init2(&out_ga, 1, 4096);
+    ga_init2(&బహిర్గతం_ga, 1, 4096);
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_నిడివి = పరిమాణం(SECURITY_లక్షణాలు);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ఖాళీ;
 
     // Create a pipe for the child's stdout.
-    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
-	    || !SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
+    ఒకవేళ (!CreatePipe(&h_బిడ్డ_Stdout_Rd, &h_బిడ్డ_Stdout_Wr, &saAttr, 0)
+	    || !సమితి_Handle_Information(h_బిడ్డ_Stdout_Rd, HANDLE_FLAG_INHERIT, 0))
     {
 	emsg(_(e_cannot_create_pipes));
-	goto done;
+	వెళ్ళు పూర్తి;
     }
 
     // Set up stdin from infile if provided.
-    if (infile != NULL)
+    ఒకవేళ (infile != ఖాళీ)
     {
-	WCHAR *winfile = enc_to_utf16(infile, NULL);
+	WCHAR *winfile = enc_గమ్యం_utf16(infile, ఖాళీ);
 
-	if (winfile != NULL)
+	ఒకవేళ (winfile != ఖాళీ)
 	{
-	    hChildStdinRd = CreateFileW(winfile, GENERIC_READ,
+	    h_బిడ్డ_Stdin_Rd = CreateFileW(winfile, GENERIC_READ,
 		    FILE_SHARE_READ, &saAttr, OPEN_EXISTING,
-		    FILE_ATTRIBUTE_NORMAL, NULL);
+		    FILE_ATTRIBUTE_సాధారణ, ఖాళీ);
 	    vim_free(winfile);
 	}
     }
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_జ్ఞాపకం(&pi, పరిమాణం(pi));
+    Zero_జ్ఞాపకం(&si, పరిమాణం(si));
+    si.cb = పరిమాణం(si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
-    si.hStdOutput = hChildStdoutWr;
-    si.hStdError = hChildStdoutWr;
-    si.hStdInput = (hChildStdinRd != INVALID_HANDLE_VALUE)
-		    ? hChildStdinRd : INVALID_HANDLE_VALUE;
+    si.w_Show_కిటికీ = SW_HIDE;
+    si.hStdOutput = h_బిడ్డ_Stdout_Wr;
+    si.hStdError = h_బిడ్డ_Stdout_Wr;
+    si.h_Std_ఆదానం = (h_బిడ్డ_Stdin_Rd != INVALID_HANDLE_విలువ)
+		    ? h_బిడ్డ_Stdin_Rd : INVALID_HANDLE_విలువ;
 
-    ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
+    ch_log(ఖాళీ, "directly executing: %s", (అక్షరం *)cmd_ga.ga_దత్తాంశం);
 
     // Create the child process directly, without going through the shell.
-    if (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
-		CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
-		&si, &pi, NULL, NULL))
+    ఒకవేళ (!vim_create_process((అక్షరం *)cmd_ga.ga_దత్తాంశం, TRUE,
+		CREATE_DEFAULT_ERROR_బహుళకం | CREATE_NEW_PROCESS_సమూహం,
+		&si, &pi, ఖాళీ, ఖాళీ))
     {
-	semsg(_(e_invalid_argument_str), cmd_ga.ga_data);
-	goto done;
+	semsg(_(e_invalid_వాదం_str), cmd_ga.ga_దత్తాంశం);
+	వెళ్ళు పూర్తి;
     }
 
     // Close the write end of stdout pipe and stdin in the parent so that
     // ReadFile() will get EOF when the child process exits.
-    CloseHandle(hChildStdoutWr);
-    hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    CloseHandle(h_బిడ్డ_Stdout_Wr);
+    h_బిడ్డ_Stdout_Wr = INVALID_HANDLE_విలువ;
+    ఒకవేళ (h_బిడ్డ_Stdin_Rd != INVALID_HANDLE_విలువ)
     {
-	CloseHandle(hChildStdinRd);
-	hChildStdinRd = INVALID_HANDLE_VALUE;
+	CloseHandle(h_బిడ్డ_Stdin_Rd);
+	h_బిడ్డ_Stdin_Rd = INVALID_HANDLE_విలువ;
     }
 
     // Read output from child process.
-    for (;;)
+    కొరకు (;;)
     {
-	char	buf[4096];
+	అక్షరం	buf[4096];
 	DWORD	n;
 
-	if (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
-	    break;
-	if (ga_grow(&out_ga, (int)n) == OK)
+	ఒకవేళ (!ReadFile(h_బిడ్డ_Stdout_Rd, buf, పరిమాణం(buf), &n, ఖాళీ) || n == 0)
+	    ఆపు;
+	ఒకవేళ (ga_grow(&బహిర్గతం_ga, (పూర్ణాంకం)n) == OK)
 	{
-	    mch_memmove((char *)out_ga.ga_data + out_ga.ga_len, buf, n);
-	    out_ga.ga_len += (int)n;
+	    mch_memmove((అక్షరం *)బహిర్గతం_ga.ga_దత్తాంశం + బహిర్గతం_ga.ga_len, buf, n);
+	    బహిర్గతం_ga.ga_len += (పూర్ణాంకం)n;
 	}
     }
 
     // Wait for child to finish and get exit code.
     WaitForSingleObject(pi.hProcess, INFINITE);
-    GetExitCodeProcess(pi.hProcess, &exit_code);
+    Get_Exit_సంకేతం_Process(pi.hProcess, &exit_సంకేతం);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    set_vim_var_nr(VV_SHELL_ERROR, (long)exit_code);
+    సమితి_vim_var_nr(VV_SHELL_ERROR, (దీర్ఘ)exit_సంకేతం);
 
-    if (out_ga.ga_len > 0)
+    ఒకవేళ (బహిర్గతం_ga.ga_len > 0)
     {
-	buffer = alloc(out_ga.ga_len + 1);
-	if (buffer != NULL)
+	బఫరు = alloc(బహిర్గతం_ga.ga_len + 1);
+	ఒకవేళ (బఫరు != ఖాళీ)
 	{
-	    mch_memmove(buffer, out_ga.ga_data, out_ga.ga_len);
-	    if (ret_len == NULL)
+	    mch_memmove(బఫరు, బహిర్గతం_ga.ga_దత్తాంశం, బహిర్గతం_ga.ga_len);
+	    ఒకవేళ (ret_len == ఖాళీ)
 	    {
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < out_ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
-			buffer[i] = 1;
-		buffer[out_ga.ga_len] = NUL;
+		కొరకు (i = 0; i < బహిర్గతం_ga.ga_len; ++i)
+		    ఒకవేళ (బఫరు[i] == NUL)
+			బఫరు[i] = 1;
+		బఫరు[బహిర్గతం_ga.ga_len] = NUL;
 	    }
-	    else
-		*ret_len = out_ga.ga_len;
+	    లేకపోతే
+		*ret_len = బహిర్గతం_ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    లేకపోతే ఒకవేళ (ret_len != ఖాళీ)
 	*ret_len = 0;
 
-done:
+పూర్తి:
     ga_clear(&cmd_ga);
-    ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdinRd);
-    return buffer;
+    ga_clear(&బహిర్గతం_ga);
+    ఒకవేళ (h_బిడ్డ_Stdout_Rd != INVALID_HANDLE_విలువ)
+	CloseHandle(h_బిడ్డ_Stdout_Rd);
+    ఒకవేళ (h_బిడ్డ_Stdout_Wr != INVALID_HANDLE_విలువ)
+	CloseHandle(h_బిడ్డ_Stdout_Wr);
+    ఒకవేళ (h_బిడ్డ_Stdin_Rd != INVALID_HANDLE_విలువ)
+	CloseHandle(h_బిడ్డ_Stdin_Rd);
+    తిరిగి బఫరు;
 }
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-mch_job_start(char *cmd, job_T *job, jobopt_T *options)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
+    శూన్య
+mch_పని_ప్రారంభం(అక్షరం *cmd, పని_T *పని, jobopt_T *options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION	pi;
     HANDLE		jo;
-    SECURITY_ATTRIBUTES saAttr;
-    channel_T		*channel = NULL;
+    SECURITY_లక్షణాలు saAttr;
+    channel_T		*channel = ఖాళీ;
     HANDLE		ifd[2];
     HANDLE		ofd[2];
     HANDLE		efd[2];
     garray_T		ga;
 
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    పూర్ణాంకం		use_null_for_లోపల = options->jo_io[PART_లోపల] == JIO_NULL;
+    పూర్ణాంకం		use_null_for_బహిర్గతం = options->jo_io[PART_బహిర్గతం] == JIO_NULL;
+    పూర్ణాంకం		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    పూర్ణాంకం		use_file_for_లోపల = options->jo_io[PART_లోపల] == JIO_FILE;
+    పూర్ణాంకం		use_file_for_బహిర్గతం = options->jo_io[PART_బహిర్గతం] == JIO_FILE;
+    పూర్ణాంకం		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    పూర్ణాంకం		use_బహిర్గతం_for_err = options->jo_io[PART_ERR] == JIO_బహిర్గతం;
 
-    if (use_out_for_err && use_null_for_out)
+    ఒకవేళ (use_బహిర్గతం_for_err && use_null_for_బహిర్గతం)
 	use_null_for_err = TRUE;
 
-    ifd[0] = INVALID_HANDLE_VALUE;
-    ifd[1] = INVALID_HANDLE_VALUE;
-    ofd[0] = INVALID_HANDLE_VALUE;
-    ofd[1] = INVALID_HANDLE_VALUE;
-    efd[0] = INVALID_HANDLE_VALUE;
-    efd[1] = INVALID_HANDLE_VALUE;
-    ga_init2(&ga, sizeof(wchar_t), 500);
+    ifd[0] = INVALID_HANDLE_విలువ;
+    ifd[1] = INVALID_HANDLE_విలువ;
+    ofd[0] = INVALID_HANDLE_విలువ;
+    ofd[1] = INVALID_HANDLE_విలువ;
+    efd[0] = INVALID_HANDLE_విలువ;
+    efd[1] = INVALID_HANDLE_విలువ;
+    ga_init2(&ga, పరిమాణం(wchar_t), 500);
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
+    jo = Create_పని_Object(ఖాళీ, ఖాళీ);
+    ఒకవేళ (jo == ఖాళీ)
     {
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	పని->jv_స్థితి = పని_FAILED;
+	వెళ్ళు failed;
     }
 
-    if (options->jo_env != NULL)
+    ఒకవేళ (options->jo_env != ఖాళీ)
 	win32_build_env(options->jo_env, &ga, FALSE);
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_జ్ఞాపకం(&pi, పరిమాణం(pi));
+    Zero_జ్ఞాపకం(&si, పరిమాణం(si));
+    si.cb = పరిమాణం(si);
     si.dwFlags |= STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
+    si.w_Show_కిటికీ = SW_HIDE;
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_నిడివి = పరిమాణం(SECURITY_లక్షణాలు);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ఖాళీ;
 
-    if (use_file_for_in)
+    ఒకవేళ (use_file_for_లోపల)
     {
-	char_u *fname = options->jo_io_name[PART_IN];
+	char_u *fname = options->jo_io_name[PART_లోపల];
 
-	ifd[0] = job_io_file_open(fname, GENERIC_READ,
+	ifd[0] = పని_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_సాధారణ);
+	ఒకవేళ (ifd[0] == INVALID_HANDLE_విలువ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    వెళ్ళు failed;
 	}
     }
-    else if (!use_null_for_in
+    లేకపోతే ఒకవేళ (!use_null_for_లోపల
 	    && (!create_pipe_pair(ifd)
-		|| !SetHandleInformation(ifd[1], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+		|| !సమితి_Handle_Information(ifd[1], HANDLE_FLAG_INHERIT, 0)))
+	వెళ్ళు failed;
 
-    if (use_file_for_out)
+    ఒకవేళ (use_file_for_బహిర్గతం)
     {
-	char_u *fname = options->jo_io_name[PART_OUT];
+	char_u *fname = options->jo_io_name[PART_బహిర్గతం];
 
-	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	ofd[1] = పని_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_సాధారణ);
+	ఒకవేళ (ofd[1] == INVALID_HANDLE_విలువ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    వెళ్ళు failed;
 	}
     }
-    else if (!use_null_for_out &&
+    లేకపోతే ఒకవేళ (!use_null_for_బహిర్గతం &&
 	    (!CreatePipe(&ofd[0], &ofd[1], &saAttr, 0)
-	    || !SetHandleInformation(ofd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !సమితి_Handle_Information(ofd[0], HANDLE_FLAG_INHERIT, 0)))
+	వెళ్ళు failed;
 
-    if (use_file_for_err)
+    ఒకవేళ (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
-	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	efd[1] = పని_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_సాధారణ);
+	ఒకవేళ (efd[1] == INVALID_HANDLE_విలువ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    వెళ్ళు failed;
 	}
     }
-    else if (!use_out_for_err && !use_null_for_err &&
+    లేకపోతే ఒకవేళ (!use_బహిర్గతం_for_err && !use_null_for_err &&
 	    (!CreatePipe(&efd[0], &efd[1], &saAttr, 0)
-	    || !SetHandleInformation(efd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !సమితి_Handle_Information(efd[0], HANDLE_FLAG_INHERIT, 0)))
+	వెళ్ళు failed;
 
     si.dwFlags |= STARTF_USESTDHANDLES;
-    si.hStdInput = ifd[0];
+    si.h_Std_ఆదానం = ifd[0];
     si.hStdOutput = ofd[1];
-    si.hStdError = use_out_for_err ? ofd[1] : efd[1];
+    si.hStdError = use_బహిర్గతం_for_err ? ofd[1] : efd[1];
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    ఒకవేళ (!use_null_for_లోపల || !use_null_for_బహిర్గతం || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	ఒకవేళ (options->jo_సమితి & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    ఒకవేళ (channel != ఖాళీ)
 		++channel->ch_refcount;
 	}
-	else
-	    channel = add_channel();
-	if (channel == NULL)
-	    goto failed;
+	లేకపోతే
+	    channel = కూడు_channel();
+	ఒకవేళ (channel == ఖాళీ)
+	    వెళ్ళు failed;
     }
 
-    if (!vim_create_process(cmd, TRUE,
+    ఒకవేళ (!vim_create_process(cmd, TRUE,
 	    CREATE_SUSPENDED |
-	    CREATE_DEFAULT_ERROR_MODE |
-	    CREATE_NEW_PROCESS_GROUP |
+	    CREATE_DEFAULT_ERROR_బహుళకం |
+	    CREATE_NEW_PROCESS_సమూహం |
 	    CREATE_UNICODE_ENVIRONMENT |
 	    CREATE_NEW_CONSOLE,
 	    &si, &pi,
-	    ga.ga_data,
-	    (char *)options->jo_cwd))
+	    ga.ga_దత్తాంశం,
+	    (అక్షరం *)options->jo_cwd))
     {
 	CloseHandle(jo);
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	పని->jv_స్థితి = పని_FAILED;
+	వెళ్ళు failed;
     }
 
     ga_clear(&ga);
 
-    if (!AssignProcessToJobObject(jo, pi.hProcess))
+    ఒకవేళ (!కేటాయించు_Process_గమ్యం_పని_Object(jo, pi.hProcess))
     {
 	// if failing, switch the way to terminate
 	// process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ఖాళీ;
     }
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
-    job->jv_proc_info = pi;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
+    పని->jv_proc_info = pi;
+    పని->jv_పని_object = jo;
+    పని->jv_స్థితి = పని_STARTED;
 
     CloseHandle(ifd[0]);
     CloseHandle(ofd[1]);
-    if (!use_out_for_err && !use_null_for_err)
+    ఒకవేళ (!use_బహిర్గతం_for_err && !use_null_for_err)
 	CloseHandle(efd[1]);
 
-    job->jv_channel = channel;
-    if (channel != NULL)
+    పని->jv_channel = channel;
+    ఒకవేళ (channel != ఖాళీ)
     {
-	channel_set_pipes(channel,
-		      use_file_for_in || use_null_for_in
+	channel_సమితి_pipes(channel,
+		      use_file_for_లోపల || use_null_for_లోపల
 					      ? INVALID_FD : (sock_T)ifd[1],
-		      use_file_for_out || use_null_for_out
+		      use_file_for_బహిర్గతం || use_null_for_బహిర్గతం
 					     ? INVALID_FD : (sock_T)ofd[0],
-		      use_out_for_err || use_file_for_err || use_null_for_err
+		      use_బహిర్గతం_for_err || use_file_for_err || use_null_for_err
 					    ? INVALID_FD : (sock_T)efd[0]);
-	channel_set_job(channel, job, options);
+	channel_సమితి_పని(channel, పని, options);
     }
-    return;
+    తిరిగి;
 
 failed:
     CloseHandle(ifd[0]);
@@ -6490,162 +6490,162 @@ failed:
     ga_clear(&ga);
 }
 
-    char *
-mch_job_status(job_T *job)
+    అక్షరం *
+mch_పని_స్థితి(పని_T *పని)
 {
-    DWORD dwExitCode = 0;
+    DWORD dw_Exit_సంకేతం = 0;
 
-    if (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
-	    || dwExitCode != STILL_ACTIVE)
+    ఒకవేళ (!Get_Exit_సంకేతం_Process(పని->jv_proc_info.hProcess, &dw_Exit_సంకేతం)
+	    || dw_Exit_సంకేతం != STILL_చురుకైన)
     {
-	job->jv_exitval = (int)dwExitCode;
-	if (job->jv_status < JOB_ENDED)
+	పని->jv_exitval = (పూర్ణాంకం)dw_Exit_సంకేతం;
+	ఒకవేళ (పని->jv_స్థితి < పని_ENDED)
 	{
-	    ch_log(job->jv_channel, "Job ended");
-	    job->jv_status = JOB_ENDED;
+	    ch_log(పని->jv_channel, "Job ended");
+	    పని->jv_స్థితి = పని_ENDED;
 	}
-	return "dead";
+	తిరిగి "dead";
     }
-    return "run";
+    తిరిగి "run";
 }
 
-    job_T *
-mch_detect_ended_job(job_T *job_list)
+    పని_T *
+mch_detect_ended_పని(పని_T *పని_list)
 {
-    HANDLE jobHandles[MAXIMUM_WAIT_OBJECTS];
-    job_T *jobArray[MAXIMUM_WAIT_OBJECTS];
-    job_T *job = job_list;
+    HANDLE పని_Handles[గరిష్ఠ_WAIT_OBJECTS];
+    పని_T *పని_Array[గరిష్ఠ_WAIT_OBJECTS];
+    పని_T *పని = పని_list;
 
-    while (job != NULL)
+    అయితే (పని != ఖాళీ)
     {
 	DWORD n;
-	DWORD result;
+	DWORD ఫలితం;
 
-	for (n = 0; n < MAXIMUM_WAIT_OBJECTS
-				       && job != NULL; job = job->jv_next)
+	కొరకు (n = 0; n < గరిష్ఠ_WAIT_OBJECTS
+				       && పని != ఖాళీ; పని = పని->jv_తదుపరి)
 	{
-	    if (job->jv_status == JOB_STARTED)
+	    ఒకవేళ (పని->jv_స్థితి == పని_STARTED)
 	    {
-		jobHandles[n] = job->jv_proc_info.hProcess;
-		jobArray[n] = job;
+		పని_Handles[n] = పని->jv_proc_info.hProcess;
+		పని_Array[n] = పని;
 		++n;
 	    }
 	}
-	if (n == 0)
-	    continue;
-	result = WaitForMultipleObjects(n, jobHandles, FALSE, 0);
-	if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
+	ఒకవేళ (n == 0)
+	    కొనసాగు;
+	ఫలితం = Wait_For_గుణిజం_Objects(n, పని_Handles, FALSE, 0);
+	ఒకవేళ (ఫలితం >= WAIT_OBJECT_0 && ఫలితం < WAIT_OBJECT_0 + n)
 	{
-	    job_T *wait_job = jobArray[result - WAIT_OBJECT_0];
+	    పని_T *wait_పని = పని_Array[ఫలితం - WAIT_OBJECT_0];
 
-	    if (STRCMP(mch_job_status(wait_job), "dead") == 0)
-		return wait_job;
+	    ఒకవేళ (STRCMP(mch_పని_స్థితి(wait_పని), "dead") == 0)
+		తిరిగి wait_పని;
 	}
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static BOOL
-terminate_all(HANDLE process, int code)
+    స్థిర BOOL
+terminate_all(HANDLE process, పూర్ణాంకం సంకేతం_2)
 {
     PROCESSENTRY32  pe;
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_విలువ;
     DWORD	    pid = GetProcessId(process);
 
-    if (pid != 0)
+    ఒకవేళ (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	ఒకవేళ (h != INVALID_HANDLE_విలువ)
 	{
-	    pe.dwSize = sizeof(PROCESSENTRY32);
-	    if (!Process32First(h, &pe))
-		goto theend;
+	    pe.dw_కొలత = పరిమాణం(PROCESSENTRY32);
+	    ఒకవేళ (!Process32_మొదటి(h, &pe))
+		వెళ్ళు theend;
 
-	    do
+	    చేయి
 	    {
-		if (pe.th32ParentProcessID == pid)
+		ఒకవేళ (pe.th32_మాతృ_Process_ID == pid)
 		{
 		    HANDLE ph = OpenProcess(
 				  PROCESS_ALL_ACCESS, FALSE, pe.th32ProcessID);
-		    if (ph != NULL)
+		    ఒకవేళ (ph != ఖాళీ)
 		    {
-			terminate_all(ph, code);
+			terminate_all(ph, సంకేతం_2);
 			CloseHandle(ph);
 		    }
 		}
-	    } while (Process32Next(h, &pe));
+	    } అయితే (Process32_తదుపరి(h, &pe));
 
 	    CloseHandle(h);
 	}
     }
 
 theend:
-    return TerminateProcess(process, code);
+    తిరిగి TerminateProcess(process, సంకేతం_2);
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if it didn't work.
  */
-    int
-mch_signal_job(job_T *job, char_u *how)
+    పూర్ణాంకం
+mch_signal_పని(పని_T *పని, char_u *how)
 {
-    int ret;
+    పూర్ణాంకం ret;
 
-    if (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
+    ఒకవేళ (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
     {
 	// deadly signal
-	if (job->jv_job_object != NULL)
+	ఒకవేళ (పని->jv_పని_object != ఖాళీ)
 	{
-	    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
-		job->jv_channel->ch_killing = TRUE;
-	    return TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
+	    ఒకవేళ (పని->jv_channel != ఖాళీ && పని->jv_channel->ch_anonymous_pipe)
+		పని->jv_channel->ch_killing = TRUE;
+	    తిరిగి Terminate_పని_Object(పని->jv_పని_object, (UINT)-1) ? OK : FAIL;
 	}
-	return terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
+	తిరిగి terminate_all(పని->jv_proc_info.hProcess, -1) ? OK : FAIL;
     }
 
-    if (!AttachConsole(job->jv_proc_info.dwProcessId))
-	return FAIL;
+    ఒకవేళ (!AttachConsole(పని->jv_proc_info.dwProcessId))
+	తిరిగి FAIL;
     ret = GenerateConsoleCtrlEvent(
 		STRCMP(how, "int") == 0 ? CTRL_C_EVENT : CTRL_BREAK_EVENT,
-		job->jv_proc_info.dwProcessId)
+		పని->jv_proc_info.dwProcessId)
 	    ? OK : FAIL;
     FreeConsole();
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Clear the data related to "job".
  */
-    void
-mch_clear_job(job_T *job)
+    శూన్య
+mch_clear_పని(పని_T *పని)
 {
-    if (job->jv_status == JOB_FAILED)
-	return;
+    ఒకవేళ (పని->jv_స్థితి == పని_FAILED)
+	తిరిగి;
 
-    if (job->jv_job_object != NULL)
-	CloseHandle(job->jv_job_object);
-    CloseHandle(job->jv_proc_info.hProcess);
+    ఒకవేళ (పని->jv_పని_object != ఖాళీ)
+	CloseHandle(పని->jv_పని_object);
+    CloseHandle(పని->jv_proc_info.hProcess);
 }
-#endif
+#అయితే_ముగింపు
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * Start termcap mode
  */
-    static void
-termcap_mode_start(void)
+    స్థిర శూన్య
+termcap_బహుళకం_ప్రారంభం(శూన్య)
 {
     DWORD cmodein;
 
-    if (g_fTermcapMode)
-	return;
+    ఒకవేళ (g_f_Termcap_బహుళకం)
+	తిరిగి;
 
-    SaveConsoleBuffer(&g_cbNonTermcap);
+    Save_Console_బఫరు(&g_cbNonTermcap);
 
-    if (g_cbTermcap.IsValid)
+    ఒకవేళ (g_cbTermcap.IsValid)
     {
 	/*
 	 * We've been in termcap mode before.  Restore certain screen
@@ -6653,87 +6653,87 @@ termcap_mode_start(void)
 	 * size.  Since we will be redrawing the screen, we don't need
 	 * to restore the actual contents of the buffer.
 	 */
-	RestoreConsoleBuffer(&g_cbTermcap, FALSE);
+	Restore_Console_బఫరు(&g_cbTermcap, FALSE);
 	reset_console_color_rgb();
-	SetConsoleWindowInfo(g_hConOut, TRUE, &g_cbTermcap.Info.srWindow);
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	సమితి_Console_కిటికీ_Info(g_h_Con_బహిర్గతం, TRUE, &g_cbTermcap.Info.sr_కిటికీ);
+	అడ్డువరుసలు = g_cbTermcap.Info.dw_కొలత.Y;
+	Columns = g_cbTermcap.Info.dw_కొలత.X;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * This is our first time entering termcap mode.  Clear the console
 	 * screen buffer, and resize the buffer to match the current window
 	 * size.  We will use this as the size of our editing environment.
 	 */
-	ClearConsoleBuffer(g_attrCurrent);
-	set_console_color_rgb();
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Clear_Console_బఫరు(g_attrCurrent);
+	సమితి_console_color_rgb();
+	Resize_Con_Buf_And_కిటికీ(g_h_Con_బహిర్గతం, Columns, అడ్డువరుసలు);
     }
 
     resettitle();
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    if (g_fMouseActive)
+    Get_Console_బహుళకం(g_h_Con_లోపల, &cmodein);
+    ఒకవేళ (g_f_Mouse_చురుకైన)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_ఆదానం;
+	cmodein &= ~ENABLE_శీఘ్ర_EDIT_బహుళకం;
     }
-    else
+    లేకపోతే
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_ఆదానం;
+	cmodein |= g_cmodein & ENABLE_శీఘ్ర_EDIT_బహుళకం;
     }
-    cmodein |= ENABLE_WINDOW_INPUT;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    cmodein |= ENABLE_కిటికీ_ఆదానం;
+    సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodein | ENABLE_EXTENDED_FLAGS);
 
     redraw_later_clear();
-    g_fTermcapMode = TRUE;
+    g_f_Termcap_బహుళకం = TRUE;
 }
 
 
 /*
  * End termcap mode
  */
-    static void
-termcap_mode_end(void)
+    స్థిర శూన్య
+termcap_బహుళకం_చివర(శూన్య)
 {
     DWORD cmodein;
-    ConsoleBuffer *cb;
+    Console_బఫరు *cb;
     COORD coord;
     DWORD dwDummy;
 
-    if (!g_fTermcapMode)
-	return;
+    ఒకవేళ (!g_f_Termcap_బహుళకం)
+	తిరిగి;
 
-    SaveConsoleBuffer(&g_cbTermcap);
+    Save_Console_బఫరు(&g_cbTermcap);
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    cmodein &= ~(ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
-    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    Get_Console_బహుళకం(g_h_Con_లోపల, &cmodein);
+    cmodein &= ~(ENABLE_MOUSE_ఆదానం | ENABLE_కిటికీ_ఆదానం);
+    cmodein |= g_cmodein & ENABLE_శీఘ్ర_EDIT_బహుళకం;
+    సమితి_Console_బహుళకం(g_h_Con_లోపల, cmodein | ENABLE_EXTENDED_FLAGS);
 
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     cb = exiting ? &g_cbOrig : &g_cbNonTermcap;
-# else
+# లేకపోతే
     cb = &g_cbNonTermcap;
 # endif
-    RestoreConsoleBuffer(cb, p_rs);
+    Restore_Console_బఫరు(cb, p_rs);
     restore_console_color_rgb();
 
     // Switch back to main screen buffer.
-    if (exiting && use_alternate_screen_buffer)
+    ఒకవేళ (exiting && use_alternate_screen_బఫరు)
 	vtp_printf("\033[?1049l");
 
-    if (!USE_WT && (p_rs || exiting))
+    ఒకవేళ (!USE_WT && (p_rs || exiting))
     {
 	/*
 	 * Clear anything that happens to be on the current line.
 	 */
 	coord.X = 0;
-	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (Rows - 1));
-	FillConsoleOutputCharacter(g_hConOut, ' ',
-		cb->Info.dwSize.X, coord, &dwDummy);
+	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (అడ్డువరుసలు - 1));
+	FillConsoleOutputCharacter(g_h_Con_బహిర్గతం, ' ',
+		cb->Info.dw_కొలత.X, coord, &dwDummy);
 	/*
 	 * The following is just for aesthetics.  If we are exiting without
 	 * restoring the screen, then we want to have a prompt string
@@ -6742,40 +6742,40 @@ termcap_mode_end(void)
 	 * the prompt string, which causes the screen to scroll.  To
 	 * counter this, move the cursor up one line before exiting.
 	 */
-	if (exiting && !p_rs)
+	ఒకవేళ (exiting && !p_rs)
 	    coord.Y--;
 	/*
 	 * Position the cursor at the leftmost column of the desired row.
 	 */
-	SetConsoleCursorPosition(g_hConOut, coord);
+	సమితి_Console_Cursor_Position(g_h_Con_బహిర్గతం, coord);
     }
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    g_fTermcapMode = FALSE;
+    సమితి_Console_Cursor_Info(g_h_Con_బహిర్గతం, &g_cci);
+    g_f_Termcap_బహుళకం = FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * clear `n' chars, starting from `coord'
  */
-    static void
+    స్థిర శూన్య
 clear_chars(
     COORD coord,
     DWORD n)
 {
-    if (!vtp_working)
+    ఒకవేళ (!vtp_working)
     {
 	DWORD dwDummy;
 
-	FillConsoleOutputCharacter(g_hConOut, ' ', n, coord, &dwDummy);
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, n, coord,
+	FillConsoleOutputCharacter(g_h_Con_బహిర్గతం, ' ', n, coord, &dwDummy);
+	FillConsoleOutputAttribute(g_h_Con_బహిర్గతం, g_attrCurrent, n, coord,
 								     &dwDummy);
     }
-    else
+    లేకపోతే
     {
-	set_console_color_rgb();
+	సమితి_console_color_rgb();
 	gotoxy(coord.X + 1, coord.Y + 1);
 	vtp_printf("\033[%dX", n);
     }
@@ -6785,16 +6785,16 @@ clear_chars(
 /*
  * Clear the screen
  */
-    static void
-clear_screen(void)
+    స్థిర శూన్య
+clear_screen(శూన్య)
 {
     g_coord.X = g_coord.Y = 0;
 
-    if (!vtp_working)
-	clear_chars(g_coord, Rows * Columns);
-    else
+    ఒకవేళ (!vtp_working)
+	clear_chars(g_coord, అడ్డువరుసలు * Columns);
+    లేకపోతే
     {
-	set_console_color_rgb();
+	సమితి_console_color_rgb();
 	gotoxy(1, 1);
 	vtp_printf("\033[2J");
     }
@@ -6804,17 +6804,17 @@ clear_screen(void)
 /*
  * Clear to end of display
  */
-    static void
-clear_to_end_of_display(void)
+    స్థిర శూన్య
+clear_గమ్యం_చివర_యొక్క_display(శూన్య)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
-	clear_chars(g_coord, (Rows - g_coord.Y - 1)
+    ఒకవేళ (!vtp_working)
+	clear_chars(g_coord, (అడ్డువరుసలు - g_coord.Y - 1)
 					   * Columns + (Columns - g_coord.X));
-    else
+    లేకపోతే
     {
-	set_console_color_rgb();
+	సమితి_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0J");
 
@@ -6827,16 +6827,16 @@ clear_to_end_of_display(void)
 /*
  * Clear to end of line
  */
-    static void
-clear_to_end_of_line(void)
+    స్థిర శూన్య
+clear_గమ్యం_చివర_యొక్క_పంక్తి(శూన్య)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    ఒకవేళ (!vtp_working)
 	clear_chars(g_coord, Columns - g_coord.X);
-    else
+    లేకపోతే
     {
-	set_console_color_rgb();
+	సమితి_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0K");
 
@@ -6849,13 +6849,13 @@ clear_to_end_of_line(void)
 /*
  * Scroll the scroll region up by `cLines' lines
  */
-    static void
-scroll(unsigned cLines)
+    స్థిర శూన్య
+scroll(గుర్తులేని c_పంక్తులు)
 {
     COORD oldcoord = g_coord;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
-    delete_lines(cLines);
+    gotoxy(g_srScrollRegion.ఎడమ_4 + 1, g_srScrollRegion.శిఖరం_2 + 1);
+    delete_పంక్తులు(c_పంక్తులు);
 
     g_coord = oldcoord;
 }
@@ -6864,84 +6864,84 @@ scroll(unsigned cLines)
 /*
  * Set the scroll region
  */
-    static void
-set_scroll_region(
-    unsigned left,
-    unsigned top,
-    unsigned right,
-    unsigned bottom)
+    స్థిర శూన్య
+సమితి_scroll_region(
+    గుర్తులేని ఎడమ_2,
+    గుర్తులేని శిఖరం,
+    గుర్తులేని కుడి_2,
+    గుర్తులేని bottom)
 {
-    if (left >= right
-	    || top >= bottom
-	    || right > (unsigned) Columns - 1
-	    || bottom > (unsigned) Rows - 1)
-	return;
+    ఒకవేళ (ఎడమ_2 >= కుడి_2
+	    || శిఖరం >= bottom
+	    || కుడి_2 > (గుర్తులేని) Columns - 1
+	    || bottom > (గుర్తులేని) అడ్డువరుసలు - 1)
+	తిరిగి;
 
-    g_srScrollRegion.Left =   left;
-    g_srScrollRegion.Top =    top;
-    g_srScrollRegion.Right =  right;
+    g_srScrollRegion.ఎడమ_4 =   ఎడమ_2;
+    g_srScrollRegion.శిఖరం_2 =    శిఖరం;
+    g_srScrollRegion.కుడి_4 =  కుడి_2;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_tb(
-    unsigned top,
-    unsigned bottom)
+    స్థిర శూన్య
+సమితి_scroll_region_tb(
+    గుర్తులేని శిఖరం,
+    గుర్తులేని bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
-	return;
+    ఒకవేళ (శిఖరం >= bottom || bottom > (గుర్తులేని)అడ్డువరుసలు - 1)
+	తిరిగి;
 
-    g_srScrollRegion.Top = top;
+    g_srScrollRegion.శిఖరం_2 = శిఖరం;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_lr(
-    unsigned left,
-    unsigned right)
+    స్థిర శూన్య
+సమితి_scroll_region_lr(
+    గుర్తులేని ఎడమ_2,
+    గుర్తులేని కుడి_2)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
-	return;
+    ఒకవేళ (ఎడమ_2 >= కుడి_2 || కుడి_2 > (గుర్తులేని)Columns - 1)
+	తిరిగి;
 
-    g_srScrollRegion.Left = left;
-    g_srScrollRegion.Right = right;
+    g_srScrollRegion.ఎడమ_4 = ఎడమ_2;
+    g_srScrollRegion.కుడి_4 = కుడి_2;
 }
 
 
 /*
  * Insert `cLines' lines at the current cursor position
  */
-    static void
-insert_lines(unsigned cLines)
+    స్థిర శూన్య
+చొప్పించు_పంక్తులు(గుర్తులేని c_పంక్తులు)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    ఆధారం, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.ఎడమ_4 + 1, g_srScrollRegion.శిఖరం_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
-    dest.Y = g_coord.Y + cLines;
+    dest.X = g_srScrollRegion.ఎడమ_4;
+    dest.Y = g_coord.Y + c_పంక్తులు;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom - cLines;
+    ఆధారం.ఎడమ_4   = g_srScrollRegion.ఎడమ_4;
+    ఆధారం.శిఖరం_2	  = g_coord.Y;
+    ఆధారం.కుడి_4  = g_srScrollRegion.కుడి_4;
+    ఆధారం.Bottom = g_srScrollRegion.Bottom - c_పంక్తులు;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.ఎడమ_4   = g_srScrollRegion.ఎడమ_4;
+    clip.శిఖరం_2    = g_coord.Y;
+    clip.కుడి_4  = g_srScrollRegion.కుడి_4;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!USE_VTP)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    ఒకవేళ (!USE_VTP)
+	fill.లక్షణాలు_2 = g_attrCurrent;
+    లేకపోతే
+	fill.లక్షణాలు_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    సమితి_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_బఫరు(g_h_Con_బహిర్గతం, &ఆధారం, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake: If the scroll
     // region looks like abc and we scroll c to a and fill with d we get
@@ -6950,29 +6950,29 @@ insert_lines(unsigned cLines)
     // here... (this also occurs scrolling the same way in the other
     // direction).
 
-    if (source.Bottom < dest.Y)
+    ఒకవేళ (ఆధారం.Bottom < dest.Y)
     {
 	COORD coord;
-	int   i;
+	పూర్ణాంకం   i;
 
-	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	coord.X = ఆధారం.ఎడమ_4;
+	కొరకు (i = clip.శిఖరం_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ఆధారం.కుడి_4 - ఆధారం.ఎడమ_4 + 1);
 	}
     }
 
-    if (vtp_working)
+    ఒకవేళ (vtp_working)
     {
 	COORD coord;
-	int i;
+	పూర్ణాంకం i;
 
-	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	coord.X = ఆధారం.ఎడమ_4;
+	కొరకు (i = ఆధారం.శిఖరం_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ఆధారం.కుడి_4 - ఆధారం.ఎడమ_4 + 1);
 	}
     }
 }
@@ -6981,67 +6981,67 @@ insert_lines(unsigned cLines)
 /*
  * Delete `cLines' lines at the current cursor position
  */
-    static void
-delete_lines(unsigned cLines)
+    స్థిర శూన్య
+delete_పంక్తులు(గుర్తులేని c_పంక్తులు)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    ఆధారం, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
-    int		    nb;
+    పూర్ణాంకం		    nb;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.ఎడమ_4 + 1, g_srScrollRegion.శిఖరం_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
+    dest.X = g_srScrollRegion.ఎడమ_4;
     dest.Y = g_coord.Y;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y + cLines;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom;
+    ఆధారం.ఎడమ_4   = g_srScrollRegion.ఎడమ_4;
+    ఆధారం.శిఖరం_2	  = g_coord.Y + c_పంక్తులు;
+    ఆధారం.కుడి_4  = g_srScrollRegion.కుడి_4;
+    ఆధారం.Bottom = g_srScrollRegion.Bottom;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.ఎడమ_4   = g_srScrollRegion.ఎడమ_4;
+    clip.శిఖరం_2    = g_coord.Y;
+    clip.కుడి_4  = g_srScrollRegion.కుడి_4;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!vtp_working)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    ఒకవేళ (!vtp_working)
+	fill.లక్షణాలు_2 = g_attrCurrent;
+    లేకపోతే
+	fill.లక్షణాలు_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    సమితి_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_బఫరు(g_h_Con_బహిర్గతం, &ఆధారం, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake; See insert_lines()
     // above.
 
-    nb = dest.Y + (source.Bottom - source.Top) + 1;
+    nb = dest.Y + (ఆధారం.Bottom - ఆధారం.శిఖరం_2) + 1;
 
-    if (nb < source.Top)
+    ఒకవేళ (nb < ఆధారం.శిఖరం_2)
     {
 	COORD coord;
-	int   i;
+	పూర్ణాంకం   i;
 
-	coord.X = source.Left;
-	for (i = nb; i < clip.Bottom; ++i)
+	coord.X = ఆధారం.ఎడమ_4;
+	కొరకు (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ఆధారం.కుడి_4 - ఆధారం.ఎడమ_4 + 1);
 	}
     }
 
-    if (vtp_working)
+    ఒకవేళ (vtp_working)
     {
 	COORD coord;
-	int i;
+	పూర్ణాంకం i;
 
-	coord.X = source.Left;
-	for (i = nb; i <= source.Bottom; ++i)
+	coord.X = ఆధారం.ఎడమ_4;
+	కొరకు (i = nb; i <= ఆధారం.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ఆధారం.కుడి_4 - ఆధారం.ఎడమ_4 + 1);
 	}
     }
 }
@@ -7050,28 +7050,28 @@ delete_lines(unsigned cLines)
 /*
  * Set the cursor position to (x,y) (1-based).
  */
-    static void
+    స్థిర శూన్య
 gotoxy(
-    unsigned x,
-    unsigned y)
+    గుర్తులేని x,
+    గుర్తులేని y)
 {
-    if (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
-	return;
+    ఒకవేళ (x < 1 || x > (గుర్తులేని)Columns || y < 1 || y > (గుర్తులేని)అడ్డువరుసలు)
+	తిరిగి;
 
-    if (!USE_VTP)
+    ఒకవేళ (!USE_VTP)
     {
 	// There are reports of double-width characters not displayed
 	// correctly.  This workaround should fix it, similar to how it's done
 	// for VTP.
 	g_coord.X = 0;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	సమితి_Console_Cursor_Position(g_h_Con_బహిర్గతం, g_coord);
 
 	// external cursor coords are 1-based; internal are 0-based
 	g_coord.X = x - 1;
 	g_coord.Y = y - 1;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	సమితి_Console_Cursor_Position(g_h_Con_బహిర్గతం, g_coord);
     }
-    else
+    లేకపోతే
     {
 	// Move the cursor to the left edge of the screen to prevent screen
 	// destruction.  Insider build bug.  Always enabled because it's cheap
@@ -7090,35 +7090,35 @@ gotoxy(
  * Set the current text attribute = (foreground | background)
  * See ../runtime/doc/os_win32.txt for the numbers.
  */
-    static void
-textattr(WORD wAttr)
+    స్థిర శూన్య
+textattr(మాట_2 wAttr)
 {
     g_attrCurrent = wAttr & 0xff;
 
-    SetConsoleTextAttribute(g_hConOut, wAttr);
+    సమితి_Console_పాఠ్యం_Attribute(g_h_Con_బహిర్గతం, wAttr);
 }
 
 
-    static void
-textcolor(WORD wAttr)
+    స్థిర శూన్య
+textcolor(మాట_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0xf0) + (wAttr & 0x0f);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    ఒకవేళ (!vtp_working)
+	సమితి_Console_పాఠ్యం_Attribute(g_h_Con_బహిర్గతం, g_attrCurrent);
+    లేకపోతే
 	vtp_sgr_bulk(wAttr);
 }
 
 
-    static void
-textbackground(WORD wAttr)
+    స్థిర శూన్య
+textbackground(మాట_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0x0f) + ((wAttr & 0x0f) << 4);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    ఒకవేళ (!vtp_working)
+	సమితి_Console_పాఠ్యం_Attribute(g_h_Con_బహిర్గతం, g_attrCurrent);
+    లేకపోతే
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7126,37 +7126,37 @@ textbackground(WORD wAttr)
 /*
  * restore the default text attribute (whatever we started with)
  */
-    static void
-normvideo(void)
+    స్థిర శూన్య
+normvideo(శూన్య)
 {
-    if (!vtp_working)
+    ఒకవేళ (!vtp_working)
 	textattr(g_attrDefault);
-    else
+    లేకపోతే
 	vtp_sgr_bulk(0);
 }
 
 
-static WORD g_attrPreStandout = 0;
+స్థిర మాట_2 g_attrPreStandout = 0;
 
 /*
  * Make the text standout, by brightening it
  */
-    static void
-standout(void)
+    స్థిర శూన్య
+standout(శూన్య)
 {
     g_attrPreStandout = g_attrCurrent;
 
-    textattr((WORD) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
+    textattr((మాట_2) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
 }
 
 
 /*
  * Turn off standout mode
  */
-    static void
-standend(void)
+    స్థిర శూన్య
+standend(శూన్య)
 {
-    if (g_attrPreStandout)
+    ఒకవేళ (g_attrPreStandout)
 	textattr(g_attrPreStandout);
 
     g_attrPreStandout = 0;
@@ -7166,15 +7166,15 @@ standend(void)
 /*
  * Set normal fg/bg color, based on T_ME.  Called when t_me has been set.
  */
-    void
-mch_set_normal_colors(void)
+    శూన్య
+mch_సమితి_సాధారణ_colors(శూన్య)
 {
     char_u	*p;
-    int		n;
+    పూర్ణాంకం		n;
 
-    cterm_normal_fg_color = (g_attrDefault & 0xf) + 1;
-    cterm_normal_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
-    if (
+    cterm_సాధారణ_fg_color = (g_attrDefault & 0xf) + 1;
+    cterm_సాధారణ_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
+    ఒకవేళ (
 # ifdef FEAT_TERMGUICOLORS
 	!p_tgc &&
 # endif
@@ -7182,15 +7182,15 @@ mch_set_normal_colors(void)
     {
 	p = T_ME + 2;
 	n = getdigits(&p);
-	if (*p == 'm' && n > 0)
+	ఒకవేళ (*p == 'm' && n > 0)
 	{
-	    cterm_normal_fg_color = (n & 0xf) + 1;
-	    cterm_normal_bg_color = ((n >> 4) & 0xf) + 1;
+	    cterm_సాధారణ_fg_color = (n & 0xf) + 1;
+	    cterm_సాధారణ_bg_color = ((n >> 4) & 0xf) + 1;
 	}
     }
 # ifdef FEAT_TERMGUICOLORS
-    cterm_normal_fg_gui_color = INVALCOLOR;
-    cterm_normal_bg_gui_color = INVALCOLOR;
+    cterm_సాధారణ_fg_gui_color = INVALCOLOR;
+    cterm_సాధారణ_bg_gui_color = INVALCOLOR;
 # endif
 }
 
@@ -7198,34 +7198,34 @@ mch_set_normal_colors(void)
 /*
  * visual bell: flash the screen
  */
-    static void
-visual_bell(void)
+    స్థిర శూన్య
+visual_bell(శూన్య)
 {
     COORD   coordOrigin = {0, 0};
-    WORD    attrFlash = ~g_attrCurrent & 0xff;
+    మాట_2    attrFlash = ~g_attrCurrent & 0xff;
 
     DWORD   dwDummy;
-    LPWORD  oldattrs = NULL;
+    LPWORD  oldattrs = ఖాళీ;
 
 # ifdef FEAT_TERMGUICOLORS
-    if (!(p_tgc || t_colors >= 256))
+    ఒకవేళ (!(p_tgc || t_colors >= 256))
 # endif
     {
-	oldattrs = ALLOC_MULT(WORD, Rows * Columns);
-	if (oldattrs == NULL)
-	    return;
-	ReadConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	oldattrs = ALLOC_MULT(మాట_2, అడ్డువరుసలు * Columns);
+	ఒకవేళ (oldattrs == ఖాళీ)
+	    తిరిగి;
+	ReadConsoleOutputAttribute(g_h_Con_బహిర్గతం, oldattrs, అడ్డువరుసలు * Columns,
 			       coordOrigin, &dwDummy);
     }
 
-    FillConsoleOutputAttribute(g_hConOut, attrFlash, Rows * Columns,
+    FillConsoleOutputAttribute(g_h_Con_బహిర్గతం, attrFlash, అడ్డువరుసలు * Columns,
 			       coordOrigin, &dwDummy);
 
     Sleep(15);	    // wait for 15 msec
 
-    if (oldattrs != NULL)
+    ఒకవేళ (oldattrs != ఖాళీ)
     {
-	WriteConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	WriteConsoleOutputAttribute(g_h_Con_బహిర్గతం, oldattrs, అడ్డువరుసలు * Columns,
 				coordOrigin, &dwDummy);
 	vim_free(oldattrs);
     }
@@ -7235,19 +7235,19 @@ visual_bell(void)
 /*
  * Make the cursor visible or invisible
  */
-    static void
+    స్థిర శూన్య
 cursor_visible(BOOL fVisible)
 {
     s_cursor_visible = fVisible;
 
-    if (vtp_working)
+    ఒకవేళ (vtp_working)
     {
 	// In vtp mode, visibility is controlled solely by DECTCEM.  Skip
 	// mch_update_cursor() since shape is independent of visibility and
 	// re-emitting DECSCUSR can cause the terminal to briefly redisplay
 	// the cursor while a redraw is in progress.
 	vtp_printf("\033[?25%c", fVisible ? 'h' : 'l');
-	return;
+	తిరిగి;
     }
 
 # ifdef MCH_CURSOR_SHAPE
@@ -7263,201 +7263,201 @@ cursor_visible(BOOL fVisible)
  * Write "cbToWrite" bytes in `pchBuf' to the screen.
  * Returns the number of bytes actually written (at least one).
  */
-    static DWORD
+    స్థిర DWORD
 write_chars(
     char_u *pchBuf,
-    DWORD  cbToWrite)
+    DWORD  cb_గమ్యం_Write)
 {
     COORD	    coord = g_coord;
     DWORD	    written;
     DWORD	    n, cchwritten;
-    static DWORD    cells;
-    static WCHAR    *unicodebuf = NULL;
-    static int	    unibuflen = 0;
-    static int	    length;
-    int		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
-    static WCHAR    *utf8spbuf = NULL;
-    static int	    utf8splength;
-    static DWORD    utf8spcells;
-    static WCHAR    **utf8usingbuf = &unicodebuf;
+    స్థిర DWORD    cells;
+    స్థిర WCHAR    *unicodebuf = ఖాళీ;
+    స్థిర పూర్ణాంకం	    unibuflen = 0;
+    స్థిర పూర్ణాంకం	    నిడివి;
+    పూర్ణాంకం		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
+    స్థిర WCHAR    *utf8spbuf = ఖాళీ;
+    స్థిర పూర్ణాంకం	    utf8splength;
+    స్థిర DWORD    utf8spcells;
+    స్థిర WCHAR    **utf8usingbuf = &unicodebuf;
 
-    if (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
+    ఒకవేళ (cb_గమ్యం_Write != 1 || *pchBuf != ' ' || !enc_utf8)
     {
 	utf8usingbuf = &unicodebuf;
-	do
+	చేయి
 	{
-	    length = MultiByteToWideChar(cp, 0, (LPCSTR)pchBuf, cbToWrite,
+	    నిడివి = Multi_Byte_గమ్యం_Wide_Char(cp, 0, (LPCSTR)pchBuf, cb_గమ్యం_Write,
 							unicodebuf, unibuflen);
-	    if (length && length <= unibuflen)
-		break;
+	    ఒకవేళ (నిడివి && నిడివి <= unibuflen)
+		ఆపు;
 	    vim_free(unicodebuf);
-	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : NULL;
-	    unibuflen = unibuflen ? 0 : length;
-	} while (TRUE);
-	cells = mb_string2cells(pchBuf, cbToWrite);
+	    unicodebuf = నిడివి ? LALLOC_MULT(WCHAR, నిడివి) : ఖాళీ;
+	    unibuflen = unibuflen ? 0 : నిడివి;
+	} అయితే (TRUE);
+	cells = mb_string2cells(pchBuf, cb_గమ్యం_Write);
     }
-    else // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
+    లేకపోతే // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
     {
-	if (utf8usingbuf != &utf8spbuf)
+	ఒకవేళ (utf8usingbuf != &utf8spbuf)
 	{
-	    if (utf8spbuf == NULL)
+	    ఒకవేళ (utf8spbuf == ఖాళీ)
 	    {
 		cells = mb_string2cells((char_u *)" ", 1);
-		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, NULL, 0);
-		utf8spbuf = LALLOC_MULT(WCHAR, length);
-		if (utf8spbuf != NULL)
+		నిడివి = Multi_Byte_గమ్యం_Wide_Char(CP_UTF8, 0, " ", 1, ఖాళీ, 0);
+		utf8spbuf = LALLOC_MULT(WCHAR, నిడివి);
+		ఒకవేళ (utf8spbuf != ఖాళీ)
 		{
-		    MultiByteToWideChar(CP_UTF8, 0, " ", 1, utf8spbuf, length);
+		    Multi_Byte_గమ్యం_Wide_Char(CP_UTF8, 0, " ", 1, utf8spbuf, నిడివి);
 		    utf8usingbuf = &utf8spbuf;
-		    utf8splength = length;
+		    utf8splength = నిడివి;
 		    utf8spcells = cells;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		utf8usingbuf = &utf8spbuf;
-		length = utf8splength;
+		నిడివి = utf8splength;
 		cells = utf8spcells;
 	    }
 	}
     }
 
-    if (!USE_VTP)
+    ఒకవేళ (!USE_VTP)
     {
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, cells,
+	FillConsoleOutputAttribute(g_h_Con_బహిర్గతం, g_attrCurrent, cells,
 				    coord, &written);
 	// When writing fails or didn't write a single character, pretend one
 	// character was written, otherwise we get stuck.
-	if (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
+	ఒకవేళ (WriteConsoleOutputCharacterW(g_h_Con_బహిర్గతం, *utf8usingbuf, నిడివి,
 		    coord, &cchwritten) == 0
 		|| cchwritten == 0 || cchwritten == (DWORD)-1)
 	    cchwritten = 1;
     }
-    else
+    లేకపోతే
     {
-	if (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
-		    NULL) == 0 || cchwritten == 0)
+	ఒకవేళ (WriteConsoleW(g_h_Con_బహిర్గతం, *utf8usingbuf, నిడివి, &cchwritten,
+		    ఖాళీ) == 0 || cchwritten == 0)
 	    cchwritten = 1;
     }
 
-    if (cchwritten == (DWORD)length)
+    ఒకవేళ (cchwritten == (DWORD)నిడివి)
     {
-	written = cbToWrite;
+	written = cb_గమ్యం_Write;
 	g_coord.X += (SHORT)cells;
     }
-    else
+    లేకపోతే
     {
 	char_u *p = pchBuf;
-	for (n = 0; n < cchwritten; n++)
+	కొరకు (n = 0; n < cchwritten; n++)
 	    MB_CPTR_ADV(p);
 	written = p - pchBuf;
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    అయితే (g_coord.X > g_srScrollRegion.కుడి_4)
     {
 	g_coord.X -= (SHORT) Columns;
-	if (g_coord.Y < g_srScrollRegion.Bottom)
+	ఒకవేళ (g_coord.Y < g_srScrollRegion.Bottom)
 	    g_coord.Y++;
     }
 
     // Cursor under VTP is always in the correct position, no need to reset.
-    if (!USE_VTP)
+    ఒకవేళ (!USE_VTP)
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 
-    return written;
+    తిరిగి written;
 }
 
-    static char_u *
+    స్థిర char_u *
 get_seq(
-    int *args,
-    int *count,
-    char_u *head)
+    పూర్ణాంకం *వాదనలు,
+    పూర్ణాంకం *లెక్క,
+    char_u *తల)
 {
-    int argc;
+    పూర్ణాంకం argc;
     char_u *p;
 
-    if (head == NULL || *head != '\033')
-	return NULL;
+    ఒకవేళ (తల == ఖాళీ || *తల != '\033')
+	తిరిగి ఖాళీ;
 
     argc = 0;
-    p = head;
+    p = తల;
     ++p;
-    do
+    చేయి
     {
 	++p;
-	args[argc] = getdigits(&p);
+	వాదనలు[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
-    } while (*p == ';');
-    *count = argc;
+    } అయితే (*p == ';');
+    *లెక్క = argc;
 
-    return p;
+    తిరిగి p;
 }
 
-    static char_u *
+    స్థిర char_u *
 get_sgr(
-    int *args,
-    int *count,
-    char_u *head)
+    పూర్ణాంకం *వాదనలు,
+    పూర్ణాంకం *లెక్క,
+    char_u *తల)
 {
-    char_u *p = get_seq(args, count, head);
+    char_u *p = get_seq(వాదనలు, లెక్క, తల);
 
-    return (p && *p == 'm') ? ++p : NULL;
+    తిరిగి (p && *p == 'm') ? ++p : ఖాళీ;
 }
 
 /*
  * Pointer to next if SGR (^[[n;2;*;*;*m), NULL otherwise.
  */
-    static char_u *
+    స్థిర char_u *
 sgrn2(
-    char_u *head,
-    int	   n)
+    char_u *తల,
+    పూర్ణాంకం	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    పూర్ణాంకం argc;
+    పూర్ణాంకం వాదనలు[16];
+    char_u *p = get_sgr(వాదనలు, &argc, తల);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    తిరిగి p && argc == 5 && వాదనలు[0] == n && వాదనలు[1] == 2 ? p : ఖాళీ;
 }
 
 /*
  * Pointer to next if SGR(^[[nm)<space>ESC, NULL otherwise.
  */
-    static char_u *
+    స్థిర char_u *
 sgrnc(
-    char_u *head,
-    int	   n)
+    char_u *తల,
+    పూర్ణాంకం	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    పూర్ణాంకం argc;
+    పూర్ణాంకం వాదనలు[16];
+    char_u *p = get_sgr(వాదనలు, &argc, తల);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
-								    ? p : NULL;
+    తిరిగి p && argc == 1 && వాదనలు[0] == n && (p = skipwhite(p)) && *p == '\033'
+								    ? p : ఖాళీ;
 }
 
-    static char_u *
+    స్థిర char_u *
 skipblank(char_u *q)
 {
     char_u *p = q;
 
-    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+    అయితే (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Pointer to the next if any whitespace that may follow SGR is ESC, otherwise
  * NULL.
  */
-    static char_u *
+    స్థిర char_u *
 sgrn2c(
-    char_u *head,
-    int	   n)
+    char_u *తల,
+    పూర్ణాంకం	   n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(తల, n);
 
-    return p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
+    తిరిగి p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : ఖాళీ;
 }
 
 /*
@@ -7465,38 +7465,38 @@ sgrn2c(
  * a pointer to the character following the newline is returned.
  * Otherwise NULL.
  */
-    static char_u *
+    స్థిర char_u *
 sgrn2cn(
-    char_u *head,
-    int n)
+    char_u *తల,
+    పూర్ణాంకం n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(తల, n);
 
-    return p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
+    తిరిగి p && p[0] == 0x0a && p[1] == '\033' ? ++p : ఖాళీ;
 }
 
-static bool in_dcs = false;	// inside a DCS (sixel) sequence
-static bool dcs_esc = false;	// last DCS byte written was ESC
+స్థిర bool లోపల_dcs = false;	// inside a DCS (sixel) sequence
+స్థిర bool dcs_esc = false;	// last DCS byte written was ESC
 
 /*
  * Write "len" bytes at "s" with WriteConsoleW, so that the console's own VT
  * parser processes them.  Needed for DCS sequences when USE_VTP is off.
  */
-    static void
-write_vt(char_u *s, int len)
+    స్థిర శూన్య
+write_vt(char_u *s, పూర్ణాంకం len)
 {
-    int		wlen;
+    పూర్ణాంకం		wlen;
     WCHAR	*ws;
     DWORD	written;
 
-    wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, NULL, 0);
-    if (wlen <= 0)
-	return;
+    wlen = Multi_Byte_గమ్యం_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, ఖాళీ, 0);
+    ఒకవేళ (wlen <= 0)
+	తిరిగి;
     ws = ALLOC_MULT(WCHAR, wlen);
-    if (ws == NULL)
-	return;
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
-    WriteConsoleW(g_hConOut, ws, wlen, &written, NULL);
+    ఒకవేళ (ws == ఖాళీ)
+	తిరిగి;
+    Multi_Byte_గమ్యం_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
+    WriteConsoleW(g_h_Con_బహిర్గతం, ws, wlen, &written, ఖాళీ);
     vim_free(ws);
 }
 
@@ -7505,171 +7505,171 @@ write_vt(char_u *s, int len)
  * Returns "end" when the ST is not in this chunk; "in_dcs" then stays set so
  * that the next mch_write() call continues the scan.
  */
-    static char_u *
-skip_dcs(char_u *s, char_u *end)
+    స్థిర char_u *
+skip_dcs(char_u *s, char_u *చివర)
 {
-    for (char_u *p = s; p < end; ++p)
+    కొరకు (char_u *p = s; p < చివర; ++p)
     {
-	if (dcs_esc && *p == '\\')
+	ఒకవేళ (dcs_esc && *p == '\\')
 	{
 	    dcs_esc = false;
-	    in_dcs = false;
-	    return p + 1;
+	    లోపల_dcs = false;
+	    తిరిగి p + 1;
 	}
 	dcs_esc = *p == ESC;
     }
-    return end;
+    తిరిగి చివర;
 }
 
 /*
  * mch_write(): write the output buffer to the screen, translating ESC
  * sequences into calls to console output routines.
  */
-    void
+    శూన్య
 mch_write(
     char_u  *s,
-    int	    len)
+    పూర్ణాంకం	    len)
 {
-    char_u  *end = s + len;
+    char_u  *చివర = s + len;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 # endif
 
-    if (!term_console)
+    ఒకవేళ (!పదం_console)
     {
-	write(1, s, (unsigned)len);
-	return;
+	లిఖ(1, s, (గుర్తులేని)len);
+	తిరిగి;
     }
 
     // translate ESC | sequences into faked bios calls
-    while (len--)
+    అయితే (len--)
     {
-	int prefix = -1;
+	పూర్ణాంకం ఉపసర్గ = -1;
 	char_u ch;
 
 	// While processing a sequence, on rare occasions it seems that another
 	// sequence may be inserted asynchronously.
-	if (len < 0)
+	ఒకవేళ (len < 0)
 	{
 	    redraw_all_later(UPD_CLEAR);
-	    return;
+	    తిరిగి;
 	}
 
-	if (in_dcs)
+	ఒకవేళ (లోపల_dcs)
 	{
 	    // Continuation of a DCS sequence split over several writes.
-	    int	l = (int)(skip_dcs(s, end) - s);
+	    పూర్ణాంకం	l = (పూర్ణాంకం)(skip_dcs(s, చివర) - s);
 
-	    if (vtp_working)
+	    ఒకవేళ (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
-	    continue;
+	    కొనసాగు;
 	}
 
-	while (s + ++prefix < end)
+	అయితే (s + ++ఉపసర్గ < చివర)
 	{
-	    ch = s[prefix];
-	    if (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
+	    ch = s[ఉపసర్గ];
+	    ఒకవేళ (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
 						&& ch != '\a' && ch != '\033'))
-		break;
+		ఆపు;
 	}
 
-	if (p_wd)
+	ఒకవేళ (p_wd)
 	{
 	    WaitForChar(p_wd, FALSE);
-	    if (prefix != 0)
-		prefix = 1;
+	    ఒకవేళ (ఉపసర్గ != 0)
+		ఉపసర్గ = 1;
 	}
 
-	if (prefix != 0)
+	ఒకవేళ (ఉపసర్గ != 0)
 	{
 	    DWORD nWritten;
 
-	    nWritten = write_chars(s, prefix);
+	    nWritten = write_chars(s, ఉపసర్గ);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, పరిమాణం(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
 	    len -= (nWritten - 1);
 	    s += nWritten;
 	}
-	else if (s[0] == '\n')
+	లేకపోతే ఒకవేళ (s[0] == '\n')
 	{
 	    // \n, newline: go to the beginning of the next line or scroll
-	    if (g_coord.Y == g_srScrollRegion.Bottom)
+	    ఒకవేళ (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
-		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
+		gotoxy(g_srScrollRegion.ఎడమ_4 + 1, g_srScrollRegion.Bottom + 1);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
+		gotoxy(g_srScrollRegion.ఎడమ_4 + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 		fputs("\\n\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\r')
+	లేకపోతే ఒకవేళ (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
-	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
+	    gotoxy(g_srScrollRegion.ఎడమ_4+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 		fputs("\\r\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\b')
+	లేకపోతే ఒకవేళ (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    ఒకవేళ (g_coord.X > g_srScrollRegion.ఎడమ_4)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    లేకపోతే ఒకవేళ (g_coord.Y > g_srScrollRegion.శిఖరం_2)
 	    {
-		g_coord.X = g_srScrollRegion.Right;
+		g_coord.X = g_srScrollRegion.కుడి_4;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 		fputs("\\b\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\a')
+	లేకపోతే ఒకవేళ (s[0] == '\a')
 	{
 	    // \a, bell
-	    MessageBeep(0xFFFFFFFF);
+	    సందేశం_Beep(0xFFFFFFFF);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 		fputs("\\a\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '|')
+	లేకపోతే ఒకవేళ (s[0] == ESC && len >= 3-1 && s[1] == '|')
 	{
 # ifdef MCH_WRITE_DUMP
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    పూర్ణాంకం	    arg1 = 0, arg2 = 0, argc = 0, వాదనలు[16];
 	    char_u  *sp;
 
-	    switch (s[2])
+	    ఎంపిక (s[2])
 	    {
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
-		    goto notsgr;
+	    స్థితి '0': స్థితి '1': స్థితి '2': స్థితి '3': స్థితి '4':
+	    స్థితి '5': స్థితి '6': స్థితి '7': స్థితి '8': స్థితి '9':
+		ఒకవేళ (*(p = get_seq(వాదనలు, &argc, s)) != 'm')
+		    వెళ్ళు notsgr;
 
 		p = s;
 
@@ -7678,164 +7678,164 @@ mch_write(
 
 		// If resetFG,FG,BG,<cr>,BG,FG are connected, the preceding
 		// resetFG,FG,BG are omitted.
-		if (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
+		ఒకవేళ (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
 		{
 		    p = sgrn2(sgrn2(sgrnc(p, 39), 38), 48);
-		    len = len + 1 - (int)(p - s);
+		    len = len + 1 - (పూర్ణాంకం)(p - s);
 		    s = p;
-		    break;
+		    ఆపు;
 		}
 
 		// If FG,BG,BG,FG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
+		ఒకవేళ (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
 		    p = sp;
 
 		// If FG,BG,FG,BG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
+		ఒకవేళ (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
 		    p = sp;
 
 		// If BG,BG of SGR are connected, the first BG can be omitted.
-		if (sgrn2((sp = sgrn2(p, 48)), 48))
+		ఒకవేళ (sgrn2((sp = sgrn2(p, 48)), 48))
 		    p = sp;
 
 		// If restoreFG and FG are connected, the restoreFG can be
 		// omitted.
-		if (sgrn2((sp = sgrnc(p, 39)), 38))
+		ఒకవేళ (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
-		p = get_seq(args, &argc, p);
+		p = get_seq(వాదనలు, &argc, p);
 
 notsgr:
-		arg1 = args[0];
-		arg2 = args[1];
-		if (*p == 'm')
+		arg1 = వాదనలు[0];
+		arg2 = వాదనలు[1];
+		ఒకవేళ (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    ఒకవేళ (argc == 1 && వాదనలు[0] == 0)
 			normvideo();
-		    else if (argc == 1)
+		    లేకపోతే ఒకవేళ (argc == 1)
 		    {
-			if (USE_VTP)
-			    textcolor((WORD)arg1);
-			else
-			    textattr((WORD)arg1);
+			ఒకవేళ (USE_VTP)
+			    textcolor((మాట_2)arg1);
+			లేకపోతే
+			    textattr((మాట_2)arg1);
 		    }
-		    else if (vtp_working)
-			vtp_sgr_bulks(argc, args);
+		    లేకపోతే ఒకవేళ (vtp_working)
+			vtp_sgr_bulks(argc, వాదనలు);
 		}
-		else if (argc == 2 && *p == 'H')
+		లేకపోతే ఒకవేళ (argc == 2 && *p == 'H')
 		{
 		    gotoxy(arg2, arg1);
 		}
-		else if (argc == 2 && *p == 'r')
+		లేకపోతే ఒకవేళ (argc == 2 && *p == 'r')
 		{
-		    set_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
+		    సమితి_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
 		}
-		else if (argc == 2 && *p == 'R')
+		లేకపోతే ఒకవేళ (argc == 2 && *p == 'R')
 		{
-		    set_scroll_region_tb(arg1, arg2);
+		    సమితి_scroll_region_tb(arg1, arg2);
 		}
-		else if (argc == 2 && *p == 'V')
+		లేకపోతే ఒకవేళ (argc == 2 && *p == 'V')
 		{
-		    set_scroll_region_lr(arg1, arg2);
+		    సమితి_scroll_region_lr(arg1, arg2);
 		}
-		else if (argc == 1 && *p == 'A')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
-			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
+			   max(g_srScrollRegion.శిఖరం_2, g_coord.Y - arg1) + 1);
 		}
-		else if (argc == 1 && *p == 'b')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'b')
 		{
-		    textbackground((WORD) arg1);
+		    textbackground((మాట_2) arg1);
 		}
-		else if (argc == 1 && *p == 'C')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'C')
 		{
-		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
+		    gotoxy(min(g_srScrollRegion.కుడి_4, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
-		else if (argc == 1 && *p == 'f')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'f')
 		{
-		    textcolor((WORD) arg1);
+		    textcolor((మాట_2) arg1);
 		}
-		else if (argc == 1 && *p == 'H')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'H')
 		{
 		    gotoxy(1, arg1);
 		}
-		else if (argc == 1 && *p == 'L')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'L')
 		{
-		    insert_lines(arg1);
+		    చొప్పించు_పంక్తులు(arg1);
 		}
-		else if (argc == 1 && *p == 'M')
+		లేకపోతే ఒకవేళ (argc == 1 && *p == 'M')
 		{
-		    delete_lines(arg1);
+		    delete_పంక్తులు(arg1);
 		}
 
-		len -= (int)(p - s);
+		len -= (పూర్ణాంకం)(p - s);
 		s = p + 1;
-		break;
+		ఆపు;
 
-	    case 'A':
+	    స్థితి 'A':
 		gotoxy(g_coord.X + 1,
-		       max(g_srScrollRegion.Top, g_coord.Y - 1) + 1);
-		goto got3;
+		       max(g_srScrollRegion.శిఖరం_2, g_coord.Y - 1) + 1);
+		వెళ్ళు got3;
 
-	    case 'B':
+	    స్థితి 'B':
 		visual_bell();
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'C':
-		gotoxy(min(g_srScrollRegion.Right, g_coord.X + 1) + 1,
+	    స్థితి 'C':
+		gotoxy(min(g_srScrollRegion.కుడి_4, g_coord.X + 1) + 1,
 		       g_coord.Y + 1);
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'E':
-		termcap_mode_end();
-		goto got3;
+	    స్థితి 'E':
+		termcap_బహుళకం_చివర();
+		వెళ్ళు got3;
 
-	    case 'F':
+	    స్థితి 'F':
 		standout();
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'f':
+	    స్థితి 'f':
 		standend();
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'H':
+	    స్థితి 'H':
 		gotoxy(1, 1);
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'j':
-		clear_to_end_of_display();
-		goto got3;
+	    స్థితి 'j':
+		clear_గమ్యం_చివర_యొక్క_display();
+		వెళ్ళు got3;
 
-	    case 'J':
+	    స్థితి 'J':
 		clear_screen();
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'K':
-		clear_to_end_of_line();
-		goto got3;
+	    స్థితి 'K':
+		clear_గమ్యం_చివర_యొక్క_పంక్తి();
+		వెళ్ళు got3;
 
-	    case 'L':
-		insert_lines(1);
-		goto got3;
+	    స్థితి 'L':
+		చొప్పించు_పంక్తులు(1);
+		వెళ్ళు got3;
 
-	    case 'M':
-		delete_lines(1);
-		goto got3;
+	    స్థితి 'M':
+		delete_పంక్తులు(1);
+		వెళ్ళు got3;
 
-	    case 'S':
-		termcap_mode_start();
-		goto got3;
+	    స్థితి 'S':
+		termcap_బహుళకం_ప్రారంభం();
+		వెళ్ళు got3;
 
-	    case 'V':
+	    స్థితి 'V':
 		cursor_visible(TRUE);
-		goto got3;
+		వెళ్ళు got3;
 
-	    case 'v':
+	    స్థితి 'v':
 		cursor_visible(FALSE);
-		goto got3;
+		వెళ్ళు got3;
 
 	    got3:
 		s += 3;
@@ -7843,61 +7843,61 @@ notsgr:
 	    }
 
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 	    {
 		fputs("ESC | ", fdDump);
-		fwrite(old_s + 2, sizeof(char_u), s - old_s - 2, fdDump);
+		fwrite(old_s + 2, పరిమాణం(char_u), s - old_s - 2, fdDump);
 		fputc('\n', fdDump);
 	    }
 # endif
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '[')
+	లేకపోతే ఒకవేళ (s[0] == ESC && len >= 3-1 && s[1] == '[')
 	{
 	    // CSI sequences should not be written as plain text to the
 	    // console.  Parse the sequence and skip over it.  When
 	    // USE_VTP is active, pass through known safe ones (e.g.
 	    // DECSCUSR for cursor shape) via vtp_printf().
-	    int l = 2;
+	    పూర్ణాంకం l = 2;
 
 	    // skip parameter and intermediate bytes (0x20-0x3F)
-	    while (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
+	    అయితే (s + l < చివర && s[l] >= 0x20 && s[l] <= 0x3F)
 		l++;
 	    // skip the final byte (0x40-0x7E)
-	    if (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
+	    ఒకవేళ (s + l < చివర && s[l] >= 0x40 && s[l] <= 0x7E)
 	    {
 		// DECSCUSR (cursor style): pass through to terminal
-		if (USE_VTP && s[l] == 'q')
+		ఒకవేళ (USE_VTP && s[l] == 'q')
 		    vtp_printf("%.*s", l + 1, s);
 		l++;
 	    }
 	    len -= l - 1;
 	    s += l;
 	}
-	else if (s[0] == ESC && len >= 2-1 && s[1] == 'P')
+	లేకపోతే ఒకవేళ (s[0] == ESC && len >= 2-1 && s[1] == 'P')
 	{
 	    // DCS (e.g. sixel image): write_chars() would print it as raw text
 	    // when USE_VTP is off, so let the console's VT parser handle it.
-	    int	l;
+	    పూర్ణాంకం	l;
 
-	    in_dcs = true;
+	    లోపల_dcs = true;
 	    dcs_esc = false;
-	    l = (int)(skip_dcs(s + 2, end) - s);
-	    if (vtp_working)
+	    l = (పూర్ణాంకం)(skip_dcs(s + 2, చివర) - s);
+	    ఒకవేళ (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	}
-	else
+	లేకపోతే
 	{
 	    // Write a single character
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ఒకవేళ (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, పరిమాణం(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
@@ -7908,63 +7908,63 @@ notsgr:
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ఒకవేళ (fdDump)
 	fflush(fdDump);
 # endif
 }
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    void
+#లేకపోతే // FEAT_GUI_MSWIN && !VIMDLL
+    శూన్య
 mch_write(
-    char_u  *s UNUSED,
-    int	    len UNUSED)
+    char_u  *s వాడని,
+    పూర్ణాంకం	    len వాడని)
 {
     // never used
 }
 
-#endif
+#అయితే_ముగింపు
 
 
 /*
  * Delay for "msec" milliseconds.
  */
-    void
+    శూన్య
 mch_delay(
-    long    msec,
-    int	    flags UNUSED)
+    దీర్ఘ    msec,
+    పూర్ణాంకం	    flags వాడని)
 {
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    Sleep((int)msec);	    // never wait for input
-#else // Console
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    Sleep((పూర్ణాంకం)msec);	    // never wait for input
+#లేకపోతే // Console
 # ifdef VIMDLL
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
     {
-	Sleep((int)msec);	    // never wait for input
-	return;
+	Sleep((పూర్ణాంకం)msec);	    // never wait for input
+	తిరిగి;
     }
 # endif
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ఒకవేళ (flags & MCH_DELAY_IGNOREINPUT)
 # ifdef FEAT_MZSCHEME
-	if (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
+	ఒకవేళ (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
 	{
-	    int towait = p_mzq;
+	    పూర్ణాంకం towait = p_mzq;
 
 	    // if msec is large enough, wait by portions in p_mzq
-	    while (msec > 0)
+	    అయితే (msec > 0)
 	    {
-		mzvim_check_threads();
-		if (msec < towait)
+		mzvim_check_దారాలు();
+		ఒకవేళ (msec < towait)
 		    towait = msec;
 		Sleep(towait);
 		msec -= towait;
 	    }
 	}
-	else
+	లేకపోతే
 # endif
-	    Sleep((int)msec);
-    else
+	    Sleep((పూర్ణాంకం)msec);
+    లేకపోతే
 	WaitForChar(msec, FALSE);
-#endif
+#అయితే_ముగింపు
 }
 
 
@@ -7973,77 +7973,77 @@ mch_delay(
  * This can also remove a symbolic link like Unix.
  * Return 0 for success, -1 for failure.
  */
-    int
+    పూర్ణాంకం
 mch_remove(char_u *name)
 {
     WCHAR	*wn;
-    int		n;
+    పూర్ణాంకం		n;
 
     /*
      * On Windows, deleting a directory's symbolic link is done by
      * RemoveDirectory(): mch_rmdir.  It seems unnatural, but it is fact.
      */
-    if (mch_isdir(name) && mch_is_symbolic_link(name))
-	return mch_rmdir(name);
+    ఒకవేళ (mch_isdir(name) && mch_is_symbolic_link(name))
+	తిరిగి mch_rmdir(name);
 
-    win32_setattrs(name, FILE_ATTRIBUTE_NORMAL);
+    win32_setattrs(name, FILE_ATTRIBUTE_సాధారణ);
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి -1;
 
     n = DeleteFileW(wn) ? 0 : -1;
     vim_free(wn);
-    return n;
+    తిరిగి n;
 }
 
 
 /*
  * Check for an "interrupt signal": CTRL-break or CTRL-C.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    శూన్య
+mch_breakcheck(పూర్ణాంకం force వాడని)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
 # endif
-	if (g_fCtrlCPressed || g_fCBrkPressed)
+	ఒకవేళ (g_fCtrlCPressed || g_fCBrkPressed)
 	{
 	    ctrl_break_was_pressed = g_fCBrkPressed;
 	    g_fCtrlCPressed = g_fCBrkPressed = FALSE;
 	    got_int = TRUE;
 	}
-#endif
+#అయితే_ముగింపు
 }
 
 // physical RAM to leave for the OS
-#define WINNT_RESERVE_BYTES     (256*1024*1024)
+#నిర్వచించు WINNT_RESERVE_బైట్లు     (256*1024*1024)
 
 /*
  * How much main memory in KiB that can be used by VIM.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_మొత్తం_mem(పూర్ణాంకం special వాడని)
 {
     MEMORYSTATUSEX  ms;
 
     // Need to use GlobalMemoryStatusEx() when there is more memory than
     // what fits in 32 bits.
-    ms.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&ms);
-    if (ms.ullAvailVirtual < ms.ullTotalPhys)
+    ms.dw_నిడివి = పరిమాణం(MEMORYSTATUSEX);
+    Global_జ్ఞాపకం_స్థితి_Ex(&ms);
+    ఒకవేళ (ms.ullAvailVirtual < ms.ull_మొత్తం_Phys)
     {
 	// Process address space fits in physical RAM, use all of it.
-	return (long_u)(ms.ullAvailVirtual / 1024);
+	తిరిగి (long_u)(ms.ullAvailVirtual / 1024);
     }
-    if (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
+    ఒకవేళ (ms.ull_మొత్తం_Phys <= WINNT_RESERVE_బైట్లు)
     {
 	// Catch old NT box or perverse hardware setup.
-	return (long_u)((ms.ullTotalPhys / 2) / 1024);
+	తిరిగి (long_u)((ms.ull_మొత్తం_Phys / 2) / 1024);
     }
     // Use physical RAM less reserve for OS + data.
-    return (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
+    తిరిగి (long_u)((ms.ull_మొత్తం_Phys - WINNT_RESERVE_బైట్లు) / 1024);
 }
 
 /*
@@ -8052,13 +8052,13 @@ mch_total_mem(int special UNUSED)
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    పూర్ణాంకం
 mch_expandpath(
     garray_T	*gap,
-    char_u	*path,
-    int		flags)		// EW_* flags
+    char_u	*మార్గం,
+    పూర్ణాంకం		flags)		// EW_* flags
 {
-    return dos_expandpath(gap, path, 0, flags, FALSE);
+    తిరిగి dos_expandpath(gap, మార్గం, 0, flags, FALSE);
 }
 
 /*
@@ -8070,56 +8070,56 @@ mch_expandpath(
  * Like rename(), returns 0 upon success, non-zero upon failure.
  * Should probably set errno appropriately when errors occur.
  */
-    int
+    పూర్ణాంకం
 mch_wrename(WCHAR *wold, WCHAR *wnew)
 {
     WCHAR	*p;
     WCHAR	*q;
-    WCHAR	szTempFile[_MAX_PATH + 1];
-    WCHAR	szNewPath[_MAX_PATH + 1];
+    WCHAR	sz_తాత్కాలిక_File[MAX_మార్గం_2 + 1];
+    WCHAR	sz_New_మార్గం[MAX_మార్గం_2 + 1];
     HANDLE	hf;
 
     // No need to play tricks unless the file name contains a "~" as the
     // seventh character.
-    for (p = q = wold; *p != L'\0'; ++p)
+    కొరకు (p = q = wold; *p != L'\0'; ++p)
     {
-	switch (*p)
+	ఎంపిక (*p)
 	{
-	case L'/':
-	case L'\\':
-	case L':':
-	    if (*(p + 1) != L'\0')
+	స్థితి L'/':
+	స్థితి L'\\':
+	స్థితి L':':
+	    ఒకవేళ (*(p + 1) != L'\0')
 		q = p + 1;	    // point to the character after the path
 				    // separator.
-	    break;
+	    ఆపు;
 
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
 	}
     }
 
     // If the length of the file name is less than 8 characters or the seventh
     // character is not a "~', do a normal move.
-    if ((int)(p - q) < 8 || q[6] != L'~')
-	return (MoveFileW(wold, wnew) == 0);
+    ఒకవేళ ((పూర్ణాంకం)(p - q) < 8 || q[6] != L'~')
+	తిరిగి (MoveFileW(wold, wnew) == 0);
 
     // Get base path of new file name.  Undocumented feature: If pszNewFile is
     // a directory, no error is returned and pszFilePart will be NULL.
-    if (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
-	return -1;
+    ఒకవేళ (Get_నిండిన_మార్గం_Name_W(wnew, MAX_మార్గం_2, sz_New_మార్గం, &p) == 0 || p == ఖాళీ)
+	తిరిగి -1;
     *p = NUL;
 
     // Get (and create) a unique temporary file name in directory of new file
-    if (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
-	return -2;
+    ఒకవేళ (Get_తాత్కాలిక_File_Name_W(sz_New_మార్గం, L"VIM", 0, sz_తాత్కాలిక_File) == 0)
+	తిరిగి -2;
 
     // blow the temp file away
-    if (!DeleteFileW(szTempFile))
-	return -3;
+    ఒకవేళ (!DeleteFileW(sz_తాత్కాలిక_File))
+	తిరిగి -3;
 
     // rename old file to the temp file
-    if (!MoveFileW(wold, szTempFile))
-	return -4;
+    ఒకవేళ (!MoveFileW(wold, sz_తాత్కాలిక_File))
+	తిరిగి -4;
 
     // now create an empty file called pszOldFile; this prevents the operating
     // system using pszOldFile as an alias (SFN) if we're renaming within the
@@ -8130,29 +8130,29 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // cause all sorts of problems later in buf_write().  So, we create an
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
-    if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-	return -5;
-    if (!CloseHandle(hf))
-	return -6;
+    ఒకవేళ ((hf = CreateFileW(wold, GENERIC_WRITE, 0, ఖాళీ, CREATE_NEW,
+		    FILE_ATTRIBUTE_సాధారణ, ఖాళీ)) == INVALID_HANDLE_విలువ)
+	తిరిగి -5;
+    ఒకవేళ (!CloseHandle(hf))
+	తిరిగి -6;
 
     // rename the temp file to the new file
-    if (!MoveFileW(szTempFile, wnew))
+    ఒకవేళ (!MoveFileW(sz_తాత్కాలిక_File, wnew))
     {
 	// Renaming failed.  Rename the file back to its old name, so that it
 	// looks like nothing happened.
-	(void)MoveFileW(szTempFile, wold);
-	return -7;
+	(శూన్య)MoveFileW(sz_తాత్కాలిక_File, wold);
+	తిరిగి -7;
     }
 
     // Seems to be left around on Novell filesystems
-    DeleteFileW(szTempFile);
+    DeleteFileW(sz_తాత్కాలిక_File);
 
     // finally, remove the empty old file
-    if (!DeleteFileW(wold))
-	return -8;
+    ఒకవేళ (!DeleteFileW(wold))
+	తిరిగి -8;
 
-    return 0;
+    తిరిగి 0;
 }
 
 
@@ -8160,159 +8160,159 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
  * Converts the filenames to UTF-16, then call mch_wrename().
  * Like rename(), returns 0 upon success, non-zero upon failure.
  */
-    int
+    పూర్ణాంకం
 mch_rename(
-    const char	*pszOldFile,
-    const char	*pszNewFile)
+    స్థిరరాశి అక్షరం	*pszOldFile,
+    స్థిరరాశి అక్షరం	*pszNewFile)
 {
-    WCHAR	*wold = NULL;
-    WCHAR	*wnew = NULL;
-    int		retval = -1;
+    WCHAR	*wold = ఖాళీ;
+    WCHAR	*wnew = ఖాళీ;
+    పూర్ణాంకం		retval = -1;
 
-    wold = enc_to_utf16((char_u *)pszOldFile, NULL);
-    wnew = enc_to_utf16((char_u *)pszNewFile, NULL);
-    if (wold != NULL && wnew != NULL)
+    wold = enc_గమ్యం_utf16((char_u *)pszOldFile, ఖాళీ);
+    wnew = enc_గమ్యం_utf16((char_u *)pszNewFile, ఖాళీ);
+    ఒకవేళ (wold != ఖాళీ && wnew != ఖాళీ)
 	retval = mch_wrename(wold, wnew);
     vim_free(wold);
     vim_free(wnew);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Get the default shell for the current hardware platform
  */
-    char *
-default_shell(void)
+    అక్షరం *
+default_shell(శూన్య)
 {
-    return "cmd.exe";
+    తిరిగి "cmd.exe";
 }
 
 /*
  * mch_access() extends access() to do more detailed check on network drives.
  * Returns 0 if file "n" has access rights according to "p", -1 otherwise.
  */
-    int
-mch_access(char *n, int p)
+    పూర్ణాంకం
+mch_access(అక్షరం *n, పూర్ణాంకం p)
 {
     HANDLE	hFile;
-    int		retval = -1;	    // default: fail
+    పూర్ణాంకం		retval = -1;	    // default: fail
     WCHAR	*wn;
 
-    wn = enc_to_utf16((char_u *)n, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_గమ్యం_utf16((char_u *)n, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి -1;
 
-    if (mch_isdir((char_u *)n))
+    ఒకవేళ (mch_isdir((char_u *)n))
     {
-	WCHAR TempNameW[_MAX_PATH + 16] = L"";
+	WCHAR తాత్కాలిక_Name_W[MAX_మార్గం_2 + 16] = L"";
 
-	if (p & R_OK)
+	ఒకవేళ (p & R_OK)
 	{
 	    // Read check is performed by seeing if we can do a find file on
 	    // the directory for any file.
-	    int			i;
-	    WIN32_FIND_DATAW    d;
+	    పూర్ణాంకం			i;
+	    WIN32_కనుగొను_DATAW    d;
 
-	    for (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
-		TempNameW[i] = wn[i];
-	    if (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
-		TempNameW[i++] = '\\';
-	    TempNameW[i++] = '*';
-	    TempNameW[i++] = 0;
+	    కొరకు (i = 0; i < MAX_మార్గం_2 && wn[i] != 0; ++i)
+		తాత్కాలిక_Name_W[i] = wn[i];
+	    ఒకవేళ (తాత్కాలిక_Name_W[i - 1] != '\\' && తాత్కాలిక_Name_W[i - 1] != '/')
+		తాత్కాలిక_Name_W[i++] = '\\';
+	    తాత్కాలిక_Name_W[i++] = '*';
+	    తాత్కాలిక_Name_W[i++] = 0;
 
-	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
-		goto getout;
-	    else
-		(void)FindClose(hFile);
+	    hFile = కనుగొను_మొదటి_File_W(తాత్కాలిక_Name_W, &d);
+	    ఒకవేళ (hFile == INVALID_HANDLE_విలువ)
+		వెళ్ళు getout;
+	    లేకపోతే
+		(శూన్య)కనుగొను_Close(hFile);
 	}
 
-	if (p & W_OK)
+	ఒకవేళ (p & W_OK)
 	{
 	    // Trying to create a temporary file in the directory should catch
 	    // directories on read-only network shares.  However, in
 	    // directories whose ACL allows writes but denies deletes will end
 	    // up keeping the temporary file :-(.
-	    if (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
-		goto getout;
-	    else
-		DeleteFileW(TempNameW);
+	    ఒకవేళ (!Get_తాత్కాలిక_File_Name_W(wn, L"VIM", 0, తాత్కాలిక_Name_W))
+		వెళ్ళు getout;
+	    లేకపోతే
+		DeleteFileW(తాత్కాలిక_Name_W);
 	}
     }
-    else
+    లేకపోతే
     {
 	// Don't consider a file read-only if another process has opened it.
-	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	DWORD share_బహుళకం = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
 	// Trying to open the file for the required access does ACL, read-only
 	// network share, and file attribute checks.
-	DWORD access_mode = ((p & W_OK) ? GENERIC_WRITE : 0)
+	DWORD access_బహుళకం = ((p & W_OK) ? GENERIC_WRITE : 0)
 					     | ((p & R_OK) ? GENERIC_READ : 0);
 
-	hFile = CreateFileW(wn, access_mode, share_mode,
-					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
-	    goto getout;
+	hFile = CreateFileW(wn, access_బహుళకం, share_బహుళకం,
+					     ఖాళీ, OPEN_EXISTING, 0, ఖాళీ);
+	ఒకవేళ (hFile == INVALID_HANDLE_విలువ)
+	    వెళ్ళు getout;
 	CloseHandle(hFile);
     }
 
     retval = 0;	    // success
 getout:
     vim_free(wn);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Version of open() that may use UTF-16 file name.
  */
-    int
-mch_open(const char *name, int flags, int mode)
+    పూర్ణాంకం
+mch_open(స్థిరరాశి అక్షరం *name, పూర్ణాంకం flags, పూర్ణాంకం బహుళకం)
 {
     WCHAR	*wn;
-    int		f;
+    పూర్ణాంకం		f;
 
-    wn = enc_to_utf16((char_u *)name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_గమ్యం_utf16((char_u *)name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి -1;
 
-    f = _wopen(wn, flags, mode);
+    f = _wopen(wn, flags, బహుళకం);
     vim_free(wn);
-    return f;
+    తిరిగి f;
 }
 
 /*
  * Version of fopen() that uses UTF-16 file name.
  */
     FILE *
-mch_fopen(const char *name, const char *mode)
+mch_fopen(స్థిరరాశి అక్షరం *name, స్థిరరాశి అక్షరం *బహుళకం)
 {
     WCHAR	*wn, *wm;
-    FILE	*f = NULL;
+    FILE	*f = ఖాళీ;
 
-#if defined(DEBUG) && _MSC_VER >= 1400
+#ఒకవేళ defined(DEBUG) && _MSC_VER >= 1400
     // Work around an annoying assertion in the Microsoft debug CRT
     // when mode's text/binary setting doesn't match _get_fmode().
-    char newMode = mode[strlen(mode) - 1];
-    int oldMode = 0;
+    అక్షరం new_బహుళకం = బహుళకం[అక్షరశ్రేణి_పొడవు(బహుళకం) - 1];
+    పూర్ణాంకం old_బహుళకం_2 = 0;
 
-    _get_fmode(&oldMode);
-    if (newMode == 't')
-	_set_fmode(_O_TEXT);
-    else if (newMode == 'b')
-	_set_fmode(_O_BINARY);
-#endif
-    wn = enc_to_utf16((char_u *)name, NULL);
-    wm = enc_to_utf16((char_u *)mode, NULL);
-    if (wn != NULL && wm != NULL)
+    _get_fmode(&old_బహుళకం_2);
+    ఒకవేళ (new_బహుళకం == 't')
+	సమితి_fmode(O_పాఠ్యం);
+    లేకపోతే ఒకవేళ (new_బహుళకం == 'b')
+	సమితి_fmode(O_ద్విమాన_2);
+#అయితే_ముగింపు
+    wn = enc_గమ్యం_utf16((char_u *)name, ఖాళీ);
+    wm = enc_గమ్యం_utf16((char_u *)బహుళకం, ఖాళీ);
+    ఒకవేళ (wn != ఖాళీ && wm != ఖాళీ)
 	f = _wfopen(wn, wm);
     vim_free(wn);
     vim_free(wm);
 
-#if defined(DEBUG) && _MSC_VER >= 1400
-    if (oldMode != 0)
-	_set_fmode(oldMode);
-#endif
-    return f;
+#ఒకవేళ defined(DEBUG) && _MSC_VER >= 1400
+    ఒకవేళ (old_బహుళకం_2 != 0)
+	సమితి_fmode(old_బహుళకం_2);
+#అయితే_ముగింపు
+    తిరిగి f;
 }
 
 /*
@@ -8336,123 +8336,123 @@ mch_fopen(const char *name, const char *mode)
  * and write to stream "substream" of file "to".
  * Errors are ignored.
  */
-    static void
-copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
+    స్థిర శూన్య
+copy_substream(HANDLE sh, శూన్య *context, WCHAR *గమ్యం, WCHAR *substream, దీర్ఘ len)
 {
-    HANDLE  hTo;
-    WCHAR   *to_name;
+    HANDLE  h_గమ్యం;
+    WCHAR   *గమ్యం_name;
 
-    to_name = alloc((wcslen(to) + wcslen(substream) + 1) * sizeof(WCHAR));
-    if (to_name == NULL)
-	return;
+    గమ్యం_name = alloc((wcslen(గమ్యం) + wcslen(substream) + 1) * పరిమాణం(WCHAR));
+    ఒకవేళ (గమ్యం_name == ఖాళీ)
+	తిరిగి;
 
-    wcscpy(to_name, to);
-    wcscat(to_name, substream);
+    wcscpy(గమ్యం_name, గమ్యం);
+    wcscat(గమ్యం_name, substream);
 
-    hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    h_గమ్యం = CreateFileW(గమ్యం_name, GENERIC_WRITE, 0, ఖాళీ, OPEN_ALWAYS,
+						 FILE_ATTRIBUTE_సాధారణ, ఖాళీ);
+    ఒకవేళ (h_గమ్యం != INVALID_HANDLE_విలువ)
     {
-	long	done;
+	దీర్ఘ	పూర్తి;
 	DWORD	todo;
 	DWORD	readcnt, written;
-	char	buf[4096];
+	అక్షరం	buf[4096];
 
 	// Copy block of bytes at a time.  Abort when something goes wrong.
-	for (done = 0; done < len; done += written)
+	కొరకు (పూర్తి = 0; పూర్తి < len; పూర్తి += written)
 	{
 	    // (size_t) cast for Borland C 5.5
-	    todo = (DWORD)((size_t)(len - done) > sizeof(buf) ? sizeof(buf)
-						       : (size_t)(len - done));
-	    if (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
+	    todo = (DWORD)((size_t)(len - పూర్తి) > పరిమాణం(buf) ? పరిమాణం(buf)
+						       : (size_t)(len - పూర్తి));
+	    ఒకవేళ (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
 						       FALSE, FALSE, context)
 		    || readcnt != todo
-		    || !WriteFile(hTo, buf, todo, &written, NULL)
+		    || !WriteFile(h_గమ్యం, buf, todo, &written, ఖాళీ)
 		    || written != todo)
-		break;
+		ఆపు;
 	}
-	CloseHandle(hTo);
+	CloseHandle(h_గమ్యం);
     }
 
-    free(to_name);
+    విడుదల(గమ్యం_name);
 }
 
 /*
  * Copy info streams from file "from" to file "to".
  */
-    static void
-copy_infostreams(char_u *from, char_u *to)
+    స్థిర శూన్య
+copy_infostreams(char_u *from, char_u *గమ్యం)
 {
     WCHAR		*fromw;
     WCHAR		*tow;
     HANDLE		sh;
-    WIN32_STREAM_ID	sid;
-    int			headersize;
-    WCHAR		streamname[_MAX_PATH];
+    WIN32_ప్రవాహం_ID	sid;
+    పూర్ణాంకం			headersize;
+    WCHAR		streamname[MAX_మార్గం_2];
     DWORD		readcount;
-    void		*context = NULL;
+    శూన్య		*context = ఖాళీ;
     DWORD		lo, hi;
-    int			len;
+    పూర్ణాంకం			len;
 
     // Convert the file names to wide characters.
-    fromw = enc_to_utf16(from, NULL);
-    tow = enc_to_utf16(to, NULL);
-    if (fromw != NULL && tow != NULL)
+    fromw = enc_గమ్యం_utf16(from, ఖాళీ);
+    tow = enc_గమ్యం_utf16(గమ్యం, ఖాళీ);
+    ఒకవేళ (fromw != ఖాళీ && tow != ఖాళీ)
     {
 	// Open the file for reading.
-	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
-			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, ఖాళీ,
+			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, ఖాళీ);
+	ఒకవేళ (sh != INVALID_HANDLE_విలువ)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
-	    for (;;)
+	    కొరకు (;;)
 	    {
 		// Get the header to find the length of the stream name.  If
 		// the "readcount" is zero we have done all info streams.
-		ZeroMemory(&sid, sizeof(WIN32_STREAM_ID));
-		headersize = (int)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
-		if (!BackupRead(sh, (LPBYTE)&sid, headersize,
+		Zero_జ్ఞాపకం(&sid, పరిమాణం(WIN32_ప్రవాహం_ID));
+		headersize = (పూర్ణాంకం)((అక్షరం *)&sid.c_ప్రవాహం_Name - (అక్షరం *)&sid.dw_ప్రవాహం_Id);
+		ఒకవేళ (!BackupRead(sh, (LPBYTE)&sid, headersize,
 					   &readcount, FALSE, FALSE, &context)
 			|| readcount == 0)
-		    break;
+		    ఆపు;
 
 		// We only deal with streams that have a name.  The normal
 		// file data appears to be without a name, even though docs
 		// suggest it is called "::$DATA".
-		if (sid.dwStreamNameSize > 0)
+		ఒకవేళ (sid.dw_ప్రవాహం_Name_కొలత > 0)
 		{
 		    // Read the stream name.
-		    if (!BackupRead(sh, (LPBYTE)streamname,
-							 sid.dwStreamNameSize,
+		    ఒకవేళ (!BackupRead(sh, (LPBYTE)streamname,
+							 sid.dw_ప్రవాహం_Name_కొలత,
 					  &readcount, FALSE, FALSE, &context))
-			break;
+			ఆపు;
 
 		    // Copy an info stream with a name ":anything:$DATA".
 		    // Skip "::$DATA", it has no stream name (examples suggest
 		    // it might be used for the normal file contents).
 		    // Note that BackupRead() counts bytes, but the name is in
 		    // wide characters.
-		    len = readcount / sizeof(WCHAR);
+		    len = readcount / పరిమాణం(WCHAR);
 		    streamname[len] = 0;
-		    if (len > 7 && wcsicmp(streamname + len - 6,
+		    ఒకవేళ (len > 7 && wcsicmp(streamname + len - 6,
 							      L":$DATA") == 0)
 		    {
 			streamname[len - 6] = 0;
 			copy_substream(sh, &context, tow, streamname,
-						    (long)sid.Size.u.LowPart);
+						    (దీర్ఘ)sid.కొలత_2.u.దిగువ_Part);
 		    }
 		}
 
 		// Advance to the next stream.  We might try seeking too far,
 		// but BackupSeek() doesn't skip over stream borders, thus
 		// that's OK.
-		(void)BackupSeek(sh, sid.Size.u.LowPart, sid.Size.u.HighPart,
+		(శూన్య)BackupSeek(sh, sid.కొలత_2.u.దిగువ_Part, sid.కొలత_2.u.ఎగువ_Part,
 							  &lo, &hi, &context);
 	    }
 
 	    // Clear the context.
-	    (void)BackupRead(sh, NULL, 0, &readcount, TRUE, FALSE, &context);
+	    (శూన్య)BackupRead(sh, ఖాళీ, 0, &readcount, TRUE, FALSE, &context);
 
 	    CloseHandle(sh);
 	}
@@ -8464,154 +8464,154 @@ copy_infostreams(char_u *from, char_u *to)
 /*
  * ntdll.dll definitions
  */
-#define FileEaInformation   7
-#ifndef STATUS_SUCCESS
-# define STATUS_SUCCESS	    ((NTSTATUS) 0x00000000L)
-#endif
+#నిర్వచించు FileEaInformation   7
+#నిర్వచితం_కాకపోతే స్థితి_SUCCESS
+# define స్థితి_SUCCESS	    ((NTSTATUS) 0x00000000L)
+#అయితే_ముగింపు
 
-typedef struct _FILE_FULL_EA_INFORMATION_ {
-    ULONG  NextEntryOffset;
+రకనిర్వచనం నిర్మాణం FILE_నిండిన_EA_INFORMATION {
+    ULONG  తదుపరి_నమోదు_స్థానభ్రంశం;
     UCHAR  Flags;
-    UCHAR  EaNameLength;
-    USHORT EaValueLength;
+    UCHAR  Ea_Name_నిడివి;
+    USHORT Ea_విలువ_నిడివి;
     CHAR   EaName[1];
-} FILE_FULL_EA_INFORMATION_, *PFILE_FULL_EA_INFORMATION_;
+} FILE_నిండిన_EA_INFORMATION_2, *PFILE_నిండిన_EA_INFORMATION;
 
-typedef struct _FILE_EA_INFORMATION_ {
-    ULONG EaSize;
+రకనిర్వచనం నిర్మాణం _FILE_EA_INFORMATION_ {
+    ULONG Ea_కొలత;
 } FILE_EA_INFORMATION_, *PFILE_EA_INFORMATION_;
 
-#ifndef PROTO
-typedef NTSTATUS (NTAPI *PfnNtOpenFile)(
+#నిర్వచితం_కాకపోతే PROTO
+రకనిర్వచనం NTSTATUS (NTAPI *PfnNtOpenFile)(
 	PHANDLE FileHandle,
-	ACCESS_MASK DesiredAccess,
-	POBJECT_ATTRIBUTES ObjectAttributes,
-	PIO_STATUS_BLOCK IoStatusBlock,
+	ACCESS_ముసుగు DesiredAccess,
+	POBJECT_లక్షణాలు Object_లక్షణాలు,
+	PIO_స్థితి_ఖండం Io_స్థితి_ఖండం,
 	ULONG ShareAccess,
 	ULONG OpenOptions);
-typedef NTSTATUS (NTAPI *PfnNtClose)(
+రకనిర్వచనం NTSTATUS (NTAPI *PfnNtClose)(
 	HANDLE Handle);
-typedef NTSTATUS (NTAPI *PfnNtSetEaFile)(
+రకనిర్వచనం NTSTATUS (NTAPI *Pfn_Nt_సమితి_Ea_File)(
 	HANDLE		    FileHandle,
-	PIO_STATUS_BLOCK    IoStatusBlock,
-	PVOID		    Buffer,
-	ULONG		    Length);
-typedef NTSTATUS (NTAPI *PfnNtQueryEaFile)(
+	PIO_స్థితి_ఖండం    Io_స్థితి_ఖండం,
+	PVOID		    బఫరు_2,
+	ULONG		    నిడివి_2);
+రకనిర్వచనం NTSTATUS (NTAPI *PfnNtQueryEaFile)(
 	HANDLE FileHandle,
-	PIO_STATUS_BLOCK IoStatusBlock,
-	PVOID Buffer,
-	ULONG Length,
-	BOOLEAN ReturnSingleEntry,
+	PIO_స్థితి_ఖండం Io_స్థితి_ఖండం,
+	PVOID బఫరు_2,
+	ULONG నిడివి_2,
+	BOOLEAN Return_Single_నమోదు,
 	PVOID EaList,
-	ULONG EaListLength,
-	PULONG EaIndex,
-	BOOLEAN RestartScan);
-typedef NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
+	ULONG Ea_List_నిడివి,
+	PULONG Ea_సూచీ,
+	BOOLEAN Restart_పరిశీలన);
+రకనిర్వచనం NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
 	HANDLE			FileHandle,
-	PIO_STATUS_BLOCK	IoStatusBlock,
+	PIO_స్థితి_ఖండం	Io_స్థితి_ఖండం,
 	PVOID			FileInformation,
-	ULONG			Length,
+	ULONG			నిడివి_2,
 	FILE_INFORMATION_CLASS FileInformationClass);
-typedef VOID (NTAPI *PfnRtlInitUnicodeString)(
+రకనిర్వచనం VOID (NTAPI *PfnRtlInitUnicodeString)(
 	PUNICODE_STRING DestinationString,
-	PCWSTR SourceString);
+	PCWSTR ఆధారం_String);
 
-PfnNtOpenFile pNtOpenFile = NULL;
-PfnNtClose pNtClose = NULL;
-PfnNtSetEaFile pNtSetEaFile = NULL;
-PfnNtQueryEaFile pNtQueryEaFile = NULL;
-PfnNtQueryInformationFile pNtQueryInformationFile = NULL;
-PfnRtlInitUnicodeString pRtlInitUnicodeString = NULL;
-#endif
+PfnNtOpenFile pNtOpenFile = ఖాళీ;
+PfnNtClose pNtClose = ఖాళీ;
+Pfn_Nt_సమితి_Ea_File p_Nt_సమితి_Ea_File = ఖాళీ;
+PfnNtQueryEaFile pNtQueryEaFile = ఖాళీ;
+PfnNtQueryInformationFile pNtQueryInformationFile = ఖాళీ;
+PfnRtlInitUnicodeString pRtlInitUnicodeString = ఖాళీ;
+#అయితే_ముగింపు
 
 /*
  * Load ntdll.dll functions.
  */
-    static BOOL
-load_ntdll(void)
+    స్థిర BOOL
+ఎక్కించు_ntdll(శూన్య)
 {
-    static int	loaded = -1;
+    స్థిర పూర్ణాంకం	loaded = -1;
 
-    if (loaded != -1)
-	return (BOOL) loaded;
+    ఒకవేళ (loaded != -1)
+	తిరిగి (BOOL) loaded;
 
     HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll != NULL)
+    ఒకవేళ (hNtdll != ఖాళీ)
     {
-	pNtOpenFile = (PfnNtOpenFile) GetProcAddress(hNtdll, "NtOpenFile");
-	pNtClose = (PfnNtClose) GetProcAddress(hNtdll, "NtClose");
-	pNtSetEaFile = (PfnNtSetEaFile)
-	    GetProcAddress(hNtdll, "NtSetEaFile");
+	pNtOpenFile = (PfnNtOpenFile) Get_Proc_చిరునామా(hNtdll, "NtOpenFile");
+	pNtClose = (PfnNtClose) Get_Proc_చిరునామా(hNtdll, "NtClose");
+	p_Nt_సమితి_Ea_File = (Pfn_Nt_సమితి_Ea_File)
+	    Get_Proc_చిరునామా(hNtdll, "NtSetEaFile");
 	pNtQueryEaFile = (PfnNtQueryEaFile)
-	    GetProcAddress(hNtdll, "NtQueryEaFile");
+	    Get_Proc_చిరునామా(hNtdll, "NtQueryEaFile");
 	pNtQueryInformationFile = (PfnNtQueryInformationFile)
-	    GetProcAddress(hNtdll, "NtQueryInformationFile");
+	    Get_Proc_చిరునామా(hNtdll, "NtQueryInformationFile");
 	pRtlInitUnicodeString = (PfnRtlInitUnicodeString)
-	    GetProcAddress(hNtdll, "RtlInitUnicodeString");
+	    Get_Proc_చిరునామా(hNtdll, "RtlInitUnicodeString");
     }
-    if (pNtOpenFile == NULL
-	    || pNtClose == NULL
-	    || pNtSetEaFile == NULL
-	    || pNtQueryEaFile == NULL
-	    || pNtQueryInformationFile == NULL
-	    || pRtlInitUnicodeString == NULL)
+    ఒకవేళ (pNtOpenFile == ఖాళీ
+	    || pNtClose == ఖాళీ
+	    || p_Nt_సమితి_Ea_File == ఖాళీ
+	    || pNtQueryEaFile == ఖాళీ
+	    || pNtQueryInformationFile == ఖాళీ
+	    || pRtlInitUnicodeString == ఖాళీ)
 	loaded = FALSE;
-    else
+    లేకపోతే
 	loaded = TRUE;
-    return (BOOL) loaded;
+    తిరిగి (BOOL) loaded;
 }
 
 /*
  * Copy extended attributes (EA) from file "from" to file "to".
  */
-    static void
-copy_extattr(char_u *from, char_u *to)
+    స్థిర శూన్య
+copy_extattr(char_u *from, char_u *గమ్యం)
 {
-    char_u		    *fromf = NULL;
-    char_u		    *tof = NULL;
-    WCHAR		    *fromw = NULL;
-    WCHAR		    *tow = NULL;
+    char_u		    *fromf = ఖాళీ;
+    char_u		    *tof = ఖాళీ;
+    WCHAR		    *fromw = ఖాళీ;
+    WCHAR		    *tow = ఖాళీ;
     UNICODE_STRING	    u;
     HANDLE		    h;
-    OBJECT_ATTRIBUTES	    oa;
-    IO_STATUS_BLOCK	    iosb;
+    OBJECT_లక్షణాలు	    oa;
+    IO_స్థితి_ఖండం	    iosb;
     FILE_EA_INFORMATION_    eainfo = {0};
-    void		    *ea = NULL;
+    శూన్య		    *ea = ఖాళీ;
 
-    if (!load_ntdll())
-	return;
+    ఒకవేళ (!ఎక్కించు_ntdll())
+	తిరిగి;
 
     // Convert the file names to the fully qualified object names.
     fromf = alloc(STRLEN(from) + 5);
-    tof = alloc(STRLEN(to) + 5);
-    if (fromf == NULL || tof == NULL)
-	goto theend;
+    tof = alloc(STRLEN(గమ్యం) + 5);
+    ఒకవేళ (fromf == ఖాళీ || tof == ఖాళీ)
+	వెళ్ళు theend;
     STRCPY(fromf, "\\??\\");
     STRCPY(fromf + STRLEN_LITERAL("\\??\\"), from);
     STRCPY(tof, "\\??\\");
-    STRCPY(tof + STRLEN_LITERAL("\\??\\"), to);
+    STRCPY(tof + STRLEN_LITERAL("\\??\\"), గమ్యం);
 
     // Convert the names to wide characters.
-    fromw = enc_to_utf16(fromf, NULL);
-    tow = enc_to_utf16(tof, NULL);
-    if (fromw == NULL || tow == NULL)
-	goto theend;
+    fromw = enc_గమ్యం_utf16(fromf, ఖాళీ);
+    tow = enc_గమ్యం_utf16(tof, ఖాళీ);
+    ఒకవేళ (fromw == ఖాళీ || tow == ఖాళీ)
+	వెళ్ళు theend;
 
     // Get the EA.
     pRtlInitUnicodeString(&u, fromw);
-    InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-    if (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
-		FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	goto theend;
-    pNtQueryInformationFile(h, &iosb, &eainfo, sizeof(eainfo),
+    Initialize_Object_లక్షణాలు(&oa, &u, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
+		FILE_NON_DIRECTORY_FILE) != స్థితి_SUCCESS)
+	వెళ్ళు theend;
+    pNtQueryInformationFile(h, &iosb, &eainfo, పరిమాణం(eainfo),
 	    FileEaInformation);
-    if (eainfo.EaSize != 0)
+    ఒకవేళ (eainfo.Ea_కొలత != 0)
     {
-	ea = alloc(eainfo.EaSize);
-	if (ea != NULL)
+	ea = alloc(eainfo.Ea_కొలత);
+	ఒకవేళ (ea != ఖాళీ)
 	{
-	    if (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
-			NULL, 0, NULL, TRUE) != STATUS_SUCCESS)
+	    ఒకవేళ (pNtQueryEaFile(h, &iosb, ea, eainfo.Ea_కొలత, FALSE,
+			ఖాళీ, 0, ఖాళీ, TRUE) != స్థితి_SUCCESS)
 	    {
 		VIM_CLEAR(ea);
 	    }
@@ -8620,15 +8620,15 @@ copy_extattr(char_u *from, char_u *to)
     pNtClose(h);
 
     // Set the EA.
-    if (ea != NULL)
+    ఒకవేళ (ea != ఖాళీ)
     {
 	pRtlInitUnicodeString(&u, tow);
-	InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-	if (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
-		    FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	    goto theend;
+	Initialize_Object_లక్షణాలు(&oa, &u, 0, ఖాళీ, ఖాళీ);
+	ఒకవేళ (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
+		    FILE_NON_DIRECTORY_FILE) != స్థితి_SUCCESS)
+	    వెళ్ళు theend;
 
-	pNtSetEaFile(h, &iosb, ea, eainfo.EaSize);
+	p_Nt_సమితి_Ea_File(h, &iosb, ea, eainfo.Ea_కొలత);
 	pNtClose(h);
     }
 
@@ -8645,73 +8645,73 @@ theend:
  * For Windows NT and later we copy info streams.
  * Always returns zero, errors are ignored.
  */
-    int
-mch_copy_file_attribute(char_u *from, char_u *to)
+    పూర్ణాంకం
+mch_copy_file_attribute(char_u *from, char_u *గమ్యం)
 {
     // File streams only work on Windows NT and later.
-    copy_infostreams(from, to);
-    copy_extattr(from, to);
-    return 0;
+    copy_infostreams(from, గమ్యం);
+    copy_extattr(from, గమ్యం);
+    తిరిగి 0;
 }
 
 
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
-static LPWSTR	*ArglistW = NULL;
-static int	global_argc = 0;
-static char	**global_argv;
+స్థిర పూర్ణాంకం	n_వాదనలు_W = 0;
+స్థిర LPWSTR	*ArglistW = ఖాళీ;
+స్థిర పూర్ణాంకం	global_argc = 0;
+స్థిర అక్షరం	**global_argv;
 
-static int	used_file_argc = 0;	// last argument in global_argv[] used
+స్థిర పూర్ణాంకం	వాడిన_file_argc = 0;	// last argument in global_argv[] used
 					// for the argument list.
-static int	*used_file_indexes = NULL; // indexes in global_argv[] for
+స్థిర పూర్ణాంకం	*వాడిన_file_indexes = ఖాళీ; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
-static int	used_file_literal = FALSE;  // take file names literally
-static int	used_file_full_path = FALSE;  // file name was full path
-#ifdef FEAT_DIFF
-static int	used_file_diff_mode = FALSE;  // file name was with diff mode
-#endif
-static int	used_alist_count = 0;
+స్థిర పూర్ణాంకం	వాడిన_file_లెక్క = 0;	// nr of entries in used_file_indexes
+స్థిర పూర్ణాంకం	వాడిన_file_literal = FALSE;  // take file names literally
+స్థిర పూర్ణాంకం	వాడిన_file_నిండిన_మార్గం = FALSE;  // file name was full path
+#నిర్వచితమైతే FEAT_DIFF
+స్థిర పూర్ణాంకం	వాడిన_file_diff_బహుళకం = FALSE;  // file name was with diff mode
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం	వాడిన_alist_లెక్క = 0;
 
 
 /*
  * Get the command line arguments.  Unicode version.
  * Returns argc.  Zero when something fails.
  */
-    int
-get_cmd_argsW(char ***argvp)
+    పూర్ణాంకం
+get_cmd_వాదనలు_W(అక్షరం ***argvp)
 {
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    అక్షరం	**argv = ఖాళీ;
+    పూర్ణాంకం		argc = 0;
+    పూర్ణాంకం		i;
 
-    free_cmd_argsW();
-    ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
-    if (ArglistW != NULL)
+    free_cmd_వాదనలు_W();
+    ArglistW = Command_పంక్తి_గమ్యం_Argv_W(Get_Command_పంక్తి_W(), &n_వాదనలు_W);
+    ఒకవేళ (ArglistW != ఖాళీ)
     {
-	argv = alloc((nArgsW + 1) * sizeof(char *));
-	if (argv != NULL)
+	argv = alloc((n_వాదనలు_W + 1) * పరిమాణం(అక్షరం *));
+	ఒకవేళ (argv != ఖాళీ)
 	{
-	    argc = nArgsW;
-	    argv[argc] = NULL;
-	    for (i = 0; i < argc; ++i)
+	    argc = n_వాదనలు_W;
+	    argv[argc] = ఖాళీ;
+	    కొరకు (i = 0; i < argc; ++i)
 	    {
-		int	len;
+		పూర్ణాంకం	len;
 
 		// Convert each Unicode argument to UTF-8.
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-				ArglistW[i], (int)wcslen(ArglistW[i]) + 1,
+		Wide_Char_గమ్యం_Multi_Byte_alloc(CP_UTF8, 0,
+				ArglistW[i], (పూర్ణాంకం)wcslen(ArglistW[i]) + 1,
 				(LPSTR *)&argv[i], &len, 0, 0);
-		if (argv[i] == NULL)
+		ఒకవేళ (argv[i] == ఖాళీ)
 		{
 		    // Out of memory, clear everything.
-		    while (i > 0)
-			free(argv[--i]);
-		    free(argv);
-		    argv = NULL;
+		    అయితే (i > 0)
+			విడుదల(argv[--i]);
+		    విడుదల(argv);
+		    argv = ఖాళీ;
 		    argc = 0;
 		}
 	    }
@@ -8720,26 +8720,26 @@ get_cmd_argsW(char ***argvp)
 
     global_argc = argc;
     global_argv = argv;
-    if (argc > 0)
+    ఒకవేళ (argc > 0)
     {
-	if (used_file_indexes != NULL)
-	    free(used_file_indexes);
-	used_file_indexes = alloc(argc * sizeof(int));
+	ఒకవేళ (వాడిన_file_indexes != ఖాళీ)
+	    విడుదల(వాడిన_file_indexes);
+	వాడిన_file_indexes = alloc(argc * పరిమాణం(పూర్ణాంకం));
     }
 
-    if (argvp != NULL)
+    ఒకవేళ (argvp != ఖాళీ)
 	*argvp = argv;
-    return argc;
+    తిరిగి argc;
 }
 
-    void
-free_cmd_argsW(void)
+    శూన్య
+free_cmd_వాదనలు_W(శూన్య)
 {
-    if (ArglistW == NULL)
-	return;
+    ఒకవేళ (ArglistW == ఖాళీ)
+	తిరిగి;
 
     GlobalFree(ArglistW);
-    ArglistW = NULL;
+    ArglistW = ఖాళీ;
 }
 
 /*
@@ -8747,35 +8747,35 @@ free_cmd_argsW(void)
  * This avoids that we have to re-parse the argument list when fix_arg_enc()
  * is called.
  */
-    void
-used_file_arg(char *name, int literal, int full_path, int diff_mode)
+    శూన్య
+వాడిన_file_arg(అక్షరం *name, పూర్ణాంకం literal, పూర్ణాంకం నిండిన_మార్గం, పూర్ణాంకం diff_బహుళకం)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (used_file_indexes == NULL)
-	return;
-    for (i = used_file_argc + 1; i < global_argc; ++i)
-	if (STRCMP(global_argv[i], name) == 0)
+    ఒకవేళ (వాడిన_file_indexes == ఖాళీ)
+	తిరిగి;
+    కొరకు (i = వాడిన_file_argc + 1; i < global_argc; ++i)
+	ఒకవేళ (STRCMP(global_argv[i], name) == 0)
 	{
-	    used_file_argc = i;
-	    used_file_indexes[used_file_count++] = i;
-	    break;
+	    వాడిన_file_argc = i;
+	    వాడిన_file_indexes[వాడిన_file_లెక్క++] = i;
+	    ఆపు;
 	}
-    used_file_literal = literal;
-    used_file_full_path = full_path;
-#ifdef FEAT_DIFF
-    used_file_diff_mode = diff_mode;
-#endif
+    వాడిన_file_literal = literal;
+    వాడిన_file_నిండిన_మార్గం = నిండిన_మార్గం;
+#నిర్వచితమైతే FEAT_DIFF
+    వాడిన_file_diff_బహుళకం = diff_బహుళకం;
+#అయితే_ముగింపు
 }
 
 /*
  * Remember the length of the argument list as it was.  If it changes then we
  * leave it alone when 'encoding' is set.
  */
-    void
-set_alist_count(void)
+    శూన్య
+సమితి_alist_లెక్క(శూన్య)
 {
-    used_alist_count = GARGCOUNT;
+    వాడిన_alist_లెక్క = GARGCOUNT;
 }
 
 /*
@@ -8783,83 +8783,83 @@ set_alist_count(void)
  * has been changed while starting up.  Use the UTF-16 command line arguments
  * and convert them to 'encoding'.
  */
-    void
-fix_arg_enc(void)
+    శూన్య
+fix_arg_enc(శూన్య)
 {
-    int		i;
-    int		idx;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx;
     char_u	*str;
-    int		*fnum_list;
+    పూర్ణాంకం		*fnum_list;
 
     // Safety checks:
     // - if argument count differs between the wide and non-wide argument
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
-	    || ArglistW == NULL
-	    || used_file_indexes == NULL
-	    || used_file_count == 0
-	    || used_alist_count != GARGCOUNT)
-	return;
+    ఒకవేళ (global_argc != n_వాదనలు_W
+	    || ArglistW == ఖాళీ
+	    || వాడిన_file_indexes == ఖాళీ
+	    || వాడిన_file_లెక్క == 0
+	    || వాడిన_alist_లెక్క != GARGCOUNT)
+	తిరిగి;
 
     // Remember the buffer numbers for the arguments.
-    fnum_list = ALLOC_MULT(int, GARGCOUNT);
-    if (fnum_list == NULL)
-	return;		// out of memory
-    for (i = 0; i < GARGCOUNT; ++i)
+    fnum_list = ALLOC_MULT(పూర్ణాంకం, GARGCOUNT);
+    ఒకవేళ (fnum_list == ఖాళీ)
+	తిరిగి;		// out of memory
+    కొరకు (i = 0; i < GARGCOUNT; ++i)
 	fnum_list[i] = GARGLIST[i].ae_fnum;
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
-	return;		// out of memory
+    ఒకవేళ (ga_grow(&global_alist.al_ga, వాడిన_file_లెక్క) == FAIL)
+	తిరిగి;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    కొరకు (i = 0; i < వాడిన_file_లెక్క; ++i)
     {
-	idx = used_file_indexes[i];
-	str = utf16_to_enc(ArglistW[idx], NULL);
-	if (str != NULL)
+	idx = వాడిన_file_indexes[i];
+	str = utf16_గమ్యం_enc(ArglistW[idx], ఖాళీ);
+	ఒకవేళ (str != ఖాళీ)
 	{
-	    int literal = used_file_literal;
+	    పూర్ణాంకం literal = వాడిన_file_literal;
 
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	    // When using diff mode may need to concatenate file name to
 	    // directory name.  Just like it's done in main().
-	    if (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
+	    ఒకవేళ (వాడిన_file_diff_బహుళకం && mch_isdir(str) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
-		char_u	    *tail;
+		char_u	    *తోక;
 		string_T    ret;
 
-		tail = gettail(alist_name(&GARGLIST[0]));
-		concat_fnames(str, STRLEN(str), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		తోక = gettail(alist_name(&GARGLIST[0]));
+		concat_fnames(str, STRLEN(str), తోక, STRLEN(తోక), TRUE, &ret);
+		ఒకవేళ (ret.string != ఖాళీ)
 		{
 		    vim_free(str);
 		    str = ret.string;
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	    // Re-use the old buffer by renaming it.  When not using literal
 	    // names it's done by alist_expand() below.
-	    if (used_file_literal)
-		buf_set_name(fnum_list[i], str);
+	    ఒకవేళ (వాడిన_file_literal)
+		buf_సమితి_name(fnum_list[i], str);
 
 	    // Check backtick literal. backtick literal is already expanded in
 	    // main.c, so this part add str as literal.
-	    if (literal == FALSE)
+	    ఒకవేళ (literal == FALSE)
 	    {
 		size_t len = STRLEN(str);
 
-		if (len > 2 && *str == '`' && *(str + len - 1) == '`')
+		ఒకవేళ (len > 2 && *str == '`' && *(str + len - 1) == '`')
 		    literal = TRUE;
 	    }
-	    alist_add(&global_alist, str, literal ? 2 : 0);
+	    alist_కూడు(&global_alist, str, literal ? 2 : 0);
 	}
     }
 
-    if (!used_file_literal)
+    ఒకవేళ (!వాడిన_file_literal)
     {
 	// Now expand wildcards in the arguments.
 	// Temporarily add '(' and ')' to 'isfname'.  These are valid
@@ -8871,7 +8871,7 @@ fix_arg_enc(void)
 	// Use :legacy so that it also works when in Vim9 script.
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_ISF = &isf|set isf+=(,)");
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_WIG = &wig|set wig=");
-	alist_expand(fnum_list, used_alist_count);
+	alist_expand(fnum_list, వాడిన_alist_లెక్క);
 	do_cmdline_cmd(
 		(char_u *)":legacy let &isf = g:SaVe_ISF|unlet g:SaVe_ISF");
 	do_cmdline_cmd(
@@ -8880,83 +8880,83 @@ fix_arg_enc(void)
 
     // If wildcard expansion failed, we are editing the first file of the
     // arglist and there is no file name: Edit the first argument now.
-    if (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
+    ఒకవేళ (curwin->w_arg_idx == 0 && curbuf->b_fname == ఖాళీ)
     {
 	do_cmdline_cmd((char_u *)":rewind");
-	if (GARGCOUNT == 1 && used_file_full_path
+	ఒకవేళ (GARGCOUNT == 1 && వాడిన_file_నిండిన_మార్గం
 		&& vim_chdirfile(alist_name(&GARGLIST[0]), "drop") == OK)
-	    last_chdir_reason = "drop";
+	    చివరి_chdir_reason = "drop";
     }
 
-    set_alist_count();
+    సమితి_alist_లెక్క();
 }
 
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    పూర్ణాంకం
+mch_setenv(అక్షరం *var, అక్షరం *విలువ, పూర్ణాంకం x వాడని)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
-    envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
-    if (envbuf == NULL)
-	return -1;
+    envbuf = alloc(STRLEN(var) + STRLEN(విలువ) + 2);
+    ఒకవేళ (envbuf == ఖాళీ)
+	తిరిగి -1;
 
-    sprintf((char *)envbuf, "%s=%s", var, value);
+    sprintf((అక్షరం *)envbuf, "%s=%s", var, విలువ);
 
-    p = enc_to_utf16(envbuf, NULL);
+    p = enc_గమ్యం_utf16(envbuf, ఖాళీ);
 
     vim_free(envbuf);
-    if (p == NULL)
-	return -1;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
     _wputenv(p);
-#ifdef libintl_wputenv
+#నిర్వచితమైతే libintl_wputenv
     libintl_wputenv(p);
-#endif
+#అయితే_ముగింపు
     // Unlike Un*x systems, we can free the string for _wputenv().
     vim_free(p);
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Support for 256 colors and 24-bit colors was added in Windows 10
  * version 1703 (Creators update).
  */
-#define VTP_FIRST_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
+#నిర్వచించు VTP_మొదటి_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
 
 /*
  * Support for pseudo-console (ConPTY) was added in windows 10
  * version 1809 (October 2018 update).
  */
-#define CONPTY_FIRST_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
+#నిర్వచించు CONPTY_మొదటి_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
 
 /*
  * ConPTY differences between versions, need different logic.
  * version 1903 (May 2019 update).
  */
-#define CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
+#నిర్వచించు CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
 
 /*
  * version 1909 (November 2019 update).
  */
-#define CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
+#నిర్వచించు CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
 
 /*
  * Stay ahead of the next update, and when it's done, fix this.
  * version ? (2020 update, temporarily use the build number of insider preview)
  */
-#define CONPTY_NEXT_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
+#నిర్వచించు CONPTY_తదుపరి_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
 
 /*
  * Confirm until this version.  Also the logic changes.
  * insider preview.
  */
-#define CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
+#నిర్వచించు CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
 
 /*
  * Make conpty default on Windows 11
  */
-#define CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
+#నిర్వచించు CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
 // Notes:
 // Win 10 22H2 Final is build 19045, its conpty is widely used.
 // Strangely, 19045 is newer but is a lower build number than the 2020 insider
@@ -8964,218 +8964,218 @@ mch_setenv(char *var, char *value, int x UNUSED)
 // Win Server 2022 (May 10, 2022) is build 20348, its conpty is widely used.
 // Win 11 starts from build 22000, even though the major version says 10!
 
-    static void
-vtp_flag_init(void)
+    స్థిర శూన్య
+vtp_flag_init(శూన్య)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    DWORD   mode;
-    HANDLE  out;
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    DWORD   బహుళకం;
+    HANDLE  బహిర్గతం;
 
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
 # endif
     {
-	out = GetStdHandle(STD_OUTPUT_HANDLE);
+	బహిర్గతం = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	vtp_working = (win_version >= VTP_FIRST_SUPPORT_BUILD) ? 1 : 0;
-	GetConsoleMode(out, &mode);
-	mode |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	if (SetConsoleMode(out, mode) == 0)
+	vtp_working = (win_సంస్కరణ >= VTP_మొదటి_SUPPORT_BUILD) ? 1 : 0;
+	Get_Console_బహుళకం(బహిర్గతం, &బహుళకం);
+	బహుళకం |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	ఒకవేళ (సమితి_Console_బహుళకం(బహిర్గతం, బహుళకం) == 0)
 	    vtp_working = 0;
 
 	// VTP uses alternate screen buffer.
 	// But, not if running in a nested terminal
-	use_alternate_screen_buffer = win_version >= MAKE_VER(10, 0, 19045)
+	use_alternate_screen_బఫరు = win_సంస్కరణ >= MAKE_VER(10, 0, 19045)
 	    && p_rs && vtp_working && !mch_getenv("VIM_TERMINAL");
     }
-#endif
+#అయితే_ముగింపు
 
-    if (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
+    ఒకవేళ (win_సంస్కరణ >= CONPTY_మొదటి_SUPPORT_BUILD)
 	conpty_working = 1;
-    if (win_version >= CONPTY_STABLE_BUILD)
+    ఒకవేళ (win_సంస్కరణ >= CONPTY_STABLE_BUILD)
 	conpty_stable = 1;
 
-    if (win_version <= CONPTY_INSIDER_BUILD)
+    ఒకవేళ (win_సంస్కరణ <= CONPTY_INSIDER_BUILD)
 	conpty_type = 3;
-    if (win_version <= CONPTY_1909_BUILD)
+    ఒకవేళ (win_సంస్కరణ <= CONPTY_1909_BUILD)
 	conpty_type = 2;
-    if (win_version <= CONPTY_1903_BUILD)
+    ఒకవేళ (win_సంస్కరణ <= CONPTY_1903_BUILD)
 	conpty_type = 2;
-    if (win_version < CONPTY_FIRST_SUPPORT_BUILD)
+    ఒకవేళ (win_సంస్కరణ < CONPTY_మొదటి_SUPPORT_BUILD)
 	conpty_type = 1;
 
-    if (win_version >= CONPTY_NEXT_UPDATE_BUILD)
+    ఒకవేళ (win_సంస్కరణ >= CONPTY_తదుపరి_UPDATE_BUILD)
 	conpty_fix_type = 1;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    static void
-vtp_init(void)
+    స్థిర శూన్య
+vtp_init(శూన్య)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
-    save_console_bg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_bg];
-    save_console_fg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_fg];
+    CONSOLE_SCREEN_బఫరు_INFOEX csbi;
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    Get_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
+    save_console_bg_rgb = (guicolor_T)csbi.Color_పట్టిక[g_color_సూచీ_bg];
+    save_console_fg_rgb = (guicolor_T)csbi.Color_పట్టిక[g_color_సూచీ_fg];
     store_console_bg_rgb = save_console_bg_rgb;
     store_console_fg_rgb = save_console_fg_rgb;
 
     COLORREF bg;
-    bg = (COLORREF)csbi.ColorTable[g_color_index_bg];
+    bg = (COLORREF)csbi.Color_పట్టిక[g_color_సూచీ_bg];
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
     default_console_color_bg = bg;
 
     COLORREF fg;
-    fg = (COLORREF)csbi.ColorTable[g_color_index_fg];
+    fg = (COLORREF)csbi.Color_పట్టిక[g_color_సూచీ_fg];
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     default_console_color_fg = fg;
 # endif
-    set_console_color_rgb();
+    సమితి_console_color_rgb();
 }
 
-    static void
-vtp_exit(void)
+    స్థిర శూన్య
+vtp_exit(శూన్య)
 {
     restore_console_color_rgb();
 }
 
-    int
+    పూర్ణాంకం
 vtp_printf(
-    char *format,
+    అక్షరం *format,
     ...)
 {
     char_u  buf[100];
     va_list list;
-    DWORD   result;
-    int	    len;
+    DWORD   ఫలితం;
+    పూర్ణాంకం	    len;
 
-    if (silent_mode)
-	return 0;
+    ఒకవేళ (silent_బహుళకం)
+	తిరిగి 0;
 
     va_start(list, format);
-    len = vim_vsnprintf((char *)buf, 100, (char *)format, list);
+    len = vim_vsnprintf((అక్షరం *)buf, 100, (అక్షరం *)format, list);
     va_end(list);
-    WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, NULL);
-    return (int)result;
+    WriteConsoleA(g_h_Con_బహిర్గతం, buf, (DWORD)len, &ఫలితం, ఖాళీ);
+    తిరిగి (పూర్ణాంకం)ఫలితం;
 }
 
-    static void
+    స్థిర శూన్య
 vtp_sgr_bulk(
-    int arg)
+    పూర్ణాంకం arg)
 {
-    int args[1];
+    పూర్ణాంకం వాదనలు[1];
 
-    args[0] = arg;
-    vtp_sgr_bulks(1, args);
+    వాదనలు[0] = arg;
+    vtp_sgr_bulks(1, వాదనలు);
 }
 
 # define FAST256(x) \
-    if ((*p-- = "0123456789"[(n = x % 10)]) \
+    ఒకవేళ ((*p-- = "0123456789"[(n = x % 10)]) \
 	    && x >= 10 && (*p-- = "0123456789"[((m = x % 100) - n) / 10]) \
 	    && x >= 100 && (*p-- = "012"[((x & 0xff) - m) / 100]));
 
 # define FAST256CASE(x) \
-    case x: \
+    స్థితి x: \
 	FAST256(newargs[x - 1]);
 
-    static void
+    స్థిర శూన్య
 vtp_sgr_bulks(
-    int argc,
-    int *args)
+    పూర్ణాంకం argc,
+    పూర్ణాంకం *వాదనలు)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
     char_u  buf[SGRBUFSIZE];
     char_u  *p;
-    int	    in, out;
-    int	    newargs[16];
-    static int sgrfgr = -1, sgrfgg, sgrfgb;
-    static int sgrbgr = -1, sgrbgg, sgrbgb;
+    పూర్ణాంకం	    లోపల, బహిర్గతం;
+    పూర్ణాంకం	    newargs[16];
+    స్థిర పూర్ణాంకం sgrfgr = -1, sgrfgg, sgrfgb;
+    స్థిర పూర్ణాంకం sgrbgr = -1, sgrbgg, sgrbgb;
 
-    if (argc == 0)
+    ఒకవేళ (argc == 0)
     {
 	sgrfgr = sgrbgr = -1;
 	vtp_printf("\033[m");
-	return;
+	తిరిగి;
     }
 
-    in = out = 0;
-    while (in < argc)
+    లోపల = బహిర్గతం = 0;
+    అయితే (లోపల < argc)
     {
-	int s = args[in];
-	int copylen = 1;
+	పూర్ణాంకం s = వాదనలు[లోపల];
+	పూర్ణాంకం copylen = 1;
 
-	if (s == 38)
+	ఒకవేళ (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ఒకవేళ (argc - లోపల >= 5 && వాదనలు[లోపల + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
-						     && sgrfgb == args[in + 4])
+		ఒకవేళ (sgrfgr == వాదనలు[లోపల + 2] && sgrfgg == వాదనలు[లోపల + 3]
+						     && sgrfgb == వాదనలు[లోపల + 4])
 		{
-		    in += 5;
+		    లోపల += 5;
 		    copylen = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    sgrfgr = args[in + 2];
-		    sgrfgg = args[in + 3];
-		    sgrfgb = args[in + 4];
+		    sgrfgr = వాదనలు[లోపల + 2];
+		    sgrfgg = వాదనలు[లోపల + 3];
+		    sgrfgb = వాదనలు[లోపల + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    లేకపోతే ఒకవేళ (argc - లోపల >= 3 && వాదనలు[లోపల + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (s == 48)
+	లేకపోతే ఒకవేళ (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ఒకవేళ (argc - లోపల >= 5 && వాదనలు[లోపల + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
-						     && sgrbgb == args[in + 4])
+		ఒకవేళ (sgrbgr == వాదనలు[లోపల + 2] && sgrbgg == వాదనలు[లోపల + 3]
+						     && sgrbgb == వాదనలు[లోపల + 4])
 		{
-		    in += 5;
+		    లోపల += 5;
 		    copylen = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    sgrbgr = args[in + 2];
-		    sgrbgg = args[in + 3];
-		    sgrbgb = args[in + 4];
+		    sgrbgr = వాదనలు[లోపల + 2];
+		    sgrbgg = వాదనలు[లోపల + 3];
+		    sgrbgb = వాదనలు[లోపల + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    లేకపోతే ఒకవేళ (argc - లోపల >= 3 && వాదనలు[లోపల + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (30 <= s && s <= 39)
+	లేకపోతే ఒకవేళ (30 <= s && s <= 39)
 	    sgrfgr = -1;
-	else if (90 <= s && s <= 97)
+	లేకపోతే ఒకవేళ (90 <= s && s <= 97)
 	    sgrfgr = -1;
-	else if (40 <= s && s <= 49)
+	లేకపోతే ఒకవేళ (40 <= s && s <= 49)
 	    sgrbgr = -1;
-	else if (100 <= s && s <= 107)
+	లేకపోతే ఒకవేళ (100 <= s && s <= 107)
 	    sgrbgr = -1;
-	else if (s == 0)
+	లేకపోతే ఒకవేళ (s == 0)
 	    sgrfgr = sgrbgr = -1;
 
-	while (copylen--)
-	    newargs[out++] = args[in++];
+	అయితే (copylen--)
+	    newargs[బహిర్గతం++] = వాదనలు[లోపల++];
     }
 
-    p = &buf[sizeof(buf) - 1];
+    p = &buf[పరిమాణం(buf) - 1];
     *p-- = 'm';
 
-    switch (out)
+    ఎంపిక (బహిర్గతం)
     {
-	int	n, m;
+	పూర్ణాంకం	n, m;
 	DWORD	r;
 
 	FAST256CASE(16);
@@ -9211,110 +9211,110 @@ vtp_sgr_bulks(
 	FAST256CASE(1);
 	*p-- = '[';
 	*p = '\033';
-	WriteConsoleA(g_hConOut, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, NULL);
-    default:
-	break;
+	WriteConsoleA(g_h_Con_బహిర్గతం, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, ఖాళీ);
+    అప్రమేయ:
+	ఆపు;
     }
 }
 
-    static void
-wt_init(void)
+    స్థిర శూన్య
+wt_init(శూన్య)
 {
-    wt_working = mch_getenv("WT_SESSION") != NULL;
+    wt_working = mch_getenv("WT_SESSION") != ఖాళీ;
 }
 
 # ifdef FEAT_TERMGUICOLORS
-    static int
+    స్థిర పూర్ణాంకం
 ctermtoxterm(
-    int cterm)
+    పూర్ణాంకం cterm)
 {
     char_u r, g, b, idx;
 
     cterm_color2rgb(cterm, &r, &g, &b, &idx);
-    return (((int)r << 16) | ((int)g << 8) | (int)b);
+    తిరిగి (((పూర్ణాంకం)r << 16) | ((పూర్ణాంకం)g << 8) | (పూర్ణాంకం)b);
 }
 # endif
 
-    static void
-set_console_color_rgb(void)
+    స్థిర శూన్య
+సమితి_console_color_rgb(శూన్య)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_బఫరు_INFOEX csbi;
     guicolor_T	fg, bg;
-    int		ctermfg, ctermbg;
+    పూర్ణాంకం		ctermfg, ctermbg;
 
-    if (!vtp_working)
-	return;
+    ఒకవేళ (!vtp_working)
+	తిరిగి;
 
     get_default_console_color(&ctermfg, &ctermbg, &fg, &bg);
 
-    if (p_tgc || t_colors >= 256)
+    ఒకవేళ (p_tgc || t_colors >= 256)
     {
-	term_fg_rgb_color(fg);
-	term_bg_rgb_color(bg);
-	return;
+	పదం_fg_rgb_color(fg);
+	పదం_bg_rgb_color(bg);
+	తిరిగి;
     }
 
-    if (use_alternate_screen_buffer)
-	return;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి;
 
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    Get_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    store_console_bg_rgb = csbi.ColorTable[g_color_index_bg];
-    store_console_fg_rgb = csbi.ColorTable[g_color_index_fg];
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)bg;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)fg;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    csbi.sr_కిటికీ.కుడి_4 += 1;
+    csbi.sr_కిటికీ.Bottom += 1;
+    store_console_bg_rgb = csbi.Color_పట్టిక[g_color_సూచీ_bg];
+    store_console_fg_rgb = csbi.Color_పట్టిక[g_color_సూచీ_fg];
+    csbi.Color_పట్టిక[g_color_సూచీ_bg] = (COLORREF)bg;
+    csbi.Color_పట్టిక[g_color_సూచీ_fg] = (COLORREF)fg;
+    సమితి_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 # endif
 }
 
-# if defined(FEAT_TERMGUICOLORS)
-    void
+# ఒకవేళ defined(FEAT_TERMGUICOLORS)
+    శూన్య
 get_default_console_color(
-    int *cterm_fg,
-    int *cterm_bg,
+    పూర్ణాంకం *cterm_fg,
+    పూర్ణాంకం *cterm_bg,
     guicolor_T *gui_fg,
     guicolor_T *gui_bg)
 {
-    int id;
+    పూర్ణాంకం id;
     guicolor_T guifg = INVALCOLOR;
     guicolor_T guibg = INVALCOLOR;
-    int ctermfg = 0;
-    int ctermbg = 0;
-    int dummynull = 0;
+    పూర్ణాంకం ctermfg = 0;
+    పూర్ణాంకం ctermbg = 0;
+    పూర్ణాంకం dummynull = 0;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0 && p_tgc)
+    ఒకవేళ (id > 0 && p_tgc)
 	syn_id2colors(id, &guifg, &guibg);
-    if (guifg == INVALCOLOR)
+    ఒకవేళ (guifg == INVALCOLOR)
     {
 	ctermfg = -1;
-	if (id > 0)
+	ఒకవేళ (id > 0)
 	    syn_id2cterm_bg(id, &ctermfg, &dummynull);
-	if (ctermfg != -1)
+	ఒకవేళ (ctermfg != -1)
 	    guifg = ctermtoxterm(ctermfg);
-	else
+	లేకపోతే
 	    guifg = USE_WT ? INVALCOLOR : default_console_color_fg;
-	cterm_normal_fg_gui_color = guifg;
+	cterm_సాధారణ_fg_gui_color = guifg;
 	ctermfg = ctermfg < 0 ? 0 : ctermfg;
     }
-    if (guibg == INVALCOLOR)
+    ఒకవేళ (guibg == INVALCOLOR)
     {
 	ctermbg = -1;
-	if (id > 0)
+	ఒకవేళ (id > 0)
 	    syn_id2cterm_bg(id, &dummynull, &ctermbg);
-	if (ctermbg != -1)
+	ఒకవేళ (ctermbg != -1)
 	    guibg = ctermtoxterm(ctermbg);
-	else
+	లేకపోతే
 	    guibg = USE_WT ? INVALCOLOR : default_console_color_bg;
-	cterm_normal_bg_gui_color = guibg;
+	cterm_సాధారణ_bg_gui_color = guibg;
 	ctermbg = ctermbg < 0 ? 0 : ctermbg;
     }
 
@@ -9328,172 +9328,172 @@ get_default_console_color(
 /*
  * Set the console colors to the original colors or the last set colors.
  */
-    static void
-reset_console_color_rgb(void)
+    స్థిర శూన్య
+reset_console_color_rgb(శూన్య)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_బఫరు_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    Get_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)store_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)store_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    csbi.sr_కిటికీ.కుడి_4 += 1;
+    csbi.sr_కిటికీ.Bottom += 1;
+    csbi.Color_పట్టిక[g_color_సూచీ_bg] = (COLORREF)store_console_bg_rgb;
+    csbi.Color_పట్టిక[g_color_సూచీ_fg] = (COLORREF)store_console_fg_rgb;
+    సమితి_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 # endif
 }
 
 /*
  * Set the console colors to the original colors.
  */
-    static void
-restore_console_color_rgb(void)
+    స్థిర శూన్య
+restore_console_color_rgb(శూన్య)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_బఫరు_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    Get_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)save_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)save_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_కొలత = పరిమాణం(csbi);
+    csbi.sr_కిటికీ.కుడి_4 += 1;
+    csbi.sr_కిటికీ.Bottom += 1;
+    csbi.Color_పట్టిక[g_color_సూచీ_bg] = (COLORREF)save_console_bg_rgb;
+    csbi.Color_పట్టిక[g_color_సూచీ_fg] = (COLORREF)save_console_fg_rgb;
+    సమితి_Console_Screen_బఫరు_Info_Ex(g_h_Con_బహిర్గతం, &csbi);
 # endif
 }
 
-    void
-control_console_color_rgb(void)
+    శూన్య
+control_console_color_rgb(శూన్య)
 {
-    if (vtp_working)
-	set_console_color_rgb();
-    else
+    ఒకవేళ (vtp_working)
+	సమితి_console_color_rgb();
+    లేకపోతే
 	reset_console_color_rgb();
 }
 
-    int
-use_vtp(void)
+    పూర్ణాంకం
+use_vtp(శూన్య)
 {
-    return USE_VTP;
+    తిరిగి USE_VTP;
 }
 
-    int
-is_term_win32(void)
+    పూర్ణాంకం
+is_పదం_win32(శూన్య)
 {
-    return T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
+    తిరిగి T_NAME != ఖాళీ && STRCMP(T_NAME, "win32") == 0;
 }
 
-    int
-has_vtp_working(void)
+    పూర్ణాంకం
+has_vtp_working(శూన్య)
 {
-    return vtp_working;
+    తిరిగి vtp_working;
 }
 
-#endif
+#అయితే_ముగింపు
 
-    int
-has_conpty_working(void)
+    పూర్ణాంకం
+has_conpty_working(శూన్య)
 {
-    return conpty_working;
+    తిరిగి conpty_working;
 }
 
-    int
-get_conpty_type(void)
+    పూర్ణాంకం
+get_conpty_type(శూన్య)
 {
-    return conpty_type;
+    తిరిగి conpty_type;
 }
 
-    int
-is_conpty_stable(void)
+    పూర్ణాంకం
+is_conpty_stable(శూన్య)
 {
-    return conpty_stable;
+    తిరిగి conpty_stable;
 }
 
-    int
-get_conpty_fix_type(void)
+    పూర్ణాంకం
+get_conpty_fix_type(శూన్య)
 {
-    return conpty_fix_type;
+    తిరిగి conpty_fix_type;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    void
-resize_console_buf(void)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    శూన్య
+resize_console_buf(శూన్య)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ఒకవేళ (use_alternate_screen_బఫరు)
+	తిరిగి;
 
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_బఫరు_INFO csbi;
     COORD coord;
     SMALL_RECT newsize;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return;
+    ఒకవేళ (!Get_Console_Screen_బఫరు_Info(g_h_Con_బహిర్గతం, &csbi))
+	తిరిగి;
 
-    coord.X = SRWIDTH(csbi.srWindow);
-    coord.Y = SRHEIGHT(csbi.srWindow);
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    coord.X = SRWIDTH(csbi.sr_కిటికీ);
+    coord.Y = SRHEIGHT(csbi.sr_కిటికీ);
+    సమితి_Console_Screen_బఫరు_కొలత(g_h_Con_బహిర్గతం, coord);
 
-    newsize.Left = 0;
-    newsize.Top = 0;
-    newsize.Right = coord.X - 1;
+    newsize.ఎడమ_4 = 0;
+    newsize.శిఖరం_2 = 0;
+    newsize.కుడి_4 = coord.X - 1;
     newsize.Bottom = coord.Y - 1;
-    SetConsoleWindowInfo(g_hConOut, TRUE, &newsize);
+    సమితి_Console_కిటికీ_Info(g_h_Con_బహిర్గతం, TRUE, &newsize);
 
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    సమితి_Console_Screen_బఫరు_కొలత(g_h_Con_బహిర్గతం, coord);
 }
-#endif
+#అయితే_ముగింపు
 
-    char *
-GetWin32Error(void)
+    అక్షరం *
+GetWin32Error(శూన్య)
 {
-    static char	*oldmsg = NULL;
-    char	*acp_msg = NULL;
+    స్థిర అక్షరం	*oldmsg = ఖాళీ;
+    అక్షరం	*acp_సందేశం = ఖాళీ;
     DWORD	acp_len;
-    char	*enc_msg = NULL;
-    int		enc_len = 0;
+    అక్షరం	*enc_సందేశం = ఖాళీ;
+    పూర్ణాంకం		enc_len = 0;
 
     // get formatted message from OS
-    acp_len = FormatMessage(
-	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
-	return NULL;
+    acp_len = Format_సందేశం(
+	    FORMAT_సందేశం_ALLOCATE_బఫరు|FORMAT_సందేశం_FROM_SYSTEM,
+	    ఖాళీ, Get_చివరి_Error(), 0, (LPSTR)&acp_సందేశం, 0, ఖాళీ);
+    ఒకవేళ (acp_len == 0 || acp_సందేశం == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // clean oldmsg if remained.
-    if (oldmsg != NULL)
+    ఒకవేళ (oldmsg != ఖాళీ)
     {
 	vim_free(oldmsg);
-	oldmsg = NULL;
+	oldmsg = ఖాళీ;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
-    LocalFree(acp_msg);
-    if (enc_msg == NULL)
-	return NULL;
+    acp_గమ్యం_enc((char_u *)acp_సందేశం, (పూర్ణాంకం)acp_len, (char_u **)&enc_సందేశం, &enc_len);
+    LocalFree(acp_సందేశం);
+    ఒకవేళ (enc_సందేశం == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // remove trailing \r\n
-    char *pcrlf = strstr(enc_msg, "\r\n");
-    if (pcrlf != NULL)
+    అక్షరం *pcrlf = అక్షరశ్రేణి_శోధన(enc_సందేశం, "\r\n");
+    ఒకవేళ (pcrlf != ఖాళీ)
 	*pcrlf = NUL;
 
-    oldmsg = enc_msg;
-    return enc_msg;
+    oldmsg = enc_సందేశం;
+    తిరిగి enc_సందేశం;
 }
 
-#if defined(FEAT_RELTIME)
-static HANDLE   timer_handle;
-static int      timer_active = FALSE;
+#ఒకవేళ defined(FEAT_RELTIME)
+స్థిర HANDLE   timer_handle;
+స్థిర పూర్ణాంకం      timer_చురుకైన = FALSE;
 
 /*
  * Calls to start_timeout alternate the return value pointer between the two
@@ -9503,13 +9503,13 @@ static int      timer_active = FALSE;
  * deleted. Ping-ponging between the two flags prevents this causing 'fake'
  * timeouts.
  */
-static sig_atomic_t timeout_flags[2];
-static int	    timeout_flag_idx = 0;
-static sig_atomic_t *timeout_flag = &timeout_flags[0];
+స్థిర sig_atomic_t timeout_flags[2];
+స్థిర పూర్ణాంకం	    timeout_flag_idx = 0;
+స్థిర sig_atomic_t *timeout_flag = &timeout_flags[0];
 
 
-    static void CALLBACK
-set_flag(void *param, BOOLEAN unused2 UNUSED)
+    స్థిర శూన్య CALLBACK
+సమితి_flag(శూన్య *param, BOOLEAN unused2 వాడని)
 {
     *(sig_atomic_t *)param = TRUE;
 }
@@ -9517,14 +9517,14 @@ set_flag(void *param, BOOLEAN unused2 UNUSED)
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    శూన్య
+stop_timeout(శూన్య)
 {
-    if (timer_active)
+    ఒకవేళ (timer_చురుకైన)
     {
-	BOOL ret = DeleteTimerQueueTimer(NULL, timer_handle, NULL);
-	timer_active = FALSE;
-	if (!ret && GetLastError() != ERROR_IO_PENDING)
+	BOOL ret = Delete_Timer_వరుస_Timer(ఖాళీ, timer_handle, ఖాళీ);
+	timer_చురుకైన = FALSE;
+	ఒకవేళ (!ret && Get_చివరి_Error() != ERROR_IO_PENDING)
 	{
 	    semsg(_(e_could_not_clear_timeout_str), GetWin32Error());
 	}
@@ -9545,27 +9545,27 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it still returns a
  * valid flag pointer; the flag will remain stuck at zero.
  */
-    volatile sig_atomic_t *
-start_timeout(long msec)
+    అస్థిర sig_atomic_t *
+ప్రారంభం_timeout(దీర్ఘ msec)
 {
     BOOL ret;
 
     timeout_flag = &timeout_flags[timeout_flag_idx];
 
     stop_timeout();
-    ret = CreateTimerQueueTimer(
-	    &timer_handle, NULL, set_flag, timeout_flag,
+    ret = Create_Timer_వరుస_Timer(
+	    &timer_handle, ఖాళీ, సమితి_flag, timeout_flag,
 	    (DWORD)msec, 0, WT_EXECUTEDEFAULT);
-    if (!ret)
+    ఒకవేళ (!ret)
     {
-	semsg(_(e_could_not_set_timeout_str), GetWin32Error());
+	semsg(_(e_could_not_సమితి_timeout_str), GetWin32Error());
     }
-    else
+    లేకపోతే
     {
 	timeout_flag_idx = (timeout_flag_idx + 1) % 2;
-	timer_active = TRUE;
+	timer_చురుకైన = TRUE;
 	*timeout_flag = FALSE;
     }
-    return timeout_flag;
+    తిరిగి timeout_flag;
 }
-#endif
+#అయితే_ముగింపు

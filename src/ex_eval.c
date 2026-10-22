@@ -11,11 +11,11 @@
  * ex_eval.c: functions for Ex command line for the +eval feature.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
-static char	*get_end_emsg(cstack_T *cstack);
+స్థిర అక్షరం	*get_చివర_emsg(cstack_T *cstack);
 
 /*
  * Exception handling terms:
@@ -50,18 +50,18 @@ static char	*get_end_emsg(cstack_T *cstack);
  * is an error exception.)  -  The macros can be defined as expressions checking
  * for a variable that is allowed to be changed during execution of a script.
  */
-#if 0
+#ఒకవేళ 0
 // Expressions used for testing during the development phase.
-# define THROW_ON_ERROR		(!eval_to_number("$VIMNOERRTHROW"))
-# define THROW_ON_INTERRUPT	(!eval_to_number("$VIMNOINTTHROW"))
+# define THROW_ON_ERROR		(!eval_గమ్యం_సంఖ్య("$VIMNOERRTHROW"))
+# define THROW_ON_అంతరాయం	(!eval_గమ్యం_సంఖ్య("$VIMNOINTTHROW"))
 # define THROW_TEST
-#else
+#లేకపోతే
 // Values used for the Vim release.
 # define THROW_ON_ERROR		TRUE
 # define THROW_ON_ERROR_TRUE
-# define THROW_ON_INTERRUPT	TRUE
-# define THROW_ON_INTERRUPT_TRUE
-#endif
+# define THROW_ON_అంతరాయం	TRUE
+# define THROW_ON_అంతరాయం_TRUE
+#అయితే_ముగింపు
 
 /*
  * When several errors appear in a row, setting "force_abort" is delayed until
@@ -72,7 +72,7 @@ static char	*get_end_emsg(cstack_T *cstack);
  * error messages on parsing errors during the expression evaluation are given
  * (even if a try conditional is active).
  */
-static int cause_abort = FALSE;
+స్థిర పూర్ణాంకం cause_abort = FALSE;
 
 /*
  * Return TRUE when immediately aborting on error, or when an interrupt
@@ -86,10 +86,10 @@ static int cause_abort = FALSE;
  * due to a parsing error, aborting() always returns the same value.
  * "got_int" is also set by calling interrupt().
  */
-    int
-aborting(void)
+    పూర్ణాంకం
+aborting(శూన్య)
 {
-    return (did_emsg && force_abort) || got_int || did_throw;
+    తిరిగి (did_emsg && force_abort) || got_int || did_throw;
 }
 
 /*
@@ -98,10 +98,10 @@ aborting(void)
  * be necessary to restore "force_abort" even before the throw point for the
  * error message has been reached.  update_force_abort() should be called then.
  */
-    void
-update_force_abort(void)
+    శూన్య
+update_force_abort(శూన్య)
 {
-    if (cause_abort)
+    ఒకవేళ (cause_abort)
 	force_abort = TRUE;
 }
 
@@ -111,10 +111,10 @@ update_force_abort(void)
  * execution of a failing subcommand as long as the error message has not been
  * displayed and actually caused the abortion.
  */
-    int
-should_abort(int retcode)
+    పూర్ణాంకం
+should_abort(పూర్ణాంకం retcode)
 {
-    return ((retcode == FAIL && trylevel != 0 && !emsg_silent) || aborting());
+    తిరిగి ((retcode == FAIL && trylevel != 0 && !emsg_silent) || aborting());
 }
 
 /*
@@ -123,12 +123,12 @@ should_abort(int retcode)
  * to find finally clauses to be executed, and that some errors in skipped
  * commands are still reported.
  */
-    int
-aborted_in_try(void)
+    పూర్ణాంకం
+aborted_లోపల_try(శూన్య)
 {
     // This function is only called after an error.  In this case, "force_abort"
     // determines whether searching for finally clauses is necessary.
-    return force_abort;
+    తిరిగి force_abort;
 }
 
 /*
@@ -140,11 +140,11 @@ aborted_in_try(void)
  * most specific one and used as the exception value.  The "severe" flag can be
  * set to TRUE, if a later but severer message should be used instead.
  */
-    int
+    పూర్ణాంకం
 cause_errthrow(
     char_u	*mesg,
-    int		severe,
-    int		*ignore)
+    పూర్ణాంకం		severe,
+    పూర్ణాంకం		*ignore)
 {
     msglist_T	*elem;
     msglist_T	**plist;
@@ -155,8 +155,8 @@ cause_errthrow(
      * level.  Also when no exception can be thrown.  The message will be
      * displayed by emsg().
      */
-    if (suppress_errthrow)
-	return FALSE;
+    ఒకవేళ (suppress_errthrow)
+	తిరిగి FALSE;
 
     /*
      * If emsg() has not been called previously, temporarily reset
@@ -167,7 +167,7 @@ cause_errthrow(
      * multiply, even when the expression is evaluated from a finally clause
      * that was activated due to an aborting error, interrupt, or exception.
      */
-    if (!did_emsg)
+    ఒకవేళ (!did_emsg)
     {
 	cause_abort = force_abort;
 	force_abort = FALSE;
@@ -181,8 +181,8 @@ cause_errthrow(
      * currently throwing an exception, do nothing.  The message text will
      * then be stored to v:errmsg by emsg() without displaying it.
      */
-    if (((trylevel == 0 && !cause_abort) || emsg_silent) && !did_throw)
-	return FALSE;
+    ఒకవేళ (((trylevel == 0 && !cause_abort) || emsg_silent) && !did_throw)
+	తిరిగి FALSE;
 
     /*
      * Ignore an interrupt message when inside a try conditional or when an
@@ -191,10 +191,10 @@ cause_errthrow(
      * interrupt exception is catchable by the innermost try conditional and
      * not replaced by an interrupt message error exception.
      */
-    if (mesg == (char_u *)_(e_interrupted))
+    ఒకవేళ (mesg == (char_u *)_(e_interrupted))
     {
 	*ignore = TRUE;
-	return TRUE;
+	తిరిగి TRUE;
     }
 
     /*
@@ -212,28 +212,28 @@ cause_errthrow(
      * exception currently being thrown to prevent it from being caught.  Just
      * execute finally clauses and terminate.
      */
-    if (did_throw)
+    ఒకవేళ (did_throw)
     {
 	// When discarding an interrupt exception, reset got_int to prevent the
 	// same interrupt being converted to an exception again and discarding
 	// the error exception we are about to throw here.
-	if (current_exception->type == ET_INTERRUPT)
+	ఒకవేళ (current_exception->type == ET_అంతరాయం)
 	    got_int = FALSE;
 	discard_current_exception();
     }
 
-#ifdef THROW_TEST
-    if (!THROW_ON_ERROR)
+#నిర్వచితమైతే THROW_TEST
+    ఒకవేళ (!THROW_ON_ERROR)
     {
 	/*
 	 * Print error message immediately without searching for a matching
 	 * catch clause; just finally clauses are executed before the script
 	 * is terminated.
 	 */
-	return FALSE;
+	తిరిగి FALSE;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	/*
 	 * Prepare the throw of an error exception, so that everything will
@@ -245,77 +245,77 @@ cause_errthrow(
 	 * returned.  -  Throw only the first of several errors in a row, except
 	 * a severe error is following.
 	 */
-	if (msg_list != NULL)
+	ఒకవేళ (సందేశం_list != ఖాళీ)
 	{
-	    plist = msg_list;
-	    while (*plist != NULL)
-		plist = &(*plist)->next;
+	    plist = సందేశం_list;
+	    అయితే (*plist != ఖాళీ)
+		plist = &(*plist)->తదుపరి;
 
 	    elem = ALLOC_CLEAR_ONE(msglist_T);
-	    if (elem == NULL)
+	    ఒకవేళ (elem == ఖాళీ)
 	    {
 		suppress_errthrow = TRUE;
-		emsg(_(e_out_of_memory));
+		emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 	    }
-	    else
+	    లేకపోతే
 	    {
-		elem->msg = (char *)vim_strsave(mesg);
-		if (elem->msg == NULL)
+		elem->సందేశం = (అక్షరం *)vim_strsave(mesg);
+		ఒకవేళ (elem->సందేశం == ఖాళీ)
 		{
 		    vim_free(elem);
 		    suppress_errthrow = TRUE;
-		    emsg(_(e_out_of_memory));
+		    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 		}
-		else
+		లేకపోతే
 		{
-		    elem->next = NULL;
-		    elem->throw_msg = NULL;
+		    elem->తదుపరి = ఖాళీ;
+		    elem->throw_సందేశం = ఖాళీ;
 		    *plist = elem;
-		    if (plist == msg_list || severe)
+		    ఒకవేళ (plist == సందేశం_list || severe)
 		    {
-			char	    *tmsg;
+			అక్షరం	    *tmsg;
 
 			// Skip the extra "Vim " prefix for message "E457".
-			tmsg = elem->msg;
-			if (STRNCMP(tmsg, "Vim E", 5) == 0
+			tmsg = elem->సందేశం;
+			ఒకవేళ (STRNCMP(tmsg, "Vim E", 5) == 0
 				&& VIM_ISDIGIT(tmsg[5])
 				&& VIM_ISDIGIT(tmsg[6])
 				&& VIM_ISDIGIT(tmsg[7])
 				&& tmsg[8] == ':'
 				&& tmsg[9] == ' ')
-			    (*msg_list)->throw_msg = &tmsg[4];
-			else
-			    (*msg_list)->throw_msg = tmsg;
+			    (*సందేశం_list)->throw_సందేశం = &tmsg[4];
+			లేకపోతే
+			    (*సందేశం_list)->throw_సందేశం = tmsg;
 		    }
 
 		    // Get the source name and lnum now, it may change before
 		    // reaching do_errthrow().
 		    elem->sfile = estack_sfile(ESTACK_NONE);
 		    elem->slnum = SOURCING_LNUM;
-		    elem->msg_compiling = estack_compiling;
+		    elem->సందేశం_compiling = estack_compiling;
 		}
 	    }
 	}
-	return TRUE;
+	తిరిగి TRUE;
     }
 }
 
 /*
  * Free a "msg_list" and the messages it contains.
  */
-    static void
+    స్థిర శూన్య
 free_msglist(msglist_T *l)
 {
-    msglist_T  *messages, *next;
+    msglist_T  *messages, *తదుపరి;
 
     messages = l;
-    while (messages != NULL)
+    అయితే (messages != ఖాళీ)
     {
-	next = messages->next;
-	vim_free(messages->msg);
+	తదుపరి = messages->తదుపరి;
+	vim_free(messages->సందేశం);
 	vim_free(messages->sfile);
 	vim_free(messages);
-	messages = next;
+	messages = తదుపరి;
     }
 }
 
@@ -323,11 +323,11 @@ free_msglist(msglist_T *l)
  * Free global "*msg_list" and the messages it contains, then set "*msg_list"
  * to NULL.
  */
-    void
-free_global_msglist(void)
+    శూన్య
+free_global_msglist(శూన్య)
 {
-    free_msglist(*msg_list);
-    *msg_list = NULL;
+    free_msglist(*సందేశం_list);
+    *సందేశం_list = ఖాళీ;
 }
 
 /*
@@ -335,14 +335,14 @@ free_global_msglist(void)
  * error exception.  If cstack is NULL, postpone the throw until do_cmdline()
  * has returned (see do_one_cmd()).
  */
-    void
+    శూన్య
 do_errthrow(cstack_T *cstack, char_u *cmdname)
 {
     /*
      * Ensure that all commands in nested function calls and sourced files
      * are aborted immediately.
      */
-    if (cause_abort)
+    ఒకవేళ (cause_abort)
     {
 	cause_abort = FALSE;
 	force_abort = TRUE;
@@ -350,19 +350,19 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
 
     // If no exception is to be thrown or the conversion should be done after
     // returning to a previous invocation of do_one_cmd(), do nothing.
-    if (msg_list == NULL || *msg_list == NULL)
-	return;
+    ఒకవేళ (సందేశం_list == ఖాళీ || *సందేశం_list == ఖాళీ)
+	తిరిగి;
 
-    if (throw_exception(*msg_list, ET_ERROR, cmdname) == FAIL)
-	free_msglist(*msg_list);
-    else
+    ఒకవేళ (throw_exception(*సందేశం_list, ET_ERROR, cmdname) == FAIL)
+	free_msglist(*సందేశం_list);
+    లేకపోతే
     {
-	if (cstack != NULL)
+	ఒకవేళ (cstack != ఖాళీ)
 	    do_throw(cstack);
-	else
+	లేకపోతే
 	    need_rethrow = TRUE;
     }
-    *msg_list = NULL;
+    *సందేశం_list = ఖాళీ;
 }
 
 /*
@@ -370,29 +370,29 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
  * exception if appropriate.  Return TRUE if the current exception is discarded,
  * FALSE otherwise.
  */
-    int
+    పూర్ణాంకం
 do_intthrow(cstack_T *cstack)
 {
     /*
      * If no interrupt occurred or no try conditional is active and no exception
      * is being thrown, do nothing (for compatibility of non-EH scripts).
      */
-    if (!got_int || (trylevel == 0 && !did_throw))
-	return FALSE;
+    ఒకవేళ (!got_int || (trylevel == 0 && !did_throw))
+	తిరిగి FALSE;
 
-#ifdef THROW_TEST	// avoid warning for condition always true
-    if (!THROW_ON_INTERRUPT)
+#నిర్వచితమైతే THROW_TEST	// avoid warning for condition always true
+    ఒకవేళ (!THROW_ON_అంతరాయం)
     {
 	/*
 	 * The interrupt aborts everything except for executing finally clauses.
 	 * Discard any user or error or interrupt exception currently being
 	 * thrown.
 	 */
-	if (did_throw)
+	ఒకవేళ (did_throw)
 	    discard_current_exception();
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	/*
 	 * Throw an interrupt exception, so that everything will be aborted
@@ -402,65 +402,65 @@ do_intthrow(cstack_T *cstack)
 	 * being thrown, do nothing.
 	 *
 	 */
-	if (did_throw)
+	ఒకవేళ (did_throw)
 	{
-	    if (current_exception->type == ET_INTERRUPT)
-		return FALSE;
+	    ఒకవేళ (current_exception->type == ET_అంతరాయం)
+		తిరిగి FALSE;
 
 	    // An interrupt exception replaces any user or error exception.
 	    discard_current_exception();
 	}
-	if (throw_exception("Vim:Interrupt", ET_INTERRUPT, NULL) != FAIL)
+	ఒకవేళ (throw_exception("Vim:Interrupt", ET_అంతరాయం, ఖాళీ) != FAIL)
 	    do_throw(cstack);
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Get an exception message that is to be stored in current_exception->value.
  */
-    char *
+    అక్షరం *
 get_exception_string(
-    void	*value,
+    శూన్య	*విలువ,
     except_type_T type,
     char_u	*cmdname,
-    int		*should_free)
+    పూర్ణాంకం		*should_free)
 {
-    char	*ret;
-    char	*mesg;
-    int		cmdlen;
-    char	*p, *val;
+    అక్షరం	*ret;
+    అక్షరం	*mesg;
+    పూర్ణాంకం		cmdlen;
+    అక్షరం	*p, *val;
 
-    if (type == ET_ERROR)
+    ఒకవేళ (type == ET_ERROR)
     {
 	*should_free = TRUE;
-	mesg = ((msglist_T *)value)->throw_msg;
-	if (cmdname != NULL && *cmdname != NUL)
+	mesg = ((msglist_T *)విలువ)->throw_సందేశం;
+	ఒకవేళ (cmdname != ఖాళీ && *cmdname != NUL)
 	{
-	    cmdlen = (int)STRLEN(cmdname);
-	    ret = (char *)vim_strnsave((char_u *)"Vim(",
+	    cmdlen = (పూర్ణాంకం)STRLEN(cmdname);
+	    ret = (అక్షరం *)vim_strnsave((char_u *)"Vim(",
 						4 + cmdlen + 2 + STRLEN(mesg));
-	    if (ret == NULL)
-		return ret;
+	    ఒకవేళ (ret == ఖాళీ)
+		తిరిగి ret;
 	    STRCPY(&ret[4], cmdname);
 	    STRCPY(&ret[4 + cmdlen], "):");
 	    val = ret + 4 + cmdlen + 2;
 	}
-	else
+	లేకపోతే
 	{
-	    ret = (char *)vim_strnsave((char_u *)"Vim:", 4 + STRLEN(mesg));
-	    if (ret == NULL)
-		return ret;
+	    ret = (అక్షరం *)vim_strnsave((char_u *)"Vim:", 4 + STRLEN(mesg));
+	    ఒకవేళ (ret == ఖాళీ)
+		తిరిగి ret;
 	    val = ret + 4;
 	}
 
 	// msg_add_fname may have been used to prefix the message with a file
 	// name in quotes.  In the exception value, put the file name in
 	// parentheses and move it to the end.
-	for (p = mesg; ; p++)
+	కొరకు (p = mesg; ; p++)
 	{
-	    if (*p == NUL
+	    ఒకవేళ (*p == NUL
 		    || (*p == 'E'
 			&& VIM_ISDIGIT(p[1])
 			&& (p[2] == ':'
@@ -469,32 +469,32 @@ get_exception_string(
 				    || (VIM_ISDIGIT(p[3])
 					&& p[4] == ':'))))))
 	    {
-		if (*p == NUL || p == mesg)
+		ఒకవేళ (*p == NUL || p == mesg)
 		    STRCAT(val, mesg);  // 'E123' missing or at beginning
-		else
+		లేకపోతే
 		{
 		    // '"filename" E123: message text'
-		    if (mesg[0] != '"' || p-2 < &mesg[1] ||
+		    ఒకవేళ (mesg[0] != '"' || p-2 < &mesg[1] ||
 			    p[-2] != '"' || p[-1] != ' ')
 			// "E123:" is part of the file name.
-			continue;
+			కొనసాగు;
 
 		    STRCAT(val, p);
 		    p[-2] = NUL;
-		    sprintf((char *)(val + STRLEN(p)), " (%s)", &mesg[1]);
+		    sprintf((అక్షరం *)(val + STRLEN(p)), " (%s)", &mesg[1]);
 		    p[-2] = '"';
 		}
-		break;
+		ఆపు;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	*should_free = FALSE;
-	ret = value;
+	ret = విలువ;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 
@@ -504,151 +504,151 @@ get_exception_string(
  * user or interrupt exception, or points to a message list in case of an
  * error exception.
  */
-    int
-throw_exception(void *value, except_type_T type, char_u *cmdname)
+    పూర్ణాంకం
+throw_exception(శూన్య *విలువ, except_type_T type, char_u *cmdname)
 {
     except_T	*excp;
-    int		should_free;
+    పూర్ణాంకం		should_free;
 
     /*
      * Disallow faking Interrupt or error exceptions as user exceptions.  They
      * would be treated differently from real interrupt or error exceptions
      * when no active try block is found, see do_cmdline().
      */
-    if (type == ET_USER)
+    ఒకవేళ (type == ET_USER)
     {
-	if (STRNCMP((char_u *)value, "Vim", 3) == 0
-		&& (((char_u *)value)[3] == NUL || ((char_u *)value)[3] == ':'
-		    || ((char_u *)value)[3] == '('))
+	ఒకవేళ (STRNCMP((char_u *)విలువ, "Vim", 3) == 0
+		&& (((char_u *)విలువ)[3] == NUL || ((char_u *)విలువ)[3] == ':'
+		    || ((char_u *)విలువ)[3] == '('))
 	{
-	    emsg(_(e_cannot_throw_exceptions_with_vim_prefix));
-	    goto fail;
+	    emsg(_(e_cannot_throw_exceptions_with_vim_ఉపసర్గ));
+	    వెళ్ళు fail;
 	}
     }
 
     excp = ALLOC_ONE(except_T);
-    if (excp == NULL)
-	goto nomem;
+    ఒకవేళ (excp == ఖాళీ)
+	వెళ్ళు nomem;
 
-    if (type == ET_ERROR)
+    ఒకవేళ (type == ET_ERROR)
 	// Store the original message and prefix the exception value with
 	// "Vim:" or, if a command name is given, "Vim(cmdname):".
-	excp->messages = (msglist_T *)value;
+	excp->messages = (msglist_T *)విలువ;
 
-    excp->value = get_exception_string(value, type, cmdname, &should_free);
-    if (excp->value == NULL && should_free)
-	goto nomem;
+    excp->విలువ = get_exception_string(విలువ, type, cmdname, &should_free);
+    ఒకవేళ (excp->విలువ == ఖాళీ && should_free)
+	వెళ్ళు nomem;
 
     excp->type = type;
-    if (type == ET_ERROR && ((msglist_T *)value)->sfile != NULL)
+    ఒకవేళ (type == ET_ERROR && ((msglist_T *)విలువ)->sfile != ఖాళీ)
     {
-	msglist_T *entry = (msglist_T *)value;
+	msglist_T *నమోదు_2 = (msglist_T *)విలువ;
 
-	excp->throw_name = entry->sfile;
-	entry->sfile = NULL;
-	excp->throw_lnum = entry->slnum;
+	excp->throw_name = నమోదు_2->sfile;
+	నమోదు_2->sfile = ఖాళీ;
+	excp->throw_lnum = నమోదు_2->slnum;
     }
-    else
+    లేకపోతే
     {
 	excp->throw_name = estack_sfile(ESTACK_NONE);
-	if (excp->throw_name == NULL)
+	ఒకవేళ (excp->throw_name == ఖాళీ)
 	    excp->throw_name = vim_strsave((char_u *)"");
-	if (excp->throw_name == NULL)
+	ఒకవేళ (excp->throw_name == ఖాళీ)
 	{
-	    if (should_free)
-		vim_free(excp->value);
-	    goto nomem;
+	    ఒకవేళ (should_free)
+		vim_free(excp->విలువ);
+	    వెళ్ళు nomem;
 	}
 	excp->throw_lnum = SOURCING_LNUM;
     }
 
     excp->stacktrace = stacktrace_create();
-    if (excp->stacktrace != NULL)
+    ఒకవేళ (excp->stacktrace != ఖాళీ)
 	excp->stacktrace->lv_refcount = 1;
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	పూర్ణాంకం	save_సందేశం_silent = సందేశం_silent;
 
-	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = FALSE;		// display messages
+	లేకపోతే
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    సందేశం_scroll = TRUE;	    // always scroll up, don't overwrite
 
-	smsg(_("Exception thrown: %s"), excp->value);
-	msg_puts("\n");   // don't overwrite this either
+	smsg(_("Exception thrown: %s"), excp->విలువ);
+	సందేశం_puts("\n");   // don't overwrite this either
 
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	--no_wait_return;
-	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = save_సందేశం_silent;
+	లేకపోతే
 	    verbose_leave();
     }
 
     current_exception = excp;
-    return OK;
+    తిరిగి OK;
 
 nomem:
     vim_free(excp);
     suppress_errthrow = TRUE;
-    emsg(_(e_out_of_memory));
+    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 fail:
-    current_exception = NULL;
-    return FAIL;
+    current_exception = ఖాళీ;
+    తిరిగి FAIL;
 }
 
 /*
  * Discard an exception.  "was_finished" is set when the exception has been
  * caught and the catch clause has been ended normally.
  */
-    static void
-discard_exception(except_T *excp, int was_finished)
+    స్థిర శూన్య
+discard_exception(except_T *excp, పూర్ణాంకం was_ముగిసిన)
 {
     char_u		*saved_IObuff;
 
-    if (current_exception == excp)
-	current_exception = NULL;
-    if (excp == NULL)
+    ఒకవేళ (current_exception == excp)
+	current_exception = ఖాళీ;
+    ఒకవేళ (excp == ఖాళీ)
     {
-	internal_error("discard_exception()");
-	return;
+	అంతర్గత_error("discard_exception()");
+	తిరిగి;
     }
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	పూర్ణాంకం	save_సందేశం_silent = సందేశం_silent;
 
 	saved_IObuff = vim_strsave(IObuff);
-	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = FALSE;		// display messages
+	లేకపోతే
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
-	smsg(was_finished
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    సందేశం_scroll = TRUE;	    // always scroll up, don't overwrite
+	smsg(was_ముగిసిన
 		    ? _("Exception finished: %s")
 		    : _("Exception discarded: %s"),
-		excp->value);
-	msg_puts("\n");   // don't overwrite this either
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+		excp->విలువ);
+	సందేశం_puts("\n");   // don't overwrite this either
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	--no_wait_return;
-	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = save_సందేశం_silent;
+	లేకపోతే
 	    verbose_leave();
 	STRCPY(IObuff, saved_IObuff);
 	vim_free(saved_IObuff);
     }
-    if (excp->type != ET_INTERRUPT)
-	vim_free(excp->value);
-    if (excp->type == ET_ERROR)
+    ఒకవేళ (excp->type != ET_అంతరాయం)
+	vim_free(excp->విలువ);
+    ఒకవేళ (excp->type == ET_ERROR)
 	free_msglist(excp->messages);
     vim_free(excp->throw_name);
     list_unref(excp->stacktrace);
@@ -658,10 +658,10 @@ discard_exception(except_T *excp, int was_finished)
 /*
  * Discard the exception currently being thrown.
  */
-    void
-discard_current_exception(void)
+    శూన్య
+discard_current_exception(శూన్య)
 {
-    if (current_exception != NULL)
+    ఒకవేళ (current_exception != ఖాళీ)
 	discard_exception(current_exception, FALSE);
     did_throw = FALSE;
     need_rethrow = FALSE;
@@ -670,49 +670,49 @@ discard_current_exception(void)
 /*
  * Put an exception on the caught stack.
  */
-    void
+    శూన్య
 catch_exception(except_T *excp)
 {
-    excp->caught = caught_stack;
-    caught_stack = excp;
-    set_vim_var_string(VV_EXCEPTION, (char_u *)excp->value, -1);
-    set_vim_var_list(VV_STACKTRACE, excp->stacktrace);
-    if (*excp->throw_name != NUL)
+    excp->caught = caught_దొంతర;
+    caught_దొంతర = excp;
+    సమితి_vim_var_string(VV_EXCEPTION, (char_u *)excp->విలువ, -1);
+    సమితి_vim_var_list(VV_STACKTRACE, excp->stacktrace);
+    ఒకవేళ (*excp->throw_name != NUL)
     {
 	size_t	IObufflen;
 
-	if (excp->throw_lnum != 0)
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, _("%s, line %ld"),
-				    excp->throw_name, (long)excp->throw_lnum);
-	else
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, "%s", excp->throw_name);
-	set_vim_var_string(VV_THROWPOINT, IObuff, (int)IObufflen);
+	ఒకవేళ (excp->throw_lnum != 0)
+	    IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE, _("%s, line %ld"),
+				    excp->throw_name, (దీర్ఘ)excp->throw_lnum);
+	లేకపోతే
+	    IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE, "%s", excp->throw_name);
+	సమితి_vim_var_string(VV_THROWPOINT, IObuff, (పూర్ణాంకం)IObufflen);
     }
-    else
+    లేకపోతే
 	// throw_name not set on an exception from a command that was typed.
-	set_vim_var_string(VV_THROWPOINT, NULL, -1);
+	సమితి_vim_var_string(VV_THROWPOINT, ఖాళీ, -1);
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	పూర్ణాంకం	save_సందేశం_silent = సందేశం_silent;
 
-	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = FALSE;		// display messages
+	లేకపోతే
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    సందేశం_scroll = TRUE;	    // always scroll up, don't overwrite
 
-	smsg(_("Exception caught: %s"), excp->value);
-	msg_puts("\n");   // don't overwrite this either
+	smsg(_("Exception caught: %s"), excp->విలువ);
+	సందేశం_puts("\n");   // don't overwrite this either
 
-	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+	ఒకవేళ (debug_break_level > 0 || *p_vfile == NUL)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	--no_wait_return;
-	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
-	else
+	ఒకవేళ (debug_break_level > 0)
+	    సందేశం_silent = save_సందేశం_silent;
+	లేకపోతే
 	    verbose_leave();
     }
 }
@@ -720,39 +720,39 @@ catch_exception(except_T *excp)
 /*
  * Remove an exception from the caught stack.
  */
-    void
-finish_exception(except_T *excp)
+    శూన్య
+ముగింపు_exception(except_T *excp)
 {
-    if (excp != caught_stack)
-	internal_error("finish_exception()");
-    caught_stack = caught_stack->caught;
-    if (caught_stack != NULL)
+    ఒకవేళ (excp != caught_దొంతర)
+	అంతర్గత_error("finish_exception()");
+    caught_దొంతర = caught_దొంతర->caught;
+    ఒకవేళ (caught_దొంతర != ఖాళీ)
     {
-	set_vim_var_string(VV_EXCEPTION, (char_u *)caught_stack->value, -1);
-	set_vim_var_list(VV_STACKTRACE, caught_stack->stacktrace);
-	if (*caught_stack->throw_name != NUL)
+	సమితి_vim_var_string(VV_EXCEPTION, (char_u *)caught_దొంతర->విలువ, -1);
+	సమితి_vim_var_list(VV_STACKTRACE, caught_దొంతర->stacktrace);
+	ఒకవేళ (*caught_దొంతర->throw_name != NUL)
 	{
 	    size_t  IObufflen;
 
-	    if (caught_stack->throw_lnum != 0)
-		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-			_("%s, line %ld"), caught_stack->throw_name,
-			(long)caught_stack->throw_lnum);
-	    else
-		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, "%s",
-						    caught_stack->throw_name);
-	    set_vim_var_string(VV_THROWPOINT, IObuff, (int)IObufflen);
+	    ఒకవేళ (caught_దొంతర->throw_lnum != 0)
+		IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE,
+			_("%s, line %ld"), caught_దొంతర->throw_name,
+			(దీర్ఘ)caught_దొంతర->throw_lnum);
+	    లేకపోతే
+		IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE, "%s",
+						    caught_దొంతర->throw_name);
+	    సమితి_vim_var_string(VV_THROWPOINT, IObuff, (పూర్ణాంకం)IObufflen);
 	}
-	else
+	లేకపోతే
 	    // throw_name not set on an exception from a command that was
 	    // typed.
-	    set_vim_var_string(VV_THROWPOINT, NULL, -1);
+	    సమితి_vim_var_string(VV_THROWPOINT, ఖాళీ, -1);
     }
-    else
+    లేకపోతే
     {
-	set_vim_var_string(VV_EXCEPTION, NULL, -1);
-	set_vim_var_string(VV_THROWPOINT, NULL, -1);
-	set_vim_var_list(VV_STACKTRACE, NULL);
+	సమితి_vim_var_string(VV_EXCEPTION, ఖాళీ, -1);
+	సమితి_vim_var_string(VV_THROWPOINT, ఖాళీ, -1);
+	సమితి_vim_var_list(VV_STACKTRACE, ఖాళీ);
     }
 
     // Discard the exception, but use the finish message for 'verbose'.
@@ -762,7 +762,7 @@ finish_exception(except_T *excp)
 /*
  * Save the current exception state in "estate"
  */
-    void
+    శూన్య
 exception_state_save(exception_state_T *estate)
 {
     estate->estate_current_exception = current_exception;
@@ -775,11 +775,11 @@ exception_state_save(exception_state_T *estate)
 /*
  * Restore the current exception state from "estate"
  */
-    void
+    శూన్య
 exception_state_restore(exception_state_T *estate)
 {
     // Handle any outstanding exceptions before restoring the state
-    if (did_throw)
+    ఒకవేళ (did_throw)
 	handle_did_throw();
     current_exception = estate->estate_current_exception;
     did_throw = estate->estate_did_throw;
@@ -791,10 +791,10 @@ exception_state_restore(exception_state_T *estate)
 /*
  * Clear the current exception state
  */
-    void
-exception_state_clear(void)
+    శూన్య
+exception_state_clear(శూన్య)
 {
-    current_exception = NULL;
+    current_exception = ఖాళీ;
     did_throw = FALSE;
     need_rethrow = FALSE;
     trylevel = 0;
@@ -804,9 +804,9 @@ exception_state_clear(void)
 /*
  * Flags specifying the message displayed by report_pending.
  */
-#define RP_MAKE		0
-#define RP_RESUME	1
-#define RP_DISCARD	2
+#నిర్వచించు RP_MAKE		0
+#నిర్వచించు RP_RESUME	1
+#నిర్వచించు RP_DISCARD	2
 
 /*
  * Report information about something pending in a finally clause if required by
@@ -815,78 +815,78 @@ exception_state_clear(void)
  * what is pending.  "value" specifies the return value for a pending ":return"
  * or the exception value for a pending exception.
  */
-    static void
-report_pending(int action, int pending, void *value)
+    స్థిర శూన్య
+report_pending(పూర్ణాంకం action, పూర్ణాంకం pending, శూన్య *విలువ)
 {
-    char	*mesg;
-    char	*s;
-    int		save_msg_silent;
+    అక్షరం	*mesg;
+    అక్షరం	*s;
+    పూర్ణాంకం		save_సందేశం_silent;
 
 
-    switch (action)
+    ఎంపిక (action)
     {
-	case RP_MAKE:
+	స్థితి RP_MAKE:
 	    mesg = _("%s made pending");
-	    break;
-	case RP_RESUME:
+	    ఆపు;
+	స్థితి RP_RESUME:
 	    mesg = _("%s resumed");
-	    break;
+	    ఆపు;
 	// case RP_DISCARD:
-	default:
+	అప్రమేయ:
 	    mesg = _("%s discarded");
-	    break;
+	    ఆపు;
     }
 
-    switch (pending)
+    ఎంపిక (pending)
     {
-	case CSTP_NONE:
-	    return;
+	స్థితి CSTP_NONE:
+	    తిరిగి;
 
-	case CSTP_CONTINUE:
+	స్థితి CSTP_CONTINUE:
 	    s = ":continue";
-	    break;
-	case CSTP_BREAK:
+	    ఆపు;
+	స్థితి CSTP_BREAK:
 	    s = ":break";
-	    break;
-	case CSTP_FINISH:
+	    ఆపు;
+	స్థితి CSTP_ముగింపు:
 	    s = ":finish";
-	    break;
-	case CSTP_RETURN:
+	    ఆపు;
+	స్థితి CSTP_RETURN:
 	    // ":return" command producing value, allocated
-	    s = (char *)get_return_cmd(value);
-	    break;
+	    s = (అక్షరం *)get_return_cmd(విలువ);
+	    ఆపు;
 
-	default:
-	    if (pending & CSTP_THROW)
+	అప్రమేయ:
+	    ఒకవేళ (pending & CSTP_THROW)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, mesg, _("Exception"));
-		mesg = (char *)vim_strnsave(IObuff, STRLEN(IObuff) + 4);
+		vim_snprintf((అక్షరం *)IObuff, IOSIZE, mesg, _("Exception"));
+		mesg = (అక్షరం *)vim_strnsave(IObuff, STRLEN(IObuff) + 4);
 		STRCAT(mesg, ": %s");
-		s = (char *)((except_T *)value)->value;
+		s = (అక్షరం *)((except_T *)విలువ)->విలువ;
 	    }
-	    else if ((pending & CSTP_ERROR) && (pending & CSTP_INTERRUPT))
+	    లేకపోతే ఒకవేళ ((pending & CSTP_ERROR) && (pending & CSTP_అంతరాయం))
 		s = _("Error and interrupt");
-	    else if (pending & CSTP_ERROR)
+	    లేకపోతే ఒకవేళ (pending & CSTP_ERROR)
 		s = _("Error");
-	    else // if (pending & CSTP_INTERRUPT)
+	    లేకపోతే // if (pending & CSTP_INTERRUPT)
 		s = _("Interrupt");
     }
 
-    save_msg_silent = msg_silent;
-    if (debug_break_level > 0)
-	msg_silent = FALSE;	// display messages
+    save_సందేశం_silent = సందేశం_silent;
+    ఒకవేళ (debug_break_level > 0)
+	సందేశం_silent = FALSE;	// display messages
     ++no_wait_return;
-    msg_scroll = TRUE;		// always scroll up, don't overwrite
+    సందేశం_scroll = TRUE;		// always scroll up, don't overwrite
     smsg(mesg, s);
-    msg_puts("\n");   // don't overwrite this either
-    cmdline_row = msg_row;
+    సందేశం_puts("\n");   // don't overwrite this either
+    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
     --no_wait_return;
-    if (debug_break_level > 0)
-	msg_silent = save_msg_silent;
+    ఒకవేళ (debug_break_level > 0)
+	సందేశం_silent = save_సందేశం_silent;
 
-    if (pending == CSTP_RETURN)
+    ఒకవేళ (pending == CSTP_RETURN)
 	vim_free(s);
-    else if (pending & CSTP_THROW)
+    లేకపోతే ఒకవేళ (pending & CSTP_THROW)
 	vim_free(mesg);
 }
 
@@ -894,15 +894,15 @@ report_pending(int action, int pending, void *value)
  * If something is made pending in a finally clause, report it if required by
  * the 'verbose' option or when debugging.
  */
-    void
-report_make_pending(int pending, void *value)
+    శూన్య
+report_make_pending(పూర్ణాంకం pending, శూన్య *విలువ)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_MAKE, pending, value);
-	if (debug_break_level <= 0)
+	report_pending(RP_MAKE, pending, విలువ);
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -911,15 +911,15 @@ report_make_pending(int pending, void *value)
  * If something pending in a finally clause is resumed at the ":endtry", report
  * it if required by the 'verbose' option or when debugging.
  */
-    static void
-report_resume_pending(int pending, void *value)
+    స్థిర శూన్య
+report_resume_pending(పూర్ణాంకం pending, శూన్య *విలువ)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_RESUME, pending, value);
-	if (debug_break_level <= 0)
+	report_pending(RP_RESUME, pending, విలువ);
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -928,15 +928,15 @@ report_resume_pending(int pending, void *value)
  * If something pending in a finally clause is discarded, report it if required
  * by the 'verbose' option or when debugging.
  */
-    static void
-report_discard_pending(int pending, void *value)
+    స్థిర శూన్య
+report_discard_pending(పూర్ణాంకం pending, శూన్య *విలువ)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    ఒకవేళ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_DISCARD, pending, value);
-	if (debug_break_level <= 0)
+	report_pending(RP_DISCARD, pending, విలువ);
+	ఒకవేళ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -945,73 +945,73 @@ report_discard_pending(int pending, void *value)
  * Return TRUE if "arg" is only a variable, register, environment variable,
  * option name or string.
  */
-    int
+    పూర్ణాంకం
 cmd_is_name_only(char_u *arg)
 {
     char_u  *p = arg;
-    char_u  *alias = NULL;
-    int	    name_only = FALSE;
+    char_u  *alias = ఖాళీ;
+    పూర్ణాంకం	    name_only = FALSE;
 
-    if (*p == '@')
+    ఒకవేళ (*p == '@')
     {
 	++p;
-	if (*p != NUL)
+	ఒకవేళ (*p != NUL)
 	    ++p;
     }
-    else if (*p == '\'' || *p == '"')
+    లేకపోతే ఒకవేళ (*p == '\'' || *p == '"')
     {
-	int	    r;
+	పూర్ణాంకం	    r;
 
-	if (*p == '"')
-	    r = eval_string(&p, NULL, FALSE, FALSE);
-	else
-	    r = eval_lit_string(&p, NULL, FALSE, FALSE);
-	if (r == FAIL)
-	    return FALSE;
+	ఒకవేళ (*p == '"')
+	    r = eval_string(&p, ఖాళీ, FALSE, FALSE);
+	లేకపోతే
+	    r = eval_lit_string(&p, ఖాళీ, FALSE, FALSE);
+	ఒకవేళ (r == FAIL)
+	    తిరిగి FALSE;
     }
-    else
+    లేకపోతే
     {
-	if (*p == '&')
+	ఒకవేళ (*p == '&')
 	{
 	    ++p;
-	    if (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
+	    ఒకవేళ (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
 		p += 2;
 	}
-	else if (*p == '$')
+	లేకపోతే ఒకవేళ (*p == '$')
 	    ++p;
-	(void)get_name_len(&p, &alias, FALSE, FALSE);
+	(శూన్య)get_name_len(&p, &alias, FALSE, FALSE);
     }
-    name_only = ends_excmd2(arg, skipwhite(p));
+    name_only = చివర్లు_excmd2(arg, skipwhite(p));
     vim_free(alias);
-    return name_only;
+    తిరిగి name_only;
 }
 
 /*
  * ":eval".
  */
-    void
+    శూన్య
 ex_eval(exarg_T *eap)
 {
     typval_T	tv;
     evalarg_T	evalarg;
-    int		name_only = FALSE;
-    long	lnum = SOURCING_LNUM;
+    పూర్ణాంకం		name_only = FALSE;
+    దీర్ఘ	lnum = SOURCING_LNUM;
 
-    if (in_vim9script())
+    ఒకవేళ (లోపల_vim9script())
 	name_only = cmd_is_name_only(eap->arg);
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    if (eval0(eap->arg, &tv, eap, &evalarg) == OK)
+    ఒకవేళ (eval0(eap->arg, &tv, eap, &evalarg) == OK)
     {
 	clear_tv(&tv);
-	if (in_vim9script() && name_only
-		&& (evalarg.eval_tofree == NULL
-		    || ends_excmd2(evalarg.eval_tofree,
+	ఒకవేళ (లోపల_vim9script() && name_only
+		&& (evalarg.eval_tofree == ఖాళీ
+		    || చివర్లు_excmd2(evalarg.eval_tofree,
 					      skipwhite(evalarg.eval_tofree))))
 	{
 	    SOURCING_LNUM = lnum;
-	    semsg(_(e_expression_without_effect_str), eap->arg);
+	    semsg(_(e_వ్యక్తీకరణ_without_effect_str), eap->arg);
 	}
     }
 
@@ -1022,56 +1022,56 @@ ex_eval(exarg_T *eap)
  * Start a new scope/block.  Caller should have checked that cs_idx is not
  * exceeding CSTACK_LEN.
  */
-    static void
-enter_block(cstack_T *cstack)
+    స్థిర శూన్య
+enter_ఖండం(cstack_T *cstack)
 {
     ++cstack->cs_idx;
-    if (in_vim9script() && current_sctx.sc_sid > 0)
+    ఒకవేళ (లోపల_vim9script() && current_sctx.sc_sid > 0)
     {
-	scriptitem_T *si = SCRIPT_ITEM(current_sctx.sc_sid);
+	scriptitem_T *si = SCRIPT_అంశం(current_sctx.sc_sid);
 
 	cstack->cs_script_var_len[cstack->cs_idx] = si->sn_var_vals.ga_len;
-	cstack->cs_block_id[cstack->cs_idx] = ++si->sn_last_block_id;
-	si->sn_current_block_id = si->sn_last_block_id;
+	cstack->cs_ఖండం_id[cstack->cs_idx] = ++si->sn_చివరి_ఖండం_id;
+	si->sn_current_ఖండం_id = si->sn_చివరి_ఖండం_id;
     }
-    else
+    లేకపోతే
     {
 	// Just in case in_vim9script() does not return the same value when the
 	// block ends.
 	cstack->cs_script_var_len[cstack->cs_idx] = 0;
-	cstack->cs_block_id[cstack->cs_idx] = 0;
+	cstack->cs_ఖండం_id[cstack->cs_idx] = 0;
     }
 }
 
-    static void
-leave_block(cstack_T *cstack)
+    స్థిర శూన్య
+leave_ఖండం(cstack_T *cstack)
 {
-    if (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
+    ఒకవేళ (లోపల_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
-	scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
-	int		i;
-	int		func_defined =
+	scriptitem_T	*si = SCRIPT_అంశం(current_sctx.sc_sid);
+	పూర్ణాంకం		i;
+	పూర్ణాంకం		func_defined =
 			       cstack->cs_flags[cstack->cs_idx] & CSF_FUNC_DEF;
 
-	for (i = cstack->cs_script_var_len[cstack->cs_idx];
+	కొరకు (i = cstack->cs_script_var_len[cstack->cs_idx];
 					       i < si->sn_var_vals.ga_len; ++i)
 	{
-	    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + i;
+	    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_దత్తాంశం) + i;
 
 	    // sv_name is set to NULL if it was already removed.  This happens
 	    // when it was defined in an inner block and no functions were
 	    // defined there.
-	    if (sv->sv_name != NULL)
+	    ఒకవేళ (sv->sv_name != ఖాళీ)
 		// Remove a variable declared inside the block, if it still
 		// exists, from sn_vars and move the value into sn_all_vars
 		// if "func_defined" is non-zero.
 		hide_script_var(si, i, func_defined);
 	}
 
-	if (cstack->cs_idx == 0)
-	    si->sn_current_block_id = 0;
-	else
-	    si->sn_current_block_id = cstack->cs_block_id[cstack->cs_idx - 1];
+	ఒకవేళ (cstack->cs_idx == 0)
+	    si->sn_current_ఖండం_id = 0;
+	లేకపోతే
+	    si->sn_current_ఖండం_id = cstack->cs_ఖండం_id[cstack->cs_idx - 1];
     }
     --cstack->cs_idx;
 }
@@ -1079,19 +1079,19 @@ leave_block(cstack_T *cstack)
 /*
  * ":if".
  */
-    void
+    శూన్య
 ex_if(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    పూర్ణాంకం		error;
+    పూర్ణాంకం		skip;
+    పూర్ణాంకం		ఫలితం;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    ఒకవేళ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_if_nesting_too_deep);
-    else
+    లేకపోతే
     {
-	enter_block(cstack);
+	enter_ఖండం(cstack);
 	cstack->cs_flags[cstack->cs_idx] = 0;
 
 	/*
@@ -1099,16 +1099,16 @@ ex_if(exarg_T *eap)
 	 * there is a surrounding conditional and it was not active.
 	 */
 	skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
-		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
+		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_చురుకైన));
 
-	result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
+	ఫలితం = eval_గమ్యం_bool(eap->arg, &error, eap, skip, FALSE);
 
-	if (!skip && !error)
+	ఒకవేళ (!skip && !error)
 	{
-	    if (result)
-		cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE | CSF_TRUE;
+	    ఒకవేళ (ఫలితం)
+		cstack->cs_flags[cstack->cs_idx] = CSF_చురుకైన | CSF_TRUE;
 	}
-	else
+	లేకపోతే
 	    // set TRUE, so this conditional will never get active
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
     }
@@ -1117,19 +1117,19 @@ ex_if(exarg_T *eap)
 /*
  * ":endif".
  */
-    void
+    శూన్య
 ex_endif(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    ఒకవేళ (cmdmod_error(FALSE))
+	తిరిగి;
     did_endif = TRUE;
-    if (cstack->cs_idx < 0
+    ఒకవేళ (cstack->cs_idx < 0
 	    || (cstack->cs_flags[cstack->cs_idx]
-				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_BLOCK)))
+				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_ఖండం)))
 	eap->errmsg = _(e_endif_without_if);
-    else
+    లేకపోతే
     {
 	/*
 	 * When debugging or a breakpoint was encountered, display the debug
@@ -1140,23 +1140,23 @@ ex_endif(exarg_T *eap)
 	 * Doing this here prevents an exception for a parsing error being
 	 * discarded by throwing the interrupt exception later on.
 	 */
-	if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
+	ఒకవేళ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
 						    && dbg_check_skipped(eap))
-	    (void)do_intthrow(cstack);
+	    (శూన్య)do_intthrow(cstack);
 
-	leave_block(cstack);
+	leave_ఖండం(cstack);
     }
 }
 
 /*
  * ":else" and ":elseif".
  */
-    void
+    శూన్య
 ex_else(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    పూర్ణాంకం		error;
+    పూర్ణాంకం		skip;
+    పూర్ణాంకం		ఫలితం;
     cstack_T	*cstack = eap->cstack;
 
     /*
@@ -1164,48 +1164,48 @@ ex_else(exarg_T *eap)
      * a surrounding conditional and it was not active.
      */
     skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
-	    && !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
+	    && !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_చురుకైన));
 
-    if (cstack->cs_idx < 0
+    ఒకవేళ (cstack->cs_idx < 0
 	    || (cstack->cs_flags[cstack->cs_idx]
-				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_BLOCK)))
+				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_ఖండం)))
     {
-	if (eap->cmdidx == CMD_else)
+	ఒకవేళ (eap->cmdidx == CMD_else)
 	{
 	    eap->errmsg = _(e_else_without_if);
-	    return;
+	    తిరిగి;
 	}
 	eap->errmsg = _(e_elseif_without_if);
 	skip = TRUE;
     }
-    else if (cstack->cs_flags[cstack->cs_idx] & CSF_ELSE)
+    లేకపోతే ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & CSF_ELSE)
     {
-	if (eap->cmdidx == CMD_else)
+	ఒకవేళ (eap->cmdidx == CMD_else)
 	{
-	    eap->errmsg = _(e_multiple_else);
-	    return;
+	    eap->errmsg = _(e_గుణిజం_else);
+	    తిరిగి;
 	}
 	eap->errmsg = _(e_elseif_after_else);
 	skip = TRUE;
     }
 
-    if (cstack->cs_idx >= 0)
+    ఒకవేళ (cstack->cs_idx >= 0)
     {
 	// Variables declared in the previous block can no longer be
 	// used.  Needs to be done before setting "cs_flags".
-	leave_block(cstack);
-	enter_block(cstack);
+	leave_ఖండం(cstack);
+	enter_ఖండం(cstack);
     }
 
     // if skipping or the ":if" was TRUE, reset ACTIVE, otherwise set it
-    if (skip || cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
+    ఒకవేళ (skip || cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
     {
-	if (eap->errmsg == NULL)
+	ఒకవేళ (eap->errmsg == ఖాళీ)
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
 	skip = TRUE;	// don't evaluate an ":elseif"
     }
-    else
-	cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE;
+    లేకపోతే
+	cstack->cs_flags[cstack->cs_idx] = CSF_చురుకైన;
 
     /*
      * When debugging or a breakpoint was encountered, display the debug prompt
@@ -1217,77 +1217,77 @@ ex_else(exarg_T *eap)
      * for a parsing errors is discarded when throwing the interrupt exception
      * later on.
      */
-    if (!skip && dbg_check_skipped(eap) && got_int)
+    ఒకవేళ (!skip && dbg_check_skipped(eap) && got_int)
     {
-	(void)do_intthrow(cstack);
+	(శూన్య)do_intthrow(cstack);
 	skip = TRUE;
     }
 
-    if (eap->cmdidx == CMD_elseif)
+    ఒకవేళ (eap->cmdidx == CMD_elseif)
     {
 	// When skipping we ignore most errors, but a missing expression is
 	// wrong, perhaps it should have been "else".
 	// A double quote here is the start of a string, not a comment.
-	if (skip && *eap->arg != '"' && ends_excmd(*eap->arg))
-	    semsg(_(e_invalid_expression_str), eap->arg);
-	else
-	    result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
+	ఒకవేళ (skip && *eap->arg != '"' && చివర్లు_excmd(*eap->arg))
+	    semsg(_(e_invalid_వ్యక్తీకరణ_str), eap->arg);
+	లేకపోతే
+	    ఫలితం = eval_గమ్యం_bool(eap->arg, &error, eap, skip, FALSE);
 
 	// When throwing error exceptions, we want to throw always the first
 	// of several errors in a row.  This is what actually happens when
 	// a conditional error was detected above and there is another failure
 	// when parsing the expression.  Since the skip flag is set in this
 	// case, the parsing error will be ignored by emsg().
-	if (!skip && !error)
+	ఒకవేళ (!skip && !error)
 	{
-	    if (result)
-		cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE | CSF_TRUE;
-	    else
+	    ఒకవేళ (ఫలితం)
+		cstack->cs_flags[cstack->cs_idx] = CSF_చురుకైన | CSF_TRUE;
+	    లేకపోతే
 		cstack->cs_flags[cstack->cs_idx] = 0;
 	}
-	else if (eap->errmsg == NULL)
+	లేకపోతే ఒకవేళ (eap->errmsg == ఖాళీ)
 	    // set TRUE, so this conditional will never get active
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
     }
-    else
+    లేకపోతే
 	cstack->cs_flags[cstack->cs_idx] |= CSF_ELSE;
 }
 
 /*
  * Handle ":while" and ":for".
  */
-    void
+    శూన్య
 ex_while(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    పూర్ణాంకం		error;
+    పూర్ణాంకం		skip;
+    పూర్ణాంకం		ఫలితం;
     cstack_T	*cstack = eap->cstack;
-    int		prev_cs_flags = 0;
+    పూర్ణాంకం		prev_cs_flags = 0;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    ఒకవేళ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_while_for_nesting_too_deep);
-    else
+    లేకపోతే
     {
 	/*
 	 * The loop flag is set when we have jumped back from the matching
 	 * ":endwhile" or ":endfor".  When not set, need to initialise this
 	 * cstack entry.
 	 */
-	if ((cstack->cs_lflags & CSL_HAD_LOOP) == 0)
+	ఒకవేళ ((cstack->cs_lflags & CSL_HAD_LOOP) == 0)
 	{
-	    enter_block(cstack);
+	    enter_ఖండం(cstack);
 	    ++cstack->cs_looplevel;
-	    cstack->cs_line[cstack->cs_idx] = -1;
+	    cstack->cs_పంక్తి[cstack->cs_idx] = -1;
 	}
-	else
+	లేకపోతే
 	{
-	    if (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
+	    ఒకవేళ (లోపల_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
 	    {
-		scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
-		int		i;
-		int		first;
-		int		func_defined = cstack->cs_flags[cstack->cs_idx]
+		scriptitem_T	*si = SCRIPT_అంశం(current_sctx.sc_sid);
+		పూర్ణాంకం		i;
+		పూర్ణాంకం		మొదటి;
+		పూర్ణాంకం		func_defined = cstack->cs_flags[cstack->cs_idx]
 								& CSF_FUNC_DEF;
 
 		// Any variables defined in the previous round are no longer
@@ -1295,22 +1295,22 @@ ex_while(exarg_T *eap)
 		// variable that we reuse every time around.
 		// Do this backwards, so that vars defined in a later round are
 		// found first.
-		first = cstack->cs_script_var_len[cstack->cs_idx];
-		if (eap->cmdidx == CMD_for)
+		మొదటి = cstack->cs_script_var_len[cstack->cs_idx];
+		ఒకవేళ (eap->cmdidx == CMD_for)
 		{
 		    forinfo_T	*fi = cstack->cs_forinfo[cstack->cs_idx];
 
-		    first += fi == NULL || fi->fi_varcount == 0
+		    మొదటి += fi == ఖాళీ || fi->fi_varcount == 0
 							 ? 1 : fi->fi_varcount;
 		}
-		for (i = si->sn_var_vals.ga_len - 1; i >= first; --i)
+		కొరకు (i = si->sn_var_vals.ga_len - 1; i >= మొదటి; --i)
 		{
-		    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + i;
+		    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_దత్తాంశం) + i;
 
 		    // sv_name is set to NULL if it was already removed.  This
 		    // happens when it was defined in an inner block and no
 		    // functions were defined there.
-		    if (sv->sv_name != NULL)
+		    ఒకవేళ (sv->sv_name != ఖాళీ)
 			// Remove a variable declared inside the block, if it
 			// still exists, from sn_vars.
 			hide_script_var(si, i, func_defined);
@@ -1319,8 +1319,8 @@ ex_while(exarg_T *eap)
 		// Start a new block ID, so that variables defined inside the
 		// loop are created new and not shared with the previous loop.
 		// Matters when used in a closure.
-		cstack->cs_block_id[cstack->cs_idx] = ++si->sn_last_block_id;
-		si->sn_current_block_id = si->sn_last_block_id;
+		cstack->cs_ఖండం_id[cstack->cs_idx] = ++si->sn_చివరి_ఖండం_id;
+		si->sn_current_ఖండం_id = si->sn_చివరి_ఖండం_id;
 	    }
 	}
 	prev_cs_flags = cstack->cs_flags[cstack->cs_idx];
@@ -1332,15 +1332,15 @@ ex_while(exarg_T *eap)
 	 * there is a surrounding conditional and it was not active.
 	 */
 	skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
-		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
-	if (eap->cmdidx == CMD_while)
+		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_చురుకైన));
+	ఒకవేళ (eap->cmdidx == CMD_while)
 	{
 	    /*
 	     * ":while bool-expr"
 	     */
-	    result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
+	    ఫలితం = eval_గమ్యం_bool(eap->arg, &error, eap, skip, FALSE);
 	}
-	else
+	లేకపోతే
 	{
 	    forinfo_T	*fi;
 	    evalarg_T	evalarg;
@@ -1349,7 +1349,7 @@ ex_while(exarg_T *eap)
 	     * ":for var in list-expr"
 	     */
 	    fill_evalarg_from_eap(&evalarg, eap, skip);
-	    if ((cstack->cs_lflags & CSL_HAD_LOOP) != 0)
+	    ఒకవేళ ((cstack->cs_lflags & CSL_HAD_LOOP) != 0)
 	    {
 		// Jumping here from a ":continue" or ":endfor": use the
 		// previously evaluated list.
@@ -1357,14 +1357,14 @@ ex_while(exarg_T *eap)
 		error = FALSE;
 
 		// the "in expr" is not used, skip over it
-		skip_for_lines(fi, &evalarg);
+		skip_for_పంక్తులు(fi, &evalarg);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		long save_lnum = SOURCING_LNUM;
+		దీర్ఘ save_lnum = SOURCING_LNUM;
 
 		// Evaluate the argument and get the info in a structure.
-		fi = eval_for_line(eap->arg, &error, eap, &evalarg);
+		fi = eval_for_పంక్తి(eap->arg, &error, eap, &evalarg);
 		cstack->cs_forinfo[cstack->cs_idx] = fi;
 
 		// Errors should use the first line number.
@@ -1372,24 +1372,24 @@ ex_while(exarg_T *eap)
 	    }
 
 	    // use the element at the start of the list and advance
-	    if (!error && fi != NULL && !skip)
-		result = next_for_item(fi, eap->arg);
-	    else
-		result = FALSE;
-	    if (fi != NULL)
+	    ఒకవేళ (!error && fi != ఖాళీ && !skip)
+		ఫలితం = తదుపరి_for_అంశం(fi, eap->arg);
+	    లేకపోతే
+		ఫలితం = FALSE;
+	    ఒకవేళ (fi != ఖాళీ)
 		// OR all the cs_flags together, if a function was defined in
 		// any round then the loop variable may have been used.
 		fi->fi_cs_flags |= prev_cs_flags;
 
-	    if (!result)
+	    ఒకవేళ (!ఫలితం)
 	    {
 		// If a function was defined in any round then set the
 		// CSF_FUNC_DEF flag now, so that it's seen by leave_block().
-		if (fi != NULL && (fi->fi_cs_flags & CSF_FUNC_DEF))
+		ఒకవేళ (fi != ఖాళీ && (fi->fi_cs_flags & CSF_FUNC_DEF))
 		    cstack->cs_flags[cstack->cs_idx] |= CSF_FUNC_DEF;
 
 		free_for_info(fi);
-		cstack->cs_forinfo[cstack->cs_idx] = NULL;
+		cstack->cs_forinfo[cstack->cs_idx] = ఖాళీ;
 	    }
 	    clear_evalarg(&evalarg, eap);
 	}
@@ -1399,19 +1399,19 @@ ex_while(exarg_T *eap)
 	 * loop flag, so do_cmdline() will set the line number in cs_line[].
 	 * If executing the command a second time, clear the loop flag.
 	 */
-	if (!skip && !error && result)
+	ఒకవేళ (!skip && !error && ఫలితం)
 	{
-	    cstack->cs_flags[cstack->cs_idx] |= (CSF_ACTIVE | CSF_TRUE);
+	    cstack->cs_flags[cstack->cs_idx] |= (CSF_చురుకైన | CSF_TRUE);
 	    cstack->cs_lflags ^= CSL_HAD_LOOP;
 	}
-	else
+	లేకపోతే
 	{
 	    cstack->cs_lflags &= ~CSL_HAD_LOOP;
 	    // If the ":while" evaluates to FALSE or ":for" is past the end of
 	    // the list, show the debug prompt at the ":endwhile"/":endfor" as
 	    // if there was a ":break" in a ":while"/":for" evaluating to
 	    // TRUE.
-	    if (!skip && !error)
+	    ఒకవేళ (!skip && !error)
 		cstack->cs_flags[cstack->cs_idx] |= CSF_TRUE;
 	}
     }
@@ -1420,22 +1420,22 @@ ex_while(exarg_T *eap)
 /*
  * ":continue"
  */
-    void
+    శూన్య
 ex_continue(exarg_T *eap)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    ఒకవేళ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(e_continue_without_while_or_for);
-    else
+    లేకపోతే
     {
 	// Try to find the matching ":while".  This might stop at a try
 	// conditional not in its finally clause (which is then to be executed
 	// next).  Therefore, inactivate all conditionals except the ":while"
 	// itself (if reached).
 	idx = cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, FALSE);
-	if (idx >= 0 && (cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
+	ఒకవేళ (idx >= 0 && (cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
 	{
 	    rewind_conditionals(cstack, idx, CSF_TRY, &cstack->cs_trylevel);
 
@@ -1445,12 +1445,12 @@ ex_continue(exarg_T *eap)
 	     */
 	    cstack->cs_lflags |= CSL_HAD_CONT;	// let do_cmdline() handle it
 	}
-	else
+	లేకపోతే
 	{
 	    // If a try conditional not in its finally clause is reached first,
 	    // make the ":continue" pending for execution at the ":endtry".
 	    cstack->cs_pending[idx] = CSTP_CONTINUE;
-	    report_make_pending(CSTP_CONTINUE, NULL);
+	    report_make_pending(CSTP_CONTINUE, ఖాళీ);
 	}
     }
 }
@@ -1458,25 +1458,25 @@ ex_continue(exarg_T *eap)
 /*
  * ":break"
  */
-    void
+    శూన్య
 ex_break(exarg_T *eap)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    ఒకవేళ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(e_break_without_while_or_for);
-    else
+    లేకపోతే
     {
 	// Inactivate conditionals until the matching ":while" or a try
 	// conditional not in its finally clause (which is then to be
 	// executed next) is found.  In the latter case, make the ":break"
 	// pending for execution at the ":endtry".
 	idx = cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, TRUE);
-	if (idx >= 0 && !(cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
+	ఒకవేళ (idx >= 0 && !(cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
 	{
 	    cstack->cs_pending[idx] = CSTP_BREAK;
-	    report_make_pending(CSTP_BREAK, NULL);
+	    report_make_pending(CSTP_BREAK, ఖాళీ);
 	}
     }
 }
@@ -1484,65 +1484,65 @@ ex_break(exarg_T *eap)
 /*
  * ":endwhile" and ":endfor"
  */
-    void
+    శూన్య
 ex_endwhile(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
-    int		idx;
-    char	*err;
-    int		csf;
-    int		fl;
+    పూర్ణాంకం		idx;
+    అక్షరం	*err;
+    పూర్ణాంకం		csf;
+    పూర్ణాంకం		fl;
 
-    if (cmdmod_error(TRUE))
-	return;
+    ఒకవేళ (cmdmod_error(TRUE))
+	తిరిగి;
 
-    if (eap->cmdidx == CMD_endwhile)
+    ఒకవేళ (eap->cmdidx == CMD_endwhile)
     {
 	err = e_endwhile_without_while;
 	csf = CSF_WHILE;
     }
-    else
+    లేకపోతే
     {
 	err = e_endfor_without_for;
 	csf = CSF_FOR;
     }
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    ఒకవేళ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(err);
-    else
+    లేకపోతే
     {
 	fl = cstack->cs_flags[cstack->cs_idx];
-	if (!(fl & csf))
+	ఒకవేళ (!(fl & csf))
 	{
 	    // If we are in a ":while" or ":for" but used the wrong endloop
 	    // command, do not rewind to the next enclosing ":for"/":while".
-	    if (fl & CSF_WHILE)
+	    ఒకవేళ (fl & CSF_WHILE)
 		eap->errmsg = _(e_using_endfor_with_while);
-	    else if (fl & CSF_FOR)
+	    లేకపోతే ఒకవేళ (fl & CSF_FOR)
 		eap->errmsg = _(e_using_endwhile_with_for);
 	}
-	if (!(fl & (CSF_WHILE | CSF_FOR)))
+	ఒకవేళ (!(fl & (CSF_WHILE | CSF_FOR)))
 	{
-	    if (!(fl & CSF_TRY))
+	    ఒకవేళ (!(fl & CSF_TRY))
 		eap->errmsg = _(e_missing_endif);
-	    else if (fl & CSF_FINALLY)
+	    లేకపోతే ఒకవేళ (fl & CSF_FINALLY)
 		eap->errmsg = _(e_missing_endtry);
 	    // Try to find the matching ":while" and report what's missing.
-	    for (idx = cstack->cs_idx; idx > 0; --idx)
+	    కొరకు (idx = cstack->cs_idx; idx > 0; --idx)
 	    {
 		fl =  cstack->cs_flags[idx];
-		if ((fl & CSF_TRY) && !(fl & CSF_FINALLY))
+		ఒకవేళ ((fl & CSF_TRY) && !(fl & CSF_FINALLY))
 		{
 		    // Give up at a try conditional not in its finally clause.
 		    // Ignore the ":endwhile"/":endfor".
 		    eap->errmsg = _(err);
-		    return;
+		    తిరిగి;
 		}
-		if (fl & csf)
-		    break;
+		ఒకవేళ (fl & csf)
+		    ఆపు;
 	    }
 	    // Cleanup and rewind all contained (and unclosed) conditionals.
-	    (void)cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, FALSE);
+	    (శూన్య)cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, FALSE);
 	    rewind_conditionals(cstack, idx, CSF_TRY, &cstack->cs_trylevel);
 	}
 
@@ -1556,10 +1556,10 @@ ex_endwhile(exarg_T *eap)
 	 * prevents that an exception for a parsing error is discarded when
 	 * throwing the interrupt exception later on.
 	 */
-	else if (cstack->cs_flags[cstack->cs_idx] & CSF_TRUE
-		&& !(cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE)
+	లేకపోతే ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & CSF_TRUE
+		&& !(cstack->cs_flags[cstack->cs_idx] & CSF_చురుకైన)
 		&& dbg_check_skipped(eap))
-	    (void)do_intthrow(cstack);
+	    (శూన్య)do_intthrow(cstack);
 
 	// Set loop flag, so do_cmdline() will jump back to the matching
 	// ":while" or ":for".
@@ -1570,93 +1570,93 @@ ex_endwhile(exarg_T *eap)
 /*
  * "{" start of a block in Vim9 script
  */
-    void
-ex_block(exarg_T *eap)
+    శూన్య
+ex_ఖండం(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
-	eap->errmsg = _(e_block_nesting_too_deep);
-    else
+    ఒకవేళ (cstack->cs_idx == CSTACK_LEN - 1)
+	eap->errmsg = _(e_ఖండం_nesting_too_deep);
+    లేకపోతే
     {
-	enter_block(cstack);
-	cstack->cs_flags[cstack->cs_idx] = CSF_BLOCK | CSF_ACTIVE | CSF_TRUE;
+	enter_ఖండం(cstack);
+	cstack->cs_flags[cstack->cs_idx] = CSF_ఖండం | CSF_చురుకైన | CSF_TRUE;
     }
 }
 
 /*
  * "}" end of a block in Vim9 script
  */
-    void
+    శూన్య
 ex_endblock(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx < 0
-	    || (cstack->cs_flags[cstack->cs_idx] & CSF_BLOCK) == 0)
-	eap->errmsg = _(e_endblock_without_block);
-    else
-	leave_block(cstack);
+    ఒకవేళ (cstack->cs_idx < 0
+	    || (cstack->cs_flags[cstack->cs_idx] & CSF_ఖండం) == 0)
+	eap->errmsg = _(e_endblock_without_ఖండం);
+    లేకపోతే
+	leave_ఖండం(cstack);
 }
 
-    int
-inside_block(exarg_T *eap)
+    పూర్ణాంకం
+inside_ఖండం(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
-    int		i;
+    పూర్ణాంకం		i;
 
     // Control flow commands handle '|' themselves and must not be treated
     // as if inside a block even when they are - otherwise '|' separators
     // in "try | catch | endtry" etc. would not be recognized.
-    switch (eap->cmdidx)
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_if:
-	case CMD_elseif:
-	case CMD_else:
-	case CMD_endif:
-	case CMD_while:
-	case CMD_endwhile:
-	case CMD_for:
-	case CMD_endfor:
-	case CMD_try:
-	case CMD_catch:
-	case CMD_finally:
-	case CMD_endtry:
-	    return FALSE;
-	default:
-	    break;
+	స్థితి CMD_if:
+	స్థితి CMD_elseif:
+	స్థితి CMD_else:
+	స్థితి CMD_endif:
+	స్థితి CMD_while:
+	స్థితి CMD_endwhile:
+	స్థితి CMD_for:
+	స్థితి CMD_endfor:
+	స్థితి CMD_try:
+	స్థితి CMD_catch:
+	స్థితి CMD_finally:
+	స్థితి CMD_endtry:
+	    తిరిగి FALSE;
+	అప్రమేయ:
+	    ఆపు;
     }
 
-    for (i = 0; i <= cstack->cs_idx; ++i)
-	if (cstack->cs_flags[i] & CSF_BLOCK)
-	    return TRUE;
-    return FALSE;
+    కొరకు (i = 0; i <= cstack->cs_idx; ++i)
+	ఒకవేళ (cstack->cs_flags[i] & CSF_ఖండం)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * ":throw expr"
  */
-    void
+    శూన్య
 ex_throw(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    char_u	*value;
+    char_u	*విలువ;
 
-    if (*arg != NUL && *arg != '|' && *arg != '\n')
-	value = eval_to_string_skip(arg, eap, eap->skip);
-    else
+    ఒకవేళ (*arg != NUL && *arg != '|' && *arg != '\n')
+	విలువ = eval_గమ్యం_string_skip(arg, eap, eap->skip);
+    లేకపోతే
     {
-	emsg(_(e_argument_required));
-	value = NULL;
+	emsg(_(e_వాదం_required));
+	విలువ = ఖాళీ;
     }
 
     // On error or when an exception is thrown during argument evaluation, do
     // not throw.
-    if (!eap->skip && value != NULL)
+    ఒకవేళ (!eap->skip && విలువ != ఖాళీ)
     {
-	if (throw_exception(value, ET_USER, NULL) == FAIL)
-	    vim_free(value);
-	else
+	ఒకవేళ (throw_exception(విలువ, ET_USER, ఖాళీ) == FAIL)
+	    vim_free(విలువ);
+	లేకపోతే
 	    do_throw(eap->cstack);
     }
 }
@@ -1666,11 +1666,11 @@ ex_throw(exarg_T *eap)
  * for ":throw" (user exception) and error and interrupt exceptions.  Also
  * used for rethrowing an uncaught exception.
  */
-    void
+    శూన్య
 do_throw(cstack_T *cstack)
 {
-    int		idx;
-    int		inactivate_try = FALSE;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		inactivate_try = FALSE;
 
     /*
      * Cleanup and inactivate up to the next surrounding try conditional that
@@ -1681,22 +1681,22 @@ do_throw(cstack_T *cstack)
      * and reset the did_emsg or got_int flag, so this won't happen again at
      * the next surrounding try conditional.
      */
-#ifndef THROW_ON_ERROR_TRUE
-    if (did_emsg && !THROW_ON_ERROR)
+#నిర్వచితం_కాకపోతే THROW_ON_ERROR_TRUE
+    ఒకవేళ (did_emsg && !THROW_ON_ERROR)
     {
 	inactivate_try = TRUE;
 	did_emsg = FALSE;
     }
-#endif
-#ifndef THROW_ON_INTERRUPT_TRUE
-    if (got_int && !THROW_ON_INTERRUPT)
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే THROW_ON_అంతరాయం_TRUE
+    ఒకవేళ (got_int && !THROW_ON_అంతరాయం)
     {
 	inactivate_try = TRUE;
 	got_int = FALSE;
     }
-#endif
+#అయితే_ముగింపు
     idx = cleanup_conditionals(cstack, 0, inactivate_try);
-    if (idx >= 0)
+    ఒకవేళ (idx >= 0)
     {
 	/*
 	 * If this try conditional is active and we are before its first
@@ -1711,35 +1711,35 @@ do_throw(cstack_T *cstack)
 	 * from a preceding throw of a user or error or interrupt exception to
 	 * the matching catch clause or the finally clause.
 	 */
-	if (!(cstack->cs_flags[idx] & CSF_CAUGHT))
+	ఒకవేళ (!(cstack->cs_flags[idx] & CSF_CAUGHT))
 	{
-	    if (cstack->cs_flags[idx] & CSF_ACTIVE)
+	    ఒకవేళ (cstack->cs_flags[idx] & CSF_చురుకైన)
 		cstack->cs_flags[idx] |= CSF_THROWN;
-	    else
+	    లేకపోతే
 		// THROWN may have already been set for a catchable exception
 		// that has been discarded.  Ensure it is reset for the new
 		// exception.
 		cstack->cs_flags[idx] &= ~CSF_THROWN;
 	}
-	cstack->cs_flags[idx] &= ~CSF_ACTIVE;
+	cstack->cs_flags[idx] &= ~CSF_చురుకైన;
 	cstack->cs_exception[idx] = current_exception;
     }
-#if 0
+#ఒకవేళ 0
     // TODO: Add optimization below.  Not yet done because of interface
     // problems to eval.c and ex_cmds2.c. (Servatius)
-    else
+    లేకపోతే
     {
 	/*
 	 * There are no catch clauses to check or finally clauses to execute.
 	 * End the current script or function.  The exception will be rethrown
 	 * in the caller.
 	 */
-	if (getline_equal(eap->getline, eap->cookie, get_func_line))
+	ఒకవేళ (getline_equal(eap->getline, eap->cookie, get_func_పంక్తి))
 	    current_funccal->returned = TRUE;
-	elseif (eap->get_func_line == getsourceline)
-	    ((struct source_cookie *)eap->cookie)->finished = TRUE;
+	elseif (eap->get_func_పంక్తి == getsourceline)
+	    ((నిర్మాణం ఆధారం_cookie *)eap->cookie)->ముగిసిన = TRUE;
     }
-#endif
+#అయితే_ముగింపు
 
     did_throw = TRUE;
 }
@@ -1747,20 +1747,20 @@ do_throw(cstack_T *cstack)
 /*
  * ":try"
  */
-    void
+    శూన్య
 ex_try(exarg_T *eap)
 {
-    int		skip;
+    పూర్ణాంకం		skip;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    ఒకవేళ (cmdmod_error(FALSE))
+	తిరిగి;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    ఒకవేళ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_try_nesting_too_deep);
-    else
+    లేకపోతే
     {
-	enter_block(cstack);
+	enter_ఖండం(cstack);
 	++cstack->cs_trylevel;
 	cstack->cs_flags[cstack->cs_idx] = CSF_TRY;
 	cstack->cs_pending[cstack->cs_idx] = CSTP_NONE;
@@ -1770,14 +1770,14 @@ ex_try(exarg_T *eap)
 	 * is a surrounding conditional and it was not active.
 	 */
 	skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
-		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
+		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_చురుకైన));
 
-	if (!skip)
+	ఒకవేళ (!skip)
 	{
 	    // Set ACTIVE and TRUE.  TRUE means that the corresponding ":catch"
 	    // commands should check for a match if an exception is thrown and
 	    // that the finally clause needs to be executed.
-	    cstack->cs_flags[cstack->cs_idx] |= CSF_ACTIVE | CSF_TRUE;
+	    cstack->cs_flags[cstack->cs_idx] |= CSF_చురుకైన | CSF_TRUE;
 
 	    /*
 	     * ":silent!", even when used in a try conditional, disables
@@ -1795,17 +1795,17 @@ ex_try(exarg_T *eap)
 	     * The effect is then just freeing the memory that was allocated
 	     * to save the value.
 	     */
-	    if (emsg_silent)
+	    ఒకవేళ (emsg_silent)
 	    {
 		eslist_T	*elem;
 
-		elem = ALLOC_ONE(struct eslist_elem);
-		if (elem == NULL)
-		    emsg(_(e_out_of_memory));
-		else
+		elem = ALLOC_ONE(నిర్మాణం eslist_elem);
+		ఒకవేళ (elem == ఖాళీ)
+		    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
+		లేకపోతే
 		{
 		    elem->saved_emsg_silent = emsg_silent;
-		    elem->next = cstack->cs_emsg_silent_list;
+		    elem->తదుపరి = cstack->cs_emsg_silent_list;
 		    cstack->cs_emsg_silent_list = elem;
 		    cstack->cs_flags[cstack->cs_idx] |= CSF_SILENT;
 		    emsg_silent = 0;
@@ -1819,77 +1819,77 @@ ex_try(exarg_T *eap)
 /*
  * ":catch /{pattern}/" and ":catch"
  */
-    void
+    శూన్య
 ex_catch(exarg_T *eap)
 {
-    int		idx = 0;
-    int		give_up = FALSE;
-    int		skip = FALSE;
-    int		caught = FALSE;
-    char_u	*end;
-    int		save_char = 0;
+    పూర్ణాంకం		idx = 0;
+    పూర్ణాంకం		give_పైకి = FALSE;
+    పూర్ణాంకం		skip = FALSE;
+    పూర్ణాంకం		caught = FALSE;
+    char_u	*చివర;
+    పూర్ణాంకం		save_char = 0;
     char_u	*save_cpo;
     regmatch_T	regmatch;
-    int		prev_got_int;
+    పూర్ణాంకం		prev_got_int;
     cstack_T	*cstack = eap->cstack;
     char_u	*pat;
 
-    if (cmdmod_error(FALSE))
-	return;
+    ఒకవేళ (cmdmod_error(FALSE))
+	తిరిగి;
 
-    if (cstack->cs_trylevel <= 0 || cstack->cs_idx < 0)
+    ఒకవేళ (cstack->cs_trylevel <= 0 || cstack->cs_idx < 0)
     {
 	eap->errmsg = _(e_catch_without_try);
-	give_up = TRUE;
+	give_పైకి = TRUE;
     }
-    else
+    లేకపోతే
     {
-	if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+	ఒకవేళ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	{
 	    // Report what's missing if the matching ":try" is not in its
 	    // finally clause.
-	    eap->errmsg = get_end_emsg(cstack);
+	    eap->errmsg = get_చివర_emsg(cstack);
 	    skip = TRUE;
 	}
-	for (idx = cstack->cs_idx; idx > 0; --idx)
-	    if (cstack->cs_flags[idx] & CSF_TRY)
-		break;
-	if (cstack->cs_flags[idx] & CSF_TRY)
+	కొరకు (idx = cstack->cs_idx; idx > 0; --idx)
+	    ఒకవేళ (cstack->cs_flags[idx] & CSF_TRY)
+		ఆపు;
+	ఒకవేళ (cstack->cs_flags[idx] & CSF_TRY)
 	    cstack->cs_flags[idx] |= CSF_CATCH;
-	if (cstack->cs_flags[idx] & CSF_FINALLY)
+	ఒకవేళ (cstack->cs_flags[idx] & CSF_FINALLY)
 	{
 	    // Give up for a ":catch" after ":finally" and ignore it.
 	    // Just parse.
 	    eap->errmsg = _(e_catch_after_finally);
-	    give_up = TRUE;
+	    give_పైకి = TRUE;
 	}
-	else
+	లేకపోతే
 	    rewind_conditionals(cstack, idx, CSF_WHILE | CSF_FOR,
 						       &cstack->cs_looplevel);
     }
 
-    if (ends_excmd2(eap->cmd, eap->arg))   // no argument, catch all errors
+    ఒకవేళ (చివర్లు_excmd2(eap->cmd, eap->arg))   // no argument, catch all errors
     {
 	pat = (char_u *)".*";
-	end = NULL;
-	eap->nextcmd = find_nextcmd(eap->arg);
+	చివర = ఖాళీ;
+	eap->nextcmd = కనుగొను_nextcmd(eap->arg);
     }
-    else
+    లేకపోతే
     {
 	pat = eap->arg + 1;
-	end = skip_regexp_err(pat, *eap->arg, TRUE);
-	if (end == NULL)
-	    give_up = TRUE;
+	చివర = skip_regexp_err(pat, *eap->arg, TRUE);
+	ఒకవేళ (చివర == ఖాళీ)
+	    give_పైకి = TRUE;
     }
 
-    if (!give_up)
+    ఒకవేళ (!give_పైకి)
     {
 	/*
 	 * Don't do something when no exception has been thrown or when the
 	 * corresponding try block never got active (because of an inactive
 	 * surrounding conditional or after an error or interrupt or throw).
 	 */
-	if (!did_throw || !(cstack->cs_flags[idx] & CSF_TRUE))
+	ఒకవేళ (!did_throw || !(cstack->cs_flags[idx] & CSF_TRUE))
 	    skip = TRUE;
 
 	/*
@@ -1897,14 +1897,14 @@ ex_catch(exarg_T *eap)
 	 * a previous ":catch".  An exception that has replaced a discarded
 	 * exception is not checked (THROWN is not set then).
 	 */
-	if (!skip && (cstack->cs_flags[idx] & CSF_THROWN)
+	ఒకవేళ (!skip && (cstack->cs_flags[idx] & CSF_THROWN)
 		&& !(cstack->cs_flags[idx] & CSF_CAUGHT))
 	{
-	    if (end != NULL && *end != NUL
-				      && !ends_excmd2(end, skipwhite(end + 1)))
+	    ఒకవేళ (చివర != ఖాళీ && *చివర != NUL
+				      && !చివర్లు_excmd2(చివర, skipwhite(చివర + 1)))
 	    {
-		semsg(_(e_trailing_characters_str), end);
-		return;
+		semsg(_(e_trailing_characters_str), చివర);
+		తిరిగి;
 	    }
 
 	    // When debugging or a breakpoint was encountered, display the
@@ -1914,29 +1914,29 @@ ex_catch(exarg_T *eap)
 	    // interrupt had occurred before the ":catch".  That is, discard
 	    // the original exception, replace it by an interrupt exception,
 	    // and don't catch it in this try block.
-	    if (!dbg_check_skipped(eap) || !do_intthrow(cstack))
+	    ఒకవేళ (!dbg_check_skipped(eap) || !do_intthrow(cstack))
 	    {
 		// Terminate the pattern and avoid the 'l' flag in 'cpoptions'
 		// while compiling it.
-		if (end != NULL)
+		ఒకవేళ (చివర != ఖాళీ)
 		{
-		    save_char = *end;
-		    *end = NUL;
+		    save_char = *చివర;
+		    *చివర = NUL;
 		}
 		save_cpo  = p_cpo;
-		p_cpo = empty_option;
+		p_cpo = ఖాళీలు_option;
 		// Disable error messages, it will make current_exception
 		// invalid.
 		++emsg_off;
 		regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
 		--emsg_off;
 		regmatch.rm_ic = FALSE;
-		if (end != NULL)
-		    *end = save_char;
+		ఒకవేళ (చివర != ఖాళీ)
+		    *చివర = save_char;
 		p_cpo = save_cpo;
-		if (regmatch.regprog == NULL)
-		    semsg(_(e_invalid_argument_str), pat);
-		else
+		ఒకవేళ (regmatch.regprog == ఖాళీ)
+		    semsg(_(e_invalid_వాదం_str), pat);
+		లేకపోతే
 		{
 		    /*
 		     * Save the value of got_int and reset it.  We don't want
@@ -1946,28 +1946,28 @@ ex_catch(exarg_T *eap)
 		    prev_got_int = got_int;
 		    got_int = FALSE;
 		    caught = vim_regexec_nl(&regmatch,
-			       (char_u *)current_exception->value, (colnr_T)0);
+			       (char_u *)current_exception->విలువ, (colnr_T)0);
 		    got_int |= prev_got_int;
 		    vim_regfree(regmatch.regprog);
 		}
 	    }
 	}
 
-	if (caught)
+	ఒకవేళ (caught)
 	{
 	    // Make this ":catch" clause active and reset did_emsg, got_int,
 	    // and did_throw.  Put the exception on the caught stack.
-	    cstack->cs_flags[idx] |= CSF_ACTIVE | CSF_CAUGHT;
+	    cstack->cs_flags[idx] |= CSF_చురుకైన | CSF_CAUGHT;
 	    did_emsg = got_int = did_throw = FALSE;
 	    catch_exception((except_T *)cstack->cs_exception[idx]);
 
-	    if (cstack->cs_idx >= 0
+	    ఒకవేళ (cstack->cs_idx >= 0
 			       && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	    {
 		// Variables declared in the previous block can no longer be
 		// used.
-		leave_block(cstack);
-		enter_block(cstack);
+		leave_ఖండం(cstack);
+		enter_ఖండం(cstack);
 	    }
 
 	    // It's mandatory that the current exception is stored in the cstack
@@ -1975,10 +1975,10 @@ ex_catch(exarg_T *eap)
 	    // ":endtry" or when the catch clause is left by a ":continue",
 	    // ":break", ":return", ":finish", error, interrupt, or another
 	    // exception.
-	    if (cstack->cs_exception[cstack->cs_idx] != current_exception)
-		internal_error("ex_catch()");
+	    ఒకవేళ (cstack->cs_exception[cstack->cs_idx] != current_exception)
+		అంతర్గత_error("ex_catch()");
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * If there is a preceding catch clause and it caught the exception,
@@ -1994,47 +1994,47 @@ ex_catch(exarg_T *eap)
 	}
     }
 
-    if (end != NULL)
-	eap->nextcmd = find_nextcmd(end);
+    ఒకవేళ (చివర != ఖాళీ)
+	eap->nextcmd = కనుగొను_nextcmd(చివర);
 }
 
 /*
  * ":finally"
  */
-    void
+    శూన్య
 ex_finally(exarg_T *eap)
 {
-    int		idx;
-    int		skip = FALSE;
-    int		pending = CSTP_NONE;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		skip = FALSE;
+    పూర్ణాంకం		pending = CSTP_NONE;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    ఒకవేళ (cmdmod_error(FALSE))
+	తిరిగి;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
-	if (cstack->cs_flags[idx] & CSF_TRY)
-	    break;
-    if (cstack->cs_trylevel <= 0 || idx < 0)
+    కొరకు (idx = cstack->cs_idx; idx >= 0; --idx)
+	ఒకవేళ (cstack->cs_flags[idx] & CSF_TRY)
+	    ఆపు;
+    ఒకవేళ (cstack->cs_trylevel <= 0 || idx < 0)
     {
 	eap->errmsg = _(e_finally_without_try);
-	return;
+	తిరిగి;
     }
 
-    if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+    ఒకవేళ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
     {
-	eap->errmsg = get_end_emsg(cstack);
+	eap->errmsg = get_చివర_emsg(cstack);
 	// Make this error pending, so that the commands in the following
 	// finally clause can be executed.  This overrules also a pending
 	// ":continue", ":break", ":return", or ":finish".
 	pending = CSTP_ERROR;
     }
 
-    if (cstack->cs_flags[idx] & CSF_FINALLY)
+    ఒకవేళ (cstack->cs_flags[idx] & CSF_FINALLY)
     {
 	// Give up for a multiple ":finally" and ignore it.
-	eap->errmsg = _(e_multiple_finally);
-	return;
+	eap->errmsg = _(e_గుణిజం_finally);
+	తిరిగి;
     }
     rewind_conditionals(cstack, idx, CSF_WHILE | CSF_FOR,
 						   &cstack->cs_looplevel);
@@ -2049,18 +2049,18 @@ ex_finally(exarg_T *eap)
      */
     skip = !(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE);
 
-    if (!skip)
+    ఒకవేళ (!skip)
     {
 	// When debugging or a breakpoint was encountered, display the
 	// debug prompt (if not already done).  The user then knows that the
 	// finally clause is executed.
-	if (dbg_check_skipped(eap))
+	ఒకవేళ (dbg_check_skipped(eap))
 	{
 	    // Handle a ">quit" debug command as if an interrupt had
 	    // occurred before the ":finally".  That is, discard the
 	    // original exception and replace it by an interrupt
 	    // exception.
-	    (void)do_intthrow(cstack);
+	    (శూన్య)do_intthrow(cstack);
 	}
 
 	/*
@@ -2073,13 +2073,13 @@ ex_finally(exarg_T *eap)
 	 */
 	cleanup_conditionals(cstack, CSF_TRY, FALSE);
 
-	if (cstack->cs_idx >= 0
+	ఒకవేళ (cstack->cs_idx >= 0
 			   && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	{
 	    // Variables declared in the previous block can no longer be
 	    // used.
-	    leave_block(cstack);
-	    enter_block(cstack);
+	    leave_ఖండం(cstack);
+	    enter_ఖండం(cstack);
 	}
 
 	/*
@@ -2097,20 +2097,20 @@ ex_finally(exarg_T *eap)
 	 * We must not set did_emsg here since that would suppress the
 	 * error message.
 	 */
-	if (pending == CSTP_ERROR || did_emsg || got_int || did_throw)
+	ఒకవేళ (pending == CSTP_ERROR || did_emsg || got_int || did_throw)
 	{
-	    if (cstack->cs_pending[cstack->cs_idx] == CSTP_RETURN)
+	    ఒకవేళ (cstack->cs_pending[cstack->cs_idx] == CSTP_RETURN)
 	    {
 		report_discard_pending(CSTP_RETURN,
 				       cstack->cs_rettv[cstack->cs_idx]);
 		discard_pending_return(cstack->cs_rettv[cstack->cs_idx]);
 	    }
-	    if (pending == CSTP_ERROR && !did_emsg)
+	    ఒకవేళ (pending == CSTP_ERROR && !did_emsg)
 		pending |= (THROW_ON_ERROR) ? CSTP_THROW : 0;
-	    else
+	    లేకపోతే
 		pending |= did_throw ? CSTP_THROW : 0;
 	    pending |= did_emsg  ? CSTP_ERROR     : 0;
-	    pending |= got_int   ? CSTP_INTERRUPT : 0;
+	    pending |= got_int   ? CSTP_అంతరాయం : 0;
 	    cstack->cs_pending[cstack->cs_idx] = pending;
 
 	    // It's mandatory that the current exception is stored in the
@@ -2120,9 +2120,9 @@ ex_finally(exarg_T *eap)
 	    // exception.  When emsg() is called for a missing ":endif" or
 	    // a missing ":endwhile"/":endfor" detected here, the
 	    // exception will be discarded.
-	    if (did_throw && cstack->cs_exception[cstack->cs_idx]
+	    ఒకవేళ (did_throw && cstack->cs_exception[cstack->cs_idx]
 						     != current_exception)
-		internal_error("ex_finally()");
+		అంతర్గత_error("ex_finally()");
 	}
 
 	/*
@@ -2139,26 +2139,26 @@ ex_finally(exarg_T *eap)
 /*
  * ":endtry"
  */
-    void
+    శూన్య
 ex_endtry(exarg_T *eap)
 {
-    int		idx;
-    int		skip;
-    int		rethrow = FALSE;
-    int		pending = CSTP_NONE;
-    void	*rettv = NULL;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		skip;
+    పూర్ణాంకం		rethrow = FALSE;
+    పూర్ణాంకం		pending = CSTP_NONE;
+    శూన్య	*rettv = ఖాళీ;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    ఒకవేళ (cmdmod_error(FALSE))
+	తిరిగి;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
-	if (cstack->cs_flags[idx] & CSF_TRY)
-	    break;
-    if (cstack->cs_trylevel <= 0 || idx < 0)
+    కొరకు (idx = cstack->cs_idx; idx >= 0; --idx)
+	ఒకవేళ (cstack->cs_flags[idx] & CSF_TRY)
+	    ఆపు;
+    ఒకవేళ (cstack->cs_trylevel <= 0 || idx < 0)
     {
 	eap->errmsg = _(e_endtry_without_try);
-	return;
+	తిరిగి;
     }
 
     /*
@@ -2175,9 +2175,9 @@ ex_endtry(exarg_T *eap)
     skip = did_emsg || got_int || did_throw
 			     || !(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE);
 
-    if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+    ఒకవేళ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
     {
-	eap->errmsg = get_end_emsg(cstack);
+	eap->errmsg = get_చివర_emsg(cstack);
 
 	// Find the matching ":try" and report what's missing.
 	rewind_conditionals(cstack, idx, CSF_WHILE | CSF_FOR,
@@ -2191,18 +2191,18 @@ ex_endtry(exarg_T *eap)
 	 * This does not affect the script termination due to the error
 	 * since "trylevel" is decremented after emsg() has been called.
 	 */
-	if (did_throw)
+	ఒకవేళ (did_throw)
 	    discard_current_exception();
 
 	// report eap->errmsg, also when there already was an error
 	did_emsg = FALSE;
     }
-    else
+    లేకపోతే
     {
 	idx = cstack->cs_idx;
 
 	// Check the flags only when not in a skipped block.
-	if (!skip && in_vim9script()
+	ఒకవేళ (!skip && లోపల_vim9script()
 		     && (cstack->cs_flags[idx] & (CSF_CATCH|CSF_FINALLY)) == 0)
 	{
 	    // try/endtry without any catch or finally: give an error and
@@ -2216,7 +2216,7 @@ ex_endtry(exarg_T *eap)
 	 * a finally clause, we need to rethrow it after closing the try
 	 * conditional.
 	 */
-	if (did_throw && (cstack->cs_flags[idx] & CSF_TRUE)
+	ఒకవేళ (did_throw && (cstack->cs_flags[idx] & CSF_TRUE)
 		&& !(cstack->cs_flags[idx] & CSF_FINALLY))
 	    rethrow = TRUE;
     }
@@ -2228,21 +2228,21 @@ ex_endtry(exarg_T *eap)
     // on an interrupt or error not converted to an exception or when
     // a ":break", ":continue", ":return", or ":finish" is pending.  These
     // actions are carried out immediately.
-    if ((rethrow || (!skip && !(cstack->cs_flags[idx] & CSF_FINALLY)
+    ఒకవేళ ((rethrow || (!skip && !(cstack->cs_flags[idx] & CSF_FINALLY)
 		    && !cstack->cs_pending[idx]))
 	    && dbg_check_skipped(eap))
     {
 	// Handle a ">quit" debug command as if an interrupt had occurred
 	// before the ":endtry".  That is, throw an interrupt exception and
 	// set "skip" and "rethrow".
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
 	    skip = TRUE;
-	    (void)do_intthrow(cstack);
+	    (శూన్య)do_intthrow(cstack);
 	    // The do_intthrow() call may have reset did_throw or
 	    // cstack->cs_pending[idx].
 	    rethrow = FALSE;
-	    if (did_throw && !(cstack->cs_flags[idx] & CSF_FINALLY))
+	    ఒకవేళ (did_throw && !(cstack->cs_flags[idx] & CSF_FINALLY))
 		rethrow = TRUE;
 	}
     }
@@ -2253,13 +2253,13 @@ ex_endtry(exarg_T *eap)
      * clause making an exception pending, we need to rethrow it.  Make it
      * the exception currently being thrown.
      */
-    if (!skip)
+    ఒకవేళ (!skip)
     {
 	pending = cstack->cs_pending[idx];
 	cstack->cs_pending[idx] = CSTP_NONE;
-	if (pending == CSTP_RETURN)
+	ఒకవేళ (pending == CSTP_RETURN)
 	    rettv = cstack->cs_rettv[idx];
-	else if (pending & CSTP_THROW)
+	లేకపోతే ఒకవేళ (pending & CSTP_THROW)
 	    current_exception = cstack->cs_exception[idx];
     }
 
@@ -2273,21 +2273,21 @@ ex_endtry(exarg_T *eap)
      * after errors except when this ":endtry" is not within a ":try".
      * Restore "emsg_silent" if it has been reset by this try conditional.
      */
-    (void)cleanup_conditionals(cstack, CSF_TRY | CSF_SILENT, TRUE);
+    (శూన్య)cleanup_conditionals(cstack, CSF_TRY | CSF_SILENT, TRUE);
 
-    if (cstack->cs_idx >= 0 && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
-	leave_block(cstack);
+    ఒకవేళ (cstack->cs_idx >= 0 && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+	leave_ఖండం(cstack);
     --cstack->cs_trylevel;
 
-    if (!skip)
+    ఒకవేళ (!skip)
     {
 	report_resume_pending(pending,
 		    (pending == CSTP_RETURN) ? rettv :
-		    (pending & CSTP_THROW) ? (void *)current_exception : NULL);
-	switch (pending)
+		    (pending & CSTP_THROW) ? (శూన్య *)current_exception : ఖాళీ);
+	ఎంపిక (pending)
 	{
-	    case CSTP_NONE:
-		break;
+	    స్థితి CSTP_NONE:
+		ఆపు;
 
 	    // Reactivate a pending ":continue", ":break", ":return",
 	    // ":finish" from the try block or a catch clause of this try
@@ -2296,18 +2296,18 @@ ex_endtry(exarg_T *eap)
 	    // or if the finally clause is present and executed a new error,
 	    // interrupt, throw, ":continue", ":break", ":return", or
 	    // ":finish".
-	    case CSTP_CONTINUE:
+	    స్థితి CSTP_CONTINUE:
 		ex_continue(eap);
-		break;
-	    case CSTP_BREAK:
+		ఆపు;
+	    స్థితి CSTP_BREAK:
 		ex_break(eap);
-		break;
-	    case CSTP_RETURN:
+		ఆపు;
+	    స్థితి CSTP_RETURN:
 		do_return(eap, FALSE, FALSE, rettv);
-		break;
-	    case CSTP_FINISH:
-		do_finish(eap, FALSE);
-		break;
+		ఆపు;
+	    స్థితి CSTP_ముగింపు:
+		do_ముగింపు(eap, FALSE);
+		ఆపు;
 
 	    // When the finally clause was entered due to an error,
 	    // interrupt or throw (as opposed to a ":continue", ":break",
@@ -2315,18 +2315,18 @@ ex_endtry(exarg_T *eap)
 	    // did_emsg, got_int, and did_throw.  This is skipped, if there
 	    // was a new error, interrupt, throw, ":continue", ":break",
 	    // ":return", or ":finish".  in the finally clause.
-	    default:
-		if (pending & CSTP_ERROR)
+	    అప్రమేయ:
+		ఒకవేళ (pending & CSTP_ERROR)
 		    did_emsg = TRUE;
-		if (pending & CSTP_INTERRUPT)
+		ఒకవేళ (pending & CSTP_అంతరాయం)
 		    got_int = TRUE;
-		if (pending & CSTP_THROW)
+		ఒకవేళ (pending & CSTP_THROW)
 		    rethrow = TRUE;
-		break;
+		ఆపు;
 	}
     }
 
-    if (rethrow)
+    ఒకవేళ (rethrow)
 	// Rethrow the current exception (within this cstack).
 	do_throw(cstack);
 }
@@ -2352,20 +2352,20 @@ ex_endtry(exarg_T *eap)
  * do_cmdline() that is going to be made for the cleanup autocommand
  * execution.
  */
-    void
+    శూన్య
 enter_cleanup(cleanup_T *csp)
 {
-    int		pending = CSTP_NONE;
+    పూర్ణాంకం		pending = CSTP_NONE;
 
     /*
      * Postpone did_emsg, got_int, did_throw.  The pending values will be
      * restored by leave_cleanup() except if there was an aborting error,
      * interrupt, or uncaught exception after this function ends.
      */
-    if (did_emsg || got_int || did_throw || need_rethrow)
+    ఒకవేళ (did_emsg || got_int || did_throw || need_rethrow)
     {
 	csp->pending = (did_emsg     ? CSTP_ERROR     : 0)
-		     | (got_int      ? CSTP_INTERRUPT : 0)
+		     | (got_int      ? CSTP_అంతరాయం : 0)
 		     | (did_throw    ? CSTP_THROW     : 0)
 		     | (need_rethrow ? CSTP_THROW     : 0);
 
@@ -2375,15 +2375,15 @@ enter_cleanup(cleanup_T *csp)
 	// This is needed for the do_cmdline() call that is going to be made
 	// for autocommand execution.  We need not save *msg_list because
 	// there is an extra instance for every call of do_cmdline(), anyway.
-	if (did_throw || need_rethrow)
+	ఒకవేళ (did_throw || need_rethrow)
 	{
 	    csp->exception = current_exception;
-	    current_exception = NULL;
+	    current_exception = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
-	    csp->exception = NULL;
-	    if (did_emsg)
+	    csp->exception = ఖాళీ;
+	    ఒకవేళ (did_emsg)
 	    {
 		force_abort |= cause_abort;
 		cause_abort = FALSE;
@@ -2394,10 +2394,10 @@ enter_cleanup(cleanup_T *csp)
 	// Report if required by the 'verbose' option or when debugging.
 	report_make_pending(pending, csp->exception);
     }
-    else
+    లేకపోతే
     {
 	csp->pending = CSTP_NONE;
-	csp->exception = NULL;
+	csp->exception = ఖాళీ;
     }
 }
 
@@ -2416,29 +2416,29 @@ enter_cleanup(cleanup_T *csp)
  * cleanup autocommands.  In the latter case, the saved error/interrupt/
  * exception state is discarded.
  */
-    void
+    శూన్య
 leave_cleanup(cleanup_T *csp)
 {
-    int		pending = csp->pending;
+    పూర్ణాంకం		pending = csp->pending;
 
-    if (pending == CSTP_NONE)	// nothing to do
-	return;
+    ఒకవేళ (pending == CSTP_NONE)	// nothing to do
+	తిరిగి;
 
     // If there was an aborting error, an interrupt, or an uncaught exception
     // after the corresponding call to enter_cleanup(), discard what has been
     // made pending by it.  Report this to the user if required by the
     // 'verbose' option or when debugging.
-    if (aborting() || need_rethrow)
+    ఒకవేళ (aborting() || need_rethrow)
     {
-	if (pending & CSTP_THROW)
+	ఒకవేళ (pending & CSTP_THROW)
 	    // Cancel the pending exception (includes report).
 	    discard_exception(csp->exception, FALSE);
-	else
-	    report_discard_pending(pending, NULL);
+	లేకపోతే
+	    report_discard_pending(pending, ఖాళీ);
 
 	// If an error was about to be converted to an exception when
 	// enter_cleanup() was called, free the message list.
-	if (msg_list != NULL)
+	ఒకవేళ (సందేశం_list != ఖాళీ)
 	    free_global_msglist();
     }
 
@@ -2447,14 +2447,14 @@ leave_cleanup(cleanup_T *csp)
      * to enter_cleanup() and leave_cleanup(), restore the pending
      * error/interrupt/exception state.
      */
-    else
+    లేకపోతే
     {
 	/*
 	 * If there was an exception being thrown when enter_cleanup() was
 	 * called, we need to rethrow it.  Make it the exception currently
 	 * being thrown.
 	 */
-	if (pending & CSTP_THROW)
+	ఒకవేళ (pending & CSTP_THROW)
 	    current_exception = csp->exception;
 
 	/*
@@ -2462,7 +2462,7 @@ leave_cleanup(cleanup_T *csp)
 	 * enter_cleanup() was called, let "cause_abort" take the part of
 	 * "force_abort" (as done by cause_errthrow()).
 	 */
-	else if (pending & CSTP_ERROR)
+	లేకపోతే ఒకవేళ (pending & CSTP_ERROR)
 	{
 	    cause_abort = force_abort;
 	    force_abort = FALSE;
@@ -2471,16 +2471,16 @@ leave_cleanup(cleanup_T *csp)
 	/*
 	 * Restore the pending values of did_emsg, got_int, and did_throw.
 	 */
-	if (pending & CSTP_ERROR)
+	ఒకవేళ (pending & CSTP_ERROR)
 	    did_emsg = TRUE;
-	if (pending & CSTP_INTERRUPT)
+	ఒకవేళ (pending & CSTP_అంతరాయం)
 	    got_int = TRUE;
-	if (pending & CSTP_THROW)
+	ఒకవేళ (pending & CSTP_THROW)
 	    need_rethrow = TRUE;    // did_throw will be set by do_one_cmd()
 
 	// Report if required by the 'verbose' option or when debugging.
 	report_resume_pending(pending,
-		   (pending & CSTP_THROW) ? (void *)current_exception : NULL);
+		   (pending & CSTP_THROW) ? (శూన్య *)current_exception : ఖాళీ);
     }
 }
 
@@ -2501,18 +2501,18 @@ leave_cleanup(cleanup_T *csp)
  * entered, is restored (used by ex_endtry()).  This is normally done only
  * when such a try conditional is left.
  */
-    int
+    పూర్ణాంకం
 cleanup_conditionals(
     cstack_T   *cstack,
-    int		searched_cond,
-    int		inclusive)
+    పూర్ణాంకం		searched_cond,
+    పూర్ణాంకం		inclusive)
 {
-    int		idx;
-    int		stop = FALSE;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		stop = FALSE;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
+    కొరకు (idx = cstack->cs_idx; idx >= 0; --idx)
     {
-	if (cstack->cs_flags[idx] & CSF_TRY)
+	ఒకవేళ (cstack->cs_flags[idx] & CSF_TRY)
 	{
 	    /*
 	     * Discard anything pending in a finally clause and continue the
@@ -2520,32 +2520,32 @@ cleanup_conditionals(
 	     * ":return", or ":finish" before the finally clause.  We must not
 	     * discard it, unless an error or interrupt occurred afterwards.
 	     */
-	    if (did_emsg || got_int || (cstack->cs_flags[idx] & CSF_FINALLY))
+	    ఒకవేళ (did_emsg || got_int || (cstack->cs_flags[idx] & CSF_FINALLY))
 	    {
-		switch (cstack->cs_pending[idx])
+		ఎంపిక (cstack->cs_pending[idx])
 		{
-		    case CSTP_NONE:
-			break;
+		    స్థితి CSTP_NONE:
+			ఆపు;
 
-		    case CSTP_CONTINUE:
-		    case CSTP_BREAK:
-		    case CSTP_FINISH:
-			report_discard_pending(cstack->cs_pending[idx], NULL);
+		    స్థితి CSTP_CONTINUE:
+		    స్థితి CSTP_BREAK:
+		    స్థితి CSTP_ముగింపు:
+			report_discard_pending(cstack->cs_pending[idx], ఖాళీ);
 			cstack->cs_pending[idx] = CSTP_NONE;
-			break;
+			ఆపు;
 
-		    case CSTP_RETURN:
+		    స్థితి CSTP_RETURN:
 			report_discard_pending(CSTP_RETURN,
 						      cstack->cs_rettv[idx]);
 			discard_pending_return(cstack->cs_rettv[idx]);
 			cstack->cs_pending[idx] = CSTP_NONE;
-			break;
+			ఆపు;
 
-		    default:
-			if (cstack->cs_flags[idx] & CSF_FINALLY)
+		    అప్రమేయ:
+			ఒకవేళ (cstack->cs_flags[idx] & CSF_FINALLY)
 			{
-			    if ((cstack->cs_pending[idx] & CSTP_THROW)
-				    && cstack->cs_exception[idx] != NULL)
+			    ఒకవేళ ((cstack->cs_pending[idx] & CSTP_THROW)
+				    && cstack->cs_exception[idx] != ఖాళీ)
 			    {
 				// Cancel the pending exception.  This is in the
 				// finally clause, so that the stack of the
@@ -2554,12 +2554,12 @@ cleanup_conditionals(
 					(except_T *)cstack->cs_exception[idx],
 					FALSE);
 			    }
-			    else
+			    లేకపోతే
 				report_discard_pending(cstack->cs_pending[idx],
-					NULL);
+					ఖాళీ);
 			    cstack->cs_pending[idx] = CSTP_NONE;
 			}
-			break;
+			ఆపు;
 		}
 	    }
 
@@ -2568,23 +2568,23 @@ cleanup_conditionals(
 	     * conditional is in an active catch clause, finish the caught
 	     * exception.
 	     */
-	    if (!(cstack->cs_flags[idx] & CSF_FINALLY))
+	    ఒకవేళ (!(cstack->cs_flags[idx] & CSF_FINALLY))
 	    {
-		if ((cstack->cs_flags[idx] & CSF_ACTIVE)
+		ఒకవేళ ((cstack->cs_flags[idx] & CSF_చురుకైన)
 			&& (cstack->cs_flags[idx] & CSF_CAUGHT)
-			&& !(cstack->cs_flags[idx] & CSF_FINISHED))
+			&& !(cstack->cs_flags[idx] & CSF_ముగిసిన))
 		{
-		    finish_exception((except_T *)cstack->cs_exception[idx]);
-		    cstack->cs_flags[idx] |= CSF_FINISHED;
+		    ముగింపు_exception((except_T *)cstack->cs_exception[idx]);
+		    cstack->cs_flags[idx] |= CSF_ముగిసిన;
 		}
 		// Stop at this try conditional - except the try block never
 		// got active (because of an inactive surrounding conditional
 		// or when the ":try" appeared after an error or interrupt or
 		// throw).
-		if (cstack->cs_flags[idx] & CSF_TRUE)
+		ఒకవేళ (cstack->cs_flags[idx] & CSF_TRUE)
 		{
-		    if (searched_cond == 0 && !inclusive)
-			break;
+		    ఒకవేళ (searched_cond == 0 && !inclusive)
+			ఆపు;
 		    stop = TRUE;
 		}
 	    }
@@ -2594,49 +2594,49 @@ cleanup_conditionals(
 	// conditional is not active or something has been made pending).
 	// If "inclusive" is TRUE and "searched_cond" is CSF_TRY|CSF_SILENT,
 	// check first whether "emsg_silent" needs to be restored.
-	if (cstack->cs_flags[idx] & searched_cond)
+	ఒకవేళ (cstack->cs_flags[idx] & searched_cond)
 	{
-	    if (!inclusive)
-		break;
+	    ఒకవేళ (!inclusive)
+		ఆపు;
 	    stop = TRUE;
 	}
-	cstack->cs_flags[idx] &= ~CSF_ACTIVE;
-	if (stop && searched_cond != (CSF_TRY | CSF_SILENT))
-	    break;
+	cstack->cs_flags[idx] &= ~CSF_చురుకైన;
+	ఒకవేళ (stop && searched_cond != (CSF_TRY | CSF_SILENT))
+	    ఆపు;
 
 	/*
 	 * When leaving a try conditional that reset "emsg_silent" on its
 	 * entry after saving the original value, restore that value here and
 	 * free the memory used to store it.
 	 */
-	if ((cstack->cs_flags[idx] & CSF_TRY)
+	ఒకవేళ ((cstack->cs_flags[idx] & CSF_TRY)
 		&& (cstack->cs_flags[idx] & CSF_SILENT))
 	{
 	    eslist_T	*elem;
 
 	    elem = cstack->cs_emsg_silent_list;
-	    cstack->cs_emsg_silent_list = elem->next;
+	    cstack->cs_emsg_silent_list = elem->తదుపరి;
 	    emsg_silent = elem->saved_emsg_silent;
 	    vim_free(elem);
 	    cstack->cs_flags[idx] &= ~CSF_SILENT;
 	}
-	if (stop)
-	    break;
+	ఒకవేళ (stop)
+	    ఆపు;
     }
-    return idx;
+    తిరిగి idx;
 }
 
 /*
  * Return an appropriate error message for a missing endwhile/endfor/endif.
  */
-   static char *
-get_end_emsg(cstack_T *cstack)
+   స్థిర అక్షరం *
+get_చివర_emsg(cstack_T *cstack)
 {
-    if (cstack->cs_flags[cstack->cs_idx] & CSF_WHILE)
-	return _(e_missing_endwhile);
-    if (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
-	return _(e_missing_endfor);
-    return _(e_missing_endif);
+    ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & CSF_WHILE)
+	తిరిగి _(e_missing_endwhile);
+    ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
+	తిరిగి _(e_missing_endfor);
+    తిరిగి _(e_missing_endif);
 }
 
 
@@ -2647,57 +2647,57 @@ get_end_emsg(cstack_T *cstack)
  * type.
  * Also free "for info" structures where needed.
  */
-    void
+    శూన్య
 rewind_conditionals(
     cstack_T   *cstack,
-    int		idx,
-    int		cond_type,
-    int		*cond_level)
+    పూర్ణాంకం		idx,
+    పూర్ణాంకం		cond_type,
+    పూర్ణాంకం		*cond_level)
 {
-    while (cstack->cs_idx > idx)
+    అయితే (cstack->cs_idx > idx)
     {
-	if (cstack->cs_flags[cstack->cs_idx] & cond_type)
+	ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & cond_type)
 	    --*cond_level;
-	if (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
+	ఒకవేళ (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
 	    free_for_info(cstack->cs_forinfo[cstack->cs_idx]);
-	leave_block(cstack);
+	leave_ఖండం(cstack);
     }
 }
 
 /*
  * ":endfunction" or ":enddef" when not after a ":function"
  */
-    void
+    శూన్య
 ex_endfunction(exarg_T *eap)
 {
-    if (eap->cmdidx == CMD_enddef)
+    ఒకవేళ (eap->cmdidx == CMD_enddef)
 	semsg(_(e_str_not_inside_function), ":enddef");
-    else
+    లేకపోతే
 	semsg(_(e_str_not_inside_function), ":endfunction");
 }
 
 /*
  * Return TRUE if the string "p" looks like a ":while" or ":for" command.
  */
-    int
+    పూర్ణాంకం
 has_loop_cmd(char_u *p)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
     // skip modifiers, white space and ':'
-    for (;;)
+    కొరకు (;;)
     {
-	while (*p == ' ' || *p == '\t' || *p == ':')
+	అయితే (*p == ' ' || *p == '\t' || *p == ':')
 	    ++p;
 	len = modifier_len(p);
-	if (len == 0)
-	    break;
+	ఒకవేళ (len == 0)
+	    ఆపు;
 	p += len;
     }
-    if ((p[0] == 'w' && p[1] == 'h')
+    ఒకవేళ ((p[0] == 'w' && p[1] == 'h')
 	    || (p[0] == 'f' && p[1] == 'o' && p[2] == 'r'))
-	return TRUE;
-    return FALSE;
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL

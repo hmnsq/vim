@@ -12,90 +12,90 @@
  */
 
 
-#ifdef FEAT_WAYLAND
+#నిర్వచితమైతే FEAT_WAYLAND
 
-#include <wayland-client.h>
+#అన్తర్భావ <wayland-client.h>
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 # include "auto/wayland/wlr-data-control-unstable-v1.h"
 # include "auto/wayland/ext-data-control-v1.h"
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 
 // Wayland protocols for accessing the selection
-typedef enum {
-    VWL_DATA_PROTOCOL_NONE,
-    VWL_DATA_PROTOCOL_EXT,
-    VWL_DATA_PROTOCOL_WLR,
-} vwl_data_protocol_T;
+రకనిర్వచనం గణన {
+    VWL_దత్తాంశం_PROTOCOL_NONE,
+    VWL_దత్తాంశం_PROTOCOL_EXT,
+    VWL_దత్తాంశం_PROTOCOL_WLR,
+} vwl_దత్తాంశం_protocol_T;
 
-#endif // FEAT_WAYLAND_CLIPBOARD
+#అయితే_ముగింపు // FEAT_WAYLAND_CLIPBOARD
 
 // Struct that represents a seat. (Should be accessed via
 // vwl_get_seat()).
-struct vwl_seat_S {
-    struct wl_seat  *proxy;
-    char	    *label;	    // Name of seat as text (e.g. seat0,
+నిర్మాణం vwl_seat_S {
+    నిర్మాణం wl_seat  *proxy;
+    అక్షరం	    *label;	    // Name of seat as text (e.g. seat0,
 				    // seat1...).
     uint32_t	    capabilities;   // Bitmask of the capabilities of the seat
 				    // (pointer, keyboard, touch).
 };
 
 // Struct wrapper for a Wayland connection
-struct vwl_connection_S {
-    struct {
-	struct wl_display   *proxy;
-	int		    fd;	// File descriptor for display
+నిర్మాణం vwl_connection_S {
+    నిర్మాణం {
+	నిర్మాణం wl_display   *proxy;
+	పూర్ణాంకం		    fd;	// File descriptor for display
     } display;
 
-    struct {
-	struct wl_registry *proxy;
+    నిర్మాణం {
+	నిర్మాణం wl_registry *proxy;
     } registry;
 
     // Global objects
-    struct {
+    నిర్మాణం {
 	garray_T seats;
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
-	struct zwlr_data_control_manager_v1 *zwlr_data_control_manager_v1;
-	struct ext_data_control_manager_v1  *ext_data_control_manager_v1;
-#endif
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
+	నిర్మాణం zwlr_దత్తాంశం_control_manager_v1 *zwlr_దత్తాంశం_control_manager_v1;
+	నిర్మాణం ext_దత్తాంశం_control_manager_v1  *ext_దత్తాంశం_control_manager_v1;
+#అయితే_ముగింపు
     } gobjects;
 };
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 
 // LISTENER WRAPPERS
 
-struct vwl_data_device_listener_S {
-    void (*data_offer)(void *data,
-		       vwl_data_device_T *device,
-		       vwl_data_offer_T *offer);
-    void (*selection)(void *data,
-		      vwl_data_device_T *device,
-		      vwl_data_offer_T *offer,
+నిర్మాణం vwl_దత్తాంశం_device_listener_S {
+    శూన్య (*దత్తాంశం_offer)(శూన్య *దత్తాంశం,
+		       vwl_దత్తాంశం_device_T *device,
+		       vwl_దత్తాంశం_offer_T *offer);
+    శూన్య (*selection)(శూన్య *దత్తాంశం,
+		      vwl_దత్తాంశం_device_T *device,
+		      vwl_దత్తాంశం_offer_T *offer,
 		      wayland_selection_T selection);
 
     // This event is only relevant for data control protocols
-    void (*finished)(void *data, vwl_data_device_T *device);
+    శూన్య (*ముగిసిన)(శూన్య *దత్తాంశం, vwl_దత్తాంశం_device_T *device);
 };
 
-struct vwl_data_source_listener_S {
-    void (*send)(void *data,
-		 vwl_data_source_T *source,
-		 const char *mime_type,
-		 int fd);
-    void (*cancelled)(void *data, vwl_data_source_T *source);
+నిర్మాణం vwl_దత్తాంశం_ఆధారం_listener_S {
+    శూన్య (*send)(శూన్య *దత్తాంశం,
+		 vwl_దత్తాంశం_ఆధారం_T *ఆధారం,
+		 స్థిరరాశి అక్షరం *mime_type,
+		 పూర్ణాంకం fd);
+    శూన్య (*cancelled)(శూన్య *దత్తాంశం, vwl_దత్తాంశం_ఆధారం_T *ఆధారం);
 };
 
-struct vwl_data_offer_listener_S {
+నిర్మాణం vwl_దత్తాంశం_offer_listener_S {
     // Return TRUE to add mime type to internal array in data offer. Note that
     // this is not called for the special Vim mime type
     // (wayland_vim_special_mime), but offer->from_vim is set to true.
     // Additionally when the special mime type is received, any offer events
     // after are ignored.
-    bool (*offer)(void *data, vwl_data_offer_T *offer, const char *mime_type);
+    bool (*offer)(శూన్య *దత్తాంశం, vwl_దత్తాంశం_offer_T *offer, స్థిరరాశి అక్షరం *mime_type);
 };
 
 // DATA RELATED OBJECT WRAPPERS
@@ -103,39 +103,39 @@ struct vwl_data_offer_listener_S {
 // The `data` member is used to pass other needed stuff around such as a
 // vwl_clipboard_selection_T pointer.
 
-struct vwl_data_offer_S {
-    void			*proxy;
-    void			*data;	    // Should be same as parent data
+నిర్మాణం vwl_దత్తాంశం_offer_S {
+    శూన్య			*proxy;
+    శూన్య			*దత్తాంశం;	    // Should be same as parent data
 					    // device.
     garray_T			mime_types;
 
-    const vwl_data_offer_listener_T *listener;
-    vwl_data_protocol_T		    protocol;
+    స్థిరరాశి vwl_దత్తాంశం_offer_listener_T *listener;
+    vwl_దత్తాంశం_protocol_T		    protocol;
 };
 
-struct vwl_data_source_S {
-    void				*proxy;
-    void				*data;
-    const vwl_data_source_listener_T	*listener;
-    vwl_data_protocol_T	    protocol;
+నిర్మాణం vwl_దత్తాంశం_ఆధారం_S {
+    శూన్య				*proxy;
+    శూన్య				*దత్తాంశం;
+    స్థిరరాశి vwl_దత్తాంశం_ఆధారం_listener_T	*listener;
+    vwl_దత్తాంశం_protocol_T	    protocol;
 };
 
-struct vwl_data_device_S {
-    void				*proxy;
-    void				*data;
-    vwl_data_offer_T			*offer;
-    const vwl_data_device_listener_T	*listener;
-    vwl_data_protocol_T			protocol;
+నిర్మాణం vwl_దత్తాంశం_device_S {
+    శూన్య				*proxy;
+    శూన్య				*దత్తాంశం;
+    vwl_దత్తాంశం_offer_T			*offer;
+    స్థిరరాశి vwl_దత్తాంశం_device_listener_T	*listener;
+    vwl_దత్తాంశం_protocol_T			protocol;
 };
 
-struct vwl_data_device_manager_S {
-    void		*proxy;
-    vwl_data_protocol_T protocol;
+నిర్మాణం vwl_దత్తాంశం_device_manager_S {
+    శూన్య		*proxy;
+    vwl_దత్తాంశం_protocol_T protocol;
 };
 
-#endif // FEAT_WAYLAND_CLIPBOARD
+#అయితే_ముగింపు // FEAT_WAYLAND_CLIPBOARD
 
 // Global Wayland connection. Is also set to NULL when the connection is lost.
-extern vwl_connection_T *wayland_ct;
+బాహ్య vwl_connection_T *wayland_ct;
 
-#endif // FEAT_WAYLAND
+#అయితే_ముగింపు // FEAT_WAYLAND

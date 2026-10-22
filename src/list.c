@@ -11,25 +11,25 @@
  * list.c: List support and container (List, Dict, Blob) functions.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 // List heads for garbage collection.
-static list_T		*first_list = NULL;	// list of all lists
+స్థిర list_T		*మొదటి_list = ఖాళీ;	// list of all lists
 
-#define FOR_ALL_WATCHERS(l, lw) \
-    for ((lw) = (l)->lv_watch; (lw) != NULL; (lw) = (lw)->lw_next)
+#నిర్వచించు FOR_ALL_WATCHERS(l, lw) \
+    కొరకు ((lw) = (l)->lv_watch; (lw) != ఖాళీ; (lw) = (lw)->lw_తదుపరి)
 
-static void list_free_item(list_T *l, listitem_T *item);
+స్థిర శూన్య list_free_అంశం(list_T *l, listitem_T *అంశం);
 
 /*
  * Add a watcher to a list.
  */
-    void
-list_add_watch(list_T *l, listwatch_T *lw)
+    శూన్య
+list_కూడు_watch(list_T *l, listwatch_T *lw)
 {
-    lw->lw_next = l->lv_watch;
+    lw->lw_తదుపరి = l->lv_watch;
     l->lv_watch = lw;
 }
 
@@ -37,7 +37,7 @@ list_add_watch(list_T *l, listwatch_T *lw)
  * Remove a watcher from a list.
  * No warning when it isn't found...
  */
-    void
+    శూన్య
 list_rem_watch(list_T *l, listwatch_T *lwrem)
 {
     listwatch_T	*lw, **lwp;
@@ -45,12 +45,12 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
     lwp = &l->lv_watch;
     FOR_ALL_WATCHERS(l, lw)
     {
-	if (lw == lwrem)
+	ఒకవేళ (lw == lwrem)
 	{
-	    *lwp = lw->lw_next;
-	    break;
+	    *lwp = lw->lw_తదుపరి;
+	    ఆపు;
 	}
-	lwp = &lw->lw_next;
+	lwp = &lw->lw_తదుపరి;
     }
 }
 
@@ -58,25 +58,25 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
  * Just before removing an item from a list: advance watchers to the next
  * item.
  */
-    static void
-list_fix_watch(list_T *l, listitem_T *item)
+    స్థిర శూన్య
+list_fix_watch(list_T *l, listitem_T *అంశం)
 {
     listwatch_T	*lw;
 
     FOR_ALL_WATCHERS(l, lw)
-	if (lw->lw_item == item)
-	    lw->lw_item = item->li_next;
+	ఒకవేళ (lw->lw_అంశం == అంశం)
+	    lw->lw_అంశం = అంశం->li_తదుపరి;
 }
 
-    static void
+    స్థిర శూన్య
 list_init(list_T *l)
 {
     // Prepend the list to the list of lists for garbage collection.
-    if (first_list != NULL)
-	first_list->lv_used_prev = l;
-    l->lv_used_prev = NULL;
-    l->lv_used_next = first_list;
-    first_list = l;
+    ఒకవేళ (మొదటి_list != ఖాళీ)
+	మొదటి_list->lv_వాడిన_prev = l;
+    l->lv_వాడిన_prev = ఖాళీ;
+    l->lv_వాడిన_తదుపరి = మొదటి_list;
+    మొదటి_list = l;
 }
 
 /*
@@ -84,27 +84,27 @@ list_init(list_T *l)
  * Caller should take care of the reference count.
  */
     list_T *
-list_alloc(void)
+list_alloc(శూన్య)
 {
     list_T  *l;
 
     l = ALLOC_CLEAR_ONE(list_T);
-    if (l != NULL)
+    ఒకవేళ (l != ఖాళీ)
 	list_init(l);
-    return l;
+    తిరిగి l;
 }
 
 /*
  * list_alloc() with an ID for alloc_fail().
  */
     list_T *
-list_alloc_id(alloc_id_T id UNUSED)
+list_alloc_id(alloc_id_T id వాడని)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
-#endif
-    return (list_alloc());
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (alloc_fail_id == id && alloc_does_fail(పరిమాణం(list_T)))
+	తిరిగి ఖాళీ;
+#అయితే_ముగింపు
+    తిరిగి (list_alloc());
 }
 
 /*
@@ -114,43 +114,43 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_వస్తువులు(పూర్ణాంకం లెక్క)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
-	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
-    if (l == NULL)
-	return NULL;
+    ఒకవేళ (లెక్క > 0
+	    && (size_t)లెక్క > (కొలత_MAX - పరిమాణం(list_T)) / పరిమాణం(listitem_T))
+	తిరిగి ఖాళీ;
+    l = (list_T *)alloc_clear(పరిమాణం(list_T) + లెక్క * పరిమాణం(listitem_T));
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     list_init(l);
 
-    if (count <= 0)
-	return l;
+    ఒకవేళ (లెక్క <= 0)
+	తిరిగి l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
-    int		i;
+    పూర్ణాంకం		i;
 
-    l->lv_len = count;
-    l->lv_with_items = count;
-    l->lv_first = li;
-    l->lv_u.mat.lv_last = li + count - 1;
-    for (i = 0; i < count; ++i)
+    l->lv_len = లెక్క;
+    l->lv_with_వస్తువులు = లెక్క;
+    l->lv_మొదటి = li;
+    l->lv_u.mat.lv_చివరి = li + లెక్క - 1;
+    కొరకు (i = 0; i < లెక్క; ++i)
     {
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	ఒకవేళ (i == 0)
+	    li->li_prev = ఖాళీ;
+	లేకపోతే
 	    li->li_prev = li - 1;
-	if (i == count - 1)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	ఒకవేళ (i == లెక్క - 1)
+	    li->li_తదుపరి = ఖాళీ;
+	లేకపోతే
+	    li->li_తదుపరి = li + 1;
 	++li;
     }
 
-    return l;
+    తిరిగి l;
 }
 
 /*
@@ -158,8 +158,8 @@ list_alloc_with_items(int count)
  * The contents of "tv" is moved into the list item.
  * Each item must be set exactly once.
  */
-    void
-list_set_item(list_T *l, int idx, typval_T *tv)
+    శూన్య
+list_సమితి_అంశం(list_T *l, పూర్ణాంకం idx, typval_T *tv)
 {
     listitem_T	*li = (listitem_T *)(l + 1) + idx;
 
@@ -170,42 +170,42 @@ list_set_item(list_T *l, int idx, typval_T *tv)
  * Allocate an empty list for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 rettv_list_alloc(typval_T *rettv)
 {
     list_T	*l = list_alloc();
 
-    if (l == NULL)
-	return FAIL;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి FAIL;
 
-    rettv->v_lock = 0;
-    rettv_list_set(rettv, l);
-    return OK;
+    rettv->v_తాళం = 0;
+    rettv_list_సమితి(rettv, l);
+    తిరిగి OK;
 }
 
 /*
  * Same as rettv_list_alloc() but uses an allocation id for testing.
  */
-    int
-rettv_list_alloc_id(typval_T *rettv, alloc_id_T id UNUSED)
+    పూర్ణాంకం
+rettv_list_alloc_id(typval_T *rettv, alloc_id_T id వాడని)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
-#endif
-    return rettv_list_alloc(rettv);
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (alloc_fail_id == id && alloc_does_fail(పరిమాణం(list_T)))
+	తిరిగి FAIL;
+#అయితే_ముగింపు
+    తిరిగి rettv_list_alloc(rettv);
 }
 
 
 /*
  * Set a list as the return value.  Increments the reference count.
  */
-    void
-rettv_list_set(typval_T *rettv, list_T *l)
+    శూన్య
+rettv_list_సమితి(typval_T *rettv, list_T *l)
 {
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l != NULL)
+    ఒకవేళ (l != ఖాళీ)
 	++l->lv_refcount;
 }
 
@@ -213,10 +213,10 @@ rettv_list_set(typval_T *rettv, list_T *l)
  * Unreference a list: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    శూన్య
 list_unref(list_T *l)
 {
-    if (l != NULL && --l->lv_refcount <= 0)
+    ఒకవేళ (l != ఖాళీ && --l->lv_refcount <= 0)
 	list_free(l);
 }
 
@@ -224,18 +224,18 @@ list_unref(list_T *l)
  * Free a list, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    స్థిర శూన్య
 list_free_contents(list_T *l)
 {
-    listitem_T *item;
+    listitem_T *అంశం;
 
-    if (l->lv_first != &range_list_item)
-	for (item = l->lv_first; item != NULL; item = l->lv_first)
+    ఒకవేళ (l->lv_మొదటి != &range_list_అంశం)
+	కొరకు (అంశం = l->lv_మొదటి; అంశం != ఖాళీ; అంశం = l->lv_మొదటి)
 	{
 	    // Remove the item before deleting it.
-	    l->lv_first = item->li_next;
-	    clear_tv(&item->li_tv);
-	    list_free_item(l, item);
+	    l->lv_మొదటి = అంశం->li_తదుపరి;
+	    clear_tv(&అంశం->li_tv);
+	    list_free_అంశం(l, అంశం);
 	}
 }
 
@@ -244,15 +244,15 @@ list_free_contents(list_T *l)
  * But don't free a list that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-list_free_nonref(int copyID)
+    పూర్ణాంకం
+list_free_nonref(పూర్ణాంకం copyID)
 {
     list_T	*ll;
-    int		did_free = FALSE;
+    పూర్ణాంకం		did_free = FALSE;
 
-    for (ll = first_list; ll != NULL; ll = ll->lv_used_next)
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+    కొరకు (ll = మొదటి_list; ll != ఖాళీ; ll = ll->lv_వాడిన_తదుపరి)
+	ఒకవేళ ((ll->lv_copyID & COPYID_ముసుగు) != (copyID & COPYID_ముసుగు)
+						      && ll->lv_watch == ఖాళీ)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -260,34 +260,34 @@ list_free_nonref(int copyID)
 	    list_free_contents(ll);
 	    did_free = TRUE;
 	}
-    return did_free;
+    తిరిగి did_free;
 }
 
-    static void
+    స్థిర శూన్య
 list_free_list(list_T  *l)
 {
     // Remove the list from the list of lists for garbage collection.
-    if (l->lv_used_prev == NULL)
-	first_list = l->lv_used_next;
-    else
-	l->lv_used_prev->lv_used_next = l->lv_used_next;
-    if (l->lv_used_next != NULL)
-	l->lv_used_next->lv_used_prev = l->lv_used_prev;
+    ఒకవేళ (l->lv_వాడిన_prev == ఖాళీ)
+	మొదటి_list = l->lv_వాడిన_తదుపరి;
+    లేకపోతే
+	l->lv_వాడిన_prev->lv_వాడిన_తదుపరి = l->lv_వాడిన_తదుపరి;
+    ఒకవేళ (l->lv_వాడిన_తదుపరి != ఖాళీ)
+	l->lv_వాడిన_తదుపరి->lv_వాడిన_prev = l->lv_వాడిన_prev;
 
     free_type(l->lv_type);
     vim_free(l);
 }
 
-    void
-list_free_items(int copyID)
+    శూన్య
+list_free_వస్తువులు(పూర్ణాంకం copyID)
 {
-    list_T	*ll, *ll_next;
+    list_T	*ll, *ll_తదుపరి;
 
-    for (ll = first_list; ll != NULL; ll = ll_next)
+    కొరకు (ll = మొదటి_list; ll != ఖాళీ; ll = ll_తదుపరి)
     {
-	ll_next = ll->lv_used_next;
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+	ll_తదుపరి = ll->lv_వాడిన_తదుపరి;
+	ఒకవేళ ((ll->lv_copyID & COPYID_ముసుగు) != (copyID & COPYID_ముసుగు)
+						      && ll->lv_watch == ఖాళీ)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -297,11 +297,11 @@ list_free_items(int copyID)
     }
 }
 
-    void
+    శూన్య
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
-	return;
+    ఒకవేళ (లోపల_free_unref_వస్తువులు)
+	తిరిగి;
 
     list_free_contents(l);
     list_free_list(l);
@@ -312,85 +312,85 @@ list_free(list_T *l)
  * It is not initialized, don't forget to set v_lock.
  */
     listitem_T *
-listitem_alloc(void)
+listitem_alloc(శూన్య)
 {
-    return ALLOC_ONE(listitem_T);
+    తిరిగి ALLOC_ONE(listitem_T);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Does not clear the value.  Does not notify watchers.
  */
-    static void
-list_free_item(list_T *l, listitem_T *item)
+    స్థిర శూన్య
+list_free_అంశం(list_T *l, listitem_T *అంశం)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
-			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
-	vim_free(item);
+    ఒకవేళ (l->lv_with_వస్తువులు == 0 || అంశం < (listitem_T *)l
+			   || అంశం >= (listitem_T *)(l + 1) + l->lv_with_వస్తువులు)
+	vim_free(అంశం);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Also clears the value.  Does not notify watchers.
  */
-    void
-listitem_free(list_T *l, listitem_T *item)
+    శూన్య
+listitem_free(list_T *l, listitem_T *అంశం)
 {
-    clear_tv(&item->li_tv);
-    list_free_item(l, item);
+    clear_tv(&అంశం->li_tv);
+    list_free_అంశం(l, అంశం);
 }
 
 /*
  * Remove a list item from a List and free it.  Also clears the value.
  */
-    void
-listitem_remove(list_T *l, listitem_T *item)
+    శూన్య
+listitem_remove(list_T *l, listitem_T *అంశం)
 {
-    vimlist_remove(l, item, item);
-    listitem_free(l, item);
+    vimlist_remove(l, అంశం, అంశం);
+    listitem_free(l, అంశం);
 }
 
 /*
  * Get the number of items in a list.
  */
-    long
+    దీర్ఘ
 list_len(list_T *l)
 {
-    if (l == NULL)
-	return 0L;
-    return l->lv_len;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి 0L;
+    తిరిగి l->lv_len;
 }
 
 /*
  * Return TRUE when two lists have exactly the same values.
  */
-    int
+    పూర్ణాంకం
 list_equal(
     list_T	*l1,
     list_T	*l2,
-    int		ic)	// ignore case for strings
+    పూర్ణాంకం		ic)	// ignore case for strings
 {
     listitem_T	*item1, *item2;
 
-    if (l1 == l2)
-	return TRUE;
-    if (list_len(l1) != list_len(l2))
-	return FALSE;
-    if (list_len(l1) == 0)
+    ఒకవేళ (l1 == l2)
+	తిరిగి TRUE;
+    ఒకవేళ (list_len(l1) != list_len(l2))
+	తిరిగి FALSE;
+    ఒకవేళ (list_len(l1) == 0)
 	// empty and NULL list are considered equal
-	return TRUE;
-    if (l1 == NULL || l2 == NULL)
-	return FALSE;
+	తిరిగి TRUE;
+    ఒకవేళ (l1 == ఖాళీ || l2 == ఖాళీ)
+	తిరిగి FALSE;
 
     CHECK_LIST_MATERIALIZE(l1);
     CHECK_LIST_MATERIALIZE(l2);
 
-    for (item1 = l1->lv_first, item2 = l2->lv_first;
-	    item1 != NULL && item2 != NULL;
-			       item1 = item1->li_next, item2 = item2->li_next)
-	if (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
-	    return FALSE;
-    return item1 == NULL && item2 == NULL;
+    కొరకు (item1 = l1->lv_మొదటి, item2 = l2->lv_మొదటి;
+	    item1 != ఖాళీ && item2 != ఖాళీ;
+			       item1 = item1->li_తదుపరి, item2 = item2->li_తదుపరి)
+	ఒకవేళ (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
+	    తిరిగి FALSE;
+    తిరిగి item1 == ఖాళీ && item2 == ఖాళీ;
 }
 
 /*
@@ -399,142 +399,142 @@ list_equal(
  * Returns NULL when "n" is out of range.
  */
     listitem_T *
-list_find(list_T *l, long n)
+list_కనుగొను(list_T *l, దీర్ఘ n)
 {
-    listitem_T	*item;
-    long	idx;
+    listitem_T	*అంశం;
+    దీర్ఘ	idx;
 
-    if (l == NULL)
-	return NULL;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    ఒకవేళ (n < 0)
 	n = l->lv_len + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= l->lv_len)
-	return NULL;
+    ఒకవేళ (n < 0 || n >= l->lv_len)
+	తిరిగి ఖాళీ;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // range_list_materialize may reset l->lv_len
-    if (n >= l->lv_len)
-	return NULL;
+    ఒకవేళ (n >= l->lv_len)
+	తిరిగి ఖాళీ;
 
     // When there is a cached index may start search from there.
-    if (l->lv_u.mat.lv_idx_item != NULL)
+    ఒకవేళ (l->lv_u.mat.lv_idx_అంశం != ఖాళీ)
     {
-	if (n < l->lv_u.mat.lv_idx / 2)
+	ఒకవేళ (n < l->lv_u.mat.lv_idx / 2)
 	{
 	    // closest to the start of the list
-	    item = l->lv_first;
+	    అంశం = l->lv_మొదటి;
 	    idx = 0;
 	}
-	else if (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
+	లేకపోతే ఒకవేళ (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
 	{
 	    // closest to the end of the list
-	    item = l->lv_u.mat.lv_last;
+	    అంశం = l->lv_u.mat.lv_చివరి;
 	    idx = l->lv_len - 1;
 	}
-	else
+	లేకపోతే
 	{
 	    // closest to the cached index
-	    item = l->lv_u.mat.lv_idx_item;
+	    అంశం = l->lv_u.mat.lv_idx_అంశం;
 	    idx = l->lv_u.mat.lv_idx;
 	}
     }
-    else
+    లేకపోతే
     {
-	if (n < l->lv_len / 2)
+	ఒకవేళ (n < l->lv_len / 2)
 	{
 	    // closest to the start of the list
-	    item = l->lv_first;
+	    అంశం = l->lv_మొదటి;
 	    idx = 0;
 	}
-	else
+	లేకపోతే
 	{
 	    // closest to the end of the list
-	    item = l->lv_u.mat.lv_last;
+	    అంశం = l->lv_u.mat.lv_చివరి;
 	    idx = l->lv_len - 1;
 	}
     }
 
-    while (n > idx)
+    అయితే (n > idx)
     {
 	// search forward
-	item = item->li_next;
+	అంశం = అంశం->li_తదుపరి;
 	++idx;
     }
-    while (n < idx)
+    అయితే (n < idx)
     {
 	// search backward
-	item = item->li_prev;
+	అంశం = అంశం->li_prev;
 	--idx;
     }
 
     // cache the used index
     l->lv_u.mat.lv_idx = idx;
-    l->lv_u.mat.lv_idx_item = item;
+    l->lv_u.mat.lv_idx_అంశం = అంశం;
 
-    return item;
+    తిరిగి అంశం;
 }
 
 /*
  * Get list item "l[idx]" as a number.
  */
-    long
-list_find_nr(
+    దీర్ఘ
+list_కనుగొను_nr(
     list_T	*l,
-    long	idx,
-    int		*errorp)	// set to TRUE when something wrong
+    దీర్ఘ	idx,
+    పూర్ణాంకం		*errorp)	// set to TRUE when something wrong
 {
     listitem_T	*li;
 
-    if (l != NULL && l->lv_first == &range_list_item)
+    ఒకవేళ (l != ఖాళీ && l->lv_మొదటి == &range_list_అంశం)
     {
-	long	    n = idx;
+	దీర్ఘ	    n = idx;
 
 	// not materialized range() list: compute the value.
 	// Negative index is relative to the end.
-	if (n < 0)
+	ఒకవేళ (n < 0)
 	    n = l->lv_len + n;
 
 	// Check for index out of range.
-	if (n < 0 || n >= l->lv_len)
+	ఒకవేళ (n < 0 || n >= l->lv_len)
 	{
-	    if (errorp != NULL)
+	    ఒకవేళ (errorp != ఖాళీ)
 		*errorp = TRUE;
-	    return -1L;
+	    తిరిగి -1L;
 	}
 
-	return l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
+	తిరిగి l->lv_u.nonmat.lv_ప్రారంభం + n * l->lv_u.nonmat.lv_stride;
     }
 
-    li = list_find(l, idx);
-    if (li == NULL)
+    li = list_కనుగొను(l, idx);
+    ఒకవేళ (li == ఖాళీ)
     {
-	if (errorp != NULL)
+	ఒకవేళ (errorp != ఖాళీ)
 	    *errorp = TRUE;
-	return -1L;
+	తిరిగి -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    తిరిగి (దీర్ఘ)tv_get_సంఖ్య_chk(&li->li_tv, errorp);
 }
 
 /*
  * Get list item "l[idx - 1]" as a string.  Returns NULL for failure.
  */
     char_u *
-list_find_str(list_T *l, long idx)
+list_కనుగొను_str(list_T *l, దీర్ఘ idx)
 {
     listitem_T	*li;
 
-    li = list_find(l, idx - 1);
-    if (li == NULL)
+    li = list_కనుగొను(l, idx - 1);
+    ఒకవేళ (li == ఖాళీ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return NULL;
+	semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), idx);
+	తిరిగి ఖాళీ;
     }
-    return tv_get_string(&li->li_tv);
+    తిరిగి tv_get_string(&li->li_tv);
 }
 
 /*
@@ -542,138 +542,138 @@ list_find_str(list_T *l, long idx)
  * zero and set "idx" to zero.  Used for first index of a range.
  */
     listitem_T *
-list_find_index(list_T *l, long *idx)
+list_కనుగొను_సూచీ(list_T *l, దీర్ఘ *idx)
 {
-    listitem_T *li = list_find(l, *idx);
+    listitem_T *li = list_కనుగొను(l, *idx);
 
-    if (li != NULL)
-	return li;
+    ఒకవేళ (li != ఖాళీ)
+	తిరిగి li;
 
-    if (*idx < 0)
+    ఒకవేళ (*idx < 0)
     {
 	*idx = 0;
-	li = list_find(l, *idx);
+	li = list_కనుగొను(l, *idx);
     }
-    return li;
+    తిరిగి li;
 }
 
 /*
  * Locate "item" list "l" and return its index.
  * Returns -1 when "item" is not in the list.
  */
-    long
-list_idx_of_item(list_T *l, listitem_T *item)
+    దీర్ఘ
+list_idx_యొక్క_అంశం(list_T *l, listitem_T *అంశం)
 {
-    long	idx = 0;
+    దీర్ఘ	idx = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return -1;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి -1;
     CHECK_LIST_MATERIALIZE(l);
     idx = 0;
-    for (li = l->lv_first; li != NULL && li != item; li = li->li_next)
+    కొరకు (li = l->lv_మొదటి; li != ఖాళీ && li != అంశం; li = li->li_తదుపరి)
 	++idx;
-    if (li == NULL)
-	return -1;
-    return idx;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి -1;
+    తిరిగి idx;
 }
 
 /*
  * Append item "item" to the end of list "l".
  */
-    void
-list_append(list_T *l, listitem_T *item)
+    శూన్య
+list_append(list_T *l, listitem_T *అంశం)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (l->lv_u.mat.lv_last == NULL)
+    ఒకవేళ (l->lv_u.mat.lv_చివరి == ఖాళీ)
     {
 	// empty list
-	l->lv_first = item;
-	item->li_prev = NULL;
+	l->lv_మొదటి = అంశం;
+	అంశం->li_prev = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	l->lv_u.mat.lv_last->li_next = item;
-	item->li_prev = l->lv_u.mat.lv_last;
+	l->lv_u.mat.lv_చివరి->li_తదుపరి = అంశం;
+	అంశం->li_prev = l->lv_u.mat.lv_చివరి;
     }
-    l->lv_u.mat.lv_last = item;
+    l->lv_u.mat.lv_చివరి = అంశం;
     ++l->lv_len;
-    item->li_next = NULL;
+    అంశం->li_తదుపరి = ఖాళీ;
 }
 
 /*
  * Append typval_T "tv" to the end of list "l".  "tv" is copied.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    పూర్ణాంకం
 list_append_tv(list_T *l, typval_T *tv)
 {
     listitem_T	*li;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ఖాళీ, 0) == FAIL)
+	తిరిగి FAIL;
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
     copy_tv(tv, &li->li_tv);
     list_append(l, li);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * As list_append_tv() but move the value instead of copying it.
  * Return FAIL when out of memory.
  */
-    static int
+    స్థిర పూర్ణాంకం
 list_append_tv_move(list_T *l, typval_T *tv)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
     li->li_tv = *tv;
     list_append(l, li);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Add a dictionary to a list.  Used by getqflist().
  * Return FAIL when out of memory.
  */
-    int
+    పూర్ణాంకం
 list_append_dict(list_T *list, dict_T *dict)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
     li->li_tv.v_type = VAR_DICT;
-    li->li_tv.v_lock = 0;
+    li->li_tv.v_తాళం = 0;
     li->li_tv.vval.v_dict = dict;
     list_append(list, li);
     ++dict->dv_refcount;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Append list2 to list1.
  * Return FAIL when out of memory.
  */
-    int
+    పూర్ణాంకం
 list_append_list(list_T *list1, list_T *list2)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
     li->li_tv.v_type = VAR_LIST;
-    li->li_tv.v_lock = 0;
+    li->li_tv.v_తాళం = 0;
     li->li_tv.vval.v_list = list2;
     list_append(list1, li);
     ++list2->lv_refcount;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -681,41 +681,41 @@ list_append_list(list_T *list1, list_T *list2)
  * When "len" >= 0 use "str[len]".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_string(list_T *l, char_u *str, int len)
+    పూర్ణాంకం
+list_append_string(list_T *l, char_u *str, పూర్ణాంకం len)
 {
     listitem_T *li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
     list_append(l, li);
     li->li_tv.v_type = VAR_STRING;
-    li->li_tv.v_lock = 0;
-    if (str == NULL)
-	li->li_tv.vval.v_string = NULL;
-    else if ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
-						 : vim_strsave(str))) == NULL)
-	return FAIL;
-    return OK;
+    li->li_tv.v_తాళం = 0;
+    ఒకవేళ (str == ఖాళీ)
+	li->li_tv.vval.v_string = ఖాళీ;
+    లేకపోతే ఒకవేళ ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
+						 : vim_strsave(str))) == ఖాళీ)
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Append "n" to list "l".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_number(list_T *l, varnumber_T n)
+    పూర్ణాంకం
+list_append_సంఖ్య(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
-    li->li_tv.v_type = VAR_NUMBER;
-    li->li_tv.v_lock = 0;
-    li->li_tv.vval.v_number = n;
+    ఒకవేళ (li == ఖాళీ)
+	తిరిగి FAIL;
+    li->li_tv.v_type = VAR_సంఖ్య;
+    li->li_tv.v_తాళం = 0;
+    li->li_tv.vval.v_సంఖ్య = n;
     list_append(l, li);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -723,46 +723,46 @@ list_append_number(list_T *l, varnumber_T n)
  * If "item" is NULL append at the end.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
-list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
+    పూర్ణాంకం
+list_చొప్పించు_tv(list_T *l, typval_T *tv, listitem_T *అంశం)
 {
     listitem_T	*ni;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ఖాళీ, 0) == FAIL)
+	తిరిగి FAIL;
     ni = listitem_alloc();
-    if (ni == NULL)
-	return FAIL;
+    ఒకవేళ (ni == ఖాళీ)
+	తిరిగి FAIL;
     copy_tv(tv, &ni->li_tv);
-    list_insert(l, ni, item);
-    return OK;
+    list_చొప్పించు(l, ni, అంశం);
+    తిరిగి OK;
 }
 
-    void
-list_insert(list_T *l, listitem_T *ni, listitem_T *item)
+    శూన్య
+list_చొప్పించు(list_T *l, listitem_T *ni, listitem_T *అంశం)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (item == NULL)
+    ఒకవేళ (అంశం == ఖాళీ)
 	// Append new item at end of list.
 	list_append(l, ni);
-    else
+    లేకపోతే
     {
 	// Insert new item before existing item.
-	ni->li_prev = item->li_prev;
-	ni->li_next = item;
-	if (item->li_prev == NULL)
+	ni->li_prev = అంశం->li_prev;
+	ni->li_తదుపరి = అంశం;
+	ఒకవేళ (అంశం->li_prev == ఖాళీ)
 	{
-	    l->lv_first = ni;
+	    l->lv_మొదటి = ni;
 	    ++l->lv_u.mat.lv_idx;
 	}
-	else
+	లేకపోతే
 	{
-	    item->li_prev->li_next = ni;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    అంశం->li_prev->li_తదుపరి = ni;
+	    l->lv_u.mat.lv_idx_అంశం = ఖాళీ;
 	}
-	item->li_prev = ni;
+	అంశం->li_prev = ni;
 	++l->lv_len;
     }
 }
@@ -772,58 +772,58 @@ list_insert(list_T *l, listitem_T *ni, listitem_T *item)
  * adding a new element to a List in Vim9script by using the current list
  * length as the index.
  */
-    static int
-list_append_new_item(list_T *l)
+    స్థిర పూర్ణాంకం
+list_append_new_అంశం(list_T *l)
 {
     typval_T	tv;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ)
 	tv.v_type = l->lv_type->tt_member->tt_type;
-    else
-	tv.v_type = VAR_NUMBER;
-    tv.v_lock = 0;
+    లేకపోతే
+	tv.v_type = VAR_సంఖ్య;
+    tv.v_తాళం = 0;
 
-    switch (tv.v_type)
+    ఎంపిక (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
-	case VAR_FLOAT: tv.vval.v_float = 0; break;
-	case VAR_STRING: tv.vval.v_string = NULL; break;
-	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
-	case VAR_FUNC: tv.vval.v_string = NULL; break;
-	case VAR_PARTIAL: tv.vval.v_partial = NULL; break;
-	case VAR_LIST: tv.vval.v_list = list_alloc(); break;
-	case VAR_DICT: tv.vval.v_dict = dict_alloc(); break;
-#ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB: tv.vval.v_job = NULL; break;
-	case VAR_CHANNEL: tv.vval.v_channel = NULL; break;
-#endif
-	case VAR_CLASS:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	స్థితి VAR_BOOL: tv.vval.v_సంఖ్య = VVAL_FALSE; ఆపు;
+	స్థితి VAR_SPECIAL: tv.vval.v_సంఖ్య = 0; ఆపు;
+	స్థితి VAR_సంఖ్య: tv.vval.v_సంఖ్య = 0; ఆపు;
+	స్థితి VAR_FLOAT: tv.vval.v_float = 0; ఆపు;
+	స్థితి VAR_STRING: tv.vval.v_string = ఖాళీ; ఆపు;
+	స్థితి VAR_BLOB: tv.vval.v_blob = blob_alloc(); ఆపు;
+	స్థితి VAR_FUNC: tv.vval.v_string = ఖాళీ; ఆపు;
+	స్థితి VAR_PARTIAL: tv.vval.v_partial = ఖాళీ; ఆపు;
+	స్థితి VAR_LIST: tv.vval.v_list = list_alloc(); ఆపు;
+	స్థితి VAR_DICT: tv.vval.v_dict = dict_alloc(); ఆపు;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	స్థితి VAR_పని: tv.vval.v_పని = ఖాళీ; ఆపు;
+	స్థితి VAR_CHANNEL: tv.vval.v_channel = ఖాళీ; ఆపు;
+#అయితే_ముగింపు
+	స్థితి VAR_CLASS:
+	    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ)
 		tv.vval.v_class = l->lv_type->tt_member->tt_class;
-	    else
-		tv.vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	    లేకపోతే
+		tv.vval.v_class = ఖాళీ;
+	    ఆపు;
+	స్థితి VAR_OBJECT:
+	    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ)
 		tv.vval.v_object =
 		    alloc_object(l->lv_type->tt_member->tt_class);
-	    else
-		tv.vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
-	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
-	default:
-	    tv.v_type = VAR_NUMBER;
-	    tv.vval.v_number = 0;
-	    break;
+	    లేకపోతే
+		tv.vval.v_object = ఖాళీ;
+	    ఆపు;
+	స్థితి VAR_TYPEALIAS: tv.vval.v_typealias = ఖాళీ; ఆపు;
+	స్థితి VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); ఆపు;
+	అప్రమేయ:
+	    tv.v_type = VAR_సంఖ్య;
+	    tv.vval.v_సంఖ్య = 0;
+	    ఆపు;
     }
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
-	set_tv_type(&tv, l->lv_type->tt_member);
+    ఒకవేళ (l->lv_type != ఖాళీ && l->lv_type->tt_member != ఖాళీ)
+	సమితి_tv_type(&tv, l->lv_type->tt_member);
 
-    return list_append_tv(l, &tv);
+    తిరిగి list_append_tv(l, &tv);
 }
 
 /*
@@ -832,29 +832,29 @@ list_append_new_item(list_T *l)
  * Return NULL if there is no such item.
  */
     listitem_T *
-check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
+check_range_సూచీ_one(list_T *l, దీర్ఘ *n1, పూర్ణాంకం can_append, పూర్ణాంకం quiet)
 {
-    long	orig_n1 = *n1;
-    listitem_T	*li = list_find_index(l, n1);
+    దీర్ఘ	orig_n1 = *n1;
+    listitem_T	*li = list_కనుగొను_సూచీ(l, n1);
 
-    if (li != NULL)
-	return li;
+    ఒకవేళ (li != ఖాళీ)
+	తిరిగి li;
 
     // Vim9: Allow for adding an item at the end.
-    if (can_append && in_vim9script()
-	    && *n1 == l->lv_len && l->lv_lock == 0)
+    ఒకవేళ (can_append && లోపల_vim9script()
+	    && *n1 == l->lv_len && l->lv_తాళం == 0)
     {
-	if (list_append_new_item(l) == FAIL)
-	    return NULL;
-	li = list_find_index(l, n1);
+	ఒకవేళ (list_append_new_అంశం(l) == FAIL)
+	    తిరిగి ఖాళీ;
+	li = list_కనుగొను_సూచీ(l, n1);
     }
-    if (li == NULL)
+    ఒకవేళ (li == ఖాళీ)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), orig_n1);
-	return NULL;
+	ఒకవేళ (!quiet)
+	    semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), orig_n1);
+	తిరిగి ఖాళీ;
     }
-    return li;
+    తిరిగి li;
 }
 
 /*
@@ -863,37 +863,37 @@ check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
  * "li1" is the item for item "n1".
  * Return OK or FAIL.
  */
-    int
-check_range_index_two(
+    పూర్ణాంకం
+check_range_సూచీ_two(
 	list_T	    *l,
-	long	    *n1,
+	దీర్ఘ	    *n1,
 	listitem_T  *li1,
-	long	    *n2,
-	int	    quiet)
+	దీర్ఘ	    *n2,
+	పూర్ణాంకం	    quiet)
 {
-    if (*n2 < 0)
+    ఒకవేళ (*n2 < 0)
     {
-	listitem_T	*ni = list_find(l, *n2);
+	listitem_T	*ni = list_కనుగొను(l, *n2);
 
-	if (ni == NULL)
+	ఒకవేళ (ni == ఖాళీ)
 	{
-	    if (!quiet)
-		semsg(_(e_list_index_out_of_range_nr), *n2);
-	    return FAIL;
+	    ఒకవేళ (!quiet)
+		semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), *n2);
+	    తిరిగి FAIL;
 	}
-	*n2 = list_idx_of_item(l, ni);
+	*n2 = list_idx_యొక్క_అంశం(l, ni);
     }
 
     // Check that n2 isn't before n1.
-    if (*n1 < 0)
-	*n1 = list_idx_of_item(l, li1);
-    if (*n2 < *n1)
+    ఒకవేళ (*n1 < 0)
+	*n1 = list_idx_యొక్క_అంశం(l, li1);
+    ఒకవేళ (*n2 < *n1)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), *n2);
-	return FAIL;
+	ఒకవేళ (!quiet)
+	    semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), *n2);
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -905,85 +905,85 @@ check_range_index_two(
  * "varname" is used for error messages.
  * Returns OK or FAIL.
  */
-    int
-list_assign_range(
+    పూర్ణాంకం
+list_కేటాయించు_range(
 	list_T	    *dest,
 	list_T	    *src,
-	long	    idx1_arg,
-	long	    idx2,
-	int	    empty_idx2,
+	దీర్ఘ	    idx1_arg,
+	దీర్ఘ	    idx2,
+	పూర్ణాంకం	    ఖాళీలు_idx2,
 	char_u	    *op,
 	char_u	    *varname)
 {
     listitem_T	*src_li;
     listitem_T	*dest_li;
-    long	idx1 = idx1_arg;
-    listitem_T	*first_li = list_find_index(dest, &idx1);
-    long	idx;
-    type_T	*member_type = NULL;
+    దీర్ఘ	idx1 = idx1_arg;
+    listitem_T	*మొదటి_li = list_కనుగొను_సూచీ(dest, &idx1);
+    దీర్ఘ	idx;
+    type_T	*member_type = ఖాళీ;
 
     // Check whether any of the list items is locked before making any changes.
     idx = idx1;
-    dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
+    dest_li = మొదటి_li;
+    కొరకు (src_li = src->lv_మొదటి; src_li != ఖాళీ && dest_li != ఖాళీ; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
-	    return FAIL;
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	dest_li = dest_li->li_next;
+	ఒకవేళ (విలువ_check_తాళం(dest_li->li_tv.v_తాళం, varname, FALSE))
+	    తిరిగి FAIL;
+	src_li = src_li->li_తదుపరి;
+	ఒకవేళ (src_li == ఖాళీ || (!ఖాళీలు_idx2 && idx2 == idx))
+	    ఆపు;
+	dest_li = dest_li->li_తదుపరి;
 	++idx;
     }
 
-    if (in_vim9script() && dest->lv_type != NULL
-					   && dest->lv_type->tt_member != NULL)
+    ఒకవేళ (లోపల_vim9script() && dest->lv_type != ఖాళీ
+					   && dest->lv_type->tt_member != ఖాళీ)
 	member_type = dest->lv_type->tt_member;
 
     // Assign the List values to the list items.
     idx = idx1;
-    dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL; )
+    dest_li = మొదటి_li;
+    కొరకు (src_li = src->lv_మొదటి; src_li != ఖాళీ; )
     {
-	if (op != NULL && *op != '=')
+	ఒకవేళ (op != ఖాళీ && *op != '=')
 	    tv_op(&dest_li->li_tv, &src_li->li_tv, op);
-	else
+	లేకపోతే
 	{
-	    if (member_type != NULL
+	    ఒకవేళ (member_type != ఖాళీ
 		    && check_typval_arg_type(member_type, &src_li->li_tv,
-							      NULL, 0) == FAIL)
-		return FAIL;
+							      ఖాళీ, 0) == FAIL)
+		తిరిగి FAIL;
 	    clear_tv(&dest_li->li_tv);
 	    copy_tv(&src_li->li_tv, &dest_li->li_tv);
 	}
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	if (dest_li->li_next == NULL)
+	src_li = src_li->li_తదుపరి;
+	ఒకవేళ (src_li == ఖాళీ || (!ఖాళీలు_idx2 && idx2 == idx))
+	    ఆపు;
+	ఒకవేళ (dest_li->li_తదుపరి == ఖాళీ)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    ఒకవేళ (list_append_సంఖ్య(dest, 0) == FAIL)
 	    {
-		src_li = NULL;
-		break;
+		src_li = ఖాళీ;
+		ఆపు;
 	    }
 	}
-	dest_li = dest_li->li_next;
+	dest_li = dest_li->li_తదుపరి;
 	++idx;
     }
-    if (src_li != NULL)
+    ఒకవేళ (src_li != ఖాళీ)
     {
-	emsg(_(e_list_value_has_more_items_than_targets));
-	return FAIL;
+	emsg(_(e_list_విలువ_has_మరిన్ని_వస్తువులు_than_targets));
+	తిరిగి FAIL;
     }
-    if (empty_idx2
-	    ? (dest_li != NULL && dest_li->li_next != NULL)
+    ఒకవేళ (ఖాళీలు_idx2
+	    ? (dest_li != ఖాళీ && dest_li->li_తదుపరి != ఖాళీ)
 	    : idx != idx2)
     {
-	emsg(_(e_list_value_does_not_have_enough_items));
-	return FAIL;
+	emsg(_(e_list_విలువ_does_not_have_enough_వస్తువులు));
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -992,130 +992,130 @@ list_assign_range(
  * It does nothing if "maxdepth" is 0.
  * Returns FAIL when out of memory.
  */
-    static void
-list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
+    స్థిర శూన్య
+list_flatten(list_T *list, listitem_T *మొదటి, దీర్ఘ maxitems, దీర్ఘ maxdepth)
 {
-    listitem_T	*item;
-    int		done = 0;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		పూర్తి = 0;
 
-    if (maxdepth == 0)
-	return;
+    ఒకవేళ (maxdepth == 0)
+	తిరిగి;
     CHECK_LIST_MATERIALIZE(list);
-    if (first == NULL)
-	item = list->lv_first;
-    else
-	item = first;
+    ఒకవేళ (మొదటి == ఖాళీ)
+	అంశం = list->lv_మొదటి;
+    లేకపోతే
+	అంశం = మొదటి;
 
-    while (item != NULL && done < maxitems)
+    అయితే (అంశం != ఖాళీ && పూర్తి < maxitems)
     {
-	listitem_T	*next = item->li_next;
+	listitem_T	*తదుపరి = అంశం->li_తదుపరి;
 
 	fast_breakcheck();
-	if (got_int)
-	    return;
+	ఒకవేళ (got_int)
+	    తిరిగి;
 
-	if (item->li_tv.v_type == VAR_LIST)
+	ఒకవేళ (అంశం->li_tv.v_type == VAR_LIST)
 	{
-	    list_T	*itemlist = item->li_tv.vval.v_list;
+	    list_T	*itemlist = అంశం->li_tv.vval.v_list;
 
-	    vimlist_remove(list, item, item);
-	    if (list_extend(list, itemlist, next) == FAIL)
+	    vimlist_remove(list, అంశం, అంశం);
+	    ఒకవేళ (list_extend(list, itemlist, తదుపరి) == FAIL)
 	    {
-		list_free_item(list, item);
-		return;
+		list_free_అంశం(list, అంశం);
+		తిరిగి;
 	    }
 
-	    if (maxdepth > 0)
-		list_flatten(list, item->li_prev == NULL
-				     ? list->lv_first : item->li_prev->li_next,
+	    ఒకవేళ (maxdepth > 0)
+		list_flatten(list, అంశం->li_prev == ఖాళీ
+				     ? list->lv_మొదటి : అంశం->li_prev->li_తదుపరి,
 				itemlist->lv_len, maxdepth - 1);
-	    clear_tv(&item->li_tv);
-	    list_free_item(list, item);
+	    clear_tv(&అంశం->li_tv);
+	    list_free_అంశం(list, అంశం);
 	}
 
-	++done;
-	item = next;
+	++పూర్తి;
+	అంశం = తదుపరి;
     }
 }
 
 /*
  * "flatten()" and "flattennew()" functions
  */
-    static void
-flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
+    స్థిర శూన్య
+flatten_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం make_copy)
 {
     list_T  *l;
-    long    maxdepth;
-    int	    error = FALSE;
+    దీర్ఘ    maxdepth;
+    పూర్ణాంకం	    error = FALSE;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ఒకవేళ (argvars[0].v_type != VAR_LIST)
     {
-	semsg(_(e_argument_of_str_must_be_list), "flatten()");
-	return;
+	semsg(_(e_వాదం_యొక్క_str_must_be_list), "flatten()");
+	తిరిగి;
     }
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type == VAR_UNKNOWN)
 	maxdepth = 999999;
-    else
+    లేకపోతే
     {
-	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (maxdepth < 0)
+	maxdepth = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[1], &error);
+	ఒకవేళ (error)
+	    తిరిగి;
+	ఒకవేళ (maxdepth < 0)
 	{
-	    emsg(_(e_maxdepth_must_be_non_negative_number));
-	    return;
+	    emsg(_(e_maxdepth_must_be_non_negative_సంఖ్య));
+	    తిరిగి;
 	}
     }
 
     l = argvars[0].vval.v_list;
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l == NULL)
-	return;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;
 
-    if (make_copy)
+    ఒకవేళ (make_copy)
     {
 	l = list_copy(l, FALSE, TRUE, get_copyID());
 	rettv->vval.v_list = l;
-	if (l == NULL)
-	    return;
+	ఒకవేళ (l == ఖాళీ)
+	    తిరిగి;
 	// The type will change.
 	free_type(l->lv_type);
-	l->lv_type = NULL;
+	l->lv_type = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	if (value_check_lock(l->lv_lock,
+	ఒకవేళ (విలువ_check_తాళం(l->lv_తాళం,
 				     (char_u *)N_("flatten() argument"), TRUE))
-	    return;
+	    తిరిగి;
 	++l->lv_refcount;
     }
 
-    list_flatten(l, NULL, l->lv_len, maxdepth);
+    list_flatten(l, ఖాళీ, l->lv_len, maxdepth);
 }
 
 /*
  * "flatten(list[, {maxdepth}])" function
  */
-    void
+    శూన్య
 f_flatten(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script())
-	emsg(_(e_cannot_use_flatten_in_vim9_script));
-    else
+    ఒకవేళ (లోపల_vim9script())
+	emsg(_(e_cannot_use_flatten_లోపల_vim9_script));
+    లేకపోతే
 	flatten_common(argvars, rettv, FALSE);
 }
 
 /*
  * "flattennew(list[, {maxdepth}])" function
  */
-    void
+    శూన్య
 f_flattennew(typval_T *argvars, typval_T *rettv)
 {
     flatten_common(argvars, rettv, TRUE);
@@ -1125,34 +1125,34 @@ f_flattennew(typval_T *argvars, typval_T *rettv)
  * "items(list)" function
  * Caller must have already checked that argvars[0] is a List.
  */
-    void
+    శూన్య
 list2items(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     listitem_T	*li;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (l == NULL)
-	return;  // null list behaves like an empty list
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;  // null list behaves like an empty list
 
     // TODO: would be more efficient to not materialize the argument
     CHECK_LIST_MATERIALIZE(l);
-    for (idx = 0, li = l->lv_first; li != NULL; li = li->li_next, ++idx)
+    కొరకు (idx = 0, li = l->lv_మొదటి; li != ఖాళీ; li = li->li_తదుపరి, ++idx)
     {
 	list_T	    *l2 = list_alloc();
 
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ఒకవేళ (l2 == ఖాళీ)
+	    ఆపు;
+	ఒకవేళ (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    ఆపు;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ఒకవేళ (list_append_సంఖ్య(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
-	    break;
+	    ఆపు;
     }
 }
 
@@ -1160,35 +1160,35 @@ list2items(typval_T *argvars, typval_T *rettv)
  * "items(string)" function
  * Caller must have already checked that argvars[0] is a String.
  */
-    void
+    శూన్య
 string2items(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p = argvars[0].vval.v_string;
     varnumber_T idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (p == NULL)
-	return;  // null string behaves like an empty string
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;  // null string behaves like an empty string
 
-    for (idx = 0; *p != NUL; ++idx)
+    కొరకు (idx = 0; *p != NUL; ++idx)
     {
-	int	    len = mb_ptr2len(p);
+	పూర్ణాంకం	    len = mb_ptr2len(p);
 	list_T	    *l2;
 
-	if (len == 0)
-	    break;
+	ఒకవేళ (len == 0)
+	    ఆపు;
 	l2 = list_alloc();
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ఒకవేళ (l2 == ఖాళీ)
+	    ఆపు;
+	ఒకవేళ (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    ఆపు;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ఒకవేళ (list_append_సంఖ్య(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
-	    break;
+	    ఆపు;
 	p += len;
     }
 }
@@ -1198,16 +1198,16 @@ string2items(typval_T *argvars, typval_T *rettv)
  * If "bef" is NULL append at the end, otherwise insert before this item.
  * Returns FAIL when out of memory.
  */
-    int
+    పూర్ణాంకం
 list_extend(list_T *l1, list_T *l2, listitem_T *bef)
 {
-    listitem_T	*item;
-    int		todo;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		todo;
     listitem_T	*bef_prev;
 
     // NULL list is equivalent to an empty list: nothing to do.
-    if (l2 == NULL || l2->lv_len == 0)
-	return OK;
+    ఒకవేళ (l2 == ఖాళీ || l2->lv_len == 0)
+	తిరిగి OK;
 
     todo = l2->lv_len;
     CHECK_LIST_MATERIALIZE(l1);
@@ -1216,196 +1216,196 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // When exending a list with itself, at some point we run into the item
     // that was before "bef" and need to skip over the already inserted items
     // to "bef".
-    bef_prev = bef == NULL ? NULL : bef->li_prev;
+    bef_prev = bef == ఖాళీ ? ఖాళీ : bef->li_prev;
 
     // We also quit the loop when we have inserted the original item count of
     // the list, avoid a hang when we extend a list with itself.
-    for (item = l2->lv_first; item != NULL && --todo >= 0;
-				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
-	    return FAIL;
-    return OK;
+    కొరకు (అంశం = l2->lv_మొదటి; అంశం != ఖాళీ && --todo >= 0;
+				 అంశం = అంశం == bef_prev ? bef : అంశం->li_తదుపరి)
+	ఒకవేళ (list_చొప్పించు_tv(l1, &అంశం->li_tv, bef) == FAIL)
+	    తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Concatenate lists "l1" and "l2" into a new list, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    పూర్ణాంకం
 list_concat(list_T *l1, list_T *l2, typval_T *tv)
 {
     list_T	*l;
-    int		len1 = l1 == NULL ? 0 : l1->lv_len;
-    int		len2 = l2 == NULL ? 0 : l2->lv_len;
-    long	totallen = (long)len1 + (long)len2;
-    int		i;
-    listitem_T	*item;
+    పూర్ణాంకం		len1 = l1 == ఖాళీ ? 0 : l1->lv_len;
+    పూర్ణాంకం		len2 = l2 == ఖాళీ ? 0 : l2->lv_len;
+    దీర్ఘ	totallen = (దీర్ఘ)len1 + (దీర్ఘ)len2;
+    పూర్ణాంకం		i;
+    listitem_T	*అంశం;
 
-    if (totallen == 0)
+    ఒకవేళ (totallen == 0)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ఒకవేళ (l == ఖాళీ)
+	    తిరిగి FAIL;
 	++l->lv_refcount;
 	tv->v_type = VAR_LIST;
-	tv->v_lock = 0;
+	tv->v_తాళం = 0;
 	tv->vval.v_list = l;
-	return OK;
+	తిరిగి OK;
     }
-    if (totallen > INT_MAX)
-	return FAIL;
+    ఒకవేళ (totallen > గరిష్ఠ_పూర్ణాంకం)
+	తిరిగి FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
-    if (l == NULL)
-	return FAIL;
+    l = list_alloc_with_వస్తువులు((పూర్ణాంకం)totallen);
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి FAIL;
 
     i = 0;
-    if (len1 > 0)
+    ఒకవేళ (len1 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l1);
-	for (item = l1->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	కొరకు (అంశం = l1->lv_మొదటి; అంశం != ఖాళీ && !got_int;
+		అంశం = అంశం->li_తదుపరి)
 	{
 	    typval_T new_tv;
 
-	    copy_tv(&item->li_tv, &new_tv);
-	    list_set_item(l, i++, &new_tv);
+	    copy_tv(&అంశం->li_tv, &new_tv);
+	    list_సమితి_అంశం(l, i++, &new_tv);
 	}
     }
-    if (len2 > 0)
+    ఒకవేళ (len2 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l2);
-	for (item = l2->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	కొరకు (అంశం = l2->lv_మొదటి; అంశం != ఖాళీ && !got_int;
+		అంశం = అంశం->li_తదుపరి)
 	{
 	    typval_T new_tv;
 
-	    copy_tv(&item->li_tv, &new_tv);
-	    list_set_item(l, i++, &new_tv);
+	    copy_tv(&అంశం->li_tv, &new_tv);
+	    list_సమితి_అంశం(l, i++, &new_tv);
 	}
     }
 
     ++l->lv_refcount;
     tv->v_type = VAR_LIST;
-    tv->v_lock = 0;
+    tv->v_తాళం = 0;
     tv->vval.v_list = l;
-    return OK;
+    తిరిగి OK;
 }
 
     list_T *
-list_slice(list_T *ol, long n1, long n2)
+list_ముక్క(list_T *ol, దీర్ఘ n1, దీర్ఘ n2)
 {
-    listitem_T	*item;
+    listitem_T	*అంశం;
     list_T	*l;
-    long	count;
-    long	idx;
+    దీర్ఘ	లెక్క;
+    దీర్ఘ	idx;
 
-    if (n2 < n1)
-	return list_alloc();
-    if (n1 > INT_MAX - (n2 - n1) - 1)
-	return NULL;
-    count = n2 - n1 + 1;
+    ఒకవేళ (n2 < n1)
+	తిరిగి list_alloc();
+    ఒకవేళ (n1 > గరిష్ఠ_పూర్ణాంకం - (n2 - n1) - 1)
+	తిరిగి ఖాళీ;
+    లెక్క = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_వస్తువులు((పూర్ణాంకం)లెక్క);
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    item = list_find(ol, n1);
-    for (idx = 0; idx < count; ++idx)
+    అంశం = list_కనుగొను(ol, n1);
+    కొరకు (idx = 0; idx < లెక్క; ++idx)
     {
 	typval_T	new_tv;
 
 	// "item" is NULL when materializing "ol" stopped early.
-	if (item == NULL)
+	ఒకవేళ (అంశం == ఖాళీ)
 	{
 	    list_free(l);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	copy_tv(&item->li_tv, &new_tv);
-	list_set_item(l, (int)idx, &new_tv);
-	item = item->li_next;
+	copy_tv(&అంశం->li_tv, &new_tv);
+	list_సమితి_అంశం(l, (పూర్ణాంకం)idx, &new_tv);
+	అంశం = అంశం->li_తదుపరి;
     }
-    return l;
+    తిరిగి l;
 }
 
-    int
-list_slice_or_index(
+    పూర్ణాంకం
+list_ముక్క_or_సూచీ(
 	    list_T	*list,
-	    int		range,
+	    పూర్ణాంకం		range,
 	    varnumber_T	n1_arg,
 	    varnumber_T	n2_arg,
-	    int		exclusive,
+	    పూర్ణాంకం		exclusive,
 	    typval_T	*rettv,
-	    int		verbose)
+	    పూర్ణాంకం		verbose)
 {
-    long	len = list_len(list);
+    దీర్ఘ	len = list_len(list);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    ఒకవేళ (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    ఒకవేళ (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty list, for Vim9 script start at the first item.
 	// A list index out of range is an error.
-	if (!range)
+	ఒకవేళ (!range)
 	{
-	    if (verbose)
-		semsg(_(e_list_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    ఒకవేళ (verbose)
+		semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), (దీర్ఘ)n1_arg);
+	    తిరిగి FAIL;
 	}
-	if (in_vim9script())
+	ఒకవేళ (లోపల_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	లేకపోతే
 	    n1 = len;
     }
-    if (range)
+    ఒకవేళ (range)
     {
 	list_T	*l;
 
-	if (n2 < 0)
+	ఒకవేళ (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	లేకపోతే ఒకవేళ (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	ఒకవేళ (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	ఒకవేళ (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
-	l = list_slice(list, n1, n2);
-	if (l == NULL)
-	    return FAIL;
+	l = list_ముక్క(list, n1, n2);
+	ఒకవేళ (l == ఖాళీ)
+	    తిరిగి FAIL;
 	clear_tv(rettv);
-	rettv_list_set(rettv, l);
+	rettv_list_సమితి(rettv, l);
     }
-    else
+    లేకపోతే
     {
 	// copy the item to "var1" to avoid that freeing the list makes it
 	// invalid.
-	long index = n1;
-	listitem_T *li = check_range_index_one(list, &index, TRUE, TRUE);
-	if (li == NULL)
-	    return FAIL;
+	దీర్ఘ సూచీ = n1;
+	listitem_T *li = check_range_సూచీ_one(list, &సూచీ, TRUE, TRUE);
+	ఒకవేళ (li == ఖాళీ)
+	    తిరిగి FAIL;
 	copy_tv(&li->li_tv, &var1);
 
 	// If "var1" is a List and the List item type is not set, then set it
 	// from the declared list item type.
-	if (in_vim9script() && var1.v_type == VAR_LIST
-					&& var1.vval.v_list != NULL
-					&& var1.vval.v_list->lv_type == NULL)
+	ఒకవేళ (లోపల_vim9script() && var1.v_type == VAR_LIST
+					&& var1.vval.v_list != ఖాళీ
+					&& var1.vval.v_list->lv_type == ఖాళీ)
 	{
-	    if (list->lv_type != NULL && list->lv_type->tt_member != NULL)
-		set_tv_type(&var1, list->lv_type->tt_member);
+	    ఒకవేళ (list->lv_type != ఖాళీ && list->lv_type->tt_member != ఖాళీ)
+		సమితి_tv_type(&var1, list->lv_type->tt_member);
 	}
 
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1415,54 +1415,54 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, పూర్ణాంకం deep, పూర్ణాంకం శిఖరం, పూర్ణాంకం copyID)
 {
     list_T	*copy;
-    listitem_T	*item;
-    int		idx = 0;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		idx = 0;
 
-    if (orig == NULL)
-	return NULL;
+    ఒకవేళ (orig == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
-    copy = list_alloc_with_items(orig->lv_len);
-    if (copy == NULL)
-	return NULL;
+    copy = list_alloc_with_వస్తువులు(orig->lv_len);
+    ఒకవేళ (copy == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (orig->lv_type == NULL || top || deep)
-	copy->lv_type = NULL;
-    else
+    ఒకవేళ (orig->lv_type == ఖాళీ || శిఖరం || deep)
+	copy->lv_type = ఖాళీ;
+    లేకపోతే
 	copy->lv_type = alloc_type(orig->lv_type);
-    if (copyID != 0)
+    ఒకవేళ (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this list.
 	orig->lv_copyID = copyID;
 	orig->lv_copylist = copy;
     }
-    for (item = orig->lv_first; item != NULL && !got_int;
-	    item = item->li_next)
+    కొరకు (అంశం = orig->lv_మొదటి; అంశం != ఖాళీ && !got_int;
+	    అంశం = అంశం->li_తదుపరి)
     {
 	typval_T	new_tv;
 
-	if (deep)
+	ఒకవేళ (deep)
 	{
-	    if (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
-		break;
+	    ఒకవేళ (అంశం_copy(&అంశం->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
+		ఆపు;
 	}
-	else
-	    copy_tv(&item->li_tv, &new_tv);
-	list_set_item(copy, idx++, &new_tv);
+	లేకపోతే
+	    copy_tv(&అంశం->li_tv, &new_tv);
+	list_సమితి_అంశం(copy, idx++, &new_tv);
     }
     ++copy->lv_refcount;
-    if (item != NULL)
+    ఒకవేళ (అంశం != ఖాళీ)
     {
 	list_unref(copy);
-	copy = NULL;
+	copy = ఖాళీ;
     }
 
-    return copy;
+    తిరిగి copy;
 }
 
 /*
@@ -1471,31 +1471,31 @@ list_copy(list_T *orig, int deep, int top, int copyID)
  * This used to be called list_remove, but that conflicts with a Sun header
  * file.
  */
-    void
-vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
+    శూన్య
+vimlist_remove(list_T *l, listitem_T *అంశం, listitem_T *item2)
 {
     listitem_T	*ip;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // notify watchers
-    for (ip = item; ip != NULL; ip = ip->li_next)
+    కొరకు (ip = అంశం; ip != ఖాళీ; ip = ip->li_తదుపరి)
     {
 	--l->lv_len;
 	list_fix_watch(l, ip);
-	if (ip == item2)
-	    break;
+	ఒకవేళ (ip == item2)
+	    ఆపు;
     }
 
-    if (item2->li_next == NULL)
-	l->lv_u.mat.lv_last = item->li_prev;
-    else
-	item2->li_next->li_prev = item->li_prev;
-    if (item->li_prev == NULL)
-	l->lv_first = item2->li_next;
-    else
-	item->li_prev->li_next = item2->li_next;
-    l->lv_u.mat.lv_idx_item = NULL;
+    ఒకవేళ (item2->li_తదుపరి == ఖాళీ)
+	l->lv_u.mat.lv_చివరి = అంశం->li_prev;
+    లేకపోతే
+	item2->li_తదుపరి->li_prev = అంశం->li_prev;
+    ఒకవేళ (అంశం->li_prev == ఖాళీ)
+	l->lv_మొదటి = item2->li_తదుపరి;
+    లేకపోతే
+	అంశం->li_prev->li_తదుపరి = item2->li_తదుపరి;
+    l->lv_u.mat.lv_idx_అంశం = ఖాళీ;
 }
 
 /*
@@ -1503,49 +1503,49 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
  * May return NULL.
  */
     char_u *
-list2string(typval_T *tv, int copyID, int restore_copyID)
+list2string(typval_T *tv, పూర్ణాంకం copyID, పూర్ణాంకం restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_list == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ఒకవేళ (tv->vval.v_list == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ga_init2(&ga, పరిమాణం(అక్షరం), 80);
     ga_append(&ga, '[');
     CHECK_LIST_MATERIALIZE(tv->vval.v_list);
-    if (list_join(&ga, tv->vval.v_list, (char_u *)", ",
+    ఒకవేళ (list_join(&ga, tv->vval.v_list, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_దత్తాంశం);
+	తిరిగి ఖాళీ;
     }
     ga_append(&ga, ']');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    తిరిగి (char_u *)ga.ga_దత్తాంశం;
 }
 
-typedef struct join_S {
+రకనిర్వచనం నిర్మాణం join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    స్థిర పూర్ణాంకం
 list_join_inner(
     garray_T	*gap,		// to store the result in
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    పూర్ణాంకం		echo_style,
+    పూర్ణాంకం		restore_copyID,
+    పూర్ణాంకం		copyID,
     garray_T	*join_gap)	// to keep each list item string
 {
-    int		i;
+    పూర్ణాంకం		i;
     join_T	*p;
-    long	sumlen = 0;
-    int		first = TRUE;
-    int		prev_lock;
+    దీర్ఘ	sumlen = 0;
+    పూర్ణాంకం		మొదటి = TRUE;
+    పూర్ణాంకం		prev_తాళం;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
-    listitem_T	*item;
+    listitem_T	*అంశం;
     string_T	s;
     size_t	seplen;
 
@@ -1553,65 +1553,65 @@ list_join_inner(
     CHECK_LIST_MATERIALIZE(l);
     // Lock the list, the string() method of an object item could remove the
     // item the loop is standing on.
-    prev_lock = l->lv_lock;
-    if (l->lv_lock == 0)
-	l->lv_lock = VAR_LOCKED;
-    for (item = l->lv_first; item != NULL && !got_int; item = item->li_next)
+    prev_తాళం = l->lv_తాళం;
+    ఒకవేళ (l->lv_తాళం == 0)
+	l->lv_తాళం = VAR_LOCKED;
+    కొరకు (అంశం = l->lv_మొదటి; అంశం != ఖాళీ && !got_int; అంశం = అంశం->li_తదుపరి)
     {
-	s.string = echo_string_core(&item->li_tv, &tofree, numbuf, copyID,
+	s.string = echo_string_core(&అంశం->li_tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
+	ఒకవేళ (s.string == ఖాళీ)
 	{
-	    l->lv_lock = prev_lock;
-	    return FAIL;
+	    l->lv_తాళం = prev_తాళం;
+	    తిరిగి FAIL;
 	}
 
-	s.length = STRLEN(s.string);
-	sumlen += (long)s.length;
+	s.నిడివి = STRLEN(s.string);
+	sumlen += (దీర్ఘ)s.నిడివి;
 
-	(void)ga_grow(join_gap, 1);
-	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	(శూన్య)ga_grow(join_gap, 1);
+	p = ((join_T *)join_gap->ga_దత్తాంశం) + (join_gap->ga_len++);
+	ఒకవేళ (tofree != ఖాళీ || s.string != numbuf)
 	{
 	    p->s.string = s.string;
-	    p->s.length = s.length;
+	    p->s.నిడివి = s.నిడివి;
 	    p->tofree = tofree;
 	}
-	else
+	లేకపోతే
 	{
-	    p->s.string = vim_strnsave(s.string, s.length);
-	    p->s.length = s.length;
+	    p->s.string = vim_strnsave(s.string, s.నిడివి);
+	    p->s.నిడివి = s.నిడివి;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	పంక్తి_breakcheck();
+	ఒకవేళ (did_echo_string_emsg)  // recursion error, bail out
+	    ఆపు;
     }
-    l->lv_lock = prev_lock;
+    l->lv_తాళం = prev_తాళం;
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ']' and NUL.
     seplen = STRLEN(sep);
-    if (join_gap->ga_len >= 2)
-	sumlen += (long)seplen * (join_gap->ga_len - 1);
-    if (sumlen > INT_MAX - 2 || ga_grow(gap, (int)sumlen + 2) == FAIL)
-	return FAIL;
+    ఒకవేళ (join_gap->ga_len >= 2)
+	sumlen += (దీర్ఘ)seplen * (join_gap->ga_len - 1);
+    ఒకవేళ (sumlen > గరిష్ఠ_పూర్ణాంకం - 2 || ga_grow(gap, (పూర్ణాంకం)sumlen + 2) == FAIL)
+	తిరిగి FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    కొరకు (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
-	    first = FALSE;
-	else
+	ఒకవేళ (మొదటి)
+	    మొదటి = FALSE;
+	లేకపోతే
 	    ga_concat_len(gap, sep, seplen);
-	p = ((join_T *)join_gap->ga_data) + i;
+	p = ((join_T *)join_gap->ga_దత్తాంశం) + i;
 
-	if (p->s.string != NULL)
-	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	ఒకవేళ (p->s.string != ఖాళీ)
+	    ga_concat_len(gap, p->s.string, p->s.నిడివి);
+	పంక్తి_breakcheck();
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1619,45 +1619,45 @@ list_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a List.
  * Return FAIL or OK.
  */
-    int
+    పూర్ణాంకం
 list_join(
     garray_T	*gap,
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    పూర్ణాంకం		echo_style,
+    పూర్ణాంకం		restore_copyID,
+    పూర్ణాంకం		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    పూర్ణాంకం		retval;
     join_T	*p;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (l->lv_len < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), l->lv_len);
+    ఒకవేళ (l->lv_len < 1)
+	తిరిగి OK; // nothing to do
+    ga_init2(&join_ga, పరిమాణం(join_T), l->lv_len);
     retval = list_join_inner(gap, l, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    ఒకవేళ (join_ga.ga_దత్తాంశం == ఖాళీ)
+	తిరిగి retval;
 
     // Dispose each item in join_ga.
-    p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    p = (join_T *)join_ga.ga_దత్తాంశం;
+    కొరకు (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * "join()" function
  */
-    void
+    శూన్య
 f_join(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
@@ -1665,32 +1665,32 @@ f_join(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (check_for_list_or_tuple_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_list_or_tuple_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	తిరిగి;
 
-    if ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
+    ఒకవేళ ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == ఖాళీ)
 	    || (argvars[0].v_type == VAR_TUPLE
-		&& argvars[0].vval.v_tuple == NULL))
-	return;
+		&& argvars[0].vval.v_tuple == ఖాళీ))
+	తిరిగి;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type == VAR_UNKNOWN)
 	sep = (char_u *)" ";
-    else
+    లేకపోతే
 	sep = tv_get_string_chk(&argvars[1]);
 
-    if (sep != NULL)
+    ఒకవేళ (sep != ఖాళీ)
     {
-	ga_init2(&ga, sizeof(char), 80);
-	if (argvars[0].v_type == VAR_LIST)
+	ga_init2(&ga, పరిమాణం(అక్షరం), 80);
+	ఒకవేళ (argvars[0].v_type == VAR_LIST)
 	    list_join(&ga, argvars[0].vval.v_list, sep, TRUE, FALSE, 0);
-	else
+	లేకపోతే
 	    tuple_join(&ga, argvars[0].vval.v_tuple, sep, TRUE, FALSE, 0);
 	ga_append(&ga, NUL);
-	rettv->vval.v_string = (char_u *)ga.ga_data;
+	rettv->vval.v_string = (char_u *)ga.ga_దత్తాంశం;
     }
-    else
-	rettv->vval.v_string = NULL;
+    లేకపోతే
+	rettv->vval.v_string = ఖాళీ;
 }
 
 /*
@@ -1698,59 +1698,59 @@ f_join(typval_T *argvars, typval_T *rettv)
  * "*arg" points to the "[".
  * Return OK or FAIL.
  */
-    int
-eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    పూర్ణాంకం
+eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, పూర్ణాంకం do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    పూర్ణాంకం		evaluate = evalarg == ఖాళీ ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    list_T	*l = NULL;
+    list_T	*l = ఖాళీ;
     typval_T	tv;
-    listitem_T	*item;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
+    పూర్ణాంకం		had_comma;
 
-    if (evaluate)
+    ఒకవేళ (evaluate)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ఒకవేళ (l == ఖాళీ)
+	    తిరిగి FAIL;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ']' && **arg != NUL)
+    అయితే (**arg != ']' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	ఒకవేళ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    వెళ్ళు failret;
+	ఒకవేళ (check_typval_is_విలువ(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    ఒకవేళ (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    వెళ్ళు failret;
 	}
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
-	    item = listitem_alloc();
-	    if (item != NULL)
+	    అంశం = listitem_alloc();
+	    ఒకవేళ (అంశం != ఖాళీ)
 	    {
-		item->li_tv = tv;
-		item->li_tv.v_lock = 0;
-		list_append(l, item);
+		అంశం->li_tv = tv;
+		అంశం->li_tv.v_తాళం = 0;
+		list_append(l, అంశం);
 	    }
-	    else
+	    లేకపోతే
 		clear_tv(&tv);
 	}
 	// Legacy Vim script allowed a space before the comma.
-	if (!vim9script)
+	ఒకవేళ (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	ఒకవేళ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
+	    ఒకవేళ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		వెళ్ళు failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -1758,183 +1758,183 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The "]" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ']')
-	    break;
+	ఒకవేళ (**arg == ']')
+	    ఆపు;
 
-	if (!had_comma)
+	ఒకవేళ (!had_comma)
 	{
-	    if (do_error)
+	    ఒకవేళ (do_error)
 	    {
-		if (**arg == ',')
+		ఒకవేళ (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
-		    semsg(_(e_missing_comma_in_list_str), *arg);
+		లేకపోతే
+		    semsg(_(e_missing_comma_లోపల_list_str), *arg);
 	    }
-	    goto failret;
+	    వెళ్ళు failret;
 	}
     }
 
-    if (**arg != ']')
+    ఒకవేళ (**arg != ']')
     {
-	if (do_error)
-	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
+	ఒకవేళ (do_error)
+	    semsg(_(e_missing_చివర_యొక్క_list_rsb_str), *arg);
 failret:
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	    list_free(l);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     *arg += 1;
-    if (evaluate)
-	rettv_list_set(rettv, l);
+    ఒకవేళ (evaluate)
+	rettv_list_సమితి(rettv, l);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Write "list" of strings to file "fd".
  */
-    int
-write_list(FILE *fd, list_T *list, int binary)
+    పూర్ణాంకం
+write_list(FILE *fd, list_T *list, పూర్ణాంకం ద్విమాన)
 {
     listitem_T	*li;
-    int		c;
-    int		ret = OK;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		ret = OK;
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_వస్తువులు(list, li)
     {
-	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
+	కొరకు (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
-	    if (*s == '\n')
+	    ఒకవేళ (*s == '\n')
 		c = putc(NUL, fd);
-	    else
+	    లేకపోతే
 		c = putc(*s, fd);
-	    if (c == EOF)
+	    ఒకవేళ (c == EOF)
 	    {
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
-	    if (putc('\n', fd) == EOF)
+	ఒకవేళ (!ద్విమాన || li->li_తదుపరి != ఖాళీ)
+	    ఒకవేళ (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
-	if (ret == FAIL)
+	ఒకవేళ (ret == FAIL)
 	{
 	    emsg(_(e_error_while_writing));
-	    break;
+	    ఆపు;
 	}
     }
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Initialize a static list with 10 items.
  */
-    void
+    శూన్య
 init_static_list(staticList10_T *sl)
 {
     list_T  *l = &sl->sl_list;
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    CLEAR_POINTER(sl);
-    l->lv_first = &sl->sl_items[0];
-    l->lv_u.mat.lv_last = &sl->sl_items[9];
+    CLEAR_సూచిక(sl);
+    l->lv_మొదటి = &sl->sl_వస్తువులు[0];
+    l->lv_u.mat.lv_చివరి = &sl->sl_వస్తువులు[9];
     l->lv_refcount = DO_NOT_FREE_CNT;
-    l->lv_lock = VAR_FIXED;
+    l->lv_తాళం = VAR_FIXED;
     sl->sl_list.lv_len = 10;
 
-    for (i = 0; i < 10; ++i)
+    కొరకు (i = 0; i < 10; ++i)
     {
-	listitem_T *li = &sl->sl_items[i];
+	listitem_T *li = &sl->sl_వస్తువులు[i];
 
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	ఒకవేళ (i == 0)
+	    li->li_prev = ఖాళీ;
+	లేకపోతే
 	    li->li_prev = li - 1;
-	if (i == 9)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	ఒకవేళ (i == 9)
+	    li->li_తదుపరి = ఖాళీ;
+	లేకపోతే
+	    li->li_తదుపరి = li + 1;
     }
 }
 
 /*
  * "list2str()" function
  */
-    void
+    శూన్య
 f_list2str(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
     garray_T	ga;
-    int		utf8 = FALSE;
+    పూర్ణాంకం		utf8 = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_list_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty string
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;  // empty list results in empty string
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (పూర్ణాంకం)tv_get_bool_chk(&argvars[1], ఖాళీ);
 
     CHECK_LIST_MATERIALIZE(l);
     ga_init2(&ga, 1, 80);
-    if (has_mbyte || utf8)
+    ఒకవేళ (has_mbyte || utf8)
     {
 	char_u	buf[MB_MAXBYTES + 1];
-	int	(*char2bytes)(int, char_u *);
+	పూర్ణాంకం	(*char2bytes)(పూర్ణాంకం, char_u *);
 
-	if (utf8 || enc_utf8)
+	ఒకవేళ (utf8 || enc_utf8)
 	    char2bytes = utf_char2bytes;
-	else
+	లేకపోతే
 	    char2bytes = mb_char2bytes;
 
-	FOR_ALL_LIST_ITEMS(l, li)
+	FOR_ALL_LIST_వస్తువులు(l, li)
 	{
 	    size_t  buflen;
 
-	    buflen = (size_t)(*char2bytes)(tv_get_number(&li->li_tv), buf);
+	    buflen = (size_t)(*char2bytes)(tv_get_సంఖ్య(&li->li_tv), buf);
 	    buf[buflen] = NUL;
 	    ga_concat_len(&ga, buf, buflen);
 	}
 	ga_append(&ga, NUL);
     }
-    else
+    లేకపోతే
     {
-	long len = (long)list_len(l) + 1;
+	దీర్ఘ len = (దీర్ఘ)list_len(l) + 1;
 
-	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
+	ఒకవేళ (len <= గరిష్ఠ_పూర్ణాంకం && ga_grow(&ga, (పూర్ణాంకం)len) == OK)
 	{
-	    FOR_ALL_LIST_ITEMS(l, li)
-		ga_append(&ga, tv_get_number(&li->li_tv));
+	    FOR_ALL_LIST_వస్తువులు(l, li)
+		ga_append(&ga, tv_get_సంఖ్య(&li->li_tv));
 	    ga_append(&ga, NUL);
 	}
     }
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_దత్తాంశం;
 }
 
 /*
  * "list2tuple()" function
  */
-    void
+    శూన్య
 f_list2tuple(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
@@ -1942,439 +1942,439 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple;
 
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = ఖాళీ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_list_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty tuple
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;  // empty list results in empty tuple
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
-	return;
+    ఒకవేళ (rettv_tuple_సమితి_with_వస్తువులు(rettv, list_len(l)) == FAIL)
+	తిరిగి;
 
     tuple = rettv->vval.v_tuple;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
-	copy_tv(&li->li_tv, TUPLE_ITEM(tuple, TUPLE_LEN(tuple)));
-	tuple->tv_items.ga_len++;
+	copy_tv(&li->li_tv, TUPLE_అంశం(tuple, TUPLE_LEN(tuple)));
+	tuple->tv_వస్తువులు.ga_len++;
     }
 }
 
 /*
  * "tuple2list()" function
  */
-    void
+    శూన్య
 f_tuple2list(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     tuple_T	*tuple;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (check_for_tuple_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_tuple_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     tuple = argvars[0].vval.v_tuple;
-    if (tuple == NULL)
-	return;  // empty tuple results in empty list
+    ఒకవేళ (tuple == ఖాళీ)
+	తిరిగి;  // empty tuple results in empty list
 
     l = rettv->vval.v_list;
-    for (int i = 0; i < tuple_len(tuple); i++)
-	list_append_tv(l, TUPLE_ITEM(tuple, i));
+    కొరకు (పూర్ణాంకం i = 0; i < tuple_len(tuple); i++)
+	list_append_tv(l, TUPLE_అంశం(tuple, i));
 }
 
 /*
  * Remove item argvars[1] from List argvars[0]. If argvars[2] is supplied, then
  * remove the range of items from argvars[1] to argvars[2] (inclusive).
  */
-    static void
+    స్థిర శూన్య
 list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     list_T	*l;
-    listitem_T	*item, *item2;
+    listitem_T	*అంశం, *item2;
     listitem_T	*li;
-    int		error = FALSE;
-    long	idx;
-    long	end;
-    int		cnt = 0;
+    పూర్ణాంకం		error = FALSE;
+    దీర్ఘ	idx;
+    దీర్ఘ	చివర;
+    పూర్ణాంకం		cnt = 0;
     list_T	*rl;
 
-    if ((l = argvars[0].vval.v_list) == NULL
-			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
-	return;
+    ఒకవేళ ((l = argvars[0].vval.v_list) == ఖాళీ
+			     || విలువ_check_తాళం(l->lv_తాళం, arg_errmsg, TRUE))
+	తిరిగి;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;		// type error: do nothing, errmsg already given
+    idx = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[1], &error);
+    ఒకవేళ (error)
+	తిరిగి;		// type error: do nothing, errmsg already given
 
-    if ((item = list_find(l, idx)) == NULL)
+    ఒకవేళ ((అంశం = list_కనుగొను(l, idx)) == ఖాళీ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return;
+	semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), idx);
+	తిరిగి;
     }
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
-	vimlist_remove(l, item, item);
-	*rettv = item->li_tv;
-	list_free_item(l, item);
-	return;
+	vimlist_remove(l, అంశం, అంశం);
+	*rettv = అంశం->li_tv;
+	list_free_అంశం(l, అంశం);
+	తిరిగి;
     }
 
     // Remove range of items, return list with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error: do nothing
+    చివర = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[2], &error);
+    ఒకవేళ (error)
+	తిరిగి;		// type error: do nothing
 
-    if ((item2 = list_find(l, end)) == NULL)
+    ఒకవేళ ((item2 = list_కనుగొను(l, చివర)) == ఖాళీ)
     {
-	semsg(_(e_list_index_out_of_range_nr), end);
-	return;
+	semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), చివర);
+	తిరిగి;
     }
 
-    for (li = item; li != NULL; li = li->li_next)
+    కొరకు (li = అంశం; li != ఖాళీ; li = li->li_తదుపరి)
     {
 	++cnt;
-	if (li == item2)
-	    break;
+	ఒకవేళ (li == item2)
+	    ఆపు;
     }
-    if (li == NULL)  // didn't find "item2" after "item"
+    ఒకవేళ (li == ఖాళీ)  // didn't find "item2" after "item"
     {
 	emsg(_(e_invalid_range));
-	return;
+	తిరిగి;
     }
 
-    vimlist_remove(l, item, item2);
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    vimlist_remove(l, అంశం, item2);
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    ఒకవేళ (l->lv_with_వస్తువులు > 0)
     {
 	// need to copy the list items and move the value
-	while (item != NULL)
+	అయితే (అంశం != ఖాళీ)
 	{
 	    li = listitem_alloc();
-	    if (li == NULL)
-		return;
-	    li->li_tv = item->li_tv;
-	    init_tv(&item->li_tv);
+	    ఒకవేళ (li == ఖాళీ)
+		తిరిగి;
+	    li->li_tv = అంశం->li_tv;
+	    init_tv(&అంశం->li_tv);
 	    list_append(rl, li);
-	    if (item == item2)
-		break;
-	    item = item->li_next;
+	    ఒకవేళ (అంశం == item2)
+		ఆపు;
+	    అంశం = అంశం->li_తదుపరి;
 	}
     }
-    else
+    లేకపోతే
     {
-	rl->lv_first = item;
-	rl->lv_u.mat.lv_last = item2;
-	item->li_prev = NULL;
-	item2->li_next = NULL;
+	rl->lv_మొదటి = అంశం;
+	rl->lv_u.mat.lv_చివరి = item2;
+	అంశం->li_prev = ఖాళీ;
+	item2->li_తదుపరి = ఖాళీ;
 	rl->lv_len = cnt;
     }
 }
 
-static int item_compare(const void *s1, const void *s2);
-static int item_compare2(const void *s1, const void *s2);
+స్థిర పూర్ణాంకం అంశం_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2);
+స్థిర పూర్ణాంకం అంశం_compare2(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2);
 
 // struct used in the array that's given to qsort()
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    listitem_T	*item;
-    int		idx;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		idx;
     // Sort key precomputed once per item for the numeric compare modes.
     // Only valid when sortinfo->item_compare_keys_ready is set (the sort()
     // path); uniq() passes a bare listitem_T pointer and must not read this.
-    union {
+    సంఘం {
 	varnumber_T	inum;	// for "N"
-	double		fnum;	// for "n" and "f"
-    } key;
-} sortItem_T;
+	ద్విగుణ		fnum;	// for "n" and "f"
+    } కీలకం;
+} క్రమీకరించు_అంశం_T;
 
 // struct storing information about current sort
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int		item_compare_ic;
-    int		item_compare_lc;
-    int		item_compare_numeric;
-    int		item_compare_numbers;
-    int		item_compare_float;
-    char_u	*item_compare_func;
-    partial_T	*item_compare_partial;
-    dict_T	*item_compare_selfdict;
-    int		item_compare_func_err;
-    int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    పూర్ణాంకం		అంశం_compare_ic;
+    పూర్ణాంకం		అంశం_compare_lc;
+    పూర్ణాంకం		అంశం_compare_numeric;
+    పూర్ణాంకం		అంశం_compare_numbers;
+    పూర్ణాంకం		అంశం_compare_float;
+    char_u	*అంశం_compare_func;
+    partial_T	*అంశం_compare_partial;
+    dict_T	*అంశం_compare_selfdict;
+    పూర్ణాంకం		అంశం_compare_func_err;
+    పూర్ణాంకం		అంశం_compare_keep_zero;
+    పూర్ణాంకం		అంశం_compare_కీలకాలు_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
-static sortinfo_T	*sortinfo = NULL;
-#define ITEM_COMPARE_FAIL 999
+స్థిర sortinfo_T	*sortinfo = ఖాళీ;
+#నిర్వచించు అంశం_COMPARE_FAIL 999
 
 /*
  * Compare functions for f_sort() and f_uniq() below.
  */
-    static int
-item_compare(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+అంశం_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
-    sortItem_T  *si1, *si2;
+    క్రమీకరించు_అంశం_T  *si1, *si2;
     typval_T	*tv1, *tv2;
     char_u	*p1, *p2;
-    char_u	*tofree1 = NULL, *tofree2 = NULL;
-    int		res;
+    char_u	*tofree1 = ఖాళీ, *tofree2 = ఖాళీ;
+    పూర్ణాంకం		res;
     char_u	numbuf1[NUMBUFLEN];
     char_u	numbuf2[NUMBUFLEN];
 
-    si1 = (sortItem_T *)s1;
-    si2 = (sortItem_T *)s2;
-    tv1 = &si1->item->li_tv;
-    tv2 = &si2->item->li_tv;
+    si1 = (క్రమీకరించు_అంశం_T *)s1;
+    si2 = (క్రమీకరించు_అంశం_T *)s2;
+    tv1 = &si1->అంశం->li_tv;
+    tv2 = &si2->అంశం->li_tv;
 
-    if (sortinfo->item_compare_numbers)
+    ఒకవేళ (sortinfo->అంశం_compare_numbers)
     {
-	varnumber_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.inum : tv_to_number(tv1);
-	varnumber_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.inum : tv_to_number(tv2);
+	varnumber_T	v1 = sortinfo->అంశం_compare_కీలకాలు_ready
+					? si1->కీలకం.inum : tv_గమ్యం_సంఖ్య(tv1);
+	varnumber_T	v2 = sortinfo->అంశం_compare_కీలకాలు_ready
+					? si2->కీలకం.inum : tv_గమ్యం_సంఖ్య(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	తిరిగి v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_float)
+    ఒకవేళ (sortinfo->అంశం_compare_float)
     {
-	float_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.fnum : tv_get_float(tv1);
-	float_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.fnum : tv_get_float(tv2);
+	float_T	v1 = sortinfo->అంశం_compare_కీలకాలు_ready
+					? si1->కీలకం.fnum : tv_get_float(tv1);
+	float_T	v2 = sortinfo->అంశం_compare_కీలకాలు_ready
+					? si2->కీలకం.fnum : tv_get_float(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	తిరిగి v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    ఒకవేళ (sortinfo->అంశం_compare_numeric && sortinfo->అంశం_compare_కీలకాలు_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	ద్విగుణ	n1 = si1->కీలకం.fnum;
+	ద్విగుణ	n2 = si2->కీలకం.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
-	if (res == 0 && !sortinfo->item_compare_keep_zero)
+	ఒకవేళ (res == 0 && !sortinfo->అంశం_compare_keep_zero)
 	    res = si1->idx > si2->idx ? 1 : -1;
-	return res;
+	తిరిగి res;
     }
 
     // tv2string() puts quotes around a string and allocates memory.  Don't do
     // that for string variables. Use a single quote when comparing with a
     // non-string to do what the docs promise.
-    if (tv1->v_type == VAR_STRING)
+    ఒకవేళ (tv1->v_type == VAR_STRING)
     {
-	if (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ఒకవేళ (tv2->v_type != VAR_STRING || sortinfo->అంశం_compare_numeric)
 	    p1 = (char_u *)"'";
-	else
+	లేకపోతే
 	    p1 = tv1->vval.v_string;
     }
-    else
+    లేకపోతే
 	p1 = tv2string(tv1, &tofree1, numbuf1, 0);
-    if (tv2->v_type == VAR_STRING)
+    ఒకవేళ (tv2->v_type == VAR_STRING)
     {
-	if (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ఒకవేళ (tv1->v_type != VAR_STRING || sortinfo->అంశం_compare_numeric)
 	    p2 = (char_u *)"'";
-	else
+	లేకపోతే
 	    p2 = tv2->vval.v_string;
     }
-    else
+    లేకపోతే
 	p2 = tv2string(tv2, &tofree2, numbuf2, 0);
-    if (p1 == NULL)
+    ఒకవేళ (p1 == ఖాళీ)
 	p1 = (char_u *)"";
-    if (p2 == NULL)
+    ఒకవేళ (p2 == ఖాళీ)
 	p2 = (char_u *)"";
-    if (!sortinfo->item_compare_numeric)
+    ఒకవేళ (!sortinfo->అంశం_compare_numeric)
     {
-	if (sortinfo->item_compare_lc)
-	    res = strcoll((char *)p1, (char *)p2);
-	else
-	    res = sortinfo->item_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
+	ఒకవేళ (sortinfo->అంశం_compare_lc)
+	    res = strcoll((అక్షరం *)p1, (అక్షరం *)p2);
+	లేకపోతే
+	    res = sortinfo->అంశం_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
     }
-    else
+    లేకపోతే
     {
-	double n1, n2;
-	n1 = strtod((char *)p1, (char **)&p1);
-	n2 = strtod((char *)p2, (char **)&p2);
+	ద్విగుణ n1, n2;
+	n1 = strtod((అక్షరం *)p1, (అక్షరం **)&p1);
+	n2 = strtod((అక్షరం *)p2, (అక్షరం **)&p2);
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
     }
 
     // When the result would be zero, compare the item indexes.  Makes the
     // sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ఒకవేళ (res == 0 && !sortinfo->అంశం_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
     vim_free(tofree1);
     vim_free(tofree2);
-    return res;
+    తిరిగి res;
 }
 
-    static int
-item_compare2(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+అంశం_compare2(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
-    sortItem_T  *si1, *si2;
-    int		res;
+    క్రమీకరించు_అంశం_T  *si1, *si2;
+    పూర్ణాంకం		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	*func_name;
-    partial_T	*partial = sortinfo->item_compare_partial;
+    partial_T	*partial = sortinfo->అంశం_compare_partial;
     funcexe_T	funcexe;
-    int		did_emsg_before = did_emsg;
+    పూర్ణాంకం		did_emsg_before = did_emsg;
 
     // shortcut after failure in previous call; compare all items equal
-    if (sortinfo->item_compare_func_err)
-	return 0;
+    ఒకవేళ (sortinfo->అంశం_compare_func_err)
+	తిరిగి 0;
 
-    si1 = (sortItem_T *)s1;
-    si2 = (sortItem_T *)s2;
+    si1 = (క్రమీకరించు_అంశం_T *)s1;
+    si2 = (క్రమీకరించు_అంశం_T *)s2;
 
-    if (partial == NULL)
-	func_name = sortinfo->item_compare_func;
-    else
+    ఒకవేళ (partial == ఖాళీ)
+	func_name = sortinfo->అంశం_compare_func;
+    లేకపోతే
 	func_name = partial_name(partial);
 
     // Copy the values.  This is needed to be able to set v_lock to VAR_FIXED
     // in the copy without changing the original list items.
-    copy_tv(&si1->item->li_tv, &argv[0]);
-    copy_tv(&si2->item->li_tv, &argv[1]);
+    copy_tv(&si1->అంశం->li_tv, &argv[0]);
+    copy_tv(&si2->అంశం->li_tv, &argv[1]);
 
     rettv.v_type = VAR_UNKNOWN;		// clear_tv() uses this
-    CLEAR_FIELD(funcexe);
+    CLEAR_క్షేత్రం(funcexe);
     funcexe.fe_evaluate = TRUE;
     funcexe.fe_partial = partial;
-    funcexe.fe_selfdict = sortinfo->item_compare_selfdict;
+    funcexe.fe_selfdict = sortinfo->అంశం_compare_selfdict;
     res = call_func(func_name, -1, &rettv, 2, argv, &funcexe);
     clear_tv(&argv[0]);
     clear_tv(&argv[1]);
 
-    if (res == FAIL || did_emsg > did_emsg_before)
-	res = ITEM_COMPARE_FAIL;
-    else
+    ఒకవేళ (res == FAIL || did_emsg > did_emsg_before)
+	res = అంశం_COMPARE_FAIL;
+    లేకపోతే
     {
 	varnumber_T	n;
 
-	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
+	n = tv_get_సంఖ్య_chk(&rettv, &sortinfo->అంశం_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
-    if (sortinfo->item_compare_func_err)
-	res = ITEM_COMPARE_FAIL;  // return value has wrong type
+    ఒకవేళ (sortinfo->అంశం_compare_func_err)
+	res = అంశం_COMPARE_FAIL;  // return value has wrong type
     clear_tv(&rettv);
 
     // When the result would be zero, compare the pointers themselves.  Makes
     // the sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ఒకవేళ (res == 0 && !sortinfo->అంశం_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
-    return res;
+    తిరిగి res;
 }
 
 /*
  * Precompute the numeric sort key of each item.  Only for the builtin numeric
  * compare modes; each key is computed exactly as item_compare() would have.
  */
-    static void
-sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
+    స్థిర శూన్య
+క్రమీకరించు_compute_కీలకాలు(క్రమీకరించు_అంశం_T *ptrs, దీర్ఘ len, sortinfo_T *info)
 {
-    long	i;
+    దీర్ఘ	i;
 
-    if (info->item_compare_numbers)
+    ఒకవేళ (info->అంశం_compare_numbers)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
+	కొరకు (i = 0; i < len; ++i)
+	    ptrs[i].కీలకం.inum = tv_గమ్యం_సంఖ్య(&ptrs[i].అంశం->li_tv);
     }
-    else if (info->item_compare_float)
+    లేకపోతే ఒకవేళ (info->అంశం_compare_float)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
+	కొరకు (i = 0; i < len; ++i)
+	    ptrs[i].కీలకం.fnum = tv_get_float(&ptrs[i].అంశం->li_tv);
     }
-    else // info->item_compare_numeric
+    లేకపోతే // info->item_compare_numeric
     {
-	for (i = 0; i < len; ++i)
+	కొరకు (i = 0; i < len; ++i)
 	{
-	    typval_T	*tv = &ptrs[i].item->li_tv;
+	    typval_T	*tv = &ptrs[i].అంశం->li_tv;
 
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
-	    if (tv->v_type == VAR_STRING)
-		ptrs[i].key.fnum = 0.0;
-	    else
+	    ఒకవేళ (tv->v_type == VAR_STRING)
+		ptrs[i].కీలకం.fnum = 0.0;
+	    లేకపోతే
 	    {
 		char_u	numbuf[NUMBUFLEN];
-		char_u	*tofree = NULL;
+		char_u	*tofree = ఖాళీ;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].కీలకం.fnum = p == ఖాళీ ? 0.0 : strtod((అక్షరం *)p, ఖాళీ);
 		vim_free(tofree);
 	    }
 	}
     }
-    info->item_compare_keys_ready = TRUE;
+    info->అంశం_compare_కీలకాలు_ready = TRUE;
 }
 
 /*
  * sort() List "l"
  */
-    static void
-do_sort(list_T *l, sortinfo_T *info)
+    స్థిర శూన్య
+do_క్రమీకరించు(list_T *l, sortinfo_T *info)
 {
-    long	len;
-    sortItem_T	*ptrs;
-    long	i = 0;
+    దీర్ఘ	len;
+    క్రమీకరించు_అంశం_T	*ptrs;
+    దీర్ఘ	i = 0;
     listitem_T	*li;
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
-    ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(క్రమీకరించు_అంశం_T, len);
+    ఒకవేళ (ptrs == ఖాళీ)
+	తిరిగి;
 
     // sort(): ptrs will be the list to sort
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
-	ptrs[i].item = li;
+	ptrs[i].అంశం = li;
 	ptrs[i].idx = i;
 	++i;
     }
 
-    info->item_compare_func_err = FALSE;
-    info->item_compare_keep_zero = FALSE;
-    info->item_compare_keys_ready = FALSE;
+    info->అంశం_compare_func_err = FALSE;
+    info->అంశం_compare_keep_zero = FALSE;
+    info->అంశం_compare_కీలకాలు_ready = FALSE;
 
-    if (info->item_compare_func == NULL && info->item_compare_partial == NULL
-	    && (info->item_compare_numbers || info->item_compare_float
-						|| info->item_compare_numeric))
-	sort_compute_keys(ptrs, len, info);
+    ఒకవేళ (info->అంశం_compare_func == ఖాళీ && info->అంశం_compare_partial == ఖాళీ
+	    && (info->అంశం_compare_numbers || info->అంశం_compare_float
+						|| info->అంశం_compare_numeric))
+	క్రమీకరించు_compute_కీలకాలు(ptrs, len, info);
     // test the compare function
-    if ((info->item_compare_func != NULL
-		|| info->item_compare_partial != NULL)
-	    && item_compare2((void *)&ptrs[0], (void *)&ptrs[1])
-	    == ITEM_COMPARE_FAIL)
-	emsg(_(e_sort_compare_function_failed));
-    else
+    ఒకవేళ ((info->అంశం_compare_func != ఖాళీ
+		|| info->అంశం_compare_partial != ఖాళీ)
+	    && అంశం_compare2((శూన్య *)&ptrs[0], (శూన్య *)&ptrs[1])
+	    == అంశం_COMPARE_FAIL)
+	emsg(_(e_క్రమీకరించు_compare_function_failed));
+    లేకపోతే
     {
 	// Sort the array with item pointers.
-	qsort((void *)ptrs, (size_t)len, sizeof(sortItem_T),
-		info->item_compare_func == NULL
-		&& info->item_compare_partial == NULL
-		? item_compare : item_compare2);
+	qsort((శూన్య *)ptrs, (size_t)len, పరిమాణం(క్రమీకరించు_అంశం_T),
+		info->అంశం_compare_func == ఖాళీ
+		&& info->అంశం_compare_partial == ఖాళీ
+		? అంశం_compare : అంశం_compare2);
 
-	if (!info->item_compare_func_err)
+	ఒకవేళ (!info->అంశం_compare_func_err)
 	{
 	    // Clear the List and append the items in sorted order.
-	    l->lv_first = l->lv_u.mat.lv_last
-		= l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_మొదటి = l->lv_u.mat.lv_చివరి
+		= l->lv_u.mat.lv_idx_అంశం = ఖాళీ;
 	    l->lv_len = 0;
-	    for (i = 0; i < len; ++i)
-		list_append(l, ptrs[i].item);
+	    కొరకు (i = 0; i < len; ++i)
+		list_append(l, ptrs[i].అంశం);
 	}
     }
 
@@ -2384,52 +2384,52 @@ do_sort(list_T *l, sortinfo_T *info)
 /*
  * uniq() List "l"
  */
-    static void
+    స్థిర శూన్య
 do_uniq(list_T *l, sortinfo_T *info)
 {
-    long	len;
-    sortItem_T	*ptrs;
-    long	i = 0;
+    దీర్ఘ	len;
+    క్రమీకరించు_అంశం_T	*ptrs;
+    దీర్ఘ	i = 0;
     listitem_T	*li;
-    int	(*item_compare_func_ptr)(const void *, const void *);
+    పూర్ణాంకం	(*అంశం_compare_func_ptr)(స్థిరరాశి శూన్య *, స్థిరరాశి శూన్య *);
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
-    ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(క్రమీకరించు_అంశం_T, len);
+    ఒకవేళ (ptrs == ఖాళీ)
+	తిరిగి;
 
     // f_uniq(): ptrs will be a stack of items to remove
-    info->item_compare_func_err = FALSE;
-    info->item_compare_keep_zero = TRUE;
-    item_compare_func_ptr = info->item_compare_func != NULL
-	|| info->item_compare_partial != NULL
-	? item_compare2 : item_compare;
+    info->అంశం_compare_func_err = FALSE;
+    info->అంశం_compare_keep_zero = TRUE;
+    అంశం_compare_func_ptr = info->అంశం_compare_func != ఖాళీ
+	|| info->అంశం_compare_partial != ఖాళీ
+	? అంశం_compare2 : అంశం_compare;
 
-    for (li = l->lv_first; li != NULL && li->li_next != NULL;
-	    li = li->li_next)
+    కొరకు (li = l->lv_మొదటి; li != ఖాళీ && li->li_తదుపరి != ఖాళీ;
+	    li = li->li_తదుపరి)
     {
-	if (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
+	ఒకవేళ (అంశం_compare_func_ptr((శూన్య *)&li, (శూన్య *)&li->li_తదుపరి)
 		== 0)
-	    ptrs[i++].item = li;
-	if (info->item_compare_func_err)
+	    ptrs[i++].అంశం = li;
+	ఒకవేళ (info->అంశం_compare_func_err)
 	{
 	    emsg(_(e_uniq_compare_function_failed));
-	    break;
+	    ఆపు;
 	}
     }
 
-    if (!info->item_compare_func_err)
+    ఒకవేళ (!info->అంశం_compare_func_err)
     {
-	while (--i >= 0)
+	అయితే (--i >= 0)
 	{
-	    li = ptrs[i].item->li_next;
-	    ptrs[i].item->li_next = li->li_next;
-	    if (li->li_next != NULL)
-		li->li_next->li_prev = ptrs[i].item;
-	    else
-		l->lv_u.mat.lv_last = ptrs[i].item;
+	    li = ptrs[i].అంశం->li_తదుపరి;
+	    ptrs[i].అంశం->li_తదుపరి = li->li_తదుపరి;
+	    ఒకవేళ (li->li_తదుపరి != ఖాళీ)
+		li->li_తదుపరి->li_prev = ptrs[i].అంశం;
+	    లేకపోతే
+		l->lv_u.mat.lv_చివరి = ptrs[i].అంశం;
 	    list_fix_watch(l, li);
 	    listitem_free(l, li);
 	    l->lv_len--;
@@ -2443,118 +2443,118 @@ do_uniq(list_T *l, sortinfo_T *info)
  * Parse the optional arguments supplied to the sort() or uniq() function and
  * return the values in "info".
  */
-    static int
-parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
+    స్థిర పూర్ణాంకం
+parse_క్రమీకరించు_uniq_వాదనలు(typval_T *argvars, sortinfo_T *info)
 {
-    info->item_compare_ic = FALSE;
-    info->item_compare_lc = FALSE;
-    info->item_compare_numeric = FALSE;
-    info->item_compare_numbers = FALSE;
-    info->item_compare_float = FALSE;
-    info->item_compare_func = NULL;
-    info->item_compare_partial = NULL;
-    info->item_compare_selfdict = NULL;
-    info->item_compare_keys_ready = FALSE;
+    info->అంశం_compare_ic = FALSE;
+    info->అంశం_compare_lc = FALSE;
+    info->అంశం_compare_numeric = FALSE;
+    info->అంశం_compare_numbers = FALSE;
+    info->అంశం_compare_float = FALSE;
+    info->అంశం_compare_func = ఖాళీ;
+    info->అంశం_compare_partial = ఖాళీ;
+    info->అంశం_compare_selfdict = ఖాళీ;
+    info->అంశం_compare_కీలకాలు_ready = FALSE;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	return OK;
+    ఒకవేళ (argvars[1].v_type == VAR_UNKNOWN)
+	తిరిగి OK;
 
     // optional second argument: {func}
-    if (argvars[1].v_type == VAR_FUNC)
-	info->item_compare_func = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
-	info->item_compare_partial = argvars[1].vval.v_partial;
-    else
+    ఒకవేళ (argvars[1].v_type == VAR_FUNC)
+	info->అంశం_compare_func = argvars[1].vval.v_string;
+    లేకపోతే ఒకవేళ (argvars[1].v_type == VAR_PARTIAL)
+	info->అంశం_compare_partial = argvars[1].vval.v_partial;
+    లేకపోతే
     {
-	int	    error = FALSE;
-	int	    nr = 0;
+	పూర్ణాంకం	    error = FALSE;
+	పూర్ణాంకం	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	ఒకవేళ (argvars[1].v_type == VAR_సంఖ్య)
 	{
-	    nr = tv_get_number_chk(&argvars[1], &error);
-	    if (error)
-		return FAIL;
-	    if (nr == 1)
-		info->item_compare_ic = TRUE;
+	    nr = tv_get_సంఖ్య_chk(&argvars[1], &error);
+	    ఒకవేళ (error)
+		తిరిగి FAIL;
+	    ఒకవేళ (nr == 1)
+		info->అంశం_compare_ic = TRUE;
 	}
-	if (nr != 1)
+	ఒకవేళ (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
-		info->item_compare_func = tv_get_string(&argvars[1]);
-	    else if (nr != 0)
+	    ఒకవేళ (argvars[1].v_type != VAR_సంఖ్య)
+		info->అంశం_compare_func = tv_get_string(&argvars[1]);
+	    లేకపోతే ఒకవేళ (nr != 0)
 	    {
-		emsg(_(e_invalid_argument));
-		return FAIL;
+		emsg(_(e_invalid_వాదం));
+		తిరిగి FAIL;
 	    }
 	}
-	if (info->item_compare_func != NULL)
+	ఒకవేళ (info->అంశం_compare_func != ఖాళీ)
 	{
-	    if (*info->item_compare_func == NUL)
+	    ఒకవేళ (*info->అంశం_compare_func == NUL)
 	    {
 		// empty string means default sort
-		info->item_compare_func = NULL;
+		info->అంశం_compare_func = ఖాళీ;
 	    }
-	    else if (STRCMP(info->item_compare_func, "n") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(info->అంశం_compare_func, "n") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_numeric = TRUE;
+		info->అంశం_compare_func = ఖాళీ;
+		info->అంశం_compare_numeric = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "N") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(info->అంశం_compare_func, "N") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_numbers = TRUE;
+		info->అంశం_compare_func = ఖాళీ;
+		info->అంశం_compare_numbers = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "f") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(info->అంశం_compare_func, "f") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_float = TRUE;
+		info->అంశం_compare_func = ఖాళీ;
+		info->అంశం_compare_float = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "i") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(info->అంశం_compare_func, "i") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_ic = TRUE;
+		info->అంశం_compare_func = ఖాళీ;
+		info->అంశం_compare_ic = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "l") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(info->అంశం_compare_func, "l") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_lc = TRUE;
+		info->అంశం_compare_func = ఖాళీ;
+		info->అంశం_compare_lc = TRUE;
 	    }
 	}
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// optional third argument: {dict}
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return FAIL;
-	info->item_compare_selfdict = argvars[2].vval.v_dict;
+	ఒకవేళ (check_for_dict_arg(argvars, 2) == FAIL)
+	    తిరిగి FAIL;
+	info->అంశం_compare_selfdict = argvars[2].vval.v_dict;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * "sort()" or "uniq()" function
  */
-    static void
-do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
+    స్థిర శూన్య
+do_క్రమీకరించు_uniq(typval_T *argvars, typval_T *rettv, పూర్ణాంకం క్రమీకరించు)
 {
     list_T	*l;
     sortinfo_T	*old_sortinfo;
     sortinfo_T	info;
-    long	len;
+    దీర్ఘ	len;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_string_or_func_arg(argvars, 1) == FAIL
 			      || check_for_opt_dict_arg(argvars, 2) == FAIL))))
-	return;
+	తిరిగి;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ఒకవేళ (argvars[0].v_type != VAR_LIST)
     {
-	semsg(_(e_argument_of_str_must_be_list), sort ? "sort()" : "uniq()");
-	return;
+	semsg(_(e_వాదం_యొక్క_str_must_be_list), క్రమీకరించు ? "sort()" : "uniq()");
+	తిరిగి;
     }
 
     // Pointer to current info struct used in compare function. Save and
@@ -2563,25 +2563,25 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
-		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
+    ఒకవేళ (l != ఖాళీ && విలువ_check_తాళం(l->lv_తాళం,
+		(char_u *)(క్రమీకరించు ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
-	goto theend;
-    rettv_list_set(rettv, l);
-    if (l == NULL)
-	goto theend;
+	వెళ్ళు theend;
+    rettv_list_సమితి(rettv, l);
+    ఒకవేళ (l == ఖాళీ)
+	వెళ్ళు theend;
     CHECK_LIST_MATERIALIZE(l);
 
     len = list_len(l);
-    if (len <= 1)
-	goto theend;	// short list sorts pretty quickly
+    ఒకవేళ (len <= 1)
+	వెళ్ళు theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
-	goto theend;
+    ఒకవేళ (parse_క్రమీకరించు_uniq_వాదనలు(argvars, &info) == FAIL)
+	వెళ్ళు theend;
 
-    if (sort)
-	do_sort(l, &info);
-    else
+    ఒకవేళ (క్రమీకరించు)
+	do_క్రమీకరించు(l, &info);
+    లేకపోతే
 	do_uniq(l, &info);
 
 theend:
@@ -2591,240 +2591,240 @@ theend:
 /*
  * "sort({list})" function
  */
-    void
-f_sort(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_క్రమీకరించు(typval_T *argvars, typval_T *rettv)
 {
-    do_sort_uniq(argvars, rettv, TRUE);
+    do_క్రమీకరించు_uniq(argvars, rettv, TRUE);
 }
 
 /*
  * "uniq({list})" function
  */
-    void
+    శూన్య
 f_uniq(typval_T *argvars, typval_T *rettv)
 {
-    do_sort_uniq(argvars, rettv, FALSE);
+    do_క్రమీకరించు_uniq(argvars, rettv, FALSE);
 }
 
 /*
  * Handle one item for map(), filter(), foreach().
  * Sets v:val to "tv".  Caller must set v:key.
  */
-    int
+    పూర్ణాంకం
 filter_map_one(
 	typval_T	*tv,	    // original value
-	typval_T	*expr,	    // callback
+	typval_T	*సమాసం,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
-	int		*remp)	    // for filter(): remove flag
+	పూర్ణాంకం		*remp)	    // for filter(): remove flag
 {
     typval_T	argv[3];
-    int		retval = FAIL;
+    పూర్ణాంకం		retval = FAIL;
 
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    ఒకవేళ (filtermap == FILTERMAP_FOREACH && సమాసం->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
-	do_cmdline_cmd(expr->vval.v_string);
-	if (!did_emsg)
+	do_cmdline_cmd(సమాసం->vval.v_string);
+	ఒకవేళ (!did_emsg)
 	    retval = OK;
-	goto theend;
+	వెళ్ళు theend;
     }
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_కీలకం);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
-	goto theend;
-    if (filtermap == FILTERMAP_FILTER)
+    ఒకవేళ (eval_సమాసం_typval(సమాసం, FALSE, argv, 2, fc, newtv) == FAIL)
+	వెళ్ళు theend;
+    ఒకవేళ (filtermap == FILTERMAP_FILTER)
     {
-	int	    error = FALSE;
+	పూర్ణాంకం	    error = FALSE;
 
 	// filter(): when expr is zero remove the item
-	if (in_vim9script())
+	ఒకవేళ (లోపల_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
-	else
-	    *remp = (tv_get_number_chk(newtv, &error) == 0);
+	లేకపోతే
+	    *remp = (tv_get_సంఖ్య_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
-	if (error)
-	    goto theend;
+	ఒకవేళ (error)
+	    వెళ్ళు theend;
     }
-    else if (filtermap == FILTERMAP_FOREACH)
+    లేకపోతే ఒకవేళ (filtermap == FILTERMAP_FOREACH)
 	clear_tv(newtv);
     retval = OK;
 theend:
     clear_tv(get_vim_var_tv(VV_VAL));
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Implementation of map(), filter(), foreach() for a List.  Apply "expr" to
  * every item in List "l" and return the result in "rettv".
  */
-    static void
+    స్థిర శూన్య
 list_filter_map(
 	list_T		*l,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	అక్షరం		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*సమాసం,
 	typval_T	*rettv)
 {
-    int		prev_lock;
-    list_T	*l_ret = NULL;
-    int		idx = 0;
-    int		rem;
+    పూర్ణాంకం		prev_తాళం;
+    list_T	*l_ret = ఖాళీ;
+    పూర్ణాంకం		idx = 0;
+    పూర్ణాంకం		rem;
     listitem_T	*li, *nli;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ఒకవేళ (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_LIST;
-	rettv->vval.v_list = NULL;
+	rettv->vval.v_list = ఖాళీ;
     }
-    if (l == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
-	return;
+    ఒకవేళ (l == ఖాళీ || (filtermap == FILTERMAP_FILTER
+			    && విలువ_check_తాళం(l->lv_తాళం, arg_errmsg, TRUE)))
+	తిరిగి;
 
-    prev_lock = l->lv_lock;
+    prev_తాళం = l->lv_తాళం;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ఒకవేళ (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_list_alloc(rettv) == FAIL)
-	    return;
+	ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	    తిరిగి;
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    సమితి_vim_var_type(VV_కీలకం, VAR_సంఖ్య);
 
-    if (l->lv_lock == 0)
-	l->lv_lock = VAR_LOCKED;
+    ఒకవేళ (l->lv_తాళం == 0)
+	l->lv_తాళం = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_సమాసం_get_funccal(సమాసం, &newtv);
 
-    if (l->lv_first == &range_list_item)
+    ఒకవేళ (l->lv_మొదటి == &range_list_అంశం)
     {
-	varnumber_T	val = l->lv_u.nonmat.lv_start;
-	int		len = l->lv_len;
-	int		stride = l->lv_u.nonmat.lv_stride;
+	varnumber_T	val = l->lv_u.nonmat.lv_ప్రారంభం;
+	పూర్ణాంకం		len = l->lv_len;
+	పూర్ణాంకం		stride = l->lv_u.nonmat.lv_stride;
 
 	// List from range(): loop over the numbers
 	// NOTE: foreach() returns the range_list_item
-	if (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
+	ఒకవేళ (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
 	{
-	    l->lv_first = NULL;
-	    l->lv_u.mat.lv_last = NULL;
+	    l->lv_మొదటి = ఖాళీ;
+	    l->lv_u.mat.lv_చివరి = ఖాళీ;
 	    l->lv_len = 0;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_u.mat.lv_idx_అంశం = ఖాళీ;
 	}
 
-	for (idx = 0; idx < len; ++idx)
+	కొరకు (idx = 0; idx < len; ++idx)
 	{
 	    typval_T tv;
 
-	    tv.v_type = VAR_NUMBER;
-	    tv.v_lock = 0;
-	    tv.vval.v_number = val;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+	    tv.v_type = VAR_సంఖ్య;
+	    tv.v_తాళం = 0;
+	    tv.vval.v_సంఖ్య = val;
+	    సమితి_vim_var_nr(VV_కీలకం, idx);
+	    ఒకవేళ (filter_map_one(&tv, సమాసం, filtermap, fc, &newtv, &rem) == FAIL)
+		ఆపు;
+	    ఒకవేళ (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ఆపు;
 	    }
-	    if (filtermap != FILTERMAP_FOREACH)
+	    ఒకవేళ (filtermap != FILTERMAP_FOREACH)
 	    {
-		if (filtermap != FILTERMAP_FILTER)
+		ఒకవేళ (filtermap != FILTERMAP_FILTER)
 		{
-		    if (filtermap == FILTERMAP_MAP && argtype != NULL
+		    ఒకవేళ (filtermap == FILTERMAP_MAP && argtype != ఖాళీ
 			&& check_typval_arg_type(
 						 argtype->tt_member, &newtv,
 						 func_name, 0) == FAIL)
 		    {
 			clear_tv(&newtv);
-			break;
+			ఆపు;
 		    }
 		    // map(), mapnew(): always append the new value to the
 		    // list
-		    if (list_append_tv_move(filtermap == FILTERMAP_MAP
+		    ఒకవేళ (list_append_tv_move(filtermap == FILTERMAP_MAP
 					    ? l : l_ret, &newtv) == FAIL)
-			break;
+			ఆపు;
 		}
-		else if (!rem)
+		లేకపోతే ఒకవేళ (!rem)
 		{
 		    // filter(): append the list item value when not rem
-		    if (list_append_tv_move(l, &tv) == FAIL)
-			break;
+		    ఒకవేళ (list_append_tv_move(l, &tv) == FAIL)
+			ఆపు;
 		}
 	    }
 
 	    val += stride;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Materialized list: loop over the items
-	for (li = l->lv_first; li != NULL; li = nli)
+	కొరకు (li = l->lv_మొదటి; li != ఖాళీ; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
-			li->li_tv.v_lock, arg_errmsg, TRUE))
-		break;
-	    nli = li->li_next;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+	    ఒకవేళ (filtermap == FILTERMAP_MAP && విలువ_check_తాళం(
+			li->li_tv.v_తాళం, arg_errmsg, TRUE))
+		ఆపు;
+	    nli = li->li_తదుపరి;
+	    సమితి_vim_var_nr(VV_కీలకం, idx);
+	    ఒకవేళ (filter_map_one(&li->li_tv, సమాసం, filtermap, fc,
 							 &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+		ఆపు;
+	    ఒకవేళ (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ఆపు;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    ఒకవేళ (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		ఒకవేళ (argtype != ఖాళీ && check_typval_arg_type(
 			    argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    ఆపు;
 		}
 		// map(): replace the list item value
 		clear_tv(&li->li_tv);
-		newtv.v_lock = 0;
+		newtv.v_తాళం = 0;
 		li->li_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    లేకపోతే ఒకవేళ (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): append the list item value
-		if (list_append_tv_move(l_ret, &newtv) == FAIL)
-		    break;
+		ఒకవేళ (list_append_tv_move(l_ret, &newtv) == FAIL)
+		    ఆపు;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    లేకపోతే ఒకవేళ (filtermap == FILTERMAP_FILTER && rem)
 		    listitem_remove(l, li);
 	    ++idx;
 	}
     }
 
-    l->lv_lock = prev_lock;
-    if (fc != NULL)
+    l->lv_తాళం = prev_తాళం;
+    ఒకవేళ (fc != ఖాళీ)
 	remove_funccal();
 }
 
 /*
  * Implementation of map(), filter() and foreach().
  */
-    static void
+    స్థిర శూన్య
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
-    typval_T	*expr;
-    char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
+    typval_T	*సమాసం;
+    అక్షరం	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
 				  : "foreach()";
@@ -2835,84 +2835,84 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 				       : filtermap == FILTERMAP_FILTER
 						      ? N_("filter() argument")
 						   : N_("foreach() argument"));
-    int		save_did_emsg;
-    type_T	*type = NULL;
+    పూర్ణాంకం		save_did_emsg;
+    type_T	*type = ఖాళీ;
 
     // map(), filter(), foreach() return the first argument, also on failure.
-    if (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
+    ఒకవేళ (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
 	copy_tv(&argvars[0], rettv);
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_tuple_dict_blob_or_string_arg(argvars, 0)
 								== FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
+    ఒకవేళ (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
     {
 	semsg(_(e_cannot_use_tuple_with_function_str), func_name);
-	return;
+	తిరిగి;
     }
 
-    if (filtermap == FILTERMAP_MAP && in_vim9script())
+    ఒకవేళ (filtermap == FILTERMAP_MAP && లోపల_vim9script())
     {
 	// Check that map() does not change the declared type of the list or
 	// dict.
-	if (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
+	ఒకవేళ (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != ఖాళీ)
 	    type = argvars[0].vval.v_dict->dv_type;
-	else if (argvars[0].v_type == VAR_LIST
-					     && argvars[0].vval.v_list != NULL)
+	లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_LIST
+					     && argvars[0].vval.v_list != ఖాళీ)
 	    type = argvars[0].vval.v_list->lv_type;
     }
 
-    if (argvars[0].v_type != VAR_BLOB
+    ఒకవేళ (argvars[0].v_type != VAR_BLOB
 	    && argvars[0].v_type != VAR_LIST
 	    && argvars[0].v_type != VAR_TUPLE
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	అక్షరం *సందేశం;
 
-	if (filtermap == FILTERMAP_FOREACH)
-	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
-	else
-	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
-	semsg(_(msg), func_name);
-	return;
+	ఒకవేళ (filtermap == FILTERMAP_FOREACH)
+	    సందేశం = e_వాదం_యొక్క_str_must_be_list_tuple_string_dictionary_or_blob;
+	లేకపోతే
+	    సందేశం = e_వాదం_యొక్క_str_must_be_list_string_dictionary_or_blob;
+	semsg(_(సందేశం), func_name);
+	తిరిగి;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
-    expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
-	return;
+    సమాసం = &argvars[1];
+    ఒకవేళ (సమాసం->v_type == VAR_UNKNOWN)
+	తిరిగి;
 
     typval_T	save_val;
-    typval_T	save_key;
+    typval_T	save_కీలకం;
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_కీలకం, &save_కీలకం);
 
     // We reset "did_emsg" to be able to detect whether an error
     // occurred during evaluation of the expression.
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ఒకవేళ (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
+						      arg_errmsg, సమాసం, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_BLOB)
+	blob_filter_map(argvars[0].vval.v_blob, filtermap, సమాసం,
 							    arg_errmsg, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
-	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
-    else // argvars[0].v_type == VAR_LIST
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_STRING)
+	string_filter_map(tv_get_string(&argvars[0]), filtermap, సమాసం, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_TUPLE)
+	tuple_foreach(argvars[0].vval.v_tuple, filtermap, సమాసం);
+    లేకపోతే // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, సమాసం, rettv);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_కీలకం, &save_కీలకం);
     restore_vimvar(VV_VAL, &save_val);
 
     did_emsg |= save_did_emsg;
@@ -2921,7 +2921,7 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 /*
  * "filter()" function
  */
-    void
+    శూన్య
 f_filter(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FILTER);
@@ -2930,7 +2930,7 @@ f_filter(typval_T *argvars, typval_T *rettv)
 /*
  * "map()" function
  */
-    void
+    శూన్య
 f_map(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAP);
@@ -2939,7 +2939,7 @@ f_map(typval_T *argvars, typval_T *rettv)
 /*
  * "mapnew()" function
  */
-    void
+    శూన్య
 f_mapnew(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAPNEW);
@@ -2948,7 +2948,7 @@ f_mapnew(typval_T *argvars, typval_T *rettv)
 /*
  * "foreach()" function
  */
-    void
+    శూన్య
 f_foreach(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FOREACH);
@@ -2957,17 +2957,17 @@ f_foreach(typval_T *argvars, typval_T *rettv)
 /*
  * "add(list, item)" function
  */
-    static void
-list_add(typval_T *argvars, typval_T *rettv)
+    స్థిర శూన్య
+list_కూడు(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
 
-    if (l == NULL)
+    ఒకవేళ (l == ఖాళీ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_list));
+	ఒకవేళ (లోపల_vim9script())
+	    emsg(_(e_cannot_కూడు_గమ్యం_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    లేకపోతే ఒకవేళ (!విలువ_check_తాళం(l->lv_తాళం,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2978,22 +2978,22 @@ list_add(typval_T *argvars, typval_T *rettv)
 /*
  * "add(object, item)" function
  */
-    void
-f_add(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_కూడు(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = 1; // Default: Failed
+    rettv->vval.v_సంఖ్య = 1; // Default: Failed
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_సంఖ్య_arg(argvars, 1) == FAIL)))
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_LIST)
-	list_add(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_add(argvars, rettv);
-    else
+    ఒకవేళ (argvars[0].v_type == VAR_LIST)
+	list_కూడు(argvars, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_BLOB)
+	blob_కూడు(argvars, rettv);
+    లేకపోతే
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -3001,89 +3001,89 @@ f_add(typval_T *argvars, typval_T *rettv)
  * Count the number of times item "needle" occurs in List "l" starting at index
  * "idx". Case is ignored if "ic" is TRUE.
  */
-    static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+    స్థిర దీర్ఘ
+list_లెక్క(list_T *l, typval_T *needle, దీర్ఘ idx, పూర్ణాంకం ic)
 {
-    long	n = 0;
+    దీర్ఘ	n = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return 0;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి 0;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (list_len(l) == 0)
-	return 0;
+    ఒకవేళ (list_len(l) == 0)
+	తిరిగి 0;
 
-    li = list_find(l, idx);
-    if (li == NULL)
+    li = list_కనుగొను(l, idx);
+    ఒకవేళ (li == ఖాళీ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return 0;
+	semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), idx);
+	తిరిగి 0;
     }
 
-    for ( ; li != NULL; li = li->li_next)
-	if (tv_equal(&li->li_tv, needle, ic))
+    కొరకు ( ; li != ఖాళీ; li = li->li_తదుపరి)
+	ఒకవేళ (tv_equal(&li->li_tv, needle, ic))
 	    ++n;
 
-    return n;
+    తిరిగి n;
 }
 
 /*
  * "count()" function
  */
-    void
-f_count(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_లెక్క(typval_T *argvars, typval_T *rettv)
 {
-    long	n = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    దీర్ఘ	n = 0;
+    పూర్ణాంకం		ic = FALSE;
+    పూర్ణాంకం		error = FALSE;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+		    && check_for_opt_సంఖ్య_arg(argvars, 3) == FAIL)))
+	తిరిగి;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	ic = (int)tv_get_bool_chk(&argvars[2], &error);
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
+	ic = (పూర్ణాంకం)tv_get_bool_chk(&argvars[2], &error);
 
-    if (!error && argvars[0].v_type == VAR_STRING)
-	n = string_count(argvars[0].vval.v_string,
+    ఒకవేళ (!error && argvars[0].v_type == VAR_STRING)
+	n = string_లెక్క(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
-    else if (!error && argvars[0].v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (!error && argvars[0].v_type == VAR_LIST)
     {
-	long idx = 0;
+	దీర్ఘ idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
+	    idx = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[3], &error);
+	ఒకవేళ (!error)
+	    n = list_లెక్క(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_TUPLE)
+    లేకపోతే ఒకవేళ (!error && argvars[0].v_type == VAR_TUPLE)
     {
-	long idx = 0;
+	దీర్ఘ idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
+	    idx = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[3], &error);
+	ఒకవేళ (!error)
+	    n = tuple_లెక్క(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_DICT)
+    లేకపోతే ఒకవేళ (!error && argvars[0].v_type == VAR_DICT)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    emsg(_(e_invalid_argument));
-	else
-	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
+	    emsg(_(e_invalid_వాదం));
+	లేకపోతే
+	    n = dict_లెక్క(argvars[0].vval.v_dict, &argvars[1], ic);
     }
-    else if (!error)
-	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
+    లేకపోతే ఒకవేళ (!error)
+	semsg(_(e_వాదం_యొక్క_str_must_be_list_string_or_dictionary),
 								    "count()");
-    rettv->vval.v_number = n;
+    rettv->vval.v_సంఖ్య = n;
 }
 
 /*
@@ -3091,76 +3091,76 @@ f_count(typval_T *argvars, typval_T *rettv)
  * argvars[3] and return the resulting list in "rettv".  "is_new" is TRUE for
  * extendnew().
  */
-    static void
+    స్థిర శూన్య
 list_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	అక్షరం		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	పూర్ణాంకం		is_new,
 	typval_T	*rettv)
 {
     list_T	*l1, *l2;
-    listitem_T	*item;
-    long	before;
-    int		error = FALSE;
+    listitem_T	*అంశం;
+    దీర్ఘ	before;
+    పూర్ణాంకం		error = FALSE;
 
     l1 = argvars[0].vval.v_list;
-    if (l1 == NULL)
+    ఒకవేళ (l1 == ఖాళీ)
     {
 	emsg(_(e_cannot_extend_null_list));
-	return;
+	తిరిగి;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    ఒకవేళ (is_new || !విలువ_check_తాళం(l1->lv_తాళం, arg_errmsg, TRUE))
     {
-	if (is_new)
+	ఒకవేళ (is_new)
 	{
 	    l1 = list_copy(l1, FALSE, TRUE, get_copyID());
-	    if (l1 == NULL)
-		return;
+	    ఒకవేళ (l1 == ఖాళీ)
+		తిరిగి;
 	}
 
 	l2 = argvars[1].vval.v_list;
-	if (l2 == NULL)
-	    goto theend;
+	ఒకవేళ (l2 == ఖాళీ)
+	    వెళ్ళు theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		goto cleanup;		// type error; errmsg already given
-	    if (before == l1->lv_len)
-		item = NULL;
-	    else
+	    before = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[2], &error);
+	    ఒకవేళ (error)
+		వెళ్ళు cleanup;		// type error; errmsg already given
+	    ఒకవేళ (before == l1->lv_len)
+		అంశం = ఖాళీ;
+	    లేకపోతే
 	    {
-		item = list_find(l1, before);
-		if (item == NULL)
+		అంశం = list_కనుగొను(l1, before);
+		ఒకవేళ (అంశం == ఖాళీ)
 		{
-		    semsg(_(e_list_index_out_of_range_nr), before);
-		    goto cleanup;
+		    semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), before);
+		    వెళ్ళు cleanup;
 		}
 	    }
 	}
-	else
-	    item = NULL;
-	if (type != NULL && check_typval_arg_type(
+	లేకపోతే
+	    అంశం = ఖాళీ;
+	ఒకవేళ (type != ఖాళీ && check_typval_arg_type(
 		    type, &argvars[1], func_name, 2) == FAIL)
-	    goto cleanup;
-	list_extend(l1, l2, item);
+	    వెళ్ళు cleanup;
+	list_extend(l1, l2, అంశం);
 
 theend:
-	if (is_new)
+	ఒకవేళ (is_new)
 	{
 	    rettv->v_type = VAR_LIST;
 	    rettv->vval.v_list = l1;
-	    rettv->v_lock = FALSE;
+	    rettv->v_తాళం = FALSE;
 	}
-	else
+	లేకపోతే
 	    copy_tv(&argvars[0], rettv);
-	return;
+	తిరిగి;
 
 cleanup:
-	if (is_new)
+	ఒకవేళ (is_new)
 	    list_unref(l1);
     }
 }
@@ -3168,32 +3168,32 @@ cleanup:
 /*
  * "extend()" or "extendnew()" function.  "is_new" is TRUE for extendnew().
  */
-    static void
-extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
+    స్థిర శూన్య
+extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, పూర్ణాంకం is_new)
 {
-    type_T	*type = NULL;
-    char	*func_name = is_new ? "extendnew()" : "extend()";
+    type_T	*type = ఖాళీ;
+    అక్షరం	*func_name = is_new ? "extendnew()" : "extend()";
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
+    ఒకవేళ (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
     {
 	// Check that extend() does not change the type of the list if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
+	ఒకవేళ (!is_new && లోపల_vim9script() && argvars[0].vval.v_list != ఖాళీ)
 	    type = argvars[0].vval.v_list->lv_type;
 	list_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
     {
 	// Check that extend() does not change the type of the dict if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
+	ఒకవేళ (!is_new && లోపల_vim9script() && argvars[0].vval.v_dict != ఖాళీ)
 	    type = argvars[0].vval.v_dict->dv_type;
 	dict_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
 	blob_extend_func(argvars, arg_errmsg, is_new, rettv);
-    else
-	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), func_name);
+    లేకపోతే
+	semsg(_(e_వాదం_యొక్క_str_must_be_list_dictionary_or_blob), func_name);
 }
 
 /*
@@ -3201,7 +3201,7 @@ extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
  * "extend(dict, dict [, action])" function
  * "extend(blob, blob [, idx])" function
  */
-    void
+    శూన్య
 f_extend(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extend() argument");
@@ -3214,7 +3214,7 @@ f_extend(typval_T *argvars, typval_T *rettv)
  * "extendnew(dict, dict [, action])" function
  * "extendnew(blob, blob [, idx])" function
  */
-    void
+    శూన్య
 f_extendnew(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extendnew() argument");
@@ -3222,43 +3222,43 @@ f_extendnew(typval_T *argvars, typval_T *rettv)
     extend(argvars, rettv, errmsg, TRUE);
 }
 
-    static void
-list_insert_func(typval_T *argvars, typval_T *rettv)
+    స్థిర శూన్య
+list_చొప్పించు_func(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    long	before = 0;
-    listitem_T	*item;
-    int		error = FALSE;
+    దీర్ఘ	before = 0;
+    listitem_T	*అంశం;
+    పూర్ణాంకం		error = FALSE;
 
-    if (l == NULL)
+    ఒకవేళ (l == ఖాళీ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_list));
-	return;
+	ఒకవేళ (లోపల_vim9script())
+	    emsg(_(e_cannot_కూడు_గమ్యం_null_list));
+	తిరిగి;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    ఒకవేళ (విలువ_check_తాళం(l->lv_తాళం, (char_u *)N_("insert() argument"), TRUE))
+	తిరిగి;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	before = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error; errmsg already given
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
+	before = (దీర్ఘ)tv_get_సంఖ్య_chk(&argvars[2], &error);
+    ఒకవేళ (error)
+	తిరిగి;		// type error; errmsg already given
 
-    if (before == l->lv_len)
-	item = NULL;
-    else
+    ఒకవేళ (before == l->lv_len)
+	అంశం = ఖాళీ;
+    లేకపోతే
     {
-	item = list_find(l, before);
-	if (item == NULL)
+	అంశం = list_కనుగొను(l, before);
+	ఒకవేళ (అంశం == ఖాళీ)
 	{
-	    semsg(_(e_list_index_out_of_range_nr), before);
-	    l = NULL;
+	    semsg(_(e_list_సూచీ_బహిర్గతం_యొక్క_range_nr), before);
+	    l = ఖాళీ;
 	}
     }
-    if (l != NULL)
+    ఒకవేళ (l != ఖాళీ)
     {
-	(void)list_insert_tv(l, &argvars[1], item);
+	(శూన్య)list_చొప్పించు_tv(l, &argvars[1], అంశం);
 	copy_tv(&argvars[0], rettv);
     }
 }
@@ -3266,76 +3266,76 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
 /*
  * "insert()" function
  */
-    void
-f_insert(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_చొప్పించు(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		    && check_for_సంఖ్య_arg(argvars, 1) == FAIL)
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL))
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_insert_func(argvars, rettv);
-    else if (argvars[0].v_type != VAR_LIST)
-	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
-    else
-	list_insert_func(argvars, rettv);
+    ఒకవేళ (argvars[0].v_type == VAR_BLOB)
+	blob_చొప్పించు_func(argvars, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type != VAR_LIST)
+	semsg(_(e_వాదం_యొక్క_str_must_be_list_or_blob), "insert()");
+    లేకపోతే
+	list_చొప్పించు_func(argvars, rettv);
 }
 
 /*
  * "remove()" function
  */
-    void
+    శూన్య
 f_remove(typval_T *argvars, typval_T *rettv)
 {
     char_u	*arg_errmsg = (char_u *)N_("remove() argument");
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
-		    && (check_for_number_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && (check_for_సంఖ్య_arg(argvars, 1) == FAIL
+			|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
-		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_string_or_సంఖ్య_arg(argvars, 1) == FAIL)))
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ఒకవేళ (argvars[0].v_type == VAR_DICT)
 	dict_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_BLOB)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_BLOB)
 	blob_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_LIST)
 	list_remove(argvars, rettv, arg_errmsg);
-    else
-	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), "remove()");
+    లేకపోతే
+	semsg(_(e_వాదం_యొక్క_str_must_be_list_dictionary_or_blob), "remove()");
 }
 
-    static void
-list_reverse(list_T *l, typval_T *rettv)
+    స్థిర శూన్య
+list_తిరగేయి(list_T *l, typval_T *rettv)
 {
     listitem_T	*li, *ni;
 
-    rettv_list_set(rettv, l);
-    if (l != NULL
-	    && !value_check_lock(l->lv_lock,
+    rettv_list_సమితి(rettv, l);
+    ఒకవేళ (l != ఖాళీ
+	    && !విలువ_check_తాళం(l->lv_తాళం,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
-	if (l->lv_first == &range_list_item)
+	ఒకవేళ (l->lv_మొదటి == &range_list_అంశం)
 	{
-	    varnumber_T new_start = l->lv_u.nonmat.lv_start
+	    varnumber_T new_ప్రారంభం = l->lv_u.nonmat.lv_ప్రారంభం
 		+ ((varnumber_T)l->lv_len - 1) * l->lv_u.nonmat.lv_stride;
-	    l->lv_u.nonmat.lv_end = new_start
-		- (l->lv_u.nonmat.lv_end - l->lv_u.nonmat.lv_start);
-	    l->lv_u.nonmat.lv_start = new_start;
+	    l->lv_u.nonmat.lv_చివర = new_ప్రారంభం
+		- (l->lv_u.nonmat.lv_చివర - l->lv_u.nonmat.lv_ప్రారంభం);
+	    l->lv_u.nonmat.lv_ప్రారంభం = new_ప్రారంభం;
 	    l->lv_u.nonmat.lv_stride = -l->lv_u.nonmat.lv_stride;
-	    return;
+	    తిరిగి;
 	}
-	li = l->lv_u.mat.lv_last;
-	l->lv_first = l->lv_u.mat.lv_last = NULL;
+	li = l->lv_u.mat.lv_చివరి;
+	l->lv_మొదటి = l->lv_u.mat.lv_చివరి = ఖాళీ;
 	l->lv_len = 0;
-	while (li != NULL)
+	అయితే (li != ఖాళీ)
 	{
 	    ni = li->li_prev;
 	    list_append(l, li);
@@ -3348,26 +3348,26 @@ list_reverse(list_T *l, typval_T *rettv)
 /*
  * "reverse({list})" function
  */
-    void
-f_reverse(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_తిరగేయి(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_reverse(argvars[0].vval.v_blob, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ఒకవేళ (argvars[0].v_type == VAR_BLOB)
+	blob_తిరగేయి(argvars[0].vval.v_blob, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_STRING)
     {
 	rettv->v_type = VAR_STRING;
-	if (argvars[0].vval.v_string != NULL)
-	    rettv->vval.v_string = reverse_text(argvars[0].vval.v_string);
-	else
-	    rettv->vval.v_string = NULL;
+	ఒకవేళ (argvars[0].vval.v_string != ఖాళీ)
+	    rettv->vval.v_string = తిరగేయి_పాఠ్యం(argvars[0].vval.v_string);
+	లేకపోతే
+	    rettv->vval.v_string = ఖాళీ;
     }
-    else if (argvars[0].v_type == VAR_LIST)
-	list_reverse(argvars[0].vval.v_list, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_reverse(argvars[0].vval.v_tuple, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_LIST)
+	list_తిరగేయి(argvars[0].vval.v_list, rettv);
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_TUPLE)
+	tuple_తిరగేయి(argvars[0].vval.v_tuple, rettv);
 }
 
 /*
@@ -3375,100 +3375,100 @@ f_reverse(typval_T *argvars, typval_T *rettv)
  * starting with the optional initial value argvars[2] and return the result in
  * "rettv".
  */
-    static void
+    స్థిర శూన్య
 list_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*సమాసం,
 	typval_T	*rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    listitem_T  *li = NULL;
-    int		range_list;
-    int		range_idx = 0;
+    listitem_T  *li = ఖాళీ;
+    పూర్ణాంకం		range_list;
+    పూర్ణాంకం		range_idx = 0;
     varnumber_T	range_val = 0;
     typval_T	initial;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
-    int		prev_locked;
+    పూర్ణాంకం		r;
+    పూర్ణాంకం		called_emsg_ప్రారంభం = called_emsg;
+    పూర్ణాంకం		prev_locked;
     funccall_T	*fc;
 
     // Using reduce on a range() uses "range_idx" and "range_val".
-    range_list = l != NULL && l->lv_first == &range_list_item;
-    if (range_list)
-	range_val = l->lv_u.nonmat.lv_start;
+    range_list = l != ఖాళీ && l->lv_మొదటి == &range_list_అంశం;
+    ఒకవేళ (range_list)
+	range_val = l->lv_u.nonmat.lv_ప్రారంభం;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (l == NULL || l->lv_len == 0)
+	ఒకవేళ (l == ఖాళీ || l->lv_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
-	    return;
+	    semsg(_(e_reduce_యొక్క_an_ఖాళీలు_str_with_no_initial_విలువ), "List");
+	    తిరిగి;
 	}
-	if (range_list)
+	ఒకవేళ (range_list)
 	{
-	    initial.v_type = VAR_NUMBER;
-	    initial.vval.v_number = range_val;
+	    initial.v_type = VAR_సంఖ్య;
+	    initial.vval.v_సంఖ్య = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
-	else
+	లేకపోతే
 	{
-	    initial = l->lv_first->li_tv;
-	    li = l->lv_first->li_next;
+	    initial = l->lv_మొదటి->li_tv;
+	    li = l->lv_మొదటి->li_తదుపరి;
 	}
     }
-    else
+    లేకపోతే
     {
 	initial = argvars[2];
-	if (l != NULL && !range_list)
-	    li = l->lv_first;
+	ఒకవేళ (l != ఖాళీ && !range_list)
+	    li = l->lv_మొదటి;
     }
     copy_tv(&initial, rettv);
 
-    if (l == NULL)
-	return;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_సమాసం_get_funccal(సమాసం, rettv);
 
-    prev_locked = l->lv_lock;
-    l->lv_lock = VAR_FIXED;  // disallow the list changing here
+    prev_locked = l->lv_తాళం;
+    l->lv_తాళం = VAR_FIXED;  // disallow the list changing here
 
-    while (range_list ? range_idx < l->lv_len : li != NULL)
+    అయితే (range_list ? range_idx < l->lv_len : li != ఖాళీ)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	if (range_list)
+	ఒకవేళ (range_list)
 	{
-	    argv[1].v_type = VAR_NUMBER;
-	    argv[1].vval.v_number = range_val;
+	    argv[1].v_type = VAR_సంఖ్య;
+	    argv[1].vval.v_సంఖ్య = range_val;
 	}
-	else
+	లేకపోతే
 	    argv[1] = li->li_tv;
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_సమాసం_typval(సమాసం, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argv[0].v_type != VAR_సంఖ్య && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ఒకవేళ (r == FAIL || called_emsg != called_emsg_ప్రారంభం)
+	    ఆపు;
 
 	// advance to the next item
-	if (range_list)
+	ఒకవేళ (range_list)
 	{
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    ++range_idx;
 	}
-	else
-	    li = li->li_next;
+	లేకపోతే
+	    li = li->li_తదుపరి;
     }
 
-    if (fc != NULL)
+    ఒకవేళ (fc != ఖాళీ)
 	remove_funccal();
 
-    l->lv_lock = prev_locked;
+    l->lv_తాళం = prev_locked;
 }
 
 /*
@@ -3477,59 +3477,59 @@ list_reduce(
  * "reduce(blob, { accumulator, element -> value } [, initial])"
  * "reduce(string, { accumulator, element -> value } [, initial])"
  */
-    void
+    శూన్య
 f_reduce(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func_name;
 
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[1].v_type == VAR_FUNC)
+    ఒకవేళ (argvars[1].v_type == VAR_FUNC)
 	func_name = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    లేకపోతే ఒకవేళ (argvars[1].v_type == VAR_PARTIAL)
 	func_name = partial_name(argvars[1].vval.v_partial);
-    else
+    లేకపోతే
 	func_name = tv_get_string_strict(&argvars[1]);
-    if (func_name == NULL || *func_name == NUL)
+    ఒకవేళ (func_name == ఖాళీ || *func_name == NUL)
     {
-	emsg(_(e_missing_function_argument));
-	return;
+	emsg(_(e_missing_function_వాదం));
+	తిరిగి;
     }
 
-    if (argvars[0].v_type == VAR_LIST)
+    ఒకవేళ (argvars[0].v_type == VAR_LIST)
 	list_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_TUPLE)
 	tuple_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    లేకపోతే ఒకవేళ (argvars[0].v_type == VAR_STRING)
 	string_reduce(argvars, &argvars[1], rettv);
-    else
+    లేకపోతే
 	blob_reduce(argvars, &argvars[1], rettv);
 }
 
 /*
  * slice() function
  */
-    void
-f_slice(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_ముక్క(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && ((argvars[0].v_type != VAR_STRING
 		    && argvars[0].v_type != VAR_LIST
 		    && argvars[0].v_type != VAR_TUPLE
 		    && argvars[0].v_type != VAR_BLOB
 		    && check_for_list_arg(argvars, 0) == FAIL)
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL))
+	తిరిగి;
 
-    if (check_can_index(&argvars[0], TRUE, FALSE) != OK)
-	return;
+    ఒకవేళ (check_can_సూచీ(&argvars[0], TRUE, FALSE) != OK)
+	తిరిగి;
 
     copy_tv(argvars, rettv);
-    eval_index_inner(rettv, TRUE, argvars + 1,
-	    argvars[2].v_type == VAR_UNKNOWN ? NULL : argvars + 2,
-	    TRUE, NULL, 0, FALSE);
+    eval_సూచీ_inner(rettv, TRUE, argvars + 1,
+	    argvars[2].v_type == VAR_UNKNOWN ? ఖాళీ : argvars + 2,
+	    TRUE, ఖాళీ, 0, FALSE);
 }
 
-#endif // defined(FEAT_EVAL)
+#అయితే_ముగింపు // defined(FEAT_EVAL)

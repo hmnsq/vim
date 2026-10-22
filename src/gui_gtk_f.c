@@ -23,209 +23,209 @@
  * 2016  Kazunobu Kuriyama  <kazunobu.kuriyama@gmail.com>
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>	// without this it compiles, but gives errors at
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ <gtk/gtk.h>	// without this it compiles, but gives errors at
 			// runtime!
-#include "gui_gtk_f.h"
-#if !GTK_CHECK_VERSION(3,0,0)
+#అన్తర్భావ "gui_gtk_f.h"
+#ఒకవేళ !GTK_CHECK_సంస్కరణ(3,0,0)
 # include <gtk/gtksignal.h>
-#endif
-#ifdef MSWIN
+#అయితే_ముగింపు
+#నిర్వచితమైతే MSWIN
 # include <gdk/gdkwin32.h>
-#else
+#లేకపోతే
 # include <gdk/gdkx.h>
-#endif
+#అయితే_ముగింపు
 
-typedef struct _GtkFormChild GtkFormChild;
+రకనిర్వచనం నిర్మాణం Gtk_Form_బిడ్డ Gtk_Form_బిడ్డ_2;
 
-struct _GtkFormChild
+నిర్మాణం Gtk_Form_బిడ్డ
 {
     GtkWidget *widget;
-    GdkWindow *window;
+    Gdk_కిటికీ *కిటికీ_2;
     gint x;		// relative subwidget x position
     gint y;		// relative subwidget y position
     gint mapped;
 };
 
 
-static void gui_gtk_form_class_init(GtkFormClass *klass);
-#if GTK_CHECK_VERSION(3,0,0)
-static void gui_gtk_form_init(GtkForm *form);
-#else
-static void gui_gtk_form_init(GtkForm *form, void *g_class);
-#endif
+స్థిర శూన్య gui_gtk_form_class_init(GtkFormClass *klass);
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+స్థిర శూన్య gui_gtk_form_init(GtkForm *form);
+#లేకపోతే
+స్థిర శూన్య gui_gtk_form_init(GtkForm *form, శూన్య *g_class);
+#అయితే_ముగింపు
 
-static void form_realize(GtkWidget *widget);
-static void form_unrealize(GtkWidget *widget);
-static void form_map(GtkWidget *widget);
-static void form_size_request(GtkWidget *widget, GtkRequisition *requisition);
-#if GTK_CHECK_VERSION(3,0,0)
-static void form_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width);
-static void form_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height);
-#endif
-static void form_size_allocate(GtkWidget *widget, GtkAllocation *allocation);
-#if GTK_CHECK_VERSION(3,0,0)
-static gboolean form_draw(GtkWidget *widget, cairo_t *cr);
-#else
-static gint form_expose(GtkWidget *widget, GdkEventExpose *event);
-#endif
+స్థిర శూన్య form_realize(GtkWidget *widget);
+స్థిర శూన్య form_unrealize(GtkWidget *widget);
+స్థిర శూన్య form_map(GtkWidget *widget);
+స్థిర శూన్య form_కొలత_request(GtkWidget *widget, GtkRequisition *requisition);
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+స్థిర శూన్య form_get_preferred_వెడల్పు(GtkWidget *widget, gint *కనీస_వెడల్పు, gint *natural_వెడల్పు);
+స్థిర శూన్య form_get_preferred_ఎత్తు(GtkWidget *widget, gint *కనీస_ఎత్తు, gint *natural_ఎత్తు);
+#అయితే_ముగింపు
+స్థిర శూన్య form_కొలత_allocate(GtkWidget *widget, Gtk_కేటాయింపు *కేటాయింపు);
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+స్థిర gboolean form_draw(GtkWidget *widget, cairo_t *cr);
+#లేకపోతే
+స్థిర gint form_expose(GtkWidget *widget, GdkEventExpose *event);
+#అయితే_ముగింపు
 
-static void form_remove(GtkContainer *container, GtkWidget *widget);
-static void form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_data);
+స్థిర శూన్య form_remove(GtkContainer *container, GtkWidget *widget);
+స్థిర శూన్య form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_దత్తాంశం);
 
-static void form_attach_child_window(GtkForm *form, GtkFormChild *child);
-static void form_realize_child(GtkForm *form, GtkFormChild *child);
-static void form_position_child(GtkForm *form, GtkFormChild *child, gboolean force_allocate);
-static void form_position_children(GtkForm *form);
+స్థిర శూన్య form_attach_బిడ్డ_కిటికీ(GtkForm *form, Gtk_Form_బిడ్డ_2 *బిడ్డ);
+స్థిర శూన్య form_realize_బిడ్డ(GtkForm *form, Gtk_Form_బిడ్డ_2 *బిడ్డ);
+స్థిర శూన్య form_position_బిడ్డ(GtkForm *form, Gtk_Form_బిడ్డ_2 *బిడ్డ, gboolean force_allocate);
+స్థిర శూన్య form_position_children(GtkForm *form);
 
-static void form_send_configure(GtkForm *form);
+స్థిర శూన్య form_send_configure(GtkForm *form);
 
-static void form_child_map(GtkWidget *widget, gpointer user_data);
-static void form_child_unmap(GtkWidget *widget, gpointer user_data);
+స్థిర శూన్య form_బిడ్డ_map(GtkWidget *widget, gpointer user_దత్తాంశం);
+స్థిర శూన్య form_బిడ్డ_unmap(GtkWidget *widget, gpointer user_దత్తాంశం);
 
-#if !GTK_CHECK_VERSION(3,0,0)
-static GtkWidgetClass *parent_class = NULL;
-#endif
+#ఒకవేళ !GTK_CHECK_సంస్కరణ(3,0,0)
+స్థిర GtkWidgetClass *మాతృ_class = ఖాళీ;
+#అయితే_ముగింపు
 
 // Public interface
 
     GtkWidget *
-gui_gtk_form_new(void)
+gui_gtk_form_new(శూన్య)
 {
     GtkForm *form;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    form = g_object_new(GTK_TYPE_FORM, NULL);
-#else
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    form = g_object_new(GTK_TYPE_FORM, ఖాళీ);
+#లేకపోతే
     form = gtk_type_new(gui_gtk_form_get_type());
-#endif
+#అయితే_ముగింపు
 
-    return GTK_WIDGET(form);
+    తిరిగి GTK_WIDGET(form);
 }
 
-    void
+    శూన్య
 gui_gtk_form_put(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*బిడ్డ_widget,
 	gint	x,
 	gint	y)
 {
-    GtkFormChild *child;
+    Gtk_Form_బిడ్డ_2 *బిడ్డ;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
     // LINTED: avoid warning: conversion to 'unsigned long'
-    child = g_new(GtkFormChild, 1);
-    if (child == NULL)
-	return;
+    బిడ్డ = g_new(Gtk_Form_బిడ్డ_2, 1);
+    ఒకవేళ (బిడ్డ == ఖాళీ)
+	తిరిగి;
 
-    child->widget = child_widget;
-    child->window = NULL;
-    child->x = x;
-    child->y = y;
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(child->widget, -1, -1);
-#else
-    child->widget->requisition.width = 0;
-    child->widget->requisition.height = 0;
-#endif
-    child->mapped = FALSE;
+    బిడ్డ->widget = బిడ్డ_widget;
+    బిడ్డ->కిటికీ_2 = ఖాళీ;
+    బిడ్డ->x = x;
+    బిడ్డ->y = y;
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    gtk_widget_సమితి_కొలత_request(బిడ్డ->widget, -1, -1);
+#లేకపోతే
+    బిడ్డ->widget->requisition.వెడల్పు = 0;
+    బిడ్డ->widget->requisition.ఎత్తు = 0;
+#అయితే_ముగింపు
+    బిడ్డ->mapped = FALSE;
 
-    form->children = g_list_append(form->children, child);
+    form->children = g_list_append(form->children, బిడ్డ);
 
     // child->window must be created and attached to the widget _before_
     // it has been realized, or else things will break with GTK2.  Note
     // that gtk_widget_set_parent() realizes the widget if it's visible
     // and its parent is mapped.
-    if (gtk_widget_get_realized(GTK_WIDGET(form)))
-	form_attach_child_window(form, child);
+    ఒకవేళ (gtk_widget_get_realized(GTK_WIDGET(form)))
+	form_attach_బిడ్డ_కిటికీ(form, బిడ్డ);
 
-    gtk_widget_set_parent(child_widget, GTK_WIDGET(form));
+    gtk_widget_సమితి_మాతృ(బిడ్డ_widget, GTK_WIDGET(form));
 
-    if (gtk_widget_get_realized(GTK_WIDGET(form))
-	    && !gtk_widget_get_realized(child_widget))
-	form_realize_child(form, child);
+    ఒకవేళ (gtk_widget_get_realized(GTK_WIDGET(form))
+	    && !gtk_widget_get_realized(బిడ్డ_widget))
+	form_realize_బిడ్డ(form, బిడ్డ);
 
-    form_position_child(form, child, TRUE);
+    form_position_బిడ్డ(form, బిడ్డ, TRUE);
 }
 
-    void
+    శూన్య
 gui_gtk_form_move(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*బిడ్డ_widget,
 	gint	x,
 	gint	y)
 {
     GList *tmp_list;
-    GtkFormChild *child;
+    Gtk_Form_బిడ్డ_2 *బిడ్డ;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
     {
-	child = tmp_list->data;
-	if (child->widget == child_widget)
+	బిడ్డ = tmp_list->దత్తాంశం;
+	ఒకవేళ (బిడ్డ->widget == బిడ్డ_widget)
 	{
-	    child->x = x;
-	    child->y = y;
+	    బిడ్డ->x = x;
+	    బిడ్డ->y = y;
 
-	    form_position_child(form, child, TRUE);
-	    return;
+	    form_position_బిడ్డ(form, బిడ్డ, TRUE);
+	    తిరిగి;
 	}
     }
 }
 
-    void
+    శూన్య
 gui_gtk_form_freeze(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    ++form->freeze_count;
+    ++form->freeze_లెక్క;
 }
 
-    void
+    శూన్య
 gui_gtk_form_thaw(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    if (!form->freeze_count)
-	return;
+    ఒకవేళ (!form->freeze_లెక్క)
+	తిరిగి;
 
-    if (!(--form->freeze_count))
+    ఒకవేళ (!(--form->freeze_లెక్క))
     {
 	form_position_children(form);
-	gtk_widget_queue_draw(GTK_WIDGET(form));
+	gtk_widget_వరుస_draw(GTK_WIDGET(form));
     }
 }
 
 // Basic Object handling procedures
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
 G_DEFINE_TYPE(GtkForm, gui_gtk_form, GTK_TYPE_CONTAINER)
-#else
+#లేకపోతే
     GtkType
-gui_gtk_form_get_type(void)
+gui_gtk_form_get_type(శూన్య)
 {
-    static GtkType form_type = 0;
+    స్థిర GtkType form_type = 0;
 
-    if (!form_type)
+    ఒకవేళ (!form_type)
     {
 	GtkTypeInfo form_info;
 
-	CLEAR_FIELD(form_info);
+	CLEAR_క్షేత్రం(form_info);
 	form_info.type_name = "GtkForm";
-	form_info.object_size = sizeof(GtkForm);
-	form_info.class_size = sizeof(GtkFormClass);
+	form_info.object_కొలత = పరిమాణం(GtkForm);
+	form_info.class_కొలత = పరిమాణం(GtkFormClass);
 	form_info.class_init_func = (GtkClassInitFunc)gui_gtk_form_class_init;
 	form_info.object_init_func = (GtkObjectInitFunc)gui_gtk_form_init;
 
 	form_type = gtk_type_unique(GTK_TYPE_CONTAINER, &form_info);
     }
-    return form_type;
+    తిరిగి form_type;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#అయితే_ముగింపు // !GTK_CHECK_VERSION(3,0,0)
 
-    static void
+    స్థిర శూన్య
 gui_gtk_form_class_init(GtkFormClass *klass)
 {
     GtkWidgetClass *widget_class;
@@ -234,122 +234,122 @@ gui_gtk_form_class_init(GtkFormClass *klass)
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
-#if !GTK_CHECK_VERSION(3,0,0)
-    parent_class = gtk_type_class(gtk_container_get_type());
-#endif
+#ఒకవేళ !GTK_CHECK_సంస్కరణ(3,0,0)
+    మాతృ_class = gtk_type_class(gtk_container_get_type());
+#అయితే_ముగింపు
 
     widget_class->realize = form_realize;
     widget_class->unrealize = form_unrealize;
     widget_class->map = form_map;
-#if GTK_CHECK_VERSION(3,0,0)
-    widget_class->get_preferred_width = form_get_preferred_width;
-    widget_class->get_preferred_height = form_get_preferred_height;
-#else
-    widget_class->size_request = form_size_request;
-#endif
-    widget_class->size_allocate = form_size_allocate;
-#if GTK_CHECK_VERSION(3,0,0)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    widget_class->get_preferred_వెడల్పు = form_get_preferred_వెడల్పు;
+    widget_class->get_preferred_ఎత్తు = form_get_preferred_ఎత్తు;
+#లేకపోతే
+    widget_class->కొలత_request = form_కొలత_request;
+#అయితే_ముగింపు
+    widget_class->కొలత_allocate = form_కొలత_allocate;
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
     widget_class->draw = form_draw;
-#else
+#లేకపోతే
     widget_class->expose_event = form_expose;
-#endif
+#అయితే_ముగింపు
 
     container_class->remove = form_remove;
     container_class->forall = form_forall;
 }
 
-    static void
+    స్థిర శూన్య
 gui_gtk_form_init(GtkForm *form
-#if !GTK_CHECK_VERSION(3,0,0)
-	, void *g_class UNUSED
-#endif
+#ఒకవేళ !GTK_CHECK_సంస్కరణ(3,0,0)
+	, శూన్య *g_class వాడని
+#అయితే_ముగింపు
 	)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_has_window(GTK_WIDGET(form), TRUE);
-#endif
-    form->children = NULL;
-    form->bin_window = NULL;
-    form->freeze_count = 0;
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    gtk_widget_సమితి_has_కిటికీ(GTK_WIDGET(form), TRUE);
+#అయితే_ముగింపు
+    form->children = ఖాళీ;
+    form->bin_కిటికీ = ఖాళీ;
+    form->freeze_లెక్క = 0;
 }
 
 /*
  * Widget methods
  */
 
-    static void
+    స్థిర శూన్య
 form_realize(GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GdkWindowAttr attributes;
-    gint attributes_mask;
-    GtkAllocation allocation;
+    Gdk_కిటికీ_Attr లక్షణాలు;
+    gint లక్షణాలు_ముసుగు;
+    Gtk_కేటాయింపు కేటాయింపు;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
     form = GTK_FORM(widget);
-    gtk_widget_set_realized(widget, TRUE);
+    gtk_widget_సమితి_realized(widget, TRUE);
 
-    gtk_widget_get_allocation(widget, &allocation);
-    attributes.window_type = GDK_WINDOW_CHILD;
-    attributes.x = allocation.x;
-    attributes.y = allocation.y;
-    attributes.width = allocation.width;
-    attributes.height = allocation.height;
-    attributes.wclass = GDK_INPUT_OUTPUT;
-    attributes.visual = gtk_widget_get_visual(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes.event_mask = GDK_EXPOSURE_MASK;
-#else
-    attributes.colormap = gtk_widget_get_colormap(widget);
-    attributes.event_mask = GDK_VISIBILITY_NOTIFY_MASK;
-#endif
+    gtk_widget_get_కేటాయింపు(widget, &కేటాయింపు);
+    లక్షణాలు.కిటికీ_type = GDK_కిటికీ_బిడ్డ;
+    లక్షణాలు.x = కేటాయింపు.x;
+    లక్షణాలు.y = కేటాయింపు.y;
+    లక్షణాలు.వెడల్పు = కేటాయింపు.వెడల్పు;
+    లక్షణాలు.ఎత్తు = కేటాయింపు.ఎత్తు;
+    లక్షణాలు.wclass = GDK_ఆదానం_OUTPUT;
+    లక్షణాలు.visual = gtk_widget_get_visual(widget);
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    లక్షణాలు.event_ముసుగు = GDK_EXPOSURE_ముసుగు;
+#లేకపోతే
+    లక్షణాలు.colormap = gtk_widget_get_colormap(widget);
+    లక్షణాలు.event_ముసుగు = GDK_VISIBILITY_NOTIFY_ముసుగు;
+#అయితే_ముగింపు
 
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    లక్షణాలు_ముసుగు = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#లేకపోతే
+    లక్షణాలు_ముసుగు = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#అయితే_ముగింపు
 
-    gtk_widget_set_window(widget,
-			  gdk_window_new(gtk_widget_get_parent_window(widget),
-					 &attributes, attributes_mask));
-    gdk_window_set_user_data(gtk_widget_get_window(widget), widget);
+    gtk_widget_సమితి_కిటికీ(widget,
+			  gdk_కిటికీ_new(gtk_widget_get_మాతృ_కిటికీ(widget),
+					 &లక్షణాలు, లక్షణాలు_ముసుగు));
+    gdk_కిటికీ_సమితి_user_దత్తాంశం(gtk_widget_get_కిటికీ(widget), widget);
 
-    attributes.x = 0;
-    attributes.y = 0;
-    attributes.event_mask = gtk_widget_get_events(widget);
+    లక్షణాలు.x = 0;
+    లక్షణాలు.y = 0;
+    లక్షణాలు.event_ముసుగు = gtk_widget_get_events(widget);
 
-    form->bin_window = gdk_window_new(gtk_widget_get_window(widget),
-				      &attributes, attributes_mask);
-    gdk_window_set_user_data(form->bin_window, widget);
+    form->bin_కిటికీ = gdk_కిటికీ_new(gtk_widget_get_కిటికీ(widget),
+				      &లక్షణాలు, లక్షణాలు_ముసుగు);
+    gdk_కిటికీ_సమితి_user_దత్తాంశం(form->bin_కిటికీ, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
     {
-	GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	GtkStyleContext * స్థిరరాశి sctx = gtk_widget_get_style_context(widget);
 
-	gtk_style_context_add_class(sctx, "gtk-form");
-	gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	gtk_style_context_set_background(sctx, gtk_widget_get_window(widget));
-	gtk_style_context_set_background(sctx, form->bin_window);
+	gtk_style_context_కూడు_class(sctx, "gtk-form");
+	gtk_style_context_సమితి_state(sctx, GTK_STATE_FLAG_సాధారణ);
+# ఒకవేళ !GTK_CHECK_సంస్కరణ(3,18,0)
+	gtk_style_context_సమితి_background(sctx, gtk_widget_get_కిటికీ(widget));
+	gtk_style_context_సమితి_background(sctx, form->bin_కిటికీ);
 # endif
     }
-#else
-    widget->style = gtk_style_attach(widget->style, widget->window);
-    gtk_style_set_background(widget->style, widget->window, GTK_STATE_NORMAL);
-    gtk_style_set_background(widget->style, form->bin_window, GTK_STATE_NORMAL);
-#endif
+#లేకపోతే
+    widget->style = gtk_style_attach(widget->style, widget->కిటికీ_2);
+    gtk_style_సమితి_background(widget->style, widget->కిటికీ_2, GTK_STATE_సాధారణ);
+    gtk_style_సమితి_background(widget->style, form->bin_కిటికీ, GTK_STATE_సాధారణ);
+#అయితే_ముగింపు
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_బిడ్డ_2 *బిడ్డ = tmp_list->దత్తాంశం;
 
-	form_attach_child_window(form, child);
+	form_attach_బిడ్డ_కిటికీ(form, బిడ్డ);
 
-	if (gtk_widget_get_visible(child->widget))
-	    form_realize_child(form, child);
+	ఒకవేళ (gtk_widget_get_visible(బిడ్డ->widget))
+	    form_realize_బిడ్డ(form, బిడ్డ);
     }
 }
 
@@ -361,7 +361,7 @@ form_realize(GtkWidget *widget)
 //
 // Well, I reckon at least the gdk_window_show(form->bin_window)
 // is necessary.  GtkForm is anything but a usual container widget.
-    static void
+    స్థిర శూన్య
 form_map(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -371,22 +371,22 @@ form_map(GtkWidget *widget)
 
     form = GTK_FORM(widget);
 
-    gtk_widget_set_mapped(widget, TRUE);
+    gtk_widget_సమితి_mapped(widget, TRUE);
 
-    gdk_window_show(gtk_widget_get_window(widget));
-    gdk_window_show(form->bin_window);
+    gdk_కిటికీ_show(gtk_widget_get_కిటికీ(widget));
+    gdk_కిటికీ_show(form->bin_కిటికీ);
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_బిడ్డ_2 *బిడ్డ = tmp_list->దత్తాంశం;
 
-	if (gtk_widget_get_visible(child->widget)
-		&& !gtk_widget_get_mapped(child->widget))
-	    gtk_widget_map(child->widget);
+	ఒకవేళ (gtk_widget_get_visible(బిడ్డ->widget)
+		&& !gtk_widget_get_mapped(బిడ్డ->widget))
+	    gtk_widget_map(బిడ్డ->widget);
     }
 }
 
-    static void
+    స్థిర శూన్య
 form_unrealize(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -398,155 +398,155 @@ form_unrealize(GtkWidget *widget)
 
     tmp_list = form->children;
 
-    gdk_window_set_user_data(form->bin_window, NULL);
-    gdk_window_destroy(form->bin_window);
-    form->bin_window = NULL;
+    gdk_కిటికీ_సమితి_user_దత్తాంశం(form->bin_కిటికీ, ఖాళీ);
+    gdk_కిటికీ_destroy(form->bin_కిటికీ);
+    form->bin_కిటికీ = ఖాళీ;
 
-    while (tmp_list)
+    అయితే (tmp_list)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_బిడ్డ_2 *బిడ్డ = tmp_list->దత్తాంశం;
 
-	if (child->window != NULL)
+	ఒకవేళ (బిడ్డ->కిటికీ_2 != ఖాళీ)
 	{
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_map),
-		    child);
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_unmap),
-		    child);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(బిడ్డ->widget),
+		    FUNC2GENERIC(form_బిడ్డ_map),
+		    బిడ్డ);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(బిడ్డ->widget),
+		    FUNC2GENERIC(form_బిడ్డ_unmap),
+		    బిడ్డ);
 
-	    gdk_window_set_user_data(child->window, NULL);
-	    gdk_window_destroy(child->window);
+	    gdk_కిటికీ_సమితి_user_దత్తాంశం(బిడ్డ->కిటికీ_2, ఖాళీ);
+	    gdk_కిటికీ_destroy(బిడ్డ->కిటికీ_2);
 
-	    child->window = NULL;
+	    బిడ్డ->కిటికీ_2 = ఖాళీ;
 	}
 
-	tmp_list = tmp_list->next;
+	tmp_list = tmp_list->తదుపరి;
     }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize) (widget);
-#else
-    if (GTK_WIDGET_CLASS (parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
-#endif
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    ఒకవేళ (GTK_WIDGET_CLASS (gui_gtk_form_మాతృ_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (gui_gtk_form_మాతృ_class)->unrealize) (widget);
+#లేకపోతే
+    ఒకవేళ (GTK_WIDGET_CLASS (మాతృ_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (మాతృ_class)->unrealize) (widget);
+#అయితే_ముగింపు
 }
 
-    static void
-form_size_request(GtkWidget *widget, GtkRequisition *requisition)
+    స్థిర శూన్య
+form_కొలత_request(GtkWidget *widget, GtkRequisition *requisition)
 {
     g_return_if_fail(GTK_IS_FORM(widget));
-    g_return_if_fail(requisition != NULL);
+    g_return_if_fail(requisition != ఖాళీ);
 
-    requisition->width = 1;
-    requisition->height = 1;
+    requisition->వెడల్పు = 1;
+    requisition->ఎత్తు = 1;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-form_get_preferred_width(GtkWidget *widget,
-			     gint      *minimal_width,
-			     gint      *natural_width)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    స్థిర శూన్య
+form_get_preferred_వెడల్పు(GtkWidget *widget,
+			     gint      *కనీస_వెడల్పు,
+			     gint      *natural_వెడల్పు)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_కొలత_request(widget, &requisition);
 
-    *minimal_width = requisition.width;
-    *natural_width = requisition.width;
+    *కనీస_వెడల్పు = requisition.వెడల్పు;
+    *natural_వెడల్పు = requisition.వెడల్పు;
 }
 
-    static void
-form_get_preferred_height(GtkWidget *widget,
-			      gint	*minimal_height,
-			      gint	*natural_height)
+    స్థిర శూన్య
+form_get_preferred_ఎత్తు(GtkWidget *widget,
+			      gint	*కనీస_ఎత్తు,
+			      gint	*natural_ఎత్తు)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_కొలత_request(widget, &requisition);
 
-    *minimal_height = requisition.height;
-    *natural_height = requisition.height;
+    *కనీస_ఎత్తు = requisition.ఎత్తు;
+    *natural_ఎత్తు = requisition.ఎత్తు;
 }
-#endif // GTK_CHECK_VERSION(3,0,0)
+#అయితే_ముగింపు // GTK_CHECK_VERSION(3,0,0)
 
-    static void
-form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+    స్థిర శూన్య
+form_కొలత_allocate(GtkWidget *widget, Gtk_కేటాయింపు *కేటాయింపు)
 {
     GList *tmp_list;
     GtkForm *form;
     gboolean need_reposition;
-    GtkAllocation cur_alloc;
+    Gtk_కేటాయింపు cur_alloc;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
-    gtk_widget_get_allocation(widget, &cur_alloc);
+    gtk_widget_get_కేటాయింపు(widget, &cur_alloc);
 
-    if (cur_alloc.x == allocation->x
-	    && cur_alloc.y == allocation->y
-	    && cur_alloc.width == allocation->width
-	    && cur_alloc.height == allocation->height)
-	return;
+    ఒకవేళ (cur_alloc.x == కేటాయింపు->x
+	    && cur_alloc.y == కేటాయింపు->y
+	    && cur_alloc.వెడల్పు == కేటాయింపు->వెడల్పు
+	    && cur_alloc.ఎత్తు == కేటాయింపు->ఎత్తు)
+	తిరిగి;
 
-    need_reposition = cur_alloc.width != allocation->width
-		   || cur_alloc.height != allocation->height;
+    need_reposition = cur_alloc.వెడల్పు != కేటాయింపు->వెడల్పు
+		   || cur_alloc.ఎత్తు != కేటాయింపు->ఎత్తు;
     form = GTK_FORM(widget);
 
-    if (need_reposition)
+    ఒకవేళ (need_reposition)
     {
 	tmp_list = form->children;
 
-	while (tmp_list)
+	అయితే (tmp_list)
 	{
-	    GtkFormChild *child = tmp_list->data;
-	    form_position_child(form, child, TRUE);
+	    Gtk_Form_బిడ్డ_2 *బిడ్డ = tmp_list->దత్తాంశం;
+	    form_position_బిడ్డ(form, బిడ్డ, TRUE);
 
-	    tmp_list = tmp_list->next;
+	    tmp_list = tmp_list->తదుపరి;
 	}
     }
 
-    if (gtk_widget_get_realized(widget))
+    ఒకవేళ (gtk_widget_get_realized(widget))
     {
-	gdk_window_move_resize(gtk_widget_get_window(widget),
-			       allocation->x, allocation->y,
-			       allocation->width, allocation->height);
-	gdk_window_move_resize(GTK_FORM(widget)->bin_window,
+	gdk_కిటికీ_move_resize(gtk_widget_get_కిటికీ(widget),
+			       కేటాయింపు->x, కేటాయింపు->y,
+			       కేటాయింపు->వెడల్పు, కేటాయింపు->ఎత్తు);
+	gdk_కిటికీ_move_resize(GTK_FORM(widget)->bin_కిటికీ,
 			       0, 0,
-			       allocation->width, allocation->height);
+			       కేటాయింపు->వెడల్పు, కేటాయింపు->ఎత్తు);
     }
-    gtk_widget_set_allocation(widget, allocation);
-    if (need_reposition)
+    gtk_widget_సమితి_కేటాయింపు(widget, కేటాయింపు);
+    ఒకవేళ (need_reposition)
 	form_send_configure(form);
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    స్థిర శూన్య
 gtk_form_render_background(GtkWidget *widget, cairo_t *cr)
 {
     gtk_render_background(gtk_widget_get_style_context(widget), cr,
 			  0, 0,
-			  gtk_widget_get_allocated_width(widget),
-			  gtk_widget_get_allocated_height(widget));
+			  gtk_widget_get_allocated_వెడల్పు(widget),
+			  gtk_widget_get_allocated_ఎత్తు(widget));
 }
 
-    static gboolean
+    స్థిర gboolean
 form_draw(GtkWidget *widget, cairo_t *cr)
 {
-    GList   *tmp_list = NULL;
-    GtkForm *form     = NULL;
+    GList   *tmp_list = ఖాళీ;
+    GtkForm *form     = ఖాళీ;
 
     g_return_val_if_fail(GTK_IS_FORM(widget), FALSE);
 
     gtk_form_render_background(widget, cr);
 
     form = GTK_FORM(widget);
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
     {
-	GtkFormChild * const formchild = tmp_list->data;
+	Gtk_Form_బిడ్డ_2 * స్థిరరాశి formchild = tmp_list->దత్తాంశం;
 
-	if (!gtk_widget_get_has_window(formchild->widget) &&
-		gtk_cairo_should_draw_window(cr, formchild->window))
+	ఒకవేళ (!gtk_widget_get_has_కిటికీ(formchild->widget) &&
+		gtk_cairo_should_draw_కిటికీ(cr, formchild->కిటికీ_2))
 	{
 	    // To get gtk_widget_draw() to work, it is required to call
 	    // gtk_widget_size_allocate() in advance with a well-posed
@@ -558,16 +558,16 @@ form_draw(GtkWidget *widget, cairo_t *cr)
 	    //
 	    // Calling form_position_child() like this is one of ways
 	    // to make sure of that.
-	    form_position_child(form, formchild, TRUE);
+	    form_position_బిడ్డ(form, formchild, TRUE);
 
 	    gtk_form_render_background(formchild->widget, cr);
 	}
     }
 
-    return GTK_WIDGET_CLASS(gui_gtk_form_parent_class)->draw(widget, cr);
+    తిరిగి GTK_WIDGET_CLASS(gui_gtk_form_మాతృ_class)->draw(widget, cr);
 }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    static gint
+#లేకపోతే // !GTK_CHECK_VERSION(3,0,0)
+    స్థిర gint
 form_expose(GtkWidget *widget, GdkEventExpose *event)
 {
     GList   *tmp_list;
@@ -577,310 +577,310 @@ form_expose(GtkWidget *widget, GdkEventExpose *event)
 
     form = GTK_FORM(widget);
 
-    if (event->window == form->bin_window)
-	return FALSE;
+    ఒకవేళ (event->కిటికీ_2 == form->bin_కిటికీ)
+	తిరిగి FALSE;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
 	gtk_container_propagate_expose(GTK_CONTAINER(widget),
-		GTK_WIDGET(((GtkFormChild *)tmp_list->data)->widget),
+		GTK_WIDGET(((Gtk_Form_బిడ్డ_2 *)tmp_list->దత్తాంశం)->widget),
 		event);
 
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#అయితే_ముగింపు // !GTK_CHECK_VERSION(3,0,0)
 
 // Container method
-    static void
+    స్థిర శూన్య
 form_remove(GtkContainer *container, GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GtkFormChild *child = NULL;	    // init for gcc
+    Gtk_Form_బిడ్డ_2 *బిడ్డ = ఖాళీ;	    // init for gcc
 
     g_return_if_fail(GTK_IS_FORM(container));
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    అయితే (tmp_list)
     {
-	child = tmp_list->data;
-	if (child->widget == widget)
-	    break;
-	tmp_list = tmp_list->next;
+	బిడ్డ = tmp_list->దత్తాంశం;
+	ఒకవేళ (బిడ్డ->widget == widget)
+	    ఆపు;
+	tmp_list = tmp_list->తదుపరి;
     }
 
-    if (tmp_list == NULL)
-	return;
+    ఒకవేళ (tmp_list == ఖాళీ)
+	తిరిగి;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    const gboolean was_visible = gtk_widget_get_visible(widget);
-#endif
-    if (child->window)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    స్థిరరాశి gboolean was_visible = gtk_widget_get_visible(widget);
+#అయితే_ముగింపు
+    ఒకవేళ (బిడ్డ->కిటికీ_2)
     {
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_map), child);
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_unmap), child);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(బిడ్డ->widget),
+		FUNC2GENERIC(&form_బిడ్డ_map), బిడ్డ);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(బిడ్డ->widget),
+		FUNC2GENERIC(&form_బిడ్డ_unmap), బిడ్డ);
 
 	// FIXME: This will cause problems for reparenting NO_WINDOW
 	// widgets out of a GtkForm
-	gdk_window_set_user_data(child->window, NULL);
-	gdk_window_destroy(child->window);
+	gdk_కిటికీ_సమితి_user_దత్తాంశం(బిడ్డ->కిటికీ_2, ఖాళీ);
+	gdk_కిటికీ_destroy(బిడ్డ->కిటికీ_2);
     }
     gtk_widget_unparent(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    if (was_visible)
-	gtk_widget_queue_resize(GTK_WIDGET(container));
-#endif
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    ఒకవేళ (was_visible)
+	gtk_widget_వరుస_resize(GTK_WIDGET(container));
+#అయితే_ముగింపు
     form->children = g_list_remove_link(form->children, tmp_list);
     g_list_free_1(tmp_list);
-    g_free(child);
+    g_free(బిడ్డ);
 }
 
-    static void
+    స్థిర శూన్య
 form_forall(GtkContainer	*container,
-		gboolean	include_internals UNUSED,
+		gboolean	include_internals వాడని,
 		GtkCallback	callback,
-		gpointer	callback_data)
+		gpointer	callback_దత్తాంశం)
 {
     GtkForm *form;
-    GtkFormChild *child;
+    Gtk_Form_బిడ్డ_2 *బిడ్డ;
     GList *tmp_list;
 
     g_return_if_fail(GTK_IS_FORM(container));
-    g_return_if_fail(callback != NULL);
+    g_return_if_fail(callback != ఖాళీ);
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    అయితే (tmp_list)
     {
-	child = tmp_list->data;
-	tmp_list = tmp_list->next;
+	బిడ్డ = tmp_list->దత్తాంశం;
+	tmp_list = tmp_list->తదుపరి;
 
-	(*callback) (child->widget, callback_data);
+	(*callback) (బిడ్డ->widget, callback_దత్తాంశం);
     }
 }
 
 // Operations on children
 
-    static void
-form_attach_child_window(GtkForm *form, GtkFormChild *child)
+    స్థిర శూన్య
+form_attach_బిడ్డ_కిటికీ(GtkForm *form, Gtk_Form_బిడ్డ_2 *బిడ్డ)
 {
-    if (child->window != NULL)
-	return; // been there, done that
+    ఒకవేళ (బిడ్డ->కిటికీ_2 != ఖాళీ)
+	తిరిగి; // been there, done that
 
-    if (!gtk_widget_get_has_window(child->widget))
+    ఒకవేళ (!gtk_widget_get_has_కిటికీ(బిడ్డ->widget))
     {
 	GtkWidget	*widget;
-	GdkWindowAttr	attributes;
-	gint		attributes_mask;
+	Gdk_కిటికీ_Attr	లక్షణాలు;
+	gint		లక్షణాలు_ముసుగు;
 	GtkRequisition	requisition;
 
 	widget = GTK_WIDGET(form);
 
-#if GTK_CHECK_VERSION(3,0,0)
-	gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	requisition = child->widget->requisition;
-#endif
-	attributes.window_type = GDK_WINDOW_CHILD;
-	attributes.x = child->x;
-	attributes.y = child->y;
-	attributes.width = requisition.width;
-	attributes.height = requisition.height;
-	attributes.wclass = GDK_INPUT_OUTPUT;
-	attributes.visual = gtk_widget_get_visual(widget);
-#if !GTK_CHECK_VERSION(3,0,0)
-	attributes.colormap = gtk_widget_get_colormap(widget);
-#endif
-	attributes.event_mask = GDK_EXPOSURE_MASK;
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+	gtk_widget_get_preferred_కొలత(బిడ్డ->widget, &requisition, ఖాళీ);
+#లేకపోతే
+	requisition = బిడ్డ->widget->requisition;
+#అయితే_ముగింపు
+	లక్షణాలు.కిటికీ_type = GDK_కిటికీ_బిడ్డ;
+	లక్షణాలు.x = బిడ్డ->x;
+	లక్షణాలు.y = బిడ్డ->y;
+	లక్షణాలు.వెడల్పు = requisition.వెడల్పు;
+	లక్షణాలు.ఎత్తు = requisition.ఎత్తు;
+	లక్షణాలు.wclass = GDK_ఆదానం_OUTPUT;
+	లక్షణాలు.visual = gtk_widget_get_visual(widget);
+#ఒకవేళ !GTK_CHECK_సంస్కరణ(3,0,0)
+	లక్షణాలు.colormap = gtk_widget_get_colormap(widget);
+#అయితే_ముగింపు
+	లక్షణాలు.event_ముసుగు = GDK_EXPOSURE_ముసుగు;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
-	child->window = gdk_window_new(form->bin_window,
-				       &attributes, attributes_mask);
-	gdk_window_set_user_data(child->window, widget);
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+	లక్షణాలు_ముసుగు = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#లేకపోతే
+	లక్షణాలు_ముసుగు = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#అయితే_ముగింపు
+	బిడ్డ->కిటికీ_2 = gdk_కిటికీ_new(form->bin_కిటికీ,
+				       &లక్షణాలు, లక్షణాలు_ముసుగు);
+	gdk_కిటికీ_సమితి_user_దత్తాంశం(బిడ్డ->కిటికీ_2, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
 	{
-	    GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	    GtkStyleContext * స్థిరరాశి sctx = gtk_widget_get_style_context(widget);
 
-	    gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	    gtk_style_context_set_background(sctx, child->window);
+	    gtk_style_context_సమితి_state(sctx, GTK_STATE_FLAG_సాధారణ);
+# ఒకవేళ !GTK_CHECK_సంస్కరణ(3,18,0)
+	    gtk_style_context_సమితి_background(sctx, బిడ్డ->కిటికీ_2);
 # endif
 	}
-#else
-	gtk_style_set_background(widget->style,
-				 child->window,
-				 GTK_STATE_NORMAL);
-#endif
+#లేకపోతే
+	gtk_style_సమితి_background(widget->style,
+				 బిడ్డ->కిటికీ_2,
+				 GTK_STATE_సాధారణ);
+#అయితే_ముగింపు
 
-	gtk_widget_set_parent_window(child->widget, child->window);
+	gtk_widget_సమితి_మాతృ_కిటికీ(బిడ్డ->widget, బిడ్డ->కిటికీ_2);
 	/*
 	 * Install signal handlers to map/unmap child->window
 	 * alongside with the actual widget.
 	 */
-	g_signal_connect(G_OBJECT(child->widget), "map",
-			 G_CALLBACK(&form_child_map), child);
-	g_signal_connect(G_OBJECT(child->widget), "unmap",
-			 G_CALLBACK(&form_child_unmap), child);
+	g_signal_connect(G_OBJECT(బిడ్డ->widget), "map",
+			 G_CALLBACK(&form_బిడ్డ_map), బిడ్డ);
+	g_signal_connect(G_OBJECT(బిడ్డ->widget), "unmap",
+			 G_CALLBACK(&form_బిడ్డ_unmap), బిడ్డ);
     }
-    else if (!gtk_widget_get_realized(child->widget))
+    లేకపోతే ఒకవేళ (!gtk_widget_get_realized(బిడ్డ->widget))
     {
-	gtk_widget_set_parent_window(child->widget, form->bin_window);
+	gtk_widget_సమితి_మాతృ_కిటికీ(బిడ్డ->widget, form->bin_కిటికీ);
     }
 }
 
-    static void
-form_realize_child(GtkForm *form, GtkFormChild *child)
+    స్థిర శూన్య
+form_realize_బిడ్డ(GtkForm *form, Gtk_Form_బిడ్డ_2 *బిడ్డ)
 {
-    form_attach_child_window(form, child);
-    gtk_widget_realize(child->widget);
+    form_attach_బిడ్డ_కిటికీ(form, బిడ్డ);
+    gtk_widget_realize(బిడ్డ->widget);
 }
 
-    static void
-form_position_child(
+    స్థిర శూన్య
+form_position_బిడ్డ(
     GtkForm		*form,
-    GtkFormChild	*child,
+    Gtk_Form_బిడ్డ_2	*బిడ్డ,
     gboolean		force_allocate)
 {
     gint x;
     gint y;
 
-    x = child->x;
-    y = child->y;
+    x = బిడ్డ->x;
+    y = బిడ్డ->y;
 
-    if ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
+    ఒకవేళ ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
 	(y >= G_MINSHORT) && (y <= G_MAXSHORT))
     {
-	if (!child->mapped)
+	ఒకవేళ (!బిడ్డ->mapped)
 	{
-	    if (gtk_widget_get_mapped(GTK_WIDGET(form))
-		    && gtk_widget_get_visible(child->widget))
+	    ఒకవేళ (gtk_widget_get_mapped(GTK_WIDGET(form))
+		    && gtk_widget_get_visible(బిడ్డ->widget))
 	    {
-		if (!gtk_widget_get_mapped(child->widget))
-		    gtk_widget_map(child->widget);
+		ఒకవేళ (!gtk_widget_get_mapped(బిడ్డ->widget))
+		    gtk_widget_map(బిడ్డ->widget);
 
-		child->mapped = TRUE;
+		బిడ్డ->mapped = TRUE;
 		force_allocate = TRUE;
 	    }
 	}
 
-	if (force_allocate)
+	ఒకవేళ (force_allocate)
 	{
-	    GtkAllocation allocation;
+	    Gtk_కేటాయింపు కేటాయింపు;
 	    GtkRequisition requisition;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	    requisition = child->widget->requisition;
-#endif
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+	    gtk_widget_get_preferred_కొలత(బిడ్డ->widget, &requisition, ఖాళీ);
+#లేకపోతే
+	    requisition = బిడ్డ->widget->requisition;
+#అయితే_ముగింపు
 
-	    if (!gtk_widget_get_has_window(child->widget))
+	    ఒకవేళ (!gtk_widget_get_has_కిటికీ(బిడ్డ->widget))
 	    {
-		if (child->window)
+		ఒకవేళ (బిడ్డ->కిటికీ_2)
 		{
-		    gdk_window_move_resize(child->window,
+		    gdk_కిటికీ_move_resize(బిడ్డ->కిటికీ_2,
 			    x, y,
-			    requisition.width,
-			    requisition.height);
+			    requisition.వెడల్పు,
+			    requisition.ఎత్తు);
 		}
 
-		allocation.x = 0;
-		allocation.y = 0;
+		కేటాయింపు.x = 0;
+		కేటాయింపు.y = 0;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		allocation.x = x;
-		allocation.y = y;
+		కేటాయింపు.x = x;
+		కేటాయింపు.y = y;
 	    }
 
-	    allocation.width = requisition.width;
-	    allocation.height = requisition.height;
+	    కేటాయింపు.వెడల్పు = requisition.వెడల్పు;
+	    కేటాయింపు.ఎత్తు = requisition.ఎత్తు;
 
-	    gtk_widget_size_allocate(child->widget, &allocation);
+	    gtk_widget_కొలత_allocate(బిడ్డ->widget, &కేటాయింపు);
 	}
     }
-    else
+    లేకపోతే
     {
-	if (child->mapped)
+	ఒకవేళ (బిడ్డ->mapped)
 	{
-	    child->mapped = FALSE;
+	    బిడ్డ->mapped = FALSE;
 
-	    if (gtk_widget_get_mapped(child->widget))
-		gtk_widget_unmap(child->widget);
+	    ఒకవేళ (gtk_widget_get_mapped(బిడ్డ->widget))
+		gtk_widget_unmap(బిడ్డ->widget);
 	}
     }
 }
 
-    static void
+    స్థిర శూన్య
 form_position_children(GtkForm *form)
 {
     GList *tmp_list;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
-	form_position_child(form, tmp_list->data, FALSE);
+    కొరకు (tmp_list = form->children; tmp_list; tmp_list = tmp_list->తదుపరి)
+	form_position_బిడ్డ(form, tmp_list->దత్తాంశం, FALSE);
 }
 
-    void
+    శూన్య
 gui_gtk_form_move_resize(GtkForm *form, GtkWidget *widget,
 		     gint x, gint y, gint w, gint h)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(widget, w, h);
-#else
-    widget->requisition.width  = w;
-    widget->requisition.height = h;
-#endif
+#ఒకవేళ GTK_CHECK_సంస్కరణ(3,0,0)
+    gtk_widget_సమితి_కొలత_request(widget, w, h);
+#లేకపోతే
+    widget->requisition.వెడల్పు  = w;
+    widget->requisition.ఎత్తు = h;
+#అయితే_ముగింపు
 
     gui_gtk_form_move(form, widget, x, y);
 }
 
-    static void
+    స్థిర శూన్య
 form_send_configure(GtkForm *form)
 {
     GtkWidget *widget;
     GdkEventConfigure event;
-    GtkAllocation allocation;
+    Gtk_కేటాయింపు కేటాయింపు;
 
     widget = GTK_WIDGET(form);
 
-    gtk_widget_get_allocation(widget, &allocation);
+    gtk_widget_get_కేటాయింపు(widget, &కేటాయింపు);
     event.type = GDK_CONFIGURE;
-    event.window = gtk_widget_get_window(widget);
-    event.x = allocation.x;
-    event.y = allocation.y;
-    event.width = allocation.width;
-    event.height = allocation.height;
+    event.కిటికీ_2 = gtk_widget_get_కిటికీ(widget);
+    event.x = కేటాయింపు.x;
+    event.y = కేటాయింపు.y;
+    event.వెడల్పు = కేటాయింపు.వెడల్పు;
+    event.ఎత్తు = కేటాయింపు.ఎత్తు;
 
     gtk_main_do_event((GdkEvent*)&event);
 }
 
-    static void
-form_child_map(GtkWidget *widget UNUSED, gpointer user_data)
+    స్థిర శూన్య
+form_బిడ్డ_map(GtkWidget *widget వాడని, gpointer user_దత్తాంశం)
 {
-    GtkFormChild *child;
+    Gtk_Form_బిడ్డ_2 *బిడ్డ;
 
-    child = (GtkFormChild *)user_data;
+    బిడ్డ = (Gtk_Form_బిడ్డ_2 *)user_దత్తాంశం;
 
-    child->mapped = TRUE;
-    gdk_window_show(child->window);
+    బిడ్డ->mapped = TRUE;
+    gdk_కిటికీ_show(బిడ్డ->కిటికీ_2);
 }
 
-    static void
-form_child_unmap(GtkWidget *widget UNUSED, gpointer user_data)
+    స్థిర శూన్య
+form_బిడ్డ_unmap(GtkWidget *widget వాడని, gpointer user_దత్తాంశం)
 {
-    GtkFormChild *child;
+    Gtk_Form_బిడ్డ_2 *బిడ్డ;
 
-    child = (GtkFormChild *)user_data;
+    బిడ్డ = (Gtk_Form_బిడ్డ_2 *)user_దత్తాంశం;
 
-    child->mapped = FALSE;
-    gdk_window_hide(child->window);
+    బిడ్డ->mapped = FALSE;
+    gdk_కిటికీ_hide(బిడ్డ->కిటికీ_2);
 }

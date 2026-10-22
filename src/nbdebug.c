@@ -25,19 +25,19 @@
  * This code must have NBDEBUG defined for it to be compiled into vim/gvim.
  */
 
-#ifdef NBDEBUG
+#నిర్వచితమైతే NBDEBUG
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-FILE		*nb_debug = NULL;
+FILE		*nb_debug = ఖాళీ;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+శూన్య		 nbdb(అక్షరం *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
-#ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
-#endif
+స్థిర పూర్ణాంకం	 lookup(అక్షరం *);
+#నిర్వచితమైతే USE_NB_ERRORHANDLER
+స్థిర పూర్ణాంకం	 errorHandler(Display *, XErrorEvent *);
+#అయితే_ముగింపు
 
 /*
  * nbdebug_wait	-   This function can be used to delay or stop execution of vim.
@@ -46,73 +46,73 @@ static int	 errorHandler(Display *, XErrorEvent *);
  *		    from a background process this is the only way to debug
  *		    startup problems.
  */
-	void
+	శూన్య
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	అక్షరం		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
 	init_homedir();			// not inited yet
-#ifdef USE_WDDUMP
+#నిర్వచితమైతే USE_WDDUMP
 	WDDump(0, 0, 0);
-#endif
+#అయితే_ముగింపు
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	ఒకవేళ (wait_flags & WT_ENV && wait_var && getenv(wait_var) != ఖాళీ)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	లేకపోతే ఒకవేళ (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	లేకపోతే ఒకవేళ (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		పూర్ణాంకం w = 1;
+		అయితే (w)
 		{
 			;
 		}
 	}
 }
 
-	void
+	శూన్య
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	అక్షరం		*log_var,	// env var with log file
+	అక్షరం		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	అక్షరం		*file;		// possible nb_debug output file
+	అక్షరం		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	ఒకవేళ (log_var && (file = getenv(log_var)) != ఖాళీ)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
-		time(&now);
+		సమయం(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		ఒకవేళ (level_var && (cp = getenv(level_var)) != ఖాళీ)
 		{
-			nb_dlevel = strtoul(cp, NULL, 0);
+			nb_dlevel = strtoul(cp, ఖాళీ, 0);
 		}
-		else
+		లేకపోతే
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
-#ifdef USE_NB_ERRORHANDLER
+#నిర్వచితమైతే USE_NB_ERRORHANDLER
 		XSetErrorHandler(errorHandler);
-#endif
+#అయితే_ముగింపు
 	}
 
 }
 
-	void
-nbdbg(char *fmt, ...)
+	శూన్య
+nbdbg(అక్షరం *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	ఒకవేళ (nb_debug != ఖాళీ && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,47 +122,47 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
-lookup(char *file)
+	స్థిర పూర్ణాంకం
+lookup(అక్షరం *file)
 {
-	char		 buf[BUFSIZ];
+	అక్షరం		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
-#ifndef FEAT_GUI_MSWIN
+	తిరిగి
+#నిర్వచితం_కాకపోతే FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#లేకపోతే
 		(access(buf, 0) == 0);
-#endif
+#అయితే_ముగింపు
 
 }
 
-#ifdef USE_NB_ERRORHANDLER
-	static int
+#నిర్వచితమైతే USE_NB_ERRORHANDLER
+	స్థిర పూర్ణాంకం
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	అక్షరం		 సందేశం[256];
+	అక్షరం		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGet_Error_పాఠ్యం(dpy, err->error_సంకేతం, సందేశం, పరిమాణం(సందేశం));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", సందేశం);
 
-	sprintf(buf, "%d", err->request_code);
-	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	sprintf(buf, "%d", err->request_సంకేతం);
+	XGet_Error_Database_పాఠ్యం(dpy,
+	    "XRequest", buf, "Unknown", సందేశం, పరిమాణం(సందేశం));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
-	if (err->request_code > 128)
+	    err->request_సంకేతం, సందేశం);
+	ఒకవేళ (err->request_సంకేతం > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
-		    err->minor_code);
+		    err->minor_సంకేతం);
 	}
 
-	return 0;
+	తిరిగి 0;
 }
-#endif
+#అయితే_ముగింపు
 
 
-#endif // NBDEBUG
+#అయితే_ముగింపు // NBDEBUG

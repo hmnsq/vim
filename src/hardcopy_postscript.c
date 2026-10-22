@@ -36,37 +36,37 @@
  * http://www.adobe.com
  */
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
-#ifdef FEAT_POSTSCRIPT
+#నిర్వచితమైతే FEAT_POSTSCRIPT
 
 # include "hardcopy.h"
 # include "hardcopy_postscript.h"
 
-option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS] =
+option_పట్టిక_T mbfont_opts[OPT_MBFONT_అంకె_OPTIONS] =
 {
-    {"c",	FALSE, 0, NULL, 0, FALSE},
-    {"a",	FALSE, 0, NULL, 0, FALSE},
-    {"r",	FALSE, 0, NULL, 0, FALSE},
-    {"b",	FALSE, 0, NULL, 0, FALSE},
-    {"i",	FALSE, 0, NULL, 0, FALSE},
-    {"o",	FALSE, 0, NULL, 0, FALSE},
+    {"c",	FALSE, 0, ఖాళీ, 0, FALSE},
+    {"a",	FALSE, 0, ఖాళీ, 0, FALSE},
+    {"r",	FALSE, 0, ఖాళీ, 0, FALSE},
+    {"b",	FALSE, 0, ఖాళీ, 0, FALSE},
+    {"i",	FALSE, 0, ఖాళీ, 0, FALSE},
+    {"o",	FALSE, 0, ఖాళీ, 0, FALSE},
 };
 
 # define PRT_PS_DEFAULT_DPI	    (72)    // Default user space resolution
 # define PRT_PS_DEFAULT_FONTSIZE     (10)
-# define PRT_PS_DEFAULT_BUFFER_SIZE  (80)
+# define PRT_PS_DEFAULT_బఫరు_కొలత  (80)
 
 // PS font names, must be in Roman, Bold, Italic, Bold-Italic order
-struct prt_ps_font_S
+నిర్మాణం prt_ps_font_S
 {
-    int		wx;
-    int		uline_offset;
-    int		uline_width;
-    int		bbox_min_y;
-    int		bbox_max_y;
-    char	*(ps_fontname[4]);
+    పూర్ణాంకం		wx;
+    పూర్ణాంకం		uline_స్థానభ్రంశం;
+    పూర్ణాంకం		uline_వెడల్పు;
+    పూర్ణాంకం		bbox_min_y;
+    పూర్ణాంకం		bbox_max_y;
+    అక్షరం	*(ps_fontname[4]);
 };
 
 # define PRT_PS_FONT_ROMAN	(0)
@@ -75,7 +75,7 @@ struct prt_ps_font_S
 # define PRT_PS_FONT_BOLDOBLIQUE (3)
 
 // Standard font metrics for Courier family
-static struct prt_ps_font_S prt_ps_courier_font =
+స్థిర నిర్మాణం prt_ps_font_S prt_ps_courier_font =
 {
     600,
     -100, 50,
@@ -84,31 +84,31 @@ static struct prt_ps_font_S prt_ps_courier_font =
 };
 
 // Generic font metrics for multi-byte fonts
-static struct prt_ps_font_S prt_ps_mb_font =
+స్థిర నిర్మాణం prt_ps_font_S prt_ps_mb_font =
 {
     1000,
     -100, 50,
     -250, 805,
-    {NULL, NULL, NULL, NULL}
+    {ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ}
 };
 
 // Pointer to current font set being used
-static struct prt_ps_font_S* prt_ps_font;
+స్థిర నిర్మాణం prt_ps_font_S* prt_ps_font;
 
 // Structures to map user named encoding and mapping to PS equivalents for
 // building CID font name
-struct prt_ps_encoding_S
+నిర్మాణం prt_ps_encoding_S
 {
-    char	*encoding;
-    char	*cmap_encoding;
-    int		needs_charset;
+    అక్షరం	*encoding;
+    అక్షరం	*cmap_encoding;
+    పూర్ణాంకం		needs_charset;
 };
 
-struct prt_ps_charset_S
+నిర్మాణం prt_ps_charset_S
 {
-    char	*charset;
-    char	*cmap_charset;
-    int		has_charset;
+    అక్షరం	*charset;
+    అక్షరం	*cmap_charset;
+    పూర్ణాంకం		has_charset;
 };
 
 # define CS_JIS_C_1978   (0x01)
@@ -121,9 +121,9 @@ struct prt_ps_charset_S
 # define CS_KANJITALK7   (0x80)
 
 // Japanese encodings and charsets
-static struct prt_ps_encoding_S j_encodings[] =
+స్థిర నిర్మాణం prt_ps_encoding_S j_encodings[] =
 {
-    {"iso-2022-jp", NULL,       (CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990|
+    {"iso-2022-jp", ఖాళీ,       (CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990|
 								    CS_NEC)},
     {"euc-jp",	    "EUC",	(CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990)},
     {"sjis",	    "RKSJ",	(CS_JIS_C_1978|CS_JIS_X_1983|CS_MSWINDOWS|
@@ -132,10 +132,10 @@ static struct prt_ps_encoding_S j_encodings[] =
     {"ucs-2",       "UCS2",     CS_JIS_X_1990},
     {"utf-8",       "UTF8" ,    CS_JIS_X_1990}
 };
-static struct prt_ps_charset_S j_charsets[] =
+స్థిర నిర్మాణం prt_ps_charset_S j_charsets[] =
 {
     {"JIS_C_1978",  "78",       CS_JIS_C_1978},
-    {"JIS_X_1983",  NULL,       CS_JIS_X_1983},
+    {"JIS_X_1983",  ఖాళీ,       CS_JIS_X_1983},
     {"JIS_X_1990",  "Hojo",     CS_JIS_X_1990},
     {"NEC",	    "Ext",	CS_NEC},
     {"MSWINDOWS",   "90ms",     CS_MSWINDOWS},
@@ -153,17 +153,17 @@ static struct prt_ps_charset_S j_charsets[] =
 # define CS_SC_ISO10646      (0x40)
 
 // Simplified Chinese encodings and charsets
-static struct prt_ps_encoding_S sc_encodings[] =
+స్థిర నిర్మాణం prt_ps_encoding_S sc_encodings[] =
 {
-    {"iso-2022",    NULL,       (CS_GB_2312_80|CS_GBT_12345_90)},
-    {"gb18030",     NULL,       CS_GBK2K},
+    {"iso-2022",    ఖాళీ,       (CS_GB_2312_80|CS_GBT_12345_90)},
+    {"gb18030",     ఖాళీ,       CS_GBK2K},
     {"euc-cn",      "EUC",      (CS_GB_2312_80|CS_GBT_12345_90|CS_SC_MAC|
 								CS_GBT_90_MAC)},
     {"gbk",	    "EUC",	CS_GBK},
     {"ucs-2",       "UCS2",     CS_SC_ISO10646},
     {"utf-8",       "UTF8",     CS_SC_ISO10646}
 };
-static struct prt_ps_charset_S sc_charsets[] =
+స్థిర నిర్మాణం prt_ps_charset_S sc_charsets[] =
 {
     {"GB_2312-80",  "GB",       CS_GB_2312_80},
     {"GBT_12345-90","GBT",      CS_GBT_12345_90},
@@ -189,9 +189,9 @@ static struct prt_ps_charset_S sc_charsets[] =
 # define CS_TC_ISO10646	    (0x1000)
 
 // Traditional Chinese encodings and charsets
-static struct prt_ps_encoding_S tc_encodings[] =
+స్థిర నిర్మాణం prt_ps_encoding_S tc_encodings[] =
 {
-    {"iso-2022",    NULL,       (CS_CNS_PLANE_1|CS_CNS_PLANE_2)},
+    {"iso-2022",    ఖాళీ,       (CS_CNS_PLANE_1|CS_CNS_PLANE_2)},
     {"euc-tw",      "EUC",      CS_CNS_PLANE_1_2},
     {"big5",	    "B5",	(CS_B5|CS_ETEN|CS_HK_GCCS|CS_HK_SCS|
 				    CS_HK_SCS_ETEN|CS_MTHKL|CS_MTHKS|CS_DLHKL|
@@ -202,13 +202,13 @@ static struct prt_ps_encoding_S tc_encodings[] =
     {"utf-16",      "UTF16",    CS_TC_ISO10646},
     {"utf-32",      "UTF32",    CS_TC_ISO10646}
 };
-static struct prt_ps_charset_S tc_charsets[] =
+స్థిర నిర్మాణం prt_ps_charset_S tc_charsets[] =
 {
     {"CNS_1992_1",  "CNS1",     CS_CNS_PLANE_1},
     {"CNS_1992_2",  "CNS2",     CS_CNS_PLANE_2},
     {"CNS_1993",    "CNS",      CS_CNS_PLANE_1_2},
-    {"BIG5",	    NULL,	CS_B5},
-    {"CP950",	    NULL,	CS_B5},
+    {"BIG5",	    ఖాళీ,	CS_B5},
+    {"CP950",	    ఖాళీ,	CS_B5},
     {"ETEN",	    "ETen",	CS_ETEN},
     {"HK_GCCS",     "HKgccs",	CS_HK_GCCS},
     {"SCS",	    "HKscs",	CS_HK_SCS},
@@ -226,9 +226,9 @@ static struct prt_ps_charset_S tc_charsets[] =
 # define CS_KR_ISO10646      (0x08)
 
 // Korean encodings and charsets
-static struct prt_ps_encoding_S k_encodings[] =
+స్థిర నిర్మాణం prt_ps_encoding_S k_encodings[] =
 {
-    {"iso-2022-kr", NULL,       CS_KR_X_1992},
+    {"iso-2022-kr", ఖాళీ,       CS_KR_X_1992},
     {"euc-kr",      "EUC",      (CS_KR_X_1992|CS_KR_MAC)},
     {"johab",       "Johab",    CS_KR_X_1992},
     {"cp1361",      "Johab",    CS_KR_X_1992},
@@ -237,7 +237,7 @@ static struct prt_ps_encoding_S k_encodings[] =
     {"ucs-2",       "UCS2",     CS_KR_ISO10646},
     {"utf-8",       "UTF8",     CS_KR_ISO10646}
 };
-static struct prt_ps_charset_S k_charsets[] =
+స్థిర నిర్మాణం prt_ps_charset_S k_charsets[] =
 {
     {"KS_X_1992",   "KSC",      CS_KR_X_1992},
     {"CP1361",      "KSC",      CS_KR_X_1992},
@@ -249,59 +249,59 @@ static struct prt_ps_charset_S k_charsets[] =
 };
 
 // Collections of encodings and charsets for multi-byte printing
-struct prt_ps_mbfont_S
+నిర్మాణం prt_ps_mbfont_S
 {
-    int				num_encodings;
-    struct prt_ps_encoding_S	*encodings;
-    int				num_charsets;
-    struct prt_ps_charset_S	*charsets;
-    char			*ascii_enc;
-    char			*defcs;
+    పూర్ణాంకం				అంకె_encodings;
+    నిర్మాణం prt_ps_encoding_S	*encodings;
+    పూర్ణాంకం				అంకె_charsets;
+    నిర్మాణం prt_ps_charset_S	*charsets;
+    అక్షరం			*ascii_enc;
+    అక్షరం			*defcs;
 };
 
-static struct prt_ps_mbfont_S prt_ps_mbfonts[] =
+స్థిర నిర్మాణం prt_ps_mbfont_S prt_ps_mbfonts[] =
 {
     {
-	ARRAY_LENGTH(j_encodings),
+	ARRAY_నిడివి(j_encodings),
 	j_encodings,
-	ARRAY_LENGTH(j_charsets),
+	ARRAY_నిడివి(j_charsets),
 	j_charsets,
 	"jis_roman",
 	"JIS_X_1983"
     },
     {
-	ARRAY_LENGTH(sc_encodings),
+	ARRAY_నిడివి(sc_encodings),
 	sc_encodings,
-	ARRAY_LENGTH(sc_charsets),
+	ARRAY_నిడివి(sc_charsets),
 	sc_charsets,
 	"gb_roman",
 	"GB_2312-80"
     },
     {
-	ARRAY_LENGTH(tc_encodings),
+	ARRAY_నిడివి(tc_encodings),
 	tc_encodings,
-	ARRAY_LENGTH(tc_charsets),
+	ARRAY_నిడివి(tc_charsets),
 	tc_charsets,
 	"cns_roman",
 	"BIG5"
     },
     {
-	ARRAY_LENGTH(k_encodings),
+	ARRAY_నిడివి(k_encodings),
 	k_encodings,
-	ARRAY_LENGTH(k_charsets),
+	ARRAY_నిడివి(k_charsets),
 	k_charsets,
 	"ks_roman",
 	"KS_X_1992"
     }
 };
 
-struct prt_ps_resource_S
+నిర్మాణం prt_ps_resource_S
 {
     char_u  name[64];
     char_u  filename[MAXPATHL + 1];
-    int     type;
+    పూర్ణాంకం     type;
     char_u  title[256];
-    char_u  version[256];
+    char_u  సంస్కరణ_2[256];
 };
 
 // Types of PS resource file currently used
@@ -318,12 +318,12 @@ struct prt_ps_resource_S
 // VIM      Prolog  CIDProlog
 // 6.2      1.3
 // 7.0      1.4	    1.0
-# define PRT_PROLOG_VERSION  ((char_u *)"1.4")
-# define PRT_CID_PROLOG_VERSION  ((char_u *)"1.0")
+# define PRT_PROLOG_సంస్కరణ  ((char_u *)"1.4")
+# define PRT_CID_PROLOG_సంస్కరణ  ((char_u *)"1.0")
 
 // String versions of PS resource types - indexed by constants above so don't
 // re-order!
-static char *prt_resource_types[] =
+స్థిర అక్షరం *prt_resource_types[] =
 {
     "procset",
     "encoding",
@@ -331,7 +331,7 @@ static char *prt_resource_types[] =
 };
 
 // Strings to look for in a PS resource file
-# define PRT_RESOURCE_HEADER	    "%!PS-Adobe-"
+# define PRT_RESOURCE_శీర్షిక	    "%!PS-Adobe-"
 # define PRT_RESOURCE_RESOURCE	    "Resource-"
 # define PRT_RESOURCE_PROCSET	    "ProcSet"
 # define PRT_RESOURCE_ENCODING	    "Encoding"
@@ -342,215 +342,215 @@ static char *prt_resource_types[] =
 // read more comments.
 # define PRT_DSC_MISC_TYPE	    (-1)
 # define PRT_DSC_TITLE_TYPE	    (1)
-# define PRT_DSC_VERSION_TYPE	    (2)
+# define PRT_DSC_సంస్కరణ_TYPE	    (2)
 # define PRT_DSC_ENDCOMMENTS_TYPE    (3)
 
 # define PRT_DSC_TITLE		    "%%Title:"
-# define PRT_DSC_VERSION		    "%%Version:"
+# define PRT_DSC_సంస్కరణ		    "%%Version:"
 # define PRT_DSC_ENDCOMMENTS	    "%%EndComments:"
 
-struct prt_dsc_comment_S
+నిర్మాణం prt_dsc_comment_S
 {
-    char	*string;
-    int		len;
-    int		type;
+    అక్షరం	*string;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		type;
 };
 
-struct prt_dsc_line_S
+నిర్మాణం prt_dsc_పంక్తి_S
 {
-    int		type;
+    పూర్ణాంకం		type;
     char_u	*string;
-    int		len;
+    పూర్ణాంకం		len;
 };
 
 
-# define SIZEOF_CSTR(s)      (sizeof(s) - 1)
-static struct prt_dsc_comment_S prt_dsc_table[] =
+# define SIZEOF_CSTR(s)      (పరిమాణం(s) - 1)
+స్థిర నిర్మాణం prt_dsc_comment_S prt_dsc_పట్టిక[] =
 {
     {PRT_DSC_TITLE,       SIZEOF_CSTR(PRT_DSC_TITLE),     PRT_DSC_TITLE_TYPE},
-    {PRT_DSC_VERSION,     SIZEOF_CSTR(PRT_DSC_VERSION),
-							PRT_DSC_VERSION_TYPE},
+    {PRT_DSC_సంస్కరణ,     SIZEOF_CSTR(PRT_DSC_సంస్కరణ),
+							PRT_DSC_సంస్కరణ_TYPE},
     {PRT_DSC_ENDCOMMENTS, SIZEOF_CSTR(PRT_DSC_ENDCOMMENTS),
 						     PRT_DSC_ENDCOMMENTS_TYPE}
 };
 
-static void prt_write_file_len(char_u *buffer, int bytes);
-static int prt_next_dsc(struct prt_dsc_line_S *p_dsc_line);
+స్థిర శూన్య prt_write_file_len(char_u *బఫరు, పూర్ణాంకం బైట్లు);
+స్థిర పూర్ణాంకం prt_తదుపరి_dsc(నిర్మాణం prt_dsc_పంక్తి_S *p_dsc_పంక్తి);
 
 /*
  * Variables for the output PostScript file.
  */
-static FILE *prt_ps_fd;
-static int prt_file_error;
-static char_u *prt_ps_file_name = NULL;
+స్థిర FILE *prt_ps_fd;
+స్థిర పూర్ణాంకం prt_file_error;
+స్థిర char_u *prt_ps_file_name = ఖాళీ;
 
 /*
  * Various offsets and dimensions in default PostScript user space (points).
  * Used for text positioning calculations
  */
-static float prt_page_width;
-static float prt_page_height;
-static float prt_left_margin;
-static float prt_right_margin;
-static float prt_top_margin;
-static float prt_bottom_margin;
-static float prt_line_height;
-static float prt_first_line_height;
-static float prt_char_width;
-static float prt_number_width;
-static float prt_bgcol_offset;
-static float prt_pos_x_moveto = 0.0;
-static float prt_pos_y_moveto = 0.0;
+స్థిర దశాంశం prt_పుట_వెడల్పు;
+స్థిర దశాంశం prt_పుట_ఎత్తు;
+స్థిర దశాంశం prt_ఎడమ_margin;
+స్థిర దశాంశం prt_కుడి_margin;
+స్థిర దశాంశం prt_శిఖరం_margin;
+స్థిర దశాంశం prt_bottom_margin;
+స్థిర దశాంశం prt_పంక్తి_ఎత్తు;
+స్థిర దశాంశం prt_మొదటి_పంక్తి_ఎత్తు;
+స్థిర దశాంశం prt_char_వెడల్పు;
+స్థిర దశాంశం prt_సంఖ్య_వెడల్పు;
+స్థిర దశాంశం prt_bgcol_స్థానభ్రంశం;
+స్థిర దశాంశం prt_pos_x_moveto = 0.0;
+స్థిర దశాంశం prt_pos_y_moveto = 0.0;
 
 /*
  * Various control variables used to decide when and how to change the
  * PostScript graphics state.
  */
-static int prt_need_moveto;
-static int prt_do_moveto;
-static int prt_need_font;
-static int prt_font;
-static int prt_need_underline;
-static int prt_underline;
-static int prt_do_underline;
-static int prt_need_fgcol;
-static int prt_fgcol;
-static int prt_need_bgcol;
-static int prt_do_bgcol;
-static int prt_bgcol;
-static int prt_new_bgcol;
-static int prt_attribute_change;
-static float prt_text_run;
-static int prt_page_num;
-static int prt_bufsiz;
+స్థిర పూర్ణాంకం prt_need_moveto;
+స్థిర పూర్ణాంకం prt_do_moveto;
+స్థిర పూర్ణాంకం prt_need_font;
+స్థిర పూర్ణాంకం prt_font;
+స్థిర పూర్ణాంకం prt_need_underline;
+స్థిర పూర్ణాంకం prt_underline;
+స్థిర పూర్ణాంకం prt_do_underline;
+స్థిర పూర్ణాంకం prt_need_fgcol;
+స్థిర పూర్ణాంకం prt_fgcol;
+స్థిర పూర్ణాంకం prt_need_bgcol;
+స్థిర పూర్ణాంకం prt_do_bgcol;
+స్థిర పూర్ణాంకం prt_bgcol;
+స్థిర పూర్ణాంకం prt_new_bgcol;
+స్థిర పూర్ణాంకం prt_attribute_change;
+స్థిర దశాంశం prt_పాఠ్యం_నిరంతరం;
+స్థిర పూర్ణాంకం prt_పుట_అంకె;
+స్థిర పూర్ణాంకం prt_bufsiz;
 
 /*
  * Variables controlling physical printing.
  */
-static int prt_media;
-static int prt_portrait;
-static int prt_num_copies;
-static int prt_duplex;
-static int prt_tumble;
-static int prt_collate;
+స్థిర పూర్ణాంకం prt_media;
+స్థిర పూర్ణాంకం prt_portrait;
+స్థిర పూర్ణాంకం prt_అంకె_copies;
+స్థిర పూర్ణాంకం prt_duplex;
+స్థిర పూర్ణాంకం prt_tumble;
+స్థిర పూర్ణాంకం prt_collate;
 
 /*
  * Buffers used when generating PostScript output
  */
-static char_u prt_line_buffer[257];
-static garray_T prt_ps_buffer;
+స్థిర char_u prt_పంక్తి_బఫరు[257];
+స్థిర garray_T prt_ps_బఫరు;
 
-static int prt_do_conv;
-static vimconv_T prt_conv;
+స్థిర పూర్ణాంకం prt_do_conv;
+స్థిర vimconv_T prt_conv;
 
-static int prt_out_mbyte;
-static int prt_custom_cmap;
-static char prt_cmap[80];
-static int prt_use_courier;
-static int prt_in_ascii;
-static int prt_half_width;
-static char *prt_ascii_encoding;
-static const char_u prt_hexchar[] = "0123456789abcdef";
+స్థిర పూర్ణాంకం prt_బహిర్గతం_mbyte;
+స్థిర పూర్ణాంకం prt_custom_cmap;
+స్థిర అక్షరం prt_cmap[80];
+స్థిర పూర్ణాంకం prt_use_courier;
+స్థిర పూర్ణాంకం prt_లోపల_ascii;
+స్థిర పూర్ణాంకం prt_half_వెడల్పు;
+స్థిర అక్షరం *prt_ascii_encoding;
+స్థిర స్థిరరాశి char_u prt_hexchar[] = "0123456789abcdef";
 
-    static void
-prt_write_file_raw_len(char_u *buffer, int bytes)
+    స్థిర శూన్య
+prt_write_file_raw_len(char_u *బఫరు, పూర్ణాంకం బైట్లు)
 {
-    if (!prt_file_error
-	    && fwrite(buffer, sizeof(char_u), bytes, prt_ps_fd)
-							     != (size_t)bytes)
+    ఒకవేళ (!prt_file_error
+	    && fwrite(బఫరు, పరిమాణం(char_u), బైట్లు, prt_ps_fd)
+							     != (size_t)బైట్లు)
     {
-	emsg(_(e_error_writing_to_postscript_output_file));
+	emsg(_(e_error_writing_గమ్యం_postscript_output_file));
 	prt_file_error = TRUE;
     }
 }
 
-    static void
-prt_write_file(char_u *buffer)
+    స్థిర శూన్య
+prt_write_file(char_u *బఫరు)
 {
-    prt_write_file_len(buffer, (int)STRLEN(buffer));
+    prt_write_file_len(బఫరు, (పూర్ణాంకం)STRLEN(బఫరు));
 }
 
-    static void
-prt_write_file_len(char_u *buffer, int bytes)
+    స్థిర శూన్య
+prt_write_file_len(char_u *బఫరు, పూర్ణాంకం బైట్లు)
 {
-    prt_write_file_raw_len(buffer, bytes);
+    prt_write_file_raw_len(బఫరు, బైట్లు);
 }
 
 /*
  * Write a string.
  */
-    static void
-prt_write_string(char *s)
+    స్థిర శూన్య
+prt_write_string(అక్షరం *s)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer), "%s", s);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు), "%s", s);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write an int and a space.
  */
-    static void
-prt_write_int(int i)
+    స్థిర శూన్య
+prt_write_int(పూర్ణాంకం i)
 {
-    sprintf((char *)prt_line_buffer, "%d ", i);
-    prt_write_file(prt_line_buffer);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "%d ", i);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write a boolean and a space.
  */
-    static void
-prt_write_boolean(int b)
+    స్థిర శూన్య
+prt_write_boolean(పూర్ణాంకం b)
 {
-    sprintf((char *)prt_line_buffer, "%s ", (b ? "T" : "F"));
-    prt_write_file(prt_line_buffer);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "%s ", (b ? "T" : "F"));
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write PostScript to re-encode and define the font.
  */
-    static void
+    స్థిర శూన్య
 prt_def_font(
-    char	*new_name,
-    char	*encoding,
-    int		height,
-    char	*font)
+    అక్షరం	*new_name,
+    అక్షరం	*encoding,
+    పూర్ణాంకం		ఎత్తు,
+    అక్షరం	*font)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 			  "/_%s /VIM-%s /%s ref\n", new_name, encoding, font);
-    prt_write_file(prt_line_buffer);
-    if (prt_out_mbyte)
-	sprintf((char *)prt_line_buffer, "/%s %d %f /_%s sffs\n",
-		       new_name, height, 500./prt_ps_courier_font.wx, new_name);
-    else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
+	sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "/%s %d %f /_%s sffs\n",
+		       new_name, ఎత్తు, 500./prt_ps_courier_font.wx, new_name);
+    లేకపోతే
+	vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
+			     "/%s %d /_%s ffs\n", new_name, ఎత్తు, new_name);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write a line to define the CID font.
  */
-    static void
-prt_def_cidfont(char *new_name, int height, char *cidfont)
+    స్థిర శూన్య
+prt_def_cidfont(అక్షరం *new_name, పూర్ణాంకం ఎత్తు, అక్షరం *cidfont)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 	      "/_%s /%s[/%s] vim_composefont\n", new_name, prt_cmap, cidfont);
-    prt_write_file(prt_line_buffer);
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
+			     "/%s %d /_%s ffs\n", new_name, ఎత్తు, new_name);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write a line to define a duplicate of a CID font
  */
-    static void
-prt_dup_cidfont(char *original_name, char *new_name)
+    స్థిర శూన్య
+prt_dup_cidfont(అక్షరం *original_name, అక్షరం *new_name)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 				       "/%s %s d\n", new_name, original_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
@@ -558,26 +558,26 @@ prt_dup_cidfont(char *original_name, char *new_name)
  * the fractional part being in the range [0,10^precision).  The fractional part
  * is also rounded based on the precision + 1'th fractional digit.
  */
-    static void
-prt_real_bits(
-    double      real,
-    int		precision,
-    int		*pinteger,
-    int		*pfraction)
+    స్థిర శూన్య
+prt_real_బిట్లు(
+    ద్విగుణ      real,
+    పూర్ణాంకం		precision,
+    పూర్ణాంకం		*pinteger,
+    పూర్ణాంకం		*pfraction)
 {
-    int     i;
-    int     integer;
-    float   fraction;
+    పూర్ణాంకం     i;
+    పూర్ణాంకం     integer;
+    దశాంశం   fraction;
 
-    integer = (int)real;
-    fraction = (float)(real - integer);
-    if (real < (double)integer)
+    integer = (పూర్ణాంకం)real;
+    fraction = (దశాంశం)(real - integer);
+    ఒకవేళ (real < (ద్విగుణ)integer)
 	fraction = -fraction;
-    for (i = 0; i < precision; i++)
+    కొరకు (i = 0; i < precision; i++)
 	fraction *= 10.0;
 
     *pinteger = integer;
-    *pfraction = (int)(fraction + 0.5);
+    *pfraction = (పూర్ణాంకం)(fraction + 0.5);
 }
 
 /*
@@ -585,62 +585,62 @@ prt_real_bits(
  * We use prt_real_bits() as %f in sprintf uses the locale setting to decide
  * what decimal point character to use, but PS always requires a '.'.
  */
-    static void
-prt_write_real(double val, int prec)
+    స్థిర శూన్య
+prt_write_real(ద్విగుణ val, పూర్ణాంకం prec)
 {
-    int     integer;
-    int     fraction;
+    పూర్ణాంకం     integer;
+    పూర్ణాంకం     fraction;
 
-    prt_real_bits(val, prec, &integer, &fraction);
+    prt_real_బిట్లు(val, prec, &integer, &fraction);
     // Emit integer part
-    sprintf((char *)prt_line_buffer, "%d", integer);
-    prt_write_file(prt_line_buffer);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "%d", integer);
+    prt_write_file(prt_పంక్తి_బఫరు);
     // Only emit fraction if necessary
-    if (fraction != 0)
+    ఒకవేళ (fraction != 0)
     {
 	// Remove any trailing zeros
-	while ((fraction % 10) == 0)
+	అయితే ((fraction % 10) == 0)
 	{
 	    prec--;
 	    fraction /= 10;
 	}
 	// Emit fraction left padded with zeros
-	sprintf((char *)prt_line_buffer, ".%0*d", prec, fraction);
-	prt_write_file(prt_line_buffer);
+	sprintf((అక్షరం *)prt_పంక్తి_బఫరు, ".%0*d", prec, fraction);
+	prt_write_file(prt_పంక్తి_బఫరు);
     }
-    sprintf((char *)prt_line_buffer, " ");
-    prt_write_file(prt_line_buffer);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, " ");
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 /*
  * Write a line to define a numeric variable.
  */
-    static void
-prt_def_var(char *name, double value, int prec)
+    స్థిర శూన్య
+prt_def_var(అక్షరం *name, ద్విగుణ విలువ, పూర్ణాంకం prec)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 								"/%s ", name);
-    prt_write_file(prt_line_buffer);
-    prt_write_real(value, prec);
-    sprintf((char *)prt_line_buffer, "d\n");
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
+    prt_write_real(విలువ, prec);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "d\n");
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
 // Convert size from font space to user space at current font scale
-# define PRT_PS_FONT_TO_USER(scale, size)    ((size) * ((scale)/1000.0))
+# define PRT_PS_FONT_గమ్యం_USER(scale, కొలత)    ((కొలత) * ((scale)/1000.0))
 
-    static void
-prt_flush_buffer(void)
+    స్థిర శూన్య
+prt_flush_బఫరు(శూన్య)
 {
-    if (prt_ps_buffer.ga_len <= 0)
-	return;
+    ఒకవేళ (prt_ps_బఫరు.ga_len <= 0)
+	తిరిగి;
 
     // Any background color must be drawn first
-    if (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
+    ఒకవేళ (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
     {
-	int     r, g, b;
+	పూర్ణాంకం     r, g, b;
 
-	if (prt_do_moveto)
+	ఒకవేళ (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -649,12 +649,12 @@ prt_flush_buffer(void)
 	}
 
 	// Size of rect of background color on which text is printed
-	prt_write_real(prt_text_run, 2);
-	prt_write_real(prt_line_height, 2);
+	prt_write_real(prt_పాఠ్యం_నిరంతరం, 2);
+	prt_write_real(prt_పంక్తి_ఎత్తు, 2);
 
 	// Lastly add the color of the background
-	r = ((unsigned)prt_new_bgcol & 0xff0000) >> 16;
-	g = ((unsigned)prt_new_bgcol & 0xff00) >> 8;
+	r = ((గుర్తులేని)prt_new_bgcol & 0xff0000) >> 16;
+	g = ((గుర్తులేని)prt_new_bgcol & 0xff00) >> 8;
 	b = prt_new_bgcol & 0xff;
 	prt_write_real(r / 255.0, 3);
 	prt_write_real(g / 255.0, 3);
@@ -663,9 +663,9 @@ prt_flush_buffer(void)
     }
     // Draw underlines before the text as it makes it slightly easier to
     // find the starting point.
-    if (prt_do_underline)
+    ఒకవేళ (prt_do_underline)
     {
-	if (prt_do_moveto)
+	ఒకవేళ (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -674,21 +674,21 @@ prt_flush_buffer(void)
 	}
 
 	// Underline length of text run
-	prt_write_real(prt_text_run, 2);
+	prt_write_real(prt_పాఠ్యం_నిరంతరం, 2);
 	prt_write_string("ul\n");
     }
     // Draw the text
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
 	prt_write_string("<");
-    else
+    లేకపోతే
 	prt_write_string("(");
-    prt_write_file_raw_len(prt_ps_buffer.ga_data, prt_ps_buffer.ga_len);
-    if (prt_out_mbyte)
+    prt_write_file_raw_len(prt_ps_బఫరు.ga_దత్తాంశం, prt_ps_బఫరు.ga_len);
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
 	prt_write_string(">");
-    else
+    లేకపోతే
 	prt_write_string(")");
     // Add a moveto if need be and use the appropriate show procedure
-    if (prt_do_moveto)
+    ఒకవేళ (prt_do_moveto)
     {
 	prt_write_real(prt_pos_x_moveto, 2);
 	prt_write_real(prt_pos_y_moveto, 2);
@@ -696,47 +696,47 @@ prt_flush_buffer(void)
 	prt_write_string("ms\n");
 	prt_do_moveto = FALSE;
     }
-    else // Simple show
+    లేకపోతే // Simple show
 	prt_write_string("s\n");
 
-    ga_clear(&prt_ps_buffer);
-    ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
+    ga_clear(&prt_ps_బఫరు);
+    ga_init2(&prt_ps_బఫరు, పరిమాణం(అక్షరం), prt_bufsiz);
 }
 
 
-    static void
-prt_resource_name(char_u *filename, void *cookie)
+    స్థిర శూన్య
+prt_resource_name(char_u *filename, శూన్య *cookie)
 {
     char_u *resource_filename = cookie;
 
-    if (STRLEN(filename) >= MAXPATHL)
+    ఒకవేళ (STRLEN(filename) >= MAXPATHL)
 	*resource_filename = NUL;
-    else
+    లేకపోతే
 	STRCPY(resource_filename, filename);
 }
 
-    static int
-prt_find_resource(char *name, struct prt_ps_resource_S *resource)
+    స్థిర పూర్ణాంకం
+prt_కనుగొను_resource(అక్షరం *name, నిర్మాణం prt_ps_resource_S *resource)
 {
-    char_u	*buffer;
-    int		retval;
+    char_u	*బఫరు;
+    పూర్ణాంకం		retval;
 
-    buffer = alloc(MAXPATHL + 1);
-    if (buffer == NULL)
-	return FALSE;
+    బఫరు = alloc(MAXPATHL + 1);
+    ఒకవేళ (బఫరు == ఖాళీ)
+	తిరిగి FALSE;
 
     vim_strncpy(resource->name, (char_u *)name, 63);
     // Look for named resource file in runtimepath
-    STRCPY(buffer, "print");
-    add_pathsep(buffer);
-    vim_strcat(buffer, (char_u *)name, MAXPATHL);
-    vim_strcat(buffer, (char_u *)".ps", MAXPATHL);
+    STRCPY(బఫరు, "print");
+    కూడు_pathsep(బఫరు);
+    vim_strcat(బఫరు, (char_u *)name, MAXPATHL);
+    vim_strcat(బఫరు, (char_u *)".ps", MAXPATHL);
     resource->filename[0] = NUL;
-    retval = (do_in_runtimepath(buffer, 0, prt_resource_name,
+    retval = (do_లోపల_runtimepath(బఫరు, 0, prt_resource_name,
 							   resource->filename)
 	    && resource->filename[0] != NUL);
-    vim_free(buffer);
-    return retval;
+    vim_free(బఫరు);
+    తిరిగి retval;
 }
 
 // PS CR and LF characters have platform independent values
@@ -745,658 +745,658 @@ prt_find_resource(char *name, struct prt_ps_resource_S *resource)
 
 // Static buffer to read initial comments in a resource file, some can have a
 // couple of KB of comments!
-# define PRT_FILE_BUFFER_LEN (2048)
-struct prt_resfile_buffer_S
+# define PRT_FILE_బఫరు_LEN (2048)
+నిర్మాణం prt_resfile_బఫరు_S
 {
-    char_u  buffer[PRT_FILE_BUFFER_LEN];
-    int     len;
-    int     line_start;
-    int     line_end;
+    char_u  బఫరు[PRT_FILE_బఫరు_LEN];
+    పూర్ణాంకం     len;
+    పూర్ణాంకం     పంక్తి_ప్రారంభం;
+    పూర్ణాంకం     పంక్తి_చివర;
 };
 
-static struct prt_resfile_buffer_S prt_resfile;
+స్థిర నిర్మాణం prt_resfile_బఫరు_S prt_resfile;
 
-    static int
-prt_resfile_next_line(void)
+    స్థిర పూర్ణాంకం
+prt_resfile_తదుపరి_పంక్తి(శూన్య)
 {
-    int     idx;
+    పూర్ణాంకం     idx;
 
     // Move to start of next line and then find end of line
-    idx = prt_resfile.line_end + 1;
-    while (idx < prt_resfile.len)
+    idx = prt_resfile.పంక్తి_చివర + 1;
+    అయితే (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] != PSLF && prt_resfile.buffer[idx] != PSCR)
-	    break;
+	ఒకవేళ (prt_resfile.బఫరు[idx] != PSLF && prt_resfile.బఫరు[idx] != PSCR)
+	    ఆపు;
 	idx++;
     }
-    prt_resfile.line_start = idx;
+    prt_resfile.పంక్తి_ప్రారంభం = idx;
 
-    while (idx < prt_resfile.len)
+    అయితే (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] == PSLF || prt_resfile.buffer[idx] == PSCR)
-	    break;
+	ఒకవేళ (prt_resfile.బఫరు[idx] == PSLF || prt_resfile.బఫరు[idx] == PSCR)
+	    ఆపు;
 	idx++;
     }
-    prt_resfile.line_end = idx;
+    prt_resfile.పంక్తి_చివర = idx;
 
-    return (idx < prt_resfile.len);
+    తిరిగి (idx < prt_resfile.len);
 }
 
-    static int
-prt_resfile_strncmp(int offset, char *string, int len)
+    స్థిర పూర్ణాంకం
+prt_resfile_strncmp(పూర్ణాంకం స్థానభ్రంశం, అక్షరం *string, పూర్ణాంకం len)
 {
     // Force not equal if string is longer than remainder of line
-    if (len > (prt_resfile.line_end - (prt_resfile.line_start + offset)))
-	return 1;
+    ఒకవేళ (len > (prt_resfile.పంక్తి_చివర - (prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం)))
+	తిరిగి 1;
 
-    return STRNCMP(&prt_resfile.buffer[prt_resfile.line_start + offset],
+    తిరిగి STRNCMP(&prt_resfile.బఫరు[prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం],
 								string, len);
 }
 
-    static int
-prt_resfile_skip_nonws(int offset)
+    స్థిర పూర్ణాంకం
+prt_resfile_skip_nonws(పూర్ణాంకం స్థానభ్రంశం)
 {
-    int     idx;
+    పూర్ణాంకం     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం;
+    అయితే (idx < prt_resfile.పంక్తి_చివర)
     {
-	if (SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	ఒకవేళ (సురక్షిత_isspace(prt_resfile.బఫరు[idx]))
+	    తిరిగి idx - prt_resfile.పంక్తి_ప్రారంభం;
 	idx++;
     }
-    return -1;
+    తిరిగి -1;
 }
 
-    static int
-prt_resfile_skip_ws(int offset)
+    స్థిర పూర్ణాంకం
+prt_resfile_skip_ws(పూర్ణాంకం స్థానభ్రంశం)
 {
-    int     idx;
+    పూర్ణాంకం     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం;
+    అయితే (idx < prt_resfile.పంక్తి_చివర)
     {
-	if (!SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	ఒకవేళ (!సురక్షిత_isspace(prt_resfile.బఫరు[idx]))
+	    తిరిగి idx - prt_resfile.పంక్తి_ప్రారంభం;
 	idx++;
     }
-    return -1;
+    తిరిగి -1;
 }
 
 // prt_next_dsc() - returns detail on next DSC comment line found.  Returns true
 // if a DSC comment is found, else false
-    static int
-prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
+    స్థిర పూర్ణాంకం
+prt_తదుపరి_dsc(నిర్మాణం prt_dsc_పంక్తి_S *p_dsc_పంక్తి)
 {
-    int     comment;
-    int     offset;
+    పూర్ణాంకం     comment;
+    పూర్ణాంకం     స్థానభ్రంశం;
 
     // Move to start of next line
-    if (!prt_resfile_next_line())
-	return FALSE;
+    ఒకవేళ (!prt_resfile_తదుపరి_పంక్తి())
+	తిరిగి FALSE;
 
     // DSC comments always start %%
-    if (prt_resfile_strncmp(0, "%%", 2) != 0)
-	return FALSE;
+    ఒకవేళ (prt_resfile_strncmp(0, "%%", 2) != 0)
+	తిరిగి FALSE;
 
     // Find type of DSC comment
-    for (comment = 0; comment < (int)ARRAY_LENGTH(prt_dsc_table); comment++)
-	if (prt_resfile_strncmp(0, prt_dsc_table[comment].string,
-					    prt_dsc_table[comment].len) == 0)
-	    break;
+    కొరకు (comment = 0; comment < (పూర్ణాంకం)ARRAY_నిడివి(prt_dsc_పట్టిక); comment++)
+	ఒకవేళ (prt_resfile_strncmp(0, prt_dsc_పట్టిక[comment].string,
+					    prt_dsc_పట్టిక[comment].len) == 0)
+	    ఆపు;
 
-    if (comment != ARRAY_LENGTH(prt_dsc_table))
+    ఒకవేళ (comment != ARRAY_నిడివి(prt_dsc_పట్టిక))
     {
 	// Return type of comment
-	p_dsc_line->type = prt_dsc_table[comment].type;
-	offset = prt_dsc_table[comment].len;
+	p_dsc_పంక్తి->type = prt_dsc_పట్టిక[comment].type;
+	స్థానభ్రంశం = prt_dsc_పట్టిక[comment].len;
     }
-    else
+    లేకపోతే
     {
 	// Unrecognised DSC comment, skip to ws after comment leader
-	p_dsc_line->type = PRT_DSC_MISC_TYPE;
-	offset = prt_resfile_skip_nonws(0);
-	if (offset == -1)
-	    return FALSE;
+	p_dsc_పంక్తి->type = PRT_DSC_MISC_TYPE;
+	స్థానభ్రంశం = prt_resfile_skip_nonws(0);
+	ఒకవేళ (స్థానభ్రంశం == -1)
+	    తిరిగి FALSE;
     }
 
     // Skip ws to comment value
-    offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    స్థానభ్రంశం = prt_resfile_skip_ws(స్థానభ్రంశం);
+    ఒకవేళ (స్థానభ్రంశం == -1)
+	తిరిగి FALSE;
 
-    p_dsc_line->string = &prt_resfile.buffer[prt_resfile.line_start + offset];
-    p_dsc_line->len = prt_resfile.line_end - (prt_resfile.line_start + offset);
+    p_dsc_పంక్తి->string = &prt_resfile.బఫరు[prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం];
+    p_dsc_పంక్తి->len = prt_resfile.పంక్తి_చివర - (prt_resfile.పంక్తి_ప్రారంభం + స్థానభ్రంశం);
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Improved hand crafted parser to get the type, title, and version number of a
  * PS resource file so the file details can be added to the DSC header comments.
  */
-    static int
-prt_open_resource(struct prt_ps_resource_S *resource)
+    స్థిర పూర్ణాంకం
+prt_open_resource(నిర్మాణం prt_ps_resource_S *resource)
 {
-    int		offset;
-    int		seen_all;
-    int		seen_title;
-    int		seen_version;
+    పూర్ణాంకం		స్థానభ్రంశం;
+    పూర్ణాంకం		చూసిన_all;
+    పూర్ణాంకం		చూసిన_title;
+    పూర్ణాంకం		చూసిన_సంస్కరణ;
     FILE	*fd_resource;
-    struct prt_dsc_line_S dsc_line;
+    నిర్మాణం prt_dsc_పంక్తి_S dsc_పంక్తి;
 
-    fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    fd_resource = mch_fopen((అక్షరం *)resource->filename, READBIN);
+    ఒకవేళ (fd_resource == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str_3), resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
-    CLEAR_FIELD(prt_resfile.buffer);
+    CLEAR_క్షేత్రం(prt_resfile.బఫరు);
 
     // Parse first line to ensure valid resource file
-    prt_resfile.len = (int)fread((char *)prt_resfile.buffer, sizeof(char_u),
-					    PRT_FILE_BUFFER_LEN, fd_resource);
-    if (ferror(fd_resource))
+    prt_resfile.len = (పూర్ణాంకం)fread((అక్షరం *)prt_resfile.బఫరు, పరిమాణం(char_u),
+					    PRT_FILE_బఫరు_LEN, fd_resource);
+    ఒకవేళ (ferror(fd_resource))
     {
 	semsg(_(e_cant_read_postscript_resource_file_str),
 		resource->filename);
 	fclose(fd_resource);
-	return FALSE;
+	తిరిగి FALSE;
     }
     fclose(fd_resource);
 
-    prt_resfile.line_end = -1;
-    prt_resfile.line_start = 0;
-    if (!prt_resfile_next_line())
-	return FALSE;
+    prt_resfile.పంక్తి_చివర = -1;
+    prt_resfile.పంక్తి_ప్రారంభం = 0;
+    ఒకవేళ (!prt_resfile_తదుపరి_పంక్తి())
+	తిరిగి FALSE;
 
-    offset = 0;
+    స్థానభ్రంశం = 0;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_HEADER,
-			       (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER)) != 0)
+    ఒకవేళ (prt_resfile_strncmp(స్థానభ్రంశం, PRT_RESOURCE_శీర్షిక,
+			       (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_శీర్షిక)) != 0)
     {
 	semsg(_(e_file_str_is_not_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // Skip over any version numbers and following ws
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER);
-    offset = prt_resfile_skip_nonws(offset);
-    if (offset == -1)
-	return FALSE;
-    offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    స్థానభ్రంశం += (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_శీర్షిక);
+    స్థానభ్రంశం = prt_resfile_skip_nonws(స్థానభ్రంశం);
+    ఒకవేళ (స్థానభ్రంశం == -1)
+	తిరిగి FALSE;
+    స్థానభ్రంశం = prt_resfile_skip_ws(స్థానభ్రంశం);
+    ఒకవేళ (స్థానభ్రంశం == -1)
+	తిరిగి FALSE;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_RESOURCE,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
+    ఒకవేళ (prt_resfile_strncmp(స్థానభ్రంశం, PRT_RESOURCE_RESOURCE,
+			     (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
+    స్థానభ్రంశం += (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
 
     // Decide type of resource in the file
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_PROCSET,
-			      (int)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
+    ఒకవేళ (prt_resfile_strncmp(స్థానభ్రంశం, PRT_RESOURCE_PROCSET,
+			      (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_PROCSET;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_ENCODING,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
+    లేకపోతే ఒకవేళ (prt_resfile_strncmp(స్థానభ్రంశం, PRT_RESOURCE_ENCODING,
+			     (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_ENCODING;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_CMAP,
-				 (int)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
+    లేకపోతే ఒకవేళ (prt_resfile_strncmp(స్థానభ్రంశం, PRT_RESOURCE_CMAP,
+				 (పూర్ణాంకం)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_CMAP;
-    else
+    లేకపోతే
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // Look for title and version of resource
     resource->title[0] = '\0';
-    resource->version[0] = '\0';
-    seen_title = FALSE;
-    seen_version = FALSE;
-    seen_all = FALSE;
-    while (!seen_all && prt_next_dsc(&dsc_line))
+    resource->సంస్కరణ_2[0] = '\0';
+    చూసిన_title = FALSE;
+    చూసిన_సంస్కరణ = FALSE;
+    చూసిన_all = FALSE;
+    అయితే (!చూసిన_all && prt_తదుపరి_dsc(&dsc_పంక్తి))
     {
-	switch (dsc_line.type)
+	ఎంపిక (dsc_పంక్తి.type)
 	{
-	case PRT_DSC_TITLE_TYPE:
-	    vim_strncpy(resource->title, dsc_line.string, dsc_line.len);
-	    seen_title = TRUE;
-	    if (seen_version)
-		seen_all = TRUE;
-	    break;
+	స్థితి PRT_DSC_TITLE_TYPE:
+	    vim_strncpy(resource->title, dsc_పంక్తి.string, dsc_పంక్తి.len);
+	    చూసిన_title = TRUE;
+	    ఒకవేళ (చూసిన_సంస్కరణ)
+		చూసిన_all = TRUE;
+	    ఆపు;
 
-	case PRT_DSC_VERSION_TYPE:
-	    vim_strncpy(resource->version, dsc_line.string, dsc_line.len);
-	    seen_version = TRUE;
-	    if (seen_title)
-		seen_all = TRUE;
-	    break;
+	స్థితి PRT_DSC_సంస్కరణ_TYPE:
+	    vim_strncpy(resource->సంస్కరణ_2, dsc_పంక్తి.string, dsc_పంక్తి.len);
+	    చూసిన_సంస్కరణ = TRUE;
+	    ఒకవేళ (చూసిన_title)
+		చూసిన_all = TRUE;
+	    ఆపు;
 
-	case PRT_DSC_ENDCOMMENTS_TYPE:
+	స్థితి PRT_DSC_ENDCOMMENTS_TYPE:
 	    // Won't find title or resource after this comment, stop searching
-	    seen_all = TRUE;
-	    break;
+	    చూసిన_all = TRUE;
+	    ఆపు;
 
-	case PRT_DSC_MISC_TYPE:
+	స్థితి PRT_DSC_MISC_TYPE:
 	    // Not interested in whatever comment this line had
-	    break;
+	    ఆపు;
 	}
     }
 
-    if (!seen_title || !seen_version)
+    ఒకవేళ (!చూసిన_title || !చూసిన_సంస్కరణ)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    static int
-prt_check_resource(struct prt_ps_resource_S *resource, char_u *version)
+    స్థిర పూర్ణాంకం
+prt_check_resource(నిర్మాణం prt_ps_resource_S *resource, char_u *సంస్కరణ_2)
 {
     // Version number m.n should match, the revision number does not matter
-    if (STRNCMP(resource->version, version, STRLEN(version)) != 0)
+    ఒకవేళ (STRNCMP(resource->సంస్కరణ_2, సంస్కరణ_2, STRLEN(సంస్కరణ_2)) != 0)
     {
-	semsg(_(e_str_resource_file_has_wrong_version),
+	semsg(_(e_str_resource_file_has_wrong_సంస్కరణ),
 		resource->name);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     // Other checks to be added as needed
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    static void
-prt_dsc_start(void)
+    స్థిర శూన్య
+prt_dsc_ప్రారంభం(శూన్య)
 {
     prt_write_string("%!PS-Adobe-3.0\n");
 }
 
-    static void
-prt_dsc_noarg(char *comment)
+    స్థిర శూన్య
+prt_dsc_noarg(అక్షరం *comment)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 							 "%%%%%s\n", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
-    static void
-prt_dsc_textline(char *comment, char *text)
+    స్థిర శూన్య
+prt_dsc_textline(అక్షరం *comment, అక్షరం *పాఠ్యం)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-					       "%%%%%s: %s\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
+					       "%%%%%s: %s\n", comment, పాఠ్యం);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
-    static void
-prt_dsc_text(char *comment, char *text)
+    స్థిర శూన్య
+prt_dsc_పాఠ్యం(అక్షరం *comment, అక్షరం *పాఠ్యం)
 {
     // TODO - should scan 'text' for any chars needing escaping!
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-					     "%%%%%s: (%s)\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
+					     "%%%%%s: (%s)\n", comment, పాఠ్యం);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
-# define prt_dsc_atend(c)	prt_dsc_text((c), "atend")
+# define prt_dsc_atend(c)	prt_dsc_పాఠ్యం((c), "atend")
 
-    static void
-prt_dsc_ints(char *comment, int count, int *ints)
+    స్థిర శూన్య
+prt_dsc_ints(అక్షరం *comment, పూర్ణాంకం లెక్క, పూర్ణాంకం *ints)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 							  "%%%%%s:", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
 
-    for (i = 0; i < count; i++)
+    కొరకు (i = 0; i < లెక్క; i++)
     {
-	sprintf((char *)prt_line_buffer, " %d", ints[i]);
-	prt_write_file(prt_line_buffer);
+	sprintf((అక్షరం *)prt_పంక్తి_బఫరు, " %d", ints[i]);
+	prt_write_file(prt_పంక్తి_బఫరు);
     }
 
     prt_write_string("\n");
 }
 
-    static void
+    స్థిర శూన్య
 prt_dsc_resources(
-    char	*comment,	// if NULL add to previous
-    char	*type,
-    char	*string)
+    అక్షరం	*comment,	// if NULL add to previous
+    అక్షరం	*type,
+    అక్షరం	*string)
 {
-    if (comment != NULL)
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    ఒకవేళ (comment != ఖాళీ)
+	vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 						 "%%%%%s: %s", comment, type);
-    else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    లేకపోతే
+	vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 							    "%%%%+ %s", type);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 							     " %s\n", string);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_పంక్తి_బఫరు);
 }
 
-    static void
-prt_dsc_font_resource(char *resource, struct prt_ps_font_S *ps_font)
+    స్థిర శూన్య
+prt_dsc_font_resource(అక్షరం *resource, నిర్మాణం prt_ps_font_S *ps_font)
 {
-    int     i;
+    పూర్ణాంకం     i;
 
     prt_dsc_resources(resource, "font",
 				    ps_font->ps_fontname[PRT_PS_FONT_ROMAN]);
-    for (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
-	if (ps_font->ps_fontname[i] != NULL)
-	    prt_dsc_resources(NULL, "font", ps_font->ps_fontname[i]);
+    కొరకు (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
+	ఒకవేళ (ps_font->ps_fontname[i] != ఖాళీ)
+	    prt_dsc_resources(ఖాళీ, "font", ps_font->ps_fontname[i]);
 }
 
-    static void
+    స్థిర శూన్య
 prt_dsc_requirements(
-    int		duplex,
-    int		tumble,
-    int		collate,
-    int		color,
-    int		num_copies)
+    పూర్ణాంకం		duplex,
+    పూర్ణాంకం		tumble,
+    పూర్ణాంకం		collate,
+    పూర్ణాంకం		color,
+    పూర్ణాంకం		అంకె_copies)
 {
     // Only output the comment if we need to.
     // Note: tumble is ignored if we are not duplexing
-    if (!(duplex || collate || color || (num_copies > 1)))
-	return;
+    ఒకవేళ (!(duplex || collate || color || (అంకె_copies > 1)))
+	తిరిగి;
 
-    sprintf((char *)prt_line_buffer, "%%%%Requirements:");
-    prt_write_file(prt_line_buffer);
+    sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "%%%%Requirements:");
+    prt_write_file(prt_పంక్తి_బఫరు);
 
-    if (duplex)
+    ఒకవేళ (duplex)
     {
 	prt_write_string(" duplex");
-	if (tumble)
+	ఒకవేళ (tumble)
 	    prt_write_string("(tumble)");
     }
-    if (collate)
+    ఒకవేళ (collate)
 	prt_write_string(" collate");
-    if (color)
+    ఒకవేళ (color)
 	prt_write_string(" color");
-    if (num_copies > 1)
+    ఒకవేళ (అంకె_copies > 1)
     {
 	prt_write_string(" numcopies(");
 	// Note: no space wanted so don't use prt_write_int()
-	sprintf((char *)prt_line_buffer, "%d", num_copies);
-	prt_write_file(prt_line_buffer);
+	sprintf((అక్షరం *)prt_పంక్తి_బఫరు, "%d", అంకె_copies);
+	prt_write_file(prt_పంక్తి_బఫరు);
 	prt_write_string(")");
     }
     prt_write_string("\n");
 }
 
-    static void
+    స్థిర శూన్య
 prt_dsc_docmedia(
-    char	*paper_name,
-    double	width,
-    double	height,
-    double	weight,
-    char	*colour,
-    char	*type)
+    అక్షరం	*paper_name,
+    ద్విగుణ	వెడల్పు,
+    ద్విగుణ	ఎత్తు,
+    ద్విగుణ	బరువు,
+    అక్షరం	*రంగు,
+    అక్షరం	*type)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((అక్షరం *)prt_పంక్తి_బఫరు, పరిమాణం(prt_పంక్తి_బఫరు),
 					"%%%%DocumentMedia: %s ", paper_name);
-    prt_write_file(prt_line_buffer);
-    prt_write_real(width, 2);
-    prt_write_real(height, 2);
-    prt_write_real(weight, 2);
-    if (colour == NULL)
+    prt_write_file(prt_పంక్తి_బఫరు);
+    prt_write_real(వెడల్పు, 2);
+    prt_write_real(ఎత్తు, 2);
+    prt_write_real(బరువు, 2);
+    ఒకవేళ (రంగు == ఖాళీ)
 	prt_write_string("()");
-    else
-	prt_write_string(colour);
+    లేకపోతే
+	prt_write_string(రంగు);
     prt_write_string(" ");
-    if (type == NULL)
+    ఒకవేళ (type == ఖాళీ)
 	prt_write_string("()");
-    else
+    లేకపోతే
 	prt_write_string(type);
     prt_write_string("\n");
 }
 
-    void
-mch_print_cleanup(void)
+    శూన్య
+mch_print_cleanup(శూన్య)
 {
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
-	int     i;
+	పూర్ణాంకం     i;
 
 	// Free off all CID font names created, but first clear duplicate
 	// pointers to the same string (when the same font is used for more than
 	// one style).
-	for (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
+	కొరకు (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
 	{
-	    if (prt_ps_mb_font.ps_fontname[i] != NULL)
+	    ఒకవేళ (prt_ps_mb_font.ps_fontname[i] != ఖాళీ)
 		VIM_CLEAR(prt_ps_mb_font.ps_fontname[i]);
 	}
     }
 
-    if (prt_do_conv)
+    ఒకవేళ (prt_do_conv)
     {
-	convert_setup(&prt_conv, NULL, NULL);
+	convert_అమరిక(&prt_conv, ఖాళీ, ఖాళీ);
 	prt_do_conv = FALSE;
     }
-    if (prt_ps_fd != NULL)
+    ఒకవేళ (prt_ps_fd != ఖాళీ)
     {
 	fclose(prt_ps_fd);
-	prt_ps_fd = NULL;
+	prt_ps_fd = ఖాళీ;
 	prt_file_error = FALSE;
     }
-    if (prt_ps_file_name != NULL)
+    ఒకవేళ (prt_ps_file_name != ఖాళీ)
 	VIM_CLEAR(prt_ps_file_name);
 }
 
-    static float
-to_device_units(int idx, double physsize, int def_number)
+    స్థిర దశాంశం
+గమ్యం_device_units(పూర్ణాంకం idx, ద్విగుణ physsize, పూర్ణాంకం def_సంఖ్య)
 {
-    float	ret;
-    int		u;
-    int		nr;
+    దశాంశం	ret;
+    పూర్ణాంకం		u;
+    పూర్ణాంకం		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    ఒకవేళ (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_సంఖ్య;
     }
-    else
-	nr = printer_opts[idx].number;
+    లేకపోతే
+	nr = printer_opts[idx].సంఖ్య;
 
-    switch (u)
+    ఎంపిక (u)
     {
-	case PRT_UNIT_INCH:
-	    ret = (float)(nr * PRT_PS_DEFAULT_DPI);
-	    break;
-	case PRT_UNIT_MM:
-	    ret = (float)(nr * PRT_PS_DEFAULT_DPI) / (float)25.4;
-	    break;
-	case PRT_UNIT_POINT:
-	    ret = (float)nr;
-	    break;
-	case PRT_UNIT_PERC:
-	default:
-	    ret = (float)(physsize * nr) / 100;
-	    break;
+	స్థితి PRT_UNIT_INCH:
+	    ret = (దశాంశం)(nr * PRT_PS_DEFAULT_DPI);
+	    ఆపు;
+	స్థితి PRT_UNIT_MM:
+	    ret = (దశాంశం)(nr * PRT_PS_DEFAULT_DPI) / (దశాంశం)25.4;
+	    ఆపు;
+	స్థితి PRT_UNIT_బిందువు:
+	    ret = (దశాంశం)nr;
+	    ఆపు;
+	స్థితి PRT_UNIT_PERC:
+	అప్రమేయ:
+	    ret = (దశాంశం)(physsize * nr) / 100;
+	    ఆపు;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Calculate margins for given width and height from printoptions settings.
  */
-    static void
-prt_page_margins(
-    double	width,
-    double	height,
-    double	*left,
-    double	*right,
-    double	*top,
-    double	*bottom)
+    స్థిర శూన్య
+prt_పుట_margins(
+    ద్విగుణ	వెడల్పు,
+    ద్విగుణ	ఎత్తు,
+    ద్విగుణ	*ఎడమ_2,
+    ద్విగుణ	*కుడి_2,
+    ద్విగుణ	*శిఖరం,
+    ద్విగుణ	*bottom)
 {
-    *left   = to_device_units(OPT_PRINT_LEFT, width, 10);
-    *right  = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
-    *top    = height - to_device_units(OPT_PRINT_TOP, height, 5);
-    *bottom = to_device_units(OPT_PRINT_BOT, height, 5);
+    *ఎడమ_2   = గమ్యం_device_units(OPT_PRINT_ఎడమ, వెడల్పు, 10);
+    *కుడి_2  = వెడల్పు - గమ్యం_device_units(OPT_PRINT_కుడి, వెడల్పు, 5);
+    *శిఖరం    = ఎత్తు - గమ్యం_device_units(OPT_PRINT_శిఖరం, ఎత్తు, 5);
+    *bottom = గమ్యం_device_units(OPT_PRINT_BOT, ఎత్తు, 5);
 }
 
-    static void
-prt_font_metrics(int font_scale)
+    స్థిర శూన్య
+prt_font_metrics(పూర్ణాంకం font_scale)
 {
-    prt_line_height = (float)font_scale;
-    prt_char_width = (float)PRT_PS_FONT_TO_USER(font_scale, prt_ps_font->wx);
+    prt_పంక్తి_ఎత్తు = (దశాంశం)font_scale;
+    prt_char_వెడల్పు = (దశాంశం)PRT_PS_FONT_గమ్యం_USER(font_scale, prt_ps_font->wx);
 }
 
 
-    static int
-prt_get_cpl(void)
+    స్థిర పూర్ణాంకం
+prt_get_cpl(శూన్య)
 {
-    if (prt_use_number())
+    ఒకవేళ (prt_use_సంఖ్య())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_char_width;
+	prt_సంఖ్య_వెడల్పు = PRINT_సంఖ్య_వెడల్పు * prt_char_వెడల్పు;
 	// If we are outputting multi-byte characters then line numbers will be
 	// printed with half width characters
-	if (prt_out_mbyte)
-	    prt_number_width /= 2;
-	prt_left_margin += prt_number_width;
+	ఒకవేళ (prt_బహిర్గతం_mbyte)
+	    prt_సంఖ్య_వెడల్పు /= 2;
+	prt_ఎడమ_margin += prt_సంఖ్య_వెడల్పు;
     }
-    else
-	prt_number_width = 0.0;
+    లేకపోతే
+	prt_సంఖ్య_వెడల్పు = 0.0;
 
-    return (int)((prt_right_margin - prt_left_margin) / prt_char_width);
+    తిరిగి (పూర్ణాంకం)((prt_కుడి_margin - prt_ఎడమ_margin) / prt_char_వెడల్పు);
 }
 
-    static int
-prt_build_cid_fontname(int font, char_u *name, int name_len)
+    స్థిర పూర్ణాంకం
+prt_build_cid_fontname(పూర్ణాంకం font, char_u *name, పూర్ణాంకం name_len)
 {
-    char    *fontname;
+    అక్షరం    *fontname;
 
     fontname = alloc(name_len + 1);
-    if (fontname == NULL)
-	return FALSE;
+    ఒకవేళ (fontname == ఖాళీ)
+	తిరిగి FALSE;
     vim_strncpy((char_u *)fontname, name, name_len);
     prt_ps_mb_font.ps_fontname[font] = fontname;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
-prt_get_lpp(void)
+    స్థిర పూర్ణాంకం
+prt_get_lpp(శూన్య)
 {
-    int lpp;
+    పూర్ణాంకం lpp;
 
     /*
      * Calculate offset to lower left corner of background rect based on actual
      * font height (based on its bounding box) and the line height, handling the
      * case where the font height can exceed the line height.
      */
-    prt_bgcol_offset = (float)PRT_PS_FONT_TO_USER(prt_line_height,
+    prt_bgcol_స్థానభ్రంశం = (దశాంశం)PRT_PS_FONT_గమ్యం_USER(prt_పంక్తి_ఎత్తు,
 					   prt_ps_font->bbox_min_y);
-    if ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
+    ఒకవేళ ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
     {
-	prt_bgcol_offset -= (float)PRT_PS_FONT_TO_USER(prt_line_height,
+	prt_bgcol_స్థానభ్రంశం -= (దశాంశం)PRT_PS_FONT_గమ్యం_USER(prt_పంక్తి_ఎత్తు,
 				(1000.0 - (prt_ps_font->bbox_max_y -
 					    prt_ps_font->bbox_min_y)) / 2);
     }
 
     // Get height for topmost line based on background rect offset.
-    prt_first_line_height = prt_line_height + prt_bgcol_offset;
+    prt_మొదటి_పంక్తి_ఎత్తు = prt_పంక్తి_ఎత్తు + prt_bgcol_స్థానభ్రంశం;
 
     // Calculate lpp
-    lpp = (int)((prt_top_margin - prt_bottom_margin) / prt_line_height);
+    lpp = (పూర్ణాంకం)((prt_శిఖరం_margin - prt_bottom_margin) / prt_పంక్తి_ఎత్తు);
 
     // Adjust top margin if there is a header
-    prt_top_margin -= prt_line_height * prt_header_height();
+    prt_శిఖరం_margin -= prt_పంక్తి_ఎత్తు * prt_శీర్షిక_ఎత్తు();
 
-    return lpp - prt_header_height();
+    తిరిగి lpp - prt_శీర్షిక_ఎత్తు();
 }
 
-    static int
-prt_match_encoding(
-    char			*p_encoding,
-    struct prt_ps_mbfont_S	*p_cmap,
-    struct prt_ps_encoding_S	**pp_mbenc)
+    స్థిర పూర్ణాంకం
+prt_సరిపోలిక_encoding(
+    అక్షరం			*p_encoding,
+    నిర్మాణం prt_ps_mbfont_S	*p_cmap,
+    నిర్మాణం prt_ps_encoding_S	**pp_mbenc)
 {
-    int				mbenc;
-    int				enc_len;
-    struct prt_ps_encoding_S	*p_mbenc;
+    పూర్ణాంకం				mbenc;
+    పూర్ణాంకం				enc_len;
+    నిర్మాణం prt_ps_encoding_S	*p_mbenc;
 
-    *pp_mbenc = NULL;
+    *pp_mbenc = ఖాళీ;
     // Look for recognised encoding
-    enc_len = (int)STRLEN(p_encoding);
+    enc_len = (పూర్ణాంకం)STRLEN(p_encoding);
     p_mbenc = p_cmap->encodings;
-    for (mbenc = 0; mbenc < p_cmap->num_encodings; mbenc++)
+    కొరకు (mbenc = 0; mbenc < p_cmap->అంకె_encodings; mbenc++)
     {
-	if (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
+	ఒకవేళ (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
 	{
 	    *pp_mbenc = p_mbenc;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 	p_mbenc++;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    static int
-prt_match_charset(
-    char		    *p_charset,
-    struct prt_ps_mbfont_S  *p_cmap,
-    struct prt_ps_charset_S **pp_mbchar)
+    స్థిర పూర్ణాంకం
+prt_సరిపోలిక_charset(
+    అక్షరం		    *p_charset,
+    నిర్మాణం prt_ps_mbfont_S  *p_cmap,
+    నిర్మాణం prt_ps_charset_S **pp_mbchar)
 {
-    int			    mbchar;
-    int			    char_len;
-    struct prt_ps_charset_S *p_mbchar;
+    పూర్ణాంకం			    mbchar;
+    పూర్ణాంకం			    char_len;
+    నిర్మాణం prt_ps_charset_S *p_mbchar;
 
     // Look for recognised character set, using default if one is not given
-    if (*p_charset == NUL)
+    ఒకవేళ (*p_charset == NUL)
 	p_charset = p_cmap->defcs;
-    char_len = (int)STRLEN(p_charset);
+    char_len = (పూర్ణాంకం)STRLEN(p_charset);
     p_mbchar = p_cmap->charsets;
-    for (mbchar = 0; mbchar < p_cmap->num_charsets; mbchar++)
+    కొరకు (mbchar = 0; mbchar < p_cmap->అంకె_charsets; mbchar++)
     {
-	if (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
+	ఒకవేళ (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
 	{
 	    *pp_mbchar = p_mbchar;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 	p_mbchar++;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    int
+    పూర్ణాంకం
 mch_print_init(
     prt_settings_T *psettings,
     char_u	*jobname,
-    int		forceit UNUSED)
+    పూర్ణాంకం		forceit వాడని)
 {
-    int		i;
-    char	*paper_name;
-    int		paper_strlen;
-    int		fontsize;
+    పూర్ణాంకం		i;
+    అక్షరం	*paper_name;
+    పూర్ణాంకం		paper_strlen;
+    పూర్ణాంకం		fontsize;
     char_u	*p;
-    double      left;
-    double      right;
-    double      top;
-    double      bottom;
-    int		props;
-    int		cmap = 0;
+    ద్విగుణ      ఎడమ_2;
+    ద్విగుణ      కుడి_2;
+    ద్విగుణ      శిఖరం;
+    ద్విగుణ      bottom;
+    పూర్ణాంకం		props;
+    పూర్ణాంకం		cmap = 0;
     char_u	*p_encoding;
-    struct prt_ps_encoding_S *p_mbenc;
-    struct prt_ps_encoding_S *p_mbenc_first;
-    struct prt_ps_charset_S  *p_mbchar = NULL;
+    నిర్మాణం prt_ps_encoding_S *p_mbenc;
+    నిర్మాణం prt_ps_encoding_S *p_mbenc_మొదటి;
+    నిర్మాణం prt_ps_charset_S  *p_mbchar = ఖాళీ;
 
-# if 0
+# ఒకవేళ 0
     /*
      * TODO:
      * If "forceit" is false: pop up a dialog to select:
@@ -1410,7 +1410,7 @@ mch_print_init(
      *
      * If "forceit" is true: use the default printer and settings
      */
-    if (forceit)
+    ఒకవేళ (forceit)
 	s_pd.Flags |= PD_RETURNDEFAULT;
 # endif
 
@@ -1418,131 +1418,131 @@ mch_print_init(
      * Set up font and encoding.
      */
     p_encoding = enc_skip(p_penc);
-    if (*p_encoding == NUL)
+    ఒకవేళ (*p_encoding == NUL)
 	p_encoding = enc_skip(p_enc);
 
     // Look for a multi-byte font that matches the encoding and character set.
     // Only look if multi-byte character set is defined, or using multi-byte
     // encoding other than Unicode.  This is because a Unicode encoding does not
     // uniquely identify a CJK character set to use.
-    p_mbenc = NULL;
+    p_mbenc = ఖాళీ;
     props = enc_canon_props(p_encoding);
-    if (!(props & ENC_8BIT) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
+    ఒకవేళ (!(props & ENC_8_బిట్టు) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
     {
-	int cmap_first = 0;
+	పూర్ణాంకం cmap_మొదటి = 0;
 
-	p_mbenc_first = NULL;
-	for (cmap = 0; cmap < (int)ARRAY_LENGTH(prt_ps_mbfonts); cmap++)
-	    if (prt_match_encoding((char *)p_encoding, &prt_ps_mbfonts[cmap],
+	p_mbenc_మొదటి = ఖాళీ;
+	కొరకు (cmap = 0; cmap < (పూర్ణాంకం)ARRAY_నిడివి(prt_ps_mbfonts); cmap++)
+	    ఒకవేళ (prt_సరిపోలిక_encoding((అక్షరం *)p_encoding, &prt_ps_mbfonts[cmap],
 								    &p_mbenc))
 	    {
-		if (p_mbenc_first == NULL)
+		ఒకవేళ (p_mbenc_మొదటి == ఖాళీ)
 		{
-		    p_mbenc_first = p_mbenc;
-		    cmap_first = cmap;
+		    p_mbenc_మొదటి = p_mbenc;
+		    cmap_మొదటి = cmap;
 		}
-		if (prt_match_charset((char *)p_pmcs, &prt_ps_mbfonts[cmap],
+		ఒకవేళ (prt_సరిపోలిక_charset((అక్షరం *)p_pmcs, &prt_ps_mbfonts[cmap],
 								   &p_mbchar))
-		    break;
+		    ఆపు;
 	    }
 
 	// Use first encoding matched if no charset matched
-	if (p_mbchar == NULL && p_mbenc_first != NULL)
+	ఒకవేళ (p_mbchar == ఖాళీ && p_mbenc_మొదటి != ఖాళీ)
 	{
-	    p_mbenc = p_mbenc_first;
-	    cmap = cmap_first;
+	    p_mbenc = p_mbenc_మొదటి;
+	    cmap = cmap_మొదటి;
 	}
     }
 
-    prt_out_mbyte = (p_mbenc != NULL);
-    if (prt_out_mbyte)
+    prt_బహిర్గతం_mbyte = (p_mbenc != ఖాళీ);
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
 	// Build CMap name - will be same for all multi-byte fonts used
 	prt_cmap[0] = NUL;
 
-	prt_custom_cmap = (p_mbchar == NULL);
-	if (!prt_custom_cmap)
+	prt_custom_cmap = (p_mbchar == ఖాళీ);
+	ఒకవేళ (!prt_custom_cmap)
 	{
 	    // Check encoding and character set are compatible
-	    if ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
+	    ఒకవేళ ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
 	    {
-		emsg(_(e_incompatible_multi_byte_encoding_and_character_set));
-		return FALSE;
+		emsg(_(e_incompatible_multi_byte_encoding_and_character_సమితి));
+		తిరిగి FALSE;
 	    }
 
 	    // Add charset name if not empty
-	    if (p_mbchar->cmap_charset != NULL)
+	    ఒకవేళ (p_mbchar->cmap_charset != ఖాళీ)
 	    {
 		vim_strncpy((char_u *)prt_cmap,
-		      (char_u *)p_mbchar->cmap_charset, sizeof(prt_cmap) - 3);
+		      (char_u *)p_mbchar->cmap_charset, పరిమాణం(prt_cmap) - 3);
 		STRCAT(prt_cmap, "-");
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // Add custom CMap character set name
-	    if (*p_pmcs == NUL)
+	    ఒకవేళ (*p_pmcs == NUL)
 	    {
-		emsg(_(e_printmbcharset_cannot_be_empty_with_multi_byte_encoding));
-		return FALSE;
+		emsg(_(e_printmbcharset_cannot_be_ఖాళీలు_with_multi_byte_encoding));
+		తిరిగి FALSE;
 	    }
-	    vim_strncpy((char_u *)prt_cmap, p_pmcs, sizeof(prt_cmap) - 3);
+	    vim_strncpy((char_u *)prt_cmap, p_pmcs, పరిమాణం(prt_cmap) - 3);
 	    STRCAT(prt_cmap, "-");
 	}
 
 	// CMap name ends with (optional) encoding name and -H for horizontal
-	if (p_mbenc->cmap_encoding != NULL && STRLEN(prt_cmap)
-		      + STRLEN(p_mbenc->cmap_encoding) + 3 < sizeof(prt_cmap))
+	ఒకవేళ (p_mbenc->cmap_encoding != ఖాళీ && STRLEN(prt_cmap)
+		      + STRLEN(p_mbenc->cmap_encoding) + 3 < పరిమాణం(prt_cmap))
 	{
 	    STRCAT(prt_cmap, p_mbenc->cmap_encoding);
 	    STRCAT(prt_cmap, "-");
 	}
 	STRCAT(prt_cmap, "H");
 
-	if (!mbfont_opts[OPT_MBFONT_REGULAR].present)
+	ఒకవేళ (!mbfont_opts[OPT_MBFONT_REGULAR].present)
 	{
 	    emsg(_(e_no_default_font_specified_for_multi_byte_printing));
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
 
 	// Derive CID font names with fallbacks if not defined
-	if (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
+	ఒకవేళ (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
 				    mbfont_opts[OPT_MBFONT_REGULAR].string,
-				    mbfont_opts[OPT_MBFONT_REGULAR].strlen))
-	    return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLD].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
+				    mbfont_opts[OPT_MBFONT_REGULAR].అక్షరశ్రేణి_పొడవు))
+	    తిరిగి FALSE;
+	ఒకవేళ (mbfont_opts[OPT_MBFONT_BOLD].present)
+	    ఒకవేళ (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
 					mbfont_opts[OPT_MBFONT_BOLD].string,
-					mbfont_opts[OPT_MBFONT_BOLD].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
+					mbfont_opts[OPT_MBFONT_BOLD].అక్షరశ్రేణి_పొడవు))
+		తిరిగి FALSE;
+	ఒకవేళ (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
+	    ఒకవేళ (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
 					mbfont_opts[OPT_MBFONT_OBLIQUE].string,
-					mbfont_opts[OPT_MBFONT_OBLIQUE].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
+					mbfont_opts[OPT_MBFONT_OBLIQUE].అక్షరశ్రేణి_పొడవు))
+		తిరిగి FALSE;
+	ఒకవేళ (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
+	    ఒకవేళ (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
 				   mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].string,
-				  mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].strlen))
-		return FALSE;
+				  mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].అక్షరశ్రేణి_పొడవు))
+		తిరిగి FALSE;
 
 	// Check if need to use Courier for ASCII code range, and if so pick up
 	// the encoding to use
 	prt_use_courier = mbfont_opts[OPT_MBFONT_USECOURIER].present &&
 	    (TOLOWER_ASC(mbfont_opts[OPT_MBFONT_USECOURIER].string[0]) == 'y');
-	if (prt_use_courier)
+	ఒకవేళ (prt_use_courier)
 	{
 	    // Use national ASCII variant unless ASCII wanted
-	    if (mbfont_opts[OPT_MBFONT_ASCII].present &&
+	    ఒకవేళ (mbfont_opts[OPT_MBFONT_ASCII].present &&
 		(TOLOWER_ASC(mbfont_opts[OPT_MBFONT_ASCII].string[0]) == 'y'))
 		prt_ascii_encoding = "ascii";
-	    else
+	    లేకపోతే
 		prt_ascii_encoding = prt_ps_mbfonts[cmap].ascii_enc;
 	}
 
 	prt_ps_font = &prt_ps_mb_font;
     }
-    else
+    లేకపోతే
     {
 	prt_use_courier = FALSE;
 	prt_ps_font = &prt_ps_courier_font;
@@ -1553,22 +1553,22 @@ mch_print_init(
      */
     prt_portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present
 	   || TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
-    if (printer_opts[OPT_PRINT_PAPER].present)
+    ఒకవేళ (printer_opts[OPT_PRINT_PAPER].present)
     {
-	paper_name = (char *)printer_opts[OPT_PRINT_PAPER].string;
-	paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
+	paper_name = (అక్షరం *)printer_opts[OPT_PRINT_PAPER].string;
+	paper_strlen = printer_opts[OPT_PRINT_PAPER].అక్షరశ్రేణి_పొడవు;
     }
-    else
+    లేకపోతే
     {
 	paper_name = "A4";
 	paper_strlen = 2;
     }
-    for (i = 0; i < (int)PRT_MEDIASIZE_LEN; ++i)
-	if (STRLEN(prt_mediasize[i].name) == (unsigned)paper_strlen
+    కొరకు (i = 0; i < (పూర్ణాంకం)PRT_MEDIASIZE_LEN; ++i)
+	ఒకవేళ (STRLEN(prt_mediasize[i].name) == (గుర్తులేని)paper_strlen
 		&& STRNICMP(prt_mediasize[i].name, paper_name,
 							   paper_strlen) == 0)
-	    break;
-    if (i == PRT_MEDIASIZE_LEN)
+	    ఆపు;
+    ఒకవేళ (i == PRT_MEDIASIZE_LEN)
 	i = 0;
     prt_media = i;
 
@@ -1579,47 +1579,47 @@ mch_print_init(
      * printed on, whereas the page size is the area that the PostScript
      * interpreter renders into.
      */
-    if (prt_portrait)
+    ఒకవేళ (prt_portrait)
     {
-	prt_page_width = prt_mediasize[i].width;
-	prt_page_height = prt_mediasize[i].height;
+	prt_పుట_వెడల్పు = prt_mediasize[i].వెడల్పు;
+	prt_పుట_ఎత్తు = prt_mediasize[i].ఎత్తు;
     }
-    else
+    లేకపోతే
     {
-	prt_page_width = prt_mediasize[i].height;
-	prt_page_height = prt_mediasize[i].width;
+	prt_పుట_వెడల్పు = prt_mediasize[i].ఎత్తు;
+	prt_పుట_ఎత్తు = prt_mediasize[i].వెడల్పు;
     }
 
     /*
      * Set PS page margins based on the PS pagesize, not the mediasize - this
      * needs to be done before the cpl and lpp are calculated.
      */
-    prt_page_margins(prt_page_width, prt_page_height, &left, &right, &top,
+    prt_పుట_margins(prt_పుట_వెడల్పు, prt_పుట_ఎత్తు, &ఎడమ_2, &కుడి_2, &శిఖరం,
 								    &bottom);
-    prt_left_margin = (float)left;
-    prt_right_margin = (float)right;
-    prt_top_margin = (float)top;
-    prt_bottom_margin = (float)bottom;
+    prt_ఎడమ_margin = (దశాంశం)ఎడమ_2;
+    prt_కుడి_margin = (దశాంశం)కుడి_2;
+    prt_శిఖరం_margin = (దశాంశం)శిఖరం;
+    prt_bottom_margin = (దశాంశం)bottom;
 
     /*
      * Set up the font size.
      */
     fontsize = PRT_PS_DEFAULT_FONTSIZE;
-    for (p = p_pfn; (p = vim_strchr(p, ':')) != NULL; ++p)
-	if (p[1] == 'h' && VIM_ISDIGIT(p[2]))
-	    fontsize = atoi((char *)p + 2);
+    కొరకు (p = p_pfn; (p = vim_strchr(p, ':')) != ఖాళీ; ++p)
+	ఒకవేళ (p[1] == 'h' && VIM_ISDIGIT(p[2]))
+	    fontsize = atoi((అక్షరం *)p + 2);
     prt_font_metrics(fontsize);
 
     /*
      * Return the number of characters per line, and lines per page for the
      * generic print code.
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
+    psettings->chars_చొప్పున_పంక్తి = prt_get_cpl();
+    psettings->పంక్తులు_చొప్పున_పుట = prt_get_lpp();
 
     // Catch margin settings that leave no space for output!
-    if (psettings->chars_per_line <= 0 || psettings->lines_per_page <= 0)
-	return FAIL;
+    ఒకవేళ (psettings->chars_చొప్పున_పంక్తి <= 0 || psettings->పంక్తులు_చొప్పున_పుట <= 0)
+	తిరిగి FAIL;
 
     /*
      * Sort out the number of copies to be printed.  PS by default will do
@@ -1629,19 +1629,19 @@ mch_print_init(
      */
     psettings->n_collated_copies = 1;
     psettings->n_uncollated_copies = 1;
-    prt_num_copies = 1;
+    prt_అంకె_copies = 1;
     prt_collate = (!printer_opts[OPT_PRINT_COLLATE].present
 	    || TOLOWER_ASC(printer_opts[OPT_PRINT_COLLATE].string[0]) == 'y');
-    if (prt_collate)
+    ఒకవేళ (prt_collate)
     {
 	// TODO: Get number of collated copies wanted.
 	psettings->n_collated_copies = 1;
     }
-    else
+    లేకపోతే
     {
 	// TODO: Get number of uncollated copies wanted and update the cached
 	// count.
-	prt_num_copies = 1;
+	prt_అంకె_copies = 1;
     }
 
     psettings->jobname = jobname;
@@ -1653,14 +1653,14 @@ mch_print_init(
     prt_duplex = TRUE;
     prt_tumble = FALSE;
     psettings->duplex = 1;
-    if (printer_opts[OPT_PRINT_DUPLEX].present)
+    ఒకవేళ (printer_opts[OPT_PRINT_DUPLEX].present)
     {
-	if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	ఒకవేళ (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	{
 	    prt_duplex = FALSE;
 	    psettings->duplex = 0;
 	}
-	else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
+	లేకపోతే ఒకవేళ (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
 									 == 0)
 	    prt_tumble = TRUE;
     }
@@ -1669,38 +1669,38 @@ mch_print_init(
     psettings->user_abort = 0;
 
     // If the user didn't specify a file name, use a temp file.
-    if (psettings->outfile == NULL)
+    ఒకవేళ (psettings->outfile == ఖాళీ)
     {
 	prt_ps_file_name = vim_tempname('p', TRUE);
-	if (prt_ps_file_name == NULL)
+	ఒకవేళ (prt_ps_file_name == ఖాళీ)
 	{
-	    emsg(_(e_cant_get_temp_file_name));
-	    return FAIL;
+	    emsg(_(e_cant_get_తాత్కాలిక_file_name));
+	    తిరిగి FAIL;
 	}
-	prt_ps_fd = mch_fopen((char *)prt_ps_file_name, WRITEBIN);
+	prt_ps_fd = mch_fopen((అక్షరం *)prt_ps_file_name, WRITEBIN);
     }
-    else
+    లేకపోతే
     {
 	p = expand_env_save(psettings->outfile);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    prt_ps_fd = mch_fopen((char *)p, WRITEBIN);
+	    prt_ps_fd = mch_fopen((అక్షరం *)p, WRITEBIN);
 	    vim_free(p);
 	}
     }
-    if (prt_ps_fd == NULL)
+    ఒకవేళ (prt_ps_fd == ఖాళీ)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    prt_bufsiz = psettings->chars_per_line;
-    if (prt_out_mbyte)
+    prt_bufsiz = psettings->chars_చొప్పున_పంక్తి;
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
 	prt_bufsiz *= 2;
-    ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
+    ga_init2(&prt_ps_బఫరు, పరిమాణం(అక్షరం), prt_bufsiz);
 
-    prt_page_num = 0;
+    prt_పుట_అంకె = 0;
 
     prt_attribute_change = FALSE;
     prt_need_moveto = FALSE;
@@ -1711,45 +1711,45 @@ mch_print_init(
 
     prt_file_error = FALSE;
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-prt_add_resource(struct prt_ps_resource_S *resource)
+    స్థిర పూర్ణాంకం
+prt_కూడు_resource(నిర్మాణం prt_ps_resource_S *resource)
 {
     FILE*	fd_resource;
-    char_u	resource_buffer[512];
-    size_t	bytes_read;
+    char_u	resource_బఫరు[512];
+    size_t	బైట్లు_read;
 
-    fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    fd_resource = mch_fopen((అక్షరం *)resource->filename, READBIN);
+    ఒకవేళ (fd_resource == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str_2), resource->filename);
-	return FALSE;
+	తిరిగి FALSE;
     }
     prt_dsc_resources("BeginResource", prt_resource_types[resource->type],
-						     (char *)resource->title);
+						     (అక్షరం *)resource->title);
 
-    prt_dsc_textline("BeginDocument", (char *)resource->filename);
+    prt_dsc_textline("BeginDocument", (అక్షరం *)resource->filename);
 
-    for (;;)
+    కొరకు (;;)
     {
-	bytes_read = fread((char *)resource_buffer, sizeof(char_u),
-			   sizeof(resource_buffer), fd_resource);
-	if (ferror(fd_resource))
+	బైట్లు_read = fread((అక్షరం *)resource_బఫరు, పరిమాణం(char_u),
+			   పరిమాణం(resource_బఫరు), fd_resource);
+	ఒకవేళ (ferror(fd_resource))
 	{
 	    semsg(_(e_cant_read_postscript_resource_file_str),
 							    resource->filename);
 	    fclose(fd_resource);
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
-	if (bytes_read == 0)
-	    break;
-	prt_write_file_raw_len(resource_buffer, (int)bytes_read);
-	if (prt_file_error)
+	ఒకవేళ (బైట్లు_read == 0)
+	    ఆపు;
+	prt_write_file_raw_len(resource_బఫరు, (పూర్ణాంకం)బైట్లు_read);
+	ఒకవేళ (prt_file_error)
 	{
 	    fclose(fd_resource);
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
     fclose(fd_resource);
@@ -1758,45 +1758,45 @@ prt_add_resource(struct prt_ps_resource_S *resource)
 
     prt_dsc_noarg("EndResource");
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    int
+    పూర్ణాంకం
 mch_print_begin(prt_settings_T *psettings)
 {
-    int		bbox[4];
-    double      left;
-    double      right;
-    double      top;
-    double      bottom;
-    struct prt_ps_resource_S *res_prolog;
-    struct prt_ps_resource_S *res_encoding;
-    char	buffer[256];
+    పూర్ణాంకం		bbox[4];
+    ద్విగుణ      ఎడమ_2;
+    ద్విగుణ      కుడి_2;
+    ద్విగుణ      శిఖరం;
+    ద్విగుణ      bottom;
+    నిర్మాణం prt_ps_resource_S *res_prolog;
+    నిర్మాణం prt_ps_resource_S *res_encoding;
+    అక్షరం	బఫరు[256];
     char_u      *p_encoding;
-    struct prt_ps_resource_S *res_cidfont;
-    struct prt_ps_resource_S *res_cmap;
-    int		retval = FALSE;
+    నిర్మాణం prt_ps_resource_S *res_cidfont;
+    నిర్మాణం prt_ps_resource_S *res_cmap;
+    పూర్ణాంకం		retval = FALSE;
 
-    res_prolog = ALLOC_ONE(struct prt_ps_resource_S);
-    res_encoding = ALLOC_ONE(struct prt_ps_resource_S);
-    res_cidfont = ALLOC_ONE(struct prt_ps_resource_S);
-    res_cmap = ALLOC_ONE(struct prt_ps_resource_S);
-    if (res_prolog == NULL || res_encoding == NULL
-	    || res_cidfont == NULL || res_cmap == NULL)
-	goto theend;
+    res_prolog = ALLOC_ONE(నిర్మాణం prt_ps_resource_S);
+    res_encoding = ALLOC_ONE(నిర్మాణం prt_ps_resource_S);
+    res_cidfont = ALLOC_ONE(నిర్మాణం prt_ps_resource_S);
+    res_cmap = ALLOC_ONE(నిర్మాణం prt_ps_resource_S);
+    ఒకవేళ (res_prolog == ఖాళీ || res_encoding == ఖాళీ
+	    || res_cidfont == ఖాళీ || res_cmap == ఖాళీ)
+	వెళ్ళు theend;
 
     /*
      * PS DSC Header comments - no PS code!
      */
-    prt_dsc_start();
-    prt_dsc_textline("Title", (char *)psettings->jobname);
-    if (!get_user_name((char_u *)buffer, 256))
-	STRCPY(buffer, "Unknown");
-    prt_dsc_textline("For", buffer);
-    prt_dsc_textline("Creator", VIM_VERSION_LONG);
+    prt_dsc_ప్రారంభం();
+    prt_dsc_textline("Title", (అక్షరం *)psettings->jobname);
+    ఒకవేళ (!get_user_name((char_u *)బఫరు, 256))
+	STRCPY(బఫరు, "Unknown");
+    prt_dsc_textline("For", బఫరు);
+    prt_dsc_textline("Creator", VIM_సంస్కరణ_LONG);
     // Note: to ensure Clean8bit I don't think we can use LC_TIME
 
-    prt_dsc_textline("CreationDate", get_ctime(time(NULL), FALSE));
+    prt_dsc_textline("CreationDate", get_ctime(సమయం(ఖాళీ), FALSE));
     prt_dsc_textline("DocumentData", "Clean8Bit");
     prt_dsc_textline("Orientation", prt_portrait ? "Portrait" : "Landscape");
     prt_dsc_atend("Pages");
@@ -1804,187 +1804,187 @@ mch_print_begin(prt_settings_T *psettings)
     // The bbox does not change with orientation - it is always in the default
     // user coordinate system!  We have to recalculate right and bottom
     // coordinates based on the font metrics for the bbox to be accurate.
-    prt_page_margins(prt_mediasize[prt_media].width,
-					    prt_mediasize[prt_media].height,
-					    &left, &right, &top, &bottom);
-    bbox[0] = (int)left;
-    if (prt_portrait)
+    prt_పుట_margins(prt_mediasize[prt_media].వెడల్పు,
+					    prt_mediasize[prt_media].ఎత్తు,
+					    &ఎడమ_2, &కుడి_2, &శిఖరం, &bottom);
+    bbox[0] = (పూర్ణాంకం)ఎడమ_2;
+    ఒకవేళ (prt_portrait)
     {
 	// In portrait printing the fixed point is the top left corner so we
 	// derive the bbox from that point.  We have the expected cpl chars
 	// across the media and lpp lines down the media.
-	bbox[1] = (int)(top - (psettings->lines_per_page + prt_header_height())
-						    * (double)prt_line_height);
-	bbox[2] = (int)(left + psettings->chars_per_line
-					       * (double)prt_char_width + 0.5);
-	bbox[3] = (int)(top + 0.5);
+	bbox[1] = (పూర్ణాంకం)(శిఖరం - (psettings->పంక్తులు_చొప్పున_పుట + prt_శీర్షిక_ఎత్తు())
+						    * (ద్విగుణ)prt_పంక్తి_ఎత్తు);
+	bbox[2] = (పూర్ణాంకం)(ఎడమ_2 + psettings->chars_చొప్పున_పంక్తి
+					       * (ద్విగుణ)prt_char_వెడల్పు + 0.5);
+	bbox[3] = (పూర్ణాంకం)(శిఖరం + 0.5);
     }
-    else
+    లేకపోతే
     {
 	// In landscape printing the fixed point is the bottom left corner so we
 	// derive the bbox from that point.  We have lpp chars across the media
 	// and cpl lines up the media.
-	bbox[1] = (int)bottom;
-	bbox[2] = (int)(left + ((psettings->lines_per_page
-			      + prt_header_height()) * prt_line_height) + 0.5);
-	bbox[3] = (int)(bottom + psettings->chars_per_line
-					       * (double)prt_char_width + 0.5);
+	bbox[1] = (పూర్ణాంకం)bottom;
+	bbox[2] = (పూర్ణాంకం)(ఎడమ_2 + ((psettings->పంక్తులు_చొప్పున_పుట
+			      + prt_శీర్షిక_ఎత్తు()) * prt_పంక్తి_ఎత్తు) + 0.5);
+	bbox[3] = (పూర్ణాంకం)(bottom + psettings->chars_చొప్పున_పంక్తి
+					       * (ద్విగుణ)prt_char_వెడల్పు + 0.5);
     }
     prt_dsc_ints("BoundingBox", 4, bbox);
     // The media width and height does not change with landscape printing!
     prt_dsc_docmedia(prt_mediasize[prt_media].name,
-				prt_mediasize[prt_media].width,
-				prt_mediasize[prt_media].height,
-				(double)0, NULL, NULL);
+				prt_mediasize[prt_media].వెడల్పు,
+				prt_mediasize[prt_media].ఎత్తు,
+				(ద్విగుణ)0, ఖాళీ, ఖాళీ);
     // Define fonts needed
-    if (!prt_out_mbyte || prt_use_courier)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte || prt_use_courier)
 	prt_dsc_font_resource("DocumentNeededResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
-	prt_dsc_font_resource((prt_use_courier ? NULL
+	prt_dsc_font_resource((prt_use_courier ? ఖాళీ
 				: "DocumentNeededResources"), &prt_ps_mb_font);
-	if (!prt_custom_cmap)
-	    prt_dsc_resources(NULL, "cmap", prt_cmap);
+	ఒకవేళ (!prt_custom_cmap)
+	    prt_dsc_resources(ఖాళీ, "cmap", prt_cmap);
     }
 
     // Search for external resources VIM supplies
-    if (!prt_find_resource("prolog", res_prolog))
+    ఒకవేళ (!prt_కనుగొను_resource("prolog", res_prolog))
     {
-	semsg(_(e_cant_find_postscript_resource_file_str_ps), "prolog");
-	goto theend;
+	semsg(_(e_cant_కనుగొను_postscript_resource_file_str_ps), "prolog");
+	వెళ్ళు theend;
     }
-    if (!prt_open_resource(res_prolog))
-	goto theend;
-    if (!prt_check_resource(res_prolog, PRT_PROLOG_VERSION))
-	goto theend;
-    if (prt_out_mbyte)
+    ఒకవేళ (!prt_open_resource(res_prolog))
+	వెళ్ళు theend;
+    ఒకవేళ (!prt_check_resource(res_prolog, PRT_PROLOG_సంస్కరణ))
+	వెళ్ళు theend;
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
 	// Look for required version of multi-byte printing procset
-	if (!prt_find_resource("cidfont", res_cidfont))
+	ఒకవేళ (!prt_కనుగొను_resource("cidfont", res_cidfont))
 	{
-	    semsg(_(e_cant_find_postscript_resource_file_str_ps), "cidfont");
-	    goto theend;
+	    semsg(_(e_cant_కనుగొను_postscript_resource_file_str_ps), "cidfont");
+	    వెళ్ళు theend;
 	}
-	if (!prt_open_resource(res_cidfont))
-	    goto theend;
-	if (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_VERSION))
-	    goto theend;
+	ఒకవేళ (!prt_open_resource(res_cidfont))
+	    వెళ్ళు theend;
+	ఒకవేళ (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_సంస్కరణ))
+	    వెళ్ళు theend;
     }
 
     // Find an encoding to use for printing.
     // Check 'printencoding'. If not set or not found, then use 'encoding'. If
     // that cannot be found then default to "latin1".
     // Note: VIM specific encoding header is always skipped.
-    if (!prt_out_mbyte)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte)
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL
-		|| !prt_find_resource((char *)p_encoding, res_encoding))
+	ఒకవేళ (*p_encoding == NUL
+		|| !prt_కనుగొను_resource((అక్షరం *)p_encoding, res_encoding))
 	{
 	    // 'printencoding' not set or not supported - find alternate
-	    int		props;
+	    పూర్ణాంకం		props;
 
 	    p_encoding = enc_skip(p_enc);
 	    props = enc_canon_props(p_encoding);
-	    if (!(props & ENC_8BIT)
-		    || !prt_find_resource((char *)p_encoding, res_encoding))
+	    ఒకవేళ (!(props & ENC_8_బిట్టు)
+		    || !prt_కనుగొను_resource((అక్షరం *)p_encoding, res_encoding))
 		// 8-bit 'encoding' is not supported
 	    {
 		// Use latin1 as default printing encoding
 		p_encoding = (char_u *)"latin1";
-		if (!prt_find_resource((char *)p_encoding, res_encoding))
+		ఒకవేళ (!prt_కనుగొను_resource((అక్షరం *)p_encoding, res_encoding))
 		{
-		    semsg(_(e_cant_find_postscript_resource_file_str_ps),
+		    semsg(_(e_cant_కనుగొను_postscript_resource_file_str_ps),
 			    p_encoding);
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 	    }
 	}
-	if (!prt_open_resource(res_encoding))
-	    goto theend;
+	ఒకవేళ (!prt_open_resource(res_encoding))
+	    వెళ్ళు theend;
 	// For the moment there are no checks on encoding resource files to
 	// perform
     }
-    else
+    లేకపోతే
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL)
+	ఒకవేళ (*p_encoding == NUL)
 	    p_encoding = enc_skip(p_enc);
-	if (prt_use_courier)
+	ఒకవేళ (prt_use_courier)
 	{
 	    // Include ASCII range encoding vector
-	    if (!prt_find_resource(prt_ascii_encoding, res_encoding))
+	    ఒకవేళ (!prt_కనుగొను_resource(prt_ascii_encoding, res_encoding))
 	    {
-		semsg(_(e_cant_find_postscript_resource_file_str_ps),
+		semsg(_(e_cant_కనుగొను_postscript_resource_file_str_ps),
 							  prt_ascii_encoding);
-		goto theend;
+		వెళ్ళు theend;
 	    }
-	    if (!prt_open_resource(res_encoding))
-		goto theend;
+	    ఒకవేళ (!prt_open_resource(res_encoding))
+		వెళ్ళు theend;
 	    // For the moment there are no checks on encoding resource files to
 	    // perform
 	}
     }
 
     prt_conv.vc_type = CONV_NONE;
-    if (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8BIT))
+    ఒకవేళ (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8_బిట్టు))
     {
 	// Set up encoding conversion if required
-	if (FAIL == convert_setup(&prt_conv, p_enc, p_encoding))
+	ఒకవేళ (FAIL == convert_అమరిక(&prt_conv, p_enc, p_encoding))
 	{
-	    semsg(_(e_unable_to_convert_to_print_encoding_str), p_encoding);
-	    goto theend;
+	    semsg(_(e_unable_గమ్యం_convert_గమ్యం_print_encoding_str), p_encoding);
+	    వెళ్ళు theend;
 	}
 	prt_do_conv = TRUE;
     }
     prt_do_conv = prt_conv.vc_type != CONV_NONE;
 
-    if (prt_out_mbyte && prt_custom_cmap)
+    ఒకవేళ (prt_బహిర్గతం_mbyte && prt_custom_cmap)
     {
 	// Find user supplied CMap
-	if (!prt_find_resource(prt_cmap, res_cmap))
+	ఒకవేళ (!prt_కనుగొను_resource(prt_cmap, res_cmap))
 	{
-	    semsg(_(e_cant_find_postscript_resource_file_str_ps), prt_cmap);
-	    goto theend;
+	    semsg(_(e_cant_కనుగొను_postscript_resource_file_str_ps), prt_cmap);
+	    వెళ్ళు theend;
 	}
-	if (!prt_open_resource(res_cmap))
-	    goto theend;
+	ఒకవేళ (!prt_open_resource(res_cmap))
+	    వెళ్ళు theend;
     }
 
     // List resources supplied
-    STRCPY(buffer, res_prolog->title);
-    STRCAT(buffer, " ");
-    STRCAT(buffer, res_prolog->version);
-    prt_dsc_resources("DocumentSuppliedResources", "procset", buffer);
-    if (prt_out_mbyte)
+    STRCPY(బఫరు, res_prolog->title);
+    STRCAT(బఫరు, " ");
+    STRCAT(బఫరు, res_prolog->సంస్కరణ_2);
+    prt_dsc_resources("DocumentSuppliedResources", "procset", బఫరు);
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
-	STRCPY(buffer, res_cidfont->title);
-	STRCAT(buffer, " ");
-	STRCAT(buffer, res_cidfont->version);
-	prt_dsc_resources(NULL, "procset", buffer);
+	STRCPY(బఫరు, res_cidfont->title);
+	STRCAT(బఫరు, " ");
+	STRCAT(బఫరు, res_cidfont->సంస్కరణ_2);
+	prt_dsc_resources(ఖాళీ, "procset", బఫరు);
 
-	if (prt_custom_cmap)
+	ఒకవేళ (prt_custom_cmap)
 	{
-	    STRCPY(buffer, res_cmap->title);
-	    STRCAT(buffer, " ");
-	    STRCAT(buffer, res_cmap->version);
-	    prt_dsc_resources(NULL, "cmap", buffer);
+	    STRCPY(బఫరు, res_cmap->title);
+	    STRCAT(బఫరు, " ");
+	    STRCAT(బఫరు, res_cmap->సంస్కరణ_2);
+	    prt_dsc_resources(ఖాళీ, "cmap", బఫరు);
 	}
     }
-    if (!prt_out_mbyte || prt_use_courier)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte || prt_use_courier)
     {
-	STRCPY(buffer, res_encoding->title);
-	STRCAT(buffer, " ");
-	STRCAT(buffer, res_encoding->version);
-	prt_dsc_resources(NULL, "encoding", buffer);
+	STRCPY(బఫరు, res_encoding->title);
+	STRCAT(బఫరు, " ");
+	STRCAT(బఫరు, res_encoding->సంస్కరణ_2);
+	prt_dsc_resources(ఖాళీ, "encoding", బఫరు);
     }
     prt_dsc_requirements(prt_duplex, prt_tumble, prt_collate,
 # ifdef FEAT_SYN_HL
 					psettings->do_syntax
-# else
+# లేకపోతే
 					0
 # endif
-					, prt_num_copies);
+					, prt_అంకె_copies);
     prt_dsc_noarg("EndComments");
 
     /*
@@ -1993,14 +1993,14 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginDefaults");
 
     // List font resources most likely common to all pages
-    if (!prt_out_mbyte || prt_use_courier)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte || prt_use_courier)
 	prt_dsc_font_resource("PageResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
-	prt_dsc_font_resource((prt_use_courier ? NULL : "PageResources"),
+	prt_dsc_font_resource((prt_use_courier ? ఖాళీ : "PageResources"),
 							    &prt_ps_mb_font);
-	if (!prt_custom_cmap)
-	    prt_dsc_resources(NULL, "cmap", prt_cmap);
+	ఒకవేళ (!prt_custom_cmap)
+	    prt_dsc_resources(ఖాళీ, "cmap", prt_cmap);
     }
 
     // Paper will be used for all pages
@@ -2014,22 +2014,22 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginProlog");
 
     // Add required procsets - NOTE: order is important!
-    if (!prt_add_resource(res_prolog))
-	goto theend;
-    if (prt_out_mbyte)
+    ఒకవేళ (!prt_కూడు_resource(res_prolog))
+	వెళ్ళు theend;
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
 	// Add CID font procset, and any user supplied CMap
-	if (!prt_add_resource(res_cidfont))
-	    goto theend;
-	if (prt_custom_cmap && !prt_add_resource(res_cmap))
-	    goto theend;
+	ఒకవేళ (!prt_కూడు_resource(res_cidfont))
+	    వెళ్ళు theend;
+	ఒకవేళ (prt_custom_cmap && !prt_కూడు_resource(res_cmap))
+	    వెళ్ళు theend;
     }
 
-    if (!prt_out_mbyte || prt_use_courier)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte || prt_use_courier)
 	// There will be only one Roman font encoding to be included in the PS
 	// file.
-	if (!prt_add_resource(res_encoding))
-	    goto theend;
+	ఒకవేళ (!prt_కూడు_resource(res_encoding))
+	    వెళ్ళు theend;
 
     prt_dsc_noarg("EndProlog");
 
@@ -2039,11 +2039,11 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginSetup");
 
     // Device setup - page size and number of uncollated copies
-    prt_write_int((int)prt_mediasize[prt_media].width);
-    prt_write_int((int)prt_mediasize[prt_media].height);
+    prt_write_int((పూర్ణాంకం)prt_mediasize[prt_media].వెడల్పు);
+    prt_write_int((పూర్ణాంకం)prt_mediasize[prt_media].ఎత్తు);
     prt_write_int(0);
     prt_write_string("sps\n");
-    prt_write_int(prt_num_copies);
+    prt_write_int(prt_అంకె_copies);
     prt_write_string("nc\n");
     prt_write_boolean(prt_duplex);
     prt_write_boolean(prt_tumble);
@@ -2052,30 +2052,30 @@ mch_print_begin(prt_settings_T *psettings)
     prt_write_string("c\n");
 
     // Font resource inclusion and definition
-    if (!prt_out_mbyte || prt_use_courier)
+    ఒకవేళ (!prt_బహిర్గతం_mbyte || prt_use_courier)
     {
 	// When using Courier for ASCII range when printing multi-byte, need to
 	// pick up ASCII encoding to use with it.
-	if (prt_use_courier)
+	ఒకవేళ (prt_use_courier)
 	    p_encoding = (char_u *)prt_ascii_encoding;
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	prt_def_font("F0", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F0", (అక్షరం *)p_encoding, (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	prt_def_font("F1", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F1", (అక్షరం *)p_encoding, (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	prt_def_font("F2", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F2", (అక్షరం *)p_encoding, (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	prt_def_font("F3", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F3", (అక్షరం *)p_encoding, (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
     }
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
 	// Define the CID fonts to be used in the job.	Typically CJKV fonts do
 	// not have an italic form being a western style, so where no font is
@@ -2084,57 +2084,57 @@ mch_print_begin(prt_settings_T *psettings)
 	// have bold/italic/bolditalic regardless of the setting of printmbfont.
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	if (!prt_custom_cmap)
+	ఒకవేళ (!prt_custom_cmap)
 	    prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	prt_def_cidfont("CF0", (int)prt_line_height,
+	prt_def_cidfont("CF0", (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 			prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != NULL)
+	ఒకవేళ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != ఖాళీ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	    if (!prt_custom_cmap)
+	    ఒకవేళ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF1", (int)prt_line_height,
+	    prt_def_cidfont("CF1", (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	}
-	else
+	లేకపోతే
 	    // Use ROMAN for BOLD
 	    prt_dup_cidfont("CF0", "CF1");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != NULL)
+	ఒకవేళ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != ఖాళీ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	    if (!prt_custom_cmap)
+	    ఒకవేళ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF2", (int)prt_line_height,
+	    prt_def_cidfont("CF2", (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	}
-	else
+	లేకపోతే
 	    // Use ROMAN for OBLIQUE
 	    prt_dup_cidfont("CF0", "CF2");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != NULL)
+	ఒకవేళ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != ఖాళీ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	    if (!prt_custom_cmap)
+	    ఒకవేళ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF3", (int)prt_line_height,
+	    prt_def_cidfont("CF3", (పూర్ణాంకం)prt_పంక్తి_ఎత్తు,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
 	}
-	else
+	లేకపోతే
 	    // Use BOLD for BOLDOBLIQUE
 	    prt_dup_cidfont("CF1", "CF3");
     }
 
     // Misc constant vars used for underlining and background rects
-    prt_def_var("UO", PRT_PS_FONT_TO_USER(prt_line_height,
-						prt_ps_font->uline_offset), 2);
-    prt_def_var("UW", PRT_PS_FONT_TO_USER(prt_line_height,
-						 prt_ps_font->uline_width), 2);
-    prt_def_var("BO", prt_bgcol_offset, 2);
+    prt_def_var("UO", PRT_PS_FONT_గమ్యం_USER(prt_పంక్తి_ఎత్తు,
+						prt_ps_font->uline_స్థానభ్రంశం), 2);
+    prt_def_var("UW", PRT_PS_FONT_గమ్యం_USER(prt_పంక్తి_ఎత్తు,
+						 prt_ps_font->uline_వెడల్పు), 2);
+    prt_def_var("BO", prt_bgcol_స్థానభ్రంశం, 2);
 
     prt_dsc_noarg("EndSetup");
 
@@ -2147,18 +2147,18 @@ theend:
     vim_free(res_cidfont);
     vim_free(res_cmap);
 
-    return retval;
+    తిరిగి retval;
 }
 
-    void
-mch_print_end(prt_settings_T *psettings)
+    శూన్య
+mch_print_చివర(prt_settings_T *psettings)
 {
     prt_dsc_noarg("Trailer");
 
     /*
      * Output any info we don't know in toto until we finish
      */
-    prt_dsc_ints("Pages", 1, &prt_page_num);
+    prt_dsc_ints("Pages", 1, &prt_పుట_అంకె);
 
     prt_dsc_noarg("EOF");
 
@@ -2166,65 +2166,65 @@ mch_print_end(prt_settings_T *psettings)
     // NOTHING MUST BE WRITTEN AFTER THIS!
     prt_write_file((char_u *)"\004");
 
-    if (!prt_file_error && psettings->outfile == NULL
+    ఒకవేళ (!prt_file_error && psettings->outfile == ఖాళీ
 					&& !got_int && !psettings->user_abort)
     {
 	// Close the file first.
-	if (prt_ps_fd != NULL)
+	ఒకవేళ (prt_ps_fd != ఖాళీ)
 	{
 	    fclose(prt_ps_fd);
-	    prt_ps_fd = NULL;
+	    prt_ps_fd = ఖాళీ;
 	}
-	prt_message((char_u *)_("Sending to printer..."));
+	prt_సందేశం((char_u *)_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
-	    emsg(_(e_failed_to_print_postscript_file));
-	else
-	    prt_message((char_u *)_("Print job sent."));
+	ఒకవేళ (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
+	    emsg(_(e_failed_గమ్యం_print_postscript_file));
+	లేకపోతే
+	    prt_సందేశం((char_u *)_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
-mch_print_end_page(void)
+    పూర్ణాంకం
+mch_print_చివర_పుట(శూన్య)
 {
-    prt_flush_buffer();
+    prt_flush_బఫరు();
 
     prt_write_string("re sp\n");
 
     prt_dsc_noarg("PageTrailer");
 
-    return !prt_file_error;
+    తిరిగి !prt_file_error;
 }
 
-    int
-mch_print_begin_page(char_u *str UNUSED)
+    పూర్ణాంకం
+mch_print_begin_పుట(char_u *str వాడని)
 {
-    int		page_num[2];
+    పూర్ణాంకం		పుట_అంకె[2];
 
-    prt_page_num++;
+    prt_పుట_అంకె++;
 
-    page_num[0] = page_num[1] = prt_page_num;
-    prt_dsc_ints("Page", 2, page_num);
+    పుట_అంకె[0] = పుట_అంకె[1] = prt_పుట_అంకె;
+    prt_dsc_ints("Page", 2, పుట_అంకె);
 
     prt_dsc_noarg("BeginPageSetup");
 
     prt_write_string("sv\n0 g\n");
-    prt_in_ascii = !prt_out_mbyte;
-    if (prt_out_mbyte)
+    prt_లోపల_ascii = !prt_బహిర్గతం_mbyte;
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
 	prt_write_string("CF0 sf\n");
-    else
+    లేకపోతే
 	prt_write_string("F0 sf\n");
     prt_fgcol = PRCOLOR_BLACK;
     prt_bgcol = PRCOLOR_WHITE;
     prt_font = PRT_PS_FONT_ROMAN;
 
     // Set up page transformation for landscape printing.
-    if (!prt_portrait)
+    ఒకవేళ (!prt_portrait)
     {
-	prt_write_int(-((int)prt_mediasize[prt_media].width));
+	prt_write_int(-((పూర్ణాంకం)prt_mediasize[prt_media].వెడల్పు));
 	prt_write_string("sl\n");
     }
 
@@ -2235,47 +2235,47 @@ mch_print_begin_page(char_u *str UNUSED)
     prt_curr_fg = (long_u)0xffffffff;
     prt_curr_bold = MAYBE;
 
-    return !prt_file_error;
+    తిరిగి !prt_file_error;
 }
 
-    int
-mch_print_blank_page(void)
+    పూర్ణాంకం
+mch_print_blank_పుట(శూన్య)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    తిరిగి (mch_print_begin_పుట(ఖాళీ) ? (mch_print_చివర_పుట()) : FALSE);
 }
 
-static float prt_pos_x = 0;
-static float prt_pos_y = 0;
+స్థిర దశాంశం prt_pos_x = 0;
+స్థిర దశాంశం prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    శూన్య
+mch_print_ప్రారంభం_పంక్తి(పూర్ణాంకం margin, పూర్ణాంకం పుట_పంక్తి)
 {
-    prt_pos_x = prt_left_margin;
-    if (margin)
-	prt_pos_x -= prt_number_width;
+    prt_pos_x = prt_ఎడమ_margin;
+    ఒకవేళ (margin)
+	prt_pos_x -= prt_సంఖ్య_వెడల్పు;
 
-    prt_pos_y = prt_top_margin - prt_first_line_height -
-					page_line * prt_line_height;
+    prt_pos_y = prt_శిఖరం_margin - prt_మొదటి_పంక్తి_ఎత్తు -
+					పుట_పంక్తి * prt_పంక్తి_ఎత్తు;
 
     prt_attribute_change = TRUE;
     prt_need_moveto = TRUE;
-    prt_half_width = FALSE;
+    prt_half_వెడల్పు = FALSE;
 }
 
-    int
-mch_print_text_out(char_u *textp, int len UNUSED)
+    పూర్ణాంకం
+mch_print_పాఠ్యం_బహిర్గతం(char_u *textp, పూర్ణాంకం len వాడని)
 {
     char_u	*p = textp;
-    int		need_break;
+    పూర్ణాంకం		need_break;
     char_u	ch;
     char_u      ch_buff[8];
-    float       char_width;
-    float       next_pos;
-    int		in_ascii;
-    int		half_width;
-    char_u	*tofree = NULL;
+    దశాంశం       char_వెడల్పు;
+    దశాంశం       తదుపరి_pos;
+    పూర్ణాంకం		లోపల_ascii;
+    పూర్ణాంకం		half_వెడల్పు;
+    char_u	*tofree = ఖాళీ;
 
-    char_width = prt_char_width;
+    char_వెడల్పు = prt_char_వెడల్పు;
 
     // Ideally VIM would create a rearranged CID font to combine a Roman and
     // CJKV font to do what VIM is doing here - use a Roman font for characters
@@ -2283,46 +2283,46 @@ mch_print_text_out(char_u *textp, int len UNUSED)
     // The problem is that GhostScript still (as of 8.13) does not support
     // rearranged fonts even though they have been documented by Adobe for 7
     // years!  If they ever do, a lot of this code will disappear.
-    if (prt_use_courier)
+    ఒకవేళ (prt_use_courier)
     {
-	in_ascii = (len == 1 && *p < 0x80);
-	if (prt_in_ascii)
+	లోపల_ascii = (len == 1 && *p < 0x80);
+	ఒకవేళ (prt_లోపల_ascii)
 	{
-	    if (!in_ascii)
+	    ఒకవేళ (!లోపల_ascii)
 	    {
 		// No longer in ASCII range - need to switch font
-		prt_in_ascii = FALSE;
+		prt_లోపల_ascii = FALSE;
 		prt_need_font = TRUE;
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (in_ascii)
+	లేకపోతే ఒకవేళ (లోపల_ascii)
 	{
 	    // Now in ASCII range - need to switch font
-	    prt_in_ascii = TRUE;
+	    prt_లోపల_ascii = TRUE;
 	    prt_need_font = TRUE;
 	    prt_attribute_change = TRUE;
 	}
     }
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
-	half_width = ((*mb_ptr2cells)(p) == 1);
-	if (half_width)
-	    char_width /= 2;
-	if (prt_half_width)
+	half_వెడల్పు = ((*mb_ptr2cells)(p) == 1);
+	ఒకవేళ (half_వెడల్పు)
+	    char_వెడల్పు /= 2;
+	ఒకవేళ (prt_half_వెడల్పు)
 	{
-	    if (!half_width)
+	    ఒకవేళ (!half_వెడల్పు)
 	    {
-		prt_half_width = FALSE;
-		prt_pos_x += prt_char_width/4;
+		prt_half_వెడల్పు = FALSE;
+		prt_pos_x += prt_char_వెడల్పు/4;
 		prt_need_moveto = TRUE;
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (half_width)
+	లేకపోతే ఒకవేళ (half_వెడల్పు)
 	{
-	    prt_half_width = TRUE;
-	    prt_pos_x += prt_char_width/4;
+	    prt_half_వెడల్పు = TRUE;
+	    prt_pos_x += prt_char_వెడల్పు/4;
 	    prt_need_moveto = TRUE;
 	    prt_attribute_change = TRUE;
 	}
@@ -2330,13 +2330,13 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
     // Output any required changes to the graphics state, after flushing any
     // text buffered so far.
-    if (prt_attribute_change)
+    ఒకవేళ (prt_attribute_change)
     {
-	prt_flush_buffer();
+	prt_flush_బఫరు();
 	// Reset count of number of chars that will be printed
-	prt_text_run = 0;
+	prt_పాఠ్యం_నిరంతరం = 0;
 
-	if (prt_need_moveto)
+	ఒకవేళ (prt_need_moveto)
 	{
 	    prt_pos_x_moveto = prt_pos_x;
 	    prt_pos_y_moveto = prt_pos_y;
@@ -2344,27 +2344,27 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
 	    prt_need_moveto = FALSE;
 	}
-	if (prt_need_font)
+	ఒకవేళ (prt_need_font)
 	{
-	    if (!prt_in_ascii)
+	    ఒకవేళ (!prt_లోపల_ascii)
 		prt_write_string("CF");
-	    else
+	    లేకపోతే
 		prt_write_string("F");
 	    prt_write_int(prt_font);
 	    prt_write_string("sf\n");
 	    prt_need_font = FALSE;
 	}
-	if (prt_need_fgcol)
+	ఒకవేళ (prt_need_fgcol)
 	{
-	    int     r, g, b;
-	    r = ((unsigned)prt_fgcol & 0xff0000) >> 16;
-	    g = ((unsigned)prt_fgcol & 0xff00) >> 8;
+	    పూర్ణాంకం     r, g, b;
+	    r = ((గుర్తులేని)prt_fgcol & 0xff0000) >> 16;
+	    g = ((గుర్తులేని)prt_fgcol & 0xff00) >> 8;
 	    b = prt_fgcol & 0xff;
 
 	    prt_write_real(r / 255.0, 3);
-	    if (r == g && g == b)
+	    ఒకవేళ (r == g && g == b)
 		prt_write_string("g\n");
-	    else
+	    లేకపోతే
 	    {
 		prt_write_real(g / 255.0, 3);
 		prt_write_real(b / 255.0, 3);
@@ -2373,116 +2373,116 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 	    prt_need_fgcol = FALSE;
 	}
 
-	if (prt_bgcol != PRCOLOR_WHITE)
+	ఒకవేళ (prt_bgcol != PRCOLOR_WHITE)
 	{
 	    prt_new_bgcol = prt_bgcol;
-	    if (prt_need_bgcol)
+	    ఒకవేళ (prt_need_bgcol)
 		prt_do_bgcol = TRUE;
 	}
-	else
+	లేకపోతే
 	    prt_do_bgcol = FALSE;
 	prt_need_bgcol = FALSE;
 
-	if (prt_need_underline)
+	ఒకవేళ (prt_need_underline)
 	    prt_do_underline = prt_underline;
 	prt_need_underline = FALSE;
 
 	prt_attribute_change = FALSE;
     }
 
-    if (prt_do_conv)
+    ఒకవేళ (prt_do_conv)
     {
 	// Convert from multi-byte to 8-bit encoding
 	tofree = p = string_convert(&prt_conv, p, &len);
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	{
 	    p = (char_u *)"";
 	    len = 0;
 	}
     }
 
-    if (prt_out_mbyte)
+    ఒకవేళ (prt_బహిర్గతం_mbyte)
     {
 	// Multi-byte character strings are represented more efficiently as hex
 	// strings when outputting clean 8 bit PS.
-	while (len-- > 0)
+	అయితే (len-- > 0)
 	{
-	    ch = prt_hexchar[(unsigned)(*p) >> 4];
-	    ga_append(&prt_ps_buffer, ch);
+	    ch = prt_hexchar[(గుర్తులేని)(*p) >> 4];
+	    ga_append(&prt_ps_బఫరు, ch);
 	    ch = prt_hexchar[(*p) & 0xf];
-	    ga_append(&prt_ps_buffer, ch);
+	    ga_append(&prt_ps_బఫరు, ch);
 	    p++;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Add next character to buffer of characters to output.
 	// Note: One printed character may require several PS characters to
 	// represent it, but we only count them as one printed character.
 	ch = *p;
-	if (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
+	ఒకవేళ (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
 	{
 	    // Convert non-printing characters to either their escape or octal
 	    // sequence, ensures PS sent over a serial line does not interfere
 	    // with the comms protocol.
-	    ga_append(&prt_ps_buffer, '\\');
-	    switch (ch)
+	    ga_append(&prt_ps_బఫరు, '\\');
+	    ఎంపిక (ch)
 	    {
-		case BS:   ga_append(&prt_ps_buffer, 'b'); break;
-		case TAB:  ga_append(&prt_ps_buffer, 't'); break;
-		case NL:   ga_append(&prt_ps_buffer, 'n'); break;
-		case FF:   ga_append(&prt_ps_buffer, 'f'); break;
-		case CAR:  ga_append(&prt_ps_buffer, 'r'); break;
-		case '(':  ga_append(&prt_ps_buffer, '('); break;
-		case ')':  ga_append(&prt_ps_buffer, ')'); break;
-		case '\\': ga_append(&prt_ps_buffer, '\\'); break;
+		స్థితి BS:   ga_append(&prt_ps_బఫరు, 'b'); ఆపు;
+		స్థితి TAB:  ga_append(&prt_ps_బఫరు, 't'); ఆపు;
+		స్థితి NL:   ga_append(&prt_ps_బఫరు, 'n'); ఆపు;
+		స్థితి FF:   ga_append(&prt_ps_బఫరు, 'f'); ఆపు;
+		స్థితి CAR:  ga_append(&prt_ps_బఫరు, 'r'); ఆపు;
+		స్థితి '(':  ga_append(&prt_ps_బఫరు, '('); ఆపు;
+		స్థితి ')':  ga_append(&prt_ps_బఫరు, ')'); ఆపు;
+		స్థితి '\\': ga_append(&prt_ps_బఫరు, '\\'); ఆపు;
 
-		default:
-			   sprintf((char *)ch_buff, "%03o", (unsigned int)ch);
-			   ga_append(&prt_ps_buffer, ch_buff[0]);
-			   ga_append(&prt_ps_buffer, ch_buff[1]);
-			   ga_append(&prt_ps_buffer, ch_buff[2]);
-			   break;
+		అప్రమేయ:
+			   sprintf((అక్షరం *)ch_buff, "%03o", (గుర్తులేని పూర్ణాంకం)ch);
+			   ga_append(&prt_ps_బఫరు, ch_buff[0]);
+			   ga_append(&prt_ps_బఫరు, ch_buff[1]);
+			   ga_append(&prt_ps_బఫరు, ch_buff[2]);
+			   ఆపు;
 	    }
 	}
-	else
-	    ga_append(&prt_ps_buffer, ch);
+	లేకపోతే
+	    ga_append(&prt_ps_బఫరు, ch);
     }
 
     // Need to free any translated characters
     vim_free(tofree);
 
-    prt_text_run += char_width;
-    prt_pos_x += char_width;
+    prt_పాఠ్యం_నిరంతరం += char_వెడల్పు;
+    prt_pos_x += char_వెడల్పు;
 
     // The downside of fp - use relative error on right margin check
-    next_pos = prt_pos_x + prt_char_width;
-    need_break = (next_pos > prt_right_margin) &&
-		    ((next_pos - prt_right_margin) > (prt_right_margin*1e-5));
+    తదుపరి_pos = prt_pos_x + prt_char_వెడల్పు;
+    need_break = (తదుపరి_pos > prt_కుడి_margin) &&
+		    ((తదుపరి_pos - prt_కుడి_margin) > (prt_కుడి_margin*1e-5));
 
-    if (need_break)
-	prt_flush_buffer();
+    ఒకవేళ (need_break)
+	prt_flush_బఫరు();
 
-    return need_break;
+    తిరిగి need_break;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    శూన్య
+mch_print_సమితి_font(పూర్ణాంకం iBold, పూర్ణాంకం iItalic, పూర్ణాంకం iUnderline)
 {
-    int		font = 0;
+    పూర్ణాంకం		font = 0;
 
-    if (iBold)
+    ఒకవేళ (iBold)
 	font |= 0x01;
-    if (iItalic)
+    ఒకవేళ (iItalic)
 	font |= 0x02;
 
-    if (font != prt_font)
+    ఒకవేళ (font != prt_font)
     {
 	prt_font = font;
 	prt_attribute_change = TRUE;
 	prt_need_font = TRUE;
     }
-    if (prt_underline != iUnderline)
+    ఒకవేళ (prt_underline != iUnderline)
     {
 	prt_underline = iUnderline;
 	prt_attribute_change = TRUE;
@@ -2490,23 +2490,23 @@ mch_print_set_font(int iBold, int iItalic, int iUnderline)
     }
 }
 
-    void
-mch_print_set_bg(long_u bgcol)
+    శూన్య
+mch_print_సమితి_bg(long_u bgcol)
 {
-    prt_bgcol = (int)bgcol;
+    prt_bgcol = (పూర్ణాంకం)bgcol;
     prt_attribute_change = TRUE;
     prt_need_bgcol = TRUE;
 }
 
-    void
-mch_print_set_fg(long_u fgcol)
+    శూన్య
+mch_print_సమితి_fg(long_u fgcol)
 {
-    if (fgcol == (long_u)prt_fgcol)
-	return;
+    ఒకవేళ (fgcol == (long_u)prt_fgcol)
+	తిరిగి;
 
-    prt_fgcol = (int)fgcol;
+    prt_fgcol = (పూర్ణాంకం)fgcol;
     prt_attribute_change = TRUE;
     prt_need_fgcol = TRUE;
 }
 
-#endif // FEAT_POSTSCRIPT
+#అయితే_ముగింపు // FEAT_POSTSCRIPT

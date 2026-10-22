@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ఒకవేళ defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,131 +24,131 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+రకనిర్వచనం గుర్తులేని పూర్ణాంకం u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+రకనిర్వచనం నిర్మాణం {
+    u32_T కీలకాలు[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+స్థిర u32_T చక్రీయ_తనిఖీ_32_పట్టిక[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    స్థిర శూన్య
+make_చక్రీయ_తనిఖీ_tab(శూన్య)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    స్థిర పూర్ణాంకం	పూర్తి = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    ఒకవేళ (పూర్తి)
+	తిరిగి;
+    కొరకు (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	కొరకు (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
-	crc_32_table[t] = v;
+	చక్రీయ_తనిఖీ_32_పట్టిక[t] = v;
     }
-    done = TRUE;
+    పూర్తి = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#నిర్వచించు చక్రీయ_తనిఖీ_32(c, b) (చక్రీయ_తనిఖీ_32_పట్టిక[((పూర్ణాంకం)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#నిర్వచించు DECRYPT_BYTE_ZIP(కీలకాలు, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u తాత్కాలిక = (short_u)కీలకాలు[2] | 2; \
+    t = (పూర్ణాంకం)(((గుర్తులేని)(తాత్కాలిక * (తాత్కాలిక ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#నిర్వచించు UPDATE_కీలకాలు_ZIP(కీలకాలు, c) చేయి { \
+    కీలకాలు[0] = చక్రీయ_తనిఖీ_32(కీలకాలు[0], (c)); \
+    కీలకాలు[1] += కీలకాలు[0] & 0xff; \
+    కీలకాలు[1] = కీలకాలు[1] * 134775813L + 1; \
+    కీలకాలు[2] = చక్రీయ_తనిఖీ_32(కీలకాలు[2], (పూర్ణాంకం)(కీలకాలు[1] >> 24)); \
+} అయితే (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    పూర్ణాంకం
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
-    crypt_arg_T     *arg UNUSED)
+    char_u	    *కీలకం,
+    crypt_arg_T     *arg వాడని)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
-    state->method_state = zs;
+    ఒకవేళ (zs == ఖాళీ)
+	తిరిగి FAIL;
+    state->పద్ధతి_state = zs;
 
-    make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    make_చక్రీయ_తనిఖీ_tab();
+    zs->కీలకాలు[0] = 305419896L;
+    zs->కీలకాలు[1] = 591751049L;
+    zs->కీలకాలు[2] = 878082192L;
+    కొరకు (p = కీలకం; *p != NUL; ++p)
+	UPDATE_కీలకాలు_ZIP(zs->కీలకాలు, (పూర్ణాంకం)*p);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    శూన్య
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*గమ్యం,
+    పూర్ణాంకం		చివరి వాడని)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->పద్ధతి_state;
     size_t	i;
-    int		ztemp, t;
+    పూర్ణాంకం		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    కొరకు (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
-	to[i] = t ^ ztemp;
+	DECRYPT_BYTE_ZIP(zs->కీలకాలు, t);
+	UPDATE_కీలకాలు_ZIP(zs->కీలకాలు, ztemp);
+	గమ్యం[i] = t ^ ztemp;
     }
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    శూన్య
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*గమ్యం,
+    పూర్ణాంకం		చివరి వాడని)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->పద్ధతి_state;
     size_t	i;
-    short_u	temp;
+    short_u	తాత్కాలిక;
 
-    for (i = 0; i < len; ++i)
+    కొరకు (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	తాత్కాలిక = (short_u)zs->కీలకాలు[2] | 2;
+	తాత్కాలిక = (పూర్ణాంకం)(((గుర్తులేని)(తాత్కాలిక * (తాత్కాలిక ^ 1U)) >> 8) & 0xff);
+	UPDATE_కీలకాలు_ZIP(zs->కీలకాలు, గమ్యం[i] = from[i] ^ తాత్కాలిక);
     }
 }
 
-#endif // FEAT_CRYPT
+#అయితే_ముగింపు // FEAT_CRYPT

@@ -11,65 +11,65 @@
  * message.c: functions for displaying messages on the command line
  */
 
-#define MESSAGE_FILE		// don't include prototype for smsg()
+#నిర్వచించు సందేశం_FILE		// don't include prototype for smsg()
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-static void add_msg_hist(char_u *s, int len, int attr);
-static void check_msg_hist(void);
-static void hit_return_msg(void);
-static void msg_home_replace_attr(char_u *fname, int attr);
-static void msg_puts_attr_len(char *str, int maxlen, int attr);
-static void msg_puts_display(char_u *str, int maxlen, int attr, int recurse);
-static void msg_scroll_up(void);
-static void inc_msg_scrolled(void);
-static void store_sb_text(char_u **sb_str, char_u *s, int attr, int *sb_col, int finish);
-static void t_puts(int *t_col, char_u *t_s, char_u *s, int attr);
-static void msg_puts_printf(char_u *str, int maxlen);
-static int do_more_prompt(int typed_char);
-static void msg_screen_putchar(int c, int attr);
-static void msg_moremsg(int full);
-static int  msg_check_screen(void);
-static void redir_write(char_u *s, int maxlen);
-#ifdef FEAT_CON_DIALOG
-static char_u *msg_show_console_dialog(char_u *message, char_u *buttons, int dfltbutton);
-static int	confirm_msg_used = FALSE;	// displaying confirm_msg
-static char_u	*confirm_msg = NULL;		// ":confirm" message
-static char_u	*confirm_msg_tail;		// tail of confirm_msg
-static void display_confirm_msg(void);
-#endif
-#ifdef FEAT_EVAL
-static int emsg_to_channel_log = FALSE;
-#endif
+స్థిర శూన్య కూడు_సందేశం_hist(char_u *s, పూర్ణాంకం len, పూర్ణాంకం attr);
+స్థిర శూన్య check_సందేశం_hist(శూన్య);
+స్థిర శూన్య తగిలింది_return_సందేశం(శూన్య);
+స్థిర శూన్య సందేశం_home_replace_attr(char_u *fname, పూర్ణాంకం attr);
+స్థిర శూన్య సందేశం_puts_attr_len(అక్షరం *str, పూర్ణాంకం maxlen, పూర్ణాంకం attr);
+స్థిర శూన్య సందేశం_puts_display(char_u *str, పూర్ణాంకం maxlen, పూర్ణాంకం attr, పూర్ణాంకం recurse);
+స్థిర శూన్య సందేశం_scroll_పైకి(శూన్య);
+స్థిర శూన్య inc_సందేశం_scrolled(శూన్య);
+స్థిర శూన్య store_sb_పాఠ్యం(char_u **sb_str, char_u *s, పూర్ణాంకం attr, పూర్ణాంకం *sb_నిలువు, పూర్ణాంకం ముగింపు);
+స్థిర శూన్య t_puts(పూర్ణాంకం *t_నిలువు, char_u *t_s, char_u *s, పూర్ణాంకం attr);
+స్థిర శూన్య సందేశం_puts_printf(char_u *str, పూర్ణాంకం maxlen);
+స్థిర పూర్ణాంకం do_మరిన్ని_prompt(పూర్ణాంకం typed_char);
+స్థిర శూన్య సందేశం_screen_putchar(పూర్ణాంకం c, పూర్ణాంకం attr);
+స్థిర శూన్య సందేశం_moremsg(పూర్ణాంకం నిండిన);
+స్థిర పూర్ణాంకం  సందేశం_check_screen(శూన్య);
+స్థిర శూన్య redir_write(char_u *s, పూర్ణాంకం maxlen);
+#నిర్వచితమైతే FEAT_CON_DIALOG
+స్థిర char_u *సందేశం_show_console_dialog(char_u *సందేశం_2, char_u *buttons, పూర్ణాంకం dfltbutton);
+స్థిర పూర్ణాంకం	confirm_సందేశం_వాడిన = FALSE;	// displaying confirm_msg
+స్థిర char_u	*confirm_సందేశం = ఖాళీ;		// ":confirm" message
+స్థిర char_u	*confirm_సందేశం_తోక;		// tail of confirm_msg
+స్థిర శూన్య display_confirm_సందేశం(శూన్య);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర పూర్ణాంకం emsg_గమ్యం_channel_log = FALSE;
+#అయితే_ముగింపు
 
-struct msg_hist
+నిర్మాణం సందేశం_hist
 {
-    struct msg_hist	*next;
-    char_u		*msg;
-    int			attr;
+    నిర్మాణం సందేశం_hist	*తదుపరి;
+    char_u		*సందేశం;
+    పూర్ణాంకం			attr;
 };
 
-static struct msg_hist *first_msg_hist = NULL;
-static struct msg_hist *last_msg_hist = NULL;
-static int msg_hist_len = 0;
-static int msg_hist_max = 500;		// The default max value is 500
+స్థిర నిర్మాణం సందేశం_hist *మొదటి_సందేశం_hist = ఖాళీ;
+స్థిర నిర్మాణం సందేశం_hist *చివరి_సందేశం_hist = ఖాళీ;
+స్థిర పూర్ణాంకం సందేశం_hist_len = 0;
+స్థిర పూర్ణాంకం సందేశం_hist_max = 500;		// The default max value is 500
 
 // flags obtained from the 'messagesopt' option
-#define MESSAGES_HIT_ENTER	0x001
-#define MESSAGES_WAIT		0x002
-#define MESSAGES_HISTORY	0x004
+#నిర్వచించు MESSAGES_తగిలింది_ENTER	0x001
+#నిర్వచించు MESSAGES_WAIT		0x002
+#నిర్వచించు MESSAGES_HISTORY	0x004
 
 // args in 'messagesopt' option
-#define MESSAGES_OPT_HIT_ENTER "hit-enter"
-#define MESSAGES_OPT_WAIT "wait:"
-#define MESSAGES_OPT_HISTORY "history:"
+#నిర్వచించు MESSAGES_OPT_తగిలింది_ENTER "hit-enter"
+#నిర్వచించు MESSAGES_OPT_WAIT "wait:"
+#నిర్వచించు MESSAGES_OPT_HISTORY "history:"
 
 // The default is "hit-enter,history:500"
-static int msg_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
-static int msg_wait = 0;
+స్థిర పూర్ణాంకం సందేశం_flags = MESSAGES_తగిలింది_ENTER | MESSAGES_HISTORY;
+స్థిర పూర్ణాంకం సందేశం_wait = 0;
 
-static FILE *verbose_fd = NULL;
-static int  verbose_did_open = FALSE;
+స్థిర FILE *verbose_fd = ఖాళీ;
+స్థిర పూర్ణాంకం  verbose_did_open = FALSE;
 
 /*
  * When writing messages to the screen, there are many different situations.
@@ -112,96 +112,96 @@ static int  verbose_did_open = FALSE;
  * When terminal not initialized (yet) mch_errmsg(..) is used.
  * return TRUE if wait_return() not called
  */
-    int
-msg(char *s)
+    పూర్ణాంకం
+సందేశం(అక్షరం *s)
 {
-    return msg_attr_keep(s, 0, FALSE);
+    తిరిగి సందేశం_attr_keep(s, 0, FALSE);
 }
 
 /*
  * Like msg() but keep it silent when 'verbosefile' is set.
  */
-    int
-verb_msg(char *s)
+    పూర్ణాంకం
+verb_సందేశం(అక్షరం *s)
 {
-    int		n;
+    పూర్ణాంకం		n;
 
     verbose_enter();
-    n = msg_attr_keep(s, 0, FALSE);
+    n = సందేశం_attr_keep(s, 0, FALSE);
     verbose_leave();
 
-    return n;
+    తిరిగి n;
 }
 
-    int
-msg_attr(char *s, int attr)
+    పూర్ణాంకం
+సందేశం_attr(అక్షరం *s, పూర్ణాంకం attr)
 {
-    return msg_attr_keep(s, attr, FALSE);
+    తిరిగి సందేశం_attr_keep(s, attr, FALSE);
 }
 
-    int
-msg_attr_keep(
-    char	*s,
-    int		attr,
-    int		keep)	    // TRUE: set keep_msg if it doesn't scroll
+    పూర్ణాంకం
+సందేశం_attr_keep(
+    అక్షరం	*s,
+    పూర్ణాంకం		attr,
+    పూర్ణాంకం		keep)	    // TRUE: set keep_msg if it doesn't scroll
 {
-    static int	entered = 0;
-    int		retval;
-    char_u	*buf = NULL;
+    స్థిర పూర్ణాంకం	entered = 0;
+    పూర్ణాంకం		retval;
+    char_u	*buf = ఖాళీ;
 
     // Skip messages not matching ":filter pattern".
     // Don't filter when there is an error.
-    if (!emsg_on_display && message_filtered((char_u *)s))
-	return TRUE;
+    ఒకవేళ (!emsg_on_display && సందేశం_filtered((char_u *)s))
+	తిరిగి TRUE;
 
-#ifdef FEAT_EVAL
-    if (attr == 0)
-	set_vim_var_string(VV_STATUSMSG, (char_u *)s, -1);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (attr == 0)
+	సమితి_vim_var_string(VV_STATUSMSG, (char_u *)s, -1);
+#అయితే_ముగింపు
 
     /*
      * It is possible that displaying a messages causes a problem (e.g.,
      * when redrawing the window), which causes another message, etc..	To
      * break this loop, limit the recursiveness to 3 levels.
      */
-    if (entered >= 3)
-	return TRUE;
+    ఒకవేళ (entered >= 3)
+	తిరిగి TRUE;
     ++entered;
 
     // Add message to history (unless it's a repeated kept message or a
     // truncated message)
-    if ((char_u *)s != keep_msg
+    ఒకవేళ ((char_u *)s != keep_సందేశం
 	    || (*s != '<'
-		&& last_msg_hist != NULL
-		&& last_msg_hist->msg != NULL
-		&& STRCMP(s, last_msg_hist->msg) != 0))
-	add_msg_hist((char_u *)s, -1, attr);
+		&& చివరి_సందేశం_hist != ఖాళీ
+		&& చివరి_సందేశం_hist->సందేశం != ఖాళీ
+		&& STRCMP(s, చివరి_సందేశం_hist->సందేశం) != 0))
+	కూడు_సందేశం_hist((char_u *)s, -1, attr);
 
-#ifdef FEAT_EVAL
-    if (emsg_to_channel_log)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (emsg_గమ్యం_channel_log)
 	// Write message in the channel log.
-	ch_log(NULL, "ERROR: %s", s);
-#endif
+	ch_log(ఖాళీ, "ERROR: %s", s);
+#అయితే_ముగింపు
 
     // Truncate the message if needed.
-    msg_start();
-    buf = msg_strtrunc((char_u *)s, FALSE);
-    if (buf != NULL)
-	s = (char *)buf;
+    సందేశం_ప్రారంభం();
+    buf = సందేశం_strtrunc((char_u *)s, FALSE);
+    ఒకవేళ (buf != ఖాళీ)
+	s = (అక్షరం *)buf;
 
-    msg_outtrans_attr((char_u *)s, attr);
-    msg_clr_eos();
-    retval = msg_end();
+    సందేశం_outtrans_attr((char_u *)s, attr);
+    సందేశం_clr_eos();
+    retval = సందేశం_చివర();
 
-    if (keep && retval && vim_strsize((char_u *)s)
-		    < (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	set_keep_msg((char_u *)s, 0);
+    ఒకవేళ (keep && retval && vim_strsize((char_u *)s)
+		    < (పూర్ణాంకం)(అడ్డువరుసలు - cmdline_అడ్డువరుస - 1) * cmdline_వెడల్పు + sc_నిలువు)
+	సమితి_keep_సందేశం((char_u *)s, 0);
 
     need_fileinfo = FALSE;
 
     vim_free(buf);
     --entered;
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -209,164 +209,164 @@ msg_attr_keep(
  * Returns an allocated string or NULL when no truncating is done.
  */
     char_u *
-msg_strtrunc(
+సందేశం_strtrunc(
     char_u	*s,
-    int		force)	    // always truncate
+    పూర్ణాంకం		force)	    // always truncate
 {
-    char_u	*buf = NULL;
-    int		len;
-    int		room;
+    char_u	*buf = ఖాళీ;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		స్థలం;
 
     // May truncate message to avoid a hit-return prompt
-    if ((!msg_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
-			       && !exmode_active && msg_silent == 0) || force)
+    ఒకవేళ ((!సందేశం_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
+			       && !exmode_చురుకైన && సందేశం_silent == 0) || force)
     {
 	len = vim_strsize(s);
-	if (msg_scrolled != 0
-#ifdef HAS_MESSAGE_WINDOW
-		|| in_echowindow
-#endif
+	ఒకవేళ (సందేశం_scrolled != 0
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+		|| లోపల_echowindow
+#అయితే_ముగింపు
 		)
 	    // Use all the columns.
-	    room = (int)(Rows - msg_row) * cmdline_width - 1;
-	else
+	    స్థలం = (పూర్ణాంకం)(అడ్డువరుసలు - సందేశం_అడ్డువరుస) * cmdline_వెడల్పు - 1;
+	లేకపోతే
 	    // Use up to 'showcmd' column.
-	    room = (int)(Rows - msg_row - 1) * cmdline_width + sc_col - 1;
-	if (len > room && room > 0)
+	    స్థలం = (పూర్ణాంకం)(అడ్డువరుసలు - సందేశం_అడ్డువరుస - 1) * cmdline_వెడల్పు + sc_నిలువు - 1;
+	ఒకవేళ (len > స్థలం && స్థలం > 0)
 	{
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 		// may have up to 18 bytes per cell (6 per char, up to two
 		// composing chars)
-		len = (room + 2) * 18;
-	    else if (enc_dbcs == DBCS_JPNU)
+		len = (స్థలం + 2) * 18;
+	    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU)
 		// may have up to 2 bytes per cell for euc-jp
-		len = (room + 2) * 2;
-	    else
-		len = room + 2;
+		len = (స్థలం + 2) * 2;
+	    లేకపోతే
+		len = స్థలం + 2;
 	    buf = alloc(len);
-	    if (buf != NULL)
-		trunc_string(s, buf, room, len);
+	    ఒకవేళ (buf != ఖాళీ)
+		trunc_string(s, buf, స్థలం, len);
 	}
     }
-    return buf;
+    తిరిగి buf;
 }
 
 /*
  * Truncate a string "s" to "buf" with cell width "room".
  * "s" and "buf" may be equal.
  */
-    void
+    శూన్య
 trunc_string(
     char_u	*s,
     char_u	*buf,
-    int		room_in,
-    int		buflen)
+    పూర్ణాంకం		స్థలం_లోపల,
+    పూర్ణాంకం		buflen)
 {
-    size_t	room = room_in - 3; // "..." takes 3 chars
+    size_t	స్థలం = స్థలం_లోపల - 3; // "..." takes 3 chars
     size_t	half;
     size_t	len = 0;
-    int		e;
-    int		i;
-    int		n;
+    పూర్ణాంకం		e;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		n;
 
-    if (*s == NUL)
+    ఒకవేళ (*s == NUL)
     {
-	if (buflen > 0)
+	ఒకవేళ (buflen > 0)
 	    *buf = NUL;
-	return;
+	తిరిగి;
     }
 
-    if (room_in < 3)
-	room = 0;
-    half = room / 2;
+    ఒకవేళ (స్థలం_లోపల < 3)
+	స్థలం = 0;
+    half = స్థలం / 2;
 
     // First part: Start of the string.
-    for (e = 0; len < half && e < buflen; ++e)
+    కొరకు (e = 0; len < half && e < buflen; ++e)
     {
-	if (s[e] == NUL)
+	ఒకవేళ (s[e] == NUL)
 	{
 	    // text fits without truncating!
 	    buf[e] = NUL;
-	    return;
+	    తిరిగి;
 	}
 	n = ptr2cells(s + e);
-	if (len + n > half)
-	    break;
+	ఒకవేళ (len + n > half)
+	    ఆపు;
 	len += n;
 	buf[e] = s[e];
-	if (has_mbyte)
-	    for (n = (*mb_ptr2len)(s + e); --n > 0; )
+	ఒకవేళ (has_mbyte)
+	    కొరకు (n = (*mb_ptr2len)(s + e); --n > 0; )
 	    {
-		if (++e == buflen)
-		    break;
+		ఒకవేళ (++e == buflen)
+		    ఆపు;
 		buf[e] = s[e];
 	    }
     }
 
     // Last part: End of the string.
     i = e;
-    if (enc_dbcs != 0)
+    ఒకవేళ (enc_dbcs != 0)
     {
 	// For DBCS going backwards in a string is slow, but
 	// computing the cell width isn't too slow: go forward
 	// until the rest fits.
 	n = vim_strsize(s + i);
-	while (len + n > room)
+	అయితే (len + n > స్థలం)
 	{
 	    n -= ptr2cells(s + i);
 	    i += (*mb_ptr2len)(s + i);
 	}
     }
-    else if (enc_utf8)
+    లేకపోతే ఒకవేళ (enc_utf8)
     {
 	// For UTF-8 we can go backwards easily.
-	half = i = (int)STRLEN(s);
-	for (;;)
+	half = i = (పూర్ణాంకం)STRLEN(s);
+	కొరకు (;;)
 	{
-	    do
-		half = half - utf_head_off(s, s + half - 1) - 1;
-	    while (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
+	    చేయి
+		half = half - utf_తల_off(s, s + half - 1) - 1;
+	    అయితే (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
 	    n = ptr2cells(s + half);
-	    if (len + n > room || half == 0)
-		break;
+	    ఒకవేళ (len + n > స్థలం || half == 0)
+		ఆపు;
 	    len += n;
-	    i = (int)half;
+	    i = (పూర్ణాంకం)half;
 	}
     }
-    else
+    లేకపోతే
     {
-	for (i = (int)STRLEN(s);
-		   i - 1 >= 0 && len + (n = ptr2cells(s + i - 1)) <= room; --i)
+	కొరకు (i = (పూర్ణాంకం)STRLEN(s);
+		   i - 1 >= 0 && len + (n = ptr2cells(s + i - 1)) <= స్థలం; --i)
 	    len += n;
     }
 
 
-    if (i <= e + 3)
+    ఒకవేళ (i <= e + 3)
     {
 	// text fits without truncating
-	if (s != buf)
+	ఒకవేళ (s != buf)
 	{
 	    len = STRLEN(s);
-	    if (len >= (size_t)buflen)
+	    ఒకవేళ (len >= (size_t)buflen)
 		len = buflen - 1;
 	    len = len - e + 1;
-	    if (len < 1)
+	    ఒకవేళ (len < 1)
 		buf[e - 1] = NUL;
-	    else
+	    లేకపోతే
 		mch_memmove(buf + e, s + e, len);
 	}
     }
-    else if (e + 3 < buflen)
+    లేకపోతే ఒకవేళ (e + 3 < buflen)
     {
 	// set the middle and copy the last part
 	mch_memmove(buf + e, "...", (size_t)3);
 	len = STRLEN(s + i) + 1;
-	if (len >= (size_t)buflen - e - 3)
+	ఒకవేళ (len >= (size_t)buflen - e - 3)
 	    len = buflen - e - 3 - 1;
 	mch_memmove(buf + e + 3, s + i, len);
 	buf[e + 3 + len - 1] = NUL;
     }
-    else
+    లేకపోతే
     {
 	// can't fit in the "...", just truncate it
 	buf[buflen - 1] = NUL;
@@ -378,97 +378,97 @@ trunc_string(
  * Note: Caller of smsg() and smsg_attr() must check the resulting string is
  * shorter than IOSIZE!!!
  */
-#ifndef PROTO
+#నిర్వచితం_కాకపోతే PROTO
 
-int vim_snprintf(char *str, size_t str_m, const char *fmt, ...);
+పూర్ణాంకం vim_snprintf(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, ...);
 
-    int
-smsg(const char *s, ...)
+    పూర్ణాంకం
+smsg(స్థిరరాశి అక్షరం *s, ...)
 {
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg((char *)s);
+	తిరిగి సందేశం((అక్షరం *)s);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((అక్షరం *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg((char *)IObuff);
+    తిరిగి సందేశం((అక్షరం *)IObuff);
 }
 
-    int
-smsg_attr(int attr, const char *s, ...)
+    పూర్ణాంకం
+smsg_attr(పూర్ణాంకం attr, స్థిరరాశి అక్షరం *s, ...)
 {
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr((char *)s, attr);
+	తిరిగి సందేశం_attr((అక్షరం *)s, attr);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((అక్షరం *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr((char *)IObuff, attr);
+    తిరిగి సందేశం_attr((అక్షరం *)IObuff, attr);
 }
 
-    int
-smsg_attr_keep(int attr, const char *s, ...)
+    పూర్ణాంకం
+smsg_attr_keep(పూర్ణాంకం attr, స్థిరరాశి అక్షరం *s, ...)
 {
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr_keep((char *)s, attr, TRUE);
+	తిరిగి సందేశం_attr_keep((అక్షరం *)s, attr, TRUE);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((అక్షరం *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr_keep((char *)IObuff, attr, TRUE);
+    తిరిగి సందేశం_attr_keep((అక్షరం *)IObuff, attr, TRUE);
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Remember the last sourcing name/lnum used in an error message, so that it
  * isn't printed each time when it didn't change.
  */
-static int	last_sourcing_lnum = 0;
-static char_u   *last_sourcing_name = NULL;
+స్థిర పూర్ణాంకం	చివరి_sourcing_lnum = 0;
+స్థిర char_u   *చివరి_sourcing_name = ఖాళీ;
 
 /*
  * Reset the last used sourcing name/lnum.  Makes sure it is displayed again
  * for the next error message;
  */
-    void
-reset_last_sourcing(void)
+    శూన్య
+reset_చివరి_sourcing(శూన్య)
 {
-    VIM_CLEAR(last_sourcing_name);
-    last_sourcing_lnum = 0;
+    VIM_CLEAR(చివరి_sourcing_name);
+    చివరి_sourcing_lnum = 0;
 }
 
 /*
  * Return TRUE if "SOURCING_NAME" differs from "last_sourcing_name".
  */
-    static int
-other_sourcing_name(void)
+    స్థిర పూర్ణాంకం
+other_sourcing_name(శూన్య)
 {
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL)
+    ఒకవేళ (HAVE_SOURCING_INFO && SOURCING_NAME != ఖాళీ)
     {
-	if (last_sourcing_name != NULL)
-	    return STRCMP(SOURCING_NAME, last_sourcing_name) != 0;
-	return TRUE;
+	ఒకవేళ (చివరి_sourcing_name != ఖాళీ)
+	    తిరిగి STRCMP(SOURCING_NAME, చివరి_sourcing_name) != 0;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -476,32 +476,32 @@ other_sourcing_name(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_source(void)
+    స్థిర char_u *
+get_emsg_ఆధారం(శూన్య)
 {
     char_u	*Buf, *p;
 
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL && other_sourcing_name())
+    ఒకవేళ (HAVE_SOURCING_INFO && SOURCING_NAME != ఖాళీ && other_sourcing_name())
     {
 	char_u	    *sname = estack_sfile(ESTACK_NONE);
 	char_u	    *tofree = sname;
 
-	if (sname == NULL)
+	ఒకవేళ (sname == ఖాళీ)
 	    sname = SOURCING_NAME;
 
-#ifdef FEAT_EVAL
-	if (estack_compiling)
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (estack_compiling)
 	    p = (char_u *)_("Error detected while compiling %s:");
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    p = (char_u *)_("Error detected while processing %s:");
 	Buf = alloc(STRLEN(sname) + STRLEN(p));
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, sname);
+	ఒకవేళ (Buf != ఖాళీ)
+	    sprintf((అక్షరం *)Buf, (అక్షరం *)p, sname);
 	vim_free(tofree);
-	return Buf;
+	తిరిగి Buf;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -509,24 +509,24 @@ get_emsg_source(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_lnum(void)
+    స్థిర char_u *
+get_emsg_lnum(శూన్య)
 {
     char_u	*Buf, *p;
 
     // lnum is 0 when executing a command from the command line
     // argument, we don't want a line number then
-    if (SOURCING_NAME != NULL
-	    && (other_sourcing_name() || SOURCING_LNUM != last_sourcing_lnum)
+    ఒకవేళ (SOURCING_NAME != ఖాళీ
+	    && (other_sourcing_name() || SOURCING_LNUM != చివరి_sourcing_lnum)
 	    && SOURCING_LNUM != 0)
     {
 	p = (char_u *)_("line %4ld:");
 	Buf = alloc(STRLEN(p) + 20);
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, (long)SOURCING_LNUM);
-	return Buf;
+	ఒకవేళ (Buf != ఖాళీ)
+	    sprintf((అక్షరం *)Buf, (అక్షరం *)p, (దీర్ఘ)SOURCING_LNUM);
+	తిరిగి Buf;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -534,39 +534,39 @@ get_emsg_lnum(void)
  * Remember the file name and line number, so that for the next error the info
  * is only displayed if it changed.
  */
-    void
-msg_source(int attr)
+    శూన్య
+సందేశం_ఆధారం(పూర్ణాంకం attr)
 {
     char_u	*p;
-    static int	recursive = FALSE;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
 
     // Bail out if something called here causes an error.
-    if (recursive)
-	return;
+    ఒకవేళ (recursive)
+	తిరిగి;
     recursive = TRUE;
 
     ++no_wait_return;
-    p = get_emsg_source();
-    if (p != NULL)
+    p = get_emsg_ఆధారం();
+    ఒకవేళ (p != ఖాళీ)
     {
-	msg_scroll = TRUE;  // this will take more than one line
-	msg_attr((char *)p, attr);
+	సందేశం_scroll = TRUE;  // this will take more than one line
+	సందేశం_attr((అక్షరం *)p, attr);
 	vim_free(p);
     }
     p = get_emsg_lnum();
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	msg_attr((char *)p, HL_ATTR(HLF_N));
+	సందేశం_attr((అక్షరం *)p, HL_ATTR(HLF_N));
 	vim_free(p);
-	last_sourcing_lnum = SOURCING_LNUM;  // only once for each line
+	చివరి_sourcing_lnum = SOURCING_LNUM;  // only once for each line
     }
 
     // remember the last sourcing name printed, also when it's empty
-    if (SOURCING_NAME == NULL || other_sourcing_name())
+    ఒకవేళ (SOURCING_NAME == ఖాళీ || other_sourcing_name())
     {
-	VIM_CLEAR(last_sourcing_name);
-	if (SOURCING_NAME != NULL)
-	    last_sourcing_name = vim_strsave(SOURCING_NAME);
+	VIM_CLEAR(చివరి_sourcing_name);
+	ఒకవేళ (SOURCING_NAME != ఖాళీ)
+	    చివరి_sourcing_name = vim_strsave(SOURCING_NAME);
     }
     --no_wait_return;
 
@@ -579,61 +579,61 @@ msg_source(int attr)
  * If "msg" is in 'debug': do error message but without side effects.
  * If "emsg_skip" is set: never do error messages.
  */
-    static int
-emsg_not_now(void)
+    స్థిర పూర్ణాంకం
+emsg_not_now(శూన్య)
 {
-    if ((emsg_off > 0 && vim_strchr(p_debug, 'm') == NULL
-					  && vim_strchr(p_debug, 't') == NULL)
-#ifdef FEAT_EVAL
+    ఒకవేళ ((emsg_off > 0 && vim_strchr(p_debug, 'm') == ఖాళీ
+					  && vim_strchr(p_debug, 't') == ఖాళీ)
+#నిర్వచితమైతే FEAT_EVAL
 	    || emsg_skip > 0
-#endif
+#అయితే_ముగింపు
 	    )
-	return TRUE;
-    return FALSE;
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_EVAL)
-static garray_T ignore_error_list = GA_EMPTY;
+#ఒకవేళ defined(FEAT_EVAL)
+స్థిర garray_T ignore_error_list = GA_ఖాళీలు;
 
-    void
+    శూన్య
 ignore_error_for_testing(char_u *error)
 {
-    if (ignore_error_list.ga_itemsize == 0)
-	ga_init2(&ignore_error_list, sizeof(char_u *), 1);
+    ఒకవేళ (ignore_error_list.ga_itemsize == 0)
+	ga_init2(&ignore_error_list, పరిమాణం(char_u *), 1);
 
-    if (STRCMP("RESET", error) == 0)
-	ga_clear_strings(&ignore_error_list);
-    else
+    ఒకవేళ (STRCMP("RESET", error) == 0)
+	ga_clear_అక్షరశ్రేణులు(&ignore_error_list);
+    లేకపోతే
 	ga_copy_string(&ignore_error_list, error);
 }
 
-    static int
-ignore_error(const char *msg)
+    స్థిర పూర్ణాంకం
+ignore_error(స్థిరరాశి అక్షరం *సందేశం)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < ignore_error_list.ga_len; ++i)
-	if (strstr(msg,
-		  (char *)((char_u **)(ignore_error_list.ga_data))[i]) != NULL)
-	    return TRUE;
-    return FALSE;
+    కొరకు (i = 0; i < ignore_error_list.ga_len; ++i)
+	ఒకవేళ (అక్షరశ్రేణి_శోధన(సందేశం,
+		  (అక్షరం *)((char_u **)(ignore_error_list.ga_దత్తాంశం))[i]) != ఖాళీ)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
-#if !defined(HAVE_STRERROR)
+#ఒకవేళ !defined(HAVE_STRERROR)
 /*
  * Replacement for perror() that behaves more or less like emsg() was called.
  * v:errmsg will be set and called_emsg will be incremented.
  */
-    void
-do_perror(char *msg)
+    శూన్య
+do_perror(అక్షరం *సందేశం)
 {
-    perror(msg);
+    perror(సందేశం);
     ++emsg_silent;
-    emsg(msg);
+    emsg(సందేశం);
     --emsg_silent;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * emsg_core() - display an error message
@@ -644,36 +644,36 @@ do_perror(char *msg)
  * Return TRUE if wait_return() not called.
  * Note: caller must check 'emsg_not_now()' before calling this.
  */
-    static int
-emsg_core(const char *s)
+    స్థిర పూర్ణాంకం
+emsg_core(స్థిరరాశి అక్షరం *s)
 {
-    int		attr;
+    పూర్ణాంకం		attr;
     char_u	*p;
-    int		r;
-#ifdef FEAT_EVAL
-    int		ignore = FALSE;
-    int		severe;
-#endif
+    పూర్ణాంకం		r;
+#నిర్వచితమైతే FEAT_EVAL
+    పూర్ణాంకం		ignore = FALSE;
+    పూర్ణాంకం		severe;
+#అయితే_ముగింపు
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // When testing some errors are turned into a normal message.
-    if (ignore_error(s))
+    ఒకవేళ (ignore_error(s))
 	// don't call msg() if it results in a dialog
-	return msg_use_printf() ? FALSE : msg((char *)s);
-#endif
+	తిరిగి సందేశం_use_printf() ? FALSE : సందేశం((అక్షరం *)s);
+#అయితే_ముగింపు
 
     ++called_emsg;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // If "emsg_severe" is TRUE: When an error exception is to be thrown,
     // prefer this message over previous messages for the same command.
     severe = emsg_severe;
     emsg_severe = FALSE;
-#endif
+#అయితే_ముగింపు
 
-    if (!emsg_off || vim_strchr(p_debug, 't') != NULL)
+    ఒకవేళ (!emsg_off || vim_strchr(p_debug, 't') != ఖాళీ)
     {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	/*
 	 * Cause a throw of an error exception if appropriate.  Don't display
 	 * the error message in this case.  (If no matching catch clause will
@@ -681,47 +681,47 @@ emsg_core(const char *s)
 	 * when the message should be ignored completely (used for the
 	 * interrupt message).
 	 */
-	if (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
+	ఒకవేళ (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
 	{
-	    if (!ignore)
+	    ఒకవేళ (!ignore)
 		++did_emsg;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 
-	if (in_assert_fails && emsg_assert_fails_msg == NULL)
+	ఒకవేళ (లోపల_assert_fails && emsg_assert_fails_సందేశం == ఖాళీ)
 	{
-	    emsg_assert_fails_msg = vim_strsave((char_u *)s);
+	    emsg_assert_fails_సందేశం = vim_strsave((char_u *)s);
 	    emsg_assert_fails_lnum = SOURCING_LNUM;
 	    vim_free(emsg_assert_fails_context);
 	    emsg_assert_fails_context = vim_strsave(
-			 SOURCING_NAME == NULL ? (char_u *)"" : SOURCING_NAME);
+			 SOURCING_NAME == ఖాళీ ? (char_u *)"" : SOURCING_NAME);
 	}
 
 	// set "v:errmsg", also when using ":silent! cmd"
-	set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-#endif
+	సమితి_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
+#అయితే_ముగింపు
 
 	/*
 	 * When using ":silent! cmd" ignore error messages.
 	 * But do write it to the redirection file.
 	 */
-	if (emsg_silent != 0)
+	ఒకవేళ (emsg_silent != 0)
 	{
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	    ++did_emsg_silent;
-#endif
-	    if (emsg_noredir == 0)
+#అయితే_ముగింపు
+	    ఒకవేళ (emsg_noredir == 0)
 	    {
-		msg_start();
-		p = get_emsg_source();
-		if (p != NULL)
+		సందేశం_ప్రారంభం();
+		p = get_emsg_ఆధారం();
+		ఒకవేళ (p != ఖాళీ)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
 		    vim_free(p);
 		}
 		p = get_emsg_lnum();
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
@@ -729,226 +729,226 @@ emsg_core(const char *s)
 		}
 		redir_write((char_u *)s, -1);
 	    }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	    // Only increment did_emsg_def when :silent! wasn't used inside the
 	    // :def function.
-	    if (emsg_silent == emsg_silent_def)
+	    ఒకవేళ (emsg_silent == emsg_silent_def)
 		++did_emsg_def;
-#endif
-#ifdef FEAT_EVAL
-	    ch_log(NULL, "ERROR silent: %s", s);
-#endif
-	    return TRUE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
+	    ch_log(ఖాళీ, "ERROR silent: %s", s);
+#అయితే_ముగింపు
+	    తిరిగి TRUE;
 	}
 
 	ex_exitval = 1;
 
 	// Reset msg_silent, an error causes messages to be switched back on.
-	msg_silent = 0;
+	సందేశం_silent = 0;
 	cmd_silent = FALSE;
 
-	if (global_busy)		// break :global command
+	ఒకవేళ (global_busy)		// break :global command
 	    ++global_busy;
 
-	if (p_eb)
+	ఒకవేళ (p_eb)
 	    beep_flush();		// also includes flush_buffers()
-	else
-	    flush_buffers(FLUSH_MINIMAL);  // flush internal buffers
+	లేకపోతే
+	    flush_buffers(FLUSH_కనీస);  // flush internal buffers
 	++did_emsg;			   // flag for DoOneCmd()
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	++uncaught_emsg;
-#endif
+#అయితే_ముగింపు
     }
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (!in_echowindow)
-#endif
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (!లోపల_echowindow)
+#అయితే_ముగింపు
 	emsg_on_display = TRUE;	    // remember there is an error message
 
     attr = HL_ATTR(HLF_E);	    // set highlight mode for error messages
-    if (msg_scrolled != 0)
+    ఒకవేళ (సందేశం_scrolled != 0)
 	need_wait_return = TRUE;    // needed in case emsg() is called after
 				    // wait_return() has reset need_wait_return
 				    // and a redraw is expected because
 				    // msg_scrolled is non-zero
 
-#ifdef FEAT_JOB_CHANNEL
-    emsg_to_channel_log = TRUE;
-#endif
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    emsg_గమ్యం_channel_log = TRUE;
+#అయితే_ముగింపు
     /*
      * Display name and line number for the source of the error.
      */
-    msg_scroll = TRUE;
-    msg_source(attr);
+    సందేశం_scroll = TRUE;
+    సందేశం_ఆధారం(attr);
 
     /*
      * Display the error message itself.
      */
-    msg_nowait = FALSE;			// wait for this msg
-    r = msg_attr((char *)s, attr);
+    సందేశం_nowait = FALSE;			// wait for this msg
+    r = సందేశం_attr((అక్షరం *)s, attr);
 
-#ifdef FEAT_JOB_CHANNEL
-    emsg_to_channel_log = FALSE;
-#endif
-    return r;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    emsg_గమ్యం_channel_log = FALSE;
+#అయితే_ముగింపు
+    తిరిగి r;
 }
 
 /*
  * Print error message "s".  Should already be translated.
  * Return TRUE if wait_return() not called.
  */
-    int
-emsg(char *s)
+    పూర్ణాంకం
+emsg(అక్షరం *s)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    ఒకవేళ (emsg_not_now())
+	తిరిగి TRUE;
 
-    return emsg_core(s);
+    తిరిగి emsg_core(s);
 }
 
-#ifndef PROTO  // manual proto with __attribute__
+#నిర్వచితం_కాకపోతే PROTO  // manual proto with __attribute__
 /*
  * Print error message "s" with format string and variable arguments.
  * "s" should already be translated.
  * Note: caller must not use "IObuff" for "s"!
  * Return TRUE if wait_return() not called.
  */
-    int
-semsg(const char *s, ...)
+    పూర్ణాంకం
+semsg(స్థిరరాశి అక్షరం *s, ...)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    ఒకవేళ (emsg_not_now())
+	తిరిగి TRUE;
 
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return emsg_core(s);
+	తిరిగి emsg_core(s);
 
     va_list ap;
 
     va_start(ap, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+    vim_vsnprintf((అక్షరం *)IObuff, IOSIZE, s, ap);
     va_end(ap);
-    return emsg_core((char *)IObuff);
+    తిరిగి emsg_core((అక్షరం *)IObuff);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Same as emsg(...), but abort on error when ABORT_ON_INTERNAL_ERROR is
  * defined. It is used for internal errors only, so that they can be
  * detected when fuzzing vim.
  */
-    void
-iemsg(char *s)
+    శూన్య
+iemsg(అక్షరం *s)
 {
-    if (emsg_not_now())
-	return;
+    ఒకవేళ (emsg_not_now())
+	తిరిగి;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_అంతర్గత_error_please_report_a_bug));
 
     emsg_core(s);
-#if defined(ABORT_ON_INTERNAL_ERROR) && defined(FEAT_EVAL)
-    set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-    msg_putchar('\n');  // avoid overwriting the error message
-    out_flush();
+#ఒకవేళ defined(ABORT_ON_అంతర్గత_ERROR) && defined(FEAT_EVAL)
+    సమితి_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
+    సందేశం_putchar('\n');  // avoid overwriting the error message
+    బహిర్గతం_flush();
     abort();
-#endif
+#అయితే_ముగింపు
 }
 
-#ifndef PROTO  // manual proto with __attribute__
+#నిర్వచితం_కాకపోతే PROTO  // manual proto with __attribute__
 /*
  * Same as semsg(...) but abort on error when ABORT_ON_INTERNAL_ERROR is
  * defined. It is used for internal errors only, so that they can be
  * detected when fuzzing vim.
  * Note: caller must not pass 'IObuff' as 1st argument.
  */
-    void
-siemsg(const char *s, ...)
+    శూన్య
+siemsg(స్థిరరాశి అక్షరం *s, ...)
 {
-    if (emsg_not_now())
-	return;
+    ఒకవేళ (emsg_not_now())
+	తిరిగి;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_అంతర్గత_error_please_report_a_bug));
 
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
 	emsg_core(s);
     }
-    else
+    లేకపోతే
     {
 	va_list ap;
 
 	va_start(ap, s);
-	vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+	vim_vsnprintf((అక్షరం *)IObuff, IOSIZE, s, ap);
 	va_end(ap);
-	emsg_core((char *)IObuff);
+	emsg_core((అక్షరం *)IObuff);
     }
-# ifdef ABORT_ON_INTERNAL_ERROR
-    msg_putchar('\n');  // avoid overwriting the error message
-    out_flush();
+# ifdef ABORT_ON_అంతర్గత_ERROR
+    సందేశం_putchar('\n');  // avoid overwriting the error message
+    బహిర్గతం_flush();
     abort();
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Give an "Internal error" message.
  */
-    void
-internal_error(char *where)
+    శూన్య
+అంతర్గత_error(అక్షరం *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_అంతర్గత_error_please_report_a_bug));
 
-    siemsg(_(e_internal_error_str), where);
+    siemsg(_(e_అంతర్గత_error_str), where);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Like internal_error() but do not call abort(), to avoid tests using
  * test_unknown() and test_void() causing Vim to exit.
  */
-    void
-internal_error_no_abort(char *where)
+    శూన్య
+అంతర్గత_error_no_abort(అక్షరం *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_అంతర్గత_error_please_report_a_bug));
 
-    semsg(_(e_internal_error_str), where);
+    semsg(_(e_అంతర్గత_error_str), where);
 }
-#endif
+#అయితే_ముగింపు
 
 // emsg3() and emsgn() are in misc2.c to avoid warnings for the prototypes.
 
-    void
-emsg_invreg(int name)
+    శూన్య
+emsg_invreg(పూర్ణాంకం name)
 {
-    semsg(_(e_invalid_register_name_str), transchar_buf(NULL, name));
+    semsg(_(e_invalid_రిజిస్టరు_name_str), transchar_buf(ఖాళీ, name));
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Give an error message which contains %s for "name[len]".
  */
-    void
-emsg_namelen(char *msg, char_u *name, int len)
+    శూన్య
+emsg_namelen(అక్షరం *సందేశం, char_u *name, పూర్ణాంకం len)
 {
     char_u *copy = vim_strnsave(name, len);
 
-    semsg(msg, copy == NULL ? "NULL" : (char *)copy);
+    semsg(సందేశం, copy == ఖాళీ ? "NULL" : (అక్షరం *)copy);
     vim_free(copy);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Like msg(), but truncate to a single line if p_shm contains 't', or when
@@ -956,24 +956,24 @@ emsg_namelen(char *msg, char_u *name, int len)
  * Careful: The string may be changed by msg_may_trunc()!
  * Returns a pointer to the printed message, if wait_return() not called.
  */
-    char *
-msg_trunc_attr(char *s, int force, int attr)
+    అక్షరం *
+సందేశం_trunc_attr(అక్షరం *s, పూర్ణాంకం force, పూర్ణాంకం attr)
 {
-    int		n;
-    char	*ts;
+    పూర్ణాంకం		n;
+    అక్షరం	*ts;
 
     // Add message to history before truncating
-    add_msg_hist((char_u *)s, -1, attr);
+    కూడు_సందేశం_hist((char_u *)s, -1, attr);
 
-    ts = (char *)msg_may_trunc(force, (char_u *)s);
+    ts = (అక్షరం *)సందేశం_may_trunc(force, (char_u *)s);
 
-    msg_hist_off = TRUE;
-    n = msg_attr(ts, attr);
-    msg_hist_off = FALSE;
+    సందేశం_hist_off = TRUE;
+    n = సందేశం_attr(ts, attr);
+    సందేశం_hist_off = FALSE;
 
-    if (n)
-	return ts;
-    return NULL;
+    ఒకవేళ (n)
+	తిరిగి ts;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -982,28 +982,28 @@ msg_trunc_attr(char *s, int force, int attr)
  * Note: May change the message by replacing a character with '<'.
  */
     char_u *
-msg_may_trunc(int force, char_u *s)
+సందేశం_may_trunc(పూర్ణాంకం force, char_u *s)
 {
-    int		n;
-    int		room;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		స్థలం;
 
     // If 'cmdheight' is zero or something unexpected happened "room" may be
     // negative.
-    room = (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col - 1;
-    if (room > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_active))
-	    && (n = (int)STRLEN(s) - room) > 0)
+    స్థలం = (పూర్ణాంకం)(అడ్డువరుసలు - cmdline_అడ్డువరుస - 1) * cmdline_వెడల్పు + sc_నిలువు - 1;
+    ఒకవేళ (స్థలం > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_చురుకైన))
+	    && (n = (పూర్ణాంకం)STRLEN(s) - స్థలం) > 0)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    int	size = vim_strsize(s);
+	    పూర్ణాంకం	కొలత = vim_strsize(s);
 
 	    // There may be room anyway when there are multibyte chars.
-	    if (size <= room)
-		return s;
+	    ఒకవేళ (కొలత <= స్థలం)
+		తిరిగి s;
 
-	    for (n = 0; size >= room; )
+	    కొరకు (n = 0; కొలత >= స్థలం; )
 	    {
-		size -= (*mb_ptr2cells)(s + n);
+		కొలత -= (*mb_ptr2cells)(s + n);
 		n += (*mb_ptr2len)(s + n);
 	    }
 	    --n;
@@ -1011,96 +1011,96 @@ msg_may_trunc(int force, char_u *s)
 	s += n;
 	*s = '<';
     }
-    return s;
+    తిరిగి s;
 }
 
-    static void
-add_msg_hist(
+    స్థిర శూన్య
+కూడు_సందేశం_hist(
     char_u	*s,
-    int		len,		// -1 for undetermined length
-    int		attr)
+    పూర్ణాంకం		len,		// -1 for undetermined length
+    పూర్ణాంకం		attr)
 {
-    struct msg_hist *p;
+    నిర్మాణం సందేశం_hist *p;
 
-    if (msg_hist_off || msg_silent != 0)
-	return;
+    ఒకవేళ (సందేశం_hist_off || సందేశం_silent != 0)
+	తిరిగి;
 
     // allocate an entry and add the message at the end of the history
-    p = ALLOC_ONE(struct msg_hist);
-    if (p == NULL)
-	return;
+    p = ALLOC_ONE(నిర్మాణం సందేశం_hist);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
-    if (len < 0)
-	len = (int)STRLEN(s);
+    ఒకవేళ (len < 0)
+	len = (పూర్ణాంకం)STRLEN(s);
     // remove leading and trailing newlines
-    while (len > 0 && *s == '\n')
+    అయితే (len > 0 && *s == '\n')
     {
 	++s;
 	--len;
     }
-    while (len > 0 && s[len - 1] == '\n')
+    అయితే (len > 0 && s[len - 1] == '\n')
 	--len;
-    p->msg = vim_strnsave(s, len);
-    p->next = NULL;
+    p->సందేశం = vim_strnsave(s, len);
+    p->తదుపరి = ఖాళీ;
     p->attr = attr;
-    if (last_msg_hist != NULL)
-	last_msg_hist->next = p;
-    last_msg_hist = p;
-    if (first_msg_hist == NULL)
-	first_msg_hist = last_msg_hist;
-    ++msg_hist_len;
+    ఒకవేళ (చివరి_సందేశం_hist != ఖాళీ)
+	చివరి_సందేశం_hist->తదుపరి = p;
+    చివరి_సందేశం_hist = p;
+    ఒకవేళ (మొదటి_సందేశం_hist == ఖాళీ)
+	మొదటి_సందేశం_hist = చివరి_సందేశం_hist;
+    ++సందేశం_hist_len;
 
-    check_msg_hist();
+    check_సందేశం_hist();
 }
 
 /*
  * Delete the first (oldest) message from the history.
  * Returns FAIL if there are no messages.
  */
-    int
-delete_first_msg(void)
+    పూర్ణాంకం
+delete_మొదటి_సందేశం(శూన్య)
 {
-    struct msg_hist *p;
+    నిర్మాణం సందేశం_hist *p;
 
-    if (msg_hist_len <= 0)
-	return FAIL;
-    p = first_msg_hist;
-    first_msg_hist = p->next;
-    if (first_msg_hist == NULL)
-	last_msg_hist = NULL;  // history is empty
-    vim_free(p->msg);
+    ఒకవేళ (సందేశం_hist_len <= 0)
+	తిరిగి FAIL;
+    p = మొదటి_సందేశం_hist;
+    మొదటి_సందేశం_hist = p->తదుపరి;
+    ఒకవేళ (మొదటి_సందేశం_hist == ఖాళీ)
+	చివరి_సందేశం_hist = ఖాళీ;  // history is empty
+    vim_free(p->సందేశం);
     vim_free(p);
-    --msg_hist_len;
-    return OK;
+    --సందేశం_hist_len;
+    తిరిగి OK;
 }
 
-    static void
-check_msg_hist(void)
+    స్థిర శూన్య
+check_సందేశం_hist(శూన్య)
 {
     // Don't let the message history get too big
-    while (msg_hist_len > 0 && msg_hist_len > msg_hist_max)
-	(void)delete_first_msg();
+    అయితే (సందేశం_hist_len > 0 && సందేశం_hist_len > సందేశం_hist_max)
+	(శూన్య)delete_మొదటి_సందేశం();
 }
 
 
-    int
-messagesopt_changed(void)
+    పూర్ణాంకం
+messagesopt_మారింది(శూన్య)
 {
     char_u	*p;
-    int		messages_flags_new = 0;
-    int		messages_wait_new = 0;
-    int		messages_history_new = 0;
+    పూర్ణాంకం		messages_flags_new = 0;
+    పూర్ణాంకం		messages_wait_new = 0;
+    పూర్ణాంకం		messages_history_new = 0;
 
     p = p_mopt;
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	if (STRNCMP(p, MESSAGES_OPT_HIT_ENTER,
-	     STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER)) == 0)
+	ఒకవేళ (STRNCMP(p, MESSAGES_OPT_తగిలింది_ENTER,
+	     STRLEN_LITERAL(MESSAGES_OPT_తగిలింది_ENTER)) == 0)
 	{
-	    p += STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER);
-	    messages_flags_new |= MESSAGES_HIT_ENTER;
+	    p += STRLEN_LITERAL(MESSAGES_OPT_తగిలింది_ENTER);
+	    messages_flags_new |= MESSAGES_తగిలింది_ENTER;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_WAIT,
+	లేకపోతే ఒకవేళ (STRNCMP(p, MESSAGES_OPT_WAIT,
 		  STRLEN_LITERAL(MESSAGES_OPT_WAIT)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_WAIT)]))
 	{
@@ -1108,7 +1108,7 @@ messagesopt_changed(void)
 	    messages_wait_new = getdigits(&p);
 	    messages_flags_new |= MESSAGES_WAIT;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_HISTORY,
+	లేకపోతే ఒకవేళ (STRNCMP(p, MESSAGES_OPT_HISTORY,
 		  STRLEN_LITERAL(MESSAGES_OPT_HISTORY)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_HISTORY)]))
 	{
@@ -1117,87 +1117,87 @@ messagesopt_changed(void)
 	    messages_flags_new |= MESSAGES_HISTORY;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ఒకవేళ (*p != ',' && *p != NUL)
+	    తిరిగి FAIL;
+	ఒకవేళ (*p == ',')
 	    ++p;
     }
 
     // Either "wait" or "hit-enter" is required
-    if (!(messages_flags_new & (MESSAGES_HIT_ENTER | MESSAGES_WAIT)))
-	return FAIL;
+    ఒకవేళ (!(messages_flags_new & (MESSAGES_తగిలింది_ENTER | MESSAGES_WAIT)))
+	తిరిగి FAIL;
 
     // "history" must be set
-    if (!(messages_flags_new & MESSAGES_HISTORY))
-	return FAIL;
+    ఒకవేళ (!(messages_flags_new & MESSAGES_HISTORY))
+	తిరిగి FAIL;
 
-    if (messages_history_new < 0 || messages_history_new > 10000)
-	return FAIL;
+    ఒకవేళ (messages_history_new < 0 || messages_history_new > 10000)
+	తిరిగి FAIL;
 
-    if (messages_wait_new < 0 || messages_wait_new > 10000)
-	return FAIL;
+    ఒకవేళ (messages_wait_new < 0 || messages_wait_new > 10000)
+	తిరిగి FAIL;
 
-    msg_flags = messages_flags_new;
-    msg_wait = messages_wait_new;
+    సందేశం_flags = messages_flags_new;
+    సందేశం_wait = messages_wait_new;
 
-    msg_hist_max = messages_history_new;
-    check_msg_hist();
+    సందేశం_hist_max = messages_history_new;
+    check_సందేశం_hist();
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * ":messages" command.
  */
-    void
+    శూన్య
 ex_messages(exarg_T *eap)
 {
-    struct msg_hist *p;
+    నిర్మాణం సందేశం_hist *p;
     char_u	    *s;
-    int		    c = 0;
+    పూర్ణాంకం		    c = 0;
 
-    if (STRCMP(eap->arg, "clear") == 0)
+    ఒకవేళ (STRCMP(eap->arg, "clear") == 0)
     {
-	int keep = eap->addr_count == 0 ? 0 : eap->line2;
+	పూర్ణాంకం keep = eap->addr_లెక్క == 0 ? 0 : eap->line2;
 
-	while (msg_hist_len > keep)
-	    (void)delete_first_msg();
-	return;
+	అయితే (సందేశం_hist_len > keep)
+	    (శూన్య)delete_మొదటి_సందేశం();
+	తిరిగి;
     }
 
-    if (*eap->arg != NUL)
+    ఒకవేళ (*eap->arg != NUL)
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_వాదం));
+	తిరిగి;
     }
 
-    msg_hist_off = TRUE;
+    సందేశం_hist_off = TRUE;
 
-    p = first_msg_hist;
-    if (eap->addr_count != 0)
+    p = మొదటి_సందేశం_hist;
+    ఒకవేళ (eap->addr_లెక్క != 0)
     {
 	// Count total messages
-	for (; p != NULL && !got_int; p = p->next)
+	కొరకు (; p != ఖాళీ && !got_int; p = p->తదుపరి)
 	    c++;
 
 	c -= eap->line2;
 
 	// Skip without number of messages specified
-	for (p = first_msg_hist; p != NULL && !got_int && c > 0;
-						    p = p->next, c--);
+	కొరకు (p = మొదటి_సందేశం_hist; p != ఖాళీ && !got_int && c > 0;
+						    p = p->తదుపరి, c--);
     }
 
-    if (p == first_msg_hist)
+    ఒకవేళ (p == మొదటి_సందేశం_hist)
     {
-#ifdef FEAT_MULTI_LANG
+#నిర్వచితమైతే FEAT_MULTI_LANG
 	s = get_mess_lang();
-#else
+#లేకపోతే
 	s = mch_getenv((char_u *)"LANG");
-#endif
-	if (s != NULL && *s != NUL)
+#అయితే_ముగింపు
+	ఒకవేళ (s != ఖాళీ && *s != NUL)
 	    // The next comment is extracted by xgettext and put in po file for
 	    // translators to read.
-	    msg_attr(
+	    సందేశం_attr(
 		    // Translator: Please replace the name and email address
 		    // with the appropriate text for your translation.
 		    _("Messages maintainer: The Vim Project"),
@@ -1205,29 +1205,29 @@ ex_messages(exarg_T *eap)
     }
 
     // Display what was not skipped.
-    for (; p != NULL && !got_int; p = p->next)
-	if (p->msg != NULL)
-	    msg_attr((char *)p->msg, p->attr);
+    కొరకు (; p != ఖాళీ && !got_int; p = p->తదుపరి)
+	ఒకవేళ (p->సందేశం != ఖాళీ)
+	    సందేశం_attr((అక్షరం *)p->సందేశం, p->attr);
 
-    msg_hist_off = FALSE;
+    సందేశం_hist_off = FALSE;
 }
 
-#if defined(FEAT_CON_DIALOG) || defined(FIND_REPLACE_DIALOG)
+#ఒకవేళ defined(FEAT_CON_DIALOG) || defined(కనుగొను_REPLACE_DIALOG)
 /*
  * Call this after prompting the user.  This will avoid a hit-return message
  * and a delay.
  */
-    void
-msg_end_prompt(void)
+    శూన్య
+సందేశం_చివర_prompt(శూన్య)
 {
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    cmdline_row = msg_row;
-    msg_col = 0;
-    msg_clr_eos();
-    lines_left = -1;
+    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
+    సందేశం_నిలువు = 0;
+    సందేశం_clr_eos();
+    పంక్తులు_ఎడమ = -1;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Wait for the user to hit a key (normally Enter).
@@ -1235,27 +1235,27 @@ msg_end_prompt(void)
  * If "redraw" is FALSE, just redraw the screen.
  * If "redraw" is -1, don't redraw at all.
  */
-    void
-wait_return(int redraw)
+    శూన్య
+wait_return(పూర్ణాంకం redraw)
 {
-    int		c;
-    int		oldState;
-    int		tmpState;
-    int		had_got_int;
-    int		save_reg_recording;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		oldState;
+    పూర్ణాంకం		tmpState;
+    పూర్ణాంకం		had_got_int;
+    పూర్ణాంకం		save_reg_recording;
     FILE	*save_scriptout;
 
-    if (redraw == TRUE)
-	set_must_redraw(UPD_CLEAR);
+    ఒకవేళ (redraw == TRUE)
+	సమితి_must_redraw(UPD_CLEAR);
 
     // If using ":silent cmd", don't wait for a return.  Also don't set
     // need_wait_return to do it later.
-    if (msg_silent != 0)
-	return;
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
-#endif
+    ఒకవేళ (సందేశం_silent != 0)
+	తిరిగి;
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (లోపల_echowindow)
+	తిరిగి;
+#అయితే_ముగింపు
 
     /*
      * When inside vgetc(), we can't wait for a typed character at all.
@@ -1263,65 +1263,65 @@ wait_return(int redraw)
      * the end. Adjust cmdline_row to avoid the next message overwriting the
      * last one.
      */
-    if (vgetc_busy > 0)
-	return;
+    ఒకవేళ (vgetc_busy > 0)
+	తిరిగి;
     need_wait_return = TRUE;
-    if (no_wait_return)
+    ఒకవేళ (no_wait_return)
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
-	return;
+	ఒకవేళ (!exmode_చురుకైన)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
+	తిరిగి;
     }
 
     redir_off = TRUE;		// don't redirect this message
     oldState = State;
-    if (quit_more)
+    ఒకవేళ (quit_మరిన్ని)
     {
 	c = CAR;		// just pretend CR was hit
-	quit_more = FALSE;
+	quit_మరిన్ని = FALSE;
 	got_int = FALSE;
     }
-    else if (exmode_active)
+    లేకపోతే ఒకవేళ (exmode_చురుకైన)
     {
-	msg_puts(" ");		// make sure the cursor is on the right line
+	సందేశం_puts(" ");		// make sure the cursor is on the right line
 	c = CAR;		// no need for a return in ex mode
 	got_int = FALSE;
     }
-    else if (!stuff_empty())
+    లేకపోతే ఒకవేళ (!stuff_ఖాళీలు())
 	// When there are stuffed characters, the next stuffed character will
 	// dismiss the hit-enter prompt immediately and have to be put back, so
 	// instead just don't show the hit-enter prompt at all.
 	c = CAR;
-    else
+    లేకపోతే
     {
 	// Make sure the hit-return prompt is on screen when 'guioptions' was
 	// just changed.
 	screenalloc(FALSE);
 
-	State = MODE_HITRETURN;
+	State = బహుళకం_HITRETURN;
 	setmouse();
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
-#endif
-	cmdline_row = msg_row;
+#అయితే_ముగింపు
+	cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 
 	// Avoid the sequence that the user types ":" at the hit-return prompt
 	// to start an Ex command, but the file-changed dialog gets in the
 	// way.
-	if (need_check_timestamps)
+	ఒకవేళ (need_check_timestamps)
 	    check_timestamps(FALSE);
 
-	if (msg_flags & MESSAGES_HIT_ENTER)
+	ఒకవేళ (సందేశం_flags & MESSAGES_తగిలింది_ENTER)
 	{
-	    hit_return_msg();
+	    తగిలింది_return_సందేశం();
 
-	    do
+	    చేయి
 	    {
-#ifdef FEAT_IMAGE
+#నిర్వచితమైతే FEAT_IMAGE
 		// Make sure to update image placements (since their row offset
 		// will have been changed).
 		draw_image_placements();
-#endif
+#అయితే_ముగింపు
 		// Remember "got_int", if it is set vgetc() probably returns a
 		// CTRL-C, but we need to loop then.
 		had_got_int = got_int;
@@ -1329,7 +1329,7 @@ wait_return(int redraw)
 		// Don't do mappings here, we put the character back in the
 		// typeahead buffer.
 		++no_mapping;
-		++allow_keys;
+		++allow_కీలకాలు;
 
 		// Temporarily disable Recording. If Recording is active, the
 		// character will be recorded later, since it will be added to
@@ -1337,26 +1337,26 @@ wait_return(int redraw)
 		save_reg_recording = reg_recording;
 		save_scriptout = scriptout;
 		reg_recording = 0;
-		scriptout = NULL;
-		c = safe_vgetc();
-		if (had_got_int && !global_busy)
+		scriptout = ఖాళీ;
+		c = సురక్షిత_vgetc();
+		ఒకవేళ (had_got_int && !global_busy)
 		    got_int = FALSE;
 		--no_mapping;
-		--allow_keys;
+		--allow_కీలకాలు;
 		reg_recording = save_reg_recording;
 		scriptout = save_scriptout;
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
 		// Strange way to allow copying (yanking) a modeless selection
 		// at the hit-enter prompt.  Use CTRL-Y, because the same is
 		// used in Cmdline-mode and it's harmless when there is no
 		// selection.
-		if (KeyTyped && c == Ctrl_Y && clip_star.state == SELECT_DONE)
+		ఒకవేళ (కీలకం_Typed && c == Ctrl_Y && clip_నక్షత్రం.state == SELECT_పూర్తి)
 		{
 		    clip_copy_modeless_selection(TRUE);
 		    c = K_IGNORE;
 		}
-#endif
+#అయితే_ముగింపు
 
 		/*
 		* Allow scrolling back in the messages.
@@ -1364,46 +1364,46 @@ wait_return(int redraw)
 		* screen, to avoid that typing one 'j' too many makes the
 		* messages disappear.
 		*/
-		if (KeyTyped && p_more && !p_cp)
+		ఒకవేళ (కీలకం_Typed && p_మరిన్ని && !p_cp)
 		{
-		    if (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
-						|| c == K_UP || c == K_PAGEUP)
+		    ఒకవేళ (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
+						|| c == K_పైకి || c == K_PAGEUP)
 		    {
-			if (msg_scrolled > Rows)
+			ఒకవేళ (సందేశం_scrolled > అడ్డువరుసలు)
 			    // scroll back to show older messages
-			    do_more_prompt(c);
-			else
+			    do_మరిన్ని_prompt(c);
+			లేకపోతే
 			{
-			    msg_didout = FALSE;
+			    సందేశం_didout = FALSE;
 			    c = K_IGNORE;
-			    msg_col =
-#ifdef FEAT_RIGHTLEFT
-				cmdmsg_rl ? cmdline_width - 1 :
-#endif
+			    సందేశం_నిలువు =
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+				cmdmsg_rl ? cmdline_వెడల్పు - 1 :
+#అయితే_ముగింపు
 				0;
 			}
-			if (quit_more)
+			ఒకవేళ (quit_మరిన్ని)
 			{
 			    c = CAR;		// just pretend CR was hit
-			    quit_more = FALSE;
+			    quit_మరిన్ని = FALSE;
 			    got_int = FALSE;
 			}
-			else if (c != K_IGNORE)
+			లేకపోతే ఒకవేళ (c != K_IGNORE)
 			{
 			    c = K_IGNORE;
-			    hit_return_msg();
+			    తగిలింది_return_సందేశం();
 			}
 		    }
-		    else if (msg_scrolled > Rows - 2
+		    లేకపోతే ఒకవేళ (సందేశం_scrolled > అడ్డువరుసలు - 2
 			    && (c == 'j' || c == 'd' || c == 'f' || c == Ctrl_F
-					    || c == K_DOWN || c == K_PAGEDOWN))
+					    || c == K_కిందికి || c == K_PAGEDOWN))
 			c = K_IGNORE;
 		}
-	    } while ((had_got_int && c == Ctrl_C)
+	    } అయితే ((had_got_int && c == Ctrl_C)
 				|| c == K_IGNORE
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 				|| c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR
-#endif
+#అయితే_ముగింపు
 				|| c == K_LEFTDRAG   || c == K_LEFTRELEASE
 				|| c == K_MIDDLEDRAG || c == K_MIDDLERELEASE
 				|| c == K_RIGHTDRAG  || c == K_RIGHTRELEASE
@@ -1411,7 +1411,7 @@ wait_return(int redraw)
 				|| c == K_MOUSEDOWN  || c == K_MOUSEUP
 				|| c == K_MOUSEMOVE
 				|| (!mouse_has(MOUSE_RETURN)
-				    && mouse_row < msg_row
+				    && mouse_అడ్డువరుస < సందేశం_అడ్డువరుస
 				    && (c == K_LEFTMOUSE
 					|| c == K_MIDDLEMOUSE
 					|| c == K_RIGHTMOUSE
@@ -1421,24 +1421,24 @@ wait_return(int redraw)
 	    ui_breakcheck();
 
 	    // Avoid that the mouse-up event causes Visual mode to start.
-	    if (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
+	    ఒకవేళ (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
 					|| c == K_X1MOUSE || c == K_X2MOUSE)
-		(void)jump_to_mouse(MOUSE_SETPOS, NULL, 0);
-	    else if (!KeyTyped || (vim_strchr((char_u *)"\r\n ", c) == NULL
+		(శూన్య)jump_గమ్యం_mouse(MOUSE_SETPOS, ఖాళీ, 0);
+	    లేకపోతే ఒకవేళ (!కీలకం_Typed || (vim_strchr((char_u *)"\r\n ", c) == ఖాళీ
 						   && c != Ctrl_C && c != 'q'))
 	    {
 		// Put the character back in the typeahead buffer.  Don't use
 		// the stuff buffer, because lmaps wouldn't work.
-		ins_char_typebuf(vgetc_char, vgetc_mod_mask);
+		ins_char_typebuf(vgetc_char, vgetc_mod_ముసుగు);
 		do_redraw = TRUE;	// need a redraw even though there is
 					// typeahead
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    c = CAR;
 	    // Wait to allow the user to verify the output.
-	    do_sleep(msg_wait, TRUE);
+	    do_sleep(సందేశం_wait, TRUE);
 	}
     }
     redir_off = FALSE;
@@ -1447,15 +1447,15 @@ wait_return(int redraw)
      * If the user hits ':', '?' or '/' we get a command line from the next
      * line.
      */
-    if (c == ':' || c == '?' || c == '/')
+    ఒకవేళ (c == ':' || c == '?' || c == '/')
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
+	ఒకవేళ (!exmode_చురుకైన)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	skip_redraw = TRUE;	    // skip redraw once
 	do_redraw = FALSE;
-#ifdef FEAT_TERMINAL
-	skip_term_loop = TRUE;
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+	skip_పదం_loop = TRUE;
+#అయితే_ముగింపు
     }
 
     /*
@@ -1466,33 +1466,33 @@ wait_return(int redraw)
     tmpState = State;
     State = oldState;		    // restore State before set_shellsize
     setmouse();
-    msg_check();
+    సందేశం_check();
 
-#ifndef MSWIN
+#నిర్వచితం_కాకపోతే MSWIN
     /*
      * On TTY-style terminals (all but Windows), an extra newline is
      * needed when switching screens on exit.
      */
-    if (swapping_screen() && !termcap_active)
+    ఒకవేళ (swapping_screen() && !termcap_చురుకైన)
 	newline_on_exit = TRUE;
-#endif
+#అయితే_ముగింపు
 
     need_wait_return = FALSE;
     did_wait_return = TRUE;
     emsg_on_display = FALSE;	// can delete error message now
-    lines_left = -1;		// reset lines_left at next msg_start()
-    reset_last_sourcing();
-    if (keep_msg != NULL && vim_strsize(keep_msg) >=
-			    (Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	VIM_CLEAR(keep_msg);	    // don't redisplay message, it's too long
+    పంక్తులు_ఎడమ = -1;		// reset lines_left at next msg_start()
+    reset_చివరి_sourcing();
+    ఒకవేళ (keep_సందేశం != ఖాళీ && vim_strsize(keep_సందేశం) >=
+			    (అడ్డువరుసలు - cmdline_అడ్డువరుస - 1) * cmdline_వెడల్పు + sc_నిలువు)
+	VIM_CLEAR(keep_సందేశం);	    // don't redisplay message, it's too long
 
-    if (tmpState == MODE_SETWSIZE)  // got resize event while in vgetc()
+    ఒకవేళ (tmpState == బహుళకం_SETWSIZE)  // got resize event while in vgetc()
     {
 	starttermcap();		    // start termcap before redrawing
 	shell_resized();
     }
-    else if (!skip_redraw
-	    && (redraw == TRUE || (msg_scrolled != 0 && redraw != -1)))
+    లేకపోతే ఒకవేళ (!skip_redraw
+	    && (redraw == TRUE || (సందేశం_scrolled != 0 && redraw != -1)))
     {
 	starttermcap();		    // start termcap before redrawing
 	redraw_later(UPD_VALID);
@@ -1502,190 +1502,190 @@ wait_return(int redraw)
 /*
  * Write the hit-return prompt.
  */
-    static void
-hit_return_msg(void)
+    స్థిర శూన్య
+తగిలింది_return_సందేశం(శూన్య)
 {
-    int		save_p_more = p_more;
+    పూర్ణాంకం		save_p_మరిన్ని = p_మరిన్ని;
 
-    p_more = FALSE;	// don't want to see this message when scrolling back
-    if (msg_didout)	// start on a new line
-	msg_putchar('\n');
-    if (got_int)
-	msg_puts(_("Interrupt: "));
+    p_మరిన్ని = FALSE;	// don't want to see this message when scrolling back
+    ఒకవేళ (సందేశం_didout)	// start on a new line
+	సందేశం_putchar('\n');
+    ఒకవేళ (got_int)
+	సందేశం_puts(_("Interrupt: "));
 
-    msg_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
-    if (!msg_use_printf())
-	msg_clr_eos();
-    p_more = save_p_more;
+    సందేశం_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
+    ఒకవేళ (!సందేశం_use_printf())
+	సందేశం_clr_eos();
+    p_మరిన్ని = save_p_మరిన్ని;
 }
 
 /*
  * Set "keep_msg" to "s".  Free the old value and check for NULL pointer.
  */
-    void
-set_keep_msg(char_u *s, int attr)
+    శూన్య
+సమితి_keep_సందేశం(char_u *s, పూర్ణాంకం attr)
 {
-    vim_free(keep_msg);
-    if (s != NULL && msg_silent == 0)
-	keep_msg = vim_strsave(s);
-    else
-	keep_msg = NULL;
-    keep_msg_more = FALSE;
-    keep_msg_attr = attr;
+    vim_free(keep_సందేశం);
+    ఒకవేళ (s != ఖాళీ && సందేశం_silent == 0)
+	keep_సందేశం = vim_strsave(s);
+    లేకపోతే
+	keep_సందేశం = ఖాళీ;
+    keep_సందేశం_మరిన్ని = FALSE;
+    keep_సందేశం_attr = attr;
 }
 
 /*
  * If there currently is a message being displayed, set "keep_msg" to it, so
  * that it will be displayed again after redraw.
  */
-    void
-set_keep_msg_from_hist(void)
+    శూన్య
+సమితి_keep_సందేశం_from_hist(శూన్య)
 {
-    if (keep_msg == NULL && last_msg_hist != NULL && msg_scrolled == 0
-						      && (State & MODE_NORMAL))
-	set_keep_msg(last_msg_hist->msg, last_msg_hist->attr);
+    ఒకవేళ (keep_సందేశం == ఖాళీ && చివరి_సందేశం_hist != ఖాళీ && సందేశం_scrolled == 0
+						      && (State & బహుళకం_సాధారణ))
+	సమితి_keep_సందేశం(చివరి_సందేశం_hist->సందేశం, చివరి_సందేశం_hist->attr);
 }
 
 /*
  * Prepare for outputting characters in the command line.
  */
-    void
-msg_start(void)
+    శూన్య
+సందేశం_ప్రారంభం(శూన్య)
 {
-    int		did_return = FALSE;
+    పూర్ణాంకం		did_return = FALSE;
 
-    if (msg_row < cmdline_row)
-	msg_row = cmdline_row;
+    ఒకవేళ (సందేశం_అడ్డువరుస < cmdline_అడ్డువరుస)
+	సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;
 
-    if (!msg_silent)
+    ఒకవేళ (!సందేశం_silent)
     {
-	VIM_CLEAR(keep_msg);
+	VIM_CLEAR(keep_సందేశం);
 	need_fileinfo = FALSE;
     }
 
-#ifdef FEAT_EVAL
-    if (need_clr_eos)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (need_clr_eos)
     {
 	// Halfway an ":echo" command and getting an (error) message: clear
 	// any text from the command.
 	need_clr_eos = FALSE;
-	msg_clr_eos();
+	సందేశం_clr_eos();
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (లోపల_echowindow)
     {
-	if (popup_message_win_visible()
-		    && ((msg_col > 0 && (msg_scroll || !full_screen))
-			|| in_echowindow))
+	ఒకవేళ (popup_సందేశం_win_visible()
+		    && ((సందేశం_నిలువు > 0 && (సందేశం_scroll || !నిండిన_screen))
+			|| లోపల_echowindow))
 	{
-	    win_T *wp = popup_get_message_win();
+	    win_T *wp = popup_get_సందేశం_win();
 
 	    // start a new line
-	    curbuf = wp->w_buffer;
-	    ml_append(wp->w_buffer->b_ml.ml_line_count,
+	    curbuf = wp->w_బఫరు;
+	    ml_append(wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క,
 					      (char_u *)"", (colnr_T)0, FALSE);
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_బఫరు;
 	}
-	msg_col = 0;
+	సందేశం_నిలువు = 0;
     }
-    else
-#endif
-	if (!msg_scroll && full_screen)	// overwrite last message
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (!సందేశం_scroll && నిండిన_screen)	// overwrite last message
     {
-	msg_row = cmdline_row;
-	msg_col =
-#ifdef FEAT_RIGHTLEFT
-	    cmdmsg_rl ? cmdline_width - 1 :
-#endif
+	సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;
+	సందేశం_నిలువు =
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	    cmdmsg_rl ? cmdline_వెడల్పు - 1 :
+#అయితే_ముగింపు
 	    0;
     }
-    else if (msg_didout || in_echowindow)
+    లేకపోతే ఒకవేళ (సందేశం_didout || లోపల_echowindow)
     {
 	// start message on next line
-	msg_putchar('\n');
+	సందేశం_putchar('\n');
 	did_return = TRUE;
-	if (exmode_active != EXMODE_NORMAL)
-	    cmdline_row = msg_row;
+	ఒకవేళ (exmode_చురుకైన != EXMODE_సాధారణ)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
     }
-    if (!msg_didany || lines_left < 0)
-	msg_starthere();
-    if (msg_silent == 0)
+    ఒకవేళ (!సందేశం_didany || పంక్తులు_ఎడమ < 0)
+	సందేశం_starthere();
+    ఒకవేళ (సందేశం_silent == 0)
     {
-	msg_didout = FALSE;		    // no output on current line yet
+	సందేశం_didout = FALSE;		    // no output on current line yet
 	cursor_off();
     }
 
     // when redirecting, may need to start a new line.
-    if (!did_return)
+    ఒకవేళ (!did_return)
 	redir_write((char_u *)"\n", -1);
 }
 
 /*
  * Note that the current msg position is where messages start.
  */
-    void
-msg_starthere(void)
+    శూన్య
+సందేశం_starthere(శూన్య)
 {
-    lines_left = cmdline_row;
-    msg_didany = FALSE;
+    పంక్తులు_ఎడమ = cmdline_అడ్డువరుస;
+    సందేశం_didany = FALSE;
 }
 
-    void
-msg_putchar(int c)
+    శూన్య
+సందేశం_putchar(పూర్ణాంకం c)
 {
-    msg_putchar_attr(c, 0);
+    సందేశం_putchar_attr(c, 0);
 }
 
-    void
-msg_putchar_attr(int c, int attr)
+    శూన్య
+సందేశం_putchar_attr(పూర్ణాంకం c, పూర్ణాంకం attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (IS_SPECIAL(c))
+    ఒకవేళ (IS_SPECIAL(c))
     {
 	buf[0] = K_SPECIAL;
-	buf[1] = K_SECOND(c);
-	buf[2] = K_THIRD(c);
+	buf[1] = K_రెండవ(c);
+	buf[2] = K_మూడవ(c);
 	buf[3] = NUL;
     }
-    else
+    లేకపోతే
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    msg_puts_attr((char *)buf, attr);
+    సందేశం_puts_attr((అక్షరం *)buf, attr);
 }
 
-    void
-msg_outnum(long n)
+    శూన్య
+సందేశం_outnum(దీర్ఘ n)
 {
-    char	buf[20];
+    అక్షరం	buf[20];
 
     sprintf(buf, "%ld", n);
-    msg_puts(buf);
+    సందేశం_puts(buf);
 }
 
-    void
-msg_home_replace(char_u *fname)
+    శూన్య
+సందేశం_home_replace(char_u *fname)
 {
-    msg_home_replace_attr(fname, 0);
+    సందేశం_home_replace_attr(fname, 0);
 }
 
-#if defined(FEAT_FIND_ID)
-    void
-msg_home_replace_hl(char_u *fname)
+#ఒకవేళ defined(FEAT_కనుగొను_ID)
+    శూన్య
+సందేశం_home_replace_hl(char_u *fname)
 {
-    msg_home_replace_attr(fname, HL_ATTR(HLF_D));
+    సందేశం_home_replace_attr(fname, HL_ATTR(HLF_D));
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-msg_home_replace_attr(char_u *fname, int attr)
+    స్థిర శూన్య
+సందేశం_home_replace_attr(char_u *fname, పూర్ణాంకం attr)
 {
     char_u	*name;
 
-    name = home_replace_save(NULL, fname);
-    if (name != NULL)
-	msg_outtrans_attr(name, attr);
+    name = home_replace_save(ఖాళీ, fname);
+    ఒకవేళ (name != ఖాళీ)
+	సందేశం_outtrans_attr(name, attr);
     vim_free(name);
 }
 
@@ -1695,22 +1695,22 @@ msg_home_replace_attr(char_u *fname, int attr)
  * Use attributes 'attr'.
  * Return the number of characters it takes on the screen.
  */
-    int
-msg_outtrans(char_u *str)
+    పూర్ణాంకం
+సందేశం_outtrans(char_u *str)
 {
-    return msg_outtrans_attr(str, 0);
+    తిరిగి సందేశం_outtrans_attr(str, 0);
 }
 
-    int
-msg_outtrans_attr(char_u *str, int attr)
+    పూర్ణాంకం
+సందేశం_outtrans_attr(char_u *str, పూర్ణాంకం attr)
 {
-    return msg_outtrans_len_attr(str, (int)STRLEN(str), attr);
+    తిరిగి సందేశం_outtrans_len_attr(str, (పూర్ణాంకం)STRLEN(str), attr);
 }
 
-    int
-msg_outtrans_len(char_u *str, int len)
+    పూర్ణాంకం
+సందేశం_outtrans_len(char_u *str, పూర్ణాంకం len)
 {
-    return msg_outtrans_len_attr(str, len, 0);
+    తిరిగి సందేశం_outtrans_len_attr(str, len, 0);
 }
 
 /*
@@ -1718,138 +1718,138 @@ msg_outtrans_len(char_u *str, int len)
  * Handles multi-byte characters.
  */
     char_u *
-msg_outtrans_one(char_u *p, int attr)
+సందేశం_outtrans_one(char_u *p, పూర్ణాంకం attr)
 {
-    int		l;
+    పూర్ణాంకం		l;
 
-    if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+    ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
     {
-	msg_outtrans_len_attr(p, l, attr);
-	return p + l;
+	సందేశం_outtrans_len_attr(p, l, attr);
+	తిరిగి p + l;
     }
-    msg_puts_attr((char *)transchar_byte_buf(NULL, *p), attr);
-    return p + 1;
+    సందేశం_puts_attr((అక్షరం *)transchar_byte_buf(ఖాళీ, *p), attr);
+    తిరిగి p + 1;
 }
 
-    int
-msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
+    పూర్ణాంకం
+సందేశం_outtrans_len_attr(char_u *msgstr, పూర్ణాంకం len, పూర్ణాంకం attr)
 {
-    int		retval = 0;
+    పూర్ణాంకం		retval = 0;
     char_u	*str = msgstr;
-    char_u	*plain_start = msgstr;
+    char_u	*plain_ప్రారంభం = msgstr;
     char_u	*s;
-    int		mb_l;
-    int		c;
-    int		save_got_int = got_int;
+    పూర్ణాంకం		mb_l;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		save_got_int = got_int;
 
     // Only quit when got_int was set in here.
     got_int = FALSE;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    ఒకవేళ (attr == 0)
+	attr = HL_ATTR(HLF_సందేశం);
 
     // if MSG_HIST flag set, add message to history
-    if (attr & MSG_HIST)
+    ఒకవేళ (attr & సందేశం_HIST)
     {
-	add_msg_hist(str, len, attr);
-	attr &= ~MSG_HIST;
+	కూడు_సందేశం_hist(str, len, attr);
+	attr &= ~సందేశం_HIST;
     }
 
     // When drawing over the command line no need to clear it later or remove
     // the mode message.
-    if (msg_silent == 0 && len > 0 && msg_row >= cmdline_row && msg_col == 0)
+    ఒకవేళ (సందేశం_silent == 0 && len > 0 && సందేశం_అడ్డువరుస >= cmdline_అడ్డువరుస && సందేశం_నిలువు == 0)
     {
 	clear_cmdline = FALSE;
-	mode_displayed = FALSE;
+	బహుళకం_displayed = FALSE;
     }
 
     // If the string starts with a composing character first draw a space on
     // which the composing char can be drawn.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
-	msg_puts_attr(" ", attr);
+    ఒకవేళ (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
+	సందేశం_puts_attr(" ", attr);
 
     /*
      * Go over the string.  Special characters are translated and printed.
      * Normal characters are printed several at a time.
      */
-    while (--len >= 0 && !got_int)
+    అయితే (--len >= 0 && !got_int)
     {
-	if (enc_utf8)
+	ఒకవేళ (enc_utf8)
 	    // Don't include composing chars after the end.
 	    mb_l = utfc_ptr2len_len(str, len + 1);
-	else if (has_mbyte)
+	లేకపోతే ఒకవేళ (has_mbyte)
 	    mb_l = (*mb_ptr2len)(str);
-	else
+	లేకపోతే
 	    mb_l = 1;
-	if (has_mbyte && mb_l > 1)
+	ఒకవేళ (has_mbyte && mb_l > 1)
 	{
 	    c = (*mb_ptr2char)(str);
-	    if (vim_isprintc(c))
+	    ఒకవేళ (vim_isprintc(c))
 		// printable multi-byte char: count the cells.
 		retval += (*mb_ptr2cells)(str);
-	    else
+	    లేకపోతే
 	    {
 		// unprintable multi-byte char: print the printable chars so
 		// far and the translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
-		plain_start = str + mb_l;
-		msg_puts_attr((char *)transchar_buf(NULL, c),
+		ఒకవేళ (str > plain_ప్రారంభం)
+		    సందేశం_puts_attr_len((అక్షరం *)plain_ప్రారంభం,
+					       (పూర్ణాంకం)(str - plain_ప్రారంభం), attr);
+		plain_ప్రారంభం = str + mb_l;
+		సందేశం_puts_attr((అక్షరం *)transchar_buf(ఖాళీ, c),
 					    attr == 0 ? HL_ATTR(HLF_8) : attr);
 		retval += char2cells(c);
 	    }
 	    len -= mb_l - 1;
 	    str += mb_l;
 	}
-	else
+	లేకపోతే
 	{
-	    s = transchar_byte_buf(NULL, *str);
-	    if (s[1] != NUL)
+	    s = transchar_byte_buf(ఖాళీ, *str);
+	    ఒకవేళ (s[1] != NUL)
 	    {
 		// unprintable char: print the printable chars so far and the
 		// translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
-		plain_start = str + 1;
-		msg_puts_attr((char *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
-		retval += (int)STRLEN(s);
+		ఒకవేళ (str > plain_ప్రారంభం)
+		    సందేశం_puts_attr_len((అక్షరం *)plain_ప్రారంభం,
+					       (పూర్ణాంకం)(str - plain_ప్రారంభం), attr);
+		plain_ప్రారంభం = str + 1;
+		సందేశం_puts_attr((అక్షరం *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
+		retval += (పూర్ణాంకం)STRLEN(s);
 	    }
-	    else
+	    లేకపోతే
 		++retval;
 	    ++str;
 	}
     }
 
-    if (str > plain_start && !got_int)
+    ఒకవేళ (str > plain_ప్రారంభం && !got_int)
 	// print the printable chars at the end
-	msg_puts_attr_len((char *)plain_start, (int)(str - plain_start), attr);
+	సందేశం_puts_attr_len((అక్షరం *)plain_ప్రారంభం, (పూర్ణాంకం)(str - plain_ప్రారంభం), attr);
 
     got_int |= save_got_int;
 
-    return retval;
+    తిరిగి retval;
 }
 
-#if defined(FEAT_QUICKFIX)
-    void
-msg_make(char_u *arg)
+#ఒకవేళ defined(FEAT_QUICKFIX)
+    శూన్య
+సందేశం_make(char_u *arg)
 {
-    int	    i;
-    static char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
+    పూర్ణాంకం	    i;
+    స్థిర char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
 
     arg = skipwhite(arg);
-    for (i = 5; *arg && i >= 0; --i)
-	if (*arg++ != str[i])
-	    break;
-    if (i < 0)
+    కొరకు (i = 5; *arg && i >= 0; --i)
+	ఒకవేళ (*arg++ != str[i])
+	    ఆపు;
+    ఒకవేళ (i < 0)
     {
-	msg_putchar('\n');
-	for (i = 0; rs[i]; ++i)
-	    msg_putchar(rs[i] - 3);
+	సందేశం_putchar('\n');
+	కొరకు (i = 0; rs[i]; ++i)
+	    సందేశం_putchar(rs[i] - 3);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Output the string 'str' up to a NUL character.
@@ -1865,44 +1865,44 @@ msg_make(char_u *arg)
  * This function is used to show mappings, where we want to see how to type
  * the character/string -- webb
  */
-    int
-msg_outtrans_special(
+    పూర్ణాంకం
+సందేశం_outtrans_special(
     char_u	*strstart,
-    int		from,	// TRUE for lhs of a mapping
-    int		maxlen) // screen columns, 0 for unlimited
+    పూర్ణాంకం		from,	// TRUE for lhs of a mapping
+    పూర్ణాంకం		maxlen) // screen columns, 0 for unlimited
 {
     char_u	*str = strstart;
-    int		retval = 0;
-    char	*text;
-    int		attr;
-    int		len;
+    పూర్ణాంకం		retval = 0;
+    అక్షరం	*పాఠ్యం;
+    పూర్ణాంకం		attr;
+    పూర్ణాంకం		len;
 
     attr = HL_ATTR(HLF_8);
-    while (*str != NUL)
+    అయితే (*str != NUL)
     {
 	// Leading and trailing spaces need to be displayed in <> form.
-	if ((str == strstart || str[1] == NUL) && *str == ' ')
+	ఒకవేళ ((str == strstart || str[1] == NUL) && *str == ' ')
 	{
-	    text = "<Space>";
+	    పాఠ్యం = "<Space>";
 	    ++str;
 	}
-	else
-	    text = (char *)str2special(&str, from, FALSE);
-	if (text[0] != NUL && text[1] == NUL)
+	లేకపోతే
+	    పాఠ్యం = (అక్షరం *)str2special(&str, from, FALSE);
+	ఒకవేళ (పాఠ్యం[0] != NUL && పాఠ్యం[1] == NUL)
 	    // single-byte character or illegal byte
-	    text = (char *)transchar_byte_buf(NULL, (char_u)text[0]);
-	len = vim_strsize((char_u *)text);
-	if (maxlen > 0 && retval + len >= maxlen)
-	    break;
+	    పాఠ్యం = (అక్షరం *)transchar_byte_buf(ఖాళీ, (char_u)పాఠ్యం[0]);
+	len = vim_strsize((char_u *)పాఠ్యం);
+	ఒకవేళ (maxlen > 0 && retval + len >= maxlen)
+	    ఆపు;
 	// Highlight special keys
-	msg_puts_attr(text, len > 1
-		&& (*mb_ptr2len)((char_u *)text) <= 1 ? attr : 0);
+	సందేశం_puts_attr(పాఠ్యం, len > 1
+		&& (*mb_ptr2len)((char_u *)పాఠ్యం) <= 1 ? attr : 0);
 	retval += len;
     }
-    return retval;
+    తిరిగి retval;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return the lhs or rhs of a mapping, with the key codes turned into printable
  * strings, in an allocated string.
@@ -1910,21 +1910,21 @@ msg_outtrans_special(
     char_u *
 str2special_save(
     char_u  *str,
-    int	    replace_spaces,	// TRUE to replace " " with "<Space>".
+    పూర్ణాంకం	    replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int	    replace_others)	// TRUE to replace "<" with "<lt>",
+    పూర్ణాంకం	    replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
     garray_T	ga;
     char_u	*p = str;
 
     ga_init2(&ga, 1, 40);
-    while (*p != NUL)
+    అయితే (*p != NUL)
 	ga_concat(&ga, str2special(&p, replace_spaces, replace_others));
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    తిరిగి (char_u *)ga.ga_దత్తాంశం;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return the printable string for the key codes at "*sp".
@@ -1935,231 +1935,231 @@ str2special_save(
     char_u *
 str2special(
     char_u	**sp,
-    int		replace_spaces,	// TRUE to replace " " with "<Space>".
+    పూర్ణాంకం		replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int		replace_others)	// TRUE to replace "<" with "<lt>",
+    పూర్ణాంకం		replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
-    int			c;
-    static char_u	buf[7];
+    పూర్ణాంకం			c;
+    స్థిర char_u	buf[7];
     char_u		*str = *sp;
-    int			modifiers = 0;
-    int			special = FALSE;
+    పూర్ణాంకం			modifiers = 0;
+    పూర్ణాంకం			special = FALSE;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
 	char_u	*p;
 
 	// Try to un-escape a multi-byte character.  Return the un-escaped
 	// string if it is a multi-byte character.
 	p = mb_unescape(sp);
-	if (p != NULL)
-	    return p;
+	ఒకవేళ (p != ఖాళీ)
+	    తిరిగి p;
     }
 
     c = *str;
-    if ((c == K_SPECIAL
-#ifdef FEAT_GUI
+    ఒకవేళ ((c == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		|| c == CSI
-#endif
+#అయితే_ముగింపు
 	) && str[1] != NUL && str[2] != NUL)
     {
-	if (str[1] == KS_MODIFIER)
+	ఒకవేళ (str[1] == KS_MODIFIER)
 	{
 	    modifiers = str[2];
 	    str += 3;
 	    c = *str;
 	}
-	if ((c == K_SPECIAL
-#ifdef FEAT_GUI
+	ఒకవేళ ((c == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		    || c == CSI
-#endif
+#అయితే_ముగింపు
 	    ) && str[1] != NUL && str[2] != NUL)
 	{
-	    c = TO_SPECIAL(str[1], str[2]);
+	    c = గమ్యం_SPECIAL(str[1], str[2]);
 	    str += 2;
 	}
-	if (IS_SPECIAL(c) || modifiers)	// special key
+	ఒకవేళ (IS_SPECIAL(c) || modifiers)	// special key
 	    special = TRUE;
     }
 
-    if (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
+    ఒకవేళ (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
     {
 	char_u	*p;
 
 	*sp = str;
 	// Try to un-escape a multi-byte character after modifiers.
 	p = mb_unescape(sp);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	    // Since 'special' is TRUE the multi-byte character 'c' will be
 	    // processed by get_special_key_name()
 	    c = (*mb_ptr2char)(p);
-	else
+	లేకపోతే
 	    // illegal byte
 	    *sp = str + 1;
     }
-    else
+    లేకపోతే
 	// single-byte character, NUL or illegal byte
 	*sp = str + (*str == NUL ? 0 : 1);
 
     // Make special keys and C0 control characters in <> form, also <M-Space>.
-    if (special
+    ఒకవేళ (special
 	|| c < ' '
 	|| (replace_spaces && c == ' ')
 	|| (replace_others && (c == '<' || c == '|' || c == '\\')))
-	return get_special_key_name(c, modifiers);
+	తిరిగి get_special_కీలకం_name(c, modifiers);
     buf[0] = c;
     buf[1] = NUL;
-    return buf;
+    తిరిగి buf;
 }
 
 /*
  * Translate a key sequence into special key names.
  */
-    void
-str2specialbuf(char_u *sp, char_u *buf, int len)
+    శూన్య
+str2specialbuf(char_u *sp, char_u *buf, పూర్ణాంకం len)
 {
     char_u     *s;
     size_t     buf_len = 0;
     size_t     s_len;
 
     *buf = NUL;
-    while (*sp)
+    అయితే (*sp)
     {
 	s = str2special(&sp, FALSE, FALSE);
 	s_len = STRLEN(s);
-	if (buf_len + s_len < (size_t)len)
+	ఒకవేళ (buf_len + s_len < (size_t)len)
 	{
 	    STRCPY(buf + buf_len, s);
 	    buf_len += s_len;
 	}
-	else
-	    break;
+	లేకపోతే
+	    ఆపు;
     }
 }
 
 /*
  * print line for :print or :list command
  */
-    void
-msg_prt_line(char_u *s, int list)
+    శూన్య
+సందేశం_prt_పంక్తి(char_u *s, పూర్ణాంకం list)
 {
-    int		c;
-    int		col = 0;
-    int		n_extra = 0;
-    int		c_extra = 0;
-    int		c_final = 0;
-    char_u	*p_extra = NULL;	    // init to make SASC shut up
-    int		n;
-    int		attr = 0;
-    char_u	*trail = NULL;
-    char_u	*lead = NULL;
-    int		in_multispace = FALSE;
-    int		multispace_pos = 0;
-    int		l;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		నిలువు = 0;
+    పూర్ణాంకం		n_extra = 0;
+    పూర్ణాంకం		c_extra = 0;
+    పూర్ణాంకం		c_final = 0;
+    char_u	*p_extra = ఖాళీ;	    // init to make SASC shut up
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		attr = 0;
+    char_u	*trail = ఖాళీ;
+    char_u	*lead = ఖాళీ;
+    పూర్ణాంకం		లోపల_multispace = FALSE;
+    పూర్ణాంకం		multispace_pos = 0;
+    పూర్ణాంకం		l;
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (curwin->w_p_list)
+    ఒకవేళ (curwin->w_p_list)
 	list = TRUE;
 
-    if (list)
+    ఒకవేళ (list)
     {
 	// find start of trailing whitespace
-	if (curwin->w_lcs_chars.trail)
+	ఒకవేళ (curwin->w_lcs_chars.trail)
 	{
 	    trail = s + STRLEN(s);
-	    while (trail > s && VIM_ISWHITE(trail[-1]))
+	    అయితే (trail > s && VIM_ISWHITE(trail[-1]))
 		--trail;
 	}
 	// find end of leading whitespace
-	if (curwin->w_lcs_chars.lead
-				 || curwin->w_lcs_chars.leadmultispace != NULL
+	ఒకవేళ (curwin->w_lcs_chars.lead
+				 || curwin->w_lcs_chars.leadmultispace != ఖాళీ
 				 || curwin->w_lcs_chars.leadtab1 != NUL)
 	{
 	    lead = s;
-	    while (VIM_ISWHITE(lead[0]))
+	    అయితే (VIM_ISWHITE(lead[0]))
 		lead++;
 	    // in a line full of spaces all of them are treated as trailing
-	    if (*lead == NUL)
-		lead = NULL;
+	    ఒకవేళ (*lead == NUL)
+		lead = ఖాళీ;
 	}
     }
 
     // output a space for an empty line, otherwise the line will be
     // overwritten
-    if (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
-	msg_putchar(' ');
+    ఒకవేళ (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
+	సందేశం_putchar(' ');
 
-    while (!got_int)
+    అయితే (!got_int)
     {
-	if (n_extra > 0)
+	ఒకవేళ (n_extra > 0)
 	{
 	    --n_extra;
-	    if (n_extra == 0 && c_final)
+	    ఒకవేళ (n_extra == 0 && c_final)
 		c = c_final;
-	    else if (c_extra)
+	    లేకపోతే ఒకవేళ (c_extra)
 		c = c_extra;
-	    else
+	    లేకపోతే
 		c = *p_extra++;
 	}
-	else if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	లేకపోతే ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	{
-	    col += (*mb_ptr2cells)(s);
-	    if (l >= MB_MAXBYTES)
+	    నిలువు += (*mb_ptr2cells)(s);
+	    ఒకవేళ (l >= MB_MAXBYTES)
 	    {
 		STRCPY(buf, "?");
 	    }
-	    else if (curwin->w_lcs_chars.nbsp != NUL && list
+	    లేకపోతే ఒకవేళ (curwin->w_lcs_chars.nbsp != NUL && list
 		    && (mb_ptr2char(s) == 160
 			|| mb_ptr2char(s) == 0x202f))
 	    {
-		int len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
+		పూర్ణాంకం len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
 
 		buf[len] = NUL;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		mch_memmove(buf, s, (size_t)l);
 		buf[l] = NUL;
 	    }
-	    msg_puts((char *)buf);
+	    సందేశం_puts((అక్షరం *)buf);
 	    s += l;
-	    continue;
+	    కొనసాగు;
 	}
-	else
+	లేకపోతే
 	{
 	    attr = 0;
 	    c = *s++;
-	    if (list)
+	    ఒకవేళ (list)
 	    {
-		in_multispace = c == ' ' && (*s == ' '
-						 || (col > 0 && s[-2] == ' '));
-		if (!in_multispace)
+		లోపల_multispace = c == ' ' && (*s == ' '
+						 || (నిలువు > 0 && s[-2] == ' '));
+		ఒకవేళ (!లోపల_multispace)
 		    multispace_pos = 0;
 	    }
-	    if (c == TAB && (!list || curwin->w_lcs_chars.tab1))
+	    ఒకవేళ (c == TAB && (!list || curwin->w_lcs_chars.tab1))
 	    {
 		// tab amount depends on current column
-#ifdef FEAT_VARTABS
-		n_extra = tabstop_padding(col, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+		n_extra = tabstop_padding(నిలువు, curbuf->b_p_ts,
 						    curbuf->b_p_vts_array) - 1;
-#else
-		n_extra = curbuf->b_p_ts - col % curbuf->b_p_ts - 1;
-#endif
-		if (!list)
+#లేకపోతే
+		n_extra = curbuf->b_p_ts - నిలువు % curbuf->b_p_ts - 1;
+#అయితే_ముగింపు
+		ఒకవేళ (!list)
 		{
 		    c = ' ';
 		    c_extra = ' ';
 		    c_final = NUL;
 		}
-		else
+		లేకపోతే
 		{
-		    int lcs_tab1 = curwin->w_lcs_chars.tab1;
-		    int lcs_tab2 = curwin->w_lcs_chars.tab2;
-		    int lcs_tab3 = curwin->w_lcs_chars.tab3;
+		    పూర్ణాంకం lcs_tab1 = curwin->w_lcs_chars.tab1;
+		    పూర్ణాంకం lcs_tab2 = curwin->w_lcs_chars.tab2;
+		    పూర్ణాంకం lcs_tab3 = curwin->w_lcs_chars.tab3;
 
 		    // check if leadtab is set in 'listchars'
-		    if (lead != NULL && s <= lead
+		    ఒకవేళ (lead != ఖాళీ && s <= lead
 					&& curwin->w_lcs_chars.leadtab1 != NUL)
 		    {
 			lcs_tab1 = curwin->w_lcs_chars.leadtab1;
@@ -2173,12 +2173,12 @@ msg_prt_line(char_u *s, int list)
 		    attr = HL_ATTR(HLF_8);
 		}
 	    }
-	    else if (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
+	    లేకపోతే ఒకవేళ (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
 	    {
 		c = curwin->w_lcs_chars.nbsp;
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
+	    లేకపోతే ఒకవేళ (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
 	    {
 		p_extra = (char_u *)"";
 		c_extra = NUL;
@@ -2188,10 +2188,10 @@ msg_prt_line(char_u *s, int list)
 		attr = HL_ATTR(HLF_AT);
 		--s;
 	    }
-	    else if (c != NUL && (n = byte2cells(c)) > 1)
+	    లేకపోతే ఒకవేళ (c != NUL && (n = byte2cells(c)) > 1)
 	    {
 		n_extra = n - 1;
-		p_extra = transchar_byte_buf(NULL, c);
+		p_extra = transchar_byte_buf(ఖాళీ, c);
 		c_extra = NUL;
 		c_final = NUL;
 		c = *p_extra++;
@@ -2199,37 +2199,37 @@ msg_prt_line(char_u *s, int list)
 		// the same in plain text.
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == ' ')
+	    లేకపోతే ఒకవేళ (c == ' ')
 	    {
-		if (lead != NULL && s <= lead && in_multispace
-			&& curwin->w_lcs_chars.leadmultispace != NULL)
+		ఒకవేళ (lead != ఖాళీ && s <= lead && లోపల_multispace
+			&& curwin->w_lcs_chars.leadmultispace != ఖాళీ)
 		{
 		    c = curwin->w_lcs_chars.leadmultispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.leadmultispace[multispace_pos]
+		    ఒకవేళ (curwin->w_lcs_chars.leadmultispace[multispace_pos]
 									== NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (lead != NULL && s <= lead
+		లేకపోతే ఒకవేళ (lead != ఖాళీ && s <= lead
 					    && curwin->w_lcs_chars.lead != NUL)
 		{
 		    c = curwin->w_lcs_chars.lead;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (trail != NULL && s > trail)
+		లేకపోతే ఒకవేళ (trail != ఖాళీ && s > trail)
 		{
 		    c = curwin->w_lcs_chars.trail;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (in_multispace
-			&& curwin->w_lcs_chars.multispace != NULL)
+		లేకపోతే ఒకవేళ (లోపల_multispace
+			&& curwin->w_lcs_chars.multispace != ఖాళీ)
 		{
 		    c = curwin->w_lcs_chars.multispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
+		    ఒకవేళ (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (list && curwin->w_lcs_chars.space != NUL)
+		లేకపోతే ఒకవేళ (list && curwin->w_lcs_chars.space != NUL)
 		{
 		    c = curwin->w_lcs_chars.space;
 		    attr = HL_ATTR(HLF_8);
@@ -2237,75 +2237,75 @@ msg_prt_line(char_u *s, int list)
 	    }
 	}
 
-	if (c == NUL)
-	    break;
+	ఒకవేళ (c == NUL)
+	    ఆపు;
 
-	msg_putchar_attr(c, attr);
-	col++;
+	సందేశం_putchar_attr(c, attr);
+	నిలువు++;
     }
-    msg_clr_eos();
+    సందేశం_clr_eos();
 }
 
 /*
  * Use screen_puts() to output one multi-byte character.
  * Return the pointer "s" advanced to the next character.
  */
-    static char_u *
-screen_puts_mbyte(char_u *s, int l, int attr)
+    స్థిర char_u *
+screen_puts_mbyte(char_u *s, పూర్ణాంకం l, పూర్ణాంకం attr)
 {
-    int		cw;
+    పూర్ణాంకం		cw;
 
-    msg_didout = TRUE;		// remember that line is not empty
+    సందేశం_didout = TRUE;		// remember that line is not empty
     cw = (*mb_ptr2cells)(s);
-    if (cw > 1 && (
-#ifdef FEAT_RIGHTLEFT
-		cmdmsg_rl ? msg_col <= 1 :
-#endif
-		msg_col == cmdline_width - 1))
+    ఒకవేళ (cw > 1 && (
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		cmdmsg_rl ? సందేశం_నిలువు <= 1 :
+#అయితే_ముగింపు
+		సందేశం_నిలువు == cmdline_వెడల్పు - 1))
     {
 	// Doesn't fit, print a highlighted '>' to fill it up.
-	msg_screen_putchar('>', HL_ATTR(HLF_AT));
-	return s;
+	సందేశం_screen_putchar('>', HL_ATTR(HLF_AT));
+	తిరిగి s;
     }
 
-    screen_puts_len(s, l, msg_row, cmdline_col_off + msg_col, attr);
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    screen_puts_len(s, l, సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు, attr);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (cmdmsg_rl)
     {
-	msg_col -= cw;
-	if (msg_col == 0)
+	సందేశం_నిలువు -= cw;
+	ఒకవేళ (సందేశం_నిలువు == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    సందేశం_నిలువు = cmdline_వెడల్పు;
+	    ++సందేశం_అడ్డువరుస;
 	}
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	msg_col += cw;
-	if (msg_col >= cmdline_width)
+	సందేశం_నిలువు += cw;
+	ఒకవేళ (సందేశం_నిలువు >= cmdline_వెడల్పు)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    సందేశం_నిలువు = 0;
+	    ++సందేశం_అడ్డువరుస;
 	}
     }
-    return s + l;
+    తిరిగి s + l;
 }
 
 /*
  * Output a string to the screen at position msg_row, msg_col.
  * Update msg_row and msg_col for the next message.
  */
-    void
-msg_puts(char *s)
+    శూన్య
+సందేశం_puts(అక్షరం *s)
 {
-    msg_puts_attr(s, 0);
+    సందేశం_puts_attr(s, 0);
 }
 
-    void
-msg_puts_title(char *s)
+    శూన్య
+సందేశం_puts_title(అక్షరం *s)
 {
-    msg_puts_attr(s, HL_ATTR(HLF_T));
+    సందేశం_puts_attr(s, HL_ATTR(HLF_T));
 }
 
 /*
@@ -2313,35 +2313,35 @@ msg_puts_title(char *s)
  * part in the middle and replace it with "..." when necessary.
  * Does not handle multi-byte characters!
  */
-    static void
-msg_outtrans_long_len_attr(char_u *longstr, int len, int attr)
+    స్థిర శూన్య
+సందేశం_outtrans_long_len_attr(char_u *longstr, పూర్ణాంకం len, పూర్ణాంకం attr)
 {
-    int		slen = len;
-    int		room;
+    పూర్ణాంకం		slen = len;
+    పూర్ణాంకం		స్థలం;
 
-    room = cmdline_width - msg_col;
-    if (len > room && room >= 20)
+    స్థలం = cmdline_వెడల్పు - సందేశం_నిలువు;
+    ఒకవేళ (len > స్థలం && స్థలం >= 20)
     {
-	slen = (room - 3) / 2;
-	msg_outtrans_len_attr(longstr, slen, attr);
-	msg_puts_attr("...", HL_ATTR(HLF_8));
+	slen = (స్థలం - 3) / 2;
+	సందేశం_outtrans_len_attr(longstr, slen, attr);
+	సందేశం_puts_attr("...", HL_ATTR(HLF_8));
     }
-    msg_outtrans_len_attr(longstr + len - slen, slen, attr);
+    సందేశం_outtrans_len_attr(longstr + len - slen, slen, attr);
 }
 
-    void
-msg_outtrans_long_attr(char_u *longstr, int attr)
+    శూన్య
+సందేశం_outtrans_long_attr(char_u *longstr, పూర్ణాంకం attr)
 {
-    msg_outtrans_long_len_attr(longstr, (int)STRLEN(longstr), attr);
+    సందేశం_outtrans_long_len_attr(longstr, (పూర్ణాంకం)STRLEN(longstr), attr);
 }
 
 /*
  * Basic function for writing a message with highlight attributes.
  */
-    void
-msg_puts_attr(char *s, int attr)
+    శూన్య
+సందేశం_puts_attr(అక్షరం *s, పూర్ణాంకం attr)
 {
-    msg_puts_attr_len(s, -1, attr);
+    సందేశం_puts_attr_len(s, -1, attr);
 }
 
 /*
@@ -2349,8 +2349,8 @@ msg_puts_attr(char *s, int attr)
  * When "maxlen" is -1 there is no maximum length.
  * When "maxlen" is >= 0 the message is not put in the history.
  */
-    static void
-msg_puts_attr_len(char *str, int maxlen, int attr)
+    స్థిర శూన్య
+సందేశం_puts_attr_len(అక్షరం *str, పూర్ణాంకం maxlen, పూర్ణాంకం attr)
 {
     /*
      * If redirection is on, also write to the redirection file.
@@ -2360,17 +2360,17 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     /*
      * Don't print anything when using ":silent cmd".
      */
-    if (msg_silent != 0)
-	return;
+    ఒకవేళ (సందేశం_silent != 0)
+	తిరిగి;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    ఒకవేళ (attr == 0)
+	attr = HL_ATTR(HLF_సందేశం);
 
     // if MSG_HIST flag set, add message to history
-    if ((attr & MSG_HIST) && maxlen < 0)
+    ఒకవేళ ((attr & సందేశం_HIST) && maxlen < 0)
     {
-	add_msg_hist((char_u *)str, -1, attr);
-	attr &= ~MSG_HIST;
+	కూడు_సందేశం_hist((char_u *)str, -1, attr);
+	attr &= ~సందేశం_HIST;
     }
 
     // When writing something to the screen after it has scrolled, requires a
@@ -2378,9 +2378,9 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     // need_wait_return after some prompt, and then outputting something
     // without scrolling
     // Not needed when only using CR to move the cursor.
-    if (msg_scrolled != 0 && !msg_scrolled_ign && STRCMP(str, "\r") != 0)
+    ఒకవేళ (సందేశం_scrolled != 0 && !సందేశం_scrolled_ign && STRCMP(str, "\r") != 0)
 	need_wait_return = TRUE;
-    msg_didany = TRUE;		// remember that something was outputted
+    సందేశం_didany = TRUE;		// remember that something was outputted
 
     /*
      * If there is no valid screen, use fprintf so we can see error messages.
@@ -2389,360 +2389,360 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
      * different, e.g. for Win32 console) or we just don't know where the
      * cursor is.
      */
-    if (msg_use_printf())
-	msg_puts_printf((char_u *)str, maxlen);
-    else
-	msg_puts_display((char_u *)str, maxlen, attr, FALSE);
+    ఒకవేళ (సందేశం_use_printf())
+	సందేశం_puts_printf((char_u *)str, maxlen);
+    లేకపోతే
+	సందేశం_puts_display((char_u *)str, maxlen, attr, FALSE);
 
     need_fileinfo = FALSE;
 }
 
 // values for "where"
-#define PUT_APPEND 0		// append to "lnum"
-#define PUT_TRUNC 1		// replace "lnum"
-#define PUT_BELOW 2		// add below "lnum"
+#నిర్వచించు PUT_APPEND 0		// append to "lnum"
+#నిర్వచించు PUT_TRUNC 1		// replace "lnum"
+#నిర్వచించు PUT_క్రింద 2		// add below "lnum"
 				//
-#ifdef HAS_MESSAGE_WINDOW
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
 /*
  * Put text "t_s" until "end" in the message window.
  * "where" specifies where to put the text.
  */
-    static void
-put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
+    స్థిర శూన్య
+put_సందేశం_win(win_T *wp, పూర్ణాంకం where, char_u *t_s, char_u *చివర, linenr_T lnum)
 {
     char_u  *p;
 
-    if (where == PUT_BELOW)
+    ఒకవేళ (where == PUT_క్రింద)
     {
-	if (*end != NUL)
+	ఒకవేళ (*చివర != NUL)
 	{
-	    p = vim_strnsave(t_s, end - t_s);
-	    if (p == NULL)
-		return;
+	    p = vim_strnsave(t_s, చివర - t_s);
+	    ఒకవేళ (p == ఖాళీ)
+		తిరిగి;
 	}
-	else
+	లేకపోతే
 	    p = t_s;
-	ml_append_buf(wp->w_buffer, lnum, p, (colnr_T)0, FALSE);
-	if (p != t_s)
+	ml_append_buf(wp->w_బఫరు, lnum, p, (colnr_T)0, FALSE);
+	ఒకవేళ (p != t_s)
 	    vim_free(p);
     }
-    else
+    లేకపోతే
     {
 	char_u *newp;
 
-	curbuf = wp->w_buffer;
-	if (where == PUT_APPEND)
+	curbuf = wp->w_బఫరు;
+	ఒకవేళ (where == PUT_APPEND)
 	{
 	    newp = concat_str(ml_get(lnum), t_s);
-	    if (newp == NULL)
-		return;
-	    if (*end != NUL)
-		newp[STRLEN(ml_get(lnum)) + (end - t_s)] = NUL;
+	    ఒకవేళ (newp == ఖాళీ)
+		తిరిగి;
+	    ఒకవేళ (*చివర != NUL)
+		newp[STRLEN(ml_get(lnum)) + (చివర - t_s)] = NUL;
 	}
-	else
+	లేకపోతే
 	{
-	    newp = vim_strnsave(t_s, end - t_s);
-	    if (newp == NULL)
-		return;
+	    newp = vim_strnsave(t_s, చివర - t_s);
+	    ఒకవేళ (newp == ఖాళీ)
+		తిరిగి;
 	}
 	ml_replace(lnum, newp, FALSE);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
     }
     redraw_win_later(wp, UPD_NOT_VALID);
 
     // set msg_col so that a newline is written if needed
-    msg_col += (int)(end - t_s);
+    సందేశం_నిలువు += (పూర్ణాంకం)(చివర - t_s);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * The display part of msg_puts_attr_len().
  * May be called recursively to display scroll-back text.
  */
-    static void
-msg_puts_display(
+    స్థిర శూన్య
+సందేశం_puts_display(
     char_u	*str,
-    int		maxlen,
-    int		attr,
-    int		recurse)
+    పూర్ణాంకం		maxlen,
+    పూర్ణాంకం		attr,
+    పూర్ణాంకం		recurse)
 {
     char_u	*s = str;
     char_u	*t_s = str;	// string from "t_s" to "s" is still todo
-    int		t_col = 0;	// screen cells todo, 0 when "t_s" not used
-    int		l;
-    int		cw;
+    పూర్ణాంకం		t_నిలువు = 0;	// screen cells todo, 0 when "t_s" not used
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		cw;
     char_u	*sb_str = str;
-    int		sb_col = msg_col;
-    int		wrap;
-    int		did_last_char;
-#ifdef HAS_MESSAGE_WINDOW
-    int		where = PUT_APPEND;
-    win_T	*msg_win = NULL;
+    పూర్ణాంకం		sb_నిలువు = సందేశం_నిలువు;
+    పూర్ణాంకం		wrap;
+    పూర్ణాంకం		did_చివరి_char;
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    పూర్ణాంకం		where = PUT_APPEND;
+    win_T	*సందేశం_win = ఖాళీ;
     linenr_T    lnum = 1;
 
-    if (in_echowindow)
+    ఒకవేళ (లోపల_echowindow)
     {
-	msg_win = popup_get_message_win();
+	సందేశం_win = popup_get_సందేశం_win();
 
-	if (msg_win != NULL)
+	ఒకవేళ (సందేశం_win != ఖాళీ)
 	{
-	    if (!popup_message_win_visible())
+	    ఒకవేళ (!popup_సందేశం_win_visible())
 	    {
-		if (*str == NL)
+		ఒకవేళ (*str == NL)
 		{
 		    // When not showing the message window and the output
 		    // starts with a NL show the message normally.
-		    msg_win = NULL;
+		    సందేశం_win = ఖాళీ;
 		}
-		else
+		లేకపోతే
 		{
 		    // currently hidden, make it empty
-		    curbuf = msg_win->w_buffer;
-		    while ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
+		    curbuf = సందేశం_win->w_బఫరు;
+		    అయితే ((curbuf->b_ml.ml_flags & ML_ఖాళీలు) == 0)
 			ml_delete(1);
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_బఫరు;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		lnum = msg_win->w_buffer->b_ml.ml_line_count;
-		if (msg_col == 0)
+		lnum = సందేశం_win->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
+		ఒకవేళ (సందేశం_నిలువు == 0)
 		    where = PUT_TRUNC;
 	    }
 	}
     }
-#endif
+#అయితే_ముగింపు
 
     did_wait_return = FALSE;
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+    అయితే ((maxlen < 0 || (పూర్ణాంకం)(s - str) < maxlen) && *s != NUL)
     {
-#ifdef HAS_MESSAGE_WINDOW
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
 	// For echowindow, use full width; for regular messages, leave last column
-	int wrap_col = msg_win != NULL ? cmdline_width : cmdline_width - 1;
-#else
-	int wrap_col = cmdline_width - 1;
-#endif
+	పూర్ణాంకం wrap_నిలువు = సందేశం_win != ఖాళీ ? cmdline_వెడల్పు : cmdline_వెడల్పు - 1;
+#లేకపోతే
+	పూర్ణాంకం wrap_నిలువు = cmdline_వెడల్పు - 1;
+#అయితే_ముగింపు
 
 	/*
 	 * We are at the end of the screen line when:
 	 * - When outputting a newline.
 	 * - When outputting a character in the last column.
 	 */
-	if (!recurse && msg_row >= Rows - 1 && (*s == '\n' || (
-#ifdef FEAT_RIGHTLEFT
+	ఒకవేళ (!recurse && సందేశం_అడ్డువరుస >= అడ్డువరుసలు - 1 && (*s == '\n' || (
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    cmdmsg_rl
 		    ? (
-			msg_col <= 1
-		      || (*s == TAB && msg_col <= 7)
-		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && msg_col <= 2))
+			సందేశం_నిలువు <= 1
+		      || (*s == TAB && సందేశం_నిలువు <= 7)
+		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && సందేశం_నిలువు <= 2))
 		    :
-#endif
-		      ((*s != '\r' && msg_col + t_col >= wrap_col)
-		       || (*s == TAB && msg_col + t_col
-			   >= (wrap_col & ~7))
+#అయితే_ముగింపు
+		      ((*s != '\r' && సందేశం_నిలువు + t_నిలువు >= wrap_నిలువు)
+		       || (*s == TAB && సందేశం_నిలువు + t_నిలువు
+			   >= (wrap_నిలువు & ~7))
 		       || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			   && msg_col + t_col >= wrap_col - 1)))))
+			   && సందేశం_నిలువు + t_నిలువు >= wrap_నిలువు - 1)))))
 	{
 	    /*
 	     * The screen is scrolled up when at the last row (some terminals
 	     * scroll automatically, some don't.  To avoid problems we scroll
 	     * ourselves).
 	     */
-	    if (t_col > 0)
+	    ఒకవేళ (t_నిలువు > 0)
 	    {
 		// output postponed text
-#ifdef HAS_MESSAGE_WINDOW
-		if (msg_win != NULL)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+		ఒకవేళ (సందేశం_win != ఖాళీ)
 		{
-		    put_msg_win(msg_win, where, t_s, s, lnum);
-		    if (where == PUT_BELOW)
+		    put_సందేశం_win(సందేశం_win, where, t_s, s, lnum);
+		    ఒకవేళ (where == PUT_క్రింద)
 			++lnum;
-		    t_col = 0;
-		    where = PUT_BELOW;
+		    t_నిలువు = 0;
+		    where = PUT_క్రింద;
 		}
-		else
-#endif
-		    t_puts(&t_col, t_s, s, attr);
+		లేకపోతే
+#అయితే_ముగింపు
+		    t_puts(&t_నిలువు, t_s, s, attr);
 	    }
 
 	    // When no more prompt and no more room, truncate here
-	    if (msg_no_more && lines_left == 0)
-		break;
+	    ఒకవేళ (సందేశం_no_మరిన్ని && పంక్తులు_ఎడమ == 0)
+		ఆపు;
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
-#endif
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win == ఖాళీ)
+#అయితే_ముగింపు
 		// Scroll the screen up one line.
-		msg_scroll_up();
+		సందేశం_scroll_పైకి();
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win == ఖాళీ)
 	    {
-#endif
-		msg_row = Rows - 2;
-		if (msg_col >= cmdline_width)  // can happen after screen resize
-		    msg_col = cmdline_width - 1;
-#ifdef HAS_MESSAGE_WINDOW
+#అయితే_ముగింపు
+		సందేశం_అడ్డువరుస = అడ్డువరుసలు - 2;
+		ఒకవేళ (సందేశం_నిలువు >= cmdline_వెడల్పు)  // can happen after screen resize
+		    సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
 	    }
-#endif
+#అయితే_ముగింపు
 
 	    // Display char in last column before showing more-prompt.
-	    if (*s >= ' '
-#ifdef FEAT_RIGHTLEFT
+	    ఒకవేళ (*s >= ' '
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    && !cmdmsg_rl
-#endif
+#అయితే_ముగింపు
 	       )
 	    {
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
-		    if (enc_utf8 && maxlen >= 0)
+		    ఒకవేళ (enc_utf8 && maxlen >= 0)
 			// avoid including composing chars after the end
-			l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		    else
+			l = utfc_ptr2len_len(s, (పూర్ణాంకం)((str + maxlen) - s));
+		    లేకపోతే
 			l = (*mb_ptr2len)(s);
 		    s = screen_puts_mbyte(s, l, attr);
 		}
-		else
-		    msg_screen_putchar(*s++, attr);
-		did_last_char = TRUE;
+		లేకపోతే
+		    సందేశం_screen_putchar(*s++, attr);
+		did_చివరి_char = TRUE;
 	    }
-	    else
-		did_last_char = FALSE;
+	    లేకపోతే
+		did_చివరి_char = FALSE;
 
-	    if (p_more)
+	    ఒకవేళ (p_మరిన్ని)
 		// store text for scrolling back
-		store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
+		store_sb_పాఠ్యం(&sb_str, s, attr, &sb_నిలువు, TRUE);
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win == ఖాళీ)
 	    {
-#endif
-		inc_msg_scrolled();
+#అయితే_ముగింపు
+		inc_సందేశం_scrolled();
 		need_wait_return = TRUE; // may need wait_return() in main()
 		redraw_cmdline = TRUE;
-		if (cmdline_row > 0 && !exmode_active)
-		    --cmdline_row;
+		ఒకవేళ (cmdline_అడ్డువరుస > 0 && !exmode_చురుకైన)
+		    --cmdline_అడ్డువరుస;
 
 		/*
 		 * If screen is completely filled and 'more' is set then wait
 		 * for a character.
 		 */
-		if (lines_left > 0)
-		    --lines_left;
-#ifdef HAS_MESSAGE_WINDOW
+		ఒకవేళ (పంక్తులు_ఎడమ > 0)
+		    --పంక్తులు_ఎడమ;
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
 	    }
-#endif
-	    if (p_more && lines_left == 0 && State != MODE_HITRETURN
-					    && !msg_no_more && !exmode_active)
+#అయితే_ముగింపు
+	    ఒకవేళ (p_మరిన్ని && పంక్తులు_ఎడమ == 0 && State != బహుళకం_HITRETURN
+					    && !సందేశం_no_మరిన్ని && !exmode_చురుకైన)
 	    {
-#ifdef FEAT_CON_DIALOG
-		if (do_more_prompt(NUL))
-		    s = confirm_msg_tail;
-#else
-		(void)do_more_prompt(NUL);
-#endif
-		if (quit_more)
-		    return;
+#నిర్వచితమైతే FEAT_CON_DIALOG
+		ఒకవేళ (do_మరిన్ని_prompt(NUL))
+		    s = confirm_సందేశం_తోక;
+#లేకపోతే
+		(శూన్య)do_మరిన్ని_prompt(NUL);
+#అయితే_ముగింపు
+		ఒకవేళ (quit_మరిన్ని)
+		    తిరిగి;
 	    }
 
 	    // When we displayed a char in last column need to check if there
 	    // is still more.
-	    if (did_last_char)
-		continue;
+	    ఒకవేళ (did_చివరి_char)
+		కొనసాగు;
 	}
 
 	wrap = *s == '\n'
-		    || msg_col + t_col >= wrap_col
+		    || సందేశం_నిలువు + t_నిలువు >= wrap_నిలువు
 		    || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			    && msg_col + t_col >= wrap_col - 1);
-	if (t_col > 0 && (wrap || *s == '\r' || *s == '\b'
+			    && సందేశం_నిలువు + t_నిలువు >= wrap_నిలువు - 1);
+	ఒకవేళ (t_నిలువు > 0 && (wrap || *s == '\r' || *s == '\b'
 						 || *s == '\t' || *s == BELL))
 	{
 	    // output any postponed text
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win != ఖాళీ)
 	    {
-		put_msg_win(msg_win, where, t_s, s, lnum);
-		if (where == PUT_BELOW)
+		put_సందేశం_win(సందేశం_win, where, t_s, s, lnum);
+		ఒకవేళ (where == PUT_క్రింద)
 		    ++lnum;
-		t_col = 0;
-		where = PUT_BELOW;
+		t_నిలువు = 0;
+		where = PUT_క్రింద;
 		// Reset msg_col after outputting to new line in echowindow
-		if (wrap)
-		    msg_col = 0;
+		ఒకవేళ (wrap)
+		    సందేశం_నిలువు = 0;
 	    }
-	    else
-#endif
-		t_puts(&t_col, t_s, s, attr);
+	    లేకపోతే
+#అయితే_ముగింపు
+		t_puts(&t_నిలువు, t_s, s, attr);
 	}
 
-	if (wrap && p_more && !recurse)
+	ఒకవేళ (wrap && p_మరిన్ని && !recurse)
 	    // store text for scrolling back
-	    store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
+	    store_sb_పాఠ్యం(&sb_str, s, attr, &sb_నిలువు, TRUE);
 
-	if (*s == '\n')		    // go to next line
+	ఒకవేళ (*s == '\n')		    // go to next line
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win != ఖాళీ)
 	    {
 		// Ignore a NL when the buffer is empty, it is used to scroll
 		// up the text.
-		if ((msg_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
+		ఒకవేళ ((సందేశం_win->w_బఫరు->b_ml.ml_flags & ML_ఖాళీలు) == 0)
 		{
-		    put_msg_win(msg_win, PUT_BELOW, t_s, t_s, lnum);
+		    put_సందేశం_win(సందేశం_win, PUT_క్రింద, t_s, t_s, lnum);
 		    ++lnum;
 		}
-		msg_col = 0;  // Reset column for new line
+		సందేశం_నిలువు = 0;  // Reset column for new line
 	    }
-	    else
-#endif
-		msg_didout = FALSE;	    // remember that line is empty
-#ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
-		msg_col = cmdline_width - 1;
-	    else
-#endif
-		msg_col = 0;
-	    if (++msg_row >= Rows)  // safety check
-		msg_row = Rows - 1;
+	    లేకపోతే
+#అయితే_ముగింపు
+		సందేశం_didout = FALSE;	    // remember that line is empty
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	    ఒకవేళ (cmdmsg_rl)
+		సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+	    లేకపోతే
+#అయితే_ముగింపు
+		సందేశం_నిలువు = 0;
+	    ఒకవేళ (++సందేశం_అడ్డువరుస >= అడ్డువరుసలు)  // safety check
+		సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
 	}
-	else if (*s == '\r')	    // go to column 0
+	లేకపోతే ఒకవేళ (*s == '\r')	    // go to column 0
 	{
-	    msg_col = 0;
-#ifdef HAS_MESSAGE_WINDOW
+	    సందేశం_నిలువు = 0;
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
 	    where = PUT_TRUNC;
-#endif
+#అయితే_ముగింపు
 	}
-	else if (*s == '\b')	    // go to previous char
+	లేకపోతే ఒకవేళ (*s == '\b')	    // go to previous char
 	{
-	    if (msg_col)
-		--msg_col;
+	    ఒకవేళ (సందేశం_నిలువు)
+		--సందేశం_నిలువు;
 	}
-	else if (*s == TAB)	    // translate Tab into spaces
+	లేకపోతే ఒకవేళ (*s == TAB)	    // translate Tab into spaces
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
-		msg_col = (msg_col + 7) % 8;
-	    else
-#endif
-		do
-		    msg_screen_putchar(' ', attr);
-		while (msg_col & 7);
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ఒకవేళ (సందేశం_win != ఖాళీ)
+		సందేశం_నిలువు = (సందేశం_నిలువు + 7) % 8;
+	    లేకపోతే
+#అయితే_ముగింపు
+		చేయి
+		    సందేశం_screen_putchar(' ', attr);
+		అయితే (సందేశం_నిలువు & 7);
 	}
-	else if (*s == BELL)		// beep (from ":sh")
+	లేకపోతే ఒకవేళ (*s == BELL)		// beep (from ":sh")
 	    vim_beep(BO_SH);
-	else
+	లేకపోతే
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		cw = (*mb_ptr2cells)(s);
-		if (enc_utf8 && maxlen >= 0)
+		ఒకవేళ (enc_utf8 && maxlen >= 0)
 		    // avoid including composing chars after the end
-		    l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		else
+		    l = utfc_ptr2len_len(s, (పూర్ణాంకం)((str + maxlen) - s));
+		లేకపోతే
 		    l = (*mb_ptr2len)(s);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		cw = 1;
 		l = 1;
@@ -2751,23 +2751,23 @@ msg_puts_display(
 	    // When drawing from right to left or when a double-wide character
 	    // doesn't fit, draw a single character here.  Otherwise collect
 	    // characters and draw them all at once later.
-	    if (
-#ifdef FEAT_RIGHTLEFT
+	    ఒకవేళ (
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    cmdmsg_rl ||
-#endif
-		    (cw > 1 && msg_col + t_col >= wrap_col))
+#అయితే_ముగింపు
+		    (cw > 1 && సందేశం_నిలువు + t_నిలువు >= wrap_నిలువు))
 	    {
-		if (l > 1)
+		ఒకవేళ (l > 1)
 		    s = screen_puts_mbyte(s, l, attr) - 1;
-		else
-		    msg_screen_putchar(*s, attr);
+		లేకపోతే
+		    సందేశం_screen_putchar(*s, attr);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// postpone this character until later
-		if (t_col == 0)
+		ఒకవేళ (t_నిలువు == 0)
 		    t_s = s;
-		t_col += cw;
+		t_నిలువు += cw;
 		s += l - 1;
 	    }
 	}
@@ -2775,263 +2775,263 @@ msg_puts_display(
     }
 
     // output any postponed text
-    if (t_col > 0)
+    ఒకవేళ (t_నిలువు > 0)
     {
-#ifdef HAS_MESSAGE_WINDOW
-	if (msg_win != NULL)
-	    put_msg_win(msg_win, where, t_s, s, lnum);
-	else
-#endif
-	    t_puts(&t_col, t_s, s, attr);
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	ఒకవేళ (సందేశం_win != ఖాళీ)
+	    put_సందేశం_win(సందేశం_win, where, t_s, s, lnum);
+	లేకపోతే
+#అయితే_ముగింపు
+	    t_puts(&t_నిలువు, t_s, s, attr);
     }
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (msg_win != NULL)
-	popup_show_message_win();
-#endif
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (సందేశం_win != ఖాళీ)
+	popup_show_సందేశం_win();
+#అయితే_ముగింపు
     // Store the text for scroll back.
-    if (p_more && !recurse)
-	store_sb_text(&sb_str, s, attr, &sb_col, FALSE);
+    ఒకవేళ (p_మరిన్ని && !recurse)
+	store_sb_పాఠ్యం(&sb_str, s, attr, &sb_నిలువు, FALSE);
 
-    msg_check();
+    సందేశం_check();
 }
 
 /*
  * Return TRUE when ":filter pattern" was used and "msg" does not match
  * "pattern".
  */
-    int
-message_filtered(char_u *msg)
+    పూర్ణాంకం
+సందేశం_filtered(char_u *సందేశం)
 {
-    int match;
+    పూర్ణాంకం సరిపోలిక;
 
-    if (cmdmod.cmod_filter_regmatch.regprog == NULL)
-	return FALSE;
-    match = vim_regexec(&cmdmod.cmod_filter_regmatch, msg, (colnr_T)0);
-    return cmdmod.cmod_filter_force ? match : !match;
+    ఒకవేళ (cmdmod.cmod_filter_regmatch.regprog == ఖాళీ)
+	తిరిగి FALSE;
+    సరిపోలిక = vim_regexec(&cmdmod.cmod_filter_regmatch, సందేశం, (colnr_T)0);
+    తిరిగి cmdmod.cmod_filter_force ? సరిపోలిక : !సరిపోలిక;
 }
 
 /*
  * Scroll the screen up one line for displaying the next message line.
  */
-    static void
-msg_scroll_up(void)
+    స్థిర శూన్య
+సందేశం_scroll_పైకి(శూన్య)
 {
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
-#endif
-#ifdef FEAT_GUI
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (లోపల_echowindow)
+	తిరిగి;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
     // Remove the cursor before scrolling, ScreenLines[] is going
     // to become invalid.
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	gui_undraw_cursor();
-#endif
+#అయితే_ముగింపు
     // scrolling up always works
     mch_disable_flush();
-    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
+    screen_del_పంక్తులు(0, 0, 1, (పూర్ణాంకం)అడ్డువరుసలు, TRUE, 0, ఖాళీ);
     mch_enable_flush();
 
-    if (!can_clear((char_u *)" "))
+    ఒకవేళ (!can_clear((char_u *)" "))
     {
 	// Scrolling up doesn't result in the right background.  Set the
 	// background here.  It's not efficient, but avoids that we have to do
 	// it all over the code.
-	screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_MSG));
+	screen_fill((పూర్ణాంకం)అడ్డువరుసలు - 1, (పూర్ణాంకం)అడ్డువరుసలు, cmdline_నిలువు_off,
+		cmdline_నిలువు_off + cmdline_వెడల్పు, ' ', ' ', HL_ATTR(HLF_సందేశం));
 
 	// Also clear the last char of the last but one line if it was not
 	// cleared before to avoid a scroll-up.
-	if (ScreenAttrs[LineOffset[Rows - 2] + Columns - 1] == (sattr_T)-1)
-	    screen_fill((int)Rows - 2, (int)Rows - 1,
-				 (int)Columns - 1, (int)Columns,
-				 ' ', ' ', HL_ATTR(HLF_MSG));
+	ఒకవేళ (ScreenAttrs[పంక్తి_స్థానభ్రంశం[అడ్డువరుసలు - 2] + Columns - 1] == (sattr_T)-1)
+	    screen_fill((పూర్ణాంకం)అడ్డువరుసలు - 2, (పూర్ణాంకం)అడ్డువరుసలు - 1,
+				 (పూర్ణాంకం)Columns - 1, (పూర్ణాంకం)Columns,
+				 ' ', ' ', HL_ATTR(HLF_సందేశం));
     }
 }
 
 /*
  * Increment "msg_scrolled".
  */
-    static void
-inc_msg_scrolled(void)
+    స్థిర శూన్య
+inc_సందేశం_scrolled(శూన్య)
 {
-#ifdef FEAT_EVAL
-    if (*get_vim_var_str(VV_SCROLLSTART) == NUL)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (*get_vim_var_str(VV_SCROLLSTART) == NUL)
     {
 	string_T    p = {SOURCING_NAME, 0};
-	char_u	    *tofree = NULL;
+	char_u	    *tofree = ఖాళీ;
 
 	// v:scrollstart is empty, set it to the script/function name and line
-	// number
-	if (p.string == NULL)
+	//సంఖ్య
+	ఒకవేళ (p.string == ఖాళీ)
 	{
 	    p.string = (char_u *)_("Unknown");
-	    p.length = STRLEN(p.string);
+	    p.నిడివి = STRLEN(p.string);
 	}
-	else
+	లేకపోతే
 	{
 	    size_t  tofreesize;
 
-	    tofreesize = (int)STRLEN(p.string) + 40;
+	    tofreesize = (పూర్ణాంకం)STRLEN(p.string) + 40;
 	    tofree = alloc(tofreesize);
-	    if (tofree != NULL)
+	    ఒకవేళ (tofree != ఖాళీ)
 	    {
-		p.length = vim_snprintf_safelen((char *)tofree, tofreesize,
-		    _("%s line %ld"), p.string, (long)SOURCING_LNUM);
+		p.నిడివి = vim_snprintf_safelen((అక్షరం *)tofree, tofreesize,
+		    _("%s line %ld"), p.string, (దీర్ఘ)SOURCING_LNUM);
 		p.string = tofree;
 	    }
 	}
-	set_vim_var_string(VV_SCROLLSTART, p.string, (int)p.length);
+	సమితి_vim_var_string(VV_SCROLLSTART, p.string, (పూర్ణాంకం)p.నిడివి);
 	vim_free(tofree);
     }
-#endif
-    ++msg_scrolled;
-    set_must_redraw(UPD_VALID);
+#అయితే_ముగింపు
+    ++సందేశం_scrolled;
+    సమితి_must_redraw(UPD_VALID);
 }
 
 /*
  * To be able to scroll back at the "more" and "hit-enter" prompts we need to
  * store the displayed text and remember where screen lines start.
  */
-typedef struct msgchunk_S msgchunk_T;
-struct msgchunk_S
+రకనిర్వచనం నిర్మాణం msgchunk_S msgchunk_T;
+నిర్మాణం msgchunk_S
 {
-    msgchunk_T	*sb_next;
+    msgchunk_T	*sb_తదుపరి;
     msgchunk_T	*sb_prev;
-    char	sb_eol;		// TRUE when line ends after this text
-    int		sb_msg_col;	// column in which text starts
-    int		sb_attr;	// text attributes
-    char_u	sb_text[1];	// text to be displayed, actually longer
+    అక్షరం	sb_eol;		// TRUE when line ends after this text
+    పూర్ణాంకం		sb_సందేశం_నిలువు;	// column in which text starts
+    పూర్ణాంకం		sb_attr;	// text attributes
+    char_u	sb_పాఠ్యం[1];	// text to be displayed, actually longer
 };
 
-static msgchunk_T *last_msgchunk = NULL; // last displayed text
+స్థిర msgchunk_T *చివరి_msgchunk = ఖాళీ; // last displayed text
 
-static msgchunk_T *msg_sb_start(msgchunk_T *mps);
+స్థిర msgchunk_T *సందేశం_sb_ప్రారంభం(msgchunk_T *mps);
 
-typedef enum {
+రకనిర్వచనం గణన {
     SB_CLEAR_NONE = 0,
     SB_CLEAR_ALL,
     SB_CLEAR_CMDLINE_BUSY,
-    SB_CLEAR_CMDLINE_DONE
+    SB_CLEAR_CMDLINE_పూర్తి
 } sb_clear_T;
 
 // When to clear text on next msg.
-static sb_clear_T do_clear_sb_text = SB_CLEAR_NONE;
+స్థిర sb_clear_T do_clear_sb_పాఠ్యం = SB_CLEAR_NONE;
 
 /*
  * Store part of a printed message for displaying when scrolling back.
  */
-    static void
-store_sb_text(
+    స్థిర శూన్య
+store_sb_పాఠ్యం(
     char_u	**sb_str,	// start of string
     char_u	*s,		// just after string
-    int		attr,
-    int		*sb_col,
-    int		finish)		// line ends
+    పూర్ణాంకం		attr,
+    పూర్ణాంకం		*sb_నిలువు,
+    పూర్ణాంకం		ముగింపు)		// line ends
 {
     msgchunk_T	*mp;
 
-    if (do_clear_sb_text == SB_CLEAR_ALL
-	    || do_clear_sb_text == SB_CLEAR_CMDLINE_DONE)
+    ఒకవేళ (do_clear_sb_పాఠ్యం == SB_CLEAR_ALL
+	    || do_clear_sb_పాఠ్యం == SB_CLEAR_CMDLINE_పూర్తి)
     {
-	clear_sb_text(do_clear_sb_text == SB_CLEAR_ALL);
-	msg_sb_eol();  // prevent messages from overlapping
-	do_clear_sb_text = SB_CLEAR_NONE;
+	clear_sb_పాఠ్యం(do_clear_sb_పాఠ్యం == SB_CLEAR_ALL);
+	సందేశం_sb_eol();  // prevent messages from overlapping
+	do_clear_sb_పాఠ్యం = SB_CLEAR_NONE;
     }
 
-    if (s > *sb_str)
+    ఒకవేళ (s > *sb_str)
     {
-	mp = alloc(offsetof(msgchunk_T, sb_text) + (s - *sb_str) + 1);
-	if (mp != NULL)
+	mp = alloc(offsetof(msgchunk_T, sb_పాఠ్యం) + (s - *sb_str) + 1);
+	ఒకవేళ (mp != ఖాళీ)
 	{
-	    mp->sb_eol = finish;
-	    mp->sb_msg_col = *sb_col;
+	    mp->sb_eol = ముగింపు;
+	    mp->sb_సందేశం_నిలువు = *sb_నిలువు;
 	    mp->sb_attr = attr;
-	    vim_strncpy(mp->sb_text, *sb_str, s - *sb_str);
+	    vim_strncpy(mp->sb_పాఠ్యం, *sb_str, s - *sb_str);
 
-	    if (last_msgchunk == NULL)
+	    ఒకవేళ (చివరి_msgchunk == ఖాళీ)
 	    {
-		last_msgchunk = mp;
-		mp->sb_prev = NULL;
+		చివరి_msgchunk = mp;
+		mp->sb_prev = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		mp->sb_prev = last_msgchunk;
-		last_msgchunk->sb_next = mp;
-		last_msgchunk = mp;
+		mp->sb_prev = చివరి_msgchunk;
+		చివరి_msgchunk->sb_తదుపరి = mp;
+		చివరి_msgchunk = mp;
 	    }
-	    mp->sb_next = NULL;
+	    mp->sb_తదుపరి = ఖాళీ;
 	}
     }
-    else if (finish && last_msgchunk != NULL)
-	last_msgchunk->sb_eol = TRUE;
+    లేకపోతే ఒకవేళ (ముగింపు && చివరి_msgchunk != ఖాళీ)
+	చివరి_msgchunk->sb_eol = TRUE;
 
     *sb_str = s;
-    *sb_col = 0;
+    *sb_నిలువు = 0;
 }
 
 /*
  * Finished showing messages, clear the scroll-back text on the next message.
  */
-    void
-may_clear_sb_text(void)
+    శూన్య
+may_clear_sb_పాఠ్యం(శూన్య)
 {
-    do_clear_sb_text = SB_CLEAR_ALL;
+    do_clear_sb_పాఠ్యం = SB_CLEAR_ALL;
 }
 
 /*
  * Starting to edit the command line: do not clear messages now.
  */
-    void
-sb_text_start_cmdline(void)
+    శూన్య
+sb_పాఠ్యం_ప్రారంభం_cmdline(శూన్య)
 {
-    if (do_clear_sb_text == SB_CLEAR_CMDLINE_BUSY)
+    ఒకవేళ (do_clear_sb_పాఠ్యం == SB_CLEAR_CMDLINE_BUSY)
 	// Invoking command line recursively: the previous-level command line
 	// doesn't need to be remembered as it will be redrawn when returning
 	// to that level.
-	sb_text_restart_cmdline();
-    else
+	sb_పాఠ్యం_restart_cmdline();
+    లేకపోతే
     {
-	msg_sb_eol();
-	do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
+	సందేశం_sb_eol();
+	do_clear_sb_పాఠ్యం = SB_CLEAR_CMDLINE_BUSY;
     }
 }
 
 /*
  * Redrawing the command line: clear the last unfinished line.
  */
-    void
-sb_text_restart_cmdline(void)
+    శూన్య
+sb_పాఠ్యం_restart_cmdline(శూన్య)
 {
     msgchunk_T *tofree;
 
     // Needed when returning from nested command line.
-    do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
+    do_clear_sb_పాఠ్యం = SB_CLEAR_CMDLINE_BUSY;
 
-    if (last_msgchunk == NULL || last_msgchunk->sb_eol)
+    ఒకవేళ (చివరి_msgchunk == ఖాళీ || చివరి_msgchunk->sb_eol)
 	// No unfinished line: don't clear anything.
-	return;
+	తిరిగి;
 
-    tofree = msg_sb_start(last_msgchunk);
-    last_msgchunk = tofree->sb_prev;
-    if (last_msgchunk != NULL)
-	last_msgchunk->sb_next = NULL;
-    while (tofree != NULL)
+    tofree = సందేశం_sb_ప్రారంభం(చివరి_msgchunk);
+    చివరి_msgchunk = tofree->sb_prev;
+    ఒకవేళ (చివరి_msgchunk != ఖాళీ)
+	చివరి_msgchunk->sb_తదుపరి = ఖాళీ;
+    అయితే (tofree != ఖాళీ)
     {
-	msgchunk_T *tofree_next = tofree->sb_next;
+	msgchunk_T *tofree_తదుపరి = tofree->sb_తదుపరి;
 
 	vim_free(tofree);
-	tofree = tofree_next;
+	tofree = tofree_తదుపరి;
     }
 }
 
 /*
  * Ending to edit the command line: clear old lines but the last one later.
  */
-    void
-sb_text_end_cmdline(void)
+    శూన్య
+sb_పాఠ్యం_చివర_cmdline(శూన్య)
 {
-    do_clear_sb_text = SB_CLEAR_CMDLINE_DONE;
+    do_clear_sb_పాఠ్యం = SB_CLEAR_CMDLINE_పూర్తి;
 }
 
 /*
@@ -3039,22 +3039,22 @@ sb_text_end_cmdline(void)
  * When "all" is FALSE keep the last line.
  * Called when redrawing the screen.
  */
-    void
-clear_sb_text(int all)
+    శూన్య
+clear_sb_పాఠ్యం(పూర్ణాంకం all)
 {
     msgchunk_T	*mp;
     msgchunk_T	**lastp;
 
-    if (all)
-	lastp = &last_msgchunk;
-    else
+    ఒకవేళ (all)
+	lastp = &చివరి_msgchunk;
+    లేకపోతే
     {
-	if (last_msgchunk == NULL)
-	    return;
-	lastp = &msg_sb_start(last_msgchunk)->sb_prev;
+	ఒకవేళ (చివరి_msgchunk == ఖాళీ)
+	    తిరిగి;
+	lastp = &సందేశం_sb_ప్రారంభం(చివరి_msgchunk)->sb_prev;
     }
 
-    while (*lastp != NULL)
+    అయితే (*lastp != ఖాళీ)
     {
 	mp = (*lastp)->sb_prev;
 	vim_free(*lastp);
@@ -3065,19 +3065,19 @@ clear_sb_text(int all)
 /*
  * "g<" command.
  */
-    void
-show_sb_text(void)
+    శూన్య
+show_sb_పాఠ్యం(శూన్య)
 {
     msgchunk_T	*mp;
 
     // Only show something if there is more than one line, otherwise it looks
     // weird, typing a command without output results in one line.
-    mp = msg_sb_start(last_msgchunk);
-    if (mp == NULL || mp->sb_prev == NULL)
+    mp = సందేశం_sb_ప్రారంభం(చివరి_msgchunk);
+    ఒకవేళ (mp == ఖాళీ || mp->sb_prev == ఖాళీ)
 	vim_beep(BO_MESS);
-    else
+    లేకపోతే
     {
-	do_more_prompt('G');
+	do_మరిన్ని_prompt('G');
 	wait_return(FALSE);
     }
 }
@@ -3085,28 +3085,28 @@ show_sb_text(void)
 /*
  * Move to the start of screen line in already displayed text.
  */
-    static msgchunk_T *
-msg_sb_start(msgchunk_T *mps)
+    స్థిర msgchunk_T *
+సందేశం_sb_ప్రారంభం(msgchunk_T *mps)
 {
     msgchunk_T *mp = mps;
 
-    while (mp != NULL && mp->sb_prev != NULL && !mp->sb_prev->sb_eol)
+    అయితే (mp != ఖాళీ && mp->sb_prev != ఖాళీ && !mp->sb_prev->sb_eol)
 	mp = mp->sb_prev;
-    return mp;
+    తిరిగి mp;
 }
 
 /*
  * Mark the last message chunk as finishing the line.
  */
-    void
-msg_sb_eol(void)
+    శూన్య
+సందేశం_sb_eol(శూన్య)
 {
     // A trailing newline starts an empty line that has not been filled yet.
     // Marking it as finished would introduce an extra empty line.
-    if (last_msgchunk != NULL
-	    && !(last_msgchunk->sb_text[0] == '\n'
-		&& last_msgchunk->sb_text[1] == NUL))
-	last_msgchunk->sb_eol = TRUE;
+    ఒకవేళ (చివరి_msgchunk != ఖాళీ
+	    && !(చివరి_msgchunk->sb_పాఠ్యం[0] == '\n'
+		&& చివరి_msgchunk->sb_పాఠ్యం[1] == NUL))
+	చివరి_msgchunk->sb_eol = TRUE;
 }
 
 /*
@@ -3114,59 +3114,59 @@ msg_sb_eol(void)
  * When "clear_to_eol" is set clear the rest of the screen line.
  * Returns a pointer to the text for the next line (can be NULL).
  */
-    static msgchunk_T *
-disp_sb_line(int row, msgchunk_T *smp, int clear_to_eol)
+    స్థిర msgchunk_T *
+disp_sb_పంక్తి(పూర్ణాంకం అడ్డువరుస, msgchunk_T *smp, పూర్ణాంకం clear_గమ్యం_eol)
 {
     msgchunk_T	*mp = smp;
     char_u	*p;
 
-    for (;;)
+    కొరకు (;;)
     {
-	msg_row = row;
-	msg_col = mp->sb_msg_col;
-	p = mp->sb_text;
-	if (*p == '\n')	    // don't display the line break
+	సందేశం_అడ్డువరుస = అడ్డువరుస;
+	సందేశం_నిలువు = mp->sb_సందేశం_నిలువు;
+	p = mp->sb_పాఠ్యం;
+	ఒకవేళ (*p == '\n')	    // don't display the line break
 	    ++p;
-	msg_puts_display(p, -1, mp->sb_attr, TRUE);
+	సందేశం_puts_display(p, -1, mp->sb_attr, TRUE);
 
 	// If clearing the screen did not work (e.g. because of a background
 	// color and t_ut isn't set) clear until the last column here.
-	if (clear_to_eol)
-	    screen_fill(row, row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', HL_ATTR(HLF_MSG));
+	ఒకవేళ (clear_గమ్యం_eol)
+	    screen_fill(అడ్డువరుస, అడ్డువరుస + 1,
+		    cmdline_నిలువు_off + సందేశం_నిలువు, cmdline_నిలువు_off + cmdline_వెడల్పు,
+		    ' ', ' ', HL_ATTR(HLF_సందేశం));
 
-	if (mp->sb_eol || mp->sb_next == NULL)
-	    break;
-	mp = mp->sb_next;
+	ఒకవేళ (mp->sb_eol || mp->sb_తదుపరి == ఖాళీ)
+	    ఆపు;
+	mp = mp->sb_తదుపరి;
     }
-    return mp->sb_next;
+    తిరిగి mp->sb_తదుపరి;
 }
 
 /*
  * Output any postponed text for msg_puts_attr_len().
  */
-    static void
+    స్థిర శూన్య
 t_puts(
-    int		*t_col,
+    పూర్ణాంకం		*t_నిలువు,
     char_u	*t_s,
     char_u	*s,
-    int		attr)
+    పూర్ణాంకం		attr)
 {
     // output postponed text
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_puts_len(t_s, (int)(s - t_s), msg_row, cmdline_col_off + msg_col,
+    సందేశం_didout = TRUE;		// remember that line is not empty
+    screen_puts_len(t_s, (పూర్ణాంకం)(s - t_s), సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు,
 	    attr);
-    msg_col += *t_col;
-    *t_col = 0;
+    సందేశం_నిలువు += *t_నిలువు;
+    *t_నిలువు = 0;
     // If the string starts with a composing character don't increment the
     // column position for it.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
-	--msg_col;
-    if (msg_col >= cmdline_width)
+    ఒకవేళ (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
+	--సందేశం_నిలువు;
+    ఒకవేళ (సందేశం_నిలువు >= cmdline_వెడల్పు)
     {
-	msg_col = 0;
-	++msg_row;
+	సందేశం_నిలువు = 0;
+	++సందేశం_అడ్డువరుస;
     }
 }
 
@@ -3178,56 +3178,56 @@ t_puts(
  * different, e.g. for Win32 console) or we just don't know where the
  * cursor is.
  */
-    int
-msg_use_printf(void)
+    పూర్ణాంకం
+సందేశం_use_printf(శూన్య)
 {
-    return (!msg_check_screen()
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    తిరిగి (!సందేశం_check_screen()
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    || (!gui.in_use && !termcap_active)
-# else
-	    || !termcap_active
+	    || (!gui.లోపల_use && !termcap_చురుకైన)
+# లేకపోతే
+	    || !termcap_చురుకైన
 # endif
-#endif
-	    || (swapping_screen() && !termcap_active)
+#అయితే_ముగింపు
+	    || (swapping_screen() && !termcap_చురుకైన)
 	       );
 }
 
 /*
  * Print a message when there is no valid screen.
  */
-    static void
-msg_puts_printf(char_u *str, int maxlen)
+    స్థిర శూన్య
+సందేశం_puts_printf(char_u *str, పూర్ణాంకం maxlen)
 {
     char_u	*s = str;
-    char_u	*buf = NULL;
+    char_u	*buf = ఖాళీ;
     char_u	*p = s;
 
-#ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (!(silent_బహుళకం && p_verbose == 0))
 	mch_settmode(TMODE_COOK);	// handle CR and NL correctly
-#endif
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+#అయితే_ముగింపు
+    అయితే ((maxlen < 0 || (పూర్ణాంకం)(s - str) < maxlen) && *s != NUL)
     {
-	if (!(silent_mode && p_verbose == 0))
+	ఒకవేళ (!(silent_బహుళకం && p_verbose == 0))
 	{
 	    // NL --> CR NL translation (for Unix, not for "--version")
-	    if (*s == NL)
+	    ఒకవేళ (*s == NL)
 	    {
-		int n = (int)(s - p);
+		పూర్ణాంకం n = (పూర్ణాంకం)(s - p);
 
 		buf = alloc(n + 3);
-		if (buf != NULL)
+		ఒకవేళ (buf != ఖాళీ)
 		{
-		    memcpy(buf, p, n);
-		    if (!info_message)
+		    జ్ఞాపకం_నకలు(buf, p, n);
+		    ఒకవేళ (!info_సందేశం)
 			buf[n++] = CAR;
 		    buf[n++] = NL;
 		    buf[n++] = NUL;
-		    if (info_message)   // informative message, not an error
-			mch_msg((char *)buf);
-		    else
-			mch_errmsg((char *)buf);
+		    ఒకవేళ (info_సందేశం)   // informative message, not an error
+			mch_సందేశం((అక్షరం *)buf);
+		    లేకపోతే
+			mch_errmsg((అక్షరం *)buf);
 		    vim_free(buf);
 		}
 		p = s + 1;
@@ -3235,51 +3235,51 @@ msg_puts_printf(char_u *str, int maxlen)
 	}
 
 	// primitive way to compute the current column
-#ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (cmdmsg_rl)
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = cmdline_width - 1;
-	    else
-		--msg_col;
+	    ఒకవేళ (*s == CAR || *s == NL)
+		సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+	    లేకపోతే
+		--సందేశం_నిలువు;
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = 0;
-	    else
-		++msg_col;
+	    ఒకవేళ (*s == CAR || *s == NL)
+		సందేశం_నిలువు = 0;
+	    లేకపోతే
+		++సందేశం_నిలువు;
 	}
 	++s;
     }
 
-    if (*p != NUL && !(silent_mode && p_verbose == 0))
+    ఒకవేళ (*p != NUL && !(silent_బహుళకం && p_verbose == 0))
     {
-	char_u *tofree = NULL;
+	char_u *tofree = ఖాళీ;
 
-	if (maxlen > 0 && vim_strlen_maxlen((char *)p, (size_t)maxlen)
+	ఒకవేళ (maxlen > 0 && vim_strlen_maxlen((అక్షరం *)p, (size_t)maxlen)
 							     >= (size_t)maxlen)
 	{
 	    tofree = vim_strnsave(p, (size_t)maxlen);
 	    p = tofree;
 	}
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    if (info_message)
-		mch_msg((char *)p);
-	    else
-		mch_errmsg((char *)p);
+	    ఒకవేళ (info_సందేశం)
+		mch_సందేశం((అక్షరం *)p);
+	    లేకపోతే
+		mch_errmsg((అక్షరం *)p);
 	    vim_free(tofree);
 	}
     }
 
-    msg_didout = TRUE;	    // assume that line is not empty
+    సందేశం_didout = TRUE;	    // assume that line is not empty
 
-#ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (!(silent_బహుళకం && p_verbose == 0))
 	mch_settmode(TMODE_RAW);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -3289,311 +3289,311 @@ msg_puts_printf(char_u *str, int maxlen)
  * otherwise it's NUL.
  * Returns TRUE when jumping ahead to "confirm_msg_tail".
  */
-    static int
-do_more_prompt(int typed_char)
+    స్థిర పూర్ణాంకం
+do_మరిన్ని_prompt(పూర్ణాంకం typed_char)
 {
-    static int	entered = FALSE;
-    int		used_typed_char = typed_char;
-    int		oldState = State;
-    int		c;
-#ifdef FEAT_CON_DIALOG
-    int		retval = FALSE;
-#endif
-    int		toscroll;
-    msgchunk_T	*mp_last = NULL;
+    స్థిర పూర్ణాంకం	entered = FALSE;
+    పూర్ణాంకం		వాడిన_typed_char = typed_char;
+    పూర్ణాంకం		oldState = State;
+    పూర్ణాంకం		c;
+#నిర్వచితమైతే FEAT_CON_DIALOG
+    పూర్ణాంకం		retval = FALSE;
+#అయితే_ముగింపు
+    పూర్ణాంకం		toscroll;
+    msgchunk_T	*mp_చివరి = ఖాళీ;
     msgchunk_T	*mp;
-    int		i;
-    int		msg_attr;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		సందేశం_attr;
 
-    msg_attr = HL_ATTR(HLF_MSG);
+    సందేశం_attr = HL_ATTR(HLF_సందేశం);
 
     // We get called recursively when a timer callback outputs a message. In
     // that case don't show another prompt. Also when at the hit-Enter prompt
     // and nothing was typed.
-    if (entered || (State == MODE_HITRETURN && typed_char == 0))
-	return FALSE;
+    ఒకవేళ (entered || (State == బహుళకం_HITRETURN && typed_char == 0))
+	తిరిగి FALSE;
     entered = TRUE;
 
-    if (typed_char == 'G')
+    ఒకవేళ (typed_char == 'G')
     {
 	// "g<": Find first line on the last page.
-	mp_last = msg_sb_start(last_msgchunk);
-	for (i = 0; i < Rows - 2 && mp_last != NULL
-					     && mp_last->sb_prev != NULL; ++i)
-	    mp_last = msg_sb_start(mp_last->sb_prev);
+	mp_చివరి = సందేశం_sb_ప్రారంభం(చివరి_msgchunk);
+	కొరకు (i = 0; i < అడ్డువరుసలు - 2 && mp_చివరి != ఖాళీ
+					     && mp_చివరి->sb_prev != ఖాళీ; ++i)
+	    mp_చివరి = సందేశం_sb_ప్రారంభం(mp_చివరి->sb_prev);
     }
 
-    State = MODE_ASKMORE;
+    State = బహుళకం_ASKMORE;
     setmouse();
-    if (typed_char == NUL)
-	msg_moremsg(FALSE);
-    for (;;)
+    ఒకవేళ (typed_char == NUL)
+	సందేశం_moremsg(FALSE);
+    కొరకు (;;)
     {
 	/*
 	 * Get a typed character directly from the user.
 	 */
-	if (used_typed_char != NUL)
+	ఒకవేళ (వాడిన_typed_char != NUL)
 	{
-	    c = used_typed_char;	// was typed at hit-enter prompt
-	    used_typed_char = NUL;
+	    c = వాడిన_typed_char;	// was typed at hit-enter prompt
+	    వాడిన_typed_char = NUL;
 	}
-	else
+	లేకపోతే
 	    c = get_keystroke();
 
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	if (c == K_MENU)
+#ఒకవేళ defined(FEAT_MENU) && defined(FEAT_GUI)
+	ఒకవేళ (c == K_MENU)
 	{
-	    int idx = get_menu_index(current_menu, MODE_ASKMORE);
+	    పూర్ణాంకం idx = get_menu_సూచీ(current_menu, బహుళకం_ASKMORE);
 
 	    // Used a menu.  If it starts with CTRL-Y, it must
 	    // be a "Copy" for the clipboard.  Otherwise
 	    // assume that we end
-	    if (idx == MENU_INDEX_INVALID)
-		continue;
-	    c = *current_menu->strings[idx];
-	    if (c != NUL && current_menu->strings[idx][1] != NUL)
-		ins_typebuf(current_menu->strings[idx] + 1,
+	    ఒకవేళ (idx == MENU_సూచీ_INVALID)
+		కొనసాగు;
+	    c = *current_menu->అక్షరశ్రేణులు[idx];
+	    ఒకవేళ (c != NUL && current_menu->అక్షరశ్రేణులు[idx][1] != NUL)
+		ins_typebuf(current_menu->అక్షరశ్రేణులు[idx] + 1,
 				current_menu->noremap[idx], 0, TRUE,
 						   current_menu->silent[idx]);
 	}
-#endif
+#అయితే_ముగింపు
 
 	toscroll = 0;
-	switch (c)
+	ఎంపిక (c)
 	{
-	case BS:		// scroll one line back
-	case K_BS:
-	case 'k':
-	case K_UP:
+	స్థితి BS:		// scroll one line back
+	స్థితి K_BS:
+	స్థితి 'k':
+	స్థితి K_పైకి:
 	    toscroll = -1;
-	    break;
+	    ఆపు;
 
-	case CAR:		// one extra line
-	case NL:
-	case 'j':
-	case K_DOWN:
+	స్థితి CAR:		// one extra line
+	స్థితి NL:
+	స్థితి 'j':
+	స్థితి K_కిందికి:
 	    toscroll = 1;
-	    break;
+	    ఆపు;
 
-	case 'u':		// Up half a page
-	    toscroll = -(Rows / 2);
-	    break;
+	స్థితి 'u':		// Up half a page
+	    toscroll = -(అడ్డువరుసలు / 2);
+	    ఆపు;
 
-	case 'd':		// Down half a page
-	    toscroll = Rows / 2;
-	    break;
+	స్థితి 'd':		// Down half a page
+	    toscroll = అడ్డువరుసలు / 2;
+	    ఆపు;
 
-	case 'b':		// one page back
-	case Ctrl_B:
-	case K_PAGEUP:
-	    toscroll = -(Rows - 1);
-	    break;
+	స్థితి 'b':		// one page back
+	స్థితి Ctrl_B:
+	స్థితి K_PAGEUP:
+	    toscroll = -(అడ్డువరుసలు - 1);
+	    ఆపు;
 
-	case ' ':		// one extra page
-	case 'f':
-	case Ctrl_F:
-	case K_PAGEDOWN:
-	case K_LEFTMOUSE:
-	    toscroll = Rows - 1;
-	    break;
+	స్థితి ' ':		// one extra page
+	స్థితి 'f':
+	స్థితి Ctrl_F:
+	స్థితి K_PAGEDOWN:
+	స్థితి K_LEFTMOUSE:
+	    toscroll = అడ్డువరుసలు - 1;
+	    ఆపు;
 
-	case 'g':		// all the way back to the start
+	స్థితి 'g':		// all the way back to the start
 	    toscroll = -999999;
-	    break;
+	    ఆపు;
 
-	case 'G':		// all the way to the end
+	స్థితి 'G':		// all the way to the end
 	    toscroll = 999999;
-	    lines_left = 999999;
-	    break;
+	    పంక్తులు_ఎడమ = 999999;
+	    ఆపు;
 
-	case ':':		// start new command line
-#ifdef FEAT_CON_DIALOG
-	    if (!confirm_msg_used)
-#endif
+	స్థితి ':':		// start new command line
+#నిర్వచితమైతే FEAT_CON_DIALOG
+	    ఒకవేళ (!confirm_సందేశం_వాడిన)
+#అయితే_ముగింపు
 	    {
 		// Since got_int is set all typeahead will be flushed, but we
 		// want to keep this ':', remember that in a special way.
 		typeahead_noflush(':');
-#ifdef FEAT_TERMINAL
-		skip_term_loop = TRUE;
-#endif
-		cmdline_row = Rows - 1;		// put ':' on this line
+#నిర్వచితమైతే FEAT_TERMINAL
+		skip_పదం_loop = TRUE;
+#అయితే_ముగింపు
+		cmdline_అడ్డువరుస = అడ్డువరుసలు - 1;		// put ':' on this line
 		skip_redraw = TRUE;		// skip redraw once
 		need_wait_return = FALSE;	// don't wait in main()
 	    }
 	    // FALLTHROUGH
-	case 'q':		// quit
-	case Ctrl_C:
-	case ESC:
-#ifdef FEAT_CON_DIALOG
-	    if (confirm_msg_used)
+	స్థితి 'q':		// quit
+	స్థితి Ctrl_C:
+	స్థితి ESC:
+#నిర్వచితమైతే FEAT_CON_DIALOG
+	    ఒకవేళ (confirm_సందేశం_వాడిన)
 	    {
 		// Jump to the choices of the dialog.
 		retval = TRUE;
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
 		got_int = TRUE;
-		quit_more = TRUE;
+		quit_మరిన్ని = TRUE;
 	    }
 	    // When there is some more output (wrapping line) display that
 	    // without another prompt.
-	    lines_left = Rows - 1;
-	    break;
+	    పంక్తులు_ఎడమ = అడ్డువరుసలు - 1;
+	    ఆపు;
 
-#ifdef FEAT_CLIPBOARD
-	case Ctrl_Y:
+#నిర్వచితమైతే FEAT_CLIPBOARD
+	స్థితి Ctrl_Y:
 	    // Strange way to allow copying (yanking) a modeless
 	    // selection at the more prompt.  Use CTRL-Y,
 	    // because the same is used in Cmdline-mode and at the
 	    // hit-enter prompt.  However, scrolling one line up
 	    // might be expected...
-	    if (clip_star.state == SELECT_DONE)
+	    ఒకవేళ (clip_నక్షత్రం.state == SELECT_పూర్తి)
 		clip_copy_modeless_selection(TRUE);
-	    continue;
-#endif
-	default:		// no valid response
-	    msg_moremsg(TRUE);
-	    continue;
+	    కొనసాగు;
+#అయితే_ముగింపు
+	అప్రమేయ:		// no valid response
+	    సందేశం_moremsg(TRUE);
+	    కొనసాగు;
 	}
 
-	if (toscroll != 0)
+	ఒకవేళ (toscroll != 0)
 	{
-	    if (toscroll < 0)
+	    ఒకవేళ (toscroll < 0)
 	    {
 		// go to start of last line
-		if (mp_last == NULL)
-		    mp = msg_sb_start(last_msgchunk);
-		else if (mp_last->sb_prev != NULL)
-		    mp = msg_sb_start(mp_last->sb_prev);
-		else
-		    mp = NULL;
+		ఒకవేళ (mp_చివరి == ఖాళీ)
+		    mp = సందేశం_sb_ప్రారంభం(చివరి_msgchunk);
+		లేకపోతే ఒకవేళ (mp_చివరి->sb_prev != ఖాళీ)
+		    mp = సందేశం_sb_ప్రారంభం(mp_చివరి->sb_prev);
+		లేకపోతే
+		    mp = ఖాళీ;
 
 		// go to start of line at top of the screen
-		for (i = 0; i < Rows - 2 && mp != NULL && mp->sb_prev != NULL;
+		కొరకు (i = 0; i < అడ్డువరుసలు - 2 && mp != ఖాళీ && mp->sb_prev != ఖాళీ;
 									  ++i)
-		    mp = msg_sb_start(mp->sb_prev);
+		    mp = సందేశం_sb_ప్రారంభం(mp->sb_prev);
 
-		if (mp != NULL && mp->sb_prev != NULL)
+		ఒకవేళ (mp != ఖాళీ && mp->sb_prev != ఖాళీ)
 		{
 		    // Find line to be displayed at top.
-		    for (i = 0; i > toscroll; --i)
+		    కొరకు (i = 0; i > toscroll; --i)
 		    {
-			if (mp == NULL || mp->sb_prev == NULL)
-			    break;
-			mp = msg_sb_start(mp->sb_prev);
-			if (mp_last == NULL)
-			    mp_last = msg_sb_start(last_msgchunk);
-			else
-			    mp_last = msg_sb_start(mp_last->sb_prev);
+			ఒకవేళ (mp == ఖాళీ || mp->sb_prev == ఖాళీ)
+			    ఆపు;
+			mp = సందేశం_sb_ప్రారంభం(mp->sb_prev);
+			ఒకవేళ (mp_చివరి == ఖాళీ)
+			    mp_చివరి = సందేశం_sb_ప్రారంభం(చివరి_msgchunk);
+			లేకపోతే
+			    mp_చివరి = సందేశం_sb_ప్రారంభం(mp_చివరి->sb_prev);
 		    }
 
-		    if (toscroll == -1 && screen_ins_lines(0, 0, 1,
-						     (int)Rows, 0, NULL) == OK)
+		    ఒకవేళ (toscroll == -1 && screen_ins_పంక్తులు(0, 0, 1,
+						     (పూర్ణాంకం)అడ్డువరుసలు, 0, ఖాళీ) == OK)
 		    {
 			// display line at top
-			(void)disp_sb_line(0, mp, FALSE);
+			(శూన్య)disp_sb_పంక్తి(0, mp, FALSE);
 		    }
-		    else
+		    లేకపోతే
 		    {
-			int did_clear = screenclear();
+			పూర్ణాంకం did_clear = screenclear();
 
 			// redisplay all lines
-			for (i = 0; mp != NULL && i < Rows - 1; ++i)
+			కొరకు (i = 0; mp != ఖాళీ && i < అడ్డువరుసలు - 1; ++i)
 			{
-			    mp = disp_sb_line(i, mp, !did_clear);
-			    ++msg_scrolled;
+			    mp = disp_sb_పంక్తి(i, mp, !did_clear);
+			    ++సందేశం_scrolled;
 			}
 		    }
 		    toscroll = 0;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// First display any text that we scrolled back.
-		while (toscroll > 0 && mp_last != NULL)
+		అయితే (toscroll > 0 && mp_చివరి != ఖాళీ)
 		{
 		    // scroll up, display line at bottom
-		    msg_scroll_up();
-		    inc_msg_scrolled();
-		    screen_fill((int)Rows - 2, (int)Rows - 1,
-			    cmdline_col_off, cmdline_col_off + cmdline_width,
-			    ' ', ' ', msg_attr);
-		    mp_last = disp_sb_line((int)Rows - 2, mp_last, FALSE);
+		    సందేశం_scroll_పైకి();
+		    inc_సందేశం_scrolled();
+		    screen_fill((పూర్ణాంకం)అడ్డువరుసలు - 2, (పూర్ణాంకం)అడ్డువరుసలు - 1,
+			    cmdline_నిలువు_off, cmdline_నిలువు_off + cmdline_వెడల్పు,
+			    ' ', ' ', సందేశం_attr);
+		    mp_చివరి = disp_sb_పంక్తి((పూర్ణాంకం)అడ్డువరుసలు - 2, mp_చివరి, FALSE);
 		    --toscroll;
 		}
 	    }
 
-	    if (toscroll <= 0)
+	    ఒకవేళ (toscroll <= 0)
 	    {
 		// displayed the requested text, more prompt again
-		screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-			cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
-		msg_moremsg(FALSE);
-		continue;
+		screen_fill((పూర్ణాంకం)అడ్డువరుసలు - 1, (పూర్ణాంకం)అడ్డువరుసలు, cmdline_నిలువు_off,
+			cmdline_నిలువు_off + cmdline_వెడల్పు, ' ', ' ', సందేశం_attr);
+		సందేశం_moremsg(FALSE);
+		కొనసాగు;
 	    }
 
 	    // display more text, return to caller
-	    lines_left = toscroll;
+	    పంక్తులు_ఎడమ = toscroll;
 	}
 
-	break;
+	ఆపు;
     }
 
     // clear the --more-- message
-    screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-	    cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
+    screen_fill((పూర్ణాంకం)అడ్డువరుసలు - 1, (పూర్ణాంకం)అడ్డువరుసలు, cmdline_నిలువు_off,
+	    cmdline_నిలువు_off + cmdline_వెడల్పు, ' ', ' ', సందేశం_attr);
     State = oldState;
     setmouse();
-    if (quit_more)
+    ఒకవేళ (quit_మరిన్ని)
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
+	సందేశం_నిలువు = 0;
     }
-#ifdef FEAT_RIGHTLEFT
-    else if (cmdmsg_rl)
-	msg_col = cmdline_width - 1;
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    లేకపోతే ఒకవేళ (cmdmsg_rl)
+	సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+#అయితే_ముగింపు
 
     entered = FALSE;
-#ifdef FEAT_CON_DIALOG
-    return retval;
-#else
-    return FALSE;
-#endif
+#నిర్వచితమైతే FEAT_CON_DIALOG
+    తిరిగి retval;
+#లేకపోతే
+    తిరిగి FALSE;
+#అయితే_ముగింపు
 }
 
-#if defined(USE_MCH_ERRMSG)
+#ఒకవేళ defined(USE_MCH_ERRMSG)
 
 # ifdef mch_errmsg
 #  undef mch_errmsg
 # endif
-# ifdef mch_msg
-#  undef mch_msg
+# ifdef mch_సందేశం
+#  undef mch_సందేశం
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_errmsg_c(char *str)
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    స్థిర శూన్య
+mch_errmsg_c(అక్షరం *str)
 {
     DWORD   nwrite = 0;
-    DWORD   mode = 0;
+    DWORD   బహుళకం = 0;
     HANDLE  h = GetStdHandle(STD_ERROR_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    ఒకవేళ (Get_Console_బహుళకం(h, &బహుళకం) && enc_codepage >= 0
+	    && (పూర్ణాంకం)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
-	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
+	పూర్ణాంకం	len = (పూర్ణాంకం)STRLEN(str);
+	WCHAR	*w = enc_గమ్యం_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	ఒకవేళ (w != ఖాళీ)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, ఖాళీ);
 	    vim_free(w);
 	}
     }
-    else
+    లేకపోతే
     {
 	fprintf(stderr, "%s", str);
     }
@@ -3605,22 +3605,22 @@ mch_errmsg_c(char *str)
  * yet.  When stderr can't be used, collect error messages until the GUI has
  * started and they can be displayed in a message box.
  */
-    void
-mch_errmsg(char *str)
+    శూన్య
+mch_errmsg(అక్షరం *str)
 {
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
-    int		len;
+# ఒకవేళ !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+    పూర్ణాంకం		len;
 # endif
 
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# ఒకవేళ (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stderr if it's a tty.
     // When not going to start the GUI also use stderr.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    ఒకవేళ (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   లేకపోతే
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3628,50 +3628,50 @@ mch_errmsg(char *str)
 #   endif
 #  endif
 #  ifdef FEAT_GUI
-	    !(gui.in_use || gui.starting)
+	    !(gui.లోపల_use || gui.starting)
 #  endif
 	    )
     {
 	fprintf(stderr, "%s", str);
-	return;
+	తిరిగి;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    ఒకవేళ (!(gui.లోపల_use || gui.starting))
 #  endif
     {
 	mch_errmsg_c(str);
-	return;
+	తిరిగి;
     }
 # endif
 
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# ఒకవేళ !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     // avoid a delay for a message that isn't there
     emsg_on_display = FALSE;
 
-    len = (int)STRLEN(str) + 1;
-    if (error_ga.ga_growsize == 0)
+    len = (పూర్ణాంకం)STRLEN(str) + 1;
+    ఒకవేళ (error_ga.ga_growsize == 0)
     {
 	error_ga.ga_growsize = 80;
 	error_ga.ga_itemsize = 1;
     }
-    if (ga_grow(&error_ga, len) == OK)
+    ఒకవేళ (ga_grow(&error_ga, len) == OK)
     {
-	mch_memmove((char_u *)error_ga.ga_data + error_ga.ga_len,
+	mch_memmove((char_u *)error_ga.ga_దత్తాంశం + error_ga.ga_len,
 							  (char_u *)str, len);
 #  ifdef UNIX
 	// remove CR characters, they are displayed
 	{
 	    char_u	*p;
 
-	    p = (char_u *)error_ga.ga_data + error_ga.ga_len;
-	    for (;;)
+	    p = (char_u *)error_ga.ga_దత్తాంశం + error_ga.ga_len;
+	    కొరకు (;;)
 	    {
 		p = vim_strchr(p, '\r');
-		if (p == NULL)
-		    break;
+		ఒకవేళ (p == ఖాళీ)
+		    ఆపు;
 		*p = ' ';
 	    }
 	}
@@ -3682,29 +3682,29 @@ mch_errmsg(char *str)
 # endif
 }
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_msg_c(char *str)
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    స్థిర శూన్య
+mch_సందేశం_c(అక్షరం *str)
 {
     DWORD   nwrite = 0;
-    DWORD   mode;
+    DWORD   బహుళకం;
     HANDLE  h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    ఒకవేళ (Get_Console_బహుళకం(h, &బహుళకం) && enc_codepage >= 0
+	    && (పూర్ణాంకం)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
-	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
+	పూర్ణాంకం	len = (పూర్ణాంకం)STRLEN(str);
+	WCHAR	*w = enc_గమ్యం_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	ఒకవేళ (w != ఖాళీ)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, ఖాళీ);
 	    vim_free(w);
 	}
     }
-    else
+    లేకపోతే
     {
-	printf("%s", str);
+	రాయి("%s", str);
     }
 }
 # endif
@@ -3714,19 +3714,19 @@ mch_msg_c(char *str)
  * When there is no tty, collect messages until the GUI has started and they
  * can be displayed in a message box.
  */
-    void
-mch_msg(char *str)
+    శూన్య
+mch_సందేశం(అక్షరం *str)
 {
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# ఒకవేళ (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stdout if we have a tty.  This allows "vim -h | more" and
     // uses mch_errmsg() when started from the desktop.
     // When not going to start the GUI also use stdout.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    ఒకవేళ (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   లేకపోతే
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3734,109 +3734,109 @@ mch_msg(char *str)
 #   endif
 #  endif
 #  ifdef FEAT_GUI
-	    !(gui.in_use || gui.starting)
+	    !(gui.లోపల_use || gui.starting)
 #  endif
 	    )
     {
-	printf("%s", str);
-	return;
+	రాయి("%s", str);
+	తిరిగి;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    ఒకవేళ (!(gui.లోపల_use || gui.starting))
 #  endif
     {
-	mch_msg_c(str);
-	return;
+	mch_సందేశం_c(str);
+	తిరిగి;
     }
 # endif
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# ఒకవేళ !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     mch_errmsg(str);
 # endif
 }
-#endif // USE_MCH_ERRMSG
+#అయితే_ముగింపు // USE_MCH_ERRMSG
 
 /*
  * Put a character on the screen at the current message position and advance
  * to the next position.  Only for printable ASCII!
  */
-    static void
-msg_screen_putchar(int c, int attr)
+    స్థిర శూన్య
+సందేశం_screen_putchar(పూర్ణాంకం c, పూర్ణాంకం attr)
 {
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_putchar(c, msg_row, cmdline_col_off + msg_col, attr);
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    సందేశం_didout = TRUE;		// remember that line is not empty
+    screen_putchar(c, సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు, attr);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (cmdmsg_rl)
     {
-	if (--msg_col == 0)
+	ఒకవేళ (--సందేశం_నిలువు == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    సందేశం_నిలువు = cmdline_వెడల్పు;
+	    ++సందేశం_అడ్డువరుస;
 	}
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	if (++msg_col >= cmdline_width)
+	ఒకవేళ (++సందేశం_నిలువు >= cmdline_వెడల్పు)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    సందేశం_నిలువు = 0;
+	    ++సందేశం_అడ్డువరుస;
 	}
     }
 }
 
-    static void
-msg_moremsg(int full)
+    స్థిర శూన్య
+సందేశం_moremsg(పూర్ణాంకం నిండిన)
 {
-    int		attr;
+    పూర్ణాంకం		attr;
     char_u	*s = (char_u *)_("-- More --");
 
     attr = HL_ATTR(HLF_M);
-    screen_puts(s, (int)Rows - 1, cmdline_col_off, attr);
-    if (full)
+    screen_puts(s, (పూర్ణాంకం)అడ్డువరుసలు - 1, cmdline_నిలువు_off, attr);
+    ఒకవేళ (నిండిన)
 	screen_puts((char_u *)
 		_(" SPACE/d/j: screen/page/line down, b/u/k: up, q: quit "),
-		(int)Rows - 1, cmdline_col_off + vim_strsize(s), attr);
+		(పూర్ణాంకం)అడ్డువరుసలు - 1, cmdline_నిలువు_off + vim_strsize(s), attr);
 }
 
 /*
  * Repeat the message for the current mode: MODE_ASKMORE, MODE_EXTERNCMD,
  * MODE_CONFIRM or exmode_active.
  */
-    void
-repeat_message(void)
+    శూన్య
+repeat_సందేశం(శూన్య)
 {
-    if (State == MODE_ASKMORE)
+    ఒకవేళ (State == బహుళకం_ASKMORE)
     {
-	msg_moremsg(TRUE);	// display --more-- message again
-	msg_row = Rows - 1;
+	సందేశం_moremsg(TRUE);	// display --more-- message again
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
     }
-#ifdef FEAT_CON_DIALOG
-    else if (State == MODE_CONFIRM)
+#నిర్వచితమైతే FEAT_CON_DIALOG
+    లేకపోతే ఒకవేళ (State == బహుళకం_CONFIRM)
     {
-	display_confirm_msg();	// display ":confirm" message again
-	msg_row = Rows - 1;
+	display_confirm_సందేశం();	// display ":confirm" message again
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
     }
-#endif
-    else if (State == MODE_EXTERNCMD)
+#అయితే_ముగింపు
+    లేకపోతే ఒకవేళ (State == బహుళకం_EXTERNCMD)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col); // put cursor back
+	windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు); // put cursor back
     }
-    else if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    లేకపోతే ఒకవేళ (State == బహుళకం_HITRETURN || State == బహుళకం_SETWSIZE)
     {
-	if (msg_row == Rows - 1)
+	ఒకవేళ (సందేశం_అడ్డువరుస == అడ్డువరుసలు - 1)
 	{
 	    // Avoid drawing the "hit-enter" prompt below the previous one,
 	    // overwrite it.  Esp. useful when regaining focus and a
 	    // FocusGained autocmd exists but didn't draw anything.
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    msg_clr_eos();
+	    సందేశం_didout = FALSE;
+	    సందేశం_నిలువు = 0;
+	    సందేశం_clr_eos();
 	}
-	hit_return_msg();
-	msg_row = Rows - 1;
+	తగిలింది_return_సందేశం();
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
     }
 }
 
@@ -3846,28 +3846,28 @@ repeat_message(void)
  * While starting the GUI the terminal codes will be set for the GUI, but the
  * output goes to the terminal.  Don't use the terminal codes then.
  */
-    static int
-msg_check_screen(void)
+    స్థిర పూర్ణాంకం
+సందేశం_check_screen(శూన్య)
 {
-    if (!full_screen || !screen_valid(FALSE))
-	return FALSE;
+    ఒకవేళ (!నిండిన_screen || !screen_valid(FALSE))
+	తిరిగి FALSE;
 
-    if (msg_row >= Rows)
-	msg_row = Rows - 1;
-    if (msg_col >= cmdline_width)
-	msg_col = cmdline_width - 1;
-    return TRUE;
+    ఒకవేళ (సందేశం_అడ్డువరుస >= అడ్డువరుసలు)
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
+    ఒకవేళ (సందేశం_నిలువు >= cmdline_వెడల్పు)
+	సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+    తిరిగి TRUE;
 }
 
 /*
  * Clear from current message position to end of screen.
  * Skip this when ":silent" was used, no need to clear for redirection.
  */
-    void
-msg_clr_eos(void)
+    శూన్య
+సందేశం_clr_eos(శూన్య)
 {
-    if (msg_silent == 0)
-	msg_clr_eos_force();
+    ఒకవేళ (సందేశం_silent == 0)
+	సందేశం_clr_eos_force();
 }
 
 /*
@@ -3875,48 +3875,48 @@ msg_clr_eos(void)
  * Note: msg_col is not updated, so we remember the end of the message
  * for msg_check().
  */
-    void
-msg_clr_eos_force(void)
+    శూన్య
+సందేశం_clr_eos_force(శూన్య)
 {
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;  // messages go into a popup
-#endif
-    if (msg_use_printf())
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+    ఒకవేళ (లోపల_echowindow)
+	తిరిగి;  // messages go into a popup
+#అయితే_ముగింపు
+    ఒకవేళ (సందేశం_use_printf())
     {
-	if (full_screen)	// only when termcap codes are valid
+	ఒకవేళ (నిండిన_screen)	// only when termcap codes are valid
 	{
-	    if (*T_CD)
-		out_str(T_CD);	// clear to end of display
-	    else if (*T_CE)
-		out_str(T_CE);	// clear to end of line
+	    ఒకవేళ (*T_CD)
+		బహిర్గతం_str(T_CD);	// clear to end of display
+	    లేకపోతే ఒకవేళ (*T_CE)
+		బహిర్గతం_str(T_CE);	// clear to end of line
 	}
     }
-    else
+    లేకపోతే
     {
-	int msg_attr;
+	పూర్ణాంకం సందేశం_attr;
 
-	msg_attr = HL_ATTR(HLF_MSG);
+	సందేశం_attr = HL_ATTR(HLF_సందేశం);
 
-#ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (cmdmsg_rl)
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off, cmdline_col_off + msg_col + 1,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
-		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+	    screen_fill(సందేశం_అడ్డువరుస, సందేశం_అడ్డువరుస + 1,
+		    cmdline_నిలువు_off, cmdline_నిలువు_off + సందేశం_నిలువు + 1,
+		    ' ', ' ', సందేశం_attr);
+	    screen_fill(సందేశం_అడ్డువరుస + 1, (పూర్ణాంకం)అడ్డువరుసలు,
+		    cmdline_నిలువు_off, cmdline_నిలువు_off + cmdline_వెడల్పు,
+		    ' ', ' ', సందేశం_attr);
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
-		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+	    screen_fill(సందేశం_అడ్డువరుస, సందేశం_అడ్డువరుస + 1,
+		    cmdline_నిలువు_off + సందేశం_నిలువు, cmdline_నిలువు_off + cmdline_వెడల్పు,
+		    ' ', ' ', సందేశం_attr);
+	    screen_fill(సందేశం_అడ్డువరుస + 1, (పూర్ణాంకం)అడ్డువరుసలు,
+		    cmdline_నిలువు_off, cmdline_నిలువు_off + cmdline_వెడల్పు,
+		    ' ', ' ', సందేశం_attr);
 	}
     }
 }
@@ -3924,12 +3924,12 @@ msg_clr_eos_force(void)
 /*
  * Clear the command line.
  */
-    void
-msg_clr_cmdline(void)
+    శూన్య
+సందేశం_clr_cmdline(శూన్య)
 {
-    msg_row = cmdline_row;
-    msg_col = 0;
-    msg_clr_eos_force();
+    సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;
+    సందేశం_నిలువు = 0;
+    సందేశం_clr_eos_force();
 }
 
 /*
@@ -3937,8 +3937,8 @@ msg_clr_cmdline(void)
  * call wait_return() if the message does not fit in the available space
  * return TRUE if wait_return() not called.
  */
-    int
-msg_end(void)
+    పూర్ణాంకం
+సందేశం_చివర(శూన్య)
 {
     /*
      * If the string is larger than the window,
@@ -3946,26 +3946,26 @@ msg_end(void)
      * we have to redraw the window.
      * Do not do this if we are abandoning the file or editing the command line.
      */
-    if (!exiting && need_wait_return && !(State & MODE_CMDLINE))
+    ఒకవేళ (!exiting && need_wait_return && !(State & బహుళకం_CMDLINE))
     {
 	wait_return(FALSE);
-	return FALSE;
+	తిరిగి FALSE;
     }
-    out_flush();
-    return TRUE;
+    బహిర్గతం_flush();
+    తిరిగి TRUE;
 }
 
 /*
  * If the written message runs into the shown command or ruler, we have to
  * wait for hit-return and redraw the window later.
  */
-    void
-msg_check(void)
+    శూన్య
+సందేశం_check(శూన్య)
 {
-    if (msg_row == Rows - 1 && msg_col >= sc_col
-#ifdef HAS_MESSAGE_WINDOW
-		&& !in_echowindow
-#endif
+    ఒకవేళ (సందేశం_అడ్డువరుస == అడ్డువరుసలు - 1 && సందేశం_నిలువు >= sc_నిలువు
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+		&& !లోపల_echowindow
+#అయితే_ముగింపు
 	    )
     {
 	need_wait_return = TRUE;
@@ -3977,84 +3977,84 @@ msg_check(void)
  * May write a string to the redirection file.
  * When "maxlen" is -1 write the whole string, otherwise up to "maxlen" bytes.
  */
-    static void
-redir_write(char_u *str, int maxlen)
+    స్థిర శూన్య
+redir_write(char_u *str, పూర్ణాంకం maxlen)
 {
     char_u	*s = str;
-    static int	cur_col = 0;
+    స్థిర పూర్ణాంకం	cur_నిలువు = 0;
 
     // Don't do anything for displaying prompts and the like.
-    if (redir_off)
-	return;
+    ఒకవేళ (redir_off)
+	తిరిగి;
 
     // If 'verbosefile' is set prepare for writing in that file.
-    if (*p_vfile != NUL && verbose_fd == NULL)
+    ఒకవేళ (*p_vfile != NUL && verbose_fd == ఖాళీ)
 	verbose_open();
 
-    if (redirecting())
+    ఒకవేళ (redirecting())
     {
 	// If the string doesn't start with CR or NL, go to msg_col
-	if (*s != '\n' && *s != '\r')
+	ఒకవేళ (*s != '\n' && *s != '\r')
 	{
-	    while (cur_col < msg_col)
+	    అయితే (cur_నిలువు < సందేశం_నిలువు)
 	    {
-#ifdef FEAT_EVAL
-		if (redir_execute)
+#నిర్వచితమైతే FEAT_EVAL
+		ఒకవేళ (redir_execute)
 		    execute_redir_str((char_u *)" ", -1);
-		else if (redir_reg)
+		లేకపోతే ఒకవేళ (redir_reg)
 		    write_reg_contents(redir_reg, (char_u *)" ", -1, TRUE);
-		else if (redir_vname)
+		లేకపోతే ఒకవేళ (redir_vname)
 		    var_redir_str((char_u *)" ", -1);
-		else
-#endif
-		    if (redir_fd != NULL)
+		లేకపోతే
+#అయితే_ముగింపు
+		    ఒకవేళ (redir_fd != ఖాళీ)
 		    fputs(" ", redir_fd);
-		if (verbose_fd != NULL)
+		ఒకవేళ (verbose_fd != ఖాళీ)
 		    fputs(" ", verbose_fd);
-		++cur_col;
+		++cur_నిలువు;
 	    }
 	}
 
-#ifdef FEAT_EVAL
-	if (redir_execute)
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (redir_execute)
 	    execute_redir_str(s, maxlen);
-	else if (redir_reg)
+	లేకపోతే ఒకవేళ (redir_reg)
 	    write_reg_contents(redir_reg, s, maxlen, TRUE);
-	else if (redir_vname)
+	లేకపోతే ఒకవేళ (redir_vname)
 	    var_redir_str(s, maxlen);
-#endif
+#అయితే_ముగింపు
 
 	// Write and adjust the current column.
-	while (*s != NUL && (maxlen < 0 || (int)(s - str) < maxlen))
+	అయితే (*s != NUL && (maxlen < 0 || (పూర్ణాంకం)(s - str) < maxlen))
 	{
-#ifdef FEAT_EVAL
-	    if (!redir_reg && !redir_vname && !redir_execute)
-#endif
-		if (redir_fd != NULL)
+#నిర్వచితమైతే FEAT_EVAL
+	    ఒకవేళ (!redir_reg && !redir_vname && !redir_execute)
+#అయితే_ముగింపు
+		ఒకవేళ (redir_fd != ఖాళీ)
 		    putc(*s, redir_fd);
-	    if (verbose_fd != NULL)
+	    ఒకవేళ (verbose_fd != ఖాళీ)
 		putc(*s, verbose_fd);
-	    if (*s == '\r' || *s == '\n')
-		cur_col = 0;
-	    else if (*s == '\t')
-		cur_col += (8 - cur_col % 8);
-	    else
-		++cur_col;
+	    ఒకవేళ (*s == '\r' || *s == '\n')
+		cur_నిలువు = 0;
+	    లేకపోతే ఒకవేళ (*s == '\t')
+		cur_నిలువు += (8 - cur_నిలువు % 8);
+	    లేకపోతే
+		++cur_నిలువు;
 	    ++s;
 	}
 
-	if (msg_silent != 0)	// should update msg_col
-	    msg_col = cur_col;
+	ఒకవేళ (సందేశం_silent != 0)	// should update msg_col
+	    సందేశం_నిలువు = cur_నిలువు;
     }
 }
 
-    int
-redirecting(void)
+    పూర్ణాంకం
+redirecting(శూన్య)
 {
-    return redir_fd != NULL || *p_vfile != NUL
-#ifdef FEAT_EVAL
+    తిరిగి redir_fd != ఖాళీ || *p_vfile != NUL
+#నిర్వచితమైతే FEAT_EVAL
 			  || redir_reg || redir_vname || redir_execute
-#endif
+#అయితే_ముగింపు
 				       ;
 }
 
@@ -4062,63 +4062,63 @@ redirecting(void)
  * Before giving verbose message.
  * Must always be called paired with verbose_leave()!
  */
-    void
-verbose_enter(void)
+    శూన్య
+verbose_enter(శూన్య)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
+    ఒకవేళ (*p_vfile != NUL)
+	++సందేశం_silent;
 }
 
 /*
  * After giving verbose message.
  * Must always be called paired with verbose_enter()!
  */
-    void
-verbose_leave(void)
+    శూన్య
+verbose_leave(శూన్య)
 {
-    if (*p_vfile != NUL)
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+    ఒకవేళ (*p_vfile != NUL)
+	ఒకవేళ (--సందేశం_silent < 0)
+	    సందేశం_silent = 0;
 }
 
 /*
  * Like verbose_enter() and set msg_scroll when displaying the message.
  */
-    void
-verbose_enter_scroll(void)
+    శూన్య
+verbose_enter_scroll(శూన్య)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
-    else
+    ఒకవేళ (*p_vfile != NUL)
+	++సందేశం_silent;
+    లేకపోతే
 	// always scroll up, don't overwrite
-	msg_scroll = TRUE;
+	సందేశం_scroll = TRUE;
 }
 
 /*
  * Like verbose_leave() and set cmdline_row when displaying the message.
  */
-    void
-verbose_leave_scroll(void)
+    శూన్య
+verbose_leave_scroll(శూన్య)
 {
-    if (*p_vfile != NUL)
+    ఒకవేళ (*p_vfile != NUL)
     {
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+	ఒకవేళ (--సందేశం_silent < 0)
+	    సందేశం_silent = 0;
     }
-    else
-	cmdline_row = msg_row;
+    లేకపోతే
+	cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 }
 
 /*
  * Called when 'verbosefile' is set: stop writing to the file.
  */
-    void
-verbose_stop(void)
+    శూన్య
+verbose_stop(శూన్య)
 {
-    if (verbose_fd != NULL)
+    ఒకవేళ (verbose_fd != ఖాళీ)
     {
 	fclose(verbose_fd);
-	verbose_fd = NULL;
+	verbose_fd = ఖాళీ;
     }
     verbose_did_open = FALSE;
 }
@@ -4127,133 +4127,133 @@ verbose_stop(void)
  * Open the file 'verbosefile'.
  * Return FAIL or OK.
  */
-    int
-verbose_open(void)
+    పూర్ణాంకం
+verbose_open(శూన్య)
 {
-    if (verbose_fd == NULL && !verbose_did_open)
+    ఒకవేళ (verbose_fd == ఖాళీ && !verbose_did_open)
     {
 	// Only give the error message once.
 	verbose_did_open = TRUE;
 
-	verbose_fd = mch_fopen((char *)p_vfile, "a");
-	if (verbose_fd == NULL)
+	verbose_fd = mch_fopen((అక్షరం *)p_vfile, "a");
+	ఒకవేళ (verbose_fd == ఖాళీ)
 	{
 	    semsg(_(e_cant_open_file_str), p_vfile);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Give a warning message (for searching).
  * Use 'w' highlighting and may repeat the message after redrawing
  */
-    void
-give_warning(char_u *message, int hl)
+    శూన్య
+give_warning(char_u *సందేశం_2, పూర్ణాంకం hl)
 {
-    give_warning_with_source(message, hl, FALSE);
+    give_warning_with_ఆధారం(సందేశం_2, hl, FALSE);
 }
 
-    void
-give_warning_with_source(char_u *message, int hl, int with_source)
+    శూన్య
+give_warning_with_ఆధారం(char_u *సందేశం_2, పూర్ణాంకం hl, పూర్ణాంకం with_ఆధారం)
 {
     // Don't do this for ":silent".
-    if (msg_silent != 0)
-	return;
+    ఒకవేళ (సందేశం_silent != 0)
+	తిరిగి;
 
     // Don't want a hit-enter prompt here.
     ++no_wait_return;
 
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_WARNINGMSG, message, -1);
-#endif
-    VIM_CLEAR(keep_msg);
-    if (hl)
-	keep_msg_attr = HL_ATTR(HLF_W);
-    else
-	keep_msg_attr = 0;
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_string(VV_WARNINGMSG, సందేశం_2, -1);
+#అయితే_ముగింపు
+    VIM_CLEAR(keep_సందేశం);
+    ఒకవేళ (hl)
+	keep_సందేశం_attr = HL_ATTR(HLF_W);
+    లేకపోతే
+	keep_సందేశం_attr = 0;
 
-    if (with_source)
+    ఒకవేళ (with_ఆధారం)
     {
 	// Do what msg() does, but with a column offset if the warning should
 	// be after the mode message.
-	msg_start();
-	msg_source(HL_ATTR(HLF_W));
-	msg_puts(" ");
-	msg_puts_attr((char *)message, HL_ATTR(HLF_W) | MSG_HIST);
-	msg_clr_eos();
-	(void)msg_end();
+	సందేశం_ప్రారంభం();
+	సందేశం_ఆధారం(HL_ATTR(HLF_W));
+	సందేశం_puts(" ");
+	సందేశం_puts_attr((అక్షరం *)సందేశం_2, HL_ATTR(HLF_W) | సందేశం_HIST);
+	సందేశం_clr_eos();
+	(శూన్య)సందేశం_చివర();
     }
-    else if (msg_attr((char *)message, keep_msg_attr) && msg_scrolled == 0)
-	set_keep_msg(message, keep_msg_attr);
+    లేకపోతే ఒకవేళ (సందేశం_attr((అక్షరం *)సందేశం_2, keep_సందేశం_attr) && సందేశం_scrolled == 0)
+	సమితి_keep_సందేశం(సందేశం_2, keep_సందేశం_attr);
 
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
+    సందేశం_didout = FALSE;	    // overwrite this message
+    సందేశం_nowait = TRUE;	    // don't wait for this message
+    సందేశం_నిలువు = 0;
 
     --no_wait_return;
 }
 
-#if defined(FEAT_EVAL)
-    void
-give_warning2(char_u *message, char_u *a1, int hl)
+#ఒకవేళ defined(FEAT_EVAL)
+    శూన్య
+give_warning2(char_u *సందేశం_2, char_u *a1, పూర్ణాంకం hl)
 {
-    if (IObuff == NULL)
+    ఒకవేళ (IObuff == ఖాళీ)
     {
 	// Very early in initialisation and already something wrong, just give
 	// the raw message so the user at least gets a hint.
-	give_warning(message, hl);
+	give_warning(సందేశం_2, hl);
     }
-    else
+    లేకపోతే
     {
-	vim_snprintf((char *)IObuff, IOSIZE, (char *)message, a1);
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, (అక్షరం *)సందేశం_2, a1);
 	give_warning(IObuff, hl);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Advance msg cursor to column "col".
  */
-    void
-msg_advance(int col)
+    శూన్య
+సందేశం_advance(పూర్ణాంకం నిలువు)
 {
-    if (msg_silent != 0)	// nothing to advance to
+    ఒకవేళ (సందేశం_silent != 0)	// nothing to advance to
     {
-	msg_col = col;		// for redirection, may fill it up later
-	return;
+	సందేశం_నిలువు = నిలువు;		// for redirection, may fill it up later
+	తిరిగి;
     }
-    if (col >= cmdline_width)	// not enough room
-	col = cmdline_width - 1;
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
-	while (msg_col > cmdline_width - col)
-	    msg_putchar(' ');
-    else
-#endif
-	while (msg_col < col)
-	    msg_putchar(' ');
+    ఒకవేళ (నిలువు >= cmdline_వెడల్పు)	// not enough room
+	నిలువు = cmdline_వెడల్పు - 1;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (cmdmsg_rl)
+	అయితే (సందేశం_నిలువు > cmdline_వెడల్పు - నిలువు)
+	    సందేశం_putchar(' ');
+    లేకపోతే
+#అయితే_ముగింపు
+	అయితే (సందేశం_నిలువు < నిలువు)
+	    సందేశం_putchar(' ');
 }
 
 /*
  * Warn about missing Clipboard Support
  */
-    void
-msg_warn_missing_clipboard(void)
+    శూన్య
+సందేశం_warn_missing_clipboard(శూన్య)
 {
-    if (!global_busy && !did_warn_clipboard && silence_w23_w24_msg == 0)
+    ఒకవేళ (!global_busy && !did_warn_clipboard && silence_w23_w24_సందేశం == 0)
     {
-#ifdef FEAT_CLIPBOARD
-	msg(_("W23: Clipboard register not available, using register 0"));
-#else
-	msg(_("W24: Clipboard register not available. See :h W24"));
-#endif
+#నిర్వచితమైతే FEAT_CLIPBOARD
+	సందేశం(_("W23: Clipboard register not available, using register 0"));
+#లేకపోతే
+	సందేశం(_("W24: Clipboard register not available. See :h W24"));
+#అయితే_ముగింపు
 	did_warn_clipboard = TRUE;
     }
 }
 
-#if defined(FEAT_CON_DIALOG)
+#ఒకవేళ defined(FEAT_CON_DIALOG)
 /*
  * Used for "confirm()" function, and the :confirm command prefix.
  * Versions which haven't got flexible dialogs yet, and console
@@ -4274,57 +4274,57 @@ msg_warn_missing_clipboard(void)
  *
  * Returns 0 if cancelled, otherwise the nth button (1-indexed).
  */
-    int
+    పూర్ణాంకం
 do_dialog(
-    int		type UNUSED,
-    char_u	*title UNUSED,
-    char_u	*message,
+    పూర్ణాంకం		type వాడని,
+    char_u	*title వాడని,
+    char_u	*సందేశం_2,
     char_u	*buttons,
-    int		dfltbutton,
-    char_u	*textfield UNUSED,	// IObuff for inputdialog(), NULL
+    పూర్ణాంకం		dfltbutton,
+    char_u	*textfield వాడని,	// IObuff for inputdialog(), NULL
 					// otherwise
-    int		ex_cmd)	    // when TRUE pressing : accepts default and starts
+    పూర్ణాంకం		ex_cmd)	    // when TRUE pressing : accepts default and starts
 			    // Ex command
 {
-    int		oldState;
-    int		retval = 0;
+    పూర్ణాంకం		oldState;
+    పూర్ణాంకం		retval = 0;
     char_u	*hotkeys;
-    int		c;
-    int		i;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		i;
     tmode_T	save_tmode;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
-    if (silent_mode)
-	return dfltbutton;   // return default option
+    ఒకవేళ (silent_బహుళకం)
+	తిరిగి dfltbutton;   // return default option
 # endif
 
 # ifdef FEAT_GUI_DIALOG
     // When GUI is running and 'c' not in 'guioptions', use the GUI dialog
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    ఒకవేళ (gui.లోపల_use && vim_strchr(p_go, GO_CONDIALOG) == ఖాళీ)
     {
 	// --gui-dialog-file: write text to a file
-	if (gui_dialog_log(title, message))
+	ఒకవేళ (gui_dialog_log(title, సందేశం_2))
 	    c = dfltbutton;
-	else
-	    c = gui_mch_dialog(type, title, message, buttons, dfltbutton,
+	లేకపోతే
+	    c = gui_mch_dialog(type, title, సందేశం_2, buttons, dfltbutton,
 							   textfield, ex_cmd);
 	// avoid a hit-enter prompt without clearing the cmdline
 	need_wait_return = FALSE;
 	emsg_on_display = FALSE;
-	cmdline_row = msg_row;
+	cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 
 	// Flush output to avoid that further messages and redrawing is done
 	// in the wrong order.
-	out_flush();
+	బహిర్గతం_flush();
 	gui_mch_update();
 
-	return c;
+	తిరిగి c;
     }
 # endif
 
     oldState = State;
-    State = MODE_CONFIRM;
+    State = బహుళకం_CONFIRM;
     setmouse();
 
     // Ensure raw mode here.
@@ -4336,56 +4336,56 @@ do_dialog(
      * user press RETURN as well afterwards.
      */
     ++no_wait_return;
-    hotkeys = msg_show_console_dialog(message, buttons, dfltbutton);
+    hotkeys = సందేశం_show_console_dialog(సందేశం_2, buttons, dfltbutton);
 
-    if (hotkeys != NULL)
+    ఒకవేళ (hotkeys != ఖాళీ)
     {
-	for (;;)
+	కొరకు (;;)
 	{
 	    // Get a typed character directly from the user.
 	    c = get_keystroke();
-	    switch (c)
+	    ఎంపిక (c)
 	    {
-	    case CAR:		// User accepts default option
-	    case NL:
+	    స్థితి CAR:		// User accepts default option
+	    స్థితి NL:
 		retval = dfltbutton;
-		break;
-	    case Ctrl_C:	// User aborts/cancels
-	    case ESC:
+		ఆపు;
+	    స్థితి Ctrl_C:	// User aborts/cancels
+	    స్థితి ESC:
 		retval = 0;
-		break;
-	    default:		// Could be a hotkey?
-		if (c < 0)	// special keys are ignored here
-		    continue;
-		if (c == ':' && ex_cmd)
+		ఆపు;
+	    అప్రమేయ:		// Could be a hotkey?
+		ఒకవేళ (c < 0)	// special keys are ignored here
+		    కొనసాగు;
+		ఒకవేళ (c == ':' && ex_cmd)
 		{
 		    retval = dfltbutton;
 		    ins_char_typebuf(':', 0);
-		    break;
+		    ఆపు;
 		}
 
 		// Make the character lowercase, as chars in "hotkeys" are.
 		c = MB_TOLOWER(c);
 		retval = 1;
-		for (i = 0; hotkeys[i]; ++i)
+		కొరకు (i = 0; hotkeys[i]; ++i)
 		{
-		    if (has_mbyte)
+		    ఒకవేళ (has_mbyte)
 		    {
-			if ((*mb_ptr2char)(hotkeys + i) == c)
-			    break;
+			ఒకవేళ ((*mb_ptr2char)(hotkeys + i) == c)
+			    ఆపు;
 			i += (*mb_ptr2len)(hotkeys + i) - 1;
 		    }
-		    else
-			if (hotkeys[i] == c)
-			    break;
+		    లేకపోతే
+			ఒకవేళ (hotkeys[i] == c)
+			    ఆపు;
 		    ++retval;
 		}
-		if (hotkeys[i])
-		    break;
+		ఒకవేళ (hotkeys[i])
+		    ఆపు;
 		// No hotkey match, so keep waiting
-		continue;
+		కొనసాగు;
 	    }
-	    break;
+	    ఆపు;
 	}
 
 	vim_free(hotkeys);
@@ -4395,45 +4395,45 @@ do_dialog(
     State = oldState;
     setmouse();
     --no_wait_return;
-    msg_end_prompt();
+    సందేశం_చివర_prompt();
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Copy one character from "*from" to "*to", taking care of multi-byte
  * characters.  Return the length of the character in bytes.
  */
-    static int
+    స్థిర పూర్ణాంకం
 copy_char(
     char_u	*from,
-    char_u	*to,
-    int		lowercase)	// make character lower case
+    char_u	*గమ్యం,
+    పూర్ణాంకం		lowercase)	// make character lower case
 {
-    int		len;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	if (lowercase)
+	ఒకవేళ (lowercase)
 	{
 	    c = MB_TOLOWER((*mb_ptr2char)(from));
-	    return (*mb_char2bytes)(c, to);
+	    తిరిగి (*mb_char2bytes)(c, గమ్యం);
 	}
-	else
+	లేకపోతే
 	{
 	    len = (*mb_ptr2len)(from);
-	    mch_memmove(to, from, (size_t)len);
-	    return len;
+	    mch_memmove(గమ్యం, from, (size_t)len);
+	    తిరిగి len;
 	}
     }
-    else
+    లేకపోతే
     {
-	if (lowercase)
-	    *to = (char_u)TOLOWER_LOC(*from);
-	else
-	    *to = *from;
-	return 1;
+	ఒకవేళ (lowercase)
+	    *గమ్యం = (char_u)TOLOWER_LOC(*from);
+	లేకపోతే
+	    *గమ్యం = *from;
+	తిరిగి 1;
     }
 }
 
@@ -4446,24 +4446,24 @@ copy_char(
  *
  * Returns an allocated string with hotkeys, or NULL for error.
  */
-    static char_u *
-msg_show_console_dialog(
-    char_u	*message,
+    స్థిర char_u *
+సందేశం_show_console_dialog(
+    char_u	*సందేశం_2,
     char_u	*buttons,
-    int		dfltbutton)
+    పూర్ణాంకం		dfltbutton)
 {
-    int		len = 0;
+    పూర్ణాంకం		len = 0;
 # define HOTK_LEN (has_mbyte ? MB_MAXBYTES : 1)
-    int		lenhotkey = HOTK_LEN;	// count first button
-    char_u	*hotk = NULL;
-    char_u	*msgp = NULL;
-    char_u	*hotkp = NULL;
+    పూర్ణాంకం		lenhotkey = HOTK_LEN;	// count first button
+    char_u	*hotk = ఖాళీ;
+    char_u	*msgp = ఖాళీ;
+    char_u	*hotkp = ఖాళీ;
     char_u	*r;
-    int		copy;
+    పూర్ణాంకం		copy;
 # define HAS_HOTKEY_LEN 30
     char_u	has_hotkey[HAS_HOTKEY_LEN];
-    int		first_hotkey = FALSE;	// first char of button is hotkey
-    int		idx;
+    పూర్ణాంకం		మొదటి_hotkey = FALSE;	// first char of button is hotkey
+    పూర్ణాంకం		idx;
 
     has_hotkey[0] = FALSE;
 
@@ -4471,50 +4471,50 @@ msg_show_console_dialog(
      * First loop: compute the size of memory to allocate.
      * Second loop: copy to the allocated memory.
      */
-    for (copy = 0; copy <= 1; ++copy)
+    కొరకు (copy = 0; copy <= 1; ++copy)
     {
 	r = buttons;
 	idx = 0;
-	while (*r)
+	అయితే (*r)
 	{
-	    if (*r == DLG_BUTTON_SEP)
+	    ఒకవేళ (*r == DLG_BUTTON_SEP)
 	    {
-		if (copy)
+		ఒకవేళ (copy)
 		{
 		    *msgp++ = ',';
 		    *msgp++ = ' ';	    // '\n' -> ', '
 
 		    // advance to next hotkey and set default hotkey
-		    if (has_mbyte)
+		    ఒకవేళ (has_mbyte)
 			hotkp += STRLEN(hotkp);
-		    else
+		    లేకపోతే
 			++hotkp;
 		    hotkp[copy_char(r + 1, hotkp, TRUE)] = NUL;
-		    if (dfltbutton)
+		    ఒకవేళ (dfltbutton)
 			--dfltbutton;
 
 		    // If no hotkey is specified first char is used.
-		    if (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
-			first_hotkey = TRUE;
+		    ఒకవేళ (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
+			మొదటి_hotkey = TRUE;
 		}
-		else
+		లేకపోతే
 		{
 		    len += 3;		    // '\n' -> ', '; 'x' -> '(x)'
 		    lenhotkey += HOTK_LEN;  // each button needs a hotkey
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    ఒకవేళ (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[++idx] = FALSE;
 		}
 	    }
-	    else if (*r == DLG_HOTKEY_CHAR || first_hotkey)
+	    లేకపోతే ఒకవేళ (*r == DLG_HOTKEY_CHAR || మొదటి_hotkey)
 	    {
-		if (*r == DLG_HOTKEY_CHAR)
+		ఒకవేళ (*r == DLG_HOTKEY_CHAR)
 		    ++r;
-		first_hotkey = FALSE;
-		if (copy)
+		మొదటి_hotkey = FALSE;
+		ఒకవేళ (copy)
 		{
-		    if (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
+		    ఒకవేళ (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
 			*msgp++ = *r;
-		    else
+		    లేకపోతే
 		    {
 			// '&a' -> '[a]'
 			*msgp++ = (dfltbutton == 1) ? '[' : '(';
@@ -4525,17 +4525,17 @@ msg_show_console_dialog(
 			hotkp[copy_char(r, hotkp, TRUE)] = NUL;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    ++len;	    // '&a' -> '[a]'
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    ఒకవేళ (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[idx] = TRUE;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// everything else copy literally
-		if (copy)
+		ఒకవేళ (copy)
 		    msgp += copy_char(r, msgp, FALSE);
 	    }
 
@@ -4543,43 +4543,43 @@ msg_show_console_dialog(
 	    MB_PTR_ADV(r);
 	}
 
-	if (copy)
+	ఒకవేళ (copy)
 	{
 	    *msgp++ = ':';
 	    *msgp++ = ' ';
 	    *msgp = NUL;
 	}
-	else
+	లేకపోతే
 	{
-	    len += (int)(STRLEN(message)
+	    len += (పూర్ణాంకం)(STRLEN(సందేశం_2)
 			+ 2			// for the NL's
 			+ STRLEN(buttons)
 			+ 3);			// for the ": " and NUL
 	    lenhotkey++;			// for the NUL
 
 	    // If no hotkey is specified first char is used.
-	    if (!has_hotkey[0])
+	    ఒకవేళ (!has_hotkey[0])
 	    {
-		first_hotkey = TRUE;
+		మొదటి_hotkey = TRUE;
 		len += 2;		// "x" -> "[x]"
 	    }
 
 	    /*
 	     * Now allocate and load the strings
 	     */
-	    vim_free(confirm_msg);
-	    confirm_msg = alloc(len);
-	    if (confirm_msg == NULL)
-		return NULL;
-	    *confirm_msg = NUL;
+	    vim_free(confirm_సందేశం);
+	    confirm_సందేశం = alloc(len);
+	    ఒకవేళ (confirm_సందేశం == ఖాళీ)
+		తిరిగి ఖాళీ;
+	    *confirm_సందేశం = NUL;
 	    hotk = alloc(lenhotkey);
-	    if (hotk == NULL)
-		return NULL;
+	    ఒకవేళ (hotk == ఖాళీ)
+		తిరిగి ఖాళీ;
 
-	    *confirm_msg = '\n';
-	    STRCPY(confirm_msg + 1, message);
+	    *confirm_సందేశం = '\n';
+	    STRCPY(confirm_సందేశం + 1, సందేశం_2);
 
-	    msgp = confirm_msg + 1 + STRLEN(message);
+	    msgp = confirm_సందేశం + 1 + STRLEN(సందేశం_2);
 	    hotkp = hotk;
 
 	    // Define first default hotkey.  Keep the hotkey string NUL
@@ -4588,84 +4588,84 @@ msg_show_console_dialog(
 
 	    // Remember where the choices start, displaying starts here when
 	    // "hotkp" typed at the more prompt.
-	    confirm_msg_tail = msgp;
+	    confirm_సందేశం_తోక = msgp;
 	    *msgp++ = '\n';
 	}
     }
 
-    display_confirm_msg();
-    return hotk;
+    display_confirm_సందేశం();
+    తిరిగి hotk;
 }
 
 /*
  * Display the ":confirm" message.  Also called when screen resized.
  */
-    static void
-display_confirm_msg(void)
+    స్థిర శూన్య
+display_confirm_సందేశం(శూన్య)
 {
     // avoid that 'q' at the more prompt truncates the message here
-    ++confirm_msg_used;
-    if (confirm_msg != NULL)
-	msg_puts_attr((char *)confirm_msg, HL_ATTR(HLF_M));
-    --confirm_msg_used;
+    ++confirm_సందేశం_వాడిన;
+    ఒకవేళ (confirm_సందేశం != ఖాళీ)
+	సందేశం_puts_attr((అక్షరం *)confirm_సందేశం, HL_ATTR(HLF_M));
+    --confirm_సందేశం_వాడిన;
 }
 
-#endif // FEAT_CON_DIALOG
+#అయితే_ముగింపు // FEAT_CON_DIALOG
 
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 
-    int
+    పూర్ణాంకం
 vim_dialog_yesno(
-    int		type,
+    పూర్ణాంకం		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*సందేశం_2,
+    పూర్ణాంకం		dflt)
 {
-    if (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
-		message,
-		(char_u *)_("&Yes\n&No"), dflt, NULL, FALSE) == 1)
-	return VIM_YES;
-    return VIM_NO;
+    ఒకవేళ (do_dialog(type,
+		title == ఖాళీ ? (char_u *)_("Question") : title,
+		సందేశం_2,
+		(char_u *)_("&Yes\n&No"), dflt, ఖాళీ, FALSE) == 1)
+	తిరిగి VIM_YES;
+    తిరిగి VIM_NO;
 }
 
-    int
+    పూర్ణాంకం
 vim_dialog_yesnocancel(
-    int		type,
+    పూర్ణాంకం		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*సందేశం_2,
+    పూర్ణాంకం		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
-		message,
-		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, NULL, FALSE))
+    ఎంపిక (do_dialog(type,
+		title == ఖాళీ ? (char_u *)_("Question") : title,
+		సందేశం_2,
+		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, ఖాళీ, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
+	స్థితి 1: తిరిగి VIM_YES;
+	స్థితి 2: తిరిగి VIM_NO;
     }
-    return VIM_CANCEL;
+    తిరిగి VIM_CANCEL;
 }
 
-    int
+    పూర్ణాంకం
 vim_dialog_yesnoallcancel(
-    int		type,
+    పూర్ణాంకం		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*సందేశం_2,
+    పూర్ణాంకం		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)"Question" : title,
-		message,
+    ఎంపిక (do_dialog(type,
+		title == ఖాళీ ? (char_u *)"Question" : title,
+		సందేశం_2,
 		(char_u *)_("&Yes\n&No\nSave &All\n&Discard All\n&Cancel"),
-							   dflt, NULL, FALSE))
+							   dflt, ఖాళీ, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
-	case 3: return VIM_ALL;
-	case 4: return VIM_DISCARDALL;
+	స్థితి 1: తిరిగి VIM_YES;
+	స్థితి 2: తిరిగి VIM_NO;
+	స్థితి 3: తిరిగి VIM_ALL;
+	స్థితి 4: తిరిగి VIM_DISCARDALL;
     }
-    return VIM_CANCEL;
+    తిరిగి VIM_CANCEL;
 }
 
-#endif // FEAT_GUI_DIALOG || FEAT_CON_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG || FEAT_CON_DIALOG

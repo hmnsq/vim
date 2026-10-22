@@ -10,43 +10,43 @@
  * search.c: code for normal mode searching commands
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_EVAL
-static void set_vv_searchforward(void);
-static int first_submatch(regmmatch_T *rp);
-#endif
-#ifdef FEAT_FIND_ID
-static char_u *get_line_and_copy(linenr_T lnum, char_u *buf);
-static void show_pat_in_path(char_u *, int, int, int, FILE *, linenr_T *, long);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర శూన్య సమితి_vv_searchforward(శూన్య);
+స్థిర పూర్ణాంకం మొదటి_submatch(regmmatch_T *rp);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_కనుగొను_ID
+స్థిర char_u *get_పంక్తి_and_copy(linenr_T lnum, char_u *buf);
+స్థిర శూన్య show_pat_లోపల_మార్గం(char_u *, పూర్ణాంకం, పూర్ణాంకం, పూర్ణాంకం, FILE *, linenr_T *, దీర్ఘ);
+#అయితే_ముగింపు
 
-typedef struct searchstat
+రకనిర్వచనం నిర్మాణం searchstat
 {
-    int	    cur;	    // current position of found words
-    int	    cnt;	    // total count of found words
-    int	    exact_match;    // TRUE if matched exactly on specified position
-    int	    incomplete;	    // 0: search was fully completed
+    పూర్ణాంకం	    cur;	    // current position of found words
+    పూర్ణాంకం	    cnt;	    // total count of found words
+    పూర్ణాంకం	    exact_సరిపోలిక;    // TRUE if matched exactly on specified position
+    పూర్ణాంకం	    incomplete;	    // 0: search was fully completed
 			    // 1: recomputing was timed out
 			    // 2: max count exceeded
-    int	    last_maxcount;  // the max count of the last search
+    పూర్ణాంకం	    చివరి_maxcount;  // the max count of the last search
 } searchstat_T;
 
-#ifdef FEAT_SEARCH_EXTRA
-static void save_incsearch_state(void);
-static void restore_incsearch_state(void);
-#endif
-static int check_prevcol(char_u *linep, int col, int ch, int *prevcol);
-static int find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
-static void find_mps_values(int *initc, int *findc, int *backwards, int switchit);
-static int is_zero_width(char_u *pattern, size_t patternlen, int move, pos_T *cur, int direction);
-static void cmdline_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
-static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+స్థిర శూన్య save_incsearch_state(శూన్య);
+స్థిర శూన్య restore_incsearch_state(శూన్య);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం check_prevcol(char_u *linep, పూర్ణాంకం నిలువు, పూర్ణాంకం ch, పూర్ణాంకం *prevcol);
+స్థిర పూర్ణాంకం కనుగొను_rawstring_చివర(char_u *linep, pos_T *startpos, pos_T *endpos);
+స్థిర శూన్య కనుగొను_mps_విలువలు(పూర్ణాంకం *initc, పూర్ణాంకం *findc, పూర్ణాంకం *backwards, పూర్ణాంకం switchit);
+స్థిర పూర్ణాంకం is_zero_వెడల్పు(char_u *నమూనా, size_t patternlen, పూర్ణాంకం move, pos_T *cur, పూర్ణాంకం direction);
+స్థిర శూన్య cmdline_శోధన_stat(పూర్ణాంకం dirc, pos_T *pos, pos_T *cursor_pos, పూర్ణాంకం show_శిఖరం_bot_సందేశం, char_u *msgbuf, size_t msgbuflen, పూర్ణాంకం recompute, పూర్ణాంకం maxcount, దీర్ఘ timeout);
+స్థిర శూన్య update_శోధన_stat(పూర్ణాంకం dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, పూర్ణాంకం recompute, పూర్ణాంకం maxcount, దీర్ఘ timeout);
 
-#define SEARCH_STAT_DEF_TIMEOUT 40L
+#నిర్వచించు శోధన_STAT_DEF_TIMEOUT 40L
 // 'W ':  2 +
 // '[>9999/>9999]': 13 + 1 (NUL)
-#define SEARCH_STAT_BUF_LEN 16
+#నిర్వచించు శోధన_STAT_BUF_LEN 16
 
 /*
  * This file contains various searching-related routines. These fall into
@@ -76,46 +76,46 @@ static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchst
  * one for other searches.  last_idx points to the one that was used the last
  * time.
  */
-static spat_T spats[2] =
+స్థిర spat_T spats[2] =
 {
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
+    {ఖాళీ, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
+    {ఖాళీ, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
 };
 
-static int last_idx = 0;	// index in spats[] for RE_LAST
+స్థిర పూర్ణాంకం చివరి_idx = 0;	// index in spats[] for RE_LAST
 
-static char_u lastc[2] = {NUL, NUL};	// last character searched for
-static int lastcdir = FORWARD;		// last direction of character search
-static int last_t_cmd = TRUE;		// last search t_cmd
-static char_u	lastc_bytes[MB_MAXBYTES + 1];
-static int	lastc_bytelen = 1;	// >1 for multi-byte char
+స్థిర char_u lastc[2] = {NUL, NUL};	// last character searched for
+స్థిర పూర్ణాంకం lastcdir = FORWARD;		// last direction of character search
+స్థిర పూర్ణాంకం చివరి_t_cmd = TRUE;		// last search t_cmd
+స్థిర char_u	lastc_బైట్లు[MB_MAXBYTES + 1];
+స్థిర పూర్ణాంకం	lastc_bytelen = 1;	// >1 for multi-byte char
 
 // copy of spats[], for keeping the search patterns while executing autocmds
-static spat_T	    saved_spats[ARRAY_LENGTH(spats)];
-static char_u	    *saved_mr_pattern = NULL;
-static size_t	    saved_mr_patternlen = 0;
-#ifdef FEAT_SEARCH_EXTRA
-static int	    saved_spats_last_idx = 0;
-static int	    saved_spats_no_hlsearch = 0;
-#endif
+స్థిర spat_T	    saved_spats[ARRAY_నిడివి(spats)];
+స్థిర char_u	    *saved_mr_నమూనా = ఖాళీ;
+స్థిర size_t	    saved_mr_patternlen = 0;
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+స్థిర పూర్ణాంకం	    saved_spats_చివరి_idx = 0;
+స్థిర పూర్ణాంకం	    saved_spats_no_hlsearch = 0;
+#అయితే_ముగింపు
 
 // allocated copy of pattern used by search_regcomp()
-static char_u	    *mr_pattern = NULL;
-static size_t	    mr_patternlen = 0;
+స్థిర char_u	    *mr_నమూనా = ఖాళీ;
+స్థిర size_t	    mr_patternlen = 0;
 
-#ifdef FEAT_FIND_ID
+#నిర్వచితమైతే FEAT_కనుగొను_ID
 /*
  * Type used by find_pattern_in_path() to remember which included files have
  * been searched already.
  */
-typedef struct SearchedFile
+రకనిర్వచనం నిర్మాణం SearchedFile
 {
     FILE	*fp;		// File pointer
     char_u	*name;		// Full name of file
     linenr_T	lnum;		// Line we were up to in file
-    int		matched;	// Found a match in this file
+    పూర్ణాంకం		matched;	// Found a match in this file
 } SearchedFile;
-#endif
+#అయితే_ముగింపు
 
 /*
  * translate search pattern for vim_regcomp()
@@ -131,17 +131,17 @@ typedef struct SearchedFile
  *
  * returns FAIL if failed, OK otherwise.
  */
-    int
-search_regcomp(
+    పూర్ణాంకం
+శోధన_regcomp(
     char_u	*pat,
     size_t	patlen,
-    char_u	**used_pat,
-    int		pat_save,
-    int		pat_use,
-    int		options,
+    char_u	**వాడిన_pat,
+    పూర్ణాంకం		pat_save,
+    పూర్ణాంకం		pat_use,
+    పూర్ణాంకం		options,
     regmmatch_T	*regmatch)	// return: pattern and ignore-case flag
 {
-    int		magic;
+    పూర్ణాంకం		magic;
 
     rc_did_emsg = FALSE;
     magic = magic_isset();
@@ -149,191 +149,191 @@ search_regcomp(
     /*
      * If no pattern given, use a previously defined pattern.
      */
-    if (pat == NULL || *pat == NUL)
+    ఒకవేళ (pat == ఖాళీ || *pat == NUL)
     {
-	int i;
+	పూర్ణాంకం i;
 
-	if (pat_use == RE_LAST)
-	    i = last_idx;
-	else
+	ఒకవేళ (pat_use == RE_చివరి)
+	    i = చివరి_idx;
+	లేకపోతే
 	    i = pat_use;
-	if (spats[i].pat == NULL)	// pattern was never defined
+	ఒకవేళ (spats[i].pat == ఖాళీ)	// pattern was never defined
 	{
-	    if (pat_use == RE_SUBST)
-		emsg(_(e_no_previous_substitute_regular_expression));
-	    else
-		emsg(_(e_no_previous_regular_expression));
+	    ఒకవేళ (pat_use == RE_SUBST)
+		emsg(_(e_no_మునుపటి_substitute_regular_వ్యక్తీకరణ));
+	    లేకపోతే
+		emsg(_(e_no_మునుపటి_regular_వ్యక్తీకరణ));
 	    rc_did_emsg = TRUE;
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	pat = spats[i].pat;
 	patlen = spats[i].patlen;
 	magic = spats[i].magic;
 	no_smartcase = spats[i].no_scs;
     }
-    else if (options & SEARCH_HIS)	// put new pattern in history
-	add_to_history(HIST_SEARCH, pat, patlen, TRUE, NUL);
+    లేకపోతే ఒకవేళ (options & శోధన_HIS)	// put new pattern in history
+	కూడు_గమ్యం_history(HIST_శోధన, pat, patlen, TRUE, NUL);
 
-    if (used_pat)
-	*used_pat = pat;
+    ఒకవేళ (వాడిన_pat)
+	*వాడిన_pat = pat;
 
-    vim_free(mr_pattern);
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
-	mr_pattern = reverse_text(pat);
-    else
-#endif
-	mr_pattern = vim_strnsave(pat, patlen);
-    if (mr_pattern == NULL)
+    vim_free(mr_నమూనా);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+	mr_నమూనా = తిరగేయి_పాఠ్యం(pat);
+    లేకపోతే
+#అయితే_ముగింపు
+	mr_నమూనా = vim_strnsave(pat, patlen);
+    ఒకవేళ (mr_నమూనా == ఖాళీ)
 	mr_patternlen = 0;
-    else
+    లేకపోతే
 	mr_patternlen = patlen;
 
     /*
      * Save the currently used pattern in the appropriate place,
      * unless the pattern should not be remembered.
      */
-    if (!(options & SEARCH_KEEP)
+    ఒకవేళ (!(options & శోధన_KEEP)
 			       && (cmdmod.cmod_flags & CMOD_KEEPPATTERNS) == 0)
     {
 	// search or global command
-	if (pat_save == RE_SEARCH || pat_save == RE_BOTH)
-	    save_re_pat(RE_SEARCH, pat, patlen, magic);
+	ఒకవేళ (pat_save == RE_శోధన || pat_save == RE_BOTH)
+	    save_re_pat(RE_శోధన, pat, patlen, magic);
 	// substitute or global command
-	if (pat_save == RE_SUBST || pat_save == RE_BOTH)
+	ఒకవేళ (pat_save == RE_SUBST || pat_save == RE_BOTH)
 	    save_re_pat(RE_SUBST, pat, patlen, magic);
     }
 
     regmatch->rmm_ic = ignorecase(pat);
     regmatch->rmm_maxcol = 0;
     regmatch->regprog = vim_regcomp(pat, magic ? RE_MAGIC : 0);
-    if (regmatch->regprog == NULL)
-	return FAIL;
-    return OK;
+    ఒకవేళ (regmatch->regprog == ఖాళీ)
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Get search pattern used by search_regcomp().
  */
     char_u *
-get_search_pat(void)
+get_శోధన_pat(శూన్య)
 {
-    return mr_pattern;
+    తిరిగి mr_నమూనా;
 }
 
-    void
-save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
+    శూన్య
+save_re_pat(పూర్ణాంకం idx, char_u *pat, size_t patlen, పూర్ణాంకం magic)
 {
-    if (spats[idx].pat == pat)
-	return;
+    ఒకవేళ (spats[idx].pat == pat)
+	తిరిగి;
 
     vim_free(spats[idx].pat);
     spats[idx].pat = vim_strnsave(pat, patlen);
-    if (spats[idx].pat == NULL)
+    ఒకవేళ (spats[idx].pat == ఖాళీ)
 	spats[idx].patlen = 0;
-    else
+    లేకపోతే
 	spats[idx].patlen = patlen;
     spats[idx].magic = magic;
     spats[idx].no_scs = no_smartcase;
-    last_idx = idx;
-#ifdef FEAT_SEARCH_EXTRA
+    చివరి_idx = idx;
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls)
+    ఒకవేళ (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    set_no_hlsearch(FALSE);
-#endif
+    సమితి_no_hlsearch(FALSE);
+#అయితే_ముగింపు
 }
 
 /*
  * Save the search patterns, so they can be restored later.
  * Used before/after executing autocommands and user functions.
  */
-static int save_level = 0;
+స్థిర పూర్ణాంకం save_level = 0;
 
-    void
-save_search_patterns(void)
+    శూన్య
+save_శోధన_patterns(శూన్య)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (save_level++ != 0)
-	return;
+    ఒకవేళ (save_level++ != 0)
+	తిరిగి;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(spats); ++i)
     {
 	saved_spats[i] = spats[i];
-	if (spats[i].pat != NULL)
+	ఒకవేళ (spats[i].pat != ఖాళీ)
 	{
 	    saved_spats[i].pat = vim_strnsave(spats[i].pat, spats[i].patlen);
-	    if (saved_spats[i].pat == NULL)
+	    ఒకవేళ (saved_spats[i].pat == ఖాళీ)
 		saved_spats[i].patlen = 0;
-	    else
+	    లేకపోతే
 		saved_spats[i].patlen = spats[i].patlen;
 	}
     }
-    if (mr_pattern == NULL)
-	saved_mr_pattern = NULL;
-    else
-	saved_mr_pattern = vim_strnsave(mr_pattern, mr_patternlen);
-    if (saved_mr_pattern == NULL)
+    ఒకవేళ (mr_నమూనా == ఖాళీ)
+	saved_mr_నమూనా = ఖాళీ;
+    లేకపోతే
+	saved_mr_నమూనా = vim_strnsave(mr_నమూనా, mr_patternlen);
+    ఒకవేళ (saved_mr_నమూనా == ఖాళీ)
 	saved_mr_patternlen = 0;
-    else
+    లేకపోతే
 	saved_mr_patternlen = mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
-    saved_spats_last_idx = last_idx;
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+    saved_spats_చివరి_idx = చివరి_idx;
     saved_spats_no_hlsearch = no_hlsearch;
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-restore_search_patterns(void)
+    శూన్య
+restore_శోధన_patterns(శూన్య)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (--save_level != 0)
-	return;
+    ఒకవేళ (--save_level != 0)
+	తిరిగి;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(spats); ++i)
     {
 	vim_free(spats[i].pat);
 	spats[i] = saved_spats[i];
     }
-#if defined(FEAT_EVAL)
-    set_vv_searchforward();
-#endif
-    vim_free(mr_pattern);
-    mr_pattern = saved_mr_pattern;
+#ఒకవేళ defined(FEAT_EVAL)
+    సమితి_vv_searchforward();
+#అయితే_ముగింపు
+    vim_free(mr_నమూనా);
+    mr_నమూనా = saved_mr_నమూనా;
     mr_patternlen = saved_mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
-    last_idx = saved_spats_last_idx;
-    set_no_hlsearch(saved_spats_no_hlsearch);
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+    చివరి_idx = saved_spats_చివరి_idx;
+    సమితి_no_hlsearch(saved_spats_no_hlsearch);
+#అయితే_ముగింపు
 }
 
-#if defined(EXITFREE)
-    void
-free_search_patterns(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_శోధన_patterns(శూన్య)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(spats); ++i)
     {
 	VIM_CLEAR(spats[i].pat);
 	spats[i].patlen = 0;
     }
-    VIM_CLEAR(mr_pattern);
+    VIM_CLEAR(mr_నమూనా);
     mr_patternlen = 0;
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 // copy of spats[RE_SEARCH], for keeping the search patterns while incremental
 // searching
-static spat_T	    saved_last_search_spat;
-static int	    did_save_last_search_spat = 0;
-static int	    saved_last_idx = 0;
-static int	    saved_no_hlsearch = 0;
-static int	    saved_search_match_endcol;
-static int	    saved_search_match_lines;
+స్థిర spat_T	    saved_చివరి_శోధన_spat;
+స్థిర పూర్ణాంకం	    did_save_చివరి_శోధన_spat = 0;
+స్థిర పూర్ణాంకం	    saved_చివరి_idx = 0;
+స్థిర పూర్ణాంకం	    saved_no_hlsearch = 0;
+స్థిర పూర్ణాంకం	    saved_శోధన_సరిపోలిక_endcol;
+స్థిర పూర్ణాంకం	    saved_శోధన_సరిపోలిక_పంక్తులు;
 
 /*
  * Save and restore the search pattern for incremental highlight search
@@ -343,47 +343,47 @@ static int	    saved_search_match_lines;
  * restore_search_patterns(), because the search pattern must be restored when
  * canceling incremental searching even if it's called inside user functions.
  */
-    void
-save_last_search_pattern(void)
+    శూన్య
+save_చివరి_శోధన_నమూనా(శూన్య)
 {
-    if (++did_save_last_search_spat != 1)
+    ఒకవేళ (++did_save_చివరి_శోధన_spat != 1)
 	// nested call, nothing to do
-	return;
+	తిరిగి;
 
-    saved_last_search_spat = spats[RE_SEARCH];
-    if (spats[RE_SEARCH].pat != NULL)
+    saved_చివరి_శోధన_spat = spats[RE_శోధన];
+    ఒకవేళ (spats[RE_శోధన].pat != ఖాళీ)
     {
-	saved_last_search_spat.pat = vim_strnsave(spats[RE_SEARCH].pat, spats[RE_SEARCH].patlen);
-	if (saved_last_search_spat.pat == NULL)
-	    saved_last_search_spat.patlen = 0;
-	else
-	    saved_last_search_spat.patlen = spats[RE_SEARCH].patlen;
+	saved_చివరి_శోధన_spat.pat = vim_strnsave(spats[RE_శోధన].pat, spats[RE_శోధన].patlen);
+	ఒకవేళ (saved_చివరి_శోధన_spat.pat == ఖాళీ)
+	    saved_చివరి_శోధన_spat.patlen = 0;
+	లేకపోతే
+	    saved_చివరి_శోధన_spat.patlen = spats[RE_శోధన].patlen;
     }
-    saved_last_idx = last_idx;
+    saved_చివరి_idx = చివరి_idx;
     saved_no_hlsearch = no_hlsearch;
 }
 
-    void
-restore_last_search_pattern(void)
+    శూన్య
+restore_చివరి_శోధన_నమూనా(శూన్య)
 {
-    if (--did_save_last_search_spat > 0)
+    ఒకవేళ (--did_save_చివరి_శోధన_spat > 0)
 	// nested call, nothing to do
-	return;
-    if (did_save_last_search_spat != 0)
+	తిరిగి;
+    ఒకవేళ (did_save_చివరి_శోధన_spat != 0)
     {
 	iemsg("restore_last_search_pattern() called more often than save_last_search_pattern()");
-	return;
+	తిరిగి;
     }
 
-    vim_free(spats[RE_SEARCH].pat);
-    spats[RE_SEARCH] = saved_last_search_spat;
-    saved_last_search_spat.pat = NULL;
-    saved_last_search_spat.patlen = 0;
-# if defined(FEAT_EVAL)
-    set_vv_searchforward();
+    vim_free(spats[RE_శోధన].pat);
+    spats[RE_శోధన] = saved_చివరి_శోధన_spat;
+    saved_చివరి_శోధన_spat.pat = ఖాళీ;
+    saved_చివరి_శోధన_spat.patlen = 0;
+# ఒకవేళ defined(FEAT_EVAL)
+    సమితి_vv_searchforward();
 # endif
-    last_idx = saved_last_idx;
-    set_no_hlsearch(saved_no_hlsearch);
+    చివరి_idx = saved_చివరి_idx;
+    సమితి_no_hlsearch(saved_no_hlsearch);
 }
 
 /*
@@ -391,245 +391,245 @@ restore_last_search_pattern(void)
  * This is required so that calling searchcount() at does not invalidate the
  * incsearch highlighting.
  */
-    static void
-save_incsearch_state(void)
+    స్థిర శూన్య
+save_incsearch_state(శూన్య)
 {
-    saved_search_match_endcol = search_match_endcol;
-    saved_search_match_lines  = search_match_lines;
+    saved_శోధన_సరిపోలిక_endcol = శోధన_సరిపోలిక_endcol;
+    saved_శోధన_సరిపోలిక_పంక్తులు  = శోధన_సరిపోలిక_పంక్తులు;
 }
 
-    static void
-restore_incsearch_state(void)
+    స్థిర శూన్య
+restore_incsearch_state(శూన్య)
 {
-    search_match_endcol = saved_search_match_endcol;
-    search_match_lines  = saved_search_match_lines;
+    శోధన_సరిపోలిక_endcol = saved_శోధన_సరిపోలిక_endcol;
+    శోధన_సరిపోలిక_పంక్తులు  = saved_శోధన_సరిపోలిక_పంక్తులు;
 }
 
     char_u *
-last_search_pattern(void)
+చివరి_శోధన_నమూనా(శూన్య)
 {
-    return spats[RE_SEARCH].pat;
+    తిరిగి spats[RE_శోధన].pat;
 }
 
     size_t
-last_search_pattern_len(void)
+చివరి_శోధన_నమూనా_len(శూన్య)
 {
-    return spats[RE_SEARCH].patlen;
+    తిరిగి spats[RE_శోధన].patlen;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE when case should be ignored for search pattern "pat".
  * Uses the 'ignorecase' and 'smartcase' options.
  */
-    int
+    పూర్ణాంకం
 ignorecase(char_u *pat)
 {
-    return ignorecase_opt(pat, p_ic, p_scs);
+    తిరిగి ignorecase_opt(pat, p_ic, p_scs);
 }
 
 /*
  * As ignorecase() but pass the "ic" and "scs" flags.
  */
-    int
-ignorecase_opt(char_u *pat, int ic_in, int scs)
+    పూర్ణాంకం
+ignorecase_opt(char_u *pat, పూర్ణాంకం ic_లోపల, పూర్ణాంకం scs)
 {
-    int		ic = ic_in;
+    పూర్ణాంకం		ic = ic_లోపల;
 
-    if (ic && !no_smartcase && scs
-			    && !(ctrl_x_mode_not_default() && curbuf->b_p_inf))
+    ఒకవేళ (ic && !no_smartcase && scs
+			    && !(ctrl_x_బహుళకం_not_default() && curbuf->b_p_inf))
 	ic = !pat_has_uppercase(pat);
     no_smartcase = FALSE;
 
-    return ic;
+    తిరిగి ic;
 }
 
 /*
  * Return TRUE if pattern "pat" has an uppercase character.
  */
-    int
+    పూర్ణాంకం
 pat_has_uppercase(char_u *pat)
 {
     char_u *p = pat;
     magic_T magic_val = MAGIC_ON;
 
     // get the magicness of the pattern
-    (void)skip_regexp_ex(pat, NUL, magic_isset(), NULL, NULL, &magic_val);
+    (శూన్య)skip_regexp_ex(pat, NUL, magic_isset(), ఖాళీ, ఖాళీ, &magic_val);
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	int		l;
+	పూర్ణాంకం		l;
 
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    if (enc_utf8 && utf_isupper(utf_ptr2char(p)))
-		return TRUE;
+	    ఒకవేళ (enc_utf8 && utf_isupper(utf_ptr2char(p)))
+		తిరిగి TRUE;
 	    p += l;
 	}
-	else if (*p == '\\' && magic_val <= MAGIC_ON)
+	లేకపోతే ఒకవేళ (*p == '\\' && magic_val <= MAGIC_ON)
 	{
-	    if (p[1] == '_' && p[2] != NUL)  // skip "\_X"
+	    ఒకవేళ (p[1] == '_' && p[2] != NUL)  // skip "\_X"
 		p += 3;
-	    else if (p[1] == '%' && p[2] != NUL)  // skip "\%X"
+	    లేకపోతే ఒకవేళ (p[1] == '%' && p[2] != NUL)  // skip "\%X"
 		p += 3;
-	    else if (p[1] != NUL)  // skip "\X"
+	    లేకపోతే ఒకవేళ (p[1] != NUL)  // skip "\X"
 		p += 2;
-	    else
+	    లేకపోతే
 		p += 1;
 	}
-	else if ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
+	లేకపోతే ఒకవేళ ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
 	{
-	    if (p[1] != NUL)  // skip "_X" and %X
+	    ఒకవేళ (p[1] != NUL)  // skip "_X" and %X
 		p += 2;
-	    else
+	    లేకపోతే
 		p++;
 	}
-	else if (MB_ISUPPER(*p))
-	    return TRUE;
-	else
+	లేకపోతే ఒకవేళ (MB_ISUPPER(*p))
+	    తిరిగి TRUE;
+	లేకపోతే
 	    ++p;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
     char_u *
-last_csearch(void)
+చివరి_csearch(శూన్య)
 {
-    return lastc_bytes;
+    తిరిగి lastc_బైట్లు;
 }
 
-    int
-last_csearch_forward(void)
+    పూర్ణాంకం
+చివరి_csearch_forward(శూన్య)
 {
-    return lastcdir == FORWARD;
+    తిరిగి lastcdir == FORWARD;
 }
 
-    int
-last_csearch_until(void)
+    పూర్ణాంకం
+చివరి_csearch_until(శూన్య)
 {
-    return last_t_cmd == TRUE;
+    తిరిగి చివరి_t_cmd == TRUE;
 }
 
-    void
-set_last_csearch(int c, char_u *s, int len)
+    శూన్య
+సమితి_చివరి_csearch(పూర్ణాంకం c, char_u *s, పూర్ణాంకం len)
 {
     *lastc = c;
     lastc_bytelen = len;
-    if (len)
-	memcpy(lastc_bytes, s, len);
-    else
-	CLEAR_FIELD(lastc_bytes);
+    ఒకవేళ (len)
+	జ్ఞాపకం_నకలు(lastc_బైట్లు, s, len);
+    లేకపోతే
+	CLEAR_క్షేత్రం(lastc_బైట్లు);
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-set_csearch_direction(int cdir)
+    శూన్య
+సమితి_csearch_direction(పూర్ణాంకం cdir)
 {
     lastcdir = cdir;
 }
 
-    void
-set_csearch_until(int t_cmd)
+    శూన్య
+సమితి_csearch_until(పూర్ణాంకం t_cmd)
 {
-    last_t_cmd = t_cmd;
+    చివరి_t_cmd = t_cmd;
 }
 
     char_u *
-last_search_pat(void)
+చివరి_శోధన_pat(శూన్య)
 {
-    return spats[last_idx].pat;
+    తిరిగి spats[చివరి_idx].pat;
 }
 
 /*
  * Reset search direction to forward.  For "gd" and "gD" commands.
  */
-    void
-reset_search_dir(void)
+    శూన్య
+reset_శోధన_dir(శూన్య)
 {
     spats[0].off.dir = '/';
-#if defined(FEAT_EVAL)
-    set_vv_searchforward();
-#endif
+#ఒకవేళ defined(FEAT_EVAL)
+    సమితి_vv_searchforward();
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
 /*
  * Set the last search pattern.  For ":let @/ =" and viminfo.
  * Also set the saved search pattern, so that this works in an autocommand.
  */
-    void
-set_last_search_pat(
+    శూన్య
+సమితి_చివరి_శోధన_pat(
     char_u	*s,
-    int		idx,
-    int		magic,
-    int		setlast)
+    పూర్ణాంకం		idx,
+    పూర్ణాంకం		magic,
+    పూర్ణాంకం		setlast)
 {
     vim_free(spats[idx].pat);
     // An empty string means that nothing should be matched.
-    if (*s == NUL)
-	spats[idx].pat = NULL;
-    else
+    ఒకవేళ (*s == NUL)
+	spats[idx].pat = ఖాళీ;
+    లేకపోతే
     {
 	spats[idx].patlen = STRLEN(s);
 	spats[idx].pat = vim_strnsave(s, spats[idx].patlen);
     }
-    if (spats[idx].pat == NULL)
+    ఒకవేళ (spats[idx].pat == ఖాళీ)
 	spats[idx].patlen = 0;
     spats[idx].magic = magic;
     spats[idx].no_scs = FALSE;
     spats[idx].off.dir = '/';
-# if defined(FEAT_EVAL)
-    set_vv_searchforward();
+# ఒకవేళ defined(FEAT_EVAL)
+    సమితి_vv_searchforward();
 # endif
-    spats[idx].off.line = FALSE;
-    spats[idx].off.end = FALSE;
+    spats[idx].off.పంక్తి = FALSE;
+    spats[idx].off.చివర = FALSE;
     spats[idx].off.off = 0;
-    if (setlast)
-	last_idx = idx;
-    if (save_level)
+    ఒకవేళ (setlast)
+	చివరి_idx = idx;
+    ఒకవేళ (save_level)
     {
 	vim_free(saved_spats[idx].pat);
 	saved_spats[idx] = spats[0];
-	if (spats[idx].pat == NULL)
-	    saved_spats[idx].pat = NULL;
-	else
+	ఒకవేళ (spats[idx].pat == ఖాళీ)
+	    saved_spats[idx].pat = ఖాళీ;
+	లేకపోతే
 	    saved_spats[idx].pat = vim_strnsave(spats[idx].pat, spats[idx].patlen);
-	if (saved_spats[idx].pat == NULL)
+	ఒకవేళ (saved_spats[idx].pat == ఖాళీ)
 	    saved_spats[idx].patlen = 0;
-	else
+	లేకపోతే
 	    saved_spats[idx].patlen = spats[idx].patlen;
-# ifdef FEAT_SEARCH_EXTRA
-	saved_spats_last_idx = last_idx;
+# ifdef FEAT_శోధన_EXTRA
+	saved_spats_చివరి_idx = చివరి_idx;
 # endif
     }
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_శోధన_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls && idx == last_idx && !no_hlsearch)
+    ఒకవేళ (p_hls && idx == చివరి_idx && !no_hlsearch)
 	redraw_all_later(UPD_SOME_VALID);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 /*
  * Get a regexp program for the last used search pattern.
  * This is used for highlighting all matches in a window.
  * Values returned in regmatch->regprog and regmatch->rmm_ic.
  */
-    void
-last_pat_prog(regmmatch_T *regmatch)
+    శూన్య
+చివరి_pat_prog(regmmatch_T *regmatch)
 {
-    if (spats[last_idx].pat == NULL)
+    ఒకవేళ (spats[చివరి_idx].pat == ఖాళీ)
     {
-	regmatch->regprog = NULL;
-	return;
+	regmatch->regprog = ఖాళీ;
+	తిరిగి;
     }
     ++emsg_off;		// So it doesn't beep if bad expr
-    (void)search_regcomp((char_u *)"", 0, NULL, 0, last_idx, SEARCH_KEEP, regmatch);
+    (శూన్య)శోధన_regcomp((char_u *)"", 0, ఖాళీ, 0, చివరి_idx, శోధన_KEEP, regmatch);
     --emsg_off;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Lowest level search function.
@@ -651,115 +651,115 @@ last_pat_prog(regmmatch_T *regmatch)
  * When FEAT_EVAL is defined, returns the index of the first matching
  * subpattern plus one; one if there was none.
  */
-    int
+    పూర్ణాంకం
 searchit(
     win_T	*win,		// window to search in; can be NULL for a
 				// buffer without a window!
     buf_T	*buf,
     pos_T	*pos,
-    pos_T	*end_pos,	// set to end of the match, unless NULL
-    int		dir,
+    pos_T	*చివర_pos,	// set to end of the match, unless NULL
+    పూర్ణాంకం		dir,
     char_u	*pat,
     size_t	patlen,
-    long	count,
-    int		options,
-    int		pat_use,	// which pattern to use when "pat" is empty
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		options,
+    పూర్ణాంకం		pat_use,	// which pattern to use when "pat" is empty
     searchit_arg_T *extra_arg)	// optional extra arguments, can be NULL
 {
-    int		found;
+    పూర్ణాంకం		దొరికింది;
     linenr_T	lnum;		// no init to shut up Apollo cc
-    colnr_T	col;
+    colnr_T	నిలువు;
     regmmatch_T	regmatch;
     char_u	*ptr;
     colnr_T	matchcol;
     lpos_T	endpos;
     lpos_T	matchpos;
-    int		loop;
-    pos_T	start_pos;
-    int		at_first_line;
-    int		extra_col;
-    int		start_char_len;
-    int		match_ok;
-    long	nmatched;
-    int		submatch = 0;
-    int		first_match = TRUE;
-    int		called_emsg_before = called_emsg;
-#ifdef FEAT_SEARCH_EXTRA
-    int		break_loop = FALSE;
-#endif
+    పూర్ణాంకం		loop;
+    pos_T	ప్రారంభం_pos;
+    పూర్ణాంకం		at_మొదటి_పంక్తి;
+    పూర్ణాంకం		extra_నిలువు;
+    పూర్ణాంకం		ప్రారంభం_char_len;
+    పూర్ణాంకం		సరిపోలిక_ok;
+    దీర్ఘ	nmatched;
+    పూర్ణాంకం		submatch = 0;
+    పూర్ణాంకం		మొదటి_సరిపోలిక = TRUE;
+    పూర్ణాంకం		called_emsg_before = called_emsg;
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+    పూర్ణాంకం		break_loop = FALSE;
+#అయితే_ముగింపు
     linenr_T	stop_lnum = 0;	// stop after this line number when != 0
-    int		unused_timeout_flag = FALSE;
-    int		*timed_out = &unused_timeout_flag;  // set when timed out.
-    int		search_from_match_end;		    // vi-compatible search?
+    పూర్ణాంకం		వాడని_timeout_flag = FALSE;
+    పూర్ణాంకం		*timed_బహిర్గతం = &వాడని_timeout_flag;  // set when timed out.
+    పూర్ణాంకం		శోధన_from_సరిపోలిక_చివర;		    // vi-compatible search?
 
-    if (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
-		   (options & (SEARCH_HIS + SEARCH_KEEP)), &regmatch) == FAIL)
+    ఒకవేళ (శోధన_regcomp(pat, patlen, ఖాళీ, RE_శోధన, pat_use,
+		   (options & (శోధన_HIS + శోధన_KEEP)), &regmatch) == FAIL)
     {
-	if ((options & SEARCH_MSG) && !rc_did_emsg)
-	    semsg(_(e_invalid_search_string_str), mr_pattern);
-	return FAIL;
+	ఒకవేళ ((options & శోధన_సందేశం) && !rc_did_emsg)
+	    semsg(_(e_invalid_శోధన_string_str), mr_నమూనా);
+	తిరిగి FAIL;
     }
 
-    search_from_match_end = vim_strchr(p_cpo, CPO_SEARCH) != NULL;
+    శోధన_from_సరిపోలిక_చివర = vim_strchr(p_cpo, CPO_శోధన) != ఖాళీ;
 
-    if (extra_arg != NULL)
+    ఒకవేళ (extra_arg != ఖాళీ)
     {
 	stop_lnum = extra_arg->sa_stop_lnum;
-#ifdef FEAT_RELTIME
-	if (extra_arg->sa_tm > 0)
+#నిర్వచితమైతే FEAT_RELTIME
+	ఒకవేళ (extra_arg->sa_tm > 0)
 	    init_regexp_timeout(extra_arg->sa_tm);
 	// Also set the pointer when sa_tm is zero, the caller may have set the
 	// timeout.
-	timed_out = &extra_arg->sa_timed_out;
-#endif
+	timed_బహిర్గతం = &extra_arg->sa_timed_బహిర్గతం;
+#అయితే_ముగింపు
     }
 
     /*
      * find the string
      */
-    do	// loop for count
+    చేయి	// loop for count
     {
 	// When not accepting a match at the start position set "extra_col" to
 	// a non-zero value.  Don't do that when starting at MAXCOL, since
 	// MAXCOL + 1 is zero.
-	if (pos->col == MAXCOL)
-	    start_char_len = 0;
+	ఒకవేళ (pos->నిలువు == MAXCOL)
+	    ప్రారంభం_char_len = 0;
 	// Watch out for the "col" being MAXCOL - 2, used in a closed fold.
-	else if (has_mbyte
-		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_line_count
-						    && pos->col < MAXCOL - 2)
+	లేకపోతే ఒకవేళ (has_mbyte
+		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_పంక్తి_లెక్క
+						    && pos->నిలువు < MAXCOL - 2)
 	{
 	    ptr = ml_get_buf(buf, pos->lnum, FALSE);
-	    if (ml_get_buf_len(buf, pos->lnum) <= pos->col)
-		start_char_len = 1;
-	    else
-		start_char_len = (*mb_ptr2len)(ptr + pos->col);
+	    ఒకవేళ (ml_get_buf_len(buf, pos->lnum) <= pos->నిలువు)
+		ప్రారంభం_char_len = 1;
+	    లేకపోతే
+		ప్రారంభం_char_len = (*mb_ptr2len)(ptr + pos->నిలువు);
 	}
-	else
-	    start_char_len = 1;
-	if (dir == FORWARD)
+	లేకపోతే
+	    ప్రారంభం_char_len = 1;
+	ఒకవేళ (dir == FORWARD)
 	{
-	    if (options & SEARCH_START)
-		extra_col = 0;
-	    else
-		extra_col = start_char_len;
+	    ఒకవేళ (options & శోధన_ప్రారంభం)
+		extra_నిలువు = 0;
+	    లేకపోతే
+		extra_నిలువు = ప్రారంభం_char_len;
 	}
-	else
+	లేకపోతే
 	{
-	    if (options & SEARCH_START)
-		extra_col = start_char_len;
-	    else
-		extra_col = 0;
+	    ఒకవేళ (options & శోధన_ప్రారంభం)
+		extra_నిలువు = ప్రారంభం_char_len;
+	    లేకపోతే
+		extra_నిలువు = 0;
 	}
 
-	start_pos = *pos;	// remember start pos for detecting no match
-	found = 0;		// default: not found
-	at_first_line = TRUE;	// default: start in first line
-	if (pos->lnum == 0)	// correct lnum for when starting in line 0
+	ప్రారంభం_pos = *pos;	// remember start pos for detecting no match
+	దొరికింది = 0;		// default: not found
+	at_మొదటి_పంక్తి = TRUE;	// default: start in first line
+	ఒకవేళ (pos->lnum == 0)	// correct lnum for when starting in line 0
 	{
 	    pos->lnum = 1;
-	    pos->col = 0;
-	    at_first_line = FALSE;  // not in first line now
+	    pos->నిలువు = 0;
+	    at_మొదటి_పంక్తి = FALSE;  // not in first line now
 	}
 
 	/*
@@ -769,53 +769,53 @@ searchit(
 	 * current position, gain some efficiency by skipping back a line.
 	 * Otherwise begin the search in the current line.
 	 */
-	if (dir == BACKWARD && start_pos.col == 0
-					     && (options & SEARCH_START) == 0)
+	ఒకవేళ (dir == BACKWARD && ప్రారంభం_pos.నిలువు == 0
+					     && (options & శోధన_ప్రారంభం) == 0)
 	{
 	    lnum = pos->lnum - 1;
-	    at_first_line = FALSE;
+	    at_మొదటి_పంక్తి = FALSE;
 	}
-	else
+	లేకపోతే
 	    lnum = pos->lnum;
 
-	for (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
+	కొరకు (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
 	{
-	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
-					   lnum += dir, at_first_line = FALSE)
+	    కొరకు ( ; lnum > 0 && lnum <= buf->b_ml.ml_పంక్తి_లెక్క;
+					   lnum += dir, at_మొదటి_పంక్తి = FALSE)
 	    {
 		// Stop after checking "stop_lnum", if it's set.
-		if (stop_lnum != 0 && (dir == FORWARD
+		ఒకవేళ (stop_lnum != 0 && (dir == FORWARD
 				       ? lnum > stop_lnum : lnum < stop_lnum))
-		    break;
+		    ఆపు;
 		// Stop after passing the time limit.
-		if (*timed_out)
-		    break;
+		ఒకవేళ (*timed_బహిర్గతం)
+		    ఆపు;
 
 		/*
 		 * Look for a match somewhere in line "lnum".
 		 */
-		col = at_first_line && (options & SEARCH_COL) ? pos->col
+		నిలువు = at_మొదటి_పంక్తి && (options & శోధన_నిలువు) ? pos->నిలువు
 								 : (colnr_T)0;
 		nmatched = vim_regexec_multi(&regmatch, win, buf,
-							 lnum, col, timed_out);
+							 lnum, నిలువు, timed_బహిర్గతం);
 		// vim_regexec_multi() may clear "regprog"
-		if (regmatch.regprog == NULL)
-		    break;
+		ఒకవేళ (regmatch.regprog == ఖాళీ)
+		    ఆపు;
 		// Abort searching on an error (e.g., out of stack).
-		if (called_emsg > called_emsg_before || *timed_out)
-		    break;
-		if (nmatched > 0)
+		ఒకవేళ (called_emsg > called_emsg_before || *timed_బహిర్గతం)
+		    ఆపు;
+		ఒకవేళ (nmatched > 0)
 		{
 		    // match may actually be in another line when using \zs
 		    matchpos = regmatch.startpos[0];
 		    endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-		    submatch = first_submatch(&regmatch);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+		    submatch = మొదటి_submatch(&regmatch);
+#అయితే_ముగింపు
 		    // "lnum" may be past end of buffer for "\n\zs".
-		    if (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
+		    ఒకవేళ (lnum + matchpos.lnum > buf->b_ml.ml_పంక్తి_లెక్క)
 			ptr = (char_u *)"";
-		    else
+		    లేకపోతే
 			ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 
 		    /*
@@ -823,9 +823,9 @@ searchit(
 		     * the start position. If not, continue at the end of the
 		     * match (this is vi compatible) or on the next char.
 		     */
-		    if (dir == FORWARD && at_first_line)
+		    ఒకవేళ (dir == FORWARD && at_మొదటి_పంక్తి)
 		    {
-			match_ok = TRUE;
+			సరిపోలిక_ok = TRUE;
 
 			/*
 			 * When the match starts in a next line it's certainly
@@ -834,83 +834,83 @@ searchit(
 			 * one back afterwards, compare with that position,
 			 * otherwise "/$" will get stuck on end of line.
 			 */
-			while (matchpos.lnum == 0
-				&& ((options & SEARCH_END) && first_match
+			అయితే (matchpos.lnum == 0
+				&& ((options & శోధన_చివర) && మొదటి_సరిపోలిక
 				    ?  (nmatched == 1
-					&& (int)endpos.col - 1
-					     < (int)start_pos.col + extra_col)
-				    : ((int)matchpos.col
-						  - (ptr[matchpos.col] == NUL)
-					    < (int)start_pos.col + extra_col)))
+					&& (పూర్ణాంకం)endpos.నిలువు - 1
+					     < (పూర్ణాంకం)ప్రారంభం_pos.నిలువు + extra_నిలువు)
+				    : ((పూర్ణాంకం)matchpos.నిలువు
+						  - (ptr[matchpos.నిలువు] == NUL)
+					    < (పూర్ణాంకం)ప్రారంభం_pos.నిలువు + extra_నిలువు)))
 			{
 			    /*
 			     * If vi-compatible searching, continue at the end
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ఒకవేళ (శోధన_from_సరిపోలిక_చివర)
 			    {
-				if (nmatched > 1)
+				ఒకవేళ (nmatched > 1)
 				{
 				    // end is in next line, thus no match in
 				    // this line
-				    match_ok = FALSE;
-				    break;
+				    సరిపోలిక_ok = FALSE;
+				    ఆపు;
 				}
-				matchcol = endpos.col;
+				matchcol = endpos.నిలువు;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ఒకవేళ (matchcol == matchpos.నిలువు
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ఒకవేళ (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    లేకపోతే
 					++matchcol;
 				}
 			    }
-			    else
+			    లేకపోతే
 			    {
 				// Advance "matchcol" to the next character.
 				// This uses rmm_matchcol, the actual start of
 				// the match, ignoring "\zs".
 				matchcol = regmatch.rmm_matchcol;
-				if (ptr[matchcol] != NUL)
+				ఒకవేళ (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ఒకవేళ (has_mbyte)
 					matchcol += (*mb_ptr2len)(ptr
 								  + matchcol);
-				    else
+				    లేకపోతే
 					++matchcol;
 				}
 			    }
-			    if (matchcol == 0 && (options & SEARCH_START))
-				break;
-			    if (ptr[matchcol] == NUL
+			    ఒకవేళ (matchcol == 0 && (options & శోధన_ప్రారంభం))
+				ఆపు;
+			    ఒకవేళ (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
-					      matchcol, timed_out)) == 0)
+					      matchcol, timed_బహిర్గతం)) == 0)
 			    {
-				match_ok = FALSE;
-				break;
+				సరిపోలిక_ok = FALSE;
+				ఆపు;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ఒకవేళ (regmatch.regprog == ఖాళీ)
+				ఆపు;
 			    matchpos = regmatch.startpos[0];
 			    endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-			    submatch = first_submatch(&regmatch);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+			    submatch = మొదటి_submatch(&regmatch);
+#అయితే_ముగింపు
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
 			    ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 			}
-			if (!match_ok)
-			    continue;
+			ఒకవేళ (!సరిపోలిక_ok)
+			    కొనసాగు;
 		    }
-		    if (dir == BACKWARD)
+		    ఒకవేళ (dir == BACKWARD)
 		    {
 			/*
 			 * Now, if there are multiple matches on this line,
@@ -919,39 +919,39 @@ searchit(
 			 * When putting the new cursor at the end, compare
 			 * relative to the end of the match.
 			 */
-			match_ok = FALSE;
-			for (;;)
+			సరిపోలిక_ok = FALSE;
+			కొరకు (;;)
 			{
 			    // Remember a position that is before the start
 			    // position, we use it if it's the last match in
 			    // the line.  Always accept a position after
 			    // wrapping around.
-			    if (loop
-				|| ((options & SEARCH_END)
+			    ఒకవేళ (loop
+				|| ((options & శోధన_చివర)
 				    ? (lnum + regmatch.endpos[0].lnum
-							      < start_pos.lnum
+							      < ప్రారంభం_pos.lnum
 					|| (lnum + regmatch.endpos[0].lnum
-							     == start_pos.lnum
-					     && (int)regmatch.endpos[0].col - 1
-							< (int)start_pos.col
-								+ extra_col))
+							     == ప్రారంభం_pos.lnum
+					     && (పూర్ణాంకం)regmatch.endpos[0].నిలువు - 1
+							< (పూర్ణాంకం)ప్రారంభం_pos.నిలువు
+								+ extra_నిలువు))
 				    : (lnum + regmatch.startpos[0].lnum
-							      < start_pos.lnum
+							      < ప్రారంభం_pos.lnum
 					|| (lnum + regmatch.startpos[0].lnum
-							     == start_pos.lnum
-					     && (int)regmatch.startpos[0].col
-						      < (int)start_pos.col
-							      + extra_col))))
+							     == ప్రారంభం_pos.lnum
+					     && (పూర్ణాంకం)regmatch.startpos[0].నిలువు
+						      < (పూర్ణాంకం)ప్రారంభం_pos.నిలువు
+							      + extra_నిలువు))))
 			    {
-				match_ok = TRUE;
+				సరిపోలిక_ok = TRUE;
 				matchpos = regmatch.startpos[0];
 				endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-				submatch = first_submatch(&regmatch);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+				submatch = మొదటి_submatch(&regmatch);
+#అయితే_ముగింపు
 			    }
-			    else
-				break;
+			    లేకపోతే
+				ఆపు;
 
 			    /*
 			     * We found a valid match, now check if there is
@@ -960,52 +960,52 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ఒకవేళ (శోధన_from_సరిపోలిక_చివర)
 			    {
-				if (nmatched > 1)
-				    break;
-				matchcol = endpos.col;
+				ఒకవేళ (nmatched > 1)
+				    ఆపు;
+				matchcol = endpos.నిలువు;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ఒకవేళ (matchcol == matchpos.నిలువు
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ఒకవేళ (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    లేకపోతే
 					++matchcol;
 				}
 			    }
-			    else
+			    లేకపోతే
 			    {
 				// Stop when the match is in a next line.
-				if (matchpos.lnum > 0)
-				    break;
-				matchcol = matchpos.col;
-				if (ptr[matchcol] != NUL)
+				ఒకవేళ (matchpos.lnum > 0)
+				    ఆపు;
+				matchcol = matchpos.నిలువు;
+				ఒకవేళ (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ఒకవేళ (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    లేకపోతే
 					++matchcol;
 				}
 			    }
-			    if (ptr[matchcol] == NUL
+			    ఒకవేళ (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
-					      matchcol, timed_out)) == 0)
+					      matchcol, timed_బహిర్గతం)) == 0)
 			    {
 				// If the search timed out, we did find a match
 				// but it might be the wrong one, so that's not
 				// OK.
-				if (*timed_out)
-				    match_ok = FALSE;
-				break;
+				ఒకవేళ (*timed_బహిర్గతం)
+				    సరిపోలిక_ok = FALSE;
+				ఆపు;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ఒకవేళ (regmatch.regprog == ఖాళీ)
+				ఆపు;
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
@@ -1016,104 +1016,104 @@ searchit(
 			 * If there is only a match after the cursor, skip
 			 * this match.
 			 */
-			if (!match_ok)
-			    continue;
+			ఒకవేళ (!సరిపోలిక_ok)
+			    కొనసాగు;
 		    }
 
 		    // With the SEARCH_END option move to the last character
 		    // of the match.  Don't do it for an empty match, end
 		    // should be same as start then.
-		    if ((options & SEARCH_END) && !(options & SEARCH_NOOF)
+		    ఒకవేళ ((options & శోధన_చివర) && !(options & శోధన_NOOF)
 			    && !(matchpos.lnum == endpos.lnum
-				&& matchpos.col == endpos.col))
+				&& matchpos.నిలువు == endpos.నిలువు))
 		    {
 			// For a match in the first column, set the position
 			// on the NUL in the previous line.
 			pos->lnum = lnum + endpos.lnum;
-			pos->col = endpos.col;
-			if (endpos.col == 0)
+			pos->నిలువు = endpos.నిలువు;
+			ఒకవేళ (endpos.నిలువు == 0)
 			{
-			    if (pos->lnum > 1)  // just in case
+			    ఒకవేళ (pos->lnum > 1)  // just in case
 			    {
 				--pos->lnum;
-				pos->col = ml_get_buf_len(buf, pos->lnum);
+				pos->నిలువు = ml_get_buf_len(buf, pos->lnum);
 			    }
 			}
-			else
+			లేకపోతే
 			{
-			    --pos->col;
-			    if (has_mbyte
-				    && pos->lnum <= buf->b_ml.ml_line_count)
+			    --pos->నిలువు;
+			    ఒకవేళ (has_mbyte
+				    && pos->lnum <= buf->b_ml.ml_పంక్తి_లెక్క)
 			    {
 				ptr = ml_get_buf(buf, pos->lnum, FALSE);
-				pos->col -= (*mb_head_off)(ptr, ptr + pos->col);
+				pos->నిలువు -= (*mb_తల_off)(ptr, ptr + pos->నిలువు);
 			    }
 			}
-			if (end_pos != NULL)
+			ఒకవేళ (చివర_pos != ఖాళీ)
 			{
-			    end_pos->lnum = lnum + matchpos.lnum;
-			    end_pos->col = matchpos.col;
+			    చివర_pos->lnum = lnum + matchpos.lnum;
+			    చివర_pos->నిలువు = matchpos.నిలువు;
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
 			pos->lnum = lnum + matchpos.lnum;
-			pos->col = matchpos.col;
-			if (end_pos != NULL)
+			pos->నిలువు = matchpos.నిలువు;
+			ఒకవేళ (చివర_pos != ఖాళీ)
 			{
-			    end_pos->lnum = lnum + endpos.lnum;
-			    end_pos->col = endpos.col;
+			    చివర_pos->lnum = lnum + endpos.lnum;
+			    చివర_pos->నిలువు = endpos.నిలువు;
 			}
 		    }
 		    pos->coladd = 0;
-		    if (end_pos != NULL)
-			end_pos->coladd = 0;
-		    found = 1;
-		    first_match = FALSE;
+		    ఒకవేళ (చివర_pos != ఖాళీ)
+			చివర_pos->coladd = 0;
+		    దొరికింది = 1;
+		    మొదటి_సరిపోలిక = FALSE;
 
 		    // Set variables used for 'incsearch' highlighting.
-		    search_match_lines = endpos.lnum - matchpos.lnum;
-		    search_match_endcol = endpos.col;
-		    break;
+		    శోధన_సరిపోలిక_పంక్తులు = endpos.lnum - matchpos.lnum;
+		    శోధన_సరిపోలిక_endcol = endpos.నిలువు;
+		    ఆపు;
 		}
-		line_breakcheck();	// stop if ctrl-C typed
-		if (got_int)
-		    break;
+		పంక్తి_breakcheck();	// stop if ctrl-C typed
+		ఒకవేళ (got_int)
+		    ఆపు;
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 		// Cancel searching if a character was typed.  Used for
 		// 'incsearch'.  Don't check too often, that would slowdown
 		// searching too much.
-		if ((options & SEARCH_PEEK)
+		ఒకవేళ ((options & శోధన_PEEK)
 			&& ((lnum - pos->lnum) & 0x3f) == 0
 			&& char_avail())
 		{
 		    break_loop = TRUE;
-		    break;
+		    ఆపు;
 		}
-#endif
+#అయితే_ముగింపు
 
-		if (loop && lnum == start_pos.lnum)
-		    break;	    // if second loop, stop where started
+		ఒకవేళ (loop && lnum == ప్రారంభం_pos.lnum)
+		    ఆపు;	    // if second loop, stop where started
 	    }
-	    at_first_line = FALSE;
+	    at_మొదటి_పంక్తి = FALSE;
 
 	    // vim_regexec_multi() may clear "regprog"
-	    if (regmatch.regprog == NULL)
-		break;
+	    ఒకవేళ (regmatch.regprog == ఖాళీ)
+		ఆపు;
 
 	    /*
 	     * Stop the search if wrapscan isn't set, "stop_lnum" is
 	     * specified, after an interrupt, after a match and after looping
 	     * twice.
 	     */
-	    if (!p_ws || stop_lnum != 0 || got_int
-			      || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+	    ఒకవేళ (!p_ws || stop_lnum != 0 || got_int
+			      || called_emsg > called_emsg_before || *timed_బహిర్గతం
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 			      || break_loop
-#endif
-			      || found || loop)
-		break;
+#అయితే_ముగింపు
+			      || దొరికింది || loop)
+		ఆపు;
 
 	    /*
 	     * If 'wrapscan' is set we continue at the other end of the file.
@@ -1124,96 +1124,96 @@ searchit(
 	     * is redrawn. The keep_msg is cleared whenever another message is
 	     * written.
 	     */
-	    if (dir == BACKWARD)    // start second loop at the other end
-		lnum = buf->b_ml.ml_line_count;
-	    else
+	    ఒకవేళ (dir == BACKWARD)    // start second loop at the other end
+		lnum = buf->b_ml.ml_పంక్తి_లెక్క;
+	    లేకపోతే
 		lnum = 1;
-	    if (!shortmess(SHM_SEARCH)
+	    ఒకవేళ (!shortmess(SHM_శోధన)
 		    && shortmess(SHM_SEARCHCOUNT)
-		    && (options & SEARCH_MSG))
+		    && (options & శోధన_సందేశం))
 		give_warning((char_u *)_(dir == BACKWARD
-					  ? top_bot_msg : bot_top_msg), TRUE);
-	    if (extra_arg != NULL)
+					  ? శిఖరం_bot_సందేశం : bot_శిఖరం_సందేశం), TRUE);
+	    ఒకవేళ (extra_arg != ఖాళీ)
 		extra_arg->sa_wrapped = TRUE;
 	}
-	if (got_int || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+	ఒకవేళ (got_int || called_emsg > called_emsg_before || *timed_బహిర్గతం
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 		|| break_loop
-#endif
+#అయితే_ముగింపు
 		)
-	    break;
+	    ఆపు;
     }
-    while (--count > 0 && found);   // stop after count matches or no match
+    అయితే (--లెక్క > 0 && దొరికింది);   // stop after count matches or no match
 
-#ifdef FEAT_RELTIME
-    if (extra_arg != NULL && extra_arg->sa_tm > 0)
+#నిర్వచితమైతే FEAT_RELTIME
+    ఒకవేళ (extra_arg != ఖాళీ && extra_arg->sa_tm > 0)
 	disable_regexp_timeout();
-#endif
+#అయితే_ముగింపు
     vim_regfree(regmatch.regprog);
 
-    if (!found)		    // did not find it
+    ఒకవేళ (!దొరికింది)		    // did not find it
     {
-	if (got_int)
+	ఒకవేళ (got_int)
 	    emsg(_(e_interrupted));
-	else if ((options & SEARCH_MSG) == SEARCH_MSG)
+	లేకపోతే ఒకవేళ ((options & శోధన_సందేశం) == శోధన_సందేశం)
 	{
-	    if (p_ws)
-		semsg(_(e_pattern_not_found_str), mr_pattern);
-	    else if (lnum == 0)
-		semsg(_(e_search_hit_top_without_match_for_str), mr_pattern);
-	    else
-		semsg(_(e_search_hit_bottom_without_match_for_str), mr_pattern);
+	    ఒకవేళ (p_ws)
+		semsg(_(e_నమూనా_not_దొరికింది_str), mr_నమూనా);
+	    లేకపోతే ఒకవేళ (lnum == 0)
+		semsg(_(e_శోధన_తగిలింది_శిఖరం_without_సరిపోలిక_for_str), mr_నమూనా);
+	    లేకపోతే
+		semsg(_(e_శోధన_తగిలింది_bottom_without_సరిపోలిక_for_str), mr_నమూనా);
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // A pattern like "\n\zs" may go past the last line.
-    if (pos->lnum > buf->b_ml.ml_line_count)
+    ఒకవేళ (pos->lnum > buf->b_ml.ml_పంక్తి_లెక్క)
     {
-	pos->lnum = buf->b_ml.ml_line_count;
-	pos->col = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > 0)
-	    --pos->col;
+	pos->lnum = buf->b_ml.ml_పంక్తి_లెక్క;
+	pos->నిలువు = ml_get_buf_len(buf, pos->lnum);
+	ఒకవేళ (pos->నిలువు > 0)
+	    --pos->నిలువు;
     }
 
-    return submatch + 1;
+    తిరిగి submatch + 1;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
-    void
-set_search_direction(int cdir)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_PROTO)
+    శూన్య
+సమితి_శోధన_direction(పూర్ణాంకం cdir)
 {
     spats[0].off.dir = cdir;
 }
 
-    static void
-set_vv_searchforward(void)
+    స్థిర శూన్య
+సమితి_vv_searchforward(శూన్య)
 {
-    set_vim_var_nr(VV_SEARCHFORWARD, (long)(spats[0].off.dir == '/'));
+    సమితి_vim_var_nr(VV_SEARCHFORWARD, (దీర్ఘ)(spats[0].off.dir == '/'));
 }
 
 /*
  * Return the number of the first subpat that matched.
  * Return zero if none of them matched.
  */
-    static int
-first_submatch(regmmatch_T *rp)
+    స్థిర పూర్ణాంకం
+మొదటి_submatch(regmmatch_T *rp)
 {
-    int		submatch;
+    పూర్ణాంకం		submatch;
 
-    for (submatch = 1; ; ++submatch)
+    కొరకు (submatch = 1; ; ++submatch)
     {
-	if (rp->startpos[submatch].lnum >= 0)
-	    break;
-	if (submatch == 9)
+	ఒకవేళ (rp->startpos[submatch].lnum >= 0)
+	    ఆపు;
+	ఒకవేళ (submatch == 9)
 	{
 	    submatch = 0;
-	    break;
+	    ఆపు;
 	}
     }
-    return submatch;
+    తిరిగి submatch;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Parse a search pattern followed by an optional offset (e.g. "pat/e+1").
@@ -1231,91 +1231,91 @@ first_submatch(regmmatch_T *rp)
  * Returns the length of the parsed pattern + offset (used by get_address()
  * to know how much of the command line was consumed).
  */
-    int
-parse_search_pattern_offset(
+    పూర్ణాంకం
+parse_శోధన_నమూనా_స్థానభ్రంశం(
     char_u	**pat,
     size_t	*patlen,
-    int		search_delim,
-    int		options,
+    పూర్ణాంకం		శోధన_delim,
+    పూర్ణాంకం		options,
     char_u	**strcopy,
     char_u	**searchstr,
     size_t	*searchstrlen,
     char_u	**dircp,
-    soffset_T	*offset)
+    soffset_T	*స్థానభ్రంశం)
 {
-    int		cmdlen = 0;
+    పూర్ణాంకం		cmdlen = 0;
     char_u	*p;
     char_u	*ps;
 
-    if (*pat == NULL || **pat == NUL)
-	return 0;
+    ఒకవేళ (*pat == ఖాళీ || **pat == NUL)
+	తిరిగి 0;
 
     ps = *strcopy;
     *searchstr = *pat;
     *searchstrlen = *patlen;
-    *dircp = NULL;
+    *dircp = ఖాళీ;
 
     /*
      * Find end of regular expression.
      * If there is a matching '/' or '?', toss it.
      */
-    p = skip_regexp_ex(*pat, search_delim, magic_isset(),
-						    strcopy, NULL, NULL);
-    if (*strcopy != ps)
+    p = skip_regexp_ex(*pat, శోధన_delim, magic_isset(),
+						    strcopy, ఖాళీ, ఖాళీ);
+    ఒకవేళ (*strcopy != ps)
     {
 	size_t len = STRLEN(*strcopy);
 	// made a copy of "pat" to change "\?" to "?"
-	cmdlen += (int)(*patlen - len);
+	cmdlen += (పూర్ణాంకం)(*patlen - len);
 	*pat = *strcopy;
 	*patlen = len;
 	*searchstr = *strcopy;
 	*searchstrlen = len;
     }
-    if (*p == search_delim)
+    ఒకవేళ (*p == శోధన_delim)
     {
 	*searchstrlen = p - *pat;
 	*dircp = p;	// remember where we put the NUL
 	*p++ = NUL;
     }
 
-    offset->line = FALSE;
-    offset->end = FALSE;
-    offset->off = 0;
+    స్థానభ్రంశం->పంక్తి = FALSE;
+    స్థానభ్రంశం->చివర = FALSE;
+    స్థానభ్రంశం->off = 0;
     /*
      * Check for a line offset or a character offset.
      * For get_address (echo off) we don't check for a character
      * offset, because it is meaningless and the 's' could be a
      * substitute command.
      */
-    if (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
-	offset->line = TRUE;
-    else if ((options & SEARCH_OPT)
+    ఒకవేళ (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
+	స్థానభ్రంశం->పంక్తి = TRUE;
+    లేకపోతే ఒకవేళ ((options & శోధన_OPT)
 				  && (*p == 'e' || *p == 's' || *p == 'b'))
     {
-	if (*p == 'e')		// end
-	    offset->end = SEARCH_END;
+	ఒకవేళ (*p == 'e')		// end
+	    స్థానభ్రంశం->చివర = శోధన_చివర;
 	++p;
     }
-    if (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
+    ఒకవేళ (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
     {
 				    // 'nr' or '+nr' or '-nr'
-	if (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
-	    offset->off = atol((char *)p);
-	else if (*p == '-')	    // single '-'
-	    offset->off = -1;
-	else			    // single '+'
-	    offset->off = 1;
+	ఒకవేళ (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
+	    స్థానభ్రంశం->off = atol((అక్షరం *)p);
+	లేకపోతే ఒకవేళ (*p == '-')	    // single '-'
+	    స్థానభ్రంశం->off = -1;
+	లేకపోతే			    // single '+'
+	    స్థానభ్రంశం->off = 1;
 	++p;
-	while (VIM_ISDIGIT(*p))	    // skip number
+	అయితే (VIM_ISDIGIT(*p))	    // skip number
 	    ++p;
     }
 
     // compute length of search command for get_address()
-    cmdlen += (int)(p - *pat);
+    cmdlen += (పూర్ణాంకం)(p - *pat);
     *patlen -= p - *pat;
     *pat = p;			    // put pat after search command
 
-    return cmdlen;
+    తిరిగి cmdlen;
 }
 
 /*
@@ -1339,40 +1339,40 @@ parse_search_pattern_offset(
  *
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    int
-do_search(
+    పూర్ణాంకం
+do_శోధన(
     oparg_T	    *oap,	// can be NULL
-    int		    dirc,	// '/' or '?'
-    int		    search_delim, // the delimiter for the search, e.g. '%' in
+    పూర్ణాంకం		    dirc,	// '/' or '?'
+    పూర్ణాంకం		    శోధన_delim, // the delimiter for the search, e.g. '%' in
 				  // s%regex%replacement%
     char_u	    *pat,
     size_t	    patlen,
-    long	    count,
-    int		    options,
+    దీర్ఘ	    లెక్క,
+    పూర్ణాంకం		    options,
     searchit_arg_T  *sia)	// optional arguments or NULL
 {
     pos_T	    pos;	// position of the last match
     char_u	    *searchstr;
     size_t	    searchstrlen;
     soffset_T	    old_off;
-    int		    retval;	// Return value
+    పూర్ణాంకం		    retval;	// Return value
     char_u	    *p;
-    long	    c;
+    దీర్ఘ	    c;
     char_u	    *dircp;
-    char_u	    *strcopy = NULL;
-    int		    show_search_stats;
-    char_u	    *msgbuf = NULL;
+    char_u	    *strcopy = ఖాళీ;
+    పూర్ణాంకం		    show_శోధన_stats;
+    char_u	    *msgbuf = ఖాళీ;
     size_t	    msgbuflen = 0;
-    int		    has_offset = FALSE;
+    పూర్ణాంకం		    has_స్థానభ్రంశం = FALSE;
 
     searchcmdlen = 0;
 
     /*
      * A line offset is not remembered, this is vi compatible.
      */
-    if (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
+    ఒకవేళ (spats[0].off.పంక్తి && vim_strchr(p_cpo, CPO_LINEOFF) != ఖాళీ)
     {
-	spats[0].off.line = FALSE;
+	spats[0].off.పంక్తి = FALSE;
 	spats[0].off.off = 0;
     }
 
@@ -1387,81 +1387,81 @@ do_search(
     /*
      * Find out the direction of the search.
      */
-    if (dirc == 0)
+    ఒకవేళ (dirc == 0)
 	dirc = spats[0].off.dir;
-    else
+    లేకపోతే
     {
 	spats[0].off.dir = dirc;
-#if defined(FEAT_EVAL)
-	set_vv_searchforward();
-#endif
+#ఒకవేళ defined(FEAT_EVAL)
+	సమితి_vv_searchforward();
+#అయితే_ముగింపు
     }
-    if (options & SEARCH_REV)
+    ఒకవేళ (options & శోధన_REV)
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// There is a bug in the Visual C++ 2.2 compiler which means that
 	// dirc always ends up being '/'
 	dirc = (dirc == '/')  ?  '?'  :  '/';
-#else
-	if (dirc == '/')
+#లేకపోతే
+	ఒకవేళ (dirc == '/')
 	    dirc = '?';
-	else
+	లేకపోతే
 	    dirc = '/';
-#endif
+#అయితే_ముగింపు
     }
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // If the cursor is in a closed fold, don't find another match in the same
     // fold.
-    if (dirc == '/')
+    ఒకవేళ (dirc == '/')
     {
-	if (hasFolding(pos.lnum, NULL, &pos.lnum))
-	    pos.col = MAXCOL - 2;	// avoid overflow when adding 1
+	ఒకవేళ (hasFolding(pos.lnum, ఖాళీ, &pos.lnum))
+	    pos.నిలువు = MAXCOL - 2;	// avoid overflow when adding 1
     }
-    else
+    లేకపోతే
     {
-	if (hasFolding(pos.lnum, &pos.lnum, NULL))
-	    pos.col = 0;
+	ఒకవేళ (hasFolding(pos.lnum, &pos.lnum, ఖాళీ))
+	    pos.నిలువు = 0;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
     /*
      * Turn 'hlsearch' highlighting back on.
      */
-    if (no_hlsearch && !(options & SEARCH_KEEP))
+    ఒకవేళ (no_hlsearch && !(options & శోధన_KEEP))
     {
 	redraw_all_later(UPD_SOME_VALID);
-	set_no_hlsearch(FALSE);
+	సమితి_no_hlsearch(FALSE);
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Repeat the search when pattern followed by ';', e.g. "/foo/;?bar".
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int		show_top_bot_msg = FALSE;
+	పూర్ణాంకం		show_శిఖరం_bot_సందేశం = FALSE;
 
 	searchstr = pat;
 	searchstrlen = patlen;
 
-	dircp = NULL;
+	dircp = ఖాళీ;
 					    // use previous pattern
-	if (pat == NULL || *pat == NUL || *pat == search_delim)
+	ఒకవేళ (pat == ఖాళీ || *pat == NUL || *pat == శోధన_delim)
 	{
-	    if (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
+	    ఒకవేళ (spats[RE_శోధన].pat == ఖాళీ)	    // no previous pattern
 	    {
-		if (spats[RE_SUBST].pat == NULL)
+		ఒకవేళ (spats[RE_SUBST].pat == ఖాళీ)
 		{
-		    emsg(_(e_no_previous_regular_expression));
+		    emsg(_(e_no_మునుపటి_regular_వ్యక్తీకరణ));
 		    retval = 0;
-		    goto end_do_search;
+		    వెళ్ళు చివర_do_శోధన;
 		}
 		searchstr = spats[RE_SUBST].pat;
 		searchstrlen = spats[RE_SUBST].patlen;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// make search_regcomp() use spats[RE_SEARCH].pat
 		searchstr = (char_u *)"";
@@ -1469,26 +1469,26 @@ do_search(
 	    }
 	}
 
-	if (pat != NULL && *pat != NUL)	// look for (new) offset
+	ఒకవేళ (pat != ఖాళీ && *pat != NUL)	// look for (new) offset
 	{
 	    char_u	*prev_searchstr = searchstr;
 	    size_t	prev_searchstrlen = searchstrlen;
 
-	    searchcmdlen += parse_search_pattern_offset(&pat, &patlen,
-				search_delim, options, &strcopy, &searchstr,
+	    searchcmdlen += parse_శోధన_నమూనా_స్థానభ్రంశం(&pat, &patlen,
+				శోధన_delim, options, &strcopy, &searchstr,
 				&searchstrlen, &dircp, &spats[0].off);
 	    // An empty pattern (e.g. "//e") uses the previous pattern selected
 	    // above.
-	    if (*searchstr == NUL)
+	    ఒకవేళ (*searchstr == NUL)
 	    {
 		searchstr = prev_searchstr;
 		searchstrlen = prev_searchstrlen;
 	    }
 	}
 
-	show_search_stats = FALSE;
-	if ((options & SEARCH_ECHO) && messaging()
-		&& !msg_silent
+	show_శోధన_stats = FALSE;
+	ఒకవేళ ((options & శోధన_ECHO) && messaging()
+		&& !సందేశం_silent
 		&& (!cmd_silent || !shortmess(SHM_SEARCHCOUNT)))
 	{
 	    char_u	off_buf[40];
@@ -1497,132 +1497,132 @@ do_search(
 	    size_t	msgbufsize;
 
 	    // Compute msg_row early.
-	    msg_start();
+	    సందేశం_ప్రారంభం();
 
 	    // Get the offset, so we know how long it is.
-	    if (!cmd_silent &&
-		    (spats[0].off.line || spats[0].off.end || spats[0].off.off))
+	    ఒకవేళ (!cmd_silent &&
+		    (spats[0].off.పంక్తి || spats[0].off.చివర || spats[0].off.off))
 	    {
 		off_buf[off_len++] = dirc;
-		if (spats[0].off.end)
+		ఒకవేళ (spats[0].off.చివర)
 		    off_buf[off_len++] = 'e';
-		else if (!spats[0].off.line)
+		లేకపోతే ఒకవేళ (!spats[0].off.పంక్తి)
 		    off_buf[off_len++] = 's';
 		off_buf[off_len] = NUL;
-		if (spats[0].off.off != 0 || spats[0].off.line)
-		    off_len += vim_snprintf((char *)off_buf + off_len,
-			   sizeof(off_buf) - off_len, "%+ld", spats[0].off.off);
+		ఒకవేళ (spats[0].off.off != 0 || spats[0].off.పంక్తి)
+		    off_len += vim_snprintf((అక్షరం *)off_buf + off_len,
+			   పరిమాణం(off_buf) - off_len, "%+ld", spats[0].off.off);
 	    }
 
-	    if (*searchstr == NUL)
+	    ఒకవేళ (*searchstr == NUL)
 	    {
 		p = spats[0].pat;
 		plen = spats[0].patlen;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		p = searchstr;
 		plen = searchstrlen;
 	    }
 
-	    if (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
+	    ఒకవేళ (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
 	    {
 		// Reserve enough space for the search pattern + offset +
 		// search stat.  Use all the space available, so that the
 		// search state is right aligned.  If there is not enough space
 		// msg_strtrunc() will shorten in the middle.
-		if (msg_scrolled != 0 && !cmd_silent)
+		ఒకవేళ (సందేశం_scrolled != 0 && !cmd_silent)
 		    // Use all the columns.
-		    msgbufsize = (int)(Rows - msg_row) * cmdline_width - 1;
-		else
+		    msgbufsize = (పూర్ణాంకం)(అడ్డువరుసలు - సందేశం_అడ్డువరుస) * cmdline_వెడల్పు - 1;
+		లేకపోతే
 		    // Use up to 'showcmd' column.
-		    msgbufsize = (int)(Rows - msg_row - 1) * cmdline_width
-			+ sc_col - 1;
-		if (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
-		    msgbufsize = plen + off_len + SEARCH_STAT_BUF_LEN + 3;
+		    msgbufsize = (పూర్ణాంకం)(అడ్డువరుసలు - సందేశం_అడ్డువరుస - 1) * cmdline_వెడల్పు
+			+ sc_నిలువు - 1;
+		ఒకవేళ (msgbufsize < plen + off_len + శోధన_STAT_BUF_LEN + 3)
+		    msgbufsize = plen + off_len + శోధన_STAT_BUF_LEN + 3;
 	    }
-	    else
+	    లేకపోతే
 		// Reserve enough space for the search pattern + offset.
 		msgbufsize = plen + off_len + 3;
 
 	    vim_free(msgbuf);
 	    msgbuf = alloc(msgbufsize);
-	    if (msgbuf == NULL)
+	    ఒకవేళ (msgbuf == ఖాళీ)
 	    {
 		msgbuflen = 0;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		vim_memset(msgbuf, ' ', msgbufsize);
 		msgbuflen = msgbufsize - 1;
 		msgbuf[msgbuflen] = NUL;
 		// do not fill the msgbuf buffer, if cmd_silent is set, leave it
 		// empty for the search_stat feature.
-		if (!cmd_silent)
+		ఒకవేళ (!cmd_silent)
 		{
 		    char_u	*trunc;
 
 		    msgbuf[0] = dirc;
 
-		    if (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
+		    ఒకవేళ (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
 		    {
 			// Use a space to draw the composing char on.
 			msgbuf[1] = ' ';
 			mch_memmove(msgbuf + 2, p, plen);
 		    }
-		    else
+		    లేకపోతే
 			mch_memmove(msgbuf + 1, p, plen);
-		    if (off_len > 0)
+		    ఒకవేళ (off_len > 0)
 			mch_memmove(msgbuf + plen + 1, off_buf, off_len);
 
-		    trunc = msg_strtrunc(msgbuf, TRUE);
-		    if (trunc != NULL)
+		    trunc = సందేశం_strtrunc(msgbuf, TRUE);
+		    ఒకవేళ (trunc != ఖాళీ)
 		    {
 			vim_free(msgbuf);
 			msgbuf = trunc;
 			msgbuflen = STRLEN(msgbuf);
 		    }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    // The search pattern could be shown on the right in
 		    // rightleft mode, but the 'ruler' and 'showcmd' area use
 		    // it too, thus it would be blanked out again very soon.
 		    // Show it on the left, but do reverse the text.
-		    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+		    ఒకవేళ (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 		    {
 			char_u *r;
 			size_t pat_len;
 
-			r = reverse_text(msgbuf);
-			if (r != NULL)
+			r = తిరగేయి_పాఠ్యం(msgbuf);
+			ఒకవేళ (r != ఖాళీ)
 			{
 			    vim_free(msgbuf);
 			    msgbuf = r;
 			    msgbuflen = STRLEN(msgbuf);
 			    // move reversed text to beginning of buffer
-			    while (*r != NUL && *r == ' ')
+			    అయితే (*r != NUL && *r == ' ')
 				r++;
 			    pat_len = msgbuf + msgbuflen - r;
 			    mch_memmove(msgbuf, r, pat_len);
 			    // overwrite old text
-			    if ((size_t)(r - msgbuf) >= pat_len)
+			    ఒకవేళ ((size_t)(r - msgbuf) >= pat_len)
 				vim_memset(r, ' ', pat_len);
-			    else
+			    లేకపోతే
 				vim_memset(msgbuf + pat_len, ' ', r - msgbuf);
 			}
 		    }
-#endif
-		    msg_outtrans(msgbuf);
-		    msg_clr_eos();
-		    msg_check();
+#అయితే_ముగింపు
+		    సందేశం_outtrans(msgbuf);
+		    సందేశం_clr_eos();
+		    సందేశం_check();
 
 		    gotocmdline(FALSE);
-		    out_flush();
-		    msg_nowait = TRUE;	    // don't wait for this message
+		    బహిర్గతం_flush();
+		    సందేశం_nowait = TRUE;	    // don't wait for this message
 		}
 
-		if (!shortmess(SHM_SEARCHCOUNT))
-		    show_search_stats = TRUE;
+		ఒకవేళ (!shortmess(SHM_SEARCHCOUNT))
+		    show_శోధన_stats = TRUE;
 	    }	// msgbuf != NULL
 	}
 
@@ -1633,28 +1633,28 @@ do_search(
 	 * This is not done for a line offset, because then we would not be vi
 	 * compatible.
 	 */
-	if (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
+	ఒకవేళ (!spats[0].off.పంక్తి && spats[0].off.off && pos.నిలువు < MAXCOL - 2)
 	{
-	    if (spats[0].off.off > 0)
+	    ఒకవేళ (spats[0].off.off > 0)
 	    {
-		for (c = spats[0].off.off; c; --c)
-		    if (decl(&pos) == -1)
-			break;
-		if (c)			// at start of buffer
+		కొరకు (c = spats[0].off.off; c; --c)
+		    ఒకవేళ (decl(&pos) == -1)
+			ఆపు;
+		ఒకవేళ (c)			// at start of buffer
 		{
 		    pos.lnum = 0;	// allow lnum == 0 here
-		    pos.col = MAXCOL;
+		    pos.నిలువు = MAXCOL;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		for (c = spats[0].off.off; c; ++c)
-		    if (incl(&pos) == -1)
-			break;
-		if (c)			// at end of buffer
+		కొరకు (c = spats[0].off.off; c; ++c)
+		    ఒకవేళ (incl(&pos) == -1)
+			ఆపు;
+		ఒకవేళ (c)			// at end of buffer
 		{
-		    pos.lnum = curbuf->b_ml.ml_line_count + 1;
-		    pos.col = 0;
+		    pos.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క + 1;
+		    pos.నిలువు = 0;
 		}
 	    }
 	}
@@ -1662,26 +1662,26 @@ do_search(
 	/*
 	 * The actual search.
 	 */
-	c = searchit(curwin, curbuf, &pos, NULL,
+	c = searchit(curwin, curbuf, &pos, ఖాళీ,
 					      dirc == '/' ? FORWARD : BACKWARD,
-		searchstr, searchstrlen, count, spats[0].off.end + (options &
-		       (SEARCH_KEEP + SEARCH_PEEK + SEARCH_HIS
-			+ SEARCH_MSG + SEARCH_START
-			+ ((pat != NULL && *pat == ';') ? 0 : SEARCH_NOOF))),
-		RE_LAST, sia);
+		searchstr, searchstrlen, లెక్క, spats[0].off.చివర + (options &
+		       (శోధన_KEEP + శోధన_PEEK + శోధన_HIS
+			+ శోధన_సందేశం + శోధన_ప్రారంభం
+			+ ((pat != ఖాళీ && *pat == ';') ? 0 : శోధన_NOOF))),
+		RE_చివరి, sia);
 
-	if (dircp != NULL)
-	    *dircp = search_delim; // restore second '/' or '?' for normal_cmd()
+	ఒకవేళ (dircp != ఖాళీ)
+	    *dircp = శోధన_delim; // restore second '/' or '?' for normal_cmd()
 
-	if (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
-	    show_top_bot_msg = TRUE;
+	ఒకవేళ (!shortmess(SHM_శోధన) && sia && sia->sa_wrapped)
+	    show_శిఖరం_bot_సందేశం = TRUE;
 
-	if (c == FAIL)
+	ఒకవేళ (c == FAIL)
 	{
 	    retval = 0;
-	    goto end_do_search;
+	    వెళ్ళు చివర_do_శోధన;
 	}
-	if (spats[0].off.end && oap != NULL)
+	ఒకవేళ (spats[0].off.చివర && oap != ఖాళీ)
 	    oap->inclusive = TRUE;  // 'e' includes last character
 
 	retval = 1;		    // pattern found
@@ -1689,58 +1689,58 @@ do_search(
 	/*
 	 * Add character and/or line offset
 	 */
-	if (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
+	ఒకవేళ (!(options & శోధన_NOOF) || (pat != ఖాళీ && *pat == ';'))
 	{
 	    pos_T org_pos = pos;
 
-	    if (spats[0].off.line)	// Add the offset to the line number.
+	    ఒకవేళ (spats[0].off.పంక్తి)	// Add the offset to the line number.
 	    {
 		c = pos.lnum + spats[0].off.off;
-		if (c < 1)
+		ఒకవేళ (c < 1)
 		    pos.lnum = 1;
-		else if (c > curbuf->b_ml.ml_line_count)
-		    pos.lnum = curbuf->b_ml.ml_line_count;
-		else
+		లేకపోతే ఒకవేళ (c > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		    pos.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+		లేకపోతే
 		    pos.lnum = c;
-		pos.col = 0;
+		pos.నిలువు = 0;
 
 		retval = 2;	    // pattern found, line offset added
 	    }
-	    else if (pos.col < MAXCOL - 2)	// just in case
+	    లేకపోతే ఒకవేళ (pos.నిలువు < MAXCOL - 2)	// just in case
 	    {
 		// to the right, check for end of file
 		c = spats[0].off.off;
-		if (c > 0)
+		ఒకవేళ (c > 0)
 		{
-		    while (c-- > 0)
-			if (incl(&pos) == -1)
-			    break;
+		    అయితే (c-- > 0)
+			ఒకవేళ (incl(&pos) == -1)
+			    ఆపు;
 		}
 		// to the left, check for start of file
-		else
+		లేకపోతే
 		{
-		    while (c++ < 0)
-			if (decl(&pos) == -1)
-			    break;
+		    అయితే (c++ < 0)
+			ఒకవేళ (decl(&pos) == -1)
+			    ఆపు;
 		}
 	    }
-	    if (!EQUAL_POS(pos, org_pos))
-		has_offset = TRUE;
+	    ఒకవేళ (!EQUAL_POS(pos, org_pos))
+		has_స్థానభ్రంశం = TRUE;
 	}
 
 	// Show [1/15] if 'S' is not in 'shortmess'.
-	if (show_search_stats)
-	     cmdline_search_stat(dirc, &pos, &curwin->w_cursor,
-				show_top_bot_msg, msgbuf, msgbuflen,
-				(count != 1 || has_offset
-#ifdef FEAT_FOLDING
-				 || (!(fdo_flags & FDO_SEARCH)
+	ఒకవేళ (show_శోధన_stats)
+	     cmdline_శోధన_stat(dirc, &pos, &curwin->w_cursor,
+				show_శిఖరం_bot_సందేశం, msgbuf, msgbuflen,
+				(లెక్క != 1 || has_స్థానభ్రంశం
+#నిర్వచితమైతే FEAT_FOLDING
+				 || (!(fdo_flags & FDO_శోధన)
 				     && hasFolding(curwin->w_cursor.lnum,
-								   NULL, NULL))
-#endif
+								   ఖాళీ, ఖాళీ))
+#అయితే_ముగింపు
 				),
 				p_msc,
-				SEARCH_STAT_DEF_TIMEOUT);
+				శోధన_STAT_DEF_TIMEOUT);
 
 	/*
 	 * The search command can be followed by a ';' to do another search.
@@ -1750,34 +1750,34 @@ do_search(
 	 * - When an error happens the cursor isn't moved at all.
 	 * Don't do this when called by get_address() (it handles ';' itself).
 	 */
-	if (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
-	    break;
+	ఒకవేళ (!(options & శోధన_OPT) || pat == ఖాళీ || *pat != ';')
+	    ఆపు;
 
 	dirc = *++pat;
 	--patlen;
-	search_delim = dirc;
-	if (dirc != '?' && dirc != '/')
+	శోధన_delim = dirc;
+	ఒకవేళ (dirc != '?' && dirc != '/')
 	{
 	    retval = 0;
 	    emsg(_(e_expected_question_or_slash_after_semicolon));
-	    goto end_do_search;
+	    వెళ్ళు చివర_do_శోధన;
 	}
 	++pat;
 	--patlen;
     }
 
-    if (options & SEARCH_MARK)
+    ఒకవేళ (options & శోధన_MARK)
 	setpcmark();
     curwin->w_cursor = pos;
-    curwin->w_set_curswant = true;
+    curwin->w_సమితి_curswant = true;
 
-end_do_search:
-    if ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
+చివర_do_శోధన:
+    ఒకవేళ ((options & శోధన_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
 	spats[0].off = old_off;
     vim_free(strcopy);
     vim_free(msgbuf);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1789,74 +1789,74 @@ end_do_search:
  * ADDING is set.  If p_ic is set then the pattern must be in lowercase.
  * Return OK for success, or FAIL if no line found.
  */
-    int
-search_for_exact_line(
+    పూర్ణాంకం
+శోధన_for_exact_పంక్తి(
     buf_T	*buf,
     pos_T	*pos,
-    int		dir,
+    పూర్ణాంకం		dir,
     char_u	*pat)
 {
-    linenr_T	start = 0;
+    linenr_T	ప్రారంభం = 0;
     char_u	*ptr;
     char_u	*p;
-    int		compl_len = ins_compl_len();
+    పూర్ణాంకం		compl_len = ins_compl_len();
 
-    if (buf->b_ml.ml_line_count == 0)
-	return FAIL;
-    for (;;)
+    ఒకవేళ (buf->b_ml.ml_పంక్తి_లెక్క == 0)
+	తిరిగి FAIL;
+    కొరకు (;;)
     {
 	pos->lnum += dir;
-	if (pos->lnum < 1)
+	ఒకవేళ (pos->lnum < 1)
 	{
-	    if (p_ws)
+	    ఒకవేళ (p_ws)
 	    {
-		pos->lnum = buf->b_ml.ml_line_count;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		pos->lnum = buf->b_ml.ml_పంక్తి_లెక్క;
+		ఒకవేళ (!shortmess(SHM_శోధన))
+		    give_warning((char_u *)_(శిఖరం_bot_సందేశం), TRUE);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		pos->lnum = 1;
-		break;
+		ఆపు;
 	    }
 	}
-	else if (pos->lnum > buf->b_ml.ml_line_count)
+	లేకపోతే ఒకవేళ (pos->lnum > buf->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    if (p_ws)
+	    ఒకవేళ (p_ws)
 	    {
 		pos->lnum = 1;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		ఒకవేళ (!shortmess(SHM_శోధన))
+		    give_warning((char_u *)_(bot_శిఖరం_సందేశం), TRUE);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		pos->lnum = 1;
-		break;
+		ఆపు;
 	    }
 	}
-	if (pos->lnum == start)
-	    break;
-	if (start == 0)
-	    start = pos->lnum;
+	ఒకవేళ (pos->lnum == ప్రారంభం)
+	    ఆపు;
+	ఒకవేళ (ప్రారంభం == 0)
+	    ప్రారంభం = pos->lnum;
 	ptr = ml_get_buf(buf, pos->lnum, FALSE);
 	p = skipwhite(ptr);
-	pos->col = (colnr_T) (p - ptr);
+	pos->నిలువు = (colnr_T) (p - ptr);
 
 	// when adding lines the matching line may be empty but it is not
 	// ignored because we are interested in the next line -- Acevedo
-	if (compl_status_adding() && !compl_status_sol())
+	ఒకవేళ (compl_స్థితి_adding() && !compl_స్థితి_sol())
 	{
-	    if ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
-		return OK;
+	    ఒకవేళ ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
+		తిరిగి OK;
 	}
-	else if (*p != NUL)	// ignore empty lines
+	లేకపోతే ఒకవేళ (*p != NUL)	// ignore empty lines
 	{	// expanding lines or words
-	    if ((p_ic ? MB_STRNICMP(p, pat, compl_len)
+	    ఒకవేళ ((p_ic ? MB_STRNICMP(p, pat, compl_len)
 				   : STRNCMP(p, pat, compl_len)) == 0)
-		return OK;
+		తిరిగి OK;
 	}
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
@@ -1869,122 +1869,122 @@ search_for_exact_line(
  * Do this "cap->count1" times.
  * Return FAIL or OK.
  */
-    int
-searchc(cmdarg_T *cap, int t_cmd)
+    పూర్ణాంకం
+searchc(cmdarg_T *cap, పూర్ణాంకం t_cmd)
 {
-    int			c = cap->nchar;	// char to search for
-    int			dir = cap->arg;	// TRUE for searching forward
-    long		count = cap->count1;	// repeat count
-    int			col;
+    పూర్ణాంకం			c = cap->nchar;	// char to search for
+    పూర్ణాంకం			dir = cap->arg;	// TRUE for searching forward
+    దీర్ఘ		లెక్క = cap->count1;	// repeat count
+    పూర్ణాంకం			నిలువు;
     char_u		*p;
-    int			len;
-    int			stop = TRUE;
+    పూర్ణాంకం			len;
+    పూర్ణాంకం			stop = TRUE;
 
-    if (c != NUL)	// normal search: remember args for repeat
+    ఒకవేళ (c != NUL)	// normal search: remember args for repeat
     {
-	if (!KeyStuffed)    // don't remember when redoing
+	ఒకవేళ (!కీలకం_Stuffed)    // don't remember when redoing
 	{
 	    *lastc = c;
-	    set_csearch_direction(dir);
-	    set_csearch_until(t_cmd);
-	    lastc_bytelen = (*mb_char2bytes)(c, lastc_bytes);
-	    if (cap->ncharC1 != 0)
+	    సమితి_csearch_direction(dir);
+	    సమితి_csearch_until(t_cmd);
+	    lastc_bytelen = (*mb_char2bytes)(c, lastc_బైట్లు);
+	    ఒకవేళ (cap->ncharC1 != 0)
 	    {
 		lastc_bytelen += (*mb_char2bytes)(cap->ncharC1,
-			lastc_bytes + lastc_bytelen);
-		if (cap->ncharC2 != 0)
+			lastc_బైట్లు + lastc_bytelen);
+		ఒకవేళ (cap->ncharC2 != 0)
 		    lastc_bytelen += (*mb_char2bytes)(cap->ncharC2,
-			    lastc_bytes + lastc_bytelen);
+			    lastc_బైట్లు + lastc_bytelen);
 	    }
 	}
     }
-    else		// repeat previous search
+    లేకపోతే		// repeat previous search
     {
-	if (*lastc == NUL && lastc_bytelen <= 1)
-	    return FAIL;
-	if (dir)	// repeat in opposite direction
+	ఒకవేళ (*lastc == NUL && lastc_bytelen <= 1)
+	    తిరిగి FAIL;
+	ఒకవేళ (dir)	// repeat in opposite direction
 	    dir = -lastcdir;
-	else
+	లేకపోతే
 	    dir = lastcdir;
-	t_cmd = last_t_cmd;
+	t_cmd = చివరి_t_cmd;
 	c = *lastc;
 	// For multi-byte re-use last lastc_bytes[] and lastc_bytelen.
 
 	// Force a move of at least one char, so ";" and "," will move the
 	// cursor, even if the cursor is right in front of char we are looking
 	// at.
-	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
+	ఒకవేళ (vim_strchr(p_cpo, CPO_SCOLON) == ఖాళీ && లెక్క == 1 && t_cmd)
 	    stop = FALSE;
     }
 
-    if (dir == BACKWARD)
+    ఒకవేళ (dir == BACKWARD)
 	cap->oap->inclusive = FALSE;
-    else
+    లేకపోతే
 	cap->oap->inclusive = TRUE;
 
     p = ml_get_curline();
-    col = curwin->w_cursor.col;
+    నిలువు = curwin->w_cursor.నిలువు;
     len = ml_get_curline_len();
 
-    while (count--)
+    అయితే (లెక్క--)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    for (;;)
+	    కొరకు (;;)
 	    {
-		if (dir > 0)
+		ఒకవేళ (dir > 0)
 		{
-		    col += (*mb_ptr2len)(p + col);
-		    if (col >= len)
-			return FAIL;
+		    నిలువు += (*mb_ptr2len)(p + నిలువు);
+		    ఒకవేళ (నిలువు >= len)
+			తిరిగి FAIL;
 		}
-		else
+		లేకపోతే
 		{
-		    if (col == 0)
-			return FAIL;
-		    col -= (*mb_head_off)(p, p + col - 1) + 1;
+		    ఒకవేళ (నిలువు == 0)
+			తిరిగి FAIL;
+		    నిలువు -= (*mb_తల_off)(p, p + నిలువు - 1) + 1;
 		}
-		if (lastc_bytelen <= 1)
+		ఒకవేళ (lastc_bytelen <= 1)
 		{
-		    if (p[col] == c && stop)
-			break;
+		    ఒకవేళ (p[నిలువు] == c && stop)
+			ఆపు;
 		}
-		else if (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
+		లేకపోతే ఒకవేళ (STRNCMP(p + నిలువు, lastc_బైట్లు, lastc_bytelen) == 0
 								       && stop)
-		    break;
+		    ఆపు;
 		stop = TRUE;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    for (;;)
+	    కొరకు (;;)
 	    {
-		if ((col += dir) < 0 || col >= len)
-		    return FAIL;
-		if (p[col] == c && stop)
-		    break;
+		ఒకవేళ ((నిలువు += dir) < 0 || నిలువు >= len)
+		    తిరిగి FAIL;
+		ఒకవేళ (p[నిలువు] == c && stop)
+		    ఆపు;
 		stop = TRUE;
 	    }
 	}
     }
 
-    if (t_cmd)
+    ఒకవేళ (t_cmd)
     {
 	// backup to before the character (possibly double-byte)
-	col -= dir;
-	if (has_mbyte)
+	నిలువు -= dir;
+	ఒకవేళ (has_mbyte)
 	{
-	    if (dir < 0)
+	    ఒకవేళ (dir < 0)
 		// Landed on the search char which is lastc_bytelen long
-		col += lastc_bytelen - 1;
-	    else
+		నిలువు += lastc_bytelen - 1;
+	    లేకపోతే
 		// To previous char, which may be multi-byte.
-		col -= (*mb_head_off)(p, p + col);
+		నిలువు -= (*mb_తల_off)(p, p + నిలువు);
 	}
     }
-    curwin->w_cursor.col = col;
+    curwin->w_cursor.నిలువు = నిలువు;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1997,9 +1997,9 @@ searchc(cmdarg_T *cap, int t_cmd)
  * Improvement over vi: Braces inside quotes are ignored.
  */
     pos_T *
-findmatch(oparg_T *oap, int initc)
+findmatch(oparg_T *oap, పూర్ణాంకం initc)
 {
-    return findmatchlimit(oap, initc, 0, 0);
+    తిరిగి findmatchlimit(oap, initc, 0, 0);
 }
 
 /*
@@ -2009,61 +2009,61 @@ findmatch(oparg_T *oap, int initc)
  * is NULL.
  * Handles multibyte string correctly.
  */
-    static int
+    స్థిర పూర్ణాంకం
 check_prevcol(
     char_u	*linep,
-    int		col,
-    int		ch,
-    int		*prevcol)
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		ch,
+    పూర్ణాంకం		*prevcol)
 {
-    --col;
-    if (col > 0 && has_mbyte)
-	col -= (*mb_head_off)(linep, linep + col);
-    if (prevcol)
-	*prevcol = col;
-    return (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
+    --నిలువు;
+    ఒకవేళ (నిలువు > 0 && has_mbyte)
+	నిలువు -= (*mb_తల_off)(linep, linep + నిలువు);
+    ఒకవేళ (prevcol)
+	*prevcol = నిలువు;
+    తిరిగి (నిలువు >= 0 && linep[నిలువు] == ch) ? TRUE : FALSE;
 }
 
 /*
  * Raw string start is found at linep[startpos.col - 1].
  * Return TRUE if the matching end can be found between startpos and endpos.
  */
-    static int
-find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
+    స్థిర పూర్ణాంకం
+కనుగొను_rawstring_చివర(char_u *linep, pos_T *startpos, pos_T *endpos)
 {
     char_u	*p;
     char_u	*delim_copy;
     size_t	delim_len;
     linenr_T	lnum;
-    int		found = FALSE;
+    పూర్ణాంకం		దొరికింది = FALSE;
 
-    for (p = linep + startpos->col + 1; *p && *p != '('; ++p)
+    కొరకు (p = linep + startpos->నిలువు + 1; *p && *p != '('; ++p)
 	;
-    delim_len = (p - linep) - startpos->col - 1;
-    delim_copy = vim_strnsave(linep + startpos->col + 1, delim_len);
-    if (delim_copy == NULL)
-	return FALSE;
-    for (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
+    delim_len = (p - linep) - startpos->నిలువు - 1;
+    delim_copy = vim_strnsave(linep + startpos->నిలువు + 1, delim_len);
+    ఒకవేళ (delim_copy == ఖాళీ)
+	తిరిగి FALSE;
+    కొరకు (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
     {
-	char_u *line = ml_get(lnum);
+	char_u *పంక్తి = ml_get(lnum);
 
-	for (p = line + (lnum == startpos->lnum
-					    ? startpos->col + 1 : 0); *p; ++p)
+	కొరకు (p = పంక్తి + (lnum == startpos->lnum
+					    ? startpos->నిలువు + 1 : 0); *p; ++p)
 	{
-	    if (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
-		break;
-	    if (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
+	    ఒకవేళ (lnum == endpos->lnum && (colnr_T)(p - పంక్తి) >= endpos->నిలువు)
+		ఆపు;
+	    ఒకవేళ (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
 			  && p[delim_len + 1] == '"')
 	    {
-		found = TRUE;
-		break;
+		దొరికింది = TRUE;
+		ఆపు;
 	    }
 	}
-	if (found)
-	    break;
+	ఒకవేళ (దొరికింది)
+	    ఆపు;
     }
     vim_free(delim_copy);
-    return found;
+    తిరిగి దొరికింది;
 }
 
 /*
@@ -2072,92 +2072,92 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
  * the opposite character.  Set "*backwards" to the direction.
  * When "switchit" is TRUE swap the direction.
  */
-    static void
-find_mps_values(
-    int	    *initc,
-    int	    *findc,
-    int	    *backwards,
-    int	    switchit)
+    స్థిర శూన్య
+కనుగొను_mps_విలువలు(
+    పూర్ణాంకం	    *initc,
+    పూర్ణాంకం	    *findc,
+    పూర్ణాంకం	    *backwards,
+    పూర్ణాంకం	    switchit)
 {
     char_u	*ptr;
 
     ptr = curbuf->b_p_mps;
-    while (*ptr != NUL)
+    అయితే (*ptr != NUL)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    char_u *prev;
 
-	    if (mb_ptr2char(ptr) == *initc)
+	    ఒకవేళ (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ఒకవేళ (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = TRUE;
 		}
-		else
+		లేకపోతే
 		{
 		    *findc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = FALSE;
 		}
-		return;
+		తిరిగి;
 	    }
 	    prev = ptr;
 	    ptr += mb_ptr2len(ptr) + 1;
-	    if (mb_ptr2char(ptr) == *initc)
+	    ఒకవేళ (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ఒకవేళ (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(prev);
 		    *backwards = FALSE;
 		}
-		else
+		లేకపోతే
 		{
 		    *findc = mb_ptr2char(prev);
 		    *backwards = TRUE;
 		}
-		return;
+		తిరిగి;
 	    }
 	    ptr += mb_ptr2len(ptr);
 	}
-	else
+	లేకపోతే
 	{
-	    if (*ptr == *initc)
+	    ఒకవేళ (*ptr == *initc)
 	    {
-		if (switchit)
+		ఒకవేళ (switchit)
 		{
 		    *backwards = TRUE;
 		    *findc = *initc;
 		    *initc = ptr[2];
 		}
-		else
+		లేకపోతే
 		{
 		    *backwards = FALSE;
 		    *findc = ptr[2];
 		}
-		return;
+		తిరిగి;
 	    }
 	    ptr += 2;
-	    if (*ptr == *initc)
+	    ఒకవేళ (*ptr == *initc)
 	    {
-		if (switchit)
+		ఒకవేళ (switchit)
 		{
 		    *backwards = FALSE;
 		    *findc = *initc;
 		    *initc = ptr[-2];
 		}
-		else
+		లేకపోతే
 		{
 		    *backwards = TRUE;
 		    *findc =  ptr[-2];
 		}
-		return;
+		తిరిగి;
 	    }
 	    ++ptr;
 	}
-	if (*ptr == ',')
+	ఒకవేళ (*ptr == ',')
 	    ++ptr;
     }
 }
@@ -2185,50 +2185,50 @@ find_mps_values(
     pos_T *
 findmatchlimit(
     oparg_T	*oap,
-    int		initc,
-    int		flags,
-    int		maxtravel)
+    పూర్ణాంకం		initc,
+    పూర్ణాంకం		flags,
+    పూర్ణాంకం		maxtravel)
 {
-    static pos_T pos;			// current search position
-    int		findc = 0;		// matching brace
-    int		c;
-    int		count = 0;		// cumulative number of braces
-    int		backwards = FALSE;	// init for gcc
-    int		raw_string = FALSE;	// search for raw string
-    int		inquote = FALSE;	// TRUE when inside quotes
+    స్థిర pos_T pos;			// current search position
+    పూర్ణాంకం		findc = 0;		// matching brace
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		లెక్క = 0;		// cumulative number of braces
+    పూర్ణాంకం		backwards = FALSE;	// init for gcc
+    పూర్ణాంకం		raw_string = FALSE;	// search for raw string
+    పూర్ణాంకం		inquote = FALSE;	// TRUE when inside quotes
     char_u	*linep;			// pointer to current line
     char_u	*ptr;
-    int		do_quotes;		// check for quotes in current line
-    int		at_start;		// do_quotes value at start position
-    int		hash_dir = 0;		// Direction searched for # things
-    int		comment_dir = 0;	// Direction searched for comments
-    pos_T	match_pos;		// Where last slash-star was found
-    int		start_in_quotes;	// start position is in quotes
-    int		traveled = 0;		// how far we've searched so far
-    int		ignore_cend = FALSE;    // ignore comment end
-    int		cpo_match;		// vi compatible matching
-    int		cpo_bsl;		// don't recognize backslashes
-    int		match_escaped = 0;	// search for escaped match
-    int		dir;			// Direction to search
-    int		comment_col = MAXCOL;   // start of / / comment
-    int		lispcomm = FALSE;	// inside of Lisp-style comment
-    int		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
-    int		skip_comments = (flags & FM_SKIPCOMM) != 0;
-    int		in_block_comment = FALSE; // inside /* */ block comment
+    పూర్ణాంకం		do_quotes;		// check for quotes in current line
+    పూర్ణాంకం		at_ప్రారంభం;		// do_quotes value at start position
+    పూర్ణాంకం		hash_dir = 0;		// Direction searched for # things
+    పూర్ణాంకం		comment_dir = 0;	// Direction searched for comments
+    pos_T	సరిపోలిక_pos;		// Where last slash-star was found
+    పూర్ణాంకం		ప్రారంభం_లోపల_quotes;	// start position is in quotes
+    పూర్ణాంకం		traveled = 0;		// how far we've searched so far
+    పూర్ణాంకం		ignore_cend = FALSE;    // ignore comment end
+    పూర్ణాంకం		cpo_సరిపోలిక;		// vi compatible matching
+    పూర్ణాంకం		cpo_bsl;		// don't recognize backslashes
+    పూర్ణాంకం		సరిపోలిక_escaped = 0;	// search for escaped match
+    పూర్ణాంకం		dir;			// Direction to search
+    పూర్ణాంకం		comment_నిలువు = MAXCOL;   // start of / / comment
+    పూర్ణాంకం		lispcomm = FALSE;	// inside of Lisp-style comment
+    పూర్ణాంకం		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
+    పూర్ణాంకం		skip_comments = (flags & FM_SKIPCOMM) != 0;
+    పూర్ణాంకం		లోపల_ఖండం_comment = FALSE; // inside /* */ block comment
 
     pos = curwin->w_cursor;
     pos.coladd = 0;
     linep = ml_get(pos.lnum);
 
-    cpo_match = (vim_strchr(p_cpo, CPO_MATCH) != NULL);
-    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != NULL);
+    cpo_సరిపోలిక = (vim_strchr(p_cpo, CPO_సరిపోలిక) != ఖాళీ);
+    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != ఖాళీ);
 
     // Direction to search when initc is '/', '*' or '#'
-    if (flags & FM_BACKWARD)
+    ఒకవేళ (flags & FM_BACKWARD)
 	dir = BACKWARD;
-    else if (flags & FM_FORWARD)
+    లేకపోతే ఒకవేళ (flags & FM_FORWARD)
 	dir = FORWARD;
-    else
+    లేకపోతే
 	dir = 0;
 
     /*
@@ -2237,77 +2237,77 @@ findmatchlimit(
      * When '/' is used, we ignore running backwards into an star-slash, for
      * "[*" command, we just want to find any comment.
      */
-    if (initc == '/' || initc == '*' || initc == 'R')
+    ఒకవేళ (initc == '/' || initc == '*' || initc == 'R')
     {
 	comment_dir = dir;
-	if (initc == '/')
+	ఒకవేళ (initc == '/')
 	    ignore_cend = TRUE;
 	backwards = (dir == FORWARD) ? FALSE : TRUE;
 	raw_string = (initc == 'R');
 	initc = NUL;
     }
-    else if (initc != '#' && initc != NUL)
+    లేకపోతే ఒకవేళ (initc != '#' && initc != NUL)
     {
-	find_mps_values(&initc, &findc, &backwards, TRUE);
-	if (dir)
+	కనుగొను_mps_విలువలు(&initc, &findc, &backwards, TRUE);
+	ఒకవేళ (dir)
 	    backwards = (dir == FORWARD) ? FALSE : TRUE;
-	if (findc == NUL)
-	    return NULL;
+	ఒకవేళ (findc == NUL)
+	    తిరిగి ఖాళీ;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Either initc is '#', or no initc was given and we need to look
 	 * under the cursor.
 	 */
-	if (initc == '#')
+	ఒకవేళ (initc == '#')
 	{
 	    hash_dir = dir;
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * initc was not given, must look for something to match under
 	     * or near the cursor.
 	     * Only check for special things when 'cpo' doesn't have '%'.
 	     */
-	    if (!cpo_match)
+	    ఒకవేళ (!cpo_సరిపోలిక)
 	    {
 		// Are we before or at #if, #else etc.?
 		ptr = skipwhite(linep);
-		if (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
+		ఒకవేళ (*ptr == '#' && pos.నిలువు <= (colnr_T)(ptr - linep))
 		{
 		    ptr = skipwhite(ptr + 1);
-		    if (   STRNCMP(ptr, "if", 2) == 0
+		    ఒకవేళ (   STRNCMP(ptr, "if", 2) == 0
 			|| STRNCMP(ptr, "endif", 5) == 0
 			|| STRNCMP(ptr, "el", 2) == 0)
 			hash_dir = 1;
 		}
 
 		// Are we on a comment?
-		else if (linep[pos.col] == '/')
+		లేకపోతే ఒకవేళ (linep[pos.నిలువు] == '/')
 		{
-		    if (linep[pos.col + 1] == '*')
+		    ఒకవేళ (linep[pos.నిలువు + 1] == '*')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
-			pos.col++;
+			pos.నిలువు++;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '*')
+		    లేకపోతే ఒకవేళ (pos.నిలువు > 0 && linep[pos.నిలువు - 1] == '*')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
-			pos.col--;
+			pos.నిలువు--;
 		    }
 		}
-		else if (linep[pos.col] == '*')
+		లేకపోతే ఒకవేళ (linep[pos.నిలువు] == '*')
 		{
-		    if (linep[pos.col + 1] == '/')
+		    ఒకవేళ (linep[pos.నిలువు + 1] == '/')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '/')
+		    లేకపోతే ఒకవేళ (pos.నిలువు > 0 && linep[pos.నిలువు - 1] == '/')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
@@ -2319,213 +2319,213 @@ findmatchlimit(
 	     * If we are not on a comment or the # at the start of a line, then
 	     * look for brace anywhere on this line after the cursor.
 	     */
-	    if (!hash_dir && !comment_dir)
+	    ఒకవేళ (!hash_dir && !comment_dir)
 	    {
 		/*
 		 * Find the brace under or after the cursor.
 		 * If beyond the end of the line, use the last character in
 		 * the line.
 		 */
-		if (linep[pos.col] == NUL && pos.col)
-		    --pos.col;
-		for (;;)
+		ఒకవేళ (linep[pos.నిలువు] == NUL && pos.నిలువు)
+		    --pos.నిలువు;
+		కొరకు (;;)
 		{
-		    initc = PTR2CHAR(linep + pos.col);
-		    if (initc == NUL)
-			break;
+		    initc = PTR2CHAR(linep + pos.నిలువు);
+		    ఒకవేళ (initc == NUL)
+			ఆపు;
 
-		    find_mps_values(&initc, &findc, &backwards, FALSE);
-		    if (findc)
-			break;
-		    pos.col += mb_ptr2len(linep + pos.col);
+		    కనుగొను_mps_విలువలు(&initc, &findc, &backwards, FALSE);
+		    ఒకవేళ (findc)
+			ఆపు;
+		    pos.నిలువు += mb_ptr2len(linep + pos.నిలువు);
 		}
-		if (!findc)
+		ఒకవేళ (!findc)
 		{
 		    // no brace in the line, maybe use "  #if" then
-		    if (!cpo_match && *skipwhite(linep) == '#')
+		    ఒకవేళ (!cpo_సరిపోలిక && *skipwhite(linep) == '#')
 			hash_dir = 1;
-		    else
-			return NULL;
+		    లేకపోతే
+			తిరిగి ఖాళీ;
 		}
-		else if (!cpo_bsl)
+		లేకపోతే ఒకవేళ (!cpo_bsl)
 		{
-		    int col, bslcnt = 0;
+		    పూర్ణాంకం నిలువు, bslcnt = 0;
 
 		    // Set "match_escaped" if there are an odd number of
 		    // backslashes.
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    కొరకు (నిలువు = pos.నిలువు; check_prevcol(linep, నిలువు, '\\', &నిలువు);)
 			bslcnt++;
-		    match_escaped = (bslcnt & 1);
+		    సరిపోలిక_escaped = (bslcnt & 1);
 		}
 	    }
 	}
-	if (hash_dir)
+	ఒకవేళ (hash_dir)
 	{
 	    /*
 	     * Look for matching #if, #else, #elif, or #endif
 	     */
-	    if (oap != NULL)
+	    ఒకవేళ (oap != ఖాళీ)
 		oap->motion_type = MLINE;   // Linewise for this case only
-	    if (initc != '#')
+	    ఒకవేళ (initc != '#')
 	    {
 		ptr = skipwhite(skipwhite(linep) + 1);
-		if (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
+		ఒకవేళ (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
 		    hash_dir = 1;
-		else if (STRNCMP(ptr, "endif", 5) == 0)
+		లేకపోతే ఒకవేళ (STRNCMP(ptr, "endif", 5) == 0)
 		    hash_dir = -1;
-		else
-		    return NULL;
+		లేకపోతే
+		    తిరిగి ఖాళీ;
 	    }
-	    pos.col = 0;
-	    while (!got_int)
+	    pos.నిలువు = 0;
+	    అయితే (!got_int)
 	    {
-		if (hash_dir > 0)
+		ఒకవేళ (hash_dir > 0)
 		{
-		    if (pos.lnum == curbuf->b_ml.ml_line_count)
-			break;
+		    ఒకవేళ (pos.lnum == curbuf->b_ml.ml_పంక్తి_లెక్క)
+			ఆపు;
 		}
-		else if (pos.lnum == 1)
-		    break;
+		లేకపోతే ఒకవేళ (pos.lnum == 1)
+		    ఆపు;
 		pos.lnum += hash_dir;
 		linep = ml_get(pos.lnum);
-		line_breakcheck();	// check for CTRL-C typed
+		పంక్తి_breakcheck();	// check for CTRL-C typed
 		ptr = skipwhite(linep);
-		if (*ptr != '#')
-		    continue;
-		pos.col = (colnr_T) (ptr - linep);
+		ఒకవేళ (*ptr != '#')
+		    కొనసాగు;
+		pos.నిలువు = (colnr_T) (ptr - linep);
 		ptr = skipwhite(ptr + 1);
-		if (hash_dir > 0)
+		ఒకవేళ (hash_dir > 0)
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
-			count++;
-		    else if (STRNCMP(ptr, "el", 2) == 0)
+		    ఒకవేళ (STRNCMP(ptr, "if", 2) == 0)
+			లెక్క++;
+		    లేకపోతే ఒకవేళ (STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ఒకవేళ (లెక్క == 0)
+			    తిరిగి &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
+		    లేకపోతే ఒకవేళ (STRNCMP(ptr, "endif", 5) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ఒకవేళ (లెక్క == 0)
+			    తిరిగి &pos;
+			లెక్క--;
 		    }
 		}
-		else
+		లేకపోతే
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
+		    ఒకవేళ (STRNCMP(ptr, "if", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ఒకవేళ (లెక్క == 0)
+			    తిరిగి &pos;
+			లెక్క--;
 		    }
-		    else if (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
+		    లేకపోతే ఒకవేళ (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ఒకవేళ (లెక్క == 0)
+			    తిరిగి &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
-			count++;
+		    లేకపోతే ఒకవేళ (STRNCMP(ptr, "endif", 5) == 0)
+			లెక్క++;
 		}
 	    }
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     // This is just guessing: when 'rightleft' is set, search for a matching
     // paren/brace in the other direction.
-    if (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != NULL)
+    ఒకవేళ (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != ఖాళీ)
 	backwards = !backwards;
-#endif
+#అయితే_ముగింపు
 
     do_quotes = -1;
-    start_in_quotes = MAYBE;
-    CLEAR_POS(&match_pos);
+    ప్రారంభం_లోపల_quotes = MAYBE;
+    CLEAR_POS(&సరిపోలిక_pos);
 
     // backward search: Check if this line contains a single-line comment
-    if ((backwards && comment_dir) || lisp || skip_comments)
-	comment_col = check_linecomment(linep);
-    if (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
+    ఒకవేళ ((backwards && comment_dir) || lisp || skip_comments)
+	comment_నిలువు = check_linecomment(linep);
+    ఒకవేళ (lisp && comment_నిలువు != MAXCOL && pos.నిలువు > (colnr_T)comment_నిలువు)
 	lispcomm = TRUE;    // find match inside this comment
     // skip // comment portion at starting position
-    if (skip_comments && !in_block_comment && comment_col != MAXCOL
-	    && backwards && pos.col > (colnr_T)comment_col)
-	pos.col = comment_col;
+    ఒకవేళ (skip_comments && !లోపల_ఖండం_comment && comment_నిలువు != MAXCOL
+	    && backwards && pos.నిలువు > (colnr_T)comment_నిలువు)
+	pos.నిలువు = comment_నిలువు;
 
-    while (!got_int)
+    అయితే (!got_int)
     {
 	/*
 	 * Go to the next position, forward or backward. We could use
 	 * inc() and dec() here, but that is much slower
 	 */
-	if (backwards)
+	ఒకవేళ (backwards)
 	{
 	    // char to match is inside of comment, don't search outside
-	    if (lispcomm && pos.col < (colnr_T)comment_col)
-		break;
-	    if (pos.col == 0)		// at start of line, go to prev. one
+	    ఒకవేళ (lispcomm && pos.నిలువు < (colnr_T)comment_నిలువు)
+		ఆపు;
+	    ఒకవేళ (pos.నిలువు == 0)		// at start of line, go to prev. one
 	    {
-		if (pos.lnum == 1)	// start of file
-		    break;
+		ఒకవేళ (pos.lnum == 1)	// start of file
+		    ఆపు;
 		--pos.lnum;
 
-		if (maxtravel > 0 && ++traveled > maxtravel)
-		    break;
+		ఒకవేళ (maxtravel > 0 && ++traveled > maxtravel)
+		    ఆపు;
 
 		linep = ml_get(pos.lnum);
-		pos.col = ml_get_len(pos.lnum); // pos.col on trailing NUL
+		pos.నిలువు = ml_get_len(pos.lnum); // pos.col on trailing NUL
 		do_quotes = -1;
-		line_breakcheck();
+		పంక్తి_breakcheck();
 
 		// Check if this line contains a single-line comment
-		if (comment_dir || lisp || skip_comments)
-		    comment_col = check_linecomment(linep);
+		ఒకవేళ (comment_dir || lisp || skip_comments)
+		    comment_నిలువు = check_linecomment(linep);
 		// skip comment
-		if (lisp && comment_col != MAXCOL)
-		    pos.col = comment_col;
-		else if (skip_comments && !in_block_comment
-			&& comment_col != MAXCOL
-			&& pos.col > (colnr_T)comment_col)
-		    pos.col = comment_col;
+		ఒకవేళ (lisp && comment_నిలువు != MAXCOL)
+		    pos.నిలువు = comment_నిలువు;
+		లేకపోతే ఒకవేళ (skip_comments && !లోపల_ఖండం_comment
+			&& comment_నిలువు != MAXCOL
+			&& pos.నిలువు > (colnr_T)comment_నిలువు)
+		    pos.నిలువు = comment_నిలువు;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		--pos.col;
-		if (has_mbyte)
-		    pos.col -= (*mb_head_off)(linep, linep + pos.col);
+		--pos.నిలువు;
+		ఒకవేళ (has_mbyte)
+		    pos.నిలువు -= (*mb_తల_off)(linep, linep + pos.నిలువు);
 	    }
 	}
-	else				// forward search
+	లేకపోతే				// forward search
 	{
-	    if (linep[pos.col] == NUL
+	    ఒకవేళ (linep[pos.నిలువు] == NUL
 		    // at end of line, go to next one
 		    // For lisp don't search for match in comment
-		    || (lisp && comment_col != MAXCOL
-					   && pos.col == (colnr_T)comment_col))
+		    || (lisp && comment_నిలువు != MAXCOL
+					   && pos.నిలువు == (colnr_T)comment_నిలువు))
 	    {
-		if (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
+		ఒకవేళ (pos.lnum == curbuf->b_ml.ml_పంక్తి_లెక్క  // end of file
 			// line is exhausted and comment with it,
 			// don't search for match in code
 			 || lispcomm)
-		    break;
+		    ఆపు;
 		++pos.lnum;
 
-		if (maxtravel && traveled++ > maxtravel)
-		    break;
+		ఒకవేళ (maxtravel && traveled++ > maxtravel)
+		    ఆపు;
 
 		linep = ml_get(pos.lnum);
-		pos.col = 0;
+		pos.నిలువు = 0;
 		do_quotes = -1;
-		line_breakcheck();
-		if (lisp || skip_comments)   // find comment pos in new line
-		    comment_col = check_linecomment(linep);
+		పంక్తి_breakcheck();
+		ఒకవేళ (lisp || skip_comments)   // find comment pos in new line
+		    comment_నిలువు = check_linecomment(linep);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (has_mbyte)
-		    pos.col += (*mb_ptr2len)(linep + pos.col);
-		else
-		    ++pos.col;
+		ఒకవేళ (has_mbyte)
+		    pos.నిలువు += (*mb_ptr2len)(linep + pos.నిలువు);
+		లేకపోతే
+		    ++pos.నిలువు;
 	    }
 	}
 
@@ -2533,109 +2533,109 @@ findmatchlimit(
 	// string are not comments, so skip them while "inquote" is set.
 	// Backward: '/' of end-marker enters comment; '*' of start-marker exits.
 	// Forward:  '/' of start-marker enters comment; '/' of end-marker exits.
-	if (skip_comments && !comment_dir && !inquote)
+	ఒకవేళ (skip_comments && !comment_dir && !inquote)
 	{
-	    if (backwards)
+	    ఒకవేళ (backwards)
 	    {
 		// Guard pos.col < comment_col: don't misread '*/' at the '//'
 		// position as a block-comment end-marker.
-		if (!in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
-		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '/' && linep[pos.col] == '*')
-		    in_block_comment = FALSE;
+		ఒకవేళ (!లోపల_ఖండం_comment && pos.నిలువు > 0
+			&& linep[pos.నిలువు - 1] == '*' && linep[pos.నిలువు] == '/'
+			&& (comment_నిలువు == MAXCOL || (పూర్ణాంకం)pos.నిలువు < comment_నిలువు))
+		    లోపల_ఖండం_comment = TRUE;
+		లేకపోతే ఒకవేళ (లోపల_ఖండం_comment && pos.నిలువు > 0
+			&& linep[pos.నిలువు - 1] == '/' && linep[pos.నిలువు] == '*')
+		    లోపల_ఖండం_comment = FALSE;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Guard pos.col < comment_col: don't treat '/*' inside a '//'
 		// comment as a block-comment start-marker.
-		if (!in_block_comment && linep[pos.col] == '/'
-			&& linep[pos.col + 1] == '*'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
-		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/')
-		    in_block_comment = FALSE;
+		ఒకవేళ (!లోపల_ఖండం_comment && linep[pos.నిలువు] == '/'
+			&& linep[pos.నిలువు + 1] == '*'
+			&& (comment_నిలువు == MAXCOL || (పూర్ణాంకం)pos.నిలువు < comment_నిలువు))
+		    లోపల_ఖండం_comment = TRUE;
+		లేకపోతే ఒకవేళ (లోపల_ఖండం_comment && pos.నిలువు > 0
+			&& linep[pos.నిలువు - 1] == '*' && linep[pos.నిలువు] == '/')
+		    లోపల_ఖండం_comment = FALSE;
 	    }
 	}
 
 	/*
 	 * If FM_BLOCKSTOP given, stop at a '{' or '}' in column 0.
 	 */
-	if (pos.col == 0 && (flags & FM_BLOCKSTOP)
+	ఒకవేళ (pos.నిలువు == 0 && (flags & FM_BLOCKSTOP)
 				       && (linep[0] == '{' || linep[0] == '}'))
 	{
-	    if (linep[0] == findc && count == 0)	// match!
-		return &pos;
-	    break;					// out of scope
+	    ఒకవేళ (linep[0] == findc && లెక్క == 0)	// match!
+		తిరిగి &pos;
+	    ఆపు;					// out of scope
 	}
 
-	if (comment_dir)
+	ఒకవేళ (comment_dir)
 	{
 	    // Note: comments do not nest, and we ignore quotes in them
 	    // TODO: ignore comment brackets inside strings
-	    if (comment_dir == FORWARD)
+	    ఒకవేళ (comment_dir == FORWARD)
 	    {
-		if (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
+		ఒకవేళ (linep[pos.నిలువు] == '*' && linep[pos.నిలువు + 1] == '/')
 		{
-		    pos.col++;
-		    return &pos;
+		    pos.నిలువు++;
+		    తిరిగి &pos;
 		}
 	    }
-	    else    // Searching backwards
+	    లేకపోతే    // Searching backwards
 	    {
 		/*
 		 * A comment may contain / * or / /, it may also start or end
 		 * with / * /.	Ignore a / * after / / and after *.
 		 */
-		if (pos.col == 0)
-		    continue;
-		else if (raw_string)
+		ఒకవేళ (pos.నిలువు == 0)
+		    కొనసాగు;
+		లేకపోతే ఒకవేళ (raw_string)
 		{
-		    if (linep[pos.col - 1] == 'R'
-			&& linep[pos.col] == '"'
-			&& vim_strchr(linep + pos.col + 1, '(') != NULL)
+		    ఒకవేళ (linep[pos.నిలువు - 1] == 'R'
+			&& linep[pos.నిలువు] == '"'
+			&& vim_strchr(linep + pos.నిలువు + 1, '(') != ఖాళీ)
 		    {
 			// Possible start of raw string. Now that we have the
 			// delimiter we can check if it ends before where we
 			// started searching, or before the previously found
 			// raw string start.
-			if (!find_rawstring_end(linep, &pos,
-				  count > 0 ? &match_pos : &curwin->w_cursor))
+			ఒకవేళ (!కనుగొను_rawstring_చివర(linep, &pos,
+				  లెక్క > 0 ? &సరిపోలిక_pos : &curwin->w_cursor))
 			{
-			    count++;
-			    match_pos = pos;
-			    match_pos.col--;
+			    లెక్క++;
+			    సరిపోలిక_pos = pos;
+			    సరిపోలిక_pos.నిలువు--;
 			}
 			linep = ml_get(pos.lnum); // may have been released
 		    }
 		}
-		else if (  linep[pos.col - 1] == '/'
-			&& linep[pos.col] == '*'
-			&& (pos.col == 1 || linep[pos.col - 2] != '*')
-			&& (int)pos.col < comment_col)
+		లేకపోతే ఒకవేళ (  linep[pos.నిలువు - 1] == '/'
+			&& linep[pos.నిలువు] == '*'
+			&& (pos.నిలువు == 1 || linep[pos.నిలువు - 2] != '*')
+			&& (పూర్ణాంకం)pos.నిలువు < comment_నిలువు)
 		{
-		    count++;
-		    match_pos = pos;
-		    match_pos.col--;
+		    లెక్క++;
+		    సరిపోలిక_pos = pos;
+		    సరిపోలిక_pos.నిలువు--;
 		}
-		else if (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
+		లేకపోతే ఒకవేళ (linep[pos.నిలువు - 1] == '*' && linep[pos.నిలువు] == '/')
 		{
-		    if (count > 0)
-			pos = match_pos;
-		    else if (pos.col > 1 && linep[pos.col - 2] == '/'
-					       && (int)pos.col <= comment_col)
-			pos.col -= 2;
-		    else if (ignore_cend)
-			continue;
-		    else
-			return NULL;
-		    return &pos;
+		    ఒకవేళ (లెక్క > 0)
+			pos = సరిపోలిక_pos;
+		    లేకపోతే ఒకవేళ (pos.నిలువు > 1 && linep[pos.నిలువు - 2] == '/'
+					       && (పూర్ణాంకం)pos.నిలువు <= comment_నిలువు)
+			pos.నిలువు -= 2;
+		    లేకపోతే ఒకవేళ (ignore_cend)
+			కొనసాగు;
+		    లేకపోతే
+			తిరిగి ఖాళీ;
+		    తిరిగి &pos;
 		}
 	    }
-	    continue;
+	    కొనసాగు;
 	}
 
 	/*
@@ -2643,23 +2643,23 @@ findmatchlimit(
 	 * of quotes are ignored, but only if there is an even number of
 	 * quotes in the line.
 	 */
-	if (cpo_match)
+	ఒకవేళ (cpo_సరిపోలిక)
 	    do_quotes = 0;
-	else if (do_quotes == -1)
+	లేకపోతే ఒకవేళ (do_quotes == -1)
 	{
 	    /*
 	     * Count the number of quotes in the line, skipping \" and '"'.
 	     * Watch out for "\\".
 	     */
-	    at_start = do_quotes;
-	    for (ptr = linep; *ptr; ++ptr)
+	    at_ప్రారంభం = do_quotes;
+	    కొరకు (ptr = linep; *ptr; ++ptr)
 	    {
-		if (ptr == linep + pos.col + backwards)
-		    at_start = (do_quotes & 1);
-		if (*ptr == '"'
+		ఒకవేళ (ptr == linep + pos.నిలువు + backwards)
+		    at_ప్రారంభం = (do_quotes & 1);
+		ఒకవేళ (*ptr == '"'
 			&& (ptr == linep || ptr[-1] != '\'' || ptr[1] != '\''))
 		    ++do_quotes;
-		if (*ptr == '\\' && ptr[1] != NUL)
+		ఒకవేళ (*ptr == '\\' && ptr[1] != NUL)
 		    ++ptr;
 	    }
 	    do_quotes &= 1;	    // result is 1 with even number of quotes
@@ -2668,34 +2668,34 @@ findmatchlimit(
 	     * If we find an uneven count, check current line and previous
 	     * one for a '\' at the end.
 	     */
-	    if (!do_quotes)
+	    ఒకవేళ (!do_quotes)
 	    {
 		inquote = FALSE;
-		if (ptr[-1] == '\\')
+		ఒకవేళ (ptr[-1] == '\\')
 		{
 		    do_quotes = 1;
-		    if (start_in_quotes == MAYBE)
+		    ఒకవేళ (ప్రారంభం_లోపల_quotes == MAYBE)
 		    {
-			inquote = at_start;
-			if (inquote)
-			    start_in_quotes = TRUE;
+			inquote = at_ప్రారంభం;
+			ఒకవేళ (inquote)
+			    ప్రారంభం_లోపల_quotes = TRUE;
 		    }
-		    else if (backwards)
+		    లేకపోతే ఒకవేళ (backwards)
 			inquote = TRUE;
 		}
-		if (pos.lnum > 1)
+		ఒకవేళ (pos.lnum > 1)
 		{
 		    ptr = ml_get(pos.lnum - 1);
-		    if (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
+		    ఒకవేళ (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
 		    {
 			do_quotes = 1;
-			if (start_in_quotes == MAYBE)
+			ఒకవేళ (ప్రారంభం_లోపల_quotes == MAYBE)
 			{
-			    inquote = at_start;
-			    if (inquote)
-				start_in_quotes = TRUE;
+			    inquote = at_ప్రారంభం;
+			    ఒకవేళ (inquote)
+				ప్రారంభం_లోపల_quotes = TRUE;
 			}
-			else if (!backwards)
+			లేకపోతే ఒకవేళ (!backwards)
 			    inquote = TRUE;
 		    }
 
@@ -2704,8 +2704,8 @@ findmatchlimit(
 		}
 	    }
 	}
-	if (start_in_quotes == MAYBE)
-	    start_in_quotes = FALSE;
+	ఒకవేళ (ప్రారంభం_లోపల_quotes == MAYBE)
+	    ప్రారంభం_లోపల_quotes = FALSE;
 
 	/*
 	 * If 'smartmatch' is set:
@@ -2718,35 +2718,35 @@ findmatchlimit(
 	 *   inquote if the number of quotes in a line is even, unless this
 	 *   line or the previous one ends in a '\'.  Complicated, isn't it?
 	 */
-	c = PTR2CHAR(linep + pos.col);
-	switch (c)
+	c = PTR2CHAR(linep + pos.నిలువు);
+	ఎంపిక (c)
 	{
-	case NUL:
+	స్థితి NUL:
 	    // at end of line without trailing backslash, reset inquote
-	    if (pos.col == 0 || linep[pos.col - 1] != '\\')
+	    ఒకవేళ (pos.నిలువు == 0 || linep[pos.నిలువు - 1] != '\\')
 	    {
 		inquote = FALSE;
-		start_in_quotes = FALSE;
+		ప్రారంభం_లోపల_quotes = FALSE;
 	    }
-	    break;
+	    ఆపు;
 
-	case '"':
+	స్థితి '"':
 	    // a quote that is preceded with an odd number of backslashes is
 	    // ignored
-	    if (do_quotes)
+	    ఒకవేళ (do_quotes)
 	    {
-		int col;
+		పూర్ణాంకం నిలువు;
 
-		for (col = pos.col - 1; col >= 0; --col)
-		    if (linep[col] != '\\')
-			break;
-		if ((((int)pos.col - 1 - col) & 1) == 0)
+		కొరకు (నిలువు = pos.నిలువు - 1; నిలువు >= 0; --నిలువు)
+		    ఒకవేళ (linep[నిలువు] != '\\')
+			ఆపు;
+		ఒకవేళ ((((పూర్ణాంకం)pos.నిలువు - 1 - నిలువు) & 1) == 0)
 		{
 		    inquote = !inquote;
-		    start_in_quotes = FALSE;
+		    ప్రారంభం_లోపల_quotes = FALSE;
 		}
 	    }
-	    break;
+	    ఆపు;
 
 	/*
 	 * If smart matching ('cpoptions' does not contain '%'):
@@ -2755,95 +2755,95 @@ findmatchlimit(
 	 *   skipped, there is never a brace in them.
 	 *   Ignore this when finding matches for `'.
 	 */
-	case '\'':
-	    if (!cpo_match && initc != '\'' && findc != '\'')
+	స్థితి '\'':
+	    ఒకవేళ (!cpo_సరిపోలిక && initc != '\'' && findc != '\'')
 	    {
-		if (backwards)
+		ఒకవేళ (backwards)
 		{
-		    if (pos.col > 1)
+		    ఒకవేళ (pos.నిలువు > 1)
 		    {
-			if (linep[pos.col - 2] == '\'')
+			ఒకవేళ (linep[pos.నిలువు - 2] == '\'')
 			{
-			    pos.col -= 2;
-			    break;
+			    pos.నిలువు -= 2;
+			    ఆపు;
 			}
-			else if (linep[pos.col - 2] == '\\'
-				  && pos.col > 2 && linep[pos.col - 3] == '\'')
+			లేకపోతే ఒకవేళ (linep[pos.నిలువు - 2] == '\\'
+				  && pos.నిలువు > 2 && linep[pos.నిలువు - 3] == '\'')
 			{
-			    pos.col -= 3;
-			    break;
+			    pos.నిలువు -= 3;
+			    ఆపు;
 			}
 		    }
 		}
-		else if (linep[pos.col + 1])	// forward search
+		లేకపోతే ఒకవేళ (linep[pos.నిలువు + 1])	// forward search
 		{
-		    if (linep[pos.col + 1] == '\\'
-			   && linep[pos.col + 2] && linep[pos.col + 3] == '\'')
+		    ఒకవేళ (linep[pos.నిలువు + 1] == '\\'
+			   && linep[pos.నిలువు + 2] && linep[pos.నిలువు + 3] == '\'')
 		    {
-			pos.col += 3;
-			break;
+			pos.నిలువు += 3;
+			ఆపు;
 		    }
-		    else if (linep[pos.col + 2] == '\'')
+		    లేకపోతే ఒకవేళ (linep[pos.నిలువు + 2] == '\'')
 		    {
-			pos.col += 2;
-			break;
+			pos.నిలువు += 2;
+			ఆపు;
 		    }
 		}
 	    }
 	    // FALLTHROUGH
 
-	default:
+	అప్రమేయ:
 	    /*
 	     * For Lisp skip over backslashed (), {} and [].
 	     * (actually, we skip #\( et al)
 	     */
-	    if (curbuf->b_p_lisp
-		    && vim_strchr((char_u *)"{}()[]", c) != NULL
-		    && pos.col > 1
-		    && check_prevcol(linep, pos.col, '\\', NULL)
-		    && check_prevcol(linep, pos.col - 1, '#', NULL))
-		break;
+	    ఒకవేళ (curbuf->b_p_lisp
+		    && vim_strchr((char_u *)"{}()[]", c) != ఖాళీ
+		    && pos.నిలువు > 1
+		    && check_prevcol(linep, pos.నిలువు, '\\', ఖాళీ)
+		    && check_prevcol(linep, pos.నిలువు - 1, '#', ఖాళీ))
+		ఆపు;
 
 	    // Skip matches inside comments when FM_SKIPCOMM is set.
-	    if (skip_comments && (in_block_comment
-		    || (comment_col != MAXCOL && (int)pos.col >= comment_col)))
-		break;
+	    ఒకవేళ (skip_comments && (లోపల_ఖండం_comment
+		    || (comment_నిలువు != MAXCOL && (పూర్ణాంకం)pos.నిలువు >= comment_నిలువు)))
+		ఆపు;
 
 	    // Check for match outside of quotes, and inside of
 	    // quotes when the start is also inside of quotes.
-	    if ((!inquote || start_in_quotes == TRUE)
+	    ఒకవేళ ((!inquote || ప్రారంభం_లోపల_quotes == TRUE)
 		    && (c == initc || c == findc))
 	    {
-		int	col, bslcnt = 0;
+		పూర్ణాంకం	నిలువు, bslcnt = 0;
 
-		if (!cpo_bsl)
+		ఒకవేళ (!cpo_bsl)
 		{
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    కొరకు (నిలువు = pos.నిలువు; check_prevcol(linep, నిలువు, '\\', &నిలువు);)
 			bslcnt++;
 		}
 		// Only accept a match when 'M' is in 'cpo' or when escaping
 		// is what we expect.
-		if (cpo_bsl || (bslcnt & 1) == match_escaped)
+		ఒకవేళ (cpo_bsl || (bslcnt & 1) == సరిపోలిక_escaped)
 		{
-		    if (c == initc)
-			count++;
-		    else
+		    ఒకవేళ (c == initc)
+			లెక్క++;
+		    లేకపోతే
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ఒకవేళ (లెక్క == 0)
+			    తిరిగి &pos;
+			లెక్క--;
 		    }
 		}
 	    }
 	}
     }
 
-    if (comment_dir == BACKWARD && count > 0)
+    ఒకవేళ (comment_dir == BACKWARD && లెక్క > 0)
     {
-	pos = match_pos;
-	return &pos;
+	pos = సరిపోలిక_pos;
+	తిరిగి &pos;
     }
-    return (pos_T *)NULL;	// never found it
+    తిరిగి (pos_T *)ఖాళీ;	// never found it
 }
 
 /*
@@ -2852,64 +2852,64 @@ findmatchlimit(
  * Show the match only if it is visible on the screen.
  * If there isn't a match, then beep.
  */
-    void
+    శూన్య
 showmatch(
-    int		c)	    // char to show match for
+    పూర్ణాంకం		c)	    // char to show match for
 {
     pos_T	*lpos, save_cursor;
     pos_T	mpos;
     colnr_T	vcol;
-    long	save_so;
-    long	save_siso;
-#ifdef CURSOR_SHAPE
-    int		save_state;
-#endif
+    దీర్ఘ	save_so;
+    దీర్ఘ	save_siso;
+#నిర్వచితమైతే CURSOR_SHAPE
+    పూర్ణాంకం		save_state;
+#అయితే_ముగింపు
     colnr_T	save_dollar_vcol;
     char_u	*p;
-    long	*so = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
-    long	*siso = curwin->w_p_siso >= 0 ? &curwin->w_p_siso : &p_siso;
+    దీర్ఘ	*so = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
+    దీర్ఘ	*siso = curwin->w_p_siso >= 0 ? &curwin->w_p_siso : &p_siso;
 
     /*
      * Only show match for chars in the 'matchpairs' option.
      */
     // 'matchpairs' is "x:y,x:y"
-    for (p = curbuf->b_p_mps; *p != NUL; ++p)
+    కొరకు (p = curbuf->b_p_mps; *p != NUL; ++p)
     {
-#ifdef FEAT_RIGHTLEFT
-	if (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
-	    break;
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
+	    ఆపు;
+#అయితే_ముగింపు
 	p += mb_ptr2len(p) + 1;
-	if (PTR2CHAR(p) == c
-#ifdef FEAT_RIGHTLEFT
+	ఒకవేళ (PTR2CHAR(p) == c
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		&& !(curwin->w_p_rl ^ p_ri)
-#endif
+#అయితే_ముగింపు
 	   )
-	    break;
+	    ఆపు;
 	p += mb_ptr2len(p);
-	if (*p == NUL)
-	    return;
+	ఒకవేళ (*p == NUL)
+	    తిరిగి;
     }
-    if (*p == NUL)
-	return;
+    ఒకవేళ (*p == NUL)
+	తిరిగి;
 
-    if ((lpos = findmatch(NULL, NUL)) == NULL)	    // no match, so beep
+    ఒకవేళ ((lpos = findmatch(ఖాళీ, NUL)) == ఖాళీ)	    // no match, so beep
     {
-	vim_beep(BO_MATCH);
-	return;
+	vim_beep(BO_సరిపోలిక);
+	తిరిగి;
     }
 
-    if (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
-	return;
+    ఒకవేళ (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
+	తిరిగి;
 
-    if (!curwin->w_p_wrap)
-	getvcol(curwin, lpos, NULL, &vcol, NULL, 0);
+    ఒకవేళ (!curwin->w_p_wrap)
+	getvcol(curwin, lpos, ఖాళీ, &vcol, ఖాళీ, 0);
 
-    int col_visible = (curwin->w_p_wrap
+    పూర్ణాంకం నిలువు_visible = (curwin->w_p_wrap
 	    || (vcol >= curwin->w_leftcol
-		&& vcol < curwin->w_leftcol + curwin->w_width));
-    if (!col_visible)
-	return;
+		&& vcol < curwin->w_leftcol + curwin->w_వెడల్పు));
+    ఒకవేళ (!నిలువు_visible)
+	తిరిగి;
 
     mpos = *lpos;    // save the pos, update_screen() may change it
     save_cursor = curwin->w_cursor;
@@ -2917,24 +2917,24 @@ showmatch(
     save_siso = *siso;
     // Handle "$" in 'cpo': If the ')' is typed on top of the "$",
     // stop displaying the "$".
-    if (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
+    ఒకవేళ (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
 	dollar_vcol = -1;
     ++curwin->w_virtcol;	// do display ')' just before "$"
     update_screen(UPD_VALID);	// show the new char first
 
     save_dollar_vcol = dollar_vcol;
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     save_state = State;
-    State = MODE_SHOWMATCH;
+    State = బహుళకం_SHOWMATCH;
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
     curwin->w_cursor = mpos;	// move to matching char
     *so = 0;			// don't use 'scrolloff' here
     *siso = 0;			// don't use 'sidescrolloff' here
     showruler(FALSE);
     setcursor();
     cursor_on();		// make sure that the cursor is shown
-    out_flush_cursor(TRUE, FALSE);
+    బహిర్గతం_flush_cursor(TRUE, FALSE);
 
     // Restore dollar_vcol(), because setcursor() may call curs_rows()
     // which resets it if the matching position is in a previous line
@@ -2945,17 +2945,17 @@ showmatch(
      * brief pause, unless 'm' is present in 'cpo' and a character is
      * available.
      */
-    if (vim_strchr(p_cpo, CPO_SHOWMATCH) != NULL)
+    ఒకవేళ (vim_strchr(p_cpo, CPO_SHOWMATCH) != ఖాళీ)
 	ui_delay(p_mat * 100L + 8, TRUE);
-    else if (!char_avail())
+    లేకపోతే ఒకవేళ (!char_avail())
 	ui_delay(p_mat * 100L + 9, FALSE);
     curwin->w_cursor = save_cursor;	// restore cursor position
     *so = save_so;
     *siso = save_siso;
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     State = save_state;
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -2965,71 +2965,71 @@ showmatch(
  * "direction" is FORWARD or BACKWARD.
  * Returns TRUE, FALSE or -1 for failure.
  */
-    static int
-is_zero_width(
-    char_u	*pattern,
+    స్థిర పూర్ణాంకం
+is_zero_వెడల్పు(
+    char_u	*నమూనా,
     size_t	patternlen,
-    int		move,
+    పూర్ణాంకం		move,
     pos_T	*cur,
-    int		direction)
+    పూర్ణాంకం		direction)
 {
     regmmatch_T	regmatch;
-    int		nmatched = 0;
-    int		result = -1;
+    పూర్ణాంకం		nmatched = 0;
+    పూర్ణాంకం		ఫలితం = -1;
     pos_T	pos;
-    int		called_emsg_before = called_emsg;
-    int		flag = 0;
+    పూర్ణాంకం		called_emsg_before = called_emsg;
+    పూర్ణాంకం		flag = 0;
 
-    if (pattern == NULL)
+    ఒకవేళ (నమూనా == ఖాళీ)
     {
-	pattern = spats[last_idx].pat;
-	patternlen = spats[last_idx].patlen;
+	నమూనా = spats[చివరి_idx].pat;
+	patternlen = spats[చివరి_idx].patlen;
     }
 
-    if (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
-					      SEARCH_KEEP, &regmatch) == FAIL)
-	return -1;
+    ఒకవేళ (శోధన_regcomp(నమూనా, patternlen, ఖాళీ, RE_శోధన, RE_శోధన,
+					      శోధన_KEEP, &regmatch) == FAIL)
+	తిరిగి -1;
 
     // init startcol correctly
-    regmatch.startpos[0].col = -1;
+    regmatch.startpos[0].నిలువు = -1;
     // move to match
-    if (move)
+    ఒకవేళ (move)
     {
 	CLEAR_POS(&pos);
     }
-    else
+    లేకపోతే
     {
 	pos = *cur;
 	// accept a match at the cursor position
-	flag = SEARCH_START;
+	flag = శోధన_ప్రారంభం;
     }
 
-    if (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
-				  SEARCH_KEEP + flag, RE_SEARCH, NULL) != FAIL)
+    ఒకవేళ (searchit(curwin, curbuf, &pos, ఖాళీ, direction, నమూనా, patternlen, 1,
+				  శోధన_KEEP + flag, RE_శోధన, ఖాళీ) != FAIL)
     {
 	// Zero-width pattern should match somewhere, then we can check if
 	// start and end are in the same position.
-	do
+	చేయి
 	{
-	    regmatch.startpos[0].col++;
+	    regmatch.startpos[0].నిలువు++;
 	    nmatched = vim_regexec_multi(&regmatch, curwin, curbuf,
-			       pos.lnum, regmatch.startpos[0].col, NULL);
-	    if (nmatched != 0)
-		break;
-	} while (regmatch.regprog != NULL
-		&& (direction == FORWARD ? regmatch.startpos[0].col < pos.col
-				      : regmatch.startpos[0].col > pos.col));
+			       pos.lnum, regmatch.startpos[0].నిలువు, ఖాళీ);
+	    ఒకవేళ (nmatched != 0)
+		ఆపు;
+	} అయితే (regmatch.regprog != ఖాళీ
+		&& (direction == FORWARD ? regmatch.startpos[0].నిలువు < pos.నిలువు
+				      : regmatch.startpos[0].నిలువు > pos.నిలువు));
 
-	if (called_emsg == called_emsg_before)
+	ఒకవేళ (called_emsg == called_emsg_before)
 	{
-	    result = (nmatched != 0
+	    ఫలితం = (nmatched != 0
 		&& regmatch.startpos[0].lnum == regmatch.endpos[0].lnum
-		&& regmatch.startpos[0].col == regmatch.endpos[0].col);
+		&& regmatch.startpos[0].నిలువు == regmatch.endpos[0].నిలువు);
 	}
     }
 
     vim_regfree(regmatch.regprog);
-    return result;
+    తిరిగి ఫలితం;
 }
 
 
@@ -3037,77 +3037,77 @@ is_zero_width(
  * Find next search match under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
-current_search(
-    long	count,
-    int		forward)	// TRUE for forward, FALSE for backward
+    పూర్ణాంకం
+current_శోధన(
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		forward)	// TRUE for forward, FALSE for backward
 {
-    pos_T	start_pos;	// start position of the pattern match
-    pos_T	end_pos;	// end position of the pattern match
+    pos_T	ప్రారంభం_pos;	// start position of the pattern match
+    pos_T	చివర_pos;	// end position of the pattern match
     pos_T	orig_pos;	// position of the cursor at beginning
     pos_T	pos;		// position after the pattern
-    int		i;
-    int		dir;
-    int		result;		// result of various function calls
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		dir;
+    పూర్ణాంకం		ఫలితం;		// result of various function calls
     char_u	old_p_ws = p_ws;
-    int		flags = 0;
+    పూర్ణాంకం		flags = 0;
     pos_T	save_VIsual = VIsual;
-    int		zero_width;
-    int		skip_first_backward;
+    పూర్ణాంకం		zero_వెడల్పు;
+    పూర్ణాంకం		skip_మొదటి_backward;
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    ఒకవేళ (VIsual_చురుకైన && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     // When searching forward and the cursor is at the start of the Visual
     // area, skip the first search backward, otherwise it doesn't move.
-    skip_first_backward = forward && VIsual_active
+    skip_మొదటి_backward = forward && VIsual_చురుకైన
 					   && LT_POS(curwin->w_cursor, VIsual);
 
     orig_pos = pos = curwin->w_cursor;
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
-	if (forward)
+	ఒకవేళ (forward)
 	    incl(&pos);
-	else
+	లేకపోతే
 	    decl(&pos);
     }
 
     // Is the pattern is zero-width?, this time, don't care about the direction
-    zero_width = is_zero_width(spats[last_idx].pat, spats[last_idx].patlen,
+    zero_వెడల్పు = is_zero_వెడల్పు(spats[చివరి_idx].pat, spats[చివరి_idx].patlen,
 						TRUE, &curwin->w_cursor, FORWARD);
-    if (zero_width == -1)
-	return FAIL;  // pattern not found
+    ఒకవేళ (zero_వెడల్పు == -1)
+	తిరిగి FAIL;  // pattern not found
 
     /*
      * The trick is to first search backwards and then search forward again,
      * so that a match at the current cursor position will be correctly
      * captured.  When "forward" is false do it the other way around.
      */
-    for (i = 0; i < 2; i++)
+    కొరకు (i = 0; i < 2; i++)
     {
-	if (forward)
+	ఒకవేళ (forward)
 	{
-	    if (i == 0 && skip_first_backward)
-		continue;
+	    ఒకవేళ (i == 0 && skip_మొదటి_backward)
+		కొనసాగు;
 	    dir = i;
 	}
-	else
+	లేకపోతే
 	    dir = !i;
 
 	flags = 0;
-	if (!dir && !zero_width)
-	    flags = SEARCH_END;
-	end_pos = pos;
+	ఒకవేళ (!dir && !zero_వెడల్పు)
+	    flags = శోధన_చివర;
+	చివర_pos = pos;
 
 	// wrapping should not occur in the first round
-	if (i == 0)
+	ఒకవేళ (i == 0)
 	    p_ws = FALSE;
 
-	result = searchit(curwin, curbuf, &pos, &end_pos,
+	ఫలితం = searchit(curwin, curbuf, &pos, &చివర_pos,
 		(dir ? FORWARD : BACKWARD),
-		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? count : 1),
-		SEARCH_KEEP | flags, RE_SEARCH, NULL);
+		spats[చివరి_idx].pat, spats[చివరి_idx].patlen, (దీర్ఘ) (i ? లెక్క : 1),
+		శోధన_KEEP | flags, RE_శోధన, ఖాళీ);
 
 	p_ws = old_p_ws;
 
@@ -3115,148 +3115,148 @@ current_search(
 	// beginning of the file (cursor might be on the search match)
 	// except when Visual mode is active, so that extending the visual
 	// selection works.
-	if (i == 1 && !result) // not found, abort
+	ఒకవేళ (i == 1 && !ఫలితం) // not found, abort
 	{
 	    curwin->w_cursor = orig_pos;
-	    if (VIsual_active)
+	    ఒకవేళ (VIsual_చురుకైన)
 		VIsual = save_VIsual;
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	else if (i == 0 && !result)
+	లేకపోతే ఒకవేళ (i == 0 && !ఫలితం)
 	{
-	    if (forward)
+	    ఒకవేళ (forward)
 	    {
 		// try again from start of buffer
 		CLEAR_POS(&pos);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// try again from end of buffer
 		// searching backwards, so set pos to last line and col
-		pos.lnum = curwin->w_buffer->b_ml.ml_line_count;
-		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_line_count);
+		pos.lnum = curwin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
+		pos.నిలువు  = ml_get_len(curwin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క);
 	    }
 	}
     }
 
-    start_pos = pos;
+    ప్రారంభం_pos = pos;
 
-    if (!VIsual_active)
-	VIsual = start_pos;
+    ఒకవేళ (!VIsual_చురుకైన)
+	VIsual = ప్రారంభం_pos;
 
     // put the cursor after the match
-    curwin->w_cursor = end_pos;
-    if (LT_POS(VIsual, end_pos) && forward)
+    curwin->w_cursor = చివర_pos;
+    ఒకవేళ (LT_POS(VIsual, చివర_pos) && forward)
     {
-	if (skip_first_backward)
+	ఒకవేళ (skip_మొదటి_backward)
 	    // put the cursor on the start of the match
 	    curwin->w_cursor = pos;
-	else
+	లేకపోతే
 	    // put the cursor on last character of match
 	    dec_cursor();
     }
-    else if (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
+    లేకపోతే ఒకవేళ (VIsual_చురుకైన && LT_POS(curwin->w_cursor, VIsual) && forward)
 	curwin->w_cursor = pos;   // put the cursor on the start of the match
-    VIsual_active = TRUE;
-    VIsual_mode = 'v';
+    VIsual_చురుకైన = TRUE;
+    VIsual_బహుళకం = 'v';
 
-    if (*p_sel == 'e')
+    ఒకవేళ (*p_sel == 'e')
     {
 	// Correction for exclusive selection depends on the direction.
-	if (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
+	ఒకవేళ (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	else if (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
+	లేకపోతే ఒకవేళ (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
 	    inc(&VIsual);
     }
 
-#ifdef FEAT_FOLDING
-    if (fdo_flags & FDO_SEARCH && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ (fdo_flags & FDO_శోధన && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
-    may_start_select('c');
+    may_ప్రారంభం_select('c');
     setmouse();
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
     // end are still the same, and the selection needs to be owned
-    clip_star.vmode = NUL;
-#endif
+    clip_నక్షత్రం.vmode = NUL;
+#అయితే_ముగింపు
     redraw_curbuf_later(UPD_INVERTED);
     showmode();
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * return TRUE if line 'lnum' is empty or has white chars only.
  */
-    int
+    పూర్ణాంకం
 linewhite(linenr_T lnum)
 {
     char_u  *p;
 
     p = skipwhite(ml_get(lnum));
-    return (*p == NUL);
+    తిరిగి (*p == NUL);
 }
 
 /*
  * Add the search count "[3/19]" to "msgbuf".
  * See update_search_stat() for other arguments.
  */
-    static void
-cmdline_search_stat(
-    int		dirc,
+    స్థిర శూన్య
+cmdline_శోధన_stat(
+    పూర్ణాంకం		dirc,
     pos_T	*pos,
     pos_T	*cursor_pos,
-    int		show_top_bot_msg,
+    పూర్ణాంకం		show_శిఖరం_bot_సందేశం,
     char_u	*msgbuf,
     size_t	msgbuflen,
-    int		recompute,
-    int		maxcount,
-    long	timeout)
+    పూర్ణాంకం		recompute,
+    పూర్ణాంకం		maxcount,
+    దీర్ఘ	timeout)
 {
     searchstat_T stat;
 
-    update_search_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
+    update_శోధన_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
 								      timeout);
-    if (stat.cur <= 0)
-	return;
+    ఒకవేళ (stat.cur <= 0)
+	తిరిగి;
 
-    char	t[SEARCH_STAT_BUF_LEN];
+    అక్షరం	t[శోధన_STAT_BUF_LEN];
     size_t	len;
 
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (curwin->w_p_rl && *curwin->w_p_rlc == 's')
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	ఒకవేళ (stat.incomplete == 1)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[?/??]");
+	లేకపోతే ఒకవేళ (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/%d]",
+	లేకపోతే ఒకవేళ (stat.cnt > maxcount)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[>%d/%d]",
 		    maxcount, stat.cur);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	లేకపోతే
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cnt, stat.cur);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	ఒకవేళ (stat.incomplete == 1)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[?/??]");
+	లేకపోతే ఒకవేళ (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/>%d]",
+	లేకపోతే ఒకవేళ (stat.cnt > maxcount)
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[%d/>%d]",
 		    stat.cur, maxcount);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	లేకపోతే
+	    len = vim_snprintf(t, శోధన_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cur, stat.cnt);
     }
 
-    if (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
+    ఒకవేళ (show_శిఖరం_bot_సందేశం && len + 2 < శోధన_STAT_BUF_LEN)
     {
 	mch_memmove(t + 2, t, len);
 	t[0] = 'W';
@@ -3264,17 +3264,17 @@ cmdline_search_stat(
 	len += 2;
     }
 
-    if (len > msgbuflen)
+    ఒకవేళ (len > msgbuflen)
 	len = msgbuflen;
     mch_memmove(msgbuf + msgbuflen - len, t, len);
 
-    if (dirc == '?' && stat.cur == maxcount + 1)
+    ఒకవేళ (dirc == '?' && stat.cur == maxcount + 1)
 	stat.cur = -1;
 
     // keep the message even after redraw, but don't put in history
-    msg_hist_off = TRUE;
+    సందేశం_hist_off = TRUE;
     give_warning(msgbuf, FALSE);
-    msg_hist_off = FALSE;
+    సందేశం_hist_off = FALSE;
 }
 
 /*
@@ -3285,54 +3285,54 @@ cmdline_search_stat(
  * dirc == '/': find the next match
  * dirc == '?': find the previous match
  */
-    static void
-update_search_stat(
-    int			dirc,
+    స్థిర శూన్య
+update_శోధన_stat(
+    పూర్ణాంకం			dirc,
     pos_T		*pos,
     pos_T		*cursor_pos,
     searchstat_T	*stat,
-    int			recompute,
-    int			maxcount,
-    long		timeout UNUSED)
+    పూర్ణాంకం			recompute,
+    పూర్ణాంకం			maxcount,
+    దీర్ఘ		timeout వాడని)
 {
-    int		    save_ws = p_ws;
-    int		    wraparound = FALSE;
+    పూర్ణాంకం		    save_ws = p_ws;
+    పూర్ణాంకం		    wraparound = FALSE;
     pos_T	    p = (*pos);
-    static pos_T    lastpos = {0, 0, 0};
-    static int	    cur = 0;
-    static int	    cnt = 0;
-    static int	    exact_match = FALSE;
-    static int	    incomplete = 0;
-    static int	    last_maxcount = 0;
-    static int	    chgtick = 0;
-    static char_u   *lastpat = NULL;
-    static size_t   lastpatlen = 0;
-    static buf_T    *lbuf = NULL;
-#ifdef FEAT_RELTIME
-    proftime_T  start;
-#endif
+    స్థిర pos_T    lastpos = {0, 0, 0};
+    స్థిర పూర్ణాంకం	    cur = 0;
+    స్థిర పూర్ణాంకం	    cnt = 0;
+    స్థిర పూర్ణాంకం	    exact_సరిపోలిక = FALSE;
+    స్థిర పూర్ణాంకం	    incomplete = 0;
+    స్థిర పూర్ణాంకం	    చివరి_maxcount = 0;
+    స్థిర పూర్ణాంకం	    chgtick = 0;
+    స్థిర char_u   *lastpat = ఖాళీ;
+    స్థిర size_t   lastpatlen = 0;
+    స్థిర buf_T    *lbuf = ఖాళీ;
+#నిర్వచితమైతే FEAT_RELTIME
+    proftime_T  ప్రారంభం;
+#అయితే_ముగింపు
 
-    CLEAR_POINTER(stat);
+    CLEAR_సూచిక(stat);
 
-    if (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
+    ఒకవేళ (dirc == 0 && !recompute && !ఖాళీలు_POS(lastpos))
     {
 	stat->cur = cur;
 	stat->cnt = cnt;
-	stat->exact_match = exact_match;
+	stat->exact_సరిపోలిక = exact_సరిపోలిక;
 	stat->incomplete = incomplete;
-	stat->last_maxcount = last_maxcount;
-	return;
+	stat->చివరి_maxcount = చివరి_maxcount;
+	తిరిగి;
     }
-    last_maxcount = maxcount;
+    చివరి_maxcount = maxcount;
 
     wraparound = ((dirc == '?' && LT_POS(lastpos, p))
 	       || (dirc == '/' && LT_POS(p, lastpos)));
 
     // If anything relevant changed the count has to be recomputed.
-    if (!(chgtick == CHANGEDTICK(curbuf)
-	&& (lastpat != NULL
-	    && STRNCMP(lastpat, spats[last_idx].pat, lastpatlen) == 0
-	    && lastpatlen == spats[last_idx].patlen
+    ఒకవేళ (!(chgtick == CHANGEDTICK(curbuf)
+	&& (lastpat != ఖాళీ
+	    && STRNCMP(lastpat, spats[చివరి_idx].pat, lastpatlen) == 0
+	    && lastpatlen == spats[చివరి_idx].patlen
 	)
 	&& EQUAL_POS(lastpos, *cursor_pos)
 	&& lbuf == curbuf) || wraparound || cur < 0
@@ -3340,7 +3340,7 @@ update_search_stat(
     {
 	cur = 0;
 	cnt = 0;
-	exact_match = FALSE;
+	exact_సరిపోలిక = FALSE;
 	incomplete = 0;
 	CLEAR_POS(&lastpos);
 	lbuf = curbuf;
@@ -3348,55 +3348,55 @@ update_search_stat(
 
     // when searching backwards and having jumped to the first occurrence,
     // cur must remain greater than 1
-    if (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
+    ఒకవేళ (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
 		&& (dirc == 0 || dirc == '/' ? cur < cnt : cur > 1))
 	cur += dirc == 0 ? 0 : dirc == '/' ? 1 : -1;
-    else
+    లేకపోతే
     {
-	int	done_search = FALSE;
+	పూర్ణాంకం	పూర్తి_శోధన = FALSE;
 	pos_T	endpos = {0, 0, 0};
 
 	p_ws = FALSE;
-#ifdef FEAT_RELTIME
-	if (timeout > 0)
-	    profile_setlimit(timeout, &start);
-#endif
-	while (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
-			 FORWARD, NULL, 0, 1, SEARCH_KEEP, RE_LAST, NULL) != FAIL)
+#నిర్వచితమైతే FEAT_RELTIME
+	ఒకవేళ (timeout > 0)
+	    profile_setlimit(timeout, &ప్రారంభం);
+#అయితే_ముగింపు
+	అయితే (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
+			 FORWARD, ఖాళీ, 0, 1, శోధన_KEEP, RE_చివరి, ఖాళీ) != FAIL)
 	{
-	    done_search = TRUE;
-#ifdef FEAT_RELTIME
+	    పూర్తి_శోధన = TRUE;
+#నిర్వచితమైతే FEAT_RELTIME
 	    // Stop after passing the time limit.
-	    if (timeout > 0 && profile_passed_limit(&start))
+	    ఒకవేళ (timeout > 0 && profile_passed_హద్దు(&ప్రారంభం))
 	    {
 		incomplete = 1;
-		break;
+		ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 	    cnt++;
-	    if (LTOREQ_POS(lastpos, p))
+	    ఒకవేళ (LTOREQ_POS(lastpos, p))
 	    {
 		cur = cnt;
-		if (LT_POS(p, endpos))
-		    exact_match = TRUE;
+		ఒకవేళ (LT_POS(p, endpos))
+		    exact_సరిపోలిక = TRUE;
 	    }
 	    fast_breakcheck();
-	    if (maxcount > 0 && cnt > maxcount)
+	    ఒకవేళ (maxcount > 0 && cnt > maxcount)
 	    {
 		incomplete = 2;    // max count exceeded
-		break;
+		ఆపు;
 	    }
 	}
-	if (got_int)
+	ఒకవేళ (got_int)
 	    cur = -1; // abort
-	if (done_search)
+	ఒకవేళ (పూర్తి_శోధన)
 	{
 	    vim_free(lastpat);
-	    lastpat = vim_strnsave(spats[last_idx].pat, spats[last_idx].patlen);
-	    if (lastpat == NULL)
+	    lastpat = vim_strnsave(spats[చివరి_idx].pat, spats[చివరి_idx].patlen);
+	    ఒకవేళ (lastpat == ఖాళీ)
 		lastpatlen = 0;
-	    else
-		lastpatlen = spats[last_idx].patlen;
+	    లేకపోతే
+		lastpatlen = spats[చివరి_idx].patlen;
 	    chgtick = CHANGEDTICK(curbuf);
 	    lbuf = curbuf;
 	    lastpos = p;
@@ -3404,308 +3404,308 @@ update_search_stat(
     }
     stat->cur = cur;
     stat->cnt = cnt;
-    stat->exact_match = exact_match;
+    stat->exact_సరిపోలిక = exact_సరిపోలిక;
     stat->incomplete = incomplete;
-    stat->last_maxcount = last_maxcount;
+    stat->చివరి_maxcount = చివరి_maxcount;
     p_ws = save_ws;
 }
 
-#if defined(FEAT_FIND_ID)
+#ఒకవేళ defined(FEAT_కనుగొను_ID)
 
 /*
  * Get line "lnum" and copy it into "buf[LSIZE]".
  * The copy is made because the regexp may make the line invalid when using a
  * mark.
  */
-    static char_u *
-get_line_and_copy(linenr_T lnum, char_u *buf)
+    స్థిర char_u *
+get_పంక్తి_and_copy(linenr_T lnum, char_u *buf)
 {
-    char_u *line = ml_get(lnum);
+    char_u *పంక్తి = ml_get(lnum);
 
-    vim_strncpy(buf, line, LSIZE - 1);
-    return buf;
+    vim_strncpy(buf, పంక్తి, LSIZE - 1);
+    తిరిగి buf;
 }
 
 /*
  * Find identifiers or defines in included files.
  * If p_ic && compl_status_sol() then ptr must be in lowercase.
  */
-    void
-find_pattern_in_path(
+    శూన్య
+కనుగొను_నమూనా_లోపల_మార్గం(
     char_u	*ptr,		// pointer to search pattern
-    int		dir UNUSED,	// direction of expansion
-    int		len,		// length of search pattern
-    int		whole,		// match whole words only
-    int		skip_comments,	// don't match inside comments
-    int		type,		// Type of search; are we looking for a type?
+    పూర్ణాంకం		dir వాడని,	// direction of expansion
+    పూర్ణాంకం		len,		// length of search pattern
+    పూర్ణాంకం		సంపూర్ణ,		// match whole words only
+    పూర్ణాంకం		skip_comments,	// don't match inside comments
+    పూర్ణాంకం		type,		// Type of search; are we looking for a type?
 				// a macro?
-    long	count,
-    int		action,		// What to do when we find it
-    linenr_T	start_lnum,	// first line to start searching
-    linenr_T	end_lnum,	// last line for searching
-    int		forceit,	// If true, always switch to the found path
-    int		silent)		// Do not print messages when ACTION_EXPAND
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		action,		// What to do when we find it
+    linenr_T	ప్రారంభం_lnum,	// first line to start searching
+    linenr_T	చివర_lnum,	// last line for searching
+    పూర్ణాంకం		forceit,	// If true, always switch to the found path
+    పూర్ణాంకం		silent)		// Do not print messages when ACTION_EXPAND
 {
     SearchedFile *files;		// Stack of included files
     SearchedFile *bigger;		// When we need more space
-    int		max_path_depth = 50;
-    long	match_count = 1;
+    పూర్ణాంకం		max_మార్గం_లోతు = 50;
+    దీర్ఘ	సరిపోలిక_లెక్క = 1;
 
     char_u	*pat;
     char_u	*new_fname;
     char_u	*curr_fname = curbuf->b_fname;
-    char_u	*prev_fname = NULL;
+    char_u	*prev_fname = ఖాళీ;
     linenr_T	lnum;
-    int		depth;
-    int		depth_displayed;	// For type==CHECK_PATH
-    int		old_files;
-    int		already_searched;
-    char_u	*file_line;
-    char_u	*line;
+    పూర్ణాంకం		లోతు;
+    పూర్ణాంకం		లోతు_displayed;	// For type==CHECK_PATH
+    పూర్ణాంకం		old_files;
+    పూర్ణాంకం		already_searched;
+    char_u	*file_పంక్తి;
+    char_u	*పంక్తి;
     char_u	*p;
     char_u	save_char;
-    int		define_matched;
+    పూర్ణాంకం		define_matched;
     regmatch_T	regmatch;
     regmatch_T	incl_regmatch;
     regmatch_T	def_regmatch;
-    int		matched = FALSE;
-    int		did_show = FALSE;
-    int		found = FALSE;
-    int		i;
-    char_u	*already = NULL;
-    char_u	*startp = NULL;
-    char_u	*inc_opt = NULL;
-# if defined(FEAT_QUICKFIX)
-    win_T	*curwin_save = NULL;
+    పూర్ణాంకం		matched = FALSE;
+    పూర్ణాంకం		did_show = FALSE;
+    పూర్ణాంకం		దొరికింది = FALSE;
+    పూర్ణాంకం		i;
+    char_u	*already = ఖాళీ;
+    char_u	*startp = ఖాళీ;
+    char_u	*inc_opt = ఖాళీ;
+# ఒకవేళ defined(FEAT_QUICKFIX)
+    win_T	*curwin_save = ఖాళీ;
 # endif
 
-    regmatch.regprog = NULL;
-    incl_regmatch.regprog = NULL;
-    def_regmatch.regprog = NULL;
+    regmatch.regprog = ఖాళీ;
+    incl_regmatch.regprog = ఖాళీ;
+    def_regmatch.regprog = ఖాళీ;
 
-    file_line = alloc(LSIZE);
-    if (file_line == NULL)
-	return;
+    file_పంక్తి = alloc(LSIZE);
+    ఒకవేళ (file_పంక్తి == ఖాళీ)
+	తిరిగి;
 
-    if (type != CHECK_PATH && type != FIND_DEFINE
+    ఒకవేళ (type != CHECK_మార్గం && type != కనుగొను_DEFINE
 	    // when CONT_SOL is set compare "ptr" with the beginning of the
 	    // line is faster than quote_meta/regcomp/regexec "ptr" -- Acevedo
-	    && !compl_status_sol())
+	    && !compl_స్థితి_sol())
     {
 	pat = alloc(len + 5);
-	if (pat == NULL)
-	    goto fpip_end;
-	vim_snprintf((char *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
+	ఒకవేళ (pat == ఖాళీ)
+	    వెళ్ళు fpip_చివర;
+	vim_snprintf((అక్షరం *)pat, len + 5, సంపూర్ణ ? "\\<%.*s\\>" : "%.*s", len, ptr);
 	// ignore case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
 	vim_free(pat);
-	if (regmatch.regprog == NULL)
-	    goto fpip_end;
+	ఒకవేళ (regmatch.regprog == ఖాళీ)
+	    వెళ్ళు fpip_చివర;
     }
     inc_opt = (*curbuf->b_p_inc == NUL) ? p_inc : curbuf->b_p_inc;
-    if (*inc_opt != NUL)
+    ఒకవేళ (*inc_opt != NUL)
     {
 	incl_regmatch.regprog = vim_regcomp(inc_opt,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (incl_regmatch.regprog == NULL)
-	    goto fpip_end;
+	ఒకవేళ (incl_regmatch.regprog == ఖాళీ)
+	    వెళ్ళు fpip_చివర;
 	incl_regmatch.rm_ic = FALSE;	// don't ignore case in incl. pat.
     }
-    if (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
+    ఒకవేళ (type == కనుగొను_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
     {
 	def_regmatch.regprog = vim_regcomp(*curbuf->b_p_def == NUL ? p_def : curbuf->b_p_def,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (def_regmatch.regprog == NULL)
-	    goto fpip_end;
+	ఒకవేళ (def_regmatch.regprog == ఖాళీ)
+	    వెళ్ళు fpip_చివర;
 	def_regmatch.rm_ic = FALSE;	// don't ignore case in define pat.
     }
-    files = lalloc_clear(max_path_depth * sizeof(SearchedFile), TRUE);
-    if (files == NULL)
-	goto fpip_end;
-    old_files = max_path_depth;
-    depth = depth_displayed = -1;
+    files = lalloc_clear(max_మార్గం_లోతు * పరిమాణం(SearchedFile), TRUE);
+    ఒకవేళ (files == ఖాళీ)
+	వెళ్ళు fpip_చివర;
+    old_files = max_మార్గం_లోతు;
+    లోతు = లోతు_displayed = -1;
 
-    lnum = start_lnum;
-    if (end_lnum > curbuf->b_ml.ml_line_count)
-	end_lnum = curbuf->b_ml.ml_line_count;
-    if (lnum > end_lnum)		// do at least one line
-	lnum = end_lnum;
-    line = get_line_and_copy(lnum, file_line);
+    lnum = ప్రారంభం_lnum;
+    ఒకవేళ (చివర_lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	చివర_lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+    ఒకవేళ (lnum > చివర_lnum)		// do at least one line
+	lnum = చివర_lnum;
+    పంక్తి = get_పంక్తి_and_copy(lnum, file_పంక్తి);
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (incl_regmatch.regprog != NULL
-		&& vim_regexec(&incl_regmatch, line, (colnr_T)0))
+	ఒకవేళ (incl_regmatch.regprog != ఖాళీ
+		&& vim_regexec(&incl_regmatch, పంక్తి, (colnr_T)0))
 	{
 	    char_u *p_fname = (curr_fname == curbuf->b_fname)
 					      ? curbuf->b_ffname : curr_fname;
 
-	    if (strstr((char *)inc_opt, "\\zs") != NULL)
+	    ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)inc_opt, "\\zs") != ఖాళీ)
 		// Use text from '\zs' to '\ze' (or end) of 'include'.
-		new_fname = find_file_name_in_path(incl_regmatch.startp[0],
-		       (int)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
+		new_fname = కనుగొను_file_name_లోపల_మార్గం(incl_regmatch.startp[0],
+		       (పూర్ణాంకం)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
 				 FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname);
-	    else
+	    లేకపోతే
 		// Use text after match with 'include'.
-		new_fname = file_name_in_line(incl_regmatch.endp[0], 0,
-			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, NULL);
+		new_fname = file_name_లోపల_పంక్తి(incl_regmatch.endp[0], 0,
+			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, ఖాళీ);
 	    already_searched = FALSE;
-	    if (new_fname != NULL)
+	    ఒకవేళ (new_fname != ఖాళీ)
 	    {
 		// Check whether we have already searched in this file
-		for (i = 0;; i++)
+		కొరకు (i = 0;; i++)
 		{
-		    if (i == depth + 1)
+		    ఒకవేళ (i == లోతు + 1)
 			i = old_files;
-		    if (i == max_path_depth)
-			break;
-		    if (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
+		    ఒకవేళ (i == max_మార్గం_లోతు)
+			ఆపు;
+		    ఒకవేళ (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
 								    & FPC_SAME)
 		    {
-			if (type != CHECK_PATH
+			ఒకవేళ (type != CHECK_మార్గం
 				&& action == ACTION_SHOW_ALL
 				&& files[i].matched)
 			{
-			    msg_putchar('\n');	    // cursor below last one
-			    if (!got_int)	    // don't display if 'q'
+			    సందేశం_putchar('\n');	    // cursor below last one
+			    ఒకవేళ (!got_int)	    // don't display if 'q'
 						    // typed at "--more--"
-						    // message
+						    //సందేశం
 			    {
-				msg_home_replace_hl(new_fname);
-				msg_puts(_(" (includes previously listed match)"));
-				prev_fname = NULL;
+				సందేశం_home_replace_hl(new_fname);
+				సందేశం_puts(_(" (includes previously listed match)"));
+				prev_fname = ఖాళీ;
 			    }
 			}
 			VIM_CLEAR(new_fname);
 			already_searched = TRUE;
-			break;
+			ఆపు;
 		    }
 		}
 	    }
 
-	    if (type == CHECK_PATH && (action == ACTION_SHOW_ALL
-				 || (new_fname == NULL && !already_searched)))
+	    ఒకవేళ (type == CHECK_మార్గం && (action == ACTION_SHOW_ALL
+				 || (new_fname == ఖాళీ && !already_searched)))
 	    {
-		if (did_show)
-		    msg_putchar('\n');	    // cursor below last one
-		else
+		ఒకవేళ (did_show)
+		    సందేశం_putchar('\n');	    // cursor below last one
+		లేకపోతే
 		{
 		    gotocmdline(TRUE);	    // cursor at status line
-		    msg_puts_title(_("--- Included files "));
-		    if (action != ACTION_SHOW_ALL)
-			msg_puts_title(_("not found "));
-		    msg_puts_title(_("in path ---\n"));
+		    సందేశం_puts_title(_("--- Included files "));
+		    ఒకవేళ (action != ACTION_SHOW_ALL)
+			సందేశం_puts_title(_("not found "));
+		    సందేశం_puts_title(_("in path ---\n"));
 		}
 		did_show = TRUE;
-		while (depth_displayed < depth && !got_int)
+		అయితే (లోతు_displayed < లోతు && !got_int)
 		{
-		    ++depth_displayed;
-		    for (i = 0; i < depth_displayed; i++)
-			msg_puts("  ");
-		    msg_home_replace(files[depth_displayed].name);
-		    msg_puts(" -->\n");
+		    ++లోతు_displayed;
+		    కొరకు (i = 0; i < లోతు_displayed; i++)
+			సందేశం_puts("  ");
+		    సందేశం_home_replace(files[లోతు_displayed].name);
+		    సందేశం_puts(" -->\n");
 		}
-		if (!got_int)		    // don't display if 'q' typed
+		ఒకవేళ (!got_int)		    // don't display if 'q' typed
 					    // for "--more--" message
 		{
-		    for (i = 0; i <= depth_displayed; i++)
-			msg_puts("  ");
-		    if (new_fname != NULL)
+		    కొరకు (i = 0; i <= లోతు_displayed; i++)
+			సందేశం_puts("  ");
+		    ఒకవేళ (new_fname != ఖాళీ)
 		    {
 			// using "new_fname" is more reliable, e.g., when
 			// 'includeexpr' is set.
-			msg_outtrans_attr(new_fname, HL_ATTR(HLF_D));
+			సందేశం_outtrans_attr(new_fname, HL_ATTR(HLF_D));
 		    }
-		    else
+		    లేకపోతే
 		    {
 			/*
 			 * Isolate the file name.
 			 * Include the surrounding "" or <> if present.
 			 */
-			if (strstr((char *)inc_opt, "\\zs") != NULL)
+			ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)inc_opt, "\\zs") != ఖాళీ)
 			{
 			    // pattern contains \zs, use the match
 			    p = incl_regmatch.startp[0];
-			    i = (int)(incl_regmatch.endp[0]
+			    i = (పూర్ణాంకం)(incl_regmatch.endp[0]
 						   - incl_regmatch.startp[0]);
 			}
-			else
+			లేకపోతే
 			{
 			    // find the file name after the end of the match
-			    for (p = incl_regmatch.endp[0];
+			    కొరకు (p = incl_regmatch.endp[0];
 						  *p && !vim_isfilec(*p); p++)
 				;
-			    for (i = 0; vim_isfilec(p[i]); i++)
+			    కొరకు (i = 0; vim_isfilec(p[i]); i++)
 				;
 			}
 
-			if (i == 0)
+			ఒకవేళ (i == 0)
 			{
 			    // Nothing found, use the rest of the line.
 			    p = incl_regmatch.endp[0];
-			    i = (int)STRLEN(p);
+			    i = (పూర్ణాంకం)STRLEN(p);
 			}
 			// Avoid checking before the start of the line, can
 			// happen if \zs appears in the regexp.
-			else if (p > line)
+			లేకపోతే ఒకవేళ (p > పంక్తి)
 			{
-			    if (p[-1] == '"' || p[-1] == '<')
+			    ఒకవేళ (p[-1] == '"' || p[-1] == '<')
 			    {
 				--p;
 				++i;
 			    }
-			    if (p[i] == '"' || p[i] == '>')
+			    ఒకవేళ (p[i] == '"' || p[i] == '>')
 				++i;
 			}
 			save_char = p[i];
 			p[i] = NUL;
-			msg_outtrans_attr(p, HL_ATTR(HLF_D));
+			సందేశం_outtrans_attr(p, HL_ATTR(HLF_D));
 			p[i] = save_char;
 		    }
 
-		    if (new_fname == NULL && action == ACTION_SHOW_ALL)
+		    ఒకవేళ (new_fname == ఖాళీ && action == ACTION_SHOW_ALL)
 		    {
-			if (already_searched)
-			    msg_puts(_("  (Already listed)"));
-			else
-			    msg_puts(_("  NOT FOUND"));
+			ఒకవేళ (already_searched)
+			    సందేశం_puts(_("  (Already listed)"));
+			లేకపోతే
+			    సందేశం_puts(_("  NOT FOUND"));
 		    }
 		}
-		out_flush();	    // output each line directly
+		బహిర్గతం_flush();	    // output each line directly
 	    }
 
-	    if (new_fname != NULL)
+	    ఒకవేళ (new_fname != ఖాళీ)
 	    {
 		// Push the new file onto the file stack
-		if (depth + 1 == old_files)
+		ఒకవేళ (లోతు + 1 == old_files)
 		{
-		    bigger = ALLOC_MULT(SearchedFile, max_path_depth * 2);
-		    if (bigger != NULL)
+		    bigger = ALLOC_MULT(SearchedFile, max_మార్గం_లోతు * 2);
+		    ఒకవేళ (bigger != ఖాళీ)
 		    {
-			for (i = 0; i <= depth; i++)
+			కొరకు (i = 0; i <= లోతు; i++)
 			    bigger[i] = files[i];
-			for (i = depth + 1; i < old_files + max_path_depth; i++)
+			కొరకు (i = లోతు + 1; i < old_files + max_మార్గం_లోతు; i++)
 			{
-			    bigger[i].fp = NULL;
-			    bigger[i].name = NULL;
+			    bigger[i].fp = ఖాళీ;
+			    bigger[i].name = ఖాళీ;
 			    bigger[i].lnum = 0;
 			    bigger[i].matched = FALSE;
 			}
-			for (i = old_files; i < max_path_depth; i++)
-			    bigger[i + max_path_depth] = files[i];
-			old_files += max_path_depth;
-			max_path_depth *= 2;
+			కొరకు (i = old_files; i < max_మార్గం_లోతు; i++)
+			    bigger[i + max_మార్గం_లోతు] = files[i];
+			old_files += max_మార్గం_లోతు;
+			max_మార్గం_లోతు *= 2;
 			vim_free(files);
 			files = bigger;
 		    }
 		}
-		if ((files[depth + 1].fp = mch_fopen((char *)new_fname, "r"))
-								    == NULL)
+		ఒకవేళ ((files[లోతు + 1].fp = mch_fopen((అక్షరం *)new_fname, "r"))
+								    == ఖాళీ)
 		    vim_free(new_fname);
-		else
+		లేకపోతే
 		{
-		    if (++depth == old_files)
+		    ఒకవేళ (++లోతు == old_files)
 		    {
 			/*
 			 * lalloc() for 'bigger' must have failed above.  We
@@ -3714,39 +3714,39 @@ find_pattern_in_path(
 			vim_free(files[old_files].name);
 			++old_files;
 		    }
-		    files[depth].name = curr_fname = new_fname;
-		    files[depth].lnum = 0;
-		    files[depth].matched = FALSE;
-		    if (action == ACTION_EXPAND
+		    files[లోతు].name = curr_fname = new_fname;
+		    files[లోతు].lnum = 0;
+		    files[లోతు].matched = FALSE;
+		    ఒకవేళ (action == ACTION_EXPAND
 			    && !shortmess(SHM_COMPLETIONSCAN) && !silent)
 		    {
-			msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-			vim_snprintf((char*)IObuff, IOSIZE,
+			సందేశం_hist_off = TRUE;	// reset in msg_trunc_attr()
+			vim_snprintf((అక్షరం*)IObuff, IOSIZE,
 				_("Scanning included file: %s"),
-				(char *)new_fname);
-			msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+				(అక్షరం *)new_fname);
+			సందేశం_trunc_attr((అక్షరం *)IObuff, TRUE, HL_ATTR(HLF_R));
 		    }
-		    else if (p_verbose >= 5)
+		    లేకపోతే ఒకవేళ (p_verbose >= 5)
 		    {
 			verbose_enter();
 			smsg(_("Searching included file %s"),
-							   (char *)new_fname);
+							   (అక్షరం *)new_fname);
 			verbose_leave();
 		    }
 
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Check if the line is a define (type == FIND_DEFINE)
 	     */
-	    p = line;
-search_line:
+	    p = పంక్తి;
+శోధన_పంక్తి:
 	    define_matched = FALSE;
-	    if (def_regmatch.regprog != NULL
-			      && vim_regexec(&def_regmatch, line, (colnr_T)0))
+	    ఒకవేళ (def_regmatch.regprog != ఖాళీ
+			      && vim_regexec(&def_regmatch, పంక్తి, (colnr_T)0))
 	    {
 		/*
 		 * Pattern must be first identifier after 'define', so skip
@@ -3754,7 +3754,7 @@ search_line:
 		 * don't let it match beyond the end of this identifier.
 		 */
 		p = def_regmatch.endp[0];
-		while (*p && !vim_iswordc(*p))
+		అయితే (*p && !vim_iswordc(*p))
 		    p++;
 		define_matched = TRUE;
 	    }
@@ -3763,22 +3763,22 @@ search_line:
 	     * Look for a match.  Don't do this if we are looking for a
 	     * define and this line didn't match define_prog above.
 	     */
-	    if (def_regmatch.regprog == NULL || define_matched)
+	    ఒకవేళ (def_regmatch.regprog == ఖాళీ || define_matched)
 	    {
-		if (define_matched || compl_status_sol())
+		ఒకవేళ (define_matched || compl_స్థితి_sol())
 		{
 		    // compare the first "len" chars from "ptr"
 		    startp = skipwhite(p);
-		    if (p_ic)
+		    ఒకవేళ (p_ic)
 			matched = MB_STRNICMP(startp, ptr, len) == 0;
-		    else
+		    లేకపోతే
 			matched = STRNCMP(startp, ptr, len) == 0;
-		    if (matched && define_matched && whole
+		    ఒకవేళ (matched && define_matched && సంపూర్ణ
 						  && vim_iswordc(startp[len]))
 			matched = FALSE;
 		}
-		else if (regmatch.regprog != NULL
-			 && vim_regexec(&regmatch, line, (colnr_T)(p - line)))
+		లేకపోతే ఒకవేళ (regmatch.regprog != ఖాళీ
+			 && vim_regexec(&regmatch, పంక్తి, (colnr_T)(p - పంక్తి)))
 		{
 		    matched = TRUE;
 		    startp = regmatch.startp[0];
@@ -3787,11 +3787,11 @@ search_line:
 		     * looking for a define).  A line starting with "# define"
 		     * is not considered to be a comment line.
 		     */
-		    if (!define_matched && skip_comments)
+		    ఒకవేళ (!define_matched && skip_comments)
 		    {
-			if ((*line != '#' ||
-				STRNCMP(skipwhite(line + 1), "define", 6) != 0)
-				&& get_leader_len(line, NULL, FALSE, TRUE))
+			ఒకవేళ ((*పంక్తి != '#' ||
+				STRNCMP(skipwhite(పంక్తి + 1), "define", 6) != 0)
+				&& get_leader_len(పంక్తి, ఖాళీ, FALSE, TRUE))
 			    matched = FALSE;
 
 			/*
@@ -3800,22 +3800,22 @@ search_line:
 			 * * /" when looking for "normal".
 			 * Note: Doesn't skip "/ *" in comments.
 			 */
-			p = skipwhite(line);
-			if (matched
+			p = skipwhite(పంక్తి);
+			ఒకవేళ (matched
 				|| (p[0] == '/' && p[1] == '*') || p[0] == '*')
-			    for (p = line; *p && p < startp; ++p)
+			    కొరకు (p = పంక్తి; *p && p < startp; ++p)
 			    {
-				if (matched
+				ఒకవేళ (matched
 					&& p[0] == '/'
 					&& (p[1] == '*' || p[1] == '/'))
 				{
 				    matched = FALSE;
 				    // After "//" all text is comment
-				    if (p[1] == '/')
-					break;
+				    ఒకవేళ (p[1] == '/')
+					ఆపు;
 				    ++p;
 				}
-				else if (!matched && p[0] == '*' && p[1] == '/')
+				లేకపోతే ఒకవేళ (!matched && p[0] == '*' && p[1] == '/')
 				{
 				    // Can find match after "* /".
 				    matched = TRUE;
@@ -3826,29 +3826,29 @@ search_line:
 		}
 	    }
 	}
-	if (matched)
+	ఒకవేళ (matched)
 	{
-	    if (action == ACTION_EXPAND)
+	    ఒకవేళ (action == ACTION_EXPAND)
 	    {
-		int	cont_s_ipos = FALSE;
-		int	add_r;
+		పూర్ణాంకం	cont_s_ipos = FALSE;
+		పూర్ణాంకం	కూడు_r;
 		char_u	*aux;
 
-		if (depth == -1 && lnum == curwin->w_cursor.lnum)
-		    break;
-		found = TRUE;
+		ఒకవేళ (లోతు == -1 && lnum == curwin->w_cursor.lnum)
+		    ఆపు;
+		దొరికింది = TRUE;
 		aux = p = startp;
-		if (compl_status_adding() && (int)STRLEN(p) >= ins_compl_len())
+		ఒకవేళ (compl_స్థితి_adding() && (పూర్ణాంకం)STRLEN(p) >= ins_compl_len())
 		{
 		    p += ins_compl_len();
-		    if (vim_iswordp(p))
-			goto exit_matched;
-		    p = find_word_start(p);
+		    ఒకవేళ (vim_iswordp(p))
+			వెళ్ళు exit_matched;
+		    p = కనుగొను_మాట_ప్రారంభం(p);
 		}
-		p = find_word_end(p);
-		i = (int)(p - aux);
+		p = కనుగొను_మాట_చివర(p);
+		i = (పూర్ణాంకం)(p - aux);
 
-		if (compl_status_adding() && i == ins_compl_len())
+		ఒకవేళ (compl_స్థితి_adding() && i == ins_compl_len())
 		{
 		    // IOSIZE > compl_length, so the STRNCPY works
 		    STRNCPY(IObuff, aux, i);
@@ -3856,159 +3856,159 @@ search_line:
 		    // Get the next line: when "depth" < 0  from the current
 		    // buffer, otherwise from the included file.  Jump to
 		    // exit_matched when past the last line.
-		    if (depth < 0)
+		    ఒకవేళ (లోతు < 0)
 		    {
-			if (lnum >= end_lnum)
-			    goto exit_matched;
-			line = get_line_and_copy(++lnum, file_line);
+			ఒకవేళ (lnum >= చివర_lnum)
+			    వెళ్ళు exit_matched;
+			పంక్తి = get_పంక్తి_and_copy(++lnum, file_పంక్తి);
 		    }
-		    else if (vim_fgets(line = file_line,
-						      LSIZE, files[depth].fp))
-			goto exit_matched;
+		    లేకపోతే ఒకవేళ (vim_fgets(పంక్తి = file_పంక్తి,
+						      LSIZE, files[లోతు].fp))
+			వెళ్ళు exit_matched;
 
 		    // we read a line, set "already" to check this "line" later
 		    // if depth >= 0 we'll increase files[depth].lnum far
 		    // below  -- Acevedo
-		    already = aux = p = skipwhite(line);
-		    p = find_word_start(p);
-		    p = find_word_end(p);
-		    if (p > aux)
+		    already = aux = p = skipwhite(పంక్తి);
+		    p = కనుగొను_మాట_ప్రారంభం(p);
+		    p = కనుగొను_మాట_చివర(p);
+		    ఒకవేళ (p > aux)
 		    {
-			if (*aux != ')' && IObuff[i-1] != TAB)
+			ఒకవేళ (*aux != ')' && IObuff[i-1] != TAB)
 			{
-			    if (IObuff[i-1] != ' ')
+			    ఒకవేళ (IObuff[i-1] != ' ')
 				IObuff[i++] = ' ';
 			    // IObuf =~ "\(\k\|\i\).* ", thus i >= 2
-			    if (p_js
+			    ఒకవేళ (p_js
 				&& (IObuff[i-2] == '.'
-				    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
+				    || (vim_strchr(p_cpo, CPO_JOINSP) == ఖాళీ
 					&& (IObuff[i-2] == '?'
 					    || IObuff[i-2] == '!'))))
 				IObuff[i++] = ' ';
 			}
 			// copy as much as possible of the new word
-			if (p - aux >= IOSIZE - i)
+			ఒకవేళ (p - aux >= IOSIZE - i)
 			    p = aux + IOSIZE - i - 1;
 			STRNCPY(IObuff + i, aux, p - aux);
-			i += (int)(p - aux);
+			i += (పూర్ణాంకం)(p - aux);
 			cont_s_ipos = TRUE;
 		    }
 		    IObuff[i] = NUL;
 		    aux = IObuff;
 
-		    if (i == ins_compl_len())
-			goto exit_matched;
+		    ఒకవేళ (i == ins_compl_len())
+			వెళ్ళు exit_matched;
 		}
 
-		add_r = ins_compl_add_infercase(aux, i, p_ic,
-			curr_fname == curbuf->b_fname ? NULL
+		కూడు_r = ins_compl_కూడు_infercase(aux, i, p_ic,
+			curr_fname == curbuf->b_fname ? ఖాళీ
 						  : shorten_fname1(curr_fname),
 			dir, cont_s_ipos, 0);
-		if (add_r == OK)
+		ఒకవేళ (కూడు_r == OK)
 		    // if dir was BACKWARD then honor it just once
 		    dir = FORWARD;
-		else if (add_r == FAIL)
-		    break;
+		లేకపోతే ఒకవేళ (కూడు_r == FAIL)
+		    ఆపు;
 	    }
-	    else if (action == ACTION_SHOW_ALL)
+	    లేకపోతే ఒకవేళ (action == ACTION_SHOW_ALL)
 	    {
-		found = TRUE;
-		if (!did_show)
+		దొరికింది = TRUE;
+		ఒకవేళ (!did_show)
 		    gotocmdline(TRUE);		// cursor at status line
-		if (curr_fname != prev_fname)
+		ఒకవేళ (curr_fname != prev_fname)
 		{
-		    if (did_show)
-			msg_putchar('\n');	// cursor below last one
-		    if (!got_int)		// don't display if 'q' typed
+		    ఒకవేళ (did_show)
+			సందేశం_putchar('\n');	// cursor below last one
+		    ఒకవేళ (!got_int)		// don't display if 'q' typed
 						// at "--more--" message
-			msg_home_replace_hl(curr_fname);
+			సందేశం_home_replace_hl(curr_fname);
 		    prev_fname = curr_fname;
 		}
 		did_show = TRUE;
-		if (!got_int)
-		    show_pat_in_path(line, type, TRUE, action,
-			    (depth == -1) ? NULL : files[depth].fp,
-			    (depth == -1) ? &lnum : &files[depth].lnum,
-			    match_count++);
+		ఒకవేళ (!got_int)
+		    show_pat_లోపల_మార్గం(పంక్తి, type, TRUE, action,
+			    (లోతు == -1) ? ఖాళీ : files[లోతు].fp,
+			    (లోతు == -1) ? &lnum : &files[లోతు].lnum,
+			    సరిపోలిక_లెక్క++);
 
 		// Set matched flag for this file and all the ones that
 		// include it
-		for (i = 0; i <= depth; ++i)
+		కొరకు (i = 0; i <= లోతు; ++i)
 		    files[i].matched = TRUE;
 	    }
-	    else if (--count <= 0)
+	    లేకపోతే ఒకవేళ (--లెక్క <= 0)
 	    {
-		found = TRUE;
-		if (depth == -1 && lnum == curwin->w_cursor.lnum
-# if defined(FEAT_QUICKFIX)
+		దొరికింది = TRUE;
+		ఒకవేళ (లోతు == -1 && lnum == curwin->w_cursor.lnum
+# ఒకవేళ defined(FEAT_QUICKFIX)
 						      && g_do_tagpreview == 0
 # endif
 						      )
-		    emsg(_(e_match_is_on_current_line));
-		else if (action == ACTION_SHOW)
+		    emsg(_(e_సరిపోలిక_is_on_current_పంక్తి));
+		లేకపోతే ఒకవేళ (action == ACTION_SHOW)
 		{
-		    show_pat_in_path(line, type, did_show, action,
-			    (depth == -1) ? NULL : files[depth].fp,
-			    (depth == -1) ? &lnum : &files[depth].lnum, 1L);
+		    show_pat_లోపల_మార్గం(పంక్తి, type, did_show, action,
+			    (లోతు == -1) ? ఖాళీ : files[లోతు].fp,
+			    (లోతు == -1) ? &lnum : &files[లోతు].lnum, 1L);
 		    did_show = TRUE;
 		}
-		else
+		లేకపోతే
 		{
 # ifdef FEAT_GUI
 		    need_mouse_correct = TRUE;
 # endif
-# if defined(FEAT_QUICKFIX)
+# ఒకవేళ defined(FEAT_QUICKFIX)
 		    // ":psearch" uses the preview window
-		    if (g_do_tagpreview != 0)
+		    ఒకవేళ (g_do_tagpreview != 0)
 		    {
 			curwin_save = curwin;
 			prepare_tagpreview(TRUE, TRUE, FALSE);
 		    }
 # endif
-		    if (action == ACTION_SPLIT)
+		    ఒకవేళ (action == ACTION_విభజించు)
 		    {
-			if (win_split(0, 0) == FAIL)
-			    break;
+			ఒకవేళ (win_విభజించు(0, 0) == FAIL)
+			    ఆపు;
 			RESET_BINDING(curwin);
 		    }
-		    if (depth == -1)
+		    ఒకవేళ (లోతు == -1)
 		    {
 			// match in current file
-# if defined(FEAT_QUICKFIX)
-			if (g_do_tagpreview != 0)
+# ఒకవేళ defined(FEAT_QUICKFIX)
+			ఒకవేళ (g_do_tagpreview != 0)
 			{
-			    if (!win_valid(curwin_save))
-				break;
-			    if (!GETFILE_SUCCESS(getfile(
-					   curwin_save->w_buffer->b_fnum, NULL,
-						     NULL, TRUE, lnum, forceit)))
-				break;	// failed to jump to file
+			    ఒకవేళ (!win_valid(curwin_save))
+				ఆపు;
+			    ఒకవేళ (!GETFILE_SUCCESS(getfile(
+					   curwin_save->w_బఫరు->b_fnum, ఖాళీ,
+						     ఖాళీ, TRUE, lnum, forceit)))
+				ఆపు;	// failed to jump to file
 			}
-			else
+			లేకపోతే
 # endif
 			    setpcmark();
 			curwin->w_cursor.lnum = lnum;
 			check_cursor();
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (!GETFILE_SUCCESS(getfile(
-					0, files[depth].name, NULL, TRUE,
-						    files[depth].lnum, forceit)))
-			    break;	// failed to jump to file
+			ఒకవేళ (!GETFILE_SUCCESS(getfile(
+					0, files[లోతు].name, ఖాళీ, TRUE,
+						    files[లోతు].lnum, forceit)))
+			    ఆపు;	// failed to jump to file
 			// autocommands may have changed the lnum, we don't
 			// want that here
-			curwin->w_cursor.lnum = files[depth].lnum;
+			curwin->w_cursor.lnum = files[లోతు].lnum;
 		    }
 		}
-		if (action != ACTION_SHOW)
+		ఒకవేళ (action != ACTION_SHOW)
 		{
-		    curwin->w_cursor.col = (colnr_T)(startp - line);
-		    curwin->w_set_curswant = true;
+		    curwin->w_cursor.నిలువు = (colnr_T)(startp - పంక్తి);
+		    curwin->w_సమితి_curswant = true;
 		}
 
-# if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0
+# ఒకవేళ defined(FEAT_QUICKFIX)
+		ఒకవేళ (g_do_tagpreview != 0
 			   && curwin != curwin_save && win_valid(curwin_save))
 		{
 		    // Return cursor to where we were
@@ -4017,315 +4017,315 @@ search_line:
 		    win_enter(curwin_save, TRUE);
 		}
 #  ifdef FEAT_PROP_POPUP
-		else if (WIN_IS_POPUP(curwin))
+		లేకపోతే ఒకవేళ (WIN_IS_POPUP(curwin))
 		    // can't keep focus in popup window
 		    win_enter(firstwin, TRUE);
 #  endif
 # endif
-		break;
+		ఆపు;
 	    }
 exit_matched:
 	    matched = FALSE;
 	    // look for other matches in the rest of the line if we
 	    // are not at the end of it already
-	    if (def_regmatch.regprog == NULL
+	    ఒకవేళ (def_regmatch.regprog == ఖాళీ
 		    && action == ACTION_EXPAND
-		    && !compl_status_sol()
+		    && !compl_స్థితి_sol()
 		    && *startp != NUL
 		    && *(startp + mb_ptr2len(startp)) != NUL)
-		goto search_line;
+		వెళ్ళు శోధన_పంక్తి;
 	}
-	line_breakcheck();
-	if (action == ACTION_EXPAND)
-	    ins_compl_check_keys(30, FALSE);
-	if (got_int || ins_compl_interrupted())
-	    break;
+	పంక్తి_breakcheck();
+	ఒకవేళ (action == ACTION_EXPAND)
+	    ins_compl_check_కీలకాలు(30, FALSE);
+	ఒకవేళ (got_int || ins_compl_interrupted())
+	    ఆపు;
 
 	/*
 	 * Read the next line.  When reading an included file and encountering
 	 * end-of-file, close the file and continue in the file that included
 	 * it.
 	 */
-	while (depth >= 0 && !already
-		&& vim_fgets(line = file_line, LSIZE, files[depth].fp))
+	అయితే (లోతు >= 0 && !already
+		&& vim_fgets(పంక్తి = file_పంక్తి, LSIZE, files[లోతు].fp))
 	{
-	    fclose(files[depth].fp);
+	    fclose(files[లోతు].fp);
 	    --old_files;
-	    files[old_files].name = files[depth].name;
-	    files[old_files].matched = files[depth].matched;
-	    --depth;
-	    curr_fname = (depth == -1) ? curbuf->b_fname
-				       : files[depth].name;
-	    if (depth < depth_displayed)
-		depth_displayed = depth;
+	    files[old_files].name = files[లోతు].name;
+	    files[old_files].matched = files[లోతు].matched;
+	    --లోతు;
+	    curr_fname = (లోతు == -1) ? curbuf->b_fname
+				       : files[లోతు].name;
+	    ఒకవేళ (లోతు < లోతు_displayed)
+		లోతు_displayed = లోతు;
 	}
-	if (depth >= 0)		// we could read the line
+	ఒకవేళ (లోతు >= 0)		// we could read the line
 	{
-	    files[depth].lnum++;
+	    files[లోతు].lnum++;
 	    // Remove any CR and LF from the line.
-	    i = (int)STRLEN(line);
-	    if (i > 0 && line[i - 1] == '\n')
-		line[--i] = NUL;
-	    if (i > 0 && line[i - 1] == '\r')
-		line[--i] = NUL;
+	    i = (పూర్ణాంకం)STRLEN(పంక్తి);
+	    ఒకవేళ (i > 0 && పంక్తి[i - 1] == '\n')
+		పంక్తి[--i] = NUL;
+	    ఒకవేళ (i > 0 && పంక్తి[i - 1] == '\r')
+		పంక్తి[--i] = NUL;
 	}
-	else if (!already)
+	లేకపోతే ఒకవేళ (!already)
 	{
-	    if (++lnum > end_lnum)
-		break;
-	    line = get_line_and_copy(lnum, file_line);
+	    ఒకవేళ (++lnum > చివర_lnum)
+		ఆపు;
+	    పంక్తి = get_పంక్తి_and_copy(lnum, file_పంక్తి);
 	}
-	already = NULL;
+	already = ఖాళీ;
     }
     // End of big for (;;) loop.
 
     // Close any files that are still open.
-    for (i = 0; i <= depth; i++)
+    కొరకు (i = 0; i <= లోతు; i++)
     {
 	fclose(files[i].fp);
 	vim_free(files[i].name);
     }
-    for (i = old_files; i < max_path_depth; i++)
+    కొరకు (i = old_files; i < max_మార్గం_లోతు; i++)
 	vim_free(files[i].name);
     vim_free(files);
 
-    if (type == CHECK_PATH)
+    ఒకవేళ (type == CHECK_మార్గం)
     {
-	if (!did_show)
+	ఒకవేళ (!did_show)
 	{
-	    if (action != ACTION_SHOW_ALL)
-		msg(_("All included files were found"));
-	    else
-		msg(_("No included files"));
+	    ఒకవేళ (action != ACTION_SHOW_ALL)
+		సందేశం(_("All included files were found"));
+	    లేకపోతే
+		సందేశం(_("No included files"));
 	}
     }
-    else if (!found && action != ACTION_EXPAND && !silent)
+    లేకపోతే ఒకవేళ (!దొరికింది && action != ACTION_EXPAND && !silent)
     {
-	if (got_int || ins_compl_interrupted())
+	ఒకవేళ (got_int || ins_compl_interrupted())
 	    emsg(_(e_interrupted));
-	else if (type == FIND_DEFINE)
-	    emsg(_(e_couldnt_find_definition));
-	else
-	    emsg(_(e_couldnt_find_pattern));
+	లేకపోతే ఒకవేళ (type == కనుగొను_DEFINE)
+	    emsg(_(e_couldnt_కనుగొను_definition));
+	లేకపోతే
+	    emsg(_(e_couldnt_కనుగొను_నమూనా));
     }
-    if (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
-	msg_end();
+    ఒకవేళ (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
+	సందేశం_చివర();
 
-fpip_end:
-    vim_free(file_line);
+fpip_చివర:
+    vim_free(file_పంక్తి);
     vim_regfree(regmatch.regprog);
     vim_regfree(incl_regmatch.regprog);
     vim_regfree(def_regmatch.regprog);
 }
 
-    static void
-show_pat_in_path(
-    char_u  *line,
-    int	    type,
-    int	    did_show,
-    int	    action,
+    స్థిర శూన్య
+show_pat_లోపల_మార్గం(
+    char_u  *పంక్తి,
+    పూర్ణాంకం	    type,
+    పూర్ణాంకం	    did_show,
+    పూర్ణాంకం	    action,
     FILE    *fp,
     linenr_T *lnum,
-    long    count)
+    దీర్ఘ    లెక్క)
 {
     char_u  *p;
     size_t  linelen;
 
-    if (did_show)
-	msg_putchar('\n');	// cursor below last one
-    else if (!msg_silent)
+    ఒకవేళ (did_show)
+	సందేశం_putchar('\n');	// cursor below last one
+    లేకపోతే ఒకవేళ (!సందేశం_silent)
 	gotocmdline(TRUE);	// cursor at status line
-    if (got_int)		// 'q' typed at "--more--" message
-	return;
-    linelen = STRLEN(line);
-    for (;;)
+    ఒకవేళ (got_int)		// 'q' typed at "--more--" message
+	తిరిగి;
+    linelen = STRLEN(పంక్తి);
+    కొరకు (;;)
     {
-	p = line + linelen - 1;
-	if (fp != NULL)
+	p = పంక్తి + linelen - 1;
+	ఒకవేళ (fp != ఖాళీ)
 	{
 	    // We used fgets(), so get rid of newline at end
-	    if (p >= line && *p == '\n')
+	    ఒకవేళ (p >= పంక్తి && *p == '\n')
 		--p;
-	    if (p >= line && *p == '\r')
+	    ఒకవేళ (p >= పంక్తి && *p == '\r')
 		--p;
 	    *(p + 1) = NUL;
 	}
-	if (action == ACTION_SHOW_ALL)
+	ఒకవేళ (action == ACTION_SHOW_ALL)
 	{
-	    sprintf((char *)IObuff, "%3ld: ", count);	// show match nr
-	    msg_puts((char *)IObuff);
-	    sprintf((char *)IObuff, "%4ld", *lnum);	// show line nr
+	    sprintf((అక్షరం *)IObuff, "%3ld: ", లెక్క);	// show match nr
+	    సందేశం_puts((అక్షరం *)IObuff);
+	    sprintf((అక్షరం *)IObuff, "%4ld", *lnum);	// show line nr
 						// Highlight line numbers
-	    msg_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
-	    msg_puts(" ");
+	    సందేశం_puts_attr((అక్షరం *)IObuff, HL_ATTR(HLF_N));
+	    సందేశం_puts(" ");
 	}
-	msg_prt_line(line, FALSE);
-	out_flush();			// show one line at a time
+	సందేశం_prt_పంక్తి(పంక్తి, FALSE);
+	బహిర్గతం_flush();			// show one line at a time
 
 	// Definition continues until line that doesn't end with '\'
-	if (got_int || type != FIND_DEFINE || p < line || *p != '\\')
-	    break;
+	ఒకవేళ (got_int || type != కనుగొను_DEFINE || p < పంక్తి || *p != '\\')
+	    ఆపు;
 
-	if (fp != NULL)
+	ఒకవేళ (fp != ఖాళీ)
 	{
-	    if (vim_fgets(line, LSIZE, fp)) // end of file
-		break;
-	    linelen = STRLEN(line);
+	    ఒకవేళ (vim_fgets(పంక్తి, LSIZE, fp)) // end of file
+		ఆపు;
+	    linelen = STRLEN(పంక్తి);
 	    ++*lnum;
 	}
-	else
+	లేకపోతే
 	{
-	    if (++*lnum > curbuf->b_ml.ml_line_count)
-		break;
-	    line = ml_get(*lnum);
+	    ఒకవేళ (++*lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		ఆపు;
+	    పంక్తి = ml_get(*lnum);
 	    linelen = ml_get_len(*lnum);
 	}
-	msg_putchar('\n');
+	సందేశం_putchar('\n');
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_VIMINFO
+#నిర్వచితమైతే FEAT_VIMINFO
 /*
  * Return the last used search pattern at "idx".
  */
     spat_T *
-get_spat(int idx)
+get_spat(పూర్ణాంకం idx)
 {
-    return &spats[idx];
+    తిరిగి &spats[idx];
 }
 
 /*
  * Return the last used search pattern index.
  */
-    int
-get_spat_last_idx(void)
+    పూర్ణాంకం
+get_spat_చివరి_idx(శూన్య)
 {
-    return last_idx;
+    తిరిగి చివరి_idx;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_PROTO)
 /*
  * "searchcount()" function
  */
-    void
+    శూన్య
 f_searchcount(typval_T *argvars, typval_T *rettv)
 {
     pos_T		pos = curwin->w_cursor;
-    char_u		*pattern = NULL;
-    int			maxcount = p_msc;
-    long		timeout = SEARCH_STAT_DEF_TIMEOUT;
-    int			recompute = TRUE;
+    char_u		*నమూనా = ఖాళీ;
+    పూర్ణాంకం			maxcount = p_msc;
+    దీర్ఘ		timeout = శోధన_STAT_DEF_TIMEOUT;
+    పూర్ణాంకం			recompute = TRUE;
     searchstat_T	stat;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_dict_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
+    ఒకవేళ (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
 	recompute = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	dict_T		*dict;
 	dictitem_T	*di;
 	listitem_T	*li;
-	int		error = FALSE;
+	పూర్ణాంకం		error = FALSE;
 
-	if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	    return;
+	ఒకవేళ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	    తిరిగి;
 	dict = argvars[0].vval.v_dict;
-	di = dict_find(dict, (char_u *)"timeout", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"timeout", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    timeout = (long)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    timeout = (దీర్ఘ)tv_get_సంఖ్య_chk(&di->di_tv, &error);
+	    ఒకవేళ (error)
+		తిరిగి;
 	}
-	di = dict_find(dict, (char_u *)"maxcount", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"maxcount", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    maxcount = (int)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    maxcount = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&di->di_tv, &error);
+	    ఒకవేళ (error)
+		తిరిగి;
 	}
 	recompute = dict_get_bool(dict, "recompute", recompute);
-	di = dict_find(dict, (char_u *)"pattern", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"pattern", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    pattern = tv_get_string_chk(&di->di_tv);
-	    if (pattern == NULL)
-		return;
+	    నమూనా = tv_get_string_chk(&di->di_tv);
+	    ఒకవేళ (నమూనా == ఖాళీ)
+		తిరిగి;
 	}
-	di = dict_find(dict, (char_u *)"pos", -1);
-	if (di != NULL)
+	di = dict_కనుగొను(dict, (char_u *)"pos", -1);
+	ఒకవేళ (di != ఖాళీ)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    ఒకవేళ (di->di_tv.v_type != VAR_LIST)
 	    {
-		semsg(_(e_invalid_argument_str), "pos");
-		return;
+		semsg(_(e_invalid_వాదం_str), "pos");
+		తిరిగి;
 	    }
-	    if (list_len(di->di_tv.vval.v_list) != 3)
+	    ఒకవేళ (list_len(di->di_tv.vval.v_list) != 3)
 	    {
-		semsg(_(e_invalid_argument_str), "List format should be [lnum, col, off]");
-		return;
+		semsg(_(e_invalid_వాదం_str), "List format should be [lnum, col, off]");
+		తిరిగి;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 0L);
-	    if (li != NULL)
+	    li = list_కనుగొను(di->di_tv.vval.v_list, 0L);
+	    ఒకవేళ (li != ఖాళీ)
 	    {
-		pos.lnum = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.lnum = tv_get_సంఖ్య_chk(&li->li_tv, &error);
+		ఒకవేళ (error)
+		    తిరిగి;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 1L);
-	    if (li != NULL)
+	    li = list_కనుగొను(di->di_tv.vval.v_list, 1L);
+	    ఒకవేళ (li != ఖాళీ)
 	    {
-		pos.col = tv_get_number_chk(&li->li_tv, &error) - 1;
-		if (error)
-		    return;
+		pos.నిలువు = tv_get_సంఖ్య_chk(&li->li_tv, &error) - 1;
+		ఒకవేళ (error)
+		    తిరిగి;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 2L);
-	    if (li != NULL)
+	    li = list_కనుగొను(di->di_tv.vval.v_list, 2L);
+	    ఒకవేళ (li != ఖాళీ)
 	    {
-		pos.coladd = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.coladd = tv_get_సంఖ్య_chk(&li->li_tv, &error);
+		ఒకవేళ (error)
+		    తిరిగి;
 	    }
 	}
     }
 
-    save_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    save_చివరి_శోధన_నమూనా();
+# ifdef FEAT_శోధన_EXTRA
     save_incsearch_state();
 # endif
-    if (pattern != NULL)
+    ఒకవేళ (నమూనా != ఖాళీ)
     {
-	if (*pattern == NUL)
-	    goto the_end;
-	vim_free(spats[last_idx].pat);
-	spats[last_idx].patlen = STRLEN(pattern);
-	spats[last_idx].pat = vim_strnsave(pattern, spats[last_idx].patlen);
-	if (spats[last_idx].pat == NULL)
-	    spats[last_idx].patlen = 0;
+	ఒకవేళ (*నమూనా == NUL)
+	    వెళ్ళు the_చివర;
+	vim_free(spats[చివరి_idx].pat);
+	spats[చివరి_idx].patlen = STRLEN(నమూనా);
+	spats[చివరి_idx].pat = vim_strnsave(నమూనా, spats[చివరి_idx].patlen);
+	ఒకవేళ (spats[చివరి_idx].pat == ఖాళీ)
+	    spats[చివరి_idx].patlen = 0;
     }
-    if (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
-	goto the_end;	// the previous pattern was never defined
+    ఒకవేళ (spats[చివరి_idx].pat == ఖాళీ || *spats[చివరి_idx].pat == NUL)
+	వెళ్ళు the_చివర;	// the previous pattern was never defined
 
-    update_search_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
+    update_శోధన_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
 
-    dict_add_number(rettv->vval.v_dict, "current", stat.cur);
-    dict_add_number(rettv->vval.v_dict, "total", stat.cnt);
-    dict_add_number(rettv->vval.v_dict, "exact_match", stat.exact_match);
-    dict_add_number(rettv->vval.v_dict, "incomplete", stat.incomplete);
-    dict_add_number(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
+    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "current", stat.cur);
+    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "total", stat.cnt);
+    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "exact_match", stat.exact_సరిపోలిక);
+    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "incomplete", stat.incomplete);
+    dict_కూడు_సంఖ్య(rettv->vval.v_dict, "maxcount", stat.చివరి_maxcount);
 
-the_end:
-    restore_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+the_చివర:
+    restore_చివరి_శోధన_నమూనా();
+# ifdef FEAT_శోధన_EXTRA
     restore_incsearch_state();
 # endif
 }
-#endif
+#అయితే_ముగింపు

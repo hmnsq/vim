@@ -12,199 +12,199 @@
  * async debugging.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 // Log file opened with ch_logfile().
-static FILE *log_fd = NULL;
-static char_u *log_name = NULL;
-#ifdef FEAT_RELTIME
-static proftime_T log_start;
-#endif
+స్థిర FILE *log_fd = ఖాళీ;
+స్థిర char_u *log_name = ఖాళీ;
+#నిర్వచితమైతే FEAT_RELTIME
+స్థిర proftime_T log_ప్రారంభం;
+#అయితే_ముగింపు
 
-    void
+    శూన్య
 ch_logfile(char_u *fname, char_u *opt)
 {
-    FILE	*file = NULL;
-    char	*mode = "a";
+    FILE	*file = ఖాళీ;
+    అక్షరం	*బహుళకం = "a";
 
-    if (log_fd != NULL)
+    ఒకవేళ (log_fd != ఖాళీ)
     {
-	if (*fname != NUL)
-	    ch_log(NULL, "closing this logfile, opening %s", fname);
-	else
-	    ch_log(NULL, "closing logfile %s", log_name);
+	ఒకవేళ (*fname != NUL)
+	    ch_log(ఖాళీ, "closing this logfile, opening %s", fname);
+	లేకపోతే
+	    ch_log(ఖాళీ, "closing logfile %s", log_name);
 	fclose(log_fd);
     }
 
     // The "a" flag overrules the "w" flag.
-    if (vim_strchr(opt, 'a') == NULL && vim_strchr(opt, 'w') != NULL)
-	mode = "w";
-    ch_log_output = vim_strchr(opt, 'o') != NULL ? LOG_ALWAYS : FALSE;
+    ఒకవేళ (vim_strchr(opt, 'a') == ఖాళీ && vim_strchr(opt, 'w') != ఖాళీ)
+	బహుళకం = "w";
+    ch_log_output = vim_strchr(opt, 'o') != ఖాళీ ? LOG_ALWAYS : FALSE;
 
-    if (*fname != NUL)
+    ఒకవేళ (*fname != NUL)
     {
-	file = fopen((char *)fname, mode);
-	if (file == NULL)
+	file = fopen((అక్షరం *)fname, బహుళకం);
+	ఒకవేళ (file == ఖాళీ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    return;
+	    తిరిగి;
 	}
 	vim_free(log_name);
 	log_name = vim_strsave(fname);
     }
     log_fd = file;
 
-    if (log_fd != NULL)
+    ఒకవేళ (log_fd != ఖాళీ)
     {
 	fprintf(log_fd, "==== start log session %s ====\n",
-						 get_ctime(time(NULL), FALSE));
+						 get_ctime(సమయం(ఖాళీ), FALSE));
 	// flush now, if fork/exec follows it could be written twice
 	fflush(log_fd);
-#ifdef FEAT_RELTIME
-	profile_start(&log_start);
-#endif
+#నిర్వచితమైతే FEAT_RELTIME
+	profile_ప్రారంభం(&log_ప్రారంభం);
+#అయితే_ముగింపు
     }
 }
 
-    int
-ch_log_active(void)
+    పూర్ణాంకం
+ch_log_చురుకైన(శూన్య)
 {
-    return log_fd != NULL;
+    తిరిగి log_fd != ఖాళీ;
 }
 
-    static void
-ch_log_lead(const char *what, channel_T *ch UNUSED, ch_part_T part UNUSED)
+    స్థిర శూన్య
+ch_log_lead(స్థిరరాశి అక్షరం *what, channel_T *ch వాడని, ch_part_T part వాడని)
 {
-    if (log_fd == NULL)
-	return;
+    ఒకవేళ (log_fd == ఖాళీ)
+	తిరిగి;
 
-#ifdef FEAT_RELTIME
+#నిర్వచితమైతే FEAT_RELTIME
     proftime_T log_now;
 
-    profile_start(&log_now);
-    profile_sub(&log_now, &log_start);
-    fprintf(log_fd, "%s ", profile_msg(&log_now));
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    if (ch != NULL)
+    profile_ప్రారంభం(&log_now);
+    profile_sub(&log_now, &log_ప్రారంభం);
+    fprintf(log_fd, "%s ", profile_సందేశం(&log_now));
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    ఒకవేళ (ch != ఖాళీ)
     {
-	if (part < PART_COUNT)
-	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_names[part]);
-	else
+	ఒకవేళ (part < PART_లెక్క)
+	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_పేర్లు[part]);
+	లేకపోతే
 	    fprintf(log_fd, "%son %d: ", what, ch->ch_id);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	fprintf(log_fd, "%s: ", what);
 }
 
-#ifndef PROTO  // prototype is in proto.h
-    void
-ch_log(channel_T *ch, const char *fmt, ...)
+#నిర్వచితం_కాకపోతే PROTO  // prototype is in proto.h
+    శూన్య
+ch_log(channel_T *ch, స్థిరరాశి అక్షరం *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    ఒకవేళ (log_fd == ఖాళీ)
+	తిరిగి;
 
     va_list ap;
 
-    ch_log_lead("", ch, PART_COUNT);
+    ch_log_lead("", ch, PART_లెక్క);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_సందేశం = 0;
 }
 
-    void
-ch_error(channel_T *ch, const char *fmt, ...)
+    శూన్య
+ch_error(channel_T *ch, స్థిరరాశి అక్షరం *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    ఒకవేళ (log_fd == ఖాళీ)
+	తిరిగి;
 
     va_list ap;
 
-    ch_log_lead("ERR ", ch, PART_COUNT);
+    ch_log_lead("ERR ", ch, PART_లెక్క);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_సందేశం = 0;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_JOB_CHANNEL)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
 /*
  * Log a message "buf[len]" for channel "ch" part "part".
  * Only to be called when ch_log_active() returns TRUE.
  */
-    void
+    శూన్య
 ch_log_literal(
-	char	    *lead,
+	అక్షరం	    *lead,
 	channel_T   *ch,
 	ch_part_T   part,
 	char_u	    *buf,
-	int	    len)
+	పూర్ణాంకం	    len)
 {
     ch_log_lead(lead, ch, part);
     fprintf(log_fd, "'");
-    vim_ignored = (int)fwrite(buf, len, 1, log_fd);
+    vim_ignored = (పూర్ణాంకం)fwrite(buf, len, 1, log_fd);
     fprintf(log_fd, "'\n");
     fflush(log_fd);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * "ch_log()" function
  */
-    void
-f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_log(typval_T *argvars, typval_T *rettv వాడని)
 {
-    char_u	*msg;
-    channel_T	*channel = NULL;
+    char_u	*సందేశం;
+    channel_T	*channel = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_chan_or_job_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_chan_or_పని_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
-    msg = tv_get_string(&argvars[0]);
-#if defined(FEAT_JOB_CHANNEL)
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    సందేశం = tv_get_string(&argvars[0]);
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
 	channel = get_channel_arg(&argvars[1], FALSE, FALSE, 0);
-#endif
+#అయితే_ముగింపు
 
     // Prepend "ch_log()" to make it easier to find these entries in the
     // logfile.
-    ch_log(channel, "ch_log(): %s", msg);
+    ch_log(channel, "ch_log(): %s", సందేశం);
 }
 
 /*
  * "ch_logfile()" function
  */
-    void
-f_ch_logfile(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_ch_logfile(typval_T *argvars, typval_T *rettv వాడని)
 {
     char_u *fname;
     char_u *opt = (char_u *)"";
     char_u buf[NUMBUFLEN];
 
     // Don't open a file in restricted mode.
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     fname = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_STRING)
+    ఒకవేళ (argvars[1].v_type == VAR_STRING)
 	opt = tv_get_string_buf(&argvars[1], buf);
     ch_logfile(fname, opt);
 }
 
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL

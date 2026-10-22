@@ -11,40 +11,40 @@
  * quickfix.c: functions for quickfix mode, using a file with error messages
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_QUICKFIX)
+#ఒకవేళ defined(FEAT_QUICKFIX)
 
-struct dir_stack_T
+నిర్మాణం dir_దొంతర_T
 {
-    struct dir_stack_T	*next;
+    నిర్మాణం dir_దొంతర_T	*తదుపరి;
     char_u		*dirname;
 };
 
 /*
  * For each error the next struct is allocated and linked in a list.
  */
-typedef struct qfline_S qfline_T;
-struct qfline_S
+రకనిర్వచనం నిర్మాణం qfline_S qfline_T;
+నిర్మాణం qfline_S
 {
-    qfline_T	*qf_next;	// pointer to next error in the list
+    qfline_T	*qf_తదుపరి;	// pointer to next error in the list
     qfline_T	*qf_prev;	// pointer to previous error in the list
     linenr_T	qf_lnum;	// line number where the error occurred
-    linenr_T	qf_end_lnum;	// line number when the error has range or zero
-    int		qf_fnum;	// file number for the line
-    int		qf_col;		// column where the error occurred
-    int		qf_end_col;	// column when the error has range or zero
-    int		qf_nr;		// error number
+    linenr_T	qf_చివర_lnum;	// line number when the error has range or zero
+    పూర్ణాంకం		qf_fnum;	// file number for the line
+    పూర్ణాంకం		qf_నిలువు;		// column where the error occurred
+    పూర్ణాంకం		qf_చివర_నిలువు;	// column when the error has range or zero
+    పూర్ణాంకం		qf_nr;		// error number
     char_u	*qf_module;	// module name for this error
     char_u	*qf_fname;	// different filename if there're hard links
-    char_u	*qf_pattern;	// search pattern for the error
-    char_u	*qf_text;	// description of the error
+    char_u	*qf_నమూనా;	// search pattern for the error
+    char_u	*qf_పాఠ్యం;	// description of the error
     char_u	qf_viscol;	// set to TRUE if qf_col and qf_end_col is
 				// screen column
     char_u	qf_cleared;	// set to TRUE if line has been deleted
     char_u	qf_type;	// type of the error (mostly 'E'); 1 for
 				// :helpgrep
-    typval_T	qf_user_data;	// custom user data associated with this item
+    typval_T	qf_user_దత్తాంశం;	// custom user data associated with this item
     char_u	qf_valid;	// valid error message detected
 };
 
@@ -57,11 +57,11 @@ struct qfline_S
 /*
  * Quickfix list type.
  */
-typedef enum
+రకనిర్వచనం గణన
 {
     QFLT_QUICKFIX, // Quickfix list - global list
     QFLT_LOCATION, // Location list - per window list
-    QFLT_INTERNAL  // Internal - Temporary list used by getqflist()/getloclist()
+    QFLT_అంతర్గత  // Internal - Temporary list used by getqflist()/getloclist()
 } qfltype_T;
 
 /*
@@ -73,67 +73,67 @@ typedef enum
  * created using setqflist()/setloclist() with a title and/or user context
  * information and entries can be added later using setqflist()/setloclist().
  */
-typedef struct qf_list_S
+రకనిర్వచనం నిర్మాణం qf_list_S
 {
     int_u	qf_id;		// Unique identifier for this list
     qfltype_T	qfl_type;
-    qfline_T	*qf_start;	// pointer to the first error
-    qfline_T	*qf_last;	// pointer to the last error
+    qfline_T	*qf_ప్రారంభం;	// pointer to the first error
+    qfline_T	*qf_చివరి;	// pointer to the last error
     qfline_T	*qf_ptr;	// pointer to the current error
-    int		qf_count;	// number of errors (0 means empty list)
-    int		qf_index;	// current index in the error list
-    int		qf_nonevalid;	// TRUE if not a single valid entry found
-    int		qf_has_user_data; // TRUE if at least one item has user_data attached
+    పూర్ణాంకం		qf_లెక్క;	// number of errors (0 means empty list)
+    పూర్ణాంకం		qf_సూచీ;	// current index in the error list
+    పూర్ణాంకం		qf_nonevalid;	// TRUE if not a single valid entry found
+    పూర్ణాంకం		qf_has_user_దత్తాంశం; // TRUE if at least one item has user_data attached
     char_u	*qf_title;	// title derived from the command that created
 				// the error list or set by setqflist
     typval_T	*qf_ctx;	// context set by setqflist/setloclist
     callback_T  qf_qftf_cb;	// 'quickfixtextfunc' callback function
 
-    struct dir_stack_T	*qf_dir_stack;
+    నిర్మాణం dir_దొంతర_T	*qf_dir_దొంతర;
     char_u		*qf_directory;
-    struct dir_stack_T	*qf_file_stack;
+    నిర్మాణం dir_దొంతర_T	*qf_file_దొంతర;
     char_u		*qf_currfile;
-    int			qf_multiline;
-    int			qf_multiignore;
-    int			qf_multiscan;
-    long		qf_changedtick;
+    పూర్ణాంకం			qf_multiline;
+    పూర్ణాంకం			qf_multiignore;
+    పూర్ణాంకం			qf_multiscan;
+    దీర్ఘ		qf_changedtick;
 } qf_list_T;
 
 /*
  * Quickfix/Location list stack definition
  * Contains a list of quickfix/location lists (qf_list_T)
  */
-struct qf_info_S
+నిర్మాణం qf_info_S
 {
     // Count of references to this list. Used only for location lists.
     // When a location list window reference this list, qf_refcount
     // will be 2. Otherwise, qf_refcount will be 1. When qf_refcount
     // reaches 0, the list is freed.
-    int		qf_refcount;
-    int		qf_listcount;	    // current number of lists
-    int		qf_curlist;	    // current error list
-    int         qf_maxcount;        // maximum number of lists
+    పూర్ణాంకం		qf_refcount;
+    పూర్ణాంకం		qf_listcount;	    // current number of lists
+    పూర్ణాంకం		qf_curlist;	    // current error list
+    పూర్ణాంకం         qf_maxcount;        // maximum number of lists
     qf_list_T	*qf_lists;
     qfltype_T	qfl_type;	    // type of list
-    int		qf_bufnr;	    // quickfix window buffer number
+    పూర్ణాంకం		qf_bufnr;	    // quickfix window buffer number
 };
 
-static qf_info_T ql_info_actual; // global quickfix list
-static qf_info_T *ql_info;	// points to ql_info_actual if memory allocation is successful.
-static int_u last_qf_id = 0;	// Last used quickfix list id
+స్థిర qf_info_T ql_info_actual; // global quickfix list
+స్థిర qf_info_T *ql_info;	// points to ql_info_actual if memory allocation is successful.
+స్థిర int_u చివరి_qf_id = 0;	// Last used quickfix list id
 
 # define FMT_PATTERNS 14		// maximum number of % recognized
 
 /*
  * Structure used to hold the info of one part of 'errorformat'
  */
-typedef struct efm_S efm_T;
-struct efm_S
+రకనిర్వచనం నిర్మాణం efm_S efm_T;
+నిర్మాణం efm_S
 {
     regprog_T	    *prog;	// pre-formatted part of 'errorformat'
-    efm_T	    *next;	// pointer to next (NULL if last)
+    efm_T	    *తదుపరి;	// pointer to next (NULL if last)
     char_u	    addr[FMT_PATTERNS]; // indices of used % patterns
-    char_u	    prefix;	// prefix of this format line:
+    char_u	    ఉపసర్గ;	// prefix of this format line:
 				//   'D' enter directory
 				//   'X' leave directory
 				//   'A' start of multi-line message
@@ -150,64 +150,64 @@ struct efm_S
     char_u	    flags;	// additional flags given in prefix
 				//   '-' do not include this line
 				//   '+' include whole line in message
-    int		    conthere;	// %> used
+    పూర్ణాంకం		    conthere;	// %> used
 };
 
 // List of location lists to be deleted.
 // Used to delay the deletion of locations lists by autocmds.
-typedef struct qf_delq_S
+రకనిర్వచనం నిర్మాణం qf_delq_S
 {
-    struct qf_delq_S	*next;
+    నిర్మాణం qf_delq_S	*తదుపరి;
     qf_info_T		*qi;
 } qf_delq_T;
-static qf_delq_T *qf_delq_head = NULL;
+స్థిర qf_delq_T *qf_delq_తల = ఖాళీ;
 
 // Counter to prevent autocmds from freeing up location lists when they are
 // still being used.
-static int	quickfix_busy = 0;
+స్థిర పూర్ణాంకం	quickfix_busy = 0;
 
-static efm_T	*fmt_start = NULL; // cached across qf_parse_line() calls
+స్థిర efm_T	*fmt_ప్రారంభం = ఖాళీ; // cached across qf_parse_line() calls
 
 // callback function for 'quickfixtextfunc'
-static callback_T qftf_cb;
+స్థిర callback_T qftf_cb;
 
-static void     qf_pop_stack(qf_info_T *qi, int adjust);
-static void	qf_new_list(qf_info_T *qi, char_u *qf_title);
-static int	qf_add_entry(qf_list_T *qfl, char_u *dir, char_u *fname, char_u *module, int bufnum, char_u *mesg, long lnum, long end_lnum, int col, int end_col, int vis_col, char_u *pattern, int nr, int type, typval_T *user_data, int valid);
-static int      qf_resize_stack_base(qf_info_T *qi, int n);
-static void     qf_sync_llw_to_win(win_T *llw);
-static void     qf_sync_win_to_llw(win_T *pwp);
-static qf_info_T *qf_alloc_stack(qfltype_T qfltype, int n);
-static qf_list_T *qf_alloc_list_stack(int n);
-static void	qf_free(qf_list_T *qfl);
-static char_u	*qf_types(int, int);
-static int	qf_get_fnum(qf_list_T *qfl, char_u *, char_u *);
-static char_u	*qf_push_dir(char_u *, struct dir_stack_T **, int is_file_stack);
-static char_u	*qf_pop_dir(struct dir_stack_T **);
-static char_u	*qf_guess_filepath(qf_list_T *qfl, char_u *);
-static win_T    *qf_find_win_with_loclist(qf_info_T *ll);
-static void	qf_jump_newwin(qf_info_T *qi, int dir, int errornr, int forceit, int newwin);
-static void	qf_fmt_text(garray_T *gap, char_u *text);
-static void	qf_range_text(garray_T *gap, qfline_T *qfp);
-static int	qf_win_pos_update(qf_info_T *qi, int old_qf_index);
-static win_T	*qf_find_win(qf_info_T *qi);
-static buf_T	*qf_find_buf(qf_info_T *qi);
-static void	qf_update_buffer(qf_info_T *qi, qfline_T *old_last);
-static void	qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid);
-static buf_T	*load_dummy_buffer(char_u *fname, char_u *dirname_start, char_u *resulting_dir);
-static void	wipe_dummy_buffer(buf_T *buf, char_u *dirname_start);
-static void	unload_dummy_buffer(buf_T *buf, char_u *dirname_start);
-static qf_info_T *ll_get_or_alloc_list(win_T *);
-static int	entry_is_closer_to_target(qfline_T *entry, qfline_T *other_entry, int target_fnum, int target_lnum, int target_col);
+స్థిర శూన్య     qf_తీయి_దొంతర(qf_info_T *qi, పూర్ణాంకం adjust);
+స్థిర శూన్య	qf_new_list(qf_info_T *qi, char_u *qf_title);
+స్థిర పూర్ణాంకం	qf_కూడు_నమోదు(qf_list_T *qfl, char_u *dir, char_u *fname, char_u *module, పూర్ణాంకం bufnum, char_u *mesg, దీర్ఘ lnum, దీర్ఘ చివర_lnum, పూర్ణాంకం నిలువు, పూర్ణాంకం చివర_నిలువు, పూర్ణాంకం vis_నిలువు, char_u *నమూనా, పూర్ణాంకం nr, పూర్ణాంకం type, typval_T *user_దత్తాంశం, పూర్ణాంకం valid);
+స్థిర పూర్ణాంకం      qf_resize_దొంతర_పునాది(qf_info_T *qi, పూర్ణాంకం n);
+స్థిర శూన్య     qf_sync_llw_గమ్యం_win(win_T *llw);
+స్థిర శూన్య     qf_sync_win_గమ్యం_llw(win_T *pwp);
+స్థిర qf_info_T *qf_alloc_దొంతర(qfltype_T qfltype, పూర్ణాంకం n);
+స్థిర qf_list_T *qf_alloc_list_దొంతర(పూర్ణాంకం n);
+స్థిర శూన్య	qf_free(qf_list_T *qfl);
+స్థిర char_u	*qf_types(పూర్ణాంకం, పూర్ణాంకం);
+స్థిర పూర్ణాంకం	qf_get_fnum(qf_list_T *qfl, char_u *, char_u *);
+స్థిర char_u	*qf_నెట్టు_dir(char_u *, నిర్మాణం dir_దొంతర_T **, పూర్ణాంకం is_file_దొంతర);
+స్థిర char_u	*qf_తీయి_dir(నిర్మాణం dir_దొంతర_T **);
+స్థిర char_u	*qf_guess_filepath(qf_list_T *qfl, char_u *);
+స్థిర win_T    *qf_కనుగొను_win_with_loclist(qf_info_T *ll);
+స్థిర శూన్య	qf_jump_newwin(qf_info_T *qi, పూర్ణాంకం dir, పూర్ణాంకం errornr, పూర్ణాంకం forceit, పూర్ణాంకం newwin);
+స్థిర శూన్య	qf_fmt_పాఠ్యం(garray_T *gap, char_u *పాఠ్యం);
+స్థిర శూన్య	qf_range_పాఠ్యం(garray_T *gap, qfline_T *qfp);
+స్థిర పూర్ణాంకం	qf_win_pos_update(qf_info_T *qi, పూర్ణాంకం old_qf_సూచీ);
+స్థిర win_T	*qf_కనుగొను_win(qf_info_T *qi);
+స్థిర buf_T	*qf_కనుగొను_buf(qf_info_T *qi);
+స్థిర శూన్య	qf_update_బఫరు(qf_info_T *qi, qfline_T *old_చివరి);
+స్థిర శూన్య	qf_fill_బఫరు(qf_list_T *qfl, buf_T *buf, qfline_T *old_చివరి, పూర్ణాంకం qf_winid);
+స్థిర buf_T	*ఎక్కించు_dummy_బఫరు(char_u *fname, char_u *dirname_ప్రారంభం, char_u *resulting_dir);
+స్థిర శూన్య	wipe_dummy_బఫరు(buf_T *buf, char_u *dirname_ప్రారంభం);
+స్థిర శూన్య	unload_dummy_బఫరు(buf_T *buf, char_u *dirname_ప్రారంభం);
+స్థిర qf_info_T *ll_get_or_alloc_list(win_T *);
+స్థిర పూర్ణాంకం	నమోదు_is_closer_గమ్యం_లక్ష్యం(qfline_T *నమోదు_2, qfline_T *other_నమోదు, పూర్ణాంకం లక్ష్యం_fnum, పూర్ణాంకం లక్ష్యం_lnum, పూర్ణాంకం లక్ష్యం_నిలువు);
 
 // Quickfix window check helper macro
-# define IS_QF_WINDOW(wp) (bt_quickfix((wp)->w_buffer) && (wp)->w_llist_ref == NULL)
+# define IS_QF_కిటికీ(wp) (bt_quickfix((wp)->w_బఫరు) && (wp)->w_llist_ref == ఖాళీ)
 // Location list window check helper macro
-# define IS_LL_WINDOW(wp) (bt_quickfix((wp)->w_buffer) && (wp)->w_llist_ref != NULL)
+# define IS_LL_కిటికీ(wp) (bt_quickfix((wp)->w_బఫరు) && (wp)->w_llist_ref != ఖాళీ)
 
 // Quickfix and location list stack check helper macros
-# define IS_QF_STACK(qi)		((qi)->qfl_type == QFLT_QUICKFIX)
-# define IS_LL_STACK(qi)		((qi)->qfl_type == QFLT_LOCATION)
+# define IS_QF_దొంతర(qi)		((qi)->qfl_type == QFLT_QUICKFIX)
+# define IS_LL_దొంతర(qi)		((qi)->qfl_type == QFLT_LOCATION)
 # define IS_QF_LIST(qfl)		((qfl)->qfl_type == QFLT_QUICKFIX)
 # define IS_LL_LIST(qfl)		((qfl)->qfl_type == QFLT_LOCATION)
 
@@ -215,34 +215,34 @@ static int	entry_is_closer_to_target(qfline_T *entry, qfline_T *other_entry, int
  * Return location list for window 'wp'
  * For location list window, return the referenced location list
  */
-# define GET_LOC_LIST(wp) (IS_LL_WINDOW(wp) ? (wp)->w_llist_ref : (wp)->w_llist)
+# define GET_LOC_LIST(wp) (IS_LL_కిటికీ(wp) ? (wp)->w_llist_ref : (wp)->w_llist)
 
 // Macro to loop through all the items in a quickfix list
 // Quickfix item index starts from 1, so i below starts at 1
-# define FOR_ALL_QFL_ITEMS(qfl, qfp, i) \
-		    for ((i) = 1, (qfp) = (qfl)->qf_start; \
-			    !got_int && (i) <= (qfl)->qf_count && (qfp) != NULL; \
-			    ++(i), (qfp) = (qfp)->qf_next)
+# define FOR_ALL_QFL_వస్తువులు(qfl, qfp, i) \
+		    కొరకు ((i) = 1, (qfp) = (qfl)->qf_ప్రారంభం; \
+			    !got_int && (i) <= (qfl)->qf_లెక్క && (qfp) != ఖాళీ; \
+			    ++(i), (qfp) = (qfp)->qf_తదుపరి)
 
 /*
  * Looking up a buffer can be slow if there are many.  Remember the last one
  * to make this a lot faster if there are multiple matches in the same file.
  */
-static char_u   *qf_last_bufname = NULL;
-static bufref_T  qf_last_bufref = {NULL, 0, 0};
+స్థిర char_u   *qf_చివరి_bufname = ఖాళీ;
+స్థిర bufref_T  qf_చివరి_bufref = {ఖాళీ, 0, 0};
 
-static garray_T qfga;
+స్థిర garray_T qfga;
 
 /*
  * Get a growarray to buffer text in.  Shared between various commands to avoid
  * many alloc/free calls.
  */
-    static garray_T *
-qfga_get(void)
+    స్థిర garray_T *
+qfga_get(శూన్య)
 {
-    static int initialized = FALSE;
+    స్థిర పూర్ణాంకం initialized = FALSE;
 
-    if (!initialized)
+    ఒకవేళ (!initialized)
     {
 	initialized = TRUE;
 	ga_init2(&qfga, 1, 256);
@@ -252,7 +252,7 @@ qfga_get(void)
     // many alloc/free calls.
     qfga.ga_len = 0;
 
-    return &qfga;
+    తిరిగి &qfga;
 }
 
 /*
@@ -261,27 +261,27 @@ qfga_get(void)
  * buffer size is large, then to avoid holding on to that memory, clear the
  * grow array.  Otherwise just reset the grow array length.
  */
-    static void
-qfga_clear(void)
+    స్థిర శూన్య
+qfga_clear(శూన్య)
 {
-    if (qfga.ga_maxlen > 1000)
+    ఒకవేళ (qfga.ga_maxlen > 1000)
 	ga_clear(&qfga);
-    else
+    లేకపోతే
 	qfga.ga_len = 0;
 }
 
 /*
  * Maximum number of bytes allowed per line while reading a errorfile.
  */
-# define LINE_MAXLEN 4096
+# define పంక్తి_MAXLEN 4096
 
 /*
  * Patterns used.  Keep in sync with qf_parse_fmt[].
  */
-static struct fmtpattern
+స్థిర నిర్మాణం fmtpattern
 {
     char_u	convchar;
-    char	*pattern;
+    అక్షరం	*నమూనా;
 } fmt_pat[FMT_PATTERNS] =
     {
 	{'f', ".\\+"},	    // only used when at end
@@ -292,9 +292,9 @@ static struct fmtpattern
 	{'c', "\\d\\+"},	// 5
 	{'k', "\\d\\+"},	// 6
 	{'t', "."},		// 7
-# define FMT_PATTERN_M 8
+# define FMT_నమూనా_M 8
 	{'m', ".\\+"},		// 8
-# define FMT_PATTERN_R 9
+# define FMT_నమూనా_R 9
 	{'r', ".*"},		// 9
 	{'p', "[-	 .]*"},	// 10
 	{'v', "\\d\\+"},	// 11
@@ -308,35 +308,35 @@ static struct fmtpattern
  * pattern specifier is supplied in "efmpat".  The converted pattern is stored
  * in "regpat".  Returns a pointer to the location after the pattern.
  */
-    static char_u *
-efmpat_to_regpat(
+    స్థిర char_u *
+efmpat_గమ్యం_regpat(
 	char_u	*efmpat,
 	char_u	*regpat,
 	efm_T	*efminfo,
-	int	idx,
-	int	round)
+	పూర్ణాంకం	idx,
+	పూర్ణాంకం	విడత)
 {
     char_u	*srcptr;
 
-    if (efminfo->addr[idx])
+    ఒకవేళ (efminfo->addr[idx])
     {
 	// Each errorformat pattern can occur only once
-	semsg(_(e_too_many_chr_in_format_string), *efmpat);
-	return NULL;
+	semsg(_(e_too_many_chr_లోపల_format_string), *efmpat);
+	తిరిగి ఖాళీ;
     }
-    if ((idx && idx < FMT_PATTERN_R
-		&& vim_strchr((char_u *)"DXOPQ", efminfo->prefix) != NULL)
-	    || (idx == FMT_PATTERN_R
-		&& vim_strchr((char_u *)"OPQ", efminfo->prefix) == NULL))
+    ఒకవేళ ((idx && idx < FMT_నమూనా_R
+		&& vim_strchr((char_u *)"DXOPQ", efminfo->ఉపసర్గ) != ఖాళీ)
+	    || (idx == FMT_నమూనా_R
+		&& vim_strchr((char_u *)"OPQ", efminfo->ఉపసర్గ) == ఖాళీ))
     {
-	semsg(_(e_unexpected_chr_in_format_str), *efmpat);
-	return NULL;
+	semsg(_(e_unexpected_chr_లోపల_format_str), *efmpat);
+	తిరిగి ఖాళీ;
     }
-    efminfo->addr[idx] = (char_u)++round;
+    efminfo->addr[idx] = (char_u)++విడత;
     *regpat++ = '\\';
     *regpat++ = '(';
-# ifdef BACKSLASH_IN_FILENAME
-    if (*efmpat == 'f')
+# ifdef BACKSLASH_లోపల_FILENAME
+    ఒకవేళ (*efmpat == 'f')
     {
 	// Also match "c:" in the file name, even when
 	// checking for a colon next: "%f:".
@@ -345,9 +345,9 @@ efmpat_to_regpat(
 	regpat += 10;
     }
 # endif
-    if (*efmpat == 'f' && efmpat[1] != NUL)
+    ఒకవేళ (*efmpat == 'f' && efmpat[1] != NUL)
     {
-	if (efmpat[1] != '\\' && efmpat[1] != '%')
+	ఒకవేళ (efmpat[1] != '\\' && efmpat[1] != '%')
 	{
 	    // A file name may contain spaces, but this isn't
 	    // in "\f".  For "%f:%l:%m" there may be a ":" in
@@ -357,7 +357,7 @@ efmpat_to_regpat(
 	    STRCPY(regpat, ".\\{-1,}");
 	    regpat += 7;
 	}
-	else
+	లేకపోతే
 	{
 	    // File name followed by '\\' or '%': include as
 	    // many file name chars as possible.
@@ -365,84 +365,84 @@ efmpat_to_regpat(
 	    regpat += 4;
 	}
     }
-    else
+    లేకపోతే
     {
-	srcptr = (char_u *)fmt_pat[idx].pattern;
-	while ((*regpat = *srcptr++) != NUL)
+	srcptr = (char_u *)fmt_pat[idx].నమూనా;
+	అయితే ((*regpat = *srcptr++) != NUL)
 	    ++regpat;
     }
     *regpat++ = '\\';
     *regpat++ = ')';
 
-    return regpat;
+    తిరిగి regpat;
 }
 
 /*
  * Convert a scanf like format in 'errorformat' to a regular expression.
  * Returns a pointer to the location after the pattern.
  */
-    static char_u *
-scanf_fmt_to_regpat(
+    స్థిర char_u *
+scanf_fmt_గమ్యం_regpat(
 	char_u	**pefmp,
 	char_u	*efm,
-	int	len,
+	పూర్ణాంకం	len,
 	char_u	*regpat)
 {
     char_u	*efmp = *pefmp;
 
-    if (*efmp == '[' || *efmp == '\\')
+    ఒకవేళ (*efmp == '[' || *efmp == '\\')
     {
-	if ((*regpat++ = *efmp) == '[')	// %*[^a-z0-9] etc.
+	ఒకవేళ ((*regpat++ = *efmp) == '[')	// %*[^a-z0-9] etc.
 	{
-	    if (efmp[1] == '^')
+	    ఒకవేళ (efmp[1] == '^')
 		*regpat++ = *++efmp;
-	    if (efmp < efm + len)
+	    ఒకవేళ (efmp < efm + len)
 	    {
 		*regpat++ = *++efmp;	    // could be ']'
-		while (efmp < efm + len
+		అయితే (efmp < efm + len
 			&& (*regpat++ = *++efmp) != ']')
 		    // skip ;
-		if (efmp == efm + len)
+		ఒకవేళ (efmp == efm + len)
 		{
-		    emsg(_(e_missing_rsb_in_format_string));
-		    return NULL;
+		    emsg(_(e_missing_rsb_లోపల_format_string));
+		    తిరిగి ఖాళీ;
 		}
 	    }
 	}
-	else if (efmp < efm + len)	// %*\D, %*\s etc.
+	లేకపోతే ఒకవేళ (efmp < efm + len)	// %*\D, %*\s etc.
 	    *regpat++ = *++efmp;
 	*regpat++ = '\\';
 	*regpat++ = '+';
     }
-    else
+    లేకపోతే
     {
 	// TODO: scanf()-like: %*ud, %*3c, %*f, ... ?
-	semsg(_(e_unsupported_chr_in_format_string), *efmp);
-	return NULL;
+	semsg(_(e_unsupported_chr_లోపల_format_string), *efmp);
+	తిరిగి ఖాళీ;
     }
 
     *pefmp = efmp;
 
-    return regpat;
+    తిరిగి regpat;
 }
 
 /*
  * Analyze/parse an errorformat prefix.
  */
-    static char_u *
-efm_analyze_prefix(char_u *efmp, efm_T *efminfo)
+    స్థిర char_u *
+efm_analyze_ఉపసర్గ(char_u *efmp, efm_T *efminfo)
 {
-    if (vim_strchr((char_u *)"+-", *efmp) != NULL)
+    ఒకవేళ (vim_strchr((char_u *)"+-", *efmp) != ఖాళీ)
 	efminfo->flags = *efmp++;
-    if (vim_strchr((char_u *)"DXAEWINCZGOPQ", *efmp) != NULL)
-	efminfo->prefix = *efmp;
-    else
+    ఒకవేళ (vim_strchr((char_u *)"DXAEWINCZGOPQ", *efmp) != ఖాళీ)
+	efminfo->ఉపసర్గ = *efmp;
+    లేకపోతే
     {
-	semsg(_(e_invalid_chr_in_format_string_prefix), *efmp);
-	return NULL;
+	semsg(_(e_invalid_chr_లోపల_format_string_ఉపసర్గ), *efmp);
+	తిరిగి ఖాళీ;
     }
 
-    return efmp;
+    తిరిగి efmp;
 }
 
 /*
@@ -451,132 +451,132 @@ efm_analyze_prefix(char_u *efmp, efm_T *efminfo)
  * information about the 'erroformat' pattern is returned in "fmt_ptr".
  * Returns OK or FAIL.
  */
-    static int
-efm_to_regpat(
+    స్థిర పూర్ణాంకం
+efm_గమ్యం_regpat(
 	char_u	*efm,
-	int	len,
+	పూర్ణాంకం	len,
 	efm_T	*fmt_ptr,
 	char_u	*regpat)
 {
     char_u	*ptr;
     char_u	*efmp;
-    int		round;
-    int		idx = 0;
+    పూర్ణాంకం		విడత;
+    పూర్ణాంకం		idx = 0;
 
     // Build a regexp pattern for a 'errorformat' option part
     ptr = regpat;
     *ptr++ = '^';
-    round = 0;
-    for (efmp = efm; efmp < efm + len; ++efmp)
+    విడత = 0;
+    కొరకు (efmp = efm; efmp < efm + len; ++efmp)
     {
-	if (*efmp == '%')
+	ఒకవేళ (*efmp == '%')
 	{
 	    ++efmp;
-	    for (idx = 0; idx < FMT_PATTERNS; ++idx)
-		if (fmt_pat[idx].convchar == *efmp)
-		    break;
-	    if (idx < FMT_PATTERNS)
+	    కొరకు (idx = 0; idx < FMT_PATTERNS; ++idx)
+		ఒకవేళ (fmt_pat[idx].convchar == *efmp)
+		    ఆపు;
+	    ఒకవేళ (idx < FMT_PATTERNS)
 	    {
-		ptr = efmpat_to_regpat(efmp, ptr, fmt_ptr, idx, round);
-		if (ptr == NULL)
-		    return FAIL;
-		round++;
+		ptr = efmpat_గమ్యం_regpat(efmp, ptr, fmt_ptr, idx, విడత);
+		ఒకవేళ (ptr == ఖాళీ)
+		    తిరిగి FAIL;
+		విడత++;
 	    }
-	    else if (*efmp == '*')
+	    లేకపోతే ఒకవేళ (*efmp == '*')
 	    {
 		++efmp;
-		ptr = scanf_fmt_to_regpat(&efmp, efm, len, ptr);
-		if (ptr == NULL)
-		    return FAIL;
+		ptr = scanf_fmt_గమ్యం_regpat(&efmp, efm, len, ptr);
+		ఒకవేళ (ptr == ఖాళీ)
+		    తిరిగి FAIL;
 	    }
-	    else if (vim_strchr((char_u *)"%\\.^$~[", *efmp) != NULL)
+	    లేకపోతే ఒకవేళ (vim_strchr((char_u *)"%\\.^$~[", *efmp) != ఖాళీ)
 		*ptr++ = *efmp;		// regexp magic characters
-	    else if (*efmp == '#')
+	    లేకపోతే ఒకవేళ (*efmp == '#')
 		*ptr++ = '*';
-	    else if (*efmp == '>')
+	    లేకపోతే ఒకవేళ (*efmp == '>')
 		fmt_ptr->conthere = TRUE;
-	    else if (efmp == efm + 1)		// analyse prefix
+	    లేకపోతే ఒకవేళ (efmp == efm + 1)		// analyse prefix
 	    {
 		// prefix is allowed only at the beginning of the errorformat
 		// option part
-		efmp = efm_analyze_prefix(efmp, fmt_ptr);
-		if (efmp == NULL)
-		    return FAIL;
+		efmp = efm_analyze_ఉపసర్గ(efmp, fmt_ptr);
+		ఒకవేళ (efmp == ఖాళీ)
+		    తిరిగి FAIL;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		semsg(_(e_invalid_chr_in_format_string), *efmp);
-		return FAIL;
+		semsg(_(e_invalid_chr_లోపల_format_string), *efmp);
+		తిరిగి FAIL;
 	    }
 	}
-	else			// copy normal character
+	లేకపోతే			// copy normal character
 	{
-	    if (*efmp == '\\' && efmp + 1 < efm + len)
+	    ఒకవేళ (*efmp == '\\' && efmp + 1 < efm + len)
 		++efmp;
-	    else if (vim_strchr((char_u *)".*^$~[", *efmp) != NULL)
+	    లేకపోతే ఒకవేళ (vim_strchr((char_u *)".*^$~[", *efmp) != ఖాళీ)
 		*ptr++ = '\\';	// escape regexp atoms
-	    if (*efmp)
+	    ఒకవేళ (*efmp)
 		*ptr++ = *efmp;
 	}
     }
     *ptr++ = '$';
     *ptr = NUL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Free the 'errorformat' information list
  */
-    static void
-free_efm_list(efm_T **efm_first)
+    స్థిర శూన్య
+free_efm_list(efm_T **efm_మొదటి)
 {
     efm_T *efm_ptr;
 
-    for (efm_ptr = *efm_first; efm_ptr != NULL; efm_ptr = *efm_first)
+    కొరకు (efm_ptr = *efm_మొదటి; efm_ptr != ఖాళీ; efm_ptr = *efm_మొదటి)
     {
-	*efm_first = efm_ptr->next;
+	*efm_మొదటి = efm_ptr->తదుపరి;
 	vim_regfree(efm_ptr->prog);
 	vim_free(efm_ptr);
     }
-    fmt_start = NULL;
+    fmt_ప్రారంభం = ఖాళీ;
 }
 
 /*
  * Compute the size of the buffer used to convert a 'errorformat' pattern into
  * a regular expression pattern.
  */
-    static int
+    స్థిర పూర్ణాంకం
 efm_regpat_bufsz(char_u *efm)
 {
-    int sz;
-    int i;
+    పూర్ణాంకం sz;
+    పూర్ణాంకం i;
 
-    sz = (FMT_PATTERNS * 3) + ((int)STRLEN(efm) << 2);
-    for (i = FMT_PATTERNS; i > 0; )
-	sz += (int)STRLEN(fmt_pat[--i].pattern);
-# ifdef BACKSLASH_IN_FILENAME
+    sz = (FMT_PATTERNS * 3) + ((పూర్ణాంకం)STRLEN(efm) << 2);
+    కొరకు (i = FMT_PATTERNS; i > 0; )
+	sz += (పూర్ణాంకం)STRLEN(fmt_pat[--i].నమూనా);
+# ifdef BACKSLASH_లోపల_FILENAME
     sz += 12; // "%f" can become twelve chars longer (see efm_to_regpat)
-# else
+# లేకపోతే
     sz += 2; // "%f" can become two chars longer
 # endif
 
-    return sz;
+    తిరిగి sz;
 }
 
 /*
  * Return the length of a 'errorformat' option part (separated by ",").
  */
-    static int
+    స్థిర పూర్ణాంకం
 efm_option_part_len(char_u *efm)
 {
-    int len;
+    పూర్ణాంకం len;
 
-    for (len = 0; efm[len] != NUL && efm[len] != ','; ++len)
-	if (efm[len] == '\\' && efm[len + 1] != NUL)
+    కొరకు (len = 0; efm[len] != NUL && efm[len] != ','; ++len)
+	ఒకవేళ (efm[len] == '\\' && efm[len + 1] != NUL)
 	    ++len;
 
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -584,67 +584,67 @@ efm_option_part_len(char_u *efm)
  * are parsed and converted to regular expressions. Returns information about
  * the parsed 'errorformat' option.
  */
-    static efm_T *
+    స్థిర efm_T *
 parse_efm_option(char_u *efm)
 {
-    efm_T	*fmt_ptr = NULL;
-    efm_T	*fmt_first = NULL;
-    efm_T	*fmt_last = NULL;
-    char_u	*fmtstr = NULL;
-    int		len;
-    int		sz;
+    efm_T	*fmt_ptr = ఖాళీ;
+    efm_T	*fmt_మొదటి = ఖాళీ;
+    efm_T	*fmt_చివరి = ఖాళీ;
+    char_u	*fmtstr = ఖాళీ;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		sz;
 
     // Each part of the format string is copied and modified from errorformat
     // to regex prog.  Only a few % characters are allowed.
 
     // Get some space to modify the format string into.
     sz = efm_regpat_bufsz(efm);
-    if ((fmtstr = alloc_id(sz, aid_qf_efm_fmtstr)) == NULL)
-	goto parse_efm_error;
+    ఒకవేళ ((fmtstr = alloc_id(sz, aid_qf_efm_fmtstr)) == ఖాళీ)
+	వెళ్ళు parse_efm_error;
 
-    while (efm[0] != NUL)
+    అయితే (efm[0] != NUL)
     {
 	// Allocate a new eformat structure and put it at the end of the list
 	fmt_ptr = ALLOC_CLEAR_ONE_ID(efm_T, aid_qf_efm_fmtpart);
-	if (fmt_ptr == NULL)
-	    goto parse_efm_error;
-	if (fmt_first == NULL)	    // first one
-	    fmt_first = fmt_ptr;
-	else
-	    fmt_last->next = fmt_ptr;
-	fmt_last = fmt_ptr;
+	ఒకవేళ (fmt_ptr == ఖాళీ)
+	    వెళ్ళు parse_efm_error;
+	ఒకవేళ (fmt_మొదటి == ఖాళీ)	    // first one
+	    fmt_మొదటి = fmt_ptr;
+	లేకపోతే
+	    fmt_చివరి->తదుపరి = fmt_ptr;
+	fmt_చివరి = fmt_ptr;
 
 	// Isolate one part in the 'errorformat' option
 	len = efm_option_part_len(efm);
 
-	if (efm_to_regpat(efm, len, fmt_ptr, fmtstr) == FAIL)
-	    goto parse_efm_error;
-	if ((fmt_ptr->prog = vim_regcomp(fmtstr, RE_MAGIC + RE_STRING)) == NULL)
-	    goto parse_efm_error;
+	ఒకవేళ (efm_గమ్యం_regpat(efm, len, fmt_ptr, fmtstr) == FAIL)
+	    వెళ్ళు parse_efm_error;
+	ఒకవేళ ((fmt_ptr->prog = vim_regcomp(fmtstr, RE_MAGIC + RE_STRING)) == ఖాళీ)
+	    వెళ్ళు parse_efm_error;
 	// Advance to next part
-	efm = skip_to_option_part(efm + len);	// skip comma and spaces
+	efm = skip_గమ్యం_option_part(efm + len);	// skip comma and spaces
     }
 
-    if (fmt_first == NULL)	// nothing found
-	emsg(_(e_errorformat_contains_no_pattern));
+    ఒకవేళ (fmt_మొదటి == ఖాళీ)	// nothing found
+	emsg(_(e_errorformat_కలిగియుంది_no_నమూనా));
 
-    goto parse_efm_end;
+    వెళ్ళు parse_efm_చివర;
 
 parse_efm_error:
-    free_efm_list(&fmt_first);
+    free_efm_list(&fmt_మొదటి);
 
-parse_efm_end:
+parse_efm_చివర:
     vim_free(fmtstr);
 
-    return fmt_first;
+    తిరిగి fmt_మొదటి;
 }
 
-enum {
+గణన {
     QF_FAIL = 0,
     QF_OK = 1,
-    QF_END_OF_INPUT = 2,
+    QF_చివర_యొక్క_ఆదానం = 2,
     QF_NOMEM = 3,
-    QF_IGNORE_LINE = 4,
+    QF_IGNORE_పంక్తి = 4,
     QF_MULTISCAN = 5,
     QF_ABORT = 6
 };
@@ -653,11 +653,11 @@ enum {
  * State information used to parse lines and add entries to a quickfix/location
  * list.
  */
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     char_u	*linebuf;
-    int		linelen;
+    పూర్ణాంకం		linelen;
     char_u	*growbuf;
-    int		growbufsiz;
+    పూర్ణాంకం		growbufsiz;
     FILE	*fd;
     typval_T	*tv;
     char_u	*p_str;
@@ -671,58 +671,58 @@ typedef struct {
 /*
  * Allocate more memory for the line buffer used for parsing lines.
  */
-    static char_u *
-qf_grow_linebuf(qfstate_T *state, int newsz)
+    స్థిర char_u *
+qf_grow_linebuf(qfstate_T *state, పూర్ణాంకం newsz)
 {
     char_u	*p;
 
     // If the line exceeds LINE_MAXLEN exclude the last
     // byte since it's not a NL character.
-    state->linelen = newsz > LINE_MAXLEN ? LINE_MAXLEN - 1 : newsz;
-    if (state->growbuf == NULL)
+    state->linelen = newsz > పంక్తి_MAXLEN ? పంక్తి_MAXLEN - 1 : newsz;
+    ఒకవేళ (state->growbuf == ఖాళీ)
     {
 	state->growbuf = alloc_id(state->linelen + 1, aid_qf_linebuf);
-	if (state->growbuf == NULL)
-	    return NULL;
+	ఒకవేళ (state->growbuf == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	state->growbufsiz = state->linelen;
     }
-    else if (state->linelen > state->growbufsiz)
+    లేకపోతే ఒకవేళ (state->linelen > state->growbufsiz)
     {
-	if ((p = vim_realloc(state->growbuf, state->linelen + 1)) == NULL)
-	    return NULL;
+	ఒకవేళ ((p = vim_realloc(state->growbuf, state->linelen + 1)) == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	state->growbuf = p;
 	state->growbufsiz = state->linelen;
     }
-    return state->growbuf;
+    తిరిగి state->growbuf;
 }
 
 /*
  * Get the next string (separated by newline) from state->p_str.
  */
-    static int
-qf_get_next_str_line(qfstate_T *state)
+    స్థిర పూర్ణాంకం
+qf_get_తదుపరి_str_పంక్తి(qfstate_T *state)
 {
     // Get the next line from the supplied string
     char_u	*p_str = state->p_str;
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (*p_str == NUL) // Reached the end of the string
-	return QF_END_OF_INPUT;
+    ఒకవేళ (*p_str == NUL) // Reached the end of the string
+	తిరిగి QF_చివర_యొక్క_ఆదానం;
 
     p = vim_strchr(p_str, '\n');
-    if (p != NULL)
-	len = (int)(p - p_str) + 1;
-    else
-	len = (int)STRLEN(p_str);
+    ఒకవేళ (p != ఖాళీ)
+	len = (పూర్ణాంకం)(p - p_str) + 1;
+    లేకపోతే
+	len = (పూర్ణాంకం)STRLEN(p_str);
 
-    if (len > IOSIZE - 2)
+    ఒకవేళ (len > IOSIZE - 2)
     {
 	state->linebuf = qf_grow_linebuf(state, len);
-	if (state->linebuf == NULL)
-	    return QF_NOMEM;
+	ఒకవేళ (state->linebuf == ఖాళీ)
+	    తిరిగి QF_NOMEM;
     }
-    else
+    లేకపోతే
     {
 	state->linebuf = IObuff;
 	state->linelen = len;
@@ -734,37 +734,37 @@ qf_get_next_str_line(qfstate_T *state)
     p_str += len;
     state->p_str = p_str;
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Get the next string from the List item state->p_li.
  */
-    static int
-qf_get_next_list_line(qfstate_T *state)
+    స్థిర పూర్ణాంకం
+qf_get_తదుపరి_list_పంక్తి(qfstate_T *state)
 {
     listitem_T	*p_li = state->p_li;
-    int		len;
+    పూర్ణాంకం		len;
 
-    while (p_li != NULL
+    అయితే (p_li != ఖాళీ
 	    && (p_li->li_tv.v_type != VAR_STRING
-		|| p_li->li_tv.vval.v_string == NULL))
-	p_li = p_li->li_next;	// Skip non-string items
+		|| p_li->li_tv.vval.v_string == ఖాళీ))
+	p_li = p_li->li_తదుపరి;	// Skip non-string items
 
-    if (p_li == NULL)		// End of the list
+    ఒకవేళ (p_li == ఖాళీ)		// End of the list
     {
-	state->p_li = NULL;
-	return QF_END_OF_INPUT;
+	state->p_li = ఖాళీ;
+	తిరిగి QF_చివర_యొక్క_ఆదానం;
     }
 
-    len = (int)STRLEN(p_li->li_tv.vval.v_string);
-    if (len > IOSIZE - 2)
+    len = (పూర్ణాంకం)STRLEN(p_li->li_tv.vval.v_string);
+    ఒకవేళ (len > IOSIZE - 2)
     {
 	state->linebuf = qf_grow_linebuf(state, len);
-	if (state->linebuf == NULL)
-	    return QF_NOMEM;
+	ఒకవేళ (state->linebuf == ఖాళీ)
+	    తిరిగి QF_NOMEM;
     }
-    else
+    లేకపోతే
     {
 	state->linebuf = IObuff;
 	state->linelen = len;
@@ -772,215 +772,215 @@ qf_get_next_list_line(qfstate_T *state)
 
     vim_strncpy(state->linebuf, p_li->li_tv.vval.v_string, state->linelen);
 
-    state->p_li = p_li->li_next;	// next item
-    return QF_OK;
+    state->p_li = p_li->li_తదుపరి;	// next item
+    తిరిగి QF_OK;
 }
 
 /*
  * Get the next string from state->buf.
  */
-    static int
-qf_get_next_buf_line(qfstate_T *state)
+    స్థిర పూర్ణాంకం
+qf_get_తదుపరి_buf_పంక్తి(qfstate_T *state)
 {
-    char_u	*p_buf = NULL;
-    int		len;
+    char_u	*p_buf = ఖాళీ;
+    పూర్ణాంకం		len;
 
     // Get the next line from the supplied buffer
-    if (state->buflnum > state->lnumlast)
-	return QF_END_OF_INPUT;
+    ఒకవేళ (state->buflnum > state->lnumlast)
+	తిరిగి QF_చివర_యొక్క_ఆదానం;
 
     p_buf = ml_get_buf(state->buf, state->buflnum, FALSE);
     len = ml_get_buf_len(state->buf, state->buflnum);
     state->buflnum += 1;
 
-    if (len > IOSIZE - 2)
+    ఒకవేళ (len > IOSIZE - 2)
     {
 	state->linebuf = qf_grow_linebuf(state, len);
-	if (state->linebuf == NULL)
-	    return QF_NOMEM;
+	ఒకవేళ (state->linebuf == ఖాళీ)
+	    తిరిగి QF_NOMEM;
     }
-    else
+    లేకపోతే
     {
 	state->linebuf = IObuff;
 	state->linelen = len;
     }
     vim_strncpy(state->linebuf, p_buf, state->linelen);
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Get the next string from file state->fd.
  */
-    static int
-qf_get_next_file_line(qfstate_T *state)
+    స్థిర పూర్ణాంకం
+qf_get_తదుపరి_file_పంక్తి(qfstate_T *state)
 {
-    int	    discard;
-    int	    growbuflen;
+    పూర్ణాంకం	    discard;
+    పూర్ణాంకం	    growbuflen;
 
-    if (fgets((char *)IObuff, IOSIZE, state->fd) == NULL)
-	return QF_END_OF_INPUT;
+    ఒకవేళ (fgets((అక్షరం *)IObuff, IOSIZE, state->fd) == ఖాళీ)
+	తిరిగి QF_చివర_యొక్క_ఆదానం;
 
     discard = FALSE;
-    state->linelen = (int)STRLEN(IObuff);
-    if (state->linelen == IOSIZE - 1 && !(IObuff[state->linelen - 1] == '\n'))
+    state->linelen = (పూర్ణాంకం)STRLEN(IObuff);
+    ఒకవేళ (state->linelen == IOSIZE - 1 && !(IObuff[state->linelen - 1] == '\n'))
     {
 	// The current line exceeds IObuff, continue reading using
 	// growbuf until EOL or LINE_MAXLEN bytes is read.
-	if (state->growbuf == NULL)
+	ఒకవేళ (state->growbuf == ఖాళీ)
 	{
 	    state->growbufsiz = 2 * (IOSIZE - 1);
 	    state->growbuf = alloc_id(state->growbufsiz, aid_qf_linebuf);
-	    if (state->growbuf == NULL)
-		return QF_NOMEM;
+	    ఒకవేళ (state->growbuf == ఖాళీ)
+		తిరిగి QF_NOMEM;
 	}
 
 	// Copy the read part of the line, excluding null-terminator
-	memcpy(state->growbuf, IObuff, IOSIZE - 1);
+	జ్ఞాపకం_నకలు(state->growbuf, IObuff, IOSIZE - 1);
 	growbuflen = state->linelen;
 	state->growbuf[growbuflen] = NUL;
 
-	for (;;)
+	కొరకు (;;)
 	{
 	    char_u	*p;
 
-	    if (fgets((char *)state->growbuf + growbuflen,
-			state->growbufsiz - growbuflen, state->fd) == NULL)
-		break;
-	    state->linelen = (int)STRLEN(state->growbuf + growbuflen);
+	    ఒకవేళ (fgets((అక్షరం *)state->growbuf + growbuflen,
+			state->growbufsiz - growbuflen, state->fd) == ఖాళీ)
+		ఆపు;
+	    state->linelen = (పూర్ణాంకం)STRLEN(state->growbuf + growbuflen);
 	    growbuflen += state->linelen;
-	    if ((state->growbuf)[growbuflen - 1] == '\n')
-		break;
-	    if (state->growbufsiz == LINE_MAXLEN)
+	    ఒకవేళ ((state->growbuf)[growbuflen - 1] == '\n')
+		ఆపు;
+	    ఒకవేళ (state->growbufsiz == పంక్తి_MAXLEN)
 	    {
 		discard = TRUE;
-		break;
+		ఆపు;
 	    }
 
-	    state->growbufsiz = 2 * state->growbufsiz < LINE_MAXLEN
-		? 2 * state->growbufsiz : LINE_MAXLEN;
-	    if ((p = vim_realloc(state->growbuf, state->growbufsiz)) == NULL)
-		return QF_NOMEM;
+	    state->growbufsiz = 2 * state->growbufsiz < పంక్తి_MAXLEN
+		? 2 * state->growbufsiz : పంక్తి_MAXLEN;
+	    ఒకవేళ ((p = vim_realloc(state->growbuf, state->growbufsiz)) == ఖాళీ)
+		తిరిగి QF_NOMEM;
 	    state->growbuf = p;
 	}
 
-	while (discard)
+	అయితే (discard)
 	{
 	    // The current line is longer than LINE_MAXLEN, continue
 	    // reading but discard everything until EOL or EOF is
 	    // reached.
-	    if (fgets((char *)IObuff, IOSIZE, state->fd) == NULL
-		    || (int)STRLEN(IObuff) < IOSIZE - 1
+	    ఒకవేళ (fgets((అక్షరం *)IObuff, IOSIZE, state->fd) == ఖాళీ
+		    || (పూర్ణాంకం)STRLEN(IObuff) < IOSIZE - 1
 		    || IObuff[IOSIZE - 2] == '\n')
-		break;
+		ఆపు;
 	}
 
 	state->linebuf = state->growbuf;
 	state->linelen = growbuflen;
     }
-    else
+    లేకపోతే
 	state->linebuf = IObuff;
 
     // Convert a line if it contains a non-ASCII character.
-    if (state->vc.vc_type != CONV_NONE && has_non_ascii(state->linebuf))
+    ఒకవేళ (state->vc.vc_type != CONV_NONE && has_non_ascii(state->linebuf))
     {
-	char_u	*line;
+	char_u	*పంక్తి;
 
-	line = string_convert(&state->vc, state->linebuf, &state->linelen);
-	if (line != NULL)
+	పంక్తి = string_convert(&state->vc, state->linebuf, &state->linelen);
+	ఒకవేళ (పంక్తి != ఖాళీ)
 	{
-	    if (state->linelen < IOSIZE)
+	    ఒకవేళ (state->linelen < IOSIZE)
 	    {
-		STRCPY(state->linebuf, line);
-		vim_free(line);
+		STRCPY(state->linebuf, పంక్తి);
+		vim_free(పంక్తి);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		vim_free(state->growbuf);
-		state->linebuf = state->growbuf = line;
-		state->growbufsiz = state->linelen < LINE_MAXLEN
-						? state->linelen : LINE_MAXLEN;
+		state->linebuf = state->growbuf = పంక్తి;
+		state->growbufsiz = state->linelen < పంక్తి_MAXLEN
+						? state->linelen : పంక్తి_MAXLEN;
 	    }
 	}
     }
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Get the next string from a file/buffer/list/string.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_get_nextline(qfstate_T *state)
 {
-    int status = QF_FAIL;
+    పూర్ణాంకం స్థితి_2 = QF_FAIL;
 
-    if (state->fd == NULL)
+    ఒకవేళ (state->fd == ఖాళీ)
     {
-	if (state->tv != NULL)
+	ఒకవేళ (state->tv != ఖాళీ)
 	{
-	    if (state->tv->v_type == VAR_STRING)
+	    ఒకవేళ (state->tv->v_type == VAR_STRING)
 		// Get the next line from the supplied string
-		status = qf_get_next_str_line(state);
-	    else if (state->tv->v_type == VAR_LIST)
+		స్థితి_2 = qf_get_తదుపరి_str_పంక్తి(state);
+	    లేకపోతే ఒకవేళ (state->tv->v_type == VAR_LIST)
 		// Get the next line from the supplied list
-		status = qf_get_next_list_line(state);
+		స్థితి_2 = qf_get_తదుపరి_list_పంక్తి(state);
 	}
-	else
+	లేకపోతే
 	    // Get the next line from the supplied buffer
-	    status = qf_get_next_buf_line(state);
+	    స్థితి_2 = qf_get_తదుపరి_buf_పంక్తి(state);
     }
-    else
+    లేకపోతే
 	// Get the next line from the supplied file
-	status = qf_get_next_file_line(state);
+	స్థితి_2 = qf_get_తదుపరి_file_పంక్తి(state);
 
-    if (status != QF_OK)
-	return status;
+    ఒకవేళ (స్థితి_2 != QF_OK)
+	తిరిగి స్థితి_2;
 
     // remove newline/CR from the line
-    if (state->linelen > 0 && state->linebuf[state->linelen - 1] == '\n')
+    ఒకవేళ (state->linelen > 0 && state->linebuf[state->linelen - 1] == '\n')
     {
 	state->linebuf[state->linelen - 1] = NUL;
 # ifdef USE_CRNL
-	if (state->linelen > 1 && state->linebuf[state->linelen - 2] == '\r')
+	ఒకవేళ (state->linelen > 1 && state->linebuf[state->linelen - 2] == '\r')
 	    state->linebuf[state->linelen - 2] = NUL;
 # endif
     }
 
     remove_bom(state->linebuf);
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     char_u	*namebuf;
-    int		bnr;
+    పూర్ణాంకం		bnr;
     char_u	*module;
     char_u	*errmsg;
-    int		errmsglen;
-    long	lnum;
-    long	end_lnum;
-    int		col;
-    int		end_col;
+    పూర్ణాంకం		errmsglen;
+    దీర్ఘ	lnum;
+    దీర్ఘ	చివర_lnum;
+    పూర్ణాంకం		నిలువు;
+    పూర్ణాంకం		చివర_నిలువు;
     char_u	use_viscol;
-    char_u	*pattern;
-    int		enr;
-    int		type;
-    typval_T	*user_data;
-    int		valid;
+    char_u	*నమూనా;
+    పూర్ణాంకం		enr;
+    పూర్ణాంకం		type;
+    typval_T	*user_దత్తాంశం;
+    పూర్ణాంకం		valid;
 } qffields_T;
 
 /*
  * Parse the match for filename ('%f') pattern in regmatch.
  * Return the matched value in "fields->namebuf".
  */
-    static int
-qf_parse_fmt_f(regmatch_T *rmp, int midx, qffields_T *fields, int prefix)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_f(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields, పూర్ణాంకం ఉపసర్గ)
 {
-    int c;
+    పూర్ణాంకం c;
 
-    if (rmp->startp[midx] == NULL || rmp->endp[midx] == NULL)
-	return QF_FAIL;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ || rmp->endp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
 
     // Expand ~/file and $HOME/file to full path.
     c = *rmp->endp[midx];
@@ -990,247 +990,247 @@ qf_parse_fmt_f(regmatch_T *rmp, int midx, qffields_T *fields, int prefix)
 
     // For separate filename patterns (%O, %P and %Q), the specified file
     // should exist.
-    if (vim_strchr((char_u *)"OPQ", prefix) != NULL
+    ఒకవేళ (vim_strchr((char_u *)"OPQ", ఉపసర్గ) != ఖాళీ
 	    && mch_getperm(fields->namebuf) == -1)
-	return QF_FAIL;
+	తిరిగి QF_FAIL;
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for buffer number ('%b') pattern in regmatch.
  * Return the matched value in "fields->bnr".
  */
-    static int
-qf_parse_fmt_b(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_b(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    int bnr = (int)atol((char *)rmp->startp[midx]);
-    if (buflist_findnr(bnr) == NULL)
-	return QF_FAIL;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    పూర్ణాంకం bnr = (పూర్ణాంకం)atol((అక్షరం *)rmp->startp[midx]);
+    ఒకవేళ (buflist_findnr(bnr) == ఖాళీ)
+	తిరిగి QF_FAIL;
     fields->bnr = bnr;
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for error number ('%n') pattern in regmatch.
  * Return the matched value in "fields->enr".
  */
-    static int
-qf_parse_fmt_n(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_n(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->enr = (int)atol((char *)rmp->startp[midx]);
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->enr = (పూర్ణాంకం)atol((అక్షరం *)rmp->startp[midx]);
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for line number ('%l') pattern in regmatch.
  * Return the matched value in "fields->lnum".
  */
-    static int
-qf_parse_fmt_l(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_l(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->lnum = atol((char *)rmp->startp[midx]);
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->lnum = atol((అక్షరం *)rmp->startp[midx]);
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for end line number ('%e') pattern in regmatch.
  * Return the matched value in "fields->end_lnum".
  */
-    static int
-qf_parse_fmt_e(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_e(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->end_lnum = atol((char *)rmp->startp[midx]);
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->చివర_lnum = atol((అక్షరం *)rmp->startp[midx]);
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for column number ('%c') pattern in regmatch.
  * Return the matched value in "fields->col".
  */
-    static int
-qf_parse_fmt_c(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_c(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->col = (int)atol((char *)rmp->startp[midx]);
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->నిలువు = (పూర్ణాంకం)atol((అక్షరం *)rmp->startp[midx]);
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for end column number ('%k') pattern in regmatch.
  * Return the matched value in "fields->end_col".
  */
-    static int
-qf_parse_fmt_k(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_k(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->end_col = (int)atol((char *)rmp->startp[midx]);
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->చివర_నిలువు = (పూర్ణాంకం)atol((అక్షరం *)rmp->startp[midx]);
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for error type ('%t') pattern in regmatch.
  * Return the matched value in "fields->type".
  */
-    static int
-qf_parse_fmt_t(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_t(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
     fields->type = *rmp->startp[midx];
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Copy a non-error line into the error string.  Return the matched line in
  * "fields->errmsg".
  */
-    static int
-copy_nonerror_line(char_u *linebuf, int linelen, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+copy_nonerror_పంక్తి(char_u *linebuf, పూర్ణాంకం linelen, qffields_T *fields)
 {
     char_u	*p;
 
-    if (linelen >= fields->errmsglen)
+    ఒకవేళ (linelen >= fields->errmsglen)
     {
 	// linelen + null terminator
-	if ((p = vim_realloc(fields->errmsg, linelen + 1)) == NULL)
-	    return QF_NOMEM;
+	ఒకవేళ ((p = vim_realloc(fields->errmsg, linelen + 1)) == ఖాళీ)
+	    తిరిగి QF_NOMEM;
 	fields->errmsg = p;
 	fields->errmsglen = linelen + 1;
     }
     // copy whole line to error message
     vim_strncpy(fields->errmsg, linebuf, linelen);
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for error message ('%m') pattern in regmatch.
  * Return the matched value in "fields->errmsg".
  */
-    static int
-qf_parse_fmt_m(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_m(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (rmp->startp[midx] == NULL || rmp->endp[midx] == NULL)
-	return QF_FAIL;
-    len = (int)(rmp->endp[midx] - rmp->startp[midx]);
-    if (len >= fields->errmsglen)
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ || rmp->endp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    len = (పూర్ణాంకం)(rmp->endp[midx] - rmp->startp[midx]);
+    ఒకవేళ (len >= fields->errmsglen)
     {
 	// len + null terminator
-	if ((p = vim_realloc(fields->errmsg, len + 1)) == NULL)
-	    return QF_NOMEM;
+	ఒకవేళ ((p = vim_realloc(fields->errmsg, len + 1)) == ఖాళీ)
+	    తిరిగి QF_NOMEM;
 	fields->errmsg = p;
 	fields->errmsglen = len + 1;
     }
     vim_strncpy(fields->errmsg, rmp->startp[midx], len);
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for rest of a single-line file message ('%r') pattern.
  * Return the matched value in "tail".
  */
-    static int
-qf_parse_fmt_r(regmatch_T *rmp, int midx, char_u **tail)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_r(regmatch_T *rmp, పూర్ణాంకం midx, char_u **తోక)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    *tail = rmp->startp[midx];
-    return QF_OK;
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    *తోక = rmp->startp[midx];
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for the pointer line ('%p') pattern in regmatch.
  * Return the matched value in "fields->col".
  */
-    static int
-qf_parse_fmt_p(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_p(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    char_u	*match_ptr;
+    char_u	*సరిపోలిక_ptr;
 
-    if (rmp->startp[midx] == NULL || rmp->endp[midx] == NULL)
-	return QF_FAIL;
-    fields->col = 0;
-    for (match_ptr = rmp->startp[midx]; match_ptr != rmp->endp[midx];
-								++match_ptr)
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ || rmp->endp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->నిలువు = 0;
+    కొరకు (సరిపోలిక_ptr = rmp->startp[midx]; సరిపోలిక_ptr != rmp->endp[midx];
+								++సరిపోలిక_ptr)
     {
-	++fields->col;
-	if (*match_ptr == TAB)
+	++fields->నిలువు;
+	ఒకవేళ (*సరిపోలిక_ptr == TAB)
 	{
-	    fields->col += 7;
-	    fields->col -= fields->col % 8;
+	    fields->నిలువు += 7;
+	    fields->నిలువు -= fields->నిలువు % 8;
 	}
     }
-    ++fields->col;
+    ++fields->నిలువు;
     fields->use_viscol = TRUE;
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for the virtual column number ('%v') pattern in regmatch.
  * Return the matched value in "fields->col".
  */
-    static int
-qf_parse_fmt_v(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_v(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    if (rmp->startp[midx] == NULL)
-	return QF_FAIL;
-    fields->col = (int)atol((char *)rmp->startp[midx]);
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    fields->నిలువు = (పూర్ణాంకం)atol((అక్షరం *)rmp->startp[midx]);
     fields->use_viscol = TRUE;
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for the search text ('%s') pattern in regmatch.
  * Return the matched value in "fields->pattern".
  */
-    static int
-qf_parse_fmt_s(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_s(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (rmp->startp[midx] == NULL || rmp->endp[midx] == NULL)
-	return QF_FAIL;
-    len = (int)(rmp->endp[midx] - rmp->startp[midx]);
-    if (len > CMDBUFFSIZE - 5)
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ || rmp->endp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    len = (పూర్ణాంకం)(rmp->endp[midx] - rmp->startp[midx]);
+    ఒకవేళ (len > CMDBUFFSIZE - 5)
 	len = CMDBUFFSIZE - 5;
-    STRCPY(fields->pattern, "^\\V");
-    STRNCAT(fields->pattern, rmp->startp[midx], len);
-    fields->pattern[len + 3] = '\\';
-    fields->pattern[len + 4] = '$';
-    fields->pattern[len + 5] = NUL;
-    return QF_OK;
+    STRCPY(fields->నమూనా, "^\\V");
+    STRNCAT(fields->నమూనా, rmp->startp[midx], len);
+    fields->నమూనా[len + 3] = '\\';
+    fields->నమూనా[len + 4] = '$';
+    fields->నమూనా[len + 5] = NUL;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse the match for the module ('%o') pattern in regmatch.
  * Return the matched value in "fields->module".
  */
-    static int
-qf_parse_fmt_o(regmatch_T *rmp, int midx, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_fmt_o(regmatch_T *rmp, పూర్ణాంకం midx, qffields_T *fields)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (rmp->startp[midx] == NULL || rmp->endp[midx] == NULL)
-	return QF_FAIL;
-    len = (int)(rmp->endp[midx] - rmp->startp[midx]);
-    if (len > CMDBUFFSIZE)
+    ఒకవేళ (rmp->startp[midx] == ఖాళీ || rmp->endp[midx] == ఖాళీ)
+	తిరిగి QF_FAIL;
+    len = (పూర్ణాంకం)(rmp->endp[midx] - rmp->startp[midx]);
+    ఒకవేళ (len > CMDBUFFSIZE)
 	len = CMDBUFFSIZE;
     STRNCAT(fields->module, rmp->startp[midx], len);
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
@@ -1239,9 +1239,9 @@ qf_parse_fmt_o(regmatch_T *rmp, int midx, qffields_T *fields)
  * See qf_parse_match() for details.
  * Keep in sync with fmt_pat[].
  */
-static int (*qf_parse_fmt[FMT_PATTERNS])(regmatch_T *, int, qffields_T *) =
+స్థిర పూర్ణాంకం (*qf_parse_fmt[FMT_PATTERNS])(regmatch_T *, పూర్ణాంకం, qffields_T *) =
 {
-    NULL, // %f
+    ఖాళీ, // %f
     qf_parse_fmt_b,
     qf_parse_fmt_n,
     qf_parse_fmt_l,
@@ -1250,7 +1250,7 @@ static int (*qf_parse_fmt[FMT_PATTERNS])(regmatch_T *, int, qffields_T *) =
     qf_parse_fmt_k,
     qf_parse_fmt_t,
     qf_parse_fmt_m,
-    NULL, // %r
+    ఖాళీ, // %r
     qf_parse_fmt_p,
     qf_parse_fmt_v,
     qf_parse_fmt_s,
@@ -1263,55 +1263,55 @@ static int (*qf_parse_fmt[FMT_PATTERNS])(regmatch_T *, int, qffields_T *) =
  * match.  Returns QF_OK if all the matches are successfully parsed. On
  * failure, returns QF_FAIL or QF_NOMEM.
  */
-    static int
-qf_parse_match(
+    స్థిర పూర్ణాంకం
+qf_parse_సరిపోలిక(
 	char_u		*linebuf,
-	int		linelen,
+	పూర్ణాంకం		linelen,
 	efm_T		*fmt_ptr,
 	regmatch_T	*regmatch,
 	qffields_T	*fields,
-	int		qf_multiline,
-	int		qf_multiscan,
-	char_u		**tail)
+	పూర్ణాంకం		qf_multiline,
+	పూర్ణాంకం		qf_multiscan,
+	char_u		**తోక)
 {
-    int		idx = fmt_ptr->prefix;
-    int		i;
-    int		midx;
-    int		status;
+    పూర్ణాంకం		idx = fmt_ptr->ఉపసర్గ;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		midx;
+    పూర్ణాంకం		స్థితి_2;
 
-    if ((idx == 'C' || idx == 'Z') && !qf_multiline)
-	return QF_FAIL;
-    if (vim_strchr((char_u *)"EWIN", idx) != NULL)
+    ఒకవేళ ((idx == 'C' || idx == 'Z') && !qf_multiline)
+	తిరిగి QF_FAIL;
+    ఒకవేళ (vim_strchr((char_u *)"EWIN", idx) != ఖాళీ)
 	fields->type = idx;
-    else
+    లేకపోతే
 	fields->type = 0;
 
     // Extract error message data from matched line.
     // We check for an actual submatch, because "\[" and "\]" in
     // the 'errorformat' may cause the wrong submatch to be used.
-    for (i = 0; i < FMT_PATTERNS; i++)
+    కొరకు (i = 0; i < FMT_PATTERNS; i++)
     {
-	status = QF_OK;
-	midx = (int)fmt_ptr->addr[i];
-	if (i == 0 && midx > 0)				// %f
-	    status = qf_parse_fmt_f(regmatch, midx, fields, idx);
-	else if (i == FMT_PATTERN_M)
+	స్థితి_2 = QF_OK;
+	midx = (పూర్ణాంకం)fmt_ptr->addr[i];
+	ఒకవేళ (i == 0 && midx > 0)				// %f
+	    స్థితి_2 = qf_parse_fmt_f(regmatch, midx, fields, idx);
+	లేకపోతే ఒకవేళ (i == FMT_నమూనా_M)
 	{
-	    if (fmt_ptr->flags == '+' && !qf_multiscan)	// %+
-		status = copy_nonerror_line(linebuf, linelen, fields);
-	    else if (midx > 0)				// %m
-		status = qf_parse_fmt_m(regmatch, midx, fields);
+	    ఒకవేళ (fmt_ptr->flags == '+' && !qf_multiscan)	// %+
+		స్థితి_2 = copy_nonerror_పంక్తి(linebuf, linelen, fields);
+	    లేకపోతే ఒకవేళ (midx > 0)				// %m
+		స్థితి_2 = qf_parse_fmt_m(regmatch, midx, fields);
 	}
-	else if (i == FMT_PATTERN_R && midx > 0)	// %r
-	    status = qf_parse_fmt_r(regmatch, midx, tail);
-	else if (midx > 0)				// others
-	    status = (qf_parse_fmt[i])(regmatch, midx, fields);
+	లేకపోతే ఒకవేళ (i == FMT_నమూనా_R && midx > 0)	// %r
+	    స్థితి_2 = qf_parse_fmt_r(regmatch, midx, తోక);
+	లేకపోతే ఒకవేళ (midx > 0)				// others
+	    స్థితి_2 = (qf_parse_fmt[i])(regmatch, midx, fields);
 
-	if (status != QF_OK)
-	    return status;
+	ఒకవేళ (స్థితి_2 != QF_OK)
+	    తిరిగి స్థితి_2;
     }
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
@@ -1320,49 +1320,49 @@ qf_parse_match(
  * Returns QF_OK if the efm format matches completely and the fields are
  * successfully copied. Otherwise returns QF_FAIL or QF_NOMEM.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_parse_get_fields(
 	char_u		*linebuf,
-	int		linelen,
+	పూర్ణాంకం		linelen,
 	efm_T		*fmt_ptr,
 	qffields_T	*fields,
-	int		qf_multiline,
-	int		qf_multiscan,
-	char_u		**tail)
+	పూర్ణాంకం		qf_multiline,
+	పూర్ణాంకం		qf_multiscan,
+	char_u		**తోక)
 {
     regmatch_T	regmatch;
-    int		status = QF_FAIL;
-    int		r;
+    పూర్ణాంకం		స్థితి_2 = QF_FAIL;
+    పూర్ణాంకం		r;
 
-    if (qf_multiscan &&
-		vim_strchr((char_u *)"OPQ", fmt_ptr->prefix) == NULL)
-	return QF_FAIL;
+    ఒకవేళ (qf_multiscan &&
+		vim_strchr((char_u *)"OPQ", fmt_ptr->ఉపసర్గ) == ఖాళీ)
+	తిరిగి QF_FAIL;
 
     fields->namebuf[0] = NUL;
     fields->bnr = 0;
     fields->module[0] = NUL;
-    fields->pattern[0] = NUL;
-    if (!qf_multiscan)
+    fields->నమూనా[0] = NUL;
+    ఒకవేళ (!qf_multiscan)
 	fields->errmsg[0] = NUL;
     fields->lnum = 0;
-    fields->end_lnum = 0;
-    fields->col = 0;
-    fields->end_col = 0;
+    fields->చివర_lnum = 0;
+    fields->నిలువు = 0;
+    fields->చివర_నిలువు = 0;
     fields->use_viscol = FALSE;
     fields->enr = -1;
     fields->type = 0;
-    *tail = NULL;
+    *తోక = ఖాళీ;
 
     // Always ignore case when looking for a matching error.
     regmatch.rm_ic = TRUE;
     regmatch.regprog = fmt_ptr->prog;
     r = vim_regexec(&regmatch, linebuf, (colnr_T)0);
     fmt_ptr->prog = regmatch.regprog;
-    if (r)
-	status = qf_parse_match(linebuf, linelen, fmt_ptr, &regmatch,
-		fields, qf_multiline, qf_multiscan, tail);
+    ఒకవేళ (r)
+	స్థితి_2 = qf_parse_సరిపోలిక(linebuf, linelen, fmt_ptr, &regmatch,
+		fields, qf_multiline, qf_multiscan, తోక);
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -1370,309 +1370,309 @@ qf_parse_get_fields(
  * Push and pop directories from the directory stack when scanning directory
  * names.
  */
-    static int
-qf_parse_dir_pfx(int idx, qffields_T *fields, qf_list_T *qfl)
+    స్థిర పూర్ణాంకం
+qf_parse_dir_pfx(పూర్ణాంకం idx, qffields_T *fields, qf_list_T *qfl)
 {
-    if (idx == 'D')				// enter directory
+    ఒకవేళ (idx == 'D')				// enter directory
     {
-	if (*fields->namebuf == NUL)
+	ఒకవేళ (*fields->namebuf == NUL)
 	{
-	    emsg(_(e_missing_or_empty_directory_name));
-	    return QF_FAIL;
+	    emsg(_(e_missing_or_ఖాళీలు_directory_name));
+	    తిరిగి QF_FAIL;
 	}
 	qfl->qf_directory =
-	    qf_push_dir(fields->namebuf, &qfl->qf_dir_stack, FALSE);
-	if (qfl->qf_directory == NULL)
-	    return QF_FAIL;
+	    qf_నెట్టు_dir(fields->namebuf, &qfl->qf_dir_దొంతర, FALSE);
+	ఒకవేళ (qfl->qf_directory == ఖాళీ)
+	    తిరిగి QF_FAIL;
     }
-    else if (idx == 'X')			// leave directory
-	qfl->qf_directory = qf_pop_dir(&qfl->qf_dir_stack);
+    లేకపోతే ఒకవేళ (idx == 'X')			// leave directory
+	qfl->qf_directory = qf_తీయి_dir(&qfl->qf_dir_దొంతర);
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse global file name error format prefixes (%O, %P and %Q).
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_parse_file_pfx(
-	int idx,
+	పూర్ణాంకం idx,
 	qffields_T *fields,
 	qf_list_T *qfl,
-	char_u *tail)
+	char_u *తోక)
 {
     fields->valid = FALSE;
-    if (*fields->namebuf == NUL || mch_getperm(fields->namebuf) >= 0)
+    ఒకవేళ (*fields->namebuf == NUL || mch_getperm(fields->namebuf) >= 0)
     {
-	if (*fields->namebuf && idx == 'P')
+	ఒకవేళ (*fields->namebuf && idx == 'P')
 	    qfl->qf_currfile =
-		qf_push_dir(fields->namebuf, &qfl->qf_file_stack, TRUE);
-	else if (idx == 'Q')
-	    qfl->qf_currfile = qf_pop_dir(&qfl->qf_file_stack);
+		qf_నెట్టు_dir(fields->namebuf, &qfl->qf_file_దొంతర, TRUE);
+	లేకపోతే ఒకవేళ (idx == 'Q')
+	    qfl->qf_currfile = qf_తీయి_dir(&qfl->qf_file_దొంతర);
 	*fields->namebuf = NUL;
-	if (tail && *tail)
+	ఒకవేళ (తోక && *తోక)
 	{
 	    qfl->qf_multiscan = TRUE;
-	    return QF_MULTISCAN;
+	    తిరిగి QF_MULTISCAN;
 	}
     }
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Parse a non-error line (a line which doesn't match any of the error
  * format in 'efm').
  */
-    static int
-qf_parse_line_nomatch(char_u *linebuf, int linelen, qffields_T *fields)
+    స్థిర పూర్ణాంకం
+qf_parse_పంక్తి_nomatch(char_u *linebuf, పూర్ణాంకం linelen, qffields_T *fields)
 {
     fields->namebuf[0] = NUL;	// no match found, remove file name
     fields->lnum = 0;		// don't jump to this line
     fields->valid = FALSE;
 
-    return copy_nonerror_line(linebuf, linelen, fields);
+    తిరిగి copy_nonerror_పంక్తి(linebuf, linelen, fields);
 }
 
 /*
  * Parse multi-line error format prefixes (%C and %Z)
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_parse_multiline_pfx(
-	int idx,
+	పూర్ణాంకం idx,
 	qf_list_T *qfl,
 	qffields_T *fields)
 {
     char_u		*ptr;
-    int			len;
+    పూర్ణాంకం			len;
 
-    if (!qfl->qf_multiignore)
+    ఒకవేళ (!qfl->qf_multiignore)
     {
-	qfline_T *qfprev = qfl->qf_last;
+	qfline_T *qfprev = qfl->qf_చివరి;
 
-	if (qfprev == NULL)
-	    return QF_FAIL;
-	if (*fields->errmsg && !qfl->qf_multiignore)
+	ఒకవేళ (qfprev == ఖాళీ)
+	    తిరిగి QF_FAIL;
+	ఒకవేళ (*fields->errmsg && !qfl->qf_multiignore)
 	{
-	    len = (int)STRLEN(qfprev->qf_text);
+	    len = (పూర్ణాంకం)STRLEN(qfprev->qf_పాఠ్యం);
 	    ptr = alloc_id(len + STRLEN(fields->errmsg) + 2,
 						aid_qf_multiline_pfx);
-	    if (ptr == NULL)
-		return QF_FAIL;
-	    STRCPY(ptr, qfprev->qf_text);
-	    vim_free(qfprev->qf_text);
-	    qfprev->qf_text = ptr;
+	    ఒకవేళ (ptr == ఖాళీ)
+		తిరిగి QF_FAIL;
+	    STRCPY(ptr, qfprev->qf_పాఠ్యం);
+	    vim_free(qfprev->qf_పాఠ్యం);
+	    qfprev->qf_పాఠ్యం = ptr;
 	    *(ptr += len) = '\n';
 	    STRCPY(++ptr, fields->errmsg);
 	}
-	if (qfprev->qf_nr == -1)
+	ఒకవేళ (qfprev->qf_nr == -1)
 	    qfprev->qf_nr = fields->enr;
-	if (vim_isprintc(fields->type) && !qfprev->qf_type)
+	ఒకవేళ (vim_isprintc(fields->type) && !qfprev->qf_type)
 	    // only printable chars allowed
 	    qfprev->qf_type = fields->type;
 
-	if (!qfprev->qf_lnum)
+	ఒకవేళ (!qfprev->qf_lnum)
 	    qfprev->qf_lnum = fields->lnum;
-	if (!qfprev->qf_end_lnum)
-	    qfprev->qf_end_lnum = fields->end_lnum;
-	if (!qfprev->qf_col)
+	ఒకవేళ (!qfprev->qf_చివర_lnum)
+	    qfprev->qf_చివర_lnum = fields->చివర_lnum;
+	ఒకవేళ (!qfprev->qf_నిలువు)
 	{
-	    qfprev->qf_col = fields->col;
+	    qfprev->qf_నిలువు = fields->నిలువు;
 	    qfprev->qf_viscol = fields->use_viscol;
 	}
-	if (!qfprev->qf_end_col)
-	    qfprev->qf_end_col = fields->end_col;
-	if (!qfprev->qf_fnum)
+	ఒకవేళ (!qfprev->qf_చివర_నిలువు)
+	    qfprev->qf_చివర_నిలువు = fields->చివర_నిలువు;
+	ఒకవేళ (!qfprev->qf_fnum)
 	    qfprev->qf_fnum = qf_get_fnum(qfl,
 		    qfl->qf_directory,
-		    *fields->namebuf || qfl->qf_directory != NULL
+		    *fields->namebuf || qfl->qf_directory != ఖాళీ
 		    ? fields->namebuf
-		    : qfl->qf_currfile != NULL && fields->valid
+		    : qfl->qf_currfile != ఖాళీ && fields->valid
 		    ? qfl->qf_currfile : 0);
     }
-    if (idx == 'Z')
+    ఒకవేళ (idx == 'Z')
 	qfl->qf_multiline = qfl->qf_multiignore = FALSE;
-    line_breakcheck();
+    పంక్తి_breakcheck();
 
-    return QF_IGNORE_LINE;
+    తిరిగి QF_IGNORE_పంక్తి;
 }
 
 /*
  * Parse a line and get the quickfix fields.
  * Return the QF_ status.
  */
-    static int
-qf_parse_line(
+    స్థిర పూర్ణాంకం
+qf_parse_పంక్తి(
 	qf_list_T	*qfl,
 	char_u		*linebuf,
-	int		linelen,
-	efm_T		*fmt_first,
+	పూర్ణాంకం		linelen,
+	efm_T		*fmt_మొదటి,
 	qffields_T	*fields)
 {
     efm_T		*fmt_ptr;
-    int			idx = 0;
-    char_u		*tail = NULL;
-    int			status;
+    పూర్ణాంకం			idx = 0;
+    char_u		*తోక = ఖాళీ;
+    పూర్ణాంకం			స్థితి_2;
 
 restofline:
     // If there was no %> item start at the first pattern
-    if (fmt_start == NULL)
-	fmt_ptr = fmt_first;
-    else
+    ఒకవేళ (fmt_ప్రారంభం == ఖాళీ)
+	fmt_ptr = fmt_మొదటి;
+    లేకపోతే
     {
 	// Otherwise start from the last used pattern
-	fmt_ptr = fmt_start;
-	fmt_start = NULL;
+	fmt_ptr = fmt_ప్రారంభం;
+	fmt_ప్రారంభం = ఖాళీ;
     }
 
     // Try to match each part of 'errorformat' until we find a complete
     // match or no match.
     fields->valid = TRUE;
-    for ( ; fmt_ptr != NULL; fmt_ptr = fmt_ptr->next)
+    కొరకు ( ; fmt_ptr != ఖాళీ; fmt_ptr = fmt_ptr->తదుపరి)
     {
-	idx = fmt_ptr->prefix;
-	status = qf_parse_get_fields(linebuf, linelen, fmt_ptr, fields,
-				qfl->qf_multiline, qfl->qf_multiscan, &tail);
-	if (status == QF_NOMEM)
-	    return status;
-	if (status == QF_OK)
-	    break;
+	idx = fmt_ptr->ఉపసర్గ;
+	స్థితి_2 = qf_parse_get_fields(linebuf, linelen, fmt_ptr, fields,
+				qfl->qf_multiline, qfl->qf_multiscan, &తోక);
+	ఒకవేళ (స్థితి_2 == QF_NOMEM)
+	    తిరిగి స్థితి_2;
+	ఒకవేళ (స్థితి_2 == QF_OK)
+	    ఆపు;
     }
     qfl->qf_multiscan = FALSE;
 
-    if (fmt_ptr == NULL || idx == 'D' || idx == 'X')
+    ఒకవేళ (fmt_ptr == ఖాళీ || idx == 'D' || idx == 'X')
     {
-	if (fmt_ptr != NULL)
+	ఒకవేళ (fmt_ptr != ఖాళీ)
 	{
 	    // 'D' and 'X' directory specifiers
-	    status = qf_parse_dir_pfx(idx, fields, qfl);
-	    if (status != QF_OK)
-		return status;
+	    స్థితి_2 = qf_parse_dir_pfx(idx, fields, qfl);
+	    ఒకవేళ (స్థితి_2 != QF_OK)
+		తిరిగి స్థితి_2;
 	}
 
-	status = qf_parse_line_nomatch(linebuf, linelen, fields);
-	if (status != QF_OK)
-	    return status;
+	స్థితి_2 = qf_parse_పంక్తి_nomatch(linebuf, linelen, fields);
+	ఒకవేళ (స్థితి_2 != QF_OK)
+	    తిరిగి స్థితి_2;
 
-	if (fmt_ptr == NULL)
+	ఒకవేళ (fmt_ptr == ఖాళీ)
 	    qfl->qf_multiline = qfl->qf_multiignore = FALSE;
     }
-    else if (fmt_ptr != NULL)
+    లేకపోతే ఒకవేళ (fmt_ptr != ఖాళీ)
     {
 	// honor %> item
-	if (fmt_ptr->conthere)
-	    fmt_start = fmt_ptr;
+	ఒకవేళ (fmt_ptr->conthere)
+	    fmt_ప్రారంభం = fmt_ptr;
 
-	if (vim_strchr((char_u *)"AEWIN", idx) != NULL)
+	ఒకవేళ (vim_strchr((char_u *)"AEWIN", idx) != ఖాళీ)
 	{
 	    qfl->qf_multiline = TRUE;	// start of a multi-line message
 	    qfl->qf_multiignore = FALSE;// reset continuation
 	}
-	else if (vim_strchr((char_u *)"CZ", idx) != NULL)
+	లేకపోతే ఒకవేళ (vim_strchr((char_u *)"CZ", idx) != ఖాళీ)
 	{				// continuation of multi-line msg
-	    status = qf_parse_multiline_pfx(idx, qfl, fields);
-	    if (status != QF_OK)
-		return status;
+	    స్థితి_2 = qf_parse_multiline_pfx(idx, qfl, fields);
+	    ఒకవేళ (స్థితి_2 != QF_OK)
+		తిరిగి స్థితి_2;
 	}
-	else if (vim_strchr((char_u *)"OPQ", idx) != NULL)
+	లేకపోతే ఒకవేళ (vim_strchr((char_u *)"OPQ", idx) != ఖాళీ)
 	{				// global file names
-	    status = qf_parse_file_pfx(idx, fields, qfl, tail);
-	    if (status == QF_MULTISCAN)
+	    స్థితి_2 = qf_parse_file_pfx(idx, fields, qfl, తోక);
+	    ఒకవేళ (స్థితి_2 == QF_MULTISCAN)
 	    {
-		char_u *s = skipwhite(tail);
-		int new_linelen = (int)STRLEN(s);
-		if (new_linelen >= linelen)
-		    return QF_IGNORE_LINE;
+		char_u *s = skipwhite(తోక);
+		పూర్ణాంకం new_linelen = (పూర్ణాంకం)STRLEN(s);
+		ఒకవేళ (new_linelen >= linelen)
+		    తిరిగి QF_IGNORE_పంక్తి;
 		linebuf = s;
 		linelen = new_linelen;
-		goto restofline;
+		వెళ్ళు restofline;
 	    }
 	}
-	if (fmt_ptr->flags == '-')	// generally exclude this line
+	ఒకవేళ (fmt_ptr->flags == '-')	// generally exclude this line
 	{
-	    if (qfl->qf_multiline)
+	    ఒకవేళ (qfl->qf_multiline)
 		// also exclude continuation lines
 		qfl->qf_multiignore = TRUE;
-	    return QF_IGNORE_LINE;
+	    తిరిగి QF_IGNORE_పంక్తి;
 	}
     }
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Returns TRUE if the specified quickfix/location stack is empty
  */
-    static int
-qf_stack_empty(qf_info_T *qi)
+    స్థిర పూర్ణాంకం
+qf_దొంతర_ఖాళీలు(qf_info_T *qi)
 {
-    return qi == NULL || qi->qf_listcount <= 0;
+    తిరిగి qi == ఖాళీ || qi->qf_listcount <= 0;
 }
 
 /*
  * Returns TRUE if the specified quickfix/location list is empty.
  */
-    static int
-qf_list_empty(qf_list_T *qfl)
+    స్థిర పూర్ణాంకం
+qf_list_ఖాళీలు(qf_list_T *qfl)
 {
-    return qfl == NULL || qfl->qf_count <= 0;
+    తిరిగి qfl == ఖాళీ || qfl->qf_లెక్క <= 0;
 }
 
 /*
  * Returns TRUE if the specified quickfix/location list is not empty and
  * has valid entries.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_list_has_valid_entries(qf_list_T *qfl)
 {
-    return !qf_list_empty(qfl) && !qfl->qf_nonevalid;
+    తిరిగి !qf_list_ఖాళీలు(qfl) && !qfl->qf_nonevalid;
 }
 
 /*
  * Return a pointer to a list in the specified quickfix stack
  */
-    static qf_list_T *
-qf_get_list(qf_info_T *qi, int idx)
+    స్థిర qf_list_T *
+qf_get_list(qf_info_T *qi, పూర్ణాంకం idx)
 {
-    return &qi->qf_lists[idx];
+    తిరిగి &qi->qf_lists[idx];
 }
 
 /*
  * Allocate the fields used for parsing lines and populating a quickfix list.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_alloc_fields(qffields_T *pfields)
 {
     pfields->namebuf = alloc_id(CMDBUFFSIZE + 1, aid_qf_namebuf);
     pfields->module = alloc_id(CMDBUFFSIZE + 1, aid_qf_module);
     pfields->errmsglen = CMDBUFFSIZE + 1;
     pfields->errmsg = alloc_id(pfields->errmsglen, aid_qf_errmsg);
-    pfields->pattern = alloc_id(CMDBUFFSIZE + 1, aid_qf_pattern);
-    if (pfields->namebuf == NULL || pfields->errmsg == NULL
-		|| pfields->pattern == NULL || pfields->module == NULL)
-	return FAIL;
+    pfields->నమూనా = alloc_id(CMDBUFFSIZE + 1, aid_qf_నమూనా);
+    ఒకవేళ (pfields->namebuf == ఖాళీ || pfields->errmsg == ఖాళీ
+		|| pfields->నమూనా == ఖాళీ || pfields->module == ఖాళీ)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Free the fields used for parsing lines and populating a quickfix list.
  */
-    static void
+    స్థిర శూన్య
 qf_free_fields(qffields_T *pfields)
 {
     vim_free(pfields->namebuf);
     vim_free(pfields->module);
     vim_free(pfields->errmsg);
-    vim_free(pfields->pattern);
+    vim_free(pfields->నమూనా);
 }
 
 /*
  * Setup the state information used for parsing lines and populating a
  * quickfix list.
  */
-    static int
-qf_setup_state(
+    స్థిర పూర్ణాంకం
+qf_అమరిక_state(
 	qfstate_T	*pstate,
 	char_u		*enc,
 	char_u		*efile,
@@ -1682,86 +1682,86 @@ qf_setup_state(
 	linenr_T	lnumlast)
 {
     pstate->vc.vc_type = CONV_NONE;
-    if (enc != NULL && *enc != NUL)
-	convert_setup(&pstate->vc, enc, p_enc);
+    ఒకవేళ (enc != ఖాళీ && *enc != NUL)
+	convert_అమరిక(&pstate->vc, enc, p_enc);
 
-    if (efile != NULL && (pstate->fd = mch_fopen((char *)efile, "r")) == NULL)
+    ఒకవేళ (efile != ఖాళీ && (pstate->fd = mch_fopen((అక్షరం *)efile, "r")) == ఖాళీ)
     {
 	semsg(_(e_cant_open_errorfile_str), efile);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (tv != NULL)
+    ఒకవేళ (tv != ఖాళీ)
     {
-	if (tv->v_type == VAR_STRING)
+	ఒకవేళ (tv->v_type == VAR_STRING)
 	    pstate->p_str = tv->vval.v_string;
-	else if (tv->v_type == VAR_LIST)
-	    pstate->p_li = tv->vval.v_list->lv_first;
+	లేకపోతే ఒకవేళ (tv->v_type == VAR_LIST)
+	    pstate->p_li = tv->vval.v_list->lv_మొదటి;
 	pstate->tv = tv;
     }
     pstate->buf = buf;
     pstate->buflnum = lnumfirst;
     pstate->lnumlast = lnumlast;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Cleanup the state information used for parsing lines and populating a
  * quickfix list.
  */
-    static void
+    స్థిర శూన్య
 qf_cleanup_state(qfstate_T *pstate)
 {
-    if (pstate->fd != NULL)
+    ఒకవేళ (pstate->fd != ఖాళీ)
 	fclose(pstate->fd);
 
     vim_free(pstate->growbuf);
-    if (pstate->vc.vc_type != CONV_NONE)
-	convert_setup(&pstate->vc, NULL, NULL);
+    ఒకవేళ (pstate->vc.vc_type != CONV_NONE)
+	convert_అమరిక(&pstate->vc, ఖాళీ, ఖాళీ);
 }
 
 /*
  * Process the next line from a file/buffer/list/string and add it
  * to the quickfix list 'qfl'.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_init_process_nextline(
 	qf_list_T	*qfl,
-	efm_T		*fmt_first,
+	efm_T		*fmt_మొదటి,
 	qfstate_T	*state,
 	qffields_T	*fields)
 {
-    int		    status;
+    పూర్ణాంకం		    స్థితి_2;
 
     // Get the next line from a file/buffer/list/string
-    status = qf_get_nextline(state);
-    if (status != QF_OK)
-	return status;
+    స్థితి_2 = qf_get_nextline(state);
+    ఒకవేళ (స్థితి_2 != QF_OK)
+	తిరిగి స్థితి_2;
 
-    status = qf_parse_line(qfl, state->linebuf, state->linelen,
-	    fmt_first, fields);
-    if (status != QF_OK)
-	return status;
+    స్థితి_2 = qf_parse_పంక్తి(qfl, state->linebuf, state->linelen,
+	    fmt_మొదటి, fields);
+    ఒకవేళ (స్థితి_2 != QF_OK)
+	తిరిగి స్థితి_2;
 
-    return qf_add_entry(qfl,
+    తిరిగి qf_కూడు_నమోదు(qfl,
 		qfl->qf_directory,
-		(*fields->namebuf || qfl->qf_directory != NULL)
+		(*fields->namebuf || qfl->qf_directory != ఖాళీ)
 		? fields->namebuf
-		: ((qfl->qf_currfile != NULL && fields->valid)
-		    ? qfl->qf_currfile : (char_u *)NULL),
+		: ((qfl->qf_currfile != ఖాళీ && fields->valid)
+		    ? qfl->qf_currfile : (char_u *)ఖాళీ),
 		fields->module,
 		fields->bnr,
 		fields->errmsg,
 		fields->lnum,
-		fields->end_lnum,
-		fields->col,
-		fields->end_col,
+		fields->చివర_lnum,
+		fields->నిలువు,
+		fields->చివర_నిలువు,
 		fields->use_viscol,
-		fields->pattern,
+		fields->నమూనా,
 		fields->enr,
 		fields->type,
-		fields->user_data,
+		fields->user_దత్తాంశం,
 		fields->valid);
 }
 
@@ -1775,15 +1775,15 @@ qf_init_process_nextline(
  * Set the title of the list to "qf_title".
  * Return -1 for error, number of errors for success.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_init_ext(
     qf_info_T	    *qi,
-    int		    qf_idx,
+    పూర్ణాంకం		    qf_idx,
     char_u	    *efile,
     buf_T	    *buf,
     typval_T	    *tv,
     char_u	    *errorformat,
-    int		    newlist,		// TRUE: start a new error list
+    పూర్ణాంకం		    newlist,		// TRUE: start a new error list
     linenr_T	    lnumfirst,		// first line number to use
     linenr_T	    lnumlast,		// last line number to use
     char_u	    *qf_title,
@@ -1792,62 +1792,62 @@ qf_init_ext(
     qf_list_T	    *qfl;
     qfstate_T	    state;
     qffields_T	    fields;
-    qfline_T	    *old_last = NULL;
-    int		    adding = FALSE;
-    static efm_T    *fmt_first = NULL;
+    qfline_T	    *old_చివరి = ఖాళీ;
+    పూర్ణాంకం		    adding = FALSE;
+    స్థిర efm_T    *fmt_మొదటి = ఖాళీ;
     char_u	    *efm;
-    static char_u   *last_efm = NULL;
-    int		    retval = -1;	// default: return error flag
-    int		    status;
+    స్థిర char_u   *చివరి_efm = ఖాళీ;
+    పూర్ణాంకం		    retval = -1;	// default: return error flag
+    పూర్ణాంకం		    స్థితి_2;
 
     // Do not used the cached buffer, it may have been wiped out.
-    VIM_CLEAR(qf_last_bufname);
+    VIM_CLEAR(qf_చివరి_bufname);
 
-    CLEAR_FIELD(state);
-    CLEAR_FIELD(fields);
-    if ((qf_alloc_fields(&fields) == FAIL) ||
-		(qf_setup_state(&state, enc, efile, tv, buf,
+    CLEAR_క్షేత్రం(state);
+    CLEAR_క్షేత్రం(fields);
+    ఒకవేళ ((qf_alloc_fields(&fields) == FAIL) ||
+		(qf_అమరిక_state(&state, enc, efile, tv, buf,
 					lnumfirst, lnumlast) == FAIL))
-	goto qf_init_end;
+	వెళ్ళు qf_init_చివర;
 
-    if (newlist || qf_idx == qi->qf_listcount)
+    ఒకవేళ (newlist || qf_idx == qi->qf_listcount)
     {
 	// make place for a new list
 	qf_new_list(qi, qf_title);
 	qf_idx = qi->qf_curlist;
 	qfl = qf_get_list(qi, qf_idx);
     }
-    else
+    లేకపోతే
     {
 	// Adding to existing list, use last entry.
 	adding = TRUE;
 	qfl = qf_get_list(qi, qf_idx);
-	if (!qf_list_empty(qfl))
-	    old_last = qfl->qf_last;
+	ఒకవేళ (!qf_list_ఖాళీలు(qfl))
+	    old_చివరి = qfl->qf_చివరి;
     }
 
     // Use the local value of 'errorformat' if it's set.
-    if (errorformat == p_efm && tv == NULL && *buf->b_p_efm != NUL)
+    ఒకవేళ (errorformat == p_efm && tv == ఖాళీ && *buf->b_p_efm != NUL)
 	efm = buf->b_p_efm;
-    else
+    లేకపోతే
 	efm = errorformat;
 
     // If the errorformat didn't change between calls, then reuse the
     // previously parsed values.
-    if (last_efm == NULL || (STRCMP(last_efm, efm) != 0))
+    ఒకవేళ (చివరి_efm == ఖాళీ || (STRCMP(చివరి_efm, efm) != 0))
     {
 	// free the previously parsed data
-	VIM_CLEAR(last_efm);
-	free_efm_list(&fmt_first);
+	VIM_CLEAR(చివరి_efm);
+	free_efm_list(&fmt_మొదటి);
 
 	// parse the current 'efm'
-	fmt_first = parse_efm_option(efm);
-	if (fmt_first != NULL)
-	    last_efm = vim_strsave(efm);
+	fmt_మొదటి = parse_efm_option(efm);
+	ఒకవేళ (fmt_మొదటి != ఖాళీ)
+	    చివరి_efm = vim_strsave(efm);
     }
 
-    if (fmt_first == NULL)	// nothing found
-	goto error2;
+    ఒకవేళ (fmt_మొదటి == ఖాళీ)	// nothing found
+	వెళ్ళు error2;
 
     // got_int is reset here, because it was probably set when killing the
     // ":make" command, but we still want to read the errorfile then.
@@ -1855,54 +1855,54 @@ qf_init_ext(
 
     // Read the lines in the error file one by one.
     // Try to recognize one of the error formats in each line.
-    while (!got_int)
+    అయితే (!got_int)
     {
-	status = qf_init_process_nextline(qfl, fmt_first, &state, &fields);
-	if (status == QF_NOMEM)		// memory alloc failure
-	    goto qf_init_end;
-	if (status == QF_END_OF_INPUT)	// end of input
-	    break;
-	if (status == QF_FAIL)
-	    goto error2;
+	స్థితి_2 = qf_init_process_nextline(qfl, fmt_మొదటి, &state, &fields);
+	ఒకవేళ (స్థితి_2 == QF_NOMEM)		// memory alloc failure
+	    వెళ్ళు qf_init_చివర;
+	ఒకవేళ (స్థితి_2 == QF_చివర_యొక్క_ఆదానం)	// end of input
+	    ఆపు;
+	ఒకవేళ (స్థితి_2 == QF_FAIL)
+	    వెళ్ళు error2;
 
-	line_breakcheck();
+	పంక్తి_breakcheck();
     }
-    if (state.fd == NULL || !ferror(state.fd))
+    ఒకవేళ (state.fd == ఖాళీ || !ferror(state.fd))
     {
-	if (qfl->qf_index == 0)
+	ఒకవేళ (qfl->qf_సూచీ == 0)
 	{
 	    // no valid entry found
-	    qfl->qf_ptr = qfl->qf_start;
-	    qfl->qf_index = 1;
+	    qfl->qf_ptr = qfl->qf_ప్రారంభం;
+	    qfl->qf_సూచీ = 1;
 	    qfl->qf_nonevalid = TRUE;
 	}
-	else
+	లేకపోతే
 	{
 	    qfl->qf_nonevalid = FALSE;
-	    if (qfl->qf_ptr == NULL)
-		qfl->qf_ptr = qfl->qf_start;
+	    ఒకవేళ (qfl->qf_ptr == ఖాళీ)
+		qfl->qf_ptr = qfl->qf_ప్రారంభం;
 	}
 	// return number of matches
-	retval = qfl->qf_count;
-	goto qf_init_end;
+	retval = qfl->qf_లెక్క;
+	వెళ్ళు qf_init_చివర;
     }
     emsg(_(e_error_while_reading_errorfile));
 error2:
-    if (!adding)
+    ఒకవేళ (!adding)
     {
 	// Error when creating a new list. Free the new list
 	qf_free(qfl);
 	qi->qf_listcount--;
-	if (qi->qf_curlist > 0)
+	ఒకవేళ (qi->qf_curlist > 0)
 	    --qi->qf_curlist;
     }
-qf_init_end:
-    if (qf_idx == qi->qf_curlist)
-	qf_update_buffer(qi, old_last);
+qf_init_చివర:
+    ఒకవేళ (qf_idx == qi->qf_curlist)
+	qf_update_బఫరు(qi, old_చివరి);
     qf_cleanup_state(&state);
     qf_free_fields(&fields);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1910,22 +1910,22 @@ qf_init_end:
  * list. Set the error list's title to qf_title.
  * Return -1 for error, number of errors for success.
  */
-    int
+    పూర్ణాంకం
 qf_init(win_T	    *wp,
 	char_u	    *efile,
 	char_u	    *errorformat,
-	int	    newlist,		// TRUE: start a new error list
+	పూర్ణాంకం	    newlist,		// TRUE: start a new error list
 	char_u	    *qf_title,
 	char_u	    *enc)
 {
     qf_info_T	    *qi = ql_info;
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
 	qi = ll_get_or_alloc_list(wp);
-    if (qi == NULL)
-	return FAIL;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    return qf_init_ext(qi, qi->qf_curlist, efile, curbuf, NULL, errorformat,
+    తిరిగి qf_init_ext(qi, qi->qf_curlist, efile, curbuf, ఖాళీ, errorformat,
 	    newlist, (linenr_T)0, (linenr_T)0, qf_title, enc);
 }
 
@@ -1933,18 +1933,18 @@ qf_init(win_T	    *wp,
  * Set the title of the specified quickfix list. Frees the previous title.
  * Prepends ':' to the title.
  */
-    static void
+    స్థిర శూన్య
 qf_store_title(qf_list_T *qfl, char_u *title)
 {
     VIM_CLEAR(qfl->qf_title);
 
-    if (title == NULL)
-	return;
+    ఒకవేళ (title == ఖాళీ)
+	తిరిగి;
 
     char_u *p = alloc_id(STRLEN(title) + 2, aid_qf_title);
 
     qfl->qf_title = p;
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
 	STRCPY(p, title);
 }
 
@@ -1954,22 +1954,22 @@ qf_store_title(qf_list_T *qfl, char_u *title)
  * Create a quickfix list title string by prepending ":" to a user command.
  * Returns a pointer to a static buffer with the title.
  */
-    static char_u *
+    స్థిర char_u *
 qf_cmdtitle(char_u *cmd)
 {
-    static char_u qftitle_str[IOSIZE];
+    స్థిర char_u qftitle_str[IOSIZE];
 
-    vim_snprintf((char *)qftitle_str, IOSIZE, ":%s", (char *)cmd);
-    return qftitle_str;
+    vim_snprintf((అక్షరం *)qftitle_str, IOSIZE, ":%s", (అక్షరం *)cmd);
+    తిరిగి qftitle_str;
 }
 
 /*
  * Return a pointer to the current list in the specified quickfix stack
  */
-    static qf_list_T *
+    స్థిర qf_list_T *
 qf_get_curlist(qf_info_T *qi)
 {
-    return qf_get_list(qi, qi->qf_curlist);
+    తిరిగి qf_get_list(qi, qi->qf_curlist);
 }
 
 /*
@@ -1979,23 +1979,23 @@ qf_get_curlist(qf_info_T *qi)
  * newest created list instead. qf_listcount will be set correctly.
  * The above will only happen if <adjust> is TRUE.
  */
-    static void
-qf_pop_stack(qf_info_T *qi, int adjust)
+    స్థిర శూన్య
+qf_తీయి_దొంతర(qf_info_T *qi, పూర్ణాంకం adjust)
 {
-    int i;
+    పూర్ణాంకం i;
     qf_free(&qi->qf_lists[0]);
-    for (i = 1; i < qi->qf_listcount; ++i)
+    కొరకు (i = 1; i < qi->qf_listcount; ++i)
 	qi->qf_lists[i - 1] = qi->qf_lists[i];
 
     // fill with zeroes now unused list at the top
-    vim_memset(qi->qf_lists + qi->qf_listcount - 1, 0, sizeof(*qi->qf_lists));
+    vim_memset(qi->qf_lists + qi->qf_listcount - 1, 0, పరిమాణం(*qi->qf_lists));
 
-    if (adjust)
+    ఒకవేళ (adjust)
     {
 	qi->qf_listcount--;
-	if (qi->qf_curlist == 0)
+	ఒకవేళ (qi->qf_curlist == 0)
 	    qi->qf_curlist = qi->qf_listcount - 1;
-	else
+	లేకపోతే
 	    qi->qf_curlist--;
     }
 }
@@ -2005,7 +2005,7 @@ qf_pop_stack(qf_info_T *qi, int adjust)
  * middle of the stack, then all the following lists are freed and then
  * the new list is added.
  */
-    static void
+    స్థిర శూన్య
 qf_new_list(qf_info_T *qi, char_u *qf_title)
 {
     qf_list_T	*qfl;
@@ -2013,88 +2013,88 @@ qf_new_list(qf_info_T *qi, char_u *qf_title)
     // If the current entry is not the last entry, delete entries beyond
     // the current entry.  This makes it possible to browse in a tree-like
     // way with ":grep".
-    while (qi->qf_listcount > qi->qf_curlist + 1)
+    అయితే (qi->qf_listcount > qi->qf_curlist + 1)
 	qf_free(&qi->qf_lists[--qi->qf_listcount]);
 
     // When the stack is full, remove to oldest entry
     // Otherwise, add a new entry.
-    if (qi->qf_listcount == qi->qf_maxcount)
+    ఒకవేళ (qi->qf_listcount == qi->qf_maxcount)
     {
-	qf_pop_stack(qi, FALSE);
+	qf_తీయి_దొంతర(qi, FALSE);
 	qi->qf_curlist = qi->qf_listcount - 1; // point to new empty list
     }
-    else
+    లేకపోతే
 	qi->qf_curlist = qi->qf_listcount++;
 
     qfl = qf_get_curlist(qi);
-    CLEAR_POINTER(qfl);
+    CLEAR_సూచిక(qfl);
     qf_store_title(qfl, qf_title);
     qfl->qfl_type = qi->qfl_type;
-    qfl->qf_id = ++last_qf_id;
-    qfl->qf_has_user_data = FALSE;
+    qfl->qf_id = ++చివరి_qf_id;
+    qfl->qf_has_user_దత్తాంశం = FALSE;
 }
 
 /*
  * Queue location list stack delete request.
  */
-    static void
-locstack_queue_delreq(qf_info_T *qi)
+    స్థిర శూన్య
+locstack_వరుస_delreq(qf_info_T *qi)
 {
     qf_delq_T	*q;
 
     q = ALLOC_ONE(qf_delq_T);
-    if (q == NULL)
-	return;
+    ఒకవేళ (q == ఖాళీ)
+	తిరిగి;
 
     q->qi = qi;
-    q->next = qf_delq_head;
-    qf_delq_head = q;
+    q->తదుపరి = qf_delq_తల;
+    qf_delq_తల = q;
 }
 
 /*
  * Return the global quickfix stack window buffer number.
  */
-    int
-qf_stack_get_bufnr(void)
+    పూర్ణాంకం
+qf_దొంతర_get_bufnr(శూన్య)
 {
-    if (ql_info == NULL)
-	return INVALID_QFBUFNR;
-    return ql_info->qf_bufnr;
+    ఒకవేళ (ql_info == ఖాళీ)
+	తిరిగి INVALID_QFBUFNR;
+    తిరిగి ql_info->qf_bufnr;
 }
 
 /*
  * Wipe the quickfix window buffer (if present) for the specified
  * quickfix/location list.
  */
-    static void
-wipe_qf_buffer(qf_info_T *qi)
+    స్థిర శూన్య
+wipe_qf_బఫరు(qf_info_T *qi)
 {
     buf_T	*qfbuf;
 
-    if (qi->qf_bufnr == INVALID_QFBUFNR)
-	return;
+    ఒకవేళ (qi->qf_bufnr == INVALID_QFBUFNR)
+	తిరిగి;
 
     qfbuf = buflist_findnr(qi->qf_bufnr);
-    if (qfbuf != NULL && qfbuf->b_nwindows == 0)
+    ఒకవేళ (qfbuf != ఖాళీ && qfbuf->b_nwindows == 0)
     {
-	int buf_was_null = FALSE;
+	పూర్ణాంకం buf_was_null = FALSE;
 	// Can happen when curwin is closing (e.g: w_buffer was unloaded in
 	// win_close()) and we are now closing the window-related location list
 	// buffer from win_free().  close_buffer() calls CHECK_CURBUF() and
 	// requires curwin->w_buffer == curbuf.  Should be OK to not increment
 	// b_nwindows, especially as autocmds are blocked in win_free().
-	if (curwin->w_buffer == NULL)
+	ఒకవేళ (curwin->w_బఫరు == ఖాళీ)
 	{
-	    curwin->w_buffer = curbuf;
+	    curwin->w_బఫరు = curbuf;
 	    buf_was_null = TRUE;
 	}
 
 	// If the quickfix buffer is not loaded in any window, then
 	// wipe the buffer.
-	close_buffer(NULL, qfbuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	close_బఫరు(ఖాళీ, qfbuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	qi->qf_bufnr = INVALID_QFBUFNR;
-	if (buf_was_null)
-	    curwin->w_buffer = NULL;
+	ఒకవేళ (buf_was_null)
+	    curwin->w_బఫరు = ఖాళీ;
     }
 }
 
@@ -2102,20 +2102,20 @@ wipe_qf_buffer(qf_info_T *qi)
 /*
  * Free all lists in the stack (not including the stack)
  */
-    static void
-qf_free_list_stack_items(qf_info_T *qi)
+    స్థిర శూన్య
+qf_free_list_దొంతర_వస్తువులు(qf_info_T *qi)
 {
-    for (int i = 0; i < qi->qf_listcount; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < qi->qf_listcount; ++i)
 	qf_free(qf_get_list(qi, i));
 }
 
 /*
  * Free a qf_info_T struct completely
  */
-    static void
+    స్థిర శూన్య
 qf_free_lists(qf_info_T *qi)
 {
-    qf_free_list_stack_items(qi);
+    qf_free_list_దొంతర_వస్తువులు(qi);
 
     vim_free(qi->qf_lists);
     vim_free(qi);
@@ -2124,30 +2124,30 @@ qf_free_lists(qf_info_T *qi)
 /*
  * Free a location list stack
  */
-    static void
+    స్థిర శూన్య
 ll_free_all(qf_info_T **pqi)
 {
     qf_info_T	*qi;
 
     qi = *pqi;
-    if (qi == NULL)
-	return;
-    *pqi = NULL;	// Remove reference to this list
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి;
+    *pqi = ఖాళీ;	// Remove reference to this list
 
     // If the location list is still in use, then queue the delete request
     // to be processed later.
-    if (quickfix_busy > 0)
+    ఒకవేళ (quickfix_busy > 0)
     {
-	locstack_queue_delreq(qi);
-	return;
+	locstack_వరుస_delreq(qi);
+	తిరిగి;
     }
 
     qi->qf_refcount--;
-    if (qi->qf_refcount < 1)
+    ఒకవేళ (qi->qf_refcount < 1)
     {
 	// No references to this location list.
 	// If the quickfix window buffer is loaded, then wipe it
-	wipe_qf_buffer(qi);
+	wipe_qf_బఫరు(qi);
 
 	qf_free_lists(qi);
     }
@@ -2156,19 +2156,19 @@ ll_free_all(qf_info_T **pqi)
 /*
  * Free all the quickfix/location lists in the stack.
  */
-    void
+    శూన్య
 qf_free_all(win_T *wp)
 {
     qf_info_T	*qi = ql_info;
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
     {
 	// location list
 	ll_free_all(&wp->w_llist);
 	ll_free_all(&wp->w_llist_ref);
     }
-    else if (qi != NULL)
-	qf_free_list_stack_items(qi); // quickfix list
+    లేకపోతే ఒకవేళ (qi != ఖాళీ)
+	qf_free_list_దొంతర_వస్తువులు(qi); // quickfix list
 }
 
 /*
@@ -2177,8 +2177,8 @@ qf_free_all(win_T *wp)
  * quickfix code is still referencing the stack.
  * Must always call decr_quickfix_busy() exactly once after this.
  */
-    static void
-incr_quickfix_busy(void)
+    స్థిర శూన్య
+incr_quickfix_busy(శూన్య)
 {
     quickfix_busy++;
 }
@@ -2186,24 +2186,24 @@ incr_quickfix_busy(void)
 /*
  * Safe to free location list stacks. Process any delayed delete requests.
  */
-    static void
-decr_quickfix_busy(void)
+    స్థిర శూన్య
+decr_quickfix_busy(శూన్య)
 {
-    if (--quickfix_busy == 0)
+    ఒకవేళ (--quickfix_busy == 0)
     {
 	// No longer referencing the location lists. Process all the pending
 	// delete requests.
-	while (qf_delq_head != NULL)
+	అయితే (qf_delq_తల != ఖాళీ)
 	{
-	    qf_delq_T	*q = qf_delq_head;
+	    qf_delq_T	*q = qf_delq_తల;
 
-	    qf_delq_head = q->next;
+	    qf_delq_తల = q->తదుపరి;
 	    ll_free_all(&q->qi);
 	    vim_free(q);
 	}
     }
-# ifdef ABORT_ON_INTERNAL_ERROR
-    if (quickfix_busy < 0)
+# ifdef ABORT_ON_అంతర్గత_ERROR
+    ఒకవేళ (quickfix_busy < 0)
     {
 	emsg("quickfix_busy has become negative");
 	abort();
@@ -2211,14 +2211,14 @@ decr_quickfix_busy(void)
 # endif
 }
 
-# if defined(EXITFREE)
-    void
-check_quickfix_busy(void)
+# ఒకవేళ defined(EXITFREE)
+    శూన్య
+check_quickfix_busy(శూన్య)
 {
-    if (quickfix_busy != 0)
+    ఒకవేళ (quickfix_busy != 0)
     {
-	semsg("quickfix_busy not zero on exit: %ld", (long)quickfix_busy);
-#  ifdef ABORT_ON_INTERNAL_ERROR
+	semsg("quickfix_busy not zero on exit: %ld", (దీర్ఘ)quickfix_busy);
+#  ifdef ABORT_ON_అంతర్గత_ERROR
 	abort();
 #  endif
     }
@@ -2229,247 +2229,247 @@ check_quickfix_busy(void)
  * Add an entry to the end of the list of errors.
  * Returns QF_OK on success or QF_FAIL on a memory allocation failure.
  */
-    static int
-qf_add_entry(
+    స్థిర పూర్ణాంకం
+qf_కూడు_నమోదు(
     qf_list_T	*qfl,		// quickfix list entry
     char_u	*dir,		// optional directory name
     char_u	*fname,		// file name or NULL
     char_u	*module,	// module name or NULL
-    int		bufnum,		// buffer number or zero
-    char_u	*mesg,		// message
-    long	lnum,		// line number
-    long	end_lnum,	// line number for end
-    int		col,		// column
-    int		end_col,	// column for end
-    int		vis_col,	// using visual column
-    char_u	*pattern,	// search pattern
-    int		nr,		// error number
-    int		type,		// type character
-    typval_T	*user_data,     // custom user data or NULL
-    int		valid)		// valid entry
+    పూర్ణాంకం		bufnum,		// buffer number or zero
+    char_u	*mesg,		//సందేశం
+    దీర్ఘ	lnum,		// line number
+    దీర్ఘ	చివర_lnum,	// line number for end
+    పూర్ణాంకం		నిలువు,		//స్తంభం
+    పూర్ణాంకం		చివర_నిలువు,	// column for end
+    పూర్ణాంకం		vis_నిలువు,	// using visual column
+    char_u	*నమూనా,	// search pattern
+    పూర్ణాంకం		nr,		// error number
+    పూర్ణాంకం		type,		// type character
+    typval_T	*user_దత్తాంశం,     // custom user data or NULL
+    పూర్ణాంకం		valid)		// valid entry
 {
     buf_T	*buf;
     qfline_T	*qfp;
     qfline_T	**lastp;	// pointer to qf_last or NULL
-    char_u	*fullname = NULL;
-    char_u	*p = NULL;
+    char_u	*fullname = ఖాళీ;
+    char_u	*p = ఖాళీ;
 
-    if ((qfp = ALLOC_ONE_ID(qfline_T, aid_qf_qfline)) == NULL)
-	return QF_FAIL;
-    if (bufnum != 0)
+    ఒకవేళ ((qfp = ALLOC_ONE_ID(qfline_T, aid_qf_qfline)) == ఖాళీ)
+	తిరిగి QF_FAIL;
+    ఒకవేళ (bufnum != 0)
     {
 	buf = buflist_findnr(bufnum);
 
 	qfp->qf_fnum = bufnum;
-	if (buf != NULL)
-	    buf->b_has_qf_entry |=
-		IS_QF_LIST(qfl) ? BUF_HAS_QF_ENTRY : BUF_HAS_LL_ENTRY;
+	ఒకవేళ (buf != ఖాళీ)
+	    buf->b_has_qf_నమోదు |=
+		IS_QF_LIST(qfl) ? BUF_HAS_QF_నమోదు : BUF_HAS_LL_నమోదు;
     }
-    else
+    లేకపోతే
     {
 	qfp->qf_fnum = qf_get_fnum(qfl, dir, fname);
 	buf = buflist_findnr(qfp->qf_fnum);
     }
-    if (fname != NULL)
+    ఒకవేళ (fname != ఖాళీ)
 	fullname = fix_fname(fname);
-    qfp->qf_fname = NULL;
-    if (buf != NULL &&
-	buf->b_ffname != NULL && fullname != NULL)
+    qfp->qf_fname = ఖాళీ;
+    ఒకవేళ (buf != ఖాళీ &&
+	buf->b_ffname != ఖాళీ && fullname != ఖాళీ)
     {
-	if (fnamecmp(fullname, buf->b_ffname) != 0)
+	ఒకవేళ (fnamecmp(fullname, buf->b_ffname) != 0)
 	{
 	    p = shorten_fname1(fullname);
-	    if (p != NULL)
+	    ఒకవేళ (p != ఖాళీ)
 		qfp->qf_fname = vim_strsave(p);
 	}
     }
     vim_free(fullname);
-    if ((qfp->qf_text = vim_strsave(mesg)) == NULL)
+    ఒకవేళ ((qfp->qf_పాఠ్యం = vim_strsave(mesg)) == ఖాళీ)
     {
 	vim_free(qfp);
-	return QF_FAIL;
+	తిరిగి QF_FAIL;
     }
     qfp->qf_lnum = lnum;
-    qfp->qf_end_lnum = end_lnum;
-    qfp->qf_col = col;
-    qfp->qf_end_col = end_col;
-    qfp->qf_viscol = vis_col;
-    if (user_data == NULL || user_data->v_type == VAR_UNKNOWN)
-	qfp->qf_user_data.v_type = VAR_UNKNOWN;
-    else
+    qfp->qf_చివర_lnum = చివర_lnum;
+    qfp->qf_నిలువు = నిలువు;
+    qfp->qf_చివర_నిలువు = చివర_నిలువు;
+    qfp->qf_viscol = vis_నిలువు;
+    ఒకవేళ (user_దత్తాంశం == ఖాళీ || user_దత్తాంశం->v_type == VAR_UNKNOWN)
+	qfp->qf_user_దత్తాంశం.v_type = VAR_UNKNOWN;
+    లేకపోతే
     {
-	copy_tv(user_data, &qfp->qf_user_data);
-	qfl->qf_has_user_data = TRUE;
+	copy_tv(user_దత్తాంశం, &qfp->qf_user_దత్తాంశం);
+	qfl->qf_has_user_దత్తాంశం = TRUE;
     }
-    if (pattern == NULL || *pattern == NUL)
-	qfp->qf_pattern = NULL;
-    else if ((qfp->qf_pattern = vim_strsave(pattern)) == NULL)
+    ఒకవేళ (నమూనా == ఖాళీ || *నమూనా == NUL)
+	qfp->qf_నమూనా = ఖాళీ;
+    లేకపోతే ఒకవేళ ((qfp->qf_నమూనా = vim_strsave(నమూనా)) == ఖాళీ)
     {
-	vim_free(qfp->qf_text);
+	vim_free(qfp->qf_పాఠ్యం);
 	vim_free(qfp);
-	return QF_FAIL;
+	తిరిగి QF_FAIL;
     }
-    if (module == NULL || *module == NUL)
-	qfp->qf_module = NULL;
-    else if ((qfp->qf_module = vim_strsave(module)) == NULL)
+    ఒకవేళ (module == ఖాళీ || *module == NUL)
+	qfp->qf_module = ఖాళీ;
+    లేకపోతే ఒకవేళ ((qfp->qf_module = vim_strsave(module)) == ఖాళీ)
     {
-	vim_free(qfp->qf_text);
-	vim_free(qfp->qf_pattern);
+	vim_free(qfp->qf_పాఠ్యం);
+	vim_free(qfp->qf_నమూనా);
 	vim_free(qfp);
-	return QF_FAIL;
+	తిరిగి QF_FAIL;
     }
     qfp->qf_nr = nr;
-    if (type != 1 && !vim_isprintc(type)) // only printable chars allowed
+    ఒకవేళ (type != 1 && !vim_isprintc(type)) // only printable chars allowed
 	type = 0;
     qfp->qf_type = type;
     qfp->qf_valid = valid;
 
-    lastp = &qfl->qf_last;
-    if (qf_list_empty(qfl))		// first element in the list
+    lastp = &qfl->qf_చివరి;
+    ఒకవేళ (qf_list_ఖాళీలు(qfl))		// first element in the list
     {
-	qfl->qf_start = qfp;
+	qfl->qf_ప్రారంభం = qfp;
 	qfl->qf_ptr = qfp;
-	qfl->qf_index = 0;
-	qfp->qf_prev = NULL;
+	qfl->qf_సూచీ = 0;
+	qfp->qf_prev = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
 	qfp->qf_prev = *lastp;
-	(*lastp)->qf_next = qfp;
+	(*lastp)->qf_తదుపరి = qfp;
     }
-    qfp->qf_next = NULL;
+    qfp->qf_తదుపరి = ఖాళీ;
     qfp->qf_cleared = FALSE;
     *lastp = qfp;
-    ++qfl->qf_count;
-    if (qfl->qf_index == 0 && qfp->qf_valid)	// first valid entry
+    ++qfl->qf_లెక్క;
+    ఒకవేళ (qfl->qf_సూచీ == 0 && qfp->qf_valid)	// first valid entry
     {
-	qfl->qf_index = qfl->qf_count;
+	qfl->qf_సూచీ = qfl->qf_లెక్క;
 	qfl->qf_ptr = qfp;
     }
 
-    return QF_OK;
+    తిరిగి QF_OK;
 }
 
 /*
  * Resize quickfix stack to be able to hold n amount of lists.
  * returns FAIL on failure and OK on success.
  */
-    int
-qf_resize_stack(int n)
+    పూర్ణాంకం
+qf_resize_దొంతర(పూర్ణాంకం n)
 {
-    if (ql_info == NULL)
-	return FAIL;
+    ఒకవేళ (ql_info == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (qf_resize_stack_base(ql_info, n) == FAIL)
-	return FAIL;
+    ఒకవేళ (qf_resize_దొంతర_పునాది(ql_info, n) == FAIL)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Resize location list stack for window 'wp' to be able to
  * hold n amount of lists. Returns FAIL on failure and OK on success
  */
-    int
-ll_resize_stack(win_T *wp, int n)
+    పూర్ణాంకం
+ll_resize_దొంతర(win_T *wp, పూర్ణాంకం n)
 {
     // check if given window is a location list window;
     // if so then sync its 'lhistory' to the parent window or vice versa
-    if (IS_LL_WINDOW(wp))
-	qf_sync_llw_to_win(wp);
-    else
-	qf_sync_win_to_llw(wp);
+    ఒకవేళ (IS_LL_కిటికీ(wp))
+	qf_sync_llw_గమ్యం_win(wp);
+    లేకపోతే
+	qf_sync_win_గమ్యం_llw(wp);
 
     qf_info_T *qi = ll_get_or_alloc_list(wp);
-    if (qi == NULL)
-	return FAIL;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (qf_resize_stack_base(qi, n) == FAIL)
-	return FAIL;
+    ఒకవేళ (qf_resize_దొంతర_పునాది(qi, n) == FAIL)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Resize quickfix/location lists stack to be able to hold n amount of lists.
  * Returns FAIL on failure and OK on success.
  */
-    static int
-qf_resize_stack_base(qf_info_T *qi, int n)
+    స్థిర పూర్ణాంకం
+qf_resize_దొంతర_పునాది(qf_info_T *qi, పూర్ణాంకం n)
 {
     qf_list_T *new;
-    int amount_to_rm = 0, i;
+    పూర్ణాంకం amount_గమ్యం_rm = 0, i;
 
-    if (qi == NULL)
-	return FAIL;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    size_t lsz = sizeof(*qi->qf_lists);
+    size_t lsz = పరిమాణం(*qi->qf_lists);
 
-    if (n == qi->qf_maxcount)
-	return OK;
-    else if (n < qi->qf_maxcount && n < qi->qf_listcount)
+    ఒకవేళ (n == qi->qf_maxcount)
+	తిరిగి OK;
+    లేకపోతే ఒకవేళ (n < qi->qf_maxcount && n < qi->qf_listcount)
     {
 	// We have too many lists to store them all in the new stack,
 	// pop lists until we can fit them all in the newly resized stack
-	amount_to_rm = qi->qf_listcount - n;
+	amount_గమ్యం_rm = qi->qf_listcount - n;
 
-	for (i = 0; i < amount_to_rm; i++)
-	    qf_pop_stack(qi, TRUE);
+	కొరకు (i = 0; i < amount_గమ్యం_rm; i++)
+	    qf_తీయి_దొంతర(qi, TRUE);
     }
 
     new = vim_realloc(qi->qf_lists, lsz * n);
 
-    if (new == NULL)
-	return FAIL;
+    ఒకవేళ (new == ఖాళీ)
+	తిరిగి FAIL;
 
     // fill with zeroes any newly allocated memory
-    if (n > qi->qf_maxcount)
+    ఒకవేళ (n > qi->qf_maxcount)
 	vim_memset(new + qi->qf_maxcount, 0, lsz * (n - qi->qf_maxcount));
 
     qi->qf_lists = new;
     qi->qf_maxcount = n;
 
-    qf_update_buffer(qi, NULL);
+    qf_update_బఫరు(qi, ఖాళీ);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Initialize quickfix list, should only be called once.
  */
-   void
-qf_init_stack(void)
+   శూన్య
+qf_init_దొంతర(శూన్య)
 {
-    ql_info = qf_alloc_stack(QFLT_QUICKFIX, p_chi);
+    ql_info = qf_alloc_దొంతర(QFLT_QUICKFIX, p_chi);
 }
 
 /*
  * Sync a location list window's 'lhistory' value to the parent window
  */
-    static void
-qf_sync_llw_to_win(win_T *llw)
+    స్థిర శూన్య
+qf_sync_llw_గమ్యం_win(win_T *llw)
 {
-    win_T *wp = qf_find_win_with_loclist(llw->w_llist_ref);
+    win_T *wp = qf_కనుగొను_win_with_loclist(llw->w_llist_ref);
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
 	wp->w_p_lhi = llw->w_p_lhi;
 }
 
 /*
  * Sync a window's 'lhistory' value to its location list window, if any
  */
-    static void
-qf_sync_win_to_llw(win_T *pwp)
+    స్థిర శూన్య
+qf_sync_win_గమ్యం_llw(win_T *pwp)
 {
     win_T *wp;
     qf_info_T  *llw = pwp->w_llist;
 
-    if (llw != NULL)
+    ఒకవేళ (llw != ఖాళీ)
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_llist_ref == llw && bt_quickfix(wp->w_buffer))
+	    ఒకవేళ (wp->w_llist_ref == llw && bt_quickfix(wp->w_బఫరు))
 	    {
 		wp->w_p_lhi = pwp->w_p_lhi;
-		return;
+		తిరిగి;
 	    }
 }
 
@@ -2477,63 +2477,63 @@ qf_sync_win_to_llw(win_T *pwp)
  * Allocate a new quickfix/location list stack that is able to hold
  * up to n amount of lists
  */
-    static qf_info_T *
-qf_alloc_stack(qfltype_T qfltype, int n)
+    స్థిర qf_info_T *
+qf_alloc_దొంతర(qfltype_T qfltype, పూర్ణాంకం n)
 {
     qf_info_T *qi;
 
-    if (qfltype == QFLT_QUICKFIX)
+    ఒకవేళ (qfltype == QFLT_QUICKFIX)
 	qi = &ql_info_actual;
-    else
+    లేకపోతే
     {
 	qi = ALLOC_CLEAR_ONE_ID(qf_info_T, aid_qf_qfinfo);
-	if (qi == NULL)
-	    return NULL;
+	ఒకవేళ (qi == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	qi->qf_refcount++;
     }
     qi->qfl_type = qfltype;
     qi->qf_bufnr = INVALID_QFBUFNR;
-    qi->qf_lists = qf_alloc_list_stack(n);
-    if (qi->qf_lists == NULL)
+    qi->qf_lists = qf_alloc_list_దొంతర(n);
+    ఒకవేళ (qi->qf_lists == ఖాళీ)
     {
-	if (qfltype != QFLT_QUICKFIX)
+	ఒకవేళ (qfltype != QFLT_QUICKFIX)
 	    vim_free(qi);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     qi->qf_maxcount = n;
 
-    return qi;
+    తిరిగి qi;
 }
 
 /*
  * Allocate memory for qf_lists member of qf_info_T struct.
  */
-    static qf_list_T *
-qf_alloc_list_stack(int n)
+    స్థిర qf_list_T *
+qf_alloc_list_దొంతర(పూర్ణాంకం n)
 {
-    return ALLOC_CLEAR_MULT(qf_list_T, n);
+    తిరిగి ALLOC_CLEAR_MULT(qf_list_T, n);
 }
 
 /*
  * Return the location list stack for window 'wp'.
  * If not present, allocate a location list stack
  */
-    static qf_info_T *
+    స్థిర qf_info_T *
 ll_get_or_alloc_list(win_T *wp)
 {
-    if (IS_LL_WINDOW(wp))
+    ఒకవేళ (IS_LL_కిటికీ(wp))
 	// For a location list window, use the referenced location list
-	return wp->w_llist_ref;
+	తిరిగి wp->w_llist_ref;
 
     // For a non-location list window, w_llist_ref should not point to a
     // location list.
     ll_free_all(&wp->w_llist_ref);
 
-    if (wp->w_llist == NULL)
+    ఒకవేళ (wp->w_llist == ఖాళీ)
 	// new location list
-	wp->w_llist = qf_alloc_stack(QFLT_LOCATION, wp->w_p_lhi);
+	wp->w_llist = qf_alloc_దొంతర(QFLT_LOCATION, wp->w_p_lhi);
 
-    return wp->w_llist;
+    తిరిగి wp->w_llist;
 }
 
 /*
@@ -2542,25 +2542,25 @@ ll_get_or_alloc_list(win_T *wp)
  * the location list is not found, then returns NULL and prints an error
  * message if 'print_emsg' is TRUE.
  */
-    static qf_info_T *
-qf_cmd_get_stack(exarg_T *eap, int print_emsg)
+    స్థిర qf_info_T *
+qf_cmd_get_దొంతర(exarg_T *eap, పూర్ణాంకం print_emsg)
 {
     qf_info_T	*qi = ql_info;
 
-    if (is_loclist_cmd(eap->cmdidx))
+    ఒకవేళ (is_loclist_cmd(eap->cmdidx))
     {
 	qi = GET_LOC_LIST(curwin);
-	if (qi == NULL)
+	ఒకవేళ (qi == ఖాళీ)
 	{
-	    if (print_emsg)
+	    ఒకవేళ (print_emsg)
 		emsg(_(e_no_location_list));
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    if (qi == NULL && print_emsg)
-	emsg(_(e_no_quickfix_stack));
+    ఒకవేళ (qi == ఖాళీ && print_emsg)
+	emsg(_(e_no_quickfix_దొంతర));
 
-    return qi;
+    తిరిగి qi;
 }
 
 /*
@@ -2570,268 +2570,268 @@ qf_cmd_get_stack(exarg_T *eap, int print_emsg)
  * Returns NULL if the allocation fails.  For a location list command, sets
  * 'pwinp' to curwin.
  */
-    static qf_info_T *
-qf_cmd_get_or_alloc_stack(exarg_T *eap, win_T **pwinp)
+    స్థిర qf_info_T *
+qf_cmd_get_or_alloc_దొంతర(exarg_T *eap, win_T **pwinp)
 {
     qf_info_T	*qi = ql_info;
 
-    if (is_loclist_cmd(eap->cmdidx))
+    ఒకవేళ (is_loclist_cmd(eap->cmdidx))
     {
 	qi = ll_get_or_alloc_list(curwin);
-	if (qi == NULL)
-	    return NULL;
+	ఒకవేళ (qi == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	*pwinp = curwin;
     }
 
-    return qi;
+    తిరిగి qi;
 }
 
 /*
  * Copy location list entries from 'from_qfl' to 'to_qfl'.
  */
-    static int
-copy_loclist_entries(qf_list_T *from_qfl, qf_list_T *to_qfl)
+    స్థిర పూర్ణాంకం
+copy_loclist_entries(qf_list_T *from_qfl, qf_list_T *గమ్యం_qfl)
 {
-    int		i;
+    పూర్ణాంకం		i;
     qfline_T    *from_qfp;
     qfline_T    *prevp;
 
     // copy all the location entries in this list
-    FOR_ALL_QFL_ITEMS(from_qfl, from_qfp, i)
+    FOR_ALL_QFL_వస్తువులు(from_qfl, from_qfp, i)
     {
-	if (qf_add_entry(to_qfl,
-		    NULL,
-		    NULL,
+	ఒకవేళ (qf_కూడు_నమోదు(గమ్యం_qfl,
+		    ఖాళీ,
+		    ఖాళీ,
 		    from_qfp->qf_module,
 		    0,
-		    from_qfp->qf_text,
+		    from_qfp->qf_పాఠ్యం,
 		    from_qfp->qf_lnum,
-		    from_qfp->qf_end_lnum,
-		    from_qfp->qf_col,
-		    from_qfp->qf_end_col,
+		    from_qfp->qf_చివర_lnum,
+		    from_qfp->qf_నిలువు,
+		    from_qfp->qf_చివర_నిలువు,
 		    from_qfp->qf_viscol,
-		    from_qfp->qf_pattern,
+		    from_qfp->qf_నమూనా,
 		    from_qfp->qf_nr,
 		    0,
-		    &from_qfp->qf_user_data,
+		    &from_qfp->qf_user_దత్తాంశం,
 		    from_qfp->qf_valid) == QF_FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
 
 	// qf_add_entry() will not set the qf_num field, as the
 	// directory and file names are not supplied. So the qf_fnum
 	// field is copied here.
-	prevp = to_qfl->qf_last;
+	prevp = గమ్యం_qfl->qf_చివరి;
 	prevp->qf_fnum = from_qfp->qf_fnum;	// file number
 	prevp->qf_type = from_qfp->qf_type;	// error type
-	if (from_qfl->qf_ptr == from_qfp)
-	    to_qfl->qf_ptr = prevp;		// current location
+	ఒకవేళ (from_qfl->qf_ptr == from_qfp)
+	    గమ్యం_qfl->qf_ptr = prevp;		// current location
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Copy the specified location list 'from_qfl' to 'to_qfl'.
  */
-    static int
-copy_loclist(qf_list_T *from_qfl, qf_list_T *to_qfl)
+    స్థిర పూర్ణాంకం
+copy_loclist(qf_list_T *from_qfl, qf_list_T *గమ్యం_qfl)
 {
     // Some of the fields are populated by qf_add_entry()
-    to_qfl->qfl_type = from_qfl->qfl_type;
-    to_qfl->qf_nonevalid = from_qfl->qf_nonevalid;
-    to_qfl->qf_has_user_data = from_qfl->qf_has_user_data;
-    to_qfl->qf_count = 0;
-    to_qfl->qf_index = 0;
-    to_qfl->qf_start = NULL;
-    to_qfl->qf_last = NULL;
-    to_qfl->qf_ptr = NULL;
-    if (from_qfl->qf_title != NULL)
-	to_qfl->qf_title = vim_strsave(from_qfl->qf_title);
-    else
-	to_qfl->qf_title = NULL;
-    if (from_qfl->qf_ctx != NULL)
+    గమ్యం_qfl->qfl_type = from_qfl->qfl_type;
+    గమ్యం_qfl->qf_nonevalid = from_qfl->qf_nonevalid;
+    గమ్యం_qfl->qf_has_user_దత్తాంశం = from_qfl->qf_has_user_దత్తాంశం;
+    గమ్యం_qfl->qf_లెక్క = 0;
+    గమ్యం_qfl->qf_సూచీ = 0;
+    గమ్యం_qfl->qf_ప్రారంభం = ఖాళీ;
+    గమ్యం_qfl->qf_చివరి = ఖాళీ;
+    గమ్యం_qfl->qf_ptr = ఖాళీ;
+    ఒకవేళ (from_qfl->qf_title != ఖాళీ)
+	గమ్యం_qfl->qf_title = vim_strsave(from_qfl->qf_title);
+    లేకపోతే
+	గమ్యం_qfl->qf_title = ఖాళీ;
+    ఒకవేళ (from_qfl->qf_ctx != ఖాళీ)
     {
-	to_qfl->qf_ctx = alloc_tv();
-	if (to_qfl->qf_ctx != NULL)
-	    copy_tv(from_qfl->qf_ctx, to_qfl->qf_ctx);
+	గమ్యం_qfl->qf_ctx = alloc_tv();
+	ఒకవేళ (గమ్యం_qfl->qf_ctx != ఖాళీ)
+	    copy_tv(from_qfl->qf_ctx, గమ్యం_qfl->qf_ctx);
     }
-    else
-	to_qfl->qf_ctx = NULL;
-    if (from_qfl->qf_qftf_cb.cb_name != NULL)
-	copy_callback(&to_qfl->qf_qftf_cb, &from_qfl->qf_qftf_cb);
-    else
-	to_qfl->qf_qftf_cb.cb_name = NULL;
+    లేకపోతే
+	గమ్యం_qfl->qf_ctx = ఖాళీ;
+    ఒకవేళ (from_qfl->qf_qftf_cb.cb_name != ఖాళీ)
+	copy_callback(&గమ్యం_qfl->qf_qftf_cb, &from_qfl->qf_qftf_cb);
+    లేకపోతే
+	గమ్యం_qfl->qf_qftf_cb.cb_name = ఖాళీ;
 
-    if (from_qfl->qf_count)
-	if (copy_loclist_entries(from_qfl, to_qfl) == FAIL)
-	    return FAIL;
+    ఒకవేళ (from_qfl->qf_లెక్క)
+	ఒకవేళ (copy_loclist_entries(from_qfl, గమ్యం_qfl) == FAIL)
+	    తిరిగి FAIL;
 
-    to_qfl->qf_index = from_qfl->qf_index;	// current index in the list
+    గమ్యం_qfl->qf_సూచీ = from_qfl->qf_సూచీ;	// current index in the list
 
     // Assign a new ID for the location list
-    to_qfl->qf_id = ++last_qf_id;
-    to_qfl->qf_changedtick = 0L;
+    గమ్యం_qfl->qf_id = ++చివరి_qf_id;
+    గమ్యం_qfl->qf_changedtick = 0L;
 
     // When no valid entries are present in the list, qf_ptr points to
     // the first item in the list
-    if (to_qfl->qf_nonevalid)
+    ఒకవేళ (గమ్యం_qfl->qf_nonevalid)
     {
-	to_qfl->qf_ptr = to_qfl->qf_start;
-	to_qfl->qf_index = 1;
+	గమ్యం_qfl->qf_ptr = గమ్యం_qfl->qf_ప్రారంభం;
+	గమ్యం_qfl->qf_సూచీ = 1;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Copy the location list stack 'from' window to 'to' window.
  */
-    void
-copy_loclist_stack(win_T *from, win_T *to)
+    శూన్య
+copy_loclist_దొంతర(win_T *from, win_T *గమ్యం)
 {
     qf_info_T	*qi;
-    int		idx;
+    పూర్ణాంకం		idx;
 
     // When copying from a location list window, copy the referenced
     // location list. For other windows, copy the location list for
     // that window.
-    if (IS_LL_WINDOW(from))
+    ఒకవేళ (IS_LL_కిటికీ(from))
 	qi = from->w_llist_ref;
-    else
+    లేకపోతే
 	qi = from->w_llist;
 
-    if (qi == NULL)		    // no location list to copy
-	return;
+    ఒకవేళ (qi == ఖాళీ)		    // no location list to copy
+	తిరిగి;
 
     // allocate a new location list, set size of stack to 'from' window value
-    if ((to->w_llist = qf_alloc_stack(QFLT_LOCATION, from->w_p_lhi)) == NULL)
-	return;
-    else
+    ఒకవేళ ((గమ్యం->w_llist = qf_alloc_దొంతర(QFLT_LOCATION, from->w_p_lhi)) == ఖాళీ)
+	తిరిగి;
+    లేకపోతే
 	// set 'to' lhi to reflect new value
-	to->w_p_lhi = to->w_llist->qf_maxcount;
+	గమ్యం->w_p_lhi = గమ్యం->w_llist->qf_maxcount;
 
-    to->w_llist->qf_listcount = qi->qf_listcount;
+    గమ్యం->w_llist->qf_listcount = qi->qf_listcount;
 
     // Copy the location lists one at a time
-    for (idx = 0; idx < qi->qf_listcount; ++idx)
+    కొరకు (idx = 0; idx < qi->qf_listcount; ++idx)
     {
-	to->w_llist->qf_curlist = idx;
+	గమ్యం->w_llist->qf_curlist = idx;
 
-	if (copy_loclist(qf_get_list(qi, idx),
-			qf_get_list(to->w_llist, idx)) == FAIL)
+	ఒకవేళ (copy_loclist(qf_get_list(qi, idx),
+			qf_get_list(గమ్యం->w_llist, idx)) == FAIL)
 	{
-	    qf_free_all(to);
-	    return;
+	    qf_free_all(గమ్యం);
+	    తిరిగి;
 	}
     }
 
-    to->w_llist->qf_curlist = qi->qf_curlist;	// current list
+    గమ్యం->w_llist->qf_curlist = qi->qf_curlist;	// current list
 }
 
 /*
  * Get buffer number for file "directory/fname".
  * Also sets the b_has_qf_entry flag.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_get_fnum(qf_list_T *qfl, char_u *directory, char_u *fname)
 {
-    string_T	ptr = {NULL, 0};
+    string_T	ptr = {ఖాళీ, 0};
     buf_T	*buf;
     string_T	bufname;
     size_t	fname_len;
 
-    if (fname == NULL || *fname == NUL)		// no file name
-	return 0;
+    ఒకవేళ (fname == ఖాళీ || *fname == NUL)		// no file name
+	తిరిగి 0;
 
 # ifdef VMS
-    vms_remove_version(fname);
+    vms_remove_సంస్కరణ(fname);
 # endif
-# ifdef BACKSLASH_IN_FILENAME
-    if (directory != NULL)
+# ifdef BACKSLASH_లోపల_FILENAME
+    ఒకవేళ (directory != ఖాళీ)
 	slash_adjust(directory);
     slash_adjust(fname);
 # endif
     fname_len = STRLEN(fname);
-    if (directory != NULL && !vim_isAbsName(fname)
-	    && concat_fnames(directory, STRLEN(directory), fname, fname_len, TRUE, &ptr) != NULL)
+    ఒకవేళ (directory != ఖాళీ && !vim_isAbsName(fname)
+	    && concat_fnames(directory, STRLEN(directory), fname, fname_len, TRUE, &ptr) != ఖాళీ)
     {
 	// Here we check if the file really exists.
 	// This should normally be true, but if make works without
 	// "leaving directory"-messages we might have missed a
 	// directory change.
-	if (mch_getperm(ptr.string) < 0)
+	ఒకవేళ (mch_getperm(ptr.string) < 0)
 	{
 	    vim_free(ptr.string);
 	    directory = qf_guess_filepath(qfl, fname);
-	    if (directory)
+	    ఒకవేళ (directory)
 		concat_fnames(directory, STRLEN(directory), fname, fname_len, TRUE, &ptr);
-	    else
+	    లేకపోతే
 	    {
-		ptr.length = fname_len;
+		ptr.నిడివి = fname_len;
 		ptr.string = vim_strnsave(fname, fname_len);
 	    }
-	    if (ptr.string == NULL)
-		return 0;
+	    ఒకవేళ (ptr.string == ఖాళీ)
+		తిరిగి 0;
 	}
 	// Use concatenated directory name and file name
 	bufname.string = ptr.string;
-	bufname.length = ptr.length;
+	bufname.నిడివి = ptr.నిడివి;
     }
-    else
+    లేకపోతే
     {
 	bufname.string = fname;
-	bufname.length = fname_len;
+	bufname.నిడివి = fname_len;
     }
 
-    if (qf_last_bufname != NULL && STRCMP(bufname.string, qf_last_bufname) == 0
-	    && bufref_valid(&qf_last_bufref))
+    ఒకవేళ (qf_చివరి_bufname != ఖాళీ && STRCMP(bufname.string, qf_చివరి_bufname) == 0
+	    && bufref_valid(&qf_చివరి_bufref))
     {
-	buf = qf_last_bufref.br_buf;
+	buf = qf_చివరి_bufref.br_buf;
 	vim_free(ptr.string);
     }
-    else
+    లేకపోతే
     {
-	vim_free(qf_last_bufname);
-	buf = buflist_new(bufname.string, NULL, (linenr_T)0, BLN_NOOPT);
-	if (bufname.string == ptr.string)
-	    qf_last_bufname = bufname.string;
-	else
-	    qf_last_bufname = vim_strnsave(bufname.string, bufname.length);
-	set_bufref(&qf_last_bufref, buf);
+	vim_free(qf_చివరి_bufname);
+	buf = buflist_new(bufname.string, ఖాళీ, (linenr_T)0, BLN_NOOPT);
+	ఒకవేళ (bufname.string == ptr.string)
+	    qf_చివరి_bufname = bufname.string;
+	లేకపోతే
+	    qf_చివరి_bufname = vim_strnsave(bufname.string, bufname.నిడివి);
+	సమితి_bufref(&qf_చివరి_bufref, buf);
     }
-    if (buf == NULL)
-	return 0;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి 0;
 
-    buf->b_has_qf_entry =
-			IS_QF_LIST(qfl) ? BUF_HAS_QF_ENTRY : BUF_HAS_LL_ENTRY;
-    return buf->b_fnum;
+    buf->b_has_qf_నమోదు =
+			IS_QF_LIST(qfl) ? BUF_HAS_QF_నమోదు : BUF_HAS_LL_నమోదు;
+    తిరిగి buf->b_fnum;
 }
 
 /*
  * Push dirbuf onto the directory stack and return pointer to actual dir or
  * NULL on error.
  */
-    static char_u *
-qf_push_dir(char_u *dirbuf, struct dir_stack_T **stackptr, int is_file_stack)
+    స్థిర char_u *
+qf_నెట్టు_dir(char_u *dirbuf, నిర్మాణం dir_దొంతర_T **stackptr, పూర్ణాంకం is_file_దొంతర)
 {
-    struct dir_stack_T  *ds_new;
-    struct dir_stack_T  *ds_ptr;
+    నిర్మాణం dir_దొంతర_T  *ds_new;
+    నిర్మాణం dir_దొంతర_T  *ds_ptr;
 
     // allocate new stack element
-    ds_new = ALLOC_ONE_ID(struct dir_stack_T, aid_qf_dirstack);
-    if (ds_new == NULL)
-	return NULL;
+    ds_new = ALLOC_ONE_ID(నిర్మాణం dir_దొంతర_T, aid_qf_dirstack);
+    ఒకవేళ (ds_new == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // push the new element onto the stack
-    ds_new->next = *stackptr;
+    ds_new->తదుపరి = *stackptr;
     *stackptr = ds_new;
 
     // store directory on the stack
-    if (vim_isAbsName(dirbuf)
-	    || (*stackptr)->next == NULL
-	    || is_file_stack)
+    ఒకవేళ (vim_isAbsName(dirbuf)
+	    || (*stackptr)->తదుపరి == ఖాళీ
+	    || is_file_దొంతర)
 	(*stackptr)->dirname = vim_strsave(dirbuf);
-    else
+    లేకపోతే
     {
 	size_t	dirbuf_len;
 
@@ -2839,97 +2839,97 @@ qf_push_dir(char_u *dirbuf, struct dir_stack_T **stackptr, int is_file_stack)
 	// dirbuf must be a subdir of one of the directories on the stack.
 	// Let's search...
 	dirbuf_len = STRLEN(dirbuf);
-	ds_new = (*stackptr)->next;
-	(*stackptr)->dirname = NULL;
-	while (ds_new)
+	ds_new = (*stackptr)->తదుపరి;
+	(*stackptr)->dirname = ఖాళీ;
+	అయితే (ds_new)
 	{
 	    string_T	dirname;
 
 	    concat_fnames(ds_new->dirname, STRLEN(ds_new->dirname),
 		dirbuf, dirbuf_len, TRUE, &dirname);
-	    if (dirname.string == NULL)
+	    ఒకవేళ (dirname.string == ఖాళీ)
 	    {
 		// pop the new element from the stack and free it
 		ds_ptr = *stackptr;
-		*stackptr = (*stackptr)->next;
+		*stackptr = (*stackptr)->తదుపరి;
 		vim_free(ds_ptr);
 
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    if (mch_isdir(dirname.string) == TRUE)
+	    ఒకవేళ (mch_isdir(dirname.string) == TRUE)
 	    {
 		vim_free((*stackptr)->dirname);
 		(*stackptr)->dirname = dirname.string;
-		break;
+		ఆపు;
 	    }
 	    vim_free(dirname.string);
-	    ds_new = ds_new->next;
+	    ds_new = ds_new->తదుపరి;
 	}
 
 	// clean up all dirs we already left
-	while ((*stackptr)->next != ds_new)
+	అయితే ((*stackptr)->తదుపరి != ds_new)
 	{
-	    ds_ptr = (*stackptr)->next;
-	    (*stackptr)->next = (*stackptr)->next->next;
+	    ds_ptr = (*stackptr)->తదుపరి;
+	    (*stackptr)->తదుపరి = (*stackptr)->తదుపరి->తదుపరి;
 	    vim_free(ds_ptr->dirname);
 	    vim_free(ds_ptr);
 	}
 
 	// Nothing found -> it must be on top level
-	if (ds_new == NULL)
+	ఒకవేళ (ds_new == ఖాళీ)
 	{
 	    vim_free((*stackptr)->dirname);
 	    (*stackptr)->dirname = vim_strnsave(dirbuf, dirbuf_len);
 	}
     }
 
-    if ((*stackptr)->dirname != NULL)
-	return (*stackptr)->dirname;
+    ఒకవేళ ((*stackptr)->dirname != ఖాళీ)
+	తిరిగి (*stackptr)->dirname;
 
     // pop the new element from the stack and free it
     ds_ptr = *stackptr;
-    *stackptr = (*stackptr)->next;
+    *stackptr = (*stackptr)->తదుపరి;
     vim_free(ds_ptr);
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * pop dirbuf from the directory stack and return previous directory or NULL if
  * stack is empty
  */
-    static char_u *
-qf_pop_dir(struct dir_stack_T **stackptr)
+    స్థిర char_u *
+qf_తీయి_dir(నిర్మాణం dir_దొంతర_T **stackptr)
 {
-    struct dir_stack_T  *ds_ptr;
+    నిర్మాణం dir_దొంతర_T  *ds_ptr;
 
     // TODO: Should we check if dirbuf is the directory on top of the stack?
     // What to do if it isn't?
 
     // pop top element and free it
-    if (*stackptr != NULL)
+    ఒకవేళ (*stackptr != ఖాళీ)
     {
 	ds_ptr = *stackptr;
-	*stackptr = (*stackptr)->next;
+	*stackptr = (*stackptr)->తదుపరి;
 	vim_free(ds_ptr->dirname);
 	vim_free(ds_ptr);
     }
 
     // return NEW top element as current dir or NULL if stack is empty
-    return *stackptr ? (*stackptr)->dirname : NULL;
+    తిరిగి *stackptr ? (*stackptr)->dirname : ఖాళీ;
 }
 
 /*
  * clean up directory stack
  */
-    static void
-qf_clean_dir_stack(struct dir_stack_T **stackptr)
+    స్థిర శూన్య
+qf_clean_dir_దొంతర(నిర్మాణం dir_దొంతర_T **stackptr)
 {
-    struct dir_stack_T  *ds_ptr;
+    నిర్మాణం dir_దొంతర_T  *ds_ptr;
 
-    while ((ds_ptr = *stackptr) != NULL)
+    అయితే ((ds_ptr = *stackptr) != ఖాళీ)
     {
-	*stackptr = (*stackptr)->next;
+	*stackptr = (*stackptr)->తదుపరి;
 	vim_free(ds_ptr->dirname);
 	vim_free(ds_ptr);
     }
@@ -2955,23 +2955,23 @@ qf_clean_dir_stack(struct dir_stack_T **stackptr)
  * Then qf_push_dir thinks we are in ./aa/bb, but we are in ./bb.
  * qf_guess_filepath will return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 qf_guess_filepath(qf_list_T *qfl, char_u *filename)
 {
-    struct dir_stack_T     *ds_ptr;
-    struct dir_stack_T     *ds_tmp;
+    నిర్మాణం dir_దొంతర_T     *ds_ptr;
+    నిర్మాణం dir_దొంతర_T     *ds_tmp;
     string_T		   fullname;
     size_t		   filename_len;
 
     // no dirs on the stack - there's nothing we can do
-    if (qfl->qf_dir_stack == NULL)
-	return NULL;
+    ఒకవేళ (qfl->qf_dir_దొంతర == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    ds_ptr = qfl->qf_dir_stack->next;
-    fullname.string = NULL;
-    fullname.length = 0;
+    ds_ptr = qfl->qf_dir_దొంతర->తదుపరి;
+    fullname.string = ఖాళీ;
+    fullname.నిడివి = 0;
     filename_len = STRLEN(filename);
-    while (ds_ptr)
+    అయితే (ds_ptr)
     {
 	vim_free(fullname.string);
 	concat_fnames(ds_ptr->dirname, STRLEN(ds_ptr->dirname),
@@ -2979,49 +2979,49 @@ qf_guess_filepath(qf_list_T *qfl, char_u *filename)
 
 	// If concat_fnames failed, just go on. The worst thing that can happen
 	// is that we delete the entire stack.
-	if ((fullname.string != NULL) && (mch_getperm(fullname.string) >= 0))
-	    break;
+	ఒకవేళ ((fullname.string != ఖాళీ) && (mch_getperm(fullname.string) >= 0))
+	    ఆపు;
 
-	ds_ptr = ds_ptr->next;
+	ds_ptr = ds_ptr->తదుపరి;
     }
 
     vim_free(fullname.string);
 
     // clean up all dirs we already left
-    while (qfl->qf_dir_stack->next != ds_ptr)
+    అయితే (qfl->qf_dir_దొంతర->తదుపరి != ds_ptr)
     {
-	ds_tmp = qfl->qf_dir_stack->next;
-	qfl->qf_dir_stack->next = qfl->qf_dir_stack->next->next;
+	ds_tmp = qfl->qf_dir_దొంతర->తదుపరి;
+	qfl->qf_dir_దొంతర->తదుపరి = qfl->qf_dir_దొంతర->తదుపరి->తదుపరి;
 	vim_free(ds_tmp->dirname);
 	vim_free(ds_tmp);
     }
 
-    return ds_ptr == NULL ? NULL : ds_ptr->dirname;
+    తిరిగి ds_ptr == ఖాళీ ? ఖాళీ : ds_ptr->dirname;
 }
 
 /*
  * Returns TRUE if a quickfix/location list with the given identifier exists.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qflist_valid(win_T *wp, int_u qf_id)
 {
     qf_info_T	*qi = ql_info;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
     {
-	if (!win_valid(wp))
-	    return FALSE;
+	ఒకవేళ (!win_valid(wp))
+	    తిరిగి FALSE;
 	qi = GET_LOC_LIST(wp);	    // Location list
     }
-    if (qi == NULL)
-	return FALSE;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FALSE;
 
-    for (i = 0; i < qi->qf_listcount; ++i)
-	if (qi->qf_lists[i].qf_id == qf_id)
-	    return TRUE;
+    కొరకు (i = 0; i < qi->qf_listcount; ++i)
+	ఒకవేళ (qi->qf_lists[i].qf_id == qf_id)
+	    తిరిగి TRUE;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -3030,81 +3030,81 @@ qflist_valid(win_T *wp, int_u qf_id)
  * whether an entry is still present in the quickfix list.
  * Similar to location list.
  */
-    static int
-is_qf_entry_present(qf_list_T *qfl, qfline_T *qf_ptr)
+    స్థిర పూర్ణాంకం
+is_qf_నమోదు_present(qf_list_T *qfl, qfline_T *qf_ptr)
 {
     qfline_T	*qfp;
-    int		i;
+    పూర్ణాంకం		i;
 
     // Search for the entry in the current list
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
-	if (qfp == qf_ptr)
-	    break;
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
+	ఒకవేళ (qfp == qf_ptr)
+	    ఆపు;
 
-    if (i > qfl->qf_count) // Entry is not found
-	return FALSE;
+    ఒకవేళ (i > qfl->qf_లెక్క) // Entry is not found
+	తిరిగి FALSE;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Get the next valid entry in the current quickfix/location list. The search
  * starts from the current entry.  Returns NULL on failure.
  */
-    static qfline_T *
-get_next_valid_entry(
+    స్థిర qfline_T *
+get_తదుపరి_valid_నమోదు(
 	qf_list_T	*qfl,
 	qfline_T	*qf_ptr,
-	int		*qf_index,
-	int		dir)
+	పూర్ణాంకం		*qf_సూచీ,
+	పూర్ణాంకం		dir)
 {
-    int			idx;
-    int			old_qf_fnum;
+    పూర్ణాంకం			idx;
+    పూర్ణాంకం			old_qf_fnum;
 
-    idx = *qf_index;
+    idx = *qf_సూచీ;
     old_qf_fnum = qf_ptr->qf_fnum;
 
-    do
+    చేయి
     {
-	if (idx == qfl->qf_count || qf_ptr->qf_next == NULL)
-	    return NULL;
+	ఒకవేళ (idx == qfl->qf_లెక్క || qf_ptr->qf_తదుపరి == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	++idx;
-	qf_ptr = qf_ptr->qf_next;
-    } while ((!qfl->qf_nonevalid && !qf_ptr->qf_valid)
+	qf_ptr = qf_ptr->qf_తదుపరి;
+    } అయితే ((!qfl->qf_nonevalid && !qf_ptr->qf_valid)
 	    || (dir == FORWARD_FILE && qf_ptr->qf_fnum == old_qf_fnum));
 
-    *qf_index = idx;
-    return qf_ptr;
+    *qf_సూచీ = idx;
+    తిరిగి qf_ptr;
 }
 
 /*
  * Get the previous valid entry in the current quickfix/location list. The
  * search starts from the current entry.  Returns NULL on failure.
  */
-    static qfline_T *
-get_prev_valid_entry(
+    స్థిర qfline_T *
+get_prev_valid_నమోదు(
 	qf_list_T	*qfl,
 	qfline_T	*qf_ptr,
-	int		*qf_index,
-	int		dir)
+	పూర్ణాంకం		*qf_సూచీ,
+	పూర్ణాంకం		dir)
 {
-    int			idx;
-    int			old_qf_fnum;
+    పూర్ణాంకం			idx;
+    పూర్ణాంకం			old_qf_fnum;
 
-    idx = *qf_index;
+    idx = *qf_సూచీ;
     old_qf_fnum = qf_ptr->qf_fnum;
 
-    do
+    చేయి
     {
-	if (idx == 1 || qf_ptr->qf_prev == NULL)
-	    return NULL;
+	ఒకవేళ (idx == 1 || qf_ptr->qf_prev == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	--idx;
 	qf_ptr = qf_ptr->qf_prev;
-    } while ((!qfl->qf_nonevalid && !qf_ptr->qf_valid)
+    } అయితే ((!qfl->qf_nonevalid && !qf_ptr->qf_valid)
 	    || (dir == BACKWARD_FILE && qf_ptr->qf_fnum == old_qf_fnum));
 
-    *qf_index = idx;
-    return qf_ptr;
+    *qf_సూచీ = idx;
+    తిరిగి qf_ptr;
 }
 
 /*
@@ -3113,73 +3113,73 @@ get_prev_valid_entry(
  *   dir == FORWARD or FORWARD_FILE: next valid entry
  *   dir == BACKWARD or BACKWARD_FILE: previous valid entry
  */
-    static qfline_T *
-get_nth_valid_entry(
+    స్థిర qfline_T *
+get_nth_valid_నమోదు(
 	qf_list_T	*qfl,
-	int		errornr,
-	int		dir,
-	int		*new_qfidx)
+	పూర్ణాంకం		errornr,
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		*new_qfidx)
 {
     qfline_T		*qf_ptr = qfl->qf_ptr;
-    int			qf_idx = qfl->qf_index;
+    పూర్ణాంకం			qf_idx = qfl->qf_సూచీ;
     qfline_T		*prev_qf_ptr;
-    int			prev_index;
-    char		*err = e_no_more_items;
+    పూర్ణాంకం			prev_సూచీ;
+    అక్షరం		*err = e_no_మరిన్ని_వస్తువులు;
 
-    while (errornr--)
+    అయితే (errornr--)
     {
 	prev_qf_ptr = qf_ptr;
-	prev_index = qf_idx;
+	prev_సూచీ = qf_idx;
 
-	if (dir == FORWARD || dir == FORWARD_FILE)
-	    qf_ptr = get_next_valid_entry(qfl, qf_ptr, &qf_idx, dir);
-	else
-	    qf_ptr = get_prev_valid_entry(qfl, qf_ptr, &qf_idx, dir);
-	if (qf_ptr == NULL)
+	ఒకవేళ (dir == FORWARD || dir == FORWARD_FILE)
+	    qf_ptr = get_తదుపరి_valid_నమోదు(qfl, qf_ptr, &qf_idx, dir);
+	లేకపోతే
+	    qf_ptr = get_prev_valid_నమోదు(qfl, qf_ptr, &qf_idx, dir);
+	ఒకవేళ (qf_ptr == ఖాళీ)
 	{
 	    qf_ptr = prev_qf_ptr;
-	    qf_idx = prev_index;
-	    if (err != NULL)
+	    qf_idx = prev_సూచీ;
+	    ఒకవేళ (err != ఖాళీ)
 	    {
 		emsg(_(err));
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
-	    break;
+	    ఆపు;
 	}
 
-	err = NULL;
+	err = ఖాళీ;
     }
 
     *new_qfidx = qf_idx;
-    return qf_ptr;
+    తిరిగి qf_ptr;
 }
 
 /*
  * Get n'th (errornr) quickfix entry from the current entry in the quickfix
  * list 'qfl'. Returns a pointer to the new entry and the index in 'new_qfidx'
  */
-    static qfline_T *
-get_nth_entry(qf_list_T *qfl, int errornr, int *new_qfidx)
+    స్థిర qfline_T *
+get_nth_నమోదు(qf_list_T *qfl, పూర్ణాంకం errornr, పూర్ణాంకం *new_qfidx)
 {
     qfline_T	*qf_ptr = qfl->qf_ptr;
-    int		qf_idx = qfl->qf_index;
+    పూర్ణాంకం		qf_idx = qfl->qf_సూచీ;
 
     // New error number is less than the current error number
-    while (errornr < qf_idx && qf_idx > 1 && qf_ptr->qf_prev != NULL)
+    అయితే (errornr < qf_idx && qf_idx > 1 && qf_ptr->qf_prev != ఖాళీ)
     {
 	--qf_idx;
 	qf_ptr = qf_ptr->qf_prev;
     }
     // New error number is greater than the current error number
-    while (errornr > qf_idx && qf_idx < qfl->qf_count &&
-						qf_ptr->qf_next != NULL)
+    అయితే (errornr > qf_idx && qf_idx < qfl->qf_లెక్క &&
+						qf_ptr->qf_తదుపరి != ఖాళీ)
     {
 	++qf_idx;
-	qf_ptr = qf_ptr->qf_next;
+	qf_ptr = qf_ptr->qf_తదుపరి;
     }
 
     *new_qfidx = qf_idx;
-    return qf_ptr;
+    తిరిగి qf_ptr;
 }
 
 /*
@@ -3189,45 +3189,45 @@ get_nth_entry(qf_list_T *qfl, int errornr, int *new_qfidx)
  * Returns a pointer to the entry and the index of the new entry is stored in
  * 'new_qfidx'.
  */
-    static qfline_T *
-qf_get_entry(
+    స్థిర qfline_T *
+qf_get_నమోదు(
 	qf_list_T	*qfl,
-	int		errornr,
-	int		dir,
-	int		*new_qfidx)
+	పూర్ణాంకం		errornr,
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		*new_qfidx)
 {
     qfline_T	*qf_ptr = qfl->qf_ptr;
-    int		qfidx = qfl->qf_index;
+    పూర్ణాంకం		qfidx = qfl->qf_సూచీ;
 
-    if (dir != 0)    // next/prev valid entry
-	qf_ptr = get_nth_valid_entry(qfl, errornr, dir, &qfidx);
-    else if (errornr != 0)	// go to specified number
-	qf_ptr = get_nth_entry(qfl, errornr, &qfidx);
+    ఒకవేళ (dir != 0)    // next/prev valid entry
+	qf_ptr = get_nth_valid_నమోదు(qfl, errornr, dir, &qfidx);
+    లేకపోతే ఒకవేళ (errornr != 0)	// go to specified number
+	qf_ptr = get_nth_నమోదు(qfl, errornr, &qfidx);
 
     *new_qfidx = qfidx;
-    return qf_ptr;
+    తిరిగి qf_ptr;
 }
 
 /*
  * Find a window displaying a Vim help file in the current tab page.
  */
-    static win_T *
-qf_find_help_win(void)
+    స్థిర win_T *
+qf_కనుగొను_help_win(శూన్య)
 {
     win_T *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (bt_help(wp->w_buffer))
-	    return wp;
+	ఒకవేళ (bt_help(wp->w_బఫరు))
+	    తిరిగి wp;
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Set the location list for the specified window to 'qi'.
  */
-    static void
-win_set_loclist(win_T *wp, qf_info_T *qi)
+    స్థిర శూన్య
+win_సమితి_loclist(win_T *wp, qf_info_T *qi)
 {
     wp->w_llist = qi;
     qi->qf_refcount++;
@@ -3237,50 +3237,50 @@ win_set_loclist(win_T *wp, qf_info_T *qi)
  * Find a help window or open one. If 'newwin' is TRUE, then open a new help
  * window.
  */
-    static int
-jump_to_help_window(qf_info_T *qi, int newwin, int *opened_window)
+    స్థిర పూర్ణాంకం
+jump_గమ్యం_help_కిటికీ(qf_info_T *qi, పూర్ణాంకం newwin, పూర్ణాంకం *opened_కిటికీ)
 {
     win_T	*wp;
-    int		flags;
+    పూర్ణాంకం		flags;
 
-    if (cmdmod.cmod_tab != 0 || newwin)
-	wp = NULL;
-    else
-	wp = qf_find_help_win();
-    if (wp != NULL && wp->w_buffer->b_nwindows > 0)
+    ఒకవేళ (cmdmod.cmod_tab != 0 || newwin)
+	wp = ఖాళీ;
+    లేకపోతే
+	wp = qf_కనుగొను_help_win();
+    ఒకవేళ (wp != ఖాళీ && wp->w_బఫరు->b_nwindows > 0)
 	win_enter(wp, TRUE);
-    else
+    లేకపోతే
     {
 	// Split off help window; put it at far top if no position
 	// specified, the current window is vertically split and narrow.
 	flags = WSP_HELP;
-	if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
-		&& curwin->w_width < 80)
-	    flags |= WSP_TOP;
+	ఒకవేళ (cmdmod.cmod_విభజించు == 0 && curwin->w_వెడల్పు != Columns
+		&& curwin->w_వెడల్పు < 80)
+	    flags |= WSP_శిఖరం;
 	// If the user asks to open a new window, then copy the location list.
 	// Otherwise, don't copy the location list.
-	if (IS_LL_STACK(qi) && !newwin)
+	ఒకవేళ (IS_LL_దొంతర(qi) && !newwin)
 	    flags |= WSP_NEWLOC;
 
-	if (win_split(0, flags) == FAIL)
-	    return FAIL;
+	ఒకవేళ (win_విభజించు(0, flags) == FAIL)
+	    తిరిగి FAIL;
 
-	*opened_window = TRUE;
+	*opened_కిటికీ = TRUE;
 
-	if (curwin->w_height < p_hh)
-	    win_setheight((int)p_hh);
+	ఒకవేళ (curwin->w_ఎత్తు < p_hh)
+	    win_setheight((పూర్ణాంకం)p_hh);
 
 	// When using location list, the new window should use the supplied
 	// location list. If the user asks to open a new window, then the new
 	// window will get a copy of the location list.
-	if (IS_LL_STACK(qi) && !newwin)
-	    win_set_loclist(curwin, qi);
+	ఒకవేళ (IS_LL_దొంతర(qi) && !newwin)
+	    win_సమితి_loclist(curwin, qi);
     }
 
-    if (!p_im)
+    ఒకవేళ (!p_im)
 	restart_edit = 0;	    // don't want insert mode in help file
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3288,75 +3288,75 @@ jump_to_help_window(qf_info_T *qi, int newwin, int *opened_window)
  * current tabpage.
  * Returns NULL if a matching window is not found.
  */
-    static win_T *
-qf_find_win_with_loclist(qf_info_T *ll)
+    స్థిర win_T *
+qf_కనుగొను_win_with_loclist(qf_info_T *ll)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_llist == ll && !bt_quickfix(wp->w_buffer))
-	    return wp;
+	ఒకవేళ (wp->w_llist == ll && !bt_quickfix(wp->w_బఫరు))
+	    తిరిగి wp;
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Find a window containing a normal buffer in the current tab page.
  */
-    static win_T *
-qf_find_win_with_normal_buf(void)
+    స్థిర win_T *
+qf_కనుగొను_win_with_సాధారణ_buf(శూన్య)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (bt_normal(wp->w_buffer))
-	    return wp;
+	ఒకవేళ (bt_సాధారణ(wp->w_బఫరు))
+	    తిరిగి wp;
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Go to a window in any tabpage containing the specified file.  Returns TRUE
  * if successfully jumped to the window. Otherwise returns FALSE.
  */
-    static int
-qf_goto_tabwin_with_file(int fnum)
+    స్థిర పూర్ణాంకం
+qf_goto_tabwin_with_file(పూర్ణాంకం fnum)
 {
     tabpage_T	*tp;
     win_T	*wp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer->b_fnum == fnum)
+	ఒకవేళ (wp->w_బఫరు->b_fnum == fnum)
 	{
 	    goto_tabpage_win(tp, wp);
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Create a new window to show a file above the quickfix window. Called when
  * only the quickfix window is present.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_open_new_file_win(qf_info_T *ll_ref)
 {
-    int		flags;
+    పూర్ణాంకం		flags;
 
     flags = WSP_ABOVE;
-    if (ll_ref != NULL)
+    ఒకవేళ (ll_ref != ఖాళీ)
 	flags |= WSP_NEWLOC;
-    if (win_split(0, flags) == FAIL)
-	return FAIL;		// not enough room for window
-    p_swb = empty_option;	// don't split again
+    ఒకవేళ (win_విభజించు(0, flags) == FAIL)
+	తిరిగి FAIL;		// not enough room for window
+    p_swb = ఖాళీలు_option;	// don't split again
     swb_flags = 0;
     RESET_BINDING(curwin);
-    if (ll_ref != NULL)
+    ఒకవేళ (ll_ref != ఖాళీ)
 	// The new window should use the location list from the
 	// location list window
-	win_set_loclist(curwin, ll_ref);
-    return OK;
+	win_సమితి_loclist(curwin, ll_ref);
+    తిరిగి OK;
 }
 
 /*
@@ -3365,38 +3365,38 @@ qf_open_new_file_win(qf_info_T *ll_ref)
  * a file from a location window and not from a quickfix window. If some usable
  * window is previously found, then it is supplied in 'use_win'.
  */
-    static void
-qf_goto_win_with_ll_file(win_T *use_win, int qf_fnum, qf_info_T *ll_ref)
+    స్థిర శూన్య
+qf_goto_win_with_ll_file(win_T *use_win, పూర్ణాంకం qf_fnum, qf_info_T *ll_ref)
 {
     win_T	*win = use_win;
 
-    if (win == NULL)
+    ఒకవేళ (win == ఖాళీ)
     {
 	// Find the window showing the selected file in the current tab page.
 	FOR_ALL_WINDOWS(win)
-	    if (win->w_buffer->b_fnum == qf_fnum)
-		break;
-	if (win == NULL)
+	    ఒకవేళ (win->w_బఫరు->b_fnum == qf_fnum)
+		ఆపు;
+	ఒకవేళ (win == ఖాళీ)
 	{
 	    // Find a previous usable window
 	    win = curwin;
-	    do
+	    చేయి
 	    {
-		if (bt_normal(win->w_buffer))
-		    break;
-		if (win->w_prev == NULL)
+		ఒకవేళ (bt_సాధారణ(win->w_బఫరు))
+		    ఆపు;
+		ఒకవేళ (win->w_prev == ఖాళీ)
 		    win = lastwin;	// wrap around the top
-		else
+		లేకపోతే
 		    win = win->w_prev; // go to previous window
-	    } while (win != curwin);
+	    } అయితే (win != curwin);
 	}
     }
     win_goto(win);
 
     // If the location list for the window is not set, then set it
     // to the location list from the location window
-    if (win->w_llist == NULL && ll_ref != NULL)
-	win_set_loclist(win, ll_ref);
+    ఒకవేళ (win->w_llist == ఖాళీ && ll_ref != ఖాళీ)
+	win_సమితి_loclist(win, ll_ref);
 }
 
 /*
@@ -3405,43 +3405,43 @@ qf_goto_win_with_ll_file(win_T *use_win, int qf_fnum, qf_info_T *ll_ref)
  * used for opening a file from a quickfix window and not from a location
  * window.
  */
-    static void
-qf_goto_win_with_qfl_file(int qf_fnum)
+    స్థిర శూన్య
+qf_goto_win_with_qfl_file(పూర్ణాంకం qf_fnum)
 {
     win_T	*win;
     win_T	*altwin;
 
     win = curwin;
-    altwin = NULL;
-    for (;;)
+    altwin = ఖాళీ;
+    కొరకు (;;)
     {
-	if (win->w_buffer->b_fnum == qf_fnum)
-	    break;
-	if (win->w_prev == NULL)
+	ఒకవేళ (win->w_బఫరు->b_fnum == qf_fnum)
+	    ఆపు;
+	ఒకవేళ (win->w_prev == ఖాళీ)
 	    win = lastwin;	// wrap around the top
-	else
+	లేకపోతే
 	    win = win->w_prev;	// go to previous window
 
-	if (IS_QF_WINDOW(win))
+	ఒకవేళ (IS_QF_కిటికీ(win))
 	{
 	    // Didn't find it, go to the window before the quickfix
 	    // window, unless 'switchbuf' contains 'uselast': in this case we
 	    // try to jump to the previously used window first.
-	    if ((swb_flags & SWB_USELAST) && win_valid(prevwin) &&
+	    ఒకవేళ ((swb_flags & SWB_USELAST) && win_valid(prevwin) &&
 		    !prevwin->w_p_wfb)
 		win = prevwin;
-	    else if (altwin != NULL)
+	    లేకపోతే ఒకవేళ (altwin != ఖాళీ)
 		win = altwin;
-	    else if (curwin->w_prev != NULL)
+	    లేకపోతే ఒకవేళ (curwin->w_prev != ఖాళీ)
 		win = curwin->w_prev;
-	    else
-		win = curwin->w_next;
-	    break;
+	    లేకపోతే
+		win = curwin->w_తదుపరి;
+	    ఆపు;
 	}
 
 	// Remember a usable window.
-	if (altwin == NULL && !win->w_p_pvw && !win->w_p_wfb &&
-		bt_normal(win->w_buffer))
+	ఒకవేళ (altwin == ఖాళీ && !win->w_p_pvw && !win->w_p_wfb &&
+		bt_సాధారణ(win->w_బఫరు))
 	    altwin = win;
     }
 
@@ -3455,57 +3455,57 @@ qf_goto_win_with_qfl_file(int qf_fnum)
  * 'newwin' is TRUE, then always open a new window. This is called from either
  * a quickfix or a location list window.
  */
-    static int
-qf_jump_to_usable_window(int qf_fnum, int newwin, int *opened_window)
+    స్థిర పూర్ణాంకం
+qf_jump_గమ్యం_usable_కిటికీ(పూర్ణాంకం qf_fnum, పూర్ణాంకం newwin, పూర్ణాంకం *opened_కిటికీ)
 {
-    win_T	*usable_wp = NULL;
-    int		usable_win = FALSE;
-    qf_info_T	*ll_ref = NULL;
+    win_T	*usable_wp = ఖాళీ;
+    పూర్ణాంకం		usable_win = FALSE;
+    qf_info_T	*ll_ref = ఖాళీ;
 
     // If opening a new window, then don't use the location list referred by
     // the current window.  Otherwise two windows will refer to the same
     // location list.
-    if (!newwin)
+    ఒకవేళ (!newwin)
 	ll_ref = curwin->w_llist_ref;
 
-    if (ll_ref != NULL)
+    ఒకవేళ (ll_ref != ఖాళీ)
     {
 	// Find a non-quickfix window with this location list
-	usable_wp = qf_find_win_with_loclist(ll_ref);
-	if (usable_wp != NULL)
+	usable_wp = qf_కనుగొను_win_with_loclist(ll_ref);
+	ఒకవేళ (usable_wp != ఖాళీ)
 	    usable_win = TRUE;
     }
 
-    if (!usable_win)
+    ఒకవేళ (!usable_win)
     {
 	// Locate a window showing a normal buffer
-	win_T	*win = qf_find_win_with_normal_buf();
-	if (win != NULL)
+	win_T	*win = qf_కనుగొను_win_with_సాధారణ_buf();
+	ఒకవేళ (win != ఖాళీ)
 	    usable_win = TRUE;
     }
 
     // If no usable window is found and 'switchbuf' contains "usetab"
     // then search in other tabs.
-    if (!usable_win && (swb_flags & SWB_USETAB))
+    ఒకవేళ (!usable_win && (swb_flags & SWB_USETAB))
 	usable_win = qf_goto_tabwin_with_file(qf_fnum);
 
     // If there is only one window and it is the quickfix window, create a
     // new one above the quickfix window.
-    if ((ONE_WINDOW && bt_quickfix(curbuf)) || !usable_win || newwin)
+    ఒకవేళ ((ONE_కిటికీ && bt_quickfix(curbuf)) || !usable_win || newwin)
     {
-	if (qf_open_new_file_win(ll_ref) != OK)
-	    return FAIL;
-	*opened_window = TRUE;	// close it when fail
+	ఒకవేళ (qf_open_new_file_win(ll_ref) != OK)
+	    తిరిగి FAIL;
+	*opened_కిటికీ = TRUE;	// close it when fail
     }
-    else
+    లేకపోతే
     {
-	if (curwin->w_llist_ref != NULL)	// In a location window
+	ఒకవేళ (curwin->w_llist_ref != ఖాళీ)	// In a location window
 	    qf_goto_win_with_ll_file(usable_wp, qf_fnum, ll_ref);
-	else					// In a quickfix window
+	లేకపోతే					// In a quickfix window
 	    qf_goto_win_with_qfl_file(qf_fnum);
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3514,76 +3514,76 @@ qf_jump_to_usable_window(int qf_fnum, int newwin, int *opened_window)
  * buffer and QF_ABORT if the quickfix/location list was freed by an autocmd
  * when opening the buffer.
  */
-    static int
-qf_jump_edit_buffer(
+    స్థిర పూర్ణాంకం
+qf_jump_edit_బఫరు(
 	qf_info_T	*qi,
 	qfline_T	*qf_ptr,
-	int		forceit,
-	int		prev_winid,
-	int		*opened_window)
+	పూర్ణాంకం		forceit,
+	పూర్ణాంకం		prev_winid,
+	పూర్ణాంకం		*opened_కిటికీ)
 {
     qf_list_T	*qfl = qf_get_curlist(qi);
-    int		old_changedtick = qfl->qf_changedtick;
+    పూర్ణాంకం		old_changedtick = qfl->qf_changedtick;
     qfltype_T	qfl_type = qfl->qfl_type;
-    int		retval = OK;
-    int		old_qf_curlist = qi->qf_curlist;
-    int		save_qfid = qfl->qf_id;
+    పూర్ణాంకం		retval = OK;
+    పూర్ణాంకం		old_qf_curlist = qi->qf_curlist;
+    పూర్ణాంకం		save_qfid = qfl->qf_id;
 
-    if (qf_ptr->qf_type == 1)
+    ఒకవేళ (qf_ptr->qf_type == 1)
     {
 	// Open help file (do_ecmd() will set b_help flag, readfile() will
 	// set b_p_ro flag).
-	if (!can_abandon(curbuf, forceit))
+	ఒకవేళ (!can_abandon(curbuf, forceit))
 	{
-	    no_write_message();
-	    return FAIL;
+	    no_write_సందేశం();
+	    తిరిగి FAIL;
 	}
 
-	retval = do_ecmd(qf_ptr->qf_fnum, NULL, NULL, NULL, (linenr_T)1,
-		ECMD_HIDE + ECMD_SET_HELP,
-		prev_winid == curwin->w_id ? curwin : NULL);
+	retval = do_ecmd(qf_ptr->qf_fnum, ఖాళీ, ఖాళీ, ఖాళీ, (linenr_T)1,
+		ECMD_HIDE + ECMD_సమితి_HELP,
+		prev_winid == curwin->w_id ? curwin : ఖాళీ);
     }
-    else
+    లేకపోతే
     {
-	int	fnum = qf_ptr->qf_fnum;
+	పూర్ణాంకం	fnum = qf_ptr->qf_fnum;
 
-	if (!forceit && curwin->w_p_wfb && curbuf->b_fnum != fnum)
+	ఒకవేళ (!forceit && curwin->w_p_wfb && curbuf->b_fnum != fnum)
 	{
-	    if (qi->qfl_type == QFLT_LOCATION)
+	    ఒకవేళ (qi->qfl_type == QFLT_LOCATION)
 	    {
 		// Location lists cannot split or reassign their window
 		// so 'winfixbuf' windows must fail
-		emsg(_(e_winfixbuf_cannot_go_to_buffer));
-		return FAIL;
+		emsg(_(e_winfixbuf_cannot_go_గమ్యం_బఫరు));
+		తిరిగి FAIL;
 	    }
 
-	    if (win_valid(prevwin) && !prevwin->w_p_wfb &&
-		    !bt_quickfix(prevwin->w_buffer))
+	    ఒకవేళ (win_valid(prevwin) && !prevwin->w_p_wfb &&
+		    !bt_quickfix(prevwin->w_బఫరు))
 	    {
 		// 'winfixbuf' is set; attempt to change to a window without it
 		// that isn't a quickfix/location list window.
 		win_goto(prevwin);
 	    }
-	    if (curwin->w_p_wfb)
+	    ఒకవేళ (curwin->w_p_wfb)
 	    {
 		// Split the window, which will be 'nowinfixbuf', and set curwin
 		// to that
-		if (win_split(0, 0) == OK)
-		    *opened_window = TRUE;
+		ఒకవేళ (win_విభజించు(0, 0) == OK)
+		    *opened_కిటికీ = TRUE;
 
-		if (curwin->w_p_wfb)
+		ఒకవేళ (curwin->w_p_wfb)
 		{
 		    // Autocommands set 'winfixbuf' or sent us to another window
 		    // with it set, or we failed to split the window.  Give up,
 		    // but don't return immediately, as they may have messed
 		    // with the list.
-		    emsg(_(e_winfixbuf_cannot_go_to_buffer));
+		    emsg(_(e_winfixbuf_cannot_go_గమ్యం_బఫరు));
 		    retval = FAIL;
 		}
 	    }
 	}
 
-	if (retval == OK)
+	ఒకవేళ (retval == OK)
 	{
 	    retval = buflist_getfile(fnum,
 		    (linenr_T)1, GETF_SETMARK | GETF_SWITCH, forceit);
@@ -3592,38 +3592,38 @@ qf_jump_edit_buffer(
 
     // If a location list, check whether the associated window is still
     // present.
-    if (qfl_type == QFLT_LOCATION)
+    ఒకవేళ (qfl_type == QFLT_LOCATION)
     {
 	win_T	*wp = win_id2wp(prev_winid);
 
-	if (wp == NULL && curwin->w_llist != qi)
+	ఒకవేళ (wp == ఖాళీ && curwin->w_llist != qi)
 	{
-	    emsg(_(e_current_window_was_closed));
-	    *opened_window = FALSE;
-	    return QF_ABORT;
+	    emsg(_(e_current_కిటికీ_was_closed));
+	    *opened_కిటికీ = FALSE;
+	    తిరిగి QF_ABORT;
 	}
     }
 
-    if (qfl_type == QFLT_QUICKFIX && !qflist_valid(NULL, save_qfid))
+    ఒకవేళ (qfl_type == QFLT_QUICKFIX && !qflist_valid(ఖాళీ, save_qfid))
     {
-	emsg(_(e_current_quickfix_list_was_changed));
-	return QF_ABORT;
+	emsg(_(e_current_quickfix_list_was_మారింది));
+	తిరిగి QF_ABORT;
     }
 
     // Check if the list was changed.  The pointers may happen to be identical,
     // thus also check qf_changedtick.
-    if (old_qf_curlist != qi->qf_curlist
+    ఒకవేళ (old_qf_curlist != qi->qf_curlist
 	    || old_changedtick != qfl->qf_changedtick
-	    || !is_qf_entry_present(qfl, qf_ptr))
+	    || !is_qf_నమోదు_present(qfl, qf_ptr))
     {
-	if (qfl_type == QFLT_QUICKFIX)
-	    emsg(_(e_current_quickfix_list_was_changed));
-	else
-	    emsg(_(e_current_location_list_was_changed));
-	return QF_ABORT;
+	ఒకవేళ (qfl_type == QFLT_QUICKFIX)
+	    emsg(_(e_current_quickfix_list_was_మారింది));
+	లేకపోతే
+	    emsg(_(e_current_location_list_was_మారింది));
+	తిరిగి QF_ABORT;
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -3632,70 +3632,70 @@ qf_jump_edit_buffer(
  * column numbers compilers report for the "%v" item in 'errorformat',
  * regardless of the buffer's 'tabstop'.
  */
-    static int
-qf_screen_col_to_idx(colnr_T vcol)
+    స్థిర పూర్ణాంకం
+qf_screen_నిలువు_గమ్యం_idx(colnr_T vcol)
 {
-    char_u	*line = ml_get_curline();
-    char_u	*p = line;
-    colnr_T	col = 0;
+    char_u	*పంక్తి = ml_get_curline();
+    char_u	*p = పంక్తి;
+    colnr_T	నిలువు = 0;
 
-    while (*p != NUL && col < vcol)
+    అయితే (*p != NUL && నిలువు < vcol)
     {
-	if (*p == TAB)
-	    col += 8 - (col % 8);
-	else
-	    col += ptr2cells(p);
-	if (col > vcol)
-	    break;
+	ఒకవేళ (*p == TAB)
+	    నిలువు += 8 - (నిలువు % 8);
+	లేకపోతే
+	    నిలువు += ptr2cells(p);
+	ఒకవేళ (నిలువు > vcol)
+	    ఆపు;
 	MB_PTR_ADV(p);
     }
-    return (int)(p - line);
+    తిరిగి (పూర్ణాంకం)(p - పంక్తి);
 }
 
 /*
  * Go to the error line in the current file using either line/column number or
  * a search pattern.
  */
-    static void
-qf_jump_goto_line(
+    స్థిర శూన్య
+qf_jump_goto_పంక్తి(
 	linenr_T	qf_lnum,
-	int		qf_col,
+	పూర్ణాంకం		qf_నిలువు,
 	char_u		qf_viscol,
-	char_u		*qf_pattern)
+	char_u		*qf_నమూనా)
 {
     linenr_T		i;
 
-    if (qf_pattern == NULL)
+    ఒకవేళ (qf_నమూనా == ఖాళీ)
     {
 	// Go to line with error, unless qf_lnum is 0.
 	i = qf_lnum;
-	if (i > 0)
+	ఒకవేళ (i > 0)
 	{
-	    if (i > curbuf->b_ml.ml_line_count)
-		i = curbuf->b_ml.ml_line_count;
+	    ఒకవేళ (i > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		i = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	    curwin->w_cursor.lnum = i;
 	}
-	if (qf_col > 0)
+	ఒకవేళ (qf_నిలువు > 0)
 	{
 	    curwin->w_cursor.coladd = 0;
-	    if (qf_viscol == TRUE)
-		curwin->w_cursor.col = qf_screen_col_to_idx(qf_col - 1);
-	    else
-		curwin->w_cursor.col = qf_col - 1;
-	    curwin->w_set_curswant = true;
+	    ఒకవేళ (qf_viscol == TRUE)
+		curwin->w_cursor.నిలువు = qf_screen_నిలువు_గమ్యం_idx(qf_నిలువు - 1);
+	    లేకపోతే
+		curwin->w_cursor.నిలువు = qf_నిలువు - 1;
+	    curwin->w_సమితి_curswant = true;
 	    check_cursor();
 	}
-	else
+	లేకపోతే
 	    beginline(BL_WHITE | BL_FIX);
     }
-    else
+    లేకపోతే
     {
 	pos_T save_cursor;
 
 	// Move the cursor to the first line in the buffer
 	save_cursor = curwin->w_cursor;
 	curwin->w_cursor.lnum = 0;
-	if (!do_search(NULL, '/', '/', qf_pattern, STRLEN(qf_pattern), (long)1, SEARCH_KEEP, NULL))
+	ఒకవేళ (!do_శోధన(ఖాళీ, '/', '/', qf_నమూనా, STRLEN(qf_నమూనా), (దీర్ఘ)1, శోధన_KEEP, ఖాళీ))
 	    curwin->w_cursor = save_cursor;
     }
 }
@@ -3703,10 +3703,10 @@ qf_jump_goto_line(
 /*
  * Display quickfix list index and size message
  */
-    static void
-qf_jump_print_msg(
+    స్థిర శూన్య
+qf_jump_print_సందేశం(
 	qf_info_T	*qi,
-	int		qf_index,
+	పూర్ణాంకం		qf_సూచీ,
 	qfline_T	*qf_ptr,
 	buf_T		*old_curbuf,
 	linenr_T	old_lnum)
@@ -3719,28 +3719,28 @@ qf_jump_print_msg(
 
     // Update the screen before showing the message, unless the screen
     // scrolled up.
-    if (!msg_scrolled)
+    ఒకవేళ (!సందేశం_scrolled)
 	update_topline_redraw();
-    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-	    _("(%d of %d)%s%s: "), qf_index,
-	    qf_get_curlist(qi)->qf_count,
+    IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE,
+	    _("(%d of %d)%s%s: "), qf_సూచీ,
+	    qf_get_curlist(qi)->qf_లెక్క,
 	    qf_ptr->qf_cleared ? _(" (line deleted)") : "",
-	    (char *)qf_types(qf_ptr->qf_type, qf_ptr->qf_nr));
+	    (అక్షరం *)qf_types(qf_ptr->qf_type, qf_ptr->qf_nr));
     // Add the message, skipping leading whitespace and newlines.
     ga_concat_len(gap, IObuff, IObufflen);
-    qf_fmt_text(gap, skipwhite(qf_ptr->qf_text));
+    qf_fmt_పాఠ్యం(gap, skipwhite(qf_ptr->qf_పాఠ్యం));
     ga_append(gap, NUL);
 
     // Output the message.  Overwrite to avoid scrolling when the 'O'
     // flag is present in 'shortmess'; But when not jumping, print the
     // whole message.
-    i = msg_scroll;
-    if (curbuf == old_curbuf && curwin->w_cursor.lnum == old_lnum)
-	msg_scroll = TRUE;
-    else if (!msg_scrolled && shortmess(SHM_OVERALL))
-	msg_scroll = FALSE;
-    msg_attr_keep((char *)gap->ga_data, 0, TRUE);
-    msg_scroll = i;
+    i = సందేశం_scroll;
+    ఒకవేళ (curbuf == old_curbuf && curwin->w_cursor.lnum == old_lnum)
+	సందేశం_scroll = TRUE;
+    లేకపోతే ఒకవేళ (!సందేశం_scrolled && shortmess(SHM_OVERALL))
+	సందేశం_scroll = FALSE;
+    సందేశం_attr_keep((అక్షరం *)gap->ga_దత్తాంశం, 0, TRUE);
+    సందేశం_scroll = i;
 
     qfga_clear();
 }
@@ -3754,59 +3754,59 @@ qf_jump_print_msg(
  * with the entry.  Returns QF_ABORT if the quickfix/location list was modified
  * by an autocmd.
  */
-    static int
-qf_jump_open_window(
+    స్థిర పూర్ణాంకం
+qf_jump_open_కిటికీ(
 	qf_info_T	*qi,
 	qfline_T	*qf_ptr,
-	int		newwin,
-	int		*opened_window)
+	పూర్ణాంకం		newwin,
+	పూర్ణాంకం		*opened_కిటికీ)
 {
     qf_list_T	*qfl = qf_get_curlist(qi);
-    int		old_changedtick = qfl->qf_changedtick;
-    int		old_qf_curlist = qi->qf_curlist;
+    పూర్ణాంకం		old_changedtick = qfl->qf_changedtick;
+    పూర్ణాంకం		old_qf_curlist = qi->qf_curlist;
     qfltype_T	qfl_type = qfl->qfl_type;
 
     // For ":helpgrep" find a help window or open one.
-    if (qf_ptr->qf_type == 1 && (!bt_help(curwin->w_buffer)
+    ఒకవేళ (qf_ptr->qf_type == 1 && (!bt_help(curwin->w_బఫరు)
 						      || cmdmod.cmod_tab != 0))
-	if (jump_to_help_window(qi, newwin, opened_window) == FAIL)
-	    return FAIL;
-    if (old_qf_curlist != qi->qf_curlist
+	ఒకవేళ (jump_గమ్యం_help_కిటికీ(qi, newwin, opened_కిటికీ) == FAIL)
+	    తిరిగి FAIL;
+    ఒకవేళ (old_qf_curlist != qi->qf_curlist
 	    || old_changedtick != qfl->qf_changedtick
-	    || !is_qf_entry_present(qfl, qf_ptr))
+	    || !is_qf_నమోదు_present(qfl, qf_ptr))
     {
-	if (qfl_type == QFLT_QUICKFIX)
-	    emsg(_(e_current_quickfix_list_was_changed));
-	else
-	    emsg(_(e_current_location_list_was_changed));
-	return QF_ABORT;
+	ఒకవేళ (qfl_type == QFLT_QUICKFIX)
+	    emsg(_(e_current_quickfix_list_was_మారింది));
+	లేకపోతే
+	    emsg(_(e_current_location_list_was_మారింది));
+	తిరిగి QF_ABORT;
     }
 
     // If currently in the quickfix window, find another window to show the
     // file in.
-    if (bt_quickfix(curbuf) && !*opened_window)
+    ఒకవేళ (bt_quickfix(curbuf) && !*opened_కిటికీ)
     {
 	// If there is no file specified, we don't know where to go.
 	// But do advance, otherwise ":cn" gets stuck.
-	if (qf_ptr->qf_fnum == 0)
-	    return NOTDONE;
+	ఒకవేళ (qf_ptr->qf_fnum == 0)
+	    తిరిగి NOTDONE;
 
-	if (qf_jump_to_usable_window(qf_ptr->qf_fnum, newwin,
-						opened_window) == FAIL)
-	    return FAIL;
+	ఒకవేళ (qf_jump_గమ్యం_usable_కిటికీ(qf_ptr->qf_fnum, newwin,
+						opened_కిటికీ) == FAIL)
+	    తిరిగి FAIL;
     }
-    if (old_qf_curlist != qi->qf_curlist
+    ఒకవేళ (old_qf_curlist != qi->qf_curlist
 	    || old_changedtick != qfl->qf_changedtick
-	    || !is_qf_entry_present(qfl, qf_ptr))
+	    || !is_qf_నమోదు_present(qfl, qf_ptr))
     {
-	if (qfl_type == QFLT_QUICKFIX)
-	    emsg(_(e_current_quickfix_list_was_changed));
-	else
-	    emsg(_(e_current_location_list_was_changed));
-	return QF_ABORT;
+	ఒకవేళ (qfl_type == QFLT_QUICKFIX)
+	    emsg(_(e_current_quickfix_list_was_మారింది));
+	లేకపోతే
+	    emsg(_(e_current_location_list_was_మారింది));
+	తిరిగి QF_ABORT;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3817,59 +3817,59 @@ qf_jump_open_window(
  * QF_ABORT if the quickfix/location list is freed by an autocmd when opening
  * the file.
  */
-    static int
-qf_jump_to_buffer(
+    స్థిర పూర్ణాంకం
+qf_jump_గమ్యం_బఫరు(
 	qf_info_T	*qi,
-	int		qf_index,
+	పూర్ణాంకం		qf_సూచీ,
 	qfline_T	*qf_ptr,
-	int		forceit,
-	int		prev_winid,
-	int		*opened_window,
-	int		openfold,
-	int		print_message)
+	పూర్ణాంకం		forceit,
+	పూర్ణాంకం		prev_winid,
+	పూర్ణాంకం		*opened_కిటికీ,
+	పూర్ణాంకం		openfold,
+	పూర్ణాంకం		print_సందేశం)
 {
     buf_T	*old_curbuf;
     linenr_T	old_lnum;
-    int		retval = OK;
+    పూర్ణాంకం		retval = OK;
 
     // If there is a file name, read the wanted file if needed, and check
     // autowrite etc.
     old_curbuf = curbuf;
     old_lnum = curwin->w_cursor.lnum;
 
-    if (qf_ptr->qf_fnum != 0)
+    ఒకవేళ (qf_ptr->qf_fnum != 0)
     {
-	retval = qf_jump_edit_buffer(qi, qf_ptr, forceit, prev_winid,
-						opened_window);
-	if (retval != OK)
-	    return retval;
+	retval = qf_jump_edit_బఫరు(qi, qf_ptr, forceit, prev_winid,
+						opened_కిటికీ);
+	ఒకవేళ (retval != OK)
+	    తిరిగి retval;
     }
 
     // When not switched to another buffer, still need to set pc mark
-    if (curbuf == old_curbuf)
+    ఒకవేళ (curbuf == old_curbuf)
 	setpcmark();
 
-    qf_jump_goto_line(qf_ptr->qf_lnum, qf_ptr->qf_col, qf_ptr->qf_viscol,
-	    qf_ptr->qf_pattern);
+    qf_jump_goto_పంక్తి(qf_ptr->qf_lnum, qf_ptr->qf_నిలువు, qf_ptr->qf_viscol,
+	    qf_ptr->qf_నమూనా);
 
 # ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_QUICKFIX) && openfold)
+    ఒకవేళ ((fdo_flags & FDO_QUICKFIX) && openfold)
 	foldOpenCursor();
 # endif
-    if (print_message)
-	qf_jump_print_msg(qi, qf_index, qf_ptr, old_curbuf, old_lnum);
+    ఒకవేళ (print_సందేశం)
+	qf_jump_print_సందేశం(qi, qf_సూచీ, qf_ptr, old_curbuf, old_lnum);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Jump to a quickfix line and try to use an existing window.
  */
-    void
+    శూన్య
 qf_jump(qf_info_T	*qi,
-	int		dir,
-	int		errornr,
-	int		forceit)
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		errornr,
+	పూర్ణాంకం		forceit)
 {
     qf_jump_newwin(qi, dir, errornr, forceit, FALSE);
 }
@@ -3885,40 +3885,40 @@ qf_jump(qf_info_T	*qi,
  * If 'forceit' is TRUE, then can discard changes to the current buffer.
  * If 'newwin' is TRUE, then open the file in a new window.
  */
-    static void
+    స్థిర శూన్య
 qf_jump_newwin(qf_info_T	*qi,
-	int		dir,
-	int		errornr,
-	int		forceit,
-	int		newwin)
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		errornr,
+	పూర్ణాంకం		forceit,
+	పూర్ణాంకం		newwin)
 {
     qf_list_T		*qfl;
     qfline_T		*qf_ptr;
     qfline_T		*old_qf_ptr;
-    int			qf_index;
-    int			old_qf_index;
+    పూర్ణాంకం			qf_సూచీ;
+    పూర్ణాంకం			old_qf_సూచీ;
     char_u		*old_swb = p_swb;
-    unsigned		old_swb_flags = swb_flags;
-    int			prev_winid;
-    int			opened_window = FALSE;
-    int			print_message = TRUE;
-    int			old_KeyTyped = KeyTyped; // getting file may reset it
-    int			retval = OK;
+    గుర్తులేని		old_swb_flags = swb_flags;
+    పూర్ణాంకం			prev_winid;
+    పూర్ణాంకం			opened_కిటికీ = FALSE;
+    పూర్ణాంకం			print_సందేశం = TRUE;
+    పూర్ణాంకం			old_కీలకం_Typed = కీలకం_Typed; // getting file may reset it
+    పూర్ణాంకం			retval = OK;
 
-    if (qi == NULL)
+    ఒకవేళ (qi == ఖాళీ)
     {
-	if (ql_info == NULL)
+	ఒకవేళ (ql_info == ఖాళీ)
 	{
-	    emsg(_(e_no_quickfix_stack));
-	    return;
+	    emsg(_(e_no_quickfix_దొంతర));
+	    తిరిగి;
 	}
 	qi = ql_info;
     }
 
-    if (qf_stack_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi) || qf_list_ఖాళీలు(qf_get_curlist(qi)))
     {
 	emsg(_(e_no_errors));
-	return;
+	తిరిగి;
     }
 
     incr_quickfix_busy();
@@ -3927,67 +3927,67 @@ qf_jump_newwin(qf_info_T	*qi,
 
     qf_ptr = qfl->qf_ptr;
     old_qf_ptr = qf_ptr;
-    qf_index = qfl->qf_index;
-    old_qf_index = qf_index;
+    qf_సూచీ = qfl->qf_సూచీ;
+    old_qf_సూచీ = qf_సూచీ;
 
-    qf_ptr = qf_get_entry(qfl, errornr, dir, &qf_index);
-    if (qf_ptr == NULL)
+    qf_ptr = qf_get_నమోదు(qfl, errornr, dir, &qf_సూచీ);
+    ఒకవేళ (qf_ptr == ఖాళీ)
     {
 	qf_ptr = old_qf_ptr;
-	qf_index = old_qf_index;
-	goto theend;
+	qf_సూచీ = old_qf_సూచీ;
+	వెళ్ళు theend;
     }
 
-    qfl->qf_index = qf_index;
+    qfl->qf_సూచీ = qf_సూచీ;
     qfl->qf_ptr = qf_ptr;
-    if (qf_win_pos_update(qi, old_qf_index))
+    ఒకవేళ (qf_win_pos_update(qi, old_qf_సూచీ))
 	// No need to print the error message if it's visible in the error
-	// window
-	print_message = FALSE;
+	//కిటికీ
+	print_సందేశం = FALSE;
 
     prev_winid = curwin->w_id;
 
-    retval = qf_jump_open_window(qi, qf_ptr, newwin, &opened_window);
-    if (retval == FAIL)
-	goto failed;
-    if (retval == QF_ABORT)
+    retval = qf_jump_open_కిటికీ(qi, qf_ptr, newwin, &opened_కిటికీ);
+    ఒకవేళ (retval == FAIL)
+	వెళ్ళు failed;
+    ఒకవేళ (retval == QF_ABORT)
     {
-	qi = NULL;
-	qf_ptr = NULL;
-	goto theend;
+	qi = ఖాళీ;
+	qf_ptr = ఖాళీ;
+	వెళ్ళు theend;
     }
-    if (retval == NOTDONE)
-	goto theend;
+    ఒకవేళ (retval == NOTDONE)
+	వెళ్ళు theend;
 
-    retval = qf_jump_to_buffer(qi, qf_index, qf_ptr, forceit, prev_winid,
-				  &opened_window, old_KeyTyped, print_message);
-    if (retval == QF_ABORT)
+    retval = qf_jump_గమ్యం_బఫరు(qi, qf_సూచీ, qf_ptr, forceit, prev_winid,
+				  &opened_కిటికీ, old_కీలకం_Typed, print_సందేశం);
+    ఒకవేళ (retval == QF_ABORT)
     {
 	// Quickfix/location list was modified by an autocmd
-	qi = NULL;
-	qf_ptr = NULL;
+	qi = ఖాళీ;
+	qf_ptr = ఖాళీ;
     }
 
-    if (retval != OK)
+    ఒకవేళ (retval != OK)
     {
-	if (opened_window)
+	ఒకవేళ (opened_కిటికీ)
 	    win_close(curwin, TRUE);    // Close opened window
-	if (qf_ptr != NULL && qf_ptr->qf_fnum != 0)
+	ఒకవేళ (qf_ptr != ఖాళీ && qf_ptr->qf_fnum != 0)
 	{
 	    // Couldn't open file, so put index back where it was.  This could
 	    // happen if the file was readonly and we changed something.
 failed:
 	    qf_ptr = old_qf_ptr;
-	    qf_index = old_qf_index;
+	    qf_సూచీ = old_qf_సూచీ;
 	}
     }
 theend:
-    if (qi != NULL)
+    ఒకవేళ (qi != ఖాళీ)
     {
 	qfl->qf_ptr = qf_ptr;
-	qfl->qf_index = qf_index;
+	qfl->qf_సూచీ = qf_సూచీ;
     }
-    if (p_swb != old_swb && p_swb == empty_option)
+    ఒకవేళ (p_swb != old_swb && p_swb == ఖాళీలు_option)
     {
 	// Restore old 'switchbuf' value, but not when an autocommand or
 	// modeline has changed the value.
@@ -3998,9 +3998,9 @@ theend:
 }
 
 // Highlight attributes used for displaying entries from the quickfix list.
-static int	qfFileAttr;
-static int	qfSepAttr;
-static int	qfLineAttr;
+స్థిర పూర్ణాంకం	qfFileAttr;
+స్థిర పూర్ణాంకం	qfSepAttr;
+స్థిర పూర్ణాంకం	qf_పంక్తి_Attr;
 
 /*
  * Display information about a single entry from the quickfix/location list.
@@ -4008,134 +4008,134 @@ static int	qfLineAttr;
  * 'cursel' will be set to TRUE for the currently selected entry in the
  * quickfix list.
  */
-    static void
-qf_list_entry(qfline_T *qfp, int qf_idx, int cursel)
+    స్థిర శూన్య
+qf_list_నమోదు(qfline_T *qfp, పూర్ణాంకం qf_idx, పూర్ణాంకం cursel)
 {
     char_u	*fname;
     buf_T	*buf;
-    int		filter_entry;
+    పూర్ణాంకం		filter_నమోదు;
     garray_T	*gap;
 
-    fname = NULL;
-    if (qfp->qf_module != NULL && *qfp->qf_module != NUL)
-	vim_snprintf((char *)IObuff, IOSIZE, "%2d %s", qf_idx,
-						(char *)qfp->qf_module);
-    else
+    fname = ఖాళీ;
+    ఒకవేళ (qfp->qf_module != ఖాళీ && *qfp->qf_module != NUL)
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, "%2d %s", qf_idx,
+						(అక్షరం *)qfp->qf_module);
+    లేకపోతే
     {
-	if (qfp->qf_fnum != 0
-		&& (buf = buflist_findnr(qfp->qf_fnum)) != NULL)
+	ఒకవేళ (qfp->qf_fnum != 0
+		&& (buf = buflist_findnr(qfp->qf_fnum)) != ఖాళీ)
 	{
-	    if (qfp->qf_fname == NULL)
+	    ఒకవేళ (qfp->qf_fname == ఖాళీ)
 		fname = buf->b_fname;
-	    else
+	    లేకపోతే
 		fname = qfp->qf_fname;
-	    if (qfp->qf_type == 1)	// :helpgrep
+	    ఒకవేళ (qfp->qf_type == 1)	// :helpgrep
 		fname = gettail(fname);
 	}
-	if (fname == NULL)
-	    sprintf((char *)IObuff, "%2d", qf_idx);
-	else
-	    vim_snprintf((char *)IObuff, IOSIZE, "%2d %s",
-		    qf_idx, (char *)fname);
+	ఒకవేళ (fname == ఖాళీ)
+	    sprintf((అక్షరం *)IObuff, "%2d", qf_idx);
+	లేకపోతే
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE, "%2d %s",
+		    qf_idx, (అక్షరం *)fname);
     }
 
     // Support for filtering entries using :filter /pat/ clist
     // Match against the module name, file name, search pattern and
     // text of the entry.
-    filter_entry = TRUE;
-    if (qfp->qf_module != NULL && *qfp->qf_module != NUL)
-	filter_entry &= message_filtered(qfp->qf_module);
-    if (filter_entry && fname != NULL)
-	filter_entry &= message_filtered(fname);
-    if (filter_entry && qfp->qf_pattern != NULL)
-	filter_entry &= message_filtered(qfp->qf_pattern);
-    if (filter_entry)
-	filter_entry &= message_filtered(qfp->qf_text);
-    if (filter_entry)
-	return;
+    filter_నమోదు = TRUE;
+    ఒకవేళ (qfp->qf_module != ఖాళీ && *qfp->qf_module != NUL)
+	filter_నమోదు &= సందేశం_filtered(qfp->qf_module);
+    ఒకవేళ (filter_నమోదు && fname != ఖాళీ)
+	filter_నమోదు &= సందేశం_filtered(fname);
+    ఒకవేళ (filter_నమోదు && qfp->qf_నమూనా != ఖాళీ)
+	filter_నమోదు &= సందేశం_filtered(qfp->qf_నమూనా);
+    ఒకవేళ (filter_నమోదు)
+	filter_నమోదు &= సందేశం_filtered(qfp->qf_పాఠ్యం);
+    ఒకవేళ (filter_నమోదు)
+	తిరిగి;
 
-    msg_putchar('\n');
-    msg_outtrans_attr(IObuff, cursel ? HL_ATTR(HLF_QFL) : qfFileAttr);
+    సందేశం_putchar('\n');
+    సందేశం_outtrans_attr(IObuff, cursel ? HL_ATTR(HLF_QFL) : qfFileAttr);
 
-    if (qfp->qf_lnum != 0)
-	msg_puts_attr(":", qfSepAttr);
+    ఒకవేళ (qfp->qf_lnum != 0)
+	సందేశం_puts_attr(":", qfSepAttr);
     gap = qfga_get();
-    if (qfp->qf_lnum != 0)
-	qf_range_text(gap, qfp);
+    ఒకవేళ (qfp->qf_lnum != 0)
+	qf_range_పాఠ్యం(gap, qfp);
     ga_concat(gap, qf_types(qfp->qf_type, qfp->qf_nr));
     ga_append(gap, NUL);
-    msg_puts_attr((char *)gap->ga_data, qfLineAttr);
-    msg_puts_attr(":", qfSepAttr);
-    if (qfp->qf_pattern != NULL)
+    సందేశం_puts_attr((అక్షరం *)gap->ga_దత్తాంశం, qf_పంక్తి_Attr);
+    సందేశం_puts_attr(":", qfSepAttr);
+    ఒకవేళ (qfp->qf_నమూనా != ఖాళీ)
     {
 	gap = qfga_get();
-	qf_fmt_text(gap, qfp->qf_pattern);
+	qf_fmt_పాఠ్యం(gap, qfp->qf_నమూనా);
 	ga_append(gap, NUL);
-	msg_puts((char *)gap->ga_data);
-	msg_puts_attr(":", qfSepAttr);
+	సందేశం_puts((అక్షరం *)gap->ga_దత్తాంశం);
+	సందేశం_puts_attr(":", qfSepAttr);
     }
-    msg_puts(" ");
+    సందేశం_puts(" ");
 
     // Remove newlines and leading whitespace from the text.  For an
     // unrecognized line keep the indent, the compiler may mark a word
     // with ^^^^.
     gap = qfga_get();
-    qf_fmt_text(gap, (fname != NULL || qfp->qf_lnum != 0)
-				     ? skipwhite(qfp->qf_text) : qfp->qf_text);
+    qf_fmt_పాఠ్యం(gap, (fname != ఖాళీ || qfp->qf_lnum != 0)
+				     ? skipwhite(qfp->qf_పాఠ్యం) : qfp->qf_పాఠ్యం);
     ga_append(gap, NUL);
-    msg_prt_line((char_u *)gap->ga_data, FALSE);
-    out_flush();		// show one line at a time
+    సందేశం_prt_పంక్తి((char_u *)gap->ga_దత్తాంశం, FALSE);
+    బహిర్గతం_flush();		// show one line at a time
 }
 
 /*
  * ":clist": list all errors
  * ":llist": list all locations
  */
-    void
+    శూన్య
 qf_list(exarg_T *eap)
 {
     qf_list_T	*qfl;
     qfline_T	*qfp;
-    int		i;
-    int		idx1 = 1;
-    int		idx2 = -1;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx1 = 1;
+    పూర్ణాంకం		idx2 = -1;
     char_u	*arg = eap->arg;
-    int		plus = FALSE;
-    int		all = eap->forceit;	// if not :cl!, only show
+    పూర్ణాంకం		plus = FALSE;
+    పూర్ణాంకం		all = eap->forceit;	// if not :cl!, only show
 					// recognised errors
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
-    if (qf_stack_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi) || qf_list_ఖాళీలు(qf_get_curlist(qi)))
     {
 	emsg(_(e_no_errors));
-	return;
+	తిరిగి;
     }
-    if (*arg == '+')
+    ఒకవేళ (*arg == '+')
     {
 	++arg;
 	plus = TRUE;
     }
-    if (!get_list_range(&arg, &idx1, &idx2) || *arg != NUL)
+    ఒకవేళ (!get_list_range(&arg, &idx1, &idx2) || *arg != NUL)
     {
 	semsg(_(e_trailing_characters_str), arg);
-	return;
+	తిరిగి;
     }
     qfl = qf_get_curlist(qi);
-    if (plus)
+    ఒకవేళ (plus)
     {
-	i = qfl->qf_index;
+	i = qfl->qf_సూచీ;
 	idx2 = i + idx1;
 	idx1 = i;
     }
-    else
+    లేకపోతే
     {
-	i = qfl->qf_count;
-	if (idx1 < 0)
+	i = qfl->qf_లెక్క;
+	ఒకవేళ (idx1 < 0)
 	    idx1 = (-idx1 > i) ? 0 : idx1 + i + 1;
-	if (idx2 < 0)
+	ఒకవేళ (idx2 < 0)
 	    idx2 = (-idx2 > i) ? 0 : idx2 + i + 1;
     }
 
@@ -4145,21 +4145,21 @@ qf_list(exarg_T *eap)
     // Get the attributes for the different quickfix highlight items.  Note
     // that this depends on syntax items defined in the qf.vim syntax file
     qfFileAttr = syn_name2attr((char_u *)"qfFileName");
-    if (qfFileAttr == 0)
+    ఒకవేళ (qfFileAttr == 0)
 	qfFileAttr = HL_ATTR(HLF_D);
     qfSepAttr = syn_name2attr((char_u *)"qfSeparator");
-    if (qfSepAttr == 0)
+    ఒకవేళ (qfSepAttr == 0)
 	qfSepAttr = HL_ATTR(HLF_D);
-    qfLineAttr = syn_name2attr((char_u *)"qfLineNr");
-    if (qfLineAttr == 0)
-	qfLineAttr = HL_ATTR(HLF_N);
+    qf_పంక్తి_Attr = syn_name2attr((char_u *)"qfLineNr");
+    ఒకవేళ (qf_పంక్తి_Attr == 0)
+	qf_పంక్తి_Attr = HL_ATTR(HLF_N);
 
-    if (qfl->qf_nonevalid)
+    ఒకవేళ (qfl->qf_nonevalid)
 	all = TRUE;
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
     {
-	if ((qfp->qf_valid || all) && idx1 <= i && i <= idx2)
-	    qf_list_entry(qfp, i, i == qfl->qf_index);
+	ఒకవేళ ((qfp->qf_valid || all) && idx1 <= i && i <= idx2)
+	    qf_list_నమోదు(qfp, i, i == qfl->qf_సూచీ);
 
 	ui_breakcheck();
     }
@@ -4170,20 +4170,20 @@ qf_list(exarg_T *eap)
  * Remove newlines and leading whitespace from an error message.
  * Add the result to the grow array "gap".
  */
-    static void
-qf_fmt_text(garray_T *gap, char_u *text)
+    స్థిర శూన్య
+qf_fmt_పాఠ్యం(garray_T *gap, char_u *పాఠ్యం)
 {
-    char_u	*p = text;
-    while (*p != NUL)
+    char_u	*p = పాఠ్యం;
+    అయితే (*p != NUL)
     {
-	if (*p == '\n')
+	ఒకవేళ (*p == '\n')
 	{
 	    ga_append(gap, ' ');
-	    while (*++p != NUL)
-		if (!VIM_ISWHITE(*p) && *p != '\n')
-		    break;
+	    అయితే (*++p != NUL)
+		ఒకవేళ (!VIM_ISWHITE(*p) && *p != '\n')
+		    ఆపు;
 	}
-	else
+	లేకపోతే
 	    ga_append(gap, *p++);
     }
 }
@@ -4192,52 +4192,52 @@ qf_fmt_text(garray_T *gap, char_u *text)
  * Add the range information from the lnum, col, end_lnum, and end_col values
  * of a quickfix entry to the grow array "gap".
  */
-    static void
-qf_range_text(garray_T *gap, qfline_T *qfp)
+    స్థిర శూన్య
+qf_range_పాఠ్యం(garray_T *gap, qfline_T *qfp)
 {
     string_T	buf = {IObuff, 0};
 
-    buf.length = vim_snprintf_safelen((char *)buf.string, IOSIZE, "%ld", qfp->qf_lnum);
+    buf.నిడివి = vim_snprintf_safelen((అక్షరం *)buf.string, IOSIZE, "%ld", qfp->qf_lnum);
 
-    if (qfp->qf_end_lnum > 0 && qfp->qf_lnum != qfp->qf_end_lnum)
+    ఒకవేళ (qfp->qf_చివర_lnum > 0 && qfp->qf_lnum != qfp->qf_చివర_lnum)
     {
-	buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-	    IOSIZE - buf.length, "-%ld", qfp->qf_end_lnum);
+	buf.నిడివి += vim_snprintf_safelen((అక్షరం *)buf.string + buf.నిడివి,
+	    IOSIZE - buf.నిడివి, "-%ld", qfp->qf_చివర_lnum);
     }
-    if (qfp->qf_col > 0)
+    ఒకవేళ (qfp->qf_నిలువు > 0)
     {
-	buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-	    IOSIZE - buf.length, " col %d", qfp->qf_col);
-	if (qfp->qf_end_col > 0 && qfp->qf_col != qfp->qf_end_col)
-	    buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		IOSIZE - buf.length, "-%d", qfp->qf_end_col);
+	buf.నిడివి += vim_snprintf_safelen((అక్షరం *)buf.string + buf.నిడివి,
+	    IOSIZE - buf.నిడివి, " col %d", qfp->qf_నిలువు);
+	ఒకవేళ (qfp->qf_చివర_నిలువు > 0 && qfp->qf_నిలువు != qfp->qf_చివర_నిలువు)
+	    buf.నిడివి += vim_snprintf_safelen((అక్షరం *)buf.string + buf.నిడివి,
+		IOSIZE - buf.నిడివి, "-%d", qfp->qf_చివర_నిలువు);
     }
 
-    ga_concat_len(gap, buf.string, buf.length);
+    ga_concat_len(gap, buf.string, buf.నిడివి);
 }
 
 /*
  * Display information (list number, list size and the title) about a
  * quickfix/location list.
  */
-    static void
-qf_msg(qf_info_T *qi, int which, char *lead)
+    స్థిర శూన్య
+qf_సందేశం(qf_info_T *qi, పూర్ణాంకం which, అక్షరం *lead)
 {
-    char   *title = (char *)qi->qf_lists[which].qf_title;
-    int    count = qi->qf_lists[which].qf_count;
+    అక్షరం   *title = (అక్షరం *)qi->qf_lists[which].qf_title;
+    పూర్ణాంకం    లెక్క = qi->qf_lists[which].qf_లెక్క;
     char_u buf[IOSIZE];
 
-    vim_snprintf((char *)buf, IOSIZE, _("%serror list %d of %d; %d errors "),
+    vim_snprintf((అక్షరం *)buf, IOSIZE, _("%serror list %d of %d; %d errors "),
 	    lead,
 	    which + 1,
 	    qi->qf_listcount,
-	    count);
+	    లెక్క);
 
-    if (title != NULL)
+    ఒకవేళ (title != ఖాళీ)
     {
 	size_t	len = STRLEN(buf);
 
-	if (len < 34)
+	ఒకవేళ (len < 34)
 	{
 	    vim_memset(buf + len, ' ', 34 - len);
 	    buf[34] = NUL;
@@ -4245,7 +4245,7 @@ qf_msg(qf_info_T *qi, int which, char *lead)
 	vim_strcat(buf, (char_u *)title, IOSIZE);
     }
     trunc_string(buf, buf, Columns - 1, IOSIZE);
-    msg((char *)buf);
+    సందేశం((అక్షరం *)buf);
 }
 
 /*
@@ -4254,126 +4254,126 @@ qf_msg(qf_info_T *qi, int which, char *lead)
  * ":lolder [count]": Up in the location list stack.
  * ":lnewer [count]": Down in the location list stack.
  */
-    void
+    శూన్య
 qf_age(exarg_T *eap)
 {
     qf_info_T	*qi;
-    int		count;
+    పూర్ణాంకం		లెక్క;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
-    if (eap->addr_count != 0)
-	count = eap->line2;
-    else
-	count = 1;
-    while (count--)
+    ఒకవేళ (eap->addr_లెక్క != 0)
+	లెక్క = eap->line2;
+    లేకపోతే
+	లెక్క = 1;
+    అయితే (లెక్క--)
     {
-	if (eap->cmdidx == CMD_colder || eap->cmdidx == CMD_lolder)
+	ఒకవేళ (eap->cmdidx == CMD_colder || eap->cmdidx == CMD_lolder)
 	{
-	    if (qi->qf_curlist == 0)
+	    ఒకవేళ (qi->qf_curlist == 0)
 	    {
-		emsg(_(e_at_bottom_of_quickfix_stack));
-		break;
+		emsg(_(e_at_bottom_యొక్క_quickfix_దొంతర));
+		ఆపు;
 	    }
 	    --qi->qf_curlist;
 	}
-	else
+	లేకపోతే
 	{
-	    if (qi->qf_curlist >= qi->qf_listcount - 1)
+	    ఒకవేళ (qi->qf_curlist >= qi->qf_listcount - 1)
 	    {
-		emsg(_(e_at_top_of_quickfix_stack));
-		break;
+		emsg(_(e_at_శిఖరం_యొక్క_quickfix_దొంతర));
+		ఆపు;
 	    }
 	    ++qi->qf_curlist;
 	}
     }
-    qf_msg(qi, qi->qf_curlist, "");
-    qf_update_buffer(qi, NULL);
+    qf_సందేశం(qi, qi->qf_curlist, "");
+    qf_update_బఫరు(qi, ఖాళీ);
 }
 
 /*
  * Display the information about all the quickfix/location lists in the stack
  */
-    void
+    శూన్య
 qf_history(exarg_T *eap)
 {
-    qf_info_T	*qi = qf_cmd_get_stack(eap, FALSE);
-    int		i;
+    qf_info_T	*qi = qf_cmd_get_దొంతర(eap, FALSE);
+    పూర్ణాంకం		i;
 
-    if (eap->addr_count > 0)
+    ఒకవేళ (eap->addr_లెక్క > 0)
     {
-	if (qi == NULL)
+	ఒకవేళ (qi == ఖాళీ)
 	{
 	    emsg(_(e_no_location_list));
-	    return;
+	    తిరిగి;
 	}
 
 	// Jump to the specified quickfix list
-	if (eap->line2 > 0 && eap->line2 <= qi->qf_listcount)
+	ఒకవేళ (eap->line2 > 0 && eap->line2 <= qi->qf_listcount)
 	{
 	    qi->qf_curlist = eap->line2 - 1;
-	    qf_msg(qi, qi->qf_curlist, "");
-	    qf_update_buffer(qi, NULL);
+	    qf_సందేశం(qi, qi->qf_curlist, "");
+	    qf_update_బఫరు(qi, ఖాళీ);
 	}
-	else
+	లేకపోతే
 	    emsg(_(e_invalid_range));
 
-	return;
+	తిరిగి;
     }
 
-    if (qf_stack_empty(qi))
-	msg(_("No entries"));
-    else
-	for (i = 0; i < qi->qf_listcount; ++i)
-	    qf_msg(qi, i, i == qi->qf_curlist ? "> " : "  ");
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi))
+	సందేశం(_("No entries"));
+    లేకపోతే
+	కొరకు (i = 0; i < qi->qf_listcount; ++i)
+	    qf_సందేశం(qi, i, i == qi->qf_curlist ? "> " : "  ");
 }
 
 /*
  * Free all the entries in the error list "idx". Note that other information
  * associated with the list like context and title are not freed.
  */
-    static void
-qf_free_items(qf_list_T *qfl)
+    స్థిర శూన్య
+qf_free_వస్తువులు(qf_list_T *qfl)
 {
     qfline_T	*qfp;
     qfline_T	*qfpnext;
-    int		stop = FALSE;
+    పూర్ణాంకం		stop = FALSE;
 
-    while (qfl->qf_count && qfl->qf_start != NULL)
+    అయితే (qfl->qf_లెక్క && qfl->qf_ప్రారంభం != ఖాళీ)
     {
-	qfp = qfl->qf_start;
-	qfpnext = qfp->qf_next;
-	if (!stop)
+	qfp = qfl->qf_ప్రారంభం;
+	qfpnext = qfp->qf_తదుపరి;
+	ఒకవేళ (!stop)
 	{
 	    vim_free(qfp->qf_fname);
 	    vim_free(qfp->qf_module);
-	    vim_free(qfp->qf_text);
-	    vim_free(qfp->qf_pattern);
-	    clear_tv(&qfp->qf_user_data);
+	    vim_free(qfp->qf_పాఠ్యం);
+	    vim_free(qfp->qf_నమూనా);
+	    clear_tv(&qfp->qf_user_దత్తాంశం);
 	    stop = (qfp == qfpnext);
 	    vim_free(qfp);
-	    if (stop)
+	    ఒకవేళ (stop)
 		// Somehow qf_count may have an incorrect value, set it to 1
 		// to avoid crashing when it's wrong.
 		// TODO: Avoid qf_count being incorrect.
-		qfl->qf_count = 1;
-	    else
-		qfl->qf_start = qfpnext;
+		qfl->qf_లెక్క = 1;
+	    లేకపోతే
+		qfl->qf_ప్రారంభం = qfpnext;
 	}
-	--qfl->qf_count;
+	--qfl->qf_లెక్క;
     }
 
-    qfl->qf_index = 0;
-    qfl->qf_start = NULL;
-    qfl->qf_last = NULL;
-    qfl->qf_ptr = NULL;
+    qfl->qf_సూచీ = 0;
+    qfl->qf_ప్రారంభం = ఖాళీ;
+    qfl->qf_చివరి = ఖాళీ;
+    qfl->qf_ptr = ఖాళీ;
     qfl->qf_nonevalid = TRUE;
 
-    qf_clean_dir_stack(&qfl->qf_dir_stack);
-    qfl->qf_directory = NULL;
-    qf_clean_dir_stack(&qfl->qf_file_stack);
-    qfl->qf_currfile = NULL;
+    qf_clean_dir_దొంతర(&qfl->qf_dir_దొంతర);
+    qfl->qf_directory = ఖాళీ;
+    qf_clean_dir_దొంతర(&qfl->qf_file_దొంతర);
+    qfl->qf_currfile = ఖాళీ;
     qfl->qf_multiline = FALSE;
     qfl->qf_multiignore = FALSE;
     qfl->qf_multiscan = FALSE;
@@ -4383,14 +4383,14 @@ qf_free_items(qf_list_T *qfl)
  * Free error list "idx". Frees all the entries in the quickfix list,
  * associated context information and the title.
  */
-    static void
+    స్థిర శూన్య
 qf_free(qf_list_T *qfl)
 {
-    qf_free_items(qfl);
+    qf_free_వస్తువులు(qfl);
 
     VIM_CLEAR(qfl->qf_title);
     free_tv(qfl->qf_ctx);
-    qfl->qf_ctx = NULL;
+    qfl->qf_ctx = ఖాళీ;
     free_callback(&qfl->qf_qftf_cb);
     qfl->qf_id = 0;
     qfl->qf_changedtick = 0L;
@@ -4399,58 +4399,58 @@ qf_free(qf_list_T *qfl)
 /*
  * qf_mark_adjust: adjust marks
  */
-   void
+   శూన్య
 qf_mark_adjust(
 	win_T	*wp,
 	linenr_T	line1,
 	linenr_T	line2,
-	long	amount,
-	long	amount_after)
+	దీర్ఘ	amount,
+	దీర్ఘ	amount_after)
 {
-    int		i;
+    పూర్ణాంకం		i;
     qfline_T	*qfp;
-    int		idx;
+    పూర్ణాంకం		idx;
     qf_info_T	*qi = ql_info;
-    int		found_one = FALSE;
-    int		buf_has_flag = wp == NULL ? BUF_HAS_QF_ENTRY : BUF_HAS_LL_ENTRY;
+    పూర్ణాంకం		దొరికింది_one = FALSE;
+    పూర్ణాంకం		buf_has_flag = wp == ఖాళీ ? BUF_HAS_QF_నమోదు : BUF_HAS_LL_నమోదు;
 
-    if (!(curbuf->b_has_qf_entry & buf_has_flag))
-	return;
-    if (wp != NULL)
+    ఒకవేళ (!(curbuf->b_has_qf_నమోదు & buf_has_flag))
+	తిరిగి;
+    ఒకవేళ (wp != ఖాళీ)
     {
-	if (wp->w_llist == NULL)
-	    return;
+	ఒకవేళ (wp->w_llist == ఖాళీ)
+	    తిరిగి;
 	qi = wp->w_llist;
     }
-    else if (qi == NULL)
-	return;
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
+	తిరిగి;
 
-    for (idx = 0; idx < qi->qf_listcount; ++idx)
+    కొరకు (idx = 0; idx < qi->qf_listcount; ++idx)
     {
 	qf_list_T	*qfl = qf_get_list(qi, idx);
 
-	if (!qf_list_empty(qfl))
-	    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
-		if (qfp->qf_fnum == curbuf->b_fnum)
+	ఒకవేళ (!qf_list_ఖాళీలు(qfl))
+	    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
+		ఒకవేళ (qfp->qf_fnum == curbuf->b_fnum)
 		{
-		    found_one = TRUE;
-		    if (qfp->qf_cleared)
-			continue;
+		    దొరికింది_one = TRUE;
+		    ఒకవేళ (qfp->qf_cleared)
+			కొనసాగు;
 
-		    if (qfp->qf_lnum >= line1 && qfp->qf_lnum <= line2)
+		    ఒకవేళ (qfp->qf_lnum >= line1 && qfp->qf_lnum <= line2)
 		    {
-			if (amount == MAXLNUM)
+			ఒకవేళ (amount == MAXLNUM)
 			    qfp->qf_cleared = TRUE;
-			else
+			లేకపోతే
 			    qfp->qf_lnum += amount;
 		    }
-		    else if (amount_after && qfp->qf_lnum > line2)
+		    లేకపోతే ఒకవేళ (amount_after && qfp->qf_lnum > line2)
 			qfp->qf_lnum += amount_after;
 		}
     }
 
-    if (!found_one)
-	curbuf->b_has_qf_entry &= ~buf_has_flag;
+    ఒకవేళ (!దొరికింది_one)
+	curbuf->b_has_qf_నమోదు &= ~buf_has_flag;
 }
 
 /*
@@ -4470,24 +4470,24 @@ qf_mark_adjust(
  *  other     n		" c n"
  *  1	      x		""	:helpgrep
  */
-    static char_u *
-qf_types(int c, int nr)
+    స్థిర char_u *
+qf_types(పూర్ణాంకం c, పూర్ణాంకం nr)
 {
-    static char_u	buf[20];
-    static char_u	cc[3];
+    స్థిర char_u	buf[20];
+    స్థిర char_u	cc[3];
     char_u		*p;
 
-    if (c == 'W' || c == 'w')
+    ఒకవేళ (c == 'W' || c == 'w')
 	p = (char_u *)" warning";
-    else if (c == 'I' || c == 'i')
+    లేకపోతే ఒకవేళ (c == 'I' || c == 'i')
 	p = (char_u *)" info";
-    else if (c == 'N' || c == 'n')
+    లేకపోతే ఒకవేళ (c == 'N' || c == 'n')
 	p = (char_u *)" note";
-    else if (c == 'E' || c == 'e' || (c == 0 && nr > 0))
+    లేకపోతే ఒకవేళ (c == 'E' || c == 'e' || (c == 0 && nr > 0))
 	p = (char_u *)" error";
-    else if (c == 0 || c == 1)
+    లేకపోతే ఒకవేళ (c == 0 || c == 1)
 	p = (char_u *)"";
-    else
+    లేకపోతే
     {
 	cc[0] = ' ';
 	cc[1] = c;
@@ -4495,45 +4495,45 @@ qf_types(int c, int nr)
 	p = cc;
     }
 
-    if (nr <= 0)
-	return p;
+    ఒకవేళ (nr <= 0)
+	తిరిగి p;
 
-    sprintf((char *)buf, "%s %3d", (char *)p, nr);
-    return buf;
+    sprintf((అక్షరం *)buf, "%s %3d", (అక్షరం *)p, nr);
+    తిరిగి buf;
 }
 
 /*
  * When "split" is FALSE: Open the entry/result under the cursor.
  * When "split" is TRUE: Open the entry/result under the cursor in a new window.
  */
-    void
-qf_view_result(int split)
+    శూన్య
+qf_view_ఫలితం(పూర్ణాంకం విభజించు)
 {
     qf_info_T   *qi = ql_info;
 
-    if (IS_LL_WINDOW(curwin))
+    ఒకవేళ (IS_LL_కిటికీ(curwin))
 	qi = GET_LOC_LIST(curwin);
-    else if (qi == NULL)
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
     {
-	emsg(_(e_no_quickfix_stack));
-	return;
+	emsg(_(e_no_quickfix_దొంతర));
+	తిరిగి;
     }
 
-    if (qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (qf_list_ఖాళీలు(qf_get_curlist(qi)))
     {
 	emsg(_(e_no_errors));
-	return;
+	తిరిగి;
     }
 
-    if (split)
+    ఒకవేళ (విభజించు)
     {
 	// Open the selected entry in a new window
-	qf_jump_newwin(qi, 0, (long)curwin->w_cursor.lnum, FALSE, TRUE);
+	qf_jump_newwin(qi, 0, (దీర్ఘ)curwin->w_cursor.lnum, FALSE, TRUE);
 	do_cmdline_cmd((char_u *) "clearjumps");
-	return;
+	తిరిగి;
     }
 
-    do_cmdline_cmd((char_u *)(IS_LL_WINDOW(curwin) ? ".ll" : ".cc"));
+    do_cmdline_cmd((char_u *)(IS_LL_కిటికీ(curwin) ? ".ll" : ".cc"));
 }
 
 /*
@@ -4542,32 +4542,32 @@ qf_view_result(int split)
  * ":lwindow": open the location list window if we have locations to display,
  *	       close it if not.
  */
-    void
+    శూన్య
 ex_cwindow(exarg_T *eap)
 {
     qf_info_T	*qi;
     qf_list_T	*qfl;
     win_T	*win;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
     qfl = qf_get_curlist(qi);
 
     // Look for an existing quickfix window.
-    win = qf_find_win(qi);
+    win = qf_కనుగొను_win(qi);
 
     // If a quickfix window is open but we have no errors to display,
     // close the window.  If a quickfix window is not open, then open
     // it if we have errors; otherwise, leave it closed.
-    if (qf_stack_empty(qi)
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi)
 	    || qfl->qf_nonevalid
-	    || qf_list_empty(qfl))
+	    || qf_list_ఖాళీలు(qfl))
     {
-	if (win != NULL)
+	ఒకవేళ (win != ఖాళీ)
 	    ex_cclose(eap);
     }
-    else if (win == NULL)
+    లేకపోతే ఒకవేళ (win == ఖాళీ)
 	ex_copen(eap);
 }
 
@@ -4575,77 +4575,77 @@ ex_cwindow(exarg_T *eap)
  * ":cclose": close the window showing the list of errors.
  * ":lclose": close the window showing the location list
  */
-    void
+    శూన్య
 ex_cclose(exarg_T *eap)
 {
-    win_T	*win = NULL;
+    win_T	*win = ఖాళీ;
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, FALSE)) == ఖాళీ)
+	తిరిగి;
 
     // Find existing quickfix window and close it.
-    win = qf_find_win(qi);
-    if (win != NULL)
+    win = qf_కనుగొను_win(qi);
+    ఒకవేళ (win != ఖాళీ)
 	win_close(win, FALSE);
 }
 
 /*
  * Set "w:quickfix_title" if "qi" has a title.
  */
-    static void
-qf_set_title_var(qf_list_T *qfl)
+    స్థిర శూన్య
+qf_సమితి_title_var(qf_list_T *qfl)
 {
-    if (qfl->qf_title != NULL)
-	set_internal_string_var((char_u *)"w:quickfix_title", qfl->qf_title);
+    ఒకవేళ (qfl->qf_title != ఖాళీ)
+	సమితి_అంతర్గత_string_var((char_u *)"w:quickfix_title", qfl->qf_title);
 }
 
 /*
  * Goto a quickfix or location list window (if present).
  * Returns OK if the window is found, FAIL otherwise.
  */
-    static int
-qf_goto_cwindow(qf_info_T *qi, int resize, int sz, int vertsplit)
+    స్థిర పూర్ణాంకం
+qf_goto_cwindow(qf_info_T *qi, పూర్ణాంకం resize, పూర్ణాంకం sz, పూర్ణాంకం vertsplit)
 {
     win_T	*win;
 
-    win = qf_find_win(qi);
-    if (win == NULL)
-	return FAIL;
+    win = qf_కనుగొను_win(qi);
+    ఒకవేళ (win == ఖాళీ)
+	తిరిగి FAIL;
 
     win_goto(win);
-    if (resize)
+    ఒకవేళ (resize)
     {
-	if (vertsplit)
+	ఒకవేళ (vertsplit)
 	{
-	    if (sz != win->w_width)
+	    ఒకవేళ (sz != win->w_వెడల్పు)
 		win_setwidth(sz);
 	}
-	else if (sz != win->w_height && win->w_height
-		       + win->w_status_height + tabline_height() < cmdline_row)
+	లేకపోతే ఒకవేళ (sz != win->w_ఎత్తు && win->w_ఎత్తు
+		       + win->w_స్థితి_ఎత్తు + tabline_ఎత్తు() < cmdline_అడ్డువరుస)
 	    win_setheight(sz);
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set options for the buffer in the quickfix or location list window.
  */
-    static void
-qf_set_cwindow_options(void)
+    స్థిర శూన్య
+qf_సమితి_cwindow_options(శూన్య)
 {
     // switch off 'swapfile'
-    set_option_value_give_err((char_u *)"swf", 0L, NULL, OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bt",
+    సమితి_option_విలువ_give_err((char_u *)"swf", 0L, ఖాళీ, OPT_LOCAL);
+    సమితి_option_విలువ_give_err((char_u *)"bt",
 					  0L, (char_u *)"quickfix", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+    సమితి_option_విలువ_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
     RESET_BINDING(curwin);
 # ifdef FEAT_DIFF
     curwin->w_p_diff = FALSE;
 # endif
 # ifdef FEAT_FOLDING
-    set_option_value_give_err((char_u *)"fdm", 0L, (char_u *)"manual",
+    సమితి_option_విలువ_give_err((char_u *)"fdm", 0L, (char_u *)"manual",
 	    OPT_LOCAL);
 # endif
 }
@@ -4655,39 +4655,39 @@ qf_set_cwindow_options(void)
  * set the appropriate options for the window.
  * Returns FAIL if the window could not be opened.
  */
-    static int
-qf_open_new_cwindow(qf_info_T *qi, int height)
+    స్థిర పూర్ణాంకం
+qf_open_new_cwindow(qf_info_T *qi, పూర్ణాంకం ఎత్తు)
 {
     buf_T	*qf_buf;
     win_T	*oldwin = curwin;
     tabpage_T	*prevtab = curtab;
-    int		flags = 0;
+    పూర్ణాంకం		flags = 0;
     win_T	*win;
 
-    qf_buf = qf_find_buf(qi);
+    qf_buf = qf_కనుగొను_buf(qi);
 
     // The current window becomes the previous window afterwards.
     win = curwin;
 
-    if (IS_QF_STACK(qi) && cmdmod.cmod_split == 0)
+    ఒకవేళ (IS_QF_దొంతర(qi) && cmdmod.cmod_విభజించు == 0)
 	// Create the new quickfix window at the very bottom, except when
 	// :belowright or :aboveleft is used.
 	win_goto(lastwin);
     // Default is to open the window below the current window
-    if (cmdmod.cmod_split == 0)
-	flags = WSP_BELOW;
+    ఒకవేళ (cmdmod.cmod_విభజించు == 0)
+	flags = WSP_క్రింద;
     flags |= WSP_NEWLOC;
 
     // Create a snapshot for quickfix window (not for location list)
     // so that when closing it, we can restore to the previous window
-    if (IS_QF_STACK(qi))
+    ఒకవేళ (IS_QF_దొంతర(qi))
 	flags |= WSP_QUICKFIX;
 
-    if (win_split(height, flags) == FAIL)
-	return FAIL;		// not enough room for window
+    ఒకవేళ (win_విభజించు(ఎత్తు, flags) == FAIL)
+	తిరిగి FAIL;		// not enough room for window
     RESET_BINDING(curwin);
 
-    if (IS_LL_STACK(qi))
+    ఒకవేళ (IS_LL_దొంతర(qi))
     {
 	// For the location list window, create a reference to the
 	// location list stack from the window 'win'.
@@ -4695,21 +4695,21 @@ qf_open_new_cwindow(qf_info_T *qi, int height)
 	qi->qf_refcount++;
     }
 
-    if (oldwin != curwin)
-	oldwin = NULL;  // don't store info when in another window
-    if (qf_buf != NULL)
+    ఒకవేళ (oldwin != curwin)
+	oldwin = ఖాళీ;  // don't store info when in another window
+    ఒకవేళ (qf_buf != ఖాళీ)
     {
 	// Use the existing quickfix buffer
-	if (do_ecmd(qf_buf->b_fnum, NULL, NULL, NULL, ECMD_ONE,
+	ఒకవేళ (do_ecmd(qf_buf->b_fnum, ఖాళీ, ఖాళీ, ఖాళీ, ECMD_ONE,
 		    ECMD_HIDE + ECMD_OLDBUF + ECMD_NOWINENTER, oldwin) == FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
     }
-    else
+    లేకపోతే
     {
 	// Create a new quickfix buffer
-	if (do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, ECMD_HIDE + ECMD_NOWINENTER,
+	ఒకవేళ (do_ecmd(0, ఖాళీ, ఖాళీ, ఖాళీ, ECMD_ONE, ECMD_HIDE + ECMD_NOWINENTER,
 							       oldwin) == FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
 
 	// save the number of the new buffer
 	qi->qf_bufnr = curbuf->b_fnum;
@@ -4718,42 +4718,42 @@ qf_open_new_cwindow(qf_info_T *qi, int height)
     // Set the options for the quickfix buffer/window (if not already done)
     // Do this even if the quickfix buffer was already present, as an autocmd
     // might have previously deleted (:bdelete) the quickfix buffer.
-    if (!bt_quickfix(curbuf))
-	qf_set_cwindow_options();
+    ఒకవేళ (!bt_quickfix(curbuf))
+	qf_సమితి_cwindow_options();
 
     // Only set the height when still in the same tab page and there is no
     // window to the side.
-    if (curtab == prevtab && curwin->w_width == Columns)
-	win_setheight(height);
+    ఒకవేళ (curtab == prevtab && curwin->w_వెడల్పు == Columns)
+	win_setheight(ఎత్తు);
     curwin->w_p_wfh = TRUE;	    // set 'winfixheight'
-    if (win_valid(win))
+    ఒకవేళ (win_valid(win))
 	prevwin = win;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * ":copen": open a window that shows the list of errors.
  * ":lopen": open a window that shows the location list.
  */
-    void
+    శూన్య
 ex_copen(exarg_T *eap)
 {
     qf_info_T	*qi;
     qf_list_T	*qfl;
-    int		height;
-    int		status = FAIL;
-    int		lnum;
+    పూర్ణాంకం		ఎత్తు;
+    పూర్ణాంకం		స్థితి_2 = FAIL;
+    పూర్ణాంకం		lnum;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
     incr_quickfix_busy();
 
-    if (eap->addr_count != 0)
-	height = eap->line2;
-    else
-	height = QF_WINHEIGHT;
+    ఒకవేళ (eap->addr_లెక్క != 0)
+	ఎత్తు = eap->line2;
+    లేకపోతే
+	ఎత్తు = QF_WINHEIGHT;
 
     reset_VIsual_and_resel();			// stop Visual mode
 # ifdef FEAT_GUI
@@ -4761,29 +4761,29 @@ ex_copen(exarg_T *eap)
 # endif
 
     // Find an existing quickfix window, or open a new one.
-    if (cmdmod.cmod_tab == 0)
-	status = qf_goto_cwindow(qi, eap->addr_count != 0, height,
-						cmdmod.cmod_split & WSP_VERT);
-    if (status == FAIL)
-	if (qf_open_new_cwindow(qi, height) == FAIL)
+    ఒకవేళ (cmdmod.cmod_tab == 0)
+	స్థితి_2 = qf_goto_cwindow(qi, eap->addr_లెక్క != 0, ఎత్తు,
+						cmdmod.cmod_విభజించు & WSP_VERT);
+    ఒకవేళ (స్థితి_2 == FAIL)
+	ఒకవేళ (qf_open_new_cwindow(qi, ఎత్తు) == FAIL)
 	{
 	    decr_quickfix_busy();
-	    return;
+	    తిరిగి;
 	}
 
     qfl = qf_get_curlist(qi);
-    qf_set_title_var(qfl);
+    qf_సమితి_title_var(qfl);
     // Save the current index here, as updating the quickfix buffer may free
     // the quickfix list
-    lnum = qfl->qf_index;
+    lnum = qfl->qf_సూచీ;
 
     // Fill the buffer with the quickfix list.
-    qf_fill_buffer(qfl, curbuf, NULL, curwin->w_id);
+    qf_fill_బఫరు(qfl, curbuf, ఖాళీ, curwin->w_id);
 
     decr_quickfix_busy();
 
     curwin->w_cursor.lnum = lnum;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
     check_cursor();
     update_topline();		// scroll to show the line
 }
@@ -4791,39 +4791,39 @@ ex_copen(exarg_T *eap)
 /*
  * Move the cursor in the quickfix window to "lnum".
  */
-    static void
+    స్థిర శూన్య
 qf_win_goto(win_T *win, linenr_T lnum)
 {
     win_T	*old_curwin = curwin;
 
     curwin = win;
-    curbuf = win->w_buffer;
+    curbuf = win->w_బఫరు;
     curwin->w_cursor.lnum = lnum;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
     curwin->w_cursor.coladd = 0;
     curwin->w_curswant = 0;
     update_topline();		// scroll to show the line
     redraw_later(UPD_VALID);
-    curwin->w_redr_status = true;	// update ruler
+    curwin->w_redr_స్థితి = true;	// update ruler
     curwin = old_curwin;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_బఫరు;
 }
 
 /*
  * :cbottom/:lbottom commands.
  */
-    void
+    శూన్య
 ex_cbottom(exarg_T *eap)
 {
     qf_info_T	*qi;
     win_T	*win;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
-    win = qf_find_win(qi);
-    if (win != NULL && win->w_cursor.lnum != win->w_buffer->b_ml.ml_line_count)
-	qf_win_goto(win, win->w_buffer->b_ml.ml_line_count);
+    win = qf_కనుగొను_win(qi);
+    ఒకవేళ (win != ఖాళీ && win->w_cursor.lnum != win->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
+	qf_win_goto(win, win->w_బఫరు->b_ml.ml_పంక్తి_లెక్క);
 }
 
 /*
@@ -4831,132 +4831,132 @@ ex_cbottom(exarg_T *eap)
  * window).
  */
     linenr_T
-qf_current_entry(win_T *wp)
+qf_current_నమోదు(win_T *wp)
 {
     qf_info_T	*qi = ql_info;
 
-    if (IS_LL_WINDOW(wp))
+    ఒకవేళ (IS_LL_కిటికీ(wp))
 	// In the location list window, use the referenced location list
 	qi = wp->w_llist_ref;
-    else if (qi == NULL)
-	return 0;
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
+	తిరిగి 0;
 
-    return qf_get_curlist(qi)->qf_index;
+    తిరిగి qf_get_curlist(qi)->qf_సూచీ;
 }
 
 /*
  * Update the cursor position in the quickfix window to the current error.
  * Return TRUE if there is a quickfix window.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_win_pos_update(
     qf_info_T	*qi,
-    int		old_qf_index)	// previous qf_index or zero
+    పూర్ణాంకం		old_qf_సూచీ)	// previous qf_index or zero
 {
     win_T	*win;
-    int		qf_index = qf_get_curlist(qi)->qf_index;
+    పూర్ణాంకం		qf_సూచీ = qf_get_curlist(qi)->qf_సూచీ;
 
     // Put the cursor on the current error in the quickfix window, so that
     // it's viewable.
-    win = qf_find_win(qi);
-    if (win != NULL
-	    && qf_index <= win->w_buffer->b_ml.ml_line_count
-	    && old_qf_index != qf_index)
+    win = qf_కనుగొను_win(qi);
+    ఒకవేళ (win != ఖాళీ
+	    && qf_సూచీ <= win->w_బఫరు->b_ml.ml_పంక్తి_లెక్క
+	    && old_qf_సూచీ != qf_సూచీ)
     {
-	if (qf_index > old_qf_index)
+	ఒకవేళ (qf_సూచీ > old_qf_సూచీ)
 	{
-	    win->w_redraw_top = old_qf_index;
-	    win->w_redraw_bot = qf_index;
+	    win->w_redraw_శిఖరం = old_qf_సూచీ;
+	    win->w_redraw_bot = qf_సూచీ;
 	}
-	else
+	లేకపోతే
 	{
-	    win->w_redraw_top = qf_index;
-	    win->w_redraw_bot = old_qf_index;
+	    win->w_redraw_శిఖరం = qf_సూచీ;
+	    win->w_redraw_bot = old_qf_సూచీ;
 	}
-	qf_win_goto(win, qf_index);
+	qf_win_goto(win, qf_సూచీ);
     }
-    return win != NULL;
+    తిరిగి win != ఖాళీ;
 }
 
 /*
  * Check whether the given window is displaying the specified quickfix/location
  * stack.
  */
-    static int
+    స్థిర పూర్ణాంకం
 is_qf_win(win_T *win, qf_info_T *qi)
 {
     // A window displaying the quickfix buffer will have the w_llist_ref field
     // set to NULL.
     // A window displaying a location list buffer will have the w_llist_ref
     // pointing to the location list.
-    if (buf_valid(win->w_buffer) && bt_quickfix(win->w_buffer))
-	if ((IS_QF_STACK(qi) && win->w_llist_ref == NULL)
-		|| (IS_LL_STACK(qi) && win->w_llist_ref == qi))
-	    return TRUE;
+    ఒకవేళ (buf_valid(win->w_బఫరు) && bt_quickfix(win->w_బఫరు))
+	ఒకవేళ ((IS_QF_దొంతర(qi) && win->w_llist_ref == ఖాళీ)
+		|| (IS_LL_దొంతర(qi) && win->w_llist_ref == qi))
+	    తిరిగి TRUE;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Find a window displaying the quickfix/location stack 'qi' in the current tab
  * page.
  */
-    static win_T *
-qf_find_win(qf_info_T *qi)
+    స్థిర win_T *
+qf_కనుగొను_win(qf_info_T *qi)
 {
     win_T	*win;
 
     FOR_ALL_WINDOWS(win)
-	if (is_qf_win(win, qi))
-	    return win;
-    return NULL;
+	ఒకవేళ (is_qf_win(win, qi))
+	    తిరిగి win;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Find a quickfix buffer.
  * Searches in windows opened in all the tab pages.
  */
-    static buf_T *
-qf_find_buf(qf_info_T *qi)
+    స్థిర buf_T *
+qf_కనుగొను_buf(qf_info_T *qi)
 {
     tabpage_T	*tp;
     win_T	*win;
 
-    if (qi->qf_bufnr != INVALID_QFBUFNR)
+    ఒకవేళ (qi->qf_bufnr != INVALID_QFBUFNR)
     {
 	buf_T	*qfbuf;
 	qfbuf = buflist_findnr(qi->qf_bufnr);
-	if (qfbuf != NULL)
-	    return qfbuf;
+	ఒకవేళ (qfbuf != ఖాళీ)
+	    తిరిగి qfbuf;
 	// buffer is no longer present
 	qi->qf_bufnr = INVALID_QFBUFNR;
     }
 
     FOR_ALL_TAB_WINDOWS(tp, win)
-	if (is_qf_win(win, qi))
-	    return win->w_buffer;
+	ఒకవేళ (is_qf_win(win, qi))
+	    తిరిగి win->w_బఫరు;
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Process the 'quickfixtextfunc' option value.
  * Returns OK or FAIL.
  */
-    char *
-did_set_quickfixtextfunc(optset_T *args UNUSED)
+    అక్షరం *
+did_సమితి_quickfixtextfunc(optset_T *వాదనలు వాడని)
 {
-    if (option_set_callback_func(p_qftf, &qftf_cb) == FAIL)
-	return e_invalid_argument;
+    ఒకవేళ (option_సమితి_callback_func(p_qftf, &qftf_cb) == FAIL)
+	తిరిగి e_invalid_వాదం;
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Update the w:quickfix_title variable in the quickfix/location list window in
  * all the tab pages.
  */
-    static void
+    స్థిర శూన్య
 qf_update_win_titlevar(qf_info_T *qi)
 {
     qf_list_T	*qfl = qf_get_curlist(qi);
@@ -4966,10 +4966,10 @@ qf_update_win_titlevar(qf_info_T *qi)
 
     FOR_ALL_TAB_WINDOWS(tp, win)
     {
-	if (is_qf_win(win, qi))
+	ఒకవేళ (is_qf_win(win, qi))
 	{
 	    curwin = win;
-	    qf_set_title_var(qfl);
+	    qf_సమితి_title_var(qfl);
 	}
     }
     curwin = save_curwin;
@@ -4978,34 +4978,34 @@ qf_update_win_titlevar(qf_info_T *qi)
 /*
  * Find the quickfix buffer.  If it exists, update the contents.
  */
-    static void
-qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
+    స్థిర శూన్య
+qf_update_బఫరు(qf_info_T *qi, qfline_T *old_చివరి)
 {
     buf_T	*buf;
     win_T	*win;
     aco_save_T	aco;
 
     // Check if a buffer for the quickfix list exists.  Update it.
-    buf = qf_find_buf(qi);
-    if (buf == NULL)
-	return;
+    buf = qf_కనుగొను_buf(qi);
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    linenr_T	old_line_count = buf->b_ml.ml_line_count;
-    int		qf_winid = 0;
+    linenr_T	old_పంక్తి_లెక్క = buf->b_ml.ml_పంక్తి_లెక్క;
+    పూర్ణాంకం		qf_winid = 0;
 
-    if (IS_LL_STACK(qi))
+    ఒకవేళ (IS_LL_దొంతర(qi))
     {
-	if (curwin->w_llist == qi)
+	ఒకవేళ (curwin->w_llist == qi)
 	    win = curwin;
-	else
+	లేకపోతే
 	{
 	    // Find the file window (non-quickfix) with this location list
-	    win = qf_find_win_with_loclist(qi);
-	    if (win == NULL)
+	    win = qf_కనుగొను_win_with_loclist(qi);
+	    ఒకవేళ (win == ఖాళీ)
 		// File window is not found. Find the location list window.
-		win = qf_find_win(qi);
-	    if (win == NULL)
-		return;
+		win = qf_కనుగొను_win(qi);
+	    ఒకవేళ (win == ఖాళీ)
+		తిరిగి;
 	}
 	qf_winid = win->w_id;
     }
@@ -5013,25 +5013,25 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
     // autocommands may cause trouble
     incr_quickfix_busy();
 
-    int do_fill = TRUE;
-    if (old_last == NULL)
+    పూర్ణాంకం do_fill = TRUE;
+    ఒకవేళ (old_చివరి == ఖాళీ)
     {
 	// set curwin/curbuf to buf and save a few things
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	ఒకవేళ (curbuf != buf)
 	    do_fill = FALSE;  // failed to find a window for "buf"
     }
 
-    if (do_fill)
+    ఒకవేళ (do_fill)
     {
 	qf_update_win_titlevar(qi);
 
-	qf_fill_buffer(qf_get_curlist(qi), buf, old_last, qf_winid);
+	qf_fill_బఫరు(qf_get_curlist(qi), buf, old_చివరి, qf_winid);
 	++CHANGEDTICK(buf);
 
-	if (old_last == NULL)
+	ఒకవేళ (old_చివరి == ఖాళీ)
 	{
-	    (void)qf_win_pos_update(qi, 0);
+	    (శూన్య)qf_win_pos_update(qi, 0);
 
 	    // restore curwin/curbuf and a few other things
 	    aucmd_restbuf(&aco);
@@ -5040,7 +5040,7 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
 
     // Only redraw when added lines are visible.  This avoids flickering
     // when the added lines are not visible.
-    if ((win = qf_find_win(qi)) != NULL && old_line_count < win->w_botline)
+    ఒకవేళ ((win = qf_కనుగొను_win(qi)) != ఖాళీ && old_పంక్తి_లెక్క < win->w_botline)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 
     // always called after incr_quickfix_busy()
@@ -5050,13 +5050,13 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
 /*
  * Add an error line to the quickfix buffer.
  */
-    static int
-qf_buf_add_line(
+    స్థిర పూర్ణాంకం
+qf_buf_కూడు_పంక్తి(
 	buf_T		*buf,		// quickfix window buffer
 	linenr_T	lnum,
 	qfline_T	*qfp,
 	char_u		*dirname,
-	int		first_bufline,
+	పూర్ణాంకం		మొదటి_bufline,
 	char_u		*qftf_str)
 {
     buf_T	*errbuf;
@@ -5066,111 +5066,111 @@ qf_buf_add_line(
 
     // If the 'quickfixtextfunc' function returned a non-empty custom string
     // for this entry, then use it.
-    if (qftf_str != NULL && *qftf_str != NUL)
+    ఒకవేళ (qftf_str != ఖాళీ && *qftf_str != NUL)
     {
 	ga_concat(gap, qftf_str);
     }
-    else
+    లేకపోతే
     {
-	if (qfp->qf_module != NULL)
+	ఒకవేళ (qfp->qf_module != ఖాళీ)
 	    ga_concat(gap, qfp->qf_module);
-	else if (qfp->qf_fnum != 0
-		&& (errbuf = buflist_findnr(qfp->qf_fnum)) != NULL
-		&& errbuf->b_fname != NULL)
+	లేకపోతే ఒకవేళ (qfp->qf_fnum != 0
+		&& (errbuf = buflist_findnr(qfp->qf_fnum)) != ఖాళీ
+		&& errbuf->b_fname != ఖాళీ)
 	{
-	    if (qfp->qf_type == 1)	// :helpgrep
+	    ఒకవేళ (qfp->qf_type == 1)	// :helpgrep
 		ga_concat(gap, gettail(errbuf->b_fname));
-	    else
+	    లేకపోతే
 	    {
 		// Shorten the file name if not done already.
 		// For optimization, do this only for the first entry in a
 		// buffer.
-		if (first_bufline && (errbuf->b_sfname == NULL
-				|| mch_isFullName(errbuf->b_sfname)))
+		ఒకవేళ (మొదటి_bufline && (errbuf->b_sfname == ఖాళీ
+				|| mch_is_నిండిన_Name(errbuf->b_sfname)))
 		{
-		    if (*dirname == NUL)
+		    ఒకవేళ (*dirname == NUL)
 			mch_dirname(dirname, MAXPATHL);
 		    shorten_buf_fname(errbuf, dirname, FALSE);
 		}
-		if (qfp->qf_fname == NULL)
+		ఒకవేళ (qfp->qf_fname == ఖాళీ)
 		    ga_concat(gap, errbuf->b_fname);
-		else
+		లేకపోతే
 		    ga_concat(gap, qfp->qf_fname);
 	    }
 	}
 
 	ga_append(gap, '|');
 
-	if (qfp->qf_lnum > 0)
+	ఒకవేళ (qfp->qf_lnum > 0)
 	{
-	    qf_range_text(gap, qfp);
+	    qf_range_పాఠ్యం(gap, qfp);
 	    ga_concat(gap, qf_types(qfp->qf_type, qfp->qf_nr));
 	}
-	else if (qfp->qf_pattern != NULL)
-	    qf_fmt_text(gap, qfp->qf_pattern);
+	లేకపోతే ఒకవేళ (qfp->qf_నమూనా != ఖాళీ)
+	    qf_fmt_పాఠ్యం(gap, qfp->qf_నమూనా);
 	ga_append(gap, '|');
 	ga_append(gap, ' ');
 
 	// Remove newlines and leading whitespace from the text.
 	// For an unrecognized line keep the indent, the compiler may
 	// mark a word with ^^^^.
-	qf_fmt_text(gap, gap->ga_len > 3 ? skipwhite(qfp->qf_text)
-							       : qfp->qf_text);
+	qf_fmt_పాఠ్యం(gap, gap->ga_len > 3 ? skipwhite(qfp->qf_పాఠ్యం)
+							       : qfp->qf_పాఠ్యం);
     }
 
     ga_append(gap, NUL);
-    if (ml_append_buf(buf, lnum, gap->ga_data, gap->ga_len, FALSE) == FAIL)
-	return FAIL;
+    ఒకవేళ (ml_append_buf(buf, lnum, gap->ga_దత్తాంశం, gap->ga_len, FALSE) == FAIL)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Call the 'quickfixtextfunc' function to get the list of lines to display in
  * the quickfix window for the entries 'start_idx' to 'end_idx'.
  */
-    static list_T *
-call_qftf_func(qf_list_T *qfl, int qf_winid, long start_idx, long end_idx)
+    స్థిర list_T *
+call_qftf_func(qf_list_T *qfl, పూర్ణాంకం qf_winid, దీర్ఘ ప్రారంభం_idx, దీర్ఘ చివర_idx)
 {
     callback_T	*cb = &qftf_cb;
-    list_T	*qftf_list = NULL;
-    static int	recursive = FALSE;
+    list_T	*qftf_list = ఖాళీ;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
 
-    if (recursive)
-	return NULL;  // this doesn't work properly recursively
+    ఒకవేళ (recursive)
+	తిరిగి ఖాళీ;  // this doesn't work properly recursively
     recursive = TRUE;
 
     // If 'quickfixtextfunc' is set, then use the user-supplied function to get
     // the text to display. Use the local value of 'quickfixtextfunc' if it is
     // set.
-    if (qfl->qf_qftf_cb.cb_name != NULL)
+    ఒకవేళ (qfl->qf_qftf_cb.cb_name != ఖాళీ)
 	cb = &qfl->qf_qftf_cb;
-    if (cb->cb_name != NULL)
+    ఒకవేళ (cb->cb_name != ఖాళీ)
     {
-	typval_T	args[1];
+	typval_T	వాదనలు[1];
 	dict_T		*d;
 	typval_T	rettv;
 
 	// create the dict argument
-	if ((d = dict_alloc_lock(VAR_FIXED)) == NULL)
+	ఒకవేళ ((d = dict_alloc_తాళం(VAR_FIXED)) == ఖాళీ)
 	{
 	    recursive = FALSE;
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	dict_add_number(d, "quickfix", (long)IS_QF_LIST(qfl));
-	dict_add_number(d, "winid", (long)qf_winid);
-	dict_add_number(d, "id", (long)qfl->qf_id);
-	dict_add_number(d, "start_idx", start_idx);
-	dict_add_number(d, "end_idx", end_idx);
+	dict_కూడు_సంఖ్య(d, "quickfix", (దీర్ఘ)IS_QF_LIST(qfl));
+	dict_కూడు_సంఖ్య(d, "winid", (దీర్ఘ)qf_winid);
+	dict_కూడు_సంఖ్య(d, "id", (దీర్ఘ)qfl->qf_id);
+	dict_కూడు_సంఖ్య(d, "start_idx", ప్రారంభం_idx);
+	dict_కూడు_సంఖ్య(d, "end_idx", చివర_idx);
 	++d->dv_refcount;
-	args[0].v_type = VAR_DICT;
-	args[0].vval.v_dict = d;
+	వాదనలు[0].v_type = VAR_DICT;
+	వాదనలు[0].vval.v_dict = d;
 
-	qftf_list = NULL;
+	qftf_list = ఖాళీ;
 	textlock++;
-	if (call_callback(cb, 0, &rettv, 1, args) != FAIL)
+	ఒకవేళ (call_callback(cb, 0, &rettv, 1, వాదనలు) != FAIL)
 	{
-	    if (rettv.v_type == VAR_LIST)
+	    ఒకవేళ (rettv.v_type == VAR_LIST)
 	    {
 		qftf_list = rettv.vval.v_list;
 		qftf_list->lv_refcount++;
@@ -5182,7 +5182,7 @@ call_qftf_func(qf_list_T *qfl, int qf_winid, long start_idx, long end_idx)
     }
 
     recursive = FALSE;
-    return qftf_list;
+    తిరిగి qftf_list;
 }
 
 /*
@@ -5192,24 +5192,24 @@ call_qftf_func(qf_list_T *qfl, int qf_winid, long start_idx, long end_idx)
  * When "old_last" is NULL then "buf" must equal "curbuf"!  Because
  * ml_delete() is used and autocommands will be triggered.
  */
-    static void
-qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
+    స్థిర శూన్య
+qf_fill_బఫరు(qf_list_T *qfl, buf_T *buf, qfline_T *old_చివరి, పూర్ణాంకం qf_winid)
 {
     linenr_T	lnum;
     qfline_T	*qfp;
-    int		old_KeyTyped = KeyTyped;
-    list_T	*qftf_list = NULL;
-    listitem_T	*qftf_li = NULL;
+    పూర్ణాంకం		old_కీలకం_Typed = కీలకం_Typed;
+    list_T	*qftf_list = ఖాళీ;
+    listitem_T	*qftf_li = ఖాళీ;
 
-    if (old_last == NULL)
+    ఒకవేళ (old_చివరి == ఖాళీ)
     {
 	win_T		*wp;
 	tabpage_T	*tp;
 
-	if (buf != curbuf)
+	ఒకవేళ (buf != curbuf)
 	{
-	    internal_error("qf_fill_buffer()");
-	    return;
+	    అంతర్గత_error("qf_fill_buffer()");
+	    తిరిగి;
 	}
 
 	// delete all existing lines
@@ -5219,11 +5219,11 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
 	//
 	// So we need to clean up undo information
 	// otherwise autocommands may invalidate the undo stack
-	while ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
-	    (void)ml_delete((linenr_T)1);
+	అయితే ((curbuf->b_ml.ml_flags & ML_ఖాళీలు) == 0)
+	    (శూన్య)ml_delete((linenr_T)1);
 
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == curbuf)
+	    ఒకవేళ (wp->w_బఫరు == curbuf)
 		wp->w_skipcol = 0;
 
 	// Remove all undo information
@@ -5231,65 +5231,65 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
     }
 
     // Check if there is anything to display
-    if (qfl != NULL && qfl->qf_start != NULL)
+    ఒకవేళ (qfl != ఖాళీ && qfl->qf_ప్రారంభం != ఖాళీ)
     {
 	char_u		dirname[MAXPATHL];
-	int		invalid_val = FALSE;
-	int		prev_bufnr = -1;
+	పూర్ణాంకం		invalid_val = FALSE;
+	పూర్ణాంకం		prev_bufnr = -1;
 
 	*dirname = NUL;
 
 	// Add one line for each error
-	if (old_last == NULL)
+	ఒకవేళ (old_చివరి == ఖాళీ)
 	{
-	    qfp = qfl->qf_start;
+	    qfp = qfl->qf_ప్రారంభం;
 	    lnum = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    if (old_last->qf_next != NULL)
-		qfp = old_last->qf_next;
-	    else
-		qfp = old_last;
-	    lnum = buf->b_ml.ml_line_count;
+	    ఒకవేళ (old_చివరి->qf_తదుపరి != ఖాళీ)
+		qfp = old_చివరి->qf_తదుపరి;
+	    లేకపోతే
+		qfp = old_చివరి;
+	    lnum = buf->b_ml.ml_పంక్తి_లెక్క;
 	}
 
-	qftf_list = call_qftf_func(qfl, qf_winid, (long)(lnum + 1),
-							(long)qfl->qf_count);
-	if (qftf_list != NULL)
-	    qftf_li = qftf_list->lv_first;
+	qftf_list = call_qftf_func(qfl, qf_winid, (దీర్ఘ)(lnum + 1),
+							(దీర్ఘ)qfl->qf_లెక్క);
+	ఒకవేళ (qftf_list != ఖాళీ)
+	    qftf_li = qftf_list->lv_మొదటి;
 
-	while (lnum < qfl->qf_count)
+	అయితే (lnum < qfl->qf_లెక్క)
 	{
-	    char_u	*qftf_str = NULL;
+	    char_u	*qftf_str = ఖాళీ;
 
 	    // Use the text supplied by the user defined function (if any).
 	    // If the returned value is not string, then ignore the rest
 	    // of the returned values and use the default.
-	    if (qftf_li != NULL && !invalid_val)
+	    ఒకవేళ (qftf_li != ఖాళీ && !invalid_val)
 	    {
 		qftf_str = tv_get_string_chk(&qftf_li->li_tv);
-		if (qftf_str == NULL)
+		ఒకవేళ (qftf_str == ఖాళీ)
 		    invalid_val = TRUE;
 	    }
 
-	    if (qf_buf_add_line(buf, lnum, qfp, dirname,
+	    ఒకవేళ (qf_buf_కూడు_పంక్తి(buf, lnum, qfp, dirname,
 			prev_bufnr != qfp->qf_fnum, qftf_str) == FAIL)
-		break;
+		ఆపు;
 
 	    prev_bufnr = qfp->qf_fnum;
 	    ++lnum;
-	    qfp = qfp->qf_next;
-	    if (qfp == NULL)
-		break;
+	    qfp = qfp->qf_తదుపరి;
+	    ఒకవేళ (qfp == ఖాళీ)
+		ఆపు;
 
-	    if (qftf_li != NULL)
-		qftf_li = qftf_li->li_next;
+	    ఒకవేళ (qftf_li != ఖాళీ)
+		qftf_li = qftf_li->li_తదుపరి;
 	}
 
-	if (old_last == NULL)
+	ఒకవేళ (old_చివరి == ఖాళీ)
 	    // Delete the empty line which is now at the end
-	    (void)ml_delete(lnum + 1);
+	    (శూన్య)ml_delete(lnum + 1);
 
 	list_unref(qftf_list);
 	qfga_clear();
@@ -5298,37 +5298,37 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
     // correct cursor position
     check_lnums(TRUE);
 
-    if (old_last == NULL)
+    ఒకవేళ (old_చివరి == ఖాళీ)
     {
 	// Set the 'filetype' to "qf" each time after filling the buffer.
 	// This resembles reading a file into a buffer, it's more logical when
 	// using autocommands.
-	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	++curbuf_తాళం;
+	సమితి_option_విలువ_give_err((char_u *)"ft",
 						0L, (char_u *)"qf", OPT_LOCAL);
 	curbuf->b_p_ma = FALSE;
 
 	curbuf->b_keep_filetype = true;	// don't detect 'filetype'
-	apply_autocmds(EVENT_BUFREADPOST, (char_u *)"quickfix", NULL,
+	apply_autocmds(EVENT_BUFREADPOST, (char_u *)"quickfix", ఖాళీ,
 							       FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, (char_u *)"quickfix", NULL,
+	apply_autocmds(EVENT_BUFWINENTER, (char_u *)"quickfix", ఖాళీ,
 							       FALSE, curbuf);
 	curbuf->b_keep_filetype = false;
-	--curbuf_lock;
+	--curbuf_తాళం;
 
 	// make sure it will be redrawn
 	redraw_curbuf_later(UPD_NOT_VALID);
     }
 
     // Restore KeyTyped, setting 'filetype' may reset it.
-    KeyTyped = old_KeyTyped;
+    కీలకం_Typed = old_కీలకం_Typed;
 }
 
 /*
  * For every change made to the quickfix list, update the changed tick.
  */
-    static void
-qf_list_changed(qf_list_T *qfl)
+    స్థిర శూన్య
+qf_list_మారింది(qf_list_T *qfl)
 {
     qfl->qf_changedtick++;
 }
@@ -5337,15 +5337,15 @@ qf_list_changed(qf_list_T *qfl)
  * Return the quickfix/location list number with the given identifier.
  * Returns -1 if list is not found.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_id2nr(qf_info_T *qi, int_u qfid)
 {
-    int		qf_idx;
+    పూర్ణాంకం		qf_idx;
 
-    for (qf_idx = 0; qf_idx < qi->qf_listcount; qf_idx++)
-	if (qi->qf_lists[qf_idx].qf_id == qfid)
-	    return qf_idx;
-    return INVALID_QFIDX;
+    కొరకు (qf_idx = 0; qf_idx < qi->qf_listcount; qf_idx++)
+	ఒకవేళ (qi->qf_lists[qf_idx].qf_id == qfid)
+	    తిరిగి qf_idx;
+    తిరిగి INVALID_QFIDX;
 }
 
 /*
@@ -5355,48 +5355,48 @@ qf_id2nr(qf_info_T *qi, int_u qfid)
  * Returns OK if successfully restored the list. Returns FAIL if the list with
  * the specified identifier (save_qfid) is not found in the stack.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_restore_list(qf_info_T *qi, int_u save_qfid)
 {
-    int curlist;
+    పూర్ణాంకం curlist;
 
-    if (qf_get_curlist(qi)->qf_id == save_qfid)
-	return OK;
+    ఒకవేళ (qf_get_curlist(qi)->qf_id == save_qfid)
+	తిరిగి OK;
 
     curlist = qf_id2nr(qi, save_qfid);
-    if (curlist < 0)
+    ఒకవేళ (curlist < 0)
 	// list is not present
-	return FAIL;
+	తిరిగి FAIL;
     qi->qf_curlist = curlist;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Jump to the first entry if there is one.
  */
-    static void
-qf_jump_first(qf_info_T *qi, int_u save_qfid, int forceit)
+    స్థిర శూన్య
+qf_jump_మొదటి(qf_info_T *qi, int_u save_qfid, పూర్ణాంకం forceit)
 {
-    if (qf_restore_list(qi, save_qfid) == FAIL)
-	return;
+    ఒకవేళ (qf_restore_list(qi, save_qfid) == FAIL)
+	తిరిగి;
 
 
-    if (!check_can_set_curbuf_forceit(forceit))
-	return;
+    ఒకవేళ (!check_can_సమితి_curbuf_forceit(forceit))
+	తిరిగి;
 
 
     // Autocommands might have cleared the list, check for that.
-    if (!qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (!qf_list_ఖాళీలు(qf_get_curlist(qi)))
 	qf_jump(qi, 0, 0, forceit);
 }
 
 /*
  * Return TRUE when using ":vimgrep" for ":grep".
  */
-    int
-grep_internal(cmdidx_T cmdidx)
+    పూర్ణాంకం
+grep_అంతర్గత(cmdidx_T cmdidx)
 {
-    return ((cmdidx == CMD_grep
+    తిరిగి ((cmdidx == CMD_grep
 		|| cmdidx == CMD_lgrep
 		|| cmdidx == CMD_grepadd
 		|| cmdidx == CMD_lgrepadd)
@@ -5407,18 +5407,18 @@ grep_internal(cmdidx_T cmdidx)
 /*
  * Return the make/grep autocmd name.
  */
-    static char_u *
+    స్థిర char_u *
 make_get_auname(cmdidx_T cmdidx)
 {
-    switch (cmdidx)
+    ఎంపిక (cmdidx)
     {
-	case CMD_make:	    return (char_u *)"make";
-	case CMD_lmake:	    return (char_u *)"lmake";
-	case CMD_grep:	    return (char_u *)"grep";
-	case CMD_lgrep:	    return (char_u *)"lgrep";
-	case CMD_grepadd:   return (char_u *)"grepadd";
-	case CMD_lgrepadd:  return (char_u *)"lgrepadd";
-	default: return NULL;
+	స్థితి CMD_make:	    తిరిగి (char_u *)"make";
+	స్థితి CMD_lmake:	    తిరిగి (char_u *)"lmake";
+	స్థితి CMD_grep:	    తిరిగి (char_u *)"grep";
+	స్థితి CMD_lgrep:	    తిరిగి (char_u *)"lgrep";
+	స్థితి CMD_grepadd:   తిరిగి (char_u *)"grepadd";
+	స్థితి CMD_lgrepadd:  తిరిగి (char_u *)"lgrepadd";
+	అప్రమేయ: తిరిగి ఖాళీ;
     }
 }
 
@@ -5427,183 +5427,183 @@ make_get_auname(cmdidx_T cmdidx)
  * Find a new unique name when 'makeef' contains "##".
  * Returns NULL for error.
  */
-    static char_u *
-get_mef_name(void)
+    స్థిర char_u *
+get_mef_name(శూన్య)
 {
     char_u	*p;
     char_u	*name;
-    static int	start = -1;
-    static int	off = 0;
+    స్థిర పూర్ణాంకం	ప్రారంభం = -1;
+    స్థిర పూర్ణాంకం	off = 0;
 # ifdef HAVE_LSTAT
     stat_T	sb;
 # endif
 
-    if (*p_mef == NUL)
+    ఒకవేళ (*p_mef == NUL)
     {
 	name = vim_tempname('e', FALSE);
-	if (name == NULL)
-	    emsg(_(e_cant_get_temp_file_name));
-	return name;
+	ఒకవేళ (name == ఖాళీ)
+	    emsg(_(e_cant_get_తాత్కాలిక_file_name));
+	తిరిగి name;
     }
 
-    for (p = p_mef; *p; ++p)
-	if (p[0] == '#' && p[1] == '#')
-	    break;
+    కొరకు (p = p_mef; *p; ++p)
+	ఒకవేళ (p[0] == '#' && p[1] == '#')
+	    ఆపు;
 
-    if (*p == NUL)
-	return vim_strsave(p_mef);
+    ఒకవేళ (*p == NUL)
+	తిరిగి vim_strsave(p_mef);
 
     // Keep trying until the name doesn't exist yet.
-    for (;;)
+    కొరకు (;;)
     {
-	if (start == -1)
-	    start = mch_get_pid();
-	else
+	ఒకవేళ (ప్రారంభం == -1)
+	    ప్రారంభం = mch_get_pid();
+	లేకపోతే
 	    off += 19;
 
 	name = alloc_id(STRLEN(p_mef) + 30, aid_qf_mef_name);
-	if (name == NULL)
-	    break;
+	ఒకవేళ (name == ఖాళీ)
+	    ఆపు;
 	STRCPY(name, p_mef);
-	sprintf((char *)name + (p - p_mef), "%d%d", start, off);
+	sprintf((అక్షరం *)name + (p - p_mef), "%d%d", ప్రారంభం, off);
 	STRCAT(name, p + 2);
-	if (mch_getperm(name) < 0
+	ఒకవేళ (mch_getperm(name) < 0
 # ifdef HAVE_LSTAT
 		    // Don't accept a symbolic link, it's a security risk.
-		    && mch_lstat((char *)name, &sb) < 0
+		    && mch_lstat((అక్షరం *)name, &sb) < 0
 # endif
 		)
-	    break;
+	    ఆపు;
 	vim_free(name);
     }
-    return name;
+    తిరిగి name;
 }
 
 /*
  * Form the complete command line to invoke 'make'/'grep'. Quote the command
  * using 'shellquote' and append 'shellpipe'. Echo the fully formed command.
  */
-    static char_u *
+    స్థిర char_u *
 make_get_fullcmd(char_u *makecmd, char_u *fname)
 {
     char_u	*cmd;
-    unsigned	len;
+    గుర్తులేని	len;
 
-    len = (unsigned)STRLEN(p_shq) * 2 + (unsigned)STRLEN(makecmd) + 1;
-    if (*p_sp != NUL)
-	len += (unsigned)STRLEN(p_sp) + (unsigned)STRLEN(fname) + 3;
+    len = (గుర్తులేని)STRLEN(p_shq) * 2 + (గుర్తులేని)STRLEN(makecmd) + 1;
+    ఒకవేళ (*p_sp != NUL)
+	len += (గుర్తులేని)STRLEN(p_sp) + (గుర్తులేని)STRLEN(fname) + 3;
     cmd = alloc_id(len, aid_qf_makecmd);
-    if (cmd == NULL)
-	return NULL;
-    sprintf((char *)cmd, "%s%s%s", (char *)p_shq, (char *)makecmd,
-							       (char *)p_shq);
+    ఒకవేళ (cmd == ఖాళీ)
+	తిరిగి ఖాళీ;
+    sprintf((అక్షరం *)cmd, "%s%s%s", (అక్షరం *)p_shq, (అక్షరం *)makecmd,
+							       (అక్షరం *)p_shq);
 
     // If 'shellpipe' empty: don't redirect to 'errorfile'.
-    if (*p_sp != NUL)
+    ఒకవేళ (*p_sp != NUL)
 	append_redir(cmd, len, p_sp, fname);
 
     // Display the fully formed command.  Output a newline if there's something
     // else than the :make command that was typed (in which case the cursor is
     // in column 0).
-    if (msg_col == 0)
-	msg_didout = FALSE;
-    msg_start();
-    msg_puts(":!");
-    msg_outtrans(cmd);		// show what we are doing
+    ఒకవేళ (సందేశం_నిలువు == 0)
+	సందేశం_didout = FALSE;
+    సందేశం_ప్రారంభం();
+    సందేశం_puts(":!");
+    సందేశం_outtrans(cmd);		// show what we are doing
 
-    return cmd;
+    తిరిగి cmd;
 }
 
 /*
  * Used for ":make", ":lmake", ":grep", ":lgrep", ":grepadd", and ":lgrepadd"
  */
-    void
+    శూన్య
 ex_make(exarg_T *eap)
 {
     char_u	*fname;
     char_u	*cmd;
-    char_u	*enc = NULL;
-    win_T	*wp = NULL;
+    char_u	*enc = ఖాళీ;
+    win_T	*wp = ఖాళీ;
     qf_info_T	*qi = ql_info;
-    int		res;
-    char_u	*au_name = NULL;
+    పూర్ణాంకం		res;
+    char_u	*au_name = ఖాళీ;
     int_u	save_qfid;
     char_u	*errorformat = p_efm;
-    int		newlist = TRUE;
+    పూర్ణాంకం		newlist = TRUE;
 
     // Redirect ":grep" to ":vimgrep" if 'grepprg' is "internal".
-    if (grep_internal(eap->cmdidx))
+    ఒకవేళ (grep_అంతర్గత(eap->cmdidx))
     {
 	ex_vimgrep(eap);
-	return;
+	తిరిగి;
     }
 
     au_name = make_get_auname(eap->cmdidx);
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
 					       curbuf->b_fname, TRUE, curbuf))
     {
 # ifdef FEAT_EVAL
-	if (aborting())
-	    return;
+	ఒకవేళ (aborting())
+	    తిరిగి;
 # endif
     }
     enc = (*curbuf->b_p_menc != NUL) ? curbuf->b_p_menc : p_menc;
 
-    if (is_loclist_cmd(eap->cmdidx))
+    ఒకవేళ (is_loclist_cmd(eap->cmdidx))
 	wp = curwin;
 
     autowrite_all();
     fname = get_mef_name();
-    if (fname == NULL)
-	return;
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి;
     mch_remove(fname);	    // in case it's not unique
 
     cmd = make_get_fullcmd(eap->arg, fname);
-    if (cmd == NULL)
+    ఒకవేళ (cmd == ఖాళీ)
     {
 	vim_free(fname);
-	return;
+	తిరిగి;
     }
 
     // let the shell know if we are redirecting output or not
     do_shell(cmd, *p_sp != NUL ? SHELL_DOOUT : 0);
 
 # ifdef AMIGA
-    out_flush();
+    బహిర్గతం_flush();
 		// read window status report and redraw before message
-    (void)char_avail();
+    (శూన్య)char_avail();
 # endif
 
     incr_quickfix_busy();
 
-    if (eap->cmdidx != CMD_make && eap->cmdidx != CMD_lmake)
+    ఒకవేళ (eap->cmdidx != CMD_make && eap->cmdidx != CMD_lmake)
 	errorformat =  *curbuf->b_p_gefm != NUL ? curbuf->b_p_gefm : p_gefm;
-    if (eap->cmdidx == CMD_grepadd || eap->cmdidx == CMD_lgrepadd)
+    ఒకవేళ (eap->cmdidx == CMD_grepadd || eap->cmdidx == CMD_lgrepadd)
 	newlist = FALSE;
 
     res = qf_init(wp, fname, errorformat, newlist, qf_cmdtitle(*eap->cmdlinep),
 									enc);
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
     {
 	qi = GET_LOC_LIST(wp);
-	if (qi == NULL)
-	    goto cleanup;
+	ఒకవేళ (qi == ఖాళీ)
+	    వెళ్ళు cleanup;
     }
-    else if (qi == NULL)
-	goto cleanup;
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
+	వెళ్ళు cleanup;
 
-    if (res >= 0)
-	qf_list_changed(qf_get_curlist(qi));
+    ఒకవేళ (res >= 0)
+	qf_list_మారింది(qf_get_curlist(qi));
 
     // Remember the current quickfix list identifier, so that we can
     // check for autocommands changing the current quickfix list.
     save_qfid = qf_get_curlist(qi)->qf_id;
-    if (au_name != NULL)
+    ఒకవేళ (au_name != ఖాళీ)
 	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name,
 					       curbuf->b_fname, TRUE, curbuf);
-    if (res > 0 && !eap->forceit && qflist_valid(wp, save_qfid))
+    ఒకవేళ (res > 0 && !eap->forceit && qflist_valid(wp, save_qfid))
 	// display the first error
-	qf_jump_first(qi, save_qfid, FALSE);
+	qf_jump_మొదటి(qi, save_qfid, FALSE);
 
 cleanup:
     decr_quickfix_busy();
@@ -5615,39 +5615,39 @@ cleanup:
 /*
  * Returns the number of entries in the current quickfix/location list.
  */
-    int
-qf_get_size(exarg_T *eap)
+    పూర్ణాంకం
+qf_get_కొలత(exarg_T *eap)
 {
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
-	return 0;
-    return qf_get_curlist(qi)->qf_count;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, FALSE)) == ఖాళీ)
+	తిరిగి 0;
+    తిరిగి qf_get_curlist(qi)->qf_లెక్క;
 }
 
 /*
  * Returns the number of valid entries in the current quickfix/location list.
  */
-    int
-qf_get_valid_size(exarg_T *eap)
+    పూర్ణాంకం
+qf_get_valid_కొలత(exarg_T *eap)
 {
     qf_info_T	*qi;
     qf_list_T	*qfl;
     qfline_T	*qfp;
-    int		i, sz = 0;
-    int		prev_fnum = 0;
+    పూర్ణాంకం		i, sz = 0;
+    పూర్ణాంకం		prev_fnum = 0;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
-	return 0;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, FALSE)) == ఖాళీ)
+	తిరిగి 0;
 
     qfl = qf_get_curlist(qi);
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
     {
-	if (qfp->qf_valid)
+	ఒకవేళ (qfp->qf_valid)
 	{
-	    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo)
+	    ఒకవేళ (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo)
 		sz++;	// Count all valid entries
-	    else if (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
+	    లేకపోతే ఒకవేళ (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
 	    {
 		// Count the number of files
 		sz++;
@@ -5656,66 +5656,66 @@ qf_get_valid_size(exarg_T *eap)
 	}
     }
 
-    return sz;
+    తిరిగి sz;
 }
 
 /*
  * Returns the current index of the quickfix/location list.
  * Returns 0 if there is an error.
  */
-    int
+    పూర్ణాంకం
 qf_get_cur_idx(exarg_T *eap)
 {
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
-	return 0;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, FALSE)) == ఖాళీ)
+	తిరిగి 0;
 
-    return qf_get_curlist(qi)->qf_index;
+    తిరిగి qf_get_curlist(qi)->qf_సూచీ;
 }
 
 /*
  * Returns the current index in the quickfix/location list (counting only valid
  * entries). If no valid entries are in the list, then returns 1.
  */
-    int
+    పూర్ణాంకం
 qf_get_cur_valid_idx(exarg_T *eap)
 {
     qf_info_T	*qi;
     qf_list_T	*qfl;
     qfline_T	*qfp;
-    int		i, eidx = 0;
-    int		prev_fnum = 0;
+    పూర్ణాంకం		i, eidx = 0;
+    పూర్ణాంకం		prev_fnum = 0;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
-	return 1;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, FALSE)) == ఖాళీ)
+	తిరిగి 1;
 
     qfl = qf_get_curlist(qi);
-    qfp = qfl->qf_start;
+    qfp = qfl->qf_ప్రారంభం;
 
     // check if the list has valid errors
-    if (!qf_list_has_valid_entries(qfl))
-	return 1;
+    ఒకవేళ (!qf_list_has_valid_entries(qfl))
+	తిరిగి 1;
 
-    for (i = 1; i <= qfl->qf_index && qfp!= NULL; i++, qfp = qfp->qf_next)
+    కొరకు (i = 1; i <= qfl->qf_సూచీ && qfp!= ఖాళీ; i++, qfp = qfp->qf_తదుపరి)
     {
-	if (qfp->qf_valid)
+	ఒకవేళ (qfp->qf_valid)
 	{
-	    if (eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
+	    ఒకవేళ (eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	    {
-		if (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
+		ఒకవేళ (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
 		{
 		    // Count the number of files
 		    eidx++;
 		    prev_fnum = qfp->qf_fnum;
 		}
 	    }
-	    else
+	    లేకపోతే
 		eidx++;
 	}
     }
 
-    return eidx ? eidx : 1;
+    తిరిగి eidx ? eidx : 1;
 }
 
 /*
@@ -5724,43 +5724,43 @@ qf_get_cur_valid_idx(exarg_T *eap)
  * For :cdo and :ldo returns the 'n'th valid error entry.
  * For :cfdo and :lfdo returns the 'n'th valid file entry.
  */
-    static int
-qf_get_nth_valid_entry(qf_list_T *qfl, int n, int fdo)
+    స్థిర పూర్ణాంకం
+qf_get_nth_valid_నమోదు(qf_list_T *qfl, పూర్ణాంకం n, పూర్ణాంకం fdo)
 {
     qfline_T	*qfp;
-    int		i, eidx;
-    int		prev_fnum = 0;
+    పూర్ణాంకం		i, eidx;
+    పూర్ణాంకం		prev_fnum = 0;
 
     // check if the list has valid errors
-    if (!qf_list_has_valid_entries(qfl))
-	return 1;
+    ఒకవేళ (!qf_list_has_valid_entries(qfl))
+	తిరిగి 1;
 
     eidx = 0;
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
     {
-	if (qfp->qf_valid)
+	ఒకవేళ (qfp->qf_valid)
 	{
-	    if (fdo)
+	    ఒకవేళ (fdo)
 	    {
-		if (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
+		ఒకవేళ (qfp->qf_fnum > 0 && qfp->qf_fnum != prev_fnum)
 		{
 		    // Count the number of files
 		    eidx++;
 		    prev_fnum = qfp->qf_fnum;
 		}
 	    }
-	    else
+	    లేకపోతే
 		eidx++;
 	}
 
-	if (eidx == n)
-	    break;
+	ఒకవేళ (eidx == n)
+	    ఆపు;
     }
 
-    if (i <= qfl->qf_count)
-	return i;
-    else
-	return 1;
+    ఒకవేళ (i <= qfl->qf_లెక్క)
+	తిరిగి i;
+    లేకపోతే
+	తిరిగి 1;
 }
 
 /*
@@ -5768,39 +5768,39 @@ qf_get_nth_valid_entry(qf_list_T *qfl, int n, int fdo)
  * ":ll", ":lrewind", ":lfirst" and ":llast".
  * ":cdo", ":ldo", ":cfdo" and ":lfdo"
  */
-    void
+    శూన్య
 ex_cc(exarg_T *eap)
 {
     qf_info_T	*qi;
-    int		errornr;
+    పూర్ణాంకం		errornr;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
-    if (eap->addr_count > 0)
-	errornr = (int)eap->line2;
-    else
+    ఒకవేళ (eap->addr_లెక్క > 0)
+	errornr = (పూర్ణాంకం)eap->line2;
+    లేకపోతే
     {
-	switch (eap->cmdidx)
+	ఎంపిక (eap->cmdidx)
 	{
-	    case CMD_cc: case CMD_ll:
+	    స్థితి CMD_cc: స్థితి CMD_ll:
 		errornr = 0;
-		break;
-	    case CMD_crewind: case CMD_lrewind: case CMD_cfirst:
-	    case CMD_lfirst:
+		ఆపు;
+	    స్థితి CMD_crewind: స్థితి CMD_lrewind: స్థితి CMD_cfirst:
+	    స్థితి CMD_lfirst:
 		errornr = 1;
-		break;
-	    default:
+		ఆపు;
+	    అప్రమేయ:
 		errornr = 32767;
 	}
     }
 
     // For cdo and ldo commands, jump to the nth valid error.
     // For cfdo and lfdo commands, jump to the nth valid file entry.
-    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+    ఒకవేళ (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 	    || eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
-	errornr = qf_get_nth_valid_entry(qf_get_curlist(qi),
-		eap->addr_count > 0 ? (int)eap->line1 : 1,
+	errornr = qf_get_nth_valid_నమోదు(qf_get_curlist(qi),
+		eap->addr_లెక్క > 0 ? (పూర్ణాంకం)eap->line1 : 1,
 		eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo);
 
     qf_jump(qi, 0, errornr, eap->forceit);
@@ -5811,42 +5811,42 @@ ex_cc(exarg_T *eap)
  * ":lnext", ":lNext", ":lprevious", ":lnfile", ":lNfile" and ":lpfile".
  * Also, used by ":cdo", ":ldo", ":cfdo" and ":lfdo" commands.
  */
-    void
+    శూన్య
 ex_cnext(exarg_T *eap)
 {
     qf_info_T	*qi;
-    int		errornr;
-    int		dir;
+    పూర్ణాంకం		errornr;
+    పూర్ణాంకం		dir;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
-    if (eap->addr_count > 0
+    ఒకవేళ (eap->addr_లెక్క > 0
 	    && (eap->cmdidx != CMD_cdo && eap->cmdidx != CMD_ldo
 		&& eap->cmdidx != CMD_cfdo && eap->cmdidx != CMD_lfdo))
-	errornr = (int)eap->line2;
-    else
+	errornr = (పూర్ణాంకం)eap->line2;
+    లేకపోతే
 	errornr = 1;
 
     // Depending on the command jump to either next or previous entry/file.
-    switch (eap->cmdidx)
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_cnext: case CMD_lnext: case CMD_cdo: case CMD_ldo:
+	స్థితి CMD_cnext: స్థితి CMD_lnext: స్థితి CMD_cdo: స్థితి CMD_ldo:
 	    dir = FORWARD;
-	    break;
-	case CMD_cprevious: case CMD_lprevious: case CMD_cNext:
-	case CMD_lNext:
+	    ఆపు;
+	స్థితి CMD_cprevious: స్థితి CMD_lprevious: స్థితి CMD_c_తదుపరి:
+	స్థితి CMD_l_తదుపరి:
 	    dir = BACKWARD;
-	    break;
-	case CMD_cnfile: case CMD_lnfile: case CMD_cfdo: case CMD_lfdo:
+	    ఆపు;
+	స్థితి CMD_cnfile: స్థితి CMD_lnfile: స్థితి CMD_cfdo: స్థితి CMD_lfdo:
 	    dir = FORWARD_FILE;
-	    break;
-	case CMD_cpfile: case CMD_lpfile: case CMD_cNfile: case CMD_lNfile:
+	    ఆపు;
+	స్థితి CMD_cpfile: స్థితి CMD_lpfile: స్థితి CMD_cNfile: స్థితి CMD_lNfile:
 	    dir = BACKWARD_FILE;
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 	    dir = FORWARD;
-	    break;
+	    ఆపు;
     }
 
     qf_jump(qi, dir, errornr, eap->forceit);
@@ -5857,19 +5857,19 @@ ex_cnext(exarg_T *eap)
  * The index of the entry is stored in 'errornr'.
  * Returns NULL if an entry is not found.
  */
-    static qfline_T *
-qf_find_first_entry_in_buf(qf_list_T *qfl, int bnr, int *errornr)
+    స్థిర qfline_T *
+qf_కనుగొను_మొదటి_నమోదు_లోపల_buf(qf_list_T *qfl, పూర్ణాంకం bnr, పూర్ణాంకం *errornr)
 {
-    qfline_T	*qfp = NULL;
-    int		idx = 0;
+    qfline_T	*qfp = ఖాళీ;
+    పూర్ణాంకం		idx = 0;
 
     // Find the first entry in this file
-    FOR_ALL_QFL_ITEMS(qfl, qfp, idx)
-	if (qfp->qf_fnum == bnr)
-	    break;
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, idx)
+	ఒకవేళ (qfp->qf_fnum == bnr)
+	    ఆపు;
 
     *errornr = idx;
-    return qfp;
+    తిరిగి qfp;
 }
 
 /*
@@ -5877,19 +5877,19 @@ qf_find_first_entry_in_buf(qf_list_T *qfl, int bnr, int *errornr)
  * with the error number for the first entry. Assumes the entries are sorted in
  * the quickfix list by line number.
  */
-    static qfline_T *
-qf_find_first_entry_on_line(qfline_T *entry, int *errornr)
+    స్థిర qfline_T *
+qf_కనుగొను_మొదటి_నమోదు_on_పంక్తి(qfline_T *నమోదు_2, పూర్ణాంకం *errornr)
 {
-    while (!got_int
-	    && entry->qf_prev != NULL
-	    && entry->qf_fnum == entry->qf_prev->qf_fnum
-	    && entry->qf_lnum == entry->qf_prev->qf_lnum)
+    అయితే (!got_int
+	    && నమోదు_2->qf_prev != ఖాళీ
+	    && నమోదు_2->qf_fnum == నమోదు_2->qf_prev->qf_fnum
+	    && నమోదు_2->qf_lnum == నమోదు_2->qf_prev->qf_lnum)
     {
-	entry = entry->qf_prev;
+	నమోదు_2 = నమోదు_2->qf_prev;
 	--*errornr;
     }
 
-    return entry;
+    తిరిగి నమోదు_2;
 }
 
 /*
@@ -5897,19 +5897,19 @@ qf_find_first_entry_on_line(qfline_T *entry, int *errornr)
  * with the error number for the last entry. Assumes the entries are sorted in
  * the quickfix list by line number.
  */
-    static qfline_T *
-qf_find_last_entry_on_line(qfline_T *entry, int *errornr)
+    స్థిర qfline_T *
+qf_కనుగొను_చివరి_నమోదు_on_పంక్తి(qfline_T *నమోదు_2, పూర్ణాంకం *errornr)
 {
-    while (!got_int &&
-	    entry->qf_next != NULL
-	    && entry->qf_fnum == entry->qf_next->qf_fnum
-	    && entry->qf_lnum == entry->qf_next->qf_lnum)
+    అయితే (!got_int &&
+	    నమోదు_2->qf_తదుపరి != ఖాళీ
+	    && నమోదు_2->qf_fnum == నమోదు_2->qf_తదుపరి->qf_fnum
+	    && నమోదు_2->qf_lnum == నమోదు_2->qf_తదుపరి->qf_lnum)
     {
-	entry = entry->qf_next;
+	నమోదు_2 = నమోదు_2->qf_తదుపరి;
 	++*errornr;
     }
 
-    return entry;
+    తిరిగి నమోదు_2;
 }
 
 /*
@@ -5917,14 +5917,14 @@ qf_find_last_entry_on_line(qfline_T *entry, int *errornr)
  *   after the given line (linewise is TRUE)
  *   or after the line and column.
  */
-    static int
-qf_entry_after_pos(qfline_T *qfp, pos_T *pos, int linewise)
+    స్థిర పూర్ణాంకం
+qf_నమోదు_after_pos(qfline_T *qfp, pos_T *pos, పూర్ణాంకం linewise)
 {
-    if (linewise)
-	return qfp->qf_lnum > pos->lnum;
-    else
-	return (qfp->qf_lnum > pos->lnum ||
-		(qfp->qf_lnum == pos->lnum && qfp->qf_col > pos->col));
+    ఒకవేళ (linewise)
+	తిరిగి qfp->qf_lnum > pos->lnum;
+    లేకపోతే
+	తిరిగి (qfp->qf_lnum > pos->lnum ||
+		(qfp->qf_lnum == pos->lnum && qfp->qf_నిలువు > pos->నిలువు));
 }
 
 /*
@@ -5932,14 +5932,14 @@ qf_entry_after_pos(qfline_T *qfp, pos_T *pos, int linewise)
  *   before the given line (linewise is TRUE)
  *   or before the line and column.
  */
-    static int
-qf_entry_before_pos(qfline_T *qfp, pos_T *pos, int linewise)
+    స్థిర పూర్ణాంకం
+qf_నమోదు_before_pos(qfline_T *qfp, pos_T *pos, పూర్ణాంకం linewise)
 {
-    if (linewise)
-	return qfp->qf_lnum < pos->lnum;
-    else
-	return (qfp->qf_lnum < pos->lnum ||
-		(qfp->qf_lnum == pos->lnum && qfp->qf_col < pos->col));
+    ఒకవేళ (linewise)
+	తిరిగి qfp->qf_lnum < pos->lnum;
+    లేకపోతే
+	తిరిగి (qfp->qf_lnum < pos->lnum ||
+		(qfp->qf_lnum == pos->lnum && qfp->qf_నిలువు < pos->నిలువు));
 }
 
 /*
@@ -5947,14 +5947,14 @@ qf_entry_before_pos(qfline_T *qfp, pos_T *pos, int linewise)
  *   on or after the given line (linewise is TRUE)
  *   or on or after the line and column.
  */
-    static int
-qf_entry_on_or_after_pos(qfline_T *qfp, pos_T *pos, int linewise)
+    స్థిర పూర్ణాంకం
+qf_నమోదు_on_or_after_pos(qfline_T *qfp, pos_T *pos, పూర్ణాంకం linewise)
 {
-    if (linewise)
-	return qfp->qf_lnum >= pos->lnum;
-    else
-	return (qfp->qf_lnum > pos->lnum ||
-		(qfp->qf_lnum == pos->lnum && qfp->qf_col >= pos->col));
+    ఒకవేళ (linewise)
+	తిరిగి qfp->qf_lnum >= pos->lnum;
+    లేకపోతే
+	తిరిగి (qfp->qf_lnum > pos->lnum ||
+		(qfp->qf_lnum == pos->lnum && qfp->qf_నిలువు >= pos->నిలువు));
 }
 
 /*
@@ -5962,14 +5962,14 @@ qf_entry_on_or_after_pos(qfline_T *qfp, pos_T *pos, int linewise)
  *   on or before the given line (linewise is TRUE)
  *   or on or before the line and column.
  */
-    static int
-qf_entry_on_or_before_pos(qfline_T *qfp, pos_T *pos, int linewise)
+    స్థిర పూర్ణాంకం
+qf_నమోదు_on_or_before_pos(qfline_T *qfp, pos_T *pos, పూర్ణాంకం linewise)
 {
-    if (linewise)
-	return qfp->qf_lnum <= pos->lnum;
-    else
-	return (qfp->qf_lnum < pos->lnum ||
-		(qfp->qf_lnum == pos->lnum && qfp->qf_col <= pos->col));
+    ఒకవేళ (linewise)
+	తిరిగి qfp->qf_lnum <= pos->lnum;
+    లేకపోతే
+	తిరిగి (qfp->qf_lnum < pos->lnum ||
+		(qfp->qf_lnum == pos->lnum && qfp->qf_నిలువు <= pos->నిలువు));
 }
 
 /*
@@ -5981,36 +5981,36 @@ qf_entry_on_or_before_pos(qfline_T *qfp, pos_T *pos, int linewise)
  * index of the very first entry in the quickfix list.
  * Returns NULL if an entry is not found after 'pos'.
  */
-    static qfline_T *
-qf_find_entry_after_pos(
-	int		bnr,
+    స్థిర qfline_T *
+qf_కనుగొను_నమోదు_after_pos(
+	పూర్ణాంకం		bnr,
 	pos_T		*pos,
-	int		linewise,
+	పూర్ణాంకం		linewise,
 	qfline_T	*qfp,
-	int		*errornr)
+	పూర్ణాంకం		*errornr)
 {
-    if (qf_entry_after_pos(qfp, pos, linewise))
+    ఒకవేళ (qf_నమోదు_after_pos(qfp, pos, linewise))
 	// First entry is after position 'pos'
-	return qfp;
+	తిరిగి qfp;
 
     // Find the entry just before or at the position 'pos'
-    while (qfp->qf_next != NULL
-	    && qfp->qf_next->qf_fnum == bnr
-	    && qf_entry_on_or_before_pos(qfp->qf_next, pos, linewise))
+    అయితే (qfp->qf_తదుపరి != ఖాళీ
+	    && qfp->qf_తదుపరి->qf_fnum == bnr
+	    && qf_నమోదు_on_or_before_pos(qfp->qf_తదుపరి, pos, linewise))
     {
-	qfp = qfp->qf_next;
+	qfp = qfp->qf_తదుపరి;
 	++*errornr;
     }
 
-    if (qfp->qf_next == NULL || qfp->qf_next->qf_fnum != bnr)
+    ఒకవేళ (qfp->qf_తదుపరి == ఖాళీ || qfp->qf_తదుపరి->qf_fnum != bnr)
 	// No entries found after position 'pos'
-	return NULL;
+	తిరిగి ఖాళీ;
 
     // Use the entry just after position 'pos'
-    qfp = qfp->qf_next;
+    qfp = qfp->qf_తదుపరి;
     ++*errornr;
 
-    return qfp;
+    తిరిగి qfp;
 }
 
 /*
@@ -6022,61 +6022,61 @@ qf_find_entry_after_pos(
  * index of the very first entry in the quickfix list.
  * Returns NULL if an entry is not found before 'pos'.
  */
-    static qfline_T *
-qf_find_entry_before_pos(
-	int		bnr,
+    స్థిర qfline_T *
+qf_కనుగొను_నమోదు_before_pos(
+	పూర్ణాంకం		bnr,
 	pos_T		*pos,
-	int		linewise,
+	పూర్ణాంకం		linewise,
 	qfline_T	*qfp,
-	int		*errornr)
+	పూర్ణాంకం		*errornr)
 {
     // Find the entry just before the position 'pos'
-    while (qfp->qf_next != NULL
-	    && qfp->qf_next->qf_fnum == bnr
-	    && qf_entry_before_pos(qfp->qf_next, pos, linewise))
+    అయితే (qfp->qf_తదుపరి != ఖాళీ
+	    && qfp->qf_తదుపరి->qf_fnum == bnr
+	    && qf_నమోదు_before_pos(qfp->qf_తదుపరి, pos, linewise))
     {
-	qfp = qfp->qf_next;
+	qfp = qfp->qf_తదుపరి;
 	++*errornr;
     }
 
-    if (qf_entry_on_or_after_pos(qfp, pos, linewise))
-	return NULL;
+    ఒకవేళ (qf_నమోదు_on_or_after_pos(qfp, pos, linewise))
+	తిరిగి ఖాళీ;
 
-    if (linewise)
+    ఒకవేళ (linewise)
 	// If multiple entries are on the same line, then use the first entry
-	qfp = qf_find_first_entry_on_line(qfp, errornr);
+	qfp = qf_కనుగొను_మొదటి_నమోదు_on_పంక్తి(qfp, errornr);
 
-    return qfp;
+    తిరిగి qfp;
 }
 
 /*
  * Find a quickfix entry in 'qfl' closest to position 'pos' in buffer 'bnr' in
  * the direction 'dir'.
  */
-    static qfline_T *
-qf_find_closest_entry(
+    స్థిర qfline_T *
+qf_కనుగొను_closest_నమోదు(
 	qf_list_T	*qfl,
-	int		bnr,
+	పూర్ణాంకం		bnr,
 	pos_T		*pos,
-	int		dir,
-	int		linewise,
-	int		*errornr)
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		linewise,
+	పూర్ణాంకం		*errornr)
 {
     qfline_T	*qfp;
 
     *errornr = 0;
 
     // Find the first entry in this file
-    qfp = qf_find_first_entry_in_buf(qfl, bnr, errornr);
-    if (qfp == NULL)
-	return NULL;		// no entry in this file
+    qfp = qf_కనుగొను_మొదటి_నమోదు_లోపల_buf(qfl, bnr, errornr);
+    ఒకవేళ (qfp == ఖాళీ)
+	తిరిగి ఖాళీ;		// no entry in this file
 
-    if (dir == FORWARD)
-	qfp = qf_find_entry_after_pos(bnr, pos, linewise, qfp, errornr);
-    else
-	qfp = qf_find_entry_before_pos(bnr, pos, linewise, qfp, errornr);
+    ఒకవేళ (dir == FORWARD)
+	qfp = qf_కనుగొను_నమోదు_after_pos(bnr, pos, linewise, qfp, errornr);
+    లేకపోతే
+	qfp = qf_కనుగొను_నమోదు_before_pos(bnr, pos, linewise, qfp, errornr);
 
-    return qfp;
+    తిరిగి qfp;
 }
 
 /*
@@ -6084,28 +6084,28 @@ qf_find_closest_entry(
  * the list. If linewise is TRUE, then treat multiple entries on a single line
  * as one.
  */
-    static void
-qf_get_nth_below_entry(qfline_T *entry_arg, int n, int linewise, int *errornr)
+    స్థిర శూన్య
+qf_get_nth_క్రింద_నమోదు(qfline_T *నమోదు_arg, పూర్ణాంకం n, పూర్ణాంకం linewise, పూర్ణాంకం *errornr)
 {
-    qfline_T *entry = entry_arg;
+    qfline_T *నమోదు_2 = నమోదు_arg;
 
-    while (n-- > 0 && !got_int)
+    అయితే (n-- > 0 && !got_int)
     {
-	int		first_errornr = *errornr;
+	పూర్ణాంకం		మొదటి_errornr = *errornr;
 
-	if (linewise)
+	ఒకవేళ (linewise)
 	    // Treat all the entries on the same line in this file as one
-	    entry = qf_find_last_entry_on_line(entry, errornr);
+	    నమోదు_2 = qf_కనుగొను_చివరి_నమోదు_on_పంక్తి(నమోదు_2, errornr);
 
-	if (entry->qf_next == NULL
-		|| entry->qf_next->qf_fnum != entry->qf_fnum)
+	ఒకవేళ (నమోదు_2->qf_తదుపరి == ఖాళీ
+		|| నమోదు_2->qf_తదుపరి->qf_fnum != నమోదు_2->qf_fnum)
 	{
-	    if (linewise)
-		*errornr = first_errornr;
-	    break;
+	    ఒకవేళ (linewise)
+		*errornr = మొదటి_errornr;
+	    ఆపు;
 	}
 
-	entry = entry->qf_next;
+	నమోదు_2 = నమోదు_2->qf_తదుపరి;
 	++*errornr;
     }
 }
@@ -6115,21 +6115,21 @@ qf_get_nth_below_entry(qfline_T *entry_arg, int n, int linewise, int *errornr)
  * the list. If linewise is TRUE, then treat multiple entries on a single line
  * as one.
  */
-    static void
-qf_get_nth_above_entry(qfline_T *entry, int n, int linewise, int *errornr)
+    స్థిర శూన్య
+qf_get_nth_above_నమోదు(qfline_T *నమోదు_2, పూర్ణాంకం n, పూర్ణాంకం linewise, పూర్ణాంకం *errornr)
 {
-    while (n-- > 0 && !got_int)
+    అయితే (n-- > 0 && !got_int)
     {
-	if (entry->qf_prev == NULL
-		|| entry->qf_prev->qf_fnum != entry->qf_fnum)
-	    break;
+	ఒకవేళ (నమోదు_2->qf_prev == ఖాళీ
+		|| నమోదు_2->qf_prev->qf_fnum != నమోదు_2->qf_fnum)
+	    ఆపు;
 
-	entry = entry->qf_prev;
+	నమోదు_2 = నమోదు_2->qf_prev;
 	--*errornr;
 
 	// If multiple entries are on the same line, then use the first entry
-	if (linewise)
-	    entry = qf_find_first_entry_on_line(entry, errornr);
+	ఒకవేళ (linewise)
+	    నమోదు_2 = qf_కనుగొను_మొదటి_నమోదు_on_పంక్తి(నమోదు_2, errornr);
     }
 }
 
@@ -6138,33 +6138,33 @@ qf_get_nth_above_entry(qfline_T *entry, int n, int linewise, int *errornr)
  * the specified direction.  Returns the error number in the quickfix list or 0
  * if an entry is not found.
  */
-    static int
-qf_find_nth_adj_entry(
+    స్థిర పూర్ణాంకం
+qf_కనుగొను_nth_adj_నమోదు(
 	qf_list_T	*qfl,
-	int		bnr,
+	పూర్ణాంకం		bnr,
 	pos_T		*pos,
-	int		n,
-	int		dir,
-	int		linewise)
+	పూర్ణాంకం		n,
+	పూర్ణాంకం		dir,
+	పూర్ణాంకం		linewise)
 {
-    qfline_T	*adj_entry;
-    int		errornr;
+    qfline_T	*adj_నమోదు;
+    పూర్ణాంకం		errornr;
 
     // Find an entry closest to the specified position
-    adj_entry = qf_find_closest_entry(qfl, bnr, pos, dir, linewise, &errornr);
-    if (adj_entry == NULL)
-	return 0;
+    adj_నమోదు = qf_కనుగొను_closest_నమోదు(qfl, bnr, pos, dir, linewise, &errornr);
+    ఒకవేళ (adj_నమోదు == ఖాళీ)
+	తిరిగి 0;
 
-    if (--n > 0)
+    ఒకవేళ (--n > 0)
     {
 	// Go to the n'th entry in the current buffer
-	if (dir == FORWARD)
-	    qf_get_nth_below_entry(adj_entry, n, linewise, &errornr);
-	else
-	    qf_get_nth_above_entry(adj_entry, n, linewise, &errornr);
+	ఒకవేళ (dir == FORWARD)
+	    qf_get_nth_క్రింద_నమోదు(adj_నమోదు, n, linewise, &errornr);
+	లేకపోతే
+	    qf_get_nth_above_నమోదు(adj_నమోదు, n, linewise, &errornr);
     }
 
-    return errornr;
+    తిరిగి errornr;
 }
 
 /*
@@ -6173,86 +6173,86 @@ qf_find_nth_adj_entry(
  * ":cabove", ":cbelow", ":labove", ":lbelow", ":cafter", ":cbefore",
  * ":lafter" and ":lbefore" commands
  */
-    void
+    శూన్య
 ex_cbelow(exarg_T *eap)
 {
     qf_info_T	*qi;
     qf_list_T	*qfl;
-    int		dir;
-    int		buf_has_flag;
-    int		errornr = 0;
+    పూర్ణాంకం		dir;
+    పూర్ణాంకం		buf_has_flag;
+    పూర్ణాంకం		errornr = 0;
     pos_T	pos;
 
-    if (eap->addr_count > 0 && eap->line2 <= 0)
+    ఒకవేళ (eap->addr_లెక్క > 0 && eap->line2 <= 0)
     {
 	emsg(_(e_invalid_range));
-	return;
+	తిరిగి;
     }
 
     // Check whether the current buffer has any quickfix entries
-    if (eap->cmdidx == CMD_cabove || eap->cmdidx == CMD_cbelow
+    ఒకవేళ (eap->cmdidx == CMD_cabove || eap->cmdidx == CMD_cbelow
 	    || eap->cmdidx == CMD_cbefore || eap->cmdidx == CMD_cafter)
-	buf_has_flag = BUF_HAS_QF_ENTRY;
-    else
-	buf_has_flag = BUF_HAS_LL_ENTRY;
-    if (!(curbuf->b_has_qf_entry & buf_has_flag))
+	buf_has_flag = BUF_HAS_QF_నమోదు;
+    లేకపోతే
+	buf_has_flag = BUF_HAS_LL_నమోదు;
+    ఒకవేళ (!(curbuf->b_has_qf_నమోదు & buf_has_flag))
     {
 	emsg(_(e_no_errors));
-	return;
+	తిరిగి;
     }
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
-	return;
+    ఒకవేళ ((qi = qf_cmd_get_దొంతర(eap, TRUE)) == ఖాళీ)
+	తిరిగి;
 
     qfl = qf_get_curlist(qi);
     // check if the list has valid errors
-    if (!qf_list_has_valid_entries(qfl))
+    ఒకవేళ (!qf_list_has_valid_entries(qfl))
     {
 	emsg(_(e_no_errors));
-	return;
+	తిరిగి;
     }
 
-    if (eap->cmdidx == CMD_cbelow
+    ఒకవేళ (eap->cmdidx == CMD_cbelow
 	    || eap->cmdidx == CMD_lbelow
 	    || eap->cmdidx == CMD_cafter
 	    || eap->cmdidx == CMD_lafter)
 	// Forward motion commands
 	dir = FORWARD;
-    else
+    లేకపోతే
 	dir = BACKWARD;
 
     pos = curwin->w_cursor;
     // A quickfix entry column number is 1 based whereas cursor column
     // number is 0 based. Adjust the column number.
-    pos.col++;
-    errornr = qf_find_nth_adj_entry(qfl, curbuf->b_fnum, &pos,
-				eap->addr_count > 0 ? eap->line2 : 0, dir,
+    pos.నిలువు++;
+    errornr = qf_కనుగొను_nth_adj_నమోదు(qfl, curbuf->b_fnum, &pos,
+				eap->addr_లెక్క > 0 ? eap->line2 : 0, dir,
 				eap->cmdidx == CMD_cbelow
 					|| eap->cmdidx == CMD_lbelow
 					|| eap->cmdidx == CMD_cabove
 					|| eap->cmdidx == CMD_labove);
 
-    if (errornr > 0)
+    ఒకవేళ (errornr > 0)
 	qf_jump(qi, 0, errornr, FALSE);
-    else
-	emsg(_(e_no_more_items));
+    లేకపోతే
+	emsg(_(e_no_మరిన్ని_వస్తువులు));
 }
 
 /*
  * Return the autocmd name for the :cfile Ex commands
  */
-    static char_u *
+    స్థిర char_u *
 cfile_get_auname(cmdidx_T cmdidx)
 {
-    switch (cmdidx)
+    ఎంపిక (cmdidx)
     {
-	case CMD_cfile:	    return (char_u *)"cfile";
-	case CMD_cgetfile:  return (char_u *)"cgetfile";
-	case CMD_caddfile:  return (char_u *)"caddfile";
-	case CMD_lfile:	    return (char_u *)"lfile";
-	case CMD_lgetfile:  return (char_u *)"lgetfile";
-	case CMD_laddfile:  return (char_u *)"laddfile";
-	default:	    return NULL;
+	స్థితి CMD_cfile:	    తిరిగి (char_u *)"cfile";
+	స్థితి CMD_cgetfile:  తిరిగి (char_u *)"cgetfile";
+	స్థితి CMD_caddfile:  తిరిగి (char_u *)"caddfile";
+	స్థితి CMD_lfile:	    తిరిగి (char_u *)"lfile";
+	స్థితి CMD_lgetfile:  తిరిగి (char_u *)"lgetfile";
+	స్థితి CMD_laddfile:  తిరిగి (char_u *)"laddfile";
+	అప్రమేయ:	    తిరిగి ఖాళీ;
     }
 }
 
@@ -6260,44 +6260,44 @@ cfile_get_auname(cmdidx_T cmdidx)
  * ":cfile"/":cgetfile"/":caddfile" commands.
  * ":lfile"/":lgetfile"/":laddfile" commands.
  */
-    void
+    శూన్య
 ex_cfile(exarg_T *eap)
 {
-    char_u	*enc = NULL;
-    win_T	*wp = NULL;
+    char_u	*enc = ఖాళీ;
+    win_T	*wp = ఖాళీ;
     qf_info_T	*qi = ql_info;
-    char_u	*au_name = NULL;
+    char_u	*au_name = ఖాళీ;
     int_u	save_qfid = 0;		// init for gcc
-    int		res;
+    పూర్ణాంకం		res;
 
     au_name = cfile_get_auname(eap->cmdidx);
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
-							NULL, FALSE, curbuf))
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+							ఖాళీ, FALSE, curbuf))
     {
 # ifdef FEAT_EVAL
-	if (aborting())
-	    return;
+	ఒకవేళ (aborting())
+	    తిరిగి;
 # endif
     }
 
     enc = (*curbuf->b_p_menc != NUL) ? curbuf->b_p_menc : p_menc;
 # ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    ఒకవేళ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	char_u *browse_file = do_browse(0, (char_u *)_("Error file"), eap->arg,
-				   NULL, NULL,
-				   (char_u *)_(BROWSE_FILTER_ALL_FILES), NULL);
-	if (browse_file == NULL)
-	    return;
-	set_string_option_direct((char_u *)"ef", -1, browse_file, OPT_FREE, 0);
+				   ఖాళీ, ఖాళీ,
+				   (char_u *)_(BROWSE_FILTER_ALL_FILES), ఖాళీ);
+	ఒకవేళ (browse_file == ఖాళీ)
+	    తిరిగి;
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ef", -1, browse_file, OPT_FREE, 0);
 	vim_free(browse_file);
     }
-    else
+    లేకపోతే
 # endif
-    if (*eap->arg != NUL)
-	set_string_option_direct((char_u *)"ef", -1, eap->arg, OPT_FREE, 0);
+    ఒకవేళ (*eap->arg != NUL)
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ef", -1, eap->arg, OPT_FREE, 0);
 
-    if (is_loclist_cmd(eap->cmdidx))
+    ఒకవేళ (is_loclist_cmd(eap->cmdidx))
 	wp = curwin;
 
     incr_quickfix_busy();
@@ -6313,32 +6313,32 @@ ex_cfile(exarg_T *eap)
     res = qf_init(wp, p_ef, p_efm, (eap->cmdidx != CMD_caddfile
 			&& eap->cmdidx != CMD_laddfile),
 			qf_cmdtitle(*eap->cmdlinep), enc);
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
     {
 	qi = GET_LOC_LIST(wp);
-	if (qi == NULL)
+	ఒకవేళ (qi == ఖాళీ)
 	{
 	    decr_quickfix_busy();
-	    return;
+	    తిరిగి;
 	}
     }
-    else if (qi == NULL)
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
     {
 	decr_quickfix_busy();
-	return;
+	తిరిగి;
     }
-    if (res >= 0)
-	qf_list_changed(qf_get_curlist(qi));
+    ఒకవేళ (res >= 0)
+	qf_list_మారింది(qf_get_curlist(qi));
     save_qfid = qf_get_curlist(qi)->qf_id;
-    if (au_name != NULL)
-	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name, NULL, FALSE, curbuf);
+    ఒకవేళ (au_name != ఖాళీ)
+	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name, ఖాళీ, FALSE, curbuf);
 
     // Jump to the first error for a new list and if autocmds didn't
     // free the list.
-    if (res > 0 && (eap->cmdidx == CMD_cfile || eap->cmdidx == CMD_lfile)
+    ఒకవేళ (res > 0 && (eap->cmdidx == CMD_cfile || eap->cmdidx == CMD_lfile)
 	    && qflist_valid(wp, save_qfid))
 	// display the first error
-	qf_jump_first(qi, save_qfid, eap->forceit);
+	qf_jump_మొదటి(qi, save_qfid, eap->forceit);
 
     decr_quickfix_busy();
 }
@@ -6346,43 +6346,43 @@ ex_cfile(exarg_T *eap)
 /*
  * Return the vimgrep autocmd name.
  */
-    static char_u *
+    స్థిర char_u *
 vgr_get_auname(cmdidx_T cmdidx)
 {
-    switch (cmdidx)
+    ఎంపిక (cmdidx)
     {
-	case CMD_vimgrep:     return (char_u *)"vimgrep";
-	case CMD_lvimgrep:    return (char_u *)"lvimgrep";
-	case CMD_vimgrepadd:  return (char_u *)"vimgrepadd";
-	case CMD_lvimgrepadd: return (char_u *)"lvimgrepadd";
-	case CMD_grep:	      return (char_u *)"grep";
-	case CMD_lgrep:	      return (char_u *)"lgrep";
-	case CMD_grepadd:     return (char_u *)"grepadd";
-	case CMD_lgrepadd:    return (char_u *)"lgrepadd";
-	default: return NULL;
+	స్థితి CMD_vimgrep:     తిరిగి (char_u *)"vimgrep";
+	స్థితి CMD_lvimgrep:    తిరిగి (char_u *)"lvimgrep";
+	స్థితి CMD_vimgrepadd:  తిరిగి (char_u *)"vimgrepadd";
+	స్థితి CMD_lvimgrepadd: తిరిగి (char_u *)"lvimgrepadd";
+	స్థితి CMD_grep:	      తిరిగి (char_u *)"grep";
+	స్థితి CMD_lgrep:	      తిరిగి (char_u *)"lgrep";
+	స్థితి CMD_grepadd:     తిరిగి (char_u *)"grepadd";
+	స్థితి CMD_lgrepadd:    తిరిగి (char_u *)"lgrepadd";
+	అప్రమేయ: తిరిగి ఖాళీ;
     }
 }
 
 /*
  * Initialize the regmatch used by vimgrep for pattern "s".
  */
-    static void
+    స్థిర శూన్య
 vgr_init_regmatch(regmmatch_T *regmatch, char_u *s)
 {
     // Get the search pattern: either white-separated or enclosed in //
-    regmatch->regprog = NULL;
+    regmatch->regprog = ఖాళీ;
 
-    if (s == NULL || *s == NUL)
+    ఒకవేళ (s == ఖాళీ || *s == NUL)
     {
 	// Pattern is empty, use last search pattern.
-	if (last_search_pat() == NULL)
+	ఒకవేళ (చివరి_శోధన_pat() == ఖాళీ)
 	{
-	    emsg(_(e_no_previous_regular_expression));
-	    return;
+	    emsg(_(e_no_మునుపటి_regular_వ్యక్తీకరణ));
+	    తిరిగి;
 	}
-	regmatch->regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+	regmatch->regprog = vim_regcomp(చివరి_శోధన_pat(), RE_MAGIC);
     }
-    else
+    లేకపోతే
 	regmatch->regprog = vim_regcomp(s, RE_MAGIC);
 
     regmatch->rmm_ic = p_ic;
@@ -6392,43 +6392,43 @@ vgr_init_regmatch(regmmatch_T *regmatch, char_u *s)
 /*
  * Display a file name when vimgrep is running.
  */
-    static void
+    స్థిర శూన్య
 vgr_display_fname(char_u *fname)
 {
     char_u	*p;
 
-    msg_start();
-    p = msg_strtrunc(fname, TRUE);
-    if (p == NULL)
-	msg_outtrans(fname);
-    else
+    సందేశం_ప్రారంభం();
+    p = సందేశం_strtrunc(fname, TRUE);
+    ఒకవేళ (p == ఖాళీ)
+	సందేశం_outtrans(fname);
+    లేకపోతే
     {
-	msg_outtrans(p);
+	సందేశం_outtrans(p);
 	vim_free(p);
     }
-    msg_clr_eos();
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
-    out_flush();
+    సందేశం_clr_eos();
+    సందేశం_didout = FALSE;	    // overwrite this message
+    సందేశం_nowait = TRUE;	    // don't wait for this message
+    సందేశం_నిలువు = 0;
+    బహిర్గతం_flush();
 }
 
 /*
  * Load a dummy buffer to search for a pattern using vimgrep.
  */
-    static buf_T *
-vgr_load_dummy_buf(
+    స్థిర buf_T *
+vgr_ఎక్కించు_dummy_buf(
 	char_u *fname,
-	char_u *dirname_start,
+	char_u *dirname_ప్రారంభం,
 	char_u *dirname_now)
 {
-    int		save_mls;
-# if defined(FEAT_SYN_HL)
-    char_u	*save_ei = NULL;
+    పూర్ణాంకం		save_mls;
+# ఒకవేళ defined(FEAT_SYN_HL)
+    char_u	*save_ei = ఖాళీ;
 # endif
     buf_T	*buf;
 
-# if defined(FEAT_SYN_HL)
+# ఒకవేళ defined(FEAT_SYN_HL)
     // Don't do Filetype autocommands to avoid loading syntax and
     // indent scripts, a great speed improvement.
     save_ei = au_event_disable(",Filetype");
@@ -6439,14 +6439,14 @@ vgr_load_dummy_buf(
 
     // Load file into a buffer, so that 'fileencoding' is detected,
     // autocommands applied, etc.
-    buf = load_dummy_buffer(fname, dirname_start, dirname_now);
+    buf = ఎక్కించు_dummy_బఫరు(fname, dirname_ప్రారంభం, dirname_now);
 
     p_mls = save_mls;
-# if defined(FEAT_SYN_HL)
+# ఒకవేళ defined(FEAT_SYN_HL)
     au_event_restore(save_ei);
 # endif
 
-    return buf;
+    తిరిగి buf;
 }
 
 /*
@@ -6454,7 +6454,7 @@ vgr_load_dummy_buf(
  * change a quickfix list when vimgrep is running. If the list is not found,
  * create a new list.
  */
-    static int
+    స్థిర పూర్ణాంకం
 vgr_qflist_valid(
 	win_T	    *wp,
 	qf_info_T   *qi,
@@ -6462,178 +6462,178 @@ vgr_qflist_valid(
 	char_u	    *title)
 {
     // Verify that the quickfix/location list was not freed by an autocmd
-    if (!qflist_valid(wp, qfid))
+    ఒకవేళ (!qflist_valid(wp, qfid))
     {
-	if (wp != NULL)
+	ఒకవేళ (wp != ఖాళీ)
 	{
 	    // An autocmd has freed the location list.
-	    emsg(_(e_current_location_list_was_changed));
-	    return FALSE;
+	    emsg(_(e_current_location_list_was_మారింది));
+	    తిరిగి FALSE;
 	}
-	else
+	లేకపోతే
 	{
 	    // Quickfix list is not found, create a new one.
 	    qf_new_list(qi, title);
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
     }
 
-    if (qf_restore_list(qi, qfid) == FAIL)
-	return FALSE;
+    ఒకవేళ (qf_restore_list(qi, qfid) == FAIL)
+	తిరిగి FALSE;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Search for a pattern in all the lines in a buffer and add the matching lines
  * to a quickfix list.
  */
-    static int
-vgr_match_buflines(
+    స్థిర పూర్ణాంకం
+vgr_సరిపోలిక_buflines(
 	qf_list_T   *qfl,
 	char_u	    *fname,
 	buf_T	    *buf,
 	char_u	    *spat,
 	regmmatch_T *regmatch,
-	long	    *tomatch,
-	int	    duplicate_name,
-	int	    flags)
+	దీర్ఘ	    *tomatch,
+	పూర్ణాంకం	    duplicate_name,
+	పూర్ణాంకం	    flags)
 {
-    int		found_match = FALSE;
-    long	lnum;
-    colnr_T	col;
-    int		pat_len = (int)STRLEN(spat);
-    if (pat_len > FUZZY_MATCH_MAX_LEN)
-	pat_len = FUZZY_MATCH_MAX_LEN;
+    పూర్ణాంకం		దొరికింది_సరిపోలిక = FALSE;
+    దీర్ఘ	lnum;
+    colnr_T	నిలువు;
+    పూర్ణాంకం		pat_len = (పూర్ణాంకం)STRLEN(spat);
+    ఒకవేళ (pat_len > FUZZY_సరిపోలిక_MAX_LEN)
+	pat_len = FUZZY_సరిపోలిక_MAX_LEN;
 
-    for (lnum = 1; lnum <= buf->b_ml.ml_line_count && *tomatch > 0; ++lnum)
+    కొరకు (lnum = 1; lnum <= buf->b_ml.ml_పంక్తి_లెక్క && *tomatch > 0; ++lnum)
     {
-	col = 0;
-	if (!(flags & VGR_FUZZY))
+	నిలువు = 0;
+	ఒకవేళ (!(flags & VGR_FUZZY))
 	{
 	    // Regular expression match
-	    while (vim_regexec_multi(regmatch, curwin, buf, lnum,
-								col, NULL) > 0)
+	    అయితే (vim_regexec_multi(regmatch, curwin, buf, lnum,
+								నిలువు, ఖాళీ) > 0)
 	    {
 		// Pass the buffer number so that it gets used even for a
 		// dummy buffer, unless duplicate_name is set, then the
 		// buffer will be wiped out below.
-		if (qf_add_entry(qfl,
-			    NULL,	// dir
+		ఒకవేళ (qf_కూడు_నమోదు(qfl,
+			    ఖాళీ,	// dir
 			    fname,
-			    NULL,
+			    ఖాళీ,
 			    duplicate_name ? 0 : buf->b_fnum,
 			    ml_get_buf(buf,
 				regmatch->startpos[0].lnum + lnum, FALSE),
 			    regmatch->startpos[0].lnum + lnum,
 			    regmatch->endpos[0].lnum + lnum,
-			    regmatch->startpos[0].col + 1,
-			    regmatch->endpos[0].col + 1,
+			    regmatch->startpos[0].నిలువు + 1,
+			    regmatch->endpos[0].నిలువు + 1,
 			    FALSE,	// vis_col
-			    NULL,	// search pattern
+			    ఖాళీ,	// search pattern
 			    0,		// nr
 			    0,		// type
-			    NULL,	// user_data
+			    ఖాళీ,	// user_data
 			    TRUE	// valid
 			    ) == QF_FAIL)
 		{
 		    got_int = TRUE;
-		    break;
+		    ఆపు;
 		}
-		found_match = TRUE;
-		if (--*tomatch == 0)
-		    break;
-		if ((flags & VGR_GLOBAL) == 0
+		దొరికింది_సరిపోలిక = TRUE;
+		ఒకవేళ (--*tomatch == 0)
+		    ఆపు;
+		ఒకవేళ ((flags & VGR_GLOBAL) == 0
 			|| regmatch->endpos[0].lnum > 0)
-		    break;
-		col = regmatch->endpos[0].col
-		    + (col == regmatch->endpos[0].col);
-		if (col > ml_get_buf_len(buf, lnum))
-		    break;
+		    ఆపు;
+		నిలువు = regmatch->endpos[0].నిలువు
+		    + (నిలువు == regmatch->endpos[0].నిలువు);
+		ఒకవేళ (నిలువు > ml_get_buf_len(buf, lnum))
+		    ఆపు;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    char_u  *str = ml_get_buf(buf, lnum, FALSE);
 	    colnr_T linelen = ml_get_buf_len(buf, lnum);
-	    int	    score;
-	    int_u   matches[FUZZY_MATCH_MAX_LEN];
-	    int_u   sz = ARRAY_LENGTH(matches);
+	    పూర్ణాంకం	    score;
+	    int_u   matches[FUZZY_సరిపోలిక_MAX_LEN];
+	    int_u   sz = ARRAY_నిడివి(matches);
 
 	    // Fuzzy string match
-	    CLEAR_FIELD(matches);
-	    while (fuzzy_match(str + col, spat, FALSE, &score,
+	    CLEAR_క్షేత్రం(matches);
+	    అయితే (fuzzy_సరిపోలిక(str + నిలువు, spat, FALSE, &score,
 			matches, sz) > 0)
 	    {
 		// Pass the buffer number so that it gets used even for a
 		// dummy buffer, unless duplicate_name is set, then the
 		// buffer will be wiped out below.
-		if (qf_add_entry(qfl,
-			    NULL,	// dir
+		ఒకవేళ (qf_కూడు_నమోదు(qfl,
+			    ఖాళీ,	// dir
 			    fname,
-			    NULL,
+			    ఖాళీ,
 			    duplicate_name ? 0 : buf->b_fnum,
 			    str,
 			    lnum,
 			    0,
-			    matches[0] + col + 1,
+			    matches[0] + నిలువు + 1,
 			    0,
 			    FALSE,	// vis_col
-			    NULL,	// search pattern
+			    ఖాళీ,	// search pattern
 			    0,		// nr
 			    0,		// type
-			    NULL,	// user_data
+			    ఖాళీ,	// user_data
 			    TRUE	// valid
 			    ) == QF_FAIL)
 		{
 		    got_int = TRUE;
-		    break;
+		    ఆపు;
 		}
-		found_match = TRUE;
-		if (--*tomatch == 0)
-		    break;
-		if ((flags & VGR_GLOBAL) == 0)
-		    break;
-		col = matches[pat_len - 1] + col + 1;
-		if (col > linelen)
-		    break;
+		దొరికింది_సరిపోలిక = TRUE;
+		ఒకవేళ (--*tomatch == 0)
+		    ఆపు;
+		ఒకవేళ ((flags & VGR_GLOBAL) == 0)
+		    ఆపు;
+		నిలువు = matches[pat_len - 1] + నిలువు + 1;
+		ఒకవేళ (నిలువు > linelen)
+		    ఆపు;
 	    }
 	}
-	line_breakcheck();
-	if (got_int)
-	    break;
+	పంక్తి_breakcheck();
+	ఒకవేళ (got_int)
+	    ఆపు;
     }
 
-    return found_match;
+    తిరిగి దొరికింది_సరిపోలిక;
 }
 
 /*
  * Jump to the first match and update the directory.
  */
-    static void
-vgr_jump_to_match(
+    స్థిర శూన్య
+vgr_jump_గమ్యం_సరిపోలిక(
 	qf_info_T   *qi,
-	int	    forceit,
-	int	    *redraw_for_dummy,
-	buf_T	    *first_match_buf,
-	char_u	    *target_dir)
+	పూర్ణాంకం	    forceit,
+	పూర్ణాంకం	    *redraw_for_dummy,
+	buf_T	    *మొదటి_సరిపోలిక_buf,
+	char_u	    *లక్ష్యం_dir)
 {
     buf_T	*buf;
 
     buf = curbuf;
     qf_jump(qi, 0, 0, forceit);
-    if (buf != curbuf)
+    ఒకవేళ (buf != curbuf)
 	// If we jumped to another buffer redrawing will already be
 	// taken care of.
 	*redraw_for_dummy = FALSE;
 
     // Jump to the directory used after loading the buffer.
-    if (curbuf == first_match_buf && target_dir != NULL)
+    ఒకవేళ (curbuf == మొదటి_సరిపోలిక_buf && లక్ష్యం_dir != ఖాళీ)
     {
 	exarg_T ea;
 
-	CLEAR_FIELD(ea);
-	ea.arg = target_dir;
+	CLEAR_క్షేత్రం(ea);
+	ea.arg = లక్ష్యం_dir;
 	ea.cmdidx = CMD_lcd;
 	ex_cd(&ea);
     }
@@ -6642,180 +6642,180 @@ vgr_jump_to_match(
 /*
  * :vimgrep command arguments
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    long	tomatch;	// maximum number of matches to find
+    దీర్ఘ	tomatch;	// maximum number of matches to find
     char_u	*spat;		// search pattern
-    int		flags;		// search modifier
+    పూర్ణాంకం		flags;		// search modifier
     char_u	**fnames;	// list of files to search
-    int		fcount;		// number of files
+    పూర్ణాంకం		fcount;		// number of files
     regmmatch_T	regmatch;	// compiled search pattern
     char_u	*qf_title;	// quickfix list title
-} vgr_args_T;
+} vgr_వాదనలు_T;
 
 /*
  * Process :vimgrep command arguments. The command syntax is:
  *
  *	:{count}vimgrep /{pattern}/[g][j] {file} ...
  */
-    static int
-vgr_process_args(
+    స్థిర పూర్ణాంకం
+vgr_process_వాదనలు(
 	exarg_T		*eap,
-	vgr_args_T	*args)
+	vgr_వాదనలు_T	*వాదనలు)
 {
     char_u	*p;
 
-    CLEAR_POINTER(args);
+    CLEAR_సూచిక(వాదనలు);
 
-    args->regmatch.regprog = NULL;
-    args->qf_title = vim_strsave(qf_cmdtitle(*eap->cmdlinep));
+    వాదనలు->regmatch.regprog = ఖాళీ;
+    వాదనలు->qf_title = vim_strsave(qf_cmdtitle(*eap->cmdlinep));
 
-    if (eap->addr_count > 0)
-	args->tomatch = eap->line2;
-    else
-	args->tomatch = MAXLNUM;
+    ఒకవేళ (eap->addr_లెక్క > 0)
+	వాదనలు->tomatch = eap->line2;
+    లేకపోతే
+	వాదనలు->tomatch = MAXLNUM;
 
     // Get the search pattern: either white-separated or enclosed in //
-    p = skip_vimgrep_pat(eap->arg, &args->spat, &args->flags);
-    if (p == NULL)
+    p = skip_vimgrep_pat(eap->arg, &వాదనలు->spat, &వాదనలు->flags);
+    ఒకవేళ (p == ఖాళీ)
     {
-	emsg(_(e_invalid_search_pattern_or_delimiter));
-	return FAIL;
+	emsg(_(e_invalid_శోధన_నమూనా_or_delimiter));
+	తిరిగి FAIL;
     }
 
-    vgr_init_regmatch(&args->regmatch, args->spat);
-    if (args->regmatch.regprog == NULL)
-	return FAIL;
+    vgr_init_regmatch(&వాదనలు->regmatch, వాదనలు->spat);
+    ఒకవేళ (వాదనలు->regmatch.regprog == ఖాళీ)
+	తిరిగి FAIL;
 
     p = skipwhite(p);
-    if (*p == NUL)
+    ఒకవేళ (*p == NUL)
     {
-	emsg(_(e_file_name_missing_or_invalid_pattern));
-	return FAIL;
+	emsg(_(e_file_name_missing_or_invalid_నమూనా));
+	తిరిగి FAIL;
     }
 
     // Parse the list of arguments, wildcards have already been expanded.
-    if ((get_arglist_exp(p, &args->fcount, &args->fnames, TRUE) == FAIL) ||
-	args->fcount == 0)
+    ఒకవేళ ((get_arglist_exp(p, &వాదనలు->fcount, &వాదనలు->fnames, TRUE) == FAIL) ||
+	వాదనలు->fcount == 0)
     {
-	emsg(_(e_no_match));
-	return FAIL;
+	emsg(_(e_no_సరిపోలిక));
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE if "buf" had an existing swap file, the current swap file does
  * not end in ".swp".
  */
-    static int
+    స్థిర పూర్ణాంకం
 existing_swapfile(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL && buf->b_ml.ml_mfp->mf_fname != NULL)
+    ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ && buf->b_ml.ml_mfp->mf_fname != ఖాళీ)
     {
 	char_u *fname = buf->b_ml.ml_mfp->mf_fname;
 	size_t len = STRLEN(fname);
 
-	return fname[len - 1] != 'p' || fname[len - 2] != 'w';
+	తిరిగి fname[len - 1] != 'p' || fname[len - 2] != 'w';
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Search for a pattern in a list of files and populate the quickfix list with
  * the matches.
  */
-    static int
+    స్థిర పూర్ణాంకం
 vgr_process_files(
 	win_T		*wp,
 	qf_info_T	*qi,
-	vgr_args_T	*cmd_args,
-	int		*redraw_for_dummy,
-	buf_T		**first_match_buf,
-	char_u		**target_dir)
+	vgr_వాదనలు_T	*cmd_వాదనలు,
+	పూర్ణాంకం		*redraw_for_dummy,
+	buf_T		**మొదటి_సరిపోలిక_buf,
+	char_u		**లక్ష్యం_dir)
 {
-    int		status = FAIL;
+    పూర్ణాంకం		స్థితి_2 = FAIL;
     int_u	save_qfid = qf_get_curlist(qi)->qf_id;
     time_t	seconds = 0;
     char_u	*fname;
-    int		fi;
+    పూర్ణాంకం		fi;
     buf_T	*buf;
-    int		duplicate_name = FALSE;
-    int		using_dummy;
-    char_u	*dirname_start = NULL;
-    char_u	*dirname_now = NULL;
-    int		found_match;
+    పూర్ణాంకం		duplicate_name = FALSE;
+    పూర్ణాంకం		using_dummy;
+    char_u	*dirname_ప్రారంభం = ఖాళీ;
+    char_u	*dirname_now = ఖాళీ;
+    పూర్ణాంకం		దొరికింది_సరిపోలిక;
     aco_save_T	aco;
 
-    dirname_start = alloc_id(MAXPATHL, aid_qf_dirname_start);
+    dirname_ప్రారంభం = alloc_id(MAXPATHL, aid_qf_dirname_ప్రారంభం);
     dirname_now = alloc_id(MAXPATHL, aid_qf_dirname_now);
-    if (dirname_start == NULL || dirname_now == NULL)
-	goto theend;
+    ఒకవేళ (dirname_ప్రారంభం == ఖాళీ || dirname_now == ఖాళీ)
+	వెళ్ళు theend;
 
     // Remember the current directory, because a BufRead autocommand that does
     // ":lcd %:p:h" changes the meaning of short path names.
-    mch_dirname(dirname_start, MAXPATHL);
+    mch_dirname(dirname_ప్రారంభం, MAXPATHL);
 
     seconds = (time_t)0;
-    for (fi = 0; fi < cmd_args->fcount && !got_int && cmd_args->tomatch > 0;
+    కొరకు (fi = 0; fi < cmd_వాదనలు->fcount && !got_int && cmd_వాదనలు->tomatch > 0;
 									++fi)
     {
-	fname = shorten_fname1(cmd_args->fnames[fi]);
-	if (time(NULL) > seconds)
+	fname = shorten_fname1(cmd_వాదనలు->fnames[fi]);
+	ఒకవేళ (సమయం(ఖాళీ) > seconds)
 	{
 	    // Display the file name every second or so, show the user we are
 	    // working on it.
-	    seconds = time(NULL);
+	    seconds = సమయం(ఖాళీ);
 	    vgr_display_fname(fname);
 	}
 
-	buf = buflist_findname_exp(cmd_args->fnames[fi]);
-	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
+	buf = buflist_findname_exp(cmd_వాదనలు->fnames[fi]);
+	ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
 	{
 	    // Remember that a buffer with this name already exists.
-	    duplicate_name = (buf != NULL);
+	    duplicate_name = (buf != ఖాళీ);
 	    using_dummy = TRUE;
 	    *redraw_for_dummy = TRUE;
 
-	    buf = vgr_load_dummy_buf(fname, dirname_start, dirname_now);
+	    buf = vgr_ఎక్కించు_dummy_buf(fname, dirname_ప్రారంభం, dirname_now);
 	}
-	else
+	లేకపోతే
 	    // Use existing, loaded buffer.
 	    using_dummy = FALSE;
 
 	// Check whether the quickfix list is still valid. When loading a
 	// buffer above, autocommands might have changed the quickfix list.
-	if (!vgr_qflist_valid(wp, qi, save_qfid, cmd_args->qf_title))
-	    goto theend;
+	ఒకవేళ (!vgr_qflist_valid(wp, qi, save_qfid, cmd_వాదనలు->qf_title))
+	    వెళ్ళు theend;
 
 	save_qfid = qf_get_curlist(qi)->qf_id;
 
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	{
-	    if (!got_int)
+	    ఒకవేళ (!got_int)
 		smsg(_("Cannot open file \"%s\""), fname);
 	}
-	else
+	లేకపోతే
 	{
 	    // Try for a match in all lines of the buffer.
 	    // For ":1vimgrep" look for first match only.
-	    found_match = vgr_match_buflines(qf_get_curlist(qi),
-		    fname, buf, cmd_args->spat, &cmd_args->regmatch,
-		    &cmd_args->tomatch, duplicate_name, cmd_args->flags);
+	    దొరికింది_సరిపోలిక = vgr_సరిపోలిక_buflines(qf_get_curlist(qi),
+		    fname, buf, cmd_వాదనలు->spat, &cmd_వాదనలు->regmatch,
+		    &cmd_వాదనలు->tomatch, duplicate_name, cmd_వాదనలు->flags);
 
-	    if (using_dummy)
+	    ఒకవేళ (using_dummy)
 	    {
-		if (found_match && *first_match_buf == NULL)
-		    *first_match_buf = buf;
-		if (duplicate_name)
+		ఒకవేళ (దొరికింది_సరిపోలిక && *మొదటి_సరిపోలిక_buf == ఖాళీ)
+		    *మొదటి_సరిపోలిక_buf = buf;
+		ఒకవేళ (duplicate_name)
 		{
 		    // Never keep a dummy buffer if there is another buffer
 		    // with the same name.
-		    wipe_dummy_buffer(buf, dirname_start);
-		    buf = NULL;
+		    wipe_dummy_బఫరు(buf, dirname_ప్రారంభం);
+		    buf = ఖాళీ;
 		}
-		else if ((cmdmod.cmod_flags & CMOD_HIDE) == 0
+		లేకపోతే ఒకవేళ ((cmdmod.cmod_flags & CMOD_HIDE) == 0
 			    || buf->b_p_bh[0] == 'u'	// "unload"
 			    || buf->b_p_bh[0] == 'w'	// "wipe"
 			    || buf->b_p_bh[0] == 'd')	// "delete"
@@ -6826,42 +6826,42 @@ vgr_process_files(
 		    // unload the buffer.
 		    // Ignore 'hidden' here, because it may lead to having too
 		    // many swap files.
-		    if (!found_match)
+		    ఒకవేళ (!దొరికింది_సరిపోలిక)
 		    {
-			wipe_dummy_buffer(buf, dirname_start);
-			buf = NULL;
+			wipe_dummy_బఫరు(buf, dirname_ప్రారంభం);
+			buf = ఖాళీ;
 		    }
-		    else if (buf != *first_match_buf
-					|| (cmd_args->flags & VGR_NOJUMP)
+		    లేకపోతే ఒకవేళ (buf != *మొదటి_సరిపోలిక_buf
+					|| (cmd_వాదనలు->flags & VGR_NOJUMP)
 					|| existing_swapfile(buf))
 		    {
-			unload_dummy_buffer(buf, dirname_start);
+			unload_dummy_బఫరు(buf, dirname_ప్రారంభం);
 			// Keeping the buffer, remove the dummy flag.
 			buf->b_flags &= ~BF_DUMMY;
-			buf = NULL;
+			buf = ఖాళీ;
 		    }
 		}
 
-		if (buf != NULL)
+		ఒకవేళ (buf != ఖాళీ)
 		{
 		    // Keeping the buffer, remove the dummy flag.
 		    buf->b_flags &= ~BF_DUMMY;
 
 		    // If the buffer is still loaded we need to use the
 		    // directory we jumped to below.
-		    if (buf == *first_match_buf
-			    && *target_dir == NULL
-			    && STRCMP(dirname_start, dirname_now) != 0)
-			*target_dir = vim_strsave(dirname_now);
+		    ఒకవేళ (buf == *మొదటి_సరిపోలిక_buf
+			    && *లక్ష్యం_dir == ఖాళీ
+			    && STRCMP(dirname_ప్రారంభం, dirname_now) != 0)
+			*లక్ష్యం_dir = vim_strsave(dirname_now);
 
 		    // The buffer is still loaded, the Filetype autocommands
 		    // need to be done now, in that buffer.  And the modelines
 		    // need to be done (again).  But not the window-local
 		    // options!
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    ఒకవేళ (curbuf == buf)
 		    {
-# if defined(FEAT_SYN_HL)
+# ఒకవేళ defined(FEAT_SYN_HL)
 			apply_autocmds(EVENT_FILETYPE, buf->b_p_ft,
 						     buf->b_fname, TRUE, buf);
 # endif
@@ -6873,12 +6873,12 @@ vgr_process_files(
 	}
     }
 
-    status = OK;
+    స్థితి_2 = OK;
 
 theend:
     vim_free(dirname_now);
-    vim_free(dirname_start);
-    return status;
+    vim_free(dirname_ప్రారంభం);
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -6887,135 +6887,135 @@ theend:
  * ":lvimgrep {pattern} file(s)"
  * ":lvimgrepadd {pattern} file(s)"
  */
-    void
+    శూన్య
 ex_vimgrep(exarg_T *eap)
 {
-    vgr_args_T	args;
+    vgr_వాదనలు_T	వాదనలు;
     qf_info_T	*qi;
     qf_list_T	*qfl;
     int_u	save_qfid;
-    win_T	*wp = NULL;
-    int		redraw_for_dummy = FALSE;
-    buf_T	*first_match_buf = NULL;
-    char_u	*target_dir = NULL;
-    char_u	*au_name =  NULL;
-    int		status;
+    win_T	*wp = ఖాళీ;
+    పూర్ణాంకం		redraw_for_dummy = FALSE;
+    buf_T	*మొదటి_సరిపోలిక_buf = ఖాళీ;
+    char_u	*లక్ష్యం_dir = ఖాళీ;
+    char_u	*au_name =  ఖాళీ;
+    పూర్ణాంకం		స్థితి_2;
 
-    if (!check_can_set_curbuf_forceit(eap->forceit))
-	return;
+    ఒకవేళ (!check_can_సమితి_curbuf_forceit(eap->forceit))
+	తిరిగి;
 
     au_name = vgr_get_auname(eap->cmdidx);
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
 					       curbuf->b_fname, TRUE, curbuf))
     {
 # ifdef FEAT_EVAL
-	if (aborting())
-	    return;
+	ఒకవేళ (aborting())
+	    తిరిగి;
 # endif
     }
 
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
-    if (qi == NULL)
-	return;
+    qi = qf_cmd_get_or_alloc_దొంతర(eap, &wp);
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి;
 
-    if (vgr_process_args(eap, &args) == FAIL)
-	goto theend;
+    ఒకవేళ (vgr_process_వాదనలు(eap, &వాదనలు) == FAIL)
+	వెళ్ళు theend;
 
-    if ((eap->cmdidx != CMD_grepadd && eap->cmdidx != CMD_lgrepadd
+    ఒకవేళ ((eap->cmdidx != CMD_grepadd && eap->cmdidx != CMD_lgrepadd
 		&& eap->cmdidx != CMD_vimgrepadd
 		&& eap->cmdidx != CMD_lvimgrepadd)
-					|| qf_stack_empty(qi))
+					|| qf_దొంతర_ఖాళీలు(qi))
 	// make place for a new list
-	qf_new_list(qi, args.qf_title);
+	qf_new_list(qi, వాదనలు.qf_title);
 
     incr_quickfix_busy();
 
-    status = vgr_process_files(wp, qi, &args, &redraw_for_dummy,
-						&first_match_buf, &target_dir);
-    if (status != OK)
+    స్థితి_2 = vgr_process_files(wp, qi, &వాదనలు, &redraw_for_dummy,
+						&మొదటి_సరిపోలిక_buf, &లక్ష్యం_dir);
+    ఒకవేళ (స్థితి_2 != OK)
     {
-	FreeWild(args.fcount, args.fnames);
+	FreeWild(వాదనలు.fcount, వాదనలు.fnames);
 	decr_quickfix_busy();
-	goto theend;
+	వెళ్ళు theend;
     }
 
-    FreeWild(args.fcount, args.fnames);
+    FreeWild(వాదనలు.fcount, వాదనలు.fnames);
 
     qfl = qf_get_curlist(qi);
     qfl->qf_nonevalid = FALSE;
-    qfl->qf_ptr = qfl->qf_start;
-    qfl->qf_index = 1;
-    qf_list_changed(qfl);
+    qfl->qf_ptr = qfl->qf_ప్రారంభం;
+    qfl->qf_సూచీ = 1;
+    qf_list_మారింది(qfl);
 
-    qf_update_buffer(qi, NULL);
+    qf_update_బఫరు(qi, ఖాళీ);
 
     // Remember the current quickfix list identifier, so that we can check for
     // autocommands changing the current quickfix list.
     save_qfid = qf_get_curlist(qi)->qf_id;
 
-    if (au_name != NULL)
+    ఒకవేళ (au_name != ఖాళీ)
 	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name,
 					       curbuf->b_fname, TRUE, curbuf);
     // The QuickFixCmdPost autocmd may free the quickfix list. Check the list
     // is still valid.
-    if (!qflist_valid(wp, save_qfid)
+    ఒకవేళ (!qflist_valid(wp, save_qfid)
 	    || qf_restore_list(qi, save_qfid) == FAIL)
     {
 	decr_quickfix_busy();
-	goto theend;
+	వెళ్ళు theend;
     }
 
     // Jump to first match.
-    if (!qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (!qf_list_ఖాళీలు(qf_get_curlist(qi)))
     {
-	if ((args.flags & VGR_NOJUMP) == 0)
-	    vgr_jump_to_match(qi, eap->forceit, &redraw_for_dummy,
-		    first_match_buf, target_dir);
+	ఒకవేళ ((వాదనలు.flags & VGR_NOJUMP) == 0)
+	    vgr_jump_గమ్యం_సరిపోలిక(qi, eap->forceit, &redraw_for_dummy,
+		    మొదటి_సరిపోలిక_buf, లక్ష్యం_dir);
     }
-    else
-	semsg(_(e_no_match_str_2), args.spat);
+    లేకపోతే
+	semsg(_(e_no_సరిపోలిక_str_2), వాదనలు.spat);
 
     decr_quickfix_busy();
 
     // If we loaded a dummy buffer into the current window, the autocommands
     // may have messed up things, need to redraw and recompute folds.
-    if (redraw_for_dummy)
+    ఒకవేళ (redraw_for_dummy)
     {
 # ifdef FEAT_FOLDING
 	foldUpdateAll(curwin);
-# else
+# లేకపోతే
 	redraw_later(UPD_NOT_VALID);
 # endif
     }
 
 theend:
-    vim_free(args.qf_title);
-    vim_free(target_dir);
-    vim_regfree(args.regmatch.regprog);
+    vim_free(వాదనలు.qf_title);
+    vim_free(లక్ష్యం_dir);
+    vim_regfree(వాదనలు.regmatch.regprog);
 }
 
 /*
  * Restore current working directory to "dirname_start" if they differ, taking
  * into account whether it is set locally or globally.
  */
-    static void
-restore_start_dir(char_u *dirname_start)
+    స్థిర శూన్య
+restore_ప్రారంభం_dir(char_u *dirname_ప్రారంభం)
 {
     char_u *dirname_now = alloc(MAXPATHL);
 
-    if (dirname_now == NULL)
-	return;
+    ఒకవేళ (dirname_now == ఖాళీ)
+	తిరిగి;
 
     mch_dirname(dirname_now, MAXPATHL);
-    if (STRCMP(dirname_start, dirname_now) != 0)
+    ఒకవేళ (STRCMP(dirname_ప్రారంభం, dirname_now) != 0)
     {
 	// If the directory has changed, change it back by building up an
 	// appropriate ex command and executing it.
 	exarg_T ea;
 
-	CLEAR_FIELD(ea);
-	ea.arg = dirname_start;
-	ea.cmdidx = (curwin->w_localdir == NULL) ? CMD_cd : CMD_lcd;
+	CLEAR_క్షేత్రం(ea);
+	ea.arg = dirname_ప్రారంభం;
+	ea.cmdidx = (curwin->w_localdir == ఖాళీ) ? CMD_cd : CMD_lcd;
 	ex_cd(&ea);
     }
     vim_free(dirname_now);
@@ -7033,65 +7033,65 @@ restore_start_dir(char_u *dirname_start)
  *
  * Returns NULL if it fails.
  */
-    static buf_T *
-load_dummy_buffer(
+    స్థిర buf_T *
+ఎక్కించు_dummy_బఫరు(
     char_u	*fname,
-    char_u	*dirname_start,  // in: old directory
+    char_u	*dirname_ప్రారంభం,  // in: old directory
     char_u	*resulting_dir)  // out: new directory
 {
     buf_T	*newbuf;
     bufref_T	newbufref;
-    bufref_T	newbuf_to_wipe;
-    int		failed = TRUE;
+    bufref_T	newbuf_గమ్యం_wipe;
+    పూర్ణాంకం		failed = TRUE;
     aco_save_T	aco;
-    int		readfile_result;
+    పూర్ణాంకం		readfile_ఫలితం;
 
     // Allocate a buffer without putting it in the buffer list.
-    newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return NULL;
-    set_bufref(&newbufref, newbuf);
+    newbuf = buflist_new(ఖాళీ, ఖాళీ, (linenr_T)1, BLN_DUMMY);
+    ఒకవేళ (newbuf == ఖాళీ)
+	తిరిగి ఖాళీ;
+    సమితి_bufref(&newbufref, newbuf);
 
     // Init the options.
     buf_copy_options(newbuf, BCO_ENTER | BCO_NOHELP);
 
     // need to open the memfile before putting the buffer in a window
-    if (ml_open(newbuf) == OK)
+    ఒకవేళ (ml_open(newbuf) == OK)
     {
 	// Make sure this buffer isn't wiped out by autocommands.
 	++newbuf->b_locked;
 
 	// set curwin/curbuf to buf and save a few things
 	aucmd_prepbuf(&aco, newbuf);
-	if (curbuf == newbuf)
+	ఒకవేళ (curbuf == newbuf)
 	{
 	    // Need to set the filename for autocommands.
-	    (void)setfname(curbuf, fname, NULL, FALSE);
+	    (శూన్య)setfname(curbuf, fname, ఖాళీ, FALSE);
 
 	    // Create swap file now to avoid the ATTENTION message.
-	    check_need_swap(TRUE);
+	    check_need_మార్పిడి(TRUE);
 
 	    // Remove the "dummy" flag, otherwise autocommands may not
 	    // work.
 	    curbuf->b_flags &= ~BF_DUMMY;
 
-	    newbuf_to_wipe.br_buf = NULL;
-	    readfile_result = readfile(fname, NULL,
+	    newbuf_గమ్యం_wipe.br_buf = ఖాళీ;
+	    readfile_ఫలితం = readfile(fname, ఖాళీ,
 			(linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
-			NULL, READ_NEW | READ_DUMMY);
+			ఖాళీ, READ_NEW | READ_DUMMY);
 	    --newbuf->b_locked;
-	    if (readfile_result == OK
+	    ఒకవేళ (readfile_ఫలితం == OK
 		    && !got_int
 		    && !(curbuf->b_flags & BF_NEW))
 	    {
 		failed = FALSE;
-		if (curbuf != newbuf)
+		ఒకవేళ (curbuf != newbuf)
 		{
 		    // Bloody autocommands changed the buffer!  Can happen when
 		    // using netrw and editing a remote file.  Use the current
 		    // buffer instead, delete the dummy one after restoring the
 		    // window stuff.
-		    set_bufref(&newbuf_to_wipe, newbuf);
+		    సమితి_bufref(&newbuf_గమ్యం_wipe, newbuf);
 		    newbuf = curbuf;
 		}
 	    }
@@ -7099,10 +7099,10 @@ load_dummy_buffer(
 	    // restore curwin/curbuf and a few other things
 	    aucmd_restbuf(&aco);
 
-	    if (newbuf_to_wipe.br_buf != NULL && bufref_valid(&newbuf_to_wipe))
+	    ఒకవేళ (newbuf_గమ్యం_wipe.br_buf != ఖాళీ && bufref_valid(&newbuf_గమ్యం_wipe))
 	    {
-		block_autocmds();
-		wipe_dummy_buffer(newbuf_to_wipe.br_buf, NULL);
+		ఖండం_autocmds();
+		wipe_dummy_బఫరు(newbuf_గమ్యం_wipe.br_buf, ఖాళీ);
 		unblock_autocmds();
 	    }
 	}
@@ -7116,16 +7116,16 @@ load_dummy_buffer(
     // Let the caller know what the resulting dir was first, in case it is
     // important.
     mch_dirname(resulting_dir, MAXPATHL);
-    restore_start_dir(dirname_start);
+    restore_ప్రారంభం_dir(dirname_ప్రారంభం);
 
-    if (!bufref_valid(&newbufref))
-	return NULL;
-    if (failed)
+    ఒకవేళ (!bufref_valid(&newbufref))
+	తిరిగి ఖాళీ;
+    ఒకవేళ (failed)
     {
-	wipe_dummy_buffer(newbuf, dirname_start);
-	return NULL;
+	wipe_dummy_బఫరు(newbuf, dirname_ప్రారంభం);
+	తిరిగి ఖాళీ;
     }
-    return newbuf;
+    తిరిగి newbuf;
 }
 
 /*
@@ -7133,31 +7133,31 @@ load_dummy_buffer(
  * directory to "dirname_start" if not NULL prior to returning, if autocmds or
  * the 'autochdir' option have changed it.
  */
-    static void
-wipe_dummy_buffer(buf_T *buf, char_u *dirname_start)
+    స్థిర శూన్య
+wipe_dummy_బఫరు(buf_T *buf, char_u *dirname_ప్రారంభం)
 {
     // If any autocommand opened a window on the dummy buffer, close that
     // window.  If we can't close them all then give up.
-    while (buf->b_nwindows > 0)
+    అయితే (buf->b_nwindows > 0)
     {
-	int	    did_one = FALSE;
+	పూర్ణాంకం	    did_one = FALSE;
 	win_T	    *wp;
 
-	if (firstwin->w_next != NULL)
+	ఒకవేళ (firstwin->w_తదుపరి != ఖాళీ)
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
+		ఒకవేళ (wp->w_బఫరు == buf)
 		{
-		    if (win_close(wp, FALSE) == OK)
+		    ఒకవేళ (win_close(wp, FALSE) == OK)
 			did_one = TRUE;
-		    break;
+		    ఆపు;
 		}
-	if (!did_one)
-	    goto fail;
+	ఒకవేళ (!did_one)
+	    వెళ్ళు fail;
     }
 
-    if (curbuf != buf && buf->b_nwindows == 0)	// safety check
+    ఒకవేళ (curbuf != buf && buf->b_nwindows == 0)	// safety check
     {
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that aborting()
@@ -7166,18 +7166,18 @@ wipe_dummy_buffer(buf_T *buf, char_u *dirname_start)
 	enter_cleanup(&cs);
 # endif
 
-	wipe_buffer(buf, TRUE);
+	wipe_బఫరు(buf, TRUE);
 
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 # endif
-	if (dirname_start != NULL)
+	ఒకవేళ (dirname_ప్రారంభం != ఖాళీ)
 	    // When autocommands/'autochdir' option changed directory: go back.
-	    restore_start_dir(dirname_start);
+	    restore_ప్రారంభం_dir(dirname_ప్రారంభం);
 
-	return;
+	తిరిగి;
     }
 
 fail:
@@ -7190,64 +7190,64 @@ fail:
  * directory to "dirname_start" prior to returning, if autocmds or the
  * 'autochdir' option have changed it.
  */
-    static void
-unload_dummy_buffer(buf_T *buf, char_u *dirname_start)
+    స్థిర శూన్య
+unload_dummy_బఫరు(buf_T *buf, char_u *dirname_ప్రారంభం)
 {
-    if (curbuf == buf)		// safety check
-	return;
+    ఒకవేళ (curbuf == buf)		// safety check
+	తిరిగి;
 
-    close_buffer(NULL, buf, DOBUF_UNLOAD, FALSE, TRUE, FALSE);
+    close_బఫరు(ఖాళీ, buf, DOBUF_UNLOAD, FALSE, TRUE, FALSE);
 
     // When autocommands/'autochdir' option changed directory: go back.
-    restore_start_dir(dirname_start);
+    restore_ప్రారంభం_dir(dirname_ప్రారంభం);
 }
 
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
 /*
  * Copy the specified quickfix entry items into a new dict and append the dict
  * to 'list'.  Returns OK on success.
  */
-    static int
-get_qfline_items(qfline_T *qfp, list_T *list)
+    స్థిర పూర్ణాంకం
+get_qfline_వస్తువులు(qfline_T *qfp, list_T *list)
 {
-    int		bufnum;
+    పూర్ణాంకం		bufnum;
     dict_T	*dict;
     char_u	buf[2];
     size_t	buflen;
 
     // Handle entries with a non-existing buffer number.
     bufnum = qfp->qf_fnum;
-    if (bufnum != 0 && (buflist_findnr(bufnum) == NULL))
+    ఒకవేళ (bufnum != 0 && (buflist_findnr(bufnum) == ఖాళీ))
 	bufnum = 0;
 
-    if ((dict = dict_alloc()) == NULL)
-	return FAIL;
-    if (list_append_dict(list, dict) == FAIL)
+    ఒకవేళ ((dict = dict_alloc()) == ఖాళీ)
+	తిరిగి FAIL;
+    ఒకవేళ (list_append_dict(list, dict) == FAIL)
     {
 	dict_unref(dict);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     buf[0] = qfp->qf_type;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    if (dict_add_number(dict, "bufnr", (long)bufnum) == FAIL
-	    || dict_add_number(dict, "lnum",     (long)qfp->qf_lnum) == FAIL
-	    || dict_add_number(dict, "end_lnum", (long)qfp->qf_end_lnum) == FAIL
-	    || dict_add_number(dict, "col",      (long)qfp->qf_col) == FAIL
-	    || dict_add_number(dict, "end_col",  (long)qfp->qf_end_col) == FAIL
-	    || dict_add_number(dict, "vcol",     (long)qfp->qf_viscol) == FAIL
-	    || dict_add_number(dict, "nr",       (long)qfp->qf_nr) == FAIL
-	    || dict_add_string(dict, "module", qfp->qf_module) == FAIL
-	    || dict_add_string(dict, "pattern", qfp->qf_pattern) == FAIL
-	    || dict_add_string(dict, "text", qfp->qf_text) == FAIL
-	    || dict_add_string_len(dict, "type", buf, (int)buflen) == FAIL
-	    || (qfp->qf_user_data.v_type != VAR_UNKNOWN
-		&& dict_add_tv(dict, "user_data", &qfp->qf_user_data) == FAIL )
-	    || dict_add_number(dict, "valid", (long)qfp->qf_valid) == FAIL)
-	return FAIL;
+    ఒకవేళ (dict_కూడు_సంఖ్య(dict, "bufnr", (దీర్ఘ)bufnum) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "lnum",     (దీర్ఘ)qfp->qf_lnum) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "end_lnum", (దీర్ఘ)qfp->qf_చివర_lnum) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "col",      (దీర్ఘ)qfp->qf_నిలువు) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "end_col",  (దీర్ఘ)qfp->qf_చివర_నిలువు) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "vcol",     (దీర్ఘ)qfp->qf_viscol) == FAIL
+	    || dict_కూడు_సంఖ్య(dict, "nr",       (దీర్ఘ)qfp->qf_nr) == FAIL
+	    || dict_కూడు_string(dict, "module", qfp->qf_module) == FAIL
+	    || dict_కూడు_string(dict, "pattern", qfp->qf_నమూనా) == FAIL
+	    || dict_కూడు_string(dict, "text", qfp->qf_పాఠ్యం) == FAIL
+	    || dict_కూడు_string_len(dict, "type", buf, (పూర్ణాంకం)buflen) == FAIL
+	    || (qfp->qf_user_దత్తాంశం.v_type != VAR_UNKNOWN
+		&& dict_కూడు_tv(dict, "user_data", &qfp->qf_user_దత్తాంశం) == FAIL )
+	    || dict_కూడు_సంఖ్య(dict, "valid", (దీర్ఘ)qfp->qf_valid) == FAIL)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -7256,67 +7256,67 @@ get_qfline_items(qfline_T *qfp, list_T *list)
  * If eidx is not 0, then return only the specified entry. Otherwise return
  * all the entries.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_errorlist(
 	qf_info_T	*qi_arg,
 	win_T		*wp,
-	int		qf_idx,
-	int		eidx,
+	పూర్ణాంకం		qf_idx,
+	పూర్ణాంకం		eidx,
 	list_T		*list)
 {
     qf_info_T	*qi = qi_arg;
     qf_list_T	*qfl;
     qfline_T	*qfp;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (qi == NULL)
+    ఒకవేళ (qi == ఖాళీ)
     {
 	qi = ql_info;
-	if (wp != NULL)
+	ఒకవేళ (wp != ఖాళీ)
 	    qi = GET_LOC_LIST(wp);
-	if (qi == NULL)
-	    return FAIL;
+	ఒకవేళ (qi == ఖాళీ)
+	    తిరిగి FAIL;
 
     }
 
-    if (eidx < 0)
-	return OK;
+    ఒకవేళ (eidx < 0)
+	తిరిగి OK;
 
-    if (qf_idx == INVALID_QFIDX)
+    ఒకవేళ (qf_idx == INVALID_QFIDX)
 	qf_idx = qi->qf_curlist;
 
-    if (qf_idx >= qi->qf_listcount)
-	return FAIL;
+    ఒకవేళ (qf_idx >= qi->qf_listcount)
+	తిరిగి FAIL;
 
     qfl = qf_get_list(qi, qf_idx);
-    if (qf_list_empty(qfl))
-	return FAIL;
+    ఒకవేళ (qf_list_ఖాళీలు(qfl))
+	తిరిగి FAIL;
 
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_వస్తువులు(qfl, qfp, i)
     {
-	if (eidx > 0)
+	ఒకవేళ (eidx > 0)
 	{
-	    if (eidx == i)
-		return get_qfline_items(qfp, list);
+	    ఒకవేళ (eidx == i)
+		తిరిగి get_qfline_వస్తువులు(qfp, list);
 	}
-	else if (get_qfline_items(qfp, list) == FAIL)
-	    return FAIL;
+	లేకపోతే ఒకవేళ (get_qfline_వస్తువులు(qfp, list) == FAIL)
+	    తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 // Flags used by getqflist()/getloclist() to determine which fields to return.
-enum {
+గణన {
     QF_GETLIST_NONE	= 0x0,
     QF_GETLIST_TITLE	= 0x1,
-    QF_GETLIST_ITEMS	= 0x2,
+    QF_GETLIST_వస్తువులు	= 0x2,
     QF_GETLIST_NR	= 0x4,
     QF_GETLIST_WINID	= 0x8,
     QF_GETLIST_CONTEXT	= 0x10,
     QF_GETLIST_ID	= 0x20,
     QF_GETLIST_IDX	= 0x40,
-    QF_GETLIST_SIZE	= 0x80,
+    QF_GETLIST_కొలత	= 0x80,
     QF_GETLIST_TICK	= 0x100,
     QF_GETLIST_FILEWINID	= 0x200,
     QF_GETLIST_QFBUFNR	= 0x400,
@@ -7328,67 +7328,67 @@ enum {
  * Parse text from 'di' and return the quickfix list items.
  * Existing quickfix lists are not modified.
  */
-    static int
-qf_get_list_from_lines(dict_T *what, dictitem_T *di, dict_T *retdict)
+    స్థిర పూర్ణాంకం
+qf_get_list_from_పంక్తులు(dict_T *what, dictitem_T *di, dict_T *retdict)
 {
-    int		status = FAIL;
+    పూర్ణాంకం		స్థితి_2 = FAIL;
     qf_info_T	*qi;
     char_u	*errorformat = p_efm;
     dictitem_T	*efm_di;
     list_T	*l;
 
     // Only a List value is supported
-    if (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == NULL)
-	return FAIL;
+    ఒకవేళ (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == ఖాళీ)
+	తిరిగి FAIL;
 
     // If errorformat is supplied then use it, otherwise use the 'efm'
     // option setting
-    if ((efm_di = dict_find(what, (char_u *)"efm", -1)) != NULL)
+    ఒకవేళ ((efm_di = dict_కనుగొను(what, (char_u *)"efm", -1)) != ఖాళీ)
     {
-	if (efm_di->di_tv.v_type != VAR_STRING ||
-		efm_di->di_tv.vval.v_string == NULL)
-	    return FAIL;
+	ఒకవేళ (efm_di->di_tv.v_type != VAR_STRING ||
+		efm_di->di_tv.vval.v_string == ఖాళీ)
+	    తిరిగి FAIL;
 	errorformat = efm_di->di_tv.vval.v_string;
     }
 
     l = list_alloc();
-    if (l == NULL)
-	return FAIL;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి FAIL;
 
-    qi = qf_alloc_stack(QFLT_INTERNAL, 1);
-    if (qi != NULL)
+    qi = qf_alloc_దొంతర(QFLT_అంతర్గత, 1);
+    ఒకవేళ (qi != ఖాళీ)
     {
-	if (qf_init_ext(qi, 0, NULL, NULL, &di->di_tv, errorformat,
-		    TRUE, (linenr_T)0, (linenr_T)0, NULL, NULL) > 0)
+	ఒకవేళ (qf_init_ext(qi, 0, ఖాళీ, ఖాళీ, &di->di_tv, errorformat,
+		    TRUE, (linenr_T)0, (linenr_T)0, ఖాళీ, ఖాళీ) > 0)
 	{
-	    (void)get_errorlist(qi, NULL, 0, 0, l);
+	    (శూన్య)get_errorlist(qi, ఖాళీ, 0, 0, l);
 	    qf_free(&qi->qf_lists[0]);
 	}
 
 	qf_free_lists(qi);
     }
-    dict_add_list(retdict, "items", l);
-    status = OK;
+    dict_కూడు_list(retdict, "items", l);
+    స్థితి_2 = OK;
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
  * Return the quickfix/location list window identifier in the current tabpage.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_winid(qf_info_T *qi)
 {
     win_T	*win;
 
     // The quickfix window can be opened even if the quickfix list is not set
     // using ":copen". This is not true for location lists.
-    if (qi == NULL)
-	return 0;
-    win = qf_find_win(qi);
-    if (win != NULL)
-	return win->w_id;
-    return 0;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి 0;
+    win = qf_కనుగొను_win(qi);
+    ఒకవేళ (win != ఖాళీ)
+	తిరిగి win->w_id;
+    తిరిగి 0;
 }
 
 /*
@@ -7396,70 +7396,70 @@ qf_winid(qf_info_T *qi)
  * window. If there is no buffer associated with the list or the buffer is
  * wiped out, then returns 0.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_qfbufnr(qf_info_T *qi, dict_T *retdict)
 {
-    int	bufnum = 0;
+    పూర్ణాంకం	bufnum = 0;
 
-    if (qi != NULL && buflist_findnr(qi->qf_bufnr) != NULL)
+    ఒకవేళ (qi != ఖాళీ && buflist_findnr(qi->qf_bufnr) != ఖాళీ)
 	bufnum = qi->qf_bufnr;
 
-    return dict_add_number(retdict, "qfbufnr", bufnum);
+    తిరిగి dict_కూడు_సంఖ్య(retdict, "qfbufnr", bufnum);
 }
 
 /*
  * Convert the keys in 'what' to quickfix list property flags.
  */
-    static int
-qf_getprop_keys2flags(dict_T *what, int loclist)
+    స్థిర పూర్ణాంకం
+qf_getprop_keys2flags(dict_T *what, పూర్ణాంకం loclist)
 {
-    int		flags = QF_GETLIST_NONE;
+    పూర్ణాంకం		flags = QF_GETLIST_NONE;
 
-    if (dict_has_key(what, "all"))
+    ఒకవేళ (dict_has_కీలకం(what, "all"))
     {
 	flags |= QF_GETLIST_ALL;
-	if (!loclist)
+	ఒకవేళ (!loclist)
 	    // File window ID is applicable only to location list windows
 	    flags &= ~ QF_GETLIST_FILEWINID;
     }
 
-    if (dict_has_key(what, "title"))
+    ఒకవేళ (dict_has_కీలకం(what, "title"))
 	flags |= QF_GETLIST_TITLE;
 
-    if (dict_has_key(what, "nr"))
+    ఒకవేళ (dict_has_కీలకం(what, "nr"))
 	flags |= QF_GETLIST_NR;
 
-    if (dict_has_key(what, "winid"))
+    ఒకవేళ (dict_has_కీలకం(what, "winid"))
 	flags |= QF_GETLIST_WINID;
 
-    if (dict_has_key(what, "context"))
+    ఒకవేళ (dict_has_కీలకం(what, "context"))
 	flags |= QF_GETLIST_CONTEXT;
 
-    if (dict_has_key(what, "id"))
+    ఒకవేళ (dict_has_కీలకం(what, "id"))
 	flags |= QF_GETLIST_ID;
 
-    if (dict_has_key(what, "items"))
-	flags |= QF_GETLIST_ITEMS;
+    ఒకవేళ (dict_has_కీలకం(what, "items"))
+	flags |= QF_GETLIST_వస్తువులు;
 
-    if (dict_has_key(what, "idx"))
+    ఒకవేళ (dict_has_కీలకం(what, "idx"))
 	flags |= QF_GETLIST_IDX;
 
-    if (dict_has_key(what, "size"))
-	flags |= QF_GETLIST_SIZE;
+    ఒకవేళ (dict_has_కీలకం(what, "size"))
+	flags |= QF_GETLIST_కొలత;
 
-    if (dict_has_key(what, "changedtick"))
+    ఒకవేళ (dict_has_కీలకం(what, "changedtick"))
 	flags |= QF_GETLIST_TICK;
 
-    if (loclist && dict_has_key(what, "filewinid"))
+    ఒకవేళ (loclist && dict_has_కీలకం(what, "filewinid"))
 	flags |= QF_GETLIST_FILEWINID;
 
-    if (dict_has_key(what, "qfbufnr"))
+    ఒకవేళ (dict_has_కీలకం(what, "qfbufnr"))
 	flags |= QF_GETLIST_QFBUFNR;
 
-    if (dict_has_key(what, "quickfixtextfunc"))
+    ఒకవేళ (dict_has_కీలకం(what, "quickfixtextfunc"))
 	flags |= QF_GETLIST_QFTF;
 
-    return flags;
+    తిరిగి flags;
 }
 
 /*
@@ -7472,100 +7472,100 @@ qf_getprop_keys2flags(dict_T *what, int loclist)
  * If 'id' is zero then return the quickfix list index specified by 'nr'.
  * Return -1, if quickfix list is not present or if the stack is empty.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_qfidx(qf_info_T *qi, dict_T *what)
 {
-    int		qf_idx;
+    పూర్ణాంకం		qf_idx;
     dictitem_T	*di;
 
     qf_idx = qi->qf_curlist;	// default is the current list
-    if ((di = dict_find(what, (char_u *)"nr", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"nr", -1)) != ఖాళీ)
     {
 	// Use the specified quickfix/location list
-	if (di->di_tv.v_type == VAR_NUMBER)
+	ఒకవేళ (di->di_tv.v_type == VAR_సంఖ్య)
 	{
 	    // for zero use the current list
-	    if (di->di_tv.vval.v_number != 0)
+	    ఒకవేళ (di->di_tv.vval.v_సంఖ్య != 0)
 	    {
-		qf_idx = di->di_tv.vval.v_number - 1;
-		if (qf_idx < 0 || qf_idx >= qi->qf_listcount)
+		qf_idx = di->di_tv.vval.v_సంఖ్య - 1;
+		ఒకవేళ (qf_idx < 0 || qf_idx >= qi->qf_listcount)
 		    qf_idx = INVALID_QFIDX;
 	    }
 	}
-	else if (di->di_tv.v_type == VAR_STRING
-		&& di->di_tv.vval.v_string != NULL
+	లేకపోతే ఒకవేళ (di->di_tv.v_type == VAR_STRING
+		&& di->di_tv.vval.v_string != ఖాళీ
 		&& STRCMP(di->di_tv.vval.v_string, "$") == 0)
 	    // Get the last quickfix list number
 	    qf_idx = qi->qf_listcount - 1;
-	else
+	లేకపోతే
 	    qf_idx = INVALID_QFIDX;
     }
 
-    if ((di = dict_find(what, (char_u *)"id", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"id", -1)) != ఖాళీ)
     {
 	// Look for a list with the specified id
-	if (di->di_tv.v_type == VAR_NUMBER)
+	ఒకవేళ (di->di_tv.v_type == VAR_సంఖ్య)
 	{
 	    // For zero, use the current list or the list specified by 'nr'
-	    if (di->di_tv.vval.v_number != 0)
-		qf_idx = qf_id2nr(qi, di->di_tv.vval.v_number);
+	    ఒకవేళ (di->di_tv.vval.v_సంఖ్య != 0)
+		qf_idx = qf_id2nr(qi, di->di_tv.vval.v_సంఖ్య);
 	}
-	else
+	లేకపోతే
 	    qf_idx = INVALID_QFIDX;
     }
 
-    return qf_idx;
+    తిరిగి qf_idx;
 }
 
 /*
  * Return default values for quickfix list properties in retdict.
  */
-    static int
-qf_getprop_defaults(qf_info_T *qi, int flags, int locstack, dict_T *retdict)
+    స్థిర పూర్ణాంకం
+qf_getprop_defaults(qf_info_T *qi, పూర్ణాంకం flags, పూర్ణాంకం locstack, dict_T *retdict)
 {
-    int		status = OK;
+    పూర్ణాంకం		స్థితి_2 = OK;
 
-    if (flags & QF_GETLIST_TITLE)
-	status = dict_add_string_len(retdict, "title", (char_u *)"", 0);
-    if ((status == OK) && (flags & QF_GETLIST_ITEMS))
+    ఒకవేళ (flags & QF_GETLIST_TITLE)
+	స్థితి_2 = dict_కూడు_string_len(retdict, "title", (char_u *)"", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_వస్తువులు))
     {
 	list_T	*l = list_alloc();
-	if (l != NULL)
-	    status = dict_add_list(retdict, "items", l);
-	else
-	    status = FAIL;
+	ఒకవేళ (l != ఖాళీ)
+	    స్థితి_2 = dict_కూడు_list(retdict, "items", l);
+	లేకపోతే
+	    స్థితి_2 = FAIL;
     }
-    if ((status == OK) && (flags & QF_GETLIST_NR))
-	status = dict_add_number(retdict, "nr", 0);
-    if ((status == OK) && (flags & QF_GETLIST_WINID))
-	status = dict_add_number(retdict, "winid", qf_winid(qi));
-    if ((status == OK) && (flags & QF_GETLIST_CONTEXT))
-	status = dict_add_string_len(retdict, "context", (char_u *)"", 0);
-    if ((status == OK) && (flags & QF_GETLIST_ID))
-	status = dict_add_number(retdict, "id", 0);
-    if ((status == OK) && (flags & QF_GETLIST_IDX))
-	status = dict_add_number(retdict, "idx", 0);
-    if ((status == OK) && (flags & QF_GETLIST_SIZE))
-	status = dict_add_number(retdict, "size", 0);
-    if ((status == OK) && (flags & QF_GETLIST_TICK))
-	status = dict_add_number(retdict, "changedtick", 0);
-    if ((status == OK) && locstack && (flags & QF_GETLIST_FILEWINID))
-	status = dict_add_number(retdict, "filewinid", 0);
-    if ((status == OK) && (flags & QF_GETLIST_QFBUFNR))
-	status = qf_getprop_qfbufnr(qi, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_QFTF))
-	status = dict_add_string_len(retdict, "quickfixtextfunc", (char_u *)"", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_NR))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "nr", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_WINID))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "winid", qf_winid(qi));
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_CONTEXT))
+	స్థితి_2 = dict_కూడు_string_len(retdict, "context", (char_u *)"", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_ID))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "id", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_IDX))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "idx", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_కొలత))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "size", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_TICK))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "changedtick", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && locstack && (flags & QF_GETLIST_FILEWINID))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "filewinid", 0);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_QFBUFNR))
+	స్థితి_2 = qf_getprop_qfbufnr(qi, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_QFTF))
+	స్థితి_2 = dict_కూడు_string_len(retdict, "quickfixtextfunc", (char_u *)"", 0);
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
  * Return the quickfix list title as 'title' in retdict
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_title(qf_list_T *qfl, dict_T *retdict)
 {
-    return dict_add_string(retdict, "title", qfl->qf_title);
+    తిరిగి dict_కూడు_string(retdict, "title", qfl->qf_title);
 }
 
 /*
@@ -7573,106 +7573,106 @@ qf_getprop_title(qf_list_T *qfl, dict_T *retdict)
  * list.  If there is no associated window, then returns 0. Useful only when
  * called from a location list window.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_filewinid(win_T *wp, qf_info_T *qi, dict_T *retdict)
 {
-    int winid = 0;
+    పూర్ణాంకం winid = 0;
 
-    if (wp != NULL && IS_LL_WINDOW(wp))
+    ఒకవేళ (wp != ఖాళీ && IS_LL_కిటికీ(wp))
     {
-	win_T	*ll_wp = qf_find_win_with_loclist(qi);
-	if (ll_wp != NULL)
+	win_T	*ll_wp = qf_కనుగొను_win_with_loclist(qi);
+	ఒకవేళ (ll_wp != ఖాళీ)
 	    winid = ll_wp->w_id;
     }
 
-    return dict_add_number(retdict, "filewinid", winid);
+    తిరిగి dict_కూడు_సంఖ్య(retdict, "filewinid", winid);
 }
 
 /*
  * Return the quickfix list items/entries as 'items' in retdict.
  * If eidx is not 0, then return the item at the specified index.
  */
-    static int
-qf_getprop_items(qf_info_T *qi, int qf_idx, int eidx, dict_T *retdict)
+    స్థిర పూర్ణాంకం
+qf_getprop_వస్తువులు(qf_info_T *qi, పూర్ణాంకం qf_idx, పూర్ణాంకం eidx, dict_T *retdict)
 {
-    int		status = OK;
+    పూర్ణాంకం		స్థితి_2 = OK;
     list_T	*l = list_alloc();
-    if (l != NULL)
+    ఒకవేళ (l != ఖాళీ)
     {
-	(void)get_errorlist(qi, NULL, qf_idx, eidx, l);
-	dict_add_list(retdict, "items", l);
+	(శూన్య)get_errorlist(qi, ఖాళీ, qf_idx, eidx, l);
+	dict_కూడు_list(retdict, "items", l);
     }
-    else
-	status = FAIL;
+    లేకపోతే
+	స్థితి_2 = FAIL;
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
  * Return the quickfix list context (if any) as 'context' in retdict.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_ctx(qf_list_T *qfl, dict_T *retdict)
 {
-    int		status;
+    పూర్ణాంకం		స్థితి_2;
     dictitem_T	*di;
 
-    if (qfl->qf_ctx != NULL)
+    ఒకవేళ (qfl->qf_ctx != ఖాళీ)
     {
 	di = dictitem_alloc((char_u *)"context");
-	if (di != NULL)
+	ఒకవేళ (di != ఖాళీ)
 	{
 	    copy_tv(qfl->qf_ctx, &di->di_tv);
-	    status = dict_add(retdict, di);
-	    if (status == FAIL)
+	    స్థితి_2 = dict_కూడు(retdict, di);
+	    ఒకవేళ (స్థితి_2 == FAIL)
 		dictitem_free(di);
 	}
-	else
-	    status = FAIL;
+	లేకపోతే
+	    స్థితి_2 = FAIL;
     }
-    else
-	status = dict_add_string_len(retdict, "context", (char_u *)"", 0);
+    లేకపోతే
+	స్థితి_2 = dict_కూడు_string_len(retdict, "context", (char_u *)"", 0);
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
  * Return the current quickfix list index as 'idx' in retdict.
  * If a specific entry index (eidx) is supplied, then use that.
  */
-    static int
-qf_getprop_idx(qf_list_T *qfl, int eidx, dict_T *retdict)
+    స్థిర పూర్ణాంకం
+qf_getprop_idx(qf_list_T *qfl, పూర్ణాంకం eidx, dict_T *retdict)
 {
-    if (eidx == 0)
+    ఒకవేళ (eidx == 0)
     {
-	eidx = qfl->qf_index;
-	if (qf_list_empty(qfl))
+	eidx = qfl->qf_సూచీ;
+	ఒకవేళ (qf_list_ఖాళీలు(qfl))
 	    // For empty lists, current index is set to 0
 	    eidx = 0;
     }
-    return dict_add_number(retdict, "idx", eidx);
+    తిరిగి dict_కూడు_సంఖ్య(retdict, "idx", eidx);
 }
 
 /*
  * Return the 'quickfixtextfunc' function of a quickfix/location list
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_getprop_qftf(qf_list_T *qfl, dict_T *retdict)
 {
-    int		status;
+    పూర్ణాంకం		స్థితి_2;
 
-    if (qfl->qf_qftf_cb.cb_name != NULL)
+    ఒకవేళ (qfl->qf_qftf_cb.cb_name != ఖాళీ)
     {
 	typval_T	tv;
 
 	put_callback(&qfl->qf_qftf_cb, &tv);
-	status = dict_add_tv(retdict, "quickfixtextfunc", &tv);
+	స్థితి_2 = dict_కూడు_tv(retdict, "quickfixtextfunc", &tv);
 	clear_tv(&tv);
     }
-    else
-	status = dict_add_string_len(retdict, "quickfixtextfunc", (char_u *)"", 0);
+    లేకపోతే
+	స్థితి_2 = dict_కూడు_string_len(retdict, "quickfixtextfunc", (char_u *)"", 0);
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -7680,70 +7680,70 @@ qf_getprop_qftf(qf_list_T *qfl, dict_T *retdict)
  * dictionary. 'what' contains the details to return. If 'list_idx' is -1,
  * then current list is used. Otherwise the specified list is used.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_get_properties(win_T *wp, dict_T *what, dict_T *retdict)
 {
     qf_info_T	*qi = ql_info;
     qf_list_T	*qfl;
-    int		status = OK;
-    int		qf_idx = INVALID_QFIDX;
-    int		eidx = 0;
+    పూర్ణాంకం		స్థితి_2 = OK;
+    పూర్ణాంకం		qf_idx = INVALID_QFIDX;
+    పూర్ణాంకం		eidx = 0;
     dictitem_T	*di;
-    int		flags = QF_GETLIST_NONE;
+    పూర్ణాంకం		flags = QF_GETLIST_NONE;
 
-    if ((di = dict_find(what, (char_u *)"lines", -1)) != NULL)
-	return qf_get_list_from_lines(what, di, retdict);
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"lines", -1)) != ఖాళీ)
+	తిరిగి qf_get_list_from_పంక్తులు(what, di, retdict);
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
 	qi = GET_LOC_LIST(wp);
-    else if (qi == NULL)
-	return FAIL;
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    flags = qf_getprop_keys2flags(what, (wp != NULL));
+    flags = qf_getprop_keys2flags(what, (wp != ఖాళీ));
 
-    if (!qf_stack_empty(qi))
+    ఒకవేళ (!qf_దొంతర_ఖాళీలు(qi))
 	qf_idx = qf_getprop_qfidx(qi, what);
 
     // List is not present or is empty
-    if (qf_stack_empty(qi) || qf_idx == INVALID_QFIDX)
-	return qf_getprop_defaults(qi, flags, wp != NULL, retdict);
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi) || qf_idx == INVALID_QFIDX)
+	తిరిగి qf_getprop_defaults(qi, flags, wp != ఖాళీ, retdict);
 
     qfl = qf_get_list(qi, qf_idx);
 
     // If an entry index is specified, use that
-    if ((di = dict_find(what, (char_u *)"idx", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"idx", -1)) != ఖాళీ)
     {
-	if (di->di_tv.v_type != VAR_NUMBER)
-	    return FAIL;
-	eidx = di->di_tv.vval.v_number;
+	ఒకవేళ (di->di_tv.v_type != VAR_సంఖ్య)
+	    తిరిగి FAIL;
+	eidx = di->di_tv.vval.v_సంఖ్య;
     }
 
-    if (flags & QF_GETLIST_TITLE)
-	status = qf_getprop_title(qfl, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_NR))
-	status = dict_add_number(retdict, "nr", qf_idx + 1);
-    if ((status == OK) && (flags & QF_GETLIST_WINID))
-	status = dict_add_number(retdict, "winid", qf_winid(qi));
-    if ((status == OK) && (flags & QF_GETLIST_ITEMS))
-	status = qf_getprop_items(qi, qf_idx, eidx, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_CONTEXT))
-	status = qf_getprop_ctx(qfl, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_ID))
-	status = dict_add_number(retdict, "id", qfl->qf_id);
-    if ((status == OK) && (flags & QF_GETLIST_IDX))
-	status = qf_getprop_idx(qfl, eidx, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_SIZE))
-	status = dict_add_number(retdict, "size", qfl->qf_count);
-    if ((status == OK) && (flags & QF_GETLIST_TICK))
-	status = dict_add_number(retdict, "changedtick", qfl->qf_changedtick);
-    if ((status == OK) && (wp != NULL) && (flags & QF_GETLIST_FILEWINID))
-	status = qf_getprop_filewinid(wp, qi, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_QFBUFNR))
-	status = qf_getprop_qfbufnr(qi, retdict);
-    if ((status == OK) && (flags & QF_GETLIST_QFTF))
-	status = qf_getprop_qftf(qfl, retdict);
+    ఒకవేళ (flags & QF_GETLIST_TITLE)
+	స్థితి_2 = qf_getprop_title(qfl, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_NR))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "nr", qf_idx + 1);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_WINID))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "winid", qf_winid(qi));
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_వస్తువులు))
+	స్థితి_2 = qf_getprop_వస్తువులు(qi, qf_idx, eidx, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_CONTEXT))
+	స్థితి_2 = qf_getprop_ctx(qfl, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_ID))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "id", qfl->qf_id);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_IDX))
+	స్థితి_2 = qf_getprop_idx(qfl, eidx, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_కొలత))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "size", qfl->qf_లెక్క);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_TICK))
+	స్థితి_2 = dict_కూడు_సంఖ్య(retdict, "changedtick", qfl->qf_changedtick);
+    ఒకవేళ ((స్థితి_2 == OK) && (wp != ఖాళీ) && (flags & QF_GETLIST_FILEWINID))
+	స్థితి_2 = qf_getprop_filewinid(wp, qi, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_QFBUFNR))
+	స్థితి_2 = qf_getprop_qfbufnr(qi, retdict);
+    ఒకవేళ ((స్థితి_2 == OK) && (flags & QF_GETLIST_QFTF))
+	స్థితి_2 = qf_getprop_qftf(qfl, retdict);
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -7751,88 +7751,88 @@ qf_get_properties(win_T *wp, dict_T *what, dict_T *retdict)
  * items in the dict 'd'. If it is a valid error entry, then set 'valid_entry'
  * to TRUE.
  */
-    static int
-qf_add_entry_from_dict(
+    స్థిర పూర్ణాంకం
+qf_కూడు_నమోదు_from_dict(
 	qf_list_T	*qfl,
 	dict_T		*d,
-	int		first_entry,
-	int		*valid_entry)
+	పూర్ణాంకం		మొదటి_నమోదు,
+	పూర్ణాంకం		*valid_నమోదు)
 {
-    static int	did_bufnr_emsg;
-    char_u	*filename, *module, *pattern, *text, *type;
-    int		bufnum, valid, status, col, end_col, vcol, nr;
-    long	lnum, end_lnum;
+    స్థిర పూర్ణాంకం	did_bufnr_emsg;
+    char_u	*filename, *module, *నమూనా, *పాఠ్యం, *type;
+    పూర్ణాంకం		bufnum, valid, స్థితి_2, నిలువు, చివర_నిలువు, vcol, nr;
+    దీర్ఘ	lnum, చివర_lnum;
 
-    if (first_entry)
+    ఒకవేళ (మొదటి_నమోదు)
 	did_bufnr_emsg = FALSE;
 
     filename = dict_get_string(d, "filename", TRUE);
     module = dict_get_string(d, "module", TRUE);
-    bufnum = (int)dict_get_number(d, "bufnr");
-    lnum = (int)dict_get_number(d, "lnum");
-    end_lnum = (int)dict_get_number(d, "end_lnum");
-    col = (int)dict_get_number(d, "col");
-    end_col = (int)dict_get_number(d, "end_col");
-    vcol = (int)dict_get_number(d, "vcol");
-    nr = (int)dict_get_number(d, "nr");
+    bufnum = (పూర్ణాంకం)dict_get_సంఖ్య(d, "bufnr");
+    lnum = (పూర్ణాంకం)dict_get_సంఖ్య(d, "lnum");
+    చివర_lnum = (పూర్ణాంకం)dict_get_సంఖ్య(d, "end_lnum");
+    నిలువు = (పూర్ణాంకం)dict_get_సంఖ్య(d, "col");
+    చివర_నిలువు = (పూర్ణాంకం)dict_get_సంఖ్య(d, "end_col");
+    vcol = (పూర్ణాంకం)dict_get_సంఖ్య(d, "vcol");
+    nr = (పూర్ణాంకం)dict_get_సంఖ్య(d, "nr");
     type = dict_get_string(d, "type", TRUE);
-    pattern = dict_get_string(d, "pattern", TRUE);
-    text = dict_get_string(d, "text", TRUE);
-    if (text == NULL)
-	text = vim_strsave((char_u *)"");
-    typval_T user_data;
-    user_data.v_type = VAR_UNKNOWN;
-    dict_get_tv(d, "user_data", &user_data);
+    నమూనా = dict_get_string(d, "pattern", TRUE);
+    పాఠ్యం = dict_get_string(d, "text", TRUE);
+    ఒకవేళ (పాఠ్యం == ఖాళీ)
+	పాఠ్యం = vim_strsave((char_u *)"");
+    typval_T user_దత్తాంశం;
+    user_దత్తాంశం.v_type = VAR_UNKNOWN;
+    dict_get_tv(d, "user_data", &user_దత్తాంశం);
 
     valid = TRUE;
-    if ((filename == NULL && bufnum == 0) || (lnum == 0 && pattern == NULL))
+    ఒకవేళ ((filename == ఖాళీ && bufnum == 0) || (lnum == 0 && నమూనా == ఖాళీ))
 	valid = FALSE;
 
     // Mark entries with non-existing buffer number as not valid. Give the
     // error message only once.
-    if (bufnum != 0 && (buflist_findnr(bufnum) == NULL))
+    ఒకవేళ (bufnum != 0 && (buflist_findnr(bufnum) == ఖాళీ))
     {
-	if (!did_bufnr_emsg)
+	ఒకవేళ (!did_bufnr_emsg)
 	{
 	    did_bufnr_emsg = TRUE;
-	    semsg(_(e_buffer_nr_not_found), bufnum);
+	    semsg(_(e_బఫరు_nr_not_దొరికింది), bufnum);
 	}
 	valid = FALSE;
 	bufnum = 0;
     }
 
     // If the 'valid' field is present it overrules the detected value.
-    if (dict_has_key(d, "valid"))
-	valid = (int)dict_get_bool(d, "valid", FALSE);
+    ఒకవేళ (dict_has_కీలకం(d, "valid"))
+	valid = (పూర్ణాంకం)dict_get_bool(d, "valid", FALSE);
 
-    status =  qf_add_entry(qfl,
-			NULL,		// dir
+    స్థితి_2 =  qf_కూడు_నమోదు(qfl,
+			ఖాళీ,		// dir
 			filename,
 			module,
 			bufnum,
-			text,
+			పాఠ్యం,
 			lnum,
-			end_lnum,
-			col,
-			end_col,
+			చివర_lnum,
+			నిలువు,
+			చివర_నిలువు,
 			vcol,		// vis_col
-			pattern,	// search pattern
+			నమూనా,	// search pattern
 			nr,
-			type == NULL ? NUL : *type,
-			&user_data,
+			type == ఖాళీ ? NUL : *type,
+			&user_దత్తాంశం,
 			valid);
 
     vim_free(filename);
     vim_free(module);
-    vim_free(pattern);
-    vim_free(text);
+    vim_free(నమూనా);
+    vim_free(పాఠ్యం);
     vim_free(type);
-    clear_tv(&user_data);
+    clear_tv(&user_దత్తాంశం);
 
-    if (valid)
-	*valid_entry = TRUE;
+    ఒకవేళ (valid)
+	*valid_నమోదు = TRUE;
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -7841,387 +7841,387 @@ qf_add_entry_from_dict(
  * Only returns TRUE if `entry` is definitively closer. If it's further
  * away, or there's not enough information to tell, return FALSE.
  */
-    static int
-entry_is_closer_to_target(
-	qfline_T	*entry,
-	qfline_T	*other_entry,
-	int		target_fnum,
-	int		target_lnum,
-	int		target_col)
+    స్థిర పూర్ణాంకం
+నమోదు_is_closer_గమ్యం_లక్ష్యం(
+	qfline_T	*నమోదు_2,
+	qfline_T	*other_నమోదు,
+	పూర్ణాంకం		లక్ష్యం_fnum,
+	పూర్ణాంకం		లక్ష్యం_lnum,
+	పూర్ణాంకం		లక్ష్యం_నిలువు)
 {
     // First, compare entries to target file.
-    if (!target_fnum)
+    ఒకవేళ (!లక్ష్యం_fnum)
 	// Without a target file, we can't know which is closer.
-	return FALSE;
+	తిరిగి FALSE;
 
-    int is_target_file = entry->qf_fnum && entry->qf_fnum == target_fnum;
-    int other_is_target_file = other_entry->qf_fnum && other_entry->qf_fnum == target_fnum;
-    if (!is_target_file && other_is_target_file)
-	return FALSE;
-    else if (is_target_file && !other_is_target_file)
-	return TRUE;
+    పూర్ణాంకం is_లక్ష్యం_file = నమోదు_2->qf_fnum && నమోదు_2->qf_fnum == లక్ష్యం_fnum;
+    పూర్ణాంకం other_is_లక్ష్యం_file = other_నమోదు->qf_fnum && other_నమోదు->qf_fnum == లక్ష్యం_fnum;
+    ఒకవేళ (!is_లక్ష్యం_file && other_is_లక్ష్యం_file)
+	తిరిగి FALSE;
+    లేకపోతే ఒకవేళ (is_లక్ష్యం_file && !other_is_లక్ష్యం_file)
+	తిరిగి TRUE;
 
     // Both entries are pointing at the exact same file. Now compare line
     // numbers.
-    if (!target_lnum)
+    ఒకవేళ (!లక్ష్యం_lnum)
 	// Without a target line number, we can't know which is closer.
-	return FALSE;
+	తిరిగి FALSE;
 
-    int line_distance = entry->qf_lnum ? labs(entry->qf_lnum - target_lnum) : INT_MAX;
-    int other_line_distance = other_entry->qf_lnum ? labs(other_entry->qf_lnum - target_lnum) : INT_MAX;
-    if (line_distance > other_line_distance)
-	return FALSE;
-    else if (line_distance < other_line_distance)
-	return TRUE;
+    పూర్ణాంకం పంక్తి_దూరం = నమోదు_2->qf_lnum ? labs(నమోదు_2->qf_lnum - లక్ష్యం_lnum) : గరిష్ఠ_పూర్ణాంకం;
+    పూర్ణాంకం other_పంక్తి_దూరం = other_నమోదు->qf_lnum ? labs(other_నమోదు->qf_lnum - లక్ష్యం_lnum) : గరిష్ఠ_పూర్ణాంకం;
+    ఒకవేళ (పంక్తి_దూరం > other_పంక్తి_దూరం)
+	తిరిగి FALSE;
+    లేకపోతే ఒకవేళ (పంక్తి_దూరం < other_పంక్తి_దూరం)
+	తిరిగి TRUE;
 
     // Both entries are pointing at the exact same line number (or no line
     // number at all). Now compare columns.
-    if (!target_col)
+    ఒకవేళ (!లక్ష్యం_నిలువు)
 	// Without a target column, we can't know which is closer.
-	return FALSE;
+	తిరిగి FALSE;
 
-    int column_distance = entry->qf_col ? abs(entry->qf_col - target_col) : INT_MAX;
-    int other_column_distance = other_entry->qf_col ? abs(other_entry->qf_col - target_col): INT_MAX;
-    if (column_distance > other_column_distance)
-	return FALSE;
-    else if (column_distance < other_column_distance)
-	return TRUE;
+    పూర్ణాంకం స్తంభం_దూరం = నమోదు_2->qf_నిలువు ? నిరపేక్ష(నమోదు_2->qf_నిలువు - లక్ష్యం_నిలువు) : గరిష్ఠ_పూర్ణాంకం;
+    పూర్ణాంకం other_స్తంభం_దూరం = other_నమోదు->qf_నిలువు ? నిరపేక్ష(other_నమోదు->qf_నిలువు - లక్ష్యం_నిలువు): గరిష్ఠ_పూర్ణాంకం;
+    ఒకవేళ (స్తంభం_దూరం > other_స్తంభం_దూరం)
+	తిరిగి FALSE;
+    లేకపోతే ఒకవేళ (స్తంభం_దూరం < other_స్తంభం_దూరం)
+	తిరిగి TRUE;
 
     // It's a complete tie! The exact same file, line, and column.
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Add list of entries to quickfix/location list. Each list entry is
  * a dictionary with item information.
  */
-    static int
-qf_add_entries(
+    స్థిర పూర్ణాంకం
+qf_కూడు_entries(
 	qf_info_T	*qi,
-	int		qf_idx,
+	పూర్ణాంకం		qf_idx,
 	list_T		*list,
 	char_u		*title,
-	int		action)
+	పూర్ణాంకం		action)
 {
     qf_list_T	*qfl = qf_get_list(qi, qf_idx);
     listitem_T	*li;
     dict_T	*d;
-    qfline_T	*old_last = NULL;
-    int		retval = OK;
-    int		valid_entry = FALSE;
+    qfline_T	*old_చివరి = ఖాళీ;
+    పూర్ణాంకం		retval = OK;
+    పూర్ణాంకం		valid_నమోదు = FALSE;
 
     // If there's an entry selected in the quickfix list, remember its location
     // (file, line, column), so we can select the nearest entry in the updated
     // quickfix list.
-    int prev_fnum = 0;
-    int prev_lnum = 0;
-    int prev_col = 0;
-    if (qfl->qf_ptr)
+    పూర్ణాంకం prev_fnum = 0;
+    పూర్ణాంకం prev_lnum = 0;
+    పూర్ణాంకం prev_నిలువు = 0;
+    ఒకవేళ (qfl->qf_ptr)
     {
 	prev_fnum = qfl->qf_ptr->qf_fnum;
 	prev_lnum = qfl->qf_ptr->qf_lnum;
-	prev_col = qfl->qf_ptr->qf_col;
+	prev_నిలువు = qfl->qf_ptr->qf_నిలువు;
     }
 
-    int select_first_entry = FALSE;
-    int select_nearest_entry = FALSE;
+    పూర్ణాంకం select_మొదటి_నమోదు = FALSE;
+    పూర్ణాంకం select_సమీప_నమోదు = FALSE;
 
-    if (action == ' ' || qf_idx == qi->qf_listcount)
+    ఒకవేళ (action == ' ' || qf_idx == qi->qf_listcount)
     {
-	select_first_entry = TRUE;
+	select_మొదటి_నమోదు = TRUE;
 	// make place for a new list
 	qf_new_list(qi, title);
 	qf_idx = qi->qf_curlist;
 	qfl = qf_get_list(qi, qf_idx);
     }
-    else if (action == 'a')
+    లేకపోతే ఒకవేళ (action == 'a')
     {
-	if (qf_list_empty(qfl))
+	ఒకవేళ (qf_list_ఖాళీలు(qfl))
 	    // Appending to empty list, select first entry.
-	    select_first_entry = TRUE;
-	else
+	    select_మొదటి_నమోదు = TRUE;
+	లేకపోతే
 	    // Adding to existing list, use last entry.
-	    old_last = qfl->qf_last;
+	    old_చివరి = qfl->qf_చివరి;
     }
-    else if (action == 'r')
+    లేకపోతే ఒకవేళ (action == 'r')
     {
-	select_first_entry = TRUE;
-	qf_free_items(qfl);
+	select_మొదటి_నమోదు = TRUE;
+	qf_free_వస్తువులు(qfl);
 	qf_store_title(qfl, title);
     }
-    else if (action == 'u')
+    లేకపోతే ఒకవేళ (action == 'u')
     {
-	select_nearest_entry = TRUE;
-	qf_free_items(qfl);
+	select_సమీప_నమోదు = TRUE;
+	qf_free_వస్తువులు(qfl);
 	qf_store_title(qfl, title);
     }
 
-    qfline_T *entry_to_select = NULL;
-    int entry_to_select_index = 0;
+    qfline_T *నమోదు_గమ్యం_select = ఖాళీ;
+    పూర్ణాంకం నమోదు_గమ్యం_select_సూచీ = 0;
 
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_వస్తువులు(list, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
-	    continue; // Skip non-dict items
+	ఒకవేళ (li->li_tv.v_type != VAR_DICT)
+	    కొనసాగు; // Skip non-dict items
 
 	d = li->li_tv.vval.v_dict;
-	if (d == NULL)
-	    continue;
+	ఒకవేళ (d == ఖాళీ)
+	    కొనసాగు;
 
-	retval = qf_add_entry_from_dict(qfl, d, li == list->lv_first,
-								&valid_entry);
-	if (retval == QF_FAIL)
-	    break;
+	retval = qf_కూడు_నమోదు_from_dict(qfl, d, li == list->lv_మొదటి,
+								&valid_నమోదు);
+	ఒకవేళ (retval == QF_FAIL)
+	    ఆపు;
 
-	qfline_T *entry = qfl->qf_last;
-	if (
-	    (select_first_entry && entry_to_select == NULL) ||
-	    (select_nearest_entry &&
-		(entry_to_select == NULL ||
-		 entry_is_closer_to_target(entry, entry_to_select, prev_fnum,
-					   prev_lnum, prev_col))))
+	qfline_T *నమోదు_2 = qfl->qf_చివరి;
+	ఒకవేళ (
+	    (select_మొదటి_నమోదు && నమోదు_గమ్యం_select == ఖాళీ) ||
+	    (select_సమీప_నమోదు &&
+		(నమోదు_గమ్యం_select == ఖాళీ ||
+		 నమోదు_is_closer_గమ్యం_లక్ష్యం(నమోదు_2, నమోదు_గమ్యం_select, prev_fnum,
+					   prev_lnum, prev_నిలువు))))
 	{
-	    entry_to_select = entry;
-	    entry_to_select_index = qfl->qf_count;
+	    నమోదు_గమ్యం_select = నమోదు_2;
+	    నమోదు_గమ్యం_select_సూచీ = qfl->qf_లెక్క;
 	}
     }
 
     // Check if any valid error entries are added to the list.
-    if (valid_entry)
+    ఒకవేళ (valid_నమోదు)
 	qfl->qf_nonevalid = FALSE;
-    else if (qfl->qf_index == 0)
+    లేకపోతే ఒకవేళ (qfl->qf_సూచీ == 0)
 	// no valid entry
 	qfl->qf_nonevalid = TRUE;
 
     // Set the current error.
-    if (entry_to_select)
+    ఒకవేళ (నమోదు_గమ్యం_select)
     {
-	qfl->qf_ptr = entry_to_select;
-	qfl->qf_index = entry_to_select_index;
+	qfl->qf_ptr = నమోదు_గమ్యం_select;
+	qfl->qf_సూచీ = నమోదు_గమ్యం_select_సూచీ;
     }
 
     // Don't update the cursor in quickfix window when appending entries
-    qf_update_buffer(qi, old_last);
+    qf_update_బఫరు(qi, old_చివరి);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Get the quickfix list index from 'nr' or 'id'
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_setprop_get_qfidx(
 	qf_info_T	*qi,
 	dict_T		*what,
-	int		action,
-	int		*newlist)
+	పూర్ణాంకం		action,
+	పూర్ణాంకం		*newlist)
 {
     dictitem_T	*di;
-    int		qf_idx = qi->qf_curlist;    // default is the current list
+    పూర్ణాంకం		qf_idx = qi->qf_curlist;    // default is the current list
 
-    if ((di = dict_find(what, (char_u *)"nr", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"nr", -1)) != ఖాళీ)
     {
 	// Use the specified quickfix/location list
-	if (di->di_tv.v_type == VAR_NUMBER)
+	ఒకవేళ (di->di_tv.v_type == VAR_సంఖ్య)
 	{
 	    // for zero use the current list
-	    if (di->di_tv.vval.v_number != 0)
-		qf_idx = di->di_tv.vval.v_number - 1;
+	    ఒకవేళ (di->di_tv.vval.v_సంఖ్య != 0)
+		qf_idx = di->di_tv.vval.v_సంఖ్య - 1;
 
-	    if ((action == ' ' || action == 'a') && qf_idx == qi->qf_listcount)
+	    ఒకవేళ ((action == ' ' || action == 'a') && qf_idx == qi->qf_listcount)
 	    {
 		// When creating a new list, accept qf_idx pointing to the next
 		// non-available list and add the new list at the end of the
 		// stack.
 		*newlist = TRUE;
-		qf_idx = qf_stack_empty(qi) ? 0 : qi->qf_listcount - 1;
+		qf_idx = qf_దొంతర_ఖాళీలు(qi) ? 0 : qi->qf_listcount - 1;
 	    }
-	    else if (qf_idx < 0 || qf_idx >= qi->qf_listcount)
-		return INVALID_QFIDX;
-	    else if (action != ' ')
+	    లేకపోతే ఒకవేళ (qf_idx < 0 || qf_idx >= qi->qf_listcount)
+		తిరిగి INVALID_QFIDX;
+	    లేకపోతే ఒకవేళ (action != ' ')
 		*newlist = FALSE;	// use the specified list
 	}
-	else if (di->di_tv.v_type == VAR_STRING
-		&& di->di_tv.vval.v_string != NULL
+	లేకపోతే ఒకవేళ (di->di_tv.v_type == VAR_STRING
+		&& di->di_tv.vval.v_string != ఖాళీ
 		&& STRCMP(di->di_tv.vval.v_string, "$") == 0)
 	{
-	    if (!qf_stack_empty(qi))
+	    ఒకవేళ (!qf_దొంతర_ఖాళీలు(qi))
 		qf_idx = qi->qf_listcount - 1;
-	    else if (*newlist)
+	    లేకపోతే ఒకవేళ (*newlist)
 		qf_idx = 0;
-	    else
-		return INVALID_QFIDX;
+	    లేకపోతే
+		తిరిగి INVALID_QFIDX;
 	}
-	else
-	    return INVALID_QFIDX;
+	లేకపోతే
+	    తిరిగి INVALID_QFIDX;
     }
 
-    if (!*newlist && (di = dict_find(what, (char_u *)"id", -1)) != NULL)
+    ఒకవేళ (!*newlist && (di = dict_కనుగొను(what, (char_u *)"id", -1)) != ఖాళీ)
     {
 	// Use the quickfix/location list with the specified id
-	if (di->di_tv.v_type != VAR_NUMBER)
-	    return INVALID_QFIDX;
+	ఒకవేళ (di->di_tv.v_type != VAR_సంఖ్య)
+	    తిరిగి INVALID_QFIDX;
 
-	return qf_id2nr(qi, di->di_tv.vval.v_number);
+	తిరిగి qf_id2nr(qi, di->di_tv.vval.v_సంఖ్య);
     }
 
-    return qf_idx;
+    తిరిగి qf_idx;
 }
 
 /*
  * Set the quickfix list title.
  */
-    static int
-qf_setprop_title(qf_info_T *qi, int qf_idx, dict_T *what, dictitem_T *di)
+    స్థిర పూర్ణాంకం
+qf_setprop_title(qf_info_T *qi, పూర్ణాంకం qf_idx, dict_T *what, dictitem_T *di)
 {
     qf_list_T	*qfl = qf_get_list(qi, qf_idx);
 
-    if (di->di_tv.v_type != VAR_STRING)
-	return FAIL;
+    ఒకవేళ (di->di_tv.v_type != VAR_STRING)
+	తిరిగి FAIL;
 
     vim_free(qfl->qf_title);
     qfl->qf_title = dict_get_string(what, "title", TRUE);
-    if (qf_idx == qi->qf_curlist)
+    ఒకవేళ (qf_idx == qi->qf_curlist)
 	qf_update_win_titlevar(qi);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set quickfix list items/entries.
  */
-    static int
-qf_setprop_items(qf_info_T *qi, int qf_idx, dictitem_T *di, int action)
+    స్థిర పూర్ణాంకం
+qf_setprop_వస్తువులు(qf_info_T *qi, పూర్ణాంకం qf_idx, dictitem_T *di, పూర్ణాంకం action)
 {
-    int		retval = FAIL;
+    పూర్ణాంకం		retval = FAIL;
     char_u	*title_save;
 
-    if (di->di_tv.v_type != VAR_LIST)
-	return FAIL;
+    ఒకవేళ (di->di_tv.v_type != VAR_LIST)
+	తిరిగి FAIL;
 
     title_save = vim_strsave(qi->qf_lists[qf_idx].qf_title);
-    retval = qf_add_entries(qi, qf_idx, di->di_tv.vval.v_list,
+    retval = qf_కూడు_entries(qi, qf_idx, di->di_tv.vval.v_list,
 	    title_save, action == ' ' ? 'a' : action);
     vim_free(title_save);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Set quickfix list items/entries from a list of lines.
  */
-    static int
-qf_setprop_items_from_lines(
+    స్థిర పూర్ణాంకం
+qf_setprop_వస్తువులు_from_పంక్తులు(
 	qf_info_T	*qi,
-	int		qf_idx,
+	పూర్ణాంకం		qf_idx,
 	dict_T		*what,
 	dictitem_T	*di,
-	int		action)
+	పూర్ణాంకం		action)
 {
     char_u	*errorformat = p_efm;
     dictitem_T	*efm_di;
-    int		retval = FAIL;
+    పూర్ణాంకం		retval = FAIL;
 
     // Use the user supplied errorformat settings (if present)
-    if ((efm_di = dict_find(what, (char_u *)"efm", -1)) != NULL)
+    ఒకవేళ ((efm_di = dict_కనుగొను(what, (char_u *)"efm", -1)) != ఖాళీ)
     {
-	if (efm_di->di_tv.v_type != VAR_STRING ||
-		efm_di->di_tv.vval.v_string == NULL)
-	    return FAIL;
+	ఒకవేళ (efm_di->di_tv.v_type != VAR_STRING ||
+		efm_di->di_tv.vval.v_string == ఖాళీ)
+	    తిరిగి FAIL;
 	errorformat = efm_di->di_tv.vval.v_string;
     }
 
     // Only a List value is supported
-    if (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == NULL)
-	return FAIL;
+    ఒకవేళ (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (action == 'r' || action == 'u')
-	qf_free_items(&qi->qf_lists[qf_idx]);
-    if (qf_init_ext(qi, qf_idx, NULL, NULL, &di->di_tv, errorformat,
-		FALSE, (linenr_T)0, (linenr_T)0, NULL, NULL) >= 0)
+    ఒకవేళ (action == 'r' || action == 'u')
+	qf_free_వస్తువులు(&qi->qf_lists[qf_idx]);
+    ఒకవేళ (qf_init_ext(qi, qf_idx, ఖాళీ, ఖాళీ, &di->di_tv, errorformat,
+		FALSE, (linenr_T)0, (linenr_T)0, ఖాళీ, ఖాళీ) >= 0)
 	retval = OK;
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Set quickfix list context.
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_setprop_context(qf_list_T *qfl, dictitem_T *di)
 {
     typval_T	*ctx;
 
     free_tv(qfl->qf_ctx);
     ctx =  alloc_tv();
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	copy_tv(&di->di_tv, ctx);
     qfl->qf_ctx = ctx;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set the current index in the specified quickfix list
  */
-    static int
+    స్థిర పూర్ణాంకం
 qf_setprop_curidx(qf_info_T *qi, qf_list_T *qfl, dictitem_T *di)
 {
-    int		denote = FALSE;
-    int		newidx;
-    int		old_qfidx;
+    పూర్ణాంకం		denote = FALSE;
+    పూర్ణాంకం		newidx;
+    పూర్ణాంకం		old_qfidx;
     qfline_T	*qf_ptr;
 
     // If the specified index is '$', then use the last entry
-    if (di->di_tv.v_type == VAR_STRING
-	    && di->di_tv.vval.v_string != NULL
+    ఒకవేళ (di->di_tv.v_type == VAR_STRING
+	    && di->di_tv.vval.v_string != ఖాళీ
 	    && STRCMP(di->di_tv.vval.v_string, "$") == 0)
-	newidx = qfl->qf_count;
-    else
+	newidx = qfl->qf_లెక్క;
+    లేకపోతే
     {
 	// Otherwise use the specified index
-	newidx = tv_get_number_chk(&di->di_tv, &denote);
-	if (denote)
-	    return FAIL;
+	newidx = tv_get_సంఖ్య_chk(&di->di_tv, &denote);
+	ఒకవేళ (denote)
+	    తిరిగి FAIL;
     }
 
-    if (newidx < 1)		// sanity check
-	return FAIL;
-    if (newidx > qfl->qf_count)
-	newidx = qfl->qf_count;
+    ఒకవేళ (newidx < 1)		// sanity check
+	తిరిగి FAIL;
+    ఒకవేళ (newidx > qfl->qf_లెక్క)
+	newidx = qfl->qf_లెక్క;
 
-    old_qfidx = qfl->qf_index;
-    qf_ptr = get_nth_entry(qfl, newidx, &newidx);
-    if (qf_ptr == NULL)
-	return FAIL;
+    old_qfidx = qfl->qf_సూచీ;
+    qf_ptr = get_nth_నమోదు(qfl, newidx, &newidx);
+    ఒకవేళ (qf_ptr == ఖాళీ)
+	తిరిగి FAIL;
     qfl->qf_ptr = qf_ptr;
-    qfl->qf_index = newidx;
+    qfl->qf_సూచీ = newidx;
 
     // If the current list is modified and it is displayed in the quickfix
     // window, then Update it.
-    if (qf_get_curlist(qi)->qf_id == qfl->qf_id)
+    ఒకవేళ (qf_get_curlist(qi)->qf_id == qfl->qf_id)
 	qf_win_pos_update(qi, old_qfidx);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set the 'quickfixtextfunc' in the specified quickfix/location list
  */
-    static int
-qf_setprop_qftf(qf_info_T *qi UNUSED, qf_list_T *qfl, dictitem_T *di)
+    స్థిర పూర్ణాంకం
+qf_setprop_qftf(qf_info_T *qi వాడని, qf_list_T *qfl, dictitem_T *di)
 {
     callback_T	cb;
 
-    if (check_restricted() || check_secure())
-	return FAIL;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి FAIL;
 
     free_callback(&qfl->qf_qftf_cb);
     cb = get_callback(&di->di_tv);
-    if (cb.cb_name == NULL || *cb.cb_name == NUL)
-	return OK;
-    set_callback(&qfl->qf_qftf_cb, &cb);
-    return OK;
+    ఒకవేళ (cb.cb_name == ఖాళీ || *cb.cb_name == NUL)
+	తిరిగి OK;
+    సమితి_callback(&qfl->qf_qftf_cb, &cb);
+    తిరిగి OK;
 }
 
 /*
@@ -8229,23 +8229,23 @@ qf_setprop_qftf(qf_info_T *qi UNUSED, qf_list_T *qfl, dictitem_T *di)
  * Also used to add items from parsing a list of lines.
  * Used by the setqflist() and setloclist() Vim script functions.
  */
-    static int
-qf_set_properties(qf_info_T *qi, dict_T *what, int action, char_u *title)
+    స్థిర పూర్ణాంకం
+qf_సమితి_properties(qf_info_T *qi, dict_T *what, పూర్ణాంకం action, char_u *title)
 {
     dictitem_T	*di;
-    int		retval = FAIL;
-    int		qf_idx;
-    int		newlist = FALSE;
+    పూర్ణాంకం		retval = FAIL;
+    పూర్ణాంకం		qf_idx;
+    పూర్ణాంకం		newlist = FALSE;
     qf_list_T	*qfl;
 
-    if (action == ' ' || qf_stack_empty(qi))
+    ఒకవేళ (action == ' ' || qf_దొంతర_ఖాళీలు(qi))
 	newlist = TRUE;
 
     qf_idx = qf_setprop_get_qfidx(qi, what, action, &newlist);
-    if (qf_idx == INVALID_QFIDX)	// List not found
-	return FAIL;
+    ఒకవేళ (qf_idx == INVALID_QFIDX)	// List not found
+	తిరిగి FAIL;
 
-    if (newlist)
+    ఒకవేళ (newlist)
     {
 	qi->qf_curlist = qf_idx;
 	qf_new_list(qi, title);
@@ -8253,77 +8253,77 @@ qf_set_properties(qf_info_T *qi, dict_T *what, int action, char_u *title)
     }
 
     qfl = qf_get_list(qi, qf_idx);
-    if ((di = dict_find(what, (char_u *)"title", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"title", -1)) != ఖాళీ)
 	retval = qf_setprop_title(qi, qf_idx, what, di);
-    if ((di = dict_find(what, (char_u *)"items", -1)) != NULL)
-	retval = qf_setprop_items(qi, qf_idx, di, action);
-    if ((di = dict_find(what, (char_u *)"lines", -1)) != NULL)
-	retval = qf_setprop_items_from_lines(qi, qf_idx, what, di, action);
-    if ((di = dict_find(what, (char_u *)"context", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"items", -1)) != ఖాళీ)
+	retval = qf_setprop_వస్తువులు(qi, qf_idx, di, action);
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"lines", -1)) != ఖాళీ)
+	retval = qf_setprop_వస్తువులు_from_పంక్తులు(qi, qf_idx, what, di, action);
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"context", -1)) != ఖాళీ)
 	retval = qf_setprop_context(qfl, di);
-    if ((di = dict_find(what, (char_u *)"idx", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"idx", -1)) != ఖాళీ)
 	retval = qf_setprop_curidx(qi, qfl, di);
-    if ((di = dict_find(what, (char_u *)"quickfixtextfunc", -1)) != NULL)
+    ఒకవేళ ((di = dict_కనుగొను(what, (char_u *)"quickfixtextfunc", -1)) != ఖాళీ)
 	retval = qf_setprop_qftf(qi, qfl, di);
 
-    if (newlist || retval == OK)
-	qf_list_changed(qfl);
-    if (newlist)
-	qf_update_buffer(qi, NULL);
+    ఒకవేళ (newlist || retval == OK)
+	qf_list_మారింది(qfl);
+    ఒకవేళ (newlist)
+	qf_update_బఫరు(qi, ఖాళీ);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Free the entire quickfix/location list stack.
  * If the quickfix/location list window is open, then clear it.
  */
-    static void
-qf_free_stack(win_T *wp, qf_info_T *qi)
+    స్థిర శూన్య
+qf_free_దొంతర(win_T *wp, qf_info_T *qi)
 {
-    win_T	*qfwin = qf_find_win(qi);
-    win_T	*llwin = NULL;
+    win_T	*qfwin = qf_కనుగొను_win(qi);
+    win_T	*llwin = ఖాళీ;
 
-    if (qfwin != NULL)
+    ఒకవేళ (qfwin != ఖాళీ)
     {
 	// If the quickfix/location list window is open, then clear it
-	if (qi->qf_curlist < qi->qf_listcount)
+	ఒకవేళ (qi->qf_curlist < qi->qf_listcount)
 	    qf_free(qf_get_curlist(qi));
-	qf_update_buffer(qi, NULL);
+	qf_update_బఫరు(qi, ఖాళీ);
     }
 
-    if (wp != NULL && IS_LL_WINDOW(wp))
+    ఒకవేళ (wp != ఖాళీ && IS_LL_కిటికీ(wp))
     {
 	// If in the location list window, then use the non-location list
 	// window with this location list (if present)
-	llwin = qf_find_win_with_loclist(qi);
-	if (llwin != NULL)
+	llwin = qf_కనుగొను_win_with_loclist(qi);
+	ఒకవేళ (llwin != ఖాళీ)
 	    wp = llwin;
     }
 
     qf_free_all(wp);
-    if (wp == NULL)
+    ఒకవేళ (wp == ఖాళీ)
     {
 	// quickfix list
 	qi->qf_curlist = 0;
 	qi->qf_listcount = 0;
     }
-    else if (qfwin != NULL)
+    లేకపోతే ఒకవేళ (qfwin != ఖాళీ)
     {
 	// If the location list window is open, then create a new empty
 	// location list
-	qf_info_T *new_ll = qf_alloc_stack(QFLT_LOCATION, wp->w_p_lhi);
+	qf_info_T *new_ll = qf_alloc_దొంతర(QFLT_LOCATION, wp->w_p_lhi);
 
-	if (new_ll != NULL)
+	ఒకవేళ (new_ll != ఖాళీ)
 	{
-	    new_ll->qf_bufnr = qfwin->w_buffer->b_fnum;
+	    new_ll->qf_bufnr = qfwin->w_బఫరు->b_fnum;
 
 	    // first free the list reference in the location list window
 	    ll_free_all(&qfwin->w_llist_ref);
 
 	    qfwin->w_llist_ref = new_ll;
-	    if (wp != qfwin)
-		win_set_loclist(wp, new_ll);
+	    ఒకవేళ (wp != qfwin)
+		win_సమితి_loclist(wp, new_ll);
 	}
     }
 }
@@ -8334,174 +8334,174 @@ qf_free_stack(win_T *wp, qf_info_T *qi)
  * "action" is 'a' for add, 'r' for replace, 'u' for update.  Otherwise
  * create a new list. When "what" is not NULL then only set some properties.
  */
-    int
-set_errorlist(
+    పూర్ణాంకం
+సమితి_errorlist(
 	win_T	*wp,
 	list_T	*list,
-	int	action,
+	పూర్ణాంకం	action,
 	char_u	*title,
 	dict_T	*what)
 {
     qf_info_T	*qi;
-    int		retval = OK;
+    పూర్ణాంకం		retval = OK;
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
 	qi = ll_get_or_alloc_list(wp);
-    else
+    లేకపోతే
 	qi = ql_info;
-    if (qi == NULL)
-	return FAIL;
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (action == 'f')
+    ఒకవేళ (action == 'f')
     {
 	// Free the entire quickfix or location list stack
-	qf_free_stack(wp, qi);
-	return OK;
+	qf_free_దొంతర(wp, qi);
+	తిరిగి OK;
     }
 
     // A dict argument cannot be specified with a non-empty list argument
-    if (list->lv_len != 0 && what != NULL)
+    ఒకవేళ (list->lv_len != 0 && what != ఖాళీ)
     {
-	semsg(_(e_invalid_argument_str),
+	semsg(_(e_invalid_వాదం_str),
 			 _("cannot have both a list and a \"what\" argument"));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     incr_quickfix_busy();
 
-    if (what != NULL)
-	retval = qf_set_properties(qi, what, action, title);
-    else
+    ఒకవేళ (what != ఖాళీ)
+	retval = qf_సమితి_properties(qi, what, action, title);
+    లేకపోతే
     {
-	retval = qf_add_entries(qi, qi->qf_curlist, list, title, action);
-	if (retval == OK)
-	    qf_list_changed(qf_get_curlist(qi));
+	retval = qf_కూడు_entries(qi, qi->qf_curlist, list, title, action);
+	ఒకవేళ (retval == OK)
+	    qf_list_మారింది(qf_get_curlist(qi));
     }
 
     decr_quickfix_busy();
 
-    return retval;
+    తిరిగి retval;
 }
 
-static int mark_quickfix_user_data(qf_info_T *qi, int copyID)
+స్థిర పూర్ణాంకం mark_quickfix_user_దత్తాంశం(qf_info_T *qi, పూర్ణాంకం copyID)
 {
-    int abort = FALSE;
-    for (int i = 0; i < qi->qf_maxcount && !abort; ++i)
+    పూర్ణాంకం abort = FALSE;
+    కొరకు (పూర్ణాంకం i = 0; i < qi->qf_maxcount && !abort; ++i)
     {
 	qf_list_T *qfl = &qi->qf_lists[i];
-	if (!qfl->qf_has_user_data)
-	    continue;
+	ఒకవేళ (!qfl->qf_has_user_దత్తాంశం)
+	    కొనసాగు;
 	qfline_T *qfp;
-	int j;
-	FOR_ALL_QFL_ITEMS(qfl, qfp, j)
+	పూర్ణాంకం j;
+	FOR_ALL_QFL_వస్తువులు(qfl, qfp, j)
 	{
-	    typval_T* user_data = &qfp->qf_user_data;
-	    if (user_data != NULL && user_data->v_type != VAR_NUMBER
-		&& user_data->v_type != VAR_STRING && user_data->v_type != VAR_FLOAT)
-		abort = abort || set_ref_in_item(user_data, copyID, NULL, NULL, NULL);
+	    typval_T* user_దత్తాంశం = &qfp->qf_user_దత్తాంశం;
+	    ఒకవేళ (user_దత్తాంశం != ఖాళీ && user_దత్తాంశం->v_type != VAR_సంఖ్య
+		&& user_దత్తాంశం->v_type != VAR_STRING && user_దత్తాంశం->v_type != VAR_FLOAT)
+		abort = abort || సమితి_ref_లోపల_అంశం(user_దత్తాంశం, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 	}
     }
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Mark the quickfix context and callback function as in use for all the lists
  * in a quickfix stack.
  */
-    static int
-mark_quickfix_ctx(qf_info_T *qi, int copyID)
+    స్థిర పూర్ణాంకం
+mark_quickfix_ctx(qf_info_T *qi, పూర్ణాంకం copyID)
 {
-    int		i;
-    int		abort = FALSE;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		abort = FALSE;
     typval_T	*ctx;
     callback_T	*cb;
 
-    for (i = 0; i < qi->qf_maxcount && !abort; ++i)
+    కొరకు (i = 0; i < qi->qf_maxcount && !abort; ++i)
     {
 	ctx = qi->qf_lists[i].qf_ctx;
-	if (ctx != NULL && ctx->v_type != VAR_NUMBER
+	ఒకవేళ (ctx != ఖాళీ && ctx->v_type != VAR_సంఖ్య
 		&& ctx->v_type != VAR_STRING && ctx->v_type != VAR_FLOAT)
-	    abort = abort || set_ref_in_item(ctx, copyID, NULL, NULL, NULL);
+	    abort = abort || సమితి_ref_లోపల_అంశం(ctx, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 
 	cb = &qi->qf_lists[i].qf_qftf_cb;
-	abort = abort || set_ref_in_callback(cb, copyID);
+	abort = abort || సమితి_ref_లోపల_callback(cb, copyID);
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Mark the context of the quickfix list and the location lists (if present) as
  * "in use". So that garbage collection doesn't free the context.
  */
-    int
-set_ref_in_quickfix(int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_quickfix(పూర్ణాంకం copyID)
 {
-    int		abort = FALSE;
+    పూర్ణాంకం		abort = FALSE;
     tabpage_T	*tp;
     win_T	*win;
 
-    if (ql_info == NULL)
-	return TRUE;
+    ఒకవేళ (ql_info == ఖాళీ)
+	తిరిగి TRUE;
 
     abort = mark_quickfix_ctx(ql_info, copyID);
-    if (abort)
-	return abort;
+    ఒకవేళ (abort)
+	తిరిగి abort;
 
-    abort = mark_quickfix_user_data(ql_info, copyID);
-    if (abort)
-	return abort;
+    abort = mark_quickfix_user_దత్తాంశం(ql_info, copyID);
+    ఒకవేళ (abort)
+	తిరిగి abort;
 
-    abort = set_ref_in_callback(&qftf_cb, copyID);
-    if (abort)
-	return abort;
+    abort = సమితి_ref_లోపల_callback(&qftf_cb, copyID);
+    ఒకవేళ (abort)
+	తిరిగి abort;
 
     FOR_ALL_TAB_WINDOWS(tp, win)
     {
-	if (win->w_llist != NULL)
+	ఒకవేళ (win->w_llist != ఖాళీ)
 	{
 	    abort = mark_quickfix_ctx(win->w_llist, copyID);
-	    if (abort)
-		return abort;
+	    ఒకవేళ (abort)
+		తిరిగి abort;
 
-	    abort = mark_quickfix_user_data(win->w_llist, copyID);
-	    if (abort)
-		return abort;
+	    abort = mark_quickfix_user_దత్తాంశం(win->w_llist, copyID);
+	    ఒకవేళ (abort)
+		తిరిగి abort;
 	}
-	if (IS_LL_WINDOW(win) && (win->w_llist_ref->qf_refcount == 1))
+	ఒకవేళ (IS_LL_కిటికీ(win) && (win->w_llist_ref->qf_refcount == 1))
 	{
 	    // In a location list window and none of the other windows is
 	    // referring to this location list. Mark the location list
 	    // context as still in use.
 	    abort = mark_quickfix_ctx(win->w_llist_ref, copyID);
-	    if (abort)
-		return abort;
+	    ఒకవేళ (abort)
+		తిరిగి abort;
 
-	    abort = mark_quickfix_user_data(win->w_llist_ref, copyID);
-	    if (abort)
-		return abort;
+	    abort = mark_quickfix_user_దత్తాంశం(win->w_llist_ref, copyID);
+	    ఒకవేళ (abort)
+		తిరిగి abort;
 	}
     }
 
-    return abort;
+    తిరిగి abort;
 }
 # endif
 
 /*
  * Return the autocmd name for the :cbuffer Ex commands
  */
-    static char_u *
+    స్థిర char_u *
 cbuffer_get_auname(cmdidx_T cmdidx)
 {
-    switch (cmdidx)
+    ఎంపిక (cmdidx)
     {
-	case CMD_cbuffer:	return (char_u *)"cbuffer";
-	case CMD_cgetbuffer:	return (char_u *)"cgetbuffer";
-	case CMD_caddbuffer:	return (char_u *)"caddbuffer";
-	case CMD_lbuffer:	return (char_u *)"lbuffer";
-	case CMD_lgetbuffer:	return (char_u *)"lgetbuffer";
-	case CMD_laddbuffer:	return (char_u *)"laddbuffer";
-	default:		return NULL;
+	స్థితి CMD_cbuffer:	తిరిగి (char_u *)"cbuffer";
+	స్థితి CMD_cgetbuffer:	తిరిగి (char_u *)"cgetbuffer";
+	స్థితి CMD_caddbuffer:	తిరిగి (char_u *)"caddbuffer";
+	స్థితి CMD_lbuffer:	తిరిగి (char_u *)"lbuffer";
+	స్థితి CMD_lgetbuffer:	తిరిగి (char_u *)"lgetbuffer";
+	స్థితి CMD_laddbuffer:	తిరిగి (char_u *)"laddbuffer";
+	అప్రమేయ:		తిరిగి ఖాళీ;
     }
 }
 
@@ -8509,50 +8509,50 @@ cbuffer_get_auname(cmdidx_T cmdidx)
  * Process and validate the arguments passed to the :cbuffer, :caddbuffer,
  * :cgetbuffer, :lbuffer, :laddbuffer, :lgetbuffer Ex commands.
  */
-    static int
-cbuffer_process_args(
+    స్థిర పూర్ణాంకం
+cbuffer_process_వాదనలు(
 	exarg_T		*eap,
 	buf_T		**bufp,
 	linenr_T	*line1,
 	linenr_T	*line2)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
 
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
 	buf = curbuf;
-    else if (*skipwhite(skipdigits(eap->arg)) == NUL)
-	buf = buflist_findnr(atoi((char *)eap->arg));
+    లేకపోతే ఒకవేళ (*skipwhite(skipdigits(eap->arg)) == NUL)
+	buf = buflist_findnr(atoi((అక్షరం *)eap->arg));
 
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
-	emsg(_(e_invalid_argument));
-	return FAIL;
+	emsg(_(e_invalid_వాదం));
+	తిరిగి FAIL;
     }
 
-    if (buf->b_ml.ml_mfp == NULL)
+    ఒకవేళ (buf->b_ml.ml_mfp == ఖాళీ)
     {
-	emsg(_(e_buffer_is_not_loaded));
-	return FAIL;
+	emsg(_(e_బఫరు_is_not_loaded));
+	తిరిగి FAIL;
     }
 
-    if (eap->addr_count == 0)
+    ఒకవేళ (eap->addr_లెక్క == 0)
     {
 	eap->line1 = 1;
-	eap->line2 = buf->b_ml.ml_line_count;
+	eap->line2 = buf->b_ml.ml_పంక్తి_లెక్క;
     }
 
-    if (eap->line1 < 1 || eap->line1 > buf->b_ml.ml_line_count
-	    || eap->line2 < 1 || eap->line2 > buf->b_ml.ml_line_count)
+    ఒకవేళ (eap->line1 < 1 || eap->line1 > buf->b_ml.ml_పంక్తి_లెక్క
+	    || eap->line2 < 1 || eap->line2 > buf->b_ml.ml_పంక్తి_లెక్క)
     {
 	emsg(_(e_invalid_range));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     *line1 = eap->line1;
     *line2 = eap->line2;
     *bufp = buf;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -8563,169 +8563,169 @@ cbuffer_process_args(
  * ":[range]laddbuffer [bufnr]" command.
  * ":[range]lgetbuffer [bufnr]" command.
  */
-    void
+    శూన్య
 ex_cbuffer(exarg_T *eap)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
     qf_info_T	*qi;
-    char_u	*au_name = NULL;
-    int		res;
+    char_u	*au_name = ఖాళీ;
+    పూర్ణాంకం		res;
     int_u	save_qfid;
-    win_T	*wp = NULL;
+    win_T	*wp = ఖాళీ;
     char_u	*qf_title;
     linenr_T	line1;
     linenr_T	line2;
 
     au_name = cbuffer_get_auname(eap->cmdidx);
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
 					curbuf->b_fname, TRUE, curbuf))
     {
 # ifdef FEAT_EVAL
-	if (aborting())
-	    return;
+	ఒకవేళ (aborting())
+	    తిరిగి;
 # endif
     }
 
     // Must come after autocommands.
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
-    if (qi == NULL)
-	return;
+    qi = qf_cmd_get_or_alloc_దొంతర(eap, &wp);
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి;
 
-    if (cbuffer_process_args(eap, &buf, &line1, &line2) == FAIL)
-	return;
+    ఒకవేళ (cbuffer_process_వాదనలు(eap, &buf, &line1, &line2) == FAIL)
+	తిరిగి;
 
     qf_title = qf_cmdtitle(*eap->cmdlinep);
 
-    if (buf->b_sfname)
+    ఒకవేళ (buf->b_sfname)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "%s (%s)",
-		(char *)qf_title, (char *)buf->b_sfname);
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, "%s (%s)",
+		(అక్షరం *)qf_title, (అక్షరం *)buf->b_sfname);
 	qf_title = IObuff;
     }
 
     incr_quickfix_busy();
 
-    res = qf_init_ext(qi, qi->qf_curlist, NULL, buf, NULL, p_efm,
+    res = qf_init_ext(qi, qi->qf_curlist, ఖాళీ, buf, ఖాళీ, p_efm,
 	    (eap->cmdidx != CMD_caddbuffer
 	     && eap->cmdidx != CMD_laddbuffer),
 	    line1, line2,
-	    qf_title, NULL);
-    if (qf_stack_empty(qi))
+	    qf_title, ఖాళీ);
+    ఒకవేళ (qf_దొంతర_ఖాళీలు(qi))
     {
 	decr_quickfix_busy();
-	return;
+	తిరిగి;
     }
-    if (res >= 0)
-	qf_list_changed(qf_get_curlist(qi));
+    ఒకవేళ (res >= 0)
+	qf_list_మారింది(qf_get_curlist(qi));
 
     // Remember the current quickfix list identifier, so that we can
     // check for autocommands changing the current quickfix list.
     save_qfid = qf_get_curlist(qi)->qf_id;
-    if (au_name != NULL)
+    ఒకవేళ (au_name != ఖాళీ)
     {
 	buf_T *curbuf_old = curbuf;
 
 	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name, curbuf->b_fname,
 								TRUE, curbuf);
-	if (curbuf != curbuf_old)
+	ఒకవేళ (curbuf != curbuf_old)
 	    // Autocommands changed buffer, don't jump now, "qi" may
 	    // be invalid.
 	    res = 0;
     }
     // Jump to the first error for a new list and if autocmds didn't
     // free the list.
-    if (res > 0 && (eap->cmdidx == CMD_cbuffer ||
+    ఒకవేళ (res > 0 && (eap->cmdidx == CMD_cbuffer ||
 		eap->cmdidx == CMD_lbuffer)
 	    && qflist_valid(wp, save_qfid))
 	// display the first error
-	qf_jump_first(qi, save_qfid, eap->forceit);
+	qf_jump_మొదటి(qi, save_qfid, eap->forceit);
 
     decr_quickfix_busy();
 }
 
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return the autocmd name for the :cexpr Ex commands.
  */
     char_u *
 cexpr_get_auname(cmdidx_T cmdidx)
 {
-    switch (cmdidx)
+    ఎంపిక (cmdidx)
     {
-	case CMD_cexpr:	    return (char_u *)"cexpr";
-	case CMD_cgetexpr:  return (char_u *)"cgetexpr";
-	case CMD_caddexpr:  return (char_u *)"caddexpr";
-	case CMD_lexpr:	    return (char_u *)"lexpr";
-	case CMD_lgetexpr:  return (char_u *)"lgetexpr";
-	case CMD_laddexpr:  return (char_u *)"laddexpr";
-	default:	    return NULL;
+	స్థితి CMD_cexpr:	    తిరిగి (char_u *)"cexpr";
+	స్థితి CMD_cgetexpr:  తిరిగి (char_u *)"cgetexpr";
+	స్థితి CMD_caddexpr:  తిరిగి (char_u *)"caddexpr";
+	స్థితి CMD_lexpr:	    తిరిగి (char_u *)"lexpr";
+	స్థితి CMD_lgetexpr:  తిరిగి (char_u *)"lgetexpr";
+	స్థితి CMD_laddexpr:  తిరిగి (char_u *)"laddexpr";
+	అప్రమేయ:	    తిరిగి ఖాళీ;
     }
 }
 
-    int
-trigger_cexpr_autocmd(int cmdidx)
+    పూర్ణాంకం
+trigger_cexpr_autocmd(పూర్ణాంకం cmdidx)
 {
     char_u	*au_name = cexpr_get_auname(cmdidx);
 
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
 					       curbuf->b_fname, TRUE, curbuf))
     {
-	if (aborting())
-	    return FAIL;
+	ఒకవేళ (aborting())
+	    తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-    int
+    పూర్ణాంకం
 cexpr_core(exarg_T *eap, typval_T *tv)
 {
     qf_info_T	*qi;
-    win_T	*wp = NULL;
+    win_T	*wp = ఖాళీ;
 
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
-    if (qi == NULL)
-	return FAIL;
+    qi = qf_cmd_get_or_alloc_దొంతర(eap, &wp);
+    ఒకవేళ (qi == ఖాళీ)
+	తిరిగి FAIL;
 
-    if ((tv->v_type == VAR_STRING && tv->vval.v_string != NULL)
-	    || (tv->v_type == VAR_LIST && tv->vval.v_list != NULL))
+    ఒకవేళ ((tv->v_type == VAR_STRING && tv->vval.v_string != ఖాళీ)
+	    || (tv->v_type == VAR_LIST && tv->vval.v_list != ఖాళీ))
     {
-	int	res;
+	పూర్ణాంకం	res;
 	int_u	save_qfid;
 	char_u	*au_name = cexpr_get_auname(eap->cmdidx);
 
 	incr_quickfix_busy();
-	res = qf_init_ext(qi, qi->qf_curlist, NULL, NULL, tv, p_efm,
+	res = qf_init_ext(qi, qi->qf_curlist, ఖాళీ, ఖాళీ, tv, p_efm,
 			(eap->cmdidx != CMD_caddexpr
 			 && eap->cmdidx != CMD_laddexpr),
 			     (linenr_T)0, (linenr_T)0,
-			     qf_cmdtitle(*eap->cmdlinep), NULL);
-	if (qf_stack_empty(qi))
+			     qf_cmdtitle(*eap->cmdlinep), ఖాళీ);
+	ఒకవేళ (qf_దొంతర_ఖాళీలు(qi))
 	{
 	    decr_quickfix_busy();
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (res >= 0)
-	    qf_list_changed(qf_get_curlist(qi));
+	ఒకవేళ (res >= 0)
+	    qf_list_మారింది(qf_get_curlist(qi));
 
 	// Remember the current quickfix list identifier, so that we can
 	// check for autocommands changing the current quickfix list.
 	save_qfid = qf_get_curlist(qi)->qf_id;
-	if (au_name != NULL)
+	ఒకవేళ (au_name != ఖాళీ)
 	    apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name,
 					    curbuf->b_fname, TRUE, curbuf);
 
 	// Jump to the first error for a new list and if autocmds didn't
 	// free the list.
-	if (res > 0 && (eap->cmdidx == CMD_cexpr || eap->cmdidx == CMD_lexpr)
+	ఒకవేళ (res > 0 && (eap->cmdidx == CMD_cexpr || eap->cmdidx == CMD_lexpr)
 		&& qflist_valid(wp, save_qfid))
 	    // display the first error
-	    qf_jump_first(qi, save_qfid, eap->forceit);
+	    qf_jump_మొదటి(qi, save_qfid, eap->forceit);
 	decr_quickfix_busy();
-	return OK;
+	తిరిగి OK;
     }
 
     emsg(_(e_string_or_list_expected));
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
@@ -8733,21 +8733,21 @@ cexpr_core(exarg_T *eap, typval_T *tv)
  * ":lexpr {expr}", ":lgetexpr {expr}", ":laddexpr {expr}" command.
  * Also: ":caddexpr", ":cgetexpr", "laddexpr" and "laddexpr".
  */
-    void
+    శూన్య
 ex_cexpr(exarg_T *eap)
 {
     typval_T	*tv;
 
-    if (trigger_cexpr_autocmd(eap->cmdidx) == FAIL)
-	return;
+    ఒకవేళ (trigger_cexpr_autocmd(eap->cmdidx) == FAIL)
+	తిరిగి;
 
     // Evaluate the expression.  When the result is a string or a list we can
     // use it to fill the errorlist.
-    tv = eval_expr(eap->arg, eap);
-    if (tv == NULL)
-	return;
+    tv = eval_సమాసం(eap->arg, eap);
+    ఒకవేళ (tv == ఖాళీ)
+	తిరిగి;
 
-    (void)cexpr_core(eap, tv);
+    (శూన్య)cexpr_core(eap, tv);
     free_tv(tv);
 }
 # endif
@@ -8755,104 +8755,104 @@ ex_cexpr(exarg_T *eap)
 /*
  * Get the location list for ":lhelpgrep"
  */
-    static qf_info_T *
-hgr_get_ll(int *new_ll)
+    స్థిర qf_info_T *
+hgr_get_ll(పూర్ణాంకం *new_ll)
 {
     win_T	*wp;
     qf_info_T	*qi;
 
     // If the current window is a help window, then use it
-    if (bt_help(curwin->w_buffer))
+    ఒకవేళ (bt_help(curwin->w_బఫరు))
 	wp = curwin;
-    else
+    లేకపోతే
 	// Find an existing help window
-	wp = qf_find_help_win();
+	wp = qf_కనుగొను_help_win();
 
-    if (wp == NULL)	    // Help window not found
-	qi = NULL;
-    else
+    ఒకవేళ (wp == ఖాళీ)	    // Help window not found
+	qi = ఖాళీ;
+    లేకపోతే
 	qi = wp->w_llist;
 
-    if (qi == NULL)
+    ఒకవేళ (qi == ఖాళీ)
     {
 	// Allocate a new location list for help text matches
-	if ((qi = qf_alloc_stack(QFLT_LOCATION, 1)) == NULL)
-	    return NULL;
+	ఒకవేళ ((qi = qf_alloc_దొంతర(QFLT_LOCATION, 1)) == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	*new_ll = TRUE;
     }
 
-    return qi;
+    తిరిగి qi;
 }
 
 /*
  * Search for a pattern in a help file.
  */
-    static void
-hgr_search_file(
+    స్థిర శూన్య
+hgr_శోధన_file(
 	qf_list_T *qfl,
 	char_u *fname,
 	vimconv_T *p_vc,
 	regmatch_T *p_regmatch)
 {
     FILE	*fd;
-    long	lnum;
+    దీర్ఘ	lnum;
 
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
-	return;
+    fd = mch_fopen((అక్షరం *)fname, "r");
+    ఒకవేళ (fd == ఖాళీ)
+	తిరిగి;
 
     lnum = 1;
-    while (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
+    అయితే (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
     {
-	char_u    *line = IObuff;
+	char_u    *పంక్తి = IObuff;
 
 	// Convert a line if 'encoding' is not utf-8 and
 	// the line contains a non-ASCII character.
-	if (p_vc->vc_type != CONV_NONE && has_non_ascii(IObuff))
+	ఒకవేళ (p_vc->vc_type != CONV_NONE && has_non_ascii(IObuff))
 	{
-	    line = string_convert(p_vc, IObuff, NULL);
-	    if (line == NULL)
-		line = IObuff;
+	    పంక్తి = string_convert(p_vc, IObuff, ఖాళీ);
+	    ఒకవేళ (పంక్తి == ఖాళీ)
+		పంక్తి = IObuff;
 	}
 
-	if (vim_regexec(p_regmatch, line, (colnr_T)0))
+	ఒకవేళ (vim_regexec(p_regmatch, పంక్తి, (colnr_T)0))
 	{
-	    int	l = (int)STRLEN(line);
+	    పూర్ణాంకం	l = (పూర్ణాంకం)STRLEN(పంక్తి);
 
 	    // remove trailing CR, LF, spaces, etc.
-	    while (l > 0 && line[l - 1] <= ' ')
-		line[--l] = NUL;
+	    అయితే (l > 0 && పంక్తి[l - 1] <= ' ')
+		పంక్తి[--l] = NUL;
 
-	    if (qf_add_entry(qfl,
-			NULL,	// dir
+	    ఒకవేళ (qf_కూడు_నమోదు(qfl,
+			ఖాళీ,	// dir
 			fname,
-			NULL,
+			ఖాళీ,
 			0,
-			line,
+			పంక్తి,
 			lnum,
 			0,
-			(int)(p_regmatch->startp[0] - line)
-			+ 1,	// col
-			(int)(p_regmatch->endp[0] - line)
+			(పూర్ణాంకం)(p_regmatch->startp[0] - పంక్తి)
+			+ 1,	//నిలువు
+			(పూర్ణాంకం)(p_regmatch->endp[0] - పంక్తి)
 			+ 1,	// end_col
 			FALSE,	// vis_col
-			NULL,	// search pattern
+			ఖాళీ,	// search pattern
 			0,	// nr
 			1,	// type
-			NULL,	// user_data
+			ఖాళీ,	// user_data
 			TRUE	// valid
 			) == QF_FAIL)
 	    {
 		got_int = TRUE;
-		if (line != IObuff)
-		    vim_free(line);
-		break;
+		ఒకవేళ (పంక్తి != IObuff)
+		    vim_free(పంక్తి);
+		ఆపు;
 	    }
 	}
-	if (line != IObuff)
-	    vim_free(line);
+	ఒకవేళ (పంక్తి != IObuff)
+	    vim_free(పంక్తి);
 	++lnum;
-	line_breakcheck();
+	పంక్తి_breakcheck();
     }
     fclose(fd);
 }
@@ -8861,8 +8861,8 @@ hgr_search_file(
  * Search for a pattern in all the help files in the doc directory under
  * the given directory.
  */
-    static void
-hgr_search_files_in_dir(
+    స్థిర శూన్య
+hgr_శోధన_files_లోపల_dir(
 	qf_list_T *qfl,
 	char_u *dirname,
 	regmatch_T *p_regmatch,
@@ -8872,31 +8872,31 @@ hgr_search_files_in_dir(
 # endif
 	)
 {
-    int		fcount;
+    పూర్ణాంకం		fcount;
     char_u	**fnames;
-    int		fi;
+    పూర్ణాంకం		fi;
 
     // Find all "*.txt" and "*.??x" files in the "doc" directory.
-    add_pathsep(dirname);
+    కూడు_pathsep(dirname);
     STRCAT(dirname, "doc/*.\\(txt\\|??x\\)");
-    if (gen_expand_wildcards(1, &dirname, &fcount,
+    ఒకవేళ (gen_expand_wildcards(1, &dirname, &fcount,
 		&fnames, EW_FILE|EW_SILENT) == OK
 	    && fcount > 0)
     {
-	for (fi = 0; fi < fcount && !got_int; ++fi)
+	కొరకు (fi = 0; fi < fcount && !got_int; ++fi)
 	{
 # ifdef FEAT_MULTI_LANG
 	    // Skip files for a different language.
-	    if (lang != NULL
+	    ఒకవేళ (lang != ఖాళీ
 		    && STRNICMP(lang, fnames[fi]
 				    + STRLEN(fnames[fi]) - 3, 2) != 0
 		    && !(STRNICMP(lang, "en", 2) == 0
 			&& STRNICMP("txt", fnames[fi]
 			    + STRLEN(fnames[fi]) - 3, 3) == 0))
-		continue;
+		కొనసాగు;
 # endif
 
-	    hgr_search_file(qfl, fnames[fi], p_vc, p_regmatch);
+	    hgr_శోధన_file(qfl, fnames[fi], p_vc, p_regmatch);
 	}
 	FreeWild(fcount, fnames);
     }
@@ -8908,8 +8908,8 @@ hgr_search_files_in_dir(
  * 'lang' is the language specifier.  If supplied, then only matches in the
  * specified language are found.
  */
-    static void
-hgr_search_in_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
+    స్థిర శూన్య
+hgr_శోధన_లోపల_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
 {
     char_u	*p;
 
@@ -8918,72 +8918,72 @@ hgr_search_in_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
     // Help files are in utf-8 or latin1, convert lines when 'encoding'
     // differs.
     vc.vc_type = CONV_NONE;
-    if (!enc_utf8)
-	convert_setup(&vc, (char_u *)"utf-8", p_enc);
+    ఒకవేళ (!enc_utf8)
+	convert_అమరిక(&vc, (char_u *)"utf-8", p_enc);
 
     // Go through all the directories in 'runtimepath'
     p = p_rtp;
-    while (*p != NUL && !got_int)
+    అయితే (*p != NUL && !got_int)
     {
 	copy_option_part(&p, NameBuff, MAXPATHL, ",");
 
-	hgr_search_files_in_dir(qfl, NameBuff, p_regmatch, &vc
+	hgr_శోధన_files_లోపల_dir(qfl, NameBuff, p_regmatch, &vc
 # ifdef FEAT_MULTI_LANG
 		, lang
 # endif
 		);
     }
 
-    if (vc.vc_type != CONV_NONE)
-	convert_setup(&vc, NULL, NULL);
+    ఒకవేళ (vc.vc_type != CONV_NONE)
+	convert_అమరిక(&vc, ఖాళీ, ఖాళీ);
 }
 
 /*
  * ":helpgrep {pattern}"
  */
-    void
+    శూన్య
 ex_helpgrep(exarg_T *eap)
 {
     regmatch_T	regmatch;
     char_u	*save_cpo;
-    int		save_cpo_allocated;
+    పూర్ణాంకం		save_cpo_allocated;
     qf_info_T	*qi = ql_info;
-    int		new_qi = FALSE;
-    char_u	*au_name =  NULL;
-    char_u	*lang = NULL;
-    int		updated = FALSE;
+    పూర్ణాంకం		new_qi = FALSE;
+    char_u	*au_name =  ఖాళీ;
+    char_u	*lang = ఖాళీ;
+    పూర్ణాంకం		updated = FALSE;
 
-    switch (eap->cmdidx)
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_helpgrep:  au_name = (char_u *)"helpgrep"; break;
-	case CMD_lhelpgrep: au_name = (char_u *)"lhelpgrep"; break;
-	default: break;
+	స్థితి CMD_helpgrep:  au_name = (char_u *)"helpgrep"; ఆపు;
+	స్థితి CMD_lhelpgrep: au_name = (char_u *)"lhelpgrep"; ఆపు;
+	అప్రమేయ: ఆపు;
     }
-    if (au_name != NULL && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
+    ఒకవేళ (au_name != ఖాళీ && apply_autocmds(EVENT_QUICKFIXCMDPRE, au_name,
 					       curbuf->b_fname, TRUE, curbuf))
     {
 # ifdef FEAT_EVAL
-	if (aborting())
-	    return;
+	ఒకవేళ (aborting())
+	    తిరిగి;
 # endif
     }
 
-    if (is_loclist_cmd(eap->cmdidx))
+    ఒకవేళ (is_loclist_cmd(eap->cmdidx))
     {
 	qi = hgr_get_ll(&new_qi);
-	if (qi == NULL)
-	    return;
+	ఒకవేళ (qi == ఖాళీ)
+	    తిరిగి;
     }
-    else if (qi == NULL)
+    లేకపోతే ఒకవేళ (qi == ఖాళీ)
     {
-	emsg(_(e_no_quickfix_stack));
-	return;
+	emsg(_(e_no_quickfix_దొంతర));
+	తిరిగి;
     }
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     save_cpo_allocated = is_option_allocated("cpo");
-    p_cpo = empty_option;
+    p_cpo = ఖాళీలు_option;
 
     incr_quickfix_busy();
 
@@ -8993,7 +8993,7 @@ ex_helpgrep(exarg_T *eap)
 # endif
     regmatch.regprog = vim_regcomp(eap->arg, RE_MAGIC + RE_STRING);
     regmatch.rm_ic = FALSE;
-    if (regmatch.regprog != NULL)
+    ఒకవేళ (regmatch.regprog != ఖాళీ)
     {
 	qf_list_T	*qfl;
 
@@ -9001,79 +9001,79 @@ ex_helpgrep(exarg_T *eap)
 	qf_new_list(qi, qf_cmdtitle(*eap->cmdlinep));
 	qfl = qf_get_curlist(qi);
 
-	hgr_search_in_rtp(qfl, &regmatch, lang);
+	hgr_శోధన_లోపల_rtp(qfl, &regmatch, lang);
 
 	vim_regfree(regmatch.regprog);
 
 	qfl->qf_nonevalid = FALSE;
-	qfl->qf_ptr = qfl->qf_start;
-	qfl->qf_index = 1;
-	qf_list_changed(qfl);
+	qfl->qf_ptr = qfl->qf_ప్రారంభం;
+	qfl->qf_సూచీ = 1;
+	qf_list_మారింది(qfl);
 	updated = TRUE;
     }
 
-    if (p_cpo == empty_option)
+    ఒకవేళ (p_cpo == ఖాళీలు_option)
 	p_cpo = save_cpo;
-    else
+    లేకపోతే
     {
 	// Darn, some plugin changed the value.  If it's still empty it was
 	// changed and restored, need to restore in the complicated way.
-	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
-	if (save_cpo_allocated)
+	ఒకవేళ (*p_cpo == NUL)
+	    సమితి_option_విలువ_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	ఒకవేళ (save_cpo_allocated)
 	    free_string_option(save_cpo);
     }
 
-    if (updated)
+    ఒకవేళ (updated)
 	// This may open a window and source scripts, do this after 'cpo' was
 	// restored.
-	qf_update_buffer(qi, NULL);
+	qf_update_బఫరు(qi, ఖాళీ);
 
-    if (au_name != NULL)
+    ఒకవేళ (au_name != ఖాళీ)
     {
 	apply_autocmds(EVENT_QUICKFIXCMDPOST, au_name,
 					       curbuf->b_fname, TRUE, curbuf);
 	// When adding a location list to an existing location list stack,
 	// if the autocmd made the stack invalid, then just return.
-	if (!new_qi && IS_LL_STACK(qi) && qf_find_win_with_loclist(qi) == NULL)
+	ఒకవేళ (!new_qi && IS_LL_దొంతర(qi) && qf_కనుగొను_win_with_loclist(qi) == ఖాళీ)
 	{
 	    decr_quickfix_busy();
-	    return;
+	    తిరిగి;
 	}
     }
 
     // Jump to first match.
-    if (!qf_list_empty(qf_get_curlist(qi)))
+    ఒకవేళ (!qf_list_ఖాళీలు(qf_get_curlist(qi)))
 	qf_jump(qi, 0, 0, FALSE);
-    else
-	semsg(_(e_no_match_str_2), eap->arg);
+    లేకపోతే
+	semsg(_(e_no_సరిపోలిక_str_2), eap->arg);
 
     decr_quickfix_busy();
 
-    if (eap->cmdidx == CMD_lhelpgrep)
+    ఒకవేళ (eap->cmdidx == CMD_lhelpgrep)
     {
 	// If the help window is not opened or if it already points to the
 	// correct location list, then free the new location list.
-	if (!bt_help(curwin->w_buffer) || curwin->w_llist == qi)
+	ఒకవేళ (!bt_help(curwin->w_బఫరు) || curwin->w_llist == qi)
 	{
-	    if (new_qi)
+	    ఒకవేళ (new_qi)
 		ll_free_all(&qi);
 	}
-	else if (curwin->w_llist == NULL && new_qi)
+	లేకపోతే ఒకవేళ (curwin->w_llist == ఖాళీ && new_qi)
 	    // current window didn't have a location list associated with it
 	    // before. Associate the new location list now.
 	    curwin->w_llist = qi;
     }
 }
 
-# if defined(EXITFREE)
-    void
-free_quickfix(void)
+# ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_quickfix(శూన్య)
 {
     win_T	*win;
     tabpage_T	*tab;
 
-    qf_free_all(NULL);
+    qf_free_all(ఖాళీ);
     // Free all location lists
     FOR_ALL_TAB_WINDOWS(tab, win)
 	qf_free_all(win);
@@ -9082,32 +9082,32 @@ free_quickfix(void)
 }
 # endif
 
-#endif // FEAT_QUICKFIX
+#అయితే_ముగింపు // FEAT_QUICKFIX
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 # ifdef FEAT_QUICKFIX
-    static void
-get_qf_loc_list(int is_qf, win_T *wp, typval_T *what_arg, typval_T *rettv)
+    స్థిర శూన్య
+get_qf_loc_list(పూర్ణాంకం is_qf, win_T *wp, typval_T *what_arg, typval_T *rettv)
 {
-    if (what_arg->v_type == VAR_UNKNOWN)
+    ఒకవేళ (what_arg->v_type == VAR_UNKNOWN)
     {
-	if (rettv_list_alloc(rettv) == OK)
-	    if (is_qf || wp != NULL)
-		(void)get_errorlist(NULL, wp, -1, 0, rettv->vval.v_list);
+	ఒకవేళ (rettv_list_alloc(rettv) == OK)
+	    ఒకవేళ (is_qf || wp != ఖాళీ)
+		(శూన్య)get_errorlist(ఖాళీ, wp, -1, 0, rettv->vval.v_list);
     }
-    else
+    లేకపోతే
     {
-	if (rettv_dict_alloc(rettv) == OK)
-	    if (is_qf || (wp != NULL))
+	ఒకవేళ (rettv_dict_alloc(rettv) == OK)
+	    ఒకవేళ (is_qf || (wp != ఖాళీ))
 	    {
-		if (what_arg->v_type == VAR_DICT)
+		ఒకవేళ (what_arg->v_type == VAR_DICT)
 		{
 		    dict_T	*d = what_arg->vval.v_dict;
 
-		    if (d != NULL)
+		    ఒకవేళ (d != ఖాళీ)
 			qf_get_properties(wp, d, rettv->vval.v_dict);
 		}
-		else
+		లేకపోతే
 		    emsg(_(e_dictionary_required));
 	    }
     }
@@ -9117,18 +9117,18 @@ get_qf_loc_list(int is_qf, win_T *wp, typval_T *what_arg, typval_T *rettv)
 /*
  * "getloclist()" function
  */
-    void
-f_getloclist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_getloclist(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
 # ifdef FEAT_QUICKFIX
     win_T	*wp;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
+    wp = కనుగొను_win_by_nr_or_id(&argvars[0]);
     get_qf_loc_list(FALSE, wp, &argvars[1], rettv);
 # endif
 }
@@ -9136,69 +9136,69 @@ f_getloclist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "getqflist()" function
  */
-    void
-f_getqflist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_getqflist(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
 # ifdef FEAT_QUICKFIX
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    get_qf_loc_list(TRUE, NULL, &argvars[0], rettv);
+    get_qf_loc_list(TRUE, ఖాళీ, &argvars[0], rettv);
 # endif
 }
 
 /*
  * Used by "setqflist()" and "setloclist()" functions
  */
-    static void
-set_qf_ll_list(
-    win_T	*wp UNUSED,
-    typval_T	*list_arg UNUSED,
-    typval_T	*action_arg UNUSED,
-    typval_T	*what_arg UNUSED,
+    స్థిర శూన్య
+సమితి_qf_ll_list(
+    win_T	*wp వాడని,
+    typval_T	*list_arg వాడని,
+    typval_T	*action_arg వాడని,
+    typval_T	*what_arg వాడని,
     typval_T	*rettv)
 {
 # ifdef FEAT_QUICKFIX
     char_u	*act;
-    int		action = 0;
-    static int	recursive = 0;
+    పూర్ణాంకం		action = 0;
+    స్థిర పూర్ణాంకం	recursive = 0;
 # endif
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
 # ifdef FEAT_QUICKFIX
-    if (list_arg->v_type != VAR_LIST)
+    ఒకవేళ (list_arg->v_type != VAR_LIST)
 	emsg(_(e_list_required));
-    else if (recursive != 0)
+    లేకపోతే ఒకవేళ (recursive != 0)
 	emsg(_(e_autocommand_caused_recursive_behavior));
-    else
+    లేకపోతే
     {
 	list_T  *l = list_arg->vval.v_list;
-	dict_T	*what = NULL;
-	int	valid_dict = TRUE;
+	dict_T	*what = ఖాళీ;
+	పూర్ణాంకం	valid_dict = TRUE;
 
-	if (action_arg->v_type == VAR_STRING)
+	ఒకవేళ (action_arg->v_type == VAR_STRING)
 	{
 	    act = tv_get_string_chk(action_arg);
-	    if (act == NULL)
-		return;		// type error; errmsg already given
-	    if ((*act == 'a' || *act == 'r' || *act == 'u' || *act == ' ' || *act == 'f') &&
+	    ఒకవేళ (act == ఖాళీ)
+		తిరిగి;		// type error; errmsg already given
+	    ఒకవేళ ((*act == 'a' || *act == 'r' || *act == 'u' || *act == ' ' || *act == 'f') &&
 		    act[1] == NUL)
 		action = *act;
-	    else
+	    లేకపోతే
 		semsg(_(e_invalid_action_str_1), act);
 	}
-	else if (action_arg->v_type == VAR_UNKNOWN)
+	లేకపోతే ఒకవేళ (action_arg->v_type == VAR_UNKNOWN)
 	    action = ' ';
-	else
+	లేకపోతే
 	    emsg(_(e_string_required));
 
-	if (action_arg->v_type != VAR_UNKNOWN
+	ఒకవేళ (action_arg->v_type != VAR_UNKNOWN
 		&& what_arg->v_type != VAR_UNKNOWN)
 	{
-	    if (what_arg->v_type == VAR_DICT && what_arg->vval.v_dict != NULL)
+	    ఒకవేళ (what_arg->v_type == VAR_DICT && what_arg->vval.v_dict != ఖాళీ)
 		what = what_arg->vval.v_dict;
-	    else
+	    లేకపోతే
 	    {
 		emsg(_(e_dictionary_required));
 		valid_dict = FALSE;
@@ -9206,11 +9206,11 @@ set_qf_ll_list(
 	}
 
 	++recursive;
-	if (l != NULL && action && valid_dict
-		    && set_errorlist(wp, l, action,
-		     (char_u *)(wp == NULL ? ":setqflist()" : ":setloclist()"),
+	ఒకవేళ (l != ఖాళీ && action && valid_dict
+		    && సమితి_errorlist(wp, l, action,
+		     (char_u *)(wp == ఖాళీ ? ":setqflist()" : ":setloclist()"),
 		     what) == OK)
-	    rettv->vval.v_number = 0;
+	    rettv->vval.v_సంఖ్య = 0;
 	--recursive;
     }
 # endif
@@ -9219,39 +9219,39 @@ set_qf_ll_list(
 /*
  * "setloclist()" function
  */
-    void
+    శూన్య
 f_setloclist(typval_T *argvars, typval_T *rettv)
 {
     win_T	*win;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 3) == FAIL)))
-	return;
+	తిరిగి;
 
-    win = find_win_by_nr_or_id(&argvars[0]);
-    if (win != NULL)
-	set_qf_ll_list(win, &argvars[1], &argvars[2], &argvars[3], rettv);
+    win = కనుగొను_win_by_nr_or_id(&argvars[0]);
+    ఒకవేళ (win != ఖాళీ)
+	సమితి_qf_ll_list(win, &argvars[1], &argvars[2], &argvars[3], rettv);
 }
 
 /*
  * "setqflist()" function
  */
-    void
+    శూన్య
 f_setqflist(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	తిరిగి;
 
-    set_qf_ll_list(NULL, &argvars[0], &argvars[1], &argvars[2], rettv);
+    సమితి_qf_ll_list(ఖాళీ, &argvars[0], &argvars[1], &argvars[2], rettv);
 }
-#endif
+#అయితే_ముగింపు

@@ -135,133 +135,133 @@
  */
 
 // definition	number		   opnd?    meaning
-#define END		0	//	End of program or NOMATCH operand.
-#define BOL		1	//	Match "" at beginning of line.
-#define EOL		2	//	Match "" at end of line.
-#define BRANCH		3	// node Match this alternative, or the
+#నిర్వచించు చివర_3		0	//	End of program or NOMATCH operand.
+#నిర్వచించు BOL		1	//	Match "" at beginning of line.
+#నిర్వచించు EOL		2	//	Match "" at end of line.
+#నిర్వచించు BRANCH		3	// node Match this alternative, or the
 				//	next...
-#define BACK		4	//	Match "", "next" ptr points backward.
-#define EXACTLY		5	// str	Match this string.
-#define NOTHING		6	//	Match empty string.
-#define STAR		7	// node Match this (simple) thing 0 or more
+#నిర్వచించు వెనుక_2		4	//	Match "", "next" ptr points backward.
+#నిర్వచించు EXACTLY		5	// str	Match this string.
+#నిర్వచించు NOTHING		6	//	Match empty string.
+#నిర్వచించు నక్షత్రం		7	// node Match this (simple) thing 0 or more
 				//	times.
-#define PLUS		8	// node Match this (simple) thing 1 or more
+#నిర్వచించు PLUS		8	// node Match this (simple) thing 1 or more
 				//	times.
-#define MATCH		9	// node match the operand zero-width
-#define NOMATCH		10	// node check for no match with operand
-#define BEHIND		11	// node look behind for a match with operand
-#define NOBEHIND	12	// node look behind for no match with operand
-#define SUBPAT		13	// node match the operand here
-#define BRACE_SIMPLE	14	// node Match this (simple) thing between m and
+#నిర్వచించు సరిపోలిక_2		9	// node match the operand zero-width
+#నిర్వచించు NOMATCH		10	// node check for no match with operand
+#నిర్వచించు BEHIND		11	// node look behind for a match with operand
+#నిర్వచించు NOBEHIND	12	// node look behind for no match with operand
+#నిర్వచించు SUBPAT		13	// node match the operand here
+#నిర్వచించు BRACE_SIMPLE	14	// node Match this (simple) thing between m and
 				//	n times (\{m,n\}).
-#define BOW		15	//	Match "" after [^a-zA-Z0-9_]
-#define EOW		16	//	Match "" at    [^a-zA-Z0-9_]
-#define BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
+#నిర్వచించు BOW		15	//	Match "" after [^a-zA-Z0-9_]
+#నిర్వచించు EOW		16	//	Match "" at    [^a-zA-Z0-9_]
+#నిర్వచించు BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
 				//	and BRACE_COMPLEX.
-#define NEWL		18	//	Match line-break
-#define BHPOS		19	//	End position for BEHIND or NOBEHIND
+#నిర్వచించు NEWL		18	//	Match line-break
+#నిర్వచించు BHPOS		19	//	End position for BEHIND or NOBEHIND
 
 
 // character classes: 20-48 normal, 50-78 include a line-break
-#define ADD_NL		30
-#define FIRST_NL	ANY + ADD_NL
-#define ANY		20	//	Match any one character.
-#define ANYOF		21	// str	Match any character in this string.
-#define ANYBUT		22	// str	Match any character not in this
+#నిర్వచించు కూడు_NL		30
+#నిర్వచించు మొదటి_NL	ANY + కూడు_NL
+#నిర్వచించు ANY		20	//	Match any one character.
+#నిర్వచించు ANYOF		21	// str	Match any character in this string.
+#నిర్వచించు ANYBUT		22	// str	Match any character not in this
 				//	string.
-#define IDENT		23	//	Match identifier char
-#define SIDENT		24	//	Match identifier char but no digit
-#define KWORD		25	//	Match keyword char
-#define SKWORD		26	//	Match word char but no digit
-#define FNAME		27	//	Match file name char
-#define SFNAME		28	//	Match file name char but no digit
-#define PRINT		29	//	Match printable char
-#define SPRINT		30	//	Match printable char but no digit
-#define WHITE		31	//	Match whitespace char
-#define NWHITE		32	//	Match non-whitespace char
-#define DIGIT		33	//	Match digit char
-#define NDIGIT		34	//	Match non-digit char
-#define HEX		35	//	Match hex char
-#define NHEX		36	//	Match non-hex char
-#define OCTAL		37	//	Match octal char
-#define NOCTAL		38	//	Match non-octal char
-#define WORD		39	//	Match word char
-#define NWORD		40	//	Match non-word char
-#define HEAD		41	//	Match head char
-#define NHEAD		42	//	Match non-head char
-#define ALPHA		43	//	Match alpha char
-#define NALPHA		44	//	Match non-alpha char
-#define LOWER		45	//	Match lowercase char
-#define NLOWER		46	//	Match non-lowercase char
-#define UPPER		47	//	Match uppercase char
-#define NUPPER		48	//	Match non-uppercase char
-#define LAST_NL		NUPPER + ADD_NL
-#define WITH_NL(op)	((op) >= FIRST_NL && (op) <= LAST_NL)
+#నిర్వచించు IDENT		23	//	Match identifier char
+#నిర్వచించు SIDENT		24	//	Match identifier char but no digit
+#నిర్వచించు KWORD		25	//	Match keyword char
+#నిర్వచించు SKWORD		26	//	Match word char but no digit
+#నిర్వచించు FNAME		27	//	Match file name char
+#నిర్వచించు SFNAME		28	//	Match file name char but no digit
+#నిర్వచించు PRINT		29	//	Match printable char
+#నిర్వచించు SPRINT		30	//	Match printable char but no digit
+#నిర్వచించు WHITE		31	//	Match whitespace char
+#నిర్వచించు NWHITE		32	//	Match non-whitespace char
+#నిర్వచించు DIGIT		33	//	Match digit char
+#నిర్వచించు NDIGIT		34	//	Match non-digit char
+#నిర్వచించు HEX		35	//	Match hex char
+#నిర్వచించు NHEX		36	//	Match non-hex char
+#నిర్వచించు OCTAL		37	//	Match octal char
+#నిర్వచించు NOCTAL		38	//	Match non-octal char
+#నిర్వచించు మాట_2		39	//	Match word char
+#నిర్వచించు NWORD		40	//	Match non-word char
+#నిర్వచించు తల_2		41	//	Match head char
+#నిర్వచించు NHEAD		42	//	Match non-head char
+#నిర్వచించు ALPHA		43	//	Match alpha char
+#నిర్వచించు NALPHA		44	//	Match non-alpha char
+#నిర్వచించు క్రింది_2		45	//	Match lowercase char
+#నిర్వచించు NLOWER		46	//	Match non-lowercase char
+#నిర్వచించు పై		47	//	Match uppercase char
+#నిర్వచించు NUPPER		48	//	Match non-uppercase char
+#నిర్వచించు చివరి_NL		NUPPER + కూడు_NL
+#నిర్వచించు WITH_NL(op)	((op) >= మొదటి_NL && (op) <= చివరి_NL)
 
-#define MOPEN		80  // -89	 Mark this point in input as start of
+#నిర్వచించు MOPEN		80  // -89	 Mark this point in input as start of
 				//	 \( subexpr.  MOPEN + 0 marks start of
 				//	 match.
-#define MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
+#నిర్వచించు MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
 				//	 end of match.
-#define BACKREF		100 // -109 node Match same string again \1-\9
+#నిర్వచించు BACKREF		100 // -109 node Match same string again \1-\9
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 # define ZOPEN		110 // -119	 Mark this point in input as start of
 				//	 \z( subexpr.
 # define ZCLOSE		120 // -129	 Analogous to ZOPEN.
 # define ZREF		130 // -139 node Match external submatch \z1-\z9
-#endif
+#అయితే_ముగింపు
 
-#define BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
+#నిర్వచించు BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
 
-#define NOPEN		150	//	Mark this point in input as start of
+#నిర్వచించు NOPEN		150	//	Mark this point in input as start of
 				//	\%( subexpr.
-#define NCLOSE		151	//	Analogous to NOPEN.
+#నిర్వచించు NCLOSE		151	//	Analogous to NOPEN.
 
-#define MULTIBYTECODE	200	// mbc	Match one multi-byte character
-#define RE_BOF		201	//	Match "" at beginning of file.
-#define RE_EOF		202	//	Match "" at end of file.
-#define CURSOR		203	//	Match location of cursor.
+#నిర్వచించు MULTIBYTECODE	200	// mbc	Match one multi-byte character
+#నిర్వచించు RE_BOF		201	//	Match "" at beginning of file.
+#నిర్వచించు RE_EOF		202	//	Match "" at end of file.
+#నిర్వచించు CURSOR		203	//	Match location of cursor.
 
-#define RE_LNUM		204	// nr cmp  Match line number
-#define RE_COL		205	// nr cmp  Match column number
-#define RE_VCOL		206	// nr cmp  Match virtual column number
+#నిర్వచించు RE_LNUM		204	// nr cmp  Match line number
+#నిర్వచించు RE_నిలువు		205	// nr cmp  Match column number
+#నిర్వచించు RE_VCOL		206	// nr cmp  Match virtual column number
 
-#define RE_MARK		207	// mark cmp  Match mark position
-#define RE_VISUAL	208	//	Match Visual area
-#define RE_COMPOSING	209	// any composing characters
+#నిర్వచించు RE_MARK		207	// mark cmp  Match mark position
+#నిర్వచించు RE_VISUAL	208	//	Match Visual area
+#నిర్వచించు RE_COMPOSING	209	// any composing characters
 
 /*
  * Flags to be passed up and down.
  */
-#define HASWIDTH	0x1	// Known never to match null string.
-#define SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
-#define SPSTART		0x4	// Starts with * or +.
-#define HASNL		0x8	// Contains some \n.
-#define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
-#define WORST		0	// Worst case.
+#నిర్వచించు HASWIDTH	0x1	// Known never to match null string.
+#నిర్వచించు SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
+#నిర్వచించు SPSTART		0x4	// Starts with * or +.
+#నిర్వచించు HASNL		0x8	// Contains some \n.
+#నిర్వచించు HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
+#నిర్వచించు WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
-static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
-static long	regsize;	// Code size.
-static int	reg_toolong;	// TRUE when offset out of range
-static int	bt_reg_parse_depth;	// nesting depth in reg()
-static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
-static long	brace_min[10];	// Minimums for complex brace repeats
-static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
-static int	one_exactly = FALSE;	// only do one char for EXACTLY
+స్థిర పూర్ణాంకం	అంకె_complex_braces; // Complex \{...} count
+స్థిర char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
+స్థిర దీర్ఘ	regsize;	// Code size.
+స్థిర పూర్ణాంకం	reg_toolong;	// TRUE when offset out of range
+స్థిర పూర్ణాంకం	bt_reg_parse_లోతు;	// nesting depth in reg()
+స్థిర char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
+స్థిర దీర్ఘ	brace_min[10];	// Minimums for complex brace repeats
+స్థిర దీర్ఘ	brace_max[10];	// Maximums for complex brace repeats
+స్థిర పూర్ణాంకం	brace_లెక్క[10]; // Current counts for complex brace repeats
+స్థిర పూర్ణాంకం	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
-static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-static const int classcodes[] = {
+స్థిర char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
+స్థిర స్థిరరాశి పూర్ణాంకం classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
     FNAME, SFNAME, PRINT, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
     HEX, NHEX, OCTAL, NOCTAL,
-    WORD, NWORD, HEAD, NHEAD,
-    ALPHA, NALPHA, LOWER, NLOWER,
-    UPPER, NUPPER
+    మాట_2, NWORD, తల_2, NHEAD,
+    ALPHA, NALPHA, క్రింది_2, NLOWER,
+    పై, NUPPER
 };
 
 /*
@@ -269,73 +269,73 @@ static const int classcodes[] = {
  * "]") and try to recognize a character class in expanded form, for example
  * [0-9].  On success, return the atom to be emitted, on failure 0.
  */
-    static int
-bt_recognize_char_class(char_u *start, char_u *end)
+    స్థిర పూర్ణాంకం
+bt_recognize_char_class(char_u *ప్రారంభం, char_u *చివర)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    పూర్ణాంకం		newl;
+    పూర్ణాంకం		config = get_char_class_బిట్లు(ప్రారంభం, చివర, &newl);
 
     // A newline would need the ADD_NL variant, don't bother with it here.
-    if (config < 0 || newl)
-	return 0;
+    ఒకవేళ (config < 0 || newl)
+	తిరిగి 0;
 
 	// The old engine has no case-insensitive class opcode, so [a-z] and [A-Z]
 	// are left as collections.  The classes below are case-independent.
-    switch (config)
+    ఎంపిక (config)
     {
-	case CLASS_o9:
-	    return DIGIT;
-	case CLASS_not | CLASS_o9:
-	    return NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return NHEX;
-	case CLASS_o7:
-	    return OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return NALPHA;
+	స్థితి CLASS_o9:
+	    తిరిగి DIGIT;
+	స్థితి CLASS_not | CLASS_o9:
+	    తిరిగి NDIGIT;
+	స్థితి CLASS_af | CLASS_AF | CLASS_o9:
+	    తిరిగి HEX;
+	స్థితి CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    తిరిగి NHEX;
+	స్థితి CLASS_o7:
+	    తిరిగి OCTAL;
+	స్థితి CLASS_not | CLASS_o7:
+	    తిరిగి NOCTAL;
+	స్థితి CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    తిరిగి మాట_2;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    తిరిగి NWORD;
+	స్థితి CLASS_az | CLASS_AZ | CLASS_underscore:
+	    తిరిగి తల_2;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    తిరిగి NHEAD;
+	స్థితి CLASS_az | CLASS_AZ:
+	    తిరిగి ALPHA;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ:
+	    తిరిగి NALPHA;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * When regcode is set to this value, code is not emitted and size is computed
  * instead.
  */
-#define JUST_CALC_SIZE	((char_u *) -1)
+#నిర్వచించు JUST_CALC_కొలత	((char_u *) -1)
 
 // Values for rs_state in regitem_T.
-typedef enum regstate_E
+రకనిర్వచనం గణన regstate_E
 {
     RS_NOPEN = 0	// NOPEN and NCLOSE
     , RS_MOPEN		// MOPEN + [0-9]
     , RS_MCLOSE		// MCLOSE + [0-9]
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     , RS_ZOPEN		// ZOPEN + [0-9]
     , RS_ZCLOSE		// ZCLOSE + [0-9]
-#endif
+#అయితే_ముగింపు
     , RS_BRANCH		// BRANCH
-    , RS_BRCPLX_MORE	// BRACE_COMPLEX and trying one more match
+    , RS_BRCPLX_మరిన్ని	// BRACE_COMPLEX and trying one more match
     , RS_BRCPLX_LONG	// BRACE_COMPLEX and trying longest match
     , RS_BRCPLX_SHORT	// BRACE_COMPLEX and trying shortest match
     , RS_NOMATCH	// NOMATCH
     , RS_BEHIND1	// BEHIND / NOBEHIND matching rest
     , RS_BEHIND2	// BEHIND / NOBEHIND matching behind part
-    , RS_STAR_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
-    , RS_STAR_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
+    , RS_నక్షత్రం_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
+    , RS_నక్షత్రం_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
 } regstate_T;
 
 /*
@@ -343,20 +343,20 @@ typedef enum regstate_E
  * restored after trying a match.  Used by reg_save() and reg_restore().
  * Also stores the length of "backpos".
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    union
+    సంఘం
     {
 	char_u	*ptr;	// rex.input pointer, for single-line regexp
 	lpos_T	pos;	// rex.input pos, for multi-line regexp
     } rs_u;
-    int		rs_len;
+    పూర్ణాంకం		rs_len;
 } regsave_T;
 
 // struct to save start/end pointer/position in for \(\)
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    union
+    సంఘం
     {
 	char_u	*ptr;
 	lpos_T	pos;
@@ -364,13 +364,13 @@ typedef struct
 } save_se_T;
 
 // used for BEHIND and NOBEHIND matching
-typedef struct regbehind_S
+రకనిర్వచనం నిర్మాణం regbehind_S
 {
     regsave_T	save_after;
     regsave_T	save_behind;
-    int		save_need_clear_subexpr;
-    save_se_T   save_start[NSUBEXP];
-    save_se_T   save_end[NSUBEXP];
+    పూర్ణాంకం		save_need_clear_subexpr;
+    save_se_T   save_ప్రారంభం[NSUBEXP];
+    save_se_T   save_చివర[NSUBEXP];
 } regbehind_T;
 
 /*
@@ -379,12 +379,12 @@ typedef struct regbehind_S
  * Before it may be another type of item, depending on rs_state, to remember
  * more things.
  */
-typedef struct regitem_S
+రకనిర్వచనం నిర్మాణం regitem_S
 {
     regstate_T	rs_state;	// what we are doing, one of RS_ above
-    short	rs_no;		// submatch nr or BEHIND/NOBEHIND
-    char_u	*rs_scan;	// current node in program
-    union
+    పొట్టి	rs_no;		// submatch nr or BEHIND/NOBEHIND
+    char_u	*rs_పరిశీలన;	// current node in program
+    సంఘం
     {
 	save_se_T  sesave;
 	regsave_T  regsave;
@@ -393,20 +393,20 @@ typedef struct regitem_S
 
 
 // used for STAR, PLUS and BRACE_SIMPLE matching
-typedef struct regstar_S
+రకనిర్వచనం నిర్మాణం regstar_S
 {
-    int		nextb;		// next byte
-    int		nextb_ic;	// next byte reverse case
-    long	count;
-    long	minval;
-    long	maxval;
+    పూర్ణాంకం		nextb;		// next byte
+    పూర్ణాంకం		nextb_ic;	// next byte reverse case
+    దీర్ఘ	లెక్క;
+    దీర్ఘ	minval;
+    దీర్ఘ	maxval;
 } regstar_T;
 
 // used to store input position when a BACK was encountered, so that we now if
 // we made any progress since the last time.
-typedef struct backpos_S
+రకనిర్వచనం నిర్మాణం backpos_S
 {
-    char_u	*bp_scan;	// "scan" where BACK was encountered
+    char_u	*bp_పరిశీలన;	// "scan" where BACK was encountered
     regsave_T	bp_pos;		// last input position
 } backpos_T;
 
@@ -417,10 +417,10 @@ typedef struct backpos_S
  * or regbehind_T.
  * "backpos_T" is a table with backpos_T for BACK
  */
-static garray_T	regstack = {0, 0, 0, 0, NULL};
-static garray_T	backpos = {0, 0, 0, 0, NULL};
+స్థిర garray_T	regstack = {0, 0, 0, 0, ఖాళీ};
+స్థిర garray_T	backpos = {0, 0, 0, 0, ఖాళీ};
 
-static regsave_T behind_pos;
+స్థిర regsave_T behind_pos;
 
 /*
  * Both for regstack and backpos tables we use the following strategy of
@@ -433,8 +433,8 @@ static regsave_T behind_pos;
  * This makes it fast while not keeping a lot of memory allocated.
  * A three times speed increase was observed when using many simple patterns.
  */
-#define REGSTACK_INITIAL	2048
-#define BACKPOS_INITIAL		64
+#నిర్వచించు REGSTACK_INITIAL	2048
+#నిర్వచించు BACKPOS_INITIAL		64
 
 /*
  * Opcode notes:
@@ -473,73 +473,73 @@ static regsave_T behind_pos;
  * Using two bytes for the "next" pointer is vast overkill for most things,
  * but allows patterns to get big without disasters.
  */
-#define OP(p)		((int)*(p))
-#define NEXT(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
-#define OPERAND(p)	((p) + 3)
+#నిర్వచించు OP(p)		((పూర్ణాంకం)*(p))
+#నిర్వచించు తదుపరి_2(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
+#నిర్వచించు నిర్వాహ్యం(p)	((p) + 3)
 // Obtain an operand that was stored as four bytes, MSB first.
-#define OPERAND_MIN(p)	(((long)(p)[3] << 24) + ((long)(p)[4] << 16) \
-			+ ((long)(p)[5] << 8) + (long)(p)[6])
+#నిర్వచించు నిర్వాహ్యం_MIN(p)	(((దీర్ఘ)(p)[3] << 24) + ((దీర్ఘ)(p)[4] << 16) \
+			+ ((దీర్ఘ)(p)[5] << 8) + (దీర్ఘ)(p)[6])
 // Obtain a second operand stored as four bytes.
-#define OPERAND_MAX(p)	OPERAND_MIN((p) + 4)
+#నిర్వచించు నిర్వాహ్యం_MAX(p)	నిర్వాహ్యం_MIN((p) + 4)
 // Obtain a second single-byte operand stored after a four bytes operand.
-#define OPERAND_CMP(p)	(p)[7]
+#నిర్వచించు నిర్వాహ్యం_CMP(p)	(p)[7]
 
-static char_u *reg(int paren, int *flagp);
+స్థిర char_u *reg(పూర్ణాంకం paren, పూర్ణాంకం *flagp);
 
-#ifdef BT_REGEXP_DUMP
-static void	regdump(char_u *, bt_regprog_T *);
-#endif
+#నిర్వచితమైతే BT_REGEXP_DUMP
+స్థిర శూన్య	regdump(char_u *, bt_regprog_T *);
+#అయితే_ముగింపు
 
-static int	re_num_cmp(long_u val, char_u *scan);
+స్థిర పూర్ణాంకం	re_అంకె_cmp(long_u val, char_u *పరిశీలన);
 
-#ifdef DEBUG
-static char_u	*regprop(char_u *);
+#నిర్వచితమైతే DEBUG
+స్థిర char_u	*regprop(char_u *);
 
-static int	regnarrate = 0;
-#endif
+స్థిర పూర్ణాంకం	regnarrate = 0;
+#అయితే_ముగింపు
 
 
 /*
  * Setup to parse the regexp.  Used once to get the length and once to do it.
  */
-    static void
-regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    స్థిర శూన్య
+regcomp_ప్రారంభం(
+    char_u	*సమాసం,
+    పూర్ణాంకం		re_flags)	    // see vim_regcomp()
 {
-    initchr(expr);
-    if (re_flags & RE_MAGIC)
+    initchr(సమాసం);
+    ఒకవేళ (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
-    else
+    లేకపోతే
 	reg_magic = MAGIC_OFF;
     reg_string = (re_flags & RE_STRING);
     reg_strict = (re_flags & RE_STRICT);
     get_cpo_flags();
 
-    num_complex_braces = 0;
+    అంకె_complex_braces = 0;
     regnpar = 1;
-    CLEAR_FIELD(had_endbrace);
-#ifdef FEAT_SYN_HL
+    CLEAR_క్షేత్రం(had_endbrace);
+#నిర్వచితమైతే FEAT_SYN_HL
     regnzpar = 1;
     re_has_z = 0;
-#endif
+#అయితే_ముగింపు
     regsize = 0L;
     reg_toolong = FALSE;
-    bt_reg_parse_depth = 0;
+    bt_reg_parse_లోతు = 0;
     regflags = 0;
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
     had_eol = FALSE;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Return TRUE if MULTIBYTECODE should be used instead of EXACTLY for
  * character "c".
  */
-    static int
-use_multibytecode(int c)
+    స్థిర పూర్ణాంకం
+use_multibytecode(పూర్ణాంకం c)
 {
-    return has_mbyte && (*mb_char2len)(c) > 1
+    తిరిగి has_mbyte && (*mb_char2len)(c) > 1
 		     && (re_multi_type(peekchr()) != NOT_MULTI
 			     || (enc_utf8 && utf_iscomposing(c)));
 }
@@ -547,26 +547,26 @@ use_multibytecode(int c)
 /*
  * Emit (if appropriate) a byte of code
  */
-    static void
-regc(int b)
+    స్థిర శూన్య
+regc(పూర్ణాంకం b)
 {
-    if (regcode == JUST_CALC_SIZE)
+    ఒకవేళ (regcode == JUST_CALC_కొలత)
 	regsize++;
-    else
+    లేకపోతే
 	*regcode++ = b;
 }
 
 /*
  * Emit (if appropriate) a multi-byte character of code
  */
-    static void
-regmbc(int c)
+    స్థిర శూన్య
+regmbc(పూర్ణాంకం c)
 {
-    if (!has_mbyte && c > 0xff)
-	return;
-    if (regcode == JUST_CALC_SIZE)
+    ఒకవేళ (!has_mbyte && c > 0xff)
+	తిరిగి;
+    ఒకవేళ (regcode == JUST_CALC_కొలత)
 	regsize += (*mb_char2len)(c);
-    else
+    లేకపోతే
 	regcode += (*mb_char2bytes)(c, regcode);
 }
 
@@ -576,21 +576,21 @@ regmbc(int c)
  * Currently only handles latin1, latin9 and utf-8.
  * NOTE: When changing this function, also change nfa_emit_equi_class()
  */
-    static void
-reg_equi_class(int c)
+    స్థిర శూన్య
+reg_equi_class(పూర్ణాంకం c)
 {
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    ఒకవేళ (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-	switch (c)
+	ఎంపిక (c)
 	{
 	    // Do not use '\300' style, it results in a negative number.
-	    case 'A': case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4:
-	    case 0xc5: case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x202: case 0x226:
-	    case 0x23a: case 0x1e00: case 0x1ea0: case 0x1ea2: case 0x1ea4:
-	    case 0x1ea6: case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    స్థితి 'A': స్థితి 0xc0: స్థితి 0xc1: స్థితి 0xc2: స్థితి 0xc3: స్థితి 0xc4:
+	    స్థితి 0xc5: స్థితి 0x100: స్థితి 0x102: స్థితి 0x104: స్థితి 0x1cd:
+	    స్థితి 0x1de: స్థితి 0x1e0: స్థితి 0x1fa: స్థితి 0x202: స్థితి 0x226:
+	    స్థితి 0x23a: స్థితి 0x1e00: స్థితి 0x1ea0: స్థితి 0x1ea2: స్థితి 0x1ea4:
+	    స్థితి 0x1ea6: స్థితి 0x1ea8: స్థితి 0x1eaa: స్థితి 0x1eac: స్థితి 0x1eae:
+	    స్థితి 0x1eb0: స్థితి 0x1eb2: స్థితి 0x1eb4: స్థితి 0x1eb6:
 		      regmbc('A'); regmbc(0xc0); regmbc(0xc1); regmbc(0xc2);
 		      regmbc(0xc3); regmbc(0xc4); regmbc(0xc5);
 		      regmbc(0x100); regmbc(0x102); regmbc(0x104);
@@ -601,34 +601,34 @@ reg_equi_class(int c)
 		      regmbc(0x1ea8); regmbc(0x1eaa); regmbc(0x1eac);
 		      regmbc(0x1eae); regmbc(0x1eb0); regmbc(0x1eb2);
 		      regmbc(0x1eb4); regmbc(0x1eb6);
-		      return;
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+		      తిరిగి;
+	    స్థితి 'B': స్థితి 0x181: స్థితి 0x243: స్థితి 0x1e02:
+	    స్థితి 0x1e04: స్థితి 0x1e06:
 		      regmbc('B');
 		      regmbc(0x181); regmbc(0x243); regmbc(0x1e02);
 		      regmbc(0x1e04); regmbc(0x1e06);
-		      return;
-	    case 'C': case 0xc7:
-	    case 0x106: case 0x108: case 0x10a: case 0x10c: case 0x187:
-	    case 0x23b: case 0x1e08: case 0xa792:
+		      తిరిగి;
+	    స్థితి 'C': స్థితి 0xc7:
+	    స్థితి 0x106: స్థితి 0x108: స్థితి 0x10a: స్థితి 0x10c: స్థితి 0x187:
+	    స్థితి 0x23b: స్థితి 0x1e08: స్థితి 0xa792:
 		      regmbc('C'); regmbc(0xc7);
 		      regmbc(0x106); regmbc(0x108); regmbc(0x10a);
 		      regmbc(0x10c); regmbc(0x187); regmbc(0x23b);
 		      regmbc(0x1e08); regmbc(0xa792);
-		      return;
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+		      తిరిగి;
+	    స్థితి 'D': స్థితి 0x10e: స్థితి 0x110: స్థితి 0x18a:
+	    స్థితి 0x1e0a: స్థితి 0x1e0c: స్థితి 0x1e0e: స్థితి 0x1e10:
+	    స్థితి 0x1e12:
 		      regmbc('D'); regmbc(0x10e); regmbc(0x110);
 		      regmbc(0x18a); regmbc(0x1e0a); regmbc(0x1e0c);
 		      regmbc(0x1e0e); regmbc(0x1e10); regmbc(0x1e12);
-		      return;
-	    case 'E': case 0xc8: case 0xc9: case 0xca: case 0xcb:
-	    case 0x112: case 0x114: case 0x116: case 0x118: case 0x11a:
-	    case 0x204: case 0x206: case 0x228: case 0x246: case 0x1e14:
-	    case 0x1e16: case 0x1e18: case 0x1e1a: case 0x1e1c:
-	    case 0x1eb8: case 0x1eba: case 0x1ebc: case 0x1ebe:
-	    case 0x1ec0: case 0x1ec2: case 0x1ec4: case 0x1ec6:
+		      తిరిగి;
+	    స్థితి 'E': స్థితి 0xc8: స్థితి 0xc9: స్థితి 0xca: స్థితి 0xcb:
+	    స్థితి 0x112: స్థితి 0x114: స్థితి 0x116: స్థితి 0x118: స్థితి 0x11a:
+	    స్థితి 0x204: స్థితి 0x206: స్థితి 0x228: స్థితి 0x246: స్థితి 0x1e14:
+	    స్థితి 0x1e16: స్థితి 0x1e18: స్థితి 0x1e1a: స్థితి 0x1e1c:
+	    స్థితి 0x1eb8: స్థితి 0x1eba: స్థితి 0x1ebc: స్థితి 0x1ebe:
+	    స్థితి 0x1ec0: స్థితి 0x1ec2: స్థితి 0x1ec4: స్థితి 0x1ec6:
 		      regmbc('E'); regmbc(0xc8); regmbc(0xc9);
 		      regmbc(0xca); regmbc(0xcb); regmbc(0x112);
 		      regmbc(0x114); regmbc(0x116); regmbc(0x118);
@@ -638,77 +638,77 @@ reg_equi_class(int c)
 		      regmbc(0x1e1c); regmbc(0x1eb8); regmbc(0x1eba);
 		      regmbc(0x1ebc); regmbc(0x1ebe); regmbc(0x1ec0);
 		      regmbc(0x1ec2); regmbc(0x1ec4); regmbc(0x1ec6);
-		      return;
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+		      తిరిగి;
+	    స్థితి 'F': స్థితి 0x191: స్థితి 0x1e1e: స్థితి 0xa798:
 		      regmbc('F'); regmbc(0x191); regmbc(0x1e1e);
 		      regmbc(0xa798);
-		      return;
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+		      తిరిగి;
+	    స్థితి 'G': స్థితి 0x11c: స్థితి 0x11e: స్థితి 0x120:
+	    స్థితి 0x122: స్థితి 0x193: స్థితి 0x1e4: స్థితి 0x1e6:
+	    స్థితి 0x1f4: స్థితి 0x1e20: స్థితి 0xa7a0:
 		      regmbc('G'); regmbc(0x11c); regmbc(0x11e);
 		      regmbc(0x120); regmbc(0x122); regmbc(0x193);
 		      regmbc(0x1e4); regmbc(0x1e6); regmbc(0x1f4);
 		      regmbc(0x1e20); regmbc(0xa7a0);
-		      return;
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26:
-	    case 0x1e28: case 0x1e2a: case 0x2c67:
+		      తిరిగి;
+	    స్థితి 'H': స్థితి 0x124: స్థితి 0x126: స్థితి 0x21e:
+	    స్థితి 0x1e22: స్థితి 0x1e24: స్థితి 0x1e26:
+	    స్థితి 0x1e28: స్థితి 0x1e2a: స్థితి 0x2c67:
 		      regmbc('H'); regmbc(0x124); regmbc(0x126);
 		      regmbc(0x21e); regmbc(0x1e22); regmbc(0x1e24);
 		      regmbc(0x1e26); regmbc(0x1e28); regmbc(0x1e2a);
 		      regmbc(0x2c67);
-		      return;
-	    case 'I': case 0xcc: case 0xcd: case 0xce: case 0xcf:
-	    case 0x128: case 0x12a: case 0x12c: case 0x12e:
-	    case 0x130: case 0x197: case 0x1cf: case 0x208:
-	    case 0x20a: case 0x1e2c: case 0x1e2e: case 0x1ec8:
-	    case 0x1eca:
+		      తిరిగి;
+	    స్థితి 'I': స్థితి 0xcc: స్థితి 0xcd: స్థితి 0xce: స్థితి 0xcf:
+	    స్థితి 0x128: స్థితి 0x12a: స్థితి 0x12c: స్థితి 0x12e:
+	    స్థితి 0x130: స్థితి 0x197: స్థితి 0x1cf: స్థితి 0x208:
+	    స్థితి 0x20a: స్థితి 0x1e2c: స్థితి 0x1e2e: స్థితి 0x1ec8:
+	    స్థితి 0x1eca:
 		      regmbc('I'); regmbc(0xcc); regmbc(0xcd);
 		      regmbc(0xce); regmbc(0xcf); regmbc(0x128);
 		      regmbc(0x12a); regmbc(0x12c); regmbc(0x12e);
 		      regmbc(0x130); regmbc(0x197); regmbc(0x1cf);
 		      regmbc(0x208); regmbc(0x20a); regmbc(0x1e2c);
 		      regmbc(0x1e2e); regmbc(0x1ec8); regmbc(0x1eca);
-		      return;
-	    case 'J': case 0x134: case 0x248:
+		      తిరిగి;
+	    స్థితి 'J': స్థితి 0x134: స్థితి 0x248:
 		      regmbc('J'); regmbc(0x134); regmbc(0x248);
-		      return;
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+		      తిరిగి;
+	    స్థితి 'K': స్థితి 0x136: స్థితి 0x198: స్థితి 0x1e8: స్థితి 0x1e30:
+	    స్థితి 0x1e32: స్థితి 0x1e34: స్థితి 0x2c69: స్థితి 0xa740:
 		      regmbc('K'); regmbc(0x136); regmbc(0x198);
 		      regmbc(0x1e8); regmbc(0x1e30); regmbc(0x1e32);
 		      regmbc(0x1e34); regmbc(0x2c69); regmbc(0xa740);
-		      return;
-	    case 'L': case 0x139: case 0x13b: case 0x13d: case 0x13f:
-	    case 0x141: case 0x23d: case 0x1e36: case 0x1e38:
-	    case 0x1e3a: case 0x1e3c: case 0x2c60:
+		      తిరిగి;
+	    స్థితి 'L': స్థితి 0x139: స్థితి 0x13b: స్థితి 0x13d: స్థితి 0x13f:
+	    స్థితి 0x141: స్థితి 0x23d: స్థితి 0x1e36: స్థితి 0x1e38:
+	    స్థితి 0x1e3a: స్థితి 0x1e3c: స్థితి 0x2c60:
 		      regmbc('L'); regmbc(0x139); regmbc(0x13b);
 		      regmbc(0x13d); regmbc(0x13f); regmbc(0x141);
 		      regmbc(0x23d); regmbc(0x1e36); regmbc(0x1e38);
 		      regmbc(0x1e3a); regmbc(0x1e3c); regmbc(0x2c60);
-		      return;
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+		      తిరిగి;
+	    స్థితి 'M': స్థితి 0x1e3e: స్థితి 0x1e40: స్థితి 0x1e42:
 		      regmbc('M'); regmbc(0x1e3e); regmbc(0x1e40);
 		      regmbc(0x1e42);
-		      return;
-	    case 'N': case 0xd1:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+		      తిరిగి;
+	    స్థితి 'N': స్థితి 0xd1:
+	    స్థితి 0x143: స్థితి 0x145: స్థితి 0x147: స్థితి 0x1f8:
+	    స్థితి 0x1e44: స్థితి 0x1e46: స్థితి 0x1e48: స్థితి 0x1e4a:
+	    స్థితి 0xa7a4:
 		      regmbc('N'); regmbc(0xd1);
 		      regmbc(0x143); regmbc(0x145); regmbc(0x147);
 		      regmbc(0x1f8); regmbc(0x1e44); regmbc(0x1e46);
 		      regmbc(0x1e48); regmbc(0x1e4a); regmbc(0xa7a4);
-		      return;
-	    case 'O': case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6:
-	    case 0xd8: case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec: case 0x1fe:
-	    case 0x20c: case 0x20e: case 0x22a: case 0x22c: case 0x22e:
-	    case 0x230: case 0x1e4c: case 0x1e4e: case 0x1e50: case 0x1e52:
-	    case 0x1ecc: case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc: case 0x1ede:
-	    case 0x1ee0: case 0x1ee2:
+		      తిరిగి;
+	    స్థితి 'O': స్థితి 0xd2: స్థితి 0xd3: స్థితి 0xd4: స్థితి 0xd5: స్థితి 0xd6:
+	    స్థితి 0xd8: స్థితి 0x14c: స్థితి 0x14e: స్థితి 0x150: స్థితి 0x19f:
+	    స్థితి 0x1a0: స్థితి 0x1d1: స్థితి 0x1ea: స్థితి 0x1ec: స్థితి 0x1fe:
+	    స్థితి 0x20c: స్థితి 0x20e: స్థితి 0x22a: స్థితి 0x22c: స్థితి 0x22e:
+	    స్థితి 0x230: స్థితి 0x1e4c: స్థితి 0x1e4e: స్థితి 0x1e50: స్థితి 0x1e52:
+	    స్థితి 0x1ecc: స్థితి 0x1ece: స్థితి 0x1ed0: స్థితి 0x1ed2: స్థితి 0x1ed4:
+	    స్థితి 0x1ed6: స్థితి 0x1ed8: స్థితి 0x1eda: స్థితి 0x1edc: స్థితి 0x1ede:
+	    స్థితి 0x1ee0: స్థితి 0x1ee2:
 		      regmbc('O'); regmbc(0xd2); regmbc(0xd3); regmbc(0xd4);
 		      regmbc(0xd5); regmbc(0xd6); regmbc(0xd8);
 		      regmbc(0x14c); regmbc(0x14e); regmbc(0x150);
@@ -722,48 +722,48 @@ reg_equi_class(int c)
 		      regmbc(0x1ed6); regmbc(0x1ed8); regmbc(0x1eda);
 		      regmbc(0x1edc); regmbc(0x1ede); regmbc(0x1ee0);
 		      regmbc(0x1ee2);
-		      return;
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+		      తిరిగి;
+	    స్థితి 'P': స్థితి 0x1a4: స్థితి 0x1e54: స్థితి 0x1e56: స్థితి 0x2c63:
 		      regmbc('P'); regmbc(0x1a4); regmbc(0x1e54);
 		      regmbc(0x1e56); regmbc(0x2c63);
-		      return;
-	    case 'Q': case 0x24a:
+		      తిరిగి;
+	    స్థితి 'Q': స్థితి 0x24a:
 		      regmbc('Q'); regmbc(0x24a);
-		      return;
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+		      తిరిగి;
+	    స్థితి 'R': స్థితి 0x154: స్థితి 0x156: స్థితి 0x158: స్థితి 0x210:
+	    స్థితి 0x212: స్థితి 0x24c: స్థితి 0x1e58: స్థితి 0x1e5a:
+	    స్థితి 0x1e5c: స్థితి 0x1e5e: స్థితి 0x2c64: స్థితి 0xa7a6:
 		      regmbc('R'); regmbc(0x154); regmbc(0x156);
 		      regmbc(0x210); regmbc(0x212); regmbc(0x158);
 		      regmbc(0x24c); regmbc(0x1e58); regmbc(0x1e5a);
 		      regmbc(0x1e5c); regmbc(0x1e5e); regmbc(0x2c64);
 		      regmbc(0xa7a6);
-		      return;
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+		      తిరిగి;
+	    స్థితి 'S': స్థితి 0x15a: స్థితి 0x15c: స్థితి 0x15e: స్థితి 0x160:
+	    స్థితి 0x218: స్థితి 0x1e60: స్థితి 0x1e62: స్థితి 0x1e64:
+	    స్థితి 0x1e66: స్థితి 0x1e68: స్థితి 0x2c7e: స్థితి 0xa7a8:
 		      regmbc('S'); regmbc(0x15a); regmbc(0x15c);
 		      regmbc(0x15e); regmbc(0x160); regmbc(0x218);
 		      regmbc(0x1e60); regmbc(0x1e62); regmbc(0x1e64);
 		      regmbc(0x1e66); regmbc(0x1e68); regmbc(0x2c7e);
 			  regmbc(0xa7a8);
-		      return;
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+		      తిరిగి;
+	    స్థితి 'T': స్థితి 0x162: స్థితి 0x164: స్థితి 0x166: స్థితి 0x1ac:
+	    స్థితి 0x1ae: స్థితి 0x21a: స్థితి 0x23e: స్థితి 0x1e6a: స్థితి 0x1e6c:
+	    స్థితి 0x1e6e: స్థితి 0x1e70:
 		      regmbc('T'); regmbc(0x162); regmbc(0x164);
 		      regmbc(0x166); regmbc(0x1ac); regmbc(0x23e);
 		      regmbc(0x1ae); regmbc(0x21a); regmbc(0x1e6a);
 		      regmbc(0x1e6c); regmbc(0x1e6e); regmbc(0x1e70);
-		      return;
-	    case 'U': case 0xd9: case 0xda: case 0xdb: case 0xdc:
-	    case 0x168: case 0x16a: case 0x16c: case 0x16e:
-	    case 0x170: case 0x172: case 0x1af: case 0x1d3:
-	    case 0x1d5: case 0x1d7: case 0x1d9: case 0x1db:
-	    case 0x214: case 0x216: case 0x244: case 0x1e72:
-	    case 0x1e74: case 0x1e76: case 0x1e78: case 0x1e7a:
-	    case 0x1ee4: case 0x1ee6: case 0x1ee8: case 0x1eea:
-	    case 0x1eec: case 0x1eee: case 0x1ef0:
+		      తిరిగి;
+	    స్థితి 'U': స్థితి 0xd9: స్థితి 0xda: స్థితి 0xdb: స్థితి 0xdc:
+	    స్థితి 0x168: స్థితి 0x16a: స్థితి 0x16c: స్థితి 0x16e:
+	    స్థితి 0x170: స్థితి 0x172: స్థితి 0x1af: స్థితి 0x1d3:
+	    స్థితి 0x1d5: స్థితి 0x1d7: స్థితి 0x1d9: స్థితి 0x1db:
+	    స్థితి 0x214: స్థితి 0x216: స్థితి 0x244: స్థితి 0x1e72:
+	    స్థితి 0x1e74: స్థితి 0x1e76: స్థితి 0x1e78: స్థితి 0x1e7a:
+	    స్థితి 0x1ee4: స్థితి 0x1ee6: స్థితి 0x1ee8: స్థితి 0x1eea:
+	    స్థితి 0x1eec: స్థితి 0x1eee: స్థితి 0x1ef0:
 		      regmbc('U'); regmbc(0xd9); regmbc(0xda);
 		      regmbc(0xdb); regmbc(0xdc); regmbc(0x168);
 		      regmbc(0x16a); regmbc(0x16c); regmbc(0x16e);
@@ -775,42 +775,42 @@ reg_equi_class(int c)
 		      regmbc(0x1e7a); regmbc(0x1ee4); regmbc(0x1ee6);
 		      regmbc(0x1ee8); regmbc(0x1eea); regmbc(0x1eec);
 		      regmbc(0x1eee); regmbc(0x1ef0);
-		      return;
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+		      తిరిగి;
+	    స్థితి 'V': స్థితి 0x1b2: స్థితి 0x1e7c: స్థితి 0x1e7e:
 		      regmbc('V'); regmbc(0x1b2); regmbc(0x1e7c);
 		      regmbc(0x1e7e);
-		      return;
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82:
-	    case 0x1e84: case 0x1e86: case 0x1e88:
+		      తిరిగి;
+	    స్థితి 'W': స్థితి 0x174: స్థితి 0x1e80: స్థితి 0x1e82:
+	    స్థితి 0x1e84: స్థితి 0x1e86: స్థితి 0x1e88:
 		      regmbc('W'); regmbc(0x174); regmbc(0x1e80);
 		      regmbc(0x1e82); regmbc(0x1e84); regmbc(0x1e86);
 		      regmbc(0x1e88);
-		      return;
-	    case 'X': case 0x1e8a: case 0x1e8c:
+		      తిరిగి;
+	    స్థితి 'X': స్థితి 0x1e8a: స్థితి 0x1e8c:
 		      regmbc('X'); regmbc(0x1e8a); regmbc(0x1e8c);
-		      return;
-	    case 'Y': case 0xdd:
-	    case 0x176: case 0x178: case 0x1b3: case 0x232: case 0x24e:
-	    case 0x1e8e: case 0x1ef2: case 0x1ef6: case 0x1ef4: case 0x1ef8:
+		      తిరిగి;
+	    స్థితి 'Y': స్థితి 0xdd:
+	    స్థితి 0x176: స్థితి 0x178: స్థితి 0x1b3: స్థితి 0x232: స్థితి 0x24e:
+	    స్థితి 0x1e8e: స్థితి 0x1ef2: స్థితి 0x1ef6: స్థితి 0x1ef4: స్థితి 0x1ef8:
 		      regmbc('Y'); regmbc(0xdd); regmbc(0x176);
 		      regmbc(0x178); regmbc(0x1b3); regmbc(0x232);
 		      regmbc(0x24e); regmbc(0x1e8e); regmbc(0x1ef2);
 		      regmbc(0x1ef4); regmbc(0x1ef6); regmbc(0x1ef8);
-		      return;
-	    case 'Z': case 0x179: case 0x17b: case 0x17d: case 0x1b5:
-	    case 0x1e90: case 0x1e92: case 0x1e94: case 0x2c6b:
+		      తిరిగి;
+	    స్థితి 'Z': స్థితి 0x179: స్థితి 0x17b: స్థితి 0x17d: స్థితి 0x1b5:
+	    స్థితి 0x1e90: స్థితి 0x1e92: స్థితి 0x1e94: స్థితి 0x2c6b:
 		      regmbc('Z'); regmbc(0x179); regmbc(0x17b);
 		      regmbc(0x17d); regmbc(0x1b5); regmbc(0x1e90);
 		      regmbc(0x1e92); regmbc(0x1e94); regmbc(0x2c6b);
-		      return;
-	    case 'a': case 0xe0: case 0xe1: case 0xe2:
-	    case 0xe3: case 0xe4: case 0xe5: case 0x101: case 0x103:
-	    case 0x105: case 0x1ce: case 0x1df: case 0x1e1: case 0x1fb:
-	    case 0x201: case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+		      తిరిగి;
+	    స్థితి 'a': స్థితి 0xe0: స్థితి 0xe1: స్థితి 0xe2:
+	    స్థితి 0xe3: స్థితి 0xe4: స్థితి 0xe5: స్థితి 0x101: స్థితి 0x103:
+	    స్థితి 0x105: స్థితి 0x1ce: స్థితి 0x1df: స్థితి 0x1e1: స్థితి 0x1fb:
+	    స్థితి 0x201: స్థితి 0x203: స్థితి 0x227: స్థితి 0x1d8f: స్థితి 0x1e01:
+	    స్థితి 0x1e9a: స్థితి 0x1ea1: స్థితి 0x1ea3: స్థితి 0x1ea5:
+	    స్థితి 0x1ea7: స్థితి 0x1ea9: స్థితి 0x1eab: స్థితి 0x1ead:
+	    స్థితి 0x1eaf: స్థితి 0x1eb1: స్థితి 0x1eb3: స్థితి 0x1eb5:
+	    స్థితి 0x1eb7: స్థితి 0x2c65:
 		      regmbc('a'); regmbc(0xe0); regmbc(0xe1);
 		      regmbc(0xe2); regmbc(0xe3); regmbc(0xe4);
 		      regmbc(0xe5); regmbc(0x101); regmbc(0x103);
@@ -822,37 +822,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ea9); regmbc(0x1eab); regmbc(0x1ead);
 		      regmbc(0x1eaf); regmbc(0x1eb1); regmbc(0x1eb3);
 		      regmbc(0x1eb5); regmbc(0x1eb7); regmbc(0x2c65);
-		      return;
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+		      తిరిగి;
+	    స్థితి 'b': స్థితి 0x180: స్థితి 0x253: స్థితి 0x1d6c: స్థితి 0x1d80:
+	    స్థితి 0x1e03: స్థితి 0x1e05: స్థితి 0x1e07:
 		      regmbc('b');
 		      regmbc(0x180); regmbc(0x253); regmbc(0x1d6c);
 		      regmbc(0x1d80); regmbc(0x1e03); regmbc(0x1e05);
 		      regmbc(0x1e07);
-		      return;
-	    case 'c': case 0xe7:
-	    case 0x107: case 0x109: case 0x10b: case 0x10d: case 0x188:
-	    case 0x23c: case 0x1e09: case 0xa793: case 0xa794:
+		      తిరిగి;
+	    స్థితి 'c': స్థితి 0xe7:
+	    స్థితి 0x107: స్థితి 0x109: స్థితి 0x10b: స్థితి 0x10d: స్థితి 0x188:
+	    స్థితి 0x23c: స్థితి 0x1e09: స్థితి 0xa793: స్థితి 0xa794:
 		      regmbc('c'); regmbc(0xe7); regmbc(0x107);
 		      regmbc(0x109); regmbc(0x10b); regmbc(0x10d);
 		      regmbc(0x188); regmbc(0x23c); regmbc(0x1e09);
 		      regmbc(0xa793); regmbc(0xa794);
-		      return;
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d:
-	    case 0x1e0f: case 0x1e11: case 0x1e13:
+		      తిరిగి;
+	    స్థితి 'd': స్థితి 0x10f: స్థితి 0x111: స్థితి 0x257: స్థితి 0x1d6d:
+	    స్థితి 0x1d81: స్థితి 0x1d91: స్థితి 0x1e0b: స్థితి 0x1e0d:
+	    స్థితి 0x1e0f: స్థితి 0x1e11: స్థితి 0x1e13:
 		      regmbc('d'); regmbc(0x10f); regmbc(0x111);
 		      regmbc(0x257); regmbc(0x1d6d); regmbc(0x1d81);
 		      regmbc(0x1d91); regmbc(0x1e0b); regmbc(0x1e0d);
 		      regmbc(0x1e0f); regmbc(0x1e11); regmbc(0x1e13);
-		      return;
-	    case 'e': case 0xe8: case 0xe9: case 0xea: case 0xeb:
-	    case 0x113: case 0x115: case 0x117: case 0x119:
-	    case 0x11b: case 0x205: case 0x207: case 0x229:
-	    case 0x247: case 0x1d92: case 0x1e15: case 0x1e17:
-	    case 0x1e19: case 0x1e1b: case 0x1eb9: case 0x1ebb:
-	    case 0x1e1d: case 0x1ebd: case 0x1ebf: case 0x1ec1:
-	    case 0x1ec3: case 0x1ec5: case 0x1ec7:
+		      తిరిగి;
+	    స్థితి 'e': స్థితి 0xe8: స్థితి 0xe9: స్థితి 0xea: స్థితి 0xeb:
+	    స్థితి 0x113: స్థితి 0x115: స్థితి 0x117: స్థితి 0x119:
+	    స్థితి 0x11b: స్థితి 0x205: స్థితి 0x207: స్థితి 0x229:
+	    స్థితి 0x247: స్థితి 0x1d92: స్థితి 0x1e15: స్థితి 0x1e17:
+	    స్థితి 0x1e19: స్థితి 0x1e1b: స్థితి 0x1eb9: స్థితి 0x1ebb:
+	    స్థితి 0x1e1d: స్థితి 0x1ebd: స్థితి 0x1ebf: స్థితి 0x1ec1:
+	    స్థితి 0x1ec3: స్థితి 0x1ec5: స్థితి 0x1ec7:
 		      regmbc('e'); regmbc(0xe8); regmbc(0xe9);
 		      regmbc(0xea); regmbc(0xeb); regmbc(0x113);
 		      regmbc(0x115); regmbc(0x117); regmbc(0x119);
@@ -863,83 +863,83 @@ reg_equi_class(int c)
 		      regmbc(0x1ebb); regmbc(0x1ebd); regmbc(0x1ebf);
 		      regmbc(0x1ec1); regmbc(0x1ec3); regmbc(0x1ec5);
 		      regmbc(0x1ec7);
-		      return;
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+		      తిరిగి;
+	    స్థితి 'f': స్థితి 0x192: స్థితి 0x1d6e: స్థితి 0x1d82:
+	    స్థితి 0x1e1f: స్థితి 0xa799:
 		     regmbc('f'); regmbc(0x192); regmbc(0x1d6e);
 		     regmbc(0x1d82); regmbc(0x1e1f); regmbc(0xa799);
-		     return;
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x260: case 0x1f5: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+		     తిరిగి;
+	    స్థితి 'g': స్థితి 0x11d: స్థితి 0x11f: స్థితి 0x121: స్థితి 0x123:
+	    స్థితి 0x1e5: స్థితి 0x1e7: స్థితి 0x260: స్థితి 0x1f5: స్థితి 0x1d83:
+	    స్థితి 0x1e21: స్థితి 0xa7a1:
 		      regmbc('g'); regmbc(0x11d); regmbc(0x11f);
 		      regmbc(0x121); regmbc(0x123); regmbc(0x1e5);
 		      regmbc(0x1e7); regmbc(0x1f5); regmbc(0x260);
 		      regmbc(0x1d83); regmbc(0x1e21); regmbc(0xa7a1);
-		      return;
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+		      తిరిగి;
+	    స్థితి 'h': స్థితి 0x125: స్థితి 0x127: స్థితి 0x21f: స్థితి 0x1e23:
+	    స్థితి 0x1e25: స్థితి 0x1e27: స్థితి 0x1e29: స్థితి 0x1e2b:
+	    స్థితి 0x1e96: స్థితి 0x2c68: స్థితి 0xa795:
 		      regmbc('h'); regmbc(0x125); regmbc(0x127);
 		      regmbc(0x21f); regmbc(0x1e23); regmbc(0x1e25);
 		      regmbc(0x1e27); regmbc(0x1e29); regmbc(0x1e2b);
 		      regmbc(0x1e96); regmbc(0x2c68); regmbc(0xa795);
-		      return;
-	    case 'i': case 0xec: case 0xed: case 0xee: case 0xef:
-	    case 0x129: case 0x12b: case 0x12d: case 0x12f:
-	    case 0x1d0: case 0x209: case 0x20b: case 0x268:
-	    case 0x1d96: case 0x1e2d: case 0x1e2f: case 0x1ec9:
-	    case 0x1ecb:
+		      తిరిగి;
+	    స్థితి 'i': స్థితి 0xec: స్థితి 0xed: స్థితి 0xee: స్థితి 0xef:
+	    స్థితి 0x129: స్థితి 0x12b: స్థితి 0x12d: స్థితి 0x12f:
+	    స్థితి 0x1d0: స్థితి 0x209: స్థితి 0x20b: స్థితి 0x268:
+	    స్థితి 0x1d96: స్థితి 0x1e2d: స్థితి 0x1e2f: స్థితి 0x1ec9:
+	    స్థితి 0x1ecb:
 		      regmbc('i'); regmbc(0xec); regmbc(0xed);
 		      regmbc(0xee); regmbc(0xef); regmbc(0x129);
 		      regmbc(0x12b); regmbc(0x12d); regmbc(0x12f);
 		      regmbc(0x1d0); regmbc(0x209); regmbc(0x20b);
 		      regmbc(0x268); regmbc(0x1d96); regmbc(0x1e2d);
 		      regmbc(0x1e2f); regmbc(0x1ec9); regmbc(0x1ecb);
-		      return;
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+		      తిరిగి;
+	    స్థితి 'j': స్థితి 0x135: స్థితి 0x1f0: స్థితి 0x249:
 		      regmbc('j'); regmbc(0x135); regmbc(0x1f0);
 		      regmbc(0x249);
-		      return;
-	    case 'k': case 0x137: case 0x199: case 0x1e9:
-	    case 0x1d84: case 0x1e31: case 0x1e33: case 0x1e35:
-	    case 0x2c6a: case 0xa741:
+		      తిరిగి;
+	    స్థితి 'k': స్థితి 0x137: స్థితి 0x199: స్థితి 0x1e9:
+	    స్థితి 0x1d84: స్థితి 0x1e31: స్థితి 0x1e33: స్థితి 0x1e35:
+	    స్థితి 0x2c6a: స్థితి 0xa741:
 		      regmbc('k'); regmbc(0x137); regmbc(0x199);
 		      regmbc(0x1e9); regmbc(0x1d84); regmbc(0x1e31);
 		      regmbc(0x1e33); regmbc(0x1e35); regmbc(0x2c6a);
 		      regmbc(0xa741);
-		      return;
-	    case 'l': case 0x13a: case 0x13c: case 0x13e:
-	    case 0x140: case 0x142: case 0x19a: case 0x1e37:
-	    case 0x1e39: case 0x1e3b: case 0x1e3d: case 0x2c61:
+		      తిరిగి;
+	    స్థితి 'l': స్థితి 0x13a: స్థితి 0x13c: స్థితి 0x13e:
+	    స్థితి 0x140: స్థితి 0x142: స్థితి 0x19a: స్థితి 0x1e37:
+	    స్థితి 0x1e39: స్థితి 0x1e3b: స్థితి 0x1e3d: స్థితి 0x2c61:
 		      regmbc('l'); regmbc(0x13a); regmbc(0x13c);
 		      regmbc(0x13e); regmbc(0x140); regmbc(0x142);
 		      regmbc(0x19a); regmbc(0x1e37); regmbc(0x1e39);
 		      regmbc(0x1e3b); regmbc(0x1e3d); regmbc(0x2c61);
-		      return;
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+		      తిరిగి;
+	    స్థితి 'm': స్థితి 0x1d6f: స్థితి 0x1e3f: స్థితి 0x1e41: స్థితి 0x1e43:
 		      regmbc('m'); regmbc(0x1d6f); regmbc(0x1e3f);
 		      regmbc(0x1e41); regmbc(0x1e43);
-		      return;
-	    case 'n': case 0xf1: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87:
-	    case 0x1e45: case 0x1e47: case 0x1e49: case 0x1e4b:
-	    case 0xa7a5:
+		      తిరిగి;
+	    స్థితి 'n': స్థితి 0xf1: స్థితి 0x144: స్థితి 0x146: స్థితి 0x148:
+	    స్థితి 0x149: స్థితి 0x1f9: స్థితి 0x1d70: స్థితి 0x1d87:
+	    స్థితి 0x1e45: స్థితి 0x1e47: స్థితి 0x1e49: స్థితి 0x1e4b:
+	    స్థితి 0xa7a5:
 		      regmbc('n'); regmbc(0xf1); regmbc(0x144);
 		      regmbc(0x146); regmbc(0x148); regmbc(0x149);
 		      regmbc(0x1f9); regmbc(0x1d70); regmbc(0x1d87);
 		      regmbc(0x1e45); regmbc(0x1e47); regmbc(0x1e49);
 		      regmbc(0x1e4b); regmbc(0xa7a5);
-		      return;
-	    case 'o': case 0xf2: case 0xf3: case 0xf4: case 0xf5:
-	    case 0xf6: case 0xf8: case 0x14d: case 0x14f: case 0x151:
-	    case 0x1a1: case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d: case 0x22f:
-	    case 0x231: case 0x275: case 0x1e4d: case 0x1e4f:
-	    case 0x1e51: case 0x1e53: case 0x1ecd: case 0x1ecf:
-	    case 0x1ed1: case 0x1ed3: case 0x1ed5: case 0x1ed7:
-	    case 0x1ed9: case 0x1edb: case 0x1edd: case 0x1edf:
-	    case 0x1ee1: case 0x1ee3:
+		      తిరిగి;
+	    స్థితి 'o': స్థితి 0xf2: స్థితి 0xf3: స్థితి 0xf4: స్థితి 0xf5:
+	    స్థితి 0xf6: స్థితి 0xf8: స్థితి 0x14d: స్థితి 0x14f: స్థితి 0x151:
+	    స్థితి 0x1a1: స్థితి 0x1d2: స్థితి 0x1eb: స్థితి 0x1ed: స్థితి 0x1ff:
+	    స్థితి 0x20d: స్థితి 0x20f: స్థితి 0x22b: స్థితి 0x22d: స్థితి 0x22f:
+	    స్థితి 0x231: స్థితి 0x275: స్థితి 0x1e4d: స్థితి 0x1e4f:
+	    స్థితి 0x1e51: స్థితి 0x1e53: స్థితి 0x1ecd: స్థితి 0x1ecf:
+	    స్థితి 0x1ed1: స్థితి 0x1ed3: స్థితి 0x1ed5: స్థితి 0x1ed7:
+	    స్థితి 0x1ed9: స్థితి 0x1edb: స్థితి 0x1edd: స్థితి 0x1edf:
+	    స్థితి 0x1ee1: స్థితి 0x1ee3:
 		      regmbc('o'); regmbc(0xf2); regmbc(0xf3);
 		      regmbc(0xf4); regmbc(0xf5); regmbc(0xf6);
 		      regmbc(0xf8); regmbc(0x14d); regmbc(0x14f);
@@ -953,54 +953,54 @@ reg_equi_class(int c)
 		      regmbc(0x1ed5); regmbc(0x1ed7); regmbc(0x1ed9);
 		      regmbc(0x1edb); regmbc(0x1edd); regmbc(0x1edf);
 		      regmbc(0x1ee1); regmbc(0x1ee3);
-		      return;
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d88: case 0x1d7d:
-	    case 0x1e55: case 0x1e57:
+		      తిరిగి;
+	    స్థితి 'p': స్థితి 0x1a5: స్థితి 0x1d71: స్థితి 0x1d88: స్థితి 0x1d7d:
+	    స్థితి 0x1e55: స్థితి 0x1e57:
 		      regmbc('p'); regmbc(0x1a5); regmbc(0x1d71);
 		      regmbc(0x1d7d); regmbc(0x1d88); regmbc(0x1e55);
 		      regmbc(0x1e57);
-		      return;
-	    case 'q': case 0x24b: case 0x2a0:
+		      తిరిగి;
+	    స్థితి 'q': స్థితి 0x24b: స్థితి 0x2a0:
 		      regmbc('q'); regmbc(0x24b); regmbc(0x2a0);
-		      return;
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+		      తిరిగి;
+	    స్థితి 'r': స్థితి 0x155: స్థితి 0x157: స్థితి 0x159: స్థితి 0x211:
+	    స్థితి 0x213: స్థితి 0x24d: స్థితి 0x27d: స్థితి 0x1d72: స్థితి 0x1d73:
+	    స్థితి 0x1d89: స్థితి 0x1e59: స్థితి 0x1e5b: స్థితి 0x1e5d: స్థితి 0x1e5f:
+	    స్థితి 0xa7a7:
 		      regmbc('r'); regmbc(0x155); regmbc(0x157);
 		      regmbc(0x159); regmbc(0x211); regmbc(0x213);
 		      regmbc(0x24d); regmbc(0x1d72); regmbc(0x1d73);
 		      regmbc(0x1d89); regmbc(0x1e59); regmbc(0x27d);
 		      regmbc(0x1e5b); regmbc(0x1e5d); regmbc(0x1e5f);
 		      regmbc(0xa7a7);
-		      return;
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x1e61: case 0x219: case 0x23f: case 0x1d74: case 0x1d8a:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+		      తిరిగి;
+	    స్థితి 's': స్థితి 0x15b: స్థితి 0x15d: స్థితి 0x15f: స్థితి 0x161:
+	    స్థితి 0x1e61: స్థితి 0x219: స్థితి 0x23f: స్థితి 0x1d74: స్థితి 0x1d8a:
+	    స్థితి 0x1e63: స్థితి 0x1e65: స్థితి 0x1e67: స్థితి 0x1e69: స్థితి 0xa7a9:
 		      regmbc('s'); regmbc(0x15b); regmbc(0x15d);
 		      regmbc(0x15f); regmbc(0x161); regmbc(0x23f);
 		      regmbc(0x219); regmbc(0x1d74); regmbc(0x1d8a);
 		      regmbc(0x1e61); regmbc(0x1e63); regmbc(0x1e65);
 		      regmbc(0x1e67); regmbc(0x1e69); regmbc(0xa7a9);
-		      return;
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+		      తిరిగి;
+	    స్థితి 't': స్థితి 0x163: స్థితి 0x165: స్థితి 0x167: స్థితి 0x1ab:
+	    స్థితి 0x1ad: స్థితి 0x21b: స్థితి 0x288: స్థితి 0x1d75: స్థితి 0x1e6b:
+	    స్థితి 0x1e6d: స్థితి 0x1e6f: స్థితి 0x1e71: స్థితి 0x1e97: స్థితి 0x2c66:
 		      regmbc('t'); regmbc(0x163); regmbc(0x165);
 		      regmbc(0x167); regmbc(0x1ab); regmbc(0x21b);
 		      regmbc(0x1ad); regmbc(0x288); regmbc(0x1d75);
 		      regmbc(0x1e6b); regmbc(0x1e6d); regmbc(0x1e6f);
 		      regmbc(0x1e71); regmbc(0x1e97); regmbc(0x2c66);
-		      return;
-	    case 'u': case 0xf9: case 0xfa: case 0xfb: case 0xfc:
-	    case 0x169: case 0x16b: case 0x16d: case 0x16f:
-	    case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc:
-	    case 0x215: case 0x217: case 0x289: case 0x1e73:
-	    case 0x1d7e: case 0x1d99: case 0x1e75: case 0x1e77:
-	    case 0x1e79: case 0x1e7b: case 0x1ee5: case 0x1ee7:
-	    case 0x1ee9: case 0x1eeb: case 0x1eed: case 0x1eef:
-	    case 0x1ef1:
+		      తిరిగి;
+	    స్థితి 'u': స్థితి 0xf9: స్థితి 0xfa: స్థితి 0xfb: స్థితి 0xfc:
+	    స్థితి 0x169: స్థితి 0x16b: స్థితి 0x16d: స్థితి 0x16f:
+	    స్థితి 0x171: స్థితి 0x173: స్థితి 0x1b0: స్థితి 0x1d4:
+	    స్థితి 0x1d6: స్థితి 0x1d8: స్థితి 0x1da: స్థితి 0x1dc:
+	    స్థితి 0x215: స్థితి 0x217: స్థితి 0x289: స్థితి 0x1e73:
+	    స్థితి 0x1d7e: స్థితి 0x1d99: స్థితి 0x1e75: స్థితి 0x1e77:
+	    స్థితి 0x1e79: స్థితి 0x1e7b: స్థితి 0x1ee5: స్థితి 0x1ee7:
+	    స్థితి 0x1ee9: స్థితి 0x1eeb: స్థితి 0x1eed: స్థితి 0x1eef:
+	    స్థితి 0x1ef1:
 		      regmbc('u'); regmbc(0xf9); regmbc(0xfa);
 		      regmbc(0xfb); regmbc(0xfc); regmbc(0x169);
 		      regmbc(0x16b); regmbc(0x16d); regmbc(0x16f);
@@ -1013,37 +1013,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ee5); regmbc(0x1ee7); regmbc(0x1ee9);
 		      regmbc(0x1eeb); regmbc(0x1eed); regmbc(0x1eef);
 		      regmbc(0x1ef1);
-		      return;
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+		      తిరిగి;
+	    స్థితి 'v': స్థితి 0x28b: స్థితి 0x1d8c: స్థితి 0x1e7d: స్థితి 0x1e7f:
 		      regmbc('v'); regmbc(0x28b); regmbc(0x1d8c);
 		      regmbc(0x1e7d); regmbc(0x1e7f);
-		      return;
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83:
-	    case 0x1e85: case 0x1e87: case 0x1e89: case 0x1e98:
+		      తిరిగి;
+	    స్థితి 'w': స్థితి 0x175: స్థితి 0x1e81: స్థితి 0x1e83:
+	    స్థితి 0x1e85: స్థితి 0x1e87: స్థితి 0x1e89: స్థితి 0x1e98:
 		      regmbc('w'); regmbc(0x175); regmbc(0x1e81);
 		      regmbc(0x1e83); regmbc(0x1e85); regmbc(0x1e87);
 		      regmbc(0x1e89); regmbc(0x1e98);
-		      return;
-	    case 'x': case 0x1e8b: case 0x1e8d:
+		      తిరిగి;
+	    స్థితి 'x': స్థితి 0x1e8b: స్థితి 0x1e8d:
 		      regmbc('x'); regmbc(0x1e8b); regmbc(0x1e8d);
-		      return;
-	    case 'y': case 0xfd: case 0xff: case 0x177: case 0x1b4:
-	    case 0x233: case 0x24f: case 0x1e8f: case 0x1e99: case 0x1ef3:
-	    case 0x1ef5: case 0x1ef7: case 0x1ef9:
+		      తిరిగి;
+	    స్థితి 'y': స్థితి 0xfd: స్థితి 0xff: స్థితి 0x177: స్థితి 0x1b4:
+	    స్థితి 0x233: స్థితి 0x24f: స్థితి 0x1e8f: స్థితి 0x1e99: స్థితి 0x1ef3:
+	    స్థితి 0x1ef5: స్థితి 0x1ef7: స్థితి 0x1ef9:
 		      regmbc('y'); regmbc(0xfd); regmbc(0xff);
 		      regmbc(0x177); regmbc(0x1b4); regmbc(0x233);
 		      regmbc(0x24f); regmbc(0x1e8f); regmbc(0x1e99);
 		      regmbc(0x1ef3); regmbc(0x1ef5); regmbc(0x1ef7);
 		      regmbc(0x1ef9);
-		      return;
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+		      తిరిగి;
+	    స్థితి 'z': స్థితి 0x17a: స్థితి 0x17c: స్థితి 0x17e: స్థితి 0x1b6:
+	    స్థితి 0x1d76: స్థితి 0x1d8e: స్థితి 0x1e91: స్థితి 0x1e93:
+	    స్థితి 0x1e95: స్థితి 0x2c6c:
 		      regmbc('z'); regmbc(0x17a); regmbc(0x17c);
 		      regmbc(0x17e); regmbc(0x1b6); regmbc(0x1d76);
 		      regmbc(0x1d8e); regmbc(0x1e91); regmbc(0x1e93);
 		      regmbc(0x1e95); regmbc(0x2c6c);
-		      return;
+		      తిరిగి;
 	}
     }
     regmbc(c);
@@ -1053,34 +1053,34 @@ reg_equi_class(int c)
  * Emit a node.
  * Return pointer to generated code.
  */
-    static char_u *
-regnode(int op)
+    స్థిర char_u *
+regnode(పూర్ణాంకం op)
 {
     char_u  *ret;
 
     ret = regcode;
-    if (ret == JUST_CALC_SIZE)
+    ఒకవేళ (ret == JUST_CALC_కొలత)
 	regsize += 3;
-    else
+    లేకపోతే
     {
 	*regcode++ = op;
 	*regcode++ = NUL;		// Null "next" pointer.
 	*regcode++ = NUL;
     }
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Write a long as four bytes at "p" and return pointer to the next char.
  */
-    static char_u *
+    స్థిర char_u *
 re_put_long(char_u *p, long_u val)
 {
     *p++ = (char_u) ((val >> 24) & 0377);
     *p++ = (char_u) ((val >> 16) & 0377);
     *p++ = (char_u) ((val >> 8) & 0377);
     *p++ = (char_u) (val & 0377);
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -1088,75 +1088,75 @@ re_put_long(char_u *p, long_u val)
  * Returns NULL when calculating size, when there is no next item and when
  * there is an error.
  */
-    static char_u *
+    స్థిర char_u *
 regnext(char_u *p)
 {
-    int	    offset;
+    పూర్ణాంకం	    స్థానభ్రంశం;
 
-    if (p == JUST_CALC_SIZE || reg_toolong)
-	return NULL;
+    ఒకవేళ (p == JUST_CALC_కొలత || reg_toolong)
+	తిరిగి ఖాళీ;
 
-    offset = NEXT(p);
-    if (offset == 0)
-	return NULL;
+    స్థానభ్రంశం = తదుపరి_2(p);
+    ఒకవేళ (స్థానభ్రంశం == 0)
+	తిరిగి ఖాళీ;
 
-    if (OP(p) == BACK)
-	return p - offset;
-    else
-	return p + offset;
+    ఒకవేళ (OP(p) == వెనుక_2)
+	తిరిగి p - స్థానభ్రంశం;
+    లేకపోతే
+	తిరిగి p + స్థానభ్రంశం;
 }
 
 /*
  * Set the next-pointer at the end of a node chain.
  */
-    static void
+    స్థిర శూన్య
 regtail(char_u *p, char_u *val)
 {
-    char_u	*scan;
-    char_u	*temp;
-    int		offset;
+    char_u	*పరిశీలన;
+    char_u	*తాత్కాలిక;
+    పూర్ణాంకం		స్థానభ్రంశం;
 
-    if (p == JUST_CALC_SIZE)
-	return;
+    ఒకవేళ (p == JUST_CALC_కొలత)
+	తిరిగి;
 
     // Find last node.
-    scan = p;
-    for (;;)
+    పరిశీలన = p;
+    కొరకు (;;)
     {
-	temp = regnext(scan);
-	if (temp == NULL)
-	    break;
-	scan = temp;
+	తాత్కాలిక = regnext(పరిశీలన);
+	ఒకవేళ (తాత్కాలిక == ఖాళీ)
+	    ఆపు;
+	పరిశీలన = తాత్కాలిక;
     }
 
-    if (OP(scan) == BACK)
-	offset = (int)(scan - val);
-    else
-	offset = (int)(val - scan);
+    ఒకవేళ (OP(పరిశీలన) == వెనుక_2)
+	స్థానభ్రంశం = (పూర్ణాంకం)(పరిశీలన - val);
+    లేకపోతే
+	స్థానభ్రంశం = (పూర్ణాంకం)(val - పరిశీలన);
     // When the offset uses more than 16 bits it can no longer fit in the two
     // bytes available.  Use a global flag to avoid having to check return
     // values in too many places.
-    if (offset > 0xffff)
+    ఒకవేళ (స్థానభ్రంశం > 0xffff)
 	reg_toolong = TRUE;
-    else
+    లేకపోతే
     {
-	*(scan + 1) = (char_u) (((unsigned)offset >> 8) & 0377);
-	*(scan + 2) = (char_u) (offset & 0377);
+	*(పరిశీలన + 1) = (char_u) (((గుర్తులేని)స్థానభ్రంశం >> 8) & 0377);
+	*(పరిశీలన + 2) = (char_u) (స్థానభ్రంశం & 0377);
     }
 }
 
 /*
  * Like regtail, on item after a BRANCH; nop if none.
  */
-    static void
+    స్థిర శూన్య
 regoptail(char_u *p, char_u *val)
 {
     // When op is neither BRANCH nor BRACE_COMPLEX0-9, it is "operandless"
-    if (p == NULL || p == JUST_CALC_SIZE
+    ఒకవేళ (p == ఖాళీ || p == JUST_CALC_కొలత
 	    || (OP(p) != BRANCH
 		&& (OP(p) < BRACE_COMPLEX || OP(p) > BRACE_COMPLEX + 9)))
-	return;
-    regtail(OPERAND(p), val);
+	తిరిగి;
+    regtail(నిర్వాహ్యం(p), val);
 }
 
 /*
@@ -1164,57 +1164,57 @@ regoptail(char_u *p, char_u *val)
  *
  * Means relocating the operand.
  */
-    static void
-reginsert(int op, char_u *opnd)
+    స్థిర శూన్య
+reginsert(పూర్ణాంకం op, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ఉంచు;
 
-    if (regcode == JUST_CALC_SIZE)
+    ఒకవేళ (regcode == JUST_CALC_కొలత)
     {
 	regsize += 3;
-	return;
+	తిరిగి;
     }
     src = regcode;
     regcode += 3;
     dst = regcode;
-    while (src > opnd)
+    అయితే (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place = NUL;
+    ఉంచు = opnd;		// Op node, where operand used to be.
+    *ఉంచు++ = op;
+    *ఉంచు++ = NUL;
+    *ఉంచు = NUL;
 }
 
 /*
  * Insert an operator in front of already-emitted operand.
  * Add a number to the operator.
  */
-    static void
-reginsert_nr(int op, long val, char_u *opnd)
+    స్థిర శూన్య
+reginsert_nr(పూర్ణాంకం op, దీర్ఘ val, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ఉంచు;
 
-    if (regcode == JUST_CALC_SIZE)
+    ఒకవేళ (regcode == JUST_CALC_కొలత)
     {
 	regsize += 7;
-	return;
+	తిరిగి;
     }
     src = regcode;
     regcode += 7;
     dst = regcode;
-    while (src > opnd)
+    అయితే (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    re_put_long(place, (long_u)val);
+    ఉంచు = opnd;		// Op node, where operand used to be.
+    *ఉంచు++ = op;
+    *ఉంచు++ = NUL;
+    *ఉంచు++ = NUL;
+    re_put_long(ఉంచు, (long_u)val);
 }
 
 /*
@@ -1223,35 +1223,35 @@ reginsert_nr(int op, long val, char_u *opnd)
  *
  * Means relocating the operand.
  */
-    static void
+    స్థిర శూన్య
 reginsert_limits(
-    int		op,
-    long	minval,
-    long	maxval,
+    పూర్ణాంకం		op,
+    దీర్ఘ	minval,
+    దీర్ఘ	maxval,
     char_u	*opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ఉంచు;
 
-    if (regcode == JUST_CALC_SIZE)
+    ఒకవేళ (regcode == JUST_CALC_కొలత)
     {
 	regsize += 11;
-	return;
+	తిరిగి;
     }
     src = regcode;
     regcode += 11;
     dst = regcode;
-    while (src > opnd)
+    అయితే (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    place = re_put_long(place, (long_u)minval);
-    place = re_put_long(place, (long_u)maxval);
-    regtail(opnd, place);
+    ఉంచు = opnd;		// Op node, where operand used to be.
+    *ఉంచు++ = op;
+    *ఉంచు++ = NUL;
+    *ఉంచు++ = NUL;
+    ఉంచు = re_put_long(ఉంచు, (long_u)minval);
+    ఉంచు = re_put_long(ఉంచు, (long_u)maxval);
+    regtail(opnd, ఉంచు);
 }
 
 /*
@@ -1260,26 +1260,26 @@ reginsert_limits(
  * TODO: Should also check that we don't refer to something that is repeated
  * (+*=): what instance of the repetition should we match?
  */
-    static int
-seen_endbrace(int refnum)
+    స్థిర పూర్ణాంకం
+చూసిన_endbrace(పూర్ణాంకం refnum)
 {
-    if (!had_endbrace[refnum])
+    ఒకవేళ (!had_endbrace[refnum])
     {
 	char_u *p;
 
 	// Trick: check if "@<=" or "@<!" follows, in which case
 	// the \1 can appear before the referenced match.
-	for (p = regparse; *p != NUL; ++p)
-	    if (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
-		break;
-	if (*p == NUL)
+	కొరకు (p = regparse; *p != NUL; ++p)
+	    ఒకవేళ (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
+		ఆపు;
+	ఒకవేళ (*p == NUL)
 	{
-	    emsg(_(e_illegal_back_reference));
+	    emsg(_(e_illegal_వెనుక_reference));
 	    rc_did_emsg = TRUE;
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1289,111 +1289,111 @@ seen_endbrace(int refnum)
  * it can turn them into a single node, which is smaller to store and
  * faster to run.  Don't do this when one_exactly is set.
  */
-    static char_u *
-regatom(int *flagp)
+    స్థిర char_u *
+regatom(పూర్ణాంకం *flagp)
 {
     char_u	    *ret;
-    int		    flags;
-    int		    c;
+    పూర్ణాంకం		    flags;
+    పూర్ణాంకం		    c;
     char_u	    *p;
-    int		    extra = 0;
-    int		    save_prev_at_start = prev_at_start;
+    పూర్ణాంకం		    extra = 0;
+    పూర్ణాంకం		    save_prev_at_ప్రారంభం = prev_at_ప్రారంభం;
 
     *flagp = WORST;		// Tentatively.
 
     c = getchr();
-    switch (c)
+    ఎంపిక (c)
     {
-      case Magic('^'):
+      స్థితి Magic('^'):
 	ret = regnode(BOL);
-	break;
+	ఆపు;
 
-      case Magic('$'):
+      స్థితి Magic('$'):
 	ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 	had_eol = TRUE;
-#endif
-	break;
+#అయితే_ముగింపు
+	ఆపు;
 
-      case Magic('<'):
+      స్థితి Magic('<'):
 	ret = regnode(BOW);
-	break;
+	ఆపు;
 
-      case Magic('>'):
+      స్థితి Magic('>'):
 	ret = regnode(EOW);
-	break;
+	ఆపు;
 
-      case Magic('_'):
+      స్థితి Magic('_'):
 	c = no_Magic(getchr());
-	if (c == '^')		// "\_^" is start-of-line
+	ఒకవేళ (c == '^')		// "\_^" is start-of-line
 	{
 	    ret = regnode(BOL);
-	    break;
+	    ఆపు;
 	}
-	if (c == '$')		// "\_$" is end-of-line
+	ఒకవేళ (c == '$')		// "\_$" is end-of-line
 	{
 	    ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
-#endif
-	    break;
+#అయితే_ముగింపు
+	    ఆపు;
 	}
 
-	extra = ADD_NL;
+	extra = కూడు_NL;
 	*flagp |= HASNL;
 
 	// "\_[" is character range plus newline
-	if (c == '[')
-	    goto collection;
+	ఒకవేళ (c == '[')
+	    వెళ్ళు collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
 
 	// Character classes.
-      case Magic('.'):
-      case Magic('i'):
-      case Magic('I'):
-      case Magic('k'):
-      case Magic('K'):
-      case Magic('f'):
-      case Magic('F'):
-      case Magic('p'):
-      case Magic('P'):
-      case Magic('s'):
-      case Magic('S'):
-      case Magic('d'):
-      case Magic('D'):
-      case Magic('x'):
-      case Magic('X'):
-      case Magic('o'):
-      case Magic('O'):
-      case Magic('w'):
-      case Magic('W'):
-      case Magic('h'):
-      case Magic('H'):
-      case Magic('a'):
-      case Magic('A'):
-      case Magic('l'):
-      case Magic('L'):
-      case Magic('u'):
-      case Magic('U'):
+      స్థితి Magic('.'):
+      స్థితి Magic('i'):
+      స్థితి Magic('I'):
+      స్థితి Magic('k'):
+      స్థితి Magic('K'):
+      స్థితి Magic('f'):
+      స్థితి Magic('F'):
+      స్థితి Magic('p'):
+      స్థితి Magic('P'):
+      స్థితి Magic('s'):
+      స్థితి Magic('S'):
+      స్థితి Magic('d'):
+      స్థితి Magic('D'):
+      స్థితి Magic('x'):
+      స్థితి Magic('X'):
+      స్థితి Magic('o'):
+      స్థితి Magic('O'):
+      స్థితి Magic('w'):
+      స్థితి Magic('W'):
+      స్థితి Magic('h'):
+      స్థితి Magic('H'):
+      స్థితి Magic('a'):
+      స్థితి Magic('A'):
+      స్థితి Magic('l'):
+      స్థితి Magic('L'):
+      స్థితి Magic('u'):
+      స్థితి Magic('U'):
 	p = vim_strchr(classchars, no_Magic(c));
-	if (p == NULL)
-	    EMSG_RET_NULL(_(e_invalid_use_of_underscore));
+	ఒకవేళ (p == ఖాళీ)
+	    EMSG_RET_NULL(_(e_invalid_use_యొక్క_underscore));
 
 	// When '.' is followed by a composing char ignore the dot, so that
 	// the composing char is matched here.
-	if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	ఒకవేళ (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	{
 	    c = getchr();
-	    goto do_multibyte;
+	    వెళ్ళు do_multibyte;
 	}
 	ret = regnode(classcodes[p - classchars] + extra);
 	*flagp |= HASWIDTH | SIMPLE;
-	break;
+	ఆపు;
 
-      case Magic('n'):
-	if (reg_string)
+      స్థితి Magic('n'):
+	ఒకవేళ (reg_string)
 	{
 	    // In a string "\n" matches a newline character.
 	    ret = regnode(EXACTLY);
@@ -1401,359 +1401,359 @@ regatom(int *flagp)
 	    regc(NUL);
 	    *flagp |= HASWIDTH | SIMPLE;
 	}
-	else
+	లేకపోతే
 	{
 	    // In buffer text "\n" matches the end of a line.
 	    ret = regnode(NEWL);
 	    *flagp |= HASWIDTH | HASNL;
 	}
-	break;
+	ఆపు;
 
-      case Magic('('):
-	if (one_exactly)
+      స్థితి Magic('('):
+	ఒకవేళ (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	ret = reg(REG_PAREN, &flags);
-	if (ret == NULL)
-	    return NULL;
+	ఒకవేళ (ret == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	*flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-	break;
+	ఆపు;
 
-      case NUL:
-      case Magic('|'):
-      case Magic('&'):
-      case Magic(')'):
-	if (one_exactly)
+      స్థితి NUL:
+      స్థితి Magic('|'):
+      స్థితి Magic('&'):
+      స్థితి Magic(')'):
+	ఒకవేళ (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	// Supposed to be caught earlier.
-	IEMSG_RET_NULL(e_internal_error_in_regexp);
+	IEMSG_RET_NULL(e_అంతర్గత_error_లోపల_regexp);
 	// NOTREACHED
 
-      case Magic('='):
-      case Magic('?'):
-      case Magic('+'):
-      case Magic('@'):
-      case Magic('{'):
-      case Magic('*'):
+      స్థితి Magic('='):
+      స్థితి Magic('?'):
+      స్థితి Magic('+'):
+      స్థితి Magic('@'):
+      స్థితి Magic('{'):
+      స్థితి Magic('*'):
 	c = no_Magic(c);
 	EMSG3_RET_NULL(_(e_str_chr_follows_nothing),
 		(c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL), c);
 	// NOTREACHED
 
-      case Magic('~'):		// previous substitute pattern
-	    if (reg_prev_sub != NULL)
+      స్థితి Magic('~'):		// previous substitute pattern
+	    ఒకవేళ (reg_prev_sub != ఖాళీ)
 	    {
 		char_u	    *lp;
 
 		ret = regnode(EXACTLY);
 		lp = reg_prev_sub;
-		while (*lp != NUL)
+		అయితే (*lp != NUL)
 		    regc(*lp++);
 		regc(NUL);
-		if (*reg_prev_sub != NUL)
+		ఒకవేళ (*reg_prev_sub != NUL)
 		{
 		    *flagp |= HASWIDTH;
-		    if ((lp - reg_prev_sub) == 1)
+		    ఒకవేళ ((lp - reg_prev_sub) == 1)
 			*flagp |= SIMPLE;
 		}
 	    }
-	    else
-		EMSG_RET_NULL(_(e_no_previous_substitute_regular_expression));
-	    break;
+	    లేకపోతే
+		EMSG_RET_NULL(_(e_no_మునుపటి_substitute_regular_వ్యక్తీకరణ));
+	    ఆపు;
 
-      case Magic('1'):
-      case Magic('2'):
-      case Magic('3'):
-      case Magic('4'):
-      case Magic('5'):
-      case Magic('6'):
-      case Magic('7'):
-      case Magic('8'):
-      case Magic('9'):
+      స్థితి Magic('1'):
+      స్థితి Magic('2'):
+      స్థితి Magic('3'):
+      స్థితి Magic('4'):
+      స్థితి Magic('5'):
+      స్థితి Magic('6'):
+      స్థితి Magic('7'):
+      స్థితి Magic('8'):
+      స్థితి Magic('9'):
 	    {
-		int		    refnum;
+		పూర్ణాంకం		    refnum;
 
 		refnum = c - Magic('0');
-		if (!seen_endbrace(refnum))
-		    return NULL;
+		ఒకవేళ (!చూసిన_endbrace(refnum))
+		    తిరిగి ఖాళీ;
 		ret = regnode(BACKREF + refnum);
 	    }
-	    break;
+	    ఆపు;
 
-      case Magic('z'):
+      స్థితి Magic('z'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ఎంపిక (c)
 	    {
-#ifdef FEAT_SYN_HL
-		case '(': if ((reg_do_extmatch & REX_SET) == 0)
-			      EMSG_RET_NULL(_(e_z_not_allowed_here));
-			  if (one_exactly)
+#నిర్వచితమైతే FEAT_SYN_HL
+		స్థితి '(': ఒకవేళ ((reg_do_extmatch & REX_సమితి) == 0)
+			      EMSG_RET_NULL(_(e_z_not_allowed_ఇక్కడ));
+			  ఒకవేళ (one_exactly)
 			      EMSG_ONE_RET_NULL;
 			  ret = reg(REG_ZPAREN, &flags);
-			  if (ret == NULL)
-			      return NULL;
+			  ఒకవేళ (ret == ఖాళీ)
+			      తిరిగి ఖాళీ;
 			  *flagp |= flags & (HASWIDTH|SPSTART|HASNL|HASLOOKBH);
-			  re_has_z = REX_SET;
-			  break;
+			  re_has_z = REX_సమితి;
+			  ఆపు;
 
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9': if ((reg_do_extmatch & REX_USE) == 0)
-			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_here));
+		స్థితి '1':
+		స్థితి '2':
+		స్థితి '3':
+		స్థితి '4':
+		స్థితి '5':
+		స్థితి '6':
+		స్థితి '7':
+		స్థితి '8':
+		స్థితి '9': ఒకవేళ ((reg_do_extmatch & REX_USE) == 0)
+			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_ఇక్కడ));
 			  ret = regnode(ZREF + c - '0');
 			  re_has_z = REX_USE;
-			  break;
-#endif
+			  ఆపు;
+#అయితే_ముగింపు
 
-		case 's': ret = regnode(MOPEN + 0);
-			  if (re_mult_next("\\zs") == FAIL)
-			      return NULL;
-			  break;
+		స్థితి 's': ret = regnode(MOPEN + 0);
+			  ఒకవేళ (re_mult_తదుపరి("\\zs") == FAIL)
+			      తిరిగి ఖాళీ;
+			  ఆపు;
 
-		case 'e': ret = regnode(MCLOSE + 0);
-			  if (re_mult_next("\\ze") == FAIL)
-			      return NULL;
-			  break;
+		స్థితి 'e': ret = regnode(MCLOSE + 0);
+			  ఒకవేళ (re_mult_తదుపరి("\\ze") == FAIL)
+			      తిరిగి ఖాళీ;
+			  ఆపు;
 
-		default:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
+		అప్రమేయ:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
 	    }
 	}
-	break;
+	ఆపు;
 
-      case Magic('%'):
+      స్థితి Magic('%'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ఎంపిక (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (one_exactly)
+		స్థితి '(':
+		    ఒకవేళ (one_exactly)
 			EMSG_ONE_RET_NULL;
 		    ret = reg(REG_NPAREN, &flags);
-		    if (ret == NULL)
-			return NULL;
+		    ఒకవేళ (ret == ఖాళీ)
+			తిరిగి ఖాళీ;
 		    *flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-		    break;
+		    ఆపు;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		స్థితి '^':
 		    ret = regnode(RE_BOF);
-		    break;
+		    ఆపు;
 
-		case '$':
+		స్థితి '$':
 		    ret = regnode(RE_EOF);
-		    break;
+		    ఆపు;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		స్థితి '#':
+		    ఒకవేళ (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
-			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
+			semsg(_(e_atom_engine_must_be_at_ప్రారంభం_యొక్క_నమూనా),
 								  regparse[1]);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		    ret = regnode(CURSOR);
-		    break;
+		    ఆపు;
 
-		case 'V':
+		స్థితి 'V':
 		    ret = regnode(RE_VISUAL);
-		    break;
+		    ఆపు;
 
-		case 'C':
+		స్థితి 'C':
 		    ret = regnode(RE_COMPOSING);
-		    break;
+		    ఆపు;
 
 		// \%[abc]: Emit as a list of branches, all ending at the last
 		// branch which matches nothing.
-		case '[':
-			  if (one_exactly)	// doesn't nest
+		స్థితి '[':
+			  ఒకవేళ (one_exactly)	// doesn't nest
 			      EMSG_ONE_RET_NULL;
 			  {
 			      char_u	*lastbranch;
-			      char_u	*lastnode = NULL;
+			      char_u	*lastnode = ఖాళీ;
 			      char_u	*br;
 
-			      ret = NULL;
-			      while ((c = getchr()) != ']')
+			      ret = ఖాళీ;
+			      అయితే ((c = getchr()) != ']')
 			      {
-				  if (c == NUL)
+				  ఒకవేళ (c == NUL)
 				      EMSG2_RET_NULL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 				  br = regnode(BRANCH);
-				  if (ret == NULL)
+				  ఒకవేళ (ret == ఖాళీ)
 				      ret = br;
-				  else
+				  లేకపోతే
 				  {
 				      regtail(lastnode, br);
-				      if (reg_toolong)
-					  return NULL;
+				      ఒకవేళ (reg_toolong)
+					  తిరిగి ఖాళీ;
 				  }
 
 				  ungetchr();
 				  one_exactly = TRUE;
 				  lastnode = regatom(flagp);
 				  one_exactly = FALSE;
-				  if (lastnode == NULL)
-				      return NULL;
+				  ఒకవేళ (lastnode == ఖాళీ)
+				      తిరిగి ఖాళీ;
 			      }
-			      if (ret == NULL)
-				  EMSG2_RET_NULL(_(e_empty_str_brackets),
+			      ఒకవేళ (ret == ఖాళీ)
+				  EMSG2_RET_NULL(_(e_ఖాళీలు_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			      lastbranch = regnode(BRANCH);
 			      br = regnode(NOTHING);
-			      if (ret != JUST_CALC_SIZE)
+			      ఒకవేళ (ret != JUST_CALC_కొలత)
 			      {
 				  regtail(lastnode, br);
 				  regtail(lastbranch, br);
 				  // connect all branches to the NOTHING
 				  // branch at the end
-				  for (br = ret; br != lastnode; )
+				  కొరకు (br = ret; br != lastnode; )
 				  {
-				      if (OP(br) == BRANCH)
+				      ఒకవేళ (OP(br) == BRANCH)
 				      {
 					  regtail(br, lastbranch);
-					  if (reg_toolong)
-					      return NULL;
-					  br = OPERAND(br);
+					  ఒకవేళ (reg_toolong)
+					      తిరిగి ఖాళీ;
+					  br = నిర్వాహ్యం(br);
 				      }
-				      else
+				      లేకపోతే
 					  br = regnext(br);
 				  }
 			      }
 			      *flagp &= ~(HASWIDTH | SIMPLE);
-			      break;
+			      ఆపు;
 			  }
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		స్థితి 'd':   // %d123 decimal
+		స్థితి 'o':   // %o123 octal
+		స్థితి 'x':   // %xab hex 2
+		స్థితి 'u':   // %uabcd hex 4
+		స్థితి 'U':   // %U1234abcd hex 8
 			  {
 			      vimlong_T i;
 
-			      switch (c)
+			      ఎంపిక (c)
 			      {
-				  case 'd': i = getdecchrs(); break;
-				  case 'o': i = getoctchrs(); break;
-				  case 'x': i = gethexchrs(2); break;
-				  case 'u': i = gethexchrs(4); break;
-				  case 'U': i = gethexchrs(8); break;
-				  default:  i = -1; break;
+				  స్థితి 'd': i = getdecchrs(); ఆపు;
+				  స్థితి 'o': i = getoctchrs(); ఆపు;
+				  స్థితి 'x': i = gethexchrs(2); ఆపు;
+				  స్థితి 'u': i = gethexchrs(4); ఆపు;
+				  స్థితి 'U': i = gethexchrs(8); ఆపు;
+				  అప్రమేయ:  i = -1; ఆపు;
 			      }
 
-			      if (i < 0 || i > INT_MAX)
+			      ఒకవేళ (i < 0 || i > గరిష్ఠ_పూర్ణాంకం)
 				  EMSG2_RET_NULL(
 					    _(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
-			      if (use_multibytecode(i))
+			      ఒకవేళ (use_multibytecode(i))
 				  ret = regnode(MULTIBYTECODE);
-			      else
+			      లేకపోతే
 				  ret = regnode(EXACTLY);
-			      if (i == 0)
+			      ఒకవేళ (i == 0)
 				  regc(0x0a);
-			      else
-				  regmbc((int)i);
+			      లేకపోతే
+				  regmbc((పూర్ణాంకం)i);
 			      regc(NUL);
 			      *flagp |= HASWIDTH;
-			      break;
+			      ఆపు;
 			  }
 
-		default:
-			  if (VIM_ISDIGIT(c) || c == '<' || c == '>'
+		అప్రమేయ:
+			  ఒకవేళ (VIM_ISDIGIT(c) || c == '<' || c == '>'
 						|| c == '\'' || c == '.')
 			  {
 			      long_u	n = 0;
-			      int	cmp;
-			      int	cur = FALSE;
-			      int	got_digit = FALSE;
+			      పూర్ణాంకం	cmp;
+			      పూర్ణాంకం	cur = FALSE;
+			      పూర్ణాంకం	got_digit = FALSE;
 
 			      cmp = c;
-			      if (cmp == '<' || cmp == '>')
+			      ఒకవేళ (cmp == '<' || cmp == '>')
 				  c = getchr();
-			      if (no_Magic(c) == '.')
+			      ఒకవేళ (no_Magic(c) == '.')
 			      {
 				  cur = TRUE;
 				  c = getchr();
 			      }
-			      while (VIM_ISDIGIT(c))
+			      అయితే (VIM_ISDIGIT(c))
 			      {
 				  got_digit = TRUE;
 				  n = n * 10 + (c - '0');
 				  c = getchr();
 			      }
-			      if (no_Magic(c) == '\'' && n == 0)
+			      ఒకవేళ (no_Magic(c) == '\'' && n == 0)
 			      {
 				  // "\%'m", "\%<'m" and "\%>'m": Mark
 				  c = getchr();
 				  ret = regnode(RE_MARK);
-				  if (ret == JUST_CALC_SIZE)
+				  ఒకవేళ (ret == JUST_CALC_కొలత)
 				      regsize += 2;
-				  else
+				  లేకపోతే
 				  {
 				      *regcode++ = c;
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ఆపు;
 			      }
-			      else if ((c == 'l' || c == 'c' || c == 'v')
+			      లేకపోతే ఒకవేళ ((c == 'l' || c == 'c' || c == 'v')
 					  && (cur || got_digit))
 			      {
-				  if (cur && n)
+				  ఒకవేళ (cur && n)
 				  {
-				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				    semsg(_(e_regexp_సంఖ్య_after_dot_pos_శోధన_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
-				    return NULL;
+				    తిరిగి ఖాళీ;
 				  }
-				  if (c == 'l')
+				  ఒకవేళ (c == 'l')
 				  {
-				      if (cur)
+				      ఒకవేళ (cur)
 					  n = curwin->w_cursor.lnum;
 				      ret = regnode(RE_LNUM);
-				      if (save_prev_at_start)
-					  at_start = TRUE;
+				      ఒకవేళ (save_prev_at_ప్రారంభం)
+					  at_ప్రారంభం = TRUE;
 				  }
-				  else if (c == 'c')
+				  లేకపోతే ఒకవేళ (c == 'c')
 				  {
-				      if (cur)
+				      ఒకవేళ (cur)
 				      {
-					  n = curwin->w_cursor.col;
+					  n = curwin->w_cursor.నిలువు;
 					  n++;
 				      }
-				      ret = regnode(RE_COL);
+				      ret = regnode(RE_నిలువు);
 				  }
-				  else
+				  లేకపోతే
 				  {
-				      if (cur)
+				      ఒకవేళ (cur)
 				      {
 					  colnr_T vcol = 0;
 
 					  getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 ఖాళీ, ఖాళీ, &vcol, 0);
 					  ++vcol;
 					  n = vcol;
 				      }
 				      ret = regnode(RE_VCOL);
 				  }
-				  if (ret == JUST_CALC_SIZE)
+				  ఒకవేళ (ret == JUST_CALC_కొలత)
 				      regsize += 5;
-				  else
+				  లేకపోతే
 				  {
 				      // put the number and the optional
 				      // comparator after the opcode
 				      regcode = re_put_long(regcode, n);
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ఆపు;
 			      }
 			  }
 
@@ -1761,9 +1761,9 @@ regatom(int *flagp)
 						      reg_magic == MAGIC_ALL);
 	    }
 	}
-	break;
+	ఆపు;
 
-      case Magic('['):
+      స్థితి Magic('['):
 collection:
 	{
 	    char_u	*lp;
@@ -1771,88 +1771,88 @@ collection:
 	    // If there is no matching ']', we assume the '[' is a normal
 	    // character.  This makes 'incsearch' and ":help [" work.
 	    lp = skip_anyof(regparse);
-	    if (*lp == ']')	// there is a matching ']'
+	    ఒకవేళ (*lp == ']')	// there is a matching ']'
 	    {
-		int	startc = -1;	// > 0 when next '-' is a range
-		int	endc;
+		పూర్ణాంకం	startc = -1;	// > 0 when next '-' is a range
+		పూర్ణాంకం	endc;
 
-		if (extra == 0)
+		ఒకవేళ (extra == 0)
 		{
-		    int	cl = bt_recognize_char_class(regparse, lp);
+		    పూర్ణాంకం	cl = bt_recognize_char_class(regparse, lp);
 
-		    if (cl != 0)
+		    ఒకవేళ (cl != 0)
 		    {
 			ret = regnode(cl);
 			regparse = lp;
 			skipchr();
 			*flagp |= HASWIDTH | SIMPLE;
-			break;
+			ఆపు;
 		    }
 		}
 
 		// In a character class, different parsing rules apply.
 		// Not even \ is special anymore, nothing is.
-		if (*regparse == '^')	    // Complement of range.
+		ఒకవేళ (*regparse == '^')	    // Complement of range.
 		{
 		    ret = regnode(ANYBUT + extra);
 		    regparse++;
 		}
-		else
+		లేకపోతే
 		    ret = regnode(ANYOF + extra);
 
 		// At the start ']' and '-' mean the literal character.
-		if (*regparse == ']' || *regparse == '-')
+		ఒకవేళ (*regparse == ']' || *regparse == '-')
 		{
 		    startc = *regparse;
 		    regc(*regparse++);
 		}
 
-		while (*regparse != NUL && *regparse != ']')
+		అయితే (*regparse != NUL && *regparse != ']')
 		{
-		    if (*regparse == '-')
+		    ఒకవేళ (*regparse == '-')
 		    {
 			++regparse;
 			// The '-' is not used for a range at the end and
 			// after or before a '\n'.
-			if (*regparse == ']' || *regparse == NUL
+			ఒకవేళ (*regparse == ']' || *regparse == NUL
 				|| startc == -1
 				|| (regparse[0] == '\\' && regparse[1] == 'n'))
 			{
 			    regc('-');
 			    startc = '-';	// [--x] is a range
 			}
-			else
+			లేకపోతే
 			{
 			    // Also accept "a-[.z.]"
 			    endc = 0;
-			    if (*regparse == '[')
+			    ఒకవేళ (*regparse == '[')
 				endc = get_coll_element(&regparse);
-			    if (endc == 0)
+			    ఒకవేళ (endc == 0)
 			    {
-				if (has_mbyte)
+				ఒకవేళ (has_mbyte)
 				    endc = mb_ptr2char_adv(&regparse);
-				else
+				లేకపోతే
 				    endc = *regparse++;
 			    }
 
 			    // Handle \o40, \x20 and \u20AC style sequences
-			    if (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
+			    ఒకవేళ (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
 				endc = coll_get_char();
 
-			    if (startc > endc)
-				EMSG_RET_NULL(_(e_reverse_range_in_character_class));
-			    if (has_mbyte && ((*mb_char2len)(startc) > 1
+			    ఒకవేళ (startc > endc)
+				EMSG_RET_NULL(_(e_తిరగేయి_range_లోపల_character_class));
+			    ఒకవేళ (has_mbyte && ((*mb_char2len)(startc) > 1
 						 || (*mb_char2len)(endc) > 1))
 			    {
 				// Limit to a range of 256 chars.
-				if (endc > startc + 256)
-				    EMSG_RET_NULL(_(e_range_too_large_in_character_class));
-				while (++startc <= endc)
+				ఒకవేళ (endc > startc + 256)
+				    EMSG_RET_NULL(_(e_range_too_large_లోపల_character_class));
+				అయితే (++startc <= endc)
 				    regmbc(startc);
 			    }
-			    else
+			    లేకపోతే
 			    {
-				while (++startc <= endc)
+				అయితే (++startc <= endc)
 				    regc(startc);
 			    }
 			    startc = -1;
@@ -1862,24 +1862,24 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    else if (*regparse == '\\'
+		    లేకపోతే ఒకవేళ (*regparse == '\\'
 			    && !reg_cpo_bsl
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != ఖాళీ
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR,
-						       regparse[1]) != NULL)))
+						       regparse[1]) != ఖాళీ)))
 		    {
 			regparse++;
-			if (*regparse == 'n')
+			ఒకవేళ (*regparse == 'n')
 			{
 			    // '\n' in range: also match NL
-			    if (ret != JUST_CALC_SIZE)
+			    ఒకవేళ (ret != JUST_CALC_కొలత)
 			    {
 				// Using \n inside [^] does not change what
 				// matches. "[^\n]" is the same as ".".
-				if (*ret == ANYOF)
+				ఒకవేళ (*ret == ANYOF)
 				{
-				    *ret = ANYOF + ADD_NL;
+				    *ret = ANYOF + కూడు_NL;
 				    *flagp |= HASNL;
 				}
 				// else: must have had a \n already
@@ -1887,7 +1887,7 @@ collection:
 			    regparse++;
 			    startc = -1;
 			}
-			else if (*regparse == 'd'
+			లేకపోతే ఒకవేళ (*regparse == 'd'
 				|| *regparse == 'o'
 				|| *regparse == 'x'
 				|| *regparse == 'u'
@@ -1896,154 +1896,154 @@ collection:
 			    startc = coll_get_char();
 			    // max UTF-8 Codepoint is U+10FFFF,
 			    // but allow values until INT_MAX
-			    if (startc == INT_MAX)
+			    ఒకవేళ (startc == గరిష్ఠ_పూర్ణాంకం)
 				EMSG_RET_NULL(_(e_unicode_val_too_large));
-			    if (startc == 0)
+			    ఒకవేళ (startc == 0)
 				regc(0x0a);
-			    else
+			    లేకపోతే
 				regmbc(startc);
 			}
-			else
+			లేకపోతే
 			{
 			    startc = backslash_trans(*regparse++);
 			    regc(startc);
 			}
 		    }
-		    else if (*regparse == '[')
+		    లేకపోతే ఒకవేళ (*regparse == '[')
 		    {
-			int c_class;
-			int cu;
+			పూర్ణాంకం c_class;
+			పూర్ణాంకం cu;
 
 			c_class = get_char_class(&regparse);
 			startc = -1;
 			// Characters assumed to be 8 bits!
-			switch (c_class)
+			ఎంపిక (c_class)
 			{
-			    case CLASS_NONE:
+			    స్థితి CLASS_NONE:
 				c_class = get_equi_class(&regparse);
-				if (c_class != 0)
+				ఒకవేళ (c_class != 0)
 				{
 				    // produce equivalence class
 				    reg_equi_class(c_class);
 				}
-				else if ((c_class =
+				లేకపోతే ఒకవేళ ((c_class =
 					    get_coll_element(&regparse)) != 0)
 				{
 				    // produce a collating element
 				    regmbc(c_class);
 				}
-				else
+				లేకపోతే
 				{
 				    // literal '[', allow [[-x] as a range
 				    startc = *regparse++;
 				    regc(startc);
 				}
-				break;
-			    case CLASS_ALNUM:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalnum(cu))
+				ఆపు;
+			    స్థితి CLASS_ALNUM:
+				కొరకు (cu = 1; cu < 128; cu++)
+				    ఒకవేళ (అక్షరమా_అంకెనా(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_ALPHA:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalpha(cu))
+				ఆపు;
+			    స్థితి CLASS_ALPHA:
+				కొరకు (cu = 1; cu < 128; cu++)
+				    ఒకవేళ (అక్షరమా(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_BLANK:
+				ఆపు;
+			    స్థితి CLASS_BLANK:
 				regc(' ');
 				regc('\t');
-				break;
-			    case CLASS_CNTRL:
-				for (cu = 1; cu <= 127; cu++)
-				    if (iscntrl(cu))
+				ఆపు;
+			    స్థితి CLASS_CNTRL:
+				కొరకు (cu = 1; cu <= 127; cu++)
+				    ఒకవేళ (iscntrl(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_DIGIT:
-				for (cu = 1; cu <= 127; cu++)
-				    if (VIM_ISDIGIT(cu))
+				ఆపు;
+			    స్థితి CLASS_DIGIT:
+				కొరకు (cu = 1; cu <= 127; cu++)
+				    ఒకవేళ (VIM_ISDIGIT(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_GRAPH:
-				for (cu = 1; cu <= 127; cu++)
-				    if (isgraph(cu))
+				ఆపు;
+			    స్థితి CLASS_లేఖాచిత్రం:
+				కొరకు (cu = 1; cu <= 127; cu++)
+				    ఒకవేళ (isgraph(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_LOWER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISLOWER(cu) && cu != 170
+				ఆపు;
+			    స్థితి CLASS_క్రింది:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (MB_ISLOWER(cu) && cu != 170
 								 && cu != 186)
 					regmbc(cu);
-				break;
-			    case CLASS_PRINT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isprintc(cu))
+				ఆపు;
+			    స్థితి CLASS_PRINT:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (vim_isprintc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_PUNCT:
-				for (cu = 1; cu < 128; cu++)
-				    if (ispunct(cu))
+				ఆపు;
+			    స్థితి CLASS_PUNCT:
+				కొరకు (cu = 1; cu < 128; cu++)
+				    ఒకవేళ (ispunct(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_SPACE:
-				for (cu = 9; cu <= 13; cu++)
+				ఆపు;
+			    స్థితి CLASS_SPACE:
+				కొరకు (cu = 9; cu <= 13; cu++)
 				    regc(cu);
 				regc(' ');
-				break;
-			    case CLASS_UPPER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISUPPER(cu))
+				ఆపు;
+			    స్థితి CLASS_పై:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (MB_ISUPPER(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_XDIGIT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isxdigit(cu))
+				ఆపు;
+			    స్థితి CLASS_XDIGIT:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (vim_isxdigit(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_TAB:
+				ఆపు;
+			    స్థితి CLASS_TAB:
 				regc('\t');
-				break;
-			    case CLASS_RETURN:
+				ఆపు;
+			    స్థితి CLASS_RETURN:
 				regc('\r');
-				break;
-			    case CLASS_BACKSPACE:
+				ఆపు;
+			    స్థితి CLASS_BACKSPACE:
 				regc('\b');
-				break;
-			    case CLASS_ESCAPE:
+				ఆపు;
+			    స్థితి CLASS_ESCAPE:
 				regc('\033');
-				break;
-			    case CLASS_IDENT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isIDc(cu))
+				ఆపు;
+			    స్థితి CLASS_IDENT:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (vim_isIDc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_KEYWORD:
-				for (cu = 1; cu <= 255; cu++)
-				    if (reg_iswordc(cu))
+				ఆపు;
+			    స్థితి CLASS_KEYWORD:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (reg_iswordc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_FNAME:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isfilec(cu))
+				ఆపు;
+			    స్థితి CLASS_FNAME:
+				కొరకు (cu = 1; cu <= 255; cu++)
+				    ఒకవేళ (vim_isfilec(cu))
 					regmbc(cu);
-				break;
+				ఆపు;
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (has_mbyte)
+			ఒకవేళ (has_mbyte)
 			{
-			    int	len;
+			    పూర్ణాంకం	len;
 
 			    // produce a multibyte character, including any
 			    // following composing characters
 			    startc = mb_ptr2char(regparse);
 			    len = (*mb_ptr2len)(regparse);
-			    if (enc_utf8 && utf_char2len(startc) != len)
+			    ఒకవేళ (enc_utf8 && utf_char2len(startc) != len)
 				startc = -1;	// composing chars
-			    while (--len >= 0)
+			    అయితే (--len >= 0)
 				regc(*regparse++);
 			}
-			else
+			లేకపోతే
 			{
 			    startc = *regparse++;
 			    regc(startc);
@@ -2052,31 +2052,31 @@ collection:
 		}
 		regc(NUL);
 		prevchr_len = 1;	// last char was the ']'
-		if (*regparse != ']')
+		ఒకవేళ (*regparse != ']')
 		    EMSG_RET_NULL(_(e_too_many_brackets));  // Cannot happen?
 		skipchr();	    // let's be friends with the lexer again
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ఆపు;
 	    }
-	    else if (reg_strict)
+	    లేకపోతే ఒకవేళ (reg_strict)
 		EMSG2_RET_NULL(_(e_missing_rsb_after_str_lsb),
 							reg_magic > MAGIC_OFF);
 	}
 	// FALLTHROUGH
 
-      default:
+      అప్రమేయ:
 	{
-	    int		len;
+	    పూర్ణాంకం		len;
 
 	    // A multi-byte character is handled as a separate atom if it's
 	    // before a multi and when it's a composing char.
-	    if (use_multibytecode(c))
+	    ఒకవేళ (use_multibytecode(c))
 	    {
 do_multibyte:
 		ret = regnode(MULTIBYTECODE);
 		regmbc(c);
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ఆపు;
 	    }
 
 	    ret = regnode(EXACTLY);
@@ -2088,31 +2088,31 @@ do_multibyte:
 	    // - "one_exactly" is not set
 	    // But always emit at least one character.  Might be a Multi,
 	    // e.g., a "[" without matching "]".
-	    for (len = 0; c != NUL && (len == 0
+	    కొరకు (len = 0; c != NUL && (len == 0
 			|| (re_multi_type(peekchr()) == NOT_MULTI
 			    && !one_exactly
 			    && !is_Magic(c))); ++len)
 	    {
 		c = no_Magic(c);
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
 		    regmbc(c);
-		    if (enc_utf8)
+		    ఒకవేళ (enc_utf8)
 		    {
-			int	l;
+			పూర్ణాంకం	l;
 
 			// Need to get composing character too.
-			for (;;)
+			కొరకు (;;)
 			{
 			    l = utf_ptr2len(regparse);
-			    if (!UTF_COMPOSINGLIKE(regparse, regparse + l))
-				break;
+			    ఒకవేళ (!UTF_COMPOSINGLIKE(regparse, regparse + l))
+				ఆపు;
 			    regmbc(utf_ptr2char(regparse));
 			    skipchr();
 			}
 		    }
 		}
-		else
+		లేకపోతే
 		    regc(c);
 		c = getchr();
 	    }
@@ -2120,13 +2120,13 @@ do_multibyte:
 
 	    regc(NUL);
 	    *flagp |= HASWIDTH;
-	    if (len == 1)
+	    ఒకవేళ (len == 1)
 		*flagp |= SIMPLE;
 	}
-	break;
+	ఆపు;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -2138,241 +2138,241 @@ do_multibyte:
  * It might seem that this node could be dispensed with entirely, but the
  * endmarker role is not redundant.
  */
-    static char_u *
-regpiece(int *flagp)
+    స్థిర char_u *
+regpiece(పూర్ణాంకం *flagp)
 {
     char_u	    *ret;
-    int		    op;
-    char_u	    *next;
-    int		    flags;
-    long	    minval;
-    long	    maxval;
+    పూర్ణాంకం		    op;
+    char_u	    *తదుపరి;
+    పూర్ణాంకం		    flags;
+    దీర్ఘ	    minval;
+    దీర్ఘ	    maxval;
 
     ret = regatom(&flags);
-    if (ret == NULL)
-	return NULL;
+    ఒకవేళ (ret == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
+    ఒకవేళ (re_multi_type(op) == NOT_MULTI)
     {
 	*flagp = flags;
-	return ret;
+	తిరిగి ret;
     }
     // default flags
     *flagp = (WORST | SPSTART | (flags & (HASNL | HASLOOKBH)));
 
     skipchr();
-    switch (op)
+    ఎంపిక (op)
     {
-	case Magic('*'):
-	    if (flags & SIMPLE)
-		reginsert(STAR, ret);
-	    else
+	స్థితి Magic('*'):
+	    ఒకవేళ (flags & SIMPLE)
+		reginsert(నక్షత్రం, ret);
+	    లేకపోతే
 	    {
 		// Emit x* as (x&|), where & means "self".
 		reginsert(BRANCH, ret); // Either x
-		regoptail(ret, regnode(BACK));	// and loop
-		regoptail(ret, ret);	// back
+		regoptail(ret, regnode(వెనుక_2));	// and loop
+		regoptail(ret, ret);	//వెనుక
 		regtail(ret, regnode(BRANCH));	// or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('+'):
-	    if (flags & SIMPLE)
+	స్థితి Magic('+'):
+	    ఒకవేళ (flags & SIMPLE)
 		reginsert(PLUS, ret);
-	    else
+	    లేకపోతే
 	    {
 		// Emit x+ as x(&|), where & means "self".
-		next = regnode(BRANCH); // Either
-		regtail(ret, next);
-		regtail(regnode(BACK), ret);	// loop back
-		regtail(next, regnode(BRANCH)); // or
+		తదుపరి = regnode(BRANCH); // Either
+		regtail(ret, తదుపరి);
+		regtail(regnode(వెనుక_2), ret);	// loop back
+		regtail(తదుపరి, regnode(BRANCH)); // or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
 	    *flagp = (WORST | HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ఆపు;
 
-	case Magic('@'):
+	స్థితి Magic('@'):
 	    {
-		int	lop = END;
-		long	nr;
+		పూర్ణాంకం	lop = చివర_3;
+		దీర్ఘ	nr;
 
-		nr = (long)getdecchrs();
-		switch (no_Magic(getchr()))
+		nr = (దీర్ఘ)getdecchrs();
+		ఎంపిక (no_Magic(getchr()))
 		{
-		    case '=': lop = MATCH; break;		  // \@=
-		    case '!': lop = NOMATCH; break;		  // \@!
-		    case '>': lop = SUBPAT; break;		  // \@>
-		    case '<': switch (no_Magic(getchr()))
+		    స్థితి '=': lop = సరిపోలిక_2; ఆపు;		  // \@=
+		    స్థితి '!': lop = NOMATCH; ఆపు;		  // \@!
+		    స్థితి '>': lop = SUBPAT; ఆపు;		  // \@>
+		    స్థితి '<': ఎంపిక (no_Magic(getchr()))
 			      {
-				  case '=': lop = BEHIND; break;   // \@<=
-				  case '!': lop = NOBEHIND; break; // \@<!
+				  స్థితి '=': lop = BEHIND; ఆపు;   // \@<=
+				  స్థితి '!': lop = NOBEHIND; ఆపు; // \@<!
 			      }
 		}
-		if (lop == END)
+		ఒకవేళ (lop == చివర_3)
 		    EMSG2_RET_NULL(_(e_invalid_character_after_str_at),
 						      reg_magic == MAGIC_ALL);
 		// Look behind must match with behind_pos.
-		if (lop == BEHIND || lop == NOBEHIND)
+		ఒకవేళ (lop == BEHIND || lop == NOBEHIND)
 		{
 		    regtail(ret, regnode(BHPOS));
 		    *flagp |= HASLOOKBH;
 		}
-		regtail(ret, regnode(END)); // operand ends
-		if (lop == BEHIND || lop == NOBEHIND)
+		regtail(ret, regnode(చివర_3)); // operand ends
+		ఒకవేళ (lop == BEHIND || lop == NOBEHIND)
 		{
-		    if (nr < 0)
+		    ఒకవేళ (nr < 0)
 			nr = 0; // no limit is same as zero limit
 		    reginsert_nr(lop, nr, ret);
 		}
-		else
+		లేకపోతే
 		    reginsert(lop, ret);
-		break;
+		ఆపు;
 	    }
 
-	case Magic('?'):
-	case Magic('='):
+	స్థితి Magic('?'):
+	స్థితి Magic('='):
 	    // Emit x= as (x|)
 	    reginsert(BRANCH, ret);		// Either x
 	    regtail(ret, regnode(BRANCH));	// or
-	    next = regnode(NOTHING);		// null.
-	    regtail(ret, next);
-	    regoptail(ret, next);
-	    break;
+	    తదుపరి = regnode(NOTHING);		// null.
+	    regtail(ret, తదుపరి);
+	    regoptail(ret, తదుపరి);
+	    ఆపు;
 
-	case Magic('{'):
-	    if (!read_limits(&minval, &maxval))
-		return NULL;
-	    if (flags & SIMPLE)
+	స్థితి Magic('{'):
+	    ఒకవేళ (!read_limits(&minval, &maxval))
+		తిరిగి ఖాళీ;
+	    ఒకవేళ (flags & SIMPLE)
 	    {
 		reginsert(BRACE_SIMPLE, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (num_complex_braces >= 10)
+		ఒకవేళ (అంకె_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
-		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
-		regoptail(ret, regnode(BACK));
+		reginsert(BRACE_COMPLEX + అంకె_complex_braces, ret);
+		regoptail(ret, regnode(వెనుక_2));
 		regoptail(ret, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
-		++num_complex_braces;
+		++అంకె_complex_braces;
 	    }
-	    if (minval > 0 && maxval > 0)
+	    ఒకవేళ (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ఆపు;
     }
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    ఒకవేళ (re_multi_type(peekchr()) != NOT_MULTI)
     {
 	// Can't have a multi follow a multi.
-	if (peekchr() == Magic('*'))
+	ఒకవేళ (peekchr() == Magic('*'))
 	    EMSG2_RET_NULL(_(e_nested_str), reg_magic >= MAGIC_ON);
 	EMSG3_RET_NULL(_(e_nested_str_chr), reg_magic == MAGIC_ALL,
 							  no_Magic(peekchr()));
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Parse one alternative of an | or & operator.
  * Implements the concatenation operator.
  */
-    static char_u *
-regconcat(int *flagp)
+    స్థిర char_u *
+regconcat(పూర్ణాంకం *flagp)
 {
-    char_u	*first = NULL;
-    char_u	*chain = NULL;
+    char_u	*మొదటి = ఖాళీ;
+    char_u	*chain = ఖాళీ;
     char_u	*latest;
-    int		flags;
-    int		cont = TRUE;
+    పూర్ణాంకం		flags;
+    పూర్ణాంకం		cont = TRUE;
 
     *flagp = WORST;		// Tentatively.
 
-    while (cont)
+    అయితే (cont)
     {
-	switch (peekchr())
+	ఎంపిక (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    స్థితి NUL:
+	    స్థితి Magic('|'):
+	    స్థితి Magic('&'):
+	    స్థితి Magic(')'):
 			    cont = FALSE;
-			    break;
-	    case Magic('Z'):
+			    ఆపు;
+	    స్థితి Magic('Z'):
 			    regflags |= RF_ICOMBINE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('c'):
+			    ఆపు;
+	    స్థితి Magic('c'):
 			    regflags |= RF_ICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('C'):
+			    ఆపు;
+	    స్థితి Magic('C'):
 			    regflags |= RF_NOICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('v'):
+			    ఆపు;
+	    స్థితి Magic('v'):
 			    reg_magic = MAGIC_ALL;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('m'):
+			    ఆపు;
+	    స్థితి Magic('m'):
 			    reg_magic = MAGIC_ON;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('M'):
+			    ఆపు;
+	    స్థితి Magic('M'):
 			    reg_magic = MAGIC_OFF;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('V'):
+			    ఆపు;
+	    స్థితి Magic('V'):
 			    reg_magic = MAGIC_NONE;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    default:
+			    ఆపు;
+	    అప్రమేయ:
 			    latest = regpiece(&flags);
-			    if (latest == NULL || reg_toolong)
-				return NULL;
+			    ఒకవేళ (latest == ఖాళీ || reg_toolong)
+				తిరిగి ఖాళీ;
 			    *flagp |= flags & (HASWIDTH | HASNL | HASLOOKBH);
-			    if (chain == NULL)	// First piece.
+			    ఒకవేళ (chain == ఖాళీ)	// First piece.
 				*flagp |= flags & SPSTART;
-			    else
+			    లేకపోతే
 				regtail(chain, latest);
 			    chain = latest;
-			    if (first == NULL)
-				first = latest;
-			    break;
+			    ఒకవేళ (మొదటి == ఖాళీ)
+				మొదటి = latest;
+			    ఆపు;
 	}
     }
-    if (first == NULL)		// Loop ran zero times.
-	first = regnode(NOTHING);
-    return first;
+    ఒకవేళ (మొదటి == ఖాళీ)		// Loop ran zero times.
+	మొదటి = regnode(NOTHING);
+    తిరిగి మొదటి;
 }
 
 /*
  * Parse one alternative of an | operator.
  * Implements the & operator.
  */
-    static char_u *
-regbranch(int *flagp)
+    స్థిర char_u *
+regbranch(పూర్ణాంకం *flagp)
 {
     char_u	*ret;
-    char_u	*chain = NULL;
+    char_u	*chain = ఖాళీ;
     char_u	*latest;
-    int		flags;
+    పూర్ణాంకం		flags;
 
     *flagp = WORST | HASNL;		// Tentatively.
 
     ret = regnode(BRANCH);
-    for (;;)
+    కొరకు (;;)
     {
 	latest = regconcat(&flags);
-	if (latest == NULL)
-	    return NULL;
+	ఒకవేళ (latest == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	// If one of the branches has width, the whole thing has.  If one of
 	// the branches anchors at start-of-line, the whole thing does.
 	// If one of the branches uses look-behind, the whole thing does.
@@ -2380,19 +2380,19 @@ regbranch(int *flagp)
 	// If one of the branches doesn't match a line-break, the whole thing
 	// doesn't.
 	*flagp &= ~HASNL | (flags & HASNL);
-	if (chain != NULL)
+	ఒకవేళ (chain != ఖాళీ)
 	    regtail(chain, latest);
-	if (peekchr() != Magic('&'))
-	    break;
+	ఒకవేళ (peekchr() != Magic('&'))
+	    ఆపు;
 	skipchr();
-	regtail(latest, regnode(END)); // operand ends
-	if (reg_toolong)
-	    break;
-	reginsert(MATCH, latest);
+	regtail(latest, regnode(చివర_3)); // operand ends
+	ఒకవేళ (reg_toolong)
+	    ఆపు;
+	reginsert(సరిపోలిక_2, latest);
 	chain = latest;
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -2404,153 +2404,153 @@ regbranch(int *flagp)
  * is a trifle forced, but the need to tie the tails of the branches to what
  * follows makes it hard to avoid.
  */
-    static char_u *
+    స్థిర char_u *
 reg(
-    int		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
-    int		*flagp)
+    పూర్ణాంకం		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    పూర్ణాంకం		*flagp)
 {
     char_u	*ret;
     char_u	*br;
     char_u	*ender;
-    int		parno = 0;
-    int		flags;
+    పూర్ణాంకం		parno = 0;
+    పూర్ణాంకం		flags;
 
     *flagp = HASWIDTH;		// Tentatively.
 
-#ifdef FEAT_SYN_HL
-    if (paren == REG_ZPAREN)
+#నిర్వచితమైతే FEAT_SYN_HL
+    ఒకవేళ (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	ఒకవేళ (regnzpar >= NSUBEXP)
 	    EMSG_RET_NULL(_(e_too_many_z));
 	parno = regnzpar;
 	regnzpar++;
 	ret = regnode(ZOPEN + parno);
     }
-    else
-#endif
-	if (paren == REG_PAREN)
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (paren == REG_PAREN)
     {
 	// Make a MOPEN node.
-	if (regnpar >= NSUBEXP)
+	ఒకవేళ (regnpar >= NSUBEXP)
 	    EMSG2_RET_NULL(_(e_too_many_str_open), reg_magic == MAGIC_ALL);
 	parno = regnpar;
 	++regnpar;
 	ret = regnode(MOPEN + parno);
     }
-    else if (paren == REG_NPAREN)
+    లేకపోతే ఒకవేళ (paren == REG_NPAREN)
     {
 	// Make a NOPEN node.
 	ret = regnode(NOPEN);
     }
-    else
-	ret = NULL;
+    లేకపోతే
+	ret = ఖాళీ;
 
-    if (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    ఒకవేళ (bt_reg_parse_లోతు >= REG_MAX_PAREN_లోతు)
 	EMSG_RET_NULL(_(e_command_too_complex));
-    ++bt_reg_parse_depth;
+    ++bt_reg_parse_లోతు;
 
     // Pick up the branches, linking them together.
     br = regbranch(&flags);
-    if (br == NULL)
+    ఒకవేళ (br == ఖాళీ)
     {
-	ret = NULL;
-	goto theend;
+	ret = ఖాళీ;
+	వెళ్ళు theend;
     }
-    if (ret != NULL)
+    ఒకవేళ (ret != ఖాళీ)
 	regtail(ret, br);	// [MZ]OPEN -> first.
-    else
+    లేకపోతే
 	ret = br;
     // If one of the branches can be zero-width, the whole thing can.
     // If one of the branches has * at start or matches a line-break, the
     // whole thing can.
-    if (!(flags & HASWIDTH))
+    ఒకవేళ (!(flags & HASWIDTH))
 	*flagp &= ~HASWIDTH;
     *flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
-    while (peekchr() == Magic('|'))
+    అయితే (peekchr() == Magic('|'))
     {
 	skipchr();
 	br = regbranch(&flags);
-	if (br == NULL || reg_toolong)
+	ఒకవేళ (br == ఖాళీ || reg_toolong)
 	{
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
 	regtail(ret, br);	// BRANCH -> BRANCH.
-	if (!(flags & HASWIDTH))
+	ఒకవేళ (!(flags & HASWIDTH))
 	    *flagp &= ~HASWIDTH;
 	*flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
     }
 
     // Make a closing node, and hook it on the end.
     ender = regnode(
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 	    paren == REG_ZPAREN ? ZCLOSE + parno :
-#endif
+#అయితే_ముగింపు
 	    paren == REG_PAREN ? MCLOSE + parno :
-	    paren == REG_NPAREN ? NCLOSE : END);
+	    paren == REG_NPAREN ? NCLOSE : చివర_3);
     regtail(ret, ender);
 
     // Hook the tails of the branches to the closing node.
-    for (br = ret; br != NULL; br = regnext(br))
+    కొరకు (br = ret; br != ఖాళీ; br = regnext(br))
 	regoptail(br, ender);
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    ఒకవేళ (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-#ifdef FEAT_SYN_HL
-	if (paren == REG_ZPAREN)
+#నిర్వచితమైతే FEAT_SYN_HL
+	ఒకవేళ (paren == REG_ZPAREN)
 	{
 	    emsg(_(e_unmatched_z));
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
-	else
-#endif
-	if (paren == REG_NPAREN)
+	లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (paren == REG_NPAREN)
 	{
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
-	else
+	లేకపోతే
 	{
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    లేకపోతే ఒకవేళ (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (curchr == Magic(')'))
+	ఒకవేళ (curchr == Magic(')'))
 	{
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
-	else
+	లేకపోతే
 	{
 	    emsg(_(e_trailing_characters));	// "Can't happen".
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ఖాళీ;
+	    వెళ్ళు theend;
 	}
     }
     // Here we set the flag allowing back references to this set of
     // parentheses.
-    if (paren == REG_PAREN)
+    ఒకవేళ (paren == REG_PAREN)
 	had_endbrace[parno] = TRUE;	// have seen the close paren
 
 theend:
-    --bt_reg_parse_depth;
-    return ret;
+    --bt_reg_parse_లోతు;
+    తిరిగి ret;
 }
 
 /*
@@ -2574,92 +2574,92 @@ theend:
  * of the structure of the compiled regexp.
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
-    static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+    స్థిర regprog_T *
+bt_regcomp(char_u *సమాసం, పూర్ణాంకం re_flags)
 {
     bt_regprog_T    *r;
-    char_u	*scan;
+    char_u	*పరిశీలన;
     char_u	*longest;
-    int		len;
-    int		flags;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		flags;
 
-    if (expr == NULL)
-	IEMSG_RET_NULL(e_null_argument);
+    ఒకవేళ (సమాసం == ఖాళీ)
+	IEMSG_RET_NULL(e_null_వాదం);
 
     init_class_tab();
 
     // First pass: determine size, legality.
-    regcomp_start(expr, re_flags);
-    regcode = JUST_CALC_SIZE;
+    regcomp_ప్రారంభం(సమాసం, re_flags);
+    regcode = JUST_CALC_కొలత;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL)
-	return NULL;
+    ఒకవేళ (reg(REG_NOPAREN, &flags) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Allocate space.
-    r = alloc(offsetof(bt_regprog_T, program) + regsize);
-    if (r == NULL)
-	return NULL;
-    r->re_in_use = FALSE;
-#ifdef DEBUG
+    r = alloc(offsetof(bt_regprog_T, కార్యక్రమం) + regsize);
+    ఒకవేళ (r == ఖాళీ)
+	తిరిగి ఖాళీ;
+    r->re_లోపల_use = FALSE;
+#నిర్వచితమైతే DEBUG
     r->regsz = regsize;
-#endif
+#అయితే_ముగింపు
 
     // Second pass: emit code.
-    regcomp_start(expr, re_flags);
-    regcode = r->program;
+    regcomp_ప్రారంభం(సమాసం, re_flags);
+    regcode = r->కార్యక్రమం;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
+    ఒకవేళ (reg(REG_NOPAREN, &flags) == ఖాళీ || reg_toolong)
     {
 	vim_free(r);
-	if (reg_toolong)
-	    EMSG_RET_NULL(_(e_pattern_too_long));
-	return NULL;
+	ఒకవేళ (reg_toolong)
+	    EMSG_RET_NULL(_(e_నమూనా_too_long));
+	తిరిగి ఖాళీ;
     }
 
     // Dig out information for optimizations.
     r->regstart = NUL;		// Worst-case defaults.
     r->reganch = 0;
-    r->regmust = NULL;
+    r->regmust = ఖాళీ;
     r->regmlen = 0;
     r->regflags = regflags;
-    if (flags & HASNL)
+    ఒకవేళ (flags & HASNL)
 	r->regflags |= RF_HASNL;
-    if (flags & HASLOOKBH)
+    ఒకవేళ (flags & HASLOOKBH)
 	r->regflags |= RF_LOOKBH;
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     r->reghasz = re_has_z;
-#endif
-    scan = r->program + 1;	// First BRANCH.
-    if (OP(regnext(scan)) == END)   // Only one top-level choice.
+#అయితే_ముగింపు
+    పరిశీలన = r->కార్యక్రమం + 1;	// First BRANCH.
+    ఒకవేళ (OP(regnext(పరిశీలన)) == చివర_3)   // Only one top-level choice.
     {
-	scan = OPERAND(scan);
+	పరిశీలన = నిర్వాహ్యం(పరిశీలన);
 
 	// Starting-point info.
-	if (OP(scan) == BOL || OP(scan) == RE_BOF)
+	ఒకవేళ (OP(పరిశీలన) == BOL || OP(పరిశీలన) == RE_BOF)
 	{
 	    r->reganch++;
-	    scan = regnext(scan);
+	    పరిశీలన = regnext(పరిశీలన);
 	}
 
-	if (OP(scan) == EXACTLY)
+	ఒకవేళ (OP(పరిశీలన) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(scan));
-	    else
-		r->regstart = *OPERAND(scan);
+	    ఒకవేళ (has_mbyte)
+		r->regstart = (*mb_ptr2char)(నిర్వాహ్యం(పరిశీలన));
+	    లేకపోతే
+		r->regstart = *నిర్వాహ్యం(పరిశీలన);
 	}
-	else if ((OP(scan) == BOW
-		    || OP(scan) == EOW
-		    || OP(scan) == NOTHING
-		    || OP(scan) == MOPEN + 0 || OP(scan) == NOPEN
-		    || OP(scan) == MCLOSE + 0 || OP(scan) == NCLOSE)
-		 && OP(regnext(scan)) == EXACTLY)
+	లేకపోతే ఒకవేళ ((OP(పరిశీలన) == BOW
+		    || OP(పరిశీలన) == EOW
+		    || OP(పరిశీలన) == NOTHING
+		    || OP(పరిశీలన) == MOPEN + 0 || OP(పరిశీలన) == NOPEN
+		    || OP(పరిశీలన) == MCLOSE + 0 || OP(పరిశీలన) == NCLOSE)
+		 && OP(regnext(పరిశీలన)) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(regnext(scan)));
-	    else
-		r->regstart = *OPERAND(regnext(scan));
+	    ఒకవేళ (has_mbyte)
+		r->regstart = (*mb_ptr2char)(నిర్వాహ్యం(regnext(పరిశీలన)));
+	    లేకపోతే
+		r->regstart = *నిర్వాహ్యం(regnext(పరిశీలన));
 	}
 
 	// If there's something expensive in the r.e., find the longest
@@ -2671,22 +2671,22 @@ bt_regcomp(char_u *expr, int re_flags)
 
 	// When the r.e. starts with BOW, it is faster to look for a regmust
 	// first. Used a lot for "#" and "*" commands. (Added by mool).
-	if ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
+	ఒకవేళ ((flags & SPSTART || OP(పరిశీలన) == BOW || OP(పరిశీలన) == EOW)
 							  && !(flags & HASNL))
 	{
 	    size_t  scanlen;
 
-	    longest = NULL;
+	    longest = ఖాళీ;
 	    len = 0;
-	    for (; scan != NULL; scan = regnext(scan))
+	    కొరకు (; పరిశీలన != ఖాళీ; పరిశీలన = regnext(పరిశీలన))
 	    {
-		if (OP(scan) == EXACTLY)
+		ఒకవేళ (OP(పరిశీలన) == EXACTLY)
 		{
-		    scanlen = STRLEN(OPERAND(scan));
-		    if (scanlen >= (size_t)len)
+		    scanlen = STRLEN(నిర్వాహ్యం(పరిశీలన));
+		    ఒకవేళ (scanlen >= (size_t)len)
 		    {
-			longest = OPERAND(scan);
-			len = (int)scanlen;
+			longest = నిర్వాహ్యం(పరిశీలన);
+			len = (పూర్ణాంకం)scanlen;
 		    }
 		}
 	    }
@@ -2694,133 +2694,133 @@ bt_regcomp(char_u *expr, int re_flags)
 	    r->regmlen = len;
 	}
     }
-#ifdef BT_REGEXP_DUMP
-    regdump(expr, r);
-#endif
+#నిర్వచితమైతే BT_REGEXP_DUMP
+    regdump(సమాసం, r);
+#అయితే_ముగింపు
     r->engine = &bt_regengine;
-    return (regprog_T *)r;
+    తిరిగి (regprog_T *)r;
 }
 
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 /*
  * Check if during the previous call to vim_regcomp the EOL item "$" has been
  * found.  This is messy, but it works fine.
  */
-    int
-vim_regcomp_had_eol(void)
+    పూర్ణాంకం
+vim_regcomp_had_eol(శూన్య)
 {
-    return had_eol;
+    తిరిగి had_eol;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get a number after a backslash that is inside [].
  * When nothing is recognized return a backslash.
  */
-    static int
-coll_get_char(void)
+    స్థిర పూర్ణాంకం
+coll_get_char(శూన్య)
 {
     vimlong_T	nr = -1;
 
-    switch (*regparse++)
+    ఎంపిక (*regparse++)
     {
-	case 'd': nr = getdecchrs(); break;
-	case 'o': nr = getoctchrs(); break;
-	case 'x': nr = gethexchrs(2); break;
-	case 'u': nr = gethexchrs(4); break;
-	case 'U': nr = gethexchrs(8); break;
+	స్థితి 'd': nr = getdecchrs(); ఆపు;
+	స్థితి 'o': nr = getoctchrs(); ఆపు;
+	స్థితి 'x': nr = gethexchrs(2); ఆపు;
+	స్థితి 'u': nr = gethexchrs(4); ఆపు;
+	స్థితి 'U': nr = gethexchrs(8); ఆపు;
     }
-    if (nr < 0)
+    ఒకవేళ (nr < 0)
     {
 	// If getting the number fails be backwards compatible: the character
 	// is a backslash.
 	--regparse;
 	nr = '\\';
     }
-    if (nr > INT_MAX)
-	nr = INT_MAX;
-    return nr;
+    ఒకవేళ (nr > గరిష్ఠ_పూర్ణాంకం)
+	nr = గరిష్ఠ_పూర్ణాంకం;
+    తిరిగి nr;
 }
 
 /*
  * Free a compiled regexp program, returned by bt_regcomp().
  */
-    static void
+    స్థిర శూన్య
 bt_regfree(regprog_T *prog)
 {
     vim_free(prog);
 }
 
-#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.input)
+#నిర్వచించు ADVANCE_REGINPUT() MB_PTR_ADV(rex.ఆదానం)
 
 /*
  * The arguments from BRACE_LIMITS are stored here.  They are actually local
  * to regmatch(), but they are here to reduce the amount of stack space used
  * (it can be called recursively many times).
  */
-static long	bl_minval;
-static long	bl_maxval;
+స్థిర దీర్ఘ	bl_minval;
+స్థిర దీర్ఘ	bl_maxval;
 
 /*
  * Save the input line and position in a regsave_T.
  */
-    static void
+    స్థిర శూన్య
 reg_save(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
+	save->rs_u.pos.నిలువు = (colnr_T)(rex.ఆదానం - rex.పంక్తి);
 	save->rs_u.pos.lnum = rex.lnum;
     }
-    else
-	save->rs_u.ptr = rex.input;
+    లేకపోతే
+	save->rs_u.ptr = rex.ఆదానం;
     save->rs_len = gap->ga_len;
 }
 
 /*
  * Restore the input line and position from a regsave_T.
  */
-    static void
+    స్థిర శూన్య
 reg_restore(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	if (rex.lnum != save->rs_u.pos.lnum)
+	ఒకవేళ (rex.lnum != save->rs_u.pos.lnum)
 	{
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
 	    rex.lnum = save->rs_u.pos.lnum;
-	    rex.line = reg_getline(rex.lnum);
+	    rex.పంక్తి = reg_getline(rex.lnum);
 	}
-	rex.input = rex.line + save->rs_u.pos.col;
+	rex.ఆదానం = rex.పంక్తి + save->rs_u.pos.నిలువు;
     }
-    else
-	rex.input = save->rs_u.ptr;
+    లేకపోతే
+	rex.ఆదానం = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
 
 /*
  * Return TRUE if current position is equal to saved position.
  */
-    static int
+    స్థిర పూర్ణాంకం
 reg_save_equal(regsave_T *save)
 {
-    if (REG_MULTI)
-	return rex.lnum == save->rs_u.pos.lnum
-				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+    ఒకవేళ (REG_MULTI)
+	తిరిగి rex.lnum == save->rs_u.pos.lnum
+				  && rex.ఆదానం == rex.పంక్తి + save->rs_u.pos.నిలువు;
+    తిరిగి rex.ఆదానం == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
-#define save_se(savep, posp, pp) \
+#నిర్వచించు save_se(savep, posp, pp) \
     REG_MULTI ? save_se_multi((savep), (posp)) : save_se_one((savep), (pp))
 
 // After a failed match restore the sub-expressions.
-#define restore_se(savep, posp, pp) \
+#నిర్వచించు restore_se(savep, posp, pp) \
 { \
-    if (REG_MULTI) \
+    ఒకవేళ (REG_MULTI) \
 	*(posp) = (savep)->se_u.pos; \
-    else \
+    లేకపోతే \
 	*(pp) = (savep)->se_u.ptr; \
 }
 
@@ -2831,498 +2831,498 @@ reg_save_equal(regsave_T *save)
  * Use se_save() to use pointer (save_se_multi()) or position (save_se_one()),
  * depending on REG_MULTI.
  */
-    static void
+    స్థిర శూన్య
 save_se_multi(save_se_T *savep, lpos_T *posp)
 {
     savep->se_u.pos = *posp;
     posp->lnum = rex.lnum;
-    posp->col = (colnr_T)(rex.input - rex.line);
+    posp->నిలువు = (colnr_T)(rex.ఆదానం - rex.పంక్తి);
 }
 
-    static void
+    స్థిర శూన్య
 save_se_one(save_se_T *savep, char_u **pp)
 {
     savep->se_u.ptr = *pp;
-    *pp = rex.input;
+    *pp = rex.ఆదానం;
 }
 
 /*
  * regrepeat - repeatedly match something simple, return how many.
  * Advances rex.input (and rex.lnum) to just after the matched chars.
  */
-    static int
+    స్థిర పూర్ణాంకం
 regrepeat(
     char_u	*p,
-    long	maxcount)   // maximum number of matches allowed
+    దీర్ఘ	maxcount)   // maximum number of matches allowed
 {
-    long	count = 0;
-    char_u	*scan;
+    దీర్ఘ	లెక్క = 0;
+    char_u	*పరిశీలన;
     char_u	*opnd;
-    int		mask;
-    int		testval = 0;
+    పూర్ణాంకం		ముసుగు;
+    పూర్ణాంకం		testval = 0;
 
-    scan = rex.input;	    // Make local copy of rex.input for speed.
-    opnd = OPERAND(p);
-    switch (OP(p))
+    పరిశీలన = rex.ఆదానం;	    // Make local copy of rex.input for speed.
+    opnd = నిర్వాహ్యం(p);
+    ఎంపిక (OP(p))
     {
-      case ANY:
-      case ANY + ADD_NL:
-	while (count < maxcount)
+      స్థితి ANY:
+      స్థితి ANY + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    అయితే (*పరిశీలన != NUL && లెక్క < maxcount)
 	    {
-		++count;
-		MB_PTR_ADV(scan);
+		++లెక్క;
+		MB_PTR_ADV(పరిశీలన);
 	    }
-	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-				      || rex.reg_line_lbr || count == maxcount)
-		break;
-	    ++count;		// count the line-break
+	    ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+				      || rex.reg_పంక్తి_lbr || లెక్క == maxcount)
+		ఆపు;
+	    ++లెక్క;		// count the line-break
 	    reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    పరిశీలన = rex.ఆదానం;
+	    ఒకవేళ (got_int)
+		ఆపు;
 	}
-	break;
+	ఆపు;
 
-      case IDENT:
-      case IDENT + ADD_NL:
+      స్థితి IDENT:
+      స్థితి IDENT + కూడు_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SIDENT:
-      case SIDENT + ADD_NL:
-	while (count < maxcount)
+      స్థితి SIDENT:
+      స్థితి SIDENT + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
-	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ఒకవేళ (vim_isIDc(PTR2CHAR(పరిశీలన)) && (testval || !VIM_ISDIGIT(*పరిశీలన)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(పరిశీలన);
 	    }
-	    else if (*scan == NUL)
+	    లేకపోతే ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే
+		ఆపు;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case KWORD:
-      case KWORD + ADD_NL:
+      స్థితి KWORD:
+      స్థితి KWORD + కూడు_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SKWORD:
-      case SKWORD + ADD_NL:
-	while (count < maxcount)
+      స్థితి SKWORD:
+      స్థితి SKWORD + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
-	    if (vim_iswordp_buf(scan, rex.reg_buf)
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    ఒకవేళ (vim_iswordp_buf(పరిశీలన, rex.reg_buf)
+					  && (testval || !VIM_ISDIGIT(*పరిశీలన)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(పరిశీలన);
 	    }
-	    else if (*scan == NUL)
+	    లేకపోతే ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే
+		ఆపు;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case FNAME:
-      case FNAME + ADD_NL:
+      స్థితి FNAME:
+      స్థితి FNAME + కూడు_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SFNAME:
-      case SFNAME + ADD_NL:
-	while (count < maxcount)
+      స్థితి SFNAME:
+      స్థితి SFNAME + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
-	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ఒకవేళ (vim_isfilec(PTR2CHAR(పరిశీలన)) && (testval || !VIM_ISDIGIT(*పరిశీలన)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(పరిశీలన);
 	    }
-	    else if (*scan == NUL)
+	    లేకపోతే ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే
+		ఆపు;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case PRINT:
-      case PRINT + ADD_NL:
+      స్థితి PRINT:
+      స్థితి PRINT + కూడు_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SPRINT:
-      case SPRINT + ADD_NL:
-	while (count < maxcount)
+      స్థితి SPRINT:
+      స్థితి SPRINT + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
-	    if (*scan == NUL)
+	    ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (vim_isprintc(PTR2CHAR(scan)) == 1
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    లేకపోతే ఒకవేళ (vim_isprintc(PTR2CHAR(పరిశీలన)) == 1
+					  && (testval || !VIM_ISDIGIT(*పరిశీలన)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(పరిశీలన);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే
+		ఆపు;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case WHITE:
-      case WHITE + ADD_NL:
-	testval = mask = RI_WHITE;
+      స్థితి WHITE:
+      స్థితి WHITE + కూడు_NL:
+	testval = ముసుగు = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	అయితే (లెక్క < maxcount)
 	{
-	    int		l;
+	    పూర్ణాంకం		l;
 
-	    if (*scan == NUL)
+	    ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
+	    లేకపోతే ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(పరిశీలన)) > 1)
 	    {
-		if (testval != 0)
-		    break;
-		scan += l;
+		ఒకవేళ (testval != 0)
+		    ఆపు;
+		పరిశీలన += l;
 	    }
-	    else if ((class_tab[*scan] & mask) == testval)
-		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    లేకపోతే ఒకవేళ ((class_tab[*పరిశీలన] & ముసుగు) == testval)
+		++పరిశీలన;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే
+		ఆపు;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case NWHITE:
-      case NWHITE + ADD_NL:
-	mask = RI_WHITE;
-	goto do_class;
-      case DIGIT:
-      case DIGIT + ADD_NL:
-	testval = mask = RI_DIGIT;
-	goto do_class;
-      case NDIGIT:
-      case NDIGIT + ADD_NL:
-	mask = RI_DIGIT;
-	goto do_class;
-      case HEX:
-      case HEX + ADD_NL:
-	testval = mask = RI_HEX;
-	goto do_class;
-      case NHEX:
-      case NHEX + ADD_NL:
-	mask = RI_HEX;
-	goto do_class;
-      case OCTAL:
-      case OCTAL + ADD_NL:
-	testval = mask = RI_OCTAL;
-	goto do_class;
-      case NOCTAL:
-      case NOCTAL + ADD_NL:
-	mask = RI_OCTAL;
-	goto do_class;
-      case WORD:
-      case WORD + ADD_NL:
-	testval = mask = RI_WORD;
-	goto do_class;
-      case NWORD:
-      case NWORD + ADD_NL:
-	mask = RI_WORD;
-	goto do_class;
-      case HEAD:
-      case HEAD + ADD_NL:
-	testval = mask = RI_HEAD;
-	goto do_class;
-      case NHEAD:
-      case NHEAD + ADD_NL:
-	mask = RI_HEAD;
-	goto do_class;
-      case ALPHA:
-      case ALPHA + ADD_NL:
-	testval = mask = RI_ALPHA;
-	goto do_class;
-      case NALPHA:
-      case NALPHA + ADD_NL:
-	mask = RI_ALPHA;
-	goto do_class;
-      case LOWER:
-      case LOWER + ADD_NL:
-	testval = mask = RI_LOWER;
-	goto do_class;
-      case NLOWER:
-      case NLOWER + ADD_NL:
-	mask = RI_LOWER;
-	goto do_class;
-      case UPPER:
-      case UPPER + ADD_NL:
-	testval = mask = RI_UPPER;
-	goto do_class;
-      case NUPPER:
-      case NUPPER + ADD_NL:
-	mask = RI_UPPER;
-	goto do_class;
+      స్థితి NWHITE:
+      స్థితి NWHITE + కూడు_NL:
+	ముసుగు = RI_WHITE;
+	వెళ్ళు do_class;
+      స్థితి DIGIT:
+      స్థితి DIGIT + కూడు_NL:
+	testval = ముసుగు = RI_DIGIT;
+	వెళ్ళు do_class;
+      స్థితి NDIGIT:
+      స్థితి NDIGIT + కూడు_NL:
+	ముసుగు = RI_DIGIT;
+	వెళ్ళు do_class;
+      స్థితి HEX:
+      స్థితి HEX + కూడు_NL:
+	testval = ముసుగు = RI_HEX;
+	వెళ్ళు do_class;
+      స్థితి NHEX:
+      స్థితి NHEX + కూడు_NL:
+	ముసుగు = RI_HEX;
+	వెళ్ళు do_class;
+      స్థితి OCTAL:
+      స్థితి OCTAL + కూడు_NL:
+	testval = ముసుగు = RI_OCTAL;
+	వెళ్ళు do_class;
+      స్థితి NOCTAL:
+      స్థితి NOCTAL + కూడు_NL:
+	ముసుగు = RI_OCTAL;
+	వెళ్ళు do_class;
+      స్థితి మాట_2:
+      స్థితి మాట_2 + కూడు_NL:
+	testval = ముసుగు = RI_మాట;
+	వెళ్ళు do_class;
+      స్థితి NWORD:
+      స్థితి NWORD + కూడు_NL:
+	ముసుగు = RI_మాట;
+	వెళ్ళు do_class;
+      స్థితి తల_2:
+      స్థితి తల_2 + కూడు_NL:
+	testval = ముసుగు = RI_తల;
+	వెళ్ళు do_class;
+      స్థితి NHEAD:
+      స్థితి NHEAD + కూడు_NL:
+	ముసుగు = RI_తల;
+	వెళ్ళు do_class;
+      స్థితి ALPHA:
+      స్థితి ALPHA + కూడు_NL:
+	testval = ముసుగు = RI_ALPHA;
+	వెళ్ళు do_class;
+      స్థితి NALPHA:
+      స్థితి NALPHA + కూడు_NL:
+	ముసుగు = RI_ALPHA;
+	వెళ్ళు do_class;
+      స్థితి క్రింది_2:
+      స్థితి క్రింది_2 + కూడు_NL:
+	testval = ముసుగు = RI_క్రింది;
+	వెళ్ళు do_class;
+      స్థితి NLOWER:
+      స్థితి NLOWER + కూడు_NL:
+	ముసుగు = RI_క్రింది;
+	వెళ్ళు do_class;
+      స్థితి పై:
+      స్థితి పై + కూడు_NL:
+	testval = ముసుగు = RI_పై;
+	వెళ్ళు do_class;
+      స్థితి NUPPER:
+      స్థితి NUPPER + కూడు_NL:
+	ముసుగు = RI_పై;
+	వెళ్ళు do_class;
 
-      case EXACTLY:
+      స్థితి EXACTLY:
 	{
-	    int	    cu, cl;
+	    పూర్ణాంకం	    cu, cl;
 
 	    // This doesn't do a multi-byte character, because a MULTIBYTECODE
 	    // would have been used for it.  It does handle single-byte
 	    // characters, such as latin1.
-	    if (rex.reg_ic)
+	    ఒకవేళ (rex.reg_ic)
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		అయితే (లెక్క < maxcount && (*పరిశీలన == cu || *పరిశీలన == cl))
 		{
-		    count++;
-		    scan++;
+		    లెక్క++;
+		    పరిశీలన++;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		అయితే (లెక్క < maxcount && *పరిశీలన == cu)
 		{
-		    count++;
-		    scan++;
+		    లెక్క++;
+		    పరిశీలన++;
 		}
 	    }
-	    break;
+	    ఆపు;
 	}
 
-      case MULTIBYTECODE:
+      స్థితి MULTIBYTECODE:
 	{
-	    int		i, len, cf = 0;
+	    పూర్ణాంకం		i, len, cf = 0;
 
 	    // Safety check (just in case 'encoding' was changed since
 	    // compiling the program).
-	    if ((len = (*mb_ptr2len)(opnd)) > 1)
+	    ఒకవేళ ((len = (*mb_ptr2len)(opnd)) > 1)
 	    {
-		if (rex.reg_ic && enc_utf8)
+		ఒకవేళ (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		అయితే (లెక్క < maxcount && (*mb_ptr2len)(పరిశీలన) >= len)
 		{
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != scan[i])
-			    break;
-		    if (i < len && (!rex.reg_ic || !enc_utf8
-					|| utf_fold(utf_ptr2char(scan)) != cf))
-			break;
-		    scan += len;
-		    ++count;
+		    కొరకు (i = 0; i < len; ++i)
+			ఒకవేళ (opnd[i] != పరిశీలన[i])
+			    ఆపు;
+		    ఒకవేళ (i < len && (!rex.reg_ic || !enc_utf8
+					|| utf_fold(utf_ptr2char(పరిశీలన)) != cf))
+			ఆపు;
+		    పరిశీలన += len;
+		    ++లెక్క;
 		}
 	    }
 	}
-	break;
+	ఆపు;
 
-      case ANYOF:
-      case ANYOF + ADD_NL:
+      స్థితి ANYOF:
+      స్థితి ANYOF + కూడు_NL:
 	testval = TRUE;
 	// FALLTHROUGH
 
-      case ANYBUT:
-      case ANYBUT + ADD_NL:
-	while (count < maxcount)
+      స్థితి ANYBUT:
+      స్థితి ANYBUT + కూడు_NL:
+	అయితే (లెక్క < maxcount)
 	{
-	    int len;
+	    పూర్ణాంకం len;
 
-	    if (*scan == NUL)
+	    ఒకవేళ (*పరిశీలన == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ఒకవేళ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_పంక్తి_lbr)
+		    ఆపు;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		పరిశీలన = rex.ఆదానం;
+		ఒకవేళ (got_int)
+		    ఆపు;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && *పరిశీలన == '\n' && WITH_NL(OP(p)))
+		++పరిశీలన;
+	    లేకపోతే ఒకవేళ (has_mbyte && (len = (*mb_ptr2len)(పరిశీలన)) > 1)
 	    {
-		if ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
-		    break;
-		scan += len;
+		ఒకవేళ ((cstrchr(opnd, (*mb_ptr2char)(పరిశీలన)) == ఖాళీ) == testval)
+		    ఆపు;
+		పరిశీలన += len;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if ((cstrchr(opnd, *scan) == NULL) == testval)
-		    break;
-		++scan;
+		ఒకవేళ ((cstrchr(opnd, *పరిశీలన) == ఖాళీ) == testval)
+		    ఆపు;
+		++పరిశీలన;
 	    }
-	    ++count;
+	    ++లెక్క;
 	}
-	break;
+	ఆపు;
 
-      case NEWL:
-	while (count < maxcount
-		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
-				       && !rex.reg_line_lbr && REG_MULTI)
-		    || (*scan == '\n' && rex.reg_line_lbr)))
+      స్థితి NEWL:
+	అయితే (లెక్క < maxcount
+		&& ((*పరిశీలన == NUL && rex.lnum <= rex.reg_maxline
+				       && !rex.reg_పంక్తి_lbr && REG_MULTI)
+		    || (*పరిశీలన == '\n' && rex.reg_పంక్తి_lbr)))
 	{
-	    count++;
-	    if (rex.reg_line_lbr)
+	    లెక్క++;
+	    ఒకవేళ (rex.reg_పంక్తి_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    లేకపోతే
 		reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    పరిశీలన = rex.ఆదానం;
+	    ఒకవేళ (got_int)
+		ఆపు;
 	}
-	break;
+	ఆపు;
 
-      default:			// Oh dear.  Called inappropriately.
-	iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	printf("Called regrepeat with op code %d\n", OP(p));
-#endif
-	break;
+      అప్రమేయ:			// Oh dear.  Called inappropriately.
+	iemsg(e_corrupted_regexp_కార్యక్రమం);
+#నిర్వచితమైతే DEBUG
+	రాయి("Called regrepeat with op code %d\n", OP(p));
+#అయితే_ముగింపు
+	ఆపు;
     }
 
-    rex.input = scan;
+    rex.ఆదానం = పరిశీలన;
 
-    return (int)count;
+    తిరిగి (పూర్ణాంకం)లెక్క;
 }
 
 /*
  * Push an item onto the regstack.
  * Returns pointer to new item.  Returns NULL when out of memory.
  */
-    static regitem_T *
-regstack_push(regstate_T state, char_u *scan)
+    స్థిర regitem_T *
+regstack_నెట్టు(regstate_T state, char_u *పరిశీలన)
 {
     regitem_T	*rp;
 
-    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+    ఒకవేళ ((దీర్ఘ)((గుర్తులేని)regstack.ga_len >> 10) >= p_mmp)
     {
-	emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-	return NULL;
+	emsg(_(e_నమూనా_ఉపయోగిస్తుంది_మరిన్ని_జ్ఞాపకం_than_maxmempattern));
+	తిరిగి ఖాళీ;
     }
-    if (GA_GROW_FAILS(&regstack, (int)sizeof(regitem_T)))
-	return NULL;
+    ఒకవేళ (GA_GROW_FAILS(&regstack, (పూర్ణాంకం)పరిమాణం(regitem_T)))
+	తిరిగి ఖాళీ;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len);
+    rp = (regitem_T *)((అక్షరం *)regstack.ga_దత్తాంశం + regstack.ga_len);
     rp->rs_state = state;
-    rp->rs_scan = scan;
+    rp->rs_పరిశీలన = పరిశీలన;
 
-    regstack.ga_len += sizeof(regitem_T);
-    return rp;
+    regstack.ga_len += పరిమాణం(regitem_T);
+    తిరిగి rp;
 }
 
 /*
  * Pop an item from the regstack.
  */
-    static void
-regstack_pop(char_u **scan)
+    స్థిర శూన్య
+regstack_తీయి(char_u **పరిశీలన)
 {
     regitem_T	*rp;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-    *scan = rp->rs_scan;
+    rp = (regitem_T *)((అక్షరం *)regstack.ga_దత్తాంశం + regstack.ga_len) - 1;
+    *పరిశీలన = rp->rs_పరిశీలన;
 
-    regstack.ga_len -= sizeof(regitem_T);
+    regstack.ga_len -= పరిమాణం(regitem_T);
 }
 
-#ifdef FEAT_RELTIME
+#నిర్వచితమైతే FEAT_RELTIME
 /*
  * Check if the timer expired, return TRUE if so.
  */
-    static int
-bt_did_time_out(int *timed_out)
+    స్థిర పూర్ణాంకం
+bt_did_సమయం_బహిర్గతం(పూర్ణాంకం *timed_బహిర్గతం)
 {
-    if (*timeout_flag)
+    ఒకవేళ (*timeout_flag)
     {
-	if (timed_out != NULL)
+	ఒకవేళ (timed_బహిర్గతం != ఖాళీ)
 	{
 # ifdef FEAT_EVAL
-	    if (!*timed_out)
-		ch_log(NULL, "BT regexp timed out");
+	    ఒకవేళ (!*timed_బహిర్గతం)
+		ch_log(ఖాళీ, "BT regexp timed out");
 # endif
-	    *timed_out = TRUE;
+	    *timed_బహిర్గతం = TRUE;
 	}
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Save the current subexpr to "bp", so that they can be restored
  * later by restore_subexpr().
  */
-    static void
+    స్థిర శూన్య
 save_subexpr(regbehind_T *bp)
 {
-    int i;
+    పూర్ణాంకం i;
 
     // When "rex.need_clear_subexpr" is set we don't need to save the values,
     // only remember that this flag needs to be set again when restoring.
     bp->save_need_clear_subexpr = rex.need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ఒకవేళ (rex.need_clear_subexpr)
+	తిరిగి;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    కొరకు (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    bp->save_start[i].se_u.pos = rex.reg_startpos[i];
-	    bp->save_end[i].se_u.pos = rex.reg_endpos[i];
+	    bp->save_ప్రారంభం[i].se_u.pos = rex.reg_startpos[i];
+	    bp->save_చివర[i].se_u.pos = rex.reg_endpos[i];
 	}
-	else
+	లేకపోతే
 	{
-	    bp->save_start[i].se_u.ptr = rex.reg_startp[i];
-	    bp->save_end[i].se_u.ptr = rex.reg_endp[i];
+	    bp->save_ప్రారంభం[i].se_u.ptr = rex.reg_startp[i];
+	    bp->save_చివర[i].se_u.ptr = rex.reg_endp[i];
 	}
     }
 }
@@ -3330,27 +3330,27 @@ save_subexpr(regbehind_T *bp)
 /*
  * Restore the subexpr from "bp".
  */
-    static void
+    స్థిర శూన్య
 restore_subexpr(regbehind_T *bp)
 {
-    int i;
+    పూర్ణాంకం i;
 
     // Only need to restore saved values when they are not to be cleared.
     rex.need_clear_subexpr = bp->save_need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ఒకవేళ (rex.need_clear_subexpr)
+	తిరిగి;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    కొరకు (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    rex.reg_startpos[i] = bp->save_start[i].se_u.pos;
-	    rex.reg_endpos[i] = bp->save_end[i].se_u.pos;
+	    rex.reg_startpos[i] = bp->save_ప్రారంభం[i].se_u.pos;
+	    rex.reg_endpos[i] = bp->save_చివర[i].se_u.pos;
 	}
-	else
+	లేకపోతే
 	{
-	    rex.reg_startp[i] = bp->save_start[i].se_u.ptr;
-	    rex.reg_endp[i] = bp->save_end[i].se_u.ptr;
+	    rex.reg_startp[i] = bp->save_ప్రారంభం[i].se_u.ptr;
+	    rex.reg_endp[i] = bp->save_చివర[i].se_u.ptr;
 	}
     }
 }
@@ -3370,17 +3370,17 @@ restore_subexpr(regbehind_T *bp)
  * Returns FALSE when there is no match.  Leaves rex.input and rex.lnum in an
  * undefined state!
  */
-    static int
+    స్థిర పూర్ణాంకం
 regmatch(
-    char_u	*scan,		    // Current node.
-    int		*timed_out UNUSED)  // flag set on timeout or NULL
+    char_u	*పరిశీలన,		    // Current node.
+    పూర్ణాంకం		*timed_బహిర్గతం వాడని)  // flag set on timeout or NULL
 {
-  char_u	*next;		// Next node.
-  int		op;
-  int		c;
+  char_u	*తదుపరి;		// Next node.
+  పూర్ణాంకం		op;
+  పూర్ణాంకం		c;
   regitem_T	*rp;
-  int		no;
-  int		status;		// one of the RA_ values:
+  పూర్ణాంకం		no;
+  పూర్ణాంకం		స్థితి_2;		// one of the RA_ values:
 
   // Make "regstack" and "backpos" empty.  They are allocated and freed in
   // bt_regexec_both() to reduce malloc()/free() calls.
@@ -3388,588 +3388,588 @@ regmatch(
   backpos.ga_len = 0;
 
   // Repeat until "regstack" is empty.
-  for (;;)
+  కొరకు (;;)
   {
     // Some patterns may take a long time to match, e.g., "\([a-z]\+\)\+Q".
     // Allow interrupting them with CTRL-C.
     fast_breakcheck();
 
-#ifdef DEBUG
-    if (scan != NULL && regnarrate)
+#నిర్వచితమైతే DEBUG
+    ఒకవేళ (పరిశీలన != ఖాళీ && regnarrate)
     {
-	mch_errmsg((char *)regprop(scan));
+	mch_errmsg((అక్షరం *)regprop(పరిశీలన));
 	mch_errmsg("(\n");
     }
-#endif
+#అయితే_ముగింపు
 
     // Repeat for items that can be matched sequentially, without using the
     // regstack.
-    for (;;)
+    కొరకు (;;)
     {
-	if (got_int || scan == NULL)
+	ఒకవేళ (got_int || పరిశీలన == ఖాళీ)
 	{
-	    status = RA_FAIL;
-	    break;
+	    స్థితి_2 = RA_FAIL;
+	    ఆపు;
 	}
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#నిర్వచితమైతే FEAT_RELTIME
+	ఒకవేళ (bt_did_సమయం_బహిర్గతం(timed_బహిర్గతం))
 	{
-	    status = RA_FAIL;
-	    break;
+	    స్థితి_2 = RA_FAIL;
+	    ఆపు;
 	}
-#endif
-	status = RA_CONT;
+#అయితే_ముగింపు
+	స్థితి_2 = RA_CONT;
 
-#ifdef DEBUG
-	if (regnarrate)
+#నిర్వచితమైతే DEBUG
+	ఒకవేళ (regnarrate)
 	{
-	    mch_errmsg((char *)regprop(scan));
+	    mch_errmsg((అక్షరం *)regprop(పరిశీలన));
 	    mch_errmsg("...\n");
 # ifdef FEAT_SYN_HL
-	    if (re_extmatch_in != NULL)
+	    ఒకవేళ (re_extmatch_లోపల != ఖాళీ)
 	    {
-		int i;
+		పూర్ణాంకం i;
 
 		mch_errmsg(_("External submatches:\n"));
-		for (i = 0; i < NSUBEXP; i++)
+		కొరకు (i = 0; i < NSUBEXP; i++)
 		{
 		    mch_errmsg("    \"");
-		    if (re_extmatch_in->matches[i] != NULL)
-			mch_errmsg((char *)re_extmatch_in->matches[i]);
+		    ఒకవేళ (re_extmatch_లోపల->matches[i] != ఖాళీ)
+			mch_errmsg((అక్షరం *)re_extmatch_లోపల->matches[i]);
 		    mch_errmsg("\"\n");
 		}
 	    }
 # endif
 	}
-#endif
-	next = regnext(scan);
+#అయితే_ముగింపు
+	తదుపరి = regnext(పరిశీలన);
 
-	op = OP(scan);
+	op = OP(పరిశీలన);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
-			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
+	ఒకవేళ (!rex.reg_పంక్తి_lbr && WITH_NL(op) && REG_MULTI
+			     && *rex.ఆదానం == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr && WITH_NL(op) && *rex.ఆదానం == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
-	else
+	లేకపోతే
 	{
-	  if (WITH_NL(op))
-	      op -= ADD_NL;
-	  if (has_mbyte)
-	      c = (*mb_ptr2char)(rex.input);
-	  else
-	      c = *rex.input;
-	  switch (op)
+	  ఒకవేళ (WITH_NL(op))
+	      op -= కూడు_NL;
+	  ఒకవేళ (has_mbyte)
+	      c = (*mb_ptr2char)(rex.ఆదానం);
+	  లేకపోతే
+	      c = *rex.ఆదానం;
+	  ఎంపిక (op)
 	  {
-	  case BOL:
-	    if (rex.input != rex.line)
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి BOL:
+	    ఒకవేళ (rex.ఆదానం != rex.పంక్తి)
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case EOL:
-	    if (c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి EOL:
+	    ఒకవేళ (c != NUL)
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_BOF:
+	  స్థితి RE_BOF:
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    ఒకవేళ (rex.lnum != 0 || rex.ఆదానం != rex.పంక్తి
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
-		status = RA_NOMATCH;
-	    break;
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_EOF:
-	    if (rex.lnum != rex.reg_maxline || c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి RE_EOF:
+	    ఒకవేళ (rex.lnum != rex.reg_maxline || c != NUL)
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case CURSOR:
+	  స్థితి CURSOR:
 	    // Check if the buffer is in a window and compare the
 	    // rex.reg_win->w_cursor position to the match position.
-	    if (rex.reg_win == NULL
+	    ఒకవేళ (rex.reg_win == ఖాళీ
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
-		    || ((colnr_T)(rex.input - rex.line)
-						 != rex.reg_win->w_cursor.col))
-		status = RA_NOMATCH;
-	    break;
+		    || ((colnr_T)(rex.ఆదానం - rex.పంక్తి)
+						 != rex.reg_win->w_cursor.నిలువు))
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_MARK:
+	  స్థితి RE_MARK:
 	    // Compare the mark position to the match position.
 	    {
-		int	mark = OPERAND(scan)[0];
-		int	cmp = OPERAND(scan)[1];
+		పూర్ణాంకం	mark = నిర్వాహ్యం(పరిశీలన)[0];
+		పూర్ణాంకం	cmp = నిర్వాహ్యం(పరిశీలన)[1];
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	నిలువు = REG_MULTI ? rex.ఆదానం - rex.పంక్తి : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		ఒకవేళ (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.పంక్తి = reg_getline(rex.lnum);
+		    rex.ఆదానం = rex.పంక్తి + నిలువు;
 		}
 
-		if (pos == NULL		     // mark doesn't exist
+		ఒకవేళ (pos == ఖాళీ		     // mark doesn't exist
 			|| pos->lnum <= 0)   // mark isn't set in reg_buf
 		{
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 		}
-		else
+		లేకపోతే
 		{
-		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
-							  && pos->col == MAXCOL
+		    colnr_T pos_నిలువు = pos->lnum == rex.lnum + rex.reg_firstlnum
+							  && pos->నిలువు == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
-				      : pos->col;
+				      : pos->నిలువు;
 
-		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    ఒకవేళ ((pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_నిలువు == (colnr_T)(rex.ఆదానం - rex.పంక్తి)
 				    ? (cmp == '<' || cmp == '>')
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_నిలువు < (colnr_T)(rex.ఆదానం - rex.పంక్తి)
 					? cmp != '>'
 					: cmp != '<'))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? cmp != '>'
 				    : cmp != '<')))
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case RE_VISUAL:
-	    if (!reg_match_visual())
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి RE_VISUAL:
+	    ఒకవేళ (!reg_సరిపోలిక_visual())
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
-									scan))
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి RE_LNUM:
+	    ఒకవేళ (!REG_MULTI || !re_అంకె_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+									పరిశీలన))
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
-		status = RA_NOMATCH;
-	    break;
+	  స్థితి RE_నిలువు:
+	    ఒకవేళ (!re_అంకె_cmp((long_u)(rex.ఆదానం - rex.పంక్తి) + 1, పరిశీలన))
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case RE_VCOL:
+	  స్థితి RE_VCOL:
 	    {
-		win_T	    *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		win_T	    *wp = rex.reg_win == ఖాళీ ? curwin : rex.reg_win;
 		linenr_T    lnum = REG_MULTI ? rex.reg_firstlnum + rex.lnum : 1;
 		long_u	    vcol;
 
-		if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+		ఒకవేళ (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క))
 		    lnum = 1;
-		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
-					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
-		    status = RA_NOMATCH;
+		vcol = (long_u)win_linetabsize(wp, lnum, rex.పంక్తి,
+					      (colnr_T)(rex.ఆదానం - rex.పంక్తి));
+		ఒకవేళ (!re_అంకె_cmp(vcol + 1, పరిశీలన))
+		    స్థితి_2 = RA_NOMATCH;
 	    }
-	    break;
+	    ఆపు;
 
-	  case BOW:	// \<word; rex.input points to w
-	    if (c == NUL)	// Can't match at end of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  స్థితి BOW:	// \<word; rex.input points to w
+	    ఒకవేళ (c == NUL)	// Can't match at end of line
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే ఒకవేళ (has_mbyte)
 	    {
-		int this_class;
+		పూర్ణాంకం this_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		if (this_class <= 1)
-		    status = RA_NOMATCH;  // not on a word at all
-		else if (reg_prev_class() == this_class)
-		    status = RA_NOMATCH;  // previous char is in same word
+		this_class = mb_get_class_buf(rex.ఆదానం, rex.reg_buf);
+		ఒకవేళ (this_class <= 1)
+		    స్థితి_2 = RA_NOMATCH;  // not on a word at all
+		లేకపోతే ఒకవేళ (reg_prev_class() == this_class)
+		    స్థితి_2 = RA_NOMATCH;  // previous char is in same word
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
-				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    status = RA_NOMATCH;
+		ఒకవేళ (!vim_iswordc_buf(c, rex.reg_buf) || (rex.ఆదానం > rex.పంక్తి
+				&& vim_iswordc_buf(rex.ఆదానం[-1], rex.reg_buf)))
+		    స్థితి_2 = RA_NOMATCH;
 	    }
-	    break;
+	    ఆపు;
 
-	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  స్థితి EOW:	// word\>; rex.input points after d
+	    ఒకవేళ (rex.ఆదానం == rex.పంక్తి)    // Can't match at start of line
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే ఒకవేళ (has_mbyte)
 	    {
-		int this_class, prev_class;
+		పూర్ణాంకం this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.ఆదానం, rex.reg_buf);
 		prev_class = reg_prev_class();
-		if (this_class == prev_class
+		ఒకవేళ (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		ఒకవేళ (!vim_iswordc_buf(rex.ఆదానం[-1], rex.reg_buf)
+			|| (rex.ఆదానం[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 	    }
-	    break; // Matched with EOW
+	    ఆపు; // Matched with EOW
 
-	  case ANY:
+	  స్థితి ANY:
 	    // ANY does not match new lines.
-	    if (c == NUL)
-		status = RA_NOMATCH;
-	    else
+	    ఒకవేళ (c == NUL)
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case IDENT:
-	    if (!vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి IDENT:
+	    ఒకవేళ (!vim_isIDc(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి SIDENT:
+	    ఒకవేళ (VIM_ISDIGIT(*rex.ఆదానం) || !vim_isIDc(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి KWORD:
+	    ఒకవేళ (!vim_iswordp_buf(rex.ఆదానం, rex.reg_buf))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
-				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి SKWORD:
+	    ఒకవేళ (VIM_ISDIGIT(*rex.ఆదానం)
+				    || !vim_iswordp_buf(rex.ఆదానం, rex.reg_buf))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case FNAME:
-	    if (!vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి FNAME:
+	    ఒకవేళ (!vim_isfilec(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి SFNAME:
+	    ఒకవేళ (VIM_ISDIGIT(*rex.ఆదానం) || !vim_isfilec(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి PRINT:
+	    ఒకవేళ (!vim_isprintc(PTR2CHAR(rex.ఆదానం)))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి SPRINT:
+	    ఒకవేళ (VIM_ISDIGIT(*rex.ఆదానం) || !vim_isprintc(PTR2CHAR(rex.ఆదానం)))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case WHITE:
-	    if (!VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి WHITE:
+	    ఒకవేళ (!VIM_ISWHITE(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NWHITE:
-	    if (c == NUL || VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NWHITE:
+	    ఒకవేళ (c == NUL || VIM_ISWHITE(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case DIGIT:
-	    if (!ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి DIGIT:
+	    ఒకవేళ (!ri_digit(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NDIGIT:
-	    if (c == NUL || ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NDIGIT:
+	    ఒకవేళ (c == NUL || ri_digit(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case HEX:
-	    if (!ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి HEX:
+	    ఒకవేళ (!ri_hex(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NHEX:
-	    if (c == NUL || ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NHEX:
+	    ఒకవేళ (c == NUL || ri_hex(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case OCTAL:
-	    if (!ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి OCTAL:
+	    ఒకవేళ (!ri_octal(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NOCTAL:
-	    if (c == NUL || ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NOCTAL:
+	    ఒకవేళ (c == NUL || ri_octal(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case WORD:
-	    if (!ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి మాట_2:
+	    ఒకవేళ (!ri_మాట(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NWORD:
-	    if (c == NUL || ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NWORD:
+	    ఒకవేళ (c == NUL || ri_మాట(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case HEAD:
-	    if (!ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి తల_2:
+	    ఒకవేళ (!ri_తల(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NHEAD:
-	    if (c == NUL || ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NHEAD:
+	    ఒకవేళ (c == NUL || ri_తల(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case ALPHA:
-	    if (!ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి ALPHA:
+	    ఒకవేళ (!ri_alpha(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NALPHA:
-	    if (c == NUL || ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NALPHA:
+	    ఒకవేళ (c == NUL || ri_alpha(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case LOWER:
-	    if (!ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి క్రింది_2:
+	    ఒకవేళ (!ri_క్రింది(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NLOWER:
-	    if (c == NUL || ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NLOWER:
+	    ఒకవేళ (c == NUL || ri_క్రింది(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case UPPER:
-	    if (!ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి పై:
+	    ఒకవేళ (!ri_పై(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case NUPPER:
-	    if (c == NUL || ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  స్థితి NUPPER:
+	    ఒకవేళ (c == NUL || ri_పై(c))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 		ADVANCE_REGINPUT();
-	    break;
+	    ఆపు;
 
-	  case EXACTLY:
+	  స్థితి EXACTLY:
 	    {
-		int	len;
+		పూర్ణాంకం	len;
 		char_u	*opnd;
 
-		opnd = OPERAND(scan);
+		opnd = నిర్వాహ్యం(పరిశీలన);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		ఒకవేళ (*opnd != *rex.ఆదానం
 			&& (!rex.reg_ic
 			    || (!enc_utf8
-			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
-		    status = RA_NOMATCH;
-		else if (*opnd == NUL)
+			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.ఆదానం))))
+		    స్థితి_2 = RA_NOMATCH;
+		లేకపోతే ఒకవేళ (*opnd == NUL)
 		{
 		    // match empty string always works; happens when "~" is
 		    // empty.
 		}
-		else
+		లేకపోతే
 		{
-		    if (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
+		    ఒకవేళ (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
 		    {
 			len = 1;	// matched a single byte above
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Need to match first byte again for multi-byte.
-			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (పూర్ణాంకం)STRLEN(opnd);
+			ఒకవేళ (cstrncmp(opnd, rex.ఆదానం, &len) != 0)
+			    స్థితి_2 = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
-		    if (status != RA_NOMATCH
+		    ఒకవేళ (స్థితి_2 != RA_NOMATCH
 			    && enc_utf8
-			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
+			    && UTF_COMPOSINGLIKE(rex.ఆదానం, rex.ఆదానం + len)
 			    && !rex.reg_icombine
-			    && OP(next) != RE_COMPOSING)
+			    && OP(తదుపరి) != RE_COMPOSING)
 		    {
 			// raaron: This code makes a composing character get
 			// ignored, which is the correct behavior (sometimes)
 			// for voweled Hebrew texts.
-			status = RA_NOMATCH;
+			స్థితి_2 = RA_NOMATCH;
 		    }
-		    if (status != RA_NOMATCH)
-			rex.input += len;
+		    ఒకవేళ (స్థితి_2 != RA_NOMATCH)
+			rex.ఆదానం += len;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case ANYOF:
-	  case ANYBUT:
+	  స్థితి ANYOF:
+	  స్థితి ANYBUT:
 	    {
-		char_u  *q = OPERAND(scan);
+		char_u  *q = నిర్వాహ్యం(పరిశీలన);
 
-		if (c == NUL)
-		    status = RA_NOMATCH;
-		else if ((cstrchr(q, c) == NULL) == (op == ANYOF))
-		    status = RA_NOMATCH;
-		else
+		ఒకవేళ (c == NUL)
+		    స్థితి_2 = RA_NOMATCH;
+		లేకపోతే ఒకవేళ ((cstrchr(q, c) == ఖాళీ) == (op == ANYOF))
+		    స్థితి_2 = RA_NOMATCH;
+		లేకపోతే
 		{
 		    // Check following combining characters
-		    int	len = 0;
-		    int i;
+		    పూర్ణాంకం	len = 0;
+		    పూర్ణాంకం i;
 
-		    if (enc_utf8)
+		    ఒకవేళ (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
-		    MB_CPTR_ADV(rex.input);
+		    MB_CPTR_ADV(rex.ఆదానం);
 		    MB_CPTR_ADV(q);
 
-		    if (!enc_utf8 || len == 0)
-			break;
+		    ఒకవేళ (!enc_utf8 || len == 0)
+			ఆపు;
 
-		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+		    కొరకు (i = 0; i < len; ++i)
+			ఒకవేళ (q[i] != rex.ఆదానం[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    స్థితి_2 = RA_NOMATCH;
+			    ఆపు;
 			}
-		    rex.input += len;
+		    rex.ఆదానం += len;
 		}
-		break;
+		ఆపు;
 	    }
 
-	  case MULTIBYTECODE:
-	    if (has_mbyte)
+	  స్థితి MULTIBYTECODE:
+	    ఒకవేళ (has_mbyte)
 	    {
-		int	i, len;
+		పూర్ణాంకం	i, len;
 		char_u	*opnd;
-		int	opndc = 0, inpc;
+		పూర్ణాంకం	opndc = 0, inpc;
 
-		opnd = OPERAND(scan);
+		opnd = నిర్వాహ్యం(పరిశీలన);
 		// Safety check (just in case 'encoding' was changed since
 		// compiling the program).
-		if ((len = (*mb_ptr2len)(opnd)) < 2)
+		ఒకవేళ ((len = (*mb_ptr2len)(opnd)) < 2)
 		{
-		    status = RA_NOMATCH;
-		    break;
+		    స్థితి_2 = RA_NOMATCH;
+		    ఆపు;
 		}
-		if (enc_utf8)
+		ఒకవేళ (enc_utf8)
 		    opndc = utf_ptr2char(opnd);
-		if (enc_utf8 && utf_iscomposing(opndc))
+		ఒకవేళ (enc_utf8 && utf_iscomposing(opndc))
 		{
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
-		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
-						i += utf_ptr2len(rex.input + i))
+		    స్థితి_2 = RA_NOMATCH;
+		    కొరకు (i = 0; rex.ఆదానం[i] != NUL;
+						i += utf_ptr2len(rex.ఆదానం + i))
 		    {
-			inpc = utf_ptr2char(rex.input + i);
-			if (!utf_iscomposing(inpc))
+			inpc = utf_ptr2char(rex.ఆదానం + i);
+			ఒకవేళ (!utf_iscomposing(inpc))
 			{
-			    if (i > 0)
-				break;
+			    ఒకవేళ (i > 0)
+				ఆపు;
 			}
-			else if (opndc == inpc)
+			లేకపోతే ఒకవేళ (opndc == inpc)
 			{
 			    // Include all following composing chars.
-			    len = i + utfc_ptr2len(rex.input + i);
-			    status = RA_MATCH;
-			    break;
+			    len = i + utfc_ptr2len(rex.ఆదానం + i);
+			    స్థితి_2 = RA_సరిపోలిక;
+			    ఆపు;
 			}
 		    }
 		}
-		else if (enc_utf8)
+		లేకపోతే ఒకవేళ (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    ఒకవేళ (cstrncmp(opnd, rex.ఆదానం, &len) != 0)
 		    {
-			status = RA_NOMATCH;
-			break;
+			స్థితి_2 = RA_NOMATCH;
+			ఆపు;
 		    }
 		}
-		else
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+		లేకపోతే
+		    కొరకు (i = 0; i < len; ++i)
+			ఒకవేళ (opnd[i] != rex.ఆదానం[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    స్థితి_2 = RA_NOMATCH;
+			    ఆపు;
 			}
-		rex.input += len;
+		rex.ఆదానం += len;
 	    }
-	    else
-		status = RA_NOMATCH;
-	    break;
-	  case RE_COMPOSING:
-	    if (enc_utf8)
+	    లేకపోతే
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
+	  స్థితి RE_COMPOSING:
+	    ఒకవేళ (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
-		    MB_CPTR_ADV(rex.input);
+		అయితే (utf_iscomposing(utf_ptr2char(rex.ఆదానం)))
+		    MB_CPTR_ADV(rex.ఆదానం);
 	    }
-	    break;
+	    ఆపు;
 
-	  case NOTHING:
-	    break;
+	  స్థితి NOTHING:
+	    ఆపు;
 
-	  case BACK:
+	  స్థితి వెనుక_2:
 	    {
-		int		i;
+		పూర్ణాంకం		i;
 		backpos_T	*bp;
 
 		// When we run into BACK we need to check if we don't keep
@@ -3978,49 +3978,49 @@ regmatch(
 		// at the same position as the previous time.
 		// The positions are stored in "backpos" and found by the
 		// current value of "scan", the position in the RE program.
-		bp = (backpos_T *)backpos.ga_data;
-		for (i = 0; i < backpos.ga_len; ++i)
-		    if (bp[i].bp_scan == scan)
-			break;
-		if (i == backpos.ga_len)
+		bp = (backpos_T *)backpos.ga_దత్తాంశం;
+		కొరకు (i = 0; i < backpos.ga_len; ++i)
+		    ఒకవేళ (bp[i].bp_పరిశీలన == పరిశీలన)
+			ఆపు;
+		ఒకవేళ (i == backpos.ga_len)
 		{
 		    // First time at this BACK, make room to store the pos.
-		    if (GA_GROW_FAILS(&backpos, 1))
-			status = RA_FAIL;
-		    else
+		    ఒకవేళ (GA_GROW_FAILS(&backpos, 1))
+			స్థితి_2 = RA_FAIL;
+		    లేకపోతే
 		    {
 			// get "ga_data" again, it may have changed
-			bp = (backpos_T *)backpos.ga_data;
-			bp[i].bp_scan = scan;
+			bp = (backpos_T *)backpos.ga_దత్తాంశం;
+			bp[i].bp_పరిశీలన = పరిశీలన;
 			++backpos.ga_len;
 		    }
 		}
-		else if (reg_save_equal(&bp[i].bp_pos))
+		లేకపోతే ఒకవేళ (reg_save_equal(&bp[i].bp_pos))
 		    // Still at same position as last time, fail.
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 
-		if (status != RA_FAIL && status != RA_NOMATCH)
+		ఒకవేళ (స్థితి_2 != RA_FAIL && స్థితి_2 != RA_NOMATCH)
 		    reg_save(&bp[i].bp_pos, &backpos);
 	    }
-	    break;
+	    ఆపు;
 
-	  case MOPEN + 0:   // Match start: \zs
-	  case MOPEN + 1:   // \(
-	  case MOPEN + 2:
-	  case MOPEN + 3:
-	  case MOPEN + 4:
-	  case MOPEN + 5:
-	  case MOPEN + 6:
-	  case MOPEN + 7:
-	  case MOPEN + 8:
-	  case MOPEN + 9:
+	  స్థితి MOPEN + 0:   // Match start: \zs
+	  స్థితి MOPEN + 1:   // \(
+	  స్థితి MOPEN + 2:
+	  స్థితి MOPEN + 3:
+	  స్థితి MOPEN + 4:
+	  స్థితి MOPEN + 5:
+	  స్థితి MOPEN + 6:
+	  స్థితి MOPEN + 7:
+	  స్థితి MOPEN + 8:
+	  స్థితి MOPEN + 9:
 	    {
 		no = op - MOPEN;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_నెట్టు(RS_MOPEN, పరిశీలన);
+		ఒకవేళ (rp == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
+		లేకపోతే
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_startpos[no],
@@ -4028,32 +4028,32 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case NOPEN:	    // \%(
-	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
-		    status = RA_FAIL;
+	  స్థితి NOPEN:	    // \%(
+	  స్థితి NCLOSE:	    // \) after \%(
+		ఒకవేళ (regstack_నెట్టు(RS_NOPEN, పరిశీలన) == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
 		// We simply continue and handle the result when done.
-		break;
+		ఆపు;
 
-#ifdef FEAT_SYN_HL
-	  case ZOPEN + 1:
-	  case ZOPEN + 2:
-	  case ZOPEN + 3:
-	  case ZOPEN + 4:
-	  case ZOPEN + 5:
-	  case ZOPEN + 6:
-	  case ZOPEN + 7:
-	  case ZOPEN + 8:
-	  case ZOPEN + 9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	  స్థితి ZOPEN + 1:
+	  స్థితి ZOPEN + 2:
+	  స్థితి ZOPEN + 3:
+	  స్థితి ZOPEN + 4:
+	  స్థితి ZOPEN + 5:
+	  స్థితి ZOPEN + 6:
+	  స్థితి ZOPEN + 7:
+	  స్థితి ZOPEN + 8:
+	  స్థితి ZOPEN + 9:
 	    {
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_నెట్టు(RS_ZOPEN, పరిశీలన);
+		ఒకవేళ (rp == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
+		లేకపోతే
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_startzpos[no],
@@ -4061,26 +4061,26 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	  case MCLOSE + 0:  // Match end: \ze
-	  case MCLOSE + 1:  // \)
-	  case MCLOSE + 2:
-	  case MCLOSE + 3:
-	  case MCLOSE + 4:
-	  case MCLOSE + 5:
-	  case MCLOSE + 6:
-	  case MCLOSE + 7:
-	  case MCLOSE + 8:
-	  case MCLOSE + 9:
+	  స్థితి MCLOSE + 0:  // Match end: \ze
+	  స్థితి MCLOSE + 1:  // \)
+	  స్థితి MCLOSE + 2:
+	  స్థితి MCLOSE + 3:
+	  స్థితి MCLOSE + 4:
+	  స్థితి MCLOSE + 5:
+	  స్థితి MCLOSE + 6:
+	  స్థితి MCLOSE + 7:
+	  స్థితి MCLOSE + 8:
+	  స్థితి MCLOSE + 9:
 	    {
 		no = op - MCLOSE;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_నెట్టు(RS_MCLOSE, పరిశీలన);
+		ఒకవేళ (rp == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
+		లేకపోతే
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_endpos[no],
@@ -4088,25 +4088,25 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ఆపు;
 
-#ifdef FEAT_SYN_HL
-	  case ZCLOSE + 1:  // \) after \z(
-	  case ZCLOSE + 2:
-	  case ZCLOSE + 3:
-	  case ZCLOSE + 4:
-	  case ZCLOSE + 5:
-	  case ZCLOSE + 6:
-	  case ZCLOSE + 7:
-	  case ZCLOSE + 8:
-	  case ZCLOSE + 9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	  స్థితి ZCLOSE + 1:  // \) after \z(
+	  స్థితి ZCLOSE + 2:
+	  స్థితి ZCLOSE + 3:
+	  స్థితి ZCLOSE + 4:
+	  స్థితి ZCLOSE + 5:
+	  స్థితి ZCLOSE + 6:
+	  స్థితి ZCLOSE + 7:
+	  స్థితి ZCLOSE + 8:
+	  స్థితి ZCLOSE + 9:
 	    {
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_నెట్టు(RS_ZCLOSE, పరిశీలన);
+		ఒకవేళ (rp == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
+		లేకపోతే
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_endzpos[no],
@@ -4114,210 +4114,210 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	  case BACKREF + 1:
-	  case BACKREF + 2:
-	  case BACKREF + 3:
-	  case BACKREF + 4:
-	  case BACKREF + 5:
-	  case BACKREF + 6:
-	  case BACKREF + 7:
-	  case BACKREF + 8:
-	  case BACKREF + 9:
+	  స్థితి BACKREF + 1:
+	  స్థితి BACKREF + 2:
+	  స్థితి BACKREF + 3:
+	  స్థితి BACKREF + 4:
+	  స్థితి BACKREF + 5:
+	  స్థితి BACKREF + 6:
+	  స్థితి BACKREF + 7:
+	  స్థితి BACKREF + 8:
+	  స్థితి BACKREF + 9:
 	    {
-		int		len;
+		పూర్ణాంకం		len;
 
 		no = op - BACKREF;
 		cleanup_subexpr();
-		if (!REG_MULTI)		// Single-line regexp
+		ఒకవేళ (!REG_MULTI)		// Single-line regexp
 		{
-		    if (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
+		    ఒకవేళ (rex.reg_startp[no] == ఖాళీ || rex.reg_endp[no] == ఖాళీ)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Compare current input with back-ref in the same
 			// line.
-			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (పూర్ణాంకం)(rex.reg_endp[no] - rex.reg_startp[no]);
+			ఒకవేళ (cstrncmp(rex.reg_startp[no], rex.ఆదానం, &len) != 0)
+			    స్థితి_2 = RA_NOMATCH;
 		    }
 		}
-		else				// Multi-line regexp
+		లేకపోతే				// Multi-line regexp
 		{
-		    if (rex.reg_startpos[no].lnum < 0
+		    ఒకవేళ (rex.reg_startpos[no].lnum < 0
 						|| rex.reg_endpos[no].lnum < 0)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (rex.reg_startpos[no].lnum == rex.lnum
+			ఒకవేళ (rex.reg_startpos[no].lnum == rex.lnum
 				&& rex.reg_endpos[no].lnum == rex.lnum)
 			{
 			    // Compare back-ref within the current line.
-			    len = rex.reg_endpos[no].col
-						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
-							  rex.input, &len) != 0)
-				status = RA_NOMATCH;
+			    len = rex.reg_endpos[no].నిలువు
+						    - rex.reg_startpos[no].నిలువు;
+			    ఒకవేళ (cstrncmp(rex.పంక్తి + rex.reg_startpos[no].నిలువు,
+							  rex.ఆదానం, &len) != 0)
+				స్థితి_2 = RA_NOMATCH;
 			}
-			else
+			లేకపోతే
 			{
 			    // Messy situation: Need to compare between two
 			    // lines.
-			    int r = match_with_backref(
+			    పూర్ణాంకం r = సరిపోలిక_with_backref(
 					    rex.reg_startpos[no].lnum,
-					    rex.reg_startpos[no].col,
+					    rex.reg_startpos[no].నిలువు,
 					    rex.reg_endpos[no].lnum,
-					    rex.reg_endpos[no].col,
+					    rex.reg_endpos[no].నిలువు,
 					    &len);
 
-			    if (r != RA_MATCH)
-				status = r;
+			    ఒకవేళ (r != RA_సరిపోలిక)
+				స్థితి_2 = r;
 			}
 		    }
 		}
 
 		// Matched the backref, skip over it.
-		rex.input += len;
+		rex.ఆదానం += len;
 	    }
-	    break;
+	    ఆపు;
 
-#ifdef FEAT_SYN_HL
-	  case ZREF + 1:
-	  case ZREF + 2:
-	  case ZREF + 3:
-	  case ZREF + 4:
-	  case ZREF + 5:
-	  case ZREF + 6:
-	  case ZREF + 7:
-	  case ZREF + 8:
-	  case ZREF + 9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	  స్థితి ZREF + 1:
+	  స్థితి ZREF + 2:
+	  స్థితి ZREF + 3:
+	  స్థితి ZREF + 4:
+	  స్థితి ZREF + 5:
+	  స్థితి ZREF + 6:
+	  స్థితి ZREF + 7:
+	  స్థితి ZREF + 8:
+	  స్థితి ZREF + 9:
 	    {
-		int	len;
+		పూర్ణాంకం	len;
 
 		cleanup_zsubexpr();
 		no = op - ZREF;
-		if (re_extmatch_in != NULL
-			&& re_extmatch_in->matches[no] != NULL)
+		ఒకవేళ (re_extmatch_లోపల != ఖాళీ
+			&& re_extmatch_లోపల->matches[no] != ఖాళీ)
 		{
-		    len = (int)STRLEN(re_extmatch_in->matches[no]);
-		    if (cstrncmp(re_extmatch_in->matches[no],
-							  rex.input, &len) != 0)
-			status = RA_NOMATCH;
-		    else
-			rex.input += len;
+		    len = (పూర్ణాంకం)STRLEN(re_extmatch_లోపల->matches[no]);
+		    ఒకవేళ (cstrncmp(re_extmatch_లోపల->matches[no],
+							  rex.ఆదానం, &len) != 0)
+			స్థితి_2 = RA_NOMATCH;
+		    లేకపోతే
+			rex.ఆదానం += len;
 		}
-		else
+		లేకపోతే
 		{
 		    // Backref was not set: Match an empty string.
 		}
 	    }
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	  case BRANCH:
+	  స్థితి BRANCH:
 	    {
-		if (OP(next) != BRANCH) // No choice.
-		    next = OPERAND(scan);	// Avoid recursion.
-		else
+		ఒకవేళ (OP(తదుపరి) != BRANCH) // No choice.
+		    తదుపరి = నిర్వాహ్యం(పరిశీలన);	// Avoid recursion.
+		లేకపోతే
 		{
-		    rp = regstack_push(RS_BRANCH, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
-			status = RA_BREAK;	// rest is below
+		    rp = regstack_నెట్టు(RS_BRANCH, పరిశీలన);
+		    ఒకవేళ (rp == ఖాళీ)
+			స్థితి_2 = RA_FAIL;
+		    లేకపోతే
+			స్థితి_2 = RA_BREAK;	// rest is below
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case BRACE_LIMITS:
+	  స్థితి BRACE_LIMITS:
 	    {
-		if (OP(next) == BRACE_SIMPLE)
+		ఒకవేళ (OP(తదుపరి) == BRACE_SIMPLE)
 		{
-		    bl_minval = OPERAND_MIN(scan);
-		    bl_maxval = OPERAND_MAX(scan);
+		    bl_minval = నిర్వాహ్యం_MIN(పరిశీలన);
+		    bl_maxval = నిర్వాహ్యం_MAX(పరిశీలన);
 		}
-		else if (OP(next) >= BRACE_COMPLEX
-			&& OP(next) < BRACE_COMPLEX + 10)
+		లేకపోతే ఒకవేళ (OP(తదుపరి) >= BRACE_COMPLEX
+			&& OP(తదుపరి) < BRACE_COMPLEX + 10)
 		{
-		    no = OP(next) - BRACE_COMPLEX;
-		    brace_min[no] = OPERAND_MIN(scan);
-		    brace_max[no] = OPERAND_MAX(scan);
-		    brace_count[no] = 0;
+		    no = OP(తదుపరి) - BRACE_COMPLEX;
+		    brace_min[no] = నిర్వాహ్యం_MIN(పరిశీలన);
+		    brace_max[no] = నిర్వాహ్యం_MAX(పరిశీలన);
+		    brace_లెక్క[no] = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    internal_error("BRACE_LIMITS");
-		    status = RA_FAIL;
+		    అంతర్గత_error("BRACE_LIMITS");
+		    స్థితి_2 = RA_FAIL;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case BRACE_COMPLEX + 0:
-	  case BRACE_COMPLEX + 1:
-	  case BRACE_COMPLEX + 2:
-	  case BRACE_COMPLEX + 3:
-	  case BRACE_COMPLEX + 4:
-	  case BRACE_COMPLEX + 5:
-	  case BRACE_COMPLEX + 6:
-	  case BRACE_COMPLEX + 7:
-	  case BRACE_COMPLEX + 8:
-	  case BRACE_COMPLEX + 9:
+	  స్థితి BRACE_COMPLEX + 0:
+	  స్థితి BRACE_COMPLEX + 1:
+	  స్థితి BRACE_COMPLEX + 2:
+	  స్థితి BRACE_COMPLEX + 3:
+	  స్థితి BRACE_COMPLEX + 4:
+	  స్థితి BRACE_COMPLEX + 5:
+	  స్థితి BRACE_COMPLEX + 6:
+	  స్థితి BRACE_COMPLEX + 7:
+	  స్థితి BRACE_COMPLEX + 8:
+	  స్థితి BRACE_COMPLEX + 9:
 	    {
 		no = op - BRACE_COMPLEX;
-		++brace_count[no];
+		++brace_లెక్క[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		ఒకవేళ (brace_లెక్క[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
-		    rp = regstack_push(RS_BRCPLX_MORE, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
+		    rp = regstack_నెట్టు(RS_BRCPLX_మరిన్ని, పరిశీలన);
+		    ఒకవేళ (rp == ఖాళీ)
+			స్థితి_2 = RA_FAIL;
+		    లేకపోతే
 		    {
 			rp->rs_no = no;
 			reg_save(&rp->rs_un.regsave, &backpos);
-			next = OPERAND(scan);
+			తదుపరి = నిర్వాహ్యం(పరిశీలన);
 			// We continue and handle the result when done.
 		    }
-		    break;
+		    ఆపు;
 		}
 
 		// If matched enough times, may try matching some more
-		if (brace_min[no] <= brace_max[no])
+		ఒకవేళ (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    ఒకవేళ (brace_లెక్క[no] <= brace_max[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_LONG, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_నెట్టు(RS_BRCPLX_LONG, పరిశీలన);
+			ఒకవేళ (rp == ఖాళీ)
+			    స్థితి_2 = RA_FAIL;
+			లేకపోతే
 			{
 			    rp->rs_no = no;
 			    reg_save(&rp->rs_un.regsave, &backpos);
-			    next = OPERAND(scan);
+			    తదుపరి = నిర్వాహ్యం(పరిశీలన);
 			    // We continue and handle the result when done.
 			}
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    ఒకవేళ (brace_లెక్క[no] <= brace_min[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_నెట్టు(RS_BRCPLX_SHORT, పరిశీలన);
+			ఒకవేళ (rp == ఖాళీ)
+			    స్థితి_2 = RA_FAIL;
+			లేకపోతే
 			{
 			    reg_save(&rp->rs_un.regsave, &backpos);
 			    // We continue and handle the result when done.
@@ -4325,40 +4325,40 @@ regmatch(
 		    }
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case BRACE_SIMPLE:
-	  case STAR:
-	  case PLUS:
+	  స్థితి BRACE_SIMPLE:
+	  స్థితి నక్షత్రం:
+	  స్థితి PLUS:
 	    {
 		regstar_T	rst;
 
 		// Lookahead to avoid useless match attempts when we know
 		// what character comes next.
-		if (OP(next) == EXACTLY)
+		ఒకవేళ (OP(తదుపరి) == EXACTLY)
 		{
-		    rst.nextb = *OPERAND(next);
-		    if (rex.reg_ic)
+		    rst.nextb = *నిర్వాహ్యం(తదుపరి);
+		    ఒకవేళ (rex.reg_ic)
 		    {
-			if (MB_ISUPPER(rst.nextb))
+			ఒకవేళ (MB_ISUPPER(rst.nextb))
 			    rst.nextb_ic = MB_TOLOWER(rst.nextb);
-			else
+			లేకపోతే
 			    rst.nextb_ic = MB_TOUPPER(rst.nextb);
 		    }
-		    else
+		    లేకపోతే
 			rst.nextb_ic = rst.nextb;
 		}
-		else
+		లేకపోతే
 		{
 		    rst.nextb = NUL;
 		    rst.nextb_ic = NUL;
 		}
-		if (op != BRACE_SIMPLE)
+		ఒకవేళ (op != BRACE_SIMPLE)
 		{
-		    rst.minval = (op == STAR) ? 0 : 1;
-		    rst.maxval = MAX_LIMIT;
+		    rst.minval = (op == నక్షత్రం) ? 0 : 1;
+		    rst.maxval = MAX_హద్దు;
 		}
-		else
+		లేకపోతే
 		{
 		    rst.minval = bl_minval;
 		    rst.maxval = bl_maxval;
@@ -4368,77 +4368,77 @@ regmatch(
 		// to maxval.  When maxval < minval, try matching at least the
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
-		rst.count = regrepeat(OPERAND(scan), rst.maxval);
-		if (got_int)
+		rst.లెక్క = regrepeat(నిర్వాహ్యం(పరిశీలన), rst.maxval);
+		ఒకవేళ (got_int)
 		{
-		    status = RA_FAIL;
-		    break;
+		    స్థితి_2 = RA_FAIL;
+		    ఆపు;
 		}
-		if (rst.minval <= rst.maxval
-			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
+		ఒకవేళ (rst.minval <= rst.maxval
+			  ? rst.లెక్క >= rst.minval : rst.లెక్క >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
 		    // a regstar_T on the regstack.
-		    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+		    ఒకవేళ ((దీర్ఘ)((గుర్తులేని)regstack.ga_len >> 10) >= p_mmp)
 		    {
-			emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-			status = RA_FAIL;
+			emsg(_(e_నమూనా_ఉపయోగిస్తుంది_మరిన్ని_జ్ఞాపకం_than_maxmempattern));
+			స్థితి_2 = RA_FAIL;
 		    }
-		    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regstar_T)))
-			status = RA_FAIL;
-		    else
+		    లేకపోతే ఒకవేళ (GA_GROW_FAILS(&regstack, (పూర్ణాంకం)పరిమాణం(regstar_T)))
+			స్థితి_2 = RA_FAIL;
+		    లేకపోతే
 		    {
-			regstack.ga_len += sizeof(regstar_T);
-			rp = regstack_push(rst.minval <= rst.maxval
-					? RS_STAR_LONG : RS_STAR_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			regstack.ga_len += పరిమాణం(regstar_T);
+			rp = regstack_నెట్టు(rst.minval <= rst.maxval
+					? RS_నక్షత్రం_LONG : RS_నక్షత్రం_SHORT, పరిశీలన);
+			ఒకవేళ (rp == ఖాళీ)
+			    స్థితి_2 = RA_FAIL;
+			లేకపోతే
 			{
 			    *(((regstar_T *)rp) - 1) = rst;
-			    status = RA_BREAK;	    // skip the restore bits
+			    స్థితి_2 = RA_BREAK;	    // skip the restore bits
 			}
 		    }
 		}
-		else
-		    status = RA_NOMATCH;
+		లేకపోతే
+		    స్థితి_2 = RA_NOMATCH;
 
 	    }
-	    break;
+	    ఆపు;
 
-	  case NOMATCH:
-	  case MATCH:
-	  case SUBPAT:
-	    rp = regstack_push(RS_NOMATCH, scan);
-	    if (rp == NULL)
-		status = RA_FAIL;
-	    else
+	  స్థితి NOMATCH:
+	  స్థితి సరిపోలిక_2:
+	  స్థితి SUBPAT:
+	    rp = regstack_నెట్టు(RS_NOMATCH, పరిశీలన);
+	    ఒకవేళ (rp == ఖాళీ)
+		స్థితి_2 = RA_FAIL;
+	    లేకపోతే
 	    {
 		rp->rs_no = op;
 		reg_save(&rp->rs_un.regsave, &backpos);
-		next = OPERAND(scan);
+		తదుపరి = నిర్వాహ్యం(పరిశీలన);
 		// We continue and handle the result when done.
 	    }
-	    break;
+	    ఆపు;
 
-	  case BEHIND:
-	  case NOBEHIND:
+	  స్థితి BEHIND:
+	  స్థితి NOBEHIND:
 	    // Need a bit of room to store extra positions.
-	    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+	    ఒకవేళ ((దీర్ఘ)((గుర్తులేని)regstack.ga_len >> 10) >= p_mmp)
 	    {
-		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		status = RA_FAIL;
+		emsg(_(e_నమూనా_ఉపయోగిస్తుంది_మరిన్ని_జ్ఞాపకం_than_maxmempattern));
+		స్థితి_2 = RA_FAIL;
 	    }
-	    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regbehind_T)))
-		status = RA_FAIL;
-	    else
+	    లేకపోతే ఒకవేళ (GA_GROW_FAILS(&regstack, (పూర్ణాంకం)పరిమాణం(regbehind_T)))
+		స్థితి_2 = RA_FAIL;
+	    లేకపోతే
 	    {
-		regstack.ga_len += sizeof(regbehind_T);
-		rp = regstack_push(RS_BEHIND1, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		regstack.ga_len += పరిమాణం(regbehind_T);
+		rp = regstack_నెట్టు(RS_BEHIND1, పరిశీలన);
+		ఒకవేళ (rp == ఖాళీ)
+		    స్థితి_2 = RA_FAIL;
+		లేకపోతే
 		{
 		    // Need to save the subexpr to be able to restore them
 		    // when there is a match but we don't use it.
@@ -4450,191 +4450,191 @@ regmatch(
 		    // check the behind match by looping.
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case BHPOS:
-	    if (REG_MULTI)
+	  స్థితి BHPOS:
+	    ఒకవేళ (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		ఒకవేళ (behind_pos.rs_u.pos.నిలువు != (colnr_T)(rex.ఆదానం - rex.పంక్తి)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
-		status = RA_NOMATCH;
-	    break;
+	    లేకపోతే ఒకవేళ (behind_pos.rs_u.ptr != rex.ఆదానం)
+		స్థితి_2 = RA_NOMATCH;
+	    ఆపు;
 
-	  case NEWL:
-	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
-			     || rex.reg_line_lbr)
-					   && (c != '\n' || !rex.reg_line_lbr))
-		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	  స్థితి NEWL:
+	    ఒకవేళ ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
+			     || rex.reg_పంక్తి_lbr)
+					   && (c != '\n' || !rex.reg_పంక్తి_lbr))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే ఒకవేళ (rex.reg_పంక్తి_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    లేకపోతే
 		reg_nextline();
-	    break;
+	    ఆపు;
 
-	  case END:
-	    status = RA_MATCH;	// Success!
-	    break;
+	  స్థితి చివర_3:
+	    స్థితి_2 = RA_సరిపోలిక;	// Success!
+	    ఆపు;
 
-	  default:
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Illegal op code %d\n", op);
-#endif
-	    status = RA_FAIL;
-	    break;
+	  అప్రమేయ:
+	    iemsg(e_corrupted_regexp_కార్యక్రమం);
+#నిర్వచితమైతే DEBUG
+	    రాయి("Illegal op code %d\n", op);
+#అయితే_ముగింపు
+	    స్థితి_2 = RA_FAIL;
+	    ఆపు;
 	  }
 	}
 
 	// If we can't continue sequentially, break the inner loop.
-	if (status != RA_CONT)
-	    break;
+	ఒకవేళ (స్థితి_2 != RA_CONT)
+	    ఆపు;
 
 	// Continue in inner loop, advance to next item.
-	scan = next;
+	పరిశీలన = తదుపరి;
 
     } // end of inner loop
 
     // If there is something on the regstack execute the code for the state.
     // If the state is popped then loop and use the older state.
-    while (regstack.ga_len > 0 && status != RA_FAIL)
+    అయితే (regstack.ga_len > 0 && స్థితి_2 != RA_FAIL)
     {
-	rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-	switch (rp->rs_state)
+	rp = (regitem_T *)((అక్షరం *)regstack.ga_దత్తాంశం + regstack.ga_len) - 1;
+	ఎంపిక (rp->rs_state)
 	{
-	  case RS_NOPEN:
+	  స్థితి RS_NOPEN:
 	    // Result is passed on as-is, simply pop the state.
-	    regstack_pop(&scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
 
-	  case RS_MOPEN:
+	  స్థితి RS_MOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZOPEN:
+#నిర్వచితమైతే FEAT_SYN_HL
+	  స్థితి RS_ZOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
+#అయితే_ముగింపు
 
-	  case RS_MCLOSE:
+	  స్థితి RS_MCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZCLOSE:
+#నిర్వచితమైతే FEAT_SYN_HL
+	  స్థితి RS_ZCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
+#అయితే_ముగింపు
 
-	  case RS_BRANCH:
-	    if (status == RA_MATCH)
+	  స్థితి RS_BRANCH:
+	    ఒకవేళ (స్థితి_2 == RA_సరిపోలిక)
 		// this branch matched, use it
-		regstack_pop(&scan);
-	    else
+		regstack_తీయి(&పరిశీలన);
+	    లేకపోతే
 	    {
-		if (status != RA_BREAK)
+		ఒకవేళ (స్థితి_2 != RA_BREAK)
 		{
 		    // After a non-matching branch: try next one.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = rp->rs_scan;
+		    పరిశీలన = rp->rs_పరిశీలన;
 		}
-		if (scan == NULL || OP(scan) != BRANCH)
+		ఒకవేళ (పరిశీలన == ఖాళీ || OP(పరిశీలన) != BRANCH)
 		{
 		    // no more branches, didn't find a match
-		    status = RA_NOMATCH;
-		    regstack_pop(&scan);
+		    స్థితి_2 = RA_NOMATCH;
+		    regstack_తీయి(&పరిశీలన);
 		}
-		else
+		లేకపోతే
 		{
 		    // Prepare to try a branch.
-		    rp->rs_scan = regnext(scan);
+		    rp->rs_పరిశీలన = regnext(పరిశీలన);
 		    reg_save(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(scan);
+		    పరిశీలన = నిర్వాహ్యం(పరిశీలన);
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case RS_BRCPLX_MORE:
+	  స్థితి RS_BRCPLX_మరిన్ని:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];	// decrement match count
+		--brace_లెక్క[rp->rs_no];	// decrement match count
 	    }
-	    regstack_pop(&scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఆపు;
 
-	  case RS_BRCPLX_LONG:
+	  స్థితి RS_BRCPLX_LONG:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];
+		--brace_లెక్క[rp->rs_no];
 		// continue with the items after "\{}"
-		status = RA_CONT;
+		స్థితి_2 = RA_CONT;
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఒకవేళ (స్థితి_2 == RA_CONT)
+		పరిశీలన = regnext(పరిశీలన);
+	    ఆపు;
 
-	  case RS_BRCPLX_SHORT:
+	  స్థితి RS_BRCPLX_SHORT:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-	    regstack_pop(&scan);
-	    if (status == RA_NOMATCH)
+	    regstack_తీయి(&పరిశీలన);
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 	    {
-		scan = OPERAND(scan);
-		status = RA_CONT;
+		పరిశీలన = నిర్వాహ్యం(పరిశీలన);
+		స్థితి_2 = RA_CONT;
 	    }
-	    break;
+	    ఆపు;
 
-	  case RS_NOMATCH:
+	  స్థితి RS_NOMATCH:
 	    // Pop the state.  If the operand matches for NOMATCH or
 	    // doesn't match for MATCH/SUBPAT, we fail.  Otherwise backup,
 	    // except for SUBPAT, and continue with the next item.
-	    if (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
-		status = RA_NOMATCH;
-	    else
+	    ఒకవేళ (స్థితి_2 == (rp->rs_no == NOMATCH ? RA_సరిపోలిక : RA_NOMATCH))
+		స్థితి_2 = RA_NOMATCH;
+	    లేకపోతే
 	    {
-		status = RA_CONT;
-		if (rp->rs_no != SUBPAT)	// zero-width
+		స్థితి_2 = RA_CONT;
+		ఒకవేళ (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_తీయి(&పరిశీలన);
+	    ఒకవేళ (స్థితి_2 == RA_CONT)
+		పరిశీలన = regnext(పరిశీలన);
+	    ఆపు;
 
-	  case RS_BEHIND1:
-	    if (status == RA_NOMATCH)
+	  స్థితి RS_BEHIND1:
+	    ఒకవేళ (స్థితి_2 == RA_NOMATCH)
 	    {
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_తీయి(&పరిశీలన);
+		regstack.ga_len -= పరిమాణం(regbehind_T);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// The stuff after BEHIND/NOBEHIND matches.  Now try if
 		// the behind part does (not) match before the current
@@ -4657,247 +4657,247 @@ regmatch(
 		rp->rs_state = RS_BEHIND2;
 
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		scan = OPERAND(rp->rs_scan) + 4;
+		పరిశీలన = నిర్వాహ్యం(rp->rs_పరిశీలన) + 4;
 	    }
-	    break;
+	    ఆపు;
 
-	  case RS_BEHIND2:
+	  స్థితి RS_BEHIND2:
 	    // Looping for BEHIND / NOBEHIND match.
-	    if (status == RA_MATCH && reg_save_equal(&behind_pos))
+	    ఒకవేళ (స్థితి_2 == RA_సరిపోలిక && reg_save_equal(&behind_pos))
 	    {
 		// found a match that ends where "next" started
 		behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		if (rp->rs_no == BEHIND)
+		ఒకవేళ (rp->rs_no == BEHIND)
 		    reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-		else
+		లేకపోతే
 		{
 		    // But we didn't want a match.  Need to restore the
 		    // subexpr, because what follows matched, so they have
 		    // been set.
-		    status = RA_NOMATCH;
+		    స్థితి_2 = RA_NOMATCH;
 		    restore_subexpr(((regbehind_T *)rp) - 1);
 		}
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_తీయి(&పరిశీలన);
+		regstack.ga_len -= పరిమాణం(regbehind_T);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		long limit;
+		దీర్ఘ హద్దు;
 
 		// No match or a match that doesn't end where we want it: Go
 		// back one character.  May go to previous line once.
 		no = OK;
-		limit = OPERAND_MIN(rp->rs_scan);
-		if (REG_MULTI)
+		హద్దు = నిర్వాహ్యం_MIN(rp->rs_పరిశీలన);
+		ఒకవేళ (REG_MULTI)
 		{
-		    if (limit > 0
+		    ఒకవేళ (హద్దు > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
-				    ? (colnr_T)STRLEN(rex.line)
-				    : behind_pos.rs_u.pos.col)
-				- rp->rs_un.regsave.rs_u.pos.col >= limit))
+				    ? (colnr_T)STRLEN(rex.పంక్తి)
+				    : behind_pos.rs_u.pos.నిలువు)
+				- rp->rs_un.regsave.rs_u.pos.నిలువు >= హద్దు))
 			no = FAIL;
-		    else if (rp->rs_un.regsave.rs_u.pos.col == 0)
+		    లేకపోతే ఒకవేళ (rp->rs_un.regsave.rs_u.pos.నిలువు == 0)
 		    {
-			if (rp->rs_un.regsave.rs_u.pos.lnum
+			ఒకవేళ (rp->rs_un.regsave.rs_u.pos.lnum
 					< behind_pos.rs_u.pos.lnum
 				|| reg_getline(
 					--rp->rs_un.regsave.rs_u.pos.lnum)
-								  == NULL)
+								  == ఖాళీ)
 			    no = FAIL;
-			else
+			లేకపోతే
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
-			    rp->rs_un.regsave.rs_u.pos.col =
-						 (colnr_T)STRLEN(rex.line);
+			    rp->rs_un.regsave.rs_u.pos.నిలువు =
+						 (colnr_T)STRLEN(rex.పంక్తి);
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (has_mbyte)
+			ఒకవేళ (has_mbyte)
 			{
-			    char_u *line =
+			    char_u *పంక్తి =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
 
-			    rp->rs_un.regsave.rs_u.pos.col -=
-				(*mb_head_off)(line, line
-				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
+			    rp->rs_un.regsave.rs_u.pos.నిలువు -=
+				(*mb_తల_off)(పంక్తి, పంక్తి
+				    + rp->rs_un.regsave.rs_u.pos.నిలువు - 1) + 1;
 			}
-			else
-			    --rp->rs_un.regsave.rs_u.pos.col;
+			లేకపోతే
+			    --rp->rs_un.regsave.rs_u.pos.నిలువు;
 		    }
 		}
-		else
+		లేకపోతే
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    ఒకవేళ (rp->rs_un.regsave.rs_u.ptr == rex.పంక్తి)
 			no = FAIL;
-		    else
+		    లేకపోతే
 		    {
-			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
-			if (limit > 0 && (long)(behind_pos.rs_u.ptr
-				     - rp->rs_un.regsave.rs_u.ptr) > limit)
+			MB_PTR_వెనుక(rex.పంక్తి, rp->rs_un.regsave.rs_u.ptr);
+			ఒకవేళ (హద్దు > 0 && (దీర్ఘ)(behind_pos.rs_u.ptr
+				     - rp->rs_un.regsave.rs_u.ptr) > హద్దు)
 			    no = FAIL;
 		    }
 		}
-		if (no == OK)
+		ఒకవేళ (no == OK)
 		{
 		    // Advanced, prepare for finding match again.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(rp->rs_scan) + 4;
-		    if (status == RA_MATCH)
+		    పరిశీలన = నిర్వాహ్యం(rp->rs_పరిశీలన) + 4;
+		    ఒకవేళ (స్థితి_2 == RA_సరిపోలిక)
 		    {
 			// We did match, so subexpr may have been changed,
 			// need to restore them for the next try.
-			status = RA_NOMATCH;
+			స్థితి_2 = RA_NOMATCH;
 			restore_subexpr(((regbehind_T *)rp) - 1);
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    // Can't advance.  For NOBEHIND that's a match.
 		    behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		    if (rp->rs_no == NOBEHIND)
+		    ఒకవేళ (rp->rs_no == NOBEHIND)
 		    {
 			reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-			status = RA_MATCH;
+			స్థితి_2 = RA_సరిపోలిక;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// We do want a proper match.  Need to restore the
 			// subexpr if we had a match, because they may have
 			// been set.
-			if (status == RA_MATCH)
+			ఒకవేళ (స్థితి_2 == RA_సరిపోలిక)
 			{
-			    status = RA_NOMATCH;
+			    స్థితి_2 = RA_NOMATCH;
 			    restore_subexpr(((regbehind_T *)rp) - 1);
 			}
 		    }
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regbehind_T);
+		    regstack_తీయి(&పరిశీలన);
+		    regstack.ga_len -= పరిమాణం(regbehind_T);
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	  case RS_STAR_LONG:
-	  case RS_STAR_SHORT:
+	  స్థితి RS_నక్షత్రం_LONG:
+	  స్థితి RS_నక్షత్రం_SHORT:
 	    {
 		regstar_T	    *rst = ((regstar_T *)rp) - 1;
 
-		if (status == RA_MATCH)
+		ఒకవేళ (స్థితి_2 == RA_సరిపోలిక)
 		{
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    break;
+		    regstack_తీయి(&పరిశీలన);
+		    regstack.ga_len -= పరిమాణం(regstar_T);
+		    ఆపు;
 		}
 
 		// Tried once already, restore input pointers.
-		if (status != RA_BREAK)
+		ఒకవేళ (స్థితి_2 != RA_BREAK)
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 
 		// Repeat until we found a position where it could match.
-		for (;;)
+		కొరకు (;;)
 		{
-		    if (status != RA_BREAK)
+		    ఒకవేళ (స్థితి_2 != RA_BREAK)
 		    {
 			// Tried first position already, advance.
-			if (rp->rs_state == RS_STAR_LONG)
+			ఒకవేళ (rp->rs_state == RS_నక్షత్రం_LONG)
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
-				break;
-			    if (rex.input == rex.line)
+			    ఒకవేళ (--rst->లెక్క < rst->minval)
+				ఆపు;
+			    ఒకవేళ (rex.ఆదానం == rex.పంక్తి)
 			    {
 				// backup to last char of previous line
-				if (rex.lnum == 0)
+				ఒకవేళ (rex.lnum == 0)
 				{
-				    status = RA_NOMATCH;
-				    break;
+				    స్థితి_2 = RA_NOMATCH;
+				    ఆపు;
 				}
 				--rex.lnum;
-				rex.line = reg_getline(rex.lnum);
+				rex.పంక్తి = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
-				    break;
-				rex.input = rex.line + reg_getline_len(rex.lnum);
+				ఒకవేళ (rex.పంక్తి == ఖాళీ)
+				    ఆపు;
+				rex.ఆదానం = rex.పంక్తి + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
-			    else
-				MB_PTR_BACK(rex.line, rex.input);
+			    లేకపోతే
+				MB_PTR_వెనుక(rex.పంక్తి, rex.ఆదానం);
 			}
-			else
+			లేకపోతే
 			{
 			    // Range is backwards, use shortest match first.
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
-				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
-				break;
-			    ++rst->count;
+			    ఒకవేళ (rst->లెక్క == rst->minval
+				  || regrepeat(నిర్వాహ్యం(rp->rs_పరిశీలన), 1L) == 0)
+				ఆపు;
+			    ++rst->లెక్క;
 			}
-			if (got_int)
-			    break;
+			ఒకవేళ (got_int)
+			    ఆపు;
 		    }
-		    else
-			status = RA_NOMATCH;
+		    లేకపోతే
+			స్థితి_2 = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
-					     || *rex.input == rst->nextb_ic)
+		    ఒకవేళ (rst->nextb == NUL || *rex.ఆదానం == rst->nextb
+					     || *rex.ఆదానం == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
-			scan = regnext(rp->rs_scan);
-			status = RA_CONT;
-			break;
+			పరిశీలన = regnext(rp->rs_పరిశీలన);
+			స్థితి_2 = RA_CONT;
+			ఆపు;
 		    }
 		}
-		if (status != RA_CONT)
+		ఒకవేళ (స్థితి_2 != RA_CONT)
 		{
 		    // Failed.
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    status = RA_NOMATCH;
+		    regstack_తీయి(&పరిశీలన);
+		    regstack.ga_len -= పరిమాణం(regstar_T);
+		    స్థితి_2 = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ఆపు;
 	}
 
 	// If we want to continue the inner loop or didn't pop a state
 	// continue matching loop
-	if (status == RA_CONT || rp == (regitem_T *)
-			     ((char *)regstack.ga_data + regstack.ga_len) - 1)
-	    break;
+	ఒకవేళ (స్థితి_2 == RA_CONT || rp == (regitem_T *)
+			     ((అక్షరం *)regstack.ga_దత్తాంశం + regstack.ga_len) - 1)
+	    ఆపు;
 
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#నిర్వచితమైతే FEAT_RELTIME
+	ఒకవేళ (bt_did_సమయం_బహిర్గతం(timed_బహిర్గతం))
 	{
-	    status = RA_FAIL;
-	    break;
+	    స్థితి_2 = RA_FAIL;
+	    ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
 
     // May need to continue with the inner loop, starting at "scan".
-    if (status == RA_CONT)
-	continue;
+    ఒకవేళ (స్థితి_2 == RA_CONT)
+	కొనసాగు;
 
     // If the regstack is empty or something failed we are done.
-    if (regstack.ga_len == 0 || status == RA_FAIL)
+    ఒకవేళ (regstack.ga_len == 0 || స్థితి_2 == RA_FAIL)
     {
-	if (scan == NULL)
+	ఒకవేళ (పరిశీలన == ఖాళీ)
 	{
 	    // We get here only if there's trouble -- normally "case END" is
 	    // the terminating point.
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Premature EOL\n");
-#endif
+	    iemsg(e_corrupted_regexp_కార్యక్రమం);
+#నిర్వచితమైతే DEBUG
+	    రాయి("Premature EOL\n");
+#అయితే_ముగింపు
 	}
-	return (status == RA_MATCH);
+	తిరిగి (స్థితి_2 == RA_సరిపోలిక);
     }
 
   } // End of loop until the regstack is empty.
@@ -4909,83 +4909,83 @@ regmatch(
  * regtry - try match of "prog" with at rex.line["col"].
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    స్థిర దీర్ఘ
 regtry(
     bt_regprog_T	*prog,
-    colnr_T		col,
-    int			*timed_out)	// flag set on timeout or NULL
+    colnr_T		నిలువు,
+    పూర్ణాంకం			*timed_బహిర్గతం)	// flag set on timeout or NULL
 {
-    rex.input = rex.line + col;
+    rex.ఆదానం = rex.పంక్తి + నిలువు;
     rex.need_clear_subexpr = TRUE;
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    rex.need_clear_zsubexpr = (prog->reghasz == REX_SET);
-#endif
+    rex.need_clear_zsubexpr = (prog->reghasz == REX_సమితి);
+#అయితే_ముగింపు
 
-    if (regmatch(prog->program + 1, timed_out) == 0)
-	return 0;
+    ఒకవేళ (regmatch(prog->కార్యక్రమం + 1, timed_బహిర్గతం) == 0)
+	తిరిగి 0;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	if (rex.reg_startpos[0].lnum < 0)
+	ఒకవేళ (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
-	    rex.reg_startpos[0].col = col;
+	    rex.reg_startpos[0].నిలువు = నిలువు;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	ఒకవేళ (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].నిలువు = (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
 	}
-	else
+	లేకపోతే
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    లేకపోతే
     {
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	ఒకవేళ (rex.reg_startp[0] == ఖాళీ)
+	    rex.reg_startp[0] = rex.పంక్తి + నిలువు;
+	ఒకవేళ (rex.reg_endp[0] == ఖాళీ)
+	    rex.reg_endp[0] = rex.ఆదానం;
     }
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
-    unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    unref_extmatch(re_extmatch_బహిర్గతం);
+    re_extmatch_బహిర్గతం = ఖాళీ;
 
-    if (prog->reghasz == REX_SET)
+    ఒకవేళ (prog->reghasz == REX_సమితి)
     {
-	int		i;
+	పూర్ణాంకం		i;
 
 	cleanup_zsubexpr();
-	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
-	for (i = 0; i < NSUBEXP; i++)
+	re_extmatch_బహిర్గతం = make_extmatch();
+	ఒకవేళ (re_extmatch_బహిర్గతం == ఖాళీ)
+	    తిరిగి 0;
+	కొరకు (i = 0; i < NSUBEXP; i++)
 	{
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 	    {
 		// Only accept single line matches.
-		if (reg_startzpos[i].lnum >= 0
+		ఒకవేళ (reg_startzpos[i].lnum >= 0
 			&& reg_endzpos[i].lnum == reg_startzpos[i].lnum
-			&& reg_endzpos[i].col >= reg_startzpos[i].col)
-		    re_extmatch_out->matches[i] =
+			&& reg_endzpos[i].నిలువు >= reg_startzpos[i].నిలువు)
+		    re_extmatch_బహిర్గతం->matches[i] =
 			vim_strnsave(reg_getline(reg_startzpos[i].lnum)
-						       + reg_startzpos[i].col,
-				   reg_endzpos[i].col - reg_startzpos[i].col);
+						       + reg_startzpos[i].నిలువు,
+				   reg_endzpos[i].నిలువు - reg_startzpos[i].నిలువు);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
-		    re_extmatch_out->matches[i] =
+		ఒకవేళ (reg_startzp[i] != ఖాళీ && reg_endzp[i] != ఖాళీ)
+		    re_extmatch_బహిర్గతం->matches[i] =
 			    vim_strnsave(reg_startzp[i],
 						reg_endzp[i] - reg_startzp[i]);
 	    }
 	}
     }
-#endif
-    return 1 + rex.lnum;
+#అయితే_ముగింపు
+    తిరిగి 1 + rex.lnum;
 }
 
 /*
@@ -4993,230 +4993,230 @@ regtry(
  * lines (if "line" is NULL, use reg_getline()).
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    స్థిర దీర్ఘ
 bt_regexec_both(
-    char_u	*line,
+    char_u	*పంక్తి,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    పూర్ణాంకం		*timed_బహిర్గతం)	// flag set on timeout or NULL
 {
     bt_regprog_T    *prog;
     char_u	    *s;
-    colnr_T	    col = startcol;
-    long	    retval = 0L;
+    colnr_T	    నిలువు = startcol;
+    దీర్ఘ	    retval = 0L;
 
     // Create "regstack" and "backpos" if they are not allocated yet.
     // We allocate *_INITIAL amount of bytes first and then set the grow size
     // to much bigger value to avoid many malloc calls in case of deep regular
     // expressions.
-    if (regstack.ga_data == NULL)
+    ఒకవేళ (regstack.ga_దత్తాంశం == ఖాళీ)
     {
 	// Use an item size of 1 byte, since we push different things
 	// onto the regstack.
 	ga_init2(&regstack, 1, REGSTACK_INITIAL);
-	(void)ga_grow(&regstack, REGSTACK_INITIAL);
+	(శూన్య)ga_grow(&regstack, REGSTACK_INITIAL);
 	regstack.ga_growsize = REGSTACK_INITIAL * 8;
     }
 
-    if (backpos.ga_data == NULL)
+    ఒకవేళ (backpos.ga_దత్తాంశం == ఖాళీ)
     {
-	ga_init2(&backpos, sizeof(backpos_T), BACKPOS_INITIAL);
-	(void)ga_grow(&backpos, BACKPOS_INITIAL);
+	ga_init2(&backpos, పరిమాణం(backpos_T), BACKPOS_INITIAL);
+	(శూన్య)ga_grow(&backpos, BACKPOS_INITIAL);
 	backpos.ga_growsize = BACKPOS_INITIAL * 8;
     }
 
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);
+	పంక్తి = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    లేకపోతే
     {
-	prog = (bt_regprog_T *)rex.reg_match->regprog;
-	rex.reg_startp = rex.reg_match->startp;
-	rex.reg_endp = rex.reg_match->endp;
+	prog = (bt_regprog_T *)rex.reg_సరిపోలిక->regprog;
+	rex.reg_startp = rex.reg_సరిపోలిక->startp;
+	rex.reg_endp = rex.reg_సరిపోలిక->endp;
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    ఒకవేళ (prog == ఖాళీ || పంక్తి == ఖాళీ)
     {
-	iemsg(e_null_argument);
-	goto theend;
+	iemsg(e_null_వాదం);
+	వెళ్ళు theend;
     }
 
     // Check validity of program.
-    if (prog_magic_wrong())
-	goto theend;
+    ఒకవేళ (prog_magic_wrong())
+	వెళ్ళు theend;
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    ఒకవేళ (rex.reg_maxcol > 0 && నిలువు >= rex.reg_maxcol)
+	వెళ్ళు theend;
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    ఒకవేళ (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    లేకపోతే ఒకవేళ (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    ఒకవేళ (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     // If there is a "must appear" string, look for it.
-    if (prog->regmust != NULL)
+    ఒకవేళ (prog->regmust != ఖాళీ)
     {
-	int c;
+	పూర్ణాంకం c;
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    c = (*mb_ptr2char)(prog->regmust);
-	else
+	లేకపోతే
 	    c = *prog->regmust;
-	s = line + col;
+	s = పంక్తి + నిలువు;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
-	if (!rex.reg_ic && !has_mbyte)
-	    while ((s = vim_strbyte(s, c)) != NULL)
+	ఒకవేళ (!rex.reg_ic && !has_mbyte)
+	    అయితే ((s = vim_strbyte(s, c)) != ఖాళీ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		పూర్ణాంకం len = prog->regmlen;
+		ఒకవేళ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ఆపు;		// Found it.
 		++s;
 	    }
-	else if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	    while ((s = vim_strchr(s, c)) != NULL)
+	లేకపోతే ఒకవేళ (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	    అయితే ((s = vim_strchr(s, c)) != ఖాళీ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		పూర్ణాంకం len = prog->regmlen;
+		ఒకవేళ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ఆపు;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	else
-	    while ((s = cstrchr(s, c)) != NULL)
+	లేకపోతే
+	    అయితే ((s = cstrchr(s, c)) != ఖాళీ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		పూర్ణాంకం len = prog->regmlen;
+		ఒకవేళ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ఆపు;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	if (s == NULL)		// Not present.
-	    goto theend;
+	ఒకవేళ (s == ఖాళీ)		// Not present.
+	    వెళ్ళు theend;
     }
 
-    rex.line = line;
+    rex.పంక్తి = పంక్తి;
     rex.lnum = 0;
     reg_toolong = FALSE;
 
     // Simplest case: Anchored match need be tried only once.
-    if (prog->reganch)
+    ఒకవేళ (prog->reganch)
     {
-	int	c;
+	పూర్ణాంకం	c;
 
-	if (has_mbyte)
-	    c = (*mb_ptr2char)(rex.line + col);
-	else
-	    c = rex.line[col];
-	if (prog->regstart == NUL
+	ఒకవేళ (has_mbyte)
+	    c = (*mb_ptr2char)(rex.పంక్తి + నిలువు);
+	లేకపోతే
+	    c = rex.పంక్తి[నిలువు];
+	ఒకవేళ (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
 		    && (((enc_utf8 && utf_fold(prog->regstart) == utf_fold(c)))
 			|| (c < 255 && prog->regstart < 255 &&
 			    MB_TOLOWER(prog->regstart) == MB_TOLOWER(c)))))
-	    retval = regtry(prog, col, timed_out);
-	else
+	    retval = regtry(prog, నిలువు, timed_బహిర్గతం);
+	లేకపోతే
 	    retval = 0;
     }
-    else
+    లేకపోతే
     {
 	// Messy cases:  unanchored match.
-	while (!got_int)
+	అయితే (!got_int)
 	{
-	    if (prog->regstart != NUL)
+	    ఒకవేళ (prog->regstart != NUL)
 	    {
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
-		if (!rex.reg_ic && !has_mbyte)
-		    s = vim_strbyte(rex.line + col, prog->regstart);
-		else
-		    s = cstrchr(rex.line + col, prog->regstart);
-		if (s == NULL)
+		ఒకవేళ (!rex.reg_ic && !has_mbyte)
+		    s = vim_strbyte(rex.పంక్తి + నిలువు, prog->regstart);
+		లేకపోతే
+		    s = cstrchr(rex.పంక్తి + నిలువు, prog->regstart);
+		ఒకవేళ (s == ఖాళీ)
 		{
 		    retval = 0;
-		    break;
+		    ఆపు;
 		}
-		col = (int)(s - rex.line);
+		నిలువు = (పూర్ణాంకం)(s - rex.పంక్తి);
 	    }
 
 	    // Check for maximum column to try.
-	    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	    ఒకవేళ (rex.reg_maxcol > 0 && నిలువు >= rex.reg_maxcol)
 	    {
 		retval = 0;
-		break;
+		ఆపు;
 	    }
 
-	    retval = regtry(prog, col, timed_out);
-	    if (retval > 0)
-		break;
+	    retval = regtry(prog, నిలువు, timed_బహిర్గతం);
+	    ఒకవేళ (retval > 0)
+		ఆపు;
 
 	    // if not currently on the first line, get it again
-	    if (rex.lnum != 0)
+	    ఒకవేళ (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
-		rex.line = reg_getline((linenr_T)0);
+		rex.పంక్తి = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
-		break;
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(rex.line + col);
-	    else
-		++col;
-#ifdef FEAT_RELTIME
-	    if (bt_did_time_out(timed_out))
-		break;
-#endif
+	    ఒకవేళ (rex.పంక్తి[నిలువు] == NUL)
+		ఆపు;
+	    ఒకవేళ (has_mbyte)
+		నిలువు += (*mb_ptr2len)(rex.పంక్తి + నిలువు);
+	    లేకపోతే
+		++నిలువు;
+#నిర్వచితమైతే FEAT_RELTIME
+	    ఒకవేళ (bt_did_సమయం_బహిర్గతం(timed_బహిర్గతం))
+		ఆపు;
+#అయితే_ముగింపు
 	}
     }
 
 theend:
     // Free "reg_tofree" when it's a bit big.
     // Free regstack and backpos if they are bigger than their initial size.
-    if (reg_tofreelen > 400)
+    ఒకవేళ (reg_tofreelen > 400)
 	VIM_CLEAR(reg_tofree);
-    if (regstack.ga_maxlen > REGSTACK_INITIAL)
+    ఒకవేళ (regstack.ga_maxlen > REGSTACK_INITIAL)
 	ga_clear(&regstack);
-    if (backpos.ga_maxlen > BACKPOS_INITIAL)
+    ఒకవేళ (backpos.ga_maxlen > BACKPOS_INITIAL)
 	ga_clear(&backpos);
 
-    if (retval > 0)
+    ఒకవేళ (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs
 	// and \ze are used.
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    lpos_T *start = &rex.reg_mmatch->startpos[0];
-	    lpos_T *end = &rex.reg_mmatch->endpos[0];
+	    lpos_T *ప్రారంభం = &rex.reg_mmatch->startpos[0];
+	    lpos_T *చివర = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
-			|| (end->lnum == start->lnum && end->col < start->col))
+	    ఒకవేళ (చివర->lnum < ప్రారంభం->lnum
+			|| (చివర->lnum == ప్రారంభం->lnum && చివర->నిలువు < ప్రారంభం->నిలువు))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_mmatch->rmm_matchcol = col;
+	    rex.reg_mmatch->rmm_matchcol = నిలువు;
 	}
-	else
+	లేకపోతే
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
-		rex.reg_match->endp[0] = rex.reg_match->startp[0];
+	    ఒకవేళ (rex.reg_సరిపోలిక->endp[0] < rex.reg_సరిపోలిక->startp[0])
+		rex.reg_సరిపోలిక->endp[0] = rex.reg_సరిపోలిక->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_match->rm_matchcol = col;
+	    rex.reg_సరిపోలిక->rm_matchcol = నిలువు;
 	}
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -5227,24 +5227,24 @@ theend:
  *
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 bt_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
-    colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    char_u	*పంక్తి,	// string to match against
+    colnr_T	నిలువు,	// column to start looking for match
+    పూర్ణాంకం		పంక్తి_lbr)
 {
-    rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_సరిపోలిక = rmp;
+    rex.reg_mmatch = ఖాళీ;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_పంక్తి_lbr = పంక్తి_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = ఖాళీ;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    తిరిగి bt_regexec_both(పంక్తి, నిలువు, ఖాళీ);
 }
 
 /*
@@ -5255,102 +5255,102 @@ bt_regexec_nl(
  * Return zero if there is no match.  Return number of lines contained in the
  * match otherwise.
  */
-    static long
+    స్థిర దీర్ఘ
 bt_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
-    colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    colnr_T	నిలువు,		// column to start looking for match
+    పూర్ణాంకం		*timed_బహిర్గతం)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return bt_regexec_both(NULL, col, timed_out);
+    తిరిగి bt_regexec_both(ఖాళీ, నిలువు, timed_బహిర్గతం);
 }
 
 /*
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
-    static int
-re_num_cmp(long_u val, char_u *scan)
+    స్థిర పూర్ణాంకం
+re_అంకె_cmp(long_u val, char_u *పరిశీలన)
 {
-    long_u  n = OPERAND_MIN(scan);
+    long_u  n = నిర్వాహ్యం_MIN(పరిశీలన);
 
-    if (OPERAND_CMP(scan) == '>')
-	return val > n;
-    if (OPERAND_CMP(scan) == '<')
-	return val < n;
-    return val == n;
+    ఒకవేళ (నిర్వాహ్యం_CMP(పరిశీలన) == '>')
+	తిరిగి val > n;
+    ఒకవేళ (నిర్వాహ్యం_CMP(పరిశీలన) == '<')
+	తిరిగి val < n;
+    తిరిగి val == n;
 }
 
-#ifdef BT_REGEXP_DUMP
+#నిర్వచితమైతే BT_REGEXP_DUMP
 
 /*
  * regdump - dump a regexp onto stdout in vaguely comprehensible form
  */
-    static void
-regdump(char_u *pattern, bt_regprog_T *r)
+    స్థిర శూన్య
+regdump(char_u *నమూనా, bt_regprog_T *r)
 {
     char_u  *s;
-    int	    op = EXACTLY;	// Arbitrary non-END op.
-    char_u  *next;
-    char_u  *end = NULL;
+    పూర్ణాంకం	    op = EXACTLY;	// Arbitrary non-END op.
+    char_u  *తదుపరి;
+    char_u  *చివర = ఖాళీ;
     FILE    *f;
 
 # ifdef BT_REGEXP_LOG
     f = fopen("bt_regexp_log.log", "a");
-# else
+# లేకపోతే
     f = stdout;
 # endif
-    if (f == NULL)
-	return;
-    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", pattern);
+    ఒకవేళ (f == ఖాళీ)
+	తిరిగి;
+    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", నమూనా);
 
-    s = r->program + 1;
+    s = r->కార్యక్రమం + 1;
     // Loop until we find the END that isn't before a referred next (an END
     // can also appear in a NOMATCH operand).
-    while ((op != END || s <= end) && s < r->program + r->regsz)
+    అయితే ((op != చివర_3 || s <= చివర) && s < r->కార్యక్రమం + r->regsz)
     {
 	op = OP(s);
-	fprintf(f, "%2d%s", (int)(s - r->program), regprop(s)); // Where, what.
-	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : NULL;
-	if (next == NULL)	// Next ptr.
+	fprintf(f, "%2d%s", (పూర్ణాంకం)(s - r->కార్యక్రమం), regprop(s)); // Where, what.
+	తదుపరి = (s + 3 <= r->కార్యక్రమం + r->regsz) ? regnext(s) : ఖాళీ;
+	ఒకవేళ (తదుపరి == ఖాళీ)	// Next ptr.
 	    fprintf(f, "(0)");
-	else
-	    fprintf(f, "(%d)", (int)((s - r->program) + (next - s)));
-	if (end < next)
-	    end = next;
-	if (op == BRACE_LIMITS)
+	లేకపోతే
+	    fprintf(f, "(%d)", (పూర్ణాంకం)((s - r->కార్యక్రమం) + (తదుపరి - s)));
+	ఒకవేళ (చివర < తదుపరి)
+	    చివర = తదుపరి;
+	ఒకవేళ (op == BRACE_LIMITS)
 	{
 	    // Two ints
-	    fprintf(f, " minval %ld, maxval %ld", OPERAND_MIN(s), OPERAND_MAX(s));
+	    fprintf(f, " minval %ld, maxval %ld", నిర్వాహ్యం_MIN(s), నిర్వాహ్యం_MAX(s));
 	    s += 8;
 	}
-	else if (op == BEHIND || op == NOBEHIND)
+	లేకపోతే ఒకవేళ (op == BEHIND || op == NOBEHIND)
 	{
 	    // one int
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", నిర్వాహ్యం_MIN(s));
 	    s += 4;
 	}
-	else if (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
+	లేకపోతే ఒకవేళ (op == RE_LNUM || op == RE_నిలువు || op == RE_VCOL)
 	{
 	    // one int plus comparator
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", నిర్వాహ్యం_MIN(s));
 	    s += 5;
 	}
 	s += 3;
-	if (op == MULTIBYTECODE)
+	ఒకవేళ (op == MULTIBYTECODE)
 	{
 	    fprintf(f, " mbc=%d", utf_ptr2char(s));
 	    s += utfc_ptr2len(s);
 	}
-	if (op == ANYOF || op == ANYOF + ADD_NL
-		|| op == ANYBUT || op == ANYBUT + ADD_NL
+	ఒకవేళ (op == ANYOF || op == ANYOF + కూడు_NL
+		|| op == ANYBUT || op == ANYBUT + కూడు_NL
 		|| op == EXACTLY)
 	{
 	    // Literal string, where present.
 	    fprintf(f, "\nxxxxxxxxx\n");
-	    while (*s != NUL && s < r->program + r->regsz)
+	    అయితే (*s != NUL && s < r->కార్యక్రమం + r->regsz)
 	    {
 		fprintf(f, "%c", *s);
 		s += utfc_ptr2len(s);  // advance by full char including combining
@@ -5362,13 +5362,13 @@ regdump(char_u *pattern, bt_regprog_T *r)
     }
 
     // Header fields of interest.
-    if (r->regstart != NUL)
+    ఒకవేళ (r->regstart != NUL)
 	fprintf(f, "start `%s' 0x%x; ", r->regstart < 256
-		? (char *)transchar(r->regstart)
+		? (అక్షరం *)transchar(r->regstart)
 		: "multibyte", r->regstart);
-    if (r->reganch)
+    ఒకవేళ (r->reganch)
 	fprintf(f, "anchored; ");
-    if (r->regmust != NULL)
+    ఒకవేళ (r->regmust != ఖాళీ)
 	fprintf(f, "must have \"%s\"", r->regmust);
     fprintf(f, "\r\n");
 
@@ -5376,388 +5376,388 @@ regdump(char_u *pattern, bt_regprog_T *r)
     fclose(f);
 # endif
 }
-#endif	    // BT_REGEXP_DUMP
+#అయితే_ముగింపు	    // BT_REGEXP_DUMP
 
-#ifdef DEBUG
+#నిర్వచితమైతే DEBUG
 /*
  * regprop - printable representation of opcode
  */
-    static char_u *
+    స్థిర char_u *
 regprop(char_u *op)
 {
-    char	    *p;
-    static char	    buf[50];
-    static size_t   buflen = 0;
+    అక్షరం	    *p;
+    స్థిర అక్షరం	    buf[50];
+    స్థిర size_t   buflen = 0;
 
     STRCPY(buf, ":");
     buflen = 1;
 
-    switch ((int) OP(op))
+    ఎంపిక ((పూర్ణాంకం) OP(op))
     {
-      case BOL:
+      స్థితి BOL:
 	p = "BOL";
-	break;
-      case EOL:
+	ఆపు;
+      స్థితి EOL:
 	p = "EOL";
-	break;
-      case RE_BOF:
+	ఆపు;
+      స్థితి RE_BOF:
 	p = "BOF";
-	break;
-      case RE_EOF:
+	ఆపు;
+      స్థితి RE_EOF:
 	p = "EOF";
-	break;
-      case CURSOR:
+	ఆపు;
+      స్థితి CURSOR:
 	p = "CURSOR";
-	break;
-      case RE_VISUAL:
+	ఆపు;
+      స్థితి RE_VISUAL:
 	p = "RE_VISUAL";
-	break;
-      case RE_LNUM:
+	ఆపు;
+      స్థితి RE_LNUM:
 	p = "RE_LNUM";
-	break;
-      case RE_MARK:
+	ఆపు;
+      స్థితి RE_MARK:
 	p = "RE_MARK";
-	break;
-      case RE_COL:
+	ఆపు;
+      స్థితి RE_నిలువు:
 	p = "RE_COL";
-	break;
-      case RE_VCOL:
+	ఆపు;
+      స్థితి RE_VCOL:
 	p = "RE_VCOL";
-	break;
-      case BOW:
+	ఆపు;
+      స్థితి BOW:
 	p = "BOW";
-	break;
-      case EOW:
+	ఆపు;
+      స్థితి EOW:
 	p = "EOW";
-	break;
-      case ANY:
+	ఆపు;
+      స్థితి ANY:
 	p = "ANY";
-	break;
-      case ANY + ADD_NL:
+	ఆపు;
+      స్థితి ANY + కూడు_NL:
 	p = "ANY+NL";
-	break;
-      case ANYOF:
+	ఆపు;
+      స్థితి ANYOF:
 	p = "ANYOF";
-	break;
-      case ANYOF + ADD_NL:
+	ఆపు;
+      స్థితి ANYOF + కూడు_NL:
 	p = "ANYOF+NL";
-	break;
-      case ANYBUT:
+	ఆపు;
+      స్థితి ANYBUT:
 	p = "ANYBUT";
-	break;
-      case ANYBUT + ADD_NL:
+	ఆపు;
+      స్థితి ANYBUT + కూడు_NL:
 	p = "ANYBUT+NL";
-	break;
-      case IDENT:
+	ఆపు;
+      స్థితి IDENT:
 	p = "IDENT";
-	break;
-      case IDENT + ADD_NL:
+	ఆపు;
+      స్థితి IDENT + కూడు_NL:
 	p = "IDENT+NL";
-	break;
-      case SIDENT:
+	ఆపు;
+      స్థితి SIDENT:
 	p = "SIDENT";
-	break;
-      case SIDENT + ADD_NL:
+	ఆపు;
+      స్థితి SIDENT + కూడు_NL:
 	p = "SIDENT+NL";
-	break;
-      case KWORD:
+	ఆపు;
+      స్థితి KWORD:
 	p = "KWORD";
-	break;
-      case KWORD + ADD_NL:
+	ఆపు;
+      స్థితి KWORD + కూడు_NL:
 	p = "KWORD+NL";
-	break;
-      case SKWORD:
+	ఆపు;
+      స్థితి SKWORD:
 	p = "SKWORD";
-	break;
-      case SKWORD + ADD_NL:
+	ఆపు;
+      స్థితి SKWORD + కూడు_NL:
 	p = "SKWORD+NL";
-	break;
-      case FNAME:
+	ఆపు;
+      స్థితి FNAME:
 	p = "FNAME";
-	break;
-      case FNAME + ADD_NL:
+	ఆపు;
+      స్థితి FNAME + కూడు_NL:
 	p = "FNAME+NL";
-	break;
-      case SFNAME:
+	ఆపు;
+      స్థితి SFNAME:
 	p = "SFNAME";
-	break;
-      case SFNAME + ADD_NL:
+	ఆపు;
+      స్థితి SFNAME + కూడు_NL:
 	p = "SFNAME+NL";
-	break;
-      case PRINT:
+	ఆపు;
+      స్థితి PRINT:
 	p = "PRINT";
-	break;
-      case PRINT + ADD_NL:
+	ఆపు;
+      స్థితి PRINT + కూడు_NL:
 	p = "PRINT+NL";
-	break;
-      case SPRINT:
+	ఆపు;
+      స్థితి SPRINT:
 	p = "SPRINT";
-	break;
-      case SPRINT + ADD_NL:
+	ఆపు;
+      స్థితి SPRINT + కూడు_NL:
 	p = "SPRINT+NL";
-	break;
-      case WHITE:
+	ఆపు;
+      స్థితి WHITE:
 	p = "WHITE";
-	break;
-      case WHITE + ADD_NL:
+	ఆపు;
+      స్థితి WHITE + కూడు_NL:
 	p = "WHITE+NL";
-	break;
-      case NWHITE:
+	ఆపు;
+      స్థితి NWHITE:
 	p = "NWHITE";
-	break;
-      case NWHITE + ADD_NL:
+	ఆపు;
+      స్థితి NWHITE + కూడు_NL:
 	p = "NWHITE+NL";
-	break;
-      case DIGIT:
+	ఆపు;
+      స్థితి DIGIT:
 	p = "DIGIT";
-	break;
-      case DIGIT + ADD_NL:
+	ఆపు;
+      స్థితి DIGIT + కూడు_NL:
 	p = "DIGIT+NL";
-	break;
-      case NDIGIT:
+	ఆపు;
+      స్థితి NDIGIT:
 	p = "NDIGIT";
-	break;
-      case NDIGIT + ADD_NL:
+	ఆపు;
+      స్థితి NDIGIT + కూడు_NL:
 	p = "NDIGIT+NL";
-	break;
-      case HEX:
+	ఆపు;
+      స్థితి HEX:
 	p = "HEX";
-	break;
-      case HEX + ADD_NL:
+	ఆపు;
+      స్థితి HEX + కూడు_NL:
 	p = "HEX+NL";
-	break;
-      case NHEX:
+	ఆపు;
+      స్థితి NHEX:
 	p = "NHEX";
-	break;
-      case NHEX + ADD_NL:
+	ఆపు;
+      స్థితి NHEX + కూడు_NL:
 	p = "NHEX+NL";
-	break;
-      case OCTAL:
+	ఆపు;
+      స్థితి OCTAL:
 	p = "OCTAL";
-	break;
-      case OCTAL + ADD_NL:
+	ఆపు;
+      స్థితి OCTAL + కూడు_NL:
 	p = "OCTAL+NL";
-	break;
-      case NOCTAL:
+	ఆపు;
+      స్థితి NOCTAL:
 	p = "NOCTAL";
-	break;
-      case NOCTAL + ADD_NL:
+	ఆపు;
+      స్థితి NOCTAL + కూడు_NL:
 	p = "NOCTAL+NL";
-	break;
-      case WORD:
+	ఆపు;
+      స్థితి మాట_2:
 	p = "WORD";
-	break;
-      case WORD + ADD_NL:
+	ఆపు;
+      స్థితి మాట_2 + కూడు_NL:
 	p = "WORD+NL";
-	break;
-      case NWORD:
+	ఆపు;
+      స్థితి NWORD:
 	p = "NWORD";
-	break;
-      case NWORD + ADD_NL:
+	ఆపు;
+      స్థితి NWORD + కూడు_NL:
 	p = "NWORD+NL";
-	break;
-      case HEAD:
+	ఆపు;
+      స్థితి తల_2:
 	p = "HEAD";
-	break;
-      case HEAD + ADD_NL:
+	ఆపు;
+      స్థితి తల_2 + కూడు_NL:
 	p = "HEAD+NL";
-	break;
-      case NHEAD:
+	ఆపు;
+      స్థితి NHEAD:
 	p = "NHEAD";
-	break;
-      case NHEAD + ADD_NL:
+	ఆపు;
+      స్థితి NHEAD + కూడు_NL:
 	p = "NHEAD+NL";
-	break;
-      case ALPHA:
+	ఆపు;
+      స్థితి ALPHA:
 	p = "ALPHA";
-	break;
-      case ALPHA + ADD_NL:
+	ఆపు;
+      స్థితి ALPHA + కూడు_NL:
 	p = "ALPHA+NL";
-	break;
-      case NALPHA:
+	ఆపు;
+      స్థితి NALPHA:
 	p = "NALPHA";
-	break;
-      case NALPHA + ADD_NL:
+	ఆపు;
+      స్థితి NALPHA + కూడు_NL:
 	p = "NALPHA+NL";
-	break;
-      case LOWER:
+	ఆపు;
+      స్థితి క్రింది_2:
 	p = "LOWER";
-	break;
-      case LOWER + ADD_NL:
+	ఆపు;
+      స్థితి క్రింది_2 + కూడు_NL:
 	p = "LOWER+NL";
-	break;
-      case NLOWER:
+	ఆపు;
+      స్థితి NLOWER:
 	p = "NLOWER";
-	break;
-      case NLOWER + ADD_NL:
+	ఆపు;
+      స్థితి NLOWER + కూడు_NL:
 	p = "NLOWER+NL";
-	break;
-      case UPPER:
+	ఆపు;
+      స్థితి పై:
 	p = "UPPER";
-	break;
-      case UPPER + ADD_NL:
+	ఆపు;
+      స్థితి పై + కూడు_NL:
 	p = "UPPER+NL";
-	break;
-      case NUPPER:
+	ఆపు;
+      స్థితి NUPPER:
 	p = "NUPPER";
-	break;
-      case NUPPER + ADD_NL:
+	ఆపు;
+      స్థితి NUPPER + కూడు_NL:
 	p = "NUPPER+NL";
-	break;
-      case BRANCH:
+	ఆపు;
+      స్థితి BRANCH:
 	p = "BRANCH";
-	break;
-      case EXACTLY:
+	ఆపు;
+      స్థితి EXACTLY:
 	p = "EXACTLY";
-	break;
-      case NOTHING:
+	ఆపు;
+      స్థితి NOTHING:
 	p = "NOTHING";
-	break;
-      case BACK:
+	ఆపు;
+      స్థితి వెనుక_2:
 	p = "BACK";
-	break;
-      case END:
+	ఆపు;
+      స్థితి చివర_3:
 	p = "END";
-	break;
-      case MOPEN + 0:
+	ఆపు;
+      స్థితి MOPEN + 0:
 	p = "MATCH START";
-	break;
-      case MOPEN + 1:
-      case MOPEN + 2:
-      case MOPEN + 3:
-      case MOPEN + 4:
-      case MOPEN + 5:
-      case MOPEN + 6:
-      case MOPEN + 7:
-      case MOPEN + 8:
-      case MOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
-	p = NULL;
-	break;
-      case MCLOSE + 0:
+	ఆపు;
+      స్థితి MOPEN + 1:
+      స్థితి MOPEN + 2:
+      స్థితి MOPEN + 3:
+      స్థితి MOPEN + 4:
+      స్థితి MOPEN + 5:
+      స్థితి MOPEN + 6:
+      స్థితి MOPEN + 7:
+      స్థితి MOPEN + 8:
+      స్థితి MOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి MCLOSE + 0:
 	p = "MATCH END";
-	break;
-      case MCLOSE + 1:
-      case MCLOSE + 2:
-      case MCLOSE + 3:
-      case MCLOSE + 4:
-      case MCLOSE + 5:
-      case MCLOSE + 6:
-      case MCLOSE + 7:
-      case MCLOSE + 8:
-      case MCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
-	p = NULL;
-	break;
-      case BACKREF + 1:
-      case BACKREF + 2:
-      case BACKREF + 3:
-      case BACKREF + 4:
-      case BACKREF + 5:
-      case BACKREF + 6:
-      case BACKREF + 7:
-      case BACKREF + 8:
-      case BACKREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
-	p = NULL;
-	break;
-      case NOPEN:
+	ఆపు;
+      స్థితి MCLOSE + 1:
+      స్థితి MCLOSE + 2:
+      స్థితి MCLOSE + 3:
+      స్థితి MCLOSE + 4:
+      స్థితి MCLOSE + 5:
+      స్థితి MCLOSE + 6:
+      స్థితి MCLOSE + 7:
+      స్థితి MCLOSE + 8:
+      స్థితి MCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి BACKREF + 1:
+      స్థితి BACKREF + 2:
+      స్థితి BACKREF + 3:
+      స్థితి BACKREF + 4:
+      స్థితి BACKREF + 5:
+      స్థితి BACKREF + 6:
+      స్థితి BACKREF + 7:
+      స్థితి BACKREF + 8:
+      స్థితి BACKREF + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి NOPEN:
 	p = "NOPEN";
-	break;
-      case NCLOSE:
+	ఆపు;
+      స్థితి NCLOSE:
 	p = "NCLOSE";
-	break;
+	ఆపు;
 # ifdef FEAT_SYN_HL
-      case ZOPEN + 1:
-      case ZOPEN + 2:
-      case ZOPEN + 3:
-      case ZOPEN + 4:
-      case ZOPEN + 5:
-      case ZOPEN + 6:
-      case ZOPEN + 7:
-      case ZOPEN + 8:
-      case ZOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
-	p = NULL;
-	break;
-      case ZCLOSE + 1:
-      case ZCLOSE + 2:
-      case ZCLOSE + 3:
-      case ZCLOSE + 4:
-      case ZCLOSE + 5:
-      case ZCLOSE + 6:
-      case ZCLOSE + 7:
-      case ZCLOSE + 8:
-      case ZCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
-	p = NULL;
-	break;
-      case ZREF + 1:
-      case ZREF + 2:
-      case ZREF + 3:
-      case ZREF + 4:
-      case ZREF + 5:
-      case ZREF + 6:
-      case ZREF + 7:
-      case ZREF + 8:
-      case ZREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZREF%d", OP(op) - ZREF);
-	p = NULL;
-	break;
+      స్థితి ZOPEN + 1:
+      స్థితి ZOPEN + 2:
+      స్థితి ZOPEN + 3:
+      స్థితి ZOPEN + 4:
+      స్థితి ZOPEN + 5:
+      స్థితి ZOPEN + 6:
+      స్థితి ZOPEN + 7:
+      స్థితి ZOPEN + 8:
+      స్థితి ZOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి ZCLOSE + 1:
+      స్థితి ZCLOSE + 2:
+      స్థితి ZCLOSE + 3:
+      స్థితి ZCLOSE + 4:
+      స్థితి ZCLOSE + 5:
+      స్థితి ZCLOSE + 6:
+      స్థితి ZCLOSE + 7:
+      స్థితి ZCLOSE + 8:
+      స్థితి ZCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి ZREF + 1:
+      స్థితి ZREF + 2:
+      స్థితి ZREF + 3:
+      స్థితి ZREF + 4:
+      స్థితి ZREF + 5:
+      స్థితి ZREF + 6:
+      స్థితి ZREF + 7:
+      స్థితి ZREF + 8:
+      స్థితి ZREF + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "ZREF%d", OP(op) - ZREF);
+	p = ఖాళీ;
+	ఆపు;
 # endif
-      case STAR:
+      స్థితి నక్షత్రం:
 	p = "STAR";
-	break;
-      case PLUS:
+	ఆపు;
+      స్థితి PLUS:
 	p = "PLUS";
-	break;
-      case NOMATCH:
+	ఆపు;
+      స్థితి NOMATCH:
 	p = "NOMATCH";
-	break;
-      case MATCH:
+	ఆపు;
+      స్థితి సరిపోలిక_2:
 	p = "MATCH";
-	break;
-      case BEHIND:
+	ఆపు;
+      స్థితి BEHIND:
 	p = "BEHIND";
-	break;
-      case NOBEHIND:
+	ఆపు;
+      స్థితి NOBEHIND:
 	p = "NOBEHIND";
-	break;
-      case SUBPAT:
+	ఆపు;
+      స్థితి SUBPAT:
 	p = "SUBPAT";
-	break;
-      case BRACE_LIMITS:
+	ఆపు;
+      స్థితి BRACE_LIMITS:
 	p = "BRACE_LIMITS";
-	break;
-      case BRACE_SIMPLE:
+	ఆపు;
+      స్థితి BRACE_SIMPLE:
 	p = "BRACE_SIMPLE";
-	break;
-      case BRACE_COMPLEX + 0:
-      case BRACE_COMPLEX + 1:
-      case BRACE_COMPLEX + 2:
-      case BRACE_COMPLEX + 3:
-      case BRACE_COMPLEX + 4:
-      case BRACE_COMPLEX + 5:
-      case BRACE_COMPLEX + 6:
-      case BRACE_COMPLEX + 7:
-      case BRACE_COMPLEX + 8:
-      case BRACE_COMPLEX + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
-	p = NULL;
-	break;
-      case MULTIBYTECODE:
+	ఆపు;
+      స్థితి BRACE_COMPLEX + 0:
+      స్థితి BRACE_COMPLEX + 1:
+      స్థితి BRACE_COMPLEX + 2:
+      స్థితి BRACE_COMPLEX + 3:
+      స్థితి BRACE_COMPLEX + 4:
+      స్థితి BRACE_COMPLEX + 5:
+      స్థితి BRACE_COMPLEX + 6:
+      స్థితి BRACE_COMPLEX + 7:
+      స్థితి BRACE_COMPLEX + 8:
+      స్థితి BRACE_COMPLEX + 9:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
+	p = ఖాళీ;
+	ఆపు;
+      స్థితి MULTIBYTECODE:
 	p = "MULTIBYTECODE";
-	break;
-      case NEWL:
+	ఆపు;
+      స్థితి NEWL:
 	p = "NEWL";
-	break;
-      default:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "corrupt %d", OP(op));
-	p = NULL;
-	break;
+	ఆపు;
+      అప్రమేయ:
+	buflen += vim_snprintf(buf + buflen, పరిమాణం(buf) - buflen, "corrupt %d", OP(op));
+	p = ఖాళీ;
+	ఆపు;
     }
-    if (p != NULL)
-	vim_strncpy((char_u *)buf + buflen, (char_u *)p, sizeof(buf) - buflen - 1);
-    return (char_u *)buf;
+    ఒకవేళ (p != ఖాళీ)
+	vim_strncpy((char_u *)buf + buflen, (char_u *)p, పరిమాణం(buf) - buflen - 1);
+    తిరిగి (char_u *)buf;
 }
-#endif	    // DEBUG
+#అయితే_ముగింపు	    // DEBUG

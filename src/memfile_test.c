@@ -12,122 +12,122 @@
  * Mostly by Ivan Krasilnikov.
  */
 
-#undef NDEBUG
-#include <assert.h>
+#నిర్వచనం_రద్దు NDEBUG
+#అన్తర్భావ <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#నిర్వచించు NO_VIM_MAIN
+#అన్తర్భావ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#అన్తర్భావ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#నిర్వచించు సూచీ_గమ్యం_కీలకం(i) ((i) ^ 15167)
+#నిర్వచించు TEST_లెక్క 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    స్థిర శూన్య
+test_mf_hash(శూన్య)
 {
     mf_hashtab_T   ht;
-    mf_hashitem_T  *item;
-    blocknr_T      key;
+    mf_hashitem_T  *అంశం;
+    blocknr_T      కీలకం;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   అంకె_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    కొరకు (i = 0; i < TEST_లెక్క; i++)
     {
-	assert(ht.mht_count == i);
+	ప్రతిజ్ఞా(ht.mht_లెక్క == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	అంకె_buckets = ht.mht_ముసుగు + 1;
+	ప్రతిజ్ఞా(అంకె_buckets > 0 && (అంకె_buckets & (అంకె_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	ప్రతిజ్ఞా(ht.mht_లెక్క <= (అంకె_buckets << MHT_LOG_ఎక్కించు_గుణకం));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	ఒకవేళ (i < (MHT_INIT_కొలత << MHT_LOG_ఎక్కించు_గుణకం))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    ప్రతిజ్ఞా(అంకె_buckets == MHT_INIT_కొలత);
+	    ప్రతిజ్ఞా(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	లేకపోతే
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    ప్రతిజ్ఞా(అంకె_buckets > MHT_INIT_కొలత);
+	    ప్రతిజ్ఞా(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	కీలకం = సూచీ_గమ్యం_కీలకం(i);
+	ప్రతిజ్ఞా(mf_hash_కనుగొను(&ht, కీలకం) == ఖాళీ);
 
 	// allocate and add new item
-	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
-	mf_hash_add_item(&ht, item);
+	అంశం = LALLOC_CLEAR_ONE(mf_hashitem_T);
+	ప్రతిజ్ఞా(అంశం != ఖాళీ);
+	అంశం->mhi_కీలకం = కీలకం;
+	mf_hash_కూడు_అంశం(&ht, అంశం);
 
-	assert(mf_hash_find(&ht, key) == item);
+	ప్రతిజ్ఞా(mf_hash_కనుగొను(&ht, కీలకం) == అంశం);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	ఒకవేళ (ht.mht_ముసుగు + 1 != అంకె_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    ప్రతిజ్ఞా(ht.mht_ముసుగు + 1 == అంకె_buckets * MHT_GROWTH_గుణకం);
+	    ప్రతిజ్ఞా(i + 1 == (అంకె_buckets << MHT_LOG_ఎక్కించు_గుణకం));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    కొరకు (i = 0; i < TEST_లెక్క; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	కీలకం = సూచీ_గమ్యం_కీలకం(i);
+	అంశం = mf_hash_కనుగొను(&ht, కీలకం);
+	ప్రతిజ్ఞా(అంశం != ఖాళీ);
+	ప్రతిజ్ఞా(అంశం->mhi_కీలకం == కీలకం);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    కొరకు (i = 0; i < TEST_లెక్క; i++)
     {
-	if (i % 100 < 70)
+	ఒకవేళ (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    కీలకం = సూచీ_గమ్యం_కీలకం(i);
+	    అంశం = mf_hash_కనుగొను(&ht, కీలకం);
+	    ప్రతిజ్ఞా(అంశం != ఖాళీ);
+	    ప్రతిజ్ఞా(అంశం->mhi_కీలకం == కీలకం);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_అంశం(&ht, అంశం);
+	    ప్రతిజ్ఞా(mf_hash_కనుగొను(&ht, కీలకం) == ఖాళీ);
 
-	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    mf_hash_కూడు_అంశం(&ht, అంశం);
+	    ప్రతిజ్ఞా(mf_hash_కనుగొను(&ht, కీలకం) == అంశం);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_అంశం(&ht, అంశం);
+	    ప్రతిజ్ఞా(mf_hash_కనుగొను(&ht, కీలకం) == ఖాళీ);
 
-	    vim_free(item);
+	    vim_free(అంశం);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    కొరకు (i = 0; i < TEST_లెక్క; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	కీలకం = సూచీ_గమ్యం_కీలకం(i);
+	అంశం = mf_hash_కనుగొను(&ht, కీలకం);
 
-	if (i % 100 < 70)
+	ఒకవేళ (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    ప్రతిజ్ఞా(అంశం == ఖాళీ);
 	}
-	else
+	లేకపోతే
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ప్రతిజ్ఞా(అంశం != ఖాళీ);
+	    ప్రతిజ్ఞా(అంశం->mhi_కీలకం == కీలకం);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    పూర్ణాంకం
+ప్రధాన(శూన్య)
 {
     test_mf_hash();
-    return 0;
+    తిరిగి 0;
 }

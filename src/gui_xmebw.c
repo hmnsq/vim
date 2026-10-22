@@ -21,36 +21,36 @@
  * Enhanced Motif PushButton widget with move over behavior.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
 
-#include <Xm/XmP.h>
-#include <Xm/DrawP.h>
-#if defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
+#అన్తర్భావ <Xm/XmP.h>
+#అన్తర్భావ <Xm/DrawP.h>
+#ఒకవేళ defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
 	&& defined(HAVE_XM_UNHIGHLIGHTT_H) && defined(HAVE_XM_XPMP_H)
 # include <Xm/TraitP.h>
 # include <Xm/Manager.h>
 # include <Xm/UnhighlightT.h>
 # include <Xm/XpmP.h>
 # define UNHIGHLIGHTT
-#else
+#లేకపోతే
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  లేకపోతే
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
-#include <Xm/ManagerP.h>
-#include <Xm/Display.h>
-#include <Xm/DisplayP.h>
+#అయితే_ముగింపు
+#అన్తర్భావ <Xm/ManagerP.h>
+#అన్తర్భావ <Xm/Display.h>
+#అన్తర్భావ <Xm/DisplayP.h>
 
-#include <X11/Shell.h>
-#include <X11/ShellP.h>
+#అన్తర్భావ <X11/Shell.h>
+#అన్తర్భావ <X11/ShellP.h>
 
-#include "gui_xmebwp.h"
+#అన్తర్భావ "gui_xmebwp.h"
 
 // Provide some missing wrappers, which are missed from the LessTif
 // implementation.  Also missing in Motif 1.2 and earlier.
@@ -58,102 +58,102 @@
 // We neither use XmeGetPixmapData or _XmGetPixmapData, since with LessTif the
 // pixmap will not appear in its caches properly. We cache the interesting
 // values in XmEnhancedButtonPart instead ourself.
-#if defined(LESSTIF_VERSION) || (XmVersion <= 1002)
+#ఒకవేళ defined(LESSTIF_సంస్కరణ) || (Xm_సంస్కరణ <= 1002)
 # ifndef Lab_IsMenupane
-#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (int)XmMENU_POPUP || \
-		    Lab_MenuType(w) == (int)XmMENU_PULLDOWN)
+#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (పూర్ణాంకం)XmMENU_POPUP || \
+		    Lab_MenuType(w) == (పూర్ణాంకం)XmMENU_PULLDOWN)
 # endif
 # define XmeClearBorder	    _XmClearBorder
 # define XmeDrawShadows	    _XmDrawShadows
 # define XmeDrawHighlight(a, b, c, d, e, f, g, h) \
-    _XmDrawHighlight(a, b, c, d, e, f, g, h, LineSolid)
-#endif
+    _XmDrawHighlight(a, b, c, d, e, f, g, h, పంక్తి_Solid)
+#అయితే_ముగింపు
 
 // Older VMS systems do not have xos_r.h and cannot haldle XtProcessLocking
-#if defined(VMS)
-# if defined(HAVE_XOS_R_H)
-#  define XTPROCESS_LOCK XtProcessLock()
+#ఒకవేళ defined(VMS)
+# ఒకవేళ defined(HAVE_XOS_R_H)
+#  define XTPROCESS_తాళం Xt_Process_తాళం()
 #  define XTPROCESS_UNLOCK XtProcessUnlock()
-# else
-#  define XTPROCESS_LOCK
+# లేకపోతే
+#  define XTPROCESS_తాళం
 #  define XTPROCESS_UNLOCK
 # endif
-#else
-# define XTPROCESS_LOCK XtProcessLock()
+#లేకపోతే
+# define XTPROCESS_తాళం Xt_Process_తాళం()
 # define XTPROCESS_UNLOCK XtProcessUnlock()
-#endif
+#అయితే_ముగింపు
 
 /*
  * Motif internals we have to cheat around with.
  */
 
 // Hopefully this will never change...
-#ifndef XmFOCUS_IGNORE
+#నిర్వచితం_కాకపోతే XmFOCUS_IGNORE
 # define XmFOCUS_IGNORE       1<<1
-#endif
+#అయితే_ముగింపు
 
-extern Boolean _XmGetInDragMode(Widget widget);
-extern void _XmPrimitiveEnter(Widget wid,
+బాహ్య Boolean Xm_Get_లోపల_Drag_బహుళకం(Widget widget);
+బాహ్య శూన్య _XmPrimitiveEnter(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmPrimitiveLeave(Widget wid,
+			      String * params, Cardinal * అంకె_params);
+బాహ్య శూన్య _XmPrimitiveLeave(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmSetFocusFlag(Widget w, unsigned int mask, Boolean value);
-extern void _XmCalcLabelDimensions(Widget wid);
+			      String * params, Cardinal * అంకె_params);
+బాహ్య శూన్య Xm_సమితి_Focus_Flag(Widget w, గుర్తులేని పూర్ణాంకం ముసుగు, Boolean విలువ);
+బాహ్య శూన్య _XmCalcLabelDimensions(Widget wid);
 
 /*
  * Declaration of class methods.
  */
-static void Destroy(Widget w);
-static void Initialize(Widget rq, Widget eb, ArgList args, Cardinal *n);
-static Boolean SetValues(Widget current, Widget request, Widget new, ArgList args, Cardinal *n);
-static void Redisplay(Widget, XEvent *, Region);
+స్థిర శూన్య Destroy(Widget w);
+స్థిర శూన్య Initialize(Widget rq, Widget eb, ArgList వాదనలు, Cardinal *n);
+స్థిర Boolean సమితి_విలువలు(Widget current, Widget request, Widget new, ArgList వాదనలు, Cardinal *n);
+స్థిర శూన్య Redisplay(Widget, XEvent *, Region);
 
 /*
  * Declaration of action methods.
  */
-static void Enter(Widget, XEvent *, String *, Cardinal *);
-static void Leave(Widget, XEvent *, String *, Cardinal *);
-static void BorderHighlight(Widget);
-static void BorderUnhighlight(Widget);
+స్థిర శూన్య Enter(Widget, XEvent *, String *, Cardinal *);
+స్థిర శూన్య Leave(Widget, XEvent *, String *, Cardinal *);
+స్థిర శూన్య BorderHighlight(Widget);
+స్థిర శూన్య BorderUnhighlight(Widget);
 
 /*
  * 4 x 4 stipple for desensitized widgets
  */
-#define stipple_width  4
-#define stipple_height 4
-static char stipple_bits[] = { 0x0a, 0x05, 0x0a, 0x05 };
-#define STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
+#నిర్వచించు stipple_వెడల్పు  4
+#నిర్వచించు stipple_ఎత్తు 4
+స్థిర అక్షరం stipple_బిట్లు[] = { 0x0a, 0x05, 0x0a, 0x05 };
+#నిర్వచించు STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
 
 /*
  * Override actions.
  */
-static XtActionsRec actionsList[] =
+స్థిర XtActionsRec actionsList[] =
 {
     {"Enter", Enter},
     {"Leave", Leave},
 };
 
-static XtResource resources[] =
+స్థిర XtResource resources[] =
 {
     {
-	XmNpixmapData, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_data),
-	XmRImmediate, (XtPointer) NULL
+	Xm_Npixmap_దత్తాంశం, XmCPixmap, XmRString, పరిమాణం(String),
+	Xt_స్థానభ్రంశం_యొక్క(XmEnhancedButtonRec, enhancedbutton.pixmap_దత్తాంశం),
+	XmRImmediate, (Xt_సూచిక) ఖాళీ
     }, {
-	XmNpixmapFile, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
-	XmRImmediate, (XtPointer) NULL
+	XmNpixmapFile, XmCPixmap, XmRString, పరిమాణం(String),
+	Xt_స్థానభ్రంశం_యొక్క(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
+	XmRImmediate, (Xt_సూచిక) ఖాళీ
     }, {
-	XmNspacing, XmCSpacing, XmRHorizontalDimension, sizeof(Dimension),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.spacing),
-	XmRImmediate, (XtPointer) 2
+	XmNspacing, XmCSpacing, XmRHorizontalDimension, పరిమాణం(Dimension),
+	Xt_స్థానభ్రంశం_యొక్క(XmEnhancedButtonRec, enhancedbutton.spacing),
+	XmRImmediate, (Xt_సూచిక) 2
     },
     {
-	XmNlabelLocation, XmCLocation, XmRInt, sizeof(int),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.label_location),
-	XtRImmediate, (XtPointer) XmRIGHT
+	XmNlabelLocation, XmCLocation, XmRInt, పరిమాణం(పూర్ణాంకం),
+	Xt_స్థానభ్రంశం_యొక్క(XmEnhancedButtonRec, enhancedbutton.label_location),
+	XtRImmediate, (Xt_సూచిక) Xm_కుడి
     }
 };
 
@@ -161,32 +161,32 @@ static XtResource resources[] =
 // NULL somehow results in getting it set to an invalid pointer.
 XmPrimitiveClassExtRec xmEnhancedButtonPrimClassExtRec =
 {
-    /* next_extension      */ NULL,
+    /* next_extension      */ ఖాళీ,
     /* record_type	   */ NULLQUARK,
-    /* version		   */ XmPrimitiveClassExtVersion,
-    /* record_size	   */ sizeof(XmPrimitiveClassExtRec),
+    /*సంస్కరణ*/ Xm_Primitive_Class_Ext_సంస్కరణ,
+    /* record_size	   */ పరిమాణం(XmPrimitiveClassExtRec),
     /* widget_baseline	   */ XmInheritBaselineProc,
     /* widget_display_rect */ XmInheritDisplayRectProc,
-    /* widget_margins      */ NULL
+    /* widget_margins      */ ఖాళీ
 };
 
 XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 {
     {
 	// core_class fields
-	/* superclass		 */ (WidgetClass) & xmPushButtonClassRec,
+	/* superclass		 */ (WidgetClass) & xm_నెట్టు_Button_Class_Rec,
 	/* class_name		 */ "XmEnhancedButton",
-	/* widget_size		 */ sizeof(XmEnhancedButtonRec),
-	/* class_initialize	 */ NULL,
-	/* class_part_initialize */ NULL,
+	/* widget_size		 */ పరిమాణం(XmEnhancedButtonRec),
+	/* class_initialize	 */ ఖాళీ,
+	/* class_part_initialize */ ఖాళీ,
 	/* class_inited		 */ False,
 	/* initialize		 */ Initialize,
-	/* initialize_hook	 */ NULL,
+	/* initialize_hook	 */ ఖాళీ,
 	/* realize		 */ XtInheritRealize,
 	/* actions		 */ actionsList,
-	/* num_actions		 */ XtNumber(actionsList),
+	/* num_actions		 */ Xt_సంఖ్య(actionsList),
 	/* resources		 */ resources,
-	/* num_resources	 */ XtNumber(resources),
+	/* num_resources	 */ Xt_సంఖ్య(resources),
 	/* xrm_class		 */ NULLQUARK,
 	/* compress_motion	 */ True,
 	/* compress_exposure	 */ XtExposeCompressMaximal,
@@ -195,17 +195,17 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* destroy		 */ Destroy,
 	/* resize		 */ XtInheritResize,
 	/* expose		 */ Redisplay,
-	/* set_values		 */ SetValues,
-	/* set_values_hook	 */ NULL,
-	/* set_values_almost	 */ XtInheritSetValuesAlmost,
-	/* get_values_hook	 */ NULL,
+	/* set_values		 */ సమితి_విలువలు,
+	/* set_values_hook	 */ ఖాళీ,
+	/* set_values_almost	 */ Xt_Inherit_సమితి_విలువలు_Almost,
+	/* get_values_hook	 */ ఖాళీ,
 	/* accept_focus		 */ XtInheritAcceptFocus,
-	/* version		 */ XtVersion,
-	/* callback_private	 */ NULL,
-	/* tm_table		 */ NULL,
-	/* query_geometry	 */ NULL,
+	/* version		 */ Xt_సంస్కరణ,
+	/* callback_private	 */ ఖాళీ,
+	/* tm_table		 */ ఖాళీ,
+	/* query_geometry	 */ ఖాళీ,
 	/* display_accelerator	 */ XtInheritDisplayAccelerator,
-	/* extension		 */ NULL
+	/* extension		 */ ఖాళీ
     },
 
     // primitive_class fields
@@ -214,22 +214,22 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* border_unhighlight	 */ BorderUnhighlight,
 	/* translations		 */ XtInheritTranslations,
 	/* arm and activate	 */ XmInheritArmAndActivate,
-	/* synthetic resources	 */ NULL,
+	/* synthetic resources	 */ ఖాళీ,
 	/* number of syn res	 */ 0,
-	/* extension		 */ (XtPointer)&xmEnhancedButtonPrimClassExtRec,
+	/* extension		 */ (Xt_సూచిక)&xmEnhancedButtonPrimClassExtRec,
     },
 
     // label_class fields
     {
-	/* setOverrideCallback	 */ XmInheritSetOverrideCallback,
+	/* setOverrideCallback	 */ Xm_Inherit_సమితి_Override_Callback,
 	/* menuProcs		 */ XmInheritMenuProc,
 	/* translations		 */ XtInheritTranslations,
-	/* extension		 */ NULL,
+	/* extension		 */ ఖాళీ,
     },
 
     // pushbutton_class record
     {
-	/* extension		 */ (XtPointer) NULL,
+	/* extension		 */ (Xt_సూచిక) ఖాళీ,
     },
 
     // enhancedbutton_class fields
@@ -246,37 +246,37 @@ WidgetClass xmEnhancedButtonWidgetClass =
 /*
  * Create a slightly fainter pixmap to be shown on button entry.
  */
-    static unsigned short
-bump_color(unsigned short value)
+    స్థిర గుర్తులేని పొట్టి
+bump_color(గుర్తులేని పొట్టి విలువ)
 {
-    int tmp = 2 * (((int) value - 65535) / 3) + 65535;
+    పూర్ణాంకం tmp = 2 * (((పూర్ణాంకం) విలువ - 65535) / 3) + 65535;
 
-    return tmp;
+    తిరిగి tmp;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 alloc_color(Display	*display,
 	Colormap	colormap,
-	char		*colorname,
+	అక్షరం		*colorname,
 	XColor		*xcolor,
-	void		*closure UNUSED)
+	శూన్య		*సంవృతం వాడని)
 {
-    int status;
+    పూర్ణాంకం స్థితి_2;
 
-    if (colorname)
-	if (!XParseColor(display, colormap, colorname, xcolor))
-	    return -1;
+    ఒకవేళ (colorname)
+	ఒకవేళ (!XParseColor(display, colormap, colorname, xcolor))
+	    తిరిగి -1;
 
     xcolor->red = bump_color(xcolor->red);
     xcolor->green = bump_color(xcolor->green);
     xcolor->blue = bump_color(xcolor->blue);
 
-    status = XAllocColor(display, colormap, xcolor);
-    return status != 0 ? 1 : 0;
+    స్థితి_2 = XAllocColor(display, colormap, xcolor);
+    తిరిగి స్థితి_2 != 0 ? 1 : 0;
 }
 
 // XPM
-static char * blank_xpm[] =
+స్థిర అక్షరం * blank_xpm[] =
 {
 // width height ncolors cpp [x_hot y_hot]
 "12 12 4 1 0 0",
@@ -302,55 +302,55 @@ static char * blank_xpm[] =
 /*
  * Set the pixmap.
  */
-    static void
-set_pixmap(XmEnhancedButtonWidget eb)
+    స్థిర శూన్య
+సమితి_pixmap(XmEnhancedButtonWidget eb)
 {
     // Configure defines XPMATTRIBUTES_TYPE as XpmAttributes or as
     // XpmAttributes_21, depending on what is in Xm/XpmP.h.
     XPMATTRIBUTES_TYPE   attr;
     Pixmap	    sen_pix;
-    Window	    root;
-    static XpmColorSymbol color[8] = {
+    కిటికీ	    మూలం;
+    స్థిర Xpm_Color_చిహ్నం color[8] = {
 	{"none", "none", 0},
 	{"None", "none", 0},
-	{"background", NULL, 0},
-	{"foreground", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"highlightColor", NULL, 0},
-	{"armColor", NULL, 0}
+	{"background", ఖాళీ, 0},
+	{"foreground", ఖాళీ, 0},
+	{"bottomShadowColor", ఖాళీ, 0},
+	{"topShadowColor", ఖాళీ, 0},
+	{"highlightColor", ఖాళీ, 0},
+	{"armColor", ఖాళీ, 0}
     };
-    int		    scr;
+    పూర్ణాంకం		    scr;
     Display	    *dpy = XtDisplay(eb);
-    int		    x;
-    int		    y;
-    unsigned int    height, width, border, depth;
-    int		    status = 0;
-    Pixmap	    mask;
+    పూర్ణాంకం		    x;
+    పూర్ణాంకం		    y;
+    గుర్తులేని పూర్ణాంకం    ఎత్తు, వెడల్పు, border, లోతు;
+    పూర్ణాంకం		    స్థితి_2 = 0;
+    Pixmap	    ముసుగు;
     Pixmap	    pix = None;
     Pixmap	    arm_pix = None;
     Pixmap	    ins_pix = None;
-    Pixmap	    high_pix = None;
-    char	    **data = (char **) eb->enhancedbutton.pixmap_data;
-    char	    *fname = (char *) eb->enhancedbutton.pixmap_file;
-    int		    shift;
+    Pixmap	    ఎగువ_pix = None;
+    అక్షరం	    **దత్తాంశం = (అక్షరం **) eb->enhancedbutton.pixmap_దత్తాంశం;
+    అక్షరం	    *fname = (అక్షరం *) eb->enhancedbutton.pixmap_file;
+    పూర్ణాంకం		    జరుపు;
     GC		    gc;
 
     // Make sure there is a default value for the pixmap.
-    if (!data)
-	return;
+    ఒకవేళ (!దత్తాంశం)
+	తిరిగి;
 
-    gc = XtGetGC((Widget)eb, (XtGCMask)0, NULL);
+    gc = XtGetGC((Widget)eb, (XtGCMask)0, ఖాళీ);
 
     scr = DefaultScreen(dpy);
-    root = RootWindow(dpy, scr);
+    మూలం = మూలం_కిటికీ_2(dpy, scr);
 
     eb->label.pixmap = None;
 
-    eb->enhancedbutton.pixmap_depth = 0;
-    eb->enhancedbutton.pixmap_width = 0;
-    eb->enhancedbutton.pixmap_height = 0;
-    eb->enhancedbutton.normal_pixmap = None;
+    eb->enhancedbutton.pixmap_లోతు = 0;
+    eb->enhancedbutton.pixmap_వెడల్పు = 0;
+    eb->enhancedbutton.pixmap_ఎత్తు = 0;
+    eb->enhancedbutton.సాధారణ_pixmap = None;
     eb->enhancedbutton.armed_pixmap = None;
     eb->enhancedbutton.highlight_pixmap = None;
     eb->enhancedbutton.insensitive_pixmap = None;
@@ -360,7 +360,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
 	    &eb->core.background_pixel,
 	    &eb->primitive.foreground,
 	    &eb->primitive.bottom_shadow_color,
-	    &eb->primitive.top_shadow_color,
+	    &eb->primitive.శిఖరం_shadow_color,
 	    &eb->primitive.highlight_color);
 
     // Setup color substitution table.
@@ -369,7 +369,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     color[2].pixel = eb->core.background_pixel;
     color[3].pixel = eb->primitive.foreground;
     color[4].pixel = eb->core.background_pixel;
-    color[5].pixel = eb->primitive.top_shadow_color;
+    color[5].pixel = eb->primitive.శిఖరం_shadow_color;
     color[6].pixel = eb->primitive.highlight_color;
     color[7].pixel = eb->pushbutton.arm_color;
 
@@ -377,112 +377,112 @@ set_pixmap(XmEnhancedButtonWidget eb)
     attr.valuemask = XpmColorSymbols | XpmCloseness;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_సంఖ్య(color);
 
-    if (fname)
-	status = XpmReadFileToPixmap(dpy, root, fname, &pix, &mask, &attr);
-    if (!fname || status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    ఒకవేళ (fname)
+	స్థితి_2 = Xpm_Read_File_గమ్యం_Pixmap(dpy, మూలం, fname, &pix, &ముసుగు, &attr);
+    ఒకవేళ (!fname || స్థితి_2 != XpmSuccess)
+	స్థితి_2 = Xpm_Create_Pixmap_From_దత్తాంశం(dpy, మూలం, దత్తాంశం, &pix, &ముసుగు, &attr);
 
     // If something failed, we will fill in the default pixmap.
-    if (status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, blank_xpm, &pix,
-								&mask, &attr);
+    ఒకవేళ (స్థితి_2 != XpmSuccess)
+	స్థితి_2 = Xpm_Create_Pixmap_From_దత్తాంశం(dpy, మూలం, blank_xpm, &pix,
+								&ముసుగు, &attr);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_లక్షణాలు(&attr);
 
-    XGetGeometry(dpy, pix, &root, &x, &y, &width, &height, &border, &depth);
+    XGetGeometry(dpy, pix, &మూలం, &x, &y, &వెడల్పు, &ఎత్తు, &border, &లోతు);
 
     // TODO: does the shift depend on label_location somehow?
-    shift = eb->primitive.shadow_thickness / 2;
+    జరుపు = eb->primitive.shadow_thickness / 2;
 
-    if (shift < 1)
-	shift = 1;
+    ఒకవేళ (జరుపు < 1)
+	జరుపు = 1;
 
-    sen_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    sen_pix = XCreatePixmap(dpy, మూలం, వెడల్పు + జరుపు, ఎత్తు + జరుపు, లోతు);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
-    XFillRectangle(dpy, sen_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, width, height, shift, shift);
+    XFillRectangle(dpy, sen_pix, gc, 0, 0, వెడల్పు + జరుపు, ఎత్తు + జరుపు);
+    XSet_Clip_ముసుగు(dpy, gc, ముసుగు);
+    XSetClipOrigin(dpy, gc, జరుపు, జరుపు);
+    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, వెడల్పు, ఎత్తు, జరుపు, జరుపు);
 
     // Create the "highlight" pixmap.
     color[4].pixel = eb->primitive.bottom_shadow_color;
-#ifdef XpmAllocColor // SGI doesn't have it
+#నిర్వచితమైతే XpmAllocColor // SGI doesn't have it
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmAllocColor;
     attr.alloc_color = alloc_color;
-#else
+#లేకపోతే
     attr.valuemask = XpmColorSymbols | XpmCloseness;
-#endif
+#అయితే_ముగింపు
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_సంఖ్య(color);
 
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, NULL, &attr);
-    XpmFreeAttributes(&attr);
+    స్థితి_2 = Xpm_Create_Pixmap_From_దత్తాంశం(dpy, మూలం, దత్తాంశం, &pix, ఖాళీ, &attr);
+    Xpm_Free_లక్షణాలు(&attr);
 
-    high_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ఎగువ_pix = XCreatePixmap(dpy, మూలం, వెడల్పు + జరుపు, ఎత్తు + జరుపు, లోతు);
 
-#if 1
+#ఒకవేళ 1
     XSetForeground(dpy, gc, eb->core.background_pixel);
-#else
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-#endif
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, high_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
+#లేకపోతే
+    XSetForeground(dpy, gc, eb->primitive.శిఖరం_shadow_color);
+#అయితే_ముగింపు
+    XSet_Clip_ముసుగు(dpy, gc, None);
+    XFillRectangle(dpy, ఎగువ_pix, gc, 0, 0, వెడల్పు + జరుపు, ఎత్తు + జరుపు);
+    XSet_Clip_ముసుగు(dpy, gc, ముసుగు);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XCopyArea(dpy, pix, high_pix, gc, 0, 0, width, height, 0, 0);
+    XCopyArea(dpy, pix, ఎగువ_pix, gc, 0, 0, వెడల్పు, ఎత్తు, 0, 0);
 
-    arm_pix = XCreatePixmap(dpy, pix, width + shift, height + shift, depth);
+    arm_pix = XCreatePixmap(dpy, pix, వెడల్పు + జరుపు, ఎత్తు + జరుపు, లోతు);
 
-    if (eb->pushbutton.fill_on_arm)
+    ఒకవేళ (eb->pushbutton.fill_on_arm)
 	XSetForeground(dpy, gc, eb->pushbutton.arm_color);
-    else
+    లేకపోతే
 	XSetForeground(dpy, gc, eb->core.background_pixel);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, arm_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, width, height, 2 * shift, 2 * shift);
+    XSetClipOrigin(dpy, gc, జరుపు, జరుపు);
+    XSet_Clip_ముసుగు(dpy, gc, None);
+    XFillRectangle(dpy, arm_pix, gc, 0, 0, వెడల్పు + జరుపు, ఎత్తు + జరుపు);
+    XSet_Clip_ముసుగు(dpy, gc, ముసుగు);
+    XSetClipOrigin(dpy, gc, 2 * జరుపు, 2 * జరుపు);
+    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, వెడల్పు, ఎత్తు, 2 * జరుపు, 2 * జరుపు);
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, ముసుగు);
 
     // Create the "insensitive" pixmap.
-    attr.valuemask = XpmColorSymbols | XpmCloseness | XpmColorKey;
+    attr.valuemask = XpmColorSymbols | XpmCloseness | Xpm_Color_కీలకం;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = ARRAY_LENGTH(color);
-    attr.color_key = XPM_MONO;
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    attr.numsymbols = ARRAY_నిడివి(color);
+    attr.color_కీలకం = XPM_MONO;
+    స్థితి_2 = Xpm_Create_Pixmap_From_దత్తాంశం(dpy, మూలం, దత్తాంశం, &pix, &ముసుగు, &attr);
 
     // Need to create new Pixmaps with the mask applied.
 
-    ins_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ins_pix = XCreatePixmap(dpy, మూలం, వెడల్పు + జరుపు, ఎత్తు + జరుపు, లోతు);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XFillRectangle(dpy, ins_pix, gc, 2 * shift, 2 * shift, width, height);
+    XSet_Clip_ముసుగు(dpy, gc, None);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, వెడల్పు + జరుపు, ఎత్తు + జరుపు);
+    XSet_Clip_ముసుగు(dpy, gc, ముసుగు);
+    XSetForeground(dpy, gc, eb->primitive.శిఖరం_shadow_color);
+    XSetClipOrigin(dpy, gc, 2 * జరుపు, 2 * జరుపు);
+    XFillRectangle(dpy, ins_pix, gc, 2 * జరుపు, 2 * జరుపు, వెడల్పు, ఎత్తు);
     XSetForeground(dpy, gc, eb->primitive.bottom_shadow_color);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
+    XSetClipOrigin(dpy, gc, జరుపు, జరుపు);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, వెడల్పు + జరుపు, ఎత్తు + జరుపు);
     XtReleaseGC((Widget) eb, gc);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_లక్షణాలు(&attr);
 
-    eb->enhancedbutton.pixmap_depth = depth;
-    eb->enhancedbutton.pixmap_width = width;
-    eb->enhancedbutton.pixmap_height = height;
-    eb->enhancedbutton.normal_pixmap = sen_pix;
-    eb->enhancedbutton.highlight_pixmap = high_pix;
+    eb->enhancedbutton.pixmap_లోతు = లోతు;
+    eb->enhancedbutton.pixmap_వెడల్పు = వెడల్పు;
+    eb->enhancedbutton.pixmap_ఎత్తు = ఎత్తు;
+    eb->enhancedbutton.సాధారణ_pixmap = sen_pix;
+    eb->enhancedbutton.highlight_pixmap = ఎగువ_pix;
     eb->enhancedbutton.insensitive_pixmap = ins_pix;
     eb->enhancedbutton.armed_pixmap = arm_pix;
 
@@ -490,75 +490,75 @@ set_pixmap(XmEnhancedButtonWidget eb)
     eb->enhancedbutton.doing_setvalues = False;
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, ముసుగు);
 }
 
-#define	BUTTON_MASK ( \
-	Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask \
+#నిర్వచించు	BUTTON_ముసుగు ( \
+	Button1_ముసుగు | Button2_ముసుగు | Button3_ముసుగు | Button4_ముసుగు | Button5_ముసుగు \
 )
 
-    static void
+    స్థిర శూన్య
 draw_shadows(XmEnhancedButtonWidget eb)
 {
-    GC		top_gc;
+    GC		శిఖరం_gc;
     GC		bottom_gc;
-    Boolean	etched_in;
+    Boolean	etched_లోపల;
 
-    if (!eb->primitive.shadow_thickness)
-	return;
+    ఒకవేళ (!eb->primitive.shadow_thickness)
+	తిరిగి;
 
-    if ((eb->core.width <= 2 * eb->primitive.highlight_thickness)
-	    || (eb->core.height <= 2 * eb->primitive.highlight_thickness))
-	return;
+    ఒకవేళ ((eb->core.వెడల్పు <= 2 * eb->primitive.highlight_thickness)
+	    || (eb->core.ఎత్తు <= 2 * eb->primitive.highlight_thickness))
+	తిరిగి;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
     {
 	XmDisplay	dpy;
 
 	dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(eb));
-	etched_in = dpy->display.enable_etched_in_menu;
+	etched_లోపల = dpy->display.enable_etched_లోపల_menu;
     }
-#else
-    etched_in = False;
-#endif
-    if (!etched_in ^ eb->pushbutton.armed)
+#లేకపోతే
+    etched_లోపల = False;
+#అయితే_ముగింపు
+    ఒకవేళ (!etched_లోపల ^ eb->pushbutton.armed)
     {
-	top_gc = eb->primitive.top_shadow_GC;
+	శిఖరం_gc = eb->primitive.శిఖరం_shadow_GC;
 	bottom_gc = eb->primitive.bottom_shadow_GC;
     }
-    else
+    లేకపోతే
     {
-	top_gc = eb->primitive.bottom_shadow_GC;
-	bottom_gc = eb->primitive.top_shadow_GC;
+	శిఖరం_gc = eb->primitive.bottom_shadow_GC;
+	bottom_gc = eb->primitive.శిఖరం_shadow_GC;
     }
 
-    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-	    top_gc,
+    XmeDrawShadows(XtDisplay(eb), Xt_కిటికీ(eb),
+	    శిఖరం_gc,
 	    bottom_gc,
 	    eb->primitive.highlight_thickness,
 	    eb->primitive.highlight_thickness,
-	    eb->core.width - 2 * eb->primitive.highlight_thickness,
-	    eb->core.height - 2 * eb->primitive.highlight_thickness,
+	    eb->core.వెడల్పు - 2 * eb->primitive.highlight_thickness,
+	    eb->core.ఎత్తు - 2 * eb->primitive.highlight_thickness,
 	    eb->primitive.shadow_thickness,
-	    (unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+	    (గుర్తులేని)(etched_లోపల ? Xm_SHADOW_లోపల : Xm_SHADOW_బహిర్గతం));
 }
 
-    static void
+    స్థిర శూన్య
 draw_highlight(XmEnhancedButtonWidget eb)
 {
     eb->primitive.highlighted = True;
     eb->primitive.highlight_drawn = True;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    ఒకవేళ (!Xt_వెడల్పు(eb) || !Xt_ఎత్తు(eb) || !eb->primitive.highlight_thickness)
+	తిరిగి;
 
-    XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+    XmeDrawHighlight(XtDisplay(eb), Xt_కిటికీ(eb),
 	    eb->primitive.highlight_GC, 0, 0,
-	    XtWidth(eb), XtHeight(eb),
+	    Xt_వెడల్పు(eb), Xt_ఎత్తు(eb),
 	    eb->primitive.highlight_thickness);
 }
 
-    static void
+    స్థిర శూన్య
 draw_unhighlight(XmEnhancedButtonWidget eb)
 {
     GC manager_background_GC;
@@ -566,129 +566,129 @@ draw_unhighlight(XmEnhancedButtonWidget eb)
     eb->primitive.highlighted = False;
     eb->primitive.highlight_drawn = False;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    ఒకవేళ (!Xt_వెడల్పు(eb) || !Xt_ఎత్తు(eb) || !eb->primitive.highlight_thickness)
+	తిరిగి;
 
-    if (XmIsManager(eb->core.parent))
+    ఒకవేళ (XmIsManager(eb->core.మాతృ))
     {
-#ifdef UNHIGHLIGHTT
+#నిర్వచితమైతే UNHIGHLIGHTT
 	XmSpecifyUnhighlightTrait UnhighlightT;
 
-	if (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((XtPointer)
-			    XtClass(eb->core.parent), XmQTspecifyUnhighlight))
-		    != NULL) && (UnhighlightT->getUnhighlightGC != NULL))
+	ఒకవేళ (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((Xt_సూచిక)
+			    XtClass(eb->core.మాతృ), XmQTspecifyUnhighlight))
+		    != ఖాళీ) && (UnhighlightT->getUnhighlightGC != ఖాళీ))
 	{
 	    // if unhighlight trait in parent use specified GC...
 	    manager_background_GC =
-		 UnhighlightT->getUnhighlightGC(eb->core.parent, (Widget) eb);
+		 UnhighlightT->getUnhighlightGC(eb->core.మాతృ, (Widget) eb);
 	}
-	else
+	లేకపోతే
 	{
 	    // ...otherwise, use parent's background GC
 	    manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
+				    (eb->core.మాతృ))->manager.background_GC;
 	}
-#else
+#లేకపోతే
 	manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
-#endif
-	XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+				    (eb->core.మాతృ))->manager.background_GC;
+#అయితే_ముగింపు
+	XmeDrawHighlight(XtDisplay(eb), Xt_కిటికీ(eb),
 			 manager_background_GC,
-			 0, 0, XtWidth(eb), XtHeight(eb),
+			 0, 0, Xt_వెడల్పు(eb), Xt_ఎత్తు(eb),
 			 eb->primitive.highlight_thickness);
-	if (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
-	    XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+	ఒకవేళ (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
+	    XmeClearBorder(XtDisplay(eb), Xt_కిటికీ(eb),
 		    eb->primitive.highlight_thickness,
 		    eb->primitive.highlight_thickness,
-		    eb->core.width - 2 * eb->primitive.highlight_thickness,
-		    eb->core.height - 2 * eb->primitive.highlight_thickness,
+		    eb->core.వెడల్పు - 2 * eb->primitive.highlight_thickness,
+		    eb->core.ఎత్తు - 2 * eb->primitive.highlight_thickness,
 		    eb->primitive.shadow_thickness);
     }
-    else
-	XmeClearBorder(XtDisplay(eb), XtWindow(eb), 0, 0, XtWidth(eb),
-		       XtHeight(eb), eb->primitive.highlight_thickness);
+    లేకపోతే
+	XmeClearBorder(XtDisplay(eb), Xt_కిటికీ(eb), 0, 0, Xt_వెడల్పు(eb),
+		       Xt_ఎత్తు(eb), eb->primitive.highlight_thickness);
 }
 
-    static void
+    స్థిర శూన్య
 draw_pixmap(XmEnhancedButtonWidget eb,
-	    XEvent *event UNUSED,
-	    Region region UNUSED)
+	    XEvent *event వాడని,
+	    Region region వాడని)
 {
     Pixmap	pix;
-    GC		gc = eb->label.normal_GC;
-    int		depth;
-    Cardinal	width;
-    Cardinal	height;
+    GC		gc = eb->label.సాధారణ_GC;
+    పూర్ణాంకం		లోతు;
+    Cardinal	వెడల్పు;
+    Cardinal	ఎత్తు;
     Cardinal	w;
     Cardinal	h;
-    int		x;
-    int		y;
+    పూర్ణాంకం		x;
+    పూర్ణాంకం		y;
 
-    if (!XtIsSensitive((Widget) eb))
+    ఒకవేళ (!XtIsSensitive((Widget) eb))
 	pix = eb->enhancedbutton.insensitive_pixmap;
-    else
+    లేకపోతే
     {
-	if (eb->primitive.highlighted && !eb->pushbutton.armed)
+	ఒకవేళ (eb->primitive.highlighted && !eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.highlight_pixmap;
-	else if (eb->pushbutton.armed)
+	లేకపోతే ఒకవేళ (eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.armed_pixmap;
-	else
-	    pix = eb->enhancedbutton.normal_pixmap;
+	లేకపోతే
+	    pix = eb->enhancedbutton.సాధారణ_pixmap;
     }
 
-    if (pix == None || !eb->enhancedbutton.pixmap_data)
-	return;
+    ఒకవేళ (pix == None || !eb->enhancedbutton.pixmap_దత్తాంశం)
+	తిరిగి;
 
-    depth = eb->enhancedbutton.pixmap_depth;
-    w = eb->enhancedbutton.pixmap_width;
-    h = eb->enhancedbutton.pixmap_height;
+    లోతు = eb->enhancedbutton.pixmap_లోతు;
+    w = eb->enhancedbutton.pixmap_వెడల్పు;
+    h = eb->enhancedbutton.pixmap_ఎత్తు;
 
-    gc = eb->label.normal_GC;
+    gc = eb->label.సాధారణ_GC;
     x = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_width;
+	+ eb->label.margin_వెడల్పు;
     y = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_height;
-    width = eb->core.width - 2 * x;
-    if (w < width)
-	width = w;
-    height = eb->core.height - 2 * y;
-    if (h < height)
-	height = h;
-    if (depth == (int)eb->core.depth)
-	XCopyArea(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y);
-    else if (depth == 1)
-	XCopyPlane(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y, (unsigned long)1);
+	+ eb->label.margin_ఎత్తు;
+    వెడల్పు = eb->core.వెడల్పు - 2 * x;
+    ఒకవేళ (w < వెడల్పు)
+	వెడల్పు = w;
+    ఎత్తు = eb->core.ఎత్తు - 2 * y;
+    ఒకవేళ (h < ఎత్తు)
+	ఎత్తు = h;
+    ఒకవేళ (లోతు == (పూర్ణాంకం)eb->core.లోతు)
+	XCopyArea(XtDisplay(eb), pix, Xt_కిటికీ(eb), gc, 0, 0,
+		వెడల్పు, ఎత్తు, x, y);
+    లేకపోతే ఒకవేళ (లోతు == 1)
+	XCopyPlane(XtDisplay(eb), pix, Xt_కిటికీ(eb), gc, 0, 0,
+		వెడల్పు, ఎత్తు, x, y, (గుర్తులేని దీర్ఘ)1);
 }
 
 /*
  * Draw the label contained in the pushbutton.
  */
-    static void
+    స్థిర శూన్య
 draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
 {
-    GC		tmp_gc = NULL;
+    GC		tmp_gc = ఖాళీ;
     Boolean	replaceGC = False;
     Boolean	deadjusted = False;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
     XmDisplay	dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
-    Boolean	etched_in = dpy->display.enable_etched_in_menu;
-#else
-    Boolean	etched_in = False;
-#endif
+    Boolean	etched_లోపల = dpy->display.enable_etched_లోపల_menu;
+#లేకపోతే
+    Boolean	etched_లోపల = False;
+#అయితే_ముగింపు
 
-    if (eb->pushbutton.armed
+    ఒకవేళ (eb->pushbutton.armed
 	    && ((!Lab_IsMenupane(eb) && eb->pushbutton.fill_on_arm)
-		|| (Lab_IsMenupane(eb) && etched_in)))
+		|| (Lab_IsMenupane(eb) && etched_లోపల)))
     {
-	if (eb->label.label_type == (int)XmSTRING
+	ఒకవేళ (eb->label.label_type == (పూర్ణాంకం)XmSTRING
 		&& eb->pushbutton.arm_color == eb->primitive.foreground)
 	{
-	    tmp_gc = eb->label.normal_GC;
-	    eb->label.normal_GC = eb->pushbutton.background_gc;
+	    tmp_gc = eb->label.సాధారణ_GC;
+	    eb->label.సాధారణ_GC = eb->pushbutton.background_gc;
 	    replaceGC = True;
 	}
     }
@@ -698,16 +698,16 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      * own pixmap.
      */
 
-    if (eb->label.label_type == (int)XmPIXMAP)
+    ఒకవేళ (eb->label.label_type == (పూర్ణాంకం)XmPIXMAP)
     {
-	if (eb->pushbutton.armed)
+	ఒకవేళ (eb->pushbutton.armed)
 	{
-	    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+	    ఒకవేళ (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 		eb->label.pixmap = eb->pushbutton.arm_pixmap;
-	    else
+	    లేకపోతే
 		eb->label.pixmap = eb->pushbutton.unarm_pixmap;
 	}
-	else
+	లేకపోతే
 	    // pushbutton is not armed
 	    eb->label.pixmap = eb->pushbutton.unarm_pixmap;
     }
@@ -716,278 +716,278 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      *	Temporarily remove the Xm3D_ENHANCE_PIXEL hack ("adjustment") from the
      *	margin values, so we don't confuse Label.
      */
-    if (eb->pushbutton.default_button_shadow_thickness > 0)
+    ఒకవేళ (eb->pushbutton.default_button_shadow_thickness > 0)
     {
 	deadjusted = True;
-	Lab_MarginLeft(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ఎడమ(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_కుడి(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_శిఖరం(eb) -= Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) -= Xm3D_ENHANCE_PIXEL;
     }
 
     {
 	XtExposeProc expose;
 
-	XTPROCESS_LOCK;
+	XTPROCESS_తాళం;
 	expose = xmLabelClassRec.core_class.expose;
 	XTPROCESS_UNLOCK;
 	(*expose)((Widget) eb, event, region);
     }
 
-    if (deadjusted)
+    ఒకవేళ (deadjusted)
     {
-	Lab_MarginLeft(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ఎడమ(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_కుడి(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_శిఖరం(eb) += Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) += Xm3D_ENHANCE_PIXEL;
     }
 
-    if (replaceGC)
-	eb->label.normal_GC = tmp_gc;
+    ఒకవేళ (replaceGC)
+	eb->label.సాధారణ_GC = tmp_gc;
 }
 
-    static void
+    స్థిర శూన్య
 Enter(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params వాడని,
+    Cardinal *అంకె_params వాడని)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget) wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_నెట్టు_Button_Callback_Struct call_విలువ;
 
-    if (Lab_IsMenupane(eb))
+    ఒకవేళ (Lab_IsMenupane(eb))
     {
-	if ((((ShellWidget) XtParent(XtParent(eb)))->shell.popped_up)
-		&& _XmGetInDragMode((Widget) eb))
+	ఒకవేళ ((((ShellWidget) Xt_మాతృ(Xt_మాతృ(eb)))->shell.popped_పైకి)
+		&& Xm_Get_లోపల_Drag_బహుళకం((Widget) eb))
 	{
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
 	    XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	    Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	    Boolean etched_in = False;
-#endif
+	    Boolean etched_లోపల = dpy->display.enable_etched_లోపల_menu;
+#లేకపోతే
+	    Boolean etched_లోపల = False;
+#అయితే_ముగింపు
 
-	    if (eb->pushbutton.armed)
-		return;
+	    ఒకవేళ (eb->pushbutton.armed)
+		తిరిగి;
 
 	    // ...so KHelp event is delivered correctly.
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, TRUE);
-	    XtSetKeyboardFocus(XtParent(XtParent(eb)), (Widget) eb);
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, FALSE);
+	    Xm_సమితి_Focus_Flag(Xt_మాతృ(Xt_మాతృ(eb)), XmFOCUS_IGNORE, TRUE);
+	    Xt_సమితి_Keyboard_Focus(Xt_మాతృ(Xt_మాతృ(eb)), (Widget) eb);
+	    Xm_సమితి_Focus_Flag(Xt_మాతృ(Xt_మాతృ(eb)), XmFOCUS_IGNORE, FALSE);
 
 	    eb->pushbutton.armed = TRUE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = wid;
+	    ((XmManagerWidget) Xt_మాతృ(wid))->manager.చురుకైన_బిడ్డ = wid;
 
 	    // etched in menu button
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    ఒకవేళ (etched_లోపల && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_కిటికీ(eb),
 			       eb->pushbutton.fill_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.వెడల్పు, eb->core.ఎత్తు);
+		draw_label(eb, event, ఖాళీ);
+		draw_pixmap(eb, event, ఖాళీ);
 	    }
 
-	    if ((eb->core.width > 2 * eb->primitive.highlight_thickness)
-		    && (eb->core.height >
+	    ఒకవేళ ((eb->core.వెడల్పు > 2 * eb->primitive.highlight_thickness)
+		    && (eb->core.ఎత్తు >
 				       2 * eb->primitive.highlight_thickness))
 	    {
-		XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			eb->primitive.top_shadow_GC,
+		XmeDrawShadows(XtDisplay(eb), Xt_కిటికీ(eb),
+			eb->primitive.శిఖరం_shadow_GC,
 			eb->primitive.bottom_shadow_GC,
 			eb->primitive.highlight_thickness,
 			eb->primitive.highlight_thickness,
-			eb->core.width - 2 * eb->primitive.highlight_thickness,
-			eb->core.height - 2 * eb->primitive.highlight_thickness,
+			eb->core.వెడల్పు - 2 * eb->primitive.highlight_thickness,
+			eb->core.ఎత్తు - 2 * eb->primitive.highlight_thickness,
 			eb->primitive.shadow_thickness,
-			(unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+			(గుర్తులేని)(etched_లోపల ? Xm_SHADOW_లోపల : Xm_SHADOW_బహిర్గతం));
 	    }
 
-	    if (eb->pushbutton.arm_callback)
+	    ఒకవేళ (eb->pushbutton.arm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_ARM;
-		call_value.event = event;
+		call_విలువ.reason = (పూర్ణాంకం)XmCR_ARM;
+		call_విలువ.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.arm_callback,
-				   &call_value);
+				   &call_విలువ);
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	XtExposeProc expose;
 
-	_XmPrimitiveEnter((Widget) eb, event, NULL, NULL);
-	if (eb->pushbutton.armed == TRUE)
+	_XmPrimitiveEnter((Widget) eb, event, ఖాళీ, ఖాళీ);
+	ఒకవేళ (eb->pushbutton.armed == TRUE)
 	{
-	    XTPROCESS_LOCK;
+	    XTPROCESS_తాళం;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region) NULL);
+	    (*expose) (wid, event, (Region) ఖాళీ);
 	}
 
 	draw_highlight(eb);
 	draw_shadows(eb);
-	draw_pixmap(eb, event, NULL);
+	draw_pixmap(eb, event, ఖాళీ);
     }
 }
 
-    static void
+    స్థిర శూన్య
 Leave(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params వాడని,
+    Cardinal *అంకె_params వాడని)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_నెట్టు_Button_Callback_Struct call_విలువ;
 
-    if (Lab_IsMenupane(eb))
+    ఒకవేళ (Lab_IsMenupane(eb))
     {
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
 	XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	Boolean etched_in = False;
-#endif
+	Boolean etched_లోపల = dpy->display.enable_etched_లోపల_menu;
+#లేకపోతే
+	Boolean etched_లోపల = False;
+#అయితే_ముగింపు
 
-	if (_XmGetInDragMode((Widget)eb)
+	ఒకవేళ (Xm_Get_లోపల_Drag_బహుళకం((Widget)eb)
 		&& eb->pushbutton.armed
 		&& ( // !ActiveTearOff ||
-				       event->xcrossing.mode == NotifyNormal))
+				       event->xcrossing.బహుళకం == Notify_సాధారణ))
 	{
 	    eb->pushbutton.armed = FALSE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = NULL;
+	    ((XmManagerWidget) Xt_మాతృ(wid))->manager.చురుకైన_బిడ్డ = ఖాళీ;
 
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    ఒకవేళ (etched_లోపల && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_కిటికీ(eb),
 			       eb->pushbutton.background_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.వెడల్పు, eb->core.ఎత్తు);
+		draw_label(eb, event, ఖాళీ);
+		draw_pixmap(eb, event, ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 		XmeClearBorder
-		    (XtDisplay(eb), XtWindow(eb),
+		    (XtDisplay(eb), Xt_కిటికీ(eb),
 		     eb->primitive.highlight_thickness,
 		     eb->primitive.highlight_thickness,
-		     eb->core.width -
+		     eb->core.వెడల్పు -
 		     2 * eb->primitive.highlight_thickness,
-		     eb->core.height -
+		     eb->core.ఎత్తు -
 		     2 * eb->primitive.highlight_thickness,
 		     eb->primitive.shadow_thickness);
 
-	    if (eb->pushbutton.disarm_callback)
+	    ఒకవేళ (eb->pushbutton.disarm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_DISARM;
-		call_value.event = event;
+		call_విలువ.reason = (పూర్ణాంకం)XmCR_DISARM;
+		call_విలువ.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.disarm_callback,
-				   &call_value);
+				   &call_విలువ);
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
-	_XmPrimitiveLeave((Widget) eb, event, NULL, NULL);
+	_XmPrimitiveLeave((Widget) eb, event, ఖాళీ, ఖాళీ);
 
-	if (eb->pushbutton.armed == TRUE)
+	ఒకవేళ (eb->pushbutton.armed == TRUE)
 	{
 	    XtExposeProc expose;
 	    eb->pushbutton.armed = FALSE;
-	    XTPROCESS_LOCK;
+	    XTPROCESS_తాళం;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region)NULL);
+	    (*expose) (wid, event, (Region)ఖాళీ);
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, ఖాళీ);
 	    eb->pushbutton.armed = TRUE;
 	}
-	else
+	లేకపోతే
 	{
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, ఖాళీ);
 	}
     }
 }
 
-#define IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
+#నిర్వచించు IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
 
-    static void
-set_size(XmEnhancedButtonWidget newtb)
+    స్థిర శూన్య
+సమితి_కొలత_2(XmEnhancedButtonWidget newtb)
 {
-    unsigned int w = 0;
-    unsigned int h = 0;
+    గుర్తులేని పూర్ణాంకం w = 0;
+    గుర్తులేని పూర్ణాంకం h = 0;
 
     _XmCalcLabelDimensions((Widget) newtb);
 
     // Find out how big the pixmap is
-    if (newtb->enhancedbutton.pixmap_data
+    ఒకవేళ (newtb->enhancedbutton.pixmap_దత్తాంశం
 	    && !IsNull(newtb->label.pixmap)
-	    && !IsNull(newtb->enhancedbutton.normal_pixmap))
+	    && !IsNull(newtb->enhancedbutton.సాధారణ_pixmap))
     {
-	w = newtb->enhancedbutton.pixmap_width;
-	h = newtb->enhancedbutton.pixmap_height;
+	w = newtb->enhancedbutton.pixmap_వెడల్పు;
+	h = newtb->enhancedbutton.pixmap_ఎత్తు;
     }
 
     /*
      * Please note that we manipulate the width only in case of push buttons
      * not used in the context of a menu pane.
      */
-    if (Lab_IsMenupane(newtb))
+    ఒకవేళ (Lab_IsMenupane(newtb))
     {
-	newtb->label.margin_left = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_ఎడమ = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness)
-	    + newtb->label.margin_width;
+	    + newtb->label.margin_వెడల్పు;
     }
-    else
+    లేకపోతే
     {
-	newtb->label.margin_left = w;
-	newtb->core.width = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_ఎడమ = w;
+	newtb->core.వెడల్పు = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_width)
-	    + newtb->label.TextRect.width;
+		+ newtb->label.margin_వెడల్పు)
+	    + newtb->label.పాఠ్యం_Rect.వెడల్పు;
 
-	if (newtb->label.TextRect.width > 0)
+	ఒకవేళ (newtb->label.పాఠ్యం_Rect.వెడల్పు > 0)
 	{
-	    newtb->label.margin_left += newtb->label.margin_width
+	    newtb->label.margin_ఎడమ += newtb->label.margin_వెడల్పు
 					  + newtb->primitive.shadow_thickness;
-	    newtb->core.width += newtb->label.margin_width
+	    newtb->core.వెడల్పు += newtb->label.margin_వెడల్పు
 					  + newtb->primitive.shadow_thickness;
 	}
     }
-    if (newtb->label.TextRect.height < h)
+    ఒకవేళ (newtb->label.పాఠ్యం_Rect.ఎత్తు < h)
     {
-	newtb->core.height = h  + 2 * (newtb->primitive.shadow_thickness
+	newtb->core.ఎత్తు = h  + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_height);
+		+ newtb->label.margin_ఎత్తు);
     }
-    else
+    లేకపోతే
     {
 	// FIXME: We should calculate a drawing offset for the pixmap here to
 	// adjust it.
     }
 
-#if 0
-    printf("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.normal_pixmap,
-	    h, newtb->core.height,
+#ఒకవేళ 0
+    రాయి("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.సాధారణ_pixmap,
+	    h, newtb->core.ఎత్తు,
 	    newtb->primitive.shadow_thickness,
 	    newtb->primitive.highlight_thickness,
-	    newtb->label.margin_height,
-	    newtb->core.width,
-	    newtb->core.height);
-#endif
+	    newtb->label.margin_ఎత్తు,
+	    newtb->core.వెడల్పు,
+	    newtb->core.ఎత్తు);
+#అయితే_ముగింపు
 
     // Invoke Label's Resize procedure.
     {
 	XtWidgetProc resize;
-	XTPROCESS_LOCK;
+	XTPROCESS_తాళం;
 	resize = xmLabelClassRec.core_class.resize;
 	XTPROCESS_UNLOCK;
 
@@ -995,90 +995,90 @@ set_size(XmEnhancedButtonWidget newtb)
     }
 }
 
-    static void
-Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
+    స్థిర శూన్య
+Initialize(Widget rq, Widget ebw, ArgList వాదనలు వాడని, Cardinal *n వాడని)
 {
     XmEnhancedButtonWidget  request = (XmEnhancedButtonWidget)rq;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget)ebw;
     XtWidgetProc	    resize;
 
-    XTPROCESS_LOCK;
+    XTPROCESS_తాళం;
     resize = xmLabelClassRec.core_class.resize;
     XTPROCESS_UNLOCK;
 
     // Create a bitmap for stippling (Drawable resources are cheap).
-    if (STIPPLE_BITMAP == None)
+    ఒకవేళ (STIPPLE_BITMAP == None)
     {
 	Display *dpy = XtDisplay((Widget) request);
-	Window	rootW = DefaultRootWindow(dpy);
+	కిటికీ	మూలం_W = Default_మూలం_కిటికీ(dpy);
 
-	STIPPLE_BITMAP = XCreateBitmapFromData(dpy, rootW, stipple_bits,
-		stipple_width, stipple_height);
+	STIPPLE_BITMAP = XCreate_Bitmap_From_దత్తాంశం(dpy, మూలం_W, stipple_బిట్లు,
+		stipple_వెడల్పు, stipple_ఎత్తు);
     }
     eb->enhancedbutton.doing_setvalues = False;
 
     // First see what type of extended label this is.
-    if (eb->enhancedbutton.pixmap_data)
+    ఒకవేళ (eb->enhancedbutton.pixmap_దత్తాంశం)
     {
 	XmString str;
-	set_pixmap(eb);
+	సమితి_pixmap(eb);
 
 	// FIXME: this is not the perfect way to deal with menus, which do not
 	// have any string set right now.
 	str = XmStringCreateLocalized("");
-	XtVaSetValues((Widget) eb, XmNlabelString, str, NULL);
+	Xt_Va_సమితి_విలువలు((Widget) eb, XmNlabelString, str, ఖాళీ);
 	XmStringFree(str);
     }
-    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
+    eb->label.pixmap = eb->enhancedbutton.సాధారణ_pixmap;
 
-    if (request->core.width == 0)
-	eb->core.width = 0;
-    if (request->core.height == 0)
-	eb->core.height = 0;
-    set_size(eb);
+    ఒకవేళ (request->core.వెడల్పు == 0)
+	eb->core.వెడల్పు = 0;
+    ఒకవేళ (request->core.ఎత్తు == 0)
+	eb->core.ఎత్తు = 0;
+    సమితి_కొలత_2(eb);
 
     (* resize)((Widget)eb);
 }
 
-    static void
+    స్థిర శూన్య
 free_pixmaps(XmEnhancedButtonWidget eb)
 {
     /*
      * Clear the old pixmaps.
      */
-    Pixmap norm_pix = eb->enhancedbutton.normal_pixmap;
+    Pixmap norm_pix = eb->enhancedbutton.సాధారణ_pixmap;
     Pixmap arm_pix = eb->enhancedbutton.armed_pixmap;
     Pixmap insen_pix = eb->enhancedbutton.insensitive_pixmap;
-    Pixmap high_pix = eb->enhancedbutton.highlight_pixmap;
+    Pixmap ఎగువ_pix = eb->enhancedbutton.highlight_pixmap;
 
-    if (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
+    ఒకవేళ (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), norm_pix);
 
-    if (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
+    ఒకవేళ (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), arm_pix);
 
-    if (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
+    ఒకవేళ (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), insen_pix);
 
-    if (high_pix != None && high_pix != XmUNSPECIFIED_PIXMAP)
-	XFreePixmap(XtDisplay(eb), high_pix);
+    ఒకవేళ (ఎగువ_pix != None && ఎగువ_pix != XmUNSPECIFIED_PIXMAP)
+	XFreePixmap(XtDisplay(eb), ఎగువ_pix);
 }
 
-    static void
+    స్థిర శూన్య
 Destroy(Widget w)
 {
-    if (!XmIsEnhancedButton(w))
-	return;
+    ఒకవేళ (!XmIsEnhancedButton(w))
+	తిరిగి;
 
     free_pixmaps((XmEnhancedButtonWidget)w);
 }
 
-    static Boolean
-SetValues(Widget current,
-	  Widget request UNUSED,
+    స్థిర Boolean
+సమితి_విలువలు(Widget current,
+	  Widget request వాడని,
 	  Widget new,
-	  ArgList args UNUSED,
-	  Cardinal *n UNUSED)
+	  ArgList వాదనలు వాడని,
+	  Cardinal *n వాడని)
 {
     XmEnhancedButtonWidget  cur = (XmEnhancedButtonWidget) current;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) new;
@@ -1086,219 +1086,219 @@ SetValues(Widget current,
     Boolean		    change = True;
     Display		    *dpy = XtDisplay(current);
 
-#define NOT_EQUAL(field)       (cur->field != eb->field)
+#నిర్వచించు NOT_EQUAL(క్షేత్రం)       (cur->క్షేత్రం != eb->క్షేత్రం)
 
     /*
      * Make sure that lost sensitivity is causing the border to vanish as well.
      */
-    if (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
+    ఒకవేళ (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
     {
-	if (cur->core.sensitive == True)
+	ఒకవేళ (cur->core.sensitive == True)
 	{
 	    draw_unhighlight(eb);
 	}
-	else
+	లేకపోతే
 	{
-	    int		    r_x;
-	    int		    r_y;
-	    unsigned int    r_height;
-	    unsigned int    r_width;
-	    unsigned int    r_border;
-	    unsigned int    r_depth;
-	    int		    root_x;
-	    int		    root_y;
-	    int		    win_x;
-	    int		    win_y;
-	    Window	    root;
-	    Window	    root_q;
-	    Window	    child;
-	    unsigned int    mask;
+	    పూర్ణాంకం		    r_x;
+	    పూర్ణాంకం		    r_y;
+	    గుర్తులేని పూర్ణాంకం    r_ఎత్తు;
+	    గుర్తులేని పూర్ణాంకం    r_వెడల్పు;
+	    గుర్తులేని పూర్ణాంకం    r_border;
+	    గుర్తులేని పూర్ణాంకం    r_లోతు;
+	    పూర్ణాంకం		    మూలం_x;
+	    పూర్ణాంకం		    మూలం_y;
+	    పూర్ణాంకం		    win_x;
+	    పూర్ణాంకం		    win_y;
+	    కిటికీ	    మూలం;
+	    కిటికీ	    మూలం_q;
+	    కిటికీ	    బిడ్డ;
+	    గుర్తులేని పూర్ణాంకం    ముసుగు;
 
 	    /*
 	     * Artificially let the highlight appear if the mouse is over us.
 	     */
 	    // Best way to get the root window of object:
-	    XGetGeometry(dpy, XtWindow(cur), &root, &r_x, &r_y, &r_width,
-			 &r_height, &r_border, &r_depth);
-	    XQueryPointer(XtDisplay(cur), XtWindow(cur), &root_q, &child,
-			  &root_x, &root_y, &win_x, &win_y, &mask);
+	    XGetGeometry(dpy, Xt_కిటికీ(cur), &మూలం, &r_x, &r_y, &r_వెడల్పు,
+			 &r_ఎత్తు, &r_border, &r_లోతు);
+	    XQuery_సూచిక(XtDisplay(cur), Xt_కిటికీ(cur), &మూలం_q, &బిడ్డ,
+			  &మూలం_x, &మూలం_y, &win_x, &win_y, &ముసుగు);
 
-	    if (root == root_q)
+	    ఒకవేళ (మూలం == మూలం_q)
 	    {
-		if ((win_x < 0) || (win_y < 0))
-		    return False;
+		ఒకవేళ ((win_x < 0) || (win_y < 0))
+		    తిరిగి False;
 
-		if ((win_x > (int)r_width) || (win_y > (int)r_height))
-		    return False;
+		ఒకవేళ ((win_x > (పూర్ణాంకం)r_వెడల్పు) || (win_y > (పూర్ణాంకం)r_ఎత్తు))
+		    తిరిగి False;
 		draw_highlight(eb);
 		draw_shadows(eb);
 	    }
 	}
 
-	return True;
+	తిరిగి True;
     }
 
     /*
      * Check for changed ExtLabelString.
      */
-    if (NOT_EQUAL(primitive.shadow_thickness))
+    ఒకవేళ (NOT_EQUAL(primitive.shadow_thickness))
     {
 	redraw = True;
 	// Don't change the pixmaps
 	change = False;
     }
 
-    if (NOT_EQUAL(primitive.foreground))
+    ఒకవేళ (NOT_EQUAL(primitive.foreground))
 	redraw = True;
-    if (NOT_EQUAL(core.background_pixel))
+    ఒకవేళ (NOT_EQUAL(core.background_pixel))
 	redraw = True;
-    if (NOT_EQUAL(pushbutton.fill_on_arm))
+    ఒకవేళ (NOT_EQUAL(pushbutton.fill_on_arm))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.spacing))
+    ఒకవేళ (NOT_EQUAL(enhancedbutton.spacing))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.label_location))
+    ఒకవేళ (NOT_EQUAL(enhancedbutton.label_location))
     {
 	redraw = True;
 	change = False;
     }
-    if (NOT_EQUAL(label._label))
+    ఒకవేళ (NOT_EQUAL(label._label))
     {
 	redraw = True;
-	set_size(eb);
+	సమితి_కొలత_2(eb);
     }
 
-    if (redraw == True)
+    ఒకవేళ (redraw == True)
     {
-	if (change)
-	    set_pixmap(eb);
-	if (eb->primitive.highlighted)
+	ఒకవేళ (change)
+	    సమితి_pixmap(eb);
+	ఒకవేళ (eb->primitive.highlighted)
 	    eb->label.pixmap = eb->enhancedbutton.highlight_pixmap;
-	else
-	    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
-	if (change)
-	    set_size(eb);
+	లేకపోతే
+	    eb->label.pixmap = eb->enhancedbutton.సాధారణ_pixmap;
+	ఒకవేళ (change)
+	    సమితి_కొలత_2(eb);
 	redraw = False;
     }
 
-    return redraw;
+    తిరిగి redraw;
 }
 
-    static void
+    స్థిర శూన్య
 Redisplay(Widget w, XEvent *event, Region region)
 {
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) w;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
     XmDisplay		    dpy;
     XtEnum		    default_button_emphasis;
-#endif
+#అయితే_ముగింపు
     XRectangle		    box;
-    int			    dx;
-    int			    adjust;
-    short		    fill = 0;
+    పూర్ణాంకం			    dx;
+    పూర్ణాంకం			    adjust;
+    పొట్టి		    fill = 0;
 
-    if (!XtIsRealized((Widget)eb))
-	return;
+    ఒకవేళ (!XtIsRealized((Widget)eb))
+	తిరిగి;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
     dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
     default_button_emphasis = dpy->display.default_button_emphasis;
-#endif
+#అయితే_ముగింపు
 
     /*
      * Compute the area allocated to the label of the pushbutton; fill in the
      * dimensions in the box.
      */
 
-    if ((eb->pushbutton.arm_color == eb->primitive.top_shadow_color)
+    ఒకవేళ ((eb->pushbutton.arm_color == eb->primitive.శిఖరం_shadow_color)
 	    || (eb->pushbutton.arm_color == eb->primitive.bottom_shadow_color))
 	fill = 1;
 
-    if (eb->pushbutton.compatible)
+    ఒకవేళ (eb->pushbutton.compatible)
 	adjust = eb->pushbutton.show_as_default;
-    else
+    లేకపోతే
 	adjust = eb->pushbutton.default_button_shadow_thickness;
 
-    if (adjust > 0)
+    ఒకవేళ (adjust > 0)
     {
 	adjust = adjust + eb->primitive.shadow_thickness;
 	adjust = (adjust << 1);
 	dx = eb->primitive.highlight_thickness + adjust + fill;
     }
-    else
+    లేకపోతే
 	dx = (eb->primitive.highlight_thickness
 		+ eb->primitive.shadow_thickness + fill);
 
     box.x = dx;
     box.y = dx;
     adjust = (dx << 1);
-    box.width  = eb->core.width - adjust;
-    box.height = eb->core.height - adjust;
+    box.వెడల్పు  = eb->core.వెడల్పు - adjust;
+    box.ఎత్తు = eb->core.ఎత్తు - adjust;
 
     /*
      * Redraw the background.
      */
-    if (!Lab_IsMenupane(eb))
+    ఒకవేళ (!Lab_IsMenupane(eb))
     {
 	GC  gc;
 
 	// Don't shade if the button contains a label with a pixmap, since
 	// there is no variant of the label available with the needed
 	// background.
-	if (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
+	ఒకవేళ (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
 	{
-		if (eb->label.label_type == (int)XmPIXMAP)
+		ఒకవేళ (eb->label.label_type == (పూర్ణాంకం)XmPIXMAP)
 		{
-		    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+		    ఒకవేళ (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 			gc = eb->pushbutton.fill_gc;
-		    else
+		    లేకపోతే
 			gc = eb->pushbutton.background_gc;
 		}
-		else
+		లేకపోతే
 		    gc = eb->pushbutton.fill_gc;
 	}
-	else
+	లేకపోతే
 	    gc = eb->pushbutton.background_gc;
 	// really need to fill with background if not armed ?
-	if (gc)
-	    XFillRectangle(XtDisplay(eb), XtWindow(eb), gc,
-		    box.x, box.y, box.width, box.height);
+	ఒకవేళ (gc)
+	    XFillRectangle(XtDisplay(eb), Xt_కిటికీ(eb), gc,
+		    box.x, box.y, box.వెడల్పు, box.ఎత్తు);
     }
 
     draw_label(eb, event, region);
 
-    if (Lab_IsMenupane(eb))
+    ఒకవేళ (Lab_IsMenupane(eb))
     {
-	if (eb->pushbutton.armed)
-	    (*(((XmPushButtonWidgetClass)XtClass(eb))
+	ఒకవేళ (eb->pushbutton.armed)
+	    (*(((Xm_నెట్టు_Button_Widget_Class)XtClass(eb))
 	       ->primitive_class.border_highlight))(w);
 	draw_pixmap(eb, event, region);
     }
-    else
+    లేకపోతే
     {
 	adjust = 0;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
 	/*
 	 *  NOTE: PushButton has two types of shadows: primitive-shadow and
 	 *  default-button-shadow.  If pushbutton is in a menu only primitive
 	 *  shadows are drawn.
 	 */
-	switch (default_button_emphasis)
+	ఎంపిక (default_button_emphasis)
 	{
-	    case XmEXTERNAL_HIGHLIGHT:
+	    స్థితి XmEXTERNAL_HIGHLIGHT:
 		adjust = (eb->primitive.highlight_thickness -
 			 (eb->pushbutton.default_button_shadow_thickness
 			  ?  Xm3D_ENHANCE_PIXEL : 0));
-		break;
+		ఆపు;
 
-	    case XmINTERNAL_HIGHLIGHT:
-		break;
+	    స్థితి Xm_అంతర్గత_HIGHLIGHT:
+		ఆపు;
 
-	    default:
-		assert(FALSE);
-		return;
+	    అప్రమేయ:
+		ప్రతిజ్ఞా(FALSE);
+		తిరిగి;
 	}
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * Clear the area not occupied by label with parents background color.
@@ -1306,43 +1306,43 @@ Redisplay(Widget w, XEvent *event, Region region)
 	 * area, which is redundant when XmEXTERNAL_HIGHLIGHT default button
 	 * shadow emphasis is used.
 	 */
-	if (box.x > adjust)
+	ఒకవేళ (box.x > adjust)
 	{
-	    int borderwidth =box.x - adjust;
-	    int rectwidth = eb->core.width - 2 * adjust;
-	    int rectheight = eb->core.height - 2 * adjust;
+	    పూర్ణాంకం borderwidth =box.x - adjust;
+	    పూర్ణాంకం rectwidth = eb->core.వెడల్పు - 2 * adjust;
+	    పూర్ణాంకం rectheight = eb->core.ఎత్తు - 2 * adjust;
 
-	    if (XmIsManager(XtParent(eb)))
+	    ఒకవేళ (XmIsManager(Xt_మాతృ(eb)))
 	    {
-		XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
-						     XmParentBackgroundGC(eb),
+		XmeDrawHighlight(XtDisplay(eb), Xt_కిటికీ(eb),
+						     Xm_మాతృ_Background_GC(eb),
 			adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+		XmeClearBorder(XtDisplay(eb), Xt_కిటికీ(eb),
 			  adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
-	    switch (default_button_emphasis)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
+	    ఎంపిక (default_button_emphasis)
 	    {
-		case XmINTERNAL_HIGHLIGHT:
+		స్థితి Xm_అంతర్గత_HIGHLIGHT:
 		    // The call above erases the border highlighting.
-		    if (eb->primitive.highlight_drawn)
-			(*(((XmPushButtonWidgetClass) XtClass (eb))
+		    ఒకవేళ (eb->primitive.highlight_drawn)
+			(*(((Xm_నెట్టు_Button_Widget_Class) XtClass (eb))
 			   ->primitive_class.border_highlight)) ((Widget) eb) ;
-		    break;
+		    ఆపు;
 
-		default:
-		    break;
+		అప్రమేయ:
+		    ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
 
-	if (eb->pushbutton.default_button_shadow_thickness)
+	ఒకవేళ (eb->pushbutton.default_button_shadow_thickness)
 	{
-	    if (eb->pushbutton.show_as_default)
+	    ఒకవేళ (eb->pushbutton.show_as_default)
 	    {
 		/*
 		 *  - get the topShadowColor and bottomShadowColor from the
@@ -1355,106 +1355,106 @@ Redisplay(Widget w, XEvent *event, Region region)
 		 *  - Should be called only if a defaultbuttonshadow is to be
 		 *  drawn.
 		 */
-		GC	    top_gc;
+		GC	    శిఖరం_gc;
 		GC	    bottom_gc;
-		int	    default_button_shadow_thickness;
-		int	    x, y, width, height, delta;
-		Widget	    parent;
+		పూర్ణాంకం	    default_button_shadow_thickness;
+		పూర్ణాంకం	    x, y, వెడల్పు, ఎత్తు, delta;
+		Widget	    మాతృ;
 
-		if (eb->pushbutton.compatible
+		ఒకవేళ (eb->pushbutton.compatible
 				     && (eb->pushbutton.show_as_default == 0))
-		    return;
+		    తిరిగి;
 
-		if (!eb->pushbutton.compatible
+		ఒకవేళ (!eb->pushbutton.compatible
 			&& (eb->pushbutton.default_button_shadow_thickness
 									== 0))
-		    return;
+		    తిరిగి;
 
 		delta = eb->primitive.highlight_thickness;
 
 		/*
 		 * May need more complex computation for getting the GCs.
 		 */
-		parent = XtParent(eb);
-		if (XmIsManager(parent))
+		మాతృ = Xt_మాతృ(eb);
+		ఒకవేళ (XmIsManager(మాతృ))
 		{
 		    // Use the parent's GC so monochrome works.
-		    bottom_gc = XmParentTopShadowGC(eb);
-		    top_gc = XmParentBottomShadowGC(eb);
+		    bottom_gc = Xm_మాతృ_శిఖరం_Shadow_GC(eb);
+		    శిఖరం_gc = Xm_మాతృ_Bottom_Shadow_GC(eb);
 		}
-		else
+		లేకపోతే
 		{
 		    // Use your own pixel for drawing.
-		    bottom_gc = eb->primitive.top_shadow_GC;
-		    top_gc = eb->primitive.bottom_shadow_GC;
+		    bottom_gc = eb->primitive.శిఖరం_shadow_GC;
+		    శిఖరం_gc = eb->primitive.bottom_shadow_GC;
 		}
 
-		if ((bottom_gc == None) || (top_gc == None))
-		    return;
+		ఒకవేళ ((bottom_gc == None) || (శిఖరం_gc == None))
+		    తిరిగి;
 
 
-		if (eb->pushbutton.compatible)
+		ఒకవేళ (eb->pushbutton.compatible)
 		    default_button_shadow_thickness =
 					       eb->pushbutton.show_as_default;
-		else
+		లేకపోతే
 		    default_button_shadow_thickness =
 			       eb->pushbutton.default_button_shadow_thickness;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ఒకవేళ !defined(LESSTIF_సంస్కరణ) && (Xm_సంస్కరణ > 1002)
 		/*
 		 * Compute location of bounding box to contain the
 		 * defaultButtonShadow.
 		 */
-		switch (default_button_emphasis)
+		ఎంపిక (default_button_emphasis)
 		{
-		    case XmEXTERNAL_HIGHLIGHT:
+		    స్థితి XmEXTERNAL_HIGHLIGHT:
 			delta = eb->primitive.highlight_thickness;
-			break;
+			ఆపు;
 
-		    case XmINTERNAL_HIGHLIGHT:
+		    స్థితి Xm_అంతర్గత_HIGHLIGHT:
 			delta = Xm3D_ENHANCE_PIXEL;
-			break;
+			ఆపు;
 
-		    default:
-			assert(FALSE);
-			return;
+		    అప్రమేయ:
+			ప్రతిజ్ఞా(FALSE);
+			తిరిగి;
 		}
-#endif
+#అయితే_ముగింపు
 
 		x = y = delta;
-		width = eb->core.width - 2 * delta;
-		height = eb->core.height - 2 * delta;
+		వెడల్పు = eb->core.వెడల్పు - 2 * delta;
+		ఎత్తు = eb->core.ఎత్తు - 2 * delta;
 
-		if ((width > 0) && (height > 0))
-		    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			    top_gc, bottom_gc, x, y, width, height,
+		ఒకవేళ ((వెడల్పు > 0) && (ఎత్తు > 0))
+		    XmeDrawShadows(XtDisplay(eb), Xt_కిటికీ(eb),
+			    శిఖరం_gc, bottom_gc, x, y, వెడల్పు, ఎత్తు,
 			    default_button_shadow_thickness,
-			    (unsigned)XmSHADOW_OUT);
+			    (గుర్తులేని)Xm_SHADOW_బహిర్గతం);
 	    }
 	}
 
-	if (eb->primitive.highlight_drawn)
+	ఒకవేళ (eb->primitive.highlight_drawn)
 	    draw_shadows(eb);
 	draw_pixmap(eb, event, region);
     }
 }
 
-    static void
+    స్థిర శూన్య
 BorderHighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_highlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_నెట్టు_Button_Class_Rec.primitive_class.border_highlight))(w);
+    draw_pixmap(eb, ఖాళీ, ఖాళీ);
 }
 
-    static void
+    స్థిర శూన్య
 BorderUnhighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_unhighlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_నెట్టు_Button_Class_Rec.primitive_class.border_unhighlight))(w);
+    draw_pixmap(eb, ఖాళీ, ఖాళీ);
 }
 
-#endif // FEAT_TOOLBAR
+#అయితే_ముగింపు // FEAT_TOOLBAR

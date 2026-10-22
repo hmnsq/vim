@@ -40,48 +40,48 @@
  * ScreenLines[].
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * The attributes that are actually active for writing to the screen.
  */
-static int	screen_attr = 0;
+స్థిర పూర్ణాంకం	screen_attr = 0;
 
-static void screen_char_2(unsigned off, int row, int col);
-static int screenclear2(int doclear);
-static void lineclear(unsigned off, int width, int attr);
-static void lineinvalid(unsigned off, int width);
-static int win_do_lines(win_T *wp, int row, int line_count, int mayclear, int del, int clear_attr);
-static void win_rest_invalid(win_T *wp);
-static void msg_pos_mode(void);
-static void recording_mode(int attr);
+స్థిర శూన్య screen_char_2(గుర్తులేని off, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు);
+స్థిర పూర్ణాంకం screenclear2(పూర్ణాంకం doclear);
+స్థిర శూన్య lineclear(గుర్తులేని off, పూర్ణాంకం వెడల్పు, పూర్ణాంకం attr);
+స్థిర శూన్య lineinvalid(గుర్తులేని off, పూర్ణాంకం వెడల్పు);
+స్థిర పూర్ణాంకం win_do_పంక్తులు(win_T *wp, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం పంక్తి_లెక్క, పూర్ణాంకం mayclear, పూర్ణాంకం del, పూర్ణాంకం clear_attr);
+స్థిర శూన్య win_rest_invalid(win_T *wp);
+స్థిర శూన్య సందేశం_pos_బహుళకం(శూన్య);
+స్థిర శూన్య recording_బహుళకం(పూర్ణాంకం attr);
 
 // Ugly global: overrule attribute used by screen_char()
-static int screen_char_attr = 0;
+స్థిర పూర్ణాంకం screen_char_attr = 0;
 
-#if defined(FEAT_CONCEAL)
+#ఒకవేళ defined(FEAT_CONCEAL)
 /*
  * Return TRUE if the cursor line in window "wp" may be concealed, according
  * to the 'concealcursor' option.
  */
-    int
-conceal_cursor_line(win_T *wp)
+    పూర్ణాంకం
+conceal_cursor_పంక్తి(win_T *wp)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
-    if (*wp->w_p_cocu == NUL)
-	return FALSE;
-    if (get_real_state() & MODE_VISUAL)
+    ఒకవేళ (*wp->w_p_cocu == NUL)
+	తిరిగి FALSE;
+    ఒకవేళ (get_real_state() & బహుళకం_VISUAL)
 	c = 'v';
-    else if (State & MODE_INSERT)
+    లేకపోతే ఒకవేళ (State & బహుళకం_చొప్పించు)
 	c = 'i';
-    else if (State & MODE_NORMAL)
+    లేకపోతే ఒకవేళ (State & బహుళకం_సాధారణ)
 	c = 'n';
-    else if (State & MODE_CMDLINE)
+    లేకపోతే ఒకవేళ (State & బహుళకం_CMDLINE)
 	c = 'c';
-    else
-	return FALSE;
-    return vim_strchr(wp->w_p_cocu, c) != NULL;
+    లేకపోతే
+	తిరిగి FALSE;
+    తిరిగి vim_strchr(wp->w_p_cocu, c) != ఖాళీ;
 }
 
 /*
@@ -90,91 +90,91 @@ conceal_cursor_line(win_T *wp)
  * "conceal_cursor_line()" before the change.
  * "
  */
-    void
-conceal_check_cursor_line(int was_concealed)
+    శూన్య
+conceal_check_cursor_పంక్తి(పూర్ణాంకం was_concealed)
 {
-    if (curwin->w_p_cole <= 0 || conceal_cursor_line(curwin) == was_concealed)
-	return;
+    ఒకవేళ (curwin->w_p_cole <= 0 || conceal_cursor_పంక్తి(curwin) == was_concealed)
+	తిరిగి;
 
-    int wcol = curwin->w_wcol;
+    పూర్ణాంకం wcol = curwin->w_wcol;
 
-    need_cursor_line_redraw = TRUE;
+    need_cursor_పంక్తి_redraw = TRUE;
     // Need to recompute cursor column, e.g., when starting Visual mode
     // without concealing.
     curs_columns(TRUE);
 
     // When concealing now w_wcol will be computed wrong, keep the previous
     // value, it will be updated in win_line().
-    if (!was_concealed)
+    ఒకవేళ (!was_concealed)
 	curwin->w_wcol = wcol;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get HLF_WIN attribute for window "wp".  If not set and "wp" is a popup window
  * then get the "Pmenu" highlight attribute.
  */
-    int
+    పూర్ణాంకం
 get_win_attr(win_T *wp)
 {
-    int	    win_attr = wp->w_hlfwin_id;
+    పూర్ణాంకం	    win_attr = wp->w_hlfwin_id;
     bool    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-    if (win_attr != 0)
+    ఒకవేళ (win_attr != 0)
     {
-	if (win_attr != -1)
+	ఒకవేళ (win_attr != -1)
 	    win_attr = syn_id2attr(win_attr);
-	else
+	లేకపోతే
 	    win_attr = 0;
     }
-#ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(wp))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    లేకపోతే ఒకవేళ (WIN_IS_POPUP(wp))
     {
-	if (wp->w_popup_flags & POPF_INFO)
+	ఒకవేళ (wp->w_popup_flags & POPF_INFO)
 	    win_attr = HL_ATTR(HLF_PSI);    // PmenuSel
-	else
-	    win_attr = HL_ATTR(HLF_POP);    // Popup
+	లేకపోతే
+	    win_attr = HL_ATTR(HLF_తీయి);    // Popup
     }
-#endif
+#అయితే_ముగింపు
 
-    if (override_success)
-	pop_highlight_overrides();
-    return win_attr;
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
+    తిరిగి win_attr;
 }
 
 /*
  * Call screen_fill() with the columns adjusted for 'rightleft' if needed.
  * Return the new offset.
  */
-    static int
-screen_fill_end(
+    స్థిర పూర్ణాంకం
+screen_fill_చివర(
 	win_T *wp,
-	int	c1,
-	int	c2,
-	int	off,
-	int	width,
-	int	row,
-	int	endrow,
-	int	attr)
+	పూర్ణాంకం	c1,
+	పూర్ణాంకం	c2,
+	పూర్ణాంకం	off,
+	పూర్ణాంకం	వెడల్పు,
+	పూర్ణాంకం	అడ్డువరుస,
+	పూర్ణాంకం	endrow,
+	పూర్ణాంకం	attr)
 {
-    int	    nn = off + width;
+    పూర్ణాంకం	    nn = off + వెడల్పు;
 
-    if (nn > wp->w_width)
-	nn = wp->w_width;
-#ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+    ఒకవేళ (nn > wp->w_వెడల్పు)
+	nn = wp->w_వెడల్పు;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (wp->w_p_rl)
     {
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		W_ENDCOL(wp) - nn, (int)W_ENDCOL(wp) - off,
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + endrow,
+		W_ENDCOL(wp) - nn, (పూర్ణాంకం)W_ENDCOL(wp) - off,
 		c1, c2, attr);
     }
-    else
-#endif
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		wp->w_wincol + off, (int)wp->w_wincol + nn,
+    లేకపోతే
+#అయితే_ముగింపు
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + endrow,
+		wp->w_wincol + off, (పూర్ణాంకం)wp->w_wincol + nn,
 		c1, c2, attr);
-    return nn;
+    తిరిగి nn;
 }
 
 /*
@@ -182,80 +182,80 @@ screen_fill_end(
  * use "c2" as the filler character.
  * When "draw_margin" is TRUE then draw the sign, fold and number columns.
  */
-    void
-win_draw_end(
+    శూన్య
+win_draw_చివర(
     win_T	*wp,
-    int		c1,
-    int		c2,
-    int		draw_margin,
-    int		row,
-    int		endrow,
+    పూర్ణాంకం		c1,
+    పూర్ణాంకం		c2,
+    పూర్ణాంకం		draw_margin,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		endrow,
     hlf_T	hl)
 {
-    int		n = 0;
-    int		attr = HL_ATTR(hl);
-    int		win_attr = get_win_attr(wp);
+    పూర్ణాంకం		n = 0;
+    పూర్ణాంకం		attr = HL_ATTR(hl);
+    పూర్ణాంకం		win_attr = get_win_attr(wp);
     bool	override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
     attr = hl_combine_attr(win_attr, attr);
 
-    if (draw_margin)
+    ఒకవేళ (draw_margin)
     {
-#ifdef FEAT_FOLDING
-	int	fdc = compute_foldcolumn(wp, 0);
+#నిర్వచితమైతే FEAT_FOLDING
+	పూర్ణాంకం	fdc = compute_foldcolumn(wp, 0);
 
-	if (fdc > 0)
+	ఒకవేళ (fdc > 0)
 	    // draw the fold column
-	    n = screen_fill_end(wp, ' ', ' ', n, fdc,
-		      row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_FC)));
-#endif
-#ifdef FEAT_SIGNS
-	if (signcolumn_on(wp))
+	    n = screen_fill_చివర(wp, ' ', ' ', n, fdc,
+		      అడ్డువరుస, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_FC)));
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SIGNS
+	ఒకవేళ (signcolumn_on(wp))
 	    // draw the sign column
-	    n = screen_fill_end(wp, ' ', ' ', n, 2,
-		      row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_SC)));
-#endif
-	if ((wp->w_p_nu || wp->w_p_rnu)
-				  && vim_strchr(p_cpo, CPO_NUMCOL) == NULL)
+	    n = screen_fill_చివర(wp, ' ', ' ', n, 2,
+		      అడ్డువరుస, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_SC)));
+#అయితే_ముగింపు
+	ఒకవేళ ((wp->w_p_nu || wp->w_p_rnu)
+				  && vim_strchr(p_cpo, CPO_NUMCOL) == ఖాళీ)
 	    // draw the number column
-	    n = screen_fill_end(wp, ' ', ' ', n, number_width(wp) + 1,
-		       row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_N)));
+	    n = screen_fill_చివర(wp, ' ', ' ', n, సంఖ్య_వెడల్పు(wp) + 1,
+		       అడ్డువరుస, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_N)));
     }
 
-#ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (wp->w_p_rl)
     {
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + endrow,
 		wp->w_wincol, W_ENDCOL(wp) - 1 - n, c2, c2, attr);
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + endrow,
 		W_ENDCOL(wp) - 1 - n, W_ENDCOL(wp) - n, c1, c2, attr);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		wp->w_wincol + n, (int)W_ENDCOL(wp), c1, c2, attr);
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + endrow,
+		wp->w_wincol + n, (పూర్ణాంకం)W_ENDCOL(wp), c1, c2, attr);
     }
 
-    set_empty_rows(wp, row);
+    సమితి_ఖాళీలు_అడ్డువరుసలు(wp, అడ్డువరుస);
 
-    if (override_success)
-	pop_highlight_overrides();
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
 }
 
-#if defined(FEAT_FOLDING)
+#ఒకవేళ defined(FEAT_FOLDING)
 /*
  * Compute the width of the foldcolumn.  Based on 'foldcolumn' and how much
  * space is available for window "wp", minus "col".
  */
-    int
-compute_foldcolumn(win_T *wp, int col)
+    పూర్ణాంకం
+compute_foldcolumn(win_T *wp, పూర్ణాంకం నిలువు)
 {
-    int wmw = wp == curwin && p_wmw == 0 ? 1 : p_wmw;
-    int n = wp->w_width - (col + wmw);
+    పూర్ణాంకం wmw = wp == curwin && p_wmw == 0 ? 1 : p_wmw;
+    పూర్ణాంకం n = wp->w_వెడల్పు - (నిలువు + wmw);
 
-    return MIN(wp->w_p_fdc, n);
+    తిరిగి MIN(wp->w_p_fdc, n);
 }
 
 /*
@@ -269,91 +269,91 @@ compute_foldcolumn(win_T *wp, int col)
 fill_foldcolumn(
     char_u	*p,
     win_T	*wp,
-    int		closed,		// TRUE of FALSE
+    పూర్ణాంకం		closed,		// TRUE of FALSE
     linenr_T	lnum)		// current line number
 {
-    int		i = 0;
-    int		level;
-    int		first_level;
-    int		empty;
-    int		fdc = compute_foldcolumn(wp, 0);
+    పూర్ణాంకం		i = 0;
+    పూర్ణాంకం		level;
+    పూర్ణాంకం		మొదటి_level;
+    పూర్ణాంకం		ఖాళీలు_2;
+    పూర్ణాంకం		fdc = compute_foldcolumn(wp, 0);
     size_t	byte_counter = 0;
-    int		symbol = 0;
-    int		len = 0;
-    int		n;
+    పూర్ణాంకం		చిహ్నం = 0;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		n;
 
     // Init to all spaces.
     vim_memset(p, ' ', MAX_MCO * fdc + 1);
 
     level = win_foldinfo.fi_level;
-    empty = (fdc == 1) ? 0 : 1;
+    ఖాళీలు_2 = (fdc == 1) ? 0 : 1;
 
     // If the column is too narrow, we start at the lowest level that
     // fits and use numbers to indicate the depth.
-    first_level = level - fdc - closed + 1 + empty;
-    if (first_level < 1)
-	first_level = 1;
+    మొదటి_level = level - fdc - closed + 1 + ఖాళీలు_2;
+    ఒకవేళ (మొదటి_level < 1)
+	మొదటి_level = 1;
 
     n = MIN(fdc, level);		// evaluate this once
-    for (i = 0; i < n; i++)
+    కొరకు (i = 0; i < n; i++)
     {
-	if (win_foldinfo.fi_lnum == lnum
-		&& first_level + i >= win_foldinfo.fi_low_level)
-	    symbol = wp->w_fill_chars.foldopen;
-	else if (first_level == 1)
-	    symbol = wp->w_fill_chars.foldsep;
-	else if (wp->w_fill_chars.foldinner != NUL)
-	    symbol = wp->w_fill_chars.foldinner;
-	else if (first_level + i <= 9)
-	    symbol = '0' + first_level + i;
-	else
-	    symbol = '>';
+	ఒకవేళ (win_foldinfo.fi_lnum == lnum
+		&& మొదటి_level + i >= win_foldinfo.fi_దిగువ_level)
+	    చిహ్నం = wp->w_fill_chars.foldopen;
+	లేకపోతే ఒకవేళ (మొదటి_level == 1)
+	    చిహ్నం = wp->w_fill_chars.foldsep;
+	లేకపోతే ఒకవేళ (wp->w_fill_chars.foldinner != NUL)
+	    చిహ్నం = wp->w_fill_chars.foldinner;
+	లేకపోతే ఒకవేళ (మొదటి_level + i <= 9)
+	    చిహ్నం = '0' + మొదటి_level + i;
+	లేకపోతే
+	    చిహ్నం = '>';
 
-	len = utf_char2bytes(symbol, &p[byte_counter]);
+	len = utf_char2bytes(చిహ్నం, &p[byte_counter]);
 	byte_counter += len;
-	if (first_level + i >= level)
+	ఒకవేళ (మొదటి_level + i >= level)
 	{
 	    i++;
-	    break;
+	    ఆపు;
 	}
     }
 
-    if (closed)
+    ఒకవేళ (closed)
     {
-	if (symbol != 0)
+	ఒకవేళ (చిహ్నం != 0)
 	{
 	    // rollback length and the character
 	    byte_counter -= len;
-	    if (len > 1)
+	    ఒకవేళ (len > 1)
 		// for a multibyte character, erase all the bytes
 		vim_memset(p + byte_counter, ' ', len);
 	}
-	symbol = wp->w_fill_chars.foldclosed;
-	len = utf_char2bytes(symbol, &p[byte_counter]);
+	చిహ్నం = wp->w_fill_chars.foldclosed;
+	len = utf_char2bytes(చిహ్నం, &p[byte_counter]);
 	byte_counter += len;
     }
 
-    return MAX(byte_counter + (fdc - i), (size_t)fdc);
+    తిరిగి MAX(byte_counter + (fdc - i), (size_t)fdc);
 }
-#endif // FEAT_FOLDING
+#అయితే_ముగింపు // FEAT_FOLDING
 
 /*
  * Return if the composing characters at "off_from" and "off_to" differ.
  * Only to be used when ScreenLinesUC[off_from] != 0.
  */
-    static int
-comp_char_differs(int off_from, int off_to)
+    స్థిర పూర్ణాంకం
+comp_char_differs(పూర్ణాంకం off_from, పూర్ణాంకం off_గమ్యం)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = 0; i < Screen_mco; ++i)
+    కొరకు (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off_from] != ScreenLinesC[i][off_to])
-	    return TRUE;
-	if (ScreenLinesC[i][off_from] == 0)
-	    break;
+	ఒకవేళ (Screen_పంక్తులు_C[i][off_from] != Screen_పంక్తులు_C[i][off_గమ్యం])
+	    తిరిగి TRUE;
+	ఒకవేళ (Screen_పంక్తులు_C[i][off_from] == 0)
+	    ఆపు;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -363,70 +363,70 @@ comp_char_differs(int off_from, int off_to)
  * - the character is multi-byte and the next byte is different
  * - the character is two cells wide and the second cell differs.
  */
-    static int
-char_needs_redraw(int off_from, int off_to, int cols)
+    స్థిర పూర్ణాంకం
+char_needs_redraw(పూర్ణాంకం off_from, పూర్ణాంకం off_గమ్యం, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
-    if (cols > 0
-	    && ((ScreenLines[off_from] != ScreenLines[off_to]
-		    || ScreenAttrs[off_from] != ScreenAttrs[off_to])
+    ఒకవేళ (నిలువుల_సంఖ్య > 0
+	    && ((Screen_పంక్తులు[off_from] != Screen_పంక్తులు[off_గమ్యం]
+		    || ScreenAttrs[off_from] != ScreenAttrs[off_గమ్యం])
 		|| (enc_dbcs != 0
-		    && MB_BYTE2LEN(ScreenLines[off_from]) > 1
-		    && (enc_dbcs == DBCS_JPNU && ScreenLines[off_from] == 0x8e
-			? ScreenLines2[off_from] != ScreenLines2[off_to]
-			: (cols > 1 && ScreenLines[off_from + 1]
-						 != ScreenLines[off_to + 1])))
+		    && MB_BYTE2LEN(Screen_పంక్తులు[off_from]) > 1
+		    && (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off_from] == 0x8e
+			? ScreenLines2[off_from] != ScreenLines2[off_గమ్యం]
+			: (నిలువుల_సంఖ్య > 1 && Screen_పంక్తులు[off_from + 1]
+						 != Screen_పంక్తులు[off_గమ్యం + 1])))
 		|| (enc_utf8
-		    && (ScreenLinesUC[off_from] != ScreenLinesUC[off_to]
-			|| (ScreenLinesUC[off_from] != 0
-			    && comp_char_differs(off_from, off_to))
-			|| ((*mb_off2cells)(off_from, off_from + cols) > 1
-			    && ScreenLines[off_from + 1]
-						!= ScreenLines[off_to + 1])))))
-	return TRUE;
-    return FALSE;
+		    && (Screen_పంక్తులు_UC[off_from] != Screen_పంక్తులు_UC[off_గమ్యం]
+			|| (Screen_పంక్తులు_UC[off_from] != 0
+			    && comp_char_differs(off_from, off_గమ్యం))
+			|| ((*mb_off2cells)(off_from, off_from + నిలువుల_సంఖ్య) > 1
+			    && Screen_పంక్తులు[off_from + 1]
+						!= Screen_పంక్తులు[off_గమ్యం + 1])))))
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 /*
  * Return the index in ScreenLines[] for the current screen line.
  */
-    int
-screen_get_current_line_off(void)
+    పూర్ణాంకం
+screen_get_current_పంక్తి_off(శూన్య)
 {
-    return (int)(current_ScreenLine - ScreenLines);
+    తిరిగి (పూర్ణాంకం)(current_Screen_పంక్తి - Screen_పంక్తులు);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 /*
  * Return TRUE if this position has a higher level popup or this cell is
  * transparent in the current popup.
  */
-    static int
-blocked_by_popup(int row, int col)
+    స్థిర పూర్ణాంకం
+blocked_by_popup(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    int off;
+    పూర్ణాంకం off;
 
-    if (!popup_visible)
-	return FALSE;
-    off = row * screen_Columns + col;
-    return popup_mask[off] > screen_zindex || popup_transparent[off];
+    ఒకవేళ (!popup_visible)
+	తిరిగి FALSE;
+    off = అడ్డువరుస * screen_Columns + నిలువు;
+    తిరిగి popup_ముసుగు[off] > screen_zindex || popup_transparent[off];
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Reset the highlighting.  Used before clearing the screen.
  */
-    void
-reset_screen_attr(void)
+    శూన్య
+reset_screen_attr(శూన్య)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	// Use a code that will reset gui.highlight_mask in
 	// gui_stop_highlight().
 	screen_attr = HL_ALL + 1;
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	// Use attributes that is very unlikely to appear in text.
 	screen_attr = HL_BOLD | HL_UNDERLINE | HL_INVERSE | HL_STRIKETHROUGH;
 }
@@ -435,99 +435,99 @@ reset_screen_attr(void)
  * Return TRUE if the character at "row" / "col" is under the popup menu and it
  * will be redrawn soon or it is under another popup.
  */
-    static int
-skip_for_popup(int row, int col)
+    స్థిర పూర్ణాంకం
+skip_for_popup(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
     // Popup windows with zindex higher than POPUPMENU_ZINDEX go on top.
-    if (pum_under_menu(row, col, TRUE)
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (pum_under_menu(అడ్డువరుస, నిలువు, TRUE)
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    && screen_zindex <= POPUPMENU_ZINDEX
-#endif
+#అయితే_ముగింపు
 	    )
-	return TRUE;
+	తిరిగి TRUE;
     // Protect cells under the pum from background draws (vsep, status line).
     // Excluded for wildmenu pum (MODE_CMDLINE): pum_row can be stale while
     // the cmdline grows.
-#ifdef FEAT_PROP_POPUP
-    if (screen_zindex < POPUPMENU_ZINDEX
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (screen_zindex < POPUPMENU_ZINDEX
 	    && pum_visible()
-	    && (State & MODE_CMDLINE) == 0
-	    && pum_under_menu(row, col, FALSE))
-	return TRUE;
-#else
-    if (pum_visible()
-	    && (State & MODE_CMDLINE) == 0
-	    && pum_under_menu(row, col, FALSE))
-	return TRUE;
-#endif
-#ifdef FEAT_PROP_POPUP
-    if (blocked_by_popup(row, col))
-	return TRUE;
-#endif
-    return FALSE;
+	    && (State & బహుళకం_CMDLINE) == 0
+	    && pum_under_menu(అడ్డువరుస, నిలువు, FALSE))
+	తిరిగి TRUE;
+#లేకపోతే
+    ఒకవేళ (pum_visible()
+	    && (State & బహుళకం_CMDLINE) == 0
+	    && pum_under_menu(అడ్డువరుస, నిలువు, FALSE))
+	తిరిగి TRUE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (blocked_by_popup(అడ్డువరుస, నిలువు))
+	తిరిగి TRUE;
+#అయితే_ముగింపు
+    తిరిగి FALSE;
 }
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 // Cells where ScreenLines[] was updated but terminal output was suppressed
 // because the cell was under an opacity popup.  For these cells the terminal
 // no longer matches ScreenLines[], so the "cell unchanged, skip output"
 // optimization must not be applied until they are output again.
-static char_u	*suppressed_cells = NULL;
-static int	suppressed_rows = 0;
-static int	suppressed_cols = 0;
+స్థిర char_u	*suppressed_cells = ఖాళీ;
+స్థిర పూర్ణాంకం	suppressed_అడ్డువరుసలు = 0;
+స్థిర పూర్ణాంకం	suppressed_నిలువుల_సంఖ్య = 0;
 
-    static void
-mark_suppressed_cell(int row, int col)
+    స్థిర శూన్య
+mark_suppressed_cell(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    if (suppressed_cells == NULL
-	    || suppressed_rows != screen_Rows
-	    || suppressed_cols != screen_Columns)
+    ఒకవేళ (suppressed_cells == ఖాళీ
+	    || suppressed_అడ్డువరుసలు != screen_అడ్డువరుసలు
+	    || suppressed_నిలువుల_సంఖ్య != screen_Columns)
     {
 	vim_free(suppressed_cells);
 	suppressed_cells = alloc_clear(
-				   (size_t)screen_Rows * screen_Columns);
-	if (suppressed_cells == NULL)
+				   (size_t)screen_అడ్డువరుసలు * screen_Columns);
+	ఒకవేళ (suppressed_cells == ఖాళీ)
 	{
-	    suppressed_rows = 0;
-	    suppressed_cols = 0;
-	    return;
+	    suppressed_అడ్డువరుసలు = 0;
+	    suppressed_నిలువుల_సంఖ్య = 0;
+	    తిరిగి;
 	}
-	suppressed_rows = screen_Rows;
-	suppressed_cols = screen_Columns;
+	suppressed_అడ్డువరుసలు = screen_అడ్డువరుసలు;
+	suppressed_నిలువుల_సంఖ్య = screen_Columns;
     }
-    suppressed_cells[row * suppressed_cols + col] = TRUE;
+    suppressed_cells[అడ్డువరుస * suppressed_నిలువుల_సంఖ్య + నిలువు] = TRUE;
 }
 
-    static void
-unmark_suppressed_cell(int row, int col)
+    స్థిర శూన్య
+unmark_suppressed_cell(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    if (suppressed_cells != NULL
-	    && row >= 0 && row < suppressed_rows
-	    && col >= 0 && col < suppressed_cols)
-	suppressed_cells[row * suppressed_cols + col] = FALSE;
+    ఒకవేళ (suppressed_cells != ఖాళీ
+	    && అడ్డువరుస >= 0 && అడ్డువరుస < suppressed_అడ్డువరుసలు
+	    && నిలువు >= 0 && నిలువు < suppressed_నిలువుల_సంఖ్య)
+	suppressed_cells[అడ్డువరుస * suppressed_నిలువుల_సంఖ్య + నిలువు] = FALSE;
 }
 
-    static int
-is_suppressed_cell(int row, int col)
+    స్థిర పూర్ణాంకం
+is_suppressed_cell(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    return suppressed_cells != NULL
-	&& row >= 0 && row < suppressed_rows
-	&& col >= 0 && col < suppressed_cols
-	&& suppressed_cells[row * suppressed_cols + col];
+    తిరిగి suppressed_cells != ఖాళీ
+	&& అడ్డువరుస >= 0 && అడ్డువరుస < suppressed_అడ్డువరుసలు
+	&& నిలువు >= 0 && నిలువు < suppressed_నిలువుల_సంఖ్య
+	&& suppressed_cells[అడ్డువరుస * suppressed_నిలువుల_సంఖ్య + నిలువు];
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 /*
  * Cached attributes of the current opacity popup, computed once per
  * screen_line() to avoid recomputing them inside the per-cell loop.
  */
-typedef struct {
-    int		popup_attr;	// get_win_attr(screen_opacity_popup)
-    int		blend;		// screen_opacity_popup->w_popup_blend
+రకనిర్వచనం నిర్మాణం {
+    పూర్ణాంకం		popup_attr;	// get_win_attr(screen_opacity_popup)
+    పూర్ణాంకం		blend;		// screen_opacity_popup->w_popup_blend
 } popup_opacity_T;
 
-    static inline void
+    స్థిర అంతఃవరుస శూన్య
 popup_opacity_init(popup_opacity_T *po)
 {
     po->popup_attr = get_win_attr(screen_opacity_popup);
@@ -538,13 +538,13 @@ popup_opacity_init(popup_opacity_T *po)
  * Read the underlying base screen attribute at (row, col), falling back
  * to "fallback" when the position is outside base_screenattrs.
  */
-    static inline int
-popup_base_attr_or(int row, int col, int fallback)
+    స్థిర అంతఃవరుస పూర్ణాంకం
+popup_పునాది_attr_or(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం fallback)
 {
-    int		base = fallback;
+    పూర్ణాంకం		పునాది = fallback;
 
-    popup_get_base_screen_cell(row, col, NULL, &base, NULL);
-    return base;
+    popup_get_పునాది_screen_cell(అడ్డువరుస, నిలువు, ఖాళీ, &పునాది, ఖాళీ);
+    తిరిగి పునాది;
 }
 
 /*
@@ -552,16 +552,16 @@ popup_base_attr_or(int row, int col, int fallback)
  * "blend_fg" is TRUE when both fg and bg should blend (space cells), FALSE
  * when only bg should blend so the popup fg is preserved (text cells).
  */
-    static inline int
-popup_blend_with_base(
-	const popup_opacity_T	*po,
-	int			char_attr,
-	int			base_attr,
-	int			blend_fg)
+    స్థిర అంతఃవరుస పూర్ణాంకం
+popup_blend_with_పునాది(
+	స్థిరరాశి popup_opacity_T	*po,
+	పూర్ణాంకం			char_attr,
+	పూర్ణాంకం			పునాది_attr,
+	పూర్ణాంకం			blend_fg)
 {
-    int		combined = hl_combine_attr(po->popup_attr, char_attr);
+    పూర్ణాంకం		combined = hl_combine_attr(po->popup_attr, char_attr);
 
-    return hl_blend_attr(base_attr, combined, po->blend, blend_fg);
+    తిరిగి hl_blend_attr(పునాది_attr, combined, po->blend, blend_fg);
 }
 
 /*
@@ -569,41 +569,41 @@ popup_blend_with_base(
  * (blend==100), the two cells may have different underlying attrs.
  * Pick the one without a background color to prevent color leaking.
  */
-    static void
+    స్థిర శూన్య
 resolve_wide_char_opacity_attrs(
-	int row, int col1, int col2,
+	పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం col1, పూర్ణాంకం col2,
 	sattr_T *attr1, sattr_T *attr2)
 {
-    int		bg1, bg2;
-    int		base1 = 0;
-    int		base2 = 0;
+    పూర్ణాంకం		bg1, bg2;
+    పూర్ణాంకం		base1 = 0;
+    పూర్ణాంకం		base2 = 0;
     attrentry_T	*ae;
 
-    if (*attr1 == *attr2)
-	return;
+    ఒకవేళ (*attr1 == *attr2)
+	తిరిగి;
 
-    popup_get_base_screen_cell(row, col1, NULL, &base1, NULL);
+    popup_get_పునాది_screen_cell(అడ్డువరుస, col1, ఖాళీ, &base1, ఖాళీ);
     ae = syn_cterm_attr2entry(base1);
 # ifdef FEAT_TERMGUICOLORS
-    bg1 = (ae != NULL && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
-# else
-    bg1 = (ae != NULL && ae->ae_u.cterm.bg_color != 0);
+    bg1 = (ae != ఖాళీ && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
+# లేకపోతే
+    bg1 = (ae != ఖాళీ && ae->ae_u.cterm.bg_color != 0);
 # endif
 
-    popup_get_base_screen_cell(row, col2, NULL, &base2, NULL);
+    popup_get_పునాది_screen_cell(అడ్డువరుస, col2, ఖాళీ, &base2, ఖాళీ);
     ae = syn_cterm_attr2entry(base2);
 # ifdef FEAT_TERMGUICOLORS
-    bg2 = (ae != NULL && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
-# else
-    bg2 = (ae != NULL && ae->ae_u.cterm.bg_color != 0);
+    bg2 = (ae != ఖాళీ && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
+# లేకపోతే
+    bg2 = (ae != ఖాళీ && ae->ae_u.cterm.bg_color != 0);
 # endif
 
-    if (bg1 && !bg2)
+    ఒకవేళ (bg1 && !bg2)
 	*attr1 = *attr2;
-    else if (!bg1 && bg2)
+    లేకపోతే ఒకవేళ (!bg1 && bg2)
 	*attr2 = *attr1;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Move one "cooked" screen line to the screen, but only the characters that
@@ -622,141 +622,141 @@ resolve_wide_char_opacity_attrs(
  *    When TRUE, use an increasing sequence starting from "last_vcol + 1" for
  *    ScreenCols[] of the columns to clear.
  */
-    void
-screen_line(
+    శూన్య
+screen_పంక్తి(
 	win_T	*wp,
-	int	row,
-	int	coloff,
-	int	endcol,
-	int	clear_width,
-	colnr_T	last_vcol,
-	int	flags UNUSED)
+	పూర్ణాంకం	అడ్డువరుస,
+	పూర్ణాంకం	coloff,
+	పూర్ణాంకం	endcol,
+	పూర్ణాంకం	clear_వెడల్పు,
+	colnr_T	చివరి_vcol,
+	పూర్ణాంకం	flags వాడని)
 {
-    unsigned	    off_from;
-    unsigned	    off_to;
-    unsigned	    max_off_from;
-    unsigned	    max_off_to;
-    int		    col = 0;
-    int		    hl;
-    int		    force = FALSE;	// force update rest of the line
-    int		    redraw_this		// bool: does character need redraw?
-#ifdef FEAT_GUI
+    గుర్తులేని	    off_from;
+    గుర్తులేని	    off_గమ్యం;
+    గుర్తులేని	    max_off_from;
+    గుర్తులేని	    max_off_గమ్యం;
+    పూర్ణాంకం		    నిలువు = 0;
+    పూర్ణాంకం		    hl;
+    పూర్ణాంకం		    force = FALSE;	// force update rest of the line
+    పూర్ణాంకం		    redraw_this		// bool: does character need redraw?
+#నిర్వచితమైతే FEAT_GUI
 				= TRUE	// For GUI when while-loop empty
-#endif
+#అయితే_ముగింపు
 				;
-    int		    redraw_next;	// redraw_this for next character
-#ifdef FEAT_GUI_MSWIN
-    int		    changed_this;	// TRUE if character changed
-    int		    changed_next;	// TRUE if next character changed
-#endif
-    int		    clear_next = FALSE;
-    int		    char_cells;		// 1: normal char
+    పూర్ణాంకం		    redraw_తదుపరి;	// redraw_this for next character
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    పూర్ణాంకం		    మారింది_this;	// TRUE if character changed
+    పూర్ణాంకం		    మారింది_తదుపరి;	// TRUE if next character changed
+#అయితే_ముగింపు
+    పూర్ణాంకం		    clear_తదుపరి = FALSE;
+    పూర్ణాంకం		    char_cells;		// 1: normal char
 					// 2: occupies two display cells
     bool	    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
-#ifdef FEAT_PROP_POPUP
+	నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
+#నిర్వచితమైతే FEAT_PROP_POPUP
     popup_opacity_T po;			// cached when drawing an opacity popup
-    int		    drawing_opacity_popup =
-				screen_opacity_popup != NULL
+    పూర్ణాంకం		    drawing_opacity_popup =
+				screen_opacity_popup != ఖాళీ
 				&& (flags & SLF_POPUP);
-    CLEAR_FIELD(po);
-    if (drawing_opacity_popup)
+    CLEAR_క్షేత్రం(po);
+    ఒకవేళ (drawing_opacity_popup)
 	popup_opacity_init(&po);
-#endif
+#అయితే_ముగింపు
 
     // Check for illegal row and col, just in case.
-    if (row >= Rows)
-	row = Rows - 1;
-    if (endcol > Columns)
+    ఒకవేళ (అడ్డువరుస >= అడ్డువరుసలు)
+	అడ్డువరుస = అడ్డువరుసలు - 1;
+    ఒకవేళ (endcol > Columns)
 	endcol = Columns;
 
-#ifdef FEAT_CLIPBOARD
-    clip_may_clear_selection(row, row);
-#endif
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    clip_may_clear_selection(అడ్డువరుస, అడ్డువరుస);
+#అయితే_ముగింపు
 
-    off_from = (unsigned)(current_ScreenLine - ScreenLines);
-    off_to = LineOffset[row] + coloff;
+    off_from = (గుర్తులేని)(current_Screen_పంక్తి - Screen_పంక్తులు);
+    off_గమ్యం = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + coloff;
     max_off_from = off_from + screen_Columns;
-    max_off_to = LineOffset[row] + screen_Columns;
+    max_off_గమ్యం = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + screen_Columns;
 
-#ifdef FEAT_RIGHTLEFT
-    if (flags & SLF_RIGHTLEFT)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (flags & SLF_RIGHTLEFT)
     {
 	// Clear rest first, because it's left of the text.
-	if (clear_width > 0)
+	ఒకవేళ (clear_వెడల్పు > 0)
 	{
-	    int clear_start = col;
+	    పూర్ణాంకం clear_ప్రారంభం = నిలువు;
 
-	    while (col <= endcol && ScreenLines[off_to] == ' '
-		    && ScreenAttrs[off_to] == 0
-				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0))
+	    అయితే (నిలువు <= endcol && Screen_పంక్తులు[off_గమ్యం] == ' '
+		    && ScreenAttrs[off_గమ్యం] == 0
+				  && (!enc_utf8 || Screen_పంక్తులు_UC[off_గమ్యం] == 0))
 	    {
-		++off_to;
-		++col;
+		++off_గమ్యం;
+		++నిలువు;
 	    }
-	    if (col <= endcol)
-		screen_fill(row, row + 1, col + coloff,
+	    ఒకవేళ (నిలువు <= endcol)
+		screen_fill(అడ్డువరుస, అడ్డువరుస + 1, నిలువు + coloff,
 					    endcol + coloff + 1, ' ', ' ', 0);
 
-	    for (int i = endcol; i >= clear_start; i--)
-		ScreenCols[off_to + (i - col)] =
-		    (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
+	    కొరకు (పూర్ణాంకం i = endcol; i >= clear_ప్రారంభం; i--)
+		Screen_నిలువుల_సంఖ్య[off_గమ్యం + (i - నిలువు)] =
+		    (flags & SLF_INC_VCOL) ? ++చివరి_vcol : చివరి_vcol;
 	}
-	col = endcol + 1;
-	off_to = LineOffset[row] + col + coloff;
-	off_from += col;
-	endcol = (clear_width > 0 ? clear_width : -clear_width);
+	నిలువు = endcol + 1;
+	off_గమ్యం = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు + coloff;
+	off_from += నిలువు;
+	endcol = (clear_వెడల్పు > 0 ? clear_వెడల్పు : -clear_వెడల్పు);
     }
-#endif // FEAT_RIGHTLEFT
+#అయితే_ముగింపు // FEAT_RIGHTLEFT
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // First char of a popup window may go on top of the right half of a
     // double-wide character. Clear the left half to avoid it getting the popup
     // window background color.
-    if (coloff > 0 && enc_utf8
-		   && ScreenLines[off_to] == 0
-		   && ScreenLinesUC[off_to - 1] != 0
-		   && (*mb_char2cells)(ScreenLinesUC[off_to - 1]) > 1)
+    ఒకవేళ (coloff > 0 && enc_utf8
+		   && Screen_పంక్తులు[off_గమ్యం] == 0
+		   && Screen_పంక్తులు_UC[off_గమ్యం - 1] != 0
+		   && (*mb_char2cells)(Screen_పంక్తులు_UC[off_గమ్యం - 1]) > 1)
     {
-	ScreenLines[off_to - 1] = ' ';
-	ScreenLinesUC[off_to - 1] = 0;
+	Screen_పంక్తులు[off_గమ్యం - 1] = ' ';
+	Screen_పంక్తులు_UC[off_గమ్యం - 1] = 0;
 	// Skip screen output when drawing an opacity popup: the
 	// background draw already output this cell, and outputting
 	// a space here would briefly erase it causing flicker.
 # ifdef FEAT_PROP_POPUP
-	if (screen_opacity_popup == NULL)
+	ఒకవేళ (screen_opacity_popup == ఖాళీ)
 # endif
-	    screen_char(off_to - 1, row, col + coloff - 1);
+	    screen_char(off_గమ్యం - 1, అడ్డువరుస, నిలువు + coloff - 1);
     }
-#endif
+#అయితే_ముగింపు
 
-    redraw_next = char_needs_redraw(off_from, off_to, endcol - col);
-#ifdef FEAT_GUI_MSWIN
-    changed_next = redraw_next;
-#endif
+    redraw_తదుపరి = char_needs_redraw(off_from, off_గమ్యం, endcol - నిలువు);
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    మారింది_తదుపరి = redraw_తదుపరి;
+#అయితే_ముగింపు
 
-    while (col < endcol)
+    అయితే (నిలువు < endcol)
     {
-	if (has_mbyte && (col + 1 < endcol))
+	ఒకవేళ (has_mbyte && (నిలువు + 1 < endcol))
 	    char_cells = (*mb_off2cells)(off_from, max_off_from);
-	else
+	లేకపోతే
 	    char_cells = 1;
 
-	redraw_this = redraw_next;
-	redraw_next = force || char_needs_redraw(off_from + char_cells,
-			      off_to + char_cells, endcol - col - char_cells);
+	redraw_this = redraw_తదుపరి;
+	redraw_తదుపరి = force || char_needs_redraw(off_from + char_cells,
+			      off_గమ్యం + char_cells, endcol - నిలువు - char_cells);
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	// A cell whose output was suppressed under an opacity popup does not
 	// match the terminal even when ScreenLines[] is unchanged.
-	if (!redraw_this && is_suppressed_cell(row, col + coloff))
+	ఒకవేళ (!redraw_this && is_suppressed_cell(అడ్డువరుస, నిలువు + coloff))
 	    redraw_this = TRUE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 # ifdef FEAT_GUI_MSWIN
-	changed_this = changed_next;
-	changed_next = redraw_next;
+	మారింది_this = మారింది_తదుపరి;
+	మారింది_తదుపరి = redraw_తదుపరి;
 # endif
 	// If the next character was bold, then redraw the current character to
 	// remove any pixels that might have spilt over into us.  This only
@@ -764,127 +764,127 @@ screen_line(
 	// With MS-Windows antialiasing may also cause pixels to spill over
 	// from a previous character, no matter attributes, always redraw if a
 	// character changed.
-	if (redraw_next && gui.in_use)
+	ఒకవేళ (redraw_తదుపరి && gui.లోపల_use)
 	{
 # ifndef FEAT_GUI_MSWIN
-	    hl = ScreenAttrs[off_to + char_cells];
-	    if (hl > HL_ALL)
+	    hl = ScreenAttrs[off_గమ్యం + char_cells];
+	    ఒకవేళ (hl > HL_ALL)
 		hl = syn_attr2attr(hl);
-	    if (hl & HL_BOLD)
+	    ఒకవేళ (hl & HL_BOLD)
 # endif
 		redraw_this = TRUE;
 	}
-#endif
+#అయితే_ముగింపు
 	// skip the second cell for double-width characters.
-	if (redraw_this && char_cells == 2 && skip_for_popup(row, col + coloff + 1))
+	ఒకవేళ (redraw_this && char_cells == 2 && skip_for_popup(అడ్డువరుస, నిలువు + coloff + 1))
 	    redraw_this = FALSE;
 	// Check if the character is occluded by a popup.
-	if (redraw_this && skip_for_popup(row, col + coloff))
+	ఒకవేళ (redraw_this && skip_for_popup(అడ్డువరుస, నిలువు + coloff))
 	    redraw_this = FALSE;
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	// For popup with opacity windows: if drawing a space, show the
 	// underlying character with the popup's attributes blended in.
-	int opacity_blank = FALSE;
+	పూర్ణాంకం opacity_blank = FALSE;
 	// Popup with opacity: when drawing a space, blend the popup attrs
 	// onto whatever is underneath instead of overwriting it.
-	if (drawing_opacity_popup
-		&& ScreenLines[off_from] == ' '
-		&& (!enc_utf8 || ScreenLinesUC[off_from] == 0))
+	ఒకవేళ (drawing_opacity_popup
+		&& Screen_పంక్తులు[off_from] == ' '
+		&& (!enc_utf8 || Screen_పంక్తులు_UC[off_from] == 0))
 	{
-	    int popup_src_attr = ScreenAttrs[off_from];
-	    int bg_is_empty = ScreenLines[off_to] == 0
-				&& (!enc_utf8 || ScreenLinesUC[off_to] == 0);
+	    పూర్ణాంకం popup_src_attr = ScreenAttrs[off_from];
+	    పూర్ణాంకం bg_is_ఖాళీలు = Screen_పంక్తులు[off_గమ్యం] == 0
+				&& (!enc_utf8 || Screen_పంక్తులు_UC[off_గమ్యం] == 0);
 
 	    // Case A: target cell is the second half of a wide char from a
 	    // previous draw.  Don't overwrite it.
-	    if (bg_is_empty
-		    && off_to > 0
-		    && enc_utf8 && ScreenLinesUC[off_to - 1] != 0
-		    && utf_char2cells(ScreenLinesUC[off_to - 1]) == 2)
+	    ఒకవేళ (bg_is_ఖాళీలు
+		    && off_గమ్యం > 0
+		    && enc_utf8 && Screen_పంక్తులు_UC[off_గమ్యం - 1] != 0
+		    && utf_char2cells(Screen_పంక్తులు_UC[off_గమ్యం - 1]) == 2)
 	    {
 		opacity_blank = TRUE;
 		redraw_this = FALSE;
 	    }
 	    // Case B: target cell holds a real character — blend popup attrs
 	    // over it, preserving the underlying glyph.
-	    else if (ScreenLines[off_to] != 0
-		    || (enc_utf8 && ScreenLinesUC[off_to] != 0))
+	    లేకపోతే ఒకవేళ (Screen_పంక్తులు[off_గమ్యం] != 0
+		    || (enc_utf8 && Screen_పంక్తులు_UC[off_గమ్యం] != 0))
 	    {
-		int bg_char_cells = (enc_utf8 && ScreenLinesUC[off_to] != 0)
-				? utf_char2cells(ScreenLinesUC[off_to]) : 1;
+		పూర్ణాంకం bg_char_cells = (enc_utf8 && Screen_పంక్తులు_UC[off_గమ్యం] != 0)
+				? utf_char2cells(Screen_పంక్తులు_UC[off_గమ్యం]) : 1;
 
-		if (bg_char_cells == 2)
+		ఒకవేళ (bg_char_cells == 2)
 		{
-		    if (col + 1 >= endcol || off_from + 1 >= max_off_from
-						       || off_to + 1 >= max_off_to)
+		    ఒకవేళ (నిలువు + 1 >= endcol || off_from + 1 >= max_off_from
+						       || off_గమ్యం + 1 >= max_off_గమ్యం)
 		    {
 			// Wide char doesn't fit at the edge.  Replace with a
 			// blended space so opacity is still applied.
-			int base_attr;
-			ScreenLines[off_to] = ' ';
-			if (enc_utf8)
-			    ScreenLinesUC[off_to] = 0;
-			base_attr = popup_base_attr_or(row, col + coloff,
-							     ScreenAttrs[off_to]);
-			ScreenAttrs[off_to] = popup_blend_with_base(&po,
-					    popup_src_attr, base_attr, TRUE);
-			screen_char(off_to, row, col + coloff);
+			పూర్ణాంకం పునాది_attr;
+			Screen_పంక్తులు[off_గమ్యం] = ' ';
+			ఒకవేళ (enc_utf8)
+			    Screen_పంక్తులు_UC[off_గమ్యం] = 0;
+			పునాది_attr = popup_పునాది_attr_or(అడ్డువరుస, నిలువు + coloff,
+							     ScreenAttrs[off_గమ్యం]);
+			ScreenAttrs[off_గమ్యం] = popup_blend_with_పునాది(&po,
+					    popup_src_attr, పునాది_attr, TRUE);
+			screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
 			opacity_blank = TRUE;
 			redraw_this = FALSE;
-			goto skip_opacity;
+			వెళ్ళు skip_opacity;
 		    }
 		    // Wide bg char must be followed by a popup space, otherwise
 		    // a popup glyph would corrupt its right half.
-		    if (!(ScreenLines[off_from + 1] == ' '
-			    && (!enc_utf8 || ScreenLinesUC[off_from + 1] == 0)))
-			goto skip_opacity;
+		    ఒకవేళ (!(Screen_పంక్తులు[off_from + 1] == ' '
+			    && (!enc_utf8 || Screen_పంక్తులు_UC[off_from + 1] == 0)))
+			వెళ్ళు skip_opacity;
 		}
 
 		// Keep the underlying character and blend the popup attrs over
 		// it.  blend_fg=TRUE because we're drawing a space, so the
 		// foreground (the underlying glyph) should also blend.
 		opacity_blank = TRUE;
-		int base_attr = popup_base_attr_or(row, col + coloff,
-							     ScreenAttrs[off_to]);
-		ScreenAttrs[off_to] = popup_blend_with_base(&po,
-					    popup_src_attr, base_attr, TRUE);
-		screen_char(off_to, row, col + coloff);
+		పూర్ణాంకం పునాది_attr = popup_పునాది_attr_or(అడ్డువరుస, నిలువు + coloff,
+							     ScreenAttrs[off_గమ్యం]);
+		ScreenAttrs[off_గమ్యం] = popup_blend_with_పునాది(&po,
+					    popup_src_attr, పునాది_attr, TRUE);
+		screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
 		// For wide bg char also blend the second cell; its base may be
 		// outside the popup area.
-		if (bg_char_cells == 2)
+		ఒకవేళ (bg_char_cells == 2)
 		{
-		    int base_attr2 = popup_base_attr_or(row, col + coloff + 1,
-							 ScreenAttrs[off_to + 1]);
-		    ScreenAttrs[off_to + 1] = popup_blend_with_base(&po,
-					    popup_src_attr, base_attr2, TRUE);
-		    if (po.blend == 100)
-			resolve_wide_char_opacity_attrs(row,
-				col + coloff, col + coloff + 1,
-				&ScreenAttrs[off_to], &ScreenAttrs[off_to + 1]);
+		    పూర్ణాంకం పునాది_attr2 = popup_పునాది_attr_or(అడ్డువరుస, నిలువు + coloff + 1,
+							 ScreenAttrs[off_గమ్యం + 1]);
+		    ScreenAttrs[off_గమ్యం + 1] = popup_blend_with_పునాది(&po,
+					    popup_src_attr, పునాది_attr2, TRUE);
+		    ఒకవేళ (po.blend == 100)
+			resolve_wide_char_opacity_attrs(అడ్డువరుస,
+				నిలువు + coloff, నిలువు + coloff + 1,
+				&ScreenAttrs[off_గమ్యం], &ScreenAttrs[off_గమ్యం + 1]);
 		}
 		redraw_this = FALSE;
 	    }
 	    // Case C: popup space overlaps the second half of a destroyed wide
 	    // character.  Blend so the cell matches its neighbors instead of
 	    // appearing as a solid-colored gap.
-	    else if (bg_is_empty)
+	    లేకపోతే ఒకవేళ (bg_is_ఖాళీలు)
 	    {
-		int base_attr;
-		ScreenLines[off_to] = ' ';
-		base_attr = popup_base_attr_or(row, col + coloff,
-							     ScreenAttrs[off_to]);
-		ScreenAttrs[off_to] = popup_blend_with_base(&po,
-					    popup_src_attr, base_attr, TRUE);
-		screen_char(off_to, row, col + coloff);
+		పూర్ణాంకం పునాది_attr;
+		Screen_పంక్తులు[off_గమ్యం] = ' ';
+		పునాది_attr = popup_పునాది_attr_or(అడ్డువరుస, నిలువు + coloff,
+							     ScreenAttrs[off_గమ్యం]);
+		ScreenAttrs[off_గమ్యం] = popup_blend_with_పునాది(&po,
+					    popup_src_attr, పునాది_attr, TRUE);
+		screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
 		opacity_blank = TRUE;
 		redraw_this = FALSE;
 	    }
 	}
 skip_opacity:
-#endif
+#అయితే_ముగింపు
 
-	if (redraw_this)
+	ఒకవేళ (redraw_this)
 	{
 	    /*
 	     * Special handling when 'xs' termcap flag set (hpterm):
@@ -898,190 +898,190 @@ skip_opacity:
 	     * to clear the rest of the line, and force redrawing it
 	     * completely.
 	     */
-	    if (       p_wiv
+	    ఒకవేళ (       p_wiv
 		    && !force
-#ifdef FEAT_GUI
-		    && !gui.in_use
-#endif
-		    && ScreenAttrs[off_to] != 0
-		    && ScreenAttrs[off_from] != ScreenAttrs[off_to])
+#నిర్వచితమైతే FEAT_GUI
+		    && !gui.లోపల_use
+#అయితే_ముగింపు
+		    && ScreenAttrs[off_గమ్యం] != 0
+		    && ScreenAttrs[off_from] != ScreenAttrs[off_గమ్యం])
 	    {
 		/*
 		 * Need to remove highlighting attributes here.
 		 */
-		windgoto(row, col + coloff);
-		out_str(T_CE);		// clear rest of this screen line
-		screen_start();		// don't know where cursor is now
+		windgoto(అడ్డువరుస, నిలువు + coloff);
+		బహిర్గతం_str(T_CE);		// clear rest of this screen line
+		screen_ప్రారంభం();		// don't know where cursor is now
 		force = TRUE;		// force redraw of rest of the line
-		redraw_next = TRUE;	// or else next char would miss out
+		redraw_తదుపరి = TRUE;	// or else next char would miss out
 
 		/*
 		 * If the previous character was highlighted, need to stop
 		 * highlighting at this character.
 		 */
-		if (col + coloff > 0 && ScreenAttrs[off_to - 1] != 0)
+		ఒకవేళ (నిలువు + coloff > 0 && ScreenAttrs[off_గమ్యం - 1] != 0)
 		{
-		    screen_attr = ScreenAttrs[off_to - 1];
-		    term_windgoto(row, col + coloff);
+		    screen_attr = ScreenAttrs[off_గమ్యం - 1];
+		    పదం_windgoto(అడ్డువరుస, నిలువు + coloff);
 		    screen_stop_highlight();
 		}
-		else
+		లేకపోతే
 		    screen_attr = 0;	    // highlighting has stopped
 	    }
-	    if (enc_dbcs != 0)
+	    ఒకవేళ (enc_dbcs != 0)
 	    {
 		// Check if overwriting a double-byte with a single-byte or
 		// the other way around requires another character to be
 		// redrawn.  For UTF-8 this isn't needed, because comparing
 		// ScreenLinesUC[] is sufficient.
-		if (char_cells == 1
-			&& col + 1 < endcol
-			&& (*mb_off2cells)(off_to, max_off_to) > 1)
+		ఒకవేళ (char_cells == 1
+			&& నిలువు + 1 < endcol
+			&& (*mb_off2cells)(off_గమ్యం, max_off_గమ్యం) > 1)
 		{
 		    // Writing a single-cell character over a double-cell
 		    // character: need to redraw the next cell.
-		    ScreenLines[off_to + 1] = 0;
-		    redraw_next = TRUE;
+		    Screen_పంక్తులు[off_గమ్యం + 1] = 0;
+		    redraw_తదుపరి = TRUE;
 		}
-		else if (char_cells == 2
-			&& col + 2 < endcol
-			&& (*mb_off2cells)(off_to, max_off_to) == 1
-			&& (*mb_off2cells)(off_to + 1, max_off_to) > 1)
+		లేకపోతే ఒకవేళ (char_cells == 2
+			&& నిలువు + 2 < endcol
+			&& (*mb_off2cells)(off_గమ్యం, max_off_గమ్యం) == 1
+			&& (*mb_off2cells)(off_గమ్యం + 1, max_off_గమ్యం) > 1)
 		{
 		    // Writing the second half of a double-cell character over
 		    // a double-cell character: need to redraw the second
 		    // cell.
-		    ScreenLines[off_to + 2] = 0;
-		    redraw_next = TRUE;
+		    Screen_పంక్తులు[off_గమ్యం + 2] = 0;
+		    redraw_తదుపరి = TRUE;
 		}
 
-		if (enc_dbcs == DBCS_JPNU)
-		    ScreenLines2[off_to] = ScreenLines2[off_from];
+		ఒకవేళ (enc_dbcs == DBCS_JPNU)
+		    ScreenLines2[off_గమ్యం] = ScreenLines2[off_from];
 	    }
 	    // When writing a single-width character over a double-width
 	    // character and at the end of the redrawn text, need to clear out
 	    // the right half of the old character.
 	    // Also required when writing the right half of a double-width
 	    // char over the left half of an existing one.
-	    if (has_mbyte && col + char_cells == endcol
+	    ఒకవేళ (has_mbyte && నిలువు + char_cells == endcol
 		    && ((char_cells == 1
-			    && (*mb_off2cells)(off_to, max_off_to) > 1)
+			    && (*mb_off2cells)(off_గమ్యం, max_off_గమ్యం) > 1)
 			|| (char_cells == 2
-			    && (*mb_off2cells)(off_to, max_off_to) == 1
-			    && (*mb_off2cells)(off_to + 1, max_off_to) > 1)))
-		clear_next = TRUE;
+			    && (*mb_off2cells)(off_గమ్యం, max_off_గమ్యం) == 1
+			    && (*mb_off2cells)(off_గమ్యం + 1, max_off_గమ్యం) > 1)))
+		clear_తదుపరి = TRUE;
 
-	    ScreenLines[off_to] = ScreenLines[off_from];
-	    if (enc_utf8)
+	    Screen_పంక్తులు[off_గమ్యం] = Screen_పంక్తులు[off_from];
+	    ఒకవేళ (enc_utf8)
 	    {
-		ScreenLinesUC[off_to] = ScreenLinesUC[off_from];
-		if (ScreenLinesUC[off_from] != 0)
+		Screen_పంక్తులు_UC[off_గమ్యం] = Screen_పంక్తులు_UC[off_from];
+		ఒకవేళ (Screen_పంక్తులు_UC[off_from] != 0)
 		{
-		    int	    i;
+		    పూర్ణాంకం	    i;
 
-		    for (i = 0; i < Screen_mco; ++i)
-			ScreenLinesC[i][off_to] = ScreenLinesC[i][off_from];
+		    కొరకు (i = 0; i < Screen_mco; ++i)
+			Screen_పంక్తులు_C[i][off_గమ్యం] = Screen_పంక్తులు_C[i][off_from];
 		}
 	    }
-	    if (char_cells == 2)
+	    ఒకవేళ (char_cells == 2)
 	    {
-		ScreenLines[off_to + 1] = ScreenLines[off_from + 1];
-		if (enc_utf8)
-		    ScreenLinesUC[off_to + 1] = 0;
+		Screen_పంక్తులు[off_గమ్యం + 1] = Screen_పంక్తులు[off_from + 1];
+		ఒకవేళ (enc_utf8)
+		    Screen_పంక్తులు_UC[off_గమ్యం + 1] = 0;
 	    }
 
-#if defined(FEAT_GUI) || defined(UNIX)
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX)
 	    // The bold trick makes a single column of pixels appear in the
 	    // next character.  When a bold character is removed, the next
 	    // character should be redrawn too.  This happens for our own GUI
 	    // and for some xterms.
-	    if (
+	    ఒకవేళ (
 # ifdef FEAT_GUI
-		    gui.in_use
+		    gui.లోపల_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ఒకవేళ defined(FEAT_GUI) && defined(UNIX)
 		    ||
 # endif
 # ifdef UNIX
-		    term_is_xterm
+		    పదం_is_xterm
 # endif
 		    )
 	    {
-		hl = ScreenAttrs[off_to];
-		if (hl > HL_ALL)
+		hl = ScreenAttrs[off_గమ్యం];
+		ఒకవేళ (hl > HL_ALL)
 		    hl = syn_attr2attr(hl);
-		if (hl & HL_BOLD)
-		    redraw_next = TRUE;
+		ఒకవేళ (hl & HL_BOLD)
+		    redraw_తదుపరి = TRUE;
 	    }
-#endif
-#ifdef FEAT_GUI_MSWIN
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 	    // MS-Windows antialiasing may spill over to the next character,
 	    // redraw that one if this one changed, no matter attributes.
-	    if (gui.in_use && changed_this)
-		redraw_next = TRUE;
+	    ఒకవేళ (gui.లోపల_use && మారింది_this)
+		redraw_తదుపరి = TRUE;
 # ifdef FEAT_DIRECTX
 	    // DirectWrite subpixel rendering (especially with CFF/OTF
 	    // fonts) can extend pixels beyond cell boundaries to the
 	    // left.  Redraw the current character if the previous one
 	    // changed.
-	    if (gui.directx_enabled && changed_this)
+	    ఒకవేళ (gui.directx_enabled && మారింది_this)
 		redraw_this = TRUE;
 # endif
-#endif
+#అయితే_ముగింపు
 
-	    ScreenAttrs[off_to] = ScreenAttrs[off_from];
-#ifdef FEAT_PROP_POPUP
+	    ScreenAttrs[off_గమ్యం] = ScreenAttrs[off_from];
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // For popup with opacity text: blend popup attrs over the underlying
 	    // base.  blend_fg=FALSE so the popup foreground (the real glyph) is
 	    // preserved while only the background blends.
-	    if (drawing_opacity_popup && po.blend > 0)
+	    ఒకవేళ (drawing_opacity_popup && po.blend > 0)
 	    {
-		int popup_src_attr = ScreenAttrs[off_from];
-		int scol1 = col + coloff;
-		int base1 = popup_base_attr_or(row, scol1, 0);
+		పూర్ణాంకం popup_src_attr = ScreenAttrs[off_from];
+		పూర్ణాంకం scol1 = నిలువు + coloff;
+		పూర్ణాంకం base1 = popup_పునాది_attr_or(అడ్డువరుస, scol1, 0);
 
-		if (char_cells == 2)
+		ఒకవేళ (char_cells == 2)
 		{
-		    int base2 = popup_base_attr_or(row, scol1 + 1, 0);
+		    పూర్ణాంకం base2 = popup_పునాది_attr_or(అడ్డువరుస, scol1 + 1, 0);
 
 		    // Terminals can't render different bg colors for the two
 		    // halves of a wide char.  If one half is over a lower
 		    // opacity popup and the other isn't, use the non-popup
 		    // side for both halves to avoid color leaking.
-		    int over1 = popup_is_over_opacity(row, scol1);
-		    int over2 = popup_is_over_opacity(row, scol1 + 1);
-		    if (over1 != over2)
+		    పూర్ణాంకం over1 = popup_is_over_opacity(అడ్డువరుస, scol1);
+		    పూర్ణాంకం over2 = popup_is_over_opacity(అడ్డువరుస, scol1 + 1);
+		    ఒకవేళ (over1 != over2)
 		    {
-			if (over1)
+			ఒకవేళ (over1)
 			    base1 = base2;
-			else
+			లేకపోతే
 			    base2 = base1;
 		    }
-		    ScreenAttrs[off_to + 1] = popup_blend_with_base(&po,
+		    ScreenAttrs[off_గమ్యం + 1] = popup_blend_with_పునాది(&po,
 					    popup_src_attr, base2, FALSE);
 		}
-		ScreenAttrs[off_to] = popup_blend_with_base(&po,
+		ScreenAttrs[off_గమ్యం] = popup_blend_with_పునాది(&po,
 					    popup_src_attr, base1, FALSE);
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    // For simplicity set the attributes of second half of a
 	    // double-wide character equal to the first half.
-	    if (char_cells == 2)
-		ScreenAttrs[off_to + 1] = ScreenAttrs[off_to];
+	    ఒకవేళ (char_cells == 2)
+		ScreenAttrs[off_గమ్యం + 1] = ScreenAttrs[off_గమ్యం];
 
-	    if (enc_dbcs != 0 && char_cells == 2)
-		screen_char_2(off_to, row, col + coloff);
-	    else
-		screen_char(off_to, row, col + coloff);
+	    ఒకవేళ (enc_dbcs != 0 && char_cells == 2)
+		screen_char_2(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
+	    లేకపోతే
+		screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
 	}
-	else if (  p_wiv
-#ifdef FEAT_GUI
-		&& !gui.in_use
-#endif
-		&& col + coloff > 0 && off_to > 0)
+	లేకపోతే ఒకవేళ (  p_wiv
+#నిర్వచితమైతే FEAT_GUI
+		&& !gui.లోపల_use
+#అయితే_ముగింపు
+		&& నిలువు + coloff > 0 && off_గమ్యం > 0)
 	{
-	    if (ScreenAttrs[off_to] == ScreenAttrs[off_to - 1])
+	    ఒకవేళ (ScreenAttrs[off_గమ్యం] == ScreenAttrs[off_గమ్యం - 1])
 	    {
 		/*
 		 * Don't output stop-highlight when moving the cursor, it will
@@ -1089,67 +1089,67 @@ skip_opacity:
 		 */
 		screen_attr = 0;
 	    }
-	    else if (screen_attr != 0)
+	    లేకపోతే ఒకవేళ (screen_attr != 0)
 		screen_stop_highlight();
 	}
 
-#ifdef FEAT_PROP_POPUP
-	if (!opacity_blank)
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (!opacity_blank)
+#అయితే_ముగింపు
 	{
-	    ScreenCols[off_to] = ScreenCols[off_from];
-	    if (char_cells == 2)
-		ScreenCols[off_to + 1] = ScreenCols[off_from + 1];
+	    Screen_నిలువుల_సంఖ్య[off_గమ్యం] = Screen_నిలువుల_సంఖ్య[off_from];
+	    ఒకవేళ (char_cells == 2)
+		Screen_నిలువుల_సంఖ్య[off_గమ్యం + 1] = Screen_నిలువుల_సంఖ్య[off_from + 1];
 	}
 
-	off_to += char_cells;
+	off_గమ్యం += char_cells;
 	off_from += char_cells;
-	col += char_cells;
+	నిలువు += char_cells;
     }
 
-    if (clear_next && !skip_for_popup(row, col + coloff))
+    ఒకవేళ (clear_తదుపరి && !skip_for_popup(అడ్డువరుస, నిలువు + coloff))
     {
 	// Clear the second half of a double-wide character of which the left
 	// half was overwritten with a single-wide character.
-	ScreenLines[off_to] = ' ';
-	if (enc_utf8)
-	    ScreenLinesUC[off_to] = 0;
+	Screen_పంక్తులు[off_గమ్యం] = ' ';
+	ఒకవేళ (enc_utf8)
+	    Screen_పంక్తులు_UC[off_గమ్యం] = 0;
 	// Skip screen output when drawing an opacity popup: the
 	// background already has this cell, outputting a space here
 	// would briefly erase it causing flicker.
-#ifdef FEAT_PROP_POPUP
-	if (screen_opacity_popup == NULL)
-#endif
-	    screen_char(off_to, row, col + coloff);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (screen_opacity_popup == ఖాళీ)
+#అయితే_ముగింపు
+	    screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
     }
 
-    if (clear_width > 0
-#ifdef FEAT_RIGHTLEFT
+    ఒకవేళ (clear_వెడల్పు > 0
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    && !(flags & SLF_RIGHTLEFT)
-#endif
+#అయితే_ముగింపు
 				   )
     {
-#ifdef FEAT_GUI
-	int startCol = col;
-#endif
+#నిర్వచితమైతే FEAT_GUI
+	పూర్ణాంకం ప్రారంభం_నిలువు_2 = నిలువు;
+#అయితే_ముగింపు
 
 	// blank out the rest of the line
-	while (col < clear_width && ScreenLines[off_to] == ' '
-						  && ScreenAttrs[off_to] == 0
-				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0)
-#ifdef FEAT_PROP_POPUP
-				  && !is_suppressed_cell(row, col + coloff)
-#endif
+	అయితే (నిలువు < clear_వెడల్పు && Screen_పంక్తులు[off_గమ్యం] == ' '
+						  && ScreenAttrs[off_గమ్యం] == 0
+				  && (!enc_utf8 || Screen_పంక్తులు_UC[off_గమ్యం] == 0)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+				  && !is_suppressed_cell(అడ్డువరుస, నిలువు + coloff)
+#అయితే_ముగింపు
 				  )
 	{
-	    ScreenCols[off_to] =
-			      (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
-	    ++off_to;
-	    ++col;
+	    Screen_నిలువుల_సంఖ్య[off_గమ్యం] =
+			      (flags & SLF_INC_VCOL) ? ++చివరి_vcol : చివరి_vcol;
+	    ++off_గమ్యం;
+	    ++నిలువు;
 	}
-	if (col < clear_width)
+	ఒకవేళ (నిలువు < clear_వెడల్పు)
 	{
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	    /*
 	     * In the GUI, clearing the rest of the line may leave pixels
 	     * behind if the first character cleared was bold.  Some bold
@@ -1157,118 +1157,118 @@ skip_opacity:
 	     * character too.  If we didn't skip any blanks above, then we
 	     * only redraw if the character wasn't already redrawn anyway.
 	     */
-	    if (gui.in_use && (col > startCol || !redraw_this))
+	    ఒకవేళ (gui.లోపల_use && (నిలువు > ప్రారంభం_నిలువు_2 || !redraw_this))
 	    {
-		hl = ScreenAttrs[off_to];
-		if (hl > HL_ALL || (hl & HL_BOLD))
+		hl = ScreenAttrs[off_గమ్యం];
+		ఒకవేళ (hl > HL_ALL || (hl & HL_BOLD))
 		{
-		    int prev_cells = 1;
+		    పూర్ణాంకం prev_cells = 1;
 
-		    if (enc_utf8)
+		    ఒకవేళ (enc_utf8)
 			// for utf-8, ScreenLines[char_offset + 1] == 0 means
 			// that its width is 2.
-			prev_cells = ScreenLines[off_to - 1] == 0 ? 2 : 1;
-		    else if (enc_dbcs != 0)
+			prev_cells = Screen_పంక్తులు[off_గమ్యం - 1] == 0 ? 2 : 1;
+		    లేకపోతే ఒకవేళ (enc_dbcs != 0)
 		    {
 			// find previous character by counting from first
 			// column and get its width.
-			unsigned off = LineOffset[row];
-			unsigned max_off = LineOffset[row] + screen_Columns;
+			గుర్తులేని off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస];
+			గుర్తులేని max_off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + screen_Columns;
 
-			while (off < off_to)
+			అయితే (off < off_గమ్యం)
 			{
 			    prev_cells = (*mb_off2cells)(off, max_off);
 			    off += prev_cells;
 			}
 		    }
 
-		    if (!skip_for_popup(row, col + coloff - prev_cells))
+		    ఒకవేళ (!skip_for_popup(అడ్డువరుస, నిలువు + coloff - prev_cells))
 		    {
-			if (enc_dbcs != 0 && prev_cells > 1)
-			    screen_char_2(off_to - prev_cells, row,
-						   col + coloff - prev_cells);
-			else
-			    screen_char(off_to - prev_cells, row,
-						   col + coloff - prev_cells);
+			ఒకవేళ (enc_dbcs != 0 && prev_cells > 1)
+			    screen_char_2(off_గమ్యం - prev_cells, అడ్డువరుస,
+						   నిలువు + coloff - prev_cells);
+			లేకపోతే
+			    screen_char(off_గమ్యం - prev_cells, అడ్డువరుస,
+						   నిలువు + coloff - prev_cells);
 		    }
 		}
 	    }
-#endif
-	    screen_fill(row, row + 1, col + coloff, clear_width + coloff,
+#అయితే_ముగింపు
+	    screen_fill(అడ్డువరుస, అడ్డువరుస + 1, నిలువు + coloff, clear_వెడల్పు + coloff,
 								 ' ', ' ', 0);
-	    while (col < clear_width)
+	    అయితే (నిలువు < clear_వెడల్పు)
 	    {
-		ScreenCols[off_to++]
-			    = (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
-		++col;
+		Screen_నిలువుల_సంఖ్య[off_గమ్యం++]
+			    = (flags & SLF_INC_VCOL) ? ++చివరి_vcol : చివరి_vcol;
+		++నిలువు;
 	    }
 	}
     }
 
-    if (clear_width > 0
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (clear_వెడల్పు > 0
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    && !(flags & SLF_POPUP)  // no separator for popup window
-#endif
+#అయితే_ముగింపు
 	    )
     {
 	// For a window that has a right neighbor, draw the separator char
 	// right of the window contents.  But not on top of a popup window.
-	if (coloff + col < firstwin->w_wincol + topframe->fr_width)
+	ఒకవేళ (coloff + నిలువు < firstwin->w_wincol + topframe->fr_వెడల్పు)
 	{
-	    if (!skip_for_popup(row, col + coloff))
+	    ఒకవేళ (!skip_for_popup(అడ్డువరుస, నిలువు + coloff))
 	    {
-		int c;
+		పూర్ణాంకం c;
 
-		c = fillchar_vsep(&hl, wp, row);
-		if (ScreenLines[off_to] != (schar_T)c
-			|| (enc_utf8 && (int)ScreenLinesUC[off_to]
+		c = fillchar_vsep(&hl, wp, అడ్డువరుస);
+		ఒకవేళ (Screen_పంక్తులు[off_గమ్యం] != (schar_T)c
+			|| (enc_utf8 && (పూర్ణాంకం)Screen_పంక్తులు_UC[off_గమ్యం]
 							!= (c >= 0x80 ? c : 0))
-			|| ScreenAttrs[off_to] != hl)
+			|| ScreenAttrs[off_గమ్యం] != hl)
 		{
-		    ScreenLines[off_to] = c;
-		    ScreenAttrs[off_to] = hl;
-		    if (enc_utf8)
+		    Screen_పంక్తులు[off_గమ్యం] = c;
+		    ScreenAttrs[off_గమ్యం] = hl;
+		    ఒకవేళ (enc_utf8)
 		    {
-			if (c >= 0x80)
+			ఒకవేళ (c >= 0x80)
 			{
-			    ScreenLinesUC[off_to] = c;
-			    ScreenLinesC[0][off_to] = 0;
-			    ScreenLines[off_to] = 0x80; // avoid storing zero
+			    Screen_పంక్తులు_UC[off_గమ్యం] = c;
+			    Screen_పంక్తులు_C[0][off_గమ్యం] = 0;
+			    Screen_పంక్తులు[off_గమ్యం] = 0x80; // avoid storing zero
 			}
-			else
-			    ScreenLinesUC[off_to] = 0;
+			లేకపోతే
+			    Screen_పంక్తులు_UC[off_గమ్యం] = 0;
 		    }
-		    screen_char(off_to, row, col + coloff);
+		    screen_char(off_గమ్యం, అడ్డువరుస, నిలువు + coloff);
 		}
 	    }
 	}
-	else
-	    LineWraps[row] = FALSE;
+	లేకపోతే
+	    పంక్తి_Wraps[అడ్డువరుస] = FALSE;
     }
 
-    if (override_success)
-	pop_highlight_overrides();
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
 }
 
-#if defined(FEAT_RIGHTLEFT)
+#ఒకవేళ defined(FEAT_RIGHTLEFT)
 /*
  * Mirror text "str" for right-left displaying.
  * Only works for single-byte characters (e.g., numbers).
  */
-    void
+    శూన్య
 rl_mirror(char_u *str)
 {
     char_u	*p1, *p2;
-    int		t;
+    పూర్ణాంకం		t;
 
-    for (p1 = str, p2 = str + STRLEN(str) - 1; p1 < p2; ++p1, --p2)
+    కొరకు (p1 = str, p2 = str + STRLEN(str) - 1; p1 < p2; ++p1, --p2)
     {
 	t = *p1;
 	*p1 = *p2;
 	*p2 = t;
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Draw the vertical separator right of window "wp" starting with line "row".
@@ -1276,37 +1276,37 @@ rl_mirror(char_u *str)
  * refreshed after a current window change even for non-current windows
  * whose status lines are not redrawn.
  */
-    void
-draw_vsep_win(win_T *wp, int row)
+    శూన్య
+draw_vsep_win(win_T *wp, పూర్ణాంకం అడ్డువరుస)
 {
-    if (!wp->w_vsep_width)
-	return;
+    ఒకవేళ (!wp->w_vsep_వెడల్పు)
+	తిరిగి;
 
-    int content_end = W_WINROW(wp) + wp->w_height;
+    పూర్ణాంకం content_చివర = W_WINROW(wp) + wp->w_ఎత్తు;
 
     // Content rows: VertSplit/VertSplitNC based on adjacency.  Include the
     // WinBar row (above the content) when redrawing from the top so that
     // the separator highlight is updated on current-window changes.
-    int start_row = (row == 0) ? wp->w_winrow : W_WINROW(wp) + row;
-    for (int r = start_row; r < content_end; ++r)
+    పూర్ణాంకం ప్రారంభం_అడ్డువరుస = (అడ్డువరుస == 0) ? wp->w_winrow : W_WINROW(wp) + అడ్డువరుస;
+    కొరకు (పూర్ణాంకం r = ప్రారంభం_అడ్డువరుస; r < content_చివర; ++r)
     {
-	int hl;
-	int c = fillchar_vsep(&hl, wp, r);
+	పూర్ణాంకం hl;
+	పూర్ణాంకం c = fillchar_vsep(&hl, wp, r);
 	screen_fill(r, r + 1, W_ENDCOL(wp), W_ENDCOL(wp) + 1, c, ' ', hl);
     }
 
     // Status line rows: when the status line is connected with the right
     // neighbour the separator cell is the status line fillchar; otherwise
     // it is the vsep char.
-    if (wp->w_status_height != 0)
+    ఒకవేళ (wp->w_స్థితి_ఎత్తు != 0)
     {
-	int hl;
-	int c;
-	if (stl_connected(wp))
-	    c = fillchar_status(&hl, wp);
-	else
-	    c = fillchar_vsep(&hl, wp, content_end);
-	for (int r = content_end; r < content_end + wp->w_status_height; ++r)
+	పూర్ణాంకం hl;
+	పూర్ణాంకం c;
+	ఒకవేళ (stl_connected(wp))
+	    c = fillchar_స్థితి(&hl, wp);
+	లేకపోతే
+	    c = fillchar_vsep(&hl, wp, content_చివర);
+	కొరకు (పూర్ణాంకం r = content_చివర; r < content_చివర + wp->w_స్థితి_ఎత్తు; ++r)
 	    screen_fill(r, r + 1, W_ENDCOL(wp), W_ENDCOL(wp) + 1, c, ' ', hl);
     }
 }
@@ -1316,261 +1316,261 @@ draw_vsep_win(win_T *wp, int row)
  * line of the window right of it.  If not, then it's a vertical separator.
  * Only call if (wp->w_vsep_width != 0).
  */
-    int
+    పూర్ణాంకం
 stl_connected(win_T *wp)
 {
-    frame_T	*fr;
+    చట్రం_T	*fr;
 
-    fr = wp->w_frame;
-    while (fr->fr_parent != NULL)
+    fr = wp->w_చట్రం;
+    అయితే (fr->fr_మాతృ != ఖాళీ)
     {
-	if (fr->fr_parent->fr_layout == FR_COL)
+	ఒకవేళ (fr->fr_మాతృ->fr_layout == FR_నిలువు)
 	{
-	    if (fr->fr_next != NULL)
-		break;
+	    ఒకవేళ (fr->fr_తదుపరి != ఖాళీ)
+		ఆపు;
 	}
-	else
+	లేకపోతే
 	{
-	    if (fr->fr_next != NULL)
-		return TRUE;
+	    ఒకవేళ (fr->fr_తదుపరి != ఖాళీ)
+		తిరిగి TRUE;
 	}
-	fr = fr->fr_parent;
+	fr = fr->fr_మాతృ;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 
 /*
  * Get the value to show for the language mappings, active 'keymap'.
  */
-    int
+    పూర్ణాంకం
 get_keymap_str(
     win_T	*wp,
     char_u	*fmt,	    // format string containing one %s item
     char_u	*buf,	    // buffer for the result
-    int		len)	    // length of buffer
+    పూర్ణాంకం		len)	    // length of buffer
 {
     char_u	*p;
-    int		plen;
+    పూర్ణాంకం		plen;
 
-    if (wp->w_buffer->b_p_iminsert != B_IMODE_LMAP)
-	return 0;
+    ఒకవేళ (wp->w_బఫరు->b_p_iminsert != B_IMODE_LMAP)
+	తిరిగి 0;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     buf_T	*old_curbuf = curbuf;
     win_T	*old_curwin = curwin;
-    char_u	to_evaluate[] = "b:keymap_name";
+    char_u	గమ్యం_evaluate[] = "b:keymap_name";
     char_u	*s;
 
-    curbuf = wp->w_buffer;
+    curbuf = wp->w_బఫరు;
     curwin = wp;
     ++emsg_skip;
-    s = p = eval_to_string(to_evaluate, FALSE, FALSE);
+    s = p = eval_గమ్యం_string(గమ్యం_evaluate, FALSE, FALSE);
     --emsg_skip;
     curbuf = old_curbuf;
     curwin = old_curwin;
-    if (p == NULL || *p == NUL)
-#endif
+    ఒకవేళ (p == ఖాళీ || *p == NUL)
+#అయితే_ముగింపు
     {
-#ifdef FEAT_KEYMAP
-	if (wp->w_buffer->b_kmap_state & KEYMAP_LOADED)
-	    p = wp->w_buffer->b_p_keymap;
-	else
-#endif
+#నిర్వచితమైతే FEAT_KEYMAP
+	ఒకవేళ (wp->w_బఫరు->b_kmap_state & KEYMAP_LOADED)
+	    p = wp->w_బఫరు->b_p_keymap;
+	లేకపోతే
+#అయితే_ముగింపు
 	    p = (char_u *)"lang";
     }
-    plen = vim_snprintf((char *)buf, len, (char *)fmt, p);
-#ifdef FEAT_EVAL
+    plen = vim_snprintf((అక్షరం *)buf, len, (అక్షరం *)fmt, p);
+#నిర్వచితమైతే FEAT_EVAL
     vim_free(s);
-#endif
-    if (plen < 0 || plen > len - 1)
+#అయితే_ముగింపు
+    ఒకవేళ (plen < 0 || plen > len - 1)
     {
 	buf[0] = NUL;
 	plen = 0;
     }
 
-    return plen;
+    తిరిగి plen;
 }
 
-#if defined(FEAT_STL_OPT)
+#ఒకవేళ defined(FEAT_STL_OPT)
 /*
  * Redraw the status line or ruler of window "wp".
  * When "wp" is NULL redraw the tab pages line from 'tabline'.
  */
-    void
+    శూన్య
 win_redr_custom(
     win_T	*wp,
-    int		draw_ruler)	// TRUE or FALSE
+    పూర్ణాంకం		draw_ruler)	// TRUE or FALSE
 {
-    static int	entered = FALSE;
-    int		attr;
-    int		curattr;
-    int		row;
-    int		col = 0;
-    int		maxwidth;
-    int		width;
-    int		n;
-    int		len;
-    int		stlh_cnt;
-    int		fillchar;
+    స్థిర పూర్ణాంకం	entered = FALSE;
+    పూర్ణాంకం		attr;
+    పూర్ణాంకం		curattr;
+    పూర్ణాంకం		అడ్డువరుస;
+    పూర్ణాంకం		నిలువు = 0;
+    పూర్ణాంకం		maxwidth;
+    పూర్ణాంకం		వెడల్పు;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		stlh_cnt;
+    పూర్ణాంకం		fillchar;
     char_u	buf[MAXPATHL];
     char_u	*stl;
     char_u	*p;
     char_u	*opt_name;
-    int		opt_scope = 0;
+    పూర్ణాంకం		opt_scope = 0;
     stl_hlrec_T *hltab;
     stl_hlrec_T *tabtab;
     stl_clickrec_T *clicktab;
     win_T	*ewp;
-    int		p_crb_save;
+    పూర్ణాంకం		p_crb_save;
     bool	override_success = false;
 
     // There is a tiny chance that this gets called recursively: When
     // redrawing a status line triggers redrawing the ruler or tabline.
     // Avoid trouble by not allowing recursion.
-    if (entered)
-	return;
+    ఒకవేళ (entered)
+	తిరిగి;
     entered = TRUE;
 
     // setup environment for the task at hand
-    if (wp == NULL)
+    ఒకవేళ (wp == ఖాళీ)
     {
 	// Use 'tabline'.  Always at the first line of the screen.
 	stl = p_tal;
-	row = 0;
-	col = firstwin->w_wincol;
+	అడ్డువరుస = 0;
+	నిలువు = firstwin->w_wincol;
 	fillchar = ' ';
 	attr = HL_ATTR(HLF_TPF);
-	maxwidth = topframe->fr_width;
+	maxwidth = topframe->fr_వెడల్పు;
 	opt_name = (char_u *)"tabline";
     }
-    else
+    లేకపోతే
     {
-	override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	override_success = నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	row = statusline_row(wp);
-	fillchar = fillchar_status(&attr, wp);
-	int in_status_line = wp->w_status_height != 0;
-	maxwidth = in_status_line ? wp->w_width : cmdline_width;
+	అడ్డువరుస = statusline_అడ్డువరుస(wp);
+	fillchar = fillchar_స్థితి(&attr, wp);
+	పూర్ణాంకం లోపల_స్థితి_పంక్తి_2 = wp->w_స్థితి_ఎత్తు != 0;
+	maxwidth = లోపల_స్థితి_పంక్తి_2 ? wp->w_వెడల్పు : cmdline_వెడల్పు;
 
-	if (draw_ruler)
+	ఒకవేళ (draw_ruler)
 	{
 	    stl = p_ruf;
 	    opt_name = (char_u *)"rulerformat";
 	    // advance past any leading group spec - implicit in ru_col
-	    if (*stl == '%')
+	    ఒకవేళ (*stl == '%')
 	    {
-		if (*++stl == '-')
+		ఒకవేళ (*++stl == '-')
 		    stl++;
-		if (atoi((char *)stl))
-		    while (VIM_ISDIGIT(*stl))
+		ఒకవేళ (atoi((అక్షరం *)stl))
+		    అయితే (VIM_ISDIGIT(*stl))
 			stl++;
-		if (*stl++ != '(')
+		ఒకవేళ (*stl++ != '(')
 		    stl = p_ruf;
 	    }
-	    col = ru_col - (cmdline_width - maxwidth);
-	    if (col < (maxwidth + 1) / 2)
-		col = (maxwidth + 1) / 2;
-	    maxwidth -= col;
-	    if (!in_status_line)
+	    నిలువు = ru_నిలువు - (cmdline_వెడల్పు - maxwidth);
+	    ఒకవేళ (నిలువు < (maxwidth + 1) / 2)
+		నిలువు = (maxwidth + 1) / 2;
+	    maxwidth -= నిలువు;
+	    ఒకవేళ (!లోపల_స్థితి_పంక్తి_2)
 	    {
-		row = Rows - 1;
+		అడ్డువరుస = అడ్డువరుసలు - 1;
 		--maxwidth;	// writing in last column may cause scrolling
 		fillchar = ' ';
 		attr = 0;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    opt_name = (char_u *)"statusline";
-	    if (*wp->w_p_stl != NUL)
+	    ఒకవేళ (*wp->w_p_stl != NUL)
 	    {
 		stl = wp->w_p_stl;
 		opt_scope = OPT_LOCAL;
 	    }
-	    else
+	    లేకపోతే
 		stl = p_stl;
 	}
 
-	if (in_status_line)
-	    col += wp->w_wincol;
-	else
-	    col += cmdline_col_off;
+	ఒకవేళ (లోపల_స్థితి_పంక్తి_2)
+	    నిలువు += wp->w_wincol;
+	లేకపోతే
+	    నిలువు += cmdline_నిలువు_off;
     }
 
-    if (maxwidth <= 0)
-	goto theend;
+    ఒకవేళ (maxwidth <= 0)
+	వెళ్ళు theend;
 
     // Temporarily reset 'cursorbind', we don't want a side effect from moving
     // the cursor away and back.
-    ewp = wp == NULL ? curwin : wp;
+    ewp = wp == ఖాళీ ? curwin : wp;
     p_crb_save = ewp->w_p_crb;
     ewp->w_p_crb = FALSE;
-    stlh_cnt = draw_ruler || stl == p_tal ? 1 : wp->w_status_height;
+    stlh_cnt = draw_ruler || stl == p_tal ? 1 : wp->w_స్థితి_ఎత్తు;
 
     // Make a copy, because the statusline may include a function call that
     // might change the option value and free the memory.
     stl = vim_strsave(stl);
-    char_u *stl_tmp = (stl == NULL) ? (char_u *)"" : stl;
-    int col_save = col;
+    char_u *stl_tmp = (stl == ఖాళీ) ? (char_u *)"" : stl;
+    పూర్ణాంకం నిలువు_save = నిలువు;
 
     // Determine where click regions for this draw will be stored, and reset
     // the destination so each row in the loop below can append.  This must
     // be done before the loop because for a multi-line statusline each row
     // contributes its own click regions.
-    stl_click_region_T  **out_regions = NULL;
-    int			*out_count = NULL;
-    int			region_base_col = 0;
-    if (!draw_ruler)
+    stl_click_region_T  **బహిర్గతం_regions = ఖాళీ;
+    పూర్ణాంకం			*బహిర్గతం_లెక్క = ఖాళీ;
+    పూర్ణాంకం			region_పునాది_నిలువు = 0;
+    ఒకవేళ (!draw_ruler)
     {
-	if (wp != NULL)
+	ఒకవేళ (wp != ఖాళీ)
 	{
-	    out_regions = &wp->w_stl_click;
-	    out_count = &wp->w_stl_click_count;
-	    region_base_col = wp->w_wincol;
+	    బహిర్గతం_regions = &wp->w_stl_click;
+	    బహిర్గతం_లెక్క = &wp->w_stl_click_లెక్క;
+	    region_పునాది_నిలువు = wp->w_wincol;
 	}
-	else
+	లేకపోతే
 	{
 	    // 'tabline': store regions in global state since there is no
 	    // associated window.
-	    out_regions = &tabline_stl_click;
-	    out_count = &tabline_stl_click_count;
-	    region_base_col = firstwin->w_wincol;
+	    బహిర్గతం_regions = &tabline_stl_click;
+	    బహిర్గతం_లెక్క = &tabline_stl_click_లెక్క;
+	    region_పునాది_నిలువు = firstwin->w_wincol;
 	}
 
-	for (n = 0; n < *out_count; n++)
-	    vim_free((*out_regions)[n].funcname);
-	VIM_CLEAR(*out_regions);
-	*out_count = 0;
+	కొరకు (n = 0; n < *బహిర్గతం_లెక్క; n++)
+	    vim_free((*బహిర్గతం_regions)[n].funcname);
+	VIM_CLEAR(*బహిర్గతం_regions);
+	*బహిర్గతం_లెక్క = 0;
     }
 
-    int carry_hl = 0;
-    for (int i = 0; i < stlh_cnt; i++)
+    పూర్ణాంకం వాహకం_hl = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < stlh_cnt; i++)
     {
-	col = col_save;
+	నిలువు = నిలువు_save;
 	buf[0] = NUL;
-	width = build_stl_str_hl_mline(ewp, buf, sizeof(buf),
+	వెడల్పు = build_stl_str_hl_mline(ewp, buf, పరిమాణం(buf),
 			&stl_tmp,
 			opt_name, opt_scope,
 			fillchar, maxwidth, &hltab, &tabtab,
 			&clicktab,
-			&carry_hl);
+			&వాహకం_hl);
 
 	// Make all characters printable.
 	p = transstr(buf);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    len = vim_snprintf((char *)buf, sizeof(buf), "%s", p);
+	    len = vim_snprintf((అక్షరం *)buf, పరిమాణం(buf), "%s", p);
 	    vim_free(p);
 	}
-	else
-	    len = (int)STRLEN(buf);
+	లేకపోతే
+	    len = (పూర్ణాంకం)STRLEN(buf);
 
 	// fill up with "fillchar"
-	while (width < maxwidth && len < (int)sizeof(buf) - 1)
+	అయితే (వెడల్పు < maxwidth && len < (పూర్ణాంకం)పరిమాణం(buf) - 1)
 	{
 	    len += (*mb_char2bytes)(fillchar, buf + len);
-	    ++width;
+	    ++వెడల్పు;
 	}
 	buf[len] = NUL;
 
@@ -1579,92 +1579,92 @@ win_redr_custom(
 	 */
 	curattr = attr;
 	p = buf;
-	for (n = 0; hltab[n].start != NULL; n++)
+	కొరకు (n = 0; hltab[n].ప్రారంభం != ఖాళీ; n++)
 	{
-	    len = (int)(hltab[n].start - p);
-	    screen_puts_len(p, len, row + i, col, curattr);
-	    col += vim_strnsize(p, len);
-	    p = hltab[n].start;
+	    len = (పూర్ణాంకం)(hltab[n].ప్రారంభం - p);
+	    screen_puts_len(p, len, అడ్డువరుస + i, నిలువు, curattr);
+	    నిలువు += vim_strnsize(p, len);
+	    p = hltab[n].ప్రారంభం;
 
-	    if (hltab[n].userhl == 0)
+	    ఒకవేళ (hltab[n].userhl == 0)
 		curattr = attr;
-	    else if (hltab[n].userhl < 0)
+	    లేకపోతే ఒకవేళ (hltab[n].userhl < 0)
 		curattr = syn_id2attr(-hltab[n].userhl);
 # ifdef FEAT_TERMINAL
-	    else if (wp != NULL && wp != curwin && bt_terminal(wp->w_buffer)
-						    && wp->w_status_height != 0)
+	    లేకపోతే ఒకవేళ (wp != ఖాళీ && wp != curwin && bt_terminal(wp->w_బఫరు)
+						    && wp->w_స్థితి_ఎత్తు != 0)
 		curattr = highlight_stltermnc[hltab[n].userhl - 1];
-	    else if (wp != NULL && bt_terminal(wp->w_buffer)
-						    && wp->w_status_height != 0)
+	    లేకపోతే ఒకవేళ (wp != ఖాళీ && bt_terminal(wp->w_బఫరు)
+						    && wp->w_స్థితి_ఎత్తు != 0)
 		curattr = highlight_stlterm[hltab[n].userhl - 1];
 # endif
-	    else if (wp != NULL && wp != curwin && wp->w_status_height != 0)
+	    లేకపోతే ఒకవేళ (wp != ఖాళీ && wp != curwin && wp->w_స్థితి_ఎత్తు != 0)
 		curattr = highlight_stlnc[hltab[n].userhl - 1];
-	    else
+	    లేకపోతే
 		curattr = highlight_user[hltab[n].userhl - 1];
 	}
-	screen_puts(p, row + i, col, curattr);
+	screen_puts(p, అడ్డువరుస + i, నిలువు, curattr);
 
 	// Append click regions for this row.  clicktab reflects the line
 	// just rendered, so each row of a multi-line statusline contributes
 	// its own regions.
-	if (out_regions != NULL)
+	ఒకవేళ (బహిర్గతం_regions != ఖాళీ)
 	{
-	    int click_count = 0;
-	    for (n = 0; clicktab[n].start != NULL; n++)
-		click_count++;
+	    పూర్ణాంకం click_లెక్క = 0;
+	    కొరకు (n = 0; clicktab[n].ప్రారంభం != ఖాళీ; n++)
+		click_లెక్క++;
 
-	    if (click_count > 0)
+	    ఒకవేళ (click_లెక్క > 0)
 	    {
-		stl_click_region_T *new_arr = vim_realloc(*out_regions,
-			sizeof(stl_click_region_T)
-				    * (*out_count + click_count));
-		if (new_arr != NULL)
+		stl_click_region_T *new_arr = vim_realloc(*బహిర్గతం_regions,
+			పరిమాణం(stl_click_region_T)
+				    * (*బహిర్గతం_లెక్క + click_లెక్క));
+		ఒకవేళ (new_arr != ఖాళీ)
 		{
-		    char_u  *cur_funcname = NULL;
-		    int	    cur_minwid = 0;
-		    int	    region_start = region_base_col;
+		    char_u  *cur_funcname = ఖాళీ;
+		    పూర్ణాంకం	    cur_minwid = 0;
+		    పూర్ణాంకం	    region_ప్రారంభం = region_పునాది_నిలువు;
 
-		    *out_regions = new_arr;
+		    *బహిర్గతం_regions = new_arr;
 
 		    len = 0;
 		    p = buf;
-		    for (n = 0; clicktab[n].start != NULL; n++)
+		    కొరకు (n = 0; clicktab[n].ప్రారంభం != ఖాళీ; n++)
 		    {
 			len += vim_strnsize(p,
-					    (int)(clicktab[n].start - p));
-			p = clicktab[n].start;
+					    (పూర్ణాంకం)(clicktab[n].ప్రారంభం - p));
+			p = clicktab[n].ప్రారంభం;
 
-			if (cur_funcname != NULL)
+			ఒకవేళ (cur_funcname != ఖాళీ)
 			{
 			    stl_click_region_T *r =
-					&(*out_regions)[*out_count];
-			    r->row = row + i;
-			    r->col_start = region_start;
-			    r->col_end = region_base_col + len;
+					&(*బహిర్గతం_regions)[*బహిర్గతం_లెక్క];
+			    r->అడ్డువరుస = అడ్డువరుస + i;
+			    r->నిలువు_ప్రారంభం = region_ప్రారంభం;
+			    r->నిలువు_చివర = region_పునాది_నిలువు + len;
 			    r->funcname = vim_strsave(cur_funcname);
 			    r->minwid = cur_minwid;
 			    r->tabnr = 0;
-			    (*out_count)++;
+			    (*బహిర్గతం_లెక్క)++;
 			}
 
 			cur_funcname = clicktab[n].funcname;
 			cur_minwid = clicktab[n].minwid;
-			region_start = region_base_col + len;
+			region_ప్రారంభం = region_పునాది_నిలువు + len;
 		    }
 
 		    // Close final region if it extends to the end.
-		    if (cur_funcname != NULL)
+		    ఒకవేళ (cur_funcname != ఖాళీ)
 		    {
 			stl_click_region_T *r =
-					&(*out_regions)[*out_count];
-			r->row = row + i;
-			r->col_start = region_start;
-			r->col_end = region_base_col + maxwidth;
+					&(*బహిర్గతం_regions)[*బహిర్గతం_లెక్క];
+			r->అడ్డువరుస = అడ్డువరుస + i;
+			r->నిలువు_ప్రారంభం = region_ప్రారంభం;
+			r->నిలువు_చివర = region_పునాది_నిలువు + maxwidth;
 			r->funcname = vim_strsave(cur_funcname);
 			r->minwid = cur_minwid;
 			r->tabnr = 0;
-			(*out_count)++;
+			(*బహిర్గతం_లెక్క)++;
 		    }
 		}
 	    }
@@ -1672,64 +1672,64 @@ win_redr_custom(
 
 	// Free the funcname strings allocated by build_stl_str_hl_local()
 	// for this line.  They have been copied into the region array above.
-	for (n = 0; clicktab[n].start != NULL; n++)
+	కొరకు (n = 0; clicktab[n].ప్రారంభం != ఖాళీ; n++)
 	    vim_free(clicktab[n].funcname);
     }
     ewp->w_p_crb = p_crb_save;
 
-    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+    ఒకవేళ (p_sc && STRCMP(opt_name, p_sloc) == 0)
 	showcmd_update_clear_state();
 
     // Note: In the loop, build_stl_str_hl_mline() may replace stl_tmp with
     // a newly allocated buffer (when "%!" evaluation occurs), freeing the
     // original "stl" internally.  After the loop, stl_tmp must be freed
     // instead of stl, as it holds the current buffer ownership.
-    if (stl != NULL)
+    ఒకవేళ (stl != ఖాళీ)
 	vim_free(stl_tmp);
 
-    if (wp == NULL)
+    ఒకవేళ (wp == ఖాళీ)
     {
 	// Fill the TabPageIdxs[] array for clicking in the tab pagesline.
-	col = firstwin->w_wincol;
+	నిలువు = firstwin->w_wincol;
 	len = 0;
 	p = buf;
 	fillchar = 0;
-	for (n = 0; tabtab[n].start != NULL; n++)
+	కొరకు (n = 0; tabtab[n].ప్రారంభం != ఖాళీ; n++)
 	{
-	    len += vim_strnsize(p, (int)(tabtab[n].start - p));
-	    while (col < len)
-		TabPageIdxs[col++] = fillchar;
-	    p = tabtab[n].start;
+	    len += vim_strnsize(p, (పూర్ణాంకం)(tabtab[n].ప్రారంభం - p));
+	    అయితే (నిలువు < len)
+		Tab_పుట_Idxs[నిలువు++] = fillchar;
+	    p = tabtab[n].ప్రారంభం;
 	    fillchar = tabtab[n].userhl;
 	}
-	while (col < firstwin->w_wincol + topframe->fr_width)
-	    TabPageIdxs[col++] = fillchar;
+	అయితే (నిలువు < firstwin->w_wincol + topframe->fr_వెడల్పు)
+	    Tab_పుట_Idxs[నిలువు++] = fillchar;
     }
 
 theend:
-    if (override_success)
-	pop_highlight_overrides();
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
     entered = FALSE;
 }
 
-#endif // FEAT_STL_OPT
+#అయితే_ముగింపు // FEAT_STL_OPT
 
 /*
  * Output a single character directly to the screen and update ScreenLines.
  */
-    void
-screen_putchar(int c, int row, int col, int attr)
+    శూన్య
+screen_putchar(పూర్ణాంకం c, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    else
+    లేకపోతే
     {
 	buf[0] = c;
 	buf[1] = NUL;
     }
-    screen_puts(buf, row, col, attr);
+    screen_puts(buf, అడ్డువరుస, నిలువు, attr);
 }
 
 /*
@@ -1737,33 +1737,33 @@ screen_putchar(int c, int row, int col, int attr)
  * have a size of "MB_MAXBYTES + 1".
  * If "attrp" is not NULL, return the character's attribute in "*attrp".
  */
-    void
-screen_getbytes(int row, int col, char_u *bytes, int *attrp)
+    శూన్య
+screen_getbytes(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, char_u *బైట్లు, పూర్ణాంకం *attrp)
 {
-    unsigned off;
+    గుర్తులేని off;
 
     // safety check
-    if (ScreenLines == NULL || row >= screen_Rows || col >= screen_Columns)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ || అడ్డువరుస >= screen_అడ్డువరుసలు || నిలువు >= screen_Columns)
+	తిరిగి;
 
-    off = LineOffset[row] + col;
-    if (attrp != NULL)
+    off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు;
+    ఒకవేళ (attrp != ఖాళీ)
 	*attrp = ScreenAttrs[off];
-    bytes[0] = ScreenLines[off];
-    bytes[1] = NUL;
+    బైట్లు[0] = Screen_పంక్తులు[off];
+    బైట్లు[1] = NUL;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
-	bytes[utfc_char2bytes(off, bytes)] = NUL;
-    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0)
+	బైట్లు[utfc_char2bytes(off, బైట్లు)] = NUL;
+    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off] == 0x8e)
     {
-	bytes[0] = ScreenLines[off];
-	bytes[1] = ScreenLines2[off];
-	bytes[2] = NUL;
+	బైట్లు[0] = Screen_పంక్తులు[off];
+	బైట్లు[1] = ScreenLines2[off];
+	బైట్లు[2] = NUL;
     }
-    else if (enc_dbcs && MB_BYTE2LEN(bytes[0]) > 1)
+    లేకపోతే ఒకవేళ (enc_dbcs && MB_BYTE2LEN(బైట్లు[0]) > 1)
     {
-	bytes[1] = ScreenLines[off + 1];
-	bytes[2] = NUL;
+	బైట్లు[1] = Screen_పంక్తులు[off + 1];
+	బైట్లు[2] = NUL;
     }
 }
 
@@ -1772,19 +1772,19 @@ screen_getbytes(int row, int col, char_u *bytes, int *attrp)
  * composing characters in "u8cc".
  * Only to be used when ScreenLinesUC[off] != 0.
  */
-    static int
-screen_comp_differs(int off, int *u8cc)
+    స్థిర పూర్ణాంకం
+screen_comp_differs(పూర్ణాంకం off, పూర్ణాంకం *u8cc)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = 0; i < Screen_mco; ++i)
+    కొరకు (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] != (u8char_T)u8cc[i])
-	    return TRUE;
-	if (u8cc[i] == 0)
-	    break;
+	ఒకవేళ (Screen_పంక్తులు_C[i][off] != (u8char_T)u8cc[i])
+	    తిరిగి TRUE;
+	ఒకవేళ (u8cc[i] == 0)
+	    ఆపు;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -1793,120 +1793,120 @@ screen_comp_differs(int off, int *u8cc)
  * Note: only outputs within one row, message is truncated at screen boundary!
  * Note: if ScreenLines[], row and/or col is invalid, nothing is done.
  */
-    void
+    శూన్య
 screen_puts(
-    char_u	*text,
-    int		row,
-    int		col,
-    int		attr)
+    char_u	*పాఠ్యం,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		attr)
 {
-    screen_puts_len(text, -1, row, col, attr);
+    screen_puts_len(పాఠ్యం, -1, అడ్డువరుస, నిలువు, attr);
 }
 
 /*
  * Like screen_puts(), but output "text[len]".  When "len" is -1 output up to
  * a NUL.
  */
-    void
+    శూన్య
 screen_puts_len(
-    char_u	*text,
-    int		textlen,
-    int		row,
-    int		col,
-    int		attr_arg)
+    char_u	*పాఠ్యం,
+    పూర్ణాంకం		textlen,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		attr_arg)
 {
-    int		attr = attr_arg;
-    unsigned	off;
-    char_u	*ptr = text;
-    int		len = textlen;
-    int		c;
-    unsigned	max_off;
-    int		mbyte_blen = 1;
-    int		mbyte_cells = 1;
-    int		u8c = 0;
-    int		u8cc[MAX_MCO];
-    int		clear_next_cell = FALSE;
-#ifdef FEAT_ARABIC
-    int		prev_c = 0;		// previous Arabic character
-    int		pc, nc, nc1;
-    int		pcc[MAX_MCO];
-#endif
-    int		force_redraw_this;
-    int		force_redraw_next = FALSE;
-    int		need_redraw;
+    పూర్ణాంకం		attr = attr_arg;
+    గుర్తులేని	off;
+    char_u	*ptr = పాఠ్యం;
+    పూర్ణాంకం		len = textlen;
+    పూర్ణాంకం		c;
+    గుర్తులేని	max_off;
+    పూర్ణాంకం		mbyte_blen = 1;
+    పూర్ణాంకం		mbyte_cells = 1;
+    పూర్ణాంకం		u8c = 0;
+    పూర్ణాంకం		u8cc[MAX_MCO];
+    పూర్ణాంకం		clear_తదుపరి_cell = FALSE;
+#నిర్వచితమైతే FEAT_ARABIC
+    పూర్ణాంకం		prev_c = 0;		// previous Arabic character
+    పూర్ణాంకం		pc, nc, nc1;
+    పూర్ణాంకం		pcc[MAX_MCO];
+#అయితే_ముగింపు
+    పూర్ణాంకం		force_redraw_this;
+    పూర్ణాంకం		force_redraw_తదుపరి = FALSE;
+    పూర్ణాంకం		need_redraw;
 
     // Safety check. The check for negative row and column is to fix issue
     // #4102. TODO: find out why row/col could be negative.
-    if (ScreenLines == NULL
-	    || row >= screen_Rows || row < 0
-	    || col >= screen_Columns || col < 0)
-	return;
-    off = LineOffset[row] + col;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ
+	    || అడ్డువరుస >= screen_అడ్డువరుసలు || అడ్డువరుస < 0
+	    || నిలువు >= screen_Columns || నిలువు < 0)
+	తిరిగి;
+    off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు;
 
     // When drawing over the right half of a double-wide char clear out the
     // left half.  Only needed in a terminal.
-    if (has_mbyte && col > 0 && col < screen_Columns
-#ifdef FEAT_GUI
-	    && !gui.in_use
-#endif
-	    && mb_fix_col(col, row) != col)
+    ఒకవేళ (has_mbyte && నిలువు > 0 && నిలువు < screen_Columns
+#నిర్వచితమైతే FEAT_GUI
+	    && !gui.లోపల_use
+#అయితే_ముగింపు
+	    && mb_fix_నిలువు(నిలువు, అడ్డువరుస) != నిలువు)
     {
 	// Keep the original attribute to preserve background color
 	// when drawing over popup windows.
-	if (!skip_for_popup(row, col - 1))
+	ఒకవేళ (!skip_for_popup(అడ్డువరుస, నిలువు - 1))
 	{
-	    ScreenLines[off - 1] = ' ';
-	    if (enc_dbcs == DBCS_JPNU)
+	    Screen_పంక్తులు[off - 1] = ' ';
+	    ఒకవేళ (enc_dbcs == DBCS_JPNU)
 		ScreenAttrs[off - 1] = 0;
-	    else if (enc_utf8)
+	    లేకపోతే ఒకవేళ (enc_utf8)
 	    {
-		ScreenLinesUC[off - 1] = 0;
-		ScreenLinesC[0][off - 1] = 0;
+		Screen_పంక్తులు_UC[off - 1] = 0;
+		Screen_పంక్తులు_C[0][off - 1] = 0;
 	    }
 	    // redraw the previous cell, make it empty
-	    screen_char(off - 1, row, col - 1);
+	    screen_char(off - 1, అడ్డువరుస, నిలువు - 1);
 	}
 	// force the cell at "col" to be redrawn
-	force_redraw_next = TRUE;
+	force_redraw_తదుపరి = TRUE;
     }
 
-    max_off = LineOffset[row] + screen_Columns;
-    while (col < screen_Columns
-	    && (len < 0 || (int)(ptr - text) < len)
+    max_off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + screen_Columns;
+    అయితే (నిలువు < screen_Columns
+	    && (len < 0 || (పూర్ణాంకం)(ptr - పాఠ్యం) < len)
 	    && *ptr != NUL)
     {
 	c = *ptr;
 	// check if this is the first byte of a multibyte
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    mbyte_blen = enc_utf8 && len > 0
-			     ? utfc_ptr2len_len(ptr, (int)((text + len) - ptr))
+			     ? utfc_ptr2len_len(ptr, (పూర్ణాంకం)((పాఠ్యం + len) - ptr))
 			     : (*mb_ptr2len)(ptr);
-	    if (enc_dbcs == DBCS_JPNU && c == 0x8e)
+	    ఒకవేళ (enc_dbcs == DBCS_JPNU && c == 0x8e)
 		mbyte_cells = 1;
-	    else if (enc_dbcs != 0)
+	    లేకపోతే ఒకవేళ (enc_dbcs != 0)
 		mbyte_cells = mbyte_blen;
-	    else	// enc_utf8
+	    లేకపోతే	// enc_utf8
 	    {
 		u8c = len >= 0
-		      ? utfc_ptr2char_len(ptr, u8cc, (int)((text + len) - ptr))
+		      ? utfc_ptr2char_len(ptr, u8cc, (పూర్ణాంకం)((పాఠ్యం + len) - ptr))
 		      : utfc_ptr2char(ptr, u8cc);
 		mbyte_cells = utf_char2cells(u8c);
-#ifdef FEAT_ARABIC
-		if (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
+#నిర్వచితమైతే FEAT_ARABIC
+		ఒకవేళ (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
 		{
 		    // Do Arabic shaping.
-		    if (len >= 0 && (int)(ptr - text) + mbyte_blen >= len)
+		    ఒకవేళ (len >= 0 && (పూర్ణాంకం)(ptr - పాఠ్యం) + mbyte_blen >= len)
 		    {
 			// Past end of string to be displayed.
 			nc = NUL;
 			nc1 = NUL;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			nc = len >= 0
 				 ? utfc_ptr2char_len(ptr + mbyte_blen, pcc,
-					(int)((text + len) - ptr - mbyte_blen))
+					(పూర్ణాంకం)((పాఠ్యం + len) - ptr - mbyte_blen))
 				 : utfc_ptr2char(ptr + mbyte_blen, pcc);
 			nc1 = pcc[0];
 		    }
@@ -1914,10 +1914,10 @@ screen_puts_len(
 		    prev_c = u8c;
 		    u8c = arabic_shape(u8c, &c, &u8cc[0], nc, nc1, pc);
 		}
-		else
+		లేకపోతే
 		    prev_c = u8c;
-#endif
-		if (col + mbyte_cells > screen_Columns)
+#అయితే_ముగింపు
+		ఒకవేళ (నిలువు + mbyte_cells > screen_Columns)
 		{
 		    // Only 1 cell left, but character requires 2 cells:
 		    // display a '>' in the last column to avoid wrapping.
@@ -1927,152 +1927,152 @@ screen_puts_len(
 	    }
 	}
 
-	force_redraw_this = force_redraw_next;
-	force_redraw_next = FALSE;
+	force_redraw_this = force_redraw_తదుపరి;
+	force_redraw_తదుపరి = FALSE;
 
 	// When drawing pum text with opacity, blend the popup bg with the
 	// saved underlying bg so text cells match the padding cells that
 	// use hl_pum_blend_attr.  Without this, popup text appears on a
 	// solid bg while padding shows a blended bg, creating a visible
 	// seam.
-	int cell_attr = attr;
-	if (screen_pum_blend > 0 && pum_bg_attrs != NULL
-		&& row >= pum_bg_top && row < pum_bg_bot
-		&& col < pum_bg_cols)
+	పూర్ణాంకం cell_attr = attr;
+	ఒకవేళ (screen_pum_blend > 0 && pum_bg_attrs != ఖాళీ
+		&& అడ్డువరుస >= pum_bg_శిఖరం && అడ్డువరుస < pum_bg_bot
+		&& నిలువు < pum_bg_నిలువుల_సంఖ్య)
 	{
-	    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+	    పూర్ణాంకం soff = (అడ్డువరుస - pum_bg_శిఖరం) * pum_bg_నిలువుల_సంఖ్య + నిలువు;
 	    cell_attr = hl_blend_attr(pum_bg_attrs[soff], attr,
 					    screen_pum_blend, FALSE);
 	}
 
-	need_redraw = ScreenLines[off] != c
+	need_redraw = Screen_పంక్తులు[off] != c
 		|| (mbyte_cells == 2
-		    && ScreenLines[off + 1] != (enc_dbcs ? ptr[1] : 0))
+		    && Screen_పంక్తులు[off + 1] != (enc_dbcs ? ptr[1] : 0))
 		|| (enc_dbcs == DBCS_JPNU
 		    && c == 0x8e
 		    && ScreenLines2[off] != ptr[1])
 		|| (enc_utf8
-		    && (ScreenLinesUC[off] !=
+		    && (Screen_పంక్తులు_UC[off] !=
 				(u8char_T)(c < 0x80 && u8cc[0] == 0 ? 0 : u8c)
-			|| (ScreenLinesUC[off] != 0
+			|| (Screen_పంక్తులు_UC[off] != 0
 					  && screen_comp_differs(off, u8cc))))
 		|| ScreenAttrs[off] != cell_attr
-		|| exmode_active
-#ifdef FEAT_PROP_POPUP
+		|| exmode_చురుకైన
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// Output was suppressed under an opacity popup: the terminal
 		// does not match ScreenLines[] even when unchanged.
-		|| is_suppressed_cell(row, col)
-#endif
+		|| is_suppressed_cell(అడ్డువరుస, నిలువు)
+#అయితే_ముగింపు
 		;
 
-	if ((need_redraw || force_redraw_this) && !skip_for_popup(row, col))
+	ఒకవేళ ((need_redraw || force_redraw_this) && !skip_for_popup(అడ్డువరుస, నిలువు))
 	{
-#if defined(FEAT_GUI) || defined(UNIX)
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX)
 	    // The bold trick makes a single row of pixels appear in the next
 	    // character.  When a bold character is removed, the next
 	    // character should be redrawn too.  This happens for our own GUI
 	    // and for some xterms.
-	    if (need_redraw && ScreenLines[off] != ' ' && (
+	    ఒకవేళ (need_redraw && Screen_పంక్తులు[off] != ' ' && (
 # ifdef FEAT_GUI
-		    gui.in_use
+		    gui.లోపల_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ఒకవేళ defined(FEAT_GUI) && defined(UNIX)
 		    ||
 # endif
 # ifdef UNIX
-		    term_is_xterm
+		    పదం_is_xterm
 # endif
 		    ))
 	    {
-		int	n = ScreenAttrs[off];
+		పూర్ణాంకం	n = ScreenAttrs[off];
 
-		if (n > HL_ALL)
+		ఒకవేళ (n > HL_ALL)
 		    n = syn_attr2attr(n);
-		if (n & HL_BOLD)
-		    force_redraw_next = TRUE;
+		ఒకవేళ (n & HL_BOLD)
+		    force_redraw_తదుపరి = TRUE;
 	    }
-#endif
-#ifdef FEAT_DIRECTX
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DIRECTX
 	    // DirectWrite subpixel rendering can extend pixels beyond
 	    // cell boundaries.  Redraw the next character too.
-	    if (gui.directx_enabled && need_redraw)
-		force_redraw_next = TRUE;
-#endif
+	    ఒకవేళ (gui.directx_enabled && need_redraw)
+		force_redraw_తదుపరి = TRUE;
+#అయితే_ముగింపు
 	    // When at the end of the text and overwriting a two-cell
 	    // character with a one-cell character, need to clear the next
 	    // cell.  Also when overwriting the left half of a two-cell char
 	    // with the right half of a two-cell char.  Do this only once
 	    // (mb_off2cells() may return 2 on the right half).
-	    if (clear_next_cell)
-		clear_next_cell = FALSE;
-	    else if (has_mbyte
+	    ఒకవేళ (clear_తదుపరి_cell)
+		clear_తదుపరి_cell = FALSE;
+	    లేకపోతే ఒకవేళ (has_mbyte
 		    && (len < 0 ? ptr[mbyte_blen] == NUL
-					     : ptr + mbyte_blen >= text + len)
+					     : ptr + mbyte_blen >= పాఠ్యం + len)
 		    && ((mbyte_cells == 1 && (*mb_off2cells)(off, max_off) > 1)
 			|| (mbyte_cells == 2
 			    && (*mb_off2cells)(off, max_off) == 1
 			    && (*mb_off2cells)(off + 1, max_off) > 1)))
-		clear_next_cell = TRUE;
+		clear_తదుపరి_cell = TRUE;
 
 	    // Make sure we never leave a second byte of a double-byte behind,
 	    // it confuses mb_off2cells().
-	    if (enc_dbcs
+	    ఒకవేళ (enc_dbcs
 		    && ((mbyte_cells == 1 && (*mb_off2cells)(off, max_off) > 1)
 			|| (mbyte_cells == 2
 			    && (*mb_off2cells)(off, max_off) == 1
 			    && (*mb_off2cells)(off + 1, max_off) > 1)))
-		ScreenLines[off + mbyte_blen] = 0;
-	    ScreenLines[off] = c;
+		Screen_పంక్తులు[off + mbyte_blen] = 0;
+	    Screen_పంక్తులు[off] = c;
 	    ScreenAttrs[off] = cell_attr;
-	    ScreenCols[off] = -1;
-	    if (enc_utf8)
+	    Screen_నిలువుల_సంఖ్య[off] = -1;
+	    ఒకవేళ (enc_utf8)
 	    {
-		if (c < 0x80 && u8cc[0] == 0)
-		    ScreenLinesUC[off] = 0;
-		else
+		ఒకవేళ (c < 0x80 && u8cc[0] == 0)
+		    Screen_పంక్తులు_UC[off] = 0;
+		లేకపోతే
 		{
-		    int	    i;
+		    పూర్ణాంకం	    i;
 
-		    ScreenLinesUC[off] = u8c;
-		    for (i = 0; i < Screen_mco; ++i)
+		    Screen_పంక్తులు_UC[off] = u8c;
+		    కొరకు (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][off] = u8cc[i];
-			if (u8cc[i] == 0)
-			    break;
+			Screen_పంక్తులు_C[i][off] = u8cc[i];
+			ఒకవేళ (u8cc[i] == 0)
+			    ఆపు;
 		    }
 		}
-		if (mbyte_cells == 2)
+		ఒకవేళ (mbyte_cells == 2)
 		{
-		    ScreenLines[off + 1] = 0;
-		    ScreenLinesUC[off + 1] = 0;
-		    for (int ci = 0; ci < Screen_mco; ++ci)
-			ScreenLinesC[ci][off + 1] = 0;
+		    Screen_పంక్తులు[off + 1] = 0;
+		    Screen_పంక్తులు_UC[off + 1] = 0;
+		    కొరకు (పూర్ణాంకం ci = 0; ci < Screen_mco; ++ci)
+			Screen_పంక్తులు_C[ci][off + 1] = 0;
 		    ScreenAttrs[off + 1] = cell_attr;
-		    ScreenCols[off + 1] = -1;
+		    Screen_నిలువుల_సంఖ్య[off + 1] = -1;
 		}
-		screen_char(off, row, col);
+		screen_char(off, అడ్డువరుస, నిలువు);
 	    }
-	    else if (mbyte_cells == 2)
+	    లేకపోతే ఒకవేళ (mbyte_cells == 2)
 	    {
-		ScreenLines[off + 1] = ptr[1];
+		Screen_పంక్తులు[off + 1] = ptr[1];
 		ScreenAttrs[off + 1] = cell_attr;
-		ScreenCols[off + 1] = -1;
-		screen_char_2(off, row, col);
+		Screen_నిలువుల_సంఖ్య[off + 1] = -1;
+		screen_char_2(off, అడ్డువరుస, నిలువు);
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && c == 0x8e)
+	    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU && c == 0x8e)
 	    {
 		ScreenLines2[off] = ptr[1];
-		screen_char(off, row, col);
+		screen_char(off, అడ్డువరుస, నిలువు);
 	    }
-	    else
-		screen_char(off, row, col);
+	    లేకపోతే
+		screen_char(off, అడ్డువరుస, నిలువు);
 	}
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    off += mbyte_cells;
-	    col += mbyte_cells;
+	    నిలువు += mbyte_cells;
 	    ptr += mbyte_blen;
-	    if (clear_next_cell)
+	    ఒకవేళ (clear_తదుపరి_cell)
 	    {
 		// This only happens at the end, display one space next.
 		// Keep the attribute from before.
@@ -2081,304 +2081,304 @@ screen_puts_len(
 		attr = ScreenAttrs[off];
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    ++off;
-	    ++col;
+	    ++నిలువు;
 	    ++ptr;
 	}
     }
 
     // If we detected the next character needs to be redrawn, but the text
     // doesn't extend up to there, update the character here.
-    if (force_redraw_next && col < screen_Columns && !skip_for_popup(row, col))
+    ఒకవేళ (force_redraw_తదుపరి && నిలువు < screen_Columns && !skip_for_popup(అడ్డువరుస, నిలువు))
     {
-	if (enc_dbcs != 0 && dbcs_off2cells(off, max_off) > 1)
-	    screen_char_2(off, row, col);
-	else
-	    screen_char(off, row, col);
+	ఒకవేళ (enc_dbcs != 0 && dbcs_off2cells(off, max_off) > 1)
+	    screen_char_2(off, అడ్డువరుస, నిలువు);
+	లేకపోతే
+	    screen_char(off, అడ్డువరుస, నిలువు);
     }
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
+#ఒకవేళ defined(FEAT_శోధన_EXTRA)
 /*
  * Prepare for 'hlsearch' highlighting.
  */
-    void
-start_search_hl(void)
+    శూన్య
+ప్రారంభం_శోధన_hl(శూన్య)
 {
-    if (!p_hls || no_hlsearch)
-	return;
+    ఒకవేళ (!p_hls || no_hlsearch)
+	తిరిగి;
 
-    end_search_hl();  // just in case it wasn't called before
-    last_pat_prog(&screen_search_hl.rm);
+    చివర_శోధన_hl();  // just in case it wasn't called before
+    చివరి_pat_prog(&screen_శోధన_hl.rm);
 }
 
 /*
  * Clean up for 'hlsearch' highlighting.
  */
-    void
-end_search_hl(void)
+    శూన్య
+చివర_శోధన_hl(శూన్య)
 {
-    if (screen_search_hl.rm.regprog == NULL)
-	return;
+    ఒకవేళ (screen_శోధన_hl.rm.regprog == ఖాళీ)
+	తిరిగి;
 
-    vim_regfree(screen_search_hl.rm.regprog);
-    screen_search_hl.rm.regprog = NULL;
+    vim_regfree(screen_శోధన_hl.rm.regprog);
+    screen_శోధన_hl.rm.regprog = ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-screen_start_highlight(int attr)
+    స్థిర శూన్య
+screen_ప్రారంభం_highlight(పూర్ణాంకం attr)
 {
-    attrentry_T *aep = NULL;
+    attrentry_T *aep = ఖాళీ;
 
     screen_attr = attr;
-    if (!full_screen
-#ifdef MSWIN
-	    || !termcap_active
-#endif
+    ఒకవేళ (!నిండిన_screen
+#నిర్వచితమైతే MSWIN
+	    || !termcap_చురుకైన
+#అయితే_ముగింపు
        )
-	return;
+	తిరిగి;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
-	char	buf[20];
+	అక్షరం	buf[20];
 
 	// The GUI handles this internally.
 	sprintf(buf, "\033|%dh", attr);
-	OUT_STR(buf);
-	return;
+	బహిర్గతం_STR(buf);
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (attr > HL_ALL)				// special HL attr.
+    ఒకవేళ (attr > HL_ALL)				// special HL attr.
     {
-	if (IS_CTERM)
+	ఒకవేళ (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
-	    aep = syn_term_attr2entry(attr);
-	if (aep == NULL)	    // did ":syntax clear"
+	లేకపోతే
+	    aep = syn_పదం_attr2entry(attr);
+	ఒకవేళ (aep == ఖాళీ)	    // did ":syntax clear"
 	    attr = 0;
-	else
+	లేకపోతే
 	    attr = aep->ae_attr;
     }
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (use_vtp())
+#ఒకవేళ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (use_vtp())
     {
 	guicolor_T  defguifg, defguibg;
-	int	    defctermfg, defctermbg;
+	పూర్ణాంకం	    defctermfg, defctermbg;
 
 	// If FG and BG are unset, the color is undefined when
 	// BOLD+INVERSE. Use Normal as the default value.
 	get_default_console_color(&defctermfg, &defctermbg, &defguifg,
 		&defguibg);
 
-	if (p_tgc)
+	ఒకవేళ (p_tgc)
 	{
-	    if (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.fg_rgb))
-		term_fg_rgb_color(defguifg);
-	    if (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.bg_rgb))
-		term_bg_rgb_color(defguibg);
+	    ఒకవేళ (aep == ఖాళీ || COLOR_INVALID(aep->ae_u.cterm.fg_rgb))
+		పదం_fg_rgb_color(defguifg);
+	    ఒకవేళ (aep == ఖాళీ || COLOR_INVALID(aep->ae_u.cterm.bg_rgb))
+		పదం_bg_rgb_color(defguibg);
 	}
-	else if (t_colors >= 256)
+	లేకపోతే ఒకవేళ (t_colors >= 256)
 	{
-	    if (aep == NULL || aep->ae_u.cterm.fg_color == 0)
-		term_fg_color(defctermfg);
-	    if (aep == NULL || aep->ae_u.cterm.bg_color == 0)
-		term_bg_color(defctermbg);
+	    ఒకవేళ (aep == ఖాళీ || aep->ae_u.cterm.fg_color == 0)
+		పదం_fg_color(defctermfg);
+	    ఒకవేళ (aep == ఖాళీ || aep->ae_u.cterm.bg_color == 0)
+		పదం_bg_color(defctermbg);
 	}
     }
-#endif
-    if ((attr & HL_BOLD) && *T_MD != NUL)	// bold
-	out_str(T_MD);
-    else if (aep != NULL && cterm_normal_fg_bold && (
-#ifdef FEAT_TERMGUICOLORS
+#అయితే_ముగింపు
+    ఒకవేళ ((attr & HL_BOLD) && *T_MD != NUL)	// bold
+	బహిర్గతం_str(T_MD);
+    లేకపోతే ఒకవేళ (aep != ఖాళీ && cterm_సాధారణ_fg_bold && (
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 		p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR
 		? aep->ae_u.cterm.fg_rgb != INVALCOLOR
 		:
-#endif
+#అయితే_ముగింపు
 		t_colors > 1 && aep->ae_u.cterm.fg_color))
 	// If the Normal FG color has BOLD attribute and the new HL
 	// has a FG color defined, clear BOLD.
-	out_str(T_ME);
-    if ((attr & HL_STANDOUT) && *T_SO != NUL)	// standout
-	out_str(T_SO);
-    if ((attr & HL_UNDERCURL) && *T_UCS != NUL) // undercurl
-	out_str(T_UCS);
-    if ((attr & HL_UNDERDOUBLE) && *T_USS != NUL) // double underline
-	out_str(T_USS);
-    if ((attr & HL_UNDERDOTTED) && *T_DS != NUL) // dotted underline
-	out_str(T_DS);
-    if ((attr & HL_UNDERDASHED) && *T_CDS != NUL) // dashed underline
-	out_str(T_CDS);
-    if (((attr & HL_UNDERLINE)	    // underline or undercurl, etc.
+	బహిర్గతం_str(T_ME);
+    ఒకవేళ ((attr & HL_STANDOUT) && *T_SO != NUL)	// standout
+	బహిర్గతం_str(T_SO);
+    ఒకవేళ ((attr & HL_UNDERCURL) && *T_UCS != NUL) // undercurl
+	బహిర్గతం_str(T_UCS);
+    ఒకవేళ ((attr & HL_UNDERDOUBLE) && *T_USS != NUL) // double underline
+	బహిర్గతం_str(T_USS);
+    ఒకవేళ ((attr & HL_UNDERDOTTED) && *T_DS != NUL) // dotted underline
+	బహిర్గతం_str(T_DS);
+    ఒకవేళ ((attr & HL_UNDERDASHED) && *T_CDS != NUL) // dashed underline
+	బహిర్గతం_str(T_CDS);
+    ఒకవేళ (((attr & HL_UNDERLINE)	    // underline or undercurl, etc.
 		|| ((attr & HL_UNDERCURL) && *T_UCS == NUL)
 		|| ((attr & HL_UNDERDOUBLE) && *T_USS == NUL)
 		|| ((attr & HL_UNDERDOTTED) && *T_DS == NUL)
 		|| ((attr & HL_UNDERDASHED) && *T_CDS == NUL))
 	    && *T_US != NUL)
-	out_str(T_US);
-    if ((attr & HL_ITALIC) && *T_CZH != NUL)	// italic
-	out_str(T_CZH);
-    if ((attr & HL_INVERSE) && *T_MR != NUL)	// inverse (reverse)
-	out_str(T_MR);
-    if ((attr & HL_STRIKETHROUGH) && *T_STS != NUL)	// strike
-	out_str(T_STS);
+	బహిర్గతం_str(T_US);
+    ఒకవేళ ((attr & HL_ITALIC) && *T_CZH != NUL)	// italic
+	బహిర్గతం_str(T_CZH);
+    ఒకవేళ ((attr & HL_INVERSE) && *T_MR != NUL)	// inverse (reverse)
+	బహిర్గతం_str(T_MR);
+    ఒకవేళ ((attr & HL_STRIKETHROUGH) && *T_STS != NUL)	// strike
+	బహిర్గతం_str(T_STS);
 
     /*
      * Output the color or start string after bold etc., in case the
      * bold etc. override the color setting.
      */
-    if (aep != NULL)
+    ఒకవేళ (aep != ఖాళీ)
     {
-	if (aep->ae_u.cterm.font > 0 && aep->ae_u.cterm.font < 12)
-		term_font(aep->ae_u.cterm.font);
-#ifdef FEAT_TERMGUICOLORS
+	ఒకవేళ (aep->ae_u.cterm.font > 0 && aep->ae_u.cterm.font < 12)
+		పదం_font(aep->ae_u.cterm.font);
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	// When 'termguicolors' is set but fg or bg is unset,
 	// fall back to the cterm colors.   This helps for SpellBad,
 	// where the GUI uses a red undercurl.
-	if (p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR)
+	ఒకవేళ (p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.fg_rgb != INVALCOLOR)
-		term_fg_rgb_color(aep->ae_u.cterm.fg_rgb);
+	    ఒకవేళ (aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+		పదం_fg_rgb_color(aep->ae_u.cterm.fg_rgb);
 	}
-	else
-#endif
-	    if (t_colors > 1)
+	లేకపోతే
+#అయితే_ముగింపు
+	    ఒకవేళ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.fg_color)
-		    term_fg_color(aep->ae_u.cterm.fg_color - 1);
+		ఒకవేళ (aep->ae_u.cterm.fg_color)
+		    పదం_fg_color(aep->ae_u.cterm.fg_color - 1);
 	    }
-#ifdef FEAT_TERMGUICOLORS
-	if (p_tgc && aep->ae_u.cterm.bg_rgb != CTERMCOLOR)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+	ఒకవేళ (p_tgc && aep->ae_u.cterm.bg_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.bg_rgb != INVALCOLOR)
-		term_bg_rgb_color(aep->ae_u.cterm.bg_rgb);
+	    ఒకవేళ (aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+		పదం_bg_rgb_color(aep->ae_u.cterm.bg_rgb);
 	}
-	else
-#endif
-	    if (t_colors > 1)
+	లేకపోతే
+#అయితే_ముగింపు
+	    ఒకవేళ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.bg_color)
-		    term_bg_color(aep->ae_u.cterm.bg_color - 1);
+		ఒకవేళ (aep->ae_u.cterm.bg_color)
+		    పదం_bg_color(aep->ae_u.cterm.bg_color - 1);
 	    }
-#ifdef FEAT_TERMGUICOLORS
-	if (p_tgc && aep->ae_u.cterm.ul_rgb != CTERMCOLOR)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+	ఒకవేళ (p_tgc && aep->ae_u.cterm.ul_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.ul_rgb != INVALCOLOR)
-		term_ul_rgb_color(aep->ae_u.cterm.ul_rgb);
+	    ఒకవేళ (aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+		పదం_ul_rgb_color(aep->ae_u.cterm.ul_rgb);
 	}
-	else
-#endif
-	    if (t_colors > 1)
+	లేకపోతే
+#అయితే_ముగింపు
+	    ఒకవేళ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.ul_color)
-		    term_ul_color(aep->ae_u.cterm.ul_color - 1);
+		ఒకవేళ (aep->ae_u.cterm.ul_color)
+		    పదం_ul_color(aep->ae_u.cterm.ul_color - 1);
 	    }
 
-	if (!IS_CTERM)
+	ఒకవేళ (!IS_CTERM)
 	{
-	    if (aep->ae_u.term.start != NULL)
-		out_str(aep->ae_u.term.start);
+	    ఒకవేళ (aep->ae_u.పదం.ప్రారంభం != ఖాళీ)
+		బహిర్గతం_str(aep->ae_u.పదం.ప్రారంభం);
 	}
     }
 }
 
-    void
-screen_stop_highlight(void)
+    శూన్య
+screen_stop_highlight(శూన్య)
 {
-    int	    do_ME = FALSE;	    // output T_ME code
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    int	    do_ME_fg = FALSE, do_ME_bg = FALSE;
-#endif
+    పూర్ణాంకం	    do_ME = FALSE;	    // output T_ME code
+#ఒకవేళ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    పూర్ణాంకం	    do_ME_fg = FALSE, do_ME_bg = FALSE;
+#అయితే_ముగింపు
 
-    if (screen_attr != 0
-#ifdef MSWIN
-			&& termcap_active
-#endif
+    ఒకవేళ (screen_attr != 0
+#నిర్వచితమైతే MSWIN
+			&& termcap_చురుకైన
+#అయితే_ముగింపు
 					   )
     {
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (gui.లోపల_use)
 	{
-	    char	buf[20];
+	    అక్షరం	buf[20];
 
 	    // use internal GUI code
 	    sprintf(buf, "\033|%dH", screen_attr);
-	    OUT_STR(buf);
+	    బహిర్గతం_STR(buf);
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-	    int is_under;
+	    పూర్ణాంకం is_under;
 
-	    if (screen_attr > HL_ALL)			// special HL attr.
+	    ఒకవేళ (screen_attr > HL_ALL)			// special HL attr.
 	    {
 		attrentry_T *aep;
 
-		if (IS_CTERM)
+		ఒకవేళ (IS_CTERM)
 		{
 		    /*
 		     * Assume that t_me restores the original colors!
 		     */
 		    aep = syn_cterm_attr2entry(screen_attr);
-		    if (aep != NULL && ((
-#ifdef FEAT_TERMGUICOLORS
+		    ఒకవేళ (aep != ఖాళీ && ((
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 			    p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR
 				? aep->ae_u.cterm.fg_rgb != INVALCOLOR
 # ifdef FEAT_VTP
 				    ? !(do_ME_fg = TRUE) : (do_ME_fg = FALSE)
 # endif
 				:
-#endif
+#అయితే_ముగింపు
 				aep->ae_u.cterm.fg_color) || (
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 			    p_tgc && aep->ae_u.cterm.bg_rgb != CTERMCOLOR
 				? aep->ae_u.cterm.bg_rgb != INVALCOLOR
 # ifdef FEAT_VTP
 				    ? !(do_ME_bg = TRUE) : (do_ME_bg = FALSE)
 # endif
 				:
-#endif
+#అయితే_ముగింపు
 				aep->ae_u.cterm.bg_color)))
 			do_ME = TRUE;
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-		    if (use_vtp())
+#ఒకవేళ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+		    ఒకవేళ (use_vtp())
 		    {
-			if (do_ME_fg && do_ME_bg)
+			ఒకవేళ (do_ME_fg && do_ME_bg)
 			    do_ME = TRUE;
 
 			// FG and BG cannot be separated in T_ME, which is not
 			// efficient.
-			if (!do_ME && do_ME_fg)
-			    out_str((char_u *)"\033|39m"); // restore FG
-			if (!do_ME && do_ME_bg)
-			    out_str((char_u *)"\033|49m"); // restore BG
+			ఒకవేళ (!do_ME && do_ME_fg)
+			    బహిర్గతం_str((char_u *)"\033|39m"); // restore FG
+			ఒకవేళ (!do_ME && do_ME_bg)
+			    బహిర్గతం_str((char_u *)"\033|49m"); // restore BG
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Process FG and BG at once.
-			if (!do_ME)
+			ఒకవేళ (!do_ME)
 			    do_ME = do_ME_fg | do_ME_bg;
 		    }
-#endif
+#అయితే_ముగింపు
 		}
-		else
+		లేకపోతే
 		{
-		    aep = syn_term_attr2entry(screen_attr);
-		    if (aep != NULL && aep->ae_u.term.stop != NULL)
+		    aep = syn_పదం_attr2entry(screen_attr);
+		    ఒకవేళ (aep != ఖాళీ && aep->ae_u.పదం.stop != ఖాళీ)
 		    {
-			if (STRCMP(aep->ae_u.term.stop, T_ME) == 0)
+			ఒకవేళ (STRCMP(aep->ae_u.పదం.stop, T_ME) == 0)
 			    do_ME = TRUE;
-			else
-			    out_str(aep->ae_u.term.stop);
+			లేకపోతే
+			    బహిర్గతం_str(aep->ae_u.పదం.stop);
 		    }
 		}
-		if (aep == NULL)	    // did ":syntax clear"
+		ఒకవేళ (aep == ఖాళీ)	    // did ":syntax clear"
 		    screen_attr = 0;
-		else
+		లేకపోతే
 		    screen_attr = aep->ae_attr;
 	    }
 
@@ -2386,70 +2386,70 @@ screen_stop_highlight(void)
 	     * Often all ending-codes are equal to T_ME.  Avoid outputting the
 	     * same sequence several times.
 	     */
-	    if (screen_attr & HL_STANDOUT)
+	    ఒకవేళ (screen_attr & HL_STANDOUT)
 	    {
-		if (STRCMP(T_SE, T_ME) == 0)
+		ఒకవేళ (STRCMP(T_SE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
-		    out_str(T_SE);
+		లేకపోతే
+		    బహిర్గతం_str(T_SE);
 	    }
 	    is_under = (screen_attr & (HL_UNDERCURL
 			  | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED));
-	    if (is_under && *T_UCE != NUL)
+	    ఒకవేళ (is_under && *T_UCE != NUL)
 	    {
-		if (STRCMP(T_UCE, T_ME) == 0)
+		ఒకవేళ (STRCMP(T_UCE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
-		    out_str(T_UCE);
+		లేకపోతే
+		    బహిర్గతం_str(T_UCE);
 	    }
-	    if ((screen_attr & HL_UNDERLINE) || (is_under && *T_UCE == NUL))
+	    ఒకవేళ ((screen_attr & HL_UNDERLINE) || (is_under && *T_UCE == NUL))
 	    {
-		if (STRCMP(T_UE, T_ME) == 0)
+		ఒకవేళ (STRCMP(T_UE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
-		    out_str(T_UE);
+		లేకపోతే
+		    బహిర్గతం_str(T_UE);
 	    }
-	    if (screen_attr & HL_ITALIC)
+	    ఒకవేళ (screen_attr & HL_ITALIC)
 	    {
-		if (STRCMP(T_CZR, T_ME) == 0)
+		ఒకవేళ (STRCMP(T_CZR, T_ME) == 0)
 		    do_ME = TRUE;
-		else
-		    out_str(T_CZR);
+		లేకపోతే
+		    బహిర్గతం_str(T_CZR);
 	    }
-	    if (screen_attr & HL_STRIKETHROUGH)
+	    ఒకవేళ (screen_attr & HL_STRIKETHROUGH)
 	    {
-		if (STRCMP(T_STE, T_ME) == 0)
+		ఒకవేళ (STRCMP(T_STE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
-		    out_str(T_STE);
+		లేకపోతే
+		    బహిర్గతం_str(T_STE);
 	    }
-	    if (do_ME || (screen_attr & (HL_BOLD | HL_INVERSE)))
-		out_str(T_ME);
+	    ఒకవేళ (do_ME || (screen_attr & (HL_BOLD | HL_INVERSE)))
+		బహిర్గతం_str(T_ME);
 
-#ifdef FEAT_TERMGUICOLORS
-	    if (p_tgc)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+	    ఒకవేళ (p_tgc)
 	    {
-		if (cterm_normal_fg_gui_color != INVALCOLOR)
-		    term_fg_rgb_color(cterm_normal_fg_gui_color);
-		if (cterm_normal_bg_gui_color != INVALCOLOR)
-		    term_bg_rgb_color(cterm_normal_bg_gui_color);
-		if (cterm_normal_ul_gui_color != INVALCOLOR)
-		    term_ul_rgb_color(cterm_normal_ul_gui_color);
+		ఒకవేళ (cterm_సాధారణ_fg_gui_color != INVALCOLOR)
+		    పదం_fg_rgb_color(cterm_సాధారణ_fg_gui_color);
+		ఒకవేళ (cterm_సాధారణ_bg_gui_color != INVALCOLOR)
+		    పదం_bg_rgb_color(cterm_సాధారణ_bg_gui_color);
+		ఒకవేళ (cterm_సాధారణ_ul_gui_color != INVALCOLOR)
+		    పదం_ul_rgb_color(cterm_సాధారణ_ul_gui_color);
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
-		if (t_colors > 1)
+		ఒకవేళ (t_colors > 1)
 		{
 		    // set Normal cterm colors
-		    if (cterm_normal_fg_color != 0)
-			term_fg_color(cterm_normal_fg_color - 1);
-		    if (cterm_normal_bg_color != 0)
-			term_bg_color(cterm_normal_bg_color - 1);
-		    if (cterm_normal_ul_color != 0)
-			term_ul_color(cterm_normal_ul_color - 1);
-		    if (cterm_normal_fg_bold)
-			out_str(T_MD);
+		    ఒకవేళ (cterm_సాధారణ_fg_color != 0)
+			పదం_fg_color(cterm_సాధారణ_fg_color - 1);
+		    ఒకవేళ (cterm_సాధారణ_bg_color != 0)
+			పదం_bg_color(cterm_సాధారణ_bg_color - 1);
+		    ఒకవేళ (cterm_సాధారణ_ul_color != 0)
+			పదం_ul_color(cterm_సాధారణ_ul_color - 1);
+		    ఒకవేళ (cterm_సాధారణ_fg_bold)
+			బహిర్గతం_str(T_MD);
 		}
 	    }
 	}
@@ -2461,27 +2461,27 @@ screen_stop_highlight(void)
  * Reset the colors for a cterm.  Used when leaving Vim.
  * The machine specific code may override this again.
  */
-    void
-reset_cterm_colors(void)
+    శూన్య
+reset_cterm_colors(శూన్య)
 {
-    if (!IS_CTERM)
-	return;
+    ఒకవేళ (!IS_CTERM)
+	తిరిగి;
 
     // set Normal cterm colors
-#ifdef FEAT_TERMGUICOLORS
-    if (p_tgc ? (cterm_normal_fg_gui_color != INVALCOLOR
-		|| cterm_normal_bg_gui_color != INVALCOLOR)
-	    : (cterm_normal_fg_color > 0 || cterm_normal_bg_color > 0))
-#else
-	if (cterm_normal_fg_color > 0 || cterm_normal_bg_color > 0)
-#endif
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+    ఒకవేళ (p_tgc ? (cterm_సాధారణ_fg_gui_color != INVALCOLOR
+		|| cterm_సాధారణ_bg_gui_color != INVALCOLOR)
+	    : (cterm_సాధారణ_fg_color > 0 || cterm_సాధారణ_bg_color > 0))
+#లేకపోతే
+	ఒకవేళ (cterm_సాధారణ_fg_color > 0 || cterm_సాధారణ_bg_color > 0)
+#అయితే_ముగింపు
 	{
-	    out_str(T_OP);
+	    బహిర్గతం_str(T_OP);
 	    screen_attr = -1;
 	}
-    if (cterm_normal_fg_bold)
+    ఒకవేళ (cterm_సాధారణ_fg_bold)
     {
-	out_str(T_ME);
+	బహిర్గతం_str(T_ME);
 	screen_attr = -1;
     }
 }
@@ -2490,153 +2490,153 @@ reset_cterm_colors(void)
  * Put character ScreenLines["off"] on the screen at position "row" and "col",
  * using the attributes from ScreenAttrs["off"].
  */
-    void
-screen_char(unsigned off, int row, int col)
+    శూన్య
+screen_char(గుర్తులేని off, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    int		attr;
+    పూర్ణాంకం		attr;
 
     // Check for illegal values, just in case (could happen just after
     // resizing).
-    if (row >= screen_Rows || col >= screen_Columns)
-	return;
+    ఒకవేళ (అడ్డువరుస >= screen_అడ్డువరుసలు || నిలువు >= screen_Columns)
+	తిరిగి;
 
-#ifdef FEAT_IMAGE
-    mark_dirty_region_for_images(row, col, 1, 1);
-#endif
+#నిర్వచితమైతే FEAT_IMAGE
+    mark_dirty_region_for_images(అడ్డువరుస, నిలువు, 1, 1);
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // If this cell is under a higher-zindex opacity popup, suppress
     // output to prevent flicker.  The higher popup's redraw will
     // output the final blended result.
     // Also suppress if this is a wide character whose second cell
     // is under an opacity popup.
-    if (popup_is_under_opacity(row, col))
+    ఒకవేళ (popup_is_under_opacity(అడ్డువరుస, నిలువు))
     {
 	// If this is a wide character whose left half is under an opacity
 	// popup but right half is not, clear the right half so the old
 	// blended value doesn't remain as a ghost after popup_move().
-	if (enc_utf8 && ScreenLinesUC[off] != 0
-		&& utf_char2cells(ScreenLinesUC[off]) == 2
-		&& col + 1 < screen_Columns
-		&& !popup_is_under_opacity(row, col + 1))
+	ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0
+		&& utf_char2cells(Screen_పంక్తులు_UC[off]) == 2
+		&& నిలువు + 1 < screen_Columns
+		&& !popup_is_under_opacity(అడ్డువరుస, నిలువు + 1))
 	{
-	    int off2 = off + 1;
-	    ScreenLines[off2] = ' ';
-	    ScreenLinesUC[off2] = 0;
-	    screen_char(off2, row, col + 1);
+	    పూర్ణాంకం off2 = off + 1;
+	    Screen_పంక్తులు[off2] = ' ';
+	    Screen_పంక్తులు_UC[off2] = 0;
+	    screen_char(off2, అడ్డువరుస, నిలువు + 1);
 	}
-	mark_suppressed_cell(row, col);
-	if (enc_utf8 && ScreenLinesUC[off] != 0
-		&& utf_char2cells(ScreenLinesUC[off]) == 2
-		&& col + 1 < screen_Columns
-		&& popup_is_under_opacity(row, col + 1))
-	    mark_suppressed_cell(row, col + 1);
-	screen_cur_col = 9999;
-	return;
+	mark_suppressed_cell(అడ్డువరుస, నిలువు);
+	ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0
+		&& utf_char2cells(Screen_పంక్తులు_UC[off]) == 2
+		&& నిలువు + 1 < screen_Columns
+		&& popup_is_under_opacity(అడ్డువరుస, నిలువు + 1))
+	    mark_suppressed_cell(అడ్డువరుస, నిలువు + 1);
+	screen_cur_నిలువు = 9999;
+	తిరిగి;
     }
-    if (enc_utf8 && ScreenLinesUC[off] != 0
-	    && utf_char2cells(ScreenLinesUC[off]) == 2
-	    && col + 1 < screen_Columns
-	    && popup_is_under_opacity(row, col + 1))
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0
+	    && utf_char2cells(Screen_పంక్తులు_UC[off]) == 2
+	    && నిలువు + 1 < screen_Columns
+	    && popup_is_under_opacity(అడ్డువరుస, నిలువు + 1))
     {
-	mark_suppressed_cell(row, col);
-	mark_suppressed_cell(row, col + 1);
-	screen_cur_col = 9999;
-	return;
+	mark_suppressed_cell(అడ్డువరుస, నిలువు);
+	mark_suppressed_cell(అడ్డువరుస, నిలువు + 1);
+	screen_cur_నిలువు = 9999;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
     // Outputting a character in the last cell on the screen may scroll the
     // screen up.  Only do it when the "xn" termcap property is set, otherwise
     // mark the character invalid (update it when scrolled up).
-    if (*T_XN == NUL
-	    && row == screen_Rows - 1 && col == screen_Columns - 1
-#ifdef FEAT_RIGHTLEFT
+    ఒకవేళ (*T_XN == NUL
+	    && అడ్డువరుస == screen_అడ్డువరుసలు - 1 && నిలువు == screen_Columns - 1
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    // account for first command-line character in rightleft mode
 	    && !cmdmsg_rl
-#endif
+#అయితే_ముగింపు
        )
     {
 	ScreenAttrs[off] = (sattr_T)-1;
-	ScreenCols[off] = -1;
-	return;
+	Screen_నిలువుల_సంఖ్య[off] = -1;
+	తిరిగి;
     }
 
     /*
      * Stop highlighting first, so it's easier to move the cursor.
      */
-    if (screen_char_attr != 0)
+    ఒకవేళ (screen_char_attr != 0)
 	attr = screen_char_attr;
-    else
+    లేకపోతే
 	attr = ScreenAttrs[off];
-    if (screen_attr != attr)
+    ఒకవేళ (screen_attr != attr)
 	screen_stop_highlight();
 
-    windgoto(row, col);
+    windgoto(అడ్డువరుస, నిలువు);
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // The cell is output below, the terminal matches ScreenLines again.
-    unmark_suppressed_cell(row, col);
-    if (enc_utf8 && ScreenLinesUC[off] != 0
-	    && utf_char2cells(ScreenLinesUC[off]) == 2)
-	unmark_suppressed_cell(row, col + 1);
-#endif
+    unmark_suppressed_cell(అడ్డువరుస, నిలువు);
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0
+	    && utf_char2cells(Screen_పంక్తులు_UC[off]) == 2)
+	unmark_suppressed_cell(అడ్డువరుస, నిలువు + 1);
+#అయితే_ముగింపు
 
-    if (screen_attr != attr)
-	screen_start_highlight(attr);
+    ఒకవేళ (screen_attr != attr)
+	screen_ప్రారంభం_highlight(attr);
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0)
     {
 	char_u	    buf[MB_MAXBYTES + 1];
 
-	if (
-#ifdef FEAT_GUI
-	    !gui.in_use &&
-#endif
-	    get_cellwidth(ScreenLinesUC[off]) > 1
+	ఒకవేళ (
+#నిర్వచితమైతే FEAT_GUI
+	    !gui.లోపల_use &&
+#అయితే_ముగింపు
+	    get_cellwidth(Screen_పంక్తులు_UC[off]) > 1
 	    )
 	{
 	    // If the width is set to 2 with setcellwidths()
 	    // clear the two screen cells. If the character is actually
 	    // single width it won't change the second cell.
-	    out_str((char_u *)"  ");
-	    term_windgoto(row, col);
-	    screen_cur_col = 9999;
+	    బహిర్గతం_str((char_u *)"  ");
+	    పదం_windgoto(అడ్డువరుస, నిలువు);
+	    screen_cur_నిలువు = 9999;
 	}
-	else if (utf_ambiguous_width(ScreenLinesUC[off]))
+	లేకపోతే ఒకవేళ (utf_ambiguous_వెడల్పు(Screen_పంక్తులు_UC[off]))
 	{
-	    if (*p_ambw == 'd'
-#ifdef FEAT_GUI
-		    && !gui.in_use
-#endif
+	    ఒకవేళ (*p_ambw == 'd'
+#నిర్వచితమైతే FEAT_GUI
+		    && !gui.లోపల_use
+#అయితే_ముగింపు
 		    )
 	    {
 		// Clear the two screen cells. If the character is actually
 		// single width it won't change the second cell.
-		out_str((char_u *)"  ");
-		term_windgoto(row, col);
+		బహిర్గతం_str((char_u *)"  ");
+		పదం_windgoto(అడ్డువరుస, నిలువు);
 	    }
 	    // not sure where the cursor is after drawing the ambiguous width
 	    // character
-	    screen_cur_col = 9999;
+	    screen_cur_నిలువు = 9999;
 	}
-	else if (utf_char2cells(ScreenLinesUC[off]) > 1)
-	    ++screen_cur_col;
+	లేకపోతే ఒకవేళ (utf_char2cells(Screen_పంక్తులు_UC[off]) > 1)
+	    ++screen_cur_నిలువు;
 
 	// Convert the UTF-8 character to bytes and write it.
 	buf[utfc_char2bytes(off, buf)] = NUL;
-	out_str(buf);
+	బహిర్గతం_str(buf);
     }
-    else
+    లేకపోతే
     {
-	out_flush_check();
-	out_char(ScreenLines[off]);
+	బహిర్గతం_flush_check();
+	బహిర్గతం_char(Screen_పంక్తులు[off]);
 	// double-byte character in single-width cell
-	if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
-	    out_char(ScreenLines2[off]);
+	ఒకవేళ (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off] == 0x8e)
+	    బహిర్గతం_char(ScreenLines2[off]);
     }
 
-    screen_cur_col++;
+    screen_cur_నిలువు++;
 }
 
 /*
@@ -2645,83 +2645,83 @@ screen_char(unsigned off, int row, int col)
  * The attributes of the first byte is used for all.  This is required to
  * output the two bytes of a double-byte character with nothing in between.
  */
-    static void
-screen_char_2(unsigned off, int row, int col)
+    స్థిర శూన్య
+screen_char_2(గుర్తులేని off, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
     // Check for illegal values (could be wrong when screen was resized).
-    if (off + 1 >= (unsigned)(screen_Rows * screen_Columns))
-	return;
+    ఒకవేళ (off + 1 >= (గుర్తులేని)(screen_అడ్డువరుసలు * screen_Columns))
+	తిరిగి;
 
     // Outputting the last character on the screen may scroll the screen up.
     // Don't to it!  Mark the character invalid (update it when scrolled up)
-    if (row == screen_Rows - 1 && col >= screen_Columns - 2)
+    ఒకవేళ (అడ్డువరుస == screen_అడ్డువరుసలు - 1 && నిలువు >= screen_Columns - 2)
     {
 	ScreenAttrs[off] = (sattr_T)-1;
-	ScreenCols[off] = -1;
-	return;
+	Screen_నిలువుల_సంఖ్య[off] = -1;
+	తిరిగి;
     }
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // If under a higher-zindex opacity popup, suppress output.
-    if (popup_is_under_opacity(row, col))
+    ఒకవేళ (popup_is_under_opacity(అడ్డువరుస, నిలువు))
     {
-	mark_suppressed_cell(row, col);
-	mark_suppressed_cell(row, col + 1);
-	screen_cur_col = 9999;
-	return;
+	mark_suppressed_cell(అడ్డువరుస, నిలువు);
+	mark_suppressed_cell(అడ్డువరుస, నిలువు + 1);
+	screen_cur_నిలువు = 9999;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
     // Output the first byte normally (positions the cursor), then write the
     // second byte directly.
-    screen_char(off, row, col);
-    out_char(ScreenLines[off + 1]);
-#ifdef FEAT_PROP_POPUP
-    unmark_suppressed_cell(row, col + 1);
-#endif
-    ++screen_cur_col;
+    screen_char(off, అడ్డువరుస, నిలువు);
+    బహిర్గతం_char(Screen_పంక్తులు[off + 1]);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    unmark_suppressed_cell(అడ్డువరుస, నిలువు + 1);
+#అయితే_ముగింపు
+    ++screen_cur_నిలువు;
 }
 
 /*
  * Draw a rectangle of the screen, inverted when "invert" is TRUE.
  * This uses the contents of ScreenLines[] and doesn't change it.
  */
-    void
+    శూన్య
 screen_draw_rectangle(
-    int		row,
-    int		col,
-    int		height,
-    int		width,
-    int		invert,
-    int		force)
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		ఎత్తు,
+    పూర్ణాంకం		వెడల్పు,
+    పూర్ణాంకం		invert,
+    పూర్ణాంకం		force)
 {
-    int		r, c;
-    int		off;
-    int		max_off;
+    పూర్ణాంకం		r, c;
+    పూర్ణాంకం		off;
+    పూర్ణాంకం		max_off;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
-    if (invert)
+    ఒకవేళ (invert)
 	screen_char_attr = HL_INVERSE;
-    for (r = row; r < row + height; ++r)
+    కొరకు (r = అడ్డువరుస; r < అడ్డువరుస + ఎత్తు; ++r)
     {
-	off = LineOffset[r];
+	off = పంక్తి_స్థానభ్రంశం[r];
 	max_off = off + screen_Columns;
-	for (c = col; c < col + width; ++c)
+	కొరకు (c = నిలువు; c < నిలువు + వెడల్పు; ++c)
 	{
-	    if (enc_dbcs != 0 && dbcs_off2cells(off + c, max_off) > 1)
+	    ఒకవేళ (enc_dbcs != 0 && dbcs_off2cells(off + c, max_off) > 1)
 	    {
-		if (force || !skip_for_popup(r, c))
+		ఒకవేళ (force || !skip_for_popup(r, c))
 		    screen_char_2(off + c, r, c);
 		++c;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (force || !skip_for_popup(r, c))
+		ఒకవేళ (force || !skip_for_popup(r, c))
 		    screen_char(off + c, r, c);
-		if (utf_off2cells(off + c, max_off) > 1)
+		ఒకవేళ (utf_off2cells(off + c, max_off) > 1)
 		    ++c;
 	    }
 	}
@@ -2732,37 +2732,37 @@ screen_draw_rectangle(
 /*
  * Redraw the characters for a vertically split window.
  */
-    static void
-redraw_block(int row, int end, win_T *wp)
+    స్థిర శూన్య
+redraw_ఖండం(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం చివర, win_T *wp)
 {
-    int		col;
-    int		width;
+    పూర్ణాంకం		నిలువు;
+    పూర్ణాంకం		వెడల్పు;
 
-#ifdef FEAT_CLIPBOARD
-    clip_may_clear_selection(row, end - 1);
-#endif
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    clip_may_clear_selection(అడ్డువరుస, చివర - 1);
+#అయితే_ముగింపు
 
-    if (wp == NULL)
+    ఒకవేళ (wp == ఖాళీ)
     {
-	col = firstwin->w_wincol;
-	width = topframe->fr_width;
+	నిలువు = firstwin->w_wincol;
+	వెడల్పు = topframe->fr_వెడల్పు;
     }
-    else
+    లేకపోతే
     {
-	col = wp->w_wincol;
-	width = wp->w_width;
+	నిలువు = wp->w_wincol;
+	వెడల్పు = wp->w_వెడల్పు;
     }
-    screen_draw_rectangle(row, col, end - row, width, FALSE, FALSE);
+    screen_draw_rectangle(అడ్డువరుస, నిలువు, చివర - అడ్డువరుస, వెడల్పు, FALSE, FALSE);
 }
 
-    void
-space_to_screenline(int off, int attr)
+    శూన్య
+space_గమ్యం_screenline(పూర్ణాంకం off, పూర్ణాంకం attr)
 {
-    ScreenLines[off] = ' ';
+    Screen_పంక్తులు[off] = ' ';
     ScreenAttrs[off] = attr;
-    ScreenCols[off] = -1;
-    if (enc_utf8)
-	ScreenLinesUC[off] = 0;
+    Screen_నిలువుల_సంఖ్య[off] = -1;
+    ఒకవేళ (enc_utf8)
+	Screen_పంక్తులు_UC[off] = 0;
 }
 
 /*
@@ -2770,66 +2770,66 @@ space_to_screenline(int off, int attr)
  * to "end_col" (exclusive) with character "c1" in first column followed by
  * "c2" in the other columns.  Use attributes "attr".
  */
-    void
+    శూన్య
 screen_fill(
-	int	start_row,
-	int	end_row,
-	int	start_col,
-	int	end_col,
-	int	c1,
-	int	c2,
-	int	attr)
+	పూర్ణాంకం	ప్రారంభం_అడ్డువరుస,
+	పూర్ణాంకం	చివర_అడ్డువరుస,
+	పూర్ణాంకం	ప్రారంభం_నిలువు,
+	పూర్ణాంకం	చివర_నిలువు,
+	పూర్ణాంకం	c1,
+	పూర్ణాంకం	c2,
+	పూర్ణాంకం	attr)
 {
-    int	    row;
-    int	    col;
-    int	    off;
-    int	    end_off;
-    int	    did_delete;
-    int	    c;
-    int	    norm_term;
-#if defined(FEAT_GUI) || defined(UNIX)
-    int	    force_next = FALSE;
-#endif
+    పూర్ణాంకం	    అడ్డువరుస;
+    పూర్ణాంకం	    నిలువు;
+    పూర్ణాంకం	    off;
+    పూర్ణాంకం	    చివర_off;
+    పూర్ణాంకం	    did_delete;
+    పూర్ణాంకం	    c;
+    పూర్ణాంకం	    norm_పదం;
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX)
+    పూర్ణాంకం	    force_తదుపరి = FALSE;
+#అయితే_ముగింపు
 
-    if (end_row > screen_Rows)		// safety check
-	end_row = screen_Rows;
-    if (end_col > screen_Columns)	// safety check
-	end_col = screen_Columns;
-    if (ScreenLines == NULL
-	    || start_row < 0		// should not happen
-	    || start_row >= end_row
-	    || start_col >= end_col)	// nothing to do
-	return;
+    ఒకవేళ (చివర_అడ్డువరుస > screen_అడ్డువరుసలు)		// safety check
+	చివర_అడ్డువరుస = screen_అడ్డువరుసలు;
+    ఒకవేళ (చివర_నిలువు > screen_Columns)	// safety check
+	చివర_నిలువు = screen_Columns;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ
+	    || ప్రారంభం_అడ్డువరుస < 0		// should not happen
+	    || ప్రారంభం_అడ్డువరుస >= చివర_అడ్డువరుస
+	    || ప్రారంభం_నిలువు >= చివర_నిలువు)	// nothing to do
+	తిరిగి;
 
     // it's a "normal" terminal when not in a GUI or cterm
-    norm_term = (
-#ifdef FEAT_GUI
-	    !gui.in_use &&
-#endif
+    norm_పదం = (
+#నిర్వచితమైతే FEAT_GUI
+	    !gui.లోపల_use &&
+#అయితే_ముగింపు
 	    !IS_CTERM);
-    for (row = start_row; row < end_row; ++row)
+    కొరకు (అడ్డువరుస = ప్రారంభం_అడ్డువరుస; అడ్డువరుస < చివర_అడ్డువరుస; ++అడ్డువరుస)
     {
-	if (has_mbyte
-#ifdef FEAT_GUI
-		&& !gui.in_use
-#endif
+	ఒకవేళ (has_mbyte
+#నిర్వచితమైతే FEAT_GUI
+		&& !gui.లోపల_use
+#అయితే_ముగింపు
 	   )
 	{
 	    // When drawing over the right half of a double-wide char clear
 	    // out the left half.  When drawing over the left half of a
 	    // double wide-char clear out the right half.  Only needed in a
 	    // terminal.
-	    if (start_col > 0 && mb_fix_col(start_col, row) != start_col)
+	    ఒకవేళ (ప్రారంభం_నిలువు > 0 && mb_fix_నిలువు(ప్రారంభం_నిలువు, అడ్డువరుస) != ప్రారంభం_నిలువు)
 	    {
 		// start_col is the right half, clear the left half
-		int left_attr = ScreenAttrs[LineOffset[row] + start_col - 1];
-		screen_puts_len((char_u *)" ", 1, row, start_col - 1, left_attr);
+		పూర్ణాంకం ఎడమ_attr = ScreenAttrs[పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + ప్రారంభం_నిలువు - 1];
+		screen_puts_len((char_u *)" ", 1, అడ్డువరుస, ప్రారంభం_నిలువు - 1, ఎడమ_attr);
 	    }
-	    if (end_col < screen_Columns && mb_fix_col(end_col, row) != end_col)
+	    ఒకవేళ (చివర_నిలువు < screen_Columns && mb_fix_నిలువు(చివర_నిలువు, అడ్డువరుస) != చివర_నిలువు)
 	    {
 		// end_col is the right half of a wide char, preserve its attribute
-		int right_attr = ScreenAttrs[LineOffset[row] + end_col];
-		screen_puts_len((char_u *)" ", 1, row, end_col, right_attr);
+		పూర్ణాంకం కుడి_attr = ScreenAttrs[పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + చివర_నిలువు];
+		screen_puts_len((char_u *)" ", 1, అడ్డువరుస, చివర_నిలువు, కుడి_attr);
 	    }
 	}
 	/*
@@ -2838,147 +2838,147 @@ screen_fill(
 	 * space.
 	 */
 	did_delete = FALSE;
-	if (c2 == ' '
-		&& end_col == Columns
+	ఒకవేళ (c2 == ' '
+		&& చివర_నిలువు == Columns
 		&& can_clear(T_CE)
 		&& (attr == 0
-		    || (norm_term
+		    || (norm_పదం
 			&& attr <= HL_ALL
 			&& ((attr & ~(HL_BOLD | HL_ITALIC)) == 0)))
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// Do not use T_CE optimization if any cell in the
 		// range is under an opacity popup.  The clear-to-eol
 		// command would erase the popup area on screen.
-		&& !popup_is_under_opacity_range(row,
-						start_col, end_col)
-#endif
+		&& !popup_is_under_opacity_range(అడ్డువరుస,
+						ప్రారంభం_నిలువు, చివర_నిలువు)
+#అయితే_ముగింపు
 		)
 	{
 	    /*
 	     * check if we really need to clear something
 	     */
-	    col = start_col;
-	    if (c1 != ' ')			// don't clear first char
-		++col;
+	    నిలువు = ప్రారంభం_నిలువు;
+	    ఒకవేళ (c1 != ' ')			// don't clear first char
+		++నిలువు;
 
-	    off = LineOffset[row] + col;
-	    end_off = LineOffset[row] + end_col;
+	    off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు;
+	    చివర_off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + చివర_నిలువు;
 
 	    // skip blanks (used often, keep it fast!)
-	    if (enc_utf8)
-		while (off < end_off && ScreenLines[off] == ' '
-			  && ScreenAttrs[off] == 0 && ScreenLinesUC[off] == 0
-#ifdef FEAT_PROP_POPUP
-			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
-#endif
+	    ఒకవేళ (enc_utf8)
+		అయితే (off < చివర_off && Screen_పంక్తులు[off] == ' '
+			  && ScreenAttrs[off] == 0 && Screen_పంక్తులు_UC[off] == 0
+#నిర్వచితమైతే FEAT_PROP_POPUP
+			  && !is_suppressed_cell(అడ్డువరుస,
+					      (పూర్ణాంకం)(off - పంక్తి_స్థానభ్రంశం[అడ్డువరుస]))
+#అయితే_ముగింపు
 			  )
 		    ++off;
-	    else
-		while (off < end_off && ScreenLines[off] == ' '
+	    లేకపోతే
+		అయితే (off < చివర_off && Screen_పంక్తులు[off] == ' '
 						     && ScreenAttrs[off] == 0
-#ifdef FEAT_PROP_POPUP
-			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+			  && !is_suppressed_cell(అడ్డువరుస,
+					      (పూర్ణాంకం)(off - పంక్తి_స్థానభ్రంశం[అడ్డువరుస]))
+#అయితే_ముగింపు
 			  )
 		    ++off;
-	    if (off < end_off)		// something to be cleared
+	    ఒకవేళ (off < చివర_off)		// something to be cleared
 	    {
-		col = off - LineOffset[row];
+		నిలువు = off - పంక్తి_స్థానభ్రంశం[అడ్డువరుస];
 		screen_stop_highlight();
-		term_windgoto(row, col);// clear rest of this screen line
-		out_str(T_CE);
-		screen_start();		// don't know where cursor is now
-		col = end_col - col;
-		while (col--)		// clear chars in ScreenLines
+		పదం_windgoto(అడ్డువరుస, నిలువు);// clear rest of this screen line
+		బహిర్గతం_str(T_CE);
+		screen_ప్రారంభం();		// don't know where cursor is now
+		నిలువు = చివర_నిలువు - నిలువు;
+		అయితే (నిలువు--)		// clear chars in ScreenLines
 		{
-		    space_to_screenline(off, 0);
-#ifdef FEAT_PROP_POPUP
+		    space_గమ్యం_screenline(off, 0);
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		    // T_CE cleared the terminal cell, it matches again.
-		    unmark_suppressed_cell(row, (int)(off - LineOffset[row]));
-#endif
+		    unmark_suppressed_cell(అడ్డువరుస, (పూర్ణాంకం)(off - పంక్తి_స్థానభ్రంశం[అడ్డువరుస]));
+#అయితే_ముగింపు
 		    ++off;
 		}
 	    }
 	    did_delete = TRUE;		// the chars are cleared now
 	}
 
-	off = LineOffset[row] + start_col;
+	off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + ప్రారంభం_నిలువు;
 	c = c1;
-	for (col = start_col; col < end_col; ++col)
+	కొరకు (నిలువు = ప్రారంభం_నిలువు; నిలువు < చివర_నిలువు; ++నిలువు)
 	{
-	    if ((ScreenLines[off] != c
-		    || (enc_utf8 && (int)ScreenLinesUC[off]
+	    ఒకవేళ ((Screen_పంక్తులు[off] != c
+		    || (enc_utf8 && (పూర్ణాంకం)Screen_పంక్తులు_UC[off]
 						       != (c >= 0x80 ? c : 0))
 		    || ScreenAttrs[off] != attr
 		    || must_redraw == UPD_CLEAR  // screen clear pending
-#if defined(FEAT_GUI) || defined(UNIX)
-		    || force_next
-#endif
-#ifdef FEAT_PROP_POPUP
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX)
+		    || force_తదుపరి
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		    // Output was suppressed under an opacity popup: the
 		    // terminal does not match ScreenLines[] even when
 		    // unchanged.
-		    || is_suppressed_cell(row, col)
-#endif
+		    || is_suppressed_cell(అడ్డువరుస, నిలువు)
+#అయితే_ముగింపు
 		    )
 		    // Skip if under a(nother) popup.
-		    && !skip_for_popup(row, col))
+		    && !skip_for_popup(అడ్డువరుస, నిలువు))
 	    {
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// For popup with opacity: show underlying character with
 		// popup's background color applied.
-		if (screen_opacity_popup != NULL && c == ' ')
+		ఒకవేళ (screen_opacity_popup != ఖాళీ && c == ' ')
 		{
 		    // Skip if background is the second cell of a wide character.
 		    // Check if previous cell is a wide character.
-		    if (ScreenLines[off] == 0
+		    ఒకవేళ (Screen_పంక్తులు[off] == 0
 			    && off > 0
-			    && enc_utf8 && ScreenLinesUC[off - 1] != 0
-			    && utf_char2cells(ScreenLinesUC[off - 1]) == 2)
-			goto next_col;
+			    && enc_utf8 && Screen_పంక్తులు_UC[off - 1] != 0
+			    && utf_char2cells(Screen_పంక్తులు_UC[off - 1]) == 2)
+			వెళ్ళు తదుపరి_నిలువు;
 		}
-		if (screen_opacity_popup != NULL && c == ' '
-						       && ScreenLines[off] != 0)
+		ఒకవేళ (screen_opacity_popup != ఖాళీ && c == ' '
+						       && Screen_పంక్తులు[off] != 0)
 		{
-		    int bg_char_cells = 1;
-		    if (enc_utf8 && ScreenLinesUC[off] != 0)
-			bg_char_cells = utf_char2cells(ScreenLinesUC[off]);
+		    పూర్ణాంకం bg_char_cells = 1;
+		    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0)
+			bg_char_cells = utf_char2cells(Screen_పంక్తులు_UC[off]);
 
 		    // For wide background character, check if the next cell
 		    // is also being filled with space.  If not, the wide char
 		    // would be partially covered, so don't show it.
-		    if (bg_char_cells == 2)
+		    ఒకవేళ (bg_char_cells == 2)
 		    {
-			if (col + 1 >= end_col)
+			ఒకవేళ (నిలువు + 1 >= చివర_నిలువు)
 			    // At the edge, skip wide char.
-			    goto skip_opacity_fill;
+			    వెళ్ళు skip_opacity_fill;
 			// In screen_fill, we're filling with 'c' which is ' '.
 			// The next cell will also be filled with c2 (usually ' ').
 			// If c2 is not space, skip the wide char.
-			if (c2 != ' ')
-			    goto skip_opacity_fill;
+			ఒకవేళ (c2 != ' ')
+			    వెళ్ళు skip_opacity_fill;
 		    }
 
-		    int popup_attr = get_win_attr(screen_opacity_popup);
-		    int blend = screen_opacity_popup->w_popup_blend;
+		    పూర్ణాంకం popup_attr = get_win_attr(screen_opacity_popup);
+		    పూర్ణాంకం blend = screen_opacity_popup->w_popup_blend;
 		    // Blend both foreground and background for padding area
 		    ScreenAttrs[off] = hl_blend_attr(ScreenAttrs[off],
 							popup_attr, blend, TRUE);
-		    screen_char(off, row, col);
-		    goto next_col;
+		    screen_char(off, అడ్డువరుస, నిలువు);
+		    వెళ్ళు తదుపరి_నిలువు;
 		}
 skip_opacity_fill:
-#endif
+#అయితే_ముగింపు
 		// For pum opacity: blend pum background with underlying.
 		// Only for space cells; text cells are handled normally.
-		if (screen_pum_blend > 0 && c == ' '
-			&& pum_bg_attrs != NULL
-			&& row >= pum_bg_top && row < pum_bg_bot
-			&& col < pum_bg_cols)
+		ఒకవేళ (screen_pum_blend > 0 && c == ' '
+			&& pum_bg_attrs != ఖాళీ
+			&& అడ్డువరుస >= pum_bg_శిఖరం && అడ్డువరుస < pum_bg_bot
+			&& నిలువు < pum_bg_నిలువుల_సంఖ్య)
 		{
-		    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+		    పూర్ణాంకం soff = (అడ్డువరుస - pum_bg_శిఖరం) * pum_bg_నిలువుల_సంఖ్య + నిలువు;
 
 		    // Skip the trailing cell of a wide background char: its
 		    // leading cell already emitted the full wide glyph via
@@ -2988,20 +2988,20 @@ skip_opacity_fill:
 		    // start_col), the "wide lead" is outside our range (e.g.,
 		    // popup text wrote a narrow cell there), so we fall through
 		    // to the regular blend path which renders a blended space.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
-			    && col > start_col
-			    && pum_bg_linesUC[soff] == 0
-			    && pum_bg_linesUC[soff - 1] != 0
-			    && utf_char2cells(pum_bg_linesUC[soff - 1]) == 2)
+		    ఒకవేళ (enc_utf8 && pum_bg_పంక్తులు_UC != ఖాళీ
+			    && నిలువు > ప్రారంభం_నిలువు
+			    && pum_bg_పంక్తులు_UC[soff] == 0
+			    && pum_bg_పంక్తులు_UC[soff - 1] != 0
+			    && utf_char2cells(pum_bg_పంక్తులు_UC[soff - 1]) == 2)
 		    {
-			ScreenLines[off] = 0;
-			if (ScreenLinesUC != NULL)
-			    ScreenLinesUC[off] = 0;
+			Screen_పంక్తులు[off] = 0;
+			ఒకవేళ (Screen_పంక్తులు_UC != ఖాళీ)
+			    Screen_పంక్తులు_UC[off] = 0;
 			ScreenAttrs[off] = ScreenAttrs[off - 1];
-			goto next_col;
+			వెళ్ళు తదుపరి_నిలువు;
 		    }
 
-		    int underlying_attr = pum_bg_attrs[soff];
+		    పూర్ణాంకం underlying_attr = pum_bg_attrs[soff];
 
 		    // If restoring the leading cell of a wide background char
 		    // would extend past the end of the fill range (e.g. into a
@@ -3011,117 +3011,117 @@ skip_opacity_fill:
 		    // background char whose leading cell is outside the fill
 		    // range (e.g., popup text wrote a narrow cell there),
 		    // restoring the trailing alone would emit a stray NUL.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
-			    && ((pum_bg_linesUC[soff] != 0
-				    && utf_char2cells(pum_bg_linesUC[soff]) == 2
-				    && col + 1 >= end_col)
-				|| (col == start_col
-				    && pum_bg_linesUC[soff] == 0
-				    && col > 0
-				    && pum_bg_linesUC[soff - 1] != 0
-				    && utf_char2cells(pum_bg_linesUC[soff - 1])
+		    ఒకవేళ (enc_utf8 && pum_bg_పంక్తులు_UC != ఖాళీ
+			    && ((pum_bg_పంక్తులు_UC[soff] != 0
+				    && utf_char2cells(pum_bg_పంక్తులు_UC[soff]) == 2
+				    && నిలువు + 1 >= చివర_నిలువు)
+				|| (నిలువు == ప్రారంభం_నిలువు
+				    && pum_bg_పంక్తులు_UC[soff] == 0
+				    && నిలువు > 0
+				    && pum_bg_పంక్తులు_UC[soff - 1] != 0
+				    && utf_char2cells(pum_bg_పంక్తులు_UC[soff - 1])
 								       == 2)))
 		    {
-			ScreenLines[off] = ' ';
-			if (ScreenLinesUC != NULL)
-			    ScreenLinesUC[off] = 0;
+			Screen_పంక్తులు[off] = ' ';
+			ఒకవేళ (Screen_పంక్తులు_UC != ఖాళీ)
+			    Screen_పంక్తులు_UC[off] = 0;
 			ScreenAttrs[off] = hl_pum_blend_attr(underlying_attr,
 						attr, screen_pum_blend);
-			screen_char(off, row, col);
-			goto next_col;
+			screen_char(off, అడ్డువరుస, నిలువు);
+			వెళ్ళు తదుపరి_నిలువు;
 		    }
 
 		    // Restore underlying character so text shows through.
-		    ScreenLines[off] = pum_bg_lines[soff];
-		    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+		    Screen_పంక్తులు[off] = pum_bg_పంక్తులు[soff];
+		    ఒకవేళ (enc_utf8 && pum_bg_పంక్తులు_UC != ఖాళీ
+						&& Screen_పంక్తులు_UC != ఖాళీ)
 		    {
-			int k;
-			ScreenLinesUC[off] = pum_bg_linesUC[soff];
-			for (k = 0; k < MAX_MCO; ++k)
-			    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-				ScreenLinesC[k][off] = pum_bg_linesC[k][soff];
+			పూర్ణాంకం k;
+			Screen_పంక్తులు_UC[off] = pum_bg_పంక్తులు_UC[soff];
+			కొరకు (k = 0; k < MAX_MCO; ++k)
+			    ఒకవేళ (pum_bg_పంక్తులు_C[k] != ఖాళీ
+						    && Screen_పంక్తులు_C[k] != ఖాళీ)
+				Screen_పంక్తులు_C[k][off] = pum_bg_పంక్తులు_C[k][soff];
 		    }
 		    // Keep underlying fg, blend bg only.
 		    ScreenAttrs[off] = hl_pum_blend_attr(underlying_attr,
 					    attr, screen_pum_blend);
-		    screen_char(off, row, col);
-		    goto next_col;
+		    screen_char(off, అడ్డువరుస, నిలువు);
+		    వెళ్ళు తదుపరి_నిలువు;
 		}
-#if defined(FEAT_GUI) || defined(UNIX)
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX)
 		// The bold trick may make a single row of pixels appear in
 		// the next character.  When a bold character is removed, the
 		// next character should be redrawn too.  This happens for our
 		// own GUI and for some xterms.
-		if (
+		ఒకవేళ (
 # ifdef FEAT_GUI
-			gui.in_use
+			gui.లోపల_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ఒకవేళ defined(FEAT_GUI) && defined(UNIX)
 			||
 # endif
 # ifdef UNIX
-			term_is_xterm
+			పదం_is_xterm
 # endif
 		   )
 		{
-		    if (ScreenLines[off] != ' '
+		    ఒకవేళ (Screen_పంక్తులు[off] != ' '
 			    && (ScreenAttrs[off] > HL_ALL
 				|| ScreenAttrs[off] & HL_BOLD))
-			force_next = TRUE;
-		    else
-			force_next = FALSE;
+			force_తదుపరి = TRUE;
+		    లేకపోతే
+			force_తదుపరి = FALSE;
 		}
-#endif // FEAT_GUI || defined(UNIX)
-#ifdef FEAT_DIRECTX
+#అయితే_ముగింపు // FEAT_GUI || defined(UNIX)
+#నిర్వచితమైతే FEAT_DIRECTX
 		// DirectWrite subpixel rendering can extend pixels
 		// beyond cell boundaries.  Redraw the next character.
-		if (gui.directx_enabled)
-		    force_next = TRUE;
-#endif
-		ScreenLines[off] = c;
-		if (enc_utf8)
+		ఒకవేళ (gui.directx_enabled)
+		    force_తదుపరి = TRUE;
+#అయితే_ముగింపు
+		Screen_పంక్తులు[off] = c;
+		ఒకవేళ (enc_utf8)
 		{
-		    if (c >= 0x80)
+		    ఒకవేళ (c >= 0x80)
 		    {
-			ScreenLinesUC[off] = c;
-			ScreenLinesC[0][off] = 0;
-			ScreenLines[off] = 0x80; // avoid storing zero
+			Screen_పంక్తులు_UC[off] = c;
+			Screen_పంక్తులు_C[0][off] = 0;
+			Screen_పంక్తులు[off] = 0x80; // avoid storing zero
 		    }
-		    else
-			ScreenLinesUC[off] = 0;
+		    లేకపోతే
+			Screen_పంక్తులు_UC[off] = 0;
 		}
 		ScreenAttrs[off] = attr;
-		if (!did_delete || c != ' ')
-		    screen_char(off, row, col);
+		ఒకవేళ (!did_delete || c != ' ')
+		    screen_char(off, అడ్డువరుస, నిలువు);
 	    }
-next_col:
-	    ScreenCols[off] = -1;
+తదుపరి_నిలువు:
+	    Screen_నిలువుల_సంఖ్య[off] = -1;
 	    ++off;
-	    if (col == start_col)
+	    ఒకవేళ (నిలువు == ప్రారంభం_నిలువు)
 	    {
-		if (did_delete)
-		    break;
+		ఒకవేళ (did_delete)
+		    ఆపు;
 		c = c2;
 	    }
 	}
-	if (end_col == Columns)
-	    LineWraps[row] = FALSE;
-	if (row == Rows - 1)		// overwritten the command line
+	ఒకవేళ (చివర_నిలువు == Columns)
+	    పంక్తి_Wraps[అడ్డువరుస] = FALSE;
+	ఒకవేళ (అడ్డువరుస == అడ్డువరుసలు - 1)		// overwritten the command line
 	{
 	    redraw_cmdline = TRUE;
-	    if (((start_col == 0 && end_col == Columns)
-			|| (start_col == cmdline_col_off
-			&& end_col == cmdline_col_off + cmdline_width))
+	    ఒకవేళ (((ప్రారంభం_నిలువు == 0 && చివర_నిలువు == Columns)
+			|| (ప్రారంభం_నిలువు == cmdline_నిలువు_off
+			&& చివర_నిలువు == cmdline_నిలువు_off + cmdline_వెడల్పు))
 		    && c1 == ' ' && c2 == ' ' && attr == 0
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		    && !popup_overlaps_cmdline()
-#endif
+#అయితే_ముగింపు
 		    )
 		clear_cmdline = FALSE;	// command line has been cleared
-	    if (start_col == 0 || start_col == cmdline_col_off)
-		mode_displayed = FALSE; // mode cleared or overwritten
+	    ఒకవేళ (ప్రారంభం_నిలువు == 0 || ప్రారంభం_నిలువు == cmdline_నిలువు_off)
+		బహుళకం_displayed = FALSE; // mode cleared or overwritten
 	}
     }
 }
@@ -3130,32 +3130,32 @@ next_col:
  * Check if there should be a delay.  Used before clearing or redrawing the
  * screen or the command line.
  */
-    void
-check_for_delay(int check_msg_scroll)
+    శూన్య
+check_for_delay(పూర్ణాంకం check_సందేశం_scroll)
 {
-    if ((emsg_on_display || (check_msg_scroll && msg_scroll))
+    ఒకవేళ ((emsg_on_display || (check_సందేశం_scroll && సందేశం_scroll))
 	    && !did_wait_return
 	    && emsg_silent == 0
-	    && !in_assert_fails)
+	    && !లోపల_assert_fails)
     {
-	out_flush();
+	బహిర్గతం_flush();
 	ui_delay(1006L, TRUE);
 	emsg_on_display = FALSE;
-	if (check_msg_scroll)
-	    msg_scroll = FALSE;
+	ఒకవేళ (check_సందేశం_scroll)
+	    సందేశం_scroll = FALSE;
     }
 }
 
 /*
  * Init TabPageIdxs[] to zero: Clicking outside of tabs has no effect.
  */
-    static void
-clear_TabPageIdxs(void)
+    స్థిర శూన్య
+clear_Tab_పుట_Idxs(శూన్య)
 {
-    int		scol;
+    పూర్ణాంకం		scol;
 
-    for (scol = 0; scol < Columns; ++scol)
-	TabPageIdxs[scol] = 0;
+    కొరకు (scol = 0; scol < Columns; ++scol)
+	Tab_పుట_Idxs[scol] = 0;
 }
 
 /*
@@ -3164,11 +3164,11 @@ clear_TabPageIdxs(void)
  *	Returns TRUE if there is a valid screen to write to.
  *	Returns FALSE when starting up and screen not initialized yet.
  */
-    int
-screen_valid(int doclear)
+    పూర్ణాంకం
+screen_valid(పూర్ణాంకం doclear)
 {
     screenalloc(doclear);	   // allocate screen buffers if size changed
-    return (ScreenLines != NULL);
+    తిరిగి (Screen_పంక్తులు != ఖాళీ);
 }
 
 /*
@@ -3181,35 +3181,35 @@ screen_valid(int doclear)
  * in ScreenLines[].  Use Rows and Columns for positioning text etc. where the
  * final size of the shell is needed.
  */
-    void
-screenalloc(int doclear)
+    శూన్య
+screenalloc(పూర్ణాంకం doclear)
 {
-    int		    new_row, old_row;
-#ifdef FEAT_GUI
-    int		    old_Rows;
-#endif
+    పూర్ణాంకం		    new_అడ్డువరుస, old_అడ్డువరుస;
+#నిర్వచితమైతే FEAT_GUI
+    పూర్ణాంకం		    old_అడ్డువరుసలు_2;
+#అయితే_ముగింపు
     win_T	    *wp;
-    int		    outofmem = FALSE;
-    int		    len;
-    schar_T	    *new_ScreenLines;
-    u8char_T	    *new_ScreenLinesUC = NULL;
-    u8char_T	    *new_ScreenLinesC[MAX_MCO];
-    schar_T	    *new_ScreenLines2 = NULL;
+    పూర్ణాంకం		    outofmem = FALSE;
+    పూర్ణాంకం		    len;
+    schar_T	    *new_Screen_పంక్తులు;
+    u8char_T	    *new_Screen_పంక్తులు_UC = ఖాళీ;
+    u8char_T	    *new_Screen_పంక్తులు_C[MAX_MCO];
+    schar_T	    *new_ScreenLines2 = ఖాళీ;
     sattr_T	    *new_ScreenAttrs;
-    colnr_T	    *new_ScreenCols;
-    unsigned	    *new_LineOffset;
-    char_u	    *new_LineWraps;
-    short	    *new_TabPageIdxs;
-#ifdef FEAT_PROP_POPUP
-    short	    *new_popup_mask;
-    short	    *new_popup_mask_next;
-    char	    *new_popup_transparent;
-#endif
+    colnr_T	    *new_Screen_నిలువుల_సంఖ్య;
+    గుర్తులేని	    *new_పంక్తి_స్థానభ్రంశం;
+    char_u	    *new_పంక్తి_Wraps;
+    పొట్టి	    *new_Tab_పుట_Idxs;
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    పొట్టి	    *new_popup_ముసుగు;
+    పొట్టి	    *new_popup_ముసుగు_తదుపరి;
+    అక్షరం	    *new_popup_transparent;
+#అయితే_ముగింపు
     tabpage_T	    *tp;
-    static int	    entered = FALSE;		// avoid recursiveness
-    static int	    done_outofmem_msg = FALSE;	// did outofmem message
-    int		    retry_count = 0;
-    int		    found_null;
+    స్థిర పూర్ణాంకం	    entered = FALSE;		// avoid recursiveness
+    స్థిర పూర్ణాంకం	    పూర్తి_outofmem_సందేశం = FALSE;	// did outofmem message
+    పూర్ణాంకం		    retry_లెక్క = 0;
+    పూర్ణాంకం		    దొరికింది_null;
 
 retry:
     /*
@@ -3217,24 +3217,24 @@ retry:
      * when Rows and Columns have been set and we have started doing full
      * screen stuff.
      */
-    if ((ScreenLines != NULL
-		&& Rows == screen_Rows
+    ఒకవేళ ((Screen_పంక్తులు != ఖాళీ
+		&& అడ్డువరుసలు == screen_అడ్డువరుసలు
 		&& Columns == screen_Columns
-		&& enc_utf8 == (ScreenLinesUC != NULL)
-		&& (enc_dbcs == DBCS_JPNU) == (ScreenLines2 != NULL)
+		&& enc_utf8 == (Screen_పంక్తులు_UC != ఖాళీ)
+		&& (enc_dbcs == DBCS_JPNU) == (ScreenLines2 != ఖాళీ)
 		&& p_mco == Screen_mco)
-	    || Rows == 0
+	    || అడ్డువరుసలు == 0
 	    || Columns == 0
-	    || (!full_screen && ScreenLines == NULL))
-	return;
+	    || (!నిండిన_screen && Screen_పంక్తులు == ఖాళీ))
+	తిరిగి;
 
     /*
      * It's possible that we produce an out-of-memory message below, which
      * will cause this function to be called again.  To break the loop, just
      * return here.
      */
-    if (entered)
-	return;
+    ఒకవేళ (entered)
+	తిరిగి;
     entered = TRUE;
 
     /*
@@ -3245,11 +3245,11 @@ retry:
 
     win_new_shellsize();    // fit the windows in the new sized shell
 
-#ifdef FEAT_GUI_HAIKU
-    vim_lock_screen();  // be safe, put it here
-#endif
+#నిర్వచితమైతే FEAT_GUI_HAIKU
+    vim_తాళం_screen();  // be safe, put it here
+#అయితే_ముగింపు
 
-    comp_col();		// recompute columns for shown command and ruler
+    comp_నిలువు();		// recompute columns for shown command and ruler
 
     /*
      * We're changing the size of the screen.
@@ -3264,152 +3264,152 @@ retry:
      */
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	win_free_lsize(wp);
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    కొరకు (పూర్ణాంకం i = 0; i < AUCMD_WIN_లెక్క; ++i)
+	ఒకవేళ (aucmd_win[i].auc_win != ఖాళీ)
 	    win_free_lsize(aucmd_win[i].auc_win);
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // global popup windows
     FOR_ALL_POPUPWINS(wp)
 	win_free_lsize(wp);
     // tab-local popup windows
     FOR_ALL_TABPAGES(tp)
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
+	FOR_ALL_POPUPWINS_లోపల_TAB(tp, wp)
 	    win_free_lsize(wp);
-#endif
+#అయితే_ముగింపు
 
-    new_ScreenLines = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
-    vim_memset(new_ScreenLinesC, 0, sizeof(u8char_T *) * MAX_MCO);
-    if (enc_utf8)
+    new_Screen_పంక్తులు = LALLOC_MULT(schar_T, (అడ్డువరుసలు + 1) * Columns);
+    vim_memset(new_Screen_పంక్తులు_C, 0, పరిమాణం(u8char_T *) * MAX_MCO);
+    ఒకవేళ (enc_utf8)
     {
-	new_ScreenLinesUC = LALLOC_MULT(u8char_T, (Rows + 1) * Columns);
-	for (int i = 0; i < p_mco; ++i)
-	    new_ScreenLinesC[i] = LALLOC_CLEAR_MULT(u8char_T,
-							 (Rows + 1) * Columns);
+	new_Screen_పంక్తులు_UC = LALLOC_MULT(u8char_T, (అడ్డువరుసలు + 1) * Columns);
+	కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+	    new_Screen_పంక్తులు_C[i] = LALLOC_CLEAR_MULT(u8char_T,
+							 (అడ్డువరుసలు + 1) * Columns);
     }
-    if (enc_dbcs == DBCS_JPNU)
-	new_ScreenLines2 = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
-    new_ScreenAttrs = LALLOC_MULT(sattr_T, (Rows + 1) * Columns);
+    ఒకవేళ (enc_dbcs == DBCS_JPNU)
+	new_ScreenLines2 = LALLOC_MULT(schar_T, (అడ్డువరుసలు + 1) * Columns);
+    new_ScreenAttrs = LALLOC_MULT(sattr_T, (అడ్డువరుసలు + 1) * Columns);
     // Clear ScreenCols to avoid a warning for uninitialized memory in
     // jump_to_mouse().
-    new_ScreenCols = LALLOC_CLEAR_MULT(colnr_T, (Rows + 1) * Columns);
-    new_LineOffset = LALLOC_MULT(unsigned, Rows);
-    new_LineWraps = LALLOC_MULT(char_u, Rows);
-    new_TabPageIdxs = LALLOC_MULT(short, Columns);
-#ifdef FEAT_PROP_POPUP
-    new_popup_mask = LALLOC_MULT(short, Rows * Columns);
-    new_popup_mask_next = LALLOC_MULT(short, Rows * Columns);
-    new_popup_transparent = LALLOC_MULT(char, Rows * Columns);
-#endif
+    new_Screen_నిలువుల_సంఖ్య = LALLOC_CLEAR_MULT(colnr_T, (అడ్డువరుసలు + 1) * Columns);
+    new_పంక్తి_స్థానభ్రంశం = LALLOC_MULT(గుర్తులేని, అడ్డువరుసలు);
+    new_పంక్తి_Wraps = LALLOC_MULT(char_u, అడ్డువరుసలు);
+    new_Tab_పుట_Idxs = LALLOC_MULT(పొట్టి, Columns);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    new_popup_ముసుగు = LALLOC_MULT(పొట్టి, అడ్డువరుసలు * Columns);
+    new_popup_ముసుగు_తదుపరి = LALLOC_MULT(పొట్టి, అడ్డువరుసలు * Columns);
+    new_popup_transparent = LALLOC_MULT(అక్షరం, అడ్డువరుసలు * Columns);
+#అయితే_ముగింపు
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (win_alloc_lines(wp) == FAIL)
+	ఒకవేళ (win_alloc_పంక్తులు(wp) == FAIL)
 	{
 	    outofmem = TRUE;
-	    goto give_up;
+	    వెళ్ళు give_పైకి;
 	}
     }
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL
-		&& aucmd_win[i].auc_win->w_lines == NULL
-		&& win_alloc_lines(aucmd_win[i].auc_win) == FAIL)
+    కొరకు (పూర్ణాంకం i = 0; i < AUCMD_WIN_లెక్క; ++i)
+	ఒకవేళ (aucmd_win[i].auc_win != ఖాళీ
+		&& aucmd_win[i].auc_win->w_పంక్తులు == ఖాళీ
+		&& win_alloc_పంక్తులు(aucmd_win[i].auc_win) == FAIL)
 	{
 	    outofmem = TRUE;
-	    break;
+	    ఆపు;
 	}
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // global popup windows
     FOR_ALL_POPUPWINS(wp)
-	if (win_alloc_lines(wp) == FAIL)
+	ఒకవేళ (win_alloc_పంక్తులు(wp) == FAIL)
 	{
 	    outofmem = TRUE;
-	    goto give_up;
+	    వెళ్ళు give_పైకి;
 	}
     // tab-local popup windows
     FOR_ALL_TABPAGES(tp)
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (win_alloc_lines(wp) == FAIL)
+	FOR_ALL_POPUPWINS_లోపల_TAB(tp, wp)
+	    ఒకవేళ (win_alloc_పంక్తులు(wp) == FAIL)
 	    {
 		outofmem = TRUE;
-		goto give_up;
+		వెళ్ళు give_పైకి;
 	    }
-#endif
+#అయితే_ముగింపు
 
-give_up:
-    found_null = FALSE;
-    for (int i = 0; i < p_mco; ++i)
-	if (new_ScreenLinesC[i] == NULL)
+give_పైకి:
+    దొరికింది_null = FALSE;
+    కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+	ఒకవేళ (new_Screen_పంక్తులు_C[i] == ఖాళీ)
 	{
-	    found_null = TRUE;
-	    break;
+	    దొరికింది_null = TRUE;
+	    ఆపు;
 	}
-    if (new_ScreenLines == NULL
-	    || (enc_utf8 && (new_ScreenLinesUC == NULL || found_null))
-	    || (enc_dbcs == DBCS_JPNU && new_ScreenLines2 == NULL)
-	    || new_ScreenAttrs == NULL
-	    || new_ScreenCols == NULL
-	    || new_LineOffset == NULL
-	    || new_LineWraps == NULL
-	    || new_TabPageIdxs == NULL
-#ifdef FEAT_PROP_POPUP
-	    || new_popup_mask == NULL
-	    || new_popup_mask_next == NULL
-	    || new_popup_transparent == NULL
-#endif
+    ఒకవేళ (new_Screen_పంక్తులు == ఖాళీ
+	    || (enc_utf8 && (new_Screen_పంక్తులు_UC == ఖాళీ || దొరికింది_null))
+	    || (enc_dbcs == DBCS_JPNU && new_ScreenLines2 == ఖాళీ)
+	    || new_ScreenAttrs == ఖాళీ
+	    || new_Screen_నిలువుల_సంఖ్య == ఖాళీ
+	    || new_పంక్తి_స్థానభ్రంశం == ఖాళీ
+	    || new_పంక్తి_Wraps == ఖాళీ
+	    || new_Tab_పుట_Idxs == ఖాళీ
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    || new_popup_ముసుగు == ఖాళీ
+	    || new_popup_ముసుగు_తదుపరి == ఖాళీ
+	    || new_popup_transparent == ఖాళీ
+#అయితే_ముగింపు
 	    || outofmem)
     {
-	if (ScreenLines != NULL || !done_outofmem_msg)
+	ఒకవేళ (Screen_పంక్తులు != ఖాళీ || !పూర్తి_outofmem_సందేశం)
 	{
 	    // guess the size
-	    do_outofmem_msg((long_u)((Rows + 1) * Columns));
+	    do_outofmem_సందేశం((long_u)((అడ్డువరుసలు + 1) * Columns));
 
 	    // Remember we did this to avoid getting outofmem messages over
 	    // and over again.
-	    done_outofmem_msg = TRUE;
+	    పూర్తి_outofmem_సందేశం = TRUE;
 	}
-	VIM_CLEAR(new_ScreenLines);
-	VIM_CLEAR(new_ScreenLinesUC);
-	for (int i = 0; i < p_mco; ++i)
-	    VIM_CLEAR(new_ScreenLinesC[i]);
+	VIM_CLEAR(new_Screen_పంక్తులు);
+	VIM_CLEAR(new_Screen_పంక్తులు_UC);
+	కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+	    VIM_CLEAR(new_Screen_పంక్తులు_C[i]);
 	VIM_CLEAR(new_ScreenLines2);
 	VIM_CLEAR(new_ScreenAttrs);
-	VIM_CLEAR(new_ScreenCols);
-	VIM_CLEAR(new_LineOffset);
-	VIM_CLEAR(new_LineWraps);
-	VIM_CLEAR(new_TabPageIdxs);
-#ifdef FEAT_PROP_POPUP
-	VIM_CLEAR(new_popup_mask);
-	VIM_CLEAR(new_popup_mask_next);
+	VIM_CLEAR(new_Screen_నిలువుల_సంఖ్య);
+	VIM_CLEAR(new_పంక్తి_స్థానభ్రంశం);
+	VIM_CLEAR(new_పంక్తి_Wraps);
+	VIM_CLEAR(new_Tab_పుట_Idxs);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	VIM_CLEAR(new_popup_ముసుగు);
+	VIM_CLEAR(new_popup_ముసుగు_తదుపరి);
 	VIM_CLEAR(new_popup_transparent);
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-	done_outofmem_msg = FALSE;
+	పూర్తి_outofmem_సందేశం = FALSE;
 
-	for (new_row = 0; new_row < Rows; ++new_row)
+	కొరకు (new_అడ్డువరుస = 0; new_అడ్డువరుస < అడ్డువరుసలు; ++new_అడ్డువరుస)
 	{
-	    new_LineOffset[new_row] = new_row * Columns;
-	    new_LineWraps[new_row] = FALSE;
+	    new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస] = new_అడ్డువరుస * Columns;
+	    new_పంక్తి_Wraps[new_అడ్డువరుస] = FALSE;
 
-	    (void)vim_memset(new_ScreenLines + new_row * Columns,
-				  ' ', (size_t)Columns * sizeof(schar_T));
-	    if (enc_utf8)
+	    (శూన్య)vim_memset(new_Screen_పంక్తులు + new_అడ్డువరుస * Columns,
+				  ' ', (size_t)Columns * పరిమాణం(schar_T));
+	    ఒకవేళ (enc_utf8)
 	    {
-		(void)vim_memset(new_ScreenLinesUC + new_row * Columns,
-				   0, (size_t)Columns * sizeof(u8char_T));
-		for (int i = 0; i < p_mco; ++i)
-		    (void)vim_memset(new_ScreenLinesC[i]
-						      + new_row * Columns,
-				   0, (size_t)Columns * sizeof(u8char_T));
+		(శూన్య)vim_memset(new_Screen_పంక్తులు_UC + new_అడ్డువరుస * Columns,
+				   0, (size_t)Columns * పరిమాణం(u8char_T));
+		కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+		    (శూన్య)vim_memset(new_Screen_పంక్తులు_C[i]
+						      + new_అడ్డువరుస * Columns,
+				   0, (size_t)Columns * పరిమాణం(u8char_T));
 	    }
-	    if (enc_dbcs == DBCS_JPNU)
-		(void)vim_memset(new_ScreenLines2 + new_row * Columns,
-				   0, (size_t)Columns * sizeof(schar_T));
-	    (void)vim_memset(new_ScreenAttrs + new_row * Columns,
-				    0, (size_t)Columns * sizeof(sattr_T));
-	    (void)vim_memset(new_ScreenCols + new_row * Columns,
-				    0, (size_t)Columns * sizeof(colnr_T));
+	    ఒకవేళ (enc_dbcs == DBCS_JPNU)
+		(శూన్య)vim_memset(new_ScreenLines2 + new_అడ్డువరుస * Columns,
+				   0, (size_t)Columns * పరిమాణం(schar_T));
+	    (శూన్య)vim_memset(new_ScreenAttrs + new_అడ్డువరుస * Columns,
+				    0, (size_t)Columns * పరిమాణం(sattr_T));
+	    (శూన్య)vim_memset(new_Screen_నిలువుల_సంఖ్య + new_అడ్డువరుస * Columns,
+				    0, (size_t)Columns * పరిమాణం(colnr_T));
 
 	    /*
 	     * If the screen is not going to be cleared, copy as much as
@@ -3417,162 +3417,162 @@ give_up:
 	     * (used when resizing the window at the "--more--" prompt or when
 	     * executing an external command, for the GUI).
 	     */
-	    if (!doclear)
+	    ఒకవేళ (!doclear)
 	    {
-		old_row = new_row + (screen_Rows - Rows);
-		if (old_row >= 0 && ScreenLines != NULL)
+		old_అడ్డువరుస = new_అడ్డువరుస + (screen_అడ్డువరుసలు - అడ్డువరుసలు);
+		ఒకవేళ (old_అడ్డువరుస >= 0 && Screen_పంక్తులు != ఖాళీ)
 		{
-		    if (screen_Columns < Columns)
+		    ఒకవేళ (screen_Columns < Columns)
 			len = screen_Columns;
-		    else
+		    లేకపోతే
 			len = Columns;
 		    // When switching to utf-8 don't copy characters, they
 		    // may be invalid now.  Also when p_mco changes.
-		    if (!(enc_utf8 && ScreenLinesUC == NULL)
+		    ఒకవేళ (!(enc_utf8 && Screen_పంక్తులు_UC == ఖాళీ)
 						       && p_mco == Screen_mco)
-			mch_memmove(new_ScreenLines + new_LineOffset[new_row],
-				ScreenLines + LineOffset[old_row],
-				(size_t)len * sizeof(schar_T));
-		    if (enc_utf8 && ScreenLinesUC != NULL
+			mch_memmove(new_Screen_పంక్తులు + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+				Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+				(size_t)len * పరిమాణం(schar_T));
+		    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC != ఖాళీ
 						       && p_mco == Screen_mco)
 		    {
-			mch_memmove(new_ScreenLinesUC + new_LineOffset[new_row],
-				ScreenLinesUC + LineOffset[old_row],
-				(size_t)len * sizeof(u8char_T));
-			for (int i = 0; i < p_mco; ++i)
-			    mch_memmove(new_ScreenLinesC[i]
-						    + new_LineOffset[new_row],
-				ScreenLinesC[i] + LineOffset[old_row],
-				(size_t)len * sizeof(u8char_T));
+			mch_memmove(new_Screen_పంక్తులు_UC + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+				Screen_పంక్తులు_UC + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+				(size_t)len * పరిమాణం(u8char_T));
+			కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+			    mch_memmove(new_Screen_పంక్తులు_C[i]
+						    + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+				Screen_పంక్తులు_C[i] + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+				(size_t)len * పరిమాణం(u8char_T));
 		    }
-		    if (enc_dbcs == DBCS_JPNU && ScreenLines2 != NULL)
-			mch_memmove(new_ScreenLines2 + new_LineOffset[new_row],
-				ScreenLines2 + LineOffset[old_row],
-				(size_t)len * sizeof(schar_T));
-		    mch_memmove(new_ScreenAttrs + new_LineOffset[new_row],
-			    ScreenAttrs + LineOffset[old_row],
-			    (size_t)len * sizeof(sattr_T));
-		    mch_memmove(new_ScreenCols + new_LineOffset[new_row],
-			    ScreenCols + LineOffset[old_row],
-			    (size_t)len * sizeof(colnr_T));
+		    ఒకవేళ (enc_dbcs == DBCS_JPNU && ScreenLines2 != ఖాళీ)
+			mch_memmove(new_ScreenLines2 + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+				ScreenLines2 + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+				(size_t)len * పరిమాణం(schar_T));
+		    mch_memmove(new_ScreenAttrs + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+			    ScreenAttrs + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+			    (size_t)len * పరిమాణం(sattr_T));
+		    mch_memmove(new_Screen_నిలువుల_సంఖ్య + new_పంక్తి_స్థానభ్రంశం[new_అడ్డువరుస],
+			    Screen_నిలువుల_సంఖ్య + పంక్తి_స్థానభ్రంశం[old_అడ్డువరుస],
+			    (size_t)len * పరిమాణం(colnr_T));
 		}
 	    }
 	}
 	// Use the last line of the screen for the current line.
-	current_ScreenLine = new_ScreenLines + Rows * Columns;
+	current_Screen_పంక్తి = new_Screen_పంక్తులు + అడ్డువరుసలు * Columns;
 
-#ifdef FEAT_PROP_POPUP
-	vim_memset(new_popup_mask, 0, Rows * Columns * sizeof(short));
-	vim_memset(new_popup_transparent, 0, Rows * Columns * sizeof(char));
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	vim_memset(new_popup_ముసుగు, 0, అడ్డువరుసలు * Columns * పరిమాణం(పొట్టి));
+	vim_memset(new_popup_transparent, 0, అడ్డువరుసలు * Columns * పరిమాణం(అక్షరం));
+#అయితే_ముగింపు
     }
 
     free_screenlines();
 
     // NOTE: this may result in all pointers to become NULL.
-    ScreenLines = new_ScreenLines;
-    ScreenLinesUC = new_ScreenLinesUC;
-    for (int i = 0; i < p_mco; ++i)
-	ScreenLinesC[i] = new_ScreenLinesC[i];
+    Screen_పంక్తులు = new_Screen_పంక్తులు;
+    Screen_పంక్తులు_UC = new_Screen_పంక్తులు_UC;
+    కొరకు (పూర్ణాంకం i = 0; i < p_mco; ++i)
+	Screen_పంక్తులు_C[i] = new_Screen_పంక్తులు_C[i];
     Screen_mco = p_mco;
     ScreenLines2 = new_ScreenLines2;
     ScreenAttrs = new_ScreenAttrs;
-    ScreenCols = new_ScreenCols;
-    LineOffset = new_LineOffset;
-    LineWraps = new_LineWraps;
-    TabPageIdxs = new_TabPageIdxs;
-#ifdef FEAT_PROP_POPUP
-    popup_mask = new_popup_mask;
-    popup_mask_next = new_popup_mask_next;
+    Screen_నిలువుల_సంఖ్య = new_Screen_నిలువుల_సంఖ్య;
+    పంక్తి_స్థానభ్రంశం = new_పంక్తి_స్థానభ్రంశం;
+    పంక్తి_Wraps = new_పంక్తి_Wraps;
+    Tab_పుట_Idxs = new_Tab_పుట_Idxs;
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    popup_ముసుగు = new_popup_ముసుగు;
+    popup_ముసుగు_తదుపరి = new_popup_ముసుగు_తదుపరి;
     popup_transparent = new_popup_transparent;
-    popup_mask_refresh = TRUE;
-#endif
+    popup_ముసుగు_refresh = TRUE;
+#అయితే_ముగింపు
 
     // It's important that screen_Rows and screen_Columns reflect the actual
     // size of ScreenLines[].  Set them before calling anything.
-#ifdef FEAT_GUI
-    old_Rows = screen_Rows;
-#endif
-    screen_Rows = Rows;
+#నిర్వచితమైతే FEAT_GUI
+    old_అడ్డువరుసలు_2 = screen_అడ్డువరుసలు;
+#అయితే_ముగింపు
+    screen_అడ్డువరుసలు = అడ్డువరుసలు;
     screen_Columns = Columns;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Cursor position may now be out of bounds after resize
-    if (gui.in_use && (gui.cursor_row >= screen_Rows
-		|| gui.cursor_col >= screen_Columns))
+    ఒకవేళ (gui.లోపల_use && (gui.cursor_అడ్డువరుస >= screen_అడ్డువరుసలు
+		|| gui.cursor_నిలువు >= screen_Columns))
 	gui.cursor_is_valid = false;
-#endif
+#అయితే_ముగింపు
 
-    set_must_redraw(UPD_CLEAR);	// need to clear the screen later
-    if (doclear)
+    సమితి_must_redraw(UPD_CLEAR);	// need to clear the screen later
+    ఒకవేళ (doclear)
 	screenclear2(TRUE);
-#ifdef FEAT_GUI
-    else if (gui.in_use
+#నిర్వచితమైతే FEAT_GUI
+    లేకపోతే ఒకవేళ (gui.లోపల_use
 	    && !gui.starting
-	    && ScreenLines != NULL
-	    && old_Rows != Rows)
+	    && Screen_పంక్తులు != ఖాళీ
+	    && old_అడ్డువరుసలు_2 != అడ్డువరుసలు)
     {
-	gui_redraw_block(0, 0, (int)Rows - 1, (int)Columns - 1, 0);
+	gui_redraw_ఖండం(0, 0, (పూర్ణాంకం)అడ్డువరుసలు - 1, (పూర్ణాంకం)Columns - 1, 0);
 
 	// Adjust the position of the cursor, for when executing an external
 	// command.
-	if (msg_row >= Rows)		// Rows got smaller
-	    msg_row = Rows - 1;		// put cursor at last row
-	else if (Rows > old_Rows)	// Rows got bigger
-	    msg_row += Rows - old_Rows; // put cursor in same place
-	if (msg_col >= cmdline_width)	// cmdline_width got smaller
-	    msg_col = cmdline_width - 1;    // put cursor at last cmdline column
+	ఒకవేళ (సందేశం_అడ్డువరుస >= అడ్డువరుసలు)		// Rows got smaller
+	    సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;		// put cursor at last row
+	లేకపోతే ఒకవేళ (అడ్డువరుసలు > old_అడ్డువరుసలు_2)	// Rows got bigger
+	    సందేశం_అడ్డువరుస += అడ్డువరుసలు - old_అడ్డువరుసలు_2; // put cursor in same place
+	ఒకవేళ (సందేశం_నిలువు >= cmdline_వెడల్పు)	// cmdline_width got smaller
+	    సందేశం_నిలువు = cmdline_వెడల్పు - 1;    // put cursor at last cmdline column
     }
-#endif
-    clear_TabPageIdxs();
+#అయితే_ముగింపు
+    clear_Tab_పుట_Idxs();
 
-#ifdef FEAT_GUI_HAIKU
+#నిర్వచితమైతే FEAT_GUI_HAIKU
     vim_unlock_screen();
-#endif
+#అయితే_ముగింపు
 
     entered = FALSE;
-    if (RedrawingDisabled > 0)
+    ఒకవేళ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
     /*
      * Do not apply autocommands more than 3 times to avoid an endless loop
      * in case applying autocommands always changes Rows or Columns.
      */
-    if (starting == 0 && ++retry_count <= 3)
+    ఒకవేళ (starting == 0 && ++retry_లెక్క <= 3)
     {
-	apply_autocmds(EVENT_VIMRESIZED, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_VIMRESIZED, ఖాళీ, ఖాళీ, FALSE, curbuf);
 	// A shell resize also changes window sizes; trigger WinResized (and
 	// WinScrolled) now instead of waiting for the next command.
 	may_trigger_win_scrolled_resized();
 	// In rare cases, autocommands may have altered Rows or Columns,
 	// jump back to check if we need to allocate the screen again.
-	goto retry;
+	వెళ్ళు retry;
     }
 }
 
-    void
-free_screenlines(void)
+    శూన్య
+free_screenlines(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    VIM_CLEAR(ScreenLinesUC);
-    for (i = 0; i < Screen_mco; ++i)
-	VIM_CLEAR(ScreenLinesC[i]);
+    VIM_CLEAR(Screen_పంక్తులు_UC);
+    కొరకు (i = 0; i < Screen_mco; ++i)
+	VIM_CLEAR(Screen_పంక్తులు_C[i]);
     VIM_CLEAR(ScreenLines2);
-    VIM_CLEAR(ScreenLines);
+    VIM_CLEAR(Screen_పంక్తులు);
     VIM_CLEAR(ScreenAttrs);
-    VIM_CLEAR(ScreenCols);
-    VIM_CLEAR(LineOffset);
-    VIM_CLEAR(LineWraps);
-    VIM_CLEAR(TabPageIdxs);
-#ifdef FEAT_PROP_POPUP
-    VIM_CLEAR(popup_mask);
-    VIM_CLEAR(popup_mask_next);
+    VIM_CLEAR(Screen_నిలువుల_సంఖ్య);
+    VIM_CLEAR(పంక్తి_స్థానభ్రంశం);
+    VIM_CLEAR(పంక్తి_Wraps);
+    VIM_CLEAR(Tab_పుట_Idxs);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    VIM_CLEAR(popup_ముసుగు);
+    VIM_CLEAR(popup_ముసుగు_తదుపరి);
     VIM_CLEAR(popup_transparent);
     VIM_CLEAR(suppressed_cells);
-    suppressed_rows = 0;
-    suppressed_cols = 0;
-#endif
+    suppressed_అడ్డువరుసలు = 0;
+    suppressed_నిలువుల_సంఖ్య = 0;
+#అయితే_ముగింపు
 }
 
 /*
@@ -3582,72 +3582,72 @@ free_screenlines(void)
  * Returns TRUE when the screen was actually cleared, FALSE if all display
  * cells were marked for updating.
  */
-    int
-screenclear(void)
+    పూర్ణాంకం
+screenclear(శూన్య)
 {
     check_for_delay(FALSE);
     screenalloc(FALSE);		    // allocate screen buffers if size changed
-    return screenclear2(TRUE);	    // clear the screen
+    తిరిగి screenclear2(TRUE);	    // clear the screen
 }
 
 /*
  * Do not clear the screen but mark everything for redraw.
  */
-    void
-redraw_as_cleared(void)
+    శూన్య
+redraw_as_cleared(శూన్య)
 {
     screenclear2(FALSE);
 }
 
-    static int
-screenclear2(int doclear)
+    స్థిర పూర్ణాంకం
+screenclear2(పూర్ణాంకం doclear)
 {
-    int	    i;
-    int	    did_clear = FALSE;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    did_clear = FALSE;
 
-    if (starting == NO_SCREEN || ScreenLines == NULL
-#ifdef FEAT_GUI
-	    || (gui.in_use && gui.starting)
-#endif
+    ఒకవేళ (starting == NO_SCREEN || Screen_పంక్తులు == ఖాళీ
+#నిర్వచితమైతే FEAT_GUI
+	    || (gui.లోపల_use && gui.starting)
+#అయితే_ముగింపు
 	    )
-	return FALSE;
+	తిరిగి FALSE;
 
-#ifdef FEAT_GUI
-    if (!gui.in_use)
-#endif
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (!gui.లోపల_use)
+#అయితే_ముగింపు
 	screen_attr = -1;	// force setting the Normal colors
     screen_stop_highlight();	// don't want highlighting here
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     // disable selection without redrawing it
     clip_scroll_selection(9999);
-#endif
+#అయితే_ముగింపు
 
     // blank out ScreenLines
-    for (i = 0; i < Rows; ++i)
+    కొరకు (i = 0; i < అడ్డువరుసలు; ++i)
     {
-	lineclear(LineOffset[i], (int)Columns, 0);
-	LineWraps[i] = FALSE;
+	lineclear(పంక్తి_స్థానభ్రంశం[i], (పూర్ణాంకం)Columns, 0);
+	పంక్తి_Wraps[i] = FALSE;
     }
 
-    if (doclear && can_clear(T_CL))
+    ఒకవేళ (doclear && can_clear(T_CL))
     {
-	out_str(T_CL);		// clear the display
+	బహిర్గతం_str(T_CL);		// clear the display
 	did_clear = TRUE;
 	clear_cmdline = FALSE;
-	mode_displayed = FALSE;
-#ifdef FEAT_PROP_POPUP
+	బహుళకం_displayed = FALSE;
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	// The display was cleared, the terminal matches ScreenLines again.
-	if (suppressed_cells != NULL)
+	ఒకవేళ (suppressed_cells != ఖాళీ)
 	    vim_memset(suppressed_cells, 0,
-			       (size_t)suppressed_rows * suppressed_cols);
-#endif
+			       (size_t)suppressed_అడ్డువరుసలు * suppressed_నిలువుల_సంఖ్య);
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
 	// can't clear the screen, mark all chars with invalid attributes
-	for (i = 0; i < Rows; ++i)
-	    lineinvalid(LineOffset[i], (int)Columns);
+	కొరకు (i = 0; i < అడ్డువరుసలు; ++i)
+	    lineinvalid(పంక్తి_స్థానభ్రంశం[i], (పూర్ణాంకం)Columns);
 	clear_cmdline = TRUE;
     }
 
@@ -3656,92 +3656,92 @@ screenclear2(int doclear)
     win_rest_invalid(firstwin);	// redraw all regular windows
     redraw_cmdline = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-    if (must_redraw == UPD_CLEAR)	// no need to clear again
+#అయితే_ముగింపు
+    ఒకవేళ (must_redraw == UPD_CLEAR)	// no need to clear again
 	must_redraw = UPD_NOT_VALID;
-    msg_scrolled = 0;		// compute_cmdrow() uses this
+    సందేశం_scrolled = 0;		// compute_cmdrow() uses this
     compute_cmdrow();
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     popup_redraw_all();		// redraw all popup windows
-#endif
-    msg_row = cmdline_row;	// put cursor on last line for messages
-    msg_col = 0;
-    screen_start();		// don't know where cursor is now
-    msg_didany = FALSE;
-    msg_didout = FALSE;
-#ifdef FEAT_IMAGE
-    shift_reset_image_placements(); // Reset "row_off" for every placement
+#అయితే_ముగింపు
+    సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;	// put cursor on last line for messages
+    సందేశం_నిలువు = 0;
+    screen_ప్రారంభం();		// don't know where cursor is now
+    సందేశం_didany = FALSE;
+    సందేశం_didout = FALSE;
+#నిర్వచితమైతే FEAT_IMAGE
+    జరుపు_reset_image_placements(); // Reset "row_off" for every placement
     clear_all_image_placements();
-#endif
+#అయితే_ముగింపు
 
-    return did_clear;
+    తిరిగి did_clear;
 }
 
 /*
  * Clear one line in ScreenLines.
  */
-    static void
-lineclear(unsigned off, int width, int attr)
+    స్థిర శూన్య
+lineclear(గుర్తులేని off, పూర్ణాంకం వెడల్పు, పూర్ణాంకం attr)
 {
-    (void)vim_memset(ScreenLines + off, ' ', (size_t)width * sizeof(schar_T));
-    if (enc_utf8)
-	(void)vim_memset(ScreenLinesUC + off, 0,
-					  (size_t)width * sizeof(u8char_T));
-    (void)vim_memset(ScreenAttrs + off, attr, (size_t)width * sizeof(sattr_T));
-    (void)vim_memset(ScreenCols + off, -1, (size_t)width * sizeof(colnr_T));
+    (శూన్య)vim_memset(Screen_పంక్తులు + off, ' ', (size_t)వెడల్పు * పరిమాణం(schar_T));
+    ఒకవేళ (enc_utf8)
+	(శూన్య)vim_memset(Screen_పంక్తులు_UC + off, 0,
+					  (size_t)వెడల్పు * పరిమాణం(u8char_T));
+    (శూన్య)vim_memset(ScreenAttrs + off, attr, (size_t)వెడల్పు * పరిమాణం(sattr_T));
+    (శూన్య)vim_memset(Screen_నిలువుల_సంఖ్య + off, -1, (size_t)వెడల్పు * పరిమాణం(colnr_T));
 }
 
 /*
  * Mark one line in ScreenLines invalid by setting the attributes to an
  * invalid value.
  */
-    static void
-lineinvalid(unsigned off, int width)
+    స్థిర శూన్య
+lineinvalid(గుర్తులేని off, పూర్ణాంకం వెడల్పు)
 {
-    (void)vim_memset(ScreenAttrs + off, -1, (size_t)width * sizeof(sattr_T));
-    (void)vim_memset(ScreenCols + off, -1, (size_t)width * sizeof(colnr_T));
+    (శూన్య)vim_memset(ScreenAttrs + off, -1, (size_t)వెడల్పు * పరిమాణం(sattr_T));
+    (శూన్య)vim_memset(Screen_నిలువుల_సంఖ్య + off, -1, (size_t)వెడల్పు * పరిమాణం(colnr_T));
 }
 
 /*
  * To be called when characters were sent to the terminal directly, outputting
  * test on "screen_lnum".
  */
-    void
-line_was_clobbered(int screen_lnum)
+    శూన్య
+పంక్తి_was_clobbered(పూర్ణాంకం screen_lnum)
 {
-    lineinvalid(LineOffset[screen_lnum], (int)Columns);
+    lineinvalid(పంక్తి_స్థానభ్రంశం[screen_lnum], (పూర్ణాంకం)Columns);
 }
 
 /*
  * Copy part of a Screenline for vertically split window "wp".
  */
-    static void
-linecopy(int to, int from, win_T *wp)
+    స్థిర శూన్య
+linecopy(పూర్ణాంకం గమ్యం, పూర్ణాంకం from, win_T *wp)
 {
-    unsigned	off_to = LineOffset[to] + wp->w_wincol;
-    unsigned	off_from = LineOffset[from] + wp->w_wincol;
+    గుర్తులేని	off_గమ్యం = పంక్తి_స్థానభ్రంశం[గమ్యం] + wp->w_wincol;
+    గుర్తులేని	off_from = పంక్తి_స్థానభ్రంశం[from] + wp->w_wincol;
 
-    mch_memmove(ScreenLines + off_to, ScreenLines + off_from,
-	    wp->w_width * sizeof(schar_T));
-    if (enc_utf8)
+    mch_memmove(Screen_పంక్తులు + off_గమ్యం, Screen_పంక్తులు + off_from,
+	    wp->w_వెడల్పు * పరిమాణం(schar_T));
+    ఒకవేళ (enc_utf8)
     {
-	int	i;
+	పూర్ణాంకం	i;
 
-	mch_memmove(ScreenLinesUC + off_to, ScreenLinesUC + off_from,
-		wp->w_width * sizeof(u8char_T));
-	for (i = 0; i < p_mco; ++i)
-	    mch_memmove(ScreenLinesC[i] + off_to, ScreenLinesC[i] + off_from,
-		    wp->w_width * sizeof(u8char_T));
+	mch_memmove(Screen_పంక్తులు_UC + off_గమ్యం, Screen_పంక్తులు_UC + off_from,
+		wp->w_వెడల్పు * పరిమాణం(u8char_T));
+	కొరకు (i = 0; i < p_mco; ++i)
+	    mch_memmove(Screen_పంక్తులు_C[i] + off_గమ్యం, Screen_పంక్తులు_C[i] + off_from,
+		    wp->w_వెడల్పు * పరిమాణం(u8char_T));
     }
-    if (enc_dbcs == DBCS_JPNU)
-	mch_memmove(ScreenLines2 + off_to, ScreenLines2 + off_from,
-		wp->w_width * sizeof(schar_T));
-    mch_memmove(ScreenAttrs + off_to, ScreenAttrs + off_from,
-	    wp->w_width * sizeof(sattr_T));
-    mch_memmove(ScreenCols + off_to, ScreenCols + off_from,
-	    wp->w_width * sizeof(colnr_T));
+    ఒకవేళ (enc_dbcs == DBCS_JPNU)
+	mch_memmove(ScreenLines2 + off_గమ్యం, ScreenLines2 + off_from,
+		wp->w_వెడల్పు * పరిమాణం(schar_T));
+    mch_memmove(ScreenAttrs + off_గమ్యం, ScreenAttrs + off_from,
+	    wp->w_వెడల్పు * పరిమాణం(sattr_T));
+    mch_memmove(Screen_నిలువుల_సంఖ్య + off_గమ్యం, Screen_నిలువుల_సంఖ్య + off_from,
+	    wp->w_వెడల్పు * పరిమాణం(colnr_T));
 }
 
 /*
@@ -3749,23 +3749,23 @@ linecopy(int to, int from, win_T *wp)
  * It can't work when the string is empty or it won't set the right background.
  * Don't clear to end-of-line when there are popups, it may cause flicker.
  */
-    int
+    పూర్ణాంకం
 can_clear(char_u *p)
 {
-    return (*p != NUL && (t_colors <= 1
-#ifdef FEAT_GUI
-		|| gui.in_use
-#endif
-#ifdef FEAT_TERMGUICOLORS
-		|| (p_tgc && cterm_normal_bg_gui_color == INVALCOLOR)
-		|| (!p_tgc && cterm_normal_bg_color == 0)
-#else
-		|| cterm_normal_bg_color == 0
-#endif
+    తిరిగి (*p != NUL && (t_colors <= 1
+#నిర్వచితమైతే FEAT_GUI
+		|| gui.లోపల_use
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+		|| (p_tgc && cterm_సాధారణ_bg_gui_color == INVALCOLOR)
+		|| (!p_tgc && cterm_సాధారణ_bg_color == 0)
+#లేకపోతే
+		|| cterm_సాధారణ_bg_color == 0
+#అయితే_ముగింపు
 		|| *T_UT != NUL)
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    && !(p == T_CE && popup_visible)
-#endif
+#అయితే_ముగింపు
 	    );
 }
 
@@ -3774,10 +3774,10 @@ can_clear(char_u *p)
  * something directly to the screen (shell commands) or a terminal control
  * code.
  */
-    void
-screen_start(void)
+    శూన్య
+screen_ప్రారంభం(శూన్య)
 {
-    screen_cur_row = screen_cur_col = 9999;
+    screen_cur_అడ్డువరుస = screen_cur_నిలువు = 9999;
 }
 
 /*
@@ -3785,46 +3785,46 @@ screen_start(void)
  * This tries to find the most efficient way to move, minimizing the number of
  * characters sent to the terminal.
  */
-    void
-windgoto(int row, int col)
+    శూన్య
+windgoto(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
     sattr_T	    *p;
-    int		    i;
-    int		    plan;
-    int		    cost;
-    int		    wouldbe_col;
-    int		    noinvcurs;
+    పూర్ణాంకం		    i;
+    పూర్ణాంకం		    plan;
+    పూర్ణాంకం		    ఖర్చు;
+    పూర్ణాంకం		    wouldbe_నిలువు;
+    పూర్ణాంకం		    noinvcurs;
     char_u	    *bs;
-    int		    goto_cost;
-    int		    attr;
+    పూర్ణాంకం		    goto_ఖర్చు;
+    పూర్ణాంకం		    attr;
 
-#define GOTO_COST   7	// assume a term_windgoto() takes about 7 chars
-#define HIGHL_COST  5	// assume unhighlight takes 5 chars
+#నిర్వచించు GOTO_ఖర్చు   7	// assume a term_windgoto() takes about 7 chars
+#నిర్వచించు HIGHL_ఖర్చు  5	// assume unhighlight takes 5 chars
 
-#define PLAN_LE	    1
-#define PLAN_CR	    2
-#define PLAN_NL	    3
-#define PLAN_WRITE  4
+#నిర్వచించు PLAN_LE	    1
+#నిర్వచించు PLAN_CR	    2
+#నిర్వచించు PLAN_NL	    3
+#నిర్వచించు PLAN_WRITE  4
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
-    if (col == screen_cur_col && row == screen_cur_row)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (నిలువు == screen_cur_నిలువు && అడ్డువరుస == screen_cur_అడ్డువరుస)
+	తిరిగి;
 
     // Check for valid position.
-    if (row < 0)	// window without text lines?
-	row = 0;
-    if (row >= screen_Rows)
-	row = screen_Rows - 1;
-    if (col >= screen_Columns)
-	col = screen_Columns - 1;
+    ఒకవేళ (అడ్డువరుస < 0)	// window without text lines?
+	అడ్డువరుస = 0;
+    ఒకవేళ (అడ్డువరుస >= screen_అడ్డువరుసలు)
+	అడ్డువరుస = screen_అడ్డువరుసలు - 1;
+    ఒకవేళ (నిలువు >= screen_Columns)
+	నిలువు = screen_Columns - 1;
 
     // check if no cursor movement is allowed in highlight mode
-    if (screen_attr && *T_MS == NUL)
-	noinvcurs = HIGHL_COST;
-    else
+    ఒకవేళ (screen_attr && *T_MS == NUL)
+	noinvcurs = HIGHL_ఖర్చు;
+    లేకపోతే
 	noinvcurs = 0;
-    goto_cost = GOTO_COST + noinvcurs;
+    goto_ఖర్చు = GOTO_ఖర్చు + noinvcurs;
 
     /*
      * Plan how to do the positioning:
@@ -3839,39 +3839,39 @@ windgoto(int row, int col)
      * First check if the highlighting attributes allow us to write
      * characters to move the cursor to the right.
      */
-    if (row >= screen_cur_row && screen_cur_col < Columns)
+    ఒకవేళ (అడ్డువరుస >= screen_cur_అడ్డువరుస && screen_cur_నిలువు < Columns)
     {
 	/*
 	 * If the cursor is in the same row, bigger col, we can use CR
 	 * or T_LE.
 	 */
-	bs = NULL;			    // init for GCC
+	bs = ఖాళీ;			    // init for GCC
 	attr = screen_attr;
-	if (row == screen_cur_row && col < screen_cur_col)
+	ఒకవేళ (అడ్డువరుస == screen_cur_అడ్డువరుస && నిలువు < screen_cur_నిలువు)
 	{
 	    // "le" is preferred over "bc", because "bc" is obsolete
-	    if (*T_LE)
+	    ఒకవేళ (*T_LE)
 		bs = T_LE;		    // "cursor left"
-	    else
+	    లేకపోతే
 		bs = T_BC;		    // "backspace character (old)
-	    if (*bs)
-		cost = (screen_cur_col - col) * (int)STRLEN(bs);
-	    else
-		cost = 999;
-	    if (col + 1 < cost)	    // using CR is less characters
+	    ఒకవేళ (*bs)
+		ఖర్చు = (screen_cur_నిలువు - నిలువు) * (పూర్ణాంకం)STRLEN(bs);
+	    లేకపోతే
+		ఖర్చు = 999;
+	    ఒకవేళ (నిలువు + 1 < ఖర్చు)	    // using CR is less characters
 	    {
 		plan = PLAN_CR;
-		wouldbe_col = 0;
-		cost = 1;		    // CR is just one character
+		wouldbe_నిలువు = 0;
+		ఖర్చు = 1;		    // CR is just one character
 	    }
-	    else
+	    లేకపోతే
 	    {
 		plan = PLAN_LE;
-		wouldbe_col = col;
+		wouldbe_నిలువు = నిలువు;
 	    }
-	    if (noinvcurs)		    // will stop highlighting
+	    ఒకవేళ (noinvcurs)		    // will stop highlighting
 	    {
-		cost += noinvcurs;
+		ఖర్చు += noinvcurs;
 		attr = 0;
 	    }
 	}
@@ -3879,14 +3879,14 @@ windgoto(int row, int col)
 	/*
 	 * If the cursor is above where we want to be, we can use CR LF.
 	 */
-	else if (row > screen_cur_row)
+	లేకపోతే ఒకవేళ (అడ్డువరుస > screen_cur_అడ్డువరుస)
 	{
 	    plan = PLAN_NL;
-	    wouldbe_col = 0;
-	    cost = (row - screen_cur_row) * 2;  // CR LF
-	    if (noinvcurs)		    // will stop highlighting
+	    wouldbe_నిలువు = 0;
+	    ఖర్చు = (అడ్డువరుస - screen_cur_అడ్డువరుస) * 2;  // CR LF
+	    ఒకవేళ (noinvcurs)		    // will stop highlighting
 	    {
-		cost += noinvcurs;
+		ఖర్చు += noinvcurs;
 		attr = 0;
 	    }
 	}
@@ -3894,190 +3894,190 @@ windgoto(int row, int col)
 	/*
 	 * If the cursor is in the same row, smaller col, just use write.
 	 */
-	else
+	లేకపోతే
 	{
 	    plan = PLAN_WRITE;
-	    wouldbe_col = screen_cur_col;
-	    cost = 0;
+	    wouldbe_నిలువు = screen_cur_నిలువు;
+	    ఖర్చు = 0;
 	}
 
 	/*
 	 * Check if any characters that need to be written have the
 	 * correct attributes.  Also avoid UTF-8 characters.
 	 */
-	i = col - wouldbe_col;
-	if (i > 0)
-	    cost += i;
-	if (cost < goto_cost && i > 0)
+	i = నిలువు - wouldbe_నిలువు;
+	ఒకవేళ (i > 0)
+	    ఖర్చు += i;
+	ఒకవేళ (ఖర్చు < goto_ఖర్చు && i > 0)
 	{
 	    /*
 	     * Check if the attributes are correct without additionally
 	     * stopping highlighting.
 	     */
-	    p = ScreenAttrs + LineOffset[row] + wouldbe_col;
-	    while (i && *p++ == attr)
+	    p = ScreenAttrs + పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + wouldbe_నిలువు;
+	    అయితే (i && *p++ == attr)
 		--i;
-	    if (i != 0)
+	    ఒకవేళ (i != 0)
 	    {
 		/*
 		 * Try if it works when highlighting is stopped here.
 		 */
-		if (*--p == 0)
+		ఒకవేళ (*--p == 0)
 		{
-		    cost += noinvcurs;
-		    while (i && *p++ == 0)
+		    ఖర్చు += noinvcurs;
+		    అయితే (i && *p++ == 0)
 			--i;
 		}
-		if (i != 0)
-		    cost = 999;	// different attributes, don't do it
+		ఒకవేళ (i != 0)
+		    ఖర్చు = 999;	// different attributes, don't do it
 	    }
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
 		// Don't use an UTF-8 char for positioning, it's slow.
-		for (i = wouldbe_col; i < col; ++i)
-		    if (ScreenLinesUC[LineOffset[row] + i] != 0)
+		కొరకు (i = wouldbe_నిలువు; i < నిలువు; ++i)
+		    ఒకవేళ (Screen_పంక్తులు_UC[పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + i] != 0)
 		    {
-			cost = 999;
-			break;
+			ఖర్చు = 999;
+			ఆపు;
 		    }
 	    }
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // Don't output characters over opacity popup cells, it
 	    // would show unblended background values.
-	    if (cost < 999)
-		for (i = wouldbe_col; i < col; ++i)
-		    if (popup_is_under_opacity(row, i))
+	    ఒకవేళ (ఖర్చు < 999)
+		కొరకు (i = wouldbe_నిలువు; i < నిలువు; ++i)
+		    ఒకవేళ (popup_is_under_opacity(అడ్డువరుస, i))
 		    {
-			cost = 999;
-			break;
+			ఖర్చు = 999;
+			ఆపు;
 		    }
-#endif
+#అయితే_ముగింపు
 	}
 
 	/*
 	 * We can do it without term_windgoto()!
 	 */
-	if (cost < goto_cost)
+	ఒకవేళ (ఖర్చు < goto_ఖర్చు)
 	{
-	    if (plan == PLAN_LE)
+	    ఒకవేళ (plan == PLAN_LE)
 	    {
-		if (noinvcurs)
+		ఒకవేళ (noinvcurs)
 		    screen_stop_highlight();
-		while (screen_cur_col > col)
+		అయితే (screen_cur_నిలువు > నిలువు)
 		{
-		    out_str(bs);
-		    --screen_cur_col;
+		    బహిర్గతం_str(bs);
+		    --screen_cur_నిలువు;
 		}
 	    }
-	    else if (plan == PLAN_CR)
+	    లేకపోతే ఒకవేళ (plan == PLAN_CR)
 	    {
-		if (noinvcurs)
+		ఒకవేళ (noinvcurs)
 		    screen_stop_highlight();
-		out_char('\r');
-		screen_cur_col = 0;
+		బహిర్గతం_char('\r');
+		screen_cur_నిలువు = 0;
 	    }
-	    else if (plan == PLAN_NL)
+	    లేకపోతే ఒకవేళ (plan == PLAN_NL)
 	    {
-		if (noinvcurs)
+		ఒకవేళ (noinvcurs)
 		    screen_stop_highlight();
-		while (screen_cur_row < row)
+		అయితే (screen_cur_అడ్డువరుస < అడ్డువరుస)
 		{
-		    out_char('\n');
-		    ++screen_cur_row;
+		    బహిర్గతం_char('\n');
+		    ++screen_cur_అడ్డువరుస;
 		}
-		screen_cur_col = 0;
+		screen_cur_నిలువు = 0;
 	    }
 
-	    i = col - screen_cur_col;
-	    if (i > 0)
+	    i = నిలువు - screen_cur_నిలువు;
+	    ఒకవేళ (i > 0)
 	    {
 		/*
 		 * Use cursor-right if it's one character only.  Avoids
 		 * removing a line of pixels from the last bold char, when
 		 * using the bold trick in the GUI.
 		 */
-		if (T_ND[0] != NUL && T_ND[1] == NUL)
+		ఒకవేళ (T_ND[0] != NUL && T_ND[1] == NUL)
 		{
-		    while (i-- > 0)
-			out_char(*T_ND);
+		    అయితే (i-- > 0)
+			బహిర్గతం_char(*T_ND);
 		}
-		else
+		లేకపోతే
 		{
-		    int	off;
+		    పూర్ణాంకం	off;
 
-		    off = LineOffset[row] + screen_cur_col;
-		    while (i-- > 0)
+		    off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + screen_cur_నిలువు;
+		    అయితే (i-- > 0)
 		    {
-			if (ScreenAttrs[off] != screen_attr)
+			ఒకవేళ (ScreenAttrs[off] != screen_attr)
 			    screen_stop_highlight();
-			out_flush_check();
-			out_char(ScreenLines[off]);
-			if (enc_dbcs == DBCS_JPNU
-				&& ScreenLines[off] == 0x8e)
-			    out_char(ScreenLines2[off]);
+			బహిర్గతం_flush_check();
+			బహిర్గతం_char(Screen_పంక్తులు[off]);
+			ఒకవేళ (enc_dbcs == DBCS_JPNU
+				&& Screen_పంక్తులు[off] == 0x8e)
+			    బహిర్గతం_char(ScreenLines2[off]);
 			++off;
 		    }
 		}
 	    }
 	}
     }
-    else
-	cost = 999;
+    లేకపోతే
+	ఖర్చు = 999;
 
-    if (cost >= goto_cost)
+    ఒకవేళ (ఖర్చు >= goto_ఖర్చు)
     {
-	if (noinvcurs)
+	ఒకవేళ (noinvcurs)
 	    screen_stop_highlight();
-	if (row == screen_cur_row && (col > screen_cur_col)
+	ఒకవేళ (అడ్డువరుస == screen_cur_అడ్డువరుస && (నిలువు > screen_cur_నిలువు)
 		&& *T_CRI != NUL)
-	    term_cursor_right(col - screen_cur_col);
-	else
-	    term_windgoto(row, col);
+	    పదం_cursor_కుడి(నిలువు - screen_cur_నిలువు);
+	లేకపోతే
+	    పదం_windgoto(అడ్డువరుస, నిలువు);
     }
-    screen_cur_row = row;
-    screen_cur_col = col;
+    screen_cur_అడ్డువరుస = అడ్డువరుస;
+    screen_cur_నిలువు = నిలువు;
 }
 
 /*
  * Set cursor to its position in the current window.
  */
-    void
-setcursor(void)
+    శూన్య
+setcursor(శూన్య)
 {
     setcursor_mayforce(FALSE);
 }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 /*
  * Return the number of screen cells used by the character under the cursor
  * in the current window.
  */
-    int
-cursor_screen_cells(void)
+    పూర్ణాంకం
+cursor_screen_cells(శూన్య)
 {
-    return has_mbyte && (*mb_ptr2cells)(ml_get_cursor()) == 2
+    తిరిగి has_mbyte && (*mb_ptr2cells)(ml_get_cursor()) == 2
 				  && vim_isprintc(gchar_cursor()) ? 2 : 1;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set cursor to its position in the current window.
  * When "force" is TRUE also when not redrawing.
  */
-    void
-setcursor_mayforce(int force)
+    శూన్య
+setcursor_mayforce(పూర్ణాంకం force)
 {
-    if (force || redrawing())
+    ఒకవేళ (force || redrawing())
     {
 	validate_cursor();
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
 		curwin->w_wincol + (
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		// With 'rightleft' set and the cursor on a double-wide
 		// character, position it on the leftmost column.
-		curwin->w_p_rl ? ((int)curwin->w_width - curwin->w_wcol
+		curwin->w_p_rl ? ((పూర్ణాంకం)curwin->w_వెడల్పు - curwin->w_wcol
 					    - cursor_screen_cells()) :
-#endif
+#అయితే_ముగింపు
 					    curwin->w_wcol));
     }
 }
@@ -4090,36 +4090,36 @@ setcursor_mayforce(int force)
  * scrolling.
  * Returns FAIL if the lines are not inserted, OK for success.
  */
-    int
-win_ins_lines(
+    పూర్ణాంకం
+win_ins_పంక్తులు(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		invalid,
-    int		mayclear)
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		పంక్తి_లెక్క,
+    పూర్ణాంకం		invalid,
+    పూర్ణాంకం		mayclear)
 {
-    int		did_delete;
-    int		nextrow;
-    int		lastrow;
-    int		retval;
+    పూర్ణాంకం		did_delete;
+    పూర్ణాంకం		nextrow;
+    పూర్ణాంకం		lastrow;
+    పూర్ణాంకం		retval;
 
-    if (invalid)
-	wp->w_lines_valid = 0;
+    ఒకవేళ (invalid)
+	wp->w_పంక్తులు_valid = 0;
 
     // with only a few lines it's not worth the effort
-    if (wp->w_height < 5)
-	return FAIL;
+    ఒకవేళ (wp->w_ఎత్తు < 5)
+	తిరిగి FAIL;
 
     // with the popup menu visible this might not work correctly
-    if (pum_visible())
-	return FAIL;
+    ఒకవేళ (pum_visible())
+	తిరిగి FAIL;
 
-    if (line_count > wp->w_height - row)
-	line_count = wp->w_height - row;
+    ఒకవేళ (పంక్తి_లెక్క > wp->w_ఎత్తు - అడ్డువరుస)
+	పంక్తి_లెక్క = wp->w_ఎత్తు - అడ్డువరుస;
 
-    retval = win_do_lines(wp, row, line_count, mayclear, FALSE, 0);
-    if (retval != MAYBE)
-	return retval;
+    retval = win_do_పంక్తులు(wp, అడ్డువరుస, పంక్తి_లెక్క, mayclear, FALSE, 0);
+    ఒకవేళ (retval != MAYBE)
+	తిరిగి retval;
 
     /*
      * If there is a next window or a status line, we first try to delete the
@@ -4128,42 +4128,42 @@ win_ins_lines(
      * avoid messing up those windows, better just redraw.
      */
     did_delete = FALSE;
-    if (wp->w_next != NULL || wp->w_status_height)
+    ఒకవేళ (wp->w_తదుపరి != ఖాళీ || wp->w_స్థితి_ఎత్తు)
     {
-	if (screen_del_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-				  line_count, (int)Rows, FALSE, 0, NULL) == OK)
+	ఒకవేళ (screen_del_పంక్తులు(0, W_WINROW(wp) + wp->w_ఎత్తు - పంక్తి_లెక్క,
+				  పంక్తి_లెక్క, (పూర్ణాంకం)అడ్డువరుసలు, FALSE, 0, ఖాళీ) == OK)
 	    did_delete = TRUE;
-	else if (wp->w_next)
-	    return FAIL;
+	లేకపోతే ఒకవేళ (wp->w_తదుపరి)
+	    తిరిగి FAIL;
     }
     /*
      * if no lines deleted, blank the lines that will end up below the window
      */
-    if (!did_delete)
+    ఒకవేళ (!did_delete)
     {
-	wp->w_redr_status = true;
+	wp->w_redr_స్థితి = true;
 	redraw_cmdline = TRUE;
-	nextrow = W_WINROW(wp) + wp->w_height + wp->w_status_height;
-	lastrow = nextrow + line_count;
-	if (lastrow > Rows)
-	    lastrow = Rows;
-	screen_fill(nextrow - line_count, lastrow - line_count,
-		  wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
+	nextrow = W_WINROW(wp) + wp->w_ఎత్తు + wp->w_స్థితి_ఎత్తు;
+	lastrow = nextrow + పంక్తి_లెక్క;
+	ఒకవేళ (lastrow > అడ్డువరుసలు)
+	    lastrow = అడ్డువరుసలు;
+	screen_fill(nextrow - పంక్తి_లెక్క, lastrow - పంక్తి_లెక్క,
+		  wp->w_wincol, (పూర్ణాంకం)W_ENDCOL(wp), ' ', ' ', 0);
     }
 
-    if (screen_ins_lines(0, W_WINROW(wp) + row, line_count, (int)Rows, 0, NULL)
+    ఒకవేళ (screen_ins_పంక్తులు(0, W_WINROW(wp) + అడ్డువరుస, పంక్తి_లెక్క, (పూర్ణాంకం)అడ్డువరుసలు, 0, ఖాళీ)
 								      == FAIL)
     {
 	// deletion will have messed up other windows
-	if (did_delete)
+	ఒకవేళ (did_delete)
 	{
-	    wp->w_redr_status = true;
-	    win_rest_invalid(W_NEXT(wp));
+	    wp->w_redr_స్థితి = true;
+	    win_rest_invalid(W_తదుపరి(wp));
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4173,51 +4173,51 @@ win_ins_lines(
  * scrolling
  * Return OK for success, FAIL if the lines are not deleted.
  */
-    int
-win_del_lines(
+    పూర్ణాంకం
+win_del_పంక్తులు(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		invalid,
-    int		mayclear,
-    int		clear_attr)	    // for clearing lines
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		పంక్తి_లెక్క,
+    పూర్ణాంకం		invalid,
+    పూర్ణాంకం		mayclear,
+    పూర్ణాంకం		clear_attr)	    // for clearing lines
 {
-    int		retval;
+    పూర్ణాంకం		retval;
 
-    if (invalid)
-	wp->w_lines_valid = 0;
+    ఒకవేళ (invalid)
+	wp->w_పంక్తులు_valid = 0;
 
-    if (line_count > wp->w_height - row)
-	line_count = wp->w_height - row;
+    ఒకవేళ (పంక్తి_లెక్క > wp->w_ఎత్తు - అడ్డువరుస)
+	పంక్తి_లెక్క = wp->w_ఎత్తు - అడ్డువరుస;
 
-    retval = win_do_lines(wp, row, line_count, mayclear, TRUE, clear_attr);
-    if (retval != MAYBE)
-	return retval;
+    retval = win_do_పంక్తులు(wp, అడ్డువరుస, పంక్తి_లెక్క, mayclear, TRUE, clear_attr);
+    ఒకవేళ (retval != MAYBE)
+	తిరిగి retval;
 
-    if (screen_del_lines(0, W_WINROW(wp) + row, line_count,
-				   (int)Rows, FALSE, clear_attr, NULL) == FAIL)
-	return FAIL;
+    ఒకవేళ (screen_del_పంక్తులు(0, W_WINROW(wp) + అడ్డువరుస, పంక్తి_లెక్క,
+				   (పూర్ణాంకం)అడ్డువరుసలు, FALSE, clear_attr, ఖాళీ) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * If there are windows or status lines below, try to put them at the
      * correct place. If we can't do that, they have to be redrawn.
      */
-    if (wp->w_next || wp->w_status_height || cmdline_row < Rows - 1)
+    ఒకవేళ (wp->w_తదుపరి || wp->w_స్థితి_ఎత్తు || cmdline_అడ్డువరుస < అడ్డువరుసలు - 1)
     {
-	if (screen_ins_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-			      line_count, (int)Rows, clear_attr, NULL) == FAIL)
+	ఒకవేళ (screen_ins_పంక్తులు(0, W_WINROW(wp) + wp->w_ఎత్తు - పంక్తి_లెక్క,
+			      పంక్తి_లెక్క, (పూర్ణాంకం)అడ్డువరుసలు, clear_attr, ఖాళీ) == FAIL)
 	{
-	    wp->w_redr_status = true;
-	    win_rest_invalid(wp->w_next);
+	    wp->w_redr_స్థితి = true;
+	    win_rest_invalid(wp->w_తదుపరి);
 	}
     }
     /*
      * If this is the last window and there is no status line, redraw the
      * command line later.
      */
-    else
+    లేకపోతే
 	redraw_cmdline = TRUE;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4225,46 +4225,46 @@ win_del_lines(
  * Returns OK or FAIL when the work has been done.
  * Returns MAYBE when not finished yet.
  */
-    static int
-win_do_lines(
+    స్థిర పూర్ణాంకం
+win_do_పంక్తులు(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		mayclear,
-    int		del,
-    int		clear_attr)
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		పంక్తి_లెక్క,
+    పూర్ణాంకం		mayclear,
+    పూర్ణాంకం		del,
+    పూర్ణాంకం		clear_attr)
 {
-    int		retval;
+    పూర్ణాంకం		retval;
 
-    if (!redrawing() || line_count <= 0)
-	return FAIL;
+    ఒకవేళ (!redrawing() || పంక్తి_లెక్క <= 0)
+	తిరిగి FAIL;
 
     // When inserting lines would result in loss of command output, just redraw
     // the lines.
-    if (no_win_do_lines_ins && !del)
-	return FAIL;
+    ఒకవేళ (no_win_do_పంక్తులు_ins && !del)
+	తిరిగి FAIL;
 
     // only a few lines left: redraw is faster
-    if (mayclear && Rows - line_count < 5
-	    && wp->w_width == topframe->fr_width)
+    ఒకవేళ (mayclear && అడ్డువరుసలు - పంక్తి_లెక్క < 5
+	    && wp->w_వెడల్పు == topframe->fr_వెడల్పు)
     {
-	if (!no_win_do_lines_ins)
+	ఒకవేళ (!no_win_do_పంక్తులు_ins)
 	    redraw_as_cleared();    // don't clear the screen to avoid flicker
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // this doesn't work when there are popups visible
-    if (popup_visible)
-	return FAIL;
-#endif
+    ఒకవేళ (popup_visible)
+	తిరిగి FAIL;
+#అయితే_ముగింపు
 
     // Delete all remaining lines
-    if (row + line_count >= wp->w_height)
+    ఒకవేళ (అడ్డువరుస + పంక్తి_లెక్క >= wp->w_ఎత్తు)
     {
-	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + wp->w_height,
-		wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
-	return OK;
+	screen_fill(W_WINROW(wp) + అడ్డువరుస, W_WINROW(wp) + wp->w_ఎత్తు,
+		wp->w_wincol, (పూర్ణాంకం)W_ENDCOL(wp), ' ', ' ', 0);
+	తిరిగి OK;
     }
 
     /*
@@ -4272,15 +4272,15 @@ win_do_lines(
      * otherwise it will stay there forever.
      * Don't do this when avoiding to insert lines.
      */
-    if (!no_win_do_lines_ins)
+    ఒకవేళ (!no_win_do_పంక్తులు_ins)
 	clear_cmdline = TRUE;
 
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     // Terminal scroll operations affect the full screen width, which would
     // corrupt the vertical tabpanel area and cause flicker.
-    if (tabpanel_width() > 0)
-	return FAIL;
-#endif
+    ఒకవేళ (tabpanel_వెడల్పు() > 0)
+	తిరిగి FAIL;
+#అయితే_ముగింపు
 
     /*
      * If the terminal can set a scroll region, use that.
@@ -4291,40 +4291,40 @@ win_do_lines(
      * a character in the lower right corner of the scroll region may cause a
      * scroll-up .
      */
-    if (scroll_region || wp->w_width != topframe->fr_width)
+    ఒకవేళ (scroll_region || wp->w_వెడల్పు != topframe->fr_వెడల్పు)
     {
-	if (scroll_region && (wp->w_width == topframe->fr_width
+	ఒకవేళ (scroll_region && (wp->w_వెడల్పు == topframe->fr_వెడల్పు
 		    || *T_CSV != NUL))
-	    scroll_region_set(wp, row);
-	if (del)
-	    retval = screen_del_lines(W_WINROW(wp) + row, 0, line_count,
-				    wp->w_height - row, FALSE, clear_attr, wp);
-	else
-	    retval = screen_ins_lines(W_WINROW(wp) + row, 0, line_count,
-					   wp->w_height - row, clear_attr, wp);
-	if (scroll_region && (wp->w_width == topframe->fr_width
+	    scroll_region_సమితి(wp, అడ్డువరుస);
+	ఒకవేళ (del)
+	    retval = screen_del_పంక్తులు(W_WINROW(wp) + అడ్డువరుస, 0, పంక్తి_లెక్క,
+				    wp->w_ఎత్తు - అడ్డువరుస, FALSE, clear_attr, wp);
+	లేకపోతే
+	    retval = screen_ins_పంక్తులు(W_WINROW(wp) + అడ్డువరుస, 0, పంక్తి_లెక్క,
+					   wp->w_ఎత్తు - అడ్డువరుస, clear_attr, wp);
+	ఒకవేళ (scroll_region && (wp->w_వెడల్పు == topframe->fr_వెడల్పు
 		    || *T_CSV != NUL))
 	    scroll_region_reset();
-	return retval;
+	తిరిగి retval;
     }
 
-    if (wp->w_next != NULL && p_tf) // don't delete/insert on fast terminal
-	return FAIL;
+    ఒకవేళ (wp->w_తదుపరి != ఖాళీ && p_tf) // don't delete/insert on fast terminal
+	తిరిగి FAIL;
 
-    return MAYBE;
+    తిరిగి MAYBE;
 }
 
 /*
  * window 'wp' and everything after it is messed up, mark it for redraw
  */
-    static void
+    స్థిర శూన్య
 win_rest_invalid(win_T *wp)
 {
-    while (wp != NULL)
+    అయితే (wp != ఖాళీ)
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
-	wp->w_redr_status = true;
-	wp = wp->w_next;
+	wp->w_redr_స్థితి = true;
+	wp = wp->w_తదుపరి;
     }
     redraw_cmdline = TRUE;
 }
@@ -4342,15 +4342,15 @@ win_rest_invalid(win_T *wp)
 /*
  * types for inserting or deleting lines
  */
-#define USE_T_CAL   1
-#define USE_T_CDL   2
-#define USE_T_AL    3
-#define USE_T_CE    4
-#define USE_T_DL    5
-#define USE_T_SR    6
-#define USE_NL	    7
-#define USE_T_CD    8
-#define USE_REDRAW  9
+#నిర్వచించు USE_T_CAL   1
+#నిర్వచించు USE_T_CDL   2
+#నిర్వచించు USE_T_AL    3
+#నిర్వచించు USE_T_CE    4
+#నిర్వచించు USE_T_DL    5
+#నిర్వచించు USE_T_SR    6
+#నిర్వచించు USE_NL	    7
+#నిర్వచించు USE_T_CD    8
+#నిర్వచించు USE_REDRAW  9
 
 /*
  * insert lines on the screen and update ScreenLines[]
@@ -4360,23 +4360,23 @@ win_rest_invalid(win_T *wp)
  *
  * return FAIL for failure, OK for success.
  */
-    int
-screen_ins_lines(
-    int		off,
-    int		row,
-    int		line_count,
-    int		end,
-    int		clear_attr,
+    పూర్ణాంకం
+screen_ins_పంక్తులు(
+    పూర్ణాంకం		off,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		పంక్తి_లెక్క,
+    పూర్ణాంకం		చివర,
+    పూర్ణాంకం		clear_attr,
     win_T	*wp)	    // NULL or window to use width from
 {
-    int		i;
-    int		j;
-    unsigned	temp;
-    int		cursor_row;
-    int		cursor_col = 0;
-    int		type;
-    int		result_empty;
-    int		can_ce = can_clear(T_CE);
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
+    గుర్తులేని	తాత్కాలిక;
+    పూర్ణాంకం		cursor_అడ్డువరుస;
+    పూర్ణాంకం		cursor_నిలువు = 0;
+    పూర్ణాంకం		type;
+    పూర్ణాంకం		ఫలితం_ఖాళీలు;
+    పూర్ణాంకం		can_ce = can_clear(T_CE);
 
     /*
      * FAIL if
@@ -4387,26 +4387,26 @@ screen_ins_lines(
      * - redrawing for a callback and there is a modeless selection
      * - there is a popup window
      */
-    if (!screen_valid(TRUE)
-	     || line_count <= 0 || line_count > p_ttyscroll
-	     || end > Rows
-#ifdef FEAT_CLIPBOARD
-	     || (clip_star.state != SELECT_CLEARED
+    ఒకవేళ (!screen_valid(TRUE)
+	     || పంక్తి_లెక్క <= 0 || పంక్తి_లెక్క > p_ttyscroll
+	     || చివర > అడ్డువరుసలు
+#నిర్వచితమైతే FEAT_CLIPBOARD
+	     || (clip_నక్షత్రం.state != SELECT_CLEARED
 						 && redrawing_for_callback > 0)
-#endif
+#అయితే_ముగింపు
 	     )
-	return FAIL;
+	తిరిగి FAIL;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_visible)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (popup_visible)
     {
 # ifdef FEAT_IMAGE
 	// Always make sure images are correctly shifted
-	shift_image_placements(off + row, off + end, line_count);
+	జరుపు_image_placements(off + అడ్డువరుస, off + చివర, పంక్తి_లెక్క);
 # endif
-	return FAIL;
+	తిరిగి FAIL;
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * There are seven ways to insert lines:
@@ -4433,150 +4433,150 @@ screen_ins_lines(
      * the scrollbar for the window. It does have insert line, use that if it
      * exists.
      */
-    result_empty = (row + line_count >= end);
-    if (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
+    ఫలితం_ఖాళీలు = (అడ్డువరుస + పంక్తి_లెక్క >= చివర);
+    ఒకవేళ (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు && *T_CSV == NUL)
     {
 	// Avoid that lines are first cleared here and then redrawn, which
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
-	    return FAIL;
+	ఒకవేళ (పంక్తి_లెక్క > 3)
+	    తిరిగి FAIL;
 	type = USE_REDRAW;
     }
-    else if (can_clear(T_CD) && result_empty)
+    లేకపోతే ఒకవేళ (can_clear(T_CD) && ఫలితం_ఖాళీలు)
 	type = USE_T_CD;
-    else if (*T_CAL != NUL && (line_count > 1 || *T_AL == NUL))
+    లేకపోతే ఒకవేళ (*T_CAL != NUL && (పంక్తి_లెక్క > 1 || *T_AL == NUL))
 	type = USE_T_CAL;
-    else if (*T_CDL != NUL && result_empty && (line_count > 1 || !can_ce))
+    లేకపోతే ఒకవేళ (*T_CDL != NUL && ఫలితం_ఖాళీలు && (పంక్తి_లెక్క > 1 || !can_ce))
 	type = USE_T_CDL;
-    else if (*T_AL != NUL)
+    లేకపోతే ఒకవేళ (*T_AL != NUL)
 	type = USE_T_AL;
-    else if (can_ce && result_empty)
+    లేకపోతే ఒకవేళ (can_ce && ఫలితం_ఖాళీలు)
 	type = USE_T_CE;
-    else if (*T_DL != NUL && result_empty)
+    లేకపోతే ఒకవేళ (*T_DL != NUL && ఫలితం_ఖాళీలు)
 	type = USE_T_DL;
-    else if (*T_SR != NUL && row == 0 && (*T_DA == NUL || can_ce))
+    లేకపోతే ఒకవేళ (*T_SR != NUL && అడ్డువరుస == 0 && (*T_DA == NUL || can_ce))
 	type = USE_T_SR;
-    else
-	return FAIL;
+    లేకపోతే
+	తిరిగి FAIL;
 
     /*
      * For clearing the lines screen_del_lines() is used. This will also take
      * care of t_db if necessary.
      */
-    if (type == USE_T_CD || type == USE_T_CDL ||
+    ఒకవేళ (type == USE_T_CD || type == USE_T_CDL ||
 					 type == USE_T_CE || type == USE_T_DL)
-	return screen_del_lines(off, row, line_count, end, FALSE, 0, wp);
+	తిరిగి screen_del_పంక్తులు(off, అడ్డువరుస, పంక్తి_లెక్క, చివర, FALSE, 0, wp);
 
     /*
      * If text is retained below the screen, first clear or delete as many
      * lines at the bottom of the window as are about to be inserted so that
      * the deleted lines won't later surface during a screen_del_lines.
      */
-    if (*T_DB)
-	screen_del_lines(off, end - line_count, line_count, end, FALSE, 0, wp);
+    ఒకవేళ (*T_DB)
+	screen_del_పంక్తులు(off, చివర - పంక్తి_లెక్క, పంక్తి_లెక్క, చివర, FALSE, 0, wp);
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     // Remove a modeless selection when inserting lines halfway the screen
     // or not the full width of the screen.
-    if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
-	clip_clear_selection(&clip_star);
-    else
-	clip_scroll_selection(-line_count);
-#endif
-#ifdef FEAT_IMAGE
-    shift_image_placements(off + row, off + end, line_count);
-#endif
+    ఒకవేళ (off + అడ్డువరుస > 0 || (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు))
+	clip_clear_selection(&clip_నక్షత్రం);
+    లేకపోతే
+	clip_scroll_selection(-పంక్తి_లెక్క);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE
+    జరుపు_image_placements(off + అడ్డువరుస, off + చివర, పంక్తి_లెక్క);
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_HAIKU
-    vim_lock_screen();
-#endif
+#నిర్వచితమైతే FEAT_GUI_HAIKU
+    vim_తాళం_screen();
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Don't update the GUI cursor here, ScreenLines[] is invalid until the
     // scrolling is actually carried out.
-    gui_dont_update_cursor(row + off <= gui.cursor_row);
-#endif
+    gui_dont_update_cursor(అడ్డువరుస + off <= gui.cursor_అడ్డువరుస);
+#అయితే_ముగింపు
 
-    if (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
-	cursor_col = wp->w_wincol;
+    ఒకవేళ (wp != ఖాళీ && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
+	cursor_నిలువు = wp->w_wincol;
 
-    if (*T_CCS != NUL)	   // cursor relative to region
-	cursor_row = row;
-    else
-	cursor_row = row + off;
+    ఒకవేళ (*T_CCS != NUL)	   // cursor relative to region
+	cursor_అడ్డువరుస = అడ్డువరుస;
+    లేకపోతే
+	cursor_అడ్డువరుస = అడ్డువరుస + off;
 
     /*
      * Shift LineOffset[] line_count down to reflect the inserted lines.
      * Clear the inserted lines in ScreenLines[].
      */
-    row += off;
-    end += off;
-    for (i = 0; i < line_count; ++i)
+    అడ్డువరుస += off;
+    చివర += off;
+    కొరకు (i = 0; i < పంక్తి_లెక్క; ++i)
     {
-	if (wp != NULL && wp->w_width != topframe->fr_width)
+	ఒకవేళ (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు)
 	{
 	    // need to copy part of a line
-	    j = end - 1 - i;
-	    while ((j -= line_count) >= row)
-		linecopy(j + line_count, j, wp);
-	    j += line_count;
-	    if (can_clear((char_u *)" "))
-		lineclear(LineOffset[j] + wp->w_wincol,
-			wp->w_width, clear_attr);
-	    else
-		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
-	    LineWraps[j] = FALSE;
+	    j = చివర - 1 - i;
+	    అయితే ((j -= పంక్తి_లెక్క) >= అడ్డువరుస)
+		linecopy(j + పంక్తి_లెక్క, j, wp);
+	    j += పంక్తి_లెక్క;
+	    ఒకవేళ (can_clear((char_u *)" "))
+		lineclear(పంక్తి_స్థానభ్రంశం[j] + wp->w_wincol,
+			wp->w_వెడల్పు, clear_attr);
+	    లేకపోతే
+		lineinvalid(పంక్తి_స్థానభ్రంశం[j] + wp->w_wincol, wp->w_వెడల్పు);
+	    పంక్తి_Wraps[j] = FALSE;
 	}
-	else
+	లేకపోతే
 	{
-	    j = end - 1 - i;
-	    temp = LineOffset[j];
-	    while ((j -= line_count) >= row)
+	    j = చివర - 1 - i;
+	    తాత్కాలిక = పంక్తి_స్థానభ్రంశం[j];
+	    అయితే ((j -= పంక్తి_లెక్క) >= అడ్డువరుస)
 	    {
-		LineOffset[j + line_count] = LineOffset[j];
-		LineWraps[j + line_count] = LineWraps[j];
+		పంక్తి_స్థానభ్రంశం[j + పంక్తి_లెక్క] = పంక్తి_స్థానభ్రంశం[j];
+		పంక్తి_Wraps[j + పంక్తి_లెక్క] = పంక్తి_Wraps[j];
 	    }
-	    LineOffset[j + line_count] = temp;
-	    LineWraps[j + line_count] = FALSE;
-	    if (can_clear((char_u *)" "))
-		lineclear(temp, (int)Columns, clear_attr);
-	    else
-		lineinvalid(temp, (int)Columns);
+	    పంక్తి_స్థానభ్రంశం[j + పంక్తి_లెక్క] = తాత్కాలిక;
+	    పంక్తి_Wraps[j + పంక్తి_లెక్క] = FALSE;
+	    ఒకవేళ (can_clear((char_u *)" "))
+		lineclear(తాత్కాలిక, (పూర్ణాంకం)Columns, clear_attr);
+	    లేకపోతే
+		lineinvalid(తాత్కాలిక, (పూర్ణాంకం)Columns);
 	}
     }
 
-#ifdef FEAT_GUI_HAIKU
+#నిర్వచితమైతే FEAT_GUI_HAIKU
     vim_unlock_screen();
-#endif
+#అయితే_ముగింపు
 
     screen_stop_highlight();
-    windgoto(cursor_row, cursor_col);
-    if (clear_attr != 0)
-	screen_start_highlight(clear_attr);
+    windgoto(cursor_అడ్డువరుస, cursor_నిలువు);
+    ఒకవేళ (clear_attr != 0)
+	screen_ప్రారంభం_highlight(clear_attr);
 
     // redraw the characters
-    if (type == USE_REDRAW)
-	redraw_block(row, end, wp);
-    else if (type == USE_T_CAL)
+    ఒకవేళ (type == USE_REDRAW)
+	redraw_ఖండం(అడ్డువరుస, చివర, wp);
+    లేకపోతే ఒకవేళ (type == USE_T_CAL)
     {
-	term_append_lines(line_count);
-	screen_start();		// don't know where cursor is now
+	పదం_append_పంక్తులు(పంక్తి_లెక్క);
+	screen_ప్రారంభం();		// don't know where cursor is now
     }
-    else
+    లేకపోతే
     {
-	for (i = 0; i < line_count; i++)
+	కొరకు (i = 0; i < పంక్తి_లెక్క; i++)
 	{
-	    if (type == USE_T_AL)
+	    ఒకవేళ (type == USE_T_AL)
 	    {
-		if (i && cursor_row != 0)
-		    windgoto(cursor_row, cursor_col);
-		out_str(T_AL);
+		ఒకవేళ (i && cursor_అడ్డువరుస != 0)
+		    windgoto(cursor_అడ్డువరుస, cursor_నిలువు);
+		బహిర్గతం_str(T_AL);
 	    }
-	    else  // type == USE_T_SR
-		out_str(T_SR);
-	    screen_start();	    // don't know where cursor is now
+	    లేకపోతే  // type == USE_T_SR
+		బహిర్గతం_str(T_SR);
+	    screen_ప్రారంభం();	    // don't know where cursor is now
 	}
     }
 
@@ -4584,26 +4584,26 @@ screen_ins_lines(
      * With scroll-reverse and 'da' flag set we need to clear the lines that
      * have been scrolled down into the region.
      */
-    if (type == USE_T_SR && *T_DA)
+    ఒకవేళ (type == USE_T_SR && *T_DA)
     {
-	for (i = 0; i < line_count; ++i)
+	కొరకు (i = 0; i < పంక్తి_లెక్క; ++i)
 	{
-	    windgoto(off + i, cursor_col);
-	    out_str(T_CE);
-	    screen_start();	    // don't know where cursor is now
+	    windgoto(off + i, cursor_నిలువు);
+	    బహిర్గతం_str(T_CE);
+	    screen_ప్రారంభం();	    // don't know where cursor is now
 	}
     }
 
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     gui_can_update_cursor();
-    if (gui.in_use)
-	out_flush();	// always flush after a scroll
-#endif
-    return OK;
+    ఒకవేళ (gui.లోపల_use)
+	బహిర్గతం_flush();	// always flush after a scroll
+#అయితే_ముగింపు
+    తిరిగి OK;
 }
 
 /*
@@ -4614,25 +4614,25 @@ screen_ins_lines(
  *
  * Return OK for success, FAIL if the lines are not deleted.
  */
-    int
-screen_del_lines(
-    int		off,
-    int		row,
-    int		line_count,
-    int		end,
-    int		force,		// even when line_count > p_ttyscroll
-    int		clear_attr,	// used for clearing lines
+    పూర్ణాంకం
+screen_del_పంక్తులు(
+    పూర్ణాంకం		off,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		పంక్తి_లెక్క,
+    పూర్ణాంకం		చివర,
+    పూర్ణాంకం		force,		// even when line_count > p_ttyscroll
+    పూర్ణాంకం		clear_attr,	// used for clearing lines
     win_T	*wp)		// NULL or window to use width from
 {
-    int		j;
-    int		i;
-    unsigned	temp;
-    int		cursor_row;
-    int		cursor_col = 0;
-    int		cursor_end;
-    int		result_empty;	// result is empty until end of region
-    int		can_delete;	// deleting line codes can be used
-    int		type;
+    పూర్ణాంకం		j;
+    పూర్ణాంకం		i;
+    గుర్తులేని	తాత్కాలిక;
+    పూర్ణాంకం		cursor_అడ్డువరుస;
+    పూర్ణాంకం		cursor_నిలువు = 0;
+    పూర్ణాంకం		cursor_చివర;
+    పూర్ణాంకం		ఫలితం_ఖాళీలు;	// result is empty until end of region
+    పూర్ణాంకం		can_delete;	// deleting line codes can be used
+    పూర్ణాంకం		type;
 
     /*
      * FAIL if
@@ -4643,20 +4643,20 @@ screen_del_lines(
      * - "end" is more than "Rows" (safety check, should not happen)
      * - redrawing for a callback and there is a modeless selection
      */
-    if (!screen_valid(TRUE)
-	    || line_count <= 0
-	    || (!force && line_count > p_ttyscroll)
-	    || end > Rows
-#ifdef FEAT_CLIPBOARD
-	    || (clip_star.state != SELECT_CLEARED && redrawing_for_callback > 0)
-#endif
+    ఒకవేళ (!screen_valid(TRUE)
+	    || పంక్తి_లెక్క <= 0
+	    || (!force && పంక్తి_లెక్క > p_ttyscroll)
+	    || చివర > అడ్డువరుసలు
+#నిర్వచితమైతే FEAT_CLIPBOARD
+	    || (clip_నక్షత్రం.state != SELECT_CLEARED && redrawing_for_callback > 0)
+#అయితే_ముగింపు
        )
-	return FAIL;
+	తిరిగి FAIL;
 
     /*
      * Check if the rest of the current region will become empty.
      */
-    result_empty = row + line_count >= end;
+    ఫలితం_ఖాళీలు = అడ్డువరుస + పంక్తి_లెక్క >= చివర;
 
     /*
      * We can delete lines only when 'db' flag not set or when 'ce' option
@@ -4676,166 +4676,166 @@ screen_del_lines(
      * 5. Use T_DL (delete line) if it exists.
      * 6. redraw the characters from ScreenLines[].
      */
-    if (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
+    ఒకవేళ (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు && *T_CSV == NUL)
     {
 	// Avoid that lines are first cleared here and then redrawn, which
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
-	    return FAIL;
+	ఒకవేళ (పంక్తి_లెక్క > 3)
+	    తిరిగి FAIL;
 	type = USE_REDRAW;
     }
-    else if (can_clear(T_CD) && result_empty)
+    లేకపోతే ఒకవేళ (can_clear(T_CD) && ఫలితం_ఖాళీలు)
 	type = USE_T_CD;
-    else if (row == 0 && (
-#ifndef AMIGA
+    లేకపోతే ఒకవేళ (అడ్డువరుస == 0 && (
+#నిర్వచితం_కాకపోతే AMIGA
 	// On the Amiga, somehow '\n' on the last line doesn't always scroll
 	// up, so use delete-line command
-			    line_count == 1 ||
-#endif
+			    పంక్తి_లెక్క == 1 ||
+#అయితే_ముగింపు
 						*T_CDL == NUL))
 	type = USE_NL;
-    else if (*T_CDL != NUL && line_count > 1 && can_delete)
+    లేకపోతే ఒకవేళ (*T_CDL != NUL && పంక్తి_లెక్క > 1 && can_delete)
 	type = USE_T_CDL;
-    else if (can_clear(T_CE) && result_empty
-	    && (wp == NULL || wp->w_width == topframe->fr_width))
+    లేకపోతే ఒకవేళ (can_clear(T_CE) && ఫలితం_ఖాళీలు
+	    && (wp == ఖాళీ || wp->w_వెడల్పు == topframe->fr_వెడల్పు))
 	type = USE_T_CE;
-    else if (*T_DL != NUL && can_delete)
+    లేకపోతే ఒకవేళ (*T_DL != NUL && can_delete)
 	type = USE_T_DL;
-    else if (*T_CDL != NUL && can_delete)
+    లేకపోతే ఒకవేళ (*T_CDL != NUL && can_delete)
 	type = USE_T_CDL;
-    else
-	return FAIL;
+    లేకపోతే
+	తిరిగి FAIL;
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     // Remove a modeless selection when deleting lines halfway the screen or
     // not the full width of the screen.
-    if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
-	clip_clear_selection(&clip_star);
-    else
-	clip_scroll_selection(line_count);
-#endif
-#ifdef FEAT_IMAGE
-    shift_image_placements(off + row, off + end, -line_count);
-#endif
+    ఒకవేళ (off + అడ్డువరుస > 0 || (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు))
+	clip_clear_selection(&clip_నక్షత్రం);
+    లేకపోతే
+	clip_scroll_selection(పంక్తి_లెక్క);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE
+    జరుపు_image_placements(off + అడ్డువరుస, off + చివర, -పంక్తి_లెక్క);
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_HAIKU
-    vim_lock_screen();
-#endif
+#నిర్వచితమైతే FEAT_GUI_HAIKU
+    vim_తాళం_screen();
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Don't update the GUI cursor here, ScreenLines[] is invalid until the
     // scrolling is actually carried out.
-    gui_dont_update_cursor(gui.cursor_row >= row + off
-						&& gui.cursor_row < end + off);
-#endif
+    gui_dont_update_cursor(gui.cursor_అడ్డువరుస >= అడ్డువరుస + off
+						&& gui.cursor_అడ్డువరుస < చివర + off);
+#అయితే_ముగింపు
 
-    if (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
-	cursor_col = wp->w_wincol;
+    ఒకవేళ (wp != ఖాళీ && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
+	cursor_నిలువు = wp->w_wincol;
 
-    if (*T_CCS != NUL)	    // cursor relative to region
+    ఒకవేళ (*T_CCS != NUL)	    // cursor relative to region
     {
-	cursor_row = row;
-	cursor_end = end;
+	cursor_అడ్డువరుస = అడ్డువరుస;
+	cursor_చివర = చివర;
     }
-    else
+    లేకపోతే
     {
-	cursor_row = row + off;
-	cursor_end = end + off;
+	cursor_అడ్డువరుస = అడ్డువరుస + off;
+	cursor_చివర = చివర + off;
     }
 
     /*
      * Now shift LineOffset[] line_count up to reflect the deleted lines.
      * Clear the inserted lines in ScreenLines[].
      */
-    row += off;
-    end += off;
-    for (i = 0; i < line_count; ++i)
+    అడ్డువరుస += off;
+    చివర += off;
+    కొరకు (i = 0; i < పంక్తి_లెక్క; ++i)
     {
-	if (wp != NULL && wp->w_width != topframe->fr_width)
+	ఒకవేళ (wp != ఖాళీ && wp->w_వెడల్పు != topframe->fr_వెడల్పు)
 	{
 	    // need to copy part of a line
-	    j = row + i;
-	    while ((j += line_count) <= end - 1)
-		linecopy(j - line_count, j, wp);
-	    j -= line_count;
-	    if (can_clear((char_u *)" "))
-		lineclear(LineOffset[j] + wp->w_wincol,
-			wp->w_width, clear_attr);
-	    else
-		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
-	    LineWraps[j] = FALSE;
+	    j = అడ్డువరుస + i;
+	    అయితే ((j += పంక్తి_లెక్క) <= చివర - 1)
+		linecopy(j - పంక్తి_లెక్క, j, wp);
+	    j -= పంక్తి_లెక్క;
+	    ఒకవేళ (can_clear((char_u *)" "))
+		lineclear(పంక్తి_స్థానభ్రంశం[j] + wp->w_wincol,
+			wp->w_వెడల్పు, clear_attr);
+	    లేకపోతే
+		lineinvalid(పంక్తి_స్థానభ్రంశం[j] + wp->w_wincol, wp->w_వెడల్పు);
+	    పంక్తి_Wraps[j] = FALSE;
 	}
-	else
+	లేకపోతే
 	{
 	    // whole width, moving the line pointers is faster
-	    j = row + i;
-	    temp = LineOffset[j];
-	    while ((j += line_count) <= end - 1)
+	    j = అడ్డువరుస + i;
+	    తాత్కాలిక = పంక్తి_స్థానభ్రంశం[j];
+	    అయితే ((j += పంక్తి_లెక్క) <= చివర - 1)
 	    {
-		LineOffset[j - line_count] = LineOffset[j];
-		LineWraps[j - line_count] = LineWraps[j];
+		పంక్తి_స్థానభ్రంశం[j - పంక్తి_లెక్క] = పంక్తి_స్థానభ్రంశం[j];
+		పంక్తి_Wraps[j - పంక్తి_లెక్క] = పంక్తి_Wraps[j];
 	    }
-	    LineOffset[j - line_count] = temp;
-	    LineWraps[j - line_count] = FALSE;
-	    if (can_clear((char_u *)" "))
-		lineclear(temp, (int)Columns, clear_attr);
-	    else
-		lineinvalid(temp, (int)Columns);
+	    పంక్తి_స్థానభ్రంశం[j - పంక్తి_లెక్క] = తాత్కాలిక;
+	    పంక్తి_Wraps[j - పంక్తి_లెక్క] = FALSE;
+	    ఒకవేళ (can_clear((char_u *)" "))
+		lineclear(తాత్కాలిక, (పూర్ణాంకం)Columns, clear_attr);
+	    లేకపోతే
+		lineinvalid(తాత్కాలిక, (పూర్ణాంకం)Columns);
 	}
     }
 
-#ifdef FEAT_GUI_HAIKU
+#నిర్వచితమైతే FEAT_GUI_HAIKU
     vim_unlock_screen();
-#endif
+#అయితే_ముగింపు
 
-    if (screen_attr != clear_attr)
+    ఒకవేళ (screen_attr != clear_attr)
 	screen_stop_highlight();
-    if (clear_attr != 0)
-	screen_start_highlight(clear_attr);
+    ఒకవేళ (clear_attr != 0)
+	screen_ప్రారంభం_highlight(clear_attr);
 
     // redraw the characters
-    if (type == USE_REDRAW)
-	redraw_block(row, end, wp);
-    else if (type == USE_T_CD)	// delete the lines
+    ఒకవేళ (type == USE_REDRAW)
+	redraw_ఖండం(అడ్డువరుస, చివర, wp);
+    లేకపోతే ఒకవేళ (type == USE_T_CD)	// delete the lines
     {
-	windgoto(cursor_row, cursor_col);
-	out_str(T_CD);
-	screen_start();			// don't know where cursor is now
+	windgoto(cursor_అడ్డువరుస, cursor_నిలువు);
+	బహిర్గతం_str(T_CD);
+	screen_ప్రారంభం();			// don't know where cursor is now
     }
-    else if (type == USE_T_CDL)
+    లేకపోతే ఒకవేళ (type == USE_T_CDL)
     {
-	windgoto(cursor_row, cursor_col);
-	term_delete_lines(line_count);
-	screen_start();			// don't know where cursor is now
+	windgoto(cursor_అడ్డువరుస, cursor_నిలువు);
+	పదం_delete_పంక్తులు(పంక్తి_లెక్క);
+	screen_ప్రారంభం();			// don't know where cursor is now
     }
     /*
      * Deleting lines at top of the screen or scroll region: Just scroll
      * the whole screen (scroll region) up by outputting newlines on the
      * last line.
      */
-    else if (type == USE_NL)
+    లేకపోతే ఒకవేళ (type == USE_NL)
     {
-	windgoto(cursor_end - 1, cursor_col);
-	for (i = line_count; --i >= 0; )
-	    out_char('\n');		// cursor will remain on same line
+	windgoto(cursor_చివర - 1, cursor_నిలువు);
+	కొరకు (i = పంక్తి_లెక్క; --i >= 0; )
+	    బహిర్గతం_char('\n');		// cursor will remain on same line
     }
-    else
+    లేకపోతే
     {
-	for (i = line_count; --i >= 0; )
+	కొరకు (i = పంక్తి_లెక్క; --i >= 0; )
 	{
-	    if (type == USE_T_DL)
+	    ఒకవేళ (type == USE_T_DL)
 	    {
-		windgoto(cursor_row, cursor_col);
-		out_str(T_DL);		// delete a line
+		windgoto(cursor_అడ్డువరుస, cursor_నిలువు);
+		బహిర్గతం_str(T_DL);		// delete a line
 	    }
-	    else // type == USE_T_CE
+	    లేకపోతే // type == USE_T_CE
 	    {
-		windgoto(cursor_row + i, cursor_col);
-		out_str(T_CE);		// erase a line
+		windgoto(cursor_అడ్డువరుస + i, cursor_నిలువు);
+		బహిర్గతం_str(T_CE);		// erase a line
 	    }
-	    screen_start();		// don't know where cursor is now
+	    screen_ప్రారంభం();		// don't know where cursor is now
 	}
     }
 
@@ -4843,50 +4843,50 @@ screen_del_lines(
      * If the 'db' flag is set, we need to clear the lines that have been
      * scrolled up at the bottom of the region.
      */
-    if (*T_DB && (type == USE_T_DL || type == USE_T_CDL))
+    ఒకవేళ (*T_DB && (type == USE_T_DL || type == USE_T_CDL))
     {
-	for (i = line_count; i > 0; --i)
+	కొరకు (i = పంక్తి_లెక్క; i > 0; --i)
 	{
-	    windgoto(cursor_end - i, cursor_col);
-	    out_str(T_CE);		// erase a line
-	    screen_start();		// don't know where cursor is now
+	    windgoto(cursor_చివర - i, cursor_నిలువు);
+	    బహిర్గతం_str(T_CE);		// erase a line
+	    screen_ప్రారంభం();		// don't know where cursor is now
 	}
     }
 
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     gui_can_update_cursor();
-    if (gui.in_use)
-	out_flush();	// always flush after a scroll
-#endif
+    ఒకవేళ (gui.లోపల_use)
+	బహిర్గతం_flush();	// always flush after a scroll
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE when postponing displaying the mode message: when not redrawing
  * or inside a mapping or a script.
  */
-    int
-skip_showmode(void)
+    పూర్ణాంకం
+skip_showmode(శూన్య)
 {
     // Check the stuff buffer, typeahead buffer and script input for pending
     // characters, instead of char_avail() which also reads raw terminal input
     // and may pick up terminal response sequences (e.g. t_RV response),
     // falsely preventing the mode from being shown.
-    if (global_busy
-	    || msg_silent != 0
+    ఒకవేళ (global_busy
+	    || సందేశం_silent != 0
 	    || !redrawing()
-	    || ((!stuff_empty() || typebuf.tb_len > 0 || using_script())
-		&& !KeyTyped))
+	    || ((!stuff_ఖాళీలు() || typebuf.tb_len > 0 || using_script())
+		&& !కీలకం_Typed))
     {
-	redraw_mode = TRUE;		// show mode later
-	return TRUE;
+	redraw_బహుళకం = TRUE;		// show mode later
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -4898,25 +4898,25 @@ skip_showmode(void)
  * If redraw_mode is TRUE show or clear the mode.
  * Return the length of the message (0 if no message).
  */
-    int
-showmode(void)
+    పూర్ణాంకం
+showmode(శూన్య)
 {
-    int		need_clear;
-    int		length = 0;
-    int		do_mode;
-    int		attr;
-    int		nwr_save;
-    int		sub_attr;
-    int		show_ruler_with_pum = FALSE;
+    పూర్ణాంకం		need_clear;
+    పూర్ణాంకం		నిడివి = 0;
+    పూర్ణాంకం		do_బహుళకం;
+    పూర్ణాంకం		attr;
+    పూర్ణాంకం		nwr_save;
+    పూర్ణాంకం		sub_attr;
+    పూర్ణాంకం		show_ruler_with_pum = FALSE;
 
-    do_mode = p_smd && msg_silent == 0
-	    && ((State & MODE_INSERT)
+    do_బహుళకం = p_smd && సందేశం_silent == 0
+	    && ((State & బహుళకం_చొప్పించు)
 		|| restart_edit != NUL
-		|| VIsual_active);
-    if (do_mode || reg_recording != 0)
+		|| VIsual_చురుకైన);
+    ఒకవేళ (do_బహుళకం || reg_recording != 0)
     {
-	if (skip_showmode())
-	    return 0;		// show mode later
+	ఒకవేళ (skip_showmode())
+	    తిరిగి 0;		// show mode later
 
 	nwr_save = need_wait_return;
 
@@ -4925,120 +4925,120 @@ showmode(void)
 
 	// if the cmdline is more than one line high, erase top lines
 	need_clear = clear_cmdline;
-	if (clear_cmdline && cmdline_row < Rows - 1)
-	    msg_clr_cmdline();			// will reset clear_cmdline
+	ఒకవేళ (clear_cmdline && cmdline_అడ్డువరుస < అడ్డువరుసలు - 1)
+	    సందేశం_clr_cmdline();			// will reset clear_cmdline
 
 	// Position on the last line in the window, column 0
-	msg_pos_mode();
+	సందేశం_pos_బహుళకం();
 	cursor_off();
 	attr = HL_ATTR(HLF_CM);			// Highlight mode
-	if (do_mode)
+	ఒకవేళ (do_బహుళకం)
 	{
-	    msg_puts_attr("--", attr);
-#if defined(FEAT_XIM)
-	    if (
+	    సందేశం_puts_attr("--", attr);
+#ఒకవేళ defined(FEAT_XIM)
+	    ఒకవేళ (
 # ifdef FEAT_GUI_GTK
-		    preedit_get_status()
-# else
-		    im_get_status()
+		    preedit_get_స్థితి()
+# లేకపోతే
+		    im_get_స్థితి()
 # endif
 	       )
 # ifdef FEAT_GUI_GTK // most of the time, it's not XIM being used
-		msg_puts_attr(" IM", attr);
-# else
-		msg_puts_attr(" XIM", attr);
+		సందేశం_puts_attr(" IM", attr);
+# లేకపోతే
+		సందేశం_puts_attr(" XIM", attr);
 # endif
-#endif
+#అయితే_ముగింపు
 	    // CTRL-X in Insert mode
-	    if (edit_submode != NULL && !shortmess(SHM_COMPLETIONMENU))
+	    ఒకవేళ (edit_submode != ఖాళీ && !shortmess(SHM_COMPLETIONMENU))
 	    {
 		// These messages can get long, avoid a wrap in a narrow
 		// window.  Prefer showing edit_submode_extra.
-		length = (Rows - msg_row) * cmdline_width - 3;
-		if (edit_submode_extra != NULL)
-		    length -= vim_strsize(edit_submode_extra);
-		if (length > 0)
+		నిడివి = (అడ్డువరుసలు - సందేశం_అడ్డువరుస) * cmdline_వెడల్పు - 3;
+		ఒకవేళ (edit_submode_extra != ఖాళీ)
+		    నిడివి -= vim_strsize(edit_submode_extra);
+		ఒకవేళ (నిడివి > 0)
 		{
-		    if (edit_submode_pre != NULL)
-			length -= vim_strsize(edit_submode_pre);
-		    if (length - vim_strsize(edit_submode) > 0)
+		    ఒకవేళ (edit_submode_pre != ఖాళీ)
+			నిడివి -= vim_strsize(edit_submode_pre);
+		    ఒకవేళ (నిడివి - vim_strsize(edit_submode) > 0)
 		    {
-			if (edit_submode_pre != NULL)
-			    msg_puts_attr((char *)edit_submode_pre, attr);
-			msg_puts_attr((char *)edit_submode, attr);
+			ఒకవేళ (edit_submode_pre != ఖాళీ)
+			    సందేశం_puts_attr((అక్షరం *)edit_submode_pre, attr);
+			సందేశం_puts_attr((అక్షరం *)edit_submode, attr);
 		    }
-		    if (edit_submode_extra != NULL)
+		    ఒకవేళ (edit_submode_extra != ఖాళీ)
 		    {
-			msg_puts_attr(" ", attr);  // add a space in between
-			if ((int)edit_submode_highl < (int)HLF_COUNT)
+			సందేశం_puts_attr(" ", attr);  // add a space in between
+			ఒకవేళ ((పూర్ణాంకం)edit_submode_highl < (పూర్ణాంకం)HLF_లెక్క)
 			    sub_attr = HL_ATTR(edit_submode_highl);
-			else
+			లేకపోతే
 			    sub_attr = attr;
-			msg_puts_attr((char *)edit_submode_extra, sub_attr);
+			సందేశం_puts_attr((అక్షరం *)edit_submode_extra, sub_attr);
 		    }
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (State & VREPLACE_FLAG)
-		    msg_puts_attr(_(" VREPLACE"), attr);
-		else if (State & REPLACE_FLAG)
-		    msg_puts_attr(_(" REPLACE"), attr);
-		else if (State & MODE_INSERT)
+		ఒకవేళ (State & VREPLACE_FLAG)
+		    సందేశం_puts_attr(_(" VREPLACE"), attr);
+		లేకపోతే ఒకవేళ (State & REPLACE_FLAG)
+		    సందేశం_puts_attr(_(" REPLACE"), attr);
+		లేకపోతే ఒకవేళ (State & బహుళకం_చొప్పించు)
 		{
-#ifdef FEAT_RIGHTLEFT
-		    if (p_ri)
-			msg_puts_attr(_(" REVERSE"), attr);
-#endif
-		    msg_puts_attr(_(" INSERT"), attr);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		    ఒకవేళ (p_ri)
+			సందేశం_puts_attr(_(" REVERSE"), attr);
+#అయితే_ముగింపు
+		    సందేశం_puts_attr(_(" INSERT"), attr);
 		}
-		else if (restart_edit == 'I' || restart_edit == 'i' ||
+		లేకపోతే ఒకవేళ (restart_edit == 'I' || restart_edit == 'i' ||
 			restart_edit == 'a' || restart_edit == 'A')
-		    msg_puts_attr(_(" (insert)"), attr);
-		else if (restart_edit == 'R')
-		    msg_puts_attr(_(" (replace)"), attr);
-		else if (restart_edit == 'V')
-		    msg_puts_attr(_(" (vreplace)"), attr);
-#ifdef FEAT_RIGHTLEFT
-		if (p_hkmap)
-		    msg_puts_attr(_(" Hebrew"), attr);
-#endif
-#ifdef FEAT_KEYMAP
-		if (State & MODE_LANGMAP)
+		    సందేశం_puts_attr(_(" (insert)"), attr);
+		లేకపోతే ఒకవేళ (restart_edit == 'R')
+		    సందేశం_puts_attr(_(" (replace)"), attr);
+		లేకపోతే ఒకవేళ (restart_edit == 'V')
+		    సందేశం_puts_attr(_(" (vreplace)"), attr);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		ఒకవేళ (p_hkmap)
+		    సందేశం_puts_attr(_(" Hebrew"), attr);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_KEYMAP
+		ఒకవేళ (State & బహుళకం_LANGMAP)
 		{
 # ifdef FEAT_ARABIC
-		    if (curwin->w_p_arab)
-			msg_puts_attr(_(" Arabic"), attr);
-		    else
+		    ఒకవేళ (curwin->w_p_arab)
+			సందేశం_puts_attr(_(" Arabic"), attr);
+		    లేకపోతే
 # endif
-			if (get_keymap_str(curwin, (char_u *)" (%s)",
+			ఒకవేళ (get_keymap_str(curwin, (char_u *)" (%s)",
 							   NameBuff, MAXPATHL) > 0)
-			    msg_puts_attr((char *)NameBuff, attr);
+			    సందేశం_puts_attr((అక్షరం *)NameBuff, attr);
 		}
-#endif
-		if ((State & MODE_INSERT) && p_paste)
-		    msg_puts_attr(_(" (paste)"), attr);
+#అయితే_ముగింపు
+		ఒకవేళ ((State & బహుళకం_చొప్పించు) && p_paste)
+		    సందేశం_puts_attr(_(" (paste)"), attr);
 
-		if (VIsual_active)
+		ఒకవేళ (VIsual_చురుకైన)
 		{
-		    char *p;
+		    అక్షరం *p;
 
 		    // Don't concatenate separate words to avoid translation
 		    // problems.
-		    switch ((VIsual_select ? 4 : 0)
-			    + (VIsual_mode == Ctrl_V) * 2
-			    + (VIsual_mode == 'V'))
+		    ఎంపిక ((VIsual_select ? 4 : 0)
+			    + (VIsual_బహుళకం == Ctrl_V) * 2
+			    + (VIsual_బహుళకం == 'V'))
 		    {
-			case 0:	p = N_(" VISUAL"); break;
-			case 1: p = N_(" VISUAL LINE"); break;
-			case 2: p = N_(" VISUAL BLOCK"); break;
-			case 4: p = N_(" SELECT"); break;
-			case 5: p = N_(" SELECT LINE"); break;
-			default: p = N_(" SELECT BLOCK"); break;
+			స్థితి 0:	p = N_(" VISUAL"); ఆపు;
+			స్థితి 1: p = N_(" VISUAL LINE"); ఆపు;
+			స్థితి 2: p = N_(" VISUAL BLOCK"); ఆపు;
+			స్థితి 4: p = N_(" SELECT"); ఆపు;
+			స్థితి 5: p = N_(" SELECT LINE"); ఆపు;
+			అప్రమేయ: p = N_(" SELECT BLOCK"); ఆపు;
 		    }
-		    msg_puts_attr(_(p), attr);
+		    సందేశం_puts_attr(_(p), attr);
 		}
-		msg_puts_attr(" --", attr);
+		సందేశం_puts_attr(" --", attr);
 		// Ensure ruler is shown when a popup is visible and only the mode name
 		// is displayed. Without this, the ruler may disappear during insert-mode
 		// completion when 'shortmess' includes 'c'.
@@ -5047,54 +5047,54 @@ showmode(void)
 
 	    need_clear = TRUE;
 	}
-	if (reg_recording != 0
-		&& edit_submode == NULL)    // otherwise it gets too long
+	ఒకవేళ (reg_recording != 0
+		&& edit_submode == ఖాళీ)    // otherwise it gets too long
 	{
-	    recording_mode(attr);
+	    recording_బహుళకం(attr);
 	    need_clear = TRUE;
 	}
 
-	mode_displayed = TRUE;
-	if (need_clear || clear_cmdline || redraw_mode)
-	    msg_clr_eos();
-	msg_didout = FALSE;		// overwrite this message
-	length = msg_col;
-	msg_col = 0;
+	బహుళకం_displayed = TRUE;
+	ఒకవేళ (need_clear || clear_cmdline || redraw_బహుళకం)
+	    సందేశం_clr_eos();
+	సందేశం_didout = FALSE;		// overwrite this message
+	నిడివి = సందేశం_నిలువు;
+	సందేశం_నిలువు = 0;
 	need_wait_return = nwr_save;	// never ask for hit-return for this
     }
-    else if (clear_cmdline && msg_silent == 0)
+    లేకపోతే ఒకవేళ (clear_cmdline && సందేశం_silent == 0)
 	// Clear the whole command line.  Will reset "clear_cmdline".
-	msg_clr_cmdline();
-    else if (redraw_mode)
+	సందేశం_clr_cmdline();
+    లేకపోతే ఒకవేళ (redraw_బహుళకం)
     {
-	msg_pos_mode();
-	msg_clr_eos();
+	సందేశం_pos_బహుళకం();
+	సందేశం_clr_eos();
     }
 
     // In Visual mode the size of the selected area must be redrawn.
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
 	clear_showcmd();
 
     // If the last window has no status line, the ruler is after the mode
     // message and must be redrawn
-    if (redrawing() && lastwin->w_status_height == 0)
+    ఒకవేళ (redrawing() && lastwin->w_స్థితి_ఎత్తు == 0)
 	win_redr_ruler(lastwin, TRUE, show_ruler_with_pum);
 
     redraw_cmdline = FALSE;
-    redraw_mode = FALSE;
+    redraw_బహుళకం = FALSE;
     clear_cmdline = FALSE;
 
-    return length;
+    తిరిగి నిడివి;
 }
 
 /*
  * Position for a mode message.
  */
-    static void
-msg_pos_mode(void)
+    స్థిర శూన్య
+సందేశం_pos_బహుళకం(శూన్య)
 {
-    msg_col = 0;
-    msg_row = Rows - 1;
+    సందేశం_నిలువు = 0;
+    సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
 }
 
 /*
@@ -5102,135 +5102,135 @@ msg_pos_mode(void)
  * Insert mode (but Insert mode didn't end yet!).
  * Caller should check "mode_displayed".
  */
-    void
-unshowmode(int force)
+    శూన్య
+unshowmode(పూర్ణాంకం force)
 {
     /*
      * Don't delete it right now, when not redrawing or inside a mapping.
      */
-    if (!redrawing() || (!force && char_avail() && !KeyTyped))
+    ఒకవేళ (!redrawing() || (!force && char_avail() && !కీలకం_Typed))
 	redraw_cmdline = TRUE;		// delete mode later
-    else
+    లేకపోతే
 	clearmode();
 }
 
 /*
  * Clear the mode message.
  */
-    void
-clearmode(void)
+    శూన్య
+clearmode(శూన్య)
 {
-    int save_msg_row = msg_row;
-    int save_msg_col = msg_col;
+    పూర్ణాంకం save_సందేశం_అడ్డువరుస = సందేశం_అడ్డువరుస;
+    పూర్ణాంకం save_సందేశం_నిలువు = సందేశం_నిలువు;
 
-    msg_pos_mode();
-    if (reg_recording != 0)
-	recording_mode(HL_ATTR(HLF_CM));
-    msg_clr_eos();
+    సందేశం_pos_బహుళకం();
+    ఒకవేళ (reg_recording != 0)
+	recording_బహుళకం(HL_ATTR(HLF_CM));
+    సందేశం_clr_eos();
 
-    msg_col = save_msg_col;
-    msg_row = save_msg_row;
+    సందేశం_నిలువు = save_సందేశం_నిలువు;
+    సందేశం_అడ్డువరుస = save_సందేశం_అడ్డువరుస;
 }
 
-    static void
-recording_mode(int attr)
+    స్థిర శూన్య
+recording_బహుళకం(పూర్ణాంకం attr)
 {
-    msg_puts_attr(_("recording"), attr);
-    if (shortmess(SHM_RECORDING))
-	return;
+    సందేశం_puts_attr(_("recording"), attr);
+    ఒకవేళ (shortmess(SHM_RECORDING))
+	తిరిగి;
 
-    char s[4];
+    అక్షరం s[4];
 
     sprintf(s, " @%c", reg_recording);
-    msg_puts_attr(s, attr);
+    సందేశం_puts_attr(s, attr);
 }
 
 /*
  * Return TRUE if mouse is enabled.
  */
-    static int
-mouse_has_any(void)
+    స్థిర పూర్ణాంకం
+mouse_has_any(శూన్య)
 {
-    return mouse_has(MOUSE_NORMAL) || mouse_has(MOUSE_INSERT)
+    తిరిగి mouse_has(MOUSE_సాధారణ) || mouse_has(MOUSE_చొప్పించు)
 	|| mouse_has(MOUSE_VISUAL);
 }
 
 /*
  * Draw the tab pages line at the top of the Vim window.
  */
-    void
-draw_tabline(void)
+    శూన్య
+draw_tabline(శూన్య)
 {
-    int		tabcount = 0;
+    పూర్ణాంకం		tabcount = 0;
     tabpage_T	*tp;
-    int		tabwidth;
-    int		col = 0;
-    int		scol = 0;
-    int		attr;
+    పూర్ణాంకం		tabwidth;
+    పూర్ణాంకం		నిలువు = 0;
+    పూర్ణాంకం		scol = 0;
+    పూర్ణాంకం		attr;
     win_T	*wp;
     win_T	*cwp;
-    int		wincount;
-    int		modified;
-    int		c;
-    int		len;
-    int		attr_sel;
-    int		attr_nosel = 0;
-    int		attr_fill = 0;
+    పూర్ణాంకం		wincount;
+    పూర్ణాంకం		modified;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		attr_sel;
+    పూర్ణాంకం		attr_nosel = 0;
+    పూర్ణాంకం		attr_fill = 0;
     char_u	*p;
-    int		room;
-    int		use_sep_chars = (t_colors < 8
-#ifdef FEAT_GUI
-					    && !gui.in_use
-#endif
-#ifdef FEAT_TERMGUICOLORS
+    పూర్ణాంకం		స్థలం;
+    పూర్ణాంకం		use_sep_chars = (t_colors < 8
+#నిర్వచితమైతే FEAT_GUI
+					    && !gui.లోపల_use
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 					    && !p_tgc
-#endif
+#అయితే_ముగింపు
 					    );
     bool	override_success;
 
-#if defined(FEAT_TABPANEL)
-    col = firstwin->w_wincol;
-#endif
+#ఒకవేళ defined(FEAT_TABPANEL)
+    నిలువు = firstwin->w_wincol;
+#అయితే_ముగింపు
 
-    if (ScreenLines == NULL)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
     redraw_tabline = FALSE;
 
-#ifdef FEAT_GUI_TABLINE
+#నిర్వచితమైతే FEAT_GUI_TABLINE
     // Take care of a GUI tabline.
-    if (gui_use_tabline())
+    ఒకవేళ (gui_use_tabline())
     {
 	gui_update_tabline();
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (tabline_height() < 1)
-	return;
+    ఒకవేళ (tabline_ఎత్తు() < 1)
+	తిరిగి;
 
-#if defined(FEAT_STL_OPT)
-    clear_TabPageIdxs();
+#ఒకవేళ defined(FEAT_STL_OPT)
+    clear_Tab_పుట_Idxs();
 
     // Use the 'tabline' option if it's set.
-    if (*p_tal != NUL)
-	win_redr_custom(NULL, FALSE);
-    else
-#endif
+    ఒకవేళ (*p_tal != NUL)
+	win_redr_custom(ఖాళీ, FALSE);
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	FOR_ALL_TABPAGES(tp)
 	    ++tabcount;
 
-	tabwidth = (topframe->fr_width - 1 + tabcount / 2) / tabcount;
-	if (tabwidth < 6)
+	tabwidth = (topframe->fr_వెడల్పు - 1 + tabcount / 2) / tabcount;
+	ఒకవేళ (tabwidth < 6)
 	    tabwidth = 6;
 
 	tabcount = 0;
-	for (tp = first_tabpage; tp != NULL && col < Columns - 4;
-							     tp = tp->tp_next)
+	కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ && నిలువు < Columns - 4;
+							     tp = tp->tp_తదుపరి)
 	{
-	    scol = col;
+	    scol = నిలువు;
 
-	    override_success = push_highlight_overrides(
+	    override_success = నెట్టు_highlight_overrides(
 		    tp->tp_curwin->w_hl, tp->tp_curwin->w_hl_len);
 
 	    // Update them each time since highlight override might change them.
@@ -5239,115 +5239,115 @@ draw_tabline(void)
 	    attr_fill = HL_ATTR(HLF_TPF);
 	    attr = attr_nosel;
 
-	    if (tp->tp_topframe == topframe)
+	    ఒకవేళ (tp->tp_topframe == topframe)
 		attr = attr_sel;
-	    if (use_sep_chars && col > 0)
-		screen_putchar('|', 0, col++, attr);
+	    ఒకవేళ (use_sep_chars && నిలువు > 0)
+		screen_putchar('|', 0, నిలువు++, attr);
 
-	    if (tp->tp_topframe != topframe)
+	    ఒకవేళ (tp->tp_topframe != topframe)
 		attr = attr_nosel;
 
-	    screen_putchar(' ', 0, col++, attr);
+	    screen_putchar(' ', 0, నిలువు++, attr);
 
-	    if (tp == curtab)
+	    ఒకవేళ (tp == curtab)
 	    {
 		cwp = curwin;
 		wp = firstwin;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		cwp = tp->tp_curwin;
 		wp = tp->tp_firstwin;
 	    }
 
 	    modified = FALSE;
-	    for (wincount = 0; wp != NULL; wp = wp->w_next, ++wincount)
-		if (bufIsChanged(wp->w_buffer))
+	    కొరకు (wincount = 0; wp != ఖాళీ; wp = wp->w_తదుపరి, ++wincount)
+		ఒకవేళ (buf_Is_మారింది(wp->w_బఫరు))
 		    modified = TRUE;
-	    if (modified || wincount > 1)
+	    ఒకవేళ (modified || wincount > 1)
 	    {
-		if (wincount > 1)
+		ఒకవేళ (wincount > 1)
 		{
-		    len = vim_snprintf((char *)NameBuff, MAXPATHL, "%d", wincount);
-		    if (col + len >= Columns - 3)
-			break;
-		    screen_puts_len(NameBuff, len, 0, col,
-#if defined(FEAT_SYN_HL)
+		    len = vim_snprintf((అక్షరం *)NameBuff, MAXPATHL, "%d", wincount);
+		    ఒకవేళ (నిలువు + len >= Columns - 3)
+			ఆపు;
+		    screen_puts_len(NameBuff, len, 0, నిలువు,
+#ఒకవేళ defined(FEAT_SYN_HL)
 					 hl_combine_attr(attr, HL_ATTR(HLF_T))
-#else
+#లేకపోతే
 					 attr
-#endif
+#అయితే_ముగింపు
 					       );
-		    col += len;
+		    నిలువు += len;
 		}
-		if (modified)
-		    screen_puts_len((char_u *)"+", 1, 0, col++, attr);
-		screen_putchar(' ', 0, col++, attr);
+		ఒకవేళ (modified)
+		    screen_puts_len((char_u *)"+", 1, 0, నిలువు++, attr);
+		screen_putchar(' ', 0, నిలువు++, attr);
 	    }
 
-	    room = scol - col + tabwidth - 1;
-	    if (room > 0)
+	    స్థలం = scol - నిలువు + tabwidth - 1;
+	    ఒకవేళ (స్థలం > 0)
 	    {
-		int n;
+		పూర్ణాంకం n;
 
 		// Get buffer name in NameBuff[]
-		get_trans_bufname(cwp->w_buffer);
+		get_trans_bufname(cwp->w_బఫరు);
 		shorten_dir(NameBuff);
 		len = vim_strsize(NameBuff);
 		p = NameBuff;
-		if (has_mbyte)
-		    while (len > room)
+		ఒకవేళ (has_mbyte)
+		    అయితే (len > స్థలం)
 		    {
 			len -= ptr2cells(p);
 			MB_PTR_ADV(p);
 		    }
-		else if (len > room)
+		లేకపోతే ఒకవేళ (len > స్థలం)
 		{
-		    p += len - room;
-		    len = room;
+		    p += len - స్థలం;
+		    len = స్థలం;
 		}
-		n = Columns - col - 1;
-		if (len > n)
+		n = Columns - నిలువు - 1;
+		ఒకవేళ (len > n)
 		    len = n;
 
-		screen_puts_len(p, (int)STRLEN(p), 0, col, attr);
-		col += len;
+		screen_puts_len(p, (పూర్ణాంకం)STRLEN(p), 0, నిలువు, attr);
+		నిలువు += len;
 	    }
-	    screen_putchar(' ', 0, col++, attr);
+	    screen_putchar(' ', 0, నిలువు++, attr);
 
 	    // Store the tab page number in TabPageIdxs[], so that
 	    // jump_to_mouse() knows where each one is.
 	    ++tabcount;
-	    while (scol < col)
-		TabPageIdxs[scol++] = tabcount;
+	    అయితే (scol < నిలువు)
+		Tab_పుట_Idxs[scol++] = tabcount;
 
-	    if (override_success)
-		pop_highlight_overrides();
+	    ఒకవేళ (override_success)
+		తీయి_highlight_overrides();
 	}
 
-	if (use_sep_chars)
+	ఒకవేళ (use_sep_chars)
 	    c = '_';
-	else
+	లేకపోతే
 	    c = ' ';
-	screen_fill(0, 1, col, (int)Columns, c, c, attr_fill);
+	screen_fill(0, 1, నిలువు, (పూర్ణాంకం)Columns, c, c, attr_fill);
 
 	// Draw the 'showcmd' information if 'showcmdloc' == "tabline".
-	if (p_sc && *p_sloc == 't')
+	ఒకవేళ (p_sc && *p_sloc == 't')
 	{
-	    int	n = (int)Columns - col - (tabcount > 1) * 3;
-	    int	width = MIN(10, n);
+	    పూర్ణాంకం	n = (పూర్ణాంకం)Columns - నిలువు - (tabcount > 1) * 3;
+	    పూర్ణాంకం	వెడల్పు = MIN(10, n);
 
-	    if (width > 0)
-		screen_puts_len(showcmd_buf, width, 0, (int)Columns
-			    - width - (tabcount > 1) * 2, attr_nosel);
+	    ఒకవేళ (వెడల్పు > 0)
+		screen_puts_len(showcmd_buf, వెడల్పు, 0, (పూర్ణాంకం)Columns
+			    - వెడల్పు - (tabcount > 1) * 2, attr_nosel);
 	    showcmd_update_clear_state();
 	}
 
 	// Put an "X" for closing the current tab if there are several.
-	if (tabcount > 1 && mouse_has_any())
+	ఒకవేళ (tabcount > 1 && mouse_has_any())
 	{
-	    screen_putchar('X', 0, (int)Columns - 1, attr_nosel);
-	    TabPageIdxs[Columns - 1] = -999;
+	    screen_putchar('X', 0, (పూర్ణాంకం)Columns - 1, attr_nosel);
+	    Tab_పుట_Idxs[Columns - 1] = -999;
 	}
     }
 
@@ -5360,12 +5360,12 @@ draw_tabline(void)
  * Get buffer name for "buf" into NameBuff[].
  * Takes care of special buffer names and translates special characters.
  */
-    void
+    శూన్య
 get_trans_bufname(buf_T *buf)
 {
-    if (buf_spname(buf) != NULL)
+    ఒకవేళ (buf_spname(buf) != ఖాళీ)
 	vim_strncpy(NameBuff, buf_spname(buf), MAXPATHL - 1);
-    else
+    లేకపోతే
 	home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
     trans_characters(NameBuff, MAXPATHL);
 }
@@ -5373,43 +5373,43 @@ get_trans_bufname(buf_T *buf)
 /*
  * Get the character to use in a status line.  Get its attributes in "*attr".
  */
-    int
-fillchar_status(int *attr, win_T *wp)
+    పూర్ణాంకం
+fillchar_స్థితి(పూర్ణాంకం *attr, win_T *wp)
 {
-    int	    fill;
+    పూర్ణాంకం	    fill;
     bool    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-#ifdef FEAT_TERMINAL
-    if (bt_terminal(wp->w_buffer))
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (bt_terminal(wp->w_బఫరు))
     {
-	if (wp == curwin)
+	ఒకవేళ (wp == curwin)
 	{
 	    *attr = HL_ATTR(HLF_ST);
 	    fill = wp->w_fill_chars.stl;
 	}
-	else
+	లేకపోతే
 	{
 	    *attr = HL_ATTR(HLF_STNC);
 	    fill = wp->w_fill_chars.stlnc;
 	}
     }
-    else
-#endif
-    if (wp == curwin)
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (wp == curwin)
     {
 	*attr = HL_ATTR(HLF_S);
 	fill = wp->w_fill_chars.stl;
     }
-    else
+    లేకపోతే
     {
 	*attr = HL_ATTR(HLF_SNC);
 	fill = wp->w_fill_chars.stlnc;
     }
 
-    if (override_success)
-	pop_highlight_overrides();
-    return fill;
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
+    తిరిగి fill;
 }
 
 /*
@@ -5417,21 +5417,21 @@ fillchar_status(int *attr, win_T *wp)
  * adjacent to the current window.  The separator is owned by "wp" and drawn
  * at its right edge.
  */
-    static bool
-vsep_row_is_curwin(win_T *wp, int row)
+    స్థిర bool
+vsep_అడ్డువరుస_is_curwin(win_T *wp, పూర్ణాంకం అడ్డువరుస)
 {
-    if (wp == curwin)
-	return true;
+    ఒకవేళ (wp == curwin)
+	తిరిగి true;
 
     // Check if curwin is immediately to the right of wp's separator and
     // "row" is within curwin's row range (winbar + content + status line).
-    if (curwin->w_wincol == W_ENDCOL(wp) + wp->w_vsep_width
-	    && row >= curwin->w_winrow
-	    && row < W_WINROW(curwin) + curwin->w_height
-						   + curwin->w_status_height)
-	return true;
+    ఒకవేళ (curwin->w_wincol == W_ENDCOL(wp) + wp->w_vsep_వెడల్పు
+	    && అడ్డువరుస >= curwin->w_winrow
+	    && అడ్డువరుస < W_WINROW(curwin) + curwin->w_ఎత్తు
+						   + curwin->w_స్థితి_ఎత్తు)
+	తిరిగి true;
 
-    return false;
+    తిరిగి false;
 }
 
 /*
@@ -5440,49 +5440,49 @@ vsep_row_is_curwin(win_T *wp, int row)
  * Use VertSplit when the separator is adjacent to the current window,
  * VertSplitNC otherwise.
  */
-    int
-fillchar_vsep(int *attr, win_T *wp, int row)
+    పూర్ణాంకం
+fillchar_vsep(పూర్ణాంకం *attr, win_T *wp, పూర్ణాంకం అడ్డువరుస)
 {
     bool override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
-    if (vsep_row_is_curwin(wp, row))
+	నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
+    ఒకవేళ (vsep_అడ్డువరుస_is_curwin(wp, అడ్డువరుస))
 	*attr = HL_ATTR(HLF_C);
-    else
+    లేకపోతే
 	*attr = HL_ATTR(HLF_CNC);
-    if (override_success)
-	pop_highlight_overrides();
+    ఒకవేళ (override_success)
+	తీయి_highlight_overrides();
 
-    if (*attr == 0 && wp->w_fill_chars.vert == ' ')
-	return '|';
-    else
-	return wp->w_fill_chars.vert;
+    ఒకవేళ (*attr == 0 && wp->w_fill_chars.vert == ' ')
+	తిరిగి '|';
+    లేకపోతే
+	తిరిగి wp->w_fill_chars.vert;
 }
 
 /*
  * Return TRUE if redrawing should currently be done.
  */
-    int
-redrawing(void)
+    పూర్ణాంకం
+redrawing(శూన్య)
 {
-#ifdef FEAT_EVAL
-    if (disable_redraw_for_testing)
-	return 0;
-    else
-#endif
-	return ((RedrawingDisabled == 0
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (disable_redraw_for_testing)
+	తిరిగి 0;
+    లేకపోతే
+#అయితే_ముగింపు
+	తిరిగి ((RedrawingDisabled == 0
+#నిర్వచితమైతే FEAT_EVAL
 		    || ignore_redraw_flag_for_testing
-#endif
-		) && !(p_lz && char_avail() && !KeyTyped && !do_redraw));
+#అయితే_ముగింపు
+		) && !(p_lz && char_avail() && !కీలకం_Typed && !do_redraw));
 }
 
 /*
  * Return TRUE if printing messages should currently be done.
  */
-    int
-messaging(void)
+    పూర్ణాంకం
+messaging(శూన్య)
 {
-    return (!(p_lz && char_avail() && !KeyTyped));
+    తిరిగి (!(p_lz && char_avail() && !కీలకం_Typed));
 }
 
 /*
@@ -5492,199 +5492,199 @@ messaging(void)
  * of 'ru_col'.
  */
 
-#define COL_RULER 17	    // columns needed by standard ruler
+#నిర్వచించు నిలువు_RULER 17	    // columns needed by standard ruler
 
-    void
-comp_col(void)
+    శూన్య
+comp_నిలువు(శూన్య)
 {
-    int last_has_status = last_stl_height(FALSE) > 0;
+    పూర్ణాంకం చివరి_has_స్థితి = చివరి_stl_ఎత్తు(FALSE) > 0;
 
-    sc_col = 0;
-    ru_col = 0;
-    if (p_ru)
+    sc_నిలువు = 0;
+    ru_నిలువు = 0;
+    ఒకవేళ (p_ru)
     {
-#ifdef FEAT_STL_OPT
-	ru_col = (ru_wid ? ru_wid : COL_RULER) + 1;
-#else
-	ru_col = COL_RULER + 1;
-#endif
+#నిర్వచితమైతే FEAT_STL_OPT
+	ru_నిలువు = (ru_wid ? ru_wid : నిలువు_RULER) + 1;
+#లేకపోతే
+	ru_నిలువు = నిలువు_RULER + 1;
+#అయితే_ముగింపు
 	// no last status line, adjust sc_col
-	if (!last_has_status)
-	    sc_col = ru_col;
+	ఒకవేళ (!చివరి_has_స్థితి)
+	    sc_నిలువు = ru_నిలువు;
     }
-    if (p_sc && *p_sloc == 'l')
+    ఒకవేళ (p_sc && *p_sloc == 'l')
     {
-	sc_col += SHOWCMD_COLS;
-	if (!p_ru || last_has_status)	    // no need for separating space
-	    ++sc_col;
+	sc_నిలువు += SHOWCMD_నిలువుల_సంఖ్య;
+	ఒకవేళ (!p_ru || చివరి_has_స్థితి)	    // no need for separating space
+	    ++sc_నిలువు;
     }
-    sc_col = cmdline_width - sc_col;
-    ru_col = cmdline_width - ru_col;
-    if (sc_col <= 0)		// screen too narrow, will become a mess
-	sc_col = 1;
-    if (ru_col <= 0)
-	ru_col = 1;
-#ifdef FEAT_EVAL
-    set_vim_var_nr(VV_ECHOSPACE, sc_col - 1);
-#endif
+    sc_నిలువు = cmdline_వెడల్పు - sc_నిలువు;
+    ru_నిలువు = cmdline_వెడల్పు - ru_నిలువు;
+    ఒకవేళ (sc_నిలువు <= 0)		// screen too narrow, will become a mess
+	sc_నిలువు = 1;
+    ఒకవేళ (ru_నిలువు <= 0)
+	ru_నిలువు = 1;
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_nr(VV_ECHOSPACE, sc_నిలువు - 1);
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_LINEBREAK)
+#ఒకవేళ defined(FEAT_LINEBREAK)
 /*
  * Return the width of the 'number' and 'relativenumber' column.
  * Caller may need to check if 'number' or 'relativenumber' is set.
  * Otherwise it depends on 'numberwidth' and the line count.
  */
-    int
-number_width(win_T *wp)
+    పూర్ణాంకం
+సంఖ్య_వెడల్పు(win_T *wp)
 {
-    int		n;
+    పూర్ణాంకం		n;
     linenr_T	lnum;
 
-    if (wp->w_p_rnu && !wp->w_p_nu)
+    ఒకవేళ (wp->w_p_rnu && !wp->w_p_nu)
 	// cursor line shows "0"
-	lnum = wp->w_height;
-    else
+	lnum = wp->w_ఎత్తు;
+    లేకపోతే
 	// cursor line shows absolute line number
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 
-    if (lnum == wp->w_nrwidth_line_count && wp->w_nuw_cached == wp->w_p_nuw)
-	return wp->w_nrwidth_width;
-    wp->w_nrwidth_line_count = lnum;
+    ఒకవేళ (lnum == wp->w_nrwidth_పంక్తి_లెక్క && wp->w_nuw_cached == wp->w_p_nuw)
+	తిరిగి wp->w_nrwidth_వెడల్పు;
+    wp->w_nrwidth_పంక్తి_లెక్క = lnum;
 
     n = 0;
-    do
+    చేయి
     {
 	lnum /= 10;
 	++n;
-    } while (lnum > 0);
+    } అయితే (lnum > 0);
 
     // 'numberwidth' gives the minimal width plus one
-    if (n < wp->w_p_nuw - 1)
+    ఒకవేళ (n < wp->w_p_nuw - 1)
 	n = wp->w_p_nuw - 1;
 
 # ifdef FEAT_SIGNS
     // If 'signcolumn' is set to 'number' and there is a sign to display, then
     // the minimal width for the number column is 2.
-    if (n < 2 && get_first_valid_sign(wp) != NULL
+    ఒకవేళ (n < 2 && get_మొదటి_valid_sign(wp) != ఖాళీ
 	    && (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
 	n = 2;
 # endif
 
-    wp->w_nrwidth_width = n;
+    wp->w_nrwidth_వెడల్పు = n;
     wp->w_nuw_cached = wp->w_p_nuw;
-    return n;
+    తిరిగి n;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return the current cursor column. This is the actual position on the
  * screen. First column is 0.
  */
-    int
-screen_screencol(void)
+    పూర్ణాంకం
+screen_screencol(శూన్య)
 {
-    return screen_cur_col;
+    తిరిగి screen_cur_నిలువు;
 }
 
 /*
  * Return the current cursor row. This is the actual position on the screen.
  * First row is 0.
  */
-    int
-screen_screenrow(void)
+    పూర్ణాంకం
+screen_screenrow(శూన్య)
 {
-    return screen_cur_row;
+    తిరిగి screen_cur_అడ్డువరుస;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Calls mb_ptr2char_adv(p) and returns the character.
  * If "p" starts with "\x", "\u" or "\U" the hex or unicode value is used.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_encoded_char_adv(char_u **p)
 {
     char_u *s = *p;
 
-    if (s[0] == '\\' && (s[1] == 'x' || s[1] == 'u' || s[1] == 'U'))
+    ఒకవేళ (s[0] == '\\' && (s[1] == 'x' || s[1] == 'u' || s[1] == 'U'))
     {
-	varnumber_T num = 0;
-	int	    bytes;
-	int	    n;
+	varnumber_T అంకె = 0;
+	పూర్ణాంకం	    బైట్లు;
+	పూర్ణాంకం	    n;
 
-	for (bytes = s[1] == 'x' ? 1 : s[1] == 'u' ? 2 : 4; bytes > 0; --bytes)
+	కొరకు (బైట్లు = s[1] == 'x' ? 1 : s[1] == 'u' ? 2 : 4; బైట్లు > 0; --బైట్లు)
 	{
 	    *p += 2;
 	    n = hexhex2nr(*p);
-	    if (n < 0)
-		return 0;
-	    num = num * 256 + n;
+	    ఒకవేళ (n < 0)
+		తిరిగి 0;
+	    అంకె = అంకె * 256 + n;
 	}
 	*p += 2;
-	return num;
+	తిరిగి అంకె;
     }
-    return mb_ptr2char_adv(p);
+    తిరిగి mb_ptr2char_adv(p);
 }
 
-struct charstab
+నిర్మాణం charstab
 {
-    int	    *cp;
+    పూర్ణాంకం	    *cp;
     string_T	name;
 };
 
-#define CHARSTAB_ENTRY(cp, name) \
+#నిర్వచించు CHARSTAB_నమోదు(cp, name) \
     {(cp), {(char_u *)(name), STRLEN_LITERAL(name)}}
 
-static fill_chars_T fill_chars;
-static struct charstab filltab[] =
+స్థిర fill_chars_T fill_chars;
+స్థిర నిర్మాణం charstab filltab[] =
 {
-    CHARSTAB_ENTRY(&fill_chars.stl,	    "stl"),
-    CHARSTAB_ENTRY(&fill_chars.stlnc,	    "stlnc"),
-    CHARSTAB_ENTRY(&fill_chars.vert,	    "vert"),
-    CHARSTAB_ENTRY(&fill_chars.fold,	    "fold"),
-    CHARSTAB_ENTRY(&fill_chars.foldopen,    "foldopen"),
-    CHARSTAB_ENTRY(&fill_chars.foldclosed,  "foldclose"),
-    CHARSTAB_ENTRY(&fill_chars.foldsep,	    "foldsep"),
-    CHARSTAB_ENTRY(&fill_chars.foldinner,   "foldinner"),
-    CHARSTAB_ENTRY(&fill_chars.diff,	    "diff"),
-    CHARSTAB_ENTRY(&fill_chars.eob,	    "eob"),
-    CHARSTAB_ENTRY(&fill_chars.lastline,    "lastline"),
-#if defined(FEAT_TABPANEL)
-    CHARSTAB_ENTRY(&fill_chars.tpl_vert,    "tpl_vert"),
-#endif
-    CHARSTAB_ENTRY(&fill_chars.trunc,	    "trunc"),
-    CHARSTAB_ENTRY(&fill_chars.truncrl,	    "truncrl"),
+    CHARSTAB_నమోదు(&fill_chars.stl,	    "stl"),
+    CHARSTAB_నమోదు(&fill_chars.stlnc,	    "stlnc"),
+    CHARSTAB_నమోదు(&fill_chars.vert,	    "vert"),
+    CHARSTAB_నమోదు(&fill_chars.fold,	    "fold"),
+    CHARSTAB_నమోదు(&fill_chars.foldopen,    "foldopen"),
+    CHARSTAB_నమోదు(&fill_chars.foldclosed,  "foldclose"),
+    CHARSTAB_నమోదు(&fill_chars.foldsep,	    "foldsep"),
+    CHARSTAB_నమోదు(&fill_chars.foldinner,   "foldinner"),
+    CHARSTAB_నమోదు(&fill_chars.diff,	    "diff"),
+    CHARSTAB_నమోదు(&fill_chars.eob,	    "eob"),
+    CHARSTAB_నమోదు(&fill_chars.lastline,    "lastline"),
+#ఒకవేళ defined(FEAT_TABPANEL)
+    CHARSTAB_నమోదు(&fill_chars.tpl_vert,    "tpl_vert"),
+#అయితే_ముగింపు
+    CHARSTAB_నమోదు(&fill_chars.trunc,	    "trunc"),
+    CHARSTAB_నమోదు(&fill_chars.truncrl,	    "truncrl"),
 };
-static lcs_chars_T lcs_chars;
-static struct charstab lcstab[] =
+స్థిర lcs_chars_T lcs_chars;
+స్థిర నిర్మాణం charstab lcstab[] =
 {
-    CHARSTAB_ENTRY(&lcs_chars.eol,	    "eol"),
-    CHARSTAB_ENTRY(&lcs_chars.ext,	    "extends"),
-    CHARSTAB_ENTRY(&lcs_chars.nbsp,	    "nbsp"),
-    CHARSTAB_ENTRY(&lcs_chars.prec,	    "precedes"),
-    CHARSTAB_ENTRY(&lcs_chars.space,	    "space"),
-    CHARSTAB_ENTRY(&lcs_chars.tab2,	    "tab"),
-    CHARSTAB_ENTRY(&lcs_chars.leadtab2,	    "leadtab"),
-    CHARSTAB_ENTRY(&lcs_chars.trail,	    "trail"),
-    CHARSTAB_ENTRY(&lcs_chars.lead,	    "lead"),
-#ifdef FEAT_CONCEAL
-    CHARSTAB_ENTRY(&lcs_chars.conceal,	    "conceal"),
-#else
-    CHARSTAB_ENTRY(NULL,		    "conceal"),
-#endif
-    CHARSTAB_ENTRY(NULL,		    "multispace"),
-    CHARSTAB_ENTRY(NULL,		    "leadmultispace")
+    CHARSTAB_నమోదు(&lcs_chars.eol,	    "eol"),
+    CHARSTAB_నమోదు(&lcs_chars.ext,	    "extends"),
+    CHARSTAB_నమోదు(&lcs_chars.nbsp,	    "nbsp"),
+    CHARSTAB_నమోదు(&lcs_chars.prec,	    "precedes"),
+    CHARSTAB_నమోదు(&lcs_chars.space,	    "space"),
+    CHARSTAB_నమోదు(&lcs_chars.tab2,	    "tab"),
+    CHARSTAB_నమోదు(&lcs_chars.leadtab2,	    "leadtab"),
+    CHARSTAB_నమోదు(&lcs_chars.trail,	    "trail"),
+    CHARSTAB_నమోదు(&lcs_chars.lead,	    "lead"),
+#నిర్వచితమైతే FEAT_CONCEAL
+    CHARSTAB_నమోదు(&lcs_chars.conceal,	    "conceal"),
+#లేకపోతే
+    CHARSTAB_నమోదు(ఖాళీ,		    "conceal"),
+#అయితే_ముగింపు
+    CHARSTAB_నమోదు(ఖాళీ,		    "multispace"),
+    CHARSTAB_నమోదు(ఖాళీ,		    "leadmultispace")
 };
 
-    static char *
-field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
+    స్థిర అక్షరం *
+క్షేత్రం_విలువ_err(అక్షరం *errbuf, size_t errbuflen, అక్షరం *fmt, char_u *క్షేత్రం)
 {
-    if (errbuf == NULL)
-	return "";
-    vim_snprintf(errbuf, errbuflen, _(fmt), field);
-    return errbuf;
+    ఒకవేళ (errbuf == ఖాళీ)
+	తిరిగి "";
+    vim_snprintf(errbuf, errbuflen, _(fmt), క్షేత్రం);
+    తిరిగి errbuf;
 }
 
 /*
@@ -5695,74 +5695,74 @@ field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
  * Assume monocell characters.
  * Returns error message, NULL if it's OK.
  */
-    static char *
-set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
-						char *errbuf, size_t errbuflen)
+    స్థిర అక్షరం *
+సమితి_chars_option(win_T *wp, char_u *విలువ, పూర్ణాంకం is_listchars, పూర్ణాంకం apply,
+						అక్షరం *errbuf, size_t errbuflen)
 {
-    int	    round, i, entries;
+    పూర్ణాంకం	    విడత, i, entries;
     char_u  *p, *s;
-    int	    c1 = 0, c2 = 0, c3 = 0;
-    char_u  *last_multispace = NULL;  // Last occurrence of "multispace:"
-    char_u  *last_lmultispace = NULL; // Last occurrence of "leadmultispace:"
-    int	    multispace_len = 0;	      // Length of lcs-multispace string
-    int	    lead_multispace_len = 0;  // Length of lcs-leadmultispace string
+    పూర్ణాంకం	    c1 = 0, c2 = 0, c3 = 0;
+    char_u  *చివరి_multispace = ఖాళీ;  // Last occurrence of "multispace:"
+    char_u  *చివరి_lmultispace = ఖాళీ; // Last occurrence of "leadmultispace:"
+    పూర్ణాంకం	    multispace_len = 0;	      // Length of lcs-multispace string
+    పూర్ణాంకం	    lead_multispace_len = 0;  // Length of lcs-leadmultispace string
 
-    struct charstab *tab;
+    నిర్మాణం charstab *tab;
 
-    if (is_listchars)
+    ఒకవేళ (is_listchars)
     {
 	tab = lcstab;
-	CLEAR_FIELD(lcs_chars);
-	entries = ARRAY_LENGTH(lcstab);
-	if (wp->w_p_lcs[0] == NUL)
-	    value = p_lcs;  // local value is empty, use the global value
+	CLEAR_క్షేత్రం(lcs_chars);
+	entries = ARRAY_నిడివి(lcstab);
+	ఒకవేళ (wp->w_p_lcs[0] == NUL)
+	    విలువ = p_lcs;  // local value is empty, use the global value
     }
-    else
+    లేకపోతే
     {
 	tab = filltab;
-	entries = ARRAY_LENGTH(filltab);
-	if (wp->w_p_fcs[0] == NUL)
-	    value = p_fcs;  // local value is empty, use the global value
+	entries = ARRAY_నిడివి(filltab);
+	ఒకవేళ (wp->w_p_fcs[0] == NUL)
+	    విలువ = p_fcs;  // local value is empty, use the global value
     }
 
     // first round: check for valid value, second round: assign values
-    for (round = 0; round <= (apply ? 1 : 0); ++round)
+    కొరకు (విడత = 0; విడత <= (apply ? 1 : 0); ++విడత)
     {
-	int has_tab = FALSE, has_leadtab = FALSE;
+	పూర్ణాంకం has_tab = FALSE, has_leadtab = FALSE;
 
-	if (round > 0)
+	ఒకవేళ (విడత > 0)
 	{
 	    // After checking that the value is valid: set defaults.
-	    if (is_listchars)
+	    ఒకవేళ (is_listchars)
 	    {
-		for (i = 0; i < entries; ++i)
-		    if (tab[i].cp != NULL)
+		కొరకు (i = 0; i < entries; ++i)
+		    ఒకవేళ (tab[i].cp != ఖాళీ)
 			*(tab[i].cp) = NUL;
 		lcs_chars.tab1 = NUL;
 		lcs_chars.tab3 = NUL;
 		lcs_chars.leadtab1 = NUL;
 		lcs_chars.leadtab3 = NUL;
 
-		if (multispace_len > 0)
+		ఒకవేళ (multispace_len > 0)
 		{
-		    lcs_chars.multispace = ALLOC_MULT(int, multispace_len + 1);
-		    if (lcs_chars.multispace != NULL)
+		    lcs_chars.multispace = ALLOC_MULT(పూర్ణాంకం, multispace_len + 1);
+		    ఒకవేళ (lcs_chars.multispace != ఖాళీ)
 			lcs_chars.multispace[multispace_len] = NUL;
 		}
-		else
-		    lcs_chars.multispace = NULL;
+		లేకపోతే
+		    lcs_chars.multispace = ఖాళీ;
 
-		if (lead_multispace_len > 0)
+		ఒకవేళ (lead_multispace_len > 0)
 		{
 		    lcs_chars.leadmultispace =
-				      ALLOC_MULT(int, lead_multispace_len + 1);
-		    if (lcs_chars.leadmultispace != NULL)
+				      ALLOC_MULT(పూర్ణాంకం, lead_multispace_len + 1);
+		    ఒకవేళ (lcs_chars.leadmultispace != ఖాళీ)
 			lcs_chars.leadmultispace[lead_multispace_len] = NUL;
 		}
-		else
-		    lcs_chars.leadmultispace = NULL;
+		లేకపోతే
+		    lcs_chars.leadmultispace = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		fill_chars.stl = ' ';
 		fill_chars.stlnc = ' ';
@@ -5775,208 +5775,208 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 		fill_chars.diff = '-';
 		fill_chars.eob = '~';
 		fill_chars.lastline = '@';
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
 		fill_chars.tpl_vert = '|';
-#endif
+#అయితే_ముగింపు
 		fill_chars.trunc = '>';
 		fill_chars.truncrl = '<';
 	    }
 	}
-	p = value;
-	while (*p)
+	p = విలువ;
+	అయితే (*p)
 	{
-	    for (i = 0; i < entries; ++i)
+	    కొరకు (i = 0; i < entries; ++i)
 	    {
-		if (!(STRNCMP(p, tab[i].name.string, tab[i].name.length) == 0 && p[tab[i].name.length] == ':'))
-		    continue;
+		ఒకవేళ (!(STRNCMP(p, tab[i].name.string, tab[i].name.నిడివి) == 0 && p[tab[i].name.నిడివి] == ':'))
+		    కొనసాగు;
 
-		s = p + tab[i].name.length + 1;
+		s = p + tab[i].name.నిడివి + 1;
 
-		if (is_listchars && STRCMP(tab[i].name.string, "multispace") == 0)
+		ఒకవేళ (is_listchars && STRCMP(tab[i].name.string, "multispace") == 0)
 		{
-		    if (round == 0)
+		    ఒకవేళ (విడత == 0)
 		    {
 			// Get length of lcs-multispace string in first round
-			last_multispace = p;
+			చివరి_multispace = p;
 			multispace_len = 0;
-			while (*s != NUL && *s != ',')
+			అయితే (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
-					 e_wrong_character_width_for_field_str,
+			    ఒకవేళ (char2cells(c1) > 1)
+				తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+					 e_wrong_character_వెడల్పు_for_క్షేత్రం_str,
 					 tab[i].name.string);
 			    ++multispace_len;
 			}
-			if (multispace_len == 0)
+			ఒకవేళ (multispace_len == 0)
 			    // lcs-multispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+			    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+				    e_wrong_సంఖ్య_యొక్క_characters_for_క్షేత్రం_str,
 				    tab[i].name.string);
 		    }
-		    else
+		    లేకపోతే
 		    {
-			int multispace_pos = 0;
+			పూర్ణాంకం multispace_pos = 0;
 
-			while (*s != NUL && *s != ',')
+			అయితే (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (p == last_multispace && lcs_chars.multispace != NULL)
+			    ఒకవేళ (p == చివరి_multispace && lcs_chars.multispace != ఖాళీ)
 				lcs_chars.multispace[multispace_pos++] = c1;
 			}
 		    }
 		    p = s;
-		    break;
+		    ఆపు;
 		}
 
-		if (is_listchars && STRCMP(tab[i].name.string, "leadmultispace") == 0)
+		ఒకవేళ (is_listchars && STRCMP(tab[i].name.string, "leadmultispace") == 0)
 		{
-		    if (round == 0)
+		    ఒకవేళ (విడత == 0)
 		    {
 			// Get length of lcs-leadmultispace string in first
-			// round
-			last_lmultispace = p;
+			//విడత
+			చివరి_lmultispace = p;
 			lead_multispace_len = 0;
-			while (*s != NUL && *s != ',')
+			అయితే (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
-					 e_wrong_character_width_for_field_str,
+			    ఒకవేళ (char2cells(c1) > 1)
+				తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+					 e_wrong_character_వెడల్పు_for_క్షేత్రం_str,
 					 tab[i].name.string);
 			    ++lead_multispace_len;
 			}
-			if (lead_multispace_len == 0)
+			ఒకవేళ (lead_multispace_len == 0)
 			    // lcs-leadmultispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+			    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+				    e_wrong_సంఖ్య_యొక్క_characters_for_క్షేత్రం_str,
 				    tab[i].name.string);
 		    }
-		    else
+		    లేకపోతే
 		    {
-			int multispace_pos = 0;
+			పూర్ణాంకం multispace_pos = 0;
 
-			while (*s != NUL && *s != ',')
+			అయితే (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (p == last_lmultispace && lcs_chars.leadmultispace != NULL)
+			    ఒకవేళ (p == చివరి_lmultispace && lcs_chars.leadmultispace != ఖాళీ)
 				lcs_chars.leadmultispace[multispace_pos++] = c1;
 			}
 		    }
 		    p = s;
-		    break;
+		    ఆపు;
 		}
 
 		c2 = c3 = 0;
-		if (*s == NUL)
-		    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+		ఒకవేళ (*s == NUL)
+		    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+				    e_wrong_సంఖ్య_యొక్క_characters_for_క్షేత్రం_str,
 				    tab[i].name.string);
 		c1 = get_encoded_char_adv(&s);
-		if (char2cells(c1) > 1)
-		    return field_value_err(errbuf, errbuflen,
-					 e_wrong_character_width_for_field_str,
+		ఒకవేళ (char2cells(c1) > 1)
+		    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+					 e_wrong_character_వెడల్పు_for_క్షేత్రం_str,
 					 tab[i].name.string);
-		if (tab[i].cp == &lcs_chars.tab2 ||
+		ఒకవేళ (tab[i].cp == &lcs_chars.tab2 ||
 		    tab[i].cp == &lcs_chars.leadtab2)
 		{
-		    if (*s == NUL)
-			return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+		    ఒకవేళ (*s == NUL)
+			తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+				    e_wrong_సంఖ్య_యొక్క_characters_for_క్షేత్రం_str,
 				    tab[i].name.string);
 		    c2 = get_encoded_char_adv(&s);
-		    if (char2cells(c2) > 1)
-			return field_value_err(errbuf, errbuflen,
-					 e_wrong_character_width_for_field_str,
+		    ఒకవేళ (char2cells(c2) > 1)
+			తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+					 e_wrong_character_వెడల్పు_for_క్షేత్రం_str,
 					 tab[i].name.string);
-		    if (!(*s == ',' || *s == NUL))
+		    ఒకవేళ (!(*s == ',' || *s == NUL))
 		    {
 			c3 = get_encoded_char_adv(&s);
-			if (char2cells(c3) > 1)
-			    return field_value_err(errbuf, errbuflen,
-					 e_wrong_character_width_for_field_str,
+			ఒకవేళ (char2cells(c3) > 1)
+			    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+					 e_wrong_character_వెడల్పు_for_క్షేత్రం_str,
 					 tab[i].name.string);
 		    }
-		    if (tab[i].cp == &lcs_chars.tab2)
+		    ఒకవేళ (tab[i].cp == &lcs_chars.tab2)
 			has_tab = TRUE;
-		    else  // tab[i].cp == &lcs_chars.leadtab2
+		    లేకపోతే  // tab[i].cp == &lcs_chars.leadtab2
 			has_leadtab = TRUE;
 		}
 
-		if (*s == ',' || *s == NUL)
+		ఒకవేళ (*s == ',' || *s == NUL)
 		{
-		    if (round > 0)
+		    ఒకవేళ (విడత > 0)
 		    {
-			if (tab[i].cp == &lcs_chars.tab2)
+			ఒకవేళ (tab[i].cp == &lcs_chars.tab2)
 			{
 			    lcs_chars.tab1 = c1;
 			    lcs_chars.tab2 = c2;
 			    lcs_chars.tab3 = c3;
 			}
-			else if (tab[i].cp == &lcs_chars.leadtab2)
+			లేకపోతే ఒకవేళ (tab[i].cp == &lcs_chars.leadtab2)
 			{
 			    lcs_chars.leadtab1 = c1;
 			    lcs_chars.leadtab2 = c2;
 			    lcs_chars.leadtab3 = c3;
 			}
-			else if (tab[i].cp != NULL)
+			లేకపోతే ఒకవేళ (tab[i].cp != ఖాళీ)
 			    *(tab[i].cp) = c1;
 		    }
 		    p = s;
-		    break;
+		    ఆపు;
 		}
-		else
-		    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+		లేకపోతే
+		    తిరిగి క్షేత్రం_విలువ_err(errbuf, errbuflen,
+				    e_wrong_సంఖ్య_యొక్క_characters_for_క్షేత్రం_str,
 				    tab[i].name.string);
 	    }
 
-	    if (i == entries)
-		return e_invalid_argument;
+	    ఒకవేళ (i == entries)
+		తిరిగి e_invalid_వాదం;
 
-	    if (*p == ',')
+	    ఒకవేళ (*p == ',')
 		++p;
 	}
 
-	if (is_listchars && has_leadtab && !has_tab)
-	    return e_leadtab_requires_tab;
+	ఒకవేళ (is_listchars && has_leadtab && !has_tab)
+	    తిరిగి e_leadtab_requires_tab;
     }
 
-    if (apply)
+    ఒకవేళ (apply)
     {
-	if (is_listchars)
+	ఒకవేళ (is_listchars)
 	{
 	    vim_free(wp->w_lcs_chars.multispace);
 	    vim_free(wp->w_lcs_chars.leadmultispace);
 	    wp->w_lcs_chars = lcs_chars;
 	}
-	else
+	లేకపోతే
 	{
 	    wp->w_fill_chars = fill_chars;
 	}
     }
 
-    return NULL;	// no error
+    తిరిగి ఖాళీ;	// no error
 }
 
 /*
  * Handle the new value of 'fillchars'.
  */
-    char *
-set_fillchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
+    అక్షరం *
+సమితి_fillchars_option(win_T *wp, char_u *val, పూర్ణాంకం apply, అక్షరం *errbuf,
 							      size_t errbuflen)
 {
-    return set_chars_option(wp, val, FALSE, apply, errbuf, errbuflen);
+    తిరిగి సమితి_chars_option(wp, val, FALSE, apply, errbuf, errbuflen);
 }
 
 /*
  * Handle the new value of 'listchars'.
  */
-    char *
-set_listchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
+    అక్షరం *
+సమితి_listchars_option(win_T *wp, char_u *val, పూర్ణాంకం apply, అక్షరం *errbuf,
 							      size_t errbuflen)
 {
-    return set_chars_option(wp, val, TRUE, apply, errbuf, errbuflen);
+    తిరిగి సమితి_chars_option(wp, val, TRUE, apply, errbuf, errbuflen);
 }
 
 /*
@@ -5984,12 +5984,12 @@ set_listchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
  * 'fillchars' option.
  */
     char_u *
-get_fillchars_name(expand_T *xp UNUSED, int idx)
+get_fillchars_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(filltab))
-	return NULL;
+    ఒకవేళ (idx < 0 || idx >= (పూర్ణాంకం)ARRAY_నిడివి(filltab))
+	తిరిగి ఖాళీ;
 
-    return filltab[idx].name.string;
+    తిరిగి filltab[idx].name.string;
 }
 
 /*
@@ -5997,12 +5997,12 @@ get_fillchars_name(expand_T *xp UNUSED, int idx)
  * 'listchars' option.
  */
     char_u *
-get_listchars_name(expand_T *xp UNUSED, int idx)
+get_listchars_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(lcstab))
-	return NULL;
+    ఒకవేళ (idx < 0 || idx >= (పూర్ణాంకం)ARRAY_నిడివి(lcstab))
+	తిరిగి ఖాళీ;
 
-    return lcstab[idx].name.string;
+    తిరిగి lcstab[idx].name.string;
 }
 
 /*
@@ -6010,22 +6010,22 @@ get_listchars_name(expand_T *xp UNUSED, int idx)
  * Return an untranslated error messages if any of them is invalid, NULL
  * otherwise.
  */
-    char *
-check_chars_options(void)
+    అక్షరం *
+check_chars_options(శూన్య)
 {
     tabpage_T   *tp;
     win_T	    *wp;
 
-    if (set_listchars_option(curwin, p_lcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_listchars;
-    if (set_fillchars_option(curwin, p_fcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_fillchars;
+    ఒకవేళ (సమితి_listchars_option(curwin, p_lcs, FALSE, ఖాళీ, 0) != ఖాళీ)
+	తిరిగి e_conflicts_with_విలువ_యొక్క_listchars;
+    ఒకవేళ (సమితి_fillchars_option(curwin, p_fcs, FALSE, ఖాళీ, 0) != ఖాళీ)
+	తిరిగి e_conflicts_with_విలువ_యొక్క_fillchars;
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (set_listchars_option(wp, wp->w_p_lcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_listchars;
-	if (set_fillchars_option(wp, wp->w_p_fcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_fillchars;
+	ఒకవేళ (సమితి_listchars_option(wp, wp->w_p_lcs, FALSE, ఖాళీ, 0) != ఖాళీ)
+	    తిరిగి e_conflicts_with_విలువ_యొక్క_listchars;
+	ఒకవేళ (సమితి_fillchars_option(wp, wp->w_p_fcs, FALSE, ఖాళీ, 0) != ఖాళీ)
+	    తిరిగి e_conflicts_with_విలువ_యొక్క_fillchars;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }

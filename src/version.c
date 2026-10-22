@@ -7,7 +7,7 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * Vim originated from Stevie version 3.6 (Fish disk 217) by GRWalter (Fred)
@@ -23,725 +23,725 @@
  * interesting.
  */
 
-#include "version.h"
+#అన్తర్భావ "version.h"
 
-char		*Version = VIM_VERSION_SHORT;
-static char	*mediumVersion = VIM_VERSION_MEDIUM;
+అక్షరం		*సంస్కరణ = VIM_సంస్కరణ_SHORT;
+స్థిర అక్షరం	*medium_సంస్కరణ = VIM_సంస్కరణ_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
-char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
-						      + sizeof(__TIME__) + 3];
+#ఒకవేళ defined(HAVE_DATE_సమయం)
+# ఒకవేళ defined(VMS) && defined(VAXC)
+అక్షరం	long_సంస్కరణ[పరిమాణం(VIM_సంస్కరణ_LONG_DATE) + పరిమాణం(__DATE__)
+						      + పరిమాణం(__TIME__) + 3];
 
-    void
-init_longVersion(void)
+    శూన్య
+init_long_సంస్కరణ(శూన్య)
 {
     /*
      * Construct the long version string.  Necessary because
      * VAX C can't concatenate strings in the preprocessor.
      */
-    strcpy(longVersion, VIM_VERSION_LONG_DATE);
+    strcpy(long_సంస్కరణ, VIM_సంస్కరణ_LONG_DATE);
 #  ifdef BUILD_DATE
-    strcat(longVersion, BUILD_DATE);
-#  else
-    strcat(longVersion, __DATE__);
-    strcat(longVersion, " ");
-    strcat(longVersion, __TIME__);
+    strcat(long_సంస్కరణ, BUILD_DATE);
+#  లేకపోతే
+    strcat(long_సంస్కరణ, __DATE__);
+    strcat(long_సంస్కరణ, " ");
+    strcat(long_సంస్కరణ, __TIME__);
 #  endif
-    strcat(longVersion, ")");
+    strcat(long_సంస్కరణ, ")");
 }
 
-# else
-char	*longVersion = NULL;
+# లేకపోతే
+అక్షరం	*long_సంస్కరణ = ఖాళీ;
 
-    void
-init_longVersion(void)
+    శూన్య
+init_long_సంస్కరణ(శూన్య)
 {
-    if (longVersion != NULL)
-	return;
+    ఒకవేళ (long_సంస్కరణ != ఖాళీ)
+	తిరిగి;
 
 #  ifdef BUILD_DATE
-    char *date_time = BUILD_DATE;
-#  else
-    char *date_time = __DATE__ " " __TIME__;
+    అక్షరం *date_సమయం = BUILD_DATE;
+#  లేకపోతే
+    అక్షరం *date_సమయం = __DATE__ " " __TIME__;
 #  endif
-    char *msg = _("%s (%s, compiled %s)");
-    size_t len = strlen(msg)
-	+ STRLEN_LITERAL(VIM_VERSION_LONG_ONLY)
-	+ STRLEN_LITERAL(VIM_VERSION_DATE_ONLY)
-	+ strlen(date_time);
+    అక్షరం *సందేశం = _("%s (%s, compiled %s)");
+    size_t len = అక్షరశ్రేణి_పొడవు(సందేశం)
+	+ STRLEN_LITERAL(VIM_సంస్కరణ_LONG_ONLY)
+	+ STRLEN_LITERAL(VIM_సంస్కరణ_DATE_ONLY)
+	+ అక్షరశ్రేణి_పొడవు(date_సమయం);
 
-    longVersion = alloc(len);
-    if (longVersion == NULL)
-	longVersion = VIM_VERSION_LONG;
-    else
-	vim_snprintf(longVersion, len, msg,
-		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
+    long_సంస్కరణ = alloc(len);
+    ఒకవేళ (long_సంస్కరణ == ఖాళీ)
+	long_సంస్కరణ = VIM_సంస్కరణ_LONG;
+    లేకపోతే
+	vim_snprintf(long_సంస్కరణ, len, సందేశం,
+		VIM_సంస్కరణ_LONG_ONLY, VIM_సంస్కరణ_DATE_ONLY, date_సమయం);
 }
 # endif
-#else
-char	*longVersion = VIM_VERSION_LONG;
+#లేకపోతే
+అక్షరం	*long_సంస్కరణ = VIM_సంస్కరణ_LONG;
 
-    void
-init_longVersion(void)
+    శూన్య
+init_long_సంస్కరణ(శూన్య)
 {
     // nothing to do
 }
-#endif
+#అయితే_ముగింపు
 
-static char *(features[]) =
+స్థిర అక్షరం *(features[]) =
 {
-#ifdef HAVE_ACL
+#నిర్వచితమైతే HAVE_ACL
 	"+acl",
-#else
+#లేకపోతే
 	"-acl",
-#endif
-#ifdef FEAT_ARABIC
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_ARABIC
 	"+arabic",
-#else
+#లేకపోతే
 	"-arabic",
-#endif
-#ifdef AMIGA		// only for Amiga systems
+#అయితే_ముగింపు
+#నిర్వచితమైతే AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# లేకపోతే
 	"-ARP",
 # endif
-#endif
-#ifdef FEAT_AUTOCHDIR
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#లేకపోతే
 	"-autochdir",
-#endif
+#అయితే_ముగింపు
 	"+autocmd",
-#ifdef FEAT_AUTOSERVERNAME
+#నిర్వచితమైతే FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#లేకపోతే
 	"-autoservername",
-#endif
-#ifdef FEAT_BEVAL_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#లేకపోతే
 	"-balloon_eval",
-#endif
-#ifdef FEAT_BEVAL_TERM
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_BEVAL_పదం
 	"+balloon_eval_term",
-#else
+#లేకపోతే
 	"-balloon_eval_term",
-#endif
-#ifdef FEAT_BROWSE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_BROWSE
 	"+browse",
-#else
+#లేకపోతే
 	"-browse",
-#endif
+#అయితే_ముగింపు
 	"++builtin_terms",
-#ifdef FEAT_BYTEOFF
+#నిర్వచితమైతే FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#లేకపోతే
 	"-byte_offset",
-#endif
-#ifdef FEAT_JOB_CHANNEL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 	"+channel",
-#else
+#లేకపోతే
 	"-channel",
-#endif
+#అయితే_ముగింపు
 	"+cindent",
-#ifdef FEAT_CLIENTSERVER
+#నిర్వచితమైతే FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#లేకపోతే
 	"-clientserver",
-#endif
-#ifdef FEAT_CLIPBOARD
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#లేకపోతే
 	"-clipboard",
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#లేకపోతే
 	"-clipboard_provider",
-#endif
+#అయితే_ముగింపు
 	"+cmdline_compl",
 	"+cmdline_hist",
 	"+cmdline_info",
 	"+comments",
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
 	"+conceal",
-#else
+#లేకపోతే
 	"-conceal",
-#endif
-#ifdef FEAT_CRYPT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CRYPT
 	"+cryptv",
-#else
+#లేకపోతే
 	"-cryptv",
-#endif
-#ifdef FEAT_CSCOPE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CSCOPE
 	"+cscope",
-#else
+#లేకపోతే
 	"-cscope",
-#endif
+#అయితే_ముగింపు
 	"+cursorbind",
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
 	"+cursorshape",
-#else
+#లేకపోతే
 	"-cursorshape",
-#endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#లేకపోతే
+# ఒకవేళ defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# లేకపోతే
+#  ఒకవేళ defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  లేకపోతే
 	"-dialog",
 #  endif
 # endif
-#endif
-#ifdef FEAT_DIFF
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DIFF
 	"+diff",
-#else
+#లేకపోతే
 	"-diff",
-#endif
-#ifdef FEAT_DIGRAPHS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#లేకపోతే
 	"-digraphs",
-#endif
-#ifdef FEAT_GUI_MSWIN
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# లేకపోతే
 	"-directx",
 # endif
-#endif
-#ifdef FEAT_DND
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DND
 	"+dnd",
-#else
+#లేకపోతే
 	"-dnd",
-#endif
+#అయితే_ముగింపు
 	"-ebcdic",
-#ifdef FEAT_EMACS_TAGS
+#నిర్వచితమైతే FEAT_EMACS_ట్యాగులు
 	"+emacs_tags",
-#else
+#లేకపోతే
 	"-emacs_tags",
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
 	"+eval",
-#else
+#లేకపోతే
 	"-eval",
-#endif
+#అయితే_ముగింపు
 	"+ex_extra",
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 	"+extra_search",
-#else
+#లేకపోతే
 	"-extra_search",
-#endif
+#అయితే_ముగింపు
 	"-farsi",
 	"+file_in_path",
-#ifdef FEAT_FIND_ID
+#నిర్వచితమైతే FEAT_కనుగొను_ID
 	"+find_in_path",
-#else
+#లేకపోతే
 	"-find_in_path",
-#endif
+#అయితే_ముగింపు
 	"+float",
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	"+folding",
-#else
+#లేకపోతే
 	"-folding",
-#endif
+#అయితే_ముగింపు
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#ఒకవేళ !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
-#endif
-#ifdef FEAT_GETTEXT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# లేకపోతే
 	"+gettext",
 # endif
-#else
+#లేకపోతే
 	"-gettext",
-#endif
+#అయితే_ముగింపు
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#ఒకవేళ (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# లేకపోతే
 	"+iconv",
 # endif
-#else
+#లేకపోతే
 	"-iconv",
-#endif
-#ifdef FEAT_IMAGE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE
 	"+image",
-#else
+#లేకపోతే
 	"-image",
-#endif
-#ifdef FEAT_IMAGE_POPUP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#లేకపోతే
 	"-image_popup",
-#endif
+#అయితే_ముగింపు
 	"+insert_expand",
-#ifdef FEAT_IPV6
+#నిర్వచితమైతే FEAT_IPV6
 	"+ipv6",
-#else
+#లేకపోతే
 	"-ipv6",
-#endif
-#ifdef FEAT_JOB_CHANNEL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 	"+job",
-#else
+#లేకపోతే
 	"-job",
-#endif
+#అయితే_ముగింపు
 	"+jumplist",
-#ifdef FEAT_KEYMAP
+#నిర్వచితమైతే FEAT_KEYMAP
 	"+keymap",
-#else
+#లేకపోతే
 	"-keymap",
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
 	"+lambda",
-#else
+#లేకపోతే
 	"-lambda",
-#endif
-#ifdef FEAT_LANGMAP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_LANGMAP
 	"+langmap",
-#else
+#లేకపోతే
 	"-langmap",
-#endif
-#ifdef FEAT_LIBCALL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_LIBCALL
 	"+libcall",
-#else
+#లేకపోతే
 	"-libcall",
-#endif
-#ifdef FEAT_LINEBREAK
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_LINEBREAK
 	"+linebreak",
-#else
+#లేకపోతే
 	"-linebreak",
-#endif
+#అయితే_ముగింపు
 	"+lispindent",
 	"+listcmds",
 	"+localmap",
-#ifdef FEAT_LUA
+#నిర్వచితమైతే FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# లేకపోతే
 	"+lua",
 # endif
-#else
+#లేకపోతే
 	"-lua",
-#endif
-#ifdef FEAT_MENU
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
 	"+menu",
-#else
+#లేకపోతే
 	"-menu",
-#endif
-#ifdef FEAT_SESSION
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SESSION
 	"+mksession",
-#else
+#లేకపోతే
 	"-mksession",
-#endif
+#అయితే_ముగింపు
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#ఒకవేళ defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# లేకపోతే
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  లేకపోతే
 	"+mouse_gpm",
 #  endif
-# else
+# లేకపోతే
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# లేకపోతే
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# లేకపోతే
 	"-mouse_netterm",
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef __QNX__
+#నిర్వచితమైతే __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# లేకపోతే
 	"-mouse_pterm",
 # endif
-#endif
+#అయితే_ముగింపు
 
-#if defined(UNIX) || defined(VMS)
+#ఒకవేళ defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# లేకపోతే
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# లేకపోతే
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
-#endif
-#ifdef FEAT_MOUSESHAPE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#లేకపోతే
 	"-mouseshape",
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# లేకపోతే
 	"+multi_byte_ime",
 # endif
-#else
+#లేకపోతే
 	"+multi_byte",
-#endif
-#ifdef FEAT_MULTI_LANG
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#లేకపోతే
 	"-multi_lang",
-#endif
-#ifdef FEAT_MZSCHEME
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# లేకపోతే
 	"+mzscheme",
 # endif
-#else
+#లేకపోతే
 	"-mzscheme",
-#endif
-#ifdef FEAT_NETBEANS_INTG
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#లేకపోతే
 	"-netbeans_intg",
-#endif
+#అయితే_ముగింపు
 	"+num64",
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# లేకపోతే
 	"-ole",
 # endif
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
 	"+packages",
-#else
+#లేకపోతే
 	"-packages",
-#endif
-#ifdef FEAT_PRINT_PANGO
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PRINT_PANGO
 	"+pango",
-#else
+#లేకపోతే
 	"-pango",
-#endif
+#అయితే_ముగింపు
 	"+path_extra",
-#ifdef FEAT_PERL
+#నిర్వచితమైతే FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# లేకపోతే
 	"+perl",
 # endif
-#else
+#లేకపోతే
 	"-perl",
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#లేకపోతే
 	"-persistent_undo",
-#endif
-#ifdef FEAT_PROP_POPUP
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#లేకపోతే
 	"-popupwin",
-#endif
-#ifdef FEAT_PRINTER
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# లేకపోతే
 	"-postscript",
 # endif
 	"+printer",
-#else
+#లేకపోతే
 	"-printer",
-#endif
-#ifdef FEAT_PROFILE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROFILE
 	"+profile",
-#else
+#లేకపోతే
 	"-profile",
-#endif
-#ifdef FEAT_PYTHON
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# లేకపోతే
 	"+python",
 # endif
-#else
+#లేకపోతే
 	"-python",
-#endif
-#ifdef FEAT_PYTHON3
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  లేకపోతే
 	"+python3/dyn",
 #  endif
-# else
+# లేకపోతే
 	"+python3",
 # endif
-#else
+#లేకపోతే
 	"-python3",
-#endif
-#ifdef FEAT_QUICKFIX
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_QUICKFIX
 	"+quickfix",
-#else
+#లేకపోతే
 	"-quickfix",
-#endif
-#ifdef FEAT_RELTIME
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RELTIME
 	"+reltime",
-#else
+#లేకపోతే
 	"-reltime",
-#endif
-#ifdef FEAT_RIGHTLEFT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#లేకపోతే
 	"-rightleft",
-#endif
-#ifdef FEAT_RUBY
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# లేకపోతే
 	"+ruby",
 # endif
-#else
+#లేకపోతే
 	"-ruby",
-#endif
+#అయితే_ముగింపు
 	"+scrollbind",
-#ifdef FEAT_SIGNS
+#నిర్వచితమైతే FEAT_SIGNS
 	"+signs",
-#else
+#లేకపోతే
 	"-signs",
-#endif
+#అయితే_ముగింపు
 	"+smartindent",
-#ifdef FEAT_SOCKETSERVER
+#నిర్వచితమైతే FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#లేకపోతే
 	"-socketserver",
-#endif
-#ifdef FEAT_SODIUM
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# లేకపోతే
 	"+sodium",
 # endif
-#else
+#లేకపోతే
 	"-sodium",
-#endif
-#ifdef FEAT_SOUND
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SOUND
 	"+sound",
-#else
+#లేకపోతే
 	"-sound",
-#endif
-#ifdef FEAT_SPELL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SPELL
 	"+spell",
-#else
+#లేకపోతే
 	"-spell",
-#endif
-#ifdef STARTUPTIME
+#అయితే_ముగింపు
+#నిర్వచితమైతే STARTUPTIME
 	"+startuptime",
-#else
+#లేకపోతే
 	"-startuptime",
-#endif
-#ifdef FEAT_STL_OPT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_STL_OPT
 	"+statusline",
-#else
+#లేకపోతే
 	"-statusline",
-#endif
+#అయితే_ముగింపు
 	"-sun_workshop",
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 	"+syntax",
-#else
+#లేకపోతే
 	"-syntax",
-#endif
+#అయితే_ముగింపు
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#ఒకవేళ defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
-#endif
-#if defined(FEAT_TABPANEL)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#లేకపోతే
 	"-tabpanel",
-#endif
+#అయితే_ముగింపు
 	"-tag_any_white",
 	"+tag_binary",
 	"-tag_old_static",
-#ifdef FEAT_TCL
+#నిర్వచితమైతే FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# లేకపోతే
 	"+tcl",
 # endif
-#else
+#లేకపోతే
 	"-tcl",
-#endif
-#ifdef FEAT_TERMGUICOLORS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#లేకపోతే
 	"-termguicolors",
-#endif
-#ifdef FEAT_TERMINAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMINAL
 	"+terminal",
-#else
+#లేకపోతే
 	"-terminal",
-#endif
-#if defined(UNIX)
+#అయితే_ముగింపు
+#ఒకవేళ defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# లేకపోతే
 	"-terminfo",
 # endif
-#endif
-#ifdef FEAT_TERMRESPONSE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#లేకపోతే
 	"-termresponse",
-#endif
+#అయితే_ముగింపు
 	"+textobjects",
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	"+textprop",
-#else
+#లేకపోతే
 	"-textprop",
-#endif
-#if !defined(UNIX)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# లేకపోతే
 	"-tgetent",
 # endif
-#endif
-#ifdef FEAT_TIMERS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TIMERS
 	"+timers",
-#else
+#లేకపోతే
 	"-timers",
-#endif
+#అయితే_ముగింపు
 	"+title",
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
 	"+toolbar",
-#else
+#లేకపోతే
 	"-toolbar",
-#endif
+#అయితే_ముగింపు
 	"+user_commands",
-#ifdef FEAT_VARTABS
+#నిర్వచితమైతే FEAT_VARTABS
 	"+vartabs",
-#else
+#లేకపోతే
 	"-vartabs",
-#endif
+#అయితే_ముగింపు
 	"+vertsplit",
 	"+vim9script",
-#ifdef FEAT_VIMINFO
+#నిర్వచితమైతే FEAT_VIMINFO
 	"+viminfo",
-#else
+#లేకపోతే
 	"-viminfo",
-#endif
+#అయితే_ముగింపు
 	"+virtualedit",
 	"+visual",
 	"+visualextra",
 	"+vreplace",
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# లేకపోతే
 	"-vtp",
 # endif
-#endif
-#ifdef FEAT_WAYLAND
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_WAYLAND
 	"+wayland",
-#else
+#లేకపోతే
 	"-wayland",
-#endif
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#లేకపోతే
 	"-wayland_clipboard",
-#endif
+#అయితే_ముగింపు
 	"+wildignore",
 	"+wildmenu",
 	"+windows",
-#ifdef FEAT_WRITEBACKUP
+#నిర్వచితమైతే FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#లేకపోతే
 	"-writebackup",
-#endif
-#if defined(UNIX) || defined(VMS)
+#అయితే_ముగింపు
+#ఒకవేళ defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# లేకపోతే
 	"-X11",
 # endif
-#endif
-#ifdef FEAT_XATTR
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XATTR
 	"+xattr",
-#else
+#లేకపోతే
 	"-xattr",
-#endif
-#ifdef FEAT_XFONTSET
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XFONTSET
 	"+xfontset",
-#else
+#లేకపోతే
 	"-xfontset",
-#endif
-#ifdef FEAT_XIM
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XIM
 	"+xim",
-#else
+#లేకపోతే
 	"-xim",
-#endif
-#if defined(MSWIN)
+#అయితే_ముగింపు
+#ఒకవేళ defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# లేకపోతే
 	"-xpm_w32",
 # endif
-#elif defined(HAVE_XPM)
+#లేదావేళ defined(HAVE_XPM)
 	"+xpm",
-#else
+#లేకపోతే
 	"-xpm",
-#endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#అయితే_ముగింపు
+#ఒకవేళ defined(UNIX) || defined(VMS)
+# ఒకవేళ defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# లేకపోతే
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# లేకపోతే
 	"-xterm_clipboard",
 # endif
-#endif
-#ifdef FEAT_XTERM_SAVE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#లేకపోతే
 	"-xterm_save",
-#endif
-	NULL
+#అయితే_ముగింపు
+	ఖాళీ
 };
 
-static int included_patches[] =
+స్థిర పూర్ణాంకం included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3204,57 +3204,57 @@ static int included_patches[] =
  * See the official Vim patches for the diff format: It must use a context of
  * one line only.  Create it by hand or use "diff -C2" and edit the patch.
  */
-static char *(extra_patches[]) =
+స్థిర అక్షరం *(extra_patches[]) =
 {   /* Add your patch description below this line */
 /**/
-    NULL
+    ఖాళీ
 };
 
-    int
-highest_patch(void)
+    పూర్ణాంకం
+highest_patch(శూన్య)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    తిరిగి included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    పూర్ణాంకం
+has_patch(పూర్ణాంకం n)
 {
-    int		h, m, l;
+    పూర్ణాంకం		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (పూర్ణాంకం)ARRAY_నిడివి(included_patches) - 1;
+    కొరకు (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
-	    break;
-	if (included_patches[m] < n)
+	ఒకవేళ (included_patches[m] == n)
+	    తిరిగి TRUE;
+	ఒకవేళ (l == h)
+	    ఆపు;
+	ఒకవేళ (included_patches[m] < n)
 	    h = m;
-	else
+	లేకపోతే
 	    l = m + 1;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-ex_version(exarg_T *eap)
+    శూన్య
+ex_సంస్కరణ(exarg_T *eap)
 {
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
     {
-	msg_putchar('\n');
-	list_version();
+	సందేశం_putchar('\n');
+	list_సంస్కరణ();
     }
 }
 
@@ -3263,37 +3263,37 @@ ex_version(exarg_T *eap)
  * newline, unless the message is too long to fit on the screen anyway.
  * When "wrap" is TRUE wrap the string in [].
  */
-    static void
-version_msg_wrap(char_u *s, int wrap)
+    స్థిర శూన్య
+సంస్కరణ_సందేశం_wrap(char_u *s, పూర్ణాంకం wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    పూర్ణాంకం		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    ఒకవేళ (!got_int && len < cmdline_వెడల్పు && సందేశం_నిలువు + len >= cmdline_వెడల్పు
 								&& *s != '\n')
-	msg_putchar('\n');
-    if (!got_int)
+	సందేశం_putchar('\n');
+    ఒకవేళ (!got_int)
     {
-	if (wrap)
-	    msg_puts("[");
-	msg_puts((char *)s);
-	if (wrap)
-	    msg_puts("]");
+	ఒకవేళ (wrap)
+	    సందేశం_puts("[");
+	సందేశం_puts((అక్షరం *)s);
+	ఒకవేళ (wrap)
+	    సందేశం_puts("]");
     }
 }
 
-    static void
-version_msg(char *s)
+    స్థిర శూన్య
+సంస్కరణ_సందేశం(అక్షరం *s)
 {
-    version_msg_wrap((char_u *)s, FALSE);
+    సంస్కరణ_సందేశం_wrap((char_u *)s, FALSE);
 }
 
 /*
  * List all features aligned in columns, dictionary style.
  */
-    static void
-list_features(void)
+    స్థిర శూన్య
+list_features(శూన్య)
 {
-    list_in_columns((char_u **)features, -1, -1);
+    list_లోపల_columns((char_u **)features, -1, -1);
 }
 
 /*
@@ -3301,388 +3301,388 @@ list_features(void)
  * When "size" is < 0 then the last entry is marked with NULL.
  * The entry with index "current" is inclosed in [].
  */
-    void
-list_in_columns(char_u **items, int size, int current)
+    శూన్య
+list_లోపల_columns(char_u **వస్తువులు, పూర్ణాంకం కొలత, పూర్ణాంకం current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
-#ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
-#endif
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		ncol;
+    పూర్ణాంకం		nrow;
+    పూర్ణాంకం		cur_అడ్డువరుస = 1;
+    పూర్ణాంకం		అంశం_లెక్క = 0;
+    పూర్ణాంకం		వెడల్పు = 0;
+#నిర్వచితమైతే FEAT_SYN_HL
+    పూర్ణాంకం		use_highlight = (వస్తువులు == (char_u **)features);
+#అయితే_ముగింపు
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    కొరకు (i = 0; కొలత < 0 ? వస్తువులు[i] != ఖాళీ : i < కొలత; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	పూర్ణాంకం l = vim_strsize(వస్తువులు[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
-	    width = l;
-	++item_count;
+	ఒకవేళ (l > వెడల్పు)
+	    వెడల్పు = l;
+	++అంశం_లెక్క;
     }
-    width += 1;
+    వెడల్పు += 1;
 
-    if (cmdline_width < width)
+    ఒకవేళ (cmdline_వెడల్పు < వెడల్పు)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	కొరకు (i = 0; i < అంశం_లెక్క; ++i)
 	{
-	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
-		msg_putchar('\n');
+	    సంస్కరణ_సందేశం_wrap(వస్తువులు[i], i == current);
+	    ఒకవేళ (సందేశం_నిలువు > 0 && i < అంశం_లెక్క - 1)
+		సందేశం_putchar('\n');
 	}
-	return;
+	తిరిగి;
     }
 
     // The rightmost column doesn't need a separator.
     // Sacrifice it to fit in one more column if possible.
-    ncol = (cmdline_width + 1) / width;
-    nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
+    ncol = (cmdline_వెడల్పు + 1) / వెడల్పు;
+    nrow = అంశం_లెక్క / ncol + ((అంశం_లెక్క % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    కొరకు (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	పూర్ణాంకం idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	ఒకవేళ (idx < అంశం_లెక్క)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    పూర్ణాంకం చివరి_నిలువు = (i + 1) % ncol == 0;
 
-	    if (idx == current)
-		msg_putchar('[');
-#ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
-		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
-#endif
-		msg_puts((char *)items[idx]);
-	    if (idx == current)
-		msg_putchar(']');
-	    if (last_col)
+	    ఒకవేళ (idx == current)
+		సందేశం_putchar('[');
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (use_highlight && వస్తువులు[idx][0] == '-')
+		సందేశం_puts_attr((అక్షరం *)వస్తువులు[idx], HL_ATTR(HLF_W));
+	    లేకపోతే
+#అయితే_ముగింపు
+		సందేశం_puts((అక్షరం *)వస్తువులు[idx]);
+	    ఒకవేళ (idx == current)
+		సందేశం_putchar(']');
+	    ఒకవేళ (చివరి_నిలువు)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
-		    msg_putchar('\n');
-		++cur_row;
+		ఒకవేళ (సందేశం_నిలువు > 0 && cur_అడ్డువరుస < nrow)
+		    సందేశం_putchar('\n');
+		++cur_అడ్డువరుస;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		while (msg_col % width)
-		    msg_putchar(' ');
+		అయితే (సందేశం_నిలువు % వెడల్పు)
+		    సందేశం_putchar(' ');
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    ఒకవేళ (సందేశం_నిలువు > 0)
 	    {
-		if (cur_row < nrow)
-		    msg_putchar('\n');
-		++cur_row;
+		ఒకవేళ (cur_అడ్డువరుస < nrow)
+		    సందేశం_putchar('\n');
+		++cur_అడ్డువరుస;
 	    }
 	}
     }
 }
 
-    void
-list_version(void)
+    శూన్య
+list_సంస్కరణ(శూన్య)
 {
-    int		i;
-    int		first;
-    char	*s = "";
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		మొదటి;
+    అక్షరం	*s = "";
 
     /*
      * When adding features here, don't forget to update the list of
      * internal variables in eval.c!
      */
-    init_longVersion();
-    msg(longVersion);
-#ifdef MSWIN
+    init_long_సంస్కరణ();
+    సందేశం(long_సంస్కరణ);
+#నిర్వచితమైతే MSWIN
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
+#    ఒకవేళ defined(_M_ARM64) || defined(_M_ARM64EC)
+     సందేశం_puts(_("\nMS-Windows ARM64 GUI/console version"));
+#    లేకపోతే
+     సందేశం_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
+#   లేకపోతే
+    సందేశం_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  లేకపోతే
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI version"));
+#    ఒకవేళ defined(_M_ARM64) || defined(_M_ARM64EC)
+     సందేశం_puts(_("\nMS-Windows ARM64 GUI version"));
+#    లేకపోతే
+     సందేశం_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI version"));
+#   లేకపోతే
+    సందేశం_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
-    msg_puts(_(" with OLE support"));
+    సందేశం_puts(_(" with OLE support"));
 #  endif
-# else
+# లేకపోతే
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
-    msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
-    msg_puts(_("\nMS-Windows 64-bit console version"));
+#   ఒకవేళ defined(_M_ARM64) || defined(_M_ARM64EC)
+    సందేశం_puts(_("\nMS-Windows ARM64 console version"));
+#   లేకపోతే
+    సందేశం_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
-    msg_puts(_("\nMS-Windows 32-bit console version"));
+#  లేకపోతే
+    సందేశం_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
-#endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
-    msg_puts(_("\nmacOS version"));
-# else
-    msg_puts(_("\nmacOS version w/o darwin feat."));
+#అయితే_ముగింపు
+#ఒకవేళ defined(MACOS_X)
+# ఒకవేళ defined(MACOS_X_DARWIN)
+    సందేశం_puts(_("\nmacOS version"));
+# లేకపోతే
+    సందేశం_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
-    msg_puts(" - arm64");
+# ఒకవేళ defined(__arm64__)
+    సందేశం_puts(" - arm64");
 # elif defined(__x86_64__)
-    msg_puts(" - x86_64");
+    సందేశం_puts(" - x86_64");
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef VMS
-    msg_puts(_("\nOpenVMS (build) arch, version"));
+#నిర్వచితమైతే VMS
+    సందేశం_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    ఒకవేళ (*compiled_arch != NUL)
     {
-	msg_puts(": ");
-	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	సందేశం_puts(": ");
+	సందేశం_puts((అక్షరం *)compiled_arch);
+	ఒకవేళ (*compiled_vers != NUL)
 	{
-	    msg_puts(", ");
-	    msg_puts((char *)compiled_vers);
+	    సందేశం_puts(", ");
+	    సందేశం_puts((అక్షరం *)compiled_vers);
 	}
     }
 
 # endif
 
-#endif
+#అయితే_ముగింపు
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    ఒకవేళ (included_patches[0] != 0)
     {
-	msg_puts(_("\nIncluded patches: "));
-	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	సందేశం_puts(_("\nIncluded patches: "));
+	మొదటి = -1;
+	i = (పూర్ణాంకం)ARRAY_నిడివి(included_patches) - 1;
+	అయితే (--i >= 0)
 	{
-	    if (first < 0)
-		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    ఒకవేళ (మొదటి < 0)
+		మొదటి = included_patches[i];
+	    ఒకవేళ (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
-		msg_puts(s);
+		సందేశం_puts(s);
 		s = ", ";
-		msg_outnum((long)first);
-		if (first != included_patches[i])
+		సందేశం_outnum((దీర్ఘ)మొదటి);
+		ఒకవేళ (మొదటి != included_patches[i])
 		{
-		    msg_puts("-");
-		    msg_outnum((long)included_patches[i]);
+		    సందేశం_puts("-");
+		    సందేశం_outnum((దీర్ఘ)included_patches[i]);
 		}
-		first = -1;
+		మొదటి = -1;
 	    }
 	}
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    ఒకవేళ (extra_patches[0] != ఖాళీ)
     {
-	msg_puts(_("\nExtra patches: "));
+	సందేశం_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	కొరకు (i = 0; extra_patches[i] != ఖాళీ; ++i)
 	{
-	    msg_puts(s);
+	    సందేశం_puts(s);
 	    s = ", ";
-	    msg_puts(extra_patches[i]);
+	    సందేశం_puts(extra_patches[i]);
 	}
     }
 
-#ifdef MODIFIED_BY
-    msg_puts("\n");
-    msg_puts(_("Modified by "));
-    msg_puts(MODIFIED_BY);
-#endif
+#నిర్వచితమైతే MODIFIED_BY
+    సందేశం_puts("\n");
+    సందేశం_puts(_("Modified by "));
+    సందేశం_puts(MODIFIED_BY);
+#అయితే_ముగింపు
 
-#ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+#నిర్వచితమైతే HAVE_PATHDEF
+    ఒకవేళ (*compiled_user != NUL || *compiled_sys != NUL)
     {
-	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	సందేశం_puts(_("\nCompiled "));
+	ఒకవేళ (*compiled_user != NUL)
 	{
-	    msg_puts(_("by "));
-	    msg_puts((char *)compiled_user);
+	    సందేశం_puts(_("by "));
+	    సందేశం_puts((అక్షరం *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	ఒకవేళ (*compiled_sys != NUL)
 	{
-	    msg_puts("@");
-	    msg_puts((char *)compiled_sys);
+	    సందేశం_puts("@");
+	    సందేశం_puts((అక్షరం *)compiled_sys);
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_HUGE)
-    msg_puts(_("\nHuge version "));
-#elif defined(FEAT_NORMAL)
-    msg_puts(_("\nNormal version "));
-#else
-    msg_puts(_("\nTiny version "));
-#endif
-#if !defined(FEAT_GUI)
-    msg_puts(_("without GUI."));
-#elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
-    msg_puts(_("with GTK4 GUI."));
+#ఒకవేళ defined(FEAT_HUGE)
+    సందేశం_puts(_("\nHuge version "));
+#లేదావేళ defined(FEAT_సాధారణ)
+    సందేశం_puts(_("\nNormal version "));
+#లేకపోతే
+    సందేశం_puts(_("\nTiny version "));
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_GUI)
+    సందేశం_puts(_("without GUI."));
+#లేదావేళ defined(FEAT_GUI_GTK)
+# ఒకవేళ defined(USE_GTK4)
+    సందేశం_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
-    msg_puts(_("with GTK3 GUI."));
+    సందేశం_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
-    msg_puts(_("with GTK2-GNOME GUI."));
-# else
-    msg_puts(_("with GTK2 GUI."));
+    సందేశం_puts(_("with GTK2-GNOME GUI."));
+# లేకపోతే
+    సందేశం_puts(_("with GTK2 GUI."));
 # endif
-#elif defined(FEAT_GUI_MOTIF)
-    msg_puts(_("with X11-Motif GUI."));
-#elif defined(FEAT_GUI_HAIKU)
-    msg_puts(_("with Haiku GUI."));
-#elif defined(FEAT_GUI_PHOTON)
-    msg_puts(_("with Photon GUI."));
-#elif defined(MSWIN)
-    msg_puts(_("with GUI."));
-#endif
-    version_msg(_("  Features included (+) or not (-):\n"));
+#లేదావేళ defined(FEAT_GUI_MOTIF)
+    సందేశం_puts(_("with X11-Motif GUI."));
+#లేదావేళ defined(FEAT_GUI_HAIKU)
+    సందేశం_puts(_("with Haiku GUI."));
+#లేదావేళ defined(FEAT_GUI_PHOTON)
+    సందేశం_puts(_("with Photon GUI."));
+#లేదావేళ defined(MSWIN)
+    సందేశం_puts(_("with GUI."));
+#అయితే_ముగింపు
+    సంస్కరణ_సందేశం(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
-	msg_putchar('\n');
+    ఒకవేళ (సందేశం_నిలువు > 0)
+	సందేశం_putchar('\n');
 
-#ifdef SYS_VIMRC_FILE
-    version_msg(_("   system vimrc file: \""));
-    version_msg(SYS_VIMRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_VIMRC_FILE
-    version_msg(_("     user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_VIMRC_FILE2
-    version_msg(_(" 2nd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE2);
-    version_msg("\"\n");
-#endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-    version_msg(_(" 4th user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
-#elif defined(USR_VIMRC_FILE3)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-#elif defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
-#endif
-#ifdef USR_EXRC_FILE
-    version_msg(_("      user exrc file: \""));
-    version_msg(USR_EXRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_EXRC_FILE2
-    version_msg(_("  2nd user exrc file: \""));
-    version_msg(USR_EXRC_FILE2);
-    version_msg("\"\n");
-#endif
-#ifdef FEAT_GUI
+#నిర్వచితమైతే SYS_VIMRC_FILE
+    సంస్కరణ_సందేశం(_("   system vimrc file: \""));
+    సంస్కరణ_సందేశం(SYS_VIMRC_FILE);
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_VIMRC_FILE
+    సంస్కరణ_సందేశం(_("     user vimrc file: \""));
+    సంస్కరణ_సందేశం(USR_VIMRC_FILE);
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_VIMRC_FILE2
+    సంస్కరణ_సందేశం(_(" 2nd user vimrc file: \""));
+    సంస్కరణ_సందేశం(USR_VIMRC_FILE2);
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#ఒకవేళ defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+    సంస్కరణ_సందేశం(_(" 3rd user vimrc file: \""));
+    సంస్కరణ_సందేశం(USR_VIMRC_FILE3);
+    సంస్కరణ_సందేశం("\"\n");
+    సంస్కరణ_సందేశం(_(" 4th user vimrc file: \""));
+    సంస్కరణ_సందేశం((అక్షరం *)(XDG_VIMRC_FILE));
+    సంస్కరణ_సందేశం("\"\n");
+#లేదావేళ defined(USR_VIMRC_FILE3)
+    సంస్కరణ_సందేశం(_(" 3rd user vimrc file: \""));
+    సంస్కరణ_సందేశం(USR_VIMRC_FILE3);
+    సంస్కరణ_సందేశం("\"\n");
+#లేదావేళ defined(XDG_VIMRC_FILE)
+    సంస్కరణ_సందేశం(_(" 3rd user vimrc file: \""));
+    సంస్కరణ_సందేశం((అక్షరం *)(XDG_VIMRC_FILE));
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_EXRC_FILE
+    సంస్కరణ_సందేశం(_("      user exrc file: \""));
+    సంస్కరణ_సందేశం(USR_EXRC_FILE);
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_EXRC_FILE2
+    సంస్కరణ_సందేశం(_("  2nd user exrc file: \""));
+    సంస్కరణ_సందేశం(USR_EXRC_FILE2);
+    సంస్కరణ_సందేశం("\"\n");
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
 # ifdef SYS_GVIMRC_FILE
-    version_msg(_("  system gvimrc file: \""));
-    version_msg(SYS_GVIMRC_FILE);
-    version_msg("\"\n");
+    సంస్కరణ_సందేశం(_("  system gvimrc file: \""));
+    సంస్కరణ_సందేశం(SYS_GVIMRC_FILE);
+    సంస్కరణ_సందేశం("\"\n");
 # endif
-    version_msg(_("    user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE);
-    version_msg("\"\n");
+    సంస్కరణ_సందేశం(_("    user gvimrc file: \""));
+    సంస్కరణ_సందేశం(USR_GVIMRC_FILE);
+    సంస్కరణ_సందేశం("\"\n");
 # ifdef USR_GVIMRC_FILE2
-    version_msg(_("2nd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE2);
-    version_msg("\"\n");
+    సంస్కరణ_సందేశం(_("2nd user gvimrc file: \""));
+    సంస్కరణ_సందేశం(USR_GVIMRC_FILE2);
+    సంస్కరణ_సందేశం("\"\n");
 # endif
 # ifdef USR_GVIMRC_FILE3
-    version_msg(_("3rd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE3);
-    version_msg("\"\n");
+    సంస్కరణ_సందేశం(_("3rd user gvimrc file: \""));
+    సంస్కరణ_సందేశం(USR_GVIMRC_FILE3);
+    సంస్కరణ_సందేశం("\"\n");
 # endif
-#endif
-    version_msg(_("       defaults file: \""));
-    version_msg(VIM_DEFAULTS_FILE);
-    version_msg("\"\n");
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+    సంస్కరణ_సందేశం(_("       defaults file: \""));
+    సంస్కరణ_సందేశం(VIM_DEFAULTS_FILE);
+    సంస్కరణ_సందేశం("\"\n");
+#నిర్వచితమైతే FEAT_GUI
 # ifdef SYS_MENU_FILE
-    version_msg(_("    system menu file: \""));
-    version_msg(SYS_MENU_FILE);
-    version_msg("\"\n");
+    సంస్కరణ_సందేశం(_("    system menu file: \""));
+    సంస్కరణ_సందేశం(SYS_MENU_FILE);
+    సంస్కరణ_సందేశం("\"\n");
 # endif
-#endif
-#ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_PATHDEF
+    ఒకవేళ (*default_vim_dir != NUL)
     {
-	version_msg(_("  fall-back for $VIM: \""));
-	version_msg((char *)default_vim_dir);
-	version_msg("\"\n");
+	సంస్కరణ_సందేశం(_("  fall-back for $VIM: \""));
+	సంస్కరణ_సందేశం((అక్షరం *)default_vim_dir);
+	సంస్కరణ_సందేశం("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    ఒకవేళ (*default_vimruntime_dir != NUL)
     {
-	version_msg(_(" f-b for $VIMRUNTIME: \""));
-	version_msg((char *)default_vimruntime_dir);
-	version_msg("\"\n");
+	సంస్కరణ_సందేశం(_(" f-b for $VIMRUNTIME: \""));
+	సంస్కరణ_సందేశం((అక్షరం *)default_vimruntime_dir);
+	సంస్కరణ_సందేశం("\"\n");
     }
-    version_msg(_("Compilation: "));
-    version_msg((char *)all_cflags);
-    version_msg("\n");
+    సంస్కరణ_సందేశం(_("Compilation: "));
+    సంస్కరణ_సందేశం((అక్షరం *)all_cflags);
+    సంస్కరణ_సందేశం("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    ఒకవేళ (*compiler_సంస్కరణ != NUL)
     {
-	version_msg(_("Compiler: "));
-	version_msg((char *)compiler_version);
-	version_msg("\n");
+	సంస్కరణ_సందేశం(_("Compiler: "));
+	సంస్కరణ_సందేశం((అక్షరం *)compiler_సంస్కరణ);
+	సంస్కరణ_సందేశం("\n");
     }
 # endif
-    version_msg(_("Linking: "));
-    version_msg((char *)all_lflags);
-#endif
-#ifdef DEBUG
-    version_msg("\n");
-    version_msg(_("  DEBUG BUILD"));
-#endif
+    సంస్కరణ_సందేశం(_("Linking: "));
+    సంస్కరణ_సందేశం((అక్షరం *)all_lflags);
+#అయితే_ముగింపు
+#నిర్వచితమైతే DEBUG
+    సంస్కరణ_సందేశం("\n");
+    సంస్కరణ_సందేశం(_("  DEBUG BUILD"));
+#అయితే_ముగింపు
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+స్థిర శూన్య do_intro_పంక్తి(పూర్ణాంకం అడ్డువరుస, char_u *mesg, పూర్ణాంకం కూడు_సంస్కరణ, పూర్ణాంకం attr);
+స్థిర శూన్య intro_సందేశం(పూర్ణాంకం colon);
 
 /*
  * Show the intro message when not editing a file.
  */
-    void
-maybe_intro_message(void)
+    శూన్య
+maybe_intro_సందేశం(శూన్య)
 {
-    if (BUFEMPTY()
-	    && curbuf->b_fname == NULL
-	    && firstwin->w_next == NULL
-	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
-	intro_message(FALSE);
+    ఒకవేళ (BUFEMPTY()
+	    && curbuf->b_fname == ఖాళీ
+	    && firstwin->w_తదుపరి == ఖాళీ
+	    && vim_strchr(p_shm, SHM_INTRO) == ఖాళీ)
+	intro_సందేశం(FALSE);
 }
 
 /*
@@ -3690,24 +3690,24 @@ maybe_intro_message(void)
  * Only used when starting Vim on an empty file, without a file name.
  * Or with the ":intro" command (for Sven :-).
  */
-    static void
-intro_message(
-    int		colon)		// TRUE for ":intro"
+    స్థిర శూన్య
+intro_సందేశం(
+    పూర్ణాంకం		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
-    char	*p;
-    static char	*(lines[]) =
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		అడ్డువరుస;
+    పూర్ణాంకం		blanklines;
+    పూర్ణాంకం		sponsor;
+    అక్షరం	*p;
+    స్థిర అక్షరం	*(పంక్తులు[]) =
     {
 	N_("VIM - Vi IMproved"),
 	"",
 	N_("version "),
 	N_("by Bram Moolenaar et al."),
-#ifdef MODIFIED_BY
+#నిర్వచితమైతే MODIFIED_BY
 	" ",
-#endif
+#అయితే_ముగింపు
 	N_("Vim is open source and freely distributable"),
 	"",
 	N_("Help poor children in Uganda!"),
@@ -3716,173 +3716,173 @@ intro_message(
 	N_("type  :q<Enter>               to exit         "),
 	N_("type  :help<Enter>  or  <F1>  for on-line help"),
 	N_("type  :help version9<Enter>   for version info"),
-	NULL,
+	ఖాళీ,
 	"",
 	N_("Running in Vi compatible mode"),
 	N_("type  :set nocp<Enter>        for Vim defaults"),
 	N_("type  :help cp-default<Enter> for info on this"),
     };
-#ifdef FEAT_GUI
-    static char	*(gui_lines[]) =
+#నిర్వచితమైతే FEAT_GUI
+    స్థిర అక్షరం	*(gui_పంక్తులు[]) =
     {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	ఖాళీ,
+	ఖాళీ,
+	ఖాళీ,
+	ఖాళీ,
 # ifdef MODIFIED_BY
-	NULL,
+	ఖాళీ,
 # endif
-	NULL,
-	NULL,
-	NULL,
+	ఖాళీ,
+	ఖాళీ,
+	ఖాళీ,
 	N_("menu  Help->Orphans           for information    "),
-	NULL,
+	ఖాళీ,
 	N_("Running modeless, typed text is inserted"),
 	N_("menu  Edit->Global Settings->Toggle Insert Mode  "),
 	N_("                              for two modes      "),
-	NULL,
-	NULL,
-	NULL,
+	ఖాళీ,
+	ఖాళీ,
+	ఖాళీ,
 	N_("menu  Edit->Global Settings->Toggle Vi Compatible"),
 	N_("                              for Vim defaults   "),
     };
-#endif
+#అయితే_ముగింపు
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (పూర్ణాంకం)అడ్డువరుసలు - (ARRAY_నిడివి(పంక్తులు) - 1);
+    ఒకవేళ (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
-	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    ఒకవేళ (p_ls > 1)
+	blanklines -= అడ్డువరుసలు - topframe->fr_ఎత్తు;
+    ఒకవేళ (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (పూర్ణాంకం)సమయం(ఖాళీ);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
-    row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    అడ్డువరుస = blanklines / 2;
+    ఒకవేళ ((అడ్డువరుస >= 2 && topframe->fr_వెడల్పు >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(పంక్తులు); ++i)
 	{
-	    p = lines[i];
-#ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
-		p = gui_lines[i];
-#endif
-	    if (p == NULL)
+	    p = పంక్తులు[i];
+#నిర్వచితమైతే FEAT_GUI
+	    ఒకవేళ (p_im && gui.లోపల_use && gui_పంక్తులు[i] != ఖాళీ)
+		p = gui_పంక్తులు[i];
+#అయితే_ముగింపు
+	    ఒకవేళ (p == ఖాళీ)
 	    {
-		if (!p_cp)
-		    break;
-		continue;
+		ఒకవేళ (!p_cp)
+		    ఆపు;
+		కొనసాగు;
 	    }
-	    if (sponsor != 0)
+	    ఒకవేళ (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		ఒకవేళ (అక్షరశ్రేణి_శోధన(p, "children") != ఖాళీ)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		లేకపోతే ఒకవేళ (అక్షరశ్రేణి_శోధన(p, "Kuwasha") != ఖాళీ)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		లేకపోతే ఒకవేళ (అక్షరశ్రేణి_శోధన(p, "Orphans") != ఖాళీ)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
-		do_intro_line(row, (char_u *)_(p), i == 2, 0);
-	    ++row;
+	    ఒకవేళ (*p != NUL)
+		do_intro_పంక్తి(అడ్డువరుస, (char_u *)_(p), i == 2, 0);
+	    ++అడ్డువరుస;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
-	msg_row = row;
+    ఒకవేళ (colon)
+	సందేశం_అడ్డువరుస = అడ్డువరుస;
 }
 
-    static void
-do_intro_line(
-    int		row,
+    స్థిర శూన్య
+do_intro_పంక్తి(
+    పూర్ణాంకం		అడ్డువరుస,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    పూర్ణాంకం		కూడు_సంస్కరణ,
+    పూర్ణాంకం		attr)
 {
     char_u	vers[20];
-    int		col;
+    పూర్ణాంకం		నిలువు;
     char_u	*p;
-    int		l;
-    int		clen;
-#ifdef MODIFIED_BY
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		clen;
+#నిర్వచితమైతే MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    ఒకవేళ (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (పూర్ణాంకం)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
-#endif
+#అయితే_ముగింపు
 
     // Center the message horizontally.
-    col = vim_strsize(mesg);
-    if (add_version)
+    నిలువు = vim_strsize(mesg);
+    ఒకవేళ (కూడు_సంస్కరణ)
     {
-	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	STRCPY(vers, medium_సంస్కరణ);
+	ఒకవేళ (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    ఒకవేళ (సురక్షిత_isalpha((పూర్ణాంకం)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
-		sprintf((char *)vers + len, ".%d%s", highest_patch(),
-							 mediumVersion + len);
+		పూర్ణాంకం len = (సురక్షిత_isalpha((పూర్ణాంకం)vers[4])) ? 5 : 4;
+		sprintf((అక్షరం *)vers + len, ".%d%s", highest_patch(),
+							 medium_సంస్కరణ + len);
 	    }
-	    else
-		sprintf((char *)vers + 3, ".%d", highest_patch());
+	    లేకపోతే
+		sprintf((అక్షరం *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	నిలువు += (పూర్ణాంకం)STRLEN(vers);
     }
-    col = (topframe->fr_width - col) / 2;
-    if (col < 0)
-	col = 0;
+    నిలువు = (topframe->fr_వెడల్పు - నిలువు) / 2;
+    ఒకవేళ (నిలువు < 0)
+	నిలువు = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    కొరకు (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	కొరకు (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    లేకపోతే
 		clen += byte2cells(p[l]);
 	}
-	screen_puts_len(p, l, row, col + firstwin->w_wincol,
+	screen_puts_len(p, l, అడ్డువరుస, నిలువు + firstwin->w_wincol,
 		*p == '<' ? HL_ATTR(HLF_8) : attr);
-	col += clen;
+	నిలువు += clen;
     }
 
     // Add the version number to the version line.
-    if (add_version)
-	screen_puts(vers, row, col + firstwin->w_wincol, 0);
+    ఒకవేళ (కూడు_సంస్కరణ)
+	screen_puts(vers, అడ్డువరుస, నిలువు + firstwin->w_wincol, 0);
 }
 
 /*
  * ":intro": clear screen, display intro screen and wait for return.
  */
-    void
-ex_intro(exarg_T *eap UNUSED)
+    శూన్య
+ex_intro(exarg_T *eap వాడని)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     draw_tabpanel();
-#endif
-    intro_message(TRUE);
+#అయితే_ముగింపు
+    intro_సందేశం(TRUE);
     wait_return(TRUE);
 }

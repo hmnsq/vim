@@ -1,219 +1,219 @@
-#include "vterm_internal.h"
+#అన్తర్భావ "vterm_internal.h"
 
-#define UNICODE_INVALID 0xFFFD
+#నిర్వచించు UNICODE_INVALID 0xFFFD
 
-#if defined(DEBUG) && DEBUG > 1
+#ఒకవేళ defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
-#endif
+#అయితే_ముగింపు
 
-struct UTF8DecoderData {
+నిర్మాణం UTF8_Decoder_దత్తాంశం {
   // number of bytes remaining in this codepoint
-  int bytes_remaining;
+  పూర్ణాంకం బైట్లు_మిగిలిన;
 
   // number of bytes total in this codepoint once it's finished
   // (for detecting overlongs)
-  int bytes_total;
+  పూర్ణాంకం బైట్లు_మొత్తం;
 
-  int this_cp;
+  పూర్ణాంకం this_cp;
 };
 
-static void init_utf8(VTermEncoding *enc UNUSED, void *data_)
+స్థిర శూన్య init_utf8(VTermEncoding *enc వాడని, శూన్య *దత్తాంశం_4)
 {
-  struct UTF8DecoderData *data = data_;
+  నిర్మాణం UTF8_Decoder_దత్తాంశం *దత్తాంశం = దత్తాంశం_4;
 
-  data->bytes_remaining = 0;
-  data->bytes_total     = 0;
+  దత్తాంశం->బైట్లు_మిగిలిన = 0;
+  దత్తాంశం->బైట్లు_మొత్తం     = 0;
 }
 
-static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
-                        uint32_t cp[], int *cpi, int cplen,
-                        const char bytes[], size_t *pos, size_t bytelen)
+స్థిర శూన్య decode_utf8(VTermEncoding *enc వాడని, శూన్య *దత్తాంశం_4,
+                        uint32_t cp[], పూర్ణాంకం *cpi, పూర్ణాంకం cplen,
+                        స్థిరరాశి అక్షరం బైట్లు[], size_t *pos, size_t bytelen)
 {
-  struct UTF8DecoderData *data = data_;
+  నిర్మాణం UTF8_Decoder_దత్తాంశం *దత్తాంశం = దత్తాంశం_4;
 
-#ifdef DEBUG_PRINT_UTF8
-  printf("BEGIN UTF-8\n");
-#endif
+#నిర్వచితమైతే DEBUG_PRINT_UTF8
+  రాయి("BEGIN UTF-8\n");
+#అయితే_ముగింపు
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+  కొరకు(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    గుర్తులేని అక్షరం c = బైట్లు[*pos];
 
-#ifdef DEBUG_PRINT_UTF8
-    printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
-#endif
+#నిర్వచితమైతే DEBUG_PRINT_UTF8
+    రాయి(" pos=%zd c=%02x rem=%d\n", *pos, c, దత్తాంశం->బైట్లు_మిగిలిన);
+#అయితే_ముగింపు
 
-    if(c < 0x20) // C0
-      return;
+    ఒకవేళ(c < 0x20) // C0
+      తిరిగి;
 
-    else if(c >= 0x20 && c < 0x7f) {
-      if(data->bytes_remaining) {
-        data->bytes_remaining = 0;
+    లేకపోతే ఒకవేళ(c >= 0x20 && c < 0x7f) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన) {
+        దత్తాంశం->బైట్లు_మిగిలిన = 0;
         cp[(*cpi)++] = UNICODE_INVALID;
 	// VIM: avoid going over the end
-	if (*cpi >= cplen)
-	  break;
+	ఒకవేళ (*cpi >= cplen)
+	  ఆపు;
       }
       cp[(*cpi)++] = c;
-#ifdef DEBUG_PRINT_UTF8
-      printf(" UTF-8 char: U+%04x\n", c);
-#endif
+#నిర్వచితమైతే DEBUG_PRINT_UTF8
+      రాయి(" UTF-8 char: U+%04x\n", c);
+#అయితే_ముగింపు
     }
 
-    else if(c == 0x7f) // DEL
-      return;
+    లేకపోతే ఒకవేళ(c == 0x7f) // DEL
+      తిరిగి;
 
-    else if(c >= 0x80 && c < 0xc0) {
-      if(!data->bytes_remaining) {
+    లేకపోతే ఒకవేళ(c >= 0x80 && c < 0xc0) {
+      ఒకవేళ(!దత్తాంశం->బైట్లు_మిగిలిన) {
         cp[(*cpi)++] = UNICODE_INVALID;
-        continue;
+        కొనసాగు;
       }
 
-      data->this_cp <<= 6;
-      data->this_cp |= c & 0x3f;
-      data->bytes_remaining--;
+      దత్తాంశం->this_cp <<= 6;
+      దత్తాంశం->this_cp |= c & 0x3f;
+      దత్తాంశం->బైట్లు_మిగిలిన--;
 
-      if(!data->bytes_remaining) {
-#ifdef DEBUG_PRINT_UTF8
-        printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
-#endif
+      ఒకవేళ(!దత్తాంశం->బైట్లు_మిగిలిన) {
+#నిర్వచితమైతే DEBUG_PRINT_UTF8
+        రాయి(" UTF-8 raw char U+%04x bytelen=%d ", దత్తాంశం->this_cp, దత్తాంశం->బైట్లు_మొత్తం);
+#అయితే_ముగింపు
         // Check for overlong sequences
-        switch(data->bytes_total) {
-        case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
-          break;
-        case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
-          break;
-        case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
-          break;
+        ఎంపిక(దత్తాంశం->బైట్లు_మొత్తం) {
+        స్థితి 2:
+          ఒకవేళ(దత్తాంశం->this_cp <  0x0080) దత్తాంశం->this_cp = UNICODE_INVALID;
+          ఆపు;
+        స్థితి 3:
+          ఒకవేళ(దత్తాంశం->this_cp <  0x0800) దత్తాంశం->this_cp = UNICODE_INVALID;
+          ఆపు;
+        స్థితి 4:
+          ఒకవేళ(దత్తాంశం->this_cp < 0x10000) దత్తాంశం->this_cp = UNICODE_INVALID;
+          ఆపు;
+        స్థితి 5:
+          ఒకవేళ(దత్తాంశం->this_cp < 0x200000) దత్తాంశం->this_cp = UNICODE_INVALID;
+          ఆపు;
+        స్థితి 6:
+          ఒకవేళ(దత్తాంశం->this_cp < 0x4000000) దత్తాంశం->this_cp = UNICODE_INVALID;
+          ఆపు;
         }
         // Now look for plain invalid ones
-        if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
-           data->this_cp == 0xFFFE ||
-           data->this_cp == 0xFFFF)
-          data->this_cp = UNICODE_INVALID;
-#ifdef DEBUG_PRINT_UTF8
-        printf(" char: U+%04x\n", data->this_cp);
-#endif
-        cp[(*cpi)++] = data->this_cp;
+        ఒకవేళ((దత్తాంశం->this_cp >= 0xD800 && దత్తాంశం->this_cp <= 0xDFFF) ||
+           దత్తాంశం->this_cp == 0xFFFE ||
+           దత్తాంశం->this_cp == 0xFFFF)
+          దత్తాంశం->this_cp = UNICODE_INVALID;
+#నిర్వచితమైతే DEBUG_PRINT_UTF8
+        రాయి(" char: U+%04x\n", దత్తాంశం->this_cp);
+#అయితే_ముగింపు
+        cp[(*cpi)++] = దత్తాంశం->this_cp;
       }
     }
 
-    else if(c >= 0xc0 && c < 0xe0) {
-      if(data->bytes_remaining)
+    లేకపోతే ఒకవేళ(c >= 0xc0 && c < 0xe0) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x1f;
-      data->bytes_total = 2;
-      data->bytes_remaining = 1;
+      దత్తాంశం->this_cp = c & 0x1f;
+      దత్తాంశం->బైట్లు_మొత్తం = 2;
+      దత్తాంశం->బైట్లు_మిగిలిన = 1;
     }
 
-    else if(c >= 0xe0 && c < 0xf0) {
-      if(data->bytes_remaining)
+    లేకపోతే ఒకవేళ(c >= 0xe0 && c < 0xf0) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x0f;
-      data->bytes_total = 3;
-      data->bytes_remaining = 2;
+      దత్తాంశం->this_cp = c & 0x0f;
+      దత్తాంశం->బైట్లు_మొత్తం = 3;
+      దత్తాంశం->బైట్లు_మిగిలిన = 2;
     }
 
-    else if(c >= 0xf0 && c < 0xf8) {
-      if(data->bytes_remaining)
+    లేకపోతే ఒకవేళ(c >= 0xf0 && c < 0xf8) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x07;
-      data->bytes_total = 4;
-      data->bytes_remaining = 3;
+      దత్తాంశం->this_cp = c & 0x07;
+      దత్తాంశం->బైట్లు_మొత్తం = 4;
+      దత్తాంశం->బైట్లు_మిగిలిన = 3;
     }
 
-    else if(c >= 0xf8 && c < 0xfc) {
-      if(data->bytes_remaining)
+    లేకపోతే ఒకవేళ(c >= 0xf8 && c < 0xfc) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x03;
-      data->bytes_total = 5;
-      data->bytes_remaining = 4;
+      దత్తాంశం->this_cp = c & 0x03;
+      దత్తాంశం->బైట్లు_మొత్తం = 5;
+      దత్తాంశం->బైట్లు_మిగిలిన = 4;
     }
 
-    else if(c >= 0xfc && c < 0xfe) {
-      if(data->bytes_remaining)
+    లేకపోతే ఒకవేళ(c >= 0xfc && c < 0xfe) {
+      ఒకవేళ(దత్తాంశం->బైట్లు_మిగిలిన)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x01;
-      data->bytes_total = 6;
-      data->bytes_remaining = 5;
+      దత్తాంశం->this_cp = c & 0x01;
+      దత్తాంశం->బైట్లు_మొత్తం = 6;
+      దత్తాంశం->బైట్లు_మిగిలిన = 5;
     }
 
-    else {
+    లేకపోతే {
       cp[(*cpi)++] = UNICODE_INVALID;
     }
   }
 }
 
-static VTermEncoding encoding_utf8 = {
+స్థిర VTermEncoding encoding_utf8 = {
   &init_utf8,  // init
   &decode_utf8 // decode
 };
 
-static void decode_usascii(VTermEncoding *enc UNUSED, void *data UNUSED,
-                           uint32_t cp[], int *cpi, int cplen,
-                           const char bytes[], size_t *pos, size_t bytelen)
+స్థిర శూన్య decode_usascii(VTermEncoding *enc వాడని, శూన్య *దత్తాంశం వాడని,
+                           uint32_t cp[], పూర్ణాంకం *cpi, పూర్ణాంకం cplen,
+                           స్థిరరాశి అక్షరం బైట్లు[], size_t *pos, size_t bytelen)
 {
-  int is_gr = bytes[*pos] & 0x80;
+  పూర్ణాంకం is_gr = బైట్లు[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  కొరకు(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    గుర్తులేని అక్షరం c = బైట్లు[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    ఒకవేళ(c < 0x20 || c == 0x7f || c >= 0x80)
+      తిరిగి;
 
     cp[(*cpi)++] = c;
   }
 }
 
-static VTermEncoding encoding_usascii = {
-  NULL,           // init
+స్థిర VTermEncoding encoding_usascii = {
+  ఖాళీ,           // init
   &decode_usascii // decode
 };
 
-struct StaticTableEncoding {
-  const VTermEncoding enc;
-  const uint32_t chars[128];
+నిర్మాణం Static_పట్టిక_Encoding {
+  స్థిరరాశి VTermEncoding enc;
+  స్థిరరాశి uint32_t chars[128];
 };
 
-static void decode_table(VTermEncoding *enc, void *data UNUSED,
-                         uint32_t cp[], int *cpi, int cplen,
-                         const char bytes[], size_t *pos, size_t bytelen)
+స్థిర శూన్య decode_పట్టిక(VTermEncoding *enc, శూన్య *దత్తాంశం వాడని,
+                         uint32_t cp[], పూర్ణాంకం *cpi, పూర్ణాంకం cplen,
+                         స్థిరరాశి అక్షరం బైట్లు[], size_t *pos, size_t bytelen)
 {
-  struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
-  int is_gr = bytes[*pos] & 0x80;
+  నిర్మాణం Static_పట్టిక_Encoding *పట్టిక = (నిర్మాణం Static_పట్టిక_Encoding *)enc;
+  పూర్ణాంకం is_gr = బైట్లు[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  కొరకు(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    గుర్తులేని అక్షరం c = బైట్లు[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    ఒకవేళ(c < 0x20 || c == 0x7f || c >= 0x80)
+      తిరిగి;
 
-    if(table->chars[c])
-      cp[(*cpi)++] = table->chars[c];
-    else
+    ఒకవేళ(పట్టిక->chars[c])
+      cp[(*cpi)++] = పట్టిక->chars[c];
+    లేకపోతే
       cp[(*cpi)++] = c;
   }
 }
 
-#include "encoding/DECdrawing.inc"
-#include "encoding/uk.inc"
+#అన్తర్భావ "encoding/DECdrawing.inc"
+#అన్తర్భావ "encoding/uk.inc"
 
-static struct {
+స్థిర నిర్మాణం {
   VTermEncodingType type;
-  char designation;
+  అక్షరం designation;
   VTermEncoding *enc;
 }
 encodings[] = {
@@ -221,14 +221,14 @@ encodings[] = {
   { ENC_SINGLE_94, '0', (VTermEncoding*)&encoding_DECdrawing },
   { ENC_SINGLE_94, 'A', (VTermEncoding*)&encoding_uk },
   { ENC_SINGLE_94, 'B', &encoding_usascii },
-  { 0, 0, NULL },
+  { 0, 0, ఖాళీ },
 };
 
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, అక్షరం designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
-    if(encodings[i].type == type && encodings[i].designation == designation)
-      return encodings[i].enc;
-  return NULL;
+  కొరకు(పూర్ణాంకం i = 0; encodings[i].designation; i++)
+    ఒకవేళ(encodings[i].type == type && encodings[i].designation == designation)
+      తిరిగి encodings[i].enc;
+  తిరిగి ఖాళీ;
 }

@@ -13,22 +13,22 @@
  * caused by including both the X11 and Carbon header files.
  */
 
-#define NO_X11_INCLUDES
+#నిర్వచించు NO_X11_INCLUDES
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#include <CoreServices/CoreServices.h>
+#అన్తర్భావ <CoreServices/CoreServices.h>
 
 
-#if defined(MACOS_CONVERT)
+#ఒకవేళ defined(MACOS_CONVERT)
 
-static char_u	    *mac_utf16_to_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
-static UniChar	    *mac_utf8_to_utf16(char_u *from, size_t fromLen, size_t *actualLen);
+స్థిర char_u	    *mac_utf16_గమ్యం_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
+స్థిర UniChar	    *mac_utf8_గమ్యం_utf16(char_u *from, size_t fromLen, size_t *actualLen);
 
 // Converter for composing decomposed HFS+ file paths
-static TECObjectRef gPathConverter;
+స్థిర TECObjectRef g_మార్గం_Converter;
 // Converter used by mac_utf16_to_utf8
-static TECObjectRef gUTF16ToUTF8Converter;
+స్థిర TECObjectRef g_UTF16_గమ్యం_UTF8_Converter;
 
 /*
  * A Mac version of string_convert_ext() for special cases.
@@ -36,130 +36,130 @@ static TECObjectRef gUTF16ToUTF8Converter;
     char_u *
 mac_string_convert(
     char_u		*ptr,
-    int			len,
-    int			*lenp,
-    int			fail_on_error,
-    int			from_enc,
-    int			to_enc,
-    int			*unconvlenp)
+    పూర్ణాంకం			len,
+    పూర్ణాంకం			*lenp,
+    పూర్ణాంకం			fail_on_error,
+    పూర్ణాంకం			from_enc,
+    పూర్ణాంకం			గమ్యం_enc,
+    పూర్ణాంకం			*unconvlenp)
 {
     char_u		*retval, *d;
     CFStringRef		cfstr;
-    int			buflen, in, out, l, i;
+    పూర్ణాంకం			buflen, లోపల, బహిర్గతం, l, i;
     CFStringEncoding	from;
-    CFStringEncoding	to;
+    CFStringEncoding	గమ్యం;
 
-    switch (from_enc)
+    ఎంపిక (from_enc)
     {
-	case 'l':   from = kCFStringEncodingISOLatin1; break;
-	case 'm':   from = kCFStringEncodingMacRoman; break;
-	case 'u':   from = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	స్థితి 'l':   from = kCFStringEncodingISOLatin1; ఆపు;
+	స్థితి 'm':   from = kCFStringEncodingMacRoman; ఆపు;
+	స్థితి 'u':   from = kCFStringEncodingUTF8; ఆపు;
+	అప్రమేయ:    తిరిగి ఖాళీ;
     }
-    switch (to_enc)
+    ఎంపిక (గమ్యం_enc)
     {
-	case 'l':   to = kCFStringEncodingISOLatin1; break;
-	case 'm':   to = kCFStringEncodingMacRoman; break;
-	case 'u':   to = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	స్థితి 'l':   గమ్యం = kCFStringEncodingISOLatin1; ఆపు;
+	స్థితి 'm':   గమ్యం = kCFStringEncodingMacRoman; ఆపు;
+	స్థితి 'u':   గమ్యం = kCFStringEncodingUTF8; ఆపు;
+	అప్రమేయ:    తిరిగి ఖాళీ;
     }
 
-    if (unconvlenp != NULL)
+    ఒకవేళ (unconvlenp != ఖాళీ)
 	*unconvlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+    cfstr = CFString_Create_With_బైట్లు(ఖాళీ, ptr, len, from, 0);
 
-    if (cfstr == NULL)
+    ఒకవేళ (cfstr == ఖాళీ)
 	fprintf(stderr, "Encoding failed\n");
     // When conversion failed, try excluding bytes from the end, helps when
     // there is an incomplete byte sequence.  Only do up to 6 bytes to avoid
     // looping a long time when there really is something unconvertible.
-    while (cfstr == NULL && unconvlenp != NULL && len > 1 && *unconvlenp < 6)
+    అయితే (cfstr == ఖాళీ && unconvlenp != ఖాళీ && len > 1 && *unconvlenp < 6)
     {
 	--len;
 	++*unconvlenp;
-	cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+	cfstr = CFString_Create_With_బైట్లు(ఖాళీ, ptr, len, from, 0);
     }
-    if (cfstr == NULL)
-	return NULL;
+    ఒకవేళ (cfstr == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (to == kCFStringEncodingUTF8)
+    ఒకవేళ (గమ్యం == kCFStringEncodingUTF8)
 	buflen = len * 6 + 1;
-    else
+    లేకపోతే
 	buflen = len + 1;
     retval = alloc(buflen);
-    if (retval == NULL)
+    ఒకవేళ (retval == ఖాళీ)
     {
 	CFRelease(cfstr);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-#if 0
-    CFRange convertRange = CFRangeMake(0, CFStringGetLength(cfstr));
+#ఒకవేళ 0
+    CFRange convertRange = CFRangeMake(0, CFString_Get_నిడివి(cfstr));
     //  Determine output buffer size
-    CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, NULL, 0, (CFIndex *)&buflen);
-    retval = (buflen > 0) ? alloc(buflen) : NULL;
-    if (retval == NULL)
+    CFString_Get_బైట్లు(cfstr, convertRange, గమ్యం, ఖాళీ, FALSE, ఖాళీ, 0, (CFIndex *)&buflen);
+    retval = (buflen > 0) ? alloc(buflen) : ఖాళీ;
+    ఒకవేళ (retval == ఖాళీ)
     {
 	CFRelease(cfstr);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (lenp)
-	*lenp = buflen / sizeof(char_u);
+    ఒకవేళ (lenp)
+	*lenp = buflen / పరిమాణం(char_u);
 
-    if (!CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, retval, buflen, NULL))
-#endif
-    if (!CFStringGetCString(cfstr, (char *)retval, buflen, to))
+    ఒకవేళ (!CFString_Get_బైట్లు(cfstr, convertRange, గమ్యం, ఖాళీ, FALSE, retval, buflen, ఖాళీ))
+#అయితే_ముగింపు
+    ఒకవేళ (!CFStringGetCString(cfstr, (అక్షరం *)retval, buflen, గమ్యం))
     {
 	CFRelease(cfstr);
-	if (fail_on_error)
+	ఒకవేళ (fail_on_error)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
 	fprintf(stderr, "Trying char-by-char conversion...\n");
 	// conversion failed for the whole string, but maybe it will work
 	// for each character
-	for (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
+	కొరకు (d = retval, లోపల = 0, బహిర్గతం = 0; లోపల < len && బహిర్గతం < buflen - 1;)
 	{
-	    if (from == kCFStringEncodingUTF8)
-		l = utf_ptr2len(ptr + in);
-	    else
+	    ఒకవేళ (from == kCFStringEncodingUTF8)
+		l = utf_ptr2len(ptr + లోపల);
+	    లేకపోతే
 		l = 1;
-	    cfstr = CFStringCreateWithBytes(NULL, ptr + in, l, from, 0);
-	    if (cfstr == NULL)
+	    cfstr = CFString_Create_With_బైట్లు(ఖాళీ, ptr + లోపల, l, from, 0);
+	    ఒకవేళ (cfstr == ఖాళీ)
 	    {
 		*d++ = '?';
-		out++;
+		బహిర్గతం++;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (!CFStringGetCString(cfstr, (char *)d, buflen - out, to))
+		ఒకవేళ (!CFStringGetCString(cfstr, (అక్షరం *)d, buflen - బహిర్గతం, గమ్యం))
 		{
 		    *d++ = '?';
-		    out++;
+		    బహిర్గతం++;
 		}
-		else
+		లేకపోతే
 		{
 		    i = STRLEN(d);
 		    d += i;
-		    out += i;
+		    బహిర్గతం += i;
 		}
 		CFRelease(cfstr);
 	    }
-	    in += l;
+	    లోపల += l;
 	}
 	*d = NUL;
-	if (lenp != NULL)
-	    *lenp = out;
-	return retval;
+	ఒకవేళ (lenp != ఖాళీ)
+	    *lenp = బహిర్గతం;
+	తిరిగి retval;
     }
     CFRelease(cfstr);
-    if (lenp != NULL)
+    ఒకవేళ (lenp != ఖాళీ)
 	*lenp = STRLEN(retval);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -170,11 +170,11 @@ mac_string_convert(
  * output is in-place, "sizep" is adjusted.
  * Returns OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 macroman2enc(
     char_u	*ptr,
-    long	*sizep,
-    long	real_size)
+    దీర్ఘ	*sizep,
+    దీర్ఘ	real_కొలత)
 {
     CFStringRef		cfstr;
     CFRange		r;
@@ -182,31 +182,31 @@ macroman2enc(
 
     // MacRoman is an 8-bit encoding, no need to move bytes to
     // conv_rest[].
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len,
+    cfstr = CFString_Create_With_బైట్లు(ఖాళీ, ptr, len,
 						kCFStringEncodingMacRoman, 0);
     /*
      * If there is a conversion error, try using another
      * conversion.
      */
-    if (cfstr == NULL)
-	return FAIL;
+    ఒకవేళ (cfstr == ఖాళీ)
+	తిరిగి FAIL;
 
     r.location = 0;
-    r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    r.నిడివి = CFString_Get_నిడివి(cfstr);
+    ఒకవేళ (r.నిడివి != CFString_Get_బైట్లు(cfstr, r,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0, // no lossy conversion
 	    0, // not external representation
-	    ptr + *sizep, real_size - *sizep, &len))
+	    ptr + *sizep, real_కొలత - *sizep, &len))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	తిరిగి FAIL;
     }
     CFRelease(cfstr);
     mch_memmove(ptr, ptr + *sizep, len);
     *sizep = len;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -216,102 +216,102 @@ macroman2enc(
  * Unconverted rest in rest[*restlenp].
  * Returns OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 enc2macroman(
     char_u	*from,
     size_t	fromlen,
-    char_u	*to,
-    int		*tolenp,
-    int		maxtolen,
+    char_u	*గమ్యం,
+    పూర్ణాంకం		*tolenp,
+    పూర్ణాంకం		maxtolen,
     char_u	*rest,
-    int		*restlenp)
+    పూర్ణాంకం		*restlenp)
 {
     CFStringRef	cfstr;
     CFRange	r;
     CFIndex	l;
 
     *restlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+    cfstr = CFString_Create_With_బైట్లు(ఖాళీ, from, fromlen,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0);
-    while (cfstr == NULL && *restlenp < 3 && fromlen > 1)
+    అయితే (cfstr == ఖాళీ && *restlenp < 3 && fromlen > 1)
     {
 	rest[*restlenp++] = from[--fromlen];
-	cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+	cfstr = CFString_Create_With_బైట్లు(ఖాళీ, from, fromlen,
 		(enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 		0);
     }
-    if (cfstr == NULL)
-	return FAIL;
+    ఒకవేళ (cfstr == ఖాళీ)
+	తిరిగి FAIL;
 
     r.location = 0;
-    r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    r.నిడివి = CFString_Get_నిడివి(cfstr);
+    ఒకవేళ (r.నిడివి != CFString_Get_బైట్లు(cfstr, r,
 		kCFStringEncodingMacRoman,
 		0, // no lossy conversion
 		0, // not external representation (since vim
 		   // handles this internally)
-		to, maxtolen, &l))
+		గమ్యం, maxtolen, &l))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	తిరిగి FAIL;
     }
     CFRelease(cfstr);
     *tolenp = l;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Initializes text converters
  */
-    void
-mac_conv_init(void)
+    శూన్య
+mac_conv_init(శూన్య)
 {
-    TextEncoding    utf8_encoding;
-    TextEncoding    utf8_hfsplus_encoding;
-    TextEncoding    utf8_canon_encoding;
-    TextEncoding    utf16_encoding;
+    పాఠ్యం_Encoding    utf8_encoding;
+    పాఠ్యం_Encoding    utf8_hfsplus_encoding;
+    పాఠ్యం_Encoding    utf8_canon_encoding;
+    పాఠ్యం_Encoding    utf16_encoding;
 
-    utf8_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
-	    kTextEncodingDefaultVariant, kUnicodeUTF8Format);
-    utf8_hfsplus_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
+    utf8_encoding = Create_పాఠ్యం_Encoding(k_పాఠ్యం_Encoding_Unicode_Default,
+	    k_పాఠ్యం_Encoding_Default_Variant, kUnicodeUTF8Format);
+    utf8_hfsplus_encoding = Create_పాఠ్యం_Encoding(k_పాఠ్యం_Encoding_Unicode_Default,
 	    kUnicodeHFSPlusCompVariant, kUnicodeUTF8Format);
-    utf8_canon_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
+    utf8_canon_encoding = Create_పాఠ్యం_Encoding(k_పాఠ్యం_Encoding_Unicode_Default,
 	    kUnicodeCanonicalCompVariant, kUnicodeUTF8Format);
-    utf16_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
-	    kTextEncodingDefaultVariant, kUnicode16BitFormat);
+    utf16_encoding = Create_పాఠ్యం_Encoding(k_పాఠ్యం_Encoding_Unicode_Default,
+	    k_పాఠ్యం_Encoding_Default_Variant, k_Unicode16_బిట్టు_Format);
 
-    if (TECCreateConverter(&gPathConverter, utf8_encoding,
+    ఒకవేళ (TECCreateConverter(&g_మార్గం_Converter, utf8_encoding,
 		utf8_hfsplus_encoding) != noErr)
-	gPathConverter = NULL;
+	g_మార్గం_Converter = ఖాళీ;
 
-    if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+    ఒకవేళ (TECCreateConverter(&g_UTF16_గమ్యం_UTF8_Converter, utf16_encoding,
 		utf8_canon_encoding) != noErr)
     {
 	// On pre-10.3, Unicode normalization is not available so
 	// fall back to non-normalizing converter
-	if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+	ఒకవేళ (TECCreateConverter(&g_UTF16_గమ్యం_UTF8_Converter, utf16_encoding,
 		    utf8_encoding) != noErr)
-	    gUTF16ToUTF8Converter = NULL;
+	    g_UTF16_గమ్యం_UTF8_Converter = ఖాళీ;
     }
 }
 
 /*
  * Destroys text converters
  */
-    void
-mac_conv_cleanup(void)
+    శూన్య
+mac_conv_cleanup(శూన్య)
 {
-    if (gUTF16ToUTF8Converter)
+    ఒకవేళ (g_UTF16_గమ్యం_UTF8_Converter)
     {
-	TECDisposeConverter(gUTF16ToUTF8Converter);
-	gUTF16ToUTF8Converter = NULL;
+	TECDisposeConverter(g_UTF16_గమ్యం_UTF8_Converter);
+	g_UTF16_గమ్యం_UTF8_Converter = ఖాళీ;
     }
 
-    if (gPathConverter)
+    ఒకవేళ (g_మార్గం_Converter)
     {
-	TECDisposeConverter(gPathConverter);
-	gPathConverter = NULL;
+	TECDisposeConverter(g_మార్గం_Converter);
+	g_మార్గం_Converter = ఖాళీ;
     }
 }
 
@@ -321,8 +321,8 @@ mac_conv_cleanup(void)
  * CFBase.h) to avoid clashes with X11 header files in the .pro file
  */
     char_u *
-mac_utf16_to_enc(
-    unsigned short *from,
+mac_utf16_గమ్యం_enc(
+    గుర్తులేని పొట్టి *from,
     size_t fromLen,
     size_t *actualLen)
 {
@@ -330,13 +330,13 @@ mac_utf16_to_enc(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    char_u      *result = NULL;
+    char_u      *ఫలితం = ఖాళీ;
 
     // Convert to utf-8 first, works better with iconv
     utf8_len = 0;
-    utf8_str = mac_utf16_to_utf8(from, fromLen, &utf8_len);
+    utf8_str = mac_utf16_గమ్యం_utf8(from, fromLen, &utf8_len);
 
-    if (utf8_str)
+    ఒకవేళ (utf8_str)
     {
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
@@ -344,31 +344,31 @@ mac_utf16_to_enc(
 	// If encoding (p_enc) is any unicode, it is actually in utf-8 (vim
 	// internal unicode is always utf-8) so don't convert in such cases
 
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
-	    convert_setup(&conv, (char_u *)"utf-8",
+	ఒకవేళ ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
+	    convert_అమరిక(&conv, (char_u *)"utf-8",
 		    p_enc? p_enc: (char_u *)"macroman");
-	if (conv.vc_type == CONV_NONE)
+	ఒకవేళ (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
-	    result = utf8_str;
+	    ఫలితం = utf8_str;
 	}
-	else
+	లేకపోతే
 	{
-	    int len = utf8_len;
-	    result = string_convert(&conv, utf8_str, &len);
+	    పూర్ణాంకం len = utf8_len;
+	    ఫలితం = string_convert(&conv, utf8_str, &len);
 	    utf8_len = len;
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 
-	if (actualLen)
+	ఒకవేళ (actualLen)
 	    *actualLen = utf8_len;
     }
-    else if (actualLen)
+    లేకపోతే ఒకవేళ (actualLen)
 	*actualLen = 0;
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -376,8 +376,8 @@ mac_utf16_to_enc(
  * The function return uses the real type of UniChar (as typedef'ed in
  * CFBase.h) to avoid clashes with X11 header files in the .pro file
  */
-    unsigned short *
-mac_enc_to_utf16(
+    గుర్తులేని పొట్టి *
+mac_enc_గమ్యం_utf16(
     char_u *from,
     size_t fromLen,
     size_t *actualLen)
@@ -386,205 +386,205 @@ mac_enc_to_utf16(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    UniChar     *result = NULL;
+    UniChar     *ఫలితం = ఖాళీ;
     Boolean     should_free_utf8 = FALSE;
 
-    do
+    చేయి
     {
 	// Use MacRoman by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
-		convert_setup(&conv, p_enc ? p_enc : (char_u *)"macroman",
+	ఒకవేళ ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
+		convert_అమరిక(&conv, p_enc ? p_enc : (char_u *)"macroman",
 		    (char_u *)"utf-8") == FAIL)
-	    break;
+	    ఆపు;
 
-	if (conv.vc_type != CONV_NONE)
+	ఒకవేళ (conv.vc_type != CONV_NONE)
 	{
 	    utf8_len = fromLen;
-	    utf8_str = string_convert(&conv, from, (int *)&utf8_len);
+	    utf8_str = string_convert(&conv, from, (పూర్ణాంకం *)&utf8_len);
 	    should_free_utf8 = TRUE;
 	}
-	else
+	లేకపోతే
 	{
 	    utf8_str = from;
 	    utf8_len = fromLen;
 	}
 
-	if (utf8_str == NULL)
-	    break;
+	ఒకవేళ (utf8_str == ఖాళీ)
+	    ఆపు;
 
-	convert_setup(&conv, NULL, NULL);
+	convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 
-	result = mac_utf8_to_utf16(utf8_str, utf8_len, actualLen);
+	ఫలితం = mac_utf8_గమ్యం_utf16(utf8_str, utf8_len, actualLen);
 
-	if (should_free_utf8)
+	ఒకవేళ (should_free_utf8)
 	    vim_free(utf8_str);
-	return result;
+	తిరిగి ఫలితం;
     }
-    while (0);
+    అయితే (0);
 
-    if (actualLen)
+    ఒకవేళ (actualLen)
 	*actualLen = 0;
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Converts from UTF-16 UniChars to CFString
  * The void * return type is actually a CFStringRef
  */
-    void *
-mac_enc_to_cfstring(
+    శూన్య *
+mac_enc_గమ్యం_cfstring(
     char_u  *from,
     size_t  fromLen)
 {
     UniChar	*utf16_str;
     size_t	utf16_len;
-    CFStringRef	result = NULL;
+    CFStringRef	ఫలితం = ఖాళీ;
 
-    utf16_str = mac_enc_to_utf16(from, fromLen, &utf16_len);
-    if (utf16_str)
+    utf16_str = mac_enc_గమ్యం_utf16(from, fromLen, &utf16_len);
+    ఒకవేళ (utf16_str)
     {
-	result = CFStringCreateWithCharacters(NULL, utf16_str, utf16_len/sizeof(UniChar));
+	ఫలితం = CFStringCreateWithCharacters(ఖాళీ, utf16_str, utf16_len/పరిమాణం(UniChar));
 	vim_free(utf16_str);
     }
 
-    return (void *)result;
+    తిరిగి (శూన్య *)ఫలితం;
 }
 
 /*
  * Converts a decomposed HFS+ UTF-8 path to precomposed UTF-8
  */
     char_u *
-mac_precompose_path(
-    char_u  *decompPath,
+mac_precompose_మార్గం(
+    char_u  *decomp_మార్గం,
     size_t  decompLen,
     size_t  *precompLen)
 {
-    char_u  *result = NULL;
+    char_u  *ఫలితం = ఖాళీ;
     size_t  actualLen = 0;
 
-    if (gPathConverter)
+    ఒకవేళ (g_మార్గం_Converter)
     {
-	result = alloc(decompLen);
-	if (result)
+	ఫలితం = alloc(decompLen);
+	ఒకవేళ (ఫలితం)
 	{
-	    if (TECConvertText(gPathConverter, decompPath,
-			decompLen, &decompLen, result,
+	    ఒకవేళ (TECConvert_పాఠ్యం(g_మార్గం_Converter, decomp_మార్గం,
+			decompLen, &decompLen, ఫలితం,
 			decompLen, &actualLen) != noErr)
-		VIM_CLEAR(result);
+		VIM_CLEAR(ఫలితం);
 	}
     }
 
-    if (precompLen)
+    ఒకవేళ (precompLen)
 	*precompLen = actualLen;
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Converts from UTF-16 UniChars to precomposed UTF-8
  */
-    static char_u *
-mac_utf16_to_utf8(
+    స్థిర char_u *
+mac_utf16_గమ్యం_utf8(
     UniChar *from,
     size_t fromLen,
     size_t *actualLen)
 {
-    ByteCount		utf8_len;
-    ByteCount		inputRead;
-    char_u		*result;
+    Byte_లెక్క		utf8_len;
+    Byte_లెక్క		ఆదానం_Read;
+    char_u		*ఫలితం;
 
-    if (gUTF16ToUTF8Converter)
+    ఒకవేళ (g_UTF16_గమ్యం_UTF8_Converter)
     {
-	result = alloc(fromLen * 6 + 1);
-	if (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
-		    fromLen, &inputRead, result,
-		    (fromLen*6+1)*sizeof(char_u), &utf8_len) == noErr)
+	ఫలితం = alloc(fromLen * 6 + 1);
+	ఒకవేళ (ఫలితం && TECConvert_పాఠ్యం(g_UTF16_గమ్యం_UTF8_Converter, (Const_పాఠ్యం_Ptr)from,
+		    fromLen, &ఆదానం_Read, ఫలితం,
+		    (fromLen*6+1)*పరిమాణం(char_u), &utf8_len) == noErr)
 	{
-	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &inputRead);
-	    utf8_len += inputRead;
+	    TECFlush_పాఠ్యం(g_UTF16_గమ్యం_UTF8_Converter, ఫలితం, (fromLen*6+1)*పరిమాణం(char_u), &ఆదానం_Read);
+	    utf8_len += ఆదానం_Read;
 	}
-	else
-	    VIM_CLEAR(result);
+	లేకపోతే
+	    VIM_CLEAR(ఫలితం);
     }
-    else
+    లేకపోతే
     {
-	result = NULL;
+	ఫలితం = ఖాళీ;
     }
 
-    if (actualLen)
-	*actualLen = result ? utf8_len : 0;
+    ఒకవేళ (actualLen)
+	*actualLen = ఫలితం ? utf8_len : 0;
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Converts from UTF-8 to UTF-16 UniChars
  */
-    static UniChar *
-mac_utf8_to_utf16(
+    స్థిర UniChar *
+mac_utf8_గమ్యం_utf16(
     char_u *from,
     size_t fromLen,
     size_t *actualLen)
 {
     CFStringRef  utf8_str;
     CFRange      convertRange;
-    UniChar      *result = NULL;
+    UniChar      *ఫలితం = ఖాళీ;
 
-    utf8_str = CFStringCreateWithBytes(NULL, from, fromLen,
+    utf8_str = CFString_Create_With_బైట్లు(ఖాళీ, from, fromLen,
 	    kCFStringEncodingUTF8, FALSE);
 
-    if (utf8_str == NULL)
+    ఒకవేళ (utf8_str == ఖాళీ)
     {
-	if (actualLen)
+	ఒకవేళ (actualLen)
 	    *actualLen = 0;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    convertRange = CFRangeMake(0, CFStringGetLength(utf8_str));
-    result = ALLOC_MULT(UniChar, convertRange.length);
+    convertRange = CFRangeMake(0, CFString_Get_నిడివి(utf8_str));
+    ఫలితం = ALLOC_MULT(UniChar, convertRange.నిడివి);
 
-    CFStringGetCharacters(utf8_str, convertRange, result);
+    CFStringGetCharacters(utf8_str, convertRange, ఫలితం);
 
     CFRelease(utf8_str);
 
-    if (actualLen)
-	*actualLen = convertRange.length * sizeof(UniChar);
+    ఒకవేళ (actualLen)
+	*actualLen = convertRange.నిడివి * పరిమాణం(UniChar);
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Sets LANG environment variable in Vim from Mac locale
  */
-    void
-mac_lang_init(void)
+    శూన్య
+mac_lang_init(శూన్య)
 {
-    if (mch_getenv((char_u *)"LANG") != NULL)
-	return;
+    ఒకవేళ (mch_getenv((char_u *)"LANG") != ఖాళీ)
+	తిరిగి;
 
-    char	buf[50];
+    అక్షరం	buf[50];
 
     // $LANG is not set, either because it was unset or Vim was started
     // from the Dock.  Query the system locale.
-    if (LocaleRefGetPartString(NULL,
-		kLocaleLanguageMask | kLocaleLanguageVariantMask |
-		kLocaleRegionMask | kLocaleRegionVariantMask,
-		sizeof(buf) - 10, buf) == noErr && *buf)
+    ఒకవేళ (LocaleRefGetPartString(ఖాళీ,
+		k_Locale_Language_ముసుగు | k_Locale_Language_Variant_ముసుగు |
+		k_Locale_Region_ముసుగు | k_Locale_Region_Variant_ముసుగు,
+		పరిమాణం(buf) - 10, buf) == noErr && *buf)
     {
-	if (strcasestr(buf, "utf-8") == NULL)
+	ఒకవేళ (strcasestr(buf, "utf-8") == ఖాళీ)
 	    strcat(buf, ".UTF-8");
 	vim_setenv((char_u *)"LANG", (char_u *)buf);
-#ifdef HAVE_LOCALE_H
+#నిర్వచితమైతే HAVE_LOCALE_H
 	setlocale(LC_ALL, "");
-#endif
-#if defined(LC_NUMERIC)
+#అయితే_ముగింపు
+#ఒకవేళ defined(LC_NUMERIC)
 	// Make sure strtod() uses a decimal point, not a comma.
 	setlocale(LC_NUMERIC, "C");
-#endif
+#అయితే_ముగింపు
     }
 }
-#endif // MACOS_CONVERT
+#అయితే_ముగింపు // MACOS_CONVERT

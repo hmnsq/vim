@@ -13,13 +13,13 @@
  *		clipboard code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-# define WIN32_LEAN_AND_MEAN
+#నిర్వచితమైతే FEAT_CYGWIN_WIN32_CLIPBOARD
+# define WIN32_LEAN_AND_సగటు
 # include <windows.h>
 # include "winclip.pro"
-#endif
+#అయితే_ముగింపు
 
 // Functions for copying and pasting text between applications.
 // This is always included in a GUI version, but may also be included when the
@@ -32,36 +32,36 @@
 // for them.
 
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
-static int clip_provider_is_available(char_u *provider);
-#endif
+#నిర్వచితమైతే FEAT_CLIPBOARD_PROVIDER
+స్థిర పూర్ణాంకం clip_provider_is_అందుబాటు(char_u *provider);
+#అయితే_ముగింపు
 
-#if defined(FEAT_CLIPBOARD)
+#ఒకవేళ defined(FEAT_CLIPBOARD)
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_WAYLAND_CLIPBOARD)
 
 #  include "wayland.h"
 
 // Represents either the regular or primary selection
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     char_u		*contents;	// Non-null if we own selection,
 					// contains the data to send to other
 					// clients.
-    vwl_data_source_T	*source;	// Non-NULL if we own the selection,
+    vwl_దత్తాంశం_ఆధారం_T	*ఆధారం;	// Non-NULL if we own the selection,
 					// else NULL if we don't.
-    vwl_data_offer_T	*offer;		// Current offer for the selection
+    vwl_దత్తాంశం_offer_T	*offer;		// Current offer for the selection
 
     bool		own_success;	// Used by clip_wl_own_selection()
-    bool		available;	// If selection is ready to serve/use
+    bool		అందుబాటు;	// If selection is ready to serve/use
 
     // These may point to the same proxy as the other selection
-    vwl_data_device_manager_T	*manager;
-    vwl_data_device_T		*device;
+    vwl_దత్తాంశం_device_manager_T	*manager;
+    vwl_దత్తాంశం_device_T		*device;
 } clip_wl_selection_T;
 
 // Represents the clipboard for the global Wayland connection, for the chosen
 // seat (using the 'wl_seat' option)
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     vwl_seat_T *seat;
 
     clip_wl_selection_T regular;
@@ -71,7 +71,7 @@ typedef struct {
 // Mime types we support sending and receiving
 // Mimes with a lower index in the array are prioritized first when we are
 // receiving data.
-static const char *supported_mimes[] = {
+స్థిర స్థిరరాశి అక్షరం *supported_mimes[] = {
     VIMENC_MIMETYPE_NAME,
     VIMENC_ATOM_NAME,
     VIM_MIMETYPE_NAME,
@@ -85,15 +85,15 @@ static const char *supported_mimes[] = {
 
 clip_wl_T clip_wl;
 
-static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd);
-static void clip_wl_request_selection(Clipboard_T *cbd);
-static int clip_wl_own_selection(Clipboard_T *cbd);
-static void clip_wl_lose_selection(Clipboard_T *cbd);
-static void clip_wl_set_selection(Clipboard_T *cbd);
+స్థిర శూన్య
+clip_wl_receive_దత్తాంశం(Clipboard_T *cbd, స్థిరరాశి అక్షరం *mime_type, పూర్ణాంకం fd);
+స్థిర శూన్య clip_wl_request_selection(Clipboard_T *cbd);
+స్థిర పూర్ణాంకం clip_wl_own_selection(Clipboard_T *cbd);
+స్థిర శూన్య clip_wl_lose_selection(Clipboard_T *cbd);
+స్థిర శూన్య clip_wl_సమితి_selection(Clipboard_T *cbd);
 
-#  if defined(USE_SYSTEM)
-static bool clip_wl_owner_exists(Clipboard_T *cbd);
+#  ఒకవేళ defined(USE_SYSTEM)
+స్థిర bool clip_wl_owner_exists(Clipboard_T *cbd);
 #  endif
 
 # endif // FEAT_WAYLAND_CLIPBOARD
@@ -109,29 +109,29 @@ static bool clip_wl_owner_exists(Clipboard_T *cbd);
  * be used.  Eg unix may call this with FALSE, then call it again with TRUE if
  * the GUI starts.
  */
-    void
-clip_init(int can_use)
+    శూన్య
+clip_init(పూర్ణాంకం can_use)
 {
     Clipboard_T *cb;
 
-    cb = &clip_star;
-    for (;;)
+    cb = &clip_నక్షత్రం;
+    కొరకు (;;)
     {
 	// No need to init again if cbd is already available
-	if (can_use && cb->available)
-	    goto skip;
+	ఒకవేళ (can_use && cb->అందుబాటు)
+	    వెళ్ళు skip;
 
-	cb->available  = can_use;
+	cb->అందుబాటు  = can_use;
 	cb->owned      = FALSE;
-	cb->start.lnum = 0;
-	cb->start.col  = 0;
-	cb->end.lnum   = 0;
-	cb->end.col    = 0;
+	cb->ప్రారంభం.lnum = 0;
+	cb->ప్రారంభం.నిలువు  = 0;
+	cb->చివర.lnum   = 0;
+	cb->చివర.నిలువు    = 0;
 	cb->state      = SELECT_CLEARED;
 
 skip:
-	if (cb == &clip_plus)
-	    break;
+	ఒకవేళ (cb == &clip_plus)
+	    ఆపు;
 	cb = &clip_plus;
     }
 }
@@ -143,184 +143,184 @@ skip:
  * selected so we can still give it to others.	Will probably have to make sure
  * this is called whenever VIsual mode is ended.
  */
-    void
+    శూన్య
 clip_update_selection(Clipboard_T *clip)
 {
-    pos_T	    start, end;
+    pos_T	    ప్రారంభం, చివర;
 
     // If visual mode is only due to a redo command ("."), then ignore it
-    if (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
+    ఒకవేళ (!redo_VIsual_busy && VIsual_చురుకైన && (State & బహుళకం_సాధారణ))
     {
-	if (LT_POS(VIsual, curwin->w_cursor))
+	ఒకవేళ (LT_POS(VIsual, curwin->w_cursor))
 	{
-	    start = VIsual;
-	    end = curwin->w_cursor;
-	    if (has_mbyte)
-		end.col += (*mb_ptr2len)(ml_get_cursor()) - 1;
+	    ప్రారంభం = VIsual;
+	    చివర = curwin->w_cursor;
+	    ఒకవేళ (has_mbyte)
+		చివర.నిలువు += (*mb_ptr2len)(ml_get_cursor()) - 1;
 	}
-	else
+	లేకపోతే
 	{
-	    start = curwin->w_cursor;
-	    end = VIsual;
+	    ప్రారంభం = curwin->w_cursor;
+	    చివర = VIsual;
 	}
-	if (!EQUAL_POS(clip->start, start)
-		|| !EQUAL_POS(clip->end, end)
-		|| clip->vmode != VIsual_mode)
+	ఒకవేళ (!EQUAL_POS(clip->ప్రారంభం, ప్రారంభం)
+		|| !EQUAL_POS(clip->చివర, చివర)
+		|| clip->vmode != VIsual_బహుళకం)
 	{
 	    clip_clear_selection(clip);
-	    clip->start = start;
-	    clip->end = end;
-	    clip->vmode = VIsual_mode;
+	    clip->ప్రారంభం = ప్రారంభం;
+	    clip->చివర = చివర;
+	    clip->vmode = VIsual_బహుళకం;
 	    clip_free_selection(clip);
 	    clip_own_selection(clip);
-	    clip_gen_set_selection(clip);
+	    clip_gen_సమితి_selection(clip);
 	}
     }
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 clip_gen_own_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	return clip_mch_own_selection(cbd);
-    else
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి clip_mch_own_selection(cbd);
+    లేకపోతే
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_own_selection(cbd);
+	    తిరిగి clip_wl_own_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    return clip_xterm_own_selection(cbd);
+	    తిరిగి clip_xterm_own_selection(cbd);
 #  endif
 	}
     }
-    return FAIL;
-# else
-    return clip_mch_own_selection(cbd);
+    తిరిగి FAIL;
+# లేకపోతే
+    తిరిగి clip_mch_own_selection(cbd);
 # endif
 }
 
-    void
+    శూన్య
 clip_own_selection(Clipboard_T *cbd)
 {
     /*
      * Also want to check somehow that we are reading from the keyboard rather
      * than a mapping etc.
      */
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     // Always own the selection, we might have lost it without being
     // notified, e.g. during a ":sh" command.
-    if (cbd->available)
+    ఒకవేళ (cbd->అందుబాటు)
     {
-	int was_owned = cbd->owned;
+	పూర్ణాంకం was_owned = cbd->owned;
 
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
-	if (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
+	ఒకవేళ (!was_owned && (cbd == &clip_నక్షత్రం || cbd == &clip_plus))
 	{
 	    // May have to show a different kind of highlighting for the
 	    // selected area.  There is no specific redraw command for this,
 	    // just redraw all windows on the current buffer.
-	    if (cbd->owned
-		    && (get_real_state() == MODE_VISUAL
-					    || get_real_state() == MODE_SELECT)
-		    && (cbd == &clip_star ? clip_isautosel_star()
+	    ఒకవేళ (cbd->owned
+		    && (get_real_state() == బహుళకం_VISUAL
+					    || get_real_state() == బహుళకం_SELECT)
+		    && (cbd == &clip_నక్షత్రం ? clip_isautosel_నక్షత్రం()
 						      : clip_isautosel_plus())
 		    && HL_ATTR(HLF_V) != HL_ATTR(HLF_VNC))
 		redraw_curbuf_later(UPD_INVERTED_ALL);
 	}
     }
-# else
+# లేకపోతే
     // Only own the clipboard when we didn't own it yet.
-    if (!cbd->owned && cbd->available)
+    ఒకవేళ (!cbd->owned && cbd->అందుబాటు)
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
 # endif
 }
 
-    static void
+    స్థిర శూన్య
 clip_gen_lose_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	clip_mch_lose_selection(cbd);
-    else
+    లేకపోతే
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_lose_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_lose_selection(cbd);
 #  endif
 	}
     }
-# else
+# లేకపోతే
     clip_mch_lose_selection(cbd);
 # endif
 }
 
-    void
+    శూన్య
 clip_lose_selection(Clipboard_T *cbd)
 {
 # ifdef FEAT_X11
-    int	    was_owned = cbd->owned;
+    పూర్ణాంకం	    was_owned = cbd->owned;
 # endif
-    int     visual_selection = FALSE;
+    పూర్ణాంకం     visual_selection = FALSE;
 
-    if (cbd == &clip_star || cbd == &clip_plus)
+    ఒకవేళ (cbd == &clip_నక్షత్రం || cbd == &clip_plus)
 	visual_selection = TRUE;
 
     clip_free_selection(cbd);
     cbd->owned = FALSE;
-    if (visual_selection)
+    ఒకవేళ (visual_selection)
 	clip_clear_selection(cbd);
     clip_gen_lose_selection(cbd);
 # ifdef FEAT_X11
-    if (visual_selection)
+    ఒకవేళ (visual_selection)
     {
 	// May have to show a different kind of highlighting for the selected
 	// area.  There is no specific redraw command for this, just redraw all
 	// windows on the current buffer.
-	if (was_owned
-		&& (get_real_state() == MODE_VISUAL
-		    || get_real_state() == MODE_SELECT)
-		&& (cbd == &clip_star ?
-		    clip_isautosel_star() : clip_isautosel_plus())
+	ఒకవేళ (was_owned
+		&& (get_real_state() == బహుళకం_VISUAL
+		    || get_real_state() == బహుళకం_SELECT)
+		&& (cbd == &clip_నక్షత్రం ?
+		    clip_isautosel_నక్షత్రం() : clip_isautosel_plus())
 		&& HL_ATTR(HLF_V) != HL_ATTR(HLF_VNC)
 		&& !exiting)
 	{
 	    update_curbuf(UPD_INVERTED_ALL);
 	    setcursor();
 	    cursor_on();
-	    out_flush_cursor(TRUE, FALSE);
+	    బహిర్గతం_flush_cursor(TRUE, FALSE);
 	}
     }
 # endif
 }
 
-    static void
+    స్థిర శూన్య
 clip_copy_selection(Clipboard_T *clip)
 {
-    if (VIsual_active && (State & MODE_NORMAL) && clip->available)
+    ఒకవేళ (VIsual_చురుకైన && (State & బహుళకం_సాధారణ) && clip->అందుబాటు)
     {
 	clip_update_selection(clip);
 	clip_free_selection(clip);
 	clip_own_selection(clip);
-	if (clip->owned)
+	ఒకవేళ (clip->owned)
 	    clip_get_selection(clip);
-	clip_gen_set_selection(clip);
+	clip_gen_సమితి_selection(clip);
     }
 }
 
@@ -329,25 +329,25 @@ clip_copy_selection(Clipboard_T *clip)
  * prevents accessing the clipboard very often which might slow down Vim
  * considerably.
  */
-static int global_change_count = 0; // if set, inside a start_global_changes
-static int clipboard_needs_update = FALSE; // clipboard needs to be updated
-static int clip_did_set_selection = TRUE;
+స్థిర పూర్ణాంకం global_change_లెక్క = 0; // if set, inside a start_global_changes
+స్థిర పూర్ణాంకం clipboard_needs_update = FALSE; // clipboard needs to be updated
+స్థిర పూర్ణాంకం clip_did_సమితి_selection = TRUE;
 
 /*
  * Save clip_unnamed and reset it.
  */
-    void
-start_global_changes(void)
+    శూన్య
+ప్రారంభం_global_changes(శూన్య)
 {
-    if (++global_change_count > 1)
-	return;
+    ఒకవేళ (++global_change_లెక్క > 1)
+	తిరిగి;
     clip_unnamed_saved = clip_unnamed;
     clipboard_needs_update = FALSE;
 
-    if (clip_did_set_selection)
+    ఒకవేళ (clip_did_సమితి_selection)
     {
 	clip_unnamed = 0;
-	clip_did_set_selection = FALSE;
+	clip_did_సమితి_selection = FALSE;
     }
 }
 
@@ -355,39 +355,39 @@ start_global_changes(void)
  * Return TRUE if setting the clipboard was postponed, it already contains the
  * right text.
  */
-    static int
-is_clipboard_needs_update(void)
+    స్థిర పూర్ణాంకం
+is_clipboard_needs_update(శూన్య)
 {
-    return clipboard_needs_update;
+    తిరిగి clipboard_needs_update;
 }
 
 /*
  * Restore clip_unnamed and set the selection when needed.
  */
-    void
-end_global_changes(void)
+    శూన్య
+చివర_global_changes(శూన్య)
 {
-    if (--global_change_count > 0)
+    ఒకవేళ (--global_change_లెక్క > 0)
 	// recursive
-	return;
-    if (!clip_did_set_selection)
+	తిరిగి;
+    ఒకవేళ (!clip_did_సమితి_selection)
     {
-	clip_did_set_selection = TRUE;
+	clip_did_సమితి_selection = TRUE;
 	clip_unnamed = clip_unnamed_saved;
 	clip_unnamed_saved = 0;
-	if (clipboard_needs_update)
+	ఒకవేళ (clipboard_needs_update)
 	{
 	    // only store something in the clipboard,
 	    // if we have yanked anything to it
-	    if (clip_unnamed & CLIP_UNNAMED)
+	    ఒకవేళ (clip_unnamed & CLIP_UNNAMED)
 	    {
-		clip_own_selection(&clip_star);
-		clip_gen_set_selection(&clip_star);
+		clip_own_selection(&clip_నక్షత్రం);
+		clip_gen_సమితి_selection(&clip_నక్షత్రం);
 	    }
-	    if (clip_unnamed & CLIP_UNNAMED_PLUS)
+	    ఒకవేళ (clip_unnamed & CLIP_UNNAMED_PLUS)
 	    {
 		clip_own_selection(&clip_plus);
-		clip_gen_set_selection(&clip_plus);
+		clip_gen_సమితి_selection(&clip_plus);
 	    }
 	}
     }
@@ -397,12 +397,12 @@ end_global_changes(void)
 /*
  * Called when Visual mode is ended: update the selection.
  */
-    void
-clip_auto_select(void)
+    శూన్య
+clip_auto_select(శూన్య)
 {
-    if (clip_isautosel_star())
-	clip_copy_selection(&clip_star);
-    if (clip_isautosel_plus())
+    ఒకవేళ (clip_isautosel_నక్షత్రం())
+	clip_copy_selection(&clip_నక్షత్రం);
+    ఒకవేళ (clip_isautosel_plus())
 	clip_copy_selection(&clip_plus);
 }
 
@@ -410,37 +410,37 @@ clip_auto_select(void)
  * Return TRUE if automatic selection of Visual area is desired for the *
  * register.
  */
-    int
-clip_isautosel_star(void)
+    పూర్ణాంకం
+clip_isautosel_నక్షత్రం(శూన్య)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    ఒకవేళ (clipmethod == CLIPMETHOD_PROVIDER)
+	తిరిగి false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASEL) != NULL
-	    && vim_strchr(p_go, GO_ASELPLUS) == NULL;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి vim_strchr(p_go, GO_ASEL) != ఖాళీ
+	    && vim_strchr(p_go, GO_ASELPLUS) == ఖాళీ;
 # endif
-    return clip_autoselect_star;
+    తిరిగి clip_autoselect_నక్షత్రం;
 }
 
 /*
  * Return TRUE if automatic selection of Visual area is desired for the +
  * register.
  */
-    int
-clip_isautosel_plus(void)
+    పూర్ణాంకం
+clip_isautosel_plus(శూన్య)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    ఒకవేళ (clipmethod == CLIPMETHOD_PROVIDER)
+	తిరిగి false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASELPLUS) != NULL;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి vim_strchr(p_go, GO_ASELPLUS) != ఖాళీ;
 # endif
-    return clip_autoselect_plus;
+    తిరిగి clip_autoselect_plus;
 }
 
 
@@ -451,68 +451,68 @@ clip_isautosel_plus(void)
 /*
  * Compare two screen positions ala strcmp()
  */
-    static int
+    స్థిర పూర్ణాంకం
 clip_compare_pos(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    పూర్ణాంకం		row1,
+    పూర్ణాంకం		col1,
+    పూర్ణాంకం		row2,
+    పూర్ణాంకం		col2)
 {
-    if (row1 > row2) return(1);
-    if (row1 < row2) return(-1);
-    if (col1 > col2) return(1);
-    if (col1 < col2) return(-1);
-    return(0);
+    ఒకవేళ (row1 > row2) తిరిగి(1);
+    ఒకవేళ (row1 < row2) తిరిగి(-1);
+    ఒకవేళ (col1 > col2) తిరిగి(1);
+    ఒకవేళ (col1 < col2) తిరిగి(-1);
+    తిరిగి(0);
 }
 
 // "how" flags for clip_invert_area()
 # define CLIP_CLEAR	1
-# define CLIP_SET	2
+# define CLIP_సమితి	2
 # define CLIP_TOGGLE	3
 
 /*
  * Invert or un-invert a rectangle of the screen.
  * "invert" is true if the result is inverted.
  */
-    static void
+    స్థిర శూన్య
 clip_invert_rectangle(
-	Clipboard_T	*cbd UNUSED,
-	int		row_arg,
-	int		col_arg,
-	int		height_arg,
-	int		width_arg,
-	int		invert)
+	Clipboard_T	*cbd వాడని,
+	పూర్ణాంకం		అడ్డువరుస_arg,
+	పూర్ణాంకం		నిలువు_arg,
+	పూర్ణాంకం		ఎత్తు_arg,
+	పూర్ణాంకం		వెడల్పు_arg,
+	పూర్ణాంకం		invert)
 {
-    int		row = row_arg;
-    int		col = col_arg;
-    int		height = height_arg;
-    int		width = width_arg;
+    పూర్ణాంకం		అడ్డువరుస = అడ్డువరుస_arg;
+    పూర్ణాంకం		నిలువు = నిలువు_arg;
+    పూర్ణాంకం		ఎత్తు = ఎత్తు_arg;
+    పూర్ణాంకం		వెడల్పు = వెడల్పు_arg;
 
 # ifdef FEAT_PROP_POPUP
     // this goes on top of all popup windows
     screen_zindex = CLIP_ZINDEX;
 
-    if (col < cbd->min_col)
+    ఒకవేళ (నిలువు < cbd->min_నిలువు)
     {
-	width -= cbd->min_col - col;
-	col = cbd->min_col;
+	వెడల్పు -= cbd->min_నిలువు - నిలువు;
+	నిలువు = cbd->min_నిలువు;
     }
-    if (width > cbd->max_col - col)
-	width = cbd->max_col - col;
-    if (row < cbd->min_row)
+    ఒకవేళ (వెడల్పు > cbd->max_నిలువు - నిలువు)
+	వెడల్పు = cbd->max_నిలువు - నిలువు;
+    ఒకవేళ (అడ్డువరుస < cbd->min_అడ్డువరుస)
     {
-	height -= cbd->min_row - row;
-	row = cbd->min_row;
+	ఎత్తు -= cbd->min_అడ్డువరుస - అడ్డువరుస;
+	అడ్డువరుస = cbd->min_అడ్డువరుస;
     }
-    if (height > cbd->max_row - row + 1)
-	height = cbd->max_row - row + 1;
+    ఒకవేళ (ఎత్తు > cbd->max_అడ్డువరుస - అడ్డువరుస + 1)
+	ఎత్తు = cbd->max_అడ్డువరుస - అడ్డువరుస + 1;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	gui_mch_invert_rectangle(row, col, height, width);
-    else
+    ఒకవేళ (gui.లోపల_use)
+	gui_mch_invert_rectangle(అడ్డువరుస, నిలువు, ఎత్తు, వెడల్పు);
+    లేకపోతే
 # endif
-	screen_draw_rectangle(row, col, height, width, invert, FALSE);
+	screen_draw_rectangle(అడ్డువరుస, నిలువు, ఎత్తు, వెడల్పు, invert, FALSE);
 # ifdef FEAT_PROP_POPUP
     screen_zindex = 0;
 # endif
@@ -526,68 +526,68 @@ clip_invert_rectangle(
  * CLIP_TOGGLE: set inversion if pos1 < pos2, undo inversion otherwise.
  * 0: invert (GUI only).
  */
-    static void
+    స్థిర శూన్య
 clip_invert_area(
 	Clipboard_T	*cbd,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2,
-	int		how)
+	పూర్ణాంకం		row1,
+	పూర్ణాంకం		col1,
+	పూర్ణాంకం		row2,
+	పూర్ణాంకం		col2,
+	పూర్ణాంకం		how)
 {
-    int		invert = FALSE;
-    int		max_col;
+    పూర్ణాంకం		invert = FALSE;
+    పూర్ణాంకం		max_నిలువు;
 
 # ifdef FEAT_PROP_POPUP
-    max_col = cbd->max_col - 1;
-# else
-    max_col = Columns - 1;
+    max_నిలువు = cbd->max_నిలువు - 1;
+# లేకపోతే
+    max_నిలువు = Columns - 1;
 # endif
 
-    if (how == CLIP_SET)
+    ఒకవేళ (how == CLIP_సమితి)
 	invert = TRUE;
 
     // Swap the from and to positions so the from is always before
-    if (clip_compare_pos(row1, col1, row2, col2) > 0)
+    ఒకవేళ (clip_compare_pos(row1, col1, row2, col2) > 0)
     {
-	int tmp_row, tmp_col;
+	పూర్ణాంకం tmp_అడ్డువరుస, tmp_నిలువు;
 
-	tmp_row = row1;
-	tmp_col = col1;
+	tmp_అడ్డువరుస = row1;
+	tmp_నిలువు = col1;
 	row1	= row2;
 	col1	= col2;
-	row2	= tmp_row;
-	col2	= tmp_col;
+	row2	= tmp_అడ్డువరుస;
+	col2	= tmp_నిలువు;
     }
-    else if (how == CLIP_TOGGLE)
+    లేకపోతే ఒకవేళ (how == CLIP_TOGGLE)
 	invert = TRUE;
 
     // If all on the same line, do it the easy way
-    if (row1 == row2)
+    ఒకవేళ (row1 == row2)
     {
 	clip_invert_rectangle(cbd, row1, col1, 1, col2 - col1, invert);
     }
-    else
+    లేకపోతే
     {
 	// Handle a piece of the first line
-	if (col1 > 0)
+	ఒకవేళ (col1 > 0)
 	{
 	    clip_invert_rectangle(cbd, row1, col1, 1,
-						  (int)Columns - col1, invert);
+						  (పూర్ణాంకం)Columns - col1, invert);
 	    row1++;
 	}
 
 	// Handle a piece of the last line
-	if (col2 < max_col)
+	ఒకవేళ (col2 < max_నిలువు)
 	{
 	    clip_invert_rectangle(cbd, row2, 0, 1, col2, invert);
 	    row2--;
 	}
 
 	// Handle the rectangle that's left
-	if (row2 >= row1)
+	ఒకవేళ (row2 >= row1)
 	    clip_invert_rectangle(cbd, row1, 0, row2 - row1 + 1,
-							 (int)Columns, invert);
+							 (పూర్ణాంకం)Columns, invert);
     }
 }
 
@@ -595,65 +595,65 @@ clip_invert_area(
  * Start, continue or end a modeless selection.  Used when editing the
  * command-line, in the cmdline window and when the mouse is in a popup window.
  */
-    void
-clip_modeless(int button, int is_click, int is_drag)
+    శూన్య
+clip_modeless(పూర్ణాంకం button, పూర్ణాంకం is_click, పూర్ణాంకం is_drag)
 {
-    int		repeat;
+    పూర్ణాంకం		repeat;
 
-    repeat = ((clip_star.mode == SELECT_MODE_CHAR
-		|| clip_star.mode == SELECT_MODE_LINE)
-					      && (mod_mask & MOD_MASK_2CLICK))
-	    || (clip_star.mode == SELECT_MODE_WORD
-					     && (mod_mask & MOD_MASK_3CLICK));
-    if (is_click && button == MOUSE_RIGHT)
+    repeat = ((clip_నక్షత్రం.బహుళకం == SELECT_బహుళకం_CHAR
+		|| clip_నక్షత్రం.బహుళకం == SELECT_బహుళకం_పంక్తి)
+					      && (mod_ముసుగు & MOD_ముసుగు_2_CLICK))
+	    || (clip_నక్షత్రం.బహుళకం == SELECT_బహుళకం_మాట
+					     && (mod_ముసుగు & MOD_ముసుగు_3_CLICK));
+    ఒకవేళ (is_click && button == MOUSE_కుడి)
     {
 	// Right mouse button: If there was no selection, start one.
 	// Otherwise extend the existing selection.
-	if (clip_star.state == SELECT_CLEARED)
-	    clip_start_selection(mouse_col, mouse_row, FALSE);
-	clip_process_selection(button, mouse_col, mouse_row, repeat);
+	ఒకవేళ (clip_నక్షత్రం.state == SELECT_CLEARED)
+	    clip_ప్రారంభం_selection(mouse_నిలువు, mouse_అడ్డువరుస, FALSE);
+	clip_process_selection(button, mouse_నిలువు, mouse_అడ్డువరుస, repeat);
     }
-    else if (is_click)
-	clip_start_selection(mouse_col, mouse_row, repeat);
-    else if (is_drag)
+    లేకపోతే ఒకవేళ (is_click)
+	clip_ప్రారంభం_selection(mouse_నిలువు, mouse_అడ్డువరుస, repeat);
+    లేకపోతే ఒకవేళ (is_drag)
     {
 	// Don't try extending a selection if there isn't one.  Happens when
 	// button-down is in the cmdline and them moving mouse upwards.
-	if (clip_star.state != SELECT_CLEARED)
-	    clip_process_selection(button, mouse_col, mouse_row, repeat);
+	ఒకవేళ (clip_నక్షత్రం.state != SELECT_CLEARED)
+	    clip_process_selection(button, mouse_నిలువు, mouse_అడ్డువరుస, repeat);
     }
-    else // release
-	clip_process_selection(MOUSE_RELEASE, mouse_col, mouse_row, FALSE);
+    లేకపోతే // release
+	clip_process_selection(MOUSE_RELEASE, mouse_నిలువు, mouse_అడ్డువరుస, FALSE);
 }
 
 /*
  * Update the currently selected region by adding and/or subtracting from the
  * beginning or end and inverting the changed area(s).
  */
-    static void
+    స్థిర శూన్య
 clip_update_modeless_selection(
     Clipboard_T    *cb,
-    int		    row1,
-    int		    col1,
-    int		    row2,
-    int		    col2)
+    పూర్ణాంకం		    row1,
+    పూర్ణాంకం		    col1,
+    పూర్ణాంకం		    row2,
+    పూర్ణాంకం		    col2)
 {
     // See if we changed at the beginning of the selection
-    if (row1 != cb->start.lnum || col1 != (int)cb->start.col)
+    ఒకవేళ (row1 != cb->ప్రారంభం.lnum || col1 != (పూర్ణాంకం)cb->ప్రారంభం.నిలువు)
     {
-	clip_invert_area(cb, row1, col1, (int)cb->start.lnum, cb->start.col,
+	clip_invert_area(cb, row1, col1, (పూర్ణాంకం)cb->ప్రారంభం.lnum, cb->ప్రారంభం.నిలువు,
 								 CLIP_TOGGLE);
-	cb->start.lnum = row1;
-	cb->start.col  = col1;
+	cb->ప్రారంభం.lnum = row1;
+	cb->ప్రారంభం.నిలువు  = col1;
     }
 
     // See if we changed at the end of the selection
-    if (row2 != cb->end.lnum || col2 != (int)cb->end.col)
+    ఒకవేళ (row2 != cb->చివర.lnum || col2 != (పూర్ణాంకం)cb->చివర.నిలువు)
     {
-	clip_invert_area(cb, (int)cb->end.lnum, cb->end.col, row2, col2,
+	clip_invert_area(cb, (పూర్ణాంకం)cb->చివర.lnum, cb->చివర.నిలువు, row2, col2,
 								 CLIP_TOGGLE);
-	cb->end.lnum = row2;
-	cb->end.col  = col2;
+	cb->చివర.lnum = row2;
+	cb->చివర.నిలువు  = col2;
     }
 }
 
@@ -663,370 +663,370 @@ clip_update_modeless_selection(
  */
 # define CHAR_CLASS(c)	(c <= ' ' ? ' ' : vim_iswordc(c))
 
-    static void
-clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
+    స్థిర శూన్య
+clip_get_మాట_boundaries(Clipboard_T *cb, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    int		start_class;
-    int		temp_col;
+    పూర్ణాంకం		ప్రారంభం_class;
+    పూర్ణాంకం		తాత్కాలిక_నిలువు;
     char_u	*p;
-    int		mboff;
+    పూర్ణాంకం		mboff;
 
-    if (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
-	return;
+    ఒకవేళ (అడ్డువరుస >= screen_అడ్డువరుసలు || నిలువు >= screen_Columns || Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
-    p = ScreenLines + LineOffset[row];
+    p = Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[అడ్డువరుస];
     // Correct for starting in the right half of a double-wide char
-    if (enc_dbcs != 0)
-	col -= dbcs_screen_head_off(p, p + col);
-    else if (enc_utf8 && p[col] == 0)
-	--col;
-    start_class = CHAR_CLASS(p[col]);
+    ఒకవేళ (enc_dbcs != 0)
+	నిలువు -= dbcs_screen_తల_off(p, p + నిలువు);
+    లేకపోతే ఒకవేళ (enc_utf8 && p[నిలువు] == 0)
+	--నిలువు;
+    ప్రారంభం_class = CHAR_CLASS(p[నిలువు]);
 
-    temp_col = col;
-    for ( ; temp_col > 0; temp_col--)
-	if (enc_dbcs != 0
-		   && (mboff = dbcs_screen_head_off(p, p + temp_col - 1)) > 0)
-	    temp_col -= mboff;
-	else if (CHAR_CLASS(p[temp_col - 1]) != start_class
-		&& !(enc_utf8 && p[temp_col - 1] == 0))
-	    break;
-    cb->word_start_col = temp_col;
+    తాత్కాలిక_నిలువు = నిలువు;
+    కొరకు ( ; తాత్కాలిక_నిలువు > 0; తాత్కాలిక_నిలువు--)
+	ఒకవేళ (enc_dbcs != 0
+		   && (mboff = dbcs_screen_తల_off(p, p + తాత్కాలిక_నిలువు - 1)) > 0)
+	    తాత్కాలిక_నిలువు -= mboff;
+	లేకపోతే ఒకవేళ (CHAR_CLASS(p[తాత్కాలిక_నిలువు - 1]) != ప్రారంభం_class
+		&& !(enc_utf8 && p[తాత్కాలిక_నిలువు - 1] == 0))
+	    ఆపు;
+    cb->మాట_ప్రారంభం_నిలువు = తాత్కాలిక_నిలువు;
 
-    temp_col = col;
-    for ( ; temp_col < screen_Columns; temp_col++)
-	if (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
-	    ++temp_col;
-	else if (CHAR_CLASS(p[temp_col]) != start_class
-		&& !(enc_utf8 && p[temp_col] == 0))
-	    break;
-    cb->word_end_col = temp_col;
+    తాత్కాలిక_నిలువు = నిలువు;
+    కొరకు ( ; తాత్కాలిక_నిలువు < screen_Columns; తాత్కాలిక_నిలువు++)
+	ఒకవేళ (enc_dbcs != 0 && dbcs_ptr2cells(p + తాత్కాలిక_నిలువు) == 2)
+	    ++తాత్కాలిక_నిలువు;
+	లేకపోతే ఒకవేళ (CHAR_CLASS(p[తాత్కాలిక_నిలువు]) != ప్రారంభం_class
+		&& !(enc_utf8 && p[తాత్కాలిక_నిలువు] == 0))
+	    ఆపు;
+    cb->మాట_చివర_నిలువు = తాత్కాలిక_నిలువు;
 }
 
 /*
  * Find the column position for the last non-whitespace character on the given
  * line at or before start_col.
  */
-    static int
-clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
+    స్థిర పూర్ణాంకం
+clip_get_పంక్తి_చివర(Clipboard_T *cbd వాడని, పూర్ణాంకం అడ్డువరుస)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    if (row >= screen_Rows || ScreenLines == NULL)
-	return 0;
-    for (i =
+    ఒకవేళ (అడ్డువరుస >= screen_అడ్డువరుసలు || Screen_పంక్తులు == ఖాళీ)
+	తిరిగి 0;
+    కొరకు (i =
 # ifdef FEAT_PROP_POPUP
-	    cbd->max_col;
-# else
+	    cbd->max_నిలువు;
+# లేకపోతే
 	    screen_Columns;
 # endif
 			    i > 0; i--)
-	if (ScreenLines[LineOffset[row] + i - 1] != ' ')
-	    break;
-    return i;
+	ఒకవేళ (Screen_పంక్తులు[పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + i - 1] != ' ')
+	    ఆపు;
+    తిరిగి i;
 }
 
 /*
  * Start the selection
  */
-    void
-clip_start_selection(int col, int row, int repeated_click)
+    శూన్య
+clip_ప్రారంభం_selection(పూర్ణాంకం నిలువు, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం repeated_click)
 {
-    Clipboard_T	*cb = &clip_star;
+    Clipboard_T	*cb = &clip_నక్షత్రం;
 # ifdef FEAT_PROP_POPUP
     win_T	*wp;
-    int		row_cp = row;
-    int		col_cp = col;
+    పూర్ణాంకం		అడ్డువరుస_cp = అడ్డువరుస;
+    పూర్ణాంకం		నిలువు_cp = నిలువు;
 
-    wp = mouse_find_win(&row_cp, &col_cp, FIND_POPUP);
-    if (wp != NULL && WIN_IS_POPUP(wp)
-				  && popup_is_in_scrollbar(wp, row_cp, col_cp))
+    wp = mouse_కనుగొను_win(&అడ్డువరుస_cp, &నిలువు_cp, కనుగొను_POPUP);
+    ఒకవేళ (wp != ఖాళీ && WIN_IS_POPUP(wp)
+				  && popup_is_లోపల_scrollbar(wp, అడ్డువరుస_cp, నిలువు_cp))
 	// click or double click in scrollbar does not start a selection
-	return;
+	తిరిగి;
 # endif
 
-    if (cb->state == SELECT_DONE)
+    ఒకవేళ (cb->state == SELECT_పూర్తి)
 	clip_clear_selection(cb);
 
-    row = check_row(row);
-    col = check_col(col);
-    col = mb_fix_col(col, row);
+    అడ్డువరుస = check_అడ్డువరుస(అడ్డువరుస);
+    నిలువు = check_నిలువు(నిలువు);
+    నిలువు = mb_fix_నిలువు(నిలువు, అడ్డువరుస);
 
-    cb->start.lnum  = row;
-    cb->start.col   = col;
-    cb->end	    = cb->start;
-    cb->origin_row  = (short_u)cb->start.lnum;
-    cb->state	    = SELECT_IN_PROGRESS;
+    cb->ప్రారంభం.lnum  = అడ్డువరుస;
+    cb->ప్రారంభం.నిలువు   = నిలువు;
+    cb->చివర	    = cb->ప్రారంభం;
+    cb->origin_అడ్డువరుస  = (short_u)cb->ప్రారంభం.lnum;
+    cb->state	    = SELECT_లోపల_పురోగతి;
 # ifdef FEAT_PROP_POPUP
-    if (wp != NULL && WIN_IS_POPUP(wp))
+    ఒకవేళ (wp != ఖాళీ && WIN_IS_POPUP(wp))
     {
 	// Click in a popup window restricts selection to that window,
 	// excluding the border.
-	cb->min_col = wp->w_wincol + wp->w_popup_border[3];
-	cb->max_col = wp->w_wincol + popup_width(wp)
+	cb->min_నిలువు = wp->w_wincol + wp->w_popup_border[3];
+	cb->max_నిలువు = wp->w_wincol + popup_వెడల్పు(wp)
 				 - wp->w_popup_border[1] - wp->w_has_scrollbar;
-	if (cb->max_col > screen_Columns)
-	    cb->max_col = screen_Columns;
-	cb->min_row = wp->w_winrow + wp->w_popup_border[0];
-	cb->max_row = wp->w_winrow + popup_height(wp) - 1
+	ఒకవేళ (cb->max_నిలువు > screen_Columns)
+	    cb->max_నిలువు = screen_Columns;
+	cb->min_అడ్డువరుస = wp->w_winrow + wp->w_popup_border[0];
+	cb->max_అడ్డువరుస = wp->w_winrow + popup_ఎత్తు(wp) - 1
 						   - wp->w_popup_border[2];
     }
-    else
+    లేకపోతే
     {
-	cb->min_col = 0;
-	cb->max_col = screen_Columns;
-	cb->min_row = 0;
-	cb->max_row = screen_Rows;
+	cb->min_నిలువు = 0;
+	cb->max_నిలువు = screen_Columns;
+	cb->min_అడ్డువరుస = 0;
+	cb->max_అడ్డువరుస = screen_అడ్డువరుసలు;
     }
 # endif
 
-    if (repeated_click)
+    ఒకవేళ (repeated_click)
     {
-	if (++cb->mode > SELECT_MODE_LINE)
-	    cb->mode = SELECT_MODE_CHAR;
+	ఒకవేళ (++cb->బహుళకం > SELECT_బహుళకం_పంక్తి)
+	    cb->బహుళకం = SELECT_బహుళకం_CHAR;
     }
-    else
-	cb->mode = SELECT_MODE_CHAR;
+    లేకపోతే
+	cb->బహుళకం = SELECT_బహుళకం_CHAR;
 
 # ifdef FEAT_GUI
     // clear the cursor until the selection is made
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	gui_undraw_cursor();
 # endif
 
-    switch (cb->mode)
+    ఎంపిక (cb->బహుళకం)
     {
-	case SELECT_MODE_CHAR:
-	    cb->origin_start_col = cb->start.col;
-	    cb->word_end_col = clip_get_line_end(cb, (int)cb->start.lnum);
-	    break;
+	స్థితి SELECT_బహుళకం_CHAR:
+	    cb->origin_ప్రారంభం_నిలువు = cb->ప్రారంభం.నిలువు;
+	    cb->మాట_చివర_నిలువు = clip_get_పంక్తి_చివర(cb, (పూర్ణాంకం)cb->ప్రారంభం.lnum);
+	    ఆపు;
 
-	case SELECT_MODE_WORD:
-	    clip_get_word_boundaries(cb, (int)cb->start.lnum, cb->start.col);
-	    cb->origin_start_col = cb->word_start_col;
-	    cb->origin_end_col	 = cb->word_end_col;
+	స్థితి SELECT_బహుళకం_మాట:
+	    clip_get_మాట_boundaries(cb, (పూర్ణాంకం)cb->ప్రారంభం.lnum, cb->ప్రారంభం.నిలువు);
+	    cb->origin_ప్రారంభం_నిలువు = cb->మాట_ప్రారంభం_నిలువు;
+	    cb->origin_చివర_నిలువు	 = cb->మాట_చివర_నిలువు;
 
-	    clip_invert_area(cb, (int)cb->start.lnum, cb->word_start_col,
-			    (int)cb->end.lnum, cb->word_end_col, CLIP_SET);
-	    cb->start.col = cb->word_start_col;
-	    cb->end.col   = cb->word_end_col;
-	    break;
+	    clip_invert_area(cb, (పూర్ణాంకం)cb->ప్రారంభం.lnum, cb->మాట_ప్రారంభం_నిలువు,
+			    (పూర్ణాంకం)cb->చివర.lnum, cb->మాట_చివర_నిలువు, CLIP_సమితి);
+	    cb->ప్రారంభం.నిలువు = cb->మాట_ప్రారంభం_నిలువు;
+	    cb->చివర.నిలువు   = cb->మాట_చివర_నిలువు;
+	    ఆపు;
 
-	case SELECT_MODE_LINE:
-	    clip_invert_area(cb, (int)cb->start.lnum, 0, (int)cb->start.lnum,
-			    (int)Columns, CLIP_SET);
-	    cb->start.col = 0;
-	    cb->end.col   = Columns;
-	    break;
+	స్థితి SELECT_బహుళకం_పంక్తి:
+	    clip_invert_area(cb, (పూర్ణాంకం)cb->ప్రారంభం.lnum, 0, (పూర్ణాంకం)cb->ప్రారంభం.lnum,
+			    (పూర్ణాంకం)Columns, CLIP_సమితి);
+	    cb->ప్రారంభం.నిలువు = 0;
+	    cb->చివర.నిలువు   = Columns;
+	    ఆపు;
     }
 
-    cb->prev = cb->start;
+    cb->prev = cb->ప్రారంభం;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection started at (%ld,%d)\n", cb->start.lnum, cb->start.col);
+    రాయి("Selection started at (%ld,%d)\n", cb->ప్రారంభం.lnum, cb->ప్రారంభం.నిలువు);
 # endif
 }
 
 /*
  * Continue processing the selection
  */
-    void
+    శూన్య
 clip_process_selection(
-    int		button,
-    int		col,
-    int		row,
+    పూర్ణాంకం		button,
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		అడ్డువరుస,
     int_u	repeated_click)
 {
-    Clipboard_T	*cb = &clip_star;
-    int		diff;
-    int		slen = 1;	// cursor shape width
+    Clipboard_T	*cb = &clip_నక్షత్రం;
+    పూర్ణాంకం		diff;
+    పూర్ణాంకం		slen = 1;	// cursor shape width
 
-    if (button == MOUSE_RELEASE)
+    ఒకవేళ (button == MOUSE_RELEASE)
     {
-	if (cb->state != SELECT_IN_PROGRESS)
-	    return;
+	ఒకవేళ (cb->state != SELECT_లోపల_పురోగతి)
+	    తిరిగి;
 
 	// Check to make sure we have something selected
-	if (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
+	ఒకవేళ (cb->ప్రారంభం.lnum == cb->చివర.lnum && cb->ప్రారంభం.నిలువు == cb->చివర.నిలువు)
 	{
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    ఒకవేళ (gui.లోపల_use)
 		gui_update_cursor(FALSE, FALSE);
 # endif
 	    cb->state = SELECT_CLEARED;
-	    return;
+	    తిరిగి;
 	}
 
 # ifdef DEBUG_SELECTION
-	printf("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
-		cb->start.col, cb->end.lnum, cb->end.col);
+	రాయి("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->ప్రారంభం.lnum,
+		cb->ప్రారంభం.నిలువు, cb->చివర.lnum, cb->చివర.నిలువు);
 # endif
-	if (clip_isautosel_star() || clip_isautosel_plus()
+	ఒకవేళ (clip_isautosel_నక్షత్రం() || clip_isautosel_plus()
 		|| (
 # ifdef FEAT_GUI
-		    gui.in_use ? (vim_strchr(p_go, GO_ASELML) != NULL) :
+		    gui.లోపల_use ? (vim_strchr(p_go, GO_ASELML) != ఖాళీ) :
 # endif
 		    clip_autoselectml))
 	    clip_copy_modeless_selection(FALSE);
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	ఒకవేళ (gui.లోపల_use)
 	    gui_update_cursor(FALSE, FALSE);
 # endif
 
-	cb->state = SELECT_DONE;
-	return;
+	cb->state = SELECT_పూర్తి;
+	తిరిగి;
     }
 
-    row = check_row(row);
-    col = check_col(col);
-    col = mb_fix_col(col, row);
+    అడ్డువరుస = check_అడ్డువరుస(అడ్డువరుస);
+    నిలువు = check_నిలువు(నిలువు);
+    నిలువు = mb_fix_నిలువు(నిలువు, అడ్డువరుస);
 
-    if (col == (int)cb->prev.col && row == cb->prev.lnum && !repeated_click)
-	return;
+    ఒకవేళ (నిలువు == (పూర్ణాంకం)cb->prev.నిలువు && అడ్డువరుస == cb->prev.lnum && !repeated_click)
+	తిరిగి;
 
     /*
      * When extending the selection with the right mouse button, swap the
      * start and end if the position is before half the selection
      */
-    if (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
+    ఒకవేళ (cb->state == SELECT_పూర్తి && button == MOUSE_కుడి)
     {
 	/*
 	 * If the click is before the start, or the click is inside the
 	 * selection and the start is the closest side, set the origin to the
 	 * end of the selection.
 	 */
-	if (clip_compare_pos(row, col, (int)cb->start.lnum, cb->start.col) < 0
-		|| (clip_compare_pos(row, col,
-					   (int)cb->end.lnum, cb->end.col) < 0
-		    && (((cb->start.lnum == cb->end.lnum
-			    && cb->end.col - col > col - cb->start.col))
-			|| ((diff = (cb->end.lnum - row) -
-						   (row - cb->start.lnum)) > 0
-			    || (diff == 0 && col < (int)(cb->start.col +
-							 cb->end.col) / 2)))))
+	ఒకవేళ (clip_compare_pos(అడ్డువరుస, నిలువు, (పూర్ణాంకం)cb->ప్రారంభం.lnum, cb->ప్రారంభం.నిలువు) < 0
+		|| (clip_compare_pos(అడ్డువరుస, నిలువు,
+					   (పూర్ణాంకం)cb->చివర.lnum, cb->చివర.నిలువు) < 0
+		    && (((cb->ప్రారంభం.lnum == cb->చివర.lnum
+			    && cb->చివర.నిలువు - నిలువు > నిలువు - cb->ప్రారంభం.నిలువు))
+			|| ((diff = (cb->చివర.lnum - అడ్డువరుస) -
+						   (అడ్డువరుస - cb->ప్రారంభం.lnum)) > 0
+			    || (diff == 0 && నిలువు < (పూర్ణాంకం)(cb->ప్రారంభం.నిలువు +
+							 cb->చివర.నిలువు) / 2)))))
 	{
-	    cb->origin_row = (short_u)cb->end.lnum;
-	    cb->origin_start_col = cb->end.col - 1;
-	    cb->origin_end_col = cb->end.col;
+	    cb->origin_అడ్డువరుస = (short_u)cb->చివర.lnum;
+	    cb->origin_ప్రారంభం_నిలువు = cb->చివర.నిలువు - 1;
+	    cb->origin_చివర_నిలువు = cb->చివర.నిలువు;
 	}
-	else
+	లేకపోతే
 	{
-	    cb->origin_row = (short_u)cb->start.lnum;
-	    cb->origin_start_col = cb->start.col;
-	    cb->origin_end_col = cb->start.col;
+	    cb->origin_అడ్డువరుస = (short_u)cb->ప్రారంభం.lnum;
+	    cb->origin_ప్రారంభం_నిలువు = cb->ప్రారంభం.నిలువు;
+	    cb->origin_చివర_నిలువు = cb->ప్రారంభం.నిలువు;
 	}
-	if (cb->mode == SELECT_MODE_WORD && !repeated_click)
-	    cb->mode = SELECT_MODE_CHAR;
+	ఒకవేళ (cb->బహుళకం == SELECT_బహుళకం_మాట && !repeated_click)
+	    cb->బహుళకం = SELECT_బహుళకం_CHAR;
     }
 
     // set state, for when using the right mouse button
-    cb->state = SELECT_IN_PROGRESS;
+    cb->state = SELECT_లోపల_పురోగతి;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection extending to (%d,%d)\n", row, col);
+    రాయి("Selection extending to (%d,%d)\n", అడ్డువరుస, నిలువు);
 # endif
 
-    if (repeated_click && ++cb->mode > SELECT_MODE_LINE)
-	cb->mode = SELECT_MODE_CHAR;
+    ఒకవేళ (repeated_click && ++cb->బహుళకం > SELECT_బహుళకం_పంక్తి)
+	cb->బహుళకం = SELECT_బహుళకం_CHAR;
 
-    switch (cb->mode)
+    ఎంపిక (cb->బహుళకం)
     {
-	case SELECT_MODE_CHAR:
+	స్థితి SELECT_బహుళకం_CHAR:
 	    // If we're on a different line, find where the line ends
-	    if (row != cb->prev.lnum)
-		cb->word_end_col = clip_get_line_end(cb, row);
+	    ఒకవేళ (అడ్డువరుస != cb->prev.lnum)
+		cb->మాట_చివర_నిలువు = clip_get_పంక్తి_చివర(cb, అడ్డువరుస);
 
 	    // See if we are before or after the origin of the selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
-						   cb->origin_start_col) >= 0)
+	    ఒకవేళ (clip_compare_pos(అడ్డువరుస, నిలువు, cb->origin_అడ్డువరుస,
+						   cb->origin_ప్రారంభం_నిలువు) >= 0)
 	    {
-		if (col >= (int)cb->word_end_col)
-		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, (int)Columns);
-		else
+		ఒకవేళ (నిలువు >= (పూర్ణాంకం)cb->మాట_చివర_నిలువు)
+		    clip_update_modeless_selection(cb, cb->origin_అడ్డువరుస,
+			    cb->origin_ప్రారంభం_నిలువు, అడ్డువరుస, (పూర్ణాంకం)Columns);
+		లేకపోతే
 		{
-		    if (has_mbyte && mb_lefthalve(row, col))
+		    ఒకవేళ (has_mbyte && mb_lefthalve(అడ్డువరుస, నిలువు))
 			slen = 2;
-		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, col + slen);
+		    clip_update_modeless_selection(cb, cb->origin_అడ్డువరుస,
+			    cb->origin_ప్రారంభం_నిలువు, అడ్డువరుస, నిలువు + slen);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (has_mbyte
-			&& mb_lefthalve(cb->origin_row, cb->origin_start_col))
+		ఒకవేళ (has_mbyte
+			&& mb_lefthalve(cb->origin_అడ్డువరుస, cb->origin_ప్రారంభం_నిలువు))
 		    slen = 2;
-		if (col >= (int)cb->word_end_col)
-		    clip_update_modeless_selection(cb, row, cb->word_end_col,
-			    cb->origin_row, cb->origin_start_col + slen);
-		else
-		    clip_update_modeless_selection(cb, row, col,
-			    cb->origin_row, cb->origin_start_col + slen);
+		ఒకవేళ (నిలువు >= (పూర్ణాంకం)cb->మాట_చివర_నిలువు)
+		    clip_update_modeless_selection(cb, అడ్డువరుస, cb->మాట_చివర_నిలువు,
+			    cb->origin_అడ్డువరుస, cb->origin_ప్రారంభం_నిలువు + slen);
+		లేకపోతే
+		    clip_update_modeless_selection(cb, అడ్డువరుస, నిలువు,
+			    cb->origin_అడ్డువరుస, cb->origin_ప్రారంభం_నిలువు + slen);
 	    }
-	    break;
+	    ఆపు;
 
-	case SELECT_MODE_WORD:
+	స్థితి SELECT_బహుళకం_మాట:
 	    // If we are still within the same word, do nothing
-	    if (row == cb->prev.lnum && col >= (int)cb->word_start_col
-		    && col < (int)cb->word_end_col && !repeated_click)
-		return;
+	    ఒకవేళ (అడ్డువరుస == cb->prev.lnum && నిలువు >= (పూర్ణాంకం)cb->మాట_ప్రారంభం_నిలువు
+		    && నిలువు < (పూర్ణాంకం)cb->మాట_చివర_నిలువు && !repeated_click)
+		తిరిగి;
 
 	    // Get new word boundaries
-	    clip_get_word_boundaries(cb, row, col);
+	    clip_get_మాట_boundaries(cb, అడ్డువరుస, నిలువు);
 
 	    // Handle being after the origin point of selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
-		    cb->origin_start_col) >= 0)
-		clip_update_modeless_selection(cb, cb->origin_row,
-			cb->origin_start_col, row, cb->word_end_col);
-	    else
-		clip_update_modeless_selection(cb, row, cb->word_start_col,
-			cb->origin_row, cb->origin_end_col);
-	    break;
+	    ఒకవేళ (clip_compare_pos(అడ్డువరుస, నిలువు, cb->origin_అడ్డువరుస,
+		    cb->origin_ప్రారంభం_నిలువు) >= 0)
+		clip_update_modeless_selection(cb, cb->origin_అడ్డువరుస,
+			cb->origin_ప్రారంభం_నిలువు, అడ్డువరుస, cb->మాట_చివర_నిలువు);
+	    లేకపోతే
+		clip_update_modeless_selection(cb, అడ్డువరుస, cb->మాట_ప్రారంభం_నిలువు,
+			cb->origin_అడ్డువరుస, cb->origin_చివర_నిలువు);
+	    ఆపు;
 
-	case SELECT_MODE_LINE:
-	    if (row == cb->prev.lnum && !repeated_click)
-		return;
+	స్థితి SELECT_బహుళకం_పంక్తి:
+	    ఒకవేళ (అడ్డువరుస == cb->prev.lnum && !repeated_click)
+		తిరిగి;
 
-	    if (clip_compare_pos(row, col, cb->origin_row,
-		    cb->origin_start_col) >= 0)
-		clip_update_modeless_selection(cb, cb->origin_row, 0, row,
-			(int)Columns);
-	    else
-		clip_update_modeless_selection(cb, row, 0, cb->origin_row,
-			(int)Columns);
-	    break;
+	    ఒకవేళ (clip_compare_pos(అడ్డువరుస, నిలువు, cb->origin_అడ్డువరుస,
+		    cb->origin_ప్రారంభం_నిలువు) >= 0)
+		clip_update_modeless_selection(cb, cb->origin_అడ్డువరుస, 0, అడ్డువరుస,
+			(పూర్ణాంకం)Columns);
+	    లేకపోతే
+		clip_update_modeless_selection(cb, అడ్డువరుస, 0, cb->origin_అడ్డువరుస,
+			(పూర్ణాంకం)Columns);
+	    ఆపు;
     }
 
-    cb->prev.lnum = row;
-    cb->prev.col  = col;
+    cb->prev.lnum = అడ్డువరుస;
+    cb->prev.నిలువు  = నిలువు;
 
 # ifdef DEBUG_SELECTION
-	printf("Selection is: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
-		cb->start.col, cb->end.lnum, cb->end.col);
+	రాయి("Selection is: (%ld,%d) to (%ld,%d)\n", cb->ప్రారంభం.lnum,
+		cb->ప్రారంభం.నిలువు, cb->చివర.lnum, cb->చివర.నిలువు);
 # endif
 }
 
-# if defined(FEAT_GUI)
+# ఒకవేళ defined(FEAT_GUI)
 /*
  * Redraw part of the selection if character at "row,col" is inside of it.
  * Only used for the GUI.
  */
-    void
-clip_may_redraw_selection(int row, int col, int len)
+    శూన్య
+clip_may_redraw_selection(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం len)
 {
-    int		start = col;
-    int		end = col + len;
+    పూర్ణాంకం		ప్రారంభం = నిలువు;
+    పూర్ణాంకం		చివర = నిలువు + len;
 
-    if (clip_star.state != SELECT_CLEARED
-	    && row >= clip_star.start.lnum
-	    && row <= clip_star.end.lnum)
+    ఒకవేళ (clip_నక్షత్రం.state != SELECT_CLEARED
+	    && అడ్డువరుస >= clip_నక్షత్రం.ప్రారంభం.lnum
+	    && అడ్డువరుస <= clip_నక్షత్రం.చివర.lnum)
     {
-	if (row == clip_star.start.lnum && start < (int)clip_star.start.col)
-	    start = clip_star.start.col;
-	if (row == clip_star.end.lnum && end > (int)clip_star.end.col)
-	    end = clip_star.end.col;
-	if (end > start)
-	    clip_invert_area(&clip_star, row, start, row, end, 0);
+	ఒకవేళ (అడ్డువరుస == clip_నక్షత్రం.ప్రారంభం.lnum && ప్రారంభం < (పూర్ణాంకం)clip_నక్షత్రం.ప్రారంభం.నిలువు)
+	    ప్రారంభం = clip_నక్షత్రం.ప్రారంభం.నిలువు;
+	ఒకవేళ (అడ్డువరుస == clip_నక్షత్రం.చివర.lnum && చివర > (పూర్ణాంకం)clip_నక్షత్రం.చివర.నిలువు)
+	    చివర = clip_నక్షత్రం.చివర.నిలువు;
+	ఒకవేళ (చివర > ప్రారంభం)
+	    clip_invert_area(&clip_నక్షత్రం, అడ్డువరుస, ప్రారంభం, అడ్డువరుస, చివర, 0);
     }
 }
 # endif
@@ -1034,58 +1034,58 @@ clip_may_redraw_selection(int row, int col, int len)
 /*
  * Called from outside to clear selected region from the display
  */
-    void
+    శూన్య
 clip_clear_selection(Clipboard_T *cbd)
 {
 
-    if (cbd->state == SELECT_CLEARED)
-	return;
+    ఒకవేళ (cbd->state == SELECT_CLEARED)
+	తిరిగి;
 
-    clip_invert_area(cbd, (int)cbd->start.lnum, cbd->start.col,
-				 (int)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
+    clip_invert_area(cbd, (పూర్ణాంకం)cbd->ప్రారంభం.lnum, cbd->ప్రారంభం.నిలువు,
+				 (పూర్ణాంకం)cbd->చివర.lnum, cbd->చివర.నిలువు, CLIP_CLEAR);
     cbd->state = SELECT_CLEARED;
 }
 
 /*
  * Clear the selection if any lines from "row1" to "row2" are inside of it.
  */
-    void
-clip_may_clear_selection(int row1, int row2)
+    శూన్య
+clip_may_clear_selection(పూర్ణాంకం row1, పూర్ణాంకం row2)
 {
-    if (clip_star.state == SELECT_DONE
-	    && row2 >= clip_star.start.lnum
-	    && row1 <= clip_star.end.lnum)
-	clip_clear_selection(&clip_star);
+    ఒకవేళ (clip_నక్షత్రం.state == SELECT_పూర్తి
+	    && row2 >= clip_నక్షత్రం.ప్రారంభం.lnum
+	    && row1 <= clip_నక్షత్రం.చివర.lnum)
+	clip_clear_selection(&clip_నక్షత్రం);
 }
 
 /*
  * Called before the screen is scrolled up or down.  Adjusts the line numbers
  * of the selection.  Call with big number when clearing the screen.
  */
-    void
+    శూన్య
 clip_scroll_selection(
-    int	    rows)		// negative for scroll down
+    పూర్ణాంకం	    అడ్డువరుసలు_2)		// negative for scroll down
 {
-    int	    lnum;
+    పూర్ణాంకం	    lnum;
 
-    if (clip_star.state == SELECT_CLEARED)
-	return;
+    ఒకవేళ (clip_నక్షత్రం.state == SELECT_CLEARED)
+	తిరిగి;
 
-    lnum = clip_star.start.lnum - rows;
-    if (lnum <= 0)
-	clip_star.start.lnum = 0;
-    else if (lnum >= screen_Rows)	// scrolled off of the screen
-	clip_star.state = SELECT_CLEARED;
-    else
-	clip_star.start.lnum = lnum;
+    lnum = clip_నక్షత్రం.ప్రారంభం.lnum - అడ్డువరుసలు_2;
+    ఒకవేళ (lnum <= 0)
+	clip_నక్షత్రం.ప్రారంభం.lnum = 0;
+    లేకపోతే ఒకవేళ (lnum >= screen_అడ్డువరుసలు)	// scrolled off of the screen
+	clip_నక్షత్రం.state = SELECT_CLEARED;
+    లేకపోతే
+	clip_నక్షత్రం.ప్రారంభం.lnum = lnum;
 
-    lnum = clip_star.end.lnum - rows;
-    if (lnum < 0)			// scrolled off of the screen
-	clip_star.state = SELECT_CLEARED;
-    else if (lnum >= screen_Rows)
-	clip_star.end.lnum = screen_Rows - 1;
-    else
-	clip_star.end.lnum = lnum;
+    lnum = clip_నక్షత్రం.చివర.lnum - అడ్డువరుసలు_2;
+    ఒకవేళ (lnum < 0)			// scrolled off of the screen
+	clip_నక్షత్రం.state = SELECT_CLEARED;
+    లేకపోతే ఒకవేళ (lnum >= screen_అడ్డువరుసలు)
+	clip_నక్షత్రం.చివర.lnum = screen_అడ్డువరుసలు - 1;
+    లేకపోతే
+	clip_నక్షత్రం.చివర.lnum = lnum;
 }
 
 /*
@@ -1093,173 +1093,173 @@ clip_scroll_selection(
  * available for pasting.
  * When "both" is TRUE also copy to the other register.
  */
-    void
-clip_copy_modeless_selection(int both UNUSED)
+    శూన్య
+clip_copy_modeless_selection(పూర్ణాంకం both వాడని)
 {
     // The info for the modeless selection is stored in '*' register, however if
     // we are using the '+' register for modeless autoselect, we copy to
     // clip_plus instead while using the info in clip_star.
-    Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_star;
-    char_u	*buffer;
+    Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_నక్షత్రం;
+    char_u	*బఫరు;
     char_u	*bufp;
-    int		row;
-    int		start_col;
-    int		end_col;
-    int		line_end_col;
-    int		add_newline_flag = FALSE;
-    int		len;
+    పూర్ణాంకం		అడ్డువరుస;
+    పూర్ణాంకం		ప్రారంభం_నిలువు;
+    పూర్ణాంకం		చివర_నిలువు;
+    పూర్ణాంకం		పంక్తి_చివర_నిలువు;
+    పూర్ణాంకం		కూడు_newline_flag = FALSE;
+    పూర్ణాంకం		len;
     char_u	*p;
-    int		row1 = clip_star.start.lnum;
-    int		col1 = clip_star.start.col;
-    int		row2 = clip_star.end.lnum;
-    int		col2 = clip_star.end.col;
+    పూర్ణాంకం		row1 = clip_నక్షత్రం.ప్రారంభం.lnum;
+    పూర్ణాంకం		col1 = clip_నక్షత్రం.ప్రారంభం.నిలువు;
+    పూర్ణాంకం		row2 = clip_నక్షత్రం.చివర.lnum;
+    పూర్ణాంకం		col2 = clip_నక్షత్రం.చివర.నిలువు;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
     /*
      * Make sure row1 <= row2, and if row1 == row2 that col1 <= col2.
      */
-    if (row1 > row2)
+    ఒకవేళ (row1 > row2)
     {
-	row = row1; row1 = row2; row2 = row;
-	row = col1; col1 = col2; col2 = row;
+	అడ్డువరుస = row1; row1 = row2; row2 = అడ్డువరుస;
+	అడ్డువరుస = col1; col1 = col2; col2 = అడ్డువరుస;
     }
-    else if (row1 == row2 && col1 > col2)
+    లేకపోతే ఒకవేళ (row1 == row2 && col1 > col2)
     {
-	row = col1; col1 = col2; col2 = row;
+	అడ్డువరుస = col1; col1 = col2; col2 = అడ్డువరుస;
     }
 # ifdef FEAT_PROP_POPUP
-    if (col1 < clip_star.min_col)
-	col1 = clip_star.min_col;
-    if (col2 > clip_star.max_col)
-	col2 = clip_star.max_col;
-    if (row1 > clip_star.max_row || row2 < clip_star.min_row)
-	return;
-    if (row1 < clip_star.min_row)
-	row1 = clip_star.min_row;
-    if (row2 > clip_star.max_row)
-	row2 = clip_star.max_row;
+    ఒకవేళ (col1 < clip_నక్షత్రం.min_నిలువు)
+	col1 = clip_నక్షత్రం.min_నిలువు;
+    ఒకవేళ (col2 > clip_నక్షత్రం.max_నిలువు)
+	col2 = clip_నక్షత్రం.max_నిలువు;
+    ఒకవేళ (row1 > clip_నక్షత్రం.max_అడ్డువరుస || row2 < clip_నక్షత్రం.min_అడ్డువరుస)
+	తిరిగి;
+    ఒకవేళ (row1 < clip_నక్షత్రం.min_అడ్డువరుస)
+	row1 = clip_నక్షత్రం.min_అడ్డువరుస;
+    ఒకవేళ (row2 > clip_నక్షత్రం.max_అడ్డువరుస)
+	row2 = clip_నక్షత్రం.max_అడ్డువరుస;
 # endif
     // correct starting point for being on right half of double-wide char
-    p = ScreenLines + LineOffset[row1];
-    if (enc_dbcs != 0)
-	col1 -= (*mb_head_off)(p, p + col1);
-    else if (enc_utf8 && p[col1] == 0)
+    p = Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[row1];
+    ఒకవేళ (enc_dbcs != 0)
+	col1 -= (*mb_తల_off)(p, p + col1);
+    లేకపోతే ఒకవేళ (enc_utf8 && p[col1] == 0)
 	--col1;
 
     // Create a temporary buffer for storing the text
     len = (row2 - row1 + 1) * Columns + 1;
-    if (enc_dbcs != 0)
+    ఒకవేళ (enc_dbcs != 0)
 	len *= 2;	// max. 2 bytes per display cell
-    else if (enc_utf8)
+    లేకపోతే ఒకవేళ (enc_utf8)
 	len *= MB_MAXBYTES;
     // A newline is added after each row
     len += row2 - row1 + 2;
-    buffer = alloc(len);
-    if (buffer == NULL)	    // out of memory
-	return;
+    బఫరు = alloc(len);
+    ఒకవేళ (బఫరు == ఖాళీ)	    // out of memory
+	తిరిగి;
 
     // Process each row in the selection
-    for (bufp = buffer, row = row1; row <= row2; row++)
+    కొరకు (bufp = బఫరు, అడ్డువరుస = row1; అడ్డువరుస <= row2; అడ్డువరుస++)
     {
-	if (row == row1)
-	    start_col = col1;
-	else
+	ఒకవేళ (అడ్డువరుస == row1)
+	    ప్రారంభం_నిలువు = col1;
+	లేకపోతే
 # ifdef FEAT_PROP_POPUP
-	    start_col = clip_star.min_col;
-# else
-	    start_col = 0;
+	    ప్రారంభం_నిలువు = clip_నక్షత్రం.min_నిలువు;
+# లేకపోతే
+	    ప్రారంభం_నిలువు = 0;
 # endif
 
-	if (row == row2)
-	    end_col = col2;
-	else
+	ఒకవేళ (అడ్డువరుస == row2)
+	    చివర_నిలువు = col2;
+	లేకపోతే
 # ifdef FEAT_PROP_POPUP
-	    end_col = clip_star.max_col;
-# else
-	    end_col = Columns;
+	    చివర_నిలువు = clip_నక్షత్రం.max_నిలువు;
+# లేకపోతే
+	    చివర_నిలువు = Columns;
 # endif
 
-	line_end_col = clip_get_line_end(&clip_star, row);
+	పంక్తి_చివర_నిలువు = clip_get_పంక్తి_చివర(&clip_నక్షత్రం, అడ్డువరుస);
 
 	// See if we need to nuke some trailing whitespace
-	if (end_col >=
+	ఒకవేళ (చివర_నిలువు >=
 # ifdef FEAT_PROP_POPUP
-		clip_star.max_col
-# else
+		clip_నక్షత్రం.max_నిలువు
+# లేకపోతే
 		Columns
 # endif
-		    && (row < row2 || end_col > line_end_col))
+		    && (అడ్డువరుస < row2 || చివర_నిలువు > పంక్తి_చివర_నిలువు))
 	{
 	    // Get rid of trailing whitespace
-	    end_col = line_end_col;
-	    if (end_col < start_col)
-		end_col = start_col;
+	    చివర_నిలువు = పంక్తి_చివర_నిలువు;
+	    ఒకవేళ (చివర_నిలువు < ప్రారంభం_నిలువు)
+		చివర_నిలువు = ప్రారంభం_నిలువు;
 
 	    // If the last line extended to the end, add an extra newline
-	    if (row == row2)
-		add_newline_flag = TRUE;
+	    ఒకవేళ (అడ్డువరుస == row2)
+		కూడు_newline_flag = TRUE;
 	}
 
 	// If after the first row, we need to always add a newline
-	if (row > row1 && !LineWraps[row - 1])
+	ఒకవేళ (అడ్డువరుస > row1 && !పంక్తి_Wraps[అడ్డువరుస - 1])
 	    *bufp++ = NL;
 
 	// Safetey check for in case resizing went wrong
-	if (row < screen_Rows && end_col <= screen_Columns)
+	ఒకవేళ (అడ్డువరుస < screen_అడ్డువరుసలు && చివర_నిలువు <= screen_Columns)
 	{
-	    if (enc_dbcs != 0)
+	    ఒకవేళ (enc_dbcs != 0)
 	    {
-		int	i;
+		పూర్ణాంకం	i;
 
-		p = ScreenLines + LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
-		    if (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
+		p = Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[అడ్డువరుస];
+		కొరకు (i = ప్రారంభం_నిలువు; i < చివర_నిలువు; ++i)
+		    ఒకవేళ (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
 		    {
 			// single-width double-byte char
 			*bufp++ = 0x8e;
-			*bufp++ = ScreenLines2[LineOffset[row] + i];
+			*bufp++ = ScreenLines2[పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + i];
 		    }
-		    else
+		    లేకపోతే
 		    {
 			*bufp++ = p[i];
-			if (MB_BYTE2LEN(p[i]) == 2)
+			ఒకవేళ (MB_BYTE2LEN(p[i]) == 2)
 			    *bufp++ = p[++i];
 		    }
 	    }
-	    else if (enc_utf8)
+	    లేకపోతే ఒకవేళ (enc_utf8)
 	    {
-		int	off;
-		int	i;
+		పూర్ణాంకం	off;
+		పూర్ణాంకం	i;
 
-		off = LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
+		off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస];
+		కొరకు (i = ప్రారంభం_నిలువు; i < చివర_నిలువు; ++i)
 		{
 		    // The base character is either in ScreenLinesUC[] or
 		    // ScreenLines[].
-		    if (ScreenLinesUC[off + i] == 0)
-			*bufp++ = ScreenLines[off + i];
-		    else
+		    ఒకవేళ (Screen_పంక్తులు_UC[off + i] == 0)
+			*bufp++ = Screen_పంక్తులు[off + i];
+		    లేకపోతే
 			// Includes the composing characters.
 			bufp += utfc_char2bytes(off + i, bufp);
 		    // Skip right half of double-wide character.
-		    if (ScreenLines[off + i + 1] == 0)
+		    ఒకవేళ (Screen_పంక్తులు[off + i + 1] == 0)
 			++i;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		STRNCPY(bufp, ScreenLines + LineOffset[row] + start_col,
-							 end_col - start_col);
-		bufp += end_col - start_col;
+		STRNCPY(bufp, Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + ప్రారంభం_నిలువు,
+							 చివర_నిలువు - ప్రారంభం_నిలువు);
+		bufp += చివర_నిలువు - ప్రారంభం_నిలువు;
 	    }
 	}
     }
 
     // Add a newline at the end if the selection ended there
-    if (add_newline_flag)
+    ఒకవేళ (కూడు_newline_flag)
 	*bufp++ = NL;
 
     // First cleanup any old selection and become the owner.
@@ -1267,129 +1267,129 @@ clip_copy_modeless_selection(int both UNUSED)
     clip_own_selection(cbd);
 
     // Yank the text into the '*' register.
-    clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), cbd);
+    clip_yank_selection(MCHAR, బఫరు, (దీర్ఘ)(bufp - బఫరు), cbd);
 
     // Make the register contents available to the outside world.
-    clip_gen_set_selection(cbd);
+    clip_gen_సమితి_selection(cbd);
 
 # ifdef FEAT_X11
-    if (both)
+    ఒకవేళ (both)
     {
-	Clipboard_T *other = cbd == &clip_star ? &clip_plus : &clip_star;
+	Clipboard_T *other = cbd == &clip_నక్షత్రం ? &clip_plus : &clip_నక్షత్రం;
 	// Do the same for the '+' register.
 	clip_free_selection(other);
 	clip_own_selection(other);
-	clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), other);
-	clip_gen_set_selection(other);
+	clip_yank_selection(MCHAR, బఫరు, (దీర్ఘ)(bufp - బఫరు), other);
+	clip_gen_సమితి_selection(other);
     }
 # endif
-    vim_free(buffer);
+    vim_free(బఫరు);
 }
 
-    void
-clip_gen_set_selection(Clipboard_T *cbd)
+    శూన్య
+clip_gen_సమితి_selection(Clipboard_T *cbd)
 {
-    if (!clip_did_set_selection)
+    ఒకవేళ (!clip_did_సమితి_selection)
     {
 	// Updating postponed, so that accessing the system clipboard won't
 	// hang Vim when accessing it many times (e.g. on a :g command).
-	if ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
-		|| (cbd == &clip_star && (clip_unnamed_saved & CLIP_UNNAMED)))
+	ఒకవేళ ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
+		|| (cbd == &clip_నక్షత్రం && (clip_unnamed_saved & CLIP_UNNAMED)))
 	{
 	    clipboard_needs_update = TRUE;
-	    return;
+	    తిరిగి;
 	}
     }
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	clip_mch_set_selection(cbd);
-    else
+    ఒకవేళ (gui.లోపల_use)
+	clip_mch_సమితి_selection(cbd);
+    లేకపోతే
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    clip_wl_set_selection(cbd);
+	    clip_wl_సమితి_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    clip_xterm_set_selection(cbd);
+	    clip_xterm_సమితి_selection(cbd);
 #  endif
 	}
     }
-# else
-    clip_mch_set_selection(cbd);
+# లేకపోతే
+    clip_mch_సమితి_selection(cbd);
 # endif
 }
 
-    static void
+    స్థిర శూన్య
 clip_gen_request_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	clip_mch_request_selection(cbd);
-    else
+    లేకపోతే
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_request_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_request_selection(cbd);
 #  endif
 	}
     }
-# else
+# లేకపోతే
     clip_mch_request_selection(cbd);
 # endif
 }
 
-# if (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
-    static int
+# ఒకవేళ (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
+    స్థిర పూర్ణాంకం
 clip_x11_owner_exists(Clipboard_T *cbd)
 {
-    return XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
+    తిరిగి XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
 }
 # endif
 
-# if (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+# ఒకవేళ (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(USE_SYSTEM)
-    int
-clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
+    పూర్ణాంకం
+clip_gen_owner_exists(Clipboard_T *cbd వాడని)
 {
-#  if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #   ifdef FEAT_GUI_GTK
-    if (gui.in_use)
-	return clip_gtk_owner_exists(cbd);
-    else
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి clip_gtk_owner_exists(cbd);
+    లేకపోతే
 #   endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #   ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_owner_exists(cbd);
+	    తిరిగి clip_wl_owner_exists(cbd);
 #   endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_X11)
 	{
 #   ifdef FEAT_XCLIPBOARD
-	    return clip_x11_owner_exists(cbd);
+	    తిరిగి clip_x11_owner_exists(cbd);
 #   endif
 	}
-	else
-	    return FALSE;
+	లేకపోతే
+	    తిరిగి FALSE;
     }
-#  else
-    return TRUE;
+#  లేకపోతే
+    తిరిగి TRUE;
 #  endif
 }
 # endif
@@ -1398,7 +1398,7 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Stuff for the X clipboard.  Shared between VMS and Unix.
  */
 
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
 #  include <X11/Xatom.h>
 #  include <X11/Intrinsic.h>
 
@@ -1406,40 +1406,40 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Open the application context (if it hasn't been opened yet).
  * Used for Motif GUI and the xterm clipboard.
  */
-    void
-open_app_context(void)
+    శూన్య
+open_app_context(శూన్య)
 {
-    if (app_context == NULL)
+    ఒకవేళ (app_context == ఖాళీ)
     {
 	XtToolkitInitialize();
 	app_context = XtCreateApplicationContext();
     }
 }
 
-static Atom	vim_atom;	// Vim's own special selection format
-static Atom	vimenc_atom;	// Vim's extended selection format
-static Atom	vim_mt_atom;	// Vim's own special selection format (in mime
+స్థిర Atom	vim_atom;	// Vim's own special selection format
+స్థిర Atom	vimenc_atom;	// Vim's extended selection format
+స్థిర Atom	vim_mt_atom;	// Vim's own special selection format (in mime
 				// type format)
-static Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
+స్థిర Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
 				// format)
-static Atom	utf8_atom;
-static Atom	compound_text_atom;
-static Atom	text_atom;
-static Atom	targets_atom;
-static Atom	timestamp_atom;	// Used to get a timestamp
+స్థిర Atom	utf8_atom;
+స్థిర Atom	compound_పాఠ్యం_atom;
+స్థిర Atom	పాఠ్యం_atom;
+స్థిర Atom	targets_atom;
+స్థిర Atom	timestamp_atom;	// Used to get a timestamp
 
-    void
-x11_setup_atoms(Display *dpy)
+    శూన్య
+x11_అమరిక_atoms(Display *dpy)
 {
     vim_atom	       = XInternAtom(dpy, VIM_ATOM_NAME,   False);
     vimenc_atom	       = XInternAtom(dpy, VIMENC_ATOM_NAME,False);
     vim_mt_atom	       = XInternAtom(dpy, VIM_MIMETYPE_NAME,   False);
     vimenc_mt_atom     = XInternAtom(dpy, VIMENC_MIMETYPE_NAME,False);
     utf8_atom	       = XInternAtom(dpy, "UTF8_STRING",   False);
-    compound_text_atom = XInternAtom(dpy, "COMPOUND_TEXT", False);
-    text_atom	       = XInternAtom(dpy, "TEXT",	   False);
+    compound_పాఠ్యం_atom = XInternAtom(dpy, "COMPOUND_TEXT", False);
+    పాఠ్యం_atom	       = XInternAtom(dpy, "TEXT",	   False);
     targets_atom       = XInternAtom(dpy, "TARGETS",	   False);
-    clip_star.sel_atom = XA_PRIMARY;
+    clip_నక్షత్రం.sel_atom = XA_PRIMARY;
     clip_plus.sel_atom = XInternAtom(dpy, "CLIPBOARD",	   False);
     timestamp_atom     = XInternAtom(dpy, "TIMESTAMP",	   False);
 }
@@ -1448,157 +1448,157 @@ x11_setup_atoms(Display *dpy)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    static Boolean
+    స్థిర Boolean
 clip_x11_convert_selection_cb(
-    Widget	w UNUSED,
+    Widget	w వాడని,
     Atom	*sel_atom,
-    Atom	*target,
+    Atom	*లక్ష్యం,
     Atom	*type,
-    XtPointer	*value,
-    long_u	*length,
-    int		*format)
+    Xt_సూచిక	*విలువ,
+    long_u	*నిడివి,
+    పూర్ణాంకం		*format)
 {
-    static char_u   *save_result = NULL;
-    static long_u   save_length = 0;
+    స్థిర char_u   *save_ఫలితం = ఖాళీ;
+    స్థిర long_u   save_నిడివి = 0;
     char_u	    *string;
-    int		    motion_type;
+    పూర్ణాంకం		    motion_type;
     Clipboard_T    *cbd;
-    int		    i;
+    పూర్ణాంకం		    i;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    ఒకవేళ (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    లేకపోతే
+	cbd = &clip_నక్షత్రం;
 
-    if (!cbd->owned)
-	return False;	    // Shouldn't ever happen
+    ఒకవేళ (!cbd->owned)
+	తిరిగి False;	    // Shouldn't ever happen
 
     // requestor wants to know what target types we support
-    if (*target == targets_atom)
+    ఒకవేళ (*లక్ష్యం == targets_atom)
     {
-	static Atom array[9];
+	స్థిర Atom array[9];
 
-	*value = (XtPointer)array;
+	*విలువ = (Xt_సూచిక)array;
 	i = 0;
 	array[i++] = targets_atom;
 	array[i++] = vimenc_atom;
 	array[i++] = vim_atom;
 	array[i++] = vimenc_mt_atom;
 	array[i++] = vim_mt_atom;
-	if (enc_utf8)
+	ఒకవేళ (enc_utf8)
 	    array[i++] = utf8_atom;
 	array[i++] = XA_STRING;
-	array[i++] = text_atom;
-	array[i++] = compound_text_atom;
+	array[i++] = పాఠ్యం_atom;
+	array[i++] = compound_పాఠ్యం_atom;
 
 	*type = XA_ATOM;
 	// This used to be: *format = sizeof(Atom) * 8; but that caused
 	// crashes on 64 bit machines. (Peter Derr)
 	*format = 32;
-	*length = i;
-	return True;
+	*నిడివి = i;
+	తిరిగి True;
     }
 
-    if (       *target != XA_STRING
-	    && *target != vimenc_atom
-	    && *target != vimenc_mt_atom
-	    && (*target != utf8_atom || !enc_utf8)
-	    && *target != vim_atom
-	    && *target != vim_mt_atom
-	    && *target != text_atom
-	    && *target != compound_text_atom)
-	return False;
+    ఒకవేళ (       *లక్ష్యం != XA_STRING
+	    && *లక్ష్యం != vimenc_atom
+	    && *లక్ష్యం != vimenc_mt_atom
+	    && (*లక్ష్యం != utf8_atom || !enc_utf8)
+	    && *లక్ష్యం != vim_atom
+	    && *లక్ష్యం != vim_mt_atom
+	    && *లక్ష్యం != పాఠ్యం_atom
+	    && *లక్ష్యం != compound_పాఠ్యం_atom)
+	తిరిగి False;
 
     clip_get_selection(cbd);
-    motion_type = clip_convert_selection(&string, length, cbd);
-    if (motion_type < 0)
-	return False;
+    motion_type = clip_convert_selection(&string, నిడివి, cbd);
+    ఒకవేళ (motion_type < 0)
+	తిరిగి False;
 
     // For our own format, the first byte contains the motion type
-    if (*target == vim_atom || *target == vim_mt_atom)
-	(*length)++;
+    ఒకవేళ (*లక్ష్యం == vim_atom || *లక్ష్యం == vim_mt_atom)
+	(*నిడివి)++;
 
     // Our own format with encoding: motion 'encoding' NUL text
-    if (*target == vimenc_atom || *target == vimenc_mt_atom)
-	*length += STRLEN(p_enc) + 2;
+    ఒకవేళ (*లక్ష్యం == vimenc_atom || *లక్ష్యం == vimenc_mt_atom)
+	*నిడివి += STRLEN(p_enc) + 2;
 
-    if (save_length < *length || save_length / 2 >= *length)
-	*value = XtRealloc((char *)save_result, (Cardinal)*length + 1);
-    else
-	*value = save_result;
-    if (*value == NULL)
+    ఒకవేళ (save_నిడివి < *నిడివి || save_నిడివి / 2 >= *నిడివి)
+	*విలువ = XtRealloc((అక్షరం *)save_ఫలితం, (Cardinal)*నిడివి + 1);
+    లేకపోతే
+	*విలువ = save_ఫలితం;
+    ఒకవేళ (*విలువ == ఖాళీ)
     {
 	vim_free(string);
-	return False;
+	తిరిగి False;
     }
-    save_result = (char_u *)*value;
-    save_length = *length;
+    save_ఫలితం = (char_u *)*విలువ;
+    save_నిడివి = *నిడివి;
 
-    if (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
+    ఒకవేళ (*లక్ష్యం == XA_STRING || (*లక్ష్యం == utf8_atom && enc_utf8))
     {
-	mch_memmove(save_result, string, (size_t)(*length));
-	*type = *target;
+	mch_memmove(save_ఫలితం, string, (size_t)(*నిడివి));
+	*type = *లక్ష్యం;
     }
-    else if (*target == compound_text_atom || *target == text_atom)
+    లేకపోతే ఒకవేళ (*లక్ష్యం == compound_పాఠ్యం_atom || *లక్ష్యం == పాఠ్యం_atom)
     {
-	XTextProperty	text_prop;
-	char		*string_nt = (char *)save_result;
-	int		conv_result;
+	XTextProperty	పాఠ్యం_prop;
+	అక్షరం		*string_nt = (అక్షరం *)save_ఫలితం;
+	పూర్ణాంకం		conv_ఫలితం;
 
 	// create NUL terminated string which XmbTextListToTextProperty wants
-	mch_memmove(string_nt, string, (size_t)*length);
-	string_nt[*length] = NUL;
-	conv_result = XmbTextListToTextProperty(X_DISPLAY, &string_nt,
-					   1, XCompoundTextStyle, &text_prop);
-	if (conv_result != Success)
+	mch_memmove(string_nt, string, (size_t)*నిడివి);
+	string_nt[*నిడివి] = NUL;
+	conv_ఫలితం = Xmb_పాఠ్యం_List_గమ్యం_పాఠ్యం_Property(X_DISPLAY, &string_nt,
+					   1, XCompound_పాఠ్యం_Style, &పాఠ్యం_prop);
+	ఒకవేళ (conv_ఫలితం != Success)
 	{
 	    vim_free(string);
-	    return False;
+	    తిరిగి False;
 	}
-	*value = (XtPointer)(text_prop.value);	//    from plain text
-	*length = text_prop.nitems;
-	*type = compound_text_atom;
-	XtFree((char *)save_result);
-	save_result = (char_u *)*value;
-	save_length = *length;
+	*విలువ = (Xt_సూచిక)(పాఠ్యం_prop.విలువ);	//    from plain text
+	*నిడివి = పాఠ్యం_prop.nitems;
+	*type = compound_పాఠ్యం_atom;
+	XtFree((అక్షరం *)save_ఫలితం);
+	save_ఫలితం = (char_u *)*విలువ;
+	save_నిడివి = *నిడివి;
     }
-    else if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    లేకపోతే ఒకవేళ (*లక్ష్యం == vimenc_atom || *లక్ష్యం == vimenc_mt_atom)
     {
-	int l = STRLEN(p_enc);
+	పూర్ణాంకం l = STRLEN(p_enc);
 
-	save_result[0] = motion_type;
-	STRCPY(save_result + 1, p_enc);
-	mch_memmove(save_result + l + 2, string, (size_t)(*length - l - 2));
-	if (*target == vimenc_atom)
+	save_ఫలితం[0] = motion_type;
+	STRCPY(save_ఫలితం + 1, p_enc);
+	mch_memmove(save_ఫలితం + l + 2, string, (size_t)(*నిడివి - l - 2));
+	ఒకవేళ (*లక్ష్యం == vimenc_atom)
 	    *type = vimenc_atom;
-	else
+	లేకపోతే
 	    *type = vimenc_mt_atom;
     }
-    else
+    లేకపోతే
     {
-	save_result[0] = motion_type;
-	mch_memmove(save_result + 1, string, (size_t)(*length - 1));
-	if (*target == vim_atom)
+	save_ఫలితం[0] = motion_type;
+	mch_memmove(save_ఫలితం + 1, string, (size_t)(*నిడివి - 1));
+	ఒకవేళ (*లక్ష్యం == vim_atom)
 	    *type = vim_atom;
-	else
+	లేకపోతే
 	    *type = vim_mt_atom;
     }
     *format = 8;	    // 8 bits per char
     vim_free(string);
-    return True;
+    తిరిగి True;
 }
 
-    static void
-clip_x11_lose_ownership_cb(Widget w UNUSED, Atom *sel_atom)
+    స్థిర శూన్య
+clip_x11_lose_ownership_cb(Widget w వాడని, Atom *sel_atom)
 {
-    if (*sel_atom == clip_plus.sel_atom)
+    ఒకవేళ (*sel_atom == clip_plus.sel_atom)
 	clip_lose_selection(&clip_plus);
-    else
-	clip_lose_selection(&clip_star);
+    లేకపోతే
+	clip_lose_selection(&clip_నక్షత్రం);
 }
 
-    static void
-clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
+    స్థిర శూన్య
+clip_x11_notify_cb(Widget w వాడని, Atom *sel_atom వాడని, Atom *లక్ష్యం వాడని)
 {
     // To prevent automatically freeing the selection value.
 }
@@ -1606,102 +1606,102 @@ clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
 /*
  * Property callback to get a timestamp for XtOwnSelection.
  */
-#  if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    static void
+#  ఒకవేళ defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    స్థిర శూన్య
 clip_x11_timestamp_cb(
     Widget	w,
-    XtPointer	n UNUSED,
+    Xt_సూచిక	n వాడని,
     XEvent	*event,
-    Boolean	*cont UNUSED)
+    Boolean	*cont వాడని)
 {
     Atom	    actual_type;
-    int		    format;
-    unsigned  long  nitems, bytes_after;
-    unsigned char   *prop=NULL;
+    పూర్ణాంకం		    format;
+    గుర్తులేని  దీర్ఘ  nitems, బైట్లు_after;
+    గుర్తులేని అక్షరం   *prop=ఖాళీ;
     XPropertyEvent  *xproperty=&event->xproperty;
 
     // Must be a property notify, state can't be Delete (True), has to be
     // one of the supported selection types.
-    if (event->type != PropertyNotify || xproperty->state
-	    || (xproperty->atom != clip_star.sel_atom
+    ఒకవేళ (event->type != PropertyNotify || xproperty->state
+	    || (xproperty->atom != clip_నక్షత్రం.sel_atom
 				    && xproperty->atom != clip_plus.sel_atom))
-	return;
+	తిరిగి;
 
-    if (XGetWindowProperty(xproperty->display, xproperty->window,
+    ఒకవేళ (XGet_కిటికీ_Property(xproperty->display, xproperty->కిటికీ_2,
 	  xproperty->atom, 0, 0, False, timestamp_atom, &actual_type, &format,
-						&nitems, &bytes_after, &prop))
-	return;
+						&nitems, &బైట్లు_after, &prop))
+	తిరిగి;
 
-    if (prop)
+    ఒకవేళ (prop)
 	XFree(prop);
 
     // Make sure the property type is "TIMESTAMP" and it's 32 bits.
-    if (actual_type != timestamp_atom || format != 32)
-	return;
+    ఒకవేళ (actual_type != timestamp_atom || format != 32)
+	తిరిగి;
 
     // Get the selection, using the event timestamp.
-    if (XtOwnSelection(w, xproperty->atom, xproperty->time,
+    ఒకవేళ (XtOwnSelection(w, xproperty->atom, xproperty->సమయం,
 	    clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	    clip_x11_notify_cb) == OK)
     {
 	// Set the "owned" flag now, there may have been a call to
 	// lose_ownership_cb in between.
-	if (xproperty->atom == clip_plus.sel_atom)
+	ఒకవేళ (xproperty->atom == clip_plus.sel_atom)
 	    clip_plus.owned = TRUE;
-	else
-	    clip_star.owned = TRUE;
+	లేకపోతే
+	    clip_నక్షత్రం.owned = TRUE;
     }
 }
 
-    void
-x11_setup_selection(Widget w)
+    శూన్య
+x11_అమరిక_selection(Widget w)
 {
-    XtAddEventHandler(w, PropertyChangeMask, False,
-	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (XtPointer)NULL);
+    Xt_కూడు_Event_Handler(w, Property_Change_ముసుగు, False,
+	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (Xt_సూచిక)ఖాళీ);
 }
 #  endif
 
-    static void
+    స్థిర శూన్య
 clip_x11_request_selection_cb(
-    Widget	w UNUSED,
-    XtPointer	success,
+    Widget	w వాడని,
+    Xt_సూచిక	success,
     Atom	*sel_atom,
     Atom	*type,
-    XtPointer	value,
-    long_u	*length,
-    int		*format)
+    Xt_సూచిక	విలువ,
+    long_u	*నిడివి,
+    పూర్ణాంకం		*format)
 {
-    int		motion_type = MAUTO;
+    పూర్ణాంకం		motion_type = MAUTO;
     long_u	len;
     char_u	*p;
-    char	**text_list = NULL;
+    అక్షరం	**పాఠ్యం_list = ఖాళీ;
     Clipboard_T	*cbd;
-    char_u	*tmpbuf = NULL;
+    char_u	*tmpbuf = ఖాళీ;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    ఒకవేళ (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    లేకపోతే
+	cbd = &clip_నక్షత్రం;
 
-    if (value == NULL || *length == 0)
+    ఒకవేళ (విలువ == ఖాళీ || *నిడివి == 0)
     {
 	clip_free_selection(cbd);	// nothing received, clear register
-	*(int *)success = FALSE;
-	return;
+	*(పూర్ణాంకం *)success = FALSE;
+	తిరిగి;
     }
-    p = (char_u *)value;
-    len = *length;
-    if (*type == vim_atom || *type == vim_mt_atom)
+    p = (char_u *)విలువ;
+    len = *నిడివి;
+    ఒకవేళ (*type == vim_atom || *type == vim_mt_atom)
     {
 	motion_type = *p++;
 	len--;
     }
 
-    else if (*type == vimenc_atom || *type == vimenc_mt_atom)
+    లేకపోతే ఒకవేళ (*type == vimenc_atom || *type == vimenc_mt_atom)
     {
 	char_u		*enc;
 	vimconv_T	conv;
-	int		convlen;
+	పూర్ణాంకం		convlen;
 
 	motion_type = *p++;
 	--len;
@@ -1713,56 +1713,56 @@ clip_x11_request_selection_cb(
 	// If the encoding of the text is different from 'encoding', attempt
 	// converting it.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	convert_అమరిక(&conv, enc, p_enc);
+	ఒకవేళ (conv.vc_type != CONV_NONE)
 	{
 	    convlen = len;	// Need to use an int here.
 	    tmpbuf = string_convert(&conv, p, &convlen);
 	    len = convlen;
-	    if (tmpbuf != NULL)
+	    ఒకవేళ (tmpbuf != ఖాళీ)
 		p = tmpbuf;
-	    convert_setup(&conv, NULL, NULL);
+	    convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 	}
     }
 
-    else if (*type == compound_text_atom
+    లేకపోతే ఒకవేళ (*type == compound_పాఠ్యం_atom
 	    || *type == utf8_atom
-	    || (enc_dbcs != 0 && *type == text_atom))
+	    || (enc_dbcs != 0 && *type == పాఠ్యం_atom))
     {
-	XTextProperty	text_prop;
-	int		n_text = 0;
-	int		status;
+	XTextProperty	పాఠ్యం_prop;
+	పూర్ణాంకం		n_పాఠ్యం = 0;
+	పూర్ణాంకం		స్థితి_2;
 
-	text_prop.value = (unsigned char *)value;
-	text_prop.encoding = *type;
-	text_prop.format = *format;
-	text_prop.nitems = len;
-#  if defined(X_HAVE_UTF8_STRING)
-	if (*type == utf8_atom)
-	    status = Xutf8TextPropertyToTextList(X_DISPLAY, &text_prop,
-							 &text_list, &n_text);
-	else
+	పాఠ్యం_prop.విలువ = (గుర్తులేని అక్షరం *)విలువ;
+	పాఠ్యం_prop.encoding = *type;
+	పాఠ్యం_prop.format = *format;
+	పాఠ్యం_prop.nitems = len;
+#  ఒకవేళ defined(X_HAVE_UTF8_STRING)
+	ఒకవేళ (*type == utf8_atom)
+	    స్థితి_2 = Xutf8_పాఠ్యం_Property_గమ్యం_పాఠ్యం_List(X_DISPLAY, &పాఠ్యం_prop,
+							 &పాఠ్యం_list, &n_పాఠ్యం);
+	లేకపోతే
 #  endif
-	    status = XmbTextPropertyToTextList(X_DISPLAY, &text_prop,
-							 &text_list, &n_text);
-	if (status != Success || n_text < 1)
+	    స్థితి_2 = Xmb_పాఠ్యం_Property_గమ్యం_పాఠ్యం_List(X_DISPLAY, &పాఠ్యం_prop,
+							 &పాఠ్యం_list, &n_పాఠ్యం);
+	ఒకవేళ (స్థితి_2 != Success || n_పాఠ్యం < 1)
 	{
-	    *(int *)success = FALSE;
-	    return;
+	    *(పూర్ణాంకం *)success = FALSE;
+	    తిరిగి;
 	}
-	p = (char_u *)text_list[0];
+	p = (char_u *)పాఠ్యం_list[0];
 	len = STRLEN(p);
     }
-    clip_yank_selection(motion_type, p, (long)len, cbd);
+    clip_yank_selection(motion_type, p, (దీర్ఘ)len, cbd);
 
-    if (text_list != NULL)
-	XFreeStringList(text_list);
+    ఒకవేళ (పాఠ్యం_list != ఖాళీ)
+	XFreeStringList(పాఠ్యం_list);
     vim_free(tmpbuf);
-    XtFree((char *)value);
-    *(int *)success = TRUE;
+    XtFree((అక్షరం *)విలువ);
+    *(పూర్ణాంకం *)success = TRUE;
 }
 
-    void
+    శూన్య
 clip_x11_request_selection(
     Widget	myShell,
     Display	*dpy,
@@ -1770,35 +1770,35 @@ clip_x11_request_selection(
 {
     XEvent	event;
     Atom	type;
-    static int	success;
-    int		i;
-    time_t	start_time;
-    int		timed_out = FALSE;
+    స్థిర పూర్ణాంకం	success;
+    పూర్ణాంకం		i;
+    time_t	ప్రారంభం_సమయం;
+    పూర్ణాంకం		timed_బహిర్గతం = FALSE;
 
-    for (i = 0; i < 8; i++)
+    కొరకు (i = 0; i < 8; i++)
     {
-	switch (i)
+	ఎంపిక (i)
 	{
-	    case 0:  type = vimenc_mt_atom;	break;
-	    case 1:  type = vimenc_atom;	break;
-	    case 2:  type = vim_mt_atom;	break;
-	    case 3:  type = vim_atom;		break;
-	    case 4:  type = utf8_atom;		break;
-	    case 5:  type = compound_text_atom; break;
-	    case 6:  type = text_atom;		break;
-	    default: type = XA_STRING;
+	    స్థితి 0:  type = vimenc_mt_atom;	ఆపు;
+	    స్థితి 1:  type = vimenc_atom;	ఆపు;
+	    స్థితి 2:  type = vim_mt_atom;	ఆపు;
+	    స్థితి 3:  type = vim_atom;		ఆపు;
+	    స్థితి 4:  type = utf8_atom;		ఆపు;
+	    స్థితి 5:  type = compound_పాఠ్యం_atom; ఆపు;
+	    స్థితి 6:  type = పాఠ్యం_atom;		ఆపు;
+	    అప్రమేయ: type = XA_STRING;
 	}
-	if (type == utf8_atom
-#  if defined(X_HAVE_UTF8_STRING)
+	ఒకవేళ (type == utf8_atom
+#  ఒకవేళ defined(X_HAVE_UTF8_STRING)
 		&& !enc_utf8
 #  endif
 		)
 	    // Only request utf-8 when 'encoding' is utf8 and
 	    // Xutf8TextPropertyToTextList is available.
-	    continue;
+	    కొనసాగు;
 	success = MAYBE;
-	XtGetSelectionValue(myShell, cbd->sel_atom, type,
-	    clip_x11_request_selection_cb, (XtPointer)&success, CurrentTime);
+	Xt_Get_Selection_విలువ(myShell, cbd->sel_atom, type,
+	    clip_x11_request_selection_cb, (Xt_సూచిక)&success, Current_సమయం);
 
 	// Make sure the request for the selection goes out before waiting for
 	// a response.
@@ -1809,10 +1809,10 @@ clip_x11_request_selection(
 	 * characters, then they will appear before the one that requested the
 	 * paste!  Don't worry, we will catch up with any other events later.
 	 */
-	start_time = time(NULL);
-	while (success == MAYBE)
+	ప్రారంభం_సమయం = సమయం(ఖాళీ);
+	అయితే (success == MAYBE)
 	{
-	    if (XCheckTypedEvent(dpy, PropertyNotify, &event)
+	    ఒకవేళ (XCheckTypedEvent(dpy, PropertyNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionRequest, &event))
 	    {
@@ -1823,7 +1823,7 @@ clip_x11_request_selection(
 		// it we hang.  KDE klipper does this, for example.
 		// We need to handle a PropertyNotify for large selections.
 		XtDispatchEvent(&event);
-		continue;
+		కొనసాగు;
 	    }
 
 	    // Time out after 2 to 3 seconds to avoid that we hang when the
@@ -1831,10 +1831,10 @@ clip_x11_request_selection(
 	    // event may still come later when the selection owner comes back
 	    // to life and the text gets inserted unexpectedly.  Don't know
 	    // why that happens or how to avoid that :-(.
-	    if (time(NULL) > start_time + 2)
+	    ఒకవేళ (సమయం(ఖాళీ) > ప్రారంభం_సమయం + 2)
 	    {
-		timed_out = TRUE;
-		break;
+		timed_బహిర్గతం = TRUE;
+		ఆపు;
 	    }
 
 	    // Do we need this?  Probably not.
@@ -1844,27 +1844,27 @@ clip_x11_request_selection(
 	    ui_delay(1L, TRUE);
 	}
 
-	if (success == TRUE)
-	    return;
+	ఒకవేళ (success == TRUE)
+	    తిరిగి;
 
 	// don't do a retry with another type after timing out, otherwise we
 	// hang for 15 seconds.
-	if (timed_out)
-	    break;
+	ఒకవేళ (timed_బహిర్గతం)
+	    ఆపు;
     }
 
     // Final fallback position - use the X CUT_BUFFER0 store
     yank_cut_buffer0(dpy, cbd);
 }
 
-    void
+    శూన్య
 clip_x11_lose_selection(Widget myShell, Clipboard_T *cbd)
 {
     XtDisownSelection(myShell, cbd->sel_atom,
-				XtLastTimestampProcessed(XtDisplay(myShell)));
+				Xt_చివరి_Timestamp_Processed(XtDisplay(myShell)));
 }
 
-    int
+    పూర్ణాంకం
 clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
 {
     // When using the GUI we have proper timestamps, use the one of the last
@@ -1872,81 +1872,81 @@ clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
     // them), Get the time by a zero-length append, clip_x11_timestamp_cb will
     // be called with the current timestamp.
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
     {
-	if (XtOwnSelection(myShell, cbd->sel_atom,
-	       XtLastTimestampProcessed(XtDisplay(myShell)),
+	ఒకవేళ (XtOwnSelection(myShell, cbd->sel_atom,
+	       Xt_చివరి_Timestamp_Processed(XtDisplay(myShell)),
 	       clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	       clip_x11_notify_cb) == False)
-	    return FAIL;
+	    తిరిగి FAIL;
     }
-    else
+    లేకపోతే
 #  endif
     {
-	if (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
-		  cbd->sel_atom, timestamp_atom, 32, PropModeAppend, NULL, 0))
-	    return FAIL;
+	ఒకవేళ (!XChangeProperty(XtDisplay(myShell), Xt_కిటికీ(myShell),
+		  cbd->sel_atom, timestamp_atom, 32, Prop_బహుళకం_Append, ఖాళీ, 0))
+	    తిరిగి FAIL;
     }
     // Flush is required in a terminal as nothing else is doing it.
     XFlush(XtDisplay(myShell));
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Send the current selection to the clipboard.  Do nothing for X because we
  * will fill in the selection only when requested by another app.
  */
-    void
-clip_x11_set_selection(Clipboard_T *cbd UNUSED)
+    శూన్య
+clip_x11_సమితి_selection(Clipboard_T *cbd వాడని)
 {
 }
 
 # endif
 
-# if (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
+# ఒకవేళ (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
 	&& !defined(USE_GTK4)
 /*
  * Get the contents of the X CUT_BUFFER0 and put it in "cbd".
  */
-    void
+    శూన్య
 yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 {
-    int		nbytes = 0;
-    char_u	*buffer = (char_u *)XFetchBuffer(dpy, &nbytes, 0);
+    పూర్ణాంకం		nbytes = 0;
+    char_u	*బఫరు = (char_u *)XFetch_బఫరు(dpy, &nbytes, 0);
 
-    if (nbytes > 0)
+    ఒకవేళ (nbytes > 0)
     {
-	int  done = FALSE;
+	పూర్ణాంకం  పూర్తి = FALSE;
 
 	// CUT_BUFFER0 is supposed to be always latin1.  Convert to 'enc' when
 	// using a multi-byte encoding.  Conversion between two 8-bit
 	// character sets usually fails and the text might actually be in
 	// 'enc' anyway.
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    char_u	*conv_buf;
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
+	    ఒకవేళ (convert_అమరిక(&vc, (char_u *)"latin1", p_enc) == OK)
 	    {
-		conv_buf = string_convert(&vc, buffer, &nbytes);
-		if (conv_buf != NULL)
+		conv_buf = string_convert(&vc, బఫరు, &nbytes);
+		ఒకవేళ (conv_buf != ఖాళీ)
 		{
-		    clip_yank_selection(MCHAR, conv_buf, (long)nbytes, cbd);
+		    clip_yank_selection(MCHAR, conv_buf, (దీర్ఘ)nbytes, cbd);
 		    vim_free(conv_buf);
-		    done = TRUE;
+		    పూర్తి = TRUE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_అమరిక(&vc, ఖాళీ, ఖాళీ);
 	    }
 	}
-	if (!done)  // use the text without conversion
-	    clip_yank_selection(MCHAR, buffer, (long)nbytes, cbd);
-	XFree((void *)buffer);
-	if (p_verbose > 0)
+	ఒకవేళ (!పూర్తి)  // use the text without conversion
+	    clip_yank_selection(MCHAR, బఫరు, (దీర్ఘ)nbytes, cbd);
+	XFree((శూన్య *)బఫరు);
+	ఒకవేళ (p_verbose > 0)
 	{
 	    verbose_enter();
-	    verb_msg(_("Used CUT_BUFFER0 instead of empty selection"));
+	    verb_సందేశం(_("Used CUT_BUFFER0 instead of empty selection"));
 	    verbose_leave();
 	}
     }
@@ -1980,66 +1980,66 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
  * 'permanent' of the two), otherwise the PRIMARY one.
  * For now, use a hard-coded sanity limit of 1Mb of data.
  */
-# if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
-    void
-x11_export_final_selection(void)
+# ఒకవేళ defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+    శూన్య
+x11_export_final_selection(శూన్య)
 {
     Display	*dpy;
-    char_u	*str = NULL;
+    char_u	*str = ఖాళీ;
     long_u	len = 0;
-    int		motion_type = -1;
+    పూర్ణాంకం		motion_type = -1;
 
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	dpy = X_DISPLAY;
-    else
+    లేకపోతే
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	dpy = xterm_dpy;
-#  else
-	return;
+#  లేకపోతే
+	తిరిగి;
 #  endif
 
     // Get selection to export
-    if (clip_plus.owned)
+    ఒకవేళ (clip_plus.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_plus);
-    else if (clip_star.owned)
-	motion_type = clip_convert_selection(&str, &len, &clip_star);
+    లేకపోతే ఒకవేళ (clip_నక్షత్రం.owned)
+	motion_type = clip_convert_selection(&str, &len, &clip_నక్షత్రం);
 
     // Check it's OK
-    if (dpy != NULL && str != NULL && motion_type >= 0
+    ఒకవేళ (dpy != ఖాళీ && str != ఖాళీ && motion_type >= 0
 					       && len < 1024*1024 && len > 0)
     {
-	int ok = TRUE;
+	పూర్ణాంకం ok = TRUE;
 
 	// The CUT_BUFFER0 is supposed to always contain latin1.  Convert from
 	// 'enc' when it is a multi-byte encoding.  When 'enc' is an 8-bit
 	// encoding conversion usually doesn't work, so keep the text as-is.
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
+	    ఒకవేళ (convert_అమరిక(&vc, p_enc, (char_u *)"latin1") == OK)
 	    {
-		int	intlen = len;
+		పూర్ణాంకం	intlen = len;
 		char_u	*conv_str;
 
 		vc.vc_fail = TRUE;
 		conv_str = string_convert(&vc, str, &intlen);
 		len = intlen;
-		if (conv_str != NULL)
+		ఒకవేళ (conv_str != ఖాళీ)
 		{
 		    vim_free(str);
 		    str = conv_str;
 		}
-		else
+		లేకపోతే
 		{
 		    ok = FALSE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_అమరిక(&vc, ఖాళీ, ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		ok = FALSE;
 	    }
@@ -2047,9 +2047,9 @@ x11_export_final_selection(void)
 
 	// Do not store the string if conversion failed.  Better to use any
 	// other selection than garbled text.
-	if (ok)
+	ఒకవేళ (ok)
 	{
-	    XStoreBuffer(dpy, (char *)str, (int)len, 0);
+	    XStore_బఫరు(dpy, (అక్షరం *)str, (పూర్ణాంకం)len, 0);
 	    XFlush(dpy);
 	}
     }
@@ -2058,85 +2058,85 @@ x11_export_final_selection(void)
 }
 # endif
 
-    void
+    శూన్య
 clip_free_selection(Clipboard_T *cbd)
 {
     yankreg_T *y_ptr = get_y_current();
 
-    if (cbd == &clip_plus)
-	set_y_current(get_y_register(PLUS_REGISTER));
-    else
-	set_y_current(get_y_register(STAR_REGISTER));
+    ఒకవేళ (cbd == &clip_plus)
+	సమితి_y_current(get_y_రిజిస్టరు(PLUS_రిజిస్టరు));
+    లేకపోతే
+	సమితి_y_current(get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు));
     free_yank_all();
-    get_y_current()->y_size = 0;
-    set_y_current(y_ptr);
+    get_y_current()->y_కొలత = 0;
+    సమితి_y_current(y_ptr);
 }
 
 /*
  * Get the selected text and put it in register '*' or '+'.
  */
-    void
+    శూన్య
 clip_get_selection(Clipboard_T *cbd)
 {
-    yankreg_T	*old_y_previous, *old_y_current;
+    yankreg_T	*old_y_మునుపటి, *old_y_current;
     pos_T	old_cursor;
     pos_T	old_visual;
-    int		old_visual_mode;
+    పూర్ణాంకం		old_visual_బహుళకం;
     colnr_T	old_virtcol;
     colnr_T	old_curswant;
-    int		old_set_curswant;
-    pos_T	old_op_start, old_op_end;
+    పూర్ణాంకం		old_సమితి_curswant;
+    pos_T	old_op_ప్రారంభం, old_op_చివర;
     oparg_T	oa;
     cmdarg_T	ca;
 
-    if (cbd->owned)
+    ఒకవేళ (cbd->owned)
     {
-	if ((cbd == &clip_plus
-		&& get_y_register(PLUS_REGISTER)->y_array != NULL)
-		|| (cbd == &clip_star
-		    && get_y_register(STAR_REGISTER)->y_array != NULL))
-	    return;
+	ఒకవేళ ((cbd == &clip_plus
+		&& get_y_రిజిస్టరు(PLUS_రిజిస్టరు)->y_array != ఖాళీ)
+		|| (cbd == &clip_నక్షత్రం
+		    && get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు)->y_array != ఖాళీ))
+	    తిరిగి;
 
 	// Avoid triggering autocmds such as TextYankPost.
-	block_autocmds();
+	ఖండం_autocmds();
 
 	// Get the text between clip_star.start & clip_star.end
-	old_y_previous = get_y_previous();
+	old_y_మునుపటి = get_y_మునుపటి();
 	old_y_current = get_y_current();
 	old_cursor = curwin->w_cursor;
 	old_virtcol = curwin->w_virtcol;
 	old_curswant = curwin->w_curswant;
-	old_set_curswant = curwin->w_set_curswant;
-	old_op_start = curbuf->b_op_start;
-	old_op_end = curbuf->b_op_end;
+	old_సమితి_curswant = curwin->w_సమితి_curswant;
+	old_op_ప్రారంభం = curbuf->b_op_ప్రారంభం;
+	old_op_చివర = curbuf->b_op_చివర;
 	old_visual = VIsual;
-	old_visual_mode = VIsual_mode;
+	old_visual_బహుళకం = VIsual_బహుళకం;
 	clear_oparg(&oa);
 	oa.regname = (cbd == &clip_plus ? '+' : '*');
 	oa.op_type = OP_YANK;
-	CLEAR_FIELD(ca);
+	CLEAR_క్షేత్రం(ca);
 	ca.oap = &oa;
 	ca.cmdchar = 'y';
 	ca.count1 = 1;
-	ca.retval = CA_NO_ADJ_OP_END;
+	ca.retval = CA_NO_ADJ_OP_చివర;
 	do_pending_operator(&ca, 0, TRUE);
 
 	// restore things
-	set_y_previous(old_y_previous);
-	set_y_current(old_y_current);
+	సమితి_y_మునుపటి(old_y_మునుపటి);
+	సమితి_y_current(old_y_current);
 	curwin->w_cursor = old_cursor;
 	curwin->w_virtcol = old_virtcol;
-	changed_cline_bef_curs();   // old w_virtcol et al. may be invalid
+	మారింది_cline_bef_curs();   // old w_virtcol et al. may be invalid
 	curwin->w_curswant = old_curswant;
-	curwin->w_set_curswant = old_set_curswant;
-	curbuf->b_op_start = old_op_start;
-	curbuf->b_op_end = old_op_end;
+	curwin->w_సమితి_curswant = old_సమితి_curswant;
+	curbuf->b_op_ప్రారంభం = old_op_ప్రారంభం;
+	curbuf->b_op_చివర = old_op_చివర;
 	VIsual = old_visual;
-	VIsual_mode = old_visual_mode;
+	VIsual_బహుళకం = old_visual_బహుళకం;
 
 	unblock_autocmds();
     }
-    else if (!is_clipboard_needs_update())
+    లేకపోతే ఒకవేళ (!is_clipboard_needs_update())
     {
 	clip_free_selection(cbd);
 
@@ -2148,73 +2148,73 @@ clip_get_selection(Clipboard_T *cbd)
 /*
  * Convert from the GUI selection string into the '*'/'+' register.
  */
-    void
+    శూన్య
 clip_yank_selection(
-    int		type,
+    పూర్ణాంకం		type,
     char_u	*str,
-    long	len,
+    దీర్ఘ	len,
     Clipboard_T *cbd)
 {
     yankreg_T *y_ptr;
 
-    if (cbd == &clip_plus)
-	y_ptr = get_y_register(PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    ఒకవేళ (cbd == &clip_plus)
+	y_ptr = get_y_రిజిస్టరు(PLUS_రిజిస్టరు);
+    లేకపోతే
+	y_ptr = get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు);
 
     clip_free_selection(cbd);
 
-    str_to_reg(y_ptr, type, str, len, -1, FALSE);
+    str_గమ్యం_reg(y_ptr, type, str, len, -1, FALSE);
 }
 
-    int
-clip_convert_selection_offset(
+    పూర్ణాంకం
+clip_convert_selection_స్థానభ్రంశం(
 	char_u	    **str,
 	long_u	    *len,
-	int	    offset, // Extra space to add in *str and the offset to
+	పూర్ణాంకం	    స్థానభ్రంశం, // Extra space to add in *str and the offset to
 			    // place the actual string in *str.
 	Clipboard_T *cbd)
 {
     char_u	*p;
-    int		lnum;
-    int		i, j;
+    పూర్ణాంకం		lnum;
+    పూర్ణాంకం		i, j;
     int_u	eolsize;
     yankreg_T	*y_ptr;
 
-    if (cbd == &clip_plus)
-	y_ptr = get_y_register(PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    ఒకవేళ (cbd == &clip_plus)
+	y_ptr = get_y_రిజిస్టరు(PLUS_రిజిస్టరు);
+    లేకపోతే
+	y_ptr = get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు);
 
 # ifdef USE_CRNL
     eolsize = 2;
-# else
+# లేకపోతే
     eolsize = 1;
 # endif
 
-    *str = NULL;
+    *str = ఖాళీ;
     *len = 0;
-    if (y_ptr->y_array == NULL)
-	return -1;
+    ఒకవేళ (y_ptr->y_array == ఖాళీ)
+	తిరిగి -1;
 
-    for (i = 0; i < y_ptr->y_size; i++)
-	*len += (long_u)y_ptr->y_array[i].length + eolsize;
+    కొరకు (i = 0; i < y_ptr->y_కొలత; i++)
+	*len += (long_u)y_ptr->y_array[i].నిడివి + eolsize;
 
     // Don't want newline character at end of last line if we're in MCHAR mode.
-    if (y_ptr->y_type == MCHAR && *len >= eolsize)
+    ఒకవేళ (y_ptr->y_type == MCHAR && *len >= eolsize)
 	*len -= eolsize;
 
-    *len += offset;
+    *len += స్థానభ్రంశం;
     p = *str = alloc(*len + 1);	// add one to avoid zero
-    if (p == NULL)
-	return -1;
-    p += offset;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
+    p += స్థానభ్రంశం;
     lnum = 0;
-    for (i = 0, j = 0; i < (int)*len - offset; i++, j++)
+    కొరకు (i = 0, j = 0; i < (పూర్ణాంకం)*len - స్థానభ్రంశం; i++, j++)
     {
-	if (y_ptr->y_array[lnum].string[j] == '\n')
+	ఒకవేళ (y_ptr->y_array[lnum].string[j] == '\n')
 	    p[i] = NUL;
-	else if (y_ptr->y_array[lnum].string[j] == NUL)
+	లేకపోతే ఒకవేళ (y_ptr->y_array[lnum].string[j] == NUL)
 	{
 # ifdef USE_CRNL
 	    p[i++] = '\r';
@@ -2223,10 +2223,10 @@ clip_convert_selection_offset(
 	    lnum++;
 	    j = -1;
 	}
-	else
+	లేకపోతే
 	    p[i] = y_ptr->y_array[lnum].string[j];
     }
-    return y_ptr->y_type;
+    తిరిగి y_ptr->y_type;
 }
 
 /*
@@ -2234,155 +2234,155 @@ clip_convert_selection_offset(
  * with length *len.
  * Returns the motion type, or -1 for failure.
  */
-    int
+    పూర్ణాంకం
 clip_convert_selection(char_u **str, long_u *len, Clipboard_T *cbd)
 {
-    return clip_convert_selection_offset(str, len, 0, cbd);
+    తిరిగి clip_convert_selection_స్థానభ్రంశం(str, len, 0, cbd);
 }
 
 /*
  * When "regname" is a clipboard register, obtain the selection.  If it's not
  * available return zero, otherwise return "regname".
  */
-    int
-may_get_selection(int regname)
+    పూర్ణాంకం
+may_get_selection(పూర్ణాంకం regname)
 {
-    if (regname == '*')
+    ఒకవేళ (regname == '*')
     {
-	if (!clip_star.available)
+	ఒకవేళ (!clip_నక్షత్రం.అందుబాటు)
 	    regname = 0;
-	else
-	    clip_get_selection(&clip_star);
+	లేకపోతే
+	    clip_get_selection(&clip_నక్షత్రం);
     }
-    else if (regname == '+')
+    లేకపోతే ఒకవేళ (regname == '+')
     {
-	if (!clip_plus.available)
+	ఒకవేళ (!clip_plus.అందుబాటు)
 	    regname = 0;
-	else
+	లేకపోతే
 	    clip_get_selection(&clip_plus);
     }
-    return regname;
+    తిరిగి regname;
 }
 
 /*
  * If we have written to a clipboard register, send the text to the clipboard.
  */
-    void
-may_set_selection(void)
+    శూన్య
+may_సమితి_selection(శూన్య)
 {
-    if ((get_y_current() == get_y_register(STAR_REGISTER))
-	    && clip_star.available)
+    ఒకవేళ ((get_y_current() == get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు))
+	    && clip_నక్షత్రం.అందుబాటు)
     {
-	clip_own_selection(&clip_star);
-	clip_gen_set_selection(&clip_star);
+	clip_own_selection(&clip_నక్షత్రం);
+	clip_gen_సమితి_selection(&clip_నక్షత్రం);
     }
-    else if ((get_y_current() == get_y_register(PLUS_REGISTER))
-	    && clip_plus.available)
+    లేకపోతే ఒకవేళ ((get_y_current() == get_y_రిజిస్టరు(PLUS_రిజిస్టరు))
+	    && clip_plus.అందుబాటు)
     {
 	clip_own_selection(&clip_plus);
-	clip_gen_set_selection(&clip_plus);
+	clip_gen_సమితి_selection(&clip_plus);
     }
 }
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# ఒకవేళ defined(FEAT_WAYLAND_CLIPBOARD)
 
-    static clip_wl_selection_T *
+    స్థిర clip_wl_selection_T *
 clip_wl_get_selection(wayland_selection_T sel)
 {
-    switch (sel)
+    ఎంపిక (sel)
     {
-	case WAYLAND_SELECTION_REGULAR:
-	    return &clip_wl.regular;
-	case WAYLAND_SELECTION_PRIMARY:
-	    return &clip_wl.primary;
-	default:
-	    return NULL;
+	స్థితి WAYLAND_SELECTION_REGULAR:
+	    తిరిగి &clip_wl.regular;
+	స్థితి WAYLAND_SELECTION_PRIMARY:
+	    తిరిగి &clip_wl.primary;
+	అప్రమేయ:
+	    తిరిగి ఖాళీ;
     }
 }
 
-    static clip_wl_selection_T *
+    స్థిర clip_wl_selection_T *
 clip_wl_get_selection_from_cbd(Clipboard_T *cbd)
 {
-    if (cbd == &clip_plus)
-	return &clip_wl.regular;
-    else if (cbd == &clip_star)
-	return &clip_wl.primary;
-    else
-	return NULL;
+    ఒకవేళ (cbd == &clip_plus)
+	తిరిగి &clip_wl.regular;
+    లేకపోతే ఒకవేళ (cbd == &clip_నక్షత్రం)
+	తిరిగి &clip_wl.primary;
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
-    static Clipboard_T *
+    స్థిర Clipboard_T *
 clip_wl_get_cbd_from_selection(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return &clip_plus;
-    else if (sel == &clip_wl.primary)
-	return &clip_star;
-    else
-	return NULL;
+    ఒకవేళ (sel == &clip_wl.regular)
+	తిరిగి &clip_plus;
+    లేకపోతే ఒకవేళ (sel == &clip_wl.primary)
+	తిరిగి &clip_నక్షత్రం;
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
-    static wayland_selection_T
+    స్థిర wayland_selection_T
 clip_wl_get_selection_type(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return WAYLAND_SELECTION_REGULAR;
-    else if (sel == &clip_wl.primary)
-	return WAYLAND_SELECTION_PRIMARY;
-    else
-	return WAYLAND_SELECTION_NONE;
+    ఒకవేళ (sel == &clip_wl.regular)
+	తిరిగి WAYLAND_SELECTION_REGULAR;
+    లేకపోతే ఒకవేళ (sel == &clip_wl.primary)
+	తిరిగి WAYLAND_SELECTION_PRIMARY;
+    లేకపోతే
+	తిరిగి WAYLAND_SELECTION_NONE;
 }
 
-    static bool
-wl_data_offer_listener_event_offer(
-    void *data UNUSED,
-    vwl_data_offer_T *offer UNUSED,
-    const char *mime_type
+    స్థిర bool
+wl_దత్తాంశం_offer_listener_event_offer(
+    శూన్య *దత్తాంశం వాడని,
+    vwl_దత్తాంశం_offer_T *offer వాడని,
+    స్థిరరాశి అక్షరం *mime_type
 )
 {
     // Only accept mime type if we support it
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(mime_type, supported_mimes[i]) == 0)
-	    return true;
-    return FALSE;
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(supported_mimes); i++)
+	ఒకవేళ (STRCMP(mime_type, supported_mimes[i]) == 0)
+	    తిరిగి true;
+    తిరిగి FALSE;
 }
 
-static const vwl_data_offer_listener_T vwl_data_offer_listener = {
-    .offer = wl_data_offer_listener_event_offer
+స్థిర స్థిరరాశి vwl_దత్తాంశం_offer_listener_T vwl_దత్తాంశం_offer_listener = {
+    .offer = wl_దత్తాంశం_offer_listener_event_offer
 };
 
-    static void
-vwl_data_device_listener_event_data_offer(
-	void *data UNUSED,
-	vwl_data_device_T *device UNUSED,
-	vwl_data_offer_T *offer)
+    స్థిర శూన్య
+vwl_దత్తాంశం_device_listener_event_దత్తాంశం_offer(
+	శూన్య *దత్తాంశం వాడని,
+	vwl_దత్తాంశం_device_T *device వాడని,
+	vwl_దత్తాంశం_offer_T *offer)
 {
     // Immediately start listening for offer events from the data offer
-    vwl_data_offer_add_listener(offer, &vwl_data_offer_listener, NULL);
+    vwl_దత్తాంశం_offer_కూడు_listener(offer, &vwl_దత్తాంశం_offer_listener, ఖాళీ);
 }
 
-    static void
-vwl_data_device_listener_event_selection(
-	void *data UNUSED,
-	vwl_data_device_T *device UNUSED,
-	vwl_data_offer_T *offer,
+    స్థిర శూన్య
+vwl_దత్తాంశం_device_listener_event_selection(
+	శూన్య *దత్తాంశం వాడని,
+	vwl_దత్తాంశం_device_T *device వాడని,
+	vwl_దత్తాంశం_offer_T *offer,
 	wayland_selection_T selection)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection(selection);
 
     // Destroy previous offer if any, it is now invalid
-    vwl_data_offer_destroy(sel->offer);
+    vwl_దత్తాంశం_offer_destroy(sel->offer);
 
     // There are two cases when sel->offer is NULL
     // 1. No one owns the selection
     // 2. We own the selection (we'll just access the register directly)
-    if (offer == NULL || sel->source != NULL)
+    ఒకవేళ (offer == ఖాళీ || sel->ఆధారం != ఖాళీ)
     {
 	// Selection event is from us, so we are the source client. Therefore
 	// ignore it. Or the selection is cleared, so set sel->offer to NULL
-	vwl_data_offer_destroy(offer);
-	sel->offer = NULL;
-	return;
+	vwl_దత్తాంశం_offer_destroy(offer);
+	sel->offer = ఖాళీ;
+	తిరిగి;
     }
 
     // Save offer. When we want to request data, then we'll actually call the
@@ -2391,261 +2391,261 @@ vwl_data_device_listener_event_selection(
 
 }
 
-    static void
-vwl_data_device_listener_event_finished(
-	void *data UNUSED,
-	vwl_data_device_T *device)
+    స్థిర శూన్య
+vwl_దత్తాంశం_device_listener_event_ముగిసిన(
+	శూన్య *దత్తాంశం వాడని,
+	vwl_దత్తాంశం_device_T *device)
 {
     clip_wl_selection_T *sel;
     // Device finished, guessing this can happen is when the seat becomes
     // invalid? If so, let the user call :wlrestore! to reset. There wouldn't be
     // any point in trying to create another data device for the same seat,
     // since the seat is in an invalid state.
-    if (device == clip_wl.regular.device)
+    ఒకవేళ (device == clip_wl.regular.device)
     {
 	sel = &clip_wl.regular;
-	clip_wl.regular.device = NULL;
+	clip_wl.regular.device = ఖాళీ;
     }
-    else if (device == clip_wl.primary.device)
+    లేకపోతే ఒకవేళ (device == clip_wl.primary.device)
     {
 	sel = &clip_wl.primary;
-	clip_wl.primary.device = NULL;
+	clip_wl.primary.device = ఖాళీ;
     }
-    else
+    లేకపోతే
 	// Shouldn't happen
-	return;
+	తిరిగి;
 
     vim_free(sel->contents);
-    vwl_data_source_destroy(sel->source);
-    vwl_data_offer_destroy(sel->offer);
-    sel->available = FALSE;
+    vwl_దత్తాంశం_ఆధారం_destroy(sel->ఆధారం);
+    vwl_దత్తాంశం_offer_destroy(sel->offer);
+    sel->అందుబాటు = FALSE;
 
-    vwl_data_device_destroy(device);
+    vwl_దత్తాంశం_device_destroy(device);
 }
 
-static const vwl_data_device_listener_T vwl_data_device_listener = {
-    .data_offer = vwl_data_device_listener_event_data_offer,
-    .selection = vwl_data_device_listener_event_selection,
-    .finished = vwl_data_device_listener_event_finished
+స్థిర స్థిరరాశి vwl_దత్తాంశం_device_listener_T vwl_దత్తాంశం_device_listener = {
+    .దత్తాంశం_offer = vwl_దత్తాంశం_device_listener_event_దత్తాంశం_offer,
+    .selection = vwl_దత్తాంశం_device_listener_event_selection,
+    .ముగిసిన = vwl_దత్తాంశం_device_listener_event_ముగిసిన
 };
 
 /*
  * Initialize the clipboard for Wayland using the global Wayland connection.
  * Returns OK on success and FAIL on failure.
  */
-    int
-clip_init_wayland(void)
+    పూర్ణాంకం
+clip_init_wayland(శూన్య)
 {
     int_u supported = WAYLAND_SELECTION_NONE;
 
-    if (wayland_ct == NULL)
-	return FAIL;
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి FAIL;
 
-    memset(&clip_wl, 0, sizeof(clip_wl));
+    memset(&clip_wl, 0, పరిమాణం(clip_wl));
 
-    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (char *)p_wse);
+    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (అక్షరం *)p_wse);
 
-    if (clip_wl.seat == NULL)
-	return FAIL;
+    ఒకవేళ (clip_wl.seat == ఖాళీ)
+	తిరిగి FAIL;
 
-    clip_wl.regular.manager = vwl_connection_get_data_device_manager(
+    clip_wl.regular.manager = vwl_connection_get_దత్తాంశం_device_manager(
 	    wayland_ct, WAYLAND_SELECTION_REGULAR, &supported);
 
-    if (clip_wl.regular.manager != NULL)
+    ఒకవేళ (clip_wl.regular.manager != ఖాళీ)
     {
-	clip_wl.regular.device = vwl_data_device_manager_get_data_device(
+	clip_wl.regular.device = vwl_దత్తాంశం_device_manager_get_దత్తాంశం_device(
 		clip_wl.regular.manager, clip_wl.seat);
 
-	if (clip_wl.regular.device != NULL)
-	    clip_wl.regular.available = true;
-	else
+	ఒకవేళ (clip_wl.regular.device != ఖాళీ)
+	    clip_wl.regular.అందుబాటు = true;
+	లేకపోతే
 	{
 	    // Shouldn't happen
-	    vwl_data_device_manager_discard(clip_wl.regular.manager);
-	    clip_wl.regular.manager = NULL;
-	    return FAIL;
+	    vwl_దత్తాంశం_device_manager_discard(clip_wl.regular.manager);
+	    clip_wl.regular.manager = ఖాళీ;
+	    తిరిగి FAIL;
 	}
     }
 
     // If we still don't support the primary selection, try finding one for it
     // specifically.
-    if (!(supported & WAYLAND_SELECTION_PRIMARY))
+    ఒకవేళ (!(supported & WAYLAND_SELECTION_PRIMARY))
     {
-	clip_wl.primary.manager = vwl_connection_get_data_device_manager(
+	clip_wl.primary.manager = vwl_connection_get_దత్తాంశం_device_manager(
 		wayland_ct, WAYLAND_SELECTION_PRIMARY, &supported);
 
-	if (clip_wl.primary.manager != NULL)
+	ఒకవేళ (clip_wl.primary.manager != ఖాళీ)
 	{
-	    clip_wl.primary.device = vwl_data_device_manager_get_data_device(
+	    clip_wl.primary.device = vwl_దత్తాంశం_device_manager_get_దత్తాంశం_device(
 		    clip_wl.primary.manager, clip_wl.seat);
 
-	    if (clip_wl.primary.device != NULL)
-		clip_wl.primary.available = true;
-	    else
+	    ఒకవేళ (clip_wl.primary.device != ఖాళీ)
+		clip_wl.primary.అందుబాటు = true;
+	    లేకపోతే
 	    {
-		vwl_data_device_manager_discard(clip_wl.primary.manager);
-		clip_wl.primary.manager = NULL;
+		vwl_దత్తాంశం_device_manager_discard(clip_wl.primary.manager);
+		clip_wl.primary.manager = ఖాళీ;
 	    }
 	}
     }
 
-    if (clip_wl.regular.available && !clip_wl.primary.available)
+    ఒకవేళ (clip_wl.regular.అందుబాటు && !clip_wl.primary.అందుబాటు)
     {
 	// The protocol supports both regular and primary selections, just use
 	// one data device manager and one data device. Or the primary selection
 	// is not supported, make it point to the regular selection instead.
-	clip_wl.primary.available = true;
+	clip_wl.primary.అందుబాటు = true;
 	clip_wl.primary.manager = clip_wl.regular.manager;
 	clip_wl.primary.device = clip_wl.regular.device;
     }
 
-    if (!clip_wl.regular.available && !clip_wl.primary.available)
-	return FAIL;
+    ఒకవేళ (!clip_wl.regular.అందుబాటు && !clip_wl.primary.అందుబాటు)
+	తిరిగి FAIL;
 
     // Start listening for selection updates
-    if (clip_wl.regular.device != NULL)
-	vwl_data_device_add_listener(clip_wl.regular.device,
-		&vwl_data_device_listener, NULL);
+    ఒకవేళ (clip_wl.regular.device != ఖాళీ)
+	vwl_దత్తాంశం_device_కూడు_listener(clip_wl.regular.device,
+		&vwl_దత్తాంశం_device_listener, ఖాళీ);
     // Don't want to listen to the same data device twice
-    if (clip_wl.primary.device != NULL
+    ఒకవేళ (clip_wl.primary.device != ఖాళీ
 	    && clip_wl.primary.device != clip_wl.regular.device)
-	vwl_data_device_add_listener(clip_wl.primary.device,
-		&vwl_data_device_listener, NULL);
+	vwl_దత్తాంశం_device_కూడు_listener(clip_wl.primary.device,
+		&vwl_దత్తాంశం_device_listener, ఖాళీ);
 
-    return OK;
+    తిరిగి OK;
 }
 
-    void
-clip_uninit_wayland(void)
+    శూన్య
+clip_uninit_wayland(శూన్య)
 {
     clip_wl_selection_T *sel;
 
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+    ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
     {
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	ఒకవేళ (clip_నక్షత్రం.owned)
+	    clip_lose_selection(&clip_నక్షత్రం);
+	ఒకవేళ (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
 
     // Don't want to double free
-    if (clip_wl.regular.manager != clip_wl.primary.manager)
-	vwl_data_device_manager_discard(clip_wl.primary.manager);
-    vwl_data_device_manager_discard(clip_wl.regular.manager);
+    ఒకవేళ (clip_wl.regular.manager != clip_wl.primary.manager)
+	vwl_దత్తాంశం_device_manager_discard(clip_wl.primary.manager);
+    vwl_దత్తాంశం_device_manager_discard(clip_wl.regular.manager);
 
-    if (clip_wl.regular.device != clip_wl.primary.device)
-	vwl_data_device_destroy(clip_wl.primary.device);
-    vwl_data_device_destroy(clip_wl.regular.device);
+    ఒకవేళ (clip_wl.regular.device != clip_wl.primary.device)
+	vwl_దత్తాంశం_device_destroy(clip_wl.primary.device);
+    vwl_దత్తాంశం_device_destroy(clip_wl.regular.device);
 
     sel = &clip_wl.regular;
-    while (true)
+    అయితే (true)
     {
 	vim_free(sel->contents);
-	vwl_data_source_destroy(sel->source);
-	vwl_data_offer_destroy(sel->offer);
-	sel->available = false;
+	vwl_దత్తాంశం_ఆధారం_destroy(sel->ఆధారం);
+	vwl_దత్తాంశం_offer_destroy(sel->offer);
+	sel->అందుబాటు = false;
 
-	if (sel == &clip_wl.primary)
-	    break;
+	ఒకవేళ (sel == &clip_wl.primary)
+	    ఆపు;
 	sel = &clip_wl.primary;
     }
 
-    vim_memset(&clip_wl, 0, sizeof(clip_wl));
+    vim_memset(&clip_wl, 0, పరిమాణం(clip_wl));
 }
 
-    int
-clip_reset_wayland(void)
+    పూర్ణాంకం
+clip_reset_wayland(శూన్య)
 {
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == FAIL
+    ఒకవేళ (wayland_init_connection(wayland_display_name) == FAIL
 	    || clip_init_wayland() == FAIL)
-	return FAIL;
+	తిరిగి FAIL;
 
-    choose_clipmethod();
-    return OK;
+    ఎంచుకో_clipmethod();
+    తిరిగి OK;
 }
 
 
 /*
  * Read data from a file descriptor and write it to the given clipboard.
  */
-    static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
+    స్థిర శూన్య
+clip_wl_receive_దత్తాంశం(Clipboard_T *cbd, స్థిరరాశి అక్షరం *mime_type, పూర్ణాంకం fd)
 {
-    char_u	*start, *final;
-    long	len;
+    char_u	*ప్రారంభం, *final;
+    దీర్ఘ	len;
     garray_T	buf;
-    int		motion_type = MAUTO;
+    పూర్ణాంకం		motion_type = MAUTO;
     ssize_t	r = 0;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ఖాళీ;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    నిర్మాణం pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLIN;
-#  else
+#  లేకపోతే
     fd_set rfds;
-    struct timeval  tv;
+    నిర్మాణం timeval  tv;
 
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 #  endif
 
     // Make pipe (read end) non-blocking
-    if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
-	return;
+    ఒకవేళ (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+	తిరిగి;
 
     ga_init2(&buf, 1, 4096);
 
     // 4096 bytes seems reasonable for initial buffer size, memory is cheap
     // anyways.
-    if (ga_grow(&buf, 4096) == FAIL)
-	return;
+    ఒకవేళ (ga_grow(&buf, 4096) == FAIL)
+	తిరిగి;
 
-    start = buf.ga_data;
+    ప్రారంభం = buf.ga_దత్తాంశం;
 
 #  ifndef HAVE_SELECT
-    while (poll(&pfd, 1, p_wtm) > 0)
-#  else
-    while (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
-	    select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
+    అయితే (poll(&pfd, 1, p_wtm) > 0)
+#  లేకపోతే
+    అయితే (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
+	    select(fd + 1, &rfds, ఖాళీ, ఖాళీ, &tv) > 0)
 #  endif
     {
-	r = read(fd, start, buf.ga_maxlen - 1 - buf.ga_len);
+	r = పఠ(fd, ప్రారంభం, buf.ga_maxlen - 1 - buf.ga_len);
 
-	if (r == 0)
-	    break;
-	else if (r < 0)
+	ఒకవేళ (r == 0)
+	    ఆపు;
+	లేకపోతే ఒకవేళ (r < 0)
 	{
-	    if (errno == EAGAIN || errno == EINTR)
-		continue;
-	    break;
+	    ఒకవేళ (errno == EAGAIN || errno == EINTR)
+		కొనసాగు;
+	    ఆపు;
 	}
 
-	start += r;
+	ప్రారంభం += r;
 	buf.ga_len += r;
 
 	// Realloc if we are at the end of the buffer
-	if (buf.ga_len >= buf.ga_maxlen - 1)
+	ఒకవేళ (buf.ga_len >= buf.ga_maxlen - 1)
 	{
-	    if (ga_grow(&buf, 8192) == FAIL)
-		break;
-	    start = (char_u *)buf.ga_data + buf.ga_len;
+	    ఒకవేళ (ga_grow(&buf, 8192) == FAIL)
+		ఆపు;
+	    ప్రారంభం = (char_u *)buf.ga_దత్తాంశం + buf.ga_len;
 	}
     }
 
-    if (buf.ga_len == 0)
+    ఒకవేళ (buf.ga_len == 0)
     {
 	clip_free_selection(cbd); // Nothing received, clear register
 	ga_clear(&buf);
-	return;
+	తిరిగి;
     }
 
-    final = buf.ga_data;
+    final = buf.ga_దత్తాంశం;
     len = buf.ga_len;
 
-    if (clip_convert_data(&final, &len, &motion_type,
+    ఒకవేళ (clip_convert_దత్తాంశం(&final, &len, &motion_type,
 	    STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	    || STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0,
 	    STRCMP(mime_type, VIMENC_ATOM_NAME) == 0
@@ -2659,98 +2659,98 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
  * Get the current selection and fill the respective register for cbd with the
  * data.
  */
-    static void
+    స్థిర శూన్య
 clip_wl_request_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
-    int			fds[2];
-    int			mime_types_len;
-    const char		**mime_types;
-    const char		*chosen_mime = NULL;
+    పూర్ణాంకం			fds[2];
+    పూర్ణాంకం			mime_types_len;
+    స్థిరరాశి అక్షరం		**mime_types;
+    స్థిరరాశి అక్షరం		*chosen_mime = ఖాళీ;
 
-    if (!sel->available)
-	goto clear;
+    ఒకవేళ (!sel->అందుబాటు)
+	వెళ్ళు clear;
 
     // Dispatch any events that still queued up before checking for a data
     // offer.
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	goto clear;
+    ఒకవేళ (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	వెళ్ళు clear;
 
-    if (sel->offer == NULL)
-	goto clear;
+    ఒకవేళ (sel->offer == ఖాళీ)
+	వెళ్ళు clear;
 
     mime_types_len = sel->offer->mime_types.ga_len;
-    mime_types = sel->offer->mime_types.ga_data;
+    mime_types = sel->offer->mime_types.ga_దత్తాంశం;
 
     // Choose mime type to receive from. Mime types with a lower index in the
     // "supported_mimes" array are prioritized over ones after it.
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes)
-	    && chosen_mime == NULL; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(supported_mimes)
+	    && chosen_mime == ఖాళీ; i++)
     {
-	for (int k = 0; k < mime_types_len && chosen_mime == NULL; k++)
-	    if (STRCMP(mime_types[k], supported_mimes[i]) == 0)
+	కొరకు (పూర్ణాంకం k = 0; k < mime_types_len && chosen_mime == ఖాళీ; k++)
+	    ఒకవేళ (STRCMP(mime_types[k], supported_mimes[i]) == 0)
 		chosen_mime = supported_mimes[i];
     }
 
-    if (chosen_mime == NULL || pipe(fds) == -1)
-	goto clear;
+    ఒకవేళ (chosen_mime == ఖాళీ || pipe(fds) == -1)
+	వెళ్ళు clear;
 
-    vwl_data_offer_receive(sel->offer, chosen_mime, fds[1]);
+    vwl_దత్తాంశం_offer_receive(sel->offer, chosen_mime, fds[1]);
 
     close(fds[1]); // Close before we read data so that when the source client
 		   // closes their end we receive an EOF.
 
-    if (vwl_connection_flush(wayland_ct) >= 0)
-	clip_wl_receive_data(cbd, chosen_mime, fds[0]);
+    ఒకవేళ (vwl_connection_flush(wayland_ct) >= 0)
+	clip_wl_receive_దత్తాంశం(cbd, chosen_mime, fds[0]);
 
     close(fds[0]);
 
-    return;
+    తిరిగి;
 clear:
     clip_free_selection(cbd);
 }
 
-    static void
-vwl_data_source_listener_event_send(
-    void *data,
-    vwl_data_source_T *source UNUSED,
-    const char *mime_type,
+    స్థిర శూన్య
+vwl_దత్తాంశం_ఆధారం_listener_event_send(
+    శూన్య *దత్తాంశం,
+    vwl_దత్తాంశం_ఆధారం_T *ఆధారం వాడని,
+    స్థిరరాశి అక్షరం *mime_type,
     int32_t fd
 )
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = దత్తాంశం;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
     bool		have_mime = false;
-    int			motion_type;
-    long_u		length;
+    పూర్ణాంకం			motion_type;
+    long_u		నిడివి;
     char_u		*string; // Will be reallocated to a bigger size if
 				 // needed.
-    int			offset = 0;
+    పూర్ణాంకం			స్థానభ్రంశం = 0;
     bool		is_vim, is_vimenc;
-    size_t		total = 0;
+    size_t		మొత్తం = 0;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    నిర్మాణం pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLOUT;
-#  else
+#  లేకపోతే
     fd_set	    wfds;
-    struct timeval  tv;
+    నిర్మాణం timeval  tv;
 
     FD_ZERO(&wfds);
     FD_SET(fd, &wfds);
 #  endif
 
     // Check if we actually have mime type
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(supported_mimes); i++)
+	ఒకవేళ (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = true;
-	    break;
+	    ఆపు;
 	}
 
-    if (!have_mime)
-	goto exit;
+    ఒకవేళ (!have_mime)
+	వెళ్ళు నిష్క్రమించు;
 
     // First byte sent is motion type for vim specific formats. For the vimenc
     // format, after the first byte is the encoding type, which is null
@@ -2761,70 +2761,70 @@ vwl_data_source_listener_event_send(
     is_vim = STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	|| STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
-	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
-	offset += 1;
+    ఒకవేళ (is_vimenc)
+	స్థానభ్రంశం += 2 + STRLEN(p_enc);
+    లేకపోతే ఒకవేళ (is_vim)
+	స్థానభ్రంశం += 1;
 
     clip_get_selection(cbd);
-    motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
+    motion_type = clip_convert_selection_స్థానభ్రంశం(&string, &నిడివి, స్థానభ్రంశం, cbd);
 
-    if (motion_type < 0)
-	goto exit;
+    ఒకవేళ (motion_type < 0)
+	వెళ్ళు నిష్క్రమించు;
 
-    if (is_vimenc)
+    ఒకవేళ (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    లేకపోతే ఒకవేళ (is_vim)
 	string[0] = (char_u)motion_type;
 
 
-    while (total < (size_t)length &&
+    అయితే (మొత్తం < (size_t)నిడివి &&
 #  ifndef HAVE_SELECT
 	    poll(&pfd, 1, p_wtm) > 0)
-#  else
+#  లేకపోతే
 	    ((tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000),
-	    select(fd + 1, NULL, &wfds, NULL, &tv) > 0))
+	    select(fd + 1, ఖాళీ, &wfds, ఖాళీ, &tv) > 0))
 #  endif
     {
-	ssize_t w = write(fd, string + total, length - total);
+	ssize_t w = లిఖ(fd, string + మొత్తం, నిడివి - మొత్తం);
 
-	if (w == -1)
-	    break;
-	total += w;
+	ఒకవేళ (w == -1)
+	    ఆపు;
+	మొత్తం += w;
     }
 
     vim_free(string);
-exit:
+నిష్క్రమించు:
     close(fd);
 }
 
-    static void
-vwl_data_source_listener_event_cancelled(
-	void *data,
-	vwl_data_source_T *source UNUSED)
+    స్థిర శూన్య
+vwl_దత్తాంశం_ఆధారం_listener_event_cancelled(
+	శూన్య *దత్తాంశం,
+	vwl_దత్తాంశం_ఆధారం_T *ఆధారం వాడని)
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = దత్తాంశం;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
 
     clip_lose_selection(cbd);
 }
 
-static const vwl_data_source_listener_T vwl_data_source_listener = {
-    .send = vwl_data_source_listener_event_send,
-    .cancelled = vwl_data_source_listener_event_cancelled
+స్థిర స్థిరరాశి vwl_దత్తాంశం_ఆధారం_listener_T vwl_దత్తాంశం_ఆధారం_listener = {
+    .send = vwl_దత్తాంశం_ఆధారం_listener_event_send,
+    .cancelled = vwl_దత్తాంశం_ఆధారం_listener_event_cancelled
 };
 
-    static void
-clip_wl_do_set_selection(void *data, uint32_t serial)
+    స్థిర శూన్య
+clip_wl_do_సమితి_selection(శూన్య *దత్తాంశం, uint32_t serial)
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = దత్తాంశం;
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    vwl_data_device_set_selection(sel->device, sel->source, serial, sel_type);
+    vwl_దత్తాంశం_device_సమితి_selection(sel->device, sel->ఆధారం, serial, sel_type);
 
     sel->own_success = (vwl_connection_roundtrip(wayland_ct) == OK);
 }
@@ -2834,25 +2834,25 @@ clip_wl_do_set_selection(void *data, uint32_t serial)
  * other Wayland clients so they can receive data from us. Returns OK on success
  * and FAIL on failure.
  */
-    static int
+    స్థిర పూర్ణాంకం
 clip_wl_own_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    if (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return FAIL;
+    ఒకవేళ (!sel->అందుబాటు || vwl_connection_roundtrip(wayland_ct) == FAIL)
+	తిరిగి FAIL;
 
-    if (sel->source != NULL)
+    ఒకవేళ (sel->ఆధారం != ఖాళీ)
     {
-	if (sel_type == WAYLAND_SELECTION_PRIMARY)
+	ఒకవేళ (sel_type == WAYLAND_SELECTION_PRIMARY)
 	    // We already own the selection, ignore (only do this for primary
 	    // selection). We don't re set the selection because then we would
 	    // be setting the selection every time the user moves the visual
 	    // selection cursor, which is messy and inefficient. Some
 	    // applications like Google Chrome do it this way however.
-	    return OK;
-	else if (sel_type == WAYLAND_SELECTION_REGULAR)
+	    తిరిగి OK;
+	లేకపోతే ఒకవేళ (sel_type == WAYLAND_SELECTION_REGULAR)
 	{
 	    // Technically we don't need to do this as we already own the
 	    // selection, however if a user yanks text a second time, the
@@ -2862,195 +2862,195 @@ clip_wl_own_selection(Clipboard_T *cbd)
 	    // This can be unexpected behaviour for the user so its probably
 	    // better to do it this way. Additionally other Wayland applications
 	    // seem to set the selection every time.
-	    vwl_data_source_destroy(sel->source);
+	    vwl_దత్తాంశం_ఆధారం_destroy(sel->ఆధారం);
 	}
-	else
+	లేకపోతే
 	    // Shouldn't happen
-	    return FAIL;
+	    తిరిగి FAIL;
     }
 
-    sel->source = vwl_data_device_manager_create_data_source(sel->manager);
-    vwl_data_source_add_listener(sel->source, &vwl_data_source_listener, sel);
+    sel->ఆధారం = vwl_దత్తాంశం_device_manager_create_దత్తాంశం_ఆధారం(sel->manager);
+    vwl_దత్తాంశం_ఆధారం_కూడు_listener(sel->ఆధారం, &vwl_దత్తాంశం_ఆధారం_listener, sel);
 
     // Advertise mime types
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	vwl_data_source_offer(sel->source, supported_mimes[i]);
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(supported_mimes); i++)
+	vwl_దత్తాంశం_ఆధారం_offer(sel->ఆధారం, supported_mimes[i]);
 
     sel->own_success = false;
-    clip_wl_do_set_selection(sel, 0);
+    clip_wl_do_సమితి_selection(sel, 0);
 
-    if (!sel->own_success)
-	goto fail;
+    ఒకవేళ (!sel->own_success)
+	వెళ్ళు fail;
 
-    return OK;
+    తిరిగి OK;
 fail:
-    vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
-    return FAIL;
+    vwl_దత్తాంశం_ఆధారం_destroy(sel->ఆధారం);
+    sel->ఆధారం = ఖాళీ;
+    తిరిగి FAIL;
 }
 
 /*
  * Disown the selection that cbd corresponds to.
  */
-    static void
+    స్థిర శూన్య
 clip_wl_lose_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (!sel->available)
-	return;
+    ఒకవేళ (!sel->అందుబాటు)
+	తిరిగి;
 
-    vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
+    vwl_దత్తాంశం_ఆధారం_destroy(sel->ఆధారం);
+    sel->ఆధారం = ఖాళీ;
 }
 
 /*
  * Send the current selection to the clipboard. Do nothing for Wayland because
  * we will fill in the selection only when requested by another client.
  */
-    static void
-clip_wl_set_selection(Clipboard_T *cbd UNUSED)
+    స్థిర శూన్య
+clip_wl_సమితి_selection(Clipboard_T *cbd వాడని)
 {
 }
 
-#  if defined(USE_SYSTEM)
+#  ఒకవేళ defined(USE_SYSTEM)
 /*
  * Return true if we own the selection corresponding to cbd or another client
  * does.
  */
-    static bool
+    స్థిర bool
 clip_wl_owner_exists(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return false;
+    ఒకవేళ (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	తిరిగి false;
 
-    return sel->available && (sel->source != NULL || sel->offer != NULL);
+    తిరిగి sel->అందుబాటు && (sel->ఆధారం != ఖాళీ || sel->offer != ఖాళీ);
 }
 #  endif
 
 # endif // FEAT_WAYLAND_CLIPBOARD
 
-#endif // FEAT_CLIPBOARD
+#అయితే_ముగింపు // FEAT_CLIPBOARD
 
-#ifdef HAVE_CLIPMETHOD
+#నిర్వచితమైతే HAVE_CLIPMETHOD
 
 /*
  * Returns the first method for accessing the clipboard that is available/works,
  * depending on the order of values in str.
  */
-    static clipmethod_T
+    స్థిర clipmethod_T
 get_clipmethod(char_u *str)
 {
-    int		len	= (int)STRLEN(str) + 1;
+    పూర్ణాంకం		len	= (పూర్ణాంకం)STRLEN(str) + 1;
     char_u	*buf	= alloc(len);
 
-    if (buf == NULL)
-	return CLIPMETHOD_FAIL;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి CLIPMETHOD_FAIL;
 
     clipmethod_T ret = CLIPMETHOD_FAIL;
     char_u	*p = str;
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	clipmethod_T method = CLIPMETHOD_NONE;
+	clipmethod_T పద్ధతి = CLIPMETHOD_NONE;
 
-	(void)copy_option_part(&p, buf, len, ",");
+	(శూన్య)copy_option_part(&p, buf, len, ",");
 
-	if (STRCMP(buf, "wayland") == 0)
+	ఒకవేళ (STRCMP(buf, "wayland") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    ఒకవేళ (!gui.లోపల_use)
 # endif
 	    {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-		if (clip_wl.regular.available || clip_wl.primary.available)
-		    method = CLIPMETHOD_WAYLAND;
+		ఒకవేళ (clip_wl.regular.అందుబాటు || clip_wl.primary.అందుబాటు)
+		    పద్ధతి = CLIPMETHOD_WAYLAND;
 # endif
 	    }
 	}
-	else if (STRCMP(buf, "x11") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(buf, "x11") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    ఒకవేళ (!gui.లోపల_use)
 # endif
 	    {
 # ifdef FEAT_XCLIPBOARD
 		// x_IOerror_handler() in os_unix.c should set xterm_dpy to NULL if
 		// we lost connection to the X server.
-		if (xterm_dpy != NULL)
+		ఒకవేళ (xterm_dpy != ఖాళీ)
 		{
 		    // If the X connection is lost then that handler will longjmp
 		    // somewhere else, in that case we will call choose_clipmethod()
 		    // again from there, and this if block won't be executed since
 		    // xterm_dpy will be set to NULL.
 		    xterm_update();
-		    method = CLIPMETHOD_X11;
+		    పద్ధతి = CLIPMETHOD_X11;
 		}
 # endif
 	    }
 	}
-	else
+	లేకపోతే
 	{
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	    // Check if name matches a clipboard provider
-	    int r = clip_provider_is_available(buf);
+	    పూర్ణాంకం r = clip_provider_is_అందుబాటు(buf);
 
-	    if (r == 1)
+	    ఒకవేళ (r == 1)
 	    {
-		method = CLIPMETHOD_PROVIDER;
-		if (ret == CLIPMETHOD_FAIL)
+		పద్ధతి = CLIPMETHOD_PROVIDER;
+		ఒకవేళ (ret == CLIPMETHOD_FAIL)
 		{
 		    vim_free(clip_provider);
 		    clip_provider = vim_strsave(buf);
-		    if (clip_provider == NULL)
-			goto fail;
+		    ఒకవేళ (clip_provider == ఖాళీ)
+			వెళ్ళు fail;
 		}
 	    }
-	    else if (r == -1)
+	    లేకపోతే ఒకవేళ (r == -1)
 # endif
 	    {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 fail:
 # endif
 		ret = CLIPMETHOD_FAIL;
-		goto exit;
+		వెళ్ళు నిష్క్రమించు;
 	    }
 	}
 
 	// Keep on going in order to catch errors
-	if (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
-	    ret = method;
+	ఒకవేళ (పద్ధతి != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
+	    ret = పద్ధతి;
     }
 
     // No match found, use "none".
     ret = (ret == CLIPMETHOD_FAIL) ? CLIPMETHOD_NONE : ret;
 
-exit:
+నిష్క్రమించు:
     vim_free(buf);
-    return ret;
+    తిరిగి ret;
 }
 
 
 /*
  * Returns name of clipmethod in a statically allocated string.
  */
-    static char_u *
-clipmethod_to_str(clipmethod_T method)
+    స్థిర char_u *
+clipmethod_గమ్యం_str(clipmethod_T పద్ధతి)
 {
-    switch(method)
+    ఎంపిక(పద్ధతి)
     {
-	case CLIPMETHOD_WAYLAND:
-	    return (char_u *)"wayland";
-	case CLIPMETHOD_X11:
-	    return (char_u *)"x11";
-	case CLIPMETHOD_PROVIDER:
+	స్థితి CLIPMETHOD_WAYLAND:
+	    తిరిగి (char_u *)"wayland";
+	స్థితి CLIPMETHOD_X11:
+	    తిరిగి (char_u *)"x11";
+	స్థితి CLIPMETHOD_PROVIDER:
 # ifdef FEAT_EVAL
-	    return clip_provider;
+	    తిరిగి clip_provider;
 # endif
-	default:
-	    return (char_u *)"none";
+	అప్రమేయ:
+	    తిరిగి (char_u *)"none";
     }
 }
 
@@ -3058,20 +3058,20 @@ clipmethod_to_str(clipmethod_T method)
  * Sets the current clipmethod to use given by `get_clipmethod()`. Returns an
  * error message on failure else NULL.
  */
-    char *
-choose_clipmethod(void)
+    అక్షరం *
+ఎంచుకో_clipmethod(శూన్య)
 {
-    clipmethod_T method = get_clipmethod(p_cpm);
+    clipmethod_T పద్ధతి = get_clipmethod(p_cpm);
 
-    if (method == CLIPMETHOD_FAIL)
-	return e_invalid_argument;
+    ఒకవేళ (పద్ధతి == CLIPMETHOD_FAIL)
+	తిరిగి e_invalid_వాదం;
 
 // If GUI is running or we are not on a system with Wayland or X11, then always
 // return CLIPMETHOD_NONE. System or GUI clipboard handling always overrides.
 // This is unless a provider is being used.
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
-#  if defined(FEAT_GUI)
-    if (method != CLIPMETHOD_PROVIDER && gui.in_use)
+# ఒకవేళ defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  ఒకవేళ defined(FEAT_GUI)
+    ఒకవేళ (పద్ధతి != CLIPMETHOD_PROVIDER && gui.లోపల_use)
     {
 #   ifdef FEAT_WAYLAND
 	// We only interact with Wayland for the clipboard, we can just deinit
@@ -3079,47 +3079,47 @@ choose_clipmethod(void)
 	wayland_uninit_connection();
 #   endif
 
-	method = CLIPMETHOD_NONE;
-	goto lose_sel_exit;
+	పద్ధతి = CLIPMETHOD_NONE;
+	వెళ్ళు lose_sel_exit;
     }
 #  endif
-# else
+# లేకపోతే
     // If on a system like windows or macos, then clipmethod is irrelevant, we
     // use their way of accessing the clipboard. This is unless we are using the
     // clipboard provider
 #  ifdef FEAT_CLIPBOARD_PROVIDER
-    if (method != CLIPMETHOD_PROVIDER)
+    ఒకవేళ (పద్ధతి != CLIPMETHOD_PROVIDER)
 #  endif
     {
-	method = CLIPMETHOD_NONE;
-	goto exit;
+	పద్ధతి = CLIPMETHOD_NONE;
+	వెళ్ళు నిష్క్రమించు;
     }
 # endif
 
 # ifdef FEAT_CLIPBOARD
     // Deinitialize clipboard if there is no way to access clipboard
-    if (method == CLIPMETHOD_NONE)
+    ఒకవేళ (పద్ధతి == CLIPMETHOD_NONE)
 	clip_init(FALSE);
     // If we have a clipmethod that works now, then initialize clipboard
-    else if (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
+    లేకపోతే ఒకవేళ (clipmethod == CLIPMETHOD_NONE && పద్ధతి != CLIPMETHOD_NONE)
     {
 	clip_init(TRUE);
 	did_warn_clipboard = false;
     }
     // Disown clipboard if we are switching to a new method
-    else if (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
+    లేకపోతే ఒకవేళ (clipmethod != CLIPMETHOD_NONE && పద్ధతి != clipmethod)
     {
-#  if (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+#  ఒకవేళ (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(FEAT_GUI)
 lose_sel_exit:
 #  endif
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	ఒకవేళ (clip_నక్షత్రం.owned)
+	    clip_lose_selection(&clip_నక్షత్రం);
+	ఒకవేళ (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 
-#  if defined(FEAT_GUI)
-	if (!gui.in_use)
+#  ఒకవేళ defined(FEAT_GUI)
+	ఒకవేళ (!gui.లోపల_use)
 #  endif
 	{
 	    clip_init(TRUE);
@@ -3128,67 +3128,67 @@ lose_sel_exit:
     }
 # endif // FEAT_CLIPBOARD
 
-# if !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
-exit:
+# ఒకవేళ !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
+నిష్క్రమించు:
 # endif
 
-    clipmethod = method;
+    clipmethod = పద్ధతి;
 
 # ifdef FEAT_EVAL
-    set_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_to_str(method), -1);
+    సమితి_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_గమ్యం_str(పద్ధతి), -1);
 # endif
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Call choose_clipmethod().
  */
-    void
-ex_clipreset(exarg_T *eap UNUSED)
+    శూన్య
+ex_clipreset(exarg_T *eap వాడని)
 {
     clipmethod_T prev = clipmethod;
 
-    choose_clipmethod();
+    ఎంచుకో_clipmethod();
 
-    if (clipmethod == CLIPMETHOD_NONE)
+    ఒకవేళ (clipmethod == CLIPMETHOD_NONE)
 	smsg(_("Could not find a way to access the clipboard."));
-    else if (clipmethod != prev)
+    లేకపోతే ఒకవేళ (clipmethod != prev)
 	smsg(_("Switched to clipboard method '%s'."),
-		clipmethod_to_str(clipmethod));
+		clipmethod_గమ్యం_str(clipmethod));
 }
 
 /*
  * Adjust the register name pointed to with "rp" for the clipboard being
  * used always and the clipboard being available.
  */
-    void
-adjust_clip_reg(int *rp)
+    శూన్య
+adjust_clip_reg(పూర్ణాంకం *rp)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
+    ఒకవేళ (clipmethod == CLIPMETHOD_PROVIDER)
     {
-	if (*rp == 0 && clip_unnamed != 0)
+	ఒకవేళ (*rp == 0 && clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS)) ? '+' : '*';
-	return;
+	తిరిగి;
     }
 # endif
 # ifdef FEAT_CLIPBOARD
     // If no reg. specified, and "unnamed" or "unnamedplus" is in 'clipboard',
     // use '*' or '+' reg, respectively. "unnamedplus" prevails.
-    if (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
+    ఒకవేళ (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
     {
-	if (clip_unnamed != 0)
-	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.available)
+	ఒకవేళ (clip_unnamed != 0)
+	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.అందుబాటు)
 								  ? '+' : '*';
-	else
+	లేకపోతే
 	    *rp = ((clip_unnamed_saved & CLIP_UNNAMED_PLUS)
-					   && clip_plus.available) ? '+' : '*';
+					   && clip_plus.అందుబాటు) ? '+' : '*';
     }
-    if ((!clip_star.available && *rp == '*') ||
-	   (!clip_plus.available && *rp == '+'))
+    ఒకవేళ ((!clip_నక్షత్రం.అందుబాటు && *rp == '*') ||
+	   (!clip_plus.అందుబాటు && *rp == '+'))
     {
-	msg_warn_missing_clipboard();
+	సందేశం_warn_missing_clipboard();
 	*rp = 0;
     }
 # endif
@@ -3198,156 +3198,156 @@ adjust_clip_reg(int *rp)
  * Extract the items in the 'clipboard' option and set global values.
  * Return an error message or NULL for success.
  */
-    char *
-did_set_clipboard(optset_T *args UNUSED)
+    అక్షరం *
+did_సమితి_clipboard(optset_T *వాదనలు వాడని)
 {
-    int		new_unnamed = 0;
+    పూర్ణాంకం		new_unnamed = 0;
 # ifdef FEAT_CLIPBOARD
-    int		new_autoselect_star = FALSE;
-    int		new_autoselect_plus = FALSE;
-    int		new_autoselectml = FALSE;
-    int		new_html = FALSE;
+    పూర్ణాంకం		new_autoselect_నక్షత్రం = FALSE;
+    పూర్ణాంకం		new_autoselect_plus = FALSE;
+    పూర్ణాంకం		new_autoselectml = FALSE;
+    పూర్ణాంకం		new_html = FALSE;
 # endif
-    regprog_T	*new_exclude_prog = NULL;
-    char	*errmsg = NULL;
+    regprog_T	*new_exclude_prog = ఖాళీ;
+    అక్షరం	*errmsg = ఖాళీ;
     char_u	*p;
 
-    for (p = p_cb; *p != NUL; )
+    కొరకు (p = p_cb; *p != NUL; )
     {
 	// Note: Keep this in sync with p_cb_values.
-	if (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
+	ఒకవేళ (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED;
 	    p += 7;
 	}
-	else if (STRNCMP(p, "unnamedplus", 11) == 0
+	లేకపోతే ఒకవేళ (STRNCMP(p, "unnamedplus", 11) == 0
 					    && (p[11] == ',' || p[11] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED_PLUS;
 	    p += 11;
 	}
 # ifdef FEAT_CLIPBOARD
-	else if (STRNCMP(p, "autoselect", 10) == 0
+	లేకపోతే ఒకవేళ (STRNCMP(p, "autoselect", 10) == 0
 					    && (p[10] == ',' || p[10] == NUL))
 	{
-	    new_autoselect_star = TRUE;
+	    new_autoselect_నక్షత్రం = TRUE;
 	    p += 10;
 	}
-	else if (STRNCMP(p, "autoselectplus", 14) == 0
+	లేకపోతే ఒకవేళ (STRNCMP(p, "autoselectplus", 14) == 0
 					    && (p[14] == ',' || p[14] == NUL))
 	{
 	    new_autoselect_plus = TRUE;
 	    p += 14;
 	}
-	else if (STRNCMP(p, "autoselectml", 12) == 0
+	లేకపోతే ఒకవేళ (STRNCMP(p, "autoselectml", 12) == 0
 					    && (p[12] == ',' || p[12] == NUL))
 	{
 	    new_autoselectml = TRUE;
 	    p += 12;
 	}
-	else if (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
+	లేకపోతే ఒకవేళ (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
 	{
 	    new_html = TRUE;
 	    p += 4;
 	}
-	else if (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == NULL)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == ఖాళీ)
 	{
 	    p += 8;
 	    new_exclude_prog = vim_regcomp(p, RE_MAGIC);
-	    if (new_exclude_prog == NULL)
-		errmsg = e_invalid_argument;
-	    break;
+	    ఒకవేళ (new_exclude_prog == ఖాళీ)
+		errmsg = e_invalid_వాదం;
+	    ఆపు;
 	}
 # endif
-	else
+	లేకపోతే
 	{
-	    errmsg = e_invalid_argument;
-	    break;
+	    errmsg = e_invalid_వాదం;
+	    ఆపు;
 	}
-	if (*p == ',')
+	ఒకవేళ (*p == ',')
 	    ++p;
     }
-    if (errmsg == NULL)
+    ఒకవేళ (errmsg == ఖాళీ)
     {
 # ifdef FEAT_CLIPBOARD
-	if (global_busy)
+	ఒకవేళ (global_busy)
 	    // clip_unnamed will be reset to clip_unnamed_saved
 	    // at end_global_changes
 	    clip_unnamed_saved = new_unnamed;
-	else
+	లేకపోతే
 # endif
 	    clip_unnamed = new_unnamed;
 # ifdef FEAT_CLIPBOARD
-	clip_autoselect_star = new_autoselect_star;
+	clip_autoselect_నక్షత్రం = new_autoselect_నక్షత్రం;
 	clip_autoselect_plus = new_autoselect_plus;
 	clip_autoselectml = new_autoselectml;
 	clip_html = new_html;
 	vim_regfree(clip_exclude_prog);
 	clip_exclude_prog = new_exclude_prog;
 # endif
-# if defined(FEAT_GUI_GTK)
-	if (gui.in_use)
+# ఒకవేళ defined(FEAT_GUI_GTK)
+	ఒకవేళ (gui.లోపల_use)
 	{
 #  ifdef USE_GTK4
 	    gui_gtk_update_selection_formats(&clip_plus);
-	    gui_gtk_update_selection_formats(&clip_star);
-#  else
-	    gui_gtk_set_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
-	    gui_gtk_set_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
+	    gui_gtk_update_selection_formats(&clip_నక్షత్రం);
+#  లేకపోతే
+	    gui_gtk_సమితి_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
+	    gui_gtk_సమితి_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
 #  endif
 #  ifdef FEAT_DND
-	    gui_gtk_set_dnd_targets();
+	    gui_gtk_సమితి_dnd_targets();
 #  endif
 	}
 # endif
     }
-    else
+    లేకపోతే
 	vim_regfree(new_exclude_prog);
 
-    return errmsg;
+    తిరిగి errmsg;
 }
 
-#endif // HAVE_CLIPMETHOD
+#అయితే_ముగింపు // HAVE_CLIPMETHOD
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#నిర్వచితమైతే FEAT_CLIPBOARD_PROVIDER
 
 /*
  * Check if a clipboard provider with given name is available. Returns 1 if available,
  * 0 if not available, and -1 on error
  */
-    static int
-clip_provider_is_available(char_u *provider)
+    స్థిర పూర్ణాంకం
+clip_provider_is_అందుబాటు(char_u *provider)
 {
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
     typval_T	provider_tv = {0};
     callback_T	callback = {0};
     typval_T	rettv = {0};
     typval_T	func_tv = {0};
-    int		res = 0;
+    పూర్ణాంకం		res = 0;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL
+    ఒకవేళ (dict_get_tv(providers, (అక్షరం *)provider, &provider_tv) == FAIL
 	    || provider_tv.v_type != VAR_DICT)
 	// clipboard provider not defined
-	return -1;
+	తిరిగి -1;
 
-    if (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
+    ఒకవేళ (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	// If "available" function not specified assume always TRUE
-	return 1;
+	తిరిగి 1;
     }
 
-    if ((callback = get_callback(&func_tv)).cb_name == NULL)
-	goto fail;
+    ఒకవేళ ((callback = get_callback(&func_tv)).cb_name == ఖాళీ)
+	వెళ్ళు fail;
 
-    if (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
-	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_NUMBER))
-	goto fail;
+    ఒకవేళ (call_callback(&callback, -1, &rettv, 0, ఖాళీ) == FAIL ||
+	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_సంఖ్య))
+	వెళ్ళు fail;
 
-    if (rettv.vval.v_number)
+    ఒకవేళ (rettv.vval.v_సంఖ్య)
 	res = 1;
 
-    if (FALSE)
+    ఒకవేళ (FALSE)
 fail:
 	res = -1;
 
@@ -3356,14 +3356,14 @@ fail:
     clear_tv(&rettv);
     clear_tv(&provider_tv);
 
-    return res;
+    తిరిగి res;
 }
 
 /*
  * Get the specified callback "function" from the provider dictionary for
  * register "reg".
  */
-    static int
+    స్థిర పూర్ణాంకం
 clip_provider_get_callback(
 	char_u *reg,
 	char_u *provider,
@@ -3376,90 +3376,90 @@ clip_provider_get_callback(
     typval_T	func_tv;
     callback_T	cb;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL)
-	return FAIL;
-    else if (provider_tv.v_type != VAR_DICT)
+    ఒకవేళ (dict_get_tv(providers, (అక్షరం *)provider, &provider_tv) == FAIL)
+	తిరిగి FAIL;
+    లేకపోతే ఒకవేళ (provider_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    else if (dict_get_tv(
+    లేకపోతే ఒకవేళ (dict_get_tv(
 		provider_tv.vval.v_dict,
-		(char *)function,
+		(అక్షరం *)function,
 		&action_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    else if (action_tv.v_type != VAR_DICT)
+    లేకపోతే ఒకవేళ (action_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    else if (dict_get_tv(action_tv.vval.v_dict, (char *)reg, &func_tv) == FAIL)
+    లేకపోతే ఒకవేళ (dict_get_tv(action_tv.vval.v_dict, (అక్షరం *)reg, &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    else if ((cb = get_callback(&func_tv)).cb_name == NULL)
+    లేకపోతే ఒకవేళ ((cb = get_callback(&func_tv)).cb_name == ఖాళీ)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
 	clear_tv(&func_tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
     clear_tv(&provider_tv);
     clear_tv(&action_tv);
 
     // func_tv owns the function name, so we must make a copy for the callback
-    set_callback(callback, &cb);
+    సమితి_callback(callback, &cb);
     clear_tv(&func_tv);
-    return OK;
+    తిరిగి OK;
 }
 
-    static void
+    స్థిర శూన్య
 clip_provider_copy(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    స్థిర bool	recursive = false;
     callback_T	callback;
     typval_T	rettv;
     typval_T	argvars[4];
     yankreg_T	*y_ptr;
     char_u	type[2 + NUMBUFLEN] = {0};
-    list_T	*list = NULL;
+    list_T	*list = ఖాళీ;
 
-    if (recursive)
-	return;
+    ఒకవేళ (recursive)
+	తిరిగి;
 
-    if (clip_provider_get_callback(
+    ఒకవేళ (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"copy",
 		&callback) == FAIL)
-	return;
+	తిరిగి;
 
     // Convert register type into a string
-    if (*reg == '+')
-	y_ptr = get_y_register(REAL_PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    ఒకవేళ (*reg == '+')
+	y_ptr = get_y_రిజిస్టరు(REAL_PLUS_రిజిస్టరు);
+    లేకపోతే
+	y_ptr = get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు);
 
-    switch (y_ptr->y_type)
+    ఎంపిక (y_ptr->y_type)
     {
-	case MCHAR:
+	స్థితి MCHAR:
 	    type[0] = 'v';
-	    break;
-	case MLINE:
+	    ఆపు;
+	స్థితి MLINE:
 	    type[0] = 'V';
-	    break;
-	case MBLOCK:
-	    sprintf((char *)type, "%c%d", Ctrl_V, y_ptr->y_width + 1);
-	    break;
-	default:
+	    ఆపు;
+	స్థితి MBLOCK:
+	    sprintf((అక్షరం *)type, "%c%d", Ctrl_V, y_ptr->y_వెడల్పు + 1);
+	    ఆపు;
+	అప్రమేయ:
 	    type[0] = 0;
-	    break;
+	    ఆపు;
     }
 
     argvars[0].v_type = VAR_STRING;
@@ -3471,25 +3471,25 @@ clip_provider_copy(char_u *reg, char_u *provider)
     // Get register contents by creating a list of lines
     list = list_alloc();
 
-    if (list == NULL)
+    ఒకవేళ (list == ఖాళీ)
     {
 	free_callback(&callback);
-	return;
+	తిరిగి;
     }
 
-    for (int i = 0; i < y_ptr->y_size; i++)
-	if (list_append_string(list, y_ptr->y_array[i].string,
-	    (int)y_ptr->y_array[i].length) == FAIL)
+    కొరకు (పూర్ణాంకం i = 0; i < y_ptr->y_కొలత; i++)
+	ఒకవేళ (list_append_string(list, y_ptr->y_array[i].string,
+	    (పూర్ణాంకం)y_ptr->y_array[i].నిడివి) == FAIL)
 	{
 	    free_callback(&callback);
 	    list_unref(list);
-	    return;
+	    తిరిగి;
 	}
 
     list->lv_refcount++;
 
     argvars[2].v_type = VAR_LIST;
-    argvars[2].v_lock = VAR_FIXED;
+    argvars[2].v_తాళం = VAR_FIXED;
     argvars[2].vval.v_list = list;
 
     argvars[3].v_type = VAR_UNKNOWN;
@@ -3505,26 +3505,26 @@ clip_provider_copy(char_u *reg, char_u *provider)
     list_unref(list);
 }
 
-    static void
+    స్థిర శూన్య
 clip_provider_paste(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    స్థిర bool	recursive = false;
     callback_T	callback;
     typval_T	argvars[2];
     typval_T	rettv;
-    int		ret;
+    పూర్ణాంకం		ret;
     char_u	*reg_type;
-    list_T	*lines;
+    list_T	*పంక్తులు;
 
-    if (recursive)
-	return;
+    ఒకవేళ (recursive)
+	తిరిగి;
 
-    if (clip_provider_get_callback(
+    ఒకవేళ (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"paste",
 		&callback) == FAIL)
-	return;
+	తిరిగి;
 
     argvars[0].v_type = VAR_STRING;
     argvars[0].vval.v_string = reg;
@@ -3537,30 +3537,30 @@ clip_provider_paste(char_u *reg, char_u *provider)
     recursive = false;
     textlock--;
 
-    if (ret == FAIL)
-	goto exit;
-    else if (rettv.v_type == VAR_TUPLE
+    ఒకవేళ (ret == FAIL)
+	వెళ్ళు నిష్క్రమించు;
+    లేకపోతే ఒకవేళ (rettv.v_type == VAR_TUPLE
 	    && TUPLE_LEN(rettv.vval.v_tuple) == 2
-	    && TUPLE_ITEM(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
-	    && TUPLE_ITEM(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
+	    && TUPLE_అంశం(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
+	    && TUPLE_అంశం(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
     {
-	reg_type = TUPLE_ITEM(rettv.vval.v_tuple, 0)->vval.v_string;
-	lines = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
+	reg_type = TUPLE_అంశం(rettv.vval.v_tuple, 0)->vval.v_string;
+	పంక్తులు = TUPLE_అంశం(rettv.vval.v_tuple, 1)->vval.v_list;
     }
-    else if (rettv.v_type == VAR_LIST
+    లేకపోతే ఒకవేళ (rettv.v_type == VAR_LIST
 	    && rettv.vval.v_list->lv_len == 2
-	    && rettv.vval.v_list->lv_first->li_tv.v_type == VAR_STRING
-	    && rettv.vval.v_list->lv_first->li_next->li_tv.v_type == VAR_LIST)
+	    && rettv.vval.v_list->lv_మొదటి->li_tv.v_type == VAR_STRING
+	    && rettv.vval.v_list->lv_మొదటి->li_తదుపరి->li_tv.v_type == VAR_LIST)
     {
-	reg_type = rettv.vval.v_list->lv_first->li_tv.vval.v_string;
-	lines = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
+	reg_type = rettv.vval.v_list->lv_మొదటి->li_tv.vval.v_string;
+	పంక్తులు = rettv.vval.v_list->lv_మొదటి->li_తదుపరి->li_tv.vval.v_list;
     }
-    else
-	goto exit;
+    లేకపోతే
+	వెళ్ళు నిష్క్రమించు;
 
     {
 	char_u		yank_type = MAUTO;
-	long		block_len = -1;
+	దీర్ఘ		ఖండం_len = -1;
 	yankreg_T	*y_ptr, *cur_y_ptr;
 	char_u		**lstval;
 	char_u		**allocval;
@@ -3569,77 +3569,77 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	char_u		**curallocval;
 	char_u		*strval;
 	listitem_T	*li;
-	int		len;
+	పూర్ణాంకం		len;
 
 	// If the list is NULL handle like an empty list.
-	len = lines == NULL ? 0 : lines->lv_len;
+	len = పంక్తులు == ఖాళీ ? 0 : పంక్తులు->lv_len;
 
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    goto exit;
+	ఒకవేళ (lstval == ఖాళీ)
+	    వెళ్ళు నిష్క్రమించు;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (lines != NULL)
+	ఒకవేళ (పంక్తులు != ఖాళీ)
 	{
-	    CHECK_LIST_MATERIALIZE(lines);
-	    FOR_ALL_LIST_ITEMS(lines, li)
+	    CHECK_LIST_MATERIALIZE(పంక్తులు);
+	    FOR_ALL_LIST_వస్తువులు(పంక్తులు, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
-		    goto free_lstval;
-		if (strval == buf)
+		ఒకవేళ (strval == ఖాళీ)
+		    వెళ్ళు free_lstval;
+		ఒకవేళ (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
-			goto free_lstval;
+		    ఒకవేళ (strval == ఖాళీ)
+			వెళ్ళు free_lstval;
 		    *curallocval++ = strval;
 		}
 		*curval++ = strval;
 	    }
 	}
-	*curval++ = NULL;
+	*curval++ = ఖాళీ;
 
-	if (*reg_type != NUL && (STRLEN(reg_type) == 0
-		|| get_yank_type(&reg_type, &yank_type, &block_len) == FAIL))
+	ఒకవేళ (*reg_type != NUL && (STRLEN(reg_type) == 0
+		|| get_yank_type(&reg_type, &yank_type, &ఖండం_len) == FAIL))
 	{
-	    emsg(e_invalid_argument);
-	    goto free_lstval;
+	    emsg(e_invalid_వాదం);
+	    వెళ్ళు free_lstval;
 	}
 
-	if (*reg == '+')
-	    y_ptr = get_y_register(REAL_PLUS_REGISTER);
-	else
-	    y_ptr = get_y_register(STAR_REGISTER);
+	ఒకవేళ (*reg == '+')
+	    y_ptr = get_y_రిజిస్టరు(REAL_PLUS_రిజిస్టరు);
+	లేకపోతే
+	    y_ptr = get_y_రిజిస్టరు(నక్షత్రం_రిజిస్టరు);
 
 	// Free previous register contents
 	cur_y_ptr = get_y_current();
-	set_y_current(y_ptr);
+	సమితి_y_current(y_ptr);
 
 	free_yank_all();
-	get_y_current()->y_size = 0;
+	get_y_current()->y_కొలత = 0;
 
-	set_y_current(cur_y_ptr);
+	సమితి_y_current(cur_y_ptr);
 
-	str_to_reg(y_ptr,
+	str_గమ్యం_reg(y_ptr,
 		yank_type,
 		(char_u *)lstval,
 		-1,
-		block_len,
+		ఖండం_len,
 		TRUE);
 
 free_lstval:
-	while (curallocval > allocval)
+	అయితే (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
 
-exit:
+నిష్క్రమించు:
     free_callback(&callback);
     clear_tv(&rettv);
 }
@@ -3650,46 +3650,46 @@ exit:
 //
 // If -1 then allow provider callback to be called then set to one. Default
 // value (is allowed) is -2.
-static int star_pause_count = -2, plus_pause_count = -2;
+స్థిర పూర్ణాంకం నక్షత్రం_pause_లెక్క = -2, plus_pause_లెక్క = -2;
 
-    void
-call_clip_provider_request(int reg)
+    శూన్య
+call_clip_provider_request(పూర్ణాంకం reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    ఒకవేళ (clipmethod != CLIPMETHOD_PROVIDER)
+	తిరిగి;
 
-    if (reg == '+' && plus_pause_count < 0)
+    ఒకవేళ (reg == '+' && plus_pause_లెక్క < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	ఒకవేళ (plus_pause_లెక్క == -1)
+	    plus_pause_లెక్క = 1;
 	clip_provider_paste((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    లేకపోతే ఒకవేళ (reg == '*' && నక్షత్రం_pause_లెక్క < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	ఒకవేళ (నక్షత్రం_pause_లెక్క == -1)
+	    నక్షత్రం_pause_లెక్క = 1;
 	clip_provider_paste((char_u *)"*", clip_provider);
     }
-    else
-	return;
+    లేకపోతే
+	తిరిగి;
 }
 
-    void
-call_clip_provider_set(int reg)
+    శూన్య
+call_clip_provider_సమితి(పూర్ణాంకం reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    ఒకవేళ (clipmethod != CLIPMETHOD_PROVIDER)
+	తిరిగి;
 
-    if (reg == '+' && plus_pause_count < 0)
+    ఒకవేళ (reg == '+' && plus_pause_లెక్క < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	ఒకవేళ (plus_pause_లెక్క == -1)
+	    plus_pause_లెక్క = 1;
 	clip_provider_copy((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    లేకపోతే ఒకవేళ (reg == '*' && నక్షత్రం_pause_లెక్క < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	ఒకవేళ (నక్షత్రం_pause_లెక్క == -1)
+	    నక్షత్రం_pause_లెక్క = 1;
 	clip_provider_copy((char_u *)"*", clip_provider);
     }
 }
@@ -3699,32 +3699,32 @@ call_clip_provider_set(int reg)
  * ignored, until dec_clip_provider is called the same number of times after
  * again. Note that this is per clipboard register ("+", "*")
  */
-    void
-inc_clip_provider(void)
+    శూన్య
+inc_clip_provider(శూన్య)
 {
-    plus_pause_count = (plus_pause_count == -2
-	|| plus_pause_count == -1) ? -1 : plus_pause_count + 1;
-    star_pause_count = (star_pause_count == -2
-	|| star_pause_count == -1) ? -1 : star_pause_count + 1;
+    plus_pause_లెక్క = (plus_pause_లెక్క == -2
+	|| plus_pause_లెక్క == -1) ? -1 : plus_pause_లెక్క + 1;
+    నక్షత్రం_pause_లెక్క = (నక్షత్రం_pause_లెక్క == -2
+	|| నక్షత్రం_pause_లెక్క == -1) ? -1 : నక్షత్రం_pause_లెక్క + 1;
 }
 
-    void
-dec_clip_provider(void)
+    శూన్య
+dec_clip_provider(శూన్య)
 {
-    if (plus_pause_count != -2)
-	plus_pause_count = plus_pause_count == -1 ? -1 : plus_pause_count - 1;
-    if (star_pause_count != -2)
-	star_pause_count = star_pause_count == -1 ? -1 : star_pause_count - 1;
+    ఒకవేళ (plus_pause_లెక్క != -2)
+	plus_pause_లెక్క = plus_pause_లెక్క == -1 ? -1 : plus_pause_లెక్క - 1;
+    ఒకవేళ (నక్షత్రం_pause_లెక్క != -2)
+	నక్షత్రం_pause_లెక్క = నక్షత్రం_pause_లెక్క == -1 ? -1 : నక్షత్రం_pause_లెక్క - 1;
 
-    if (plus_pause_count == 0 || plus_pause_count == -1)
-	plus_pause_count = -2;
-    if (star_pause_count == 0 || star_pause_count == -1)
-	star_pause_count = -2;
+    ఒకవేళ (plus_pause_లెక్క == 0 || plus_pause_లెక్క == -1)
+	plus_pause_లెక్క = -2;
+    ఒకవేళ (నక్షత్రం_pause_లెక్క == 0 || నక్షత్రం_pause_లెక్క == -1)
+	నక్షత్రం_pause_లెక్క = -2;
 }
 
-#endif // FEAT_CLIPBOARD_PROVIDER
+#అయితే_ముగింపు // FEAT_CLIPBOARD_PROVIDER
 
-#if defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
+#ఒకవేళ defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
 /*
  * If "vim" is TRUE, then get the motion type. If "vimenc" is TRUE, then get the
  * motion type and also convert "*buf". "buf" and "len_store" will be updated to
@@ -3733,28 +3733,28 @@ dec_clip_provider(void)
  * otherwise use the free func for which "*buf" was allocated with. In both
  * cases use vim_free() on "*tofree". Returns OK on success and FAIL on failure.
  */
-    int
-clip_convert_data(
+    పూర్ణాంకం
+clip_convert_దత్తాంశం(
 	char_u	**buf,
-	long	*len_store,
-	int	*motion,
+	దీర్ఘ	*len_store,
+	పూర్ణాంకం	*motion,
 	bool	vim,
 	bool	vimenc,
 	char_u	**tofree)
 {
     char_u  *final = *buf;
     char_u  *enc;
-    long    len = *len_store;
+    దీర్ఘ    len = *len_store;
 
-    if (vim && len >= 2)
+    ఒకవేళ (vim && len >= 2)
     {
 	*motion = *final++;
 	len--;
     }
-    else if (vimenc && len >= 3)
+    లేకపోతే ఒకవేళ (vimenc && len >= 3)
     {
 	vimconv_T   conv;
-	int	    convlen;
+	పూర్ణాంకం	    convlen;
 
 	// First byte is motion type
 	*motion = *final++;
@@ -3765,32 +3765,32 @@ clip_convert_data(
 
 	// Skip the encoding type including null terminator in final text
 	final = memchr(final, NUL, len);
-	if (final == NULL)
-	    return FAIL;
+	ఒకవేళ (final == ఖాళీ)
+	    తిరిగి FAIL;
 	final++; // Skip NUL
 
 	// Subtract pointers to get length of encoding;
 	len -= final - enc;
 
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	convert_అమరిక(&conv, enc, p_enc);
+	ఒకవేళ (conv.vc_type != CONV_NONE)
 	{
 	   char_u *tmp;
 
 	   convlen = len;
 	   tmp = string_convert(&conv, final, &convlen);
 	   len = convlen;
-	   if (tmp != NULL)
+	   ఒకవేళ (tmp != ఖాళీ)
 	   {
 		final = tmp;
 		*tofree = final;
 	   }
-	   convert_setup(&conv, NULL, NULL);
+	   convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 	}
     }
     *buf = final;
     *len_store = len;
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు

@@ -31,15 +31,15 @@
 # Copyright: Vim license applies, see ":help license"
 # Last Change: 2025 Oct 08
 #
-import os
-import re
-import sys
-from pathlib import Path
-from typing import List, Tuple
-from clang.cindex import Index, CursorKind, StorageClass, TokenKind
+దిగుమతి os
+దిగుమతి re
+దిగుమతి sys
+తః pathlib దిగుమతి మార్గం_2
+తః typing దిగుమతి List, Tuple
+తః clang.cindex దిగుమతి సూచీ_3, Cursor_రకం, StorageClass, Token_రకం
 
-SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") not in ("", "0", "false", "no")
-DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") not in ("", "0", "false", "no")
+SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") కాదు లో ("", "0", "false", "no")
+DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") కాదు లో ("", "0", "false", "no")
 
 # Preprocessor directive detection
 _DIR_RE = re.compile(r'^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b')
@@ -53,17 +53,17 @@ _IF_NOTDEF_PROTO_RE = re.compile(r'^\s*#\s*if\s*!defined\s*\(\s*PROTO\s*\)\s*(//
 # Helpers to detect defined(PROTO) inside an expression line
 _DEFINED_CALL_RE      = re.compile(r'\bdefined\s*\(\s*PROTO\s*\)')
 
-def _ends_with_bs(line: str) -> bool:
-    return line.rstrip("\r\n").rstrip().endswith("\\")
+నిర్వచనం చివర్లు_with_bs(పంక్తి: str) -> bool:
+    తిరిగి పంక్తి.rstrip("\r\n").rstrip().endswith("\\")
 
-def _has_proto_defined_from_argv(argv: List[str]) -> bool:
+నిర్వచనం _has_proto_defined_from_argv(argv: List[str]) -> bool:
     """Return True if -DPROTO (or -DPROTO=...) appears in clang args."""
-    for a in argv:
-        if a == "-DPROTO" or a.startswith("-DPROTO="):
-            return True
-    return False
+    కొరకు a లో argv:
+        ఒకవేళ a == "-DPROTO" లేదా a.startswith("-DPROTO="):
+            తిరిగి నిజం
+    తిరిగి అబద్ధం
 
-def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
+నిర్వచనం _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
     """
     Evaluate a simple C preprocessor condition only when it contains
     defined(PROTO).
@@ -75,27 +75,27 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     """
     s = cond
 
-    if DEBUG_LOG:
-        print(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
-        print(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
+    ఒకవేళ DEBUG_LOG:
+        ముద్రించు(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
+        ముద్రించు(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
 
     # Normalize spacing
     s = s.strip()
 
     # Replace !defined(PROTO) first, then defined(PROTO)
-    if proto_is_defined:
+    ఒకవేళ proto_is_defined:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    లేకపోతే:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
     # Translate C logical ops to Python
     # Replace defined(PROTO) and !defined(PROTO) depending on -DPROTO
-    if proto_is_defined:
+    ఒకవేళ proto_is_defined:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    లేకపోతే:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
@@ -120,15 +120,15 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     # Safety: collapse excessive whitespace
     s = re.sub(r'\s+', " ", s).strip()
 
-    try:
-        return bool(eval(s, {}, {}))
-    except Exception:
+    ప్రయత్నించు:
+        తిరిగి bool(eval(s, {}, {}))
+    మినహాయింపు Exception:
         # Fail-open to avoid accidentally dropping code
-        if DEBUG_LOG:
-            print(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
-        return True
+        ఒకవేళ DEBUG_LOG:
+            ముద్రించు(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
+        తిరిగి నిజం
 
-def rewrite_conditionals_first_branch(text: str) -> str:
+నిర్వచనం rewrite_conditionals_మొదటి_branch(పాఠ్యం: str) -> str:
     """
     Keep only the first branch of #if/#ifdef/#ifndef groups, remove others.
     Extensions:
@@ -138,42 +138,42 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         evaluate the condition: if False, drop the whole group; if True, keep
         only the first branch (same as legacy behavior).
     """
-    lines = text.splitlines(keepends=True)
-    out: List[str] = []
-    i, n = 0, len(lines)
+    పంక్తులు = పాఠ్యం.splitlines(keepends=నిజం)
+    బహిర్గతం: List[str] = []
+    i, n = 0, పొడవు(పంక్తులు)
 
-    def _collect_group(start: int) -> Tuple[int, List[Tuple[str, int, int]]]:
+    నిర్వచనం collect_సమూహం(ప్రారంభం: పూర్ణాంకం) -> Tuple[పూర్ణాంకం, List[Tuple[str, పూర్ణాంకం, పూర్ణాంకం]]]:
         """
         Collect a full #if...#endif group and return (end_index, bodies).
         bodies is a list of (tag, body_s, body_e) for each if/elif/else branch.
         """
-        h = start
+        h = ప్రారంభం
         # Skip backslash-continued header lines
-        while True:
+        అయితే నిజం:
             h += 1
-            if h >= n or not _ends_with_bs(lines[h - 1]):
-                break
-        depth = 1
+            ఒకవేళ h >= n లేదా కాదు చివర్లు_with_bs(పంక్తులు[h - 1]):
+                ఆపు
+        లోతు = 1
         j = h
-        marks: List[Tuple[str, int]] = [("if", start)]
-        while j < n and depth > 0:
-            m = _DIR_RE.match(lines[j])
-            if m:
-                kw2 = m.group(1)
-                if kw2 in ("if", "ifdef", "ifndef"):
-                    depth += 1
-                elif kw2 == "endif":
-                    depth -= 1
-                    if depth == 0:
-                        break
-                elif depth == 1 and kw2 in ("elif", "else"):
+        marks: List[Tuple[str, పూర్ణాంకం]] = [("if", ప్రారంభం)]
+        అయితే j < n మరియు లోతు > 0:
+            m = _DIR_RE.సరిపోలిక(పంక్తులు[j])
+            ఒకవేళ m:
+                kw2 = m.సమూహం(1)
+                ఒకవేళ kw2 లో ("if", "ifdef", "ifndef"):
+                    లోతు += 1
+                లేదావేళ kw2 == "endif":
+                    లోతు -= 1
+                    ఒకవేళ లోతు == 0:
+                        ఆపు
+                లేదావేళ లోతు == 1 మరియు kw2 లో ("elif", "else"):
                     marks.append((kw2, j))
             j += 1
-        else:
+        లేకపోతే:
             # Unterminated: keep as-is from start to EOF
-            return n, [("text", start, n)]
+            తిరిగి n, [("text", ప్రారంభం, n)]
 
-        def _after_header_line(pos: int) -> int:
+        నిర్వచనం after_శీర్షిక_పంక్తి(pos: పూర్ణాంకం) -> పూర్ణాంకం:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -181,11 +181,11 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            అయితే k < n మరియు చివర్లు_with_bs(పంక్తులు[k - 1]):
                 k += 1
-            return k
+            తిరిగి k
 
-        def _after_header_line(pos: int) -> int:
+        నిర్వచనం after_శీర్షిక_పంక్తి(pos: పూర్ణాంకం) -> పూర్ణాంకం:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -193,92 +193,92 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            అయితే k < n మరియు చివర్లు_with_bs(పంక్తులు[k - 1]):
                 k += 1
-            return k
+            తిరిగి k
 
-        bodies: List[Tuple[str, int, int]] = []
-        header_positions = [pos for _, pos in marks] + [j]
-        tags = [tag for tag, _ in marks]
-        for idx, tag in enumerate(tags):
-            header = header_positions[idx]
+        bodies: List[Tuple[str, పూర్ణాంకం, పూర్ణాంకం]] = []
+        శీర్షిక_positions = [pos కొరకు _, pos లో marks] + [j]
+        ట్యాగులు = [ట్యాగ్ కొరకు ట్యాగ్, _ లో marks]
+        కొరకు idx, ట్యాగ్ లో enumerate(ట్యాగులు):
+            శీర్షిక = శీర్షిక_positions[idx]
             # Start body right after the whole (possibly multi-line) header
-            body_s = _after_header_line(header)
-            next_header = header_positions[idx + 1]
-            body_e = next_header
-            bodies.append((tag, body_s, body_e))
-        return j + 1, bodies
+            body_s = after_శీర్షిక_పంక్తి(శీర్షిక)
+            తదుపరి_శీర్షిక = శీర్షిక_positions[idx + 1]
+            body_e = తదుపరి_శీర్షిక
+            bodies.append((ట్యాగ్, body_s, body_e))
+        తిరిగి j + 1, bodies
 
     # Detect whether PROTO is defined from argv (clang args passed after src
     # path)
     proto_is_defined = _has_proto_defined_from_argv(sys.argv[2:])
 
-    while i < n:
-        line = lines[i]
-        m = _DIR_RE.match(line)
-        if not m:
-            out.append(line)
+    అయితే i < n:
+        పంక్తి = పంక్తులు[i]
+        m = _DIR_RE.సరిపోలిక(పంక్తి)
+        ఒకవేళ కాదు m:
+            బహిర్గతం.append(పంక్తి)
             i += 1
-            continue
+            కొనసాగు
 
-        kw = m.group(1)
-        if kw in ("if", "ifdef", "ifndef"):
+        kw = m.సమూహం(1)
+        ఒకవేళ kw లో ("if", "ifdef", "ifndef"):
             # Hard drops first (legacy behavior)
-            if _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
-                group_end, _ = _collect_group(i)
-                i = group_end
-                continue
+            ఒకవేళ _IF0_RE.సరిపోలిక(పంక్తి) లేదా _IFDEF_DEBUG_RE.సరిపోలిక(పంక్తి) లేదా _IFNDEF_PROTO_RE.సరిపోలిక(పంక్తి) లేదా _IF_NOTDEF_PROTO_RE.సరిపోలిక(పంక్తి):
+                సమూహం_చివర, _ = collect_సమూహం(i)
+                i = సమూహం_చివర
+                కొనసాగు
 
             # If '#if <expr>' contains defined(PROTO), evaluate; otherwise,
             # legacy behavior
-            evaluate = (kw == "if") and (
-                _DEFINED_CALL_RE.search(line) is not None
+            evaluate = (kw == "if") మరియు (
+                _DEFINED_CALL_RE.శోధన(పంక్తి) అయిన కాదు ఏమీలేదు
             )
 
-            if evaluate:
+            ఒకవేళ evaluate:
                 # Extract condition text after 'if'
-                try:
-                    cond_text = line.split("if", 1)[1]
-                except Exception:
-                    cond_text = ""
-                keep_first = _eval_condition_with_defined_proto(cond_text, proto_is_defined)
-                if not keep_first:
-                    group_end, _ = _collect_group(i)
-                    i = group_end
-                    continue
+                ప్రయత్నించు:
+                    cond_పాఠ్యం = పంక్తి.విభజించు("if", 1)[1]
+                మినహాయింపు Exception:
+                    cond_పాఠ్యం = ""
+                keep_మొదటి = _eval_condition_with_defined_proto(cond_పాఠ్యం, proto_is_defined)
+                ఒకవేళ కాదు keep_మొదటి:
+                    సమూహం_చివర, _ = collect_సమూహం(i)
+                    i = సమూహం_చివర
+                    కొనసాగు
 
             # Keep only the first branch
-            group_end, bodies = _collect_group(i)
-            if not bodies:
-                i = group_end
-                continue
+            సమూహం_చివర, bodies = collect_సమూహం(i)
+            ఒకవేళ కాదు bodies:
+                i = సమూహం_చివర
+                కొనసాగు
             keep_s, keep_e = bodies[0][1], bodies[0][2]
-            kept_text = "".join(lines[keep_s:keep_e])
-            kept_rewritten = rewrite_conditionals_first_branch(kept_text)
+            kept_పాఠ్యం = "".join(పంక్తులు[keep_s:keep_e])
+            kept_rewritten = rewrite_conditionals_మొదటి_branch(kept_పాఠ్యం)
 
-            if DEBUG_LOG:
-                print(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
+            ఒకవేళ DEBUG_LOG:
+                ముద్రించు(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
                 # Print the first non-empty line of the kept body for quick
                 # context
-                for ln in kept_text.splitlines():
-                    if ln.strip():
-                        print(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
-                        break
+                కొరకు ln లో kept_పాఠ్యం.splitlines():
+                    ఒకవేళ ln.strip():
+                        ముద్రించు(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
+                        ఆపు
 
-            out.append(kept_rewritten)
-            i = group_end
-        else:
+            బహిర్గతం.append(kept_rewritten)
+            i = సమూహం_చివర
+        లేకపోతే:
             # For 'elif/else/endif' lines encountered directly, output a blank
             # line to preserve line count
-            out.append("\n" if line.endswith("\n") else "")
+            బహిర్గతం.append("\n" ఒకవేళ పంక్తి.endswith("\n") లేకపోతే "")
             i += 1
 
-    return "".join(out)
+    తిరిగి "".join(బహిర్గతం)
 
-def collapse_star_spaces(s: str) -> str:
-    return re.sub(r"\*\s+", "*", s)
+నిర్వచనం collapse_నక్షత్రం_spaces(s: str) -> str:
+    తిరిగి re.sub(r"\*\s+", "*", s)
 
-def fix_spacing(s: str) -> str:
+నిర్వచనం fix_spacing(s: str) -> str:
     s = re.sub(r"\(\s+", "(", s)
     s = re.sub(r"\s+\)", ")", s)
     s = re.sub(r"(?<=[\w\)])\s+\((?!\*)", "(", s)
@@ -287,217 +287,217 @@ def fix_spacing(s: str) -> str:
     s = re.sub(r"\s+\[", "[", s)
     s = re.sub(r"\[\s+", "[", s)
     s = re.sub(r"\s+\]", "]", s)
-    return s
+    తిరిగి s
 
-def strip_unused_macros(s: str) -> str:
+నిర్వచనం strip_వాడని_macros(s: str) -> str:
     s = re.sub(r"\bUNUSED\b\s*\([^)]*\)", " ", s)
     s = re.sub(r"\bUNUSED\b", " ", s)
-    return s
+    తిరిగి s
 
-def normalize_ws(s: str) -> str:
-    return re.sub(r"\s+", " ", s).strip()
+నిర్వచనం normalize_ws(s: str) -> str:
+    తిరిగి re.sub(r"\s+", " ", s).strip()
 
-def tokens_for_function_header(cur) -> List[str]:
-    toks = [t for t in cur.get_tokens() if t.kind != TokenKind.COMMENT]
-    if not toks:
-        return []
-    name_idx = None
-    for i, t in enumerate(toks):
-        if t.kind == TokenKind.IDENTIFIER and t.spelling == cur.spelling:
+నిర్వచనం టోకెన్లు_for_function_శీర్షిక(cur) -> List[str]:
+    toks = [t కొరకు t లో cur.get_టోకెన్లు() ఒకవేళ t.రకం != Token_రకం.COMMENT]
+    ఒకవేళ కాదు toks:
+        తిరిగి []
+    name_idx = ఏమీలేదు
+    కొరకు i, t లో enumerate(toks):
+        ఒకవేళ t.రకం == Token_రకం.IDENTIFIER మరియు t.spelling == cur.spelling:
             name_idx = i
-            break
-    if name_idx is None:
-        return []
-    lpar_idx = None
-    for i in range(name_idx + 1, len(toks)):
-        if toks[i].spelling == '(':
+            ఆపు
+    ఒకవేళ name_idx అయిన ఏమీలేదు:
+        తిరిగి []
+    lpar_idx = ఏమీలేదు
+    కొరకు i లో శ్రేణి(name_idx + 1, పొడవు(toks)):
+        ఒకవేళ toks[i].spelling == '(':
             lpar_idx = i
-            break
-    if lpar_idx is None:
-        return []
-    depth, rpar_idx = 0, None
-    for i in range(lpar_idx, len(toks)):
-        if toks[i].spelling == '(':
-            depth += 1
-        elif toks[i].spelling == ')':
-            depth -= 1
-            if depth == 0:
+            ఆపు
+    ఒకవేళ lpar_idx అయిన ఏమీలేదు:
+        తిరిగి []
+    లోతు, rpar_idx = 0, ఏమీలేదు
+    కొరకు i లో శ్రేణి(lpar_idx, పొడవు(toks)):
+        ఒకవేళ toks[i].spelling == '(':
+            లోతు += 1
+        లేదావేళ toks[i].spelling == ')':
+            లోతు -= 1
+            ఒకవేళ లోతు == 0:
                 rpar_idx = i
-                break
-    if rpar_idx is None:
-        return []
-    return [t.spelling for t in toks[:rpar_idx + 1]]
+                ఆపు
+    ఒకవేళ rpar_idx అయిన ఏమీలేదు:
+        తిరిగి []
+    తిరిగి [t.spelling కొరకు t లో toks[:rpar_idx + 1]]
 
-def join_tokens(tokens: List[str]) -> str:
-    s = " ".join(tokens)
-    s = strip_unused_macros(s)
+నిర్వచనం join_టోకెన్లు(టోకెన్లు: List[str]) -> str:
+    s = " ".join(టోకెన్లు)
+    s = strip_వాడని_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_నక్షత్రం_spaces(s)
     s = fix_spacing(s)
-    return s
+    తిరిగి s
 
-def header_from_cursor(cur) -> str:
+నిర్వచనం శీర్షిక_from_cursor(cur) -> str:
     """
     Fallback header builder for cases where get_tokens() returns empty
     (e.g., macro-expanded function definitions). Uses cursor spelling and type
     information to construct "ret name(param, ...)".
     """
-    try:
-        ret = getattr(cur, "result_type", None)
-        ret_sp = ret.spelling if ret is not None else ""
-    except Exception:
+    ప్రయత్నించు:
+        ret = getattr(cur, "result_type", ఏమీలేదు)
+        ret_sp = ret.spelling ఒకవేళ ret అయిన కాదు ఏమీలేదు లేకపోతే ""
+    మినహాయింపు Exception:
         ret_sp = ""
-    if not ret_sp:
+    ఒకవేళ కాదు ret_sp:
         # As a last resort, try cur.type.get_result() if available.
-        try:
-            ret_sp = cur.type.get_result().spelling
-        except Exception:
+        ప్రయత్నించు:
+            ret_sp = cur.type.get_ఫలితం().spelling
+        మినహాయింపు Exception:
             ret_sp = "void"
-    name_sp = cur.spelling or ""
+    name_sp = cur.spelling లేదా ""
     params = []
-    try:
-        for a in cur.get_arguments() or []:
-            t = getattr(a, "type", None)
-            t_sp = t.spelling if t is not None else ""
-            a_sp = a.spelling or ""
-            seg = (t_sp + (" " + a_sp if a_sp else "")).strip()
-            params.append(seg if seg else "void")
-    except Exception:
-        pass
-    params_s = ", ".join(params) if params else "void"
+    ప్రయత్నించు:
+        కొరకు a లో cur.get_arguments() లేదా []:
+            t = getattr(a, "type", ఏమీలేదు)
+            t_sp = t.spelling ఒకవేళ t అయిన కాదు ఏమీలేదు లేకపోతే ""
+            a_sp = a.spelling లేదా ""
+            seg = (t_sp + (" " + a_sp ఒకవేళ a_sp లేకపోతే "")).strip()
+            params.append(seg ఒకవేళ seg లేకపోతే "void")
+    మినహాయింపు Exception:
+        దాటు
+    params_s = ", ".join(params) ఒకవేళ params లేకపోతే "void"
     s = f"{ret_sp} {name_sp}({params_s})"
-    s = strip_unused_macros(s)
+    s = strip_వాడని_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_నక్షత్రం_spaces(s)
     s = fix_spacing(s)
-    return s
+    తిరిగి s
 
-def in_this_file(cur, src_path: Path) -> bool:
-    try:
-        loc = cur.extent.start
-        f = (loc.file or cur.location.file)
-        if not f:
+నిర్వచనం లోపల_this_file(cur, src_మార్గం: మార్గం_2) -> bool:
+    ప్రయత్నించు:
+        loc = cur.extent.ప్రారంభం
+        f = (loc.file లేదా cur.location.file)
+        ఒకవేళ కాదు f:
             # Macro-expanded function definitions may lack an attached file.
             # Allow them only if we can actually extract a concrete function
             # header.
-            try:
-                toks = tokens_for_function_header(cur)
-                return bool(toks)
-            except Exception:
-                return False
-        cur_path = os.path.normcase(os.path.abspath(str(f.name)))
-        src_abs  = os.path.normcase(os.path.abspath(src_path.as_posix()))
+            ప్రయత్నించు:
+                toks = టోకెన్లు_for_function_శీర్షిక(cur)
+                తిరిగి bool(toks)
+            మినహాయింపు Exception:
+                తిరిగి అబద్ధం
+        cur_మార్గం = os.మార్గం.normcase(os.మార్గం.abspath(str(f.name)))
+        src_abs  = os.మార్గం.normcase(os.మార్గం.abspath(src_మార్గం.as_posix()))
         # Accept the main source file
-        if cur_path == src_abs or os.path.basename(cur_path) == os.path.basename(src_abs):
-            return True
+        ఒకవేళ cur_మార్గం == src_abs లేదా os.మార్గం.basename(cur_మార్గం) == os.మార్గం.basename(src_abs):
+            తిరిగి నిజం
         # Additionally accept quoted .c includes located in the same directory
         # (e.g., #include "regexp_nfa.c" next to the main source).
-        src_dir = os.path.normcase(os.path.abspath(src_path.parent.as_posix()))
-        if cur_path.endswith(".c") and os.path.dirname(cur_path) == src_dir:
-            return True
-        return False
-    except Exception:
-        return False
+        src_dir = os.మార్గం.normcase(os.మార్గం.abspath(src_మార్గం.మాతృ.as_posix()))
+        ఒకవేళ cur_మార్గం.endswith(".c") మరియు os.మార్గం.dirname(cur_మార్గం) == src_dir:
+            తిరిగి నిజం
+        తిరిగి అబద్ధం
+    మినహాయింపు Exception:
+        తిరిగి అబద్ధం
 
-def collect_function_defs(tu, src_path: Path):
-    def walk(node, depth=0):
-        if DEBUG_LOG:
-            print(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
-        if node.kind == CursorKind.FUNCTION_DECL:
-            if in_this_file(node, src_path):
-                if node.storage_class != StorageClass.STATIC and node.is_definition():
-                    yield node
-        for ch in node.get_children():
-            yield from walk(ch, depth+1)
-    yield from walk(tu.cursor)
+నిర్వచనం collect_function_defs(tu, src_మార్గం: మార్గం_2):
+    నిర్వచనం walk(కణుపు, లోతు=0):
+        ఒకవేళ DEBUG_LOG:
+            ముద్రించు(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
+        ఒకవేళ కణుపు.రకం == Cursor_రకం.FUNCTION_DECL:
+            ఒకవేళ లోపల_this_file(కణుపు, src_మార్గం):
+                ఒకవేళ కణుపు.storage_class != StorageClass.STATIC మరియు కణుపు.is_definition():
+                    ఇవ్వు కణుపు
+        కొరకు ch లో కణుపు.get_children():
+            ఇవ్వు తః walk(ch, లోతు+1)
+    ఇవ్వు తః walk(tu.cursor)
 
-def parse_with_clang(src_path: Path, text: str, args: List[str]):
-    index = Index.create()
-    src_abs = os.path.abspath(src_path.as_posix())
-    unsaved = [(src_abs, text)]
-    proto_h = src_path.parent / "proto.h"
-    if proto_h.exists():
+నిర్వచనం parse_with_clang(src_మార్గం: మార్గం_2, పాఠ్యం: str, వాదనలు: List[str]):
+    సూచీ = సూచీ_3.create()
+    src_abs = os.మార్గం.abspath(src_మార్గం.as_posix())
+    unsaved = [(src_abs, పాఠ్యం)]
+    proto_h = src_మార్గం.మాతృ / "proto.h"
+    ఒకవేళ proto_h.exists():
         unsaved.append((str(proto_h), "/* stubbed */\n"))
-    final_args = (args or []) + [
+    final_వాదనలు = (వాదనలు లేదా []) + [
         "-std=c99", "-ferror-limit=0", "-w",
         "-Wno-implicit-function-declaration"
     ]
-    tu = index.parse(src_abs, args=final_args, unsaved_files=unsaved, options=0)
-    if SHOW_DIAGS:
-        for d in getattr(tu, "diagnostics", []):
-            print(d, file=sys.stderr)
-    return tu
+    tu = సూచీ.parse(src_abs, వాదనలు=final_వాదనలు, unsaved_files=unsaved, options=0)
+    ఒకవేళ SHOW_DIAGS:
+        కొరకు d లో getattr(tu, "diagnostics", []):
+            ముద్రించు(d, file=sys.stderr)
+    తిరిగి tu
 
-def generate_prototypes(tu, src_path: Path) -> List[str]:
+నిర్వచనం generate_prototypes(tu, src_మార్గం: మార్గం_2) -> List[str]:
     """Collect unique function prototypes from a translation unit."""
     protos: List[str] = []
-    for fn in collect_function_defs(tu, src_path):
-        if DEBUG_LOG:
-            try:
-                sr = fn.extent.start
-                er = fn.extent.end
-                print(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
-            except Exception:
-                print(f"[def] {fn.spelling}", file=sys.stderr)
-        toks = tokens_for_function_header(fn)
-        header = join_tokens(toks) if toks else header_from_cursor(fn)
+    కొరకు fn లో collect_function_defs(tu, src_మార్గం):
+        ఒకవేళ DEBUG_LOG:
+            ప్రయత్నించు:
+                sr = fn.extent.ప్రారంభం
+                er = fn.extent.చివర
+                ముద్రించు(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
+            మినహాయింపు Exception:
+                ముద్రించు(f"[def] {fn.spelling}", file=sys.stderr)
+        toks = టోకెన్లు_for_function_శీర్షిక(fn)
+        శీర్షిక = join_టోకెన్లు(toks) ఒకవేళ toks లేకపోతే శీర్షిక_from_cursor(fn)
         # libclang expands the bool macro (from <stdbool.h>) to _Bool.
         # Restore it to bool for readability.
-        header = re.sub(r'\b_Bool\b', 'bool', header)
-        if header:
+        శీర్షిక = re.sub(r'\b_Bool\b', 'bool', శీర్షిక)
+        ఒకవేళ శీర్షిక:
             protos.append(f"{header};")
 
-    seen, unique = set(), []
-    for p in protos:
-        if p not in seen:
+    చూసిన, unique = సమితి_2(), []
+    కొరకు p లో protos:
+        ఒకవేళ p కాదు లో చూసిన:
             unique.append(p)
-            seen.add(p)
-    return unique
+            చూసిన.కూడు(p)
+    తిరిగి unique
 
-def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
+నిర్వచనం write_prototypes(బహిర్గతం_మార్గం: మార్గం_2, శీర్షికలు: List[str], src_name: str) -> ఏమీలేదు:
     """Write collected prototypes to the output .pro file."""
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with out_path.open("w", encoding="utf-8", newline="\n") as f:
-            f.write(f"// {src_name}\n")
-            for h in headers:
-                f.write(h + "\n")
-            f.write("// vim: ft=c\n")
-    except Exception as e:
-        print(f"write failed: {e}", file=sys.stderr)
+    బహిర్గతం_మార్గం.మాతృ.mkdir(parents=నిజం, exist_ok=నిజం)
+    ప్రయత్నించు:
+        తోడుగా బహిర్గతం_మార్గం.open("w", encoding="utf-8", newline="\n") ఇవ f:
+            f.లిఖ(f"// {src_name}\n")
+            కొరకు h లో శీర్షికలు:
+                f.లిఖ(h + "\n")
+            f.లిఖ("// vim: ft=c\n")
+    మినహాయింపు Exception ఇవ e:
+        ముద్రించు(f"write failed: {e}", file=sys.stderr)
         sys.exit(4)
-    print(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
+    ముద్రించు(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
 
-def main():
-    args = sys.argv[1:]
-    if not args:
-        print("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
+నిర్వచనం ప్రధాన():
+    వాదనలు = sys.argv[1:]
+    ఒకవేళ కాదు వాదనలు:
+        ముద్రించు("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
         sys.exit(1)
 
-    src_path = Path(args[0])
-    clang_args = args[1:]
-    if not src_path.exists():
-        print(f"not found: {src_path}", file=sys.stderr)
+    src_మార్గం = మార్గం_2(వాదనలు[0])
+    clang_వాదనలు = వాదనలు[1:]
+    ఒకవేళ కాదు src_మార్గం.exists():
+        ముద్రించు(f"not found: {src_path}", file=sys.stderr)
         sys.exit(2)
 
     # Load and preprocess source
-    try:
-        original = src_path.read_text(encoding="utf-8", errors="ignore")
-    except Exception as e:
-        print(f"read error: {e}", file=sys.stderr)
+    ప్రయత్నించు:
+        original = src_మార్గం.read_పాఠ్యం(encoding="utf-8", errors="ignore")
+    మినహాయింపు Exception ఇవ e:
+        ముద్రించు(f"read error: {e}", file=sys.stderr)
         sys.exit(2)
-    rewritten = rewrite_conditionals_first_branch(original)
+    rewritten = rewrite_conditionals_మొదటి_branch(original)
 
     # Parse with libclang
-    try:
-        tu = parse_with_clang(src_path, rewritten, clang_args)
-    except Exception as e:
-        print(f"parse failed: {e}", file=sys.stderr)
+    ప్రయత్నించు:
+        tu = parse_with_clang(src_మార్గం, rewritten, clang_వాదనలు)
+    మినహాయింపు Exception ఇవ e:
+        ముద్రించు(f"parse failed: {e}", file=sys.stderr)
         sys.exit(3)
 
-    headers = generate_prototypes(tu, src_path)
-    out_file = Path("proto") / (src_path.stem + ".pro")
-    write_prototypes(out_file, headers, src_path.name)
+    శీర్షికలు = generate_prototypes(tu, src_మార్గం)
+    బహిర్గతం_file = మార్గం_2("proto") / (src_మార్గం.stem + ".pro")
+    write_prototypes(బహిర్గతం_file, శీర్షికలు, src_మార్గం.name)
 
-if __name__ == "__main__":
-    main()
+ఒకవేళ __name__ == "__main__":
+    ప్రధాన()

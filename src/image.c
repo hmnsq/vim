@@ -14,36 +14,36 @@
  * blit pixels ("images" are objects), the behaviour is emulated.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_IMAGE)
+#ఒకవేళ defined(FEAT_IMAGE)
 
-struct
+నిర్మాణం
 {
-    const char *name;
+    స్థిరరాశి అక్షరం *name;
 
-    struct
+    నిర్మాణం
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_T *);
-	void (*uninit)(image_T *);
+	పూర్ణాంకం (*init)(image_T *);
+	శూన్య (*uninit)(image_T *);
     } image;
 
-    struct
+    నిర్మాణం
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_placement_T *);
-	void (*uninit)(image_placement_T *);
+	పూర్ణాంకం (*init)(image_placement_T *);
+	శూన్య (*uninit)(image_placement_T *);
 
-	void (*draw)(image_placement_T *);
-	void (*clear)(image_placement_T *);
+	శూన్య (*draw)(image_placement_T *);
+	శూన్య (*clear)(image_placement_T *);
 
 	// If backend blits the image pixels to the screen. Images are not
 	// treated as "objects".
 	bool blit;
     } placement;
 } image_backends[] = {
-#ifdef FEAT_IMAGE_GUI
+#నిర్వచితమైతే FEAT_IMAGE_GUI
     [IMAGE_BACKEND_GUI] = {
 	.name = "gui",
 	.image = {
@@ -58,18 +58,18 @@ struct
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 	    .blit = false,
-#  else
+#  లేకపోతే
 	    .blit = true,
 #  endif
 # elif FEAT_GUI_MSWIN
 	    .blit = true,
-# else
+# లేకపోతే
 	    .blit = false,
 # endif
 	}
     },
-#endif
-#ifdef FEAT_IMAGE_KITTY
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE_KITTY
     [IMAGE_BACKEND_KITTY] = {
 	.name = "kitty",
 	.image = {
@@ -84,8 +84,8 @@ struct
 	    .blit = false
 	}
     },
-#endif
-#ifdef FEAT_IMAGE_SIXEL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE_SIXEL
     [IMAGE_BACKEND_SIXEL] = {
 	.name = "sixel",
 	.image = {
@@ -100,60 +100,60 @@ struct
 	    .blit = true
 	}
     }
-#endif
+#అయితే_ముగింపు
 };
 
 // Current image backend being used
-static image_backend_T image_backend = IMAGE_BACKEND_NONE;
+స్థిర image_backend_T image_backend = IMAGE_BACKEND_NONE;
 
-static image_T *images = NULL;
+స్థిర image_T *images = ఖాళీ;
 // Sorted from highest zindex to lowest zindex
-static image_placement_T    *placements = NULL;
-static int		    n_placements = 0;
+స్థిర image_placement_T    *placements = ఖాళీ;
+స్థిర పూర్ణాంకం		    n_placements = 0;
 
-static int shift_top = 0;
-static int shift_bot = 0;
-static int shift = 0;
+స్థిర పూర్ణాంకం జరుపు_శిఖరం = 0;
+స్థిర పూర్ణాంకం జరుపు_bot = 0;
+స్థిర పూర్ణాంకం జరుపు = 0;
 
 // If > 0, then mark_dirty_region_for_images() will be a no-op
-static int freeze_mark_dirty = 0;
+స్థిర పూర్ణాంకం freeze_mark_dirty = 0;
 
-#define FOR_ALL_IMAGES(v) for ((v) = images; (v) != NULL; (v) = (v)->next)
-#define FOR_ALL_PLACEMENTS(v) \
-    for ((v) = placements; (v) != NULL; (v) = (v)->next)
+#నిర్వచించు FOR_ALL_IMAGES(v) కొరకు ((v) = images; (v) != ఖాళీ; (v) = (v)->తదుపరి)
+#నిర్వచించు FOR_ALL_PLACEMENTS(v) \
+    కొరకు ((v) = placements; (v) != ఖాళీ; (v) = (v)->తదుపరి)
 
-#define IMAGE_FUNC(b, n) (image_backends[b].image.n)
-#define PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
+#నిర్వచించు IMAGE_FUNC(b, n) (image_backends[b].image.n)
+#నిర్వచించు PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
 
-static void redraw_region(pixman_region32_t *region, bool now, bool restore);
+స్థిర శూన్య redraw_region(pixman_region32_t *region, bool now, bool restore);
 
-    void
-init_image_state(void)
+    శూన్య
+init_image_state(శూన్య)
 {
-    (void)update_image_backend();
+    (శూన్య)update_image_backend();
 }
 
-    void
-uninit_image_state(void)
+    శూన్య
+uninit_image_state(శూన్య)
 {
-#ifdef FEAT_IMAGE_SIXEL
+#నిర్వచితమైతే FEAT_IMAGE_SIXEL
     sixel_uninit();
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Return true if the there image backend is ready, otherwise emit error.
  */
-    static bool
-backend_available(bool msg)
+    స్థిర bool
+backend_అందుబాటు(bool సందేశం)
 {
-    if (image_backend == IMAGE_BACKEND_NONE)
+    ఒకవేళ (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
-	    emsg(_(e_no_image_backend_available));
-	return false;
+	ఒకవేళ (సందేశం)
+	    emsg(_(e_no_image_backend_అందుబాటు));
+	తిరిగి false;
     }
-    return true;
+    తిరిగి true;
 }
 
 /*
@@ -161,28 +161,28 @@ backend_available(bool msg)
  * failure.
  */
     image_T *
-image_new(uint8_t *data, int width, int height, image_format_T fmt)
+image_new(uint8_t *దత్తాంశం, పూర్ణాంకం వెడల్పు, పూర్ణాంకం ఎత్తు, image_format_T fmt)
 {
     image_T	    *img;
-    static int_u    id;
+    స్థిర int_u    id;
 
-    if (!backend_available(true))
-	return NULL;
+    ఒకవేళ (!backend_అందుబాటు(true))
+	తిరిగి ఖాళీ;
 
     img = ALLOC_CLEAR_ONE(image_T);
-    if (img == NULL)
-	return NULL;
+    ఒకవేళ (img == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    img->data = vim_memsave(data, (size_t)width * height * fmt);
-    if (img->data == NULL)
+    img->దత్తాంశం = vim_memsave(దత్తాంశం, (size_t)వెడల్పు * ఎత్తు * fmt);
+    ఒకవేళ (img->దత్తాంశం == ఖాళీ)
     {
 	vim_free(img);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    img->state = IMAGE_STATE_PRIVATE;
-    img->width = width;
-    img->height = height;
+    img->state = IMAGE_STATE_వ్యక్తిగత;
+    img->వెడల్పు = వెడల్పు;
+    img->ఎత్తు = ఎత్తు;
     img->fmt = fmt;
 
     // Mix in PID to prevent ID collisions when using kitty graphics protocol
@@ -191,35 +191,35 @@ image_new(uint8_t *data, int width, int height, image_format_T fmt)
 
     img->backend = image_backend;
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    ఒకవేళ (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
-	vim_free(img->data);
+	vim_free(img->దత్తాంశం);
 	vim_free(img);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (images != NULL)
+    ఒకవేళ (images != ఖాళీ)
 	images->prev = img;
-    img->next = images;
+    img->తదుపరి = images;
     images = img;
 
-    return img;
+    తిరిగి img;
 }
 
-    static void
+    స్థిర శూన్య
 image_free(image_T *img)
 {
-    if (backend_available(false))
+    ఒకవేళ (backend_అందుబాటు(false))
 	IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (img->prev != NULL)
-	img->prev->next = img->next;
-    if (img->next != NULL)
-	img->next->prev = img->prev;
-    if (images == img)
-	images = img->next;
+    ఒకవేళ (img->prev != ఖాళీ)
+	img->prev->తదుపరి = img->తదుపరి;
+    ఒకవేళ (img->తదుపరి != ఖాళీ)
+	img->తదుపరి->prev = img->prev;
+    ఒకవేళ (images == img)
+	images = img->తదుపరి;
 
-    vim_free(img->data);
+    vim_free(img->దత్తాంశం);
     vim_free(img);
 }
 
@@ -227,10 +227,10 @@ image_free(image_T *img)
  * Decrement reference count of an image. Be careful to not let the public API
  * be able to directly decrement the refcount of an image multiple times!
  */
-    void
+    శూన్య
 image_unref(image_T *img)
 {
-    if (--img->refcount <= 0)
+    ఒకవేళ (--img->refcount <= 0)
 	image_free(img);
 }
 
@@ -242,118 +242,118 @@ image_unref(image_T *img)
 image_ref(image_T *img)
 {
     img->refcount++;
-    return img;
+    తిరిగి img;
 }
 
 /*
  * Get image width and height in cells, rounding up so that every pixel is
  * covered.
  */
-    void
-image_get_cell_dimensions(image_T *img, int *cw, int *ch)
+    శూన్య
+image_get_cell_dimensions(image_T *img, పూర్ణాంకం *cw, పూర్ణాంకం *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    పూర్ణాంకం w = PHY2LOG(img->వెడల్పు);
+    పూర్ణాంకం h = PHY2LOG(img->ఎత్తు);
 
-    *cw = (w + cell_width - 1) / cell_width;
-    *ch = (h + cell_height - 1) / cell_height;
+    *cw = (w + cell_వెడల్పు - 1) / cell_వెడల్పు;
+    *ch = (h + cell_ఎత్తు - 1) / cell_ఎత్తు;
 }
 
 /*
  * Similar, but return the dimensions of all cells that are *fully* covered by
  * pixels. Pixels that are partially covered are not counted.
  */
-    static void
-image_get_cell_dimensions_min(image_T *img, int *cw, int *ch)
+    స్థిర శూన్య
+image_get_cell_dimensions_min(image_T *img, పూర్ణాంకం *cw, పూర్ణాంకం *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    పూర్ణాంకం w = PHY2LOG(img->వెడల్పు);
+    పూర్ణాంకం h = PHY2LOG(img->ఎత్తు);
 
-    *cw = w / cell_width;
-    *ch = h / cell_height;
+    *cw = w / cell_వెడల్పు;
+    *ch = h / cell_ఎత్తు;
 }
 
-    void
-image_get_dimensions(image_T *img, int *w, int *h)
+    శూన్య
+image_get_dimensions(image_T *img, పూర్ణాంకం *w, పూర్ణాంకం *h)
 {
-    *w = img->width;
-    *h = img->height;
+    *w = img->వెడల్పు;
+    *h = img->ఎత్తు;
 }
 
 /*
  * Replace the current image contents with "data". "data" should be the exact
  * same format, width, and height. Return OK on success and FAIL on failure.
  */
-    int
-image_update(image_T *img, uint8_t *data)
+    పూర్ణాంకం
+image_update(image_T *img, uint8_t *దత్తాంశం)
 {
-    int w, h;
+    పూర్ణాంకం w, h;
 
-    if (!backend_available(true) || img->data == NULL)
-	return FAIL;
+    ఒకవేళ (!backend_అందుబాటు(true) || img->దత్తాంశం == ఖాళీ)
+	తిరిగి FAIL;
 
     image_get_dimensions(img, &w, &h);
-    mch_memmove(img->data, data, (size_t)w * h * img->fmt);
+    mch_memmove(img->దత్తాంశం, దత్తాంశం, (size_t)w * h * img->fmt);
 
     IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    ఒకవేళ (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
-	emsg(_(e_out_of_memory));
-	VIM_CLEAR(img->data);
-	return FAIL;
+	emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
+	VIM_CLEAR(img->దత్తాంశం);
+	తిరిగి FAIL;
     }
 
     img->ver++;
     redraw_all_later(UPD_VALID);
-    return OK;
+    తిరిగి OK;
 }
 
-    static void
-image_placement_unlink(image_placement_T *place)
+    స్థిర శూన్య
+image_placement_unlink(image_placement_T *ఉంచు)
 {
-    if (place->prev != NULL)
-	place->prev->next = place->next;
-    if (place->next != NULL)
-	place->next->prev = place->prev;
-    if (placements == place)
-	placements = place->next;
+    ఒకవేళ (ఉంచు->prev != ఖాళీ)
+	ఉంచు->prev->తదుపరి = ఉంచు->తదుపరి;
+    ఒకవేళ (ఉంచు->తదుపరి != ఖాళీ)
+	ఉంచు->తదుపరి->prev = ఉంచు->prev;
+    ఒకవేళ (placements == ఉంచు)
+	placements = ఉంచు->తదుపరి;
     n_placements--;
 }
 
-    static void
-image_placement_link(image_placement_T *place)
+    స్థిర శూన్య
+image_placement_link(image_placement_T *ఉంచు)
 {
     image_placement_T *p = placements;
-    image_placement_T *prev = NULL;
+    image_placement_T *prev = ఖాళీ;
 
     // Add placement *before* the placement with the lower zindex.
-    while (p != NULL)
+    అయితే (p != ఖాళీ)
     {
-	if (place->zindex > p->zindex)
-	    break;
-	else if (place->zindex == p->zindex)
+	ఒకవేళ (ఉంచు->zindex > p->zindex)
+	    ఆపు;
+	లేకపోతే ఒకవేళ (ఉంచు->zindex == p->zindex)
 	{
-	    if (place->use > p->use)
-		break;
-	    if (place->gen < p->gen)
-		break;
+	    ఒకవేళ (ఉంచు->use > p->use)
+		ఆపు;
+	    ఒకవేళ (ఉంచు->gen < p->gen)
+		ఆపు;
 	}
 
 	prev = p;
-	p = p->next;
+	p = p->తదుపరి;
     }
 
-    place->next = p;
-    place->prev = prev;
+    ఉంచు->తదుపరి = p;
+    ఉంచు->prev = prev;
 
-    if (p != NULL)
-	p->prev = place;
+    ఒకవేళ (p != ఖాళీ)
+	p->prev = ఉంచు;
 
-    if (prev != NULL)
-	prev->next = place;
-    else
-	placements = place;
+    ఒకవేళ (prev != ఖాళీ)
+	prev->తదుపరి = ఉంచు;
+    లేకపోతే
+	placements = ఉంచు;
 
     n_placements++;
 }
@@ -380,233 +380,233 @@ image_placement_new(
 	image_placement_use_T	use,
 	bool			quiet)
 {
-    image_placement_T	*place;
-    static int_u	id = 1; // Kitty placements id must be > 1
+    image_placement_T	*ఉంచు;
+    స్థిర int_u	id = 1; // Kitty placements id must be > 1
 
-    if (!backend_available(!quiet))
-	return NULL;
+    ఒకవేళ (!backend_అందుబాటు(!quiet))
+	తిరిగి ఖాళీ;
 
-    place = ALLOC_CLEAR_ONE(image_placement_T);
-    if (place == NULL)
-	return NULL;
+    ఉంచు = ALLOC_CLEAR_ONE(image_placement_T);
+    ఒకవేళ (ఉంచు == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    place->id = id;
+    ఉంచు->id = id;
     id += PLACEMENT_ID_INC; // Allocate 1000 free placement ids to be used to
 			    // draw this image placement. Only relevant for
 			    // kitty graphics protocol.
-    place->gen = gen;
-    place->use = use;
+    ఉంచు->gen = gen;
+    ఉంచు->use = use;
 
-    place->img = img;
-    place->flags = IMAGEPF_DIRTY;
+    ఉంచు->img = img;
+    ఉంచు->flags = IMAGEPF_DIRTY;
 
-    if (img != NULL)
+    ఒకవేళ (img != ఖాళీ)
     {
-	place->img_ver = img->ver;
-	place->backend = image_backend;
-	place->cell_width = cell_width;
-	place->cell_height = cell_height;
+	ఉంచు->img_ver = img->ver;
+	ఉంచు->backend = image_backend;
+	ఉంచు->cell_వెడల్పు = cell_వెడల్పు;
+	ఉంచు->cell_ఎత్తు = cell_ఎత్తు;
 
 	// Bounding box is in cells
 	image_get_cell_dimensions(img,
-		&place->bounding_box.x2, &place->bounding_box.y2);
-	place->crop_box.x2 = place->bounding_box.x2;
-	place->crop_box.y2 = place->bounding_box.y2;
+		&ఉంచు->bounding_box.x2, &ఉంచు->bounding_box.y2);
+	ఉంచు->crop_box.x2 = ఉంచు->bounding_box.x2;
+	ఉంచు->crop_box.y2 = ఉంచు->bounding_box.y2;
 
-	if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+	ఒకవేళ (PLACEMENT_FUNC(image_backend, init)(ఉంచు) == FAIL)
 	{
 	    id -= PLACEMENT_ID_INC;
-	    vim_free(place);
-	    return NULL;
+	    vim_free(ఉంచు);
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
-	place->backend = IMAGE_BACKEND_NONE;
+    లేకపోతే
+	ఉంచు->backend = IMAGE_BACKEND_NONE;
 
-    image_placement_link(place);
+    image_placement_link(ఉంచు);
 
-    return place;
+    తిరిగి ఉంచు;
 }
 
-    static void
-image_placement_clear_int(image_placement_T *place, bool now)
+    స్థిర శూన్య
+image_placement_clear_int(image_placement_T *ఉంచు, bool now)
 {
-    if (backend_available(false) && place->img != NULL)
+    ఒకవేళ (backend_అందుబాటు(false) && ఉంచు->img != ఖాళీ)
     {
-	if (place->flags & IMAGEPF_VISIBLE_INIT
+	ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT
 		&& PLACEMENT_FUNC(image_backend, blit))
-	    redraw_region(&place->visible_abs, now, true);
-	PLACEMENT_FUNC(image_backend, clear)(place);
-	place->flags |= IMAGEPF_HIDDEN;
-	if (!now && !updating_screen)
+	    redraw_region(&ఉంచు->visible_abs, now, true);
+	PLACEMENT_FUNC(image_backend, clear)(ఉంచు);
+	ఉంచు->flags |= IMAGEPF_HIDDEN;
+	ఒకవేళ (!now && !updating_screen)
 	    redraw_all_later(UPD_VALID);
     }
 }
 
-    void
-image_placement_clear(image_placement_T *place)
+    శూన్య
+image_placement_clear(image_placement_T *ఉంచు)
 {
-    image_placement_clear_int(place, updating_screen);
+    image_placement_clear_int(ఉంచు, updating_screen);
 }
 
-    void
-image_placement_free(image_placement_T *place)
+    శూన్య
+image_placement_free(image_placement_T *ఉంచు)
 {
-    if (backend_available(false) && place->backend_data != NULL)
+    ఒకవేళ (backend_అందుబాటు(false) && ఉంచు->backend_దత్తాంశం != ఖాళీ)
     {
-	image_placement_clear(place);
-	PLACEMENT_FUNC(image_backend, uninit)(place);
+	image_placement_clear(ఉంచు);
+	PLACEMENT_FUNC(image_backend, uninit)(ఉంచు);
     }
 
-    if (place->flags & IMAGEPF_VISIBLE_INIT)
+    ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT)
     {
-	pixman_region32_fini(&place->visible);
-	pixman_region32_fini(&place->visible_abs);
+	pixman_region32_fini(&ఉంచు->visible);
+	pixman_region32_fini(&ఉంచు->visible_abs);
     }
-    image_placement_unlink(place);
+    image_placement_unlink(ఉంచు);
 
-    if (place->img != NULL)
-	image_unref(place->img);
-    vim_free(place);
+    ఒకవేళ (ఉంచు->img != ఖాళీ)
+	image_unref(ఉంచు->img);
+    vim_free(ఉంచు);
 }
 
-    void
-image_placement_set_zindex(image_placement_T *place, int zindex)
+    శూన్య
+image_placement_సమితి_zindex(image_placement_T *ఉంచు, పూర్ణాంకం zindex)
 {
     // If image was hidden before, must dirty it so it is fully redrawn again.
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN)
+	ఉంచు->flags |= IMAGEPF_DIRTY;
+    ఉంచు->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->zindex == zindex)
-	return;
-    place->zindex = zindex;
-    place->flags |= IMAGEPF_DIRTY;
+    ఒకవేళ (ఉంచు->zindex == zindex)
+	తిరిగి;
+    ఉంచు->zindex = zindex;
+    ఉంచు->flags |= IMAGEPF_DIRTY;
 
     // Must re-add the placement back so it is in the correct order
-    image_placement_unlink(place);
-    image_placement_link(place);
+    image_placement_unlink(ఉంచు);
+    image_placement_link(ఉంచు);
 }
 
 /*
  * Make sure to also update the bounding box!
  */
-    void
-image_placement_set_position(image_placement_T *place, int row, int col)
+    శూన్య
+image_placement_సమితి_position(image_placement_T *ఉంచు, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN)
+	ఉంచు->flags |= IMAGEPF_DIRTY;
+    ఉంచు->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->row == row && place->col == col)
-	return;
-    place->row = row;
-    place->col = col;
-    place->flags |= IMAGEPF_DIRTY;
+    ఒకవేళ (ఉంచు->అడ్డువరుస == అడ్డువరుస && ఉంచు->నిలువు == నిలువు)
+	తిరిగి;
+    ఉంచు->అడ్డువరుస = అడ్డువరుస;
+    ఉంచు->నిలువు = నిలువు;
+    ఉంచు->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
+    శూన్య
+image_placement_సమితి_crop(image_placement_T *ఉంచు, పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN)
+	ఉంచు->flags |= IMAGEPF_DIRTY;
+    ఉంచు->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->crop_box.x1 == x && place->crop_box.y1 == y
-	    && place->crop_box.x2 == x + w && place->crop_box.y2 == y + h)
-	return;
+    ఒకవేళ (ఉంచు->crop_box.x1 == x && ఉంచు->crop_box.y1 == y
+	    && ఉంచు->crop_box.x2 == x + w && ఉంచు->crop_box.y2 == y + h)
+	తిరిగి;
 
-    place->crop_box.x1 = x;
-    place->crop_box.y1 = y;
+    ఉంచు->crop_box.x1 = x;
+    ఉంచు->crop_box.y1 = y;
 
-    place->crop_box.x2 = x + w;
-    place->crop_box.y2 = y + h;
-    place->flags |= IMAGEPF_DIRTY;
+    ఉంచు->crop_box.x2 = x + w;
+    ఉంచు->crop_box.y2 = y + h;
+    ఉంచు->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_bounding_box(
-	image_placement_T   *place,
-	int		    row,
-	int		    col,
-	int		    row_height,
-	int		    col_width)
+    శూన్య
+image_placement_సమితి_bounding_box(
+	image_placement_T   *ఉంచు,
+	పూర్ణాంకం		    అడ్డువరుస,
+	పూర్ణాంకం		    నిలువు,
+	పూర్ణాంకం		    అడ్డువరుస_ఎత్తు,
+	పూర్ణాంకం		    నిలువు_వెడల్పు)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN)
+	ఉంచు->flags |= IMAGEPF_DIRTY;
+    ఉంచు->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->bounding_box.x1 == col && place->bounding_box.y1 == row
-	    && place->bounding_box.x2 == col + col_width
-	    && place->bounding_box.y2 == row + row_height)
-	return;
+    ఒకవేళ (ఉంచు->bounding_box.x1 == నిలువు && ఉంచు->bounding_box.y1 == అడ్డువరుస
+	    && ఉంచు->bounding_box.x2 == నిలువు + నిలువు_వెడల్పు
+	    && ఉంచు->bounding_box.y2 == అడ్డువరుస + అడ్డువరుస_ఎత్తు)
+	తిరిగి;
 
-    place->bounding_box.x1 = col;
-    place->bounding_box.y1 = row;
+    ఉంచు->bounding_box.x1 = నిలువు;
+    ఉంచు->bounding_box.y1 = అడ్డువరుస;
 
-    place->bounding_box.x2 = col + col_width;
-    place->bounding_box.y2 = row + row_height;
-    place->flags |= IMAGEPF_DIRTY;
+    ఉంచు->bounding_box.x2 = నిలువు + నిలువు_వెడల్పు;
+    ఉంచు->bounding_box.y2 = అడ్డువరుస + అడ్డువరుస_ఎత్తు;
+    ఉంచు->flags |= IMAGEPF_DIRTY;
 }
 
 /*
  * Enable or disable the image placement. Unlike IMAGEPF_HIDDEN, this is not
  * reset across redraws.
  */
-    void
-image_placement_set_enable(image_placement_T *place, bool enable)
+    శూన్య
+image_placement_సమితి_enable(image_placement_T *ఉంచు, bool enable)
 {
-    bool old = place->flags & IMAGEPF_ENABLED;
+    bool old = ఉంచు->flags & IMAGEPF_ENABLED;
 
-    if (enable && !old)
-	place->flags |= IMAGEPF_ENABLED;
-    else if (!enable && old)
+    ఒకవేళ (enable && !old)
+	ఉంచు->flags |= IMAGEPF_ENABLED;
+    లేకపోతే ఒకవేళ (!enable && old)
     {
-	place->flags &= ~IMAGEPF_ENABLED;
-	image_placement_clear(place);
+	ఉంచు->flags &= ~IMAGEPF_ENABLED;
+	image_placement_clear(ఉంచు);
     }
-    else
-	return;
+    లేకపోతే
+	తిరిగి;
 
-    place->flags |= IMAGEPF_DIRTY;
+    ఉంచు->flags |= IMAGEPF_DIRTY;
 }
 
 /*
  * Note that the returned crop region (x, y, w, h) is in physical pixels if
  * "physical" is true. Not relevant when using terminal protocols (sixel, KGP).
  */
-    void
+    శూన్య
 image_placement_subrect(
-	image_placement_T   *place,
+	image_placement_T   *ఉంచు,
 	pixman_box32_t	    rect,
-	int		    *row,
-	int		    *col,
-	int		    *x,
-	int		    *y,
-	int		    *w,
-	int		    *h,
+	పూర్ణాంకం		    *అడ్డువరుస,
+	పూర్ణాంకం		    *నిలువు,
+	పూర్ణాంకం		    *x,
+	పూర్ణాంకం		    *y,
+	పూర్ణాంకం		    *w,
+	పూర్ణాంకం		    *h,
 	bool		    physical)
 {
-    int iw, ih;
+    పూర్ణాంకం iw, ih;
 
-    image_get_dimensions(place->img, &iw, &ih);
+    image_get_dimensions(ఉంచు->img, &iw, &ih);
 
-    *row = place->row + rect.y1 + place->row_off;
-    *col = place->col + rect.x1;
+    *అడ్డువరుస = ఉంచు->అడ్డువరుస + rect.y1 + ఉంచు->అడ్డువరుస_off;
+    *నిలువు = ఉంచు->నిలువు + rect.x1;
 
-    *x = (rect.x1 + place->crop_box.x1) * cell_width;
-    *y = (rect.y1 + place->crop_box.y1) * cell_height;
-    *w = (rect.x2 - rect.x1) * cell_width;
-    *h = (rect.y2 - rect.y1) * cell_height;
+    *x = (rect.x1 + ఉంచు->crop_box.x1) * cell_వెడల్పు;
+    *y = (rect.y1 + ఉంచు->crop_box.y1) * cell_ఎత్తు;
+    *w = (rect.x2 - rect.x1) * cell_వెడల్పు;
+    *h = (rect.y2 - rect.y1) * cell_ఎత్తు;
 
-    if (physical)
+    ఒకవేళ (physical)
     {
 	*x = LOG2PHY(*x);
 	*y = LOG2PHY(*y);
 	*w = LOG2PHY(*w);
 	*h = LOG2PHY(*h);
     }
-    else
+    లేకపోతే
     {
 	iw = PHY2LOG(iw);
 	ih = PHY2LOG(ih);
@@ -615,8 +615,8 @@ image_placement_subrect(
     // Make that all the values are valid. "w" and "h" can especially be
     // invalid, because the image dimensions (in pixels) are converted to cells,
     // rounding *up*.
-    *row = MIN(*row, Rows);
-    *col = MIN(*col, Columns);
+    *అడ్డువరుస = MIN(*అడ్డువరుస, అడ్డువరుసలు);
+    *నిలువు = MIN(*నిలువు, Columns);
 
     *x = MIN(iw, MAX(*x, 0));
     *y = MIN(ih, MAX(*y, 0));
@@ -630,94 +630,94 @@ image_placement_subrect(
  * instead of deferring to next redraw. If "restore" is true, restore the cursor
  * position.
  */
-    static void
+    స్థిర శూన్య
 redraw_region(pixman_region32_t *region, bool now, bool restore)
 {
     pixman_box32_t  *rects;
-    int		    n_rects;
-    int		    cur_row = screen_cur_row;
-    int		    cur_col = screen_cur_col;
+    పూర్ణాంకం		    n_rects;
+    పూర్ణాంకం		    cur_అడ్డువరుస = screen_cur_అడ్డువరుస;
+    పూర్ణాంకం		    cur_నిలువు = screen_cur_నిలువు;
 
     rects = pixman_region32_rectangles(region, &n_rects);
-    if (rects == NULL)
-	return;
+    ఒకవేళ (rects == ఖాళీ)
+	తిరిగి;
 
-    for (int i = 0; i < n_rects; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	if (now)
+	ఒకవేళ (now)
 	{
 	    // The region may be from before a resize, when the screen was
 	    // bigger.
-	    int height = MIN(rect.y2, screen_Rows) - rect.y1;
-	    int width = MIN(rect.x2, screen_Columns) - rect.x1;
+	    పూర్ణాంకం ఎత్తు = MIN(rect.y2, screen_అడ్డువరుసలు) - rect.y1;
+	    పూర్ణాంకం వెడల్పు = MIN(rect.x2, screen_Columns) - rect.x1;
 
 	    // Tip: if you want to debug stale pixels appearing, set "inverse"
 	    // of screen_draw_rectangle() to TRUE.
-	    if (height > 0 && width > 0)
-		screen_draw_rectangle(rect.y1, rect.x1, height, width,
+	    ఒకవేళ (ఎత్తు > 0 && వెడల్పు > 0)
+		screen_draw_rectangle(rect.y1, rect.x1, ఎత్తు, వెడల్పు,
 			FALSE, TRUE);
-	    continue;
+	    కొనసాగు;
 	}
 
-	for (int r = rect.y1; r < rect.y2; r++)
+	కొరకు (పూర్ణాంకం r = rect.y1; r < rect.y2; r++)
 	{
-	    if (r >= screen_Rows)
-		break;
+	    ఒకవేళ (r >= screen_అడ్డువరుసలు)
+		ఆపు;
 
-	    for (int c = rect.x1; c < rect.x2; c++)
+	    కొరకు (పూర్ణాంకం c = rect.x1; c < rect.x2; c++)
 	    {
-		if (c >= screen_Columns)
-		    break;
+		ఒకవేళ (c >= screen_Columns)
+		    ఆపు;
 
-		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
+		ScreenAttrs[పంక్తి_స్థానభ్రంశం[r] + c] = (sattr_T)-1;
 	    }
 	}
     }
 
-    if (restore)
-	windgoto(cur_row, cur_col);
+    ఒకవేళ (restore)
+	windgoto(cur_అడ్డువరుస, cur_నిలువు);
 }
 
 /*
  * Draw all image placements to the screen. This should be done after all text
  * have been drawn to the screen, and image placements positioned correctly.
  */
-    void
-draw_image_placements(void)
+    శూన్య
+draw_image_placements(శూన్య)
 {
-    image_placement_T	*place;
-    pixman_region32_t	subtract_region;    // In cells
+    image_placement_T	*ఉంచు;
+    pixman_region32_t	వ్యవకలనం_region;    // In cells
     pixman_region32_t	dirty_region;	    // In cells
     image_placement_T	**pending_placements;
-    int			pending_len = -1;
+    పూర్ణాంకం			pending_len = -1;
     // Save current cursor position
-    int			cur_row = screen_cur_row;
-    int			cur_col = screen_cur_col;
+    పూర్ణాంకం			cur_అడ్డువరుస = screen_cur_అడ్డువరుస;
+    పూర్ణాంకం			cur_నిలువు = screen_cur_నిలువు;
 
     // Check if all placements have no backing image. If so, then do nothing
-    FOR_ALL_PLACEMENTS(place)
-	if (place->img != NULL)
+    FOR_ALL_PLACEMENTS(ఉంచు)
+	ఒకవేళ (ఉంచు->img != ఖాళీ)
 	{
 	    pending_len = 0;
-	    break;
+	    ఆపు;
 	}
 
-    if (pending_len == -1)
-	return;
+    ఒకవేళ (pending_len == -1)
+	తిరిగి;
 
-    if (!backend_available(false))
-	return;
+    ఒకవేళ (!backend_అందుబాటు(false))
+	తిరిగి;
 
-    if (n_placements == 0)
-	return;
+    ఒకవేళ (n_placements == 0)
+	తిరిగి;
 
     pending_placements = ALLOC_CLEAR_MULT(image_placement_T *, n_placements);
-    if (pending_placements == NULL)
-	return;
+    ఒకవేళ (pending_placements == ఖాళీ)
+	తిరిగి;
 
-    pixman_region32_init(&subtract_region);
+    pixman_region32_init(&వ్యవకలనం_region);
     pixman_region32_init(&dirty_region);
 
     cursor_off();
@@ -732,50 +732,50 @@ draw_image_placements(void)
     // also what regions are stale and redraw them. If we did everything in one
     // pass, stale regions of one image that overlap another image with a higher
     // index, would overwrite the overlapping image.
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(ఉంచు)
     {
-	image_T *img = place->img;
+	image_T *img = ఉంచు->img;
 
 	pixman_region32_t   image_region;
 	pixman_region32_t   visible_region;
 
-	int x, y;
+	పూర్ణాంకం x, y;
 
-	if (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
+	ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN || !(ఉంచు->flags & IMAGEPF_ENABLED))
 	    // Don't need to clear image placement for non-blit backends,
 	    // because we call image_placement_clear() every time we don't want
 	    // to see the image. Not sure of the side effects if we also clear
 	    // it here...
-	    continue;
+	    కొనసాగు;
 
-	if (img != NULL)
+	ఒకవేళ (img != ఖాళీ)
 	{
 	    pixman_region32_t	visible_abs;
-	    int			crop_w, crop_h;
-	    bool		cs_changed;
+	    పూర్ణాంకం			crop_w, crop_h;
+	    bool		cs_మారింది;
 	    bool		need_redraw;
 
 	    // Processing changed image data failed, skip this image
-	    if (place->img->data == NULL)
+	    ఒకవేళ (ఉంచు->img->దత్తాంశం == ఖాళీ)
 	    {
-		image_placement_clear(place);
-		continue;
+		image_placement_clear(ఉంచు);
+		కొనసాగు;
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
-			&& place->bounding_box.y2 <= shift_bot)
-		    && place->row_off != shift)
+	    ఒకవేళ ((ఉంచు->bounding_box.y1 >= జరుపు_శిఖరం
+			&& ఉంచు->bounding_box.y2 <= జరుపు_bot)
+		    && ఉంచు->అడ్డువరుస_off != జరుపు)
 	    {
-		place->row_off = shift;
-		place->flags |= IMAGEPF_DIRTY;
+		ఉంచు->అడ్డువరుస_off = జరుపు;
+		ఉంచు->flags |= IMAGEPF_DIRTY;
 	    }
 
-	    x = place->col;
-	    y = place->row + place->row_off;
+	    x = ఉంచు->నిలువు;
+	    y = ఉంచు->అడ్డువరుస + ఉంచు->అడ్డువరుస_off;
 
-	    crop_w = place->crop_box.x2 - place->crop_box.x1;
-	    crop_h = place->crop_box.y2 - place->crop_box.y1;
+	    crop_w = ఉంచు->crop_box.x2 - ఉంచు->crop_box.x1;
+	    crop_h = ఉంచు->crop_box.y2 - ఉంచు->crop_box.y1;
 
 	    // Don't add "crop_box" x1 and y1, because "row" and "col" use the
 	    // top left of the final cropped image.
@@ -786,15 +786,15 @@ draw_image_placements(void)
 
 	    // Only use parts of the image region within the actual screen.
 	    // "row_off" may offset the image slightly/completely off screen.
-	    if (!pixman_region32_intersect_rect(&image_region, &image_region,
-			0, 0, Columns, Rows)
-		    || !pixman_region32_subtract(&visible_region,
-			&image_region, &subtract_region)
+	    ఒకవేళ (!pixman_region32_intersect_rect(&image_region, &image_region,
+			0, 0, Columns, అడ్డువరుసలు)
+		    || !pixman_region32_వ్యవకలనం(&visible_region,
+			&image_region, &వ్యవకలనం_region)
 		    || !pixman_region32_copy(&visible_abs, &visible_region))
 	    {
 		pixman_region32_fini(&image_region);
 		pixman_region32_fini(&visible_region);
-		continue;
+		కొనసాగు;
 	    }
 
 	    pixman_region32_fini(&image_region);
@@ -803,50 +803,50 @@ draw_image_placements(void)
 	    // into image relative coordinates.
 	    pixman_region32_translate(&visible_region, -x, -y);
 
-	    cs_changed = place->cell_width != cell_width
-		|| place->cell_height != cell_height;
+	    cs_మారింది = ఉంచు->cell_వెడల్పు != cell_వెడల్పు
+		|| ఉంచు->cell_ఎత్తు != cell_ఎత్తు;
 
 	    // If cell size changed, then the visible regions are invalid pixel
 	    // wise. This prevents backends such as sixel from using cached
 	    // sequences.
-	    if (cs_changed)
+	    ఒకవేళ (cs_మారింది)
 	    {
-		place->cell_width = cell_width;
-		place->cell_height = cell_height;
-		place->flags |= IMAGEPF_FORCE;
+		ఉంచు->cell_వెడల్పు = cell_వెడల్పు;
+		ఉంచు->cell_ఎత్తు = cell_ఎత్తు;
+		ఉంచు->flags |= IMAGEPF_FORCE;
 	    }
 
 	    // Only redraw the image if it has changed (or if we haven't drawn
 	    // it yet). Or if image data has changed or cell size has changed
-	    need_redraw = place->flags & IMAGEPF_DIRTY || cs_changed
-		||  (place->flags & IMAGEPF_VISIBLE_INIT
+	    need_redraw = ఉంచు->flags & IMAGEPF_DIRTY || cs_మారింది
+		||  (ఉంచు->flags & IMAGEPF_VISIBLE_INIT
 			&& !pixman_region32_equal(&visible_region,
-			    &place->visible));
+			    &ఉంచు->visible));
 
-	    if (place->img_ver != img->ver)
+	    ఒకవేళ (ఉంచు->img_ver != img->ver)
 	    {
 		// Image data changed
 		need_redraw = true;
-		place->img_ver = img->ver;
+		ఉంచు->img_ver = img->ver;
 
-		image_placement_clear(place);
-		PLACEMENT_FUNC(image_backend, uninit)(place);
-		if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+		image_placement_clear(ఉంచు);
+		PLACEMENT_FUNC(image_backend, uninit)(ఉంచు);
+		ఒకవేళ (PLACEMENT_FUNC(image_backend, init)(ఉంచు) == FAIL)
 		{
-		    emsg(_(e_out_of_memory));
-		    image_unref(place->img);
-		    place->img = NULL;
-		    continue;
+		    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
+		    image_unref(ఉంచు->img);
+		    ఉంచు->img = ఖాళీ;
+		    కొనసాగు;
 		}
 	    }
 
-	    if (need_redraw)
+	    ఒకవేళ (need_redraw)
 	    {
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
-		    pixman_region32_fini(&place->visible);
-		place->visible = visible_region;
+		ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT)
+		    pixman_region32_fini(&ఉంచు->visible);
+		ఉంచు->visible = visible_region;
 
-		if (PLACEMENT_FUNC(image_backend, blit))
+		ఒకవేళ (PLACEMENT_FUNC(image_backend, blit))
 		{
 		    // Must redraw the stale regions that will not be composited
 		    // over (for this specific image).
@@ -854,17 +854,17 @@ draw_image_placements(void)
 
 		    pixman_region32_init(&stale_region);
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT)
 		    {
-			(void)pixman_region32_subtract(&stale_region,
-				&place->visible_abs, &visible_abs);
+			(శూన్య)pixman_region32_వ్యవకలనం(&stale_region,
+				&ఉంచు->visible_abs, &visible_abs);
 
 			// Since pixels may be translucent/transparent, we must
 			// redraw the cells behind the image every time, so that
 			// no stale pixels remain from the previous redraw.
-			if (img->fmt == IMAGE_FORMAT_RGBA)
-			    (void)pixman_region32_union(&stale_region,
-				    &stale_region, &place->visible_abs);
+			ఒకవేళ (img->fmt == IMAGE_FORMAT_RGBA)
+			    (శూన్య)pixman_region32_union(&stale_region,
+				    &stale_region, &ఉంచు->visible_abs);
 		    }
 
 		    // The visible region is guaranteed to cover every single
@@ -881,59 +881,59 @@ draw_image_placements(void)
 		    //
 		    // Not needed for RGBA images, because we redraw the visible
 		    // region every time anyways.
-		    if (img->fmt != IMAGE_FORMAT_RGBA)
+		    ఒకవేళ (img->fmt != IMAGE_FORMAT_RGBA)
 		    {
-			int		    min_w, min_h;
-			int		    rect_w, rect_h;
+			పూర్ణాంకం		    min_w, min_h;
+			పూర్ణాంకం		    rect_w, rect_h;
 			pixman_region32_t   min_region;
 
 			image_get_cell_dimensions_min(img, &min_w, &min_h);
 
 			// Ensure "min_region" only covers the fully covered
 			// cells of the cropped region.
-			rect_w = min_w - place->crop_box.x1;
-			rect_h = min_h - place->crop_box.y1;
+			rect_w = min_w - ఉంచు->crop_box.x1;
+			rect_h = min_h - ఉంచు->crop_box.y1;
 
-			if (rect_w > 0 && rect_h > 0)
+			ఒకవేళ (rect_w > 0 && rect_h > 0)
 			    // pixman_region32_init_rect() expects a non zero
 			    // width and height (otherwise it outputs error
 			    // message).
 			    pixman_region32_init_rect(&min_region,
 				    x, y, rect_w, rect_h);
-			else
+			లేకపోతే
 			    pixman_region32_init(&min_region);
 
-			(void)pixman_region32_subtract(&min_region,
+			(శూన్య)pixman_region32_వ్యవకలనం(&min_region,
 				&visible_abs, &min_region);
-			(void)pixman_region32_union(&stale_region,
+			(శూన్య)pixman_region32_union(&stale_region,
 				&stale_region, &min_region);
 			pixman_region32_fini(&min_region);
 		    }
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT)
 			// Also subtract "subtract_region", so we don't
 			// redundantly redraw cells that will have images
 			// painted over them after. Make sure to do this before
 			// we check partially covered cells, since
 			// "subtract_region" may also have partially covered
 			// cells.
-			(void)pixman_region32_subtract(&stale_region,
-				&stale_region, &subtract_region);
+			(శూన్య)pixman_region32_వ్యవకలనం(&stale_region,
+				&stale_region, &వ్యవకలనం_region);
 
 		    // Don't redraw now, defer it later
 		    pixman_region32_union(&dirty_region,
 			    &dirty_region, &stale_region);
 		    pixman_region32_fini(&stale_region);
 		}
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
-		    pixman_region32_fini(&place->visible_abs);
-		place->visible_abs = visible_abs;
+		ఒకవేళ (ఉంచు->flags & IMAGEPF_VISIBLE_INIT)
+		    pixman_region32_fini(&ఉంచు->visible_abs);
+		ఉంచు->visible_abs = visible_abs;
 
-		pending_placements[pending_len++] = place;
-		place->flags |= IMAGEPF_VISIBLE_INIT;
-		place->flags &= ~IMAGEPF_DIRTY;
+		pending_placements[pending_len++] = ఉంచు;
+		ఉంచు->flags |= IMAGEPF_VISIBLE_INIT;
+		ఉంచు->flags &= ~IMAGEPF_DIRTY;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		pixman_region32_fini(&visible_region);
 		pixman_region32_fini(&visible_abs);
@@ -941,14 +941,14 @@ draw_image_placements(void)
 	}
 
 	// If this is last image, no need to union its bounds.
-	if (place->next == NULL)
-	    break;
+	ఒకవేళ (ఉంచు->తదుపరి == ఖాళీ)
+	    ఆపు;
 
-	pixman_region32_union_rect(&subtract_region, &subtract_region,
-		place->bounding_box.x1,
-		place->bounding_box.y1 + place->row_off,
-		place->bounding_box.x2 - place->bounding_box.x1,
-		place->bounding_box.y2 - place->bounding_box.y1);
+	pixman_region32_union_rect(&వ్యవకలనం_region, &వ్యవకలనం_region,
+		ఉంచు->bounding_box.x1,
+		ఉంచు->bounding_box.y1 + ఉంచు->అడ్డువరుస_off,
+		ఉంచు->bounding_box.x2 - ఉంచు->bounding_box.x1,
+		ఉంచు->bounding_box.y2 - ఉంచు->bounding_box.y1);
     }
 
     // Don't want to dirty images again redundantly
@@ -956,18 +956,18 @@ draw_image_placements(void)
     redraw_region(&dirty_region, true, false);
     freeze_mark_dirty--;
 
-    if (pending_len > 0)
+    ఒకవేళ (pending_len > 0)
     {
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	// Make sure to flush any output! We write directly to the draw
 	// area/whatever, meaning draw commands outputted before this (as escape
 	// sequences), will still draw over the image surface if we don't flush
 	// now.
-	if (gui.in_use)
-	    out_flush();
-#endif
+	ఒకవేళ (gui.లోపల_use)
+	    బహిర్గతం_flush();
+#అయితే_ముగింపు
 
-	for (int i = 0; i < pending_len; i++)
+	కొరకు (పూర్ణాంకం i = 0; i < pending_len; i++)
 	{
 	    PLACEMENT_FUNC(image_backend, draw)(pending_placements[i]);
 	    pending_placements[i]->flags &= ~IMAGEPF_FORCE;
@@ -977,11 +977,11 @@ draw_image_placements(void)
     // Restore cursor position, however do not turn on the cursor, since that
     // causes it to flicker at the wrong position when using sixel. It will be
     // turned on later somewhere...
-    windgoto(cur_row, cur_col);
-    out_flush();
+    windgoto(cur_అడ్డువరుస, cur_నిలువు);
+    బహిర్గతం_flush();
 
     vim_free(pending_placements);
-    pixman_region32_fini(&subtract_region);
+    pixman_region32_fini(&వ్యవకలనం_region);
     pixman_region32_fini(&dirty_region);
 }
 
@@ -989,41 +989,41 @@ draw_image_placements(void)
  * Mark any images that touches the region dirty. Only used for backends that
  * blit pixels.
  */
-    void
-mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
+    శూన్య
+mark_dirty_region_for_images(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం అడ్డువరుస_ఎత్తు, పూర్ణాంకం నిలువు_వెడల్పు)
 {
-    image_placement_T	*place;
+    image_placement_T	*ఉంచు;
     pixman_box32_t	rect;
 
-    if (freeze_mark_dirty > 0 || !backend_available(false)
+    ఒకవేళ (freeze_mark_dirty > 0 || !backend_అందుబాటు(false)
 	    || !PLACEMENT_FUNC(image_backend, blit) || n_placements == 0)
-	return;
+	తిరిగి;
 
-    rect.x1 = col;
-    rect.y1 = row;
-    rect.x2 = col + col_width;
-    rect.y2 = row + row_height;
+    rect.x1 = నిలువు;
+    rect.y1 = అడ్డువరుస;
+    rect.x2 = నిలువు + నిలువు_వెడల్పు;
+    rect.y2 = అడ్డువరుస + అడ్డువరుస_ఎత్తు;
 
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(ఉంచు)
     {
-	if (place->flags & IMAGEPF_HIDDEN)
-	    continue;
-	if (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
-		== PIXMAN_REGION_OUT)
-	    continue;
+	ఒకవేళ (ఉంచు->flags & IMAGEPF_HIDDEN)
+	    కొనసాగు;
+	ఒకవేళ (pixman_region32_కలిగియుంది_rectangle(&ఉంచు->visible_abs, &rect)
+		== PIXMAN_REGION_బహిర్గతం)
+	    కొనసాగు;
 
-	place->flags |= IMAGEPF_DIRTY;
+	ఉంచు->flags |= IMAGEPF_DIRTY;
     }
 }
 
-    void
-clear_all_image_placements(void)
+    శూన్య
+clear_all_image_placements(శూన్య)
 {
-    image_placement_T *place;
+    image_placement_T *ఉంచు;
 
-    FOR_ALL_PLACEMENTS(place)
-	image_placement_clear(place);
-    if (!updating_screen)
+    FOR_ALL_PLACEMENTS(ఉంచు)
+	image_placement_clear(ఉంచు);
+    ఒకవేళ (!updating_screen)
 	redraw_all_later(UPD_VALID);
 }
 
@@ -1031,33 +1031,33 @@ clear_all_image_placements(void)
  * Used for screen_ins_lines() and screen_del_lines(), because they directly
  * shift rows. Note that this does not queue a screen redraw.
  */
-    void
-shift_image_placements(int top, int bot, int amount)
+    శూన్య
+జరుపు_image_placements(పూర్ణాంకం శిఖరం, పూర్ణాంకం bot, పూర్ణాంకం amount)
 {
-    shift_top = top;
-    shift_bot = bot;
-    shift += amount;
+    జరుపు_శిఖరం = శిఖరం;
+    జరుపు_bot = bot;
+    జరుపు += amount;
 }
 
 /*
  * Called when screen is cleared, as update_screen() may go to clearing the
  * screen instead of inserting lines using screen_ins_lines().
  */
-    void
-shift_reset_image_placements(void)
+    శూన్య
+జరుపు_reset_image_placements(శూన్య)
 {
-    shift = 0;
+    జరుపు = 0;
 }
 
-    static image_T *
-find_image(int_u id)
+    స్థిర image_T *
+కనుగొను_image(int_u id)
 {
     image_T *img;
 
     FOR_ALL_IMAGES(img)
-	if (img->state == IMAGE_STATE_PUBLIC && img->id == id)
-	    return img;
-    return NULL;
+	ఒకవేళ (img->state == IMAGE_STATE_ప్రజా && img->id == id)
+	    తిరిగి img;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -1065,66 +1065,66 @@ find_image(int_u id)
  * NULL, try updating it instead. If "find" is TRUE, then accept the "id" field.
  */
     image_T *
-add_image(dict_T *dict, image_T *existing, bool find)
+కూడు_image(dict_T *dict, image_T *existing, bool కనుగొను)
 {
     dictitem_T	    *di;
-    blob_T	    *data;
+    blob_T	    *దత్తాంశం;
     varnumber_T     w, h;
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    ఒకవేళ (కనుగొను && dict_has_కీలకం(dict, "id"))
     {
-	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
+	image_T *img = కనుగొను_image((int_u)dict_get_సంఖ్య(dict, "id"));
 
-	if (img == NULL)
-	    return NULL;
-	return image_ref(img);
+	ఒకవేళ (img == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	తిరిగి image_ref(img);
     }
 
-    di = dict_find(dict, (char_u *)"data", -1);
-    w = dict_get_number(dict, "width");
-    h = dict_get_number(dict, "height");
+    di = dict_కనుగొను(dict, (char_u *)"data", -1);
+    w = dict_get_సంఖ్య(dict, "width");
+    h = dict_get_సంఖ్య(dict, "height");
 
-    if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
+    ఒకవేళ (di == ఖాళీ || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
-	emsg(_(e_invalid_argument));
-	return NULL;
+	emsg(_(e_invalid_వాదం));
+	తిరిగి ఖాళీ;
     }
 
     // Check for overflow
     n_pixels = w * h;
-    if (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
+    ఒకవేళ (w > గరిష్ఠ_పూర్ణాంకం || h > గరిష్ఠ_పూర్ణాంకం || n_pixels > గరిష్ఠ_పూర్ణాంకం)
     {
 	emsg(_(e_invalid_image_dimensions));
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    data = di->di_tv.vval.v_blob;
+    దత్తాంశం = di->di_tv.vval.v_blob;
 
-    if (blob_len(data) == n_pixels * 3)
+    ఒకవేళ (blob_len(దత్తాంశం) == n_pixels * 3)
 	fmt = IMAGE_FORMAT_RGB;
-    else if (blob_len(data) == n_pixels * 4)
+    లేకపోతే ఒకవేళ (blob_len(దత్తాంశం) == n_pixels * 4)
 	fmt = IMAGE_FORMAT_RGBA;
-    else
+    లేకపోతే
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "data",
+	semsg(_(e_invalid_విలువ_for_వాదం_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (existing != NULL)
+    ఒకవేళ (existing != ఖాళీ)
     {
-	if (existing->width == w && existing->height == h
+	ఒకవేళ (existing->వెడల్పు == w && existing->ఎత్తు == h
 		&& existing->fmt == fmt)
 	{
-	    if (image_update(existing, data->bv_ga.ga_data) == FAIL)
-		return NULL;
-	    return existing;
+	    ఒకవేళ (image_update(existing, దత్తాంశం->bv_ga.ga_దత్తాంశం) == FAIL)
+		తిరిగి ఖాళీ;
+	    తిరిగి existing;
 	}
     }
 
-    return image_new(data->bv_ga.ga_data, w, h, fmt);
+    తిరిగి image_new(దత్తాంశం->bv_ga.ga_దత్తాంశం, w, h, fmt);
 }
 
 /*
@@ -1136,117 +1136,117 @@ get_image_info(image_T *img)
 {
     dict_T	*dict;
     blob_T	*blob;
-    int		w, h;
+    పూర్ణాంకం		w, h;
     dictitem_T	*di;
 
-    if (img->data == NULL)
-	return NULL;
+    ఒకవేళ (img->దత్తాంశం == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ఒకవేళ (dict == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     blob = blob_alloc();
-    if (blob == NULL)
+    ఒకవేళ (blob == ఖాళీ)
     {
 	dict_unref(dict);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     image_get_dimensions(img, &w, &h);
-    (void)ga_concat_bytes(&blob->bv_ga, (char *)img->data,
+    (శూన్య)ga_concat_బైట్లు(&blob->bv_ga, (అక్షరం *)img->దత్తాంశం,
 	    (size_t)w * h * img->fmt);
 
     di = dictitem_alloc((char_u *)"data");
 
-    if (di != NULL)
+    ఒకవేళ (di != ఖాళీ)
     {
 	di->di_tv.v_type = VAR_BLOB;
 	di->di_tv.vval.v_blob = blob;
     }
-    if (di == NULL || dict_add(dict, di) == FAIL)
+    ఒకవేళ (di == ఖాళీ || dict_కూడు(dict, di) == FAIL)
     {
-	if (di != NULL)
+	ఒకవేళ (di != ఖాళీ)
 	    dictitem_free(di);
 	dict_unref(dict);
 	// No need to unref blob, dictitem_free() will do that.
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    if (img->state == IMAGE_STATE_PUBLIC)
-	dict_add_number(dict, "id", img->id);
-    dict_add_number(dict, "width", img->width);
-    dict_add_number(dict, "height", img->height);
-    dict_add_number(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
-    dict_add_string(dict, "format",
+    ఒకవేళ (img->state == IMAGE_STATE_ప్రజా)
+	dict_కూడు_సంఖ్య(dict, "id", img->id);
+    dict_కూడు_సంఖ్య(dict, "width", img->వెడల్పు);
+    dict_కూడు_సంఖ్య(dict, "height", img->ఎత్తు);
+    dict_కూడు_సంఖ్య(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
+    dict_కూడు_string(dict, "format",
 	    (char_u *)(img->fmt == IMAGE_FORMAT_RGB ? "rgb" : "rgba"));
 
     blob->bv_refcount = 1;
 
-    return dict;
+    తిరిగి dict;
 }
 
-    static int
-match_imageprotocol(image_backend_T *backend)
+    స్థిర పూర్ణాంకం
+సరిపోలిక_imageprotocol(image_backend_T *backend)
 {
-    int		    len = (int)STRLEN(p_ipc) + 1;
+    పూర్ణాంకం		    len = (పూర్ణాంకం)STRLEN(p_ipc) + 1;
     char_u	    *buf = alloc(len);
     char_u	    *p = p_ipc;
-    int		    ret = FAIL;
+    పూర్ణాంకం		    ret = FAIL;
     image_backend_T res = IMAGE_BACKEND_NONE;
     bool	    got = false;
 
-    if (buf == NULL)
-	return FAIL;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి FAIL;
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
 	char_u		*colon;
 	regmatch_T	regmatch;
 	image_backend_T prot = IMAGE_BACKEND_NONE;
 
 	// Isolate one comma separated item.
-	(void)copy_option_part(&p, buf, len, ",");
+	(శూన్య)copy_option_part(&p, buf, len, ",");
 
 	colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
-	    goto exit;
+	ఒకవేళ (colon == ఖాళీ || colon == buf || colon[1] == NUL)
+	    వెళ్ళు నిష్క్రమించు;
 
 	*colon = NUL;
 
 	// Note: Keep this in sync with p_ipc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	ఒకవేళ (STRCMP(colon + 1, "none") == 0)
 	    prot = IMAGE_BACKEND_NONE;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(colon + 1, "kitty") == 0)
 	{
-#ifdef FEAT_IMAGE_KITTY
+#నిర్వచితమైతే FEAT_IMAGE_KITTY
 	    prot = IMAGE_BACKEND_KITTY;
-#endif
+#అయితే_ముగింపు
 	}
-	else if (STRCMP(colon + 1, "sixel") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(colon + 1, "sixel") == 0)
 	{
-#ifdef FEAT_IMAGE_SIXEL
+#నిర్వచితమైతే FEAT_IMAGE_SIXEL
 	    prot = IMAGE_BACKEND_SIXEL;
-#endif
+#అయితే_ముగింపు
 	}
-	else
-	    goto exit;
+	లేకపోతే
+	    వెళ్ళు నిష్క్రమించు;
 
-	if (got)
-	    continue;
+	ఒకవేళ (got)
+	    కొనసాగు;
 
-	CLEAR_FIELD(regmatch);
+	CLEAR_క్షేత్రం(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
 
-	if (regmatch.regprog == NULL)
-	    goto exit;
+	ఒకవేళ (regmatch.regprog == ఖాళీ)
+	    వెళ్ళు నిష్క్రమించు;
 
-	bool match = T_NAME != NULL
+	bool సరిపోలిక = T_NAME != ఖాళీ
 	    && vim_regexec(&regmatch, T_NAME, (colnr_T)0);
 
 	vim_regfree(regmatch.regprog);
-	if (match)
+	ఒకవేళ (సరిపోలిక)
 	{
 	    // Keep going to catch any errors
 	    res = prot;
@@ -1256,175 +1256,175 @@ match_imageprotocol(image_backend_T *backend)
 
     ret = OK;
     *backend = res;
-exit:
+నిష్క్రమించు:
     vim_free(buf);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Update the current image backend to use depending on 'imageprotocol' and if
  * GUI is being used. Returns OK on success and FAIL on failure.
  */
-    int
-update_image_backend(void)
+    పూర్ణాంకం
+update_image_backend(శూన్య)
 {
     image_backend_T new;
 
     image_T		*img;
-    image_placement_T	*place;
+    image_placement_T	*ఉంచు;
 
     // Always process 'imageprotocol' option to check for errors
-    if (match_imageprotocol(&new) == FAIL)
-	return FAIL;
+    ఒకవేళ (సరిపోలిక_imageprotocol(&new) == FAIL)
+	తిరిగి FAIL;
 
-#ifdef FEAT_IMAGE_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_IMAGE_GUI
+    ఒకవేళ (gui.లోపల_use)
 	new = IMAGE_BACKEND_GUI;
-#endif
+#అయితే_ముగింపు
 
-    if (image_backend == new)
-	return OK;
+    ఒకవేళ (image_backend == new)
+	తిరిగి OK;
 
     // Must uninit the backends of every image/placement, then init the new
     // backend for each.
     FOR_ALL_IMAGES(img)
     {
-	if (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
-		&& img->backend_data != NULL)
+	ఒకవేళ (image_backend != IMAGE_BACKEND_NONE && img->దత్తాంశం != ఖాళీ
+		&& img->backend_దత్తాంశం != ఖాళీ)
 	    IMAGE_FUNC(image_backend, uninit)(img);
-	img->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE)
+	img->backend_దత్తాంశం = ఖాళీ;
+	ఒకవేళ (new != IMAGE_BACKEND_NONE)
 	{
-	    if (IMAGE_FUNC(new, init)(img) == FAIL)
-		goto fail;
+	    ఒకవేళ (IMAGE_FUNC(new, init)(img) == FAIL)
+		వెళ్ళు fail;
 	    img->backend = new;
 	}
     }
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(ఉంచు)
     {
-	image_placement_clear(place);
-	if (image_backend != IMAGE_BACKEND_NONE
-		&& place->img != NULL && place->backend_data != NULL)
-	    PLACEMENT_FUNC(image_backend, uninit)(place);
-	place->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE && place->img != NULL)
+	image_placement_clear(ఉంచు);
+	ఒకవేళ (image_backend != IMAGE_BACKEND_NONE
+		&& ఉంచు->img != ఖాళీ && ఉంచు->backend_దత్తాంశం != ఖాళీ)
+	    PLACEMENT_FUNC(image_backend, uninit)(ఉంచు);
+	ఉంచు->backend_దత్తాంశం = ఖాళీ;
+	ఒకవేళ (new != IMAGE_BACKEND_NONE && ఉంచు->img != ఖాళీ)
 	{
-	    if (PLACEMENT_FUNC(new, init)(place) == FAIL)
-		goto fail;
-	    place->backend = new;
+	    ఒకవేళ (PLACEMENT_FUNC(new, init)(ఉంచు) == FAIL)
+		వెళ్ళు fail;
+	    ఉంచు->backend = new;
 	}
     }
 
     redraw_all_later(UPD_VALID);
     image_backend = new;
 
-    if (new == IMAGE_BACKEND_NONE)
-	set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
-    else
-	set_vim_var_string(VV_IMAGEBACKEND,
+    ఒకవేళ (new == IMAGE_BACKEND_NONE)
+	సమితి_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
+    లేకపోతే
+	సమితి_vim_var_string(VV_IMAGEBACKEND,
 		(char_u *)image_backends[image_backend].name, -1);
 
-    return OK;
+    తిరిగి OK;
 fail:
     FOR_ALL_IMAGES(img)
-	if (img->backend != IMAGE_BACKEND_NONE)
+	ఒకవేళ (img->backend != IMAGE_BACKEND_NONE)
 	{
 	    IMAGE_FUNC(img->backend, uninit)(img);
 	    img->backend = IMAGE_BACKEND_NONE;
 	}
 
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(ఉంచు)
     {
-	if (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
+	ఒకవేళ (ఉంచు->img != ఖాళీ && ఉంచు->backend != IMAGE_BACKEND_NONE)
 	{
-	    image_placement_clear(place);
-	    PLACEMENT_FUNC(place->backend, uninit)(place);
+	    image_placement_clear(ఉంచు);
+	    PLACEMENT_FUNC(ఉంచు->backend, uninit)(ఉంచు);
 	}
-	place->backend = IMAGE_BACKEND_NONE;
+	ఉంచు->backend = IMAGE_BACKEND_NONE;
     }
 
     redraw_all_later(UPD_VALID);
 
     image_backend = IMAGE_BACKEND_NONE;
-    set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
+    సమితి_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
     emsg(_(e_changing_image_backend_failed));
-    return FAIL;
+    తిరిగి FAIL;
 }
 
-    void
-f_image_add(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_image_కూడు(typval_T *argvars, typval_T *rettv)
 {
     dict_T  *dict;
     image_T *img;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_dict_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     dict = argvars[0].vval.v_dict;
 
-    img = add_image(dict, NULL, false);
-    if (img != NULL)
-	img->state = IMAGE_STATE_PUBLIC;
+    img = కూడు_image(dict, ఖాళీ, false);
+    ఒకవేళ (img != ఖాళీ)
+	img->state = IMAGE_STATE_ప్రజా;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = img == NULL ? (varnumber_T)-1 : img->id;
+    rettv->v_type = VAR_సంఖ్య;
+    rettv->vval.v_సంఖ్య = img == ఖాళీ ? (varnumber_T)-1 : img->id;
 }
 
-    void
-f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_image_discard(typval_T *argvars, typval_T *rettv వాడని)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_సంఖ్య_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    img = find_image((int_u)argvars[0].vval.v_number);
+    img = కనుగొను_image((int_u)argvars[0].vval.v_సంఖ్య);
 
-    if (img != NULL)
+    ఒకవేళ (img != ఖాళీ)
     {
-	img->state = IMAGE_STATE_PRIVATE;
+	img->state = IMAGE_STATE_వ్యక్తిగత;
 	image_unref(img);
     }
-    else
-	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+    లేకపోతే
+	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_సంఖ్య);
 }
 
-    void
+    శూన్య
 f_image_info(typval_T *argvars, typval_T *rettv)
 {
     image_T *img;
     dict_T  *dict;
 
-    if (rettv_list_alloc(rettv) == FAIL
-	    || check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL
+	    || check_for_opt_సంఖ్య_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    ఒకవేళ (argvars[0].v_type == VAR_సంఖ్య)
     {
-	img = find_image((int_u)argvars[0].vval.v_number);
-	if (img == NULL)
+	img = కనుగొను_image((int_u)argvars[0].vval.v_సంఖ్య);
+	ఒకవేళ (img == ఖాళీ)
 	{
-	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
-	    return;
+	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_సంఖ్య);
+	    తిరిగి;
 	}
 	dict = get_image_info(img);
-	if (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	ఒకవేళ (dict != ఖాళీ && list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	return;
+	తిరిగి;
     }
 
     FOR_ALL_IMAGES(img)
     {
-	if (img->state == IMAGE_STATE_PRIVATE)
-	    continue;
+	ఒకవేళ (img->state == IMAGE_STATE_వ్యక్తిగత)
+	    కొనసాగు;
 	dict = get_image_info(img);
-	if (dict == NULL
+	ఒకవేళ (dict == ఖాళీ
 		|| list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	{
 	    dict_unref(dict);	// NULL-safe
-	    return;
+	    తిరిగి;
 	}
     }
 }
 
-#endif // FEAT_IMAGE
+#అయితే_ముగింపు // FEAT_IMAGE

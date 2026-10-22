@@ -10,9 +10,9 @@
  * socketserver.c: Socketserver clientserver functionality
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_SOCKETSERVER
+#నిర్వచితమైతే FEAT_SOCKETSERVER
 
 // Always greater than one.
 # define PROTOCOL_VER 1
@@ -43,74 +43,74 @@
  * used to find the specific ss_reply_T, and a single string is popped from the
  * array.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     char_u *sender; // Includes "type:" prefix if any
-    garray_T strings;
-} ss_reply_T;
+    garray_T అక్షరశ్రేణులు;
+} ss_జవాబు_T;
 
-static channel_T    *server_channel = NULL;
-static char_u	    *server_address = NULL; // Includes "type:" prefix if any
-static bool	    server_is_unix = false;
-static char_u	    *server_addr_cwd = NULL; // CWD when server was started, used
+స్థిర channel_T    *server_channel = ఖాళీ;
+స్థిర char_u	    *server_చిరునామా = ఖాళీ; // Includes "type:" prefix if any
+స్థిర bool	    server_is_unix = false;
+స్థిర char_u	    *server_addr_cwd = ఖాళీ; // CWD when server was started, used
 					  // to handle relative file paths.
-static garray_T	    server_replies;
+స్థిర garray_T	    server_replies;
 
-static channel_T    *client_channels = NULL;
-static int	    client_channel_count = 0;
+స్థిర channel_T    *client_channels = ఖాళీ;
+స్థిర పూర్ణాంకం	    client_channel_లెక్క = 0;
 
 # define FOR_ALL_CLIENTS(ch) \
-    for (ch = client_channels; ch != NULL; ch = ch->ch_ss_next)
+    కొరకు (ch = client_channels; ch != ఖాళీ; ch = ch->ch_ss_తదుపరి)
 
-static void socketserver_cleanup(void);
-static char_u *socketserver_create_path(char_u *name, bool quiet);
-static char_u *socketserver_get_path(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
-static void socketserver_accept(channel_T *channel);
-static void socketserver_close(channel_T *channel);
-static ss_reply_T *socketserver_add_reply(char_u *sender);
+స్థిర శూన్య socketserver_cleanup(శూన్య);
+స్థిర char_u *socketserver_create_మార్గం(char_u *name, bool quiet);
+స్థిర char_u *socketserver_get_మార్గం(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
+స్థిర శూన్య socketserver_accept(channel_T *channel);
+స్థిర శూన్య socketserver_close(channel_T *channel);
+స్థిర ss_జవాబు_T *socketserver_కూడు_జవాబు(char_u *sender);
 
 /*
  * Start the socketserver using the given name. Returns OK on success and FAIL
  * on failure.
  */
-    int
-socketserver_start(char_u *name, bool quiet)
+    పూర్ణాంకం
+socketserver_ప్రారంభం(char_u *name, bool quiet)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*చిరునామా = ఖాళీ;
+    పూర్ణాంకం		పోర్టు;
     bool	is_unix = false;
     channel_T	*channel;
     char_u	*buf;
     char_u	dirbuf[MAXPATHL];
 
-    if (server_channel != NULL)
-	return OK;
+    ఒకవేళ (server_channel != ఖాళీ)
+	తిరిగి OK;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
+	ఒకవేళ (channel_parse_socketserver_చిరునామా(name + 8, &పోర్టు, &చిరునామా, quiet)
 		== FAIL)
-	    return FAIL;
-	if (address != NULL)
+	    తిరిగి FAIL;
+	ఒకవేళ (చిరునామా != ఖాళీ)
 	    is_unix = true;
     }
-    else
+    లేకపోతే
     {
-	address = socketserver_create_path(name, quiet);
-	if (address == NULL)
-	    return FAIL;
+	చిరునామా = socketserver_create_మార్గం(name, quiet);
+	ఒకవేళ (చిరునామా == ఖాళీ)
+	    తిరిగి FAIL;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)address, NULL, false);
-    else
-	channel = channel_listen(port, NULL);
+    ఒకవేళ (is_unix)
+	channel = channel_listen_unix((అక్షరం *)చిరునామా, ఖాళీ, false);
+    లేకపోతే
+	channel = channel_listen(పోర్టు, ఖాళీ);
 
-    if (channel == NULL)
+    ఒకవేళ (channel == ఖాళీ)
     {
-	vim_free(address);
-	return FAIL;
+	vim_free(చిరునామా);
+	తిరిగి FAIL;
     }
 
     channel->ch_socketserver = true;
@@ -122,103 +122,103 @@ socketserver_start(char_u *name, bool quiet)
 
     VIM_CLEAR(serverName);
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0)
 	buf = vim_strsave(name);
-    else
+    లేకపోతే
     {
 	buf = alloc(MAXPATHL + 1);
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
 	    buf[0] = NUL;
-	    mch_FullName(address, buf, MAXPATHL, false);
+	    mch_నిండిన_Name(చిరునామా, buf, MAXPATHL, false);
 	}
     }
-    vim_free(address);
+    vim_free(చిరునామా);
 
-    if (buf != NULL)
+    ఒకవేళ (buf != ఖాళీ)
     {
-	server_address = vim_strsave(buf);
+	server_చిరునామా = vim_strsave(buf);
 	serverName = buf;
-	set_vim_var_string(VV_SEND_SERVER, serverName, -1);
+	సమితి_vim_var_string(VV_SEND_SERVER, serverName, -1);
     }
 
     vim_free(server_addr_cwd);
-    if (mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+    ఒకవేళ (mch_dirname(dirbuf, పరిమాణం(dirbuf)) == OK)
 	server_addr_cwd = vim_strsave(dirbuf);
-    else
-	server_addr_cwd = NULL;
+    లేకపోతే
+	server_addr_cwd = ఖాళీ;
 
-    ga_init2(&server_replies, sizeof(ss_reply_T), 2);
+    ga_init2(&server_replies, పరిమాణం(ss_జవాబు_T), 2);
 
-    ch_log(NULL, "socketserver: started server at %s", name);
+    ch_log(ఖాళీ, "socketserver: started server at %s", name);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Stop running the socketserver if it is. Note that this does not stop Vim from
  * becoming a client.
  */
-    void
-socketserver_stop(void)
+    శూన్య
+socketserver_stop(శూన్య)
 {
-    if (server_channel == NULL)
-	return;
+    ఒకవేళ (server_channel == ఖాళీ)
+	తిరిగి;
 
     channel_close(server_channel, false);
     channel_clear(server_channel);
 
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: shutting down server");
+    ch_log(ఖాళీ, "socketserver: shutting down server");
 }
 
 /*
  * Cleanup server stuff. Do not close client channels, as those are not part of
  * the actual server.
  */
-    static void
-socketserver_cleanup(void)
+    స్థిర శూన్య
+socketserver_cleanup(శూన్య)
 {
 # ifdef UNIX
-    if (server_is_unix && server_address != NULL)
+    ఒకవేళ (server_is_unix && server_చిరునామా != ఖాళీ)
     {
-	char_u *path = server_address;
+	char_u *మార్గం = server_చిరునామా;
 	char_u dirbuf[MAXPATHL];
 
-	if (STRNICMP(path, "channel:unix:", 13) == 0)
-	    path += 13;
-	else if (STRNICMP(path, "name:", 5) == 0)
-	    path += 5;
+	ఒకవేళ (STRNICMP(మార్గం, "channel:unix:", 13) == 0)
+	    మార్గం += 13;
+	లేకపోతే ఒకవేళ (STRNICMP(మార్గం, "name:", 5) == 0)
+	    మార్గం += 5;
 
-	if (*path == '/')
-	    mch_remove(path);
+	ఒకవేళ (*మార్గం == '/')
+	    mch_remove(మార్గం);
 	// Go to the directory where the server was started. This is to handle
 	// when Vim changes directories and the servername is a relative path.
-	else if (server_addr_cwd != NULL
-		&& mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+	లేకపోతే ఒకవేళ (server_addr_cwd != ఖాళీ
+		&& mch_dirname(dirbuf, పరిమాణం(dirbuf)) == OK)
 	{
-	    if (mch_chdir((char *)server_addr_cwd) == 0)
+	    ఒకవేళ (mch_chdir((అక్షరం *)server_addr_cwd) == 0)
 	    {
-		mch_remove(path);
-		if (mch_chdir((char *)dirbuf) < 0)
-		    emsg(_(e_cannot_go_back_to_previous_directory));
+		mch_remove(మార్గం);
+		ఒకవేళ (mch_chdir((అక్షరం *)dirbuf) < 0)
+		    emsg(_(e_cannot_go_వెనుక_గమ్యం_మునుపటి_directory));
 	    }
 	}
     }
 # endif
 
-    server_channel = NULL;
-    VIM_CLEAR(server_address);
+    server_channel = ఖాళీ;
+    VIM_CLEAR(server_చిరునామా);
     VIM_CLEAR(server_addr_cwd);
 
     // Free all replies
-    for (int i = 0; i < server_replies.ga_len; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < server_replies.ga_len; i++)
     {
-	ss_reply_T *reply = (ss_reply_T *)server_replies.ga_data + i;
+	ss_జవాబు_T *జవాబు = (ss_జవాబు_T *)server_replies.ga_దత్తాంశం + i;
 
-	vim_free(reply->sender);
-	ga_clear_strings(&reply->strings);
+	vim_free(జవాబు->sender);
+	ga_clear_అక్షరశ్రేణులు(&జవాబు->అక్షరశ్రేణులు);
     }
     ga_clear(&server_replies);
 }
@@ -230,78 +230,78 @@ socketserver_cleanup(void)
  * and NULL on failure.
  */
     list_T *
-socketserver_list(void)
+socketserver_list(శూన్య)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి ఖాళీ;
 
 # ifdef MSWIN
     // Only support addresses on Windows
-    return list;
-# else
+    తిరిగి list;
+# లేకపోతే
     string_T	    buf;
-    string_T	    path;
+    string_T	    మార్గం;
     DIR		    *dirp;
-    struct dirent   *dp;
-    const char_u    *known_dirs[] = {
+    నిర్మాణం dirent   *dp;
+    స్థిరరాశి char_u    *తెలిసిన_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if ((buf.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
-    if ((path.string = alloc(MAXPATHL)) == NULL)
+    ఒకవేళ ((buf.string = alloc(MAXPATHL)) == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ ((మార్గం.string = alloc(MAXPATHL)) == ఖాళీ)
     {
 	vim_free(buf.string);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    buf.length = 0;
-    path.length = 0;
+    buf.నిడివి = 0;
+    మార్గం.నిడివి = 0;
 
-    for (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
+    కొరకు (size_t i = 0 ; i < ARRAY_నిడివి(తెలిసిన_dirs); i++)
     {
-	const char_u *dir = known_dirs[i];
+	స్థిరరాశి char_u *dir = తెలిసిన_dirs[i];
 
-	if (dir == NULL)
-	    continue;
+	ఒకవేళ (dir == ఖాళీ)
+	    కొనసాగు;
 
-	if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
-		    "%s/vim-%lu", dir, (unsigned long int)getuid());
-	else
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
+	ఒకవేళ (STRCMP(dir, "/tmp") == 0 ||
+		(తెలిసిన_dirs[1] != ఖాళీ && STRCMP(dir, తెలిసిన_dirs[1]) == 0))
+	    మార్గం.నిడివి = vim_snprintf_safelen((అక్షరం *)మార్గం.string, MAXPATHL,
+		    "%s/vim-%lu", dir, (గుర్తులేని దీర్ఘ పూర్ణాంకం)getuid());
+	లేకపోతే
+	    మార్గం.నిడివి = vim_snprintf_safelen((అక్షరం *)మార్గం.string, MAXPATHL,
 		    "%s/vim", dir);
 
-	dirp = opendir((char *)path.string);
-	if (dirp == NULL)
-	    continue;
+	dirp = opendir((అక్షరం *)మార్గం.string);
+	ఒకవేళ (dirp == ఖాళీ)
+	    కొనసాగు;
 
 	// Loop through directory
-	while ((dp = readdir(dirp)) != NULL)
+	అయితే ((dp = readdir(dirp)) != ఖాళీ)
 	{
-	    if (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
-		continue;
+	    ఒకవేళ (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
+		కొనసాగు;
 
-	    buf.length = vim_snprintf_safelen((char *)buf.string, MAXPATHL,
-		    "%s/%s", path.string, dp->d_name);
+	    buf.నిడివి = vim_snprintf_safelen((అక్షరం *)buf.string, MAXPATHL,
+		    "%s/%s", మార్గం.string, dp->d_name);
 
 	    list_append_string(list, (char_u *)dp->d_name,
-		    buf.length - (path.length + 1));
+		    buf.నిడివి - (మార్గం.నిడివి + 1));
 	}
 
 	closedir(dirp);
 
-	break;
+	ఆపు;
     }
 
-    vim_free(path.string);
+    vim_free(మార్గం.string);
     vim_free(buf.string);
 
-    return list;
+    తిరిగి list;
 # endif
 }
 
@@ -311,61 +311,61 @@ socketserver_list(void)
  * an incrementing number to the path until we find a socket filename that can
  * be used. Returns alloced string or NULL on failure.
  */
-    static char_u *
-socketserver_create_path(char_u *name, bool quiet)
+    స్థిర char_u *
+socketserver_create_మార్గం(char_u *name, bool quiet)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	తిరిగి vim_strsave(name + 8);
+    లేకపోతే
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	ఒకవేళ (!quiet)
+	    semsg(_(e_invalid_వాదం_str), name);
+	తిరిగి ఖాళీ;
     }
-# else
-    char_u  *buf = NULL;
-    int	    buflen = STRLEN(name) + NUMBUFLEN;
-    char_u  *path = NULL;
+# లేకపోతే
+    char_u  *buf = ఖాళీ;
+    పూర్ణాంకం	    buflen = STRLEN(name) + NUMBUFLEN;
+    char_u  *మార్గం = ఖాళీ;
     bool    fatal = false;
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    if (STRNICMP(name, "name:", 5) == 0)
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	తిరిగి vim_strsave(name + 8);
+    ఒకవేళ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    for (int i = 0; i < 1000; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < 1000; i++)
     {
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
-	    vim_snprintf((char *)buf, buflen, "%s%d", name, i);
-	    path = socketserver_get_path(buf, true, quiet, true, &fatal);
+	    vim_snprintf((అక్షరం *)buf, buflen, "%s%d", name, i);
+	    మార్గం = socketserver_get_మార్గం(buf, true, quiet, true, &fatal);
 	}
-	else
-	    path = socketserver_get_path(name, true, quiet, true, &fatal);
+	లేకపోతే
+	    మార్గం = socketserver_get_మార్గం(name, true, quiet, true, &fatal);
 
-	if (fatal)
-	    break;
+	ఒకవేళ (fatal)
+	    ఆపు;
 
-	if (path == NULL)
+	ఒకవేళ (మార్గం == ఖాళీ)
 	{
-	    if (buf == NULL)
+	    ఒకవేళ (buf == ఖాళీ)
 	    {
 		buf = alloc(buflen);
-		if (buf == NULL)
+		ఒకవేళ (buf == ఖాళీ)
 		{
-		    semsg(_(e_out_of_memory_allocating_nr_bytes), buflen);
-		    return NULL;
+		    semsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం_allocating_nr_బైట్లు), buflen);
+		    తిరిగి ఖాళీ;
 		}
 	    }
-	    continue;
+	    కొనసాగు;
 	}
-	break;
+	ఆపు;
     }
     vim_free(buf);
 
-    return path;
+    తిరిగి మార్గం;
 # endif
 }
 
@@ -386,117 +386,117 @@ socketserver_create_path(char_u *name, bool quiet)
  *
  * Returns path on success and NULL on failure.
  */
-    static char_u *
-socketserver_get_path(
+    స్థిర char_u *
+socketserver_get_మార్గం(
 	char_u *name,
-	bool new UNUSED,
+	bool new వాడని,
 	bool quiet,
-	bool ignore UNUSED,
+	bool ignore వాడని,
 	bool *fatal)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	తిరిగి vim_strsave(name + 8);
+    లేకపోతే
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), name);
-	if (fatal != NULL)
+	ఒకవేళ (!quiet)
+	    semsg(_(e_invalid_వాదం_str), name);
+	ఒకవేళ (fatal != ఖాళీ)
 	    *fatal = true;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-# else
+# లేకపోతే
     char_u	    *buf;
     bool	    res = false;
     channel_T	    *channel;
-    const char_u    *known_dirs[] = {
+    స్థిరరాశి char_u    *తెలిసిన_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if (name == NULL)
+    ఒకవేళ (name == ఖాళీ)
     {
-	if (fatal != NULL)
+	ఒకవేళ (fatal != ఖాళీ)
 	    *fatal = true;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // Ignore if name is a path
-    if (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
+    ఒకవేళ (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
 	    STRNCMP(name, "../", 3) == 0)
-	return vim_strsave(name);
+	తిరిగి vim_strsave(name);
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	తిరిగి vim_strsave(name + 8);
 
-    if (STRNICMP(name, "name:", 5) == 0)
+    ఒకవేళ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    if (vim_strchr(name, '/') != NULL)
+    ఒకవేళ (vim_strchr(name, '/') != ఖాళీ)
     {
-	if (!quiet)
+	ఒకవేళ (!quiet)
 	    semsg(_(e_socket_name_no_slashes), name);
-	if (fatal != NULL)
+	ఒకవేళ (fatal != ఖాళీ)
 	    *fatal = true;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     buf = alloc(MAXPATHL);
 
-    if (buf == NULL)
+    ఒకవేళ (buf == ఖాళీ)
     {
-	if (fatal != NULL)
+	ఒకవేళ (fatal != ఖాళీ)
 	    *fatal = true;
-	semsg(_(e_out_of_memory_allocating_nr_bytes), MAXPATHL);
-	return NULL;
+	semsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం_allocating_nr_బైట్లు), MAXPATHL);
+	తిరిగి ఖాళీ;
     }
 
-    for (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
+    కొరకు (size_t i = 0; i < ARRAY_నిడివి(తెలిసిన_dirs); i++)
     {
-	const char_u	*dir = known_dirs[i];
+	స్థిరరాశి char_u	*dir = తెలిసిన_dirs[i];
 	bool		got = false;
 
-	if (dir == NULL)
-	    continue;
-	else if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
+	ఒకవేళ (dir == ఖాళీ)
+	    కొనసాగు;
+	లేకపోతే ఒకవేళ (STRCMP(dir, "/tmp") == 0 ||
+		(తెలిసిన_dirs[1] != ఖాళీ && STRCMP(dir, తెలిసిన_dirs[1]) == 0))
 	{
 	    // "/tmp" or $TMPDIR, must suffix dir with uid
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu", dir,
-		    (unsigned long int)getuid());
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((అక్షరం *)buf, MAXPATHL, "%s/vim-%lu", dir,
+		    (గుర్తులేని దీర్ఘ పూర్ణాంకం)getuid());
+	    ఒకవేళ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		కొనసాగు;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
-		    (unsigned long int)getuid(), name);
+	    vim_snprintf((అక్షరం *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
+		    (గుర్తులేని దీర్ఘ పూర్ణాంకం)getuid(), name);
 	}
-	else
+	లేకపోతే
 	{
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim", dir);
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((అక్షరం *)buf, MAXPATHL, "%s/vim", dir);
+	    ఒకవేళ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		కొనసాగు;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim/%s", dir, name);
+	    vim_snprintf((అక్షరం *)buf, MAXPATHL, "%s/vim/%s", dir, name);
 	}
 
 	// If looking for a new socket path, and "buf" currently exists, check
 	// if it is a dead socket, if it is then remove it.
-	if (new)
+	ఒకవేళ (new)
 	{
 	    emsg_silent++;
 	    emsg_off++;
-	    channel = channel_open_unix((char *)buf, NULL);
+	    channel = channel_open_unix((అక్షరం *)buf, ఖాళీ);
 	    emsg_off--;
 	    emsg_silent--;
 
-	    if (channel != NULL)
+	    ఒకవేళ (channel != ఖాళీ)
 	    {
 		channel_close(channel, false);
 		channel_clear(channel);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		mch_remove(buf);
 		got = true;
@@ -504,63 +504,63 @@ socketserver_get_path(
 	}
 
 	res = true;
-	if (got || (!new && mch_access((char *)buf, F_OK) == 0))
+	ఒకవేళ (got || (!new && mch_access((అక్షరం *)buf, F_OK) == 0))
 	{
-	    if (server_address != NULL && STRCMP(buf, server_address) == 0)
+	    ఒకవేళ (server_చిరునామా != ఖాళీ && STRCMP(buf, server_చిరునామా) == 0)
 		// Can't connect to itself
-		break;
-	    return buf;
+		ఆపు;
+	    తిరిగి buf;
 	}
-	break;
+	ఆపు;
     }
 
-    if (!quiet)
+    ఒకవేళ (!quiet)
     {
-	if (!res)
+	ఒకవేళ (!res)
 	    semsg(_("Failed creating socket directory: %s"), strerror(errno));
-	else if (!ignore)
-	    semsg(_(e_invalid_server_id_used_str), name);
+	లేకపోతే ఒకవేళ (!ignore)
+	    semsg(_(e_invalid_server_id_వాడిన_str), name);
     }
-    if (!res && fatal != NULL)
+    ఒకవేళ (!res && fatal != ఖాళీ)
 	*fatal = true;
 
     vim_free(buf);
-    return NULL;
+    తిరిగి ఖాళీ;
 # endif
 }
 
 /*
  * Callback for when client channel is closed
  */
-    static void
+    స్థిర శూన్య
 socketserver_client_close(channel_T *channel)
 {
-    if (channel == client_channels)
-	client_channels = channel->ch_ss_next;
-    if (channel->ch_ss_prev != NULL)
-	channel->ch_ss_prev->ch_ss_next = channel->ch_ss_next;
-    if (channel->ch_ss_next != NULL)
-	channel->ch_ss_next->ch_ss_prev = channel->ch_ss_prev;
-    if (client_channel_count > 0)
-	--client_channel_count;
+    ఒకవేళ (channel == client_channels)
+	client_channels = channel->ch_ss_తదుపరి;
+    ఒకవేళ (channel->ch_ss_prev != ఖాళీ)
+	channel->ch_ss_prev->ch_ss_తదుపరి = channel->ch_ss_తదుపరి;
+    ఒకవేళ (channel->ch_ss_తదుపరి != ఖాళీ)
+	channel->ch_ss_తదుపరి->ch_ss_prev = channel->ch_ss_prev;
+    ఒకవేళ (client_channel_లెక్క > 0)
+	--client_channel_లెక్క;
 
-    ch_log(NULL, "socketserver: client channel closed");
+    ch_log(ఖాళీ, "socketserver: client channel closed");
 }
 
 /*
  * Callback for when server channel accepted new client.
  */
-    static void
+    స్థిర శూన్య
 socketserver_accept(channel_T *channel)
 {
-    if (client_channel_count >= MAX_CLIENT_CHANNELS)
+    ఒకవేళ (client_channel_లెక్క >= MAX_CLIENT_CHANNELS)
     {
 	// Too many client connections: refuse this one instead of letting the
 	// channel's file descriptor overflow the select()/poll() sets.
-	ch_log(NULL, "socketserver: too many clients, refusing connection");
+	ch_log(ఖాళీ, "socketserver: too many clients, refusing connection");
 	channel_close(channel, FALSE);
 	channel_unref(channel);
-	return;
+	తిరిగి;
     }
 
     channel->ch_socketserver = true;
@@ -568,43 +568,43 @@ socketserver_accept(channel_T *channel)
 
     // Append the client, so that commands are processed in the order the
     // clients were accepted, not reversed.
-    channel->ch_ss_next = NULL;
-    if (client_channels == NULL)
+    channel->ch_ss_తదుపరి = ఖాళీ;
+    ఒకవేళ (client_channels == ఖాళీ)
     {
-	channel->ch_ss_prev = NULL;
+	channel->ch_ss_prev = ఖాళీ;
 	client_channels = channel;
     }
-    else
+    లేకపోతే
     {
-	channel_T *last = client_channels;
+	channel_T *చివరి = client_channels;
 
-	while (last->ch_ss_next != NULL)
-	    last = last->ch_ss_next;
-	last->ch_ss_next = channel;
-	channel->ch_ss_prev = last;
+	అయితే (చివరి->ch_ss_తదుపరి != ఖాళీ)
+	    చివరి = చివరి->ch_ss_తదుపరి;
+	చివరి->ch_ss_తదుపరి = channel;
+	channel->ch_ss_prev = చివరి;
     }
-    ++client_channel_count;
+    ++client_channel_లెక్క;
 
     // We will read the command from the client later in the input loop.
-    ch_log(NULL, "socketserver: accepted new client");
+    ch_log(ఖాళీ, "socketserver: accepted new client");
 }
 
 /*
  * Callback for when server channel is closed
  */
-    static void
-socketserver_close(channel_T *channel UNUSED)
+    స్థిర శూన్య
+socketserver_close(channel_T *channel వాడని)
 {
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: server channel closed");
+    ch_log(ఖాళీ, "socketserver: server channel closed");
 }
 
 /*
  * Mark references to socketserver channels
  */
-    int
-set_ref_in_socketserver_channel(int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_socketserver_channel(పూర్ణాంకం copyID)
 {
     bool	abort = false;
     channel_T	*channel;
@@ -612,18 +612,18 @@ set_ref_in_socketserver_channel(int copyID)
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = server_channel;
-    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    abort = abort || సమితి_ref_లోపల_అంశం(&tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 
     FOR_ALL_CLIENTS(channel)
     {
-	if (abort)
-	    break;
+	ఒకవేళ (abort)
+	    ఆపు;
 
 	tv.v_type = VAR_CHANNEL;
 	tv.vval.v_channel = channel;
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || సమితి_ref_లోపల_అంశం(&tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
     }
-    return abort;
+    తిరిగి abort;
 }
 
 /*
@@ -631,56 +631,56 @@ set_ref_in_socketserver_channel(int copyID)
  * adds version header to "msg", if "ver" is true. Returns OK on success and
  * FAIL on failure.
  */
-    static int
-socketserver_send_message(channel_T *ch, dict_T *msg, char *func, bool ver)
+    స్థిర పూర్ణాంకం
+socketserver_send_సందేశం(channel_T *ch, dict_T *సందేశం, అక్షరం *func, bool ver)
 {
     typval_T	tv;
     char_u	*buf;
-    int		ret;
+    పూర్ణాంకం		ret;
 
-    if (ver)
-	dict_add_number(msg, "version", PROTOCOL_VER);
+    ఒకవేళ (ver)
+	dict_కూడు_సంఖ్య(సందేశం, "version", PROTOCOL_VER);
 
     tv.v_type = VAR_DICT;
-    tv.vval.v_dict = msg;
+    tv.vval.v_dict = సందేశం;
     buf = json_encode(&tv, JSON_NL);
 
-    if (buf != NULL)
+    ఒకవేళ (buf != ఖాళీ)
     {
 	emsg_silent++;
-	ret = channel_send(ch, PART_SOCK, buf, (int)STRLEN(buf), func);
+	ret = channel_send(ch, PART_SOCK, buf, (పూర్ణాంకం)STRLEN(buf), func);
 	emsg_silent--;
     }
-    else
-	return FAIL;
+    లేకపోతే
+	తిరిగి FAIL;
     vim_free(buf);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Execute the JSON message represented by "dict".
  */
-    static void
-socketserver_exec(channel_T *channel, dict_T *message)
+    స్థిర శూన్య
+socketserver_exec(channel_T *channel, dict_T *సందేశం_2)
 {
     dictitem_T	*di;
     char_u	*type;
-    char_u	*str = NULL;
-    char_u	*sender = NULL;
+    char_u	*str = ఖాళీ;
+    char_u	*sender = ఖాళీ;
     char_u	idbuf[11 + NUMBUFLEN];
 
-    di = dict_find(message, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING)
-	return;
-    else
+    di = dict_కనుగొను(సందేశం_2, (char_u *)"type", -1);
+    ఒకవేళ (di == ఖాళీ || di->di_tv.v_type != VAR_STRING)
+	తిరిగి;
+    లేకపోతే
 	type = di->di_tv.vval.v_string;
 
-    di = dict_find(message, (char_u *)"str", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    di = dict_కనుగొను(సందేశం_2, (char_u *)"str", -1);
+    ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_STRING)
 	str = di->di_tv.vval.v_string;
 
-    di = dict_find(message, (char_u *)"sender", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    di = dict_కనుగొను(సందేశం_2, (char_u *)"sender", -1);
+    ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_STRING)
     {
 	sender = di->di_tv.vval.v_string;
 
@@ -689,12 +689,12 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	client_socket = vim_strsave(sender);
     }
 
-    di = dict_find(message, (char_u *)"wait", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_number)
+    di = dict_కనుగొను(సందేశం_2, (char_u *)"wait", -1);
+    ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_సంఖ్య)
     {
 	// Client is not a server, but still wants a response later. Save the
 	// ID of the channel connection that we will use to send back a response,
-	vim_snprintf((char *)idbuf, sizeof(idbuf), "remotewait:%d",
+	vim_snprintf((అక్షరం *)idbuf, పరిమాణం(idbuf), "remotewait:%d",
 		channel->ch_id);
 
 	sender = idbuf;
@@ -702,142 +702,142 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	client_socket = vim_strsave(sender);
     }
 
-    ch_log(NULL, "socketserver_exec(): result: %s",
-	    str == NULL ? (char_u *)"(null)" : str);
+    ch_log(ఖాళీ, "socketserver_exec(): result: %s",
+	    str == ఖాళీ ? (char_u *)"(null)" : str);
 
-    if (STRCMP(type, "expr") == 0 && str != NULL)
+    ఒకవేళ (STRCMP(type, "expr") == 0 && str != ఖాళీ)
     {
 	// Evaluate expression and send back reply
 	dict_T	    *dict;
-	char_u	    *result;
-	int	    code;
+	char_u	    *ఫలితం;
+	పూర్ణాంకం	    సంకేతం_2;
 
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
+	ఒకవేళ (dict == ఖాళీ)
+	    తిరిగి;
 
-	result = eval_client_expr_to_string(str);
-	code = result == NULL ? -1 : 0;
+	ఫలితం = eval_client_సమాసం_గమ్యం_string(str);
+	సంకేతం_2 = ఫలితం == ఖాళీ ? -1 : 0;
 
-	dict_add_string(dict, "type", (char_u *)"reply");
-	if (result != NULL)
+	dict_కూడు_string(dict, "type", (char_u *)"reply");
+	ఒకవేళ (ఫలితం != ఖాళీ)
 	{
-	    dict_add_string(dict, "str", result);
-	    vim_free(result);
+	    dict_కూడు_string(dict, "str", ఫలితం);
+	    vim_free(ఫలితం);
 	}
-	else
+	లేకపోతే
 	    // Error occurred, return error message
-	    dict_add_string(dict, "str",
-		    (char_u *)_(e_invalid_expression_received));
+	    dict_కూడు_string(dict, "str",
+		    (char_u *)_(e_invalid_వ్యక్తీకరణ_received));
 
-	dict_add_number(dict, "code", code);
+	dict_కూడు_సంఖ్య(dict, "code", సంకేతం_2);
 
-	socketserver_send_message(channel, dict, "socketserver_exec", true);
+	socketserver_send_సందేశం(channel, dict, "socketserver_exec", true);
 	dict_unref(dict);
     }
-    else if (STRCMP(type, "keystrokes") == 0 && str != NULL)
+    లేకపోతే ఒకవేళ (STRCMP(type, "keystrokes") == 0 && str != ఖాళీ)
     {
 	// Execute keystrokes
-	server_to_input_buf(str);
+	server_గమ్యం_ఆదానం_buf(str);
     }
-    else if (STRCMP(type, "notify") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(type, "notify") == 0)
     {
 	// Notification, execute autocommands and save the reply for later use
-	if (sender != NULL && str != NULL)
+	ఒకవేళ (sender != ఖాళీ && str != ఖాళీ)
 	{
-	    ss_reply_T *reply;
+	    ss_జవాబు_T *జవాబు;
 
-	    reply = socketserver_add_reply(sender);
+	    జవాబు = socketserver_కూడు_జవాబు(sender);
 
-	    if (reply != NULL)
-		ga_copy_string(&reply->strings, str);
+	    ఒకవేళ (జవాబు != ఖాళీ)
+		ga_copy_string(&జవాబు->అక్షరశ్రేణులు, str);
 
 	    apply_autocmds(EVENT_REMOTEREPLY, sender, str, TRUE, curbuf);
 	}
     }
-    else if (STRCMP(type, "ver") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(type, "ver") == 0)
     {
 	// A message we sent previously had the wrong version. Emit an error
 	// message to alert the user.
-	emsg(_(e_socket_server_version_mismatch));
+	emsg(_(e_socket_server_సంస్కరణ_mismatch));
     }
-    else
-	ch_error(NULL, "socketserver: unknown command type '%s'", type);
+    లేకపోతే
+	ch_error(ఖాళీ, "socketserver: unknown command type '%s'", type);
 }
 
-    static int
-socketserver_get_message(channel_T *channel, typval_T **tv)
+    స్థిర పూర్ణాంకం
+socketserver_get_సందేశం(channel_T *channel, typval_T **tv)
 {
-    jsonq_T *head = &channel->ch_part[PART_SOCK].ch_json_head;
-    jsonq_T *json_msg = head->jq_next;
-    int	    ver;
+    jsonq_T *తల = &channel->ch_part[PART_SOCK].ch_json_తల;
+    jsonq_T *json_సందేశం = తల->jq_తదుపరి;
+    పూర్ణాంకం	    ver;
 
-    if (json_msg == NULL)
+    ఒకవేళ (json_సందేశం == ఖాళీ)
     {
 	// Check the readahead buffer
 	channel_parse_json(channel, PART_SOCK, true);
-	json_msg = head->jq_next;
+	json_సందేశం = తల->jq_తదుపరి;
     }
-    if (json_msg == NULL)
-	return FAIL;
-    *tv = json_msg->jq_value;
-    remove_json_node(head, json_msg);
+    ఒకవేళ (json_సందేశం == ఖాళీ)
+	తిరిగి FAIL;
+    *tv = json_సందేశం->jq_విలువ;
+    remove_json_కణుపు(తల, json_సందేశం);
 
-    if ((*tv)->v_type != VAR_DICT)
+    ఒకవేళ ((*tv)->v_type != VAR_DICT)
     {
-	ch_error(NULL, "socketserver: message is not a JSON object");
+	ch_error(ఖాళీ, "socketserver: message is not a JSON object");
 	free_tv(*tv);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    ver = dict_get_number((*tv)->vval.v_dict, "version");
+    ver = dict_get_సంఖ్య((*tv)->vval.v_dict, "version");
 
-    if (ver != 0 && ver != PROTOCOL_VER)
+    ఒకవేళ (ver != 0 && ver != PROTOCOL_VER)
     {
 	dict_T *dict;
 
-	ch_error(NULL, "socketserver: message has different version %d", ver);
+	ch_error(ఖాళీ, "socketserver: message has different version %d", ver);
 	free_tv(*tv);
 
 	// Send back a special error
 	dict = dict_alloc();
-	if (dict != NULL)
+	ఒకవేళ (dict != ఖాళీ)
 	{
-	    dict_add_string(dict, "type", (char_u *)"ver");
-	    socketserver_send_message(channel, dict,
+	    dict_కూడు_string(dict, "type", (char_u *)"ver");
+	    socketserver_send_సందేశం(channel, dict,
 		    "socketserver_get_message", false);
 	    dict_unref(dict);
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Parse any commands in the queue and execute them.
  */
-    void
-socketserver_parse_messages(void)
+    శూన్య
+socketserver_parse_messages(శూన్య)
 {
     typval_T	*tv;
 
-    for (channel_T *ch = client_channels; ch != NULL;)
+    కొరకు (channel_T *ch = client_channels; ch != ఖాళీ;)
     {
 	// Make sure to save next channel in case "ch" is freed. Not sure if
 	// this can actually happen but be safe.
-	channel_T *next = ch->ch_ss_next;
+	channel_T *తదుపరి = ch->ch_ss_తదుపరి;
 
 	// Get the JSON message if there is any from the queue for this channel.
-	if (socketserver_get_message(ch, &tv) == FAIL)
+	ఒకవేళ (socketserver_get_సందేశం(ch, &tv) == FAIL)
 	{
-	    ch = next;
-	    continue;
+	    ch = తదుపరి;
+	    కొనసాగు;
 	}
 
 	socketserver_exec(ch, tv->vval.v_dict);
 	free_tv(tv);
-	ch = next;
+	ch = తదుపరి;
     }
 }
 
@@ -850,19 +850,19 @@ socketserver_parse_messages(void)
  *
  * Return OK on success and FAIL on failure or timeout.
  */
-    static int
-socketserver_wait(channel_T *channel, int timeout)
+    స్థిర పూర్ణాంకం
+socketserver_wait(channel_T *channel, పూర్ణాంకం timeout)
 {
-    while (true)
+    అయితే (true)
     {
-	int		ret;
+	పూర్ణాంకం		ret;
 	channel_T	*ch;
 # ifdef HAVE_SELECT
 	fd_set		rfds;
-	struct timeval  tv;
-	int		maxfd = -1;
+	నిర్మాణం timeval  tv;
+	పూర్ణాంకం		maxfd = -1;
 
-	if (timeout != -1)
+	ఒకవేళ (timeout != -1)
 	{
 	    tv.tv_sec = timeout / 1000;
 	    tv.tv_usec = (timeout % 1000) * 1000;
@@ -870,95 +870,95 @@ socketserver_wait(channel_T *channel, int timeout)
 
 	FD_ZERO(&rfds);
 
-	if (channel != NULL)
+	ఒకవేళ (channel != ఖాళీ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    ఒకవేళ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		తిరిగి FAIL;
 
 	    maxfd = channel->CH_SOCK_FD;
 	    FD_SET(channel->CH_SOCK_FD, &rfds);
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	ఒకవేళ (server_channel != ఖాళీ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    FD_SET(server_channel->CH_SOCK_FD, &rfds);
-	    if (server_channel->CH_SOCK_FD > maxfd)
+	    ఒకవేళ (server_channel->CH_SOCK_FD > maxfd)
 		maxfd = server_channel->CH_SOCK_FD;
 	}
 
 	FOR_ALL_CLIENTS(ch)
 	{
-	    if (ch->CH_SOCK_FD != INVALID_FD
+	    ఒకవేళ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-		    && (int)ch->CH_SOCK_FD < FD_SETSIZE
+		    && (పూర్ణాంకం)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 		    )
 	    {
 		FD_SET(ch->CH_SOCK_FD, &rfds);
-		if (maxfd < (int)ch->CH_SOCK_FD)
-		    maxfd = (int)ch->CH_SOCK_FD;
+		ఒకవేళ (maxfd < (పూర్ణాంకం)ch->CH_SOCK_FD)
+		    maxfd = (పూర్ణాంకం)ch->CH_SOCK_FD;
 	    }
 	}
 
-	if (maxfd == -1)
-	    return FAIL;
+	ఒకవేళ (maxfd == -1)
+	    తిరిగి FAIL;
 
-	ret = select(maxfd + 1, &rfds, NULL, NULL, timeout == -1 ? NULL : &tv);
+	ret = select(maxfd + 1, &rfds, ఖాళీ, ఖాళీ, timeout == -1 ? ఖాళీ : &tv);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ఒకవేళ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    ఒకవేళ (got_int)
+		ఆపు;
+	    కొనసాగు;
 	}
 #  endif
 
-	if (ret > 0)
+	ఒకవేళ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    ఒకవేళ (server_channel != ఖాళీ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(server_channel->CH_SOCK_FD, &rfds))
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		ఒకవేళ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-			&& (int)ch->CH_SOCK_FD < FD_SETSIZE
+			&& (పూర్ణాంకం)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 			&& FD_ISSET(ch->CH_SOCK_FD, &rfds))
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    ఒకవేళ (channel == ఖాళీ)
+		తిరిగి OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    ఒకవేళ (channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(channel->CH_SOCK_FD, &rfds))
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		తిరిగి OK;
 	    }
-	    continue;
+	    కొనసాగు;
 	}
-# else
-	struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	int		nfd = 0;
-	int		channel_idx = -1;
-	int		server_idx = -1;
+# లేకపోతే
+	నిర్మాణం pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	పూర్ణాంకం		nfd = 0;
+	పూర్ణాంకం		channel_idx = -1;
+	పూర్ణాంకం		server_idx = -1;
 
-	if (channel != NULL)
+	ఒకవేళ (channel != ఖాళీ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    ఒకవేళ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		తిరిగి FAIL;
 
 	    channel_idx = nfd;
 	    fds[nfd].fd = channel->CH_SOCK_FD;
 	    fds[nfd++].events = POLLIN;
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	ఒకవేళ (server_channel != ఖాళీ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    server_idx = nfd;
 	    fds[nfd].fd = server_channel->CH_SOCK_FD;
@@ -966,7 +966,7 @@ socketserver_wait(channel_T *channel, int timeout)
 	}
 
 	FOR_ALL_CLIENTS(ch)
-	    if (ch->CH_SOCK_FD != INVALID_FD)
+	    ఒకవేళ (ch->CH_SOCK_FD != INVALID_FD)
 	    {
 		fds[nfd].fd = ch->CH_SOCK_FD;
 		fds[nfd].events = POLLIN;
@@ -977,44 +977,44 @@ socketserver_wait(channel_T *channel, int timeout)
 	ret = poll(fds, nfd, timeout);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ఒకవేళ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    ఒకవేళ (got_int)
+		ఆపు;
+	    కొనసాగు;
 	}
 #  endif
 
-	if (ret > 0)
+	ఒకవేళ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    ఒకవేళ (server_channel != ఖాళీ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && fds[server_idx].revents & POLLIN)
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		ఒకవేళ (ch->CH_SOCK_FD != INVALID_FD
 			&& fds[ch->ch_part[PART_SOCK].ch_poll_idx]
 			.revents & POLLIN)
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    ఒకవేళ (channel == ఖాళీ)
+		తిరిగి OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    ఒకవేళ (channel->CH_SOCK_FD != INVALID_FD
 		    && fds[channel_idx].revents & POLLIN)
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		తిరిగి OK;
 	    }
-	    continue;
+	    కొనసాగు;
 	}
 # endif
-	break;
+	ఆపు;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
@@ -1023,54 +1023,54 @@ socketserver_wait(channel_T *channel, int timeout)
  * true. Returns NULL on
  * failure.
  */
-    static channel_T *
+    స్థిర channel_T *
 socketserver_get_channel(char_u *name, bool quiet, bool *wait)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*చిరునామా = ఖాళీ;
+    పూర్ణాంకం		పోర్టు;
     bool	is_unix = false;
     channel_T	*channel;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ఒకవేళ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, true)
+	ఒకవేళ (channel_parse_socketserver_చిరునామా(name + 8, &పోర్టు, &చిరునామా, true)
 		== FAIL)
-	    return NULL;
-	if (address != NULL)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (చిరునామా != ఖాళీ)
 	    is_unix = true;
     }
-    else if (STRNICMP(name, "remotewait:", 11) == 0)
+    లేకపోతే ఒకవేళ (STRNICMP(name, "remotewait:", 11) == 0)
     {
 	// Channel ID name, find channel with that ID.
-	int id;
+	పూర్ణాంకం id;
 
-	if (name[11] == NUL)
-	    return NULL;
-	id = strtol((char *)name + 11, NULL, 10);
-	if (wait != NULL)
+	ఒకవేళ (name[11] == NUL)
+	    తిరిగి ఖాళీ;
+	id = strtol((అక్షరం *)name + 11, ఖాళీ, 10);
+	ఒకవేళ (wait != ఖాళీ)
 	    *wait = true;
 
-	return channel_find(id);
+	తిరిగి channel_కనుగొను(id);
     }
-    else
+    లేకపోతే
     {
-	address = socketserver_get_path(name, false, quiet, false, NULL);
-	if (address == NULL)
-	    return NULL;
+	చిరునామా = socketserver_get_మార్గం(name, false, quiet, false, ఖాళీ);
+	ఒకవేళ (చిరునామా == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel =  channel_open("localhost", port, 1000, NULL);
+    ఒకవేళ (is_unix)
+	channel = channel_open_unix((అక్షరం *)చిరునామా, ఖాళీ);
+    లేకపోతే
+	channel =  channel_open("localhost", పోర్టు, 1000, ఖాళీ);
 
-    if (channel == NULL && !quiet)
+    ఒకవేళ (channel == ఖాళీ && !quiet)
 	semsg(_(e_socket_server_failed_connecting), name);
 
-    vim_free(address);
+    vim_free(చిరునామా);
 
-    return channel;
+    తిరిగి channel;
 }
 
 /*
@@ -1079,42 +1079,42 @@ socketserver_get_channel(char_u *name, bool quiet, bool *wait)
  * be closed immediately, this is used for --remote-wait. Returns 0 for OK, -1
  * on error.
  */
-    int
+    పూర్ణాంకం
 socketserver_send(
 	char_u *name,
 	char_u *str,
-	char_u **result,
-	bool is_expr,
-	int timeout,
+	char_u **ఫలితం,
+	bool is_సమాసం,
+	పూర్ణాంకం timeout,
 	bool silent,
 	channel_T **ch)
 {
-    int		rcode = -1;
+    పూర్ణాంకం		rcode = -1;
     channel_T	*channel;
     dict_T	*dict;
     dictitem_T	*di;
-    typval_T	*resp_tv = NULL;
+    typval_T	*resp_tv = ఖాళీ;
 
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
-	semsg(_(e_unable_to_send_to_str), name);
-	return -1;
+	semsg(_(e_unable_గమ్యం_send_గమ్యం_str), name);
+	తిరిగి -1;
     }
 
     // Execute locally if target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(str, is_expr, result);
+    ఒకవేళ (serverName != ఖాళీ && STRICMP(name, serverName) == 0)
+	తిరిగి send_గమ్యం_Local_Vim(str, is_సమాసం, ఫలితం);
 
-    channel = socketserver_get_channel(name, silent, NULL);
-    if (channel == NULL)
-	return -1;
+    channel = socketserver_get_channel(name, silent, ఖాళీ);
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి -1;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	goto exit;
+    ఒకవేళ (dict == ఖాళీ)
+	వెళ్ళు నిష్క్రమించు;
 
-    dict_add_string(dict, "type", (char_u *)(is_expr ? "expr" : "keystrokes"));
-    dict_add_string(dict, "str", str);
+    dict_కూడు_string(dict, "type", (char_u *)(is_సమాసం ? "expr" : "keystrokes"));
+    dict_కూడు_string(dict, "str", str);
 
     // Tell server who we are so it can save our socket path internally for
     // later use with server2client. Only do this if we are actually a server.
@@ -1123,164 +1123,164 @@ socketserver_send(
     // case, we add "wait" to the JSON message set to true, so that the server
     // will create an internal address for our connection to it.  This is
     // only used for --remote-wait, not exposed to user.
-    if (server_address != NULL)
-	dict_add_string(dict, "sender", server_address);
-    else if (ch != NULL)
-	dict_add_bool(dict, "wait", true);
+    ఒకవేళ (server_చిరునామా != ఖాళీ)
+	dict_కూడు_string(dict, "sender", server_చిరునామా);
+    లేకపోతే ఒకవేళ (ch != ఖాళీ)
+	dict_కూడు_bool(dict, "wait", true);
 
-    if (socketserver_send_message(channel, dict, "socketserver_send", true)
+    ఒకవేళ (socketserver_send_సందేశం(channel, dict, "socketserver_send", true)
 	    == FAIL)
     {
-	semsg(_(e_unable_to_send_to_str), name);
+	semsg(_(e_unable_గమ్యం_send_గమ్యం_str), name);
 	dict_unref(dict);
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
     dict_unref(dict);
 
-    if (!is_expr)
+    ఒకవేళ (!is_సమాసం)
     {
 	// Exit, we aren't waiting for a response
 	rcode = 0;
 
-	if (ch != NULL)
+	ఒకవేళ (ch != ఖాళీ)
 	{
 	    *ch = channel;
 
-	    channel->ch_ss_next = client_channels;
-	    channel->ch_ss_prev = NULL;
+	    channel->ch_ss_తదుపరి = client_channels;
+	    channel->ch_ss_prev = ఖాళీ;
 	    channel->ch_ss_close_cb = socketserver_client_close;
 	    client_channels = channel;
 
-	    return rcode;
+	    తిరిగి rcode;
 	}
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
-    if (timeout == 0)
+    ఒకవేళ (timeout == 0)
 	timeout = 1000;
 
     // To handle recursive calls, we must handle any socketserver channels as
     // well.
-    while (socketserver_wait(channel, timeout) == OK)
-	if (socketserver_get_message(channel, &resp_tv) == OK)
-	    break;
+    అయితే (socketserver_wait(channel, timeout) == OK)
+	ఒకవేళ (socketserver_get_సందేశం(channel, &resp_tv) == OK)
+	    ఆపు;
 
-    if (resp_tv == NULL)
+    ఒకవేళ (resp_tv == ఖాళీ)
     {
 	// Channel closed, don't make this an error, because this may be the
 	// result of the expression (e.g. --remote-expr 'execute("qa!")')
 	rcode = 0;
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
     dict = resp_tv->vval.v_dict;
 
-    di = dict_find(dict, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING ||
+    di = dict_కనుగొను(dict, (char_u *)"type", -1);
+    ఒకవేళ (di == ఖాళీ || di->di_tv.v_type != VAR_STRING ||
 	    (STRCMP(di->di_tv.vval.v_string, "reply") != 0
 	     && STRCMP(di->di_tv.vval.v_string, "ver") != 0))
     {
-	ch_error(NULL, "socketserver: unknown reply type");
+	ch_error(ఖాళీ, "socketserver: unknown reply type");
 	free_tv(resp_tv);
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
-    if (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
+    ఒకవేళ (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
     {
-	emsg(_(e_socket_server_version_mismatch));
+	emsg(_(e_socket_server_సంస్కరణ_mismatch));
 	free_tv(resp_tv);
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
-    if (result != NULL)
+    ఒకవేళ (ఫలితం != ఖాళీ)
     {
-	di = dict_find(dict, (char_u *)"str", -1);
-	if (di != NULL && di->di_tv.v_type == VAR_STRING)
-	    *result = vim_strsave(di->di_tv.vval.v_string);
-	else
+	di = dict_కనుగొను(dict, (char_u *)"str", -1);
+	ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_STRING)
+	    *ఫలితం = vim_strsave(di->di_tv.vval.v_string);
+	లేకపోతే
 	{
 	    free_tv(resp_tv);
-	    goto exit;
+	    వెళ్ళు నిష్క్రమించు;
 	}
     }
 
-    di = dict_find(dict, (char_u *)"code", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-	rcode = di->di_tv.vval.v_number;
+    di = dict_కనుగొను(dict, (char_u *)"code", -1);
+    ఒకవేళ (di != ఖాళీ && di->di_tv.v_type == VAR_సంఖ్య)
+	rcode = di->di_tv.vval.v_సంఖ్య;
 
     free_tv(resp_tv);
 
-exit:
+నిష్క్రమించు:
     channel_close(channel, false);
     channel_clear(channel);
-    return rcode;
+    తిరిగి rcode;
 }
 
-   static ss_reply_T *
-socketserver_get_reply(char_u *sender, int *index)
+   స్థిర ss_జవాబు_T *
+socketserver_get_జవాబు(char_u *sender, పూర్ణాంకం *సూచీ)
 {
-    for (int i = 0; i < server_replies.ga_len; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < server_replies.ga_len; i++)
     {
-	ss_reply_T *reply = ((ss_reply_T *)server_replies.ga_data) + i;
+	ss_జవాబు_T *జవాబు = ((ss_జవాబు_T *)server_replies.ga_దత్తాంశం) + i;
 
-	if (STRCMP(reply->sender, sender) == 0)
+	ఒకవేళ (STRCMP(జవాబు->sender, sender) == 0)
 	{
-	    if (index != NULL)
-		*index = i;
-	    return reply;
+	    ఒకవేళ (సూచీ != ఖాళీ)
+		*సూచీ = i;
+	    తిరిగి జవాబు;
 	}
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Add reply to list of replies. Returns a pointer to the ss_reply_T that was
  * initialized or was found.
  */
-    static ss_reply_T *
-socketserver_add_reply(char_u *sender)
+    స్థిర ss_జవాబు_T *
+socketserver_కూడు_జవాబు(char_u *sender)
 {
-    ss_reply_T *reply;
+    ss_జవాబు_T *జవాబు;
 
-    if (server_replies.ga_growsize == 0)
-	ga_init2(&server_replies, sizeof(ss_reply_T), 1);
+    ఒకవేళ (server_replies.ga_growsize == 0)
+	ga_init2(&server_replies, పరిమాణం(ss_జవాబు_T), 1);
 
-    reply = socketserver_get_reply(sender, NULL);
+    జవాబు = socketserver_get_జవాబు(sender, ఖాళీ);
 
-    if (reply == NULL && ga_grow(&server_replies, 1) == OK)
+    ఒకవేళ (జవాబు == ఖాళీ && ga_grow(&server_replies, 1) == OK)
     {
-	reply = ((ss_reply_T *)server_replies.ga_data) + server_replies.ga_len++;
+	జవాబు = ((ss_జవాబు_T *)server_replies.ga_దత్తాంశం) + server_replies.ga_len++;
 
-	reply->sender = vim_strsave(sender);
+	జవాబు->sender = vim_strsave(sender);
 
-	if (reply->sender == NULL)
-	    return NULL;
+	ఒకవేళ (జవాబు->sender == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
-	ga_init2(&reply->strings, sizeof(char_u *), 5);
+	ga_init2(&జవాబు->అక్షరశ్రేణులు, పరిమాణం(char_u *), 5);
     }
 
-    return reply;
+    తిరిగి జవాబు;
 }
 
-    static void
-socketserver_remove_reply(char_u *sender)
+    స్థిర శూన్య
+socketserver_remove_జవాబు(char_u *sender)
 {
-    int index;
-    ss_reply_T *reply = socketserver_get_reply(sender, &index);
+    పూర్ణాంకం సూచీ;
+    ss_జవాబు_T *జవాబు = socketserver_get_జవాబు(sender, &సూచీ);
 
-    if (reply != NULL)
+    ఒకవేళ (జవాబు != ఖాళీ)
     {
-	ss_reply_T  *arr = server_replies.ga_data;
-	int	    len	 = server_replies.ga_len;
+	ss_జవాబు_T  *arr = server_replies.ga_దత్తాంశం;
+	పూర్ణాంకం	    len	 = server_replies.ga_len;
 
 	// Free strings
-	vim_free(reply->sender);
-	ga_clear_strings(&reply->strings);
+	vim_free(జవాబు->sender);
+	ga_clear_అక్షరశ్రేణులు(&జవాబు->అక్షరశ్రేణులు);
 
 	// Move all elements after the removed reply forward by one
-	if (len > 1)
-	    mch_memmove(arr + index, arr + index + 1,
-		    sizeof(ss_reply_T) * (len - index - 1));
+	ఒకవేళ (len > 1)
+	    mch_memmove(arr + సూచీ, arr + సూచీ + 1,
+		    పరిమాణం(ss_జవాబు_T) * (len - సూచీ - 1));
 	server_replies.ga_len--;
     }
 }
@@ -1289,119 +1289,119 @@ socketserver_remove_reply(char_u *sender)
  * Send a string to "client" as a reply (notification). Returns OK on success
  * and FAIL on failure.
  */
-    int
-socketserver_send_reply(char_u *client, char_u *str)
+    పూర్ణాంకం
+socketserver_send_జవాబు(char_u *client, char_u *str)
 {
     dict_T	*dict;
     channel_T	*channel;
-    int		ret = OK;
+    పూర్ణాంకం		ret = OK;
     bool	wait = false;
 
-    if (*client == NUL)
+    ఒకవేళ (*client == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	semsg(_(e_invalid_server_id_వాడిన_str), client);
+	తిరిగి FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    ఒకవేళ (server_channel == ఖాళీ || server_చిరునామా == ఖాళీ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     channel = socketserver_get_channel(client, false, &wait);
-    if (channel == NULL)
-	return FAIL;
+    ఒకవేళ (channel == ఖాళీ)
+	తిరిగి FAIL;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    ఒకవేళ (dict == ఖాళీ)
     {
 	ret = FAIL;
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
-    dict_add_string(dict, "type", (char_u *)"notify");
-    dict_add_string(dict, "str", str);
-    if (server_address != NULL)
-	dict_add_string(dict, "sender", server_address);
+    dict_కూడు_string(dict, "type", (char_u *)"notify");
+    dict_కూడు_string(dict, "str", str);
+    ఒకవేళ (server_చిరునామా != ఖాళీ)
+	dict_కూడు_string(dict, "sender", server_చిరునామా);
 
-    ret = socketserver_send_message(channel, dict,
+    ret = socketserver_send_సందేశం(channel, dict,
 	    "socketserver_send_reply", true);
     dict_unref(dict);
 
-exit:
+నిష్క్రమించు:
     // Don't want to close the channel if client is referenced by channel ID.
     // This allows --remote-wait to work with multiple files.
-    if (!wait)
+    ఒకవేళ (!wait)
     {
 	channel_close(channel, false);
 	channel_clear(channel);
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Wait for reply from "client" and place result in "str". Returns OK on success
  * and FAIL on failure. Timeout is in milliseconds
  */
-    int
-socketserver_read_reply(
+    పూర్ణాంకం
+socketserver_read_జవాబు(
 	char_u *client,
 	char_u **str,
-	int timeout,
+	పూర్ణాంకం timeout,
 	bool remotewait)
 {
-    ss_reply_T	*reply = NULL;
+    ss_జవాబు_T	*జవాబు = ఖాళీ;
     char_u	*actual;
 
-    if (*client == NUL)
+    ఒకవేళ (*client == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	semsg(_(e_invalid_server_id_వాడిన_str), client);
+	తిరిగి FAIL;
     }
 
-    if (!remotewait && (server_channel == NULL || server_address == NULL))
+    ఒకవేళ (!remotewait && (server_channel == ఖాళీ || server_చిరునామా == ఖాళీ))
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    actual = socketserver_get_path(client, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_మార్గం(client, false, false, false, ఖాళీ);
+    ఒకవేళ (actual == ఖాళీ)
+	తిరిగి FAIL;
 
-    while (true)
+    అయితే (true)
     {
-	reply = socketserver_get_reply(actual, NULL);
-	if (reply != NULL)
-	    break;
-	if (socketserver_wait(NULL, timeout) == FAIL)
-	    break;
+	జవాబు = socketserver_get_జవాబు(actual, ఖాళీ);
+	ఒకవేళ (జవాబు != ఖాళీ)
+	    ఆపు;
+	ఒకవేళ (socketserver_wait(ఖాళీ, timeout) == FAIL)
+	    ఆపు;
     }
 
-    if (reply == NULL || reply->strings.ga_len == 0)
+    ఒకవేళ (జవాబు == ఖాళీ || జవాబు->అక్షరశ్రేణులు.ga_len == 0)
     {
 	vim_free(actual);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // Consume the string
-    *str = ((char_u **)reply->strings.ga_data)[0];
+    *str = ((char_u **)జవాబు->అక్షరశ్రేణులు.ga_దత్తాంశం)[0];
 
-    if (reply->strings.ga_len > 1)
-	mch_memmove((char_u **)reply->strings.ga_data,
-		((char_u **)reply->strings.ga_data) + 1,
-		sizeof(char_u *) * (reply->strings.ga_len - 1));
-    reply->strings.ga_len--;
+    ఒకవేళ (జవాబు->అక్షరశ్రేణులు.ga_len > 1)
+	mch_memmove((char_u **)జవాబు->అక్షరశ్రేణులు.ga_దత్తాంశం,
+		((char_u **)జవాబు->అక్షరశ్రేణులు.ga_దత్తాంశం) + 1,
+		పరిమాణం(char_u *) * (జవాబు->అక్షరశ్రేణులు.ga_len - 1));
+    జవాబు->అక్షరశ్రేణులు.ga_len--;
 
-    if (reply->strings.ga_len < 1)
+    ఒకవేళ (జవాబు->అక్షరశ్రేణులు.ga_len < 1)
 	// Last string removed, remove the reply
-	socketserver_remove_reply(actual);
+	socketserver_remove_జవాబు(actual);
 
     vim_free(actual);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1410,38 +1410,38 @@ socketserver_read_reply(
  * Returns 0 if otherwise and -1 on
  * error.
  */
-    int
-socketserver_peek_reply(char_u *sender, char_u **str)
+    పూర్ణాంకం
+socketserver_peek_జవాబు(char_u *sender, char_u **str)
 {
-    ss_reply_T	*reply;
+    ss_జవాబు_T	*జవాబు;
     char_u	*actual;
 
-    if (*sender == NUL)
+    ఒకవేళ (*sender == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), sender);
-	return FAIL;
+	semsg(_(e_invalid_server_id_వాడిన_str), sender);
+	తిరిగి FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    ఒకవేళ (server_channel == ఖాళీ || server_చిరునామా == ఖాళీ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    actual = socketserver_get_path(sender, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_మార్గం(sender, false, false, false, ఖాళీ);
+    ఒకవేళ (actual == ఖాళీ)
+	తిరిగి FAIL;
 
-    reply = socketserver_get_reply(actual, NULL);
+    జవాబు = socketserver_get_జవాబు(actual, ఖాళీ);
     vim_free(actual);
 
-    if (reply != NULL && reply->strings.ga_len > 0)
+    ఒకవేళ (జవాబు != ఖాళీ && జవాబు->అక్షరశ్రేణులు.ga_len > 0)
     {
-	if (str != NULL)
-	    *str = ((char_u **)reply->strings.ga_data)[0];
-	return 1;
+	ఒకవేళ (str != ఖాళీ)
+	    *str = ((char_u **)జవాబు->అక్షరశ్రేణులు.ga_దత్తాంశం)[0];
+	తిరిగి 1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-#endif // FEAT_SOCKETSERVER
+#అయితే_ముగింపు // FEAT_SOCKETSERVER

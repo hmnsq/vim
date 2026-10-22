@@ -27,32 +27,32 @@
  * precompiled for OS/2. That one probably works better.
  */
 
-#ifndef _MSC_VER
+#నిర్వచితం_కాకపోతే _MSC_VER
 # include <unistd.h>
-#endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#అయితే_ముగింపు
+#అన్తర్భావ <malloc.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <stdlib.h>
+#అన్తర్భావ <string.h>
+#అన్తర్భావ <fcntl.h>
 
-#ifdef _WIN32
+#నిర్వచితమైతే _WIN32
 # define sysconf(x) -1
-#endif
+#అయితే_ముగింపు
 
-void usage(void)
+శూన్య usage(శూన్య)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
-\t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
-as well as to the standard output.\n\
+\t-a\tappend గమ్యం files instead యొక్క truncating\n\
+\nTee reads its ఆదానం, and writes గమ్యం each యొక్క the specified files,\n\
+as well as గమ్యం the standard output.\n\
 \n\
-This version supplied with Vim 4.2 to make ':make' possible.\n\
-For a more complete and stable version, consider getting\n\
-[a port of] the GNU shellutils package.\n\
+This సంస్కరణ_2 supplied with Vim 4.2 గమ్యం make ':make' possible.\n\
+For a మరిన్ని complete and stable సంస్కరణ_2, consider getting\n\
+[a పోర్టు యొక్క] the GNU shellutils package.\n\
 ");
 }
 
@@ -61,105 +61,105 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+పూర్ణాంకం
+myfread(అక్షరం *buf, పూర్ణాంకం elsize /*ignored*/, పూర్ణాంకం max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	పూర్ణాంకం	c;
+	పూర్ణాంకం	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	అయితే ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		ఒకవేళ (c == '\n' || c == '\r')
+			ఆపు;
 	}
-	return n;
+	తిరిగి n;
 }
 
 
-int
-main(int argc, char *argv[])
+పూర్ణాంకం
+ప్రధాన(పూర్ణాంకం argc, అక్షరం *argv[])
 {
-	int	append = 0;
+	పూర్ణాంకం	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	పూర్ణాంకం	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	పూర్ణాంకం	i;
+	అక్షరం	buf[BUFSIZ];
+	పూర్ణాంకం	n;
+	పూర్ణాంకం	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	కొరకు (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		ఒకవేళ (argv[i][0] != '-')
+			ఆపు;
+		ఒకవేళ (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		లేకపోతే
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	ఒకవేళ (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
-		exit(2);
+		నిష్క్రమించు(2);
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	ఒకవేళ (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	ఒకవేళ (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
-		exit(1);
+		నిష్క్రమించు(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = సున్నా_జ్ఞాపకం_ఇవ్వు(numfiles, పరిమాణం(FILE *));
+	ఒకవేళ (filepointers == ఖాళీ)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
-															   (long)numfiles);
-		exit(1);
+															   (దీర్ఘ)numfiles);
+		నిష్క్రమించు(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	కొరకు (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		ఒకవేళ (filepointers[i] == ఖాళీ)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
-			exit(1);
+			నిష్క్రమించు(1);
 		}
 	}
-#ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+#నిర్వచితమైతే _WIN32
+	setmode(fileno(stdin),  O_ద్విమాన);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
-#endif
+	setmode(fileno(stdout),  O_ద్విమాన);
+#అయితే_ముగింపు
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	అయితే ((n = myfread(buf, పరిమాణం(అక్షరం), పరిమాణం(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, పరిమాణం(అక్షరం), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		కొరకు (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			ఒకవేళ (filepointers[i] &&
+			     fwrite(buf, పరిమాణం(అక్షరం), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = ఖాళీ;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	కొరకు (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		ఒకవేళ (filepointers[i])
 			fclose(filepointers[i]);
 	}
 
-	exit(0);
+	నిష్క్రమించు(0);
 }

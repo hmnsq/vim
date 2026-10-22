@@ -21,27 +21,27 @@
  * To disable all of this when compiling Vim for debugging, undefine DEBUG in
  * regexp.c
  */
-#ifdef DEBUG
+#నిర్వచితమైతే DEBUG
 # define NFA_REGEXP_ERROR_LOG	"nfa_regexp_error.log"
 # define ENABLE_LOG
 # define NFA_REGEXP_DUMP_LOG	"nfa_regexp_dump.log"
-# define NFA_REGEXP_RUN_LOG	"nfa_regexp_run.log"
+# define NFA_REGEXP_నిరంతరం_LOG	"nfa_regexp_run.log"
 # define NFA_REGEXP_DEBUG_LOG	"nfa_regexp_debug.log"
-#endif
+#అయితే_ముగింపు
 
 // Added to NFA_ANY - NFA_NUPPER_IC to include a NL.
-#define NFA_ADD_NL		31
+#నిర్వచించు NFA_కూడు_NL		31
 
-enum
+గణన
 {
-    NFA_SPLIT = -1024,
-    NFA_MATCH,
-    NFA_EMPTY,			    // matches 0-length
+    NFA_విభజించు = -1024,
+    NFA_సరిపోలిక,
+    NFA_ఖాళీలు,			    // matches 0-length
 
-    NFA_START_COLL,		    // [abc] start
-    NFA_END_COLL,		    // [abc] end
-    NFA_START_NEG_COLL,		    // [^abc] start
-    NFA_END_NEG_COLL,		    // [^abc] end (postfix only)
+    NFA_ప్రారంభం_COLL,		    // [abc] start
+    NFA_చివర_COLL,		    // [abc] end
+    NFA_ప్రారంభం_NEG_COLL,		    // [^abc] start
+    NFA_చివర_NEG_COLL,		    // [^abc] end (postfix only)
     NFA_RANGE,			    // range of the two previous items
 				    // (postfix only)
     NFA_RANGE_MIN,		    // low end of a range
@@ -50,8 +50,8 @@ enum
     NFA_CONCAT,			    // concatenate two previous items (postfix
 				    // only)
     NFA_OR,			    // \| (postfix only)
-    NFA_STAR,			    // greedy * (postfix only)
-    NFA_STAR_NONGREEDY,		    // non-greedy * (postfix only)
+    NFA_నక్షత్రం,			    // greedy * (postfix only)
+    NFA_నక్షత్రం_NONGREEDY,		    // non-greedy * (postfix only)
     NFA_QUEST,			    // greedy \? (postfix only)
     NFA_QUEST_NONGREEDY,	    // non-greedy \? (postfix only)
 
@@ -66,30 +66,30 @@ enum
     NFA_ZEND,			    // Used for \ze
     NFA_NOPEN,			    // Start of subexpression marked with \%(
     NFA_NCLOSE,			    // End of subexpr. marked with \%( ... \)
-    NFA_START_INVISIBLE,
-    NFA_START_INVISIBLE_FIRST,
-    NFA_START_INVISIBLE_NEG,
-    NFA_START_INVISIBLE_NEG_FIRST,
-    NFA_START_INVISIBLE_BEFORE,
-    NFA_START_INVISIBLE_BEFORE_FIRST,
-    NFA_START_INVISIBLE_BEFORE_NEG,
-    NFA_START_INVISIBLE_BEFORE_NEG_FIRST,
-    NFA_START_PATTERN,
-    NFA_END_INVISIBLE,
-    NFA_END_INVISIBLE_NEG,
-    NFA_END_PATTERN,
+    NFA_ప్రారంభం_INVISIBLE,
+    NFA_ప్రారంభం_INVISIBLE_మొదటి,
+    NFA_ప్రారంభం_INVISIBLE_NEG,
+    NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి,
+    NFA_ప్రారంభం_INVISIBLE_BEFORE,
+    NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి,
+    NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG,
+    NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి,
+    NFA_ప్రారంభం_నమూనా,
+    NFA_చివర_INVISIBLE,
+    NFA_చివర_INVISIBLE_NEG,
+    NFA_చివర_నమూనా,
     NFA_COMPOSING,		    // Next nodes in NFA are part of the
 				    // composing multibyte char
-    NFA_END_COMPOSING,		    // End of a composing char in the NFA
+    NFA_చివర_COMPOSING,		    // End of a composing char in the NFA
     NFA_ANY_COMPOSING,		    // \%C: Any composing characters.
     NFA_OPT_CHARS,		    // \%[abc]
 
     // The following are used only in the postfix form, not in the NFA
-    NFA_PREV_ATOM_NO_WIDTH,	    // Used for \@=
-    NFA_PREV_ATOM_NO_WIDTH_NEG,	    // Used for \@!
+    NFA_PREV_ATOM_NO_వెడల్పు,	    // Used for \@=
+    NFA_PREV_ATOM_NO_వెడల్పు_NEG,	    // Used for \@!
     NFA_PREV_ATOM_JUST_BEFORE,	    // Used for \@<=
     NFA_PREV_ATOM_JUST_BEFORE_NEG,  // Used for \@<!
-    NFA_PREV_ATOM_LIKE_PATTERN,	    // Used for \@>
+    NFA_PREV_ATOM_LIKE_నమూనా,	    // Used for \@>
 
     NFA_BACKREF1,		    // \1
     NFA_BACKREF2,		    // \2
@@ -100,7 +100,7 @@ enum
     NFA_BACKREF7,		    // \7
     NFA_BACKREF8,		    // \8
     NFA_BACKREF9,		    // \9
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     NFA_ZREF1,			    // \z1
     NFA_ZREF2,			    // \z2
     NFA_ZREF3,			    // \z3
@@ -110,7 +110,7 @@ enum
     NFA_ZREF7,			    // \z7
     NFA_ZREF8,			    // \z8
     NFA_ZREF9,			    // \z9
-#endif
+#అయితే_ముగింపు
     NFA_SKIP,			    // Skip characters
 
     NFA_MOPEN,
@@ -135,7 +135,7 @@ enum
     NFA_MCLOSE8,
     NFA_MCLOSE9,
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     NFA_ZOPEN,
     NFA_ZOPEN1,
     NFA_ZOPEN2,
@@ -157,7 +157,7 @@ enum
     NFA_ZCLOSE7,
     NFA_ZCLOSE8,
     NFA_ZCLOSE9,
-#endif
+#అయితే_ముగింపు
 
     // NFA_FIRST_NL
     NFA_ANY,		//	Match any one character.
@@ -177,31 +177,31 @@ enum
     NFA_NHEX,		//	Match non-hex char
     NFA_OCTAL,		//	Match octal char
     NFA_NOCTAL,		//	Match non-octal char
-    NFA_WORD,		//	Match word char
+    NFA_మాట,		//	Match word char
     NFA_NWORD,		//	Match non-word char
-    NFA_HEAD,		//	Match head char
+    NFA_తల,		//	Match head char
     NFA_NHEAD,		//	Match non-head char
     NFA_ALPHA,		//	Match alpha char
     NFA_NALPHA,		//	Match non-alpha char
-    NFA_LOWER,		//	Match lowercase char
+    NFA_క్రింది,		//	Match lowercase char
     NFA_NLOWER,		//	Match non-lowercase char
-    NFA_UPPER,		//	Match uppercase char
+    NFA_పై,		//	Match uppercase char
     NFA_NUPPER,		//	Match non-uppercase char
-    NFA_LOWER_IC,	//	Match [a-z]
+    NFA_క్రింది_IC,	//	Match [a-z]
     NFA_NLOWER_IC,	//	Match [^a-z]
-    NFA_UPPER_IC,	//	Match [A-Z]
+    NFA_పై_IC,	//	Match [A-Z]
     NFA_NUPPER_IC,	//	Match [^A-Z]
 
-    NFA_FIRST_NL = NFA_ANY + NFA_ADD_NL,
-    NFA_LAST_NL = NFA_NUPPER_IC + NFA_ADD_NL,
+    NFA_మొదటి_NL = NFA_ANY + NFA_కూడు_NL,
+    NFA_చివరి_NL = NFA_NUPPER_IC + NFA_కూడు_NL,
 
     NFA_CURSOR,		//	Match cursor pos
     NFA_LNUM,		//	Match line number
     NFA_LNUM_GT,	//	Match > line number
     NFA_LNUM_LT,	//	Match < line number
-    NFA_COL,		//	Match cursor column
-    NFA_COL_GT,		//	Match > cursor column
-    NFA_COL_LT,		//	Match < cursor column
+    NFA_నిలువు,		//	Match cursor column
+    NFA_నిలువు_GT,		//	Match > cursor column
+    NFA_నిలువు_LT,		//	Match < cursor column
     NFA_VCOL,		//	Match cursor virtual column
     NFA_VCOL_GT,	//	Match > cursor virtual column
     NFA_VCOL_LT,	//	Match < cursor virtual column
@@ -216,12 +216,12 @@ enum
     NFA_CLASS_BLANK,
     NFA_CLASS_CNTRL,
     NFA_CLASS_DIGIT,
-    NFA_CLASS_GRAPH,
-    NFA_CLASS_LOWER,
+    NFA_CLASS_లేఖాచిత్రం,
+    NFA_CLASS_క్రింది,
     NFA_CLASS_PRINT,
     NFA_CLASS_PUNCT,
     NFA_CLASS_SPACE,
-    NFA_CLASS_UPPER,
+    NFA_CLASS_పై,
     NFA_CLASS_XDIGIT,
     NFA_CLASS_TAB,
     NFA_CLASS_RETURN,
@@ -233,252 +233,252 @@ enum
 };
 
 // Keep in sync with classchars.
-static const int nfa_classcodes[] = {
+స్థిర స్థిరరాశి పూర్ణాంకం nfa_classcodes[] = {
     NFA_ANY, NFA_IDENT, NFA_SIDENT, NFA_KWORD,NFA_SKWORD,
     NFA_FNAME, NFA_SFNAME, NFA_PRINT, NFA_SPRINT,
     NFA_WHITE, NFA_NWHITE, NFA_DIGIT, NFA_NDIGIT,
     NFA_HEX, NFA_NHEX, NFA_OCTAL, NFA_NOCTAL,
-    NFA_WORD, NFA_NWORD, NFA_HEAD, NFA_NHEAD,
-    NFA_ALPHA, NFA_NALPHA, NFA_LOWER, NFA_NLOWER,
-    NFA_UPPER, NFA_NUPPER
+    NFA_మాట, NFA_NWORD, NFA_తల, NFA_NHEAD,
+    NFA_ALPHA, NFA_NALPHA, NFA_క్రింది, NFA_NLOWER,
+    NFA_పై, NFA_NUPPER
 };
 
 // Variables only used in nfa_regcomp() and descendants.
-static int nfa_re_flags; // re_flags passed to nfa_regcomp()
-static int *post_start;  // holds the postfix form of r.e.
-static int post_start_len;  // size of allocated post_start (in ints)
-static int *post_end;
-static int *post_ptr;
-static int nfa_reg_parse_depth;	// nesting depth in nfa_reg()
+స్థిర పూర్ణాంకం nfa_re_flags; // re_flags passed to nfa_regcomp()
+స్థిర పూర్ణాంకం *post_ప్రారంభం;  // holds the postfix form of r.e.
+స్థిర పూర్ణాంకం post_ప్రారంభం_len;  // size of allocated post_start (in ints)
+స్థిర పూర్ణాంకం *post_చివర;
+స్థిర పూర్ణాంకం *post_ptr;
+స్థిర పూర్ణాంకం nfa_reg_parse_లోతు;	// nesting depth in nfa_reg()
 
 // The postfix list (post_start) and fragment stack (nfa_stack) are reused
 // across compilations; a buffer that grew past these sizes for a big pattern
 // is freed afterwards instead of being kept, to avoid holding much memory.
-#define NFA_POSTFIX_KEEP	10000	// number of ints (~40 Kbyte)
-#define NFA_STACK_KEEP		4000	// number of Frag_T (~64 Kbyte)
+#నిర్వచించు NFA_POSTFIX_KEEP	10000	// number of ints (~40 Kbyte)
+#నిర్వచించు NFA_దొంతర_KEEP		4000	// number of Frag_T (~64 Kbyte)
 
 // Set when the pattern should use the NFA engine.
 // E.g. [[:upper:]] only allows 8bit characters for BT engine,
 // while NFA engine handles multibyte characters correctly.
-static int wants_nfa;
+స్థిర పూర్ణాంకం కోరుతుంది_nfa;
 
-static int nstate;	// Number of states in the NFA.
-static int istate;	// Index in the state vector, used in alloc_state()
+స్థిర పూర్ణాంకం nstate;	// Number of states in the NFA.
+స్థిర పూర్ణాంకం istate;	// Index in the state vector, used in alloc_state()
 
 // If not NULL match must end at this position
-static save_se_T *nfa_endp = NULL;
+స్థిర save_se_T *nfa_endp = ఖాళీ;
 
 // 0 for first call to nfa_regmatch(), 1 for recursive call.
-static int nfa_ll_index = 0;
+స్థిర పూర్ణాంకం nfa_ll_సూచీ = 0;
 
-static int realloc_post_list(void);
-static int nfa_reg(int paren);
-#ifdef DEBUG
-static void nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
-#endif
-static int match_follows(nfa_state_T *startstate, int depth);
-static int failure_chance(nfa_state_T *state, int depth);
+స్థిర పూర్ణాంకం realloc_post_list(శూన్య);
+స్థిర పూర్ణాంకం nfa_reg(పూర్ణాంకం paren);
+#నిర్వచితమైతే DEBUG
+స్థిర శూన్య nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం సరిపోలిక_follows(nfa_state_T *startstate, పూర్ణాంకం లోతు);
+స్థిర పూర్ణాంకం failure_chance(nfa_state_T *state, పూర్ణాంకం లోతు);
 
 // helper functions used when doing re2post() ... regatom() parsing
-#define EMIT(c)	do {				\
-		    if (post_ptr >= post_end && realloc_post_list() == FAIL) \
-			return FAIL;		\
+#నిర్వచించు EMIT(c)	చేయి {				\
+		    ఒకవేళ (post_ptr >= post_చివర && realloc_post_list() == FAIL) \
+			తిరిగి FAIL;		\
 		    *post_ptr++ = c;		\
-		} while (0)
+		} అయితే (0)
 
 /*
  * Initialize internal variables before NFA compilation.
  * Return OK on success, FAIL otherwise.
  */
-    static int
-nfa_regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    స్థిర పూర్ణాంకం
+nfa_regcomp_ప్రారంభం(
+    char_u	*సమాసం,
+    పూర్ణాంకం		re_flags)	    // see vim_regcomp()
 {
-    size_t	postfix_size;
-    int		nstate_max;
+    size_t	postfix_కొలత;
+    పూర్ణాంకం		nstate_max;
 
     nstate = 0;
     istate = 0;
     // A reasonable estimation for maximum size
-    nstate_max = (int)(STRLEN(expr) + 1) * 25;
+    nstate_max = (పూర్ణాంకం)(STRLEN(సమాసం) + 1) * 25;
 
     // Some items blow up in size, such as [A-z].  Add more space for that.
     // When it is still not enough realloc_post_list() will be used.
     nstate_max += 1000;
 
     // Size for postfix representation of expr.
-    postfix_size = sizeof(int) * nstate_max;
+    postfix_కొలత = పరిమాణం(పూర్ణాంకం) * nstate_max;
 
     // Reuse the postfix buffer across compilations, only growing it when the
     // estimate exceeds the current size; it is freed in free_regexp_stuff().
-    if (post_start == NULL || post_start_len < nstate_max)
+    ఒకవేళ (post_ప్రారంభం == ఖాళీ || post_ప్రారంభం_len < nstate_max)
     {
-	vim_free(post_start);
-	post_start = alloc(postfix_size);
-	if (post_start == NULL)
+	vim_free(post_ప్రారంభం);
+	post_ప్రారంభం = alloc(postfix_కొలత);
+	ఒకవేళ (post_ప్రారంభం == ఖాళీ)
 	{
-	    post_start_len = 0;
-	    return FAIL;
+	    post_ప్రారంభం_len = 0;
+	    తిరిగి FAIL;
 	}
-	post_start_len = nstate_max;
+	post_ప్రారంభం_len = nstate_max;
     }
-    post_ptr = post_start;
-    post_end = post_start + post_start_len;
-    wants_nfa = FALSE;
+    post_ptr = post_ప్రారంభం;
+    post_చివర = post_ప్రారంభం + post_ప్రారంభం_len;
+    కోరుతుంది_nfa = FALSE;
     rex.nfa_has_zend = FALSE;
     rex.nfa_has_backref = FALSE;
-    nfa_reg_parse_depth = 0;
+    nfa_reg_parse_లోతు = 0;
 
     // shared with BT engine
-    regcomp_start(expr, re_flags);
+    regcomp_ప్రారంభం(సమాసం, re_flags);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Figure out if the NFA state list starts with an anchor, must match at start
  * of the line.
  */
-    static int
-nfa_get_reganch(nfa_state_T *start, int depth)
+    స్థిర పూర్ణాంకం
+nfa_get_reganch(nfa_state_T *ప్రారంభం, పూర్ణాంకం లోతు)
 {
-    nfa_state_T *p = start;
+    nfa_state_T *p = ప్రారంభం;
 
-    if (depth > 4)
-	return 0;
+    ఒకవేళ (లోతు > 4)
+	తిరిగి 0;
 
-    while (p != NULL)
+    అయితే (p != ఖాళీ)
     {
-	switch (p->c)
+	ఎంపిక (p->c)
 	{
-	    case NFA_BOL:
-	    case NFA_BOF:
-		return 1; // yes!
+	    స్థితి NFA_BOL:
+	    స్థితి NFA_BOF:
+		తిరిగి 1; // yes!
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
+	    స్థితి NFA_ZSTART:
+	    స్థితి NFA_ZEND:
+	    స్థితి NFA_CURSOR:
+	    స్థితి NFA_VISUAL:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-		p = p->out;
-		break;
+	    స్థితి NFA_MOPEN:
+	    స్థితి NFA_MOPEN1:
+	    స్థితి NFA_MOPEN2:
+	    స్థితి NFA_MOPEN3:
+	    స్థితి NFA_MOPEN4:
+	    స్థితి NFA_MOPEN5:
+	    స్థితి NFA_MOPEN6:
+	    స్థితి NFA_MOPEN7:
+	    స్థితి NFA_MOPEN8:
+	    స్థితి NFA_MOPEN9:
+	    స్థితి NFA_NOPEN:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZOPEN:
+	    స్థితి NFA_ZOPEN1:
+	    స్థితి NFA_ZOPEN2:
+	    స్థితి NFA_ZOPEN3:
+	    స్థితి NFA_ZOPEN4:
+	    స్థితి NFA_ZOPEN5:
+	    స్థితి NFA_ZOPEN6:
+	    స్థితి NFA_ZOPEN7:
+	    స్థితి NFA_ZOPEN8:
+	    స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+		p = p->బహిర్గతం;
+		ఆపు;
 
-	    case NFA_SPLIT:
-		return nfa_get_reganch(p->out, depth + 1)
-				       && nfa_get_reganch(p->out1, depth + 1);
+	    స్థితి NFA_విభజించు:
+		తిరిగి nfa_get_reganch(p->బహిర్గతం, లోతు + 1)
+				       && nfa_get_reganch(p->out1, లోతు + 1);
 
-	    default:
-		return 0; // noooo
+	    అప్రమేయ:
+		తిరిగి 0; // noooo
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Figure out if the NFA state list starts with a character which must match
  * at start of the match.
  */
-    static int
-nfa_get_regstart(nfa_state_T *start, int depth)
+    స్థిర పూర్ణాంకం
+nfa_get_regstart(nfa_state_T *ప్రారంభం, పూర్ణాంకం లోతు)
 {
-    nfa_state_T *p = start;
+    nfa_state_T *p = ప్రారంభం;
 
-    if (depth > 4)
-	return 0;
+    ఒకవేళ (లోతు > 4)
+	తిరిగి 0;
 
-    while (p != NULL)
+    అయితే (p != ఖాళీ)
     {
-	switch (p->c)
+	ఎంపిక (p->c)
 	{
 	    // all kinds of zero-width matches
-	    case NFA_BOL:
-	    case NFA_BOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    స్థితి NFA_BOL:
+	    స్థితి NFA_BOF:
+	    స్థితి NFA_BOW:
+	    స్థితి NFA_EOW:
+	    స్థితి NFA_ZSTART:
+	    స్థితి NFA_ZEND:
+	    స్థితి NFA_CURSOR:
+	    స్థితి NFA_VISUAL:
+	    స్థితి NFA_LNUM:
+	    స్థితి NFA_LNUM_GT:
+	    స్థితి NFA_LNUM_LT:
+	    స్థితి NFA_నిలువు:
+	    స్థితి NFA_నిలువు_GT:
+	    స్థితి NFA_నిలువు_LT:
+	    స్థితి NFA_VCOL:
+	    స్థితి NFA_VCOL_GT:
+	    స్థితి NFA_VCOL_LT:
+	    స్థితి NFA_MARK:
+	    స్థితి NFA_MARK_GT:
+	    స్థితి NFA_MARK_LT:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-		p = p->out;
-		break;
+	    స్థితి NFA_MOPEN:
+	    స్థితి NFA_MOPEN1:
+	    స్థితి NFA_MOPEN2:
+	    స్థితి NFA_MOPEN3:
+	    స్థితి NFA_MOPEN4:
+	    స్థితి NFA_MOPEN5:
+	    స్థితి NFA_MOPEN6:
+	    స్థితి NFA_MOPEN7:
+	    స్థితి NFA_MOPEN8:
+	    స్థితి NFA_MOPEN9:
+	    స్థితి NFA_NOPEN:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZOPEN:
+	    స్థితి NFA_ZOPEN1:
+	    స్థితి NFA_ZOPEN2:
+	    స్థితి NFA_ZOPEN3:
+	    స్థితి NFA_ZOPEN4:
+	    స్థితి NFA_ZOPEN5:
+	    స్థితి NFA_ZOPEN6:
+	    స్థితి NFA_ZOPEN7:
+	    స్థితి NFA_ZOPEN8:
+	    స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+		p = p->బహిర్గతం;
+		ఆపు;
 
-	    case NFA_SPLIT:
+	    స్థితి NFA_విభజించు:
 	    {
-		int c1 = nfa_get_regstart(p->out, depth + 1);
-		int c2 = nfa_get_regstart(p->out1, depth + 1);
+		పూర్ణాంకం c1 = nfa_get_regstart(p->బహిర్గతం, లోతు + 1);
+		పూర్ణాంకం c2 = nfa_get_regstart(p->out1, లోతు + 1);
 
-		if (c1 == c2)
-		    return c1; // yes!
-		return 0;
+		ఒకవేళ (c1 == c2)
+		    తిరిగి c1; // yes!
+		తిరిగి 0;
 	    }
 
-	    default:
-		if (p->c > 0)
-		    return p->c; // yes!
-		return 0;
+	    అప్రమేయ:
+		ఒకవేళ (p->c > 0)
+		    తిరిగి p->c; // yes!
+		తిరిగి 0;
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -486,69 +486,69 @@ nfa_get_regstart(nfa_state_T *start, int depth)
  * else.  If so return a string in allocated memory with what must match after
  * regstart.  Otherwise return NULL.
  */
-    static char_u *
-nfa_get_match_text(nfa_state_T *start)
+    స్థిర char_u *
+nfa_get_సరిపోలిక_పాఠ్యం(nfa_state_T *ప్రారంభం)
 {
-    nfa_state_T *p = start;
-    int		len = 0;
+    nfa_state_T *p = ప్రారంభం;
+    పూర్ణాంకం		len = 0;
     char_u	*ret;
     char_u	*s;
 
-    if (p->c != NFA_MOPEN)
-	return NULL; // just in case
-    p = p->out;
-    while (p->c > 0)
+    ఒకవేళ (p->c != NFA_MOPEN)
+	తిరిగి ఖాళీ; // just in case
+    p = p->బహిర్గతం;
+    అయితే (p->c > 0)
     {
 	len += MB_CHAR2LEN(p->c);
-	p = p->out;
+	p = p->బహిర్గతం;
     }
-    if (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
-	return NULL;
+    ఒకవేళ (p->c != NFA_MCLOSE || p->బహిర్గతం->c != NFA_సరిపోలిక)
+	తిరిగి ఖాళీ;
 
     ret = alloc(len);
-    if (ret == NULL)
-	return NULL;
+    ఒకవేళ (ret == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    p = start->out->out; // skip first char, it goes into regstart
+    p = ప్రారంభం->బహిర్గతం->బహిర్గతం; // skip first char, it goes into regstart
     s = ret;
-    while (p->c > 0)
+    అయితే (p->c > 0)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    s += (*mb_char2bytes)(p->c, s);
-	else
+	లేకపోతే
 	    *s++ = p->c;
-	p = p->out;
+	p = p->బహిర్గతం;
     }
     *s = NUL;
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Allocate more space for post_start.  Called when
  * running above the estimated number of states.
  */
-    static int
-realloc_post_list(void)
+    స్థిర పూర్ణాంకం
+realloc_post_list(శూన్య)
 {
-    int   nstate_max = (int)(post_end - post_start);
-    int   new_max;
-    int   *new_start;
-    int	  *old_start;
+    పూర్ణాంకం   nstate_max = (పూర్ణాంకం)(post_చివర - post_ప్రారంభం);
+    పూర్ణాంకం   new_max;
+    పూర్ణాంకం   *new_ప్రారంభం;
+    పూర్ణాంకం	  *old_ప్రారంభం;
 
     // For weird patterns the number of states can be very high. Increasing by
     // 50% seems a reasonable compromise between memory use and speed.
     new_max = nstate_max * 3 / 2;
-    new_start = ALLOC_MULT(int, new_max);
-    if (new_start == NULL)
-	return FAIL;
-    mch_memmove(new_start, post_start, nstate_max * sizeof(int));
-    old_start = post_start;
-    post_start = new_start;
-    post_start_len = new_max;
-    post_ptr = new_start + (post_ptr - old_start);
-    post_end = post_start + new_max;
-    vim_free(old_start);
-    return OK;
+    new_ప్రారంభం = ALLOC_MULT(పూర్ణాంకం, new_max);
+    ఒకవేళ (new_ప్రారంభం == ఖాళీ)
+	తిరిగి FAIL;
+    mch_memmove(new_ప్రారంభం, post_ప్రారంభం, nstate_max * పరిమాణం(పూర్ణాంకం));
+    old_ప్రారంభం = post_ప్రారంభం;
+    post_ప్రారంభం = new_ప్రారంభం;
+    post_ప్రారంభం_len = new_max;
+    post_ptr = new_ప్రారంభం + (post_ptr - old_ప్రారంభం);
+    post_చివర = post_ప్రారంభం + new_max;
+    vim_free(old_ప్రారంభం);
+    తిరిగి OK;
 }
 
 /*
@@ -561,57 +561,57 @@ realloc_post_list(void)
  * Keep in mind that 'ignorecase' applies at execution time, thus [a-z] may
  * need to be interpreted as [a-zA-Z].
  */
-    static int
-nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
+    స్థిర పూర్ణాంకం
+nfa_recognize_char_class(char_u *ప్రారంభం, char_u *చివర, పూర్ణాంకం extra_newl)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    పూర్ణాంకం		newl;
+    పూర్ణాంకం		config = get_char_class_బిట్లు(ప్రారంభం, చివర, &newl);
 
-    if (config < 0)
-	return FAIL;
+    ఒకవేళ (config < 0)
+	తిరిగి FAIL;
 
-    if (extra_newl == TRUE)
+    ఒకవేళ (extra_newl == TRUE)
 	newl = TRUE;
 
-    if (newl == TRUE)
-	extra_newl = NFA_ADD_NL;
+    ఒకవేళ (newl == TRUE)
+	extra_newl = NFA_కూడు_NL;
 
-    switch (config)
+    ఎంపిక (config)
     {
-	case CLASS_o9:
-	    return extra_newl + NFA_DIGIT;
-	case CLASS_not |  CLASS_o9:
-	    return extra_newl + NFA_NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_NHEX;
-	case CLASS_o7:
-	    return extra_newl + NFA_OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return extra_newl + NFA_NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_NALPHA;
-	case CLASS_az:
-	   return extra_newl + NFA_LOWER_IC;
-	case CLASS_not | CLASS_az:
-	    return extra_newl + NFA_NLOWER_IC;
-	case CLASS_AZ:
-	    return extra_newl + NFA_UPPER_IC;
-	case CLASS_not | CLASS_AZ:
-	    return extra_newl + NFA_NUPPER_IC;
+	స్థితి CLASS_o9:
+	    తిరిగి extra_newl + NFA_DIGIT;
+	స్థితి CLASS_not |  CLASS_o9:
+	    తిరిగి extra_newl + NFA_NDIGIT;
+	స్థితి CLASS_af | CLASS_AF | CLASS_o9:
+	    తిరిగి extra_newl + NFA_HEX;
+	స్థితి CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    తిరిగి extra_newl + NFA_NHEX;
+	స్థితి CLASS_o7:
+	    తిరిగి extra_newl + NFA_OCTAL;
+	స్థితి CLASS_not | CLASS_o7:
+	    తిరిగి extra_newl + NFA_NOCTAL;
+	స్థితి CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    తిరిగి extra_newl + NFA_మాట;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    తిరిగి extra_newl + NFA_NWORD;
+	స్థితి CLASS_az | CLASS_AZ | CLASS_underscore:
+	    తిరిగి extra_newl + NFA_తల;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    తిరిగి extra_newl + NFA_NHEAD;
+	స్థితి CLASS_az | CLASS_AZ:
+	    తిరిగి extra_newl + NFA_ALPHA;
+	స్థితి CLASS_not | CLASS_az | CLASS_AZ:
+	    తిరిగి extra_newl + NFA_NALPHA;
+	స్థితి CLASS_az:
+	   తిరిగి extra_newl + NFA_క్రింది_IC;
+	స్థితి CLASS_not | CLASS_az:
+	    తిరిగి extra_newl + NFA_NLOWER_IC;
+	స్థితి CLASS_AZ:
+	    తిరిగి extra_newl + NFA_పై_IC;
+	స్థితి CLASS_not | CLASS_AZ:
+	    తిరిగి extra_newl + NFA_NUPPER_IC;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
@@ -622,79 +622,79 @@ nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
  *
  * NOTE! When changing this function, also update reg_equi_class()
  */
-    static int
-nfa_emit_equi_class(int c)
+    స్థిర పూర్ణాంకం
+nfa_emit_equi_class(పూర్ణాంకం c)
 {
-#define EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
+#నిర్వచించు EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
 
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    ఒకవేళ (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-#define A_grave 0xc0
-#define A_acute 0xc1
-#define A_circumflex 0xc2
-#define A_virguilla 0xc3
-#define A_diaeresis 0xc4
-#define A_ring 0xc5
-#define C_cedilla 0xc7
-#define E_grave 0xc8
-#define E_acute 0xc9
-#define E_circumflex 0xca
-#define E_diaeresis 0xcb
-#define I_grave 0xcc
-#define I_acute 0xcd
-#define I_circumflex 0xce
-#define I_diaeresis 0xcf
-#define N_virguilla 0xd1
-#define O_grave 0xd2
-#define O_acute 0xd3
-#define O_circumflex 0xd4
-#define O_virguilla 0xd5
-#define O_diaeresis 0xd6
-#define O_slash 0xd8
-#define U_grave 0xd9
-#define U_acute 0xda
-#define U_circumflex 0xdb
-#define U_diaeresis 0xdc
-#define Y_acute 0xdd
-#define a_grave 0xe0
-#define a_acute 0xe1
-#define a_circumflex 0xe2
-#define a_virguilla 0xe3
-#define a_diaeresis 0xe4
-#define a_ring 0xe5
-#define c_cedilla 0xe7
-#define e_grave 0xe8
-#define e_acute 0xe9
-#define e_circumflex 0xea
-#define e_diaeresis 0xeb
-#define i_grave 0xec
-#define i_acute 0xed
-#define i_circumflex 0xee
-#define i_diaeresis 0xef
-#define n_virguilla 0xf1
-#define o_grave 0xf2
-#define o_acute 0xf3
-#define o_circumflex 0xf4
-#define o_virguilla 0xf5
-#define o_diaeresis 0xf6
-#define o_slash 0xf8
-#define u_grave 0xf9
-#define u_acute 0xfa
-#define u_circumflex 0xfb
-#define u_diaeresis 0xfc
-#define y_acute 0xfd
-#define y_diaeresis 0xff
-	switch (c)
+#నిర్వచించు A_grave 0xc0
+#నిర్వచించు A_acute 0xc1
+#నిర్వచించు A_circumflex 0xc2
+#నిర్వచించు A_virguilla 0xc3
+#నిర్వచించు A_diaeresis 0xc4
+#నిర్వచించు A_ring 0xc5
+#నిర్వచించు C_cedilla 0xc7
+#నిర్వచించు E_grave 0xc8
+#నిర్వచించు E_acute 0xc9
+#నిర్వచించు E_circumflex 0xca
+#నిర్వచించు E_diaeresis 0xcb
+#నిర్వచించు I_grave 0xcc
+#నిర్వచించు I_acute 0xcd
+#నిర్వచించు I_circumflex 0xce
+#నిర్వచించు I_diaeresis 0xcf
+#నిర్వచించు N_virguilla 0xd1
+#నిర్వచించు O_grave 0xd2
+#నిర్వచించు O_acute 0xd3
+#నిర్వచించు O_circumflex 0xd4
+#నిర్వచించు O_virguilla 0xd5
+#నిర్వచించు O_diaeresis 0xd6
+#నిర్వచించు O_slash 0xd8
+#నిర్వచించు U_grave 0xd9
+#నిర్వచించు U_acute 0xda
+#నిర్వచించు U_circumflex 0xdb
+#నిర్వచించు U_diaeresis 0xdc
+#నిర్వచించు Y_acute 0xdd
+#నిర్వచించు a_grave 0xe0
+#నిర్వచించు a_acute 0xe1
+#నిర్వచించు a_circumflex 0xe2
+#నిర్వచించు a_virguilla 0xe3
+#నిర్వచించు a_diaeresis 0xe4
+#నిర్వచించు a_ring 0xe5
+#నిర్వచించు c_cedilla 0xe7
+#నిర్వచించు e_grave 0xe8
+#నిర్వచించు e_acute 0xe9
+#నిర్వచించు e_circumflex 0xea
+#నిర్వచించు e_diaeresis 0xeb
+#నిర్వచించు i_grave 0xec
+#నిర్వచించు i_acute 0xed
+#నిర్వచించు i_circumflex 0xee
+#నిర్వచించు i_diaeresis 0xef
+#నిర్వచించు n_virguilla 0xf1
+#నిర్వచించు o_grave 0xf2
+#నిర్వచించు o_acute 0xf3
+#నిర్వచించు o_circumflex 0xf4
+#నిర్వచించు o_virguilla 0xf5
+#నిర్వచించు o_diaeresis 0xf6
+#నిర్వచించు o_slash 0xf8
+#నిర్వచించు u_grave 0xf9
+#నిర్వచించు u_acute 0xfa
+#నిర్వచించు u_circumflex 0xfb
+#నిర్వచించు u_diaeresis 0xfc
+#నిర్వచించు y_acute 0xfd
+#నిర్వచించు y_diaeresis 0xff
+	ఎంపిక (c)
 	{
-	    case 'A': case A_grave: case A_acute: case A_circumflex:
-	    case A_virguilla: case A_diaeresis: case A_ring:
-	    case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x200:
-	    case 0x202: case 0x226: case 0x23a: case 0x1e00:
-	    case 0x1ea0: case 0x1ea2: case 0x1ea4: case 0x1ea6:
-	    case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    స్థితి 'A': స్థితి A_grave: స్థితి A_acute: స్థితి A_circumflex:
+	    స్థితి A_virguilla: స్థితి A_diaeresis: స్థితి A_ring:
+	    స్థితి 0x100: స్థితి 0x102: స్థితి 0x104: స్థితి 0x1cd:
+	    స్థితి 0x1de: స్థితి 0x1e0: స్థితి 0x1fa: స్థితి 0x200:
+	    స్థితి 0x202: స్థితి 0x226: స్థితి 0x23a: స్థితి 0x1e00:
+	    స్థితి 0x1ea0: స్థితి 0x1ea2: స్థితి 0x1ea4: స్థితి 0x1ea6:
+	    స్థితి 0x1ea8: స్థితి 0x1eaa: స్థితి 0x1eac: స్థితి 0x1eae:
+	    స్థితి 0x1eb0: స్థితి 0x1eb2: స్థితి 0x1eb4: స్థితి 0x1eb6:
 		    EMIT2('A') EMIT2(A_grave) EMIT2(A_acute)
 		    EMIT2(A_circumflex) EMIT2(A_virguilla)
 		    EMIT2(A_diaeresis) EMIT2(A_ring)
@@ -706,39 +706,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ea6) EMIT2(0x1ea8) EMIT2(0x1eaa)
 		    EMIT2(0x1eac) EMIT2(0x1eae) EMIT2(0x1eb0)
 		    EMIT2(0x1eb2) EMIT2(0x1eb6) EMIT2(0x1eb4)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+	    స్థితి 'B': స్థితి 0x181: స్థితి 0x243: స్థితి 0x1e02:
+	    స్థితి 0x1e04: స్థితి 0x1e06:
 		    EMIT2('B')
 		    EMIT2(0x181) EMIT2(0x243) EMIT2(0x1e02)
 		    EMIT2(0x1e04) EMIT2(0x1e06)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'C': case C_cedilla: case 0x106: case 0x108:
-	    case 0x10a: case 0x10c: case 0x187: case 0x23b:
-	    case 0x1e08: case 0xa792:
+	    స్థితి 'C': స్థితి C_cedilla: స్థితి 0x106: స్థితి 0x108:
+	    స్థితి 0x10a: స్థితి 0x10c: స్థితి 0x187: స్థితి 0x23b:
+	    స్థితి 0x1e08: స్థితి 0xa792:
 		    EMIT2('C') EMIT2(C_cedilla)
 		    EMIT2(0x106) EMIT2(0x108) EMIT2(0x10a)
 		    EMIT2(0x10c) EMIT2(0x187) EMIT2(0x23b)
 		    EMIT2(0x1e08) EMIT2(0xa792)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+	    స్థితి 'D': స్థితి 0x10e: స్థితి 0x110: స్థితి 0x18a:
+	    స్థితి 0x1e0a: స్థితి 0x1e0c: స్థితి 0x1e0e: స్థితి 0x1e10:
+	    స్థితి 0x1e12:
 		    EMIT2('D') EMIT2(0x10e) EMIT2(0x110) EMIT2(0x18a)
 		    EMIT2(0x1e0a) EMIT2(0x1e0c) EMIT2(0x1e0e)
 		    EMIT2(0x1e10) EMIT2(0x1e12)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'E': case E_grave: case E_acute: case E_circumflex:
-	    case E_diaeresis: case 0x112: case 0x114: case 0x116:
-	    case 0x118: case 0x11a: case 0x204: case 0x206:
-	    case 0x228: case 0x246: case 0x1e14: case 0x1e16:
-	    case 0x1e18: case 0x1e1a: case 0x1e1c: case 0x1eb8:
-	    case 0x1eba: case 0x1ebc: case 0x1ebe: case 0x1ec0:
-	    case 0x1ec2: case 0x1ec4: case 0x1ec6:
+	    స్థితి 'E': స్థితి E_grave: స్థితి E_acute: స్థితి E_circumflex:
+	    స్థితి E_diaeresis: స్థితి 0x112: స్థితి 0x114: స్థితి 0x116:
+	    స్థితి 0x118: స్థితి 0x11a: స్థితి 0x204: స్థితి 0x206:
+	    స్థితి 0x228: స్థితి 0x246: స్థితి 0x1e14: స్థితి 0x1e16:
+	    స్థితి 0x1e18: స్థితి 0x1e1a: స్థితి 0x1e1c: స్థితి 0x1eb8:
+	    స్థితి 0x1eba: స్థితి 0x1ebc: స్థితి 0x1ebe: స్థితి 0x1ec0:
+	    స్థితి 0x1ec2: స్థితి 0x1ec4: స్థితి 0x1ec6:
 		    EMIT2('E') EMIT2(E_grave) EMIT2(E_acute)
 		    EMIT2(E_circumflex) EMIT2(E_diaeresis)
 		    EMIT2(0x112) EMIT2(0x114) EMIT2(0x116)
@@ -749,34 +749,34 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eba) EMIT2(0x1ebc) EMIT2(0x1ebe)
 		    EMIT2(0x1ec0) EMIT2(0x1ec2) EMIT2(0x1ec4)
 		    EMIT2(0x1ec6)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+	    స్థితి 'F': స్థితి 0x191: స్థితి 0x1e1e: స్థితి 0xa798:
 		    EMIT2('F') EMIT2(0x191) EMIT2(0x1e1e) EMIT2(0xa798)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+	    స్థితి 'G': స్థితి 0x11c: స్థితి 0x11e: స్థితి 0x120:
+	    స్థితి 0x122: స్థితి 0x193: స్థితి 0x1e4: స్థితి 0x1e6:
+	    స్థితి 0x1f4: స్థితి 0x1e20: స్థితి 0xa7a0:
 		    EMIT2('G') EMIT2(0x11c) EMIT2(0x11e) EMIT2(0x120)
 		    EMIT2(0x122) EMIT2(0x193) EMIT2(0x1e4)
 		    EMIT2(0x1e6) EMIT2(0x1f4) EMIT2(0x1e20)
 		    EMIT2(0xa7a0)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26: case 0x1e28:
-	    case 0x1e2a: case 0x2c67:
+	    స్థితి 'H': స్థితి 0x124: స్థితి 0x126: స్థితి 0x21e:
+	    స్థితి 0x1e22: స్థితి 0x1e24: స్థితి 0x1e26: స్థితి 0x1e28:
+	    స్థితి 0x1e2a: స్థితి 0x2c67:
 		    EMIT2('H') EMIT2(0x124) EMIT2(0x126) EMIT2(0x21e)
 		    EMIT2(0x1e22) EMIT2(0x1e24) EMIT2(0x1e26)
 		    EMIT2(0x1e28) EMIT2(0x1e2a) EMIT2(0x2c67)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'I': case I_grave: case I_acute: case I_circumflex:
-	    case I_diaeresis: case 0x128: case 0x12a: case 0x12c:
-	    case 0x12e: case 0x130: case 0x197: case 0x1cf:
-	    case 0x208: case 0x20a: case 0x1e2c: case 0x1e2e:
-	    case 0x1ec8: case 0x1eca:
+	    స్థితి 'I': స్థితి I_grave: స్థితి I_acute: స్థితి I_circumflex:
+	    స్థితి I_diaeresis: స్థితి 0x128: స్థితి 0x12a: స్థితి 0x12c:
+	    స్థితి 0x12e: స్థితి 0x130: స్థితి 0x197: స్థితి 0x1cf:
+	    స్థితి 0x208: స్థితి 0x20a: స్థితి 0x1e2c: స్థితి 0x1e2e:
+	    స్థితి 0x1ec8: స్థితి 0x1eca:
 		    EMIT2('I') EMIT2(I_grave) EMIT2(I_acute)
 		    EMIT2(I_circumflex) EMIT2(I_diaeresis)
 		    EMIT2(0x128) EMIT2(0x12a) EMIT2(0x12c)
@@ -784,53 +784,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1cf) EMIT2(0x208) EMIT2(0x20a)
 		    EMIT2(0x1e2c) EMIT2(0x1e2e) EMIT2(0x1ec8)
 		    EMIT2(0x1eca)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'J': case 0x134: case 0x248:
+	    స్థితి 'J': స్థితి 0x134: స్థితి 0x248:
 		    EMIT2('J') EMIT2(0x134) EMIT2(0x248)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+	    స్థితి 'K': స్థితి 0x136: స్థితి 0x198: స్థితి 0x1e8: స్థితి 0x1e30:
+	    స్థితి 0x1e32: స్థితి 0x1e34: స్థితి 0x2c69: స్థితి 0xa740:
 		    EMIT2('K') EMIT2(0x136) EMIT2(0x198) EMIT2(0x1e8)
 		    EMIT2(0x1e30) EMIT2(0x1e32) EMIT2(0x1e34)
 		    EMIT2(0x2c69) EMIT2(0xa740)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'L': case 0x139: case 0x13b: case 0x13d:
-	    case 0x13f: case 0x141: case 0x23d: case 0x1e36:
-	    case 0x1e38: case 0x1e3a: case 0x1e3c: case 0x2c60:
+	    స్థితి 'L': స్థితి 0x139: స్థితి 0x13b: స్థితి 0x13d:
+	    స్థితి 0x13f: స్థితి 0x141: స్థితి 0x23d: స్థితి 0x1e36:
+	    స్థితి 0x1e38: స్థితి 0x1e3a: స్థితి 0x1e3c: స్థితి 0x2c60:
 		    EMIT2('L') EMIT2(0x139) EMIT2(0x13b)
 		    EMIT2(0x13d) EMIT2(0x13f) EMIT2(0x141)
 		    EMIT2(0x23d) EMIT2(0x1e36) EMIT2(0x1e38)
 		    EMIT2(0x1e3a) EMIT2(0x1e3c) EMIT2(0x2c60)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+	    స్థితి 'M': స్థితి 0x1e3e: స్థితి 0x1e40: స్థితి 0x1e42:
 		    EMIT2('M') EMIT2(0x1e3e) EMIT2(0x1e40)
 		    EMIT2(0x1e42)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'N': case N_virguilla:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+	    స్థితి 'N': స్థితి N_virguilla:
+	    స్థితి 0x143: స్థితి 0x145: స్థితి 0x147: స్థితి 0x1f8:
+	    స్థితి 0x1e44: స్థితి 0x1e46: స్థితి 0x1e48: స్థితి 0x1e4a:
+	    స్థితి 0xa7a4:
 		    EMIT2('N') EMIT2(N_virguilla)
 		    EMIT2(0x143) EMIT2(0x145) EMIT2(0x147)
 		    EMIT2(0x1f8) EMIT2(0x1e44) EMIT2(0x1e46)
 		    EMIT2(0x1e48) EMIT2(0x1e4a) EMIT2(0xa7a4)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'O': case O_grave: case O_acute: case O_circumflex:
-	    case O_virguilla: case O_diaeresis: case O_slash:
-	    case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec:
-	    case 0x1fe: case 0x20c: case 0x20e: case 0x22a:
-	    case 0x22c: case 0x22e: case 0x230: case 0x1e4c:
-	    case 0x1e4e: case 0x1e50: case 0x1e52: case 0x1ecc:
-	    case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc:
-	    case 0x1ede: case 0x1ee0: case 0x1ee2:
+	    స్థితి 'O': స్థితి O_grave: స్థితి O_acute: స్థితి O_circumflex:
+	    స్థితి O_virguilla: స్థితి O_diaeresis: స్థితి O_slash:
+	    స్థితి 0x14c: స్థితి 0x14e: స్థితి 0x150: స్థితి 0x19f:
+	    స్థితి 0x1a0: స్థితి 0x1d1: స్థితి 0x1ea: స్థితి 0x1ec:
+	    స్థితి 0x1fe: స్థితి 0x20c: స్థితి 0x20e: స్థితి 0x22a:
+	    స్థితి 0x22c: స్థితి 0x22e: స్థితి 0x230: స్థితి 0x1e4c:
+	    స్థితి 0x1e4e: స్థితి 0x1e50: స్థితి 0x1e52: స్థితి 0x1ecc:
+	    స్థితి 0x1ece: స్థితి 0x1ed0: స్థితి 0x1ed2: స్థితి 0x1ed4:
+	    స్థితి 0x1ed6: స్థితి 0x1ed8: స్థితి 0x1eda: స్థితి 0x1edc:
+	    స్థితి 0x1ede: స్థితి 0x1ee0: స్థితి 0x1ee2:
 		    EMIT2('O') EMIT2(O_grave) EMIT2(O_acute)
 		    EMIT2(O_circumflex) EMIT2(O_virguilla)
 		    EMIT2(O_diaeresis) EMIT2(O_slash)
@@ -845,51 +845,51 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed6) EMIT2(0x1ed8) EMIT2(0x1eda)
 		    EMIT2(0x1edc) EMIT2(0x1ede) EMIT2(0x1ee0)
 		    EMIT2(0x1ee2)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+	    స్థితి 'P': స్థితి 0x1a4: స్థితి 0x1e54: స్థితి 0x1e56: స్థితి 0x2c63:
 		    EMIT2('P') EMIT2(0x1a4) EMIT2(0x1e54) EMIT2(0x1e56)
 		    EMIT2(0x2c63)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'Q': case 0x24a:
+	    స్థితి 'Q': స్థితి 0x24a:
 		    EMIT2('Q') EMIT2(0x24a)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+	    స్థితి 'R': స్థితి 0x154: స్థితి 0x156: స్థితి 0x158: స్థితి 0x210:
+	    స్థితి 0x212: స్థితి 0x24c: స్థితి 0x1e58: స్థితి 0x1e5a:
+	    స్థితి 0x1e5c: స్థితి 0x1e5e: స్థితి 0x2c64: స్థితి 0xa7a6:
 		    EMIT2('R') EMIT2(0x154) EMIT2(0x156) EMIT2(0x158)
 		    EMIT2(0x210) EMIT2(0x212) EMIT2(0x24c) EMIT2(0x1e58)
 		    EMIT2(0x1e5a) EMIT2(0x1e5c) EMIT2(0x1e5e) EMIT2(0x2c64)
 		    EMIT2(0xa7a6)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+	    స్థితి 'S': స్థితి 0x15a: స్థితి 0x15c: స్థితి 0x15e: స్థితి 0x160:
+	    స్థితి 0x218: స్థితి 0x1e60: స్థితి 0x1e62: స్థితి 0x1e64:
+	    స్థితి 0x1e66: స్థితి 0x1e68: స్థితి 0x2c7e: స్థితి 0xa7a8:
 		    EMIT2('S') EMIT2(0x15a) EMIT2(0x15c) EMIT2(0x15e)
 		    EMIT2(0x160) EMIT2(0x218) EMIT2(0x1e60) EMIT2(0x1e62)
 		    EMIT2(0x1e64) EMIT2(0x1e66) EMIT2(0x1e68) EMIT2(0x2c7e)
 		    EMIT2(0xa7a8)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+	    స్థితి 'T': స్థితి 0x162: స్థితి 0x164: స్థితి 0x166: స్థితి 0x1ac:
+	    స్థితి 0x1ae: స్థితి 0x21a: స్థితి 0x23e: స్థితి 0x1e6a: స్థితి 0x1e6c:
+	    స్థితి 0x1e6e: స్థితి 0x1e70:
 		    EMIT2('T') EMIT2(0x162) EMIT2(0x164) EMIT2(0x166)
 		    EMIT2(0x1ac) EMIT2(0x1ae) EMIT2(0x23e) EMIT2(0x21a)
 		    EMIT2(0x1e6a) EMIT2(0x1e6c) EMIT2(0x1e6e) EMIT2(0x1e70)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'U': case U_grave: case U_acute: case U_diaeresis:
-	    case U_circumflex: case 0x168: case 0x16a: case 0x16c:
-	    case 0x16e: case 0x170: case 0x172: case 0x1af:
-	    case 0x1d3: case 0x1d5: case 0x1d7: case 0x1d9:
-	    case 0x1db: case 0x214: case 0x216: case 0x244:
-	    case 0x1e72: case 0x1e74: case 0x1e76: case 0x1e78:
-	    case 0x1e7a: case 0x1ee4: case 0x1ee6: case 0x1ee8:
-	    case 0x1eea: case 0x1eec: case 0x1eee: case 0x1ef0:
+	    స్థితి 'U': స్థితి U_grave: స్థితి U_acute: స్థితి U_diaeresis:
+	    స్థితి U_circumflex: స్థితి 0x168: స్థితి 0x16a: స్థితి 0x16c:
+	    స్థితి 0x16e: స్థితి 0x170: స్థితి 0x172: స్థితి 0x1af:
+	    స్థితి 0x1d3: స్థితి 0x1d5: స్థితి 0x1d7: స్థితి 0x1d9:
+	    స్థితి 0x1db: స్థితి 0x214: స్థితి 0x216: స్థితి 0x244:
+	    స్థితి 0x1e72: స్థితి 0x1e74: స్థితి 0x1e76: స్థితి 0x1e78:
+	    స్థితి 0x1e7a: స్థితి 0x1ee4: స్థితి 0x1ee6: స్థితి 0x1ee8:
+	    స్థితి 0x1eea: స్థితి 0x1eec: స్థితి 0x1eee: స్థితి 0x1ef0:
 		    EMIT2('U') EMIT2(U_grave) EMIT2(U_acute)
 		    EMIT2(U_diaeresis) EMIT2(U_circumflex)
 		    EMIT2(0x168) EMIT2(0x16a)
@@ -902,49 +902,49 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ee4) EMIT2(0x1ee6) EMIT2(0x1ee8)
 		    EMIT2(0x1eea) EMIT2(0x1eec) EMIT2(0x1eee)
 		    EMIT2(0x1ef0)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+	    స్థితి 'V': స్థితి 0x1b2: స్థితి 0x1e7c: స్థితి 0x1e7e:
 		    EMIT2('V') EMIT2(0x1b2) EMIT2(0x1e7c) EMIT2(0x1e7e)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82: case 0x1e84:
-	    case 0x1e86: case 0x1e88:
+	    స్థితి 'W': స్థితి 0x174: స్థితి 0x1e80: స్థితి 0x1e82: స్థితి 0x1e84:
+	    స్థితి 0x1e86: స్థితి 0x1e88:
 		    EMIT2('W') EMIT2(0x174) EMIT2(0x1e80) EMIT2(0x1e82)
 		    EMIT2(0x1e84) EMIT2(0x1e86) EMIT2(0x1e88)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'X': case 0x1e8a: case 0x1e8c:
+	    స్థితి 'X': స్థితి 0x1e8a: స్థితి 0x1e8c:
 		    EMIT2('X') EMIT2(0x1e8a) EMIT2(0x1e8c)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'Y': case Y_acute: case 0x176: case 0x178:
-	    case 0x1b3: case 0x232: case 0x24e: case 0x1e8e:
-	    case 0x1ef2: case 0x1ef4: case 0x1ef6: case 0x1ef8:
+	    స్థితి 'Y': స్థితి Y_acute: స్థితి 0x176: స్థితి 0x178:
+	    స్థితి 0x1b3: స్థితి 0x232: స్థితి 0x24e: స్థితి 0x1e8e:
+	    స్థితి 0x1ef2: స్థితి 0x1ef4: స్థితి 0x1ef6: స్థితి 0x1ef8:
 		    EMIT2('Y') EMIT2(Y_acute)
 		    EMIT2(0x176) EMIT2(0x178) EMIT2(0x1b3)
 		    EMIT2(0x232) EMIT2(0x24e) EMIT2(0x1e8e)
 		    EMIT2(0x1ef2) EMIT2(0x1ef4) EMIT2(0x1ef6)
 		    EMIT2(0x1ef8)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'Z': case 0x179: case 0x17b: case 0x17d:
-	    case 0x1b5: case 0x1e90: case 0x1e92: case 0x1e94:
-	    case 0x2c6b:
+	    స్థితి 'Z': స్థితి 0x179: స్థితి 0x17b: స్థితి 0x17d:
+	    స్థితి 0x1b5: స్థితి 0x1e90: స్థితి 0x1e92: స్థితి 0x1e94:
+	    స్థితి 0x2c6b:
 		    EMIT2('Z') EMIT2(0x179) EMIT2(0x17b) EMIT2(0x17d)
 		    EMIT2(0x1b5) EMIT2(0x1e90) EMIT2(0x1e92)
 		    EMIT2(0x1e94) EMIT2(0x2c6b)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'a': case a_grave: case a_acute: case a_circumflex:
-	    case a_virguilla: case a_diaeresis: case a_ring:
-	    case 0x101: case 0x103: case 0x105: case 0x1ce:
-	    case 0x1df: case 0x1e1: case 0x1fb: case 0x201:
-	    case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+	    స్థితి 'a': స్థితి a_grave: స్థితి a_acute: స్థితి a_circumflex:
+	    స్థితి a_virguilla: స్థితి a_diaeresis: స్థితి a_ring:
+	    స్థితి 0x101: స్థితి 0x103: స్థితి 0x105: స్థితి 0x1ce:
+	    స్థితి 0x1df: స్థితి 0x1e1: స్థితి 0x1fb: స్థితి 0x201:
+	    స్థితి 0x203: స్థితి 0x227: స్థితి 0x1d8f: స్థితి 0x1e01:
+	    స్థితి 0x1e9a: స్థితి 0x1ea1: స్థితి 0x1ea3: స్థితి 0x1ea5:
+	    స్థితి 0x1ea7: స్థితి 0x1ea9: స్థితి 0x1eab: స్థితి 0x1ead:
+	    స్థితి 0x1eaf: స్థితి 0x1eb1: స్థితి 0x1eb3: స్థితి 0x1eb5:
+	    స్థితి 0x1eb7: స్థితి 0x2c65:
 		    EMIT2('a') EMIT2(a_grave) EMIT2(a_acute)
 		    EMIT2(a_circumflex) EMIT2(a_virguilla)
 		    EMIT2(a_diaeresis) EMIT2(a_ring)
@@ -957,39 +957,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eab) EMIT2(0x1ead) EMIT2(0x1eaf)
 		    EMIT2(0x1eb1) EMIT2(0x1eb3) EMIT2(0x1eb5)
 		    EMIT2(0x1eb7) EMIT2(0x2c65)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+	    స్థితి 'b': స్థితి 0x180: స్థితి 0x253: స్థితి 0x1d6c: స్థితి 0x1d80:
+	    స్థితి 0x1e03: స్థితి 0x1e05: స్థితి 0x1e07:
 		    EMIT2('b') EMIT2(0x180) EMIT2(0x253) EMIT2(0x1d6c)
 		    EMIT2(0x1d80) EMIT2(0x1e03) EMIT2(0x1e05) EMIT2(0x1e07)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'c': case c_cedilla: case 0x107: case 0x109: case 0x10b:
-	    case 0x10d: case 0x188: case 0x23c: case 0x1e09: case 0xa793:
-	    case 0xa794:
+	    స్థితి 'c': స్థితి c_cedilla: స్థితి 0x107: స్థితి 0x109: స్థితి 0x10b:
+	    స్థితి 0x10d: స్థితి 0x188: స్థితి 0x23c: స్థితి 0x1e09: స్థితి 0xa793:
+	    స్థితి 0xa794:
 		    EMIT2('c') EMIT2(c_cedilla)
 		    EMIT2(0x107) EMIT2(0x109) EMIT2(0x10b)
 		    EMIT2(0x10d) EMIT2(0x188) EMIT2(0x23c)
 		    EMIT2(0x1e09) EMIT2(0xa793) EMIT2(0xa794)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d: case 0x1e0f:
-	    case 0x1e11: case 0x1e13:
+	    స్థితి 'd': స్థితి 0x10f: స్థితి 0x111: స్థితి 0x257: స్థితి 0x1d6d:
+	    స్థితి 0x1d81: స్థితి 0x1d91: స్థితి 0x1e0b: స్థితి 0x1e0d: స్థితి 0x1e0f:
+	    స్థితి 0x1e11: స్థితి 0x1e13:
 		    EMIT2('d') EMIT2(0x10f) EMIT2(0x111)
 		    EMIT2(0x257) EMIT2(0x1d6d) EMIT2(0x1d81)
 		    EMIT2(0x1d91) EMIT2(0x1e0b) EMIT2(0x1e0d)
 		    EMIT2(0x1e0f) EMIT2(0x1e11) EMIT2(0x1e13)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'e': case e_grave: case e_acute: case e_circumflex:
-	    case e_diaeresis: case 0x113: case 0x115: case 0x117:
-	    case 0x119: case 0x11b: case 0x205: case 0x207:
-	    case 0x229: case 0x247: case 0x1d92: case 0x1e15:
-	    case 0x1e17: case 0x1e19: case 0x1e1b: case 0x1e1d:
-	    case 0x1eb9: case 0x1ebb: case 0x1ebd: case 0x1ebf:
-	    case 0x1ec1: case 0x1ec3: case 0x1ec5: case 0x1ec7:
+	    స్థితి 'e': స్థితి e_grave: స్థితి e_acute: స్థితి e_circumflex:
+	    స్థితి e_diaeresis: స్థితి 0x113: స్థితి 0x115: స్థితి 0x117:
+	    స్థితి 0x119: స్థితి 0x11b: స్థితి 0x205: స్థితి 0x207:
+	    స్థితి 0x229: స్థితి 0x247: స్థితి 0x1d92: స్థితి 0x1e15:
+	    స్థితి 0x1e17: స్థితి 0x1e19: స్థితి 0x1e1b: స్థితి 0x1e1d:
+	    స్థితి 0x1eb9: స్థితి 0x1ebb: స్థితి 0x1ebd: స్థితి 0x1ebf:
+	    స్థితి 0x1ec1: స్థితి 0x1ec3: స్థితి 0x1ec5: స్థితి 0x1ec7:
 		    EMIT2('e') EMIT2(e_grave) EMIT2(e_acute)
 		    EMIT2(e_circumflex) EMIT2(e_diaeresis)
 		    EMIT2(0x113) EMIT2(0x115)
@@ -1000,37 +1000,37 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e1d) EMIT2(0x1eb9) EMIT2(0x1ebb)
 		    EMIT2(0x1ebd) EMIT2(0x1ebf) EMIT2(0x1ec1)
 		    EMIT2(0x1ec3) EMIT2(0x1ec5) EMIT2(0x1ec7)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+	    స్థితి 'f': స్థితి 0x192: స్థితి 0x1d6e: స్థితి 0x1d82:
+	    స్థితి 0x1e1f: స్థితి 0xa799:
 		    EMIT2('f') EMIT2(0x192) EMIT2(0x1d6e) EMIT2(0x1d82)
 		    EMIT2(0x1e1f) EMIT2(0xa799)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x1f5: case 0x260: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+	    స్థితి 'g': స్థితి 0x11d: స్థితి 0x11f: స్థితి 0x121: స్థితి 0x123:
+	    స్థితి 0x1e5: స్థితి 0x1e7: స్థితి 0x1f5: స్థితి 0x260: స్థితి 0x1d83:
+	    స్థితి 0x1e21: స్థితి 0xa7a1:
 		    EMIT2('g') EMIT2(0x11d) EMIT2(0x11f) EMIT2(0x121)
 		    EMIT2(0x123) EMIT2(0x1e5) EMIT2(0x1e7)
 		    EMIT2(0x1f5) EMIT2(0x260) EMIT2(0x1d83)
 		    EMIT2(0x1e21) EMIT2(0xa7a1)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+	    స్థితి 'h': స్థితి 0x125: స్థితి 0x127: స్థితి 0x21f: స్థితి 0x1e23:
+	    స్థితి 0x1e25: స్థితి 0x1e27: స్థితి 0x1e29: స్థితి 0x1e2b:
+	    స్థితి 0x1e96: స్థితి 0x2c68: స్థితి 0xa795:
 		    EMIT2('h') EMIT2(0x125) EMIT2(0x127) EMIT2(0x21f)
 		    EMIT2(0x1e23) EMIT2(0x1e25) EMIT2(0x1e27)
 		    EMIT2(0x1e29) EMIT2(0x1e2b) EMIT2(0x1e96)
 		    EMIT2(0x2c68) EMIT2(0xa795)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'i': case i_grave: case i_acute: case i_circumflex:
-	    case i_diaeresis: case 0x129: case 0x12b: case 0x12d:
-	    case 0x12f: case 0x1d0: case 0x209: case 0x20b:
-	    case 0x268: case 0x1d96: case 0x1e2d: case 0x1e2f:
-	    case 0x1ec9: case 0x1ecb:
+	    స్థితి 'i': స్థితి i_grave: స్థితి i_acute: స్థితి i_circumflex:
+	    స్థితి i_diaeresis: స్థితి 0x129: స్థితి 0x12b: స్థితి 0x12d:
+	    స్థితి 0x12f: స్థితి 0x1d0: స్థితి 0x209: స్థితి 0x20b:
+	    స్థితి 0x268: స్థితి 0x1d96: స్థితి 0x1e2d: స్థితి 0x1e2f:
+	    స్థితి 0x1ec9: స్థితి 0x1ecb:
 		    EMIT2('i') EMIT2(i_grave) EMIT2(i_acute)
 		    EMIT2(i_circumflex) EMIT2(i_diaeresis)
 		    EMIT2(0x129) EMIT2(0x12b) EMIT2(0x12d)
@@ -1038,53 +1038,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x20b) EMIT2(0x268) EMIT2(0x1d96)
 		    EMIT2(0x1e2d) EMIT2(0x1e2f) EMIT2(0x1ec9)
 		    EMIT2(0x1ecb)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+	    స్థితి 'j': స్థితి 0x135: స్థితి 0x1f0: స్థితి 0x249:
 		    EMIT2('j') EMIT2(0x135) EMIT2(0x1f0) EMIT2(0x249)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'k': case 0x137: case 0x199: case 0x1e9: case 0x1d84:
-	    case 0x1e31: case 0x1e33: case 0x1e35: case 0x2c6a: case 0xa741:
+	    స్థితి 'k': స్థితి 0x137: స్థితి 0x199: స్థితి 0x1e9: స్థితి 0x1d84:
+	    స్థితి 0x1e31: స్థితి 0x1e33: స్థితి 0x1e35: స్థితి 0x2c6a: స్థితి 0xa741:
 		    EMIT2('k') EMIT2(0x137) EMIT2(0x199) EMIT2(0x1e9)
 		    EMIT2(0x1d84) EMIT2(0x1e31) EMIT2(0x1e33)
 		    EMIT2(0x1e35) EMIT2(0x2c6a) EMIT2(0xa741)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'l': case 0x13a: case 0x13c: case 0x13e: case 0x140:
-	    case 0x142: case 0x19a: case 0x1e37: case 0x1e39: case 0x1e3b:
-	    case 0x1e3d: case 0x2c61:
+	    స్థితి 'l': స్థితి 0x13a: స్థితి 0x13c: స్థితి 0x13e: స్థితి 0x140:
+	    స్థితి 0x142: స్థితి 0x19a: స్థితి 0x1e37: స్థితి 0x1e39: స్థితి 0x1e3b:
+	    స్థితి 0x1e3d: స్థితి 0x2c61:
 		    EMIT2('l') EMIT2(0x13a) EMIT2(0x13c)
 		    EMIT2(0x13e) EMIT2(0x140) EMIT2(0x142)
 		    EMIT2(0x19a) EMIT2(0x1e37) EMIT2(0x1e39)
 		    EMIT2(0x1e3b) EMIT2(0x1e3d) EMIT2(0x2c61)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+	    స్థితి 'm': స్థితి 0x1d6f: స్థితి 0x1e3f: స్థితి 0x1e41: స్థితి 0x1e43:
 		    EMIT2('m') EMIT2(0x1d6f) EMIT2(0x1e3f)
 		    EMIT2(0x1e41) EMIT2(0x1e43)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'n': case n_virguilla: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87: case 0x1e45:
-	    case 0x1e47: case 0x1e49: case 0x1e4b: case 0xa7a5:
+	    స్థితి 'n': స్థితి n_virguilla: స్థితి 0x144: స్థితి 0x146: స్థితి 0x148:
+	    స్థితి 0x149: స్థితి 0x1f9: స్థితి 0x1d70: స్థితి 0x1d87: స్థితి 0x1e45:
+	    స్థితి 0x1e47: స్థితి 0x1e49: స్థితి 0x1e4b: స్థితి 0xa7a5:
 		    EMIT2('n') EMIT2(n_virguilla)
 		    EMIT2(0x144) EMIT2(0x146) EMIT2(0x148)
 		    EMIT2(0x149) EMIT2(0x1f9) EMIT2(0x1d70)
 		    EMIT2(0x1d87) EMIT2(0x1e45) EMIT2(0x1e47)
 		    EMIT2(0x1e49) EMIT2(0x1e4b) EMIT2(0xa7a5)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'o': case o_grave: case o_acute: case o_circumflex:
-	    case o_virguilla: case o_diaeresis: case o_slash:
-	    case 0x14d: case 0x14f: case 0x151: case 0x1a1:
-	    case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d:
-	    case 0x22f: case 0x231: case 0x275: case 0x1e4d:
-	    case 0x1e4f: case 0x1e51: case 0x1e53: case 0x1ecd:
-	    case 0x1ecf: case 0x1ed1: case 0x1ed3: case 0x1ed5:
-	    case 0x1ed7: case 0x1ed9: case 0x1edb: case 0x1edd:
-	    case 0x1edf: case 0x1ee1: case 0x1ee3:
+	    స్థితి 'o': స్థితి o_grave: స్థితి o_acute: స్థితి o_circumflex:
+	    స్థితి o_virguilla: స్థితి o_diaeresis: స్థితి o_slash:
+	    స్థితి 0x14d: స్థితి 0x14f: స్థితి 0x151: స్థితి 0x1a1:
+	    స్థితి 0x1d2: స్థితి 0x1eb: స్థితి 0x1ed: స్థితి 0x1ff:
+	    స్థితి 0x20d: స్థితి 0x20f: స్థితి 0x22b: స్థితి 0x22d:
+	    స్థితి 0x22f: స్థితి 0x231: స్థితి 0x275: స్థితి 0x1e4d:
+	    స్థితి 0x1e4f: స్థితి 0x1e51: స్థితి 0x1e53: స్థితి 0x1ecd:
+	    స్థితి 0x1ecf: స్థితి 0x1ed1: స్థితి 0x1ed3: స్థితి 0x1ed5:
+	    స్థితి 0x1ed7: స్థితి 0x1ed9: స్థితి 0x1edb: స్థితి 0x1edd:
+	    స్థితి 0x1edf: స్థితి 0x1ee1: స్థితి 0x1ee3:
 		    EMIT2('o') EMIT2(o_grave) EMIT2(o_acute)
 		    EMIT2(o_circumflex) EMIT2(o_virguilla)
 		    EMIT2(o_diaeresis) EMIT2(o_slash)
@@ -1099,54 +1099,54 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed7) EMIT2(0x1ed9) EMIT2(0x1edb)
 		    EMIT2(0x1edd) EMIT2(0x1edf) EMIT2(0x1ee1)
 		    EMIT2(0x1ee3)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d7d: case 0x1d88:
-	    case 0x1e55: case 0x1e57:
+	    స్థితి 'p': స్థితి 0x1a5: స్థితి 0x1d71: స్థితి 0x1d7d: స్థితి 0x1d88:
+	    స్థితి 0x1e55: స్థితి 0x1e57:
 		    EMIT2('p') EMIT2(0x1a5) EMIT2(0x1d71) EMIT2(0x1d7d)
 		    EMIT2(0x1d88) EMIT2(0x1e55) EMIT2(0x1e57)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'q': case 0x24b: case 0x2a0:
+	    స్థితి 'q': స్థితి 0x24b: స్థితి 0x2a0:
 		    EMIT2('q') EMIT2(0x24b) EMIT2(0x2a0)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+	    స్థితి 'r': స్థితి 0x155: స్థితి 0x157: స్థితి 0x159: స్థితి 0x211:
+	    స్థితి 0x213: స్థితి 0x24d: స్థితి 0x27d: స్థితి 0x1d72: స్థితి 0x1d73:
+	    స్థితి 0x1d89: స్థితి 0x1e59: స్థితి 0x1e5b: స్థితి 0x1e5d: స్థితి 0x1e5f:
+	    స్థితి 0xa7a7:
 		    EMIT2('r') EMIT2(0x155) EMIT2(0x157) EMIT2(0x159)
 		    EMIT2(0x211) EMIT2(0x213) EMIT2(0x24d) EMIT2(0x27d)
 		    EMIT2(0x1d72) EMIT2(0x1d73) EMIT2(0x1d89) EMIT2(0x1e59)
 		    EMIT2(0x1e5b) EMIT2(0x1e5d) EMIT2(0x1e5f) EMIT2(0xa7a7)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x219: case 0x23f: case 0x1d74: case 0x1d8a: case 0x1e61:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+	    స్థితి 's': స్థితి 0x15b: స్థితి 0x15d: స్థితి 0x15f: స్థితి 0x161:
+	    స్థితి 0x219: స్థితి 0x23f: స్థితి 0x1d74: స్థితి 0x1d8a: స్థితి 0x1e61:
+	    స్థితి 0x1e63: స్థితి 0x1e65: స్థితి 0x1e67: స్థితి 0x1e69: స్థితి 0xa7a9:
 		    EMIT2('s') EMIT2(0x15b) EMIT2(0x15d) EMIT2(0x15f)
 		    EMIT2(0x161) EMIT2(0x219) EMIT2(0x23f) EMIT2(0x1d74)
 		    EMIT2(0x1d8a) EMIT2(0x1e61) EMIT2(0x1e63) EMIT2(0x1e65)
 		    EMIT2(0x1e67) EMIT2(0x1e69) EMIT2(0xa7a9)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+	    స్థితి 't': స్థితి 0x163: స్థితి 0x165: స్థితి 0x167: స్థితి 0x1ab:
+	    స్థితి 0x1ad: స్థితి 0x21b: స్థితి 0x288: స్థితి 0x1d75: స్థితి 0x1e6b:
+	    స్థితి 0x1e6d: స్థితి 0x1e6f: స్థితి 0x1e71: స్థితి 0x1e97: స్థితి 0x2c66:
 		    EMIT2('t') EMIT2(0x163) EMIT2(0x165) EMIT2(0x167)
 		    EMIT2(0x1ab) EMIT2(0x1ad) EMIT2(0x21b) EMIT2(0x288)
 		    EMIT2(0x1d75) EMIT2(0x1e6b) EMIT2(0x1e6d) EMIT2(0x1e6f)
 		    EMIT2(0x1e71) EMIT2(0x1e97) EMIT2(0x2c66)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'u': case u_grave: case u_acute: case u_circumflex:
-	    case u_diaeresis: case 0x169: case 0x16b: case 0x16d:
-	    case 0x16f: case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc: case 0x215:
-	    case 0x217: case 0x289: case 0x1d7e: case 0x1d99: case 0x1e73:
-	    case 0x1e75: case 0x1e77: case 0x1e79: case 0x1e7b:
-	    case 0x1ee5: case 0x1ee7: case 0x1ee9: case 0x1eeb:
-	    case 0x1eed: case 0x1eef: case 0x1ef1:
+	    స్థితి 'u': స్థితి u_grave: స్థితి u_acute: స్థితి u_circumflex:
+	    స్థితి u_diaeresis: స్థితి 0x169: స్థితి 0x16b: స్థితి 0x16d:
+	    స్థితి 0x16f: స్థితి 0x171: స్థితి 0x173: స్థితి 0x1b0: స్థితి 0x1d4:
+	    స్థితి 0x1d6: స్థితి 0x1d8: స్థితి 0x1da: స్థితి 0x1dc: స్థితి 0x215:
+	    స్థితి 0x217: స్థితి 0x289: స్థితి 0x1d7e: స్థితి 0x1d99: స్థితి 0x1e73:
+	    స్థితి 0x1e75: స్థితి 0x1e77: స్థితి 0x1e79: స్థితి 0x1e7b:
+	    స్థితి 0x1ee5: స్థితి 0x1ee7: స్థితి 0x1ee9: స్థితి 0x1eeb:
+	    స్థితి 0x1eed: స్థితి 0x1eef: స్థితి 0x1ef1:
 		    EMIT2('u') EMIT2(u_grave) EMIT2(u_acute)
 		    EMIT2(u_circumflex) EMIT2(u_diaeresis)
 		    EMIT2(0x169) EMIT2(0x16b)
@@ -1159,48 +1159,48 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e79) EMIT2(0x1e7b) EMIT2(0x1ee5)
 		    EMIT2(0x1ee7) EMIT2(0x1ee9) EMIT2(0x1eeb)
 		    EMIT2(0x1eed) EMIT2(0x1eef) EMIT2(0x1ef1)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+	    స్థితి 'v': స్థితి 0x28b: స్థితి 0x1d8c: స్థితి 0x1e7d: స్థితి 0x1e7f:
 		    EMIT2('v') EMIT2(0x28b) EMIT2(0x1d8c) EMIT2(0x1e7d)
 		    EMIT2(0x1e7f)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83: case 0x1e85:
-	    case 0x1e87: case 0x1e89: case 0x1e98:
+	    స్థితి 'w': స్థితి 0x175: స్థితి 0x1e81: స్థితి 0x1e83: స్థితి 0x1e85:
+	    స్థితి 0x1e87: స్థితి 0x1e89: స్థితి 0x1e98:
 		    EMIT2('w') EMIT2(0x175) EMIT2(0x1e81) EMIT2(0x1e83)
 		    EMIT2(0x1e85) EMIT2(0x1e87) EMIT2(0x1e89) EMIT2(0x1e98)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'x': case 0x1e8b: case 0x1e8d:
+	    స్థితి 'x': స్థితి 0x1e8b: స్థితి 0x1e8d:
 		    EMIT2('x') EMIT2(0x1e8b) EMIT2(0x1e8d)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'y': case y_acute: case y_diaeresis: case 0x177:
-	    case 0x1b4: case 0x233: case 0x24f: case 0x1e8f:
-	    case 0x1e99: case 0x1ef3: case 0x1ef5: case 0x1ef7:
-	    case 0x1ef9:
+	    స్థితి 'y': స్థితి y_acute: స్థితి y_diaeresis: స్థితి 0x177:
+	    స్థితి 0x1b4: స్థితి 0x233: స్థితి 0x24f: స్థితి 0x1e8f:
+	    స్థితి 0x1e99: స్థితి 0x1ef3: స్థితి 0x1ef5: స్థితి 0x1ef7:
+	    స్థితి 0x1ef9:
 		    EMIT2('y') EMIT2(y_acute) EMIT2(y_diaeresis)
 		    EMIT2(0x177) EMIT2(0x1b4) EMIT2(0x233) EMIT2(0x24f)
 		    EMIT2(0x1e8f) EMIT2(0x1e99) EMIT2(0x1ef3)
 		    EMIT2(0x1ef5) EMIT2(0x1ef7) EMIT2(0x1ef9)
-		    return OK;
+		    తిరిగి OK;
 
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+	    స్థితి 'z': స్థితి 0x17a: స్థితి 0x17c: స్థితి 0x17e: స్థితి 0x1b6:
+	    స్థితి 0x1d76: స్థితి 0x1d8e: స్థితి 0x1e91: స్థితి 0x1e93:
+	    స్థితి 0x1e95: స్థితి 0x2c6c:
 		    EMIT2('z') EMIT2(0x17a) EMIT2(0x17c) EMIT2(0x17e)
 		    EMIT2(0x1b6) EMIT2(0x1d76) EMIT2(0x1d8e) EMIT2(0x1e91)
 		    EMIT2(0x1e93) EMIT2(0x1e95) EMIT2(0x2c6c)
-		    return OK;
+		    తిరిగి OK;
 
 	    // default: character itself
 	}
     }
 
     EMIT2(c);
-    return OK;
-#undef EMIT2
+    తిరిగి OK;
+#నిర్వచనం_రద్దు EMIT2
 }
 
 /*
@@ -1223,73 +1223,73 @@ nfa_emit_equi_class(int c)
  *     or  \%( pattern \)
  *     or  \z( pattern \)
  */
-    static int
-nfa_regatom(void)
+    స్థిర పూర్ణాంకం
+nfa_regatom(శూన్య)
 {
-    int		c;
-    int		charclass;
-    int		equiclass;
-    int		collclass;
-    int		got_coll_char;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		charclass;
+    పూర్ణాంకం		equiclass;
+    పూర్ణాంకం		collclass;
+    పూర్ణాంకం		got_coll_char;
     char_u	*p;
     char_u	*endp;
     char_u	*old_regparse = regparse;
-    int		extra = 0;
-    int		emit_range;
-    int		negated;
-    int		result;
-    int		startc = -1;
-    int		save_prev_at_start = prev_at_start;
+    పూర్ణాంకం		extra = 0;
+    పూర్ణాంకం		emit_range;
+    పూర్ణాంకం		negated;
+    పూర్ణాంకం		ఫలితం;
+    పూర్ణాంకం		startc = -1;
+    పూర్ణాంకం		save_prev_at_ప్రారంభం = prev_at_ప్రారంభం;
 
     c = getchr();
-    switch (c)
+    ఎంపిక (c)
     {
-	case NUL:
-	    EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
+	స్థితి NUL:
+	    EMSG_RET_FAIL(_(e_nfa_regexp_చివర_encountered_prematurely));
 
-	case Magic('^'):
+	స్థితి Magic('^'):
 	    EMIT(NFA_BOL);
-	    break;
+	    ఆపు;
 
-	case Magic('$'):
+	స్థితి Magic('$'):
 	    EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
-#endif
-	    break;
+#అయితే_ముగింపు
+	    ఆపు;
 
-	case Magic('<'):
+	స్థితి Magic('<'):
 	    EMIT(NFA_BOW);
-	    break;
+	    ఆపు;
 
-	case Magic('>'):
+	స్థితి Magic('>'):
 	    EMIT(NFA_EOW);
-	    break;
+	    ఆపు;
 
-	case Magic('_'):
+	స్థితి Magic('_'):
 	    c = no_Magic(getchr());
-	    if (c == NUL)
-		EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
+	    ఒకవేళ (c == NUL)
+		EMSG_RET_FAIL(_(e_nfa_regexp_చివర_encountered_prematurely));
 
-	    if (c == '^')	// "\_^" is start-of-line
+	    ఒకవేళ (c == '^')	// "\_^" is start-of-line
 	    {
 		EMIT(NFA_BOL);
-		break;
+		ఆపు;
 	    }
-	    if (c == '$')	// "\_$" is end-of-line
+	    ఒకవేళ (c == '$')	// "\_$" is end-of-line
 	    {
 		EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 		had_eol = TRUE;
-#endif
-		break;
+#అయితే_ముగింపు
+		ఆపు;
 	    }
 
-	    extra = NFA_ADD_NL;
+	    extra = NFA_కూడు_NL;
 
 	    // "\_[" is collection plus newline
-	    if (c == '[')
-		goto collection;
+	    ఒకవేళ (c == '[')
+		వెళ్ళు collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
@@ -1297,269 +1297,269 @@ nfa_regatom(void)
 	/*
 	 * Character classes.
 	 */
-	case Magic('.'):
-	case Magic('i'):
-	case Magic('I'):
-	case Magic('k'):
-	case Magic('K'):
-	case Magic('f'):
-	case Magic('F'):
-	case Magic('p'):
-	case Magic('P'):
-	case Magic('s'):
-	case Magic('S'):
-	case Magic('d'):
-	case Magic('D'):
-	case Magic('x'):
-	case Magic('X'):
-	case Magic('o'):
-	case Magic('O'):
-	case Magic('w'):
-	case Magic('W'):
-	case Magic('h'):
-	case Magic('H'):
-	case Magic('a'):
-	case Magic('A'):
-	case Magic('l'):
-	case Magic('L'):
-	case Magic('u'):
-	case Magic('U'):
+	స్థితి Magic('.'):
+	స్థితి Magic('i'):
+	స్థితి Magic('I'):
+	స్థితి Magic('k'):
+	స్థితి Magic('K'):
+	స్థితి Magic('f'):
+	స్థితి Magic('F'):
+	స్థితి Magic('p'):
+	స్థితి Magic('P'):
+	స్థితి Magic('s'):
+	స్థితి Magic('S'):
+	స్థితి Magic('d'):
+	స్థితి Magic('D'):
+	స్థితి Magic('x'):
+	స్థితి Magic('X'):
+	స్థితి Magic('o'):
+	స్థితి Magic('O'):
+	స్థితి Magic('w'):
+	స్థితి Magic('W'):
+	స్థితి Magic('h'):
+	స్థితి Magic('H'):
+	స్థితి Magic('a'):
+	స్థితి Magic('A'):
+	స్థితి Magic('l'):
+	స్థితి Magic('L'):
+	స్థితి Magic('u'):
+	స్థితి Magic('U'):
 	    p = vim_strchr(classchars, no_Magic(c));
-	    if (p == NULL)
+	    ఒకవేళ (p == ఖాళీ)
 	    {
-		if (extra == NFA_ADD_NL)
+		ఒకవేళ (extra == NFA_కూడు_NL)
 		{
 		    semsg(_(e_nfa_regexp_invalid_character_class_nr), c);
 		    rc_did_emsg = TRUE;
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 		siemsg("Unknown character class char: %d", c);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 
 	    // When '.' is followed by a composing char ignore the dot, so that
 	    // the composing char is matched here.
-	    if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	    ఒకవేళ (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	    {
 		old_regparse = regparse;
 		c = getchr();
-		goto nfa_do_multibyte;
+		వెళ్ళు nfa_do_multibyte;
 	    }
 	    EMIT(nfa_classcodes[p - classchars]);
-	    if (extra == NFA_ADD_NL)
+	    ఒకవేళ (extra == NFA_కూడు_NL)
 	    {
 		EMIT(NFA_NEWL);
 		EMIT(NFA_OR);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('n'):
-	    if (reg_string)
+	స్థితి Magic('n'):
+	    ఒకవేళ (reg_string)
 		// In a string "\n" matches a newline character.
 		EMIT(NL);
-	    else
+	    లేకపోతే
 	    {
 		// In buffer text "\n" matches the end of a line.
 		EMIT(NFA_NEWL);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('('):
-	    if (nfa_reg(REG_PAREN) == FAIL)
-		return FAIL;	    // cascaded error
-	    break;
+	స్థితి Magic('('):
+	    ఒకవేళ (nfa_reg(REG_PAREN) == FAIL)
+		తిరిగి FAIL;	    // cascaded error
+	    ఆపు;
 
-	case Magic('|'):
-	case Magic('&'):
-	case Magic(')'):
+	స్థితి Magic('|'):
+	స్థితి Magic('&'):
+	స్థితి Magic(')'):
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    తిరిగి FAIL;
 
-	case Magic('='):
-	case Magic('?'):
-	case Magic('+'):
-	case Magic('@'):
-	case Magic('*'):
-	case Magic('{'):
+	స్థితి Magic('='):
+	స్థితి Magic('?'):
+	స్థితి Magic('+'):
+	స్థితి Magic('@'):
+	స్థితి Magic('*'):
+	స్థితి Magic('{'):
 	    // these should follow an atom, not form an atom
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    తిరిగి FAIL;
 
-	case Magic('~'):
+	స్థితి Magic('~'):
 	    {
 		char_u	    *lp;
 
 		// Previous substitute pattern.
 		// Generated as "\%(pattern\)".
-		if (reg_prev_sub == NULL)
+		ఒకవేళ (reg_prev_sub == ఖాళీ)
 		{
-		    emsg(_(e_no_previous_substitute_regular_expression));
-		    return FAIL;
+		    emsg(_(e_no_మునుపటి_substitute_regular_వ్యక్తీకరణ));
+		    తిరిగి FAIL;
 		}
-		for (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
+		కొరకు (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
 		{
 		    EMIT(PTR2CHAR(lp));
-		    if (lp != reg_prev_sub)
+		    ఒకవేళ (lp != reg_prev_sub)
 			EMIT(NFA_CONCAT);
 		}
 		EMIT(NFA_NOPEN);
-		break;
+		ఆపు;
 	    }
 
-	case Magic('1'):
-	case Magic('2'):
-	case Magic('3'):
-	case Magic('4'):
-	case Magic('5'):
-	case Magic('6'):
-	case Magic('7'):
-	case Magic('8'):
-	case Magic('9'):
+	స్థితి Magic('1'):
+	స్థితి Magic('2'):
+	స్థితి Magic('3'):
+	స్థితి Magic('4'):
+	స్థితి Magic('5'):
+	స్థితి Magic('6'):
+	స్థితి Magic('7'):
+	స్థితి Magic('8'):
+	స్థితి Magic('9'):
 	    {
-		int refnum = no_Magic(c) - '1';
+		పూర్ణాంకం refnum = no_Magic(c) - '1';
 
-		if (!seen_endbrace(refnum + 1))
-		    return FAIL;
+		ఒకవేళ (!చూసిన_endbrace(refnum + 1))
+		    తిరిగి FAIL;
 		EMIT(NFA_BACKREF1 + refnum);
 		rex.nfa_has_backref = TRUE;
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('z'):
+	స్థితి Magic('z'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ఎంపిక (c)
 	    {
-		case 's':
+		స్థితి 's':
 		    EMIT(NFA_ZSTART);
-		    if (re_mult_next("\\zs") == FAIL)
-			return FAIL;
-		    break;
-		case 'e':
+		    ఒకవేళ (re_mult_తదుపరి("\\zs") == FAIL)
+			తిరిగి FAIL;
+		    ఆపు;
+		స్థితి 'e':
 		    EMIT(NFA_ZEND);
 		    rex.nfa_has_zend = TRUE;
-		    if (re_mult_next("\\ze") == FAIL)
-			return FAIL;
-		    break;
-#ifdef FEAT_SYN_HL
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+		    ఒకవేళ (re_mult_తదుపరి("\\ze") == FAIL)
+			తిరిగి FAIL;
+		    ఆపు;
+#నిర్వచితమైతే FEAT_SYN_HL
+		స్థితి '1':
+		స్థితి '2':
+		స్థితి '3':
+		స్థితి '4':
+		స్థితి '5':
+		స్థితి '6':
+		స్థితి '7':
+		స్థితి '8':
+		స్థితి '9':
 		    // \z1...\z9
-		    if ((reg_do_extmatch & REX_USE) == 0)
-			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_here));
+		    ఒకవేళ ((reg_do_extmatch & REX_USE) == 0)
+			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_ఇక్కడ));
 		    EMIT(NFA_ZREF1 + (no_Magic(c) - '1'));
 		    // No need to set rex.nfa_has_backref, the sub-matches don't
 		    // change when \z1 .. \z9 matches or not.
 		    re_has_z = REX_USE;
-		    break;
-		case '(':
+		    ఆపు;
+		స్థితి '(':
 		    // \z(
-		    if ((reg_do_extmatch & REX_SET) == 0)
-			EMSG_RET_FAIL(_(e_z_not_allowed_here));
-		    if (nfa_reg(REG_ZPAREN) == FAIL)
-			return FAIL;	    // cascaded error
-		    re_has_z = REX_SET;
-		    break;
-#endif
-		default:
+		    ఒకవేళ ((reg_do_extmatch & REX_సమితి) == 0)
+			EMSG_RET_FAIL(_(e_z_not_allowed_ఇక్కడ));
+		    ఒకవేళ (nfa_reg(REG_ZPAREN) == FAIL)
+			తిరిగి FAIL;	    // cascaded error
+		    re_has_z = REX_సమితి;
+		    ఆపు;
+#అయితే_ముగింపు
+		అప్రమేయ:
 		    semsg(_(e_nfa_regexp_unknown_operator_z_chr), no_Magic(c));
-		    return FAIL;
+		    తిరిగి FAIL;
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('%'):
+	స్థితి Magic('%'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ఎంపిక (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (nfa_reg(REG_NPAREN) == FAIL)
-			return FAIL;
+		స్థితి '(':
+		    ఒకవేళ (nfa_reg(REG_NPAREN) == FAIL)
+			తిరిగి FAIL;
 		    EMIT(NFA_NOPEN);
-		    break;
+		    ఆపు;
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		స్థితి 'd':   // %d123 decimal
+		స్థితి 'o':   // %o123 octal
+		స్థితి 'x':   // %xab hex 2
+		స్థితి 'u':   // %uabcd hex 4
+		స్థితి 'U':   // %U1234abcd hex 8
 		    {
 			vimlong_T nr;
 
-			switch (c)
+			ఎంపిక (c)
 			{
-			    case 'd': nr = getdecchrs(); break;
-			    case 'o': nr = getoctchrs(); break;
-			    case 'x': nr = gethexchrs(2); break;
-			    case 'u': nr = gethexchrs(4); break;
-			    case 'U': nr = gethexchrs(8); break;
-			    default:  nr = -1; break;
+			    స్థితి 'd': nr = getdecchrs(); ఆపు;
+			    స్థితి 'o': nr = getoctchrs(); ఆపు;
+			    స్థితి 'x': nr = gethexchrs(2); ఆపు;
+			    స్థితి 'u': nr = gethexchrs(4); ఆపు;
+			    స్థితి 'U': nr = gethexchrs(8); ఆపు;
+			    అప్రమేయ:  nr = -1; ఆపు;
 			}
 
-			if (nr < 0 || nr > INT_MAX)
+			ఒకవేళ (nr < 0 || nr > గరిష్ఠ_పూర్ణాంకం)
 			    EMSG2_RET_FAIL(_(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
 			// A NUL is stored in the text as NL
 			// TODO: what if a composing character follows?
-			EMIT(nr == 0 ? 0x0a : (long)nr);
+			EMIT(nr == 0 ? 0x0a : (దీర్ఘ)nr);
 		    }
-		    break;
+		    ఆపు;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		స్థితి '^':
 		    EMIT(NFA_BOF);
-		    break;
+		    ఆపు;
 
-		case '$':
+		స్థితి '$':
 		    EMIT(NFA_EOF);
-		    break;
+		    ఆపు;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		స్థితి '#':
+		    ఒకవేళ (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
-			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
+			semsg(_(e_atom_engine_must_be_at_ప్రారంభం_యొక్క_నమూనా),
 								  regparse[1]);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		    EMIT(NFA_CURSOR);
-		    break;
+		    ఆపు;
 
-		case 'V':
+		స్థితి 'V':
 		    EMIT(NFA_VISUAL);
-		    break;
+		    ఆపు;
 
-		case 'C':
+		స్థితి 'C':
 		    EMIT(NFA_ANY_COMPOSING);
-		    break;
+		    ఆపు;
 
-		case '[':
+		స్థితి '[':
 		    {
-			int	    n;
+			పూర్ణాంకం	    n;
 
 			// \%[abc]
-			for (n = 0; (c = peekchr()) != ']'; ++n)
+			కొరకు (n = 0; (c = peekchr()) != ']'; ++n)
 			{
-			    if (c == NUL)
+			    ఒకవేళ (c == NUL)
 				EMSG2_RET_FAIL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 			    // recursive call!
-			    if (nfa_regatom() == FAIL)
-				return FAIL;
+			    ఒకవేళ (nfa_regatom() == FAIL)
+				తిరిగి FAIL;
 			}
 			getchr();  // get the ]
-			if (n == 0)
-			    EMSG2_RET_FAIL(_(e_empty_str_brackets),
+			ఒకవేళ (n == 0)
+			    EMSG2_RET_FAIL(_(e_ఖాళీలు_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			EMIT(NFA_OPT_CHARS);
 			EMIT(n);
@@ -1572,115 +1572,115 @@ nfa_regatom(void)
 			// not allowing NFA_SPLIT multiple times, it is used
 			// a lot.
 			EMIT(NFA_NOPEN);
-			break;
+			ఆపు;
 		    }
 
-		default:
+		అప్రమేయ:
 		    {
 			long_u	n = 0;
-			int	cmp = c;
-			int	cur = FALSE;
-			int	got_digit = FALSE;
+			పూర్ణాంకం	cmp = c;
+			పూర్ణాంకం	cur = FALSE;
+			పూర్ణాంకం	got_digit = FALSE;
 
-			if (c == '<' || c == '>')
+			ఒకవేళ (c == '<' || c == '>')
 			    c = getchr();
-			if (no_Magic(c) == '.')
+			ఒకవేళ (no_Magic(c) == '.')
 			{
 			    cur = TRUE;
 			    c = getchr();
 			}
-			while (VIM_ISDIGIT(c))
+			అయితే (VIM_ISDIGIT(c))
 			{
 			    long_u tmp;
 
-			    if (cur)
+			    ఒకవేళ (cur)
 			    {
-				semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				semsg(_(e_regexp_సంఖ్య_after_dot_pos_శోధన_chr),
 								  no_Magic(c));
-				return FAIL;
+				తిరిగి FAIL;
 			    }
 			    tmp = n * 10 + (c - '0');
 
-			    if (tmp < n)
+			    ఒకవేళ (tmp < n)
 			    {
 				// overflow.
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_విలువ_too_large));
+				తిరిగి FAIL;
 			    }
 			    n = tmp;
 			    c = getchr();
 			    got_digit = TRUE;
 			}
-			if (c == 'l' || c == 'c' || c == 'v')
+			ఒకవేళ (c == 'l' || c == 'c' || c == 'v')
 			{
-			    long_u limit = INT_MAX;
+			    long_u హద్దు = గరిష్ఠ_పూర్ణాంకం;
 
-			    if (!cur && !got_digit)
+			    ఒకవేళ (!cur && !got_digit)
 			    {
-				semsg(_(e_nfa_regexp_missing_value_in_chr),
+				semsg(_(e_nfa_regexp_missing_విలువ_లోపల_chr),
 								  no_Magic(c));
-				return FAIL;
+				తిరిగి FAIL;
 			    }
-			    if (c == 'l')
+			    ఒకవేళ (c == 'l')
 			    {
-				if (cur)
+				ఒకవేళ (cur)
 				    n = curwin->w_cursor.lnum;
 				// \%{n}l  \%{n}<l  \%{n}>l
 				EMIT(cmp == '<' ? NFA_LNUM_LT :
 				     cmp == '>' ? NFA_LNUM_GT : NFA_LNUM);
-				if (save_prev_at_start)
-				    at_start = TRUE;
+				ఒకవేళ (save_prev_at_ప్రారంభం)
+				    at_ప్రారంభం = TRUE;
 			    }
-			    else if (c == 'c')
+			    లేకపోతే ఒకవేళ (c == 'c')
 			    {
-				if (cur)
+				ఒకవేళ (cur)
 				{
-				    n = curwin->w_cursor.col;
+				    n = curwin->w_cursor.నిలువు;
 				    n++;
 				}
 				// \%{n}c  \%{n}<c  \%{n}>c
-				EMIT(cmp == '<' ? NFA_COL_LT :
-				     cmp == '>' ? NFA_COL_GT : NFA_COL);
+				EMIT(cmp == '<' ? NFA_నిలువు_LT :
+				     cmp == '>' ? NFA_నిలువు_GT : NFA_నిలువు);
 			    }
-			    else
+			    లేకపోతే
 			    {
-				if (cur)
+				ఒకవేళ (cur)
 				{
 				    colnr_T vcol = 0;
 
 				    getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 ఖాళీ, ఖాళీ, &vcol, 0);
 				    n = ++vcol;
 				}
 				// \%{n}v  \%{n}<v  \%{n}>v
 				EMIT(cmp == '<' ? NFA_VCOL_LT :
 				     cmp == '>' ? NFA_VCOL_GT : NFA_VCOL);
-				limit = INT_MAX / MB_MAXBYTES;
+				హద్దు = గరిష్ఠ_పూర్ణాంకం / MB_MAXBYTES;
 			    }
-			    if (n >= limit)
+			    ఒకవేళ (n >= హద్దు)
 			    {
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_విలువ_too_large));
+				తిరిగి FAIL;
 			    }
-			    EMIT((int)n);
-			    break;
+			    EMIT((పూర్ణాంకం)n);
+			    ఆపు;
 			}
-			else if (no_Magic(c) == '\'' && n == 0)
+			లేకపోతే ఒకవేళ (no_Magic(c) == '\'' && n == 0)
 			{
 			    // \%'m  \%<'m  \%>'m
 			    EMIT(cmp == '<' ? NFA_MARK_LT :
 				 cmp == '>' ? NFA_MARK_GT : NFA_MARK);
 			    EMIT(getchr());
-			    break;
+			    ఆపు;
 			}
 		    }
 		    semsg(_(e_nfa_regexp_unknown_operator_percent_chr),
 								  no_Magic(c));
-		    return FAIL;
+		    తిరిగి FAIL;
 	    }
-	    break;
+	    ఆపు;
 
-	case Magic('['):
+	స్థితి Magic('['):
 collection:
 	    /*
 	     * [abc]  uses NFA_START_COLL - NFA_END_COLL
@@ -1694,30 +1694,30 @@ collection:
 
 	    p = regparse;
 	    endp = skip_anyof(p);
-	    if (*endp == ']')
+	    ఒకవేళ (*endp == ']')
 	    {
-		int plen;
+		పూర్ణాంకం plen;
 		bool range_endpoint;
 		/*
 		 * Try to reverse engineer character classes. For example,
 		 * recognize that [0-9] stands for \d and [A-Za-z_] for \h,
 		 * and perform the necessary substitutions in the NFA.
 		 */
-		result = nfa_recognize_char_class(regparse, endp,
-							 extra == NFA_ADD_NL);
-		if (result != FAIL)
+		ఫలితం = nfa_recognize_char_class(regparse, endp,
+							 extra == NFA_కూడు_NL);
+		ఒకవేళ (ఫలితం != FAIL)
 		{
-		    if (result >= NFA_FIRST_NL && result <= NFA_LAST_NL)
+		    ఒకవేళ (ఫలితం >= NFA_మొదటి_NL && ఫలితం <= NFA_చివరి_NL)
 		    {
-			EMIT(result - NFA_ADD_NL);
+			EMIT(ఫలితం - NFA_కూడు_NL);
 			EMIT(NFA_NEWL);
 			EMIT(NFA_OR);
 		    }
-		    else
-			EMIT(result);
+		    లేకపోతే
+			EMIT(ఫలితం);
 		    regparse = endp;
 		    MB_PTR_ADV(regparse);
-		    return OK;
+		    తిరిగి OK;
 		}
 		/*
 		 * Failed to recognize a character class. Use the simple
@@ -1725,15 +1725,15 @@ collection:
 		 */
 		startc = -1;
 		negated = FALSE;
-		if (*regparse == '^')			// negated range
+		ఒకవేళ (*regparse == '^')			// negated range
 		{
 		    negated = TRUE;
 		    MB_PTR_ADV(regparse);
-		    EMIT(NFA_START_NEG_COLL);
+		    EMIT(NFA_ప్రారంభం_NEG_COLL);
 		}
-		else
-		    EMIT(NFA_START_COLL);
-		if (*regparse == '-')
+		లేకపోతే
+		    EMIT(NFA_ప్రారంభం_COLL);
+		ఒకవేళ (*regparse == '-')
 		{
 		    startc = '-';
 		    EMIT(startc);
@@ -1742,106 +1742,106 @@ collection:
 		}
 		// Emit the OR branches for each character in the []
 		emit_range = FALSE;
-		while (regparse < endp)
+		అయితే (regparse < endp)
 		{
-		    int	    oldstartc = startc;
+		    పూర్ణాంకం	    oldstartc = startc;
 		    range_endpoint = false;
 
 		    startc = -1;
 		    got_coll_char = FALSE;
-		    if (*regparse == '[')
+		    ఒకవేళ (*regparse == '[')
 		    {
 			// Check for [: :], [= =], [. .]
 			equiclass = collclass = 0;
 			charclass = get_char_class(&regparse);
-			if (charclass == CLASS_NONE)
+			ఒకవేళ (charclass == CLASS_NONE)
 			{
 			    equiclass = get_equi_class(&regparse);
-			    if (equiclass == 0)
+			    ఒకవేళ (equiclass == 0)
 				collclass = get_coll_element(&regparse);
 			}
 
 			// Character class like [:alpha:]
-			if (charclass != CLASS_NONE)
+			ఒకవేళ (charclass != CLASS_NONE)
 			{
-			    switch (charclass)
+			    ఎంపిక (charclass)
 			    {
-				case CLASS_ALNUM:
+				స్థితి CLASS_ALNUM:
 				    EMIT(NFA_CLASS_ALNUM);
-				    break;
-				case CLASS_ALPHA:
+				    ఆపు;
+				స్థితి CLASS_ALPHA:
 				    EMIT(NFA_CLASS_ALPHA);
-				    break;
-				case CLASS_BLANK:
+				    ఆపు;
+				స్థితి CLASS_BLANK:
 				    EMIT(NFA_CLASS_BLANK);
-				    break;
-				case CLASS_CNTRL:
+				    ఆపు;
+				స్థితి CLASS_CNTRL:
 				    EMIT(NFA_CLASS_CNTRL);
-				    break;
-				case CLASS_DIGIT:
+				    ఆపు;
+				స్థితి CLASS_DIGIT:
 				    EMIT(NFA_CLASS_DIGIT);
-				    break;
-				case CLASS_GRAPH:
-				    EMIT(NFA_CLASS_GRAPH);
-				    break;
-				case CLASS_LOWER:
-				    wants_nfa = TRUE;
-				    EMIT(NFA_CLASS_LOWER);
-				    break;
-				case CLASS_PRINT:
+				    ఆపు;
+				స్థితి CLASS_లేఖాచిత్రం:
+				    EMIT(NFA_CLASS_లేఖాచిత్రం);
+				    ఆపు;
+				స్థితి CLASS_క్రింది:
+				    కోరుతుంది_nfa = TRUE;
+				    EMIT(NFA_CLASS_క్రింది);
+				    ఆపు;
+				స్థితి CLASS_PRINT:
 				    EMIT(NFA_CLASS_PRINT);
-				    break;
-				case CLASS_PUNCT:
+				    ఆపు;
+				స్థితి CLASS_PUNCT:
 				    EMIT(NFA_CLASS_PUNCT);
-				    break;
-				case CLASS_SPACE:
+				    ఆపు;
+				స్థితి CLASS_SPACE:
 				    EMIT(NFA_CLASS_SPACE);
-				    break;
-				case CLASS_UPPER:
-				    wants_nfa = TRUE;
-				    EMIT(NFA_CLASS_UPPER);
-				    break;
-				case CLASS_XDIGIT:
+				    ఆపు;
+				స్థితి CLASS_పై:
+				    కోరుతుంది_nfa = TRUE;
+				    EMIT(NFA_CLASS_పై);
+				    ఆపు;
+				స్థితి CLASS_XDIGIT:
 				    EMIT(NFA_CLASS_XDIGIT);
-				    break;
-				case CLASS_TAB:
+				    ఆపు;
+				స్థితి CLASS_TAB:
 				    EMIT(NFA_CLASS_TAB);
-				    break;
-				case CLASS_RETURN:
+				    ఆపు;
+				స్థితి CLASS_RETURN:
 				    EMIT(NFA_CLASS_RETURN);
-				    break;
-				case CLASS_BACKSPACE:
+				    ఆపు;
+				స్థితి CLASS_BACKSPACE:
 				    EMIT(NFA_CLASS_BACKSPACE);
-				    break;
-				case CLASS_ESCAPE:
+				    ఆపు;
+				స్థితి CLASS_ESCAPE:
 				    EMIT(NFA_CLASS_ESCAPE);
-				    break;
-				case CLASS_IDENT:
+				    ఆపు;
+				స్థితి CLASS_IDENT:
 				    EMIT(NFA_CLASS_IDENT);
-				    break;
-				case CLASS_KEYWORD:
+				    ఆపు;
+				స్థితి CLASS_KEYWORD:
 				    EMIT(NFA_CLASS_KEYWORD);
-				    break;
-				case CLASS_FNAME:
+				    ఆపు;
+				స్థితి CLASS_FNAME:
 				    EMIT(NFA_CLASS_FNAME);
-				    break;
+				    ఆపు;
 			    }
 			    EMIT(NFA_CONCAT);
-			    continue;
+			    కొనసాగు;
 			}
 			// Try equivalence class [=a=] and the like
-			if (equiclass != 0)
+			ఒకవేళ (equiclass != 0)
 			{
-			    result = nfa_emit_equi_class(equiclass);
-			    if (result == FAIL)
+			    ఫలితం = nfa_emit_equi_class(equiclass);
+			    ఒకవేళ (ఫలితం == FAIL)
 			    {
 				// should never happen
 				EMSG_RET_FAIL(_(e_error_building_nfa_with_equivalence_class));
 			    }
-			    continue;
+			    కొనసాగు;
 			}
 			// Try collating class like [. .]
-			if (collclass != 0)
+			ఒకవేళ (collclass != 0)
 			{
 			    startc = collclass;	 // allow [.a.]-x as a range
 			    // Will emit the proper atom at the end of the
@@ -1850,12 +1850,12 @@ collection:
 		    }
 		    // Try a range like 'a-x' or '\t-z'. Also allows '-' as a
 		    // start character.
-		    if (*regparse == '-' && oldstartc != -1)
+		    ఒకవేళ (*regparse == '-' && oldstartc != -1)
 		    {
 			emit_range = TRUE;
 			startc = oldstartc;
 			MB_PTR_ADV(regparse);
-			continue;	    // reading the end of the range
+			కొనసాగు;	    // reading the end of the range
 		    }
 
 		    // Now handle simple and escaped characters.
@@ -1863,22 +1863,22 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    if (*regparse == '\\'
+		    ఒకవేళ (*regparse == '\\'
 			    && !reg_cpo_bsl
 			    && regparse + 1 <= endp
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != ఖాళీ
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR, regparse[1])
-								      != NULL)
+								      != ఖాళీ)
 			    )
 			)
 		    {
 			MB_PTR_ADV(regparse);
 
-			if (*regparse == 'n')
+			ఒకవేళ (*regparse == 'n')
 			    startc = (reg_string || emit_range
 					|| regparse[1] == '-') ? NL : NFA_NEWL;
-			else if (*regparse == 'd'
+			లేకపోతే ఒకవేళ (*regparse == 'd'
 				    || *regparse == 'o'
 				    || *regparse == 'x'
 				    || *regparse == 'u'
@@ -1889,12 +1889,12 @@ collection:
 				startc = coll_get_char();
 				// max UTF-8 Codepoint is U+10FFFF,
 				// but allow values until INT_MAX
-				if (startc == INT_MAX)
+				ఒకవేళ (startc == గరిష్ఠ_పూర్ణాంకం)
 				    EMSG_RET_FAIL(_(e_unicode_val_too_large));
 				got_coll_char = TRUE;
-				MB_PTR_BACK(old_regparse, regparse);
+				MB_PTR_వెనుక(old_regparse, regparse);
 			    }
-			    else
+			    లేకపోతే
 			    {
 				// \r,\t,\e,\b
 				startc = backslash_trans(*regparse);
@@ -1902,49 +1902,49 @@ collection:
 		    }
 
 		    // Normal printable char
-		    if (startc == -1)
+		    ఒకవేళ (startc == -1)
 			startc = PTR2CHAR(regparse);
 
 		    // Previous char was '-', so this char is end of range.
-		    if (emit_range)
+		    ఒకవేళ (emit_range)
 		    {
-			int	endc = startc;
+			పూర్ణాంకం	endc = startc;
 			range_endpoint = true;
 
 			startc = oldstartc;
-			if (startc > endc)
-			    EMSG_RET_FAIL(_(e_reverse_range_in_character_class));
+			ఒకవేళ (startc > endc)
+			    EMSG_RET_FAIL(_(e_తిరగేయి_range_లోపల_character_class));
 
-			if (endc > startc + 2)
+			ఒకవేళ (endc > startc + 2)
 			{
 			    // Emit a range instead of the sequence of
 			    // individual characters.
-			    if (startc == 0)
+			    ఒకవేళ (startc == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    లేకపోతే
 				--post_ptr; // remove NFA_CONCAT
 			    EMIT(endc);
 			    EMIT(NFA_RANGE);
 			    EMIT(NFA_CONCAT);
 			}
-			else if (has_mbyte && ((*mb_char2len)(startc) > 1
+			లేకపోతే ఒకవేళ (has_mbyte && ((*mb_char2len)(startc) > 1
 				    || (*mb_char2len)(endc) > 1))
 			{
 			    // Emit the characters in the range.
 			    // "startc" was already emitted, so skip it.
 			    //
-			    for (c = startc + 1; c <= endc; c++)
+			    కొరకు (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
 			    }
 			}
-			else
+			లేకపోతే
 			{
 			    // Emit the range. "startc" was already emitted, so
 			    // skip it.
-			    for (c = startc + 1; c <= endc; c++)
+			    కొరకు (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
@@ -1953,7 +1953,7 @@ collection:
 			emit_range = FALSE;
 			startc = -1;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// This char (startc) is not part of a range. Just
 			// emit it.
@@ -1962,25 +1962,25 @@ collection:
 			// 0x0a.
 			// This is needed to completely mimic the behaviour of
 			// the backtracking engine.
-			if (startc == NFA_NEWL)
+			ఒకవేళ (startc == NFA_NEWL)
 			{
 			    // Line break can't be matched as part of the
 			    // collection, add an OR below. But not for negated
 			    // range.
-			    if (!negated)
-				extra = NFA_ADD_NL;
+			    ఒకవేళ (!negated)
+				extra = NFA_కూడు_NL;
 			}
-			else
+			లేకపోతే
 			{
-			    if (got_coll_char == TRUE && startc == 0)
+			    ఒకవేళ (got_coll_char == TRUE && startc == 0)
 			    {
 				EMIT(0x0a);
 				EMIT(NFA_CONCAT);
 			    }
-			    else
+			    లేకపోతే
 			    {
 				EMIT(startc);
-				if (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
+				ఒకవేళ (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
 				{
 				    EMIT(NFA_CONCAT);
 				}
@@ -1994,24 +1994,24 @@ collection:
 		    // codepoint; emitting the composing part again would duplicate the
 		    // character in the postfix stream and corrupt the NFA stack.
 		    //
-		    if (!range_endpoint && enc_utf8 &&
+		    ఒకవేళ (!range_endpoint && enc_utf8 &&
 			    (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse))))
 		    {
-			int i = utf_ptr2len(regparse);
+			పూర్ణాంకం i = utf_ptr2len(regparse);
 
 			c = utf_ptr2char(regparse + i);
 
 			// Add composing characters
-			for (;;)
+			కొరకు (;;)
 			{
-			    if (c == 0)
+			    ఒకవేళ (c == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    లేకపోతే
 				EMIT(c);
 			    EMIT(NFA_CONCAT);
-			    if ((i += utf_char2len(c)) >= plen)
-				break;
+			    ఒకవేళ ((i += utf_char2len(c)) >= plen)
+				ఆపు;
 			    c = utf_ptr2char(regparse + i);
 			}
 			EMIT(NFA_COMPOSING);
@@ -2020,8 +2020,8 @@ collection:
 		    MB_PTR_ADV(regparse);
 		} // while (p < endp)
 
-		MB_PTR_BACK(old_regparse, regparse);
-		if (*regparse == '-')	    // if last, '-' is just a char
+		MB_PTR_వెనుక(old_regparse, regparse);
+		ఒకవేళ (*regparse == '-')	    // if last, '-' is just a char
 		{
 		    EMIT('-');
 		    EMIT(NFA_CONCAT);
@@ -2032,36 +2032,36 @@ collection:
 		MB_PTR_ADV(regparse);
 
 		// Mark end of the collection.
-		if (negated == TRUE)
-		    EMIT(NFA_END_NEG_COLL);
-		else
-		    EMIT(NFA_END_COLL);
+		ఒకవేళ (negated == TRUE)
+		    EMIT(NFA_చివర_NEG_COLL);
+		లేకపోతే
+		    EMIT(NFA_చివర_COLL);
 
 		// \_[] also matches \n but it's not negated
-		if (extra == NFA_ADD_NL)
+		ఒకవేళ (extra == NFA_కూడు_NL)
 		{
 		    EMIT(reg_string ? NL : NFA_NEWL);
 		    EMIT(NFA_OR);
 		}
 
-		return OK;
+		తిరిగి OK;
 	    } // if exists closing ]
 
-	    if (reg_strict)
+	    ఒకవేళ (reg_strict)
 		EMSG_RET_FAIL(_(e_missing_rsb_after_str_lsb));
 	    // FALLTHROUGH
 
-	default:
+	అప్రమేయ:
 	    {
-		int	plen;
+		పూర్ణాంకం	plen;
 
 nfa_do_multibyte:
 		// plen is length of current char with composing chars
-		if (enc_utf8 && ((*mb_char2len)(c)
+		ఒకవేళ (enc_utf8 && ((*mb_char2len)(c)
 			    != (plen = utfc_ptr2len(old_regparse))
 						       || utf_iscomposing(c)))
 		{
-		    int i = 0;
+		    పూర్ణాంకం i = 0;
 
 		    // A base character plus composing characters, or just one
 		    // or more composing characters.
@@ -2071,28 +2071,28 @@ nfa_do_multibyte:
 		    // building the postfix form, not the NFA itself;
 		    // a composing char could be: a, b, c, NFA_COMPOSING
 		    // where 'b' and 'c' are chars with codes > 256.
-		    for (;;)
+		    కొరకు (;;)
 		    {
 			EMIT(c);
-			if (i > 0)
+			ఒకవేళ (i > 0)
 			    EMIT(NFA_CONCAT);
-			if ((i += utf_char2len(c)) >= plen)
-			    break;
+			ఒకవేళ ((i += utf_char2len(c)) >= plen)
+			    ఆపు;
 			c = utf_ptr2char(old_regparse + i);
 		    }
 		    EMIT(NFA_COMPOSING);
 		    regparse = old_regparse + plen;
 		}
-		else
+		లేకపోతే
 		{
 		    c = no_Magic(c);
 		    EMIT(c);
 		}
-		return OK;
+		తిరిగి OK;
 	    }
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2105,44 +2105,44 @@ nfa_do_multibyte:
  * piece   ::=	    atom
  *	or  atom  multi
  */
-    static int
-nfa_regpiece(void)
+    స్థిర పూర్ణాంకం
+nfa_regpiece(శూన్య)
 {
-    int		i;
-    int		op;
-    int		ret;
-    long	minval, maxval;
-    int		greedy = TRUE;      // Braces are prefixed with '-' ?
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		op;
+    పూర్ణాంకం		ret;
+    దీర్ఘ	minval, maxval;
+    పూర్ణాంకం		greedy = TRUE;      // Braces are prefixed with '-' ?
     parse_state_T old_state;
     parse_state_T new_state;
-    long	c2;
-    int		old_post_pos;
-    int		my_post_start;
-    int		quest;
+    దీర్ఘ	c2;
+    పూర్ణాంకం		old_post_pos;
+    పూర్ణాంకం		my_post_ప్రారంభం;
+    పూర్ణాంకం		quest;
 
     // Save the current parse state, so that we can use it if <atom>{m,n} is
     // next.
     save_parse_state(&old_state);
 
     // store current pos in the postfix form, for \{m,n} involving 0s
-    my_post_start = (int)(post_ptr - post_start);
+    my_post_ప్రారంభం = (పూర్ణాంకం)(post_ptr - post_ప్రారంభం);
 
     ret = nfa_regatom();
-    if (ret == FAIL)
-	return FAIL;	    // cascaded error
+    ఒకవేళ (ret == FAIL)
+	తిరిగి FAIL;	    // cascaded error
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
-	return OK;
+    ఒకవేళ (re_multi_type(op) == NOT_MULTI)
+	తిరిగి OK;
 
     skipchr();
-    switch (op)
+    ఎంపిక (op)
     {
-	case Magic('*'):
-	    EMIT(NFA_STAR);
-	    break;
+	స్థితి Magic('*'):
+	    EMIT(NFA_నక్షత్రం);
+	    ఆపు;
 
-	case Magic('+'):
+	స్థితి Magic('+'):
 	    /*
 	     * Trick: Normally, (a*)\+ would match the whole input "aaa".  The
 	     * first and only submatch would be "aaa". But the backtracking
@@ -2156,58 +2156,58 @@ nfa_regpiece(void)
 	     */
 	    restore_parse_state(&old_state);
 	    curchr = -1;
-	    if (nfa_regatom() == FAIL)
-		return FAIL;
-	    EMIT(NFA_STAR);
+	    ఒకవేళ (nfa_regatom() == FAIL)
+		తిరిగి FAIL;
+	    EMIT(NFA_నక్షత్రం);
 	    EMIT(NFA_CONCAT);
 	    skipchr();		// skip the \+
-	    break;
+	    ఆపు;
 
-	case Magic('@'):
-	    c2 = (long)getdecchrs();
+	స్థితి Magic('@'):
+	    c2 = (దీర్ఘ)getdecchrs();
 	    op = no_Magic(getchr());
 	    i = 0;
-	    switch(op)
+	    ఎంపిక(op)
 	    {
-		case '=':
+		స్థితి '=':
 		    // \@=
-		    i = NFA_PREV_ATOM_NO_WIDTH;
-		    break;
-		case '!':
+		    i = NFA_PREV_ATOM_NO_వెడల్పు;
+		    ఆపు;
+		స్థితి '!':
 		    // \@!
-		    i = NFA_PREV_ATOM_NO_WIDTH_NEG;
-		    break;
-		case '<':
+		    i = NFA_PREV_ATOM_NO_వెడల్పు_NEG;
+		    ఆపు;
+		స్థితి '<':
 		    op = no_Magic(getchr());
-		    if (op == '=')
+		    ఒకవేళ (op == '=')
 			// \@<=
 			i = NFA_PREV_ATOM_JUST_BEFORE;
-		    else if (op == '!')
+		    లేకపోతే ఒకవేళ (op == '!')
 			// \@<!
 			i = NFA_PREV_ATOM_JUST_BEFORE_NEG;
-		    break;
-		case '>':
+		    ఆపు;
+		స్థితి '>':
 		    // \@>
-		    i = NFA_PREV_ATOM_LIKE_PATTERN;
-		    break;
+		    i = NFA_PREV_ATOM_LIKE_నమూనా;
+		    ఆపు;
 	    }
-	    if (i == 0)
+	    ఒకవేళ (i == 0)
 	    {
 		semsg(_(e_nfa_regexp_unknown_operator_at_chr), op);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    EMIT(i);
-	    if (i == NFA_PREV_ATOM_JUST_BEFORE
+	    ఒకవేళ (i == NFA_PREV_ATOM_JUST_BEFORE
 					|| i == NFA_PREV_ATOM_JUST_BEFORE_NEG)
 		EMIT(c2);
-	    break;
+	    ఆపు;
 
-	case Magic('?'):
-	case Magic('='):
+	స్థితి Magic('?'):
+	స్థితి Magic('='):
 	    EMIT(NFA_QUEST);
-	    break;
+	    ఆపు;
 
-	case Magic('{'):
+	స్థితి Magic('{'):
 	    // a{2,5} will expand to 'aaa?a?a?'
 	    // a{-1,3} will expand to 'aa??a??', where ?? is the nongreedy
 	    // version of '?'
@@ -2216,35 +2216,35 @@ nfa_regpiece(void)
 
 	    greedy = TRUE;
 	    c2 = peekchr();
-	    if (c2 == '-' || c2 == Magic('-'))
+	    ఒకవేళ (c2 == '-' || c2 == Magic('-'))
 	    {
 		skipchr();
 		greedy = FALSE;
 	    }
-	    if (!read_limits(&minval, &maxval))
+	    ఒకవేళ (!read_limits(&minval, &maxval))
 		EMSG_RET_FAIL(_(e_nfa_regexp_error_reading_repetition_limits));
 
 	    //  <atom>{0,inf}, <atom>{0,} and <atom>{}  are equivalent to
 	    //  <atom>*
-	    if (minval == 0 && maxval == MAX_LIMIT)
+	    ఒకవేళ (minval == 0 && maxval == MAX_హద్దు)
 	    {
-		if (greedy)		// { { (match the braces)
+		ఒకవేళ (greedy)		// { { (match the braces)
 		    // \{}, \{0,}
-		    EMIT(NFA_STAR);
-		else			// { { (match the braces)
+		    EMIT(NFA_నక్షత్రం);
+		లేకపోతే			// { { (match the braces)
 		    // \{-}, \{-0,}
-		    EMIT(NFA_STAR_NONGREEDY);
-		break;
+		    EMIT(NFA_నక్షత్రం_NONGREEDY);
+		ఆపు;
 	    }
 
 	    // Special case: x{0} or x{-0}
-	    if (maxval == 0)
+	    ఒకవేళ (maxval == 0)
 	    {
 		// Ignore result of previous call to nfa_regatom()
-		post_ptr = post_start + my_post_start;
+		post_ptr = post_ప్రారంభం + my_post_ప్రారంభం;
 		// NFA_EMPTY is 0-length and works everywhere
-		EMIT(NFA_EMPTY);
-		return OK;
+		EMIT(NFA_ఖాళీలు);
+		తిరిగి OK;
 	    }
 
 	    // The engine is very inefficient (uses too many states) when the
@@ -2254,60 +2254,60 @@ nfa_regpiece(void)
 	    // Bail out if we can use the other engine, but only, when the
 	    // pattern does not need the NFA engine like (e.g. [[:upper:]]\{2,\}
 	    // does not work with characters > 8 bit with the BT engine)
-	    if ((nfa_re_flags & RE_AUTO)
+	    ఒకవేళ ((nfa_re_flags & RE_AUTO)
 				   && (maxval > 500 || maxval > minval + 200)
-				   && (maxval != MAX_LIMIT && minval < 200)
-				   && !wants_nfa)
-		return FAIL;
+				   && (maxval != MAX_హద్దు && minval < 200)
+				   && !కోరుతుంది_nfa)
+		తిరిగి FAIL;
 
 	    // Ignore previous call to nfa_regatom()
-	    post_ptr = post_start + my_post_start;
+	    post_ptr = post_ప్రారంభం + my_post_ప్రారంభం;
 	    // Save parse state after the repeated atom and the \{}
 	    save_parse_state(&new_state);
 
 	    quest = (greedy == TRUE? NFA_QUEST : NFA_QUEST_NONGREEDY);
-	    for (i = 0; i < maxval; i++)
+	    కొరకు (i = 0; i < maxval; i++)
 	    {
 		// Goto beginning of the repeated atom
 		restore_parse_state(&old_state);
-		old_post_pos = (int)(post_ptr - post_start);
-		if (nfa_regatom() == FAIL)
-		    return FAIL;
+		old_post_pos = (పూర్ణాంకం)(post_ptr - post_ప్రారంభం);
+		ఒకవేళ (nfa_regatom() == FAIL)
+		    తిరిగి FAIL;
 		// after "minval" times, atoms are optional
-		if (i + 1 > minval)
+		ఒకవేళ (i + 1 > minval)
 		{
-		    if (maxval == MAX_LIMIT)
+		    ఒకవేళ (maxval == MAX_హద్దు)
 		    {
-			if (greedy)
-			    EMIT(NFA_STAR);
-			else
-			    EMIT(NFA_STAR_NONGREEDY);
+			ఒకవేళ (greedy)
+			    EMIT(NFA_నక్షత్రం);
+			లేకపోతే
+			    EMIT(NFA_నక్షత్రం_NONGREEDY);
 		    }
-		    else
+		    లేకపోతే
 			EMIT(quest);
 		}
-		if (old_post_pos != my_post_start)
+		ఒకవేళ (old_post_pos != my_post_ప్రారంభం)
 		    EMIT(NFA_CONCAT);
-		if (i + 1 > minval && maxval == MAX_LIMIT)
-		    break;
+		ఒకవేళ (i + 1 > minval && maxval == MAX_హద్దు)
+		    ఆపు;
 	    }
 
 	    // Go to just after the repeated atom and the \{}
 	    restore_parse_state(&new_state);
 	    curchr = -1;
 
-	    break;
+	    ఆపు;
 
 
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
     }	// end switch
 
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    ఒకవేళ (re_multi_type(peekchr()) != NOT_MULTI)
 	// Can't have a multi follow a multi.
 	EMSG_RET_FAIL(_(e_nfa_regexp_cant_have_multi_follow_multi));
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2320,68 +2320,68 @@ nfa_regpiece(void)
  *	or  piece piece piece
  *	etc.
  */
-    static int
-nfa_regconcat(void)
+    స్థిర పూర్ణాంకం
+nfa_regconcat(శూన్య)
 {
-    int		cont = TRUE;
-    int		first = TRUE;
+    పూర్ణాంకం		cont = TRUE;
+    పూర్ణాంకం		మొదటి = TRUE;
 
-    while (cont)
+    అయితే (cont)
     {
-	switch (peekchr())
+	ఎంపిక (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    స్థితి NUL:
+	    స్థితి Magic('|'):
+	    స్థితి Magic('&'):
+	    స్థితి Magic(')'):
 		cont = FALSE;
-		break;
+		ఆపు;
 
-	    case Magic('Z'):
+	    స్థితి Magic('Z'):
 		regflags |= RF_ICOMBINE;
 		skipchr_keepstart();
-		break;
-	    case Magic('c'):
+		ఆపు;
+	    స్థితి Magic('c'):
 		regflags |= RF_ICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('C'):
+		ఆపు;
+	    స్థితి Magic('C'):
 		regflags |= RF_NOICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('v'):
+		ఆపు;
+	    స్థితి Magic('v'):
 		reg_magic = MAGIC_ALL;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('m'):
+		ఆపు;
+	    స్థితి Magic('m'):
 		reg_magic = MAGIC_ON;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('M'):
+		ఆపు;
+	    స్థితి Magic('M'):
 		reg_magic = MAGIC_OFF;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('V'):
+		ఆపు;
+	    స్థితి Magic('V'):
 		reg_magic = MAGIC_NONE;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
+		ఆపు;
 
-	    default:
-		if (nfa_regpiece() == FAIL)
-		    return FAIL;
-		if (first == FALSE)
+	    అప్రమేయ:
+		ఒకవేళ (nfa_regpiece() == FAIL)
+		    తిరిగి FAIL;
+		ఒకవేళ (మొదటి == FALSE)
 		    EMIT(NFA_CONCAT);
-		else
-		    first = FALSE;
-		break;
+		లేకపోతే
+		    మొదటి = FALSE;
+		ఆపు;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2396,40 +2396,40 @@ nfa_regconcat(void)
  *		or  concat \& concat \& concat
  *		etc.
  */
-    static int
-nfa_regbranch(void)
+    స్థిర పూర్ణాంకం
+nfa_regbranch(శూన్య)
 {
-    int		old_post_pos;
+    పూర్ణాంకం		old_post_pos;
 
-    old_post_pos = (int)(post_ptr - post_start);
+    old_post_pos = (పూర్ణాంకం)(post_ptr - post_ప్రారంభం);
 
     // First branch, possibly the only one
-    if (nfa_regconcat() == FAIL)
-	return FAIL;
+    ఒకవేళ (nfa_regconcat() == FAIL)
+	తిరిగి FAIL;
 
     // Try next concats
-    while (peekchr() == Magic('&'))
+    అయితే (peekchr() == Magic('&'))
     {
 	skipchr();
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
-	    EMIT(NFA_EMPTY);
+	ఒకవేళ (old_post_pos == (పూర్ణాంకం)(post_ptr - post_ప్రారంభం))
+	    EMIT(NFA_ఖాళీలు);
 	EMIT(NFA_NOPEN);
-	EMIT(NFA_PREV_ATOM_NO_WIDTH);
-	old_post_pos = (int)(post_ptr - post_start);
-	if (nfa_regconcat() == FAIL)
-	    return FAIL;
+	EMIT(NFA_PREV_ATOM_NO_వెడల్పు);
+	old_post_pos = (పూర్ణాంకం)(post_ptr - post_ప్రారంభం);
+	ఒకవేళ (nfa_regconcat() == FAIL)
+	    తిరిగి FAIL;
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
-	    EMIT(NFA_EMPTY);
+	ఒకవేళ (old_post_pos == (పూర్ణాంకం)(post_ptr - post_ప్రారంభం))
+	    EMIT(NFA_ఖాళీలు);
 	EMIT(NFA_CONCAT);
     }
 
     // if a branch is empty, emit one node for it
-    if (old_post_pos == (int)(post_ptr - post_start))
-	EMIT(NFA_EMPTY);
+    ఒకవేళ (old_post_pos == (పూర్ణాంకం)(post_ptr - post_ప్రారంభం))
+	EMIT(NFA_ఖాళీలు);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2443,353 +2443,353 @@ nfa_regbranch(void)
  *	or  branch \| branch \| branch
  *	etc.
  */
-    static int
+    స్థిర పూర్ణాంకం
 nfa_reg(
-    int		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    పూర్ణాంకం		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
 {
-    int		parno = 0;
-    int		status = FAIL;
+    పూర్ణాంకం		parno = 0;
+    పూర్ణాంకం		స్థితి_2 = FAIL;
 
-    if (paren == REG_PAREN)
+    ఒకవేళ (paren == REG_PAREN)
     {
-	if (regnpar >= NSUBEXP) // Too many `('
+	ఒకవేళ (regnpar >= NSUBEXP) // Too many `('
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_parens));
 	parno = regnpar++;
     }
-#ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+#నిర్వచితమైతే FEAT_SYN_HL
+    లేకపోతే ఒకవేళ (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	ఒకవేళ (regnzpar >= NSUBEXP)
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_z));
 	parno = regnzpar++;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    ఒకవేళ (nfa_reg_parse_లోతు >= REG_MAX_PAREN_లోతు)
 	EMSG_RET_FAIL(_(e_command_too_complex));
-    ++nfa_reg_parse_depth;
+    ++nfa_reg_parse_లోతు;
 
-    if (nfa_regbranch() == FAIL)
-	goto theend;	    // cascaded error
+    ఒకవేళ (nfa_regbranch() == FAIL)
+	వెళ్ళు theend;	    // cascaded error
 
-    while (peekchr() == Magic('|'))
+    అయితే (peekchr() == Magic('|'))
     {
 	skipchr();
-	if (nfa_regbranch() == FAIL)
-	    goto theend;    // cascaded error
+	ఒకవేళ (nfa_regbranch() == FAIL)
+	    వెళ్ళు theend;    // cascaded error
 	EMIT(NFA_OR);
     }
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    ఒకవేళ (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-	if (paren == REG_NPAREN)
+	ఒకవేళ (paren == REG_NPAREN)
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	లేకపోతే
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	rc_did_emsg = TRUE;
-	goto theend;
+	వెళ్ళు theend;
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    లేకపోతే ఒకవేళ (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (peekchr() == Magic(')'))
+	ఒకవేళ (peekchr() == Magic(')'))
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	లేకపోతే
 	    emsg(_(e_nfa_regexp_proper_termination_error));
 	rc_did_emsg = TRUE;
-	goto theend;
+	వెళ్ళు theend;
     }
     /*
      * Here we set the flag allowing back references to this set of
      * parentheses.
      */
-    if (paren == REG_PAREN)
+    ఒకవేళ (paren == REG_PAREN)
     {
 	had_endbrace[parno] = TRUE;     // have seen the close paren
 	EMIT(NFA_MOPEN + parno);
     }
-#ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+#నిర్వచితమైతే FEAT_SYN_HL
+    లేకపోతే ఒకవేళ (paren == REG_ZPAREN)
 	EMIT(NFA_ZOPEN + parno);
-#endif
+#అయితే_ముగింపు
 
-    status = OK;
+    స్థితి_2 = OK;
 
 theend:
-    --nfa_reg_parse_depth;
-    return status;
+    --nfa_reg_parse_లోతు;
+    తిరిగి స్థితి_2;
 }
 
-#ifdef DEBUG
-static char_u code[50];
+#నిర్వచితమైతే DEBUG
+స్థిర char_u సంకేతం_2[50];
 
-    static void
-nfa_set_code(int c)
+    స్థిర శూన్య
+nfa_సమితి_సంకేతం(పూర్ణాంకం c)
 {
-    int	    addnl = FALSE;
+    పూర్ణాంకం	    addnl = FALSE;
 
-    if (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
+    ఒకవేళ (c >= NFA_మొదటి_NL && c <= NFA_చివరి_NL)
     {
 	addnl = TRUE;
-	c -= NFA_ADD_NL;
+	c -= NFA_కూడు_NL;
     }
 
-    STRCPY(code, "");
-    switch (c)
+    STRCPY(సంకేతం_2, "");
+    ఎంపిక (c)
     {
-	case NFA_MATCH:	    STRCPY(code, "NFA_MATCH "); break;
-	case NFA_SPLIT:	    STRCPY(code, "NFA_SPLIT "); break;
-	case NFA_CONCAT:    STRCPY(code, "NFA_CONCAT "); break;
-	case NFA_NEWL:	    STRCPY(code, "NFA_NEWL "); break;
-	case NFA_ZSTART:    STRCPY(code, "NFA_ZSTART"); break;
-	case NFA_ZEND:	    STRCPY(code, "NFA_ZEND"); break;
+	స్థితి NFA_సరిపోలిక:	    STRCPY(సంకేతం_2, "NFA_MATCH "); ఆపు;
+	స్థితి NFA_విభజించు:	    STRCPY(సంకేతం_2, "NFA_SPLIT "); ఆపు;
+	స్థితి NFA_CONCAT:    STRCPY(సంకేతం_2, "NFA_CONCAT "); ఆపు;
+	స్థితి NFA_NEWL:	    STRCPY(సంకేతం_2, "NFA_NEWL "); ఆపు;
+	స్థితి NFA_ZSTART:    STRCPY(సంకేతం_2, "NFA_ZSTART"); ఆపు;
+	స్థితి NFA_ZEND:	    STRCPY(సంకేతం_2, "NFA_ZEND"); ఆపు;
 
-	case NFA_BACKREF1:  STRCPY(code, "NFA_BACKREF1"); break;
-	case NFA_BACKREF2:  STRCPY(code, "NFA_BACKREF2"); break;
-	case NFA_BACKREF3:  STRCPY(code, "NFA_BACKREF3"); break;
-	case NFA_BACKREF4:  STRCPY(code, "NFA_BACKREF4"); break;
-	case NFA_BACKREF5:  STRCPY(code, "NFA_BACKREF5"); break;
-	case NFA_BACKREF6:  STRCPY(code, "NFA_BACKREF6"); break;
-	case NFA_BACKREF7:  STRCPY(code, "NFA_BACKREF7"); break;
-	case NFA_BACKREF8:  STRCPY(code, "NFA_BACKREF8"); break;
-	case NFA_BACKREF9:  STRCPY(code, "NFA_BACKREF9"); break;
+	స్థితి NFA_BACKREF1:  STRCPY(సంకేతం_2, "NFA_BACKREF1"); ఆపు;
+	స్థితి NFA_BACKREF2:  STRCPY(సంకేతం_2, "NFA_BACKREF2"); ఆపు;
+	స్థితి NFA_BACKREF3:  STRCPY(సంకేతం_2, "NFA_BACKREF3"); ఆపు;
+	స్థితి NFA_BACKREF4:  STRCPY(సంకేతం_2, "NFA_BACKREF4"); ఆపు;
+	స్థితి NFA_BACKREF5:  STRCPY(సంకేతం_2, "NFA_BACKREF5"); ఆపు;
+	స్థితి NFA_BACKREF6:  STRCPY(సంకేతం_2, "NFA_BACKREF6"); ఆపు;
+	స్థితి NFA_BACKREF7:  STRCPY(సంకేతం_2, "NFA_BACKREF7"); ఆపు;
+	స్థితి NFA_BACKREF8:  STRCPY(సంకేతం_2, "NFA_BACKREF8"); ఆపు;
+	స్థితి NFA_BACKREF9:  STRCPY(సంకేతం_2, "NFA_BACKREF9"); ఆపు;
 # ifdef FEAT_SYN_HL
-	case NFA_ZREF1:	    STRCPY(code, "NFA_ZREF1"); break;
-	case NFA_ZREF2:	    STRCPY(code, "NFA_ZREF2"); break;
-	case NFA_ZREF3:	    STRCPY(code, "NFA_ZREF3"); break;
-	case NFA_ZREF4:	    STRCPY(code, "NFA_ZREF4"); break;
-	case NFA_ZREF5:	    STRCPY(code, "NFA_ZREF5"); break;
-	case NFA_ZREF6:	    STRCPY(code, "NFA_ZREF6"); break;
-	case NFA_ZREF7:	    STRCPY(code, "NFA_ZREF7"); break;
-	case NFA_ZREF8:	    STRCPY(code, "NFA_ZREF8"); break;
-	case NFA_ZREF9:	    STRCPY(code, "NFA_ZREF9"); break;
+	స్థితి NFA_ZREF1:	    STRCPY(సంకేతం_2, "NFA_ZREF1"); ఆపు;
+	స్థితి NFA_ZREF2:	    STRCPY(సంకేతం_2, "NFA_ZREF2"); ఆపు;
+	స్థితి NFA_ZREF3:	    STRCPY(సంకేతం_2, "NFA_ZREF3"); ఆపు;
+	స్థితి NFA_ZREF4:	    STRCPY(సంకేతం_2, "NFA_ZREF4"); ఆపు;
+	స్థితి NFA_ZREF5:	    STRCPY(సంకేతం_2, "NFA_ZREF5"); ఆపు;
+	స్థితి NFA_ZREF6:	    STRCPY(సంకేతం_2, "NFA_ZREF6"); ఆపు;
+	స్థితి NFA_ZREF7:	    STRCPY(సంకేతం_2, "NFA_ZREF7"); ఆపు;
+	స్థితి NFA_ZREF8:	    STRCPY(సంకేతం_2, "NFA_ZREF8"); ఆపు;
+	స్థితి NFA_ZREF9:	    STRCPY(సంకేతం_2, "NFA_ZREF9"); ఆపు;
 # endif
-	case NFA_SKIP:	    STRCPY(code, "NFA_SKIP"); break;
+	స్థితి NFA_SKIP:	    STRCPY(సంకేతం_2, "NFA_SKIP"); ఆపు;
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH"); break;
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH_NEG"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE:
-			    STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-			 STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); break;
-	case NFA_PREV_ATOM_LIKE_PATTERN:
-			    STRCPY(code, "NFA_PREV_ATOM_LIKE_PATTERN"); break;
+	స్థితి NFA_PREV_ATOM_NO_వెడల్పు:
+			    STRCPY(సంకేతం_2, "NFA_PREV_ATOM_NO_WIDTH"); ఆపు;
+	స్థితి NFA_PREV_ATOM_NO_వెడల్పు_NEG:
+			    STRCPY(సంకేతం_2, "NFA_PREV_ATOM_NO_WIDTH_NEG"); ఆపు;
+	స్థితి NFA_PREV_ATOM_JUST_BEFORE:
+			    STRCPY(సంకేతం_2, "NFA_PREV_ATOM_JUST_BEFORE"); ఆపు;
+	స్థితి NFA_PREV_ATOM_JUST_BEFORE_NEG:
+			 STRCPY(సంకేతం_2, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); ఆపు;
+	స్థితి NFA_PREV_ATOM_LIKE_నమూనా:
+			    STRCPY(సంకేతం_2, "NFA_PREV_ATOM_LIKE_PATTERN"); ఆపు;
 
-	case NFA_NOPEN:		    STRCPY(code, "NFA_NOPEN"); break;
-	case NFA_NCLOSE:	    STRCPY(code, "NFA_NCLOSE"); break;
-	case NFA_START_INVISIBLE:   STRCPY(code, "NFA_START_INVISIBLE"); break;
-	case NFA_START_INVISIBLE_FIRST:
-			     STRCPY(code, "NFA_START_INVISIBLE_FIRST"); break;
-	case NFA_START_INVISIBLE_NEG:
-			       STRCPY(code, "NFA_START_INVISIBLE_NEG"); break;
-	case NFA_START_INVISIBLE_NEG_FIRST:
-			 STRCPY(code, "NFA_START_INVISIBLE_NEG_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE:
-			    STRCPY(code, "NFA_START_INVISIBLE_BEFORE"); break;
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-		      STRCPY(code, "NFA_START_INVISIBLE_BEFORE_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-			STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-		  STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); break;
-	case NFA_START_PATTERN:   STRCPY(code, "NFA_START_PATTERN"); break;
-	case NFA_END_INVISIBLE:	    STRCPY(code, "NFA_END_INVISIBLE"); break;
-	case NFA_END_INVISIBLE_NEG: STRCPY(code, "NFA_END_INVISIBLE_NEG"); break;
-	case NFA_END_PATTERN:	    STRCPY(code, "NFA_END_PATTERN"); break;
+	స్థితి NFA_NOPEN:		    STRCPY(సంకేతం_2, "NFA_NOPEN"); ఆపు;
+	స్థితి NFA_NCLOSE:	    STRCPY(సంకేతం_2, "NFA_NCLOSE"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE:   STRCPY(సంకేతం_2, "NFA_START_INVISIBLE"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_మొదటి:
+			     STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_FIRST"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_NEG:
+			       STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_NEG"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి:
+			 STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_NEG_FIRST"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE:
+			    STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_BEFORE"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి:
+		      STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_BEFORE_FIRST"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG:
+			STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_BEFORE_NEG"); ఆపు;
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి:
+		  STRCPY(సంకేతం_2, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); ఆపు;
+	స్థితి NFA_ప్రారంభం_నమూనా:   STRCPY(సంకేతం_2, "NFA_START_PATTERN"); ఆపు;
+	స్థితి NFA_చివర_INVISIBLE:	    STRCPY(సంకేతం_2, "NFA_END_INVISIBLE"); ఆపు;
+	స్థితి NFA_చివర_INVISIBLE_NEG: STRCPY(సంకేతం_2, "NFA_END_INVISIBLE_NEG"); ఆపు;
+	స్థితి NFA_చివర_నమూనా:	    STRCPY(సంకేతం_2, "NFA_END_PATTERN"); ఆపు;
 
-	case NFA_COMPOSING:	    STRCPY(code, "NFA_COMPOSING"); break;
-	case NFA_END_COMPOSING:	    STRCPY(code, "NFA_END_COMPOSING"); break;
-	case NFA_OPT_CHARS:	    STRCPY(code, "NFA_OPT_CHARS"); break;
+	స్థితి NFA_COMPOSING:	    STRCPY(సంకేతం_2, "NFA_COMPOSING"); ఆపు;
+	స్థితి NFA_చివర_COMPOSING:	    STRCPY(సంకేతం_2, "NFA_END_COMPOSING"); ఆపు;
+	స్థితి NFA_OPT_CHARS:	    STRCPY(సంకేతం_2, "NFA_OPT_CHARS"); ఆపు;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-	    STRCPY(code, "NFA_MOPEN(x)");
-	    code[10] = c - NFA_MOPEN + '0';
-	    break;
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-	    STRCPY(code, "NFA_MCLOSE(x)");
-	    code[11] = c - NFA_MCLOSE + '0';
-	    break;
+	స్థితి NFA_MOPEN:
+	స్థితి NFA_MOPEN1:
+	స్థితి NFA_MOPEN2:
+	స్థితి NFA_MOPEN3:
+	స్థితి NFA_MOPEN4:
+	స్థితి NFA_MOPEN5:
+	స్థితి NFA_MOPEN6:
+	స్థితి NFA_MOPEN7:
+	స్థితి NFA_MOPEN8:
+	స్థితి NFA_MOPEN9:
+	    STRCPY(సంకేతం_2, "NFA_MOPEN(x)");
+	    సంకేతం_2[10] = c - NFA_MOPEN + '0';
+	    ఆపు;
+	స్థితి NFA_MCLOSE:
+	స్థితి NFA_MCLOSE1:
+	స్థితి NFA_MCLOSE2:
+	స్థితి NFA_MCLOSE3:
+	స్థితి NFA_MCLOSE4:
+	స్థితి NFA_MCLOSE5:
+	స్థితి NFA_MCLOSE6:
+	స్థితి NFA_MCLOSE7:
+	స్థితి NFA_MCLOSE8:
+	స్థితి NFA_MCLOSE9:
+	    STRCPY(సంకేతం_2, "NFA_MCLOSE(x)");
+	    సంకేతం_2[11] = c - NFA_MCLOSE + '0';
+	    ఆపు;
 # ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-	    STRCPY(code, "NFA_ZOPEN(x)");
-	    code[10] = c - NFA_ZOPEN + '0';
-	    break;
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-	    STRCPY(code, "NFA_ZCLOSE(x)");
-	    code[11] = c - NFA_ZCLOSE + '0';
-	    break;
+	స్థితి NFA_ZOPEN:
+	స్థితి NFA_ZOPEN1:
+	స్థితి NFA_ZOPEN2:
+	స్థితి NFA_ZOPEN3:
+	స్థితి NFA_ZOPEN4:
+	స్థితి NFA_ZOPEN5:
+	స్థితి NFA_ZOPEN6:
+	స్థితి NFA_ZOPEN7:
+	స్థితి NFA_ZOPEN8:
+	స్థితి NFA_ZOPEN9:
+	    STRCPY(సంకేతం_2, "NFA_ZOPEN(x)");
+	    సంకేతం_2[10] = c - NFA_ZOPEN + '0';
+	    ఆపు;
+	స్థితి NFA_ZCLOSE:
+	స్థితి NFA_ZCLOSE1:
+	స్థితి NFA_ZCLOSE2:
+	స్థితి NFA_ZCLOSE3:
+	స్థితి NFA_ZCLOSE4:
+	స్థితి NFA_ZCLOSE5:
+	స్థితి NFA_ZCLOSE6:
+	స్థితి NFA_ZCLOSE7:
+	స్థితి NFA_ZCLOSE8:
+	స్థితి NFA_ZCLOSE9:
+	    STRCPY(సంకేతం_2, "NFA_ZCLOSE(x)");
+	    సంకేతం_2[11] = c - NFA_ZCLOSE + '0';
+	    ఆపు;
 # endif
-	case NFA_EOL:		STRCPY(code, "NFA_EOL "); break;
-	case NFA_BOL:		STRCPY(code, "NFA_BOL "); break;
-	case NFA_EOW:		STRCPY(code, "NFA_EOW "); break;
-	case NFA_BOW:		STRCPY(code, "NFA_BOW "); break;
-	case NFA_EOF:		STRCPY(code, "NFA_EOF "); break;
-	case NFA_BOF:		STRCPY(code, "NFA_BOF "); break;
-	case NFA_LNUM:		STRCPY(code, "NFA_LNUM "); break;
-	case NFA_LNUM_GT:	STRCPY(code, "NFA_LNUM_GT "); break;
-	case NFA_LNUM_LT:	STRCPY(code, "NFA_LNUM_LT "); break;
-	case NFA_COL:		STRCPY(code, "NFA_COL "); break;
-	case NFA_COL_GT:	STRCPY(code, "NFA_COL_GT "); break;
-	case NFA_COL_LT:	STRCPY(code, "NFA_COL_LT "); break;
-	case NFA_VCOL:		STRCPY(code, "NFA_VCOL "); break;
-	case NFA_VCOL_GT:	STRCPY(code, "NFA_VCOL_GT "); break;
-	case NFA_VCOL_LT:	STRCPY(code, "NFA_VCOL_LT "); break;
-	case NFA_MARK:		STRCPY(code, "NFA_MARK "); break;
-	case NFA_MARK_GT:	STRCPY(code, "NFA_MARK_GT "); break;
-	case NFA_MARK_LT:	STRCPY(code, "NFA_MARK_LT "); break;
-	case NFA_CURSOR:	STRCPY(code, "NFA_CURSOR "); break;
-	case NFA_VISUAL:	STRCPY(code, "NFA_VISUAL "); break;
-	case NFA_ANY_COMPOSING:	STRCPY(code, "NFA_ANY_COMPOSING "); break;
+	స్థితి NFA_EOL:		STRCPY(సంకేతం_2, "NFA_EOL "); ఆపు;
+	స్థితి NFA_BOL:		STRCPY(సంకేతం_2, "NFA_BOL "); ఆపు;
+	స్థితి NFA_EOW:		STRCPY(సంకేతం_2, "NFA_EOW "); ఆపు;
+	స్థితి NFA_BOW:		STRCPY(సంకేతం_2, "NFA_BOW "); ఆపు;
+	స్థితి NFA_EOF:		STRCPY(సంకేతం_2, "NFA_EOF "); ఆపు;
+	స్థితి NFA_BOF:		STRCPY(సంకేతం_2, "NFA_BOF "); ఆపు;
+	స్థితి NFA_LNUM:		STRCPY(సంకేతం_2, "NFA_LNUM "); ఆపు;
+	స్థితి NFA_LNUM_GT:	STRCPY(సంకేతం_2, "NFA_LNUM_GT "); ఆపు;
+	స్థితి NFA_LNUM_LT:	STRCPY(సంకేతం_2, "NFA_LNUM_LT "); ఆపు;
+	స్థితి NFA_నిలువు:		STRCPY(సంకేతం_2, "NFA_COL "); ఆపు;
+	స్థితి NFA_నిలువు_GT:	STRCPY(సంకేతం_2, "NFA_COL_GT "); ఆపు;
+	స్థితి NFA_నిలువు_LT:	STRCPY(సంకేతం_2, "NFA_COL_LT "); ఆపు;
+	స్థితి NFA_VCOL:		STRCPY(సంకేతం_2, "NFA_VCOL "); ఆపు;
+	స్థితి NFA_VCOL_GT:	STRCPY(సంకేతం_2, "NFA_VCOL_GT "); ఆపు;
+	స్థితి NFA_VCOL_LT:	STRCPY(సంకేతం_2, "NFA_VCOL_LT "); ఆపు;
+	స్థితి NFA_MARK:		STRCPY(సంకేతం_2, "NFA_MARK "); ఆపు;
+	స్థితి NFA_MARK_GT:	STRCPY(సంకేతం_2, "NFA_MARK_GT "); ఆపు;
+	స్థితి NFA_MARK_LT:	STRCPY(సంకేతం_2, "NFA_MARK_LT "); ఆపు;
+	స్థితి NFA_CURSOR:	STRCPY(సంకేతం_2, "NFA_CURSOR "); ఆపు;
+	స్థితి NFA_VISUAL:	STRCPY(సంకేతం_2, "NFA_VISUAL "); ఆపు;
+	స్థితి NFA_ANY_COMPOSING:	STRCPY(సంకేతం_2, "NFA_ANY_COMPOSING "); ఆపు;
 
-	case NFA_STAR:		STRCPY(code, "NFA_STAR "); break;
-	case NFA_STAR_NONGREEDY: STRCPY(code, "NFA_STAR_NONGREEDY "); break;
-	case NFA_QUEST:		STRCPY(code, "NFA_QUEST"); break;
-	case NFA_QUEST_NONGREEDY: STRCPY(code, "NFA_QUEST_NON_GREEDY"); break;
-	case NFA_EMPTY:		STRCPY(code, "NFA_EMPTY"); break;
-	case NFA_OR:		STRCPY(code, "NFA_OR"); break;
+	స్థితి NFA_నక్షత్రం:		STRCPY(సంకేతం_2, "NFA_STAR "); ఆపు;
+	స్థితి NFA_నక్షత్రం_NONGREEDY: STRCPY(సంకేతం_2, "NFA_STAR_NONGREEDY "); ఆపు;
+	స్థితి NFA_QUEST:		STRCPY(సంకేతం_2, "NFA_QUEST"); ఆపు;
+	స్థితి NFA_QUEST_NONGREEDY: STRCPY(సంకేతం_2, "NFA_QUEST_NON_GREEDY"); ఆపు;
+	స్థితి NFA_ఖాళీలు:		STRCPY(సంకేతం_2, "NFA_EMPTY"); ఆపు;
+	స్థితి NFA_OR:		STRCPY(సంకేతం_2, "NFA_OR"); ఆపు;
 
-	case NFA_START_COLL:	STRCPY(code, "NFA_START_COLL"); break;
-	case NFA_END_COLL:	STRCPY(code, "NFA_END_COLL"); break;
-	case NFA_START_NEG_COLL: STRCPY(code, "NFA_START_NEG_COLL"); break;
-	case NFA_END_NEG_COLL:	STRCPY(code, "NFA_END_NEG_COLL"); break;
-	case NFA_RANGE:		STRCPY(code, "NFA_RANGE"); break;
-	case NFA_RANGE_MIN:	STRCPY(code, "NFA_RANGE_MIN"); break;
-	case NFA_RANGE_MAX:	STRCPY(code, "NFA_RANGE_MAX"); break;
+	స్థితి NFA_ప్రారంభం_COLL:	STRCPY(సంకేతం_2, "NFA_START_COLL"); ఆపు;
+	స్థితి NFA_చివర_COLL:	STRCPY(సంకేతం_2, "NFA_END_COLL"); ఆపు;
+	స్థితి NFA_ప్రారంభం_NEG_COLL: STRCPY(సంకేతం_2, "NFA_START_NEG_COLL"); ఆపు;
+	స్థితి NFA_చివర_NEG_COLL:	STRCPY(సంకేతం_2, "NFA_END_NEG_COLL"); ఆపు;
+	స్థితి NFA_RANGE:		STRCPY(సంకేతం_2, "NFA_RANGE"); ఆపు;
+	స్థితి NFA_RANGE_MIN:	STRCPY(సంకేతం_2, "NFA_RANGE_MIN"); ఆపు;
+	స్థితి NFA_RANGE_MAX:	STRCPY(సంకేతం_2, "NFA_RANGE_MAX"); ఆపు;
 
-	case NFA_CLASS_ALNUM:	STRCPY(code, "NFA_CLASS_ALNUM"); break;
-	case NFA_CLASS_ALPHA:	STRCPY(code, "NFA_CLASS_ALPHA"); break;
-	case NFA_CLASS_BLANK:	STRCPY(code, "NFA_CLASS_BLANK"); break;
-	case NFA_CLASS_CNTRL:	STRCPY(code, "NFA_CLASS_CNTRL"); break;
-	case NFA_CLASS_DIGIT:	STRCPY(code, "NFA_CLASS_DIGIT"); break;
-	case NFA_CLASS_GRAPH:	STRCPY(code, "NFA_CLASS_GRAPH"); break;
-	case NFA_CLASS_LOWER:	STRCPY(code, "NFA_CLASS_LOWER"); break;
-	case NFA_CLASS_PRINT:	STRCPY(code, "NFA_CLASS_PRINT"); break;
-	case NFA_CLASS_PUNCT:	STRCPY(code, "NFA_CLASS_PUNCT"); break;
-	case NFA_CLASS_SPACE:	STRCPY(code, "NFA_CLASS_SPACE"); break;
-	case NFA_CLASS_UPPER:	STRCPY(code, "NFA_CLASS_UPPER"); break;
-	case NFA_CLASS_XDIGIT:	STRCPY(code, "NFA_CLASS_XDIGIT"); break;
-	case NFA_CLASS_TAB:	STRCPY(code, "NFA_CLASS_TAB"); break;
-	case NFA_CLASS_RETURN:	STRCPY(code, "NFA_CLASS_RETURN"); break;
-	case NFA_CLASS_BACKSPACE:   STRCPY(code, "NFA_CLASS_BACKSPACE"); break;
-	case NFA_CLASS_ESCAPE:	STRCPY(code, "NFA_CLASS_ESCAPE"); break;
-	case NFA_CLASS_IDENT:	STRCPY(code, "NFA_CLASS_IDENT"); break;
-	case NFA_CLASS_KEYWORD:	STRCPY(code, "NFA_CLASS_KEYWORD"); break;
-	case NFA_CLASS_FNAME:	STRCPY(code, "NFA_CLASS_FNAME"); break;
+	స్థితి NFA_CLASS_ALNUM:	STRCPY(సంకేతం_2, "NFA_CLASS_ALNUM"); ఆపు;
+	స్థితి NFA_CLASS_ALPHA:	STRCPY(సంకేతం_2, "NFA_CLASS_ALPHA"); ఆపు;
+	స్థితి NFA_CLASS_BLANK:	STRCPY(సంకేతం_2, "NFA_CLASS_BLANK"); ఆపు;
+	స్థితి NFA_CLASS_CNTRL:	STRCPY(సంకేతం_2, "NFA_CLASS_CNTRL"); ఆపు;
+	స్థితి NFA_CLASS_DIGIT:	STRCPY(సంకేతం_2, "NFA_CLASS_DIGIT"); ఆపు;
+	స్థితి NFA_CLASS_లేఖాచిత్రం:	STRCPY(సంకేతం_2, "NFA_CLASS_GRAPH"); ఆపు;
+	స్థితి NFA_CLASS_క్రింది:	STRCPY(సంకేతం_2, "NFA_CLASS_LOWER"); ఆపు;
+	స్థితి NFA_CLASS_PRINT:	STRCPY(సంకేతం_2, "NFA_CLASS_PRINT"); ఆపు;
+	స్థితి NFA_CLASS_PUNCT:	STRCPY(సంకేతం_2, "NFA_CLASS_PUNCT"); ఆపు;
+	స్థితి NFA_CLASS_SPACE:	STRCPY(సంకేతం_2, "NFA_CLASS_SPACE"); ఆపు;
+	స్థితి NFA_CLASS_పై:	STRCPY(సంకేతం_2, "NFA_CLASS_UPPER"); ఆపు;
+	స్థితి NFA_CLASS_XDIGIT:	STRCPY(సంకేతం_2, "NFA_CLASS_XDIGIT"); ఆపు;
+	స్థితి NFA_CLASS_TAB:	STRCPY(సంకేతం_2, "NFA_CLASS_TAB"); ఆపు;
+	స్థితి NFA_CLASS_RETURN:	STRCPY(సంకేతం_2, "NFA_CLASS_RETURN"); ఆపు;
+	స్థితి NFA_CLASS_BACKSPACE:   STRCPY(సంకేతం_2, "NFA_CLASS_BACKSPACE"); ఆపు;
+	స్థితి NFA_CLASS_ESCAPE:	STRCPY(సంకేతం_2, "NFA_CLASS_ESCAPE"); ఆపు;
+	స్థితి NFA_CLASS_IDENT:	STRCPY(సంకేతం_2, "NFA_CLASS_IDENT"); ఆపు;
+	స్థితి NFA_CLASS_KEYWORD:	STRCPY(సంకేతం_2, "NFA_CLASS_KEYWORD"); ఆపు;
+	స్థితి NFA_CLASS_FNAME:	STRCPY(సంకేతం_2, "NFA_CLASS_FNAME"); ఆపు;
 
-	case NFA_ANY:	STRCPY(code, "NFA_ANY"); break;
-	case NFA_IDENT:	STRCPY(code, "NFA_IDENT"); break;
-	case NFA_SIDENT:STRCPY(code, "NFA_SIDENT"); break;
-	case NFA_KWORD:	STRCPY(code, "NFA_KWORD"); break;
-	case NFA_SKWORD:STRCPY(code, "NFA_SKWORD"); break;
-	case NFA_FNAME:	STRCPY(code, "NFA_FNAME"); break;
-	case NFA_SFNAME:STRCPY(code, "NFA_SFNAME"); break;
-	case NFA_PRINT:	STRCPY(code, "NFA_PRINT"); break;
-	case NFA_SPRINT:STRCPY(code, "NFA_SPRINT"); break;
-	case NFA_WHITE:	STRCPY(code, "NFA_WHITE"); break;
-	case NFA_NWHITE:STRCPY(code, "NFA_NWHITE"); break;
-	case NFA_DIGIT:	STRCPY(code, "NFA_DIGIT"); break;
-	case NFA_NDIGIT:STRCPY(code, "NFA_NDIGIT"); break;
-	case NFA_HEX:	STRCPY(code, "NFA_HEX"); break;
-	case NFA_NHEX:	STRCPY(code, "NFA_NHEX"); break;
-	case NFA_OCTAL:	STRCPY(code, "NFA_OCTAL"); break;
-	case NFA_NOCTAL:STRCPY(code, "NFA_NOCTAL"); break;
-	case NFA_WORD:	STRCPY(code, "NFA_WORD"); break;
-	case NFA_NWORD:	STRCPY(code, "NFA_NWORD"); break;
-	case NFA_HEAD:	STRCPY(code, "NFA_HEAD"); break;
-	case NFA_NHEAD:	STRCPY(code, "NFA_NHEAD"); break;
-	case NFA_ALPHA:	STRCPY(code, "NFA_ALPHA"); break;
-	case NFA_NALPHA:STRCPY(code, "NFA_NALPHA"); break;
-	case NFA_LOWER:	STRCPY(code, "NFA_LOWER"); break;
-	case NFA_NLOWER:STRCPY(code, "NFA_NLOWER"); break;
-	case NFA_UPPER:	STRCPY(code, "NFA_UPPER"); break;
-	case NFA_NUPPER:STRCPY(code, "NFA_NUPPER"); break;
-	case NFA_LOWER_IC:  STRCPY(code, "NFA_LOWER_IC"); break;
-	case NFA_NLOWER_IC: STRCPY(code, "NFA_NLOWER_IC"); break;
-	case NFA_UPPER_IC:  STRCPY(code, "NFA_UPPER_IC"); break;
-	case NFA_NUPPER_IC: STRCPY(code, "NFA_NUPPER_IC"); break;
+	స్థితి NFA_ANY:	STRCPY(సంకేతం_2, "NFA_ANY"); ఆపు;
+	స్థితి NFA_IDENT:	STRCPY(సంకేతం_2, "NFA_IDENT"); ఆపు;
+	స్థితి NFA_SIDENT:STRCPY(సంకేతం_2, "NFA_SIDENT"); ఆపు;
+	స్థితి NFA_KWORD:	STRCPY(సంకేతం_2, "NFA_KWORD"); ఆపు;
+	స్థితి NFA_SKWORD:STRCPY(సంకేతం_2, "NFA_SKWORD"); ఆపు;
+	స్థితి NFA_FNAME:	STRCPY(సంకేతం_2, "NFA_FNAME"); ఆపు;
+	స్థితి NFA_SFNAME:STRCPY(సంకేతం_2, "NFA_SFNAME"); ఆపు;
+	స్థితి NFA_PRINT:	STRCPY(సంకేతం_2, "NFA_PRINT"); ఆపు;
+	స్థితి NFA_SPRINT:STRCPY(సంకేతం_2, "NFA_SPRINT"); ఆపు;
+	స్థితి NFA_WHITE:	STRCPY(సంకేతం_2, "NFA_WHITE"); ఆపు;
+	స్థితి NFA_NWHITE:STRCPY(సంకేతం_2, "NFA_NWHITE"); ఆపు;
+	స్థితి NFA_DIGIT:	STRCPY(సంకేతం_2, "NFA_DIGIT"); ఆపు;
+	స్థితి NFA_NDIGIT:STRCPY(సంకేతం_2, "NFA_NDIGIT"); ఆపు;
+	స్థితి NFA_HEX:	STRCPY(సంకేతం_2, "NFA_HEX"); ఆపు;
+	స్థితి NFA_NHEX:	STRCPY(సంకేతం_2, "NFA_NHEX"); ఆపు;
+	స్థితి NFA_OCTAL:	STRCPY(సంకేతం_2, "NFA_OCTAL"); ఆపు;
+	స్థితి NFA_NOCTAL:STRCPY(సంకేతం_2, "NFA_NOCTAL"); ఆపు;
+	స్థితి NFA_మాట:	STRCPY(సంకేతం_2, "NFA_WORD"); ఆపు;
+	స్థితి NFA_NWORD:	STRCPY(సంకేతం_2, "NFA_NWORD"); ఆపు;
+	స్థితి NFA_తల:	STRCPY(సంకేతం_2, "NFA_HEAD"); ఆపు;
+	స్థితి NFA_NHEAD:	STRCPY(సంకేతం_2, "NFA_NHEAD"); ఆపు;
+	స్థితి NFA_ALPHA:	STRCPY(సంకేతం_2, "NFA_ALPHA"); ఆపు;
+	స్థితి NFA_NALPHA:STRCPY(సంకేతం_2, "NFA_NALPHA"); ఆపు;
+	స్థితి NFA_క్రింది:	STRCPY(సంకేతం_2, "NFA_LOWER"); ఆపు;
+	స్థితి NFA_NLOWER:STRCPY(సంకేతం_2, "NFA_NLOWER"); ఆపు;
+	స్థితి NFA_పై:	STRCPY(సంకేతం_2, "NFA_UPPER"); ఆపు;
+	స్థితి NFA_NUPPER:STRCPY(సంకేతం_2, "NFA_NUPPER"); ఆపు;
+	స్థితి NFA_క్రింది_IC:  STRCPY(సంకేతం_2, "NFA_LOWER_IC"); ఆపు;
+	స్థితి NFA_NLOWER_IC: STRCPY(సంకేతం_2, "NFA_NLOWER_IC"); ఆపు;
+	స్థితి NFA_పై_IC:  STRCPY(సంకేతం_2, "NFA_UPPER_IC"); ఆపు;
+	స్థితి NFA_NUPPER_IC: STRCPY(సంకేతం_2, "NFA_NUPPER_IC"); ఆపు;
 
-	default:
-	    STRCPY(code, "CHAR(x)");
-	    code[5] = c;
+	అప్రమేయ:
+	    STRCPY(సంకేతం_2, "CHAR(x)");
+	    సంకేతం_2[5] = c;
     }
 
-    if (addnl == TRUE)
-	STRCAT(code, " + NEWLINE ");
+    ఒకవేళ (addnl == TRUE)
+	STRCAT(సంకేతం_2, " + NEWLINE ");
 
 }
 
 # ifdef ENABLE_LOG
-static FILE *log_fd;
-static char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
+స్థిర FILE *log_fd;
+స్థిర char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
 
 /*
  * Print the postfix notation of the current regexp.
  */
-    static void
-nfa_postfix_dump(char_u *expr, int retval)
+    స్థిర శూన్య
+nfa_postfix_dump(char_u *సమాసం, పూర్ణాంకం retval)
 {
-    int *p;
+    పూర్ణాంకం *p;
     FILE *f;
 
     f = fopen(NFA_REGEXP_DUMP_LOG, "a");
-    if (f == NULL)
-	return;
+    ఒకవేళ (f == ఖాళీ)
+	తిరిగి;
 
     fprintf(f, "\n-------------------------\n");
-    if (retval == FAIL)
+    ఒకవేళ (retval == FAIL)
 	fprintf(f, ">>> NFA engine failed... \n");
-    else if (retval == OK)
+    లేకపోతే ఒకవేళ (retval == OK)
 	fprintf(f, ">>> NFA engine succeeded !\n");
-    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", expr);
-    for (p = post_start; *p && p < post_ptr; p++)
+    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", సమాసం);
+    కొరకు (p = post_ప్రారంభం; *p && p < post_ptr; p++)
     {
-	nfa_set_code(*p);
-	fprintf(f, "%s, ", code);
+	nfa_సమితి_సంకేతం(*p);
+	fprintf(f, "%s, ", సంకేతం_2);
     }
     fprintf(f, "\"\nPostfix notation (int): ");
-    for (p = post_start; *p && p < post_ptr; p++)
+    కొరకు (p = post_ప్రారంభం; *p && p < post_ptr; p++)
 	fprintf(f, "%d ", *p);
     fprintf(f, "\n\n");
     fclose(f);
@@ -2798,7 +2798,7 @@ nfa_postfix_dump(char_u *expr, int retval)
 /*
  * Print the NFA starting with a root node "state".
  */
-    static void
+    స్థిర శూన్య
 nfa_print_state(FILE *debugf, nfa_state_T *state)
 {
     garray_T indent;
@@ -2809,51 +2809,51 @@ nfa_print_state(FILE *debugf, nfa_state_T *state)
     ga_clear(&indent);
 }
 
-    static void
+    స్థిర శూన్య
 nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 {
     char_u  *p;
 
-    if (state == NULL)
-	return;
+    ఒకవేళ (state == ఖాళీ)
+	తిరిగి;
 
-    fprintf(debugf, "(%2d)", abs(state->id));
+    fprintf(debugf, "(%2d)", నిరపేక్ష(state->id));
 
     // Output indent
-    p = (char_u *)indent->ga_data;
-    if (indent->ga_len >= 3)
+    p = (char_u *)indent->ga_దత్తాంశం;
+    ఒకవేళ (indent->ga_len >= 3)
     {
-	int	last = indent->ga_len - 3;
+	పూర్ణాంకం	చివరి = indent->ga_len - 3;
 	char_u	save[2];
 
-	STRNCPY(save, &p[last], 2);
-	memcpy(&p[last], "+-", 2);
+	STRNCPY(save, &p[చివరి], 2);
+	జ్ఞాపకం_నకలు(&p[చివరి], "+-", 2);
 	fprintf(debugf, " %s", p);
-	STRNCPY(&p[last], save, 2);
+	STRNCPY(&p[చివరి], save, 2);
     }
-    else
+    లేకపోతే
 	fprintf(debugf, " %s", p);
 
-    nfa_set_code(state->c);
+    nfa_సమితి_సంకేతం(state->c);
     fprintf(debugf, "%s (%d) (id=%d) val=%d\n",
-		 code,
+		 సంకేతం_2,
 		 state->c,
-		 abs(state->id),
+		 నిరపేక్ష(state->id),
 		 state->val);
-    if (state->id < 0)
-	return;
+    ఒకవేళ (state->id < 0)
+	తిరిగి;
 
-    state->id = abs(state->id) * -1;
+    state->id = నిరపేక్ష(state->id) * -1;
 
     // grow indent for state->out
     indent->ga_len -= 1;
-    if (state->out1)
+    ఒకవేళ (state->out1)
 	GA_CONCAT_LITERAL(indent, "| ");
-    else
+    లేకపోతే
 	GA_CONCAT_LITERAL(indent, "  ");
     ga_append(indent, NUL);
 
-    nfa_print_state2(debugf, state->out, indent);
+    nfa_print_state2(debugf, state->బహిర్గతం, indent);
 
     // replace last part of indent for state->out1
     indent->ga_len -= 3;
@@ -2870,40 +2870,40 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 /*
  * Print the NFA state machine.
  */
-    static void
+    స్థిర శూన్య
 nfa_dump(nfa_regprog_T *prog)
 {
     FILE *debugf = fopen(NFA_REGEXP_DUMP_LOG, "a");
 
-    if (debugf == NULL)
-	return;
+    ఒకవేళ (debugf == ఖాళీ)
+	తిరిగి;
 
-    nfa_print_state(debugf, prog->start);
+    nfa_print_state(debugf, prog->ప్రారంభం);
 
-    if (prog->reganch)
+    ఒకవేళ (prog->reganch)
 	fprintf(debugf, "reganch: %d\n", prog->reganch);
-    if (prog->regstart != NUL)
+    ఒకవేళ (prog->regstart != NUL)
 	fprintf(debugf, "regstart: %c (decimal: %d)\n",
 		prog->regstart, prog->regstart);
-    if (prog->match_text != NULL)
-	fprintf(debugf, "match_text: \"%s\"\n", prog->match_text);
+    ఒకవేళ (prog->సరిపోలిక_పాఠ్యం != ఖాళీ)
+	fprintf(debugf, "match_text: \"%s\"\n", prog->సరిపోలిక_పాఠ్యం);
 
     fclose(debugf);
 }
 # endif	    // ENABLE_LOG
-#endif	    // DEBUG
+#అయితే_ముగింపు	    // DEBUG
 
 /*
  * Parse r.e. @expr and convert it into postfix form.
  * Return the postfix string on success, NULL otherwise.
  */
-    static int *
-re2post(void)
+    స్థిర పూర్ణాంకం *
+re2post(శూన్య)
 {
-    if (nfa_reg(REG_NOPAREN) == FAIL)
-	return NULL;
+    ఒకవేళ (nfa_reg(REG_NOPAREN) == FAIL)
+	తిరిగి ఖాళీ;
     EMIT(NFA_MOPEN);
-    return post_start;
+    తిరిగి post_ప్రారంభం;
 }
 
 // NB. Some of the code below is inspired by Russ's.
@@ -2915,23 +2915,23 @@ re2post(void)
  * If c < 256, labeled arrow with character c to out.
  */
 
-static nfa_state_T	*state_ptr; // points to nfa_prog->state
+స్థిర nfa_state_T	*state_ptr; // points to nfa_prog->state
 
 /*
  * Allocate and initialize nfa_state_T.
  */
-    static nfa_state_T *
-alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
+    స్థిర nfa_state_T *
+alloc_state(పూర్ణాంకం c, nfa_state_T *బహిర్గతం, nfa_state_T *out1)
 {
     nfa_state_T *s;
 
-    if (istate >= nstate)
-	return NULL;
+    ఒకవేళ (istate >= nstate)
+	తిరిగి ఖాళీ;
 
     s = &state_ptr[istate++];
 
     s->c    = c;
-    s->out  = out;
+    s->బహిర్గతం  = బహిర్గతం;
     s->out1 = out1;
     s->val  = 0;
 
@@ -2939,7 +2939,7 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
     s->lastlist[0] = 0;
     s->lastlist[1] = 0;
 
-    return s;
+    తిరిగి s;
 }
 
 /*
@@ -2952,62 +2952,62 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
 // Since the out pointers in the list are always
 // uninitialized, we use the pointers themselves
 // as storage for the Ptrlists.
-typedef union Ptrlist Ptrlist;
-union Ptrlist
+రకనిర్వచనం సంఘం Ptrlist Ptrlist;
+సంఘం Ptrlist
 {
-    Ptrlist	*next;
+    Ptrlist	*తదుపరి;
     nfa_state_T	*s;
 };
 
-struct Frag
+నిర్మాణం Frag
 {
-    nfa_state_T *start;
-    Ptrlist	*out;
+    nfa_state_T *ప్రారంభం;
+    Ptrlist	*బహిర్గతం;
 };
-typedef struct Frag Frag_T;
+రకనిర్వచనం నిర్మాణం Frag Frag_T;
 
 // Reused across compilations by post2nfa(); freed in free_regexp_stuff().
-static Frag_T *nfa_stack;
-static int nfa_stack_len;
+స్థిర Frag_T *nfa_దొంతర;
+స్థిర పూర్ణాంకం nfa_దొంతర_len;
 
 /*
  * Initialize a Frag_T struct and return it.
  */
-    static Frag_T
-frag(nfa_state_T *start, Ptrlist *out)
+    స్థిర Frag_T
+frag(nfa_state_T *ప్రారంభం, Ptrlist *బహిర్గతం)
 {
     Frag_T n;
 
-    n.start = start;
-    n.out = out;
-    return n;
+    n.ప్రారంభం = ప్రారంభం;
+    n.బహిర్గతం = బహిర్గతం;
+    తిరిగి n;
 }
 
 /*
  * Create singleton list containing just outp.
  */
-    static Ptrlist *
+    స్థిర Ptrlist *
 list1(
     nfa_state_T	**outp)
 {
     Ptrlist *l;
 
     l = (Ptrlist *)outp;
-    l->next = NULL;
-    return l;
+    l->తదుపరి = ఖాళీ;
+    తిరిగి l;
 }
 
 /*
  * Patch the list of states at out to point to start.
  */
-    static void
+    స్థిర శూన్య
 patch(Ptrlist *l, nfa_state_T *s)
 {
-    Ptrlist *next;
+    Ptrlist *తదుపరి;
 
-    for (; l; l = next)
+    కొరకు (; l; l = తదుపరి)
     {
-	next = l->next;
+	తదుపరి = l->తదుపరి;
 	l->s = s;
     }
 }
@@ -3016,75 +3016,75 @@ patch(Ptrlist *l, nfa_state_T *s)
 /*
  * Join the two lists l1 and l2, returning the combination.
  */
-    static Ptrlist *
+    స్థిర Ptrlist *
 append(Ptrlist *l1, Ptrlist *l2)
 {
     Ptrlist *oldl1;
 
     oldl1 = l1;
-    while (l1->next)
-	l1 = l1->next;
-    l1->next = l2;
-    return oldl1;
+    అయితే (l1->తదుపరి)
+	l1 = l1->తదుపరి;
+    l1->తదుపరి = l2;
+    తిరిగి oldl1;
 }
 
 /*
  * Stack used for transforming postfix form into NFA.
  */
-static Frag_T empty;
+స్థిర Frag_T ఖాళీలు_2;
 
-    static void
-st_error(int *postfix UNUSED, int *end UNUSED, int *p UNUSED)
+    స్థిర శూన్య
+st_error(పూర్ణాంకం *postfix వాడని, పూర్ణాంకం *చివర వాడని, పూర్ణాంకం *p వాడని)
 {
-#ifdef NFA_REGEXP_ERROR_LOG
+#నిర్వచితమైతే NFA_REGEXP_ERROR_LOG
     FILE *df;
-    int *p2;
+    పూర్ణాంకం *p2;
 
     df = fopen(NFA_REGEXP_ERROR_LOG, "a");
-    if (df)
+    ఒకవేళ (df)
     {
 	fprintf(df, "Error popping the stack!\n");
 # ifdef DEBUG
-	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.సమాసం);
 # endif
 	fprintf(df, "Postfix form is: ");
 # ifdef DEBUG
-	for (p2 = postfix; p2 < end; p2++)
+	కొరకు (p2 = postfix; p2 < చివర; p2++)
 	{
-	    nfa_set_code(*p2);
-	    fprintf(df, "%s, ", code);
+	    nfa_సమితి_సంకేతం(*p2);
+	    fprintf(df, "%s, ", సంకేతం_2);
 	}
-	nfa_set_code(*p);
+	nfa_సమితి_సంకేతం(*p);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	కొరకు (p2 = postfix; p2 <= p; p2 ++)
 	{
-	    nfa_set_code(*p2);
-	    fprintf(df, "%s, ", code);
+	    nfa_సమితి_సంకేతం(*p2);
+	    fprintf(df, "%s, ", సంకేతం_2);
 	}
-# else
-	for (p2 = postfix; p2 < end; p2++)
+# లేకపోతే
+	కొరకు (p2 = postfix; p2 < చివర; p2++)
 	    fprintf(df, "%d, ", *p2);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	కొరకు (p2 = postfix; p2 <= p; p2 ++)
 	    fprintf(df, "%d, ", *p2);
 # endif
 	fprintf(df, "\n--------------------------\n");
 	fclose(df);
     }
-#endif
-    emsg(_(e_nfa_regexp_could_not_pop_stack));
+#అయితే_ముగింపు
+    emsg(_(e_nfa_regexp_could_not_తీయి_దొంతర));
 }
 
 /*
  * Push an item onto the stack.
  */
-    static void
-st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
+    స్థిర శూన్య
+st_నెట్టు(Frag_T s, Frag_T **p, Frag_T *దొంతర_చివర)
 {
     Frag_T *stackp = *p;
 
-    if (stackp >= stack_end)
-	return;
+    ఒకవేళ (stackp >= దొంతర_చివర)
+	తిరిగి;
     *stackp = s;
     *p = *p + 1;
 }
@@ -3092,438 +3092,438 @@ st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
 /*
  * Pop an item from the stack.
  */
-    static Frag_T
-st_pop(Frag_T **p, Frag_T *stack)
+    స్థిర Frag_T
+st_తీయి(Frag_T **p, Frag_T *దొంతర)
 {
     Frag_T *stackp;
 
     *p = *p - 1;
     stackp = *p;
-    if (stackp < stack)
-	return empty;
-    return **p;
+    ఒకవేళ (stackp < దొంతర)
+	తిరిగి ఖాళీలు_2;
+    తిరిగి **p;
 }
 
 /*
  * Estimate the maximum byte length of anything matching "state".
  * When unknown or unlimited return -1.
  */
-    static int
-nfa_max_width(nfa_state_T *startstate, int depth)
+    స్థిర పూర్ణాంకం
+nfa_max_వెడల్పు(nfa_state_T *startstate, పూర్ణాంకం లోతు)
 {
-    int		    l, r;
+    పూర్ణాంకం		    l, r;
     nfa_state_T	    *state = startstate;
-    int		    len = 0;
+    పూర్ణాంకం		    len = 0;
 
     // detect looping in a NFA_SPLIT
-    if (depth > 4)
-	return -1;
+    ఒకవేళ (లోతు > 4)
+	తిరిగి -1;
 
-    while (state != NULL)
+    అయితే (state != ఖాళీ)
     {
-	switch (state->c)
+	ఎంపిక (state->c)
 	{
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
+	    స్థితి NFA_చివర_INVISIBLE:
+	    స్థితి NFA_చివర_INVISIBLE_NEG:
 		// the end, return what we have
-		return len;
+		తిరిగి len;
 
-	    case NFA_SPLIT:
+	    స్థితి NFA_విభజించు:
 		// two alternatives, use the maximum
-		l = nfa_max_width(state->out, depth + 1);
-		r = nfa_max_width(state->out1, depth + 1);
-		if (l < 0 || r < 0)
-		    return -1;
-		return len + (l > r ? l : r);
+		l = nfa_max_వెడల్పు(state->బహిర్గతం, లోతు + 1);
+		r = nfa_max_వెడల్పు(state->out1, లోతు + 1);
+		ఒకవేళ (l < 0 || r < 0)
+		    తిరిగి -1;
+		తిరిగి len + (l > r ? l : r);
 
-	    case NFA_ANY:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    స్థితి NFA_ANY:
+	    స్థితి NFA_ప్రారంభం_COLL:
+	    స్థితి NFA_ప్రారంభం_NEG_COLL:
 		// matches some character, including composing chars
-		if (enc_utf8)
+		ఒకవేళ (enc_utf8)
 		    len += MB_MAXBYTES;
-		else if (has_mbyte)
+		లేకపోతే ఒకవేళ (has_mbyte)
 		    len += 2;
-		else
+		లేకపోతే
 		    ++len;
-		if (state->c != NFA_ANY)
+		ఒకవేళ (state->c != NFA_ANY)
 		{
 		    // Skip over the compiled collection.
 		    // malformed NFAs must not crash width estimation.
-		    if (state->out1 == NULL || state->out1->out == NULL)
-			return -1;
-		    state = state->out1->out;
-		    continue;
+		    ఒకవేళ (state->out1 == ఖాళీ || state->out1->బహిర్గతం == ఖాళీ)
+			తిరిగి -1;
+		    state = state->out1->బహిర్గతం;
+		    కొనసాగు;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_DIGIT:
-	    case NFA_WHITE:
-	    case NFA_HEX:
-	    case NFA_OCTAL:
+	    స్థితి NFA_DIGIT:
+	    స్థితి NFA_WHITE:
+	    స్థితి NFA_HEX:
+	    స్థితి NFA_OCTAL:
 		// ascii
 		++len;
-		break;
+		ఆపు;
 
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_NWHITE:
-	    case NFA_NDIGIT:
-	    case NFA_NHEX:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_ANY_COMPOSING:
+	    స్థితి NFA_IDENT:
+	    స్థితి NFA_SIDENT:
+	    స్థితి NFA_KWORD:
+	    స్థితి NFA_SKWORD:
+	    స్థితి NFA_FNAME:
+	    స్థితి NFA_SFNAME:
+	    స్థితి NFA_PRINT:
+	    స్థితి NFA_SPRINT:
+	    స్థితి NFA_NWHITE:
+	    స్థితి NFA_NDIGIT:
+	    స్థితి NFA_NHEX:
+	    స్థితి NFA_NOCTAL:
+	    స్థితి NFA_మాట:
+	    స్థితి NFA_NWORD:
+	    స్థితి NFA_తల:
+	    స్థితి NFA_NHEAD:
+	    స్థితి NFA_ALPHA:
+	    స్థితి NFA_NALPHA:
+	    స్థితి NFA_క్రింది:
+	    స్థితి NFA_NLOWER:
+	    స్థితి NFA_పై:
+	    స్థితి NFA_NUPPER:
+	    స్థితి NFA_క్రింది_IC:
+	    స్థితి NFA_NLOWER_IC:
+	    స్థితి NFA_పై_IC:
+	    స్థితి NFA_NUPPER_IC:
+	    స్థితి NFA_ANY_COMPOSING:
 		// possibly non-ascii
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		    len += 3;
-		else
+		లేకపోతే
 		    ++len;
-		break;
+		ఆపు;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG:
 		// zero-width, out1 points to the END state
-		state = state->out1->out;
-		continue;
+		state = state->out1->బహిర్గతం;
+		కొనసాగు;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
-#endif
-	    case NFA_NEWL:
-	    case NFA_SKIP:
+	    స్థితి NFA_BACKREF1:
+	    స్థితి NFA_BACKREF2:
+	    స్థితి NFA_BACKREF3:
+	    స్థితి NFA_BACKREF4:
+	    స్థితి NFA_BACKREF5:
+	    స్థితి NFA_BACKREF6:
+	    స్థితి NFA_BACKREF7:
+	    స్థితి NFA_BACKREF8:
+	    స్థితి NFA_BACKREF9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZREF1:
+	    స్థితి NFA_ZREF2:
+	    స్థితి NFA_ZREF3:
+	    స్థితి NFA_ZREF4:
+	    స్థితి NFA_ZREF5:
+	    స్థితి NFA_ZREF6:
+	    స్థితి NFA_ZREF7:
+	    స్థితి NFA_ZREF8:
+	    స్థితి NFA_ZREF9:
+#అయితే_ముగింపు
+	    స్థితి NFA_NEWL:
+	    స్థితి NFA_SKIP:
 		// unknown width
-		return -1;
+		తిరిగి -1;
 
-	    case NFA_BOL:
-	    case NFA_EOL:
-	    case NFA_BOF:
-	    case NFA_EOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-	    case NFA_ZCLOSE:
-	    case NFA_ZCLOSE1:
-	    case NFA_ZCLOSE2:
-	    case NFA_ZCLOSE3:
-	    case NFA_ZCLOSE4:
-	    case NFA_ZCLOSE5:
-	    case NFA_ZCLOSE6:
-	    case NFA_ZCLOSE7:
-	    case NFA_ZCLOSE8:
-	    case NFA_ZCLOSE9:
-#endif
-	    case NFA_MCLOSE:
-	    case NFA_MCLOSE1:
-	    case NFA_MCLOSE2:
-	    case NFA_MCLOSE3:
-	    case NFA_MCLOSE4:
-	    case NFA_MCLOSE5:
-	    case NFA_MCLOSE6:
-	    case NFA_MCLOSE7:
-	    case NFA_MCLOSE8:
-	    case NFA_MCLOSE9:
-	    case NFA_NOPEN:
-	    case NFA_NCLOSE:
+	    స్థితి NFA_BOL:
+	    స్థితి NFA_EOL:
+	    స్థితి NFA_BOF:
+	    స్థితి NFA_EOF:
+	    స్థితి NFA_BOW:
+	    స్థితి NFA_EOW:
+	    స్థితి NFA_MOPEN:
+	    స్థితి NFA_MOPEN1:
+	    స్థితి NFA_MOPEN2:
+	    స్థితి NFA_MOPEN3:
+	    స్థితి NFA_MOPEN4:
+	    స్థితి NFA_MOPEN5:
+	    స్థితి NFA_MOPEN6:
+	    స్థితి NFA_MOPEN7:
+	    స్థితి NFA_MOPEN8:
+	    స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZOPEN:
+	    స్థితి NFA_ZOPEN1:
+	    స్థితి NFA_ZOPEN2:
+	    స్థితి NFA_ZOPEN3:
+	    స్థితి NFA_ZOPEN4:
+	    స్థితి NFA_ZOPEN5:
+	    స్థితి NFA_ZOPEN6:
+	    స్థితి NFA_ZOPEN7:
+	    స్థితి NFA_ZOPEN8:
+	    స్థితి NFA_ZOPEN9:
+	    స్థితి NFA_ZCLOSE:
+	    స్థితి NFA_ZCLOSE1:
+	    స్థితి NFA_ZCLOSE2:
+	    స్థితి NFA_ZCLOSE3:
+	    స్థితి NFA_ZCLOSE4:
+	    స్థితి NFA_ZCLOSE5:
+	    స్థితి NFA_ZCLOSE6:
+	    స్థితి NFA_ZCLOSE7:
+	    స్థితి NFA_ZCLOSE8:
+	    స్థితి NFA_ZCLOSE9:
+#అయితే_ముగింపు
+	    స్థితి NFA_MCLOSE:
+	    స్థితి NFA_MCLOSE1:
+	    స్థితి NFA_MCLOSE2:
+	    స్థితి NFA_MCLOSE3:
+	    స్థితి NFA_MCLOSE4:
+	    స్థితి NFA_MCLOSE5:
+	    స్థితి NFA_MCLOSE6:
+	    స్థితి NFA_MCLOSE7:
+	    స్థితి NFA_MCLOSE8:
+	    స్థితి NFA_MCLOSE9:
+	    స్థితి NFA_NOPEN:
+	    స్థితి NFA_NCLOSE:
 
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_CURSOR:
-	    case NFA_COL:
-	    case NFA_VCOL:
-	    case NFA_MARK:
+	    స్థితి NFA_LNUM_GT:
+	    స్థితి NFA_LNUM_LT:
+	    స్థితి NFA_నిలువు_GT:
+	    స్థితి NFA_నిలువు_LT:
+	    స్థితి NFA_VCOL_GT:
+	    స్థితి NFA_VCOL_LT:
+	    స్థితి NFA_MARK_GT:
+	    స్థితి NFA_MARK_LT:
+	    స్థితి NFA_VISUAL:
+	    స్థితి NFA_LNUM:
+	    స్థితి NFA_CURSOR:
+	    స్థితి NFA_నిలువు:
+	    స్థితి NFA_VCOL:
+	    స్థితి NFA_MARK:
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_OPT_CHARS:
-	    case NFA_EMPTY:
-	    case NFA_START_PATTERN:
-	    case NFA_END_PATTERN:
-	    case NFA_COMPOSING:
-	    case NFA_END_COMPOSING:
+	    స్థితి NFA_ZSTART:
+	    స్థితి NFA_ZEND:
+	    స్థితి NFA_OPT_CHARS:
+	    స్థితి NFA_ఖాళీలు:
+	    స్థితి NFA_ప్రారంభం_నమూనా:
+	    స్థితి NFA_చివర_నమూనా:
+	    స్థితి NFA_COMPOSING:
+	    స్థితి NFA_చివర_COMPOSING:
 		// zero-width
-		break;
+		ఆపు;
 
-	    default:
-		if (state->c < 0)
+	    అప్రమేయ:
+		ఒకవేళ (state->c < 0)
 		    // don't know what this is
-		    return -1;
+		    తిరిగి -1;
 		// normal character
 		len += MB_CHAR2LEN(state->c);
-		break;
+		ఆపు;
 	}
 
 	// normal way to continue
-	state = state->out;
+	state = state->బహిర్గతం;
     }
 
     // unrecognized, "cannot happen"
-    return -1;
+    తిరిగి -1;
 }
 
 /*
  * Convert a postfix form into its equivalent NFA.
  * Return the NFA start state on success, NULL otherwise.
  */
-    static nfa_state_T *
-post2nfa(int *postfix, int *end, int nfa_calc_size)
+    స్థిర nfa_state_T *
+post2nfa(పూర్ణాంకం *postfix, పూర్ణాంకం *చివర, పూర్ణాంకం nfa_calc_కొలత)
 {
-    int		*p;
-    int		mopen;
-    int		mclose;
-    Frag_T	*stack = NULL;
-    Frag_T	*stackp = NULL;
-    Frag_T	*stack_end = NULL;
+    పూర్ణాంకం		*p;
+    పూర్ణాంకం		mopen;
+    పూర్ణాంకం		mclose;
+    Frag_T	*దొంతర = ఖాళీ;
+    Frag_T	*stackp = ఖాళీ;
+    Frag_T	*దొంతర_చివర = ఖాళీ;
     Frag_T	e1;
     Frag_T	e2;
     Frag_T	e;
     nfa_state_T	*s;
     nfa_state_T	*s1;
     nfa_state_T	*matchstate;
-    nfa_state_T	*ret = NULL;
+    nfa_state_T	*ret = ఖాళీ;
 
-    if (postfix == NULL)
-	return NULL;
+    ఒకవేళ (postfix == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-#define PUSH(s)	    st_push((s), &stackp, stack_end)
-#define POP()	    st_pop(&stackp, stack);		\
-		    if (stackp < stack)			\
+#నిర్వచించు నెట్టు_2(s)	    st_నెట్టు((s), &stackp, దొంతర_చివర)
+#నిర్వచించు తీయి_2()	    st_తీయి(&stackp, దొంతర);		\
+		    ఒకవేళ (stackp < దొంతర)			\
 		    {					\
-			st_error(postfix, end, p);	\
-			return NULL;			\
+			st_error(postfix, చివర, p);	\
+			తిరిగి ఖాళీ;			\
 		    }
 
-    if (nfa_calc_size == FALSE)
+    ఒకవేళ (nfa_calc_కొలత == FALSE)
     {
 	// Reuse the fragment stack across compilations, growing when needed;
 	// it is freed in free_regexp_stuff().
-	if (nfa_stack == NULL || nfa_stack_len < nstate + 1)
+	ఒకవేళ (nfa_దొంతర == ఖాళీ || nfa_దొంతర_len < nstate + 1)
 	{
-	    vim_free(nfa_stack);
-	    nfa_stack = ALLOC_MULT(Frag_T, nstate + 1);
-	    if (nfa_stack == NULL)
+	    vim_free(nfa_దొంతర);
+	    nfa_దొంతర = ALLOC_MULT(Frag_T, nstate + 1);
+	    ఒకవేళ (nfa_దొంతర == ఖాళీ)
 	    {
-		nfa_stack_len = 0;
-		return NULL;
+		nfa_దొంతర_len = 0;
+		తిరిగి ఖాళీ;
 	    }
-	    nfa_stack_len = nstate + 1;
+	    nfa_దొంతర_len = nstate + 1;
 	}
-	stack = nfa_stack;
-	stackp = stack;
-	stack_end = stack + (nstate + 1);
+	దొంతర = nfa_దొంతర;
+	stackp = దొంతర;
+	దొంతర_చివర = దొంతర + (nstate + 1);
     }
 
-    for (p = postfix; p < end; ++p)
+    కొరకు (p = postfix; p < చివర; ++p)
     {
-	switch (*p)
+	ఎంపిక (*p)
 	{
-	case NFA_CONCAT:
+	స్థితి NFA_CONCAT:
 	    // Concatenation.
 	    // Pay attention: this operator does not exist in the r.e. itself
 	    // (it is implicit, really).  It is added when r.e. is translated
 	    // to postfix form in re2post().
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		ఆపు;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    e2 = తీయి_2();
+	    e1 = తీయి_2();
+	    patch(e1.బహిర్గతం, e2.ప్రారంభం);
+	    నెట్టు_2(frag(e1.ప్రారంభం, e2.బహిర్గతం));
+	    ఆపు;
 
-	case NFA_OR:
+	స్థితి NFA_OR:
 	    // Alternation
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    s = alloc_state(NFA_SPLIT, e1.start, e2.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e1.out, e2.out)));
-	    break;
+	    e2 = తీయి_2();
+	    e1 = తీయి_2();
+	    s = alloc_state(NFA_విభజించు, e1.ప్రారంభం, e2.ప్రారంభం);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    నెట్టు_2(frag(s, append(e1.బహిర్గతం, e2.బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_STAR:
+	స్థితి NFA_నక్షత్రం:
 	    // Zero or more, prefer more
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out1)));
-	    break;
+	    e = తీయి_2();
+	    s = alloc_state(NFA_విభజించు, e.ప్రారంభం, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    patch(e.బహిర్గతం, s);
+	    నెట్టు_2(frag(s, list1(&s->out1)));
+	    ఆపు;
 
-	case NFA_STAR_NONGREEDY:
+	స్థితి NFA_నక్షత్రం_NONGREEDY:
 	    // Zero or more, prefer zero
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    e = తీయి_2();
+	    s = alloc_state(NFA_విభజించు, ఖాళీ, e.ప్రారంభం);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    patch(e.బహిర్గతం, s);
+	    నెట్టు_2(frag(s, list1(&s->బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_QUEST:
+	స్థితి NFA_QUEST:
 	    // one or zero atoms=> greedy match
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out1))));
-	    break;
+	    e = తీయి_2();
+	    s = alloc_state(NFA_విభజించు, e.ప్రారంభం, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    నెట్టు_2(frag(s, append(e.బహిర్గతం, list1(&s->out1))));
+	    ఆపు;
 
-	case NFA_QUEST_NONGREEDY:
+	స్థితి NFA_QUEST_NONGREEDY:
 	    // zero or one atoms => non-greedy match
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out))));
-	    break;
+	    e = తీయి_2();
+	    s = alloc_state(NFA_విభజించు, ఖాళీ, e.ప్రారంభం);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    నెట్టు_2(frag(s, append(e.బహిర్గతం, list1(&s->బహిర్గతం))));
+	    ఆపు;
 
-	case NFA_END_COLL:
-	case NFA_END_NEG_COLL:
+	స్థితి NFA_చివర_COLL:
+	స్థితి NFA_చివర_NEG_COLL:
 	    // On the stack is the sequence starting with NFA_START_COLL or
 	    // NFA_START_NEG_COLL and all possible characters. Patch it to
 	    // add the output to the start.
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_END_COLL, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    e.start->out1 = s;
-	    PUSH(frag(e.start, list1(&s->out)));
-	    break;
+	    e = తీయి_2();
+	    s = alloc_state(NFA_చివర_COLL, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    patch(e.బహిర్గతం, s);
+	    e.ప్రారంభం->out1 = s;
+	    నెట్టు_2(frag(e.ప్రారంభం, list1(&s->బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_RANGE:
+	స్థితి NFA_RANGE:
 	    // Before this are two characters, the low and high end of a
 	    // range.  Turn them into two states with MIN and MAX.
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		ఆపు;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    e2.start->val = e2.start->c;
-	    e2.start->c = NFA_RANGE_MAX;
-	    e1.start->val = e1.start->c;
-	    e1.start->c = NFA_RANGE_MIN;
-	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    e2 = తీయి_2();
+	    e1 = తీయి_2();
+	    e2.ప్రారంభం->val = e2.ప్రారంభం->c;
+	    e2.ప్రారంభం->c = NFA_RANGE_MAX;
+	    e1.ప్రారంభం->val = e1.ప్రారంభం->c;
+	    e1.ప్రారంభం->c = NFA_RANGE_MIN;
+	    patch(e1.బహిర్గతం, e2.ప్రారంభం);
+	    నెట్టు_2(frag(e1.ప్రారంభం, e2.బహిర్గతం));
+	    ఆపు;
 
-	case NFA_EMPTY:
+	స్థితి NFA_ఖాళీలు:
 	    // 0-length, used in a repetition with max/min count of 0
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    s = alloc_state(NFA_EMPTY, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(NFA_ఖాళీలు, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    నెట్టు_2(frag(s, list1(&s->బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_OPT_CHARS:
+	స్థితి NFA_OPT_CHARS:
 	  {
-	    int    n;
+	    పూర్ణాంకం    n;
 
 	    // \%[abc] implemented as:
 	    //    NFA_SPLIT
@@ -3537,70 +3537,70 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    //    |   +- next
 	    //    +- next
 	    n = *++p; // get number of characters
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate += n;
-		break;
+		ఆపు;
 	    }
-	    s = NULL; // avoid compiler warning
-	    e1.out = NULL; // stores list with out1's
-	    s1 = NULL; // previous NFA_SPLIT to connect to
-	    while (n-- > 0)
+	    s = ఖాళీ; // avoid compiler warning
+	    e1.బహిర్గతం = ఖాళీ; // stores list with out1's
+	    s1 = ఖాళీ; // previous NFA_SPLIT to connect to
+	    అయితే (n-- > 0)
 	    {
-		e = POP(); // get character
-		s = alloc_state(NFA_SPLIT, e.start, NULL);
-		if (s == NULL)
-		    goto theend;
-		if (e1.out == NULL)
+		e = తీయి_2(); // get character
+		s = alloc_state(NFA_విభజించు, e.ప్రారంభం, ఖాళీ);
+		ఒకవేళ (s == ఖాళీ)
+		    వెళ్ళు theend;
+		ఒకవేళ (e1.బహిర్గతం == ఖాళీ)
 		    e1 = e;
-		patch(e.out, s1);
-		append(e1.out, list1(&s->out1));
+		patch(e.బహిర్గతం, s1);
+		append(e1.బహిర్గతం, list1(&s->out1));
 		s1 = s;
 	    }
-	    PUSH(frag(s, e1.out));
-	    break;
+	    నెట్టు_2(frag(s, e1.బహిర్గతం));
+	    ఆపు;
 	  }
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-	case NFA_PREV_ATOM_JUST_BEFORE:
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-	case NFA_PREV_ATOM_LIKE_PATTERN:
+	స్థితి NFA_PREV_ATOM_NO_వెడల్పు:
+	స్థితి NFA_PREV_ATOM_NO_వెడల్పు_NEG:
+	స్థితి NFA_PREV_ATOM_JUST_BEFORE:
+	స్థితి NFA_PREV_ATOM_JUST_BEFORE_NEG:
+	స్థితి NFA_PREV_ATOM_LIKE_నమూనా:
 	  {
-	    int before = (*p == NFA_PREV_ATOM_JUST_BEFORE
+	    పూర్ణాంకం before = (*p == NFA_PREV_ATOM_JUST_BEFORE
 				      || *p == NFA_PREV_ATOM_JUST_BEFORE_NEG);
-	    int pattern = (*p == NFA_PREV_ATOM_LIKE_PATTERN);
-	    int start_state;
-	    int end_state;
-	    int n = 0;
+	    పూర్ణాంకం నమూనా = (*p == NFA_PREV_ATOM_LIKE_నమూనా);
+	    పూర్ణాంకం ప్రారంభం_state;
+	    పూర్ణాంకం చివర_state;
+	    పూర్ణాంకం n = 0;
 	    nfa_state_T *zend;
 	    nfa_state_T *skip;
 
-	    switch (*p)
+	    ఎంపిక (*p)
 	    {
-		case NFA_PREV_ATOM_NO_WIDTH:
-		    start_state = NFA_START_INVISIBLE;
-		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_NO_WIDTH_NEG:
-		    start_state = NFA_START_INVISIBLE_NEG;
-		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE:
-		    start_state = NFA_START_INVISIBLE_BEFORE;
-		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-		    start_state = NFA_START_INVISIBLE_BEFORE_NEG;
-		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		default: // NFA_PREV_ATOM_LIKE_PATTERN:
-		    start_state = NFA_START_PATTERN;
-		    end_state = NFA_END_PATTERN;
-		    break;
+		స్థితి NFA_PREV_ATOM_NO_వెడల్పు:
+		    ప్రారంభం_state = NFA_ప్రారంభం_INVISIBLE;
+		    చివర_state = NFA_చివర_INVISIBLE;
+		    ఆపు;
+		స్థితి NFA_PREV_ATOM_NO_వెడల్పు_NEG:
+		    ప్రారంభం_state = NFA_ప్రారంభం_INVISIBLE_NEG;
+		    చివర_state = NFA_చివర_INVISIBLE_NEG;
+		    ఆపు;
+		స్థితి NFA_PREV_ATOM_JUST_BEFORE:
+		    ప్రారంభం_state = NFA_ప్రారంభం_INVISIBLE_BEFORE;
+		    చివర_state = NFA_చివర_INVISIBLE;
+		    ఆపు;
+		స్థితి NFA_PREV_ATOM_JUST_BEFORE_NEG:
+		    ప్రారంభం_state = NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG;
+		    చివర_state = NFA_చివర_INVISIBLE_NEG;
+		    ఆపు;
+		అప్రమేయ: // NFA_PREV_ATOM_LIKE_PATTERN:
+		    ప్రారంభం_state = NFA_ప్రారంభం_నమూనా;
+		    చివర_state = NFA_చివర_నమూనా;
+		    ఆపు;
 	    }
 
-	    if (before)
+	    ఒకవేళ (before)
 		n = *++p; // get the count
 
 	    // The \@= operator: match the preceding atom with zero width.
@@ -3610,310 +3610,310 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // Surrounds the preceding atom with START_INVISIBLE and
 	    // END_INVISIBLE, similarly to MOPEN.
 
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
-		nstate += pattern ? 4 : 2;
-		break;
+		nstate += నమూనా ? 4 : 2;
+		ఆపు;
 	    }
-	    e = POP();
-	    s1 = alloc_state(end_state, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
+	    e = తీయి_2();
+	    s1 = alloc_state(చివర_state, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s1 == ఖాళీ)
+		వెళ్ళు theend;
 
-	    s = alloc_state(start_state, e.start, s1);
-	    if (s == NULL)
-		goto theend;
-	    if (pattern)
+	    s = alloc_state(ప్రారంభం_state, e.ప్రారంభం, s1);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    ఒకవేళ (నమూనా)
 	    {
 		// NFA_ZEND -> NFA_END_PATTERN -> NFA_SKIP -> what follows.
-		skip = alloc_state(NFA_SKIP, NULL, NULL);
-		if (skip == NULL)
-		    goto theend;
-		zend = alloc_state(NFA_ZEND, s1, NULL);
-		if (zend == NULL)
-		    goto theend;
-		s1->out= skip;
-		patch(e.out, zend);
-		PUSH(frag(s, list1(&skip->out)));
+		skip = alloc_state(NFA_SKIP, ఖాళీ, ఖాళీ);
+		ఒకవేళ (skip == ఖాళీ)
+		    వెళ్ళు theend;
+		zend = alloc_state(NFA_ZEND, s1, ఖాళీ);
+		ఒకవేళ (zend == ఖాళీ)
+		    వెళ్ళు theend;
+		s1->బహిర్గతం= skip;
+		patch(e.బహిర్గతం, zend);
+		నెట్టు_2(frag(s, list1(&skip->బహిర్గతం)));
 	    }
-	    else
+	    లేకపోతే
 	    {
-		patch(e.out, s1);
-		PUSH(frag(s, list1(&s1->out)));
-		if (before)
+		patch(e.బహిర్గతం, s1);
+		నెట్టు_2(frag(s, list1(&s1->బహిర్గతం)));
+		ఒకవేళ (before)
 		{
-		    if (n <= 0)
+		    ఒకవేళ (n <= 0)
 			// See if we can guess the maximum width, it avoids a
 			// lot of pointless tries.
-			n = nfa_max_width(e.start, 0);
+			n = nfa_max_వెడల్పు(e.ప్రారంభం, 0);
 		    s->val = n; // store the count
 		}
 	    }
-	    break;
+	    ఆపు;
 	  }
 
-	case NFA_COMPOSING:	// char with composing char
-#if 0
+	స్థితి NFA_COMPOSING:	// char with composing char
+#ఒకవేళ 0
 	    // TODO
-	    if (regflags & RF_ICOMBINE)
+	    ఒకవేళ (regflags & RF_ICOMBINE)
 	    {
 		// use the base character only
 	    }
-#endif
+#అయితే_ముగింపు
 	    // FALLTHROUGH
 
-	case NFA_MOPEN:	// \( \) Submatch
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:	// \z( \) Submatch
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_NOPEN:	// \%( \) "Invisible Submatch"
-	    if (nfa_calc_size == TRUE)
+	స్థితి NFA_MOPEN:	// \( \) Submatch
+	స్థితి NFA_MOPEN1:
+	స్థితి NFA_MOPEN2:
+	స్థితి NFA_MOPEN3:
+	స్థితి NFA_MOPEN4:
+	స్థితి NFA_MOPEN5:
+	స్థితి NFA_MOPEN6:
+	స్థితి NFA_MOPEN7:
+	స్థితి NFA_MOPEN8:
+	స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZOPEN:	// \z( \) Submatch
+	స్థితి NFA_ZOPEN1:
+	స్థితి NFA_ZOPEN2:
+	స్థితి NFA_ZOPEN3:
+	స్థితి NFA_ZOPEN4:
+	స్థితి NFA_ZOPEN5:
+	స్థితి NFA_ZOPEN6:
+	స్థితి NFA_ZOPEN7:
+	స్థితి NFA_ZOPEN8:
+	స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+	స్థితి NFA_NOPEN:	// \%( \) "Invisible Submatch"
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate += 2;
-		break;
+		ఆపు;
 	    }
 
 	    mopen = *p;
-	    switch (*p)
+	    ఎంపిక (*p)
 	    {
-		case NFA_NOPEN: mclose = NFA_NCLOSE; break;
-#ifdef FEAT_SYN_HL
-		case NFA_ZOPEN: mclose = NFA_ZCLOSE; break;
-		case NFA_ZOPEN1: mclose = NFA_ZCLOSE1; break;
-		case NFA_ZOPEN2: mclose = NFA_ZCLOSE2; break;
-		case NFA_ZOPEN3: mclose = NFA_ZCLOSE3; break;
-		case NFA_ZOPEN4: mclose = NFA_ZCLOSE4; break;
-		case NFA_ZOPEN5: mclose = NFA_ZCLOSE5; break;
-		case NFA_ZOPEN6: mclose = NFA_ZCLOSE6; break;
-		case NFA_ZOPEN7: mclose = NFA_ZCLOSE7; break;
-		case NFA_ZOPEN8: mclose = NFA_ZCLOSE8; break;
-		case NFA_ZOPEN9: mclose = NFA_ZCLOSE9; break;
-#endif
-		case NFA_COMPOSING: mclose = NFA_END_COMPOSING; break;
-		default:
+		స్థితి NFA_NOPEN: mclose = NFA_NCLOSE; ఆపు;
+#నిర్వచితమైతే FEAT_SYN_HL
+		స్థితి NFA_ZOPEN: mclose = NFA_ZCLOSE; ఆపు;
+		స్థితి NFA_ZOPEN1: mclose = NFA_ZCLOSE1; ఆపు;
+		స్థితి NFA_ZOPEN2: mclose = NFA_ZCLOSE2; ఆపు;
+		స్థితి NFA_ZOPEN3: mclose = NFA_ZCLOSE3; ఆపు;
+		స్థితి NFA_ZOPEN4: mclose = NFA_ZCLOSE4; ఆపు;
+		స్థితి NFA_ZOPEN5: mclose = NFA_ZCLOSE5; ఆపు;
+		స్థితి NFA_ZOPEN6: mclose = NFA_ZCLOSE6; ఆపు;
+		స్థితి NFA_ZOPEN7: mclose = NFA_ZCLOSE7; ఆపు;
+		స్థితి NFA_ZOPEN8: mclose = NFA_ZCLOSE8; ఆపు;
+		స్థితి NFA_ZOPEN9: mclose = NFA_ZCLOSE9; ఆపు;
+#అయితే_ముగింపు
+		స్థితి NFA_COMPOSING: mclose = NFA_చివర_COMPOSING; ఆపు;
+		అప్రమేయ:
 		    // NFA_MOPEN, NFA_MOPEN1 .. NFA_MOPEN9
 		    mclose = *p + NSUBEXP;
-		    break;
+		    ఆపు;
 	    }
 
 	    // Allow "NFA_MOPEN" as a valid postfix representation for
 	    // the empty regexp "". In this case, the NFA will be
 	    // NFA_MOPEN -> NFA_MCLOSE. Note that this also allows
 	    // empty groups of parenthesis, and empty mbyte chars
-	    if (stackp == stack)
+	    ఒకవేళ (stackp == దొంతర)
 	    {
-		s = alloc_state(mopen, NULL, NULL);
-		if (s == NULL)
-		    goto theend;
-		s1 = alloc_state(mclose, NULL, NULL);
-		if (s1 == NULL)
-		    goto theend;
-		patch(list1(&s->out), s1);
-		PUSH(frag(s, list1(&s1->out)));
-		break;
+		s = alloc_state(mopen, ఖాళీ, ఖాళీ);
+		ఒకవేళ (s == ఖాళీ)
+		    వెళ్ళు theend;
+		s1 = alloc_state(mclose, ఖాళీ, ఖాళీ);
+		ఒకవేళ (s1 == ఖాళీ)
+		    వెళ్ళు theend;
+		patch(list1(&s->బహిర్గతం), s1);
+		నెట్టు_2(frag(s, list1(&s1->బహిర్గతం)));
+		ఆపు;
 	    }
 
 	    // At least one node was emitted before NFA_MOPEN, so
 	    // at least one node will be between NFA_MOPEN and NFA_MCLOSE
-	    e = POP();
-	    s = alloc_state(mopen, e.start, NULL);   // `('
-	    if (s == NULL)
-		goto theend;
+	    e = తీయి_2();
+	    s = alloc_state(mopen, e.ప్రారంభం, ఖాళీ);   // `('
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
 
-	    s1 = alloc_state(mclose, NULL, NULL);   // `)'
-	    if (s1 == NULL)
-		goto theend;
-	    patch(e.out, s1);
+	    s1 = alloc_state(mclose, ఖాళీ, ఖాళీ);   // `)'
+	    ఒకవేళ (s1 == ఖాళీ)
+		వెళ్ళు theend;
+	    patch(e.బహిర్గతం, s1);
 
-	    if (mopen == NFA_COMPOSING)
+	    ఒకవేళ (mopen == NFA_COMPOSING)
 		// COMPOSING->out1 = END_COMPOSING
 		patch(list1(&s->out1), s1);
 
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    నెట్టు_2(frag(s, list1(&s1->బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
-#endif
-	    if (nfa_calc_size == TRUE)
+	స్థితి NFA_BACKREF1:
+	స్థితి NFA_BACKREF2:
+	స్థితి NFA_BACKREF3:
+	స్థితి NFA_BACKREF4:
+	స్థితి NFA_BACKREF5:
+	స్థితి NFA_BACKREF6:
+	స్థితి NFA_BACKREF7:
+	స్థితి NFA_BACKREF8:
+	స్థితి NFA_BACKREF9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZREF1:
+	స్థితి NFA_ZREF2:
+	స్థితి NFA_ZREF3:
+	స్థితి NFA_ZREF4:
+	స్థితి NFA_ZREF5:
+	స్థితి NFA_ZREF6:
+	స్థితి NFA_ZREF7:
+	స్థితి NFA_ZREF8:
+	స్థితి NFA_ZREF9:
+#అయితే_ముగింపు
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate += 2;
-		break;
+		ఆపు;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    s1 = alloc_state(NFA_SKIP, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
-	    patch(list1(&s->out), s1);
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    s = alloc_state(*p, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    s1 = alloc_state(NFA_SKIP, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s1 == ఖాళీ)
+		వెళ్ళు theend;
+	    patch(list1(&s->బహిర్గతం), s1);
+	    నెట్టు_2(frag(s, list1(&s1->బహిర్గతం)));
+	    ఆపు;
 
-	case NFA_LNUM:
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_VCOL:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_COL:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_MARK:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
+	స్థితి NFA_LNUM:
+	స్థితి NFA_LNUM_GT:
+	స్థితి NFA_LNUM_LT:
+	స్థితి NFA_VCOL:
+	స్థితి NFA_VCOL_GT:
+	స్థితి NFA_VCOL_LT:
+	స్థితి NFA_నిలువు:
+	స్థితి NFA_నిలువు_GT:
+	స్థితి NFA_నిలువు_LT:
+	స్థితి NFA_MARK:
+	స్థితి NFA_MARK_GT:
+	స్థితి NFA_MARK_LT:
 	  {
-	    int n = *++p; // lnum, col or mark name
+	    పూర్ణాంకం n = *++p; // lnum, col or mark name
 
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate += 1;
-		break;
+		ఆపు;
 	    }
-	    s = alloc_state(p[-1], NULL, NULL);
-	    if (s == NULL)
-		goto theend;
+	    s = alloc_state(p[-1], ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
 	    s->val = n;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    నెట్టు_2(frag(s, list1(&s->బహిర్గతం)));
+	    ఆపు;
 	  }
 
-	case NFA_ZSTART:
-	case NFA_ZEND:
-	default:
+	స్థితి NFA_ZSTART:
+	స్థితి NFA_ZEND:
+	అప్రమేయ:
 	    // Operands
-	    if (nfa_calc_size == TRUE)
+	    ఒకవేళ (nfa_calc_కొలత == TRUE)
 	    {
 		nstate++;
-		break;
+		ఆపు;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(*p, ఖాళీ, ఖాళీ);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు theend;
+	    నెట్టు_2(frag(s, list1(&s->బహిర్గతం)));
+	    ఆపు;
 
 	} // switch(*p)
 
     } // for (p = postfix; *p; ++p)
 
-    if (nfa_calc_size == TRUE)
+    ఒకవేళ (nfa_calc_కొలత == TRUE)
     {
 	nstate++;
-	goto theend;	// Return value when counting size is ignored anyway
+	వెళ్ళు theend;	// Return value when counting size is ignored anyway
     }
 
-    e = POP();
-    if (stackp != stack)
-	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_to_nfa_too_many_stats_left_on_stack));
+    e = తీయి_2();
+    ఒకవేళ (stackp != దొంతర)
+	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_గమ్యం_nfa_too_many_stats_ఎడమ_on_దొంతర));
 
-    if (istate >= nstate)
-	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_to_store_whole_nfa));
+    ఒకవేళ (istate >= nstate)
+	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_గమ్యం_store_సంపూర్ణ_nfa));
 
     matchstate = &state_ptr[istate++]; // the match state
-    matchstate->c = NFA_MATCH;
-    matchstate->out = matchstate->out1 = NULL;
+    matchstate->c = NFA_సరిపోలిక;
+    matchstate->బహిర్గతం = matchstate->out1 = ఖాళీ;
     matchstate->id = 0;
 
-    patch(e.out, matchstate);
-    ret = e.start;
+    patch(e.బహిర్గతం, matchstate);
+    ret = e.ప్రారంభం;
 
 theend:
-    return ret;
+    తిరిగి ret;
 
-#undef POP1
-#undef PUSH1
-#undef POP2
-#undef PUSH2
-#undef POP
-#undef PUSH
+#నిర్వచనం_రద్దు POP1
+#నిర్వచనం_రద్దు PUSH1
+#నిర్వచనం_రద్దు POP2
+#నిర్వచనం_రద్దు PUSH2
+#నిర్వచనం_రద్దు తీయి_2
+#నిర్వచనం_రద్దు నెట్టు_2
 }
 
 /*
  * After building the NFA program, inspect it to add optimization hints.
  */
-    static void
+    స్థిర శూన్య
 nfa_postprocess(nfa_regprog_T *prog)
 {
-    int i;
-    int c;
+    పూర్ణాంకం i;
+    పూర్ణాంకం c;
 
-    for (i = 0; i < prog->nstate; ++i)
+    కొరకు (i = 0; i < prog->nstate; ++i)
     {
 	c = prog->state[i].c;
-	if (c == NFA_START_INVISIBLE
-		|| c == NFA_START_INVISIBLE_NEG
-		|| c == NFA_START_INVISIBLE_BEFORE
-		|| c == NFA_START_INVISIBLE_BEFORE_NEG)
+	ఒకవేళ (c == NFA_ప్రారంభం_INVISIBLE
+		|| c == NFA_ప్రారంభం_INVISIBLE_NEG
+		|| c == NFA_ప్రారంభం_INVISIBLE_BEFORE
+		|| c == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG)
 	{
-	    int directly;
+	    పూర్ణాంకం directly;
 
 	    // Do it directly when what follows is possibly the end of the
 	    // match.
-	    if (match_follows(prog->state[i].out1->out, 0))
+	    ఒకవేళ (సరిపోలిక_follows(prog->state[i].out1->బహిర్గతం, 0))
 		directly = TRUE;
-	    else
+	    లేకపోతే
 	    {
-		int ch_invisible = failure_chance(prog->state[i].out, 0);
-		int ch_follows = failure_chance(prog->state[i].out1->out, 0);
+		పూర్ణాంకం ch_invisible = failure_chance(prog->state[i].బహిర్గతం, 0);
+		పూర్ణాంకం ch_follows = failure_chance(prog->state[i].out1->బహిర్గతం, 0);
 
 		// Postpone when the invisible match is expensive or has a
 		// lower chance of failing.
-		if (c == NFA_START_INVISIBLE_BEFORE
-		     || c == NFA_START_INVISIBLE_BEFORE_NEG)
+		ఒకవేళ (c == NFA_ప్రారంభం_INVISIBLE_BEFORE
+		     || c == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG)
 		{
 		    // "before" matches are very expensive when
 		    // unbounded, always prefer what follows then,
 		    // unless what follows will always match.
 		    // Otherwise strongly prefer what follows.
-		    if (prog->state[i].val <= 0 && ch_follows > 0)
+		    ఒకవేళ (prog->state[i].val <= 0 && ch_follows > 0)
 			directly = FALSE;
-		    else
+		    లేకపోతే
 			directly = ch_follows * 10 < ch_invisible;
 		}
-		else
+		లేకపోతే
 		{
 		    // normal invisible, first do the one with the
 		    // highest failure chance
 		    directly = ch_follows < ch_invisible;
 		}
 	    }
-	    if (directly)
+	    ఒకవేళ (directly)
 		// switch to the _FIRST state
 		++prog->state[i].c;
 	}
@@ -3924,250 +3924,250 @@ nfa_postprocess(nfa_regprog_T *prog)
 // NFA execution code.
 /////////////////////////////////////////////////////////////////
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int	    in_use; // number of subexpr with useful info
+    పూర్ణాంకం	    లోపల_use; // number of subexpr with useful info
 
     // When REG_MULTI is TRUE list.multi is used, otherwise list.line.
-    union
+    సంఘం
     {
-	struct multipos
+	నిర్మాణం multipos
 	{
-	    linenr_T	start_lnum;
-	    linenr_T	end_lnum;
-	    colnr_T	start_col;
-	    colnr_T	end_col;
+	    linenr_T	ప్రారంభం_lnum;
+	    linenr_T	చివర_lnum;
+	    colnr_T	ప్రారంభం_నిలువు;
+	    colnr_T	చివర_నిలువు;
 	} multi[NSUBEXP];
-	struct linepos
+	నిర్మాణం linepos
 	{
-	    char_u	*start;
-	    char_u	*end;
-	} line[NSUBEXP];
+	    char_u	*ప్రారంభం;
+	    char_u	*చివర;
+	} పంక్తి[NSUBEXP];
     } list;
-    colnr_T	orig_start_col;  // list.multi[0].start_col without \zs
+    colnr_T	orig_ప్రారంభం_నిలువు;  // list.multi[0].start_col without \zs
 } regsub_T;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     regsub_T	norm; // \( .. \) matches
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     regsub_T	synt; // \z( .. \) matches
-#endif
+#అయితే_ముగింపు
 } regsubs_T;
 
 // nfa_pim_T stores a Postponed Invisible Match.
-typedef struct nfa_pim_S nfa_pim_T;
-struct nfa_pim_S
+రకనిర్వచనం నిర్మాణం nfa_pim_S nfa_pim_T;
+నిర్మాణం nfa_pim_S
 {
-    int		result;		// NFA_PIM_*, see below
+    పూర్ణాంకం		ఫలితం;		// NFA_PIM_*, see below
     nfa_state_T	*state;		// the invisible match start state
     regsubs_T	subs;		// submatch info, only party used
-    union
+    సంఘం
     {
 	lpos_T	pos;
 	char_u	*ptr;
-    } end;			// where the match must end
+    } చివర;			// where the match must end
 };
 
 // Values for done in nfa_pim_T.
-#define NFA_PIM_UNUSED   0	// pim not used
-#define NFA_PIM_TODO     1	// pim not done yet
-#define NFA_PIM_MATCH    2	// pim executed, matches
-#define NFA_PIM_NOMATCH  3	// pim executed, no match
+#నిర్వచించు NFA_PIM_వాడని   0	// pim not used
+#నిర్వచించు NFA_PIM_TODO     1	// pim not done yet
+#నిర్వచించు NFA_PIM_సరిపోలిక    2	// pim executed, matches
+#నిర్వచించు NFA_PIM_NOMATCH  3	// pim executed, no match
 
 
 // nfa_thread_T contains execution information of a NFA state
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     nfa_state_T	*state;
-    int		count;
+    పూర్ణాంకం		లెక్క;
     nfa_pim_T	pim;		// if pim.result != NFA_PIM_UNUSED: postponed
 				// invisible match
     regsubs_T	subs;		// submatch info, only party used
 } nfa_thread_T;
 
 // nfa_list_T contains the alternative NFA execution states.
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     nfa_thread_T    *t;		// allocated array of states
-    int		    n;		// nr of states currently in "t"
-    int		    len;	// max nr of states in "t"
-    int		    id;		// ID of the list
-    int		    has_pim;	// TRUE when any state has a PIM
+    పూర్ణాంకం		    n;		// nr of states currently in "t"
+    పూర్ణాంకం		    len;	// max nr of states in "t"
+    పూర్ణాంకం		    id;		// ID of the list
+    పూర్ణాంకం		    has_pim;	// TRUE when any state has a PIM
 } nfa_list_T;
 
-#ifdef ENABLE_LOG
-static void log_subexpr(regsub_T *sub);
+#నిర్వచితమైతే ENABLE_LOG
+స్థిర శూన్య log_subexpr(regsub_T *sub);
 
-    static void
+    స్థిర శూన్య
 log_subsexpr(regsubs_T *subs)
 {
     log_subexpr(&subs->norm);
 # ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    ఒకవేళ (rex.nfa_has_zsubexpr)
 	log_subexpr(&subs->synt);
 # endif
 }
 
-    static void
+    స్థిర శూన్య
 log_subexpr(regsub_T *sub)
 {
-    int j;
+    పూర్ణాంకం j;
 
-    for (j = 0; j < sub->in_use; j++)
-	if (REG_MULTI)
+    కొరకు (j = 0; j < sub->లోపల_use; j++)
+	ఒకవేళ (REG_MULTI)
 	    fprintf(log_fd,
 		    "*** group %d, start: c=%d, l=%d, end: c=%d, l=%d\n",
 		    j,
-		    sub->list.multi[j].start_col,
-		    (int)sub->list.multi[j].start_lnum,
-		    sub->list.multi[j].end_col,
-		    (int)sub->list.multi[j].end_lnum);
-	else
+		    sub->list.multi[j].ప్రారంభం_నిలువు,
+		    (పూర్ణాంకం)sub->list.multi[j].ప్రారంభం_lnum,
+		    sub->list.multi[j].చివర_నిలువు,
+		    (పూర్ణాంకం)sub->list.multi[j].చివర_lnum);
+	లేకపోతే
 	{
-	    char *s = (char *)sub->list.line[j].start;
-	    char *e = (char *)sub->list.line[j].end;
+	    అక్షరం *s = (అక్షరం *)sub->list.పంక్తి[j].ప్రారంభం;
+	    అక్షరం *e = (అక్షరం *)sub->list.పంక్తి[j].చివర;
 
 	    fprintf(log_fd, "*** group %d, start: \"%s\", end: \"%s\"\n",
 		    j,
-		    s == NULL ? "NULL" : s,
-		    e == NULL ? "NULL" : e);
+		    s == ఖాళీ ? "NULL" : s,
+		    e == ఖాళీ ? "NULL" : e);
 	}
 }
 
-    static char *
+    స్థిర అక్షరం *
 pim_info(nfa_pim_T *pim)
 {
-    static char buf[30];
+    స్థిర అక్షరం buf[30];
 
-    if (pim == NULL || pim->result == NFA_PIM_UNUSED)
+    ఒకవేళ (pim == ఖాళీ || pim->ఫలితం == NFA_PIM_వాడని)
 	buf[0] = NUL;
-    else
+    లేకపోతే
     {
-	sprintf(buf, " PIM col %d", REG_MULTI ? (int)pim->end.pos.col
-		: (int)(pim->end.ptr - rex.input));
+	sprintf(buf, " PIM col %d", REG_MULTI ? (పూర్ణాంకం)pim->చివర.pos.నిలువు
+		: (పూర్ణాంకం)(pim->చివర.ptr - rex.ఆదానం));
     }
-    return buf;
+    తిరిగి buf;
 }
 
-#endif
+#అయితే_ముగింపు
 
 // Used during execution: whether a match has been found.
-static int	    nfa_match;
-#ifdef FEAT_RELTIME
-static int	   *nfa_timed_out;
-#endif
+స్థిర పూర్ణాంకం	    nfa_సరిపోలిక;
+#నిర్వచితమైతే FEAT_RELTIME
+స్థిర పూర్ణాంకం	   *nfa_timed_బహిర్గతం;
+#అయితే_ముగింపు
 
-static inline void copy_sub(regsub_T *to, regsub_T *from);
-static int pim_equal(nfa_pim_T *one, nfa_pim_T *two);
+స్థిర అంతఃవరుస శూన్య copy_sub(regsub_T *గమ్యం, regsub_T *from);
+స్థిర పూర్ణాంకం pim_equal(nfa_pim_T *one, nfa_pim_T *two);
 
 /*
  * Copy postponed invisible match info from "from" to "to".
  */
-    static void
-copy_pim(nfa_pim_T *to, nfa_pim_T *from)
+    స్థిర శూన్య
+copy_pim(nfa_pim_T *గమ్యం, nfa_pim_T *from)
 {
-    to->result = from->result;
-    to->state = from->state;
-    copy_sub(&to->subs.norm, &from->subs.norm);
-#ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
-	copy_sub(&to->subs.synt, &from->subs.synt);
-#endif
-    to->end = from->end;
+    గమ్యం->ఫలితం = from->ఫలితం;
+    గమ్యం->state = from->state;
+    copy_sub(&గమ్యం->subs.norm, &from->subs.norm);
+#నిర్వచితమైతే FEAT_SYN_HL
+    ఒకవేళ (rex.nfa_has_zsubexpr)
+	copy_sub(&గమ్యం->subs.synt, &from->subs.synt);
+#అయితే_ముగింపు
+    గమ్యం->చివర = from->చివర;
 }
 
-    static void
+    స్థిర శూన్య
 clear_sub(regsub_T *sub)
 {
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
 	// Use 0xff to set lnum to -1
 	vim_memset(sub->list.multi, 0xff,
-				  sizeof(struct multipos) * rex.nfa_nsubexpr);
-    else
-	vim_memset(sub->list.line, 0,
-				   sizeof(struct linepos) * rex.nfa_nsubexpr);
-    sub->in_use = 0;
+				  పరిమాణం(నిర్మాణం multipos) * rex.nfa_nsubexpr);
+    లేకపోతే
+	vim_memset(sub->list.పంక్తి, 0,
+				   పరిమాణం(నిర్మాణం linepos) * rex.nfa_nsubexpr);
+    sub->లోపల_use = 0;
 }
 
 /*
  * Copy the submatches from "from" to "to".
  */
-    static inline void
-copy_sub(regsub_T *to, regsub_T *from)
+    స్థిర అంతఃవరుస శూన్య
+copy_sub(regsub_T *గమ్యం, regsub_T *from)
 {
-    to->in_use = from->in_use;
-    if (from->in_use <= 0)
-	return;
+    గమ్యం->లోపల_use = from->లోపల_use;
+    ఒకవేళ (from->లోపల_use <= 0)
+	తిరిగి;
 
     // Copy the match start and end positions.  addstate() calls this for
     // every state it adds, so it is very hot.  Patterns without capturing
     // groups only use subexpression zero (the whole match), so special-case
     // "in_use == 1" with a direct assignment to avoid the mch_memmove() call.
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	if (from->in_use == 1)
-	    to->list.multi[0] = from->list.multi[0];
-	else
-	    mch_memmove(&to->list.multi[0],
+	ఒకవేళ (from->లోపల_use == 1)
+	    గమ్యం->list.multi[0] = from->list.multi[0];
+	లేకపోతే
+	    mch_memmove(&గమ్యం->list.multi[0],
 		    &from->list.multi[0],
-		    sizeof(struct multipos) * from->in_use);
-	to->orig_start_col = from->orig_start_col;
+		    పరిమాణం(నిర్మాణం multipos) * from->లోపల_use);
+	గమ్యం->orig_ప్రారంభం_నిలువు = from->orig_ప్రారంభం_నిలువు;
     }
-    else
+    లేకపోతే
     {
-	if (from->in_use == 1)
-	    to->list.line[0] = from->list.line[0];
-	else
-	    mch_memmove(&to->list.line[0],
-		    &from->list.line[0],
-		    sizeof(struct linepos) * from->in_use);
+	ఒకవేళ (from->లోపల_use == 1)
+	    గమ్యం->list.పంక్తి[0] = from->list.పంక్తి[0];
+	లేకపోతే
+	    mch_memmove(&గమ్యం->list.పంక్తి[0],
+		    &from->list.పంక్తి[0],
+		    పరిమాణం(నిర్మాణం linepos) * from->లోపల_use);
     }
 }
 
 /*
  * Like copy_sub() but exclude the main match.
  */
-    static void
-copy_sub_off(regsub_T *to, regsub_T *from)
+    స్థిర శూన్య
+copy_sub_off(regsub_T *గమ్యం, regsub_T *from)
 {
-    if (to->in_use < from->in_use)
-	to->in_use = from->in_use;
-    if (from->in_use <= 1)
-	return;
+    ఒకవేళ (గమ్యం->లోపల_use < from->లోపల_use)
+	గమ్యం->లోపల_use = from->లోపల_use;
+    ఒకవేళ (from->లోపల_use <= 1)
+	తిరిగి;
 
     // Copy the match start and end positions.
-    if (REG_MULTI)
-	mch_memmove(&to->list.multi[1],
+    ఒకవేళ (REG_MULTI)
+	mch_memmove(&గమ్యం->list.multi[1],
 		&from->list.multi[1],
-		sizeof(struct multipos) * (from->in_use - 1));
-    else
-	mch_memmove(&to->list.line[1],
-		&from->list.line[1],
-		sizeof(struct linepos) * (from->in_use - 1));
+		పరిమాణం(నిర్మాణం multipos) * (from->లోపల_use - 1));
+    లేకపోతే
+	mch_memmove(&గమ్యం->list.పంక్తి[1],
+		&from->list.పంక్తి[1],
+		పరిమాణం(నిర్మాణం linepos) * (from->లోపల_use - 1));
 }
 
 /*
  * Like copy_sub() but only do the end of the main match if \ze is present.
  */
-    static void
-copy_ze_off(regsub_T *to, regsub_T *from)
+    స్థిర శూన్య
+copy_ze_off(regsub_T *గమ్యం, regsub_T *from)
 {
-    if (!rex.nfa_has_zend)
-	return;
+    ఒకవేళ (!rex.nfa_has_zend)
+	తిరిగి;
 
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	if (from->list.multi[0].end_lnum >= 0)
+	ఒకవేళ (from->list.multi[0].చివర_lnum >= 0)
 	{
-	    to->list.multi[0].end_lnum = from->list.multi[0].end_lnum;
-	    to->list.multi[0].end_col = from->list.multi[0].end_col;
+	    గమ్యం->list.multi[0].చివర_lnum = from->list.multi[0].చివర_lnum;
+	    గమ్యం->list.multi[0].చివర_నిలువు = from->list.multi[0].చివర_నిలువు;
 	}
     }
-    else
+    లేకపోతే
     {
-	if (from->list.line[0].end != NULL)
-	    to->list.line[0].end = from->list.line[0].end;
+	ఒకవేళ (from->list.పంక్తి[0].చివర != ఖాళీ)
+	    గమ్యం->list.పంక్తి[0].చివర = from->list.పంక్తి[0].చివర;
     }
 }
 
@@ -4175,115 +4175,115 @@ copy_ze_off(regsub_T *to, regsub_T *from)
  * Return TRUE if "sub1" and "sub2" have the same start positions.
  * When using back-references also check the end position.
  */
-    static int
+    స్థిర పూర్ణాంకం
 sub_equal(regsub_T *sub1, regsub_T *sub2)
 {
-    int		i;
-    int		todo;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		todo;
     linenr_T	s1;
     linenr_T	s2;
     char_u	*sp1;
     char_u	*sp2;
 
-    todo = sub1->in_use > sub2->in_use ? sub1->in_use : sub2->in_use;
-    if (REG_MULTI)
+    todo = sub1->లోపల_use > sub2->లోపల_use ? sub1->లోపల_use : sub2->లోపల_use;
+    ఒకవేళ (REG_MULTI)
     {
-	for (i = 0; i < todo; ++i)
+	కొరకు (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
-		s1 = sub1->list.multi[i].start_lnum;
-	    else
+	    ఒకవేళ (i < sub1->లోపల_use)
+		s1 = sub1->list.multi[i].ప్రారంభం_lnum;
+	    లేకపోతే
 		s1 = -1;
-	    if (i < sub2->in_use)
-		s2 = sub2->list.multi[i].start_lnum;
-	    else
+	    ఒకవేళ (i < sub2->లోపల_use)
+		s2 = sub2->list.multi[i].ప్రారంభం_lnum;
+	    లేకపోతే
 		s2 = -1;
-	    if (s1 != s2)
-		return FALSE;
-	    if (s1 != -1 && sub1->list.multi[i].start_col
-					     != sub2->list.multi[i].start_col)
-		return FALSE;
+	    ఒకవేళ (s1 != s2)
+		తిరిగి FALSE;
+	    ఒకవేళ (s1 != -1 && sub1->list.multi[i].ప్రారంభం_నిలువు
+					     != sub2->list.multi[i].ప్రారంభం_నిలువు)
+		తిరిగి FALSE;
 
-	    if (rex.nfa_has_backref)
+	    ఒకవేళ (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
-		    s1 = sub1->list.multi[i].end_lnum;
-		else
+		ఒకవేళ (i < sub1->లోపల_use)
+		    s1 = sub1->list.multi[i].చివర_lnum;
+		లేకపోతే
 		    s1 = -1;
-		if (i < sub2->in_use)
-		    s2 = sub2->list.multi[i].end_lnum;
-		else
+		ఒకవేళ (i < sub2->లోపల_use)
+		    s2 = sub2->list.multi[i].చివర_lnum;
+		లేకపోతే
 		    s2 = -1;
-		if (s1 != s2)
-		    return FALSE;
-		if (s1 != -1 && sub1->list.multi[i].end_col
-					       != sub2->list.multi[i].end_col)
-		return FALSE;
+		ఒకవేళ (s1 != s2)
+		    తిరిగి FALSE;
+		ఒకవేళ (s1 != -1 && sub1->list.multi[i].చివర_నిలువు
+					       != sub2->list.multi[i].చివర_నిలువు)
+		తిరిగి FALSE;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
-	for (i = 0; i < todo; ++i)
+	కొరకు (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
-		sp1 = sub1->list.line[i].start;
-	    else
-		sp1 = NULL;
-	    if (i < sub2->in_use)
-		sp2 = sub2->list.line[i].start;
-	    else
-		sp2 = NULL;
-	    if (sp1 != sp2)
-		return FALSE;
-	    if (rex.nfa_has_backref)
+	    ఒకవేళ (i < sub1->లోపల_use)
+		sp1 = sub1->list.పంక్తి[i].ప్రారంభం;
+	    లేకపోతే
+		sp1 = ఖాళీ;
+	    ఒకవేళ (i < sub2->లోపల_use)
+		sp2 = sub2->list.పంక్తి[i].ప్రారంభం;
+	    లేకపోతే
+		sp2 = ఖాళీ;
+	    ఒకవేళ (sp1 != sp2)
+		తిరిగి FALSE;
+	    ఒకవేళ (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
-		    sp1 = sub1->list.line[i].end;
-		else
-		    sp1 = NULL;
-		if (i < sub2->in_use)
-		    sp2 = sub2->list.line[i].end;
-		else
-		    sp2 = NULL;
-		if (sp1 != sp2)
-		    return FALSE;
+		ఒకవేళ (i < sub1->లోపల_use)
+		    sp1 = sub1->list.పంక్తి[i].చివర;
+		లేకపోతే
+		    sp1 = ఖాళీ;
+		ఒకవేళ (i < sub2->లోపల_use)
+		    sp2 = sub2->list.పంక్తి[i].చివర;
+		లేకపోతే
+		    sp2 = ఖాళీ;
+		ఒకవేళ (sp1 != sp2)
+		    తిరిగి FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-#ifdef FEAT_RELTIME
+#నిర్వచితమైతే FEAT_RELTIME
 /*
  * Check if we are past the time limit, if there is one.
  */
-    static int
-nfa_did_time_out(void)
+    స్థిర పూర్ణాంకం
+nfa_did_సమయం_బహిర్గతం(శూన్య)
 {
-    if (*timeout_flag)
+    ఒకవేళ (*timeout_flag)
     {
-	if (nfa_timed_out != NULL)
+	ఒకవేళ (nfa_timed_బహిర్గతం != ఖాళీ)
 	{
 # ifdef FEAT_EVAL
-	    if (!*nfa_timed_out)
-		ch_log(NULL, "NFA regexp timed out");
+	    ఒకవేళ (!*nfa_timed_బహిర్గతం)
+		ch_log(ఖాళీ, "NFA regexp timed out");
 # endif
-	    *nfa_timed_out = TRUE;
+	    *nfa_timed_బహిర్గతం = TRUE;
 	}
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef ENABLE_LOG
-    static void
-open_debug_log(int result)
+#నిర్వచితమైతే ENABLE_LOG
+    స్థిర శూన్య
+open_debug_log(పూర్ణాంకం ఫలితం)
 {
-    log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    log_fd = fopen(NFA_REGEXP_నిరంతరం_LOG, "a");
+    ఒకవేళ (log_fd == ఖాళీ)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -4291,41 +4291,41 @@ open_debug_log(int result)
 
     fprintf(log_fd, "****************************\n");
     fprintf(log_fd, "FINISHED RUNNING nfa_regmatch() recursively\n");
-    fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : result == MAYBE
+    fprintf(log_fd, "MATCH = %s\n", ఫలితం == TRUE ? "OK" : ఫలితం == MAYBE
 	    ? "MAYBE" : "FALSE");
     fprintf(log_fd, "****************************\n");
 }
 
-    static void
-report_state(char *action,
+    స్థిర శూన్య
+report_state(అక్షరం *action,
 	     regsub_T *sub,
 	     nfa_state_T *state,
-	     int lid,
+	     పూర్ణాంకం lid,
 	     nfa_pim_T *pim)
 {
-    int col;
+    పూర్ణాంకం నిలువు;
 
-    if (sub->in_use <= 0)
-	col = -1;
-    else if (REG_MULTI)
-	col = sub->list.multi[0].start_col;
-    else
-	col = (int)(sub->list.line[0].start - rex.line);
-    nfa_set_code(state->c);
-    if (log_fd == NULL)
+    ఒకవేళ (sub->లోపల_use <= 0)
+	నిలువు = -1;
+    లేకపోతే ఒకవేళ (REG_MULTI)
+	నిలువు = sub->list.multi[0].ప్రారంభం_నిలువు;
+    లేకపోతే
+	నిలువు = (పూర్ణాంకం)(sub->list.పంక్తి[0].ప్రారంభం - rex.పంక్తి);
+    nfa_సమితి_సంకేతం(state->c);
+    ఒకవేళ (log_fd == ఖాళీ)
 	open_debug_log(MAYBE);
 
     fprintf(log_fd, "> %s state %d to list %d. char %d: %s (start col %d)%s\n",
-	    action, abs(state->id), lid, state->c, code, col,
+	    action, నిరపేక్ష(state->id), lid, state->c, సంకేతం_2, నిలువు,
 	    pim_info(pim));
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if the same state is already in list "l" with the same
  * positions as "subs".
  */
-    static int
+    స్థిర పూర్ణాంకం
 has_state_with_pos(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
@@ -4333,566 +4333,566 @@ has_state_with_pos(
     nfa_pim_T		*pim)	// postponed match or NULL
 {
     nfa_thread_T	*thread;
-    int			i;
+    పూర్ణాంకం			i;
 
-    for (i = 0; i < l->n; ++i)
+    కొరకు (i = 0; i < l->n; ++i)
     {
 	thread = &l->t[i];
-	if (thread->state->id == state->id
+	ఒకవేళ (thread->state->id == state->id
 		&& sub_equal(&thread->subs.norm, &subs->norm)
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 		&& (!rex.nfa_has_zsubexpr
 				|| sub_equal(&thread->subs.synt, &subs->synt))
-#endif
+#అయితే_ముగింపు
 		&& pim_equal(&thread->pim, pim))
-	    return TRUE;
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Return TRUE if "one" and "two" are equal.  That includes when both are not
  * set.
  */
-    static int
+    స్థిర పూర్ణాంకం
 pim_equal(nfa_pim_T *one, nfa_pim_T *two)
 {
-    int one_unused = (one == NULL || one->result == NFA_PIM_UNUSED);
-    int two_unused = (two == NULL || two->result == NFA_PIM_UNUSED);
+    పూర్ణాంకం one_వాడని = (one == ఖాళీ || one->ఫలితం == NFA_PIM_వాడని);
+    పూర్ణాంకం two_వాడని = (two == ఖాళీ || two->ఫలితం == NFA_PIM_వాడని);
 
-    if (one_unused)
+    ఒకవేళ (one_వాడని)
 	// one is unused: equal when two is also unused
-	return two_unused;
-    if (two_unused)
+	తిరిగి two_వాడని;
+    ఒకవేళ (two_వాడని)
 	// one is used and two is not: not equal
-	return FALSE;
+	తిరిగి FALSE;
     // compare the state id
-    if (one->state->id != two->state->id)
-	return FALSE;
+    ఒకవేళ (one->state->id != two->state->id)
+	తిరిగి FALSE;
     // compare the position
-    if (REG_MULTI)
-	return one->end.pos.lnum == two->end.pos.lnum
-	    && one->end.pos.col == two->end.pos.col;
-    return one->end.ptr == two->end.ptr;
+    ఒకవేళ (REG_MULTI)
+	తిరిగి one->చివర.pos.lnum == two->చివర.pos.lnum
+	    && one->చివర.pos.నిలువు == two->చివర.pos.నిలువు;
+    తిరిగి one->చివర.ptr == two->చివర.ptr;
 }
 
 /*
  * Return TRUE if "state" leads to a NFA_MATCH without advancing the input.
  */
-    static int
-match_follows(nfa_state_T *startstate, int depth)
+    స్థిర పూర్ణాంకం
+సరిపోలిక_follows(nfa_state_T *startstate, పూర్ణాంకం లోతు)
 {
     nfa_state_T	    *state = startstate;
 
     // avoid too much recursion
-    if (depth > 10)
-	return FALSE;
+    ఒకవేళ (లోతు > 10)
+	తిరిగి FALSE;
 
-    while (state != NULL)
+    అయితే (state != ఖాళీ)
     {
-	switch (state->c)
+	ఎంపిక (state->c)
 	{
-	    case NFA_MATCH:
-	    case NFA_MCLOSE:
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
-		return TRUE;
+	    స్థితి NFA_సరిపోలిక:
+	    స్థితి NFA_MCLOSE:
+	    స్థితి NFA_చివర_INVISIBLE:
+	    స్థితి NFA_చివర_INVISIBLE_NEG:
+	    స్థితి NFA_చివర_నమూనా:
+		తిరిగి TRUE;
 
-	    case NFA_SPLIT:
-		return match_follows(state->out, depth + 1)
-				     || match_follows(state->out1, depth + 1);
+	    స్థితి NFA_విభజించు:
+		తిరిగి సరిపోలిక_follows(state->బహిర్గతం, లోతు + 1)
+				     || సరిపోలిక_follows(state->out1, లోతు + 1);
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	    case NFA_COMPOSING:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి:
+	    స్థితి NFA_COMPOSING:
 		// skip ahead to next state
-		state = state->out1->out;
-		continue;
+		state = state->out1->బహిర్గతం;
+		కొనసాగు;
 
-	    case NFA_ANY:
-	    case NFA_ANY_COMPOSING:
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_WHITE:
-	    case NFA_NWHITE:
-	    case NFA_DIGIT:
-	    case NFA_NDIGIT:
-	    case NFA_HEX:
-	    case NFA_NHEX:
-	    case NFA_OCTAL:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
-	    case NFA_NEWL:
+	    స్థితి NFA_ANY:
+	    స్థితి NFA_ANY_COMPOSING:
+	    స్థితి NFA_IDENT:
+	    స్థితి NFA_SIDENT:
+	    స్థితి NFA_KWORD:
+	    స్థితి NFA_SKWORD:
+	    స్థితి NFA_FNAME:
+	    స్థితి NFA_SFNAME:
+	    స్థితి NFA_PRINT:
+	    స్థితి NFA_SPRINT:
+	    స్థితి NFA_WHITE:
+	    స్థితి NFA_NWHITE:
+	    స్థితి NFA_DIGIT:
+	    స్థితి NFA_NDIGIT:
+	    స్థితి NFA_HEX:
+	    స్థితి NFA_NHEX:
+	    స్థితి NFA_OCTAL:
+	    స్థితి NFA_NOCTAL:
+	    స్థితి NFA_మాట:
+	    స్థితి NFA_NWORD:
+	    స్థితి NFA_తల:
+	    స్థితి NFA_NHEAD:
+	    స్థితి NFA_ALPHA:
+	    స్థితి NFA_NALPHA:
+	    స్థితి NFA_క్రింది:
+	    స్థితి NFA_NLOWER:
+	    స్థితి NFA_పై:
+	    స్థితి NFA_NUPPER:
+	    స్థితి NFA_క్రింది_IC:
+	    స్థితి NFA_NLOWER_IC:
+	    స్థితి NFA_పై_IC:
+	    స్థితి NFA_NUPPER_IC:
+	    స్థితి NFA_ప్రారంభం_COLL:
+	    స్థితి NFA_ప్రారంభం_NEG_COLL:
+	    స్థితి NFA_NEWL:
 		// state will advance input
-		return FALSE;
+		తిరిగి FALSE;
 
-	    default:
-		if (state->c > 0)
+	    అప్రమేయ:
+		ఒకవేళ (state->c > 0)
 		    // state will advance input
-		    return FALSE;
+		    తిరిగి FALSE;
 
 		// Others: zero-width or possibly zero-width, might still find
 		// a match at the same position, keep looking.
-		break;
+		ఆపు;
 	}
-	state = state->out;
+	state = state->బహిర్గతం;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 
 /*
  * Return TRUE if "state" is already in list "l".
  */
-    static int
-state_in_list(
+    స్థిర పూర్ణాంకం
+state_లోపల_list(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs)	// pointers to subexpressions
 {
-    if (state->lastlist[nfa_ll_index] == l->id)
+    ఒకవేళ (state->lastlist[nfa_ll_సూచీ] == l->id)
     {
-	if (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, NULL))
-	    return TRUE;
+	ఒకవేళ (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, ఖాళీ))
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 // Offset used for "off" by addstate_here().
-#define ADDSTATE_HERE_OFFSET 10
+#నిర్వచించు ADDSTATE_ఇక్కడ_స్థానభ్రంశం 10
 
 /*
  * Add "state" and possibly what follows to state list ".".
  * Returns "subs_arg", possibly copied into temp_subs.
  * Returns NULL when recursiveness is too deep or timed out.
  */
-    static regsubs_T *
+    స్థిర regsubs_T *
 addstate(
     nfa_list_T		*l,	    // runtime state list
     nfa_state_T		*state,	    // state to update
     regsubs_T		*subs_arg,  // pointers to subexpressions
     nfa_pim_T		*pim,	    // postponed look-behind match
-    int			off_arg,    // byte offset, when -1 go to next line
-    int			depth)	    // recursion depth
+    పూర్ణాంకం			off_arg,    // byte offset, when -1 go to next line
+    పూర్ణాంకం			లోతు)	    // recursion depth
 {
-    int			subidx;
-    int			off = off_arg;
-    int			add_here = FALSE;
-    int			listindex = 0;
-    int			k;
-    int			found = FALSE;
+    పూర్ణాంకం			subidx;
+    పూర్ణాంకం			off = off_arg;
+    పూర్ణాంకం			కూడు_ఇక్కడ = FALSE;
+    పూర్ణాంకం			listindex = 0;
+    పూర్ణాంకం			k;
+    పూర్ణాంకం			దొరికింది = FALSE;
     nfa_thread_T	*thread;
-    struct multipos	save_multipos;
-    int			save_in_use;
+    నిర్మాణం multipos	save_multipos;
+    పూర్ణాంకం			save_లోపల_use;
     char_u		*save_ptr;
-    int			i;
+    పూర్ణాంకం			i;
     regsub_T		*sub;
     regsubs_T		*subs = subs_arg;
-    static regsubs_T	temp_subs;
-#ifdef ENABLE_LOG
-    int			did_print = FALSE;
-#endif
+    స్థిర regsubs_T	తాత్కాలిక_subs;
+#నిర్వచితమైతే ENABLE_LOG
+    పూర్ణాంకం			did_print = FALSE;
+#అయితే_ముగింపు
 
-#ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return NULL;
-#endif
+#నిర్వచితమైతే FEAT_RELTIME
+    ఒకవేళ (nfa_did_సమయం_బహిర్గతం())
+	తిరిగి ఖాళీ;
+#అయితే_ముగింపు
 
     // This function is called recursively.  When the depth is too much we run
     // out of stack and crash, limit recursiveness here.
-    if (depth >= 5000 || subs == NULL)
-	return NULL;
+    ఒకవేళ (లోతు >= 5000 || subs == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (off_arg <= -ADDSTATE_HERE_OFFSET)
+    ఒకవేళ (off_arg <= -ADDSTATE_ఇక్కడ_స్థానభ్రంశం)
     {
-	add_here = TRUE;
+	కూడు_ఇక్కడ = TRUE;
 	off = 0;
-	listindex = -(off_arg + ADDSTATE_HERE_OFFSET);
+	listindex = -(off_arg + ADDSTATE_ఇక్కడ_స్థానభ్రంశం);
     }
 
-    switch (state->c)
+    ఎంపిక (state->c)
     {
-	case NFA_NCLOSE:
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_MOPEN:
-	case NFA_ZEND:
-	case NFA_SPLIT:
-	case NFA_EMPTY:
+	స్థితి NFA_NCLOSE:
+	స్థితి NFA_MCLOSE:
+	స్థితి NFA_MCLOSE1:
+	స్థితి NFA_MCLOSE2:
+	స్థితి NFA_MCLOSE3:
+	స్థితి NFA_MCLOSE4:
+	స్థితి NFA_MCLOSE5:
+	స్థితి NFA_MCLOSE6:
+	స్థితి NFA_MCLOSE7:
+	స్థితి NFA_MCLOSE8:
+	స్థితి NFA_MCLOSE9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZCLOSE:
+	స్థితి NFA_ZCLOSE1:
+	స్థితి NFA_ZCLOSE2:
+	స్థితి NFA_ZCLOSE3:
+	స్థితి NFA_ZCLOSE4:
+	స్థితి NFA_ZCLOSE5:
+	స్థితి NFA_ZCLOSE6:
+	స్థితి NFA_ZCLOSE7:
+	స్థితి NFA_ZCLOSE8:
+	స్థితి NFA_ZCLOSE9:
+#అయితే_ముగింపు
+	స్థితి NFA_MOPEN:
+	స్థితి NFA_ZEND:
+	స్థితి NFA_విభజించు:
+	స్థితి NFA_ఖాళీలు:
 	    // These nodes are not added themselves but their "out" and/or
 	    // "out1" may be added below.
-	    break;
+	    ఆపు;
 
-	case NFA_BOL:
-	case NFA_BOF:
+	స్థితి NFA_BOL:
+	స్థితి NFA_BOF:
 	    // "^" won't match past end-of-line, don't bother trying.
 	    // Except when at the end of the line, or when we are going to the
 	    // next line for a look-behind match.
-	    if (rex.input > rex.line
-		    && *rex.input != NUL
-		    && (nfa_endp == NULL
+	    ఒకవేళ (rex.ఆదానం > rex.పంక్తి
+		    && *rex.ఆదానం != NUL
+		    && (nfa_endp == ఖాళీ
 			|| !REG_MULTI
 			|| rex.lnum == nfa_endp->se_u.pos.lnum))
-		goto skip_add;
+		వెళ్ళు skip_కూడు;
 	    // FALLTHROUGH
 
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_NOPEN:
-	case NFA_ZSTART:
+	స్థితి NFA_MOPEN1:
+	స్థితి NFA_MOPEN2:
+	స్థితి NFA_MOPEN3:
+	స్థితి NFA_MOPEN4:
+	స్థితి NFA_MOPEN5:
+	స్థితి NFA_MOPEN6:
+	స్థితి NFA_MOPEN7:
+	స్థితి NFA_MOPEN8:
+	స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZOPEN:
+	స్థితి NFA_ZOPEN1:
+	స్థితి NFA_ZOPEN2:
+	స్థితి NFA_ZOPEN3:
+	స్థితి NFA_ZOPEN4:
+	స్థితి NFA_ZOPEN5:
+	స్థితి NFA_ZOPEN6:
+	స్థితి NFA_ZOPEN7:
+	స్థితి NFA_ZOPEN8:
+	స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+	స్థితి NFA_NOPEN:
+	స్థితి NFA_ZSTART:
 	    // These nodes need to be added so that we can bail out when it
 	    // was added to this list before at the same position to avoid an
 	    // endless loop for "\(\)*"
 
-	default:
-	    if (state->lastlist[nfa_ll_index] == l->id && state->c != NFA_SKIP)
+	అప్రమేయ:
+	    ఒకవేళ (state->lastlist[nfa_ll_సూచీ] == l->id && state->c != NFA_SKIP)
 	    {
 		// This state is already in the list, don't add it again,
 		// unless it is an MOPEN that is used for a backreference or
 		// when there is a PIM. For NFA_MATCH check the position,
 		// lower position is preferred.
-		if (!rex.nfa_has_backref && pim == NULL && !l->has_pim
-						     && state->c != NFA_MATCH)
+		ఒకవేళ (!rex.nfa_has_backref && pim == ఖాళీ && !l->has_pim
+						     && state->c != NFA_సరిపోలిక)
 		{
 		    // When called from addstate_here() do insert before
 		    // existing states.
-		    if (add_here)
+		    ఒకవేళ (కూడు_ఇక్కడ)
 		    {
-			for (k = 0; k < l->n && k < listindex; ++k)
-			    if (l->t[k].state->id == state->id)
+			కొరకు (k = 0; k < l->n && k < listindex; ++k)
+			    ఒకవేళ (l->t[k].state->id == state->id)
 			    {
-				found = TRUE;
-				break;
+				దొరికింది = TRUE;
+				ఆపు;
 			    }
 		    }
-		    if (!add_here || found)
+		    ఒకవేళ (!కూడు_ఇక్కడ || దొరికింది)
 		    {
-skip_add:
-#ifdef ENABLE_LOG
-			nfa_set_code(state->c);
+skip_కూడు:
+#నిర్వచితమైతే ENABLE_LOG
+			nfa_సమితి_సంకేతం(state->c);
 			fprintf(log_fd, "> Not adding state %d to list %d. char %d: %s pim: %s has_pim: %d found: %d\n",
-			    abs(state->id), l->id, state->c, code,
-			    pim == NULL ? "NULL" : "yes", l->has_pim, found);
-#endif
-			return subs;
+			    నిరపేక్ష(state->id), l->id, state->c, సంకేతం_2,
+			    pim == ఖాళీ ? "NULL" : "yes", l->has_pim, దొరికింది);
+#అయితే_ముగింపు
+			తిరిగి subs;
 		    }
 		}
 
 		// Do not add the state again when it exists with the same
 		// positions.
-		if (has_state_with_pos(l, state, subs, pim))
-		    goto skip_add;
+		ఒకవేళ (has_state_with_pos(l, state, subs, pim))
+		    వెళ్ళు skip_కూడు;
 	    }
 
 	    // When there are backreferences or PIMs the number of states may
 	    // be (a lot) bigger than anticipated.
-	    if (l->n == l->len)
+	    ఒకవేళ (l->n == l->len)
 	    {
-		int		newlen = l->len * 3 / 2 + 50;
-		size_t		newsize = newlen * sizeof(nfa_thread_T);
+		పూర్ణాంకం		newlen = l->len * 3 / 2 + 50;
+		size_t		newsize = newlen * పరిమాణం(nfa_thread_T);
 		nfa_thread_T	*newt;
 
-		if ((long)(newsize >> 10) >= p_mmp)
+		ఒకవేళ ((దీర్ఘ)(newsize >> 10) >= p_mmp)
 		{
-		    emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		    return NULL;
+		    emsg(_(e_నమూనా_ఉపయోగిస్తుంది_మరిన్ని_జ్ఞాపకం_than_maxmempattern));
+		    తిరిగి ఖాళీ;
 		}
-		if (subs != &temp_subs)
+		ఒకవేళ (subs != &తాత్కాలిక_subs)
 		{
 		    // "subs" may point into the current array, need to make a
 		    // copy before it becomes invalid.
-		    copy_sub(&temp_subs.norm, &subs->norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
-			copy_sub(&temp_subs.synt, &subs->synt);
-#endif
-		    subs = &temp_subs;
+		    copy_sub(&తాత్కాలిక_subs.norm, &subs->norm);
+#నిర్వచితమైతే FEAT_SYN_HL
+		    ఒకవేళ (rex.nfa_has_zsubexpr)
+			copy_sub(&తాత్కాలిక_subs.synt, &subs->synt);
+#అయితే_ముగింపు
+		    subs = &తాత్కాలిక_subs;
 		}
 
 		newt = vim_realloc(l->t, newsize);
-		if (newt == NULL)
+		ఒకవేళ (newt == ఖాళీ)
 		{
 		    // out of memory
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 		l->t = newt;
 		l->len = newlen;
 	    }
 
 	    // add the state to the list
-	    state->lastlist[nfa_ll_index] = l->id;
+	    state->lastlist[nfa_ll_సూచీ] = l->id;
 	    thread = &l->t[l->n++];
 	    thread->state = state;
-	    if (pim == NULL)
-		thread->pim.result = NFA_PIM_UNUSED;
-	    else
+	    ఒకవేళ (pim == ఖాళీ)
+		thread->pim.ఫలితం = NFA_PIM_వాడని;
+	    లేకపోతే
 	    {
 		copy_pim(&thread->pim, pim);
 		l->has_pim = TRUE;
 	    }
 	    copy_sub(&thread->subs.norm, &subs->norm);
-#ifdef FEAT_SYN_HL
-	    if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (rex.nfa_has_zsubexpr)
 		copy_sub(&thread->subs.synt, &subs->synt);
-#endif
-#ifdef ENABLE_LOG
+#అయితే_ముగింపు
+#నిర్వచితమైతే ENABLE_LOG
 	    report_state("Adding", &thread->subs.norm, state, l->id, pim);
 	    did_print = TRUE;
-#endif
+#అయితే_ముగింపు
     }
 
-#ifdef ENABLE_LOG
-    if (!did_print)
+#నిర్వచితమైతే ENABLE_LOG
+    ఒకవేళ (!did_print)
 	report_state("Processing", &subs->norm, state, l->id, pim);
-#endif
-    switch (state->c)
+#అయితే_ముగింపు
+    ఎంపిక (state->c)
     {
-	case NFA_MATCH:
-	    break;
+	స్థితి NFA_సరిపోలిక:
+	    ఆపు;
 
-	case NFA_SPLIT:
+	స్థితి NFA_విభజించు:
 	    // order matters here
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    subs = addstate(l, state->out1, subs, pim, off_arg, depth + 1);
-	    break;
+	    subs = addstate(l, state->బహిర్గతం, subs, pim, off_arg, లోతు + 1);
+	    subs = addstate(l, state->out1, subs, pim, off_arg, లోతు + 1);
+	    ఆపు;
 
-	case NFA_EMPTY:
-	case NFA_NOPEN:
-	case NFA_NCLOSE:
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    break;
+	స్థితి NFA_ఖాళీలు:
+	స్థితి NFA_NOPEN:
+	స్థితి NFA_NCLOSE:
+	    subs = addstate(l, state->బహిర్గతం, subs, pim, off_arg, లోతు + 1);
+	    ఆపు;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_ZSTART:
-	    if (state->c == NFA_ZSTART)
+	స్థితి NFA_MOPEN:
+	స్థితి NFA_MOPEN1:
+	స్థితి NFA_MOPEN2:
+	స్థితి NFA_MOPEN3:
+	స్థితి NFA_MOPEN4:
+	స్థితి NFA_MOPEN5:
+	స్థితి NFA_MOPEN6:
+	స్థితి NFA_MOPEN7:
+	స్థితి NFA_MOPEN8:
+	స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZOPEN:
+	స్థితి NFA_ZOPEN1:
+	స్థితి NFA_ZOPEN2:
+	స్థితి NFA_ZOPEN3:
+	స్థితి NFA_ZOPEN4:
+	స్థితి NFA_ZOPEN5:
+	స్థితి NFA_ZOPEN6:
+	స్థితి NFA_ZOPEN7:
+	స్థితి NFA_ZOPEN8:
+	స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+	స్థితి NFA_ZSTART:
+	    ఒకవేళ (state->c == NFA_ZSTART)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
-#ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    లేకపోతే ఒకవేళ (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 	    {
 		subidx = state->c - NFA_ZOPEN;
 		sub = &subs->synt;
 	    }
-#endif
-	    else
+#అయితే_ముగింపు
+	    లేకపోతే
 	    {
 		subidx = state->c - NFA_MOPEN;
 		sub = &subs->norm;
 	    }
 
 	    // avoid compiler warnings
-	    save_ptr = NULL;
-	    CLEAR_FIELD(save_multipos);
+	    save_ptr = ఖాళీ;
+	    CLEAR_క్షేత్రం(save_multipos);
 
 	    // Set the position (with "off" added) in the subexpression.  Save
 	    // and restore it when it was in use.  Otherwise fill any gap.
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 	    {
-		if (subidx < sub->in_use)
+		ఒకవేళ (subidx < sub->లోపల_use)
 		{
 		    save_multipos = sub->list.multi[subidx];
-		    save_in_use = -1;
+		    save_లోపల_use = -1;
 		}
-		else
+		లేకపోతే
 		{
-		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    save_లోపల_use = sub->లోపల_use;
+		    కొరకు (i = sub->లోపల_use; i < subidx; ++i)
 		    {
-			sub->list.multi[i].start_lnum = -1;
-			sub->list.multi[i].end_lnum = -1;
+			sub->list.multi[i].ప్రారంభం_lnum = -1;
+			sub->list.multi[i].చివర_lnum = -1;
 		    }
-		    sub->in_use = subidx + 1;
+		    sub->లోపల_use = subidx + 1;
 		}
-		if (off == -1)
+		ఒకవేళ (off == -1)
 		{
-		    sub->list.multi[subidx].start_lnum = rex.lnum + 1;
-		    sub->list.multi[subidx].start_col = 0;
+		    sub->list.multi[subidx].ప్రారంభం_lnum = rex.lnum + 1;
+		    sub->list.multi[subidx].ప్రారంభం_నిలువు = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    sub->list.multi[subidx].start_lnum = rex.lnum;
-		    sub->list.multi[subidx].start_col =
-					 (colnr_T)(rex.input - rex.line + off);
+		    sub->list.multi[subidx].ప్రారంభం_lnum = rex.lnum;
+		    sub->list.multi[subidx].ప్రారంభం_నిలువు =
+					 (colnr_T)(rex.ఆదానం - rex.పంక్తి + off);
 		}
-		sub->list.multi[subidx].end_lnum = -1;
+		sub->list.multi[subidx].చివర_lnum = -1;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (subidx < sub->in_use)
+		ఒకవేళ (subidx < sub->లోపల_use)
 		{
-		    save_ptr = sub->list.line[subidx].start;
-		    save_in_use = -1;
+		    save_ptr = sub->list.పంక్తి[subidx].ప్రారంభం;
+		    save_లోపల_use = -1;
 		}
-		else
+		లేకపోతే
 		{
-		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    save_లోపల_use = sub->లోపల_use;
+		    కొరకు (i = sub->లోపల_use; i < subidx; ++i)
 		    {
-			sub->list.line[i].start = NULL;
-			sub->list.line[i].end = NULL;
+			sub->list.పంక్తి[i].ప్రారంభం = ఖాళీ;
+			sub->list.పంక్తి[i].చివర = ఖాళీ;
 		    }
-		    sub->in_use = subidx + 1;
+		    sub->లోపల_use = subidx + 1;
 		}
-		sub->list.line[subidx].start = rex.input + off;
+		sub->list.పంక్తి[subidx].ప్రారంభం = rex.ఆదానం + off;
 	    }
 
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    subs = addstate(l, state->బహిర్గతం, subs, pim, off_arg, లోతు + 1);
+	    ఒకవేళ (subs == ఖాళీ)
+		ఆపు;
 	    // "subs" may have changed, need to set "sub" again
-#ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 		sub = &subs->synt;
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 		sub = &subs->norm;
 
-	    if (save_in_use == -1)
+	    ఒకవేళ (save_లోపల_use == -1)
 	    {
-		if (REG_MULTI)
+		ఒకవేళ (REG_MULTI)
 		    sub->list.multi[subidx] = save_multipos;
-		else
-		    sub->list.line[subidx].start = save_ptr;
+		లేకపోతే
+		    sub->list.పంక్తి[subidx].ప్రారంభం = save_ptr;
 	    }
-	    else
-		sub->in_use = save_in_use;
-	    break;
+	    లేకపోతే
+		sub->లోపల_use = save_లోపల_use;
+	    ఆపు;
 
-	case NFA_MCLOSE:
-	    if (rex.nfa_has_zend && (REG_MULTI
-			? subs->norm.list.multi[0].end_lnum >= 0
-			: subs->norm.list.line[0].end != NULL))
+	స్థితి NFA_MCLOSE:
+	    ఒకవేళ (rex.nfa_has_zend && (REG_MULTI
+			? subs->norm.list.multi[0].చివర_lnum >= 0
+			: subs->norm.list.పంక్తి[0].చివర != ఖాళీ))
 	    {
 		// Do not overwrite the position set by \ze.
-		subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-		break;
+		subs = addstate(l, state->బహిర్గతం, subs, pim, off_arg, లోతు + 1);
+		ఆపు;
 	    }
 	    // FALLTHROUGH
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_ZEND:
-	    if (state->c == NFA_ZEND)
+	స్థితి NFA_MCLOSE1:
+	స్థితి NFA_MCLOSE2:
+	స్థితి NFA_MCLOSE3:
+	స్థితి NFA_MCLOSE4:
+	స్థితి NFA_MCLOSE5:
+	స్థితి NFA_MCLOSE6:
+	స్థితి NFA_MCLOSE7:
+	స్థితి NFA_MCLOSE8:
+	స్థితి NFA_MCLOSE9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZCLOSE:
+	స్థితి NFA_ZCLOSE1:
+	స్థితి NFA_ZCLOSE2:
+	స్థితి NFA_ZCLOSE3:
+	స్థితి NFA_ZCLOSE4:
+	స్థితి NFA_ZCLOSE5:
+	స్థితి NFA_ZCLOSE6:
+	స్థితి NFA_ZCLOSE7:
+	స్థితి NFA_ZCLOSE8:
+	స్థితి NFA_ZCLOSE9:
+#అయితే_ముగింపు
+	స్థితి NFA_ZEND:
+	    ఒకవేళ (state->c == NFA_ZEND)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
-#ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    లేకపోతే ఒకవేళ (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 	    {
 		subidx = state->c - NFA_ZCLOSE;
 		sub = &subs->synt;
 	    }
-#endif
-	    else
+#అయితే_ముగింపు
+	    లేకపోతే
 	    {
 		subidx = state->c - NFA_MCLOSE;
 		sub = &subs->norm;
@@ -4900,53 +4900,53 @@ skip_add:
 
 	    // We don't fill in gaps here, there must have been an MOPEN that
 	    // has done that.
-	    save_in_use = sub->in_use;
-	    if (sub->in_use <= subidx)
-		sub->in_use = subidx + 1;
-	    if (REG_MULTI)
+	    save_లోపల_use = sub->లోపల_use;
+	    ఒకవేళ (sub->లోపల_use <= subidx)
+		sub->లోపల_use = subidx + 1;
+	    ఒకవేళ (REG_MULTI)
 	    {
 		save_multipos = sub->list.multi[subidx];
-		if (off == -1)
+		ఒకవేళ (off == -1)
 		{
-		    sub->list.multi[subidx].end_lnum = rex.lnum + 1;
-		    sub->list.multi[subidx].end_col = 0;
+		    sub->list.multi[subidx].చివర_lnum = rex.lnum + 1;
+		    sub->list.multi[subidx].చివర_నిలువు = 0;
 		}
-		else
+		లేకపోతే
 		{
-		    sub->list.multi[subidx].end_lnum = rex.lnum;
-		    sub->list.multi[subidx].end_col =
-					  (colnr_T)(rex.input - rex.line + off);
+		    sub->list.multi[subidx].చివర_lnum = rex.lnum;
+		    sub->list.multi[subidx].చివర_నిలువు =
+					  (colnr_T)(rex.ఆదానం - rex.పంక్తి + off);
 		}
 		// avoid compiler warnings
-		save_ptr = NULL;
+		save_ptr = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		save_ptr = sub->list.line[subidx].end;
-		sub->list.line[subidx].end = rex.input + off;
+		save_ptr = sub->list.పంక్తి[subidx].చివర;
+		sub->list.పంక్తి[subidx].చివర = rex.ఆదానం + off;
 		// avoid compiler warnings
-		CLEAR_FIELD(save_multipos);
+		CLEAR_క్షేత్రం(save_multipos);
 	    }
 
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    subs = addstate(l, state->బహిర్గతం, subs, pim, off_arg, లోతు + 1);
+	    ఒకవేళ (subs == ఖాళీ)
+		ఆపు;
 	    // "subs" may have changed, need to set "sub" again
-#ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+#నిర్వచితమైతే FEAT_SYN_HL
+	    ఒకవేళ (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 		sub = &subs->synt;
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 		sub = &subs->norm;
 
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 		sub->list.multi[subidx] = save_multipos;
-	    else
-		sub->list.line[subidx].end = save_ptr;
-	    sub->in_use = save_in_use;
-	    break;
+	    లేకపోతే
+		sub->list.పంక్తి[subidx].చివర = save_ptr;
+	    sub->లోపల_use = save_లోపల_use;
+	    ఆపు;
     }
-    return subs;
+    తిరిగి subs;
 }
 
 /*
@@ -4955,289 +4955,289 @@ skip_add:
  * This makes sure the order of states to be tried does not change, which
  * matters for alternatives.
  */
-    static regsubs_T *
-addstate_here(
+    స్థిర regsubs_T *
+addstate_ఇక్కడ(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs,	// pointers to subexpressions
     nfa_pim_T		*pim,   // postponed look-behind match
-    int			*ip)
+    పూర్ణాంకం			*ip)
 {
-    int tlen = l->n;
-    int count;
-    int listidx = *ip;
+    పూర్ణాంకం tlen = l->n;
+    పూర్ణాంకం లెక్క;
+    పూర్ణాంకం listidx = *ip;
     regsubs_T *r;
 
     // First add the state(s) at the end, so that we know how many there are.
     // Pass the listidx as offset (avoids adding another argument to
     // addstate()).
-    r = addstate(l, state, subs, pim, -listidx - ADDSTATE_HERE_OFFSET, 0);
-    if (r == NULL)
-	return NULL;
+    r = addstate(l, state, subs, pim, -listidx - ADDSTATE_ఇక్కడ_స్థానభ్రంశం, 0);
+    ఒకవేళ (r == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // when "*ip" was at the end of the list, nothing to do
-    if (listidx + 1 == tlen)
-	return r;
+    ఒకవేళ (listidx + 1 == tlen)
+	తిరిగి r;
 
     // re-order to put the new state at the current position
-    count = l->n - tlen;
-    if (count == 0)
-	return r; // no state got added
-    if (count == 1)
+    లెక్క = l->n - tlen;
+    ఒకవేళ (లెక్క == 0)
+	తిరిగి r; // no state got added
+    ఒకవేళ (లెక్క == 1)
     {
 	// overwrite the current state
 	l->t[listidx] = l->t[l->n - 1];
     }
-    else if (count > 1)
+    లేకపోతే ఒకవేళ (లెక్క > 1)
     {
-	if (l->n + count - 1 >= l->len)
+	ఒకవేళ (l->n + లెక్క - 1 >= l->len)
 	{
 	    // not enough space to move the new states, reallocate the list
 	    // and move the states to the right position
-	    int		    newlen = l->len * 3 / 2 + 50;
-	    size_t	    newsize = newlen * sizeof(nfa_thread_T);
+	    పూర్ణాంకం		    newlen = l->len * 3 / 2 + 50;
+	    size_t	    newsize = newlen * పరిమాణం(nfa_thread_T);
 	    nfa_thread_T    *newl;
 
-	    if ((long)(newsize >> 10) >= p_mmp)
+	    ఒకవేళ ((దీర్ఘ)(newsize >> 10) >= p_mmp)
 	    {
-		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		return NULL;
+		emsg(_(e_నమూనా_ఉపయోగిస్తుంది_మరిన్ని_జ్ఞాపకం_than_maxmempattern));
+		తిరిగి ఖాళీ;
 	    }
 	    newl = alloc(newsize);
-	    if (newl == NULL)
-		return NULL;
+	    ఒకవేళ (newl == ఖాళీ)
+		తిరిగి ఖాళీ;
 	    l->len = newlen;
 	    mch_memmove(&(newl[0]),
 		    &(l->t[0]),
-		    sizeof(nfa_thread_T) * listidx);
+		    పరిమాణం(nfa_thread_T) * listidx);
 	    mch_memmove(&(newl[listidx]),
-		    &(l->t[l->n - count]),
-		    sizeof(nfa_thread_T) * count);
-	    mch_memmove(&(newl[listidx + count]),
+		    &(l->t[l->n - లెక్క]),
+		    పరిమాణం(nfa_thread_T) * లెక్క);
+	    mch_memmove(&(newl[listidx + లెక్క]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - count - listidx - 1));
+		    పరిమాణం(nfa_thread_T) * (l->n - లెక్క - listidx - 1));
 	    vim_free(l->t);
 	    l->t = newl;
 	}
-	else
+	లేకపోతే
 	{
 	    // make space for new states, then move them from the
 	    // end to the current position
-	    mch_memmove(&(l->t[listidx + count]),
+	    mch_memmove(&(l->t[listidx + లెక్క]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - listidx - 1));
+		    పరిమాణం(nfa_thread_T) * (l->n - listidx - 1));
 	    mch_memmove(&(l->t[listidx]),
 		    &(l->t[l->n - 1]),
-		    sizeof(nfa_thread_T) * count);
+		    పరిమాణం(nfa_thread_T) * లెక్క);
 	}
     }
     --l->n;
     *ip = listidx - 1;
 
-    return r;
+    తిరిగి r;
 }
 
 /*
  * Check character class "class" against current character c.
  */
-    static int
-check_char_class(int class, int c)
+    స్థిర పూర్ణాంకం
+check_char_class(పూర్ణాంకం class, పూర్ణాంకం c)
 {
-    switch (class)
+    ఎంపిక (class)
     {
-	case NFA_CLASS_ALNUM:
-	    if (c >= 1 && c < 128 && isalnum(c))
-		return OK;
-	    break;
-	case NFA_CLASS_ALPHA:
-	    if (c >= 1 && c < 128 && isalpha(c))
-		return OK;
-	    break;
-	case NFA_CLASS_BLANK:
-	    if (c == ' ' || c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_CNTRL:
-	    if (c >= 1 && c <= 127 && iscntrl(c))
-		return OK;
-	    break;
-	case NFA_CLASS_DIGIT:
-	    if (VIM_ISDIGIT(c))
-		return OK;
-	    break;
-	case NFA_CLASS_GRAPH:
-	    if (c >= 1 && c <= 127 && isgraph(c))
-		return OK;
-	    break;
-	case NFA_CLASS_LOWER:
-	    if (MB_ISLOWER(c) && c != 170 && c != 186)
-		return OK;
-	    break;
-	case NFA_CLASS_PRINT:
-	    if (vim_isprintc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_PUNCT:
-	    if (c >= 1 && c < 128 && ispunct(c))
-		return OK;
-	    break;
-	case NFA_CLASS_SPACE:
-	    if ((c >= 9 && c <= 13) || (c == ' '))
-		return OK;
-	    break;
-	case NFA_CLASS_UPPER:
-	    if (MB_ISUPPER(c))
-		return OK;
-	    break;
-	case NFA_CLASS_XDIGIT:
-	    if (vim_isxdigit(c))
-		return OK;
-	    break;
-	case NFA_CLASS_TAB:
-	    if (c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_RETURN:
-	    if (c == '\r')
-		return OK;
-	    break;
-	case NFA_CLASS_BACKSPACE:
-	    if (c == '\b')
-		return OK;
-	    break;
-	case NFA_CLASS_ESCAPE:
-	    if (c == '\033')
-		return OK;
-	    break;
-	case NFA_CLASS_IDENT:
-	    if (vim_isIDc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_KEYWORD:
-	    if (reg_iswordc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_FNAME:
-	    if (vim_isfilec(c))
-		return OK;
-	    break;
+	స్థితి NFA_CLASS_ALNUM:
+	    ఒకవేళ (c >= 1 && c < 128 && అక్షరమా_అంకెనా(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_ALPHA:
+	    ఒకవేళ (c >= 1 && c < 128 && అక్షరమా(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_BLANK:
+	    ఒకవేళ (c == ' ' || c == '\t')
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_CNTRL:
+	    ఒకవేళ (c >= 1 && c <= 127 && iscntrl(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_DIGIT:
+	    ఒకవేళ (VIM_ISDIGIT(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_లేఖాచిత్రం:
+	    ఒకవేళ (c >= 1 && c <= 127 && isgraph(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_క్రింది:
+	    ఒకవేళ (MB_ISLOWER(c) && c != 170 && c != 186)
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_PRINT:
+	    ఒకవేళ (vim_isprintc(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_PUNCT:
+	    ఒకవేళ (c >= 1 && c < 128 && ispunct(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_SPACE:
+	    ఒకవేళ ((c >= 9 && c <= 13) || (c == ' '))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_పై:
+	    ఒకవేళ (MB_ISUPPER(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_XDIGIT:
+	    ఒకవేళ (vim_isxdigit(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_TAB:
+	    ఒకవేళ (c == '\t')
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_RETURN:
+	    ఒకవేళ (c == '\r')
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_BACKSPACE:
+	    ఒకవేళ (c == '\b')
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_ESCAPE:
+	    ఒకవేళ (c == '\033')
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_IDENT:
+	    ఒకవేళ (vim_isIDc(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_KEYWORD:
+	    ఒకవేళ (reg_iswordc(c))
+		తిరిగి OK;
+	    ఆపు;
+	స్థితి NFA_CLASS_FNAME:
+	    ఒకవేళ (vim_isfilec(c))
+		తిరిగి OK;
+	    ఆపు;
 
-	default:
+	అప్రమేయ:
 	    // should not be here :P
 	    siemsg(_(e_nfa_regexp_invalid_character_class_nr), class);
-	    return FAIL;
+	    తిరిగి FAIL;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Check for a match with subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
-match_backref(
+    స్థిర పూర్ణాంకం
+సరిపోలిక_backref(
     regsub_T	*sub,	    // pointers to subexpressions
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    పూర్ణాంకం		subidx,
+    పూర్ణాంకం		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (sub->in_use <= subidx)
+    ఒకవేళ (sub->లోపల_use <= subidx)
     {
 retempty:
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	if (sub->list.multi[subidx].start_lnum < 0
-				       || sub->list.multi[subidx].end_lnum < 0)
-	    goto retempty;
-	if (sub->list.multi[subidx].start_lnum == rex.lnum
-			       && sub->list.multi[subidx].end_lnum == rex.lnum)
+	ఒకవేళ (sub->list.multi[subidx].ప్రారంభం_lnum < 0
+				       || sub->list.multi[subidx].చివర_lnum < 0)
+	    వెళ్ళు retempty;
+	ఒకవేళ (sub->list.multi[subidx].ప్రారంభం_lnum == rex.lnum
+			       && sub->list.multi[subidx].చివర_lnum == rex.lnum)
 	{
-	    len = sub->list.multi[subidx].end_col
-					  - sub->list.multi[subidx].start_col;
-	    if (cstrncmp(rex.line + sub->list.multi[subidx].start_col,
-							 rex.input, &len) == 0)
+	    len = sub->list.multi[subidx].చివర_నిలువు
+					  - sub->list.multi[subidx].ప్రారంభం_నిలువు;
+	    ఒకవేళ (cstrncmp(rex.పంక్తి + sub->list.multi[subidx].ప్రారంభం_నిలువు,
+							 rex.ఆదానం, &len) == 0)
 	    {
 		*bytelen = len;
-		return TRUE;
+		తిరిగి TRUE;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (match_with_backref(
-			sub->list.multi[subidx].start_lnum,
-			sub->list.multi[subidx].start_col,
-			sub->list.multi[subidx].end_lnum,
-			sub->list.multi[subidx].end_col,
-			bytelen) == RA_MATCH)
-		return TRUE;
+	    ఒకవేళ (సరిపోలిక_with_backref(
+			sub->list.multi[subidx].ప్రారంభం_lnum,
+			sub->list.multi[subidx].ప్రారంభం_నిలువు,
+			sub->list.multi[subidx].చివర_lnum,
+			sub->list.multi[subidx].చివర_నిలువు,
+			bytelen) == RA_సరిపోలిక)
+		తిరిగి TRUE;
 	}
     }
-    else
+    లేకపోతే
     {
-	if (sub->list.line[subidx].start == NULL
-					|| sub->list.line[subidx].end == NULL)
-	    goto retempty;
-	len = (int)(sub->list.line[subidx].end - sub->list.line[subidx].start);
-	if (cstrncmp(sub->list.line[subidx].start, rex.input, &len) == 0)
+	ఒకవేళ (sub->list.పంక్తి[subidx].ప్రారంభం == ఖాళీ
+					|| sub->list.పంక్తి[subidx].చివర == ఖాళీ)
+	    వెళ్ళు retempty;
+	len = (పూర్ణాంకం)(sub->list.పంక్తి[subidx].చివర - sub->list.పంక్తి[subidx].ప్రారంభం);
+	ఒకవేళ (cstrncmp(sub->list.పంక్తి[subidx].ప్రారంభం, rex.ఆదానం, &len) == 0)
 	{
 	    *bytelen = len;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 
 /*
  * Check for a match with \z subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
-match_zref(
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    స్థిర పూర్ణాంకం
+సరిపోలిక_zref(
+    పూర్ణాంకం		subidx,
+    పూర్ణాంకం		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    పూర్ణాంకం		len;
 
     cleanup_zsubexpr();
-    if (re_extmatch_in == NULL || re_extmatch_in->matches[subidx] == NULL)
+    ఒకవేళ (re_extmatch_లోపల == ఖాళీ || re_extmatch_లోపల->matches[subidx] == ఖాళీ)
     {
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    len = (int)STRLEN(re_extmatch_in->matches[subidx]);
-    if (cstrncmp(re_extmatch_in->matches[subidx], rex.input, &len) == 0)
+    len = (పూర్ణాంకం)STRLEN(re_extmatch_లోపల->matches[subidx]);
+    ఒకవేళ (cstrncmp(re_extmatch_లోపల->matches[subidx], rex.ఆదానం, &len) == 0)
     {
 	*bytelen = len;
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Save list IDs for all NFA states of "prog" into "list".
  * Also reset the IDs to zero.
  * Only used for the recursive value lastlist[1].
  */
-    static void
-nfa_save_listids(nfa_regprog_T *prog, int *list)
+    స్థిర శూన్య
+nfa_save_listids(nfa_regprog_T *prog, పూర్ణాంకం *list)
 {
-    int		    i;
+    పూర్ణాంకం		    i;
     nfa_state_T	    *p;
 
     // Order in the list is reverse, it's a bit faster that way.
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    కొరకు (i = prog->nstate; --i >= 0; )
     {
 	list[i] = p->lastlist[1];
 	p->lastlist[1] = 0;
@@ -5248,151 +5248,151 @@ nfa_save_listids(nfa_regprog_T *prog, int *list)
 /*
  * Restore list IDs from "list" to all NFA states.
  */
-    static void
-nfa_restore_listids(nfa_regprog_T *prog, int *list)
+    స్థిర శూన్య
+nfa_restore_listids(nfa_regprog_T *prog, పూర్ణాంకం *list)
 {
-    int		    i;
+    పూర్ణాంకం		    i;
     nfa_state_T	    *p;
 
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    కొరకు (i = prog->nstate; --i >= 0; )
     {
 	p->lastlist[1] = list[i];
 	++p;
     }
 }
 
-    static int
-nfa_re_num_cmp(long_u val, int op, long_u pos)
+    స్థిర పూర్ణాంకం
+nfa_re_అంకె_cmp(long_u val, పూర్ణాంకం op, long_u pos)
 {
-    if (op == 1) return pos > val;
-    if (op == 2) return pos < val;
-    return val == pos;
+    ఒకవేళ (op == 1) తిరిగి pos > val;
+    ఒకవేళ (op == 2) తిరిగి pos < val;
+    తిరిగి val == pos;
 }
 
-static int nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
+స్థిర పూర్ణాంకం nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *ప్రారంభం, regsubs_T *submatch, regsubs_T *m);
 
 /*
  * Recursively call nfa_regmatch()
  * "pim" is NULL or contains info about a Postponed Invisible Match (start
  * position).
  */
-    static int
+    స్థిర పూర్ణాంకం
 recursive_regmatch(
     nfa_state_T	    *state,
     nfa_pim_T	    *pim,
     nfa_regprog_T   *prog,
     regsubs_T	    *submatch,
     regsubs_T	    *m,
-    int		    **listids,
-    int		    *listids_len)
+    పూర్ణాంకం		    **listids,
+    పూర్ణాంకం		    *listids_len)
 {
-    int		save_reginput_col = (int)(rex.input - rex.line);
-    int		save_reglnum = rex.lnum;
-    int		save_nfa_match = nfa_match;
-    int		save_nfa_listid = rex.nfa_listid;
+    పూర్ణాంకం		save_reginput_నిలువు = (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
+    పూర్ణాంకం		save_reglnum = rex.lnum;
+    పూర్ణాంకం		save_nfa_సరిపోలిక = nfa_సరిపోలిక;
+    పూర్ణాంకం		save_nfa_listid = rex.nfa_listid;
     save_se_T   *save_nfa_endp = nfa_endp;
     save_se_T   endpos;
-    save_se_T   *endposp = NULL;
-    int		result;
-    int		need_restore = FALSE;
+    save_se_T   *endposp = ఖాళీ;
+    పూర్ణాంకం		ఫలితం;
+    పూర్ణాంకం		need_restore = FALSE;
 
-    if (pim != NULL)
+    ఒకవేళ (pim != ఖాళీ)
     {
 	// start at the position where the postponed match was
-	if (REG_MULTI)
-	    rex.input = rex.line + pim->end.pos.col;
-	else
-	    rex.input = pim->end.ptr;
+	ఒకవేళ (REG_MULTI)
+	    rex.ఆదానం = rex.పంక్తి + pim->చివర.pos.నిలువు;
+	లేకపోతే
+	    rex.ఆదానం = pim->చివర.ptr;
     }
 
-    if (state->c == NFA_START_INVISIBLE_BEFORE
-	    || state->c == NFA_START_INVISIBLE_BEFORE_FIRST
-	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG
-	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
+    ఒకవేళ (state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE
+	    || state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి
+	    || state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG
+	    || state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి)
     {
 	// The recursive match must end at the current position. When "pim" is
 	// not NULL it specifies the current position.
 	endposp = &endpos;
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    if (pim == NULL)
+	    ఒకవేళ (pim == ఖాళీ)
 	    {
-		endpos.se_u.pos.col = (int)(rex.input - rex.line);
+		endpos.se_u.pos.నిలువు = (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
 		endpos.se_u.pos.lnum = rex.lnum;
 	    }
-	    else
-		endpos.se_u.pos = pim->end.pos;
+	    లేకపోతే
+		endpos.se_u.pos = pim->చివర.pos;
 	}
-	else
+	లేకపోతే
 	{
-	    if (pim == NULL)
-		endpos.se_u.ptr = rex.input;
-	    else
-		endpos.se_u.ptr = pim->end.ptr;
+	    ఒకవేళ (pim == ఖాళీ)
+		endpos.se_u.ptr = rex.ఆదానం;
+	    లేకపోతే
+		endpos.se_u.ptr = pim->చివర.ptr;
 	}
 
 	// Go back the specified number of bytes, or as far as the
 	// start of the previous line, to try matching "\@<=" or
 	// not matching "\@<!". This is very inefficient, limit the number of
 	// bytes if possible.
-	if (state->val <= 0)
+	ఒకవేళ (state->val <= 0)
 	{
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 	    {
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.పంక్తి = reg_getline(--rex.lnum);
+		ఒకవేళ (rex.పంక్తి == ఖాళీ)
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
+		    rex.పంక్తి = reg_getline(++rex.lnum);
 	    }
-	    rex.input = rex.line;
+	    rex.ఆదానం = rex.పంక్తి;
 	}
-	else
+	లేకపోతే
 	{
-	    if (REG_MULTI && (int)(rex.input - rex.line) < state->val)
+	    ఒకవేళ (REG_MULTI && (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి) < state->val)
 	    {
 		// Not enough bytes in this line, go to end of
 		// previous line.
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.పంక్తి = reg_getline(--rex.lnum);
+		ఒకవేళ (rex.పంక్తి == ఖాళీ)
 		{
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
-		    rex.input = rex.line;
+		    rex.పంక్తి = reg_getline(++rex.lnum);
+		    rex.ఆదానం = rex.పంక్తి;
 		}
-		else
-		    rex.input = rex.line + reg_getline_len(rex.lnum);
+		లేకపోతే
+		    rex.ఆదానం = rex.పంక్తి + reg_getline_len(rex.lnum);
 	    }
-	    if ((int)(rex.input - rex.line) >= state->val)
+	    ఒకవేళ ((పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి) >= state->val)
 	    {
-		rex.input -= state->val;
-		if (has_mbyte)
-		    rex.input -= mb_head_off(rex.line, rex.input);
+		rex.ఆదానం -= state->val;
+		ఒకవేళ (has_mbyte)
+		    rex.ఆదానం -= mb_తల_off(rex.పంక్తి, rex.ఆదానం);
 	    }
-	    else
-		rex.input = rex.line;
+	    లేకపోతే
+		rex.ఆదానం = rex.పంక్తి;
 	}
     }
 
-#ifdef ENABLE_LOG
-    if (log_fd != stderr)
+#నిర్వచితమైతే ENABLE_LOG
+    ఒకవేళ (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
-#endif
+    log_fd = ఖాళీ;
+#అయితే_ముగింపు
     // Have to clear the lastlist field of the NFA nodes, so that
     // nfa_regmatch() and addstate() can run properly after recursion.
-    if (nfa_ll_index == 1)
+    ఒకవేళ (nfa_ll_సూచీ == 1)
     {
 	// Already calling nfa_regmatch() recursively.  Save the lastlist[1]
 	// values and clear them.
-	if (*listids == NULL || *listids_len < prog->nstate)
+	ఒకవేళ (*listids == ఖాళీ || *listids_len < prog->nstate)
 	{
 	    vim_free(*listids);
-	    *listids = ALLOC_MULT(int, prog->nstate);
-	    if (*listids == NULL)
+	    *listids = ALLOC_MULT(పూర్ణాంకం, prog->nstate);
+	    ఒకవేళ (*listids == ఖాళీ)
 	    {
-		emsg(_(e_nfa_regexp_could_not_allocate_memory_for_branch_traversal));
-		return 0;
+		emsg(_(e_nfa_regexp_could_not_allocate_జ్ఞాపకం_for_branch_traversal));
+		తిరిగి 0;
 	    }
 	    *listids_len = prog->nstate;
 	}
@@ -5400,46 +5400,46 @@ recursive_regmatch(
 	need_restore = TRUE;
 	// any value of rex.nfa_listid will do
     }
-    else
+    లేకపోతే
     {
 	// First recursive nfa_regmatch() call, switch to the second lastlist
 	// entry.  Make sure rex.nfa_listid is different from a previous
 	// recursive call, because some states may still have this ID.
-	++nfa_ll_index;
-	if (rex.nfa_listid <= rex.nfa_alt_listid)
+	++nfa_ll_సూచీ;
+	ఒకవేళ (rex.nfa_listid <= rex.nfa_alt_listid)
 	    rex.nfa_listid = rex.nfa_alt_listid;
     }
 
     // Call nfa_regmatch() to check if the current concat matches at this
     // position. The concat ends with the node NFA_END_INVISIBLE
     nfa_endp = endposp;
-    result = nfa_regmatch(prog, state->out, submatch, m);
+    ఫలితం = nfa_regmatch(prog, state->బహిర్గతం, submatch, m);
 
-    if (need_restore)
+    ఒకవేళ (need_restore)
 	nfa_restore_listids(prog, *listids);
-    else
+    లేకపోతే
     {
-	--nfa_ll_index;
+	--nfa_ll_సూచీ;
 	rex.nfa_alt_listid = rex.nfa_listid;
     }
 
     // restore position in input text
     rex.lnum = save_reglnum;
-    if (REG_MULTI)
-	rex.line = reg_getline(rex.lnum);
-    rex.input = rex.line + save_reginput_col;
-    if (result != NFA_TOO_EXPENSIVE)
+    ఒకవేళ (REG_MULTI)
+	rex.పంక్తి = reg_getline(rex.lnum);
+    rex.ఆదానం = rex.పంక్తి + save_reginput_నిలువు;
+    ఒకవేళ (ఫలితం != NFA_TOO_EXPENSIVE)
     {
-	nfa_match = save_nfa_match;
+	nfa_సరిపోలిక = save_nfa_సరిపోలిక;
 	rex.nfa_listid = save_nfa_listid;
     }
     nfa_endp = save_nfa_endp;
 
-#ifdef ENABLE_LOG
-    open_debug_log(result);
-#endif
+#నిర్వచితమైతే ENABLE_LOG
+    open_debug_log(ఫలితం);
+#అయితే_ముగింపు
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -5448,180 +5448,180 @@ recursive_regmatch(
  * NFA_ANY: 1
  * specific character: 99
  */
-    static int
-failure_chance(nfa_state_T *state, int depth)
+    స్థిర పూర్ణాంకం
+failure_chance(nfa_state_T *state, పూర్ణాంకం లోతు)
 {
-    int c = state->c;
-    int l, r;
+    పూర్ణాంకం c = state->c;
+    పూర్ణాంకం l, r;
 
     // detect looping
-    if (depth > 4)
-	return 1;
+    ఒకవేళ (లోతు > 4)
+	తిరిగి 1;
 
-    switch (c)
+    ఎంపిక (c)
     {
-	case NFA_SPLIT:
-	    if (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
+	స్థితి NFA_విభజించు:
+	    ఒకవేళ (state->బహిర్గతం->c == NFA_విభజించు || state->out1->c == NFA_విభజించు)
 		// avoid recursive stuff
-		return 1;
+		తిరిగి 1;
 	    // two alternatives, use the lowest failure chance
-	    l = failure_chance(state->out, depth + 1);
-	    r = failure_chance(state->out1, depth + 1);
-	    return l < r ? l : r;
+	    l = failure_chance(state->బహిర్గతం, లోతు + 1);
+	    r = failure_chance(state->out1, లోతు + 1);
+	    తిరిగి l < r ? l : r;
 
-	case NFA_ANY:
+	స్థితి NFA_ANY:
 	    // matches anything, unlikely to fail
-	    return 1;
+	    తిరిగి 1;
 
-	case NFA_MATCH:
-	case NFA_MCLOSE:
-	case NFA_ANY_COMPOSING:
+	స్థితి NFA_సరిపోలిక:
+	స్థితి NFA_MCLOSE:
+	స్థితి NFA_ANY_COMPOSING:
 	    // empty match works always
-	    return 0;
+	    తిరిగి 0;
 
-	case NFA_START_INVISIBLE:
-	case NFA_START_INVISIBLE_FIRST:
-	case NFA_START_INVISIBLE_NEG:
-	case NFA_START_INVISIBLE_NEG_FIRST:
-	case NFA_START_INVISIBLE_BEFORE:
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	case NFA_START_PATTERN:
+	స్థితి NFA_ప్రారంభం_INVISIBLE:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_మొదటి:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_NEG:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG:
+	స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి:
+	స్థితి NFA_ప్రారంభం_నమూనా:
 	    // recursive regmatch is expensive, use low failure chance
-	    return 5;
+	    తిరిగి 5;
 
-	case NFA_BOL:
-	case NFA_EOL:
-	case NFA_BOF:
-	case NFA_EOF:
-	case NFA_NEWL:
-	    return 99;
+	స్థితి NFA_BOL:
+	స్థితి NFA_EOL:
+	స్థితి NFA_BOF:
+	స్థితి NFA_EOF:
+	స్థితి NFA_NEWL:
+	    తిరిగి 99;
 
-	case NFA_BOW:
-	case NFA_EOW:
-	    return 90;
+	స్థితి NFA_BOW:
+	స్థితి NFA_EOW:
+	    తిరిగి 90;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_NOPEN:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-	case NFA_NCLOSE:
-	    return failure_chance(state->out, depth + 1);
+	స్థితి NFA_MOPEN:
+	స్థితి NFA_MOPEN1:
+	స్థితి NFA_MOPEN2:
+	స్థితి NFA_MOPEN3:
+	స్థితి NFA_MOPEN4:
+	స్థితి NFA_MOPEN5:
+	స్థితి NFA_MOPEN6:
+	స్థితి NFA_MOPEN7:
+	స్థితి NFA_MOPEN8:
+	స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZOPEN:
+	స్థితి NFA_ZOPEN1:
+	స్థితి NFA_ZOPEN2:
+	స్థితి NFA_ZOPEN3:
+	స్థితి NFA_ZOPEN4:
+	స్థితి NFA_ZOPEN5:
+	స్థితి NFA_ZOPEN6:
+	స్థితి NFA_ZOPEN7:
+	స్థితి NFA_ZOPEN8:
+	స్థితి NFA_ZOPEN9:
+	స్థితి NFA_ZCLOSE:
+	స్థితి NFA_ZCLOSE1:
+	స్థితి NFA_ZCLOSE2:
+	స్థితి NFA_ZCLOSE3:
+	స్థితి NFA_ZCLOSE4:
+	స్థితి NFA_ZCLOSE5:
+	స్థితి NFA_ZCLOSE6:
+	స్థితి NFA_ZCLOSE7:
+	స్థితి NFA_ZCLOSE8:
+	స్థితి NFA_ZCLOSE9:
+#అయితే_ముగింపు
+	స్థితి NFA_NOPEN:
+	స్థితి NFA_MCLOSE1:
+	స్థితి NFA_MCLOSE2:
+	స్థితి NFA_MCLOSE3:
+	స్థితి NFA_MCLOSE4:
+	స్థితి NFA_MCLOSE5:
+	స్థితి NFA_MCLOSE6:
+	స్థితి NFA_MCLOSE7:
+	స్థితి NFA_MCLOSE8:
+	స్థితి NFA_MCLOSE9:
+	స్థితి NFA_NCLOSE:
+	    తిరిగి failure_chance(state->బహిర్గతం, లోతు + 1);
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
-#endif
+	స్థితి NFA_BACKREF1:
+	స్థితి NFA_BACKREF2:
+	స్థితి NFA_BACKREF3:
+	స్థితి NFA_BACKREF4:
+	స్థితి NFA_BACKREF5:
+	స్థితి NFA_BACKREF6:
+	స్థితి NFA_BACKREF7:
+	స్థితి NFA_BACKREF8:
+	స్థితి NFA_BACKREF9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	స్థితి NFA_ZREF1:
+	స్థితి NFA_ZREF2:
+	స్థితి NFA_ZREF3:
+	స్థితి NFA_ZREF4:
+	స్థితి NFA_ZREF5:
+	స్థితి NFA_ZREF6:
+	స్థితి NFA_ZREF7:
+	స్థితి NFA_ZREF8:
+	స్థితి NFA_ZREF9:
+#అయితే_ముగింపు
 	    // backreferences don't match in many places
-	    return 94;
+	    తిరిగి 94;
 
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
-	case NFA_VISUAL:
+	స్థితి NFA_LNUM_GT:
+	స్థితి NFA_LNUM_LT:
+	స్థితి NFA_నిలువు_GT:
+	స్థితి NFA_నిలువు_LT:
+	స్థితి NFA_VCOL_GT:
+	స్థితి NFA_VCOL_LT:
+	స్థితి NFA_MARK_GT:
+	స్థితి NFA_MARK_LT:
+	స్థితి NFA_VISUAL:
 	    // before/after positions don't match very often
-	    return 85;
+	    తిరిగి 85;
 
-	case NFA_LNUM:
-	    return 90;
+	స్థితి NFA_LNUM:
+	    తిరిగి 90;
 
-	case NFA_CURSOR:
-	case NFA_COL:
-	case NFA_VCOL:
-	case NFA_MARK:
+	స్థితి NFA_CURSOR:
+	స్థితి NFA_నిలువు:
+	స్థితి NFA_VCOL:
+	స్థితి NFA_MARK:
 	    // specific positions rarely match
-	    return 98;
+	    తిరిగి 98;
 
-	case NFA_COMPOSING:
-	    return 95;
+	స్థితి NFA_COMPOSING:
+	    తిరిగి 95;
 
-	default:
-	    if (c > 0)
+	అప్రమేయ:
+	    ఒకవేళ (c > 0)
 		// character match fails often
-		return 95;
+		తిరిగి 95;
     }
 
     // something else, includes character classes
-    return 50;
+    తిరిగి 50;
 }
 
 /*
  * Skip until the char "c" we know a match must start with.
  */
-    static int
-skip_to_start(int c, colnr_T *colp)
+    స్థిర పూర్ణాంకం
+skip_గమ్యం_ప్రారంభం(పూర్ణాంకం c, colnr_T *colp)
 {
     char_u *s;
 
     // Used often, do some work to avoid call overhead.
-    if (!rex.reg_ic && !has_mbyte)
-	s = vim_strbyte(rex.line + *colp, c);
-    else
-	s = cstrchr(rex.line + *colp, c);
-    if (s == NULL)
-	return FAIL;
-    *colp = (int)(s - rex.line);
-    return OK;
+    ఒకవేళ (!rex.reg_ic && !has_mbyte)
+	s = vim_strbyte(rex.పంక్తి + *colp, c);
+    లేకపోతే
+	s = cstrchr(rex.పంక్తి + *colp, c);
+    ఒకవేళ (s == ఖాళీ)
+	తిరిగి FAIL;
+    *colp = (పూర్ణాంకం)(s - rex.పంక్తి);
+    తిరిగి OK;
 }
 
 /*
@@ -5629,61 +5629,61 @@ skip_to_start(int c, colnr_T *colp)
  * Called after skip_to_start() has found regstart.
  * Returns zero for no match, 1 for a match.
  */
-    static long
-find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
+    స్థిర దీర్ఘ
+కనుగొను_సరిపోలిక_పాఠ్యం(colnr_T *startcol, పూర్ణాంకం regstart, char_u *సరిపోలిక_పాఠ్యం)
 {
-    colnr_T col = *startcol;
-    int	    c1, c2;
-    int	    len1, len2;
-    int	    match;
+    colnr_T నిలువు = *startcol;
+    పూర్ణాంకం	    c1, c2;
+    పూర్ణాంకం	    len1, len2;
+    పూర్ణాంకం	    సరిపోలిక;
 
-    for (;;)
+    కొరకు (;;)
     {
-	match = TRUE;
+	సరిపోలిక = TRUE;
 	// Skip the input character: case-folding can change its byte length.
-	len2 = MB_CPTR2LEN(rex.line + col);
-	for (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
+	len2 = MB_CPTR2LEN(rex.పంక్తి + నిలువు);
+	కొరకు (len1 = 0; సరిపోలిక_పాఠ్యం[len1] != NUL; len1 += MB_CHAR2LEN(c1))
 	{
-	    c1 = PTR2CHAR(match_text + len1);
-	    c2 = PTR2CHAR(rex.line + col + len2);
-	    if (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
+	    c1 = PTR2CHAR(సరిపోలిక_పాఠ్యం + len1);
+	    c2 = PTR2CHAR(rex.పంక్తి + నిలువు + len2);
+	    ఒకవేళ (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
 	    {
-		match = FALSE;
-		break;
+		సరిపోలిక = FALSE;
+		ఆపు;
 	    }
-	    len2 += enc_utf8 ? utf_ptr2len(rex.line + col + len2)
+	    len2 += enc_utf8 ? utf_ptr2len(rex.పంక్తి + నిలువు + len2)
 							     : MB_CHAR2LEN(c2);
 	}
-	if (match
+	ఒకవేళ (సరిపోలిక
 		// check that no composing char follows
 		&& !(enc_utf8
-			  && utf_iscomposing(PTR2CHAR(rex.line + col + len2))))
+			  && utf_iscomposing(PTR2CHAR(rex.పంక్తి + నిలువు + len2))))
 	{
 	    cleanup_subexpr();
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 	    {
 		rex.reg_startpos[0].lnum = rex.lnum;
-		rex.reg_startpos[0].col = col;
+		rex.reg_startpos[0].నిలువు = నిలువు;
 		rex.reg_endpos[0].lnum = rex.lnum;
-		rex.reg_endpos[0].col = col + len2;
+		rex.reg_endpos[0].నిలువు = నిలువు + len2;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		rex.reg_startp[0] = rex.line + col;
-		rex.reg_endp[0] = rex.line + col + len2;
+		rex.reg_startp[0] = rex.పంక్తి + నిలువు;
+		rex.reg_endp[0] = rex.పంక్తి + నిలువు + len2;
 	    }
-	    *startcol = col;
-	    return 1L;
+	    *startcol = నిలువు;
+	    తిరిగి 1L;
 	}
 
 	// Try finding regstart after the current match.
-	col += MB_CPTR2LEN(rex.line + col); // skip the input character
-	if (skip_to_start(regstart, &col) == FAIL)
-	    break;
+	నిలువు += MB_CPTR2LEN(rex.పంక్తి + నిలువు); // skip the input character
+	ఒకవేళ (skip_గమ్యం_ప్రారంభం(regstart, &నిలువు) == FAIL)
+	    ఆపు;
     }
 
-    *startcol = col;
-    return 0L;
+    *startcol = నిలువు;
+    తిరిగి 0L;
 }
 
 /*
@@ -5693,59 +5693,59 @@ find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
  * length.
  * Returns OK when it matches, FAIL otherwise.
  */
-    static int
-match_composing(nfa_state_T *sta, int curc, int clen)
+    స్థిర పూర్ణాంకం
+సరిపోలిక_composing(nfa_state_T *sta, పూర్ణాంకం curc, పూర్ణాంకం clen)
 {
-    int		mc = curc;
-    int		len = 0;
-    int		cchars[MAX_MCO];
-    int		ccount = 0;
-    int		j;
+    పూర్ణాంకం		mc = curc;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		cchars[MAX_MCO];
+    పూర్ణాంకం		ccount = 0;
+    పూర్ణాంకం		j;
 
-    if (utf_iscomposing(sta->c))
+    ఒకవేళ (utf_iscomposing(sta->c))
 	// Only match composing character(s), ignore base character.  Used
 	// for ".{composing}" and "{composing}" (no preceding character).
 	len += mb_char2len(mc);
 
-    if (rex.reg_icombine && len == 0)
+    ఒకవేళ (rex.reg_icombine && len == 0)
 	// If \Z was present, then ignore composing characters.  When
 	// ignoring the base character this always matches.
-	return sta->c == curc ? OK : FAIL;
+	తిరిగి sta->c == curc ? OK : FAIL;
 
     // Check base character matches first, unless ignored.
-    if (len == 0 && mc != sta->c)
-	return FAIL;
+    ఒకవేళ (len == 0 && mc != sta->c)
+	తిరిగి FAIL;
 
-    if (len == 0)
+    ఒకవేళ (len == 0)
     {
 	len += mb_char2len(mc);
-	sta = sta->out;
+	sta = sta->బహిర్గతం;
     }
 
     // We don't care about the order of composing characters.  Get them into
     // cchars[] first.
-    while (len < clen)
+    అయితే (len < clen)
     {
-	mc = mb_ptr2char(rex.input + len);
+	mc = mb_ptr2char(rex.ఆదానం + len);
 	cchars[ccount++] = mc;
 	len += mb_char2len(mc);
-	if (ccount == MAX_MCO)
-	    break;
+	ఒకవేళ (ccount == MAX_MCO)
+	    ఆపు;
     }
 
     // Check that each composing char in the pattern matches a composing char
     // in the text.  We do not check if all composing chars are matched.
-    while (sta->c != NFA_END_COMPOSING)
+    అయితే (sta->c != NFA_చివర_COMPOSING)
     {
-	for (j = 0; j < ccount; ++j)
-	    if (cchars[j] == sta->c)
-		break;
-	if (j == ccount)
-	    return FAIL;
-	sta = sta->out;
+	కొరకు (j = 0; j < ccount; ++j)
+	    ఒకవేళ (cchars[j] == sta->c)
+		ఆపు;
+	ఒకవేళ (j == ccount)
+	    తిరిగి FAIL;
+	sta = sta->బహిర్గతం;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -5761,89 +5761,89 @@ match_composing(nfa_state_T *sta, int curc, int clen)
  *
  * Note: Caller must ensure that: start != NULL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 nfa_regmatch(
     nfa_regprog_T	*prog,
-    nfa_state_T		*start,
+    nfa_state_T		*ప్రారంభం,
     regsubs_T		*submatch,
     regsubs_T		*m)
 {
-    int		result = FALSE;
-    size_t	size = 0;
-    int		flag = 0;
-    int		go_to_nextline = FALSE;
+    పూర్ణాంకం		ఫలితం = FALSE;
+    size_t	కొలత = 0;
+    పూర్ణాంకం		flag = 0;
+    పూర్ణాంకం		go_గమ్యం_nextline = FALSE;
     nfa_thread_T *t;
     nfa_list_T	list[2];
-    int		listidx;
+    పూర్ణాంకం		listidx;
     nfa_list_T	*thislist;
     nfa_list_T	*nextlist;
-    int		*listids = NULL;
-    int		listids_len = 0;
-    nfa_state_T *add_state;
-    int		add_here;
-    int		add_count;
-    int		add_off = 0;
-    int		toplevel = start->c == NFA_MOPEN;
+    పూర్ణాంకం		*listids = ఖాళీ;
+    పూర్ణాంకం		listids_len = 0;
+    nfa_state_T *కూడు_state;
+    పూర్ణాంకం		కూడు_ఇక్కడ;
+    పూర్ణాంకం		కూడు_లెక్క;
+    పూర్ణాంకం		కూడు_off = 0;
+    పూర్ణాంకం		toplevel = ప్రారంభం->c == NFA_MOPEN;
     regsubs_T	*r;
-#ifdef NFA_REGEXP_DEBUG_LOG
+#నిర్వచితమైతే NFA_REGEXP_DEBUG_LOG
     FILE	*debug;
-#endif
+#అయితే_ముగింపు
 
     // Some patterns may take a long time to match, especially when using
     // recursive_regmatch(). Allow interrupting them with CTRL-C.
     fast_breakcheck();
-    if (got_int)
-	return FALSE;
-#ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return FALSE;
-#endif
+    ఒకవేళ (got_int)
+	తిరిగి FALSE;
+#నిర్వచితమైతే FEAT_RELTIME
+    ఒకవేళ (nfa_did_సమయం_బహిర్గతం())
+	తిరిగి FALSE;
+#అయితే_ముగింపు
 
-#ifdef NFA_REGEXP_DEBUG_LOG
+#నిర్వచితమైతే NFA_REGEXP_DEBUG_LOG
     debug = fopen(NFA_REGEXP_DEBUG_LOG, "a");
-    if (debug == NULL)
+    ఒకవేళ (debug == ఖాళీ)
     {
 	semsg("(NFA) COULD NOT OPEN %s!", NFA_REGEXP_DEBUG_LOG);
-	return FALSE;
+	తిరిగి FALSE;
     }
-#endif
-    nfa_match = FALSE;
+#అయితే_ముగింపు
+    nfa_సరిపోలిక = FALSE;
 
     // Allocate memory for the lists of nodes.
-    size = (prog->nstate + 1) * sizeof(nfa_thread_T);
+    కొలత = (prog->nstate + 1) * పరిమాణం(nfa_thread_T);
 
     // Reuse cached list buffers from prog when available (top-level call).
     // Recursive calls must allocate their own buffers.
-    if (toplevel && prog->listbuf[0] != NULL)
+    ఒకవేళ (toplevel && prog->listbuf[0] != ఖాళీ)
     {
 	list[0].t = (nfa_thread_T *)prog->listbuf[0];
 	list[1].t = (nfa_thread_T *)prog->listbuf[1];
-	prog->listbuf[0] = NULL;
-	prog->listbuf[1] = NULL;
+	prog->listbuf[0] = ఖాళీ;
+	prog->listbuf[1] = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	list[0].t = alloc(size);
-	list[1].t = alloc(size);
+	list[0].t = alloc(కొలత);
+	list[1].t = alloc(కొలత);
     }
     list[0].len = prog->nstate + 1;
     list[1].len = prog->nstate + 1;
-    if (list[0].t == NULL || list[1].t == NULL)
-	goto theend;
+    ఒకవేళ (list[0].t == ఖాళీ || list[1].t == ఖాళీ)
+	వెళ్ళు theend;
 
-#ifdef ENABLE_LOG
-    log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+#నిర్వచితమైతే ENABLE_LOG
+    log_fd = fopen(NFA_REGEXP_నిరంతరం_LOG, "a");
+    ఒకవేళ (log_fd == ఖాళీ)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
     }
     fprintf(log_fd, "**********************************\n");
-    nfa_set_code(start->c);
+    nfa_సమితి_సంకేతం(ప్రారంభం->c);
     fprintf(log_fd, " RUNNING nfa_regmatch() starting with state %d, code %s\n",
-    abs(start->id), code);
+    నిరపేక్ష(ప్రారంభం->id), సంకేతం_2);
     fprintf(log_fd, "**********************************\n");
-#endif
+#అయితే_ముగింపు
 
     thislist = &list[0];
     thislist->n = 0;
@@ -5851,74 +5851,74 @@ nfa_regmatch(
     nextlist = &list[1];
     nextlist->n = 0;
     nextlist->has_pim = FALSE;
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
     fprintf(log_fd, "(---) STARTSTATE first\n");
-#endif
+#అయితే_ముగింపు
     thislist->id = rex.nfa_listid + 1;
 
     // Inline optimized code for addstate(thislist, start, m, 0) if we know
     // it's the first MOPEN.
-    if (toplevel)
+    ఒకవేళ (toplevel)
     {
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    m->norm.list.multi[0].start_lnum = rex.lnum;
-	    m->norm.list.multi[0].start_col = (colnr_T)(rex.input - rex.line);
-	    m->norm.orig_start_col = m->norm.list.multi[0].start_col;
+	    m->norm.list.multi[0].ప్రారంభం_lnum = rex.lnum;
+	    m->norm.list.multi[0].ప్రారంభం_నిలువు = (colnr_T)(rex.ఆదానం - rex.పంక్తి);
+	    m->norm.orig_ప్రారంభం_నిలువు = m->norm.list.multi[0].ప్రారంభం_నిలువు;
 	}
-	else
-	    m->norm.list.line[0].start = rex.input;
-	m->norm.in_use = 1;
-	r = addstate(thislist, start->out, m, NULL, 0, 0);
+	లేకపోతే
+	    m->norm.list.పంక్తి[0].ప్రారంభం = rex.ఆదానం;
+	m->norm.లోపల_use = 1;
+	r = addstate(thislist, ప్రారంభం->బహిర్గతం, m, ఖాళీ, 0, 0);
     }
-    else
-	r = addstate(thislist, start, m, NULL, 0, 0);
-    if (r == NULL)
+    లేకపోతే
+	r = addstate(thislist, ప్రారంభం, m, ఖాళీ, 0, 0);
+    ఒకవేళ (r == ఖాళీ)
     {
-	nfa_match = NFA_TOO_EXPENSIVE;
-	goto theend;
+	nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+	వెళ్ళు theend;
     }
 
-#define	ADD_STATE_IF_MATCH(state)	\
-    if (result)				\
+#నిర్వచించు	కూడు_STATE_IF_సరిపోలిక(state)	\
+    ఒకవేళ (ఫలితం)				\
     {					\
-	add_state = state->out;		\
-	add_off = clen;			\
+	కూడు_state = state->బహిర్గతం;		\
+	కూడు_off = clen;			\
     }
 
     /*
      * Run for each character.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int	curc;
-	int	clen;
+	పూర్ణాంకం	curc;
+	పూర్ణాంకం	clen;
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    // Fast path for an ASCII byte not followed by a composing
 	    // character, matching the check in utfc_ptr2len().  Avoids two
 	    // indirect calls for the common case.
-	    if (rex.input[0] != NUL && rex.input[0] < 0x80 && rex.input[1] < 0x80)
+	    ఒకవేళ (rex.ఆదానం[0] != NUL && rex.ఆదానం[0] < 0x80 && rex.ఆదానం[1] < 0x80)
 	    {
-		curc = rex.input[0];
+		curc = rex.ఆదానం[0];
 		clen = 1;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		curc = (*mb_ptr2char)(rex.input);
-		clen = (*mb_ptr2len)(rex.input);
+		curc = (*mb_ptr2char)(rex.ఆదానం);
+		clen = (*mb_ptr2len)(rex.ఆదానం);
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    curc = *rex.input;
+	    curc = *rex.ఆదానం;
 	    clen = 1;
 	}
-	if (curc == NUL)
+	ఒకవేళ (curc == NUL)
 	{
 	    clen = 0;
-	    go_to_nextline = FALSE;
+	    go_గమ్యం_nextline = FALSE;
 	}
 
 	// swap lists
@@ -5927,124 +5927,124 @@ nfa_regmatch(
 	nextlist->n = 0;	    // clear nextlist
 	nextlist->has_pim = FALSE;
 	++rex.nfa_listid;
-	if (prog->re_engine == AUTOMATIC_ENGINE
-		&& (rex.nfa_listid >= NFA_MAX_STATES
-#ifdef FEAT_EVAL
+	ఒకవేళ (prog->re_engine == AUTOMATIC_ENGINE
+		&& (rex.nfa_listid >= NFA_MAX_స్థితులు
+#నిర్వచితమైతే FEAT_EVAL
 		    || nfa_fail_for_testing
-#endif
+#అయితే_ముగింపు
 		    ))
 	{
 	    // too many states, retry with old engine
-	    nfa_match = NFA_TOO_EXPENSIVE;
-	    goto theend;
+	    nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+	    వెళ్ళు theend;
 	}
 
 	thislist->id = rex.nfa_listid;
 	nextlist->id = rex.nfa_listid + 1;
 
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 	fprintf(log_fd, "------------------------------------------\n");
-	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.input);
-	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (int)curc);
+	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.ఆదానం);
+	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (పూర్ణాంకం)curc);
 	fprintf(log_fd, ">>> Thislist has %d states available: ", thislist->n);
 	{
-	    int i;
+	    పూర్ణాంకం i;
 
-	    for (i = 0; i < thislist->n; i++)
-		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
+	    కొరకు (i = 0; i < thislist->n; i++)
+		fprintf(log_fd, "%d  ", నిరపేక్ష(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
-#endif
+#అయితే_ముగింపు
 
-#ifdef NFA_REGEXP_DEBUG_LOG
+#నిర్వచితమైతే NFA_REGEXP_DEBUG_LOG
 	fprintf(debug, "\n-------------------\n");
-#endif
+#అయితే_ముగింపు
 	/*
 	 * If the state lists are empty we can stop.
 	 */
-	if (thislist->n == 0)
-	    break;
+	ఒకవేళ (thislist->n == 0)
+	    ఆపు;
 
 	// compute nextlist
-	for (listidx = 0; listidx < thislist->n; ++listidx)
+	కొరకు (listidx = 0; listidx < thislist->n; ++listidx)
 	{
 	    // If the list gets very long there probably is something wrong.
 	    // At least allow interrupting with CTRL-C.  Only check once in a
 	    // while, calling ui_breakcheck() for every state is too slow.
-	    static int	breakcheck_count = 0;  // using "static" makes it faster
-	    if (unlikely(++breakcheck_count >= 100000))
+	    స్థిర పూర్ణాంకం	breakcheck_లెక్క = 0;  // using "static" makes it faster
+	    ఒకవేళ (unlikely(++breakcheck_లెక్క >= 100000))
 	    {
 		ui_breakcheck();
-		breakcheck_count = 0;
+		breakcheck_లెక్క = 0;
 	    }
-	    if (got_int)
-		break;
-#ifdef FEAT_RELTIME
-	    if (nfa_did_time_out())
-		break;
-#endif
+	    ఒకవేళ (got_int)
+		ఆపు;
+#నిర్వచితమైతే FEAT_RELTIME
+	    ఒకవేళ (nfa_did_సమయం_బహిర్గతం())
+		ఆపు;
+#అయితే_ముగింపు
 	    t = &thislist->t[listidx];
 
-#ifdef NFA_REGEXP_DEBUG_LOG
-	    nfa_set_code(t->state->c);
-	    fprintf(debug, "%s, ", code);
-#endif
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే NFA_REGEXP_DEBUG_LOG
+	    nfa_సమితి_సంకేతం(t->state->c);
+	    fprintf(debug, "%s, ", సంకేతం_2);
+#అయితే_ముగింపు
+#నిర్వచితమైతే ENABLE_LOG
 	    {
-		int col;
+		పూర్ణాంకం నిలువు;
 
-		if (t->subs.norm.in_use <= 0)
-		    col = -1;
-		else if (REG_MULTI)
-		    col = t->subs.norm.list.multi[0].start_col;
-		else
-		    col = (int)(t->subs.norm.list.line[0].start - rex.line);
-		nfa_set_code(t->state->c);
+		ఒకవేళ (t->subs.norm.లోపల_use <= 0)
+		    నిలువు = -1;
+		లేకపోతే ఒకవేళ (REG_MULTI)
+		    నిలువు = t->subs.norm.list.multi[0].ప్రారంభం_నిలువు;
+		లేకపోతే
+		    నిలువు = (పూర్ణాంకం)(t->subs.norm.list.పంక్తి[0].ప్రారంభం - rex.పంక్తి);
+		nfa_సమితి_సంకేతం(t->state->c);
 		fprintf(log_fd, "(%d) char %d %s (start col %d)%s... \n",
-			abs(t->state->id), (int)t->state->c, code, col,
+			నిరపేక్ష(t->state->id), (పూర్ణాంకం)t->state->c, సంకేతం_2, నిలువు,
 			pim_info(&t->pim));
 	    }
-#endif
+#అయితే_ముగింపు
 
 	    /*
 	     * Handle the possible codes of the current state.
 	     * The most important is NFA_MATCH.
 	     */
-	    add_state = NULL;
-	    add_here = FALSE;
-	    add_count = 0;
-	    switch (t->state->c)
+	    కూడు_state = ఖాళీ;
+	    కూడు_ఇక్కడ = FALSE;
+	    కూడు_లెక్క = 0;
+	    ఎంపిక (t->state->c)
 	    {
-	    case NFA_MATCH:
+	    స్థితి NFA_సరిపోలిక:
 	      {
 		// If the match is not at the start of the line, ends before a
 		// composing characters and rex.reg_icombine is not set, that
 		// is not really a match.
-		if (enc_utf8 && !rex.reg_icombine
-			     && rex.input != rex.line && utf_iscomposing(curc))
-		    break;
+		ఒకవేళ (enc_utf8 && !rex.reg_icombine
+			     && rex.ఆదానం != rex.పంక్తి && utf_iscomposing(curc))
+		    ఆపు;
 
-		nfa_match = TRUE;
+		nfa_సరిపోలిక = TRUE;
 		copy_sub(&submatch->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+		ఒకవేళ (rex.nfa_has_zsubexpr)
 		    copy_sub(&submatch->synt, &t->subs.synt);
-#endif
-#ifdef ENABLE_LOG
+#అయితే_ముగింపు
+#నిర్వచితమైతే ENABLE_LOG
 		log_subsexpr(&t->subs);
-#endif
+#అయితే_ముగింపు
 		// Found the left-most longest match, do not look at any other
 		// states at this position.  When the list of states is going
 		// to be empty quit without advancing, so that "rex.input" is
 		// correct.
-		if (nextlist->n == 0)
+		ఒకవేళ (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		వెళ్ళు nextchar;
 	      }
 
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
+	    స్థితి NFA_చివర_INVISIBLE:
+	    స్థితి NFA_చివర_INVISIBLE_NEG:
+	    స్థితి NFA_చివర_నమూనా:
 		/*
 		 * This is only encountered after a NFA_START_INVISIBLE or
 		 * NFA_START_INVISIBLE_BEFORE node.
@@ -6056,108 +6056,108 @@ nfa_regmatch(
 		 * in the position in "nfa_endp".
 		 * Submatches are stored in *m, and used in the parent call.
 		 */
-#ifdef ENABLE_LOG
-		if (nfa_endp != NULL)
+#నిర్వచితమైతే ENABLE_LOG
+		ఒకవేళ (nfa_endp != ఖాళీ)
 		{
-		    if (REG_MULTI)
+		    ఒకవేళ (REG_MULTI)
 			fprintf(log_fd, "Current lnum: %d, endp lnum: %d; current col: %d, endp col: %d\n",
-				(int)rex.lnum,
-				(int)nfa_endp->se_u.pos.lnum,
-				(int)(rex.input - rex.line),
-				nfa_endp->se_u.pos.col);
-		    else
+				(పూర్ణాంకం)rex.lnum,
+				(పూర్ణాంకం)nfa_endp->se_u.pos.lnum,
+				(పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి),
+				nfa_endp->se_u.pos.నిలువు);
+		    లేకపోతే
 			fprintf(log_fd, "Current col: %d, endp col: %d\n",
-				(int)(rex.input - rex.line),
-				(int)(nfa_endp->se_u.ptr - rex.input));
+				(పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి),
+				(పూర్ణాంకం)(nfa_endp->se_u.ptr - rex.ఆదానం));
 		}
-#endif
+#అయితే_ముగింపు
 		// If "nfa_endp" is set it's only a match if it ends at
 		// "nfa_endp"
-		if (nfa_endp != NULL && (REG_MULTI
+		ఒకవేళ (nfa_endp != ఖాళీ && (REG_MULTI
 			? (rex.lnum != nfa_endp->se_u.pos.lnum
-			    || (int)(rex.input - rex.line)
-						!= nfa_endp->se_u.pos.col)
-			: rex.input != nfa_endp->se_u.ptr))
-		    break;
+			    || (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి)
+						!= nfa_endp->se_u.pos.నిలువు)
+			: rex.ఆదానం != nfa_endp->se_u.ptr))
+		    ఆపు;
 
 		// do not set submatches for \@!
-		if (t->state->c != NFA_END_INVISIBLE_NEG)
+		ఒకవేళ (t->state->c != NFA_చివర_INVISIBLE_NEG)
 		{
 		    copy_sub(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+		    ఒకవేళ (rex.nfa_has_zsubexpr)
 			copy_sub(&m->synt, &t->subs.synt);
-#endif
+#అయితే_ముగింపు
 		}
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 		fprintf(log_fd, "Match found:\n");
 		log_subsexpr(m);
-#endif
-		nfa_match = TRUE;
+#అయితే_ముగింపు
+		nfa_సరిపోలిక = TRUE;
 		// See comment above at "goto nextchar".
-		if (nextlist->n == 0)
+		ఒకవేళ (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		వెళ్ళు nextchar;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG:
+	    స్థితి NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి:
 		{
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 		    fprintf(log_fd, "Failure chance invisible: %d, what follows: %d\n",
-			    failure_chance(t->state->out, 0),
-			    failure_chance(t->state->out1->out, 0));
-#endif
+			    failure_chance(t->state->బహిర్గతం, 0),
+			    failure_chance(t->state->out1->బహిర్గతం, 0));
+#అయితే_ముగింపు
 		    // Do it directly if there already is a PIM or when
 		    // nfa_postprocess() detected it will work better.
-		    if (t->pim.result != NFA_PIM_UNUSED
-			 || t->state->c == NFA_START_INVISIBLE_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_BEFORE_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
+		    ఒకవేళ (t->pim.ఫలితం != NFA_PIM_వాడని
+			 || t->state->c == NFA_ప్రారంభం_INVISIBLE_మొదటి
+			 || t->state->c == NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి
+			 || t->state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE_మొదటి
+			 || t->state->c == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి)
 		    {
-			int in_use = m->norm.in_use;
+			పూర్ణాంకం లోపల_use = m->norm.లోపల_use;
 
 			// Copy submatch info for the recursive call, opposite
 			// of what happens on success below.
 			copy_sub_off(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+			ఒకవేళ (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&m->synt, &t->subs.synt);
-#endif
+#అయితే_ముగింపు
 
 			/*
 			 * First try matching the invisible match, then what
 			 * follows.
 			 */
-			result = recursive_regmatch(t->state, NULL, prog,
+			ఫలితం = recursive_regmatch(t->state, ఖాళీ, prog,
 					  submatch, m, &listids, &listids_len);
-			if (result == NFA_TOO_EXPENSIVE)
+			ఒకవేళ (ఫలితం == NFA_TOO_EXPENSIVE)
 			{
-			    nfa_match = result;
-			    goto theend;
+			    nfa_సరిపోలిక = ఫలితం;
+			    వెళ్ళు theend;
 			}
 
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (t->state->c == NFA_START_INVISIBLE_NEG
-			       || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
+			ఒకవేళ (ఫలితం != (t->state->c == NFA_ప్రారంభం_INVISIBLE_NEG
+			       || t->state->c == NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి
 			       || t->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG
 			       || t->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి))
 			{
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&t->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+			    ఒకవేళ (rex.nfa_has_zsubexpr)
 				copy_sub_off(&t->subs.synt, &m->synt);
-#endif
+#అయితే_ముగింపు
 			    // If the pattern has \ze and it matched in the
 			    // sub pattern, use it.
 			    copy_ze_off(&t->subs.norm, &m->norm);
@@ -6165,12 +6165,12 @@ nfa_regmatch(
 			    // t->state->out1 is the corresponding
 			    // END_INVISIBLE node; Add its out to the current
 			    // list (zero-width match).
-			    add_here = TRUE;
-			    add_state = t->state->out1->out;
+			    కూడు_ఇక్కడ = TRUE;
+			    కూడు_state = t->state->out1->బహిర్గతం;
 			}
-			m->norm.in_use = in_use;
+			m->norm.లోపల_use = లోపల_use;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			nfa_pim_T pim;
 
@@ -6181,891 +6181,891 @@ nfa_regmatch(
 			 * about the invisible match.
 			 */
 			pim.state = t->state;
-			pim.result = NFA_PIM_TODO;
-			pim.subs.norm.in_use = 0;
-#ifdef FEAT_SYN_HL
-			pim.subs.synt.in_use = 0;
-#endif
-			if (REG_MULTI)
+			pim.ఫలితం = NFA_PIM_TODO;
+			pim.subs.norm.లోపల_use = 0;
+#నిర్వచితమైతే FEAT_SYN_HL
+			pim.subs.synt.లోపల_use = 0;
+#అయితే_ముగింపు
+			ఒకవేళ (REG_MULTI)
 			{
-			    pim.end.pos.col = (int)(rex.input - rex.line);
-			    pim.end.pos.lnum = rex.lnum;
+			    pim.చివర.pos.నిలువు = (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
+			    pim.చివర.pos.lnum = rex.lnum;
 			}
-			else
-			    pim.end.ptr = rex.input;
+			లేకపోతే
+			    pim.చివర.ptr = rex.ఆదానం;
 
 			// t->state->out1 is the corresponding END_INVISIBLE
 			// node; Add its out to the current list (zero-width
 			// match).
-			if (addstate_here(thislist, t->state->out1->out,
-					     &t->subs, &pim, &listidx) == NULL)
+			ఒకవేళ (addstate_ఇక్కడ(thislist, t->state->out1->బహిర్గతం,
+					     &t->subs, &pim, &listidx) == ఖాళీ)
 			{
-			    nfa_match = NFA_TOO_EXPENSIVE;
-			    goto theend;
+			    nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+			    వెళ్ళు theend;
 			}
 		    }
 		}
-		break;
+		ఆపు;
 
-	    case NFA_START_PATTERN:
+	    స్థితి NFA_ప్రారంభం_నమూనా:
 	      {
-		nfa_state_T *skip = NULL;
-#ifdef ENABLE_LOG
-		int	    skip_lid = 0;
-#endif
+		nfa_state_T *skip = ఖాళీ;
+#నిర్వచితమైతే ENABLE_LOG
+		పూర్ణాంకం	    skip_lid = 0;
+#అయితే_ముగింపు
 
 		// There is no point in trying to match the pattern if the
 		// output state is not going to be added to the list.
-		if (state_in_list(nextlist, t->state->out1->out, &t->subs))
+		ఒకవేళ (state_లోపల_list(nextlist, t->state->out1->బహిర్గతం, &t->subs))
 		{
-		    skip = t->state->out1->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->బహిర్గతం;
+#నిర్వచితమైతే ENABLE_LOG
 		    skip_lid = nextlist->id;
-#endif
+#అయితే_ముగింపు
 		}
-		else if (state_in_list(nextlist,
-					  t->state->out1->out->out, &t->subs))
+		లేకపోతే ఒకవేళ (state_లోపల_list(nextlist,
+					  t->state->out1->బహిర్గతం->బహిర్గతం, &t->subs))
 		{
-		    skip = t->state->out1->out->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->బహిర్గతం->బహిర్గతం;
+#నిర్వచితమైతే ENABLE_LOG
 		    skip_lid = nextlist->id;
-#endif
+#అయితే_ముగింపు
 		}
-		else if (state_in_list(thislist,
-					  t->state->out1->out->out, &t->subs))
+		లేకపోతే ఒకవేళ (state_లోపల_list(thislist,
+					  t->state->out1->బహిర్గతం->బహిర్గతం, &t->subs))
 		{
-		    skip = t->state->out1->out->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->బహిర్గతం->బహిర్గతం;
+#నిర్వచితమైతే ENABLE_LOG
 		    skip_lid = thislist->id;
-#endif
+#అయితే_ముగింపు
 		}
-		if (skip != NULL)
+		ఒకవేళ (skip != ఖాళీ)
 		{
-#ifdef ENABLE_LOG
-		    nfa_set_code(skip->c);
+#నిర్వచితమైతే ENABLE_LOG
+		    nfa_సమితి_సంకేతం(skip->c);
 		    fprintf(log_fd, "> Not trying to match pattern, output state %d is already in list %d. char %d: %s\n",
-			    abs(skip->id), skip_lid, skip->c, code);
-#endif
-		    break;
+			    నిరపేక్ష(skip->id), skip_lid, skip->c, సంకేతం_2);
+#అయితే_ముగింపు
+		    ఆపు;
 		}
 		// Copy submatch info to the recursive call, opposite of what
 		// happens afterwards.
 		copy_sub_off(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+		ఒకవేళ (rex.nfa_has_zsubexpr)
 		    copy_sub_off(&m->synt, &t->subs.synt);
-#endif
+#అయితే_ముగింపు
 
 		// First try matching the pattern.
-		result = recursive_regmatch(t->state, NULL, prog,
+		ఫలితం = recursive_regmatch(t->state, ఖాళీ, prog,
 					  submatch, m, &listids, &listids_len);
-		if (result == NFA_TOO_EXPENSIVE)
+		ఒకవేళ (ఫలితం == NFA_TOO_EXPENSIVE)
 		{
-		    nfa_match = result;
-		    goto theend;
+		    nfa_సరిపోలిక = ఫలితం;
+		    వెళ్ళు theend;
 		}
-		if (result)
+		ఒకవేళ (ఫలితం)
 		{
-		    int bytelen;
+		    పూర్ణాంకం bytelen;
 
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN matches:\n");
 		    log_subsexpr(m);
-#endif
+#అయితే_ముగింపు
 		    // Copy submatch info from the recursive call
 		    copy_sub_off(&t->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+		    ఒకవేళ (rex.nfa_has_zsubexpr)
 			copy_sub_off(&t->subs.synt, &m->synt);
-#endif
+#అయితే_ముగింపు
 		    // Now we need to skip over the matched text and then
 		    // continue with what follows.
-		    if (REG_MULTI)
+		    ఒకవేళ (REG_MULTI)
 			// TODO: multi-line match
-			bytelen = m->norm.list.multi[0].end_col
-						  - (int)(rex.input - rex.line);
-		    else
-			bytelen = (int)(m->norm.list.line[0].end - rex.input);
+			bytelen = m->norm.list.multi[0].చివర_నిలువు
+						  - (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
+		    లేకపోతే
+			bytelen = (పూర్ణాంకం)(m->norm.list.పంక్తి[0].చివర - rex.ఆదానం);
 
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN length: %d\n", bytelen);
-#endif
-		    if (bytelen == 0)
+#అయితే_ముగింపు
+		    ఒకవేళ (bytelen == 0)
 		    {
 			// empty match, output of corresponding
 			// NFA_END_PATTERN/NFA_SKIP to be used at current
 			// position
-			add_here = TRUE;
-			add_state = t->state->out1->out->out;
+			కూడు_ఇక్కడ = TRUE;
+			కూడు_state = t->state->out1->బహిర్గతం->బహిర్గతం;
 		    }
-		    else if (bytelen <= clen)
+		    లేకపోతే ఒకవేళ (bytelen <= clen)
 		    {
 			// match current character, output of corresponding
 			// NFA_END_PATTERN to be used at next position.
-			add_state = t->state->out1->out->out;
-			add_off = clen;
+			కూడు_state = t->state->out1->బహిర్గతం->బహిర్గతం;
+			కూడు_off = clen;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
-			add_state = t->state->out1->out;
-			add_off = bytelen;
-			add_count = bytelen - clen;
+			కూడు_state = t->state->out1->బహిర్గతం;
+			కూడు_off = bytelen;
+			కూడు_లెక్క = bytelen - clen;
 		    }
 		}
-		break;
+		ఆపు;
 	      }
 
-	    case NFA_BOL:
-		if (rex.input == rex.line)
+	    స్థితి NFA_BOL:
+		ఒకవేళ (rex.ఆదానం == rex.పంక్తి)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_EOL:
-		if (curc == NUL)
+	    స్థితి NFA_EOL:
+		ఒకవేళ (curc == NUL)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_BOW:
-		result = TRUE;
+	    స్థితి NFA_BOW:
+		ఫలితం = TRUE;
 
-		if (curc == NUL)
-		    result = FALSE;
-		else if (has_mbyte)
+		ఒకవేళ (curc == NUL)
+		    ఫలితం = FALSE;
+		లేకపోతే ఒకవేళ (has_mbyte)
 		{
-		    int this_class;
+		    పూర్ణాంకం this_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    if (this_class <= 1)
-			result = FALSE;
-		    else if (reg_prev_class() == this_class)
-			result = FALSE;
+		    this_class = mb_get_class_buf(rex.ఆదానం, rex.reg_buf);
+		    ఒకవేళ (this_class <= 1)
+			ఫలితం = FALSE;
+		    లేకపోతే ఒకవేళ (reg_prev_class() == this_class)
+			ఫలితం = FALSE;
 		}
-		else if (!vim_iswordc_buf(curc, rex.reg_buf)
-			   || (rex.input > rex.line
-			       && vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		లేకపోతే ఒకవేళ (!vim_iswordc_buf(curc, rex.reg_buf)
+			   || (rex.ఆదానం > rex.పంక్తి
+			       && vim_iswordc_buf(rex.ఆదానం[-1], rex.reg_buf)))
+		    ఫలితం = FALSE;
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_EOW:
-		result = TRUE;
-		if (rex.input == rex.line)
-		    result = FALSE;
-		else if (has_mbyte)
+	    స్థితి NFA_EOW:
+		ఫలితం = TRUE;
+		ఒకవేళ (rex.ఆదానం == rex.పంక్తి)
+		    ఫలితం = FALSE;
+		లేకపోతే ఒకవేళ (has_mbyte)
 		{
-		    int this_class, prev_class;
+		    పూర్ణాంకం this_class, prev_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		    this_class = mb_get_class_buf(rex.ఆదానం, rex.reg_buf);
 		    prev_class = reg_prev_class();
-		    if (this_class == prev_class
+		    ఒకవేళ (this_class == prev_class
 					|| prev_class == 0 || prev_class == 1)
-			result = FALSE;
+			ఫలితం = FALSE;
 		}
-		else if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		లేకపోతే ఒకవేళ (!vim_iswordc_buf(rex.ఆదానం[-1], rex.reg_buf)
+			|| (rex.ఆదానం[0] != NUL
 					&& vim_iswordc_buf(curc, rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		    ఫలితం = FALSE;
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_BOF:
-		if (rex.lnum == 0 && rex.input == rex.line
+	    స్థితి NFA_BOF:
+		ఒకవేళ (rex.lnum == 0 && rex.ఆదానం == rex.పంక్తి
 				     && (!REG_MULTI || rex.reg_firstlnum == 1))
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_EOF:
-		if (rex.lnum == rex.reg_maxline && curc == NUL)
+	    స్థితి NFA_EOF:
+		ఒకవేళ (rex.lnum == rex.reg_maxline && curc == NUL)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_COMPOSING:
+	    స్థితి NFA_COMPOSING:
 	    {
-		nfa_state_T *end;
+		nfa_state_T *చివర;
 
-		result = match_composing(t->state->out, curc, clen);
+		ఫలితం = సరిపోలిక_composing(t->state->బహిర్గతం, curc, clen);
 
-		end = t->state->out1;	    // NFA_END_COMPOSING
-		ADD_STATE_IF_MATCH(end);
-		break;
+		చివర = t->state->out1;	    // NFA_END_COMPOSING
+		కూడు_STATE_IF_సరిపోలిక(చివర);
+		ఆపు;
 	    }
 
-	    case NFA_NEWL:
-		if (curc == NUL && !rex.reg_line_lbr && REG_MULTI
+	    స్థితి NFA_NEWL:
+		ఒకవేళ (curc == NUL && !rex.reg_పంక్తి_lbr && REG_MULTI
 						&& rex.lnum <= rex.reg_maxline)
 		{
-		    go_to_nextline = TRUE;
+		    go_గమ్యం_nextline = TRUE;
 		    // Pass -1 for the offset, which means taking the position
 		    // at the start of the next line.
-		    add_state = t->state->out;
-		    add_off = -1;
+		    కూడు_state = t->state->బహిర్గతం;
+		    కూడు_off = -1;
 		}
-		else if (curc == '\n' && rex.reg_line_lbr)
+		లేకపోతే ఒకవేళ (curc == '\n' && rex.reg_పంక్తి_lbr)
 		{
 		    // match \n as if it is an ordinary character
-		    add_state = t->state->out;
-		    add_off = 1;
+		    కూడు_state = t->state->బహిర్గతం;
+		    కూడు_off = 1;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    స్థితి NFA_ప్రారంభం_COLL:
+	    స్థితి NFA_ప్రారంభం_NEG_COLL:
 	      {
 		// What follows is a list of characters, until NFA_END_COLL.
 		// One of them must match or none of them must match.
 		nfa_state_T	*state;
-		int		result_if_matched;
-		int		c1, c2;
+		పూర్ణాంకం		ఫలితం_if_matched;
+		పూర్ణాంకం		c1, c2;
 
 		// Never match EOL. If it's part of the collection it is added
 		// as a separate state with an OR.
-		if (curc == NUL)
-		    break;
+		ఒకవేళ (curc == NUL)
+		    ఆపు;
 
-		state = t->state->out;
-		result_if_matched = (t->state->c == NFA_START_COLL);
-		for (;;)
+		state = t->state->బహిర్గతం;
+		ఫలితం_if_matched = (t->state->c == NFA_ప్రారంభం_COLL);
+		కొరకు (;;)
 		{
-		    if (state->c == NFA_COMPOSING)
+		    ఒకవేళ (state->c == NFA_COMPOSING)
 		    {
-			nfa_state_T *end;
+			nfa_state_T *చివర;
 
-			result = match_composing(t->state->out->out, curc,
+			ఫలితం = సరిపోలిక_composing(t->state->బహిర్గతం->బహిర్గతం, curc,
 									clen);
 
-			if (t->state->out->out1 != NULL
-				&& t->state->out->out1->c == NFA_END_COMPOSING)
+			ఒకవేళ (t->state->బహిర్గతం->out1 != ఖాళీ
+				&& t->state->బహిర్గతం->out1->c == NFA_చివర_COMPOSING)
 			{
-			    end = t->state->out->out1;
-			    ADD_STATE_IF_MATCH(end);
+			    చివర = t->state->బహిర్గతం->out1;
+			    కూడు_STATE_IF_సరిపోలిక(చివర);
 			}
-			break;
+			ఆపు;
 		    }
-		    if (state->c == NFA_END_COLL)
+		    ఒకవేళ (state->c == NFA_చివర_COLL)
 		    {
-			result = !result_if_matched;
-			break;
+			ఫలితం = !ఫలితం_if_matched;
+			ఆపు;
 		    }
-		    if (state->c == NFA_RANGE_MIN)
+		    ఒకవేళ (state->c == NFA_RANGE_MIN)
 		    {
 			c1 = state->val;
-			state = state->out; // advance to NFA_RANGE_MAX
+			state = state->బహిర్గతం; // advance to NFA_RANGE_MAX
 			c2 = state->val;
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 			fprintf(log_fd, "NFA_RANGE_MIN curc=%d c1=%d c2=%d\n",
 				curc, c1, c2);
-#endif
-			if (curc >= c1 && curc <= c2)
+#అయితే_ముగింపు
+			ఒకవేళ (curc >= c1 && curc <= c2)
 			{
-			    result = result_if_matched;
-			    break;
+			    ఫలితం = ఫలితం_if_matched;
+			    ఆపు;
 			}
-			if (rex.reg_ic)
+			ఒకవేళ (rex.reg_ic)
 			{
-			    int curc_low = MB_CASEFOLD(curc);
-			    int done = FALSE;
+			    పూర్ణాంకం curc_దిగువ = MB_CASEFOLD(curc);
+			    పూర్ణాంకం పూర్తి = FALSE;
 
-			    for ( ; c1 <= c2; ++c1)
-				if (MB_CASEFOLD(c1) == curc_low)
+			    కొరకు ( ; c1 <= c2; ++c1)
+				ఒకవేళ (MB_CASEFOLD(c1) == curc_దిగువ)
 				{
-				    result = result_if_matched;
-				    done = TRUE;
-				    break;
+				    ఫలితం = ఫలితం_if_matched;
+				    పూర్తి = TRUE;
+				    ఆపు;
 				}
-			    if (done)
-				break;
+			    ఒకవేళ (పూర్తి)
+				ఆపు;
 			}
 		    }
-		    else if (state->c < 0 ? check_char_class(state->c, curc)
+		    లేకపోతే ఒకవేళ (state->c < 0 ? check_char_class(state->c, curc)
 			       : (curc == state->c
 				   || (rex.reg_ic && MB_CASEFOLD(curc)
 						    == MB_CASEFOLD(state->c))))
 		    {
-			result = result_if_matched;
-			break;
+			ఫలితం = ఫలితం_if_matched;
+			ఆపు;
 		    }
-		    state = state->out;
+		    state = state->బహిర్గతం;
 		}
-		if (result)
+		ఒకవేళ (ఫలితం)
 		{
 		    // next state is in out of the NFA_END_COLL, out1 of
 		    // START points to the END state
-		    add_state = t->state->out1->out;
-		    add_off = clen;
+		    కూడు_state = t->state->out1->బహిర్గతం;
+		    కూడు_off = clen;
 		}
-		break;
+		ఆపు;
 	      }
 
-	    case NFA_ANY:
+	    స్థితి NFA_ANY:
 		// Any char except '\0', (end of input) does not match.
-		if (curc > 0)
+		ఒకవేళ (curc > 0)
 		{
-		    add_state = t->state->out;
-		    add_off = clen;
+		    కూడు_state = t->state->బహిర్గతం;
+		    కూడు_off = clen;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_ANY_COMPOSING:
+	    స్థితి NFA_ANY_COMPOSING:
 		// On a composing character skip over it.  Otherwise do
 		// nothing.  Always matches.
-		if (enc_utf8 && utf_iscomposing(curc))
+		ఒకవేళ (enc_utf8 && utf_iscomposing(curc))
 		{
-		    add_off = clen;
+		    కూడు_off = clen;
 		}
-		else
+		లేకపోతే
 		{
-		    add_here = TRUE;
-		    add_off = 0;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_off = 0;
 		}
-		add_state = t->state->out;
-		break;
+		కూడు_state = t->state->బహిర్గతం;
+		ఆపు;
 
 	    /*
 	     * Character classes like \a for alpha, \d for digit etc.
 	     */
-	    case NFA_IDENT:	//  \i
-		result = vim_isIDc(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_IDENT:	//  \i
+		ఫలితం = vim_isIDc(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_SIDENT:	//  \I
-		result = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_SIDENT:	//  \I
+		ఫలితం = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_KWORD:	//  \k
-		result = vim_iswordp_buf(rex.input, rex.reg_buf);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_KWORD:	//  \k
+		ఫలితం = vim_iswordp_buf(rex.ఆదానం, rex.reg_buf);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_SKWORD:	//  \K
-		result = !VIM_ISDIGIT(curc)
-				     && vim_iswordp_buf(rex.input, rex.reg_buf);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_SKWORD:	//  \K
+		ఫలితం = !VIM_ISDIGIT(curc)
+				     && vim_iswordp_buf(rex.ఆదానం, rex.reg_buf);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_FNAME:	//  \f
-		result = vim_isfilec(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_FNAME:	//  \f
+		ఫలితం = vim_isfilec(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_SFNAME:	//  \F
-		result = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_SFNAME:	//  \F
+		ఫలితం = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_PRINT:	//  \p
-		result = vim_isprintc(PTR2CHAR(rex.input));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_PRINT:	//  \p
+		ఫలితం = vim_isprintc(PTR2CHAR(rex.ఆదానం));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_SPRINT:	//  \P
-		result = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.input));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_SPRINT:	//  \P
+		ఫలితం = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.ఆదానం));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_WHITE:	//  \s
-		result = VIM_ISWHITE(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_WHITE:	//  \s
+		ఫలితం = VIM_ISWHITE(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NWHITE:	//  \S
-		result = curc != NUL && !VIM_ISWHITE(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NWHITE:	//  \S
+		ఫలితం = curc != NUL && !VIM_ISWHITE(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_DIGIT:	//  \d
-		result = ri_digit(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_DIGIT:	//  \d
+		ఫలితం = ri_digit(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NDIGIT:	//  \D
-		result = curc != NUL && !ri_digit(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NDIGIT:	//  \D
+		ఫలితం = curc != NUL && !ri_digit(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_HEX:	//  \x
-		result = ri_hex(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_HEX:	//  \x
+		ఫలితం = ri_hex(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NHEX:	//  \X
-		result = curc != NUL && !ri_hex(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NHEX:	//  \X
+		ఫలితం = curc != NUL && !ri_hex(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_OCTAL:	//  \o
-		result = ri_octal(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_OCTAL:	//  \o
+		ఫలితం = ri_octal(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NOCTAL:	//  \O
-		result = curc != NUL && !ri_octal(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NOCTAL:	//  \O
+		ఫలితం = curc != NUL && !ri_octal(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_WORD:	//  \w
-		result = ri_word(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_మాట:	//  \w
+		ఫలితం = ri_మాట(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NWORD:	//  \W
-		result = curc != NUL && !ri_word(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NWORD:	//  \W
+		ఫలితం = curc != NUL && !ri_మాట(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_HEAD:	//  \h
-		result = ri_head(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_తల:	//  \h
+		ఫలితం = ri_తల(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NHEAD:	//  \H
-		result = curc != NUL && !ri_head(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NHEAD:	//  \H
+		ఫలితం = curc != NUL && !ri_తల(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_ALPHA:	//  \a
-		result = ri_alpha(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_ALPHA:	//  \a
+		ఫలితం = ri_alpha(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NALPHA:	//  \A
-		result = curc != NUL && !ri_alpha(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NALPHA:	//  \A
+		ఫలితం = curc != NUL && !ri_alpha(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_LOWER:	//  \l
-		result = ri_lower(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_క్రింది:	//  \l
+		ఫలితం = ri_క్రింది(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NLOWER:	//  \L
-		result = curc != NUL && !ri_lower(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NLOWER:	//  \L
+		ఫలితం = curc != NUL && !ri_క్రింది(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_UPPER:	//  \u
-		result = ri_upper(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_పై:	//  \u
+		ఫలితం = ri_పై(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NUPPER:	// \U
-		result = curc != NUL && !ri_upper(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NUPPER:	// \U
+		ఫలితం = curc != NUL && !ri_పై(curc);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_LOWER_IC:	// [a-z]
-		result = ri_lower(curc) || (rex.reg_ic && ri_upper(curc));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_క్రింది_IC:	// [a-z]
+		ఫలితం = ri_క్రింది(curc) || (rex.reg_ic && ri_పై(curc));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NLOWER_IC:	// [^a-z]
-		result = curc != NUL
-			&& !(ri_lower(curc) || (rex.reg_ic && ri_upper(curc)));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NLOWER_IC:	// [^a-z]
+		ఫలితం = curc != NUL
+			&& !(ri_క్రింది(curc) || (rex.reg_ic && ri_పై(curc)));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_UPPER_IC:	// [A-Z]
-		result = ri_upper(curc) || (rex.reg_ic && ri_lower(curc));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_పై_IC:	// [A-Z]
+		ఫలితం = ri_పై(curc) || (rex.reg_ic && ri_క్రింది(curc));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_NUPPER_IC:	// ^[A-Z]
-		result = curc != NUL
-			&& !(ri_upper(curc) || (rex.reg_ic && ri_lower(curc)));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    స్థితి NFA_NUPPER_IC:	// ^[A-Z]
+		ఫలితం = curc != NUL
+			&& !(ri_పై(curc) || (rex.reg_ic && ri_క్రింది(curc)));
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
-#endif
+	    స్థితి NFA_BACKREF1:
+	    స్థితి NFA_BACKREF2:
+	    స్థితి NFA_BACKREF3:
+	    స్థితి NFA_BACKREF4:
+	    స్థితి NFA_BACKREF5:
+	    స్థితి NFA_BACKREF6:
+	    స్థితి NFA_BACKREF7:
+	    స్థితి NFA_BACKREF8:
+	    స్థితి NFA_BACKREF9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZREF1:
+	    స్థితి NFA_ZREF2:
+	    స్థితి NFA_ZREF3:
+	    స్థితి NFA_ZREF4:
+	    స్థితి NFA_ZREF5:
+	    స్థితి NFA_ZREF6:
+	    స్థితి NFA_ZREF7:
+	    స్థితి NFA_ZREF8:
+	    స్థితి NFA_ZREF9:
+#అయితే_ముగింపు
 		// \1 .. \9  \z1 .. \z9
 	      {
-		int subidx;
-		int bytelen;
+		పూర్ణాంకం subidx;
+		పూర్ణాంకం bytelen;
 
-#ifdef FEAT_SYN_HL
-		if (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
-#endif
+#నిర్వచితమైతే FEAT_SYN_HL
+		ఒకవేళ (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
+#అయితే_ముగింపు
 		{
 		    subidx = t->state->c - NFA_BACKREF1 + 1;
-		    result = match_backref(&t->subs.norm, subidx, &bytelen);
+		    ఫలితం = సరిపోలిక_backref(&t->subs.norm, subidx, &bytelen);
 		}
-#ifdef FEAT_SYN_HL
-		else
+#నిర్వచితమైతే FEAT_SYN_HL
+		లేకపోతే
 		{
 		    subidx = t->state->c - NFA_ZREF1 + 1;
-		    result = match_zref(subidx, &bytelen);
+		    ఫలితం = సరిపోలిక_zref(subidx, &bytelen);
 		}
-#endif
+#అయితే_ముగింపు
 
-		if (result)
+		ఒకవేళ (ఫలితం)
 		{
-		    if (bytelen == 0)
+		    ఒకవేళ (bytelen == 0)
 		    {
 			// empty match always works, output of NFA_SKIP to be
 			// used next
-			add_here = TRUE;
-			add_state = t->state->out->out;
+			కూడు_ఇక్కడ = TRUE;
+			కూడు_state = t->state->బహిర్గతం->బహిర్గతం;
 		    }
-		    else if (bytelen <= clen)
+		    లేకపోతే ఒకవేళ (bytelen <= clen)
 		    {
 			// match current character, jump ahead to out of
 			// NFA_SKIP
-			add_state = t->state->out->out;
-			add_off = clen;
+			కూడు_state = t->state->బహిర్గతం->బహిర్గతం;
+			కూడు_off = clen;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
-			add_state = t->state->out;
-			add_off = bytelen;
-			add_count = bytelen - clen;
+			కూడు_state = t->state->బహిర్గతం;
+			కూడు_off = bytelen;
+			కూడు_లెక్క = bytelen - clen;
 		    }
 		}
-		break;
+		ఆపు;
 	      }
-	    case NFA_SKIP:
+	    స్థితి NFA_SKIP:
 	      // character of previous matching \1 .. \9  or \@>
-	      if (t->count - clen <= 0)
+	      ఒకవేళ (t->లెక్క - clen <= 0)
 	      {
 		  // end of match, go to what follows
-		  add_state = t->state->out;
-		  add_off = clen;
+		  కూడు_state = t->state->బహిర్గతం;
+		  కూడు_off = clen;
 	      }
-	      else
+	      లేకపోతే
 	      {
 		  // add state again with decremented count
-		  add_state = t->state;
-		  add_off = 0;
-		  add_count = t->count - clen;
+		  కూడు_state = t->state;
+		  కూడు_off = 0;
+		  కూడు_లెక్క = t->లెక్క - clen;
 	      }
-	      break;
+	      ఆపు;
 
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-		result = (REG_MULTI &&
-			nfa_re_num_cmp(t->state->val, t->state->c - NFA_LNUM,
+	    స్థితి NFA_LNUM:
+	    స్థితి NFA_LNUM_GT:
+	    స్థితి NFA_LNUM_LT:
+		ఫలితం = (REG_MULTI &&
+			nfa_re_అంకె_cmp(t->state->val, t->state->c - NFA_LNUM,
 			    (long_u)(rex.lnum + rex.reg_firstlnum)));
-		if (result)
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-		result = nfa_re_num_cmp(t->state->val, t->state->c - NFA_COL,
-			(long_u)(rex.input - rex.line) + 1);
-		if (result)
+	    స్థితి NFA_నిలువు:
+	    స్థితి NFA_నిలువు_GT:
+	    స్థితి NFA_నిలువు_LT:
+		ఫలితం = nfa_re_అంకె_cmp(t->state->val, t->state->c - NFA_నిలువు,
+			(long_u)(rex.ఆదానం - rex.పంక్తి) + 1);
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
+	    స్థితి NFA_VCOL:
+	    స్థితి NFA_VCOL_GT:
+	    స్థితి NFA_VCOL_LT:
 		{
-		    int     op = t->state->c - NFA_VCOL;
-		    colnr_T col = (colnr_T)(rex.input - rex.line);
-		    win_T   *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		    పూర్ణాంకం     op = t->state->c - NFA_VCOL;
+		    colnr_T నిలువు = (colnr_T)(rex.ఆదానం - rex.పంక్తి);
+		    win_T   *wp = rex.reg_win == ఖాళీ ? curwin : rex.reg_win;
 
 		    // Bail out quickly when there can't be a match, avoid the
 		    // overhead of win_linetabsize() on long lines.
-		    if (op != 1 && col > t->state->val
+		    ఒకవేళ (op != 1 && నిలువు > t->state->val
 			    * (has_mbyte ? MB_MAXBYTES : 1))
-			break;
-		    result = FALSE;
-		    if (op == 1 && col - 1 > t->state->val && col > 100)
+			ఆపు;
+		    ఫలితం = FALSE;
+		    ఒకవేళ (op == 1 && నిలువు - 1 > t->state->val && నిలువు > 100)
 		    {
-			int ts = wp->w_buffer->b_p_ts;
+			పూర్ణాంకం ts = wp->w_బఫరు->b_p_ts;
 
 			// Guess that a character won't use more columns than
 			// 'tabstop', with a minimum of 4.
-			if (ts < 4)
+			ఒకవేళ (ts < 4)
 			    ts = 4;
-			result = col > t->state->val * ts;
+			ఫలితం = నిలువు > t->state->val * ts;
 		    }
-		    if (!result)
+		    ఒకవేళ (!ఫలితం)
 		    {
 			linenr_T    lnum = REG_MULTI
 					    ? rex.reg_firstlnum + rex.lnum : 1;
 			long_u	    vcol;
 
-			if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+			ఒకవేళ (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క))
 			    lnum = 1;
-			vcol = (long_u)win_linetabsize(wp, lnum, rex.line, col);
-			result = nfa_re_num_cmp(t->state->val, op, vcol + 1);
+			vcol = (long_u)win_linetabsize(wp, lnum, rex.పంక్తి, నిలువు);
+			ఫలితం = nfa_re_అంకె_cmp(t->state->val, op, vcol + 1);
 		    }
-		    if (result)
+		    ఒకవేళ (ఫలితం)
 		    {
-			add_here = TRUE;
-			add_state = t->state->out;
+			కూడు_ఇక్కడ = TRUE;
+			కూడు_state = t->state->బహిర్గతం;
 		    }
 		}
-		break;
+		ఆపు;
 
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    స్థితి NFA_MARK:
+	    స్థితి NFA_MARK_GT:
+	    స్థితి NFA_MARK_LT:
 	      {
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	నిలువు = REG_MULTI ? rex.ఆదానం - rex.పంక్తి : 0;
 
 		pos = getmark_buf(rex.reg_buf, t->state->val, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		ఒకవేళ (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.పంక్తి = reg_getline(rex.lnum);
+		    rex.ఆదానం = rex.పంక్తి + నిలువు;
 		}
 
 		// Compare the mark position to the match position, if the mark
 		// exists and mark is set in reg_buf.
-		if (pos != NULL && pos->lnum > 0)
+		ఒకవేళ (pos != ఖాళీ && pos->lnum > 0)
 		{
-		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
-							  && pos->col == MAXCOL
+		    colnr_T pos_నిలువు = pos->lnum == rex.lnum + rex.reg_firstlnum
+							  && pos->నిలువు == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
-				      : pos->col;
+				      : pos->నిలువు;
 
-		    result = (pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    ఫలితం = (pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_నిలువు == (colnr_T)(rex.ఆదానం - rex.పంక్తి)
 				    ? t->state->c == NFA_MARK
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_నిలువు < (colnr_T)(rex.ఆదానం - rex.పంక్తి)
 					? t->state->c == NFA_MARK_GT
 					: t->state->c == NFA_MARK_LT))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? t->state->c == NFA_MARK_GT
 				    : t->state->c == NFA_MARK_LT));
-		    if (result)
+		    ఒకవేళ (ఫలితం)
 		    {
-			add_here = TRUE;
-			add_state = t->state->out;
+			కూడు_ఇక్కడ = TRUE;
+			కూడు_state = t->state->బహిర్గతం;
 		    }
 		}
-		break;
+		ఆపు;
 	      }
 
-	    case NFA_CURSOR:
-		result = (rex.reg_win != NULL
+	    స్థితి NFA_CURSOR:
+		ఫలితం = (rex.reg_win != ఖాళీ
 			&& (rex.lnum + rex.reg_firstlnum
 						 == rex.reg_win->w_cursor.lnum)
-			&& ((colnr_T)(rex.input - rex.line)
-						== rex.reg_win->w_cursor.col));
-		if (result)
+			&& ((colnr_T)(rex.ఆదానం - rex.పంక్తి)
+						== rex.reg_win->w_cursor.నిలువు));
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_VISUAL:
-		result = reg_match_visual();
-		if (result)
+	    స్థితి NFA_VISUAL:
+		ఫలితం = reg_సరిపోలిక_visual();
+		ఒకవేళ (ఫలితం)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    కూడు_ఇక్కడ = TRUE;
+		    కూడు_state = t->state->బహిర్గతం;
 		}
-		break;
+		ఆపు;
 
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-	    case NFA_NOPEN:
-	    case NFA_ZSTART:
+	    స్థితి NFA_MOPEN1:
+	    స్థితి NFA_MOPEN2:
+	    స్థితి NFA_MOPEN3:
+	    స్థితి NFA_MOPEN4:
+	    స్థితి NFA_MOPEN5:
+	    స్థితి NFA_MOPEN6:
+	    స్థితి NFA_MOPEN7:
+	    స్థితి NFA_MOPEN8:
+	    స్థితి NFA_MOPEN9:
+#నిర్వచితమైతే FEAT_SYN_HL
+	    స్థితి NFA_ZOPEN:
+	    స్థితి NFA_ZOPEN1:
+	    స్థితి NFA_ZOPEN2:
+	    స్థితి NFA_ZOPEN3:
+	    స్థితి NFA_ZOPEN4:
+	    స్థితి NFA_ZOPEN5:
+	    స్థితి NFA_ZOPEN6:
+	    స్థితి NFA_ZOPEN7:
+	    స్థితి NFA_ZOPEN8:
+	    స్థితి NFA_ZOPEN9:
+#అయితే_ముగింపు
+	    స్థితి NFA_NOPEN:
+	    స్థితి NFA_ZSTART:
 		// These states are only added to be able to bail out when
 		// they are added again, nothing is to be done.
-		break;
+		ఆపు;
 
-	    default:	// regular character
+	    అప్రమేయ:	// regular character
 	      {
-		int c = t->state->c;
+		పూర్ణాంకం c = t->state->c;
 
-#ifdef DEBUG
-		if (c < 0)
-		    siemsg("Negative state char: %ld", (long)c);
-#endif
-		result = (c == curc);
+#నిర్వచితమైతే DEBUG
+		ఒకవేళ (c < 0)
+		    siemsg("Negative state char: %ld", (దీర్ఘ)c);
+#అయితే_ముగింపు
+		ఫలితం = (c == curc);
 
-		if (!result && rex.reg_ic)
-		    result = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
+		ఒకవేళ (!ఫలితం && rex.reg_ic)
+		    ఫలితం = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
 		// If rex.reg_icombine is not set only skip over the character
 		// itself.  When it is set skip over composing characters.
-		if (result && enc_utf8 && !rex.reg_icombine)
-		    clen = utf_ptr2len(rex.input);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+		ఒకవేళ (ఫలితం && enc_utf8 && !rex.reg_icombine)
+		    clen = utf_ptr2len(rex.ఆదానం);
+		కూడు_STATE_IF_సరిపోలిక(t->state);
+		ఆపు;
 	      }
 
 	    } // switch (t->state->c)
 
-	    if (add_state != NULL)
+	    ఒకవేళ (కూడు_state != ఖాళీ)
 	    {
 		nfa_pim_T *pim;
 		nfa_pim_T pim_copy;
 
-		if (t->pim.result == NFA_PIM_UNUSED)
-		    pim = NULL;
-		else
+		ఒకవేళ (t->pim.ఫలితం == NFA_PIM_వాడని)
+		    pim = ఖాళీ;
+		లేకపోతే
 		    pim = &t->pim;
 
 		// Handle the postponed invisible match if the match might end
 		// without advancing and before the end of the line.
-		if (pim != NULL && (clen == 0 || match_follows(add_state, 0)))
+		ఒకవేళ (pim != ఖాళీ && (clen == 0 || సరిపోలిక_follows(కూడు_state, 0)))
 		{
-		    if (pim->result == NFA_PIM_TODO)
+		    ఒకవేళ (pim->ఫలితం == NFA_PIM_TODO)
 		    {
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 			fprintf(log_fd, "\n");
 			fprintf(log_fd, "==================================\n");
 			fprintf(log_fd, "Postponed recursive nfa_regmatch()\n");
 			fprintf(log_fd, "\n");
-#endif
-			result = recursive_regmatch(pim->state, pim,
+#అయితే_ముగింపు
+			ఫలితం = recursive_regmatch(pim->state, pim,
 				    prog, submatch, m, &listids, &listids_len);
-			pim->result = result ? NFA_PIM_MATCH : NFA_PIM_NOMATCH;
+			pim->ఫలితం = ఫలితం ? NFA_PIM_సరిపోలిక : NFA_PIM_NOMATCH;
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
-			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
+			ఒకవేళ (ఫలితం != (pim->state->c == NFA_ప్రారంభం_INVISIBLE_NEG
+			     || pim->state->c == NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి
 			     || pim->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG
 			     || pim->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి))
 			{
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&pim->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+			    ఒకవేళ (rex.nfa_has_zsubexpr)
 				copy_sub_off(&pim->subs.synt, &m->synt);
-#endif
+#అయితే_ముగింపు
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
-			result = (pim->result == NFA_PIM_MATCH);
-#ifdef ENABLE_LOG
+			ఫలితం = (pim->ఫలితం == NFA_PIM_సరిపోలిక);
+#నిర్వచితమైతే ENABLE_LOG
 			fprintf(log_fd, "\n");
-			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->result);
-			fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : "FALSE");
+			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->ఫలితం);
+			fprintf(log_fd, "MATCH = %s\n", ఫలితం == TRUE ? "OK" : "FALSE");
 			fprintf(log_fd, "\n");
-#endif
+#అయితే_ముగింపు
 		    }
 
 		    // for \@! and \@<! it is a match when result is FALSE
-		    if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
-			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
+		    ఒకవేళ (ఫలితం != (pim->state->c == NFA_ప్రారంభం_INVISIBLE_NEG
+			     || pim->state->c == NFA_ప్రారంభం_INVISIBLE_NEG_మొదటి
 			     || pim->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG
 			     || pim->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_ప్రారంభం_INVISIBLE_BEFORE_NEG_మొదటి))
 		    {
 			// Copy submatch info from the recursive call
 			copy_sub_off(&t->subs.norm, &pim->subs.norm);
-#ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+#నిర్వచితమైతే FEAT_SYN_HL
+			ఒకవేళ (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&t->subs.synt, &pim->subs.synt);
-#endif
+#అయితే_ముగింపు
 		    }
-		    else
+		    లేకపోతే
 			// look-behind match failed, don't add the state
-			continue;
+			కొనసాగు;
 
 		    // Postponed invisible match was handled, don't add it to
 		    // following states.
-		    pim = NULL;
+		    pim = ఖాళీ;
 		}
 
 		// If "pim" points into l->t it will become invalid when
 		// adding the state causes the list to be reallocated.  Make a
 		// local copy to avoid that.
-		if (pim == &t->pim)
+		ఒకవేళ (pim == &t->pim)
 		{
 		    copy_pim(&pim_copy, pim);
 		    pim = &pim_copy;
 		}
 
-		if (add_here)
-		    r = addstate_here(thislist, add_state, &t->subs,
+		ఒకవేళ (కూడు_ఇక్కడ)
+		    r = addstate_ఇక్కడ(thislist, కూడు_state, &t->subs,
 								pim, &listidx);
-		else
+		లేకపోతే
 		{
-		    r = addstate(nextlist, add_state, &t->subs, pim, add_off, 0);
-		    if (add_count > 0)
-			nextlist->t[nextlist->n - 1].count = add_count;
+		    r = addstate(nextlist, కూడు_state, &t->subs, pim, కూడు_off, 0);
+		    ఒకవేళ (కూడు_లెక్క > 0)
+			nextlist->t[nextlist->n - 1].లెక్క = కూడు_లెక్క;
 		}
-		if (r == NULL)
+		ఒకవేళ (r == ఖాళీ)
 		{
-		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+		    వెళ్ళు theend;
 		}
 	    }
 
@@ -7079,312 +7079,312 @@ nfa_regmatch(
 	// because recursive calls should only start in the first position.
 	// Unless "nfa_endp" is not NULL, then we match the end position.
 	// Also don't start a match past the first line.
-	if (nfa_match == FALSE
+	ఒకవేళ (nfa_సరిపోలిక == FALSE
 		&& ((toplevel
 			&& rex.lnum == 0
 			&& clen != 0
 			&& (rex.reg_maxcol == 0
-			  || (colnr_T)(rex.input - rex.line) < rex.reg_maxcol))
-		    || (nfa_endp != NULL
+			  || (colnr_T)(rex.ఆదానం - rex.పంక్తి) < rex.reg_maxcol))
+		    || (nfa_endp != ఖాళీ
 			&& (REG_MULTI
 			    ? (rex.lnum < nfa_endp->se_u.pos.lnum
 			       || (rex.lnum == nfa_endp->se_u.pos.lnum
-				   && (int)(rex.input - rex.line)
-						    < nfa_endp->se_u.pos.col))
-			    : rex.input < nfa_endp->se_u.ptr))))
+				   && (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి)
+						    < nfa_endp->se_u.pos.నిలువు))
+			    : rex.ఆదానం < nfa_endp->se_u.ptr))))
 	{
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 	    fprintf(log_fd, "(---) STARTSTATE\n");
-#endif
+#అయితే_ముగింపు
 	    // Inline optimized code for addstate() if we know the state is
 	    // the first MOPEN.
-	    if (toplevel)
+	    ఒకవేళ (toplevel)
 	    {
-		int add = TRUE;
-		int c;
+		పూర్ణాంకం కూడు = TRUE;
+		పూర్ణాంకం c;
 
-		if (prog->regstart != NUL && clen != 0)
+		ఒకవేళ (prog->regstart != NUL && clen != 0)
 		{
-		    if (nextlist->n == 0)
+		    ఒకవేళ (nextlist->n == 0)
 		    {
-			colnr_T col = (colnr_T)(rex.input - rex.line) + clen;
+			colnr_T నిలువు = (colnr_T)(rex.ఆదానం - rex.పంక్తి) + clen;
 
 			// Nextlist is empty, we can skip ahead to the
 			// character that must appear at the start.
-			if (skip_to_start(prog->regstart, &col) == FAIL)
-			    break;
-#ifdef ENABLE_LOG
+			ఒకవేళ (skip_గమ్యం_ప్రారంభం(prog->regstart, &నిలువు) == FAIL)
+			    ఆపు;
+#నిర్వచితమైతే ENABLE_LOG
 			fprintf(log_fd, "  Skipping ahead %d bytes to regstart\n",
-				col - ((colnr_T)(rex.input - rex.line) + clen));
-#endif
-			rex.input = rex.line + col - clen;
+				నిలువు - ((colnr_T)(rex.ఆదానం - rex.పంక్తి) + clen));
+#అయితే_ముగింపు
+			rex.ఆదానం = rex.పంక్తి + నిలువు - clen;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Checking if the required start character matches is
 			// cheaper than adding a state that won't match.
-			c = PTR2CHAR(rex.input + clen);
-			if (c != prog->regstart && (!rex.reg_ic
+			c = PTR2CHAR(rex.ఆదానం + clen);
+			ఒకవేళ (c != prog->regstart && (!rex.reg_ic
 			     || MB_CASEFOLD(c) != MB_CASEFOLD(prog->regstart)))
 			{
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 			    fprintf(log_fd, "  Skipping start state, regstart does not match\n");
-#endif
-			    add = FALSE;
+#అయితే_ముగింపు
+			    కూడు = FALSE;
 			}
 		    }
 		}
 
-		if (add)
+		ఒకవేళ (కూడు)
 		{
-		    if (REG_MULTI)
+		    ఒకవేళ (REG_MULTI)
 		    {
-			m->norm.list.multi[0].start_col =
-					 (colnr_T)(rex.input - rex.line) + clen;
-			m->norm.orig_start_col =
-					       m->norm.list.multi[0].start_col;
+			m->norm.list.multi[0].ప్రారంభం_నిలువు =
+					 (colnr_T)(rex.ఆదానం - rex.పంక్తి) + clen;
+			m->norm.orig_ప్రారంభం_నిలువు =
+					       m->norm.list.multi[0].ప్రారంభం_నిలువు;
 		    }
-		    else
-			m->norm.list.line[0].start = rex.input + clen;
-		    if (addstate(nextlist, start->out, m, NULL, clen, 0) == NULL)
+		    లేకపోతే
+			m->norm.list.పంక్తి[0].ప్రారంభం = rex.ఆదానం + clen;
+		    ఒకవేళ (addstate(nextlist, ప్రారంభం->బహిర్గతం, m, ఖాళీ, clen, 0) == ఖాళీ)
 		    {
-			nfa_match = NFA_TOO_EXPENSIVE;
-			goto theend;
+			nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+			వెళ్ళు theend;
 		    }
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		char_u	    *save_line = rex.line;
-		char_u	    *save_input = rex.input;
+		char_u	    *save_పంక్తి = rex.పంక్తి;
+		char_u	    *save_ఆదానం = rex.ఆదానం;
 		linenr_T    save_lnum = rex.lnum;
 
 		// At the end of a line the match can only start on the next
 		// line, use that position instead of the line break.
-		if (REG_MULTI && clen == 0 && nfa_endp != NULL
+		ఒకవేళ (REG_MULTI && clen == 0 && nfa_endp != ఖాళీ
 					 && rex.lnum < nfa_endp->se_u.pos.lnum)
 		{
-		    char_u  *next_line = reg_getline(rex.lnum + 1);
+		    char_u  *తదుపరి_పంక్తి = reg_getline(rex.lnum + 1);
 
-		    if (next_line != NULL)
+		    ఒకవేళ (తదుపరి_పంక్తి != ఖాళీ)
 		    {
-			rex.line = next_line;
-			rex.input = rex.line;
+			rex.పంక్తి = తదుపరి_పంక్తి;
+			rex.ఆదానం = rex.పంక్తి;
 			++rex.lnum;
 		    }
 		}
 
-		r = addstate(nextlist, start, m, NULL, clen, 0);
+		r = addstate(nextlist, ప్రారంభం, m, ఖాళీ, clen, 0);
 
-		rex.line = save_line;
-		rex.input = save_input;
+		rex.పంక్తి = save_పంక్తి;
+		rex.ఆదానం = save_ఆదానం;
 		rex.lnum = save_lnum;
 
-		if (r == NULL)
+		ఒకవేళ (r == ఖాళీ)
 		{
-		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    nfa_సరిపోలిక = NFA_TOO_EXPENSIVE;
+		    వెళ్ళు theend;
 		}
 	    }
 	}
 
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
 	fprintf(log_fd, ">>> Thislist had %d states available: ", thislist->n);
 	{
-	    int i;
+	    పూర్ణాంకం i;
 
-	    for (i = 0; i < thislist->n; i++)
-		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
+	    కొరకు (i = 0; i < thislist->n; i++)
+		fprintf(log_fd, "%d  ", నిరపేక్ష(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
-#endif
+#అయితే_ముగింపు
 
 nextchar:
 	// Advance to the next character, or advance to the next line, or
 	// finish.
-	if (clen != 0)
-	    rex.input += clen;
-	else if (go_to_nextline || (nfa_endp != NULL && REG_MULTI
+	ఒకవేళ (clen != 0)
+	    rex.ఆదానం += clen;
+	లేకపోతే ఒకవేళ (go_గమ్యం_nextline || (nfa_endp != ఖాళీ && REG_MULTI
 					&& rex.lnum < nfa_endp->se_u.pos.lnum))
 	    reg_nextline();
-	else
-	    break;
+	లేకపోతే
+	    ఆపు;
 
 	// Allow interrupting with CTRL-C.
-	line_breakcheck();
-	if (got_int)
-	    break;
-#ifdef FEAT_RELTIME
-	if (nfa_did_time_out())
-	    break;
-#endif
+	పంక్తి_breakcheck();
+	ఒకవేళ (got_int)
+	    ఆపు;
+#నిర్వచితమైతే FEAT_RELTIME
+	ఒకవేళ (nfa_did_సమయం_బహిర్గతం())
+	    ఆపు;
+#అయితే_ముగింపు
     }
 
-#ifdef ENABLE_LOG
-    if (log_fd != stderr)
+#నిర్వచితమైతే ENABLE_LOG
+    ఒకవేళ (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
-#endif
+    log_fd = ఖాళీ;
+#అయితే_ముగింపు
 
 theend:
     // Cache list buffers in prog for reuse, or free if prog already has
     // cached buffers (recursive call case).
-    if (prog->listbuf[0] == NULL && list[0].t != NULL && list[1].t != NULL)
+    ఒకవేళ (prog->listbuf[0] == ఖాళీ && list[0].t != ఖాళీ && list[1].t != ఖాళీ)
     {
 	prog->listbuf[0] = list[0].t;
 	prog->listbuf[1] = list[1].t;
     }
-    else
+    లేకపోతే
     {
 	vim_free(list[0].t);
 	vim_free(list[1].t);
     }
     vim_free(listids);
-#undef ADD_STATE_IF_MATCH
-#ifdef NFA_REGEXP_DEBUG_LOG
+#నిర్వచనం_రద్దు కూడు_STATE_IF_సరిపోలిక
+#నిర్వచితమైతే NFA_REGEXP_DEBUG_LOG
     fclose(debug);
-#endif
+#అయితే_ముగింపు
 
-    return nfa_match;
+    తిరిగి nfa_సరిపోలిక;
 }
 
 /*
  * Try match of "prog" with at rex.line["col"].
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    స్థిర దీర్ఘ
 nfa_regtry(
     nfa_regprog_T   *prog,
-    colnr_T	    col,
-    int		    *timed_out UNUSED)	// flag set on timeout or NULL
+    colnr_T	    నిలువు,
+    పూర్ణాంకం		    *timed_బహిర్గతం వాడని)	// flag set on timeout or NULL
 {
-    int		i;
+    పూర్ణాంకం		i;
     regsubs_T	subs, m;
-    nfa_state_T	*start = prog->start;
-    int		result;
-#ifdef ENABLE_LOG
+    nfa_state_T	*ప్రారంభం = prog->ప్రారంభం;
+    పూర్ణాంకం		ఫలితం;
+#నిర్వచితమైతే ENABLE_LOG
     FILE	*f;
-#endif
+#అయితే_ముగింపు
 
-    rex.input = rex.line + col;
-#ifdef FEAT_RELTIME
-    nfa_timed_out = timed_out;
-#endif
+    rex.ఆదానం = rex.పంక్తి + నిలువు;
+#నిర్వచితమైతే FEAT_RELTIME
+    nfa_timed_బహిర్గతం = timed_బహిర్గతం;
+#అయితే_ముగింపు
 
-#ifdef ENABLE_LOG
-    f = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (f != NULL)
+#నిర్వచితమైతే ENABLE_LOG
+    f = fopen(NFA_REGEXP_నిరంతరం_LOG, "a");
+    ఒకవేళ (f != ఖాళీ)
     {
 	fprintf(f, "\n\n\t=======================================================\n");
 # ifdef DEBUG
-	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.సమాసం);
 # endif
-	fprintf(f, "\tInput text is \"%s\" \n", rex.input);
+	fprintf(f, "\tInput text is \"%s\" \n", rex.ఆదానం);
 	fprintf(f, "\t=======================================================\n\n");
-	nfa_print_state(f, start);
+	nfa_print_state(f, ప్రారంభం);
 	fprintf(f, "\n\n");
 	fclose(f);
     }
-    else
+    లేకపోతే
 	emsg("Could not open temporary log file for writing");
-#endif
+#అయితే_ముగింపు
 
     clear_sub(&subs.norm);
     clear_sub(&m.norm);
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     clear_sub(&subs.synt);
     clear_sub(&m.synt);
-#endif
+#అయితే_ముగింపు
 
-    result = nfa_regmatch(prog, start, &subs, &m);
-    if (result == FALSE)
-	return 0;
-    else if (result == NFA_TOO_EXPENSIVE)
-	return result;
+    ఫలితం = nfa_regmatch(prog, ప్రారంభం, &subs, &m);
+    ఒకవేళ (ఫలితం == FALSE)
+	తిరిగి 0;
+    లేకపోతే ఒకవేళ (ఫలితం == NFA_TOO_EXPENSIVE)
+	తిరిగి ఫలితం;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	కొరకు (i = 0; i < subs.norm.లోపల_use; i++)
 	{
-	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].start_lnum;
-	    rex.reg_startpos[i].col = subs.norm.list.multi[i].start_col;
+	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].ప్రారంభం_lnum;
+	    rex.reg_startpos[i].నిలువు = subs.norm.list.multi[i].ప్రారంభం_నిలువు;
 
-	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].end_lnum;
-	    rex.reg_endpos[i].col = subs.norm.list.multi[i].end_col;
+	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].చివర_lnum;
+	    rex.reg_endpos[i].నిలువు = subs.norm.list.multi[i].చివర_నిలువు;
 	}
-	if (rex.reg_mmatch != NULL)
-	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_start_col;
+	ఒకవేళ (rex.reg_mmatch != ఖాళీ)
+	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_ప్రారంభం_నిలువు;
 
-	if (rex.reg_startpos[0].lnum < 0)
+	ఒకవేళ (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
-	    rex.reg_startpos[0].col = col;
+	    rex.reg_startpos[0].నిలువు = నిలువు;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	ఒకవేళ (rex.reg_endpos[0].lnum < 0)
 	{
 	    // pattern has a \ze but it didn't match, use current end
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].నిలువు = (పూర్ణాంకం)(rex.ఆదానం - rex.పంక్తి);
 	}
-	else
+	లేకపోతే
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    లేకపోతే
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	కొరకు (i = 0; i < subs.norm.లోపల_use; i++)
 	{
-	    rex.reg_startp[i] = subs.norm.list.line[i].start;
-	    rex.reg_endp[i] = subs.norm.list.line[i].end;
+	    rex.reg_startp[i] = subs.norm.list.పంక్తి[i].ప్రారంభం;
+	    rex.reg_endp[i] = subs.norm.list.పంక్తి[i].చివర;
 	}
 
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	ఒకవేళ (rex.reg_startp[0] == ఖాళీ)
+	    rex.reg_startp[0] = rex.పంక్తి + నిలువు;
+	ఒకవేళ (rex.reg_endp[0] == ఖాళీ)
+	    rex.reg_endp[0] = rex.ఆదానం;
     }
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
-    unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    unref_extmatch(re_extmatch_బహిర్గతం);
+    re_extmatch_బహిర్గతం = ఖాళీ;
 
-    if (prog->reghasz == REX_SET)
+    ఒకవేళ (prog->reghasz == REX_సమితి)
     {
 	cleanup_zsubexpr();
-	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
+	re_extmatch_బహిర్గతం = make_extmatch();
+	ఒకవేళ (re_extmatch_బహిర్గతం == ఖాళీ)
+	    తిరిగి 0;
 	// Loop over \z1, \z2, etc.  There is no \z0.
-	for (i = 1; i < subs.synt.in_use; i++)
+	కొరకు (i = 1; i < subs.synt.లోపల_use; i++)
 	{
-	    if (REG_MULTI)
+	    ఒకవేళ (REG_MULTI)
 	    {
-		struct multipos *mpos = &subs.synt.list.multi[i];
+		నిర్మాణం multipos *mpos = &subs.synt.list.multi[i];
 
 		// Only accept single line matches that are valid.
-		if (mpos->start_lnum >= 0
-			&& mpos->start_lnum == mpos->end_lnum
-			&& mpos->end_col >= mpos->start_col)
-		    re_extmatch_out->matches[i] =
-			vim_strnsave(reg_getline(mpos->start_lnum)
-							    + mpos->start_col,
-					     mpos->end_col - mpos->start_col);
+		ఒకవేళ (mpos->ప్రారంభం_lnum >= 0
+			&& mpos->ప్రారంభం_lnum == mpos->చివర_lnum
+			&& mpos->చివర_నిలువు >= mpos->ప్రారంభం_నిలువు)
+		    re_extmatch_బహిర్గతం->matches[i] =
+			vim_strnsave(reg_getline(mpos->ప్రారంభం_lnum)
+							    + mpos->ప్రారంభం_నిలువు,
+					     mpos->చివర_నిలువు - mpos->ప్రారంభం_నిలువు);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		struct linepos *lpos = &subs.synt.list.line[i];
+		నిర్మాణం linepos *lpos = &subs.synt.list.పంక్తి[i];
 
-		if (lpos->start != NULL && lpos->end != NULL)
-		    re_extmatch_out->matches[i] =
-			    vim_strnsave(lpos->start, lpos->end - lpos->start);
+		ఒకవేళ (lpos->ప్రారంభం != ఖాళీ && lpos->చివర != ఖాళీ)
+		    re_extmatch_బహిర్గతం->matches[i] =
+			    vim_strnsave(lpos->ప్రారంభం, lpos->చివర - lpos->ప్రారంభం);
 	    }
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    return 1 + rex.lnum;
+    తిరిగి 1 + rex.lnum;
 }
 
 /*
@@ -7393,49 +7393,49 @@ nfa_regtry(
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    స్థిర దీర్ఘ
 nfa_regexec_both(
-    char_u	*line,
+    char_u	*పంక్తి,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    పూర్ణాంకం		*timed_బహిర్గతం)	// flag set on timeout or NULL
 {
     nfa_regprog_T   *prog;
-    long	    retval = 0L;
-    int		    i;
-    colnr_T	    col = startcol;
+    దీర్ఘ	    retval = 0L;
+    పూర్ణాంకం		    i;
+    colnr_T	    నిలువు = startcol;
 
-    if (REG_MULTI)
+    ఒకవేళ (REG_MULTI)
     {
 	prog = (nfa_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);    // relative to the cursor
+	పంక్తి = reg_getline((linenr_T)0);    // relative to the cursor
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    లేకపోతే
     {
-	prog = (nfa_regprog_T *)rex.reg_match->regprog;
-	rex.reg_startp = rex.reg_match->startp;
-	rex.reg_endp = rex.reg_match->endp;
+	prog = (nfa_regprog_T *)rex.reg_సరిపోలిక->regprog;
+	rex.reg_startp = rex.reg_సరిపోలిక->startp;
+	rex.reg_endp = rex.reg_సరిపోలిక->endp;
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    ఒకవేళ (prog == ఖాళీ || పంక్తి == ఖాళీ)
     {
-	iemsg(e_null_argument);
-	goto theend;
+	iemsg(e_null_వాదం);
+	వెళ్ళు theend;
     }
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    ఒకవేళ (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    లేకపోతే ఒకవేళ (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    ఒకవేళ (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
-    rex.line = line;
+    rex.పంక్తి = పంక్తి;
     rex.lnum = 0;    // relative to line
 
     rex.nfa_has_zend = prog->has_zend;
@@ -7443,142 +7443,142 @@ nfa_regexec_both(
     rex.nfa_nsubexpr = prog->nsubexp;
     rex.nfa_listid = 1;
     rex.nfa_alt_listid = 2;
-#ifdef DEBUG
-    nfa_regengine.expr = prog->pattern;
-#endif
+#నిర్వచితమైతే DEBUG
+    nfa_regengine.సమాసం = prog->నమూనా;
+#అయితే_ముగింపు
 
-    if (prog->reganch && col > 0)
-	return 0L;
+    ఒకవేళ (prog->reganch && నిలువు > 0)
+	తిరిగి 0L;
 
     rex.need_clear_subexpr = TRUE;
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    if (prog->reghasz == REX_SET)
+    ఒకవేళ (prog->reghasz == REX_సమితి)
     {
 	rex.nfa_has_zsubexpr = TRUE;
 	rex.need_clear_zsubexpr = TRUE;
     }
-    else
+    లేకపోతే
     {
 	rex.nfa_has_zsubexpr = FALSE;
 	rex.need_clear_zsubexpr = FALSE;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (prog->regstart != NUL)
+    ఒకవేళ (prog->regstart != NUL)
     {
 	// Skip ahead until a character we know the match must start with.
 	// When there is none there is no match.
-	if (skip_to_start(prog->regstart, &col) == FAIL)
-	    return 0L;
+	ఒకవేళ (skip_గమ్యం_ప్రారంభం(prog->regstart, &నిలువు) == FAIL)
+	    తిరిగి 0L;
 
 	// If match_text is set it contains the full text that must match.
 	// Nothing else to try. Doesn't handle combining chars well.
-	if (prog->match_text != NULL && *prog->match_text != NUL && !rex.reg_icombine)
+	ఒకవేళ (prog->సరిపోలిక_పాఠ్యం != ఖాళీ && *prog->సరిపోలిక_పాఠ్యం != NUL && !rex.reg_icombine)
 	{
-	    retval = find_match_text(&col, prog->regstart, prog->match_text);
-	    if (REG_MULTI)
-		rex.reg_mmatch->rmm_matchcol = col;
-	    else
-		rex.reg_match->rm_matchcol = col;
-	    return retval;
+	    retval = కనుగొను_సరిపోలిక_పాఠ్యం(&నిలువు, prog->regstart, prog->సరిపోలిక_పాఠ్యం);
+	    ఒకవేళ (REG_MULTI)
+		rex.reg_mmatch->rmm_matchcol = నిలువు;
+	    లేకపోతే
+		rex.reg_సరిపోలిక->rm_matchcol = నిలువు;
+	    తిరిగి retval;
 	}
     }
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    ఒకవేళ (rex.reg_maxcol > 0 && నిలువు >= rex.reg_maxcol)
+	వెళ్ళు theend;
 
     // Set the "nstate" used by nfa_regcomp() to zero to trigger an error when
     // it's accidentally used during execution.
     nstate = 0;
-    for (i = 0; i < prog->nstate; ++i)
+    కొరకు (i = 0; i < prog->nstate; ++i)
     {
 	prog->state[i].id = i;
 	prog->state[i].lastlist[0] = 0;
 	prog->state[i].lastlist[1] = 0;
     }
 
-    retval = nfa_regtry(prog, col, timed_out);
+    retval = nfa_regtry(prog, నిలువు, timed_బహిర్గతం);
 
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
+#నిర్వచితమైతే DEBUG
+    nfa_regengine.సమాసం = ఖాళీ;
+#అయితే_ముగింపు
 
 theend:
-    if (retval > 0)
+    ఒకవేళ (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs and
 	// \ze are used.
-	if (REG_MULTI)
+	ఒకవేళ (REG_MULTI)
 	{
-	    lpos_T *start = &rex.reg_mmatch->startpos[0];
-	    lpos_T *end = &rex.reg_mmatch->endpos[0];
+	    lpos_T *ప్రారంభం = &rex.reg_mmatch->startpos[0];
+	    lpos_T *చివర = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
-			|| (end->lnum == start->lnum && end->col < start->col))
+	    ఒకవేళ (చివర->lnum < ప్రారంభం->lnum
+			|| (చివర->lnum == ప్రారంభం->lnum && చివర->నిలువు < ప్రారంభం->నిలువు))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 	}
-	else
+	లేకపోతే
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
-		rex.reg_match->endp[0] = rex.reg_match->startp[0];
+	    ఒకవేళ (rex.reg_సరిపోలిక->endp[0] < rex.reg_సరిపోలిక->startp[0])
+		rex.reg_సరిపోలిక->endp[0] = rex.reg_సరిపోలిక->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_match->rm_matchcol = col;
+	    rex.reg_సరిపోలిక->rm_matchcol = నిలువు;
 	}
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Compile a regular expression into internal code for the NFA matcher.
  * Returns the program in allocated space.  Returns NULL for an error.
  */
-    static regprog_T *
-nfa_regcomp(char_u *expr, int re_flags)
+    స్థిర regprog_T *
+nfa_regcomp(char_u *సమాసం, పూర్ణాంకం re_flags)
 {
-    nfa_regprog_T	*prog = NULL;
-    size_t		prog_size;
-    int			*postfix;
+    nfa_regprog_T	*prog = ఖాళీ;
+    size_t		prog_కొలత;
+    పూర్ణాంకం			*postfix;
 
-    if (expr == NULL)
-	return NULL;
+    ఒకవేళ (సమాసం == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-#ifdef DEBUG
-    nfa_regengine.expr = expr;
-#endif
+#నిర్వచితమైతే DEBUG
+    nfa_regengine.సమాసం = సమాసం;
+#అయితే_ముగింపు
     nfa_re_flags = re_flags;
 
     init_class_tab();
 
-    if (nfa_regcomp_start(expr, re_flags) == FAIL)
-	return NULL;
+    ఒకవేళ (nfa_regcomp_ప్రారంభం(సమాసం, re_flags) == FAIL)
+	తిరిగి ఖాళీ;
 
     // Build postfix form of the regexp. Needed to build the NFA
     // (and count its size).
     postfix = re2post();
-    if (postfix == NULL)
-	goto fail;	    // Cascaded (syntax?) error
+    ఒకవేళ (postfix == ఖాళీ)
+	వెళ్ళు fail;	    // Cascaded (syntax?) error
 
     /*
      * In order to build the NFA, we parse the input regexp twice:
      * 1. first pass to count size (so we can allocate space)
      * 2. second to emit code
      */
-#ifdef ENABLE_LOG
+#నిర్వచితమైతే ENABLE_LOG
     {
-	FILE *f = fopen(NFA_REGEXP_RUN_LOG, "a");
+	FILE *f = fopen(NFA_REGEXP_నిరంతరం_LOG, "a");
 
-	if (f != NULL)
+	ఒకవేళ (f != ఖాళీ)
 	{
-	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", expr);
+	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", సమాసం);
 	    fclose(f);
 	}
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * PASS 1
@@ -7587,22 +7587,22 @@ nfa_regcomp(char_u *expr, int re_flags)
     post2nfa(postfix, post_ptr, TRUE);
 
     // allocate the regprog with space for the compiled regexp
-    prog_size = offsetof(nfa_regprog_T, state) + sizeof(nfa_state_T) * nstate;
-    prog = alloc(prog_size);
-    if (prog == NULL)
-	goto fail;
+    prog_కొలత = offsetof(nfa_regprog_T, state) + పరిమాణం(nfa_state_T) * nstate;
+    prog = alloc(prog_కొలత);
+    ఒకవేళ (prog == ఖాళీ)
+	వెళ్ళు fail;
     state_ptr = prog->state;
-    prog->re_in_use = FALSE;
-    prog->listbuf[0] = NULL;
-    prog->listbuf[1] = NULL;
+    prog->re_లోపల_use = FALSE;
+    prog->listbuf[0] = ఖాళీ;
+    prog->listbuf[1] = ఖాళీ;
 
     /*
      * PASS 2
      * Build the NFA
      */
-    prog->start = post2nfa(postfix, post_ptr, FALSE);
-    if (prog->start == NULL)
-	goto fail;
+    prog->ప్రారంభం = post2nfa(postfix, post_ptr, FALSE);
+    ఒకవేళ (prog->ప్రారంభం == ఖాళీ)
+	వెళ్ళు fail;
 
     prog->regflags = regflags;
     prog->engine = &nfa_regengine;
@@ -7613,63 +7613,63 @@ nfa_regcomp(char_u *expr, int re_flags)
 
     nfa_postprocess(prog);
 
-    prog->reganch = nfa_get_reganch(prog->start, 0);
-    prog->regstart = nfa_get_regstart(prog->start, 0);
-    prog->match_text = nfa_get_match_text(prog->start);
+    prog->reganch = nfa_get_reganch(prog->ప్రారంభం, 0);
+    prog->regstart = nfa_get_regstart(prog->ప్రారంభం, 0);
+    prog->సరిపోలిక_పాఠ్యం = nfa_get_సరిపోలిక_పాఠ్యం(prog->ప్రారంభం);
 
-#ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, OK);
+#నిర్వచితమైతే ENABLE_LOG
+    nfa_postfix_dump(సమాసం, OK);
     nfa_dump(prog);
-#endif
-#ifdef FEAT_SYN_HL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     prog->reghasz = re_has_z;
-#endif
-    prog->pattern = vim_strsave(expr);
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
+#అయితే_ముగింపు
+    prog->నమూనా = vim_strsave(సమాసం);
+#నిర్వచితమైతే DEBUG
+    nfa_regengine.సమాసం = ఖాళీ;
+#అయితే_ముగింపు
 
-out:
+బహిర్గతం:
     // The postfix list and fragment stack are reused by the next compilation
     // (and freed in free_regexp_stuff()), but drop ones that grew large for a
     // big pattern to avoid holding much memory.
-    if (post_start_len > NFA_POSTFIX_KEEP)
+    ఒకవేళ (post_ప్రారంభం_len > NFA_POSTFIX_KEEP)
     {
-	VIM_CLEAR(post_start);
-	post_start_len = 0;
+	VIM_CLEAR(post_ప్రారంభం);
+	post_ప్రారంభం_len = 0;
     }
-    post_ptr = post_end = NULL;
-    if (nfa_stack_len > NFA_STACK_KEEP)
+    post_ptr = post_చివర = ఖాళీ;
+    ఒకవేళ (nfa_దొంతర_len > NFA_దొంతర_KEEP)
     {
-	VIM_CLEAR(nfa_stack);
-	nfa_stack_len = 0;
+	VIM_CLEAR(nfa_దొంతర);
+	nfa_దొంతర_len = 0;
     }
-    state_ptr = NULL;
-    return (regprog_T *)prog;
+    state_ptr = ఖాళీ;
+    తిరిగి (regprog_T *)prog;
 
 fail:
     VIM_CLEAR(prog);
-#ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, FAIL);
-#endif
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
-    goto out;
+#నిర్వచితమైతే ENABLE_LOG
+    nfa_postfix_dump(సమాసం, FAIL);
+#అయితే_ముగింపు
+#నిర్వచితమైతే DEBUG
+    nfa_regengine.సమాసం = ఖాళీ;
+#అయితే_ముగింపు
+    వెళ్ళు బహిర్గతం;
 }
 
 /*
  * Free a compiled regexp program, returned by nfa_regcomp().
  */
-    static void
+    స్థిర శూన్య
 nfa_regfree(regprog_T *prog)
 {
-    if (prog == NULL)
-	return;
+    ఒకవేళ (prog == ఖాళీ)
+	తిరిగి;
 
-    vim_free(((nfa_regprog_T *)prog)->match_text);
-    vim_free(((nfa_regprog_T *)prog)->pattern);
+    vim_free(((nfa_regprog_T *)prog)->సరిపోలిక_పాఠ్యం);
+    vim_free(((nfa_regprog_T *)prog)->నమూనా);
     vim_free(((nfa_regprog_T *)prog)->listbuf[0]);
     vim_free(((nfa_regprog_T *)prog)->listbuf[1]);
     vim_free(prog);
@@ -7683,23 +7683,23 @@ nfa_regfree(regprog_T *prog)
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 nfa_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
-    colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    char_u	*పంక్తి,	// string to match against
+    colnr_T	నిలువు,	// column to start looking for match
+    పూర్ణాంకం		పంక్తి_lbr)
 {
-    rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_సరిపోలిక = rmp;
+    rex.reg_mmatch = ఖాళీ;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_పంక్తి_lbr = పంక్తి_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = ఖాళీ;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
-    return nfa_regexec_both(line, col, NULL);
+    తిరిగి nfa_regexec_both(పంక్తి, నిలువు, ఖాళీ);
 }
 
 
@@ -7728,19 +7728,19 @@ nfa_regexec_nl(
  *
  * FIXME if this behavior is not compatible.
  */
-    static long
+    స్థిర దీర్ఘ
 nfa_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
-    colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    colnr_T	నిలువు,		// column to start looking for match
+    పూర్ణాంకం		*timed_బహిర్గతం)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return nfa_regexec_both(NULL, col, timed_out);
+    తిరిగి nfa_regexec_both(ఖాళీ, నిలువు, timed_బహిర్గతం);
 }
 
-#ifdef DEBUG
+#నిర్వచితమైతే DEBUG
 # undef ENABLE_LOG
-#endif
+#అయితే_ముగింపు

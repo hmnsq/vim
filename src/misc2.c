@@ -10,42 +10,42 @@
 /*
  * misc2.c: Various functions.
  */
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-static char_u	*username = NULL; // cached result of mch_get_user_name()
+స్థిర char_u	*username = ఖాళీ; // cached result of mch_get_user_name()
 
-static int coladvance2(pos_T *pos, int addspaces, int finetune, colnr_T wcol);
+స్థిర పూర్ణాంకం coladvance2(pos_T *pos, పూర్ణాంకం addspaces, పూర్ణాంకం finetune, colnr_T wcol);
 
 /*
  * Return TRUE if in the current mode we need to use virtual.
  */
-    int
-virtual_active(void)
+    పూర్ణాంకం
+virtual_చురుకైన(శూన్య)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    గుర్తులేని పూర్ణాంకం cur_ve_flags = get_ve_flags();
 
-    if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
-	return TRUE;
+    ఒకవేళ (cur_ve_flags == VE_ALL
+	    || ((cur_ve_flags & VE_చొప్పించు) && (State & బహుళకం_చొప్పించు)))
+	తిరిగి TRUE;
 
     // While an operator is being executed we return "virtual_op", because
     // VIsual_active has already been reset, thus we can't check for "block"
     // being used.
-    if (virtual_op != MAYBE)
-	return virtual_op;
-    return (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
+    ఒకవేళ (virtual_op != MAYBE)
+	తిరిగి virtual_op;
+    తిరిగి (cur_ve_flags & VE_ఖండం) && VIsual_చురుకైన && VIsual_బహుళకం == Ctrl_V;
 }
 
 /*
  * Get the screen position of the cursor.
  */
-    int
-getviscol(void)
+    పూర్ణాంకం
+getviscol(శూన్య)
 {
     colnr_T	x;
 
-    getvvcol(curwin, &curwin->w_cursor, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &curwin->w_cursor, &x, ఖాళీ, ఖాళీ, GETVCOL_NO_ABOVE);
+    తిరిగి (పూర్ణాంకం)x;
 }
 
 /*
@@ -53,33 +53,33 @@ getviscol(void)
  * cursor in that column.
  * The caller must have saved the cursor line for undo!
  */
-    int
+    పూర్ణాంకం
 coladvance_force(colnr_T wcol)
 {
-    int rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
+    పూర్ణాంకం rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
 
-    if (wcol == MAXCOL)
+    ఒకవేళ (wcol == MAXCOL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else
+    లేకపోతే
 	// Virtcol is valid
-	set_valid_virtcol(curwin, wcol);
-    return rc;
+	సమితి_valid_virtcol(curwin, wcol);
+    తిరిగి rc;
 }
 
 /*
  * Get the screen position of character col with a coladd in the cursor line.
  */
-    int
-getviscol2(colnr_T col, colnr_T coladd)
+    పూర్ణాంకం
+getviscol2(colnr_T నిలువు, colnr_T coladd)
 {
     colnr_T	x;
     pos_T	pos;
 
     pos.lnum = curwin->w_cursor.lnum;
-    pos.col = col;
+    pos.నిలువు = నిలువు;
     pos.coladd = coladd;
-    getvvcol(curwin, &pos, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &pos, &x, ఖాళీ, ఖాళీ, GETVCOL_NO_ABOVE);
+    తిరిగి (పూర్ణాంకం)x;
 }
 
 /*
@@ -91,17 +91,17 @@ getviscol2(colnr_T col, colnr_T coladd)
  *
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    పూర్ణాంకం
 coladvance(colnr_T wantcol)
 {
-    int rc = getvpos(&curwin->w_cursor, wantcol);
+    పూర్ణాంకం rc = getvpos(&curwin->w_cursor, wantcol);
 
-    if (wantcol == MAXCOL || rc == FAIL)
+    ఒకవేళ (wantcol == MAXCOL || rc == FAIL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else if (*ml_get_cursor() != TAB)
+    లేకపోతే ఒకవేళ (*ml_get_cursor() != TAB)
 	// Virtcol is valid when not on a TAB
-	set_valid_virtcol(curwin, wantcol);
-    return rc;
+	సమితి_valid_virtcol(curwin, wantcol);
+    తిరిగి rc;
 }
 
 /*
@@ -109,93 +109,93 @@ coladvance(colnr_T wantcol)
  * "wantcol".
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    పూర్ణాంకం
 getvpos(pos_T *pos, colnr_T wantcol)
 {
-    return coladvance2(pos, FALSE, virtual_active(), wantcol);
+    తిరిగి coladvance2(pos, FALSE, virtual_చురుకైన(), wantcol);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 coladvance2(
     pos_T	*pos,
-    int		addspaces,	// change the text to achieve our goal?
-    int		finetune,	// change char offset for the exact column
+    పూర్ణాంకం		addspaces,	// change the text to achieve our goal?
+    పూర్ణాంకం		finetune,	// change char offset for the exact column
     colnr_T	wcol_arg)	// column to move to (can be negative)
 {
     colnr_T	wcol = wcol_arg;
-    int		idx;
-    char_u	*line;
-    int		linelen;
-    colnr_T	col = 0;
-    int		csize = 0;
-    int		one_more;
-#ifdef FEAT_LINEBREAK
-    int		head = 0;
-#endif
+    పూర్ణాంకం		idx;
+    char_u	*పంక్తి;
+    పూర్ణాంకం		linelen;
+    colnr_T	నిలువు = 0;
+    పూర్ణాంకం		csize = 0;
+    పూర్ణాంకం		one_మరిన్ని;
+#నిర్వచితమైతే FEAT_LINEBREAK
+    పూర్ణాంకం		తల = 0;
+#అయితే_ముగింపు
 
-    one_more = (State & MODE_INSERT)
+    one_మరిన్ని = (State & బహుళకం_చొప్పించు)
 		    || restart_edit != NUL
-		    || (VIsual_active && *p_sel != 'o')
+		    || (VIsual_చురుకైన && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    పంక్తి = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
-    if (wcol >= MAXCOL)
+    ఒకవేళ (wcol >= MAXCOL)
     {
-	    idx = linelen - 1 + one_more;
-	    col = wcol;
+	    idx = linelen - 1 + one_మరిన్ని;
+	    నిలువు = wcol;
 
-	    if ((addspaces || finetune) && !VIsual_active)
+	    ఒకవేళ ((addspaces || finetune) && !VIsual_చురుకైన)
 	    {
 		curwin->w_curswant = linetabsize_no_outer(curwin, pos->lnum)
-								   + one_more;
-		if (curwin->w_curswant > 0)
+								   + one_మరిన్ని;
+		ఒకవేళ (curwin->w_curswant > 0)
 		    --curwin->w_curswant;
 	    }
     }
-    else
+    లేకపోతే
     {
-	int		width = curwin->w_width - win_col_off(curwin);
+	పూర్ణాంకం		వెడల్పు = curwin->w_వెడల్పు - win_నిలువు_off(curwin);
 	chartabsize_T	cts;
 
-	if (finetune
+	ఒకవేళ (finetune
 		&& curwin->w_p_wrap
-		&& curwin->w_width != 0
-		&& wcol >= (colnr_T)width
-		&& width > 0)
+		&& curwin->w_వెడల్పు != 0
+		&& wcol >= (colnr_T)వెడల్పు
+		&& వెడల్పు > 0)
 	{
 	    csize = linetabsize_no_outer_eol(curwin, pos->lnum);
-	    if (csize > 0)
+	    ఒకవేళ (csize > 0)
 		csize--;
 
-	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+	    ఒకవేళ (wcol / వెడల్పు > (colnr_T)csize / వెడల్పు
+		    && ((State & బహుళకం_చొప్పించు) == 0 || (పూర్ణాంకం)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
 		// the last character (like what happens when typing and
 		// reaching the right window edge).
-		wcol = (csize / width + 1) * width - 1;
+		wcol = (csize / వెడల్పు + 1) * వెడల్పు - 1;
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
-#ifdef FEAT_PROP_POPUP
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, పంక్తి, పంక్తి);
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	cts.cts_no_above = true;
-#endif
-	while (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
+#అయితే_ముగింపు
+	అయితే (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
 	{
 	    // Count a tab for what it's worth (if list mode not on)
-#ifdef FEAT_LINEBREAK
-	    csize = win_lbr_chartabsize(&cts, &head, NULL);
+#నిర్వచితమైతే FEAT_LINEBREAK
+	    csize = win_lbr_chartabsize(&cts, &తల, ఖాళీ);
 	    MB_PTR_ADV(cts.cts_ptr);
-#else
+#లేకపోతే
 	    csize = lbr_chartabsize_adv(&cts);
-#endif
+#అయితే_ముగింపు
 	    cts.cts_vcol += csize;
 	}
-	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	నిలువు = cts.cts_vcol;
+	idx = (పూర్ణాంకం)(cts.cts_ptr - పంక్తి);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -204,129 +204,129 @@ coladvance2(
 	 * a line has the correct indexing.  The one_more comparison
 	 * replaces an explicit add of one_more later on.
 	 */
-	if (col > wcol || (!virtual_active() && one_more == 0))
+	ఒకవేళ (నిలువు > wcol || (!virtual_చురుకైన() && one_మరిన్ని == 0))
 	{
 	    idx -= 1;
-#ifdef FEAT_LINEBREAK
+#నిర్వచితమైతే FEAT_LINEBREAK
 	    // Don't count the chars from 'showbreak'.
-	    csize -= head;
-#endif
-	    col -= csize;
+	    csize -= తల;
+#అయితే_ముగింపు
+	    నిలువు -= csize;
 	}
 
-	if (virtual_active()
+	ఒకవేళ (virtual_చురుకైన()
 		&& addspaces
 		&& wcol >= 0
-		&& ((col != wcol && col != wcol + 1) || csize > 1))
+		&& ((నిలువు != wcol && నిలువు != wcol + 1) || csize > 1))
 	{
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    ఒకవేళ (పంక్తి[idx] == NUL)
 	    {
 		// Append spaces
-		int	correct = wcol - col;
+		పూర్ణాంకం	correct = wcol - నిలువు;
 		char_u	*newline = alloc(idx + correct + 1);
-		int	t;
+		పూర్ణాంకం	t;
 
-		if (newline == NULL)
-		    return FAIL;
+		ఒకవేళ (newline == ఖాళీ)
+		    తిరిగి FAIL;
 
-		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		కొరకు (t = 0; t < idx; ++t)
+		    newline[t] = పంక్తి[t];
 
-		for (t = 0; t < correct; ++t)
+		కొరకు (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
 
 		newline[idx + correct] = NUL;
 
 		ml_replace(pos->lnum, newline, FALSE);
-		changed_bytes(pos->lnum, (colnr_T)idx);
+		మారింది_బైట్లు(pos->lnum, (colnr_T)idx);
 		idx += correct;
-		col = wcol;
+		నిలువు = wcol;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Break a tab
-		int	correct = wcol - col - csize + 1; // negative!!
+		పూర్ణాంకం	correct = wcol - నిలువు - csize + 1; // negative!!
 		char_u	*newline;
-		int	t, s = 0;
-		int	v;
+		పూర్ణాంకం	t, s = 0;
+		పూర్ణాంకం	v;
 
-		if (-correct > csize)
-		    return FAIL;
+		ఒకవేళ (-correct > csize)
+		    తిరిగి FAIL;
 
 		newline = alloc(linelen + csize);
-		if (newline == NULL)
-		    return FAIL;
+		ఒకవేళ (newline == ఖాళీ)
+		    తిరిగి FAIL;
 
-		for (t = 0; t < linelen; t++)
+		కొరకు (t = 0; t < linelen; t++)
 		{
-		    if (t != idx)
-			newline[s++] = line[t];
-		    else
-			for (v = 0; v < csize; v++)
+		    ఒకవేళ (t != idx)
+			newline[s++] = పంక్తి[t];
+		    లేకపోతే
+			కొరకు (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
 		}
 
 		newline[linelen + csize - 1] = NUL;
 
 		ml_replace(pos->lnum, newline, FALSE);
-		changed_bytes(pos->lnum, idx);
+		మారింది_బైట్లు(pos->lnum, idx);
 		idx += (csize - 1 + correct);
-		col += correct;
+		నిలువు += correct;
 	    }
 	}
     }
 
-    if (idx < 0)
-	pos->col = 0;
-    else
-	pos->col = idx;
+    ఒకవేళ (idx < 0)
+	pos->నిలువు = 0;
+    లేకపోతే
+	pos->నిలువు = idx;
 
     pos->coladd = 0;
 
-    if (finetune)
+    ఒకవేళ (finetune)
     {
-	if (wcol == MAXCOL)
+	ఒకవేళ (wcol == MAXCOL)
 	{
 	    // The width of the last character is used to set coladd.
-	    if (!one_more)
+	    ఒకవేళ (!one_మరిన్ని)
 	    {
 		colnr_T	    scol, ecol;
 
-		getvcol(curwin, pos, &scol, NULL, &ecol, 0);
+		getvcol(curwin, pos, &scol, ఖాళీ, &ecol, 0);
 		pos->coladd = ecol - scol;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    int b = (int)wcol - (int)col;
+	    పూర్ణాంకం b = (పూర్ణాంకం)wcol - (పూర్ణాంకం)నిలువు;
 
 	    // The difference between wcol and col is used to set coladd.
-	    if (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
+	    ఒకవేళ (b > 0 && b < (MAXCOL - 2 * curwin->w_వెడల్పు))
 		pos->coladd = b;
 
-	    col += b;
+	    నిలువు += b;
 	}
     }
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	mb_adjustpos(curbuf, pos);
 
-    if (wcol < 0 || col < wcol)
-	return FAIL;
-    return OK;
+    ఒకవేళ (wcol < 0 || నిలువు < wcol)
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Increment the cursor position.  See inc() for return values.
  */
-    int
-inc_cursor(void)
+    పూర్ణాంకం
+inc_cursor(శూన్య)
 {
-    return inc(&curwin->w_cursor);
+    తిరిగి inc(&curwin->w_cursor);
 }
 
 /*
@@ -336,50 +336,50 @@ inc_cursor(void)
  * Return -1 when at the end of file.
  * Return 0 otherwise.
  */
-    int
+    పూర్ణాంకం
 inc(pos_T *lp)
 {
     char_u  *p;
 
     // when searching position may be set to end of a line
-    if (lp->col != MAXCOL)
+    ఒకవేళ (lp->నిలువు != MAXCOL)
     {
 	p = ml_get_pos(lp);
-	if (*p != NUL)	// still within line, move to next char (may be NUL)
+	ఒకవేళ (*p != NUL)	// still within line, move to next char (may be NUL)
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
-		int l = (*mb_ptr2len)(p);
+		పూర్ణాంకం l = (*mb_ptr2len)(p);
 
-		lp->col += l;
-		return ((p[l] != NUL) ? 0 : 2);
+		lp->నిలువు += l;
+		తిరిగి ((p[l] != NUL) ? 0 : 2);
 	    }
-	    lp->col++;
+	    lp->నిలువు++;
 	    lp->coladd = 0;
-	    return ((p[1] != NUL) ? 0 : 2);
+	    తిరిగి ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    ఒకవేళ (lp->lnum != curbuf->b_ml.ml_పంక్తి_లెక్క)     // there is a next line
     {
-	lp->col = 0;
+	lp->నిలువు = 0;
 	lp->lnum++;
 	lp->coladd = 0;
-	return 1;
+	తిరిగి 1;
     }
-    return -1;
+    తిరిగి -1;
 }
 
 /*
  * incl(lp): same as inc(), but skip the NUL at the end of non-empty lines
  */
-    int
+    పూర్ణాంకం
 incl(pos_T *lp)
 {
-    int	    r;
+    పూర్ణాంకం	    r;
 
-    if ((r = inc(lp)) >= 1 && lp->col)
+    ఒకవేళ ((r = inc(lp)) >= 1 && lp->నిలువు)
 	r = inc(lp);
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -388,66 +388,66 @@ incl(pos_T *lp)
  * Decrement the line pointer 'p' crossing line boundaries as necessary.
  * Return 1 when crossing a line, -1 when at start of file, 0 otherwise.
  */
-    int
-dec_cursor(void)
+    పూర్ణాంకం
+dec_cursor(శూన్య)
 {
-    return dec(&curwin->w_cursor);
+    తిరిగి dec(&curwin->w_cursor);
 }
 
-    int
+    పూర్ణాంకం
 dec(pos_T *lp)
 {
     char_u	*p;
 
     lp->coladd = 0;
-    if (lp->col == MAXCOL)
+    ఒకవేళ (lp->నిలువు == MAXCOL)
     {
 	// past end of line
 	p = ml_get(lp->lnum);
-	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 0;
+	lp->నిలువు = ml_get_len(lp->lnum);
+	ఒకవేళ (has_mbyte)
+	    lp->నిలువు -= (*mb_తల_off)(p, p + lp->నిలువు);
+	తిరిగి 0;
     }
 
-    if (lp->col > 0)
+    ఒకవేళ (lp->నిలువు > 0)
     {
 	// still within line
-	lp->col--;
-	if (has_mbyte)
+	lp->నిలువు--;
+	ఒకవేళ (has_mbyte)
 	{
 	    p = ml_get(lp->lnum);
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
+	    lp->నిలువు -= (*mb_తల_off)(p, p + lp->నిలువు);
 	}
-	return 0;
+	తిరిగి 0;
     }
 
-    if (lp->lnum > 1)
+    ఒకవేళ (lp->lnum > 1)
     {
 	// there is a prior line
 	lp->lnum--;
 	p = ml_get(lp->lnum);
-	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 1;
+	lp->నిలువు = ml_get_len(lp->lnum);
+	ఒకవేళ (has_mbyte)
+	    lp->నిలువు -= (*mb_తల_off)(p, p + lp->నిలువు);
+	తిరిగి 1;
     }
 
     // at start of file
-    return -1;
+    తిరిగి -1;
 }
 
 /*
  * decl(lp): same as dec(), but skip the NUL at the end of non-empty lines
  */
-    int
+    పూర్ణాంకం
 decl(pos_T *lp)
 {
-    int	    r;
+    పూర్ణాంకం	    r;
 
-    if ((r = dec(lp)) == 1 && lp->col)
+    ఒకవేళ ((r = dec(lp)) == 1 && lp->నిలువు)
 	r = dec(lp);
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -463,29 +463,29 @@ get_cursor_rel_lnum(
     linenr_T	cursor = wp->w_cursor.lnum;
     linenr_T	retval = 0;
 
-#ifdef FEAT_FOLDING
-    if (hasAnyFolding(wp))
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ (hasAnyFolding(wp))
     {
-	if (lnum > cursor)
+	ఒకవేళ (lnum > cursor)
 	{
-	    while (lnum > cursor)
+	    అయితే (lnum > cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+		(శూన్య)hasFoldingWin(wp, lnum, &lnum, ఖాళీ, TRUE, ఖాళీ);
 		// if lnum and cursor are in the same fold,
 		// now lnum <= cursor
-		if (lnum > cursor)
+		ఒకవేళ (lnum > cursor)
 		    retval++;
 		lnum--;
 	    }
 	}
-	else if (lnum < cursor)
+	లేకపోతే ఒకవేళ (lnum < cursor)
 	{
-	    while (lnum < cursor)
+	    అయితే (lnum < cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
+		(శూన్య)hasFoldingWin(wp, lnum, ఖాళీ, &lnum, TRUE, ఖాళీ);
 		// if lnum and cursor are in the same fold,
 		// now lnum >= cursor
-		if (lnum < cursor)
+		ఒకవేళ (lnum < cursor)
 		    retval--;
 		lnum++;
 	    }
@@ -493,122 +493,122 @@ get_cursor_rel_lnum(
 	// else if (lnum == cursor)
 	//     retval = 0;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	retval = lnum - cursor;
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Make sure "pos.lnum" and "pos.col" are valid in "buf".
  * This allows for the col to be on the NUL byte.
  */
-    void
+    శూన్య
 check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    ఒకవేళ (pos->lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	pos->lnum = buf->b_ml.ml_పంక్తి_లెక్క;
 
-    if (pos->col > 0)
+    ఒకవేళ (pos->నిలువు > 0)
     {
 	len = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > len)
-	    pos->col = len;
+	ఒకవేళ (pos->నిలువు > len)
+	    pos->నిలువు = len;
     }
 }
 
 /*
  * Make sure curwin->w_cursor.lnum is valid.
  */
-    void
-check_cursor_lnum(void)
+    శూన్య
+check_cursor_lnum(శూన్య)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (curwin->w_cursor.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
-						&curwin->w_cursor.lnum, NULL))
-#endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	ఒకవేళ (!hasFolding(curbuf->b_ml.ml_పంక్తి_లెక్క,
+						&curwin->w_cursor.lnum, ఖాళీ))
+#అయితే_ముగింపు
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
     }
-    if (curwin->w_cursor.lnum <= 0)
+    ఒకవేళ (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
 }
 
 /*
  * Make sure curwin->w_cursor.col is valid.
  */
-    void
-check_cursor_col(void)
+    శూన్య
+check_cursor_నిలువు(శూన్య)
 {
-    check_cursor_col_win(curwin);
+    check_cursor_నిలువు_win(curwin);
 }
 
 /*
  * Make sure win->w_cursor.col is valid.
  */
-    void
-check_cursor_col_win(win_T *win)
+    శూన్య
+check_cursor_నిలువు_win(win_T *win)
 {
     colnr_T      len;
-    colnr_T      oldcol = win->w_cursor.col;
-    colnr_T      oldcoladd = win->w_cursor.col + win->w_cursor.coladd;
-    unsigned int cur_ve_flags = get_ve_flags();
+    colnr_T      oldcol = win->w_cursor.నిలువు;
+    colnr_T      oldcoladd = win->w_cursor.నిలువు + win->w_cursor.coladd;
+    గుర్తులేని పూర్ణాంకం cur_ve_flags = get_ve_flags();
 
-    len = ml_get_buf_len(win->w_buffer, win->w_cursor.lnum);
-    if (len == 0)
-	win->w_cursor.col = 0;
-    else if (win->w_cursor.col >= len)
+    len = ml_get_buf_len(win->w_బఫరు, win->w_cursor.lnum);
+    ఒకవేళ (len == 0)
+	win->w_cursor.నిలువు = 0;
+    లేకపోతే ఒకవేళ (win->w_cursor.నిలువు >= len)
     {
 	// Allow cursor past end-of-line when:
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
-		|| (VIsual_active && *p_sel != 'o')
+	ఒకవేళ ((State & బహుళకం_చొప్పించు) || restart_edit
+		|| (VIsual_చురుకైన && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
-		|| virtual_active())
-	    win->w_cursor.col = len;
-	else
+		|| virtual_చురుకైన())
+	    win->w_cursor.నిలువు = len;
+	లేకపోతే
 	{
-	    win->w_cursor.col = len - 1;
+	    win->w_cursor.నిలువు = len - 1;
 	    // Move the cursor to the head byte.
-	    if (has_mbyte)
-		mb_adjustpos(win->w_buffer, &win->w_cursor);
+	    ఒకవేళ (has_mbyte)
+		mb_adjustpos(win->w_బఫరు, &win->w_cursor);
 	}
     }
-    else if (win->w_cursor.col < 0)
-	win->w_cursor.col = 0;
+    లేకపోతే ఒకవేళ (win->w_cursor.నిలువు < 0)
+	win->w_cursor.నిలువు = 0;
 
     // If virtual editing is on, we can leave the cursor on the old position,
     // only we must set it to virtual.  But don't do it when at the end of the
     // line.
-    if (oldcol == MAXCOL)
+    ఒకవేళ (oldcol == MAXCOL)
 	win->w_cursor.coladd = 0;
-    else if (cur_ve_flags == VE_ALL)
+    లేకపోతే ఒకవేళ (cur_ve_flags == VE_ALL)
     {
-	if (oldcoladd > win->w_cursor.col)
+	ఒకవేళ (oldcoladd > win->w_cursor.నిలువు)
 	{
-	    win->w_cursor.coladd = oldcoladd - win->w_cursor.col;
+	    win->w_cursor.coladd = oldcoladd - win->w_cursor.నిలువు;
 
 	    // Make sure that coladd is not more than the char width.
 	    // Not for the last character, coladd is then used when the cursor
 	    // is actually after the last character.
-	    if (win->w_cursor.col + 1 < len)
+	    ఒకవేళ (win->w_cursor.నిలువు + 1 < len)
 	    {
-		int cs, ce;
+		పూర్ణాంకం cs, ce;
 
-		getvcol(win, &win->w_cursor, &cs, NULL, &ce, 0);
-		if (win->w_cursor.coladd > ce - cs)
+		getvcol(win, &win->w_cursor, &cs, ఖాళీ, &ce, 0);
+		ఒకవేళ (win->w_cursor.coladd > ce - cs)
 		    win->w_cursor.coladd = ce - cs;
 	    }
 	}
-	else
+	లేకపోతే
 	    // avoid weird number when there is a miscalculation or overflow
 	    win->w_cursor.coladd = 0;
     }
@@ -617,33 +617,33 @@ check_cursor_col_win(win_T *win)
 /*
  * make sure curwin->w_cursor in on a valid character
  */
-    void
-check_cursor(void)
+    శూన్య
+check_cursor(శూన్య)
 {
     check_cursor_lnum();
-    check_cursor_col();
+    check_cursor_నిలువు();
 }
 
 /*
  * Check if VIsual position is valid, correct it if not.
  * Can be called when in Visual mode and a change has been made.
  */
-    void
-check_visual_pos(void)
+    శూన్య
+check_visual_pos(శూన్య)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (VIsual.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
-	VIsual.col = 0;
+	VIsual.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	VIsual.నిలువు = 0;
 	VIsual.coladd = 0;
     }
-    else
+    లేకపోతే
     {
-	int len = ml_get_len(VIsual.lnum);
+	పూర్ణాంకం len = ml_get_len(VIsual.lnum);
 
-	if (VIsual.col > len)
+	ఒకవేళ (VIsual.నిలువు > len)
 	{
-	    VIsual.col = len;
+	    VIsual.నిలువు = len;
 	    VIsual.coladd = 0;
 	}
     }
@@ -653,13 +653,13 @@ check_visual_pos(void)
  * Make sure curwin->w_cursor is not on the NUL at the end of the line.
  * Allow it when in Visual mode and 'selection' is not "old".
  */
-    void
-adjust_cursor_col(void)
+    శూన్య
+adjust_cursor_నిలువు(శూన్య)
 {
-    if (curwin->w_cursor.col > 0
-	    && (!VIsual_active || *p_sel == 'o')
+    ఒకవేళ (curwin->w_cursor.నిలువు > 0
+	    && (!VIsual_చురుకైన || *p_sel == 'o')
 	    && gchar_cursor() == NUL)
-	--curwin->w_cursor.col;
+	--curwin->w_cursor.నిలువు;
 }
 
 /*
@@ -667,58 +667,58 @@ adjust_cursor_col(void)
  * Adjust the cursor position if needed.
  * Return TRUE if the cursor was moved.
  */
-    int
-set_leftcol(colnr_T leftcol)
+    పూర్ణాంకం
+సమితి_leftcol(colnr_T leftcol)
 {
-    int		retval = FALSE;
+    పూర్ణాంకం		retval = FALSE;
 
     // Return quickly when there is no change.
-    if (curwin->w_leftcol == leftcol)
-	return FALSE;
+    ఒకవేళ (curwin->w_leftcol == leftcol)
+	తిరిగి FALSE;
     curwin->w_leftcol = leftcol;
 
-    changed_cline_bef_curs();
-    long lastcol = curwin->w_leftcol + curwin->w_width - curwin_col_off() - 1;
+    మారింది_cline_bef_curs();
+    దీర్ఘ lastcol = curwin->w_leftcol + curwin->w_వెడల్పు - curwin_నిలువు_off() - 1;
     validate_virtcol();
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
-    if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
+    దీర్ఘ siso = get_sidescrolloff_విలువ();
+    ఒకవేళ (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
 	coladvance((colnr_T)(lastcol - siso));
     }
-    else if (curwin->w_virtcol < curwin->w_leftcol + siso)
+    లేకపోతే ఒకవేళ (curwin->w_virtcol < curwin->w_leftcol + siso)
     {
 	retval = TRUE;
-	(void)coladvance((colnr_T)(curwin->w_leftcol + siso));
+	(శూన్య)coladvance((colnr_T)(curwin->w_leftcol + siso));
     }
 
     // If the start of the character under the cursor is not on the screen,
     // advance the cursor one more char.  If this fails (last char of the
     // line) adjust the scrolling.
     colnr_T	s, e;
-    getvvcol(curwin, &curwin->w_cursor, &s, NULL, &e, 0);
-    if (e > (colnr_T)lastcol)
+    getvvcol(curwin, &curwin->w_cursor, &s, ఖాళీ, &e, 0);
+    ఒకవేళ (e > (colnr_T)lastcol)
     {
 	retval = TRUE;
 	coladvance(s - 1);
     }
-    else if (s < curwin->w_leftcol)
+    లేకపోతే ఒకవేళ (s < curwin->w_leftcol)
     {
 	retval = TRUE;
-	if (coladvance(e + 1) == FAIL)	// there isn't another character
+	ఒకవేళ (coladvance(e + 1) == FAIL)	// there isn't another character
 	{
 	    curwin->w_leftcol = s;	// adjust w_leftcol instead
-	    changed_cline_bef_curs();
+	    మారింది_cline_bef_curs();
 	}
     }
 
-    if (retval)
-	curwin->w_set_curswant = true;
+    ఒకవేళ (retval)
+	curwin->w_సమితి_curswant = true;
     redraw_later(UPD_NOT_VALID);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -728,60 +728,60 @@ set_leftcol(colnr_T leftcol)
  * "*option" is advanced to the next part.
  * The length is returned.
  */
-    int
+    పూర్ణాంకం
 copy_option_part(
     char_u	**option,
     char_u	*buf,
-    int		maxlen,
-    char	*sep_chars)
+    పూర్ణాంకం		maxlen,
+    అక్షరం	*sep_chars)
 {
-    int	    len = 0;
+    పూర్ణాంకం	    len = 0;
     char_u  *p = *option;
 
     // skip '.' at start of option part, for 'suffixes'
-    if (*p == '.')
+    ఒకవేళ (*p == '.')
 	buf[len++] = *p++;
-    while (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == NULL)
+    అయితే (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == ఖాళీ)
     {
 	/*
 	 * Skip backslash before a separator character and space.
 	 */
-	if (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != NULL)
+	ఒకవేళ (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != ఖాళీ)
 	    ++p;
-	if (len < maxlen - 1)
+	ఒకవేళ (len < maxlen - 1)
 	    buf[len++] = *p;
 	++p;
     }
     buf[len] = NUL;
 
-    if (*p != NUL && *p != ',')	// skip non-standard separator
+    ఒకవేళ (*p != NUL && *p != ',')	// skip non-standard separator
 	++p;
-    p = skip_to_option_part(p);	// p points to next file name
+    p = skip_గమ్యం_option_part(p);	// p points to next file name
 
     *option = p;
-    return len;
+    తిరిగి len;
 }
 
-#if !defined(HAVE_MEMSET) && !defined(PROTO)
-    void *
-vim_memset(void *ptr, int c, size_t size)
+#ఒకవేళ !defined(HAVE_MEMSET) && !defined(PROTO)
+    శూన్య *
+vim_memset(శూన్య *ptr, పూర్ణాంకం c, size_t కొలత)
 {
-    char *p = ptr;
+    అక్షరం *p = ptr;
 
-    while (size-- > 0)
+    అయితే (కొలత-- > 0)
 	*p++ = c;
-    return ptr;
+    తిరిగి ptr;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Vim has its own isspace() function, because on some machines isspace()
  * can't handle characters above 128.
  */
-    int
-vim_isspace(int x)
+    పూర్ణాంకం
+vim_isspace(పూర్ణాంకం x)
 {
-    return ((x >= 9 && x <= 13) || x == ' ');
+    తిరిగి ((x >= 9 && x <= 13) || x == ' ');
 }
 
 /************************************************************************
@@ -793,25 +793,25 @@ vim_isspace(int x)
  * Some useful tables.
  */
 
-static struct modmasktable
+స్థిర నిర్మాణం modmasktable
 {
-    short	mod_mask;	// Bit-mask for particular key modifier
-    short	mod_flag;	// Bit(s) for particular key modifier
+    పొట్టి	mod_ముసుగు;	// Bit-mask for particular key modifier
+    పొట్టి	mod_flag;	// Bit(s) for particular key modifier
     char_u	name;		// Single letter name of modifier
-} mod_mask_table[] =
+} mod_ముసుగు_పట్టిక[] =
 {
-    {MOD_MASK_ALT,		MOD_MASK_ALT,		(char_u)'M'},
-    {MOD_MASK_META,		MOD_MASK_META,		(char_u)'T'},
-    {MOD_MASK_CTRL,		MOD_MASK_CTRL,		(char_u)'C'},
-    {MOD_MASK_SHIFT,		MOD_MASK_SHIFT,		(char_u)'S'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_2CLICK,	(char_u)'2'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_3CLICK,	(char_u)'3'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_4CLICK,	(char_u)'4'},
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
-    {MOD_MASK_CMD,		MOD_MASK_CMD,		(char_u)'D'},
-#endif
+    {MOD_ముసుగు_ALT,		MOD_ముసుగు_ALT,		(char_u)'M'},
+    {MOD_ముసుగు_META,		MOD_ముసుగు_META,		(char_u)'T'},
+    {MOD_ముసుగు_CTRL,		MOD_ముసుగు_CTRL,		(char_u)'C'},
+    {MOD_ముసుగు_జరుపు,		MOD_ముసుగు_జరుపు,		(char_u)'S'},
+    {MOD_ముసుగు_MULTI_CLICK,	MOD_ముసుగు_2_CLICK,	(char_u)'2'},
+    {MOD_ముసుగు_MULTI_CLICK,	MOD_ముసుగు_3_CLICK,	(char_u)'3'},
+    {MOD_ముసుగు_MULTI_CLICK,	MOD_ముసుగు_4_CLICK,	(char_u)'4'},
+#ఒకవేళ defined(MACOS_X) || defined(FEAT_GUI_GTK)
+    {MOD_ముసుగు_CMD,		MOD_ముసుగు_CMD,		(char_u)'D'},
+#అయితే_ముగింపు
     // 'A' must be the last one
-    {MOD_MASK_ALT,		MOD_MASK_ALT,		(char_u)'A'},
+    {MOD_ముసుగు_ALT,		MOD_ముసుగు_ALT,		(char_u)'A'},
     {0, 0, NUL}
     // NOTE: when adding an entry, update MAX_KEY_NAME_LEN!
 };
@@ -820,105 +820,105 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#నిర్వచించు MOD_కీలకాలు_నమోదు_కొలత 5
 
-static char_u modifier_keys_table[] =
+స్థిర char_u modifier_కీలకాలు_పట్టిక[] =
 {
 //  mod mask	    with modifier		without modifier
-    MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
-    MOD_MASK_SHIFT, '&', '0',			'@', '2',	// cancel
-    MOD_MASK_SHIFT, '*', '1',			'@', '4',	// command
-    MOD_MASK_SHIFT, '*', '2',			'@', '5',	// copy
-    MOD_MASK_SHIFT, '*', '3',			'@', '6',	// create
-    MOD_MASK_SHIFT, '*', '4',			'k', 'D',	// delete char
-    MOD_MASK_SHIFT, '*', '5',			'k', 'L',	// delete line
-    MOD_MASK_SHIFT, '*', '7',			'@', '7',	// end
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_END,	'@', '7',	// end
-    MOD_MASK_SHIFT, '*', '9',			'@', '9',	// exit
-    MOD_MASK_SHIFT, '*', '0',			'@', '0',	// find
-    MOD_MASK_SHIFT, '#', '1',			'%', '1',	// help
-    MOD_MASK_SHIFT, '#', '2',			'k', 'h',	// home
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
-    MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
-    MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
-    MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
-    MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
-    MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
-    MOD_MASK_SHIFT, '%', 'd',			'%', '7',	// options
-    MOD_MASK_SHIFT, '%', 'e',			'%', '8',	// previous
-    MOD_MASK_SHIFT, '%', 'f',			'%', '9',	// print
-    MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
-    MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
-    MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
-    MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
-    MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
-    MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
-    MOD_MASK_SHIFT, '!', '3',			'&', '8',	// undo
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_UP,	'k', 'u',	// up arrow
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_DOWN,	'k', 'd',	// down arrow
+    MOD_ముసుగు_జరుపు, '&', '9',			'@', '1',	// begin
+    MOD_ముసుగు_జరుపు, '&', '0',			'@', '2',	// cancel
+    MOD_ముసుగు_జరుపు, '*', '1',			'@', '4',	// command
+    MOD_ముసుగు_జరుపు, '*', '2',			'@', '5',	// copy
+    MOD_ముసుగు_జరుపు, '*', '3',			'@', '6',	// create
+    MOD_ముసుగు_జరుపు, '*', '4',			'k', 'D',	// delete char
+    MOD_ముసుగు_జరుపు, '*', '5',			'k', 'L',	// delete line
+    MOD_ముసుగు_జరుపు, '*', '7',			'@', '7',	// end
+    MOD_ముసుగు_CTRL,  KS_EXTRA, (పూర్ణాంకం)KE_C_చివర,	'@', '7',	// end
+    MOD_ముసుగు_జరుపు, '*', '9',			'@', '9',	// exit
+    MOD_ముసుగు_జరుపు, '*', '0',			'@', '0',	//కనుగొను
+    MOD_ముసుగు_జరుపు, '#', '1',			'%', '1',	// help
+    MOD_ముసుగు_జరుపు, '#', '2',			'k', 'h',	// home
+    MOD_ముసుగు_CTRL,  KS_EXTRA, (పూర్ణాంకం)KE_C_HOME,	'k', 'h',	// home
+    MOD_ముసుగు_జరుపు, '#', '3',			'k', 'I',	// insert
+    MOD_ముసుగు_జరుపు, '#', '4',			'k', 'l',	// left arrow
+    MOD_ముసుగు_CTRL,  KS_EXTRA, (పూర్ణాంకం)KE_C_ఎడమ,	'k', 'l',	// left arrow
+    MOD_ముసుగు_జరుపు, '%', 'a',			'%', '3',	//సందేశం
+    MOD_ముసుగు_జరుపు, '%', 'b',			'%', '4',	// move
+    MOD_ముసుగు_జరుపు, '%', 'c',			'%', '5',	//తదుపరి
+    MOD_ముసుగు_జరుపు, '%', 'd',			'%', '7',	// options
+    MOD_ముసుగు_జరుపు, '%', 'e',			'%', '8',	//మునుపటి
+    MOD_ముసుగు_జరుపు, '%', 'f',			'%', '9',	// print
+    MOD_ముసుగు_జరుపు, '%', 'g',			'%', '0',	// redo
+    MOD_ముసుగు_జరుపు, '%', 'h',			'&', '3',	// replace
+    MOD_ముసుగు_జరుపు, '%', 'i',			'k', 'r',	// right arr.
+    MOD_ముసుగు_CTRL,  KS_EXTRA, (పూర్ణాంకం)KE_C_కుడి,	'k', 'r',	// right arr.
+    MOD_ముసుగు_జరుపు, '%', 'j',			'&', '5',	// resume
+    MOD_ముసుగు_జరుపు, '!', '1',			'&', '6',	// save
+    MOD_ముసుగు_జరుపు, '!', '2',			'&', '7',	// suspend
+    MOD_ముసుగు_జరుపు, '!', '3',			'&', '8',	// undo
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_పైకి,	'k', 'u',	// up arrow
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_కిందికి,	'k', 'd',	// down arrow
 
 								// vt100 F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF1,	KS_EXTRA, (int)KE_XF1,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF2,	KS_EXTRA, (int)KE_XF2,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF3,	KS_EXTRA, (int)KE_XF3,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF4,	KS_EXTRA, (int)KE_XF4,
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_XF1,	KS_EXTRA, (పూర్ణాంకం)KE_XF1,
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_XF2,	KS_EXTRA, (పూర్ణాంకం)KE_XF2,
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_XF3,	KS_EXTRA, (పూర్ణాంకం)KE_XF3,
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_XF4,	KS_EXTRA, (పూర్ణాంకం)KE_XF4,
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F1,	'k', '1',	// F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F2,	'k', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F3,	'k', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F4,	'k', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F5,	'k', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F6,	'k', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F7,	'k', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F8,	'k', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F9,	'k', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F10,	'k', ';',	// F10
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F1,	'k', '1',	// F1
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F2,	'k', '2',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F3,	'k', '3',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F4,	'k', '4',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F5,	'k', '5',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F6,	'k', '6',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F7,	'k', '7',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F8,	'k', '8',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F9,	'k', '9',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F10,	'k', ';',	// F10
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F11,	'F', '1',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F12,	'F', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F13,	'F', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F14,	'F', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F15,	'F', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F16,	'F', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F17,	'F', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F18,	'F', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F19,	'F', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F20,	'F', 'A',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F11,	'F', '1',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F12,	'F', '2',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F13,	'F', '3',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F14,	'F', '4',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F15,	'F', '5',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F16,	'F', '6',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F17,	'F', '7',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F18,	'F', '8',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F19,	'F', '9',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F20,	'F', 'A',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F21,	'F', 'B',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F22,	'F', 'C',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F23,	'F', 'D',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F24,	'F', 'E',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F25,	'F', 'F',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F26,	'F', 'G',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F27,	'F', 'H',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F28,	'F', 'I',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F29,	'F', 'J',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F30,	'F', 'K',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F21,	'F', 'B',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F22,	'F', 'C',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F23,	'F', 'D',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F24,	'F', 'E',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F25,	'F', 'F',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F26,	'F', 'G',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F27,	'F', 'H',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F28,	'F', 'I',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F29,	'F', 'J',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F30,	'F', 'K',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F31,	'F', 'L',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F32,	'F', 'M',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F33,	'F', 'N',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F34,	'F', 'O',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F35,	'F', 'P',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F36,	'F', 'Q',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F37,	'F', 'R',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F31,	'F', 'L',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F32,	'F', 'M',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F33,	'F', 'N',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F34,	'F', 'O',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F35,	'F', 'P',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F36,	'F', 'Q',
+    MOD_ముసుగు_జరుపు, KS_EXTRA, (పూర్ణాంకం)KE_S_F37,	'F', 'R',
 
 							    // TAB pseudo code
-    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (int)KE_TAB,
+    MOD_ముసుగు_జరుపు, 'k', 'B',			KS_EXTRA, (పూర్ణాంకం)KE_TAB,
 
     NUL
 };
 
-static struct key_name_entry
+స్థిర నిర్మాణం కీలకం_name_నమోదు
 {
-    int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    పూర్ణాంకం		enabled;	    // is this entry available (TRUE/FALSE)?
+    పూర్ణాంకం		కీలకం;		    // special key code or ascii value
     string_T	name;		    // name of key
-    int		is_alt;		    // is an alternative name
-} key_names_table[] =
+    పూర్ణాంకం		is_alt;		    // is an alternative name
+} కీలకం_పేర్లు_పట్టిక[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -930,17 +930,17 @@ static struct key_name_entry
     {TRUE, CSI, STR_LITERAL_INIT("CSI"), FALSE},
     {TRUE, K_CURSORHOLD, STR_LITERAL_INIT("CursorHold"), FALSE},
     {
-#ifdef FEAT_MOUSE_DEC
+#నిర్వచితమైతే FEAT_MOUSE_DEC
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_DEC_MOUSE, STR_LITERAL_INIT("DecMouse"), FALSE},
     {TRUE, K_DEL, STR_LITERAL_INIT("Del"), FALSE},
     {TRUE, K_DEL, STR_LITERAL_INIT("Delete"), TRUE},
-    {TRUE, K_DOWN, STR_LITERAL_INIT("Down"), FALSE},
+    {TRUE, K_కిందికి, STR_LITERAL_INIT("Down"), FALSE},
     {TRUE, K_DROP, STR_LITERAL_INIT("Drop"), FALSE},
-    {TRUE, K_END, STR_LITERAL_INIT("End"), FALSE},
+    {TRUE, K_చివర, STR_LITERAL_INIT("End"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Enter"), TRUE},
     {TRUE, ESC, STR_LITERAL_INIT("Esc"), FALSE},
 
@@ -993,11 +993,11 @@ static struct key_name_entry
     {TRUE, K_INS, STR_LITERAL_INIT("Ins"), TRUE},
     {TRUE, K_INS, STR_LITERAL_INIT("Insert"), FALSE},
     {
-#ifdef FEAT_MOUSE_JSB
+#నిర్వచితమైతే FEAT_MOUSE_JSB
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_JSBTERM_MOUSE, STR_LITERAL_INIT("JsbMouse"), FALSE},
     {TRUE, K_K0, STR_LITERAL_INIT("k0"), FALSE},
     {TRUE, K_K1, STR_LITERAL_INIT("k1"), FALSE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_ఎడమ, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1039,11 +1039,11 @@ static struct key_name_entry
     {TRUE, K_MOUSEMOVE, STR_LITERAL_INIT("MouseMove"), FALSE},
     {TRUE, K_MOUSEUP, STR_LITERAL_INIT("MouseUp"), TRUE},
     {
-#ifdef FEAT_MOUSE_NET
+#నిర్వచితమైతే FEAT_MOUSE_NET
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_NETTERM_MOUSE, STR_LITERAL_INIT("NetMouse"), FALSE},
     {TRUE, NL, STR_LITERAL_INIT("NewLine"), TRUE},
     {TRUE, NL, STR_LITERAL_INIT("NL"), FALSE},
@@ -1055,14 +1055,14 @@ static struct key_name_entry
     {TRUE, K_PS, STR_LITERAL_INIT("PasteStart"), FALSE},
     {TRUE, K_PLUG, STR_LITERAL_INIT("Plug"), FALSE},
     {
-#ifdef FEAT_MOUSE_PTERM
+#నిర్వచితమైతే FEAT_MOUSE_PTERM
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_కుడి, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1074,23 +1074,23 @@ static struct key_name_entry
     {TRUE, K_SGR_MOUSE, STR_LITERAL_INIT("SgrMouse"), FALSE},
     {TRUE, K_SGR_MOUSERELEASE, STR_LITERAL_INIT("SgrMouseRelease"), FALSE},
     {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_SNR, STR_LITERAL_INIT("SNR"), FALSE},
     {TRUE, ' ', STR_LITERAL_INIT("Space"), FALSE},
     {TRUE, TAB, STR_LITERAL_INIT("Tab"), FALSE},
     {TRUE, K_TAB, STR_LITERAL_INIT("Tab"), FALSE},
     {TRUE, K_UNDO, STR_LITERAL_INIT("Undo"), FALSE},
-    {TRUE, K_UP, STR_LITERAL_INIT("Up"), FALSE},
+    {TRUE, K_పైకి, STR_LITERAL_INIT("Up"), FALSE},
     {
-#ifdef FEAT_MOUSE_URXVT
+#నిర్వచితమైతే FEAT_MOUSE_URXVT
     TRUE,
-#else
+#లేకపోతే
     FALSE,
-#endif
+#అయితే_ముగింపు
 	K_URXVT_MOUSE, STR_LITERAL_INIT("UrxvtMouse"), FALSE},
     {TRUE, K_X1DRAG, STR_LITERAL_INIT("X1Drag"), FALSE},
     {TRUE, K_X1MOUSE, STR_LITERAL_INIT("X1Mouse"), FALSE},
@@ -1119,80 +1119,80 @@ static struct key_name_entry
  * Return the modifier mask bit (MOD_MASK_*) which corresponds to the given
  * modifier name ('S' for Shift, 'C' for Ctrl etc).
  */
-    static int
-name_to_mod_mask(int c)
+    స్థిర పూర్ణాంకం
+name_గమ్యం_mod_ముసుగు(పూర్ణాంకం c)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
     c = TOUPPER_ASC(c);
-    for (i = 0; mod_mask_table[i].mod_mask != 0; i++)
-	if (c == mod_mask_table[i].name)
-	    return mod_mask_table[i].mod_flag;
-    return 0;
+    కొరకు (i = 0; mod_ముసుగు_పట్టిక[i].mod_ముసుగు != 0; i++)
+	ఒకవేళ (c == mod_ముసుగు_పట్టిక[i].name)
+	    తిరిగి mod_ముసుగు_పట్టిక[i].mod_flag;
+    తిరిగి 0;
 }
 
 /*
  * Check if if there is a special key code for "key" that includes the
  * modifiers specified.
  */
-    int
-simplify_key(int key, int *modifiers)
+    పూర్ణాంకం
+simplify_కీలకం(పూర్ణాంకం కీలకం, పూర్ణాంకం *modifiers)
 {
-    int	    i;
-    int	    key0;
-    int	    key1;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    key0;
+    పూర్ణాంకం	    key1;
 
-    if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+    ఒకవేళ (!(*modifiers & (MOD_ముసుగు_జరుపు | MOD_ముసుగు_CTRL)))
+	తిరిగి కీలకం;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    ఒకవేళ (కీలకం == TAB && (*modifiers & MOD_ముసుగు_జరుపు))
     {
-	*modifiers &= ~MOD_MASK_SHIFT;
-	return K_S_TAB;
+	*modifiers &= ~MOD_ముసుగు_జరుపు;
+	తిరిగి K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(కీలకం);
+    key1 = KEY2TERMCAP1(కీలకం);
+    కొరకు (i = 0; modifier_కీలకాలు_పట్టిక[i] != NUL; i += MOD_కీలకాలు_నమోదు_కొలత)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	ఒకవేళ (key0 == modifier_కీలకాలు_పట్టిక[i + 3]
+		&& key1 == modifier_కీలకాలు_పట్టిక[i + 4]
+		&& (*modifiers & modifier_కీలకాలు_పట్టిక[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_కీలకాలు_పట్టిక[i];
+	    తిరిగి TERMCAP2_కీలకం(modifier_కీలకాలు_పట్టిక[i + 1],
+		    modifier_కీలకాలు_పట్టిక[i + 2]);
 	}
     }
-    return key;
+    తిరిగి కీలకం;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
-    int
-handle_x_keys(int key)
+    పూర్ణాంకం
+handle_x_కీలకాలు(పూర్ణాంకం కీలకం)
 {
-    switch (key)
+    ఎంపిక (కీలకం)
     {
-	case K_XUP:	return K_UP;
-	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
-	case K_XHOME:	return K_HOME;
-	case K_ZHOME:	return K_HOME;
-	case K_XEND:	return K_END;
-	case K_ZEND:	return K_END;
-	case K_XF1:	return K_F1;
-	case K_XF2:	return K_F2;
-	case K_XF3:	return K_F3;
-	case K_XF4:	return K_F4;
-	case K_S_XF1:	return K_S_F1;
-	case K_S_XF2:	return K_S_F2;
-	case K_S_XF3:	return K_S_F3;
-	case K_S_XF4:	return K_S_F4;
+	స్థితి K_XUP:	తిరిగి K_పైకి;
+	స్థితి K_XDOWN:	తిరిగి K_కిందికి;
+	స్థితి K_XLEFT:	తిరిగి K_ఎడమ;
+	స్థితి K_XRIGHT:	తిరిగి K_కుడి;
+	స్థితి K_XHOME:	తిరిగి K_HOME;
+	స్థితి K_ZHOME:	తిరిగి K_HOME;
+	స్థితి K_XEND:	తిరిగి K_చివర;
+	స్థితి K_ZEND:	తిరిగి K_చివర;
+	స్థితి K_XF1:	తిరిగి K_F1;
+	స్థితి K_XF2:	తిరిగి K_F2;
+	స్థితి K_XF3:	తిరిగి K_F3;
+	స్థితి K_XF4:	తిరిగి K_F4;
+	స్థితి K_S_XF1:	తిరిగి K_S_F1;
+	స్థితి K_S_XF2:	తిరిగి K_S_F2;
+	స్థితి K_S_XF3:	తిరిగి K_S_F3;
+	స్థితి K_S_XF4:	తిరిగి K_S_F4;
     }
-    return key;
+    తిరిగి కీలకం;
 }
 
 /*
@@ -1200,73 +1200,73 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_కీలకం_name(పూర్ణాంకం c, పూర్ణాంకం modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
-    int	    i, idx, len;
-    int	    table_idx;
+    స్థిర char_u string[MAX_కీలకం_NAME_LEN + 1];
+    పూర్ణాంకం	    i, idx, len;
+    పూర్ణాంకం	    పట్టిక_idx;
 
     string[0] = '<';
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    ఒకవేళ (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_కీలకం)
 	c = KEY2TERMCAP1(c);
 
     /*
      * Translate shifted special keys into unshifted keys and set modifier.
      * Same for CTRL and ALT modifiers.
      */
-    if (IS_SPECIAL(c))
+    ఒకవేళ (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	కొరకు (i = 0; modifier_కీలకాలు_పట్టిక[i] != 0; i += MOD_కీలకాలు_నమోదు_కొలత)
+	    ఒకవేళ (       KEY2TERMCAP0(c) == (పూర్ణాంకం)modifier_కీలకాలు_పట్టిక[i + 1]
+		    && (పూర్ణాంకం)KEY2TERMCAP1(c) == (పూర్ణాంకం)modifier_కీలకాలు_పట్టిక[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
-		break;
+		modifiers |= modifier_కీలకాలు_పట్టిక[i];
+		c = TERMCAP2_కీలకం(modifier_కీలకాలు_పట్టిక[i + 3],
+						   modifier_కీలకాలు_పట్టిక[i + 4]);
+		ఆపు;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    పట్టిక_idx = కనుగొను_special_కీలకం_లోపల_పట్టిక(c);
 
     /*
      * When not a known special key, and not a printable character, try to
      * extract modifiers.
      */
-    if (c > 0 && (*mb_char2len)(c) == 1)
+    ఒకవేళ (c > 0 && (*mb_char2len)(c) == 1)
     {
-	if (table_idx < 0
+	ఒకవేళ (పట్టిక_idx < 0
 		&& (!vim_isprintc(c) || (c & 0x7f) == ' ')
 		&& (c & 0x80))
 	{
 	    c &= 0x7f;
-	    modifiers |= MOD_MASK_ALT;
+	    modifiers |= MOD_ముసుగు_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    పట్టిక_idx = కనుగొను_special_కీలకం_లోపల_పట్టిక(c);
 	}
-	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
+	ఒకవేళ (పట్టిక_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
 	    c += '@';
-	    modifiers |= MOD_MASK_CTRL;
+	    modifiers |= MOD_ముసుగు_CTRL;
 	}
     }
 
     // translate the modifier into a string
-    for (i = 0; mod_mask_table[i].name != 'A'; i++)
-	if ((modifiers & mod_mask_table[i].mod_mask)
-						== mod_mask_table[i].mod_flag)
+    కొరకు (i = 0; mod_ముసుగు_పట్టిక[i].name != 'A'; i++)
+	ఒకవేళ ((modifiers & mod_ముసుగు_పట్టిక[i].mod_ముసుగు)
+						== mod_ముసుగు_పట్టిక[i].mod_flag)
 	{
-	    string[idx++] = mod_mask_table[i].name;
+	    string[idx++] = mod_ముసుగు_పట్టిక[i].name;
 	    string[idx++] = (char_u)'-';
 	}
 
-    if (table_idx < 0)		// unknown special key, may output t_xx
+    ఒకవేళ (పట్టిక_idx < 0)		// unknown special key, may output t_xx
     {
-	if (IS_SPECIAL(c))
+	ఒకవేళ (IS_SPECIAL(c))
 	{
 	    string[idx++] = 't';
 	    string[idx++] = '_';
@@ -1274,37 +1274,37 @@ get_special_key_name(int c, int modifiers)
 	    string[idx++] = KEY2TERMCAP1(c);
 	}
 	// Not a special key, only modifiers, output directly
-	else
+	లేకపోతే
 	{
 	    len = (*mb_char2len)(c);
-	    if (len == 1 && vim_isprintc(c))
+	    ఒకవేళ (len == 1 && vim_isprintc(c))
 		string[idx++] = c;
-	    else if (has_mbyte && len > 1)
+	    లేకపోతే ఒకవేళ (has_mbyte && len > 1)
 		idx += (*mb_char2bytes)(c, string + idx);
-	    else
+	    లేకపోతే
 	    {
 		char_u	*s = transchar(c);
-		while (*s)
+		అయితే (*s)
 		    string[idx++] = *s++;
 	    }
 	}
     }
-    else		// use name of special key
+    లేకపోతే		// use name of special key
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &కీలకం_పేర్లు_పట్టిక[పట్టిక_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	ఒకవేళ (s->నిడివి + idx + 2 <= MAX_కీలకం_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
-	    idx += (int)s->length;
+	    idx += (పూర్ణాంకం)s->నిడివి;
 	}
     }
     string[idx++] = '>';
     string[idx] = NUL;
 
-    return string;
+    తిరిగి string;
 }
 
 /*
@@ -1313,22 +1313,22 @@ get_special_key_name(int c, int modifiers)
  * If there is a match, "srcp" is advanced to after the <> name.
  * "dst[]" must be big enough to hold the result (up to six characters)!
  */
-    int
+    పూర్ణాంకం
 trans_special(
     char_u	**srcp,
     char_u	*dst,
-    int		flags,		// FSK_ values
-    int		escape_ks,	// escape K_SPECIAL bytes in the character
-    int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
+    పూర్ణాంకం		flags,		// FSK_ values
+    పూర్ణాంకం		escape_ks,	// escape K_SPECIAL bytes in the character
+    పూర్ణాంకం		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
-    int		modifiers = 0;
-    int		key;
+    పూర్ణాంకం		modifiers = 0;
+    పూర్ణాంకం		కీలకం;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
-	return 0;
+    కీలకం = కనుగొను_special_కీలకం(srcp, &modifiers, flags, did_simplify);
+    ఒకవేళ (కీలకం == 0)
+	తిరిగి 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    తిరిగి special_గమ్యం_buf(కీలకం, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1338,33 +1338,33 @@ trans_special(
  * The sequence is not NUL terminated.
  * This is how characters in a string are encoded.
  */
-    int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+    పూర్ణాంకం
+special_గమ్యం_buf(పూర్ణాంకం కీలకం, పూర్ణాంకం modifiers, పూర్ణాంకం escape_ks, char_u *dst)
 {
-    int		dlen = 0;
+    పూర్ణాంకం		dlen = 0;
 
     // Put the appropriate modifier in a string
-    if (modifiers != 0)
+    ఒకవేళ (modifiers != 0)
     {
 	dst[dlen++] = K_SPECIAL;
 	dst[dlen++] = KS_MODIFIER;
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    ఒకవేళ (IS_SPECIAL(కీలకం))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(కీలకం);
+	dst[dlen++] = KEY2TERMCAP1(కీలకం);
     }
-    else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
-    else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
-    else
-	dst[dlen++] = key;
+    లేకపోతే ఒకవేళ (escape_ks)
+	dlen = (పూర్ణాంకం)(కూడు_char2buf(కీలకం, dst + dlen) - dst);
+    లేకపోతే ఒకవేళ (has_mbyte)
+	dlen += (*mb_char2bytes)(కీలకం, dst + dlen);
+    లేకపోతే
+	dst[dlen++] = కీలకం;
 
-    return dlen;
+    తిరిగి dlen;
 }
 
 /*
@@ -1373,121 +1373,121 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * "srcp" is advanced to after the <> name.
  * returns 0 if there is no match.
  */
-    int
-find_special_key(
+    పూర్ణాంకం
+కనుగొను_special_కీలకం(
     char_u	**srcp,
-    int		*modp,
-    int		flags,		// FSK_ values
-    int		*did_simplify)  // found <C-H> or <A-x>
+    పూర్ణాంకం		*modp,
+    పూర్ణాంకం		flags,		// FSK_ values
+    పూర్ణాంకం		*did_simplify)  // found <C-H> or <A-x>
 {
-    char_u	*last_dash;
-    char_u	*end_of_name;
+    char_u	*చివరి_dash;
+    char_u	*చివర_యొక్క_name;
     char_u	*src;
     char_u	*bp;
-    int		in_string = flags & FSK_IN_STRING;
-    int		modifiers;
-    int		bit;
-    int		key;
+    పూర్ణాంకం		లోపల_string = flags & FSK_లోపల_STRING;
+    పూర్ణాంకం		modifiers;
+    పూర్ణాంకం		బిట్టు;
+    పూర్ణాంకం		కీలకం;
     uvarnumber_T	n;
-    int		l;
+    పూర్ణాంకం		l;
 
     src = *srcp;
-    if (src[0] != '<')
-	return 0;
-    if (src[1] == '*')	    // <*xxx>: do not simplify
+    ఒకవేళ (src[0] != '<')
+	తిరిగి 0;
+    ఒకవేళ (src[1] == '*')	    // <*xxx>: do not simplify
 	++src;
 
     // Find end of modifier list
-    last_dash = src;
-    for (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
+    చివరి_dash = src;
+    కొరకు (bp = src + 1; *bp == '-' || vim_is_సాధారణ_IDc(*bp); bp++)
     {
-	if (*bp == '-')
+	ఒకవేళ (*bp == '-')
 	{
-	    last_dash = bp;
-	    if (bp[1] != NUL)
+	    చివరి_dash = bp;
+	    ఒకవేళ (bp[1] != NUL)
 	    {
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		    l = mb_ptr2len(bp + 1);
-		else
+		లేకపోతే
 		    l = 1;
 		// Anything accepted, like <C-?>.
 		// <C-"> or <M-"> are not special in strings as " is
 		// the string delimiter. With a backslash it works: <M-\">
-		if (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
+		ఒకవేళ (!(లోపల_string && bp[1] == '"') && bp[l + 1] == '>')
 		    bp += l;
-		else if (in_string && bp[1] == '\\' && bp[2] == '"'
+		లేకపోతే ఒకవేళ (లోపల_string && bp[1] == '\\' && bp[2] == '"'
 							   && bp[3] == '>')
 		    bp += 2;
 	    }
 	}
-	if (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
+	ఒకవేళ (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
 	    bp += 3;	// skip t_xx, xx may be '-' or '>'
-	else if (STRNICMP(bp, "char-", 5) == 0)
+	లేకపోతే ఒకవేళ (STRNICMP(bp, "char-", 5) == 0)
 	{
-	    vim_str2nr(bp + 5, NULL, &l, STR2NR_ALL, NULL, NULL, 0, TRUE, NULL);
-	    if (l == 0)
+	    vim_str2nr(bp + 5, ఖాళీ, &l, STR2NR_ALL, ఖాళీ, ఖాళీ, 0, TRUE, ఖాళీ);
+	    ఒకవేళ (l == 0)
 	    {
-		emsg(_(e_invalid_argument));
-		return 0;
+		emsg(_(e_invalid_వాదం));
+		తిరిగి 0;
 	    }
 	    bp += l + 5;
-	    break;
+	    ఆపు;
 	}
     }
 
-    if (*bp == '>')	// found matching '>'
+    ఒకవేళ (*bp == '>')	// found matching '>'
     {
-	end_of_name = bp + 1;
+	చివర_యొక్క_name = bp + 1;
 
 	// Which modifiers are given?
 	modifiers = 0x0;
-	for (bp = src + 1; bp < last_dash; bp++)
+	కొరకు (bp = src + 1; bp < చివరి_dash; bp++)
 	{
-	    if (*bp != '-')
+	    ఒకవేళ (*bp != '-')
 	    {
-		bit = name_to_mod_mask(*bp);
-		if (bit == 0x0)
-		    break;	// Illegal modifier name
-		modifiers |= bit;
+		బిట్టు = name_గమ్యం_mod_ముసుగు(*bp);
+		ఒకవేళ (బిట్టు == 0x0)
+		    ఆపు;	// Illegal modifier name
+		modifiers |= బిట్టు;
 	    }
 	}
 
 	/*
 	 * Legal modifier name.
 	 */
-	if (bp >= last_dash)
+	ఒకవేళ (bp >= చివరి_dash)
 	{
-	    if (STRNICMP(last_dash + 1, "char-", 5) == 0
-						 && VIM_ISDIGIT(last_dash[6]))
+	    ఒకవేళ (STRNICMP(చివరి_dash + 1, "char-", 5) == 0
+						 && VIM_ISDIGIT(చివరి_dash[6]))
 	    {
 		// <Char-123> or <Char-033> or <Char-0x33>
-		vim_str2nr(last_dash + 6, NULL, &l, STR2NR_ALL, NULL,
-							    &n, 0, TRUE, NULL);
-		if (l == 0)
+		vim_str2nr(చివరి_dash + 6, ఖాళీ, &l, STR2NR_ALL, ఖాళీ,
+							    &n, 0, TRUE, ఖాళీ);
+		ఒకవేళ (l == 0)
 		{
-		    emsg(_(e_invalid_argument));
-		    return 0;
+		    emsg(_(e_invalid_వాదం));
+		    తిరిగి 0;
 		}
-		key = (int)n;
+		కీలకం = (పూర్ణాంకం)n;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		int off = 1;
+		పూర్ణాంకం off = 1;
 
 		// Modifier with single letter, or special key name.
-		if (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
+		ఒకవేళ (లోపల_string && చివరి_dash[1] == '\\' && చివరి_dash[2] == '"')
 		    off = 2;
-		if (has_mbyte)
-		    l = mb_ptr2len(last_dash + off);
-		else
+		ఒకవేళ (has_mbyte)
+		    l = mb_ptr2len(చివరి_dash + off);
+		లేకపోతే
 		    l = 1;
-		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
-		else
+		ఒకవేళ (modifiers != 0 && చివరి_dash[l + off] == '>')
+		    కీలకం = PTR2CHAR(చివరి_dash + off);
+		లేకపోతే
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    కీలకం = get_special_కీలకం_సంకేతం(చివరి_dash + off);
+		    ఒకవేళ (!(flags & FSK_KEEP_X_కీలకం))
+			కీలకం = handle_x_కీలకాలు(కీలకం);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    ఒకవేళ (కీలకం != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		కీలకం = simplify_కీలకం(కీలకం, &modifiers);
 
-		if ((flags & FSK_KEYCODE) == 0)
+		ఒకవేళ ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    ఒకవేళ (కీలకం == K_BS)
+			కీలకం = BS;
+		    లేకపోతే ఒకవేళ (కీలకం == K_DEL || కీలకం == K_KDEL)
+			కీలకం = DEL;
 		}
-		else if (key == 27
+		లేకపోతే ఒకవేళ (కీలకం == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1520,27 +1520,27 @@ find_special_key(
 		    // Esc character.  For the simplified keys use the Esc
 		    // character and set did_simplify, then in the
 		    // non-simplified keys use K_ESC.
-		    if ((flags & FSK_SIMPLIFY) != 0)
+		    ఒకవేళ ((flags & FSK_SIMPLIFY) != 0)
 		    {
-			if (did_simplify != NULL)
+			ఒకవేళ (did_simplify != ఖాళీ)
 			    *did_simplify = TRUE;
 		    }
-		    else
-			key = K_ESC;
+		    లేకపోతే
+			కీలకం = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		ఒకవేళ (!IS_SPECIAL(కీలకం))
+		    కీలకం = వెలికితీయి_modifiers(కీలకం, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
-		*srcp = end_of_name;
-		return key;
+		*srcp = చివర_యొక్క_name;
+		తిరిగి కీలకం;
 	    }
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 
@@ -1554,33 +1554,33 @@ find_special_key(
  * use "H".
  * Returns the possibly adjusted key.
  */
-    int
-may_adjust_key_for_ctrl(int modifiers, int key)
+    పూర్ణాంకం
+may_adjust_కీలకం_for_ctrl(పూర్ణాంకం modifiers, పూర్ణాంకం కీలకం)
 {
-    if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+    ఒకవేళ ((modifiers & MOD_ముసుగు_CTRL) == 0)
+	తిరిగి కీలకం;
 
-    if (ASCII_ISALPHA(key))
+    ఒకవేళ (ASCII_ISALPHA(కీలకం))
     {
-#ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
-#endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+#నిర్వచితమైతే FEAT_TERMINAL
+	check_no_reduce_కీలకాలు();  // may update the no_reduce_keys flag
+#అయితే_ముగింపు
+	తిరిగి no_reduce_కీలకాలు == 0 ? TOUPPER_ASC(కీలకం) : కీలకం;
     }
-    if (key == '2')
-	return '@';
-    if (key == '6')
-	return '^';
-    if (key == '-')
-	return '_';
+    ఒకవేళ (కీలకం == '2')
+	తిరిగి '@';
+    ఒకవేళ (కీలకం == '6')
+	తిరిగి '^';
+    ఒకవేళ (కీలకం == '-')
+	తిరిగి '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
-	return ']';
+    ఒకవేళ (కీలకం == '$' && (modifiers & MOD_ముసుగు_జరుపు) == 0)
+	తిరిగి ']';
 
-    return key;
+    తిరిగి కీలకం;
 }
 
 /*
@@ -1591,27 +1591,27 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * This includes all printable ASCII characters except a-z.
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
-    int
-may_remove_shift_modifier(int modifiers, int key)
+    పూర్ణాంకం
+may_remove_జరుపు_modifier(పూర్ణాంకం modifiers, పూర్ణాంకం కీలకం)
 {
-    if ((modifiers == MOD_MASK_SHIFT
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
-#ifdef FEAT_GUI_GTK
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
-#endif
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
-	return modifiers & ~MOD_MASK_SHIFT;
+    ఒకవేళ ((modifiers == MOD_ముసుగు_జరుపు
+		|| modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_ALT)
+#నిర్వచితమైతే FEAT_GUI_GTK
+		|| modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_CMD)
+#అయితే_ముగింపు
+		|| modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_META))
+	    && ((కీలకం >= '!' && కీలకం <= '/')
+		|| (కీలకం >= ':' && కీలకం <= 'Z')
+		|| vim_isdigit(కీలకం)
+		|| (కీలకం >= '[' && కీలకం <= '`')
+		|| (కీలకం >= '{' && కీలకం <= '~')))
+	తిరిగి modifiers & ~MOD_ముసుగు_జరుపు;
 
-    if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
-	return modifiers & ~MOD_MASK_SHIFT;
+    ఒకవేళ (modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_CTRL)
+		&& (కీలకం == '{' || కీలకం == '}' || కీలకం == '|'))
+	తిరిగి modifiers & ~MOD_ముసుగు_జరుపు;
 
-    return modifiers;
+    తిరిగి modifiers;
 }
 
 /*
@@ -1621,73 +1621,73 @@ may_remove_shift_modifier(int modifiers, int key)
  * When "simplify" is TRUE and Ctrl or Alt is removed from modifiers set
  * "did_simplify" when it's not NULL.
  */
-    int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+    పూర్ణాంకం
+వెలికితీయి_modifiers(పూర్ణాంకం కీలకం, పూర్ణాంకం *modp, పూర్ణాంకం simplify, పూర్ణాంకం *did_simplify)
 {
-    int	modifiers = *modp;
+    పూర్ణాంకం	modifiers = *modp;
 
-#ifdef MACOS_X
+#నిర్వచితమైతే MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
-#endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    ఒకవేళ (!(modifiers & MOD_ముసుగు_CMD))
+#అయితే_ముగింపు
+    ఒకవేళ ((modifiers & MOD_ముసుగు_జరుపు) && ASCII_ISALPHA(కీలకం))
     {
-	key = TOUPPER_ASC(key);
+	కీలకం = TOUPPER_ASC(కీలకం);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
-	if (simplify || modifiers == MOD_MASK_SHIFT
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    modifiers &= ~MOD_MASK_SHIFT;
+	ఒకవేళ (simplify || modifiers == MOD_ముసుగు_జరుపు
+		|| modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_ALT)
+		|| modifiers == (MOD_ముసుగు_జరుపు | MOD_ముసుగు_META))
+	    modifiers &= ~MOD_ముసుగు_జరుపు;
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    ఒకవేళ ((modifiers & MOD_ముసుగు_CTRL) && ASCII_ISALPHA(కీలకం))
+	కీలకం = TOUPPER_ASC(కీలకం);
 
-    if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+    ఒకవేళ (simplify && (modifiers & MOD_ముసుగు_CTRL)
+	    && ((కీలకం >= '?' && కీలకం <= '_') || ASCII_ISALPHA(కీలకం)))
     {
-	key = Ctrl_chr(key);
-	modifiers &= ~MOD_MASK_CTRL;
+	కీలకం = Ctrl_chr(కీలకం);
+	modifiers &= ~MOD_ముసుగు_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
-	if (did_simplify != NULL)
+	ఒకవేళ (కీలకం == NUL)
+	    కీలకం = K_ZERO;
+	ఒకవేళ (did_simplify != ఖాళీ)
 	    *did_simplify = TRUE;
     }
 
-#ifdef MACOS_X
+#నిర్వచితమైతే MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
-#endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    ఒకవేళ (!(modifiers & MOD_ముసుగు_CMD))
+#అయితే_ముగింపు
+    ఒకవేళ (simplify && (modifiers & MOD_ముసుగు_ALT) && కీలకం < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
-	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
-	if (did_simplify != NULL)
+	కీలకం |= 0x80;
+	modifiers &= ~MOD_ముసుగు_ALT;	// remove the META modifier
+	ఒకవేళ (did_simplify != ఖాళీ)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    తిరిగి కీలకం;
 }
 
 /*
  * Try to find key "c" in the special key table.
  * Return the index when found, -1 when not found.
  */
-    int
-find_special_key_in_table(int c)
+    పూర్ణాంకం
+కనుగొను_special_కీలకం_లోపల_పట్టిక(పూర్ణాంకం c)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(కీలకం_పేర్లు_పట్టిక); i++)
+	ఒకవేళ (c == కీలకం_పేర్లు_పట్టిక[i].కీలకం && !కీలకం_పేర్లు_పట్టిక[i].is_alt)
+	    తిరిగి కీలకం_పేర్లు_పట్టిక[i].enabled ? i : -1;
 
-    return -1;
+    తిరిగి -1;
 }
 
 
@@ -1700,38 +1700,38 @@ find_special_key_in_table(int c)
  * 'LeftMouse'.
  * These characters are identified by vim_isNormalIDc().
  */
-    static int
-cmp_key_name_entry(const void *a, const void *b)
+    స్థిర పూర్ణాంకం
+cmp_కీలకం_name_నమోదు(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
-    int	    result = 0;
+    char_u  *p1 = ((నిర్మాణం కీలకం_name_నమోదు *)a)->name.string;
+    char_u  *p2 = ((నిర్మాణం కీలకం_name_నమోదు *)b)->name.string;
+    పూర్ణాంకం	    ఫలితం = 0;
 
-    if (p1 == p2)
-	return 0;
+    ఒకవేళ (p1 == p2)
+	తిరిగి 0;
 
-    while (vim_isNormalIDc(*p1) && *p2 != NUL)
+    అయితే (vim_is_సాధారణ_IDc(*p1) && *p2 != NUL)
     {
-	if ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
-	    break;
+	ఒకవేళ ((ఫలితం = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
+	    ఆపు;
 	++p1;
 	++p2;
     }
 
-    if (result == 0)
+    ఒకవేళ (ఫలితం == 0)
     {
-	if (*p2 == NUL)
+	ఒకవేళ (*p2 == NUL)
 	{
-	    if (vim_isNormalIDc(*p1))
-		result = 1;
+	    ఒకవేళ (vim_is_సాధారణ_IDc(*p1))
+		ఫలితం = 1;
 	}
-	else
+	లేకపోతే
 	{
-	    result = -1;
+	    ఫలితం = -1;
 	}
     }
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -1741,99 +1741,99 @@ cmp_key_name_entry(const void *a, const void *b)
  * termcap name.
  * Return the key code, or 0 if not found.
  */
-    int
-get_special_key_code(char_u *name)
+    పూర్ణాంకం
+get_special_కీలకం_సంకేతం(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
      */
-    if (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
+    ఒకవేళ (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
     {
 	char_u  string[3];
 
 	string[0] = name[2];
 	string[1] = name[3];
 	string[2] = NUL;
-	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	ఒకవేళ (కూడు_termcap_నమోదు(string, FALSE) == OK)
+	    తిరిగి TERMCAP2_కీలకం(name[2], name[3]);
     }
-    else
+    లేకపోతే
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	నిర్మాణం కీలకం_name_నమోదు	లక్ష్యం;
+	నిర్మాణం కీలకం_name_నమోదు	*నమోదు_2;
 
-	target.enabled = TRUE;
-	target.key = 0;
-	target.name.string = name;
-	target.name.length = 0;
+	లక్ష్యం.enabled = TRUE;
+	లక్ష్యం.కీలకం = 0;
+	లక్ష్యం.name.string = name;
+	లక్ష్యం.name.నిడివి = 0;
 
-	entry = (struct key_name_entry *)bsearch(
-	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
-	if (entry != NULL && entry->enabled)
+	నమోదు_2 = (నిర్మాణం కీలకం_name_నమోదు *)bsearch(
+	    &లక్ష్యం,
+	    &కీలకం_పేర్లు_పట్టిక,
+	    ARRAY_నిడివి(కీలకం_పేర్లు_పట్టిక),
+	    పరిమాణం(కీలకం_పేర్లు_పట్టిక[0]),
+	    cmp_కీలకం_name_నమోదు);
+	ఒకవేళ (నమోదు_2 != ఖాళీ && నమోదు_2->enabled)
 	{
-	    int key = entry->key;
+	    పూర్ణాంకం కీలకం = నమోదు_2->కీలకం;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    తిరిగి కీలకం == K_TAB ? TAB : కీలకం;
 	}
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
     char_u *
-get_key_name(int i)
+get_కీలకం_name(పూర్ణాంకం i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
-	return NULL;
+    ఒకవేళ (i < 0 || i >= (పూర్ణాంకం)ARRAY_నిడివి(కీలకం_పేర్లు_పట్టిక))
+	తిరిగి ఖాళీ;
 
-    return key_names_table[i].name.string;
+    తిరిగి కీలకం_పేర్లు_పట్టిక[i].name.string;
 }
 
 /*
  * Return the current end-of-line type: EOL_DOS, EOL_UNIX or EOL_MAC.
  */
-    int
+    పూర్ణాంకం
 get_fileformat(buf_T *buf)
 {
-    int		c = *buf->b_p_ff;
+    పూర్ణాంకం		c = *buf->b_p_ff;
 
-    if (buf->b_p_bin || c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    ఒకవేళ (buf->b_p_bin || c == 'u')
+	తిరిగి EOL_UNIX;
+    ఒకవేళ (c == 'm')
+	తిరిగి EOL_MAC;
+    తిరిగి EOL_DOS;
 }
 
 /*
  * Like get_fileformat(), but override 'fileformat' with "p" for "++opt=val"
  * argument.
  */
-    int
+    పూర్ణాంకం
 get_fileformat_force(
     buf_T	*buf,
     exarg_T	*eap)	    // can be NULL!
 {
-    int		c;
+    పూర్ణాంకం		c;
 
-    if (eap != NULL && eap->force_ff != 0)
+    ఒకవేళ (eap != ఖాళీ && eap->force_ff != 0)
 	c = eap->force_ff;
-    else
+    లేకపోతే
     {
-	if ((eap != NULL && eap->force_bin != 0)
+	ఒకవేళ ((eap != ఖాళీ && eap->force_bin != 0)
 			       ? (eap->force_bin == FORCE_BIN) : buf->b_p_bin)
-	    return EOL_UNIX;
+	    తిరిగి EOL_UNIX;
 	c = *buf->b_p_ff;
     }
-    if (c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    ఒకవేళ (c == 'u')
+	తిరిగి EOL_UNIX;
+    ఒకవేళ (c == 'm')
+	తిరిగి EOL_MAC;
+    తిరిగి EOL_DOS;
 }
 
 /*
@@ -1841,131 +1841,131 @@ get_fileformat_force(
  * Sets both 'textmode' and 'fileformat'.
  * Note: Does _not_ set global value of 'textmode'!
  */
-    void
-set_fileformat(
-    int		t,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    శూన్య
+సమితి_fileformat(
+    పూర్ణాంకం		t,
+    పూర్ణాంకం		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    char	*p = NULL;
+    అక్షరం	*p = ఖాళీ;
 
-    switch (t)
+    ఎంపిక (t)
     {
-    case EOL_DOS:
+    స్థితి EOL_DOS:
 	p = FF_DOS;
 	curbuf->b_p_tx = TRUE;
-	break;
-    case EOL_UNIX:
+	ఆపు;
+    స్థితి EOL_UNIX:
 	p = FF_UNIX;
 	curbuf->b_p_tx = FALSE;
-	break;
-    case EOL_MAC:
+	ఆపు;
+    స్థితి EOL_MAC:
 	p = FF_MAC;
 	curbuf->b_p_tx = FALSE;
-	break;
+	ఆపు;
     }
-    if (p != NULL)
-	set_string_option_direct((char_u *)"ff", -1, (char_u *)p,
+    ఒకవేళ (p != ఖాళీ)
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ff", -1, (char_u *)p,
 						     OPT_FREE | opt_flags, 0);
 
     // This may cause the buffer to become (un)modified.
-    check_status(curbuf);
+    check_స్థితి(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#అయితే_ముగింపు
     need_maketitle = TRUE;	    // set window title later
 }
 
 /*
  * Return the default fileformat from 'fileformats'.
  */
-    int
-default_fileformat(void)
+    పూర్ణాంకం
+default_fileformat(శూన్య)
 {
-    switch (*p_ffs)
+    ఎంపిక (*p_ffs)
     {
-	case 'm':   return EOL_MAC;
-	case 'd':   return EOL_DOS;
+	స్థితి 'm':   తిరిగి EOL_MAC;
+	స్థితి 'd':   తిరిగి EOL_DOS;
     }
-    return EOL_UNIX;
+    తిరిగి EOL_UNIX;
 }
 
 /*
  * Call shell.	Calls mch_call_shell, with 'shellxquote' added.
  */
-    int
-call_shell(char_u *cmd, int opt)
+    పూర్ణాంకం
+call_shell(char_u *cmd, పూర్ణాంకం opt)
 {
-    int		retval;
-#ifdef FEAT_PROFILE
-    proftime_T	wait_time;
-#endif
+    పూర్ణాంకం		retval;
+#నిర్వచితమైతే FEAT_PROFILE
+    proftime_T	wait_సమయం;
+#అయితే_ముగింపు
 
-    if (p_verbose > 3)
+    ఒకవేళ (p_verbose > 3)
     {
 	verbose_enter();
-	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	smsg(_("Calling shell to execute: \"%s\""), cmd == ఖాళీ ? p_sh : cmd);
+	సందేశం_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
 
-#ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_enter(&wait_time);
-#endif
+#నిర్వచితమైతే FEAT_PROFILE
+    ఒకవేళ (do_profiling == PROF_YES)
+	prof_బిడ్డ_enter(&wait_సమయం);
+#అయితే_ముగింపు
 
-    if (*p_sh == NUL)
+    ఒకవేళ (*p_sh == NUL)
     {
-	emsg(_(e_shell_option_is_empty));
+	emsg(_(e_shell_option_is_ఖాళీలు));
 	retval = -1;
     }
-    else
+    లేకపోతే
     {
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 	// Don't hide the pointer while executing a shell command.
 	gui_mch_mousehide(FALSE);
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
 	++hold_gui_events;
-#endif
+#అయితే_ముగింపు
 	// The external command may update a tags file, clear cached tags.
-	tag_freematch();
+	ట్యాగ్_freematch();
 
-	if (cmd == NULL || *p_sxq == NUL)
+	ఒకవేళ (cmd == ఖాళీ || *p_sxq == NUL)
 	    retval = mch_call_shell(cmd, opt);
-	else
+	లేకపోతే
 	{
 	    char_u  *ncmd;
 	    size_t  ncmdsize;
 	    char_u  *ecmd = cmd;
 
-	    if (*p_sxe != NUL && *p_sxq == '(')
+	    ఒకవేళ (*p_sxe != NUL && *p_sxq == '(')
 	    {
 		ecmd = vim_strsave_escaped_ext(cmd, p_sxe, '^', FALSE);
-		if (ecmd == NULL)
+		ఒకవేళ (ecmd == ఖాళీ)
 		    ecmd = cmd;
 	    }
 	    ncmdsize = STRLEN(ecmd) + STRLEN(p_sxq) * 2 + 1;
 	    ncmd = alloc(ncmdsize);
-	    if (ncmd != NULL)
+	    ఒకవేళ (ncmd != ఖాళీ)
 	    {
 		// When 'shellxquote' is ( append ).
 		// When 'shellxquote' is "( append )".
-		vim_snprintf((char *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
+		vim_snprintf((అక్షరం *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
 		    : *p_sxq == '"' && *(p_sxq+1) == '(' ? (char_u *)")\""
 		    : p_sxq);
 		retval = mch_call_shell(ncmd, opt);
 		vim_free(ncmd);
 	    }
-	    else
+	    లేకపోతే
 		retval = -1;
-	    if (ecmd != cmd)
+	    ఒకవేళ (ecmd != cmd)
 		vim_free(ecmd);
 	}
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	--hold_gui_events;
-#endif
+#అయితే_ముగింపు
 	/*
 	 * Check the window size, in case it changed while executing the
 	 * external command.
@@ -1973,15 +1973,15 @@ call_shell(char_u *cmd, int opt)
 	shell_resized_check();
     }
 
-#ifdef FEAT_EVAL
-    set_vim_var_nr(VV_SHELL_ERROR, (long)retval);
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_nr(VV_SHELL_ERROR, (దీర్ఘ)retval);
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_exit(&wait_time);
+    ఒకవేళ (do_profiling == PROF_YES)
+	prof_బిడ్డ_exit(&wait_సమయం);
 # endif
-#endif
+#అయితే_ముగింపు
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1989,21 +1989,21 @@ call_shell(char_u *cmd, int opt)
  * equal to MODE_NORMAL State with a condition.  This function returns the real
  * State.
  */
-    int
-get_real_state(void)
+    పూర్ణాంకం
+get_real_state(శూన్య)
 {
-    if (State & MODE_NORMAL)
+    ఒకవేళ (State & బహుళకం_సాధారణ)
     {
-	if (VIsual_active)
+	ఒకవేళ (VIsual_చురుకైన)
 	{
-	    if (VIsual_select)
-		return MODE_SELECT;
-	    return MODE_VISUAL;
+	    ఒకవేళ (VIsual_select)
+		తిరిగి బహుళకం_SELECT;
+	    తిరిగి బహుళకం_VISUAL;
 	}
-	else if (finish_op)
-	    return MODE_OP_PENDING;
+	లేకపోతే ఒకవేళ (ముగింపు_op)
+	    తిరిగి బహుళకం_OP_PENDING;
     }
-    return State;
+    తిరిగి State;
 }
 
 /*
@@ -2011,18 +2011,18 @@ get_real_state(void)
  * Takes care of multi-byte characters.
  * "b" must point to the start of the file name
  */
-    int
+    పూర్ణాంకం
 after_pathsep(char_u *b, char_u *p)
 {
-    return p > b && vim_ispathsep(p[-1])
-			     && (!has_mbyte || (*mb_head_off)(b, p - 1) == 0);
+    తిరిగి p > b && vim_ispathsep(p[-1])
+			     && (!has_mbyte || (*mb_తల_off)(b, p - 1) == 0);
 }
 
 /*
  * Return TRUE if file names "f1" and "f2" are in the same directory.
  * "f1" may be a short name, "f2" must be a full path.
  */
-    int
+    పూర్ణాంకం
 same_directory(char_u *f1, char_u *f2)
 {
     char_u	ffname[MAXPATHL];
@@ -2030,17 +2030,17 @@ same_directory(char_u *f1, char_u *f2)
     char_u	*t2;
 
     // safety check
-    if (f1 == NULL || f2 == NULL)
-	return FALSE;
+    ఒకవేళ (f1 == ఖాళీ || f2 == ఖాళీ)
+	తిరిగి FALSE;
 
-    (void)vim_FullName(f1, ffname, MAXPATHL, FALSE);
+    (శూన్య)vim_నిండిన_Name(f1, ffname, MAXPATHL, FALSE);
     t1 = gettail_sep(ffname);
     t2 = gettail_sep(f2);
-    return (t1 - ffname == t2 - f2
-	     && pathcmp((char *)ffname, (char *)f2, (int)(t1 - ffname)) == 0);
+    తిరిగి (t1 - ffname == t2 - f2
+	     && pathcmp((అక్షరం *)ffname, (అక్షరం *)f2, (పూర్ణాంకం)(t1 - ffname)) == 0);
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
+#ఒకవేళ defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
 	|| defined(MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_NETBEANS_INTG)
 /*
@@ -2048,72 +2048,72 @@ same_directory(char_u *f1, char_u *f2)
  * Caller must call shorten_fnames()!
  * Return OK or FAIL.
  */
-    int
-vim_chdirfile(char_u *fname, char *trigger_autocmd)
+    పూర్ణాంకం
+vim_chdirfile(char_u *fname, అక్షరం *trigger_autocmd)
 {
     char_u	old_dir[MAXPATHL];
     char_u	new_dir[MAXPATHL];
 
-    if (mch_dirname(old_dir, MAXPATHL) != OK)
+    ఒకవేళ (mch_dirname(old_dir, MAXPATHL) != OK)
 	*old_dir = NUL;
 
     vim_strncpy(new_dir, fname, MAXPATHL - 1);
     *gettail_sep(new_dir) = NUL;
 
-    if (pathcmp((char *)old_dir, (char *)new_dir, -1) == 0)
+    ఒకవేళ (pathcmp((అక్షరం *)old_dir, (అక్షరం *)new_dir, -1) == 0)
 	// nothing to do
-	return OK;
+	తిరిగి OK;
 
-    if (trigger_autocmd != NULL)
-	trigger_DirChangedPre((char_u *)trigger_autocmd, new_dir);
+    ఒకవేళ (trigger_autocmd != ఖాళీ)
+	trigger_Dir_మారింది_Pre((char_u *)trigger_autocmd, new_dir);
 
-    if (mch_chdir((char *)new_dir) != 0)
-	return FAIL;
+    ఒకవేళ (mch_chdir((అక్షరం *)new_dir) != 0)
+	తిరిగి FAIL;
 
-    if (trigger_autocmd != NULL)
+    ఒకవేళ (trigger_autocmd != ఖాళీ)
 	apply_autocmds(EVENT_DIRCHANGED, (char_u *)trigger_autocmd,
 						       new_dir, FALSE, curbuf);
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(STAT_IGNORES_SLASH)
+#ఒకవేళ defined(STAT_IGNORES_SLASH)
 /*
  * Check if "name" ends in a slash and is not a directory.
  * Used for systems where stat() ignores a trailing slash on a file name.
  * The Vim code assumes a trailing slash is only ignored for a directory.
  */
-    static int
-illegal_slash(const char *name)
+    స్థిర పూర్ణాంకం
+illegal_slash(స్థిరరాశి అక్షరం *name)
 {
-    if (name[0] == NUL)
-	return FALSE;	    // no file name is not illegal
-    if (name[strlen(name) - 1] != '/')
-	return FALSE;	    // no trailing slash
-    if (mch_isdir((char_u *)name))
-	return FALSE;	    // trailing slash for a directory
-    return TRUE;
+    ఒకవేళ (name[0] == NUL)
+	తిరిగి FALSE;	    // no file name is not illegal
+    ఒకవేళ (name[అక్షరశ్రేణి_పొడవు(name) - 1] != '/')
+	తిరిగి FALSE;	    // no trailing slash
+    ఒకవేళ (mch_isdir((char_u *)name))
+	తిరిగి FALSE;	    // trailing slash for a directory
+    తిరిగి TRUE;
 }
 
 /*
  * Special implementation of mch_stat() for Solaris.
  */
-    int
-vim_stat(const char *name, stat_T *stp)
+    పూర్ణాంకం
+vim_stat(స్థిరరాశి అక్షరం *name, stat_T *stp)
 {
     // On Solaris stat() accepts "file/" as if it was "file".  Return -1 if
     // the name ends in "/" and it's not a directory.
-    return illegal_slash(name) ? -1 : stat(name, stp);
+    తిరిగి illegal_slash(name) ? -1 : stat(name, stp);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(CURSOR_SHAPE)
+#ఒకవేళ defined(CURSOR_SHAPE)
 
 /*
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_పట్టిక[SHAPE_IDX_లెక్క] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2142,7 +2142,7 @@ cursorentry_T shape_table[SHAPE_IDX_COUNT] =
  * Table with names for mouse shapes.  Keep in sync with all the tables for
  * mch_set_mouse_shape()!.
  */
-static string_T mshape_names[] =
+స్థిర string_T mshape_పేర్లు[] =
 {
     STR_LITERAL_INIT("arrow"),	// default, must be the first one
     STR_LITERAL_INIT("blank"),	// hidden
@@ -2160,10 +2160,10 @@ static string_T mshape_names[] =
     STR_LITERAL_INIT("question"),
     STR_LITERAL_INIT("rightup-arrow"),
     STR_LITERAL_INIT("up-arrow"),
-    {NULL, 0}
+    {ఖాళీ, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_పేర్లు_లెక్క  (ARRAY_నిడివి(mshape_పేర్లు) - 1)
 # endif
 
 /*
@@ -2171,127 +2171,127 @@ static string_T mshape_names[] =
  * ("what" is SHAPE_MOUSE).
  * Returns error message for an illegal option, NULL otherwise.
  */
-    char *
-parse_shape_opt(int what)
+    అక్షరం *
+parse_shape_opt(పూర్ణాంకం what)
 {
     char_u	*modep;
     char_u	*colonp;
     char_u	*commap;
     char_u	*slashp;
     char_u	*p, *endp;
-    int		idx = 0;		// init for GCC
-    int		all_idx;
-    int		len;
-    int		i;
-    long	n;
-    int		found_ve = FALSE;	// found "ve" flag
-    int		round;
+    పూర్ణాంకం		idx = 0;		// init for GCC
+    పూర్ణాంకం		all_idx;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    దీర్ఘ	n;
+    పూర్ణాంకం		దొరికింది_ve = FALSE;	// found "ve" flag
+    పూర్ణాంకం		విడత;
 
     /*
      * First round: check for errors; second round: do it for real.
      */
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
 	/*
 	 * Repeat for all comma separated parts.
 	 */
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	ఒకవేళ (what == SHAPE_MOUSE)
 	    modep = p_mouseshape;
-	else
+	లేకపోతే
 # endif
 	    modep = p_guicursor;
-	while (*modep != NUL)
+	అయితే (*modep != NUL)
 	{
 	    colonp = vim_strchr(modep, ':');
 	    commap = vim_strchr(modep, ',');
 
-	    if (colonp == NULL || (commap != NULL && commap < colonp))
-		return e_missing_colon_2;
-	    if (colonp == modep)
-		return e_illegal_mode;
+	    ఒకవేళ (colonp == ఖాళీ || (commap != ఖాళీ && commap < colonp))
+		తిరిగి e_missing_colon_2;
+	    ఒకవేళ (colonp == modep)
+		తిరిగి e_illegal_బహుళకం;
 
 	    /*
 	     * Repeat for all mode's before the colon.
 	     * For the 'a' mode, we loop to handle all the modes.
 	     */
 	    all_idx = -1;
-	    while (modep < colonp || all_idx >= 0)
+	    అయితే (modep < colonp || all_idx >= 0)
 	    {
-		if (all_idx < 0)
+		ఒకవేళ (all_idx < 0)
 		{
 		    // Find the mode.
-		    if (modep[1] == '-' || modep[1] == ':')
+		    ఒకవేళ (modep[1] == '-' || modep[1] == ':')
 			len = 1;
-		    else
+		    లేకపోతే
 			len = 2;
-		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
-		    else
+		    ఒకవేళ (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
+			all_idx = SHAPE_IDX_లెక్క - 1;
+		    లేకపోతే
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
-			    if (STRNICMP(modep, shape_table[idx].name, len)
+			కొరకు (idx = 0; idx < SHAPE_IDX_లెక్క; ++idx)
+			    ఒకవేళ (STRNICMP(modep, shape_పట్టిక[idx].name, len)
 									 == 0)
-				break;
-			if (idx == SHAPE_IDX_COUNT
-				   || (shape_table[idx].used_for & what) == 0)
-			    return e_illegal_mode;
-			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
-			    found_ve = TRUE;
+				ఆపు;
+			ఒకవేళ (idx == SHAPE_IDX_లెక్క
+				   || (shape_పట్టిక[idx].వాడిన_for & what) == 0)
+			    తిరిగి e_illegal_బహుళకం;
+			ఒకవేళ (len == 2 && modep[0] == 'v' && modep[1] == 'e')
+			    దొరికింది_ve = TRUE;
 		    }
 		    modep += len + 1;
 		}
 
-		if (all_idx >= 0)
+		ఒకవేళ (all_idx >= 0)
 		    idx = all_idx--;
-		else if (round == 2)
+		లేకపోతే ఒకవేళ (విడత == 2)
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    ఒకవేళ (what == SHAPE_MOUSE)
 		    {
 			// Set the default, for the missing parts
-			shape_table[idx].mshape = 0;
+			shape_పట్టిక[idx].mshape = 0;
 		    }
-		    else
+		    లేకపోతే
 # endif
 		    {
 			// Set the defaults, for the missing parts
-			shape_table[idx].shape = SHAPE_BLOCK;
-			shape_table[idx].blinkwait = 700L;
-			shape_table[idx].blinkon = 400L;
-			shape_table[idx].blinkoff = 250L;
+			shape_పట్టిక[idx].shape = SHAPE_ఖండం;
+			shape_పట్టిక[idx].blinkwait = 700L;
+			shape_పట్టిక[idx].blinkon = 400L;
+			shape_పట్టిక[idx].blinkoff = 250L;
 		    }
 		}
 
 		// Parse the part after the colon
-		for (p = colonp + 1; *p && *p != ','; )
+		కొరకు (p = colonp + 1; *p && *p != ','; )
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    ఒకవేళ (what == SHAPE_MOUSE)
 		    {
-			for (i = 0; ; ++i)
+			కొరకు (i = 0; ; ++i)
 			{
-			    if (mshape_names[i].string == NULL)
+			    ఒకవేళ (mshape_పేర్లు[i].string == ఖాళీ)
 			    {
-				if (!VIM_ISDIGIT(*p))
-				    return e_illegal_mouseshape;
-				if (round == 2)
-				    shape_table[idx].mshape =
+				ఒకవేళ (!VIM_ISDIGIT(*p))
+				    తిరిగి e_illegal_mouseshape;
+				ఒకవేళ (విడత == 2)
+				    shape_పట్టిక[idx].mshape =
 					      getdigits(&p) + MSHAPE_NUMBERED;
-				else
-				    (void)getdigits(&p);
-				break;
+				లేకపోతే
+				    (శూన్య)getdigits(&p);
+				ఆపు;
 			    }
-			    if (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
+			    ఒకవేళ (STRNICMP(p, mshape_పేర్లు[i].string, mshape_పేర్లు[i].నిడివి) == 0)
 			    {
-				if (round == 2)
-				    shape_table[idx].mshape = i;
-				p += mshape_names[i].length;
-				break;
+				ఒకవేళ (విడత == 2)
+				    shape_పట్టిక[idx].mshape = i;
+				p += mshape_పేర్లు[i].నిడివి;
+				ఆపు;
 			    }
 			}
 		    }
-		    else // if (what == SHAPE_MOUSE)
+		    లేకపోతే // if (what == SHAPE_MOUSE)
 # endif
 		    {
 			/*
@@ -2299,174 +2299,174 @@ parse_shape_opt(int what)
 			 */
 			i = *p;
 			len = 0;
-			if (STRNICMP(p, "ver", 3) == 0)
+			ఒకవేళ (STRNICMP(p, "ver", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "hor", 3) == 0)
+			లేకపోతే ఒకవేళ (STRNICMP(p, "hor", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "blinkwait", 9) == 0)
+			లేకపోతే ఒకవేళ (STRNICMP(p, "blinkwait", 9) == 0)
 			    len = 9;
-			else if (STRNICMP(p, "blinkon", 7) == 0)
+			లేకపోతే ఒకవేళ (STRNICMP(p, "blinkon", 7) == 0)
 			    len = 7;
-			else if (STRNICMP(p, "blinkoff", 8) == 0)
+			లేకపోతే ఒకవేళ (STRNICMP(p, "blinkoff", 8) == 0)
 			    len = 8;
-			if (len != 0)
+			ఒకవేళ (len != 0)
 			{
 			    p += len;
-			    if (!VIM_ISDIGIT(*p))
-				return e_digit_expected;
+			    ఒకవేళ (!VIM_ISDIGIT(*p))
+				తిరిగి e_digit_expected;
 			    n = getdigits(&p);
-			    if (len == 3)   // "ver" or "hor"
+			    ఒకవేళ (len == 3)   // "ver" or "hor"
 			    {
-				if (n == 0)
-				    return e_illegal_percentage;
-				if (round == 2)
+				ఒకవేళ (n == 0)
+				    తిరిగి e_illegal_percentage;
+				ఒకవేళ (విడత == 2)
 				{
-				    if (TOLOWER_ASC(i) == 'v')
-					shape_table[idx].shape = SHAPE_VER;
-				    else
-					shape_table[idx].shape = SHAPE_HOR;
-				    shape_table[idx].percentage = n;
+				    ఒకవేళ (TOLOWER_ASC(i) == 'v')
+					shape_పట్టిక[idx].shape = SHAPE_VER;
+				    లేకపోతే
+					shape_పట్టిక[idx].shape = SHAPE_HOR;
+				    shape_పట్టిక[idx].percentage = n;
 				}
 			    }
-			    else if (round == 2)
+			    లేకపోతే ఒకవేళ (విడత == 2)
 			    {
-				if (len == 9)
-				    shape_table[idx].blinkwait = n;
-				else if (len == 7)
-				    shape_table[idx].blinkon = n;
-				else
-				    shape_table[idx].blinkoff = n;
+				ఒకవేళ (len == 9)
+				    shape_పట్టిక[idx].blinkwait = n;
+				లేకపోతే ఒకవేళ (len == 7)
+				    shape_పట్టిక[idx].blinkon = n;
+				లేకపోతే
+				    shape_పట్టిక[idx].blinkoff = n;
 			    }
 			}
-			else if (STRNICMP(p, "block", 5) == 0)
+			లేకపోతే ఒకవేళ (STRNICMP(p, "block", 5) == 0)
 			{
-			    if (round == 2)
-				shape_table[idx].shape = SHAPE_BLOCK;
+			    ఒకవేళ (విడత == 2)
+				shape_పట్టిక[idx].shape = SHAPE_ఖండం;
 			    p += 5;
 			}
-			else	// must be a highlight group name then
+			లేకపోతే	// must be a highlight group name then
 			{
 			    endp = vim_strchr(p, '-');
-			    if (commap == NULL)		    // last part
+			    ఒకవేళ (commap == ఖాళీ)		    // last part
 			    {
-				if (endp == NULL)
+				ఒకవేళ (endp == ఖాళీ)
 				    endp = p + STRLEN(p);   // find end of part
 			    }
-			    else if (endp > commap || endp == NULL)
+			    లేకపోతే ఒకవేళ (endp > commap || endp == ఖాళీ)
 				endp = commap;
 			    slashp = vim_strchr(p, '/');
-			    if (slashp != NULL && slashp < endp)
+			    ఒకవేళ (slashp != ఖాళీ && slashp < endp)
 			    {
 				// "group/langmap_group"
-				i = syn_check_group(p, (int)(slashp - p));
+				i = syn_check_సమూహం(p, (పూర్ణాంకం)(slashp - p));
 				p = slashp + 1;
 			    }
-			    if (round == 2)
+			    ఒకవేళ (విడత == 2)
 			    {
-				shape_table[idx].id = syn_check_group(p,
-							     (int)(endp - p));
-				shape_table[idx].id_lm = shape_table[idx].id;
-				if (slashp != NULL && slashp < endp)
-				    shape_table[idx].id = i;
+				shape_పట్టిక[idx].id = syn_check_సమూహం(p,
+							     (పూర్ణాంకం)(endp - p));
+				shape_పట్టిక[idx].id_lm = shape_పట్టిక[idx].id;
+				ఒకవేళ (slashp != ఖాళీ && slashp < endp)
+				    shape_పట్టిక[idx].id = i;
 			    }
 			    p = endp;
 			}
 		    } // if (what != SHAPE_MOUSE)
 
-		    if (*p == '-')
+		    ఒకవేళ (*p == '-')
 			++p;
 		}
 	    }
 	    modep = p;
-	    if (*modep == ',')
+	    ఒకవేళ (*modep == ',')
 		++modep;
 	}
     }
 
     // If the 's' flag is not given, use the 'v' cursor for 's'
-    if (!found_ve)
+    ఒకవేళ (!దొరికింది_ve)
     {
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	ఒకవేళ (what == SHAPE_MOUSE)
 	{
-	    shape_table[SHAPE_IDX_VE].mshape = shape_table[SHAPE_IDX_V].mshape;
+	    shape_పట్టిక[SHAPE_IDX_VE].mshape = shape_పట్టిక[SHAPE_IDX_V].mshape;
 	}
-	else
+	లేకపోతే
 # endif
 	{
-	    shape_table[SHAPE_IDX_VE].shape = shape_table[SHAPE_IDX_V].shape;
-	    shape_table[SHAPE_IDX_VE].percentage =
-					 shape_table[SHAPE_IDX_V].percentage;
-	    shape_table[SHAPE_IDX_VE].blinkwait =
-					  shape_table[SHAPE_IDX_V].blinkwait;
-	    shape_table[SHAPE_IDX_VE].blinkon =
-					    shape_table[SHAPE_IDX_V].blinkon;
-	    shape_table[SHAPE_IDX_VE].blinkoff =
-					   shape_table[SHAPE_IDX_V].blinkoff;
-	    shape_table[SHAPE_IDX_VE].id = shape_table[SHAPE_IDX_V].id;
-	    shape_table[SHAPE_IDX_VE].id_lm = shape_table[SHAPE_IDX_V].id_lm;
+	    shape_పట్టిక[SHAPE_IDX_VE].shape = shape_పట్టిక[SHAPE_IDX_V].shape;
+	    shape_పట్టిక[SHAPE_IDX_VE].percentage =
+					 shape_పట్టిక[SHAPE_IDX_V].percentage;
+	    shape_పట్టిక[SHAPE_IDX_VE].blinkwait =
+					  shape_పట్టిక[SHAPE_IDX_V].blinkwait;
+	    shape_పట్టిక[SHAPE_IDX_VE].blinkon =
+					    shape_పట్టిక[SHAPE_IDX_V].blinkon;
+	    shape_పట్టిక[SHAPE_IDX_VE].blinkoff =
+					   shape_పట్టిక[SHAPE_IDX_V].blinkoff;
+	    shape_పట్టిక[SHAPE_IDX_VE].id = shape_పట్టిక[SHAPE_IDX_V].id;
+	    shape_పట్టిక[SHAPE_IDX_VE].id_lm = shape_పట్టిక[SHAPE_IDX_V].id_lm;
 	}
     }
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-# if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
+# ఒకవేళ defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
 	|| defined(FEAT_MOUSESHAPE)
 /*
  * Return the index into shape_table[] for the current mode.
  * When "mouse" is TRUE, consider indexes valid for the mouse pointer.
  */
-    int
-get_shape_idx(int mouse)
+    పూర్ణాంకం
+get_shape_idx(పూర్ణాంకం mouse)
 {
 #  ifdef FEAT_MOUSESHAPE
-    if (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
+    ఒకవేళ (mouse && (State == బహుళకం_HITRETURN || State == బహుళకం_ASKMORE))
     {
 #   ifdef FEAT_GUI
-	int x, y;
+	పూర్ణాంకం x, y;
 	gui_mch_getmouse(&x, &y);
-	if (Y_2_ROW(y) == Rows - 1)
-	    return SHAPE_IDX_MOREL;
+	ఒకవేళ (Y_2_అడ్డువరుస(y) == అడ్డువరుసలు - 1)
+	    తిరిగి SHAPE_IDX_MOREL;
 #   endif
-	return SHAPE_IDX_MORE;
+	తిరిగి SHAPE_IDX_మరిన్ని;
     }
-    if (mouse && drag_status_line)
-	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
-	return SHAPE_IDX_VDRAG;
+    ఒకవేళ (mouse && drag_స్థితి_పంక్తి)
+	తిరిగి SHAPE_IDX_SDRAG;
+    ఒకవేళ (mouse && drag_sep_పంక్తి)
+	తిరిగి SHAPE_IDX_VDRAG;
 #  endif
-    if (!mouse && State == MODE_SHOWMATCH)
-	return SHAPE_IDX_SM;
-    if (State & VREPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & REPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
-	return SHAPE_IDX_I;
-    if (State & MODE_CMDLINE)
+    ఒకవేళ (!mouse && State == బహుళకం_SHOWMATCH)
+	తిరిగి SHAPE_IDX_SM;
+    ఒకవేళ (State & VREPLACE_FLAG)
+	తిరిగి SHAPE_IDX_R;
+    ఒకవేళ (State & REPLACE_FLAG)
+	తిరిగి SHAPE_IDX_R;
+    ఒకవేళ (State & బహుళకం_చొప్పించు)
+	తిరిగి SHAPE_IDX_I;
+    ఒకవేళ (State & బహుళకం_CMDLINE)
     {
-	if (cmdline_at_end())
-	    return SHAPE_IDX_C;
-	if (cmdline_overstrike())
-	    return SHAPE_IDX_CR;
-	return SHAPE_IDX_CI;
+	ఒకవేళ (cmdline_at_చివర())
+	    తిరిగి SHAPE_IDX_C;
+	ఒకవేళ (cmdline_overstrike())
+	    తిరిగి SHAPE_IDX_CR;
+	తిరిగి SHAPE_IDX_CI;
     }
-    if (finish_op)
-	return SHAPE_IDX_O;
-    if (VIsual_active)
+    ఒకవేళ (ముగింపు_op)
+	తిరిగి SHAPE_IDX_O;
+    ఒకవేళ (VIsual_చురుకైన)
     {
-	if (*p_sel == 'e')
-	    return SHAPE_IDX_VE;
-	else
-	    return SHAPE_IDX_V;
+	ఒకవేళ (*p_sel == 'e')
+	    తిరిగి SHAPE_IDX_VE;
+	లేకపోతే
+	    తిరిగి SHAPE_IDX_V;
     }
-    return SHAPE_IDX_N;
+    తిరిగి SHAPE_IDX_N;
 }
 # endif
 
-# if defined(FEAT_MOUSESHAPE)
-static int current_mouse_shape = 0;
+# ఒకవేళ defined(FEAT_MOUSESHAPE)
+స్థిర పూర్ణాంకం current_mouse_shape = 0;
 
 /*
  * Set the mouse shape:
@@ -2475,68 +2475,68 @@ static int current_mouse_shape = 0;
  * If "shape" is -2, only update the shape when it's CLINE or STATUS (used
  * when the mouse moves off the status or command line).
  */
-    void
-update_mouseshape(int shape_idx)
+    శూన్య
+update_mouseshape(పూర్ణాంకం shape_idx)
 {
-    int new_mouse_shape;
+    పూర్ణాంకం new_mouse_shape;
 
     // Only works in GUI mode.
-    if (!gui.in_use || gui.starting)
-	return;
+    ఒకవేళ (!gui.లోపల_use || gui.starting)
+	తిరిగి;
 
     // Postpone the updating when more is to come.  Speeds up executing of
     // mappings.
-    if (shape_idx == -1 && char_avail())
+    ఒకవేళ (shape_idx == -1 && char_avail())
     {
 	postponed_mouseshape = TRUE;
-	return;
+	తిరిగి;
     }
 
     // When ignoring the mouse don't change shape on the statusline.
-    if (*p_mouse == NUL
+    ఒకవేళ (*p_mouse == NUL
 	    && (shape_idx == SHAPE_IDX_CLINE
-		|| shape_idx == SHAPE_IDX_STATUS
+		|| shape_idx == SHAPE_IDX_స్థితి
 		|| shape_idx == SHAPE_IDX_VSEP))
 	shape_idx = -2;
 
-    if (shape_idx == -2
-	    && current_mouse_shape != shape_table[SHAPE_IDX_CLINE].mshape
-	    && current_mouse_shape != shape_table[SHAPE_IDX_STATUS].mshape
-	    && current_mouse_shape != shape_table[SHAPE_IDX_VSEP].mshape)
-	return;
-    if (shape_idx < 0)
-	new_mouse_shape = shape_table[get_shape_idx(TRUE)].mshape;
-    else
-	new_mouse_shape = shape_table[shape_idx].mshape;
-    if (new_mouse_shape != current_mouse_shape)
+    ఒకవేళ (shape_idx == -2
+	    && current_mouse_shape != shape_పట్టిక[SHAPE_IDX_CLINE].mshape
+	    && current_mouse_shape != shape_పట్టిక[SHAPE_IDX_స్థితి].mshape
+	    && current_mouse_shape != shape_పట్టిక[SHAPE_IDX_VSEP].mshape)
+	తిరిగి;
+    ఒకవేళ (shape_idx < 0)
+	new_mouse_shape = shape_పట్టిక[get_shape_idx(TRUE)].mshape;
+    లేకపోతే
+	new_mouse_shape = shape_పట్టిక[shape_idx].mshape;
+    ఒకవేళ (new_mouse_shape != current_mouse_shape)
     {
-	mch_set_mouse_shape(new_mouse_shape);
+	mch_సమితి_mouse_shape(new_mouse_shape);
 	current_mouse_shape = new_mouse_shape;
     }
     postponed_mouseshape = FALSE;
 }
 # endif
 
-#endif // CURSOR_SHAPE
+#అయితే_ముగింపు // CURSOR_SHAPE
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Mainly for tests: get the name of the current mouse shape.
  */
-    void
-f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getmouseshape(typval_T *argvars వాడని, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-# if defined(FEAT_MOUSESHAPE)
-    if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+    rettv->vval.v_string = ఖాళీ;
+# ఒకవేళ defined(FEAT_MOUSESHAPE)
+    ఒకవేళ (current_mouse_shape >= 0
+			      && current_mouse_shape < (పూర్ణాంకం)MSHAPE_పేర్లు_లెక్క)
 	rettv->vval.v_string = vim_strnsave(
-				  mshape_names[current_mouse_shape].string,
-				  mshape_names[current_mouse_shape].length);
+				  mshape_పేర్లు[current_mouse_shape].string,
+				  mshape_పేర్లు[current_mouse_shape].నిడివి);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 
 
@@ -2544,23 +2544,23 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
  * Change directory to "new_dir".  Search 'cdpath' for relative directory
  * names.
  */
-    int
+    పూర్ణాంకం
 vim_chdir(char_u *new_dir)
 {
     char_u	*dir_name;
-    int		r;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    పూర్ణాంకం		r;
+    char_u	*file_గమ్యం_కనుగొను = ఖాళీ;
+    అక్షరం	*శోధన_ctx = ఖాళీ;
 
-    dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
-    vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
-    if (dir_name == NULL)
-	return -1;
-    r = mch_chdir((char *)dir_name);
+    dir_name = కనుగొను_directory_లోపల_మార్గం(new_dir, (పూర్ణాంకం)STRLEN(new_dir),
+		     FNAME_MESS, curbuf->b_ffname, &file_గమ్యం_కనుగొను, &శోధన_ctx);
+    vim_free(file_గమ్యం_కనుగొను);
+    vim_findfile_cleanup(శోధన_ctx);
+    ఒకవేళ (dir_name == ఖాళీ)
+	తిరిగి -1;
+    r = mch_chdir((అక్షరం *)dir_name);
     vim_free(dir_name);
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -2570,71 +2570,71 @@ vim_chdir(char_u *new_dir)
  * cache the result.
  * Returns OK or FAIL.
  */
-    int
-get_user_name(char_u *buf, int len)
+    పూర్ణాంకం
+get_user_name(char_u *buf, పూర్ణాంకం len)
 {
-    if (username == NULL)
+    ఒకవేళ (username == ఖాళీ)
     {
-	if (mch_get_user_name(buf, len) == FAIL)
-	    return FAIL;
+	ఒకవేళ (mch_get_user_name(buf, len) == FAIL)
+	    తిరిగి FAIL;
 	username = vim_strsave(buf);
     }
-    else
+    లేకపోతే
 	vim_strncpy(buf, username, len - 1);
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(EXITFREE)
+#ఒకవేళ defined(EXITFREE)
 /*
  * Free the memory allocated by get_user_name()
  */
-    void
-free_username(void)
+    శూన్య
+free_username(శూన్య)
 {
     vim_free(username);
 }
-#endif
+#అయితే_ముగింపు
 
-#if !defined(HAVE_QSORT) && !defined(PROTO)
+#ఒకవేళ !defined(HAVE_QSORT) && !defined(PROTO)
 /*
  * Our own qsort(), for systems that don't have it.
  * It's simple and slow.  From the K&R C book.
  */
-    void
+    శూన్య
 qsort(
-    void	*base,
-    size_t	elm_count,
-    size_t	elm_size,
-    int (*cmp)(const void *, const void *))
+    శూన్య	*పునాది,
+    size_t	elm_లెక్క,
+    size_t	elm_కొలత,
+    పూర్ణాంకం (*cmp)(స్థిరరాశి శూన్య *, స్థిరరాశి శూన్య *))
 {
     char_u	*buf;
     char_u	*p1;
     char_u	*p2;
-    int		i, j;
-    int		gap;
+    పూర్ణాంకం		i, j;
+    పూర్ణాంకం		gap;
 
-    buf = alloc(elm_size);
-    if (buf == NULL)
-	return;
+    buf = alloc(elm_కొలత);
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
-	    for (j = i - gap; j >= 0; j -= gap)
+    కొరకు (gap = elm_లెక్క / 2; gap > 0; gap /= 2)
+	కొరకు (i = gap; i < elm_లెక్క; ++i)
+	    కొరకు (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
-		p1 = (char_u *)base + j * elm_size;
-		p2 = (char_u *)base + (j + gap) * elm_size;
-		if ((*cmp)((void *)p1, (void *)p2) <= 0)
-		    break;
+		p1 = (char_u *)పునాది + j * elm_కొలత;
+		p2 = (char_u *)పునాది + (j + gap) * elm_కొలత;
+		ఒకవేళ ((*cmp)((శూన్య *)p1, (శూన్య *)p2) <= 0)
+		    ఆపు;
 		// Exchange the elements.
-		mch_memmove(buf, p1, elm_size);
-		mch_memmove(p1, p2, elm_size);
-		mch_memmove(p2, buf, elm_size);
+		mch_memmove(buf, p1, elm_కొలత);
+		mch_memmove(p1, p2, elm_కొలత);
+		mch_memmove(p2, buf, elm_కొలత);
 	    }
 
     vim_free(buf);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * The putenv() implementation below comes from the "screen" program.
@@ -2662,96 +2662,96 @@ qsort(
  *  (history removed, not very interesting.  See the "screen" sources.)
  */
 
-#if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
+#ఒకవేళ !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
 
 # define EXTRASIZE 5		// increment to add to env. size
 
-static int  envsize = -1;	// current size of environment
-extern char **environ;		// the global which is your env.
+స్థిర పూర్ణాంకం  envsize = -1;	// current size of environment
+బాహ్య అక్షరం **environ;		// the global which is your env.
 
-static int  findenv(char *name); // look for a name in the env.
-static int  newenv(void);	// copy env. from stack to heap
-static int  moreenv(void);	// incr. size of env.
+స్థిర పూర్ణాంకం  findenv(అక్షరం *name); // look for a name in the env.
+స్థిర పూర్ణాంకం  newenv(శూన్య);	// copy env. from stack to heap
+స్థిర పూర్ణాంకం  moreenv(శూన్య);	// incr. size of env.
 
-    int
-putenv(const char *string)
+    పూర్ణాంకం
+putenv(స్థిరరాశి అక్షరం *string)
 {
-    int	    i;
-    char    *p;
+    పూర్ణాంకం	    i;
+    అక్షరం    *p;
 
-    if (envsize < 0)
+    ఒకవేళ (envsize < 0)
     {				// first time putenv called
-	if (newenv() < 0)	// copy env. to heap
-	    return -1;
+	ఒకవేళ (newenv() < 0)	// copy env. to heap
+	    తిరిగి -1;
     }
 
-    i = findenv((char *)string); // look for name in environment
+    i = findenv((అక్షరం *)string); // look for name in environment
 
-    if (i < 0)
+    ఒకవేళ (i < 0)
     {				// name must be added
-	for (i = 0; environ[i]; i++);
-	if (i >= (envsize - 1))
+	కొరకు (i = 0; environ[i]; i++);
+	ఒకవేళ (i >= (envsize - 1))
 	{			// need new slot
-	    if (moreenv() < 0)
-		return -1;
+	    ఒకవేళ (moreenv() < 0)
+		తిరిగి -1;
 	}
-	p = alloc(strlen(string) + 1);
-	if (p == NULL)		// not enough core
-	    return -1;
+	p = alloc(అక్షరశ్రేణి_పొడవు(string) + 1);
+	ఒకవేళ (p == ఖాళీ)		// not enough core
+	    తిరిగి -1;
 	environ[i + 1] = 0;	// new end of env.
     }
-    else
+    లేకపోతే
     {				// name already in env.
-	p = vim_realloc(environ[i], strlen(string) + 1);
-	if (p == NULL)
-	    return -1;
+	p = vim_realloc(environ[i], అక్షరశ్రేణి_పొడవు(string) + 1);
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి -1;
     }
     sprintf(p, "%s", string);	// copy into env.
     environ[i] = p;
 
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-findenv(char *name)
+    స్థిర పూర్ణాంకం
+findenv(అక్షరం *name)
 {
-    char    *namechar, *envchar;
-    int	    i, found;
+    అక్షరం    *namechar, *envchar;
+    పూర్ణాంకం	    i, దొరికింది;
 
-    found = 0;
-    for (i = 0; environ[i] && !found; i++)
+    దొరికింది = 0;
+    కొరకు (i = 0; environ[i] && !దొరికింది; i++)
     {
 	envchar = environ[i];
 	namechar = name;
-	while (*namechar && *namechar != '=' && (*namechar == *envchar))
+	అయితే (*namechar && *namechar != '=' && (*namechar == *envchar))
 	{
 	    namechar++;
 	    envchar++;
 	}
-	found = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
+	దొరికింది = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
     }
-    return found ? i - 1 : -1;
+    తిరిగి దొరికింది ? i - 1 : -1;
 }
 
-    static int
-newenv(void)
+    స్థిర పూర్ణాంకం
+newenv(శూన్య)
 {
-    char    **env, *elem;
-    int	    i, esize;
+    అక్షరం    **env, *elem;
+    పూర్ణాంకం	    i, esize;
 
-    for (i = 0; environ[i]; i++)
+    కొరకు (i = 0; environ[i]; i++)
 	;
 
     esize = i + EXTRASIZE + 1;
-    env = ALLOC_MULT(char *, esize);
-    if (env == NULL)
-	return -1;
+    env = ALLOC_MULT(అక్షరం *, esize);
+    ఒకవేళ (env == ఖాళీ)
+	తిరిగి -1;
 
-    for (i = 0; environ[i]; i++)
+    కొరకు (i = 0; environ[i]; i++)
     {
-	elem = alloc(strlen(environ[i]) + 1);
-	if (elem == NULL)
-	    return -1;
+	elem = alloc(అక్షరశ్రేణి_పొడవు(environ[i]) + 1);
+	ఒకవేళ (elem == ఖాళీ)
+	    తిరిగి -1;
 	env[i] = elem;
 	strcpy(elem, environ[i]);
     }
@@ -2759,22 +2759,22 @@ newenv(void)
     env[i] = 0;
     environ = env;
     envsize = esize;
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-moreenv(void)
+    స్థిర పూర్ణాంకం
+moreenv(శూన్య)
 {
-    int	    esize;
-    char    **env;
+    పూర్ణాంకం	    esize;
+    అక్షరం    **env;
 
     esize = envsize + EXTRASIZE;
-    env = vim_realloc((char *)environ, esize * sizeof (*env));
-    if (env == 0)
-	return -1;
+    env = vim_realloc((అక్షరం *)environ, esize * పరిమాణం (*env));
+    ఒకవేళ (env == 0)
+	తిరిగి -1;
     environ = env;
     envsize = esize;
-    return 0;
+    తిరిగి 0;
 }
 
 # ifdef USE_VIMPTY_GETENV
@@ -2782,122 +2782,122 @@ moreenv(void)
  * Used for mch_getenv() for Mac.
  */
     char_u *
-vimpty_getenv(const char_u *string)
+vimpty_getenv(స్థిరరాశి char_u *string)
 {
-    int i;
+    పూర్ణాంకం i;
     char_u *p;
 
-    if (envsize < 0)
-	return NULL;
+    ఒకవేళ (envsize < 0)
+	తిరిగి ఖాళీ;
 
-    i = findenv((char *)string);
+    i = findenv((అక్షరం *)string);
 
-    if (i < 0)
-	return NULL;
+    ఒకవేళ (i < 0)
+	తిరిగి ఖాళీ;
 
     p = vim_strchr((char_u *)environ[i], '=');
-    return (p + 1);
+    తిరిగి (p + 1);
 }
 # endif
 
-#endif // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
+#అయితే_ముగింపు // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    int
+    పూర్ణాంకం
 filewritable(char_u *fname)
 {
-    int		retval = 0;
-# if defined(UNIX) || defined(VMS)
-    int		perm = 0;
+    పూర్ణాంకం		retval = 0;
+# ఒకవేళ defined(UNIX) || defined(VMS)
+    పూర్ణాంకం		perm = 0;
 # endif
 
-# if defined(UNIX) || defined(VMS)
+# ఒకవేళ defined(UNIX) || defined(VMS)
     perm = mch_getperm(fname);
 # endif
-    if (
+    ఒకవేళ (
 # ifdef MSWIN
 	    mch_writable(fname) &&
-# else
-#  if defined(UNIX) || defined(VMS)
+# లేకపోతే
+#  ఒకవేళ defined(UNIX) || defined(VMS)
 	    (perm & 0222) &&
 #  endif
 # endif
-	    mch_access((char *)fname, W_OK) == 0
+	    mch_access((అక్షరం *)fname, W_OK) == 0
        )
     {
 	++retval;
-	if (mch_isdir(fname))
+	ఒకవేళ (mch_isdir(fname))
 	    ++retval;
     }
-    return retval;
+    తిరిగి retval;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#ఒకవేళ defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 2 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    పూర్ణాంకం
 get2c(FILE *fd)
 {
-    int		c, n;
+    పూర్ణాంకం		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    ఒకవేళ (n == EOF) తిరిగి -1;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    తిరిగి (n << 8) + c;
 }
 
 /*
  * Read 3 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    పూర్ణాంకం
 get3c(FILE *fd)
 {
-    int		c, n;
+    పూర్ణాంకం		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    ఒకవేళ (n == EOF) తిరిగి -1;
     c = getc(fd);
-    if (c == EOF) return -1;
+    ఒకవేళ (c == EOF) తిరిగి -1;
     n = (n << 8) + c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    తిరిగి (n << 8) + c;
 }
 
 /*
  * Read 4 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    పూర్ణాంకం
 get4c(FILE *fd)
 {
-    int		c;
+    పూర్ణాంకం		c;
     // Use unsigned rather than int otherwise result is undefined
     // when left-shift sets the MSB.
-    unsigned	n;
+    గుర్తులేని	n;
 
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (unsigned)c;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    n = (గుర్తులేని)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    n = (n << 8) + (గుర్తులేని)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    n = (n << 8) + (గుర్తులేని)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
-    return (int)n;
+    ఒకవేళ (c == EOF) తిరిగి -1;
+    n = (n << 8) + (గుర్తులేని)c;
+    తిరిగి (పూర్ణాంకం)n;
 }
 
 /*
@@ -2905,61 +2905,61 @@ get4c(FILE *fd)
  * Returns NULL when out of memory or unable to read that many bytes.
  */
     char_u *
-read_string(FILE *fd, int cnt)
+read_string(FILE *fd, పూర్ణాంకం cnt)
 {
     char_u	*str;
-    int		i;
-    int		c;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
 
     // allocate memory
     str = alloc(cnt + 1);
-    if (str == NULL)
-	return NULL;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Read the string.  Quit when running into the EOF.
-    for (i = 0; i < cnt; ++i)
+    కొరకు (i = 0; i < cnt; ++i)
     {
 	c = getc(fd);
-	if (c == EOF)
+	ఒకవేళ (c == EOF)
 	{
 	    vim_free(str);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 	str[i] = c;
     }
     str[i] = NUL;
-    return str;
+    తిరిగి str;
 }
 
 /*
  * Write a number to file "fd", MSB first, in "len" bytes.
  */
-    int
-put_bytes(FILE *fd, long_u nr, int len)
+    పూర్ణాంకం
+put_బైట్లు(FILE *fd, long_u nr, పూర్ణాంకం len)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = len - 1; i >= 0; --i)
-	if (putc((int)(nr >> (i * 8)), fd) == EOF)
-	    return FAIL;
-    return OK;
+    కొరకు (i = len - 1; i >= 0; --i)
+	ఒకవేళ (putc((పూర్ణాంకం)(nr >> (i * 8)), fd) == EOF)
+	    తిరిగి FAIL;
+    తిరిగి OK;
 }
 
-#endif
+#అయితే_ముగింపు
 
-#ifndef PROTO  // proto is defined in vim.h
+#నిర్వచితం_కాకపోతే PROTO  // proto is defined in vim.h
 # ifdef ELAPSED_TIMEVAL
 /*
  * Return time in msec since "start_tv".
  */
-    long
-elapsed(struct timeval *start_tv)
+    దీర్ఘ
+elapsed(నిర్మాణం timeval *ప్రారంభం_tv)
 {
-    struct timeval  now_tv;
+    నిర్మాణం timeval  now_tv;
 
-    gettimeofday(&now_tv, NULL);
-    return (now_tv.tv_sec - start_tv->tv_sec) * 1000L
-	 + (now_tv.tv_usec - start_tv->tv_usec) / 1000L;
+    gettimeofday(&now_tv, ఖాళీ);
+    తిరిగి (now_tv.tv_sec - ప్రారంభం_tv->tv_sec) * 1000L
+	 + (now_tv.tv_usec - ప్రారంభం_tv->tv_usec) / 1000L;
 }
 # endif
 
@@ -2967,17 +2967,17 @@ elapsed(struct timeval *start_tv)
 /*
  * Return time in msec since "start_tick".
  */
-    long
-elapsed(DWORD start_tick)
+    దీర్ఘ
+elapsed(DWORD ప్రారంభం_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_లెక్క();
 
-    return (long)now - (long)start_tick;
+    తిరిగి (దీర్ఘ)now - (దీర్ఘ)ప్రారంభం_tick;
 }
 # endif
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_JOB_CHANNEL) \
+#ఒకవేళ defined(FEAT_పని_CHANNEL) \
 	|| (defined(UNIX) && (!defined(USE_SYSTEM) \
 	|| (defined(FEAT_GUI) && defined(FEAT_TERMINAL))))
 /*
@@ -2985,79 +2985,79 @@ elapsed(DWORD start_tick)
  * "argv" is an allocated array with "argc" entries and room for 4 more.
  * Returns FAIL when out of memory.
  */
-    int
-mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
+    పూర్ణాంకం
+mch_parse_cmd(char_u *cmd, పూర్ణాంకం use_shcf, అక్షరం ***argv, పూర్ణాంకం *argc)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p, *d;
-    int		inquote;
+    పూర్ణాంకం		inquote;
 
     /*
      * Do this loop twice:
      * 1: find number of arguments
      * 2: separate them and build argv[]
      */
-    for (i = 1; i <= 2; ++i)
+    కొరకు (i = 1; i <= 2; ++i)
     {
 	p = skipwhite(cmd);
 	inquote = FALSE;
 	*argc = 0;
-	while (*p != NUL)
+	అయితే (*p != NUL)
 	{
-	    if (i == 2)
-		(*argv)[*argc] = (char *)p;
+	    ఒకవేళ (i == 2)
+		(*argv)[*argc] = (అక్షరం *)p;
 	    ++*argc;
 	    d = p;
-	    while (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
+	    అయితే (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
 	    {
-		if (p[0] == '"')
+		ఒకవేళ (p[0] == '"')
 		    // quotes surrounding an argument and are dropped
 		    inquote = !inquote;
-		else
+		లేకపోతే
 		{
-		    if (rem_backslash(p))
+		    ఒకవేళ (rem_backslash(p))
 		    {
 			// First pass: skip over "\ " and "\"".
 			// Second pass: Remove the backslash.
 			++p;
 		    }
-		    if (i == 2)
+		    ఒకవేళ (i == 2)
 			*d++ = *p;
 		}
 		++p;
 	    }
-	    if (*p == NUL)
+	    ఒకవేళ (*p == NUL)
 	    {
-		if (i == 2)
+		ఒకవేళ (i == 2)
 		    *d++ = NUL;
-		break;
+		ఆపు;
 	    }
-	    if (i == 2)
+	    ఒకవేళ (i == 2)
 		*d++ = NUL;
 	    p = skipwhite(p + 1);
 	}
-	if (*argv == NULL)
+	ఒకవేళ (*argv == ఖాళీ)
 	{
-	    if (use_shcf)
+	    ఒకవేళ (use_shcf)
 	    {
 		// Account for possible multiple args in p_shcf.
 		p = p_shcf;
-		for (;;)
+		కొరకు (;;)
 		{
 		    p = skiptowhite(p);
-		    if (*p == NUL)
-			break;
+		    ఒకవేళ (*p == NUL)
+			ఆపు;
 		    ++*argc;
 		    p = skipwhite(p);
 		}
 	    }
 
-	    *argv = ALLOC_MULT(char *, *argc + 4);
-	    if (*argv == NULL)	    // out of memory
-		return FAIL;
+	    *argv = ALLOC_MULT(అక్షరం *, *argc + 4);
+	    ఒకవేళ (*argv == ఖాళీ)	    // out of memory
+		తిరిగి FAIL;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3065,65 +3065,65 @@ mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_string(char_u *cmd, char ***argv, int *argc)
+    పూర్ణాంకం
+build_argv_from_string(char_u *cmd, అక్షరం ***argv, పూర్ణాంకం *argc)
 {
     char_u	*cmd_copy;
-    int		i;
+    పూర్ణాంకం		i;
 
     // Make a copy, parsing will modify "cmd".
     cmd_copy = vim_strsave(cmd);
-    if (cmd_copy == NULL
+    ఒకవేళ (cmd_copy == ఖాళీ
 	    || mch_parse_cmd(cmd_copy, FALSE, argv, argc) == FAIL)
     {
 	vim_free(cmd_copy);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    for (i = 0; i < *argc; i++)
-	(*argv)[i] = (char *)vim_strsave((char_u *)(*argv)[i]);
-    (*argv)[*argc] = NULL;
+    కొరకు (i = 0; i < *argc; i++)
+	(*argv)[i] = (అక్షరం *)vim_strsave((char_u *)(*argv)[i]);
+    (*argv)[*argc] = ఖాళీ;
     vim_free(cmd_copy);
-    return OK;
+    తిరిగి OK;
 }
 
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Build "argv[argc]" from the list "l".
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_list(list_T *l, char ***argv, int *argc)
+    పూర్ణాంకం
+build_argv_from_list(list_T *l, అక్షరం ***argv, పూర్ణాంకం *argc)
 {
     listitem_T  *li;
     char_u	*s;
 
     // Pass argv[] to mch_call_shell().
-    *argv = ALLOC_MULT(char *, l->lv_len + 1);
-    if (*argv == NULL)
-	return FAIL;
+    *argv = ALLOC_MULT(అక్షరం *, l->lv_len + 1);
+    ఒకవేళ (*argv == ఖాళీ)
+	తిరిగి FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
+	ఒకవేళ (s == ఖాళీ)
 	{
-	    int i;
+	    పూర్ణాంకం i;
 
-	    for (i = 0; i < *argc; ++i)
+	    కొరకు (i = 0; i < *argc; ++i)
 		VIM_CLEAR((*argv)[i]);
-	    (*argv)[0] = NULL;
-	    return FAIL;
+	    (*argv)[0] = ఖాళీ;
+	    తిరిగి FAIL;
 	}
-	(*argv)[*argc] = (char *)vim_strsave(s);
+	(*argv)[*argc] = (అక్షరం *)vim_strsave(s);
 	*argc += 1;
     }
-    (*argv)[*argc] = NULL;
-    return OK;
+    (*argv)[*argc] = ఖాళీ;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Change the behavior of vterm.
@@ -3134,58 +3134,58 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
  *      Use the wrong result because each result is different.
  * 3: Windows 10 insider preview (current latest logic)
  */
-    int
-get_special_pty_type(void)
+    పూర్ణాంకం
+get_special_pty_type(శూన్య)
 {
-#ifdef MSWIN
-    return get_conpty_type();
-#else
-    return 0;
-#endif
+#నిర్వచితమైతే MSWIN
+    తిరిగి get_conpty_type();
+#లేకపోతే
+    తిరిగి 0;
+#అయితే_ముగింపు
 }
 
 // compare two keyvalue_T structs by case sensitive value
-    int
-cmp_keyvalue_value(const void *a, const void *b)
+    పూర్ణాంకం
+cmp_keyvalue_విలువ(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    తిరిగి STRCMP(kv1->విలువ.string, kv2->విలువ.string);
 }
 
 // compare two keyvalue_T structs by value with length
-    int
-cmp_keyvalue_value_n(const void *a, const void *b)
+    పూర్ణాంకం
+cmp_keyvalue_విలువ_n(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    తిరిగి STRNCMP(kv1->విలువ.string, kv2->విలువ.string, MAX(kv1->విలువ.నిడివి,
+		kv2->విలువ.నిడివి));
 }
 
 // compare two keyvalue_T structs by case insensitive value
-    int
-cmp_keyvalue_value_i(const void *a, const void *b)
+    పూర్ణాంకం
+cmp_keyvalue_విలువ_i(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    తిరిగి STRICMP(kv1->విలువ.string, kv2->విలువ.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
-    int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+    పూర్ణాంకం
+cmp_keyvalue_విలువ_ni(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    తిరిగి vim_strnicmp_asc((అక్షరం *)kv1->విలువ.string,
+	    (అక్షరం *)kv2->విలువ.string, MAX(kv1->విలువ.నిడివి,
+		    kv2->విలువ.నిడివి));
 }
 
 /*
@@ -3195,146 +3195,146 @@ cmp_keyvalue_value_ni(const void *a, const void *b)
  *  - Each pair of blocks is merged in sorted order.
  *  - Merged blocks are reconnected to build the sorted list.
  */
-    void *
+    శూన్య *
 mergesort_list(
-    void	*head,
-    void	*(*get_next)(void *),
-    void	(*set_next)(void *, void *),
-    void	*(*get_prev)(void *),
-    void	(*set_prev)(void *, void *),
-    int		(*compare)(const void *, const void *))
+    శూన్య	*తల,
+    శూన్య	*(*get_తదుపరి)(శూన్య *),
+    శూన్య	(*సమితి_తదుపరి)(శూన్య *, శూన్య *),
+    శూన్య	*(*get_prev)(శూన్య *),
+    శూన్య	(*సమితి_prev)(శూన్య *, శూన్య *),
+    పూర్ణాంకం		(*compare)(స్థిరరాశి శూన్య *, స్థిరరాశి శూన్య *))
 {
-    if (!head || !get_next(head))
-	return head;
+    ఒకవేళ (!తల || !get_తదుపరి(తల))
+	తిరిగి తల;
 
     // Count length
-    int	    n = 0;
-    void*   curr = head;
-    while (curr)
+    పూర్ణాంకం	    n = 0;
+    శూన్య*   curr = తల;
+    అయితే (curr)
     {
 	n++;
-	curr = get_next(curr);
+	curr = get_తదుపరి(curr);
     }
 
-    int	size;
-    for (size = 1; size < n; size *= 2)
+    పూర్ణాంకం	కొలత;
+    కొరకు (కొలత = 1; కొలత < n; కొలత *= 2)
     {
-	void*	new_head = NULL;
-	void*	tail = NULL;
-	curr = head;
+	శూన్య*	new_తల = ఖాళీ;
+	శూన్య*	తోక = ఖాళీ;
+	curr = తల;
 
-	while (curr)
+	అయితే (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
-	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    శూన్య    *ఎడమ_2 = curr;
+	    శూన్య    *కుడి_2 = ఎడమ_2;
+	    పూర్ణాంకం	    i;
+	    కొరకు (i = 0; i < కొలత && కుడి_2; ++i)
+		కుడి_2 = get_తదుపరి(కుడి_2);
 
-	    void    *next = right;
-	    for (i = 0; i < size && next; ++i)
-		next = get_next(next);
+	    శూన్య    *తదుపరి = కుడి_2;
+	    కొరకు (i = 0; i < కొలత && తదుపరి; ++i)
+		తదుపరి = get_తదుపరి(తదుపరి);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
-	    if (l_end)
-		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    శూన్య    *l_చివర = కుడి_2 ? get_prev(కుడి_2) : ఖాళీ;
+	    ఒకవేళ (l_చివర)
+		సమితి_తదుపరి(l_చివర, ఖాళీ);
+	    ఒకవేళ (కుడి_2)
+		సమితి_prev(కుడి_2, ఖాళీ);
 
-	    void    *r_end = next ? get_prev(next) : NULL;
-	    if (r_end)
-		set_next(r_end, NULL);
-	    if (next)
-		set_prev(next, NULL);
+	    శూన్య    *r_చివర = తదుపరి ? get_prev(తదుపరి) : ఖాళీ;
+	    ఒకవేళ (r_చివర)
+		సమితి_తదుపరి(r_చివర, ఖాళీ);
+	    ఒకవేళ (తదుపరి)
+		సమితి_prev(తదుపరి, ఖాళీ);
 
-	    // Merge
-	    void    *merged = NULL;
-	    void    *merged_tail = NULL;
+	    //విలీనం
+	    శూన్య    *merged = ఖాళీ;
+	    శూన్య    *merged_తోక = ఖాళీ;
 
-	    while (left || right)
+	    అయితే (ఎడమ_2 || కుడి_2)
 	    {
-		void	*chosen = NULL;
-		if (!left)
+		శూన్య	*chosen = ఖాళీ;
+		ఒకవేళ (!ఎడమ_2)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = కుడి_2;
+		    కుడి_2 = get_తదుపరి(కుడి_2);
 		}
-		else if (!right)
+		లేకపోతే ఒకవేళ (!కుడి_2)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = ఎడమ_2;
+		    ఎడమ_2 = get_తదుపరి(ఎడమ_2);
 		}
-		else if (compare(left, right) <= 0)
+		లేకపోతే ఒకవేళ (compare(ఎడమ_2, కుడి_2) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = ఎడమ_2;
+		    ఎడమ_2 = get_తదుపరి(ఎడమ_2);
 		}
-		else
+		లేకపోతే
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = కుడి_2;
+		    కుడి_2 = get_తదుపరి(కుడి_2);
 		}
 
-		if (merged_tail)
+		ఒకవేళ (merged_తోక)
 		{
-		    set_next(merged_tail, chosen);
-		    set_prev(chosen, merged_tail);
-		    merged_tail = chosen;
+		    సమితి_తదుపరి(merged_తోక, chosen);
+		    సమితి_prev(chosen, merged_తోక);
+		    merged_తోక = chosen;
 		}
-		else
+		లేకపోతే
 		{
-		    merged = merged_tail = chosen;
-		    set_prev(chosen, NULL);
+		    merged = merged_తోక = chosen;
+		    సమితి_prev(chosen, ఖాళీ);
 		}
 	    }
 
 	    // Connect to full list
-	    if (!new_head)
-		new_head = merged;
-	    else
+	    ఒకవేళ (!new_తల)
+		new_తల = merged;
+	    లేకపోతే
 	    {
-		set_next(tail, merged);
-		set_prev(merged, tail);
+		సమితి_తదుపరి(తోక, merged);
+		సమితి_prev(merged, తోక);
 	    }
 
 	    // Move tail to end
-	    while (get_next(merged_tail))
-		merged_tail = get_next(merged_tail);
-	    tail = merged_tail;
+	    అయితే (get_తదుపరి(merged_తోక))
+		merged_తోక = get_తదుపరి(merged_తోక);
+	    తోక = merged_తోక;
 
-	    curr = next;
+	    curr = తదుపరి;
 	}
 
-	head = new_head;
+	తల = new_తల;
     }
 
-    return head;
+    తిరిగి తల;
 }
 
-static const char_u base64_table[] =
+స్థిర స్థిరరాశి char_u base64_పట్టిక[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static char_u base64_dec_table[256];
+స్థిర char_u base64_dec_పట్టిక[256];
 
-#define BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
+#నిర్వచించు BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
 
 /*
  * Initialize the base64 decoding table
  */
-    static void
-init_base64_dec_table(void)
+    స్థిర శూన్య
+init_base64_dec_పట్టిక(శూన్య)
 {
-    static int base64_dec_tbl_initialized = FALSE;
+    స్థిర పూర్ణాంకం base64_dec_tbl_initialized = FALSE;
 
-    if (base64_dec_tbl_initialized)
-	return;
+    ఒకవేళ (base64_dec_tbl_initialized)
+	తిరిగి;
 
-    vim_memset(base64_dec_table, 0xFF, sizeof(base64_dec_table));
-    for (size_t i = 0; i < sizeof(base64_table) - 1; i++)
-	base64_dec_table[(char_u)base64_table[i]] = (char_u)i;
-    base64_dec_table['='] = 0;
+    vim_memset(base64_dec_పట్టిక, 0xFF, పరిమాణం(base64_dec_పట్టిక));
+    కొరకు (size_t i = 0; i < పరిమాణం(base64_పట్టిక) - 1; i++)
+	base64_dec_పట్టిక[(char_u)base64_పట్టిక[i]] = (char_u)i;
+    base64_dec_పట్టిక['='] = 0;
 
     base64_dec_tbl_initialized = TRUE;
 }
@@ -3344,33 +3344,33 @@ init_base64_dec_table(void)
  * at least BASE64_ENCODED_LEN(len) bytes (NUL terminated). Returns the number
  * of bytes written, excluding the NUL.
  */
-    long
-base64_encode_buf(char_u *dst, const char_u *src, size_t len)
+    దీర్ఘ
+base64_encode_buf(char_u *dst, స్థిరరాశి char_u *src, size_t len)
 {
     size_t i, j;
 
-    for (i = 0, j = 0; i < len;)
+    కొరకు (i = 0, j = 0; i < len;)
     {
-	size_t remaining = len - i;
+	size_t మిగిలిన = len - i;
 
 	int_u octet_a = src[i++];
-	int_u octet_b = remaining > 1 ? src[i++] : 0;
-	int_u octet_c = remaining > 2 ? src[i++] : 0;
+	int_u octet_b = మిగిలిన > 1 ? src[i++] : 0;
+	int_u octet_c = మిగిలిన > 2 ? src[i++] : 0;
 
 	int_u triple = (octet_a << 16) | (octet_b << 8) | octet_c;
 
-	dst[j++] = base64_table[(triple >> 18) & 0x3F];
-	dst[j++] = base64_table[(triple >> 12) & 0x3F];
-	dst[j++] = remaining > 1
-	    ? base64_table[(triple >> 6) & 0x3F]
+	dst[j++] = base64_పట్టిక[(triple >> 18) & 0x3F];
+	dst[j++] = base64_పట్టిక[(triple >> 12) & 0x3F];
+	dst[j++] = మిగిలిన > 1
+	    ? base64_పట్టిక[(triple >> 6) & 0x3F]
 	    : '=';
-	dst[j++] = remaining > 2
-	    ? base64_table[triple & 0x3F]
+	dst[j++] = మిగిలిన > 2
+	    ? base64_పట్టిక[triple & 0x3F]
 	    : '=';
     }
 
     dst[j] = NUL;
-    return (long)j;
+    తిరిగి (దీర్ఘ)j;
 }
 
 /*
@@ -3378,14 +3378,14 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
  * NULL on OOM.  Caller frees with vim_free().
  */
     char_u *
-base64_encode(const char_u *data, size_t len)
+base64_encode(స్థిరరాశి char_u *దత్తాంశం, size_t len)
 {
     char_u *encoded = alloc(BASE64_ENCODED_LEN(len));
 
-    if (encoded == NULL)
-	return NULL;
-    base64_encode_buf(encoded, data, len);
-    return encoded;
+    ఒకవేళ (encoded == ఖాళీ)
+	తిరిగి ఖాళీ;
+    base64_encode_buf(encoded, దత్తాంశం, len);
+    తిరిగి encoded;
 }
 
 /*
@@ -3393,71 +3393,71 @@ base64_encode(const char_u *data, size_t len)
  * "out" (appended byte-by-byte, e.g. a blob's bv_ga). Returns OK on success and
  * FAIL on failure.
  */
-    int
-base64_decode(const char_u *data, size_t len, garray_T *out)
+    పూర్ణాంకం
+base64_decode(స్థిరరాశి char_u *దత్తాంశం, size_t len, garray_T *బహిర్గతం)
 {
-    if (len == 0)
-	return OK;
+    ఒకవేళ (len == 0)
+	తిరిగి OK;
 
-    if (len % 4 != 0)
+    ఒకవేళ (len % 4 != 0)
     {
-	semsg(_(e_invalid_argument_str), data);
-	return FAIL;
+	semsg(_(e_invalid_వాదం_str), దత్తాంశం);
+	తిరిగి FAIL;
     }
 
-    init_base64_dec_table();
+    init_base64_dec_పట్టిక();
 
     size_t decoded_len = (len / 4) * 3;
-    if (data[len - 1] == '=')
+    ఒకవేళ (దత్తాంశం[len - 1] == '=')
 	decoded_len--;
-    if (data[len - 2] == '=')
+    ఒకవేళ (దత్తాంశం[len - 2] == '=')
 	decoded_len--;
 
     size_t i, j;
-    for (i = 0, j = 0; i < len;)
+    కొరకు (i = 0, j = 0; i < len;)
     {
-	int_u sextet_a = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_b = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_c = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_d = base64_dec_table[(char_u)data[i++]];
+	int_u sextet_a = base64_dec_పట్టిక[(char_u)దత్తాంశం[i++]];
+	int_u sextet_b = base64_dec_పట్టిక[(char_u)దత్తాంశం[i++]];
+	int_u sextet_c = base64_dec_పట్టిక[(char_u)దత్తాంశం[i++]];
+	int_u sextet_d = base64_dec_పట్టిక[(char_u)దత్తాంశం[i++]];
 
-	if (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
+	ఒకవేళ (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
 							|| sextet_d == 0xFF)
 	{
-	    semsg(_(e_invalid_argument_str), data);
-	    ga_clear(out);
-	    return FAIL;
+	    semsg(_(e_invalid_వాదం_str), దత్తాంశం);
+	    ga_clear(బహిర్గతం);
+	    తిరిగి FAIL;
 	}
 
 	int_u triple = (sextet_a << 18) | (sextet_b << 12)
 						| (sextet_c << 6) | sextet_d;
 
-	if (j < decoded_len)
+	ఒకవేళ (j < decoded_len)
 	{
-	    ga_append(out, (triple >> 16) & 0xFF);
+	    ga_append(బహిర్గతం, (triple >> 16) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	ఒకవేళ (j < decoded_len)
 	{
-	    ga_append(out, (triple >> 8) & 0xFF);
+	    ga_append(బహిర్గతం, (triple >> 8) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	ఒకవేళ (j < decoded_len)
 	{
-	    ga_append(out, triple & 0xFF);
+	    ga_append(బహిర్గతం, triple & 0xFF);
 	    j++;
 	}
 
-	if (j == decoded_len)
+	ఒకవేళ (j == decoded_len)
 	{
-	    if ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
-		|| ((data[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
+	    ఒకవేళ ((దత్తాంశం[len - 2] == '=' && ((sextet_b & 0xF) != 0))
+		|| ((దత్తాంశం[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
 	    {
-		semsg(_(e_invalid_argument_str), data);
-		ga_clear(out);
-		return FAIL;
+		semsg(_(e_invalid_వాదం_str), దత్తాంశం);
+		ga_clear(బహిర్గతం);
+		తిరిగి FAIL;
 	    }
 	}
     }
-    return OK;
+    తిరిగి OK;
 }

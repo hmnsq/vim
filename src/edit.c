@@ -11,118 +11,118 @@
  * edit.c: functions for Insert mode
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#define BACKSPACE_CHAR		    1
-#define BACKSPACE_WORD		    2
-#define BACKSPACE_WORD_NOT_SPACE    3
-#define BACKSPACE_LINE		    4
+#నిర్వచించు BACKSPACE_CHAR		    1
+#నిర్వచించు BACKSPACE_మాట		    2
+#నిర్వచించు BACKSPACE_మాట_NOT_SPACE    3
+#నిర్వచించు BACKSPACE_పంక్తి		    4
 
 // Set when doing something for completion that may call edit() recursively,
 // which is not allowed.
-static int	compl_busy = FALSE;
+స్థిర పూర్ణాంకం	compl_busy = FALSE;
 
 
-static void ins_ctrl_v(void);
-static void insert_special(int, int, int);
-static void redo_literal(int c);
-static void start_arrow_common(pos_T *end_insert_pos, int change);
-#ifdef FEAT_SPELL
-static void check_spell_redraw(void);
-#endif
-static void stop_insert(pos_T *end_insert_pos, int esc, int nomove);
-static int  echeck_abbr(int);
-static void mb_replace_pop_ins(int cc);
-static void replace_flush(void);
-static void replace_do_bs(int limit_col);
-static int del_char_after_col(int limit_col);
-static void ins_reg(void);
-static void ins_ctrl_g(void);
-static void ins_ctrl_hat(void);
-static int  ins_esc(long *count, int cmdchar, int nomove);
-#ifdef FEAT_RIGHTLEFT
-static void ins_ctrl_(void);
-#endif
-static int ins_start_select(int c);
-static void ins_insert(int replaceState);
-static void ins_ctrl_o(void);
-static void ins_shift(int c, int lastc);
-static void ins_del(void);
-static int  ins_bs(int c, int mode, int *inserted_space_p);
-#if defined(FEAT_GUI_TABLINE)
-static void ins_tabline(int c);
-#endif
-static void ins_left(void);
-static void ins_home(int c);
-static void ins_end(int c);
-static void ins_s_left(void);
-static void ins_right(void);
-static void ins_s_right(void);
-static void ins_up(int startcol);
-static void ins_pageup(void);
-static void ins_down(int startcol);
-static void ins_pagedown(void);
-#ifdef FEAT_DND
-static void ins_drop(void);
-#endif
-static int  ins_tab(void);
-#ifdef FEAT_DIGRAPHS
-static int  ins_digraph(void);
-#endif
-static int  ins_ctrl_ey(int tc);
-#if defined(FEAT_EVAL)
-static char_u *do_insert_char_pre(int c);
-#endif
+స్థిర శూన్య ins_ctrl_v(శూన్య);
+స్థిర శూన్య చొప్పించు_special(పూర్ణాంకం, పూర్ణాంకం, పూర్ణాంకం);
+స్థిర శూన్య redo_literal(పూర్ణాంకం c);
+స్థిర శూన్య ప్రారంభం_arrow_common(pos_T *చివర_చొప్పించు_pos, పూర్ణాంకం change);
+#నిర్వచితమైతే FEAT_SPELL
+స్థిర శూన్య check_spell_redraw(శూన్య);
+#అయితే_ముగింపు
+స్థిర శూన్య stop_చొప్పించు(pos_T *చివర_చొప్పించు_pos, పూర్ణాంకం esc, పూర్ణాంకం nomove);
+స్థిర పూర్ణాంకం  echeck_abbr(పూర్ణాంకం);
+స్థిర శూన్య mb_replace_తీయి_ins(పూర్ణాంకం cc);
+స్థిర శూన్య replace_flush(శూన్య);
+స్థిర శూన్య replace_do_bs(పూర్ణాంకం హద్దు_నిలువు);
+స్థిర పూర్ణాంకం del_char_after_నిలువు(పూర్ణాంకం హద్దు_నిలువు);
+స్థిర శూన్య ins_reg(శూన్య);
+స్థిర శూన్య ins_ctrl_g(శూన్య);
+స్థిర శూన్య ins_ctrl_hat(శూన్య);
+స్థిర పూర్ణాంకం  ins_esc(దీర్ఘ *లెక్క, పూర్ణాంకం cmdchar, పూర్ణాంకం nomove);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+స్థిర శూన్య ins_ctrl_(శూన్య);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం ins_ప్రారంభం_select(పూర్ణాంకం c);
+స్థిర శూన్య ins_చొప్పించు(పూర్ణాంకం replaceState);
+స్థిర శూన్య ins_ctrl_o(శూన్య);
+స్థిర శూన్య ins_జరుపు(పూర్ణాంకం c, పూర్ణాంకం lastc);
+స్థిర శూన్య ins_del(శూన్య);
+స్థిర పూర్ణాంకం  ins_bs(పూర్ణాంకం c, పూర్ణాంకం బహుళకం, పూర్ణాంకం *inserted_space_p);
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+స్థిర శూన్య ins_tabline(పూర్ణాంకం c);
+#అయితే_ముగింపు
+స్థిర శూన్య ins_ఎడమ(శూన్య);
+స్థిర శూన్య ins_home(పూర్ణాంకం c);
+స్థిర శూన్య ins_చివర(పూర్ణాంకం c);
+స్థిర శూన్య ins_s_ఎడమ(శూన్య);
+స్థిర శూన్య ins_కుడి(శూన్య);
+స్థిర శూన్య ins_s_కుడి(శూన్య);
+స్థిర శూన్య ins_పైకి(పూర్ణాంకం startcol);
+స్థిర శూన్య ins_pageup(శూన్య);
+స్థిర శూన్య ins_కిందికి(పూర్ణాంకం startcol);
+స్థిర శూన్య ins_pagedown(శూన్య);
+#నిర్వచితమైతే FEAT_DND
+స్థిర శూన్య ins_drop(శూన్య);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం  ins_tab(శూన్య);
+#నిర్వచితమైతే FEAT_DIGRAPHS
+స్థిర పూర్ణాంకం  ins_digraph(శూన్య);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం  ins_ctrl_ey(పూర్ణాంకం tc);
+#ఒకవేళ defined(FEAT_EVAL)
+స్థిర char_u *do_చొప్పించు_char_pre(పూర్ణాంకం c);
+#అయితే_ముగింపు
 
-static colnr_T	Insstart_textlen;	// length of line when insert started
-static colnr_T	Insstart_blank_vcol;	// vcol for first inserted blank
-static int	update_Insstart_orig = TRUE; // set Insstart_orig to Insstart
+స్థిర colnr_T	Insstart_textlen;	// length of line when insert started
+స్థిర colnr_T	Insstart_blank_vcol;	// vcol for first inserted blank
+స్థిర పూర్ణాంకం	update_Insstart_orig = TRUE; // set Insstart_orig to Insstart
 
-static string_T	last_insert = {NULL, 0};    // the text of the previous insert,
+స్థిర string_T	చివరి_చొప్పించు = {ఖాళీ, 0};    // the text of the previous insert,
 					    // K_SPECIAL and CSI are escaped
-static int	last_insert_skip; // nr of chars in front of previous insert
-static int	new_insert_skip;  // nr of chars in front of current insert
-static int	did_restart_edit;	// "restart_edit" when calling edit()
+స్థిర పూర్ణాంకం	చివరి_చొప్పించు_skip; // nr of chars in front of previous insert
+స్థిర పూర్ణాంకం	new_చొప్పించు_skip;  // nr of chars in front of current insert
+స్థిర పూర్ణాంకం	did_restart_edit;	// "restart_edit" when calling edit()
 
-static int	can_cindent;		// may do cindenting on this line
+స్థిర పూర్ణాంకం	can_cindent;		// may do cindenting on this line
 
-#ifdef FEAT_RIGHTLEFT
-static int	revins_on;		// reverse insert mode on
-static int	revins_chars;		// how much to skip after edit
-static int	revins_legal;		// was the last char 'legal'?
-static int	revins_scol;		// start column of revins session
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+స్థిర పూర్ణాంకం	revins_on;		// reverse insert mode on
+స్థిర పూర్ణాంకం	revins_chars;		// how much to skip after edit
+స్థిర పూర్ణాంకం	revins_legal;		// was the last char 'legal'?
+స్థిర పూర్ణాంకం	revins_scol;		// start column of revins session
+#అయితే_ముగింపు
 
-static int	ins_need_undo;		// call u_save() before inserting a
+స్థిర పూర్ణాంకం	ins_need_undo;		// call u_save() before inserting a
 					// char.  Set when edit() is called.
 					// after that arrow_used is used.
 
-static int	dont_sync_undo = FALSE;	// CTRL-G U prevents syncing undo for
+స్థిర పూర్ణాంకం	dont_sync_undo = FALSE;	// CTRL-G U prevents syncing undo for
 					// the next left/right cursor key
 
 // With 'autocompletedelay' set, arm the delay and let the main loop fire
 // Insert-mode autocommands; the popup is shown later on K_COMPLETE_DELAY.
 // Otherwise trigger completion right away.
-#define TRIGGER_AUTOCOMPLETE()			\
-    do {					\
+#నిర్వచించు TRIGGER_AUTOCOMPLETE()			\
+    చేయి {					\
 	update_screen(UPD_VALID);  /* Show char (deletion) immediately */ \
-	out_flush();				\
+	బహిర్గతం_flush();				\
 	ins_compl_enable_autocomplete();	\
 	ins_compl_arm_autostart();		\
-	if (!ins_compl_arm_autocomplete_delay())\
-	    goto docomplete;			\
-    } while (0)
+	ఒకవేళ (!ins_compl_arm_autocomplete_delay())\
+	    వెళ్ళు docomplete;			\
+    } అయితే (0)
 
-#define MAY_TRIGGER_AUTOCOMPLETE(c)				\
-    do {							\
-	if (ins_compl_has_autocomplete() && !char_avail()	\
-		&& curwin->w_cursor.col > 0)			\
+#నిర్వచించు MAY_TRIGGER_AUTOCOMPLETE(c)				\
+    చేయి {							\
+	ఒకవేళ (ins_compl_has_autocomplete() && !char_avail()	\
+		&& curwin->w_cursor.నిలువు > 0)			\
 	{							\
 	    (c) = char_before_cursor();				\
-	    if (vim_isprintc(c))				\
+	    ఒకవేళ (vim_isprintc(c))				\
 		TRIGGER_AUTOCOMPLETE();				\
 	}							\
-    } while (0)
+    } అయితే (0)
 
 /*
  * edit(): Start inserting text.
@@ -143,34 +143,34 @@ static int	dont_sync_undo = FALSE;	// CTRL-G U prevents syncing undo for
  *
  * Return TRUE if a CTRL-O command caused the return (insert mode pending).
  */
-    int
+    పూర్ణాంకం
 edit(
-    int		cmdchar,
-    int		startln,	// if set, insert at start of line
-    long	count)
+    పూర్ణాంకం		cmdchar,
+    పూర్ణాంకం		startln,	// if set, insert at start of line
+    దీర్ఘ	లెక్క)
 {
-    int		c = 0;
+    పూర్ణాంకం		c = 0;
     char_u	*ptr;
-    int		lastc = 0;
-    int		mincol;
-    static linenr_T o_lnum = 0;
-    int		i;
-    int		did_backspace = TRUE;	    // previous char was backspace
-    int		line_is_white = FALSE;	    // line is empty before insert
+    పూర్ణాంకం		lastc = 0;
+    పూర్ణాంకం		mincol;
+    స్థిర linenr_T o_lnum = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		did_backspace = TRUE;	    // previous char was backspace
+    పూర్ణాంకం		పంక్తి_is_white = FALSE;	    // line is empty before insert
     linenr_T	old_topline = 0;	    // topline before insertion
-#ifdef FEAT_DIFF
-    int		old_topfill = -1;
-#endif
-    int		inserted_space = FALSE;     // just inserted a space
-    int		replaceState = MODE_REPLACE;
-    int		nomove = FALSE;		    // don't move cursor on return
-#ifdef FEAT_JOB_CHANNEL
-    int		cmdchar_todo = cmdchar;
-#endif
-#ifdef FEAT_CONCEAL
-    int		cursor_line_was_concealed;
-#endif
-    int		ins_just_started = TRUE;
+#నిర్వచితమైతే FEAT_DIFF
+    పూర్ణాంకం		old_topfill = -1;
+#అయితే_ముగింపు
+    పూర్ణాంకం		inserted_space = FALSE;     // just inserted a space
+    పూర్ణాంకం		replaceState = బహుళకం_REPLACE;
+    పూర్ణాంకం		nomove = FALSE;		    // don't move cursor on return
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    పూర్ణాంకం		cmdchar_todo = cmdchar;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CONCEAL
+    పూర్ణాంకం		cursor_పంక్తి_was_concealed;
+#అయితే_ముగింపు
+    పూర్ణాంకం		ins_just_started = TRUE;
 
     // Remember whether editing was restarted after CTRL-O.
     did_restart_edit = restart_edit;
@@ -182,46 +182,46 @@ edit(
     // set Insstart_orig to Insstart
     update_Insstart_orig = TRUE;
 
-#ifdef HAVE_SANDBOX
+#నిర్వచితమైతే HAVE_SANDBOX
     // Don't allow inserting in the sandbox.
-    if (sandbox != 0)
+    ఒకవేళ (sandbox != 0)
     {
-	emsg(_(e_not_allowed_in_sandbox));
-	return FALSE;
+	emsg(_(e_not_allowed_లోపల_sandbox));
+	తిరిగి FALSE;
     }
-#endif
+#అయితే_ముగింపు
     // Don't allow changes in the buffer while editing the cmdline.  The
     // caller of getcmdline() may get confused.
     // Don't allow recursive insert mode when busy with completion.
-    if (textlock != 0 || ins_compl_active() || compl_busy || pum_visible())
+    ఒకవేళ (textlock != 0 || ins_compl_చురుకైన() || compl_busy || pum_visible())
     {
-	emsg(_(e_not_allowed_to_change_text_or_change_window));
-	return FALSE;
+	emsg(_(e_not_allowed_గమ్యం_change_పాఠ్యం_or_change_కిటికీ));
+	తిరిగి FALSE;
     }
     ins_compl_clear();	    // clear stuff for CTRL-X mode
 
     /*
      * Trigger InsertEnter autocommands.  Do not do this for "r<CR>" or "grx".
      */
-    if (cmdchar != 'r' && cmdchar != 'v')
+    ఒకవేళ (cmdchar != 'r' && cmdchar != 'v')
     {
 	pos_T   save_cursor = curwin->w_cursor;
 
-#ifdef FEAT_EVAL
-	if (cmdchar == 'R')
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (cmdchar == 'R')
 	    ptr = (char_u *)"r";
-	else if (cmdchar == 'V')
+	లేకపోతే ఒకవేళ (cmdchar == 'V')
 	    ptr = (char_u *)"v";
-	else
+	లేకపోతే
 	    ptr = (char_u *)"i";
-	set_vim_var_string(VV_INSERTMODE, ptr, 1);
-	set_vim_var_string(VV_CHAR, NULL, -1);  // clear v:char
-#endif
+	సమితి_vim_var_string(VV_INSERTMODE, ptr, 1);
+	సమితి_vim_var_string(VV_CHAR, ఖాళీ, -1);  // clear v:char
+#అయితే_ముగింపు
 	ins_apply_autocmds(EVENT_INSERTENTER);
 
 	// Check for changed highlighting, e.g. for ModeMsg.
-	if (need_highlight_changed)
-	    highlight_changed();
+	ఒకవేళ (need_highlight_మారింది)
+	    highlight_మారింది();
 
 	// Make sure the cursor didn't move.  Do call check_cursor_col() in
 	// case the text was modified.  Since Insert mode was not started yet
@@ -229,96 +229,96 @@ edit(
 	// the "A" command, thus set State to avoid that. Also check that the
 	// line number is still valid (lines may have been deleted).
 	// Do not restore if v:char was set to a non-empty string.
-	if (!EQUAL_POS(curwin->w_cursor, save_cursor)
-#ifdef FEAT_EVAL
+	ఒకవేళ (!EQUAL_POS(curwin->w_cursor, save_cursor)
+#నిర్వచితమైతే FEAT_EVAL
 		&& *get_vim_var_str(VV_CHAR) == NUL
-#endif
-		&& save_cursor.lnum <= curbuf->b_ml.ml_line_count)
+#అయితే_ముగింపు
+		&& save_cursor.lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    int save_state = State;
+	    పూర్ణాంకం save_state = State;
 
 	    curwin->w_cursor = save_cursor;
-	    State = MODE_INSERT;
-	    check_cursor_col();
+	    State = బహుళకం_చొప్పించు;
+	    check_cursor_నిలువు();
 	    State = save_state;
 	}
     }
 
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
     // Check if the cursor line was concealed before changing State.
-    cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
-#endif
+    cursor_పంక్తి_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_పంక్తి(curwin);
+#అయితే_ముగింపు
 
     /*
      * When doing a paste with the middle mouse button, Insstart is set to
      * where the paste started.
      */
-    if (where_paste_started.lnum != 0)
+    ఒకవేళ (where_paste_started.lnum != 0)
 	Insstart = where_paste_started;
-    else
+    లేకపోతే
     {
 	Insstart = curwin->w_cursor;
-	if (startln)
-	    Insstart.col = 0;
+	ఒకవేళ (startln)
+	    Insstart.నిలువు = 0;
     }
     Insstart_textlen = (colnr_T)linetabsize_str(ml_get_curline());
     Insstart_blank_vcol = MAXCOL;
-    if (!did_ai)
-	ai_col = 0;
+    ఒకవేళ (!did_ai)
+	ai_నిలువు = 0;
 
-    if (cmdchar != NUL && restart_edit == 0)
+    ఒకవేళ (cmdchar != NUL && restart_edit == 0)
     {
 	ResetRedobuff();
-	AppendNumberToRedobuff(count);
-	if (cmdchar == 'V' || cmdchar == 'v')
+	Append_సంఖ్య_గమ్యం_Redobuff(లెక్క);
+	ఒకవేళ (cmdchar == 'V' || cmdchar == 'v')
 	{
 	    // "gR" or "gr" command
-	    AppendCharToRedobuff('g');
-	    AppendCharToRedobuff((cmdchar == 'v') ? 'r' : 'R');
+	    Append_Char_గమ్యం_Redobuff('g');
+	    Append_Char_గమ్యం_Redobuff((cmdchar == 'v') ? 'r' : 'R');
 	}
-	else
+	లేకపోతే
 	{
-	    if (cmdchar == K_PS)
-		AppendCharToRedobuff('a');
-	    else
-		AppendCharToRedobuff(cmdchar);
-	    if (cmdchar == 'g')		    // "gI" command
-		AppendCharToRedobuff('I');
-	    else if (cmdchar == 'r')	    // "r<CR>" command
-		count = 1;		    // insert only one <CR>
+	    ఒకవేళ (cmdchar == K_PS)
+		Append_Char_గమ్యం_Redobuff('a');
+	    లేకపోతే
+		Append_Char_గమ్యం_Redobuff(cmdchar);
+	    ఒకవేళ (cmdchar == 'g')		    // "gI" command
+		Append_Char_గమ్యం_Redobuff('I');
+	    లేకపోతే ఒకవేళ (cmdchar == 'r')	    // "r<CR>" command
+		లెక్క = 1;		    // insert only one <CR>
 	}
     }
 
-    if (cmdchar == 'R')
+    ఒకవేళ (cmdchar == 'R')
     {
-	State = MODE_REPLACE;
+	State = బహుళకం_REPLACE;
     }
-    else if (cmdchar == 'V' || cmdchar == 'v')
+    లేకపోతే ఒకవేళ (cmdchar == 'V' || cmdchar == 'v')
     {
-	State = MODE_VREPLACE;
-	replaceState = MODE_VREPLACE;
-	orig_line_count = curbuf->b_ml.ml_line_count;
-	vr_lines_changed = 1;
+	State = బహుళకం_VREPLACE;
+	replaceState = బహుళకం_VREPLACE;
+	orig_పంక్తి_లెక్క = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	vr_పంక్తులు_మారింది = 1;
     }
-    else
-	State = MODE_INSERT;
+    లేకపోతే
+	State = బహుళకం_చొప్పించు;
 
     may_trigger_modechanged();
-    stop_insert_mode = FALSE;
+    stop_చొప్పించు_బహుళకం = FALSE;
 
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
     // Check if the cursor line needs redrawing after changing State.  If
     // 'concealcursor' is "n" it needs to be redrawn without concealing.
-    conceal_check_cursor_line(cursor_line_was_concealed);
-#endif
+    conceal_check_cursor_పంక్తి(cursor_పంక్తి_was_concealed);
+#అయితే_ముగింపు
 
     // Need to position cursor again when on a TAB and when on a char with
     // virtual text.
-    if (gchar_cursor() == TAB
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (gchar_cursor() == TAB
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    || curbuf->b_has_textprop
-#endif
+#అయితే_ముగింపు
        )
 	curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL);
 
@@ -328,34 +328,34 @@ edit(
      * 'iminsert' value may not reflect what is actually used.  It is updated
      * when hitting <Esc>.
      */
-    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
-	State |= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
-    im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
-#endif
+    ఒకవేళ (curbuf->b_p_iminsert == B_IMODE_LMAP)
+	State |= బహుళకం_LANGMAP;
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    im_సమితి_చురుకైన(curbuf->b_p_iminsert == B_IMODE_IM);
+#అయితే_ముగింపు
 
     setmouse();
     clear_showcmd();
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     // there is no reverse replace mode
-    revins_on = (State == MODE_INSERT && p_ri);
-    if (revins_on)
+    revins_on = (State == బహుళకం_చొప్పించు && p_ri);
+    ఒకవేళ (revins_on)
 	undisplay_dollar();
     revins_chars = 0;
     revins_legal = 0;
     revins_scol = -1;
-#endif
-    if (!p_ek)
+#అయితే_ముగింపు
+    ఒకవేళ (!p_ek)
     {
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_గమ్యం_LOG_THIS;
 
 	// Disable bracketed paste mode, we won't recognize the escape
 	// sequences.
-	out_str(T_BD);
+	బహిర్గతం_str(T_BD);
 
 	// Disable modifyOtherKeys, keys with modifiers would cause exiting
 	// Insert mode.
-	out_str_t_TE();
+	బహిర్గతం_str_t_TE();
     }
 
     /*
@@ -363,16 +363,16 @@ edit(
      * Don't do this for "CTRL-O ." (repeat an insert): In that case we get
      * here with something in the stuff buffer.
      */
-    if (restart_edit != 0 && stuff_empty())
+    ఒకవేళ (restart_edit != 0 && stuff_ఖాళీలు())
     {
 	/*
 	 * After a paste we consider text typed to be part of the insert for
 	 * the pasted text. You can backspace over the pasted text too.
 	 */
-	if (where_paste_started.lnum)
-	    arrow_used = FALSE;
-	else
-	    arrow_used = TRUE;
+	ఒకవేళ (where_paste_started.lnum)
+	    arrow_వాడిన = FALSE;
+	లేకపోతే
+	    arrow_వాడిన = TRUE;
 	restart_edit = 0;
 
 	/*
@@ -384,38 +384,38 @@ edit(
 	 */
 	validate_virtcol();
 	update_curswant();
-	if (((ins_at_eol && curwin->w_cursor.lnum == o_lnum)
+	ఒకవేళ (((ins_at_eol && curwin->w_cursor.lnum == o_lnum)
 		    || curwin->w_curswant > curwin->w_virtcol)
-		&& *(ptr = ml_get_curline() + curwin->w_cursor.col) != NUL)
+		&& *(ptr = ml_get_curline() + curwin->w_cursor.నిలువు) != NUL)
 	{
-	    if (ptr[1] == NUL)
-		++curwin->w_cursor.col;
-	    else if (has_mbyte)
+	    ఒకవేళ (ptr[1] == NUL)
+		++curwin->w_cursor.నిలువు;
+	    లేకపోతే ఒకవేళ (has_mbyte)
 	    {
 		i = (*mb_ptr2len)(ptr);
-		if (ptr[i] == NUL)
-		    curwin->w_cursor.col += i;
+		ఒకవేళ (ptr[i] == NUL)
+		    curwin->w_cursor.నిలువు += i;
 	    }
 	}
 	ins_at_eol = FALSE;
     }
-    else
-	arrow_used = FALSE;
+    లేకపోతే
+	arrow_వాడిన = FALSE;
 
     // we are in insert mode now, don't need to start it anymore
-    need_start_insertmode = FALSE;
+    need_ప్రారంభం_insertmode = FALSE;
 
     // Need to save the line for undo before inserting the first char.
     ins_need_undo = TRUE;
 
     where_paste_started.lnum = 0;
     can_cindent = TRUE;
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // The cursor line is not in a closed fold, unless 'insertmode' is set or
     // restarting.
-    if (!p_im && did_restart_edit == 0)
+    ఒకవేళ (!p_im && did_restart_edit == 0)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
     /*
      * If 'showmode' is set, show the current (insert/replace/..) mode.
@@ -423,26 +423,26 @@ edit(
      * actually changing anything.  It's put after the mode, if any.
      */
     i = 0;
-    if (p_smd && msg_silent == 0)
+    ఒకవేళ (p_smd && సందేశం_silent == 0)
 	i = showmode();
 
-    if (!p_im && did_restart_edit == 0)
+    ఒకవేళ (!p_im && did_restart_edit == 0)
 	change_warning(i == 0 ? 0 : i + 1);
 
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
-#ifdef FEAT_DIGRAPHS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DIGRAPHS
     do_digraph(-1);		// clear digraphs
-#endif
+#అయితే_ముగింపు
 
     /*
      * Get the current length of the redo buffer, those characters have to be
      * skipped if we want to get to the inserted characters.
      */
     string_T inserted = get_inserted();
-    new_insert_skip = (int)inserted.length;
-    if (inserted.string != NULL)
+    new_చొప్పించు_skip = (పూర్ణాంకం)inserted.నిడివి;
+    ఒకవేళ (inserted.string != ఖాళీ)
 	vim_free(inserted.string);
 
     old_indent = 0;
@@ -450,69 +450,69 @@ edit(
     /*
      * Main loop in Insert mode: repeat until Insert mode is left.
      */
-    for (;;)
+    కొరకు (;;)
     {
-#ifdef FEAT_RIGHTLEFT
-	if (!revins_legal)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (!revins_legal)
 	    revins_scol = -1;	    // reset on illegal motions
-	else
+	లేకపోతే
 	    revins_legal = 0;
-#endif
-	if (arrow_used)	    // don't repeat insert when arrow key used
-	    count = 0;
+#అయితే_ముగింపు
+	ఒకవేళ (arrow_వాడిన)	    // don't repeat insert when arrow key used
+	    లెక్క = 0;
 
-	if (update_Insstart_orig)
+	ఒకవేళ (update_Insstart_orig)
 	    Insstart_orig = Insstart;
 
-	if (stop_insert_mode && !ins_compl_active())
+	ఒకవేళ (stop_చొప్పించు_బహుళకం && !ins_compl_చురుకైన())
 	{
 	    // ":stopinsert" used or 'insertmode' reset
-	    count = 0;
-	    goto doESCkey;
+	    లెక్క = 0;
+	    వెళ్ళు doESCkey;
 	}
 
 	// set curwin->w_curswant for next K_DOWN or K_UP
-	if (!arrow_used)
-	    curwin->w_set_curswant = true;
+	ఒకవేళ (!arrow_వాడిన)
+	    curwin->w_సమితి_curswant = true;
 
 	// If there is no typeahead may check for timestamps (e.g., for when a
 	// menu invoked a shell command).
-	if (stuff_empty())
+	ఒకవేళ (stuff_ఖాళీలు())
 	{
 	    did_check_timestamps = FALSE;
-	    if (need_check_timestamps)
+	    ఒకవేళ (need_check_timestamps)
 		check_timestamps(FALSE);
 	}
 
 	/*
 	 * When emsg() was called msg_scroll will have been set.
 	 */
-	msg_scroll = FALSE;
+	సందేశం_scroll = FALSE;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	// When 'mousefocus' is set a mouse movement may have taken us to
 	// another window.  "need_mouse_correct" may then be set because of an
 	// autocommand.
-	if (need_mouse_correct)
+	ఒకవేళ (need_mouse_correct)
 	    gui_mouse_correct();
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	// Open fold at the cursor line, according to 'foldopen'.
-	if (fdo_flags & FDO_INSERT)
+	ఒకవేళ (fdo_flags & FDO_చొప్పించు)
 	    foldOpenCursor();
 	// Close folds where the cursor isn't, according to 'foldclose'
-	if (!char_avail())
+	ఒకవేళ (!char_avail())
 	    foldCheckClose();
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(curbuf))
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	ఒకవేళ (bt_prompt(curbuf))
 	{
 	    init_prompt(cmdchar_todo);
 	    cmdchar_todo = NUL;
 	}
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * If we inserted a character at the last position of the last line in
@@ -525,58 +525,58 @@ edit(
 	 * Also don't do this when 'smoothscroll' is set, as the window should
 	 * then be scrolled by screen lines.
 	 */
-	if (curbuf->b_mod_set
+	ఒకవేళ (curbuf->b_mod_సమితి
 		&& curwin->w_p_wrap
 		&& !curwin->w_p_sms
 		&& !did_backspace
 		&& curwin->w_topline == old_topline
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 		&& curwin->w_topfill == old_topfill
-#endif
-		&& count <= 1
+#అయితే_ముగింపు
+		&& లెక్క <= 1
 		)
 	{
 	    mincol = curwin->w_wcol;
-	    validate_cursor_col();
+	    validate_cursor_నిలువు();
 
-	    if (
-#ifdef FEAT_VARTABS
+	    ఒకవేళ (
+#నిర్వచితమైతే FEAT_VARTABS
 		curwin->w_wcol < mincol - tabstop_at(get_nolist_virtcol(),
 						     curbuf->b_p_ts,
 						     curbuf->b_p_vts_array,
 						     FALSE)
-#else
-		(int)curwin->w_wcol < mincol - curbuf->b_p_ts
-#endif
+#లేకపోతే
+		(పూర్ణాంకం)curwin->w_wcol < mincol - curbuf->b_p_ts
+#అయితే_ముగింపు
 		    && curwin->w_wrow ==
-				   curwin->w_height - 1 - get_scrolloff_value()
+				   curwin->w_ఎత్తు - 1 - get_scrolloff_విలువ()
 		    && (curwin->w_cursor.lnum != curwin->w_topline
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 			|| curwin->w_topfill > 0
-#endif
+#అయితే_ముగింపు
 		    ))
 	    {
-#ifdef FEAT_DIFF
-		if (curwin->w_topfill > 0)
+#నిర్వచితమైతే FEAT_DIFF
+		ఒకవేళ (curwin->w_topfill > 0)
 		    --curwin->w_topfill;
-		else
-#endif
-#ifdef FEAT_FOLDING
-		if (hasFolding(curwin->w_topline, NULL, &old_topline))
-		    set_topline(curwin, old_topline + 1);
-		else
-#endif
-		    set_topline(curwin, curwin->w_topline + 1);
+		లేకపోతే
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_FOLDING
+		ఒకవేళ (hasFolding(curwin->w_topline, ఖాళీ, &old_topline))
+		    సమితి_topline(curwin, old_topline + 1);
+		లేకపోతే
+#అయితే_ముగింపు
+		    సమితి_topline(curwin, curwin->w_topline + 1);
 	    }
 	}
 
 	// May need to adjust w_topline to show the cursor.
-	if (count <= 1)
+	ఒకవేళ (లెక్క <= 1)
 	    update_topline();
 
 	did_backspace = FALSE;
 
-	if (count <= 1)
+	ఒకవేళ (లెక్క <= 1)
 	    validate_cursor();		// may set must_redraw
 
 	/*
@@ -585,189 +585,189 @@ edit(
 	 */
 	ins_redraw(TRUE);
 
-	if (curwin->w_p_scb)
+	ఒకవేళ (curwin->w_p_scb)
 	    do_check_scrollbind(TRUE);
 
-	if (curwin->w_p_crb)
+	ఒకవేళ (curwin->w_p_crb)
 	    do_check_cursorbind();
-	if (count <= 1)
+	ఒకవేళ (లెక్క <= 1)
 	    update_curswant();
 	old_topline = curwin->w_topline;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	old_topfill = curwin->w_topfill;
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
 	dont_scroll = FALSE;		// allow scrolling here
-#endif
+#అయితే_ముగింపు
 	// May request the keyboard protocol state now.
 	may_send_t_RK();
 
 	/*
 	 * Get a character for Insert mode.  Ignore K_IGNORE and K_NOP.
 	 */
-	if (c != K_CURSORHOLD && c != K_COMPLETE_DELAY)
+	ఒకవేళ (c != K_CURSORHOLD && c != K_COMPLETE_DELAY)
 	    lastc = c;		// remember the previous char for CTRL-D
 
 	// After using CTRL-G U the next cursor key will not break undo.
-	if (dont_sync_undo == MAYBE)
+	ఒకవేళ (dont_sync_undo == MAYBE)
 	    dont_sync_undo = TRUE;
-	else
+	లేకపోతే
 	    dont_sync_undo = FALSE;
-	if (cmdchar == K_PS)
+	ఒకవేళ (cmdchar == K_PS)
 	    // Got here from normal mode when bracketed paste started.
 	    c = K_PS;
-	else
+	లేకపోతే
 	{
 	    // Trigger autocomplete when entering Insert mode, either directly
 	    // or via change commands like 'ciw', 'cw', etc., before the first
 	    // character is typed.
-	    if (ins_just_started)
+	    ఒకవేళ (ins_just_started)
 	    {
 		ins_just_started = FALSE;
-		if (ins_compl_has_autocomplete() && !char_avail()
-			&& curwin->w_cursor.col > 0)
+		ఒకవేళ (ins_compl_has_autocomplete() && !char_avail()
+			&& curwin->w_cursor.నిలువు > 0)
 		{
 		    c = char_before_cursor();
-		    if (vim_isprintc(c))
+		    ఒకవేళ (vim_isprintc(c))
 		    {
 			ins_compl_enable_autocomplete();
 			ins_compl_arm_autostart();
 			ins_compl_init_get_longest();
-#ifdef FEAT_RIGHTLEFT
-			if (p_hkmap)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+			ఒకవేళ (p_hkmap)
 			    c = hkmap(c);		// Hebrew mode mapping
-#endif
+#అయితే_ముగింపు
 			// Defer until the delay expires (K_COMPLETE_DELAY), or
 			// trigger now when no delay is in effect.
-			if (!ins_compl_arm_autocomplete_delay())
-			    goto docomplete;
+			ఒకవేళ (!ins_compl_arm_autocomplete_delay())
+			    వెళ్ళు docomplete;
 		    }
 		}
 	    }
 
-	    do
+	    చేయి
 	    {
-		c = safe_vgetc();
+		c = సురక్షిత_vgetc();
 
-		if (stop_insert_mode
-#ifdef FEAT_TERMINAL
-			|| (c == K_IGNORE && term_use_loop())
-#endif
+		ఒకవేళ (stop_చొప్పించు_బహుళకం
+#నిర్వచితమైతే FEAT_TERMINAL
+			|| (c == K_IGNORE && పదం_use_loop())
+#అయితే_ముగింపు
 		   )
 		{
 		    // Insert mode ended, possibly from a callback, or a timer
 		    // must have opened a terminal window.
-		    if (c != K_IGNORE && c != K_NOP)
+		    ఒకవేళ (c != K_IGNORE && c != K_NOP)
 			vungetc(c);
-		    count = 0;
+		    లెక్క = 0;
 
-		    if (!bt_prompt(curwin->w_buffer)
-#ifdef FEAT_TERMINAL
-			    && !bt_terminal(curwin->w_buffer)
-#endif
-			    && stop_insert_mode)
+		    ఒకవేళ (!bt_prompt(curwin->w_బఫరు)
+#నిర్వచితమైతే FEAT_TERMINAL
+			    && !bt_terminal(curwin->w_బఫరు)
+#అయితే_ముగింపు
+			    && stop_చొప్పించు_బహుళకం)
 			// :stopinsert command via callback or via server command
 			nomove = FALSE;
-		    else
+		    లేకపోతే
 			nomove = TRUE;
 		    ins_compl_prep(ESC);
-		    goto doESCkey;
+		    వెళ్ళు doESCkey;
 		}
-	    } while (c == K_IGNORE || c == K_NOP);
+	    } అయితే (c == K_IGNORE || c == K_NOP);
 	}
 
 	// Don't want K_CURSORHOLD for the second key, e.g., after CTRL-V.
 	did_cursorhold = TRUE;
-	if (c != K_CURSORHOLD && c != K_COMPLETE_DELAY)
+	ఒకవేళ (c != K_CURSORHOLD && c != K_COMPLETE_DELAY)
 	{
 	    // Don't want delayed autocompletion from the previous key either.
 	    ins_compl_clear_autocomplete_delay();
 	    ins_compl_disarm_autostart();
 	    // A completion already on screen goes on being what it was.
-	    if (!ins_compl_active())
+	    ఒకవేళ (!ins_compl_చురుకైన())
 		ins_compl_disable_autocomplete();
 	}
 
-#ifdef FEAT_RIGHTLEFT
-	if (p_hkmap && KeyTyped)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (p_hkmap && కీలకం_Typed)
 	    c = hkmap(c);		// Hebrew mode mapping
-#endif
+#అయితే_ముగింపు
 
 	// If the window was made so small that nothing shows, make it at least
 	// one line and one column when typing.
-	if (KeyTyped && !KeyStuffed)
-	    win_ensure_size();
+	ఒకవేళ (కీలకం_Typed && !కీలకం_Stuffed)
+	    win_ensure_కొలత();
 
 	/*
 	 * Special handling of keys while the popup menu is visible or wanted
 	 * and the cursor is still in the completed word.  Only when there is
 	 * a match, skip this when no matches were found.
 	 */
-	if (ins_compl_active() && curwin->w_cursor.col >= ins_compl_col()
-		&& ins_compl_has_shown_match() && pum_wanted())
+	ఒకవేళ (ins_compl_చురుకైన() && curwin->w_cursor.నిలువు >= ins_compl_నిలువు()
+		&& ins_compl_has_shown_సరిపోలిక() && pum_wanted())
 	{
 	    // BS: Delete one character from "compl_leader".
-	    if ((c == K_BS || c == Ctrl_H)
-			&& curwin->w_cursor.col > ins_compl_col()
+	    ఒకవేళ ((c == K_BS || c == Ctrl_H)
+			&& curwin->w_cursor.నిలువు > ins_compl_నిలువు()
 			&& (c = ins_compl_bs()) == NUL)
-		continue;
+		కొనసాగు;
 
 	    // When no match was selected or it was edited.
-	    if (!ins_compl_used_match())
+	    ఒకవేళ (!ins_compl_వాడిన_సరిపోలిక())
 	    {
 		// CTRL-L: Add one character from the current match to
 		// "compl_leader".  Except when at the original match and
 		// there is nothing to add, CTRL-L works like CTRL-P then.
-		if (c == Ctrl_L
-			&& (!ctrl_x_mode_line_or_eval()
-			    || ins_compl_long_shown_match()))
+		ఒకవేళ (c == Ctrl_L
+			&& (!ctrl_x_బహుళకం_పంక్తి_or_eval()
+			    || ins_compl_long_shown_సరిపోలిక()))
 		{
 		    ins_compl_addfrommatch();
-		    continue;
+		    కొనసాగు;
 		}
 
 		// A non-white character that fits in with the current
 		// completion: Add to "compl_leader".
-		if (ins_compl_accept_char(c))
+		ఒకవేళ (ins_compl_accept_char(c))
 		{
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 		    // Trigger InsertCharPre.
-		    char_u *str = do_insert_char_pre(c);
+		    char_u *str = do_చొప్పించు_char_pre(c);
 		    char_u *p;
 
-		    if (str != NULL)
+		    ఒకవేళ (str != ఖాళీ)
 		    {
-			for (p = str; *p != NUL; MB_PTR_ADV(p))
+			కొరకు (p = str; *p != NUL; MB_PTR_ADV(p))
 			    ins_compl_addleader(PTR2CHAR(p));
 			vim_free(str);
 		    }
-		    else
-#endif
+		    లేకపోతే
+#అయితే_ముగింపు
 			ins_compl_addleader(c);
-		    continue;
+		    కొనసాగు;
 		}
 
 		// Pressing CTRL-Y selects the current match.  When
 		// ins_compl_enter_selects() is set the Enter key does the
 		// same.
-		if ((c == Ctrl_Y || (ins_compl_enter_selects()
+		ఒకవేళ ((c == Ctrl_Y || (ins_compl_enter_selects()
 				    && (c == CAR || c == K_KENTER || c == NL)))
 			&& stop_arrow() == OK)
 		{
 		    ins_compl_delete();
-		    if (ins_compl_preinsert_longest()
-			    && !ins_compl_is_match_selected())
+		    ఒకవేళ (ins_compl_preinsert_longest()
+			    && !ins_compl_is_సరిపోలిక_selected())
 		    {
-			ins_compl_insert(FALSE, TRUE);
+			ins_compl_చొప్పించు(FALSE, TRUE);
 			ins_compl_init_get_longest();
-			continue;
+			కొనసాగు;
 		    }
-		    else
-			ins_compl_insert(FALSE, FALSE);
+		    లేకపోతే
+			ins_compl_చొప్పించు(FALSE, FALSE);
 		}
 		// Delete preinserted text when typing special chars
-		else if (IS_WHITE_NL_OR_NUL(c) && ins_compl_preinsert_effect())
+		లేకపోతే ఒకవేళ (IS_WHITE_NL_OR_NUL(c) && ins_compl_preinsert_effect())
 		    ins_compl_delete();
 	    }
 	}
@@ -775,138 +775,138 @@ edit(
 	// Prepare for or stop CTRL-X mode.  This doesn't do completion, but
 	// it does fix up the text when finishing completion.
 	ins_compl_init_get_longest();
-	if (ins_compl_prep(c))
-	    continue;
+	ఒకవేళ (ins_compl_prep(c))
+	    కొనసాగు;
 
 	// CTRL-\ CTRL-N goes to Normal mode,
 	// CTRL-\ CTRL-G goes to mode selected with 'insertmode',
 	// CTRL-\ CTRL-O is like CTRL-O but without moving the cursor.
-	if (c == Ctrl_BSL)
+	ఒకవేళ (c == Ctrl_BSL)
 	{
 	    // may need to redraw when no more chars available now
 	    ins_redraw(FALSE);
 	    ++no_mapping;
-	    ++allow_keys;
+	    ++allow_కీలకాలు;
 	    c = plain_vgetc();
 	    --no_mapping;
-	    --allow_keys;
-	    if (c != Ctrl_N && c != Ctrl_G && c != Ctrl_O)
+	    --allow_కీలకాలు;
+	    ఒకవేళ (c != Ctrl_N && c != Ctrl_G && c != Ctrl_O)
 	    {
 		// it's something else
 		vungetc(c);
 		c = Ctrl_BSL;
 	    }
-	    else if (c == Ctrl_G && p_im)
-		continue;
-	    else
+	    లేకపోతే ఒకవేళ (c == Ctrl_G && p_im)
+		కొనసాగు;
+	    లేకపోతే
 	    {
-		if (c == Ctrl_O)
+		ఒకవేళ (c == Ctrl_O)
 		{
 		    ins_ctrl_o();
 		    ins_at_eol = FALSE;	// cursor keeps its column
 		    nomove = TRUE;
 		}
-		count = 0;
-		goto doESCkey;
+		లెక్క = 0;
+		వెళ్ళు doESCkey;
 	    }
 	}
 
-#ifdef FEAT_DIGRAPHS
+#నిర్వచితమైతే FEAT_DIGRAPHS
 	c = do_digraph(c);
-#endif
+#అయితే_ముగింపు
 
-	if ((c == Ctrl_V || c == Ctrl_Q) && ctrl_x_mode_cmdline())
-	    goto docomplete;
-	if (c == Ctrl_V || c == Ctrl_Q)
+	ఒకవేళ ((c == Ctrl_V || c == Ctrl_Q) && ctrl_x_బహుళకం_cmdline())
+	    వెళ్ళు docomplete;
+	ఒకవేళ (c == Ctrl_V || c == Ctrl_Q)
 	{
 	    ins_ctrl_v();
 	    c = Ctrl_V;	// pretend CTRL-V is last typed character
-	    continue;
+	    కొనసాగు;
 	}
 
-	if (cindent_on() && ctrl_x_mode_none())
+	ఒకవేళ (cindent_on() && ctrl_x_బహుళకం_none())
 	{
 	    // A key name preceded by a bang means this key is not to be
 	    // inserted.  Skip ahead to the re-indenting below.
 	    // A key name preceded by a star means that indenting has to be
 	    // done before inserting the key.
-	    line_is_white = inindent(0);
-	    if (in_cinkeys(c, '!', line_is_white))
-		goto force_cindent;
-	    if (can_cindent && in_cinkeys(c, '*', line_is_white)
+	    పంక్తి_is_white = inindent(0);
+	    ఒకవేళ (లోపల_cinkeys(c, '!', పంక్తి_is_white))
+		వెళ్ళు force_cindent;
+	    ఒకవేళ (can_cindent && లోపల_cinkeys(c, '*', పంక్తి_is_white)
 							&& stop_arrow() == OK)
-		do_c_expr_indent();
+		do_c_సమాసం_indent();
 	}
 
-#ifdef FEAT_RIGHTLEFT
-	if (curwin->w_p_rl)
-	    switch (c)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (curwin->w_p_rl)
+	    ఎంపిక (c)
 	    {
-		case K_LEFT:	c = K_RIGHT; break;
-		case K_S_LEFT:	c = K_S_RIGHT; break;
-		case K_C_LEFT:	c = K_C_RIGHT; break;
-		case K_RIGHT:	c = K_LEFT; break;
-		case K_S_RIGHT: c = K_S_LEFT; break;
-		case K_C_RIGHT: c = K_C_LEFT; break;
+		స్థితి K_ఎడమ:	c = K_కుడి; ఆపు;
+		స్థితి K_S_ఎడమ:	c = K_S_కుడి; ఆపు;
+		స్థితి K_C_ఎడమ:	c = K_C_కుడి; ఆపు;
+		స్థితి K_కుడి:	c = K_ఎడమ; ఆపు;
+		స్థితి K_S_కుడి: c = K_S_ఎడమ; ఆపు;
+		స్థితి K_C_కుడి: c = K_C_ఎడమ; ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * If 'keymodel' contains "startsel", may start selection.  If it
 	 * does, a CTRL-O and c will be stuffed, we need to get these
 	 * characters.
 	 */
-	if (ins_start_select(c))
-	    continue;
+	ఒకవేళ (ins_ప్రారంభం_select(c))
+	    కొనసాగు;
 
 	/*
 	 * The big switch to handle a character in insert mode.
 	 */
-	switch (c)
+	ఎంపిక (c)
 	{
-	case ESC:	// End input mode
-	    if (echeck_abbr(ESC + ABBR_OFF))
-		break;
+	స్థితి ESC:	// End input mode
+	    ఒకవేళ (echeck_abbr(ESC + ABBR_OFF))
+		ఆపు;
 	    // FALLTHROUGH
 
-	case Ctrl_C:	// End input mode
-	    if (c == Ctrl_C && cmdwin_type != 0)
+	స్థితి Ctrl_C:	// End input mode
+	    ఒకవేళ (c == Ctrl_C && cmdwin_type != 0)
 	    {
 		// Close the cmdline window.
-		cmdwin_result = K_IGNORE;
+		cmdwin_ఫలితం = K_IGNORE;
 		got_int = FALSE; // don't stop executing autocommands et al.
 		nomove = TRUE;
-		goto doESCkey;
+		వెళ్ళు doESCkey;
 	    }
-#ifdef FEAT_JOB_CHANNEL
-	    if (c == Ctrl_C && bt_prompt(curbuf))
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	    ఒకవేళ (c == Ctrl_C && bt_prompt(curbuf))
 	    {
-		if (invoke_prompt_interrupt())
+		ఒకవేళ (invoke_prompt_అంతరాయం())
 		{
-		    if (!bt_prompt(curbuf))
+		    ఒకవేళ (!bt_prompt(curbuf))
 			// buffer changed to a non-prompt buffer, get out of
 			// Insert mode
-			goto doESCkey;
-		    break;
+			వెళ్ళు doESCkey;
+		    ఆపు;
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 do_intr:
-#endif
+#అయితే_ముగింపు
 	    // when 'insertmode' set, and not halfway a mapping, don't leave
 	    // Insert mode
-	    if (goto_im())
+	    ఒకవేళ (goto_im())
 	    {
-		if (got_int)
+		ఒకవేళ (got_int)
 		{
-		    (void)vgetc();		// flush all buffers
+		    (శూన్య)vgetc();		// flush all buffers
 		    got_int = FALSE;
 		}
-		else
+		లేకపోతే
 		    vim_beep(BO_IM);
-		break;
+		ఆపు;
 	    }
 doESCkey:
 	    // Drop a pending autocomplete so it does not outlive Insert mode.
@@ -916,15 +916,15 @@ doESCkey:
 	     */
 	    // Always update o_lnum, so that a "CTRL-O ." that adds a line
 	    // still puts the cursor back after the inserted text.
-	    if (ins_at_eol && gchar_cursor() == NUL)
+	    ఒకవేళ (ins_at_eol && gchar_cursor() == NUL)
 		o_lnum = curwin->w_cursor.lnum;
 
-	    if (ins_esc(&count, cmdchar, nomove))
+	    ఒకవేళ (ins_esc(&లెక్క, cmdchar, nomove))
 	    {
 		// When CTRL-C was typed got_int will be set, with the result
 		// that the autocommands won't be executed. When mapped got_int
 		// is not set, but let's keep the behavior the same.
-		if (cmdchar != 'r' && cmdchar != 'v' && c != Ctrl_C)
+		ఒకవేళ (cmdchar != 'r' && cmdchar != 'v' && c != Ctrl_C)
 		    ins_apply_autocmds(EVENT_INSERTLEAVE);
 		did_cursorhold = FALSE;
 
@@ -932,238 +932,238 @@ doESCkey:
 		// are in the typeahead buffer, so reset curbuf->b_last_changedtick only
 		// if the TextChangedI was not blocked by char_avail() (e.g. using :norm!)
 		// and the TextChangedI autocommand has been triggered.
-		if (!char_avail() && curbuf->b_last_changedtick_i == CHANGEDTICK(curbuf))
-		    curbuf->b_last_changedtick = CHANGEDTICK(curbuf);
-		return (c == Ctrl_O);
+		ఒకవేళ (!char_avail() && curbuf->b_చివరి_changedtick_i == CHANGEDTICK(curbuf))
+		    curbuf->b_చివరి_changedtick = CHANGEDTICK(curbuf);
+		తిరిగి (c == Ctrl_O);
 	    }
-	    continue;
+	    కొనసాగు;
 
-	case Ctrl_Z:	// suspend when 'insertmode' set
-	    if (!p_im)
-		goto normalchar;	// insert CTRL-Z as normal char
+	స్థితి Ctrl_Z:	// suspend when 'insertmode' set
+	    ఒకవేళ (!p_im)
+		వెళ్ళు normalchar;	// insert CTRL-Z as normal char
 	    do_cmdline_cmd((char_u *)"stop");
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
 	    ui_cursor_shape();		// may need to update cursor shape
-#endif
-	    continue;
+#అయితే_ముగింపు
+	    కొనసాగు;
 
-	case Ctrl_O:	// execute one command
-#ifdef FEAT_COMPL_FUNC
-	    if (ctrl_x_mode_omni())
-		goto docomplete;
-#endif
-	    if (echeck_abbr(Ctrl_O + ABBR_OFF))
-		break;
+	స్థితి Ctrl_O:	// execute one command
+#నిర్వచితమైతే FEAT_COMPL_FUNC
+	    ఒకవేళ (ctrl_x_బహుళకం_omni())
+		వెళ్ళు docomplete;
+#అయితే_ముగింపు
+	    ఒకవేళ (echeck_abbr(Ctrl_O + ABBR_OFF))
+		ఆపు;
 	    ins_ctrl_o();
 
 	    // don't move the cursor left when 'virtualedit' has "onemore".
-	    if (get_ve_flags() & VE_ONEMORE)
+	    ఒకవేళ (get_ve_flags() & VE_ONEMORE)
 	    {
 		ins_at_eol = FALSE;
 		nomove = TRUE;
 	    }
-	    count = 0;
-	    goto doESCkey;
+	    లెక్క = 0;
+	    వెళ్ళు doESCkey;
 
-	case K_INS:	// toggle insert/replace mode
-	case K_KINS:
-	    ins_insert(replaceState);
-	    break;
+	స్థితి K_INS:	// toggle insert/replace mode
+	స్థితి K_KINS:
+	    ins_చొప్పించు(replaceState);
+	    ఆపు;
 
-	case K_SELECT:	// end of Select mode mapping - ignore
-	    break;
+	స్థితి K_SELECT:	// end of Select mode mapping - ignore
+	    ఆపు;
 
-	case K_HELP:	// Help key works like <ESC> <Help>
-	case K_F1:
-	case K_XF1:
+	స్థితి K_HELP:	// Help key works like <ESC> <Help>
+	స్థితి K_F1:
+	స్థితి K_XF1:
 	    stuffcharReadbuff(K_HELP);
-	    if (p_im)
-		need_start_insertmode = TRUE;
-	    goto doESCkey;
+	    ఒకవేళ (p_im)
+		need_ప్రారంభం_insertmode = TRUE;
+	    వెళ్ళు doESCkey;
 
-#ifdef FEAT_NETBEANS_INTG
-	case K_F21:	// NetBeans command
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	స్థితి K_F21:	// NetBeans command
 	    ++no_mapping;		// don't map the next key hits
 	    i = plain_vgetc();
 	    --no_mapping;
 	    netbeans_keycommand(i);
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case K_ZERO:	// Insert the previously inserted text.
-	case NUL:
-	case Ctrl_A:
+	స్థితి K_ZERO:	// Insert the previously inserted text.
+	స్థితి NUL:
+	స్థితి Ctrl_A:
 	    // For ^@ the trailing ESC will end the insert, unless there is an
 	    // error.
-	    if (stuff_inserted(NUL, 1L, (c == Ctrl_A)) == FAIL
+	    ఒకవేళ (stuff_inserted(NUL, 1L, (c == Ctrl_A)) == FAIL
 						   && c != Ctrl_A && !p_im)
-		goto doESCkey;		// quit insert mode
+		వెళ్ళు doESCkey;		// quit insert mode
 	    inserted_space = FALSE;
-	    break;
+	    ఆపు;
 
-	case Ctrl_R:	// insert the contents of a register
-	    if (ctrl_x_mode_register() && !ins_compl_active())
-		goto docomplete;
+	స్థితి Ctrl_R:	// insert the contents of a register
+	    ఒకవేళ (ctrl_x_బహుళకం_రిజిస్టరు() && !ins_compl_చురుకైన())
+		వెళ్ళు docomplete;
 	    ins_reg();
 	    auto_format(FALSE, TRUE);
 	    inserted_space = FALSE;
-	    break;
+	    ఆపు;
 
-	case Ctrl_G:	// commands starting with CTRL-G
+	స్థితి Ctrl_G:	// commands starting with CTRL-G
 	    ins_ctrl_g();
-	    break;
+	    ఆపు;
 
-	case Ctrl_HAT:	// switch input mode and/or langmap
+	స్థితి Ctrl_HAT:	// switch input mode and/or langmap
 	    ins_ctrl_hat();
-	    break;
+	    ఆపు;
 
-#ifdef FEAT_RIGHTLEFT
-	case Ctrl__:	// switch between languages
-	    if (!p_ari)
-		goto normalchar;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	స్థితి Ctrl__:	// switch between languages
+	    ఒకవేళ (!p_ari)
+		వెళ్ళు normalchar;
 	    ins_ctrl_();
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case Ctrl_D:	// Make indent one shiftwidth smaller.
-#if defined(FEAT_FIND_ID)
-	    if (ctrl_x_mode_path_defines())
-		goto docomplete;
-#endif
+	స్థితి Ctrl_D:	// Make indent one shiftwidth smaller.
+#ఒకవేళ defined(FEAT_కనుగొను_ID)
+	    ఒకవేళ (ctrl_x_బహుళకం_మార్గం_నిర్వచిస్తుంది())
+		వెళ్ళు docomplete;
+#అయితే_ముగింపు
 	    // FALLTHROUGH
 
-	case Ctrl_T:	// Make indent one shiftwidth greater.
-	    if (c == Ctrl_T && ctrl_x_mode_thesaurus())
+	స్థితి Ctrl_T:	// Make indent one shiftwidth greater.
+	    ఒకవేళ (c == Ctrl_T && ctrl_x_బహుళకం_thesaurus())
 	    {
-		if (has_compl_option(FALSE))
-		    goto docomplete;
-		break;
+		ఒకవేళ (has_compl_option(FALSE))
+		    వెళ్ళు docomplete;
+		ఆపు;
 	    }
 
-	    ins_shift(c, lastc);
+	    ins_జరుపు(c, lastc);
 	    auto_format(FALSE, TRUE);
 	    inserted_space = FALSE;
-	    break;
+	    ఆపు;
 
-	case K_DEL:	// delete character under the cursor
-	case K_KDEL:
+	స్థితి K_DEL:	// delete character under the cursor
+	స్థితి K_KDEL:
 	    ins_del();
 	    auto_format(FALSE, TRUE);
-	    break;
+	    ఆపు;
 
-	case K_BS:	// delete character before the cursor
-	case K_S_BS:
-	case Ctrl_H:
+	స్థితి K_BS:	// delete character before the cursor
+	స్థితి K_S_BS:
+	స్థితి Ctrl_H:
 	    did_backspace = ins_bs(c, BACKSPACE_CHAR, &inserted_space);
 	    auto_format(FALSE, TRUE);
-	    if (did_backspace)
+	    ఒకవేళ (did_backspace)
 		MAY_TRIGGER_AUTOCOMPLETE(c);
-	    break;
+	    ఆపు;
 
-	case Ctrl_W:	// delete word before the cursor
-#ifdef FEAT_JOB_CHANNEL
-	    if (bt_prompt(curbuf) && (mod_mask & MOD_MASK_SHIFT) == 0)
+	స్థితి Ctrl_W:	// delete word before the cursor
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	    ఒకవేళ (bt_prompt(curbuf) && (mod_ముసుగు & MOD_ముసుగు_జరుపు) == 0)
 	    {
 		// In a prompt window CTRL-W is used for window commands.
 		// Use Shift-CTRL-W to delete a word.
 		stuffcharReadbuff(Ctrl_W);
 		restart_edit = 'A';
 		nomove = TRUE;
-		count = 0;
-		goto doESCkey;
+		లెక్క = 0;
+		వెళ్ళు doESCkey;
 	    }
-#endif
-	    did_backspace = ins_bs(c, BACKSPACE_WORD, &inserted_space);
+#అయితే_ముగింపు
+	    did_backspace = ins_bs(c, BACKSPACE_మాట, &inserted_space);
 	    auto_format(FALSE, TRUE);
-	    if (did_backspace)
+	    ఒకవేళ (did_backspace)
 		MAY_TRIGGER_AUTOCOMPLETE(c);
-	    break;
+	    ఆపు;
 
-	case Ctrl_U:	// delete all inserted text in current line
-#ifdef FEAT_COMPL_FUNC
+	స్థితి Ctrl_U:	// delete all inserted text in current line
+#నిర్వచితమైతే FEAT_COMPL_FUNC
 	    // CTRL-X CTRL-U completes with 'completefunc'.
-	    if (ctrl_x_mode_function())
-		goto docomplete;
-#endif
-	    did_backspace = ins_bs(c, BACKSPACE_LINE, &inserted_space);
+	    ఒకవేళ (ctrl_x_బహుళకం_function())
+		వెళ్ళు docomplete;
+#అయితే_ముగింపు
+	    did_backspace = ins_bs(c, BACKSPACE_పంక్తి, &inserted_space);
 	    auto_format(FALSE, TRUE);
 	    inserted_space = FALSE;
-	    if (did_backspace)
+	    ఒకవేళ (did_backspace)
 		MAY_TRIGGER_AUTOCOMPLETE(c);
-	    break;
+	    ఆపు;
 
-	case K_LEFTMOUSE:   // mouse keys
-	case K_LEFTMOUSE_NM:
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
-	case K_X1MOUSE:
-	case K_X1DRAG:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2DRAG:
-	case K_X2RELEASE:
+	స్థితి K_LEFTMOUSE:   // mouse keys
+	స్థితి K_LEFTMOUSE_NM:
+	స్థితి K_LEFTDRAG:
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_LEFTRELEASE_NM:
+	స్థితి K_MOUSEMOVE:
+	స్థితి K_MIDDLEMOUSE:
+	స్థితి K_MIDDLEDRAG:
+	స్థితి K_MIDDLERELEASE:
+	స్థితి K_RIGHTMOUSE:
+	స్థితి K_RIGHTDRAG:
+	స్థితి K_RIGHTRELEASE:
+	స్థితి K_X1MOUSE:
+	స్థితి K_X1DRAG:
+	స్థితి K_X1RELEASE:
+	స్థితి K_X2MOUSE:
+	స్థితి K_X2DRAG:
+	స్థితి K_X2RELEASE:
 	    ins_mouse(c);
-	    break;
+	    ఆపు;
 
-	case K_MOUSEDOWN: // Default action for scroll wheel up: scroll up
-	    ins_mousescroll(MSCR_DOWN);
-	    break;
+	స్థితి K_MOUSEDOWN: // Default action for scroll wheel up: scroll up
+	    ins_mousescroll(MSCR_కిందికి);
+	    ఆపు;
 
-	case K_MOUSEUP:	// Default action for scroll wheel down: scroll down
-	    ins_mousescroll(MSCR_UP);
-	    break;
+	స్థితి K_MOUSEUP:	// Default action for scroll wheel down: scroll down
+	    ins_mousescroll(MSCR_పైకి);
+	    ఆపు;
 
-	case K_MOUSELEFT: // Scroll wheel left
-	    ins_mousescroll(MSCR_LEFT);
-	    break;
+	స్థితి K_MOUSELEFT: // Scroll wheel left
+	    ins_mousescroll(MSCR_ఎడమ);
+	    ఆపు;
 
-	case K_MOUSERIGHT: // Scroll wheel right
-	    ins_mousescroll(MSCR_RIGHT);
-	    break;
+	స్థితి K_MOUSERIGHT: // Scroll wheel right
+	    ins_mousescroll(MSCR_కుడి);
+	    ఆపు;
 
-	case K_PS:
-	    bracketed_paste(PASTE_INSERT, FALSE, NULL);
-	    if (cmdchar == K_PS)
+	స్థితి K_PS:
+	    bracketed_paste(PASTE_చొప్పించు, FALSE, ఖాళీ);
+	    ఒకవేళ (cmdchar == K_PS)
 		// invoked from normal mode, bail out
-		goto doESCkey;
-	    break;
-	case K_PE:
+		వెళ్ళు doESCkey;
+	    ఆపు;
+	స్థితి K_PE:
 	    // Got K_PE without K_PS, ignore.
-	    break;
+	    ఆపు;
 
-#ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:
-	case K_TABMENU:
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	స్థితి K_TABLINE:
+	స్థితి K_TABMENU:
 	    ins_tabline(c);
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case K_IGNORE:	// Something mapped to nothing
-	    break;
+	స్థితి K_IGNORE:	// Something mapped to nothing
+	    ఆపు;
 
-	case K_COMMAND:		    // <Cmd>command<CR>
-	case K_SCRIPT_COMMAND:	    // <ScriptCmd>command<CR>
+	స్థితి K_COMMAND:		    // <Cmd>command<CR>
+	స్థితి K_SCRIPT_COMMAND:	    // <ScriptCmd>command<CR>
 	    {
 		bufref_T    save_curbuf;
 		varnumber_T tick = CHANGEDTICK(curbuf);
 
-		set_bufref(&save_curbuf, curbuf);
+		సమితి_bufref(&save_curbuf, curbuf);
 		do_cmdkey_command(c, 0);
 
-#ifdef FEAT_TERMINAL
-		if (term_use_loop())
+#నిర్వచితమైతే FEAT_TERMINAL
+		ఒకవేళ (పదం_use_loop())
 		    // Started a terminal that gets the input, exit Insert mode.
-		    goto doESCkey;
-#endif
-		if (curbuf->b_u_synced
+		    వెళ్ళు doESCkey;
+#అయితే_ముగింపు
+		ఒకవేళ (curbuf->b_u_synced
 			|| (bufref_valid(&save_curbuf)
 			    && curbuf == save_curbuf.br_buf
 			    && tick != CHANGEDTICK(curbuf)))
@@ -1173,328 +1173,328 @@ doESCkey:
 		    ins_need_undo = TRUE;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case K_CURSORHOLD:	// Didn't type something for a while.
+	స్థితి K_CURSORHOLD:	// Didn't type something for a while.
 	    ins_apply_autocmds(EVENT_CURSORHOLDI);
 	    did_cursorhold = TRUE;
 	    // If CTRL-G U was used apply it to the next typed key.
-	    if (dont_sync_undo == TRUE)
+	    ఒకవేళ (dont_sync_undo == TRUE)
 		dont_sync_undo = MAYBE;
-	    break;
+	    ఆపు;
 
-	case K_COMPLETE_DELAY:	// 'autocompletedelay' expired
+	స్థితి K_COMPLETE_DELAY:	// 'autocompletedelay' expired
 	    // If CTRL-G U was used apply it to the next typed key.
-	    if (dont_sync_undo == TRUE)
+	    ఒకవేళ (dont_sync_undo == TRUE)
 		dont_sync_undo = MAYBE;
 	    ins_compl_clear_autocomplete_delay();
-	    if (!ins_compl_has_autocomplete() || char_avail()
-		    || curwin->w_cursor.col == 0)
-		break;
+	    ఒకవేళ (!ins_compl_has_autocomplete() || char_avail()
+		    || curwin->w_cursor.నిలువు == 0)
+		ఆపు;
 	    c = char_before_cursor();
-	    if (!vim_isprintc(c))
-		break;
+	    ఒకవేళ (!vim_isprintc(c))
+		ఆపు;
 	    // The completion may have been cleared while waiting, so re-enable
 	    // autocomplete to match a zero delay.
 	    ins_compl_enable_autocomplete();
 	    ins_compl_arm_autostart();
-	    goto docomplete;
+	    వెళ్ళు docomplete;
 
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 	    // On MS-Windows ignore <M-F4>, we get it when closing the window
 	    // was cancelled.
-	case K_F4:
-	    if (mod_mask != MOD_MASK_ALT)
-		goto normalchar;
-	    break;
-#endif
+	స్థితి K_F4:
+	    ఒకవేళ (mod_ముసుగు != MOD_ముసుగు_ALT)
+		వెళ్ళు normalchar;
+	    ఆపు;
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
-	case K_VER_SCROLLBAR:
+#నిర్వచితమైతే FEAT_GUI
+	స్థితి K_VER_SCROLLBAR:
 	    ins_scroll();
-	    break;
+	    ఆపు;
 
-	case K_HOR_SCROLLBAR:
+	స్థితి K_HOR_SCROLLBAR:
 	    ins_horscroll();
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case K_HOME:	// <Home>
-	case K_KHOME:
-	case K_S_HOME:
-	case K_C_HOME:
+	స్థితి K_HOME:	// <Home>
+	స్థితి K_KHOME:
+	స్థితి K_S_HOME:
+	స్థితి K_C_HOME:
 	    ins_home(c);
-	    break;
+	    ఆపు;
 
-	case K_END:	// <End>
-	case K_KEND:
-	case K_S_END:
-	case K_C_END:
-	    ins_end(c);
-	    break;
+	స్థితి K_చివర:	// <End>
+	స్థితి K_KEND:
+	స్థితి K_S_చివర:
+	స్థితి K_C_చివర:
+	    ins_చివర(c);
+	    ఆపు;
 
-	case K_LEFT:	// <Left>
-	    if (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL))
-		ins_s_left();
-	    else
-		ins_left();
-	    break;
+	స్థితి K_ఎడమ:	// <Left>
+	    ఒకవేళ (mod_ముసుగు & (MOD_ముసుగు_జరుపు|MOD_ముసుగు_CTRL))
+		ins_s_ఎడమ();
+	    లేకపోతే
+		ins_ఎడమ();
+	    ఆపు;
 
-	case K_S_LEFT:	// <S-Left>
-	case K_C_LEFT:
-	    ins_s_left();
-	    break;
+	స్థితి K_S_ఎడమ:	// <S-Left>
+	స్థితి K_C_ఎడమ:
+	    ins_s_ఎడమ();
+	    ఆపు;
 
-	case K_RIGHT:	// <Right>
-	    if (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL))
-		ins_s_right();
-	    else
-		ins_right();
-	    break;
+	స్థితి K_కుడి:	// <Right>
+	    ఒకవేళ (mod_ముసుగు & (MOD_ముసుగు_జరుపు|MOD_ముసుగు_CTRL))
+		ins_s_కుడి();
+	    లేకపోతే
+		ins_కుడి();
+	    ఆపు;
 
-	case K_S_RIGHT:	// <S-Right>
-	case K_C_RIGHT:
-	    ins_s_right();
-	    break;
+	స్థితి K_S_కుడి:	// <S-Right>
+	స్థితి K_C_కుడి:
+	    ins_s_కుడి();
+	    ఆపు;
 
-	case K_UP:	// <Up>
-	    if (pum_visible())
-		goto docomplete;
-	    if (mod_mask & MOD_MASK_SHIFT)
+	స్థితి K_పైకి:	// <Up>
+	    ఒకవేళ (pum_visible())
+		వెళ్ళు docomplete;
+	    ఒకవేళ (mod_ముసుగు & MOD_ముసుగు_జరుపు)
 		ins_pageup();
-	    else
-		ins_up(FALSE);
-	    break;
+	    లేకపోతే
+		ins_పైకి(FALSE);
+	    ఆపు;
 
-	case K_S_UP:	// <S-Up>
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	    if (pum_visible())
+	స్థితి K_S_పైకి:	// <S-Up>
+	స్థితి K_PAGEUP:
+	స్థితి K_KPAGEUP:
+	    ఒకవేళ (pum_visible())
 	    {
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// CTRL-SHIFT-<Up> scrolls the info popup up a line,
 		// CTRL-SHIFT-<PageUp> a page.  Shift is folded into K_S_UP but
 		// stays in mod_mask for PageUp, hence the asymmetric check.
-		if (c == K_S_UP ? (mod_mask & MOD_MASK_CTRL)
-			: ((mod_mask & MOD_MASK_CTRL)
-			    && (mod_mask & MOD_MASK_SHIFT)))
+		ఒకవేళ (c == K_S_పైకి ? (mod_ముసుగు & MOD_ముసుగు_CTRL)
+			: ((mod_ముసుగు & MOD_ముసుగు_CTRL)
+			    && (mod_ముసుగు & MOD_ముసుగు_జరుపు)))
 		{
-		    popup_scroll_info(-1, c != K_S_UP);
-		    break;
+		    popup_scroll_info(-1, c != K_S_పైకి);
+		    ఆపు;
 		}
-#endif
-		goto docomplete;
+#అయితే_ముగింపు
+		వెళ్ళు docomplete;
 	    }
 	    ins_pageup();
-	    break;
+	    ఆపు;
 
-	case K_DOWN:	// <Down>
-	    if (pum_visible())
-		goto docomplete;
-	    if (mod_mask & MOD_MASK_SHIFT)
+	స్థితి K_కిందికి:	// <Down>
+	    ఒకవేళ (pum_visible())
+		వెళ్ళు docomplete;
+	    ఒకవేళ (mod_ముసుగు & MOD_ముసుగు_జరుపు)
 		ins_pagedown();
-	    else
-		ins_down(FALSE);
-	    break;
+	    లేకపోతే
+		ins_కిందికి(FALSE);
+	    ఆపు;
 
-	case K_S_DOWN:	// <S-Down>
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-	    if (pum_visible())
+	స్థితి K_S_కిందికి:	// <S-Down>
+	స్థితి K_PAGEDOWN:
+	స్థితి K_KPAGEDOWN:
+	    ఒకవేళ (pum_visible())
 	    {
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// CTRL-SHIFT-<Down>/<PageDown> scroll the info popup down.
-		if (c == K_S_DOWN ? (mod_mask & MOD_MASK_CTRL)
-			: ((mod_mask & MOD_MASK_CTRL)
-			    && (mod_mask & MOD_MASK_SHIFT)))
+		ఒకవేళ (c == K_S_కిందికి ? (mod_ముసుగు & MOD_ముసుగు_CTRL)
+			: ((mod_ముసుగు & MOD_ముసుగు_CTRL)
+			    && (mod_ముసుగు & MOD_ముసుగు_జరుపు)))
 		{
-		    popup_scroll_info(1, c != K_S_DOWN);
-		    break;
+		    popup_scroll_info(1, c != K_S_కిందికి);
+		    ఆపు;
 		}
-#endif
-		goto docomplete;
+#అయితే_ముగింపు
+		వెళ్ళు docomplete;
 	    }
 	    ins_pagedown();
-	    break;
+	    ఆపు;
 
-#ifdef FEAT_DND
-	case K_DROP:	// drag-n-drop event
+#నిర్వచితమైతే FEAT_DND
+	స్థితి K_DROP:	// drag-n-drop event
 	    ins_drop();
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case K_S_TAB:	// When not mapped, use like a normal TAB
+	స్థితి K_S_TAB:	// When not mapped, use like a normal TAB
 	    c = TAB;
 	    // FALLTHROUGH
 
-	case TAB:	// TAB or Complete patterns along path
-#if defined(FEAT_FIND_ID)
-	    if (ctrl_x_mode_path_patterns())
-		goto docomplete;
-#endif
+	స్థితి TAB:	// TAB or Complete patterns along path
+#ఒకవేళ defined(FEAT_కనుగొను_ID)
+	    ఒకవేళ (ctrl_x_బహుళకం_మార్గం_patterns())
+		వెళ్ళు docomplete;
+#అయితే_ముగింపు
 	    inserted_space = FALSE;
-	    if (ins_tab())
-		goto normalchar;	// insert TAB as a normal char
+	    ఒకవేళ (ins_tab())
+		వెళ్ళు normalchar;	// insert TAB as a normal char
 	    auto_format(FALSE, TRUE);
-	    break;
+	    ఆపు;
 
-	case K_KENTER:	// <Enter>
+	స్థితి K_KENTER:	// <Enter>
 	    c = CAR;
 	    // FALLTHROUGH
-	case CAR:
-	case NL:
-#if defined(FEAT_QUICKFIX)
+	స్థితి CAR:
+	స్థితి NL:
+#ఒకవేళ defined(FEAT_QUICKFIX)
 	    // In a quickfix window a <CR> jumps to the error under the
 	    // cursor.
-	    if (bt_quickfix(curbuf) && c == CAR)
+	    ఒకవేళ (bt_quickfix(curbuf) && c == CAR)
 	    {
-		if (curwin->w_llist_ref == NULL)    // quickfix window
+		ఒకవేళ (curwin->w_llist_ref == ఖాళీ)    // quickfix window
 		    do_cmdline_cmd((char_u *)".cc");
-		else				    // location list window
+		లేకపోతే				    // location list window
 		    do_cmdline_cmd((char_u *)".ll");
-		break;
+		ఆపు;
 	    }
-#endif
-	    if (cmdwin_type != 0)
+#అయితే_ముగింపు
+	    ఒకవేళ (cmdwin_type != 0)
 	    {
 		// Execute the command in the cmdline window.
-		cmdwin_result = CAR;
-		goto doESCkey;
+		cmdwin_ఫలితం = CAR;
+		వెళ్ళు doESCkey;
 	    }
-#ifdef FEAT_JOB_CHANNEL
-	    if (bt_prompt(curbuf))
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	    ఒకవేళ (bt_prompt(curbuf))
 	    {
 		invoke_prompt_callback();
-		if (!bt_prompt(curbuf))
+		ఒకవేళ (!bt_prompt(curbuf))
 		    // buffer changed to a non-prompt buffer, get out of
 		    // Insert mode
-		    goto doESCkey;
-		break;
+		    వెళ్ళు doESCkey;
+		ఆపు;
 	    }
-#endif
-	    if (ins_eol(c) == FAIL && !p_im)
-		goto doESCkey;	    // out of memory
+#అయితే_ముగింపు
+	    ఒకవేళ (ins_eol(c) == FAIL && !p_im)
+		వెళ్ళు doESCkey;	    // out of memory
 	    auto_format(FALSE, FALSE);
 	    inserted_space = FALSE;
-	    break;
+	    ఆపు;
 
-	case Ctrl_K:	    // digraph or keyword completion
-	    if (ctrl_x_mode_dictionary())
+	స్థితి Ctrl_K:	    // digraph or keyword completion
+	    ఒకవేళ (ctrl_x_బహుళకం_dictionary())
 	    {
-		if (has_compl_option(TRUE))
-		    goto docomplete;
-		break;
+		ఒకవేళ (has_compl_option(TRUE))
+		    వెళ్ళు docomplete;
+		ఆపు;
 	    }
-#ifdef FEAT_DIGRAPHS
+#నిర్వచితమైతే FEAT_DIGRAPHS
 	    c = ins_digraph();
-	    if (c == NUL)
-		break;
-#endif
-	    goto normalchar;
+	    ఒకవేళ (c == NUL)
+		ఆపు;
+#అయితే_ముగింపు
+	    వెళ్ళు normalchar;
 
-	case Ctrl_X:	// Enter CTRL-X mode
+	స్థితి Ctrl_X:	// Enter CTRL-X mode
 	    ins_ctrl_x();
-	    break;
+	    ఆపు;
 
-	case Ctrl_RSB:	// Tag name completion after ^X
-	    if (!ctrl_x_mode_tags())
-		goto normalchar;
-	    goto docomplete;
+	స్థితి Ctrl_RSB:	// Tag name completion after ^X
+	    ఒకవేళ (!ctrl_x_బహుళకం_ట్యాగులు())
+		వెళ్ళు normalchar;
+	    వెళ్ళు docomplete;
 
-	case Ctrl_F:	// File name completion after ^X
-	    if (!ctrl_x_mode_files())
-		goto normalchar;
-	    goto docomplete;
+	స్థితి Ctrl_F:	// File name completion after ^X
+	    ఒకవేళ (!ctrl_x_బహుళకం_files())
+		వెళ్ళు normalchar;
+	    వెళ్ళు docomplete;
 
-	case 's':	// Spelling completion after ^X
-	case Ctrl_S:
-	    if (!ctrl_x_mode_spell())
-		goto normalchar;
-	    goto docomplete;
+	స్థితి 's':	// Spelling completion after ^X
+	స్థితి Ctrl_S:
+	    ఒకవేళ (!ctrl_x_బహుళకం_spell())
+		వెళ్ళు normalchar;
+	    వెళ్ళు docomplete;
 
-	case Ctrl_L:	// Whole line completion after ^X
-	    if (!ctrl_x_mode_whole_line())
+	స్థితి Ctrl_L:	// Whole line completion after ^X
+	    ఒకవేళ (!ctrl_x_బహుళకం_సంపూర్ణ_పంక్తి())
 	    {
 		// CTRL-L with 'insertmode' set: Leave Insert mode
-		if (p_im)
+		ఒకవేళ (p_im)
 		{
-		    if (echeck_abbr(Ctrl_L + ABBR_OFF))
-			break;
-		    goto doESCkey;
+		    ఒకవేళ (echeck_abbr(Ctrl_L + ABBR_OFF))
+			ఆపు;
+		    వెళ్ళు doESCkey;
 		}
-		goto normalchar;
+		వెళ్ళు normalchar;
 	    }
 	    // FALLTHROUGH
 
-	case Ctrl_P:	// Do previous/next pattern completion
-	case Ctrl_N:
-#ifdef FEAT_PROP_POPUP
+	స్థితి Ctrl_P:	// Do previous/next pattern completion
+	స్థితి Ctrl_N:
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // CTRL-SHIFT-P/N scroll the info popup one line.
-	    if (pum_visible() && (mod_mask & MOD_MASK_SHIFT)
+	    ఒకవేళ (pum_visible() && (mod_ముసుగు & MOD_ముసుగు_జరుపు)
 		    && (c == Ctrl_P || c == Ctrl_N))
 	    {
 		popup_scroll_info(c == Ctrl_P ? -1 : 1, false);
-		break;
+		ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 	    // if 'complete' is empty then plain ^P is no longer special,
 	    // but it is under other ^X modes
-	    if (*curbuf->b_p_cpt == NUL
-		    && (ctrl_x_mode_normal() || ctrl_x_mode_whole_line())
-		    && !compl_status_local())
-		goto normalchar;
+	    ఒకవేళ (*curbuf->b_p_cpt == NUL
+		    && (ctrl_x_బహుళకం_సాధారణ() || ctrl_x_బహుళకం_సంపూర్ణ_పంక్తి())
+		    && !compl_స్థితి_local())
+		వెళ్ళు normalchar;
 
 docomplete:
 	    ins_compl_clear_autocomplete_delay();
 	    compl_busy = TRUE;
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	    disable_fold_update++;  // don't redraw folds here
-#endif
-	    if (ins_complete(c, TRUE) == FAIL)
-		compl_status_clear();
-#ifdef FEAT_FOLDING
+#అయితే_ముగింపు
+	    ఒకవేళ (ins_complete(c, TRUE) == FAIL)
+		compl_స్థితి_clear();
+#నిర్వచితమైతే FEAT_FOLDING
 	    disable_fold_update--;
-#endif
+#అయితే_ముగింపు
 	    compl_busy = FALSE;
 	    can_si = may_do_si(); // allow smartindenting
-	    break;
+	    ఆపు;
 
-	case Ctrl_Y:	// copy from previous line or scroll down
-	case Ctrl_E:	// copy from next line	   or scroll up
+	స్థితి Ctrl_Y:	// copy from previous line or scroll down
+	స్థితి Ctrl_E:	// copy from next line	   or scroll up
 	    c = ins_ctrl_ey(c);
-	    break;
+	    ఆపు;
 
-	default:
-#ifdef UNIX
-	    if (c == intr_char)		// special interrupt char
-		goto do_intr;
-#endif
+	అప్రమేయ:
+#నిర్వచితమైతే UNIX
+	    ఒకవేళ (c == intr_char)		// special interrupt char
+		వెళ్ళు do_intr;
+#అయితే_ముగింపు
 
 normalchar:
 	    /*
 	     * Insert a normal character.
 	     */
-#if defined(FEAT_EVAL)
-	    if (!p_paste)
+#ఒకవేళ defined(FEAT_EVAL)
+	    ఒకవేళ (!p_paste)
 	    {
 		// Trigger InsertCharPre.
-		char_u *str = do_insert_char_pre(c);
+		char_u *str = do_చొప్పించు_char_pre(c);
 		char_u *p;
 
-		if (str != NULL)
+		ఒకవేళ (str != ఖాళీ)
 		{
-		    if (*str != NUL && stop_arrow() != FAIL)
+		    ఒకవేళ (*str != NUL && stop_arrow() != FAIL)
 		    {
 			// Insert the new value of v:char literally.
-			for (p = str; *p != NUL; MB_PTR_ADV(p))
+			కొరకు (p = str; *p != NUL; MB_PTR_ADV(p))
 			{
 			    c = PTR2CHAR(p);
-			    if (c == CAR || c == K_KENTER || c == NL)
+			    ఒకవేళ (c == CAR || c == K_KENTER || c == NL)
 				ins_eol(c);
-			    else
+			    లేకపోతే
 				ins_char(c);
 			}
-			AppendToRedobuffLit(str, -1);
+			Append_గమ్యం_Redobuff_Lit(str, -1);
 		    }
 		    vim_free(str);
 		    c = NUL;
@@ -1502,19 +1502,19 @@ normalchar:
 
 		// If the new value is already inserted or an empty string
 		// then don't insert any character.
-		if (c == NUL)
-		    break;
+		ఒకవేళ (c == NUL)
+		    ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 	    // Try to perform smart-indenting.
 	    ins_try_si(c);
 
-	    if (c == ' ')
+	    ఒకవేళ (c == ' ')
 	    {
 		inserted_space = TRUE;
-		if (inindent(0))
+		ఒకవేళ (inindent(0))
 		    can_cindent = FALSE;
-		if (Insstart_blank_vcol == MAXCOL
+		ఒకవేళ (Insstart_blank_vcol == MAXCOL
 			&& curwin->w_cursor.lnum == Insstart.lnum)
 		    Insstart_blank_vcol = get_nolist_virtcol();
 	    }
@@ -1522,64 +1522,64 @@ normalchar:
 	    // Insert a normal character and check for abbreviations on a
 	    // special character.  Let CTRL-] expand abbreviations without
 	    // inserting it.
-	    if (vim_iswordc(c) || (!echeck_abbr(
+	    ఒకవేళ (vim_iswordc(c) || (!echeck_abbr(
 			// Add ABBR_OFF for characters above 0x100, this is
 			// what check_abbr() expects.
 				(has_mbyte && c >= 0x100) ? (c + ABBR_OFF) : c)
 			&& c != Ctrl_RSB))
 	    {
-		insert_special(c, FALSE, FALSE);
-#ifdef FEAT_RIGHTLEFT
+		చొప్పించు_special(c, FALSE, FALSE);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		revins_legal++;
 		revins_chars++;
-#endif
+#అయితే_ముగింపు
 	    }
 
 	    auto_format(FALSE, TRUE);
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	    // When inserting a character the cursor line must never be in a
 	    // closed fold.
 	    foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 	    // Trigger autocompletion
-	    if (ins_compl_has_autocomplete() && !char_avail()
+	    ఒకవేళ (ins_compl_has_autocomplete() && !char_avail()
 		    && vim_isprintc(c))
 		TRIGGER_AUTOCOMPLETE();
 
-	    break;
+	    ఆపు;
 	}   // end of switch (c)
 
 	// If typed something may trigger CursorHoldI again; K_COMPLETE_DELAY is
 	// injected, not typed.
-	if (c != K_CURSORHOLD && c != K_COMPLETE_DELAY
-#ifdef FEAT_COMPL_FUNC
+	ఒకవేళ (c != K_CURSORHOLD && c != K_COMPLETE_DELAY
+#నిర్వచితమైతే FEAT_COMPL_FUNC
 		// but not in CTRL-X mode, a script can't restore the state
-		&& ctrl_x_mode_normal()
-#endif
+		&& ctrl_x_బహుళకం_సాధారణ()
+#అయితే_ముగింపు
 	       )
 	    did_cursorhold = FALSE;
 
 	// Check if we need to cancel completion mode because the window
 	// or tab page was changed
-	if (ins_compl_active() && !ins_compl_win_active(curwin))
+	ఒకవేళ (ins_compl_చురుకైన() && !ins_compl_win_చురుకైన(curwin))
 	    ins_compl_cancel();
 
 	// If the cursor was moved we didn't just insert a space
-	if (arrow_used)
+	ఒకవేళ (arrow_వాడిన)
 	    inserted_space = FALSE;
 
-	if (can_cindent && cindent_on() && ctrl_x_mode_normal())
+	ఒకవేళ (can_cindent && cindent_on() && ctrl_x_బహుళకం_సాధారణ())
 	{
 force_cindent:
 	    /*
 	     * Indent now if a key was typed that is in 'cinkeys'.
 	     */
-	    if (in_cinkeys(c, ' ', line_is_white))
+	    ఒకవేళ (లోపల_cinkeys(c, ' ', పంక్తి_is_white))
 	    {
-		if (stop_arrow() == OK)
+		ఒకవేళ (stop_arrow() == OK)
 		    // re-indent the current line
-		    do_c_expr_indent();
+		    do_c_సమాసం_indent();
 	    }
 	}
 
@@ -1587,10 +1587,10 @@ force_cindent:
     // NOTREACHED
 }
 
-    int
-ins_need_undo_get(void)
+    పూర్ణాంకం
+ins_need_undo_get(శూన్య)
 {
-    return ins_need_undo;
+    తిరిగి ins_need_undo;
 }
 
 /*
@@ -1600,64 +1600,64 @@ ins_need_undo_get(void)
  * Only redraw when there are no characters available.  This speeds up
  * inserting sequences of characters (e.g., for CTRL-R).
  */
-    void
-ins_redraw(int ready)	    // not busy with something
+    శూన్య
+ins_redraw(పూర్ణాంకం ready)	    // not busy with something
 {
-#ifdef FEAT_CONCEAL
-    linenr_T	conceal_old_cursor_line = 0;
-    linenr_T	conceal_new_cursor_line = 0;
-    int		conceal_update_lines = FALSE;
-#endif
+#నిర్వచితమైతే FEAT_CONCEAL
+    linenr_T	conceal_old_cursor_పంక్తి = 0;
+    linenr_T	conceal_new_cursor_పంక్తి = 0;
+    పూర్ణాంకం		conceal_update_పంక్తులు = FALSE;
+#అయితే_ముగింపు
 
-    if (char_avail())
-	return;
+    ఒకవేళ (char_avail())
+	తిరిగి;
 
     // Trigger CursorMoved if the cursor moved.  Not when the popup menu is
     // visible, the command might delete it.
-    if (ready && (has_cursormovedI()
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (ready && (has_cursormovedI()
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		|| popup_visible
-#endif
-#if defined(FEAT_CONCEAL)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_CONCEAL)
 		|| curwin->w_p_cole > 0
-#endif
+#అయితే_ముగింపు
 		)
-	    && !EQUAL_POS(last_cursormoved, curwin->w_cursor)
+	    && !EQUAL_POS(చివరి_cursormoved, curwin->w_cursor)
 	    && !pum_visible())
     {
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
 	// Need to update the screen first, to make sure syntax
 	// highlighting is correct after making a change (e.g., inserting
 	// a "(".  The autocommand may also require a redraw, so it's done
 	// again below, unfortunately.
-	if (syntax_present(curwin) && must_redraw)
+	ఒకవేళ (syntax_present(curwin) && must_redraw)
 	    update_screen(0);
-#endif
-	if (has_cursormovedI())
+#అయితే_ముగింపు
+	ఒకవేళ (has_cursormovedI())
 	{
 	    // Make sure curswant is correct, an autocommand may call
 	    // getcurpos().
 	    update_curswant();
 	    ins_apply_autocmds(EVENT_CURSORMOVEDI);
 	}
-#ifdef FEAT_PROP_POPUP
-	if (popup_visible)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (popup_visible)
 	    popup_check_cursor_pos();
-#endif
-#ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CONCEAL
+	ఒకవేళ (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_పంక్తి = చివరి_cursormoved.lnum;
+	    conceal_new_cursor_పంక్తి = curwin->w_cursor.lnum;
+	    conceal_update_పంక్తులు = TRUE;
 	}
-#endif
-	last_cursormoved = curwin->w_cursor;
+#అయితే_ముగింపు
+	చివరి_cursormoved = curwin->w_cursor;
     }
 
     // Trigger TextChangedI if b_changedtick_i differs.
-    if (ready && has_textchangedI()
-	    && curbuf->b_last_changedtick_i != CHANGEDTICK(curbuf)
+    ఒకవేళ (ready && has_textchangedI()
+	    && curbuf->b_చివరి_changedtick_i != CHANGEDTICK(curbuf)
 	    && !pum_visible())
     {
 	aco_save_T	aco;
@@ -1666,10 +1666,10 @@ ins_redraw(int ready)	    // not busy with something
 	// Save and restore curwin and curbuf, in case the autocmd changes
 	// them.
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDI, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TEXTCHANGEDI, ఖాళీ, ఖాళీ, FALSE, curbuf);
 	aucmd_restbuf(&aco);
-	curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-	if (tick != CHANGEDTICK(curbuf))  // see ins_apply_autocmds()
+	curbuf->b_చివరి_changedtick_i = CHANGEDTICK(curbuf);
+	ఒకవేళ (tick != CHANGEDTICK(curbuf))  // see ins_apply_autocmds()
 	    u_save(curwin->w_cursor.lnum,
 					(linenr_T)(curwin->w_cursor.lnum + 1));
     }
@@ -1677,8 +1677,8 @@ ins_redraw(int ready)	    // not busy with something
     // Trigger TextChangedP if b_changedtick_pum differs. When the popupmenu
     // closes TextChangedI will need to trigger for backwards compatibility,
     // thus use different b_last_changedtick* variables.
-    if (ready && has_textchangedP()
-	    && curbuf->b_last_changedtick_pum != CHANGEDTICK(curbuf)
+    ఒకవేళ (ready && has_textchangedP()
+	    && curbuf->b_చివరి_changedtick_pum != CHANGEDTICK(curbuf)
 	    && pum_visible())
     {
 	aco_save_T	aco;
@@ -1687,39 +1687,39 @@ ins_redraw(int ready)	    // not busy with something
 	// Save and restore curwin and curbuf, in case the autocmd changes
 	// them.
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDP, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TEXTCHANGEDP, ఖాళీ, ఖాళీ, FALSE, curbuf);
 	aucmd_restbuf(&aco);
-	curbuf->b_last_changedtick_pum = CHANGEDTICK(curbuf);
-	if (tick != CHANGEDTICK(curbuf))  // see ins_apply_autocmds()
+	curbuf->b_చివరి_changedtick_pum = CHANGEDTICK(curbuf);
+	ఒకవేళ (tick != CHANGEDTICK(curbuf))  // see ins_apply_autocmds()
 	    u_save(curwin->w_cursor.lnum,
 					(linenr_T)(curwin->w_cursor.lnum + 1));
     }
 
-    if (ready)
+    ఒకవేళ (ready)
 	may_trigger_win_scrolled_resized();
 
     // Trigger SafeState if nothing is pending.
     may_trigger_safestate(ready
-	    && !ins_compl_active()
+	    && !ins_compl_చురుకైన()
 	    && !pum_visible());
 
-#if defined(FEAT_CONCEAL)
-    if ((conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)))
-	    || need_cursor_line_redraw)
+#ఒకవేళ defined(FEAT_CONCEAL)
+    ఒకవేళ ((conceal_update_పంక్తులు
+	    && (conceal_old_cursor_పంక్తి != conceal_new_cursor_పంక్తి
+		|| conceal_cursor_పంక్తి(curwin)))
+	    || need_cursor_పంక్తి_redraw)
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line == 0
-			    ? curwin->w_cursor.lnum : conceal_new_cursor_line);
+	ఒకవేళ (conceal_old_cursor_పంక్తి != conceal_new_cursor_పంక్తి)
+	    redrawWinline(curwin, conceal_old_cursor_పంక్తి);
+	redrawWinline(curwin, conceal_new_cursor_పంక్తి == 0
+			    ? curwin->w_cursor.lnum : conceal_new_cursor_పంక్తి);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_పంక్తి_redraw = FALSE;
     }
-#endif
-    if (must_redraw)
+#అయితే_ముగింపు
+    ఒకవేళ (must_redraw)
 	update_screen(0);
-    else if (clear_cmdline || redraw_cmdline)
+    లేకపోతే ఒకవేళ (clear_cmdline || redraw_cmdline)
 	showmode();		// clear cmdline and show mode
     showruler(FALSE);
     setcursor();
@@ -1729,38 +1729,38 @@ ins_redraw(int ready)	    // not busy with something
 /*
  * Handle a CTRL-V or CTRL-Q typed in Insert mode.
  */
-    static void
-ins_ctrl_v(void)
+    స్థిర శూన్య
+ins_ctrl_v(శూన్య)
 {
-    int		c;
-    int		did_putchar = FALSE;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		did_putchar = FALSE;
 
     // may need to redraw when no more chars available now
     ins_redraw(FALSE);
 
-    if (redrawing() && !char_avail())
+    ఒకవేళ (redrawing() && !char_avail())
     {
 	edit_putchar('^', TRUE);
 	did_putchar = TRUE;
     }
-    AppendToRedobuff((char_u *)CTRL_V_STR);	// CTRL-V
+    Append_గమ్యం_Redobuff((char_u *)CTRL_V_STR);	// CTRL-V
 
-    add_to_showcmd_c(Ctrl_V);
+    కూడు_గమ్యం_showcmd_c(Ctrl_V);
 
     // Do not change any modifyOtherKeys ESC sequence to a normal key for
     // CTRL-SHIFT-V.
-    c = get_literal(mod_mask & MOD_MASK_SHIFT);
-    if (did_putchar)
+    c = get_literal(mod_ముసుగు & MOD_ముసుగు_జరుపు);
+    ఒకవేళ (did_putchar)
 	// when the line fits in 'columns' the '^' is at the start of the next
 	// line and will not removed by the redraw
 	edit_unputchar();
     clear_showcmd();
 
-    insert_special(c, FALSE, TRUE);
-#ifdef FEAT_RIGHTLEFT
+    చొప్పించు_special(c, FALSE, TRUE);
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     revins_chars++;
     revins_legal++;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -1770,152 +1770,152 @@ ins_ctrl_v(void)
  * Note that this doesn't wait for characters, they must be in the typeahead
  * buffer already.
  */
-    static int
-decodeModifyOtherKeys(int c)
+    స్థిర పూర్ణాంకం
+decode_Modify_Other_కీలకాలు(పూర్ణాంకం c)
 {
     char_u  *p = typebuf.tb_buf + typebuf.tb_off;
-    int	    idx;
-    int	    form = 0;
-    int	    argidx = 0;
-    int	    arg[2] = {0, 0};
+    పూర్ణాంకం	    idx;
+    పూర్ణాంకం	    form = 0;
+    పూర్ణాంకం	    argidx = 0;
+    పూర్ణాంకం	    arg[2] = {0, 0};
 
     // Recognize:
     // form 0: {lead}{key};{modifier}u
     // form 1: {lead}27;{modifier};{key}~
-    if (typebuf.tb_len >= 4 && (c == CSI || (c == ESC && *p == '[')))
+    ఒకవేళ (typebuf.tb_len >= 4 && (c == CSI || (c == ESC && *p == '[')))
     {
 	idx = (*p == '[');
-	if (p[idx] == '2' && p[idx + 1] == '7' && p[idx + 2] == ';' &&
+	ఒకవేళ (p[idx] == '2' && p[idx + 1] == '7' && p[idx + 2] == ';' &&
 		kitty_protocol_state != KKPS_ENABLED)
 	{
 	    form = 1;
 	    idx += 3;
 	}
-	while (idx < typebuf.tb_len && argidx < 2)
+	అయితే (idx < typebuf.tb_len && argidx < 2)
 	{
-	    if (p[idx] == ';')
+	    ఒకవేళ (p[idx] == ';')
 		++argidx;
-	    else if (VIM_ISDIGIT(p[idx]))
+	    లేకపోతే ఒకవేళ (VIM_ISDIGIT(p[idx]))
 		arg[argidx] = arg[argidx] * 10 + (p[idx] - '0');
-	    else
-		break;
+	    లేకపోతే
+		ఆపు;
 	    ++idx;
 	}
-	int kitty_no_mods = argidx == 0 && kitty_protocol_state == KKPS_ENABLED;
-	if (idx < typebuf.tb_len
+	పూర్ణాంకం kitty_no_mods = argidx == 0 && kitty_protocol_state == KKPS_ENABLED;
+	ఒకవేళ (idx < typebuf.tb_len
 		&& p[idx] == (form == 1 ? '~' : 'u')
 		&& (argidx == 1 || kitty_no_mods))
 	{
 	    // Match, consume the code.
 	    typebuf.tb_off += idx + 1;
 	    typebuf.tb_len -= idx + 1;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
-	    if (typebuf.tb_len == 0)
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	    ఒకవేళ (typebuf.tb_len == 0)
 		typebuf_was_filled = FALSE;
-#endif
+#అయితే_ముగింపు
 
-	    mod_mask = kitty_no_mods ? 0 : decode_modifiers(arg[!form]);
-	    c = merge_modifyOtherKeys(arg[form], &mod_mask);
+	    mod_ముసుగు = kitty_no_mods ? 0 : decode_modifiers(arg[!form]);
+	    c = విలీనం_modify_Other_కీలకాలు(arg[form], &mod_ముసుగు);
 	}
     }
 
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Put a character directly onto the screen.  It's not stored in a buffer.
  * Used while handling CTRL-K, CTRL-V, etc. in Insert mode.
  */
-static int  pc_status;
-#define PC_STATUS_UNSET	0	// pc_bytes was not set
-#define PC_STATUS_RIGHT	1	// right half of double-wide char
-#define PC_STATUS_LEFT	2	// left half of double-wide char
-#define PC_STATUS_SET	3	// pc_bytes was filled
-static char_u pc_bytes[MB_MAXBYTES + 1]; // saved bytes
-static int  pc_attr;
-static int  pc_row;
-static int  pc_col;
+స్థిర పూర్ణాంకం  pc_స్థితి;
+#నిర్వచించు PC_స్థితి_UNSET	0	// pc_bytes was not set
+#నిర్వచించు PC_స్థితి_కుడి	1	// right half of double-wide char
+#నిర్వచించు PC_స్థితి_ఎడమ	2	// left half of double-wide char
+#నిర్వచించు PC_స్థితి_సమితి	3	// pc_bytes was filled
+స్థిర char_u pc_బైట్లు[MB_MAXBYTES + 1]; // saved bytes
+స్థిర పూర్ణాంకం  pc_attr;
+స్థిర పూర్ణాంకం  pc_అడ్డువరుస;
+స్థిర పూర్ణాంకం  pc_నిలువు;
 
-    void
-edit_putchar(int c, int highlight)
+    శూన్య
+edit_putchar(పూర్ణాంకం c, పూర్ణాంకం highlight)
 {
-    int	    attr;
+    పూర్ణాంకం	    attr;
 
-    if (ScreenLines == NULL)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
     update_topline();	// just in case w_topline isn't valid
     validate_cursor();
-    if (highlight)
+    ఒకవేళ (highlight)
 	attr = HL_ATTR(HLF_8);
-    else
+    లేకపోతే
 	attr = 0;
-    pc_row = W_WINROW(curwin) + curwin->w_wrow;
-    pc_col = curwin->w_wincol;
-    pc_status = PC_STATUS_UNSET;
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    pc_అడ్డువరుస = W_WINROW(curwin) + curwin->w_wrow;
+    pc_నిలువు = curwin->w_wincol;
+    pc_స్థితి = PC_స్థితి_UNSET;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (curwin->w_p_rl)
     {
-	pc_col += curwin->w_width - 1 - curwin->w_wcol;
-	if (has_mbyte)
+	pc_నిలువు += curwin->w_వెడల్పు - 1 - curwin->w_wcol;
+	ఒకవేళ (has_mbyte)
 	{
-	    int fix_col = mb_fix_col(pc_col, pc_row);
+	    పూర్ణాంకం fix_నిలువు = mb_fix_నిలువు(pc_నిలువు, pc_అడ్డువరుస);
 
-	    if (fix_col != pc_col)
+	    ఒకవేళ (fix_నిలువు != pc_నిలువు)
 	    {
-		screen_putchar(' ', pc_row, fix_col, attr);
+		screen_putchar(' ', pc_అడ్డువరుస, fix_నిలువు, attr);
 		--curwin->w_wcol;
-		pc_status = PC_STATUS_RIGHT;
+		pc_స్థితి = PC_స్థితి_కుడి;
 	    }
 	}
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	pc_col += curwin->w_wcol;
-	if (mb_lefthalve(pc_row, pc_col))
-	    pc_status = PC_STATUS_LEFT;
+	pc_నిలువు += curwin->w_wcol;
+	ఒకవేళ (mb_lefthalve(pc_అడ్డువరుస, pc_నిలువు))
+	    pc_స్థితి = PC_స్థితి_ఎడమ;
     }
 
     // save the character to be able to put it back
-    if (pc_status == PC_STATUS_UNSET)
+    ఒకవేళ (pc_స్థితి == PC_స్థితి_UNSET)
     {
-	screen_getbytes(pc_row, pc_col, pc_bytes, &pc_attr);
-	pc_status = PC_STATUS_SET;
+	screen_getbytes(pc_అడ్డువరుస, pc_నిలువు, pc_బైట్లు, &pc_attr);
+	pc_స్థితి = PC_స్థితి_సమితి;
     }
-    screen_putchar(c, pc_row, pc_col, attr);
+    screen_putchar(c, pc_అడ్డువరుస, pc_నిలువు, attr);
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
 /*
  * Set the insert start position for when using a prompt buffer.
  */
-    void
-set_insstart(linenr_T lnum, int col)
+    శూన్య
+సమితి_insstart(linenr_T lnum, పూర్ణాంకం నిలువు)
 {
     Insstart.lnum = lnum;
-    Insstart.col = col;
+    Insstart.నిలువు = నిలువు;
     Insstart_orig = Insstart;
-    Insstart_textlen = Insstart.col;
+    Insstart_textlen = Insstart.నిలువు;
     Insstart_blank_vcol = MAXCOL;
-    arrow_used = FALSE;
+    arrow_వాడిన = FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Undo the previous edit_putchar().
  */
-    void
-edit_unputchar(void)
+    శూన్య
+edit_unputchar(శూన్య)
 {
-    if (pc_status != PC_STATUS_UNSET && pc_row >= msg_scrolled)
+    ఒకవేళ (pc_స్థితి != PC_స్థితి_UNSET && pc_అడ్డువరుస >= సందేశం_scrolled)
     {
-	if (pc_status == PC_STATUS_RIGHT)
+	ఒకవేళ (pc_స్థితి == PC_స్థితి_కుడి)
 	    ++curwin->w_wcol;
-	if (pc_status == PC_STATUS_RIGHT || pc_status == PC_STATUS_LEFT)
+	ఒకవేళ (pc_స్థితి == PC_స్థితి_కుడి || pc_స్థితి == PC_స్థితి_ఎడమ)
 	    redrawWinline(curwin, curwin->w_cursor.lnum);
-	else
-	    screen_puts(pc_bytes, pc_row - msg_scrolled, pc_col, pc_attr);
+	లేకపోతే
+	    screen_puts(pc_బైట్లు, pc_అడ్డువరుస - సందేశం_scrolled, pc_నిలువు, pc_attr);
     }
 }
 
@@ -1923,44 +1923,44 @@ edit_unputchar(void)
  * Called when "$" is in 'cpoptions': display a '$' at the end of the changed
  * text.  Only works when cursor is in the line that changes.
  */
-    void
-display_dollar(colnr_T col_arg)
+    శూన్య
+display_dollar(colnr_T నిలువు_arg)
 {
-    colnr_T col = col_arg < 0 ? 0 : col_arg;
-    colnr_T save_col;
+    colnr_T నిలువు = నిలువు_arg < 0 ? 0 : నిలువు_arg;
+    colnr_T save_నిలువు;
 
-    if (!redrawing())
-	return;
+    ఒకవేళ (!redrawing())
+	తిరిగి;
 
     cursor_off();
-    save_col = curwin->w_cursor.col;
-    curwin->w_cursor.col = col;
-    if (has_mbyte)
+    save_నిలువు = curwin->w_cursor.నిలువు;
+    curwin->w_cursor.నిలువు = నిలువు;
+    ఒకవేళ (has_mbyte)
     {
 	char_u *p;
 
 	// If on the last byte of a multi-byte move to the first byte.
 	p = ml_get_curline();
-	curwin->w_cursor.col -= (*mb_head_off)(p, p + col);
+	curwin->w_cursor.నిలువు -= (*mb_తల_off)(p, p + నిలువు);
     }
     curs_columns(FALSE);	    // recompute w_wrow and w_wcol
-    if (curwin->w_wcol < curwin->w_width)
+    ఒకవేళ (curwin->w_wcol < curwin->w_వెడల్పు)
     {
 	edit_putchar('$', FALSE);
 	dollar_vcol = curwin->w_virtcol;
     }
-    curwin->w_cursor.col = save_col;
+    curwin->w_cursor.నిలువు = save_నిలువు;
 }
 
 /*
  * Call this function before moving the cursor from the normal insert position
  * in insert mode.
  */
-    void
-undisplay_dollar(void)
+    శూన్య
+undisplay_dollar(శూన్య)
 {
-    if (dollar_vcol < 0)
-	return;
+    ఒకవేళ (dollar_vcol < 0)
+	తిరిగి;
 
     dollar_vcol = -1;
     redrawWinline(curwin, curwin->w_cursor.lnum);
@@ -1971,18 +1971,18 @@ undisplay_dollar(void)
  * insert mode.  It handles fixing the replace stack for MODE_REPLACE and
  * MODE_VREPLACE modes.
  */
-    void
-truncate_spaces(char_u *line, size_t len)
+    శూన్య
+truncate_spaces(char_u *పంక్తి, size_t len)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
     // find start of trailing white space
-    for (i = (int)len - 1; i >= 0 && VIM_ISWHITE(line[i]); i--)
+    కొరకు (i = (పూర్ణాంకం)len - 1; i >= 0 && VIM_ISWHITE(పంక్తి[i]); i--)
     {
-	if (State & REPLACE_FLAG)
+	ఒకవేళ (State & REPLACE_FLAG)
 	    replace_join(0);	    // remove a NUL from the replace stack
     }
-    line[i + 1] = NUL;
+    పంక్తి[i + 1] = NUL;
 }
 
 /*
@@ -1991,16 +1991,16 @@ truncate_spaces(char_u *line, size_t len)
  * all.  Will attempt not to go before "col" even when there is a composing
  * character.
  */
-    void
-backspace_until_column(int col)
+    శూన్య
+backspace_until_స్తంభం(పూర్ణాంకం నిలువు)
 {
-    while ((int)curwin->w_cursor.col > col)
+    అయితే ((పూర్ణాంకం)curwin->w_cursor.నిలువు > నిలువు)
     {
-	curwin->w_cursor.col--;
-	if (State & REPLACE_FLAG)
-	    replace_do_bs(col);
-	else if (!del_char_after_col(col))
-	    break;
+	curwin->w_cursor.నిలువు--;
+	ఒకవేళ (State & REPLACE_FLAG)
+	    replace_do_bs(నిలువు);
+	లేకపోతే ఒకవేళ (!del_char_after_నిలువు(నిలువు))
+	    ఆపు;
     }
 }
 
@@ -2009,32 +2009,32 @@ backspace_until_column(int col)
  * Only matters when there are composing characters.
  * Return TRUE when something was deleted.
  */
-    static int
-del_char_after_col(int limit_col UNUSED)
+    స్థిర పూర్ణాంకం
+del_char_after_నిలువు(పూర్ణాంకం హద్దు_నిలువు వాడని)
 {
-    if (enc_utf8 && limit_col >= 0)
+    ఒకవేళ (enc_utf8 && హద్దు_నిలువు >= 0)
     {
-	colnr_T ecol = curwin->w_cursor.col + 1;
+	colnr_T ecol = curwin->w_cursor.నిలువు + 1;
 
 	// Make sure the cursor is at the start of a character, but
 	// skip forward again when going too far back because of a
 	// composing character.
 	mb_adjust_cursor();
-	while (curwin->w_cursor.col < (colnr_T)limit_col)
+	అయితే (curwin->w_cursor.నిలువు < (colnr_T)హద్దు_నిలువు)
 	{
-	    int l = utf_ptr2len(ml_get_cursor());
+	    పూర్ణాంకం l = utf_ptr2len(ml_get_cursor());
 
-	    if (l == 0)  // end of line
-		break;
-	    curwin->w_cursor.col += l;
+	    ఒకవేళ (l == 0)  // end of line
+		ఆపు;
+	    curwin->w_cursor.నిలువు += l;
 	}
-	if (*ml_get_cursor() == NUL || curwin->w_cursor.col == ecol)
-	    return FALSE;
-	del_bytes((long)((int)ecol - curwin->w_cursor.col), FALSE, TRUE);
+	ఒకవేళ (*ml_get_cursor() == NUL || curwin->w_cursor.నిలువు == ecol)
+	    తిరిగి FALSE;
+	del_బైట్లు((దీర్ఘ)((పూర్ణాంకం)ecol - curwin->w_cursor.నిలువు), FALSE, TRUE);
     }
-    else
-	(void)del_char(FALSE);
-    return TRUE;
+    లేకపోతే
+	(శూన్య)del_char(FALSE);
+    తిరిగి TRUE;
 }
 
 /*
@@ -2045,149 +2045,149 @@ del_char_after_col(int limit_col UNUSED)
  * If "noReduceKeys" is TRUE do not change any modifyOtherKeys ESC sequence
  * into a normal key, return ESC.
  */
-    int
-get_literal(int noReduceKeys)
+    పూర్ణాంకం
+get_literal(పూర్ణాంకం no_Reduce_కీలకాలు)
 {
-    int		cc;
-    int		nc;
-    int		i;
-    int		hex = FALSE;
-    int		octal = FALSE;
-    int		unicode = 0;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		nc;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		hex = FALSE;
+    పూర్ణాంకం		octal = FALSE;
+    పూర్ణాంకం		unicode = 0;
 
-    if (got_int)
-	return Ctrl_C;
+    ఒకవేళ (got_int)
+	తిరిగి Ctrl_C;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     /*
      * In GUI there is no point inserting the internal code for a special key.
      * It is more useful to insert the string "<KEY>" instead.	This would
      * probably be useful in a text window too, but it would not be
      * vi-compatible (maybe there should be an option for it?) -- webb
      */
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
     {
-	++allow_keys;
-	if (noReduceKeys)
-	    ++no_reduce_keys;
+	++allow_కీలకాలు;
+	ఒకవేళ (no_Reduce_కీలకాలు)
+	    ++no_reduce_కీలకాలు;
     }
-#endif
-#ifdef USE_ON_FLY_SCROLL
+#అయితే_ముగింపు
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#అయితే_ముగింపు
     ++no_mapping;		// don't map the next key hits
     cc = 0;
     i = 0;
-    for (;;)
+    కొరకు (;;)
     {
 	nc = plain_vgetc();
-	if ((nc == ESC || nc == CSI) && !noReduceKeys)
-	    nc = decodeModifyOtherKeys(nc);
+	ఒకవేళ ((nc == ESC || nc == CSI) && !no_Reduce_కీలకాలు)
+	    nc = decode_Modify_Other_కీలకాలు(nc);
 
-	if ((mod_mask & ~MOD_MASK_SHIFT) != 0)
+	ఒకవేళ ((mod_ముసుగు & ~MOD_ముసుగు_జరుపు) != 0)
 	    // A character with non-Shift modifiers should not be a valid
 	    // character for i_CTRL-V_digit.
-	    break;
+	    ఆపు;
 
-	if ((State & MODE_CMDLINE) == 0 && MB_BYTE2LEN_CHECK(nc) == 1)
-	    add_to_showcmd(nc);
-	if (nc == 'x' || nc == 'X')
+	ఒకవేళ ((State & బహుళకం_CMDLINE) == 0 && MB_BYTE2LEN_CHECK(nc) == 1)
+	    కూడు_గమ్యం_showcmd(nc);
+	ఒకవేళ (nc == 'x' || nc == 'X')
 	    hex = TRUE;
-	else if (nc == 'o' || nc == 'O')
+	లేకపోతే ఒకవేళ (nc == 'o' || nc == 'O')
 	    octal = TRUE;
-	else if (nc == 'u' || nc == 'U')
+	లేకపోతే ఒకవేళ (nc == 'u' || nc == 'U')
 	    unicode = nc;
-	else
+	లేకపోతే
 	{
-	    if (hex || unicode != 0)
+	    ఒకవేళ (hex || unicode != 0)
 	    {
-		if (!vim_isxdigit(nc))
-		    break;
+		ఒకవేళ (!vim_isxdigit(nc))
+		    ఆపు;
 		cc = cc * 16 + hex2nr(nc);
 	    }
-	    else if (octal)
+	    లేకపోతే ఒకవేళ (octal)
 	    {
-		if (nc < '0' || nc > '7')
-		    break;
+		ఒకవేళ (nc < '0' || nc > '7')
+		    ఆపు;
 		cc = cc * 8 + nc - '0';
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (!VIM_ISDIGIT(nc))
-		    break;
+		ఒకవేళ (!VIM_ISDIGIT(nc))
+		    ఆపు;
 		cc = cc * 10 + nc - '0';
 	    }
 
 	    ++i;
 	}
 
-	if (cc > 255 && unicode == 0)
+	ఒకవేళ (cc > 255 && unicode == 0)
 	    cc = 255;		// limit range to 0-255
 	nc = 0;
 
-	if (hex)		// hex: up to two chars
+	ఒకవేళ (hex)		// hex: up to two chars
 	{
-	    if (i >= 2)
-		break;
+	    ఒకవేళ (i >= 2)
+		ఆపు;
 	}
-	else if (unicode)	// Unicode: up to four or eight chars
+	లేకపోతే ఒకవేళ (unicode)	// Unicode: up to four or eight chars
 	{
-	    if ((unicode == 'u' && i >= 4) || (unicode == 'U' && i >= 8))
-		break;
+	    ఒకవేళ ((unicode == 'u' && i >= 4) || (unicode == 'U' && i >= 8))
+		ఆపు;
 	}
-	else if (i >= 3)	// decimal or octal: up to three chars
-	    break;
+	లేకపోతే ఒకవేళ (i >= 3)	// decimal or octal: up to three chars
+	    ఆపు;
     }
-    if (i == 0)	    // no number entered
+    ఒకవేళ (i == 0)	    // no number entered
     {
-	if (nc == K_ZERO)   // NUL is stored as NL
+	ఒకవేళ (nc == K_ZERO)   // NUL is stored as NL
 	{
 	    cc = '\n';
 	    nc = 0;
 	}
-	else
+	లేకపోతే
 	{
 	    cc = nc;
 	    nc = 0;
 	}
     }
 
-    if (cc == 0)	// NUL is stored as NL
+    ఒకవేళ (cc == 0)	// NUL is stored as NL
 	cc = '\n';
-    if (enc_dbcs && (cc & 0xff) == 0)
+    ఒకవేళ (enc_dbcs && (cc & 0xff) == 0)
 	cc = '?';	// don't accept an illegal DBCS char, the NUL in the
 			// second byte will cause trouble!
 
     --no_mapping;
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
-	--allow_keys;
-	if (noReduceKeys)
-	    --no_reduce_keys;
+	--allow_కీలకాలు;
+	ఒకవేళ (no_Reduce_కీలకాలు)
+	    --no_reduce_కీలకాలు;
     }
-#endif
-    if (nc)
+#అయితే_ముగింపు
+    ఒకవేళ (nc)
     {
 	vungetc(nc);
 	// A character typed with i_CTRL-V_digit cannot have modifiers.
-	mod_mask = 0;
+	mod_ముసుగు = 0;
     }
     got_int = FALSE;	    // CTRL-C typed after CTRL-V is not an interrupt
-    return cc;
+    తిరిగి cc;
 }
 
 /*
  * Insert character, taking care of special keys and mod_mask
  */
-    static void
-insert_special(
-    int	    c,
-    int	    allow_modmask,
-    int	    ctrlv)	    // c was typed after CTRL-V
+    స్థిర శూన్య
+చొప్పించు_special(
+    పూర్ణాంకం	    c,
+    పూర్ణాంకం	    allow_modmask,
+    పూర్ణాంకం	    ctrlv)	    // c was typed after CTRL-V
 {
     char_u  *p;
-    int	    len;
+    పూర్ణాంకం	    len;
 
     /*
      * Special function key, translate into "<Key>". Up to the last '>' is
@@ -2196,27 +2196,27 @@ insert_special(
      * Only use mod_mask for special keys, to avoid things like <S-Space>,
      * unless 'allow_modmask' is TRUE.
      */
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(MACOS_X) || defined(FEAT_GUI_GTK)
     // Command-key never produces a normal key
-    if (mod_mask & MOD_MASK_CMD)
+    ఒకవేళ (mod_ముసుగు & MOD_ముసుగు_CMD)
 	allow_modmask = TRUE;
-#endif
-    if (IS_SPECIAL(c) || (mod_mask && allow_modmask))
+#అయితే_ముగింపు
+    ఒకవేళ (IS_SPECIAL(c) || (mod_ముసుగు && allow_modmask))
     {
-	p = get_special_key_name(c, mod_mask);
-	len = (int)STRLEN(p);
+	p = get_special_కీలకం_name(c, mod_ముసుగు);
+	len = (పూర్ణాంకం)STRLEN(p);
 	c = p[len - 1];
-	if (len > 2)
+	ఒకవేళ (len > 2)
 	{
-	    if (stop_arrow() == FAIL)
-		return;
+	    ఒకవేళ (stop_arrow() == FAIL)
+		తిరిగి;
 	    p[len - 1] = NUL;
 	    ins_str(p, len - 1);
-	    AppendToRedobuffLit(p, -1);
+	    Append_గమ్యం_Redobuff_Lit(p, -1);
 	    ctrlv = FALSE;
 	}
     }
-    if (stop_arrow() == OK)
+    ఒకవేళ (stop_arrow() == OK)
 	insertchar(c, ctrlv ? INSCHAR_CTRLV : 0, -1);
 }
 
@@ -2229,7 +2229,7 @@ insert_special(
  * stop and defer processing to the "normal" mechanism.
  * '0' and '^' are special, because they can be followed by CTRL-D.
  */
-#define ISSPECIAL(c)	((c) < ' ' || (c) >= DEL || (c) == '0' || (c) == '^')
+#నిర్వచించు ISSPECIAL(c)	((c) < ' ' || (c) >= DEL || (c) == '0' || (c) == '^')
 
 /*
  * "flags": INSCHAR_FORMAT - force formatting
@@ -2241,16 +2241,16 @@ insert_special(
  *	    INSCHAR_DO_COM   - format comments
  *	    INSCHAR_COM_LIST - format comments with num list or 2nd line indent
  */
-    void
+    శూన్య
 insertchar(
-    int		c,			// character to insert or NUL
-    int		flags,			// INSCHAR_FORMAT, etc.
-    int		second_indent)		// indent for second line if >= 0
+    పూర్ణాంకం		c,			// character to insert or NUL
+    పూర్ణాంకం		flags,			// INSCHAR_FORMAT, etc.
+    పూర్ణాంకం		రెండవ_indent)		// indent for second line if >= 0
 {
-    int		textwidth;
+    పూర్ణాంకం		textwidth;
     char_u	*p;
-    int		fo_ins_blank;
-    int		force_format = flags & INSCHAR_FORMAT;
+    పూర్ణాంకం		fo_ins_blank;
+    పూర్ణాంకం		force_format = flags & INSCHAR_FORMAT;
 
     textwidth = comp_textwidth(force_format);
     fo_ins_blank = has_format_option(FO_INS_BLANK);
@@ -2270,7 +2270,7 @@ insertchar(
      *	    - 'formatoptions' doesn't have 'b' or a blank was inserted at or
      *	      before 'textwidth'
      */
-    if (textwidth > 0
+    ఒకవేళ (textwidth > 0
 	    && (force_format
 		|| (!VIM_ISWHITE(c)
 		    && !((State & REPLACE_FLAG)
@@ -2285,82 +2285,82 @@ insertchar(
     {
 	// Format with 'formatexpr' when it's set.  Use internal formatting
 	// when 'formatexpr' isn't set or it returns non-zero.
-#if defined(FEAT_EVAL)
-	int     do_internal = TRUE;
+#ఒకవేళ defined(FEAT_EVAL)
+	పూర్ణాంకం     do_అంతర్గత = TRUE;
 	colnr_T virtcol = get_nolist_virtcol()
 				  + char2cells(c != NUL ? c : gchar_cursor());
 
-	if (*curbuf->b_p_fex != NUL && (flags & INSCHAR_NO_FEX) == 0
+	ఒకవేళ (*curbuf->b_p_fex != NUL && (flags & INSCHAR_NO_FEX) == 0
 		&& (force_format || virtcol > (colnr_T)textwidth))
 	{
-	    do_internal = (fex_format(curwin->w_cursor.lnum, 1L, c) != 0);
+	    do_అంతర్గత = (fex_format(curwin->w_cursor.lnum, 1L, c) != 0);
 	    // It may be required to save for undo again, e.g. when setline()
 	    // was called.
 	    ins_need_undo = TRUE;
 	}
-	if (do_internal)
-#endif
-	    internal_format(textwidth, second_indent, flags, c == NUL, c);
+	ఒకవేళ (do_అంతర్గత)
+#అయితే_ముగింపు
+	    అంతర్గత_format(textwidth, రెండవ_indent, flags, c == NUL, c);
     }
 
-    if (c == NUL)	    // only formatting was wanted
-	return;
+    ఒకవేళ (c == NUL)	    // only formatting was wanted
+	తిరిగి;
 
     // Check whether this character should end a comment.
-    if (did_ai && c == end_comment_pending)
+    ఒకవేళ (did_ai && c == చివర_comment_pending)
     {
-	char_u  *line;
-	char_u	lead_end[COM_MAX_LEN];	    // end-comment string
-	int	middle_len, end_len;
-	int	i;
+	char_u  *పంక్తి;
+	char_u	lead_చివర[COM_MAX_LEN];	    // end-comment string
+	పూర్ణాంకం	మధ్య_len, చివర_len;
+	పూర్ణాంకం	i;
 
 	/*
 	 * Need to remove existing (middle) comment leader and insert end
 	 * comment leader.  First, check what comment leader we can find.
 	 */
-	i = get_leader_len(line = ml_get_curline(), &p, FALSE, TRUE);
-	if (i > 0 && vim_strchr(p, COM_MIDDLE) != NULL)	// Just checking
+	i = get_leader_len(పంక్తి = ml_get_curline(), &p, FALSE, TRUE);
+	ఒకవేళ (i > 0 && vim_strchr(p, COM_మధ్య) != ఖాళీ)	// Just checking
 	{
 	    // Skip middle-comment string
-	    while (*p && p[-1] != ':')	// find end of middle flags
+	    అయితే (*p && p[-1] != ':')	// find end of middle flags
 		++p;
-	    middle_len = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
+	    మధ్య_len = copy_option_part(&p, lead_చివర, COM_MAX_LEN, ",");
 	    // Don't count trailing white space for middle_len
-	    while (middle_len > 0 && VIM_ISWHITE(lead_end[middle_len - 1]))
-		--middle_len;
+	    అయితే (మధ్య_len > 0 && VIM_ISWHITE(lead_చివర[మధ్య_len - 1]))
+		--మధ్య_len;
 
 	    // Find the end-comment string
-	    while (*p && p[-1] != ':')	// find end of end flags
+	    అయితే (*p && p[-1] != ':')	// find end of end flags
 		++p;
-	    end_len = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
+	    చివర_len = copy_option_part(&p, lead_చివర, COM_MAX_LEN, ",");
 
 	    // Skip white space before the cursor
-	    i = curwin->w_cursor.col;
-	    while (--i >= 0 && VIM_ISWHITE(line[i]))
+	    i = curwin->w_cursor.నిలువు;
+	    అయితే (--i >= 0 && VIM_ISWHITE(పంక్తి[i]))
 		;
 	    i++;
 
 	    // Skip to before the middle leader
-	    i -= middle_len;
+	    i -= మధ్య_len;
 
 	    // Check some expected things before we go on
-	    if (i >= 0 && end_len > 0 && lead_end[end_len - 1] == end_comment_pending)
+	    ఒకవేళ (i >= 0 && చివర_len > 0 && lead_చివర[చివర_len - 1] == చివర_comment_pending)
 	    {
 		// Backspace over all the stuff we want to replace
-		backspace_until_column(i);
+		backspace_until_స్తంభం(i);
 
 		// Insert the end-comment string, except for the last
 		// character, which will get inserted as normal later.
-		ins_bytes_len(lead_end, end_len - 1);
+		ins_బైట్లు_len(lead_చివర, చివర_len - 1);
 	    }
 	}
     }
-    end_comment_pending = NUL;
+    చివర_comment_pending = NUL;
 
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
+    can_si_వెనుక = FALSE;
 
     /*
      * If there's any pending input, grab up to INPUT_BUFLEN at once.
@@ -2373,33 +2373,33 @@ insertchar(
      * Do the check for InsertCharPre before the call to vpeekc() because the
      * InsertCharPre autocommand could change the input buffer.
      */
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = FALSE;		// allow scrolling here
-#endif
+#అయితే_ముగింపు
 
-    if (       !ISSPECIAL(c)
+    ఒకవేళ (       !ISSPECIAL(c)
 	    && (!has_mbyte || (*mb_char2len)(c) == 1)
 	    && !has_insertcharpre()
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	    // Skip typeahead if test_override("char_avail", 1) was called.
 	    && !disable_char_avail_for_testing
-#endif
+#అయితే_ముగింపు
 	    && vpeekc() != NUL
 	    && !(State & REPLACE_FLAG)
 	    && !cindent_on()
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    && !p_ri
-#endif
+#అయితే_ముగింపు
 	   )
     {
-#define INPUT_BUFLEN 100
-	char_u		buf[INPUT_BUFLEN + 1];
-	int		i;
+#నిర్వచించు ఆదానం_BUFLEN 100
+	char_u		buf[ఆదానం_BUFLEN + 1];
+	పూర్ణాంకం		i;
 	colnr_T		virtcol = 0;
 
 	buf[0] = c;
 	i = 1;
-	if (textwidth > 0)
+	ఒకవేళ (textwidth > 0)
 	    virtcol = get_nolist_virtcol();
 	/*
 	 * Stop the string when:
@@ -2409,60 +2409,60 @@ insertchar(
 	 * - running into the 'textwidth' boundary
 	 * - need to check for abbreviation: A non-word char after a word-char
 	 */
-	while (	   (c = vpeekc()) != NUL
+	అయితే (	   (c = vpeekc()) != NUL
 		&& !ISSPECIAL(c)
 		&& (!has_mbyte || MB_BYTE2LEN_CHECK(c) == 1)
-		&& i < INPUT_BUFLEN
+		&& i < ఆదానం_BUFLEN
 		&& (textwidth == 0
 		    || (virtcol += byte2cells(buf[i - 1])) < (colnr_T)textwidth)
 		&& !(!no_abbr && !vim_iswordc(c) && vim_iswordc(buf[i - 1])))
 	{
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    c = vgetc();
-	    if (p_hkmap && KeyTyped)
+	    ఒకవేళ (p_hkmap && కీలకం_Typed)
 		c = hkmap(c);		    // Hebrew mode mapping
 	    buf[i++] = c;
-#else
+#లేకపోతే
 	    buf[i++] = vgetc();
-#endif
+#అయితే_ముగింపు
 	}
 
-#ifdef FEAT_DIGRAPHS
+#నిర్వచితమైతే FEAT_DIGRAPHS
 	do_digraph(-1);			// clear digraphs
 	do_digraph(buf[i-1]);		// may be the start of a digraph
-#endif
+#అయితే_ముగింపు
 	buf[i] = NUL;
 	ins_str(buf, i);
-	if (flags & INSCHAR_CTRLV)
+	ఒకవేళ (flags & INSCHAR_CTRLV)
 	{
 	    redo_literal(*buf);
 	    i = 1;
 	}
-	else
+	లేకపోతే
 	    i = 0;
-	if (buf[i] != NUL)
-	    AppendToRedobuffLit(buf + i, -1);
+	ఒకవేళ (buf[i] != NUL)
+	    Append_గమ్యం_Redobuff_Lit(buf + i, -1);
     }
-    else
+    లేకపోతే
     {
-	int		cc;
+	పూర్ణాంకం		cc;
 
-	if (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
+	ఒకవేళ (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
 	{
 	    char_u	buf[MB_MAXBYTES + 1];
 
 	    (*mb_char2bytes)(c, buf);
 	    buf[cc] = NUL;
-	    ins_char_bytes(buf, cc);
-	    AppendCharToRedobuff(c);
+	    ins_char_బైట్లు(buf, cc);
+	    Append_Char_గమ్యం_Redobuff(c);
 	}
-	else
+	లేకపోతే
 	{
 	    ins_char(c);
-	    if (flags & INSCHAR_CTRLV)
+	    ఒకవేళ (flags & INSCHAR_CTRLV)
 		redo_literal(c);
-	    else
-		AppendCharToRedobuff(c);
+	    లేకపోతే
+		Append_Char_గమ్యం_Redobuff(c);
 	}
     }
 }
@@ -2470,75 +2470,75 @@ insertchar(
 /*
  * Put a character in the redo buffer, for when just after a CTRL-V.
  */
-    static void
-redo_literal(int c)
+    స్థిర శూన్య
+redo_literal(పూర్ణాంకం c)
 {
     char_u	buf[10];
 
     // Only digits need special treatment.  Translate them into a string of
     // three digits.
-    if (VIM_ISDIGIT(c))
+    ఒకవేళ (VIM_ISDIGIT(c))
     {
-	vim_snprintf((char *)buf, sizeof(buf), "%03d", c);
-	AppendToRedobuff(buf);
+	vim_snprintf((అక్షరం *)buf, పరిమాణం(buf), "%03d", c);
+	Append_గమ్యం_Redobuff(buf);
     }
-    else
-	AppendCharToRedobuff(c);
+    లేకపోతే
+	Append_Char_గమ్యం_Redobuff(c);
 }
 
 /*
  * start_arrow() is called when an arrow key is used in insert mode.
  * For undo/redo it resembles hitting the <ESC> key.
  */
-    void
-start_arrow(
-    pos_T    *end_insert_pos)		// can be NULL
+    శూన్య
+ప్రారంభం_arrow(
+    pos_T    *చివర_చొప్పించు_pos)		// can be NULL
 {
-    start_arrow_common(end_insert_pos, TRUE);
+    ప్రారంభం_arrow_common(చివర_చొప్పించు_pos, TRUE);
 }
 
 /*
  * Like start_arrow() but with end_change argument.
  * Will prepare for redo of CTRL-G U if "end_change" is FALSE.
  */
-    static void
-start_arrow_with_change(
-    pos_T    *end_insert_pos,		// can be NULL
-    int	      end_change)		// end undoable change
+    స్థిర శూన్య
+ప్రారంభం_arrow_with_change(
+    pos_T    *చివర_చొప్పించు_pos,		// can be NULL
+    పూర్ణాంకం	      చివర_change)		// end undoable change
 {
-    start_arrow_common(end_insert_pos, end_change);
-    if (!end_change)
+    ప్రారంభం_arrow_common(చివర_చొప్పించు_pos, చివర_change);
+    ఒకవేళ (!చివర_change)
     {
-	AppendCharToRedobuff(Ctrl_G);
-	AppendCharToRedobuff('U');
+	Append_Char_గమ్యం_Redobuff(Ctrl_G);
+	Append_Char_గమ్యం_Redobuff('U');
     }
 }
 
-    static void
-start_arrow_common(
-    pos_T    *end_insert_pos,		// can be NULL
-    int	      end_change)		// end undoable change
+    స్థిర శూన్య
+ప్రారంభం_arrow_common(
+    pos_T    *చివర_చొప్పించు_pos,		// can be NULL
+    పూర్ణాంకం	      చివర_change)		// end undoable change
 {
-    if (!arrow_used && end_change)	// something has been inserted
+    ఒకవేళ (!arrow_వాడిన && చివర_change)	// something has been inserted
     {
-	AppendToRedobuff(ESC_STR);
-	stop_insert(end_insert_pos, FALSE, FALSE);
-	arrow_used = TRUE;	// this means we stopped the current insert
+	Append_గమ్యం_Redobuff(ESC_STR);
+	stop_చొప్పించు(చివర_చొప్పించు_pos, FALSE, FALSE);
+	arrow_వాడిన = TRUE;	// this means we stopped the current insert
     }
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
     check_spell_redraw();
-#endif
+#అయితే_ముగింపు
 }
 
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
 /*
  * If we skipped highlighting word at cursor, do it now.
  * It may be skipped again, thus reset spell_redraw_lnum first.
  */
-    static void
-check_spell_redraw(void)
+    స్థిర శూన్య
+check_spell_redraw(శూన్య)
 {
-    if (spell_redraw_lnum != 0)
+    ఒకవేళ (spell_redraw_lnum != 0)
     {
 	linenr_T	lnum = spell_redraw_lnum;
 
@@ -2547,51 +2547,51 @@ check_spell_redraw(void)
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * stop_arrow() is called before a change is made in insert mode.
  * If an arrow key has been used, start a new insertion.
  * Returns FAIL if undo is impossible, shouldn't insert then.
  */
-    int
-stop_arrow(void)
+    పూర్ణాంకం
+stop_arrow(శూన్య)
 {
-    if (arrow_used)
+    ఒకవేళ (arrow_వాడిన)
     {
 	Insstart = curwin->w_cursor;	// new insertion starts here
-	if (Insstart.col > Insstart_orig.col && !ins_need_undo)
+	ఒకవేళ (Insstart.నిలువు > Insstart_orig.నిలువు && !ins_need_undo)
 	    // Don't update the original insert position when moved to the
 	    // right, except when nothing was inserted yet.
 	    update_Insstart_orig = FALSE;
 	Insstart_textlen = (colnr_T)linetabsize_str(ml_get_curline());
 
-	if (u_save_cursor() == OK)
+	ఒకవేళ (u_save_cursor() == OK)
 	{
-	    arrow_used = FALSE;
+	    arrow_వాడిన = FALSE;
 	    ins_need_undo = FALSE;
 	}
 
-	ai_col = 0;
-	if (State & VREPLACE_FLAG)
+	ai_నిలువు = 0;
+	ఒకవేళ (State & VREPLACE_FLAG)
 	{
-	    orig_line_count = curbuf->b_ml.ml_line_count;
-	    vr_lines_changed = 1;
+	    orig_పంక్తి_లెక్క = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	    vr_పంక్తులు_మారింది = 1;
 	}
 	ResetRedobuff();
-	AppendToRedobuff((char_u *)"1i");   // pretend we start an insertion
-	new_insert_skip = 2;
+	Append_గమ్యం_Redobuff((char_u *)"1i");   // pretend we start an insertion
+	new_చొప్పించు_skip = 2;
     }
-    else if (ins_need_undo)
+    లేకపోతే ఒకవేళ (ins_need_undo)
     {
-	if (u_save_cursor() == OK)
+	ఒకవేళ (u_save_cursor() == OK)
 	{
 	    // A command or event may have moved the cursor before the next
 	    // edit. Pull Insstart back only when the cursor moved above it,
 	    // so that later edits can properly decide whether an extra undo
 	    // entry is needed. Advancing Insstart would mis-place '[ after a
 	    // register paste.
-	    if (LT_POS(curwin->w_cursor, Insstart))
+	    ఒకవేళ (LT_POS(curwin->w_cursor, Insstart))
 	    {
 		Insstart = curwin->w_cursor;
 		Insstart_textlen = (colnr_T)linetabsize_str(ml_get_curline());
@@ -2600,12 +2600,12 @@ stop_arrow(void)
 	}
     }
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // Always open fold at the cursor line when inserting something.
     foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
-    return (arrow_used || ins_need_undo ? FAIL : OK);
+    తిరిగి (arrow_వాడిన || ins_need_undo ? FAIL : OK);
 }
 
 /*
@@ -2613,13 +2613,13 @@ stop_arrow(void)
  * "end_insert_pos" is where insert ended.  It is NULL when we already jumped
  * to another window/buffer.
  */
-    static void
-stop_insert(
-    pos_T	*end_insert_pos,
-    int		esc,			// called by ins_esc()
-    int		nomove)			// <c-\><c-o>, don't move cursor
+    స్థిర శూన్య
+stop_చొప్పించు(
+    pos_T	*చివర_చొప్పించు_pos,
+    పూర్ణాంకం		esc,			// called by ins_esc()
+    పూర్ణాంకం		nomove)			// <c-\><c-o>, don't move cursor
 {
-    int		cc;
+    పూర్ణాంకం		cc;
     string_T	inserted;
 
     stop_redo_ins();
@@ -2631,23 +2631,23 @@ stop_insert(
      * otherwise CTRL-O w and then <Left> will clear "last_insert".
      */
     inserted = get_inserted();
-    int added = inserted.string == NULL ? 0 : (int)inserted.length - new_insert_skip;
-    if (did_restart_edit == 0 || added > 0)
+    పూర్ణాంకం added = inserted.string == ఖాళీ ? 0 : (పూర్ణాంకం)inserted.నిడివి - new_చొప్పించు_skip;
+    ఒకవేళ (did_restart_edit == 0 || added > 0)
     {
-	vim_free(last_insert.string);
-	last_insert = inserted;			    // structure copy
-	last_insert_skip = added < 0 ? 0 : new_insert_skip;
+	vim_free(చివరి_చొప్పించు.string);
+	చివరి_చొప్పించు = inserted;			    // structure copy
+	చివరి_చొప్పించు_skip = added < 0 ? 0 : new_చొప్పించు_skip;
     }
-    else
+    లేకపోతే
 	vim_free(inserted.string);
 
-    if (!arrow_used && end_insert_pos != NULL)
+    ఒకవేళ (!arrow_వాడిన && చివర_చొప్పించు_pos != ఖాళీ)
     {
 	// Auto-format now.  It may seem strange to do this when stopping an
 	// insertion (or moving the cursor), but it's required when appending
 	// a line and having it end in a space.  But only do it when something
 	// was actually inserted, otherwise undo won't work.
-	if (!ins_need_undo && has_format_option(FO_AUTO))
+	ఒకవేళ (!ins_need_undo && has_format_option(FO_AUTO))
 	{
 	    pos_T   tpos = curwin->w_cursor;
 
@@ -2655,25 +2655,25 @@ stop_insert(
 	    // formatting will move it to the following word.  Avoid that by
 	    // moving the cursor onto the space.
 	    cc = 'x';
-	    if (curwin->w_cursor.col > 0 && gchar_cursor() == NUL)
+	    ఒకవేళ (curwin->w_cursor.నిలువు > 0 && gchar_cursor() == NUL)
 	    {
 		dec_cursor();
 		cc = gchar_cursor();
-		if (!VIM_ISWHITE(cc))
+		ఒకవేళ (!VIM_ISWHITE(cc))
 		    curwin->w_cursor = tpos;
 	    }
 
 	    auto_format(TRUE, FALSE);
 
-	    if (VIM_ISWHITE(cc))
+	    ఒకవేళ (VIM_ISWHITE(cc))
 	    {
-		if (gchar_cursor() != NUL)
+		ఒకవేళ (gchar_cursor() != NUL)
 		    inc_cursor();
 		// If the cursor is still at the same character, also keep
 		// the "coladd".
-		if (gchar_cursor() == NUL
+		ఒకవేళ (gchar_cursor() == NUL
 			&& curwin->w_cursor.lnum == tpos.lnum
-			&& curwin->w_cursor.col == tpos.col)
+			&& curwin->w_cursor.నిలువు == tpos.నిలువు)
 		    curwin->w_cursor.coladd = tpos.coladd;
 	    }
 	}
@@ -2686,54 +2686,54 @@ stop_insert(
 	// Do this when ESC was used or moving the cursor up/down.
 	// Check for the old position still being valid, just in case the text
 	// got changed unexpectedly.
-	if (!nomove && did_ai && (esc || (vim_strchr(p_cpo, CPO_INDENT) == NULL
-			&& curwin->w_cursor.lnum != end_insert_pos->lnum))
-		&& end_insert_pos->lnum <= curbuf->b_ml.ml_line_count)
+	ఒకవేళ (!nomove && did_ai && (esc || (vim_strchr(p_cpo, CPO_INDENT) == ఖాళీ
+			&& curwin->w_cursor.lnum != చివర_చొప్పించు_pos->lnum))
+		&& చివర_చొప్పించు_pos->lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    pos_T	tpos = curwin->w_cursor;
-	    colnr_T	prev_col = end_insert_pos->col;
-	    colnr_T	strip_col;
+	    colnr_T	prev_నిలువు = చివర_చొప్పించు_pos->నిలువు;
+	    colnr_T	strip_నిలువు;
 
-	    curwin->w_cursor = *end_insert_pos;
-	    check_cursor_col();  // make sure it is not past the line
+	    curwin->w_cursor = *చివర_చొప్పించు_pos;
+	    check_cursor_నిలువు();  // make sure it is not past the line
 
 	    // Where the loop would actually start (back up if on NUL).
-	    strip_col = curwin->w_cursor.col;
-	    if (gchar_cursor() == NUL && strip_col > 0)
-		--strip_col;
+	    strip_నిలువు = curwin->w_cursor.నిలువు;
+	    ఒకవేళ (gchar_cursor() == NUL && strip_నిలువు > 0)
+		--strip_నిలువు;
 
 	    // Don't strip if non-whitespace follows: setline() from a <Cmd>
 	    // mapping or CursorHoldI autocmd may have inserted content.
-	    if (*skipwhite(ml_get_curline() + strip_col) == NUL)
+	    ఒకవేళ (*skipwhite(ml_get_curline() + strip_నిలువు) == NUL)
 	    {
-		curwin->w_cursor.col = strip_col;
-		for (;;)
+		curwin->w_cursor.నిలువు = strip_నిలువు;
+		కొరకు (;;)
 		{
-		    if (gchar_cursor() == NUL && curwin->w_cursor.col > 0)
-			--curwin->w_cursor.col;
+		    ఒకవేళ (gchar_cursor() == NUL && curwin->w_cursor.నిలువు > 0)
+			--curwin->w_cursor.నిలువు;
 		    cc = gchar_cursor();
-		    if (!VIM_ISWHITE(cc))
-			break;
-		    if (del_char(TRUE) == FAIL)
-			break;  // should not happen
+		    ఒకవేళ (!VIM_ISWHITE(cc))
+			ఆపు;
+		    ఒకవేళ (del_char(TRUE) == FAIL)
+			ఆపు;  // should not happen
 		}
-		if (curwin->w_cursor.lnum != tpos.lnum)
+		ఒకవేళ (curwin->w_cursor.lnum != tpos.lnum)
 		    curwin->w_cursor = tpos;
-		else if (curwin->w_cursor.col < prev_col)
+		లేకపోతే ఒకవేళ (curwin->w_cursor.నిలువు < prev_నిలువు)
 		{
 		    // reset tpos, could have been invalidated in the loop above
 		    tpos = curwin->w_cursor;
-		    tpos.col++;
-		    if (cc != NUL && gchar_pos(&tpos) == NUL)
-			++curwin->w_cursor.col;	// put cursor back on the NUL
+		    tpos.నిలువు++;
+		    ఒకవేళ (cc != NUL && gchar_pos(&tpos) == NUL)
+			++curwin->w_cursor.నిలువు;	// put cursor back on the NUL
 		}
 
 		// <C-S-Right> may have started Visual mode, adjust the position for
 		// deleted characters.
-		if (VIsual_active)
+		ఒకవేళ (VIsual_చురుకైన)
 		    check_visual_pos();
 	    }
-	    else
+	    లేకపోతే
 		// Non-whitespace follows, keep original cursor.
 		curwin->w_cursor = tpos;
 	}
@@ -2741,15 +2741,15 @@ stop_insert(
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
+    can_si_వెనుక = FALSE;
 
     // Set '[ and '] to the inserted text.  When end_insert_pos is NULL we are
     // now in a different buffer.
-    if (end_insert_pos != NULL)
+    ఒకవేళ (చివర_చొప్పించు_pos != ఖాళీ)
     {
-	curbuf->b_op_start = Insstart;
-	curbuf->b_op_start_orig = Insstart_orig;
-	curbuf->b_op_end = *end_insert_pos;
+	curbuf->b_op_ప్రారంభం = Insstart;
+	curbuf->b_op_ప్రారంభం_orig = Insstart_orig;
+	curbuf->b_op_చివర = *చివర_చొప్పించు_pos;
     }
 }
 
@@ -2757,37 +2757,37 @@ stop_insert(
  * Set the last inserted text to a single character.
  * Used for the replace command.
  */
-    void
-set_last_insert(int c)
+    శూన్య
+సమితి_చివరి_చొప్పించు(పూర్ణాంకం c)
 {
     char_u	*s;
 
-    vim_free(last_insert.string);
-    last_insert.string = alloc(MB_MAXBYTES * 3 + 5);
-    if (last_insert.string == NULL)
+    vim_free(చివరి_చొప్పించు.string);
+    చివరి_చొప్పించు.string = alloc(MB_MAXBYTES * 3 + 5);
+    ఒకవేళ (చివరి_చొప్పించు.string == ఖాళీ)
     {
-	last_insert.length = 0;
-	return;
+	చివరి_చొప్పించు.నిడివి = 0;
+	తిరిగి;
     }
 
-    s = last_insert.string;
+    s = చివరి_చొప్పించు.string;
     // Use the CTRL-V only when entering a special char
-    if (c < ' ' || c == DEL)
+    ఒకవేళ (c < ' ' || c == DEL)
 	*s++ = Ctrl_V;
-    s = add_char2buf(c, s);
+    s = కూడు_char2buf(c, s);
     *s++ = ESC;
     *s = NUL;
-    last_insert.length = (size_t)(s - last_insert.string);
-    last_insert_skip = 0;
+    చివరి_చొప్పించు.నిడివి = (size_t)(s - చివరి_చొప్పించు.string);
+    చివరి_చొప్పించు_skip = 0;
 }
 
-#if defined(EXITFREE)
-    void
-free_last_insert(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_చివరి_చొప్పించు(శూన్య)
 {
-    VIM_CLEAR_STRING(last_insert);
+    VIM_CLEAR_STRING(చివరి_చొప్పించు);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Add character "c" to buffer "s".  Escape the special meaning of K_SPECIAL
@@ -2795,35 +2795,35 @@ free_last_insert(void)
  * Returns a pointer to after the added bytes.
  */
     char_u *
-add_char2buf(int c, char_u *s)
+కూడు_char2buf(పూర్ణాంకం c, char_u *s)
 {
-    char_u	temp[MB_MAXBYTES + 1];
-    int		i;
-    int		len;
+    char_u	తాత్కాలిక[MB_MAXBYTES + 1];
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		len;
 
-    len = (*mb_char2bytes)(c, temp);
-    for (i = 0; i < len; ++i)
+    len = (*mb_char2bytes)(c, తాత్కాలిక);
+    కొరకు (i = 0; i < len; ++i)
     {
-	c = temp[i];
+	c = తాత్కాలిక[i];
 	// Need to escape K_SPECIAL and CSI like in the typeahead buffer.
-	if (c == K_SPECIAL)
+	ఒకవేళ (c == K_SPECIAL)
 	{
 	    *s++ = K_SPECIAL;
 	    *s++ = KS_SPECIAL;
 	    *s++ = KE_FILLER;
 	}
-#ifdef FEAT_GUI
-	else if (c == CSI)
+#నిర్వచితమైతే FEAT_GUI
+	లేకపోతే ఒకవేళ (c == CSI)
 	{
 	    *s++ = CSI;
 	    *s++ = KS_EXTRA;
-	    *s++ = (int)KE_CSI;
+	    *s++ = (పూర్ణాంకం)KE_CSI;
 	}
-#endif
-	else
+#అయితే_ముగింపు
+	లేకపోతే
 	    *s++ = c;
     }
-    return s;
+    తిరిగి s;
 }
 
 /*
@@ -2833,25 +2833,25 @@ add_char2buf(int c, char_u *s)
  *			    otherwise keep "curswant" column
  * if flags & BL_FIX	don't leave the cursor on a NUL.
  */
-    void
-beginline(int flags)
+    శూన్య
+beginline(పూర్ణాంకం flags)
 {
-    if ((flags & BL_SOL) && !p_sol)
+    ఒకవేళ ((flags & BL_SOL) && !p_sol)
 	coladvance(curwin->w_curswant);
-    else
+    లేకపోతే
     {
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.నిలువు = 0;
 	curwin->w_cursor.coladd = 0;
 
-	if (flags & (BL_WHITE | BL_SOL))
+	ఒకవేళ (flags & (BL_WHITE | BL_SOL))
 	{
 	    char_u  *ptr;
 
-	    for (ptr = ml_get_curline(); VIM_ISWHITE(*ptr)
+	    కొరకు (ptr = ml_get_curline(); VIM_ISWHITE(*ptr)
 			       && !((flags & BL_FIX) && ptr[1] == NUL); ++ptr)
-		++curwin->w_cursor.col;
+		++curwin->w_cursor.నిలువు;
 	}
-	curwin->w_set_curswant = true;
+	curwin->w_సమితి_curswant = true;
     }
     adjust_skipcol();
 }
@@ -2864,13 +2864,13 @@ beginline(int flags)
  * Return OK when successful, FAIL when we hit a line of file boundary.
  */
 
-    int
-oneright(void)
+    పూర్ణాంకం
+oneright(శూన్య)
 {
     char_u	*ptr;
-    int		l;
+    పూర్ణాంకం		l;
 
-    if (virtual_active())
+    ఒకవేళ (virtual_చురుకైన())
     {
 	pos_T	prevpos = curwin->w_cursor;
 
@@ -2879,191 +2879,191 @@ oneright(void)
 	coladvance(getviscol() + ((*ptr != TAB
 					  && vim_isprintc((*mb_ptr2char)(ptr)))
 		    ? ptr2cells(ptr) : 1));
-	curwin->w_set_curswant = true;
+	curwin->w_సమితి_curswant = true;
 	// Return OK if the cursor moved, FAIL otherwise (at window edge).
-	return (prevpos.col != curwin->w_cursor.col
+	తిరిగి (prevpos.నిలువు != curwin->w_cursor.నిలువు
 		    || prevpos.coladd != curwin->w_cursor.coladd) ? OK : FAIL;
     }
 
     ptr = ml_get_cursor();
-    if (*ptr == NUL)
-	return FAIL;	    // already at the very end
+    ఒకవేళ (*ptr == NUL)
+	తిరిగి FAIL;	    // already at the very end
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	l = (*mb_ptr2len)(ptr);
-    else
+    లేకపోతే
 	l = 1;
 
     // move "l" bytes right, but don't end up on the NUL, unless 'virtualedit'
     // contains "onemore".
-    if (ptr[l] == NUL && (get_ve_flags() & VE_ONEMORE) == 0)
-	return FAIL;
-    curwin->w_cursor.col += l;
+    ఒకవేళ (ptr[l] == NUL && (get_ve_flags() & VE_ONEMORE) == 0)
+	తిరిగి FAIL;
+    curwin->w_cursor.నిలువు += l;
 
-    curwin->w_set_curswant = true;
+    curwin->w_సమితి_curswant = true;
     adjust_skipcol();
-    return OK;
+    తిరిగి OK;
 }
 
-    int
-oneleft(void)
+    పూర్ణాంకం
+oneleft(శూన్య)
 {
-    if (virtual_active())
+    ఒకవేళ (virtual_చురుకైన())
     {
-#ifdef FEAT_LINEBREAK
-	int width;
-#endif
-	int v = getviscol();
+#నిర్వచితమైతే FEAT_LINEBREAK
+	పూర్ణాంకం వెడల్పు;
+#అయితే_ముగింపు
+	పూర్ణాంకం v = getviscol();
 
-	if (v == 0)
-	    return FAIL;
+	ఒకవేళ (v == 0)
+	    తిరిగి FAIL;
 
-#ifdef FEAT_LINEBREAK
+#నిర్వచితమైతే FEAT_LINEBREAK
 	// We might get stuck on 'showbreak', skip over it.
-	width = 1;
-	for (;;)
+	వెడల్పు = 1;
+	కొరకు (;;)
 	{
-	    coladvance(v - width);
+	    coladvance(v - వెడల్పు);
 	    // getviscol() is slow, skip it when 'showbreak' is empty,
 	    // 'breakindent' is not set and there are no multi-byte
 	    // characters
-	    if ((*get_showbreak_value(curwin) == NUL && !curwin->w_p_bri
+	    ఒకవేళ ((*get_showbreak_విలువ(curwin) == NUL && !curwin->w_p_bri
 					     && !has_mbyte) || getviscol() < v)
-		break;
-	    ++width;
+		ఆపు;
+	    ++వెడల్పు;
 	}
-#else
+#లేకపోతే
 	coladvance(v - 1);
-#endif
+#అయితే_ముగింపు
 
-	if (curwin->w_cursor.coladd == 1)
+	ఒకవేళ (curwin->w_cursor.coladd == 1)
 	{
 	    char_u *ptr;
 
 	    // Adjust for multi-wide char (not a TAB)
 	    ptr = ml_get_cursor();
-	    if (*ptr != TAB && vim_isprintc((*mb_ptr2char)(ptr))
+	    ఒకవేళ (*ptr != TAB && vim_isprintc((*mb_ptr2char)(ptr))
 							 && ptr2cells(ptr) > 1)
 		curwin->w_cursor.coladd = 0;
 	}
 
-	curwin->w_set_curswant = true;
+	curwin->w_సమితి_curswant = true;
 	adjust_skipcol();
-	return OK;
+	తిరిగి OK;
     }
 
-    if (curwin->w_cursor.col == 0)
-	return FAIL;
+    ఒకవేళ (curwin->w_cursor.నిలువు == 0)
+	తిరిగి FAIL;
 
-    curwin->w_set_curswant = true;
-    --curwin->w_cursor.col;
+    curwin->w_సమితి_curswant = true;
+    --curwin->w_cursor.నిలువు;
 
     // if the character on the left of the current cursor is a multi-byte
     // character, move to its first byte
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	mb_adjust_cursor();
     adjust_skipcol();
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Move the cursor up "n" lines in window "wp".
  * Takes care of closed folds.
  */
-    void
-cursor_up_inner(win_T *wp, long n)
+    శూన్య
+cursor_పైకి_inner(win_T *wp, దీర్ఘ n)
 {
     linenr_T	lnum = wp->w_cursor.lnum;
 
-    if (n >= lnum)
+    ఒకవేళ (n >= lnum)
 	lnum = 1;
-    else
-#ifdef FEAT_FOLDING
-	if (hasAnyFolding(wp))
+    లేకపోతే
+#నిర్వచితమైతే FEAT_FOLDING
+	ఒకవేళ (hasAnyFolding(wp))
     {
 	/*
 	 * Count each sequence of folded lines as one logical line.
 	 */
 	// go to the start of the current fold
-	(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+	(శూన్య)hasFoldingWin(wp, lnum, &lnum, ఖాళీ, TRUE, ఖాళీ);
 
-	while (n--)
+	అయితే (n--)
 	{
 	    // move up one line
 	    --lnum;
-	    if (lnum <= 1)
-		break;
+	    ఒకవేళ (lnum <= 1)
+		ఆపు;
 	    // If we entered a fold, move to the beginning, unless in
 	    // Insert mode or when 'foldopen' contains "all": it will open
 	    // in a moment.
-	    if (n > 0 || !((State & MODE_INSERT) || (fdo_flags & FDO_ALL)))
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+	    ఒకవేళ (n > 0 || !((State & బహుళకం_చొప్పించు) || (fdo_flags & FDO_ALL)))
+		(శూన్య)hasFoldingWin(wp, lnum, &lnum, ఖాళీ, TRUE, ఖాళీ);
 	}
-	if (lnum < 1)
+	ఒకవేళ (lnum < 1)
 	    lnum = 1;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	lnum -= n;
 
     wp->w_cursor.lnum = lnum;
 }
 
-    int
-cursor_up(
-    long	n,
-    int		upd_topline)	    // When TRUE: update topline
+    పూర్ణాంకం
+cursor_పైకి(
+    దీర్ఘ	n,
+    పూర్ణాంకం		upd_topline)	    // When TRUE: update topline
 {
     // This fails if the cursor is already in the first line or the count is
     // larger than the line number and '-' is in 'cpoptions'
     linenr_T lnum = curwin->w_cursor.lnum;
-    if (n > 0 && (lnum <= 1
-		       || (n >= lnum && vim_strchr(p_cpo, CPO_MINUS) != NULL)))
-	return FAIL;
-    cursor_up_inner(curwin, n);
+    ఒకవేళ (n > 0 && (lnum <= 1
+		       || (n >= lnum && vim_strchr(p_cpo, CPO_MINUS) != ఖాళీ)))
+	తిరిగి FAIL;
+    cursor_పైకి_inner(curwin, n);
 
     // try to advance to the column we want to be at
     coladvance(curwin->w_curswant);
 
-    if (upd_topline)
+    ఒకవేళ (upd_topline)
 	update_topline();	// make sure curwin->w_topline is valid
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Move the cursor down "n" lines in window "wp".
  * Takes care of closed folds.
  */
-    void
-cursor_down_inner(win_T *wp, long n)
+    శూన్య
+cursor_కిందికి_inner(win_T *wp, దీర్ఘ n)
 {
     linenr_T	lnum = wp->w_cursor.lnum;
-    linenr_T	line_count = wp->w_buffer->b_ml.ml_line_count;
+    linenr_T	పంక్తి_లెక్క = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
 
-    if (lnum + n >= line_count)
-	lnum = line_count;
-    else
-#ifdef FEAT_FOLDING
-	if (hasAnyFolding(wp))
+    ఒకవేళ (lnum + n >= పంక్తి_లెక్క)
+	lnum = పంక్తి_లెక్క;
+    లేకపోతే
+#నిర్వచితమైతే FEAT_FOLDING
+	ఒకవేళ (hasAnyFolding(wp))
     {
-	linenr_T	last;
+	linenr_T	చివరి;
 
 	// count each sequence of folded lines as one logical line
-	while (n--)
+	అయితే (n--)
 	{
-	    if (hasFoldingWin(wp, lnum, NULL, &last, TRUE, NULL))
-		lnum = last + 1;
-	    else
+	    ఒకవేళ (hasFoldingWin(wp, lnum, ఖాళీ, &చివరి, TRUE, ఖాళీ))
+		lnum = చివరి + 1;
+	    లేకపోతే
 		++lnum;
-	    if (lnum >= line_count)
-		break;
+	    ఒకవేళ (lnum >= పంక్తి_లెక్క)
+		ఆపు;
 	}
-	if (lnum > line_count)
-	    lnum = line_count;
+	ఒకవేళ (lnum > పంక్తి_లెక్క)
+	    lnum = పంక్తి_లెక్క;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	lnum += n;
 
     wp->w_cursor.lnum = lnum;
@@ -3072,32 +3072,32 @@ cursor_down_inner(win_T *wp, long n)
 /*
  * Cursor down a number of logical lines.
  */
-    int
-cursor_down(
-    long	n,
-    int		upd_topline)	    // When TRUE: update topline
+    పూర్ణాంకం
+cursor_కిందికి(
+    దీర్ఘ	n,
+    పూర్ణాంకం		upd_topline)	    // When TRUE: update topline
 {
     linenr_T	lnum = curwin->w_cursor.lnum;
-    linenr_T	line_count = curwin->w_buffer->b_ml.ml_line_count;
+    linenr_T	పంక్తి_లెక్క = curwin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క;
     // This fails if the cursor is already in the last (folded) line, or would
     // move beyond the last line and '-' is in 'cpoptions'.
-#ifdef FEAT_FOLDING
-    hasFoldingWin(curwin, lnum, NULL, &lnum, TRUE, NULL);
-#endif
-    if (n > 0
-	    && (lnum >= line_count
-		|| (lnum + n > line_count
-				     && vim_strchr(p_cpo, CPO_MINUS) != NULL)))
-	return FAIL;
-    cursor_down_inner(curwin, n);
+#నిర్వచితమైతే FEAT_FOLDING
+    hasFoldingWin(curwin, lnum, ఖాళీ, &lnum, TRUE, ఖాళీ);
+#అయితే_ముగింపు
+    ఒకవేళ (n > 0
+	    && (lnum >= పంక్తి_లెక్క
+		|| (lnum + n > పంక్తి_లెక్క
+				     && vim_strchr(p_cpo, CPO_MINUS) != ఖాళీ)))
+	తిరిగి FAIL;
+    cursor_కిందికి_inner(curwin, n);
 
     // try to advance to the column we want to be at
     coladvance(curwin->w_curswant);
 
-    if (upd_topline)
+    ఒకవేళ (upd_topline)
 	update_topline();	// make sure curwin->w_topline is valid
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3105,99 +3105,99 @@ cursor_down(
  * Last_insert actually is a copy of the redo buffer, so we
  * first have to remove the command.
  */
-    int
+    పూర్ణాంకం
 stuff_inserted(
-    int	    c,		// Command character to be inserted
-    long    count,	// Repeat this many times
-    int	    no_esc)	// Don't add an ESC at the end
+    పూర్ణాంకం	    c,		// Command character to be inserted
+    దీర్ఘ    లెక్క,	// Repeat this many times
+    పూర్ణాంకం	    no_esc)	// Don't add an ESC at the end
 {
-    string_T	insert;				// text to be inserted
-    char_u	last = ' ';
+    string_T	చొప్పించు;				// text to be inserted
+    char_u	చివరి = ' ';
 
-    insert = get_last_insert();
-    if (insert.string == NULL)
+    చొప్పించు = get_చివరి_చొప్పించు();
+    ఒకవేళ (చొప్పించు.string == ఖాళీ)
     {
-	emsg(_(e_no_inserted_text_yet));
-	return FAIL;
+	emsg(_(e_no_inserted_పాఠ్యం_yet));
+	తిరిగి FAIL;
     }
 
     // may want to stuff the command character, to start Insert mode
-    if (c != NUL)
+    ఒకవేళ (c != NUL)
 	stuffcharReadbuff(c);
 
-    if (insert.length > 0)
+    ఒకవేళ (చొప్పించు.నిడివి > 0)
     {
 	char_u	*p;
 
 	// look for the last ESC in 'insert'
-	for (p = insert.string + insert.length - 1; p >= insert.string; --p)
+	కొరకు (p = చొప్పించు.string + చొప్పించు.నిడివి - 1; p >= చొప్పించు.string; --p)
 	{
-	    if (*p == ESC)
+	    ఒకవేళ (*p == ESC)
 	    {
-		insert.length = (size_t)(p - insert.string);
-		break;
+		చొప్పించు.నిడివి = (size_t)(p - చొప్పించు.string);
+		ఆపు;
 	    }
 	}
     }
 
-    if (insert.length > 0)
+    ఒకవేళ (చొప్పించు.నిడివి > 0)
     {
-	char_u	*p = insert.string + insert.length - 1;
+	char_u	*p = చొప్పించు.string + చొప్పించు.నిడివి - 1;
 
 	// when the last char is either "0" or "^" it will be quoted if no ESC
 	// comes after it OR if it will insert more than once and "ptr"
 	// starts with ^D.	-- Acevedo
-	if ((*p == '0' || *p == '^')
-		&& (no_esc || (*insert.string == Ctrl_D && count > 1)))
+	ఒకవేళ ((*p == '0' || *p == '^')
+		&& (no_esc || (*చొప్పించు.string == Ctrl_D && లెక్క > 1)))
 	{
-	    last = *p;
-	    --insert.length;
+	    చివరి = *p;
+	    --చొప్పించు.నిడివి;
 	}
     }
 
-    do
+    చేయి
     {
-	stuffReadbuffLen(insert.string, (long)insert.length);
+	stuffReadbuffLen(చొప్పించు.string, (దీర్ఘ)చొప్పించు.నిడివి);
 	// a trailing "0" is inserted as "<C-V>048", "^" as "<C-V>^"
-	switch (last)
+	ఎంపిక (చివరి)
 	{
-	case '0':
-#define TEXT_TO_INSERT "\026\060\064\070"
-	    stuffReadbuffLen((char_u *)TEXT_TO_INSERT, STRLEN_LITERAL(TEXT_TO_INSERT));
-#undef TEXT_TO_INSERT
-	    break;
+	స్థితి '0':
+#నిర్వచించు పాఠ్యం_గమ్యం_చొప్పించు "\026\060\064\070"
+	    stuffReadbuffLen((char_u *)పాఠ్యం_గమ్యం_చొప్పించు, STRLEN_LITERAL(పాఠ్యం_గమ్యం_చొప్పించు));
+#నిర్వచనం_రద్దు పాఠ్యం_గమ్యం_చొప్పించు
+	    ఆపు;
 
-	case '^':
-#define TEXT_TO_INSERT "\026^"
-	    stuffReadbuffLen((char_u *)TEXT_TO_INSERT, STRLEN_LITERAL(TEXT_TO_INSERT));
-#undef TEXT_TO_INSERT
-	    break;
+	స్థితి '^':
+#నిర్వచించు పాఠ్యం_గమ్యం_చొప్పించు "\026^"
+	    stuffReadbuffLen((char_u *)పాఠ్యం_గమ్యం_చొప్పించు, STRLEN_LITERAL(పాఠ్యం_గమ్యం_చొప్పించు));
+#నిర్వచనం_రద్దు పాఠ్యం_గమ్యం_చొప్పించు
+	    ఆపు;
 
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
 	}
     }
-    while (--count > 0);
+    అయితే (--లెక్క > 0);
 
     // may want to stuff a trailing ESC, to get out of Insert mode
-    if (!no_esc)
+    ఒకవేళ (!no_esc)
 	stuffcharReadbuff(ESC);
 
-    return OK;
+    తిరిగి OK;
 }
 
     string_T
-get_last_insert(void)
+get_చివరి_చొప్పించు(శూన్య)
 {
-    string_T insert = {NULL, 0};
+    string_T చొప్పించు = {ఖాళీ, 0};
 
-    if (last_insert.string != NULL)
+    ఒకవేళ (చివరి_చొప్పించు.string != ఖాళీ)
     {
-	insert.string = last_insert.string + last_insert_skip;
-	insert.length = (size_t)(last_insert.length - last_insert_skip);
+	చొప్పించు.string = చివరి_చొప్పించు.string + చివరి_చొప్పించు_skip;
+	చొప్పించు.నిడివి = (size_t)(చివరి_చొప్పించు.నిడివి - చివరి_చొప్పించు_skip);
     }
 
-    return insert;
+    తిరిగి చొప్పించు;
 }
 
 /*
@@ -3205,20 +3205,20 @@ get_last_insert(void)
  * Returns pointer to allocated memory (must be freed) or NULL.
  */
     char_u *
-get_last_insert_save(void)
+get_చివరి_చొప్పించు_save(శూన్య)
 {
-    string_T	insert = get_last_insert();
+    string_T	చొప్పించు = get_చివరి_చొప్పించు();
     char_u	*s;
 
-    if (insert.string == NULL)
-	return NULL;
-    s = vim_strnsave(insert.string, insert.length);
-    if (s == NULL)
-	return NULL;
+    ఒకవేళ (చొప్పించు.string == ఖాళీ)
+	తిరిగి ఖాళీ;
+    s = vim_strnsave(చొప్పించు.string, చొప్పించు.నిడివి);
+    ఒకవేళ (s == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (insert.length > 0 && s[insert.length - 1] == ESC)	// remove trailing ESC
-	s[--insert.length] = NUL;
-    return s;
+    ఒకవేళ (చొప్పించు.నిడివి > 0 && s[చొప్పించు.నిడివి - 1] == ESC)	// remove trailing ESC
+	s[--చొప్పించు.నిడివి] = NUL;
+    తిరిగి s;
 }
 
 /*
@@ -3227,16 +3227,16 @@ get_last_insert_save(void)
  * When an abbreviation is recognized it is removed from the text and
  * the replacement string is inserted in typebuf.tb_buf[], followed by "c".
  */
-    static int
-echeck_abbr(int c)
+    స్థిర పూర్ణాంకం
+echeck_abbr(పూర్ణాంకం c)
 {
     // Don't check for abbreviation in paste mode, when disabled and just
     // after moving around with cursor keys.
-    if (p_paste || no_abbr || arrow_used)
-	return FALSE;
+    ఒకవేళ (p_paste || no_abbr || arrow_వాడిన)
+	తిరిగి FALSE;
 
-    return check_abbr(c, ml_get_curline(), curwin->w_cursor.col,
-		curwin->w_cursor.lnum == Insstart.lnum ? Insstart.col : 0);
+    తిరిగి check_abbr(c, ml_get_curline(), curwin->w_cursor.నిలువు,
+		curwin->w_cursor.lnum == Insstart.lnum ? Insstart.నిలువు : 0);
 }
 
 /*
@@ -3258,40 +3258,40 @@ echeck_abbr(int c)
  * characters will be left on the stack above the newly inserted character.
  */
 
-static char_u	*replace_stack = NULL;
-static long	replace_stack_nr = 0;	    // next entry in replace stack
-static long	replace_stack_len = 0;	    // max. number of entries
+స్థిర char_u	*replace_దొంతర = ఖాళీ;
+స్థిర దీర్ఘ	replace_దొంతర_nr = 0;	    // next entry in replace stack
+స్థిర దీర్ఘ	replace_దొంతర_len = 0;	    // max. number of entries
 
-    void
-replace_push(
-    int	    c)	    // character that is replaced (NUL is none)
+    శూన్య
+replace_నెట్టు(
+    పూర్ణాంకం	    c)	    // character that is replaced (NUL is none)
 {
     char_u  *p;
 
-    if (replace_stack_nr < replace_offset)	// nothing to do
-	return;
-    if (replace_stack_len <= replace_stack_nr)
+    ఒకవేళ (replace_దొంతర_nr < replace_స్థానభ్రంశం)	// nothing to do
+	తిరిగి;
+    ఒకవేళ (replace_దొంతర_len <= replace_దొంతర_nr)
     {
-	replace_stack_len += 50;
-	p = ALLOC_MULT(char_u, replace_stack_len);
-	if (p == NULL)	    // out of memory
+	replace_దొంతర_len += 50;
+	p = ALLOC_MULT(char_u, replace_దొంతర_len);
+	ఒకవేళ (p == ఖాళీ)	    // out of memory
 	{
-	    replace_stack_len -= 50;
-	    return;
+	    replace_దొంతర_len -= 50;
+	    తిరిగి;
 	}
-	if (replace_stack != NULL)
+	ఒకవేళ (replace_దొంతర != ఖాళీ)
 	{
-	    mch_memmove(p, replace_stack,
-				 (size_t)(replace_stack_nr * sizeof(char_u)));
-	    vim_free(replace_stack);
+	    mch_memmove(p, replace_దొంతర,
+				 (size_t)(replace_దొంతర_nr * పరిమాణం(char_u)));
+	    vim_free(replace_దొంతర);
 	}
-	replace_stack = p;
+	replace_దొంతర = p;
     }
-    p = replace_stack + replace_stack_nr - replace_offset;
-    if (replace_offset)
-	mch_memmove(p + 1, p, (size_t)(replace_offset * sizeof(char_u)));
+    p = replace_దొంతర + replace_దొంతర_nr - replace_స్థానభ్రంశం;
+    ఒకవేళ (replace_స్థానభ్రంశం)
+	mch_memmove(p + 1, p, (size_t)(replace_స్థానభ్రంశం * పరిమాణం(char_u)));
     *p = c;
-    ++replace_stack_nr;
+    ++replace_దొంతర_nr;
 }
 
 /*
@@ -3299,15 +3299,15 @@ replace_push(
  * reverse byte order, so that the first byte is popped off first.
  * Return the number of bytes done (includes composing characters).
  */
-    int
-replace_push_mb(char_u *p)
+    పూర్ణాంకం
+replace_నెట్టు_mb(char_u *p)
 {
-    int l = (*mb_ptr2len)(p);
-    int j;
+    పూర్ణాంకం l = (*mb_ptr2len)(p);
+    పూర్ణాంకం j;
 
-    for (j = l - 1; j >= 0; --j)
-	replace_push(p[j]);
-    return l;
+    కొరకు (j = l - 1; j >= 0; --j)
+	replace_నెట్టు(p[j]);
+    తిరిగి l;
 }
 
 /*
@@ -3315,31 +3315,31 @@ replace_push_mb(char_u *p)
  * return -1 if stack empty
  * return replaced character or NUL otherwise
  */
-    static int
-replace_pop(void)
+    స్థిర పూర్ణాంకం
+replace_తీయి(శూన్య)
 {
-    if (replace_stack_nr == 0)
-	return -1;
-    return (int)replace_stack[--replace_stack_nr];
+    ఒకవేళ (replace_దొంతర_nr == 0)
+	తిరిగి -1;
+    తిరిగి (పూర్ణాంకం)replace_దొంతర[--replace_దొంతర_nr];
 }
 
 /*
  * Join the top two items on the replace stack.  This removes to "off"'th NUL
  * encountered.
  */
-    void
+    శూన్య
 replace_join(
-    int	    off)	// offset for which NUL to remove
+    పూర్ణాంకం	    off)	// offset for which NUL to remove
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = replace_stack_nr; --i >= 0; )
-	if (replace_stack[i] == NUL && off-- <= 0)
+    కొరకు (i = replace_దొంతర_nr; --i >= 0; )
+	ఒకవేళ (replace_దొంతర[i] == NUL && off-- <= 0)
 	{
-	    --replace_stack_nr;
-	    mch_memmove(replace_stack + i, replace_stack + i + 1,
-					      (size_t)(replace_stack_nr - i));
-	    return;
+	    --replace_దొంతర_nr;
+	    mch_memmove(replace_దొంతర + i, replace_దొంతర + i + 1,
+					      (size_t)(replace_దొంతర_nr - i));
+	    తిరిగి;
 	}
 }
 
@@ -3347,16 +3347,16 @@ replace_join(
  * Pop bytes from the replace stack until a NUL is found, and insert them
  * before the cursor.  Can only be used in MODE_REPLACE or MODE_VREPLACE state.
  */
-    static void
-replace_pop_ins(void)
+    స్థిర శూన్య
+replace_తీయి_ins(శూన్య)
 {
-    int	    cc;
-    int	    oldState = State;
+    పూర్ణాంకం	    cc;
+    పూర్ణాంకం	    oldState = State;
 
-    State = MODE_NORMAL;			// don't want MODE_REPLACE here
-    while ((cc = replace_pop()) > 0)
+    State = బహుళకం_సాధారణ;			// don't want MODE_REPLACE here
+    అయితే ((cc = replace_తీయి()) > 0)
     {
-	mb_replace_pop_ins(cc);
+	mb_replace_తీయి_ins(cc);
 	dec_cursor();
     }
     State = oldState;
@@ -3366,49 +3366,49 @@ replace_pop_ins(void)
  * Insert bytes popped from the replace stack. "cc" is the first byte.  If it
  * indicates a multi-byte char, pop the other bytes too.
  */
-    static void
-mb_replace_pop_ins(int cc)
+    స్థిర శూన్య
+mb_replace_తీయి_ins(పూర్ణాంకం cc)
 {
-    int		n;
+    పూర్ణాంకం		n;
     char_u	buf[MB_MAXBYTES + 1];
-    int		i;
-    int		c;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
 
-    if (has_mbyte && (n = MB_BYTE2LEN(cc)) > 1)
+    ఒకవేళ (has_mbyte && (n = MB_BYTE2LEN(cc)) > 1)
     {
 	buf[0] = cc;
-	for (i = 1; i < n; ++i)
-	    buf[i] = replace_pop();
-	ins_bytes_len(buf, n);
+	కొరకు (i = 1; i < n; ++i)
+	    buf[i] = replace_తీయి();
+	ins_బైట్లు_len(buf, n);
     }
-    else
+    లేకపోతే
 	ins_char(cc);
 
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
 	// Handle composing chars.
-	for (;;)
+	కొరకు (;;)
 	{
-	    c = replace_pop();
-	    if (c == -1)	    // stack empty
-		break;
-	    if ((n = MB_BYTE2LEN(c)) == 1)
+	    c = replace_తీయి();
+	    ఒకవేళ (c == -1)	    // stack empty
+		ఆపు;
+	    ఒకవేళ ((n = MB_BYTE2LEN(c)) == 1)
 	    {
 		// Not a multi-byte char, put it back.
-		replace_push(c);
-		break;
+		replace_నెట్టు(c);
+		ఆపు;
 	    }
 
 	    buf[0] = c;
-	    for (i = 1; i < n; ++i)
-		buf[i] = replace_pop();
-	    if (utf_iscomposing(utf_ptr2char(buf)))
-		ins_bytes_len(buf, n);
-	    else
+	    కొరకు (i = 1; i < n; ++i)
+		buf[i] = replace_తీయి();
+	    ఒకవేళ (utf_iscomposing(utf_ptr2char(buf)))
+		ins_బైట్లు_len(buf, n);
+	    లేకపోతే
 	    {
 		// Not a composing char, put it back.
-		for (i = n - 1; i >= 0; --i)
-		    replace_push(buf[i]);
-		break;
+		కొరకు (i = n - 1; i >= 0; --i)
+		    replace_నెట్టు(buf[i]);
+		ఆపు;
 	    }
 
 	}
@@ -3418,12 +3418,12 @@ mb_replace_pop_ins(int cc)
  * make the replace stack empty
  * (called when exiting replace mode)
  */
-    static void
-replace_flush(void)
+    స్థిర శూన్య
+replace_flush(శూన్య)
 {
-    VIM_CLEAR(replace_stack);
-    replace_stack_len = 0;
-    replace_stack_nr = 0;
+    VIM_CLEAR(replace_దొంతర);
+    replace_దొంతర_len = 0;
+    replace_దొంతర_nr = 0;
 }
 
 /*
@@ -3435,109 +3435,109 @@ replace_flush(void)
  * When "limit_col" is >= 0, don't delete before this column.  Matters when
  * using composing characters, use del_char_after_col() instead of del_char().
  */
-    static void
-replace_do_bs(int limit_col)
+    స్థిర శూన్య
+replace_do_bs(పూర్ణాంకం హద్దు_నిలువు)
 {
-    int		cc;
-    int		orig_len = 0;
-    int		ins_len;
-    int		orig_vcols = 0;
-    colnr_T	start_vcol;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		orig_len = 0;
+    పూర్ణాంకం		ins_len;
+    పూర్ణాంకం		orig_vcols = 0;
+    colnr_T	ప్రారంభం_vcol;
     char_u	*p;
-    int		i;
-    int		vcol;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		vcol;
 
-    cc = replace_pop();
-    if (cc > 0)
+    cc = replace_తీయి();
+    ఒకవేళ (cc > 0)
     {
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	size_t	len_before = 0;  // init to shut up GCC
 
-	if (curbuf->b_has_textprop)
+	ఒకవేళ (curbuf->b_has_textprop)
 	{
 	    // Do not adjust text properties for individual delete and insert
 	    // operations, do it afterwards on the resulting text.
 	    len_before = ml_get_curline_len();
-	    ++text_prop_frozen;
+	    ++పాఠ్యం_prop_frozen;
 	}
-#endif
-	if (State & VREPLACE_FLAG)
+#అయితే_ముగింపు
+	ఒకవేళ (State & VREPLACE_FLAG)
 	{
 	    // Get the number of screen cells used by the character we are
 	    // going to delete.
-	    getvcol(curwin, &curwin->w_cursor, NULL, &start_vcol, NULL, 0);
-	    orig_vcols = chartabsize(ml_get_cursor(), start_vcol);
+	    getvcol(curwin, &curwin->w_cursor, ఖాళీ, &ప్రారంభం_vcol, ఖాళీ, 0);
+	    orig_vcols = chartabsize(ml_get_cursor(), ప్రారంభం_vcol);
 	}
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    (void)del_char_after_col(limit_col);
-	    if (State & VREPLACE_FLAG)
+	    (శూన్య)del_char_after_నిలువు(హద్దు_నిలువు);
+	    ఒకవేళ (State & VREPLACE_FLAG)
 		orig_len = ml_get_cursor_len();
-	    replace_push(cc);
+	    replace_నెట్టు(cc);
 	}
-	else
+	లేకపోతే
 	{
 	    pchar_cursor(cc);
-	    if (State & VREPLACE_FLAG)
+	    ఒకవేళ (State & VREPLACE_FLAG)
 		orig_len = ml_get_cursor_len() - 1;
 	}
-	replace_pop_ins();
+	replace_తీయి_ins();
 
-	if (State & VREPLACE_FLAG)
+	ఒకవేళ (State & VREPLACE_FLAG)
 	{
 	    // Get the number of screen cells used by the inserted characters
 	    p = ml_get_cursor();
 	    ins_len = ml_get_cursor_len() - orig_len;
-	    vcol = start_vcol;
-	    for (i = 0; i < ins_len; ++i)
+	    vcol = ప్రారంభం_vcol;
+	    కొరకు (i = 0; i < ins_len; ++i)
 	    {
 		vcol += chartabsize(p + i, vcol);
 		i += (*mb_ptr2len)(p + i) - 1;
 	    }
-	    vcol -= start_vcol;
+	    vcol -= ప్రారంభం_vcol;
 
 	    // Delete spaces that were inserted after the cursor to keep the
 	    // text aligned.
-	    curwin->w_cursor.col += ins_len;
-	    while (vcol > orig_vcols && gchar_cursor() == ' ')
+	    curwin->w_cursor.నిలువు += ins_len;
+	    అయితే (vcol > orig_vcols && gchar_cursor() == ' ')
 	    {
 		del_char(FALSE);
 		++orig_vcols;
 	    }
-	    curwin->w_cursor.col -= ins_len;
+	    curwin->w_cursor.నిలువు -= ins_len;
 	}
 
 	// mark the buffer as changed and prepare for displaying
-	changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
+	మారింది_బైట్లు(curwin->w_cursor.lnum, curwin->w_cursor.నిలువు);
 
-#ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (curbuf->b_has_textprop)
 	{
 	    size_t len_now = ml_get_curline_len();
 
-	    --text_prop_frozen;
-	    adjust_prop_columns(curwin->w_cursor.lnum, curwin->w_cursor.col,
-					   (int)(len_now - len_before), 0);
+	    --పాఠ్యం_prop_frozen;
+	    adjust_prop_columns(curwin->w_cursor.lnum, curwin->w_cursor.నిలువు,
+					   (పూర్ణాంకం)(len_now - len_before), 0);
 	}
-#endif
+#అయితే_ముగింపు
     }
-    else if (cc == 0)
-	(void)del_char_after_col(limit_col);
+    లేకపోతే ఒకవేళ (cc == 0)
+	(శూన్య)del_char_after_నిలువు(హద్దు_నిలువు);
 }
 
-#if defined(FEAT_RIGHTLEFT)
+#ఒకవేళ defined(FEAT_RIGHTLEFT)
 /*
  * Map Hebrew keyboard when in hkmap mode.
  */
-    int
-hkmap(int c)
+    పూర్ణాంకం
+hkmap(పూర్ణాంకం c)
 {
-    if (p_hkmapp)   // phonetic mapping, by Ilya Dogolazky
+    ఒకవేళ (p_hkmapp)   // phonetic mapping, by Ilya Dogolazky
     {
-	enum {hALEF=0, BET, GIMEL, DALET, HEI, VAV, ZAIN, HET, TET, IUD,
+	గణన {hALEF=0, BET, GIMEL, DALET, HEI, VAV, ZAIN, HET, TET, IUD,
 	    KAFsofit, hKAF, LAMED, MEMsofit, MEM, NUNsofit, NUN, SAMEH, AIN,
 	    PEIsofit, PEI, ZADIsofit, ZADI, KOF, RESH, hSHIN, TAV};
-	static char_u map[26] =
+	స్థిర char_u map[26] =
 	    {(char_u)hALEF/*a*/, (char_u)BET  /*b*/, (char_u)hKAF    /*c*/,
 	     (char_u)DALET/*d*/, (char_u)-1   /*e*/, (char_u)PEIsofit/*f*/,
 	     (char_u)GIMEL/*g*/, (char_u)HEI  /*h*/, (char_u)IUD     /*i*/,
@@ -3548,180 +3548,180 @@ hkmap(int c)
 	     (char_u)VAV  /*v*/, (char_u)hSHIN/*w*/, (char_u)-1      /*x*/,
 	     (char_u)AIN  /*y*/, (char_u)ZADI /*z*/};
 
-	if (c == 'N' || c == 'M' || c == 'P' || c == 'C' || c == 'Z')
-	    return (int)(map[CharOrd(c)] - 1 + p_aleph);
+	ఒకవేళ (c == 'N' || c == 'M' || c == 'P' || c == 'C' || c == 'Z')
+	    తిరిగి (పూర్ణాంకం)(map[CharOrd(c)] - 1 + p_aleph);
 							    // '-1'='sofit'
-	else if (c == 'x')
-	    return 'X';
-	else if (c == 'q')
-	    return '\''; // {geresh}={'}
-	else if (c == 246)
-	    return ' ';  // \"o --> ' ' for a german keyboard
-	else if (c == 228)
-	    return ' ';  // \"a --> ' '      -- / --
-	else if (c == 252)
-	    return ' ';  // \"u --> ' '      -- / --
+	లేకపోతే ఒకవేళ (c == 'x')
+	    తిరిగి 'X';
+	లేకపోతే ఒకవేళ (c == 'q')
+	    తిరిగి '\''; // {geresh}={'}
+	లేకపోతే ఒకవేళ (c == 246)
+	    తిరిగి ' ';  // \"o --> ' ' for a german keyboard
+	లేకపోతే ఒకవేళ (c == 228)
+	    తిరిగి ' ';  // \"a --> ' '      -- / --
+	లేకపోతే ఒకవేళ (c == 252)
+	    తిరిగి ' ';  // \"u --> ' '      -- / --
 	// NOTE: islower() does not do the right thing for us on Linux so we
 	// do this the same was as 5.7 and previous, so it works correctly on
 	// all systems.  Specifically, the e.g. Delete and Arrow keys are
 	// munged and won't work if e.g. searching for Hebrew text.
-	else if (c >= 'a' && c <= 'z')
-	    return (int)(map[CharOrdLow(c)] + p_aleph);
-	else
-	    return c;
+	లేకపోతే ఒకవేళ (c >= 'a' && c <= 'z')
+	    తిరిగి (పూర్ణాంకం)(map[Char_Ord_దిగువ(c)] + p_aleph);
+	లేకపోతే
+	    తిరిగి c;
     }
-    else
+    లేకపోతే
     {
-	switch (c)
+	ఎంపిక (c)
 	{
-	    case '`':	return ';';
-	    case '/':	return '.';
-	    case '\'':	return ',';
-	    case 'q':	return '/';
-	    case 'w':	return '\'';
+	    స్థితి '`':	తిరిగి ';';
+	    స్థితి '/':	తిరిగి '.';
+	    స్థితి '\'':	తిరిగి ',';
+	    స్థితి 'q':	తిరిగి '/';
+	    స్థితి 'w':	తిరిగి '\'';
 
 			// Hebrew letters - set offset from 'a'
-	    case ',':	c = '{'; break;
-	    case '.':	c = 'v'; break;
-	    case ';':	c = 't'; break;
-	    default: {
-			 static char str[] = "zqbcxlsjphmkwonu ydafe rig";
+	    స్థితి ',':	c = '{'; ఆపు;
+	    స్థితి '.':	c = 'v'; ఆపు;
+	    స్థితి ';':	c = 't'; ఆపు;
+	    అప్రమేయ: {
+			 స్థిర అక్షరం str[] = "zqbcxlsjphmkwonu ydafe rig";
 
-			 if (c < 'a' || c > 'z')
-			     return c;
-			 c = str[CharOrdLow(c)];
-			 break;
+			 ఒకవేళ (c < 'a' || c > 'z')
+			     తిరిగి c;
+			 c = str[Char_Ord_దిగువ(c)];
+			 ఆపు;
 		     }
 	}
 
-	return (int)(CharOrdLow(c) + p_aleph);
+	తిరిగి (పూర్ణాంకం)(Char_Ord_దిగువ(c) + p_aleph);
     }
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-ins_reg(void)
+    స్థిర శూన్య
+ins_reg(శూన్య)
 {
-    int		need_redraw = FALSE;
-    int		regname;
-    int		literally = 0;
-    int		vis_active = VIsual_active;
+    పూర్ణాంకం		need_redraw = FALSE;
+    పూర్ణాంకం		regname;
+    పూర్ణాంకం		literally = 0;
+    పూర్ణాంకం		vis_చురుకైన = VIsual_చురుకైన;
 
     /*
      * If we are going to wait for a character, show a '"'.
      */
-    pc_status = PC_STATUS_UNSET;
-    if (redrawing() && !char_avail())
+    pc_స్థితి = PC_స్థితి_UNSET;
+    ఒకవేళ (redrawing() && !char_avail())
     {
 	// may need to redraw when no more chars available now
 	ins_redraw(FALSE);
 
 	edit_putchar('"', TRUE);
-	add_to_showcmd_c(Ctrl_R);
+	కూడు_గమ్యం_showcmd_c(Ctrl_R);
     }
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#అయితే_ముగింపు
 
     /*
      * Don't map the register name. This also prevents the mode message to be
      * deleted when ESC is hit.
      */
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     regname = plain_vgetc();
     LANGMAP_ADJUST(regname, TRUE);
-    if (regname == Ctrl_R || regname == Ctrl_O || regname == Ctrl_P)
+    ఒకవేళ (regname == Ctrl_R || regname == Ctrl_O || regname == Ctrl_P)
     {
 	// Get a third key for literal register insertion
 	literally = regname;
-	add_to_showcmd_c(literally);
+	కూడు_గమ్యం_showcmd_c(literally);
 	regname = plain_vgetc();
 	LANGMAP_ADJUST(regname, TRUE);
     }
     --no_mapping;
-    --allow_keys;
+    --allow_కీలకాలు;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // Don't call u_sync() while typing the expression or giving an error
     // message for it. Only call it explicitly.
     ++no_u_sync;
-    if (regname == '=')
+    ఒకవేళ (regname == '=')
     {
 	pos_T	curpos = curwin->w_cursor;
-# ifdef HAVE_INPUT_METHOD
-	int	im_on = im_get_status();
+# ifdef HAVE_ఆదానం_పద్ధతి
+	పూర్ణాంకం	im_on = im_get_స్థితి();
 # endif
 	// Sync undo when evaluating the expression calls setline() or
 	// append(), so that it can be undone separately.
 	u_sync_once = 2;
 
-	regname = get_expr_register();
+	regname = get_సమాసం_రిజిస్టరు();
 
 	// Cursor may be moved back a column.
 	curwin->w_cursor = curpos;
 	check_cursor();
-# ifdef HAVE_INPUT_METHOD
+# ifdef HAVE_ఆదానం_పద్ధతి
 	// Restore the Input Method.
-	if (im_on)
-	    im_set_active(TRUE);
+	ఒకవేళ (im_on)
+	    im_సమితి_చురుకైన(TRUE);
 # endif
     }
-    if (regname == NUL || !valid_yank_reg(regname, FALSE))
+    ఒకవేళ (regname == NUL || !valid_yank_reg(regname, FALSE))
     {
 	vim_beep(BO_REG);
 	need_redraw = TRUE;	// remove the '"'
     }
-    else
+    లేకపోతే
     {
-#endif
-	if (literally == Ctrl_O || literally == Ctrl_P)
+#అయితే_ముగింపు
+	ఒకవేళ (literally == Ctrl_O || literally == Ctrl_P)
 	{
 	    // Append the command to the redo buffer.
-	    AppendCharToRedobuff(Ctrl_R);
-	    AppendCharToRedobuff(literally);
-	    AppendCharToRedobuff(regname);
+	    Append_Char_గమ్యం_Redobuff(Ctrl_R);
+	    Append_Char_గమ్యం_Redobuff(literally);
+	    Append_Char_గమ్యం_Redobuff(regname);
 
-	    do_put(regname, NULL, BACKWARD, 1L,
+	    do_put(regname, ఖాళీ, BACKWARD, 1L,
 		 (literally == Ctrl_P ? PUT_FIXINDENT : 0) | PUT_CURSEND);
 	}
-	else if (insert_reg(regname, literally) == FAIL)
+	లేకపోతే ఒకవేళ (చొప్పించు_reg(regname, literally) == FAIL)
 	{
 	    vim_beep(BO_REG);
 	    need_redraw = TRUE;	// remove the '"'
 	}
-	else if (stop_insert_mode)
+	లేకపోతే ఒకవేళ (stop_చొప్పించు_బహుళకం)
 	    // When the '=' register was used and a function was invoked that
 	    // did ":stopinsert" then stuff_empty() returns FALSE but we won't
 	    // insert anything, need to remove the '"'
 	    need_redraw = TRUE;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     }
     --no_u_sync;
-    if (u_sync_once == 1)
+    ఒకవేళ (u_sync_once == 1)
 	ins_need_undo = TRUE;
     u_sync_once = 0;
-#endif
+#అయితే_ముగింపు
     clear_showcmd();
 
     // If the inserted register is empty, we need to remove the '"'
-    if (need_redraw || stuff_empty())
+    ఒకవేళ (need_redraw || stuff_ఖాళీలు())
 	edit_unputchar();
 
     // Disallow starting Visual mode here, would get a weird mode.
-    if (!vis_active && VIsual_active)
-	end_visual_mode();
+    ఒకవేళ (!vis_చురుకైన && VIsual_చురుకైన)
+	చివర_visual_బహుళకం();
 }
 
 /*
  * CTRL-G commands in Insert mode.
  */
-    static void
-ins_ctrl_g(void)
+    స్థిర శూన్య
+ins_ctrl_g(శూన్య)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
     // Right after CTRL-X the cursor will be after the ruler.
     setcursor();
@@ -3731,101 +3731,101 @@ ins_ctrl_g(void)
      * deleted when ESC is hit.
      */
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
-    switch (c)
+    --allow_కీలకాలు;
+    ఎంపిక (c)
     {
 	// CTRL-G k and CTRL-G <Up>: cursor up to Insstart.col
-	case K_UP:
-	case Ctrl_K:
-	case 'k': ins_up(TRUE);
-		  break;
+	స్థితి K_పైకి:
+	స్థితి Ctrl_K:
+	స్థితి 'k': ins_పైకి(TRUE);
+		  ఆపు;
 
 	// CTRL-G j and CTRL-G <Down>: cursor down to Insstart.col
-	case K_DOWN:
-	case Ctrl_J:
-	case 'j': ins_down(TRUE);
-		  break;
+	స్థితి K_కిందికి:
+	స్థితి Ctrl_J:
+	స్థితి 'j': ins_కిందికి(TRUE);
+		  ఆపు;
 
 	// CTRL-G u: start new undoable edit
-	case 'u': u_sync(TRUE);
+	స్థితి 'u': u_sync(TRUE);
 		  ins_need_undo = TRUE;
 
 		  // Need to reset Insstart, esp. because a BS that joins
 		  // a line to the previous one must save for undo.
 		  update_Insstart_orig = FALSE;
 		  Insstart = curwin->w_cursor;
-		  break;
+		  ఆపు;
 
 	// CTRL-G U: do not break undo with the next char
-	case 'U':
+	స్థితి 'U':
 		  // Allow one left/right cursor movement with the next char,
 		  // without breaking undo.
 		  dont_sync_undo = MAYBE;
-		  break;
+		  ఆపు;
 
-	case ESC:
+	స్థితి ESC:
 		  // Esc after CTRL-G cancels it.
-		  break;
+		  ఆపు;
 
 	// Unknown CTRL-G command, reserved for future expansion.
-	default:  vim_beep(BO_CTRLG);
+	అప్రమేయ:  vim_beep(BO_CTRLG);
     }
 }
 
 /*
  * CTRL-^ in Insert mode.
  */
-    static void
-ins_ctrl_hat(void)
+    స్థిర శూన్య
+ins_ctrl_hat(శూన్య)
 {
-    if (map_to_exists_mode((char_u *)"", MODE_LANGMAP, FALSE))
+    ఒకవేళ (map_గమ్యం_exists_బహుళకం((char_u *)"", బహుళకం_LANGMAP, FALSE))
     {
 	// ":lmap" mappings exists, Toggle use of ":lmap" mappings.
-	if (State & MODE_LANGMAP)
+	ఒకవేళ (State & బహుళకం_LANGMAP)
 	{
 	    curbuf->b_p_iminsert = B_IMODE_NONE;
-	    State &= ~MODE_LANGMAP;
+	    State &= ~బహుళకం_LANGMAP;
 	}
-	else
+	లేకపోతే
 	{
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
-	    State |= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
-	    im_set_active(FALSE);
-#endif
+	    State |= బహుళకం_LANGMAP;
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+	    im_సమితి_చురుకైన(FALSE);
+#అయితే_ముగింపు
 	}
     }
-#ifdef HAVE_INPUT_METHOD
-    else
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    లేకపోతే
     {
 	// There are no ":lmap" mappings, toggle IM
-	if (im_get_status())
+	ఒకవేళ (im_get_స్థితి())
 	{
 	    curbuf->b_p_iminsert = B_IMODE_NONE;
-	    im_set_active(FALSE);
+	    im_సమితి_చురుకైన(FALSE);
 	}
-	else
+	లేకపోతే
 	{
 	    curbuf->b_p_iminsert = B_IMODE_IM;
-	    State &= ~MODE_LANGMAP;
-	    im_set_active(TRUE);
+	    State &= ~బహుళకం_LANGMAP;
+	    im_సమితి_చురుకైన(TRUE);
 	}
     }
-#endif
-    set_iminsert_global();
+#అయితే_ముగింపు
+    సమితి_iminsert_global();
     showmode();
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // may show different cursor shape or color
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	gui_update_cursor(TRUE, FALSE);
-#endif
-#if defined(FEAT_KEYMAP)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines.
-    status_redraw_curbuf();
-#endif
+    స్థితి_redraw_curbuf();
+#అయితే_ముగింపు
 }
 
 /*
@@ -3833,286 +3833,286 @@ ins_ctrl_hat(void)
  * Returns TRUE when leaving insert mode, FALSE when going to repeat the
  * insert.
  */
-    static int
+    స్థిర పూర్ణాంకం
 ins_esc(
-    long	*count,
-    int		cmdchar,
-    int		nomove)	    // don't move cursor
+    దీర్ఘ	*లెక్క,
+    పూర్ణాంకం		cmdchar,
+    పూర్ణాంకం		nomove)	    // don't move cursor
 {
-    int		temp;
-    static int	disabled_redraw = FALSE;
-#ifdef FEAT_CONCEAL
+    పూర్ణాంకం		తాత్కాలిక;
+    స్థిర పూర్ణాంకం	disabled_redraw = FALSE;
+#నిర్వచితమైతే FEAT_CONCEAL
     // Remember if the cursor line was concealed before changing State.
-    int		cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
-#endif
+    పూర్ణాంకం		cursor_పంక్తి_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_పంక్తి(curwin);
+#అయితే_ముగింపు
 
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
     check_spell_redraw();
-#endif
+#అయితే_ముగింపు
 
-    temp = curwin->w_cursor.col;
-    if (disabled_redraw)
+    తాత్కాలిక = curwin->w_cursor.నిలువు;
+    ఒకవేళ (disabled_redraw)
     {
-	if (RedrawingDisabled > 0)
+	ఒకవేళ (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
 	disabled_redraw = FALSE;
     }
-    if (!arrow_used)
+    ఒకవేళ (!arrow_వాడిన)
     {
 	/*
 	 * Don't append the ESC for "r<CR>" and "grx".
 	 * When 'insertmode' is set only CTRL-L stops Insert mode.  Needed for
 	 * when "count" is non-zero.
 	 */
-	if (cmdchar != 'r' && cmdchar != 'v')
-	    AppendToRedobuff(p_im ? (char_u *)"\014" : ESC_STR);
+	ఒకవేళ (cmdchar != 'r' && cmdchar != 'v')
+	    Append_గమ్యం_Redobuff(p_im ? (char_u *)"\014" : ESC_STR);
 
 	/*
 	 * Repeating insert may take a long time.  Check for
 	 * interrupt now and then.
 	 */
-	if (*count > 0)
+	ఒకవేళ (*లెక్క > 0)
 	{
-	    line_breakcheck();
-	    if (got_int)
-		*count = 0;
+	    పంక్తి_breakcheck();
+	    ఒకవేళ (got_int)
+		*లెక్క = 0;
 	}
 
-	if (--*count > 0)	// repeat what was typed
+	ఒకవేళ (--*లెక్క > 0)	// repeat what was typed
 	{
 	    // Vi repeats the insert without replacing characters.
-	    if (vim_strchr(p_cpo, CPO_REPLCNT) != NULL)
+	    ఒకవేళ (vim_strchr(p_cpo, CPO_REPLCNT) != ఖాళీ)
 		State &= ~REPLACE_FLAG;
 
-	    (void)start_redo_ins();
-	    if (cmdchar == 'r' || cmdchar == 'v')
+	    (శూన్య)ప్రారంభం_redo_ins();
+	    ఒకవేళ (cmdchar == 'r' || cmdchar == 'v')
 		stuffRedoReadbuff(ESC_STR);	// no ESC in redo buffer
 	    ++RedrawingDisabled;
 	    disabled_redraw = TRUE;
-	    return FALSE;	// repeat the insert
+	    తిరిగి FALSE;	// repeat the insert
 	}
-	stop_insert(&curwin->w_cursor, TRUE, nomove);
+	stop_చొప్పించు(&curwin->w_cursor, TRUE, nomove);
 	undisplay_dollar();
     }
 
-    if (cmdchar != 'r' && cmdchar != 'v')
+    ఒకవేళ (cmdchar != 'r' && cmdchar != 'v')
 	ins_apply_autocmds(EVENT_INSERTLEAVEPRE);
 
     // When an autoindent was removed, curswant stays after the
     // indent
-    if (restart_edit == NUL && (colnr_T)temp == curwin->w_cursor.col)
-	curwin->w_set_curswant = true;
+    ఒకవేళ (restart_edit == NUL && (colnr_T)తాత్కాలిక == curwin->w_cursor.నిలువు)
+	curwin->w_సమితి_curswant = true;
 
     // Remember the last Insert position in the '^ mark.
-    if ((cmdmod.cmod_flags & CMOD_KEEPJUMPS) == 0)
-	curbuf->b_last_insert = curwin->w_cursor;
+    ఒకవేళ ((cmdmod.cmod_flags & CMOD_KEEPJUMPS) == 0)
+	curbuf->b_చివరి_చొప్పించు = curwin->w_cursor;
 
     /*
      * The cursor should end up on the last inserted character.
      * Don't do it for CTRL-O, unless past the end of the line.
      */
-    if (!nomove
-	    && (curwin->w_cursor.col != 0
+    ఒకవేళ (!nomove
+	    && (curwin->w_cursor.నిలువు != 0
 		|| curwin->w_cursor.coladd > 0)
 	    && (restart_edit == NUL
-		   || (gchar_cursor() == NUL && !VIsual_active))
-#ifdef FEAT_RIGHTLEFT
+		   || (gchar_cursor() == NUL && !VIsual_చురుకైన))
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    && !revins_on
-#endif
+#అయితే_ముగింపు
 				      )
     {
-	if (curwin->w_cursor.coladd > 0 || get_ve_flags() == VE_ALL)
+	ఒకవేళ (curwin->w_cursor.coladd > 0 || get_ve_flags() == VE_ALL)
 	{
 	    oneleft();
-	    if (restart_edit != NUL)
+	    ఒకవేళ (restart_edit != NUL)
 		++curwin->w_cursor.coladd;
 	}
-	else
+	లేకపోతే
 	{
-	    --curwin->w_cursor.col;
+	    --curwin->w_cursor.నిలువు;
 	    curwin->w_valid &= ~(VALID_WCOL|VALID_VIRTCOL);
 	    // Correct cursor for multi-byte character.
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		mb_adjust_cursor();
 	}
     }
 
-#ifdef HAVE_INPUT_METHOD
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
     // Disable IM to allow typing English directly for Normal mode commands.
     // When ":lmap" is enabled don't change 'iminsert' (IM can be enabled as
     // well).
-    if (!(State & MODE_LANGMAP))
-	im_save_status(&curbuf->b_p_iminsert);
-    im_set_active(FALSE);
-#endif
+    ఒకవేళ (!(State & బహుళకం_LANGMAP))
+	im_save_స్థితి(&curbuf->b_p_iminsert);
+    im_సమితి_చురుకైన(FALSE);
+#అయితే_ముగింపు
 
-    State = MODE_NORMAL;
+    State = బహుళకం_సాధారణ;
     may_trigger_modechanged();
     // need to position cursor again when on a TAB and when on a char with
     // virtual text.
-    if (gchar_cursor() == TAB
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (gchar_cursor() == TAB
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    || curbuf->b_has_textprop
-#endif
+#అయితే_ముగింపు
        )
 	curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL);
 
     setmouse();
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
-    if (!p_ek)
+#అయితే_ముగింపు
+    ఒకవేళ (!p_ek)
     {
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_గమ్యం_LOG_THIS;
 
 	// Re-enable bracketed paste mode.
-	out_str_t_BE();
+	బహిర్గతం_str_t_BE();
 
 	// Re-enable modifyOtherKeys.
-	out_str_t_TI();
+	బహిర్గతం_str_t_TI();
     }
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
     // Check if the cursor line needs redrawing after changing State.  If
     // 'concealcursor' is "i" it needs to be redrawn without concealing.
-    conceal_check_cursor_line(cursor_line_was_concealed);
-#endif
+    conceal_check_cursor_పంక్తి(cursor_పంక్తి_was_concealed);
+#అయితే_ముగింపు
 
     // When recording or for CTRL-O, need to display the new mode.
     // Otherwise remove the mode message.
-    if (reg_recording != 0 || restart_edit != NUL)
+    ఒకవేళ (reg_recording != 0 || restart_edit != NUL)
 	showmode();
-    else if (p_smd && (got_int || !skip_showmode()))
-	msg("");
+    లేకపోతే ఒకవేళ (p_smd && (got_int || !skip_showmode()))
+	సందేశం("");
 
-    return TRUE;	    // exit Insert mode
+    తిరిగి TRUE;	    // exit Insert mode
 }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 /*
  * Toggle language: hkmap and revins_on.
  * Move to end of reverse inserted text.
  */
-    static void
-ins_ctrl_(void)
+    స్థిర శూన్య
+ins_ctrl_(శూన్య)
 {
-    if (revins_on && revins_chars && revins_scol >= 0)
+    ఒకవేళ (revins_on && revins_chars && revins_scol >= 0)
     {
-	while (gchar_cursor() != NUL && revins_chars--)
-	    ++curwin->w_cursor.col;
+	అయితే (gchar_cursor() != NUL && revins_chars--)
+	    ++curwin->w_cursor.నిలువు;
     }
     p_ri = !p_ri;
-    revins_on = (State == MODE_INSERT && p_ri);
-    if (revins_on)
+    revins_on = (State == బహుళకం_చొప్పించు && p_ri);
+    ఒకవేళ (revins_on)
     {
-	revins_scol = curwin->w_cursor.col;
+	revins_scol = curwin->w_cursor.నిలువు;
 	revins_legal++;
 	revins_chars = 0;
 	undisplay_dollar();
     }
-    else
+    లేకపోతే
 	revins_scol = -1;
     p_hkmap = curwin->w_p_rl ^ p_ri;    // be consistent!
     showmode();
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * If 'keymodel' contains "startsel", may start selection.
  * Returns TRUE when a CTRL-O and other keys stuffed.
  */
-    static int
-ins_start_select(int c)
+    స్థిర పూర్ణాంకం
+ins_ప్రారంభం_select(పూర్ణాంకం c)
 {
-    if (!km_startsel)
-	return FALSE;
-    switch (c)
+    ఒకవేళ (!km_startsel)
+	తిరిగి FALSE;
+    ఎంపిక (c)
     {
-	case K_KHOME:
-	case K_KEND:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-#ifdef MACOS_X
-	case K_LEFT:
-	case K_RIGHT:
-	case K_UP:
-	case K_DOWN:
-	case K_END:
-	case K_HOME:
-#endif
-	    if (!(mod_mask & MOD_MASK_SHIFT))
-		break;
+	స్థితి K_KHOME:
+	స్థితి K_KEND:
+	స్థితి K_PAGEUP:
+	స్థితి K_KPAGEUP:
+	స్థితి K_PAGEDOWN:
+	స్థితి K_KPAGEDOWN:
+#నిర్వచితమైతే MACOS_X
+	స్థితి K_ఎడమ:
+	స్థితి K_కుడి:
+	స్థితి K_పైకి:
+	స్థితి K_కిందికి:
+	స్థితి K_చివర:
+	స్థితి K_HOME:
+#అయితే_ముగింపు
+	    ఒకవేళ (!(mod_ముసుగు & MOD_ముసుగు_జరుపు))
+		ఆపు;
 	    // FALLTHROUGH
-	case K_S_LEFT:
-	case K_S_RIGHT:
-	case K_S_UP:
-	case K_S_DOWN:
-	case K_S_END:
-	case K_S_HOME:
+	స్థితి K_S_ఎడమ:
+	స్థితి K_S_కుడి:
+	స్థితి K_S_పైకి:
+	స్థితి K_S_కిందికి:
+	స్థితి K_S_చివర:
+	స్థితి K_S_HOME:
 	    // Start selection right away, the cursor can move with CTRL-O when
 	    // beyond the end of the line.
-	    start_selection();
+	    ప్రారంభం_selection();
 
 	    // Execute the key in (insert) Select mode.
 	    stuffcharReadbuff(Ctrl_O);
-	    if (mod_mask)
+	    ఒకవేళ (mod_ముసుగు)
 	    {
 		char_u	    buf[4];
 
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_MODIFIER;
-		buf[2] = mod_mask;
+		buf[2] = mod_ముసుగు;
 		buf[3] = NUL;
 		stuffReadbuffLen(buf, 3L);
 	    }
 	    stuffcharReadbuff(c);
-	    return TRUE;
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * <Insert> key in Insert mode: toggle insert/replace mode.
  */
-    static void
-ins_insert(int replaceState)
+    స్థిర శూన్య
+ins_చొప్పించు(పూర్ణాంకం replaceState)
 {
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_INSERTMODE,
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_string(VV_INSERTMODE,
 		   (char_u *)((State & REPLACE_FLAG) ? "i"
-			    : replaceState == MODE_VREPLACE ? "v" : "r"), 1);
-#endif
+			    : replaceState == బహుళకం_VREPLACE ? "v" : "r"), 1);
+#అయితే_ముగింపు
     ins_apply_autocmds(EVENT_INSERTCHANGE);
-    if (State & REPLACE_FLAG)
-	State = MODE_INSERT | (State & MODE_LANGMAP);
-    else
-	State = replaceState | (State & MODE_LANGMAP);
+    ఒకవేళ (State & REPLACE_FLAG)
+	State = బహుళకం_చొప్పించు | (State & బహుళకం_LANGMAP);
+    లేకపోతే
+	State = replaceState | (State & బహుళకం_LANGMAP);
     may_trigger_modechanged();
-    AppendCharToRedobuff(K_INS);
+    Append_Char_గమ్యం_Redobuff(K_INS);
     showmode();
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Pressed CTRL-O in Insert mode.
  */
-    static void
-ins_ctrl_o(void)
+    స్థిర శూన్య
+ins_ctrl_o(శూన్య)
 {
     restart_VIsual_select = 0;
-    if (State & VREPLACE_FLAG)
+    ఒకవేళ (State & VREPLACE_FLAG)
 	restart_edit = 'V';
-    else if (State & REPLACE_FLAG)
+    లేకపోతే ఒకవేళ (State & REPLACE_FLAG)
 	restart_edit = 'R';
-    else
+    లేకపోతే
 	restart_edit = 'I';
-    if (virtual_active())
+    ఒకవేళ (virtual_చురుకైన())
 	ins_at_eol = FALSE;	// cursor always keeps its column
-    else
+    లేకపోతే
 	ins_at_eol = (gchar_cursor() == NUL);
 }
 
@@ -4123,111 +4123,111 @@ ins_ctrl_o(void)
  * with vi.  But vi only supports ^T and ^D after an
  * autoindent, we support it everywhere.
  */
-    static void
-ins_shift(int c, int lastc)
+    స్థిర శూన్య
+ins_జరుపు(పూర్ణాంకం c, పూర్ణాంకం lastc)
 {
-    if (stop_arrow() == FAIL)
-	return;
-    AppendCharToRedobuff(c);
+    ఒకవేళ (stop_arrow() == FAIL)
+	తిరిగి;
+    Append_Char_గమ్యం_Redobuff(c);
 
     /*
      * 0^D and ^^D: remove all indent.
      */
-    if (c == Ctrl_D && (lastc == '0' || lastc == '^')
-						  && curwin->w_cursor.col > 0)
+    ఒకవేళ (c == Ctrl_D && (lastc == '0' || lastc == '^')
+						  && curwin->w_cursor.నిలువు > 0)
     {
-	--curwin->w_cursor.col;
-	(void)del_char(FALSE);		// delete the '^' or '0'
+	--curwin->w_cursor.నిలువు;
+	(శూన్య)del_char(FALSE);		// delete the '^' or '0'
 	// In Replace mode, restore the characters that '^' or '0' replaced.
-	if (State & REPLACE_FLAG)
-	    replace_pop_ins();
-	if (lastc == '^')
+	ఒకవేళ (State & REPLACE_FLAG)
+	    replace_తీయి_ins();
+	ఒకవేళ (lastc == '^')
 	    old_indent = get_indent();	// remember curr. indent
-	change_indent(INDENT_SET, 0, TRUE, 0, TRUE);
+	change_indent(INDENT_సమితి, 0, TRUE, 0, TRUE);
     }
-    else
+    లేకపోతే
 	change_indent(c == Ctrl_D ? INDENT_DEC : INDENT_INC, 0, TRUE, 0, TRUE);
 
-    if (did_ai && *skipwhite(ml_get_curline()) != NUL)
+    ఒకవేళ (did_ai && *skipwhite(ml_get_curline()) != NUL)
 	did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
+    can_si_వెనుక = FALSE;
     can_cindent = FALSE;	// no cindenting after ^D or ^T
 }
 
-    static void
-ins_del(void)
+    స్థిర శూన్య
+ins_del(శూన్య)
 {
-    int	    temp;
+    పూర్ణాంకం	    తాత్కాలిక;
 
-    if (stop_arrow() == FAIL)
-	return;
-    if (gchar_cursor() == NUL)		// delete newline
+    ఒకవేళ (stop_arrow() == FAIL)
+	తిరిగి;
+    ఒకవేళ (gchar_cursor() == NUL)		// delete newline
     {
-	temp = curwin->w_cursor.col;
-	if (!can_bs(BS_EOL)		// only if "eol" included
+	తాత్కాలిక = curwin->w_cursor.నిలువు;
+	ఒకవేళ (!can_bs(BS_EOL)		// only if "eol" included
 		|| do_join(2, FALSE, TRUE, FALSE, FALSE) == FAIL)
 	    vim_beep(BO_BS);
-	else
+	లేకపోతే
 	{
-	    curwin->w_cursor.col = temp;
+	    curwin->w_cursor.నిలువు = తాత్కాలిక;
 	    // Adjust orig_line_count in case more lines have been deleted than
 	    // have been added. That makes sure, that open_line() later
 	    // can access all buffer lines correctly
-	    if (State & VREPLACE_FLAG &&
-		    orig_line_count > curbuf->b_ml.ml_line_count)
-		orig_line_count = curbuf->b_ml.ml_line_count;
+	    ఒకవేళ (State & VREPLACE_FLAG &&
+		    orig_పంక్తి_లెక్క > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		orig_పంక్తి_లెక్క = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	}
     }
-    else if (del_char(FALSE) == FAIL)  // delete char under cursor
+    లేకపోతే ఒకవేళ (del_char(FALSE) == FAIL)  // delete char under cursor
 	vim_beep(BO_BS);
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
-    AppendCharToRedobuff(K_DEL);
+    can_si_వెనుక = FALSE;
+    Append_Char_గమ్యం_Redobuff(K_DEL);
 }
 
 /*
  * Delete one character for ins_bs().
  */
-    static void
-ins_bs_one(void)
+    స్థిర శూన్య
+ins_bs_one(శూన్య)
 {
     dec_cursor();
-    if (State & REPLACE_FLAG)
+    ఒకవేళ (State & REPLACE_FLAG)
     {
 	// Don't delete characters before the insert point when in
 	// Replace mode
-	if (curwin->w_cursor.lnum != Insstart.lnum
-		|| curwin->w_cursor.col >= Insstart.col)
+	ఒకవేళ (curwin->w_cursor.lnum != Insstart.lnum
+		|| curwin->w_cursor.నిలువు >= Insstart.నిలువు)
 	    replace_do_bs(-1);
     }
-    else
-	(void)del_char(FALSE);
+    లేకపోతే
+	(శూన్య)del_char(FALSE);
 }
 
 /*
  * Handle Backspace, delete-word and delete-line in Insert mode.
  * Return TRUE when backspace was actually used.
  */
-    static int
+    స్థిర పూర్ణాంకం
 ins_bs(
-    int		c,
-    int		mode,
-    int		*inserted_space_p)
+    పూర్ణాంకం		c,
+    పూర్ణాంకం		బహుళకం,
+    పూర్ణాంకం		*inserted_space_p)
 {
     linenr_T	lnum;
-    int		cc;
-    int		temp = 0;	    // init for GCC
-    colnr_T	save_col;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		తాత్కాలిక = 0;	    // init for GCC
+    colnr_T	save_నిలువు;
     colnr_T	mincol;
-    int		did_backspace = FALSE;
-    int		in_indent;
-    int		oldState;
-    int		cpc[MAX_MCO];	    // composing characters
-    int		call_fix_indent = FALSE;
+    పూర్ణాంకం		did_backspace = FALSE;
+    పూర్ణాంకం		లోపల_indent;
+    పూర్ణాంకం		oldState;
+    పూర్ణాంకం		cpc[MAX_MCO];	    // composing characters
+    పూర్ణాంకం		call_fix_indent = FALSE;
 
     /*
      * can't delete anything in an empty file
@@ -4235,53 +4235,53 @@ ins_bs(
      * can't backup past starting point unless 'backspace' > 1
      * can backup to a previous line if 'backspace' == 0
      */
-    if (       BUFEMPTY()
+    ఒకవేళ (       BUFEMPTY()
 	    || (
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		!revins_on &&
-#endif
-		((curwin->w_cursor.lnum == 1 && curwin->w_cursor.col == 0)
-		    || (!can_bs(BS_START)
-			&& ((arrow_used
-#ifdef FEAT_JOB_CHANNEL
+#అయితే_ముగింపు
+		((curwin->w_cursor.lnum == 1 && curwin->w_cursor.నిలువు == 0)
+		    || (!can_bs(BS_ప్రారంభం)
+			&& ((arrow_వాడిన
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 				&& !bt_prompt(curbuf)
-#endif
+#అయితే_ముగింపు
 			) || (curwin->w_cursor.lnum == Insstart_orig.lnum
-				&& curwin->w_cursor.col <= Insstart_orig.col)))
-		    || (!can_bs(BS_INDENT) && !arrow_used && ai_col > 0
-					 && curwin->w_cursor.col <= ai_col)
-		    || (!can_bs(BS_EOL) && curwin->w_cursor.col == 0))))
+				&& curwin->w_cursor.నిలువు <= Insstart_orig.నిలువు)))
+		    || (!can_bs(BS_INDENT) && !arrow_వాడిన && ai_నిలువు > 0
+					 && curwin->w_cursor.నిలువు <= ai_నిలువు)
+		    || (!can_bs(BS_EOL) && curwin->w_cursor.నిలువు == 0))))
     {
 	vim_beep(BO_BS);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    if (stop_arrow() == FAIL)
-	return FALSE;
-    in_indent = inindent(0);
-    if (in_indent)
+    ఒకవేళ (stop_arrow() == FAIL)
+	తిరిగి FALSE;
+    లోపల_indent = inindent(0);
+    ఒకవేళ (లోపల_indent)
 	can_cindent = FALSE;
-    end_comment_pending = NUL;	// After BS, don't auto-end comment
-#ifdef FEAT_RIGHTLEFT
-    if (revins_on)	    // put cursor after last inserted char
+    చివర_comment_pending = NUL;	// After BS, don't auto-end comment
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (revins_on)	    // put cursor after last inserted char
 	inc_cursor();
-#endif
+#అయితే_ముగింపు
 
     // Virtualedit:
     //	BACKSPACE_CHAR eats a virtual space
     //	BACKSPACE_WORD eats all coladd
     //	BACKSPACE_LINE eats all coladd and keeps going
-    if (curwin->w_cursor.coladd > 0)
+    ఒకవేళ (curwin->w_cursor.coladd > 0)
     {
-	if (mode == BACKSPACE_CHAR)
+	ఒకవేళ (బహుళకం == BACKSPACE_CHAR)
 	{
 	    --curwin->w_cursor.coladd;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
-	if (mode == BACKSPACE_WORD)
+	ఒకవేళ (బహుళకం == BACKSPACE_మాట)
 	{
 	    curwin->w_cursor.coladd = 0;
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
 	curwin->w_cursor.coladd = 0;
     }
@@ -4289,20 +4289,20 @@ ins_bs(
     /*
      * Delete newline!
      */
-    if (curwin->w_cursor.col == 0)
+    ఒకవేళ (curwin->w_cursor.నిలువు == 0)
     {
 	lnum = Insstart.lnum;
-	if (curwin->w_cursor.lnum == lnum
-#ifdef FEAT_RIGHTLEFT
+	ఒకవేళ (curwin->w_cursor.lnum == lnum
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 			|| revins_on
-#endif
+#అయితే_ముగింపు
 				    )
 	{
-	    if (u_save((linenr_T)(curwin->w_cursor.lnum - 2),
+	    ఒకవేళ (u_save((linenr_T)(curwin->w_cursor.lnum - 2),
 			       (linenr_T)(curwin->w_cursor.lnum + 1)) == FAIL)
-		return FALSE;
+		తిరిగి FALSE;
 	    --Insstart.lnum;
-	    Insstart.col = ml_get_len(Insstart.lnum);
+	    Insstart.నిలువు = ml_get_len(Insstart.lnum);
 	}
 	/*
 	 * In replace mode:
@@ -4310,62 +4310,62 @@ ins_bs(
 	 * cc >= 0: NL was replaced, put original characters back
 	 */
 	cc = -1;
-	if (State & REPLACE_FLAG)
-	    cc = replace_pop();	    // returns -1 if NL was inserted
+	ఒకవేళ (State & REPLACE_FLAG)
+	    cc = replace_తీయి();	    // returns -1 if NL was inserted
 	/*
 	 * In replace mode, in the line we started replacing, we only move the
 	 * cursor.
 	 */
-	if ((State & REPLACE_FLAG) && curwin->w_cursor.lnum <= lnum)
+	ఒకవేళ ((State & REPLACE_FLAG) && curwin->w_cursor.lnum <= lnum)
 	{
 	    dec_cursor();
 	}
-	else
+	లేకపోతే
 	{
-	    if (!(State & VREPLACE_FLAG)
-				   || curwin->w_cursor.lnum > orig_line_count)
+	    ఒకవేళ (!(State & VREPLACE_FLAG)
+				   || curwin->w_cursor.lnum > orig_పంక్తి_లెక్క)
 	    {
-		temp = gchar_cursor();	// remember current char
+		తాత్కాలిక = gchar_cursor();	// remember current char
 		--curwin->w_cursor.lnum;
 
 		// When "aw" is in 'formatoptions' we must delete the space at
 		// the end of the line, otherwise the line will be broken
 		// again when auto-formatting.
-		if (has_format_option(FO_AUTO)
+		ఒకవేళ (has_format_option(FO_AUTO)
 					   && has_format_option(FO_WHITE_PAR))
 		{
 		    char_u  *ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum,
 									FALSE);
-		    int	    len = ml_get_curline_len();
+		    పూర్ణాంకం	    len = ml_get_curline_len();
 
-		    if (len > 0 && ptr[len - 1] == ' ')
+		    ఒకవేళ (len > 0 && ptr[len - 1] == ' ')
 		    {
-			char_u *newp = alloc(curbuf->b_ml.ml_line_len - 1);
+			char_u *newp = alloc(curbuf->b_ml.ml_పంక్తి_len - 1);
 
-			if (newp != NULL)
+			ఒకవేళ (newp != ఖాళీ)
 			{
 			    mch_memmove(newp, ptr, len - 1);
 			    newp[len - 1] = NUL;
-			    if (curbuf->b_ml.ml_line_len > len + 1)
+			    ఒకవేళ (curbuf->b_ml.ml_పంక్తి_len > len + 1)
 				mch_memmove(newp + len, ptr + len + 1,
-					   curbuf->b_ml.ml_line_len - len - 1);
+					   curbuf->b_ml.ml_పంక్తి_len - len - 1);
 
-			    if (curbuf->b_ml.ml_flags
-					      & (ML_LINE_DIRTY | ML_ALLOCATED))
-				vim_free(curbuf->b_ml.ml_line_ptr);
-			    curbuf->b_ml.ml_line_ptr = newp;
-			    curbuf->b_ml.ml_line_len--;
-			    curbuf->b_ml.ml_line_textlen--;
-			    curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+			    ఒకవేళ (curbuf->b_ml.ml_flags
+					      & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+				vim_free(curbuf->b_ml.ml_పంక్తి_ptr);
+			    curbuf->b_ml.ml_పంక్తి_ptr = newp;
+			    curbuf->b_ml.ml_పంక్తి_len--;
+			    curbuf->b_ml.ml_పంక్తి_textlen--;
+			    curbuf->b_ml.ml_flags |= ML_పంక్తి_DIRTY;
 			}
 		    }
 		}
 
-		(void)do_join(2, FALSE, FALSE, FALSE, FALSE);
-		if (temp == NUL && gchar_cursor() != NUL)
+		(శూన్య)do_join(2, FALSE, FALSE, FALSE, FALSE);
+		ఒకవేళ (తాత్కాలిక == NUL && gchar_cursor() != NUL)
 		    inc_cursor();
 	    }
-	    else
+	    లేకపోతే
 		dec_cursor();
 
 	    /*
@@ -4374,7 +4374,7 @@ ins_bs(
 	     * NUL-terminated sequence of characters that were deleted and then
 	     * the characters that NL replaced.
 	     */
-	    if (State & REPLACE_FLAG)
+	    ఒకవేళ (State & REPLACE_FLAG)
 	    {
 		/*
 		 * Do the next ins_char() in MODE_NORMAL state, to
@@ -4382,92 +4382,92 @@ ins_bs(
 		 * avoiding showmatch().
 		 */
 		oldState = State;
-		State = MODE_NORMAL;
+		State = బహుళకం_సాధారణ;
 		/*
 		 * restore characters (blanks) deleted after cursor
 		 */
-		while (cc > 0)
+		అయితే (cc > 0)
 		{
-		    save_col = curwin->w_cursor.col;
-		    mb_replace_pop_ins(cc);
-		    curwin->w_cursor.col = save_col;
-		    cc = replace_pop();
+		    save_నిలువు = curwin->w_cursor.నిలువు;
+		    mb_replace_తీయి_ins(cc);
+		    curwin->w_cursor.నిలువు = save_నిలువు;
+		    cc = replace_తీయి();
 		}
 		// restore the characters that NL replaced
-		replace_pop_ins();
+		replace_తీయి_ins();
 		State = oldState;
 	    }
 	}
 	did_ai = FALSE;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Delete character(s) before the cursor.
 	 */
-#ifdef FEAT_RIGHTLEFT
-	if (revins_on)		// put cursor on last inserted char
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (revins_on)		// put cursor on last inserted char
 	    dec_cursor();
-#endif
+#అయితే_ముగింపు
 	mincol = 0;
 						// keep indent
-	if (mode == BACKSPACE_LINE
+	ఒకవేళ (బహుళకం == BACKSPACE_పంక్తి
 		&& (curbuf->b_p_ai || cindent_on())
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		&& !revins_on
-#endif
+#అయితే_ముగింపు
 			    )
 	{
-	    save_col = curwin->w_cursor.col;
+	    save_నిలువు = curwin->w_cursor.నిలువు;
 	    beginline(BL_WHITE);
-	    if (curwin->w_cursor.col < save_col)
+	    ఒకవేళ (curwin->w_cursor.నిలువు < save_నిలువు)
 	    {
-		mincol = curwin->w_cursor.col;
+		mincol = curwin->w_cursor.నిలువు;
 		// should now fix the indent to match with the previous line
 		call_fix_indent = TRUE;
 	    }
-	    curwin->w_cursor.col = save_col;
+	    curwin->w_cursor.నిలువు = save_నిలువు;
 	}
 
 	/*
 	 * Handle deleting one 'shiftwidth' or 'softtabstop'.
 	 */
-	if (	   mode == BACKSPACE_CHAR
-		&& ((p_sta && in_indent)
-		    || ((get_sts_value() != 0
-#ifdef FEAT_VARTABS
-			|| tabstop_count(curbuf->b_p_vsts_array)
-#endif
+	ఒకవేళ (	   బహుళకం == BACKSPACE_CHAR
+		&& ((p_sta && లోపల_indent)
+		    || ((get_sts_విలువ() != 0
+#నిర్వచితమైతే FEAT_VARTABS
+			|| tabstop_లెక్క(curbuf->b_p_vsts_array)
+#అయితే_ముగింపు
 			)
-			&& curwin->w_cursor.col > 0
+			&& curwin->w_cursor.నిలువు > 0
 			&& (*(ml_get_cursor() - 1) == TAB
 			    || (*(ml_get_cursor() - 1) == ' '
 				&& (!*inserted_space_p
-				    || arrow_used))))))
+				    || arrow_వాడిన))))))
 	{
 	    colnr_T	vcol = 0;
 	    colnr_T	want_vcol;
-	    char_u	*line;
+	    char_u	*పంక్తి;
 	    char_u	*ptr;
 	    char_u	*cursor_ptr;
 	    char_u	*space_ptr;
 	    colnr_T	space_vcol = 0;
-	    int		prev_space = FALSE;
-	    colnr_T	want_col;
+	    పూర్ణాంకం		prev_space = FALSE;
+	    colnr_T	want_నిలువు;
 
 	    *inserted_space_p = FALSE;
 
-	    space_ptr = ptr = line = ml_get_curline();
-	    cursor_ptr = line + curwin->w_cursor.col;
+	    space_ptr = ptr = పంక్తి = ml_get_curline();
+	    cursor_ptr = పంక్తి + curwin->w_cursor.నిలువు;
 
 	    // Compute virtual column of cursor position, and find the last
 	    // whitespace before cursor that is preceded by non-whitespace.
 	    // Use chartabsize() so that virtual text and wrapping are ignored.
-	    while (ptr < cursor_ptr)
+	    అయితే (ptr < cursor_ptr)
 	    {
-		int	cur_space = VIM_ISWHITE(*ptr);
+		పూర్ణాంకం	cur_space = VIM_ISWHITE(*ptr);
 
-		if (!prev_space && cur_space)
+		ఒకవేళ (!prev_space && cur_space)
 		{
 		    space_ptr = ptr;
 		    space_vcol = vcol;
@@ -4479,48 +4479,48 @@ ins_bs(
 
 	    // Compute the virtual column where we want to be.
 	    want_vcol = vcol > 0 ? vcol - 1 : 0;
-	    if (p_sta && in_indent)
-		want_vcol -= want_vcol % (int)get_sw_value(curbuf);
-	    else
-#ifdef FEAT_VARTABS
-		want_vcol = tabstop_start(want_vcol, get_sts_value(),
+	    ఒకవేళ (p_sta && లోపల_indent)
+		want_vcol -= want_vcol % (పూర్ణాంకం)get_sw_విలువ(curbuf);
+	    లేకపోతే
+#నిర్వచితమైతే FEAT_VARTABS
+		want_vcol = tabstop_ప్రారంభం(want_vcol, get_sts_విలువ(),
 						       curbuf->b_p_vsts_array);
-#else
-		want_vcol -= want_vcol % (int)get_sts_value();
-#endif
+#లేకపోతే
+		want_vcol -= want_vcol % (పూర్ణాంకం)get_sts_విలువ();
+#అయితే_ముగింపు
 
 	    // Find the position to stop backspacing.
 	    // Use chartabsize() so that virtual text and wrapping are ignored.
-	    while (TRUE)
+	    అయితే (TRUE)
 	    {
-		int size = chartabsize(space_ptr, space_vcol);
+		పూర్ణాంకం కొలత = chartabsize(space_ptr, space_vcol);
 
-		if (space_vcol + size > want_vcol)
-		    break;
-		space_vcol += size;
+		ఒకవేళ (space_vcol + కొలత > want_vcol)
+		    ఆపు;
+		space_vcol += కొలత;
 		MB_PTR_ADV(space_ptr);
 	    }
-	    want_col = space_ptr - line;
+	    want_నిలువు = space_ptr - పంక్తి;
 
 	    // Delete characters until we are at or before want_col.
-	    while (curwin->w_cursor.col > want_col)
+	    అయితే (curwin->w_cursor.నిలువు > want_నిలువు)
 		ins_bs_one();
 
 	    // Insert extra spaces until we are at want_vcol.
-	    for (; space_vcol < want_vcol; space_vcol++)
+	    కొరకు (; space_vcol < want_vcol; space_vcol++)
 	    {
 		// Remember the first char we inserted
-		if (curwin->w_cursor.lnum == Insstart_orig.lnum
-				   && curwin->w_cursor.col < Insstart_orig.col)
-		    Insstart_orig.col = curwin->w_cursor.col;
+		ఒకవేళ (curwin->w_cursor.lnum == Insstart_orig.lnum
+				   && curwin->w_cursor.నిలువు < Insstart_orig.నిలువు)
+		    Insstart_orig.నిలువు = curwin->w_cursor.నిలువు;
 
-		if (State & VREPLACE_FLAG)
+		ఒకవేళ (State & VREPLACE_FLAG)
 		    ins_char(' ');
-		else
+		లేకపోతే
 		{
 		    ins_str((char_u *)" ", 1);
-		    if ((State & REPLACE_FLAG))
-			replace_push(NUL);
+		    ఒకవేళ ((State & REPLACE_FLAG))
+			replace_నెట్టు(NUL);
 		}
 	    }
 	}
@@ -4528,94 +4528,94 @@ ins_bs(
 	/*
 	 * Delete up to starting point, start of line or previous word.
 	 */
-	else
+	లేకపోతే
 	{
-	    int cclass = 0, prev_cclass = 0;
+	    పూర్ణాంకం cclass = 0, prev_cclass = 0;
 
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		cclass = mb_get_class(ml_get_cursor());
-	    do
+	    చేయి
 	    {
-#ifdef FEAT_RIGHTLEFT
-		if (!revins_on) // put cursor on char to be deleted
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		ఒకవేళ (!revins_on) // put cursor on char to be deleted
+#అయితే_ముగింపు
 		    dec_cursor();
 
 		cc = gchar_cursor();
 		// look multi-byte character class
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
 		    prev_cclass = cclass;
 		    cclass = mb_get_class(ml_get_cursor());
 		}
 
 		// start of word?
-		if (mode == BACKSPACE_WORD && !vim_isspace(cc))
+		ఒకవేళ (బహుళకం == BACKSPACE_మాట && !vim_isspace(cc))
 		{
-		    mode = BACKSPACE_WORD_NOT_SPACE;
-		    temp = vim_iswordc(cc);
+		    బహుళకం = BACKSPACE_మాట_NOT_SPACE;
+		    తాత్కాలిక = vim_iswordc(cc);
 		}
 		// end of word?
-		else if (mode == BACKSPACE_WORD_NOT_SPACE
-			&& ((vim_isspace(cc) || vim_iswordc(cc) != temp)
+		లేకపోతే ఒకవేళ (బహుళకం == BACKSPACE_మాట_NOT_SPACE
+			&& ((vim_isspace(cc) || vim_iswordc(cc) != తాత్కాలిక)
 			|| prev_cclass != cclass))
 		{
-#ifdef FEAT_RIGHTLEFT
-		    if (!revins_on)
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		    ఒకవేళ (!revins_on)
+#అయితే_ముగింపు
 			inc_cursor();
-#ifdef FEAT_RIGHTLEFT
-		    else if (State & REPLACE_FLAG)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		    లేకపోతే ఒకవేళ (State & REPLACE_FLAG)
 			dec_cursor();
-#endif
-		    break;
+#అయితే_ముగింపు
+		    ఆపు;
 		}
-		if (State & REPLACE_FLAG)
+		ఒకవేళ (State & REPLACE_FLAG)
 		    replace_do_bs(-1);
-		else
+		లేకపోతే
 		{
-		    if (enc_utf8 && p_deco)
-			(void)utfc_ptr2char(ml_get_cursor(), cpc);
-		    (void)del_char(FALSE);
+		    ఒకవేళ (enc_utf8 && p_deco)
+			(శూన్య)utfc_ptr2char(ml_get_cursor(), cpc);
+		    (శూన్య)del_char(FALSE);
 		    /*
 		     * If there are combining characters and 'delcombine' is set
 		     * move the cursor back.  Don't back up before the base
 		     * character.
 		     */
-		    if (enc_utf8 && p_deco && cpc[0] != NUL)
+		    ఒకవేళ (enc_utf8 && p_deco && cpc[0] != NUL)
 			inc_cursor();
-#ifdef FEAT_RIGHTLEFT
-		    if (revins_chars)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+		    ఒకవేళ (revins_chars)
 		    {
 			revins_chars--;
 			revins_legal++;
 		    }
-		    if (revins_on && gchar_cursor() == NUL)
-			break;
-#endif
+		    ఒకవేళ (revins_on && gchar_cursor() == NUL)
+			ఆపు;
+#అయితే_ముగింపు
 		}
 		// Just a single backspace?:
-		if (mode == BACKSPACE_CHAR)
-		    break;
-	    } while (
-#ifdef FEAT_RIGHTLEFT
+		ఒకవేళ (బహుళకం == BACKSPACE_CHAR)
+		    ఆపు;
+	    } అయితే (
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		    revins_on ||
-#endif
-		    (curwin->w_cursor.col > mincol
+#అయితే_ముగింపు
+		    (curwin->w_cursor.నిలువు > mincol
 		    &&  (can_bs(BS_NOSTOP)
 			|| (curwin->w_cursor.lnum != Insstart_orig.lnum
-			|| curwin->w_cursor.col != Insstart_orig.col)
+			|| curwin->w_cursor.నిలువు != Insstart_orig.నిలువు)
 		    )));
 	}
 	did_backspace = TRUE;
     }
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
-    if (curwin->w_cursor.col <= 1)
+    can_si_వెనుక = FALSE;
+    ఒకవేళ (curwin->w_cursor.నిలువు <= 1)
 	did_ai = FALSE;
 
-    if (call_fix_indent)
+    ఒకవేళ (call_fix_indent)
 	fix_indent();
 
     /*
@@ -4623,12 +4623,12 @@ ins_bs(
      * buffer, but it makes auto-indent a lot easier to deal
      * with.
      */
-    AppendCharToRedobuff(c);
+    Append_Char_గమ్యం_Redobuff(c);
 
     // If deleted before the insertion point, adjust it
-    if (curwin->w_cursor.lnum == Insstart_orig.lnum
-				  && curwin->w_cursor.col < Insstart_orig.col)
-	Insstart_orig.col = curwin->w_cursor.col;
+    ఒకవేళ (curwin->w_cursor.lnum == Insstart_orig.lnum
+				  && curwin->w_cursor.నిలువు < Insstart_orig.నిలువు)
+	Insstart_orig.నిలువు = curwin->w_cursor.నిలువు;
 
     // vi behaviour: the cursor moves backward but the character that
     //		     was there remains visible
@@ -4637,18 +4637,18 @@ ins_bs(
     // We can emulate the vi behaviour by pretending there is a dollar
     // displayed even when there isn't.
     //  --pkv Sun Jan 19 01:56:40 EST 2003
-    if (vim_strchr(p_cpo, CPO_BACKSPACE) != NULL && dollar_vcol == -1)
+    ఒకవేళ (vim_strchr(p_cpo, CPO_BACKSPACE) != ఖాళీ && dollar_vcol == -1)
 	dollar_vcol = curwin->w_virtcol;
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // When deleting a char the cursor line must never be in a closed fold.
     // E.g., when 'foldmethod' is indent and deleting the first non-white
     // char before a Tab.
-    if (did_backspace)
+    ఒకవేళ (did_backspace)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
-    return did_backspace;
+    తిరిగి did_backspace;
 }
 
 /*
@@ -4656,531 +4656,531 @@ ins_bs(
  * P_PE literally.
  * When "drop" is TRUE then consume the text and drop it.
  */
-    int
-bracketed_paste(paste_mode_T mode, int drop, garray_T *gap)
+    పూర్ణాంకం
+bracketed_paste(paste_బహుళకం_T బహుళకం, పూర్ణాంకం drop, garray_T *gap)
 {
-    int		c;
+    పూర్ణాంకం		c;
     char_u	buf[NUMBUFLEN + MB_MAXBYTES];
-    int		idx = 0;
-    char_u	*end = find_termcode((char_u *)"PE");
-    int		ret_char = -1;
-    int		save_allow_keys = allow_keys;
-    int		save_paste = p_paste;
+    పూర్ణాంకం		idx = 0;
+    char_u	*చివర = కనుగొను_termcode((char_u *)"PE");
+    పూర్ణాంకం		ret_char = -1;
+    పూర్ణాంకం		save_allow_కీలకాలు = allow_కీలకాలు;
+    పూర్ణాంకం		save_paste = p_paste;
 
     // If the end code is too long we can't detect it, read everything.
-    if (end != NULL && STRLEN(end) >= NUMBUFLEN)
-	end = NULL;
+    ఒకవేళ (చివర != ఖాళీ && STRLEN(చివర) >= NUMBUFLEN)
+	చివర = ఖాళీ;
     ++no_mapping;
-    allow_keys = 0;
-    if (!p_paste)
+    allow_కీలకాలు = 0;
+    ఒకవేళ (!p_paste)
 	// Also have the side effects of setting 'paste' to make it work much
 	// faster.
-	set_option_value_give_err((char_u *)"paste", TRUE, NULL, 0);
+	సమితి_option_విలువ_give_err((char_u *)"paste", TRUE, ఖాళీ, 0);
 
-    for (;;)
+    కొరకు (;;)
     {
 	// When the end is not defined read everything there is.
-	if (end == NULL && vpeekc() == NUL)
-	    break;
-	do
+	ఒకవేళ (చివర == ఖాళీ && vpeekc() == NUL)
+	    ఆపు;
+	చేయి
 	    c = vgetc();
-	while (c == K_IGNORE || c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR);
+	అయితే (c == K_IGNORE || c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR);
 
-	if (c == NUL || got_int || (ex_normal_busy > 0 && c == Ctrl_C))
+	ఒకవేళ (c == NUL || got_int || (ex_సాధారణ_busy > 0 && c == Ctrl_C))
 	    // When CTRL-C was encountered the typeahead will be flushed and we
 	    // won't get the end sequence.  Except when using ":normal".
-	    break;
+	    ఆపు;
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    idx += (*mb_char2bytes)(c, buf + idx);
-	else
+	లేకపోతే
 	    buf[idx++] = c;
 	buf[idx] = NUL;
-	if (end != NULL && STRNCMP(buf, end, idx) == 0)
+	ఒకవేళ (చివర != ఖాళీ && STRNCMP(buf, చివర, idx) == 0)
 	{
-	    if (end[idx] == NUL)
-		break; // Found the end of paste code.
-	    continue;
+	    ఒకవేళ (చివర[idx] == NUL)
+		ఆపు; // Found the end of paste code.
+	    కొనసాగు;
 	}
-	if (!drop)
+	ఒకవేళ (!drop)
 	{
-	    switch (mode)
+	    ఎంపిక (బహుళకం)
 	    {
-		case PASTE_CMDLINE:
+		స్థితి PASTE_CMDLINE:
 		    put_on_cmdline(buf, idx, TRUE);
-		    break;
+		    ఆపు;
 
-		case PASTE_EX:
+		స్థితి PASTE_EX:
 		    // add one for the NUL that is going to be appended
-		    if (gap != NULL && ga_grow(gap, idx + 1) == OK)
+		    ఒకవేళ (gap != ఖాళీ && ga_grow(gap, idx + 1) == OK)
 		    {
-			mch_memmove((char *)gap->ga_data + gap->ga_len,
+			mch_memmove((అక్షరం *)gap->ga_దత్తాంశం + gap->ga_len,
 							     buf, (size_t)idx);
 			gap->ga_len += idx;
 		    }
-		    break;
+		    ఆపు;
 
-		case PASTE_INSERT:
-		    if (stop_arrow() == OK)
+		స్థితి PASTE_చొప్పించు:
+		    ఒకవేళ (stop_arrow() == OK)
 		    {
 			c = buf[0];
-			if (idx == 1 && (c == CAR || c == K_KENTER || c == NL))
+			ఒకవేళ (idx == 1 && (c == CAR || c == K_KENTER || c == NL))
 			    ins_eol(c);
-			else
+			లేకపోతే
 			{
-			    ins_char_bytes(buf, idx);
-			    AppendToRedobuffLit(buf, idx);
+			    ins_char_బైట్లు(buf, idx);
+			    Append_గమ్యం_Redobuff_Lit(buf, idx);
 			}
 		    }
-		    break;
+		    ఆపు;
 
-		case PASTE_ONE_CHAR:
-		    if (ret_char == -1)
+		స్థితి PASTE_ONE_CHAR:
+		    ఒకవేళ (ret_char == -1)
 		    {
-			if (has_mbyte)
+			ఒకవేళ (has_mbyte)
 			    ret_char = (*mb_ptr2char)(buf);
-			else
+			లేకపోతే
 			    ret_char = buf[0];
 		    }
-		    break;
+		    ఆపు;
 	    }
 	}
 	idx = 0;
     }
 
     --no_mapping;
-    allow_keys = save_allow_keys;
-    if (!save_paste)
-	set_option_value_give_err((char_u *)"paste", FALSE, NULL, 0);
+    allow_కీలకాలు = save_allow_కీలకాలు;
+    ఒకవేళ (!save_paste)
+	సమితి_option_విలువ_give_err((char_u *)"paste", FALSE, ఖాళీ, 0);
 
-    return ret_char;
+    తిరిగి ret_char;
 }
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
-ins_tabline(int c)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+    స్థిర శూన్య
+ins_tabline(పూర్ణాంకం c)
 {
     // We will be leaving the current window, unless closing another tab.
-    if (c != K_TABMENU || current_tabmenu != TABLINE_MENU_CLOSE
-		|| (current_tab != 0 && current_tab != tabpage_index(curtab)))
+    ఒకవేళ (c != K_TABMENU || current_tabmenu != TABLINE_MENU_CLOSE
+		|| (current_tab != 0 && current_tab != tabpage_సూచీ(curtab)))
     {
 	undisplay_dollar();
-	start_arrow(&curwin->w_cursor);
+	ప్రారంభం_arrow(&curwin->w_cursor);
 	can_cindent = TRUE;
     }
 
-    if (c == K_TABLINE)
+    ఒకవేళ (c == K_TABLINE)
 	goto_tabpage(current_tab);
-    else
+    లేకపోతే
     {
 	handle_tabmenu();
 	redraw_statuslines();	// will redraw the tabline when needed
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI)
-    void
-ins_scroll(void)
+#ఒకవేళ defined(FEAT_GUI)
+    శూన్య
+ins_scroll(శూన్య)
 {
     pos_T	tpos;
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (gui_do_scroll())
+    ఒకవేళ (gui_do_scroll())
     {
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
 }
 
-    void
-ins_horscroll(void)
+    శూన్య
+ins_horscroll(శూన్య)
 {
     pos_T	tpos;
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (do_mousescroll_horiz(scrollbar_value))
+    ఒకవేళ (do_mousescroll_horiz(scrollbar_విలువ))
     {
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-ins_left(void)
+    స్థిర శూన్య
+ins_ఎడమ(శూన్య)
 {
     pos_T	tpos;
-    int		end_change = dont_sync_undo == FALSE; // end undoable change
+    పూర్ణాంకం		చివర_change = dont_sync_undo == FALSE; // end undoable change
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (oneleft() == OK)
+    ఒకవేళ (oneleft() == OK)
     {
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 	// Only call start_arrow() when not busy with preediting, it will
 	// break undo.  K_LEFT is inserted in im_correct_cursor().
-	if (p_imst == IM_OVER_THE_SPOT || !im_is_preediting())
-#endif
+	ఒకవేళ (p_imst == IM_OVER_THE_SPOT || !im_is_preediting())
+#అయితే_ముగింపు
 	{
-	    start_arrow_with_change(&tpos, end_change);
-	    if (!end_change)
-		AppendCharToRedobuff(K_LEFT);
+	    ప్రారంభం_arrow_with_change(&tpos, చివర_change);
+	    ఒకవేళ (!చివర_change)
+		Append_Char_గమ్యం_Redobuff(K_ఎడమ);
 	}
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	// If exit reversed string, position is fixed
-	if (revins_scol != -1 && (int)curwin->w_cursor.col >= revins_scol)
+	ఒకవేళ (revins_scol != -1 && (పూర్ణాంకం)curwin->w_cursor.నిలువు >= revins_scol)
 	    revins_legal++;
 	revins_chars++;
-#endif
+#అయితే_ముగింపు
     }
 
     /*
      * if 'whichwrap' set for cursor in insert mode may go to
      * previous line
      */
-    else if (vim_strchr(p_ww, '[') != NULL && curwin->w_cursor.lnum > 1)
+    లేకపోతే ఒకవేళ (vim_strchr(p_ww, '[') != ఖాళీ && curwin->w_cursor.lnum > 1)
     {
 	// always break undo when moving upwards/downwards, else undo may break
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	--(curwin->w_cursor.lnum);
 	coladvance((colnr_T)MAXCOL);
-	curwin->w_set_curswant = true;	// so we stay at the end
+	curwin->w_సమితి_curswant = true;	// so we stay at the end
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
     dont_sync_undo = FALSE;
 }
 
-    static void
-ins_home(int c)
+    స్థిర శూన్య
+ins_home(పూర్ణాంకం c)
 {
     pos_T	tpos;
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (c == K_C_HOME)
+    ఒకవేళ (c == K_C_HOME)
 	curwin->w_cursor.lnum = 1;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
     curwin->w_cursor.coladd = 0;
     curwin->w_curswant = 0;
-    start_arrow(&tpos);
+    ప్రారంభం_arrow(&tpos);
 }
 
-    static void
-ins_end(int c)
+    స్థిర శూన్య
+ins_చివర(పూర్ణాంకం c)
 {
     pos_T	tpos;
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (c == K_C_END)
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+    ఒకవేళ (c == K_C_చివర)
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
     coladvance((colnr_T)MAXCOL);
     curwin->w_curswant = MAXCOL;
 
-    start_arrow(&tpos);
+    ప్రారంభం_arrow(&tpos);
 }
 
-    static void
-ins_s_left(void)
+    స్థిర శూన్య
+ins_s_ఎడమ(శూన్య)
 {
-    int end_change = dont_sync_undo == FALSE; // end undoable change
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    పూర్ణాంకం చివర_change = dont_sync_undo == FALSE; // end undoable change
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
-    if (curwin->w_cursor.lnum > 1 || curwin->w_cursor.col > 0)
+    ఒకవేళ (curwin->w_cursor.lnum > 1 || curwin->w_cursor.నిలువు > 0)
     {
-	start_arrow_with_change(&curwin->w_cursor, end_change);
-	if (!end_change)
-	    AppendCharToRedobuff(K_S_LEFT);
-	(void)bck_word(1L, FALSE, FALSE);
-	curwin->w_set_curswant = true;
+	ప్రారంభం_arrow_with_change(&curwin->w_cursor, చివర_change);
+	ఒకవేళ (!చివర_change)
+	    Append_Char_గమ్యం_Redobuff(K_S_ఎడమ);
+	(శూన్య)bck_మాట(1L, FALSE, FALSE);
+	curwin->w_సమితి_curswant = true;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
     dont_sync_undo = FALSE;
 }
 
-    static void
-ins_right(void)
+    స్థిర శూన్య
+ins_కుడి(శూన్య)
 {
-    int end_change = dont_sync_undo == FALSE; // end undoable change
+    పూర్ణాంకం చివర_change = dont_sync_undo == FALSE; // end undoable change
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
-    if (gchar_cursor() != NUL || virtual_active())
+    ఒకవేళ (gchar_cursor() != NUL || virtual_చురుకైన())
     {
-	start_arrow_with_change(&curwin->w_cursor, end_change);
-	if (!end_change)
-	    AppendCharToRedobuff(K_RIGHT);
-	curwin->w_set_curswant = true;
-	if (virtual_active())
+	ప్రారంభం_arrow_with_change(&curwin->w_cursor, చివర_change);
+	ఒకవేళ (!చివర_change)
+	    Append_Char_గమ్యం_Redobuff(K_కుడి);
+	curwin->w_సమితి_curswant = true;
+	ఒకవేళ (virtual_చురుకైన())
 	    oneright();
-	else
+	లేకపోతే
 	{
-	    if (has_mbyte)
-		curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-	    else
-		++curwin->w_cursor.col;
+	    ఒకవేళ (has_mbyte)
+		curwin->w_cursor.నిలువు += (*mb_ptr2len)(ml_get_cursor());
+	    లేకపోతే
+		++curwin->w_cursor.నిలువు;
 	}
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	revins_legal++;
-	if (revins_chars)
+	ఒకవేళ (revins_chars)
 	    revins_chars--;
-#endif
+#అయితే_ముగింపు
     }
     // if 'whichwrap' set for cursor in insert mode, may move the
     // cursor to the next line
-    else if (vim_strchr(p_ww, ']') != NULL
-	    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+    లేకపోతే ఒకవేళ (vim_strchr(p_ww, ']') != ఖాళీ
+	    && curwin->w_cursor.lnum < curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	start_arrow(&curwin->w_cursor);
-	curwin->w_set_curswant = true;
+	ప్రారంభం_arrow(&curwin->w_cursor);
+	curwin->w_సమితి_curswant = true;
 	++curwin->w_cursor.lnum;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.నిలువు = 0;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
     dont_sync_undo = FALSE;
 }
 
-    static void
-ins_s_right(void)
+    స్థిర శూన్య
+ins_s_కుడి(శూన్య)
 {
-    int end_change = dont_sync_undo == FALSE; // end undoable change
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    పూర్ణాంకం చివర_change = dont_sync_undo == FALSE; // end undoable change
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_HOR) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
     undisplay_dollar();
-    if (curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count
+    ఒకవేళ (curwin->w_cursor.lnum < curbuf->b_ml.ml_పంక్తి_లెక్క
 	    || gchar_cursor() != NUL)
     {
-	start_arrow_with_change(&curwin->w_cursor, end_change);
-	if (!end_change)
-	    AppendCharToRedobuff(K_S_RIGHT);
-	(void)fwd_word(1L, FALSE, 0);
-	curwin->w_set_curswant = true;
+	ప్రారంభం_arrow_with_change(&curwin->w_cursor, చివర_change);
+	ఒకవేళ (!చివర_change)
+	    Append_Char_గమ్యం_Redobuff(K_S_కుడి);
+	(శూన్య)fwd_మాట(1L, FALSE, 0);
+	curwin->w_సమితి_curswant = true;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
     dont_sync_undo = FALSE;
 }
 
-    static void
-ins_up(
-    int		startcol)	// when TRUE move to Insstart.col
+    స్థిర శూన్య
+ins_పైకి(
+    పూర్ణాంకం		startcol)	// when TRUE move to Insstart.col
 {
     pos_T	tpos;
     linenr_T	old_topline = curwin->w_topline;
-#ifdef FEAT_DIFF
-    int		old_topfill = curwin->w_topfill;
-#endif
+#నిర్వచితమైతే FEAT_DIFF
+    పూర్ణాంకం		old_topfill = curwin->w_topfill;
+#అయితే_ముగింపు
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (cursor_up(1L, TRUE) == OK)
+    ఒకవేళ (cursor_పైకి(1L, TRUE) == OK)
     {
-	if (startcol)
+	ఒకవేళ (startcol)
 	    coladvance(getvcol_nolist(&Insstart));
-	if (old_topline != curwin->w_topline
-#ifdef FEAT_DIFF
+	ఒకవేళ (old_topline != curwin->w_topline
+#నిర్వచితమైతే FEAT_DIFF
 		|| old_topfill != curwin->w_topfill
-#endif
+#అయితే_ముగింపు
 		)
 	    redraw_later(UPD_VALID);
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
 }
 
-    static void
-ins_pageup(void)
+    స్థిర శూన్య
+ins_pageup(శూన్య)
 {
     pos_T	tpos;
 
     undisplay_dollar();
 
-    if (mod_mask & MOD_MASK_CTRL)
+    ఒకవేళ (mod_ముసుగు & MOD_ముసుగు_CTRL)
     {
 	// <C-PageUp>: tab page back
-	if (first_tabpage->tp_next != NULL)
+	ఒకవేళ (మొదటి_tabpage->tp_తదుపరి != ఖాళీ)
 	{
-	    start_arrow(&curwin->w_cursor);
+	    ప్రారంభం_arrow(&curwin->w_cursor);
 	    goto_tabpage(-1);
 	}
-	return;
+	తిరిగి;
     }
 
     tpos = curwin->w_cursor;
-    if (pagescroll(BACKWARD, 1L, FALSE) == OK)
+    ఒకవేళ (pagescroll(BACKWARD, 1L, FALSE) == OK)
     {
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
 }
 
-    static void
-ins_down(
-    int		startcol)	// when TRUE move to Insstart.col
+    స్థిర శూన్య
+ins_కిందికి(
+    పూర్ణాంకం		startcol)	// when TRUE move to Insstart.col
 {
     pos_T	tpos;
     linenr_T	old_topline = curwin->w_topline;
-#ifdef FEAT_DIFF
-    int		old_topfill = curwin->w_topfill;
-#endif
+#నిర్వచితమైతే FEAT_DIFF
+    పూర్ణాంకం		old_topfill = curwin->w_topfill;
+#అయితే_ముగింపు
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (cursor_down(1L, TRUE) == OK)
+    ఒకవేళ (cursor_కిందికి(1L, TRUE) == OK)
     {
-	if (startcol)
+	ఒకవేళ (startcol)
 	    coladvance(getvcol_nolist(&Insstart));
-	if (old_topline != curwin->w_topline
-#ifdef FEAT_DIFF
+	ఒకవేళ (old_topline != curwin->w_topline
+#నిర్వచితమైతే FEAT_DIFF
 		|| old_topfill != curwin->w_topfill
-#endif
+#అయితే_ముగింపు
 		)
 	    redraw_later(UPD_VALID);
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
 }
 
-    static void
-ins_pagedown(void)
+    స్థిర శూన్య
+ins_pagedown(శూన్య)
 {
     pos_T	tpos;
 
     undisplay_dollar();
 
-    if (mod_mask & MOD_MASK_CTRL)
+    ఒకవేళ (mod_ముసుగు & MOD_ముసుగు_CTRL)
     {
 	// <C-PageDown>: tab page forward
-	if (first_tabpage->tp_next != NULL)
+	ఒకవేళ (మొదటి_tabpage->tp_తదుపరి != ఖాళీ)
 	{
-	    start_arrow(&curwin->w_cursor);
+	    ప్రారంభం_arrow(&curwin->w_cursor);
 	    goto_tabpage(0);
 	}
-	return;
+	తిరిగి;
     }
 
     tpos = curwin->w_cursor;
-    if (pagescroll(FORWARD, 1L, FALSE) == OK)
+    ఒకవేళ (pagescroll(FORWARD, 1L, FALSE) == OK)
     {
-	start_arrow(&tpos);
+	ప్రారంభం_arrow(&tpos);
 	can_cindent = TRUE;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_CRSR);
 }
 
-#ifdef FEAT_DND
-    static void
-ins_drop(void)
+#నిర్వచితమైతే FEAT_DND
+    స్థిర శూన్య
+ins_drop(శూన్య)
 {
-    do_put('~', NULL, BACKWARD, 1L, PUT_CURSEND);
+    do_put('~', ఖాళీ, BACKWARD, 1L, PUT_CURSEND);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Handle TAB in Insert or Replace mode.
  * Return TRUE when the TAB needs to be inserted like a normal character.
  */
-    static int
-ins_tab(void)
+    స్థిర పూర్ణాంకం
+ins_tab(శూన్య)
 {
-    int		ind;
-    int		i;
-    int		temp;
+    పూర్ణాంకం		ind;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		తాత్కాలిక;
 
-    if (Insstart_blank_vcol == MAXCOL && curwin->w_cursor.lnum == Insstart.lnum)
+    ఒకవేళ (Insstart_blank_vcol == MAXCOL && curwin->w_cursor.lnum == Insstart.lnum)
 	Insstart_blank_vcol = get_nolist_virtcol();
-    if (echeck_abbr(TAB + ABBR_OFF))
-	return FALSE;
+    ఒకవేళ (echeck_abbr(TAB + ABBR_OFF))
+	తిరిగి FALSE;
 
     ind = inindent(0);
-    if (ind)
+    ఒకవేళ (ind)
 	can_cindent = FALSE;
 
     /*
      * When nothing special, insert TAB like a normal character.
      */
-    if (!curbuf->b_p_et
-#ifdef FEAT_VARTABS
+    ఒకవేళ (!curbuf->b_p_et
+#నిర్వచితమైతే FEAT_VARTABS
 	    && !(p_sta && ind
 		// These five lines mean 'tabstop' != 'shiftwidth'
-		&& ((tabstop_count(curbuf->b_p_vts_array) > 1)
-		    || (tabstop_count(curbuf->b_p_vts_array) == 1
-			&& tabstop_first(curbuf->b_p_vts_array)
-						       != get_sw_value(curbuf))
-		    || (tabstop_count(curbuf->b_p_vts_array) == 0
-			&& curbuf->b_p_ts != get_sw_value(curbuf))))
-	    && tabstop_count(curbuf->b_p_vsts_array) == 0
-#else
-	    && !(p_sta && ind && curbuf->b_p_ts != get_sw_value(curbuf))
-#endif
-	    && get_sts_value() == 0)
-	return TRUE;
+		&& ((tabstop_లెక్క(curbuf->b_p_vts_array) > 1)
+		    || (tabstop_లెక్క(curbuf->b_p_vts_array) == 1
+			&& tabstop_మొదటి(curbuf->b_p_vts_array)
+						       != get_sw_విలువ(curbuf))
+		    || (tabstop_లెక్క(curbuf->b_p_vts_array) == 0
+			&& curbuf->b_p_ts != get_sw_విలువ(curbuf))))
+	    && tabstop_లెక్క(curbuf->b_p_vsts_array) == 0
+#లేకపోతే
+	    && !(p_sta && ind && curbuf->b_p_ts != get_sw_విలువ(curbuf))
+#అయితే_ముగింపు
+	    && get_sts_విలువ() == 0)
+	తిరిగి TRUE;
 
-    if (stop_arrow() == FAIL)
-	return TRUE;
+    ఒకవేళ (stop_arrow() == FAIL)
+	తిరిగి TRUE;
 
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
-    AppendToRedobuff((char_u *)"\t");
+    can_si_వెనుక = FALSE;
+    Append_గమ్యం_Redobuff((char_u *)"\t");
 
-#ifdef FEAT_VARTABS
-    if (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
+#నిర్వచితమైతే FEAT_VARTABS
+    ఒకవేళ (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
     {
-	temp = (int)get_sw_value(curbuf);
-	temp -= get_nolist_virtcol() % temp;
+	తాత్కాలిక = (పూర్ణాంకం)get_sw_విలువ(curbuf);
+	తాత్కాలిక -= get_nolist_virtcol() % తాత్కాలిక;
     }
-    else if (tabstop_count(curbuf->b_p_vsts_array) > 0 || curbuf->b_p_sts != 0)
+    లేకపోతే ఒకవేళ (tabstop_లెక్క(curbuf->b_p_vsts_array) > 0 || curbuf->b_p_sts != 0)
 				// use 'softtabstop' when set
-	temp = tabstop_padding(get_nolist_virtcol(), get_sts_value(),
+	తాత్కాలిక = tabstop_padding(get_nolist_virtcol(), get_sts_విలువ(),
 						     curbuf->b_p_vsts_array);
-    else			// otherwise use 'tabstop'
-	temp = tabstop_padding(get_nolist_virtcol(), curbuf->b_p_ts,
+    లేకపోతే			// otherwise use 'tabstop'
+	తాత్కాలిక = tabstop_padding(get_nolist_virtcol(), curbuf->b_p_ts,
 						     curbuf->b_p_vts_array);
-#else
-    if (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
-	temp = (int)get_sw_value(curbuf);
-    else if (curbuf->b_p_sts != 0) // use 'softtabstop' when set
-	temp = (int)get_sts_value();
-    else			// otherwise use 'tabstop'
-	temp = (int)curbuf->b_p_ts;
-    temp -= get_nolist_virtcol() % temp;
-#endif
+#లేకపోతే
+    ఒకవేళ (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
+	తాత్కాలిక = (పూర్ణాంకం)get_sw_విలువ(curbuf);
+    లేకపోతే ఒకవేళ (curbuf->b_p_sts != 0) // use 'softtabstop' when set
+	తాత్కాలిక = (పూర్ణాంకం)get_sts_విలువ();
+    లేకపోతే			// otherwise use 'tabstop'
+	తాత్కాలిక = (పూర్ణాంకం)curbuf->b_p_ts;
+    తాత్కాలిక -= get_nolist_virtcol() % తాత్కాలిక;
+#అయితే_ముగింపు
 
     /*
      * Insert the first space with ins_char().	It will delete one char in
@@ -5188,37 +5188,37 @@ ins_tab(void)
      * chars.  For MODE_VREPLACE state, we use ins_char() for all characters.
      */
     ins_char(' ');
-    while (--temp > 0)
+    అయితే (--తాత్కాలిక > 0)
     {
-	if (State & VREPLACE_FLAG)
+	ఒకవేళ (State & VREPLACE_FLAG)
 	    ins_char(' ');
-	else
+	లేకపోతే
 	{
 	    ins_str((char_u *)" ", 1);
-	    if (State & REPLACE_FLAG)	    // no char replaced
-		replace_push(NUL);
+	    ఒకవేళ (State & REPLACE_FLAG)	    // no char replaced
+		replace_నెట్టు(NUL);
 	}
     }
 
     /*
      * When 'expandtab' not set: Replace spaces by TABs where possible.
      */
-#ifdef FEAT_VARTABS
-    if (!curbuf->b_p_et && (tabstop_count(curbuf->b_p_vsts_array) > 0
-			    || get_sts_value() > 0
+#నిర్వచితమైతే FEAT_VARTABS
+    ఒకవేళ (!curbuf->b_p_et && (tabstop_లెక్క(curbuf->b_p_vsts_array) > 0
+			    || get_sts_విలువ() > 0
 			    || (p_sta && ind)))
-#else
-    if (!curbuf->b_p_et && (get_sts_value() || (p_sta && ind)))
-#endif
+#లేకపోతే
+    ఒకవేళ (!curbuf->b_p_et && (get_sts_విలువ() || (p_sta && ind)))
+#అయితే_ముగింపు
     {
 	char_u		*ptr;
-	char_u		*saved_line = NULL;	// init for GCC
+	char_u		*saved_పంక్తి = ఖాళీ;	// init for GCC
 	pos_T		pos;
 	pos_T		fpos;
 	pos_T		*cursor;
 	colnr_T		want_vcol, vcol;
-	int		change_col = -1;
-	int		save_list = curwin->w_p_list;
+	పూర్ణాంకం		change_నిలువు = -1;
+	పూర్ణాంకం		save_list = curwin->w_p_list;
 	char_u		*tab = (char_u *)"\t";
 	chartabsize_T	cts;
 
@@ -5226,80 +5226,80 @@ ins_tab(void)
 	 * Get the current line.  For MODE_VREPLACE state, don't make real
 	 * changes yet, just work on a copy of the line.
 	 */
-	if (State & VREPLACE_FLAG)
+	ఒకవేళ (State & VREPLACE_FLAG)
 	{
 	    pos = curwin->w_cursor;
 	    cursor = &pos;
-	    saved_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	    if (saved_line == NULL)
-		return FALSE;
-	    ptr = saved_line + pos.col;
+	    saved_పంక్తి = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	    ఒకవేళ (saved_పంక్తి == ఖాళీ)
+		తిరిగి FALSE;
+	    ptr = saved_పంక్తి + pos.నిలువు;
 	}
-	else
+	లేకపోతే
 	{
 	    ptr = ml_get_cursor();
 	    cursor = &curwin->w_cursor;
 	}
 
 	// When 'L' is not in 'cpoptions' a tab always takes up 'ts' spaces.
-	if (vim_strchr(p_cpo, CPO_LISTWM) == NULL)
+	ఒకవేళ (vim_strchr(p_cpo, CPO_LISTWM) == ఖాళీ)
 	    curwin->w_p_list = FALSE;
 
 	// Find first white before the cursor
 	fpos = curwin->w_cursor;
-	while (fpos.col > 0 && VIM_ISWHITE(ptr[-1]))
+	అయితే (fpos.నిలువు > 0 && VIM_ISWHITE(ptr[-1]))
 	{
-	    --fpos.col;
+	    --fpos.నిలువు;
 	    --ptr;
 	}
 
 	// In Replace mode, don't change characters before the insert point.
-	if ((State & REPLACE_FLAG)
+	ఒకవేళ ((State & REPLACE_FLAG)
 		&& fpos.lnum == Insstart.lnum
-		&& fpos.col < Insstart.col)
+		&& fpos.నిలువు < Insstart.నిలువు)
 	{
-	    ptr += Insstart.col - fpos.col;
-	    fpos.col = Insstart.col;
+	    ptr += Insstart.నిలువు - fpos.నిలువు;
+	    fpos.నిలువు = Insstart.నిలువు;
 	}
 
 	// compute virtual column numbers of first white and cursor
-	getvcol(curwin, &fpos, &vcol, NULL, NULL, 0);
-	getvcol(curwin, cursor, &want_vcol, NULL, NULL, 0);
+	getvcol(curwin, &fpos, &vcol, ఖాళీ, ఖాళీ, 0);
+	getvcol(curwin, cursor, &want_vcol, ఖాళీ, ఖాళీ, 0);
 
 	init_chartabsize_arg(&cts, curwin, 0, vcol, tab, tab);
 
 	// Use as many TABs as possible.  Beware of 'breakindent', 'showbreak'
 	// and 'linebreak' adding extra virtual columns.
-	while (VIM_ISWHITE(*ptr))
+	అయితే (VIM_ISWHITE(*ptr))
 	{
 	    i = lbr_chartabsize(&cts);
-	    if (cts.cts_vcol + i > want_vcol)
-		break;
-	    if (*ptr != TAB)
+	    ఒకవేళ (cts.cts_vcol + i > want_vcol)
+		ఆపు;
+	    ఒకవేళ (*ptr != TAB)
 	    {
 		*ptr = TAB;
-		if (change_col < 0)
+		ఒకవేళ (change_నిలువు < 0)
 		{
-		    change_col = fpos.col;  // Column of first change
+		    change_నిలువు = fpos.నిలువు;  // Column of first change
 		    // May have to adjust Insstart
-		    if (fpos.lnum == Insstart.lnum && fpos.col < Insstart.col)
-			Insstart.col = fpos.col;
+		    ఒకవేళ (fpos.lnum == Insstart.lnum && fpos.నిలువు < Insstart.నిలువు)
+			Insstart.నిలువు = fpos.నిలువు;
 		}
 	    }
-	    ++fpos.col;
+	    ++fpos.నిలువు;
 	    ++ptr;
 	    cts.cts_vcol += i;
 	}
 	vcol = cts.cts_vcol;
 	clear_chartabsize_arg(&cts);
 
-	if (change_col >= 0)
+	ఒకవేళ (change_నిలువు >= 0)
 	{
-	    int		    repl_off = 0;
+	    పూర్ణాంకం		    repl_off = 0;
 
 	    // Skip over the spaces we need.
 	    init_chartabsize_arg(&cts, curwin, 0, vcol, ptr, ptr);
-	    while (cts.cts_vcol < want_vcol && *cts.cts_ptr == ' ')
+	    అయితే (cts.cts_vcol < want_vcol && *cts.cts_ptr == ' ')
 	    {
 		cts.cts_vcol += lbr_chartabsize(&cts);
 		++cts.cts_ptr;
@@ -5309,98 +5309,98 @@ ins_tab(void)
 	    vcol = cts.cts_vcol;
 	    clear_chartabsize_arg(&cts);
 
-	    if (vcol > want_vcol)
+	    ఒకవేళ (vcol > want_vcol)
 	    {
 		// Must have a char with 'showbreak' just before it.
 		--ptr;
 		--repl_off;
 	    }
-	    fpos.col += repl_off;
+	    fpos.నిలువు += repl_off;
 
 	    // Delete following spaces.
-	    i = cursor->col - fpos.col;
-	    if (i > 0)
+	    i = cursor->నిలువు - fpos.నిలువు;
+	    ఒకవేళ (i > 0)
 	    {
-#ifdef FEAT_PROP_POPUP
-		if (!(State & VREPLACE_FLAG))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+		ఒకవేళ (!(State & VREPLACE_FLAG))
 		{
 		    char_u  *newp;
-		    int	    col;
+		    పూర్ణాంకం	    నిలువు;
 
-		    newp = alloc(curbuf->b_ml.ml_line_len - i);
-		    if (newp == NULL)
-			return FALSE;
+		    newp = alloc(curbuf->b_ml.ml_పంక్తి_len - i);
+		    ఒకవేళ (newp == ఖాళీ)
+			తిరిగి FALSE;
 
-		    col = ptr - curbuf->b_ml.ml_line_ptr;
-		    if (col > 0)
-			mch_memmove(newp, ptr - col, col);
-		    mch_memmove(newp + col, ptr + i,
-					   curbuf->b_ml.ml_line_len - col - i);
+		    నిలువు = ptr - curbuf->b_ml.ml_పంక్తి_ptr;
+		    ఒకవేళ (నిలువు > 0)
+			mch_memmove(newp, ptr - నిలువు, నిలువు);
+		    mch_memmove(newp + నిలువు, ptr + i,
+					   curbuf->b_ml.ml_పంక్తి_len - నిలువు - i);
 
-		    if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-			vim_free(curbuf->b_ml.ml_line_ptr);
-		    curbuf->b_ml.ml_line_ptr = newp;
-		    curbuf->b_ml.ml_line_len -= i;
-		    curbuf->b_ml.ml_line_textlen = 0;
+		    ఒకవేళ (curbuf->b_ml.ml_flags & (ML_పంక్తి_DIRTY | ML_ALLOCATED))
+			vim_free(curbuf->b_ml.ml_పంక్తి_ptr);
+		    curbuf->b_ml.ml_పంక్తి_ptr = newp;
+		    curbuf->b_ml.ml_పంక్తి_len -= i;
+		    curbuf->b_ml.ml_పంక్తి_textlen = 0;
 		    curbuf->b_ml.ml_flags =
-			   (curbuf->b_ml.ml_flags | ML_LINE_DIRTY) & ~ML_EMPTY;
+			   (curbuf->b_ml.ml_flags | ML_పంక్తి_DIRTY) & ~ML_ఖాళీలు;
 		}
-		else
-#endif
+		లేకపోతే
+#అయితే_ముగింపు
 		    STRMOVE(ptr, ptr + i);
 		// correct replace stack.
-		if ((State & REPLACE_FLAG) && !(State & VREPLACE_FLAG))
-		    for (temp = i; --temp >= 0; )
+		ఒకవేళ ((State & REPLACE_FLAG) && !(State & VREPLACE_FLAG))
+		    కొరకు (తాత్కాలిక = i; --తాత్కాలిక >= 0; )
 			replace_join(repl_off);
 	    }
-#ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active())
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	    ఒకవేళ (netbeans_చురుకైన())
 	    {
-		netbeans_removed(curbuf, fpos.lnum, cursor->col, (long)(i + 1));
-		netbeans_inserted(curbuf, fpos.lnum, cursor->col,
+		netbeans_removed(curbuf, fpos.lnum, cursor->నిలువు, (దీర్ఘ)(i + 1));
+		netbeans_inserted(curbuf, fpos.lnum, cursor->నిలువు,
 							   (char_u *)"\t", 1);
 	    }
-#endif
-	    cursor->col -= i;
+#అయితే_ముగింపు
+	    cursor->నిలువు -= i;
 
 	    /*
 	     * In MODE_VREPLACE state, we haven't changed anything yet.  Do it
 	     * now by backspacing over the changed spacing and then inserting
 	     * the new spacing.
 	     */
-	    if (State & VREPLACE_FLAG)
+	    ఒకవేళ (State & VREPLACE_FLAG)
 	    {
 		// Backspace from real cursor to change_col
-		backspace_until_column(change_col);
+		backspace_until_స్తంభం(change_నిలువు);
 
 		// Insert each char in saved_line from changed_col to
 		// ptr-cursor
-		ins_bytes_len(saved_line + change_col,
-						    cursor->col - change_col);
+		ins_బైట్లు_len(saved_పంక్తి + change_నిలువు,
+						    cursor->నిలువు - change_నిలువు);
 	    }
 	}
 
-	if (State & VREPLACE_FLAG)
-	    vim_free(saved_line);
+	ఒకవేళ (State & VREPLACE_FLAG)
+	    vim_free(saved_పంక్తి);
 	curwin->w_p_list = save_list;
     }
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Handle CR or NL in insert mode.
  * Return FAIL when out of memory or can't undo.
  */
-    int
-ins_eol(int c)
+    పూర్ణాంకం
+ins_eol(పూర్ణాంకం c)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    if (echeck_abbr(c + ABBR_OFF))
-	return OK;
-    if (stop_arrow() == FAIL)
-	return FAIL;
+    ఒకవేళ (echeck_abbr(c + ABBR_OFF))
+	తిరిగి OK;
+    ఒకవేళ (stop_arrow() == FAIL)
+	తిరిగి FAIL;
     undisplay_dollar();
 
     /*
@@ -5408,8 +5408,8 @@ ins_eol(int c)
      * character under the cursor.  Only push a NUL on the replace stack,
      * nothing to put back when the NL is deleted.
      */
-    if ((State & REPLACE_FLAG) && !(State & VREPLACE_FLAG))
-	replace_push(NUL);
+    ఒకవేళ ((State & REPLACE_FLAG) && !(State & VREPLACE_FLAG))
+	replace_నెట్టు(NUL);
 
     /*
      * In MODE_VREPLACE state, a NL replaces the rest of the line, and starts
@@ -5420,52 +5420,52 @@ ins_eol(int c)
 
     // Put cursor on NUL if on the last char and coladd is 1 (happens after
     // CTRL-O).
-    if (virtual_active() && curwin->w_cursor.coladd > 0)
+    ఒకవేళ (virtual_చురుకైన() && curwin->w_cursor.coladd > 0)
 	coladvance(getviscol());
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     // NL in reverse insert will always start in the end of
     // current line.
-    if (revins_on)
-	curwin->w_cursor.col += ml_get_cursor_len();
-#endif
+    ఒకవేళ (revins_on)
+	curwin->w_cursor.నిలువు += ml_get_cursor_len();
+#అయితే_ముగింపు
 
-    AppendToRedobuff(NL_STR);
-    i = open_line(FORWARD,
+    Append_గమ్యం_Redobuff(NL_STR);
+    i = open_పంక్తి(FORWARD,
 	    has_format_option(FO_RET_COMS) ? OPENLINE_DO_COM : 0, old_indent,
-	    NULL);
+	    ఖాళీ);
     old_indent = 0;
     can_cindent = TRUE;
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // When inserting a line the cursor line must never be in a closed fold.
     foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
-    return i;
+    తిరిగి i;
 }
 
-#ifdef FEAT_DIGRAPHS
+#నిర్వచితమైతే FEAT_DIGRAPHS
 /*
  * Handle digraph in insert mode.
  * Returns character still to be inserted, or NUL when nothing remaining to be
  * done.
  */
-    static int
-ins_digraph(void)
+    స్థిర పూర్ణాంకం
+ins_digraph(శూన్య)
 {
-    int	    c;
-    int	    cc;
-    int	    did_putchar = FALSE;
+    పూర్ణాంకం	    c;
+    పూర్ణాంకం	    cc;
+    పూర్ణాంకం	    did_putchar = FALSE;
 
-    pc_status = PC_STATUS_UNSET;
-    if (redrawing() && !char_avail())
+    pc_స్థితి = PC_స్థితి_UNSET;
+    ఒకవేళ (redrawing() && !char_avail())
     {
 	// may need to redraw when no more chars available now
 	ins_redraw(FALSE);
 
 	edit_putchar('?', TRUE);
 	did_putchar = TRUE;
-	add_to_showcmd_c(Ctrl_K);
+	కూడు_గమ్యం_showcmd_c(Ctrl_K);
     }
 
 # ifdef USE_ON_FLY_SCROLL
@@ -5475,141 +5475,141 @@ ins_digraph(void)
     // don't map the digraph chars. This also prevents the
     // mode message to be deleted when ESC is hit
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
-    if (did_putchar)
+    --allow_కీలకాలు;
+    ఒకవేళ (did_putchar)
 	// when the line fits in 'columns' the '?' is at the start of the next
 	// line and will not be removed by the redraw
 	edit_unputchar();
 
-    if (IS_SPECIAL(c) || mod_mask)	    // special key
+    ఒకవేళ (IS_SPECIAL(c) || mod_ముసుగు)	    // special key
     {
 	clear_showcmd();
-	insert_special(c, TRUE, FALSE);
-	return NUL;
+	చొప్పించు_special(c, TRUE, FALSE);
+	తిరిగి NUL;
     }
-    if (c != ESC)
+    ఒకవేళ (c != ESC)
     {
 	did_putchar = FALSE;
-	if (redrawing() && !char_avail())
+	ఒకవేళ (redrawing() && !char_avail())
 	{
 	    // may need to redraw when no more chars available now
 	    ins_redraw(FALSE);
 
-	    if (char2cells(c) == 1)
+	    ఒకవేళ (char2cells(c) == 1)
 	    {
 		ins_redraw(FALSE);
 		edit_putchar(c, TRUE);
 		did_putchar = TRUE;
 	    }
-	    add_to_showcmd_c(c);
+	    కూడు_గమ్యం_showcmd_c(c);
 	}
 	++no_mapping;
-	++allow_keys;
+	++allow_కీలకాలు;
 	cc = plain_vgetc();
 	--no_mapping;
-	--allow_keys;
-	if (did_putchar)
+	--allow_కీలకాలు;
+	ఒకవేళ (did_putchar)
 	    // when the line fits in 'columns' the '?' is at the start of the
 	    // next line and will not be removed by a redraw
 	    edit_unputchar();
-	if (cc != ESC)
+	ఒకవేళ (cc != ESC)
 	{
-	    AppendToRedobuff((char_u *)CTRL_V_STR);
+	    Append_గమ్యం_Redobuff((char_u *)CTRL_V_STR);
 	    c = digraph_get(c, cc, TRUE);
 	    clear_showcmd();
-	    return c;
+	    తిరిగి c;
 	}
     }
     clear_showcmd();
-    return NUL;
+    తిరిగి NUL;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Handle CTRL-E and CTRL-Y in Insert mode: copy char from other line.
  * Returns the char to be inserted, or NUL if none found.
  */
-    int
+    పూర్ణాంకం
 ins_copychar(linenr_T lnum)
 {
-    int		    c;
+    పూర్ణాంకం		    c;
     char_u	    *ptr, *prev_ptr;
-    char_u	    *line;
+    char_u	    *పంక్తి;
     chartabsize_T   cts;
 
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (lnum < 1 || lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
 	vim_beep(BO_COPY);
-	return NUL;
+	తిరిగి NUL;
     }
 
     // try to advance to the cursor column
     validate_virtcol();
-    line = ml_get(lnum);
-    prev_ptr = line;
-    init_chartabsize_arg(&cts, curwin, lnum, 0, line, line);
-    while (cts.cts_vcol < curwin->w_virtcol && *cts.cts_ptr != NUL)
+    పంక్తి = ml_get(lnum);
+    prev_ptr = పంక్తి;
+    init_chartabsize_arg(&cts, curwin, lnum, 0, పంక్తి, పంక్తి);
+    అయితే (cts.cts_vcol < curwin->w_virtcol && *cts.cts_ptr != NUL)
     {
 	prev_ptr = cts.cts_ptr;
 	cts.cts_vcol += lbr_chartabsize_adv(&cts);
     }
-    if (cts.cts_vcol > curwin->w_virtcol)
+    ఒకవేళ (cts.cts_vcol > curwin->w_virtcol)
 	ptr = prev_ptr;
-    else
+    లేకపోతే
 	ptr = cts.cts_ptr;
     clear_chartabsize_arg(&cts);
 
     c = (*mb_ptr2char)(ptr);
-    if (c == NUL)
+    ఒకవేళ (c == NUL)
 	vim_beep(BO_COPY);
-    return c;
+    తిరిగి c;
 }
 
 /*
  * CTRL-Y or CTRL-E typed in Insert mode.
  */
-    static int
-ins_ctrl_ey(int tc)
+    స్థిర పూర్ణాంకం
+ins_ctrl_ey(పూర్ణాంకం tc)
 {
-    int	    c = tc;
+    పూర్ణాంకం	    c = tc;
 
-    if (ctrl_x_mode_scroll())
+    ఒకవేళ (ctrl_x_బహుళకం_scroll())
     {
-	if (c == Ctrl_Y)
+	ఒకవేళ (c == Ctrl_Y)
 	    scrolldown_clamp();
-	else
+	లేకపోతే
 	    scrollup_clamp();
 	redraw_later(UPD_VALID);
     }
-    else
+    లేకపోతే
     {
 	c = ins_copychar(curwin->w_cursor.lnum + (c == Ctrl_Y ? -1 : 1));
-	if (c != NUL)
+	ఒకవేళ (c != NUL)
 	{
-	    long	tw_save;
+	    దీర్ఘ	tw_save;
 
 	    // The character must be taken literally, insert like it
 	    // was typed after a CTRL-V, and pretend 'textwidth'
 	    // wasn't set.  Digits, 'o' and 'x' are special after a
 	    // CTRL-V, don't use it for these.
-	    if (c < 256 && !SAFE_isalnum(c))
-		AppendToRedobuff((char_u *)CTRL_V_STR);	// CTRL-V
+	    ఒకవేళ (c < 256 && !సురక్షిత_isalnum(c))
+		Append_గమ్యం_Redobuff((char_u *)CTRL_V_STR);	// CTRL-V
 	    tw_save = curbuf->b_p_tw;
 	    curbuf->b_p_tw = -1;
-	    insert_special(c, TRUE, FALSE);
+	    చొప్పించు_special(c, TRUE, FALSE);
 	    curbuf->b_p_tw = tw_save;
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    revins_chars++;
 	    revins_legal++;
-#endif
+#అయితే_ముగింపు
 	    c = Ctrl_V;	// pretend CTRL-V is last character
 	    auto_format(FALSE, TRUE);
 	}
     }
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -5617,44 +5617,44 @@ ins_ctrl_ey(int tc)
  * Unless 'cpo' contains the 'L' flag.
  */
     colnr_T
-get_nolist_virtcol(void)
+get_nolist_virtcol(శూన్య)
 {
     // check validity of cursor in current buffer
-    if (curwin->w_buffer == NULL
-	|| curwin->w_buffer->b_ml.ml_mfp == NULL
-	|| curwin->w_cursor.lnum > curwin->w_buffer->b_ml.ml_line_count)
-	return 0;
-    if (curwin->w_p_list && vim_strchr(p_cpo, CPO_LISTWM) == NULL)
-	return getvcol_nolist(&curwin->w_cursor);
+    ఒకవేళ (curwin->w_బఫరు == ఖాళీ
+	|| curwin->w_బఫరు->b_ml.ml_mfp == ఖాళీ
+	|| curwin->w_cursor.lnum > curwin->w_బఫరు->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి 0;
+    ఒకవేళ (curwin->w_p_list && vim_strchr(p_cpo, CPO_LISTWM) == ఖాళీ)
+	తిరిగి getvcol_nolist(&curwin->w_cursor);
     validate_virtcol();
-    return curwin->w_virtcol;
+    తిరిగి curwin->w_virtcol;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Handle the InsertCharPre autocommand.
  * "c" is the character that was typed.
  * Return a pointer to allocated memory with the replacement string.
  * Return NULL to continue inserting "c".
  */
-    static char_u *
-do_insert_char_pre(int c)
+    స్థిర char_u *
+do_చొప్పించు_char_pre(పూర్ణాంకం c)
 {
     char_u	*res;
     char_u	buf[MB_MAXBYTES + 1];
     size_t	buflen;
-    int		save_State = State;
+    పూర్ణాంకం		save_State = State;
 
     // Return quickly when there is nothing to do.
-    if (!has_insertcharpre())
-	return NULL;
+    ఒకవేళ (!has_insertcharpre())
+	తిరిగి ఖాళీ;
 
-    if (c == Ctrl_RSB)
-	return NULL;
+    ఒకవేళ (c == Ctrl_RSB)
+	తిరిగి ఖాళీ;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
 	buflen = (*mb_char2bytes)(c, buf);
-    else
+    లేకపోతే
     {
 	buf[0] = c;
 	buflen = 1;
@@ -5663,36 +5663,36 @@ do_insert_char_pre(int c)
 
     // Lock the text to avoid weird things from happening.
     ++textlock;
-    set_vim_var_string(VV_CHAR, buf, (int)buflen);  // set v:char
+    సమితి_vim_var_string(VV_CHAR, buf, (పూర్ణాంకం)buflen);  // set v:char
 
-    res = NULL;
-    if (ins_apply_autocmds(EVENT_INSERTCHARPRE))
+    res = ఖాళీ;
+    ఒకవేళ (ins_apply_autocmds(EVENT_INSERTCHARPRE))
     {
 	// Get the value of v:char.  It may be empty or more than one
 	// character.  Only use it when changed, otherwise continue with the
 	// original character to avoid breaking autoindent.
-	if (STRCMP(buf, get_vim_var_str(VV_CHAR)) != 0)
+	ఒకవేళ (STRCMP(buf, get_vim_var_str(VV_CHAR)) != 0)
 	    res = vim_strsave(get_vim_var_str(VV_CHAR));
     }
 
-    set_vim_var_string(VV_CHAR, NULL, -1);  // clear v:char
+    సమితి_vim_var_string(VV_CHAR, ఖాళీ, -1);  // clear v:char
     --textlock;
 
     // Restore the State, it may have been changed.
     State = save_State;
 
-    return res;
+    తిరిగి res;
 }
-#endif
+#అయితే_ముగింపు
 
-    int
-get_can_cindent(void)
+    పూర్ణాంకం
+get_can_cindent(శూన్య)
 {
-    return can_cindent;
+    తిరిగి can_cindent;
 }
 
-    void
-set_can_cindent(int val)
+    శూన్య
+సమితి_can_cindent(పూర్ణాంకం val)
 {
     can_cindent = val;
 }
@@ -5700,19 +5700,19 @@ set_can_cindent(int val)
 /*
  * Trigger "event" and take care of fixing undo.
  */
-    int
+    పూర్ణాంకం
 ins_apply_autocmds(event_T event)
 {
     varnumber_T	tick = CHANGEDTICK(curbuf);
-    int r;
+    పూర్ణాంకం r;
 
-    r = apply_autocmds(event, NULL, NULL, FALSE, curbuf);
+    r = apply_autocmds(event, ఖాళీ, ఖాళీ, FALSE, curbuf);
 
     // If u_savesub() was called then we are not prepared to start
     // a new line.  Call u_save() with no contents to fix that.
     // Except when leaving Insert mode.
-    if (event != EVENT_INSERTLEAVE && tick != CHANGEDTICK(curbuf))
+    ఒకవేళ (event != EVENT_INSERTLEAVE && tick != CHANGEDTICK(curbuf))
 	u_save(curwin->w_cursor.lnum, (linenr_T)(curwin->w_cursor.lnum + 1));
 
-    return r;
+    తిరిగి r;
 }

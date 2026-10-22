@@ -11,36 +11,36 @@
  * locale.c: functions for language/locale configuration
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#ఒకవేళ (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	&& (defined(FEAT_EVAL) || defined(FEAT_MULTI_LANG))
 # define HAVE_GET_LOCALE_VAL
-    static char_u *
-get_locale_val(int what)
+    స్థిర char_u *
+get_locale_val(పూర్ణాంకం what)
 {
     char_u	*loc;
 
     // Obtain the locale value from the libraries.
-    loc = (char_u *)setlocale(what, NULL);
+    loc = (char_u *)setlocale(what, ఖాళీ);
 
 # ifdef MSWIN
-    if (loc != NULL)
+    ఒకవేళ (loc != ఖాళీ)
     {
 	char_u	*p;
 
 	// setocale() returns something like "LC_COLLATE=<name>;LC_..." when
 	// one of the values (e.g., LC_CTYPE) differs.
 	p = vim_strchr(loc, '=');
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    loc = ++p;
-	    while (*p != NUL)	// remove trailing newline
+	    అయితే (*p != NUL)	// remove trailing newline
 	    {
-		if (*p < ' ' || *p == ';')
+		ఒకవేళ (*p < ' ' || *p == ';')
 		{
 		    *p = NUL;
-		    break;
+		    ఆపు;
 		}
 		++p;
 	    }
@@ -48,22 +48,22 @@ get_locale_val(int what)
     }
 # endif
 
-    return loc;
+    తిరిగి loc;
 }
-#endif
+#అయితే_ముగింపు
 
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 /*
  * On MS-Windows locale names are strings like "German_Germany.1252", but
  * gettext expects "de".  Try to translate one into another here for a few
  * supported languages.
  */
-    static char_u *
+    స్థిర char_u *
 gettext_lang(char_u *name)
 {
-    int		i;
-    static char *(mtable[]) = {
+    పూర్ణాంకం		i;
+    స్థిర అక్షరం *(mtable[]) = {
 			"afrikaans",	"af",
 			"czech",	"cs",
 			"dutch",	"nl",
@@ -82,24 +82,24 @@ gettext_lang(char_u *name)
 			"ukrainian",	"uk",
 			"chinese_china", "zh_CN",
 			"chinese_taiwan", "zh_TW",
-			NULL};
+			ఖాళీ};
 
-    for (i = 0; mtable[i] != NULL; i += 2)
-	if (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
-	    return (char_u *)mtable[i + 1];
-    return name;
+    కొరకు (i = 0; mtable[i] != ఖాళీ; i += 2)
+	ఒకవేళ (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
+	    తిరిగి (char_u *)mtable[i + 1];
+    తిరిగి name;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_MULTI_LANG)
+#ఒకవేళ defined(FEAT_MULTI_LANG)
 /*
  * Return TRUE when "lang" starts with a valid language name.
  * Rejects NULL, empty string, "C", "C.UTF-8" and others.
  */
-    static int
+    స్థిర పూర్ణాంకం
 is_valid_mess_lang(char_u *lang)
 {
-    return lang != NULL && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
+    తిరిగి lang != ఖాళీ && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
 }
 
 /*
@@ -107,119 +107,119 @@ is_valid_mess_lang(char_u *lang)
  * 'helplang'.  May return NULL or an empty string.
  */
     char_u *
-get_mess_lang(void)
+get_mess_lang(శూన్య)
 {
     char_u *p;
 
 # ifdef HAVE_GET_LOCALE_VAL
-#  if defined(LC_MESSAGES)
+#  ఒకవేళ defined(LC_MESSAGES)
     p = get_locale_val(LC_MESSAGES);
-#  else
+#  లేకపోతే
     // This is necessary for Win32, where LC_MESSAGES is not defined and $LANG
     // may be set to the LCID number.  $LANG holds the display language, see
     // set_init_lang_env().  Otherwise LC_COLLATE is the best guess, LC_TIME
     // and LC_MONETARY may be set differently for a Japanese working in the US.
     p = mch_getenv((char_u *)"LANG");
-    if (!is_valid_mess_lang(p))
+    ఒకవేళ (!is_valid_mess_lang(p))
 	p = get_locale_val(LC_COLLATE);
 #  endif
-# else
+# లేకపోతే
     p = mch_getenv((char_u *)"LC_ALL");
-    if (!is_valid_mess_lang(p))
+    ఒకవేళ (!is_valid_mess_lang(p))
     {
 	p = mch_getenv((char_u *)"LC_MESSAGES");
-	if (!is_valid_mess_lang(p))
+	ఒకవేళ (!is_valid_mess_lang(p))
 	    p = mch_getenv((char_u *)"LANG");
     }
 # endif
 # ifdef MSWIN
     p = gettext_lang(p);
 # endif
-    return is_valid_mess_lang(p) ? p : NULL;
+    తిరిగి is_valid_mess_lang(p) ? p : ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
 // Complicated #if; matches with where get_mess_env() is used below.
-#if (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#ఒకవేళ (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	    && defined(LC_MESSAGES))) \
 	|| ((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 		&& !defined(LC_MESSAGES))
 /*
  * Get the language used for messages from the environment.
  */
-    static char_u *
-get_mess_env(void)
+    స్థిర char_u *
+get_mess_env(శూన్య)
 {
     char_u	*p;
 
     p = mch_getenv((char_u *)"LC_ALL");
-    if (p != NULL && *p != NUL)
-	return p;
+    ఒకవేళ (p != ఖాళీ && *p != NUL)
+	తిరిగి p;
 
     p = mch_getenv((char_u *)"LC_MESSAGES");
-    if (p != NULL && *p != NUL)
-	return p;
+    ఒకవేళ (p != ఖాళీ && *p != NUL)
+	తిరిగి p;
 
     p = mch_getenv((char_u *)"LANG");
-    if (p != NULL && VIM_ISDIGIT(*p))
-	p = NULL;		// ignore something like "1043"
+    ఒకవేళ (p != ఖాళీ && VIM_ISDIGIT(*p))
+	p = ఖాళీ;		// ignore something like "1043"
 # ifdef HAVE_GET_LOCALE_VAL
-    if (p == NULL || *p == NUL)
+    ఒకవేళ (p == ఖాళీ || *p == NUL)
 	p = get_locale_val(LC_CTYPE);
 # endif
-    return p;
+    తిరిగి p;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * Set the "v:lang" variable according to the current locale setting.
  * Also do "v:lc_time"and "v:ctype".
  */
-    void
-set_lang_var(void)
+    శూన్య
+సమితి_lang_var(శూన్య)
 {
     char_u	*loc;
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_CTYPE);
-# else
+# లేకపోతే
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
-    set_vim_var_string(VV_CTYPE, loc, -1);
+    సమితి_vim_var_string(VV_CTYPE, loc, -1);
 
     // When LC_MESSAGES isn't defined use the value from $LC_MESSAGES, fall
     // back to LC_CTYPE if it's empty.
-# if defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
+# ఒకవేళ defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
     loc = get_locale_val(LC_MESSAGES);
-# else
+# లేకపోతే
     loc = get_mess_env();
 # endif
-    set_vim_var_string(VV_LANG, loc, -1);
+    సమితి_vim_var_string(VV_LANG, loc, -1);
 
 # ifdef HAVE_GET_LOCALE_VAL
-    loc = get_locale_val(LC_TIME);
+    loc = get_locale_val(LC_సమయం);
 # endif
-    set_vim_var_string(VV_LC_TIME, loc, -1);
+    సమితి_vim_var_string(VV_LC_సమయం, loc, -1);
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_COLLATE);
-# else
+# లేకపోతే
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
-    set_vim_var_string(VV_COLLATE, loc, -1);
+    సమితి_vim_var_string(VV_COLLATE, loc, -1);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#ఒకవేళ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Setup to use the current locale (for ctype() and many other things).
  */
-    void
-init_locale(void)
+    శూన్య
+init_locale(శూన్య)
 {
     setlocale(LC_ALL, "");
 
@@ -227,7 +227,7 @@ init_locale(void)
     // Tell Gtk not to change our locale settings.
     gtk_disable_setlocale();
 # endif
-# if defined(LC_NUMERIC)
+# ఒకవేళ defined(LC_NUMERIC)
     // Make sure strtod() uses a decimal point, not a comma.
     setlocale(LC_NUMERIC, "C");
 # endif
@@ -241,7 +241,7 @@ init_locale(void)
 
 # ifdef FEAT_GETTEXT
     {
-	int	mustfree = FALSE;
+	పూర్ణాంకం	mustfree = FALSE;
 	char_u	*p;
 
 #  ifdef DYNAMIC_GETTEXT
@@ -251,12 +251,12 @@ init_locale(void)
 	// expand_env() doesn't work yet, because g_chartab[] is not
 	// initialized yet, call vim_getenv() directly
 	p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-	if (p != NULL && *p != NUL)
+	ఒకవేళ (p != ఖాళీ && *p != NUL)
 	{
-	    vim_snprintf((char *)NameBuff, MAXPATHL, "%s/lang", p);
-	    bindtextdomain(VIMPACKAGE, (char *)NameBuff);
+	    vim_snprintf((అక్షరం *)NameBuff, MAXPATHL, "%s/lang", p);
+	    bindtextdomain(VIMPACKAGE, (అక్షరం *)NameBuff);
 	}
-	if (mustfree)
+	ఒకవేళ (mustfree)
 	    vim_free(p);
 	textdomain(VIMPACKAGE);
     }
@@ -266,17 +266,17 @@ init_locale(void)
 /*
  * ":language":  Set the language (locale).
  */
-    void
+    శూన్య
 ex_language(exarg_T *eap)
 {
-    char	*loc;
+    అక్షరం	*loc;
     char_u	*p;
     char_u	*name;
-    int		what = LC_ALL;
-    char	*whatstr = "";
+    పూర్ణాంకం		what = LC_ALL;
+    అక్షరం	*whatstr = "";
 # ifdef LC_MESSAGES
 #  define VIM_LC_MESSAGES LC_MESSAGES
-# else
+# లేకపోతే
 #  define VIM_LC_MESSAGES 6789
 # endif
 
@@ -286,27 +286,27 @@ ex_language(exarg_T *eap)
     // Allow abbreviation, but require at least 3 characters to avoid
     // confusion with a two letter language name "me" or "ct".
     p = skiptowhite(eap->arg);
-    if ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
+    ఒకవేళ ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
     {
-	if (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
+	ఒకవేళ (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
 	{
 	    what = VIM_LC_MESSAGES;
 	    name = skipwhite(p);
 	    whatstr = "messages ";
 	}
-	else if (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
+	లేకపోతే ఒకవేళ (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
 	{
 	    what = LC_CTYPE;
 	    name = skipwhite(p);
 	    whatstr = "ctype ";
 	}
-	else if (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
+	లేకపోతే ఒకవేళ (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
 	{
-	    what = LC_TIME;
+	    what = LC_సమయం;
 	    name = skipwhite(p);
 	    whatstr = "time ";
 	}
-	else if (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
+	లేకపోతే ఒకవేళ (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
 	{
 	    what = LC_COLLATE;
 	    name = skipwhite(p);
@@ -314,57 +314,57 @@ ex_language(exarg_T *eap)
 	}
     }
 
-    if (*name == NUL)
+    ఒకవేళ (*name == NUL)
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	ఒకవేళ (what == VIM_LC_MESSAGES)
 	    p = get_mess_env();
-	else
+	లేకపోతే
 # endif
-	    p = (char_u *)setlocale(what, NULL);
-	if (p == NULL || *p == NUL)
+	    p = (char_u *)setlocale(what, ఖాళీ);
+	ఒకవేళ (p == ఖాళీ || *p == NUL)
 	    p = (char_u *)"Unknown";
 	smsg(_("Current %slanguage: \"%s\""), whatstr, p);
     }
-    else
+    లేకపోతే
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	ఒకవేళ (what == VIM_LC_MESSAGES)
 	    loc = "";
-	else
+	లేకపోతే
 # endif
 	{
-	    loc = setlocale(what, (char *)name);
-# if defined(LC_NUMERIC)
+	    loc = setlocale(what, (అక్షరం *)name);
+# ఒకవేళ defined(LC_NUMERIC)
 	    // Make sure strtod() uses a decimal point, not a comma.
 	    setlocale(LC_NUMERIC, "C");
 # endif
 	}
-	if (loc == NULL)
-	    semsg(_(e_cannot_set_language_to_str), name);
-	else
+	ఒకవేళ (loc == ఖాళీ)
+	    semsg(_(e_cannot_సమితి_language_గమ్యం_str), name);
+	లేకపోతే
 	{
-# ifdef HAVE_NL_MSG_CAT_CNTR
+# ifdef HAVE_NL_సందేశం_CAT_CNTR
 	    // Need to do this for GNU gettext, otherwise cached translations
 	    // will be used again.
-	    extern int _nl_msg_cat_cntr;
+	    బాహ్య పూర్ణాంకం nl_సందేశం_cat_cntr;
 
-	    ++_nl_msg_cat_cntr;
+	    ++nl_సందేశం_cat_cntr;
 # elif defined(DYNAMIC_GETTEXT)
 	    // Same thing when gettext is loaded at runtime.
-	    if (dyn_libintl_nl_msg_cat_cntr != NULL)
-		++*dyn_libintl_nl_msg_cat_cntr;
+	    ఒకవేళ (dyn_libintl_nl_సందేశం_cat_cntr != ఖాళీ)
+		++*dyn_libintl_nl_సందేశం_cat_cntr;
 # endif
 	    // Reset $LC_ALL, otherwise it would overrule everything.
 	    vim_setenv((char_u *)"LC_ALL", (char_u *)"");
 
-	    if (what != LC_TIME && what != LC_COLLATE)
+	    ఒకవేళ (what != LC_సమయం && what != LC_COLLATE)
 	    {
 		// Tell gettext() what to translate to.  It apparently doesn't
 		// use the currently effective locale.  Also do this when
 		// FEAT_GETTEXT isn't defined, so that shell commands use this
 		// value.
-		if (what == LC_ALL)
+		ఒకవేళ (what == LC_ALL)
 		{
 		    vim_setenv((char_u *)"LANG", name);
 # ifdef MSWIN
@@ -374,42 +374,42 @@ ex_language(exarg_T *eap)
 		    setlocale(LC_CTYPE, "C");
 # endif
 		}
-		if (what != LC_CTYPE)
+		ఒకవేళ (what != LC_CTYPE)
 		{
 		    char_u	*mname;
 # ifdef MSWIN
 		    mname = gettext_lang(name);
-# else
+# లేకపోతే
 		    mname = name;
 # endif
 		    // Clear $LANGUAGE because GNU gettext uses it.
 		    vim_setenv((char_u *)"LANGUAGE", (char_u *)"");
 		    vim_setenv((char_u *)"LC_MESSAGES", mname);
 # ifdef FEAT_MULTI_LANG
-		    set_helplang_default(mname);
+		    సమితి_helplang_default(mname);
 # endif
 		}
 	    }
 
 # ifdef FEAT_EVAL
 	    // Set v:lang, v:lc_time, v:collate and v:ctype to the final result.
-	    set_lang_var();
+	    సమితి_lang_var();
 # endif
 	    maketitle();
 	}
     }
 }
 
-static char_u	**locales = NULL;	// Array of all available locales
+స్థిర char_u	**locales = ఖాళీ;	// Array of all available locales
 
-static int	did_init_locales = FALSE;
+స్థిర పూర్ణాంకం	did_init_locales = FALSE;
 
 /*
  * Return an array of strings for all available locales + NULL for the
  * last element.  Return NULL in case of error.
  */
-    static char_u **
-find_locales(void)
+    స్థిర char_u **
+కనుగొను_locales(శూన్య)
 {
     garray_T	locales_ga;
     char_u	*loc;
@@ -422,110 +422,110 @@ find_locales(void)
     // doesn't work we won't have completion.
 # ifndef MSWIN
     locale_list = get_cmd_output((char_u *)"locale -a",
-						    NULL, SHELL_SILENT, NULL);
-# else
+						    ఖాళీ, SHELL_SILENT, ఖాళీ);
+# లేకపోతే
     // Find all available locales by examining the directories in
     // $VIMRUNTIME/lang/
     {
-	int		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
+	పూర్ణాంకం		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
 	expand_T	xpc;
 	char_u		*p;
 
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
 	locale_list = ExpandOne(&xpc, (char_u *)"$VIMRUNTIME/lang/*",
-						      NULL, options, WILD_ALL);
+						      ఖాళీ, options, WILD_ALL);
 	ExpandCleanup(&xpc);
-	if (locale_list == NULL)
+	ఒకవేళ (locale_list == ఖాళీ)
 	    // Add a dummy input, that will be skipped lated but we need to
 	    // have something in locale_list so that the C locale is added at
 	    // the end.
 	    locale_list = vim_strsave((char_u *)".\n");
 	p = locale_list;
 	// find the last directory delimiter
-	while (p != NULL && *p != NUL)
+	అయితే (p != ఖాళీ && *p != NUL)
 	{
-	    if (*p == '\n')
-		break;
-	    if (*p == '\\')
+	    ఒకవేళ (*p == '\n')
+		ఆపు;
+	    ఒకవేళ (*p == '\\')
 		len = p - locale_list;
 	    p++;
 	}
     }
 # endif
-    if (locale_list == NULL)
-	return NULL;
-    ga_init2(&locales_ga, sizeof(char_u *), 20);
+    ఒకవేళ (locale_list == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ga_init2(&locales_ga, పరిమాణం(char_u *), 20);
 
     // Transform locale_list string where each locale is separated by "\n"
     // into an array of locale strings.
-    loc = (char_u *)strtok((char *)locale_list, "\n");
+    loc = (char_u *)strtok((అక్షరం *)locale_list, "\n");
 
-    while (loc != NULL)
+    అయితే (loc != ఖాళీ)
     {
-	int ignore = FALSE;
+	పూర్ణాంకం ignore = FALSE;
 
 # ifdef MSWIN
-	if (len > 0)
+	ఒకవేళ (len > 0)
 	    loc += len + 1;
 	// skip locales with a dot (which indicates the charset)
-	if (vim_strchr(loc, '.') != NULL)
+	ఒకవేళ (vim_strchr(loc, '.') != ఖాళీ)
 	    ignore = TRUE;
 # endif
-	if (!ignore)
+	ఒకవేళ (!ignore)
 	{
-	    if (ga_grow(&locales_ga, 1) == FAIL)
-		break;
+	    ఒకవేళ (ga_grow(&locales_ga, 1) == FAIL)
+		ఆపు;
 
 	    loc = vim_strsave(loc);
-	    if (loc == NULL)
-		break;
+	    ఒకవేళ (loc == ఖాళీ)
+		ఆపు;
 
-	    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] = loc;
+	    ((char_u **)locales_ga.ga_దత్తాంశం)[locales_ga.ga_len++] = loc;
 	}
-	loc = (char_u *)strtok(NULL, "\n");
+	loc = (char_u *)strtok(ఖాళీ, "\n");
     }
 
 # ifdef MSWIN
     // Add the C locale
-    if (ga_grow(&locales_ga, 1) == OK)
-	((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] =
+    ఒకవేళ (ga_grow(&locales_ga, 1) == OK)
+	((char_u **)locales_ga.ga_దత్తాంశం)[locales_ga.ga_len++] =
 						    vim_strsave((char_u *)"C");
 # endif
 
     vim_free(locale_list);
-    if (ga_grow(&locales_ga, 1) == FAIL)
+    ఒకవేళ (ga_grow(&locales_ga, 1) == FAIL)
     {
 	ga_clear(&locales_ga);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = NULL;
-    return (char_u **)locales_ga.ga_data;
+    ((char_u **)locales_ga.ga_దత్తాంశం)[locales_ga.ga_len] = ఖాళీ;
+    తిరిగి (char_u **)locales_ga.ga_దత్తాంశం;
 }
 
 /*
  * Lazy initialization of all available locales.
  */
-    static void
-init_locales(void)
+    స్థిర శూన్య
+init_locales(శూన్య)
 {
-    if (did_init_locales)
-	return;
+    ఒకవేళ (did_init_locales)
+	తిరిగి;
 
     did_init_locales = TRUE;
-    locales = find_locales();
+    locales = కనుగొను_locales();
 }
 
-# if defined(EXITFREE)
-    void
-free_locales(void)
+# ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_locales(శూన్య)
 {
-    int			i;
+    పూర్ణాంకం			i;
 
-    if (locales == NULL)
-	return;
+    ఒకవేళ (locales == ఖాళీ)
+	తిరిగి;
 
-    for (i = 0; locales[i] != NULL; i++)
+    కొరకు (i = 0; locales[i] != ఖాళీ; i++)
 	vim_free(locales[i]);
     VIM_CLEAR(locales);
 }
@@ -536,33 +536,33 @@ free_locales(void)
  * ":language" command.
  */
     char_u *
-get_lang_arg(expand_T *xp UNUSED, int idx)
+get_lang_arg(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx == 0)
-	return (char_u *)"messages";
-    if (idx == 1)
-	return (char_u *)"ctype";
-    if (idx == 2)
-	return (char_u *)"time";
-    if (idx == 3)
-	return (char_u *)"collate";
+    ఒకవేళ (idx == 0)
+	తిరిగి (char_u *)"messages";
+    ఒకవేళ (idx == 1)
+	తిరిగి (char_u *)"ctype";
+    ఒకవేళ (idx == 2)
+	తిరిగి (char_u *)"time";
+    ఒకవేళ (idx == 3)
+	తిరిగి (char_u *)"collate";
 
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx - 4];
+    ఒకవేళ (locales == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి locales[idx - 4];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the available locales.
  */
     char_u *
-get_locales(expand_T *xp UNUSED, int idx)
+get_locales(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx];
+    ఒకవేళ (locales == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి locales[idx];
 }
 
-#endif
+#అయితే_ముగింపు

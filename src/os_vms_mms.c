@@ -1,77 +1,77 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#అన్తర్భావ	<stdio.h>
+#అన్తర్భావ	<stdlib.h>
+#అన్తర్భావ	<string.h>
+#అన్తర్భావ	<unixio.h>
+#అన్తర్భావ	"vim.h"
+పూర్ణాంకం ప్రధాన(పూర్ణాంకం argc, అక్షరం *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    అక్షరం	cmd[132], buf[BUFSIZ], *argp, *error_file, లక్ష్యం[132], *mms;
+    పూర్ణాంకం		err = 0, err_పంక్తి = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    అయితే (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	ఒకవేళ (*argp == '-')
 	{
-	    switch (*++argp)
+	    ఎంపిక (*++argp)
 	    {
-		case 'm':
+		స్థితి 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    ఆపు;
+		స్థితి 'e':
+		    ఒకవేళ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    ఆపు;
+		అప్రమేయ:
+		    ఆపు;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (*target)
-		strcat(target, " ");
-	    strcat(target, argp);
+	    ఒకవేళ (*లక్ష్యం)
+		strcat(లక్ష్యం, " ");
+	    strcat(లక్ష్యం, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
-								 mms, target);
+    vim_snprintf(cmd, పరిమాణం(cmd), "%s/output=tmp:errors.vim_tmp %s",
+								 mms, లక్ష్యం);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    అయితే (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	ఒకవేళ (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
-	    buf[strlen(buf)-1] = '\0';
+	    err_పంక్తి++;
+	    buf[అక్షరశ్రేణి_పొడవు(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	లేకపోతే
 	{
-	    if (err_line)
+	    ఒకవేళ (err_పంక్తి)
 	    {
-		if (strstr(buf, _("At line")))
+		ఒకవేళ (అక్షరశ్రేణి_శోధన(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_పంక్తి = 0;
 		    fprintf(fpo, "@");
 		}
-		else
-		    buf[strlen(buf)-1] = '\0';
+		లేకపోతే
+		    buf[అక్షరశ్రేణి_పొడవు(buf)-1] = '\0';
 	    }
 	}
 	fprintf(fpo, "%s", buf);
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    అయితే (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
-    exit(err ? 44 : 1);
-    return(0);
+    నిష్క్రమించు(err ? 44 : 1);
+    తిరిగి(0);
 }

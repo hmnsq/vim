@@ -12,129 +12,129 @@
  * Not used for GTK.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
-#include <X11/Shell.h>
-#include <X11/cursorfont.h>
+#అన్తర్భావ <X11/keysym.h>
+#అన్తర్భావ <X11/Xatom.h>
+#అన్తర్భావ <X11/StringDefs.h>
+#అన్తర్భావ <X11/Intrinsic.h>
+#అన్తర్భావ <X11/Shell.h>
+#అన్తర్భావ <X11/cursorfont.h>
 
 /*
  * XpmP.h is preferred, because it makes the signs drawn with a transparent
  * background instead of black.
  */
-#if defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
+#ఒకవేళ defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
 	&& !defined(HAVE_X11_XPM_H)
 # include <Xm/XpmP.h>
-#else
+#లేకపోతే
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  లేకపోతే
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_XFONTSET
+#నిర్వచితమైతే FEAT_XFONTSET
 # ifdef X_LOCALE
 #  include <X11/Xlocale.h>
-# else
+# లేకపోతే
 #  include <locale.h>
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_X11_SUNKEYSYM_H
+#నిర్వచితమైతే HAVE_X11_SUNKEYSYM_H
 # include <X11/Sunkeysym.h>
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_X11_XMU_EDITRES_H
+#నిర్వచితమైతే HAVE_X11_XMU_EDITRES_H
 # include <X11/Xmu/Editres.h>
-#endif
+#అయితే_ముగింపు
 
-#define VIM_NAME	"vim"
-#define VIM_CLASS	"Vim"
+#నిర్వచించు VIM_NAME	"vim"
+#నిర్వచించు VIM_CLASS	"Vim"
 
 // Default resource values
-#define DFLT_FONT		"7x13"
-#ifdef FONTSET_ALWAYS
-# define DFLT_MENU_FONT		XtDefaultFontSet
-#else
+#నిర్వచించు DFLT_FONT		"7x13"
+#నిర్వచితమైతే FONTSET_ALWAYS
+# define DFLT_MENU_FONT		Xt_Default_Font_సమితి
+#లేకపోతే
 # define DFLT_MENU_FONT		XtDefaultFont
-#endif
-#define DFLT_TOOLTIP_FONT	XtDefaultFontSet
+#అయితే_ముగింపు
+#నిర్వచించు DFLT_TOOLTIP_FONT	Xt_Default_Font_సమితి
 
 // use the default (CDE) colors
-#define DFLT_MENU_BG_COLOR	""
-#define DFLT_MENU_FG_COLOR	""
-#define DFLT_SCROLL_BG_COLOR	""
-#define DFLT_SCROLL_FG_COLOR	""
-#define DFLT_TOOLTIP_BG_COLOR	"#ffff91"
-#define DFLT_TOOLTIP_FG_COLOR	"#000000"
+#నిర్వచించు DFLT_MENU_BG_COLOR	""
+#నిర్వచించు DFLT_MENU_FG_COLOR	""
+#నిర్వచించు DFLT_SCROLL_BG_COLOR	""
+#నిర్వచించు DFLT_SCROLL_FG_COLOR	""
+#నిర్వచించు DFLT_TOOLTIP_BG_COLOR	"#ffff91"
+#నిర్వచించు DFLT_TOOLTIP_FG_COLOR	"#000000"
 
 Widget vimShell = (Widget)0;
 
-static Atom   wm_atoms[2];	// Window Manager Atoms
-#define DELETE_WINDOW_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
-#define SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
+స్థిర Atom   wm_atoms[2];	// Window Manager Atoms
+#నిర్వచించు DELETE_కిటికీ_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
+#నిర్వచించు SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
 
-#ifdef FEAT_XFONTSET
+#నిర్వచితమైతే FEAT_XFONTSET
 /*
  * We either draw with a fontset (when current_fontset != NULL) or with a
  * normal font (current_fontset == NULL, use gui.text_gc and gui.back_gc).
  */
-static XFontSet current_fontset = NULL;
-# if !defined(XDrawString)
+స్థిర XFont_సమితి current_fontset = ఖాళీ;
+# ఒకవేళ !defined(XDrawString)
 #  define XDrawString(dpy, win, gc, x, y, str, n) \
-	do \
+	చేయి \
 	{ \
-	    if (current_fontset != NULL) \
+	    ఒకవేళ (current_fontset != ఖాళీ) \
 		XmbDrawString(dpy, win, current_fontset, gc, x, y, str, n); \
-	    else \
+	    లేకపోతే \
 		XDrawString(dpy, win, gc, x, y, str, n); \
-	} while (0)
+	} అయితే (0)
 # endif
-# if !defined(XDrawString16)
+# ఒకవేళ !defined(XDrawString16)
 #  define XDrawString16(dpy, win, gc, x, y, str, n) \
-	do \
+	చేయి \
 	{ \
-	    if (current_fontset != NULL) \
+	    ఒకవేళ (current_fontset != ఖాళీ) \
 		XwcDrawString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    లేకపోతే \
 		XDrawString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} అయితే (0)
 # endif
-# if !defined(XDrawImageString16)
+# ఒకవేళ !defined(XDrawImageString16)
 #  define XDrawImageString16(dpy, win, gc, x, y, str, n) \
-	do \
+	చేయి \
 	{ \
-	    if (current_fontset != NULL) \
+	    ఒకవేళ (current_fontset != ఖాళీ) \
 		XwcDrawImageString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    లేకపోతే \
 		XDrawImageString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} అయితే (0)
 # endif
-static int check_fontset_sanity(XFontSet fs);
-static int fontset_width(XFontSet fs);
-static int fontset_ascent(XFontSet fs);
-#endif
+స్థిర పూర్ణాంకం check_fontset_sanity(XFont_సమితి fs);
+స్థిర పూర్ణాంకం fontset_వెడల్పు(XFont_సమితి fs);
+స్థిర పూర్ణాంకం fontset_ascent(XFont_సమితి fs);
+#అయితే_ముగింపు
 
-static guicolor_T	prev_fg_color = INVALCOLOR;
-static guicolor_T	prev_bg_color = INVALCOLOR;
-static guicolor_T	prev_sp_color = INVALCOLOR;
+స్థిర guicolor_T	prev_fg_color = INVALCOLOR;
+స్థిర guicolor_T	prev_bg_color = INVALCOLOR;
+స్థిర guicolor_T	prev_sp_color = INVALCOLOR;
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-static XButtonPressedEvent last_mouse_event;
-#endif
+#ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+స్థిర XButtonPressedEvent చివరి_mouse_event;
+#అయితే_ముగింపు
 
-static void gui_x11_check_copy_area(void);
-#ifdef FEAT_CLIENTSERVER
-static void gui_x11_send_event_handler(Widget, XtPointer, XEvent *, Boolean *);
-#endif
-static void gui_x11_wm_protocol_handler(Widget, XtPointer, XEvent *, Boolean *);
-static Cursor gui_x11_create_blank_mouse(void);
+స్థిర శూన్య gui_x11_check_copy_area(శూన్య);
+#నిర్వచితమైతే FEAT_CLIENTSERVER
+స్థిర శూన్య gui_x11_send_event_handler(Widget, Xt_సూచిక, XEvent *, Boolean *);
+#అయితే_ముగింపు
+స్థిర శూన్య gui_x11_wm_protocol_handler(Widget, Xt_సూచిక, XEvent *, Boolean *);
+స్థిర Cursor gui_x11_create_blank_mouse(శూన్య);
 
 
 /*
@@ -142,17 +142,17 @@ static Cursor gui_x11_create_blank_mouse(void);
  * NOTE: when changing this, the table in gui_gtk_x11.c probably needs the
  * same change!
  */
-static struct specialkey
+స్థిర నిర్మాణం specialkey
 {
-    KeySym  key_sym;
+    కీలకం_Sym  కీలకం_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_కీలకాలు[] =
 {
-    {XK_Up,		'k', 'u'},
-    {XK_Down,		'k', 'd'},
-    {XK_Left,		'k', 'l'},
-    {XK_Right,		'k', 'r'},
+    {XK_పైకి,		'k', 'u'},
+    {XK_కిందికి,		'k', 'd'},
+    {XK_ఎడమ,		'k', 'l'},
+    {XK_కుడి,		'k', 'r'},
 
     {XK_F1,		'k', '1'},
     {XK_F2,		'k', '2'},
@@ -192,37 +192,37 @@ static struct specialkey
     {XK_F33,		'F', 'N'},
     {XK_F34,		'F', 'O'},
     {XK_F35,		'F', 'P'},	// keysymdef.h defines up to F35
-#ifdef SunXK_F36
+#నిర్వచితమైతే SunXK_F36
     {SunXK_F36,		'F', 'Q'},
     {SunXK_F37,		'F', 'R'},
-#endif
+#అయితే_ముగింపు
 
     {XK_Help,		'%', '1'},
     {XK_Undo,		'&', '8'},
-    {XK_BackSpace,	'k', 'b'},
-    {XK_Insert,		'k', 'I'},
+    {XK_వెనుక_Space,	'k', 'b'},
+    {XK_చొప్పించు,		'k', 'I'},
     {XK_Delete,		'k', 'D'},
     {XK_Home,		'k', 'h'},
-    {XK_End,		'@', '7'},
-    {XK_Prior,		'k', 'P'},
-    {XK_Next,		'k', 'N'},
+    {XK_చివర,		'@', '7'},
+    {XK_పూర్వ,		'k', 'P'},
+    {XK_తదుపరి,		'k', 'N'},
     {XK_Print,		'%', '9'},
 
     // Keypad keys:
-#ifdef XK_KP_Left
-    {XK_KP_Left,	'k', 'l'},
-    {XK_KP_Right,	'k', 'r'},
-    {XK_KP_Up,		'k', 'u'},
-    {XK_KP_Down,	'k', 'd'},
-    {XK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+#నిర్వచితమైతే XK_KP_ఎడమ
+    {XK_KP_ఎడమ,	'k', 'l'},
+    {XK_KP_కుడి,	'k', 'r'},
+    {XK_KP_పైకి,		'k', 'u'},
+    {XK_KP_కిందికి,	'k', 'd'},
+    {XK_KP_చొప్పించు,	KS_EXTRA, (char_u)KE_KINS},
     {XK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {XK_KP_Home,	'K', '1'},
-    {XK_KP_End,		'K', '4'},
-    {XK_KP_Prior,	'K', '3'},
-    {XK_KP_Next,	'K', '5'},
+    {XK_KP_చివర,		'K', '4'},
+    {XK_KP_పూర్వ,	'K', '3'},
+    {XK_KP_తదుపరి,	'K', '5'},
 
-    {XK_KP_Add,		'K', '6'},
-    {XK_KP_Subtract,	'K', '7'},
+    {XK_KP_కూడు,		'K', '6'},
+    {XK_KP_వ్యవకలనం,	'K', '7'},
     {XK_KP_Divide,	'K', '8'},
     {XK_KP_Multiply,	'K', '9'},
     {XK_KP_Enter,	'K', 'A'},
@@ -238,59 +238,59 @@ static struct specialkey
     {XK_KP_7,		'K', 'J'},
     {XK_KP_8,		'K', 'K'},
     {XK_KP_9,		'K', 'L'},
-#endif
+#అయితే_ముగింపు
 
     // End of list marker:
-    {(KeySym)0,	    0, 0}
+    {(కీలకం_Sym)0,	    0, 0}
 };
 
-#define XtNboldFont		"boldFont"
-#define XtCBoldFont		"BoldFont"
-#define XtNitalicFont		"italicFont"
-#define XtCItalicFont		"ItalicFont"
-#define XtNboldItalicFont	"boldItalicFont"
-#define XtCBoldItalicFont	"BoldItalicFont"
-#define XtNscrollbarWidth	"scrollbarWidth"
-#define XtCScrollbarWidth	"ScrollbarWidth"
-#define XtNmenuHeight		"menuHeight"
-#define XtCMenuHeight		"MenuHeight"
-#define XtNmenuFont		"menuFont"
-#define XtCMenuFont		"MenuFont"
-#define XtNmenuFontSet		"menuFontSet"
-#define XtCMenuFontSet		"MenuFontSet"
+#నిర్వచించు XtNboldFont		"boldFont"
+#నిర్వచించు XtCBoldFont		"BoldFont"
+#నిర్వచించు XtNitalicFont		"italicFont"
+#నిర్వచించు XtCItalicFont		"ItalicFont"
+#నిర్వచించు XtNboldItalicFont	"boldItalicFont"
+#నిర్వచించు XtCBoldItalicFont	"BoldItalicFont"
+#నిర్వచించు Xt_Nscrollbar_వెడల్పు	"scrollbarWidth"
+#నిర్వచించు Xt_CScrollbar_వెడల్పు	"ScrollbarWidth"
+#నిర్వచించు Xt_Nmenu_ఎత్తు		"menuHeight"
+#నిర్వచించు Xt_CMenu_ఎత్తు		"MenuHeight"
+#నిర్వచించు XtNmenuFont		"menuFont"
+#నిర్వచించు XtCMenuFont		"MenuFont"
+#నిర్వచించు Xt_Nmenu_Font_సమితి		"menuFontSet"
+#నిర్వచించు Xt_CMenu_Font_సమితి		"MenuFontSet"
 
 
 // Resources for setting the foreground and background colors of menus
-#define XtNmenuBackground	"menuBackground"
-#define XtCMenuBackground	"MenuBackground"
-#define XtNmenuForeground	"menuForeground"
-#define XtCMenuForeground	"MenuForeground"
+#నిర్వచించు XtNmenuBackground	"menuBackground"
+#నిర్వచించు XtCMenuBackground	"MenuBackground"
+#నిర్వచించు XtNmenuForeground	"menuForeground"
+#నిర్వచించు XtCMenuForeground	"MenuForeground"
 
 // Resources for setting the foreground and background colors of scrollbars
-#define XtNscrollBackground	"scrollBackground"
-#define XtCScrollBackground	"ScrollBackground"
-#define XtNscrollForeground	"scrollForeground"
-#define XtCScrollForeground	"ScrollForeground"
+#నిర్వచించు XtNscrollBackground	"scrollBackground"
+#నిర్వచించు XtCScrollBackground	"ScrollBackground"
+#నిర్వచించు XtNscrollForeground	"scrollForeground"
+#నిర్వచించు XtCScrollForeground	"ScrollForeground"
 
 // Resources for setting the foreground and background colors of tooltip
-#define XtNtooltipBackground	"tooltipBackground"
-#define XtCTooltipBackground	"TooltipBackground"
-#define XtNtooltipForeground	"tooltipForeground"
-#define XtCTooltipForeground	"TooltipForeground"
-#define XtNtooltipFont		"tooltipFont"
-#define XtCTooltipFont		"TooltipFont"
+#నిర్వచించు XtNtooltipBackground	"tooltipBackground"
+#నిర్వచించు XtCTooltipBackground	"TooltipBackground"
+#నిర్వచించు XtNtooltipForeground	"tooltipForeground"
+#నిర్వచించు XtCTooltipForeground	"TooltipForeground"
+#నిర్వచించు XtNtooltipFont		"tooltipFont"
+#నిర్వచించు XtCTooltipFont		"TooltipFont"
 
 /*
  * X Resources:
  */
-static XtResource vim_resources[] =
+స్థిర XtResource vim_resources[] =
 {
     {
 	XtNforeground,
 	XtCForeground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_norm_pixel),
+	పరిమాణం(Pixel),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, def_norm_pixel),
 	XtRString,
 	XtDefaultForeground
     },
@@ -298,8 +298,8 @@ static XtResource vim_resources[] =
 	XtNbackground,
 	XtCBackground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_back_pixel),
+	పరిమాణం(Pixel),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, def_వెనుక_pixel),
 	XtRString,
 	XtDefaultBackground
     },
@@ -307,8 +307,8 @@ static XtResource vim_resources[] =
 	XtNfont,
 	XtCFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_font_name),
+	పరిమాణం(String *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_font_name),
 	XtRImmediate,
 	XtDefaultFont
     },
@@ -316,8 +316,8 @@ static XtResource vim_resources[] =
 	XtNboldFont,
 	XtCBoldFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_bold_font_name),
+	పరిమాణం(String *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_bold_font_name),
 	XtRImmediate,
 	""
     },
@@ -325,8 +325,8 @@ static XtResource vim_resources[] =
 	XtNitalicFont,
 	XtCItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_ital_font_name),
+	పరిమాణం(String *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_ital_font_name),
 	XtRImmediate,
 	""
     },
@@ -334,8 +334,8 @@ static XtResource vim_resources[] =
 	XtNboldItalicFont,
 	XtCBoldItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_boldital_font_name),
+	పరిమాణం(String *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_boldital_font_name),
 	XtRImmediate,
 	""
     },
@@ -343,8 +343,8 @@ static XtResource vim_resources[] =
 	XtNgeometry,
 	XtCGeometry,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, geom),
+	పరిమాణం(String *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, geom),
 	XtRImmediate,
 	""
     },
@@ -352,51 +352,51 @@ static XtResource vim_resources[] =
 	XtNreverseVideo,
 	XtCReverseVideo,
 	XtRBool,
-	sizeof(Bool),
-	XtOffsetOf(gui_T, rsrc_rev_video),
+	పరిమాణం(Bool),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_rev_video),
 	XtRImmediate,
-	(XtPointer)False
+	(Xt_సూచిక)False
     },
     {
-	XtNborderWidth,
-	XtCBorderWidth,
+	Xt_Nborder_వెడల్పు,
+	Xt_CBorder_వెడల్పు,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, border_width),
+	పరిమాణం(పూర్ణాంకం),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, border_వెడల్పు),
 	XtRImmediate,
-	(XtPointer)2
+	(Xt_సూచిక)2
     },
     {
-	XtNscrollbarWidth,
-	XtCScrollbarWidth,
+	Xt_Nscrollbar_వెడల్పు,
+	Xt_CScrollbar_వెడల్పు,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, scrollbar_width),
+	పరిమాణం(పూర్ణాంకం),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, scrollbar_వెడల్పు),
 	XtRImmediate,
-	(XtPointer)SB_DEFAULT_WIDTH
+	(Xt_సూచిక)SB_DEFAULT_వెడల్పు
     },
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     {
 # ifdef FONTSET_ALWAYS
-	XtNmenuFontSet,
-	XtCMenuFontSet,
-# else
+	Xt_Nmenu_Font_సమితి,
+	Xt_CMenu_Font_సమితి,
+# లేకపోతే
 	XtNmenuFont,
 	XtCMenuFont,
 # endif
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_font_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_menu_font_name),
 	XtRString,
 	DFLT_MENU_FONT
     },
-#endif
+#అయితే_ముగింపు
     {
 	XtNmenuForeground,
 	XtCMenuForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_fg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_menu_fg_name),
 	XtRString,
 	DFLT_MENU_FG_COLOR
     },
@@ -404,8 +404,8 @@ static XtResource vim_resources[] =
 	XtNmenuBackground,
 	XtCMenuBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_bg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_menu_bg_name),
 	XtRString,
 	DFLT_MENU_BG_COLOR
     },
@@ -413,8 +413,8 @@ static XtResource vim_resources[] =
 	XtNscrollForeground,
 	XtCScrollForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_fg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_scroll_fg_name),
 	XtRString,
 	DFLT_SCROLL_FG_COLOR
     },
@@ -422,18 +422,18 @@ static XtResource vim_resources[] =
 	XtNscrollBackground,
 	XtCScrollBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_bg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_scroll_bg_name),
 	XtRString,
 	DFLT_SCROLL_BG_COLOR
     },
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
     {
 	XtNtooltipForeground,
 	XtCTooltipForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_fg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_tooltip_fg_name),
 	XtRString,
 	DFLT_TOOLTIP_FG_COLOR
     },
@@ -441,8 +441,8 @@ static XtResource vim_resources[] =
 	XtNtooltipBackground,
 	XtCTooltipBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_bg_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_tooltip_bg_name),
 	XtRString,
 	DFLT_TOOLTIP_BG_COLOR
     },
@@ -450,42 +450,42 @@ static XtResource vim_resources[] =
 	XtNtooltipFont,
 	XtCTooltipFont,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_font_name),
+	పరిమాణం(అక్షరం *),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_tooltip_font_name),
 	XtRString,
 	DFLT_TOOLTIP_FONT
     },
     // This one may not be really needed?
     {
 	"balloonEvalFontSet",
-	XtCFontSet,
-	XtRFontSet,
-	sizeof(XFontSet),
-	XtOffsetOf(gui_T, tooltip_fontset),
+	Xt_CFont_సమితి,
+	Xt_RFont_సమితి,
+	పరిమాణం(XFont_సమితి),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, tooltip_fontset),
 	XtRImmediate,
-	(XtPointer)NOFONTSET
+	(Xt_సూచిక)NOFONTSET
     },
-#endif // FEAT_BEVAL_GUI
-#ifdef FEAT_XIM
+#అయితే_ముగింపు // FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_XIM
     {
 	"preeditType",
 	"PreeditType",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_preedit_type_name),
+	పరిమాణం(అక్షరం*),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_preedit_type_name),
 	XtRString,
-	(XtPointer)"OverTheSpot,OffTheSpot,Root"
+	(Xt_సూచిక)"OverTheSpot,OffTheSpot,Root"
     },
     {
 	"inputMethod",
 	"InputMethod",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_input_method),
+	పరిమాణం(అక్షరం*),
+	Xt_స్థానభ్రంశం_యొక్క(gui_T, rsrc_ఆదానం_పద్ధతి),
 	XtRString,
-	NULL
+	ఖాళీ
     },
-#endif // FEAT_XIM
+#అయితే_ముగింపు // FEAT_XIM
 };
 
 /*
@@ -494,65 +494,65 @@ static XtResource vim_resources[] =
  * GUI (but the GUI might start up later).
  * When changing this, also update doc/vim_gui.txt and the usage message!!!
  */
-static XrmOptionDescRec cmdline_options[] =
+స్థిర XrmOptionDescRec cmdline_options[] =
 {
     // We handle these options ourselves
-    {"-bg",		".background",	    XrmoptionSepArg,	NULL},
-    {"-background",	".background",	    XrmoptionSepArg,	NULL},
-    {"-fg",		".foreground",	    XrmoptionSepArg,	NULL},
-    {"-foreground",	".foreground",	    XrmoptionSepArg,	NULL},
-    {"-fn",		".font",	    XrmoptionSepArg,	NULL},
-    {"-font",		".font",	    XrmoptionSepArg,	NULL},
-    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	NULL},
-    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	NULL},
-    {"-geom",		".geometry",	    XrmoptionSepArg,	NULL},
-    {"-geometry",	".geometry",	    XrmoptionSepArg,	NULL},
+    {"-bg",		".background",	    XrmoptionSepArg,	ఖాళీ},
+    {"-background",	".background",	    XrmoptionSepArg,	ఖాళీ},
+    {"-fg",		".foreground",	    XrmoptionSepArg,	ఖాళీ},
+    {"-foreground",	".foreground",	    XrmoptionSepArg,	ఖాళీ},
+    {"-fn",		".font",	    XrmoptionSepArg,	ఖాళీ},
+    {"-font",		".font",	    XrmoptionSepArg,	ఖాళీ},
+    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	ఖాళీ},
+    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	ఖాళీ},
+    {"-geom",		".geometry",	    XrmoptionSepArg,	ఖాళీ},
+    {"-geometry",	".geometry",	    XrmoptionSepArg,	ఖాళీ},
     {"-reverse",	"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"-rv",		"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"+reverse",	"*reverseVideo",    XrmoptionNoArg,	"False"},
     {"+rv",		"*reverseVideo",    XrmoptionNoArg,	"False"},
-    {"-display",	".display",	    XrmoptionSepArg,	NULL},
+    {"-display",	".display",	    XrmoptionSepArg,	ఖాళీ},
     {"-iconic",		".iconic",	    XrmoptionNoArg,	"True"},
-    {"-name",		".name",	    XrmoptionSepArg,	NULL},
-    {"-bw",		".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-mh",		".menuHeight",	    XrmoptionSepArg,	NULL},
-    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	NULL},
-#ifdef FONTSET_ALWAYS
-    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-#else
-    {"-mf",		".menuFont",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFont",	    XrmoptionSepArg,	NULL},
-#endif
-    {"-xrm",		NULL,		    XrmoptionResArg,	NULL}
+    {"-name",		".name",	    XrmoptionSepArg,	ఖాళీ},
+    {"-bw",		".borderWidth",	    XrmoptionSepArg,	ఖాళీ},
+    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	ఖాళీ},
+    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	ఖాళీ},
+    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	ఖాళీ},
+    {"-mh",		".menuHeight",	    XrmoptionSepArg,	ఖాళీ},
+    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	ఖాళీ},
+#నిర్వచితమైతే FONTSET_ALWAYS
+    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	ఖాళీ},
+    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	ఖాళీ},
+    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	ఖాళీ},
+#లేకపోతే
+    {"-mf",		".menuFont",	    XrmoptionSepArg,	ఖాళీ},
+    {"-menufont",	".menuFont",	    XrmoptionSepArg,	ఖాళీ},
+#అయితే_ముగింపు
+    {"-xrm",		ఖాళీ,		    XrmoptionResArg,	ఖాళీ}
 };
 
-static int gui_argc = 0;
-static char **gui_argv = NULL;
+స్థిర పూర్ణాంకం gui_argc = 0;
+స్థిర అక్షరం **gui_argv = ఖాళీ;
 
 /*
  * Call-back routines.
  */
 
-    static void
+    స్థిర శూన్య
 gui_x11_timer_cb(
-    XtPointer	    timed_out,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_సూచిక	    timed_బహిర్గతం,
+    XtIntervalId    *interval_id వాడని)
 {
-    *((int *)timed_out) = TRUE;
+    *((పూర్ణాంకం *)timed_బహిర్గతం) = TRUE;
 }
 
-#ifdef FEAT_JOB_CHANNEL
-    static void
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    స్థిర శూన్య
 channel_poll_cb(
-    XtPointer	    client_data,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_సూచిక	    client_దత్తాంశం_2,
+    XtIntervalId    *interval_id వాడని)
 {
-    XtIntervalId    *channel_timer = (XtIntervalId *)client_data;
+    XtIntervalId    *channel_timer = (XtIntervalId *)client_దత్తాంశం_2;
 
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
@@ -560,20 +560,20 @@ channel_poll_cb(
     parse_queued_messages();
 
     // repeat
-    *channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-						 channel_poll_cb, client_data);
+    *channel_timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, (long_u)20,
+						 channel_poll_cb, client_దత్తాంశం_2);
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
+    స్థిర శూన్య
 gui_x11_visibility_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	dud వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
-    if (event->type != VisibilityNotify)
-	return;
+    ఒకవేళ (event->type != VisibilityNotify)
+	తిరిగి;
 
     gui.visibility = event->xvisibility.state;
 
@@ -581,48 +581,48 @@ gui_x11_visibility_cb(
      * When we do an XCopyArea(), and the window is partially obscured, we want
      * to receive an event to tell us whether it worked or not.
      */
-    XSetGraphicsExposures(gui.dpy, gui.text_gc,
+    XSetGraphicsExposures(gui.dpy, gui.పాఠ్యం_gc,
 	    gui.visibility != VisibilityUnobscured);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_expose_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	dud వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
     XExposeEvent	*gevent;
-    int			new_x;
+    పూర్ణాంకం			new_x;
 
-    if (event->type != Expose)
-	return;
+    ఒకవేళ (event->type != Expose)
+	తిరిగి;
 
-    out_flush();	    // make sure all output has been processed
+    బహిర్గతం_flush();	    // make sure all output has been processed
 
     gevent = (XExposeEvent *)event;
-    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
+    gui_redraw(gevent->x, gevent->y, gevent->వెడల్పు, gevent->ఎత్తు);
 
     new_x = FILL_X(0);
 
     // Clear the border areas if needed
-    if (gevent->x < new_x)
+    ఒకవేళ (gevent->x < new_x)
 	XClearArea(gui.dpy, gui.wid, 0, 0, new_x, 0, False);
-    if (gevent->y < FILL_Y(0))
+    ఒకవేళ (gevent->y < FILL_Y(0))
 	XClearArea(gui.dpy, gui.wid, 0, 0, 0, FILL_Y(0), False);
-    if (gevent->x > FILL_X(Columns))
-	XClearArea(gui.dpy, gui.wid, FILL_X((int)Columns), 0, 0, 0, False);
-    if (gevent->y > FILL_Y(Rows))
-	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((int)Rows), 0, 0, False);
+    ఒకవేళ (gevent->x > FILL_X(Columns))
+	XClearArea(gui.dpy, gui.wid, FILL_X((పూర్ణాంకం)Columns), 0, 0, 0, False);
+    ఒకవేళ (gevent->y > FILL_Y(అడ్డువరుసలు))
+	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((పూర్ణాంకం)అడ్డువరుసలు), 0, 0, False);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+#ఒకవేళ defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
 /*
  * This function fills in the XRectangle object with the current x,y
  * coordinates and height, width so that an XtVaSetValues to the same shell of
@@ -633,386 +633,386 @@ gui_x11_expose_cb(
  * unchanged.  Be sure to have the XRectangle set with the proper values for a
  * failed condition prior to calling this function.
  */
-    static void
+    స్థిర శూన్య
 shellRectangle(Widget shell, XRectangle *r)
 {
-    Window		rootw, shellw, child, parentw;
-    int			absx, absy;
-    XWindowAttributes	a;
-    Window		*children;
-    unsigned int	childrenCount;
+    కిటికీ		rootw, shellw, బిడ్డ, parentw;
+    పూర్ణాంకం			absx, absy;
+    XWindow_లక్షణాలు	a;
+    కిటికీ		*children;
+    గుర్తులేని పూర్ణాంకం	children_లెక్క;
 
-    shellw = XtWindow(shell);
-    if (shellw == 0)
-	return;
-    for (;;)
+    shellw = Xt_కిటికీ(shell);
+    ఒకవేళ (shellw == 0)
+	తిరిగి;
+    కొరకు (;;)
     {
-	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
-						   &children, &childrenCount);
+	XQuery_వృక్షం(XtDisplay(shell), shellw, &rootw, &parentw,
+						   &children, &children_లెక్క);
 	XFree(children);
-	if (parentw == rootw)
-	    break;
+	ఒకవేళ (parentw == rootw)
+	    ఆపు;
 	shellw = parentw;
     }
-    XGetWindowAttributes(XtDisplay(shell), shellw, &a);
-    XTranslateCoordinates(XtDisplay(shell), shellw, a.root, 0, 0,
-							&absx, &absy, &child);
+    XGet_కిటికీ_లక్షణాలు(XtDisplay(shell), shellw, &a);
+    XTranslateCoordinates(XtDisplay(shell), shellw, a.మూలం, 0, 0,
+							&absx, &absy, &బిడ్డ);
     r->x = absx;
     r->y = absy;
-    XtVaGetValues(shell, XmNheight, &r->height, XmNwidth, &r->width, NULL);
+    Xt_Va_Get_విలువలు(shell, XmNheight, &r->ఎత్తు, XmNwidth, &r->వెడల్పు, ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-gui_x11_resize_window_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    స్థిర శూన్య
+gui_x11_resize_కిటికీ_cb(
+    Widget	w వాడని,
+    Xt_సూచిక	dud వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
-    static int lastWidth, lastHeight;
+    స్థిర పూర్ణాంకం చివరి_వెడల్పు_2, చివరి_ఎత్తు_2;
 
-    if (event->type != ConfigureNotify)
-	return;
+    ఒకవేళ (event->type != ConfigureNotify)
+	తిరిగి;
 
-    if (event->xconfigure.width != lastWidth
-	    || event->xconfigure.height != lastHeight)
+    ఒకవేళ (event->xconfigure.వెడల్పు != చివరి_వెడల్పు_2
+	    || event->xconfigure.ఎత్తు != చివరి_ఎత్తు_2)
     {
-	lastWidth = event->xconfigure.width;
-	lastHeight = event->xconfigure.height;
-	gui_resize_shell(event->xconfigure.width, event->xconfigure.height
-#ifdef FEAT_XIM
-						- xim_get_status_area_height()
-#endif
+	చివరి_వెడల్పు_2 = event->xconfigure.వెడల్పు;
+	చివరి_ఎత్తు_2 = event->xconfigure.ఎత్తు;
+	gui_resize_shell(event->xconfigure.వెడల్పు, event->xconfigure.ఎత్తు
+#నిర్వచితమైతే FEAT_XIM
+						- xim_get_స్థితి_area_ఎత్తు()
+#అయితే_ముగింపు
 		     );
     }
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
-    if (netbeans_active())
+#ఒకవేళ defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+    ఒకవేళ (netbeans_చురుకైన())
     {
 	XRectangle  rec;
 
 	shellRectangle(w, &rec);
-	netbeans_frame_moved(rec.x, rec.y);
+	netbeans_చట్రం_moved(rec.x, rec.y);
     }
-#endif
-#ifdef FEAT_XIM
-    xim_set_preedit();
-#endif
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_XIM
+    xim_సమితి_preedit();
+#అయితే_ముగింపు
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_focus_change_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	దత్తాంశం వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
-    gui_focus_change(event->type == FocusIn);
+    gui_focus_change(event->type == Focus_లోపల);
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_enter_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w వాడని,
+    Xt_సూచిక	దత్తాంశం వాడని,
+    XEvent	*event వాడని,
+    Boolean	*dum వాడని)
 {
     gui_focus_change(TRUE);
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_leave_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w వాడని,
+    Xt_సూచిక	దత్తాంశం వాడని,
+    XEvent	*event వాడని,
+    Boolean	*dum వాడని)
 {
     gui_focus_change(FALSE);
 }
 
-#if defined(X_HAVE_UTF8_STRING)
-# if X_HAVE_UTF8_STRING
+#ఒకవేళ defined(X_HAVE_UTF8_STRING)
+# ఒకవేళ X_HAVE_UTF8_STRING
 #  define USE_UTF8LOOKUP
 # endif
-#endif
+#అయితే_ముగింపు
 
-    void
-gui_x11_key_hit_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    శూన్య
+gui_x11_కీలకం_తగిలింది_cb(
+    Widget	w వాడని,
+    Xt_సూచిక	dud వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
     XKeyPressedEvent	*ev_press;
-#ifdef FEAT_XIM
+#నిర్వచితమైతే FEAT_XIM
     char_u		string2[256];
     char_u		string_shortbuf[256];
     char_u		*string = string_shortbuf;
     Boolean		string_alloced = False;
-    Status		status;
-#else
+    స్థితి_3		స్థితి_2;
+#లేకపోతే
     char_u		string[4], string2[3];
-#endif
-    KeySym		key_sym;
-    int			len;
-    int			i;
-    int			modifiers;
-    int			key;
+#అయితే_ముగింపు
+    కీలకం_Sym		కీలకం_sym;
+    పూర్ణాంకం			len;
+    పూర్ణాంకం			i;
+    పూర్ణాంకం			modifiers;
+    పూర్ణాంకం			కీలకం;
 
     ev_press = (XKeyPressedEvent *)event;
 
-#ifdef FEAT_XIM
-    if (xic)
+#నిర్వచితమైతే FEAT_XIM
+    ఒకవేళ (xic)
     {
 # ifdef USE_UTF8LOOKUP
 	// XFree86 4.0.2 or newer: Be able to get UTF-8 characters even when
 	// the locale isn't utf-8.
-	if (enc_utf8)
-	    len = Xutf8LookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	else
+	ఒకవేళ (enc_utf8)
+	    len = Xutf8LookupString(xic, ev_press, (అక్షరం *)string,
+				  పరిమాణం(string_shortbuf), &కీలకం_sym, &స్థితి_2);
+	లేకపోతే
 # endif
-	    len = XmbLookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	if (status == XBufferOverflow)
+	    len = XmbLookupString(xic, ev_press, (అక్షరం *)string,
+				  పరిమాణం(string_shortbuf), &కీలకం_sym, &స్థితి_2);
+	ఒకవేళ (స్థితి_2 == XBuffer_అధికప్రవాహం)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
 	    string_alloced = True;
 # ifdef USE_UTF8LOOKUP
 	    // XFree86 4.0.2 or newer: Be able to get UTF-8 characters even
 	    // when the locale isn't utf-8.
-	    if (enc_utf8)
-		len = Xutf8LookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
-	    else
+	    ఒకవేళ (enc_utf8)
+		len = Xutf8LookupString(xic, ev_press, (అక్షరం *)string,
+						      len, &కీలకం_sym, &స్థితి_2);
+	    లేకపోతే
 # endif
-		len = XmbLookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
+		len = XmbLookupString(xic, ev_press, (అక్షరం *)string,
+						      len, &కీలకం_sym, &స్థితి_2);
 	}
-	if (status == XLookupNone || status == XLookupChars)
-	    key_sym = XK_VoidSymbol;
+	ఒకవేళ (స్థితి_2 == XLookupNone || స్థితి_2 == XLookupChars)
+	    కీలకం_sym = XK_Void_చిహ్నం;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	ఒకవేళ (len > 0 && ఆదానం_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
 		)
 	{
-	    int		maxlen = len * 4 + 40;	// guessed
+	    పూర్ణాంకం		maxlen = len * 4 + 40;	// guessed
 	    char_u	*p = (char_u *)XtMalloc(maxlen);
 
 	    mch_memmove(p, string, len);
-	    if (string_alloced)
-		XtFree((char *)string);
+	    ఒకవేళ (string_alloced)
+		XtFree((అక్షరం *)string);
 	    string = p;
 	    string_alloced = True;
-	    len = convert_input(p, len, maxlen);
+	    len = convert_ఆదానం(p, len, maxlen);
 	}
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
 	// start of a special key.
-	for (i = 0; i < len; ++i)
-	    if (string[i] == CSI)
+	కొరకు (i = 0; i < len; ++i)
+	    ఒకవేళ (string[i] == CSI)
 	    {
 		char_u	*p = (char_u *)XtMalloc(len + 3);
 
 		mch_memmove(p, string, i + 1);
 		p[i + 1] = KS_EXTRA;
-		p[i + 2] = (int)KE_CSI;
+		p[i + 2] = (పూర్ణాంకం)KE_CSI;
 		mch_memmove(p + i + 3, string + i + 1, len - i);
-		if (string_alloced)
-		    XtFree((char *)string);
+		ఒకవేళ (string_alloced)
+		    XtFree((అక్షరం *)string);
 		string = p;
 		string_alloced = True;
 		i += 2;
 		len += 2;
 	    }
     }
-    else
-#endif
-	len = XLookupString(ev_press, (char *)string, sizeof(string),
-		&key_sym, NULL);
+    లేకపోతే
+#అయితే_ముగింపు
+	len = XLookupString(ev_press, (అక్షరం *)string, పరిమాణం(string),
+		&కీలకం_sym, ఖాళీ);
 
-#ifdef SunXK_F36
+#నిర్వచితమైతే SunXK_F36
     /*
     * These keys have bogus lookup strings, and trapping them here is
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    ఒకవేళ (కీలకం_sym == SunXK_F36 || కీలకం_sym == SunXK_F37)
 	len = 0;
-#endif
+#అయితే_ముగింపు
 
-    if (key_sym == XK_space)
+    ఒకవేళ (కీలకం_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    ఒకవేళ (కీలకం_sym == XK_minus && (ev_press->state & Control_ముసుగు))
 	string[0] = Ctrl__;
 
-#ifdef XK_ISO_Left_Tab
+#నిర్వచితమైతే XK_ISO_ఎడమ_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    ఒకవేళ (కీలకం_sym == XK_ISO_ఎడమ_Tab)
     {
-	key_sym = XK_Tab;
+	కీలకం_sym = XK_Tab;
 	string[0] = TAB;
 	len = 1;
     }
-#endif
+#అయితే_ముగింపు
 
     // We used to apply Alt/Meta to the key here (Mod1Mask), but that is now
     // done later, the same as it happens for the terminal.  Hopefully that
     // works for everybody...
 
-    if (len == 1 && string[0] == CSI)
+    ఒకవేళ (len == 1 && string[0] == CSI)
     {
 	string[1] = KS_EXTRA;
-	string[2] = (int)KE_CSI;
+	string[2] = (పూర్ణాంకం)KE_CSI;
 	len = -3;
     }
 
     // Check for special keys.  Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    ఒకవేళ (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	కొరకు (i = 0; special_కీలకాలు[i].కీలకం_sym != (కీలకం_Sym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    ఒకవేళ (special_కీలకాలు[i].కీలకం_sym == కీలకం_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].vim_code0;
-		string[2] = special_keys[i].vim_code1;
+		string[1] = special_కీలకాలు[i].vim_code0;
+		string[2] = special_కీలకాలు[i].vim_code1;
 		len = -3;
-		break;
+		ఆపు;
 	    }
 	}
     }
 
     // Unrecognised key is ignored.
-    if (len == 0)
-	goto theend;
+    ఒకవేళ (len == 0)
+	వెళ్ళు theend;
 
     // Handle modifiers.
     modifiers = 0;
-    if (ev_press->state & ShiftMask)
-	modifiers |= MOD_MASK_SHIFT;
-    if (ev_press->state & ControlMask)
+    ఒకవేళ (ev_press->state & జరుపు_ముసుగు)
+	modifiers |= MOD_ముసుగు_జరుపు;
+    ఒకవేళ (ev_press->state & Control_ముసుగు)
     {
-	modifiers |= MOD_MASK_CTRL;
-	if (len == 1 && string[0] < 0x20)
+	modifiers |= MOD_ముసుగు_CTRL;
+	ఒకవేళ (len == 1 && string[0] < 0x20)
 	    // Use the character before applyng CTRL.
 	    string[0] += 0x40;
     }
-    if (ev_press->state & Mod1Mask)
-	modifiers |= MOD_MASK_ALT;
-    if (ev_press->state & Mod4Mask)
-	modifiers |= MOD_MASK_META;
+    ఒకవేళ (ev_press->state & Mod1_ముసుగు)
+	modifiers |= MOD_ముసుగు_ALT;
+    ఒకవేళ (ev_press->state & Mod4_ముసుగు)
+	modifiers |= MOD_ముసుగు_META;
 
     /*
      * For some keys a shift modifier is translated into another key
      * code.
      */
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    ఒకవేళ (len == -3)
+	కీలకం = గమ్యం_SPECIAL(string[1], string[2]);
+    లేకపోతే
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	కీలకం = mb_ptr2char(string);
     }
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    కీలకం = simplify_కీలకం(కీలకం, &modifiers);
+    ఒకవేళ (కీలకం == CSI)
+	కీలకం = K_CSI;
+    ఒకవేళ (IS_SPECIAL(కీలకం))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_రెండవ(కీలకం);
+	string[2] = K_మూడవ(కీలకం);
 	len = 3;
     }
-    else
+    లేకపోతే
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	కీలకం = may_adjust_కీలకం_for_ctrl(modifiers, కీలకం);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(కీలకం, string);
 
 	// Remove the SHIFT modifier for keys where it's already included,
 	// e.g., '(', '!' and '*'.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_జరుపు_modifier(modifiers, కీలకం);
     }
 
-    if (modifiers != 0)
+    ఒకవేళ (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	కూడు_గమ్యం_ఆదానం_buf(string2, 3);
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	పూర్ణాంకం int_ch = check_for_అంతరాయం(కీలకం, modifiers);
 
-	if (int_ch != NUL)
+	ఒకవేళ (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_ఆదానం_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    కూడు_గమ్యం_ఆదానం_buf(string, len);
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh)
+    ఒకవేళ (p_mh)
 	gui_mch_mousehide(TRUE);
 
-#if defined(FEAT_BEVAL_TIP)
+#ఒకవేళ defined(FEAT_BEVAL_TIP)
     {
 	BalloonEval *be;
 
-	if ((be = gui_mch_currently_showing_beval()) != NULL)
+	ఒకవేళ ((be = gui_mch_currently_showing_beval()) != ఖాళీ)
 	    gui_mch_unpost_balloon(be);
     }
-#endif
+#అయితే_ముగింపు
 theend:
     {}	    // some compilers need a statement here
-#ifdef FEAT_XIM
-    if (string_alloced)
-	XtFree((char *)string);
-#endif
+#నిర్వచితమైతే FEAT_XIM
+    ఒకవేళ (string_alloced)
+	XtFree((అక్షరం *)string);
+#అయితే_ముగింపు
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_mouse_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	dud వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
-    static XtIntervalId timer = (XtIntervalId)0;
-    static int	timed_out = TRUE;
+    స్థిర XtIntervalId timer = (XtIntervalId)0;
+    స్థిర పూర్ణాంకం	timed_బహిర్గతం = TRUE;
 
-    int		button;
-    int		repeated_click = FALSE;
-    int		x, y;
+    పూర్ణాంకం		button;
+    పూర్ణాంకం		repeated_click = FALSE;
+    పూర్ణాంకం		x, y;
     int_u	x_modifiers;
     int_u	vim_modifiers;
 
-    if (event->type == MotionNotify)
+    ఒకవేళ (event->type == MotionNotify)
     {
 	// Get the latest position, avoids lagging behind on a drag.
 	x = event->xmotion.x;
 	y = event->xmotion.y;
 	x_modifiers = event->xmotion.state;
-	button = (x_modifiers & (Button1Mask | Button2Mask | Button3Mask))
+	button = (x_modifiers & (Button1_ముసుగు | Button2_ముసుగు | Button3_ముసుగు))
 		? MOUSE_DRAG : ' ';
 
 	/*
@@ -1020,64 +1020,64 @@ gui_x11_mouse_cb(
 	 */
 	gui_mch_mousehide(FALSE);
 
-	if (button != MOUSE_DRAG)	// just moving the rodent
+	ఒకవేళ (button != MOUSE_DRAG)	// just moving the rodent
 	{
-#ifdef FEAT_MENU
-	    if (dud)			// moved in vimForm
-		y -= gui.menu_height;
-#endif
+#నిర్వచితమైతే FEAT_MENU
+	    ఒకవేళ (dud)			// moved in vimForm
+		y -= gui.menu_ఎత్తు;
+#అయితే_ముగింపు
 	    gui_mouse_moved(x, y);
-	    return;
+	    తిరిగి;
 	}
     }
-    else
+    లేకపోతే
     {
 	x = event->xbutton.x;
 	y = event->xbutton.y;
-	if (event->type == ButtonPress)
+	ఒకవేళ (event->type == ButtonPress)
 	{
 	    // Handle multiple clicks
-	    if (!timed_out)
+	    ఒకవేళ (!timed_బహిర్గతం)
 	    {
-		XtRemoveTimeOut(timer);
+		Xt_Remove_సమయం_బహిర్గతం(timer);
 		repeated_click = TRUE;
 	    }
-	    timed_out = FALSE;
-	    timer = XtAppAddTimeOut(app_context, (long_u)p_mouset,
-			gui_x11_timer_cb, &timed_out);
-	    switch (event->xbutton.button)
+	    timed_బహిర్గతం = FALSE;
+	    timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, (long_u)p_mouset,
+			gui_x11_timer_cb, &timed_బహిర్గతం);
+	    ఎంపిక (event->xbutton.button)
 	    {
 		// keep in sync with gui_gtk_x11.c
-		case Button1:	button = MOUSE_LEFT;	break;
-		case Button2:	button = MOUSE_MIDDLE;	break;
-		case Button3:	button = MOUSE_RIGHT;	break;
-		case Button4:	button = MOUSE_4;	break;
-		case Button5:	button = MOUSE_5;	break;
-		case 6:		button = MOUSE_7;	break;
-		case 7:		button = MOUSE_6;	break;
-		case 8:		button = MOUSE_X1;	break;
-		case 9:		button = MOUSE_X2;	break;
-		default:
-		    return;	// Unknown button
+		స్థితి Button1:	button = MOUSE_ఎడమ;	ఆపు;
+		స్థితి Button2:	button = MOUSE_మధ్య;	ఆపు;
+		స్థితి Button3:	button = MOUSE_కుడి;	ఆపు;
+		స్థితి Button4:	button = MOUSE_4;	ఆపు;
+		స్థితి Button5:	button = MOUSE_5;	ఆపు;
+		స్థితి 6:		button = MOUSE_7;	ఆపు;
+		స్థితి 7:		button = MOUSE_6;	ఆపు;
+		స్థితి 8:		button = MOUSE_X1;	ఆపు;
+		స్థితి 9:		button = MOUSE_X2;	ఆపు;
+		అప్రమేయ:
+		    తిరిగి;	// Unknown button
 	    }
 	}
-	else if (event->type == ButtonRelease)
+	లేకపోతే ఒకవేళ (event->type == ButtonRelease)
 	    button = MOUSE_RELEASE;
-	else
-	    return;	// Unknown mouse event type
+	లేకపోతే
+	    తిరిగి;	// Unknown mouse event type
 
 	x_modifiers = event->xbutton.state;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	last_mouse_event = event->xbutton;
-#endif
+#ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	చివరి_mouse_event = event->xbutton;
+#అయితే_ముగింపు
     }
 
     vim_modifiers = 0x0;
-    if (x_modifiers & ShiftMask)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (x_modifiers & ControlMask)
+    ఒకవేళ (x_modifiers & జరుపు_ముసుగు)
+	vim_modifiers |= MOUSE_జరుపు;
+    ఒకవేళ (x_modifiers & Control_ముసుగు)
 	vim_modifiers |= MOUSE_CTRL;
-    if (x_modifiers & Mod1Mask)	    // Alt or Meta key
+    ఒకవేళ (x_modifiers & Mod1_ముసుగు)	    // Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
@@ -1092,164 +1092,164 @@ gui_x11_mouse_cb(
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    శూన్య
+gui_mch_prepare(పూర్ణాంకం *argc, అక్షరం **argv)
 {
-    int	    arg;
-    int	    i;
+    పూర్ణాంకం	    arg;
+    పూర్ణాంకం	    i;
 
     /*
      * Move all the entries in argv which are relevant to X into gui_argv.
      */
     gui_argc = 0;
-    gui_argv = LALLOC_MULT(char *, *argc);
-    if (gui_argv == NULL)
-	return;
+    gui_argv = LALLOC_MULT(అక్షరం *, *argc);
+    ఒకవేళ (gui_argv == ఖాళీ)
+	తిరిగి;
     gui_argv[gui_argc++] = argv[0];
     arg = 1;
-    while (arg < *argc)
+    అయితే (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
-	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
-		break;
+	కొరకు (i = 0; i < (పూర్ణాంకం)Xt_సంఖ్య(cmdline_options); i++)
+	    ఒకవేళ (strcmp(argv[arg], cmdline_options[i].option) == 0)
+		ఆపు;
 
-	if (i < (int)XtNumber(cmdline_options))
+	ఒకవేళ (i < (పూర్ణాంకం)Xt_సంఖ్య(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
-	    if (strcmp("-rv", argv[arg]) == 0
+	    ఒకవేళ (strcmp("-rv", argv[arg]) == 0
 		    || strcmp("-reverse", argv[arg]) == 0)
-		found_reverse_arg = TRUE;
-	    else if ((strcmp("-fn", argv[arg]) == 0
+		దొరికింది_తిరగేయి_arg = TRUE;
+	    లేకపోతే ఒకవేళ ((strcmp("-fn", argv[arg]) == 0
 			|| strcmp("-font", argv[arg]) == 0)
 		    && arg + 1 < *argc)
-		font_argument = argv[arg + 1];
+		font_వాదం = argv[arg + 1];
 
 	    // Found match in table, so move it into gui_argv
 	    gui_argv[gui_argc++] = argv[arg];
-	    if (--*argc > arg)
+	    ఒకవేళ (--*argc > arg)
 	    {
 		mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-						    * sizeof(char *));
-		if (cmdline_options[i].argKind != XrmoptionNoArg)
+						    * పరిమాణం(అక్షరం *));
+		ఒకవేళ (cmdline_options[i].arg_రకం != XrmoptionNoArg)
 		{
 		    // Move the options argument as well
 		    gui_argv[gui_argc++] = argv[arg];
-		    if (--*argc > arg)
+		    ఒకవేళ (--*argc > arg)
 			mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-							    * sizeof(char *));
+							    * పరిమాణం(అక్షరం *));
 		}
 	    }
-	    argv[*argc] = NULL;
+	    argv[*argc] = ఖాళీ;
 	}
-	else
-#ifdef FEAT_NETBEANS_INTG
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	లేకపోతే
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	    ఒకవేళ (అక్షరశ్రేణి_పోలిక("-nb", argv[arg], 3) == 0)
 	{
 	    gui.dofork = false;	// don't fork() when starting GUI
 	    netbeansArg = argv[arg];
 	    mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-	    argv[*argc] = NULL;
+					    (--*argc - arg) * పరిమాణం(అక్షరం *));
+	    argv[*argc] = ఖాళీ;
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    arg++;
     }
 }
 
-#ifndef XtSpecificationRelease
+#నిర్వచితం_కాకపోతే XtSpecificationRelease
 # define CARDINAL (Cardinal *)
-#else
-# if XtSpecificationRelease == 4
+#లేకపోతే
+# ఒకవేళ XtSpecificationRelease == 4
 #  define CARDINAL (Cardinal *)
-# else
-#  define CARDINAL (int *)
+# లేకపోతే
+#  define CARDINAL (పూర్ణాంకం *)
 # endif
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    పూర్ణాంకం
+gui_mch_init_check(శూన్య)
 {
-#ifdef FEAT_XIM
-    XtSetLanguageProc(NULL, NULL, NULL);
-#endif
+#నిర్వచితమైతే FEAT_XIM
+    Xt_సమితి_Language_Proc(ఖాళీ, ఖాళీ, ఖాళీ);
+#అయితే_ముగింపు
     open_app_context();
-    if (app_context != NULL)
+    ఒకవేళ (app_context != ఖాళీ)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
-		cmdline_options, XtNumber(cmdline_options),
+		cmdline_options, Xt_సంఖ్య(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
-#if defined(LC_NUMERIC)
+#ఒకవేళ defined(LC_NUMERIC)
     {
 	// The call to XtOpenDisplay() may have set the locale from the
 	// environment. Set LC_NUMERIC to "C" to make sure that strtod() uses a
 	// decimal point, not a comma.
-	char *p = setlocale(LC_NUMERIC, NULL);
+	అక్షరం *p = setlocale(LC_NUMERIC, ఖాళీ);
 
-	if (p == NULL || strcmp(p, "C") != 0)
+	ఒకవేళ (p == ఖాళీ || strcmp(p, "C") != 0)
 	   setlocale(LC_NUMERIC, "C");
     }
-#endif
-    if (app_context == NULL || gui.dpy == NULL)
+#అయితే_ముగింపు
+    ఒకవేళ (app_context == ఖాళీ || gui.dpy == ఖాళీ)
     {
 	gui.dying = true;
 	emsg(_(e_cannot_open_display));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 
-#ifdef USE_XSMP
+#నిర్వచితమైతే USE_XSMP
 /*
  * Handle XSMP processing, de-registering the attachment upon error
  */
-static XtInputId _xsmp_xtinputid;
+స్థిర Xt_ఆదానం_Id _xsmp_xtinputid;
 
-    static void
-local_xsmp_handle_requests(
-    XtPointer	c UNUSED,
-    int		*s UNUSED,
-    XtInputId	*i UNUSED)
+    స్థిర శూన్య
+local_xsmp_handle_అభ్యర్థనలు(
+    Xt_సూచిక	c వాడని,
+    పూర్ణాంకం		*s వాడని,
+    Xt_ఆదానం_Id	*i వాడని)
 {
-    if (xsmp_handle_requests() == FAIL)
-	XtRemoveInput(_xsmp_xtinputid);
+    ఒకవేళ (xsmp_handle_అభ్యర్థనలు() == FAIL)
+	Xt_Remove_ఆదానం(_xsmp_xtinputid);
 }
-#endif
+#అయితే_ముగింపు
 
 
 /*
  * Initialise the X GUI.  Create all the windows, set up all the call-backs etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    పూర్ణాంకం
+gui_mch_init(శూన్య)
 {
-    XtGCMask	gc_mask;
+    XtGCMask	gc_ముసుగు;
     XGCValues	gc_vals;
-    int		x, y, mask;
-    unsigned	w, h;
+    పూర్ణాంకం		x, y, ముసుగు;
+    గుర్తులేని	w, h;
 
-#if 0
+#ఒకవేళ 0
     // Uncomment this to enable synchronous mode for debugging
     XSynchronize(gui.dpy, True);
-#endif
+#అయితే_ముగింపు
 
     vimShell = XtVaAppCreateShell(VIM_NAME, VIM_CLASS,
-	    applicationShellWidgetClass, gui.dpy, NULL);
+	    applicationShellWidgetClass, gui.dpy, ఖాళీ);
 
     /*
      * Get the application resources
      */
-    XtVaGetApplicationResources(vimShell, (XtPointer)&gui,
-	vim_resources, XtNumber(vim_resources), NULL);
+    XtVaGetApplicationResources(vimShell, (Xt_సూచిక)&gui,
+	vim_resources, Xt_సంఖ్య(vim_resources), ఖాళీ);
 
-    gui.scrollbar_height = gui.scrollbar_width;
+    gui.scrollbar_ఎత్తు = gui.scrollbar_వెడల్పు;
 
     /*
      * Get the colors ourselves.  Using the automatic conversion doesn't
@@ -1259,28 +1259,28 @@ gui_mch_init(void)
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
     gui.scroll_fg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_fg_name);
     gui.scroll_bg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_bg_name);
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
     gui.tooltip_fg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_fg_name);
     gui.tooltip_bg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_bg_name);
-#endif
+#అయితే_ముగింపు
 
     // Set default foreground and background colours
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.వెనుక_pixel = gui.def_వెనుక_pixel;
 
     // Check if reverse video needs to be applied (on Sun it's done by X)
-    if (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
+    ఒకవేళ (gui.rsrc_rev_video && gui_get_lightness(gui.వెనుక_pixel)
 					  > gui_get_lightness(gui.norm_pixel))
     {
-	gui.norm_pixel = gui.def_back_pixel;
-	gui.back_pixel = gui.def_norm_pixel;
+	gui.norm_pixel = gui.def_వెనుక_pixel;
+	gui.వెనుక_pixel = gui.def_norm_pixel;
 	gui.def_norm_pixel = gui.norm_pixel;
-	gui.def_back_pixel = gui.back_pixel;
+	gui.def_వెనుక_pixel = gui.వెనుక_pixel;
     }
 
     // Get the colors from the "Normal", "Tooltip", "Scrollbar" and "Menu"
     // group (set in syntax.c or in a vimrc file)
-    set_normal_colors();
+    సమితి_సాధారణ_colors();
 
     /*
      * Check that none of the colors are the same as the background color
@@ -1290,48 +1290,48 @@ gui_mch_init(void)
     /*
      * Set up the GCs.	The font attributes will be set in gui_init_font().
      */
-    gc_mask = GCForeground | GCBackground;
+    gc_ముసుగు = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    gui.text_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gc_vals.background = gui.వెనుక_pixel;
+    gui.పాఠ్యం_gc = XtGetGC(vimShell, gc_ముసుగు, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.వెనుక_pixel;
     gc_vals.background = gui.norm_pixel;
-    gui.back_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.వెనుక_gc = XtGetGC(vimShell, gc_ముసుగు, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_ముసుగు |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.వెనుక_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.వెనుక_pixel;
     gc_vals.function   = GXxor;
-    gui.invert_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.invert_gc = XtGetGC(vimShell, gc_ముసుగు, &gc_vals);
 
     gui.visibility = VisibilityUnobscured;
-    x11_setup_atoms(gui.dpy);
+    x11_అమరిక_atoms(gui.dpy);
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    ఒకవేళ (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_సమితి_winpos(gui_win_x, gui_win_y);
 
     // Now adapt the supplied(?) geometry-settings
     // Added by Kjetil Jacobsen <kjetilja@stud.cs.uit.no>
-    if (gui.geom != NULL && *gui.geom != NUL)
+    ఒకవేళ (gui.geom != ఖాళీ && *gui.geom != NUL)
     {
-	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	ముసుగు = XParseGeometry((అక్షరం *)gui.geom, &x, &y, &w, &h);
+	ఒకవేళ (ముసుగు & వెడల్పు_విలువ)
 	    Columns = w;
-	if (mask & HeightValue)
+	ఒకవేళ (ముసుగు & ఎత్తు_విలువ)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
-		p_window = h - 1;
-	    Rows = h;
+	    ఒకవేళ (p_కిటికీ > (దీర్ఘ)h - 1 || !option_was_సమితి((char_u *)"window"))
+		p_కిటికీ = h - 1;
+	    అడ్డువరుసలు = h;
 	}
-	limit_screen_size();
+	హద్దు_screen_కొలత();
 	/*
 	 * Set the (x,y) position of the main window only if specified in the
 	 * users geometry, so we get good defaults when they don't. This needs
 	 * to be done before the shell is popped up.
 	 */
-	if (mask & (XValue|YValue))
-	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
+	ఒకవేళ (ముసుగు & (XValue|YValue))
+	    Xt_Va_సమితి_విలువలు(vimShell, XtNgeometry, gui.geom, ఖాళీ);
     }
 
     gui_x11_create_widgets();
@@ -1339,59 +1339,59 @@ gui_mch_init(void)
    /*
     * Add an icon to Vim (Marcel Douben: 11 May 1998).
     */
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    ఒకవేళ (vim_strchr(p_go, GO_ICON) != ఖాళీ)
     {
-#ifndef HAVE_XPM
+#నిర్వచితం_కాకపోతే HAVE_XPM
 # include "vim_icon.xbm"
 # include "vim_mask.xbm"
 
 	Arg	arg[2];
 
-	XtSetArg(arg[0], XtNiconPixmap,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_icon_bits,
-		    vim_icon_width,
-		    vim_icon_height));
-	XtSetArg(arg[1], XtNiconMask,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_mask_icon_bits,
-		    vim_mask_icon_width,
-		    vim_mask_icon_height));
-	XtSetValues(vimShell, arg, (Cardinal)2);
-#else
+	Xt_సమితి_Arg(arg[0], XtNiconPixmap,
+		XCreate_Bitmap_From_దత్తాంశం(gui.dpy,
+		    Default_మూలం_కిటికీ(gui.dpy),
+		    (అక్షరం *)vim_icon_బిట్లు,
+		    vim_icon_వెడల్పు,
+		    vim_icon_ఎత్తు));
+	Xt_సమితి_Arg(arg[1], Xt_Nicon_ముసుగు,
+		XCreate_Bitmap_From_దత్తాంశం(gui.dpy,
+		    Default_మూలం_కిటికీ(gui.dpy),
+		    (అక్షరం *)vim_ముసుగు_icon_బిట్లు,
+		    vim_ముసుగు_icon_వెడల్పు,
+		    vim_ముసుగు_icon_ఎత్తు));
+	Xt_సమితి_విలువలు(vimShell, arg, (Cardinal)2);
+#లేకపోతే
 // Use Pixmaps, looking much nicer.
 
 # include "../runtime/vim32x32.xpm"
 # include "../runtime/vim16x16.xpm"
 # include "../runtime/vim48x48.xpm"
 
-    static Pixmap	icon = 0;
-    static Pixmap	icon_mask = 0;
-    static char		**magick = vim32x32;
-    Window		root_window;
-    XIconSize		*size;
-    int			number_sizes;
+    స్థిర Pixmap	icon = 0;
+    స్థిర Pixmap	icon_ముసుగు = 0;
+    స్థిర అక్షరం		**magick = vim32x32;
+    కిటికీ		మూలం_కిటికీ;
+    XIcon_కొలత		*కొలత;
+    పూర్ణాంకం			సంఖ్య_sizes;
     Display		*dsp;
     Screen		*scr;
-    XpmAttributes	attr;
+    Xpm_లక్షణాలు	attr;
     Colormap		cmap;
 
     /*
      * Adjust the icon to the preferences of the actual window manager.
      */
-    root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
-						   &size, &number_sizes) != 0)
+    మూలం_కిటికీ = XRoot_కిటికీ_యొక్క_Screen(XtScreen(vimShell));
+    ఒకవేళ (XGetIconSizes(XtDisplay(vimShell), మూలం_కిటికీ,
+						   &కొలత, &సంఖ్య_sizes) != 0)
     {
-	if (number_sizes > 0)
+	ఒకవేళ (సంఖ్య_sizes > 0)
 	{
-	    if (size->max_height >= 48 && size->max_width >= 48)
+	    ఒకవేళ (కొలత->max_ఎత్తు_2 >= 48 && కొలత->max_వెడల్పు_2 >= 48)
 		magick = vim48x48;
-	    else if (size->max_height >= 32 && size->max_width >= 32)
+	    లేకపోతే ఒకవేళ (కొలత->max_ఎత్తు_2 >= 32 && కొలత->max_వెడల్పు_2 >= 32)
 		magick = vim32x32;
-	    else if (size->max_height >= 16 && size->max_width >= 16)
+	    లేకపోతే ఒకవేళ (కొలత->max_ఎత్తు_2 >= 16 && కొలత->max_వెడల్పు_2 >= 16)
 		magick = vim16x16;
 	}
     }
@@ -1400,51 +1400,51 @@ gui_mch_init(void)
     scr = XtScreen(vimShell);
 
     cmap = DefaultColormap(dsp, DefaultScreen(dsp));
-    XtVaSetValues(vimShell, XtNcolormap, cmap, NULL);
+    Xt_Va_సమితి_విలువలు(vimShell, XtNcolormap, cmap, ఖాళీ);
 
     attr.valuemask = 0L;
-    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | XpmDepth;
+    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | Xpm_లోతు;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colormap = cmap;
-    attr.depth = DefaultDepthOfScreen(scr);
+    attr.లోతు = Default_లోతు_యొక్క_Screen(scr);
 
-    if (!icon)
+    ఒకవేళ (!icon)
     {
-	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
-							   &icon_mask, &attr);
-	XpmFreeAttributes(&attr);
+	Xpm_Create_Pixmap_From_దత్తాంశం(dsp, మూలం_కిటికీ, magick, &icon,
+							   &icon_ముసుగు, &attr);
+	Xpm_Free_లక్షణాలు(&attr);
     }
 
-    XtVaSetValues(vimShell, XmNiconPixmap, icon, XmNiconMask, icon_mask, NULL);
-#endif
+    Xt_Va_సమితి_విలువలు(vimShell, XmNiconPixmap, icon, Xm_Nicon_ముసుగు, icon_ముసుగు, ఖాళీ);
+#అయితే_ముగింపు
     }
 
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
     gui_init_tooltip_font();
-#endif
-#ifdef FEAT_MENU
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
     gui_init_menu_font();
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_XSMP
+#నిర్వచితమైతే USE_XSMP
     // Attach listener on ICE connection
-    if (-1 != xsmp_icefd)
-	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
-		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
-#endif
+    ఒకవేళ (-1 != xsmp_icefd)
+	_xsmp_xtinputid = Xt_App_కూడు_ఆదానం(app_context, xsmp_icefd,
+		(Xt_సూచిక)Xt_ఆదానం_Read_ముసుగు, local_xsmp_handle_అభ్యర్థనలు, ఖాళీ);
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Called when starting the GUI fails after calling gui_mch_init().
  */
-    void
-gui_mch_uninit(void)
+    శూన్య
+gui_mch_uninit(శూన్య)
 {
     gui_x11_destroy_widgets();
     XtCloseDisplay(gui.dpy);
-    gui.dpy = NULL;
+    gui.dpy = ఖాళీ;
     vimShell = (Widget)0;
     VIM_CLEAR(gui_argv);
 }
@@ -1452,45 +1452,45 @@ gui_mch_uninit(void)
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    శూన్య
+gui_mch_new_colors(శూన్య)
 {
-    long_u	gc_mask;
+    long_u	gc_ముసుగు;
     XGCValues	gc_vals;
 
-    gc_mask = GCForeground | GCBackground;
+    gc_ముసుగు = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    if (gui.text_gc != NULL)
-	XChangeGC(gui.dpy, gui.text_gc, gc_mask, &gc_vals);
+    gc_vals.background = gui.వెనుక_pixel;
+    ఒకవేళ (gui.పాఠ్యం_gc != ఖాళీ)
+	XChangeGC(gui.dpy, gui.పాఠ్యం_gc, gc_ముసుగు, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.వెనుక_pixel;
     gc_vals.background = gui.norm_pixel;
-    if (gui.back_gc != NULL)
-	XChangeGC(gui.dpy, gui.back_gc, gc_mask, &gc_vals);
+    ఒకవేళ (gui.వెనుక_gc != ఖాళీ)
+	XChangeGC(gui.dpy, gui.వెనుక_gc, gc_ముసుగు, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_ముసుగు |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.వెనుక_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.వెనుక_pixel;
     gc_vals.function   = GXxor;
-    if (gui.invert_gc != NULL)
-	XChangeGC(gui.dpy, gui.invert_gc, gc_mask, &gc_vals);
+    ఒకవేళ (gui.invert_gc != ఖాళీ)
+	XChangeGC(gui.dpy, gui.invert_gc, gc_ముసుగు, &gc_vals);
 
-    gui_x11_set_back_color();
+    gui_x11_సమితి_వెనుక_color();
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    పూర్ణాంకం
+gui_mch_open(శూన్య)
 {
     // Actually open the window
     XtRealizeWidget(vimShell);
-    XtManageChild(XtNameToWidget(vimShell, "*vimForm"));
+    Xt_Manage_బిడ్డ(Xt_Name_గమ్యం_Widget(vimShell, "*vimForm"));
 
     gui.wid = gui_x11_get_wid();
-    gui.blank_pointer = gui_x11_create_blank_mouse();
+    gui.blank_సూచిక = gui_x11_create_blank_mouse();
 
     /*
      * Add a callback for the Close item on the window managers menu, and the
@@ -1498,182 +1498,182 @@ gui_mch_open(void)
      */
     wm_atoms[SAVE_YOURSELF_IDX] =
 			      XInternAtom(gui.dpy, "WM_SAVE_YOURSELF", False);
-    wm_atoms[DELETE_WINDOW_IDX] =
+    wm_atoms[DELETE_కిటికీ_IDX] =
 			      XInternAtom(gui.dpy, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(gui.dpy, XtWindow(vimShell), wm_atoms, 2);
-    XtAddEventHandler(vimShell, NoEventMask, True, gui_x11_wm_protocol_handler,
-							     NULL);
-#ifdef HAVE_X11_XMU_EDITRES_H
+    XSetWMProtocols(gui.dpy, Xt_కిటికీ(vimShell), wm_atoms, 2);
+    Xt_కూడు_Event_Handler(vimShell, No_Event_ముసుగు, True, gui_x11_wm_protocol_handler,
+							     ఖాళీ);
+#నిర్వచితమైతే HAVE_X11_XMU_EDITRES_H
     /*
      * Enable editres protocol (see "man editres").
      * Usually will need to add -lXmu to the linker line as well.
      */
-    XtAddEventHandler(vimShell, (EventMask)0, True, _XEditResCheckMessages,
-	    (XtPointer)NULL);
-#endif
+    Xt_కూడు_Event_Handler(vimShell, (Event_ముసుగు)0, True, _XEditResCheckMessages,
+	    (Xt_సూచిక)ఖాళీ);
+#అయితే_ముగింపు
 
-#ifdef FEAT_CLIENTSERVER
-    if (serverName == NULL && serverDelayedStartName != NULL)
+#నిర్వచితమైతే FEAT_CLIENTSERVER
+    ఒకవేళ (serverName == ఖాళీ && server_Delayed_ప్రారంభం_Name != ఖాళీ)
     {
 	// This is a :gui command in a plain vim with no previous server
-	commWindow = XtWindow(vimShell);
-	(void)serverRegisterName(gui.dpy, serverDelayedStartName);
+	comm_కిటికీ = Xt_కిటికీ(vimShell);
+	(శూన్య)server_రిజిస్టరు_Name(gui.dpy, server_Delayed_ప్రారంభం_Name);
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Cannot handle "widget-less" windows with XtProcessEvent() we'll
 	 * have to change the "server" registration to that of the main window
 	 * If we have not registered a name yet, remember the window
 	 */
-	serverChangeRegisteredWindow(gui.dpy, XtWindow(vimShell));
+	server_Change_Registered_కిటికీ(gui.dpy, Xt_కిటికీ(vimShell));
     }
-    XtAddEventHandler(vimShell, PropertyChangeMask, False,
-		      gui_x11_send_event_handler, NULL);
-#endif
+    Xt_కూడు_Event_Handler(vimShell, Property_Change_ముసుగు, False,
+		      gui_x11_send_event_handler, ఖాళీ);
+#అయితే_ముగింపు
 
     // Get the colors for the highlight groups (gui_check_colors() might have
     // changed them)
     highlight_gui_started();		// re-init colors and fonts
 
-#ifdef FEAT_XIM
+#నిర్వచితమైతే FEAT_XIM
     xim_init();
-#endif
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_BEVAL_GUI)
+#ఒకవేళ defined(FEAT_BEVAL_GUI)
 /*
  * Convert the tooltip fontset name to an XFontSet.
  */
-    void
-gui_init_tooltip_font(void)
+    శూన్య
+gui_init_tooltip_font(శూన్య)
 {
-    XrmValue from, to;
+    Xrm_విలువ from, గమ్యం;
 
-    from.addr = (char *)gui.rsrc_tooltip_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.tooltip_fontset;
-    to.size = sizeof(XFontSet);
+    from.addr = (అక్షరం *)gui.rsrc_tooltip_font_name;
+    from.కొలత = అక్షరశ్రేణి_పొడవు(from.addr);
+    గమ్యం.addr = (Xt_సూచిక)&gui.tooltip_fontset;
+    గమ్యం.కొలత = పరిమాణం(XFont_సమితి);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    ఒకవేళ (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_సమితి, &గమ్యం) == False)
     {
 	// Failed. What to do?
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 // Convert the menu font/fontset name to an XFontStruct/XFontset
-    void
-gui_init_menu_font(void)
+    శూన్య
+gui_init_menu_font(శూన్య)
 {
-    XrmValue from, to;
+    Xrm_విలువ from, గమ్యం;
 
 # ifdef FONTSET_ALWAYS
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_fontset;
-    to.size = sizeof(GuiFontset);
+    from.addr = (అక్షరం *)gui.rsrc_menu_font_name;
+    from.కొలత = అక్షరశ్రేణి_పొడవు(from.addr);
+    గమ్యం.addr = (Xt_సూచిక)&gui.menu_fontset;
+    గమ్యం.కొలత = పరిమాణం(GuiFontset);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    ఒకవేళ (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_సమితి, &గమ్యం) == False)
     {
 	// Failed. What to do?
     }
-# else
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_font;
-    to.size = sizeof(GuiFont);
+# లేకపోతే
+    from.addr = (అక్షరం *)gui.rsrc_menu_font_name;
+    from.కొలత = అక్షరశ్రేణి_పొడవు(from.addr);
+    గమ్యం.addr = (Xt_సూచిక)&gui.menu_font;
+    గమ్యం.కొలత = పరిమాణం(GuiFont);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
+    ఒకవేళ (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &గమ్యం) == False)
     {
 	// Failed. What to do?
     }
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-gui_mch_exit(int rc UNUSED)
+    శూన్య
+gui_mch_exit(పూర్ణాంకం rc వాడని)
 {
-#if 0
+#ఒకవేళ 0
     // Lesstif gives an error message here, and so does Solaris.  The man page
     // says that this isn't needed when exiting, so just skip it.
     XtCloseDisplay(gui.dpy);
-#endif
+#అయితే_ముగింపు
     VIM_CLEAR(gui_argv);
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    పూర్ణాంకం
+gui_mch_get_winpos(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
     Dimension	xpos, ypos;
 
-    XtVaGetValues(vimShell,
+    Xt_Va_Get_విలువలు(vimShell,
 	XtNx,	&xpos,
 	XtNy,	&ypos,
-	NULL);
+	ఖాళీ);
     *x = xpos;
     *y = ypos;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    శూన్య
+gui_mch_సమితి_winpos(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    XtVaSetValues(vimShell,
+    Xt_Va_సమితి_విలువలు(vimShell,
 	XtNx,	x,
 	XtNy,	y,
-	NULL);
+	ఖాళీ);
 }
 
-    void
-gui_mch_set_shellsize(
-    int		width,
-    int		height,
-    int		min_width,
-    int		min_height,
-    int		base_width,
-    int		base_height,
-    int		direction UNUSED)
+    శూన్య
+gui_mch_సమితి_shellsize(
+    పూర్ణాంకం		వెడల్పు,
+    పూర్ణాంకం		ఎత్తు,
+    పూర్ణాంకం		min_వెడల్పు,
+    పూర్ణాంకం		min_ఎత్తు,
+    పూర్ణాంకం		పునాది_వెడల్పు,
+    పూర్ణాంకం		పునాది_ఎత్తు,
+    పూర్ణాంకం		direction వాడని)
 {
-#ifdef FEAT_XIM
-    height += xim_get_status_area_height(),
-#endif
-    XtVaSetValues(vimShell,
-	XtNwidthInc,	gui.char_width,
-	XtNheightInc,	gui.char_height,
-#if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
-	XtNbaseWidth,	base_width,
-	XtNbaseHeight,	base_height,
-#endif
-	XtNminWidth,	min_width,
-	XtNminHeight,	min_height,
-	XtNwidth,	width,
-	XtNheight,	height,
-	NULL);
+#నిర్వచితమైతే FEAT_XIM
+    ఎత్తు += xim_get_స్థితి_area_ఎత్తు(),
+#అయితే_ముగింపు
+    Xt_Va_సమితి_విలువలు(vimShell,
+	XtNwidthInc,	gui.char_వెడల్పు,
+	XtNheightInc,	gui.char_ఎత్తు,
+#ఒకవేళ defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
+	Xt_Nbase_వెడల్పు,	పునాది_వెడల్పు,
+	Xt_Nbase_ఎత్తు,	పునాది_ఎత్తు,
+#అయితే_ముగింపు
+	Xt_Nmin_వెడల్పు,	min_వెడల్పు,
+	Xt_Nmin_ఎత్తు,	min_ఎత్తు,
+	XtNwidth,	వెడల్పు,
+	XtNheight,	ఎత్తు,
+	ఖాళీ);
 }
 
 /*
  * Allow 10 pixels for horizontal borders, 'guiheadroom' for vertical borders.
  * Is there no way in X to find out how wide the borders really are?
  */
-    void
+    శూన్య
 gui_mch_get_screen_dimensions(
-    int	    *screen_w,
-    int	    *screen_h)
+    పూర్ణాంకం	    *screen_w,
+    పూర్ణాంకం	    *screen_h)
 {
-    *screen_w = DisplayWidth(gui.dpy, DefaultScreen(gui.dpy)) - 10;
-    *screen_h = DisplayHeight(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
+    *screen_w = Display_వెడల్పు(gui.dpy, DefaultScreen(gui.dpy)) - 10;
+    *screen_h = Display_ఎత్తు(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
 }
 
 /*
@@ -1682,46 +1682,46 @@ gui_mch_get_screen_dimensions(
  * If "fontset" is TRUE, load the "font_name" as a fontset.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 gui_mch_init_font(
     char_u	*font_name,
-    int		do_fontset UNUSED)
+    పూర్ణాంకం		do_fontset వాడని)
 {
-    XFontStruct	*font = NULL;
+    XFontStruct	*font = ఖాళీ;
 
-#ifdef FEAT_XFONTSET
-    XFontSet	fontset = NULL;
-#endif
+#నిర్వచితమైతే FEAT_XFONTSET
+    XFont_సమితి	fontset = ఖాళీ;
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_MOTIF
+#నిర్వచితమైతే FEAT_GUI_MOTIF
     // A font name equal "*" is indicating, that we should activate the font
     // selection dialogue to get a new font name. So let us do it here.
-    if (font_name != NULL && STRCMP(font_name, "*") == 0)
+    ఒకవేళ (font_name != ఖాళీ && STRCMP(font_name, "*") == 0)
     {
 	font_name = gui_xm_select_font(hl_get_font_name());
 
 	// Do not reset to default font except on GUI startup.
-	if (font_name == NULL && !gui.starting)
-	    return OK;
+	ఒకవేళ (font_name == ఖాళీ && !gui.starting)
+	    తిరిగి OK;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_XFONTSET
-    if (do_fontset)
+#నిర్వచితమైతే FEAT_XFONTSET
+    ఒకవేళ (do_fontset)
     {
 	// If 'guifontset' is set, VIM treats all font specifications as if
 	// they were fontsets, and 'guifontset' becomes the default.
-	if (font_name != NULL)
+	ఒకవేళ (font_name != ఖాళీ)
 	{
-	    fontset = (XFontSet)gui_mch_get_fontset(font_name, FALSE, TRUE);
-	    if (fontset == NULL)
-		return FAIL;
+	    fontset = (XFont_సమితి)gui_mch_get_fontset(font_name, FALSE, TRUE);
+	    ఒకవేళ (fontset == ఖాళీ)
+		తిరిగి FAIL;
 	}
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	if (font_name == NULL)
+	ఒకవేళ (font_name == ఖాళీ)
 	{
 	    /*
 	     * If none of the fonts in 'font' could be loaded, try the one set
@@ -1730,255 +1730,255 @@ gui_mch_init_font(
 	     */
 	    font_name = gui.rsrc_font_name;
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	    if (font == NULL)
+	    ఒకవేళ (font == ఖాళీ)
 		font_name = (char_u *)DFLT_FONT;
 	}
-	if (font == NULL)
+	ఒకవేళ (font == ఖాళీ)
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	if (font == NULL)
-	    return FAIL;
+	ఒకవేళ (font == ఖాళీ)
+	    తిరిగి FAIL;
     }
 
     gui_mch_free_font(gui.norm_font);
-#ifdef FEAT_XFONTSET
+#నిర్వచితమైతే FEAT_XFONTSET
     gui_mch_free_fontset(gui.fontset);
 
-    if (fontset != NULL)
+    ఒకవేళ (fontset != ఖాళీ)
     {
 	gui.norm_font = NOFONT;
 	gui.fontset = (GuiFontset)fontset;
-	gui.char_width = fontset_width(fontset);
-	gui.char_height = fontset_height(fontset) + p_linespace;
+	gui.char_వెడల్పు = fontset_వెడల్పు(fontset);
+	gui.char_ఎత్తు = fontset_ఎత్తు(fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent(fontset) + p_linespace / 2;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	gui.norm_font = (GuiFont)font;
-#ifdef FEAT_XFONTSET
+#నిర్వచితమైతే FEAT_XFONTSET
 	gui.fontset = NOFONTSET;
-#endif
-	gui.char_width = font->max_bounds.width;
-	gui.char_height = font->ascent + font->descent + p_linespace;
+#అయితే_ముగింపు
+	gui.char_వెడల్పు = font->max_bounds.వెడల్పు;
+	gui.char_ఎత్తు = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
 
-    hl_set_font_name(font_name);
+    hl_సమితి_font_name(font_name);
 
     /*
      * Try to load other fonts for bold, italic, and bold-italic.
      * We should also try to work out what font to use for these when they are
      * not specified by X resources, but we don't yet.
      */
-    if (font_name == gui.rsrc_font_name)
+    ఒకవేళ (font_name == gui.rsrc_font_name)
     {
-	if (gui.bold_font == NOFONT
-		&& gui.rsrc_bold_font_name != NULL
+	ఒకవేళ (gui.bold_font == NOFONT
+		&& gui.rsrc_bold_font_name != ఖాళీ
 		&& *gui.rsrc_bold_font_name != NUL)
 	    gui.bold_font = gui_mch_get_font(gui.rsrc_bold_font_name, FALSE);
-	if (gui.ital_font == NOFONT
-		&& gui.rsrc_ital_font_name != NULL
+	ఒకవేళ (gui.ital_font == NOFONT
+		&& gui.rsrc_ital_font_name != ఖాళీ
 		&& *gui.rsrc_ital_font_name != NUL)
 	    gui.ital_font = gui_mch_get_font(gui.rsrc_ital_font_name, FALSE);
-	if (gui.boldital_font == NOFONT
-		&& gui.rsrc_boldital_font_name != NULL
+	ఒకవేళ (gui.boldital_font == NOFONT
+		&& gui.rsrc_boldital_font_name != ఖాళీ
 		&& *gui.rsrc_boldital_font_name != NUL)
 	    gui.boldital_font = gui_mch_get_font(gui.rsrc_boldital_font_name,
 								       FALSE);
     }
-    else
+    లేకపోతే
     {
 	// When not using the font specified by the resources, also don't use
 	// the bold/italic fonts, otherwise setting 'guifont' will look very
 	// strange.
-	if (gui.bold_font != NOFONT)
+	ఒకవేళ (gui.bold_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.bold_font);
 	    gui.bold_font = NOFONT;
 	}
-	if (gui.ital_font != NOFONT)
+	ఒకవేళ (gui.ital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.ital_font);
 	    gui.ital_font = NOFONT;
 	}
-	if (gui.boldital_font != NOFONT)
+	ఒకవేళ (gui.boldital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.boldital_font);
 	    gui.boldital_font = NOFONT;
 	}
     }
 
-#ifdef FEAT_GUI_MOTIF
+#నిర్వచితమైతే FEAT_GUI_MOTIF
     gui_motif_synch_fonts();
-#endif
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Get a font structure for highlighting.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int giveErrorIfMissing)
+gui_mch_get_font(char_u *name, పూర్ణాంకం giveErrorIfMissing)
 {
     XFontStruct	*font;
 
-    if (!gui.in_use || name == NULL)	// can't do this when GUI not running
-	return NOFONT;
+    ఒకవేళ (!gui.లోపల_use || name == ఖాళీ)	// can't do this when GUI not running
+	తిరిగి NOFONT;
 
-    font = XLoadQueryFont(gui.dpy, (char *)name);
+    font = XLoadQueryFont(gui.dpy, (అక్షరం *)name);
 
-    if (font == NULL)
+    ఒకవేళ (font == ఖాళీ)
     {
-	if (giveErrorIfMissing)
+	ఒకవేళ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	తిరిగి NOFONT;
     }
 
-#ifdef DEBUG
-    printf("Font Information for '%s':\n", name);
-    printf("  w = %d, h = %d, ascent = %d, descent = %d\n",
-	   font->max_bounds.width, font->ascent + font->descent,
+#నిర్వచితమైతే DEBUG
+    రాయి("Font Information for '%s':\n", name);
+    రాయి("  w = %d, h = %d, ascent = %d, descent = %d\n",
+	   font->max_bounds.వెడల్పు, font->ascent + font->descent,
 	   font->ascent, font->descent);
-    printf("  max ascent = %d, max descent = %d, max h = %d\n",
+    రాయి("  max ascent = %d, max descent = %d, max h = %d\n",
 	   font->max_bounds.ascent, font->max_bounds.descent,
 	   font->max_bounds.ascent + font->max_bounds.descent);
-    printf("  min lbearing = %d, min rbearing = %d\n",
+    రాయి("  min lbearing = %d, min rbearing = %d\n",
 	   font->min_bounds.lbearing, font->min_bounds.rbearing);
-    printf("  max lbearing = %d, max rbearing = %d\n",
+    రాయి("  max lbearing = %d, max rbearing = %d\n",
 	   font->max_bounds.lbearing, font->max_bounds.rbearing);
-    printf("  leftink = %d, rightink = %d\n",
+    రాయి("  leftink = %d, rightink = %d\n",
 	   (font->min_bounds.lbearing < 0),
-	   (font->max_bounds.rbearing > font->max_bounds.width));
-    printf("\n");
-#endif
+	   (font->max_bounds.rbearing > font->max_bounds.వెడల్పు));
+    రాయి("\n");
+#అయితే_ముగింపు
 
-    if (font->max_bounds.width != font->min_bounds.width)
+    ఒకవేళ (font->max_bounds.వెడల్పు != font->min_bounds.వెడల్పు)
     {
-	semsg(_(e_font_str_is_not_fixed_width), name);
+	semsg(_(e_font_str_is_not_fixed_వెడల్పు), name);
 	XFreeFont(gui.dpy, font);
-	return NOFONT;
+	తిరిగి NOFONT;
     }
-    return (GuiFont)font;
+    తిరిగి (GuiFont)font;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    char_u *ret = NULL;
+    char_u *ret = ఖాళీ;
 
-    if (name != NULL && font == NULL)
+    ఒకవేళ (name != ఖాళీ && font == ఖాళీ)
     {
 	// In this case, there's no way other than doing this.
 	ret = vim_strsave(name);
     }
-    else if (font != NULL)
+    లేకపోతే ఒకవేళ (font != ఖాళీ)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
-	unsigned long value = 0L;
+	గుర్తులేని దీర్ఘ విలువ = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	ఒకవేళ (XGetFontProperty(font, XA_FONT, &విలువ))
 	{
-	    char *xa_font_name = NULL;
+	    అక్షరం *xa_font_name = ఖాళీ;
 
-	    xa_font_name = XGetAtomName(gui.dpy, value);
-	    if (xa_font_name != NULL)
+	    xa_font_name = XGetAtomName(gui.dpy, విలువ);
+	    ఒకవేళ (xa_font_name != ఖాళీ)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
 		XFree(xa_font_name);
 	    }
-	    else if (name != NULL)
+	    లేకపోతే ఒకవేళ (name != ఖాళీ)
 		ret = vim_strsave(name);
 	}
-	else if (name != NULL)
+	లేకపోతే ఒకవేళ (name != ఖాళీ)
 	    ret = vim_strsave(name);
     }
-    return ret;
+    తిరిగి ret;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    పూర్ణాంకం
+gui_mch_adjust_charheight(శూన్య)
 {
-#ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+#నిర్వచితమైతే FEAT_XFONTSET
+    ఒకవేళ (gui.fontset != NOFONTSET)
     {
-	gui.char_height = fontset_height((XFontSet)gui.fontset) + p_linespace;
-	gui.char_ascent = fontset_ascent((XFontSet)gui.fontset)
+	gui.char_ఎత్తు = fontset_ఎత్తు((XFont_సమితి)gui.fontset) + p_linespace;
+	gui.char_ascent = fontset_ascent((XFont_సమితి)gui.fontset)
 							    + p_linespace / 2;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	XFontStruct *font = (XFontStruct *)gui.norm_font;
 
-	gui.char_height = font->ascent + font->descent + p_linespace;
+	gui.char_ఎత్తు = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Set the current text font.
  */
-    void
-gui_mch_set_font(GuiFont font)
+    శూన్య
+gui_mch_సమితి_font(GuiFont font)
 {
-    static Font	prev_font = (Font)-1;
+    స్థిర Font	prev_font = (Font)-1;
     Font	fid = ((XFontStruct *)font)->fid;
 
-    if (fid != prev_font)
+    ఒకవేళ (fid != prev_font)
     {
-	XSetFont(gui.dpy, gui.text_gc, fid);
-	XSetFont(gui.dpy, gui.back_gc, fid);
+	XSetFont(gui.dpy, gui.పాఠ్యం_gc, fid);
+	XSetFont(gui.dpy, gui.వెనుక_gc, fid);
 	prev_font = fid;
 	gui.char_ascent = ((XFontStruct *)font)->ascent + p_linespace / 2;
     }
-#ifdef FEAT_XFONTSET
-    current_fontset = (XFontSet)NULL;
-#endif
+#నిర్వచితమైతే FEAT_XFONTSET
+    current_fontset = (XFont_సమితి)ఖాళీ;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_XFONTSET)
+#ఒకవేళ defined(FEAT_XFONTSET)
 /*
  * Set the current text fontset.
  * Adjust the ascent, in case it's different.
  */
-    void
-gui_mch_set_fontset(GuiFontset fontset)
+    శూన్య
+gui_mch_సమితి_fontset(GuiFontset fontset)
 {
-    current_fontset = (XFontSet)fontset;
+    current_fontset = (XFont_సమితి)fontset;
     gui.char_ascent = fontset_ascent(current_fontset) + p_linespace / 2;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * If a font is not going to be used, free its structure.
  */
-    void
+    శూన్య
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    ఒకవేళ (font != NOFONT)
 	XFreeFont(gui.dpy, (XFontStruct *)font);
 }
 
-#if defined(FEAT_XFONTSET)
+#ఒకవేళ defined(FEAT_XFONTSET)
 /*
  * If a fontset is not going to be used, free its structure.
  */
-    void
+    శూన్య
 gui_mch_free_fontset(GuiFontset fontset)
 {
-    if (fontset != NOFONTSET)
-	XFreeFontSet(gui.dpy, (XFontSet)fontset);
+    ఒకవేళ (fontset != NOFONTSET)
+	XFree_Font_సమితి(gui.dpy, (XFont_సమితి)fontset);
 }
 
 /*
@@ -1988,138 +1988,138 @@ gui_mch_free_fontset(GuiFontset fontset)
     GuiFontset
 gui_mch_get_fontset(
     char_u	*name,
-    int		giveErrorIfMissing,
-    int		fixed_width)
+    పూర్ణాంకం		giveErrorIfMissing,
+    పూర్ణాంకం		fixed_వెడల్పు)
 {
-    XFontSet	fontset;
-    char	**missing, *def_str;
-    int		num_missing;
+    XFont_సమితి	fontset;
+    అక్షరం	**missing, *def_str;
+    పూర్ణాంకం		అంకె_missing;
 
-    if (!gui.in_use || name == NULL)
-	return NOFONTSET;
+    ఒకవేళ (!gui.లోపల_use || name == ఖాళీ)
+	తిరిగి NOFONTSET;
 
-    fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
+    fontset = XCreate_Font_సమితి(gui.dpy, (అక్షరం *)name, &missing, &అంకె_missing,
 			     &def_str);
-    if (num_missing > 0)
+    ఒకవేళ (అంకె_missing > 0)
     {
-	int i;
+	పూర్ణాంకం i;
 
-	if (giveErrorIfMissing)
+	ఒకవేళ (giveErrorIfMissing)
 	{
-	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    semsg(_(e_fonts_for_the_following_charsets_are_missing_లోపల_fontset), name);
+	    కొరకు (i = 0; i < అంకె_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
     }
 
-    if (fontset == NULL)
+    ఒకవేళ (fontset == ఖాళీ)
     {
-	if (giveErrorIfMissing)
+	ఒకవేళ (giveErrorIfMissing)
 	    semsg(_(e_unknown_fontset_str), name);
-	return NOFONTSET;
+	తిరిగి NOFONTSET;
     }
 
-    if (fixed_width && check_fontset_sanity(fontset) == FAIL)
+    ఒకవేళ (fixed_వెడల్పు && check_fontset_sanity(fontset) == FAIL)
     {
-	XFreeFontSet(gui.dpy, fontset);
-	return NOFONTSET;
+	XFree_Font_సమితి(gui.dpy, fontset);
+	తిరిగి NOFONTSET;
     }
-    return (GuiFontset)fontset;
+    తిరిగి (GuiFontset)fontset;
 }
 
 /*
  * Check if fontset "fs" is fixed width.
  */
-    static int
-check_fontset_sanity(XFontSet fs)
+    స్థిర పూర్ణాంకం
+check_fontset_sanity(XFont_సమితి fs)
 {
     XFontStruct	**xfs;
-    char	**font_name;
-    int		fn;
-    char	*base_name;
-    int		i;
-    int		min_width;
-    int		min_font_idx = 0;
+    అక్షరం	**font_name;
+    పూర్ణాంకం		fn;
+    అక్షరం	*పునాది_name;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		min_వెడల్పు;
+    పూర్ణాంకం		min_font_idx = 0;
 
-    base_name = XBaseFontNameListOfFontSet(fs);
-    fn = XFontsOfFontSet(fs, &xfs, &font_name);
-    for (i = 0; i < fn; i++)
+    పునాది_name = XBase_Font_Name_List_యొక్క_Font_సమితి(fs);
+    fn = XFonts_యొక్క_Font_సమితి(fs, &xfs, &font_name);
+    కొరకు (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
+	ఒకవేళ (xfs[i]->max_bounds.వెడల్పు != xfs[i]->min_bounds.వెడల్పు)
 	{
-	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_width),
-		    base_name, font_name[i]);
-	    return FAIL;
+	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_వెడల్పు),
+		    పునాది_name, font_name[i]);
+	    తిరిగి FAIL;
 	}
     }
     // scan base font width
-    min_width = 32767;
-    for (i = 0; i < fn; i++)
+    min_వెడల్పు = 32767;
+    కొరకు (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width<min_width)
+	ఒకవేళ (xfs[i]->max_bounds.వెడల్పు<min_వెడల్పు)
 	{
-	    min_width = xfs[i]->max_bounds.width;
+	    min_వెడల్పు = xfs[i]->max_bounds.వెడల్పు;
 	    min_font_idx = i;
 	}
     }
-    for (i = 0; i < fn; i++)
+    కొరకు (i = 0; i < fn; i++)
     {
-	if (	   xfs[i]->max_bounds.width != 2 * min_width
-		&& xfs[i]->max_bounds.width != min_width)
+	ఒకవేళ (	   xfs[i]->max_bounds.వెడల్పు != 2 * min_వెడల్పు
+		&& xfs[i]->max_bounds.వెడల్పు != min_వెడల్పు)
 	{
-	    semsg(_(e_fontset_name_str), base_name);
+	    semsg(_(e_fontset_name_str), పునాది_name);
 	    semsg(_("Font0: %s"), font_name[min_font_idx]);
 	    semsg(_("Font%d: %s"), i, font_name[i]);
 	    semsg(_("Font%d width is not twice that of font0"), i);
 	    semsg(_("Font0 width: %d"),
-				     (int)xfs[min_font_idx]->max_bounds.width);
-	    semsg(_("Font%d width: %d"), i, (int)xfs[i]->max_bounds.width);
-	    return FAIL;
+				     (పూర్ణాంకం)xfs[min_font_idx]->max_bounds.వెడల్పు);
+	    semsg(_("Font%d width: %d"), i, (పూర్ణాంకం)xfs[i]->max_bounds.వెడల్పు);
+	    తిరిగి FAIL;
 	}
     }
     // it seems ok. Good Luck!!
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-fontset_width(XFontSet fs)
+    స్థిర పూర్ణాంకం
+fontset_వెడల్పు(XFont_సమితి fs)
 {
- return XmbTextEscapement(fs, "Vim", 3) / 3;
+ తిరిగి Xmb_పాఠ్యం_Escapement(fs, "Vim", 3) / 3;
 }
 
-    int
-fontset_height(
-    XFontSet fs)
+    పూర్ణాంకం
+fontset_ఎత్తు(
+    XFont_సమితి fs)
 {
-    XFontSetExtents *extents;
+    XFont_సమితి_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return extents->max_logical_extent.height;
+    extents = XExtents_యొక్క_Font_సమితి(fs);
+    తిరిగి extents->max_logical_extent.ఎత్తు;
 }
 
-# if 0
+# ఒకవేళ 0
 // NOT USED YET
-    static int
-fontset_descent(XFontSet fs)
+    స్థిర పూర్ణాంకం
+fontset_descent(XFont_సమితి fs)
 {
-    XFontSetExtents *extents;
+    XFont_సమితి_Extents *extents;
 
-    extents = XExtentsOfFontSet (fs);
-    return extents->max_logical_extent.height + extents->max_logical_extent.y;
+    extents = XExtents_యొక్క_Font_సమితి (fs);
+    తిరిగి extents->max_logical_extent.ఎత్తు + extents->max_logical_extent.y;
 }
 # endif
 
-    static int
-fontset_ascent(XFontSet fs)
+    స్థిర పూర్ణాంకం
+fontset_ascent(XFont_సమితి fs)
 {
-    XFontSetExtents *extents;
+    XFont_సమితి_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return -extents->max_logical_extent.y;
+    extents = XExtents_యొక్క_Font_సమితి(fs);
+    తిరిగి -extents->max_logical_extent.y;
 }
 
-#endif // FEAT_XFONTSET
+#అయితే_ముగింపు // FEAT_XFONTSET
 
 /*
  * Return the Pixel value (color) for the given color name.
@@ -2131,14 +2131,14 @@ gui_mch_get_color(char_u *name)
     guicolor_T	requested;
 
     // can't do this when GUI not running
-    if (!gui.in_use || name == NULL || *name == NUL)
-	return INVALCOLOR;
+    ఒకవేళ (!gui.లోపల_use || name == ఖాళీ || *name == NUL)
+	తిరిగి INVALCOLOR;
 
     requested = gui_get_color_cmn(name);
-    if (requested == INVALCOLOR)
-	return INVALCOLOR;
+    ఒకవేళ (requested == INVALCOLOR)
+	తిరిగి INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    తిరిగి gui_mch_get_rgb_color(
 	    (requested & 0xff0000) >> 16,
 	    (requested & 0xff00) >> 8,
 	    requested & 0xff);
@@ -2149,62 +2149,62 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(పూర్ణాంకం r, పూర్ణాంకం g, పూర్ణాంకం b)
 {
-    XColor	available;
+    XColor	అందుబాటు;
     Colormap	colormap;
 
-#if 0
+#ఒకవేళ 0
 // Using XParseColor() is very slow, put rgb in XColor directly.
 
-    char	spec[8]; // space enough to hold "#RRGGBB"
-    vim_snprintf(spec, sizeof(spec), "#%.2x%.2x%.2x", r, g, b);
-    if (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
-	    && XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
-#endif
+    అక్షరం	spec[8]; // space enough to hold "#RRGGBB"
+    vim_snprintf(spec, పరిమాణం(spec), "#%.2x%.2x%.2x", r, g, b);
+    ఒకవేళ (XParseColor(gui.dpy, colormap, (అక్షరం *)spec, &అందుబాటు) != 0
+	    && XAllocColor(gui.dpy, colormap, &అందుబాటు) != 0)
+	తిరిగి (guicolor_T)అందుబాటు.pixel;
+#అయితే_ముగింపు
     colormap = DefaultColormap(gui.dpy, DefaultScreen(gui.dpy));
-    CLEAR_FIELD(available);
-    available.red = r << 8;
-    available.green = g << 8;
-    available.blue = b << 8;
-    if (XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+    CLEAR_క్షేత్రం(అందుబాటు);
+    అందుబాటు.red = r << 8;
+    అందుబాటు.green = g << 8;
+    అందుబాటు.blue = b << 8;
+    ఒకవేళ (XAllocColor(gui.dpy, colormap, &అందుబాటు) != 0)
+	తిరిగి (guicolor_T)అందుబాటు.pixel;
 
-    return INVALCOLOR;
+    తిరిగి INVALCOLOR;
 }
 
 /*
  * Set the current text foreground color.
  */
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_fg_color(guicolor_T color)
 {
-    if (color == prev_fg_color)
-	return;
+    ఒకవేళ (color == prev_fg_color)
+	తిరిగి;
 
-    XSetForeground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetForeground(gui.dpy, gui.పాఠ్యం_gc, (Pixel)color);
     prev_fg_color = color;
 }
 
 /*
  * Set the current text background color.
  */
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_bg_color(guicolor_T color)
 {
-    if (color == prev_bg_color)
-	return;
+    ఒకవేళ (color == prev_bg_color)
+	తిరిగి;
 
-    XSetBackground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetBackground(gui.dpy, gui.పాఠ్యం_gc, (Pixel)color);
     prev_bg_color = color;
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_sp_color(guicolor_T color)
 {
     prev_sp_color = color;
 }
@@ -2212,88 +2212,88 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * create a mouse pointer that is blank
  */
-    static Cursor
-gui_x11_create_blank_mouse(void)
+    స్థిర Cursor
+gui_x11_create_blank_mouse(శూన్య)
 {
     Pixmap blank_pixmap = XCreatePixmap(gui.dpy, gui.wid, 1, 1, 1);
-    GC gc = XCreateGC(gui.dpy, blank_pixmap, (unsigned long)0, (XGCValues*)0);
+    GC gc = XCreateGC(gui.dpy, blank_pixmap, (గుర్తులేని దీర్ఘ)0, (XGCValues*)0);
 
-    if (gc != NULL)
+    ఒకవేళ (gc != ఖాళీ)
     {
-	XDrawPoint(gui.dpy, blank_pixmap, gc, 0, 0);
+	XDraw_బిందువు(gui.dpy, blank_pixmap, gc, 0, 0);
 	XFreeGC(gui.dpy, gc);
     }
-    return XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
+    తిరిగి XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
 		     (XColor*)&gui.norm_pixel, (XColor*)&gui.norm_pixel, 0, 0);
 }
 
 /*
  * Draw a curled line at the bottom of the character cell.
  */
-    static void
-draw_curl(int row, int col, int cells)
+    స్థిర శూన్య
+draw_curl(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం cells)
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    పూర్ణాంకం			i;
+    పూర్ణాంకం			స్థానభ్రంశం;
+    స్థిర స్థిరరాశి పూర్ణాంకం	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
-    XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-    for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+    XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_sp_color);
+    కొరకు (i = FILL_X(నిలువు); i < FILL_X(నిలువు + cells); ++i)
     {
-	offset = val[i % 8];
-	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, i,
-						FILL_Y(row + 1) - 1 - offset);
+	స్థానభ్రంశం = val[i % 8];
+	XDraw_బిందువు(gui.dpy, gui.wid, gui.పాఠ్యం_gc, i,
+						FILL_Y(అడ్డువరుస + 1) - 1 - స్థానభ్రంశం);
     }
-    XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+    XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_fg_color);
 }
 
-    void
+    శూన్య
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		నిలువు,
     char_u	*s,
-    int		len,
-    int		flags)
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		flags)
 {
-    int			cells = len;
-    static void		*buf = NULL;
-    static int		buflen = 0;
+    పూర్ణాంకం			cells = len;
+    స్థిర శూన్య		*buf = ఖాళీ;
+    స్థిర పూర్ణాంకం		buflen = 0;
     char_u		*p;
-    int			wlen = 0;
-    int			c;
+    పూర్ణాంకం			wlen = 0;
+    పూర్ణాంకం			c;
 
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
 	// Convert UTF-8 byte sequence to 16 bit characters for the X
 	// functions.  Need a buffer for the 16 bit characters.  Keep it
 	// between calls, because allocating it each time is slow.
-	if (buflen < len)
+	ఒకవేళ (buflen < len)
 	{
-	    XtFree((char *)buf);
-	    buf = (void *)XtMalloc(len * (sizeof(XChar2b) < sizeof(wchar_t)
-					? sizeof(wchar_t) : sizeof(XChar2b)));
+	    XtFree((అక్షరం *)buf);
+	    buf = (శూన్య *)XtMalloc(len * (పరిమాణం(XChar2b) < పరిమాణం(wchar_t)
+					? పరిమాణం(wchar_t) : పరిమాణం(XChar2b)));
 	    buflen = len;
 	}
 	p = s;
 	cells = 0;
-	while (p < s + len)
+	అయితే (p < s + len)
 	{
 	    c = utf_ptr2char(p);
-#ifdef FEAT_XFONTSET
-	    if (current_fontset != NULL)
+#నిర్వచితమైతే FEAT_XFONTSET
+	    ఒకవేళ (current_fontset != ఖాళీ)
 	    {
 # ifdef SMALL_WCHAR_T
-		if (c >= 0x10000)
+		ఒకవేళ (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 # endif
 		((wchar_t *)buf)[wlen] = c;
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
-		if (c >= 0x10000)
+		ఒకవేళ (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
-		((XChar2b *)buf)[wlen].byte1 = (unsigned)c >> 8;
+		((XChar2b *)buf)[wlen].byte1 = (గుర్తులేని)c >> 8;
 		((XChar2b *)buf)[wlen].byte2 = c;
 	    }
 	    ++wlen;
@@ -2301,18 +2301,18 @@ gui_mch_draw_string(
 	    p += utf_ptr2len(p);
 	}
     }
-    else if (has_mbyte)
+    లేకపోతే ఒకవేళ (has_mbyte)
     {
 	cells = 0;
-	for (p = s; p < s + len; )
+	కొరకు (p = s; p < s + len; )
 	{
 	    cells += ptr2cells(p);
 	    p += (*mb_ptr2len)(p);
 	}
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+#నిర్వచితమైతే FEAT_XFONTSET
+    ఒకవేళ (current_fontset != ఖాళీ)
     {
 	// Setup a clip rectangle to avoid spilling over in the next or
 	// previous line.  This is apparently needed for some fonts which are
@@ -2321,206 +2321,206 @@ gui_mch_draw_string(
 
 	clip.x = 0;
 	clip.y = 0;
-	clip.height = gui.char_height;
-	clip.width = gui.char_width * cells + 1;
-	XSetClipRectangles(gui.dpy, gui.text_gc, FILL_X(col), FILL_Y(row),
+	clip.ఎత్తు = gui.char_ఎత్తు;
+	clip.వెడల్పు = gui.char_వెడల్పు * cells + 1;
+	XSetClipRectangles(gui.dpy, gui.పాఠ్యం_gc, FILL_X(నిలువు), FILL_Y(అడ్డువరుస),
 		&clip, 1, Unsorted);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (flags & DRAW_TRANSP)
+    ఒకవేళ (flags & DRAW_TRANSP)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ఒకవేళ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), buf, wlen);
+	లేకపోతే
+	    XDrawString(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), (అక్షరం *)s, len);
     }
-    else if (p_linespace != 0
-#ifdef FEAT_XFONTSET
-	    || current_fontset != NULL
-#endif
+    లేకపోతే ఒకవేళ (p_linespace != 0
+#నిర్వచితమైతే FEAT_XFONTSET
+	    || current_fontset != ఖాళీ
+#అయితే_ముగింపు
 	    )
     {
-	XSetForeground(gui.dpy, gui.text_gc, prev_bg_color);
-	XFillRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		FILL_Y(row), gui.char_width * cells, gui.char_height);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_bg_color);
+	XFillRectangle(gui.dpy, gui.wid, gui.పాఠ్యం_gc, FILL_X(నిలువు),
+		FILL_Y(అడ్డువరుస), gui.char_వెడల్పు * cells, gui.char_ఎత్తు);
+	XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_fg_color);
 
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ఒకవేళ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), buf, wlen);
+	లేకపోతే
+	    XDrawString(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), (అక్షరం *)s, len);
     }
-    else
+    లేకపోతే
     {
 	// XmbDrawImageString has bug, don't use it for fontset.
-	if (enc_utf8)
-	    XDrawImageString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawImageString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ఒకవేళ (enc_utf8)
+	    XDrawImageString16(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), buf, wlen);
+	లేకపోతే
+	    XDrawImageString(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు),
+		    పాఠ్యం_Y(అడ్డువరుస), (అక్షరం *)s, len);
     }
 
     // Bold trick: draw the text again with a one-pixel offset.
-    if (flags & DRAW_BOLD)
+    ఒకవేళ (flags & DRAW_BOLD)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), (char *)s, len);
+	ఒకవేళ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు) + 1,
+		    పాఠ్యం_Y(అడ్డువరుస), buf, wlen);
+	లేకపోతే
+	    XDrawString(gui.dpy, gui.wid, gui.పాఠ్యం_gc, పాఠ్యం_X(నిలువు) + 1,
+		    పాఠ్యం_Y(అడ్డువరుస), (అక్షరం *)s, len);
     }
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
-	draw_curl(row, col, cells);
+    ఒకవేళ (flags & DRAW_UNDERC)
+	draw_curl(అడ్డువరుస, నిలువు, cells);
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    ఒకవేళ (flags & DRAW_UNDERL)
     {
-	int	y = FILL_Y(row + 1) - 1;
+	పూర్ణాంకం	y = FILL_Y(అడ్డువరుస + 1) - 1;
 
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	ఒకవేళ (p_linespace > 1)
 	    y -= p_linespace - 1;
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
+	XDraw_పంక్తి(gui.dpy, gui.wid, gui.పాఠ్యం_gc, FILL_X(నిలువు),
+		y, FILL_X(నిలువు + cells) - 1, y);
     }
 
-    if (flags & DRAW_STRIKE)
+    ఒకవేళ (flags & DRAW_STRIKE)
     {
-	int	y = FILL_Y(row + 1) - gui.char_height/2;
+	పూర్ణాంకం	y = FILL_Y(అడ్డువరుస + 1) - gui.char_ఎత్తు/2;
 
-	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_sp_color);
+	XDraw_పంక్తి(gui.dpy, gui.wid, gui.పాఠ్యం_gc, FILL_X(నిలువు),
+		y, FILL_X(నిలువు + cells) - 1, y);
+	XSetForeground(gui.dpy, gui.పాఠ్యం_gc, prev_fg_color);
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
-	XSetClipMask(gui.dpy, gui.text_gc, None);
-#endif
+#నిర్వచితమైతే FEAT_XFONTSET
+    ఒకవేళ (current_fontset != ఖాళీ)
+	XSet_Clip_ముసుగు(gui.dpy, gui.పాఠ్యం_gc, None);
+#అయితే_ముగింపు
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    పూర్ణాంకం
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-					 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    కొరకు (i = 0; special_కీలకాలు[i].కీలకం_sym != (కీలకం_Sym)0; i++)
+	ఒకవేళ (name[0] == special_కీలకాలు[i].vim_code0 &&
+					 name[1] == special_కీలకాలు[i].vim_code1)
+	    తిరిగి OK;
+    తిరిగి FAIL;
 }
 
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
-gui_get_x11_windis(Window *win, Display **dis)
+    పూర్ణాంకం
+gui_get_x11_windis(కిటికీ *win, Display **dis)
 {
-    *win = XtWindow(vimShell);
+    *win = Xt_కిటికీ(vimShell);
     *dis = gui.dpy;
-    return OK;
+    తిరిగి OK;
 }
 
-    void
-gui_mch_beep(void)
+    శూన్య
+gui_mch_beep(శూన్య)
 {
     XBell(gui.dpy, 0);
 }
 
-    void
-gui_mch_flash(int msec)
+    శూన్య
+gui_mch_flash(పూర్ణాంకం msec)
 {
     // Do a visual beep by reversing the foreground and background colors
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((పూర్ణాంకం)Columns) + gui.border_స్థానభ్రంశం,
+	    FILL_Y((పూర్ణాంకం)అడ్డువరుసలు) + gui.border_స్థానభ్రంశం);
     XSync(gui.dpy, False);
-    ui_delay((long)msec, TRUE);	// wait for a few msec
+    ui_delay((దీర్ఘ)msec, TRUE);	// wait for a few msec
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((పూర్ణాంకం)Columns) + gui.border_స్థానభ్రంశం,
+	    FILL_Y((పూర్ణాంకం)అడ్డువరుసలు) + gui.border_స్థానభ్రంశం);
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    శూన్య
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    పూర్ణాంకం	    r,
+    పూర్ణాంకం	    c,
+    పూర్ణాంకం	    nr,
+    పూర్ణాంకం	    nc)
 {
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc,
-	FILL_X(c), FILL_Y(r), (nc) * gui.char_width, (nr) * gui.char_height);
+	FILL_X(c), FILL_Y(r), (nc) * gui.char_వెడల్పు, (nr) * gui.char_ఎత్తు);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    శూన్య
+gui_mch_iconify(శూన్య)
 {
-    XIconifyWindow(gui.dpy, XtWindow(vimShell), DefaultScreen(gui.dpy));
+    XIconify_కిటికీ(gui.dpy, Xt_కిటికీ(vimShell), DefaultScreen(gui.dpy));
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    శూన్య
+gui_mch_సమితి_foreground(శూన్య)
 {
-    XMapRaised(gui.dpy, XtWindow(vimShell));
+    XMapRaised(gui.dpy, Xt_కిటికీ(vimShell));
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    శూన్య
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		w = 1;
+    పూర్ణాంకం		w = 1;
 
-    if (mb_lefthalve(gui.row, gui.col))
+    ఒకవేళ (mb_lefthalve(gui.అడ్డువరుస, gui.నిలువు))
 	w = 2;
-    gui_mch_set_fg_color(color);
-    XDrawRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(gui.col),
-	    FILL_Y(gui.row), w * gui.char_width - 1, gui.char_height - 1);
+    gui_mch_సమితి_fg_color(color);
+    XDrawRectangle(gui.dpy, gui.wid, gui.పాఠ్యం_gc, FILL_X(gui.నిలువు),
+	    FILL_Y(gui.అడ్డువరుస), w * gui.char_వెడల్పు - 1, gui.char_ఎత్తు - 1);
 }
 
 /*
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    శూన్య
+gui_mch_draw_part_cursor(పూర్ణాంకం w, పూర్ణాంకం h, guicolor_T color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_సమితి_fg_color(color);
 
-    XFillRectangle(gui.dpy, gui.wid, gui.text_gc,
-#ifdef FEAT_RIGHTLEFT
+    XFillRectangle(gui.dpy, gui.wid, gui.పాఠ్యం_gc,
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-		FILL_X(gui.col),
-	    FILL_Y(gui.row) + gui.char_height - h,
+	    CURSOR_BAR_కుడి ? FILL_X(gui.నిలువు + 1) - w :
+#అయితే_ముగింపు
+		FILL_X(gui.నిలువు),
+	    FILL_Y(gui.అడ్డువరుస) + gui.char_ఎత్తు - h,
 	    w, h);
 }
 
@@ -2530,19 +2530,19 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
  * nothing in the X event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    శూన్య
+gui_mch_update(శూన్య)
 {
-    XtInputMask mask, desired;
+    Xt_ఆదానం_ముసుగు ముసుగు, desired;
 
-#ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+#నిర్వచితమైతే ALT_X_ఆదానం
+    ఒకవేళ (suppress_alternate_ఆదానం)
 	desired = (XtIMXEvent | XtIMTimer);
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	desired = (XtIMAll);
-    while ((mask = XtAppPending(app_context)) && (mask & desired)
-	    && !vim_is_input_buf_full())
+    అయితే ((ముసుగు = XtAppPending(app_context)) && (ముసుగు & desired)
+	    && !vim_is_ఆదానం_buf_నిండిన())
 	XtAppProcessEvent(app_context, desired);
 }
 
@@ -2555,62 +2555,62 @@ gui_mch_update(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_mch_wait_for_chars(long wtime)
+    పూర్ణాంకం
+gui_mch_wait_for_chars(దీర్ఘ wtime)
 {
-    int	    focus;
-    int	    retval = FAIL;
+    పూర్ణాంకం	    focus;
+    పూర్ణాంకం	    retval = FAIL;
 
     /*
      * Make this static, in case gui_x11_timer_cb is called after leaving
      * this function (otherwise a random value on the stack may be changed).
      */
-    static int	    timed_out;
+    స్థిర పూర్ణాంకం	    timed_బహిర్గతం;
     XtIntervalId    timer = (XtIntervalId)0;
-    XtInputMask	    desired;
-#ifdef FEAT_JOB_CHANNEL
+    Xt_ఆదానం_ముసుగు	    desired;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
     XtIntervalId    channel_timer = (XtIntervalId)0;
-#endif
+#అయితే_ముగింపు
 
-    timed_out = FALSE;
+    timed_బహిర్గతం = FALSE;
 
-    if (wtime >= 0)
-	timer = XtAppAddTimeOut(app_context,
+    ఒకవేళ (wtime >= 0)
+	timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context,
 				(long_u)(wtime == 0 ? 1L : wtime),
-						 gui_x11_timer_cb, &timed_out);
-#ifdef FEAT_JOB_CHANNEL
+						 gui_x11_timer_cb, &timed_బహిర్గతం);
+#నిర్వచితమైతే FEAT_పని_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-				   channel_poll_cb, (XtPointer)&channel_timer);
-#endif
+    ఒకవేళ (channel_any_keep_open())
+	channel_timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, (long_u)20,
+				   channel_poll_cb, (Xt_సూచిక)&channel_timer);
+#అయితే_ముగింపు
 
-    focus = gui.in_focus;
+    focus = gui.లోపల_focus;
     desired = (XtIMAll);
-    while (!timed_out)
+    అయితే (!timed_బహిర్గతం)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ఒకవేళ (gui.లోపల_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ఒకవేళ (gui.లోపల_focus)
+		gui_mch_ప్రారంభం_blink();
+	    లేకపోతే
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.లోపల_focus;
 	}
 
-#ifdef MESSAGE_QUEUE
+#నిర్వచితమైతే సందేశం_వరుస
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_కూడు_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ఒకవేళ (did_కూడు_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    ఆపు;
 # endif
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * Don't use gui_mch_update() because then we will spin-lock until a
@@ -2622,21 +2622,21 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	ఒకవేళ (ఆదానం_అందుబాటు())
 	{
 	    retval = OK;
-	    break;
+	    ఆపు;
 	}
     }
 
-    if (timer != (XtIntervalId)0 && !timed_out)
-	XtRemoveTimeOut(timer);
-#ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(channel_timer);
-#endif
+    ఒకవేళ (timer != (XtIntervalId)0 && !timed_బహిర్గతం)
+	Xt_Remove_సమయం_బహిర్గతం(timer);
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    ఒకవేళ (channel_timer != (XtIntervalId)0)
+	Xt_Remove_సమయం_బహిర్గతం(channel_timer);
+#అయితే_ముగింపు
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -2646,8 +2646,8 @@ gui_mch_wait_for_chars(long wtime)
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    శూన్య
+gui_mch_flush(శూన్య)
 {
     XFlush(gui.dpy);
 }
@@ -2656,26 +2656,26 @@ gui_mch_flush(void)
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    శూన్య
+gui_mch_clear_ఖండం(
+    పూర్ణాంకం		row1,
+    పూర్ణాంకం		col1,
+    పూర్ణాంకం		row2,
+    పూర్ణాంకం		col2)
 {
-    int		x;
+    పూర్ణాంకం		x;
 
     x = FILL_X(col1);
 
     // Clear one extra pixel at the far right, for when bold characters have
     // spilled over to the next column.
-    XFillRectangle(gui.dpy, gui.wid, gui.back_gc, x, FILL_Y(row1),
-	    (col2 - col1 + 1) * gui.char_width + (col2 == Columns - 1),
-	    (row2 - row1 + 1) * gui.char_height);
+    XFillRectangle(gui.dpy, gui.wid, gui.వెనుక_gc, x, FILL_Y(row1),
+	    (col2 - col1 + 1) * gui.char_వెడల్పు + (col2 == Columns - 1),
+	    (row2 - row1 + 1) * gui.char_ఎత్తు);
 }
 
-    void
-gui_mch_clear_all(void)
+    శూన్య
+gui_mch_clear_all(శూన్య)
 {
     XClearArea(gui.dpy, gui.wid, 0, 0, 0, 0, False);
 }
@@ -2684,24 +2684,24 @@ gui_mch_clear_all(void)
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    శూన్య
+gui_mch_delete_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    ఒకవేళ (gui.visibility == VisibilityFullyObscured)
+	తిరిగి;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.పాఠ్యం_gc,
+	FILL_X(gui.scroll_region_ఎడమ), FILL_Y(అడ్డువరుస + అంకె_పంక్తులు),
+	gui.char_వెడల్పు * (gui.scroll_region_కుడి - gui.scroll_region_ఎడమ + 1)
+			       + (gui.scroll_region_కుడి == Columns - 1),
+	gui.char_ఎత్తు * (gui.scroll_region_bot - అడ్డువరుస - అంకె_పంక్తులు + 1),
+	FILL_X(gui.scroll_region_ఎడమ), FILL_Y(అడ్డువరుస));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-			  gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_ఖండం(gui.scroll_region_bot - అంకె_పంక్తులు + 1,
+						       gui.scroll_region_ఎడమ,
+			  gui.scroll_region_bot, gui.scroll_region_కుడి);
     gui_x11_check_copy_area();
 }
 
@@ -2709,52 +2709,52 @@ gui_mch_delete_lines(int row, int num_lines)
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    శూన్య
+gui_mch_చొప్పించు_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం అంకె_పంక్తులు)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    ఒకవేళ (gui.visibility == VisibilityFullyObscured)
+	తిరిగి;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.పాఠ్యం_gc,
+	FILL_X(gui.scroll_region_ఎడమ), FILL_Y(అడ్డువరుస),
+	gui.char_వెడల్పు * (gui.scroll_region_కుడి - gui.scroll_region_ఎడమ + 1)
+			       + (gui.scroll_region_కుడి == Columns - 1),
+	gui.char_ఎత్తు * (gui.scroll_region_bot - అడ్డువరుస - అంకె_పంక్తులు + 1),
+	FILL_X(gui.scroll_region_ఎడమ), FILL_Y(అడ్డువరుస + అంకె_పంక్తులు));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_ఖండం(అడ్డువరుస, gui.scroll_region_ఎడమ,
+				అడ్డువరుస + అంకె_పంక్తులు - 1, gui.scroll_region_కుడి);
     gui_x11_check_copy_area();
 }
 
 /*
  * Update the region revealed by scrolling up/down.
  */
-    static void
-gui_x11_check_copy_area(void)
+    స్థిర శూన్య
+gui_x11_check_copy_area(శూన్య)
 {
     XEvent		    event;
     XGraphicsExposeEvent    *gevent;
 
-    if (gui.visibility != VisibilityPartiallyObscured)
-	return;
+    ఒకవేళ (gui.visibility != VisibilityPartiallyObscured)
+	తిరిగి;
 
     XFlush(gui.dpy);
 
     // Wait to check whether the scroll worked or not
-    for (;;)
+    కొరకు (;;)
     {
-	if (XCheckTypedEvent(gui.dpy, NoExpose, &event))
-	    return;	// The scroll worked.
+	ఒకవేళ (XCheckTypedEvent(gui.dpy, NoExpose, &event))
+	    తిరిగి;	// The scroll worked.
 
-	if (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
+	ఒకవేళ (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
-	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
-		return;		// This was the last expose event
+	    gui_redraw(gevent->x, gevent->y, gevent->వెడల్పు, gevent->ఎత్తు);
+	    ఒకవేళ (gevent->లెక్క == 0)
+		తిరిగి;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
     }
@@ -2764,32 +2764,32 @@ gui_x11_check_copy_area(void)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    void
+    శూన్య
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     clip_x11_lose_selection(vimShell, cbd);
 }
 
-    int
+    పూర్ణాంకం
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return clip_x11_own_selection(vimShell, cbd);
+    తిరిగి clip_x11_own_selection(vimShell, cbd);
 }
 
-    void
+    శూన్య
 clip_mch_request_selection(Clipboard_T *cbd)
 {
  clip_x11_request_selection(vimShell, gui.dpy, cbd);
 }
 
-    void
-clip_mch_set_selection(
+    శూన్య
+clip_mch_సమితి_selection(
     Clipboard_T	*cbd)
 {
-    clip_x11_set_selection(cbd);
+    clip_x11_సమితి_selection(cbd);
 }
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
@@ -2797,57 +2797,57 @@ clip_mch_set_selection(
 /*
  * Make a menu either grey or not grey.
  */
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    శూన్య
+gui_mch_menu_grey(vimmenu_T *menu, పూర్ణాంకం grey)
 {
-    if (menu->id == (Widget)0)
-	return;
+    ఒకవేళ (menu->id == (Widget)0)
+	తిరిగి;
 
     gui_mch_menu_hidden(menu, False);
-    if (grey
+    ఒకవేళ (grey
 # ifdef FEAT_GUI_MOTIF
 	    || !menu->sensitive
 # endif
        )
-	XtSetSensitive(menu->id, False);
-    else
-	XtSetSensitive(menu->id, True);
+	Xt_సమితి_Sensitive(menu->id, False);
+    లేకపోతే
+	Xt_సమితి_Sensitive(menu->id, True);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    శూన్య
+gui_mch_menu_hidden(vimmenu_T *menu, పూర్ణాంకం hidden)
 {
-    if (menu->id == (Widget)0)
-	return;
+    ఒకవేళ (menu->id == (Widget)0)
+	తిరిగి;
 
-    if (hidden)
-	XtUnmanageChild(menu->id);
-    else
-	XtManageChild(menu->id);
+    ఒకవేళ (hidden)
+	Xt_Unmanage_బిడ్డ(menu->id);
+    లేకపోతే
+	Xt_Manage_బిడ్డ(menu->id);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    శూన్య
+gui_mch_draw_menubar(శూన్య)
 {
     // Nothing to do in X
 }
 
-    void
+    శూన్య
 gui_x11_menu_cb(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    gui_menu_cb((vimmenu_T *)client_data);
+    gui_menu_cb((vimmenu_T *)client_దత్తాంశం_2);
 }
 
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 
 
@@ -2855,62 +2855,62 @@ gui_x11_menu_cb(
  * Function called when window closed.	Works like ":qa".
  * Should put up a requester!
  */
-    static void
+    స్థిర శూన్య
 gui_x11_wm_protocol_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
     /*
      * Only deal with Client messages.
      */
-    if (event->type != ClientMessage)
-	return;
+    ఒకవేళ (event->type != Client_సందేశం)
+	తిరిగి;
 
     /*
      * The WM_SAVE_YOURSELF event arrives when the window manager wants to
      * exit.  That can be cancelled though, thus Vim shouldn't exit here.
      * Just sync our swap files.
      */
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
+    ఒకవేళ ((Atom)((XClient_సందేశం_Event *)event)->దత్తాంశం.l[0] ==
 						  wm_atoms[SAVE_YOURSELF_IDX])
     {
-	out_flush();
+	బహిర్గతం_flush();
 	ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
 	// Set the window's WM_COMMAND property, to let the window manager
 	// know we are done saving ourselves.  We don't want to be restarted,
 	// thus set argv to NULL.
-	XSetCommand(gui.dpy, XtWindow(vimShell), NULL, 0);
-	return;
+	XSetCommand(gui.dpy, Xt_కిటికీ(vimShell), ఖాళీ, 0);
+	తిరిగి;
     }
 
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
-						  wm_atoms[DELETE_WINDOW_IDX])
-	return;
+    ఒకవేళ ((Atom)((XClient_సందేశం_Event *)event)->దత్తాంశం.l[0] !=
+						  wm_atoms[DELETE_కిటికీ_IDX])
+	తిరిగి;
 
     gui_shell_closed();
 }
 
-#ifdef FEAT_CLIENTSERVER
+#నిర్వచితమైతే FEAT_CLIENTSERVER
 /*
  * Function called when property changed. Check for incoming commands
  */
-    static void
+    స్థిర శూన్య
 gui_x11_send_event_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum వాడని)
 {
     XPropertyEvent *e = (XPropertyEvent *) event;
 
-    if (e->type == PropertyNotify && e->window == commWindow
-	    && e->atom == commProperty &&  e->state == PropertyNewValue)
+    ఒకవేళ (e->type == PropertyNotify && e->కిటికీ_2 == comm_కిటికీ
+	    && e->atom == commProperty &&  e->state == Property_New_విలువ)
 	serverEventProc(gui.dpy, event, 0);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Cursor blink functions.
@@ -2921,30 +2921,30 @@ gui_x11_send_event_handler(
  * BLINK_ON	blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#నిర్వచించు BLINK_NONE  0
+#నిర్వచించు BLINK_OFF   1
+#నిర్వచించు BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static XtIntervalId	blink_timer = (XtIntervalId)0;
+స్థిర పూర్ణాంకం		blink_state = BLINK_NONE;
+స్థిర long_u		blink_waittime = 700;
+స్థిర long_u		blink_ontime = 400;
+స్థిర long_u		blink_offtime = 250;
+స్థిర XtIntervalId	blink_timer = (XtIntervalId)0;
 
-    int
-gui_mch_is_blinking(void)
+    పూర్ణాంకం
+gui_mch_is_blinking(శూన్య)
 {
-    return blink_state != BLINK_NONE;
+    తిరిగి blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    పూర్ణాంకం
+gui_mch_is_blink_off(శూన్య)
 {
-    return blink_state == BLINK_OFF;
+    తిరిగి blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long waittime, long on, long off)
+    శూన్య
+gui_mch_సమితి_blinking(దీర్ఘ waittime, దీర్ఘ on, దీర్ఘ off)
 {
     blink_waittime = waittime;
     blink_ontime = on;
@@ -2954,37 +2954,37 @@ gui_mch_set_blinking(long waittime, long on, long off)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    శూన్య
+gui_mch_stop_blink(పూర్ణాంకం may_call_gui_update_cursor)
 {
-    if (blink_timer != (XtIntervalId)0)
+    ఒకవేళ (blink_timer != (XtIntervalId)0)
     {
-	XtRemoveTimeOut(blink_timer);
+	Xt_Remove_సమయం_బహిర్గతం(blink_timer);
 	blink_timer = (XtIntervalId)0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ఒకవేళ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    static void
+    స్థిర శూన్య
 gui_x11_blink_cb(
-    XtPointer	    timed_out UNUSED,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_సూచిక	    timed_బహిర్గతం వాడని,
+    XtIntervalId    *interval_id వాడని)
 {
-    if (blink_state == BLINK_ON)
+    ఒకవేళ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = XtAppAddTimeOut(app_context, blink_offtime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, blink_offtime,
+						      gui_x11_blink_cb, ఖాళీ);
     }
-    else
+    లేకపోతే
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = XtAppAddTimeOut(app_context, blink_ontime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, blink_ontime,
+						      gui_x11_blink_cb, ఖాళీ);
     }
 }
 
@@ -2992,16 +2992,16 @@ gui_x11_blink_cb(
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    శూన్య
+gui_mch_ప్రారంభం_blink(శూన్య)
 {
-    if (blink_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(blink_timer);
+    ఒకవేళ (blink_timer != (XtIntervalId)0)
+	Xt_Remove_సమయం_బహిర్గతం(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ఒకవేళ (blink_waittime && blink_ontime && blink_offtime && gui.లోపల_focus)
     {
-	blink_timer = XtAppAddTimeOut(app_context, blink_waittime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, blink_waittime,
+						      gui_x11_blink_cb, ఖాళీ);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
@@ -3020,198 +3020,198 @@ gui_mch_get_rgb(guicolor_T pixel)
     xc.pixel = pixel;
     XQueryColor(gui.dpy, colormap, &xc);
 
-    return (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
-						   + ((unsigned)xc.blue >> 8));
+    తిరిగి (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
+						   + ((గుర్తులేని)xc.blue >> 8));
 }
 
 /*
  * Add the callback functions.
  */
-    void
-gui_x11_callbacks(Widget textArea, Widget vimForm)
+    శూన్య
+gui_x11_callbacks(Widget పాఠ్యం_Area, Widget vimForm)
 {
-    XtAddEventHandler(textArea, VisibilityChangeMask, FALSE,
-	gui_x11_visibility_cb, (XtPointer)0);
+    Xt_కూడు_Event_Handler(పాఠ్యం_Area, Visibility_Change_ముసుగు, FALSE,
+	gui_x11_visibility_cb, (Xt_సూచిక)0);
 
-    XtAddEventHandler(textArea, ExposureMask, FALSE, gui_x11_expose_cb,
-	(XtPointer)0);
+    Xt_కూడు_Event_Handler(పాఠ్యం_Area, Exposure_ముసుగు, FALSE, gui_x11_expose_cb,
+	(Xt_సూచిక)0);
 
-    XtAddEventHandler(vimShell, StructureNotifyMask, FALSE,
-	gui_x11_resize_window_cb, (XtPointer)0);
+    Xt_కూడు_Event_Handler(vimShell, Structure_Notify_ముసుగు, FALSE,
+	gui_x11_resize_కిటికీ_cb, (Xt_సూచిక)0);
 
-    XtAddEventHandler(vimShell, FocusChangeMask, FALSE, gui_x11_focus_change_cb,
-	(XtPointer)0);
+    Xt_కూడు_Event_Handler(vimShell, Focus_Change_ముసుగు, FALSE, gui_x11_focus_change_cb,
+	(Xt_సూచిక)0);
     /*
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    ఒకవేళ (vim_strchr(p_go, GO_సూచిక) != ఖాళీ)
     {
-	XtAddEventHandler(vimShell, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(vimShell, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
+	Xt_కూడు_Event_Handler(vimShell, Leave_కిటికీ_ముసుగు, FALSE, gui_x11_leave_cb,
+	    (Xt_సూచిక)0);
+	Xt_కూడు_Event_Handler(పాఠ్యం_Area, Leave_కిటికీ_ముసుగు, FALSE, gui_x11_leave_cb,
+	    (Xt_సూచిక)0);
+	Xt_కూడు_Event_Handler(పాఠ్యం_Area, Enter_కిటికీ_ముసుగు, FALSE, gui_x11_enter_cb,
+	    (Xt_సూచిక)0);
+	Xt_కూడు_Event_Handler(vimShell, Enter_కిటికీ_ముసుగు, FALSE, gui_x11_enter_cb,
+	    (Xt_సూచిక)0);
     }
 
-    XtAddEventHandler(vimForm, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
-    XtAddEventHandler(textArea, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
+    Xt_కూడు_Event_Handler(vimForm, కీలకం_Press_ముసుగు, FALSE, gui_x11_కీలకం_తగిలింది_cb,
+	(Xt_సూచిక)0);
+    Xt_కూడు_Event_Handler(పాఠ్యం_Area, కీలకం_Press_ముసుగు, FALSE, gui_x11_కీలకం_తగిలింది_cb,
+	(Xt_సూచిక)0);
 
     // get pointer moved events from scrollbar, needed for 'mousefocus'
-    XtAddEventHandler(vimForm, PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)1);
-    XtAddEventHandler(textArea, ButtonPressMask | ButtonReleaseMask |
-					 ButtonMotionMask | PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)0);
+    Xt_కూడు_Event_Handler(vimForm, సూచిక_Motion_ముసుగు,
+	FALSE, gui_x11_mouse_cb, (Xt_సూచిక)1);
+    Xt_కూడు_Event_Handler(పాఠ్యం_Area, Button_Press_ముసుగు | Button_Release_ముసుగు |
+					 Button_Motion_ముసుగు | సూచిక_Motion_ముసుగు,
+	FALSE, gui_x11_mouse_cb, (Xt_సూచిక)0);
 }
 
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    శూన్య
+gui_mch_getmouse(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
-    int		rootx, rooty, winx, winy;
-    Window	root, child;
-    unsigned int mask;
+    పూర్ణాంకం		rootx, rooty, winx, winy;
+    కిటికీ	మూలం, బిడ్డ;
+    గుర్తులేని పూర్ణాంకం ముసుగు;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
-					 &rootx, &rooty, &winx, &winy, &mask))
+    ఒకవేళ (gui.wid && XQuery_సూచిక(gui.dpy, gui.wid, &మూలం, &బిడ్డ,
+					 &rootx, &rooty, &winx, &winy, &ముసుగు))
     {
 	*x = winx;
 	*y = winy;
     }
-    else
+    లేకపోతే
     {
 	*x = -1;
 	*y = -1;
     }
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    శూన్య
+gui_mch_setmouse(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    if (gui.wid)
-	XWarpPointer(gui.dpy, (Window)0, gui.wid, 0, 0, 0, 0, x, y);
+    ఒకవేళ (gui.wid)
+	XWarp_సూచిక(gui.dpy, (కిటికీ)0, gui.wid, 0, 0, 0, 0, x, y);
 }
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     XButtonPressedEvent *
-gui_x11_get_last_mouse_event(void)
+gui_x11_get_చివరి_mouse_event(శూన్య)
 {
-    return &last_mouse_event;
+    తిరిగి &చివరి_mouse_event;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SIGN_ICONS)
+#ఒకవేళ defined(FEAT_SIGN_ICONS)
 
 // Signs are currently always 2 chars wide.  Hopefully the font is big enough
 // to provide room for the bitmap!
-# define SIGN_WIDTH (gui.char_width * 2)
+# define SIGN_వెడల్పు (gui.char_వెడల్పు * 2)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    శూన్య
+gui_mch_drawsign(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం typenr)
 {
     XImage	*sign;
 
-    if (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
-	return;
+    ఒకవేళ (!gui.లోపల_use || (sign = (XImage *)sign_get_image(typenr)) == ఖాళీ)
+	తిరిగి;
 
-    XClearArea(gui.dpy, gui.wid, TEXT_X(col), TEXT_Y(row) - sign->height,
-	    SIGN_WIDTH, gui.char_height, FALSE);
-    XPutImage(gui.dpy, gui.wid, gui.text_gc, sign, 0, 0,
-	    TEXT_X(col) + (SIGN_WIDTH - sign->width) / 2,
-	    TEXT_Y(row) - sign->height,
-	    sign->width, sign->height);
+    XClearArea(gui.dpy, gui.wid, పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస) - sign->ఎత్తు,
+	    SIGN_వెడల్పు, gui.char_ఎత్తు, FALSE);
+    XPutImage(gui.dpy, gui.wid, gui.పాఠ్యం_gc, sign, 0, 0,
+	    పాఠ్యం_X(నిలువు) + (SIGN_వెడల్పు - sign->వెడల్పు) / 2,
+	    పాఠ్యం_Y(అడ్డువరుస) - sign->ఎత్తు,
+	    sign->వెడల్పు, sign->ఎత్తు);
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    శూన్య *
+gui_mch_రిజిస్టరు_sign(char_u *signfile)
 {
-    XpmAttributes   attrs;
-    XImage	    *sign = NULL;
-    int		    status;
+    Xpm_లక్షణాలు   attrs;
+    XImage	    *sign = ఖాళీ;
+    పూర్ణాంకం		    స్థితి_2;
 
     /*
      * Setup the color substitution table.
      */
-    if (signfile[0] != NUL && signfile[0] != '-')
+    ఒకవేళ (signfile[0] != NUL && signfile[0] != '-')
     {
-	XpmColorSymbol color[5] =
+	Xpm_Color_చిహ్నం color[5] =
 	{
-	    {"none", NULL, 0},
-	    {"iconColor1", NULL, 0},
-	    {"bottomShadowColor", NULL, 0},
-	    {"topShadowColor", NULL, 0},
-	    {"selectColor", NULL, 0}
+	    {"none", ఖాళీ, 0},
+	    {"iconColor1", ఖాళీ, 0},
+	    {"bottomShadowColor", ఖాళీ, 0},
+	    {"topShadowColor", ఖాళీ, 0},
+	    {"selectColor", ఖాళీ, 0}
 	};
 	attrs.valuemask = XpmColorSymbols;
 	attrs.numsymbols = 2;
 	attrs.colorsymbols = color;
-	attrs.colorsymbols[0].pixel = gui.back_pixel;
+	attrs.colorsymbols[0].pixel = gui.వెనుక_pixel;
 	attrs.colorsymbols[1].pixel = gui.norm_pixel;
-	status = XpmReadFileToImage(gui.dpy, (char *)signfile,
-							 &sign, NULL, &attrs);
-	if (status == 0)
+	స్థితి_2 = Xpm_Read_File_గమ్యం_Image(gui.dpy, (అక్షరం *)signfile,
+							 &sign, ఖాళీ, &attrs);
+	ఒకవేళ (స్థితి_2 == 0)
 	{
 	    // Sign width is fixed at two columns now.
 	    // if (sign->width > gui.sign_width)
 	    //     gui.sign_width = sign->width + 8;
 	}
-	else
-	    emsg(_(e_couldnt_read_in_sign_data));
+	లేకపోతే
+	    emsg(_(e_couldnt_read_లోపల_sign_దత్తాంశం));
     }
 
-    return (void *)sign;
+    తిరిగి (శూన్య *)sign;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    శూన్య
+gui_mch_destroy_sign(శూన్య *sign)
 {
     XDestroyImage((XImage*)sign);
 }
-#endif
+#అయితే_ముగింపు
 
 
-#ifdef FEAT_MOUSESHAPE
+#నిర్వచితమైతే FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
-#endif
+స్థిర పూర్ణాంకం చివరి_shape = 0;
+#అయితే_ముగింపు
 
 /*
  * Use the blank mouse pointer or not.
  */
-    void
+    శూన్య
 gui_mch_mousehide(
-    int		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
+    పూర్ణాంకం		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ఒకవేళ (gui.సూచిక_hidden == hide)
+	తిరిగి;
 
-    gui.pointer_hidden = hide;
-    if (hide)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
-#ifdef FEAT_MOUSESHAPE
-	mch_set_mouse_shape(last_shape);
-#else
+    gui.సూచిక_hidden = hide;
+    ఒకవేళ (hide)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_సూచిక);
+    లేకపోతే
+#నిర్వచితమైతే FEAT_MOUSESHAPE
+	mch_సమితి_mouse_shape(చివరి_shape);
+#లేకపోతే
     XUndefineCursor(gui.dpy, gui.wid);
-#endif
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ఒకవేళ defined(FEAT_MOUSESHAPE)
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+స్థిర పూర్ణాంకం mshape_ids[] =
 {
-    XC_left_ptr,		// arrow
+    XC_ఎడమ_ptr,		// arrow
     0,				// blank
     XC_xterm,			// beam
     XC_sb_v_double_arrow,	// updown
@@ -3225,66 +3225,66 @@ static int mshape_ids[] =
     XC_hand2,			// hand2
     XC_pencil,			// pencil
     XC_question_arrow,		// question
-    XC_right_ptr,		// right-arrow
+    XC_కుడి_ptr,		// right-arrow
     XC_center_ptr,		// up-arrow
-    XC_left_ptr			// last one
+    XC_ఎడమ_ptr			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    శూన్య
+mch_సమితి_mouse_shape(పూర్ణాంకం shape)
 {
-    int	    id;
+    పూర్ణాంకం	    id;
 
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    ఒకవేళ (shape == MSHAPE_HIDE || gui.సూచిక_hidden)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_సూచిక);
+    లేకపోతే
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ఒకవేళ (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
-		id = XC_left_ptr;
-	    else
+	    ఒకవేళ (id >= XC_అంకె_glyphs)
+		id = XC_ఎడమ_ptr;
+	    లేకపోతే
 		id &= ~1;	// they are always even (why?)
 	}
-	else
+	లేకపోతే
 	    id = mshape_ids[shape];
 
 	XDefineCursor(gui.dpy, gui.wid, XCreateFontCursor(gui.dpy, id));
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    ఒకవేళ (shape != MSHAPE_HIDE)
+	చివరి_shape = shape;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+#ఒకవేళ defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
 /*
  * Set the balloon-eval used for the tooltip of a toolbar menu item.
  * The check for a non-toolbar item was added, because there is a crash when
  * passing a normal menu item here.  Can't explain that, but better avoid it.
  */
-    void
-gui_mch_menu_set_tip(vimmenu_T *menu)
+    శూన్య
+gui_mch_menu_సమితి_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL
-				|| !menu_is_toolbar(menu->parent->name))
-	return;
+    ఒకవేళ (menu->id == ఖాళీ || menu->మాతృ == ఖాళీ
+				|| !menu_is_toolbar(menu->మాతృ->name))
+	తిరిగి;
 
     // Always destroy and create the balloon, in case the string was
     // changed.
-    if (menu->tip != NULL)
+    ఒకవేళ (menu->tip != ఖాళీ)
     {
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = ఖాళీ;
     }
-    if (menu->strings[MENU_INDEX_TIP] != NULL)
+    ఒకవేళ (menu->అక్షరశ్రేణులు[MENU_సూచీ_TIP] != ఖాళీ)
 	menu->tip = gui_mch_create_beval_area(
 		menu->id,
-		menu->strings[MENU_INDEX_TIP],
-		NULL,
-		NULL);
+		menu->అక్షరశ్రేణులు[MENU_సూచీ_TIP],
+		ఖాళీ,
+		ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు

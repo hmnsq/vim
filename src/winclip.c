@@ -14,17 +14,17 @@
  * Also used by Cygwin, using os_unix.c.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * Compile only the clipboard handling features when compiling for cygwin
  * posix environment.
  */
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-# define WIN32_LEAN_AND_MEAN
+#నిర్వచితమైతే FEAT_CYGWIN_WIN32_CLIPBOARD
+# define WIN32_LEAN_AND_సగటు
 # include <windows.h>
 # include "winclip.pro"
-#endif
+#అయితే_ముగింపు
 
 /*
  * Convert an UTF-8 string to UTF-16.
@@ -33,46 +33,46 @@
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Returns the number of UTF-16 words produced.
  */
-    int
-utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
+    పూర్ణాంకం
+utf8_గమ్యం_utf16(char_u *instr, పూర్ణాంకం inlen, short_u *outstr, పూర్ణాంకం *unconvlenp)
 {
-    int		outlen = 0;
+    పూర్ణాంకం		outlen = 0;
     char_u	*p = instr;
-    int		todo = inlen;
-    int		l;
-    int		ch;
+    పూర్ణాంకం		todo = inlen;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		ch;
 
-    while (todo > 0)
+    అయితే (todo > 0)
     {
 	// Only convert if we have a complete sequence.
 	l = utf_ptr2len_len(p, todo);
-	if (l > todo)
+	ఒకవేళ (l > todo)
 	{
 	    // Return length of incomplete sequence.
-	    if (unconvlenp != NULL)
+	    ఒకవేళ (unconvlenp != ఖాళీ)
 		*unconvlenp = todo;
-	    break;
+	    ఆపు;
 	}
 
 	ch = utf_ptr2char(p);
-	if (ch >= 0x10000)
+	ఒకవేళ (ch >= 0x10000)
 	{
 	    // non-BMP character, encoding with surrogate pairs
 	    ++outlen;
-	    if (outstr != NULL)
+	    ఒకవేళ (outstr != ఖాళీ)
 	    {
 		*outstr++ = (0xD800 - (0x10000 >> 10)) + (ch >> 10);
 		*outstr++ = 0xDC00 | (ch & 0x3FF);
 	    }
 	}
-	else if (outstr != NULL)
+	లేకపోతే ఒకవేళ (outstr != ఖాళీ)
 	    *outstr++ = ch;
 	++outlen;
 	p += l;
 	todo -= l;
     }
 
-    return outlen;
+    తిరిగి outlen;
 }
 
 /*
@@ -82,42 +82,42 @@ utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Return the number of bytes produced.
  */
-    int
-utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
+    పూర్ణాంకం
+utf16_గమ్యం_utf8(short_u *instr, పూర్ణాంకం inlen, char_u *outstr)
 {
-    int		outlen = 0;
-    int		todo = inlen;
+    పూర్ణాంకం		outlen = 0;
+    పూర్ణాంకం		todo = inlen;
     short_u	*p = instr;
-    int		l;
-    int		ch, ch2;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		ch, ch2;
 
-    while (todo > 0)
+    అయితే (todo > 0)
     {
 	ch = *p;
-	if (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
+	ఒకవేళ (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
 	{
 	    // surrogate pairs handling
 	    ch2 = p[1];
-	    if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+	    ఒకవేళ (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 	    {
 		ch = ((ch - 0xD800) << 10) + (ch2 & 0x3FF) + 0x10000;
 		++p;
 		--todo;
 	    }
 	}
-	if (outstr != NULL)
+	ఒకవేళ (outstr != ఖాళీ)
 	{
 	    l = utf_char2bytes(ch, outstr);
 	    outstr += l;
 	}
-	else
+	లేకపోతే
 	    l = utf_char2len(ch);
 	++p;
 	outlen += l;
 	--todo;
     }
 
-    return outlen;
+    తిరిగి outlen;
 }
 
 /*
@@ -125,48 +125,48 @@ utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
  * Returns the result in "*out[*outlen]" with an extra zero appended.
  * "outlen" is in words.
  */
-    void
-MultiByteToWideChar_alloc(UINT cp, DWORD flags,
-	LPCSTR in, int inlen,
-	LPWSTR *out, int *outlen)
+    శూన్య
+Multi_Byte_గమ్యం_Wide_Char_alloc(UINT cp, DWORD flags,
+	LPCSTR లోపల, పూర్ణాంకం inlen,
+	LPWSTR *బహిర్గతం, పూర్ణాంకం *outlen)
 {
-    *outlen = MultiByteToWideChar(cp, flags, in, inlen, 0, 0);
+    *outlen = Multi_Byte_గమ్యం_Wide_Char(cp, flags, లోపల, inlen, 0, 0);
     // Add one word to avoid a zero-length alloc().
-    *out = ALLOC_MULT(WCHAR, *outlen + 1);
-    if (*out == NULL)
-	return;
+    *బహిర్గతం = ALLOC_MULT(WCHAR, *outlen + 1);
+    ఒకవేళ (*బహిర్గతం == ఖాళీ)
+	తిరిగి;
 
-    MultiByteToWideChar(cp, flags, in, inlen, *out, *outlen);
-    (*out)[*outlen] = 0;
+    Multi_Byte_గమ్యం_Wide_Char(cp, flags, లోపల, inlen, *బహిర్గతం, *outlen);
+    (*బహిర్గతం)[*outlen] = 0;
 }
 
 /*
  * Call WideCharToMultiByte() and allocate memory for the result.
  * Returns the result in "*out[*outlen]" with an extra NUL appended.
  */
-    void
-WideCharToMultiByte_alloc(UINT cp, DWORD flags,
-	LPCWSTR in, int inlen,
-	LPSTR *out, int *outlen,
+    శూన్య
+Wide_Char_గమ్యం_Multi_Byte_alloc(UINT cp, DWORD flags,
+	LPCWSTR లోపల, పూర్ణాంకం inlen,
+	LPSTR *బహిర్గతం, పూర్ణాంకం *outlen,
 	LPCSTR def, LPBOOL useddef)
 {
-    *outlen = WideCharToMultiByte(cp, flags, in, inlen, NULL, 0, def, useddef);
+    *outlen = Wide_Char_గమ్యం_Multi_Byte(cp, flags, లోపల, inlen, ఖాళీ, 0, def, useddef);
     // Add one byte to avoid a zero-length alloc().
-    *out = alloc(*outlen + 1);
-    if (*out == NULL)
-	return;
-    WideCharToMultiByte(cp, flags, in, inlen, *out, *outlen, def, useddef);
-    (*out)[*outlen] = 0;
+    *బహిర్గతం = alloc(*outlen + 1);
+    ఒకవేళ (*బహిర్గతం == ఖాళీ)
+	తిరిగి;
+    Wide_Char_గమ్యం_Multi_Byte(cp, flags, లోపల, inlen, *బహిర్గతం, *outlen, def, useddef);
+    (*బహిర్గతం)[*outlen] = 0;
 }
 
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
 
-    void
-win_clip_init(void)
+    శూన్య
+win_clip_init(శూన్య)
 {
     clip_init(TRUE);
 
@@ -176,38 +176,38 @@ win_clip_init(void)
      * "Clipboard_T" was used for previous versions, using the first
      * character to specify MCHAR, MLINE or MBLOCK.
      */
-    clip_star.format = RegisterClipboardFormat("VimClipboard2");
-    clip_star.format_raw = RegisterClipboardFormat("VimRawBytes");
+    clip_నక్షత్రం.format = రిజిస్టరు_Clipboard_Format("VimClipboard2");
+    clip_నక్షత్రం.format_raw = రిజిస్టరు_Clipboard_Format("VimRawBytes");
 }
 
 // Type used for the clipboard type of Vim's data.
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int type;		// MCHAR, MBLOCK or MLINE
-    int txtlen;		// length of CF_TEXT in bytes
-    int ucslen;		// length of CF_UNICODETEXT in words
-    int rawlen;		// length of clip_star.format_raw, including encoding,
+    పూర్ణాంకం type;		// MCHAR, MBLOCK or MLINE
+    పూర్ణాంకం txtlen;		// length of CF_TEXT in bytes
+    పూర్ణాంకం ucslen;		// length of CF_UNICODETEXT in words
+    పూర్ణాంకం rawlen;		// length of clip_star.format_raw, including encoding,
 			// excluding terminating NUL
 } VimClipType_t;
 
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
-clip_mch_own_selection(Clipboard_T *cbd UNUSED)
+    పూర్ణాంకం
+clip_mch_own_selection(Clipboard_T *cbd వాడని)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Make vim NOT the owner of the current selection.
  */
-    void
-clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
+    శూన్య
+clip_mch_lose_selection(Clipboard_T *cbd వాడని)
 {
     // Nothing needs to be done here
 }
@@ -217,50 +217,50 @@ clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
  * Return the allocated result and the size in "*size".
  * Returns NULL when out of memory.
  */
-    static char_u *
-crnl_to_nl(const char_u *str, int *size)
+    స్థిర char_u *
+crnl_గమ్యం_nl(స్థిరరాశి char_u *str, పూర్ణాంకం *కొలత)
 {
-    int		pos = 0;
-    int		str_len = *size;
+    పూర్ణాంకం		pos = 0;
+    పూర్ణాంకం		str_len = *కొలత;
     char_u	*ret;
     char_u	*retp;
 
     // Avoid allocating zero bytes, it generates an error message.
     ret = alloc(str_len == 0 ? 1 : str_len);
-    if (ret != NULL)
+    ఒకవేళ (ret != ఖాళీ)
     {
 	retp = ret;
-	for (pos = 0; pos < str_len; ++pos)
+	కొరకు (pos = 0; pos < str_len; ++pos)
 	{
-	    if (str[pos] == '\r' && str[pos + 1] == '\n')
+	    ఒకవేళ (str[pos] == '\r' && str[pos + 1] == '\n')
 	    {
 		++pos;
-		--(*size);
+		--(*కొలత);
 	    }
 	    *retp++ = str[pos];
 	}
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Wait for another process to Close the Clipboard.
  * Returns TRUE for success.
  */
-    static int
-vim_open_clipboard(void)
+    స్థిర పూర్ణాంకం
+vim_open_clipboard(శూన్య)
 {
-    int delay = 10;
+    పూర్ణాంకం delay = 10;
 
-    while (!OpenClipboard(NULL))
+    అయితే (!OpenClipboard(ఖాళీ))
     {
-	if (delay > 500)
-	    return FALSE;  // waited too long, give up
+	ఒకవేళ (delay > 500)
+	    తిరిగి FALSE;  // waited too long, give up
 	Sleep(delay);
 	delay *= 2;	// wait for 10, 20, 40, 80, etc. msec
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -274,176 +274,176 @@ vim_open_clipboard(void)
  * so we can't just cast the return value of GetClipboardData to (char_u*).
  * <VN>
  */
-    void
+    శూన్య
 clip_mch_request_selection(Clipboard_T *cbd)
 {
     VimClipType_t	metadata = { -1, -1, -1, -1 };
-    HGLOBAL		hMem = NULL;
-    char_u		*str = NULL;
-    char_u		*to_free = NULL;
-    HGLOBAL		rawh = NULL;
-    int			str_size = 0;
-    int			maxlen;
+    HGLOBAL		hMem = ఖాళీ;
+    char_u		*str = ఖాళీ;
+    char_u		*గమ్యం_free = ఖాళీ;
+    HGLOBAL		rawh = ఖాళీ;
+    పూర్ణాంకం			str_కొలత = 0;
+    పూర్ణాంకం			maxlen;
     size_t		n;
 
     /*
      * Don't pass GetActiveWindow() as an argument to OpenClipboard() because
      * then we can't paste back into the same window for some reason - webb.
      */
-    if (!vim_open_clipboard())
-	return;
+    ఒకవేళ (!vim_open_clipboard())
+	తిరిగి;
 
     // Check for vim's own clipboard format first.  This only gets the type of
     // the data, still need to use CF_UNICODETEXT or CF_TEXT for the text.
-    if (IsClipboardFormatAvailable(cbd->format))
+    ఒకవేళ (Is_Clipboard_Format_అందుబాటు(cbd->format))
     {
 	VimClipType_t	*meta_p;
 	HGLOBAL		meta_h;
 
 	// We have metadata on the clipboard; try to get it.
-	if ((meta_h = GetClipboardData(cbd->format)) != NULL
-		&& (meta_p = (VimClipType_t *)GlobalLock(meta_h)) != NULL)
+	ఒకవేళ ((meta_h = Get_Clipboard_దత్తాంశం(cbd->format)) != ఖాళీ
+		&& (meta_p = (VimClipType_t *)Global_తాళం(meta_h)) != ఖాళీ)
 	{
 	    // The size of "VimClipType_t" changed, "rawlen" was added later.
 	    // Only copy what is available for backwards compatibility.
-	    n = sizeof(VimClipType_t);
-	    if (GlobalSize(meta_h) < n)
-		n = GlobalSize(meta_h);
-	    memcpy(&metadata, meta_p, n);
+	    n = పరిమాణం(VimClipType_t);
+	    ఒకవేళ (Global_కొలత(meta_h) < n)
+		n = Global_కొలత(meta_h);
+	    జ్ఞాపకం_నకలు(&metadata, meta_p, n);
 	    GlobalUnlock(meta_h);
 	}
     }
 
     // Check for Vim's raw clipboard format first.  This is used without
     // conversion, but only if 'encoding' matches.
-    if (IsClipboardFormatAvailable(cbd->format_raw)
-				      && metadata.rawlen > (int)STRLEN(p_enc))
+    ఒకవేళ (Is_Clipboard_Format_అందుబాటు(cbd->format_raw)
+				      && metadata.rawlen > (పూర్ణాంకం)STRLEN(p_enc))
     {
 	// We have raw data on the clipboard; try to get it.
-	if ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
+	ఒకవేళ ((rawh = Get_Clipboard_దత్తాంశం(cbd->format_raw)) != ఖాళీ)
 	{
 	    char_u	*rawp;
 
-	    rawp = (char_u *)GlobalLock(rawh);
-	    if (rawp != NULL && STRCMP(p_enc, rawp) == 0)
+	    rawp = (char_u *)Global_తాళం(rawh);
+	    ఒకవేళ (rawp != ఖాళీ && STRCMP(p_enc, rawp) == 0)
 	    {
 		n = STRLEN(p_enc) + 1;
 		str = rawp + n;
-		str_size = (int)(metadata.rawlen - n);
+		str_కొలత = (పూర్ణాంకం)(metadata.rawlen - n);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		GlobalUnlock(rawh);
-		rawh = NULL;
+		rawh = ఖాళీ;
 	    }
 	}
     }
-    if (str == NULL)
+    ఒకవేళ (str == ఖాళీ)
     {
 	// Try to get the clipboard in Unicode if it's not an empty string.
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
+	ఒకవేళ (Is_Clipboard_Format_అందుబాటు(CF_UNICODETEXT) && metadata.ucslen != 0)
 	{
 	    HGLOBAL hMemW;
 
-	    if ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
+	    ఒకవేళ ((hMemW = Get_Clipboard_దత్తాంశం(CF_UNICODETEXT)) != ఖాళీ)
 	    {
-		WCHAR *hMemWstr = (WCHAR *)GlobalLock(hMemW);
+		WCHAR *hMemWstr = (WCHAR *)Global_తాళం(hMemW);
 
 		// Use the length of our metadata if possible, but limit it to
 		// the GlobalSize() for safety.
-		maxlen = (int)(GlobalSize(hMemW) / sizeof(WCHAR));
-		if (metadata.ucslen >= 0)
+		maxlen = (పూర్ణాంకం)(Global_కొలత(hMemW) / పరిమాణం(WCHAR));
+		ఒకవేళ (metadata.ucslen >= 0)
 		{
-		    if (metadata.ucslen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.ucslen;
+		    ఒకవేళ (metadata.ucslen > maxlen)
+			str_కొలత = maxlen;
+		    లేకపోతే
+			str_కొలత = metadata.ucslen;
 		}
-		else
+		లేకపోతే
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (hMemWstr[str_size] == NUL)
-			    break;
+		    కొరకు (str_కొలత = 0; str_కొలత < maxlen; ++str_కొలత)
+			ఒకవేళ (hMemWstr[str_కొలత] == NUL)
+			    ఆపు;
 		}
-		to_free = str = utf16_to_enc((short_u *)hMemWstr, &str_size);
+		గమ్యం_free = str = utf16_గమ్యం_enc((short_u *)hMemWstr, &str_కొలత);
 		GlobalUnlock(hMemW);
 	    }
 	}
 	// Get the clipboard in the Active codepage.
-	else if (IsClipboardFormatAvailable(CF_TEXT))
+	లేకపోతే ఒకవేళ (Is_Clipboard_Format_అందుబాటు(CF_పాఠ్యం))
 	{
-	    if ((hMem = GetClipboardData(CF_TEXT)) != NULL)
+	    ఒకవేళ ((hMem = Get_Clipboard_దత్తాంశం(CF_పాఠ్యం)) != ఖాళీ)
 	    {
-		str = (char_u *)GlobalLock(hMem);
+		str = (char_u *)Global_తాళం(hMem);
 
 		// The length is either what our metadata says or the strlen().
 		// But limit it to the GlobalSize() for safety.
-		maxlen = (int)GlobalSize(hMem);
-		if (metadata.txtlen >= 0)
+		maxlen = (పూర్ణాంకం)Global_కొలత(hMem);
+		ఒకవేళ (metadata.txtlen >= 0)
 		{
-		    if (metadata.txtlen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.txtlen;
+		    ఒకవేళ (metadata.txtlen > maxlen)
+			str_కొలత = maxlen;
+		    లేకపోతే
+			str_కొలత = metadata.txtlen;
 		}
-		else
+		లేకపోతే
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (str[str_size] == NUL)
-			    break;
+		    కొరకు (str_కొలత = 0; str_కొలత < maxlen; ++str_కొలత)
+			ఒకవేళ (str[str_కొలత] == NUL)
+			    ఆపు;
 		}
 
 		// The text is in the active codepage.  Convert to
 		// 'encoding', going through UTF-16.
-		acp_to_enc(str, str_size, &to_free, &maxlen);
-		if (to_free != NULL)
+		acp_గమ్యం_enc(str, str_కొలత, &గమ్యం_free, &maxlen);
+		ఒకవేళ (గమ్యం_free != ఖాళీ)
 		{
-		    str_size = maxlen;
-		    str = to_free;
+		    str_కొలత = maxlen;
+		    str = గమ్యం_free;
 		}
 	    }
 	}
     }
 
-    if (str != NULL && metadata.txtlen != 0)
+    ఒకవేళ (str != ఖాళీ && metadata.txtlen != 0)
     {
-	char_u *temp_clipboard;
+	char_u *తాత్కాలిక_clipboard;
 
 	// If the type is not known detect it.
-	if (metadata.type == -1)
+	ఒకవేళ (metadata.type == -1)
 	    metadata.type = MAUTO;
 
 	// Translate <CR><NL> into <NL>.
-	temp_clipboard = crnl_to_nl(str, &str_size);
-	if (temp_clipboard != NULL)
+	తాత్కాలిక_clipboard = crnl_గమ్యం_nl(str, &str_కొలత);
+	ఒకవేళ (తాత్కాలిక_clipboard != ఖాళీ)
 	{
-	    clip_yank_selection(metadata.type, temp_clipboard, str_size, cbd);
-	    vim_free(temp_clipboard);
+	    clip_yank_selection(metadata.type, తాత్కాలిక_clipboard, str_కొలత, cbd);
+	    vim_free(తాత్కాలిక_clipboard);
 	}
     }
 
     // unlock the global object
-    if (hMem != NULL)
+    ఒకవేళ (hMem != ఖాళీ)
 	GlobalUnlock(hMem);
-    if (rawh != NULL)
+    ఒకవేళ (rawh != ఖాళీ)
 	GlobalUnlock(rawh);
     CloseClipboard();
-    vim_free(to_free);
+    vim_free(గమ్యం_free);
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd)
+    శూన్య
+clip_mch_సమితి_selection(Clipboard_T *cbd)
 {
-    char_u		*str = NULL;
+    char_u		*str = ఖాళీ;
     VimClipType_t	metadata;
     long_u		txtlen;
-    HGLOBAL		hMemRaw = NULL;
-    HGLOBAL		hMem = NULL;
-    HGLOBAL		hMemVim = NULL;
-    HGLOBAL		hMemW = NULL;
+    HGLOBAL		hMemRaw = ఖాళీ;
+    HGLOBAL		hMem = ఖాళీ;
+    HGLOBAL		hMemVim = ఖాళీ;
+    HGLOBAL		hMemW = ఖాళీ;
 
     // If the '*' register isn't already filled in, fill it in now
     cbd->owned = TRUE;
@@ -452,9 +452,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Get the text to be put on the clipboard, with CR-LF.
     metadata.type = clip_convert_selection(&str, &txtlen, cbd);
-    if (metadata.type < 0)
-	return;
-    metadata.txtlen = (int)txtlen;
+    ఒకవేళ (metadata.type < 0)
+	తిరిగి;
+    metadata.txtlen = (పూర్ణాంకం)txtlen;
     metadata.ucslen = 0;
     metadata.rawlen = 0;
 
@@ -464,57 +464,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMemRaw;
 
-	metadata.rawlen = (int)(txtlen + STRLEN(p_enc) + 1);
+	metadata.rawlen = (పూర్ణాంకం)(txtlen + STRLEN(p_enc) + 1);
 	hMemRaw = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							 metadata.rawlen + 1);
-	lpszMemRaw = (LPSTR)GlobalLock(hMemRaw);
-	if (lpszMemRaw != NULL)
+	lpszMemRaw = (LPSTR)Global_తాళం(hMemRaw);
+	ఒకవేళ (lpszMemRaw != ఖాళీ)
 	{
 	    STRCPY(lpszMemRaw, p_enc);
-	    memcpy(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
+	    జ్ఞాపకం_నకలు(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
 	    GlobalUnlock(hMemRaw);
 	}
-	else
+	లేకపోతే
 	    metadata.rawlen = 0;
     }
 
     {
-	WCHAR		*out;
-	int		len = metadata.txtlen;
+	WCHAR		*బహిర్గతం;
+	పూర్ణాంకం		len = metadata.txtlen;
 
 	// Convert the text to UTF-16. This is put on the clipboard as
 	// CF_UNICODETEXT.
-	out = (WCHAR *)enc_to_utf16(str, &len);
-	if (out != NULL)
+	బహిర్గతం = (WCHAR *)enc_గమ్యం_utf16(str, &len);
+	ఒకవేళ (బహిర్గతం != ఖాళీ)
 	{
 	    WCHAR *lpszMemW;
 
 	    // Convert the text for CF_TEXT to Active codepage. Otherwise it's
 	    // p_enc, which has no relation to the Active codepage.
-	    metadata.txtlen = WideCharToMultiByte(GetACP(), 0, out, len,
-							       NULL, 0, 0, 0);
+	    metadata.txtlen = Wide_Char_గమ్యం_Multi_Byte(GetACP(), 0, బహిర్గతం, len,
+							       ఖాళీ, 0, 0, 0);
 	    vim_free(str);
 	    str = alloc(metadata.txtlen == 0 ? 1 : metadata.txtlen);
-	    if (str == NULL)
+	    ఒకవేళ (str == ఖాళీ)
 	    {
-		vim_free(out);
-		return;		// out of memory
+		vim_free(బహిర్గతం);
+		తిరిగి;		// out of memory
 	    }
-	    WideCharToMultiByte(GetACP(), 0, out, len,
+	    Wide_Char_గమ్యం_Multi_Byte(GetACP(), 0, బహిర్గతం, len,
 					   (LPSTR)str, metadata.txtlen, 0, 0);
 
 	    // Allocate memory for the UTF-16 text, add one NUL word to
 	    // terminate the string.
 	    hMemW = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-						   (len + 1) * sizeof(WCHAR));
-	    lpszMemW = (WCHAR *)GlobalLock(hMemW);
-	    if (lpszMemW != NULL)
+						   (len + 1) * పరిమాణం(WCHAR));
+	    lpszMemW = (WCHAR *)Global_తాళం(hMemW);
+	    ఒకవేళ (lpszMemW != ఖాళీ)
 	    {
-		memcpy(lpszMemW, out, len * sizeof(WCHAR));
+		జ్ఞాపకం_నకలు(lpszMemW, బహిర్గతం, len * పరిమాణం(WCHAR));
 		lpszMemW[len] = NUL;
 		GlobalUnlock(hMemW);
 	    }
-	    vim_free(out);
+	    vim_free(బహిర్గతం);
 	    metadata.ucslen = len;
 	}
     }
@@ -522,9 +522,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
     // Allocate memory for the text, add one NUL byte to terminate the string.
     hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, metadata.txtlen + 1);
     {
-	LPSTR lpszMem = (LPSTR)GlobalLock(hMem);
+	LPSTR lpszMem = (LPSTR)Global_తాళం(hMem);
 
-	if (lpszMem)
+	ఒకవేళ (lpszMem)
 	{
 	    mch_memmove((char_u *)lpszMem, str, metadata.txtlen);
 	    GlobalUnlock(hMem);
@@ -533,12 +533,12 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Set up metadata:
     {
-	VimClipType_t *lpszMemVim = NULL;
+	VimClipType_t *lpszMemVim = ఖాళీ;
 
 	hMemVim = GlobalAlloc(GMEM_MOVEABLE|GMEM_DDESHARE,
-						       sizeof(VimClipType_t));
-	lpszMemVim = (VimClipType_t *)GlobalLock(hMemVim);
-	memcpy(lpszMemVim, &metadata, sizeof(metadata));
+						       పరిమాణం(VimClipType_t));
+	lpszMemVim = (VimClipType_t *)Global_తాళం(hMemVim);
+	జ్ఞాపకం_నకలు(lpszMemVim, &metadata, పరిమాణం(metadata));
 	GlobalUnlock(hMemVim);
     }
 
@@ -550,20 +550,20 @@ clip_mch_set_selection(Clipboard_T *cbd)
      * because then we can't paste back into the same window for some
      * reason - webb.
      */
-    if (vim_open_clipboard())
+    ఒకవేళ (vim_open_clipboard())
     {
-	if (EmptyClipboard())
+	ఒకవేళ (ఖాళీలు_Clipboard())
 	{
-	    SetClipboardData(cbd->format, hMemVim);
+	    సమితి_Clipboard_దత్తాంశం(cbd->format, hMemVim);
 	    hMemVim = 0;
-	    if (hMemW != NULL)
+	    ఒకవేళ (hMemW != ఖాళీ)
 	    {
-		if (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
-		    hMemW = NULL;
+		ఒకవేళ (సమితి_Clipboard_దత్తాంశం(CF_UNICODETEXT, hMemW) != ఖాళీ)
+		    hMemW = ఖాళీ;
 	    }
 	    // Always use CF_TEXT.  On Win98 Notepad won't obtain the
 	    // CF_UNICODETEXT text, only CF_TEXT.
-	    SetClipboardData(CF_TEXT, hMem);
+	    సమితి_Clipboard_దత్తాంశం(CF_పాఠ్యం, hMem);
 	    hMem = 0;
 	}
 	CloseClipboard();
@@ -571,17 +571,17 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     vim_free(str);
     // Free any allocations we didn't give to the clipboard:
-    if (hMemRaw)
+    ఒకవేళ (hMemRaw)
 	GlobalFree(hMemRaw);
-    if (hMem)
+    ఒకవేళ (hMem)
 	GlobalFree(hMem);
-    if (hMemW)
+    ఒకవేళ (hMemW)
 	GlobalFree(hMemW);
-    if (hMemVim)
+    ఒకవేళ (hMemVim)
 	GlobalFree(hMemVim);
 }
 
-#endif // FEAT_CLIPBOARD
+#అయితే_ముగింపు // FEAT_CLIPBOARD
 
 /*
  * Note: the following two functions are only guaranteed to work when using
@@ -596,57 +596,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
  * Returns NULL when out of memory.
  */
     short_u *
-enc_to_utf16(char_u *str, int *lenp)
+enc_గమ్యం_utf16(char_u *str, పూర్ణాంకం *lenp)
 {
     vimconv_T	conv;
     WCHAR	*ret;
-    char_u	*allocbuf = NULL;
-    int		len_loc;
-    int		length;
+    char_u	*allocbuf = ఖాళీ;
+    పూర్ణాంకం		len_loc;
+    పూర్ణాంకం		నిడివి;
 
-    if (lenp == NULL)
+    ఒకవేళ (lenp == ఖాళీ)
     {
-	len_loc = (int)STRLEN(str) + 1;
+	len_loc = (పూర్ణాంకం)STRLEN(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    ఒకవేళ (enc_codepage > 0)
     {
 	// We can do any CP### -> UTF-16 in one pass, and we can do it
 	// without iconv() (convert_* may need iconv).
-	MultiByteToWideChar_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
-							       &ret, &length);
+	Multi_Byte_గమ్యం_Wide_Char_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
+							       &ret, &నిడివి);
     }
-    else
+    లేకపోతే
     {
 	// Use "latin1" by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
+	ఒకవేళ (convert_అమరిక(&conv, p_enc ? p_enc : (char_u *)"latin1",
 						   (char_u *)"utf-8") == FAIL)
-	    return NULL;
-	if (conv.vc_type != CONV_NONE)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (conv.vc_type != CONV_NONE)
 	{
 	    str = allocbuf = string_convert(&conv, str, lenp);
-	    if (str == NULL)
-		return NULL;
+	    ఒకవేళ (str == ఖాళీ)
+		తిరిగి ఖాళీ;
 	}
-	convert_setup(&conv, NULL, NULL);
+	convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 
-	length = utf8_to_utf16(str, *lenp, NULL, NULL);
-	ret = ALLOC_MULT(WCHAR, length + 1);
-	if (ret != NULL)
+	నిడివి = utf8_గమ్యం_utf16(str, *lenp, ఖాళీ, ఖాళీ);
+	ret = ALLOC_MULT(WCHAR, నిడివి + 1);
+	ఒకవేళ (ret != ఖాళీ)
 	{
-	    utf8_to_utf16(str, *lenp, (short_u *)ret, NULL);
-	    ret[length] = 0;
+	    utf8_గమ్యం_utf16(str, *lenp, (short_u *)ret, ఖాళీ);
+	    ret[నిడివి] = 0;
 	}
 
 	vim_free(allocbuf);
     }
 
-    *lenp = length;
-    return (short_u *)ret;
+    *lenp = నిడివి;
+    తిరిగి (short_u *)ret;
 }
 
 /*
@@ -658,54 +658,54 @@ enc_to_utf16(char_u *str, int *lenp)
  * Returns NULL when out of memory.
  */
     char_u *
-utf16_to_enc(short_u *str, int *lenp)
+utf16_గమ్యం_enc(short_u *str, పూర్ణాంకం *lenp)
 {
     vimconv_T	conv;
-    char_u	*utf8_str = NULL, *enc_str = NULL;
-    int		len_loc;
+    char_u	*utf8_str = ఖాళీ, *enc_str = ఖాళీ;
+    పూర్ణాంకం		len_loc;
 
-    if (lenp == NULL)
+    ఒకవేళ (lenp == ఖాళీ)
     {
-	len_loc = (int)wcslen(str) + 1;
+	len_loc = (పూర్ణాంకం)wcslen(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    ఒకవేళ (enc_codepage > 0)
     {
 	// We can do any UTF-16 -> CP### in one pass.
-	int length;
+	పూర్ణాంకం నిడివి;
 
-	WideCharToMultiByte_alloc(enc_codepage, 0, str, *lenp,
-					    (LPSTR *)&enc_str, &length, 0, 0);
-	*lenp = length;
-	return enc_str;
+	Wide_Char_గమ్యం_Multi_Byte_alloc(enc_codepage, 0, str, *lenp,
+					    (LPSTR *)&enc_str, &నిడివి, 0, 0);
+	*lenp = నిడివి;
+	తిరిగి enc_str;
     }
 
     // Avoid allocating zero bytes, it generates an error message.
-    utf8_str = alloc(utf16_to_utf8(str, *lenp == 0 ? 1 : *lenp, NULL));
-    if (utf8_str != NULL)
+    utf8_str = alloc(utf16_గమ్యం_utf8(str, *lenp == 0 ? 1 : *lenp, ఖాళీ));
+    ఒకవేళ (utf8_str != ఖాళీ)
     {
-	*lenp = utf16_to_utf8(str, *lenp, utf8_str);
+	*lenp = utf16_గమ్యం_utf8(str, *lenp, utf8_str);
 
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, (char_u *)"utf-8",
+	convert_అమరిక(&conv, (char_u *)"utf-8",
 					    p_enc? p_enc: (char_u *)"latin1");
-	if (conv.vc_type == CONV_NONE)
+	ఒకవేళ (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    enc_str = utf8_str;
 	}
-	else
+	లేకపోతే
 	{
 	    enc_str = string_convert(&conv, utf8_str, lenp);
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
     }
 
-    return enc_str;
+    తిరిగి enc_str;
 }
 
 /*
@@ -714,22 +714,22 @@ utf16_to_enc(short_u *str, int *lenp)
  * The result is in allocated memory: "out[outlen]".  "outlen" includes the
  * terminating NUL.
  */
-    void
-acp_to_enc(
+    శూన్య
+acp_గమ్యం_enc(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    పూర్ణాంకం		str_కొలత,
+    char_u	**బహిర్గతం,
+    పూర్ణాంకం		*outlen)
 
 {
     LPWSTR	widestr;
 
-    MultiByteToWideChar_alloc(GetACP(), 0, (LPCSTR)str, str_size,
+    Multi_Byte_గమ్యం_Wide_Char_alloc(GetACP(), 0, (LPCSTR)str, str_కొలత,
 							    &widestr, outlen);
-    if (widestr == NULL)
-	return;
+    ఒకవేళ (widestr == ఖాళీ)
+	తిరిగి;
     ++*outlen;	// Include the 0 after the string
-    *out = utf16_to_enc((short_u *)widestr, outlen);
+    *బహిర్గతం = utf16_గమ్యం_enc((short_u *)widestr, outlen);
     vim_free(widestr);
 }
 
@@ -738,21 +738,21 @@ acp_to_enc(
  * Input is "str[str_size]".
  * The result is in allocated memory: "out[outlen]".  With terminating NUL.
  */
-    void
-enc_to_acp(
+    శూన్య
+enc_గమ్యం_acp(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    పూర్ణాంకం		str_కొలత,
+    char_u	**బహిర్గతం,
+    పూర్ణాంకం		*outlen)
 
 {
     LPWSTR	widestr;
-    int		len = str_size;
+    పూర్ణాంకం		len = str_కొలత;
 
-    widestr = (WCHAR *)enc_to_utf16(str, &len);
-    if (widestr == NULL)
-	return;
-    WideCharToMultiByte_alloc(GetACP(), 0, widestr, len,
-	    (LPSTR *)out, outlen, 0, 0);
+    widestr = (WCHAR *)enc_గమ్యం_utf16(str, &len);
+    ఒకవేళ (widestr == ఖాళీ)
+	తిరిగి;
+    Wide_Char_గమ్యం_Multi_Byte_alloc(GetACP(), 0, widestr, len,
+	    (LPSTR *)బహిర్గతం, outlen, 0, 0);
     vim_free(widestr);
 }

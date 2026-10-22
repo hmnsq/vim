@@ -1,175 +1,175 @@
-#ifndef __VTERM_INTERNAL_H__
-#define __VTERM_INTERNAL_H__
+#నిర్వచితం_కాకపోతే __VTERM_INTERNAL_H__
+#నిర్వచించు __VTERM_INTERNAL_H__
 
-#include "vterm.h"
+#అన్తర్భావ "vterm.h"
 
-#include <stdarg.h>
+#అన్తర్భావ <stdarg.h>
 
-#if defined(__GNUC__) && !defined(__MINGW32__)
-# define INTERNAL __attribute__((visibility("internal")))
-#else
-# define INTERNAL
-#endif
+#ఒకవేళ defined(__GNUC__) && !defined(__MINGW32__)
+# define అంతర్గత __attribute__((visibility("internal")))
+#లేకపోతే
+# define అంతర్గత
+#అయితే_ముగింపు
 
-#if defined(__GNUC__) || defined(__MINGW32__)
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#ఒకవేళ defined(__GNUC__) || defined(__MINGW32__)
+# define వాడని __attribute__((వాడని_2))
+#లేకపోతే
+# define వాడని
+#అయితే_ముగింపు
 
-#ifdef DEBUG
+#నిర్వచితమైతే DEBUG
 # define DEBUG_LOG(s) fprintf(stderr, s)
 # define DEBUG_LOG1(s, a) fprintf(stderr, s, a)
 # define DEBUG_LOG2(s, a, b) fprintf(stderr, s, a, b)
 # define DEBUG_LOG3(s, a, b, c) fprintf(stderr, s, a, b, c)
-#else
+#లేకపోతే
 # define DEBUG_LOG(s)
 # define DEBUG_LOG1(s, a)
 # define DEBUG_LOG2(s, a, b)
 # define DEBUG_LOG3(s, a, b, c)
-#endif
+#అయితే_ముగింపు
 
-#define ESC_S "\x1b"
+#నిర్వచించు ESC_S "\x1b"
 
-#define INTERMED_MAX 16
+#నిర్వచించు INTERMED_MAX 16
 
-#define CSI_ARGS_MAX 16
-#define CSI_LEADER_MAX 16
+#నిర్వచించు CSI_వాదనలు_MAX 16
+#నిర్వచించు CSI_LEADER_MAX 16
 
-#define BUFIDX_PRIMARY   0
-#define BUFIDX_ALTSCREEN 1
+#నిర్వచించు BUFIDX_PRIMARY   0
+#నిర్వచించు BUFIDX_ALTSCREEN 1
 
-typedef struct VTermEncoding VTermEncoding;
+రకనిర్వచనం నిర్మాణం VTermEncoding VTermEncoding;
 
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
   VTermEncoding *enc;
 
   // This size should be increased if required by other stateful encodings
-  char           data[4*sizeof(uint32_t)];
+  అక్షరం           దత్తాంశం[4*పరిమాణం(uint32_t)];
 } VTermEncodingInstance;
 
-struct VTermPen
+నిర్మాణం VTermPen
 {
   VTermColor fg;
   VTermColor bg;
-  unsigned int bold:1;
-  unsigned int underline:2;
-  unsigned int italic:1;
-  unsigned int blink:1;
-  unsigned int reverse:1;
-  unsigned int conceal:1;
-  unsigned int strike:1;
-  unsigned int font:4; /* To store 0-9 */
-  unsigned int small:1;
-  unsigned int baseline:2;
+  గుర్తులేని పూర్ణాంకం bold:1;
+  గుర్తులేని పూర్ణాంకం underline:2;
+  గుర్తులేని పూర్ణాంకం italic:1;
+  గుర్తులేని పూర్ణాంకం blink:1;
+  గుర్తులేని పూర్ణాంకం తిరగేయి:1;
+  గుర్తులేని పూర్ణాంకం conceal:1;
+  గుర్తులేని పూర్ణాంకం strike:1;
+  గుర్తులేని పూర్ణాంకం font:4; /* To store 0-9 */
+  గుర్తులేని పూర్ణాంకం small:1;
+  గుర్తులేని పూర్ణాంకం baseline:2;
 };
 
-struct VTermState
+నిర్మాణం VTermState
 {
   VTerm *vt;
 
-  const VTermStateCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_premove;
+  స్థిరరాశి VTermStateCallbacks *callbacks;
+  శూన్య *cbdata;
+  పూర్ణాంకం callbacks_has_premove;
 
-  const VTermStateFallbacks *fallbacks;
-  void *fbdata;
+  స్థిరరాశి VTermStateFallbacks *fallbacks;
+  శూన్య *fbdata;
 
-  int rows;
-  int cols;
+  పూర్ణాంకం అడ్డువరుసలు_2;
+  పూర్ణాంకం నిలువుల_సంఖ్య;
 
   /* Current cursor position */
   VTermPos pos;
 
-  int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
+  పూర్ణాంకం at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
-  int scrollregion_bottom; /* -1 means unbounded */
-#define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
-#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
-#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
+  పూర్ణాంకం scrollregion_శిఖరం;
+  పూర్ణాంకం scrollregion_bottom; /* -1 means unbounded */
+#నిర్వచించు SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->అడ్డువరుసలు_2)
+  పూర్ణాంకం scrollregion_ఎడమ;
+#నిర్వచించు SCROLLREGION_ఎడమ(state)  ((state)->బహుళకం.leftrightmargin ? (state)->scrollregion_ఎడమ : 0)
+  పూర్ణాంకం scrollregion_కుడి; /* -1 means unbounded */
+#నిర్వచించు SCROLLREGION_కుడి(state) ((state)->బహుళకం.leftrightmargin && (state)->scrollregion_కుడి > -1 ? (state)->scrollregion_కుడి : (state)->నిలువుల_సంఖ్య)
 
   /* Bitvector of tab stops */
-  unsigned char *tabstops;
+  గుర్తులేని అక్షరం *tabstops;
 
   /* Primary and Altscreen; lineinfos[1] is lazily allocated as needed */
-  VTermLineInfo *lineinfos[2];
+  VTerm_పంక్తి_Info *lineinfos[2];
 
   /* lineinfo will == lineinfos[0] or lineinfos[1], depending on altscreen */
-  VTermLineInfo *lineinfo;
-#define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
-#define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
+  VTerm_పంక్తి_Info *lineinfo;
+#నిర్వచించు ROWWIDTH(state,అడ్డువరుస) ((state)->lineinfo[(అడ్డువరుస)].doublewidth ? ((state)->నిలువుల_సంఖ్య / 2) : (state)->నిలువుల_సంఖ్య)
+#నిర్వచించు THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.అడ్డువరుస)
 
   /* Mouse state */
-  int mouse_col, mouse_row;
-  int mouse_buttons;
-  int mouse_flags;
+  పూర్ణాంకం mouse_నిలువు, mouse_అడ్డువరుస;
+  పూర్ణాంకం mouse_buttons;
+  పూర్ణాంకం mouse_flags;
 
-  enum { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
+  గణన { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
 
   /* Last glyph output, for Unicode recombining purposes */
   uint32_t *combine_chars;
-  size_t combine_chars_size; // Number of ELEMENTS in the above
-  int combine_width; // The width of the glyph above
+  size_t combine_chars_కొలత; // Number of ELEMENTS in the above
+  పూర్ణాంకం combine_వెడల్పు; // The width of the glyph above
   VTermPos combine_pos;   // Position before movement
 
-  struct {
-    unsigned int keypad:1;
-    unsigned int cursor:1;
-    unsigned int autowrap:1;
-    unsigned int insert:1;
-    unsigned int newline:1;
-    unsigned int cursor_visible:1;
-    unsigned int cursor_blink:1;
-    unsigned int cursor_shape:2;
-    unsigned int alt_screen:1;
-    unsigned int origin:1;
-    unsigned int screen:1;
-    unsigned int leftrightmargin:1;
-    unsigned int bracketpaste:1;
-    unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
-    unsigned int kitty_keyboard:1;
-  } mode;
+  నిర్మాణం {
+    గుర్తులేని పూర్ణాంకం keypad:1;
+    గుర్తులేని పూర్ణాంకం cursor:1;
+    గుర్తులేని పూర్ణాంకం autowrap:1;
+    గుర్తులేని పూర్ణాంకం చొప్పించు:1;
+    గుర్తులేని పూర్ణాంకం newline:1;
+    గుర్తులేని పూర్ణాంకం cursor_visible:1;
+    గుర్తులేని పూర్ణాంకం cursor_blink:1;
+    గుర్తులేని పూర్ణాంకం cursor_shape:2;
+    గుర్తులేని పూర్ణాంకం alt_screen:1;
+    గుర్తులేని పూర్ణాంకం origin:1;
+    గుర్తులేని పూర్ణాంకం screen:1;
+    గుర్తులేని పూర్ణాంకం leftrightmargin:1;
+    గుర్తులేని పూర్ణాంకం bracketpaste:1;
+    గుర్తులేని పూర్ణాంకం report_focus:1;
+    గుర్తులేని పూర్ణాంకం modify_other_కీలకాలు:1;
+    గుర్తులేని పూర్ణాంకం kitty_keyboard:1;
+  } బహుళకం;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set, gsingle_set;
+  పూర్ణాంకం gl_సమితి, gr_సమితి, gsingle_సమితి;
 
-  struct VTermPen pen;
+  నిర్మాణం VTermPen pen;
 
   VTermColor default_fg;
   VTermColor default_bg;
   VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
 
-  int bold_is_highbright;
+  పూర్ణాంకం bold_is_highbright;
 
-  unsigned int protected_cell : 1;
+  గుర్తులేని పూర్ణాంకం protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
-  struct {
+  నిర్మాణం {
     VTermPos pos;
-    struct VTermPen pen;
+    నిర్మాణం VTermPen pen;
 
-    struct {
-      unsigned int cursor_visible:1;
-      unsigned int cursor_blink:1;
-      unsigned int cursor_shape:2;
-    } mode;
+    నిర్మాణం {
+      గుర్తులేని పూర్ణాంకం cursor_visible:1;
+      గుర్తులేని పూర్ణాంకం cursor_blink:1;
+      గుర్తులేని పూర్ణాంకం cursor_shape:2;
+    } బహుళకం;
   } saved;
 
   /* Temporary state for DECRQSS parsing */
-  union {
-    char decrqss[4];
-    struct {
-      uint16_t mask;
-      enum {
+  సంఘం {
+    అక్షరం decrqss[4];
+    నిర్మాణం {
+      uint16_t ముసుగు;
+      గణన {
         SELECTION_INITIAL,
         SELECTION_SELECTED,
         SELECTION_QUERY,
-        SELECTION_SET_INITIAL,
-        SELECTION_SET,
+        SELECTION_సమితి_INITIAL,
+        SELECTION_సమితి,
         SELECTION_INVALID,
       } state : 8;
       uint32_t recvpartial;
@@ -177,32 +177,32 @@ struct VTermState
     } selection;
   } tmp;
 
-  struct {
-    const VTermSelectionCallbacks *callbacks;
-    void *user;
-    char *buffer;
+  నిర్మాణం {
+    స్థిరరాశి VTermSelectionCallbacks *callbacks;
+    శూన్య *user;
+    అక్షరం *బఫరు;
     size_t buflen;
   } selection;
 };
 
-struct VTerm
+నిర్మాణం VTerm
 {
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  స్థిరరాశి VTermAllocatorFunctions *allocator;
+  శూన్య *allocdata;
 
-  int rows;
-  int cols;
+  పూర్ణాంకం అడ్డువరుసలు_2;
+  పూర్ణాంకం నిలువుల_సంఖ్య;
 
-  struct {
-    unsigned int utf8:1;
-    unsigned int ctrl8bit:1;
-  } mode;
+  నిర్మాణం {
+    గుర్తులేని పూర్ణాంకం utf8:1;
+    గుర్తులేని పూర్ణాంకం ctrl8bit:1;
+  } బహుళకం;
 
-  struct {
-    enum VTermParserState {
-      NORMAL,
+  నిర్మాణం {
+    గణన VTermParserState {
+      సాధారణ_2,
       CSI_LEADER,
-      CSI_ARGS,
+      CSI_వాదనలు,
       CSI_INTERMED,
       DCS_COMMAND,
       /* below here are the "string states" */
@@ -214,84 +214,84 @@ struct VTerm
       SOS,
     } state;
 
-    unsigned int in_esc : 1;
+    గుర్తులేని పూర్ణాంకం లోపల_esc : 1;
 
-    int intermedlen;
-    char intermed[INTERMED_MAX];
+    పూర్ణాంకం intermedlen;
+    అక్షరం intermed[INTERMED_MAX];
 
-    union {
-      struct {
-        int leaderlen;
-        char leader[CSI_LEADER_MAX];
+    సంఘం {
+      నిర్మాణం {
+        పూర్ణాంకం leaderlen;
+        అక్షరం leader[CSI_LEADER_MAX];
 
-        int argi;
-        long args[CSI_ARGS_MAX];
+        పూర్ణాంకం argi;
+        దీర్ఘ వాదనలు[CSI_వాదనలు_MAX];
       } csi;
-      struct {
-        int command;
+      నిర్మాణం {
+        పూర్ణాంకం command;
       } osc;
-      struct {
-        int commandlen;
-        char command[CSI_LEADER_MAX];
+      నిర్మాణం {
+        పూర్ణాంకం commandlen;
+        అక్షరం command[CSI_LEADER_MAX];
       } dcs;
     } v;
 
-    const VTermParserCallbacks *callbacks;
-    void *cbdata;
+    స్థిరరాశి VTermParserCallbacks *callbacks;
+    శూన్య *cbdata;
 
-    int string_initial;
+    పూర్ణాంకం string_initial;
 
-    int emit_nul;
+    పూర్ణాంకం emit_nul;
   } parser;
 
   /* len == malloc()ed size; cur == number of valid bytes */
 
   VTermOutputCallback *outfunc;
-  void                *outdata;
+  శూన్య                *outdata;
 
-  char  *outbuffer;
+  అక్షరం  *outbuffer;
   size_t outbuffer_len;
   size_t outbuffer_cur;
 
-  char  *tmpbuffer;
+  అక్షరం  *tmpbuffer;
   size_t tmpbuffer_len;
 
   VTermState *state;
   VTermScreen *screen;
 
-  int in_backspace;
+  పూర్ణాంకం లోపల_backspace;
 };
 
-struct VTermEncoding {
-  void (*init) (VTermEncoding *enc, void *data);
-  void (*decode)(VTermEncoding *enc, void *data,
-                 uint32_t cp[], int *cpi, int cplen,
-                 const char bytes[], size_t *pos, size_t len);
+నిర్మాణం VTermEncoding {
+  శూన్య (*init) (VTermEncoding *enc, శూన్య *దత్తాంశం);
+  శూన్య (*decode)(VTermEncoding *enc, శూన్య *దత్తాంశం,
+                 uint32_t cp[], పూర్ణాంకం *cpi, పూర్ణాంకం cplen,
+                 స్థిరరాశి అక్షరం బైట్లు[], size_t *pos, size_t len);
 };
 
-typedef enum {
+రకనిర్వచనం గణన {
   ENC_UTF8,
   ENC_SINGLE_94
 } VTermEncodingType;
 
-void *vterm_allocator_malloc(VTerm *vt, size_t size);
-void  vterm_allocator_free(VTerm *vt, void *ptr);
+శూన్య *vterm_allocator_malloc(VTerm *vt, size_t కొలత);
+శూన్య  vterm_allocator_free(VTerm *vt, శూన్య *ptr);
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
-void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+శూన్య vterm_నెట్టు_output_బైట్లు(VTerm *vt, స్థిరరాశి అక్షరం *బైట్లు, size_t len);
+శూన్య vterm_నెట్టు_output_vsprintf(VTerm *vt, స్థిరరాశి అక్షరం *format, va_list వాదనలు);
+శూన్య vterm_నెట్టు_output_sprintf(VTerm *vt, స్థిరరాశి అక్షరం *format, ...);
+శూన్య vterm_నెట్టు_output_sprintf_ctrl(VTerm *vt, గుర్తులేని అక్షరం ctrl, స్థిరరాశి అక్షరం *fmt, ...);
+శూన్య vterm_నెట్టు_output_sprintf_str(VTerm *vt, గుర్తులేని అక్షరం ctrl, పూర్ణాంకం పదం, స్థిరరాశి అక్షరం *fmt, ...);
 
-void vterm_state_free(VTermState *state);
+శూన్య vterm_state_free(VTermState *state);
 
-void vterm_state_newpen(VTermState *state);
-void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
-void vterm_state_savepen(VTermState *state, int save);
+శూన్య vterm_state_newpen(VTermState *state);
+శూన్య vterm_state_resetpen(VTermState *state);
+శూన్య vterm_state_setpen(VTermState *state, స్థిరరాశి దీర్ఘ వాదనలు[], పూర్ణాంకం argcount);
+పూర్ణాంకం  vterm_state_getpen(VTermState *state, దీర్ఘ వాదనలు[], పూర్ణాంకం argcount);
+శూన్య vterm_state_savepen(VTermState *state, పూర్ణాంకం save);
 
-enum {
+గణన {
   C1_SS3 = 0x8f,
   C1_DCS = 0x90,
   C1_CSI = 0x9b,
@@ -299,35 +299,35 @@ enum {
   C1_OSC = 0x9d,
 };
 
-void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
+శూన్య vterm_state_నెట్టు_output_sprintf_CSI(VTermState *vts, స్థిరరాశి అక్షరం *format, ...);
 
-void vterm_screen_free(VTermScreen *screen);
+శూన్య vterm_screen_free(VTermScreen *screen);
 
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation);
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, అక్షరం designation);
 
-int vterm_unicode_width(uint32_t codepoint);
-int vterm_unicode_is_combining(uint32_t codepoint);
-int vterm_unicode_is_ambiguous(uint32_t codepoint);
-int vterm_get_special_pty_type(void);
+పూర్ణాంకం vterm_unicode_వెడల్పు(uint32_t codepoint);
+పూర్ణాంకం vterm_unicode_is_combining(uint32_t codepoint);
+పూర్ణాంకం vterm_unicode_is_ambiguous(uint32_t codepoint);
+పూర్ణాంకం vterm_get_special_pty_type(శూన్య);
 
-#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
-	|| defined(_ISOC99_SOURCE) || defined(_BSD_SOURCE)
+#ఒకవేళ (defined(XOPEN_ఆధారం) && XOPEN_ఆధారం >= 500) \
+	|| defined(ISOC99_ఆధారం) || defined(BSD_ఆధారం)
 # undef VSNPRINTF
 # define VSNPRINTF vsnprintf
 # undef SNPRINTF
-#else
+#లేకపోతే
 # ifdef VSNPRINTF
 // Use a provided vsnprintf() function.
-int VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
+పూర్ణాంకం VSNPRINTF(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, va_list ap);
 # endif
 # ifdef SNPRINTF
 // Use a provided snprintf() function.
-int SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
+పూర్ణాంకం SNPRINTF(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, ...);
 # endif
-#endif
-#ifndef SNPRINTF
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే SNPRINTF
 # define SNPRINTF snprintf
-#endif
+#అయితే_ముగింపు
 
 
-#endif
+#అయితే_ముగింపు

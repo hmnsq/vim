@@ -11,8 +11,8 @@
  * ex_cmds2.c: some more functions for command line commands
  */
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
 /*
  * If 'autowrite' option set, try to write the file.
@@ -20,48 +20,48 @@
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-autowrite(buf_T *buf, int forceit)
+    పూర్ణాంకం
+autowrite(buf_T *buf, పూర్ణాంకం forceit)
 {
-    int		r;
+    పూర్ణాంకం		r;
     bufref_T	bufref;
 
-    if (!(p_aw || p_awa) || !p_write
+    ఒకవేళ (!(p_aw || p_awa) || !p_write
 	    // never autowrite a "nofile" or "nowrite" buffer
 	    || bt_dontwrite(buf)
-	    || (!forceit && buf->b_p_ro) || buf->b_ffname == NULL)
-	return FAIL;
-    set_bufref(&bufref, buf);
+	    || (!forceit && buf->b_p_ro) || buf->b_ffname == ఖాళీ)
+	తిరిగి FAIL;
+    సమితి_bufref(&bufref, buf);
     r = buf_write_all(buf, forceit);
 
     // Writing may succeed but the buffer still changed, e.g., when there is a
     // conversion error.  We do want to return FAIL then.
-    if (bufref_valid(&bufref) && bufIsChanged(buf))
+    ఒకవేళ (bufref_valid(&bufref) && buf_Is_మారింది(buf))
 	r = FAIL;
-    return r;
+    తిరిగి r;
 }
 
 /*
  * Flush all buffers, except the ones that are readonly or are never written.
  */
-    void
-autowrite_all(void)
+    శూన్య
+autowrite_all(శూన్య)
 {
     buf_T	*buf;
 
-    if (!(p_aw || p_awa) || !p_write)
-	return;
+    ఒకవేళ (!(p_aw || p_awa) || !p_write)
+	తిరిగి;
     FOR_ALL_BUFFERS(buf)
-	if (bufIsChanged(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
+	ఒకవేళ (buf_Is_మారింది(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
 	{
 	    bufref_T	bufref;
 
-	    set_bufref(&bufref, buf);
+	    సమితి_bufref(&bufref, buf);
 
-	    (void)buf_write_all(buf, FALSE);
+	    (శూన్య)buf_write_all(buf, FALSE);
 
 	    // an autocommand may have deleted the buffer
-	    if (!bufref_valid(&bufref))
+	    ఒకవేళ (!bufref_valid(&bufref))
 		buf = firstbuf;
 	}
 }
@@ -70,82 +70,82 @@ autowrite_all(void)
  * Return TRUE if buffer was changed and cannot be abandoned.
  * For flags use the CCGD_ values.
  */
-    int
-check_changed(buf_T *buf, int flags)
+    పూర్ణాంకం
+check_మారింది(buf_T *buf, పూర్ణాంకం flags)
 {
-    int		forceit = (flags & CCGD_FORCEIT);
+    పూర్ణాంకం		forceit = (flags & CCGD_FORCEIT);
     bufref_T	bufref;
 
-    set_bufref(&bufref, buf);
+    సమితి_bufref(&bufref, buf);
 
-    if (       !forceit
-	    && bufIsChanged(buf)
+    ఒకవేళ (       !forceit
+	    && buf_Is_మారింది(buf)
 	    && ((flags & CCGD_MULTWIN) || buf->b_nwindows <= 1)
 	    && (!(flags & CCGD_AW) || autowrite(buf, forceit) == FAIL))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	ఒకవేళ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    ఒకవేళ (పదం_పని_running(buf->b_పదం))
 	    {
-		return term_confirm_stop(buf) == FAIL;
+		తిరిగి పదం_confirm_stop(buf) == FAIL;
 	    }
 # endif
 
 	    buf_T	*buf2;
-	    int		count = 0;
+	    పూర్ణాంకం		లెక్క = 0;
 
-	    if (flags & CCGD_ALLBUF)
+	    ఒకవేళ (flags & CCGD_ALLBUF)
 		FOR_ALL_BUFFERS(buf2)
-		    if (bufIsChanged(buf2)
-				     && (buf2->b_ffname != NULL
+		    ఒకవేళ (buf_Is_మారింది(buf2)
+				     && (buf2->b_ffname != ఖాళీ
 # ifdef FEAT_BROWSE
 					 || (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
 					))
-			++count;
-	    if (!bufref_valid(&bufref))
+			++లెక్క;
+	    ఒకవేళ (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
+		తిరిగి FALSE;
 
-	    dialog_changed(buf, count > 1);
+	    dialog_మారింది(buf, లెక్క > 1);
 
-	    if (!bufref_valid(&bufref))
+	    ఒకవేళ (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
-	    return bufIsChanged(buf);
+		తిరిగి FALSE;
+	    తిరిగి buf_Is_మారింది(buf);
 	}
-#endif
-	if (flags & CCGD_EXCMD)
-	    no_write_message();
-	else
-	    no_write_message_nobang(curbuf);
-	return TRUE;
+#అయితే_ముగింపు
+	ఒకవేళ (flags & CCGD_EXCMD)
+	    no_write_సందేశం();
+	లేకపోతే
+	    no_write_సందేశం_nobang(curbuf);
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 
-# if defined(FEAT_BROWSE)
+# ఒకవేళ defined(FEAT_BROWSE)
 /*
  * When wanting to write a file without a file name, ask the user for a name.
  */
-    void
+    శూన్య
 browse_save_fname(buf_T *buf)
 {
-    if (buf->b_fname != NULL)
-	return;
+    ఒకవేళ (buf->b_fname != ఖాళీ)
+	తిరిగి;
 
     char_u *fname;
 
     fname = do_browse(BROWSE_SAVE, (char_u *)_("Save As"),
-	    (char_u *)"Untitled", NULL, NULL, NULL, buf);
-    if (fname == NULL)
-	return;
+	    (char_u *)"Untitled", ఖాళీ, ఖాళీ, ఖాళీ, buf);
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి;
 
-    if (setfname(buf, fname, NULL, TRUE) == OK)
+    ఒకవేళ (setfname(buf, fname, ఖాళీ, TRUE) == OK)
 	buf->b_flags |= BF_NOTEDITED;
     vim_free(fname);
 }
@@ -155,62 +155,62 @@ browse_save_fname(buf_T *buf)
  * Ask the user what to do when abandoning a changed buffer.
  * Must check 'write' option first!
  */
-    void
-dialog_changed(
+    శూన్య
+dialog_మారింది(
     buf_T	*buf,
-    int		checkall)	// may abandon all changed buffers
+    పూర్ణాంకం		checkall)	// may abandon all changed buffers
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int		ret;
+    char_u	buff[DIALOG_సందేశం_కొలత];
+    పూర్ణాంకం		ret;
     buf_T	*buf2;
     exarg_T	ea;
 
-    dialog_msg(buff, _("Save changes to \"%s\"?"), buf->b_fname);
-    if (checkall)
-	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, NULL, buff, 1);
-    else
-	ret = vim_dialog_yesnocancel(VIM_QUESTION, NULL, buff, 1);
+    dialog_సందేశం(buff, _("Save changes to \"%s\"?"), buf->b_fname);
+    ఒకవేళ (checkall)
+	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, ఖాళీ, buff, 1);
+    లేకపోతే
+	ret = vim_dialog_yesnocancel(VIM_QUESTION, ఖాళీ, buff, 1);
 
     // Init ea pseudo-structure, this is needed for the check_overwrite()
     // function.
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
 
-    if (ret == VIM_YES)
+    ఒకవేళ (ret == VIM_YES)
     {
-	int	empty_bufname;
+	పూర్ణాంకం	ఖాళీలు_bufname;
 
 # ifdef FEAT_BROWSE
 	// May get file name, when there is none
 	browse_save_fname(buf);
 
 	// User cancelled the file dialog; keep the buffer modified.
-	if (buf->b_fname == NULL)
-	    return;
+	ఒకవేళ (buf->b_fname == ఖాళీ)
+	    తిరిగి;
 # endif
-	empty_bufname = buf->b_fname == NULL ? TRUE : FALSE;
-	if (empty_bufname)
-	    buf_set_name(buf->b_fnum, (char_u *)"Untitled");
+	ఖాళీలు_bufname = buf->b_fname == ఖాళీ ? TRUE : FALSE;
+	ఒకవేళ (ఖాళీలు_bufname)
+	    buf_సమితి_name(buf->b_fnum, (char_u *)"Untitled");
 
-	if (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
+	ఒకవేళ (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
 	{
 	    // didn't hit Cancel
-	    if (buf_write_all(buf, FALSE) == OK)
-		return;
+	    ఒకవేళ (buf_write_all(buf, FALSE) == OK)
+		తిరిగి;
 	}
 
 	// restore to empty when write failed or was cancelled
-	if (empty_bufname)
+	ఒకవేళ (ఖాళీలు_bufname)
 	{
-	    buf->b_fname = NULL;
+	    buf->b_fname = ఖాళీ;
 	    VIM_CLEAR(buf->b_ffname);
 	    VIM_CLEAR(buf->b_sfname);
 	}
     }
-    else if (ret == VIM_NO)
+    లేకపోతే ఒకవేళ (ret == VIM_NO)
     {
 	unchanged(buf, TRUE, FALSE);
     }
-    else if (ret == VIM_ALL)
+    లేకపోతే ఒకవేళ (ret == VIM_ALL)
     {
 	/*
 	 * Write all modified files that can be written.
@@ -219,8 +219,8 @@ dialog_changed(
 	 */
 	FOR_ALL_BUFFERS(buf2)
 	{
-	    if (bufIsChanged(buf2)
-		    && (buf2->b_ffname != NULL
+	    ఒకవేళ (buf_Is_మారింది(buf2)
+		    && (buf2->b_ffname != ఖాళీ
 # ifdef FEAT_BROWSE
 			|| (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
@@ -230,23 +230,23 @@ dialog_changed(
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf2);
+		సమితి_bufref(&bufref, buf2);
 # ifdef FEAT_BROWSE
 		// May get file name, when there is none
 		browse_save_fname(buf2);
 # endif
-		if (buf2->b_fname != NULL && check_overwrite(&ea, buf2,
+		ఒకవేళ (buf2->b_fname != ఖాళీ && check_overwrite(&ea, buf2,
 				  buf2->b_fname, buf2->b_ffname, FALSE) == OK)
 		    // didn't hit Cancel
-		    (void)buf_write_all(buf2, FALSE);
+		    (శూన్య)buf_write_all(buf2, FALSE);
 
 		// an autocommand may have deleted the buffer
-		if (!bufref_valid(&bufref))
+		ఒకవేళ (!bufref_valid(&bufref))
 		    buf2 = firstbuf;
 	    }
 	}
     }
-    else if (ret == VIM_DISCARDALL)
+    లేకపోతే ఒకవేళ (ret == VIM_DISCARDALL)
     {
 	/*
 	 * mark all buffers as unchanged
@@ -255,17 +255,17 @@ dialog_changed(
 	    unchanged(buf2, TRUE, FALSE);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if the buffer "buf" can be abandoned, either by making it
  * hidden, autowriting it or unloading it.
  */
-    int
-can_abandon(buf_T *buf, int forceit)
+    పూర్ణాంకం
+can_abandon(buf_T *buf, పూర్ణాంకం forceit)
 {
-    return (	   buf_hide(buf)
-		|| !bufIsChanged(buf)
+    తిరిగి (	   buf_hide(buf)
+		|| !buf_Is_మారింది(buf)
 		|| buf->b_nwindows > 1
 		|| autowrite(buf, forceit) == OK
 		|| forceit);
@@ -274,14 +274,14 @@ can_abandon(buf_T *buf, int forceit)
 /*
  * Add a buffer number to "bufnrs", unless it's already there.
  */
-    static void
-add_bufnum(int *bufnrs, int *bufnump, int nr)
+    స్థిర శూన్య
+కూడు_bufnum(పూర్ణాంకం *bufnrs, పూర్ణాంకం *bufnump, పూర్ణాంకం nr)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < *bufnump; ++i)
-	if (bufnrs[i] == nr)
-	    return;
+    కొరకు (i = 0; i < *bufnump; ++i)
+	ఒకవేళ (bufnrs[i] == nr)
+	    తిరిగి;
     bufnrs[*bufnump] = nr;
     *bufnump = *bufnump + 1;
 }
@@ -292,18 +292,18 @@ add_bufnum(int *bufnrs, int *bufnump, int nr)
  * When "unload" is TRUE the current buffer is unloaded instead of making it
  * hidden.  This is used for ":q!".
  */
-    int
-check_changed_any(
-    int		hidden,		// Only check hidden buffers
-    int		unload)
+    పూర్ణాంకం
+check_మారింది_any(
+    పూర్ణాంకం		hidden,		// Only check hidden buffers
+    పూర్ణాంకం		unload)
 {
-    int		ret = FALSE;
+    పూర్ణాంకం		ret = FALSE;
     buf_T	*buf;
-    int		save;
-    int		i;
-    int		bufnum = 0;
-    int		bufcount = 0;
-    int		*bufnrs;
+    పూర్ణాంకం		save;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		bufnum = 0;
+    పూర్ణాంకం		bufcount = 0;
+    పూర్ణాంకం		*bufnrs;
     tabpage_T   *tp;
     win_T	*wp;
 
@@ -311,89 +311,89 @@ check_changed_any(
     FOR_ALL_BUFFERS(buf)
 	++bufcount;
 
-    if (bufcount == 0)
-	return FALSE;
+    ఒకవేళ (bufcount == 0)
+	తిరిగి FALSE;
 
-    bufnrs = ALLOC_MULT(int, bufcount);
-    if (bufnrs == NULL)
-	return FALSE;
+    bufnrs = ALLOC_MULT(పూర్ణాంకం, bufcount);
+    ఒకవేళ (bufnrs == ఖాళీ)
+	తిరిగి FALSE;
 
     // curbuf
     bufnrs[bufnum++] = curbuf->b_fnum;
 
     // buffers in current tab
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != curbuf)
-	    add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
+	ఒకవేళ (wp->w_బఫరు != curbuf)
+	    కూడు_bufnum(bufnrs, &bufnum, wp->w_బఫరు->b_fnum);
 
     // buffers in other tabs
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
+	ఒకవేళ (tp != curtab)
+	    FOR_ALL_WINDOWS_లోపల_TAB(tp, wp)
+		కూడు_bufnum(bufnrs, &bufnum, wp->w_బఫరు->b_fnum);
 
     // any other buffer
     FOR_ALL_BUFFERS(buf)
-	add_bufnum(bufnrs, &bufnum, buf->b_fnum);
+	కూడు_bufnum(bufnrs, &bufnum, buf->b_fnum);
 
-    for (i = 0; i < bufnum; ++i)
+    కొరకు (i = 0; i < bufnum; ++i)
     {
 	buf = buflist_findnr(bufnrs[i]);
-	if (buf == NULL)
-	    continue;
-	if ((!hidden || buf->b_nwindows == 0) && bufIsChanged(buf))
+	ఒకవేళ (buf == ఖాళీ)
+	    కొనసాగు;
+	ఒకవేళ ((!hidden || buf->b_nwindows == 0) && buf_Is_మారింది(buf))
 	{
 	    bufref_T bufref;
 
-	    set_bufref(&bufref, buf);
-#ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    సమితి_bufref(&bufref, buf);
+#నిర్వచితమైతే FEAT_TERMINAL
+	    ఒకవేళ (పదం_పని_running(buf->b_పదం))
 	    {
-		if (term_try_stop_job(buf) == FAIL)
-		    break;
+		ఒకవేళ (పదం_try_stop_పని(buf) == FAIL)
+		    ఆపు;
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    // Try auto-writing the buffer.  If this fails but the buffer no
 	    // longer exists it's not changed, that's OK.
-	    if (check_changed(buf, (p_awa ? CCGD_AW : 0)
+	    ఒకవేళ (check_మారింది(buf, (p_awa ? CCGD_AW : 0)
 				 | CCGD_MULTWIN
 				 | CCGD_ALLBUF) && bufref_valid(&bufref))
-		break;	    // didn't save - still changes
+		ఆపు;	    // didn't save - still changes
 	}
     }
 
-    if (i >= bufnum)
-	goto theend;
+    ఒకవేళ (i >= bufnum)
+	వెళ్ళు theend;
 
     // Get here if "buf" cannot be abandoned.
     ret = TRUE;
     exiting = FALSE;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     /*
      * When ":confirm" used, don't give an error message.
      */
-    if (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
-#endif
+    ఒకవేళ (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
+#అయితే_ముగింపు
     {
 	// There must be a wait_return() for this message, do_buffer()
 	// may cause a redraw.  But wait_return() is a no-op when vgetc()
 	// is busy (Quit used from window menu), then make sure we don't
 	// cause a scroll up.
-	if (vgetc_busy > 0)
+	ఒకవేళ (vgetc_busy > 0)
 	{
-	    msg_row = cmdline_row;
-	    msg_col = 0;
-	    msg_didout = FALSE;
+	    సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస;
+	    సందేశం_నిలువు = 0;
+	    సందేశం_didout = FALSE;
 	}
-	if (
-#ifdef FEAT_TERMINAL
-		term_job_running(buf->b_term)
-		    ? semsg(_(e_job_still_running_in_buffer_str), buf->b_fname)
+	ఒకవేళ (
+#నిర్వచితమైతే FEAT_TERMINAL
+		పదం_పని_running(buf->b_పదం)
+		    ? semsg(_(e_పని_still_running_లోపల_బఫరు_str), buf->b_fname)
 		    :
-#endif
-		semsg(_(e_no_write_since_last_change_for_buffer_str),
-		    buf_spname(buf) != NULL ? buf_spname(buf) : buf->b_fname))
+#అయితే_ముగింపు
+		semsg(_(e_no_write_since_చివరి_change_for_బఫరు_str),
+		    buf_spname(buf) != ఖాళీ ? buf_spname(buf) : buf->b_fname))
 	{
 	    save = no_wait_return;
 	    no_wait_return = FALSE;
@@ -403,45 +403,45 @@ check_changed_any(
     }
 
     // Try to find a window that contains the buffer.
-    if (buf != curbuf)
+    ఒకవేళ (buf != curbuf)
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf)
+	    ఒకవేళ (wp->w_బఫరు == buf)
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
+		సమితి_bufref(&bufref, buf);
 
 		goto_tabpage_win(tp, wp);
 
 		// Paranoia: did autocmd wipe out the buffer with changes?
-		if (!bufref_valid(&bufref))
-		    goto theend;
-		goto buf_found;
+		ఒకవేళ (!bufref_valid(&bufref))
+		    వెళ్ళు theend;
+		వెళ్ళు buf_దొరికింది;
 	    }
-buf_found:
+buf_దొరికింది:
 
     // Open the changed buffer in the current window.
-    if (buf != curbuf)
-	set_curbuf(buf, unload ? DOBUF_UNLOAD : DOBUF_GOTO);
+    ఒకవేళ (buf != curbuf)
+	సమితి_curbuf(buf, unload ? DOBUF_UNLOAD : DOBUF_GOTO);
 
 theend:
     vim_free(bufnrs);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * return FAIL if there is no file name, OK if there is one
  * give error message for FAIL
  */
-    int
-check_fname(void)
+    పూర్ణాంకం
+check_fname(శూన్య)
 {
-    if (curbuf->b_ffname == NULL)
+    ఒకవేళ (curbuf->b_ffname == ఖాళీ)
     {
 	emsg(_(e_no_file_name));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -449,218 +449,218 @@ check_fname(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-buf_write_all(buf_T *buf, int forceit)
+    పూర్ణాంకం
+buf_write_all(buf_T *buf, పూర్ణాంకం forceit)
 {
-    int	    retval;
+    పూర్ణాంకం	    retval;
     buf_T	*old_curbuf = curbuf;
 
     retval = (buf_write(buf, buf->b_ffname, buf->b_fname,
-				   (linenr_T)1, buf->b_ml.ml_line_count, NULL,
+				   (linenr_T)1, buf->b_ml.ml_పంక్తి_లెక్క, ఖాళీ,
 						  FALSE, forceit, TRUE, FALSE));
-    if (curbuf != old_curbuf)
+    ఒకవేళ (curbuf != old_curbuf)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
+	సందేశం_ఆధారం(HL_ATTR(HLF_W));
+	సందేశం(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
     }
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * ":argdo", ":windo", ":bufdo", ":tabdo", ":cdo", ":ldo", ":cfdo" and ":lfdo"
  */
-    void
+    శూన్య
 ex_listdo(exarg_T *eap)
 {
-    int		i;
+    పూర్ణాంకం		i;
     win_T	*wp;
     tabpage_T	*tp;
     buf_T	*buf = curbuf;
-    int		next_fnum = 0;
+    పూర్ణాంకం		తదుపరి_fnum = 0;
 
     // ":windo" and ":tabdo" only visit existing windows/tabpages, they don't
     // change the current window's buffer, so they can't escape a 'winfixbuf'
     // window (which would create a split).
-    if (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
+    ఒకవేళ (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
 	    eap->cmdidx != CMD_tabdo)
     {
-	if ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
+	ఒకవేళ ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
 		!eap->forceit)
 	{
 	    // Disallow :ldo if 'winfixbuf' is applied
-	    emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	    return;
+	    emsg(_(e_winfixbuf_cannot_go_గమ్యం_బఫరు));
+	    తిరిగి;
 	}
 
-	if (win_valid(prevwin) && !prevwin->w_p_wfb)
+	ఒకవేళ (win_valid(prevwin) && !prevwin->w_p_wfb)
 	    // 'winfixbuf' is set; attempt to change to a window without it.
 	    win_goto(prevwin);
-	if (curwin->w_p_wfb)
+	ఒకవేళ (curwin->w_p_wfb)
 	{
 	    // Split the window, which will be 'nowinfixbuf', and set curwin to
 	    // that
-	    (void)win_split(0, 0);
+	    (శూన్య)win_విభజించు(0, 0);
 
-	    if (curwin->w_p_wfb)
+	    ఒకవేళ (curwin->w_p_wfb)
 	    {
 		// Autocommands set 'winfixbuf' or sent us to another window
 		// with it set, or we failed to split the window.  Give up.
-		emsg(_(e_winfixbuf_cannot_go_to_buffer));
-		return;
+		emsg(_(e_winfixbuf_cannot_go_గమ్యం_బఫరు));
+		తిరిగి;
 	    }
 	}
     }
 
-#if defined(FEAT_SYN_HL)
-    char_u	*save_ei = NULL;
-#endif
-#ifdef FEAT_QUICKFIX
-    int		qf_size = 0;
-    int		qf_idx;
-#endif
+#ఒకవేళ defined(FEAT_SYN_HL)
+    char_u	*save_ei = ఖాళీ;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_QUICKFIX
+    పూర్ణాంకం		qf_కొలత = 0;
+    పూర్ణాంకం		qf_idx;
+#అయితే_ముగింపు
 
-#ifndef FEAT_QUICKFIX
-    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
+#నిర్వచితం_కాకపోతే FEAT_QUICKFIX
+    ఒకవేళ (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
 	    eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
     {
 	ex_ni(eap);
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SYN_HL)
-    if (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
+#ఒకవేళ defined(FEAT_SYN_HL)
+    ఒకవేళ (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
     {
 	// Don't do syntax HL autocommands.  Skipping the syntax file is a
 	// great speed improvement.
 	save_ei = au_event_disable(",Syntax");
 
 	FOR_ALL_BUFFERS(buf)
-	    buf->b_flags &= ~BF_SYN_SET;
+	    buf->b_flags &= ~BF_SYN_సమితి;
 	buf = curbuf;
     }
-#endif
-#ifdef FEAT_CLIPBOARD
-    start_global_changes();
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    ప్రారంభం_global_changes();
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-#endif
+#అయితే_ముగింపు
 
-    if (eap->cmdidx == CMD_windo
+    ఒకవేళ (eap->cmdidx == CMD_windo
 	    || eap->cmdidx == CMD_tabdo
 	    || buf_hide(curbuf)
-	    || !check_changed(curbuf, CCGD_AW
+	    || !check_మారింది(curbuf, CCGD_AW
 				    | (eap->forceit ? CCGD_FORCEIT : 0)
 				    | CCGD_EXCMD))
     {
 	i = 0;
 	// start at the eap->line1 argument/window/buffer
 	wp = firstwin;
-	tp = first_tabpage;
-	switch (eap->cmdidx)
+	tp = మొదటి_tabpage;
+	ఎంపిక (eap->cmdidx)
 	{
-	    case CMD_windo:
-		for ( ; wp != NULL && i + 1 < eap->line1; wp = wp->w_next)
+	    స్థితి CMD_windo:
+		కొరకు ( ; wp != ఖాళీ && i + 1 < eap->line1; wp = wp->w_తదుపరి)
 		    i++;
-		break;
-	    case CMD_tabdo:
-		for ( ; tp != NULL && i + 1 < eap->line1; tp = tp->tp_next)
+		ఆపు;
+	    స్థితి CMD_tabdo:
+		కొరకు ( ; tp != ఖాళీ && i + 1 < eap->line1; tp = tp->tp_తదుపరి)
 		    i++;
-		break;
-	    case CMD_argdo:
+		ఆపు;
+	    స్థితి CMD_argdo:
 		i = eap->line1 - 1;
-		break;
-	    default:
-		break;
+		ఆపు;
+	    అప్రమేయ:
+		ఆపు;
 	}
 	// set pcmark now
-	if (eap->cmdidx == CMD_bufdo)
+	ఒకవేళ (eap->cmdidx == CMD_bufdo)
 	{
 	    // Advance to the first listed buffer after "eap->line1".
-	    for (buf = firstbuf; buf != NULL && (buf->b_fnum < eap->line1
-					  || !buf->b_p_bl); buf = buf->b_next)
-		if (buf->b_fnum > eap->line2)
+	    కొరకు (buf = firstbuf; buf != ఖాళీ && (buf->b_fnum < eap->line1
+					  || !buf->b_p_bl); buf = buf->b_తదుపరి)
+		ఒకవేళ (buf->b_fnum > eap->line2)
 		{
-		    buf = NULL;
-		    break;
+		    buf = ఖాళీ;
+		    ఆపు;
 		}
-	    if (buf != NULL)
-		goto_buffer(eap, DOBUF_FIRST, FORWARD, buf->b_fnum);
+	    ఒకవేళ (buf != ఖాళీ)
+		goto_బఫరు(eap, DOBUF_మొదటి, FORWARD, buf->b_fnum);
 	}
-#ifdef FEAT_QUICKFIX
-	else if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+#నిర్వచితమైతే FEAT_QUICKFIX
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		|| eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	{
-	    qf_size = qf_get_valid_size(eap);
-	    if (qf_size <= 0 || eap->line1 > qf_size)
-		buf = NULL;
-	    else
+	    qf_కొలత = qf_get_valid_కొలత(eap);
+	    ఒకవేళ (qf_కొలత <= 0 || eap->line1 > qf_కొలత)
+		buf = ఖాళీ;
+	    లేకపోతే
 	    {
-		save_clear_shm_value();
+		save_clear_shm_విలువ();
 		ex_cc(eap);
-		restore_shm_value();
+		restore_shm_విలువ();
 
 		buf = curbuf;
 		i = eap->line1 - 1;
-		if (eap->addr_count <= 0)
+		ఒకవేళ (eap->addr_లెక్క <= 0)
 		    // default is all the quickfix/location list entries
-		    eap->line2 = qf_size;
+		    eap->line2 = qf_కొలత;
 	    }
 	}
-#endif
-	else
+#అయితే_ముగింపు
+	లేకపోతే
 	    setpcmark();
 	listcmd_busy = TRUE;	    // avoids setting pcmark below
 
-	while (!got_int && buf != NULL)
+	అయితే (!got_int && buf != ఖాళీ)
 	{
-	    if (eap->cmdidx == CMD_argdo)
+	    ఒకవేళ (eap->cmdidx == CMD_argdo)
 	    {
 		// go to argument "i"
-		if (i == ARGCOUNT)
-		    break;
+		ఒకవేళ (i == ARGCOUNT)
+		    ఆపు;
 		// Don't call do_argfile() when already there, it will try
 		// reloading the file.
-		if (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
+		ఒకవేళ (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
 		{
 		    // Clear 'shm' to avoid that the file message overwrites
 		    // any output from the command.
-		    save_clear_shm_value();
+		    save_clear_shm_విలువ();
 		    do_argfile(eap, i);
-		    restore_shm_value();
+		    restore_shm_విలువ();
 		}
-		if (curwin->w_arg_idx != i)
-		    break;
+		ఒకవేళ (curwin->w_arg_idx != i)
+		    ఆపు;
 	    }
-	    else if (eap->cmdidx == CMD_windo)
+	    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_windo)
 	    {
 		// go to window "wp"
-		if (!win_valid(wp))
-		    break;
+		ఒకవేళ (!win_valid(wp))
+		    ఆపు;
 		win_goto(wp);
-		if (curwin != wp)
-		    break;  // something must be wrong
-		wp = curwin->w_next;
+		ఒకవేళ (curwin != wp)
+		    ఆపు;  // something must be wrong
+		wp = curwin->w_తదుపరి;
 	    }
-	    else if (eap->cmdidx == CMD_tabdo)
+	    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_tabdo)
 	    {
 		// go to window "tp"
-		if (!valid_tabpage(tp))
-		    break;
+		ఒకవేళ (!valid_tabpage(tp))
+		    ఆపు;
 		goto_tabpage_tp(tp, TRUE, TRUE);
-		tp = tp->tp_next;
+		tp = tp->tp_తదుపరి;
 	    }
-	    else if (eap->cmdidx == CMD_bufdo)
+	    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_bufdo)
 	    {
 		// Remember the number of the next listed buffer, in case
 		// ":bwipe" is used or autocommands do something strange.
-		next_fnum = -1;
-		for (buf = curbuf->b_next; buf != NULL; buf = buf->b_next)
-		    if (buf->b_p_bl)
+		తదుపరి_fnum = -1;
+		కొరకు (buf = curbuf->b_తదుపరి; buf != ఖాళీ; buf = buf->b_తదుపరి)
+		    ఒకవేళ (buf->b_p_bl)
 		    {
-			next_fnum = buf->b_fnum;
-			break;
+			తదుపరి_fnum = buf->b_fnum;
+			ఆపు;
 		    }
 	    }
 
@@ -670,90 +670,90 @@ ex_listdo(exarg_T *eap)
 	    do_cmdline(eap->arg, eap->ea_getline, eap->cookie,
 						DOCMD_VERBOSE + DOCMD_NOWAIT);
 
-	    if (eap->cmdidx == CMD_bufdo)
+	    ఒకవేళ (eap->cmdidx == CMD_bufdo)
 	    {
 		// Done?
-		if (next_fnum < 0 || next_fnum > eap->line2)
-		    break;
+		ఒకవేళ (తదుపరి_fnum < 0 || తదుపరి_fnum > eap->line2)
+		    ఆపు;
 		// Check if the buffer still exists.
 		FOR_ALL_BUFFERS(buf)
-		    if (buf->b_fnum == next_fnum)
-			break;
-		if (buf == NULL)
-		    break;
+		    ఒకవేళ (buf->b_fnum == తదుపరి_fnum)
+			ఆపు;
+		ఒకవేళ (buf == ఖాళీ)
+		    ఆపు;
 
 		// Go to the next buffer.  Clear 'shm' to avoid that the file
 		// message overwrites any output from the command.
-		save_clear_shm_value();
-		goto_buffer(eap, DOBUF_FIRST, FORWARD, next_fnum);
-		restore_shm_value();
+		save_clear_shm_విలువ();
+		goto_బఫరు(eap, DOBUF_మొదటి, FORWARD, తదుపరి_fnum);
+		restore_shm_విలువ();
 
 		// If autocommands took us elsewhere, quit here.
-		if (curbuf->b_fnum != next_fnum)
-		    break;
+		ఒకవేళ (curbuf->b_fnum != తదుపరి_fnum)
+		    ఆపు;
 	    }
 
-#ifdef FEAT_QUICKFIX
-	    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+#నిర్వచితమైతే FEAT_QUICKFIX
+	    ఒకవేళ (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		    || eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	    {
-		if (i >= qf_size || i >= eap->line2)
-		    break;
+		ఒకవేళ (i >= qf_కొలత || i >= eap->line2)
+		    ఆపు;
 
 		qf_idx = qf_get_cur_idx(eap);
 
-		save_clear_shm_value();
+		save_clear_shm_విలువ();
 		ex_cnext(eap);
-		restore_shm_value();
+		restore_shm_విలువ();
 
 		// If jumping to the next quickfix entry fails, quit here
-		if (qf_get_cur_idx(eap) == qf_idx)
-		    break;
+		ఒకవేళ (qf_get_cur_idx(eap) == qf_idx)
+		    ఆపు;
 	    }
-#endif
+#అయితే_ముగింపు
 
-	    if (eap->cmdidx == CMD_windo)
+	    ఒకవేళ (eap->cmdidx == CMD_windo)
 	    {
 		validate_cursor();	// cursor may have moved
 
 		// required when 'scrollbind' has been set
-		if (curwin->w_p_scb)
+		ఒకవేళ (curwin->w_p_scb)
 		    do_check_scrollbind(TRUE);
 	    }
 
-	    if (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
-		if (i+1 > eap->line2)
-		    break;
-	    if (eap->cmdidx == CMD_argdo && i >= eap->line2)
-		break;
+	    ఒకవేళ (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
+		ఒకవేళ (i+1 > eap->line2)
+		    ఆపు;
+	    ఒకవేళ (eap->cmdidx == CMD_argdo && i >= eap->line2)
+		ఆపు;
 	}
 	listcmd_busy = FALSE;
     }
 
-#if defined(FEAT_SYN_HL)
-    if (save_ei != NULL)
+#ఒకవేళ defined(FEAT_SYN_HL)
+    ఒకవేళ (save_ei != ఖాళీ)
     {
 	buf_T		*bnext;
 	aco_save_T	aco;
 
 	au_event_restore(save_ei);
 
-	for (buf = firstbuf; buf != NULL; buf = bnext)
+	కొరకు (buf = firstbuf; buf != ఖాళీ; buf = bnext)
 	{
-	    bnext = buf->b_next;
-	    if (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_SET))
+	    bnext = buf->b_తదుపరి;
+	    ఒకవేళ (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_సమితి))
 	    {
-		buf->b_flags &= ~BF_SYN_SET;
+		buf->b_flags &= ~BF_SYN_సమితి;
 
 		// buffer was opened while Syntax autocommands were disabled,
 		// need to trigger them now.
-		if (buf == curbuf)
+		ఒకవేళ (buf == curbuf)
 		    apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn,
 					       curbuf->b_fname, TRUE, curbuf);
-		else
+		లేకపోతే
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    ఒకవేళ (curbuf == buf)
 		    {
 			apply_autocmds(EVENT_SYNTAX, buf->b_p_syn,
 						      buf->b_fname, TRUE, buf);
@@ -766,45 +766,45 @@ ex_listdo(exarg_T *eap)
 	    }
 	}
     }
-#endif
-#ifdef FEAT_CLIPBOARD
-    end_global_changes();
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    చివర_global_changes();
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
-#endif
+#అయితే_ముగింపు
 }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 /*
  * ":compiler[!] {name}"
  */
-    void
+    శూన్య
 ex_compiler(exarg_T *eap)
 {
     char_u	*buf;
-    char_u	*old_cur_comp = NULL;
+    char_u	*old_cur_comp = ఖాళీ;
     char_u	*p;
 
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
     {
 	// List all compiler scripts.
 	do_cmdline_cmd((char_u *)"echo globpath(&rtp, 'compiler/*.vim')");
 					// ) keep the indenter happy...
-	return;
+	తిరిగి;
     }
 
     buf = alloc(STRLEN(eap->arg) + 14);
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    if (eap->forceit)
+    ఒకవేళ (eap->forceit)
     {
 	// ":compiler! {name}" sets global options
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet set <args>");
     }
-    else
+    లేకపోతే
     {
 	// ":compiler! {name}" sets local options.
 	// To remain backwards compatible "current_compiler" is always
@@ -812,8 +812,8 @@ ex_compiler(exarg_T *eap)
 	// plugin will then skip the settings.  Afterwards set
 	// "b:current_compiler" and restore "current_compiler".
 	// Explicitly prepend "g:" to make it work in a function.
-	old_cur_comp = get_var_value((char_u *)"g:current_compiler");
-	if (old_cur_comp != NULL)
+	old_cur_comp = get_var_విలువ((char_u *)"g:current_compiler");
+	ఒకవేళ (old_cur_comp != ఖాళీ)
 	    old_cur_comp = vim_strsave(old_cur_comp);
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet setlocal <args>");
@@ -821,47 +821,47 @@ ex_compiler(exarg_T *eap)
     do_unlet((char_u *)"g:current_compiler", TRUE);
     do_unlet((char_u *)"b:current_compiler", TRUE);
 
-    sprintf((char *)buf, "compiler/%s.vim", eap->arg);
-    if (source_runtime(buf, DIP_ALL) == FAIL)
+    sprintf((అక్షరం *)buf, "compiler/%s.vim", eap->arg);
+    ఒకవేళ (ఆధారం_runtime(buf, DIP_ALL) == FAIL)
 	semsg(_(e_compiler_not_supported_str), eap->arg);
     vim_free(buf);
 
     do_cmdline_cmd((char_u *)":delcommand CompilerSet");
 
     // Set "b:current_compiler" from "current_compiler".
-    p = get_var_value((char_u *)"g:current_compiler");
-    if (p != NULL)
-	set_internal_string_var((char_u *)"b:current_compiler", p);
+    p = get_var_విలువ((char_u *)"g:current_compiler");
+    ఒకవేళ (p != ఖాళీ)
+	సమితి_అంతర్గత_string_var((char_u *)"b:current_compiler", p);
 
     // Restore "current_compiler" for ":compiler {name}".
-    if (!eap->forceit)
+    ఒకవేళ (!eap->forceit)
     {
-	if (old_cur_comp != NULL)
+	ఒకవేళ (old_cur_comp != ఖాళీ)
 	{
-	    set_internal_string_var((char_u *)"g:current_compiler",
+	    సమితి_అంతర్గత_string_var((char_u *)"g:current_compiler",
 		    old_cur_comp);
 	    vim_free(old_cur_comp);
 	}
-	else
+	లేకపోతే
 	    do_unlet((char_u *)"g:current_compiler", TRUE);
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
+#ఒకవేళ defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ఒకవేళ defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 /*
  * Detect Python 3 or 2, and initialize 'pyxversion'.
  */
-    void
-init_pyxversion(void)
+    శూన్య
+init_pyxversion(శూన్య)
 {
-    if (p_pyx == 0)
+    ఒకవేళ (p_pyx == 0)
     {
-	if (python3_enabled(FALSE))
+	ఒకవేళ (python3_enabled(FALSE))
 	    p_pyx = 3;
-	else if (python_enabled(FALSE))
+	లేకపోతే ఒకవేళ (python_enabled(FALSE))
 	    p_pyx = 2;
     }
 }
@@ -876,71 +876,71 @@ init_pyxversion(void)
  * "# requires python 3.x"  => returns 3
  * otherwise return 0.
  */
-    static int
-requires_py_version(char_u *filename)
+    స్థిర పూర్ణాంకం
+requires_py_సంస్కరణ(char_u *filename)
 {
     FILE    *file;
-    int	    requires_py_version = 0;
-    int	    i, lines;
+    పూర్ణాంకం	    requires_py_సంస్కరణ = 0;
+    పూర్ణాంకం	    i, పంక్తులు;
 
-    lines = (int)p_mls;
-    if (lines < 0)
-	lines = 5;
+    పంక్తులు = (పూర్ణాంకం)p_mls;
+    ఒకవేళ (పంక్తులు < 0)
+	పంక్తులు = 5;
 
-    file = mch_fopen((char *)filename, "r");
-    if (file == NULL)
-	return 0;
+    file = mch_fopen((అక్షరం *)filename, "r");
+    ఒకవేళ (file == ఖాళీ)
+	తిరిగి 0;
 
-    for (i = 0; i < lines; i++)
+    కొరకు (i = 0; i < పంక్తులు; i++)
     {
-	if (vim_fgets(IObuff, IOSIZE, file))
-	    break;
-	if (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
+	ఒకవేళ (vim_fgets(IObuff, IOSIZE, file))
+	    ఆపు;
+	ఒకవేళ (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
 	{
 	    // Check shebang.
-	    if (strstr((char *)IObuff + 2, "python2") != NULL)
+	    ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)IObuff + 2, "python2") != ఖాళీ)
 	    {
-		requires_py_version = 2;
-		break;
+		requires_py_సంస్కరణ = 2;
+		ఆపు;
 	    }
-	    if (strstr((char *)IObuff + 2, "python3") != NULL)
+	    ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)IObuff + 2, "python3") != ఖాళీ)
 	    {
-		requires_py_version = 3;
-		break;
+		requires_py_సంస్కరణ = 3;
+		ఆపు;
 	    }
 	}
 	IObuff[21] = '\0';
-	if (STRCMP("# requires python 2.x", IObuff) == 0)
+	ఒకవేళ (STRCMP("# requires python 2.x", IObuff) == 0)
 	{
-	    requires_py_version = 2;
-	    break;
+	    requires_py_సంస్కరణ = 2;
+	    ఆపు;
 	}
-	if (STRCMP("# requires python 3.x", IObuff) == 0)
+	ఒకవేళ (STRCMP("# requires python 3.x", IObuff) == 0)
 	{
-	    requires_py_version = 3;
-	    break;
+	    requires_py_సంస్కరణ = 3;
+	    ఆపు;
 	}
     }
     fclose(file);
-    return requires_py_version;
+    తిరిగి requires_py_సంస్కరణ;
 }
 
 
 /*
  * Source a python file using the requested python version.
  */
-    static void
-source_pyx_file(exarg_T *eap, char_u *fname)
+    స్థిర శూన్య
+ఆధారం_pyx_file(exarg_T *eap, char_u *fname)
 {
     exarg_T ex;
-    int	    v = requires_py_version(fname);
+    పూర్ణాంకం	    v = requires_py_సంస్కరణ(fname);
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ఒకవేళ defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
 # endif
-    if (v == 0)
+    ఒకవేళ (v == 0)
     {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ఒకవేళ defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 	// user didn't choose a preference, 'pyx' is used
 	v = p_pyx;
 # elif defined(FEAT_PYTHON)
@@ -954,59 +954,59 @@ source_pyx_file(exarg_T *eap, char_u *fname)
      * now source, if required python version is not supported show
      * unobtrusive message.
      */
-    if (eap == NULL)
-	CLEAR_FIELD(ex);
-    else
+    ఒకవేళ (eap == ఖాళీ)
+	CLEAR_క్షేత్రం(ex);
+    లేకపోతే
 	ex = *eap;
     ex.arg = fname;
     ex.cmd = (char_u *)(v == 2 ? "pyfile" : "pyfile3");
 
-    if (v == 2)
+    ఒకవేళ (v == 2)
     {
 # ifdef FEAT_PYTHON
 	ex_pyfile(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# లేకపోతే
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		_("W20: Required python version 2.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	సందేశం((అక్షరం *)IObuff);
 # endif
-	return;
+	తిరిగి;
     }
-    else
+    లేకపోతే
     {
 # ifdef FEAT_PYTHON3
 	ex_py3file(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# లేకపోతే
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		_("W21: Required python version 3.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	సందేశం((అక్షరం *)IObuff);
 # endif
-	return;
+	తిరిగి;
     }
 }
 
 /*
  * ":pyxfile {fname}"
  */
-    void
+    శూన్య
 ex_pyxfile(exarg_T *eap)
 {
-    source_pyx_file(eap, eap->arg);
+    ఆధారం_pyx_file(eap, eap->arg);
 }
 
 /*
  * ":pyx"
  */
-    void
+    శూన్య
 ex_pyx(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ఒకవేళ defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    ఒకవేళ (p_pyx == 2)
 	ex_python(eap);
-    else
+    లేకపోతే
 	ex_py3(eap);
 # elif defined(FEAT_PYTHON)
     ex_python(eap);
@@ -1018,14 +1018,14 @@ ex_pyx(exarg_T *eap)
 /*
  * ":pyxdo"
  */
-    void
+    శూన్య
 ex_pyxdo(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ఒకవేళ defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    ఒకవేళ (p_pyx == 2)
 	ex_pydo(eap);
-    else
+    లేకపోతే
 	ex_py3do(eap);
 # elif defined(FEAT_PYTHON)
     ex_pydo(eap);
@@ -1034,25 +1034,25 @@ ex_pyxdo(exarg_T *eap)
 # endif
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":checktime [buffer]"
  */
-    void
+    శూన్య
 ex_checktime(exarg_T *eap)
 {
     buf_T	*buf;
-    int		save_no_check_timestamps = no_check_timestamps;
+    పూర్ణాంకం		save_no_check_timestamps = no_check_timestamps;
 
     no_check_timestamps = 0;
-    if (eap->addr_count == 0)	// default is all buffers
+    ఒకవేళ (eap->addr_లెక్క == 0)	// default is all buffers
 	check_timestamps(FALSE);
-    else
+    లేకపోతే
     {
-	buf = buflist_findnr((int)eap->line2);
-	if (buf != NULL)	// cannot happen?
-	    (void)buf_check_timestamp(buf, FALSE);
+	buf = buflist_findnr((పూర్ణాంకం)eap->line2);
+	ఒకవేళ (buf != ఖాళీ)	// cannot happen?
+	    (శూన్య)buf_check_timestamp(buf, FALSE);
     }
     no_check_timestamps = save_no_check_timestamps;
 }

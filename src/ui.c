@@ -15,90 +15,90 @@
  * 2. Input buffer stuff.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-    void
-ui_write(char_u *s, int len, int console UNUSED)
+    శూన్య
+ui_write(char_u *s, పూర్ణాంకం len, పూర్ణాంకం console వాడని)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use && !gui.dying && !gui.starting
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use && !gui.dying && !gui.starting
 # ifndef NO_CONSOLE
 	    && !console
 # endif
 	    )
     {
 	gui_write(s, len);
-	if (p_wd)
+	ఒకవేళ (p_wd)
 	    gui_wait_for_chars(p_wd, typebuf.tb_change_cnt);
-	return;
+	తిరిగి;
     }
-#endif
-#ifndef NO_CONSOLE
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే NO_CONSOLE
     // Don't output anything in silent mode ("ex -s") unless 'verbose' set
-    if (!(silent_mode && p_verbose == 0))
+    ఒకవేళ (!(silent_బహుళకం && p_verbose == 0))
     {
-# if !defined(MSWIN)
-	char_u	*tofree = NULL;
+# ఒకవేళ !defined(MSWIN)
+	char_u	*tofree = ఖాళీ;
 
-	if (output_conv.vc_type != CONV_NONE)
+	ఒకవేళ (output_conv.vc_type != CONV_NONE)
 	{
 	    // Convert characters from 'encoding' to 'termencoding'.
 	    tofree = string_convert(&output_conv, s, &len);
-	    if (tofree != NULL)
+	    ఒకవేళ (tofree != ఖాళీ)
 		s = tofree;
 	}
 # endif
 
 	mch_write(s, len);
-# if defined(HAVE_FSYNC)
-	if (console && s[len - 1] == '\n')
+# ఒకవేళ defined(HAVE_FSYNC)
+	ఒకవేళ (console && s[len - 1] == '\n')
 	    vim_fsync(1);
 # endif
 
-# if !defined(MSWIN)
-	if (output_conv.vc_type != CONV_NONE)
+# ఒకవేళ !defined(MSWIN)
+	ఒకవేళ (output_conv.vc_type != CONV_NONE)
 	    vim_free(tofree);
 # endif
     }
-#endif
+#అయితే_ముగింపు
 }
 
-#if defined(UNIX) || defined(VMS) || defined(MSWIN)
+#ఒకవేళ defined(UNIX) || defined(VMS) || defined(MSWIN)
 /*
  * When executing an external program, there may be some typed characters that
  * are not consumed by it.  Give them back to ui_inchar() and they are stored
  * here for the next call.
  */
-static char_u *ta_str = NULL;
-static int ta_off;	// offset for next char to use when ta_str != NULL
-static int ta_len;	// length of ta_str when it's not NULL
+స్థిర char_u *ta_str = ఖాళీ;
+స్థిర పూర్ణాంకం ta_off;	// offset for next char to use when ta_str != NULL
+స్థిర పూర్ణాంకం ta_len;	// length of ta_str when it's not NULL
 
-    void
-ui_inchar_undo(char_u *s, int len)
+    శూన్య
+ui_inchar_undo(char_u *s, పూర్ణాంకం len)
 {
     char_u  *new;
-    int	    newlen;
+    పూర్ణాంకం	    newlen;
 
     newlen = len;
-    if (ta_str != NULL)
+    ఒకవేళ (ta_str != ఖాళీ)
 	newlen += ta_len - ta_off;
     new = alloc(newlen);
-    if (new == NULL)
-	return;
+    ఒకవేళ (new == ఖాళీ)
+	తిరిగి;
 
-    if (ta_str != NULL)
+    ఒకవేళ (ta_str != ఖాళీ)
     {
 	mch_memmove(new, ta_str + ta_off, (size_t)(ta_len - ta_off));
 	mch_memmove(new + ta_len - ta_off, s, (size_t)len);
 	vim_free(ta_str);
     }
-    else
+    లేకపోతే
 	mch_memmove(new, s, (size_t)len);
     ta_str = new;
     ta_len = newlen;
     ta_off = 0;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ui_inchar(): low level input function.
@@ -113,69 +113,69 @@ ui_inchar_undo(char_u *s, int len)
  * from a remote client) "buf" can no longer be used.  "tb_change_cnt" is NULL
  * otherwise.
  */
-    int
+    పూర్ణాంకం
 ui_inchar(
     char_u	*buf,
-    int		maxlen,
-    long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt)
+    పూర్ణాంకం		maxlen,
+    దీర్ఘ	wtime,	    // don't use "time", MIPS cannot handle it
+    పూర్ణాంకం		tb_change_cnt)
 {
-    int		retval = 0;
+    పూర్ణాంకం		retval = 0;
 
-#if defined(FEAT_GUI) && (defined(UNIX) || defined(VMS))
+#ఒకవేళ defined(FEAT_GUI) && (defined(UNIX) || defined(VMS))
     /*
      * Use the typeahead if there is any.
      */
-    if (ta_str != NULL)
+    ఒకవేళ (ta_str != ఖాళీ)
     {
-	if (maxlen >= ta_len - ta_off)
+	ఒకవేళ (maxlen >= ta_len - ta_off)
 	{
 	    mch_memmove(buf, ta_str + ta_off, (size_t)ta_len);
 	    VIM_CLEAR(ta_str);
-	    return ta_len;
+	    తిరిగి ta_len;
 	}
 	mch_memmove(buf, ta_str + ta_off, (size_t)maxlen);
 	ta_off += maxlen;
-	return maxlen;
+	తిరిగి maxlen;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES && wtime != 0)
+#నిర్వచితమైతే FEAT_PROFILE
+    ఒకవేళ (do_profiling == PROF_YES && wtime != 0)
 	prof_inchar_enter();
-#endif
+#అయితే_ముగింపు
 
-#ifdef NO_CONSOLE_INPUT
+#నిర్వచితమైతే NO_CONSOLE_ఆదానం
     // Don't wait for character input when the window hasn't been opened yet.
     // Do try reading, this works when redirecting stdin from a file.
     // Must return something, otherwise we'll loop forever.  If we run into
     // this very often we probably got stuck, exit Vim.
-    if (no_console_input())
+    ఒకవేళ (no_console_ఆదానం())
     {
-	static int count = 0;
+	స్థిర పూర్ణాంకం లెక్క = 0;
 
 # ifndef NO_CONSOLE
 	retval = mch_inchar(buf, maxlen, wtime, tb_change_cnt);
-	if (retval > 0 || typebuf_changed(tb_change_cnt) || wtime >= 0)
-	    goto theend;
+	ఒకవేళ (retval > 0 || typebuf_మారింది(tb_change_cnt) || wtime >= 0)
+	    వెళ్ళు theend;
 # endif
-	if (wtime == -1 && ++count == 1000)
+	ఒకవేళ (wtime == -1 && ++లెక్క == 1000)
 	    read_error_exit();
 	buf[0] = CAR;
 	retval = 1;
-	goto theend;
+	వెళ్ళు theend;
     }
-#endif
+#అయితే_ముగింపు
 
     // If we are going to wait for some time or block...
-    if (wtime == -1 || wtime > 100L)
+    ఒకవేళ (wtime == -1 || wtime > 100L)
     {
 	// ... allow signals to kill us.
-	(void)vim_handle_signal(SIGNAL_UNBLOCK);
+	(శూన్య)vim_handle_signal(SIGNAL_UNBLOCK);
 
 	// ... there is no need for CTRL-C to interrupt something, don't let
 	// it set got_int when it was mapped.
-	if ((mapped_ctrl_c | curbuf->b_mapped_ctrl_c) & get_real_state())
+	ఒకవేళ ((mapped_ctrl_c | curbuf->b_mapped_ctrl_c) & get_real_state())
 	    ctrl_c_interrupts = FALSE;
     }
 
@@ -221,34 +221,34 @@ ui_inchar(
      *
      */
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	retval = gui_inchar(buf, maxlen, wtime, tb_change_cnt);
-#endif
-#ifndef NO_CONSOLE
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే NO_CONSOLE
 # ifdef FEAT_GUI
-    else
+    లేకపోతే
 # endif
 	retval = mch_inchar(buf, maxlen, wtime, tb_change_cnt);
-#endif
+#అయితే_ముగింపు
 
-    if (wtime == -1 || wtime > 100L)
+    ఒకవేళ (wtime == -1 || wtime > 100L)
 	// block SIGHUP et al.
-	(void)vim_handle_signal(SIGNAL_BLOCK);
+	(శూన్య)vim_handle_signal(SIGNAL_ఖండం);
 
     ctrl_c_interrupts = TRUE;
 
-#ifdef NO_CONSOLE_INPUT
+#నిర్వచితమైతే NO_CONSOLE_ఆదానం
 theend:
-#endif
-#ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES && wtime != 0)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_PROFILE
+    ఒకవేళ (do_profiling == PROF_YES && wtime != 0)
 	prof_inchar_exit();
-#endif
-    return retval;
+#అయితే_ముగింపు
+    తిరిగి retval;
 }
 
-#if defined(UNIX) || defined(VMS) || defined(FEAT_GUI)
+#ఒకవేళ defined(UNIX) || defined(VMS) || defined(FEAT_GUI)
 /*
  * Common code for mch_inchar() and gui_inchar(): Wait for a while or
  * indefinitely until characters are available, dealing with timers and
@@ -262,43 +262,43 @@ theend:
  * If "wtime" == n wait a short time for characters.
  * If "wtime" == -1 wait forever for characters.
  */
-    int
+    పూర్ణాంకం
 inchar_loop(
     char_u	*buf,
-    int		maxlen,
-    long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt,
-    int		(*wait_func)(long wtime, int *interrupted, int ignore_input),
-    int		(*resize_func)(int check_only))
+    పూర్ణాంకం		maxlen,
+    దీర్ఘ	wtime,	    // don't use "time", MIPS cannot handle it
+    పూర్ణాంకం		tb_change_cnt,
+    పూర్ణాంకం		(*wait_func)(దీర్ఘ wtime, పూర్ణాంకం *interrupted, పూర్ణాంకం ignore_ఆదానం),
+    పూర్ణాంకం		(*resize_func)(పూర్ణాంకం check_only))
 {
-    int		len;
-    int		interrupted = FALSE;
-    int		did_call_wait_func = FALSE;
-    int		did_start_blocking = FALSE;
-    long	wait_time;
-    long	elapsed_time = 0;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		interrupted = FALSE;
+    పూర్ణాంకం		did_call_wait_func = FALSE;
+    పూర్ణాంకం		did_ప్రారంభం_blocking = FALSE;
+    దీర్ఘ	wait_సమయం;
+    దీర్ఘ	elapsed_సమయం = 0;
 # ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    elapsed_T	ప్రారంభం_tv;
 
-    ELAPSED_INIT(start_tv);
+    ELAPSED_INIT(ప్రారంభం_tv);
 # endif
 
     // repeat until we got a character or waited long enough
-    for (;;)
+    కొరకు (;;)
     {
 	// Check if window changed size while we were busy, perhaps the ":set
 	// columns=99" command was used.
-	if (resize_func != NULL)
+	ఒకవేళ (resize_func != ఖాళీ)
 	    resize_func(FALSE);
 
-# ifdef MESSAGE_QUEUE
+# ifdef సందేశం_వరుస
 	// Only process messages when waiting.
-	if (wtime != 0)
+	ఒకవేళ (wtime != 0)
 	{
 	    parse_queued_messages();
 	    // If input was put directly in typeahead buffer bail out here.
-	    if (typebuf_changed(tb_change_cnt))
-		return 0;
+	    ఒకవేళ (typebuf_మారింది(tb_change_cnt))
+		తిరిగి 0;
 	}
 # endif
 	// When an autocomplete is pending, wake at the sooner of
@@ -309,290 +309,290 @@ inchar_loop(
 	// when recording a register (gotchars_add_byte() will ignore it).
 	bool delay_pending = ins_compl_autocomplete_pending() && p_acl > 0
 		&& typebuf.tb_len == 0
-		&& !ins_compl_active()
-		&& (get_real_state() & MODE_INSERT) != 0;
+		&& !ins_compl_చురుకైన()
+		&& (get_real_state() & బహుళకం_చొప్పించు) != 0;
 	// Measure the delay from when it was armed (the keystroke), so a
 	// CursorHold returning in between does not push the popup back.
-	long acl_elapsed = delay_pending ? ins_compl_autocomplete_elapsed() : 0;
+	దీర్ఘ acl_elapsed = delay_pending ? ins_compl_autocomplete_elapsed() : 0;
 
-	if (wtime < 0 && did_start_blocking && !delay_pending)
+	ఒకవేళ (wtime < 0 && did_ప్రారంభం_blocking && !delay_pending)
 	    // blocking and already waited for p_ut
-	    wait_time = -1;
-	else
+	    wait_సమయం = -1;
+	లేకపోతే
 	{
 # ifdef ELAPSED_FUNC
-	    elapsed_time = ELAPSED_FUNC(start_tv);
+	    elapsed_సమయం = ELAPSED_FUNC(ప్రారంభం_tv);
 # endif
-	    if (wtime >= 0)
-		wait_time = wtime - elapsed_time;
-	    else if (delay_pending)
+	    ఒకవేళ (wtime >= 0)
+		wait_సమయం = wtime - elapsed_సమయం;
+	    లేకపోతే ఒకవేళ (delay_pending)
 	    {
-		long delay_left = p_acl - acl_elapsed;
-		long ut_left = p_ut - elapsed_time;
+		దీర్ఘ delay_ఎడమ = p_acl - acl_elapsed;
+		దీర్ఘ ut_ఎడమ = p_ut - elapsed_సమయం;
 
-		if (did_start_blocking)
-		    wait_time = delay_left;
-		else
-		    wait_time = MIN(delay_left, ut_left);
+		ఒకవేళ (did_ప్రారంభం_blocking)
+		    wait_సమయం = delay_ఎడమ;
+		లేకపోతే
+		    wait_సమయం = MIN(delay_ఎడమ, ut_ఎడమ);
 	    }
-	    else
+	    లేకపోతే
 		// going to block after p_ut
-		wait_time = p_ut - elapsed_time;
+		wait_సమయం = p_ut - elapsed_సమయం;
 
 	    // If the waiting time is now zero or less, we timed out.  However,
 	    // loop at least once to check for characters and events.  Matters
 	    // when "wtime" is zero.
-	    if (wait_time <= 0 && did_call_wait_func)
+	    ఒకవేళ (wait_సమయం <= 0 && did_call_wait_func)
 	    {
-		if (wtime >= 0)
+		ఒకవేళ (wtime >= 0)
 		    // no character available within "wtime"
-		    return 0;
+		    తిరిగి 0;
 
 		// The 'autocompletedelay' expired: trigger the popup.  When
 		// 'updatetime' is shorter, fall through to CursorHold instead.
-		if (delay_pending && acl_elapsed >= p_acl && maxlen >= 3
-					    && !typebuf_changed(tb_change_cnt))
+		ఒకవేళ (delay_pending && acl_elapsed >= p_acl && maxlen >= 3
+					    && !typebuf_మారింది(tb_change_cnt))
 		{
-		    if (buf == NULL)
+		    ఒకవేళ (buf == ఖాళీ)
 		    {
 			char_u	ibuf[3];
 
 			ibuf[0] = CSI;
 			ibuf[1] = KS_EXTRA;
-			ibuf[2] = (int)KE_COMPLETE_DELAY;
-			add_to_input_buf(ibuf, 3);
+			ibuf[2] = (పూర్ణాంకం)KE_COMPLETE_DELAY;
+			కూడు_గమ్యం_ఆదానం_buf(ibuf, 3);
 		    }
-		    else
+		    లేకపోతే
 		    {
 			buf[0] = K_SPECIAL;
 			buf[1] = KS_EXTRA;
-			buf[2] = (int)KE_COMPLETE_DELAY;
+			buf[2] = (పూర్ణాంకం)KE_COMPLETE_DELAY;
 		    }
-		    return 3;
+		    తిరిగి 3;
 		}
 
 		// No character available within 'updatetime'.
-		did_start_blocking = TRUE;
-		if (trigger_cursorhold() && maxlen >= 3
-					    && !typebuf_changed(tb_change_cnt))
+		did_ప్రారంభం_blocking = TRUE;
+		ఒకవేళ (trigger_cursorhold() && maxlen >= 3
+					    && !typebuf_మారింది(tb_change_cnt))
 		{
 		    // Put K_CURSORHOLD in the input buffer or return it.
-		    if (buf == NULL)
+		    ఒకవేళ (buf == ఖాళీ)
 		    {
 			char_u	ibuf[3];
 
 			ibuf[0] = CSI;
 			ibuf[1] = KS_EXTRA;
-			ibuf[2] = (int)KE_CURSORHOLD;
-			add_to_input_buf(ibuf, 3);
+			ibuf[2] = (పూర్ణాంకం)KE_CURSORHOLD;
+			కూడు_గమ్యం_ఆదానం_buf(ibuf, 3);
 		    }
-		    else
+		    లేకపోతే
 		    {
 			buf[0] = K_SPECIAL;
 			buf[1] = KS_EXTRA;
-			buf[2] = (int)KE_CURSORHOLD;
+			buf[2] = (పూర్ణాంకం)KE_CURSORHOLD;
 		    }
-		    return 3;
+		    తిరిగి 3;
 		}
 
 		// There is no character available within 'updatetime' seconds:
 		// flush all the swap files to disk.  Also done when
 		// interrupted by SIGWINCH.
 		before_blocking();
-		continue;
+		కొనసాగు;
 	    }
 	}
 
-# ifdef FEAT_JOB_CHANNEL
-	if (wait_time < 0 || wait_time > 100L)
+# ifdef FEAT_పని_CHANNEL
+	ఒకవేళ (wait_సమయం < 0 || wait_సమయం > 100L)
 	{
 	    // Checking if a job ended requires polling.  Do this at least
 	    // every 100 msec.
-	    if (has_pending_job())
-		wait_time = 100L;
+	    ఒకవేళ (has_pending_పని())
+		wait_సమయం = 100L;
 
 	    // If there is readahead then parse_queued_messages() timed out and
 	    // we should call it again soon.
-	    if (channel_any_readahead())
-		wait_time = 10L;
+	    ఒకవేళ (channel_any_readahead())
+		wait_సమయం = 10L;
 	}
 # endif
 # ifdef FEAT_BEVAL_GUI
-	if (p_beval && wait_time > 100L)
+	ఒకవేళ (p_beval && wait_సమయం > 100L)
 	    // The 'balloonexpr' may indirectly invoke a callback while waiting
 	    // for a character, need to check often.
-	    wait_time = 100L;
+	    wait_సమయం = 100L;
 # endif
 
 	// Wait for a character to be typed or another event, such as the winch
 	// signal or an event on the monitored file descriptors.
 	did_call_wait_func = TRUE;
-	if (wait_func(wait_time, &interrupted, FALSE))
+	ఒకవేళ (wait_func(wait_సమయం, &interrupted, FALSE))
 	{
 	    // If input was put directly in typeahead buffer bail out here.
-	    if (typebuf_changed(tb_change_cnt))
-		return 0;
+	    ఒకవేళ (typebuf_మారింది(tb_change_cnt))
+		తిరిగి 0;
 
 	    // We might have something to return now.
-	    if (buf == NULL)
+	    ఒకవేళ (buf == ఖాళీ)
 		// "buf" is NULL, we were just waiting, not actually getting
 		// input.
-		return input_available();
+		తిరిగి ఆదానం_అందుబాటు();
 
-	    len = read_from_input_buf(buf, (long)maxlen);
-	    if (len > 0)
-		return len;
-	    continue;
+	    len = read_from_ఆదానం_buf(buf, (దీర్ఘ)maxlen);
+	    ఒకవేళ (len > 0)
+		తిరిగి len;
+	    కొనసాగు;
 	}
 	// Timed out or interrupted with no character available.
 
 # ifndef ELAPSED_FUNC
 	// estimate the elapsed time
-	elapsed_time += wait_time;
+	elapsed_సమయం += wait_సమయం;
 # endif
 
-	if ((resize_func != NULL && resize_func(TRUE))
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+	ఒకవేళ ((resize_func != ఖాళీ && resize_func(TRUE))
+# ఒకవేళ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 		||
-		(clientserver_method == CLIENTSERVER_METHOD_X11 &&
-		 server_waiting())
+		(clientserver_పద్ధతి == CLIENTSERVER_పద్ధతి_X11 &&
+		 server_నిరీక్షణ())
 # endif
-# ifdef MESSAGE_QUEUE
+# ifdef సందేశం_వరుస
 		|| interrupted
 # endif
-		|| wait_time > 0
-		|| (wtime < 0 && !did_start_blocking))
+		|| wait_సమయం > 0
+		|| (wtime < 0 && !did_ప్రారంభం_blocking))
 	    // no character available, but something to be done, keep going
-	    continue;
+	    కొనసాగు;
 
 	// no character available or interrupted, return zero
-	break;
+	ఆపు;
     }
-    return 0;
+    తిరిగి 0;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_TIMERS)
+#ఒకవేళ defined(FEAT_TIMERS)
 /*
  * Wait for a timer to fire or "wait_func" to return non-zero.
  * Returns OK when something was read.
  * Returns FAIL when it timed out or was interrupted.
  */
-    int
+    పూర్ణాంకం
 ui_wait_for_chars_or_timer(
-    long    wtime,
-    int	    (*wait_func)(long wtime, int *interrupted, int ignore_input),
-    int	    *interrupted,
-    int	    ignore_input)
+    దీర్ఘ    wtime,
+    పూర్ణాంకం	    (*wait_func)(దీర్ఘ wtime, పూర్ణాంకం *interrupted, పూర్ణాంకం ignore_ఆదానం),
+    పూర్ణాంకం	    *interrupted,
+    పూర్ణాంకం	    ignore_ఆదానం)
 {
-    int	    due_time;
-    long    remaining = wtime;
-    int	    tb_change_cnt = typebuf.tb_change_cnt;
-# ifdef FEAT_JOB_CHANNEL
-    int	    brief_wait = FALSE;
+    పూర్ణాంకం	    due_సమయం;
+    దీర్ఘ    మిగిలిన = wtime;
+    పూర్ణాంకం	    tb_change_cnt = typebuf.tb_change_cnt;
+# ifdef FEAT_పని_CHANNEL
+    పూర్ణాంకం	    brief_wait = FALSE;
 # endif
 
     // When waiting very briefly don't trigger timers.
-    if (wtime >= 0 && wtime < 10L)
-	return wait_func(wtime, NULL, ignore_input);
+    ఒకవేళ (wtime >= 0 && wtime < 10L)
+	తిరిగి wait_func(wtime, ఖాళీ, ignore_ఆదానం);
 
-    while (wtime < 0 || remaining > 0)
+    అయితే (wtime < 0 || మిగిలిన > 0)
     {
 	// Trigger timers and then get the time in wtime until the next one is
 	// due.  Wait up to that time.
-	due_time = check_due_timer();
-	if (typebuf.tb_change_cnt != tb_change_cnt)
+	due_సమయం = check_due_timer();
+	ఒకవేళ (typebuf.tb_change_cnt != tb_change_cnt)
 	{
 	    // timer may have used feedkeys()
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (due_time <= 0 || (wtime > 0 && due_time > remaining))
-	    due_time = remaining;
-# if defined(FEAT_JOB_CHANNEL) || defined(FEAT_SOUND_CANBERRA) || defined(FEAT_SOUND_MACOSX)
-	if ((due_time < 0 || due_time > 10L) && (
-#  if defined(FEAT_JOB_CHANNEL)
+	ఒకవేళ (due_సమయం <= 0 || (wtime > 0 && due_సమయం > మిగిలిన))
+	    due_సమయం = మిగిలిన;
+# ఒకవేళ defined(FEAT_పని_CHANNEL) || defined(FEAT_SOUND_CANBERRA) || defined(FEAT_SOUND_MACOSX)
+	ఒకవేళ ((due_సమయం < 0 || due_సమయం > 10L) && (
+#  ఒకవేళ defined(FEAT_పని_CHANNEL)
 		(
-#   if defined(FEAT_GUI)
-		!gui.in_use &&
+#   ఒకవేళ defined(FEAT_GUI)
+		!gui.లోపల_use &&
 #   endif
-		(has_pending_job() || channel_any_readahead()))
-#   if defined(FEAT_SOUND_CANBERRA) || defined(FEAT_SOUND_MACOSX)
+		(has_pending_పని() || channel_any_readahead()))
+#   ఒకవేళ defined(FEAT_SOUND_CANBERRA) || defined(FEAT_SOUND_MACOSX)
 		||
 #   endif
 #  endif
-#  if defined(FEAT_SOUND_CANBERRA) ||  defined(FEAT_SOUND_MACOSX)
+#  ఒకవేళ defined(FEAT_SOUND_CANBERRA) ||  defined(FEAT_SOUND_MACOSX)
 		    has_any_sound_callback()
 #  endif
 		    ))
 	{
 	    // There is a pending job or channel, should return soon in order
 	    // to handle them ASAP.  Do check for input briefly.
-	    due_time = 10L;
-#  ifdef FEAT_JOB_CHANNEL
+	    due_సమయం = 10L;
+#  ifdef FEAT_పని_CHANNEL
 	    brief_wait = TRUE;
 #  endif
 	}
 # endif
-	if (wait_func(due_time, interrupted, ignore_input))
-	    return OK;
-	if ((interrupted != NULL && *interrupted)
-# ifdef FEAT_JOB_CHANNEL
+	ఒకవేళ (wait_func(due_సమయం, interrupted, ignore_ఆదానం))
+	    తిరిగి OK;
+	ఒకవేళ ((interrupted != ఖాళీ && *interrupted)
+# ifdef FEAT_పని_CHANNEL
 		|| brief_wait
 # endif
 		)
 	    // Nothing available, but need to return so that side effects get
 	    // handled, such as handling a message on a channel.
-	    return FAIL;
-	if (wtime > 0)
-	    remaining -= due_time;
+	    తిరిగి FAIL;
+	ఒకవేళ (wtime > 0)
+	    మిగిలిన -= due_సమయం;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return non-zero if a character is available.
  */
-    int
-ui_char_avail(void)
+    పూర్ణాంకం
+ui_char_avail(శూన్య)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
 	gui_mch_update();
-	return input_available();
+	తిరిగి ఆదానం_అందుబాటు();
     }
-#endif
-#ifndef NO_CONSOLE
-# ifdef NO_CONSOLE_INPUT
-    if (no_console_input())
-	return 0;
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే NO_CONSOLE
+# ifdef NO_CONSOLE_ఆదానం
+    ఒకవేళ (no_console_ఆదానం())
+	తిరిగి 0;
 # endif
-    return mch_char_avail();
-#else
-    return 0;
-#endif
+    తిరిగి mch_char_avail();
+#లేకపోతే
+    తిరిగి 0;
+#అయితే_ముగింపు
 }
 
 /*
  * Delay for the given number of milliseconds.	If ignoreinput is FALSE then we
  * cancel the delay if a key is hit.
  */
-    void
-ui_delay(long msec_arg, int ignoreinput)
+    శూన్య
+ui_delay(దీర్ఘ msec_arg, పూర్ణాంకం ignoreinput)
 {
-    long msec = msec_arg;
+    దీర్ఘ msec = msec_arg;
 
-#ifdef FEAT_EVAL
-    if (ui_delay_for_testing > 0)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (ui_delay_for_testing > 0)
 	msec = ui_delay_for_testing;
-    ch_log(NULL, "ui_delay(%ld)", msec);
-#endif
-#ifdef FEAT_GUI
-    if (gui.in_use && !ignoreinput)
+    ch_log(ఖాళీ, "ui_delay(%ld)", msec);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use && !ignoreinput)
 	gui_wait_for_chars(msec, typebuf.tb_change_cnt);
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	mch_delay(msec, ignoreinput ? MCH_DELAY_IGNOREINPUT : 0);
 }
 
@@ -601,63 +601,63 @@ ui_delay(long msec_arg, int ignoreinput)
  * otherwise fake it by starting a new shell.
  * When running the GUI iconify the window.
  */
-    void
-ui_suspend(void)
+    శూన్య
+ui_suspend(శూన్య)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
 	gui_mch_iconify();
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
     mch_suspend();
 }
 
-#if !defined(UNIX) || !defined(SIGTSTP)
+#ఒకవేళ !defined(UNIX) || !defined(SIGTSTP)
 /*
  * When the OS can't really suspend, call this function to start a shell.
  * This is never called in the GUI.
  */
-    void
-suspend_shell(void)
+    శూన్య
+suspend_shell(శూన్య)
 {
-    if (*p_sh == NUL)
-	emsg(_(e_shell_option_is_empty));
-    else
+    ఒకవేళ (*p_sh == NUL)
+	emsg(_(e_shell_option_is_ఖాళీలు));
+    లేకపోతే
     {
-	msg_puts(_("new shell started\n"));
-	do_shell(NULL, 0);
+	సందేశం_puts(_("new shell started\n"));
+	do_shell(ఖాళీ, 0);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Try to get the current Vim shell size.  Put the result in Rows and Columns.
  * Use the new sizes as defaults for 'columns' and 'lines'.
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-ui_get_shellsize(void)
+    పూర్ణాంకం
+ui_get_shellsize(శూన్య)
 {
-    int	    retval;
+    పూర్ణాంకం	    retval;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	retval = gui_get_shellsize();
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	retval = mch_get_shellsize();
 
     check_shellsize();
 
     // adjust the default for 'lines' and 'columns'
-    if (retval == OK)
+    ఒకవేళ (retval == OK)
     {
-	set_number_default("lines", Rows);
-	set_number_default("columns", Columns);
+	సమితి_సంఖ్య_default("lines", అడ్డువరుసలు);
+	సమితి_సంఖ్య_default("columns", Columns);
     }
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -665,37 +665,37 @@ ui_get_shellsize(void)
  * The gui_set_shellsize() or mch_set_shellsize() function will try to set the
  * new size.  If this is not possible, it will adjust Rows and Columns.
  */
-    void
-ui_set_shellsize(
-    int		mustset UNUSED)	// set by the user
+    శూన్య
+ui_సమితి_shellsize(
+    పూర్ణాంకం		mustset వాడని)	// set by the user
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	gui_set_shellsize(mustset, TRUE, RESIZE_BOTH);
-    else
-#endif
-	mch_set_shellsize();
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
+	gui_సమితి_shellsize(mustset, TRUE, RESIZE_BOTH);
+    లేకపోతే
+#అయితే_ముగింపు
+	mch_సమితి_shellsize();
 }
 
 /*
  * Called when Rows and/or Columns changed.  Adjust scroll region and mouse
  * region.
  */
-    void
-ui_new_shellsize(void)
+    శూన్య
+ui_new_shellsize(శూన్య)
 {
-    if (full_screen && !exiting)
+    ఒకవేళ (నిండిన_screen && !exiting)
     {
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (gui.లోపల_use)
 	    gui_new_shellsize();
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    mch_new_shellsize();
     }
 }
 
-#if (defined(FEAT_EVAL) || defined(FEAT_TERMINAL)) \
+#ఒకవేళ (defined(FEAT_EVAL) || defined(FEAT_TERMINAL)) \
 	    && (defined(FEAT_GUI) \
 		|| defined(MSWIN) \
 		|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)))
@@ -703,27 +703,27 @@ ui_new_shellsize(void)
  * Get the window position in pixels, if possible.
  * Return FAIL when not possible.
  */
-    int
-ui_get_winpos(int *x, int *y, varnumber_T timeout UNUSED)
+    పూర్ణాంకం
+ui_get_winpos(పూర్ణాంకం *x, పూర్ణాంకం *y, varnumber_T timeout వాడని)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return gui_mch_get_winpos(x, y);
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి gui_mch_get_winpos(x, y);
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
-    return mch_get_winpos(x, y);
-# else
-#  if defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)
-    return term_get_winpos(x, y, timeout);
-#  else
-    return FAIL;
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+    తిరిగి mch_get_winpos(x, y);
+# లేకపోతే
+#  ఒకవేళ defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)
+    తిరిగి పదం_get_winpos(x, y, timeout);
+#  లేకపోతే
+    తిరిగి FAIL;
 #  endif
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-ui_breakcheck(void)
+    శూన్య
+ui_breakcheck(శూన్య)
 {
     ui_breakcheck_force(FALSE);
 }
@@ -732,32 +732,32 @@ ui_breakcheck(void)
  * When "force" is true also check when the terminal is not in raw mode.
  * This is useful to read input on channels.
  */
-    void
-ui_breakcheck_force(int force)
+    శూన్య
+ui_breakcheck_force(పూర్ణాంకం force)
 {
-    static int	recursive = FALSE;
-    int		save_updating_screen = updating_screen;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
+    పూర్ణాంకం		save_updating_screen = updating_screen;
 
     // We could be called recursively if stderr is redirected, calling
     // fill_input_buf() calls settmode() when stdin isn't a tty.  settmode()
     // calls vgetorpeek() which calls ui_breakcheck() again.
-    if (recursive)
-	return;
+    ఒకవేళ (recursive)
+	తిరిగి;
     recursive = TRUE;
 
     // We do not want gui_resize_shell() to redraw the screen here.
     ++updating_screen;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	gui_mch_update();
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	mch_breakcheck(force);
 
-    if (save_updating_screen)
+    ఒకవేళ (save_updating_screen)
 	updating_screen = TRUE;
-    else
+    లేకపోతే
 	after_updating_screen(FALSE);
 
     recursive = FALSE;
@@ -774,26 +774,26 @@ ui_breakcheck_force(int force)
 // For the client-server code in the console the received keys are put in the
 // input buffer.
 
-#if defined(USE_INPUT_BUF)
+#ఒకవేళ defined(USE_ఆదానం_BUF)
 
 /*
  * Internal typeahead buffer.  Includes extra space for long key code
  * descriptions which would otherwise overflow.  The buffer is considered full
  * when only this extra space (or part of it) remains.
  */
-# if defined(FEAT_JOB_CHANNEL) || defined(FEAT_CLIENTSERVER)
+# ఒకవేళ defined(FEAT_పని_CHANNEL) || defined(FEAT_CLIENTSERVER)
    /*
     * NetBeans stuffs debugger commands into the input buffer.
     * This requires a larger buffer...
     * (Madsen) Go with this for remote input as well ...
     */
 #  define INBUFLEN 4096
-# else
+# లేకపోతే
 #  define INBUFLEN 250
 # endif
 
-static char_u	inbuf[INBUFLEN + MAX_KEY_CODE_LEN];
-static int	inbufcount = 0;	    // number of chars in inbuf[]
+స్థిర char_u	inbuf[INBUFLEN + MAX_కీలకం_సంకేతం_LEN];
+స్థిర పూర్ణాంకం	inbufcount = 0;	    // number of chars in inbuf[]
 
 /*
  * vim_is_input_buf_full(), vim_is_input_buf_empty(), add_to_input_buf(), and
@@ -801,31 +801,31 @@ static int	inbufcount = 0;	    // number of chars in inbuf[]
  * are used by the gui_* calls when a GUI is used to handle keyboard input.
  */
 
-    int
-vim_is_input_buf_full(void)
+    పూర్ణాంకం
+vim_is_ఆదానం_buf_నిండిన(శూన్య)
 {
-    return (inbufcount >= INBUFLEN);
+    తిరిగి (inbufcount >= INBUFLEN);
 }
 
-    int
-vim_is_input_buf_empty(void)
+    పూర్ణాంకం
+vim_is_ఆదానం_buf_ఖాళీలు(శూన్య)
 {
-    return (inbufcount == 0);
+    తిరిగి (inbufcount == 0);
 }
 
-# if defined(FEAT_OLE)
-    int
-vim_free_in_input_buf(void)
+# ఒకవేళ defined(FEAT_OLE)
+    పూర్ణాంకం
+vim_free_లోపల_ఆదానం_buf(శూన్య)
 {
-    return (INBUFLEN - inbufcount);
+    తిరిగి (INBUFLEN - inbufcount);
 }
 # endif
 
-# if defined(FEAT_GUI_GTK)
-    int
-vim_used_in_input_buf(void)
+# ఒకవేళ defined(FEAT_GUI_GTK)
+    పూర్ణాంకం
+vim_వాడిన_లోపల_ఆదానం_buf(శూన్య)
 {
-    return inbufcount;
+    తిరిగి inbufcount;
 }
 # endif
 
@@ -834,22 +834,22 @@ vim_used_in_input_buf(void)
  * The returned pointer must be passed to set_input_buf() later.
  */
     char_u *
-get_input_buf(void)
+get_ఆదానం_buf(శూన్య)
 {
     garray_T	*gap;
 
     // We use a growarray to store the data pointer and the length.
     gap = ALLOC_ONE(garray_T);
-    if (gap != NULL)
+    ఒకవేళ (gap != ఖాళీ)
     {
 	// Add one to avoid a zero size.
-	gap->ga_data = alloc(inbufcount + 1);
-	if (gap->ga_data != NULL)
-	    mch_memmove(gap->ga_data, inbuf, (size_t)inbufcount);
+	gap->ga_దత్తాంశం = alloc(inbufcount + 1);
+	ఒకవేళ (gap->ga_దత్తాంశం != ఖాళీ)
+	    mch_memmove(gap->ga_దత్తాంశం, inbuf, (size_t)inbufcount);
 	gap->ga_len = inbufcount;
     }
-    trash_input_buf();
-    return (char_u *)gap;
+    trash_ఆదానం_buf();
+    తిరిగి (char_u *)gap;
 }
 
 /*
@@ -857,28 +857,28 @@ get_input_buf(void)
  * The allocated memory is freed, this only works once!
  * When "overwrite" is FALSE input typed later is kept.
  */
-    void
-set_input_buf(char_u *p, int overwrite)
+    శూన్య
+సమితి_ఆదానం_buf(char_u *p, పూర్ణాంకం overwrite)
 {
     garray_T	*gap = (garray_T *)p;
 
-    if (gap == NULL)
-	return;
+    ఒకవేళ (gap == ఖాళీ)
+	తిరిగి;
 
-    if (gap->ga_data != NULL)
+    ఒకవేళ (gap->ga_దత్తాంశం != ఖాళీ)
     {
-	if (overwrite || inbufcount + gap->ga_len >= INBUFLEN)
+	ఒకవేళ (overwrite || inbufcount + gap->ga_len >= INBUFLEN)
 	{
-	    mch_memmove(inbuf, gap->ga_data, gap->ga_len);
+	    mch_memmove(inbuf, gap->ga_దత్తాంశం, gap->ga_len);
 	    inbufcount = gap->ga_len;
 	}
-	else
+	లేకపోతే
 	{
 	    mch_memmove(inbuf + gap->ga_len, inbuf, inbufcount);
-	    mch_memmove(inbuf, gap->ga_data, gap->ga_len);
+	    mch_memmove(inbuf, gap->ga_దత్తాంశం, gap->ga_len);
 	    inbufcount += gap->ga_len;
 	}
-	vim_free(gap->ga_data);
+	vim_free(gap->ga_దత్తాంశం);
     }
     vim_free(gap);
 }
@@ -888,34 +888,34 @@ set_input_buf(char_u *p, int overwrite)
  * Special keys start with CSI.  A real CSI must have been translated to
  * CSI KS_EXTRA KE_CSI.  K_SPECIAL doesn't require translation.
  */
-    void
-add_to_input_buf(char_u *s, int len)
+    శూన్య
+కూడు_గమ్యం_ఆదానం_buf(char_u *s, పూర్ణాంకం len)
 {
-    if (inbufcount + len > INBUFLEN + MAX_KEY_CODE_LEN)
-	return;	    // Shouldn't ever happen!
+    ఒకవేళ (inbufcount + len > INBUFLEN + MAX_కీలకం_సంకేతం_LEN)
+	తిరిగి;	    // Shouldn't ever happen!
 
-    while (len--)
+    అయితే (len--)
 	inbuf[inbufcount++] = *s++;
 }
 
 /*
  * Add "str[len]" to the input buffer while escaping CSI bytes.
  */
-    void
-add_to_input_buf_csi(char_u *str, int len)
+    శూన్య
+కూడు_గమ్యం_ఆదానం_buf_csi(char_u *str, పూర్ణాంకం len)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	buf[2];
 
-    for (i = 0; i < len; ++i)
+    కొరకు (i = 0; i < len; ++i)
     {
-	add_to_input_buf(str + i, 1);
-	if (str[i] == CSI)
+	కూడు_గమ్యం_ఆదానం_buf(str + i, 1);
+	ఒకవేళ (str[i] == CSI)
 	{
 	    // Turn CSI into K_CSI.
 	    buf[0] = KS_EXTRA;
-	    buf[1] = (int)KE_CSI;
-	    add_to_input_buf(buf, 2);
+	    buf[1] = (పూర్ణాంకం)KE_CSI;
+	    కూడు_గమ్యం_ఆదానం_buf(buf, 2);
 	}
     }
 }
@@ -923,8 +923,8 @@ add_to_input_buf_csi(char_u *str, int len)
 /*
  * Remove everything from the input buffer.  Called when ^C is found.
  */
-    void
-trash_input_buf(void)
+    శూన్య
+trash_ఆదానం_buf(శూన్య)
 {
     inbufcount = 0;
 }
@@ -933,103 +933,103 @@ trash_input_buf(void)
  * Read as much data from the input buffer as possible up to maxlen, and store
  * it in buf.
  */
-    int
-read_from_input_buf(char_u *buf, long maxlen)
+    పూర్ణాంకం
+read_from_ఆదానం_buf(char_u *buf, దీర్ఘ maxlen)
 {
-    if (inbufcount == 0)	// if the buffer is empty, fill it
-	fill_input_buf(TRUE);
-    if (maxlen > inbufcount)
+    ఒకవేళ (inbufcount == 0)	// if the buffer is empty, fill it
+	fill_ఆదానం_buf(TRUE);
+    ఒకవేళ (maxlen > inbufcount)
 	maxlen = inbufcount;
     mch_memmove(buf, inbuf, (size_t)maxlen);
     inbufcount -= maxlen;
     // check "maxlen" to avoid clang warning
-    if (inbufcount > 0 && maxlen > 0)
+    ఒకవేళ (inbufcount > 0 && maxlen > 0)
 	mch_memmove(inbuf, inbuf + maxlen, (size_t)inbufcount);
-    return (int)maxlen;
+    తిరిగి (పూర్ణాంకం)maxlen;
 }
 
-    void
-fill_input_buf(int exit_on_error UNUSED)
+    శూన్య
+fill_ఆదానం_buf(పూర్ణాంకం exit_on_error వాడని)
 {
-# if defined(UNIX) || defined(VMS) || defined(MACOS_X)
-    int		len;
-    int		try;
-    static int	did_read_something = FALSE;
-    static char_u *rest = NULL;	    // unconverted rest of previous read
-    static int	restlen = 0;
-    int		unconverted;
+# ఒకవేళ defined(UNIX) || defined(VMS) || defined(MACOS_X)
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		try;
+    స్థిర పూర్ణాంకం	did_read_something = FALSE;
+    స్థిర char_u *rest = ఖాళీ;	    // unconverted rest of previous read
+    స్థిర పూర్ణాంకం	restlen = 0;
+    పూర్ణాంకం		unconverted;
 # endif
 
 # ifdef FEAT_GUI
-    if (gui.in_use
-#  ifdef NO_CONSOLE_INPUT
+    ఒకవేళ (gui.లోపల_use
+#  ifdef NO_CONSOLE_ఆదానం
     // Don't use the GUI input when the window hasn't been opened yet.
     // We get here from ui_inchar() when we should try reading from stdin.
-	    && !no_console_input()
+	    && !no_console_ఆదానం()
 #  endif
        )
     {
 	gui_mch_update();
-	return;
+	తిరిగి;
     }
 # endif
-# if defined(UNIX) || defined(VMS) || defined(MACOS_X)
-    if (vim_is_input_buf_full())
-	return;
+# ఒకవేళ defined(UNIX) || defined(VMS) || defined(MACOS_X)
+    ఒకవేళ (vim_is_ఆదానం_buf_నిండిన())
+	తిరిగి;
     /*
      * Fill_input_buf() is only called when we really need a character.
      * If we can't get any, but there is some in the buffer, just return.
      * If we can't get any, and there isn't any in the buffer, we give up and
      * exit Vim.
      */
-    if (rest != NULL)
+    ఒకవేళ (rest != ఖాళీ)
     {
 	// Use remainder of previous call, starts with an invalid character
 	// that may become valid when reading more.
-	if (restlen > INBUFLEN - inbufcount)
+	ఒకవేళ (restlen > INBUFLEN - inbufcount)
 	    unconverted = INBUFLEN - inbufcount;
-	else
+	లేకపోతే
 	    unconverted = restlen;
 	mch_memmove(inbuf + inbufcount, rest, unconverted);
-	if (unconverted == restlen)
+	ఒకవేళ (unconverted == restlen)
 	    VIM_CLEAR(rest);
-	else
+	లేకపోతే
 	{
 	    restlen -= unconverted;
 	    mch_memmove(rest, rest + unconverted, restlen);
 	}
 	inbufcount += unconverted;
     }
-    else
+    లేకపోతే
 	unconverted = 0;
 
     len = 0;	// to avoid gcc warning
-    for (try = 0; try < 100; ++try)
+    కొరకు (try = 0; try < 100; ++try)
     {
 	size_t readlen = (size_t)((INBUFLEN - inbufcount)
-						       / input_conv.vc_factor);
+						       / ఆదానం_conv.vc_గుణకం);
 #  ifdef VMS
-	len = vms_read((char *)inbuf + inbufcount, readlen);
-#  else
-	len = read(read_cmd_fd, (char *)inbuf + inbufcount, readlen);
+	len = vms_read((అక్షరం *)inbuf + inbufcount, readlen);
+#  లేకపోతే
+	len = పఠ(read_cmd_fd, (అక్షరం *)inbuf + inbufcount, readlen);
 #  endif
 #  ifdef FEAT_EVAL
-	if (len > 0)
+	ఒకవేళ (len > 0)
 	{
 	    inbuf[inbufcount + len] = NUL;
-	    ch_log(NULL, "raw key input: \"%s\"", inbuf + inbufcount);
+	    ch_log(ఖాళీ, "raw key input: \"%s\"", inbuf + inbufcount);
 	}
 #  endif
 
-	if (len > 0 || got_int)
-	    break;
+	ఒకవేళ (len > 0 || got_int)
+	    ఆపు;
 	/*
 	 * If reading stdin results in an error, continue reading stderr.
 	 * This helps when using "foo | xargs vim".
 	 */
-	if (!did_read_something && !isatty(read_cmd_fd) && read_cmd_fd == 0)
+	ఒకవేళ (!did_read_something && !isatty(read_cmd_fd) && read_cmd_fd == 0)
 	{
-	    int m = cur_tmode;
+	    పూర్ణాంకం m = cur_tmode;
 
 	    // We probably set the wrong file descriptor to raw mode.  Switch
 	    // back to cooked mode, use another descriptor and set the mode to
@@ -1039,25 +1039,25 @@ fill_input_buf(int exit_on_error UNUSED)
 	    // Use stderr for stdin, also works for shell commands.
 	    close(0);
 	    vim_ignored = dup(2);
-#  else
+#  లేకపోతే
 	    read_cmd_fd = 2;	// read from stderr instead of stdin
 #  endif
 	    settmode(m);
 	}
-	if (!exit_on_error)
-	    return;
+	ఒకవేళ (!exit_on_error)
+	    తిరిగి;
     }
-    if (len <= 0 && !got_int)
+    ఒకవేళ (len <= 0 && !got_int)
 	read_error_exit();
-    if (len > 0)
+    ఒకవేళ (len > 0)
 	did_read_something = TRUE;
-    if (got_int)
+    ఒకవేళ (got_int)
     {
 	// Interrupted, pretend a CTRL-C was typed.
 	inbuf[0] = 3;
 	inbufcount = 1;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * May perform conversion on the input characters.
@@ -1067,14 +1067,14 @@ fill_input_buf(int exit_on_error UNUSED)
 	 * Don't do this in the unlikely event that the input buffer is too
 	 * small ("rest" still contains more bytes).
 	 */
-	if (input_conv.vc_type != CONV_NONE)
+	ఒకవేళ (ఆదానం_conv.vc_type != CONV_NONE)
 	{
 	    inbufcount -= unconverted;
-	    len = convert_input_safe(inbuf + inbufcount,
+	    len = convert_ఆదానం_సురక్షిత(inbuf + inbufcount,
 				     len + unconverted, INBUFLEN - inbufcount,
-				       rest == NULL ? &rest : NULL, &restlen);
+				       rest == ఖాళీ ? &rest : ఖాళీ, &restlen);
 	}
-	while (len > 0)
+	అయితే (len > 0)
 	{
 	    // If a CTRL-C was typed, remove it from the buffer and set
 	    // got_int.  Also recognize CTRL-C with modifyOtherKeys set, lower
@@ -1082,8 +1082,8 @@ fill_input_buf(int exit_on_error UNUSED)
 	    // If terminal key protocols are in use, we expect to receive
 	    // Ctrl_C as an escape sequence, ignore a raw Ctrl_C as this could
 	    // be paste data.
-	    if (ctrl_c_interrupts
-			&& ((inbuf[inbufcount] == Ctrl_C && !key_protocol_enabled())
+	    ఒకవేళ (ctrl_c_interrupts
+			&& ((inbuf[inbufcount] == Ctrl_C && !కీలకం_protocol_enabled())
 			|| (len >= 10 && STRNCMP(inbuf + inbufcount,
 						   "\033[27;5;99~", 10) == 0)
 			|| (len >= 10 && STRNCMP(inbuf + inbufcount,
@@ -1104,95 +1104,95 @@ fill_input_buf(int exit_on_error UNUSED)
     }
 # endif // UNIX || VMS || MACOS_X
 }
-#endif // USE_INPUT_BUF
+#అయితే_ముగింపు // USE_INPUT_BUF
 
 /*
  * Exit because of an input read error.
  */
-    void
-read_error_exit(void)
+    శూన్య
+read_error_exit(శూన్య)
 {
-    if (silent_mode)	// Normal way to exit for "ex -s"
+    ఒకవేళ (silent_బహుళకం)	// Normal way to exit for "ex -s"
 	getout(0);
     STRCPY(IObuff, _("Vim: Error reading input, exiting...\n"));
     preserve_exit();
 }
 
-#if defined(CURSOR_SHAPE)
+#ఒకవేళ defined(CURSOR_SHAPE)
 /*
  * May update the shape of the cursor.
  */
-    void
-ui_cursor_shape_forced(int forced)
+    శూన్య
+ui_cursor_shape_forced(పూర్ణాంకం forced)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	gui_update_cursor_later();
-    else
+    లేకపోతే
 # endif
-	term_cursor_mode(forced);
+	పదం_cursor_బహుళకం(forced);
 
 # ifdef MCH_CURSOR_SHAPE
     mch_update_cursor();
 # endif
 
 # ifdef FEAT_CONCEAL
-    conceal_check_cursor_line(FALSE);
+    conceal_check_cursor_పంక్తి(FALSE);
 # endif
 }
 
-    void
-ui_cursor_shape(void)
+    శూన్య
+ui_cursor_shape(శూన్య)
 {
     ui_cursor_shape_forced(FALSE);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check bounds for column number
  */
-    int
-check_col(int col)
+    పూర్ణాంకం
+check_నిలువు(పూర్ణాంకం నిలువు)
 {
-    if (col < 0)
-	return 0;
-    if (col >= screen_Columns)
-	return screen_Columns - 1;
-    return col;
+    ఒకవేళ (నిలువు < 0)
+	తిరిగి 0;
+    ఒకవేళ (నిలువు >= screen_Columns)
+	తిరిగి screen_Columns - 1;
+    తిరిగి నిలువు;
 }
 
 /*
  * Check bounds for row number
  */
-    int
-check_row(int row)
+    పూర్ణాంకం
+check_అడ్డువరుస(పూర్ణాంకం అడ్డువరుస)
 {
-    if (row < 0)
-	return 0;
-    if (row >= screen_Rows)
-	return screen_Rows - 1;
-    return row;
+    ఒకవేళ (అడ్డువరుస < 0)
+	తిరిగి 0;
+    ఒకవేళ (అడ్డువరుస >= screen_అడ్డువరుసలు)
+	తిరిగి screen_అడ్డువరుసలు - 1;
+    తిరిగి అడ్డువరుస;
 }
 
 /*
  * Return length of line "lnum" in screen cells for horizontal scrolling.
  */
-    long
-scroll_line_len(linenr_T lnum)
+    దీర్ఘ
+scroll_పంక్తి_len(linenr_T lnum)
 {
     char_u	*p = ml_get(lnum);
-    colnr_T	col = 0;
+    colnr_T	నిలువు = 0;
 
-    if (*p != NUL)
-	for (;;)
+    ఒకవేళ (*p != NUL)
+	కొరకు (;;)
 	{
-	    int	    w = chartabsize(p, col);
+	    పూర్ణాంకం	    w = chartabsize(p, నిలువు);
 	    MB_PTR_ADV(p);
-	    if (*p == NUL)		// don't count the last character
-		break;
-	    col += w;
+	    ఒకవేళ (*p == NUL)		// don't count the last character
+		ఆపు;
+	    నిలువు += w;
 	}
-    return col;
+    తిరిగి నిలువు;
 }
 
 /*
@@ -1201,98 +1201,98 @@ scroll_line_len(linenr_T lnum)
  * "guioptions") then the current line number is returned.
  */
     linenr_T
-ui_find_longest_lnum(void)
+ui_కనుగొను_longest_lnum(శూన్య)
 {
     linenr_T ret = 0;
 
     // Calculate maximum for horizontal scrollbar.  Check for reasonable
     // line numbers, topline and botline can be invalid when displaying is
     // postponed.
-    if (
-#ifdef FEAT_GUI
-	    (!gui.in_use || vim_strchr(p_go, GO_HORSCROLL) == NULL) &&
-#endif
+    ఒకవేళ (
+#నిర్వచితమైతే FEAT_GUI
+	    (!gui.లోపల_use || vim_strchr(p_go, GO_HORSCROLL) == ఖాళీ) &&
+#అయితే_ముగింపు
 	    curwin->w_topline <= curwin->w_cursor.lnum
 	    && curwin->w_botline > curwin->w_cursor.lnum
-	    && curwin->w_botline <= curbuf->b_ml.ml_line_count + 1)
+	    && curwin->w_botline <= curbuf->b_ml.ml_పంక్తి_లెక్క + 1)
     {
 	linenr_T    lnum;
-	long	    n;
-	long	    max = 0;
+	దీర్ఘ	    n;
+	దీర్ఘ	    max = 0;
 
 	// Use maximum of all visible lines.  Remember the lnum of the
 	// longest line, closest to the cursor line.  Used when scrolling
 	// below.
-	for (lnum = curwin->w_topline; lnum < curwin->w_botline; ++lnum)
+	కొరకు (lnum = curwin->w_topline; lnum < curwin->w_botline; ++lnum)
 	{
-	    n = scroll_line_len(lnum);
-	    if (n > max)
+	    n = scroll_పంక్తి_len(lnum);
+	    ఒకవేళ (n > max)
 	    {
 		max = n;
 		ret = lnum;
 	    }
-	    else if (n == max && abs((int)(lnum - curwin->w_cursor.lnum))
-				     < abs((int)(ret - curwin->w_cursor.lnum)))
+	    లేకపోతే ఒకవేళ (n == max && నిరపేక్ష((పూర్ణాంకం)(lnum - curwin->w_cursor.lnum))
+				     < నిరపేక్ష((పూర్ణాంకం)(ret - curwin->w_cursor.lnum)))
 		ret = lnum;
 	}
     }
-    else
+    లేకపోతే
 	// Use cursor line only.
 	ret = curwin->w_cursor.lnum;
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Called when focus changed.  Used for the GUI or for systems where this can
  * be done in the console (Win32).
  */
-    void
+    శూన్య
 ui_focus_change(
-    int		in_focus)	// TRUE if focus gained.
+    పూర్ణాంకం		లోపల_focus)	// TRUE if focus gained.
 {
-    static time_t	last_time = (time_t)0;
-    int			need_redraw = FALSE;
+    స్థిర time_t	చివరి_సమయం = (time_t)0;
+    పూర్ణాంకం			need_redraw = FALSE;
 
     // When activated: Check if any file was modified outside of Vim.
     // Only do this when not done within the last two seconds (could get
     // several events in a row).
-    if (in_focus && last_time + 2 < time(NULL))
+    ఒకవేళ (లోపల_focus && చివరి_సమయం + 2 < సమయం(ఖాళీ))
     {
 	need_redraw = check_timestamps(
-#ifdef FEAT_GUI
-		gui.in_use
-#else
+#నిర్వచితమైతే FEAT_GUI
+		gui.లోపల_use
+#లేకపోతే
 		FALSE
-#endif
+#అయితే_ముగింపు
 		);
-	last_time = time(NULL);
+	చివరి_సమయం = సమయం(ఖాళీ);
     }
 
-#ifdef FEAT_TERMINAL
-    term_focus_change(in_focus);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    పదం_focus_change(లోపల_focus);
+#అయితే_ముగింపు
 
     /*
      * Fire the focus gained/lost autocommand.
      */
-    need_redraw |= apply_autocmds(in_focus ? EVENT_FOCUSGAINED
-				: EVENT_FOCUSLOST, NULL, NULL, FALSE, curbuf);
+    need_redraw |= apply_autocmds(లోపల_focus ? EVENT_FOCUSGAINED
+				: EVENT_FOCUSLOST, ఖాళీ, ఖాళీ, FALSE, curbuf);
 
-    if (need_redraw)
+    ఒకవేళ (need_redraw)
 	redraw_after_callback(TRUE, TRUE);
 
     // File may have been changed from 'readonly' to 'noreadonly'
-    if (need_maketitle)
+    ఒకవేళ (need_maketitle)
 	maketitle();
 }
 
-#if defined(HAVE_INPUT_METHOD)
+#ఒకవేళ defined(HAVE_ఆదానం_పద్ధతి)
 /*
  * Save current Input Method status to specified place.
  */
-    void
-im_save_status(long *psave)
+    శూన్య
+im_save_స్థితి(దీర్ఘ *psave)
 {
     // Don't save when 'imdisable' is set or "xic" is NULL, IM is always
     // disabled then (but might start later).
@@ -1301,20 +1301,20 @@ im_save_status(long *psave)
     // And don't save when the keys were stuffed (e.g., for a "." command).
     // And don't save when the GUI is running but our window doesn't have
     // input focus (e.g., when a find dialog is open).
-    if (!p_imdisable && KeyTyped && !KeyStuffed
+    ఒకవేళ (!p_imdisable && కీలకం_Typed && !కీలకం_Stuffed
 # ifdef FEAT_XIM
-	    && xic != NULL
+	    && xic != ఖాళీ
 # endif
 # ifdef FEAT_GUI
-	    && (!gui.in_use || gui.in_focus)
+	    && (!gui.లోపల_use || gui.లోపల_focus)
 # endif
 	)
     {
 	// Do save when IM is on, or IM is off and saved status is on.
-	if (vgetc_im_active)
+	ఒకవేళ (vgetc_im_చురుకైన)
 	    *psave = B_IMODE_IM;
-	else if (*psave == B_IMODE_IM)
+	లేకపోతే ఒకవేళ (*psave == B_IMODE_IM)
 	    *psave = B_IMODE_NONE;
     }
 }
-#endif
+#అయితే_ముగింపు

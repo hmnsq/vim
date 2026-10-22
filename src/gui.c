@@ -8,52 +8,52 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 // Structure containing all the GUI information
 gui_T gui;
 
-#if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
-# define USE_SET_GUIFONTWIDE
-static void set_guifontwide(char_u *font_name);
-#endif
-static void gui_check_pos(void);
-static void gui_reset_scroll_region(void);
-static void gui_outstr(char_u *, int);
-#ifndef USE_GTK4
-static int gui_screenchar(int off, int flags, guicolor_T fg, guicolor_T bg, int back);
-#endif
-static int gui_outstr_nowrap(char_u *s, int len, int flags, guicolor_T fg, guicolor_T bg, int back);
-static void gui_delete_lines(int row, int count);
-static void gui_insert_lines(int row, int count);
-static int gui_xy2colrow(int x, int y, int *colp);
-#if defined(FEAT_GUI_TABLINE)
-static int gui_has_tabline(void);
-#endif
-static void gui_do_scrollbar(win_T *wp, int which, int enable);
-static void gui_update_horiz_scrollbar(int);
-static void gui_set_fg_color(char_u *name);
-static void gui_set_bg_color(char_u *name);
-static void init_gui_options(void);
-static win_T *xy2win(int x, int y, mouse_find_T popup);
+#ఒకవేళ defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
+# define USE_సమితి_GUIFONTWIDE
+స్థిర శూన్య సమితి_guifontwide(char_u *font_name);
+#అయితే_ముగింపు
+స్థిర శూన్య gui_check_pos(శూన్య);
+స్థిర శూన్య gui_reset_scroll_region(శూన్య);
+స్థిర శూన్య gui_outstr(char_u *, పూర్ణాంకం);
+#నిర్వచితం_కాకపోతే USE_GTK4
+స్థిర పూర్ణాంకం gui_screenchar(పూర్ణాంకం off, పూర్ణాంకం flags, guicolor_T fg, guicolor_T bg, పూర్ణాంకం వెనుక);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం gui_outstr_nowrap(char_u *s, పూర్ణాంకం len, పూర్ణాంకం flags, guicolor_T fg, guicolor_T bg, పూర్ణాంకం వెనుక);
+స్థిర శూన్య gui_delete_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం లెక్క);
+స్థిర శూన్య gui_చొప్పించు_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం లెక్క);
+స్థిర పూర్ణాంకం gui_xy2colrow(పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం *colp);
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+స్థిర పూర్ణాంకం gui_has_tabline(శూన్య);
+#అయితే_ముగింపు
+స్థిర శూన్య gui_do_scrollbar(win_T *wp, పూర్ణాంకం which, పూర్ణాంకం enable);
+స్థిర శూన్య gui_update_horiz_scrollbar(పూర్ణాంకం);
+స్థిర శూన్య gui_సమితి_fg_color(char_u *name);
+స్థిర శూన్య gui_సమితి_bg_color(char_u *name);
+స్థిర శూన్య init_gui_options(శూన్య);
+స్థిర win_T *xy2win(పూర్ణాంకం x, పూర్ణాంకం y, mouse_కనుగొను_T popup);
 
-#ifdef GUI_MAY_FORK
-static void gui_do_fork(void);
+#నిర్వచితమైతే GUI_MAY_FORK
+స్థిర శూన్య gui_do_fork(శూన్య);
 
-static int gui_read_child_pipe(int fd);
+స్థిర పూర్ణాంకం gui_read_బిడ్డ_pipe(పూర్ణాంకం fd);
 
 // Return values for gui_read_child_pipe
-enum {
-    GUI_CHILD_IO_ERROR,
-    GUI_CHILD_OK,
-    GUI_CHILD_FAILED
+గణన {
+    GUI_బిడ్డ_IO_ERROR,
+    GUI_బిడ్డ_OK,
+    GUI_బిడ్డ_FAILED
 };
-#endif
+#అయితే_ముగింపు
 
-static void gui_attempt_start(void);
+స్థిర శూన్య gui_attempt_ప్రారంభం(శూన్య);
 
-static int can_update_cursor = TRUE; // can display the cursor
-static int disable_flush = 0;	// If > 0, gui_mch_flush() is disabled.
+స్థిర పూర్ణాంకం can_update_cursor = TRUE; // can display the cursor
+స్థిర పూర్ణాంకం disable_flush = 0;	// If > 0, gui_mch_flush() is disabled.
 
 /*
  * gui_start -- Called when user wants to start the GUI.
@@ -62,28 +62,28 @@ static int disable_flush = 0;	// If > 0, gui_mch_flush() is disabled.
  * command in the .gvimrc file.  Only the first call should fork, not the
  * recursive call.
  */
-    void
-gui_start(char_u *arg UNUSED)
+    శూన్య
+gui_ప్రారంభం(char_u *arg వాడని)
 {
-    char_u	*old_term;
-#ifdef GUI_MAY_FORK
-    static int	recursive = 0;
-#endif
-#if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-    char	*msg = NULL;
-#endif
+    char_u	*old_పదం;
+#నిర్వచితమైతే GUI_MAY_FORK
+    స్థిర పూర్ణాంకం	recursive = 0;
+#అయితే_ముగింపు
+#ఒకవేళ defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
+    అక్షరం	*సందేశం = ఖాళీ;
+#అయితే_ముగింపు
 
-    old_term = vim_strsave(T_NAME);
+    old_పదం = vim_strsave(T_NAME);
 
     settmode(TMODE_COOK);		// stop RAW mode
-    if (full_screen)
+    ఒకవేళ (నిండిన_screen)
 	cursor_on();			// needed for ":gui" in .vimrc
-    full_screen = FALSE;
+    నిండిన_screen = FALSE;
 
     // If GUI fails to start, then we will recover afterwards
-    term_disable_dec();
+    పదం_disable_dec();
 
-#ifdef GUI_MAY_FORK
+#నిర్వచితమైతే GUI_MAY_FORK
     ++recursive;
     /*
      * Quit the current process and continue in the child.
@@ -93,46 +93,46 @@ gui_start(char_u *arg UNUSED)
      * Don't do this when there is a running job, we can only get the status
      * of a child from the parent.
      */
-    if (gui.dofork && !vim_strchr(p_go, GO_FORG) && recursive <= 1
-# ifdef FEAT_JOB_CHANNEL
-	    && !job_any_running()
+    ఒకవేళ (gui.dofork && !vim_strchr(p_go, GO_FORG) && recursive <= 1
+# ifdef FEAT_పని_CHANNEL
+	    && !పని_any_running()
 # endif
 	    )
     {
 	gui_do_fork();
     }
-    else
-#endif
-#ifdef GUI_MAY_SPAWN
-    if (gui.dospawn
+    లేకపోతే
+#అయితే_ముగింపు
+#నిర్వచితమైతే GUI_MAY_SPAWN
+    ఒకవేళ (gui.dospawn
 # ifdef EXPERIMENTAL_GUI_CMD
 	    && gui.dofork
 # endif
 	    && !vim_strchr(p_go, GO_FORG)
-	    && !anyBufIsChanged()
-# ifdef FEAT_JOB_CHANNEL
-	    && !job_any_running()
+	    && !any_Buf_Is_మారింది()
+# ifdef FEAT_పని_CHANNEL
+	    && !పని_any_running()
 # endif
 	    )
     {
 # ifdef EXPERIMENTAL_GUI_CMD
-	msg =
+	సందేశం =
 # endif
 	    gui_mch_do_spawn(arg);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
 	// If there is 'f' in 'guioptions' and specify -g argument,
 	// gui_mch_init_check() was not called yet.
-	if (gui_mch_init_check() != OK)
+	ఒకవేళ (gui_mch_init_check() != OK)
 	    getout_preserve_modified(1);
-#endif
-	gui_attempt_start();
+#అయితే_ముగింపు
+	gui_attempt_ప్రారంభం();
     }
 
-    if (!gui.in_use)			// failed to start GUI
+    ఒకవేళ (!gui.లోపల_use)			// failed to start GUI
     {
 	// Back to old term settings
 	//
@@ -143,45 +143,45 @@ gui_start(char_u *arg UNUSED)
 	// sounds, because gui_mch_init() in both gui_x11.c and gui_gtk_x11.c
 	// return "OK" unconditionally, so it would be very difficult to
 	// actually hit this case.
-	termcapinit(old_term);
+	termcapinit(old_పదం);
 	settmode(TMODE_RAW);		// restart RAW mode
-	set_title_defaults();		// set 'title' and 'icon' again
-#ifdef UNIX
-	term_set_win_resize(true);
-#endif
-#if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-	if (msg != NULL)
-	    emsg(msg);
-#endif
+	సమితి_title_defaults();		// set 'title' and 'icon' again
+#నిర్వచితమైతే UNIX
+	పదం_సమితి_win_resize(true);
+#అయితే_ముగింపు
+#ఒకవేళ defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
+	ఒకవేళ (సందేశం != ఖాళీ)
+	    emsg(సందేశం);
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-#ifdef HAVE_CLIPMETHOD
+#నిర్వచితమైతే HAVE_CLIPMETHOD
 	// Reset clipmethod to CLIPMETHOD_NONE
-	choose_clipmethod();
-#endif
-#ifdef FEAT_IMAGE
-	update_cell_size();
+	ఎంచుకో_clipmethod();
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_IMAGE
+	update_cell_కొలత();
 	update_image_backend();
-#endif
+#అయితే_ముగింపు
     }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
     // Enable fullscreen mode
-    if (vim_strchr(p_go, GO_FULLSCREEN) != NULL)
-       gui_mch_set_fullscreen(TRUE);
-#endif
+    ఒకవేళ (vim_strchr(p_go, GO_FULLSCREEN) != ఖాళీ)
+       gui_mch_సమితి_fullscreen(TRUE);
+#అయితే_ముగింపు
 
-    vim_free(old_term);
+    vim_free(old_పదం);
 
     // If the GUI started successfully, trigger the GUIEnter event, otherwise
     // the GUIFailed event.
     gui_mch_update();
-    apply_autocmds(gui.in_use ? EVENT_GUIENTER : EVENT_GUIFAILED,
-						   NULL, NULL, FALSE, curbuf);
-#ifdef GUI_MAY_FORK
+    apply_autocmds(gui.లోపల_use ? EVENT_GUIENTER : EVENT_GUIFAILED,
+						   ఖాళీ, ఖాళీ, FALSE, curbuf);
+#నిర్వచితమైతే GUI_MAY_FORK
     --recursive;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -194,42 +194,42 @@ gui_start(char_u *arg UNUSED)
  * file, they will have to go to the terminal: Set full_screen to FALSE.
  * full_screen will be set to TRUE again by a successful termcapinit().
  */
-    static void
-gui_attempt_start(void)
+    స్థిర శూన్య
+gui_attempt_ప్రారంభం(శూన్య)
 {
-    static int recursive = 0;
+    స్థిర పూర్ణాంకం recursive = 0;
 
     ++recursive;
     gui.starting = true;
 
-#ifdef FEAT_GUI_GTK
-    gui.event_time = GDK_CURRENT_TIME;
-#endif
+#నిర్వచితమైతే FEAT_GUI_GTK
+    gui.event_సమయం = GDK_CURRENT_సమయం;
+#అయితే_ముగింపు
 
     termcapinit((char_u *)"builtin_gui");
     gui.starting = recursive - 1;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
-    if (gui.in_use)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
+    ఒకవేళ (gui.లోపల_use)
     {
 # ifdef FEAT_EVAL
-	Window	x11_window;
+	కిటికీ	x11_కిటికీ;
 	Display	*x11_display;
 
-	if (gui_get_x11_windis(&x11_window, &x11_display) == OK)
-	    set_vim_var_nr(VV_WINDOWID, (long)x11_window);
+	ఒకవేళ (gui_get_x11_windis(&x11_కిటికీ, &x11_display) == OK)
+	    సమితి_vim_var_nr(VV_WINDOWID, (దీర్ఘ)x11_కిటికీ);
 # endif
 	// Display error messages in a dialog now.
 	display_errors();
     }
-#endif
+#అయితే_ముగింపు
     --recursive;
 }
 
-#ifdef GUI_MAY_FORK
+#నిర్వచితమైతే GUI_MAY_FORK
 
 // for waitpid()
-# if defined(HAVE_SYS_WAIT_H)
+# ఒకవేళ defined(HAVE_SYS_WAIT_H)
 #  include <sys/wait.h>
 # endif
 
@@ -245,16 +245,16 @@ gui_attempt_start(void)
  * parent will return. If the child succeeds, then the parent will exit
  * and the child will return.
  */
-    static void
-gui_do_fork(void)
+    స్థిర శూన్య
+gui_do_fork(శూన్య)
 {
-    int		pipefd[2];	// pipe between parent and child
-    int		pipe_error;
-    int		status;
-    int		exit_status;
+    పూర్ణాంకం		pipefd[2];	// pipe between parent and child
+    పూర్ణాంకం		pipe_error;
+    పూర్ణాంకం		స్థితి_2;
+    పూర్ణాంకం		exit_స్థితి;
     pid_t	pid = -1;
 
-# if defined(FEAT_RELTIME) && defined(PROF_NSEC)
+# ఒకవేళ defined(FEAT_RELTIME) && defined(PROF_NSEC)
     // a timer is not carried forward
     delete_timer();
 # endif
@@ -264,44 +264,44 @@ gui_do_fork(void)
     // exit.
     pipe_error = (pipe(pipefd) < 0);
     pid = fork();
-    if (pid < 0)	    // Fork error
+    ఒకవేళ (pid < 0)	    // Fork error
     {
-	emsg(_(e_failed_to_create_new_process_for_GUI));
-	return;
+	emsg(_(e_failed_గమ్యం_create_new_process_for_GUI));
+	తిరిగి;
     }
-    else if (pid > 0)	    // Parent
+    లేకపోతే ఒకవేళ (pid > 0)	    //మాతృ
     {
 	// Give the child some time to do the setsid(), otherwise the
 	// exit() may kill the child too (when starting gvim from inside a
 	// gvim).
-	if (!pipe_error)
+	ఒకవేళ (!pipe_error)
 	{
 	    // The read returns when the child closes the pipe (or when
 	    // the child dies for some reason).
 	    close(pipefd[1]);
-	    status = gui_read_child_pipe(pipefd[0]);
-	    if (status == GUI_CHILD_FAILED)
+	    స్థితి_2 = gui_read_బిడ్డ_pipe(pipefd[0]);
+	    ఒకవేళ (స్థితి_2 == GUI_బిడ్డ_FAILED)
 	    {
 		// The child failed to start the GUI, so the caller must
 		// continue. There may be more error information written
 		// to stderr by the child.
-		waitpid(pid, &exit_status, 0);
-		emsg(_(e_the_child_process_failed_to_start_GUI));
-		return;
+		waitpid(pid, &exit_స్థితి, 0);
+		emsg(_(e_the_బిడ్డ_process_failed_గమ్యం_ప్రారంభం_GUI));
+		తిరిగి;
 	    }
-	    else if (status == GUI_CHILD_IO_ERROR)
+	    లేకపోతే ఒకవేళ (స్థితి_2 == GUI_బిడ్డ_IO_ERROR)
 	    {
 		pipe_error = TRUE;
 	    }
 	    // else GUI_CHILD_OK: parent exit
 	}
 
-	if (pipe_error)
+	ఒకవేళ (pipe_error)
 	    ui_delay(301L, TRUE);
 
 	// When swapping screens we may need to go to the next line, e.g.,
 	// after a hit-enter prompt and using ":gui".
-	if (newline_on_exit)
+	ఒకవేళ (newline_on_exit)
 	    mch_errmsg("\r\n");
 
 	/*
@@ -310,48 +310,48 @@ gui_do_fork(void)
 	 */
 	_exit(0);
     }
-    // Child
+    //బిడ్డ
 
 # ifdef FEAT_GUI_GTK
     // Call gtk_init_check() here after fork(). See gui_init_check().
-    if (gui_mch_init_check() != OK)
+    ఒకవేళ (gui_mch_init_check() != OK)
 	getout_preserve_modified(1);
 # endif
 
-# if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+# ఒకవేళ defined(HAVE_SETSID) || defined(HAVE_SETPGID)
     /*
      * Change our process group.  On some systems/shells a CTRL-C in the
      * shell where Vim was started would otherwise kill gvim!
      */
-#  if defined(HAVE_SETSID)
-    (void)setsid();
-#  else
-    (void)setpgid(0, 0);
+#  ఒకవేళ defined(HAVE_SETSID)
+    (శూన్య)setsid();
+#  లేకపోతే
+    (శూన్య)setpgid(0, 0);
 #  endif
 # endif
-    if (!pipe_error)
+    ఒకవేళ (!pipe_error)
 	close(pipefd[0]);
 
-# if defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
+# ఒకవేళ defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
     // Tell the session manager our new PID
     gui_mch_forked();
 # endif
 
     // Try to start the GUI
-    gui_attempt_start();
+    gui_attempt_ప్రారంభం();
 
     // Notify the parent
-    if (!pipe_error)
+    ఒకవేళ (!pipe_error)
     {
-	if (gui.in_use)
+	ఒకవేళ (gui.లోపల_use)
 	    write_eintr(pipefd[1], "ok", 3);
-	else
+	లేకపోతే
 	    write_eintr(pipefd[1], "fail", 5);
 	close(pipefd[1]);
     }
 
     // If we failed to start the GUI, exit now.
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
 	getout_preserve_modified(1);
 }
 
@@ -364,33 +364,33 @@ gui_do_fork(void)
  *
  * The file descriptor will be closed before the function returns.
  */
-    static int
-gui_read_child_pipe(int fd)
+    స్థిర పూర్ణాంకం
+gui_read_బిడ్డ_pipe(పూర్ణాంకం fd)
 {
-    long	bytes_read;
-# define READ_BUFFER_SIZE 10
-    char	buffer[READ_BUFFER_SIZE];
+    దీర్ఘ	బైట్లు_read;
+# define READ_బఫరు_కొలత 10
+    అక్షరం	బఫరు[READ_బఫరు_కొలత];
 
-    bytes_read = read_eintr(fd, buffer, READ_BUFFER_SIZE - 1);
-# undef READ_BUFFER_SIZE
+    బైట్లు_read = read_eintr(fd, బఫరు, READ_బఫరు_కొలత - 1);
+# undef READ_బఫరు_కొలత
     close(fd);
-    if (bytes_read < 0)
-	return GUI_CHILD_IO_ERROR;
-    buffer[bytes_read] = NUL;
-    if (STRCMP(buffer, "ok") == 0)
-	return GUI_CHILD_OK;
-    return GUI_CHILD_FAILED;
+    ఒకవేళ (బైట్లు_read < 0)
+	తిరిగి GUI_బిడ్డ_IO_ERROR;
+    బఫరు[బైట్లు_read] = NUL;
+    ఒకవేళ (STRCMP(బఫరు, "ok") == 0)
+	తిరిగి GUI_బిడ్డ_OK;
+    తిరిగి GUI_బిడ్డ_FAILED;
 }
 
-#endif // GUI_MAY_FORK
+#అయితే_ముగింపు // GUI_MAY_FORK
 
 /*
  * Call this when vim starts up, whether or not the GUI is started
  */
-    void
-gui_prepare(int *argc, char **argv)
+    శూన్య
+gui_prepare(పూర్ణాంకం *argc, అక్షరం **argv)
 {
-    gui.in_use = false;		    // No GUI yet (maybe later)
+    gui.లోపల_use = false;		    // No GUI yet (maybe later)
     gui.starting = false;	    // No GUI yet (maybe later)
     gui_mch_prepare(argc, argv);
 }
@@ -401,95 +401,95 @@ gui_prepare(int *argc, char **argv)
  * Used from gui_init() to prepare for starting the GUI.
  * Returns FAIL or OK.
  */
-    int
-gui_init_check(void)
+    పూర్ణాంకం
+gui_init_check(శూన్య)
 {
-    static int result = MAYBE;
+    స్థిర పూర్ణాంకం ఫలితం = MAYBE;
 
-    if (result != MAYBE)
+    ఒకవేళ (ఫలితం != MAYBE)
     {
-	if (result == FAIL)
-	    emsg(_(e_cannot_start_the_GUI));
-	return result;
+	ఒకవేళ (ఫలితం == FAIL)
+	    emsg(_(e_cannot_ప్రారంభం_the_GUI));
+	తిరిగి ఫలితం;
     }
 
     gui.shell_created = false;
     gui.dying = false;
-    gui.in_focus = true;		// so the guicursor setting works
+    gui.లోపల_focus = true;		// so the guicursor setting works
     gui.dragged_sb = SBAR_NONE;
-    gui.dragged_wp = NULL;
-    gui.pointer_hidden = false;
-    gui.col = 0;
-    gui.row = 0;
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
+    gui.dragged_wp = ఖాళీ;
+    gui.సూచిక_hidden = false;
+    gui.నిలువు = 0;
+    gui.అడ్డువరుస = 0;
+    gui.అంకె_నిలువుల_సంఖ్య = Columns;
+    gui.అంకె_అడ్డువరుసలు = అడ్డువరుసలు;
 
     gui.cursor_is_valid = false;
-    gui.scroll_region_top = 0;
-    gui.scroll_region_bot = Rows - 1;
-    gui.scroll_region_left = 0;
-    gui.scroll_region_right = Columns - 1;
-    gui.highlight_mask = HL_NORMAL;
-    gui.char_width = 1;
-    gui.char_height = 1;
+    gui.scroll_region_శిఖరం = 0;
+    gui.scroll_region_bot = అడ్డువరుసలు - 1;
+    gui.scroll_region_ఎడమ = 0;
+    gui.scroll_region_కుడి = Columns - 1;
+    gui.highlight_ముసుగు = HL_సాధారణ;
+    gui.char_వెడల్పు = 1;
+    gui.char_ఎత్తు = 1;
     gui.char_ascent = 0;
-    gui.border_width = 0;
+    gui.border_వెడల్పు = 0;
 
     gui.norm_font = NOFONT;
-#ifndef FEAT_GUI_GTK
+#నిర్వచితం_కాకపోతే FEAT_GUI_GTK
     gui.bold_font = NOFONT;
     gui.ital_font = NOFONT;
     gui.boldital_font = NOFONT;
 # ifdef FEAT_XFONTSET
     gui.fontset = NOFONTSET;
 # endif
-#endif
+#అయితే_ముగింపు
     gui.wide_font = NOFONT;
-#ifndef FEAT_GUI_GTK
+#నిర్వచితం_కాకపోతే FEAT_GUI_GTK
     gui.wide_bold_font = NOFONT;
     gui.wide_ital_font = NOFONT;
     gui.wide_boldital_font = NOFONT;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 # ifndef FEAT_GUI_GTK
 #  ifdef FONTSET_ALWAYS
     gui.menu_fontset = NOFONTSET;
-#  else
+#  లేకపోతే
     gui.menu_font = NOFONT;
 #  endif
 # endif
-    gui.menu_is_active = true;	    // default: include menu
+    gui.menu_is_చురుకైన = true;	    // default: include menu
 # ifndef FEAT_GUI_GTK
-    gui.menu_height = MENU_DEFAULT_HEIGHT;
-    gui.menu_width = 0;
+    gui.menu_ఎత్తు = MENU_DEFAULT_ఎత్తు;
+    gui.menu_వెడల్పు = 0;
 # endif
-#endif
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
-    gui.toolbar_height = 0;
-#endif
-#ifdef FEAT_BEVAL_TIP
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
+    gui.toolbar_ఎత్తు = 0;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_BEVAL_TIP
     gui.tooltip_fontset = NOFONTSET;
-#endif
+#అయితే_ముగింపు
 
-    gui.scrollbar_width = gui.scrollbar_height = SB_DEFAULT_WIDTH;
+    gui.scrollbar_వెడల్పు = gui.scrollbar_ఎత్తు = SB_DEFAULT_వెడల్పు;
     gui.prev_wrap = -1;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     // Note: gui_set_ligatures() might already have been called e.g. from .vimrc,
     // and in that case we don't want to overwrite ligatures map that has already
     // been correctly populated (as that would lead to a cleared ligatures maps).
-    if (*p_guiligatures == NUL)
-	CLEAR_FIELD(gui.ligatures_map);
-#endif
+    ఒకవేళ (*p_guiligatures == NUL)
+	CLEAR_క్షేత్రం(gui.ligatures_map);
+#అయితే_ముగింపు
 
-#if defined(ALWAYS_USE_GUI) || defined(VIMDLL)
-    result = OK;
-#else
+#ఒకవేళ defined(ALWAYS_USE_GUI) || defined(VIMDLL)
+    ఫలితం = OK;
+#లేకపోతే
 # ifdef FEAT_GUI_GTK
     gui.is_x11 = false;
 #  ifdef FEAT_GUI_DIALOG
-    gui.dialogs_active = 0;
+    gui.dialogs_చురుకైన = 0;
     gui.dialog_focus_pending = 0;
 #  endif
 #  ifdef GDK_WINDOWING_WAYLAND
@@ -501,23 +501,23 @@ gui_init_check(void)
      * See gui_do_fork().
      * Use a simpler check if the GUI window can probably be opened.
      */
-    result = gui.dofork ? gui_mch_early_init_check(TRUE) : gui_mch_init_check();
-# else
-    result = gui_mch_init_check();
+    ఫలితం = gui.dofork ? gui_mch_early_init_check(TRUE) : gui_mch_init_check();
+# లేకపోతే
+    ఫలితం = gui_mch_init_check();
 # endif
-#endif
-    return result;
+#అయితే_ముగింపు
+    తిరిగి ఫలితం;
 }
 
 /*
  * This is the call which starts the GUI.
  */
-    void
-gui_init(void)
+    శూన్య
+gui_init(శూన్య)
 {
     win_T	*wp;
     tabpage_T	*tp;
-    static int	recursive = 0;
+    స్థిర పూర్ణాంకం	recursive = 0;
 
     /*
      * It's possible to use ":gui" in a .gvimrc file.  The first half of this
@@ -525,68 +525,68 @@ gui_init(void)
      * recursive call.  This allow the shell to be opened halfway reading a
      * gvimrc file.
      */
-    if (!recursive)
+    ఒకవేళ (!recursive)
     {
 	++recursive;
 
 	clip_init(TRUE);
 
 	// If can't initialize, don't try doing the rest
-	if (gui_init_check() == FAIL)
+	ఒకవేళ (gui_init_check() == FAIL)
 	{
 	    --recursive;
 	    clip_init(FALSE);
-	    return;
+	    తిరిగి;
 	}
 
 	/*
 	 * Reset 'paste'.  It's useful in the terminal, but not in the GUI.  It
 	 * breaks the Paste toolbar button.
 	 */
-	set_option_value_give_err((char_u *)"paste", 0L, NULL, 0);
+	సమితి_option_విలువ_give_err((char_u *)"paste", 0L, ఖాళీ, 0);
 
 	// Set t_Co to the number of colors: RGB.
-	set_color_count(256 * 256 * 256);
+	సమితి_color_లెక్క(256 * 256 * 256);
 
 	/*
 	 * Set up system-wide default menus.
 	 */
-#if defined(SYS_MENU_FILE) && defined(FEAT_MENU)
-	if (vim_strchr(p_go, GO_NOSYSMENU) == NULL)
+#ఒకవేళ defined(SYS_MENU_FILE) && defined(FEAT_MENU)
+	ఒకవేళ (vim_strchr(p_go, GO_NOSYSMENU) == ఖాళీ)
 	{
 	    sys_menu = TRUE;
-	    do_source((char_u *)SYS_MENU_FILE, FALSE, DOSO_NONE, NULL);
+	    do_ఆధారం((char_u *)SYS_MENU_FILE, FALSE, DOSO_NONE, ఖాళీ);
 	    sys_menu = FALSE;
 	}
-#endif
+#అయితే_ముగింపు
 
 	/*
 	 * Switch on the mouse by default, unless the user changed it already.
 	 * This can then be changed in the .gvimrc.
 	 */
-	if (!option_was_set((char_u *)"mouse"))
-	    set_string_option_direct((char_u *)"mouse", -1,
+	ఒకవేళ (!option_was_సమితి((char_u *)"mouse"))
+	    సమితి_string_option_ప్రత్యక్ష((char_u *)"mouse", -1,
 					   (char_u *)"a", OPT_FREE, SID_NONE);
 
 	/*
 	 * If -U option given, use only the initializations from that file and
 	 * nothing else.  Skip all initializations for "-U NONE" or "-u NORC".
 	 */
-	if (use_gvimrc != NULL)
+	ఒకవేళ (use_gvimrc != ఖాళీ)
 	{
-	    if (STRCMP(use_gvimrc, "NONE") != 0
+	    ఒకవేళ (STRCMP(use_gvimrc, "NONE") != 0
 		    && STRCMP(use_gvimrc, "NORC") != 0
-		    && do_source(use_gvimrc, FALSE, DOSO_NONE, NULL) != OK)
+		    && do_ఆధారం(use_gvimrc, FALSE, DOSO_NONE, ఖాళీ) != OK)
 		semsg(_(e_cannot_read_from_str), use_gvimrc);
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Get system wide defaults for gvim, only when file name defined.
 	     */
-#ifdef SYS_GVIMRC_FILE
-	    do_source((char_u *)SYS_GVIMRC_FILE, FALSE, DOSO_NONE, NULL);
-#endif
+#నిర్వచితమైతే SYS_GVIMRC_FILE
+	    do_ఆధారం((char_u *)SYS_GVIMRC_FILE, FALSE, DOSO_NONE, ఖాళీ);
+#అయితే_ముగింపు
 
 	    /*
 	     * Try to read GUI initialization commands from the following
@@ -597,23 +597,23 @@ gui_init(void)
 	     * - the third user gvimrc file ($VIM/.gvimrc for Amiga)
 	     * The first that exists is used, the rest is ignored.
 	     */
-	    if (process_env((char_u *)"GVIMINIT", FALSE) == FAIL
-		 && do_source((char_u *)USR_GVIMRC_FILE, TRUE,
-						     DOSO_GVIMRC, NULL) == FAIL
-#ifdef USR_GVIMRC_FILE2
-		 && do_source((char_u *)USR_GVIMRC_FILE2, TRUE,
-						     DOSO_GVIMRC, NULL) == FAIL
-#endif
-#ifdef USR_GVIMRC_FILE3
-		 && do_source((char_u *)USR_GVIMRC_FILE3, TRUE,
-						     DOSO_GVIMRC, NULL) == FAIL
-#endif
+	    ఒకవేళ (process_env((char_u *)"GVIMINIT", FALSE) == FAIL
+		 && do_ఆధారం((char_u *)USR_GVIMRC_FILE, TRUE,
+						     DOSO_GVIMRC, ఖాళీ) == FAIL
+#నిర్వచితమైతే USR_GVIMRC_FILE2
+		 && do_ఆధారం((char_u *)USR_GVIMRC_FILE2, TRUE,
+						     DOSO_GVIMRC, ఖాళీ) == FAIL
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_GVIMRC_FILE3
+		 && do_ఆధారం((char_u *)USR_GVIMRC_FILE3, TRUE,
+						     DOSO_GVIMRC, ఖాళీ) == FAIL
+#అయితే_ముగింపు
 				)
 	    {
-#ifdef USR_GVIMRC_FILE4
-		(void)do_source((char_u *)USR_GVIMRC_FILE4, TRUE,
-							    DOSO_GVIMRC, NULL);
-#endif
+#నిర్వచితమైతే USR_GVIMRC_FILE4
+		(శూన్య)do_ఆధారం((char_u *)USR_GVIMRC_FILE4, TRUE,
+							    DOSO_GVIMRC, ఖాళీ);
+#అయితే_ముగింపు
 	    }
 
 	    /*
@@ -626,169 +626,169 @@ gui_init(void)
 	     * Only do this if GVIMRC_FILE is not the same as USR_GVIMRC_FILE,
 	     * USR_GVIMRC_FILE2, USR_GVIMRC_FILE3 or SYS_GVIMRC_FILE.
 	     */
-	    if (p_exrc)
+	    ఒకవేళ (p_exrc)
 	    {
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		{
 		    stat_T s;
 
 		    // if ".gvimrc" file is not owned by user, set 'secure'
-		    // mode
-		    if (mch_stat(GVIMRC_FILE, &s) || s.st_uid != getuid())
+		    //బహుళకం
+		    ఒకవేళ (mch_stat(GVIMRC_FILE, &s) || s.st_uid != getuid())
 			secure = p_secure;
 		}
-#else
+#లేకపోతే
 		secure = p_secure;
-#endif
+#అయితే_ముగింపు
 
-		if (       fullpathcmp((char_u *)USR_GVIMRC_FILE,
+		ఒకవేళ (       fullpathcmp((char_u *)USR_GVIMRC_FILE,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
-#ifdef SYS_GVIMRC_FILE
+#నిర్వచితమైతే SYS_GVIMRC_FILE
 			&& fullpathcmp((char_u *)SYS_GVIMRC_FILE,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
-#endif
-#ifdef USR_GVIMRC_FILE2
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_GVIMRC_FILE2
 			&& fullpathcmp((char_u *)USR_GVIMRC_FILE2,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
-#endif
-#ifdef USR_GVIMRC_FILE3
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_GVIMRC_FILE3
 			&& fullpathcmp((char_u *)USR_GVIMRC_FILE3,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
-#endif
-#ifdef USR_GVIMRC_FILE4
+#అయితే_ముగింపు
+#నిర్వచితమైతే USR_GVIMRC_FILE4
 			&& fullpathcmp((char_u *)USR_GVIMRC_FILE4,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
-#endif
+#అయితే_ముగింపు
 			)
-		    do_source((char_u *)GVIMRC_FILE, TRUE, DOSO_GVIMRC, NULL);
+		    do_ఆధారం((char_u *)GVIMRC_FILE, TRUE, DOSO_GVIMRC, ఖాళీ);
 
-		if (secure == 2)
+		ఒకవేళ (secure == 2)
 		    need_wait_return = TRUE;
 		secure = 0;
 	    }
 	}
 
-	if (need_wait_return || msg_didany)
+	ఒకవేళ (need_wait_return || సందేశం_didany)
 	    wait_return(TRUE);
 
 	--recursive;
     }
 
     // If recursive call opened the shell, return here from the first call
-    if (gui.in_use)
-	return;
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
 
     /*
      * Create the GUI shell.
      */
-    gui.in_use = true;		// Must be set after menus have been set up
-#if defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
+    gui.లోపల_use = true;		// Must be set after menus have been set up
+#ఒకవేళ defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
     gui.scale = 1.0; // Default value
-#endif
-    if (gui_mch_init() == FAIL)
-	goto error;
+#అయితే_ముగింపు
+    ఒకవేళ (gui_mch_init() == FAIL)
+	వెళ్ళు error;
 
     // Avoid a delay for an error message that was printed in the terminal
     // where Vim was started.
     emsg_on_display = FALSE;
-    msg_scrolled = 0;
-    clear_sb_text(TRUE);
+    సందేశం_scrolled = 0;
+    clear_sb_పాఠ్యం(TRUE);
     need_wait_return = FALSE;
-    msg_didany = FALSE;
+    సందేశం_didany = FALSE;
 
     /*
      * Check validity of any generic resources that may have been loaded.
      */
-    if (gui.border_width < 0)
-	gui.border_width = 0;
+    ఒకవేళ (gui.border_వెడల్పు < 0)
+	gui.border_వెడల్పు = 0;
 
     /*
      * Set up the fonts.  First use a font specified with "-fn" or "-font".
      */
-    if (font_argument != NULL)
-	set_option_value_give_err((char_u *)"gfn",
-					       0L, (char_u *)font_argument, 0);
-    if (
-#ifdef FEAT_XFONTSET
+    ఒకవేళ (font_వాదం != ఖాళీ)
+	సమితి_option_విలువ_give_err((char_u *)"gfn",
+					       0L, (char_u *)font_వాదం, 0);
+    ఒకవేళ (
+#నిర్వచితమైతే FEAT_XFONTSET
 	    (*p_guifontset == NUL
 	     || gui_init_font(p_guifontset, TRUE) == FAIL) &&
-#endif
+#అయితే_ముగింపు
 	    gui_init_font(*p_guifont == NUL ? hl_get_font_name()
 						  : p_guifont, FALSE) == FAIL)
     {
-	emsg(_(e_cannot_start_gui_no_valid_font_found));
-	goto error2;
+	emsg(_(e_cannot_ప్రారంభం_gui_no_valid_font_దొరికింది));
+	వెళ్ళు error2;
     }
-    if (gui_get_wide_font() == FAIL)
+    ఒకవేళ (gui_get_wide_font() == FAIL)
 	emsg(_(e_guifontwide_invalid));
 
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
+    gui.అంకె_నిలువుల_సంఖ్య = Columns;
+    gui.అంకె_అడ్డువరుసలు = అడ్డువరుసలు;
     gui_reset_scroll_region();
 
     // Create initial scrollbars
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	gui_create_scrollbar(&wp->w_scrollbars[SBAR_LEFT], SBAR_LEFT, wp);
-	gui_create_scrollbar(&wp->w_scrollbars[SBAR_RIGHT], SBAR_RIGHT, wp);
+	gui_create_scrollbar(&wp->w_scrollbars[SBAR_ఎడమ], SBAR_ఎడమ, wp);
+	gui_create_scrollbar(&wp->w_scrollbars[SBAR_కుడి], SBAR_కుడి, wp);
     }
-    gui_create_scrollbar(&gui.bottom_sbar, SBAR_BOTTOM, NULL);
+    gui_create_scrollbar(&gui.bottom_sbar, SBAR_BOTTOM, ఖాళీ);
 
-#ifdef FEAT_MENU
-    gui_create_initial_menus(root_menu);
-#endif
-#ifdef FEAT_SIGN_ICONS
+#నిర్వచితమైతే FEAT_MENU
+    gui_create_initial_menus(మూలం_menu);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SIGN_ICONS
     sign_gui_started();
-#endif
+#అయితే_ముగింపు
 
     // Configure the desired menu and scrollbars
-    gui_init_which_components(NULL);
+    gui_init_which_components(ఖాళీ);
 
     // All components of the GUI have been created now
     gui.shell_created = true;
 
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
     // Set the shell size, adjusted for the screen size.  For GTK this only
     // works after the shell has been opened, thus it is further down.
     // If the window is already maximized (e.g. when --windowid is passed in),
     // we want to use the system-provided dimensions by passing FALSE to
     // mustset. Otherwise, we want to initialize with the default rows/columns.
-    if (gui_mch_maximized())
-	gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-    else
-	gui_set_shellsize(TRUE, TRUE, RESIZE_BOTH);
-#else
+    ఒకవేళ (gui_mch_maximized())
+	gui_సమితి_shellsize(FALSE, TRUE, RESIZE_BOTH);
+    లేకపోతే
+	gui_సమితి_shellsize(TRUE, TRUE, RESIZE_BOTH);
+#లేకపోతే
 # ifndef FEAT_GUI_GTK
-    gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
+    gui_సమితి_shellsize(FALSE, TRUE, RESIZE_BOTH);
 # endif
-#endif
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     // Need to set the size of the menubar after all the menus have been
     // created.
-    gui_mch_compute_menu_height((Widget)0);
-#endif
+    gui_mch_compute_menu_ఎత్తు((Widget)0);
+#అయితే_ముగింపు
 
     /*
      * Actually open the GUI shell.
      */
-    if (gui_mch_open() != FAIL)
+    ఒకవేళ (gui_mch_open() != FAIL)
     {
 	maketitle();
 	resettitle();
 
 	init_gui_options();
-#ifdef FEAT_ARABIC
+#నిర్వచితమైతే FEAT_ARABIC
 	// Our GUI can't do bidi.
 	p_tbidi = FALSE;
-#endif
-#if defined(FEAT_GUI_GTK)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_GTK)
 	// Give GTK+ a chance to put all widget's into place.
 	gui_mch_update();
 
 # ifdef FEAT_MENU
 	// If there is no 'm' in 'guioptions' we need to remove the menu now.
 	// It was still there to make F10 work.
-	if (vim_strchr(p_go, GO_MENUS) == NULL)
+	ఒకవేళ (vim_strchr(p_go, GO_MENUS) == ఖాళీ)
 	{
 	    bool save_starting = gui.starting;
 
@@ -800,89 +800,89 @@ gui_init(void)
 # endif
 
 	// Now make sure the shell fits on the screen.
-	if (gui_mch_maximized())
-	    gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-	else
-	    gui_set_shellsize(TRUE, TRUE, RESIZE_BOTH);
-#endif
+	ఒకవేళ (gui_mch_maximized())
+	    gui_సమితి_shellsize(FALSE, TRUE, RESIZE_BOTH);
+	లేకపోతే
+	    gui_సమితి_shellsize(TRUE, TRUE, RESIZE_BOTH);
+#అయితే_ముగింపు
 	// When 'lines' was set while starting up the topframe may have to be
 	// resized.
 	win_new_shellsize();
 
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
 	// Always create the Balloon Evaluation area, but disable it when
 	// 'ballooneval' is off.
-	if (balloonEval != NULL)
+	ఒకవేళ (balloonEval != ఖాళీ)
 	{
 # ifdef FEAT_VARTABS
 	    vim_free(balloonEval->vts);
 # endif
 	    vim_free(balloonEval);
 	}
-	balloonEvalForTerm = FALSE;
+	balloon_Eval_For_పదం = FALSE;
 # ifdef FEAT_GUI_GTK
-	balloonEval = gui_mch_create_beval_area(gui.drawarea, NULL,
-						     &general_beval_cb, NULL);
-# else
-#  if defined(FEAT_GUI_MOTIF)
+	balloonEval = gui_mch_create_beval_area(gui.drawarea, ఖాళీ,
+						     &general_beval_cb, ఖాళీ);
+# లేకపోతే
+#  ఒకవేళ defined(FEAT_GUI_MOTIF)
 	{
-	    extern Widget	textArea;
-	    balloonEval = gui_mch_create_beval_area(textArea, NULL,
-						     &general_beval_cb, NULL);
+	    బాహ్య Widget	పాఠ్యం_Area;
+	    balloonEval = gui_mch_create_beval_area(పాఠ్యం_Area, ఖాళీ,
+						     &general_beval_cb, ఖాళీ);
 	}
-#  else
+#  లేకపోతే
 #   ifdef FEAT_GUI_MSWIN
-	balloonEval = gui_mch_create_beval_area(NULL, NULL,
-						     &general_beval_cb, NULL);
+	balloonEval = gui_mch_create_beval_area(ఖాళీ, ఖాళీ,
+						     &general_beval_cb, ఖాళీ);
 #   endif
 #  endif
 # endif
-	if (!p_beval)
+	ఒకవేళ (!p_beval)
 	    gui_mch_disable_beval_area(balloonEval);
-#endif
+#అయితే_ముగింపు
 
-#ifndef FEAT_GUI_MSWIN
+#నిర్వచితం_కాకపోతే FEAT_GUI_MSWIN
 	// In the GUI modifiers are prepended to keys.
 	// Don't do this for MS-Windows yet, it sends CTRL-K without the
 	// modifier.
-	seenModifyOtherKeys = TRUE;
-#endif
+	చూసిన_Modify_Other_కీలకాలు = TRUE;
+#అయితే_ముగింపు
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-	if (!im_xim_isvalid_imactivate())
-	    emsg(_(e_value_of_imactivatekey_is_invalid));
-#endif
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+	ఒకవేళ (!im_xim_isvalid_imactivate())
+	    emsg(_(e_విలువ_యొక్క_imactivatekey_is_invalid));
+#అయితే_ముగింపు
 	// When 'cmdheight' was set during startup it may not have taken
 	// effect yet.
-	if (p_ch != 1L)
-	    command_height();
+	ఒకవేళ (p_ch != 1L)
+	    command_ఎత్తు();
 
-	return;
+	తిరిగి;
     }
 
 error2:
-#ifdef FEAT_GUI_X11
+#నిర్వచితమైతే FEAT_GUI_X11
     // undo gui_mch_init()
     gui_mch_uninit();
-#endif
+#అయితే_ముగింపు
 
 error:
-    gui.in_use = false;
+    gui.లోపల_use = false;
     clip_init(FALSE);
 }
 
 
-    void
-gui_exit(int rc)
+    శూన్య
+gui_exit(పూర్ణాంకం rc)
 {
     // don't free the fonts, it leads to a BUS error
     // richard@whitequeen.com Jul 99
     free_highlight_fonts();
-    gui.in_use = false;
+    gui.లోపల_use = false;
     gui_mch_exit(rc);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN) \
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_PHOTON)
 # define NEED_GUI_UPDATE_SCREEN 1
 /*
@@ -891,32 +891,32 @@ gui_exit(int rc)
  * do.
  * When this function returns, Vim should NOT exit!
  */
-    void
-gui_shell_closed(void)
+    శూన్య
+gui_shell_closed(శూన్య)
 {
     cmdmod_T	    save_cmdmod = cmdmod;
 
-    if (before_quit_autocmds(curwin, TRUE, FALSE))
-	return;
+    ఒకవేళ (before_quit_autocmds(curwin, TRUE, FALSE))
+	తిరిగి;
 
     // Only exit when there are no changed files
     exiting = TRUE;
 # ifdef FEAT_BROWSE
     cmdmod.cmod_flags |= CMOD_BROWSE;
 # endif
-# if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+# ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     cmdmod.cmod_flags |= CMOD_CONFIRM;
 # endif
     // If there are changed buffers, present the user with a dialog if
     // possible, otherwise give an error message.
-    if (!check_changed_any(FALSE, FALSE))
+    ఒకవేళ (!check_మారింది_any(FALSE, FALSE))
 	getout(0);
 
     exiting = FALSE;
     cmdmod = save_cmdmod;
     gui_update_screen();	// redraw, window may show changed buffer
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the font.  "font_list" is a comma separated list of font names.  The
@@ -926,255 +926,255 @@ gui_shell_closed(void)
  * Return OK when able to set the font.  When it failed FAIL is returned and
  * the fonts are unchanged.
  */
-    int
-gui_init_font(char_u *font_list, int fontset UNUSED)
+    పూర్ణాంకం
+gui_init_font(char_u *font_list, పూర్ణాంకం fontset వాడని)
 {
-#define FONTLEN 320
+#నిర్వచించు FONTLEN 320
     char_u	font_name[FONTLEN];
-    int		font_list_empty = FALSE;
-    int		ret = FAIL;
+    పూర్ణాంకం		font_list_ఖాళీలు = FALSE;
+    పూర్ణాంకం		ret = FAIL;
 
-    if (!gui.in_use)
-	return FAIL;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి FAIL;
 
     font_name[0] = NUL;
-    if (*font_list == NUL)
-	font_list_empty = TRUE;
-    else
+    ఒకవేళ (*font_list == NUL)
+	font_list_ఖాళీలు = TRUE;
+    లేకపోతే
     {
-#ifdef FEAT_XFONTSET
+#నిర్వచితమైతే FEAT_XFONTSET
 	// When using a fontset, the whole list of fonts is one name.
-	if (fontset)
+	ఒకవేళ (fontset)
 	    ret = gui_mch_init_font(font_list, TRUE);
-	else
-#endif
-	    while (*font_list != NUL)
+	లేకపోతే
+#అయితే_ముగింపు
+	    అయితే (*font_list != NUL)
 	    {
 		// Isolate one comma separated font name.
-		(void)copy_option_part(&font_list, font_name, FONTLEN, ",");
+		(శూన్య)copy_option_part(&font_list, font_name, FONTLEN, ",");
 
 		// Careful!!!  The Win32 version of gui_mch_init_font(), when
 		// called with "*" will change p_guifont to the selected font
 		// name, which frees the old value.  This makes font_list
 		// invalid.  Thus when OK is returned here, font_list must no
 		// longer be used!
-		if (gui_mch_init_font(font_name, FALSE) == OK)
+		ఒకవేళ (gui_mch_init_font(font_name, FALSE) == OK)
 		{
-#ifdef USE_SET_GUIFONTWIDE
+#నిర్వచితమైతే USE_సమితి_GUIFONTWIDE
 		    // If it's a Unicode font, try setting 'guifontwide' to a
 		    // similar double-width font.
-		    if ((p_guifontwide == NULL || *p_guifontwide == NUL)
-				&& strstr((char *)font_name, "10646") != NULL)
-			set_guifontwide(font_name);
-#endif
+		    ఒకవేళ ((p_guifontwide == ఖాళీ || *p_guifontwide == NUL)
+				&& అక్షరశ్రేణి_శోధన((అక్షరం *)font_name, "10646") != ఖాళీ)
+			సమితి_guifontwide(font_name);
+#అయితే_ముగింపు
 		    ret = OK;
-		    break;
+		    ఆపు;
 		}
 	    }
     }
 
-    if (ret != OK
+    ఒకవేళ (ret != OK
 	    && STRCMP(font_list, "*") != 0
-	    && (font_list_empty || gui.norm_font == NOFONT))
+	    && (font_list_ఖాళీలు || gui.norm_font == NOFONT))
     {
 	/*
 	 * Couldn't load any font in 'font_list', keep the current font if
 	 * there is one.  If 'font_list' is empty, or if there is no current
 	 * font, tell gui_mch_init_font() to try to find a font we can load.
 	 */
-	ret = gui_mch_init_font(NULL, FALSE);
+	ret = gui_mch_init_font(ఖాళీ, FALSE);
     }
 
-    if (ret == OK)
+    ఒకవేళ (ret == OK)
     {
-#ifndef FEAT_GUI_GTK
+#నిర్వచితం_కాకపోతే FEAT_GUI_GTK
 	// Set normal font as current font
 # ifdef FEAT_XFONTSET
-	if (gui.fontset != NOFONTSET)
-	    gui_mch_set_fontset(gui.fontset);
-	else
+	ఒకవేళ (gui.fontset != NOFONTSET)
+	    gui_mch_సమితి_fontset(gui.fontset);
+	లేకపోతే
 # endif
-	    gui_mch_set_font(gui.norm_font);
-#endif
-	gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
+	    gui_mch_సమితి_font(gui.norm_font);
+#అయితే_ముగింపు
+	gui_సమితి_shellsize(FALSE, TRUE, RESIZE_BOTH);
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
-#ifdef USE_SET_GUIFONTWIDE
+#నిర్వచితమైతే USE_సమితి_GUIFONTWIDE
 /*
  * Try setting 'guifontwide' to a font twice as wide as "name".
  */
-    static void
-set_guifontwide(char_u *name)
+    స్థిర శూన్య
+సమితి_guifontwide(char_u *name)
 {
-    int		i = 0;
+    పూర్ణాంకం		i = 0;
     char_u	wide_name[FONTLEN + 10]; // room for 2 * width and '*'
-    char_u	*wp = NULL;
+    char_u	*wp = ఖాళీ;
     char_u	*p;
     GuiFont	font;
 
     wp = wide_name;
-    for (p = name; *p != NUL; ++p)
+    కొరకు (p = name; *p != NUL; ++p)
     {
 	*wp++ = *p;
-	if (*p == '-')
+	ఒకవేళ (*p == '-')
 	{
 	    ++i;
-	    if (i == 6)		// font type: change "--" to "-*-"
+	    ఒకవేళ (i == 6)		// font type: change "--" to "-*-"
 	    {
-		if (p[1] == '-')
+		ఒకవేళ (p[1] == '-')
 		    *wp++ = '*';
 	    }
-	    else if (i == 12)	// found the width
+	    లేకపోతే ఒకవేళ (i == 12)	// found the width
 	    {
 		++p;
 		i = getdigits(&p);
-		if (i != 0)
+		ఒకవేళ (i != 0)
 		{
 		    // Double the width specification.
-		    sprintf((char *)wp, "%d%s", i * 2, p);
+		    sprintf((అక్షరం *)wp, "%d%s", i * 2, p);
 		    font = gui_mch_get_font(wide_name, FALSE);
-		    if (font != NOFONT)
+		    ఒకవేళ (font != NOFONT)
 		    {
 			gui_mch_free_font(gui.wide_font);
 			gui.wide_font = font;
-			set_string_option_direct((char_u *)"gfw", -1,
+			సమితి_string_option_ప్రత్యక్ష((char_u *)"gfw", -1,
 						      wide_name, OPT_FREE, 0);
 		    }
 		}
-		break;
+		ఆపు;
 	    }
 	}
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get the font for 'guifontwide'.
  * Return FAIL for an invalid font name.
  */
-    int
-gui_get_wide_font(void)
+    పూర్ణాంకం
+gui_get_wide_font(శూన్య)
 {
     GuiFont	font = NOFONT;
     char_u	font_name[FONTLEN];
     char_u	*p;
 
-    if (!gui.in_use)	    // Can't allocate font yet, assume it's OK.
-	return OK;	    // Will give an error message later.
+    ఒకవేళ (!gui.లోపల_use)	    // Can't allocate font yet, assume it's OK.
+	తిరిగి OK;	    // Will give an error message later.
 
-    if (p_guifontwide != NULL && *p_guifontwide != NUL)
+    ఒకవేళ (p_guifontwide != ఖాళీ && *p_guifontwide != NUL)
     {
-	for (p = p_guifontwide; *p != NUL; )
+	కొరకు (p = p_guifontwide; *p != NUL; )
 	{
 	    // Isolate one comma separated font name.
-	    (void)copy_option_part(&p, font_name, FONTLEN, ",");
+	    (శూన్య)copy_option_part(&p, font_name, FONTLEN, ",");
 	    font = gui_mch_get_font(font_name, FALSE);
-	    if (font != NOFONT)
-		break;
+	    ఒకవేళ (font != NOFONT)
+		ఆపు;
 	}
-	if (font == NOFONT)
-	    return FAIL;
+	ఒకవేళ (font == NOFONT)
+	    తిరిగి FAIL;
     }
 
     gui_mch_free_font(gui.wide_font);
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
     // Avoid unnecessary overhead if 'guifontwide' is equal to 'guifont'.
-    if (font != NOFONT && gui.norm_font != NOFONT
+    ఒకవేళ (font != NOFONT && gui.norm_font != NOFONT
 			 && pango_font_description_equal(font, gui.norm_font))
     {
 	gui.wide_font = NOFONT;
 	gui_mch_free_font(font);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
 	gui.wide_font = font;
-#ifdef FEAT_GUI_MSWIN
-    gui_mch_wide_font_changed();
-#else
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    gui_mch_wide_font_మారింది();
+#లేకపోతే
     /*
      * TODO: setup wide_bold_font, wide_ital_font and wide_boldital_font to
      * support those fonts for 'guifontwide'.
      */
-#endif
-    return OK;
+#అయితే_ముగింపు
+    తిరిగి OK;
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 /*
  * Set list of ascii characters that combined can create ligature.
  * Store them in char map for quick access from gui_gtk_draw_string.
  */
-    void
-gui_set_ligatures(void)
+    శూన్య
+gui_సమితి_ligatures(శూన్య)
 {
     char_u	*p;
 
-    if (*p_guiligatures != NUL)
+    ఒకవేళ (*p_guiligatures != NUL)
     {
 	// check for invalid characters
-	for (p = p_guiligatures; *p != NUL; ++p)
-	    if (*p < 32 || *p > 127)
+	కొరకు (p = p_guiligatures; *p != NUL; ++p)
+	    ఒకవేళ (*p < 32 || *p > 127)
 	    {
-		emsg(_(e_ascii_code_not_in_range));
-		return;
+		emsg(_(e_ascii_సంకేతం_not_లోపల_range));
+		తిరిగి;
 	    }
 
 	// store valid setting into ligatures_map
-	CLEAR_FIELD(gui.ligatures_map);
-	for (p = p_guiligatures; *p != NUL; ++p)
+	CLEAR_క్షేత్రం(gui.ligatures_map);
+	కొరకు (p = p_guiligatures; *p != NUL; ++p)
 	    gui.ligatures_map[*p] = 1;
     }
-    else
-	CLEAR_FIELD(gui.ligatures_map);
+    లేకపోతే
+	CLEAR_క్షేత్రం(gui.ligatures_map);
 }
 
 /*
  * Adjust the columns to undraw for when the cursor is on ligatures.
  */
-    static void
-gui_adjust_undraw_cursor_for_ligatures(int *startcol, int *endcol)
+    స్థిర శూన్య
+gui_adjust_undraw_cursor_for_ligatures(పూర్ణాంకం *startcol, పూర్ణాంకం *endcol)
 {
-    int off;
+    పూర్ణాంకం off;
 
-    if (ScreenLines == NULL || *p_guiligatures == NUL)
-	return;
+    ఒకవేళ (Screen_పంక్తులు == ఖాళీ || *p_guiligatures == NUL)
+	తిరిగి;
 
     // expand before the cursor for all the chars in gui.ligatures_map
-    off = LineOffset[gui.cursor_row] + *startcol;
-    if (gui.ligatures_map[ScreenLines[off]])
-	while (*startcol > 0 && gui.ligatures_map[ScreenLines[--off]])
+    off = పంక్తి_స్థానభ్రంశం[gui.cursor_అడ్డువరుస] + *startcol;
+    ఒకవేళ (gui.ligatures_map[Screen_పంక్తులు[off]])
+	అయితే (*startcol > 0 && gui.ligatures_map[Screen_పంక్తులు[--off]])
 	    (*startcol)--;
 
     // expand after the cursor for all the chars in gui.ligatures_map
-    off = LineOffset[gui.cursor_row] + *endcol;
-    if (gui.ligatures_map[ScreenLines[off]])
-	while (*endcol < ((int)screen_Columns - 1)
-				      && gui.ligatures_map[ScreenLines[++off]])
+    off = పంక్తి_స్థానభ్రంశం[gui.cursor_అడ్డువరుస] + *endcol;
+    ఒకవేళ (gui.ligatures_map[Screen_పంక్తులు[off]])
+	అయితే (*endcol < ((పూర్ణాంకం)screen_Columns - 1)
+				      && gui.ligatures_map[Screen_పంక్తులు[++off]])
 	   (*endcol)++;
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-gui_set_cursor(int row, int col)
+    స్థిర శూన్య
+gui_సమితి_cursor(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    gui.row = row;
-    gui.col = col;
+    gui.అడ్డువరుస = అడ్డువరుస;
+    gui.నిలువు = నిలువు;
 }
 
 /*
  * gui_check_pos - check if the cursor is on the screen.
  */
-    static void
-gui_check_pos(void)
+    స్థిర శూన్య
+gui_check_pos(శూన్య)
 {
-    if (gui.row >= screen_Rows)
-	gui.row = screen_Rows - 1;
-    if (gui.col >= screen_Columns)
-	gui.col = screen_Columns - 1;
-    if (gui.cursor_row >= screen_Rows || gui.cursor_col >= screen_Columns)
+    ఒకవేళ (gui.అడ్డువరుస >= screen_అడ్డువరుసలు)
+	gui.అడ్డువరుస = screen_అడ్డువరుసలు - 1;
+    ఒకవేళ (gui.నిలువు >= screen_Columns)
+	gui.నిలువు = screen_Columns - 1;
+    ఒకవేళ (gui.cursor_అడ్డువరుస >= screen_అడ్డువరుసలు || gui.cursor_నిలువు >= screen_Columns)
 	gui.cursor_is_valid = false;
 }
 
@@ -1183,66 +1183,66 @@ gui_check_pos(void)
  * Careful: The contents of ScreenLines[] must match what is on the screen,
  * otherwise this goes wrong.  May need to call out_flush() first.
  */
-    void
+    శూన్య
 gui_update_cursor(
-    int		force,		 // when TRUE, update even when not moved
-    int		clear_selection) // clear selection under cursor
+    పూర్ణాంకం		force,		 // when TRUE, update even when not moved
+    పూర్ణాంకం		clear_selection) // clear selection under cursor
 {
-    int		cur_width = 0;
-    int		cur_height = 0;
-    int		old_hl_mask;
+    పూర్ణాంకం		cur_వెడల్పు = 0;
+    పూర్ణాంకం		cur_ఎత్తు = 0;
+    పూర్ణాంకం		old_hl_ముసుగు;
     cursorentry_T *shape;
-    int		id;
-#ifdef FEAT_TERMINAL
+    పూర్ణాంకం		id;
+#నిర్వచితమైతే FEAT_TERMINAL
     guicolor_T	shape_fg = INVALCOLOR;
     guicolor_T	shape_bg = INVALCOLOR;
-#endif
+#అయితే_ముగింపు
     guicolor_T	cfg, cbg, cc;	// cursor fore-/background color
-    int		cattr;		// cursor attributes
-    int		attr;
-    attrentry_T *aep = NULL;
-#if (defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) && !defined(USE_GTK4)
-    bool	lig_left = false, lig_right = false;
-#endif
+    పూర్ణాంకం		cattr;		// cursor attributes
+    పూర్ణాంకం		attr;
+    attrentry_T *aep = ఖాళీ;
+#ఒకవేళ (defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) && !defined(USE_GTK4)
+    bool	lig_ఎడమ = false, lig_కుడి = false;
+#అయితే_ముగింపు
 
     // Don't update the cursor when halfway busy scrolling or the screen size
     // doesn't match 'columns' and 'lines.  ScreenLines[] isn't valid then.
-    if (!can_update_cursor || screen_Columns != gui.num_cols
-					       || screen_Rows != gui.num_rows)
-	return;
+    ఒకవేళ (!can_update_cursor || screen_Columns != gui.అంకె_నిలువుల_సంఖ్య
+					       || screen_అడ్డువరుసలు != gui.అంకె_అడ్డువరుసలు)
+	తిరిగి;
 
     gui_check_pos();
 
-    if (gui.cursor_is_valid && !force
-		&& gui.row == gui.cursor_row && gui.col == gui.cursor_col)
-	return;
+    ఒకవేళ (gui.cursor_is_valid && !force
+		&& gui.అడ్డువరుస == gui.cursor_అడ్డువరుస && gui.నిలువు == gui.cursor_నిలువు)
+	తిరిగి;
 
     gui_undraw_cursor();
 
     // If a cursor-less sleep is ongoing, leave the cursor invisible
-    if (cursor_is_sleeping())
-	return;
+    ఒకవేళ (cursor_is_sleeping())
+	తిరిగి;
 
-    if (gui.row < 0)
-	return;
-#ifdef HAVE_INPUT_METHOD
-    if (gui.row != gui.cursor_row || gui.col != gui.cursor_col)
-	im_set_position(gui.row, gui.col);
-#endif
-    gui.cursor_row = gui.row;
-    gui.cursor_col = gui.col;
+    ఒకవేళ (gui.అడ్డువరుస < 0)
+	తిరిగి;
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    ఒకవేళ (gui.అడ్డువరుస != gui.cursor_అడ్డువరుస || gui.నిలువు != gui.cursor_నిలువు)
+	im_సమితి_position(gui.అడ్డువరుస, gui.నిలువు);
+#అయితే_ముగింపు
+    gui.cursor_అడ్డువరుస = gui.అడ్డువరుస;
+    gui.cursor_నిలువు = gui.నిలువు;
 
     // Only write to the screen after ScreenLines[] has been initialized
-    if (!screen_cleared || ScreenLines == NULL)
-	return;
+    ఒకవేళ (!screen_cleared || Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
     // Clear the selection if we are about to write over it
-    if (clear_selection)
-	clip_may_clear_selection(gui.row, gui.row);
+    ఒకవేళ (clear_selection)
+	clip_may_clear_selection(gui.అడ్డువరుస, gui.అడ్డువరుస);
     // Check that the cursor is inside the shell (resizing may have made
     // it invalid)
-    if (gui.row >= screen_Rows || gui.col >= screen_Columns)
-	return;
+    ఒకవేళ (gui.అడ్డువరుస >= screen_అడ్డువరుసలు || gui.నిలువు >= screen_Columns)
+	తిరిగి;
 
     gui.cursor_is_valid = true;
 
@@ -1250,113 +1250,113 @@ gui_update_cursor(
      * How the cursor is drawn depends on the current mode.
      * When in a terminal window use the shape/color specified there.
      */
-#ifdef FEAT_TERMINAL
-    if (terminal_is_active())
-	shape = term_get_cursor_shape(&shape_fg, &shape_bg);
-    else
-#endif
-	shape = &shape_table[get_shape_idx(FALSE)];
-    if (State & MODE_LANGMAP)
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (terminal_is_చురుకైన())
+	shape = పదం_get_cursor_shape(&shape_fg, &shape_bg);
+    లేకపోతే
+#అయితే_ముగింపు
+	shape = &shape_పట్టిక[get_shape_idx(FALSE)];
+    ఒకవేళ (State & బహుళకం_LANGMAP)
 	id = shape->id_lm;
-    else
+    లేకపోతే
 	id = shape->id;
 
     // get the colors and attributes for the cursor.  Default is inverted
     cfg = INVALCOLOR;
     cbg = INVALCOLOR;
     cattr = HL_INVERSE;
-    gui_mch_set_blinking(shape->blinkwait,
+    gui_mch_సమితి_blinking(shape->blinkwait,
 	    shape->blinkon,
 	    shape->blinkoff);
-    if (shape->blinkwait == 0 || shape->blinkon == 0
+    ఒకవేళ (shape->blinkwait == 0 || shape->blinkon == 0
 	    || shape->blinkoff == 0)
 	gui_mch_stop_blink(FALSE);
-#ifdef FEAT_TERMINAL
-    if (shape_bg != INVALCOLOR)
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (shape_bg != INVALCOLOR)
     {
 	cattr = 0;
 	cfg = shape_fg;
 	cbg = shape_bg;
     }
-    else
-#endif
-	if (id > 0)
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (id > 0)
 	{
 	    cattr = syn_id2colors(id, &cfg, &cbg);
-#if defined(HAVE_INPUT_METHOD)
+#ఒకవేళ defined(HAVE_ఆదానం_పద్ధతి)
 	    {
-		static int iid;
+		స్థిర పూర్ణాంకం iid;
 		guicolor_T fg, bg;
 
-		if (
-# if defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
-			preedit_get_status()
-# else
-			im_get_status()
+		ఒకవేళ (
+# ఒకవేళ defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
+			preedit_get_స్థితి()
+# లేకపోతే
+			im_get_స్థితి()
 # endif
 		   )
 		{
 		    iid = syn_name2id((char_u *)"CursorIM");
-		    if (iid > 0)
+		    ఒకవేళ (iid > 0)
 		    {
 			syn_id2colors(iid, &fg, &bg);
-			if (bg != INVALCOLOR)
+			ఒకవేళ (bg != INVALCOLOR)
 			    cbg = bg;
-			if (fg != INVALCOLOR)
+			ఒకవేళ (fg != INVALCOLOR)
 			    cfg = fg;
 		    }
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	}
 
     /*
      * Get the attributes for the character under the cursor.
      * When no cursor color was given, use the character color.
      */
-    attr = ScreenAttrs[LineOffset[gui.row] + gui.col];
-    if (attr > HL_ALL)
+    attr = ScreenAttrs[పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు];
+    ఒకవేళ (attr > HL_ALL)
 	aep = syn_gui_attr2entry(attr);
-    if (aep != NULL)
+    ఒకవేళ (aep != ఖాళీ)
     {
 	attr = aep->ae_attr;
-	if (cfg == INVALCOLOR)
+	ఒకవేళ (cfg == INVALCOLOR)
 	    cfg = ((attr & HL_INVERSE)  ? aep->ae_u.gui.bg_color
 		    : aep->ae_u.gui.fg_color);
-	if (cbg == INVALCOLOR)
+	ఒకవేళ (cbg == INVALCOLOR)
 	    cbg = ((attr & HL_INVERSE)  ? aep->ae_u.gui.fg_color
 		    : aep->ae_u.gui.bg_color);
     }
-    if (cfg == INVALCOLOR)
-	cfg = (attr & HL_INVERSE) ? gui.back_pixel : gui.norm_pixel;
-    if (cbg == INVALCOLOR)
-	cbg = (attr & HL_INVERSE) ? gui.norm_pixel : gui.back_pixel;
+    ఒకవేళ (cfg == INVALCOLOR)
+	cfg = (attr & HL_INVERSE) ? gui.వెనుక_pixel : gui.norm_pixel;
+    ఒకవేళ (cbg == INVALCOLOR)
+	cbg = (attr & HL_INVERSE) ? gui.norm_pixel : gui.వెనుక_pixel;
 
-#ifdef FEAT_XIM
-    if (aep != NULL)
+#నిర్వచితమైతే FEAT_XIM
+    ఒకవేళ (aep != ఖాళీ)
     {
 	xim_bg_color = ((attr & HL_INVERSE) ? aep->ae_u.gui.fg_color
 		: aep->ae_u.gui.bg_color);
 	xim_fg_color = ((attr & HL_INVERSE) ? aep->ae_u.gui.bg_color
 		: aep->ae_u.gui.fg_color);
-	if (xim_bg_color == INVALCOLOR)
+	ఒకవేళ (xim_bg_color == INVALCOLOR)
 	    xim_bg_color = (attr & HL_INVERSE) ? gui.norm_pixel
-		: gui.back_pixel;
-	if (xim_fg_color == INVALCOLOR)
-	    xim_fg_color = (attr & HL_INVERSE) ? gui.back_pixel
+		: gui.వెనుక_pixel;
+	ఒకవేళ (xim_fg_color == INVALCOLOR)
+	    xim_fg_color = (attr & HL_INVERSE) ? gui.వెనుక_pixel
 		: gui.norm_pixel;
     }
-    else
+    లేకపోతే
     {
 	xim_bg_color = (attr & HL_INVERSE) ? gui.norm_pixel
-	    : gui.back_pixel;
-	xim_fg_color = (attr & HL_INVERSE) ? gui.back_pixel
+	    : gui.వెనుక_pixel;
+	xim_fg_color = (attr & HL_INVERSE) ? gui.వెనుక_pixel
 	    : gui.norm_pixel;
     }
-#endif
+#అయితే_ముగింపు
 
     attr &= ~HL_INVERSE;
-    if (cattr & HL_INVERSE)
+    ఒకవేళ (cattr & HL_INVERSE)
     {
 	cc = cbg;
 	cbg = cfg;
@@ -1367,232 +1367,232 @@ gui_update_cursor(
     /*
      * When we don't have window focus, draw a hollow cursor.
      */
-    if (!gui.in_focus)
+    ఒకవేళ (!gui.లోపల_focus)
     {
-#ifdef USE_GTK4
+#నిర్వచితమైతే USE_GTK4
 	gui_gtk4_draw_cursor(cbg, cfg, -1, -1);
-#else
+#లేకపోతే
 	gui_mch_draw_hollow_cursor(cbg);
-#endif
-	return;
+#అయితే_ముగింపు
+	తిరిగి;
     }
 
-#ifdef USE_GTK4
+#నిర్వచితమైతే USE_GTK4
     // Make sure that character underneath is drawn again in case it is part of
     // a ligature.
-    gui_redraw_block(gui.row, gui.col, gui.row, gui.col, GUI_MON_NOCLEAR);
+    gui_redraw_ఖండం(gui.అడ్డువరుస, gui.నిలువు, gui.అడ్డువరుస, gui.నిలువు, GUI_MON_NOCLEAR);
     // gui_redraw_block() will invalidate the cursor
     gui.cursor_is_valid = true;
-#endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     // If cursor is in the middle of a ligature, then split the ligature at
     // the cursor boundaries by redrawing those cells again.
-    for (int c = gui.col - 1; c >= 0; c--)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+    కొరకు (పూర్ణాంకం c = gui.నిలువు - 1; c >= 0; c--)
+	ఒకవేళ (!gui.ligatures_map[Screen_పంక్తులు[పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + c]])
 	{
-	    if (c < gui.col - 1)
+	    ఒకవేళ (c < gui.నిలువు - 1)
 	    {
-		gui_redraw_block(gui.row, c + 1, gui.row, gui.col - 1,
+		gui_redraw_ఖండం(gui.అడ్డువరుస, c + 1, gui.అడ్డువరుస, gui.నిలువు - 1,
 			GUI_MON_NOCLEAR);
 # ifndef USE_GTK4
-		lig_left = true;
+		lig_ఎడమ = true;
 # endif
 	    }
-	    break;
+	    ఆపు;
 	}
 
-    for (int c = gui.col + 1; c < screen_Columns - 1; c++)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+    కొరకు (పూర్ణాంకం c = gui.నిలువు + 1; c < screen_Columns - 1; c++)
+	ఒకవేళ (!gui.ligatures_map[Screen_పంక్తులు[పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + c]])
 	{
-	    if (c > gui.col + 1)
+	    ఒకవేళ (c > gui.నిలువు + 1)
 	    {
-		gui_redraw_block(gui.row, gui.col + 1, gui.row, c - 1,
+		gui_redraw_ఖండం(gui.అడ్డువరుస, gui.నిలువు + 1, gui.అడ్డువరుస, c - 1,
 			GUI_MON_NOCLEAR);
 # ifndef USE_GTK4
-		lig_right = true;
+		lig_కుడి = true;
 # endif
 	    }
-	    break;
+	    ఆపు;
 	}
 
 # ifndef USE_GTK4
-    if ((lig_left || lig_right) && shape->shape != SHAPE_BLOCK)
+    ఒకవేళ ((lig_ఎడమ || lig_కుడి) && shape->shape != SHAPE_ఖండం)
     {
 	// Because the cursor is not drawn with gui_screenchar(), must blit the
 	// cell again (with its background), so that old ligature does not
 	// remain on screen. Not needed for GtkSnapshot, because char beneath is
 	// always rerendered (see above ifdef).
-	int old = gui.col;
-	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+	పూర్ణాంకం old = gui.నిలువు;
+	gui.highlight_ముసుగు = ScreenAttrs[పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు];
+	(శూన్య)gui_screenchar(పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు,
 		GUI_MON_NOCLEAR, (guicolor_T)0, (guicolor_T)0, 0);
-	gui.col = old;
+	gui.నిలువు = old;
     }
 # endif
     // gui_redraw_block()/gui_screenchar() may invalidate the cursor, make sure
     // to validate it again.
     gui.cursor_is_valid = true;
-#endif
+#అయితే_ముగింపు
 
-    old_hl_mask = gui.highlight_mask;
-    if (shape->shape == SHAPE_BLOCK)
+    old_hl_ముసుగు = gui.highlight_ముసుగు;
+    ఒకవేళ (shape->shape == SHAPE_ఖండం)
     {
-#ifdef USE_GTK4
+#నిర్వచితమైతే USE_GTK4
 	gui_gtk4_draw_cursor(cbg, cfg, 0, 0);
-#else
+#లేకపోతే
 	/*
 	 * Draw the text character with the cursor colors.	Use the
 	 * character attributes plus the cursor attributes.
 	 */
-	gui.highlight_mask = (cattr | attr);
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+	gui.highlight_ముసుగు = (cattr | attr);
+	(శూన్య)gui_screenchar(పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు,
 		GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR, cfg, cbg, 0);
-#endif
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-#if defined(FEAT_RIGHTLEFT)
-	int	    col_off = FALSE;
-#endif
+#ఒకవేళ defined(FEAT_RIGHTLEFT)
+	పూర్ణాంకం	    నిలువు_off = FALSE;
+#అయితే_ముగింపు
 	/*
 	 * First draw the partial cursor, then overwrite with the text
 	 * character, using a transparent background.
 	 */
-	if (shape->shape == SHAPE_VER)
+	ఒకవేళ (shape->shape == SHAPE_VER)
 	{
-	    cur_height = gui.char_height;
-	    cur_width = (gui.char_width * shape->percentage + 99) / 100;
+	    cur_ఎత్తు = gui.char_ఎత్తు;
+	    cur_వెడల్పు = (gui.char_వెడల్పు * shape->percentage + 99) / 100;
 	}
-	else
+	లేకపోతే
 	{
-	    cur_height = (gui.char_height * shape->percentage + 99) / 100;
-	    cur_width = gui.char_width;
+	    cur_ఎత్తు = (gui.char_ఎత్తు * shape->percentage + 99) / 100;
+	    cur_వెడల్పు = gui.char_వెడల్పు;
 	}
-	if (has_mbyte && (*mb_off2cells)(LineOffset[gui.row] + gui.col,
-		    LineOffset[gui.row] + screen_Columns) > 1)
+	ఒకవేళ (has_mbyte && (*mb_off2cells)(పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు,
+		    పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + screen_Columns) > 1)
 	{
 	    // Double wide character.
-	    if (shape->shape != SHAPE_VER)
-		cur_width += gui.char_width;
-#ifdef FEAT_RIGHTLEFT
-	    if (CURSOR_BAR_RIGHT)
+	    ఒకవేళ (shape->shape != SHAPE_VER)
+		cur_వెడల్పు += gui.char_వెడల్పు;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	    ఒకవేళ (CURSOR_BAR_కుడి)
 	    {
 		// gui.col points to the left half of the character but
 		// the vertical line needs to be on the right half.
 		// A double-wide horizontal line is also drawn from the
 		// right half in gui_mch_draw_part_cursor().
-		col_off = TRUE;
-		++gui.col;
+		నిలువు_off = TRUE;
+		++gui.నిలువు;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef USE_GTK4
-	gui_gtk4_draw_cursor(cbg, cfg, cur_width, cur_height);
-#else
-	gui_mch_draw_part_cursor(cur_width, cur_height, cbg);
-#endif
-#if defined(FEAT_RIGHTLEFT)
-	if (col_off)
-	    --gui.col;
-#endif
+#నిర్వచితమైతే USE_GTK4
+	gui_gtk4_draw_cursor(cbg, cfg, cur_వెడల్పు, cur_ఎత్తు);
+#లేకపోతే
+	gui_mch_draw_part_cursor(cur_వెడల్పు, cur_ఎత్తు, cbg);
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_RIGHTLEFT)
+	ఒకవేళ (నిలువు_off)
+	    --gui.నిలువు;
+#అయితే_ముగింపు
 
 	// Doesn't seem to work for MSWindows. We call gui_redraw_block() above
 	// for GtkSnapshot.
-#if !defined(FEAT_GUI_MSWIN) && !defined(USE_GTK4)
-	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) && !defined(USE_GTK4)
+	gui.highlight_ముసుగు = ScreenAttrs[పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు];
+	(శూన్య)gui_screenchar(పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు,
 		GUI_MON_TRS_CURSOR | GUI_MON_NOCLEAR,
 		(guicolor_T)0, (guicolor_T)0, 0);
-#endif
+#అయితే_ముగింపు
     }
-    gui.highlight_mask = old_hl_mask;
+    gui.highlight_ముసుగు = old_hl_ముసుగు;
 }
 
-#if defined(FEAT_MENU)
-    static void
-gui_position_menu(void)
+#ఒకవేళ defined(FEAT_MENU)
+    స్థిర శూన్య
+gui_position_menu(శూన్య)
 {
-# if !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
-    if (gui.menu_is_active && gui.in_use)
-	gui_mch_set_menu_pos(0, 0, gui.menu_width, gui.menu_height);
+# ఒకవేళ !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
+    ఒకవేళ (gui.menu_is_చురుకైన && gui.లోపల_use)
+	gui_mch_సమితి_menu_pos(0, 0, gui.menu_వెడల్పు, gui.menu_ఎత్తు);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Position the various GUI components (text area, menu).  The vertical
  * scrollbars are NOT handled here.  See gui_update_scrollbars().
  */
-    static void
-gui_position_components(int total_width UNUSED)
+    స్థిర శూన్య
+gui_position_components(పూర్ణాంకం మొత్తం_వెడల్పు వాడని)
 {
-    int	    text_area_x;
-    int	    text_area_y;
-    int	    text_area_width;
-    int	    text_area_height;
+    పూర్ణాంకం	    పాఠ్యం_area_x;
+    పూర్ణాంకం	    పాఠ్యం_area_y;
+    పూర్ణాంకం	    పాఠ్యం_area_వెడల్పు;
+    పూర్ణాంకం	    పాఠ్యం_area_ఎత్తు;
 
     // avoid that moving components around generates events
     ++hold_gui_events;
 
-    text_area_x = 0;
-    if (gui.which_scrollbars[SBAR_LEFT])
-	text_area_x += gui.scrollbar_width;
+    పాఠ్యం_area_x = 0;
+    ఒకవేళ (gui.which_scrollbars[SBAR_ఎడమ])
+	పాఠ్యం_area_x += gui.scrollbar_వెడల్పు;
 
-    text_area_y = 0;
-#if defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
-    gui.menu_width = total_width;
-    if (gui.menu_is_active)
-	text_area_y += gui.menu_height;
-#endif
+    పాఠ్యం_area_y = 0;
+#ఒకవేళ defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
+    gui.menu_వెడల్పు = మొత్తం_వెడల్పు;
+    ఒకవేళ (gui.menu_is_చురుకైన)
+	పాఠ్యం_area_y += gui.menu_ఎత్తు;
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
+#ఒకవేళ defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF))
-    if (gui_has_tabline())
-	text_area_y += gui.tabline_height;
-#endif
+    ఒకవేళ (gui_has_tabline())
+	పాఠ్యం_area_y += gui.tabline_ఎత్తు;
+#అయితే_ముగింపు
 
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) \
+#ఒకవేళ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_HAIKU) || defined(FEAT_GUI_MSWIN))
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+    ఒకవేళ (vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
     {
-# if defined(FEAT_GUI_HAIKU)
-	gui_mch_set_toolbar_pos(0, text_area_y,
-				gui.menu_width, gui.toolbar_height);
+# ఒకవేళ defined(FEAT_GUI_HAIKU)
+	gui_mch_సమితి_toolbar_pos(0, పాఠ్యం_area_y,
+				gui.menu_వెడల్పు, gui.toolbar_ఎత్తు);
 # endif
-	text_area_y += gui.toolbar_height;
+	పాఠ్యం_area_y += gui.toolbar_ఎత్తు;
     }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_HAIKU)
-    gui_mch_set_tabline_pos(0, text_area_y,
-    gui.menu_width, gui.tabline_height);
-    if (gui_has_tabline())
-	text_area_y += gui.tabline_height;
-#endif
+#ఒకవేళ defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_HAIKU)
+    gui_mch_సమితి_tabline_pos(0, పాఠ్యం_area_y,
+    gui.menu_వెడల్పు, gui.tabline_ఎత్తు);
+    ఒకవేళ (gui_has_tabline())
+	పాఠ్యం_area_y += gui.tabline_ఎత్తు;
+#అయితే_ముగింపు
 
-    text_area_width = gui.num_cols * gui.char_width + gui.border_offset * 2;
-    text_area_height = gui.num_rows * gui.char_height + gui.border_offset * 2;
+    పాఠ్యం_area_వెడల్పు = gui.అంకె_నిలువుల_సంఖ్య * gui.char_వెడల్పు + gui.border_స్థానభ్రంశం * 2;
+    పాఠ్యం_area_ఎత్తు = gui.అంకె_అడ్డువరుసలు * gui.char_ఎత్తు + gui.border_స్థానభ్రంశం * 2;
 
-    gui_mch_set_text_area_pos(text_area_x,
-			      text_area_y,
-			      text_area_width,
-			      text_area_height
-#if defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
-				  + xim_get_status_area_height()
-#endif
+    gui_mch_సమితి_పాఠ్యం_area_pos(పాఠ్యం_area_x,
+			      పాఠ్యం_area_y,
+			      పాఠ్యం_area_వెడల్పు,
+			      పాఠ్యం_area_ఎత్తు
+#ఒకవేళ defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
+				  + xim_get_స్థితి_area_ఎత్తు()
+#అయితే_ముగింపు
 			      );
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     gui_position_menu();
-#endif
-    if (gui.which_scrollbars[SBAR_BOTTOM])
-	gui_mch_set_scrollbar_pos(&gui.bottom_sbar,
-				  text_area_x,
-				  text_area_y + text_area_height
+#అయితే_ముగింపు
+    ఒకవేళ (gui.which_scrollbars[SBAR_BOTTOM])
+	gui_mch_సమితి_scrollbar_pos(&gui.bottom_sbar,
+				  పాఠ్యం_area_x,
+				  పాఠ్యం_area_y + పాఠ్యం_area_ఎత్తు
 					+ gui_mch_get_scrollbar_ypadding(),
-				  text_area_width,
-				  gui.scrollbar_height);
-    gui.left_sbar_x = 0;
-    gui.right_sbar_x = text_area_x + text_area_width
+				  పాఠ్యం_area_వెడల్పు,
+				  gui.scrollbar_ఎత్తు);
+    gui.ఎడమ_sbar_x = 0;
+    gui.కుడి_sbar_x = పాఠ్యం_area_x + పాఠ్యం_area_వెడల్పు
 					+ gui_mch_get_scrollbar_xpadding();
 
     --hold_gui_events;
@@ -1601,157 +1601,157 @@ gui_position_components(int total_width UNUSED)
 /*
  * Get the width of the widgets and decorations to the side of the text area.
  */
-    int
-gui_get_base_width(void)
+    పూర్ణాంకం
+gui_get_పునాది_వెడల్పు(శూన్య)
 {
-    int	    base_width;
+    పూర్ణాంకం	    పునాది_వెడల్పు;
 
-    base_width = 2 * gui.border_offset;
-    if (gui.which_scrollbars[SBAR_LEFT])
-	base_width += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	base_width += gui.scrollbar_width;
-    return base_width;
+    పునాది_వెడల్పు = 2 * gui.border_స్థానభ్రంశం;
+    ఒకవేళ (gui.which_scrollbars[SBAR_ఎడమ])
+	పునాది_వెడల్పు += gui.scrollbar_వెడల్పు;
+    ఒకవేళ (gui.which_scrollbars[SBAR_కుడి])
+	పునాది_వెడల్పు += gui.scrollbar_వెడల్పు;
+    తిరిగి పునాది_వెడల్పు;
 }
 
 /*
  * Get the height of the widgets and decorations above and below the text area.
  */
-    int
-gui_get_base_height(void)
+    పూర్ణాంకం
+gui_get_పునాది_ఎత్తు(శూన్య)
 {
-    int	    base_height;
+    పూర్ణాంకం	    పునాది_ఎత్తు;
 
-    base_height = 2 * gui.border_offset;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
-	base_height += gui.scrollbar_height;
-#ifdef FEAT_GUI_GTK
+    పునాది_ఎత్తు = 2 * gui.border_స్థానభ్రంశం;
+    ఒకవేళ (gui.which_scrollbars[SBAR_BOTTOM])
+	పునాది_ఎత్తు += gui.scrollbar_ఎత్తు;
+#నిర్వచితమైతే FEAT_GUI_GTK
     // We can't take the sizes properly into account until anything is
     // realized.  Therefore we recalculate all the values here just before
     // setting the size. (--mdcki)
-#else
+#లేకపోతే
 # ifdef FEAT_MENU
-    if (gui.menu_is_active)
-	base_height += gui.menu_height;
+    ఒకవేళ (gui.menu_is_చురుకైన)
+	పునాది_ఎత్తు += gui.menu_ఎత్తు;
 # endif
 # ifdef FEAT_TOOLBAR
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-	base_height += gui.toolbar_height;
+    ఒకవేళ (vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
+	పునాది_ఎత్తు += gui.toolbar_ఎత్తు;
 # endif
-# if defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
+# ఒకవేళ defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
-    if (gui_has_tabline())
-	base_height += gui.tabline_height;
+    ఒకవేళ (gui_has_tabline())
+	పునాది_ఎత్తు += gui.tabline_ఎత్తు;
 # endif
-# if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-    base_height += gui_mch_text_area_extra_height();
+# ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+    పునాది_ఎత్తు += gui_mch_పాఠ్యం_area_extra_ఎత్తు();
 # endif
-#endif
-    return base_height;
+#అయితే_ముగింపు
+    తిరిగి పునాది_ఎత్తు;
 }
 
 /*
  * Should be called after the GUI shell has been resized.  Its arguments are
  * the new width and height of the shell in pixels.
  */
-    void
-gui_resize_shell(int pixel_width, int pixel_height)
+    శూన్య
+gui_resize_shell(పూర్ణాంకం pixel_వెడల్పు, పూర్ణాంకం pixel_ఎత్తు)
 {
-    static int	busy = FALSE;
+    స్థిర పూర్ణాంకం	busy = FALSE;
 
-    if (!gui.shell_created)	    // ignore when still initializing
-	return;
+    ఒకవేళ (!gui.shell_created)	    // ignore when still initializing
+	తిరిగి;
 
     /*
      * Can't resize the screen while it is being redrawn.  Remember the new
      * size and handle it later.
      */
-    if (updating_screen || busy)
+    ఒకవేళ (updating_screen || busy)
     {
-	new_pixel_width = pixel_width;
-	new_pixel_height = pixel_height;
-	return;
+	new_pixel_వెడల్పు = pixel_వెడల్పు;
+	new_pixel_ఎత్తు = pixel_ఎత్తు;
+	తిరిగి;
     }
 
 again:
-    new_pixel_width = 0;
-    new_pixel_height = 0;
+    new_pixel_వెడల్పు = 0;
+    new_pixel_ఎత్తు = 0;
     busy = TRUE;
 
-#ifdef FEAT_GUI_HAIKU
-    vim_lock_screen();
-#endif
+#నిర్వచితమైతే FEAT_GUI_HAIKU
+    vim_తాళం_screen();
+#అయితే_ముగింపు
 
     // Flush pending output before redrawing
-    out_flush();
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-    gui_gtk_init_decor_height();
-#endif
+    బహిర్గతం_flush();
+#ఒకవేళ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+    gui_gtk_init_decor_ఎత్తు();
+#అయితే_ముగింపు
 
-    gui.num_cols = (pixel_width - gui_get_base_width()) / gui.char_width;
-    gui.num_rows = (pixel_height - gui_get_base_height()) / gui.char_height;
+    gui.అంకె_నిలువుల_సంఖ్య = (pixel_వెడల్పు - gui_get_పునాది_వెడల్పు()) / gui.char_వెడల్పు;
+    gui.అంకె_అడ్డువరుసలు = (pixel_ఎత్తు - gui_get_పునాది_ఎత్తు()) / gui.char_ఎత్తు;
 
-#ifdef USE_GTK4
-    gui_gtk4_update_size();
-#endif
+#నిర్వచితమైతే USE_GTK4
+    gui_gtk4_update_కొలత();
+#అయితే_ముగింపు
 
-    gui_position_components(pixel_width);
+    gui_position_components(pixel_వెడల్పు);
     gui_reset_scroll_region();
 
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4) && !defined(USE_GTK4)
+#ఒకవేళ defined(FEAT_GUI_GTK) && defined(USE_GTK4) && !defined(USE_GTK4)
     // We do not resize the draw area via the "resize" signal. This is because
     // when the window is resized, the form widget is the one that is resized,
     // so let that call gui_resize_shell() which will allocate the surface and
     // allocate the drawing area size/position.
-    gui_gtk4_resize(pixel_width, pixel_height);
-#endif
+    gui_gtk4_resize(pixel_వెడల్పు, pixel_ఎత్తు);
+#అయితే_ముగింపు
 
     /*
      * At the "more" and ":confirm" prompt there is no redraw, put the cursor
      * at the last line here (why does it have to be one row too low?).
      */
-    if (State == MODE_ASKMORE || State == MODE_CONFIRM)
-	gui.row = gui.num_rows;
+    ఒకవేళ (State == బహుళకం_ASKMORE || State == బహుళకం_CONFIRM)
+	gui.అడ్డువరుస = gui.అంకె_అడ్డువరుసలు;
 
     // Only comparing Rows and Columns may be sufficient, but let's stay on
     // the safe side.
-    if (gui.num_rows != screen_Rows || gui.num_cols != screen_Columns
-	    || gui.num_rows != Rows || gui.num_cols != Columns || gui.force_redraw)
+    ఒకవేళ (gui.అంకె_అడ్డువరుసలు != screen_అడ్డువరుసలు || gui.అంకె_నిలువుల_సంఖ్య != screen_Columns
+	    || gui.అంకె_అడ్డువరుసలు != అడ్డువరుసలు || gui.అంకె_నిలువుల_సంఖ్య != Columns || gui.force_redraw)
     {
 	shell_resized();
 	gui.force_redraw = 0;
     }
 
-#ifdef FEAT_GUI_HAIKU
+#నిర్వచితమైతే FEAT_GUI_HAIKU
     vim_unlock_screen();
-#endif
+#అయితే_ముగింపు
 
     gui_update_scrollbars(TRUE);
     gui_update_cursor(FALSE, TRUE);
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-    gui_gtk4_calculate_bleed(pixel_width, pixel_height);
-#endif
-#if defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
-    xim_set_status_area();
-#endif
+#ఒకవేళ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+    gui_gtk4_calculate_bleed(pixel_వెడల్పు, pixel_ఎత్తు);
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
+    xim_సమితి_స్థితి_area();
+#అయితే_ముగింపు
 
     busy = FALSE;
 
     // We may have been called again while redrawing the screen.
     // Need to do it all again with the latest size then.  But only if the size
     // actually changed.
-    if (new_pixel_height)
+    ఒకవేళ (new_pixel_ఎత్తు)
     {
-	if (pixel_width == new_pixel_width && pixel_height == new_pixel_height)
+	ఒకవేళ (pixel_వెడల్పు == new_pixel_వెడల్పు && pixel_ఎత్తు == new_pixel_ఎత్తు)
 	{
-	    new_pixel_width = 0;
-	    new_pixel_height = 0;
+	    new_pixel_వెడల్పు = 0;
+	    new_pixel_ఎత్తు = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    pixel_width = new_pixel_width;
-	    pixel_height = new_pixel_height;
-	    goto again;
+	    pixel_వెడల్పు = new_pixel_వెడల్పు;
+	    pixel_ఎత్తు = new_pixel_ఎత్తు;
+	    వెళ్ళు again;
 	}
     }
 }
@@ -1759,23 +1759,23 @@ again:
 /*
  * Check if gui_resize_shell() must be called.
  */
-    void
-gui_may_resize_shell(void)
+    శూన్య
+gui_may_resize_shell(శూన్య)
 {
-    if (new_pixel_height)
+    ఒకవేళ (new_pixel_ఎత్తు)
     {
 	// careful: gui_resize_shell() may postpone the resize again if we
 	// were called indirectly by it
-	gui_resize_shell(new_pixel_width, new_pixel_height);
+	gui_resize_shell(new_pixel_వెడల్పు, new_pixel_ఎత్తు);
     }
 }
 
-    int
-gui_get_shellsize(void)
+    పూర్ణాంకం
+gui_get_shellsize(శూన్య)
 {
-    Rows = gui.num_rows;
-    Columns = gui.num_cols;
-    return OK;
+    అడ్డువరుసలు = gui.అంకె_అడ్డువరుసలు;
+    Columns = gui.అంకె_నిలువుల_సంఖ్య;
+    తిరిగి OK;
 }
 
 /*
@@ -1785,30 +1785,30 @@ gui_get_shellsize(void)
  * When "mustset" is TRUE the size was set by the user. When FALSE a UI
  * component was added or removed (e.g., a scrollbar).
  */
-    void
-gui_set_shellsize(
-    int		mustset UNUSED,
-    int		fit_to_display,
-    int		direction)		// RESIZE_HOR, RESIZE_VER
+    శూన్య
+gui_సమితి_shellsize(
+    పూర్ణాంకం		mustset వాడని,
+    పూర్ణాంకం		fit_గమ్యం_display,
+    పూర్ణాంకం		direction)		// RESIZE_HOR, RESIZE_VER
 {
-    int		base_width;
-    int		base_height;
-    int		width;
-    int		height;
-    int		min_width;
-    int		min_height;
-    int		screen_w;
-    int		screen_h;
-#ifdef FEAT_GUI_GTK
-    int		un_maximize = mustset;
-    int		did_adjust = 0;
-#endif
-    int		x = -1, y = -1;
+    పూర్ణాంకం		పునాది_వెడల్పు;
+    పూర్ణాంకం		పునాది_ఎత్తు;
+    పూర్ణాంకం		వెడల్పు;
+    పూర్ణాంకం		ఎత్తు;
+    పూర్ణాంకం		min_వెడల్పు;
+    పూర్ణాంకం		min_ఎత్తు;
+    పూర్ణాంకం		screen_w;
+    పూర్ణాంకం		screen_h;
+#నిర్వచితమైతే FEAT_GUI_GTK
+    పూర్ణాంకం		un_maximize = mustset;
+    పూర్ణాంకం		did_adjust = 0;
+#అయితే_ముగింపు
+    పూర్ణాంకం		x = -1, y = -1;
 
-    if (!gui.shell_created)
-	return;
+    ఒకవేళ (!gui.shell_created)
+	తిరిగి;
 
-#if defined(MSWIN) || defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(MSWIN) || defined(FEAT_GUI_GTK)
     // If not setting to a user specified size and maximized, calculate the
     // number of characters that fit in the maximized window.
     // FIXME: gui_mch_newfont() is called here even when the font hasn't
@@ -1817,104 +1817,104 @@ gui_set_shellsize(
     // The intent is to keep the window size and recalculate Rows/Columns,
     // which has nothing to do with fonts.  This should be a separate
     // function with a more descriptive name.
-    if (!mustset && (vim_strchr(p_go, GO_KEEPWINSIZE) != NULL
+    ఒకవేళ (!mustset && (vim_strchr(p_go, GO_KEEPWINSIZE) != ఖాళీ
 						       || gui_mch_maximized()))
     {
 	gui_mch_newfont();
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    base_width = gui_get_base_width();
-    base_height = gui_get_base_height();
-    if (fit_to_display)
+    పునాది_వెడల్పు = gui_get_పునాది_వెడల్పు();
+    పునాది_ఎత్తు = gui_get_పునాది_ఎత్తు();
+    ఒకవేళ (fit_గమ్యం_display)
 	// Remember the original window position.
-	(void)gui_mch_get_winpos(&x, &y);
+	(శూన్య)gui_mch_get_winpos(&x, &y);
 
-    width = Columns * gui.char_width + base_width;
-    height = Rows * gui.char_height + base_height;
+    వెడల్పు = Columns * gui.char_వెడల్పు + పునాది_వెడల్పు;
+    ఎత్తు = అడ్డువరుసలు * gui.char_ఎత్తు + పునాది_ఎత్తు;
 
-    if (fit_to_display)
+    ఒకవేళ (fit_గమ్యం_display)
     {
 	gui_mch_get_screen_dimensions(&screen_w, &screen_h);
-	if ((direction & RESIZE_HOR) && width > screen_w)
+	ఒకవేళ ((direction & RESIZE_HOR) && వెడల్పు > screen_w)
 	{
-	    Columns = (screen_w - base_width) / gui.char_width;
-	    if (Columns < MIN_COLUMNS)
+	    Columns = (screen_w - పునాది_వెడల్పు) / gui.char_వెడల్పు;
+	    ఒకవేళ (Columns < MIN_COLUMNS)
 		Columns = MIN_COLUMNS;
-	    width = Columns * gui.char_width + base_width;
-#ifdef FEAT_GUI_GTK
+	    వెడల్పు = Columns * gui.char_వెడల్పు + పునాది_వెడల్పు;
+#నిర్వచితమైతే FEAT_GUI_GTK
 	    ++did_adjust;
-#endif
+#అయితే_ముగింపు
 	}
-	if ((direction & RESIZE_VERT) && height > screen_h)
+	ఒకవేళ ((direction & RESIZE_VERT) && ఎత్తు > screen_h)
 	{
-	    Rows = (screen_h - base_height) / gui.char_height;
+	    అడ్డువరుసలు = (screen_h - పునాది_ఎత్తు) / gui.char_ఎత్తు;
 	    check_shellsize();
-	    height = Rows * gui.char_height + base_height;
-#ifdef FEAT_GUI_GTK
+	    ఎత్తు = అడ్డువరుసలు * gui.char_ఎత్తు + పునాది_ఎత్తు;
+#నిర్వచితమైతే FEAT_GUI_GTK
 	    ++did_adjust;
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef FEAT_GUI_GTK
-	if (did_adjust == 2 || (width + gui.char_width >= screen_w
-				     && height + gui.char_height >= screen_h))
+#నిర్వచితమైతే FEAT_GUI_GTK
+	ఒకవేళ (did_adjust == 2 || (వెడల్పు + gui.char_వెడల్పు >= screen_w
+				     && ఎత్తు + gui.char_ఎత్తు >= screen_h))
 	    // don't unmaximize if at maximum size
 	    un_maximize = FALSE;
-#endif
+#అయితే_ముగింపు
     }
-    limit_screen_size();
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
-#ifdef USE_GTK4
+    హద్దు_screen_కొలత();
+    gui.అంకె_నిలువుల_సంఖ్య = Columns;
+    gui.అంకె_అడ్డువరుసలు = అడ్డువరుసలు;
+#నిర్వచితమైతే USE_GTK4
     // Keep the drawing area in sync with the size Vim is going to draw.
-    gui_gtk4_update_size();
-#endif
+    gui_gtk4_update_కొలత();
+#అయితే_ముగింపు
 
-    min_width = base_width + MIN_COLUMNS * gui.char_width;
-    min_height = base_height + MIN_LINES * gui.char_height;
-    min_height += tabline_height() * gui.char_height;
+    min_వెడల్పు = పునాది_వెడల్పు + MIN_COLUMNS * gui.char_వెడల్పు;
+    min_ఎత్తు = పునాది_ఎత్తు + MIN_పంక్తులు * gui.char_ఎత్తు;
+    min_ఎత్తు += tabline_ఎత్తు() * gui.char_ఎత్తు;
 
-#ifdef FEAT_GUI_GTK
-    if (un_maximize)
+#నిర్వచితమైతే FEAT_GUI_GTK
+    ఒకవేళ (un_maximize)
     {
 	// If the window size is smaller than the screen unmaximize the
 	// window, otherwise resizing won't work.
 	gui_mch_get_screen_dimensions(&screen_w, &screen_h);
-	if ((width + gui.char_width < screen_w
-				   || height + gui.char_height * 2 < screen_h)
+	ఒకవేళ ((వెడల్పు + gui.char_వెడల్పు < screen_w
+				   || ఎత్తు + gui.char_ఎత్తు * 2 < screen_h)
 		&& gui_mch_maximized())
 	    gui_mch_unmaximize();
     }
-#endif
+#అయితే_ముగింపు
 
-    gui_mch_set_shellsize(width, height, min_width, min_height,
-					  base_width, base_height, direction);
+    gui_mch_సమితి_shellsize(వెడల్పు, ఎత్తు, min_వెడల్పు, min_ఎత్తు,
+					  పునాది_వెడల్పు, పునాది_ఎత్తు, direction);
 
-    if (fit_to_display && x >= 0 && y >= 0)
+    ఒకవేళ (fit_గమ్యం_display && x >= 0 && y >= 0)
     {
 	// Some window managers put the Vim window left of/above the screen.
 	// Only change the position if it wasn't already negative before
 	// (happens on MS-Windows with a secondary monitor).
 	gui_mch_update();
-	if (gui_mch_get_winpos(&x, &y) == OK && (x < 0 || y < 0))
-	    gui_mch_set_winpos(x < 0 ? 0 : x, y < 0 ? 0 : y);
+	ఒకవేళ (gui_mch_get_winpos(&x, &y) == OK && (x < 0 || y < 0))
+	    gui_mch_సమితి_winpos(x < 0 ? 0 : x, y < 0 ? 0 : y);
     }
 
-    gui_position_components(width);
+    gui_position_components(వెడల్పు);
     gui_update_scrollbars(TRUE);
     gui_reset_scroll_region();
 
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-    gui_gtk4_calculate_bleed(width, height);
-#endif
+#ఒకవేళ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+    gui_gtk4_calculate_bleed(వెడల్పు, ఎత్తు);
+#అయితే_ముగింపు
 }
 
 /*
  * Called when Rows and/or Columns has changed.
  */
-    void
-gui_new_shellsize(void)
+    శూన్య
+gui_new_shellsize(శూన్య)
 {
     gui_reset_scroll_region();
 }
@@ -1922,52 +1922,52 @@ gui_new_shellsize(void)
 /*
  * Make scroll region cover whole screen.
  */
-    static void
-gui_reset_scroll_region(void)
+    స్థిర శూన్య
+gui_reset_scroll_region(శూన్య)
 {
-    gui.scroll_region_top = 0;
-    gui.scroll_region_bot = gui.num_rows - 1;
-    gui.scroll_region_left = 0;
-    gui.scroll_region_right = gui.num_cols - 1;
+    gui.scroll_region_శిఖరం = 0;
+    gui.scroll_region_bot = gui.అంకె_అడ్డువరుసలు - 1;
+    gui.scroll_region_ఎడమ = 0;
+    gui.scroll_region_కుడి = gui.అంకె_నిలువుల_సంఖ్య - 1;
 }
 
-    static void
-gui_start_highlight(int mask)
+    స్థిర శూన్య
+gui_ప్రారంభం_highlight(పూర్ణాంకం ముసుగు)
 {
-    if (mask > HL_ALL)		    // highlight code
-	gui.highlight_mask = mask;
-    else			    // mask
-	gui.highlight_mask |= mask;
+    ఒకవేళ (ముసుగు > HL_ALL)		    // highlight code
+	gui.highlight_ముసుగు = ముసుగు;
+    లేకపోతే			    //ముసుగు
+	gui.highlight_ముసుగు |= ముసుగు;
 }
 
-    void
-gui_stop_highlight(int mask)
+    శూన్య
+gui_stop_highlight(పూర్ణాంకం ముసుగు)
 {
-    if (mask > HL_ALL)		    // highlight code
-	gui.highlight_mask = HL_NORMAL;
-    else			    // mask
-	gui.highlight_mask &= ~mask;
+    ఒకవేళ (ముసుగు > HL_ALL)		    // highlight code
+	gui.highlight_ముసుగు = HL_సాధారణ;
+    లేకపోతే			    //ముసుగు
+	gui.highlight_ముసుగు &= ~ముసుగు;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_clear_block(
-    int	    row1,
-    int	    col1,
-    int	    row2,
-    int	    col2)
+    శూన్య
+gui_clear_ఖండం(
+    పూర్ణాంకం	    row1,
+    పూర్ణాంకం	    col1,
+    పూర్ణాంకం	    row2,
+    పూర్ణాంకం	    col2)
 {
     // Clear the selection if we are about to write over it
     clip_may_clear_selection(row1, row2);
 
-    gui_mch_clear_block(row1, col1, row2, col2);
+    gui_mch_clear_ఖండం(row1, col1, row2, col2);
 
     // Invalidate cursor if it was in this block
-    if (       gui.cursor_row >= row1 && gui.cursor_row <= row2
-	    && gui.cursor_col >= col1 && gui.cursor_col <= col2)
+    ఒకవేళ (       gui.cursor_అడ్డువరుస >= row1 && gui.cursor_అడ్డువరుస <= row2
+	    && gui.cursor_నిలువు >= col1 && gui.cursor_నిలువు <= col2)
 	gui.cursor_is_valid = false;
 }
 
@@ -1975,167 +1975,167 @@ gui_clear_block(
  * Write code to update the cursor later.  This avoids the need to flush the
  * output buffer before calling gui_update_cursor().
  */
-    void
-gui_update_cursor_later(void)
+    శూన్య
+gui_update_cursor_later(శూన్య)
 {
-    OUT_STR("\033|s");
+    బహిర్గతం_STR("\033|s");
 }
 
-    void
+    శూన్య
 gui_write(
     char_u	*s,
-    int		len)
+    పూర్ణాంకం		len)
 {
     char_u	*p;
-    int		arg1 = 0, arg2 = 0;
-    int		force_cursor = FALSE;	// force cursor update
-    int		force_scrollbar = FALSE;
-    static win_T	*old_curwin = NULL;
+    పూర్ణాంకం		arg1 = 0, arg2 = 0;
+    పూర్ణాంకం		force_cursor = FALSE;	// force cursor update
+    పూర్ణాంకం		force_scrollbar = FALSE;
+    స్థిర win_T	*old_curwin = ఖాళీ;
 
 // #define DEBUG_GUI_WRITE
-#ifdef DEBUG_GUI_WRITE
+#నిర్వచితమైతే DEBUG_GUI_WRITE
     {
-	int i;
+	పూర్ణాంకం i;
 	char_u *str;
 
-	printf("gui_write(%d):\n    ", len);
-	for (i = 0; i < len; i++)
-	    if (s[i] == ESC)
+	రాయి("gui_write(%d):\n    ", len);
+	కొరకు (i = 0; i < len; i++)
+	    ఒకవేళ (s[i] == ESC)
 	    {
-		if (i != 0)
-		    printf("\n    ");
-		printf("<ESC>");
+		ఒకవేళ (i != 0)
+		    రాయి("\n    ");
+		రాయి("<ESC>");
 	    }
-	    else
+	    లేకపోతే
 	    {
 		str = transchar_byte(s[i]);
-		if (str[0] && str[1])
-		    printf("<%s>", (char *)str);
-		else
-		    printf("%s", (char *)str);
+		ఒకవేళ (str[0] && str[1])
+		    రాయి("<%s>", (అక్షరం *)str);
+		లేకపోతే
+		    రాయి("%s", (అక్షరం *)str);
 	    }
-	printf("\n");
+	రాయి("\n");
     }
-#endif
-    while (len)
+#అయితే_ముగింపు
+    అయితే (len)
     {
-	if (s[0] == ESC && s[1] == '|')
+	ఒకవేళ (s[0] == ESC && s[1] == '|')
 	{
 	    p = s + 2;
-	    if (VIM_ISDIGIT(*p) || (*p == '-' && VIM_ISDIGIT(*(p + 1))))
+	    ఒకవేళ (VIM_ISDIGIT(*p) || (*p == '-' && VIM_ISDIGIT(*(p + 1))))
 	    {
 		arg1 = getdigits(&p);
-		if (p > s + len)
-		    break;
-		if (*p == ';')
+		ఒకవేళ (p > s + len)
+		    ఆపు;
+		ఒకవేళ (*p == ';')
 		{
 		    ++p;
 		    arg2 = getdigits(&p);
-		    if (p > s + len)
-			break;
+		    ఒకవేళ (p > s + len)
+			ఆపు;
 		}
 	    }
-	    switch (*p)
+	    ఎంపిక (*p)
 	    {
-		case 'C':	// Clear screen
+		స్థితి 'C':	// Clear screen
 		    clip_scroll_selection(9999);
 		    gui_mch_clear_all();
 		    gui.cursor_is_valid = false;
 		    force_scrollbar = TRUE;
-		    break;
-		case 'M':	// Move cursor
-		    gui_set_cursor(arg1, arg2);
-		    break;
-		case 's':	// force cursor (shape) update
+		    ఆపు;
+		స్థితి 'M':	// Move cursor
+		    gui_సమితి_cursor(arg1, arg2);
+		    ఆపు;
+		స్థితి 's':	// force cursor (shape) update
 		    force_cursor = TRUE;
-		    break;
-		case 'R':	// Set scroll region
-		    if (arg1 < arg2)
+		    ఆపు;
+		స్థితి 'R':	// Set scroll region
+		    ఒకవేళ (arg1 < arg2)
 		    {
-			gui.scroll_region_top = arg1;
+			gui.scroll_region_శిఖరం = arg1;
 			gui.scroll_region_bot = arg2;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			gui.scroll_region_top = arg2;
+			gui.scroll_region_శిఖరం = arg2;
 			gui.scroll_region_bot = arg1;
 		    }
-		    break;
-		case 'V':	// Set vertical scroll region
-		    if (arg1 < arg2)
+		    ఆపు;
+		స్థితి 'V':	// Set vertical scroll region
+		    ఒకవేళ (arg1 < arg2)
 		    {
-			gui.scroll_region_left = arg1;
-			gui.scroll_region_right = arg2;
+			gui.scroll_region_ఎడమ = arg1;
+			gui.scroll_region_కుడి = arg2;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			gui.scroll_region_left = arg2;
-			gui.scroll_region_right = arg1;
+			gui.scroll_region_ఎడమ = arg2;
+			gui.scroll_region_కుడి = arg1;
 		    }
-		    break;
-		case 'd':	// Delete line
-		    gui_delete_lines(gui.row, 1);
-		    break;
-		case 'D':	// Delete lines
-		    gui_delete_lines(gui.row, arg1);
-		    break;
-		case 'i':	// Insert line
-		    gui_insert_lines(gui.row, 1);
-		    break;
-		case 'I':	// Insert lines
-		    gui_insert_lines(gui.row, arg1);
-		    break;
-		case '$':	// Clear to end-of-line
-		    gui_clear_block(gui.row, gui.col, gui.row,
-							    (int)Columns - 1);
-		    break;
-		case 'h':	// Turn on highlighting
-		    gui_start_highlight(arg1);
-		    break;
-		case 'H':	// Turn off highlighting
+		    ఆపు;
+		స్థితి 'd':	// Delete line
+		    gui_delete_పంక్తులు(gui.అడ్డువరుస, 1);
+		    ఆపు;
+		స్థితి 'D':	// Delete lines
+		    gui_delete_పంక్తులు(gui.అడ్డువరుస, arg1);
+		    ఆపు;
+		స్థితి 'i':	// Insert line
+		    gui_చొప్పించు_పంక్తులు(gui.అడ్డువరుస, 1);
+		    ఆపు;
+		స్థితి 'I':	// Insert lines
+		    gui_చొప్పించు_పంక్తులు(gui.అడ్డువరుస, arg1);
+		    ఆపు;
+		స్థితి '$':	// Clear to end-of-line
+		    gui_clear_ఖండం(gui.అడ్డువరుస, gui.నిలువు, gui.అడ్డువరుస,
+							    (పూర్ణాంకం)Columns - 1);
+		    ఆపు;
+		స్థితి 'h':	// Turn on highlighting
+		    gui_ప్రారంభం_highlight(arg1);
+		    ఆపు;
+		స్థితి 'H':	// Turn off highlighting
 		    gui_stop_highlight(arg1);
-		    break;
-		case 'f':	// flash the window (visual bell)
+		    ఆపు;
+		స్థితి 'f':	// flash the window (visual bell)
 		    gui_mch_flash(arg1 == 0 ? 20 : arg1);
-		    break;
-		default:
+		    ఆపు;
+		అప్రమేయ:
 		    p = s + 1;	// Skip the ESC
-		    break;
+		    ఆపు;
 	    }
-	    len -= (int)(++p - s);
+	    len -= (పూర్ణాంకం)(++p - s);
 	    s = p;
 	}
-	else if (s[0] < 0x20		// Ctrl character
-#ifdef FEAT_SIGN_ICONS
+	లేకపోతే ఒకవేళ (s[0] < 0x20		// Ctrl character
+#నిర్వచితమైతే FEAT_SIGN_ICONS
 		&& s[0] != SIGN_BYTE
 # ifdef FEAT_NETBEANS_INTG
 		&& s[0] != MULTISIGN_BYTE
 # endif
-#endif
+#అయితే_ముగింపు
 		)
 	{
-	    if (s[0] == '\n')		// NL
+	    ఒకవేళ (s[0] == '\n')		// NL
 	    {
-		gui.col = 0;
-		if (gui.row < gui.scroll_region_bot)
-		    gui.row++;
-		else
-		    gui_delete_lines(gui.scroll_region_top, 1);
+		gui.నిలువు = 0;
+		ఒకవేళ (gui.అడ్డువరుస < gui.scroll_region_bot)
+		    gui.అడ్డువరుస++;
+		లేకపోతే
+		    gui_delete_పంక్తులు(gui.scroll_region_శిఖరం, 1);
 	    }
-	    else if (s[0] == '\r')	// CR
+	    లేకపోతే ఒకవేళ (s[0] == '\r')	// CR
 	    {
-		gui.col = 0;
+		gui.నిలువు = 0;
 	    }
-	    else if (s[0] == '\b')	// Backspace
+	    లేకపోతే ఒకవేళ (s[0] == '\b')	// Backspace
 	    {
-		if (gui.col)
-		    --gui.col;
+		ఒకవేళ (gui.నిలువు)
+		    --gui.నిలువు;
 	    }
-	    else if (s[0] == Ctrl_L)	// cursor-right
+	    లేకపోతే ఒకవేళ (s[0] == Ctrl_L)	// cursor-right
 	    {
-		++gui.col;
+		++gui.నిలువు;
 	    }
-	    else if (s[0] == Ctrl_G)	// Beep
+	    లేకపోతే ఒకవేళ (s[0] == Ctrl_G)	// Beep
 	    {
 		gui_mch_beep();
 	    }
@@ -2144,44 +2144,44 @@ gui_write(
 	    --len;	// Skip this char
 	    ++s;
 	}
-	else
+	లేకపోతే
 	{
 	    p = s;
-	    while (len > 0 && (
+	    అయితే (len > 0 && (
 			*p >= 0x20
-#ifdef FEAT_SIGN_ICONS
+#నిర్వచితమైతే FEAT_SIGN_ICONS
 			|| *p == SIGN_BYTE
 # ifdef FEAT_NETBEANS_INTG
 			|| *p == MULTISIGN_BYTE
 # endif
-#endif
+#అయితే_ముగింపు
 			))
 	    {
 		len--;
 		p++;
 	    }
-	    gui_outstr(s, (int)(p - s));
+	    gui_outstr(s, (పూర్ణాంకం)(p - s));
 	    s = p;
 	}
     }
 
     // Postponed update of the cursor (won't work if "can_update_cursor" isn't
     // set).
-    if (force_cursor)
+    ఒకవేళ (force_cursor)
 	gui_update_cursor(TRUE, TRUE);
 
     // When switching to another window the dragging must have stopped.
     // Required for GTK, dragged_sb isn't reset.
-    if (old_curwin != curwin)
+    ఒకవేళ (old_curwin != curwin)
 	gui.dragged_sb = SBAR_NONE;
 
     // Update the scrollbars after clearing the screen or when switched
     // to another window.
     // Update the horizontal scrollbar always, it's difficult to check all
     // situations where it might change.
-    if (force_scrollbar || old_curwin != curwin)
+    ఒకవేళ (force_scrollbar || old_curwin != curwin)
 	gui_update_scrollbars(force_scrollbar);
-    else
+    లేకపోతే
 	gui_update_horiz_scrollbar(FALSE);
     old_curwin = curwin;
 
@@ -2189,9 +2189,9 @@ gui_write(
      * We need to make sure this is cleared since GTK doesn't tell us when
      * the user is done dragging.
      */
-#if defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_GUI_GTK)
     gui.dragged_sb = SBAR_NONE;
-#endif
+#అయితే_ముగింపు
 
     gui_may_flush();		    // In case vim decides to take a nap
 }
@@ -2201,20 +2201,20 @@ gui_write(
  * produces wrong results.  Call gui_dont_update_cursor() before that code and
  * gui_can_update_cursor() afterwards.
  */
-    void
-gui_dont_update_cursor(int undraw)
+    శూన్య
+gui_dont_update_cursor(పూర్ణాంకం undraw)
 {
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
     // Undraw the cursor now, we probably can't do it after the change.
-    if (undraw)
+    ఒకవేళ (undraw)
 	gui_undraw_cursor();
     can_update_cursor = FALSE;
 }
 
-    void
-gui_can_update_cursor(void)
+    శూన్య
+gui_can_update_cursor(శూన్య)
 {
     can_update_cursor = TRUE;
     // No need to update the cursor right now, there is always more output
@@ -2224,8 +2224,8 @@ gui_can_update_cursor(void)
 /*
  * Disable issuing gui_mch_flush().
  */
-    void
-gui_disable_flush(void)
+    శూన్య
+gui_disable_flush(శూన్య)
 {
     ++disable_flush;
 }
@@ -2233,8 +2233,8 @@ gui_disable_flush(void)
 /*
  * Enable issuing gui_mch_flush().
  */
-    void
-gui_enable_flush(void)
+    శూన్య
+gui_enable_flush(శూన్య)
 {
     --disable_flush;
 }
@@ -2242,178 +2242,178 @@ gui_enable_flush(void)
 /*
  * Issue gui_mch_flush() if it is not disabled.
  */
-    void
-gui_may_flush(void)
+    శూన్య
+gui_may_flush(శూన్య)
 {
-    if (disable_flush == 0)
+    ఒకవేళ (disable_flush == 0)
 	gui_mch_flush();
 }
 
-    static void
-gui_outstr(char_u *s, int len)
+    స్థిర శూన్య
+gui_outstr(char_u *s, పూర్ణాంకం len)
 {
-    int	    this_len;
-    int	    cells;
+    పూర్ణాంకం	    this_len;
+    పూర్ణాంకం	    cells;
 
-    if (len == 0)
-	return;
+    ఒకవేళ (len == 0)
+	తిరిగి;
 
-    if (len < 0)
-	len = (int)STRLEN(s);
+    ఒకవేళ (len < 0)
+	len = (పూర్ణాంకం)STRLEN(s);
 
-    while (len > 0)
+    అయితే (len > 0)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    // Find out how many chars fit in the current line.
 	    cells = 0;
-	    for (this_len = 0; this_len < len; )
+	    కొరకు (this_len = 0; this_len < len; )
 	    {
 		cells += (*mb_ptr2cells)(s + this_len);
-		if (gui.col + cells > Columns)
-		    break;
+		ఒకవేళ (gui.నిలువు + cells > Columns)
+		    ఆపు;
 		this_len += (*mb_ptr2len)(s + this_len);
 	    }
-	    if (this_len > len)
+	    ఒకవేళ (this_len > len)
 		this_len = len;	    // don't include following composing char
 	}
-	else if (gui.col + len > Columns)
-	    this_len = Columns - gui.col;
-	else
+	లేకపోతే ఒకవేళ (gui.నిలువు + len > Columns)
+	    this_len = Columns - gui.నిలువు;
+	లేకపోతే
 	    this_len = len;
 
-	(void)gui_outstr_nowrap(s, this_len,
+	(శూన్య)gui_outstr_nowrap(s, this_len,
 					  0, (guicolor_T)0, (guicolor_T)0, 0);
 	s += this_len;
 	len -= this_len;
 	// fill up for a double-width char that doesn't fit.
-	if (len > 0 && gui.col < Columns)
-	    (void)gui_outstr_nowrap((char_u *)" ", 1,
+	ఒకవేళ (len > 0 && gui.నిలువు < Columns)
+	    (శూన్య)gui_outstr_nowrap((char_u *)" ", 1,
 					  0, (guicolor_T)0, (guicolor_T)0, 0);
 	// The cursor may wrap to the next line.
-	if (gui.col >= Columns)
+	ఒకవేళ (gui.నిలువు >= Columns)
 	{
-	    gui.col = 0;
-	    gui.row++;
+	    gui.నిలువు = 0;
+	    gui.అడ్డువరుస++;
 	}
     }
 }
 
-#ifndef USE_GTK4
+#నిర్వచితం_కాకపోతే USE_GTK4
 /*
  * Output one character (may be one or two display cells).
  * Caller must check for valid "off".
  * Returns FAIL or OK, just like gui_outstr_nowrap().
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_screenchar(
-    int		off,	    // Offset from start of screen
-    int		flags,
+    పూర్ణాంకం		off,	    // Offset from start of screen
+    పూర్ణాంకం		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    పూర్ణాంకం		వెనుక)	    // backup this many chars when using bold trick
 {
     char_u	buf[MB_MAXBYTES + 1];
 
     // Don't draw right half of a double-width UTF-8 char. "cannot happen"
-    if (enc_utf8 && ScreenLines[off] == 0)
-	return OK;
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు[off] == 0)
+	తిరిగి OK;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0)
 	// Draw UTF-8 multi-byte character.
-	return gui_outstr_nowrap(buf, utfc_char2bytes(off, buf),
-							 flags, fg, bg, back);
+	తిరిగి gui_outstr_nowrap(buf, utfc_char2bytes(off, buf),
+							 flags, fg, bg, వెనుక);
 
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    ఒకవేళ (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off] == 0x8e)
     {
-	buf[0] = ScreenLines[off];
+	buf[0] = Screen_పంక్తులు[off];
 	buf[1] = ScreenLines2[off];
-	return gui_outstr_nowrap(buf, 2, flags, fg, bg, back);
+	తిరిగి gui_outstr_nowrap(buf, 2, flags, fg, bg, వెనుక);
     }
 
     // Draw non-multi-byte character or DBCS character.
-    return gui_outstr_nowrap(ScreenLines + off,
-	    enc_dbcs ? (*mb_ptr2len)(ScreenLines + off) : 1,
-							 flags, fg, bg, back);
+    తిరిగి gui_outstr_nowrap(Screen_పంక్తులు + off,
+	    enc_dbcs ? (*mb_ptr2len)(Screen_పంక్తులు + off) : 1,
+							 flags, fg, bg, వెనుక);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
 /*
  * Output the string at the given screen position.  This is used in place
  * of gui_screenchar() where possible because Pango needs as much context
  * as possible to work nicely.  It's a lot faster as well.
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_screenstr(
-    int		off,	    // Offset from start of screen
-    int		len,	    // string length in screen cells
-    int		flags,
+    పూర్ణాంకం		off,	    // Offset from start of screen
+    పూర్ణాంకం		len,	    // string length in screen cells
+    పూర్ణాంకం		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    పూర్ణాంకం		వెనుక)	    // backup this many chars when using bold trick
 {
     char_u  *buf;
-    int	    outlen = 0;
-    int	    i;
-    int	    retval;
+    పూర్ణాంకం	    outlen = 0;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    retval;
 
-    if (len <= 0) // "cannot happen"?
-	return OK;
+    ఒకవేళ (len <= 0) // "cannot happen"?
+	తిరిగి OK;
 
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
 	buf = alloc(len * MB_MAXBYTES + 1);
-	if (buf == NULL)
-	    return OK; // not much we could do here...
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి OK; // not much we could do here...
 
-	for (i = off; i < off + len; ++i)
+	కొరకు (i = off; i < off + len; ++i)
 	{
-	    if (ScreenLines[i] == 0)
-		continue; // skip second half of double-width char
+	    ఒకవేళ (Screen_పంక్తులు[i] == 0)
+		కొనసాగు; // skip second half of double-width char
 
-	    if (ScreenLinesUC[i] == 0)
-		buf[outlen++] = ScreenLines[i];
-	    else
+	    ఒకవేళ (Screen_పంక్తులు_UC[i] == 0)
+		buf[outlen++] = Screen_పంక్తులు[i];
+	    లేకపోతే
 		outlen += utfc_char2bytes(i, buf + outlen);
 	}
 
 	buf[outlen] = NUL; // only to aid debugging
-	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, back);
+	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, వెనుక);
 	vim_free(buf);
 
-	return retval;
+	తిరిగి retval;
     }
-    else if (enc_dbcs == DBCS_JPNU)
+    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU)
     {
 	buf = alloc(len * 2 + 1);
-	if (buf == NULL)
-	    return OK; // not much we could do here...
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి OK; // not much we could do here...
 
-	for (i = off; i < off + len; ++i)
+	కొరకు (i = off; i < off + len; ++i)
 	{
-	    buf[outlen++] = ScreenLines[i];
+	    buf[outlen++] = Screen_పంక్తులు[i];
 
 	    // handle double-byte single-width char
-	    if (ScreenLines[i] == 0x8e)
+	    ఒకవేళ (Screen_పంక్తులు[i] == 0x8e)
 		buf[outlen++] = ScreenLines2[i];
-	    else if (MB_BYTE2LEN(ScreenLines[i]) == 2)
-		buf[outlen++] = ScreenLines[++i];
+	    లేకపోతే ఒకవేళ (MB_BYTE2LEN(Screen_పంక్తులు[i]) == 2)
+		buf[outlen++] = Screen_పంక్తులు[++i];
 	}
 
 	buf[outlen] = NUL; // only to aid debugging
-	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, back);
+	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, వెనుక);
 	vim_free(buf);
 
-	return retval;
+	తిరిగి retval;
     }
-    else
+    లేకపోతే
     {
-	return gui_outstr_nowrap(&ScreenLines[off], len,
-				 flags, fg, bg, back);
+	తిరిగి gui_outstr_nowrap(&Screen_పంక్తులు[off], len,
+				 flags, fg, bg, వెనుక);
     }
 }
-#endif // FEAT_GUI_GTK
+#అయితే_ముగింపు // FEAT_GUI_GTK
 
 /*
  * Output the given string at the current cursor position.  If the string is
@@ -2428,46 +2428,46 @@ gui_screenstr(
  * Returns OK, unless "back" is non-zero and using the bold trick, then return
  * FAIL (the caller should start drawing "back" chars back).
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_outstr_nowrap(
     char_u	*s,
-    int		len,
-    int		flags,
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    పూర్ణాంకం		వెనుక)	    // backup this many chars when using bold trick
 {
-    long_u	highlight_mask;
-    long_u	hl_mask_todo;
+    long_u	highlight_ముసుగు;
+    long_u	hl_ముసుగు_todo;
     guicolor_T	fg_color;
     guicolor_T	bg_color;
     guicolor_T	sp_color;
-#if !defined(FEAT_GUI_GTK)
+#ఒకవేళ !defined(FEAT_GUI_GTK)
     GuiFont	font = NOFONT;
     GuiFont	wide_font = NOFONT;
 # ifdef FEAT_XFONTSET
     GuiFontset	fontset = NOFONTSET;
 # endif
-#endif
-    attrentry_T	*aep = NULL;
-    int		draw_flags;
-    int		col = gui.col;
-#ifdef FEAT_SIGN_ICONS
-    int		draw_sign = FALSE;
-    int		signcol = 0;
+#అయితే_ముగింపు
+    attrentry_T	*aep = ఖాళీ;
+    పూర్ణాంకం		draw_flags;
+    పూర్ణాంకం		నిలువు = gui.నిలువు;
+#నిర్వచితమైతే FEAT_SIGN_ICONS
+    పూర్ణాంకం		draw_sign = FALSE;
+    పూర్ణాంకం		signcol = 0;
     char_u	extra[18];
 # ifdef FEAT_NETBEANS_INTG
-    int		multi_sign = FALSE;
+    పూర్ణాంకం		multi_sign = FALSE;
 # endif
-#endif
+#అయితే_ముగింపు
 
-    if (len < 0)
-	len = (int)STRLEN(s);
-    if (len == 0)
-	return OK;
+    ఒకవేళ (len < 0)
+	len = (పూర్ణాంకం)STRLEN(s);
+    ఒకవేళ (len == 0)
+	తిరిగి OK;
 
-#ifdef FEAT_SIGN_ICONS
-    if (*s == SIGN_BYTE
+#నిర్వచితమైతే FEAT_SIGN_ICONS
+    ఒకవేళ (*s == SIGN_BYTE
 # ifdef FEAT_NETBEANS_INTG
 	  || *s == MULTISIGN_BYTE
 # endif
@@ -2476,81 +2476,81 @@ gui_outstr_nowrap(
 	size_t	slen = 2;		    // 2 spaces by default
 
 # ifdef FEAT_NETBEANS_INTG
-	if (*s == MULTISIGN_BYTE)
+	ఒకవేళ (*s == MULTISIGN_BYTE)
 	    multi_sign = TRUE;
 # endif
 	// draw spaces instead
-	if (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u' &&
+	ఒకవేళ (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u' &&
 		(curwin->w_p_nu || curwin->w_p_rnu))
 	{
-	    int	n = number_width(curwin);
+	    పూర్ణాంకం	n = సంఖ్య_వెడల్పు(curwin);
 
-	    slen = MIN(n, (int)sizeof(extra) - 1);
+	    slen = MIN(n, (పూర్ణాంకం)పరిమాణం(extra) - 1);
 	}
 	vim_memset(extra, ' ', slen);
 	extra[slen] = NUL;
 	s = extra;
-	if (len == 1 && col > 0)
-	    --col;
-	len = (int)slen;
-	if (len > 2)
+	ఒకవేళ (len == 1 && నిలువు > 0)
+	    --నిలువు;
+	len = (పూర్ణాంకం)slen;
+	ఒకవేళ (len > 2)
 	    // right align sign icon in the number column
-	    signcol = col + len - 3;
-	else
-	    signcol = col;
+	    signcol = నిలువు + len - 3;
+	లేకపోతే
+	    signcol = నిలువు;
 	draw_sign = TRUE;
-	highlight_mask = 0;
+	highlight_ముసుగు = 0;
     }
-    else
-#endif
-    if (gui.highlight_mask > HL_ALL)
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (gui.highlight_ముసుగు > HL_ALL)
     {
-	aep = syn_gui_attr2entry(gui.highlight_mask);
-	if (aep == NULL)	    // highlighting not set
-	    highlight_mask = 0;
-	else
-	    highlight_mask = aep->ae_attr;
+	aep = syn_gui_attr2entry(gui.highlight_ముసుగు);
+	ఒకవేళ (aep == ఖాళీ)	    // highlighting not set
+	    highlight_ముసుగు = 0;
+	లేకపోతే
+	    highlight_ముసుగు = aep->ae_attr;
     }
-    else
-	highlight_mask = gui.highlight_mask;
-    hl_mask_todo = highlight_mask;
+    లేకపోతే
+	highlight_ముసుగు = gui.highlight_ముసుగు;
+    hl_ముసుగు_todo = highlight_ముసుగు;
 
-#if !defined(FEAT_GUI_GTK)
+#ఒకవేళ !defined(FEAT_GUI_GTK)
     // Set the font
-    if (aep != NULL && aep->ae_u.gui.font != NOFONT)
+    ఒకవేళ (aep != ఖాళీ && aep->ae_u.gui.font != NOFONT)
 	font = aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-    else if (aep != NULL && aep->ae_u.gui.fontset != NOFONTSET)
+    లేకపోతే ఒకవేళ (aep != ఖాళీ && aep->ae_u.gui.fontset != NOFONTSET)
 	fontset = aep->ae_u.gui.fontset;
 # endif
-    else
+    లేకపోతే
     {
 # ifdef FEAT_XFONTSET
-	if (gui.fontset != NOFONTSET)
+	ఒకవేళ (gui.fontset != NOFONTSET)
 	    fontset = gui.fontset;
-	else
+	లేకపోతే
 # endif
-	    if (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
+	    ఒకవేళ (hl_ముసుగు_todo & (HL_BOLD | HL_STANDOUT))
 	{
-	    if ((hl_mask_todo & HL_ITALIC) && gui.boldital_font != NOFONT)
+	    ఒకవేళ ((hl_ముసుగు_todo & HL_ITALIC) && gui.boldital_font != NOFONT)
 	    {
 		font = gui.boldital_font;
-		hl_mask_todo &= ~(HL_BOLD | HL_STANDOUT | HL_ITALIC);
+		hl_ముసుగు_todo &= ~(HL_BOLD | HL_STANDOUT | HL_ITALIC);
 	    }
-	    else if (gui.bold_font != NOFONT)
+	    లేకపోతే ఒకవేళ (gui.bold_font != NOFONT)
 	    {
 		font = gui.bold_font;
-		hl_mask_todo &= ~(HL_BOLD | HL_STANDOUT);
+		hl_ముసుగు_todo &= ~(HL_BOLD | HL_STANDOUT);
 	    }
-	    else
+	    లేకపోతే
 		font = gui.norm_font;
 	}
-	else if ((hl_mask_todo & HL_ITALIC) && gui.ital_font != NOFONT)
+	లేకపోతే ఒకవేళ ((hl_ముసుగు_todo & HL_ITALIC) && gui.ital_font != NOFONT)
 	{
 	    font = gui.ital_font;
-	    hl_mask_todo &= ~HL_ITALIC;
+	    hl_ముసుగు_todo &= ~HL_ITALIC;
 	}
-	else
+	లేకపోతే
 	    font = gui.norm_font;
 
 	/*
@@ -2558,71 +2558,71 @@ gui_outstr_nowrap(
 	 * at same time in above block.  But it will make many "ifdef" nasty
 	 * blocks.  So we do it here.
 	 */
-	if (font == gui.boldital_font && gui.wide_boldital_font)
+	ఒకవేళ (font == gui.boldital_font && gui.wide_boldital_font)
 	    wide_font = gui.wide_boldital_font;
-	else if (font == gui.bold_font && gui.wide_bold_font)
+	లేకపోతే ఒకవేళ (font == gui.bold_font && gui.wide_bold_font)
 	    wide_font = gui.wide_bold_font;
-	else if (font == gui.ital_font && gui.wide_ital_font)
+	లేకపోతే ఒకవేళ (font == gui.ital_font && gui.wide_ital_font)
 	    wide_font = gui.wide_ital_font;
-	else if (font == gui.norm_font && gui.wide_font)
+	లేకపోతే ఒకవేళ (font == gui.norm_font && gui.wide_font)
 	    wide_font = gui.wide_font;
     }
 # ifdef FEAT_XFONTSET
-    if (fontset != NOFONTSET)
-	gui_mch_set_fontset(fontset);
-    else
+    ఒకవేళ (fontset != NOFONTSET)
+	gui_mch_సమితి_fontset(fontset);
+    లేకపోతే
 # endif
-	gui_mch_set_font(font);
-#endif
+	gui_mch_సమితి_font(font);
+#అయితే_ముగింపు
 
     draw_flags = 0;
 
     // Set the color
-    bg_color = gui.back_pixel;
-    if ((flags & GUI_MON_IS_CURSOR) && gui.in_focus)
+    bg_color = gui.వెనుక_pixel;
+    ఒకవేళ ((flags & GUI_MON_IS_CURSOR) && gui.లోపల_focus)
     {
 	draw_flags |= DRAW_CURSOR;
 	fg_color = fg;
 	bg_color = bg;
 	sp_color = fg;
     }
-    else if (aep != NULL)
+    లేకపోతే ఒకవేళ (aep != ఖాళీ)
     {
 	fg_color = aep->ae_u.gui.fg_color;
-	if (fg_color == INVALCOLOR)
+	ఒకవేళ (fg_color == INVALCOLOR)
 	    fg_color = gui.norm_pixel;
 	bg_color = aep->ae_u.gui.bg_color;
-	if (bg_color == INVALCOLOR)
-	    bg_color = gui.back_pixel;
+	ఒకవేళ (bg_color == INVALCOLOR)
+	    bg_color = gui.వెనుక_pixel;
 	sp_color = aep->ae_u.gui.sp_color;
-	if (sp_color == INVALCOLOR)
+	ఒకవేళ (sp_color == INVALCOLOR)
 	    sp_color = fg_color;
     }
-    else
+    లేకపోతే
     {
 	fg_color = gui.norm_pixel;
 	sp_color = fg_color;
     }
 
-    if (highlight_mask & (HL_INVERSE | HL_STANDOUT))
+    ఒకవేళ (highlight_ముసుగు & (HL_INVERSE | HL_STANDOUT))
     {
-	gui_mch_set_fg_color(bg_color);
-	gui_mch_set_bg_color(fg_color);
+	gui_mch_సమితి_fg_color(bg_color);
+	gui_mch_సమితి_bg_color(fg_color);
     }
-    else
+    లేకపోతే
     {
-	gui_mch_set_fg_color(fg_color);
-	gui_mch_set_bg_color(bg_color);
+	gui_mch_సమితి_fg_color(fg_color);
+	gui_mch_సమితి_bg_color(bg_color);
     }
-    gui_mch_set_sp_color(sp_color);
+    gui_mch_సమితి_sp_color(sp_color);
 
     // Clear the selection if we are about to write over it
-    if (!(flags & GUI_MON_NOCLEAR))
-	clip_may_clear_selection(gui.row, gui.row);
+    ఒకవేళ (!(flags & GUI_MON_NOCLEAR))
+	clip_may_clear_selection(gui.అడ్డువరుస, gui.అడ్డువరుస);
 
 
     // If there's no bold font, then fake it
-    if (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
+    ఒకవేళ (hl_ముసుగు_todo & (HL_BOLD | HL_STANDOUT))
 	draw_flags |= DRAW_BOLD;
 
     /*
@@ -2630,98 +2630,98 @@ gui_outstr_nowrap(
      * neighbor may be destroyed.  Let the caller backup to start redrawing
      * just after a blank.
      */
-    if (back != 0 && ((draw_flags & DRAW_BOLD) || (highlight_mask & HL_ITALIC)))
-	return FAIL;
+    ఒకవేళ (వెనుక != 0 && ((draw_flags & DRAW_BOLD) || (highlight_ముసుగు & HL_ITALIC)))
+	తిరిగి FAIL;
 
-#if defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_GUI_GTK)
     // If there's no italic font, then fake it.
     // For GTK2, we don't need a different font for italic style.
-    if (hl_mask_todo & HL_ITALIC)
+    ఒకవేళ (hl_ముసుగు_todo & HL_ITALIC)
 	draw_flags |= DRAW_ITALIC;
 
     // Do we underline the text?
-    if (hl_mask_todo & HL_UNDERLINE)
+    ఒకవేళ (hl_ముసుగు_todo & HL_UNDERLINE)
 	draw_flags |= DRAW_UNDERL;
 
-#else
+#లేకపోతే
     // Do we underline the text?
-    if ((hl_mask_todo & HL_UNDERLINE) || (hl_mask_todo & HL_ITALIC))
+    ఒకవేళ ((hl_ముసుగు_todo & HL_UNDERLINE) || (hl_ముసుగు_todo & HL_ITALIC))
 	draw_flags |= DRAW_UNDERL;
-#endif
+#అయితే_ముగింపు
     // Do we undercurl the text?
-    if (hl_mask_todo & HL_UNDERCURL)
+    ఒకవేళ (hl_ముసుగు_todo & HL_UNDERCURL)
 	draw_flags |= DRAW_UNDERC;
 
     // TODO: HL_UNDERDOUBLE, HL_UNDERDOTTED, HL_UNDERDASHED
 
     // Do we strikethrough the text?
-    if (hl_mask_todo & HL_STRIKETHROUGH)
+    ఒకవేళ (hl_ముసుగు_todo & HL_STRIKETHROUGH)
 	draw_flags |= DRAW_STRIKE;
 
     // Do we draw transparently?
-    if (flags & GUI_MON_TRS_CURSOR)
+    ఒకవేళ (flags & GUI_MON_TRS_CURSOR)
 	draw_flags |= DRAW_TRANSP;
 
     /*
      * Draw the text.
      */
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
     // The value returned is the length in display cells
-    len = gui_gtk_draw_string(gui.row, col, s, len, draw_flags);
-#else
-    if (enc_utf8)
+    len = gui_gtk_draw_string(gui.అడ్డువరుస, నిలువు, s, len, draw_flags);
+#లేకపోతే
+    ఒకవేళ (enc_utf8)
     {
-	int	start;		// index of bytes to be drawn
-	int	cells;		// cellwidth of bytes to be drawn
-	int	thislen;	// length of bytes to be drawn
-	int	cn;		// cellwidth of current char
-	int	i;		// index of current char
-	int	c;		// current char value
-	int	cl;		// byte length of current char
-	int	comping;	// current char is composing
-	int	scol = col;	// screen column
-	int	curr_wide = FALSE;  // use 'guifontwide'
-	int	prev_wide = FALSE;
-	int	wide_changed;
+	పూర్ణాంకం	ప్రారంభం;		// index of bytes to be drawn
+	పూర్ణాంకం	cells;		// cellwidth of bytes to be drawn
+	పూర్ణాంకం	thislen;	// length of bytes to be drawn
+	పూర్ణాంకం	cn;		// cellwidth of current char
+	పూర్ణాంకం	i;		// index of current char
+	పూర్ణాంకం	c;		// current char value
+	పూర్ణాంకం	cl;		// byte length of current char
+	పూర్ణాంకం	comping;	// current char is composing
+	పూర్ణాంకం	scol = నిలువు;	// screen column
+	పూర్ణాంకం	curr_wide = FALSE;  // use 'guifontwide'
+	పూర్ణాంకం	prev_wide = FALSE;
+	పూర్ణాంకం	wide_మారింది;
 # ifdef MSWIN
-	int	sep_comp = FALSE;   // Don't separate composing chars.
-# else
-	int	sep_comp = TRUE;    // Separate composing chars.
+	పూర్ణాంకం	sep_comp = FALSE;   // Don't separate composing chars.
+# లేకపోతే
+	పూర్ణాంకం	sep_comp = TRUE;    // Separate composing chars.
 # endif
 
 	// Break the string at a composing character, it has to be drawn on
 	// top of the previous character.
-	start = 0;
+	ప్రారంభం = 0;
 	cells = 0;
-	for (i = 0; i < len; i += cl)
+	కొరకు (i = 0; i < len; i += cl)
 	{
 	    c = utf_ptr2char(s + i);
 	    cn = utf_char2cells(c);
 	    comping = utf_iscomposing(c);
-	    if (!comping)	// count cells from non-composing chars
+	    ఒకవేళ (!comping)	// count cells from non-composing chars
 		cells += cn;
-	    if (!comping || sep_comp)
+	    ఒకవేళ (!comping || sep_comp)
 	    {
-		if (cn > 1
+		ఒకవేళ (cn > 1
 # ifdef FEAT_XFONTSET
 			&& fontset == NOFONTSET
 # endif
 			&& wide_font != NOFONT)
 		    curr_wide = TRUE;
-		else
+		లేకపోతే
 		    curr_wide = FALSE;
 	    }
 	    cl = utf_ptr2len(s + i);
-	    if (cl == 0)	// hit end of string
+	    ఒకవేళ (cl == 0)	// hit end of string
 		len = i + cl;	// len must be wrong "cannot happen"
 
-	    wide_changed = curr_wide != prev_wide;
+	    wide_మారింది = curr_wide != prev_wide;
 
 	    // Print the string so far if it's the last character or there is
 	    // a composing character.
-	    if (i + cl >= len || (comping && sep_comp && i > start)
-		    || wide_changed
-# if defined(FEAT_GUI_X11)
+	    ఒకవేళ (i + cl >= len || (comping && sep_comp && i > ప్రారంభం)
+		    || wide_మారింది
+# ఒకవేళ defined(FEAT_GUI_X11)
 		    || (cn > 1
 #  ifdef FEAT_XFONTSET
 			// No fontset: At least draw char after wide char at
@@ -2732,143 +2732,143 @@ gui_outstr_nowrap(
 # endif
 	       )
 	    {
-		if ((comping && sep_comp) || wide_changed)
-		    thislen = i - start;
-		else
-		    thislen = i - start + cl;
-		if (thislen > 0)
+		ఒకవేళ ((comping && sep_comp) || wide_మారింది)
+		    thislen = i - ప్రారంభం;
+		లేకపోతే
+		    thislen = i - ప్రారంభం + cl;
+		ఒకవేళ (thislen > 0)
 		{
-		    if (prev_wide)
-			gui_mch_set_font(wide_font);
-		    gui_mch_draw_string(gui.row, scol, s + start, thislen,
+		    ఒకవేళ (prev_wide)
+			gui_mch_సమితి_font(wide_font);
+		    gui_mch_draw_string(gui.అడ్డువరుస, scol, s + ప్రారంభం, thislen,
 								  draw_flags);
-		    if (prev_wide)
-			gui_mch_set_font(font);
-		    start += thislen;
+		    ఒకవేళ (prev_wide)
+			gui_mch_సమితి_font(font);
+		    ప్రారంభం += thislen;
 		}
 		scol += cells;
 		cells = 0;
 		// Adjust to not draw a character which width is changed
 		// against with last one.
-		if (wide_changed && !(comping && sep_comp))
+		ఒకవేళ (wide_మారింది && !(comping && sep_comp))
 		{
 		    scol -= cn;
 		    cl = 0;
 		}
 
-# if defined(FEAT_GUI_X11)
+# ఒకవేళ defined(FEAT_GUI_X11)
 		// No fontset: draw a space to fill the gap after a wide char
 		//
-		if (cn > 1 && (draw_flags & DRAW_TRANSP) == 0
+		ఒకవేళ (cn > 1 && (draw_flags & DRAW_TRANSP) == 0
 #  ifdef FEAT_XFONTSET
 			&& fontset == NOFONTSET
 #  endif
-			&& !wide_changed)
-		    gui_mch_draw_string(gui.row, scol - 1, (char_u *)" ",
+			&& !wide_మారింది)
+		    gui_mch_draw_string(gui.అడ్డువరుస, scol - 1, (char_u *)" ",
 							       1, draw_flags);
 # endif
 	    }
 	    // Draw a composing char on top of the previous char.
-	    if (comping && sep_comp)
+	    ఒకవేళ (comping && sep_comp)
 	    {
-# if defined(__APPLE_CC__) && TARGET_API_MAC_CARBON
+# ఒకవేళ defined(__APPLE_CC__) && లక్ష్యం_API_MAC_CARBON
 		// Carbon ATSUI autodraws composing char over previous char
-		gui_mch_draw_string(gui.row, scol, s + i, cl,
+		gui_mch_draw_string(gui.అడ్డువరుస, scol, s + i, cl,
 						    draw_flags | DRAW_TRANSP);
-# else
-		gui_mch_draw_string(gui.row, scol - cn, s + i, cl,
+# లేకపోతే
+		gui_mch_draw_string(gui.అడ్డువరుస, scol - cn, s + i, cl,
 						    draw_flags | DRAW_TRANSP);
 # endif
-		start = i + cl;
+		ప్రారంభం = i + cl;
 	    }
 	    prev_wide = curr_wide;
 	}
 	// The stuff below assumes "len" is the length in screen columns.
-	len = scol - col;
+	len = scol - నిలువు;
     }
-    else
+    లేకపోతే
     {
-	gui_mch_draw_string(gui.row, col, s, len, draw_flags);
-	if (enc_dbcs == DBCS_JPNU)
+	gui_mch_draw_string(gui.అడ్డువరుస, నిలువు, s, len, draw_flags);
+	ఒకవేళ (enc_dbcs == DBCS_JPNU)
 	{
 	    // Get the length in display cells, this can be different from the
 	    // number of bytes for "euc-jp".
 	    len = mb_string2cells(s, len);
 	}
     }
-#endif // !FEAT_GUI_GTK
+#అయితే_ముగింపు // !FEAT_GUI_GTK
 
-    if (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
-	gui.col = col + len;
+    ఒకవేళ (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
+	gui.నిలువు = నిలువు + len;
 
     // May need to invert it when it's part of the selection.
-    if (flags & GUI_MON_NOCLEAR)
-	clip_may_redraw_selection(gui.row, col, len);
+    ఒకవేళ (flags & GUI_MON_NOCLEAR)
+	clip_may_redraw_selection(gui.అడ్డువరుస, నిలువు, len);
 
-    if (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
+    ఒకవేళ (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
     {
 	// Invalidate the old physical cursor position if we wrote over it
-	if (gui.cursor_row == gui.row
-		&& gui.cursor_col >= col
-		&& gui.cursor_col < col + len)
+	ఒకవేళ (gui.cursor_అడ్డువరుస == gui.అడ్డువరుస
+		&& gui.cursor_నిలువు >= నిలువు
+		&& gui.cursor_నిలువు < నిలువు + len)
 	    gui.cursor_is_valid = false;
     }
 
-#ifdef FEAT_SIGN_ICONS
-    if (draw_sign)
+#నిర్వచితమైతే FEAT_SIGN_ICONS
+    ఒకవేళ (draw_sign)
 	// Draw the sign on top of the spaces.
-	gui_mch_drawsign(gui.row, signcol, gui.highlight_mask);
-# if defined(FEAT_NETBEANS_INTG) && (defined(FEAT_GUI_X11) \
+	gui_mch_drawsign(gui.అడ్డువరుస, signcol, gui.highlight_ముసుగు);
+# ఒకవేళ defined(FEAT_NETBEANS_INTG) && (defined(FEAT_GUI_X11) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN))
-    if (multi_sign)
-	netbeans_draw_multisign_indicator(gui.row);
+    ఒకవేళ (multi_sign)
+	netbeans_draw_multisign_indicator(gui.అడ్డువరుస);
 # endif
-#endif
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Undraw the cursor.  This actually redraws the character at the cursor
  * position, plus some more characters when needed.
  */
-    void
-gui_undraw_cursor(void)
+    శూన్య
+gui_undraw_cursor(శూన్య)
 {
-    if (!gui.cursor_is_valid)
-	return;
+    ఒకవేళ (!gui.cursor_is_valid)
+	తిరిగి;
 
     // Always redraw the character just before if there is one, because
     // with some fonts and characters there can be a one pixel overlap.
-    int startcol = gui.cursor_col > 0 ? gui.cursor_col - 1 : gui.cursor_col;
-    int endcol = gui.cursor_col;
+    పూర్ణాంకం startcol = gui.cursor_నిలువు > 0 ? gui.cursor_నిలువు - 1 : gui.cursor_నిలువు;
+    పూర్ణాంకం endcol = gui.cursor_నిలువు;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     gui_adjust_undraw_cursor_for_ligatures(&startcol, &endcol);
-#endif
-    gui_redraw_block(gui.cursor_row, startcol,
-	    gui.cursor_row, endcol, GUI_MON_NOCLEAR);
+#అయితే_ముగింపు
+    gui_redraw_ఖండం(gui.cursor_అడ్డువరుస, startcol,
+	    gui.cursor_అడ్డువరుస, endcol, GUI_MON_NOCLEAR);
 
     // Cursor_is_valid is reset when the cursor is undrawn, also reset it
     // here in case it wasn't needed to undraw it.
     gui.cursor_is_valid = false;
 }
 
-    void
+    శూన్య
 gui_redraw(
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    పూర్ణాంకం		x,
+    పూర్ణాంకం		y,
+    పూర్ణాంకం		w,
+    పూర్ణాంకం		h)
 {
-    int		row1, col1, row2, col2;
+    పూర్ణాంకం		row1, col1, row2, col2;
 
-    row1 = Y_2_ROW(y);
-    col1 = X_2_COL(x);
-    row2 = Y_2_ROW(y + h - 1);
-    col2 = X_2_COL(x + w - 1);
+    row1 = Y_2_అడ్డువరుస(y);
+    col1 = X_2_నిలువు(x);
+    row2 = Y_2_అడ్డువరుస(y + h - 1);
+    col2 = X_2_నిలువు(x + w - 1);
 
-    gui_redraw_block(row1, col1, row2, col2, GUI_MON_NOCLEAR);
+    gui_redraw_ఖండం(row1, col1, row2, col2, GUI_MON_NOCLEAR);
 
     /*
      * We may need to redraw the cursor, but don't take it upon us to change
@@ -2877,7 +2877,7 @@ gui_redraw(
      * These things may be outside the update/clipping region and reality may
      * not reflect Vims internal ideas if these operations are clipped away.
      */
-    if (gui.row == gui.cursor_row)
+    ఒకవేళ (gui.అడ్డువరుస == gui.cursor_అడ్డువరుస)
 	gui_update_cursor(TRUE, TRUE);
 }
 
@@ -2885,247 +2885,247 @@ gui_redraw(
  * Draw a rectangular block of characters, from row1 to row2 (inclusive) and
  * from col1 to col2 (inclusive).
  */
-    void
-gui_redraw_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2,
-    int		flags)	// flags for gui_outstr_nowrap()
+    శూన్య
+gui_redraw_ఖండం(
+    పూర్ణాంకం		row1,
+    పూర్ణాంకం		col1,
+    పూర్ణాంకం		row2,
+    పూర్ణాంకం		col2,
+    పూర్ణాంకం		flags)	// flags for gui_outstr_nowrap()
 {
-    int		old_row, old_col;
-    long_u	old_hl_mask;
-    int		off;
-    sattr_T	first_attr;
-    int		idx, len;
-    int		back, nback;
-    int		orig_col1, orig_col2;
+    పూర్ణాంకం		old_అడ్డువరుస, old_నిలువు;
+    long_u	old_hl_ముసుగు;
+    పూర్ణాంకం		off;
+    sattr_T	మొదటి_attr;
+    పూర్ణాంకం		idx, len;
+    పూర్ణాంకం		వెనుక, nback;
+    పూర్ణాంకం		orig_col1, orig_col2;
 
     // Don't try to update when ScreenLines is not valid
-    if (!screen_cleared || ScreenLines == NULL)
-	return;
+    ఒకవేళ (!screen_cleared || Screen_పంక్తులు == ఖాళీ)
+	తిరిగి;
 
     // Don't try to draw outside the shell!
     // Check everything, strange values may be caused by a big border width
-    col1 = check_col(col1);
-    col2 = check_col(col2);
-    row1 = check_row(row1);
-    row2 = check_row(row2);
+    col1 = check_నిలువు(col1);
+    col2 = check_నిలువు(col2);
+    row1 = check_అడ్డువరుస(row1);
+    row2 = check_అడ్డువరుస(row2);
 
     // Remember where our cursor was
-    old_row = gui.row;
-    old_col = gui.col;
-    old_hl_mask = gui.highlight_mask;
+    old_అడ్డువరుస = gui.అడ్డువరుస;
+    old_నిలువు = gui.నిలువు;
+    old_hl_ముసుగు = gui.highlight_ముసుగు;
     orig_col1 = col1;
     orig_col2 = col2;
 
-    for (gui.row = row1; gui.row <= row2; gui.row++)
+    కొరకు (gui.అడ్డువరుస = row1; gui.అడ్డువరుస <= row2; gui.అడ్డువరుస++)
     {
 	// When only half of a double-wide character is in the block, include
 	// the other half.
 	col1 = orig_col1;
 	col2 = orig_col2;
-	off = LineOffset[gui.row];
-	if (enc_dbcs != 0)
+	off = పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస];
+	ఒకవేళ (enc_dbcs != 0)
 	{
-	    if (col1 > 0)
-		col1 -= dbcs_screen_head_off(ScreenLines + off,
-						    ScreenLines + off + col1);
-	    col2 += dbcs_screen_tail_off(ScreenLines + off,
-						    ScreenLines + off + col2);
+	    ఒకవేళ (col1 > 0)
+		col1 -= dbcs_screen_తల_off(Screen_పంక్తులు + off,
+						    Screen_పంక్తులు + off + col1);
+	    col2 += dbcs_screen_తోక_off(Screen_పంక్తులు + off,
+						    Screen_పంక్తులు + off + col2);
 	}
-	else if (enc_utf8)
+	లేకపోతే ఒకవేళ (enc_utf8)
 	{
-	    if (ScreenLines[off + col1] == 0)
+	    ఒకవేళ (Screen_పంక్తులు[off + col1] == 0)
 	    {
-		if (col1 > 0)
+		ఒకవేళ (col1 > 0)
 		    --col1;
-		else
+		లేకపోతే
 		    // FIXME: how can the first character ever be zero?
-		    siemsg("NUL in ScreenLines in row %ld", (long)gui.row);
+		    siemsg("NUL in ScreenLines in row %ld", (దీర్ఘ)gui.అడ్డువరుస);
 	    }
-#ifdef FEAT_GUI_GTK
-	    if (col2 + 1 < Columns && ScreenLines[off + col2 + 1] == 0)
+#నిర్వచితమైతే FEAT_GUI_GTK
+	    ఒకవేళ (col2 + 1 < Columns && Screen_పంక్తులు[off + col2 + 1] == 0)
 		++col2;
-#endif
+#అయితే_ముగింపు
 	}
-	gui.col = col1;
-	off = LineOffset[gui.row] + gui.col;
+	gui.నిలువు = col1;
+	off = పంక్తి_స్థానభ్రంశం[gui.అడ్డువరుస] + gui.నిలువు;
 	len = col2 - col1 + 1;
 
 	// Find how many chars back this highlighting starts, or where a space
 	// is.  Needed for when the bold trick is used
-	for (back = 0; back < col1; ++back)
-	    if (ScreenAttrs[off - 1 - back] != ScreenAttrs[off]
-		    || ScreenLines[off - 1 - back] == ' ')
-		break;
+	కొరకు (వెనుక = 0; వెనుక < col1; ++వెనుక)
+	    ఒకవేళ (ScreenAttrs[off - 1 - వెనుక] != ScreenAttrs[off]
+		    || Screen_పంక్తులు[off - 1 - వెనుక] == ' ')
+		ఆపు;
 
 	// Break it up in strings of characters with the same attributes.
 	// Print UTF-8 characters individually.
-	while (len > 0)
+	అయితే (len > 0)
 	{
-	    first_attr = ScreenAttrs[off];
-	    gui.highlight_mask = first_attr;
-#if !defined(FEAT_GUI_GTK)
-	    if (enc_utf8 && ScreenLinesUC[off] != 0)
+	    మొదటి_attr = ScreenAttrs[off];
+	    gui.highlight_ముసుగు = మొదటి_attr;
+#ఒకవేళ !defined(FEAT_GUI_GTK)
+	    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off] != 0)
 	    {
 		// output multi-byte character separately
 		nback = gui_screenchar(off, flags,
-					  (guicolor_T)0, (guicolor_T)0, back);
-		if (gui.col < Columns && ScreenLines[off + 1] == 0)
+					  (guicolor_T)0, (guicolor_T)0, వెనుక);
+		ఒకవేళ (gui.నిలువు < Columns && Screen_పంక్తులు[off + 1] == 0)
 		    idx = 2;
-		else
+		లేకపోతే
 		    idx = 1;
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	    లేకపోతే ఒకవేళ (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off] == 0x8e)
 	    {
 		// output double-byte, single-width character separately
 		nback = gui_screenchar(off, flags,
-					  (guicolor_T)0, (guicolor_T)0, back);
+					  (guicolor_T)0, (guicolor_T)0, వెనుక);
 		idx = 1;
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
-#ifdef FEAT_GUI_GTK
-		for (idx = 0; idx < len; ++idx)
+#నిర్వచితమైతే FEAT_GUI_GTK
+		కొరకు (idx = 0; idx < len; ++idx)
 		{
-		    if (enc_utf8 && ScreenLines[off + idx] == 0)
-			continue; // skip second half of double-width char
-		    if (ScreenAttrs[off + idx] != first_attr)
-			break;
+		    ఒకవేళ (enc_utf8 && Screen_పంక్తులు[off + idx] == 0)
+			కొనసాగు; // skip second half of double-width char
+		    ఒకవేళ (ScreenAttrs[off + idx] != మొదటి_attr)
+			ఆపు;
 		}
 		// gui_screenstr() takes care of multibyte chars
 		nback = gui_screenstr(off, idx, flags,
-				      (guicolor_T)0, (guicolor_T)0, back);
-#else
-		for (idx = 0; idx < len && ScreenAttrs[off + idx] == first_attr;
+				      (guicolor_T)0, (guicolor_T)0, వెనుక);
+#లేకపోతే
+		కొరకు (idx = 0; idx < len && ScreenAttrs[off + idx] == మొదటి_attr;
 									idx++)
 		{
 		    // Stop at a multi-byte Unicode character.
-		    if (enc_utf8 && ScreenLinesUC[off + idx] != 0)
-			break;
-		    if (enc_dbcs == DBCS_JPNU)
+		    ఒకవేళ (enc_utf8 && Screen_పంక్తులు_UC[off + idx] != 0)
+			ఆపు;
+		    ఒకవేళ (enc_dbcs == DBCS_JPNU)
 		    {
 			// Stop at a double-byte single-width char.
-			if (ScreenLines[off + idx] == 0x8e)
-			    break;
-			if (len > 1 && (*mb_ptr2len)(ScreenLines
+			ఒకవేళ (Screen_పంక్తులు[off + idx] == 0x8e)
+			    ఆపు;
+			ఒకవేళ (len > 1 && (*mb_ptr2len)(Screen_పంక్తులు
 							    + off + idx) == 2)
 			    ++idx;  // skip second byte of double-byte char
 		    }
 		}
-		nback = gui_outstr_nowrap(ScreenLines + off, idx, flags,
-					  (guicolor_T)0, (guicolor_T)0, back);
-#endif
+		nback = gui_outstr_nowrap(Screen_పంక్తులు + off, idx, flags,
+					  (guicolor_T)0, (guicolor_T)0, వెనుక);
+#అయితే_ముగింపు
 	    }
-	    if (nback == FAIL)
+	    ఒకవేళ (nback == FAIL)
 	    {
 		// Must back up to start drawing where a bold or italic word
 		// starts.
-		off -= back;
-		len += back;
-		gui.col -= back;
+		off -= వెనుక;
+		len += వెనుక;
+		gui.నిలువు -= వెనుక;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		off += idx;
 		len -= idx;
 	    }
-	    back = 0;
+	    వెనుక = 0;
 	}
     }
 
     // Put the cursor back where it was
-    gui.row = old_row;
-    gui.col = old_col;
-    gui.highlight_mask = (int)old_hl_mask;
+    gui.అడ్డువరుస = old_అడ్డువరుస;
+    gui.నిలువు = old_నిలువు;
+    gui.highlight_ముసుగు = (పూర్ణాంకం)old_hl_ముసుగు;
 }
 
-    static void
-gui_delete_lines(int row, int count)
+    స్థిర శూన్య
+gui_delete_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం లెక్క)
 {
-    if (count <= 0)
-	return;
+    ఒకవేళ (లెక్క <= 0)
+	తిరిగి;
 
-    if (row + count > gui.scroll_region_bot)
+    ఒకవేళ (అడ్డువరుస + లెక్క > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
-	gui_clear_block(row, gui.scroll_region_left,
-			      gui.scroll_region_bot, gui.scroll_region_right);
-    else
+	gui_clear_ఖండం(అడ్డువరుస, gui.scroll_region_ఎడమ,
+			      gui.scroll_region_bot, gui.scroll_region_కుడి);
+    లేకపోతే
     {
-	gui_mch_delete_lines(row, count);
+	gui_mch_delete_పంక్తులు(అడ్డువరుస, లెక్క);
 
 	// If the cursor was in the deleted lines it's now gone.  If the
 	// cursor was in the scrolled lines adjust its position.
-	if (gui.cursor_row >= row
-		&& gui.cursor_col >= gui.scroll_region_left
-		&& gui.cursor_col <= gui.scroll_region_right)
+	ఒకవేళ (gui.cursor_అడ్డువరుస >= అడ్డువరుస
+		&& gui.cursor_నిలువు >= gui.scroll_region_ఎడమ
+		&& gui.cursor_నిలువు <= gui.scroll_region_కుడి)
 	{
-	    if (gui.cursor_row < row + count)
+	    ఒకవేళ (gui.cursor_అడ్డువరుస < అడ్డువరుస + లెక్క)
 		gui.cursor_is_valid = false;
-	    else if (gui.cursor_row <= gui.scroll_region_bot)
-		gui.cursor_row -= count;
+	    లేకపోతే ఒకవేళ (gui.cursor_అడ్డువరుస <= gui.scroll_region_bot)
+		gui.cursor_అడ్డువరుస -= లెక్క;
 	}
     }
 }
 
-    static void
-gui_insert_lines(int row, int count)
+    స్థిర శూన్య
+gui_చొప్పించు_పంక్తులు(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం లెక్క)
 {
-    if (count <= 0)
-	return;
+    ఒకవేళ (లెక్క <= 0)
+	తిరిగి;
 
-    if (row + count > gui.scroll_region_bot)
+    ఒకవేళ (అడ్డువరుస + లెక్క > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
-	gui_clear_block(row, gui.scroll_region_left,
-			      gui.scroll_region_bot, gui.scroll_region_right);
-    else
+	gui_clear_ఖండం(అడ్డువరుస, gui.scroll_region_ఎడమ,
+			      gui.scroll_region_bot, gui.scroll_region_కుడి);
+    లేకపోతే
     {
-	gui_mch_insert_lines(row, count);
+	gui_mch_చొప్పించు_పంక్తులు(అడ్డువరుస, లెక్క);
 
-	if (gui.cursor_row >= gui.row
-		&& gui.cursor_col >= gui.scroll_region_left
-		&& gui.cursor_col <= gui.scroll_region_right)
+	ఒకవేళ (gui.cursor_అడ్డువరుస >= gui.అడ్డువరుస
+		&& gui.cursor_నిలువు >= gui.scroll_region_ఎడమ
+		&& gui.cursor_నిలువు <= gui.scroll_region_కుడి)
 	{
-	    if (gui.cursor_row <= gui.scroll_region_bot - count)
-		gui.cursor_row += count;
-	    else if (gui.cursor_row <= gui.scroll_region_bot)
+	    ఒకవేళ (gui.cursor_అడ్డువరుస <= gui.scroll_region_bot - లెక్క)
+		gui.cursor_అడ్డువరుస += లెక్క;
+	    లేకపోతే ఒకవేళ (gui.cursor_అడ్డువరుస <= gui.scroll_region_bot)
 		gui.cursor_is_valid = false;
 	}
     }
 }
 
-#ifdef FEAT_TIMERS
+#నిర్వచితమైతే FEAT_TIMERS
 /*
  * Passed to ui_wait_for_chars_or_timer(), ignoring extra arguments.
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_wait_for_chars_3(
-    long wtime,
-    int *interrupted UNUSED,
-    int ignore_input UNUSED)
+    దీర్ఘ wtime,
+    పూర్ణాంకం *interrupted వాడని,
+    పూర్ణాంకం ignore_ఆదానం వాడని)
 {
-    return gui_mch_wait_for_chars(wtime);
+    తిరిగి gui_mch_wait_for_chars(wtime);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_wait_for_chars_or_timer(
-	long wtime,
-	int *interrupted UNUSED,
-	int ignore_input UNUSED)
+	దీర్ఘ wtime,
+	పూర్ణాంకం *interrupted వాడని,
+	పూర్ణాంకం ignore_ఆదానం వాడని)
 {
-#ifdef FEAT_TIMERS
-    return ui_wait_for_chars_or_timer(wtime, gui_wait_for_chars_3,
-						    interrupted, ignore_input);
-#else
-    return gui_mch_wait_for_chars(wtime);
-#endif
+#నిర్వచితమైతే FEAT_TIMERS
+    తిరిగి ui_wait_for_chars_or_timer(wtime, gui_wait_for_chars_3,
+						    interrupted, ignore_ఆదానం);
+#లేకపోతే
+    తిరిగి gui_mch_wait_for_chars(wtime);
+#అయితే_ముగింపు
 }
 
 /*
@@ -3138,56 +3138,56 @@ gui_wait_for_chars_or_timer(
  * "buf" may be NULL, in which case a non-zero number is returned if characters
  * are available.
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_wait_for_chars_buf(
     char_u	*buf,
-    int		maxlen,
-    long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt)
+    పూర్ణాంకం		maxlen,
+    దీర్ఘ	wtime,	    // don't use "time", MIPS cannot handle it
+    పూర్ణాంకం		tb_change_cnt)
 {
-    int	    retval;
-    int	    keep_blinking; // Guard against restarting blink cycle on CursorHold
+    పూర్ణాంకం	    retval;
+    పూర్ణాంకం	    keep_blinking; // Guard against restarting blink cycle on CursorHold
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     // If we're going to wait a bit, update the menus and mouse shape for the
     // current State.
-    if (wtime != 0)
+    ఒకవేళ (wtime != 0)
 	gui_update_menus(0);
-#endif
+#అయితే_ముగింపు
 
     gui_mch_update();
-    if (input_available())	// Got char, return immediately
+    ఒకవేళ (ఆదానం_అందుబాటు())	// Got char, return immediately
     {
-	if (gui_mch_is_blinking())
+	ఒకవేళ (gui_mch_is_blinking())
 	    gui_mch_stop_blink(TRUE);
-	if (buf != NULL && !typebuf_changed(tb_change_cnt))
-	    return read_from_input_buf(buf, (long)maxlen);
-	return 0;
+	ఒకవేళ (buf != ఖాళీ && !typebuf_మారింది(tb_change_cnt))
+	    తిరిగి read_from_ఆదానం_buf(buf, (దీర్ఘ)maxlen);
+	తిరిగి 0;
     }
-    if (wtime == 0)		// Don't wait for char
-	return FAIL;
+    ఒకవేళ (wtime == 0)		// Don't wait for char
+	తిరిగి FAIL;
 
     // Before waiting, flush any output to the screen.
     gui_mch_flush();
 
     // Blink while waiting for a character.
-    if (!gui_mch_is_blinking())
-	gui_mch_start_blink();
+    ఒకవేళ (!gui_mch_is_blinking())
+	gui_mch_ప్రారంభం_blink();
 
     // Common function to loop until "wtime" is met, while handling timers and
     // other callbacks.
     retval = inchar_loop(buf, maxlen, wtime, tb_change_cnt,
-			 gui_wait_for_chars_or_timer, NULL);
+			 gui_wait_for_chars_or_timer, ఖాళీ);
 
     // Keep blinking when CursorHold wakes the input loop. (See PR #21115)
-    keep_blinking = retval == 3 && buf != NULL
+    keep_blinking = retval == 3 && buf != ఖాళీ
 	&& buf[0] == K_SPECIAL && buf[1] == KS_EXTRA
-	&& buf[2] == (int)KE_CURSORHOLD;
+	&& buf[2] == (పూర్ణాంకం)KE_CURSORHOLD;
 
-    if (!keep_blinking)
+    ఒకవేళ (!keep_blinking)
 	gui_mch_stop_blink(TRUE);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -3199,35 +3199,35 @@ gui_wait_for_chars_buf(
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_wait_for_chars(long wtime, int tb_change_cnt)
+    పూర్ణాంకం
+gui_wait_for_chars(దీర్ఘ wtime, పూర్ణాంకం tb_change_cnt)
 {
-    return gui_wait_for_chars_buf(NULL, 0, wtime, tb_change_cnt);
+    తిరిగి gui_wait_for_chars_buf(ఖాళీ, 0, wtime, tb_change_cnt);
 }
 
 /*
  * Equivalent of mch_inchar() for the GUI.
  */
-    int
+    పూర్ణాంకం
 gui_inchar(
     char_u  *buf,
-    int	    maxlen,
-    long    wtime,		// milliseconds
-    int	    tb_change_cnt)
+    పూర్ణాంకం	    maxlen,
+    దీర్ఘ    wtime,		// milliseconds
+    పూర్ణాంకం	    tb_change_cnt)
 {
-    return gui_wait_for_chars_buf(buf, maxlen, wtime, tb_change_cnt);
+    తిరిగి gui_wait_for_chars_buf(buf, maxlen, wtime, tb_change_cnt);
 }
 
 /*
  * Fill p[4] with mouse coordinates encoded for check_termcode().
  */
-    static void
-fill_mouse_coord(char_u *p, int col, int row)
+    స్థిర శూన్య
+fill_mouse_coord(char_u *p, పూర్ణాంకం నిలువు, పూర్ణాంకం అడ్డువరుస)
 {
-    p[0] = (char_u)(col / 128 + ' ' + 1);
-    p[1] = (char_u)(col % 128 + ' ' + 1);
-    p[2] = (char_u)(row / 128 + ' ' + 1);
-    p[3] = (char_u)(row % 128 + ' ' + 1);
+    p[0] = (char_u)(నిలువు / 128 + ' ' + 1);
+    p[1] = (char_u)(నిలువు % 128 + ' ' + 1);
+    p[2] = (char_u)(అడ్డువరుస / 128 + ' ' + 1);
+    p[3] = (char_u)(అడ్డువరుస % 128 + ' ' + 1);
 }
 
 /*
@@ -3246,155 +3246,155 @@ fill_mouse_coord(char_u *p, int col, int row)
  * This function will ignore drag events where the mouse has not moved to a new
  * character.
  */
-    void
+    శూన్య
 gui_send_mouse_event(
-    int	    button,
-    int	    x,
-    int	    y,
-    int	    repeated_click,
+    పూర్ణాంకం	    button,
+    పూర్ణాంకం	    x,
+    పూర్ణాంకం	    y,
+    పూర్ణాంకం	    repeated_click,
     int_u   modifiers)
 {
-    static int	    prev_row = 0, prev_col = 0;
-    static int	    prev_button = -1;
-    static int	    num_clicks = 1;
+    స్థిర పూర్ణాంకం	    prev_అడ్డువరుస = 0, prev_నిలువు = 0;
+    స్థిర పూర్ణాంకం	    prev_button = -1;
+    స్థిర పూర్ణాంకం	    అంకె_clicks = 1;
     char_u	    string[10];
-    enum key_extra  button_char;
-    int		    row, col;
-#ifdef FEAT_CLIPBOARD
-    int		    checkfor;
-    int		    did_clip = FALSE;
-#endif
+    గణన కీలకం_extra  button_char;
+    పూర్ణాంకం		    అడ్డువరుస, నిలువు;
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    పూర్ణాంకం		    checkfor;
+    పూర్ణాంకం		    did_clip = FALSE;
+#అయితే_ముగింపు
 
     /*
      * Scrolling may happen at any time, also while a selection is present.
      */
-    switch (button)
+    ఎంపిక (button)
     {
-	case MOUSE_MOVE:
+	స్థితి MOUSE_MOVE:
 	    button_char = KE_MOUSEMOVE_XY;
-	    goto button_set;
-	case MOUSE_X1:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_X1:
 	    button_char = KE_X1MOUSE;
-	    goto button_set;
-	case MOUSE_X2:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_X2:
 	    button_char = KE_X2MOUSE;
-	    goto button_set;
-	case MOUSE_4:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_4:
 	    button_char = KE_MOUSEDOWN;
-	    goto button_set;
-	case MOUSE_5:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_5:
 	    button_char = KE_MOUSEUP;
-	    goto button_set;
-	case MOUSE_6:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_6:
 	    button_char = KE_MOUSELEFT;
-	    goto button_set;
-	case MOUSE_7:
+	    వెళ్ళు button_సమితి;
+	స్థితి MOUSE_7:
 	    button_char = KE_MOUSERIGHT;
-button_set:
+button_సమితి:
 	    {
 		// Don't put events in the input queue now.
-		if (hold_gui_events)
-		    return;
+		ఒకవేళ (hold_gui_events)
+		    తిరిగి;
 
-		row = gui_xy2colrow(x, y, &col);
+		అడ్డువరుస = gui_xy2colrow(x, y, &నిలువు);
 		// Don't report a mouse move unless moved to a
 		// different character position.
-		if (button == MOUSE_MOVE)
+		ఒకవేళ (button == MOUSE_MOVE)
 		{
-		    if (row == prev_row && col == prev_col)
-			return;
-		    else
+		    ఒకవేళ (అడ్డువరుస == prev_అడ్డువరుస && నిలువు == prev_నిలువు)
+			తిరిగి;
+		    లేకపోతే
 		    {
-			prev_row = row >= 0 ? row : 0;
-			prev_col = col;
+			prev_అడ్డువరుస = అడ్డువరుస >= 0 ? అడ్డువరుస : 0;
+			prev_నిలువు = నిలువు;
 		    }
 		}
 
 		string[3] = CSI;
 		string[4] = KS_EXTRA;
-		string[5] = (int)button_char;
+		string[5] = (పూర్ణాంకం)button_char;
 
 		// Pass the pointer coordinates of the scroll event so that we
 		// know which window to scroll.
-		string[6] = (char_u)(col / 128 + ' ' + 1);
-		string[7] = (char_u)(col % 128 + ' ' + 1);
-		string[8] = (char_u)(row / 128 + ' ' + 1);
-		string[9] = (char_u)(row % 128 + ' ' + 1);
+		string[6] = (char_u)(నిలువు / 128 + ' ' + 1);
+		string[7] = (char_u)(నిలువు % 128 + ' ' + 1);
+		string[8] = (char_u)(అడ్డువరుస / 128 + ' ' + 1);
+		string[9] = (char_u)(అడ్డువరుస % 128 + ' ' + 1);
 
-		if (modifiers == 0)
-		    add_to_input_buf(string + 3, 7);
-		else
+		ఒకవేళ (modifiers == 0)
+		    కూడు_గమ్యం_ఆదానం_buf(string + 3, 7);
+		లేకపోతే
 		{
 		    string[0] = CSI;
 		    string[1] = KS_MODIFIER;
 		    string[2] = 0;
-		    if (modifiers & MOUSE_SHIFT)
-			string[2] |= MOD_MASK_SHIFT;
-		    if (modifiers & MOUSE_CTRL)
-			string[2] |= MOD_MASK_CTRL;
-		    if (modifiers & MOUSE_ALT)
-			string[2] |= MOD_MASK_ALT;
-		    add_to_input_buf(string, 10);
+		    ఒకవేళ (modifiers & MOUSE_జరుపు)
+			string[2] |= MOD_ముసుగు_జరుపు;
+		    ఒకవేళ (modifiers & MOUSE_CTRL)
+			string[2] |= MOD_ముసుగు_CTRL;
+		    ఒకవేళ (modifiers & MOUSE_ALT)
+			string[2] |= MOD_ముసుగు_ALT;
+		    కూడు_గమ్యం_ఆదానం_buf(string, 10);
 		}
-		return;
+		తిరిగి;
 	    }
     }
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     // If a clipboard selection is in progress, handle it
-    if (clip_star.state == SELECT_IN_PROGRESS)
+    ఒకవేళ (clip_నక్షత్రం.state == SELECT_లోపల_పురోగతి)
     {
-	clip_process_selection(button, X_2_COL(x), Y_2_ROW(y), repeated_click);
+	clip_process_selection(button, X_2_నిలువు(x), Y_2_అడ్డువరుస(y), repeated_click);
 
 	// A release event may still need to be sent if the position is equal.
-	row = gui_xy2colrow(x, y, &col);
-	if (button != MOUSE_RELEASE || row != prev_row || col != prev_col)
-	    return;
+	అడ్డువరుస = gui_xy2colrow(x, y, &నిలువు);
+	ఒకవేళ (button != MOUSE_RELEASE || అడ్డువరుస != prev_అడ్డువరుస || నిలువు != prev_నిలువు)
+	    తిరిగి;
     }
 
     // Determine which mouse settings to look for based on the current mode
-    switch (get_real_state())
+    ఎంపిక (get_real_state())
     {
-	case MODE_NORMAL_BUSY:
-	case MODE_OP_PENDING:
+	స్థితి బహుళకం_సాధారణ_BUSY:
+	స్థితి బహుళకం_OP_PENDING:
 # ifdef FEAT_TERMINAL
-	case MODE_TERMINAL:
+	స్థితి బహుళకం_TERMINAL:
 # endif
-	case MODE_NORMAL:	checkfor = MOUSE_NORMAL; break;
-	case MODE_VISUAL:	checkfor = MOUSE_VISUAL; break;
-	case MODE_SELECT:	checkfor = MOUSE_VISUAL; break;
-	case MODE_REPLACE:
-	case MODE_REPLACE | MODE_LANGMAP:
-	case MODE_VREPLACE:
-	case MODE_VREPLACE | MODE_LANGMAP:
-	case MODE_INSERT:
-	case MODE_INSERT | MODE_LANGMAP:
-				checkfor = MOUSE_INSERT; break;
-	case MODE_ASKMORE:
-	case MODE_HITRETURN:	// At the more- and hit-enter prompt pass the
+	స్థితి బహుళకం_సాధారణ:	checkfor = MOUSE_సాధారణ; ఆపు;
+	స్థితి బహుళకం_VISUAL:	checkfor = MOUSE_VISUAL; ఆపు;
+	స్థితి బహుళకం_SELECT:	checkfor = MOUSE_VISUAL; ఆపు;
+	స్థితి బహుళకం_REPLACE:
+	స్థితి బహుళకం_REPLACE | బహుళకం_LANGMAP:
+	స్థితి బహుళకం_VREPLACE:
+	స్థితి బహుళకం_VREPLACE | బహుళకం_LANGMAP:
+	స్థితి బహుళకం_చొప్పించు:
+	స్థితి బహుళకం_చొప్పించు | బహుళకం_LANGMAP:
+				checkfor = MOUSE_చొప్పించు; ఆపు;
+	స్థితి బహుళకం_ASKMORE:
+	స్థితి బహుళకం_HITRETURN:	// At the more- and hit-enter prompt pass the
 				// mouse event for a click on or below the
 				// message line.
-				if (Y_2_ROW(y) >= msg_row)
-				    checkfor = MOUSE_NORMAL;
-				else
+				ఒకవేళ (Y_2_అడ్డువరుస(y) >= సందేశం_అడ్డువరుస)
+				    checkfor = MOUSE_సాధారణ;
+				లేకపోతే
 				    checkfor = MOUSE_RETURN;
-				break;
+				ఆపు;
 
 	    /*
 	     * On the command line, use the clipboard selection on all lines
 	     * but the command line.  But not when pasting.
 	     */
-	case MODE_CMDLINE:
-	case MODE_CMDLINE | MODE_LANGMAP:
-	    if (Y_2_ROW(y) < cmdline_row && button != MOUSE_MIDDLE)
+	స్థితి బహుళకం_CMDLINE:
+	స్థితి బహుళకం_CMDLINE | బహుళకం_LANGMAP:
+	    ఒకవేళ (Y_2_అడ్డువరుస(y) < cmdline_అడ్డువరుస && button != MOUSE_మధ్య)
 		checkfor = MOUSE_NONE;
-	    else
+	    లేకపోతే
 		checkfor = MOUSE_COMMAND;
-	    break;
+	    ఆపు;
 
-	default:
+	అప్రమేయ:
 	    checkfor = MOUSE_NONE;
-	    break;
+	    ఆపు;
     };
 
     /*
@@ -3402,15 +3402,15 @@ button_set:
      * modes.  Don't do this when dragging the status line, or extending a
      * Visual selection.
      */
-    if ((State == MODE_NORMAL || State == MODE_NORMAL_BUSY
-						      || (State & MODE_INSERT))
-	    && X_2_COL(x) >= firstwin->w_wincol
-	    && X_2_COL(x) < firstwin->w_wincol + topframe->fr_width
-	    && Y_2_ROW(y) >= topframe->fr_height + firstwin->w_winrow
+    ఒకవేళ ((State == బహుళకం_సాధారణ || State == బహుళకం_సాధారణ_BUSY
+						      || (State & బహుళకం_చొప్పించు))
+	    && X_2_నిలువు(x) >= firstwin->w_wincol
+	    && X_2_నిలువు(x) < firstwin->w_wincol + topframe->fr_వెడల్పు
+	    && Y_2_అడ్డువరుస(y) >= topframe->fr_ఎత్తు + firstwin->w_winrow
 	    && button != MOUSE_DRAG
 # ifdef FEAT_MOUSESHAPE
-	    && !drag_status_line
-	    && !drag_sep_line
+	    && !drag_స్థితి_పంక్తి
+	    && !drag_sep_పంక్తి
 # endif
 	    )
 	checkfor = MOUSE_NONE;
@@ -3418,13 +3418,13 @@ button_set:
     /*
      * Use modeless selection when holding CTRL and SHIFT pressed.
      */
-    if ((modifiers & MOUSE_CTRL) && (modifiers & MOUSE_SHIFT))
+    ఒకవేళ ((modifiers & MOUSE_CTRL) && (modifiers & MOUSE_జరుపు))
 	checkfor = MOUSE_NONEF;
 
     /*
      * In Ex mode, always use modeless selection.
      */
-    if (exmode_active)
+    ఒకవేళ (exmode_చురుకైన)
 	checkfor = MOUSE_NONE;
 
     /*
@@ -3434,85 +3434,85 @@ button_set:
      * Exception: On the command line, both the selection is used and a mouse
      * key is sent.
      */
-    if (!mouse_has(checkfor) || checkfor == MOUSE_COMMAND)
+    ఒకవేళ (!mouse_has(checkfor) || checkfor == MOUSE_COMMAND)
     {
 	// Don't do modeless selection in Visual mode.
-	if (checkfor != MOUSE_NONEF && VIsual_active && (State & MODE_NORMAL))
-	    return;
+	ఒకవేళ (checkfor != MOUSE_NONEF && VIsual_చురుకైన && (State & బహుళకం_సాధారణ))
+	    తిరిగి;
 
 	/*
 	 * When 'mousemodel' is "popup", shift-left is translated to right.
 	 * But not when also using Ctrl.
 	 */
-	if (mouse_model_popup() && button == MOUSE_LEFT
-		&& (modifiers & MOUSE_SHIFT) && !(modifiers & MOUSE_CTRL))
+	ఒకవేళ (mouse_model_popup() && button == MOUSE_ఎడమ
+		&& (modifiers & MOUSE_జరుపు) && !(modifiers & MOUSE_CTRL))
 	{
-	    button = MOUSE_RIGHT;
-	    modifiers &= ~ MOUSE_SHIFT;
+	    button = MOUSE_కుడి;
+	    modifiers &= ~ MOUSE_జరుపు;
 	}
 
 	// If the selection is done, allow the right button to extend it.
 	// If the selection is cleared, allow the right button to start it
 	// from the cursor position.
-	if (button == MOUSE_RIGHT)
+	ఒకవేళ (button == MOUSE_కుడి)
 	{
-	    if (clip_star.state == SELECT_CLEARED)
+	    ఒకవేళ (clip_నక్షత్రం.state == SELECT_CLEARED)
 	    {
-		if (State & MODE_CMDLINE)
+		ఒకవేళ (State & బహుళకం_CMDLINE)
 		{
-		    col = msg_col;
-		    row = msg_row;
+		    నిలువు = సందేశం_నిలువు;
+		    అడ్డువరుస = సందేశం_అడ్డువరుస;
 		}
-		else
+		లేకపోతే
 		{
-		    col = curwin->w_wcol;
-		    row = curwin->w_wrow + W_WINROW(curwin);
+		    నిలువు = curwin->w_wcol;
+		    అడ్డువరుస = curwin->w_wrow + W_WINROW(curwin);
 		}
-		clip_start_selection(col, row, FALSE);
+		clip_ప్రారంభం_selection(నిలువు, అడ్డువరుస, FALSE);
 	    }
-	    clip_process_selection(button, X_2_COL(x), Y_2_ROW(y),
+	    clip_process_selection(button, X_2_నిలువు(x), Y_2_అడ్డువరుస(y),
 							      repeated_click);
 	    did_clip = TRUE;
 	}
 	// Allow the left button to start the selection
-	else if (button == MOUSE_LEFT)
+	లేకపోతే ఒకవేళ (button == MOUSE_ఎడమ)
 	{
-	    clip_start_selection(X_2_COL(x), Y_2_ROW(y), repeated_click);
+	    clip_ప్రారంభం_selection(X_2_నిలువు(x), Y_2_అడ్డువరుస(y), repeated_click);
 	    did_clip = TRUE;
 	}
 
 	// Always allow pasting
-	if (button != MOUSE_MIDDLE)
+	ఒకవేళ (button != MOUSE_మధ్య)
 	{
-	    if (!mouse_has(checkfor) || button == MOUSE_RELEASE)
-		return;
-	    if (checkfor != MOUSE_COMMAND)
-		button = MOUSE_LEFT;
+	    ఒకవేళ (!mouse_has(checkfor) || button == MOUSE_RELEASE)
+		తిరిగి;
+	    ఒకవేళ (checkfor != MOUSE_COMMAND)
+		button = MOUSE_ఎడమ;
 	}
 	repeated_click = FALSE;
     }
 
-    if (clip_star.state != SELECT_CLEARED && !did_clip)
-	clip_clear_selection(&clip_star);
-#endif
+    ఒకవేళ (clip_నక్షత్రం.state != SELECT_CLEARED && !did_clip)
+	clip_clear_selection(&clip_నక్షత్రం);
+#అయితే_ముగింపు
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ఒకవేళ (hold_gui_events)
+	తిరిగి;
 
-    row = gui_xy2colrow(x, y, &col);
+    అడ్డువరుస = gui_xy2colrow(x, y, &నిలువు);
 
     /*
      * If we are dragging and the mouse hasn't moved far enough to be on a
      * different character, then don't send an event to vim.
      */
-    if (button == MOUSE_DRAG)
+    ఒకవేళ (button == MOUSE_DRAG)
     {
-	if (row == prev_row && col == prev_col)
-	    return;
+	ఒకవేళ (అడ్డువరుస == prev_అడ్డువరుస && నిలువు == prev_నిలువు)
+	    తిరిగి;
 	// Dragging above the window, set "row" to -1 to cause a scroll.
-	if (y < 0)
-	    row = -1;
+	ఒకవేళ (y < 0)
+	    అడ్డువరుస = -1;
     }
 
     /*
@@ -3520,60 +3520,60 @@ button_set:
      * repeated_click, because we don't want starting Visual mode when
      * clicking on a different character in the text.
      */
-    if (curwin->w_topline != gui_prev_topline
-#ifdef FEAT_DIFF
+    ఒకవేళ (curwin->w_topline != gui_prev_topline
+#నిర్వచితమైతే FEAT_DIFF
 	    || curwin->w_topfill != gui_prev_topfill
-#endif
+#అయితే_ముగింపు
 	    )
 	repeated_click = FALSE;
 
     string[0] = CSI;	// this sequence is recognized by check_termcode()
     string[1] = KS_MOUSE;
     string[2] = KE_FILLER;
-    if (button != MOUSE_DRAG && button != MOUSE_RELEASE)
+    ఒకవేళ (button != MOUSE_DRAG && button != MOUSE_RELEASE)
     {
-	if (repeated_click)
+	ఒకవేళ (repeated_click)
 	{
 	    /*
 	     * Handle multiple clicks.	They only count if the mouse is still
 	     * pointing at the same character.
 	     */
-	    if (button != prev_button || row != prev_row || col != prev_col)
-		num_clicks = 1;
-	    else if (++num_clicks > 4)
-		num_clicks = 1;
+	    ఒకవేళ (button != prev_button || అడ్డువరుస != prev_అడ్డువరుస || నిలువు != prev_నిలువు)
+		అంకె_clicks = 1;
+	    లేకపోతే ఒకవేళ (++అంకె_clicks > 4)
+		అంకె_clicks = 1;
 	}
-	else
-	    num_clicks = 1;
+	లేకపోతే
+	    అంకె_clicks = 1;
 	prev_button = button;
 	gui_prev_topline = curwin->w_topline;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	gui_prev_topfill = curwin->w_topfill;
-#endif
+#అయితే_ముగింపు
 
 	string[3] = (char_u)(button | 0x20);
-	SET_NUM_MOUSE_CLICKS(string[3], num_clicks);
+	సమితి_అంకె_MOUSE_CLICKS(string[3], అంకె_clicks);
     }
-    else
+    లేకపోతే
 	string[3] = (char_u)button;
 
     string[3] |= modifiers;
-    fill_mouse_coord(string + 4, col, row);
-    add_to_input_buf(string, 8);
+    fill_mouse_coord(string + 4, నిలువు, అడ్డువరుస);
+    కూడు_గమ్యం_ఆదానం_buf(string, 8);
 
-    if (row < 0)
-	prev_row = 0;
-    else
-	prev_row = row;
-    prev_col = col;
+    ఒకవేళ (అడ్డువరుస < 0)
+	prev_అడ్డువరుస = 0;
+    లేకపోతే
+	prev_అడ్డువరుస = అడ్డువరుస;
+    prev_నిలువు = నిలువు;
 
     /*
      * We need to make sure this is cleared since GTK doesn't tell us when
      * the user is done dragging.
      */
-#if defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_GUI_GTK)
     gui.dragged_sb = SBAR_NONE;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -3581,290 +3581,290 @@ button_set:
  * Corrects for multi-byte character.
  * returns column in "*colp" and row as return value;
  */
-    static int
-gui_xy2colrow(int x, int y, int *colp)
+    స్థిర పూర్ణాంకం
+gui_xy2colrow(పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం *colp)
 {
-    int		col = check_col(X_2_COL(x));
-    int		row = check_row(Y_2_ROW(y));
+    పూర్ణాంకం		నిలువు = check_నిలువు(X_2_నిలువు(x));
+    పూర్ణాంకం		అడ్డువరుస = check_అడ్డువరుస(Y_2_అడ్డువరుస(y));
 
-    *colp = mb_fix_col(col, row);
-    return row;
+    *colp = mb_fix_నిలువు(నిలువు, అడ్డువరుస);
+    తిరిగి అడ్డువరుస;
 }
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Callback function for when a menu entry has been selected.
  */
-    void
+    శూన్య
 gui_menu_cb(vimmenu_T *menu)
 {
-    char_u  bytes[sizeof(long_u)];
+    char_u  బైట్లు[పరిమాణం(long_u)];
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ఒకవేళ (hold_gui_events)
+	తిరిగి;
 
-    bytes[0] = CSI;
-    bytes[1] = KS_MENU;
-    bytes[2] = KE_FILLER;
-    add_to_input_buf(bytes, 3);
-    add_long_to_buf((long_u)menu, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
+    బైట్లు[0] = CSI;
+    బైట్లు[1] = KS_MENU;
+    బైట్లు[2] = KE_FILLER;
+    కూడు_గమ్యం_ఆదానం_buf(బైట్లు, 3);
+    కూడు_long_గమ్యం_buf((long_u)menu, బైట్లు);
+    కూడు_గమ్యం_ఆదానం_buf_csi(బైట్లు, పరిమాణం(long_u));
 }
-#endif
+#అయితే_ముగింపు
 
-static int	prev_which_scrollbars[3];
+స్థిర పూర్ణాంకం	prev_which_scrollbars[3];
 
 /*
  * Set which components are present.
  * If "oldval" is not NULL, "oldval" is the previous value, the new value is
  * in p_go.
  */
-    void
-gui_init_which_components(char_u *oldval UNUSED)
+    శూన్య
+gui_init_which_components(char_u *oldval వాడని)
 {
-#ifdef FEAT_GUI_DARKTHEME
-    static int	prev_dark_theme = FALSE;
-    int		using_dark_theme = FALSE;
-#endif
-#ifdef FEAT_MENU
-    static int	prev_menu_is_active = -1;
-#endif
-#ifdef FEAT_TOOLBAR
-    static int	prev_toolbar = -1;
-    int		using_toolbar = FALSE;
-#endif
-#ifdef FEAT_GUI_TABLINE
-    int		using_tabline;
-#endif
-#ifdef FEAT_GUI_MSWIN
-    static int	prev_titlebar = FALSE;
-    int		using_titlebar = FALSE;
-#endif
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
+    స్థిర పూర్ణాంకం	prev_dark_theme = FALSE;
+    పూర్ణాంకం		using_dark_theme = FALSE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
+    స్థిర పూర్ణాంకం	prev_menu_is_చురుకైన = -1;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TOOLBAR
+    స్థిర పూర్ణాంకం	prev_toolbar = -1;
+    పూర్ణాంకం		using_toolbar = FALSE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    పూర్ణాంకం		using_tabline;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    స్థిర పూర్ణాంకం	prev_titlebar = FALSE;
+    పూర్ణాంకం		using_titlebar = FALSE;
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    static int	prev_fullscreen = FALSE;
-    int		using_fullscreen = FALSE;
-#endif
-#if defined(FEAT_MENU)
-    static int	prev_tearoff = -1;
-    int		using_tearoff = FALSE;
-#endif
+#ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    స్థిర పూర్ణాంకం	prev_fullscreen = FALSE;
+    పూర్ణాంకం		using_fullscreen = FALSE;
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_MENU)
+    స్థిర పూర్ణాంకం	prev_tearoff = -1;
+    పూర్ణాంకం		using_tearoff = FALSE;
+#అయితే_ముగింపు
 
     char_u	*p;
-    int		i;
-#ifdef FEAT_MENU
-    int		grey_old, grey_new;
-    char_u	*temp;
-#endif
+    పూర్ణాంకం		i;
+#నిర్వచితమైతే FEAT_MENU
+    పూర్ణాంకం		grey_old, grey_new;
+    char_u	*తాత్కాలిక;
+#అయితే_ముగింపు
     win_T	*wp;
-    int		need_set_size;
-    int		fix_size;
+    పూర్ణాంకం		need_సమితి_కొలత;
+    పూర్ణాంకం		fix_కొలత;
 
-#ifdef FEAT_MENU
-    if (oldval != NULL && gui.in_use)
+#నిర్వచితమైతే FEAT_MENU
+    ఒకవేళ (oldval != ఖాళీ && gui.లోపల_use)
     {
 	/*
 	 * Check if the menus go from grey to non-grey or vice versa.
 	 */
-	grey_old = (vim_strchr(oldval, GO_GREY) != NULL);
-	grey_new = (vim_strchr(p_go, GO_GREY) != NULL);
-	if (grey_old != grey_new)
+	grey_old = (vim_strchr(oldval, GO_GREY) != ఖాళీ);
+	grey_new = (vim_strchr(p_go, GO_GREY) != ఖాళీ);
+	ఒకవేళ (grey_old != grey_new)
 	{
-	    temp = p_go;
+	    తాత్కాలిక = p_go;
 	    p_go = oldval;
 	    gui_update_menus(MENU_ALL_MODES);
-	    p_go = temp;
+	    p_go = తాత్కాలిక;
 	}
     }
-    gui.menu_is_active = false;
-#endif
+    gui.menu_is_చురుకైన = false;
+#అయితే_ముగింపు
 
-    for (i = 0; i < 3; i++)
+    కొరకు (i = 0; i < 3; i++)
 	gui.which_scrollbars[i] = false;
-    for (p = p_go; *p; p++)
-	switch (*p)
+    కొరకు (p = p_go; *p; p++)
+	ఎంపిక (*p)
 	{
-	    case GO_LEFT:
-		gui.which_scrollbars[SBAR_LEFT] = true;
-		break;
-	    case GO_RIGHT:
-		gui.which_scrollbars[SBAR_RIGHT] = true;
-		break;
-	    case GO_VLEFT:
-		if (win_hasvertsplit())
-		    gui.which_scrollbars[SBAR_LEFT] = true;
-		break;
-	    case GO_VRIGHT:
-		if (win_hasvertsplit())
-		    gui.which_scrollbars[SBAR_RIGHT] = true;
-		break;
-	    case GO_BOT:
+	    స్థితి GO_ఎడమ:
+		gui.which_scrollbars[SBAR_ఎడమ] = true;
+		ఆపు;
+	    స్థితి GO_కుడి:
+		gui.which_scrollbars[SBAR_కుడి] = true;
+		ఆపు;
+	    స్థితి GO_VLEFT:
+		ఒకవేళ (win_hasvertsplit())
+		    gui.which_scrollbars[SBAR_ఎడమ] = true;
+		ఆపు;
+	    స్థితి GO_VRIGHT:
+		ఒకవేళ (win_hasvertsplit())
+		    gui.which_scrollbars[SBAR_కుడి] = true;
+		ఆపు;
+	    స్థితి GO_BOT:
 		gui.which_scrollbars[SBAR_BOTTOM] = true;
-		break;
-#ifdef FEAT_GUI_DARKTHEME
-	    case GO_DARKTHEME:
+		ఆపు;
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
+	    స్థితి GO_DARKTHEME:
 		using_dark_theme = TRUE;
-		break;
-#endif
-#ifdef FEAT_MENU
-	    case GO_MENUS:
-		gui.menu_is_active = true;
-		break;
-#endif
-	    case GO_GREY:
+		ఆపు;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
+	    స్థితి GO_MENUS:
+		gui.menu_is_చురుకైన = true;
+		ఆపు;
+#అయితే_ముగింపు
+	    స్థితి GO_GREY:
 		// make menu's have grey items, ignored here
-		break;
-#ifdef FEAT_GUI_MSWIN
-	    case GO_TITLEBAR:
+		ఆపు;
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+	    స్థితి GO_TITLEBAR:
 		using_titlebar = TRUE;
-		break;
-#endif
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-	    case GO_FULLSCREEN:
+		ఆపు;
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+	    స్థితి GO_FULLSCREEN:
 		using_fullscreen = TRUE;
-		break;
-#endif
-#ifdef FEAT_TOOLBAR
-	    case GO_TOOLBAR:
+		ఆపు;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TOOLBAR
+	    స్థితి GO_TOOLBAR:
 		using_toolbar = TRUE;
-		break;
-#endif
-	    case GO_TEAROFF:
-#if defined(FEAT_MENU)
+		ఆపు;
+#అయితే_ముగింపు
+	    స్థితి GO_TEAROFF:
+#ఒకవేళ defined(FEAT_MENU)
 		using_tearoff = TRUE;
-#endif
-		break;
-	    default:
+#అయితే_ముగింపు
+		ఆపు;
+	    అప్రమేయ:
 		// Ignore options that are not supported
-		break;
+		ఆపు;
 	}
 
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
-    need_set_size = 0;
-    fix_size = FALSE;
+    need_సమితి_కొలత = 0;
+    fix_కొలత = FALSE;
 
-#ifdef FEAT_GUI_MSWIN
-    if (using_titlebar != prev_titlebar)
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    ఒకవేళ (using_titlebar != prev_titlebar)
     {
-	gui_mch_set_titlebar_colors();
+	gui_mch_సమితి_titlebar_colors();
 	prev_titlebar = using_titlebar;
     }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    if (using_fullscreen != prev_fullscreen)
+#ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    ఒకవేళ (using_fullscreen != prev_fullscreen)
     {
-	gui_mch_set_fullscreen(using_fullscreen);
+	gui_mch_సమితి_fullscreen(using_fullscreen);
 	prev_fullscreen = using_fullscreen;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_DARKTHEME
-    if (using_dark_theme != prev_dark_theme)
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
+    ఒకవేళ (using_dark_theme != prev_dark_theme)
     {
-	gui_mch_set_dark_theme(using_dark_theme);
+	gui_mch_సమితి_dark_theme(using_dark_theme);
 	prev_dark_theme = using_dark_theme;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
+#నిర్వచితమైతే FEAT_GUI_TABLINE
     // Update the GUI tab line, it may appear or disappear.  This may
     // cause the non-GUI tab line to disappear or appear.
     using_tabline = gui_has_tabline();
-    if (!gui_mch_showing_tabline() != !using_tabline)
+    ఒకవేళ (!gui_mch_showing_tabline() != !using_tabline)
     {
 	// We don't want a resize event change "Rows" here, save and
 	// restore it.  Resizing is handled below.
-	i = Rows;
+	i = అడ్డువరుసలు;
 	gui_update_tabline();
-	Rows = i;
-	need_set_size |= RESIZE_VERT;
-	if (using_tabline)
-	    fix_size = TRUE;
-	if (!gui_use_tabline())
+	అడ్డువరుసలు = i;
+	need_సమితి_కొలత |= RESIZE_VERT;
+	ఒకవేళ (using_tabline)
+	    fix_కొలత = TRUE;
+	ఒకవేళ (!gui_use_tabline())
 	    redraw_tabline = TRUE;    // may draw non-GUI tab line
     }
-#endif
+#అయితే_ముగింపు
 
-    for (i = 0; i < 3; i++)
+    కొరకు (i = 0; i < 3; i++)
     {
 	// The scrollbar needs to be updated when it is shown/unshown and
 	// when switching tab pages.  But the size only changes when it's
 	// shown/unshown.  Thus we need two places to remember whether a
 	// scrollbar is there or not.
-	if (gui.which_scrollbars[i] != prev_which_scrollbars[i]
+	ఒకవేళ (gui.which_scrollbars[i] != prev_which_scrollbars[i]
 		|| gui.which_scrollbars[i]
 		!= curtab->tp_prev_which_scrollbars[i])
 	{
-	    if (i == SBAR_BOTTOM)
+	    ఒకవేళ (i == SBAR_BOTTOM)
 		gui_mch_enable_scrollbar(&gui.bottom_sbar,
 			gui.which_scrollbars[i]);
-	    else
+	    లేకపోతే
 	    {
 		FOR_ALL_WINDOWS(wp)
 		    gui_do_scrollbar(wp, i, gui.which_scrollbars[i]);
 	    }
-	    if (gui.which_scrollbars[i] != prev_which_scrollbars[i])
+	    ఒకవేళ (gui.which_scrollbars[i] != prev_which_scrollbars[i])
 	    {
-		if (i == SBAR_BOTTOM)
-		    need_set_size |= RESIZE_VERT;
-		else
-		    need_set_size |= RESIZE_HOR;
-		if (gui.which_scrollbars[i])
-		    fix_size = TRUE;
+		ఒకవేళ (i == SBAR_BOTTOM)
+		    need_సమితి_కొలత |= RESIZE_VERT;
+		లేకపోతే
+		    need_సమితి_కొలత |= RESIZE_HOR;
+		ఒకవేళ (gui.which_scrollbars[i])
+		    fix_కొలత = TRUE;
 	    }
 	}
 	curtab->tp_prev_which_scrollbars[i] = gui.which_scrollbars[i];
 	prev_which_scrollbars[i] = gui.which_scrollbars[i];
     }
 
-#ifdef FEAT_MENU
-    if (gui.menu_is_active != prev_menu_is_active)
+#నిర్వచితమైతే FEAT_MENU
+    ఒకవేళ (gui.menu_is_చురుకైన != prev_menu_is_చురుకైన)
     {
 	// We don't want a resize event change "Rows" here, save and
 	// restore it.  Resizing is handled below.
-	i = Rows;
-	gui_mch_enable_menu(gui.menu_is_active);
-	Rows = i;
-	prev_menu_is_active = gui.menu_is_active;
-	need_set_size |= RESIZE_VERT;
-	if (gui.menu_is_active)
-	    fix_size = TRUE;
+	i = అడ్డువరుసలు;
+	gui_mch_enable_menu(gui.menu_is_చురుకైన);
+	అడ్డువరుసలు = i;
+	prev_menu_is_చురుకైన = gui.menu_is_చురుకైన;
+	need_సమితి_కొలత |= RESIZE_VERT;
+	ఒకవేళ (gui.menu_is_చురుకైన)
+	    fix_కొలత = TRUE;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_TOOLBAR
-    if (using_toolbar != prev_toolbar)
+#నిర్వచితమైతే FEAT_TOOLBAR
+    ఒకవేళ (using_toolbar != prev_toolbar)
     {
 	gui_mch_show_toolbar(using_toolbar);
 	prev_toolbar = using_toolbar;
-	need_set_size |= RESIZE_VERT;
-	if (using_toolbar)
-	    fix_size = TRUE;
+	need_సమితి_కొలత |= RESIZE_VERT;
+	ఒకవేళ (using_toolbar)
+	    fix_కొలత = TRUE;
     }
-#endif
-#if defined(FEAT_MENU) && !(defined(MSWIN) && !defined(FEAT_TEAROFF))
-    if (using_tearoff != prev_tearoff)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_MENU) && !(defined(MSWIN) && !defined(FEAT_TEAROFF))
+    ఒకవేళ (using_tearoff != prev_tearoff)
     {
 	gui_mch_toggle_tearoffs(using_tearoff);
 	prev_tearoff = using_tearoff;
     }
-#endif
-    if (need_set_size != 0)
+#అయితే_ముగింపు
+    ఒకవేళ (need_సమితి_కొలత != 0)
     {
-#ifdef FEAT_GUI_GTK
-	long    prev_Columns = Columns;
-	long    prev_Rows = Rows;
-#endif
+#నిర్వచితమైతే FEAT_GUI_GTK
+	దీర్ఘ    prev_Columns = Columns;
+	దీర్ఘ    prev_అడ్డువరుసలు = అడ్డువరుసలు;
+#అయితే_ముగింపు
 	// Adjust the size of the window to make the text area keep the
 	// same size and to avoid that part of our window is off-screen
 	// and a scrollbar can't be used, for example.
-	gui_set_shellsize(FALSE, fix_size, need_set_size);
+	gui_సమితి_shellsize(FALSE, fix_కొలత, need_సమితి_కొలత);
 
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
 	// GTK has the annoying habit of sending us resize events when
 	// changing the window size ourselves.  This mostly happens when
 	// waiting for a character to arrive, quite unpredictably, and may
@@ -3879,81 +3879,81 @@ gui_init_which_components(char_u *oldval UNUSED)
 	    // Save the size gui_set_shellsize() determined before
 	    // char_avail() processes spurious configure events that may
 	    // corrupt Rows/Columns.
-	    long    post_Rows = Rows;
-	    long    post_Columns = Columns;
+	    దీర్ఘ    post_అడ్డువరుసలు = అడ్డువరుసలు;
+	    దీర్ఘ    post_Columns = Columns;
 
-	    if (!gui.starting && need_set_size != (RESIZE_VERT | RESIZE_HOR))
-		(void)char_avail();
-	    if ((need_set_size & RESIZE_VERT) == 0)
-		Rows = prev_Rows;
-	    else
-		Rows = post_Rows;
-	    if ((need_set_size & RESIZE_HOR) == 0)
+	    ఒకవేళ (!gui.starting && need_సమితి_కొలత != (RESIZE_VERT | RESIZE_HOR))
+		(శూన్య)char_avail();
+	    ఒకవేళ ((need_సమితి_కొలత & RESIZE_VERT) == 0)
+		అడ్డువరుసలు = prev_అడ్డువరుసలు;
+	    లేకపోతే
+		అడ్డువరుసలు = post_అడ్డువరుసలు;
+	    ఒకవేళ ((need_సమితి_కొలత & RESIZE_HOR) == 0)
 		Columns = prev_Columns;
-	    else
+	    లేకపోతే
 		Columns = post_Columns;
 	}
-#endif
+#అయితే_ముగింపు
     }
     // When the console tabline appears or disappears the window positions
     // change.
-    if (firstwin->w_winrow != tabline_height())
-	shell_new_rows();	// recompute window positions and heights
+    ఒకవేళ (firstwin->w_winrow != tabline_ఎత్తు())
+	shell_new_అడ్డువరుసలు();	// recompute window positions and heights
 }
 
-#if defined(FEAT_GUI_TABLINE)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
 /*
  * Return TRUE if the GUI is taking care of the tabline.
  * It may still be hidden if 'showtabline' is zero.
  */
-    int
-gui_use_tabline(void)
+    పూర్ణాంకం
+gui_use_tabline(శూన్య)
 {
-    return gui.in_use && vim_strchr(p_go, GO_TABLINE) != NULL;
+    తిరిగి gui.లోపల_use && vim_strchr(p_go, GO_TABLINE) != ఖాళీ;
 }
 
 /*
  * Return TRUE if the GUI is showing the tabline.
  * This uses 'showtabline'.
  */
-    static int
-gui_has_tabline(void)
+    స్థిర పూర్ణాంకం
+gui_has_tabline(శూన్య)
 {
-    if (!gui_use_tabline()
+    ఒకవేళ (!gui_use_tabline()
 	    || p_stal == 0
-	    || (p_stal == 1 && first_tabpage->tp_next == NULL))
-	return FALSE;
-    return TRUE;
+	    || (p_stal == 1 && మొదటి_tabpage->tp_తదుపరి == ఖాళీ))
+	తిరిగి FALSE;
+    తిరిగి TRUE;
 }
 
 /*
  * Update the tabline.
  * This may display/undisplay the tabline and update the labels.
  */
-    void
-gui_update_tabline(void)
+    శూన్య
+gui_update_tabline(శూన్య)
 {
-    int	    showit = gui_has_tabline();
-    int	    shown = gui_mch_showing_tabline();
+    పూర్ణాంకం	    showit = gui_has_tabline();
+    పూర్ణాంకం	    shown = gui_mch_showing_tabline();
 
-    if (!gui.starting && starting == 0)
+    ఒకవేళ (!gui.starting && starting == 0)
     {
 	// Updating the tabline uses direct GUI commands, flush
 	// outstanding instructions first. (esp. clear screen)
-	out_flush();
+	బహిర్గతం_flush();
 
-	if (!showit != !shown)
+	ఒకవేళ (!showit != !shown)
 	{
 	    // Save Rows/Columns before showing/hiding the tabline.
 	    // gui_mch_show_tabline() processes GTK events (via
 	    // gui_mch_update) which may trigger a spurious configure event
 	    // that temporarily corrupts Rows.  Restore the original values so
 	    // that gui_set_shellsize() uses the correct row/column count.
-	    int save_Rows = Rows;
-	    int save_Columns = Columns;
+	    పూర్ణాంకం save_అడ్డువరుసలు = అడ్డువరుసలు;
+	    పూర్ణాంకం save_Columns = Columns;
 
 	    gui_mch_show_tabline(showit);
-	    Rows = save_Rows;
+	    అడ్డువరుసలు = save_అడ్డువరుసలు;
 	    Columns = save_Columns;
 
 	    // Resize the outer window to compensate for the tabline height
@@ -3962,9 +3962,9 @@ gui_update_tabline(void)
 	    // When called from gui_init_which_components() the subsequent
 	    // gui_set_shellsize() call will redo this to the same dimensions,
 	    // which is harmless.
-	    gui_set_shellsize(FALSE, showit, RESIZE_VERT);
+	    gui_సమితి_shellsize(FALSE, showit, RESIZE_VERT);
 	}
-	if (showit != 0)
+	ఒకవేళ (showit != 0)
 	    gui_mch_update_tabline();
     }
 }
@@ -3972,25 +3972,25 @@ gui_update_tabline(void)
 /*
  * Get the label or tooltip for tab page "tp" into NameBuff[].
  */
-    void
+    శూన్య
 get_tabline_label(
     tabpage_T	*tp,
-    int		tooltip)	// TRUE: get tooltip
+    పూర్ణాంకం		tooltip)	// TRUE: get tooltip
 {
     char_u	**opt;
 
     // Use 'guitablabel' or 'guitabtooltip' if it's set.
     opt = (tooltip ? &p_gtt : &p_gtl);
-    if (**opt != NUL)
+    ఒకవేళ (**opt != NUL)
     {
 	char_u	res[MAXPATHL];
 	tabpage_T *save_curtab;
 	char_u	*opt_name = (char_u *)(tooltip ? "guitabtooltip"
 							     : "guitablabel");
 
-	printer_page_num = tabpage_index(tp);
+	printer_పుట_అంకె = tabpage_సూచీ(tp);
 # ifdef FEAT_EVAL
-	set_vim_var_nr(VV_LNUM, printer_page_num);
+	సమితి_vim_var_nr(VV_LNUM, printer_పుట_అంకె);
 # endif
 	// It's almost as going to the tabpage, but without autocommands.
 	curtab->tp_firstwin = firstwin;
@@ -4002,11 +4002,11 @@ get_tabline_label(
 	firstwin = curtab->tp_firstwin;
 	lastwin = curtab->tp_lastwin;
 	curwin = curtab->tp_curwin;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
 
 	// Can't use NameBuff directly, build_stl_str_hl() uses it.
 	build_stl_str_hl(curwin, res, MAXPATHL, *opt, opt_name, 0,
-					   0, (int)Columns, NULL, NULL, NULL);
+					   0, (పూర్ణాంకం)Columns, ఖాళీ, ఖాళీ, ఖాళీ);
 	STRCPY(NameBuff, res);
 
 	// Back to the original curtab.
@@ -4015,45 +4015,45 @@ get_tabline_label(
 	firstwin = curtab->tp_firstwin;
 	lastwin = curtab->tp_lastwin;
 	curwin = curtab->tp_curwin;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
     }
 
     // If 'guitablabel'/'guitabtooltip' is not set or the result is empty then
     // use a default label.
-    if (**opt == NUL || *NameBuff == NUL)
+    ఒకవేళ (**opt == NUL || *NameBuff == NUL)
     {
 	win_T	*wp;
-	int	wincount = 0;
-	int	modified = FALSE;
+	పూర్ణాంకం	wincount = 0;
+	పూర్ణాంకం	modified = FALSE;
 
 	// Get the buffer name into NameBuff[] and shorten it.
-	get_trans_bufname(tp == curtab ? curbuf : tp->tp_curwin->w_buffer);
-	if (!tooltip)
+	get_trans_bufname(tp == curtab ? curbuf : tp->tp_curwin->w_బఫరు);
+	ఒకవేళ (!tooltip)
 	    shorten_dir(NameBuff);
 
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	FOR_ALL_WINDOWS_లోపల_TAB(tp, wp)
 	{
 	    ++wincount;
-	    if (bufIsChanged(wp->w_buffer))
+	    ఒకవేళ (buf_Is_మారింది(wp->w_బఫరు))
 		modified = TRUE;
 	}
 
-	if (modified || wincount > 1)
+	ఒకవేళ (modified || wincount > 1)
 	{
 	    char_u  buf[40] = "+ ";		// Tentatively assume modified only
 	    size_t  buflen = 2;
 	    size_t  NameBufflen = STRLEN(NameBuff);
 
-	    if (wincount > 1)
+	    ఒకవేళ (wincount > 1)
 		buflen = vim_snprintf_safelen(
-		    (char *)buf,
-		    sizeof(buf),
+		    (అక్షరం *)buf,
+		    పరిమాణం(buf),
 		    "%d%s ",
 		    wincount,
 		    modified ? "+" : "");
 
 	    // Make sure resulting NameBuff will not exceed its bounds.
-	    if (NameBufflen + buflen < MAXPATHL)
+	    ఒకవేళ (NameBufflen + buflen < MAXPATHL)
 	    {
 		mch_memmove(NameBuff + buflen, NameBuff, NameBufflen + 1);	// +1 for NUL
 		mch_memmove(NameBuff, buf, buflen);
@@ -4067,57 +4067,57 @@ get_tabline_label(
  * Returns TRUE if it was done, FALSE when skipped because we are already at
  * that tab page or the cmdline window is open.
  */
-    int
-send_tabline_event(int nr)
+    పూర్ణాంకం
+send_tabline_event(పూర్ణాంకం nr)
 {
     char_u string[3];
 
-    if (nr == tabpage_index(curtab))
-	return FALSE;
+    ఒకవేళ (nr == tabpage_సూచీ(curtab))
+	తిరిగి FALSE;
 
     // Don't put events in the input queue now.
-    if (hold_gui_events || cmdwin_type != 0)
+    ఒకవేళ (hold_gui_events || cmdwin_type != 0)
     {
 	// Set it back to the current tab page.
-	gui_mch_set_curtab(tabpage_index(curtab));
-	return FALSE;
+	gui_mch_సమితి_curtab(tabpage_సూచీ(curtab));
+	తిరిగి FALSE;
     }
 
     string[0] = CSI;
     string[1] = KS_TABLINE;
     string[2] = KE_FILLER;
-    add_to_input_buf(string, 3);
+    కూడు_గమ్యం_ఆదానం_buf(string, 3);
     string[0] = nr;
-    add_to_input_buf_csi(string, 1);
-    return TRUE;
+    కూడు_గమ్యం_ఆదానం_buf_csi(string, 1);
+    తిరిగి TRUE;
 }
 
 /*
  * Send a tabline menu event
  */
-    void
-send_tabline_menu_event(int tabidx, int event)
+    శూన్య
+send_tabline_menu_event(పూర్ణాంకం tabidx, పూర్ణాంకం event)
 {
     char_u	    string[3];
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ఒకవేళ (hold_gui_events)
+	తిరిగి;
 
     // Cannot close the last tabpage.
-    if (event == TABLINE_MENU_CLOSE && first_tabpage->tp_next == NULL)
-	return;
+    ఒకవేళ (event == TABLINE_MENU_CLOSE && మొదటి_tabpage->tp_తదుపరి == ఖాళీ)
+	తిరిగి;
 
     string[0] = CSI;
     string[1] = KS_TABMENU;
     string[2] = KE_FILLER;
-    add_to_input_buf(string, 3);
+    కూడు_గమ్యం_ఆదానం_buf(string, 3);
     string[0] = tabidx;
-    string[1] = (char_u)(long)event;
-    add_to_input_buf_csi(string, 2);
+    string[1] = (char_u)(దీర్ఘ)event;
+    కూడు_గమ్యం_ఆదానం_buf_csi(string, 2);
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Scrollbar stuff:
@@ -4126,17 +4126,17 @@ send_tabline_menu_event(int tabidx, int event)
 /*
  * Remove all scrollbars.  Used before switching to another tab page.
  */
-    void
-gui_remove_scrollbars(void)
+    శూన్య
+gui_remove_scrollbars(శూన్య)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
     win_T   *wp;
 
-    for (i = 0; i < 3; i++)
+    కొరకు (i = 0; i < 3; i++)
     {
-	if (i == SBAR_BOTTOM)
+	ఒకవేళ (i == SBAR_BOTTOM)
 	    gui_mch_enable_scrollbar(&gui.bottom_sbar, FALSE);
-	else
+	లేకపోతే
 	{
 	    FOR_ALL_WINDOWS(wp)
 		gui_do_scrollbar(wp, i, FALSE);
@@ -4145,42 +4145,42 @@ gui_remove_scrollbars(void)
     }
 }
 
-    void
-gui_create_scrollbar(scrollbar_T *sb, int type, win_T *wp)
+    శూన్య
+gui_create_scrollbar(scrollbar_T *sb, పూర్ణాంకం type, win_T *wp)
 {
-    static int	sbar_ident = 0;
+    స్థిర పూర్ణాంకం	sbar_ident = 0;
 
     sb->ident = sbar_ident++;	// No check for too big, but would it happen?
     sb->wp = wp;
     sb->type = type;
-    sb->value = 0;
-    sb->size = 1;
+    sb->విలువ = 0;
+    sb->కొలత = 1;
     sb->max = 1;
-    sb->top = 0;
-    sb->height = 0;
-    sb->width = 0;
-    sb->status_height = 0;
-    gui_mch_create_scrollbar(sb, (wp == NULL) ? SBAR_HORIZ : SBAR_VERT);
+    sb->శిఖరం = 0;
+    sb->ఎత్తు = 0;
+    sb->వెడల్పు = 0;
+    sb->స్థితి_ఎత్తు = 0;
+    gui_mch_create_scrollbar(sb, (wp == ఖాళీ) ? SBAR_HORIZ : SBAR_VERT);
 }
 
 /*
  * Find the scrollbar with the given index.
  */
     scrollbar_T *
-gui_find_scrollbar(long ident)
+gui_కనుగొను_scrollbar(దీర్ఘ ident)
 {
     win_T	*wp;
 
-    if (gui.bottom_sbar.ident == ident)
-	return &gui.bottom_sbar;
+    ఒకవేళ (gui.bottom_sbar.ident == ident)
+	తిరిగి &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	ఒకవేళ (wp->w_scrollbars[SBAR_ఎడమ].ident == ident)
+	    తిరిగి &wp->w_scrollbars[SBAR_ఎడమ];
+	ఒకవేళ (wp->w_scrollbars[SBAR_కుడి].ident == ident)
+	    తిరిగి &wp->w_scrollbars[SBAR_కుడి];
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -4198,118 +4198,118 @@ gui_find_scrollbar(long ident)
  * Ignore the scrollbars while executing an external command or when there
  * are still characters to be processed.
  */
-    void
-gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
+    శూన్య
+gui_drag_scrollbar(scrollbar_T *sb, దీర్ఘ విలువ, పూర్ణాంకం still_dragging)
 {
     win_T	*wp;
-    int		sb_num;
-#ifdef USE_ON_FLY_SCROLL
+    పూర్ణాంకం		sb_అంకె;
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     colnr_T	old_leftcol = curwin->w_leftcol;
     linenr_T	old_topline = curwin->w_topline;
 # ifdef FEAT_DIFF
-    int		old_topfill = curwin->w_topfill;
+    పూర్ణాంకం		old_topfill = curwin->w_topfill;
 # endif
-#else
-    char_u	bytes[sizeof(long_u)];
-    int		byte_count;
-#endif
+#లేకపోతే
+    char_u	బైట్లు[పరిమాణం(long_u)];
+    పూర్ణాంకం		byte_లెక్క;
+#అయితే_ముగింపు
 
-    if (sb == NULL)
-	return;
+    ఒకవేళ (sb == ఖాళీ)
+	తిరిగి;
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ఒకవేళ (hold_gui_events)
+	తిరిగి;
 
-    if (cmdwin_type != 0 && sb->wp != cmdwin_win)
-	return;
+    ఒకవేళ (cmdwin_type != 0 && sb->wp != cmdwin_win)
+	తిరిగి;
 
-    if (still_dragging)
+    ఒకవేళ (still_dragging)
     {
-	if (sb->wp == NULL)
+	ఒకవేళ (sb->wp == ఖాళీ)
 	    gui.dragged_sb = SBAR_BOTTOM;
-	else if (sb == &sb->wp->w_scrollbars[SBAR_LEFT])
-	    gui.dragged_sb = SBAR_LEFT;
-	else
-	    gui.dragged_sb = SBAR_RIGHT;
+	లేకపోతే ఒకవేళ (sb == &sb->wp->w_scrollbars[SBAR_ఎడమ])
+	    gui.dragged_sb = SBAR_ఎడమ;
+	లేకపోతే
+	    gui.dragged_sb = SBAR_కుడి;
 	gui.dragged_wp = sb->wp;
     }
-    else
+    లేకపోతే
     {
 	gui.dragged_sb = SBAR_NONE;
-#ifdef FEAT_GUI_GTK
+#నిర్వచితమైతే FEAT_GUI_GTK
 	// Keep the "dragged_wp" value until after the scrolling, for when the
 	// mouse button is released.  GTK2 doesn't send the button-up event.
-	gui.dragged_wp = NULL;
+	gui.dragged_wp = ఖాళీ;
 	// WinScrolled event
 	gui_focus_change(TRUE);
-#endif
+#అయితే_ముగింపు
     }
 
     // Vertical sbar info is kept in the first sbar (the left one)
-    if (sb->wp != NULL)
+    ఒకవేళ (sb->wp != ఖాళీ)
 	sb = &sb->wp->w_scrollbars[0];
 
     /*
      * Check validity of value
      */
-    if (value < 0)
-	value = 0;
-#ifdef SCROLL_PAST_END
-    else if (value > sb->max)
-	value = sb->max;
-#else
-    if (value > sb->max - sb->size + 1)
-	value = sb->max - sb->size + 1;
-#endif
+    ఒకవేళ (విలువ < 0)
+	విలువ = 0;
+#నిర్వచితమైతే SCROLL_PAST_చివర
+    లేకపోతే ఒకవేళ (విలువ > sb->max)
+	విలువ = sb->max;
+#లేకపోతే
+    ఒకవేళ (విలువ > sb->max - sb->కొలత + 1)
+	విలువ = sb->max - sb->కొలత + 1;
+#అయితే_ముగింపు
 
-    sb->value = value;
+    sb->విలువ = విలువ;
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     // When not allowed to do the scrolling right now, return.
     // This also checked input_available(), but that causes the first click in
     // a scrollbar to be ignored when Vim doesn't have focus.
-    if (dont_scroll)
-	return;
-#endif
+    ఒకవేళ (dont_scroll)
+	తిరిగి;
+#అయితే_ముగింపు
     // Disallow scrolling the current window when the completion popup menu is
     // visible.
-    if ((sb->wp == NULL || sb->wp == curwin) && pum_visible())
-	return;
+    ఒకవేళ ((sb->wp == ఖాళీ || sb->wp == curwin) && pum_visible())
+	తిరిగి;
 
-#ifdef FEAT_RIGHTLEFT
-    if (sb->wp == NULL && curwin->w_p_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (sb->wp == ఖాళీ && curwin->w_p_rl)
     {
-	value = sb->max + 1 - sb->size - value;
-	if (value < 0)
-	    value = 0;
+	విలువ = sb->max + 1 - sb->కొలత - విలువ;
+	ఒకవేళ (విలువ < 0)
+	    విలువ = 0;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (sb->wp != NULL)		// vertical scrollbar
+    ఒకవేళ (sb->wp != ఖాళీ)		// vertical scrollbar
     {
-	sb_num = 0;
-	for (wp = firstwin; wp != sb->wp && wp != NULL; wp = wp->w_next)
-	    sb_num++;
-	if (wp == NULL)
-	    return;
+	sb_అంకె = 0;
+	కొరకు (wp = firstwin; wp != sb->wp && wp != ఖాళీ; wp = wp->w_తదుపరి)
+	    sb_అంకె++;
+	ఒకవేళ (wp == ఖాళీ)
+	    తిరిగి;
 
-#ifdef USE_ON_FLY_SCROLL
-	current_scrollbar = sb_num;
-	scrollbar_value = value;
-	if (State & MODE_NORMAL)
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
+	current_scrollbar = sb_అంకె;
+	scrollbar_విలువ = విలువ;
+	ఒకవేళ (State & బహుళకం_సాధారణ)
 	{
 	    gui_do_scroll();
 	    setcursor();
 	}
-	else if (State & MODE_INSERT)
+	లేకపోతే ఒకవేళ (State & బహుళకం_చొప్పించు)
 	{
 	    ins_scroll();
 	    setcursor();
 	}
-	else if (State & MODE_CMDLINE)
+	లేకపోతే ఒకవేళ (State & బహుళకం_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    ఒకవేళ (సందేశం_scrolled == 0)
 	    {
 		gui_do_scroll();
 		redrawcmdline();
@@ -4317,62 +4317,62 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	}
 # ifdef FEAT_FOLDING
 	// Value may have been changed for closed fold.
-	sb->value = sb->wp->w_topline - 1;
+	sb->విలువ = sb->wp->w_topline - 1;
 # endif
 
 	// When dragging one scrollbar and there is another one at the other
 	// side move the thumb of that one too.
-	if (gui.which_scrollbars[SBAR_RIGHT] && gui.which_scrollbars[SBAR_LEFT])
-	    gui_mch_set_scrollbar_thumb(
+	ఒకవేళ (gui.which_scrollbars[SBAR_కుడి] && gui.which_scrollbars[SBAR_ఎడమ])
+	    gui_mch_సమితి_scrollbar_thumb(
 		    &sb->wp->w_scrollbars[
-			    sb == &sb->wp->w_scrollbars[SBAR_RIGHT]
-						    ? SBAR_LEFT : SBAR_RIGHT],
-		    sb->value, sb->size, sb->max);
+			    sb == &sb->wp->w_scrollbars[SBAR_కుడి]
+						    ? SBAR_ఎడమ : SBAR_కుడి],
+		    sb->విలువ, sb->కొలత, sb->max);
 
-#else
-	bytes[0] = CSI;
-	bytes[1] = KS_VER_SCROLLBAR;
-	bytes[2] = KE_FILLER;
-	bytes[3] = (char_u)sb_num;
-	byte_count = 4;
-#endif
+#లేకపోతే
+	బైట్లు[0] = CSI;
+	బైట్లు[1] = KS_VER_SCROLLBAR;
+	బైట్లు[2] = KE_FILLER;
+	బైట్లు[3] = (char_u)sb_అంకె;
+	byte_లెక్క = 4;
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-#ifdef USE_ON_FLY_SCROLL
-	scrollbar_value = value;
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
+	scrollbar_విలువ = విలువ;
 
-	if (State & MODE_NORMAL)
-	    do_mousescroll_horiz(scrollbar_value);
-	else if (State & MODE_INSERT)
+	ఒకవేళ (State & బహుళకం_సాధారణ)
+	    do_mousescroll_horiz(scrollbar_విలువ);
+	లేకపోతే ఒకవేళ (State & బహుళకం_చొప్పించు)
 	    ins_horscroll();
-	else if (State & MODE_CMDLINE)
+	లేకపోతే ఒకవేళ (State & బహుళకం_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    ఒకవేళ (సందేశం_scrolled == 0)
 	    {
-		do_mousescroll_horiz(scrollbar_value);
+		do_mousescroll_horiz(scrollbar_విలువ);
 		redrawcmdline();
 	    }
 	}
-	if (old_leftcol != curwin->w_leftcol)
+	ఒకవేళ (old_leftcol != curwin->w_leftcol)
 	{
-	    updateWindow(curwin);   // update window, status and cmdline
+	    update_కిటికీ(curwin);   // update window, status and cmdline
 	    setcursor();
 	}
-#else
-	bytes[0] = CSI;
-	bytes[1] = KS_HOR_SCROLLBAR;
-	bytes[2] = KE_FILLER;
-	byte_count = 3;
-#endif
+#లేకపోతే
+	బైట్లు[0] = CSI;
+	బైట్లు[1] = KS_HOR_SCROLLBAR;
+	బైట్లు[2] = KE_FILLER;
+	byte_లెక్క = 3;
+#అయితే_ముగింపు
     }
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     /*
      * synchronize other windows, as necessary according to 'scrollbind'
      */
-    if (curwin->w_p_scb
-	    && ((sb->wp == NULL && curwin->w_leftcol != old_leftcol)
+    ఒకవేళ (curwin->w_p_scb
+	    && ((sb->wp == ఖాళీ && curwin->w_leftcol != old_leftcol)
 		|| (sb->wp == curwin && (curwin->w_topline != old_topline
 # ifdef FEAT_DIFF
 					   || curwin->w_topfill != old_topfill
@@ -4382,16 +4382,16 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	do_check_scrollbind(TRUE);
 	// need to update the window right here
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_redr_type > 0)
-		updateWindow(wp);
+	    ఒకవేళ (wp->w_redr_type > 0)
+		update_కిటికీ(wp);
 	setcursor();
     }
-    out_flush_cursor(FALSE, TRUE);
-#else
-    add_to_input_buf(bytes, byte_count);
-    add_long_to_buf((long_u)value, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
-#endif
+    బహిర్గతం_flush_cursor(FALSE, TRUE);
+#లేకపోతే
+    కూడు_గమ్యం_ఆదానం_buf(బైట్లు, byte_లెక్క);
+    కూడు_long_గమ్యం_buf((long_u)విలువ, బైట్లు);
+    కూడు_గమ్యం_ఆదానం_buf_csi(బైట్లు, పరిమాణం(long_u));
+#అయితే_ముగింపు
 }
 
 /*
@@ -4401,58 +4401,58 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 /*
  * Called when something in the window layout has changed.
  */
-    void
-gui_may_update_scrollbars(void)
+    శూన్య
+gui_may_update_scrollbars(శూన్య)
 {
-    if (gui.in_use && starting == 0)
+    ఒకవేళ (gui.లోపల_use && starting == 0)
     {
-	out_flush();
-	gui_init_which_components(NULL);
+	బహిర్గతం_flush();
+	gui_init_which_components(ఖాళీ);
 	gui_update_scrollbars(TRUE);
     }
     need_mouse_correct = TRUE;
 }
 
-    void
+    శూన్య
 gui_update_scrollbars(
-    int		force)	    // Force all scrollbars to get updated
+    పూర్ణాంకం		force)	    // Force all scrollbars to get updated
 {
     win_T	*wp;
     scrollbar_T	*sb;
-    long	val, size, max;		// need 32 bits here
-    int		which_sb;
-    int		h, y;
-    static win_T *prev_curwin = NULL;
+    దీర్ఘ	val, కొలత, max;		// need 32 bits here
+    పూర్ణాంకం		which_sb;
+    పూర్ణాంకం		h, y;
+    స్థిర win_T *prev_curwin = ఖాళీ;
 
     // Update the horizontal scrollbar
     gui_update_horiz_scrollbar(force);
 
-#ifndef MSWIN
+#నిర్వచితం_కాకపోతే MSWIN
     // Return straight away if there is neither a left nor right scrollbar.
     // On MS-Windows this is required anyway for scrollwheel messages.
-    if (!gui.which_scrollbars[SBAR_LEFT] && !gui.which_scrollbars[SBAR_RIGHT])
-	return;
-#endif
+    ఒకవేళ (!gui.which_scrollbars[SBAR_ఎడమ] && !gui.which_scrollbars[SBAR_కుడి])
+	తిరిగి;
+#అయితే_ముగింపు
 
     /*
      * Don't want to update a scrollbar while we're dragging it.  But if we
      * have both a left and right scrollbar, and we drag one of them, we still
      * need to update the other one.
      */
-    if (!force && (gui.dragged_sb == SBAR_LEFT || gui.dragged_sb == SBAR_RIGHT)
-	    && gui.which_scrollbars[SBAR_LEFT]
-	    && gui.which_scrollbars[SBAR_RIGHT])
+    ఒకవేళ (!force && (gui.dragged_sb == SBAR_ఎడమ || gui.dragged_sb == SBAR_కుడి)
+	    && gui.which_scrollbars[SBAR_ఎడమ]
+	    && gui.which_scrollbars[SBAR_కుడి])
     {
 	/*
 	 * If we have two scrollbars and one of them is being dragged, just
 	 * copy the scrollbar position from the dragged one to the other one.
 	 */
-	which_sb = SBAR_LEFT + SBAR_RIGHT - gui.dragged_sb;
-	if (gui.dragged_wp != NULL)
-	    gui_mch_set_scrollbar_thumb(
+	which_sb = SBAR_ఎడమ + SBAR_కుడి - gui.dragged_sb;
+	ఒకవేళ (gui.dragged_wp != ఖాళీ)
+	    gui_mch_సమితి_scrollbar_thumb(
 		    &gui.dragged_wp->w_scrollbars[which_sb],
-		    gui.dragged_wp->w_scrollbars[0].value,
-		    gui.dragged_wp->w_scrollbars[0].size,
+		    gui.dragged_wp->w_scrollbars[0].విలువ,
+		    gui.dragged_wp->w_scrollbars[0].కొలత,
 		    gui.dragged_wp->w_scrollbars[0].max);
     }
 
@@ -4461,33 +4461,33 @@ gui_update_scrollbars(
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_buffer == NULL)	// just in case
-	    continue;
+	ఒకవేళ (wp->w_బఫరు == ఖాళీ)	// just in case
+	    కొనసాగు;
 	// Skip a scrollbar that is being dragged.
-	if (!force && (gui.dragged_sb == SBAR_LEFT
-					     || gui.dragged_sb == SBAR_RIGHT)
+	ఒకవేళ (!force && (gui.dragged_sb == SBAR_ఎడమ
+					     || gui.dragged_sb == SBAR_కుడి)
 		&& gui.dragged_wp == wp)
-	    continue;
+	    కొనసాగు;
 
-#ifdef SCROLL_PAST_END
-	max = wp->w_buffer->b_ml.ml_line_count - 1;
-#else
-	max = wp->w_buffer->b_ml.ml_line_count + wp->w_height - 2;
-#endif
-	if (max < 0)			// empty buffer
+#నిర్వచితమైతే SCROLL_PAST_చివర
+	max = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క - 1;
+#లేకపోతే
+	max = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క + wp->w_ఎత్తు - 2;
+#అయితే_ముగింపు
+	ఒకవేళ (max < 0)			// empty buffer
 	    max = 0;
 	val = wp->w_topline - 1;
-	size = wp->w_height;
-#ifdef SCROLL_PAST_END
-	if (val > max)			// just in case
+	కొలత = wp->w_ఎత్తు;
+#నిర్వచితమైతే SCROLL_PAST_చివర
+	ఒకవేళ (val > max)			// just in case
 	    val = max;
-#else
-	if (size > max + 1)		// just in case
-	    size = max + 1;
-	if (val > max - size + 1)
-	    val = max - size + 1;
-#endif
-	if (val < 0)			// minimal value is 0
+#లేకపోతే
+	ఒకవేళ (కొలత > max + 1)		// just in case
+	    కొలత = max + 1;
+	ఒకవేళ (val > max - కొలత + 1)
+	    val = max - కొలత + 1;
+#అయితే_ముగింపు
+	ఒకవేళ (val < 0)			// minimal value is 0
 	    val = 0;
 
 	/*
@@ -4501,87 +4501,87 @@ gui_update_scrollbars(
 	 * Note: no check for valid w_botline.	If it's not valid the
 	 * scrollbars will be updated later anyway.
 	 */
-	if (size < 1 || wp->w_botline - 2 > max)
+	ఒకవేళ (కొలత < 1 || wp->w_botline - 2 > max)
 	{
 	    /*
 	     * This can happen during changing files.  Just don't update the
 	     * scrollbar for now.
 	     */
-	    sb->height = 0;	    // Force update next time
-	    if (gui.which_scrollbars[SBAR_LEFT])
-		gui_do_scrollbar(wp, SBAR_LEFT, FALSE);
-	    if (gui.which_scrollbars[SBAR_RIGHT])
-		gui_do_scrollbar(wp, SBAR_RIGHT, FALSE);
-	    continue;
+	    sb->ఎత్తు = 0;	    // Force update next time
+	    ఒకవేళ (gui.which_scrollbars[SBAR_ఎడమ])
+		gui_do_scrollbar(wp, SBAR_ఎడమ, FALSE);
+	    ఒకవేళ (gui.which_scrollbars[SBAR_కుడి])
+		gui_do_scrollbar(wp, SBAR_కుడి, FALSE);
+	    కొనసాగు;
 	}
-	if (force || sb->height != wp->w_height
-	    || sb->top != wp->w_winrow
-	    || sb->status_height != wp->w_status_height
-	    || sb->width != wp->w_width
+	ఒకవేళ (force || sb->ఎత్తు != wp->w_ఎత్తు
+	    || sb->శిఖరం != wp->w_winrow
+	    || sb->స్థితి_ఎత్తు != wp->w_స్థితి_ఎత్తు
+	    || sb->వెడల్పు != wp->w_వెడల్పు
 	    || prev_curwin != curwin)
 	{
 	    // Height, width or position of scrollbar has changed.  For
 	    // vertical split: curwin changed.
-	    sb->height = wp->w_height;
-	    sb->top = wp->w_winrow;
-	    sb->status_height = wp->w_status_height;
-	    sb->width = wp->w_width;
+	    sb->ఎత్తు = wp->w_ఎత్తు;
+	    sb->శిఖరం = wp->w_winrow;
+	    sb->స్థితి_ఎత్తు = wp->w_స్థితి_ఎత్తు;
+	    sb->వెడల్పు = wp->w_వెడల్పు;
 
 	    // Calculate height and position in pixels
-	    h = (sb->height + sb->status_height) * gui.char_height;
-	    y = sb->top * gui.char_height + gui.border_offset;
-#if defined(FEAT_MENU) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF) && !defined(FEAT_GUI_PHOTON)
-	    if (gui.menu_is_active)
-		y += gui.menu_height;
-#endif
+	    h = (sb->ఎత్తు + sb->స్థితి_ఎత్తు) * gui.char_ఎత్తు;
+	    y = sb->శిఖరం * gui.char_ఎత్తు + gui.border_స్థానభ్రంశం;
+#ఒకవేళ defined(FEAT_MENU) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF) && !defined(FEAT_GUI_PHOTON)
+	    ఒకవేళ (gui.menu_is_చురుకైన)
+		y += gui.menu_ఎత్తు;
+#అయితే_ముగింపు
 
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MSWIN) \
+#ఒకవేళ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_HAIKU))
-	    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-		y += gui.toolbar_height;
-#endif
+	    ఒకవేళ (vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
+		y += gui.toolbar_ఎత్తు;
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
-	    if (gui_has_tabline())
-		y += gui.tabline_height;
-#endif
+#ఒకవేళ defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
+	    ఒకవేళ (gui_has_tabline())
+		y += gui.tabline_ఎత్తు;
+#అయితే_ముగింపు
 
-	    if (wp->w_winrow == 0)
+	    ఒకవేళ (wp->w_winrow == 0)
 	    {
 		// Height of top scrollbar includes width of top border
-		h += gui.border_offset;
-		y -= gui.border_offset;
+		h += gui.border_స్థానభ్రంశం;
+		y -= gui.border_స్థానభ్రంశం;
 	    }
-	    if (gui.which_scrollbars[SBAR_LEFT])
+	    ఒకవేళ (gui.which_scrollbars[SBAR_ఎడమ])
 	    {
-		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_LEFT],
-					  gui.left_sbar_x, y,
-					  gui.scrollbar_width, h);
-		gui_do_scrollbar(wp, SBAR_LEFT, TRUE);
+		gui_mch_సమితి_scrollbar_pos(&wp->w_scrollbars[SBAR_ఎడమ],
+					  gui.ఎడమ_sbar_x, y,
+					  gui.scrollbar_వెడల్పు, h);
+		gui_do_scrollbar(wp, SBAR_ఎడమ, TRUE);
 	    }
-	    if (gui.which_scrollbars[SBAR_RIGHT])
+	    ఒకవేళ (gui.which_scrollbars[SBAR_కుడి])
 	    {
-		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_RIGHT],
-					  gui.right_sbar_x, y,
-					  gui.scrollbar_width, h);
-		gui_do_scrollbar(wp, SBAR_RIGHT, TRUE);
+		gui_mch_సమితి_scrollbar_pos(&wp->w_scrollbars[SBAR_కుడి],
+					  gui.కుడి_sbar_x, y,
+					  gui.scrollbar_వెడల్పు, h);
+		gui_do_scrollbar(wp, SBAR_కుడి, TRUE);
 	    }
 	}
 
-	if (force || sb->value != val || sb->size != size || sb->max != max)
+	ఒకవేళ (force || sb->విలువ != val || sb->కొలత != కొలత || sb->max != max)
 	{
 	    // Thumb of scrollbar has moved
-	    sb->value = val;
-	    sb->size = size;
+	    sb->విలువ = val;
+	    sb->కొలత = కొలత;
 	    sb->max = max;
-	    if (gui.which_scrollbars[SBAR_LEFT]
-		    && (gui.dragged_sb != SBAR_LEFT || gui.dragged_wp != wp))
-		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_LEFT],
-					    val, size, max);
-	    if (gui.which_scrollbars[SBAR_RIGHT]
-		    && (gui.dragged_sb != SBAR_RIGHT || gui.dragged_wp != wp))
-		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_RIGHT],
-					    val, size, max);
+	    ఒకవేళ (gui.which_scrollbars[SBAR_ఎడమ]
+		    && (gui.dragged_sb != SBAR_ఎడమ || gui.dragged_wp != wp))
+		gui_mch_సమితి_scrollbar_thumb(&wp->w_scrollbars[SBAR_ఎడమ],
+					    val, కొలత, max);
+	    ఒకవేళ (gui.which_scrollbars[SBAR_కుడి]
+		    && (gui.dragged_sb != SBAR_కుడి || gui.dragged_wp != wp))
+		gui_mch_సమితి_scrollbar_thumb(&wp->w_scrollbars[SBAR_కుడి],
+					    val, కొలత, max);
 	}
     }
 
@@ -4597,38 +4597,38 @@ gui_update_scrollbars(
  * Check for scrollbars for vertically split windows which are not enabled
  * sometimes.
  */
-    static void
+    స్థిర శూన్య
 gui_do_scrollbar(
     win_T	*wp,
-    int		which,	    // SBAR_LEFT or SBAR_RIGHT
-    int		enable)	    // TRUE to enable scrollbar
+    పూర్ణాంకం		which,	    // SBAR_LEFT or SBAR_RIGHT
+    పూర్ణాంకం		enable)	    // TRUE to enable scrollbar
 {
-    int		midcol = curwin->w_wincol + curwin->w_width / 2;
-    int		has_midcol = (wp->w_wincol <= midcol
-				     && wp->w_wincol + wp->w_width >= midcol);
+    పూర్ణాంకం		midcol = curwin->w_wincol + curwin->w_వెడల్పు / 2;
+    పూర్ణాంకం		has_midcol = (wp->w_wincol <= midcol
+				     && wp->w_wincol + wp->w_వెడల్పు >= midcol);
 
     // Only enable scrollbars that contain the middle column of the current
     // window.
-    if (gui.which_scrollbars[SBAR_RIGHT] != gui.which_scrollbars[SBAR_LEFT])
+    ఒకవేళ (gui.which_scrollbars[SBAR_కుడి] != gui.which_scrollbars[SBAR_ఎడమ])
     {
 	// Scrollbars only on one side.  Don't enable scrollbars that don't
 	// contain the middle column of the current window.
-	if (!has_midcol)
+	ఒకవేళ (!has_midcol)
 	    enable = FALSE;
     }
-    else
+    లేకపోతే
     {
 	// Scrollbars on both sides.  Don't enable scrollbars that neither
 	// contain the middle column of the current window nor are on the far
 	// side.
-	if (midcol > Columns / 2)
+	ఒకవేళ (midcol > Columns / 2)
 	{
-	    if (which == SBAR_LEFT ? wp->w_wincol != 0 : !has_midcol)
+	    ఒకవేళ (which == SBAR_ఎడమ ? wp->w_wincol != 0 : !has_midcol)
 		enable = FALSE;
 	}
-	else
+	లేకపోతే
 	{
-	    if (which == SBAR_RIGHT ? wp->w_wincol + wp->w_width != Columns
+	    ఒకవేళ (which == SBAR_కుడి ? wp->w_wincol + wp->w_వెడల్పు != Columns
 								: !has_midcol)
 		enable = FALSE;
 	}
@@ -4642,65 +4642,65 @@ gui_do_scrollbar(
  * Return TRUE if the cursor in the current window moved or FALSE otherwise.
  * may eventually cause a redraw using updateWindow
  */
-    int
-gui_do_scroll(void)
+    పూర్ణాంకం
+gui_do_scroll(శూన్య)
 {
     win_T	*wp, *save_wp;
-    int		i;
-    long	nlines;
+    పూర్ణాంకం		i;
+    దీర్ఘ	nlines;
     pos_T	old_cursor;
     linenr_T	old_topline;
-#ifdef FEAT_DIFF
-    int		old_topfill;
-#endif
+#నిర్వచితమైతే FEAT_DIFF
+    పూర్ణాంకం		old_topfill;
+#అయితే_ముగింపు
 
-    for (wp = firstwin, i = 0; i < current_scrollbar; wp = W_NEXT(wp), i++)
-	if (wp == NULL)
-	    break;
-    if (wp == NULL)
+    కొరకు (wp = firstwin, i = 0; i < current_scrollbar; wp = W_తదుపరి(wp), i++)
+	ఒకవేళ (wp == ఖాళీ)
+	    ఆపు;
+    ఒకవేళ (wp == ఖాళీ)
 	// Couldn't find window
-	return FALSE;
+	తిరిగి FALSE;
     // don't redraw, LineOffset and similar are not valid!
-    if (exmode_active)
-	return FALSE;
+    ఒకవేళ (exmode_చురుకైన)
+	తిరిగి FALSE;
 
     /*
      * Compute number of lines to scroll.  If zero, nothing to do.
      */
-    nlines = (long)scrollbar_value + 1 - (long)wp->w_topline;
-    if (nlines == 0)
-	return FALSE;
+    nlines = (దీర్ఘ)scrollbar_విలువ + 1 - (దీర్ఘ)wp->w_topline;
+    ఒకవేళ (nlines == 0)
+	తిరిగి FALSE;
 
     save_wp = curwin;
     old_topline = wp->w_topline;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     old_topfill = wp->w_topfill;
-#endif
+#అయితే_ముగింపు
     old_cursor = wp->w_cursor;
     curwin = wp;
-    curbuf = wp->w_buffer;
-    if (nlines < 0)
-	scrolldown(-nlines, gui.dragged_wp == NULL);
-    else
-	scrollup(nlines, gui.dragged_wp == NULL);
+    curbuf = wp->w_బఫరు;
+    ఒకవేళ (nlines < 0)
+	scrolldown(-nlines, gui.dragged_wp == ఖాళీ);
+    లేకపోతే
+	scrollup(nlines, gui.dragged_wp == ఖాళీ);
     // Reset dragged_wp after using it.  "dragged_sb" will have been reset for
     // the mouse-up event already, but we still want it to behave like when
     // dragging.  But not the next click in an arrow.
-    if (gui.dragged_sb == SBAR_NONE)
-	gui.dragged_wp = NULL;
+    ఒకవేళ (gui.dragged_sb == SBAR_NONE)
+	gui.dragged_wp = ఖాళీ;
 
-    if (old_topline != wp->w_topline
-#ifdef FEAT_DIFF
+    ఒకవేళ (old_topline != wp->w_topline
+#నిర్వచితమైతే FEAT_DIFF
 	    || old_topfill != wp->w_topfill
-#endif
+#అయితే_ముగింపు
 	    )
     {
-	if (get_scrolloff_value() != 0)
+	ఒకవేళ (get_scrolloff_విలువ() != 0)
 	{
 	    cursor_correct();		// fix window for 'so'
 	    update_topline();		// avoid up/down jump
 	}
-	if (old_cursor.lnum != wp->w_cursor.lnum)
+	ఒకవేళ (old_cursor.lnum != wp->w_cursor.lnum)
 	    coladvance(wp->w_curswant);
 	wp->w_scbind_pos = wp->w_topline;
     }
@@ -4709,7 +4709,7 @@ gui_do_scroll(void)
     validate_cursor();
 
     curwin = save_wp;
-    curbuf = save_wp->w_buffer;
+    curbuf = save_wp->w_బఫరు;
 
     /*
      * Don't call updateWindow() when nothing has changed (it will overwrite
@@ -4717,151 +4717,151 @@ gui_do_scroll(void)
      *
      * Check for ScreenLines, because in ex-mode, we don't have a valid display.
      */
-    if (ScreenLines != NULL && (old_topline != wp->w_topline
+    ఒకవేళ (Screen_పంక్తులు != ఖాళీ && (old_topline != wp->w_topline
 	    || wp->w_redr_type != 0
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 	    || old_topfill != wp->w_topfill
-#endif
+#అయితే_ముగింపు
 	    ))
     {
-	int type = UPD_VALID;
+	పూర్ణాంకం type = UPD_VALID;
 
-	if (pum_visible())
+	ఒకవేళ (pum_visible())
 	{
 	    type = UPD_NOT_VALID;
-	    wp->w_lines_valid = 0;
+	    wp->w_పంక్తులు_valid = 0;
 	}
 
 	// Don't set must_redraw here, it may cause the popup menu to
 	// disappear when losing focus after a scrollbar drag.
-	if (wp->w_redr_type < type)
+	ఒకవేళ (wp->w_redr_type < type)
 	    wp->w_redr_type = type;
 	mch_disable_flush();
-	updateWindow(wp);   // update window, status line, and cmdline
+	update_కిటికీ(wp);   // update window, status line, and cmdline
 	mch_enable_flush();
     }
 
     // May need to redraw the popup menu.
-    if (pum_visible())
+    ఒకవేళ (pum_visible())
 	pum_redraw();
 
-    return (wp == curwin && !EQUAL_POS(curwin->w_cursor, old_cursor));
+    తిరిగి (wp == curwin && !EQUAL_POS(curwin->w_cursor, old_cursor));
 }
 
 /*
  * Horizontal scrollbar stuff:
  */
-    static void
-gui_update_horiz_scrollbar(int force)
+    స్థిర శూన్య
+gui_update_horiz_scrollbar(పూర్ణాంకం force)
 {
-    long	value, size, max;
+    దీర్ఘ	విలువ, కొలత, max;
 
-    if (!gui.which_scrollbars[SBAR_BOTTOM])
-	return;
+    ఒకవేళ (!gui.which_scrollbars[SBAR_BOTTOM])
+	తిరిగి;
 
-    if (!force && gui.dragged_sb == SBAR_BOTTOM)
-	return;
+    ఒకవేళ (!force && gui.dragged_sb == SBAR_BOTTOM)
+	తిరిగి;
 
-    if (!force && curwin->w_p_wrap && gui.prev_wrap)
-	return;
+    ఒకవేళ (!force && curwin->w_p_wrap && gui.prev_wrap)
+	తిరిగి;
 
     /*
      * It is possible for the cursor to be invalid if we're in the middle of
      * something (like changing files).  If so, don't do anything for now.
      */
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (curwin->w_cursor.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	gui.bottom_sbar.value = -1;
-	return;
+	gui.bottom_sbar.విలువ = -1;
+	తిరిగి;
     }
 
-    size = curwin->w_width;
-    if (curwin->w_p_wrap)
+    కొలత = curwin->w_వెడల్పు;
+    ఒకవేళ (curwin->w_p_wrap)
     {
-	value = 0;
-#ifdef SCROLL_PAST_END
+	విలువ = 0;
+#నిర్వచితమైతే SCROLL_PAST_చివర
 	max = 0;
-#else
-	max = curwin->w_width - 1;
-#endif
+#లేకపోతే
+	max = curwin->w_వెడల్పు - 1;
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-	value = curwin->w_leftcol;
-	max = scroll_line_len(ui_find_longest_lnum());
+	విలువ = curwin->w_leftcol;
+	max = scroll_పంక్తి_len(ui_కనుగొను_longest_lnum());
 
-	if (virtual_active())
+	ఒకవేళ (virtual_చురుకైన())
 	{
 	    // May move the cursor even further to the right.
-	    if (curwin->w_virtcol >= (colnr_T)max)
+	    ఒకవేళ (curwin->w_virtcol >= (colnr_T)max)
 		max = curwin->w_virtcol;
 	}
 
-#ifndef SCROLL_PAST_END
-	max += curwin->w_width - 1;
-#endif
+#నిర్వచితం_కాకపోతే SCROLL_PAST_చివర
+	max += curwin->w_వెడల్పు - 1;
+#అయితే_ముగింపు
 	// The line number isn't scrolled, thus there is less space when
 	// 'number' or 'relativenumber' is set (also for 'foldcolumn').
-	size -= curwin_col_off();
-#ifndef SCROLL_PAST_END
-	max -= curwin_col_off();
-#endif
+	కొలత -= curwin_నిలువు_off();
+#నిర్వచితం_కాకపోతే SCROLL_PAST_చివర
+	max -= curwin_నిలువు_off();
+#అయితే_ముగింపు
     }
 
-#ifndef SCROLL_PAST_END
-    if (value > max - size + 1)
-	value = max - size + 1;	    // limit the value to allowable range
-#endif
+#నిర్వచితం_కాకపోతే SCROLL_PAST_చివర
+    ఒకవేళ (విలువ > max - కొలత + 1)
+	విలువ = max - కొలత + 1;	    // limit the value to allowable range
+#అయితే_ముగింపు
 
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (curwin->w_p_rl)
     {
-	value = max + 1 - size - value;
-	if (value < 0)
+	విలువ = max + 1 - కొలత - విలువ;
+	ఒకవేళ (విలువ < 0)
 	{
-	    size += value;
-	    value = 0;
+	    కొలత += విలువ;
+	    విలువ = 0;
 	}
     }
-#endif
-    if (!force && value == gui.bottom_sbar.value && size == gui.bottom_sbar.size
+#అయితే_ముగింపు
+    ఒకవేళ (!force && విలువ == gui.bottom_sbar.విలువ && కొలత == gui.bottom_sbar.కొలత
 						&& max == gui.bottom_sbar.max)
-	return;
+	తిరిగి;
 
-    gui.bottom_sbar.value = value;
-    gui.bottom_sbar.size = size;
+    gui.bottom_sbar.విలువ = విలువ;
+    gui.bottom_sbar.కొలత = కొలత;
     gui.bottom_sbar.max = max;
     gui.prev_wrap = curwin->w_p_wrap;
 
-    gui_mch_set_scrollbar_thumb(&gui.bottom_sbar, value, size, max);
+    gui_mch_సమితి_scrollbar_thumb(&gui.bottom_sbar, విలువ, కొలత, max);
 }
 
 /*
  * Check that none of the colors are the same as the background color
  */
-    void
-gui_check_colors(void)
+    శూన్య
+gui_check_colors(శూన్య)
 {
-    if (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
+    ఒకవేళ (gui.norm_pixel == gui.వెనుక_pixel || gui.norm_pixel == INVALCOLOR)
     {
-	gui_set_bg_color((char_u *)"White");
-	if (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
-	    gui_set_fg_color((char_u *)"Black");
+	gui_సమితి_bg_color((char_u *)"White");
+	ఒకవేళ (gui.norm_pixel == gui.వెనుక_pixel || gui.norm_pixel == INVALCOLOR)
+	    gui_సమితి_fg_color((char_u *)"Black");
     }
 }
 
-    static void
-gui_set_fg_color(char_u *name)
+    స్థిర శూన్య
+gui_సమితి_fg_color(char_u *name)
 {
     gui.norm_pixel = gui_get_color(name);
-    hl_set_fg_color_name(vim_strsave(name));
+    hl_సమితి_fg_color_name(vim_strsave(name));
 }
 
-    static void
-gui_set_bg_color(char_u *name)
+    స్థిర శూన్య
+gui_సమితి_bg_color(char_u *name)
 {
-    gui.back_pixel = gui_get_color(name);
-    hl_set_bg_color_name(vim_strsave(name));
+    gui.వెనుక_pixel = gui_get_color(name);
+    hl_సమితి_bg_color_name(vim_strsave(name));
 }
 
 /*
@@ -4873,157 +4873,157 @@ gui_get_color(char_u *name)
 {
     guicolor_T	t;
 
-    if (*name == NUL)
-	return INVALCOLOR;
+    ఒకవేళ (*name == NUL)
+	తిరిగి INVALCOLOR;
     t = gui_mch_get_color(name);
 
-    int is_none = STRCMP(name, "none") == 0;
-    if (t == INVALCOLOR
-#if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
-	    && (gui.in_use || is_none)
-#endif
+    పూర్ణాంకం is_none = STRCMP(name, "none") == 0;
+    ఒకవేళ (t == INVALCOLOR
+#ఒకవేళ defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+	    && (gui.లోపల_use || is_none)
+#అయితే_ముగింపు
 	    )
     {
-	if (is_none)
-	    emsg(_(e_cannot_use_color_none_did_you_mean_none));
-	else
+	ఒకవేళ (is_none)
+	    emsg(_(e_cannot_use_color_none_did_you_సగటు_none));
+	లేకపోతే
 	    semsg(_(e_cannot_allocate_color_str), name);
     }
-    return t;
+    తిరిగి t;
 }
 
 /*
  * Return the grey value of a color (range 0-255).
  */
-    int
+    పూర్ణాంకం
 gui_get_lightness(guicolor_T pixel)
 {
     long_u	rgb = (long_u)gui_mch_get_rgb(pixel);
 
-    return  (int)(  (((rgb >> 16) & 0xff) * 299)
+    తిరిగి  (పూర్ణాంకం)(  (((rgb >> 16) & 0xff) * 299)
 		   + (((rgb >> 8) & 0xff) * 587)
 		   +  ((rgb	  & 0xff) * 114)) / 1000;
 }
 
     char_u *
-gui_bg_default(void)
+gui_bg_default(శూన్య)
 {
-    if (gui_get_lightness(gui.back_pixel) < 127)
-	return (char_u *)"dark";
-    return (char_u *)"light";
+    ఒకవేళ (gui_get_lightness(gui.వెనుక_pixel) < 127)
+	తిరిగి (char_u *)"dark";
+    తిరిగి (char_u *)"light";
 }
 
 /*
  * Option initializations that can only be done after opening the GUI window.
  */
-    static void
-init_gui_options(void)
+    స్థిర శూన్య
+init_gui_options(శూన్య)
 {
     // Set the 'background' option according to the lightness of the
     // background color, unless the user has set it already.
-    if (!option_was_set((char_u *)"bg") && STRCMP(p_bg, gui_bg_default()) != 0)
+    ఒకవేళ (!option_was_సమితి((char_u *)"bg") && STRCMP(p_bg, gui_bg_default()) != 0)
     {
-	set_option_value_give_err((char_u *)"bg", 0L, gui_bg_default(), 0);
-	highlight_changed();
+	సమితి_option_విలువ_give_err((char_u *)"bg", 0L, gui_bg_default(), 0);
+	highlight_మారింది();
     }
 }
 
-#if defined(FEAT_GUI_X11)
-    void
-gui_new_scrollbar_colors(void)
+#ఒకవేళ defined(FEAT_GUI_X11)
+    శూన్య
+gui_new_scrollbar_colors(శూన్య)
 {
     win_T	*wp;
 
     // Nothing to do if GUI hasn't started yet.
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
     FOR_ALL_WINDOWS(wp)
     {
-	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_LEFT]));
-	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_RIGHT]));
+	gui_mch_సమితి_scrollbar_colors(&(wp->w_scrollbars[SBAR_ఎడమ]));
+	gui_mch_సమితి_scrollbar_colors(&(wp->w_scrollbars[SBAR_కుడి]));
     }
-    gui_mch_set_scrollbar_colors(&gui.bottom_sbar);
+    gui_mch_సమితి_scrollbar_colors(&gui.bottom_sbar);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Call this when focus has changed.
  */
-    void
-gui_focus_change(int in_focus)
+    శూన్య
+gui_focus_change(పూర్ణాంకం లోపల_focus)
 {
 /*
  * Skip this code to avoid drawing the cursor when debugging and switching
  * between the debugger window and gvim.
  */
-#if 1
-    gui.in_focus = in_focus;
-    out_flush_cursor(TRUE, FALSE);
+#ఒకవేళ 1
+    gui.లోపల_focus = లోపల_focus;
+    బహిర్గతం_flush_cursor(TRUE, FALSE);
 
 # ifdef FEAT_GUI_MSWIN
-    gui_mch_set_titlebar_colors();
+    gui_mch_సమితి_titlebar_colors();
 # endif
 
 # ifdef FEAT_XIM
-    xim_set_focus(in_focus);
+    xim_సమితి_focus(లోపల_focus);
 # endif
 
     // Put events in the input queue only when allowed.
     // ui_focus_change() isn't called directly, because it invokes
     // autocommands and that must not happen asynchronously.
-    if (!hold_gui_events
-# if defined(FEAT_GUI_GTK) && defined(FEAT_GUI_DIALOG)
-	    && gui.dialogs_active == 0
+    ఒకవేళ (!hold_gui_events
+# ఒకవేళ defined(FEAT_GUI_GTK) && defined(FEAT_GUI_DIALOG)
+	    && gui.dialogs_చురుకైన == 0
 # endif
        )
     {
-	char_u  bytes[3];
+	char_u  బైట్లు[3];
 
-	bytes[0] = CSI;
-	bytes[1] = KS_EXTRA;
-	bytes[2] = in_focus ? (int)KE_FOCUSGAINED : (int)KE_FOCUSLOST;
-	add_to_input_buf(bytes, 3);
+	బైట్లు[0] = CSI;
+	బైట్లు[1] = KS_EXTRA;
+	బైట్లు[2] = లోపల_focus ? (పూర్ణాంకం)KE_FOCUSGAINED : (పూర్ణాంకం)KE_FOCUSLOST;
+	కూడు_గమ్యం_ఆదానం_buf(బైట్లు, 3);
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * When mouse moved: apply 'mousefocus'.
  * Also updates the mouse pointer shape.
  */
-    static void
-gui_mouse_focus(int x, int y)
+    స్థిర శూన్య
+gui_mouse_focus(పూర్ణాంకం x, పూర్ణాంకం y)
 {
     win_T	*wp;
     char_u	st[8];
 
-#ifdef FEAT_MOUSESHAPE
+#నిర్వచితమైతే FEAT_MOUSESHAPE
     // Get window pointer, and update mouse shape as well.
     wp = xy2win(x, y, IGNORE_POPUP);
-#endif
+#అయితే_ముగింపు
 
     // Only handle this when 'mousefocus' set and ...
-    if (p_mousef
+    ఒకవేళ (p_mousef
 	    && !hold_gui_events		// not holding events
-	    && (State & (MODE_NORMAL | MODE_INSERT))// Normal/Visual/Insert mode
-	    && State != MODE_HITRETURN	// but not hit-return prompt
-	    && msg_scrolled == 0	// no scrolled message
+	    && (State & (బహుళకం_సాధారణ | బహుళకం_చొప్పించు))// Normal/Visual/Insert mode
+	    && State != బహుళకం_HITRETURN	// but not hit-return prompt
+	    && సందేశం_scrolled == 0	// no scrolled message
 	    && !need_mouse_correct	// not moving the pointer
-	    && gui.in_focus)		// gvim in focus
+	    && gui.లోపల_focus)		// gvim in focus
     {
 	// Don't move the mouse when it's left or right of the Vim window
-	if (x < 0 || x > Columns * gui.char_width)
-	    return;
-#ifndef FEAT_MOUSESHAPE
+	ఒకవేళ (x < 0 || x > Columns * gui.char_వెడల్పు)
+	    తిరిగి;
+#నిర్వచితం_కాకపోతే FEAT_MOUSESHAPE
 	wp = xy2win(x, y, IGNORE_POPUP);
-#endif
-	if (wp == curwin || wp == NULL)
-	    return;	// still in the same old window, or none at all
+#అయితే_ముగింపు
+	ఒకవేళ (wp == curwin || wp == ఖాళీ)
+	    తిరిగి;	// still in the same old window, or none at all
 
 	// Ignore position in the tab pages line.
-	if (Y_2_ROW(y) < tabline_height())
-	    return;
+	ఒకవేళ (Y_2_అడ్డువరుస(y) < tabline_ఎత్తు())
+	    తిరిగి;
 
 	/*
 	 * Format a mouse click on status line input,
@@ -5031,48 +5031,48 @@ gui_mouse_focus(int x, int y)
 	 * Trick: Use a column number -1, so that get_pseudo_mouse_code() will
 	 * generate a K_LEFTMOUSE_NM key code.
 	 */
-	if (finish_op)
+	ఒకవేళ (ముగింపు_op)
 	{
 	    // abort the current operator first
 	    st[0] = ESC;
-	    add_to_input_buf(st, 1);
+	    కూడు_గమ్యం_ఆదానం_buf(st, 1);
 	}
 	st[0] = CSI;
 	st[1] = KS_MOUSE;
 	st[2] = KE_FILLER;
-	st[3] = (char_u)MOUSE_LEFT;
+	st[3] = (char_u)MOUSE_ఎడమ;
 	fill_mouse_coord(st + 4,
 		wp->w_wincol == 0 ? -1 : wp->w_wincol + MOUSE_COLOFF,
-		wp->w_height + W_WINROW(wp));
+		wp->w_ఎత్తు + W_WINROW(wp));
 
-	add_to_input_buf(st, 8);
+	కూడు_గమ్యం_ఆదానం_buf(st, 8);
 	st[3] = (char_u)MOUSE_RELEASE;
-	add_to_input_buf(st, 8);
-#ifdef FEAT_GUI_GTK
+	కూడు_గమ్యం_ఆదానం_buf(st, 8);
+#నిర్వచితమైతే FEAT_GUI_GTK
 	// Need to wake up the main loop
-	if (gtk_main_level() > 0)
+	ఒకవేళ (gtk_main_level() > 0)
 	    gtk_main_quit();
-#endif
+#అయితే_ముగింపు
     }
 }
 
 /*
  * Called when the mouse moved (but not when dragging).
  */
-    void
-gui_mouse_moved(int x, int y)
+    శూన్య
+gui_mouse_moved(పూర్ణాంకం x, పూర్ణాంకం y)
 {
     // Ignore this while still starting up.
-    if (!gui.in_use || gui.starting)
-	return;
+    ఒకవేళ (!gui.లోపల_use || gui.starting)
+	తిరిగి;
 
     // apply 'mousefocus' and pointer shape
     gui_mouse_focus(x, y);
 
-    if (p_mousemev
-#ifdef FEAT_PROP_POPUP
-	|| popup_uses_mouse_move
-#endif
+    ఒకవేళ (p_mousemev
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	|| popup_ఉపయోగిస్తుంది_mouse_move
+#అయితే_ముగింపు
    )
 	// Generate a mouse-moved event. For a <MouseMove> mapping. Or so the
 	// popup can perhaps be closed, just like in the terminal.
@@ -5084,95 +5084,95 @@ gui_mouse_moved(int x, int y)
  * Returns NULL if not found.
  */
     win_T *
-gui_mouse_window(mouse_find_T popup)
+gui_mouse_కిటికీ(mouse_కనుగొను_T popup)
 {
-    int		x, y;
+    పూర్ణాంకం		x, y;
 
-    if (!(gui.in_use && (p_mousef || popup == FIND_POPUP)))
-	return NULL;
+    ఒకవేళ (!(gui.లోపల_use && (p_mousef || popup == కనుగొను_POPUP)))
+	తిరిగి ఖాళీ;
     gui_mch_getmouse(&x, &y);
 
     // Only use the mouse when it's on the Vim window
-    if (x >= 0 && x <= Columns * gui.char_width
-	    && y >= 0 && Y_2_ROW(y) >= tabline_height())
-	return xy2win(x, y, popup);
-    return NULL;
+    ఒకవేళ (x >= 0 && x <= Columns * gui.char_వెడల్పు
+	    && y >= 0 && Y_2_అడ్డువరుస(y) >= tabline_ఎత్తు())
+	తిరిగి xy2win(x, y, popup);
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Called when mouse should be moved to window with focus.
  */
-    void
-gui_mouse_correct(void)
+    శూన్య
+gui_mouse_correct(శూన్య)
 {
-    win_T	*wp = NULL;
+    win_T	*wp = ఖాళీ;
 
     need_mouse_correct = FALSE;
 
-    wp = gui_mouse_window(IGNORE_POPUP);
-    if (wp == curwin || wp == NULL)
-	return;
+    wp = gui_mouse_కిటికీ(IGNORE_POPUP);
+    ఒకవేళ (wp == curwin || wp == ఖాళీ)
+	తిరిగి;
 
     // If in other than current window
-    validate_cline_row();
-    gui_mch_setmouse((int)W_ENDCOL(curwin) * gui.char_width - 3,
-	    (W_WINROW(curwin) + curwin->w_wrow) * gui.char_height
-	    + (gui.char_height) / 2);
+    validate_cline_అడ్డువరుస();
+    gui_mch_setmouse((పూర్ణాంకం)W_ENDCOL(curwin) * gui.char_వెడల్పు - 3,
+	    (W_WINROW(curwin) + curwin->w_wrow) * gui.char_ఎత్తు
+	    + (gui.char_ఎత్తు) / 2);
 }
 
 /*
  * Find window where the mouse pointer "x" / "y" coordinate is in.
  * As a side effect update the shape of the mouse pointer.
  */
-    static win_T *
-xy2win(int x, int y, mouse_find_T popup)
+    స్థిర win_T *
+xy2win(పూర్ణాంకం x, పూర్ణాంకం y, mouse_కనుగొను_T popup)
 {
-    int		row;
-    int		col;
+    పూర్ణాంకం		అడ్డువరుస;
+    పూర్ణాంకం		నిలువు;
     win_T	*wp;
 
-    row = Y_2_ROW(y);
-    col = X_2_COL(x);
+    అడ్డువరుస = Y_2_అడ్డువరుస(y);
+    నిలువు = X_2_నిలువు(x);
 
-    if (row < 0 || col < 0)		// before first window
-	return NULL;
-    wp = mouse_find_win(&row, &col, popup);
-    if (wp == NULL)
+    ఒకవేళ (అడ్డువరుస < 0 || నిలువు < 0)		// before first window
+	తిరిగి ఖాళీ;
+    wp = mouse_కనుగొను_win(&అడ్డువరుస, &నిలువు, popup);
+    ఒకవేళ (wp == ఖాళీ)
     {
-#ifdef FEAT_MOUSESHAPE
+#నిర్వచితమైతే FEAT_MOUSESHAPE
 	update_mouseshape(-2);
-#endif
-	return NULL;
+#అయితే_ముగింపు
+	తిరిగి ఖాళీ;
     }
-#ifdef FEAT_MOUSESHAPE
-    if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+#నిర్వచితమైతే FEAT_MOUSESHAPE
+    ఒకవేళ (State == బహుళకం_HITRETURN || State == బహుళకం_ASKMORE)
     {
-	if (Y_2_ROW(y) >= msg_row)
+	ఒకవేళ (Y_2_అడ్డువరుస(y) >= సందేశం_అడ్డువరుస)
 	    update_mouseshape(SHAPE_IDX_MOREL);
-	else
-	    update_mouseshape(SHAPE_IDX_MORE);
+	లేకపోతే
+	    update_mouseshape(SHAPE_IDX_మరిన్ని);
     }
-    else if (row >= wp->w_height + wp->w_status_height)	// below status line
+    లేకపోతే ఒకవేళ (అడ్డువరుస >= wp->w_ఎత్తు + wp->w_స్థితి_ఎత్తు)	// below status line
 	update_mouseshape(SHAPE_IDX_CLINE);
-    else if (!(State & MODE_CMDLINE) && wp->w_vsep_width > 0 && col == wp->w_width
-	    && (!(row >= wp->w_height && row < wp->w_height
-	    + wp->w_status_height) || !stl_connected(wp)) && msg_scrolled == 0)
+    లేకపోతే ఒకవేళ (!(State & బహుళకం_CMDLINE) && wp->w_vsep_వెడల్పు > 0 && నిలువు == wp->w_వెడల్పు
+	    && (!(అడ్డువరుస >= wp->w_ఎత్తు && అడ్డువరుస < wp->w_ఎత్తు
+	    + wp->w_స్థితి_ఎత్తు) || !stl_connected(wp)) && సందేశం_scrolled == 0)
 	update_mouseshape(SHAPE_IDX_VSEP);
-    else if (!(State & MODE_CMDLINE) && wp->w_status_height > 0
-	    && row >= wp->w_height && row < wp->w_height + wp->w_status_height
-	    && msg_scrolled == 0)
-	update_mouseshape(SHAPE_IDX_STATUS);
-    else
+    లేకపోతే ఒకవేళ (!(State & బహుళకం_CMDLINE) && wp->w_స్థితి_ఎత్తు > 0
+	    && అడ్డువరుస >= wp->w_ఎత్తు && అడ్డువరుస < wp->w_ఎత్తు + wp->w_స్థితి_ఎత్తు
+	    && సందేశం_scrolled == 0)
+	update_mouseshape(SHAPE_IDX_స్థితి);
+    లేకపోతే
 	update_mouseshape(-2);
-#endif
-    return wp;
+#అయితే_ముగింపు
+    తిరిగి wp;
 }
 
 /*
  * ":gui" and ":gvim": Change from the terminal version to the GUI version.
  * File names may be given to redefine the args list.
  */
-    void
+    శూన్య
 ex_gui(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
@@ -5182,40 +5182,40 @@ ex_gui(exarg_T *eap)
      * Also don't fork when started with "gvim -f".
      * Do fork when using "gui -b".
      */
-    if (arg[0] == '-'
+    ఒకవేళ (arg[0] == '-'
 	    && (arg[1] == 'f' || arg[1] == 'b')
 	    && (arg[2] == NUL || VIM_ISWHITE(arg[2])))
     {
 	gui.dofork = (arg[1] == 'b');
 	eap->arg = skipwhite(eap->arg + 2);
     }
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
     {
-#if defined(VIMDLL) && !defined(EXPERIMENTAL_GUI_CMD)
-	if (!gui.starting)
+#ఒకవేళ defined(VIMDLL) && !defined(EXPERIMENTAL_GUI_CMD)
+	ఒకవేళ (!gui.starting)
 	{
-	    emsg(_(e_gui_cannot_be_used_not_enabled_at_compile_time));
-	    return;
+	    emsg(_(e_gui_cannot_be_వాడిన_not_enabled_at_compile_సమయం));
+	    తిరిగి;
 	}
-#endif
+#అయితే_ముగింపు
 	// Clear the command.  Needed for when forking+exiting, to avoid part
 	// of the argument ending up after the shell prompt.
-	msg_clr_eos_force();
-#ifdef GUI_MAY_SPAWN
-	if (!ends_excmd2(eap->cmd, eap->arg))
-	    gui_start(eap->arg);
-	else
-#endif
-	    gui_start(NULL);
-#ifdef FEAT_JOB_CHANNEL
-	channel_gui_register_all();
-#endif
+	సందేశం_clr_eos_force();
+#నిర్వచితమైతే GUI_MAY_SPAWN
+	ఒకవేళ (!చివర్లు_excmd2(eap->cmd, eap->arg))
+	    gui_ప్రారంభం(eap->arg);
+	లేకపోతే
+#అయితే_ముగింపు
+	    gui_ప్రారంభం(ఖాళీ);
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	channel_gui_రిజిస్టరు_all();
+#అయితే_ముగింపు
     }
-    if (!ends_excmd2(eap->cmd, eap->arg))
-	ex_next(eap);
+    ఒకవేళ (!చివర్లు_excmd2(eap->cmd, eap->arg))
+	ex_తదుపరి(eap);
 }
 
-#if (defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
+#ఒకవేళ (defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
 	    || defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON) \
 	    || defined(FEAT_GUI_HAIKU)) \
 	    && defined(FEAT_TOOLBAR)
@@ -5226,34 +5226,34 @@ ex_gui(exarg_T *eap)
 /*
  * Callback function for do_in_runtimepath().
  */
-    static void
-gfp_setname(char_u *fname, void *cookie)
+    స్థిర శూన్య
+gfp_setname(char_u *fname, శూన్య *cookie)
 {
-    char_u	*gfp_buffer = cookie;
+    char_u	*gfp_బఫరు = cookie;
 
-    if (STRLEN(fname) >= MAXPATHL)
-	*gfp_buffer = NUL;
-    else
-	STRCPY(gfp_buffer, fname);
+    ఒకవేళ (STRLEN(fname) >= MAXPATHL)
+	*gfp_బఫరు = NUL;
+    లేకపోతే
+	STRCPY(gfp_బఫరు, fname);
 }
 
 /*
  * Find the path of bitmap "name" with extension "ext" in 'runtimepath'.
  * Return FAIL for failure and OK if buffer[MAXPATHL] contains the result.
  */
-    int
-gui_find_bitmap(char_u *name, char_u *buffer, char *ext)
+    పూర్ణాంకం
+gui_కనుగొను_bitmap(char_u *name, char_u *బఫరు, అక్షరం *ext)
 {
-    if (STRLEN(name) > MAXPATHL - 14)
-	return FAIL;
-    vim_snprintf((char *)buffer, MAXPATHL, "bitmaps/%s.%s", name, ext);
-    if (do_in_runtimepath(buffer, 0, gfp_setname, buffer) == FAIL
-							    || *buffer == NUL)
-	return FAIL;
-    return OK;
+    ఒకవేళ (STRLEN(name) > MAXPATHL - 14)
+	తిరిగి FAIL;
+    vim_snprintf((అక్షరం *)బఫరు, MAXPATHL, "bitmaps/%s.%s", name, ext);
+    ఒకవేళ (do_లోపల_runtimepath(బఫరు, 0, gfp_setname, బఫరు) == FAIL
+							    || *బఫరు == NUL)
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
-# if !defined(FEAT_GUI_GTK)
+# ఒకవేళ !defined(FEAT_GUI_GTK)
 /*
  * Given the name of the "icon=" argument, try finding the bitmap file for the
  * icon.  If it is an absolute path name, use it as it is.  Otherwise append
@@ -5261,359 +5261,359 @@ gui_find_bitmap(char_u *name, char_u *buffer, char *ext)
  * The result is put in "buffer[MAXPATHL]".  If something fails "buffer"
  * contains "name".
  */
-    void
-gui_find_iconfile(char_u *name, char_u *buffer, char *ext)
+    శూన్య
+gui_కనుగొను_iconfile(char_u *name, char_u *బఫరు, అక్షరం *ext)
 {
     char_u	buf[MAXPATHL + 1];
 
-    expand_env(name, buffer, MAXPATHL);
-    if (!mch_isFullName(buffer) && gui_find_bitmap(buffer, buf, ext) == OK)
-	STRCPY(buffer, buf);
+    expand_env(name, బఫరు, MAXPATHL);
+    ఒకవేళ (!mch_is_నిండిన_Name(బఫరు) && gui_కనుగొను_bitmap(బఫరు, buf, ext) == OK)
+	STRCPY(బఫరు, buf);
 }
 # endif
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)|| defined(FEAT_GUI_HAIKU)
-    void
-display_errors(void)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)|| defined(FEAT_GUI_HAIKU)
+    శూన్య
+display_errors(శూన్య)
 {
     char_u	*p;
 
-    if (isatty(2))
+    ఒకవేళ (isatty(2))
     {
 	fflush(stderr);
-	return;
+	తిరిగి;
     }
 
-    if (error_ga.ga_data == NULL)
-	return;
+    ఒకవేళ (error_ga.ga_దత్తాంశం == ఖాళీ)
+	తిరిగి;
 
     // avoid putting up a message box with blanks only
-    for (p = (char_u *)error_ga.ga_data; *p != NUL; ++p)
-	if (!SAFE_isspace(*p))
+    కొరకు (p = (char_u *)error_ga.ga_దత్తాంశం; *p != NUL; ++p)
+	ఒకవేళ (!సురక్షిత_isspace(*p))
 	{
 	    // Truncate a very long message, it will go off-screen.
-	    if (STRLEN(p) > 2000)
+	    ఒకవేళ (STRLEN(p) > 2000)
 		STRCPY(p + 2000 - 14, "...(truncated)");
-	    (void)do_dialog(VIM_ERROR, (char_u *)_("Error"),
-		    p, (char_u *)_("&Ok"), 1, NULL, FALSE);
-	    break;
+	    (శూన్య)do_dialog(VIM_ERROR, (char_u *)_("Error"),
+		    p, (char_u *)_("&Ok"), 1, ఖాళీ, FALSE);
+	    ఆపు;
 	}
     ga_clear(&error_ga);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(NO_CONSOLE_INPUT)
+#ఒకవేళ defined(NO_CONSOLE_ఆదానం)
 /*
  * Return TRUE if still starting up and there is no place to enter text.
  * For GTK and X11 we check if stderr is not a tty, which means we were
  * (probably) started from the desktop.  Also check stdin, "vim >& file" does
  * allow typing on stdin.
  */
-    int
-no_console_input(void)
+    పూర్ణాంకం
+no_console_ఆదానం(శూన్య)
 {
-    return ((!gui.in_use || gui.starting)
+    తిరిగి ((!gui.లోపల_use || gui.starting)
 # ifndef NO_CONSOLE
 	    && !isatty(0) && !isatty(2)
 # endif
 	    );
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FIND_REPLACE_DIALOG) \
+#ఒకవేళ defined(కనుగొను_REPLACE_DIALOG) \
 	|| defined(NEED_GUI_UPDATE_SCREEN)
 /*
  * Update the current window and the screen.
  */
-    void
-gui_update_screen(void)
+    శూన్య
+gui_update_screen(శూన్య)
 {
 # ifdef FEAT_CONCEAL
-    linenr_T	conceal_old_cursor_line = 0;
-    linenr_T	conceal_new_cursor_line = 0;
-    int		conceal_update_lines = FALSE;
+    linenr_T	conceal_old_cursor_పంక్తి = 0;
+    linenr_T	conceal_new_cursor_పంక్తి = 0;
+    పూర్ణాంకం		conceal_update_పంక్తులు = FALSE;
 # endif
 
     update_topline();
     validate_cursor();
 
     // Trigger CursorMoved if the cursor moved.
-    if (!finish_op && (has_cursormoved()
+    ఒకవేళ (!ముగింపు_op && (has_cursormoved()
 # ifdef FEAT_PROP_POPUP
 		|| popup_visible
 # endif
 # ifdef FEAT_CONCEAL
 		|| curwin->w_p_cole > 0
 # endif
-		) && !EQUAL_POS(last_cursormoved, curwin->w_cursor))
+		) && !EQUAL_POS(చివరి_cursormoved, curwin->w_cursor))
     {
-	if (has_cursormoved())
-	    apply_autocmds(EVENT_CURSORMOVED, NULL, NULL, FALSE, curbuf);
+	ఒకవేళ (has_cursormoved())
+	    apply_autocmds(EVENT_CURSORMOVED, ఖాళీ, ఖాళీ, FALSE, curbuf);
 # ifdef FEAT_PROP_POPUP
-	if (popup_visible)
+	ఒకవేళ (popup_visible)
 	    popup_check_cursor_pos();
 # endif
 # ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0)
+	ఒకవేళ (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_పంక్తి = చివరి_cursormoved.lnum;
+	    conceal_new_cursor_పంక్తి = curwin->w_cursor.lnum;
+	    conceal_update_పంక్తులు = TRUE;
 	}
 # endif
-	last_cursormoved = curwin->w_cursor;
+	చివరి_cursormoved = curwin->w_cursor;
     }
 
-    if (!finish_op)
+    ఒకవేళ (!ముగింపు_op)
 	may_trigger_win_scrolled_resized();
 
 # ifdef FEAT_CONCEAL
-    if (conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)
-		|| need_cursor_line_redraw))
+    ఒకవేళ (conceal_update_పంక్తులు
+	    && (conceal_old_cursor_పంక్తి != conceal_new_cursor_పంక్తి
+		|| conceal_cursor_పంక్తి(curwin)
+		|| need_cursor_పంక్తి_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line);
+	ఒకవేళ (conceal_old_cursor_పంక్తి != conceal_new_cursor_పంక్తి)
+	    redrawWinline(curwin, conceal_old_cursor_పంక్తి);
+	redrawWinline(curwin, conceal_new_cursor_పంక్తి);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_పంక్తి_redraw = FALSE;
     }
 # endif
     update_screen(0);	// may need to update the screen
     setcursor();
-    out_flush_cursor(TRUE, FALSE);
+    బహిర్గతం_flush_cursor(TRUE, FALSE);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FIND_REPLACE_DIALOG)
+#ఒకవేళ defined(కనుగొను_REPLACE_DIALOG)
 /*
  * Get the text to use in a find/replace dialog.  Uses the last search pattern
  * if the argument is empty.
  * Returns an allocated string.
  */
     char_u *
-get_find_dialog_text(
+get_కనుగొను_dialog_పాఠ్యం(
     char_u	*arg,
-    int		*wwordp,	// return: TRUE if \< \> found
-    int		*mcasep)	// return: TRUE if \C found
+    పూర్ణాంకం		*wwordp,	// return: TRUE if \< \> found
+    పూర్ణాంకం		*mcasep)	// return: TRUE if \C found
 {
-    char_u	*text;
+    char_u	*పాఠ్యం;
 
-    if (*arg == NUL)
-	text = last_search_pat();
-    else
-	text = arg;
-    if (text != NULL)
+    ఒకవేళ (*arg == NUL)
+	పాఠ్యం = చివరి_శోధన_pat();
+    లేకపోతే
+	పాఠ్యం = arg;
+    ఒకవేళ (పాఠ్యం != ఖాళీ)
     {
-	int len = (int)STRLEN(text);
+	పూర్ణాంకం len = (పూర్ణాంకం)STRLEN(పాఠ్యం);
 
-	text = vim_strnsave(text, len);
-	if (text != NULL)
+	పాఠ్యం = vim_strnsave(పాఠ్యం, len);
+	ఒకవేళ (పాఠ్యం != ఖాళీ)
 	{
-	    int i;
+	    పూర్ణాంకం i;
 
 	    // Remove "\V"
-	    if (len >= 2 && STRNCMP(text, "\\V", 2) == 0)
+	    ఒకవేళ (len >= 2 && STRNCMP(పాఠ్యం, "\\V", 2) == 0)
 	    {
-		mch_memmove(text, text + 2, (size_t)(len - 1));
+		mch_memmove(పాఠ్యం, పాఠ్యం + 2, (size_t)(len - 1));
 		len -= 2;
 	    }
 
 	    // Recognize "\c" and "\C" and remove.
-	    if (len >= 2 && *text == '\\' && (text[1] == 'c' || text[1] == 'C'))
+	    ఒకవేళ (len >= 2 && *పాఠ్యం == '\\' && (పాఠ్యం[1] == 'c' || పాఠ్యం[1] == 'C'))
 	    {
-		*mcasep = (text[1] == 'C');
-		mch_memmove(text, text + 2, (size_t)(len - 1));
+		*mcasep = (పాఠ్యం[1] == 'C');
+		mch_memmove(పాఠ్యం, పాఠ్యం + 2, (size_t)(len - 1));
 		len -= 2;
 	    }
 
 	    // Recognize "\<text\>" and remove.
-	    if (len >= 4
-		    && STRNCMP(text, "\\<", 2) == 0
-		    && STRNCMP(text + len - 2, "\\>", 2) == 0)
+	    ఒకవేళ (len >= 4
+		    && STRNCMP(పాఠ్యం, "\\<", 2) == 0
+		    && STRNCMP(పాఠ్యం + len - 2, "\\>", 2) == 0)
 	    {
 		*wwordp = TRUE;
-		mch_memmove(text, text + 2, (size_t)(len - 4));
-		text[len - 4] = NUL;
+		mch_memmove(పాఠ్యం, పాఠ్యం + 2, (size_t)(len - 4));
+		పాఠ్యం[len - 4] = NUL;
 	    }
 
 	    // Recognize "\/" or "\?" and remove.
-	    for (i = 0; i + 1 < len; ++i)
-		if (text[i] == '\\' && (text[i + 1] == '/'
-						       || text[i + 1] == '?'))
+	    కొరకు (i = 0; i + 1 < len; ++i)
+		ఒకవేళ (పాఠ్యం[i] == '\\' && (పాఠ్యం[i + 1] == '/'
+						       || పాఠ్యం[i + 1] == '?'))
 		{
-		    mch_memmove(text + i, text + i + 1, (size_t)(len - i));
+		    mch_memmove(పాఠ్యం + i, పాఠ్యం + i + 1, (size_t)(len - i));
 		    --len;
 		}
 	}
     }
-    return text;
+    తిరిగి పాఠ్యం;
 }
 
 /*
  * Handle the press of a button in the find-replace dialog.
  * Return TRUE when something was added to the input buffer.
  */
-    int
+    పూర్ణాంకం
 gui_do_findrepl(
-    int		flags,		// one of FRD_REPLACE, FRD_FINDNEXT, etc.
-    char_u	*find_text,
-    char_u	*repl_text,
-    int		down)		// Search downwards.
+    పూర్ణాంకం		flags,		// one of FRD_REPLACE, FRD_FINDNEXT, etc.
+    char_u	*కనుగొను_పాఠ్యం,
+    char_u	*repl_పాఠ్యం,
+    పూర్ణాంకం		కిందికి)		// Search downwards.
 {
     garray_T	ga;
-    int		i;
-    int		type = (flags & FRD_TYPE_MASK);
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		type = (flags & FRD_TYPE_ముసుగు);
     char_u	*p;
     regmatch_T	regmatch;
-    int		save_did_emsg = did_emsg;
-    static int  busy = FALSE;
+    పూర్ణాంకం		save_did_emsg = did_emsg;
+    స్థిర పూర్ణాంకం  busy = FALSE;
 
     // When the screen is being updated we should not change buffers and
     // windows structures, it may cause freed memory to be used.  Also don't
     // do this recursively (pressing "Find" quickly several times).
-    if (updating_screen || busy)
-	return FALSE;
+    ఒకవేళ (updating_screen || busy)
+	తిరిగి FALSE;
 
     // refuse replace when text cannot be changed
-    if ((type == FRD_REPLACE || type == FRD_REPLACEALL) && text_locked())
-	return FALSE;
+    ఒకవేళ ((type == FRD_REPLACE || type == FRD_REPLACEALL) && పాఠ్యం_locked())
+	తిరిగి FALSE;
 
     busy = TRUE;
 
     ga_init2(&ga, 1, 100);
-    if (type == FRD_REPLACEALL)
+    ఒకవేళ (type == FRD_REPLACEALL)
 	GA_CONCAT_LITERAL(&ga, "%s/");
 
     GA_CONCAT_LITERAL(&ga, "\\V");
-    if (flags & FRD_MATCH_CASE)
+    ఒకవేళ (flags & FRD_సరిపోలిక_CASE)
 	GA_CONCAT_LITERAL(&ga, "\\C");
-    else
+    లేకపోతే
 	GA_CONCAT_LITERAL(&ga, "\\c");
-    if (flags & FRD_WHOLE_WORD)
+    ఒకవేళ (flags & FRD_సంపూర్ణ_మాట)
 	GA_CONCAT_LITERAL(&ga, "\\<");
     // escape slash and backslash
-    p = vim_strsave_escaped(find_text, (char_u *)"/\\");
-    if (p != NULL)
+    p = vim_strsave_escaped(కనుగొను_పాఠ్యం, (char_u *)"/\\");
+    ఒకవేళ (p != ఖాళీ)
 	ga_concat(&ga, p);
     vim_free(p);
-    if (flags & FRD_WHOLE_WORD)
+    ఒకవేళ (flags & FRD_సంపూర్ణ_మాట)
 	GA_CONCAT_LITERAL(&ga, "\\>");
 
-    if (type == FRD_REPLACEALL)
+    ఒకవేళ (type == FRD_REPLACEALL)
     {
 	GA_CONCAT_LITERAL(&ga, "/");
 	// Escape slash and backslash.
 	// Also escape tilde and ampersand if 'magic' is set.
-	p = vim_strsave_escaped(repl_text,
+	p = vim_strsave_escaped(repl_పాఠ్యం,
 				p_magic ? (char_u *)"/\\~&" : (char_u *)"/\\");
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	    ga_concat(&ga, p);
 	vim_free(p);
 	GA_CONCAT_LITERAL(&ga, "/g");
     }
     ga_append(&ga, NUL);
 
-    if (type == FRD_REPLACE)
+    ఒకవేళ (type == FRD_REPLACE)
     {
 	// Do the replacement when the text at the cursor matches.  Thus no
 	// replacement is done if the cursor was moved!
-	regmatch.regprog = vim_regcomp(ga.ga_data, RE_MAGIC + RE_STRING);
+	regmatch.regprog = vim_regcomp(ga.ga_దత్తాంశం, RE_MAGIC + RE_STRING);
 	regmatch.rm_ic = 0;
-	if (regmatch.regprog != NULL)
+	ఒకవేళ (regmatch.regprog != ఖాళీ)
 	{
 	    p = ml_get_cursor();
-	    if (vim_regexec_nl(&regmatch, p, (colnr_T)0)
+	    ఒకవేళ (vim_regexec_nl(&regmatch, p, (colnr_T)0)
 						   && regmatch.startp[0] == p)
 	    {
 		// Clear the command line to remove any old "No match"
 		// error.
-		msg_end_prompt();
+		సందేశం_చివర_prompt();
 
-		if (u_save_cursor() == OK)
+		ఒకవేళ (u_save_cursor() == OK)
 		{
 		    // A button was pressed thus undo should be synced.
 		    u_sync(FALSE);
 
-		    del_bytes((long)(regmatch.endp[0] - regmatch.startp[0]),
+		    del_బైట్లు((దీర్ఘ)(regmatch.endp[0] - regmatch.startp[0]),
 								FALSE, FALSE);
-		    ins_str(repl_text, STRLEN(repl_text));
+		    ins_str(repl_పాఠ్యం, STRLEN(repl_పాఠ్యం));
 		}
 	    }
-	    else
-		msg(_("No match at cursor, finding next"));
+	    లేకపోతే
+		సందేశం(_("No match at cursor, finding next"));
 	    vim_regfree(regmatch.regprog);
 	}
     }
 
-    if (type == FRD_REPLACEALL)
+    ఒకవేళ (type == FRD_REPLACEALL)
     {
 	// A button was pressed, thus undo should be synced.
 	u_sync(FALSE);
-	do_cmdline_cmd(ga.ga_data);
+	do_cmdline_cmd(ga.ga_దత్తాంశం);
     }
-    else
+    లేకపోతే
     {
-	int searchflags = SEARCH_MSG + SEARCH_MARK;
+	పూర్ణాంకం searchflags = శోధన_సందేశం + శోధన_MARK;
 
 	// Search for the next match.
 	// Don't skip text under cursor for single replace.
-	if (type == FRD_REPLACE)
-	    searchflags += SEARCH_START;
-	i = msg_scroll;
-	if (down)
+	ఒకవేళ (type == FRD_REPLACE)
+	    searchflags += శోధన_ప్రారంభం;
+	i = సందేశం_scroll;
+	ఒకవేళ (కిందికి)
 	{
-	    (void)do_search(NULL, '/', '/', ga.ga_data, STRLEN(ga.ga_data), 1L, searchflags, NULL);
+	    (శూన్య)do_శోధన(ఖాళీ, '/', '/', ga.ga_దత్తాంశం, STRLEN(ga.ga_దత్తాంశం), 1L, searchflags, ఖాళీ);
 	}
-	else
+	లేకపోతే
 	{
 	    // We need to escape '?' if and only if we are searching in the up
 	    // direction
-	    p = vim_strsave_escaped(ga.ga_data, (char_u *)"?");
-	    if (p != NULL)
-		(void)do_search(NULL, '?', '?', p, STRLEN(p), 1L, searchflags, NULL);
+	    p = vim_strsave_escaped(ga.ga_దత్తాంశం, (char_u *)"?");
+	    ఒకవేళ (p != ఖాళీ)
+		(శూన్య)do_శోధన(ఖాళీ, '?', '?', p, STRLEN(p), 1L, searchflags, ఖాళీ);
 	    vim_free(p);
 	}
 
-	msg_scroll = i;	    // don't let an error message set msg_scroll
+	సందేశం_scroll = i;	    // don't let an error message set msg_scroll
     }
 
     // Don't want to pass did_emsg to other code, it may cause disabling
     // syntax HL if we were busy redrawing.
     did_emsg = save_did_emsg;
 
-    if (State & (MODE_NORMAL | MODE_INSERT))
+    ఒకవేళ (State & (బహుళకం_సాధారణ | బహుళకం_చొప్పించు))
     {
 	gui_update_screen();		// update the screen
-	msg_didout = 0;			// overwrite any message
+	సందేశం_didout = 0;			// overwrite any message
 	need_wait_return = FALSE;	// don't wait for return
     }
 
-    vim_free(ga.ga_data);
+    vim_free(ga.ga_దత్తాంశం);
     busy = FALSE;
-    return (ga.ga_len > 0);
+    తిరిగి (ga.ga_len > 0);
 }
 
-#endif
+#అయితే_ముగింపు
 
-#if defined(HAVE_DROP_FILE)
+#ఒకవేళ defined(HAVE_DROP_FILE)
 /*
  * Jump to the window at specified point (x, y).
  */
-    static void
-gui_wingoto_xy(int x, int y)
+    స్థిర శూన్య
+gui_wingoto_xy(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    int		row = Y_2_ROW(y);
-    int		col = X_2_COL(x);
+    పూర్ణాంకం		అడ్డువరుస = Y_2_అడ్డువరుస(y);
+    పూర్ణాంకం		నిలువు = X_2_నిలువు(x);
     win_T	*wp;
 
-    if (row < 0 || col < 0)
-	return;
+    ఒకవేళ (అడ్డువరుస < 0 || నిలువు < 0)
+	తిరిగి;
 
-    wp = mouse_find_win(&row, &col, FAIL_POPUP);
-    if (wp != NULL && wp != curwin)
+    wp = mouse_కనుగొను_win(&అడ్డువరుస, &నిలువు, FAIL_POPUP);
+    ఒకవేళ (wp != ఖాళీ && wp != curwin)
 	win_goto(wp);
 }
 
@@ -5621,29 +5621,29 @@ gui_wingoto_xy(int x, int y)
  * Function passed to handle_drop() for the actions to be done after the
  * argument list has been updated.
  */
-    static void
-drop_callback(void *cookie)
+    స్థిర శూన్య
+drop_callback(శూన్య *cookie)
 {
     char_u	*p = cookie;
-    int		do_shorten = FALSE;
+    పూర్ణాంకం		do_shorten = FALSE;
 
     // If Shift held down, change to first file's directory.  If the first
     // item is a directory, change to that directory (and let the explorer
     // plugin show the contents).
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	if (mch_isdir(p))
+	ఒకవేళ (mch_isdir(p))
 	{
-	    if (mch_chdir((char *)p) == 0)
+	    ఒకవేళ (mch_chdir((అక్షరం *)p) == 0)
 		do_shorten = TRUE;
 	}
-	else if (vim_chdirfile(p, "drop") == OK)
+	లేకపోతే ఒకవేళ (vim_chdirfile(p, "drop") == OK)
 	    do_shorten = TRUE;
 	vim_free(p);
-	if (do_shorten)
+	ఒకవేళ (do_shorten)
 	{
 	    shorten_fnames(TRUE);
-	    last_chdir_reason = "drop";
+	    చివరి_chdir_reason = "drop";
 	}
     }
 
@@ -5654,7 +5654,7 @@ drop_callback(void *cookie)
 # endif
     maketitle();
     setcursor();
-    out_flush_cursor(FALSE, FALSE);
+    బహిర్గతం_flush_cursor(FALSE, FALSE);
 }
 
 /*
@@ -5663,110 +5663,110 @@ drop_callback(void *cookie)
  * of dropped files, they will be freed in this function, and caller can't use
  * fnames after call this function.
  */
-    void
+    శూన్య
 gui_handle_drop(
-    int		x UNUSED,
-    int		y UNUSED,
+    పూర్ణాంకం		x వాడని,
+    పూర్ణాంకం		y వాడని,
     int_u	modifiers,
     char_u	**fnames,
-    int		count)
+    పూర్ణాంకం		లెక్క)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p;
-    static int	entered = FALSE;
+    స్థిర పూర్ణాంకం	entered = FALSE;
 
     /*
      * This function is called by event handlers.  Just in case we get a
      * second event before the first one is handled, ignore the second one.
      * Not sure if this can ever happen, just in case.
      */
-    if (entered)
-	return;
+    ఒకవేళ (entered)
+	తిరిగి;
     entered = TRUE;
 
     /*
      * When the cursor is at the command line, add the file names to the
      * command line, don't edit the files.
      */
-    if (State & MODE_CMDLINE)
+    ఒకవేళ (State & బహుళకం_CMDLINE)
     {
-	shorten_filenames(fnames, count);
-	for (i = 0; i < count; ++i)
+	shorten_filenames(fnames, లెక్క);
+	కొరకు (i = 0; i < లెక్క; ++i)
 	{
-	    if (fnames[i] != NULL)
+	    ఒకవేళ (fnames[i] != ఖాళీ)
 	    {
-		if (i > 0)
-		    add_to_input_buf((char_u*)" ", 1);
+		ఒకవేళ (i > 0)
+		    కూడు_గమ్యం_ఆదానం_buf((char_u*)" ", 1);
 
 		// We don't know what command is used thus we can't be sure
 		// about which characters need to be escaped.  Only escape the
 		// most common ones.
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_లోపల_FILENAME
 		p = vim_strsave_escaped(fnames[i], (char_u *)" \t\"|");
-# else
+# లేకపోతే
 		p = vim_strsave_escaped(fnames[i], (char_u *)"\\ \t\"|");
 # endif
-		if (p != NULL)
-		    add_to_input_buf_csi(p, (int)STRLEN(p));
+		ఒకవేళ (p != ఖాళీ)
+		    కూడు_గమ్యం_ఆదానం_buf_csi(p, (పూర్ణాంకం)STRLEN(p));
 		vim_free(p);
 		vim_free(fnames[i]);
 	    }
 	}
 	vim_free(fnames);
     }
-    else
+    లేకపోతే
     {
 	// Go to the window under mouse cursor, then shorten given "fnames" by
 	// current window, because a window can have local current dir.
 	gui_wingoto_xy(x, y);
-	shorten_filenames(fnames, count);
+	shorten_filenames(fnames, లెక్క);
 
 	// If Shift held down, remember the first item.
-	if ((modifiers & MOUSE_SHIFT) != 0)
+	ఒకవేళ ((modifiers & MOUSE_జరుపు) != 0)
 	    p = vim_strsave(fnames[0]);
-	else
-	    p = NULL;
+	లేకపోతే
+	    p = ఖాళీ;
 
 	// Handle the drop, :edit or :split to get to the file.  This also
 	// frees fnames[].  Skip this if there is only one item, it's a
 	// directory and Shift is held down.
-	if (count == 1 && (modifiers & MOUSE_SHIFT) != 0
+	ఒకవేళ (లెక్క == 1 && (modifiers & MOUSE_జరుపు) != 0
 						     && mch_isdir(fnames[0]))
 	{
 	    vim_free(fnames[0]);
 	    vim_free(fnames);
 	    vim_free(p);
 	}
-	else
-	    handle_drop(count, fnames, (modifiers & MOUSE_CTRL) != 0,
-						     drop_callback, (void *)p);
+	లేకపోతే
+	    handle_drop(లెక్క, fnames, (modifiers & MOUSE_CTRL) != 0,
+						     drop_callback, (శూన్య *)p);
     }
 
     entered = FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check if "key" is to interrupt us.  Handles a key that has not had modifiers
  * applied yet.
  * Return the key with modifiers applied if so, NUL if not.
  */
-    int
-check_for_interrupt(int key, int modifiers_arg)
+    పూర్ణాంకం
+check_for_అంతరాయం(పూర్ణాంకం కీలకం, పూర్ణాంకం modifiers_arg)
 {
-    int modifiers = modifiers_arg;
-    int c = merge_modifyOtherKeys(key, &modifiers);
+    పూర్ణాంకం modifiers = modifiers_arg;
+    పూర్ణాంకం c = విలీనం_modify_Other_కీలకాలు(కీలకం, &modifiers);
 
-    if ((c == Ctrl_C && ctrl_c_interrupts)
-#ifdef UNIX
+    ఒకవేళ ((c == Ctrl_C && ctrl_c_interrupts)
+#నిర్వచితమైతే UNIX
 	    || (intr_char != Ctrl_C && c == intr_char)
-#endif
+#అయితే_ముగింపు
 	    )
     {
 	got_int = TRUE;
-	return c;
+	తిరిగి c;
     }
-    return NUL;
+    తిరిగి NUL;
 }
 
 /*
@@ -5775,20 +5775,20 @@ check_for_interrupt(int key, int modifiers_arg)
  * When there is any problem opening the file or writing to the file this is
  * ignored, showing the dialog might get the test to get stuck.
  */
-    int
-gui_dialog_log(char_u *title, char_u *message)
+    పూర్ణాంకం
+gui_dialog_log(char_u *title, char_u *సందేశం_2)
 {
     char_u  *fname = get_gui_dialog_file();
     FILE    *fd;
 
-    if (fname == NULL)
-	return FALSE;
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి FALSE;
 
-    fd = mch_fopen((char *)fname, "a");
-    if (fd != NULL)
+    fd = mch_fopen((అక్షరం *)fname, "a");
+    ఒకవేళ (fd != ఖాళీ)
     {
-	fprintf(fd, "%s: %s\n", title, message);
+	fprintf(fd, "%s: %s\n", title, సందేశం_2);
 	fclose(fd);
     }
-    return TRUE;
+    తిరిగి TRUE;
 }

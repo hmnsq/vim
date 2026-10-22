@@ -7,152 +7,152 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_IMAGE_KITTY)
+#ఒకవేళ defined(FEAT_IMAGE_KITTY)
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     bool transmitted; // If image data has been transmitted to terminal
 } image_kitty_T;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int n_ids; // Number of placements ids used for previous redraw
+    పూర్ణాంకం n_ids; // Number of placements ids used for previous redraw
 } image_placement_kitty_T;
 
-    int
+    పూర్ణాంకం
 image_kitty_init(image_T *img)
 {
     image_kitty_T *ctx = ALLOC_CLEAR_ONE(image_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ఒకవేళ (ctx == ఖాళీ)
+	తిరిగి FAIL;
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_దత్తాంశం = ctx;
+    తిరిగి OK;
 }
 
-    void
+    శూన్య
 image_kitty_uninit(image_T *img)
 {
-    if (((image_kitty_T *)img->backend_data)->transmitted)
+    ఒకవేళ (((image_kitty_T *)img->backend_దత్తాంశం)->transmitted)
     {
 	// Delete image data from terminal
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		"\033_Ga=d,d=I,i=%d,q=2\033\\", img->id);
 
-	out_str((char_u *)IObuff);
-	out_flush();
+	బహిర్గతం_str((char_u *)IObuff);
+	బహిర్గతం_flush();
     }
-    vim_free(img->backend_data);
+    vim_free(img->backend_దత్తాంశం);
 }
 
-    int
-image_placement_kitty_init(image_placement_T *place)
+    పూర్ణాంకం
+image_placement_kitty_init(image_placement_T *ఉంచు)
 {
     image_placement_kitty_T *ctx = ALLOC_CLEAR_ONE(image_placement_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ఒకవేళ (ctx == ఖాళీ)
+	తిరిగి FAIL;
 
-    place->backend_data = ctx;
-    return OK;
+    ఉంచు->backend_దత్తాంశం = ctx;
+    తిరిగి OK;
 }
 
-    void
-image_placement_kitty_uninit(image_placement_T *place)
+    శూన్య
+image_placement_kitty_uninit(image_placement_T *ఉంచు)
 {
-    vim_free(place->backend_data);
+    vim_free(ఉంచు->backend_దత్తాంశం);
 }
 
 /*
  * Transmit image data to terminal if it hasn't already been done.
  */
-    static void
+    స్థిర శూన్య
 transmit_image(image_T *img)
 {
-    static char buf[4096 + 3]; // Extra bytes for NUL and terminator
+    స్థిర అక్షరం buf[4096 + 3]; // Extra bytes for NUL and terminator
 
     int_u   off = 0;
     int_u   sz;
-    bool    first = true;
-    int	    width, height;
+    bool    మొదటి = true;
+    పూర్ణాంకం	    వెడల్పు, ఎత్తు;
 
-    if (likely(((image_kitty_T *)img->backend_data)->transmitted))
-	return;
+    ఒకవేళ (likely(((image_kitty_T *)img->backend_దత్తాంశం)->transmitted))
+	తిరిగి;
 
-    image_get_dimensions(img, &width, &height);
-    sz = img->fmt * width * height;
+    image_get_dimensions(img, &వెడల్పు, &ఎత్తు);
+    sz = img->fmt * వెడల్పు * ఎత్తు;
 
-    while (off < sz)
+    అయితే (off < sz)
     {
 	int_u chunk_sz = MIN(4096 * 3 / 4, sz - off);
-	bool more = off + chunk_sz < sz;
-	long encoded;
+	bool మరిన్ని = off + chunk_sz < sz;
+	దీర్ఘ encoded;
 
-	if (unlikely(first))
+	ఒకవేళ (unlikely(మొదటి))
 	{
-	    vim_snprintf(buf, sizeof(buf),
+	    vim_snprintf(buf, పరిమాణం(buf),
 		    "\033_Ga=t,i=%d,f=%d,s=%u,v=%u,m=%d,q=2;", img->id,
-		    img->fmt * 8, width, height, more);
-	    first = false;
+		    img->fmt * 8, వెడల్పు, ఎత్తు, మరిన్ని);
+	    మొదటి = false;
 	}
-	else
-	    vim_snprintf(buf, sizeof(buf), "\033_Gm=%d;", more);
-	out_str((char_u *)buf);
+	లేకపోతే
+	    vim_snprintf(buf, పరిమాణం(buf), "\033_Gm=%d;", మరిన్ని);
+	బహిర్గతం_str((char_u *)buf);
 
-	encoded = base64_encode_buf((char_u *)buf, img->data + off, chunk_sz);
+	encoded = base64_encode_buf((char_u *)buf, img->దత్తాంశం + off, chunk_sz);
 
 	buf[encoded] = '\033';
 	buf[encoded + 1] = '\\';
 	buf[encoded + 2] = NUL;
 
-	out_str((char_u *)buf);
+	బహిర్గతం_str((char_u *)buf);
 	off += chunk_sz;
     }
 
-    ((image_kitty_T *)img->backend_data)->transmitted = true;
-    out_flush();
+    ((image_kitty_T *)img->backend_దత్తాంశం)->transmitted = true;
+    బహిర్గతం_flush();
 }
 
-    static void
-clear_placement(int id, int place_id)
+    స్థిర శూన్య
+clear_placement(పూర్ణాంకం id, పూర్ణాంకం ఉంచు_id)
 {
-    vim_snprintf((char *)IObuff, IOSIZE,
-	    "\033_Ga=d,d=i,i=%d,p=%d,q=2\033\\", id, place_id);
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
+	    "\033_Ga=d,d=i,i=%d,p=%d,q=2\033\\", id, ఉంచు_id);
 
-    out_str((char_u *)IObuff);
+    బహిర్గతం_str((char_u *)IObuff);
 }
 
-    void
-image_placement_kitty_draw(image_placement_T *place)
+    శూన్య
+image_placement_kitty_draw(image_placement_T *ఉంచు)
 {
-    image_T		    *img = place->img;
-    image_placement_kitty_T *ctx = place->backend_data;
+    image_T		    *img = ఉంచు->img;
+    image_placement_kitty_T *ctx = ఉంచు->backend_దత్తాంశం;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    పూర్ణాంకం			    n_rects;
 
-    rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (n_rects > PLACEMENT_ID_INC)
-	return;
+    rects = pixman_region32_rectangles(&ఉంచు->visible, &n_rects);
+    ఒకవేళ (n_rects > PLACEMENT_ID_INC)
+	తిరిగి;
 
     transmit_image(img);
 
-    if (rects == NULL)
+    ఒకవేళ (rects == ఖాళీ)
 	// Not sure if this can happen...
-	return;
+	తిరిగి;
 
-    for (int i = 0; i < n_rects; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	int rect_id = place->id + i; // The placement id of each rect is
+	పూర్ణాంకం rect_id = ఉంచు->id + i; // The placement id of each rect is
 				     // "place->id + i".
-	int row, col;
-	int x, y, w, h;
+	పూర్ణాంకం అడ్డువరుస, నిలువు;
+	పూర్ణాంకం x, y, w, h;
 
-	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
+	image_placement_subrect(ఉంచు, rect, &అడ్డువరుస, &నిలువు, &x, &y, &w, &h, false);
 
 	// Since we send the image id and the placement id, the existing
 	// placement (if any) will be replaced by this one (essentially moving
@@ -172,36 +172,36 @@ image_placement_kitty_draw(image_placement_T *place)
 	// On kitty terminal it seems to scroll the terminal, messing up the
 	// screen.
 	vim_snprintf(
-		(char *)IObuff, IOSIZE,
+		(అక్షరం *)IObuff, IOSIZE,
 		"\033_Ga=p,i=%d,p=%d,x=%u,y=%u,w=%u,h=%u,z=0,q=2,C=1\033\\",
 		img->id, rect_id,
 		x, y, w, h);
 
-	windgoto(row, col);
-	out_str((char_u *)IObuff);
-	screen_start(); // Probably not needed because of C=1, but do it
+	windgoto(అడ్డువరుస, నిలువు);
+	బహిర్గతం_str((char_u *)IObuff);
+	screen_ప్రారంభం(); // Probably not needed because of C=1, but do it
 			// anyways...
     }
 
     // Clear all placements that have not been reused.
-    for (int i = n_rects; i < ctx->n_ids; i++)
-	clear_placement(img->id, place->id + i);
+    కొరకు (పూర్ణాంకం i = n_rects; i < ctx->n_ids; i++)
+	clear_placement(img->id, ఉంచు->id + i);
 
     ctx->n_ids = n_rects;
 }
 
-    void
-image_placement_kitty_clear(image_placement_T *place)
+    శూన్య
+image_placement_kitty_clear(image_placement_T *ఉంచు)
 {
-    image_placement_kitty_T *ctx = place->backend_data;
+    image_placement_kitty_T *ctx = ఉంచు->backend_దత్తాంశం;
 
-    if (ctx->n_ids == 0)
-	return;
+    ఒకవేళ (ctx->n_ids == 0)
+	తిరిగి;
 
-    for (int i = 0; i < ctx->n_ids; i++)
-	clear_placement(place->img->id, place->id + i);
-    out_flush();
+    కొరకు (పూర్ణాంకం i = 0; i < ctx->n_ids; i++)
+	clear_placement(ఉంచు->img->id, ఉంచు->id + i);
+    బహిర్గతం_flush();
     ctx->n_ids = 0;
 }
 
-#endif // FEAT_IMAGE_KITTY
+#అయితే_ముగింపు // FEAT_IMAGE_KITTY

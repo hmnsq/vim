@@ -20,46 +20,46 @@
  *
  */
 
-#if !defined(XMACROS_H)
-#define XMACROS_H
+#ఒకవేళ !defined(XMACROS_H)
+#నిర్వచించు XMACROS_H
 
 
 // SIZE_MAX may not be defined on older platforms without <stdint.h>.
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t)(-1))
-#endif
+#నిర్వచితం_కాకపోతే కొలత_MAX
+# define కొలత_MAX ((size_t)(-1))
+#అయితే_ముగింపు
 
-#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
-#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
-#define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
-#define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
-#define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
-#define XDL_MASKBITS(b)		((1UL << (b)) - 1)
-#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
-#define XDL_LE32_PUT(p, v) \
-do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
-#define XDL_LE32_GET(p, v) \
-do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
-	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
-		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+#నిర్వచించు XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#నిర్వచించు XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+#నిర్వచించు XDL_ABS(v) ((v) >= 0 ? (v): -(v))
+#నిర్వచించు XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
+#నిర్వచించు XDL_ISSPACE(c) (ఖాళీనా((గుర్తులేని అక్షరం)(c)))
+#నిర్వచించు XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
+#నిర్వచించు XDL_MASKBITS(b)		((1UL << (b)) - 1)
+#నిర్వచించు XDL_HASHLONG(v,b)	(XDL_ADDBITS((గుర్తులేని దీర్ఘ)(v), b) & XDL_MASKBITS(b))
+#నిర్వచించు XDL_LE32_PUT(p, v) \
+చేయి { \
+	గుర్తులేని అక్షరం *__p = (గుర్తులేని అక్షరం *) (p); \
+	*__p++ = (గుర్తులేని అక్షరం) (v); \
+	*__p++ = (గుర్తులేని అక్షరం) ((v) >> 8); \
+	*__p++ = (గుర్తులేని అక్షరం) ((v) >> 16); \
+	*__p = (గుర్తులేని అక్షరం) ((v) >> 24); \
+} అయితే (0)
+#నిర్వచించు XDL_LE32_GET(p, v) \
+చేయి { \
+	గుర్తులేని అక్షరం స్థిరరాశి *__p = (గుర్తులేని అక్షరం స్థిరరాశి *) (p); \
+	(v) = (గుర్తులేని దీర్ఘ) __p[0] | ((గుర్తులేని దీర్ఘ) __p[1]) << 8 | \
+		((గుర్తులేని దీర్ఘ) __p[2]) << 16 | ((గుర్తులేని దీర్ఘ) __p[3]) << 24; \
+} అయితే (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
-#define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
-		: NULL)
+#నిర్వచించు XDL_ALLOC_ARRAY(p, nr)				\
+	((p) = కొలత_MAX / పరిమాణం(*(p)) >= (size_t)(nr)	\
+		? xdl_malloc((nr) * పరిమాణం(*(p)))	\
+		: ఖాళీ)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#నిర్వచించు XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, పరిమాణం(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -67,8 +67,8 @@ do { \
  * elements) as necessary. Frees p and returns -1 on failure, returns
  * 0 on success
  */
-#define XDL_ALLOC_GROW(p, nr, alloc)	\
+#నిర్వచించు XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), పరిమాణం(*(p))))))
 
-#endif /* #if !defined(XMACROS_H) */
+#అయితే_ముగింపు /* #if !defined(XMACROS_H) */

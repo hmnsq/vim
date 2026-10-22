@@ -4,8 +4,8 @@
 #
 # This requires Python 2.6 or later.
 
-import time
+దిగుమతి సమయం
 
-if __name__ == "__main__":
+ఒకవేళ __name__ == "__main__":
 
-    time.sleep(0.1)  # sleep 100 msec
+    సమయం.సుషుప్తి(0.1)  # sleep 100 msec

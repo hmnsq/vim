@@ -10,10 +10,10 @@
 /*
  * textobject.c: functions for text objects
  */
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-static int cls(void);
-static int skip_chars(int, int);
+స్థిర పూర్ణాంకం cls(శూన్య);
+స్థిర పూర్ణాంకం skip_chars(పూర్ణాంకం, పూర్ణాంకం);
 
 /*
  * Find the start of the next sentence, searching in the direction specified
@@ -22,137 +22,137 @@ static int skip_chars(int, int);
  * otherwise.  See ":h sentence" for the precise definition of a "sentence"
  * text object.
  */
-    int
-findsent(int dir, long count)
+    పూర్ణాంకం
+findsent(పూర్ణాంకం dir, దీర్ఘ లెక్క)
 {
     pos_T	pos, tpos;
     pos_T	prev_pos;
-    int		c;
-    int		(*func)(pos_T *);
-    int		startlnum;
-    int		noskip = FALSE;	    // do not skip blanks
-    int		cpo_J;
-    int		found_dot;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		(*func)(pos_T *);
+    పూర్ణాంకం		startlnum;
+    పూర్ణాంకం		noskip = FALSE;	    // do not skip blanks
+    పూర్ణాంకం		cpo_J;
+    పూర్ణాంకం		దొరికింది_dot;
 
     pos = curwin->w_cursor;
-    if (dir == FORWARD)
+    ఒకవేళ (dir == FORWARD)
 	func = incl;
-    else
+    లేకపోతే
 	func = decl;
 
-    while (count--)
+    అయితే (లెక్క--)
     {
 	prev_pos = pos;
 
 	/*
 	 * if on an empty line, skip up to a non-empty line
 	 */
-	if (gchar_pos(&pos) == NUL)
+	ఒకవేళ (gchar_pos(&pos) == NUL)
 	{
-	    do
-		if ((*func)(&pos) == -1)
-		    break;
-	    while (gchar_pos(&pos) == NUL);
-	    if (dir == FORWARD)
-		goto found;
+	    చేయి
+		ఒకవేళ ((*func)(&pos) == -1)
+		    ఆపు;
+	    అయితే (gchar_pos(&pos) == NUL);
+	    ఒకవేళ (dir == FORWARD)
+		వెళ్ళు దొరికింది;
 	}
 	/*
 	 * if on the start of a paragraph or a section and searching forward,
 	 * go to the next line
 	 */
-	else if (dir == FORWARD && pos.col == 0 &&
-						startPS(pos.lnum, NUL, FALSE))
+	లేకపోతే ఒకవేళ (dir == FORWARD && pos.నిలువు == 0 &&
+						ప్రారంభం_PS(pos.lnum, NUL, FALSE))
 	{
-	    if (pos.lnum == curbuf->b_ml.ml_line_count)
-		return FAIL;
+	    ఒకవేళ (pos.lnum == curbuf->b_ml.ml_పంక్తి_లెక్క)
+		తిరిగి FAIL;
 	    ++pos.lnum;
-	    goto found;
+	    వెళ్ళు దొరికింది;
 	}
-	else if (dir == BACKWARD)
+	లేకపోతే ఒకవేళ (dir == BACKWARD)
 	    decl(&pos);
 
 	// go back to the previous non-white non-punctuation character
-	found_dot = FALSE;
-	while (c = gchar_pos(&pos), VIM_ISWHITE(c)
-				|| vim_strchr((char_u *)".!?)]\"'", c) != NULL)
+	దొరికింది_dot = FALSE;
+	అయితే (c = gchar_pos(&pos), VIM_ISWHITE(c)
+				|| vim_strchr((char_u *)".!?)]\"'", c) != ఖాళీ)
 	{
 	    tpos = pos;
-	    if (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
-		break;
+	    ఒకవేళ (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
+		ఆపు;
 
-	    if (found_dot)
-		break;
-	    if (vim_strchr((char_u *) ".!?", c) != NULL)
-		found_dot = TRUE;
+	    ఒకవేళ (దొరికింది_dot)
+		ఆపు;
+	    ఒకవేళ (vim_strchr((char_u *) ".!?", c) != ఖాళీ)
+		దొరికింది_dot = TRUE;
 
-	    if (vim_strchr((char_u *) ")]\"'", c) != NULL
-		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == NULL)
-		break;
+	    ఒకవేళ (vim_strchr((char_u *) ")]\"'", c) != ఖాళీ
+		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == ఖాళీ)
+		ఆపు;
 
 	    decl(&pos);
 	}
 
 	// remember the line where the search started
 	startlnum = pos.lnum;
-	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != NULL;
+	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != ఖాళీ;
 
-	for (;;)		// find end of sentence
+	కొరకు (;;)		// find end of sentence
 	{
 	    c = gchar_pos(&pos);
-	    if (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
+	    ఒకవేళ (c == NUL || (pos.నిలువు == 0 && ప్రారంభం_PS(pos.lnum, NUL, FALSE)))
 	    {
-		if (dir == BACKWARD && pos.lnum != startlnum)
+		ఒకవేళ (dir == BACKWARD && pos.lnum != startlnum)
 		    ++pos.lnum;
-		break;
+		ఆపు;
 	    }
-	    if (c == '.' || c == '!' || c == '?')
+	    ఒకవేళ (c == '.' || c == '!' || c == '?')
 	    {
 		tpos = pos;
-		do
-		    if ((c = inc(&tpos)) == -1)
-			break;
-		while (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
-			!= NULL);
-		if (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
+		చేయి
+		    ఒకవేళ ((c = inc(&tpos)) == -1)
+			ఆపు;
+		అయితే (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
+			!= ఖాళీ);
+		ఒకవేళ (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
 		    || (cpo_J && (c == ' ' && inc(&tpos) >= 0
 			      && gchar_pos(&tpos) == ' ')))
 		{
 		    pos = tpos;
-		    if (gchar_pos(&pos) == NUL) // skip NUL at EOL
+		    ఒకవేళ (gchar_pos(&pos) == NUL) // skip NUL at EOL
 			inc(&pos);
-		    break;
+		    ఆపు;
 		}
 	    }
-	    if ((*func)(&pos) == -1)
+	    ఒకవేళ ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
+		ఒకవేళ (లెక్క)
+		    తిరిగి FAIL;
 		noskip = TRUE;
-		break;
+		ఆపు;
 	    }
 	}
-found:
+దొరికింది:
 	    // skip white space
-	while (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
-	    if (incl(&pos) == -1)
-		break;
+	అయితే (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
+	    ఒకవేళ (incl(&pos) == -1)
+		ఆపు;
 
-	if (EQUAL_POS(prev_pos, pos))
+	ఒకవేళ (EQUAL_POS(prev_pos, pos))
 	{
 	    // didn't actually move, advance one character and try again
-	    if ((*func)(&pos) == -1)
+	    ఒకవేళ ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
-		break;
+		ఒకవేళ (లెక్క)
+		    తిరిగి FAIL;
+		ఆపు;
 	    }
-	    ++count;
+	    ++లెక్క;
 	}
     }
 
     setpcmark();
     curwin->w_cursor = pos;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -163,113 +163,113 @@ found:
  * If 'both' is TRUE also stop at '}'.
  * Return TRUE if the next paragraph or section was found.
  */
-    int
+    పూర్ణాంకం
 findpar(
-    int		*pincl,	    // Return: TRUE if last char is to be included
-    int		dir,
-    long	count,
-    int		what,
-    int		both)
+    పూర్ణాంకం		*pincl,	    // Return: TRUE if last char is to be included
+    పూర్ణాంకం		dir,
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		what,
+    పూర్ణాంకం		both)
 {
     linenr_T	curr;
-    int		did_skip;   // TRUE after separating lines have been skipped
-    int		first;	    // TRUE on first line
-    int		posix = (vim_strchr(p_cpo, CPO_PARA) != NULL);
-#ifdef FEAT_FOLDING
-    linenr_T	fold_first;	// first line of a closed fold
-    linenr_T	fold_last;	// last line of a closed fold
-    int		fold_skipped;	// TRUE if a closed fold was skipped this
+    పూర్ణాంకం		did_skip;   // TRUE after separating lines have been skipped
+    పూర్ణాంకం		మొదటి;	    // TRUE on first line
+    పూర్ణాంకం		posix = (vim_strchr(p_cpo, CPO_PARA) != ఖాళీ);
+#నిర్వచితమైతే FEAT_FOLDING
+    linenr_T	fold_మొదటి;	// first line of a closed fold
+    linenr_T	fold_చివరి;	// last line of a closed fold
+    పూర్ణాంకం		fold_skipped;	// TRUE if a closed fold was skipped this
 				// iteration
-#endif
+#అయితే_ముగింపు
 
     curr = curwin->w_cursor.lnum;
 
-    while (count--)
+    అయితే (లెక్క--)
     {
 	did_skip = FALSE;
-	for (first = TRUE; ; first = FALSE)
+	కొరకు (మొదటి = TRUE; ; మొదటి = FALSE)
 	{
-	    if (*ml_get(curr) != NUL)
+	    ఒకవేళ (*ml_get(curr) != NUL)
 		did_skip = TRUE;
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	    // skip folded lines
 	    fold_skipped = FALSE;
-	    if (first && hasFolding(curr, &fold_first, &fold_last))
+	    ఒకవేళ (మొదటి && hasFolding(curr, &fold_మొదటి, &fold_చివరి))
 	    {
-		curr = ((dir > 0) ? fold_last : fold_first) + dir;
+		curr = ((dir > 0) ? fold_చివరి : fold_మొదటి) + dir;
 		fold_skipped = TRUE;
 	    }
-#endif
+#అయితే_ముగింపు
 
 	    // POSIX has its own ideas of what a paragraph boundary is and it
 	    // doesn't match historical Vi: It also stops at a "{" in the
 	    // first column and at an empty line.
-	    if (!first && did_skip && (startPS(curr, what, both)
+	    ఒకవేళ (!మొదటి && did_skip && (ప్రారంభం_PS(curr, what, both)
 			   || (posix && what == NUL && *ml_get(curr) == '{')))
-		break;
+		ఆపు;
 
-#ifdef FEAT_FOLDING
-	    if (fold_skipped)
+#నిర్వచితమైతే FEAT_FOLDING
+	    ఒకవేళ (fold_skipped)
 		curr -= dir;
-#endif
-	    if ((curr += dir) < 1 || curr > curbuf->b_ml.ml_line_count)
+#అయితే_ముగింపు
+	    ఒకవేళ ((curr += dir) < 1 || curr > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	    {
-		if (count)
-		    return FALSE;
+		ఒకవేళ (లెక్క)
+		    తిరిగి FALSE;
 		curr -= dir;
-		break;
+		ఆపు;
 	    }
 	}
     }
     setpcmark();
-    if (both && *ml_get(curr) == '}')	// include line with '}'
+    ఒకవేళ (both && *ml_get(curr) == '}')	// include line with '}'
 	++curr;
     curwin->w_cursor.lnum = curr;
-    if (curr == curbuf->b_ml.ml_line_count && what != '}' && dir == FORWARD)
+    ఒకవేళ (curr == curbuf->b_ml.ml_పంక్తి_లెక్క && what != '}' && dir == FORWARD)
     {
-	char_u *line = ml_get(curr);
+	char_u *పంక్తి = ml_get(curr);
 
 	// Put the cursor on the last character in the last line and make the
 	// motion inclusive.
-	if ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
+	ఒకవేళ ((curwin->w_cursor.నిలువు = ml_get_len(curr)) != 0)
 	{
-	    --curwin->w_cursor.col;
-	    curwin->w_cursor.col -=
-			     (*mb_head_off)(line, line + curwin->w_cursor.col);
+	    --curwin->w_cursor.నిలువు;
+	    curwin->w_cursor.నిలువు -=
+			     (*mb_తల_off)(పంక్తి, పంక్తి + curwin->w_cursor.నిలువు);
 	    *pincl = TRUE;
 	}
     }
-    else
-	curwin->w_cursor.col = 0;
-    return TRUE;
+    లేకపోతే
+	curwin->w_cursor.నిలువు = 0;
+    తిరిగి TRUE;
 }
 
 /*
  * check if the string 's' is a nroff macro that is in option 'opt'
  */
-    static int
+    స్థిర పూర్ణాంకం
 inmacro(char_u *opt, char_u *s)
 {
     char_u	*macro;
 
-    for (macro = opt; macro[0]; ++macro)
+    కొరకు (macro = opt; macro[0]; ++macro)
     {
 	// Accept two characters in the option being equal to two characters
 	// in the line.  A space in the option matches with a space in the
 	// line or the line having ended.
-	if (       (macro[0] == s[0]
+	ఒకవేళ (       (macro[0] == s[0]
 		    || (macro[0] == ' '
 			&& (s[0] == NUL || s[0] == ' ')))
 		&& (macro[1] == s[1]
 		    || ((macro[1] == NUL || macro[1] == ' ')
 			&& (s[0] == NUL || s[1] == NUL || s[1] == ' '))))
-	    break;
+	    ఆపు;
 	++macro;
-	if (macro[0] == NUL)
-	    break;
+	ఒకవేళ (macro[0] == NUL)
+	    ఆపు;
     }
-    return (macro[0] != NUL);
+    తిరిగి (macro[0] != NUL);
 }
 
 /*
@@ -277,18 +277,18 @@ inmacro(char_u *opt, char_u *s)
  * If 'para' is '{' or '}' only check for sections.
  * If 'both' is TRUE also stop at '}'
  */
-    int
-startPS(linenr_T lnum, int para, int both)
+    పూర్ణాంకం
+ప్రారంభం_PS(linenr_T lnum, పూర్ణాంకం para, పూర్ణాంకం both)
 {
     char_u	*s;
 
     s = ml_get(lnum);
-    if (*s == para || *s == '\f' || (both && *s == '}'))
-	return TRUE;
-    if (*s == '.' && (inmacro(p_sections, s + 1) ||
+    ఒకవేళ (*s == para || *s == '\f' || (both && *s == '}'))
+	తిరిగి TRUE;
+    ఒకవేళ (*s == '.' && (inmacro(p_sections, s + 1) ||
 					   (!para && inmacro(p_para, s + 1))))
-	return TRUE;
-    return FALSE;
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -307,7 +307,7 @@ startPS(linenr_T lnum, int para, int both)
  * 2 or higher - keyword characters (letters, digits and underscore)
  */
 
-static int	cls_bigword;	// TRUE for "W", "B" or "E"
+స్థిర పూర్ణాంకం	cls_bigword;	// TRUE for "W", "B" or "E"
 
 /*
  * cls() - returns the class of character at curwin->w_cursor
@@ -316,38 +316,38 @@ static int	cls_bigword;	// TRUE for "W", "B" or "E"
  * from class 2 and higher are reported as class 1 since only white space
  * boundaries are of interest.
  */
-    static int
-cls(void)
+    స్థిర పూర్ణాంకం
+cls(శూన్య)
 {
-    int	    c;
+    పూర్ణాంకం	    c;
 
     c = gchar_cursor();
-    if (c == ' ' || c == '\t' || c == NUL)
-	return 0;
-    if (enc_dbcs != 0 && c > 0xFF)
+    ఒకవేళ (c == ' ' || c == '\t' || c == NUL)
+	తిరిగి 0;
+    ఒకవేళ (enc_dbcs != 0 && c > 0xFF)
     {
 	// If cls_bigword, report multi-byte chars as class 1.
-	if (enc_dbcs == DBCS_KOR && cls_bigword)
-	    return 1;
+	ఒకవేళ (enc_dbcs == DBCS_KOR && cls_bigword)
+	    తిరిగి 1;
 
 	// process code leading/trailing bytes
-	return dbcs_class(((unsigned)c >> 8), (c & 0xFF));
+	తిరిగి dbcs_class(((గుర్తులేని)c >> 8), (c & 0xFF));
     }
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
 	c = utf_class(c);
-	if (c != 0 && cls_bigword)
-	    return 1;
-	return c;
+	ఒకవేళ (c != 0 && cls_bigword)
+	    తిరిగి 1;
+	తిరిగి c;
     }
 
     // If cls_bigword is TRUE, report all non-blanks as class 1.
-    if (cls_bigword)
-	return 1;
+    ఒకవేళ (cls_bigword)
+	తిరిగి 1;
 
-    if (vim_iswordc(c))
-	return 2;
-    return 1;
+    ఒకవేళ (vim_iswordc(c))
+	తిరిగి 2;
+    తిరిగి 1;
 }
 
 
@@ -357,67 +357,67 @@ cls(void)
  * Returns FAIL if the cursor was already at the end of the file.
  * If eol is TRUE, last word stops at end of line (for operators).
  */
-    int
-fwd_word(
-    long	count,
-    int		bigword,    // "W", "E" or "B"
-    int		eol)
+    పూర్ణాంకం
+fwd_మాట(
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		bigword,    // "W", "E" or "B"
+    పూర్ణాంకం		eol)
 {
-    int		sclass;	    // starting class
-    int		i;
-    int		last_line;
+    పూర్ణాంకం		sclass;	    // starting class
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		చివరి_పంక్తి;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    అయితే (--లెక్క >= 0)
     {
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	ఒకవేళ (hasFolding(curwin->w_cursor.lnum, ఖాళీ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
-#endif
+#అయితే_ముగింపు
 	sclass = cls();
 
 	/*
 	 * We always move at least one character, unless on the last
 	 * character in the buffer.
 	 */
-	last_line = (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count);
+	చివరి_పంక్తి = (curwin->w_cursor.lnum == curbuf->b_ml.ml_పంక్తి_లెక్క);
 	i = inc_cursor();
-	if (i == -1 || (i >= 1 && last_line)) // started at last char in file
-	    return FAIL;
-	if (i >= 1 && eol && count == 0)      // started at last char in line
-	    return OK;
+	ఒకవేళ (i == -1 || (i >= 1 && చివరి_పంక్తి)) // started at last char in file
+	    తిరిగి FAIL;
+	ఒకవేళ (i >= 1 && eol && లెక్క == 0)      // started at last char in line
+	    తిరిగి OK;
 
 	/*
 	 * Go one char past end of current word (if any)
 	 */
-	if (sclass != 0)
-	    while (cls() == sclass)
+	ఒకవేళ (sclass != 0)
+	    అయితే (cls() == sclass)
 	    {
 		i = inc_cursor();
-		if (i == -1 || (i >= 1 && eol && count == 0))
-		    return OK;
+		ఒకవేళ (i == -1 || (i >= 1 && eol && లెక్క == 0))
+		    తిరిగి OK;
 	    }
 
 	/*
 	 * go to next non-white
 	 */
-	while (cls() == 0)
+	అయితే (cls() == 0)
 	{
 	    /*
 	     * We'll stop if we land on a blank line
 	     */
-	    if (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
-		break;
+	    ఒకవేళ (curwin->w_cursor.నిలువు == 0 && *ml_get_curline() == NUL)
+		ఆపు;
 
 	    i = inc_cursor();
-	    if (i == -1 || (i >= 1 && eol && count == 0))
-		return OK;
+	    ఒకవేళ (i == -1 || (i >= 1 && eol && లెక్క == 0))
+		తిరిగి OK;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -427,53 +427,53 @@ fwd_word(
  *
  * Returns FAIL if top of the file was reached.
  */
-    int
-bck_word(long count, int bigword, int stop)
+    పూర్ణాంకం
+bck_మాట(దీర్ఘ లెక్క, పూర్ణాంకం bigword, పూర్ణాంకం stop)
 {
-    int		sclass;	    // starting class
+    పూర్ణాంకం		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    అయితే (--లెక్క >= 0)
     {
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	// When inside a range of folded lines, move to the first char of the
 	// first line.
-	if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL))
-	    curwin->w_cursor.col = 0;
-#endif
+	ఒకవేళ (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, ఖాళీ))
+	    curwin->w_cursor.నిలువు = 0;
+#అయితే_ముగింపు
 	sclass = cls();
-	if (dec_cursor() == -1)		// started at start of file
-	    return FAIL;
+	ఒకవేళ (dec_cursor() == -1)		// started at start of file
+	    తిరిగి FAIL;
 
-	if (!stop || sclass == cls() || sclass == 0)
+	ఒకవేళ (!stop || sclass == cls() || sclass == 0)
 	{
 	    /*
 	     * Skip white space before the word.
 	     * Stop on an empty line.
 	     */
-	    while (cls() == 0)
+	    అయితే (cls() == 0)
 	    {
-		if (curwin->w_cursor.col == 0
+		ఒకవేళ (curwin->w_cursor.నిలువు == 0
 				      && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (dec_cursor() == -1) // hit start of file, stop here
-		    return OK;
+		    వెళ్ళు ముగిసిన;
+		ఒకవేళ (dec_cursor() == -1) // hit start of file, stop here
+		    తిరిగి OK;
 	    }
 
 	    /*
 	     * Move backward to start of this word.
 	     */
-	    if (skip_chars(cls(), BACKWARD))
-		return OK;
+	    ఒకవేళ (skip_chars(cls(), BACKWARD))
+		తిరిగి OK;
 	}
 
 	inc_cursor();			// overshot - forward one
-finished:
+ముగిసిన:
 	stop = FALSE;
     }
     adjust_skipcol();
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -491,73 +491,73 @@ finished:
  * If stop is TRUE and we are already on the end of a word, move one less.
  * If empty is TRUE stop on an empty line.
  */
-    int
-end_word(
-    long	count,
-    int		bigword,
-    int		stop,
-    int		empty)
+    పూర్ణాంకం
+చివర_మాట(
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		bigword,
+    పూర్ణాంకం		stop,
+    పూర్ణాంకం		ఖాళీలు_2)
 {
-    int		sclass;	    // starting class
+    పూర్ణాంకం		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    ఒకవేళ (*p_sel == 'e' && VIsual_చురుకైన && VIsual_బహుళకం == 'v'
 		&& VIsual_select_exclu_adj)
 	unadjust_for_sel();
 
-    while (--count >= 0)
+    అయితే (--లెక్క >= 0)
     {
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	ఒకవేళ (hasFolding(curwin->w_cursor.lnum, ఖాళీ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
-#endif
+#అయితే_ముగింపు
 	sclass = cls();
-	if (inc_cursor() == -1)
-	    return FAIL;
+	ఒకవేళ (inc_cursor() == -1)
+	    తిరిగి FAIL;
 
 	/*
 	 * If we're in the middle of a word, we just have to move to the end
 	 * of it.
 	 */
-	if (cls() == sclass && sclass != 0)
+	ఒకవేళ (cls() == sclass && sclass != 0)
 	{
 	    /*
 	     * Move forward to end of the current word
 	     */
-	    if (skip_chars(sclass, FORWARD))
-		return FAIL;
+	    ఒకవేళ (skip_chars(sclass, FORWARD))
+		తిరిగి FAIL;
 	}
-	else if (!stop || sclass == 0)
+	లేకపోతే ఒకవేళ (!stop || sclass == 0)
 	{
 	    /*
 	     * We were at the end of a word. Go to the end of the next word.
 	     * First skip white space, if 'empty' is TRUE, stop at empty line.
 	     */
-	    while (cls() == 0)
+	    అయితే (cls() == 0)
 	    {
-		if (empty && curwin->w_cursor.col == 0
+		ఒకవేళ (ఖాళీలు_2 && curwin->w_cursor.నిలువు == 0
 					  && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (inc_cursor() == -1)	    // hit end of file, stop here
-		    return FAIL;
+		    వెళ్ళు ముగిసిన;
+		ఒకవేళ (inc_cursor() == -1)	    // hit end of file, stop here
+		    తిరిగి FAIL;
 	    }
 
 	    /*
 	     * Move forward to the end of this word.
 	     */
-	    if (skip_chars(cls(), FORWARD))
-		return FAIL;
+	    ఒకవేళ (skip_chars(cls(), FORWARD))
+		తిరిగి FAIL;
 	}
 	dec_cursor();			// overshot - one char backward
-finished:
+ముగిసిన:
 	stop = FALSE;			// we move only one word less
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -565,97 +565,97 @@ finished:
  *
  * Returns FAIL if start of the file was reached.
  */
-    int
-bckend_word(
-    long	count,
-    int		bigword,    // TRUE for "B"
-    int		eol)	    // TRUE: stop at end of line.
+    పూర్ణాంకం
+bckend_మాట(
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		bigword,    // TRUE for "B"
+    పూర్ణాంకం		eol)	    // TRUE: stop at end of line.
 {
-    int		sclass;	    // starting class
-    int		i;
+    పూర్ణాంకం		sclass;	    // starting class
+    పూర్ణాంకం		i;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    అయితే (--లెక్క >= 0)
     {
 	sclass = cls();
-	if ((i = dec_cursor()) == -1)
-	    return FAIL;
-	if (eol && i == 1)
-	    return OK;
+	ఒకవేళ ((i = dec_cursor()) == -1)
+	    తిరిగి FAIL;
+	ఒకవేళ (eol && i == 1)
+	    తిరిగి OK;
 
 	/*
 	 * Move backward to before the start of this word.
 	 */
-	if (sclass != 0)
+	ఒకవేళ (sclass != 0)
 	{
-	    while (cls() == sclass)
-		if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		    return OK;
+	    అయితే (cls() == sclass)
+		ఒకవేళ ((i = dec_cursor()) == -1 || (eol && i == 1))
+		    తిరిగి OK;
 	}
 
 	/*
 	 * Move backward to end of the previous word
 	 */
-	while (cls() == 0)
+	అయితే (cls() == 0)
 	{
-	    if (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
-		break;
-	    if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		return OK;
+	    ఒకవేళ (curwin->w_cursor.నిలువు == 0 && LINEEMPTY(curwin->w_cursor.lnum))
+		ఆపు;
+	    ఒకవేళ ((i = dec_cursor()) == -1 || (eol && i == 1))
+		తిరిగి OK;
 	}
     }
     adjust_skipcol();
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Skip a row of characters of the same class.
  * Return TRUE when end-of-file reached, FALSE otherwise.
  */
-    static int
-skip_chars(int cclass, int dir)
+    స్థిర పూర్ణాంకం
+skip_chars(పూర్ణాంకం cclass, పూర్ణాంకం dir)
 {
-    while (cls() == cclass)
-	if ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
-	    return TRUE;
-    return FALSE;
+    అయితే (cls() == cclass)
+	ఒకవేళ ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * Go back to the start of the word or the start of white space
  */
-    static void
-back_in_line(void)
+    స్థిర శూన్య
+వెనుక_లోపల_పంక్తి(శూన్య)
 {
-    int		sclass;		    // starting class
+    పూర్ణాంకం		sclass;		    // starting class
 
     sclass = cls();
-    for (;;)
+    కొరకు (;;)
     {
-	if (curwin->w_cursor.col == 0)	    // stop at start of line
-	    break;
+	ఒకవేళ (curwin->w_cursor.నిలువు == 0)	    // stop at start of line
+	    ఆపు;
 	dec_cursor();
-	if (cls() != sclass)		    // stop at start of word
+	ఒకవేళ (cls() != sclass)		    // stop at start of word
 	{
 	    inc_cursor();
-	    break;
+	    ఆపు;
 	}
     }
 }
 
-    static void
-find_first_blank(pos_T *posp)
+    స్థిర శూన్య
+కనుగొను_మొదటి_blank(pos_T *posp)
 {
-    int	    c;
+    పూర్ణాంకం	    c;
 
-    while (decl(posp) != -1)
+    అయితే (decl(posp) != -1)
     {
 	c = gchar_pos(posp);
-	if (!VIM_ISWHITE(c))
+	ఒకవేళ (!VIM_ISWHITE(c))
 	{
 	    incl(posp);
-	    break;
+	    ఆపు;
 	}
     }
 }
@@ -663,19 +663,19 @@ find_first_blank(pos_T *posp)
 /*
  * Skip count/2 sentences and count/2 separating white spaces.
  */
-    static void
+    స్థిర శూన్య
 findsent_forward(
-    long    count,
-    int	    at_start_sent)	// cursor is at start of sentence
+    దీర్ఘ    లెక్క,
+    పూర్ణాంకం	    at_ప్రారంభం_పంపిన)	// cursor is at start of sentence
 {
-    while (count--)
+    అయితే (లెక్క--)
     {
 	findsent(FORWARD, 1L);
-	if (at_start_sent)
-	    find_first_blank(&curwin->w_cursor);
-	if (count == 0 || at_start_sent)
+	ఒకవేళ (at_ప్రారంభం_పంపిన)
+	    కనుగొను_మొదటి_blank(&curwin->w_cursor);
+	ఒకవేళ (లెక్క == 0 || at_ప్రారంభం_పంపిన)
 	    decl(&curwin->w_cursor);
-	at_start_sent = !at_start_sent;
+	at_ప్రారంభం_పంపిన = !at_ప్రారంభం_పంపిన;
     }
 }
 
@@ -683,48 +683,48 @@ findsent_forward(
  * Find word under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
-current_word(
+    పూర్ణాంకం
+current_మాట(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE: include word and white space
-    int		bigword)	// FALSE == word, TRUE == WORD
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		include,	// TRUE: include word and white space
+    పూర్ణాంకం		bigword)	// FALSE == word, TRUE == WORD
 {
-    pos_T	start_pos;
+    pos_T	ప్రారంభం_pos;
     pos_T	pos;
-    int		inclusive = TRUE;
-    int		include_white = FALSE;
+    పూర్ణాంకం		inclusive = TRUE;
+    పూర్ణాంకం		include_white = FALSE;
 
     cls_bigword = bigword;
-    CLEAR_POS(&start_pos);
+    CLEAR_POS(&ప్రారంభం_pos);
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    ఒకవేళ (VIsual_చురుకైన && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     /*
      * When Visual mode is not active, or when the VIsual area is only one
      * character, select the word and/or white space under the cursor.
      */
-    if (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
+    ఒకవేళ (!VIsual_చురుకైన || EQUAL_POS(curwin->w_cursor, VIsual))
     {
 	/*
 	 * Go to start of current word or white space.
 	 */
-	back_in_line();
-	start_pos = curwin->w_cursor;
+	వెనుక_లోపల_పంక్తి();
+	ప్రారంభం_pos = curwin->w_cursor;
 
 	/*
 	 * If the start is on white space, and white space should be included
 	 * ("	word"), or start is not on white space, and white space should
 	 * not be included ("word"), find end of word.
 	 */
-	if ((cls() == 0) == include)
+	ఒకవేళ ((cls() == 0) == include)
 	{
-	    if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		return FAIL;
+	    ఒకవేళ (చివర_మాట(1L, bigword, TRUE, TRUE) == FAIL)
+		తిరిగి FAIL;
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * If the start is not on white space, and white space should be
@@ -733,85 +733,85 @@ current_word(
 	     * If we end up in the first column of the next line (single char
 	     * word) back up to end of the line.
 	     */
-	    fwd_word(1L, bigword, TRUE);
-	    if (curwin->w_cursor.col == 0)
+	    fwd_మాట(1L, bigword, TRUE);
+	    ఒకవేళ (curwin->w_cursor.నిలువు == 0)
 		decl(&curwin->w_cursor);
-	    else
+	    లేకపోతే
 		oneleft();
 
-	    if (include)
+	    ఒకవేళ (include)
 		include_white = TRUE;
 	}
 
-	if (VIsual_active)
+	ఒకవేళ (VIsual_చురుకైన)
 	{
 	    // should do something when inclusive == FALSE !
-	    VIsual = start_pos;
+	    VIsual = ప్రారంభం_pos;
 	    redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	}
-	else
+	లేకపోతే
 	{
-	    oap->start = start_pos;
+	    oap->ప్రారంభం = ప్రారంభం_pos;
 	    oap->motion_type = MCHAR;
 	}
-	--count;
+	--లెక్క;
     }
 
     /*
      * When count is still > 0, extend with more objects.
      */
-    while (count > 0)
+    అయితే (లెక్క > 0)
     {
 	inclusive = TRUE;
-	if (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
+	ఒకవేళ (VIsual_చురుకైన && LT_POS(curwin->w_cursor, VIsual))
 	{
 	    /*
 	     * In Visual mode, with cursor at start: move cursor back.
 	     */
-	    if (decl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() != 0))
+	    ఒకవేళ (decl(&curwin->w_cursor) == -1)
+		తిరిగి FAIL;
+	    ఒకవేళ (include != (cls() != 0))
 	    {
-		if (bck_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
+		ఒకవేళ (bck_మాట(1L, bigword, TRUE) == FAIL)
+		    తిరిగి FAIL;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (bckend_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
-		(void)incl(&curwin->w_cursor);
+		ఒకవేళ (bckend_మాట(1L, bigword, TRUE) == FAIL)
+		    తిరిగి FAIL;
+		(శూన్య)incl(&curwin->w_cursor);
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Move cursor forward one word and/or white area.
 	     */
-	    if (incl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() == 0))
+	    ఒకవేళ (incl(&curwin->w_cursor) == -1)
+		తిరిగి FAIL;
+	    ఒకవేళ (include != (cls() == 0))
 	    {
-		if (fwd_word(1L, bigword, TRUE) == FAIL && count > 1)
-		    return FAIL;
+		ఒకవేళ (fwd_మాట(1L, bigword, TRUE) == FAIL && లెక్క > 1)
+		    తిరిగి FAIL;
 		/*
 		 * If end is just past a new-line, we don't want to include
 		 * the first character on the line.
 		 * Put cursor on last char of white.
 		 */
-		if (oneleft() == FAIL)
+		ఒకవేళ (oneleft() == FAIL)
 		    inclusive = FALSE;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		    return FAIL;
+		ఒకవేళ (చివర_మాట(1L, bigword, TRUE, TRUE) == FAIL)
+		    తిరిగి FAIL;
 	    }
 	}
-	--count;
+	--లెక్క;
     }
 
-    if (include_white && (cls() != 0
-		 || (curwin->w_cursor.col == 0 && !inclusive)))
+    ఒకవేళ (include_white && (cls() != 0
+		 || (curwin->w_cursor.నిలువు == 0 && !inclusive)))
     {
 	/*
 	 * If we don't include white space at the end, move the start
@@ -822,62 +822,62 @@ current_word(
 	 * But don't delete white space at start of line (indent).
 	 */
 	pos = curwin->w_cursor;	// save cursor position
-	curwin->w_cursor = start_pos;
-	if (oneleft() == OK)
+	curwin->w_cursor = ప్రారంభం_pos;
+	ఒకవేళ (oneleft() == OK)
 	{
-	    back_in_line();
-	    if (cls() == 0 && curwin->w_cursor.col > 0)
+	    వెనుక_లోపల_పంక్తి();
+	    ఒకవేళ (cls() == 0 && curwin->w_cursor.నిలువు > 0)
 	    {
-		if (VIsual_active)
+		ఒకవేళ (VIsual_చురుకైన)
 		    VIsual = curwin->w_cursor;
-		else
-		    oap->start = curwin->w_cursor;
+		లేకపోతే
+		    oap->ప్రారంభం = curwin->w_cursor;
 	    }
 	}
 	curwin->w_cursor = pos;	// put cursor back at end
     }
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
-	if (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
+	ఒకవేళ (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	if (VIsual_mode == 'V')
+	ఒకవేళ (VIsual_బహుళకం == 'V')
 	{
-	    VIsual_mode = 'v';
+	    VIsual_బహుళకం = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    లేకపోతే
 	oap->inclusive = inclusive;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Find sentence(s) under the cursor, cursor at end.
  * When Visual active, extend it by one or more sentences.
  */
-    int
-current_sent(oparg_T *oap, long count, int include)
+    పూర్ణాంకం
+current_పంపిన(oparg_T *oap, దీర్ఘ లెక్క, పూర్ణాంకం include)
 {
-    pos_T	start_pos;
+    pos_T	ప్రారంభం_pos;
     pos_T	pos;
-    int		start_blank;
-    int		c;
-    int		at_start_sent;
-    long	ncount;
+    పూర్ణాంకం		ప్రారంభం_blank;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		at_ప్రారంభం_పంపిన;
+    దీర్ఘ	ncount;
 
-    start_pos = curwin->w_cursor;
-    pos = start_pos;
+    ప్రారంభం_pos = curwin->w_cursor;
+    pos = ప్రారంభం_pos;
     findsent(FORWARD, 1L);	// Find start of next sentence.
 
     /*
      * When the Visual area is bigger than one character: Extend it.
      */
-    if (VIsual_active && !EQUAL_POS(start_pos, VIsual))
+    ఒకవేళ (VIsual_చురుకైన && !EQUAL_POS(ప్రారంభం_pos, VIsual))
     {
 extend:
-	if (LT_POS(start_pos, VIsual))
+	ఒకవేళ (LT_POS(ప్రారంభం_pos, VIsual))
 	{
 	    /*
 	     * Cursor at start of Visual area.
@@ -886,40 +886,40 @@ extend:
 	     * - in a sentence or just after it
 	     * - at the start of a sentence
 	     */
-	    at_start_sent = TRUE;
+	    at_ప్రారంభం_పంపిన = TRUE;
 	    decl(&pos);
-	    while (LT_POS(pos, curwin->w_cursor))
+	    అయితే (LT_POS(pos, curwin->w_cursor))
 	    {
 		c = gchar_pos(&pos);
-		if (!VIM_ISWHITE(c))
+		ఒకవేళ (!VIM_ISWHITE(c))
 		{
-		    at_start_sent = FALSE;
-		    break;
+		    at_ప్రారంభం_పంపిన = FALSE;
+		    ఆపు;
 		}
 		incl(&pos);
 	    }
-	    if (!at_start_sent)
+	    ఒకవేళ (!at_ప్రారంభం_పంపిన)
 	    {
 		findsent(BACKWARD, 1L);
-		if (EQUAL_POS(curwin->w_cursor, start_pos))
-		    at_start_sent = TRUE;  // exactly at start of sentence
-		else
+		ఒకవేళ (EQUAL_POS(curwin->w_cursor, ప్రారంభం_pos))
+		    at_ప్రారంభం_పంపిన = TRUE;  // exactly at start of sentence
+		లేకపోతే
 		    // inside a sentence, go to its end (start of next)
 		    findsent(FORWARD, 1L);
 	    }
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    while (count--)
+	    ఒకవేళ (include)	// "as" gets twice as much as "is"
+		లెక్క *= 2;
+	    అయితే (లెక్క--)
 	    {
-		if (at_start_sent)
-		    find_first_blank(&curwin->w_cursor);
+		ఒకవేళ (at_ప్రారంభం_పంపిన)
+		    కనుగొను_మొదటి_blank(&curwin->w_cursor);
 		c = gchar_cursor();
-		if (!at_start_sent || (!include && !VIM_ISWHITE(c)))
+		ఒకవేళ (!at_ప్రారంభం_పంపిన || (!include && !VIM_ISWHITE(c)))
 		    findsent(BACKWARD, 1L);
-		at_start_sent = !at_start_sent;
+		at_ప్రారంభం_పంపిన = !at_ప్రారంభం_పంపిన;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Cursor at end of Visual area.
@@ -929,154 +929,154 @@ extend:
 	     * - in a sentence
 	     */
 	    incl(&pos);
-	    at_start_sent = TRUE;
+	    at_ప్రారంభం_పంపిన = TRUE;
 	    // not just before a sentence
-	    if (!EQUAL_POS(pos, curwin->w_cursor))
+	    ఒకవేళ (!EQUAL_POS(pos, curwin->w_cursor))
 	    {
-		at_start_sent = FALSE;
-		while (LT_POS(pos, curwin->w_cursor))
+		at_ప్రారంభం_పంపిన = FALSE;
+		అయితే (LT_POS(pos, curwin->w_cursor))
 		{
 		    c = gchar_pos(&pos);
-		    if (!VIM_ISWHITE(c))
+		    ఒకవేళ (!VIM_ISWHITE(c))
 		    {
-			at_start_sent = TRUE;
-			break;
+			at_ప్రారంభం_పంపిన = TRUE;
+			ఆపు;
 		    }
 		    incl(&pos);
 		}
-		if (at_start_sent)	// in the sentence
+		ఒకవేళ (at_ప్రారంభం_పంపిన)	// in the sentence
 		    findsent(BACKWARD, 1L);
-		else		// in/before white before a sentence
-		    curwin->w_cursor = start_pos;
+		లేకపోతే		// in/before white before a sentence
+		    curwin->w_cursor = ప్రారంభం_pos;
 	    }
 
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    findsent_forward(count, at_start_sent);
-	    if (*p_sel == 'e')
-		++curwin->w_cursor.col;
+	    ఒకవేళ (include)	// "as" gets twice as much as "is"
+		లెక్క *= 2;
+	    findsent_forward(లెక్క, at_ప్రారంభం_పంపిన);
+	    ఒకవేళ (*p_sel == 'e')
+		++curwin->w_cursor.నిలువు;
 	}
-	return OK;
+	తిరిగి OK;
     }
 
     /*
      * If the cursor started on a blank, check if it is just before the start
      * of the next sentence.
      */
-    while (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
+    అయితే (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
 	incl(&pos);
-    if (EQUAL_POS(pos, curwin->w_cursor))
+    ఒకవేళ (EQUAL_POS(pos, curwin->w_cursor))
     {
-	start_blank = TRUE;
-	find_first_blank(&start_pos);	// go back to first blank
+	ప్రారంభం_blank = TRUE;
+	కనుగొను_మొదటి_blank(&ప్రారంభం_pos);	// go back to first blank
     }
-    else
+    లేకపోతే
     {
-	start_blank = FALSE;
+	ప్రారంభం_blank = FALSE;
 	findsent(BACKWARD, 1L);
-	start_pos = curwin->w_cursor;
+	ప్రారంభం_pos = curwin->w_cursor;
     }
-    if (include)
-	ncount = count * 2;
-    else
+    ఒకవేళ (include)
+	ncount = లెక్క * 2;
+    లేకపోతే
     {
-	ncount = count;
-	if (start_blank)
+	ncount = లెక్క;
+	ఒకవేళ (ప్రారంభం_blank)
 	    --ncount;
     }
-    if (ncount > 0)
+    ఒకవేళ (ncount > 0)
 	findsent_forward(ncount, TRUE);
-    else
+    లేకపోతే
 	decl(&curwin->w_cursor);
 
-    if (include)
+    ఒకవేళ (include)
     {
 	/*
 	 * If the blank in front of the sentence is included, exclude the
 	 * blanks at the end of the sentence, go back to the first blank.
 	 * If there are no trailing blanks, try to include leading blanks.
 	 */
-	if (start_blank)
+	ఒకవేళ (ప్రారంభం_blank)
 	{
-	    find_first_blank(&curwin->w_cursor);
+	    కనుగొను_మొదటి_blank(&curwin->w_cursor);
 	    c = gchar_pos(&curwin->w_cursor);	// VIM_ISWHITE() is a macro
-	    if (VIM_ISWHITE(c))
+	    ఒకవేళ (VIM_ISWHITE(c))
 		decl(&curwin->w_cursor);
 	}
-	else if (c = gchar_cursor(), !VIM_ISWHITE(c))
-	    find_first_blank(&start_pos);
+	లేకపోతే ఒకవేళ (c = gchar_cursor(), !VIM_ISWHITE(c))
+	    కనుగొను_మొదటి_blank(&ప్రారంభం_pos);
     }
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
 	// Avoid getting stuck with "is" on a single space before a sentence.
-	if (EQUAL_POS(start_pos, curwin->w_cursor))
-	    goto extend;
-	if (*p_sel == 'e')
-	    ++curwin->w_cursor.col;
-	VIsual = start_pos;
-	VIsual_mode = 'v';
+	ఒకవేళ (EQUAL_POS(ప్రారంభం_pos, curwin->w_cursor))
+	    వెళ్ళు extend;
+	ఒకవేళ (*p_sel == 'e')
+	    ++curwin->w_cursor.నిలువు;
+	VIsual = ప్రారంభం_pos;
+	VIsual_బహుళకం = 'v';
 	redraw_cmdline = TRUE;		// show mode later
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
     }
-    else
+    లేకపోతే
     {
 	// include a newline after the sentence, if there is one
-	if (incl(&curwin->w_cursor) == -1)
+	ఒకవేళ (incl(&curwin->w_cursor) == -1)
 	    oap->inclusive = TRUE;
-	else
+	లేకపోతే
 	    oap->inclusive = FALSE;
-	oap->start = start_pos;
+	oap->ప్రారంభం = ప్రారంభం_pos;
 	oap->motion_type = MCHAR;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Find block under the cursor, cursor at end.
  * "what" and "other" are two matching parenthesis/brace/etc.
  */
-    int
-current_block(
+    పూర్ణాంకం
+current_ఖండం(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		what,		// '(', '{', etc.
-    int		other)		// ')', '}', etc.
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		include,	// TRUE == include white space
+    పూర్ణాంకం		what,		// '(', '{', etc.
+    పూర్ణాంకం		other)		// ')', '}', etc.
 {
     pos_T	old_pos;
-    pos_T	*pos = NULL;
-    pos_T	start_pos;
-    pos_T	*end_pos;
-    pos_T	old_start, old_end;
+    pos_T	*pos = ఖాళీ;
+    pos_T	ప్రారంభం_pos;
+    pos_T	*చివర_pos;
+    pos_T	old_ప్రారంభం, old_చివర;
     char_u	*save_cpo;
-    int		sol = FALSE;		// '{' at start of line
+    పూర్ణాంకం		sol = FALSE;		// '{' at start of line
 
     old_pos = curwin->w_cursor;
-    old_end = curwin->w_cursor;		// remember where we started
-    old_start = old_end;
+    old_చివర = curwin->w_cursor;		// remember where we started
+    old_ప్రారంభం = old_చివర;
 
     /*
      * If we start on '(', '{', ')', '}', etc., use the whole block inclusive.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    ఒకవేళ (!VIsual_చురుకైన || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
-	if (what == '{')		// ignore indent
-	    while (inindent(1))
-		if (inc_cursor() != 0)
-		    break;
-	if (gchar_cursor() == what)
+	ఒకవేళ (what == '{')		// ignore indent
+	    అయితే (inindent(1))
+		ఒకవేళ (inc_cursor() != 0)
+		    ఆపు;
+	ఒకవేళ (gchar_cursor() == what)
 	    // cursor on '(' or '{', move cursor just after it
-	    ++curwin->w_cursor.col;
+	    ++curwin->w_cursor.నిలువు;
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    లేకపోతే ఒకవేళ (LT_POS(VIsual, curwin->w_cursor))
     {
-	old_start = VIsual;
+	old_ప్రారంభం = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
-	old_end = VIsual;
+    లేకపోతే
+	old_చివర = VIsual;
 
     /*
      * Search backwards for unclosed '(', '{', etc..
@@ -1085,25 +1085,25 @@ current_block(
      * user wants.
      */
     save_cpo = p_cpo;
-    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != NULL ? "%M" : "%");
-    if ((pos = findmatch(NULL, what)) != NULL)
+    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != ఖాళీ ? "%M" : "%");
+    ఒకవేళ ((pos = findmatch(ఖాళీ, what)) != ఖాళీ)
     {
-	while (count-- > 0)
+	అయితే (లెక్క-- > 0)
 	{
-	    if ((pos = findmatch(NULL, what)) == NULL)
-		break;
+	    ఒకవేళ ((pos = findmatch(ఖాళీ, what)) == ఖాళీ)
+		ఆపు;
 	    curwin->w_cursor = *pos;
-	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
+	    ప్రారంభం_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
     }
-    else
+    లేకపోతే
     {
-	while (count-- > 0)
+	అయితే (లెక్క-- > 0)
 	{
-	    if ((pos = findmatchlimit(NULL, what, FM_FORWARD, 0)) == NULL)
-		break;
+	    ఒకవేళ ((pos = findmatchlimit(ఖాళీ, what, FM_FORWARD, 0)) == ఖాళీ)
+		ఆపు;
 	    curwin->w_cursor = *pos;
-	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
+	    ప్రారంభం_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
     }
     p_cpo = save_cpo;
@@ -1112,12 +1112,12 @@ current_block(
      * Search for matching ')', '}', etc.
      * Put this position in curwin->w_cursor.
      */
-    if (pos == NULL || (end_pos = findmatch(NULL, other)) == NULL)
+    ఒకవేళ (pos == ఖాళీ || (చివర_pos = findmatch(ఖాళీ, other)) == ఖాళీ)
     {
 	curwin->w_cursor = old_pos;
-	return FAIL;
+	తిరిగి FAIL;
     }
-    curwin->w_cursor = *end_pos;
+    curwin->w_cursor = *చివర_pos;
 
     /*
      * Try to exclude the '(', '{', ')', '}', etc. when "include" is FALSE.
@@ -1125,26 +1125,26 @@ current_block(
      * indent.  But only if the resulting area is not smaller than what we
      * started with.
      */
-    while (!include)
+    అయితే (!include)
     {
-	incl(&start_pos);
-	sol = (curwin->w_cursor.col == 0);
+	incl(&ప్రారంభం_pos);
+	sol = (curwin->w_cursor.నిలువు == 0);
 	decl(&curwin->w_cursor);
-	while (inindent(1))
+	అయితే (inindent(1))
 	{
 	    sol = TRUE;
-	    if (decl(&curwin->w_cursor) != 0)
-		break;
+	    ఒకవేళ (decl(&curwin->w_cursor) != 0)
+		ఆపు;
 	}
 
 	/*
 	 * In Visual mode, when resulting area is empty
 	 * i.e. there is no inner block to select, abort.
 	 */
-	if (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
+	ఒకవేళ (EQUAL_POS(ప్రారంభం_pos, *చివర_pos) && VIsual_చురుకైన)
 	{
 	    curwin->w_cursor = old_pos;
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
 	/*
@@ -1152,523 +1152,523 @@ current_block(
 	 * started with, extend it to the next block, and then exclude again.
 	 * Don't try to expand the area if the area is empty.
 	 */
-	if (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
-		&& !EQUAL_POS(start_pos, curwin->w_cursor)
-		&& VIsual_active)
+	ఒకవేళ (!LT_POS(ప్రారంభం_pos, old_ప్రారంభం) && !LT_POS(old_చివర, curwin->w_cursor)
+		&& !EQUAL_POS(ప్రారంభం_pos, curwin->w_cursor)
+		&& VIsual_చురుకైన)
 	{
-	    curwin->w_cursor = old_start;
+	    curwin->w_cursor = old_ప్రారంభం;
 	    decl(&curwin->w_cursor);
-	    if ((pos = findmatch(NULL, what)) == NULL)
+	    ఒకవేళ ((pos = findmatch(ఖాళీ, what)) == ఖాళీ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    start_pos = *pos;
+	    ప్రారంభం_pos = *pos;
 	    curwin->w_cursor = *pos;
-	    if ((end_pos = findmatch(NULL, other)) == NULL)
+	    ఒకవేళ ((చివర_pos = findmatch(ఖాళీ, other)) == ఖాళీ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    curwin->w_cursor = *end_pos;
+	    curwin->w_cursor = *చివర_pos;
 	}
-	else
-	    break;
+	లేకపోతే
+	    ఆపు;
     }
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
-	if (*p_sel == 'e')
+	ఒకవేళ (*p_sel == 'e')
 	    inc(&curwin->w_cursor);
-	if (sol && gchar_cursor() != NUL)
+	ఒకవేళ (sol && gchar_cursor() != NUL)
 	    inc(&curwin->w_cursor);	// include the line break
-	VIsual = start_pos;
-	VIsual_mode = 'v';
+	VIsual = ప్రారంభం_pos;
+	VIsual_బహుళకం = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    లేకపోతే
     {
-	oap->start = start_pos;
+	oap->ప్రారంభం = ప్రారంభం_pos;
 	oap->motion_type = MCHAR;
 	oap->inclusive = FALSE;
-	if (sol)
+	ఒకవేళ (sol)
 	    incl(&curwin->w_cursor);
-	else if (LTOREQ_POS(start_pos, curwin->w_cursor))
+	లేకపోతే ఒకవేళ (LTOREQ_POS(ప్రారంభం_pos, curwin->w_cursor))
 	    // Include the character under the cursor.
 	    oap->inclusive = TRUE;
-	else
+	లేకపోతే
 	    // End is before the start (no text in between <>, [], etc.): don't
 	    // operate on any text.
-	    curwin->w_cursor = start_pos;
+	    curwin->w_cursor = ప్రారంభం_pos;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if the cursor is on a "<aaa>" tag.  Ignore "<aaa/>".
  * When "end_tag" is TRUE return TRUE if the cursor is on "</aaa>".
  */
-    static int
-in_html_tag(
-    int		end_tag)
+    స్థిర పూర్ణాంకం
+లోపల_html_ట్యాగ్(
+    పూర్ణాంకం		చివర_ట్యాగ్)
 {
-    char_u	*line = ml_get_curline();
+    char_u	*పంక్తి = ml_get_curline();
     char_u	*p;
-    int		c;
-    int		lc = NUL;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		lc = NUL;
     pos_T	pos;
 
-    if (enc_dbcs)
+    ఒకవేళ (enc_dbcs)
     {
-	char_u	*lp = NULL;
+	char_u	*lp = ఖాళీ;
 
 	// We search forward until the cursor, because searching backwards is
 	// very slow for DBCS encodings.
-	for (p = line; p < line + curwin->w_cursor.col; MB_PTR_ADV(p))
-	    if (*p == '>' || *p == '<')
+	కొరకు (p = పంక్తి; p < పంక్తి + curwin->w_cursor.నిలువు; MB_PTR_ADV(p))
+	    ఒకవేళ (*p == '>' || *p == '<')
 	    {
 		lc = *p;
 		lp = p;
 	    }
-	if (*p != '<')	    // check for '<' under cursor
+	ఒకవేళ (*p != '<')	    // check for '<' under cursor
 	{
-	    if (lc != '<')
-		return FALSE;
+	    ఒకవేళ (lc != '<')
+		తిరిగి FALSE;
 	    p = lp;
 	}
     }
-    else
+    లేకపోతే
     {
-	for (p = line + curwin->w_cursor.col; p > line; )
+	కొరకు (p = పంక్తి + curwin->w_cursor.నిలువు; p > పంక్తి; )
 	{
-	    if (*p == '<')	// find '<' under/before cursor
-		break;
-	    MB_PTR_BACK(line, p);
-	    if (*p == '>')	// find '>' before cursor
-		break;
+	    ఒకవేళ (*p == '<')	// find '<' under/before cursor
+		ఆపు;
+	    MB_PTR_వెనుక(పంక్తి, p);
+	    ఒకవేళ (*p == '>')	// find '>' before cursor
+		ఆపు;
 	}
-	if (*p != '<')
-	    return FALSE;
+	ఒకవేళ (*p != '<')
+	    తిరిగి FALSE;
     }
 
     pos.lnum = curwin->w_cursor.lnum;
-    pos.col = (colnr_T)(p - line);
+    pos.నిలువు = (colnr_T)(p - పంక్తి);
 
     MB_PTR_ADV(p);
-    if (end_tag)
+    ఒకవేళ (చివర_ట్యాగ్)
 	// check that there is a '/' after the '<'
-	return *p == '/';
+	తిరిగి *p == '/';
 
     // check that there is no '/' after the '<'
-    if (*p == '/')
-	return FALSE;
+    ఒకవేళ (*p == '/')
+	తిరిగి FALSE;
 
     // check that the matching '>' is not preceded by '/'
-    for (;;)
+    కొరకు (;;)
     {
-	if (inc(&pos) < 0)
-	    return FALSE;
+	ఒకవేళ (inc(&pos) < 0)
+	    తిరిగి FALSE;
 	c = *ml_get_pos(&pos);
-	if (c == '>')
-	    break;
+	ఒకవేళ (c == '>')
+	    ఆపు;
 	lc = c;
     }
-    return lc != '/';
+    తిరిగి lc != '/';
 }
 
 /*
  * Find tag block under the cursor, cursor at end.
  */
-    int
+    పూర్ణాంకం
 current_tagblock(
     oparg_T	*oap,
-    long	count_arg,
-    int		include)	// TRUE == include white space
+    దీర్ఘ	లెక్క_arg,
+    పూర్ణాంకం		include)	// TRUE == include white space
 {
-    long	count = count_arg;
-    long	n;
+    దీర్ఘ	లెక్క = లెక్క_arg;
+    దీర్ఘ	n;
     pos_T	old_pos;
-    pos_T	start_pos;
-    pos_T	end_pos;
-    pos_T	old_start, old_end;
+    pos_T	ప్రారంభం_pos;
+    pos_T	చివర_pos;
+    pos_T	old_ప్రారంభం, old_చివర;
     char_u	*spat, *epat;
     char_u	*p;
     char_u	*cp;
-    int		len;
-    int		r;
-    int		do_include = include;
-    int		save_p_ws = p_ws;
-    int		retval = FAIL;
-    int		is_inclusive = TRUE;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		r;
+    పూర్ణాంకం		do_include = include;
+    పూర్ణాంకం		save_p_ws = p_ws;
+    పూర్ణాంకం		retval = FAIL;
+    పూర్ణాంకం		is_inclusive = TRUE;
 
     p_ws = FALSE;
 
     old_pos = curwin->w_cursor;
-    old_end = curwin->w_cursor;		    // remember where we started
-    old_start = old_end;
-    if (!VIsual_active || *p_sel == 'e')
-	decl(&old_end);			    // old_end is inclusive
+    old_చివర = curwin->w_cursor;		    // remember where we started
+    old_ప్రారంభం = old_చివర;
+    ఒకవేళ (!VIsual_చురుకైన || *p_sel == 'e')
+	decl(&old_చివర);			    // old_end is inclusive
 
     /*
      * If we start on "<aaa>" select that block.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    ఒకవేళ (!VIsual_చురుకైన || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
 
 	// ignore indent
-	while (inindent(1))
-	    if (inc_cursor() != 0)
-		break;
+	అయితే (inindent(1))
+	    ఒకవేళ (inc_cursor() != 0)
+		ఆపు;
 
-	if (in_html_tag(FALSE))
+	ఒకవేళ (లోపల_html_ట్యాగ్(FALSE))
 	{
 	    // cursor on start tag, move to its '>'
-	    while (*ml_get_cursor() != '>')
-		if (inc_cursor() < 0)
-		    break;
+	    అయితే (*ml_get_cursor() != '>')
+		ఒకవేళ (inc_cursor() < 0)
+		    ఆపు;
 	}
-	else if (in_html_tag(TRUE))
+	లేకపోతే ఒకవేళ (లోపల_html_ట్యాగ్(TRUE))
 	{
 	    // cursor on end tag, move to just before it
-	    while (*ml_get_cursor() != '<')
-		if (dec_cursor() < 0)
-		    break;
+	    అయితే (*ml_get_cursor() != '<')
+		ఒకవేళ (dec_cursor() < 0)
+		    ఆపు;
 	    dec_cursor();
-	    old_end = curwin->w_cursor;
+	    old_చివర = curwin->w_cursor;
 	}
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    లేకపోతే ఒకవేళ (LT_POS(VIsual, curwin->w_cursor))
     {
-	old_start = VIsual;
+	old_ప్రారంభం = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
-	old_end = VIsual;
+    లేకపోతే
+	old_చివర = VIsual;
 
 again:
     /*
      * Search backwards for unclosed "<aaa>".
      * Put this position in start_pos.
      */
-    for (n = 0; n < count; ++n)
+    కొరకు (n = 0; n < లెక్క; ++n)
     {
-	if (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
+	ఒకవేళ (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
 		    (char_u *)"",
-		    (char_u *)"</[^>]*>", BACKWARD, NULL, 0,
-						  NULL, (linenr_T)0, 0L) <= 0)
+		    (char_u *)"</[^>]*>", BACKWARD, ఖాళీ, 0,
+						  ఖాళీ, (linenr_T)0, 0L) <= 0)
 	{
 	    curwin->w_cursor = old_pos;
-	    goto theend;
+	    వెళ్ళు theend;
 	}
     }
-    start_pos = curwin->w_cursor;
+    ప్రారంభం_pos = curwin->w_cursor;
 
     /*
      * Search for matching "</aaa>".  First isolate the "aaa".
      */
     inc_cursor();
     p = ml_get_cursor();
-    for (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
+    కొరకు (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
 	;
-    len = (int)(cp - p);
-    if (len == 0)
+    len = (పూర్ణాంకం)(cp - p);
+    ఒకవేళ (len == 0)
     {
 	curwin->w_cursor = old_pos;
-	goto theend;
+	వెళ్ళు theend;
     }
     spat = alloc(len + 39);
     epat = alloc(len + 9);
-    if (spat == NULL || epat == NULL)
+    ఒకవేళ (spat == ఖాళీ || epat == ఖాళీ)
     {
 	vim_free(spat);
 	vim_free(epat);
 	curwin->w_cursor = old_pos;
-	goto theend;
+	వెళ్ళు theend;
     }
-    sprintf((char *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
-    sprintf((char *)epat, "</%.*s>\\c", len, p);
+    sprintf((అక్షరం *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
+    sprintf((అక్షరం *)epat, "</%.*s>\\c", len, p);
 
-    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, NULL,
-						    0, NULL, (linenr_T)0, 0L);
+    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, ఖాళీ,
+						    0, ఖాళీ, (linenr_T)0, 0L);
 
     vim_free(spat);
     vim_free(epat);
 
-    if (r < 1 || LT_POS(curwin->w_cursor, old_end))
+    ఒకవేళ (r < 1 || LT_POS(curwin->w_cursor, old_చివర))
     {
 	// Can't find other end or it's before the previous end.  Could be a
 	// HTML tag that doesn't have a matching end.  Search backwards for
 	// another starting tag.
-	count = 1;
-	curwin->w_cursor = start_pos;
-	goto again;
+	లెక్క = 1;
+	curwin->w_cursor = ప్రారంభం_pos;
+	వెళ్ళు again;
     }
 
-    if (do_include)
+    ఒకవేళ (do_include)
     {
 	// Include up to the '>'.
-	while (*ml_get_cursor() != '>')
-	    if (inc_cursor() < 0)
-		break;
+	అయితే (*ml_get_cursor() != '>')
+	    ఒకవేళ (inc_cursor() < 0)
+		ఆపు;
     }
-    else
+    లేకపోతే
     {
 	char_u *c = ml_get_cursor();
 
 	// Exclude the '<' of the end tag.
 	// If the closing tag is on new line, do not decrement cursor, but
 	// make operation exclusive, so that the linefeed will be selected
-	if (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
+	ఒకవేళ (*c == '<' && !VIsual_చురుకైన && curwin->w_cursor.నిలువు == 0)
 	    // do not decrement cursor
 	    is_inclusive = FALSE;
-	else if (*c == '<')
+	లేకపోతే ఒకవేళ (*c == '<')
 	    dec_cursor();
     }
-    end_pos = curwin->w_cursor;
+    చివర_pos = curwin->w_cursor;
 
-    if (!do_include)
+    ఒకవేళ (!do_include)
     {
 	// Exclude the start tag,
 	// but skip over '>' if it appears in quotes
-	int in_quotes = FALSE;
-	curwin->w_cursor = start_pos;
-	while (inc_cursor() >= 0)
+	పూర్ణాంకం లోపల_quotes = FALSE;
+	curwin->w_cursor = ప్రారంభం_pos;
+	అయితే (inc_cursor() >= 0)
 	{
 	    p = ml_get_cursor();
-	    if (*p == '>' && !in_quotes)
+	    ఒకవేళ (*p == '>' && !లోపల_quotes)
 	    {
 		inc_cursor();
-		start_pos = curwin->w_cursor;
-		break;
+		ప్రారంభం_pos = curwin->w_cursor;
+		ఆపు;
 	    }
-	    else if (*p == '"' || *p == '\'')
-		in_quotes = !in_quotes;
+	    లేకపోతే ఒకవేళ (*p == '"' || *p == '\'')
+		లోపల_quotes = !లోపల_quotes;
 	}
-	curwin->w_cursor = end_pos;
+	curwin->w_cursor = చివర_pos;
 
 	// If we are in Visual mode and now have the same text as before set
 	// "do_include" and try again.
-	if (VIsual_active && EQUAL_POS(start_pos, old_start)
-						&& EQUAL_POS(end_pos, old_end))
+	ఒకవేళ (VIsual_చురుకైన && EQUAL_POS(ప్రారంభం_pos, old_ప్రారంభం)
+						&& EQUAL_POS(చివర_pos, old_చివర))
 	{
 	    do_include = TRUE;
-	    curwin->w_cursor = old_start;
-	    count = count_arg;
-	    goto again;
+	    curwin->w_cursor = old_ప్రారంభం;
+	    లెక్క = లెక్క_arg;
+	    వెళ్ళు again;
 	}
     }
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
 	// If the end is before the start there is no text between tags, select
 	// the char under the cursor.
-	if (LT_POS(end_pos, start_pos))
-	    curwin->w_cursor = start_pos;
-	else if (*p_sel == 'e')
+	ఒకవేళ (LT_POS(చివర_pos, ప్రారంభం_pos))
+	    curwin->w_cursor = ప్రారంభం_pos;
+	లేకపోతే ఒకవేళ (*p_sel == 'e')
 	    inc_cursor();
-	VIsual = start_pos;
-	VIsual_mode = 'v';
+	VIsual = ప్రారంభం_pos;
+	VIsual_బహుళకం = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    లేకపోతే
     {
-	oap->start = start_pos;
+	oap->ప్రారంభం = ప్రారంభం_pos;
 	oap->motion_type = MCHAR;
-	if (LT_POS(end_pos, start_pos))
+	ఒకవేళ (LT_POS(చివర_pos, ప్రారంభం_pos))
 	{
 	    // End is before the start: there is no text between tags; operate
 	    // on an empty area.
-	    curwin->w_cursor = start_pos;
+	    curwin->w_cursor = ప్రారంభం_pos;
 	    oap->inclusive = FALSE;
 	}
-	else
+	లేకపోతే
 	    oap->inclusive = is_inclusive;
     }
     retval = OK;
 
 theend:
     p_ws = save_p_ws;
-    return retval;
+    తిరిగి retval;
 }
-#endif
+#అయితే_ముగింపు
 
-    int
+    పూర్ణాంకం
 current_par(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		type)		// 'p' for paragraph, 'S' for section
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		include,	// TRUE == include white space
+    పూర్ణాంకం		type)		// 'p' for paragraph, 'S' for section
 {
-    linenr_T	start_lnum;
-    linenr_T	end_lnum;
-    int		white_in_front;
-    int		dir;
-    int		start_is_white;
-    int		prev_start_is_white;
-    int		retval = OK;
-    int		do_white = FALSE;
-    int		t;
-    int		i;
+    linenr_T	ప్రారంభం_lnum;
+    linenr_T	చివర_lnum;
+    పూర్ణాంకం		white_లోపల_front;
+    పూర్ణాంకం		dir;
+    పూర్ణాంకం		ప్రారంభం_is_white;
+    పూర్ణాంకం		prev_ప్రారంభం_is_white;
+    పూర్ణాంకం		retval = OK;
+    పూర్ణాంకం		do_white = FALSE;
+    పూర్ణాంకం		t;
+    పూర్ణాంకం		i;
 
-    if (type == 'S')	    // not implemented yet
-	return FAIL;
+    ఒకవేళ (type == 'S')	    // not implemented yet
+	తిరిగి FAIL;
 
-    start_lnum = curwin->w_cursor.lnum;
+    ప్రారంభం_lnum = curwin->w_cursor.lnum;
 
     /*
      * When visual area is more than one line: extend it.
      */
-    if (VIsual_active && start_lnum != VIsual.lnum)
+    ఒకవేళ (VIsual_చురుకైన && ప్రారంభం_lnum != VIsual.lnum)
     {
 extend:
-	if (start_lnum < VIsual.lnum)
+	ఒకవేళ (ప్రారంభం_lnum < VIsual.lnum)
 	    dir = BACKWARD;
-	else
+	లేకపోతే
 	    dir = FORWARD;
-	for (i = count; --i >= 0; )
+	కొరకు (i = లెక్క; --i >= 0; )
 	{
-	    if (start_lnum ==
-			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_line_count))
+	    ఒకవేళ (ప్రారంభం_lnum ==
+			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_పంక్తి_లెక్క))
 	    {
 		retval = FAIL;
-		break;
+		ఆపు;
 	    }
 
-	    prev_start_is_white = -1;
-	    for (t = 0; t < 2; ++t)
+	    prev_ప్రారంభం_is_white = -1;
+	    కొరకు (t = 0; t < 2; ++t)
 	    {
-		start_lnum += dir;
-		start_is_white = linewhite(start_lnum);
-		if (prev_start_is_white == start_is_white)
+		ప్రారంభం_lnum += dir;
+		ప్రారంభం_is_white = linewhite(ప్రారంభం_lnum);
+		ఒకవేళ (prev_ప్రారంభం_is_white == ప్రారంభం_is_white)
 		{
-		    start_lnum -= dir;
-		    break;
+		    ప్రారంభం_lnum -= dir;
+		    ఆపు;
 		}
-		for (;;)
+		కొరకు (;;)
 		{
-		    if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-			break;
-		    if (start_is_white != linewhite(start_lnum + dir)
-			    || (!start_is_white
-				    && startPS(start_lnum + (dir > 0
+		    ఒకవేళ (ప్రారంభం_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_పంక్తి_లెక్క))
+			ఆపు;
+		    ఒకవేళ (ప్రారంభం_is_white != linewhite(ప్రారంభం_lnum + dir)
+			    || (!ప్రారంభం_is_white
+				    && ప్రారంభం_PS(ప్రారంభం_lnum + (dir > 0
 							     ? 1 : 0), 0, 0)))
-			break;
-		    start_lnum += dir;
+			ఆపు;
+		    ప్రారంభం_lnum += dir;
 		}
-		if (!include)
-		    break;
-		if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-		    break;
-		prev_start_is_white = start_is_white;
+		ఒకవేళ (!include)
+		    ఆపు;
+		ఒకవేళ (ప్రారంభం_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_పంక్తి_లెక్క))
+		    ఆపు;
+		prev_ప్రారంభం_is_white = ప్రారంభం_is_white;
 	    }
 	}
-	curwin->w_cursor.lnum = start_lnum;
-	curwin->w_cursor.col = 0;
-	return retval;
+	curwin->w_cursor.lnum = ప్రారంభం_lnum;
+	curwin->w_cursor.నిలువు = 0;
+	తిరిగి retval;
     }
 
     /*
      * First move back to the start_lnum of the paragraph or white lines
      */
-    white_in_front = linewhite(start_lnum);
-    while (start_lnum > 1)
+    white_లోపల_front = linewhite(ప్రారంభం_lnum);
+    అయితే (ప్రారంభం_lnum > 1)
     {
-	if (white_in_front)	    // stop at first white line
+	ఒకవేళ (white_లోపల_front)	    // stop at first white line
 	{
-	    if (!linewhite(start_lnum - 1))
-		break;
+	    ఒకవేళ (!linewhite(ప్రారంభం_lnum - 1))
+		ఆపు;
 	}
-	else		// stop at first non-white line of start of paragraph
+	లేకపోతే		// stop at first non-white line of start of paragraph
 	{
-	    if (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
-		break;
+	    ఒకవేళ (linewhite(ప్రారంభం_lnum - 1) || ప్రారంభం_PS(ప్రారంభం_lnum, 0, 0))
+		ఆపు;
 	}
-	--start_lnum;
+	--ప్రారంభం_lnum;
     }
 
     /*
      * Move past the end of any white lines.
      */
-    end_lnum = start_lnum;
-    while (end_lnum <= curbuf->b_ml.ml_line_count && linewhite(end_lnum))
-	++end_lnum;
+    చివర_lnum = ప్రారంభం_lnum;
+    అయితే (చివర_lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క && linewhite(చివర_lnum))
+	++చివర_lnum;
 
-    --end_lnum;
-    i = count;
-    if (!include && white_in_front)
+    --చివర_lnum;
+    i = లెక్క;
+    ఒకవేళ (!include && white_లోపల_front)
 	--i;
-    while (i--)
+    అయితే (i--)
     {
-	if (end_lnum == curbuf->b_ml.ml_line_count)
-	    return FAIL;
+	ఒకవేళ (చివర_lnum == curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    తిరిగి FAIL;
 
-	if (!include)
-	    do_white = linewhite(end_lnum + 1);
+	ఒకవేళ (!include)
+	    do_white = linewhite(చివర_lnum + 1);
 
-	if (include || !do_white)
+	ఒకవేళ (include || !do_white)
 	{
-	    ++end_lnum;
+	    ++చివర_lnum;
 	    /*
 	     * skip to end of paragraph
 	     */
-	    while (end_lnum < curbuf->b_ml.ml_line_count
-		    && !linewhite(end_lnum + 1)
-		    && !startPS(end_lnum + 1, 0, 0))
-		++end_lnum;
+	    అయితే (చివర_lnum < curbuf->b_ml.ml_పంక్తి_లెక్క
+		    && !linewhite(చివర_lnum + 1)
+		    && !ప్రారంభం_PS(చివర_lnum + 1, 0, 0))
+		++చివర_lnum;
 	}
 
-	if (i == 0 && white_in_front && include)
-	    break;
+	ఒకవేళ (i == 0 && white_లోపల_front && include)
+	    ఆపు;
 
 	/*
 	 * skip to end of white lines after paragraph
 	 */
-	if (include || do_white)
-	    while (end_lnum < curbuf->b_ml.ml_line_count
-						   && linewhite(end_lnum + 1))
-		++end_lnum;
+	ఒకవేళ (include || do_white)
+	    అయితే (చివర_lnum < curbuf->b_ml.ml_పంక్తి_లెక్క
+						   && linewhite(చివర_lnum + 1))
+		++చివర_lnum;
     }
 
     /*
      * If there are no empty lines at the end, try to find some empty lines at
      * the start (unless that has been done already).
      */
-    if (!white_in_front && !linewhite(end_lnum) && include)
-	while (start_lnum > 1 && linewhite(start_lnum - 1))
-	    --start_lnum;
+    ఒకవేళ (!white_లోపల_front && !linewhite(చివర_lnum) && include)
+	అయితే (ప్రారంభం_lnum > 1 && linewhite(ప్రారంభం_lnum - 1))
+	    --ప్రారంభం_lnum;
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
 	// Problem: when doing "Vipipip" nothing happens in a single white
 	// line, we get stuck there.  Trap this here.
-	if (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
-	    goto extend;
-	if (VIsual.lnum != start_lnum)
+	ఒకవేళ (VIsual_బహుళకం == 'V' && ప్రారంభం_lnum == curwin->w_cursor.lnum)
+	    వెళ్ళు extend;
+	ఒకవేళ (VIsual.lnum != ప్రారంభం_lnum)
 	{
-	    VIsual.lnum = start_lnum;
-	    VIsual.col = 0;
+	    VIsual.lnum = ప్రారంభం_lnum;
+	    VIsual.నిలువు = 0;
 	}
-	VIsual_mode = 'V';
+	VIsual_బహుళకం = 'V';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    లేకపోతే
     {
-	oap->start.lnum = start_lnum;
-	oap->start.col = 0;
+	oap->ప్రారంభం.lnum = ప్రారంభం_lnum;
+	oap->ప్రారంభం.నిలువు = 0;
 	oap->motion_type = MLINE;
     }
-    curwin->w_cursor.lnum = end_lnum;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.lnum = చివర_lnum;
+    curwin->w_cursor.నిలువు = 0;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1677,34 +1677,34 @@ extend:
  * as a quote.
  * Returns column number of "quotechar" or -1 when not found.
  */
-    static int
-find_next_quote(
-    char_u	*line,
-    int		col,
-    int		quotechar,
+    స్థిర పూర్ణాంకం
+కనుగొను_తదుపరి_quote(
+    char_u	*పంక్తి,
+    పూర్ణాంకం		నిలువు,
+    పూర్ణాంకం		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		c;
+    పూర్ణాంకం		c;
 
-    for (;;)
+    కొరకు (;;)
     {
-	c = line[col];
-	if (c == NUL)
-	    return -1;
-	else if (escape != NULL && vim_strchr(escape, c))
+	c = పంక్తి[నిలువు];
+	ఒకవేళ (c == NUL)
+	    తిరిగి -1;
+	లేకపోతే ఒకవేళ (escape != ఖాళీ && vim_strchr(escape, c))
 	{
-	    ++col;
-	    if (line[col] == NUL)
-		return -1;
+	    ++నిలువు;
+	    ఒకవేళ (పంక్తి[నిలువు] == NUL)
+		తిరిగి -1;
 	}
-	else if (c == quotechar)
-	    break;
-	if (has_mbyte)
-	    col += (*mb_ptr2len)(line + col);
-	else
-	    ++col;
+	లేకపోతే ఒకవేళ (c == quotechar)
+	    ఆపు;
+	ఒకవేళ (has_mbyte)
+	    నిలువు += (*mb_ptr2len)(పంక్తి + నిలువు);
+	లేకపోతే
+	    ++నిలువు;
     }
-    return col;
+    తిరిగి నిలువు;
 }
 
 /*
@@ -1713,80 +1713,80 @@ find_next_quote(
  * as a quote.
  * Return the found column or zero.
  */
-    static int
-find_prev_quote(
-    char_u	*line,
-    int		col_start,
-    int		quotechar,
+    స్థిర పూర్ణాంకం
+కనుగొను_prev_quote(
+    char_u	*పంక్తి,
+    పూర్ణాంకం		నిలువు_ప్రారంభం,
+    పూర్ణాంకం		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		n;
+    పూర్ణాంకం		n;
 
-    while (col_start > 0)
+    అయితే (నిలువు_ప్రారంభం > 0)
     {
-	--col_start;
-	col_start -= (*mb_head_off)(line, line + col_start);
+	--నిలువు_ప్రారంభం;
+	నిలువు_ప్రారంభం -= (*mb_తల_off)(పంక్తి, పంక్తి + నిలువు_ప్రారంభం);
 	n = 0;
-	if (escape != NULL)
-	    while (col_start - n > 0 && vim_strchr(escape,
-					     line[col_start - n - 1]) != NULL)
+	ఒకవేళ (escape != ఖాళీ)
+	    అయితే (నిలువు_ప్రారంభం - n > 0 && vim_strchr(escape,
+					     పంక్తి[నిలువు_ప్రారంభం - n - 1]) != ఖాళీ)
 	    ++n;
-	if (n & 1)
-	    col_start -= n;	// uneven number of escape chars, skip it
-	else if (line[col_start] == quotechar)
-	    break;
+	ఒకవేళ (n & 1)
+	    నిలువు_ప్రారంభం -= n;	// uneven number of escape chars, skip it
+	లేకపోతే ఒకవేళ (పంక్తి[నిలువు_ప్రారంభం] == quotechar)
+	    ఆపు;
     }
-    return col_start;
+    తిరిగి నిలువు_ప్రారంభం;
 }
 
 /*
  * Find quote under the cursor, cursor at end.
  * Returns TRUE if found, else FALSE.
  */
-    int
+    పూర్ణాంకం
 current_quote(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include quote char
-    int		quotechar)	// Quote character
+    దీర్ఘ	లెక్క,
+    పూర్ణాంకం		include,	// TRUE == include quote char
+    పూర్ణాంకం		quotechar)	// Quote character
 {
-    char_u	*line = ml_get_curline();
-    int		col_end;
-    int		col_start = curwin->w_cursor.col;
-    int		inclusive = FALSE;
-    int		vis_empty = TRUE;	// Visual selection <= 1 char
-    int		vis_bef_curs = FALSE;	// Visual starts before cursor
-    int		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
-    int		inside_quotes = FALSE;	// Looks like "i'" done before
-    int		selected_quote = FALSE;	// Has quote inside selection
-    int		i;
-    int		restore_vis_bef = FALSE; // restore VIsual on abort
+    char_u	*పంక్తి = ml_get_curline();
+    పూర్ణాంకం		నిలువు_చివర;
+    పూర్ణాంకం		నిలువు_ప్రారంభం = curwin->w_cursor.నిలువు;
+    పూర్ణాంకం		inclusive = FALSE;
+    పూర్ణాంకం		vis_ఖాళీలు = TRUE;	// Visual selection <= 1 char
+    పూర్ణాంకం		vis_bef_curs = FALSE;	// Visual starts before cursor
+    పూర్ణాంకం		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
+    పూర్ణాంకం		inside_quotes = FALSE;	// Looks like "i'" done before
+    పూర్ణాంకం		selected_quote = FALSE;	// Has quote inside selection
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		restore_vis_bef = FALSE; // restore VIsual on abort
 
     // When 'selection' is "exclusive" move the cursor to where it would be
     // with 'selection' "inclusive", so that the logic is the same for both.
     // The cursor then is moved forward after adjusting the area.
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
 	// this only works within one line
-	if (VIsual.lnum != curwin->w_cursor.lnum)
-	    return FALSE;
+	ఒకవేళ (VIsual.lnum != curwin->w_cursor.lnum)
+	    తిరిగి FALSE;
 
 	vis_bef_curs = LT_POS(VIsual, curwin->w_cursor);
-	vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	if (*p_sel == 'e')
+	vis_ఖాళీలు = EQUAL_POS(VIsual, curwin->w_cursor);
+	ఒకవేళ (*p_sel == 'e')
 	{
-	    if (vis_bef_curs)
+	    ఒకవేళ (vis_bef_curs)
 	    {
 		dec_cursor();
 		did_exclusive_adj = TRUE;
 	    }
-	    else if (!vis_empty)
+	    లేకపోతే ఒకవేళ (!vis_ఖాళీలు)
 	    {
 		dec(&VIsual);
 		did_exclusive_adj = TRUE;
 	    }
-	    vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	    if (!vis_bef_curs && !vis_empty)
+	    vis_ఖాళీలు = EQUAL_POS(VIsual, curwin->w_cursor);
+	    ఒకవేళ (!vis_bef_curs && !vis_ఖాళీలు)
 	    {
 		// VIsual needs to be the start of Visual selection.
 		pos_T t = curwin->w_cursor;
@@ -1799,225 +1799,225 @@ current_quote(
 	}
     }
 
-    if (!vis_empty)
+    ఒకవేళ (!vis_ఖాళీలు)
     {
 	// Check if the existing selection exactly spans the text inside
 	// quotes.
-	if (vis_bef_curs)
+	ఒకవేళ (vis_bef_curs)
 	{
-	    inside_quotes = VIsual.col > 0
-			&& line[VIsual.col - 1] == quotechar
-			&& line[curwin->w_cursor.col] != NUL
-			&& line[curwin->w_cursor.col + 1] == quotechar;
-	    i = VIsual.col;
-	    col_end = curwin->w_cursor.col;
+	    inside_quotes = VIsual.నిలువు > 0
+			&& పంక్తి[VIsual.నిలువు - 1] == quotechar
+			&& పంక్తి[curwin->w_cursor.నిలువు] != NUL
+			&& పంక్తి[curwin->w_cursor.నిలువు + 1] == quotechar;
+	    i = VIsual.నిలువు;
+	    నిలువు_చివర = curwin->w_cursor.నిలువు;
 	}
-	else
+	లేకపోతే
 	{
-	    inside_quotes = curwin->w_cursor.col > 0
-			&& line[curwin->w_cursor.col - 1] == quotechar
-			&& line[VIsual.col] != NUL
-			&& line[VIsual.col + 1] == quotechar;
-	    i = curwin->w_cursor.col;
-	    col_end = VIsual.col;
+	    inside_quotes = curwin->w_cursor.నిలువు > 0
+			&& పంక్తి[curwin->w_cursor.నిలువు - 1] == quotechar
+			&& పంక్తి[VIsual.నిలువు] != NUL
+			&& పంక్తి[VIsual.నిలువు + 1] == quotechar;
+	    i = curwin->w_cursor.నిలువు;
+	    నిలువు_చివర = VIsual.నిలువు;
 	}
 
 	// Find out if we have a quote in the selection.
-	while (i <= col_end)
+	అయితే (i <= నిలువు_చివర)
 	{
 	    // check for going over the end of the line, which can happen if
 	    // the line was changed after the Visual area was selected.
-	    if (line[i] == NUL)
-		break;
-	    if (line[i++] == quotechar)
+	    ఒకవేళ (పంక్తి[i] == NUL)
+		ఆపు;
+	    ఒకవేళ (పంక్తి[i++] == quotechar)
 	    {
 		selected_quote = TRUE;
-		break;
+		ఆపు;
 	    }
 	}
     }
 
-    if (!vis_empty && line[col_start] == quotechar)
+    ఒకవేళ (!vis_ఖాళీలు && పంక్తి[నిలువు_ప్రారంభం] == quotechar)
     {
 	// Already selecting something and on a quote character.  Find the
 	// next quoted string.
-	if (vis_bef_curs)
+	ఒకవేళ (vis_bef_curs)
 	{
 	    // Assume we are on a closing quote: move to after the next
 	    // opening quote.
-	    col_start = find_next_quote(line, col_start + 1, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    నిలువు_ప్రారంభం = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం + 1, quotechar, ఖాళీ);
+	    ఒకవేళ (నిలువు_ప్రారంభం < 0)
+		వెళ్ళు abort_శోధన;
+	    నిలువు_చివర = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
+	    ఒకవేళ (నిలువు_చివర < 0)
 	    {
 		// We were on a starting quote perhaps?
-		col_end = col_start;
-		col_start = curwin->w_cursor.col;
+		నిలువు_చివర = నిలువు_ప్రారంభం;
+		నిలువు_ప్రారంభం = curwin->w_cursor.నిలువు;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    col_end = find_prev_quote(line, col_start, quotechar, NULL);
-	    if (line[col_end] != quotechar)
-		goto abort_search;
-	    col_start = find_prev_quote(line, col_end, quotechar,
+	    నిలువు_చివర = కనుగొను_prev_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, ఖాళీ);
+	    ఒకవేళ (పంక్తి[నిలువు_చివర] != quotechar)
+		వెళ్ళు abort_శోధన;
+	    నిలువు_ప్రారంభం = కనుగొను_prev_quote(పంక్తి, నిలువు_చివర, quotechar,
 							      curbuf->b_p_qe);
-	    if (line[col_start] != quotechar)
+	    ఒకవేళ (పంక్తి[నిలువు_ప్రారంభం] != quotechar)
 	    {
 		// We were on an ending quote perhaps?
-		col_start = col_end;
-		col_end = curwin->w_cursor.col;
+		నిలువు_ప్రారంభం = నిలువు_చివర;
+		నిలువు_చివర = curwin->w_cursor.నిలువు;
 	    }
 	}
     }
-    else
+    లేకపోతే
 
-    if (line[col_start] == quotechar || !vis_empty)
+    ఒకవేళ (పంక్తి[నిలువు_ప్రారంభం] == quotechar || !vis_ఖాళీలు)
     {
-	int	first_col = col_start;
+	పూర్ణాంకం	మొదటి_నిలువు = నిలువు_ప్రారంభం;
 
-	if (!vis_empty)
+	ఒకవేళ (!vis_ఖాళీలు)
 	{
-	    if (vis_bef_curs)
-		first_col = find_next_quote(line, col_start, quotechar, NULL);
-	    else
-		first_col = find_prev_quote(line, col_start, quotechar, NULL);
+	    ఒకవేళ (vis_bef_curs)
+		మొదటి_నిలువు = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, ఖాళీ);
+	    లేకపోతే
+		మొదటి_నిలువు = కనుగొను_prev_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, ఖాళీ);
 	}
 
 	// The cursor is on a quote, we don't know if it's the opening or
 	// closing quote.  Search from the start of the line to find out.
 	// Also do this when there is a Visual area, a' may leave the cursor
 	// in between two strings.
-	col_start = 0;
-	for (;;)
+	నిలువు_ప్రారంభం = 0;
+	కొరకు (;;)
 	{
 	    // Find open quote character.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0 || col_start > first_col)
-		goto abort_search;
+	    నిలువు_ప్రారంభం = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, ఖాళీ);
+	    ఒకవేళ (నిలువు_ప్రారంభం < 0 || నిలువు_ప్రారంభం > మొదటి_నిలువు)
+		వెళ్ళు abort_శోధన;
 	    // Find close quote character.
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    నిలువు_చివర = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
-		goto abort_search;
+	    ఒకవేళ (నిలువు_చివర < 0)
+		వెళ్ళు abort_శోధన;
 	    // If is cursor between start and end quote character, it is
 	    // target text object.
-	    if (col_start <= first_col && first_col <= col_end)
-		break;
-	    col_start = col_end + 1;
+	    ఒకవేళ (నిలువు_ప్రారంభం <= మొదటి_నిలువు && మొదటి_నిలువు <= నిలువు_చివర)
+		ఆపు;
+	    నిలువు_ప్రారంభం = నిలువు_చివర + 1;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Search backward for a starting quote.
-	col_start = find_prev_quote(line, col_start, quotechar, curbuf->b_p_qe);
-	if (line[col_start] != quotechar)
+	నిలువు_ప్రారంభం = కనుగొను_prev_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, curbuf->b_p_qe);
+	ఒకవేళ (పంక్తి[నిలువు_ప్రారంభం] != quotechar)
 	{
 	    // No quote before the cursor, look after the cursor.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
+	    నిలువు_ప్రారంభం = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం, quotechar, ఖాళీ);
+	    ఒకవేళ (నిలువు_ప్రారంభం < 0)
+		వెళ్ళు abort_శోధన;
 	}
 
 	// Find close quote character.
-	col_end = find_next_quote(line, col_start + 1, quotechar,
+	నిలువు_చివర = కనుగొను_తదుపరి_quote(పంక్తి, నిలువు_ప్రారంభం + 1, quotechar,
 							      curbuf->b_p_qe);
-	if (col_end < 0)
-	    goto abort_search;
+	ఒకవేళ (నిలువు_చివర < 0)
+	    వెళ్ళు abort_శోధన;
     }
 
     // When "include" is TRUE, include spaces after closing quote or before
     // the starting quote.
-    if (include)
+    ఒకవేళ (include)
     {
-	if (VIM_ISWHITE(line[col_end + 1]))
-	    while (VIM_ISWHITE(line[col_end + 1]))
-		++col_end;
-	else
-	    while (col_start > 0 && VIM_ISWHITE(line[col_start - 1]))
-		--col_start;
+	ఒకవేళ (VIM_ISWHITE(పంక్తి[నిలువు_చివర + 1]))
+	    అయితే (VIM_ISWHITE(పంక్తి[నిలువు_చివర + 1]))
+		++నిలువు_చివర;
+	లేకపోతే
+	    అయితే (నిలువు_ప్రారంభం > 0 && VIM_ISWHITE(పంక్తి[నిలువు_ప్రారంభం - 1]))
+		--నిలువు_ప్రారంభం;
     }
 
     // Set start position.  After vi" another i" must include the ".
     // For v2i" include the quotes.
-    if (!include && count < 2 && (vis_empty || !inside_quotes))
-	++col_start;
-    curwin->w_cursor.col = col_start;
-    if (VIsual_active)
+    ఒకవేళ (!include && లెక్క < 2 && (vis_ఖాళీలు || !inside_quotes))
+	++నిలువు_ప్రారంభం;
+    curwin->w_cursor.నిలువు = నిలువు_ప్రారంభం;
+    ఒకవేళ (VIsual_చురుకైన)
     {
 	// Set the start of the Visual area when the Visual area was empty, we
 	// were just inside quotes or the Visual area didn't start at a quote
 	// and didn't include a quote.
-	if (vis_empty
+	ఒకవేళ (vis_ఖాళీలు
 		|| (vis_bef_curs
 		    && !selected_quote
 		    && (inside_quotes
-			|| (line[VIsual.col] != quotechar
-			    && (VIsual.col == 0
-				|| line[VIsual.col - 1] != quotechar)))))
+			|| (పంక్తి[VIsual.నిలువు] != quotechar
+			    && (VIsual.నిలువు == 0
+				|| పంక్తి[VIsual.నిలువు - 1] != quotechar)))))
 	{
 	    VIsual = curwin->w_cursor;
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
     }
-    else
+    లేకపోతే
     {
-	oap->start = curwin->w_cursor;
+	oap->ప్రారంభం = curwin->w_cursor;
 	oap->motion_type = MCHAR;
     }
 
     // Set end position.
-    curwin->w_cursor.col = col_end;
-    if ((include || count > 1 // After vi" another i" must include the ".
-		|| (!vis_empty && inside_quotes)
+    curwin->w_cursor.నిలువు = నిలువు_చివర;
+    ఒకవేళ ((include || లెక్క > 1 // After vi" another i" must include the ".
+		|| (!vis_ఖాళీలు && inside_quotes)
 	) && inc_cursor() == 2)
 	inclusive = TRUE;
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
     {
-	if (vis_empty || vis_bef_curs)
+	ఒకవేళ (vis_ఖాళీలు || vis_bef_curs)
 	{
 	    // decrement cursor when 'selection' is not exclusive
-	    if (*p_sel != 'e')
+	    ఒకవేళ (*p_sel != 'e')
 		dec_cursor();
 	}
-	else
+	లేకపోతే
 	{
 	    // Cursor is at start of Visual area.  Set the end of the Visual
 	    // area when it was just inside quotes or it didn't end at a
 	    // quote.
-	    if (inside_quotes
+	    ఒకవేళ (inside_quotes
 		    || (!selected_quote
-			&& line[VIsual.col] != quotechar
-			&& (line[VIsual.col] == NUL
-			    || line[VIsual.col + 1] != quotechar)))
+			&& పంక్తి[VIsual.నిలువు] != quotechar
+			&& (పంక్తి[VIsual.నిలువు] == NUL
+			    || పంక్తి[VIsual.నిలువు + 1] != quotechar)))
 	    {
 		dec_cursor();
 		VIsual = curwin->w_cursor;
 	    }
-	    curwin->w_cursor.col = col_start;
+	    curwin->w_cursor.నిలువు = నిలువు_ప్రారంభం;
 	}
-	if (VIsual_mode == 'V')
+	ఒకవేళ (VIsual_బహుళకం == 'V')
 	{
-	    VIsual_mode = 'v';
+	    VIsual_బహుళకం = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    లేకపోతే
     {
 	// Set inclusive and other oap's flags.
 	oap->inclusive = inclusive;
     }
 
-    return OK;
+    తిరిగి OK;
 
-abort_search:
-    if (VIsual_active && *p_sel == 'e')
+abort_శోధన:
+    ఒకవేళ (VIsual_చురుకైన && *p_sel == 'e')
     {
-	if (did_exclusive_adj)
+	ఒకవేళ (did_exclusive_adj)
 	    inc_cursor();
-	if (restore_vis_bef)
+	ఒకవేళ (restore_vis_bef)
 	{
 	    pos_T t = curwin->w_cursor;
 
@@ -2025,5 +2025,5 @@ abort_search:
 	    VIsual = t;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }

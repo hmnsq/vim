@@ -8,277 +8,277 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/RowColumn.h>
-#include <Xm/PushB.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Separator.h>
-#include <Xm/Label.h>
-#include <Xm/CascadeB.h>
-#include <Xm/ScrollBar.h>
-#include <Xm/MenuShell.h>
-#include <Xm/DrawingA.h>
-#if (XmVersion >= 1002)
+#అన్తర్భావ <Xm/Form.h>
+#అన్తర్భావ <Xm/RowColumn.h>
+#అన్తర్భావ <Xm/PushB.h>
+#అన్తర్భావ <Xm/Text.h>
+#అన్తర్భావ <Xm/TextF.h>
+#అన్తర్భావ <Xm/Separator.h>
+#అన్తర్భావ <Xm/Label.h>
+#అన్తర్భావ <Xm/CascadeB.h>
+#అన్తర్భావ <Xm/ScrollBar.h>
+#అన్తర్భావ <Xm/MenuShell.h>
+#అన్తర్భావ <Xm/DrawingA.h>
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
 # include <Xm/RepType.h>
-#endif
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/XmP.h>
+#అయితే_ముగింపు
+#అన్తర్భావ <Xm/Frame.h>
+#అన్తర్భావ <Xm/LabelG.h>
+#అన్తర్భావ <Xm/ToggleBG.h>
+#అన్తర్భావ <Xm/SeparatoG.h>
+#అన్తర్భావ <Xm/XmP.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
-#ifdef HAVE_X11_XPM_H
-# if defined(VMS)
+#అన్తర్భావ <X11/keysym.h>
+#అన్తర్భావ <X11/Xatom.h>
+#అన్తర్భావ <X11/StringDefs.h>
+#అన్తర్భావ <X11/Intrinsic.h>
+#నిర్వచితమైతే HAVE_X11_XPM_H
+# ఒకవేళ defined(VMS)
 #  include <xpm.h>
-# else
+# లేకపోతే
 #  include <X11/xpm.h>
 # endif
-#else
+#లేకపోతే
 # ifdef HAVE_XM_XPMP_H
 #  include <Xm/XpmP.h>
 # endif
-#endif
-#ifdef HAVE_XM_NOTEBOOK_H
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_XM_NOTEBOOK_H
 # include <Xm/Notebook.h>
-#endif
+#అయితే_ముగింపు
 
-#include "gui_xmebw.h"	// for our Enhanced Button Widget
+#అన్తర్భావ "gui_xmebw.h"	// for our Enhanced Button Widget
 
-#if defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
 # include "../pixmaps/alert.xpm"
 # include "../pixmaps/error.xpm"
 # include "../pixmaps/generic.xpm"
 # include "../pixmaps/info.xpm"
 # include "../pixmaps/quest.xpm"
-#endif
+#అయితే_ముగింపు
 
-#define MOTIF_POPUP
+#నిర్వచించు MOTIF_POPUP
 
-extern Widget vimShell;
+బాహ్య Widget vimShell;
 
-static Widget vimForm;
-static Widget textAreaForm;
-Widget textArea;
-#ifdef FEAT_TOOLBAR
-static Widget toolBarFrame;
-static Widget toolBar;
-#endif
-#ifdef FEAT_GUI_TABLINE
-static Widget	tabLine;
-static Widget	tabLine_menu = 0;
-static int	showing_tabline = 0;
-#endif
-#ifdef FEAT_MENU
-# if (XmVersion >= 1002)
+స్థిర Widget vimForm;
+స్థిర Widget పాఠ్యం_Area_Form;
+Widget పాఠ్యం_Area;
+#నిర్వచితమైతే FEAT_TOOLBAR
+స్థిర Widget tool_Bar_చట్రం;
+స్థిర Widget toolBar;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+స్థిర Widget	tab_పంక్తి;
+స్థిర Widget	tab_పంక్తి_menu = 0;
+స్థిర పూర్ణాంకం	showing_tabline = 0;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 // remember the last set value for the tearoff item
-static int tearoff_val = (int)XmTEAR_OFF_ENABLED;
+స్థిర పూర్ణాంకం tearoff_val = (పూర్ణాంకం)XmTEAR_OFF_ENABLED;
 # endif
-static Widget menuBar;
-#endif
+స్థిర Widget menuBar;
+#అయితే_ముగింపు
 
-#ifdef FEAT_TOOLBAR
-static void reset_focus(void);
-#endif
+#నిర్వచితమైతే FEAT_TOOLBAR
+స్థిర శూన్య reset_focus(శూన్య);
+#అయితే_ముగింపు
 
-static void gui_motif_menu_colors(Widget id);
-static void gui_motif_scroll_colors(Widget id);
+స్థిర శూన్య gui_motif_menu_colors(Widget id);
+స్థిర శూన్య gui_motif_scroll_colors(Widget id);
 
-#if (XmVersion >= 1002)
-# define STRING_TAG  XmFONTLIST_DEFAULT_TAG
-#else
-# define STRING_TAG  XmSTRING_DEFAULT_CHARSET
-#endif
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
+# define STRING_ట్యాగ్  Xm_FONTLIST_DEFAULT_ట్యాగ్
+#లేకపోతే
+# define STRING_ట్యాగ్  XmSTRING_DEFAULT_CHARSET
+#అయితే_ముగింపు
 
 /*
  * Call-back routines.
  */
 
-    static void
-scroll_cb(Widget w UNUSED, XtPointer client_data, XtPointer call_data)
+    స్థిర శూన్య
+scroll_cb(Widget w వాడని, Xt_సూచిక client_దత్తాంశం_2, Xt_సూచిక call_దత్తాంశం)
 {
     scrollbar_T *sb;
-    long	value;
-    int		dragging;
+    దీర్ఘ	విలువ;
+    పూర్ణాంకం		dragging;
 
-    sb = gui_find_scrollbar((long)client_data);
+    sb = gui_కనుగొను_scrollbar((దీర్ఘ)client_దత్తాంశం_2);
 
-    value = ((XmScrollBarCallbackStruct *)call_data)->value;
-    dragging = (((XmScrollBarCallbackStruct *)call_data)->reason ==
-							      (int)XmCR_DRAG);
-    gui_drag_scrollbar(sb, value, dragging);
+    విలువ = ((XmScrollBarCallbackStruct *)call_దత్తాంశం)->విలువ;
+    dragging = (((XmScrollBarCallbackStruct *)call_దత్తాంశం)->reason ==
+							      (పూర్ణాంకం)XmCR_DRAG);
+    gui_drag_scrollbar(sb, విలువ, dragging);
 }
 
-#ifdef FEAT_GUI_TABLINE
-    static void
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    స్థిర శూన్య
 tabline_cb(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
-    XtPointer	call_data)
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,
+    Xt_సూచిక	call_దత్తాంశం)
 {
     XmNotebookCallbackStruct *nptr;
 
-    nptr = (XmNotebookCallbackStruct *)call_data;
-    if (nptr->reason != (int)XmCR_NONE)
-	send_tabline_event(nptr->page_number);
+    nptr = (XmNotebookCallbackStruct *)call_దత్తాంశం;
+    ఒకవేళ (nptr->reason != (పూర్ణాంకం)XmCR_NONE)
+	send_tabline_event(nptr->పుట_సంఖ్య);
 }
 
-    static void
+    స్థిర శూన్య
 tabline_button_cb(
     Widget	w,
-    XtPointer	client_data UNUSED,
-    XtPointer	call_data UNUSED)
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    XtPointer	cmd, tab_idx;
+    Xt_సూచిక	cmd, tab_idx;
 
-    XtVaGetValues(w, XmNuserData, &cmd, NULL);
-    XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+    Xt_Va_Get_విలువలు(w, Xm_Nuser_దత్తాంశం, &cmd, ఖాళీ);
+    Xt_Va_Get_విలువలు(tab_పంక్తి_menu, Xm_Nuser_దత్తాంశం, &tab_idx, ఖాళీ);
 
-    send_tabline_menu_event((int)(long)tab_idx, (int)(long)cmd);
+    send_tabline_menu_event((పూర్ణాంకం)(దీర్ఘ)tab_idx, (పూర్ణాంకం)(దీర్ఘ)cmd);
 }
 
 /*
  * Tabline single mouse click timeout handler
  */
-    static void
+    స్థిర శూన్య
 motif_tabline_timer_cb (
-    XtPointer		timed_out,
-    XtIntervalId	*interval_id UNUSED)
+    Xt_సూచిక		timed_బహిర్గతం,
+    XtIntervalId	*interval_id వాడని)
 {
-    *((int *)timed_out) = TRUE;
+    *((పూర్ణాంకం *)timed_బహిర్గతం) = TRUE;
 }
 
 /*
  * check if the tabline tab scroller is clicked
  */
-    static int
+    స్థిర పూర్ణాంకం
 tabline_scroller_clicked(
-    char		*scroller_name,
+    అక్షరం		*scroller_name,
     XButtonPressedEvent *event)
 {
     Widget	tab_scroll_w;
     Position	pos_x, pos_y;
-    Dimension	width, height;
+    Dimension	వెడల్పు, ఎత్తు;
 
-    tab_scroll_w = XtNameToWidget(tabLine, scroller_name);
-    if (tab_scroll_w != (Widget)0)
+    tab_scroll_w = Xt_Name_గమ్యం_Widget(tab_పంక్తి, scroller_name);
+    ఒకవేళ (tab_scroll_w != (Widget)0)
     {
-	XtVaGetValues(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
-		      &width, XmNheight, &height, NULL);
-	if (pos_x >= 0)
+	Xt_Va_Get_విలువలు(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
+		      &వెడల్పు, XmNheight, &ఎత్తు, ఖాళీ);
+	ఒకవేళ (pos_x >= 0)
 	{
 	    // Tab scroller (next) is visible
-	    if (event->x >= pos_x && event->x <= pos_x + width
-		    && event->y >= pos_y && event->y <= pos_y + height)
+	    ఒకవేళ (event->x >= pos_x && event->x <= pos_x + వెడల్పు
+		    && event->y >= pos_y && event->y <= pos_y + ఎత్తు)
 		// Clicked on the scroller
-		return TRUE;
+		తిరిగి TRUE;
 	}
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    static void
+    స్థిర శూన్య
 tabline_menu_cb(
     Widget	w,
-    XtPointer	closure UNUSED,
+    Xt_సూచిక	సంవృతం వాడని,
     XEvent	*e,
-    Boolean	*continue_dispatch UNUSED)
+    Boolean	*continue_dispatch వాడని)
 {
     Widget			tab_w;
     XButtonPressedEvent		*event;
-    int				tab_idx = 0;
+    పూర్ణాంకం				tab_idx = 0;
     WidgetList			children;
-    Cardinal			numChildren;
-    static XtIntervalId		timer = (XtIntervalId)0;
-    static int			timed_out = TRUE;
+    Cardinal			అంకె_Children;
+    స్థిర XtIntervalId		timer = (XtIntervalId)0;
+    స్థిర పూర్ణాంకం			timed_బహిర్గతం = TRUE;
 
     event = (XButtonPressedEvent *)e;
 
-    if (event->button == Button1)
+    ఒకవేళ (event->button == Button1)
     {
-	if (tabline_scroller_clicked("MajorTabScrollerNext", event)
+	ఒకవేళ (tabline_scroller_clicked("MajorTabScrollerNext", event)
 	    || tabline_scroller_clicked("MajorTabScrollerPrevious", event))
-	    return;
+	    తిరిగి;
 
-	if (!timed_out)
+	ఒకవేళ (!timed_బహిర్గతం)
 	{
-	    XtRemoveTimeOut(timer);
-	    timed_out = TRUE;
+	    Xt_Remove_సమయం_బహిర్గతం(timer);
+	    timed_బహిర్గతం = TRUE;
 
 	    /*
 	     * Double click on the tabline gutter, add a new tab
 	     */
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Single click on the tabline gutter, start a timer to check
 	     * for double clicks
 	     */
-	    timer = XtAppAddTimeOut(app_context, (long_u)p_mouset,
-				    motif_tabline_timer_cb, &timed_out);
-	    timed_out = FALSE;
+	    timer = Xt_App_కూడు_సమయం_బహిర్గతం(app_context, (long_u)p_mouset,
+				    motif_tabline_timer_cb, &timed_బహిర్గతం);
+	    timed_బహిర్గతం = FALSE;
 	}
-	return;
+	తిరిగి;
     }
 
-    if (event->button == Button2)
+    ఒకవేళ (event->button == Button2)
     {
 	// Middle mouse click on tabpage label closes that tab.
-	XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
-	send_tabline_menu_event(tab_idx, (int)TABLINE_MENU_CLOSE);
-	return;
+	Xt_Va_Get_విలువలు(tab_పంక్తి_menu, Xm_Nuser_దత్తాంశం, &tab_idx, ఖాళీ);
+	send_tabline_menu_event(tab_idx, (పూర్ణాంకం)TABLINE_MENU_CLOSE);
+	తిరిగి;
     }
 
-    if (event->button != Button3)
-	return;
+    ఒకవేళ (event->button != Button3)
+	తిరిగి;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    ఒకవేళ (hold_gui_events || cmdwin_type != 0)
+	తిరిగి;
 
-    if (event->subwindow != None)
+    ఒకవేళ (event->subwindow != None)
     {
-	tab_w = XtWindowToWidget(XtDisplay(w), event->subwindow);
+	tab_w = Xt_కిటికీ_గమ్యం_Widget(XtDisplay(w), event->subwindow);
 	// LINTED: avoid warning: dubious operation on enum
-	if (tab_w != (Widget)0 && XmIsPushButton(tab_w))
-	    XtVaGetValues(tab_w, XmNpageNumber, &tab_idx, NULL);
+	ఒకవేళ (tab_w != (Widget)0 && Xm_Is_నెట్టు_Button(tab_w))
+	    Xt_Va_Get_విలువలు(tab_w, Xm_Npage_సంఖ్య, &tab_idx, ఖాళీ);
     }
 
-    XtVaSetValues(tabLine_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
-    XtVaGetValues(tabLine_menu, XmNchildren, &children, XmNnumChildren,
-		  &numChildren, NULL);
-    XtManageChildren(children, numChildren);
-    XmMenuPosition(tabLine_menu, (XButtonPressedEvent *)e) ;
-    XtManageChild(tabLine_menu);
+    Xt_Va_సమితి_విలువలు(tab_పంక్తి_menu, Xm_Nuser_దత్తాంశం, (Xt_సూచిక)(దీర్ఘ)tab_idx, ఖాళీ);
+    Xt_Va_Get_విలువలు(tab_పంక్తి_menu, XmNchildren, &children, XmNnumChildren,
+		  &అంకె_Children, ఖాళీ);
+    XtManageChildren(children, అంకె_Children);
+    XmMenuPosition(tab_పంక్తి_menu, (XButtonPressedEvent *)e) ;
+    Xt_Manage_బిడ్డ(tab_పంక్తి_menu);
 }
 
-    static void
-tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
+    స్థిర శూన్య
+tabline_balloon_cb(BalloonEval *beval, పూర్ణాంకం state వాడని)
 {
-    int		nr;
+    పూర్ణాంకం		nr;
     tabpage_T	*tp;
 
-    if (beval->target == (Widget)0)
-	return;
+    ఒకవేళ (beval->లక్ష్యం == (Widget)0)
+	తిరిగి;
 
-    XtVaGetValues(beval->target, XmNpageNumber, &nr, NULL);
-    tp = find_tabpage(nr);
-    if (tp == NULL)
-	return;
+    Xt_Va_Get_విలువలు(beval->లక్ష్యం, Xm_Npage_సంఖ్య, &nr, ఖాళీ);
+    tp = కనుగొను_tabpage(nr);
+    ఒకవేళ (tp == ఖాళీ)
+	తిరిగి;
 
     get_tabline_label(tp, TRUE);
     gui_mch_post_balloon(beval, NameBuff);
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * End of call-back routines
@@ -289,26 +289,26 @@ tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
  * By Marcin Dalecki.
  */
 
-#include <Xm/XmP.h>
-#include <Xm/LabelP.h>
+#అన్తర్భావ <Xm/XmP.h>
+#అన్తర్భావ <Xm/LabelP.h>
 
-static XtExposeProc old_label_expose = NULL;
+స్థిర XtExposeProc old_label_expose = ఖాళీ;
 
-    static void
+    స్థిర శూన్య
 label_expose(Widget _w, XEvent *_event, Region _region)
 {
     GC		    insensitiveGC;
     XmLabelWidget   lw = (XmLabelWidget)_w;
-    unsigned char   label_type = (int)XmSTRING;
+    గుర్తులేని అక్షరం   label_type = (పూర్ణాంకం)XmSTRING;
 
-    XtVaGetValues(_w, XmNlabelType, &label_type, (XtPointer)0);
+    Xt_Va_Get_విలువలు(_w, XmNlabelType, &label_type, (Xt_సూచిక)0);
 
-    if (XtIsSensitive(_w) || label_type != (int)XmSTRING)
+    ఒకవేళ (XtIsSensitive(_w) || label_type != (పూర్ణాంకం)XmSTRING)
 	(*old_label_expose)(_w, _event, _region);
-    else
+    లేకపోతే
     {
-	XGCValues   values;
-	XtGCMask    mask;
+	XGCValues   విలువలు;
+	XtGCMask    ముసుగు;
 	XtGCMask    dynamic;
 	XFontStruct *fs;
 
@@ -317,53 +317,53 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 	// FIXME: we should be doing the whole drawing ourself here.
 	insensitiveGC = lw->label.insensitive_GC;
 
-	mask = GCForeground | GCBackground | GCGraphicsExposures;
-	dynamic = GCClipMask | GCClipXOrigin | GCClipYOrigin;
-	values.graphics_exposures = False;
+	ముసుగు = GCForeground | GCBackground | GCGraphicsExposures;
+	dynamic = GCClip_ముసుగు | GCClipXOrigin | GCClipYOrigin;
+	విలువలు.graphics_exposures = False;
 
-	if (fs != 0)
+	ఒకవేళ (fs != 0)
 	{
-	    mask |= GCFont;
-	    values.font = fs->fid;
+	    ముసుగు |= GCFont;
+	    విలువలు.font = fs->fid;
 	}
 
-	if (lw->primitive.top_shadow_pixmap != None
-		&& lw->primitive.top_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
+	ఒకవేళ (lw->primitive.శిఖరం_shadow_pixmap != None
+		&& lw->primitive.శిఖరం_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
 	{
-	    mask |= GCFillStyle | GCTile;
-	    values.fill_style = FillTiled;
-	    values.tile = lw->primitive.top_shadow_pixmap;
+	    ముసుగు |= GCFillStyle | GCTile;
+	    విలువలు.fill_style = FillTiled;
+	    విలువలు.tile = lw->primitive.శిఖరం_shadow_pixmap;
 	}
 
-	lw->label.TextRect.x += 1;
-	lw->label.TextRect.y += 1;
-	if (lw->label._acc_text != 0)
+	lw->label.పాఠ్యం_Rect.x += 1;
+	lw->label.పాఠ్యం_Rect.y += 1;
+	ఒకవేళ (lw->label.acc_పాఠ్యం != 0)
 	{
-	    lw->label.acc_TextRect.x += 1;
-	    lw->label.acc_TextRect.y += 1;
+	    lw->label.acc_పాఠ్యం_Rect.x += 1;
+	    lw->label.acc_పాఠ్యం_Rect.y += 1;
 	}
 
-	values.foreground = lw->primitive.top_shadow_color;
-	values.background = lw->core.background_pixel;
+	విలువలు.foreground = lw->primitive.శిఖరం_shadow_color;
+	విలువలు.background = lw->core.background_pixel;
 
-	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, ముసుగు,
+					       &విలువలు, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
-	lw->label.TextRect.x -= 1;
-	lw->label.TextRect.y -= 1;
-	if (lw->label._acc_text != 0)
+	lw->label.పాఠ్యం_Rect.x -= 1;
+	lw->label.పాఠ్యం_Rect.y -= 1;
+	ఒకవేళ (lw->label.acc_పాఠ్యం != 0)
 	{
-	    lw->label.acc_TextRect.x -= 1;
-	    lw->label.acc_TextRect.y -= 1;
+	    lw->label.acc_పాఠ్యం_Rect.x -= 1;
+	    lw->label.acc_పాఠ్యం_Rect.y -= 1;
 	}
 
-	values.foreground = lw->primitive.bottom_shadow_color;
-	values.background = lw->core.background_pixel;
+	విలువలు.foreground = lw->primitive.bottom_shadow_color;
+	విలువలు.background = lw->core.background_pixel;
 
-	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, ముసుగు,
+					       &విలువలు, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -374,20 +374,20 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 /*
  * Create all the motif widgets necessary.
  */
-    void
-gui_x11_create_widgets(void)
+    శూన్య
+gui_x11_create_widgets(శూన్య)
 {
-#ifdef FEAT_GUI_TABLINE
+#నిర్వచితమైతే FEAT_GUI_TABLINE
     Widget	button, scroller;
-    Arg		args[10];
-    int		n;
+    Arg		వాదనలు[10];
+    పూర్ణాంకం		n;
     XmString	xms;
-#endif
+#అయితే_ముగింపు
 
     /*
      * Install the 3D shade effect drawing routines.
      */
-    if (old_label_expose == NULL)
+    ఒకవేళ (old_label_expose == ఖాళీ)
     {
 	old_label_expose = xmLabelWidgetClass->core_class.expose;
 	xmLabelWidgetClass->core_class.expose = label_expose;
@@ -396,70 +396,70 @@ gui_x11_create_widgets(void)
     /*
      * Start out by adding the configured border width into the border offset
      */
-    gui.border_offset = gui.border_width;
+    gui.border_స్థానభ్రంశం = gui.border_వెడల్పు;
 
     /*
      * Install the tearOffModel resource converter.
      */
-#if (XmVersion >= 1002)
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
     XmRepTypeInstallTearOffModelConverter();
-#endif
+#అయితే_ముగింపు
 
     // Make sure the "Quit" menu entry of the window manager is ignored
-    XtVaSetValues(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_సమితి_విలువలు(vimShell, XmNdeleteResponse, XmDO_NOTHING, ఖాళీ);
 
     vimForm = XtVaCreateManagedWidget("vimForm",
 	xmFormWidgetClass, vimShell,
-	XmNborderWidth, 0,
+	Xm_Nborder_వెడల్పు, 0,
 	XmNhighlightThickness, 0,
 	XmNshadowThickness, 0,
-	XmNmarginWidth, 0,
-	XmNmarginHeight, 0,
+	Xm_Nmargin_వెడల్పు, 0,
+	Xm_Nmargin_ఎత్తు, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	ఖాళీ);
     gui_motif_menu_colors(vimForm);
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     {
 	Arg al[7]; // Make sure there is enough room for arguments!
-	int ac = 0;
+	పూర్ణాంకం ac = 0;
 
-# if (XmVersion >= 1002)
-	XtSetArg(al[ac], XmNtearOffModel, tearoff_val); ac++;
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
+	Xt_సమితి_Arg(al[ac], XmNtearOffModel, tearoff_val); ac++;
 # endif
-	XtSetArg(al[ac], XmNleftAttachment,  XmATTACH_FORM); ac++;
-	XtSetArg(al[ac], XmNtopAttachment,   XmATTACH_FORM); ac++;
-	XtSetArg(al[ac], XmNrightAttachment, XmATTACH_FORM); ac++;
+	Xt_సమితి_Arg(al[ac], XmNleftAttachment,  XmATTACH_FORM); ac++;
+	Xt_సమితి_Arg(al[ac], XmNtopAttachment,   XmATTACH_FORM); ac++;
+	Xt_సమితి_Arg(al[ac], XmNrightAttachment, XmATTACH_FORM); ac++;
 # ifndef FEAT_TOOLBAR
 	// Always stick to right hand side.
-	XtSetArg(al[ac], XmNrightOffset, 0); ac++;
+	Xt_సమితి_Arg(al[ac], Xm_Nright_స్థానభ్రంశం, 0); ac++;
 # endif
-	XtSetArg(al[ac], XmNmarginHeight, 0); ac++;
+	Xt_సమితి_Arg(al[ac], Xm_Nmargin_ఎత్తు, 0); ac++;
 	menuBar = XmCreateMenuBar(vimForm, "menuBar", al, ac);
-	XtManageChild(menuBar);
+	Xt_Manage_బిడ్డ(menuBar);
 
 	gui_motif_menu_colors(menuBar);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
     /*
      * Create an empty ToolBar. We should get buttons defined from menu.vim.
      */
-    toolBarFrame = XtVaCreateWidget("toolBarFrame",
-	xmFrameWidgetClass, vimForm,
+    tool_Bar_చట్రం = XtVaCreateWidget("toolBarFrame",
+	xm_చట్రం_Widget_Class, vimForm,
 	XmNshadowThickness, 0,
-	XmNmarginHeight, 0,
-	XmNmarginWidth, 0,
+	Xm_Nmargin_ఎత్తు, 0,
+	Xm_Nmargin_వెడల్పు, 0,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
-	NULL);
-    gui_motif_menu_colors(toolBarFrame);
+	ఖాళీ);
+    gui_motif_menu_colors(tool_Bar_చట్రం);
 
     toolBar = XtVaCreateManagedWidget("toolBar",
-	xmRowColumnWidgetClass, toolBarFrame,
-	XmNchildType, XmFRAME_WORKAREA_CHILD,
-	XmNrowColumnType, XmWORK_AREA,
+	xm_అడ్డువరుస_స్తంభం_Widget_Class, tool_Bar_చట్రం,
+	XmNchildType, Xm_చట్రం_WORKAREA_బిడ్డ,
+	Xm_Nrow_స్తంభం_Type, XmWORK_AREA,
 	XmNorientation, XmHORIZONTAL,
 	XmNtraversalOn, False,
 	XmNisHomogeneous, False,
@@ -467,34 +467,34 @@ gui_x11_create_widgets(void)
 	XmNspacing, 0,
 	XmNshadowThickness, 0,
 	XmNhighlightThickness, 0,
-	XmNmarginHeight, 0,
-	XmNmarginWidth, 0,
-	XmNadjustLast, True,
-	NULL);
+	Xm_Nmargin_ఎత్తు, 0,
+	Xm_Nmargin_వెడల్పు, 0,
+	Xm_Nadjust_చివరి, True,
+	ఖాళీ);
     gui_motif_menu_colors(toolBar);
 
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
+#నిర్వచితమైతే FEAT_GUI_TABLINE
     // Create the Vim GUI tabline
     n = 0;
-    XtSetArg(args[n], XmNbindingType, XmNONE); n++;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNbackPageSize, XmNONE); n++;
-    XtSetArg(args[n], XmNbackPageNumber, 0); n++;
-    XtSetArg(args[n], XmNbackPagePlacement, XmTOP_RIGHT); n++;
-    XtSetArg(args[n], XmNmajorTabSpacing, 0); n++;
-    XtSetArg(args[n], XmNshadowThickness, 0); n++;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-    tabLine = XmCreateNotebook(vimForm, "Vim tabline", args, n);
+    Xt_సమితి_Arg(వాదనలు[n], XmNbindingType, XmNONE); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNorientation, XmVERTICAL); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nback_పుట_కొలత, XmNONE); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nback_పుట_సంఖ్య, 0); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nback_పుట_Placement, Xm_శిఖరం_కుడి); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNmajorTabSpacing, 0); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNshadowThickness, 0); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_FORM); n++;
+    tab_పంక్తి = XmCreateNotebook(vimForm, "Vim tabline", వాదనలు, n);
 
-    XtAddCallback(tabLine, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
-			NULL);
-    XtAddEventHandler(tabLine, ButtonPressMask, False,
-			(XtEventHandler)tabline_menu_cb, NULL);
+    Xt_కూడు_Callback(tab_పంక్తి, Xm_Npage_మారింది_Callback, (XtCallbackProc)tabline_cb,
+			ఖాళీ);
+    Xt_కూడు_Event_Handler(tab_పంక్తి, Button_Press_ముసుగు, False,
+			(XtEventHandler)tabline_menu_cb, ఖాళీ);
 
-    gui.tabline_height = TABLINE_HEIGHT;
+    gui.tabline_ఎత్తు = TABLINE_ఎత్తు;
 
     /*
      * Set the size of the minor next/prev scrollers to zero, so
@@ -503,61 +503,61 @@ gui_x11_create_widgets(void)
      * managed by the Notebook widget and the notebook widget geometry
      * is adjusted to account for the minor scroller widgets.
      */
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerNext");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerPrevious");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
+    scroller = Xt_Name_గమ్యం_Widget(tab_పంక్తి, "MinorTabScrollerNext");
+    Xt_Va_సమితి_విలువలు(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, ఖాళీ);
+    scroller = Xt_Name_గమ్యం_Widget(tab_పంక్తి, "MinorTabScrollerPrevious");
+    Xt_Va_సమితి_విలువలు(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, ఖాళీ);
 
     // Create the tabline popup menu
-    tabLine_menu = XmCreatePopupMenu(tabLine, "tabline popup", NULL, 0);
+    tab_పంక్తి_menu = XmCreatePopupMenu(tab_పంక్తి, "tabline popup", ఖాళీ, 0);
 
     // Add the buttons to the tabline popup menu
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
-    xms = XmStringCreate((char *)"Close tab", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Close", args, n);
-    XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nuser_దత్తాంశం, (Xt_సూచిక)TABLINE_MENU_CLOSE); n++;
+    xms = XmStringCreate((అక్షరం *)"Close tab", STRING_ట్యాగ్);
+    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, xms); n++;
+    button = Xm_Create_నెట్టు_Button(tab_పంక్తి_menu, "Close", వాదనలు, n);
+    Xt_కూడు_Callback(button, XmNactivateCallback,
+		  (XtCallbackProc)tabline_button_cb, ఖాళీ);
     XmStringFree(xms);
 
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
-    xms = XmStringCreate((char *)"New Tab", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "New Tab", args, n);
-    XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nuser_దత్తాంశం, (Xt_సూచిక)TABLINE_MENU_NEW); n++;
+    xms = XmStringCreate((అక్షరం *)"New Tab", STRING_ట్యాగ్);
+    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, xms); n++;
+    button = Xm_Create_నెట్టు_Button(tab_పంక్తి_menu, "New Tab", వాదనలు, n);
+    Xt_కూడు_Callback(button, XmNactivateCallback,
+		  (XtCallbackProc)tabline_button_cb, ఖాళీ);
     XmStringFree(xms);
 
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
-    xms = XmStringCreate((char *)"Open tab...", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Open tab...", args, n);
-    XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nuser_దత్తాంశం, (Xt_సూచిక)TABLINE_MENU_OPEN); n++;
+    xms = XmStringCreate((అక్షరం *)"Open tab...", STRING_ట్యాగ్);
+    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, xms); n++;
+    button = Xm_Create_నెట్టు_Button(tab_పంక్తి_menu, "Open tab...", వాదనలు, n);
+    Xt_కూడు_Callback(button, XmNactivateCallback,
+		  (XtCallbackProc)tabline_button_cb, ఖాళీ);
     XmStringFree(xms);
-#endif
+#అయితే_ముగింపు
 
-    textAreaForm = XtVaCreateManagedWidget("textAreaForm",
+    పాఠ్యం_Area_Form = XtVaCreateManagedWidget("textAreaForm",
 	xmFormWidgetClass, vimForm,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
 	XmNbottomAttachment, XmATTACH_FORM,
 	XmNtopAttachment, XmATTACH_FORM,
-	XmNmarginWidth, 0,
-	XmNmarginHeight, 0,
+	Xm_Nmargin_వెడల్పు, 0,
+	Xm_Nmargin_ఎత్తు, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
-    gui_motif_scroll_colors(textAreaForm);
+	ఖాళీ);
+    gui_motif_scroll_colors(పాఠ్యం_Area_Form);
 
-    textArea = XtVaCreateManagedWidget("textArea",
-	xmDrawingAreaWidgetClass, textAreaForm,
+    పాఠ్యం_Area = XtVaCreateManagedWidget("textArea",
+	xmDrawingAreaWidgetClass, పాఠ్యం_Area_Form,
 	XmNforeground, gui.norm_pixel,
-	XmNbackground, gui.back_pixel,
+	XmNbackground, gui.వెనుక_pixel,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNtopAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
@@ -567,114 +567,114 @@ gui_x11_create_widgets(void)
 	 * These take some control away from the user, but avoids making them
 	 * add resources to get a decent looking setup.
 	 */
-	XmNborderWidth, 0,
+	Xm_Nborder_వెడల్పు, 0,
 	XmNhighlightThickness, 0,
 	XmNshadowThickness, 0,
-	NULL);
+	ఖాళీ);
 
     /*
      * Install the callbacks.
      */
-    gui_x11_callbacks(textArea, vimForm);
+    gui_x11_callbacks(పాఠ్యం_Area, vimForm);
 
     // Pretend we don't have input focus, we will get an event if we do.
-    gui.in_focus = false;
+    gui.లోపల_focus = false;
 }
 
 /*
  * Called when the GUI is not going to start after all.
  */
-    void
-gui_x11_destroy_widgets(void)
+    శూన్య
+gui_x11_destroy_widgets(శూన్య)
 {
-    textArea = NULL;
-#ifdef FEAT_MENU
-    menuBar = NULL;
-#endif
+    పాఠ్యం_Area = ఖాళీ;
+#నిర్వచితమైతే FEAT_MENU
+    menuBar = ఖాళీ;
+#అయితే_ముగింపు
 }
 
-    void
-gui_mch_set_text_area_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    శూన్య
+gui_mch_సమితి_పాఠ్యం_area_pos(
+    పూర్ణాంకం	    x వాడని,
+    పూర్ణాంకం	    y వాడని,
+    పూర్ణాంకం	    w వాడని,
+    పూర్ణాంకం	    h వాడని)
 {
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
     // Give keyboard focus to the textArea instead of the toolbar.
     reset_focus();
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-gui_x11_set_back_color(void)
+    శూన్య
+gui_x11_సమితి_వెనుక_color(శూన్య)
 {
-    if (textArea != NULL)
-#if (XmVersion >= 1002)
-	XmChangeColor(textArea, gui.back_pixel);
-#else
-	XtVaSetValues(textArea,
-		  XmNbackground, gui.back_pixel,
-		  NULL);
-#endif
+    ఒకవేళ (పాఠ్యం_Area != ఖాళీ)
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
+	XmChangeColor(పాఠ్యం_Area, gui.వెనుక_pixel);
+#లేకపోతే
+	Xt_Va_సమితి_విలువలు(పాఠ్యం_Area,
+		  XmNbackground, gui.వెనుక_pixel,
+		  ఖాళీ);
+#అయితే_ముగింపు
 }
 
 /*
  * Manage dialog centered on pointer.
  */
-    void
-manage_centered(Widget dialog_child)
+    శూన్య
+manage_centered(Widget dialog_బిడ్డ)
 {
-    Widget shell = XtParent(dialog_child);
-    Window root, child;
-    unsigned int mask;
-    unsigned int width, height, border_width, depth;
-    int x, y, win_x, win_y, maxX, maxY;
+    Widget shell = Xt_మాతృ(dialog_బిడ్డ);
+    కిటికీ మూలం, బిడ్డ;
+    గుర్తులేని పూర్ణాంకం ముసుగు;
+    గుర్తులేని పూర్ణాంకం వెడల్పు, ఎత్తు, border_వెడల్పు, లోతు;
+    పూర్ణాంకం x, y, win_x, win_y, maxX, maxY;
     Boolean mappedWhenManaged;
 
     // Temporarily set value of XmNmappedWhenManaged
     // to stop the dialog from popping up right away
-    XtVaGetValues(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
-    XtVaSetValues(shell, XmNmappedWhenManaged, False, NULL);
+    Xt_Va_Get_విలువలు(shell, XmNmappedWhenManaged, &mappedWhenManaged, ఖాళీ);
+    Xt_Va_సమితి_విలువలు(shell, XmNmappedWhenManaged, False, ఖాళీ);
 
-    XtManageChild(dialog_child);
+    Xt_Manage_బిడ్డ(dialog_బిడ్డ);
 
     // Get the pointer position (x, y)
-    XQueryPointer(XtDisplay(shell), XtWindow(shell), &root, &child,
-		  &x, &y, &win_x, &win_y, &mask);
+    XQuery_సూచిక(XtDisplay(shell), Xt_కిటికీ(shell), &మూలం, &బిడ్డ,
+		  &x, &y, &win_x, &win_y, &ముసుగు);
 
     // Translate the pointer position (x, y) into a position for the new
     // window that will place the pointer at its center
-    XGetGeometry(XtDisplay(shell), XtWindow(shell), &root, &win_x, &win_y,
-		 &width, &height, &border_width, &depth);
-    width += 2 * border_width;
-    height += 2 * border_width;
-    x -= width / 2;
-    y -= height / 2;
+    XGetGeometry(XtDisplay(shell), Xt_కిటికీ(shell), &మూలం, &win_x, &win_y,
+		 &వెడల్పు, &ఎత్తు, &border_వెడల్పు, &లోతు);
+    వెడల్పు += 2 * border_వెడల్పు;
+    ఎత్తు += 2 * border_వెడల్పు;
+    x -= వెడల్పు / 2;
+    y -= ఎత్తు / 2;
 
     // Ensure that the dialog remains on screen
-    maxX = XtScreen(shell)->width - width;
-    maxY = XtScreen(shell)->height - height;
-    if (x < 0)
+    maxX = XtScreen(shell)->వెడల్పు - వెడల్పు;
+    maxY = XtScreen(shell)->ఎత్తు - ఎత్తు;
+    ఒకవేళ (x < 0)
 	x = 0;
-    if (x > maxX)
+    ఒకవేళ (x > maxX)
 	x = maxX;
-    if (y < 0)
+    ఒకవేళ (y < 0)
 	y = 0;
-    if (y > maxY)
+    ఒకవేళ (y > maxY)
 	y = maxY;
 
     // Set desired window position in the DialogShell
-    XtVaSetValues(shell, XmNx, x, XmNy, y, NULL);
+    Xt_Va_సమితి_విలువలు(shell, XmNx, x, XmNy, y, ఖాళీ);
 
     // Map the widget
     XtMapWidget(shell);
 
     // Restore the value of XmNmappedWhenManaged
-    XtVaSetValues(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
+    Xt_Va_సమితి_విలువలు(shell, XmNmappedWhenManaged, mappedWhenManaged, ఖాళీ);
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
 
 /*
  * Encapsulate the way an XmFontList is created.
@@ -684,159 +684,159 @@ gui_motif_create_fontlist(XFontStruct *font)
 {
     XmFontList font_list;
 
-# if (XmVersion <= 1001)
+# ఒకవేళ (Xm_సంస్కరణ <= 1001)
     // Motif 1.1 method
-    font_list = XmFontListCreate(font, STRING_TAG);
-# else
+    font_list = XmFontListCreate(font, STRING_ట్యాగ్);
+# లేకపోతే
     // Motif 1.2 method
-    XmFontListEntry font_list_entry;
+    Xm_Font_List_నమోదు font_list_నమోదు;
 
-    font_list_entry = XmFontListEntryCreate(STRING_TAG, XmFONT_IS_FONT,
-					    (XtPointer)font);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
-    XmFontListEntryFree(&font_list_entry);
+    font_list_నమోదు = Xm_Font_List_నమోదు_Create(STRING_ట్యాగ్, XmFONT_IS_FONT,
+					    (Xt_సూచిక)font);
+    font_list = Xm_Font_List_Append_నమోదు(ఖాళీ, font_list_నమోదు);
+    Xm_Font_List_నమోదు_Free(&font_list_నమోదు);
 # endif
-    return font_list;
+    తిరిగి font_list;
 }
 
-# if ((XmVersion > 1001) && defined(FEAT_XFONTSET))
+# ఒకవేళ ((Xm_సంస్కరణ > 1001) && defined(FEAT_XFONTSET))
     XmFontList
-gui_motif_fontset2fontlist(XFontSet *fontset)
+gui_motif_fontset2fontlist(XFont_సమితి *fontset)
 {
     XmFontList font_list;
 
     // Motif 1.2 method
-    XmFontListEntry font_list_entry;
+    Xm_Font_List_నమోదు font_list_నమోదు;
 
-    font_list_entry = XmFontListEntryCreate(STRING_TAG,
+    font_list_నమోదు = Xm_Font_List_నమోదు_Create(STRING_ట్యాగ్,
 					    XmFONT_IS_FONTSET,
-					    (XtPointer)*fontset);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
-    XmFontListEntryFree(&font_list_entry);
-    return font_list;
+					    (Xt_సూచిక)*fontset);
+    font_list = Xm_Font_List_Append_నమోదు(ఖాళీ, font_list_నమోదు);
+    Xm_Font_List_నమోదు_Free(&font_list_నమోదు);
+    తిరిగి font_list;
 }
 # endif
 
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-static void gui_motif_add_actext(vimmenu_T *menu);
-# if (XmVersion >= 1002)
-static void toggle_tearoff(Widget wid);
-static void gui_mch_recurse_tearoffs(vimmenu_T *menu);
+స్థిర శూన్య gui_motif_కూడు_actext(vimmenu_T *menu);
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
+స్థిర శూన్య toggle_tearoff(Widget wid);
+స్థిర శూన్య gui_mch_recurse_tearoffs(vimmenu_T *menu);
 # endif
-static void submenu_change(vimmenu_T *mp, int colors);
+స్థిర శూన్య submenu_change(vimmenu_T *mp, పూర్ణాంకం colors);
 
-static void do_set_mnemonics(int enable);
-static int menu_enabled = TRUE;
+స్థిర శూన్య do_సమితి_mnemonics(పూర్ణాంకం enable);
+స్థిర పూర్ణాంకం menu_enabled = TRUE;
 
-    void
-gui_mch_enable_menu(int flag)
+    శూన్య
+gui_mch_enable_menu(పూర్ణాంకం flag)
 {
-    if (flag)
+    ఒకవేళ (flag)
     {
-	XtManageChild(menuBar);
+	Xt_Manage_బిడ్డ(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	ఒకవేళ (XtIsManaged(Xt_మాతృ(toolBar)))
 	{
 	    // toolBar is attached to top form
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_సమితి_విలువలు(Xt_మాతృ(toolBar),
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, menuBar,
-		NULL);
+		ఖాళీ);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      XmNtopWidget, Xt_మాతృ(toolBar),
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      XmNtopWidget, Xt_మాతృ(toolBar),
+			      ఖాళీ);
 	}
-	else
+	లేకపోతే
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      ఖాళీ);
 	}
     }
-    else
+    లేకపోతే
     {
-	XtUnmanageChild(menuBar);
+	Xt_Unmanage_బిడ్డ(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	ఒకవేళ (XtIsManaged(Xt_మాతృ(toolBar)))
 	{
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_సమితి_విలువలు(Xt_మాతృ(toolBar),
 		XmNtopAttachment, XmATTACH_FORM,
-		NULL);
+		ఖాళీ);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      XmNtopWidget, Xt_మాతృ(toolBar),
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      XmNtopWidget, Xt_మాతృ(toolBar),
+			      ఖాళీ);
 	}
-	else
+	లేకపోతే
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      ఖాళీ);
 	}
     }
 
@@ -845,203 +845,203 @@ gui_mch_enable_menu(int flag)
 /*
  * Enable or disable mnemonics for the toplevel menus.
  */
-    void
-gui_motif_set_mnemonics(int enable)
+    శూన్య
+gui_motif_సమితి_mnemonics(పూర్ణాంకం enable)
 {
     /*
      * Don't enable menu mnemonics when the menu bar is disabled, LessTif
      * crashes when using a mnemonic then.
      */
-    if (!menu_enabled)
+    ఒకవేళ (!menu_enabled)
 	enable = FALSE;
-    do_set_mnemonics(enable);
+    do_సమితి_mnemonics(enable);
 }
 
-    static void
-do_set_mnemonics(int enable)
+    స్థిర శూన్య
+do_సమితి_mnemonics(పూర్ణాంకం enable)
 {
     vimmenu_T	*menu;
 
     FOR_ALL_MENUS(menu)
-	if (menu->id != (Widget)0)
-	    XtVaSetValues(menu->id,
+	ఒకవేళ (menu->id != (Widget)0)
+	    Xt_Va_సమితి_విలువలు(menu->id,
 		    XmNmnemonic, enable ? menu->mnemonic : NUL,
-		    NULL);
+		    ఖాళీ);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    శూన్య
+gui_mch_కూడు_menu(vimmenu_T *menu, పూర్ణాంకం idx)
 {
     XmString	label;
     Widget	shell;
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
 # ifdef MOTIF_POPUP
-    if (menu_is_popup(menu->name))
+    ఒకవేళ (menu_is_popup(menu->name))
     {
 	Arg arg[2];
-	int n = 0;
+	పూర్ణాంకం n = 0;
 
 	// Only create the popup menu when it's actually used, otherwise there
 	// is a delay when using the right mouse button.
-#  if (XmVersion <= 1002)
-	if (mouse_model_popup())
+#  ఒకవేళ (Xm_సంస్కరణ <= 1002)
+	ఒకవేళ (mouse_model_popup())
 #  endif
 	{
-	    if (gui.menu_bg_pixel != INVALCOLOR)
+	    ఒకవేళ (gui.menu_bg_pixel != INVALCOLOR)
 	    {
-		XtSetArg(arg[0], XmNbackground, gui.menu_bg_pixel); n++;
+		Xt_సమితి_Arg(arg[0], XmNbackground, gui.menu_bg_pixel); n++;
 	    }
-	    if (gui.menu_fg_pixel != INVALCOLOR)
+	    ఒకవేళ (gui.menu_fg_pixel != INVALCOLOR)
 	    {
-		XtSetArg(arg[1], XmNforeground, gui.menu_fg_pixel); n++;
+		Xt_సమితి_Arg(arg[1], XmNforeground, gui.menu_fg_pixel); n++;
 	    }
-	    menu->submenu_id = XmCreatePopupMenu(textArea, "contextMenu",
+	    menu->submenu_id = XmCreatePopupMenu(పాఠ్యం_Area, "contextMenu",
 								      arg, n);
 	    menu->id = (Widget)0;
 	}
-	return;
+	తిరిగి;
     }
 # endif
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == (Widget)0))
-	return;
+    ఒకవేళ (!menu_is_menubar(menu->name)
+	    || (మాతృ != ఖాళీ && మాతృ->submenu_id == (Widget)0))
+	తిరిగి;
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((అక్షరం *)menu->dname, STRING_ట్యాగ్);
+    ఒకవేళ (label == ఖాళీ)
+	తిరిగి;
     menu->id = XtVaCreateWidget("subMenu",
 	    xmCascadeButtonWidgetClass,
-	    (parent == NULL) ? menuBar : parent->submenu_id,
+	    (మాతృ == ఖాళీ) ? menuBar : మాతృ->submenu_id,
 	    XmNlabelString, label,
 	    XmNmnemonic, p_wak[0] == 'n' ? NUL : menu->mnemonic,
-# if (XmVersion >= 1002)
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 	    // submenu: count the tearoff item (needed for LessTif)
-	    XmNpositionIndex, idx + (parent != NULL
-			   && tearoff_val == (int)XmTEAR_OFF_ENABLED ? 1 : 0),
+	    Xm_Nposition_సూచీ, idx + (మాతృ != ఖాళీ
+			   && tearoff_val == (పూర్ణాంకం)XmTEAR_OFF_ENABLED ? 1 : 0),
 # endif
-	    NULL);
+	    ఖాళీ);
     XmStringFree(label);
 
-    if (menu->id == (Widget)0)		// failed
-	return;
+    ఒకవేళ (menu->id == (Widget)0)		// failed
+	తిరిగి;
 
     // The "Help" menu is a special case, and should be placed at the far
     // right hand side of the menu-bar.  It's recognized by its high priority.
-    if (parent == NULL && menu->priority >= 9999)
-	XtVaSetValues(menuBar,
+    ఒకవేళ (మాతృ == ఖాళీ && menu->ప్రాధాన్యత >= 9999)
+	Xt_Va_సమితి_విలువలు(menuBar,
 		XmNmenuHelpWidget, menu->id,
-		NULL);
+		ఖాళీ);
 
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
 
     // add accelerator text
-    gui_motif_add_actext(menu);
+    gui_motif_కూడు_actext(menu);
 
     shell = XtVaCreateWidget("subMenuShell",
 	xmMenuShellWidgetClass, menu->id,
 	XmNwidth, 1,
 	XmNheight, 1,
-	NULL);
+	ఖాళీ);
     gui_motif_menu_colors(shell);
     menu->submenu_id = XtVaCreateWidget("rowColumnMenu",
-	xmRowColumnWidgetClass, shell,
-	XmNrowColumnType, XmMENU_PULLDOWN,
-	NULL);
+	xm_అడ్డువరుస_స్తంభం_Widget_Class, shell,
+	Xm_Nrow_స్తంభం_Type, XmMENU_PULLDOWN,
+	ఖాళీ);
     gui_motif_menu_colors(menu->submenu_id);
 
-    if (menu->submenu_id == (Widget)0)		// failed
-	return;
+    ఒకవేళ (menu->submenu_id == (Widget)0)		// failed
+	తిరిగి;
 
-# if (XmVersion >= 1002)
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
     // Set the colors for the tear off widget
     toggle_tearoff(menu->submenu_id);
 # endif
 
-    XtVaSetValues(menu->id,
+    Xt_Va_సమితి_విలువలు(menu->id,
 	XmNsubMenuId, menu->submenu_id,
-	NULL);
+	ఖాళీ);
 
     // When we add a top-level item to the menu bar, we can figure out how
     // high the menu bar should be.
-    if (parent == NULL)
-	gui_mch_compute_menu_height(menu->id);
+    ఒకవేళ (మాతృ == ఖాళీ)
+	gui_mch_compute_menu_ఎత్తు(menu->id);
 }
 
 
 /*
  * Add mnemonic and accelerator text to a menu button.
  */
-    static void
-gui_motif_add_actext(vimmenu_T *menu)
+    స్థిర శూన్య
+gui_motif_కూడు_actext(vimmenu_T *menu)
 {
     XmString	label;
 
     // Add accelerator text, if there is one
-    if (menu->actext == NULL || menu->id == (Widget)0)
-	return;
+    ఒకవేళ (menu->actext == ఖాళీ || menu->id == (Widget)0)
+	తిరిగి;
 
-    label = XmStringCreate((char *)menu->actext, STRING_TAG);
-    if (label == NULL)
-	return;
-    XtVaSetValues(menu->id, XmNacceleratorText, label, NULL);
+    label = XmStringCreate((అక్షరం *)menu->actext, STRING_ట్యాగ్);
+    ఒకవేళ (label == ఖాళీ)
+	తిరిగి;
+    Xt_Va_సమితి_విలువలు(menu->id, Xm_Naccelerator_పాఠ్యం, label, ఖాళీ);
     XmStringFree(label);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    శూన్య
+gui_mch_toggle_tearoffs(పూర్ణాంకం enable)
 {
-# if (XmVersion >= 1002)
-    if (enable)
-	tearoff_val = (int)XmTEAR_OFF_ENABLED;
-    else
-	tearoff_val = (int)XmTEAR_OFF_DISABLED;
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
+    ఒకవేళ (enable)
+	tearoff_val = (పూర్ణాంకం)XmTEAR_OFF_ENABLED;
+    లేకపోతే
+	tearoff_val = (పూర్ణాంకం)XmTEAR_OFF_DISABLED;
     toggle_tearoff(menuBar);
-    gui_mch_recurse_tearoffs(root_menu);
+    gui_mch_recurse_tearoffs(మూలం_menu);
 # endif
 }
 
-# if (XmVersion >= 1002)
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 /*
  * Set the tearoff for one menu widget on or off, and set the color of the
  * tearoff widget.
  */
-    static void
+    స్థిర శూన్య
 toggle_tearoff(Widget wid)
 {
     Widget	w;
 
-    XtVaSetValues(wid, XmNtearOffModel, tearoff_val, NULL);
-    if (tearoff_val == (int)XmTEAR_OFF_ENABLED
+    Xt_Va_సమితి_విలువలు(wid, XmNtearOffModel, tearoff_val, ఖాళీ);
+    ఒకవేళ (tearoff_val == (పూర్ణాంకం)XmTEAR_OFF_ENABLED
 	    && (w = XmGetTearOffControl(wid)) != (Widget)0)
 	gui_motif_menu_colors(w);
 }
 
-    static void
+    స్థిర శూన్య
 gui_mch_recurse_tearoffs(vimmenu_T *menu)
 {
-    while (menu != NULL)
+    అయితే (menu != ఖాళీ)
     {
-	if (!menu_is_popup(menu->name))
+	ఒకవేళ (!menu_is_popup(menu->name))
 	{
-	    if (menu->submenu_id != (Widget)0)
+	    ఒకవేళ (menu->submenu_id != (Widget)0)
 		toggle_tearoff(menu->submenu_id);
 	    gui_mch_recurse_tearoffs(menu->children);
 	}
-	menu = menu->next;
+	menu = menu->తదుపరి;
     }
 }
 # endif
 
-    int
-gui_mch_text_area_extra_height(void)
+    పూర్ణాంకం
+gui_mch_పాఠ్యం_area_extra_ఎత్తు(శూన్య)
 {
-    Dimension	shadowHeight;
+    Dimension	shadow_ఎత్తు;
 
-    XtVaGetValues(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
-    return shadowHeight;
+    Xt_Va_Get_విలువలు(పాఠ్యం_Area_Form, XmNshadowThickness, &shadow_ఎత్తు, ఖాళీ);
+    తిరిగి shadow_ఎత్తు;
 }
 
 /*
@@ -1049,38 +1049,38 @@ gui_mch_text_area_extra_height(void)
  * We need to check all the items for their position and height, for the case
  * there are several rows, and/or some characters extend higher or lower.
  */
-    void
-gui_mch_compute_menu_height(
+    శూన్య
+gui_mch_compute_menu_ఎత్తు(
     Widget	id)		    // can be NULL when deleting menu
 {
     Dimension	y, maxy;
     Dimension	margin, shadow;
     vimmenu_T	*mp;
-    static Dimension	height = 21;	// normal height of a menu item
+    స్థిర Dimension	ఎత్తు = 21;	// normal height of a menu item
 
     /*
      * Get the height of the new item, before managing it, because it will
      * still reflect the font size.  After managing it depends on the menu
      * height, which is what we just wanted to get!.
      */
-    if (id != (Widget)0)
-	XtVaGetValues(id, XmNheight, &height, NULL);
+    ఒకవేళ (id != (Widget)0)
+	Xt_Va_Get_విలువలు(id, XmNheight, &ఎత్తు, ఖాళీ);
 
     // Find any menu Widget, to be able to call XtManageChild()
-    else
+    లేకపోతే
 	FOR_ALL_MENUS(mp)
-	    if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	    ఒకవేళ (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	    {
 		id = mp->id;
-		break;
+		ఆపు;
 	    }
 
     /*
      * Now manage the menu item, to make them all be positioned (makes an
      * extra row when needed, removes it when not needed).
      */
-    if (id != (Widget)0)
-	XtManageChild(id);
+    ఒకవేళ (id != (Widget)0)
+	Xt_Manage_బిడ్డ(id);
 
     /*
      * Now find the menu item that is the furthest down, and get its position.
@@ -1088,18 +1088,18 @@ gui_mch_compute_menu_height(
     maxy = 0;
     FOR_ALL_MENUS(mp)
     {
-	if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	ఒకవేళ (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	{
-	    XtVaGetValues(mp->id, XmNy, &y, NULL);
-	    if (y > maxy)
+	    Xt_Va_Get_విలువలు(mp->id, XmNy, &y, ఖాళీ);
+	    ఒకవేళ (y > maxy)
 		maxy = y;
 	}
     }
 
-    XtVaGetValues(menuBar,
-	XmNmarginHeight, &margin,
+    Xt_Va_Get_విలువలు(menuBar,
+	Xm_Nmargin_ఎత్తు, &margin,
 	XmNshadowThickness, &shadow,
-	NULL);
+	ఖాళీ);
 
     /*
      * This computation is the result of trial-and-error:
@@ -1111,13 +1111,13 @@ gui_mch_compute_menu_height(
      * margin = margin around the menu buttons;  Must be added.
      * Add 4 for the underlining of shortcut keys.
      */
-    gui.menu_height = maxy + height - 2 * shadow + 2 * margin + 4;
+    gui.menu_ఎత్తు = maxy + ఎత్తు - 2 * shadow + 2 * margin + 4;
 
     // Somehow the menu bar doesn't resize automatically.  Set it here,
     // even though this is a catch 22.  Don't do this when starting up,
     // somehow the menu gets very high then.
-    if (gui.shell_created)
-	XtVaSetValues(menuBar, XmNheight, gui.menu_height, NULL);
+    ఒకవేళ (gui.shell_created)
+	Xt_Va_సమితి_విలువలు(menuBar, XmNheight, gui.menu_ఎత్తు, ఖాళీ);
 }
 
 # ifdef FEAT_TOOLBAR
@@ -1127,30 +1127,30 @@ gui_mch_compute_menu_height(
  */
 #  include "gui_x11_pm.h"
 
-static char **get_toolbar_pixmap(vimmenu_T *menu, char **fname);
+స్థిర అక్షరం **get_toolbar_pixmap(vimmenu_T *menu, అక్షరం **fname);
 
 /*
  * Read an Xpm file.  Return OK or FAIL.
  */
-    static int
-check_xpm(char_u *path)
+    స్థిర పూర్ణాంకం
+check_xpm(char_u *మార్గం)
 {
-    XpmAttributes attrs;
-    int		status;
-    Pixmap	mask;
+    Xpm_లక్షణాలు attrs;
+    పూర్ణాంకం		స్థితి_2;
+    Pixmap	ముసుగు;
     Pixmap	map;
 
     attrs.valuemask = 0;
 
     // Create the "sensitive" pixmap
-    status = XpmReadFileToPixmap(gui.dpy,
-	    RootWindow(gui.dpy, DefaultScreen(gui.dpy)),
-	    (char *)path, &map, &mask, &attrs);
-    XpmFreeAttributes(&attrs);
+    స్థితి_2 = Xpm_Read_File_గమ్యం_Pixmap(gui.dpy,
+	    మూలం_కిటికీ_2(gui.dpy, DefaultScreen(gui.dpy)),
+	    (అక్షరం *)మార్గం, &map, &ముసుగు, &attrs);
+    Xpm_Free_లక్షణాలు(&attrs);
 
-    if (status == XpmSuccess)
-	return OK;
-    return FAIL;
+    ఒకవేళ (స్థితి_2 == XpmSuccess)
+	తిరిగి OK;
+    తిరిగి FAIL;
 }
 
 
@@ -1160,238 +1160,238 @@ check_xpm(char_u *path)
  * (in allocated memory).
  * Return a blank pixmap if it fails.
  */
-    static char **
-get_toolbar_pixmap(vimmenu_T *menu, char **fname)
+    స్థిర అక్షరం **
+get_toolbar_pixmap(vimmenu_T *menu, అక్షరం **fname)
 {
     char_u	buf[MAXPATHL];		// buffer storing expanded pathname
-    char	**xpm = NULL;		// xpm array
-    int		res;
+    అక్షరం	**xpm = ఖాళీ;		// xpm array
+    పూర్ణాంకం		res;
 
-    *fname = NULL;
+    *fname = ఖాళీ;
     buf[0] = NUL;			// start with NULL path
 
-    if (menu->iconfile != NULL)
+    ఒకవేళ (menu->iconfile != ఖాళీ)
     {
 	// Use the "icon="  argument.
-	gui_find_iconfile(menu->iconfile, buf, "xpm");
+	gui_కనుగొను_iconfile(menu->iconfile, buf, "xpm");
 	res = check_xpm(buf);
 
 	// If it failed, try using the menu name.
-	if (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
+	ఒకవేళ (res == FAIL && gui_కనుగొను_bitmap(menu->name, buf, "xpm") == OK)
 	    res = check_xpm(buf);
-	if (res == OK)
+	ఒకవేళ (res == OK)
 	{
-	    *fname = (char *)vim_strsave(buf);
-	    return tb_blank_xpm;
+	    *fname = (అక్షరం *)vim_strsave(buf);
+	    తిరిగి tb_blank_xpm;
 	}
     }
 
-    if (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
+    ఒకవేళ (menu->icon_builtin || gui_కనుగొను_bitmap(menu->name, buf, "xpm") == FAIL)
     {
-	if (menu->iconidx >= 0 && menu->iconidx
-	       < (int)(sizeof(built_in_pixmaps) / sizeof(built_in_pixmaps[0])))
-	    xpm = built_in_pixmaps[menu->iconidx];
-	else
+	ఒకవేళ (menu->iconidx >= 0 && menu->iconidx
+	       < (పూర్ణాంకం)(పరిమాణం(built_లోపల_pixmaps) / పరిమాణం(built_లోపల_pixmaps[0])))
+	    xpm = built_లోపల_pixmaps[menu->iconidx];
+	లేకపోతే
 	    xpm = tb_blank_xpm;
     }
 
-    return xpm;
+    తిరిగి xpm;
 }
 
 /*
  * Add arguments for the toolbar pixmap to a menu item.
  */
-    static int
-add_pixmap_args(vimmenu_T *menu, Arg *args, int n)
+    స్థిర పూర్ణాంకం
+కూడు_pixmap_వాదనలు(vimmenu_T *menu, Arg *వాదనలు, పూర్ణాంకం n)
 {
     vim_free(menu->xpm_fname);
     menu->xpm = get_toolbar_pixmap(menu, &menu->xpm_fname);
-    if (menu->xpm == NULL)
+    ఒకవేళ (menu->xpm == ఖాళీ)
     {
-	XtSetArg(args[n], XmNlabelType, XmSTRING); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNlabelType, XmSTRING); n++;
     }
-    else
+    లేకపోతే
     {
-	if (menu->xpm_fname != NULL)
+	ఒకవేళ (menu->xpm_fname != ఖాళీ)
 	{
-	    XtSetArg(args[n], XmNpixmapFile, menu->xpm_fname); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNpixmapFile, menu->xpm_fname); n++;
 	}
-	XtSetArg(args[n], XmNpixmapData, menu->xpm); n++;
-	XtSetArg(args[n], XmNlabelLocation, XmBOTTOM); n++;
+	Xt_సమితి_Arg(వాదనలు[n], Xm_Npixmap_దత్తాంశం, menu->xpm); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNlabelLocation, XmBOTTOM); n++;
     }
-    return n;
+    తిరిగి n;
 }
 # endif // FEAT_TOOLBAR
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    శూన్య
+gui_mch_కూడు_menu_అంశం(vimmenu_T *menu, పూర్ణాంకం idx)
 {
     XmString	label;
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
-# if (XmVersion <= 1002)
+# ఒకవేళ (Xm_సంస్కరణ <= 1002)
     // Don't add Popup menu items when the popup menu isn't used.
-    if (menu_is_child_of_popup(menu) && !mouse_model_popup())
-	return;
+    ఒకవేళ (menu_is_బిడ్డ_యొక్క_popup(menu) && !mouse_model_popup())
+	తిరిగి;
 # endif
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ఒకవేళ (menu_is_toolbar(మాతృ->name))
     {
 	WidgetClass	type;
-	XmString	xms = NULL;    // fallback label if pixmap not found
-	int		n;
-	Arg		args[18];
+	XmString	xms = ఖాళీ;    // fallback label if pixmap not found
+	పూర్ణాంకం		n;
+	Arg		వాదనలు[18];
 
 	n = 0;
-	if (menu_is_separator(menu->name))
+	ఒకవేళ (menu_is_separator(menu->name))
 	{
-	    char	*cp;
+	    అక్షరం	*cp;
 	    Dimension	wid;
 
 	    /*
 	     * A separator has the format "-sep%d[:%d]-". The optional :%d is
 	     * a width specifier. If no width is specified then we choose one.
 	     */
-	    cp = (char *)vim_strchr(menu->name, ':');
-	    if (cp != NULL)
+	    cp = (అక్షరం *)vim_strchr(menu->name, ':');
+	    ఒకవేళ (cp != ఖాళీ)
 		wid = (Dimension)atoi(++cp);
-	    else
+	    లేకపోతే
 		wid = 4;
 
 	    type = xmSeparatorWidgetClass;
-	    XtSetArg(args[n], XmNwidth, wid); n++;
-	    XtSetArg(args[n], XmNminWidth, wid); n++;
-	    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-	    XtSetArg(args[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNwidth, wid); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], Xm_Nmin_వెడల్పు, wid); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNorientation, XmVERTICAL); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNseparatorType, Xm_SHADOW_ETCHED_లోపల); n++;
 	}
-	else
+	లేకపోతే
 	{
 	    // Without shadows one can't sense whatever the button has been
 	    // pressed or not! However we want to save a bit of space...
 	    // Need the highlightThickness to see the focus.
-	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
-	    XtSetArg(args[n], XmNhighlightOnEnter, True); n++;
-	    XtSetArg(args[n], XmNmarginWidth, 0); n++;
-	    XtSetArg(args[n], XmNmarginHeight, 0); n++;
-	    XtSetArg(args[n], XmNtraversalOn, False); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNhighlightThickness, 1); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNhighlightOnEnter, True); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], Xm_Nmargin_వెడల్పు, 0); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], Xm_Nmargin_ఎత్తు, 0); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNtraversalOn, False); n++;
 	    // Set the label here, so that we can switch between icons/text
 	    // by changing the XmNlabelType resource.
-	    xms = XmStringCreate((char *)menu->dname, STRING_TAG);
-	    XtSetArg(args[n], XmNlabelString, xms); n++;
+	    xms = XmStringCreate((అక్షరం *)menu->dname, STRING_ట్యాగ్);
+	    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, xms); n++;
 
-	    n = add_pixmap_args(menu, args, n);
+	    n = కూడు_pixmap_వాదనలు(menu, వాదనలు, n);
 
 	    type = xmEnhancedButtonWidgetClass;
 	}
 
-	XtSetArg(args[n], XmNpositionIndex, idx); n++;
-	if (menu->id == NULL)
+	Xt_సమితి_Arg(వాదనలు[n], Xm_Nposition_సూచీ, idx); n++;
+	ఒకవేళ (menu->id == ఖాళీ)
 	{
-	    menu->id = XtCreateManagedWidget((char *)menu->dname,
-			type, toolBar, args, n);
-	    if (menu->id != NULL && type == xmEnhancedButtonWidgetClass)
+	    menu->id = XtCreateManagedWidget((అక్షరం *)menu->dname,
+			type, toolBar, వాదనలు, n);
+	    ఒకవేళ (menu->id != ఖాళీ && type == xmEnhancedButtonWidgetClass)
 	    {
-		XtAddCallback(menu->id,
+		Xt_కూడు_Callback(menu->id,
 			XmNactivateCallback, gui_x11_menu_cb, menu);
 	    }
 	}
-	else
-	    XtSetValues(menu->id, args, n);
-	if (xms != NULL)
+	లేకపోతే
+	    Xt_సమితి_విలువలు(menu->id, వాదనలు, n);
+	ఒకవేళ (xms != ఖాళీ)
 	    XmStringFree(xms);
 
 #  ifdef FEAT_BEVAL_GUI
-	gui_mch_menu_set_tip(menu);
+	gui_mch_menu_సమితి_tip(menu);
 #  endif
 
-	menu->parent = parent;
-	menu->submenu_id = NULL;
+	menu->మాతృ = మాతృ;
+	menu->submenu_id = ఖాళీ;
 	// When adding first item to toolbar it might have to be enabled .
-	if (!XtIsManaged(XtParent(toolBar))
-		    && vim_strchr(p_go, GO_TOOLBAR) != NULL)
+	ఒకవేళ (!XtIsManaged(Xt_మాతృ(toolBar))
+		    && vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
 	    gui_mch_show_toolbar(TRUE);
-	gui.toolbar_height = gui_mch_compute_toolbar_height();
-	return;
+	gui.toolbar_ఎత్తు = gui_mch_compute_toolbar_ఎత్తు();
+	తిరిగి;
     } // toolbar menu item
 # endif
 
     // No parent, must be a non-menubar menu
-    if (parent->submenu_id == (Widget)0)
-	return;
+    ఒకవేళ (మాతృ->submenu_id == (Widget)0)
+	తిరిగి;
 
     menu->submenu_id = (Widget)0;
 
     // Add menu separator
-    if (menu_is_separator(menu->name))
+    ఒకవేళ (menu_is_separator(menu->name))
     {
 	menu->id = XtVaCreateWidget("subMenu",
-		xmSeparatorGadgetClass, parent->submenu_id,
-# if (XmVersion >= 1002)
+		xmSeparatorGadgetClass, మాతృ->submenu_id,
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 		// count the tearoff item (needed for LessTif)
-		XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+		Xm_Nposition_సూచీ, idx + (tearoff_val == (పూర్ణాంకం)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-		NULL);
+		ఖాళీ);
 	gui_motif_menu_colors(menu->id);
-	return;
+	తిరిగి;
     }
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((అక్షరం *)menu->dname, STRING_ట్యాగ్);
+    ఒకవేళ (label == ఖాళీ)
+	తిరిగి;
     menu->id = XtVaCreateWidget("subMenu",
-	xmPushButtonWidgetClass, parent->submenu_id,
+	xm_నెట్టు_Button_Widget_Class, మాతృ->submenu_id,
 	XmNlabelString, label,
 	XmNmnemonic, menu->mnemonic,
-# if (XmVersion >= 1002)
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 	// count the tearoff item (needed for LessTif)
-	XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+	Xm_Nposition_సూచీ, idx + (tearoff_val == (పూర్ణాంకం)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-	NULL);
+	ఖాళీ);
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
     XmStringFree(label);
 
-    if (menu->id != (Widget)0)
+    ఒకవేళ (menu->id != (Widget)0)
     {
-	XtAddCallback(menu->id, XmNactivateCallback, gui_x11_menu_cb,
-		(XtPointer)menu);
+	Xt_కూడు_Callback(menu->id, XmNactivateCallback, gui_x11_menu_cb,
+		(Xt_సూచిక)menu);
 	// add accelerator text
-	gui_motif_add_actext(menu);
+	gui_motif_కూడు_actext(menu);
     }
 }
 
-# if (XmVersion <= 1002)
+# ఒకవేళ (Xm_సంస్కరణ <= 1002)
 /*
  * This function will destroy/create the popup menus dynamically,
  * according to the value of 'mousemodel'.
  * This will fix the "right mouse button freeze" that occurs when
  * there exists a popup menu but it isn't managed.
  */
-    void
+    శూన్య
 gui_motif_update_mousemodel(vimmenu_T *menu)
 {
-    int		idx = 0;
+    పూర్ణాంకం		idx = 0;
 
     // When GUI hasn't started the menus have not been created.
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
-    while (menu)
+    అయితే (menu)
     {
-      if (menu->children != NULL)
+      ఒకవేళ (menu->children != ఖాళీ)
       {
-	  if (menu_is_popup(menu->name))
+	  ఒకవేళ (menu_is_popup(menu->name))
 	  {
-	      if (mouse_model_popup())
+	      ఒకవేళ (mouse_model_popup())
 	      {
 		  // Popup menu will be used.  Create the popup menus.
-		  gui_mch_add_menu(menu, idx);
+		  gui_mch_కూడు_menu(menu, idx);
 		  gui_motif_update_mousemodel(menu->children);
 	      }
-	      else
+	      లేకపోతే
 	      {
 		  // Popup menu will not be used.  Destroy the popup menus.
 		  gui_motif_update_mousemodel(menu->children);
@@ -1399,156 +1399,156 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 	      }
 	  }
       }
-      else if (menu_is_child_of_popup(menu))
+      లేకపోతే ఒకవేళ (menu_is_బిడ్డ_యొక్క_popup(menu))
       {
-	  if (mouse_model_popup())
-	      gui_mch_add_menu_item(menu, idx);
-	  else
+	  ఒకవేళ (mouse_model_popup())
+	      gui_mch_కూడు_menu_అంశం(menu, idx);
+	  లేకపోతే
 	      gui_mch_destroy_menu(menu);
       }
-      menu = menu->next;
+      menu = menu->తదుపరి;
       ++idx;
     }
 }
 # endif
 
-    void
-gui_mch_new_menu_colors(void)
+    శూన్య
+gui_mch_new_menu_colors(శూన్య)
 {
-    if (menuBar == (Widget)0)
-	return;
+    ఒకవేళ (menuBar == (Widget)0)
+	తిరిగి;
     gui_motif_menu_colors(menuBar);
 # ifdef FEAT_TOOLBAR
-    gui_motif_menu_colors(toolBarFrame);
+    gui_motif_menu_colors(tool_Bar_చట్రం);
     gui_motif_menu_colors(toolBar);
 # endif
 
-    submenu_change(root_menu, TRUE);
+    submenu_change(మూలం_menu, TRUE);
 }
 
-    void
-gui_mch_new_menu_font(void)
+    శూన్య
+gui_mch_new_menu_font(శూన్య)
 {
-    if (menuBar == (Widget)0)
-	return;
-    submenu_change(root_menu, FALSE);
+    ఒకవేళ (menuBar == (Widget)0)
+	తిరిగి;
+    submenu_change(మూలం_menu, FALSE);
     {
-	Dimension   height;
+	Dimension   ఎత్తు;
 	Position w, h;
 
-	XtVaGetValues(menuBar, XmNheight, &height, NULL);
-	gui.menu_height = height;
+	Xt_Va_Get_విలువలు(menuBar, XmNheight, &ఎత్తు, ఖాళీ);
+	gui.menu_ఎత్తు = ఎత్తు;
 
-	XtVaGetValues(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
+	Xt_Va_Get_విలువలు(vimShell, XtNwidth, &w, XtNheight, &h, ఖాళీ);
 	gui_resize_shell(w, h
 # ifdef FEAT_XIM
-		- xim_get_status_area_height()
+		- xim_get_స్థితి_area_ఎత్తు()
 # endif
 		     );
     }
-    gui_set_shellsize(FALSE, TRUE, RESIZE_VERT);
+    gui_సమితి_shellsize(FALSE, TRUE, RESIZE_VERT);
     ui_new_shellsize();
 }
 
-# if defined(FEAT_BEVAL_GUI)
-    void
-gui_mch_new_tooltip_font(void)
+# ఒకవేళ defined(FEAT_BEVAL_GUI)
+    శూన్య
+gui_mch_new_tooltip_font(శూన్య)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *menu;
 
-    if (toolBar == (Widget)0)
-	return;
+    ఒకవేళ (toolBar == (Widget)0)
+	తిరిగి;
 
-    menu = gui_find_menu((char_u *)"ToolBar");
-    if (menu != NULL)
+    menu = gui_కనుగొను_menu((char_u *)"ToolBar");
+    ఒకవేళ (menu != ఖాళీ)
 	submenu_change(menu, FALSE);
 #  endif
 }
 
-    void
-gui_mch_new_tooltip_colors(void)
+    శూన్య
+gui_mch_new_tooltip_colors(శూన్య)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *toolbar;
 
-    if (toolBar == (Widget)0)
-	return;
+    ఒకవేళ (toolBar == (Widget)0)
+	తిరిగి;
 
-    toolbar = gui_find_menu((char_u *)"ToolBar");
-    if (toolbar != NULL)
+    toolbar = gui_కనుగొను_menu((char_u *)"ToolBar");
+    ఒకవేళ (toolbar != ఖాళీ)
 	submenu_change(toolbar, TRUE);
 #  endif
 }
 # endif
 
-    static void
+    స్థిర శూన్య
 submenu_change(
     vimmenu_T	*menu,
-    int		colors)		// TRUE for colors, FALSE for font
+    పూర్ణాంకం		colors)		// TRUE for colors, FALSE for font
 {
     vimmenu_T	*mp;
 
-    for (mp = menu; mp != NULL; mp = mp->next)
+    కొరకు (mp = menu; mp != ఖాళీ; mp = mp->తదుపరి)
     {
-	if (mp->id != (Widget)0)
+	ఒకవేళ (mp->id != (Widget)0)
 	{
-	    if (colors)
+	    ఒకవేళ (colors)
 	    {
 		gui_motif_menu_colors(mp->id);
 # ifdef FEAT_TOOLBAR
 		// For a toolbar item: Free the pixmap and allocate a new one,
 		// so that the background color is right.
-		if (mp->xpm != NULL)
+		ఒకవేళ (mp->xpm != ఖాళీ)
 		{
-		    int		n = 0;
-		    Arg		args[18];
+		    పూర్ణాంకం		n = 0;
+		    Arg		వాదనలు[18];
 
-		    n = add_pixmap_args(mp, args, n);
-		    XtSetValues(mp->id, args, n);
+		    n = కూడు_pixmap_వాదనలు(mp, వాదనలు, n);
+		    Xt_సమితి_విలువలు(mp->id, వాదనలు, n);
 		}
 #  ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		ఒకవేళ (mp->tip != ఖాళీ)
 		{
-		    Arg args[2];
+		    Arg వాదనలు[2];
 
-		    args[0].name = XmNbackground;
-		    args[0].value = gui.tooltip_bg_pixel;
-		    args[1].name = XmNforeground;
-		    args[1].value = gui.tooltip_fg_pixel;
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    వాదనలు[0].name = XmNbackground;
+		    వాదనలు[0].విలువ = gui.tooltip_bg_pixel;
+		    వాదనలు[1].name = XmNforeground;
+		    వాదనలు[1].విలువ = gui.tooltip_fg_pixel;
+		    Xt_సమితి_విలువలు(mp->tip->balloonLabel, &వాదనలు[0], Xt_సంఖ్య(వాదనలు));
 		}
 #  endif
 # endif
 	    }
-	    else
+	    లేకపోతే
 	    {
 		gui_motif_menu_fontlist(mp->id);
 # ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		ఒకవేళ (mp->tip != ఖాళీ)
 		{
-		    Arg args[1];
+		    Arg వాదనలు[1];
 
-		    args[0].name = XmNfontList;
-		    args[0].value = (XtArgVal)gui_motif_fontset2fontlist(
+		    వాదనలు[0].name = XmNfontList;
+		    వాదనలు[0].విలువ = (XtArgVal)gui_motif_fontset2fontlist(
 						    &gui.tooltip_fontset);
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    Xt_సమితి_విలువలు(mp->tip->balloonLabel, &వాదనలు[0], Xt_సంఖ్య(వాదనలు));
 		}
 # endif
 	    }
 	}
 
-	if (mp->children != NULL)
+	ఒకవేళ (mp->children != ఖాళీ)
 	{
-# if (XmVersion >= 1002)
+# ఒకవేళ (Xm_సంస్కరణ >= 1002)
 	    // Set the colors/font for the tear off widget
-	    if (mp->submenu_id != (Widget)0)
+	    ఒకవేళ (mp->submenu_id != (Widget)0)
 	    {
-		if (colors)
+		ఒకవేళ (colors)
 		    gui_motif_menu_colors(mp->submenu_id);
-		else
+		లేకపోతే
 		    gui_motif_menu_fontlist(mp->submenu_id);
 		toggle_tearoff(mp->submenu_id);
 	    }
@@ -1562,26 +1562,26 @@ submenu_change(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    శూన్య
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Please be sure to destroy the parent widget first (i.e. menu->id).
     // On the other hand, problems have been reported that the submenu must be
     // deleted first...
-    if (menu->submenu_id != (Widget)0)
+    ఒకవేళ (menu->submenu_id != (Widget)0)
     {
 	XtDestroyWidget(menu->submenu_id);
 	menu->submenu_id = (Widget)0;
     }
 
-    if (menu->id == (Widget)0)
-	return;
+    ఒకవేళ (menu->id == (Widget)0)
+	తిరిగి;
 
-    Widget	    parent;
+    Widget	    మాతృ;
 
-    parent = XtParent(menu->id);
-# if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
-    if (parent == toolBar && menu->tip != NULL)
+    మాతృ = Xt_మాతృ(menu->id);
+# ఒకవేళ defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+    ఒకవేళ (మాతృ == toolBar && menu->tip != ఖాళీ)
     {
 	// We try to destroy this before the actual menu, because there are
 	// callbacks, etc. that will be unregistered during the tooltip
@@ -1592,58 +1592,58 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 	// deallocated by Xt, and unknown behaviour will ensue (probably
 	// a core dump).
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = ఖాళీ;
     }
 # endif
     XtDestroyWidget(menu->id);
     menu->id = (Widget)0;
-    if (parent == menuBar)
-	gui_mch_compute_menu_height((Widget)0);
+    ఒకవేళ (మాతృ == menuBar)
+	gui_mch_compute_menu_ఎత్తు((Widget)0);
 # ifdef FEAT_TOOLBAR
-    else if (parent == toolBar)
+    లేకపోతే ఒకవేళ (మాతృ == toolBar)
     {
-	Cardinal    num_children;
+	Cardinal    అంకె_children;
 
 	// When removing last toolbar item, don't display the toolbar.
-	XtVaGetValues(toolBar, XmNnumChildren, &num_children, NULL);
-	if (num_children == 0)
+	Xt_Va_Get_విలువలు(toolBar, XmNnumChildren, &అంకె_children, ఖాళీ);
+	ఒకవేళ (అంకె_children == 0)
 	    gui_mch_show_toolbar(FALSE);
-	else
-	    gui.toolbar_height = gui_mch_compute_toolbar_height();
+	లేకపోతే
+	    gui.toolbar_ఎత్తు = gui_mch_compute_toolbar_ఎత్తు();
     }
 # endif
 }
 
-    void
-gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
+    శూన్య
+gui_mch_show_popupmenu(vimmenu_T *menu వాడని)
 {
 # ifdef MOTIF_POPUP
-    XmMenuPosition(menu->submenu_id, gui_x11_get_last_mouse_event());
-    XtManageChild(menu->submenu_id);
+    XmMenuPosition(menu->submenu_id, gui_x11_get_చివరి_mouse_event());
+    Xt_Manage_బిడ్డ(menu->submenu_id);
 # endif
 }
 
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 /*
  * Set the menu and scrollbar colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    శూన్య
+gui_mch_def_colors(శూన్య)
 {
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
     gui.menu_fg_pixel = gui_get_color((char_u *)gui.rsrc_menu_fg_name);
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
     gui.scroll_fg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_fg_name);
     gui.scroll_bg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_bg_name);
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
     gui.tooltip_fg_pixel =
 	gui_get_color((char_u *)gui.rsrc_tooltip_fg_name);
     gui.tooltip_bg_pixel =
 	gui_get_color((char_u *)gui.rsrc_tooltip_bg_name);
-#endif
+#అయితే_ముగింపు
 }
 
 
@@ -1651,234 +1651,234 @@ gui_mch_def_colors(void)
  * Scrollbar stuff.
  */
 
-    void
-gui_mch_set_scrollbar_thumb(
+    శూన్య
+gui_mch_సమితి_scrollbar_thumb(
     scrollbar_T *sb,
-    long	val,
-    long	size,
-    long	max)
+    దీర్ఘ	val,
+    దీర్ఘ	కొలత,
+    దీర్ఘ	max)
 {
-    if (sb->id != (Widget)0)
-	XtVaSetValues(sb->id,
+    ఒకవేళ (sb->id != (Widget)0)
+	Xt_Va_సమితి_విలువలు(sb->id,
 		  XmNvalue, val,
-		  XmNsliderSize, size,
-		  XmNpageIncrement, (size > 2 ? size - 2 : 1),
+		  Xm_Nslider_కొలత, కొలత,
+		  XmNpageIncrement, (కొలత > 2 ? కొలత - 2 : 1),
 		  XmNmaximum, max + 1,	    // Motif has max one past the end
-		  NULL);
+		  ఖాళీ);
 }
 
-    void
-gui_mch_set_scrollbar_pos(
+    శూన్య
+gui_mch_సమితి_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    పూర్ణాంకం		x,
+    పూర్ణాంకం		y,
+    పూర్ణాంకం		w,
+    పూర్ణాంకం		h)
 {
-    if (sb->id == (Widget)0)
-	return;
+    ఒకవేళ (sb->id == (Widget)0)
+	తిరిగి;
 
-    if (sb->type == SBAR_LEFT || sb->type == SBAR_RIGHT)
+    ఒకవేళ (sb->type == SBAR_ఎడమ || sb->type == SBAR_కుడి)
     {
-	if (y == 0)
-	    h -= gui.border_offset;
-	else
-	    y -= gui.border_offset;
-	XtVaSetValues(sb->id,
-		XmNtopOffset, y,
-		XmNbottomOffset, -y - h,
+	ఒకవేళ (y == 0)
+	    h -= gui.border_స్థానభ్రంశం;
+	లేకపోతే
+	    y -= gui.border_స్థానభ్రంశం;
+	Xt_Va_సమితి_విలువలు(sb->id,
+		Xm_Ntop_స్థానభ్రంశం, y,
+		Xm_Nbottom_స్థానభ్రంశం, -y - h,
 		XmNwidth, w,
-		NULL);
+		ఖాళీ);
     }
-    else
-	XtVaSetValues(sb->id,
-		XmNtopOffset, y,
-		XmNleftOffset, x,
-		XmNrightOffset, gui.which_scrollbars[SBAR_RIGHT]
-						     ? gui.scrollbar_width : 0,
+    లేకపోతే
+	Xt_Va_సమితి_విలువలు(sb->id,
+		Xm_Ntop_స్థానభ్రంశం, y,
+		Xm_Nleft_స్థానభ్రంశం, x,
+		Xm_Nright_స్థానభ్రంశం, gui.which_scrollbars[SBAR_కుడి]
+						     ? gui.scrollbar_వెడల్పు : 0,
 		XmNheight, h,
-		NULL);
-    XtManageChild(sb->id);
+		ఖాళీ);
+    Xt_Manage_బిడ్డ(sb->id);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_xpadding(శూన్య)
 {
-    int xpad;
+    పూర్ణాంకం xpad;
     Dimension tw, ww;
     Position  tx;
 
-    XtVaGetValues(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
-    XtVaGetValues(vimShell, XtNwidth, &ww, NULL);
-    xpad = ww - tw - tx - gui.scrollbar_width;
-    return (xpad < 0) ? 0 : xpad;
+    Xt_Va_Get_విలువలు(పాఠ్యం_Area, XtNwidth, &tw, XtNx, &tx, ఖాళీ);
+    Xt_Va_Get_విలువలు(vimShell, XtNwidth, &ww, ఖాళీ);
+    xpad = ww - tw - tx - gui.scrollbar_వెడల్పు;
+    తిరిగి (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_ypadding(శూన్య)
 {
-    int ypad;
+    పూర్ణాంకం ypad;
     Dimension th, wh;
     Position  ty;
 
-    XtVaGetValues(textArea, XtNheight, &th, XtNy, &ty, NULL);
-    XtVaGetValues(vimShell, XtNheight, &wh, NULL);
-    ypad = wh - th - ty - gui.scrollbar_height;
-    return (ypad < 0) ? 0 : ypad;
+    Xt_Va_Get_విలువలు(పాఠ్యం_Area, XtNheight, &th, XtNy, &ty, ఖాళీ);
+    Xt_Va_Get_విలువలు(vimShell, XtNheight, &wh, ఖాళీ);
+    ypad = wh - th - ty - gui.scrollbar_ఎత్తు;
+    తిరిగి (ypad < 0) ? 0 : ypad;
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    శూన్య
+gui_mch_enable_scrollbar(scrollbar_T *sb, పూర్ణాంకం flag)
 {
-    Arg		args[16];
-    int		n;
+    Arg		వాదనలు[16];
+    పూర్ణాంకం		n;
 
-    if (sb->id == (Widget)0)
-	return;
+    ఒకవేళ (sb->id == (Widget)0)
+	తిరిగి;
 
     n = 0;
-    if (flag)
+    ఒకవేళ (flag)
     {
-	switch (sb->type)
+	ఎంపిక (sb->type)
 	{
-	    case SBAR_LEFT:
-		XtSetArg(args[n], XmNleftOffset, gui.scrollbar_width); n++;
-		break;
+	    స్థితి SBAR_ఎడమ:
+		Xt_సమితి_Arg(వాదనలు[n], Xm_Nleft_స్థానభ్రంశం, gui.scrollbar_వెడల్పు); n++;
+		ఆపు;
 
-	    case SBAR_RIGHT:
-		XtSetArg(args[n], XmNrightOffset, gui.scrollbar_width); n++;
-		break;
+	    స్థితి SBAR_కుడి:
+		Xt_సమితి_Arg(వాదనలు[n], Xm_Nright_స్థానభ్రంశం, gui.scrollbar_వెడల్పు); n++;
+		ఆపు;
 
-	    case SBAR_BOTTOM:
-		XtSetArg(args[n], XmNbottomOffset, gui.scrollbar_height);n++;
-		break;
+	    స్థితి SBAR_BOTTOM:
+		Xt_సమితి_Arg(వాదనలు[n], Xm_Nbottom_స్థానభ్రంశం, gui.scrollbar_ఎత్తు);n++;
+		ఆపు;
 	}
-	XtSetValues(textArea, args, n);
-	XtManageChild(sb->id);
+	Xt_సమితి_విలువలు(పాఠ్యం_Area, వాదనలు, n);
+	Xt_Manage_బిడ్డ(sb->id);
     }
-    else
+    లేకపోతే
     {
-	if (!gui.which_scrollbars[sb->type])
+	ఒకవేళ (!gui.which_scrollbars[sb->type])
 	{
 	    // The scrollbars of this type are all disabled, adjust the
 	    // textArea attachment offset.
-	    switch (sb->type)
+	    ఎంపిక (sb->type)
 	    {
-		case SBAR_LEFT:
-		    XtSetArg(args[n], XmNleftOffset, 0); n++;
-		    break;
+		స్థితి SBAR_ఎడమ:
+		    Xt_సమితి_Arg(వాదనలు[n], Xm_Nleft_స్థానభ్రంశం, 0); n++;
+		    ఆపు;
 
-		case SBAR_RIGHT:
-		    XtSetArg(args[n], XmNrightOffset, 0); n++;
-		    break;
+		స్థితి SBAR_కుడి:
+		    Xt_సమితి_Arg(వాదనలు[n], Xm_Nright_స్థానభ్రంశం, 0); n++;
+		    ఆపు;
 
-		case SBAR_BOTTOM:
-		    XtSetArg(args[n], XmNbottomOffset, 0);n++;
-		    break;
+		స్థితి SBAR_BOTTOM:
+		    Xt_సమితి_Arg(వాదనలు[n], Xm_Nbottom_స్థానభ్రంశం, 0);n++;
+		    ఆపు;
 	    }
-	    XtSetValues(textArea, args, n);
+	    Xt_సమితి_విలువలు(పాఠ్యం_Area, వాదనలు, n);
 	}
-	XtUnmanageChild(sb->id);
+	Xt_Unmanage_బిడ్డ(sb->id);
     }
 }
 
-    void
+    శూన్య
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    పూర్ణాంకం		orient)	// SBAR_VERT or SBAR_HORIZ
 {
-    Arg		args[16];
-    int		n = 0;
+    Arg		వాదనలు[16];
+    పూర్ణాంకం		n = 0;
 
-    XtSetArg(args[n], XmNminimum, 0); n++;
-    XtSetArg(args[n], XmNorientation,
+    Xt_సమితి_Arg(వాదనలు[n], XmNminimum, 0); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNorientation,
 	    (orient == SBAR_VERT) ? XmVERTICAL : XmHORIZONTAL); n++;
 
-    switch (sb->type)
+    ఎంపిక (sb->type)
     {
-	case SBAR_LEFT:
-	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
-	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	స్థితి SBAR_ఎడమ:
+	    Xt_సమితి_Arg(వాదనలు[n], XmNtopAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNwidth, gui.scrollbar_వెడల్పు); n++;
+	    ఆపు;
 
-	case SBAR_RIGHT:
-	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
-	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	స్థితి SBAR_కుడి:
+	    Xt_సమితి_Arg(వాదనలు[n], XmNtopAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNwidth, gui.scrollbar_వెడల్పు); n++;
+	    ఆపు;
 
-	case SBAR_BOTTOM:
-	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNheight, gui.scrollbar_height); n++;
-	    break;
+	స్థితి SBAR_BOTTOM:
+	    Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNheight, gui.scrollbar_ఎత్తు); n++;
+	    ఆపు;
     }
 
     sb->id = XtCreateWidget("scrollBar",
-	    xmScrollBarWidgetClass, textAreaForm, args, n);
-    if (sb->id == (Widget)0)
-	return;
+	    xmScrollBarWidgetClass, పాఠ్యం_Area_Form, వాదనలు, n);
+    ఒకవేళ (sb->id == (Widget)0)
+	తిరిగి;
 
-    gui_mch_set_scrollbar_colors(sb);
-    XtAddCallback(sb->id, XmNvalueChangedCallback,
-	    scroll_cb, (XtPointer)sb->ident);
-    XtAddCallback(sb->id, XmNdragCallback,
-	    scroll_cb, (XtPointer)sb->ident);
-    XtAddEventHandler(sb->id, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	    (XtPointer)0);
+    gui_mch_సమితి_scrollbar_colors(sb);
+    Xt_కూడు_Callback(sb->id, Xm_Nvalue_మారింది_Callback,
+	    scroll_cb, (Xt_సూచిక)sb->ident);
+    Xt_కూడు_Callback(sb->id, XmNdragCallback,
+	    scroll_cb, (Xt_సూచిక)sb->ident);
+    Xt_కూడు_Event_Handler(sb->id, కీలకం_Press_ముసుగు, FALSE, gui_x11_కీలకం_తగిలింది_cb,
+	    (Xt_సూచిక)0);
 }
 
-    void
+    శూన్య
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    ఒకవేళ (sb->id != (Widget)0)
 	XtDestroyWidget(sb->id);
 }
 
-    void
-gui_mch_set_scrollbar_colors(scrollbar_T *sb)
+    శూన్య
+gui_mch_సమితి_scrollbar_colors(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    ఒకవేళ (sb->id != (Widget)0)
     {
-	if (gui.scroll_bg_pixel != INVALCOLOR)
+	ఒకవేళ (gui.scroll_bg_pixel != INVALCOLOR)
 	{
-#if (XmVersion>=1002)
+#ఒకవేళ (Xm_సంస్కరణ>=1002)
 	    // This should not only set the through color but also adjust
 	    // related colors, such as shadows.
 	    XmChangeColor(sb->id, gui.scroll_bg_pixel);
-#endif
+#అయితే_ముగింపు
 
 	    // Set the through color directly, in case XmChangeColor() decided
 	    // to change it.
-	    XtVaSetValues(sb->id,
+	    Xt_Va_సమితి_విలువలు(sb->id,
 		    XmNtroughColor, gui.scroll_bg_pixel,
-		    NULL);
+		    ఖాళీ);
 	}
 
-	if (gui.scroll_fg_pixel != INVALCOLOR)
-	    XtVaSetValues(sb->id,
+	ఒకవేళ (gui.scroll_fg_pixel != INVALCOLOR)
+	    Xt_Va_సమితి_విలువలు(sb->id,
 		    XmNforeground, gui.scroll_fg_pixel,
 		    XmNbackground, gui.scroll_fg_pixel,
-		    NULL);
+		    ఖాళీ);
     }
 
     // This is needed for the rectangle below the vertical scrollbars.
-    if (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
-	gui_motif_scroll_colors(textAreaForm);
+    ఒకవేళ (sb == &gui.bottom_sbar && పాఠ్యం_Area_Form != (Widget)0)
+	gui_motif_scroll_colors(పాఠ్యం_Area_Form);
 }
 
 /*
  * Miscellaneous stuff:
  */
 
-    Window
-gui_x11_get_wid(void)
+    కిటికీ
+gui_x11_get_wid(శూన్య)
 {
-    return(XtWindow(textArea));
+    తిరిగి(Xt_కిటికీ(పాఠ్యం_Area));
 }
 
 /*
@@ -1887,65 +1887,65 @@ gui_x11_get_wid(void)
  * keyboard focus.  If the mnemonic is on a label, look in the userData field
  * of the label to see if it points to another widget, and give that the focus.
  */
-    static void
-do_mnemonic(Widget w, unsigned int keycode)
+    స్థిర శూన్య
+do_mnemonic(Widget w, గుర్తులేని పూర్ణాంకం keycode)
 {
     WidgetList	    children;
-    int		    numChildren, i;
+    పూర్ణాంకం		    అంకె_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    char	    mneString[2];
-    Widget	    userData;
-    unsigned char   rowColType;
+    కీలకం_Sym	    mnemonic = '\0';
+    అక్షరం	    mneString[2];
+    Widget	    user_దత్తాంశం_2;
+    గుర్తులేని అక్షరం   అడ్డువరుస_నిలువు_Type;
 
-    if (XtIsComposite(w))
+    ఒకవేళ (Xt_Is_సంయుక్త(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	ఒకవేళ (XtClass(w) == xm_అడ్డువరుస_స్తంభం_Widget_Class)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_విలువలు(w, Xm_Nrow_స్తంభం_Type, &అడ్డువరుస_నిలువు_Type, ఖాళీ);
+	    isMenu = (అడ్డువరుస_నిలువు_Type != (గుర్తులేని అక్షరం)XmWORK_AREA);
 	}
-	else
+	లేకపోతే
 	    isMenu = False;
-	if (!isMenu)
+	ఒకవేళ (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-			  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_విలువలు(w, XmNchildren, &children, XmNnumChildren,
+			  &అంకె_Children, ఖాళీ);
+	    కొరకు (i = 0; i < అంకె_Children; i++)
 		do_mnemonic(children[i], keycode);
 	}
     }
-    else
+    లేకపోతే
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_విలువలు(w, XmNmnemonic, &mnemonic, ఖాళీ);
+	ఒకవేళ (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    if (XKeysymToKeycode(XtDisplay(XtParent(w)),
-				       XStringToKeysym(mneString)) == keycode)
+	    ఒకవేళ (XKeysym_గమ్యం_Keycode(XtDisplay(Xt_మాతృ(w)),
+				       XString_గమ్యం_Keysym(mneString)) == keycode)
 	    {
-		if (XtClass(w) == xmLabelWidgetClass
+		ఒకవేళ (XtClass(w) == xmLabelWidgetClass
 			|| XtClass(w) == xmLabelGadgetClass)
 		{
-		    XtVaGetValues(w, XmNuserData, &userData, NULL);
-		    if (userData != NULL && XtIsWidget(userData))
-			XmProcessTraversal(userData, XmTRAVERSE_CURRENT);
+		    Xt_Va_Get_విలువలు(w, Xm_Nuser_దత్తాంశం, &user_దత్తాంశం_2, ఖాళీ);
+		    ఒకవేళ (user_దత్తాంశం_2 != ఖాళీ && XtIsWidget(user_దత్తాంశం_2))
+			XmProcessTraversal(user_దత్తాంశం_2, XmTRAVERSE_CURRENT);
 		}
-		else
+		లేకపోతే
 		{
-		    XKeyPressedEvent keyEvent;
+		    XKeyPressedEvent కీలకం_Event;
 
 		    XmProcessTraversal(w, XmTRAVERSE_CURRENT);
 
-		    CLEAR_FIELD(keyEvent);
-		    keyEvent.type = KeyPress;
-		    keyEvent.serial = 1;
-		    keyEvent.send_event = True;
-		    keyEvent.display = XtDisplay(w);
-		    keyEvent.window = XtWindow(w);
-		    XtCallActionProc(w, "Activate", (XEvent *) & keyEvent,
-								     NULL, 0);
+		    CLEAR_క్షేత్రం(కీలకం_Event);
+		    కీలకం_Event.type = కీలకం_Press;
+		    కీలకం_Event.serial = 1;
+		    కీలకం_Event.send_event = True;
+		    కీలకం_Event.display = XtDisplay(w);
+		    కీలకం_Event.కిటికీ_2 = Xt_కిటికీ(w);
+		    XtCallActionProc(w, "Activate", (XEvent *) & కీలకం_Event,
+								     ఖాళీ, 0);
 		}
 	    }
 	}
@@ -1955,12 +1955,12 @@ do_mnemonic(Widget w, unsigned int keycode)
 /*
  * Callback routine for dialog mnemonic processing.
  */
-    static void
+    స్థిర శూన్య
 mnemonic_event(
 	Widget	    w,
-	XtPointer   call_data UNUSED,
+	Xt_సూచిక   call_దత్తాంశం వాడని,
 	XKeyEvent   *event,
-	Boolean	    *b UNUSED)
+	Boolean	    *b వాడని)
 {
     do_mnemonic(w, event->keycode);
 }
@@ -1971,43 +1971,43 @@ mnemonic_event(
  * a passive grab to the dialog widget for the mnemonic character, thus
  * directing mnemonic events to the dialog widget.
  */
-    static void
-add_mnemonic_grabs(Widget dialog, Widget w)
+    స్థిర శూన్య
+కూడు_mnemonic_grabs(Widget dialog, Widget w)
 {
-    char	    mneString[2];
+    అక్షరం	    mneString[2];
     WidgetList	    children;
-    int		    numChildren, i;
+    పూర్ణాంకం		    అంకె_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    unsigned char   rowColType;
+    కీలకం_Sym	    mnemonic = '\0';
+    గుర్తులేని అక్షరం   అడ్డువరుస_నిలువు_Type;
 
-    if (XtIsComposite(w))
+    ఒకవేళ (Xt_Is_సంయుక్త(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	ఒకవేళ (XtClass(w) == xm_అడ్డువరుస_స్తంభం_Widget_Class)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_విలువలు(w, Xm_Nrow_స్తంభం_Type, &అడ్డువరుస_నిలువు_Type, ఖాళీ);
+	    isMenu = (అడ్డువరుస_నిలువు_Type != (గుర్తులేని అక్షరం)XmWORK_AREA);
 	}
-	else
+	లేకపోతే
 	    isMenu = False;
-	if (!isMenu)
+	ఒకవేళ (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-							  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
-		add_mnemonic_grabs(dialog, children[i]);
+	    Xt_Va_Get_విలువలు(w, XmNchildren, &children, XmNnumChildren,
+							  &అంకె_Children, ఖాళీ);
+	    కొరకు (i = 0; i < అంకె_Children; i++)
+		కూడు_mnemonic_grabs(dialog, children[i]);
 	}
     }
-    else
+    లేకపోతే
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_విలువలు(w, XmNmnemonic, &mnemonic, ఖాళీ);
+	ఒకవేళ (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    XtGrabKey(dialog, XKeysymToKeycode(XtDisplay(dialog),
-						  XStringToKeysym(mneString)),
-		    Mod1Mask, True, GrabModeAsync, GrabModeAsync);
+	    Xt_Grab_కీలకం(dialog, XKeysym_గమ్యం_Keycode(XtDisplay(dialog),
+						  XString_గమ్యం_Keysym(mneString)),
+		    Mod1_ముసుగు, True, Grab_బహుళకం_Async, Grab_బహుళకం_Async);
 	}
     }
 }
@@ -2021,83 +2021,83 @@ add_mnemonic_grabs(Widget dialog, Widget w)
  * the appropriate label and set the XmNuserData resource of the label to the
  * widget to get the focus when the mnemonic is typed.
  */
-    static void
+    స్థిర శూన్య
 activate_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    ఒకవేళ (!dialog)
+	తిరిగి;
 
-    XtAddEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
-    add_mnemonic_grabs(dialog, dialog);
+    Xt_కూడు_Event_Handler(dialog, కీలకం_Press_ముసుగు, False,
+			   (XtEventHandler) mnemonic_event, (Xt_సూచిక) ఖాళీ);
+    కూడు_mnemonic_grabs(dialog, dialog);
 }
 
 /*
  * Removes the event handler and key-grabs for dialog mnemonic handling.
  */
-    static void
+    స్థిర శూన్య
 suppress_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    ఒకవేళ (!dialog)
+	తిరిగి;
 
-    XtUngrabKey(dialog, AnyKey, Mod1Mask);
-    XtRemoveEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    Xt_Ungrab_కీలకం(dialog, Any_కీలకం, Mod1_ముసుగు);
+    XtRemoveEventHandler(dialog, కీలకం_Press_ముసుగు, False,
+			   (XtEventHandler) mnemonic_event, (Xt_సూచిక) ఖాళీ);
 }
 
-#if defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
 /*
  * Use the 'guifont' or 'guifontset' as a fontlist for a dialog widget.
  */
-    static void
-set_fontlist(Widget id)
+    స్థిర శూన్య
+సమితి_fontlist(Widget id)
 {
     XmFontList fl;
 
 # ifdef FONTSET_ALWAYS
-    if (gui.fontset != NOFONTSET)
+    ఒకవేళ (gui.fontset != NOFONTSET)
     {
-	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.fontset);
-	if (fl != NULL)
+	fl = gui_motif_fontset2fontlist((XFont_సమితి *)&gui.fontset);
+	ఒకవేళ (fl != ఖాళీ)
 	{
-	    if (XtIsManaged(id))
+	    ఒకవేళ (XtIsManaged(id))
 	    {
-		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Unmanage_బిడ్డ(id);
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 		// We should force the widget to recalculate its
 		// geometry now.
-		XtManageChild(id);
+		Xt_Manage_బిడ్డ(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    లేకపోతే
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.norm_font != NOFONT)
+# లేకపోతే
+    ఒకవేళ (gui.norm_font != NOFONT)
     {
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.norm_font);
-	if (fl != NULL)
+	ఒకవేళ (fl != ఖాళీ)
 	{
-	    if (XtIsManaged(id))
+	    ఒకవేళ (XtIsManaged(id))
 	    {
-		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Unmanage_బిడ్డ(id);
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 		// We should force the widget to recalculate its
 		// geometry now.
-		XtManageChild(id);
+		Xt_Manage_బిడ్డ(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    లేకపోతే
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 	    XmFontListFree(fl);
 	}
     }
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_BROWSE)
+#ఒకవేళ defined(FEAT_BROWSE)
 
 /*
  * file selector related stuff
@@ -2106,19 +2106,19 @@ set_fontlist(Widget id)
 # include <Xm/FileSB.h>
 # include <Xm/XmStrDefs.h>
 
-typedef struct dialog_callback_arg
+రకనిర్వచనం నిర్మాణం dialog_callback_arg
 {
-    char *  args;   // not used right now
-    int	    id;
+    అక్షరం *  వాదనలు;   // not used right now
+    పూర్ణాంకం	    id;
 } dcbarg_T;
 
-static Widget dialog_wgt;
-static char *browse_fname = NULL;
-static XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
+స్థిర Widget dialog_wgt;
+స్థిర అక్షరం *browse_fname = ఖాళీ;
+స్థిర Xm_String_Char_సమితి charset = (Xm_String_Char_సమితి) XmSTRING_DEFAULT_CHARSET;
 				// used to set up XmStrings
 
-static void DialogCancelCB(Widget, XtPointer, XtPointer);
-static void DialogAcceptCB(Widget, XtPointer, XtPointer);
+స్థిర శూన్య DialogCancelCB(Widget, Xt_సూచిక, Xt_సూచిక);
+స్థిర శూన్య DialogAcceptCB(Widget, Xt_సూచిక, Xt_సూచిక);
 
 /*
  * This function is used to translate the predefined label text of the
@@ -2129,60 +2129,60 @@ static void DialogAcceptCB(Widget, XtPointer, XtPointer);
  * - equalize the messages between different GUI implementations as far as
  * possible.
  */
-    static void
-set_predefined_label(Widget parent, String name, char *new_label)
+    స్థిర శూన్య
+సమితి_predefined_label(Widget మాతృ, String name, అక్షరం *new_label)
 {
     XmString	str;
     Widget	w;
-    char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    char_u	*p, *తదుపరి;
+    కీలకం_Sym	mnemonic = NUL;
 
-    w = XtNameToWidget(parent, name);
+    w = Xt_Name_గమ్యం_Widget(మాతృ, name);
 
-    if (!w)
-	return;
+    ఒకవేళ (!w)
+	తిరిగి;
 
     p = vim_strsave((char_u *)new_label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
+    కొరకు (తదుపరి = p; *తదుపరి; ++తదుపరి)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	ఒకవేళ (*తదుపరి == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    పూర్ణాంకం len = STRLEN(తదుపరి);
 
-	    if (len > 0)
+	    ఒకవేళ (len > 0)
 	    {
-		mch_memmove(next, next + 1, len);
-		mnemonic = next[0];
+		mch_memmove(తదుపరి, తదుపరి + 1, len);
+		mnemonic = తదుపరి[0];
 	    }
 	}
     }
 
-    str = XmStringCreate((char *)p, STRING_TAG);
+    str = XmStringCreate((అక్షరం *)p, STRING_ట్యాగ్);
     vim_free(p);
 
-    if (str != NULL)
+    ఒకవేళ (str != ఖాళీ)
     {
-	XtVaSetValues(w,
+	Xt_Va_సమితి_విలువలు(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		ఖాళీ);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
-set_predefined_fontlist(Widget parent, String name)
+    స్థిర శూన్య
+సమితి_predefined_fontlist(Widget మాతృ, String name)
 {
     Widget w;
-    w = XtNameToWidget(parent, name);
+    w = Xt_Name_గమ్యం_Widget(మాతృ, name);
 
-    if (!w)
-	return;
+    ఒకవేళ (!w)
+	తిరిగి;
 
-    set_fontlist(w);
+    సమితి_fontlist(w);
 }
 
 /*
@@ -2191,116 +2191,116 @@ set_predefined_fontlist(Widget parent, String name)
  */
     char_u *
 gui_mch_browse(
-    int		saving UNUSED,	// select file to write
+    పూర్ణాంకం		saving వాడని,	// select file to write
     char_u	*title,		// title for the window
     char_u	*dflt,		// default name
-    char_u	*ext UNUSED,	// not used (extension added)
+    char_u	*ext వాడని,	// not used (extension added)
     char_u	*initdir,	// initial directory, NULL for current dir
     char_u	*filter)	// file name filter
 {
     char_u	dirbuf[MAXPATHL];
     char_u	dfltbuf[MAXPATHL];
-    char_u	*pattern;
-    char_u	*tofree = NULL;
+    char_u	*నమూనా;
+    char_u	*tofree = ఖాళీ;
 
     // There a difference between the resource name and value, Therefore, we
     // avoid to (ab-)use the (maybe internationalized!) dialog title as a
     // dialog name.
 
-    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", NULL, 0);
+    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", ఖాళీ, 0);
 
-    if (initdir == NULL || *initdir == NUL)
+    ఒకవేళ (initdir == ఖాళీ || *initdir == NUL)
     {
 	mch_dirname(dirbuf, MAXPATHL);
 	initdir = dirbuf;
     }
 
-    if (dflt == NULL)
+    ఒకవేళ (dflt == ఖాళీ)
 	dflt = (char_u *)"";
-    else if (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
+    లేకపోతే ఒకవేళ (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
     {
 	// The default selection should be the full path, "dflt" is only the
 	// file name.
 	STRCPY(dfltbuf, initdir);
-	add_pathsep(dfltbuf);
+	కూడు_pathsep(dfltbuf);
 	STRCAT(dfltbuf, dflt);
 	dflt = dfltbuf;
     }
 
     // Can only use one pattern for a file name.  Get the first pattern out of
     // the filter.  An empty pattern means everything matches.
-    if (filter == NULL)
-	pattern = (char_u *)"";
-    else
+    ఒకవేళ (filter == ఖాళీ)
+	నమూనా = (char_u *)"";
+    లేకపోతే
     {
 	char_u	*s, *p;
 
 	s = filter;
-	for (p = filter; *p != NUL; ++p)
+	కొరకు (p = filter; *p != NUL; ++p)
 	{
-	    if (*p == '\t')	// end of description, start of pattern
+	    ఒకవేళ (*p == '\t')	// end of description, start of pattern
 		s = p + 1;
-	    if (*p == ';' || *p == '\n')	// end of (first) pattern
-		break;
+	    ఒకవేళ (*p == ';' || *p == '\n')	// end of (first) pattern
+		ఆపు;
 	}
-	pattern = vim_strnsave(s, p - s);
-	tofree = pattern;
-	if (pattern == NULL)
-	    pattern = (char_u *)"";
+	నమూనా = vim_strnsave(s, p - s);
+	tofree = నమూనా;
+	ఒకవేళ (నమూనా == ఖాళీ)
+	    నమూనా = (char_u *)"";
     }
 
-    XtVaSetValues(dialog_wgt,
+    Xt_Va_సమితి_విలువలు(dialog_wgt,
 	XtVaTypedArg,
-	    XmNdirectory, XmRString, (char *)initdir, STRLEN(initdir) + 1,
+	    XmNdirectory, XmRString, (అక్షరం *)initdir, STRLEN(initdir) + 1,
 	XtVaTypedArg,
-	    XmNdirSpec,	XmRString, (char *)dflt, STRLEN(dflt) + 1,
+	    XmNdirSpec,	XmRString, (అక్షరం *)dflt, STRLEN(dflt) + 1,
 	XtVaTypedArg,
-	    XmNpattern,	XmRString, (char *)pattern, STRLEN(pattern) + 1,
+	    XmNpattern,	XmRString, (అక్షరం *)నమూనా, STRLEN(నమూనా) + 1,
 	XtVaTypedArg,
-	    XmNdialogTitle, XmRString, (char *)title, STRLEN(title) + 1,
-	NULL);
+	    XmNdialogTitle, XmRString, (అక్షరం *)title, STRLEN(title) + 1,
+	ఖాళీ);
 
-    set_predefined_label(dialog_wgt, "Apply", _("&Filter"));
-    set_predefined_label(dialog_wgt, "Cancel", _("&Cancel"));
-    set_predefined_label(dialog_wgt, "Dir", _("Directories"));
-    set_predefined_label(dialog_wgt, "FilterLabel", _("Filter"));
-    set_predefined_label(dialog_wgt, "Help", _("&Help"));
-    set_predefined_label(dialog_wgt, "Items", _("Files"));
-    set_predefined_label(dialog_wgt, "OK", _("&OK"));
-    set_predefined_label(dialog_wgt, "Selection", _("Selection"));
+    సమితి_predefined_label(dialog_wgt, "Apply", _("&Filter"));
+    సమితి_predefined_label(dialog_wgt, "Cancel", _("&Cancel"));
+    సమితి_predefined_label(dialog_wgt, "Dir", _("Directories"));
+    సమితి_predefined_label(dialog_wgt, "FilterLabel", _("Filter"));
+    సమితి_predefined_label(dialog_wgt, "Help", _("&Help"));
+    సమితి_predefined_label(dialog_wgt, "Items", _("Files"));
+    సమితి_predefined_label(dialog_wgt, "OK", _("&OK"));
+    సమితి_predefined_label(dialog_wgt, "Selection", _("Selection"));
 
     // This is to save us from silly external settings using not fixed with
     // fonts for file selection.
-    set_predefined_fontlist(dialog_wgt, "DirListSW.DirList");
-    set_predefined_fontlist(dialog_wgt, "ItemsListSW.ItemsList");
+    సమితి_predefined_fontlist(dialog_wgt, "DirListSW.DirList");
+    సమితి_predefined_fontlist(dialog_wgt, "ItemsListSW.ItemsList");
 
     gui_motif_menu_colors(dialog_wgt);
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-	XtVaSetValues(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
+    ఒకవేళ (gui.scroll_bg_pixel != INVALCOLOR)
+	Xt_Va_సమితి_విలువలు(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, ఖాళీ);
 
-    XtAddCallback(dialog_wgt, XmNokCallback, DialogAcceptCB, (XtPointer)0);
-    XtAddCallback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (XtPointer)0);
+    Xt_కూడు_Callback(dialog_wgt, XmNokCallback, DialogAcceptCB, (Xt_సూచిక)0);
+    Xt_కూడు_Callback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (Xt_సూచిక)0);
     // We have no help in this window, so hide help button
-    XtUnmanageChild(XmFileSelectionBoxGetChild(dialog_wgt,
-					(unsigned char)XmDIALOG_HELP_BUTTON));
+    Xt_Unmanage_బిడ్డ(Xm_File_Selection_Box_Get_బిడ్డ(dialog_wgt,
+					(గుర్తులేని అక్షరం)XmDIALOG_HELP_BUTTON));
 
     manage_centered(dialog_wgt);
     activate_dialog_mnemonics(dialog_wgt);
 
     // sit in a loop until the dialog box has gone away
-    do
+    చేయి
     {
-	XtAppProcessEvent(XtWidgetToApplicationContext(dialog_wgt),
-	    (XtInputMask)XtIMAll);
-    } while (XtIsManaged(dialog_wgt));
+	XtAppProcessEvent(Xt_Widget_గమ్యం_Application_Context(dialog_wgt),
+	    (Xt_ఆదానం_ముసుగు)XtIMAll);
+    } అయితే (XtIsManaged(dialog_wgt));
 
     suppress_dialog_mnemonics(dialog_wgt);
     XtDestroyWidget(dialog_wgt);
     vim_free(tofree);
 
-    if (browse_fname == NULL)
-	return NULL;
-    return vim_strsave((char_u *)browse_fname);
+    ఒకవేళ (browse_fname == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి vim_strsave((char_u *)browse_fname);
 }
 
 /*
@@ -2312,218 +2312,218 @@ gui_mch_browse(
 /*
  * Process callback from Dialog cancel actions.
  */
-    static void
+    స్థిర శూన్య
 DialogCancelCB(
-    Widget	w UNUSED,		//  widget id
-    XtPointer	client_data UNUSED,	//  data from application
-    XtPointer	call_data UNUSED)	//  data from widget class
+    Widget	w వాడని,		//  widget id
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,	//  data from application
+    Xt_సూచిక	call_దత్తాంశం వాడని)	//  data from widget class
 {
-    if (browse_fname != NULL)
+    ఒకవేళ (browse_fname != ఖాళీ)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = ఖాళీ;
     }
-    XtUnmanageChild(dialog_wgt);
+    Xt_Unmanage_బిడ్డ(dialog_wgt);
 }
 
 /*
  * Process callback from Dialog actions.
  */
-    static void
+    స్థిర శూన్య
 DialogAcceptCB(
-    Widget	w UNUSED,		//  widget id
-    XtPointer	client_data UNUSED,	//  data from application
-    XtPointer	call_data)		//  data from widget class
+    Widget	w వాడని,		//  widget id
+    Xt_సూచిక	client_దత్తాంశం_2 వాడని,	//  data from application
+    Xt_సూచిక	call_దత్తాంశం)		//  data from widget class
 {
     XmFileSelectionBoxCallbackStruct *fcb;
 
-    if (browse_fname != NULL)
+    ఒకవేళ (browse_fname != ఖాళీ)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = ఖాళీ;
     }
-    fcb = (XmFileSelectionBoxCallbackStruct *)call_data;
+    fcb = (XmFileSelectionBoxCallbackStruct *)call_దత్తాంశం;
 
     // get the filename from the file selection box
-    XmStringGetLtoR(fcb->value, charset, &browse_fname);
+    XmStringGetLtoR(fcb->విలువ, charset, &browse_fname);
 
     // popdown the file selection box
-    XtUnmanageChild(dialog_wgt);
+    Xt_Unmanage_బిడ్డ(dialog_wgt);
 }
 
-#endif // FEAT_BROWSE
+#అయితే_ముగింపు // FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 
-static int	dialogStatus;
+స్థిర పూర్ణాంకం	dialog_స్థితి;
 
 /*
  * Callback function for the textfield.  When CR is hit this works like
  * hitting the "OK" button, ESC like "Cancel".
  */
-    static void
+    స్థిర శూన్య
 keyhit_callback(
     Widget		w,
-    XtPointer		client_data UNUSED,
+    Xt_సూచిక		client_దత్తాంశం_2 వాడని,
     XEvent		*event,
-    Boolean		*cont UNUSED)
+    Boolean		*cont వాడని)
 {
-    char	buf[2];
-    KeySym	key_sym;
+    అక్షరం	buf[2];
+    కీలకం_Sym	కీలకం_sym;
 
-    if (XLookupString(&(event->xkey), buf, 2, &key_sym, NULL) == 1)
+    ఒకవేళ (XLookupString(&(event->xkey), buf, 2, &కీలకం_sym, ఖాళీ) == 1)
     {
-	if (*buf == CAR)
-	    dialogStatus = 1;
-	else if (*buf == ESC)
-	    dialogStatus = 2;
+	ఒకవేళ (*buf == CAR)
+	    dialog_స్థితి = 1;
+	లేకపోతే ఒకవేళ (*buf == ESC)
+	    dialog_స్థితి = 2;
     }
-    if ((key_sym == XK_Left || key_sym == XK_Right)
-	    && !(event->xkey.state & ShiftMask))
-	XmTextFieldClearSelection(w, XtLastTimestampProcessed(gui.dpy));
+    ఒకవేళ ((కీలకం_sym == XK_ఎడమ || కీలకం_sym == XK_కుడి)
+	    && !(event->xkey.state & జరుపు_ముసుగు))
+	Xm_పాఠ్యం_క్షేత్రం_Clear_Selection(w, Xt_చివరి_Timestamp_Processed(gui.dpy));
 }
 
-    static void
+    స్థిర శూన్య
 butproc(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    dialogStatus = (int)(long)client_data + 1;
+    dialog_స్థితి = (పూర్ణాంకం)(దీర్ఘ)client_దత్తాంశం_2 + 1;
 }
 
 # ifdef HAVE_XPM
 
-    static Widget
+    స్థిర Widget
 create_pixmap_label(
-    Widget	parent,
+    Widget	మాతృ,
     String	name,
-    char	**data,
-    ArgList	args,
+    అక్షరం	**దత్తాంశం,
+    ArgList	వాదనలు,
     Cardinal	arg)
 {
     Widget		label;
     Display		*dsp;
     Screen		*scr;
-    int			depth;
+    పూర్ణాంకం			లోతు;
     Pixmap		pixmap = 0;
-    XpmAttributes	attr;
+    Xpm_లక్షణాలు	attr;
     Boolean		rs;
-    XpmColorSymbol	color[5] =
+    Xpm_Color_చిహ్నం	color[5] =
     {
-	{"none", NULL, 0},
-	{"iconColor1", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"selectColor", NULL, 0}
+	{"none", ఖాళీ, 0},
+	{"iconColor1", ఖాళీ, 0},
+	{"bottomShadowColor", ఖాళీ, 0},
+	{"topShadowColor", ఖాళీ, 0},
+	{"selectColor", ఖాళీ, 0}
     };
 
-    label = XmCreateLabelGadget(parent, name, args, arg);
+    label = XmCreateLabelGadget(మాతృ, name, వాదనలు, arg);
 
     /*
      * We need to be careful here, since in case of gadgets, there is
      * no way to get the background color directly from the widget itself.
      * In such cases we get it from The Core part of his parent instead.
      */
-    dsp = XtDisplayOfObject(label);
-    scr = XtScreenOfObject(label);
-    XtVaGetValues(XtIsSubclass(label, coreWidgetClass)
-	    ?  label : XtParent(label),
-		  XmNdepth, &depth,
+    dsp = Xt_Display_యొక్క_Object(label);
+    scr = Xt_Screen_యొక్క_Object(label);
+    Xt_Va_Get_విలువలు(XtIsSubclass(label, coreWidgetClass)
+	    ?  label : Xt_మాతృ(label),
+		  XmNdepth, &లోతు,
 		  XmNbackground, &color[0].pixel,
 		  XmNforeground, &color[1].pixel,
 		  XmNbottomShadowColor, &color[2].pixel,
 		  XmNtopShadowColor, &color[3].pixel,
 		  XmNhighlight, &color[4].pixel,
-		  NULL);
+		  ఖాళీ);
 
-    attr.valuemask = XpmColorSymbols | XpmCloseness | XpmDepth;
+    attr.valuemask = XpmColorSymbols | XpmCloseness | Xpm_లోతు;
     attr.colorsymbols = color;
     attr.numsymbols = 5;
     attr.closeness = 65535;
-    attr.depth = depth;
-    XpmCreatePixmapFromData(dsp, RootWindowOfScreen(scr),
-		    data, &pixmap, NULL, &attr);
+    attr.లోతు = లోతు;
+    Xpm_Create_Pixmap_From_దత్తాంశం(dsp, మూలం_కిటికీ_యొక్క_Screen(scr),
+		    దత్తాంశం, &pixmap, ఖాళీ, &attr);
 
-    XtVaGetValues(label, XmNrecomputeSize, &rs, NULL);
-    XtVaSetValues(label, XmNrecomputeSize, True, NULL);
-    XtVaSetValues(label,
+    Xt_Va_Get_విలువలు(label, Xm_Nrecompute_కొలత, &rs, ఖాళీ);
+    Xt_Va_సమితి_విలువలు(label, Xm_Nrecompute_కొలత, True, ఖాళీ);
+    Xt_Va_సమితి_విలువలు(label,
 	    XmNlabelType, XmPIXMAP,
 	    XmNlabelPixmap, pixmap,
-	    NULL);
-    XtVaSetValues(label, XmNrecomputeSize, rs, NULL);
+	    ఖాళీ);
+    Xt_Va_సమితి_విలువలు(label, Xm_Nrecompute_కొలత, rs, ఖాళీ);
 
-    return label;
+    తిరిగి label;
 }
 # endif
 
-    int
+    పూర్ణాంకం
 gui_mch_dialog(
-    int		type UNUSED,
+    పూర్ణాంకం		type వాడని,
     char_u	*title,
-    char_u	*message,
-    char_u	*button_names,
-    int		dfltbutton,
+    char_u	*సందేశం_2,
+    char_u	*button_పేర్లు,
+    పూర్ణాంకం		dfltbutton,
     char_u	*textfield,		// buffer of size IOSIZE
-    int		ex_cmd UNUSED)
+    పూర్ణాంకం		ex_cmd వాడని)
 {
     char_u		*buts;
-    char_u		*p, *next;
+    char_u		*p, *తదుపరి;
     XtAppContext	app;
     XmString		label;
-    int			butcount;
+    పూర్ణాంకం			butcount;
     Widget		w;
-    Widget		dialogform = NULL;
-    Widget		form = NULL;
-    Widget		dialogtextfield = NULL;
+    Widget		dialogform = ఖాళీ;
+    Widget		form = ఖాళీ;
+    Widget		dialogtextfield = ఖాళీ;
     Widget		*buttons;
-    Widget		sep_form = NULL;
+    Widget		sep_form = ఖాళీ;
     Boolean		vertical;
-    Widget		separator = NULL;
-    int			n;
-    Arg			args[6];
+    Widget		separator = ఖాళీ;
+    పూర్ణాంకం			n;
+    Arg			వాదనలు[6];
 # ifdef HAVE_XPM
-    char		**icon_data = NULL;
-    Widget		dialogpixmap = NULL;
+    అక్షరం		**icon_దత్తాంశం_2 = ఖాళీ;
+    Widget		dialogpixmap = ఖాళీ;
 # endif
 
-    if (title == NULL)
+    ఒకవేళ (title == ఖాళీ)
 	title = (char_u *)_("Vim dialog");
 
     // if our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
-    dialogform = XmCreateFormDialog(vimShell, (char *)"dialog", NULL, 0);
+    dialogform = XmCreateFormDialog(vimShell, (అక్షరం *)"dialog", ఖాళీ, 0);
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL);
+    vertical = (vim_strchr(p_go, GO_VERTICAL) != ఖాళీ);
 
     // Set the title of the Dialog window
-    label = XmStringCreateSimple((char *)title);
-    if (label == NULL)
-	return -1;
-    XtVaSetValues(dialogform,
+    label = XmStringCreateSimple((అక్షరం *)title);
+    ఒకవేళ (label == ఖాళీ)
+	తిరిగి -1;
+    Xt_Va_సమితి_విలువలు(dialogform,
 	    XmNdialogTitle, label,
 	    XmNhorizontalSpacing, 4,
 	    XmNverticalSpacing, vertical ? 0 : 4,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(label);
 
     // make a copy, so that we can insert NULs
-    buts = vim_strsave(button_names);
-    if (buts == NULL)
-	return -1;
+    buts = vim_strsave(button_పేర్లు);
+    ఒకవేళ (buts == ఖాళీ)
+	తిరిగి -1;
 
     // Count the number of buttons and allocate buttons[].
     butcount = 1;
-    for (p = buts; *p; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    కొరకు (p = buts; *p; ++p)
+	ఒకవేళ (*p == DLG_BUTTON_SEP)
 	    ++butcount;
     buttons = ALLOC_MULT(Widget, butcount);
-    if (buttons == NULL)
+    ఒకవేళ (buttons == ఖాళీ)
     {
 	vim_free(buts);
-	return -1;
+	తిరిగి -1;
     }
 
     /*
@@ -2531,60 +2531,60 @@ gui_mch_dialog(
      */
     sep_form = (Widget) 0;
     p = buts;
-    for (butcount = 0; *p; ++butcount)
+    కొరకు (butcount = 0; *p; ++butcount)
     {
-	KeySym mnemonic = NUL;
+	కీలకం_Sym mnemonic = NUL;
 
-	for (next = p; *next; ++next)
+	కొరకు (తదుపరి = p; *తదుపరి; ++తదుపరి)
 	{
-	    if (*next == DLG_HOTKEY_CHAR)
+	    ఒకవేళ (*తదుపరి == DLG_HOTKEY_CHAR)
 	    {
-		int len = STRLEN(next);
+		పూర్ణాంకం len = STRLEN(తదుపరి);
 
-		if (len > 0)
+		ఒకవేళ (len > 0)
 		{
-		    mch_memmove(next, next + 1, len);
-		    mnemonic = next[0];
+		    mch_memmove(తదుపరి, తదుపరి + 1, len);
+		    mnemonic = తదుపరి[0];
 		}
 	    }
-	    if (*next == DLG_BUTTON_SEP)
+	    ఒకవేళ (*తదుపరి == DLG_BUTTON_SEP)
 	    {
-		*next++ = NUL;
-		break;
+		*తదుపరి++ = NUL;
+		ఆపు;
 	    }
 	}
-	label = XmStringCreate(_((char *)p), STRING_TAG);
-	if (label == NULL)
-	    break;
+	label = XmStringCreate(_((అక్షరం *)p), STRING_ట్యాగ్);
+	ఒకవేళ (label == ఖాళీ)
+	    ఆపు;
 
 	buttons[butcount] = XtVaCreateManagedWidget("button",
-		xmPushButtonWidgetClass, dialogform,
+		xm_నెట్టు_Button_Widget_Class, dialogform,
 		XmNlabelString, label,
 		XmNmnemonic, mnemonic,
 		XmNbottomAttachment, XmATTACH_FORM,
-		XmNbottomOffset, 4,
+		Xm_Nbottom_స్థానభ్రంశం, 4,
 		XmNshowAsDefault, butcount == dfltbutton - 1,
 		XmNdefaultButtonShadowThickness, 1,
-		NULL);
+		ఖాళీ);
 	XmStringFree(label);
 	gui_motif_menu_fontlist(buttons[butcount]);
 
 	// Layout properly.
 
-	if (butcount > 0)
+	ఒకవేళ (butcount > 0)
 	{
-	    if (vertical)
-		XtVaSetValues(buttons[butcount],
+	    ఒకవేళ (vertical)
+		Xt_Va_సమితి_విలువలు(buttons[butcount],
 			XmNtopWidget, buttons[butcount - 1],
-			NULL);
-	    else
+			ఖాళీ);
+	    లేకపోతే
 	    {
-		if (*next == NUL)
+		ఒకవేళ (*తదుపరి == NUL)
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_సమితి_విలువలు(buttons[butcount],
 			    XmNrightAttachment, XmATTACH_FORM,
-			    XmNrightOffset, 4,
-			    NULL);
+			    Xm_Nright_స్థానభ్రంశం, 4,
+			    ఖాళీ);
 
 		    // fill in a form as invisible separator
 		    sep_form = XtVaCreateWidget("separatorForm",
@@ -2594,90 +2594,90 @@ gui_mch_dialog(
 			    XmNrightAttachment, XmATTACH_WIDGET,
 			    XmNrightWidget, buttons[butcount],
 			    XmNbottomAttachment, XmATTACH_FORM,
-			    XmNbottomOffset, 4,
-			    NULL);
-		    XtManageChild(sep_form);
+			    Xm_Nbottom_స్థానభ్రంశం, 4,
+			    ఖాళీ);
+		    Xt_Manage_బిడ్డ(sep_form);
 		}
-		else
+		లేకపోతే
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_సమితి_విలువలు(buttons[butcount],
 			    XmNleftAttachment, XmATTACH_WIDGET,
 			    XmNleftWidget, buttons[butcount - 1],
-			    NULL);
+			    ఖాళీ);
 		}
 	    }
 	}
-	else if (!vertical)
+	లేకపోతే ఒకవేళ (!vertical)
 	{
-	    if (*next == NUL)
+	    ఒకవేళ (*తదుపరి == NUL)
 	    {
-		XtVaSetValues(buttons[0],
+		Xt_Va_సమితి_విలువలు(buttons[0],
 			XmNrightAttachment, XmATTACH_FORM,
-			XmNrightOffset, 4,
-			NULL);
+			Xm_Nright_స్థానభ్రంశం, 4,
+			ఖాళీ);
 
 		// fill in a form as invisible separator
 		sep_form = XtVaCreateWidget("separatorForm",
 			xmFormWidgetClass, dialogform,
 			XmNleftAttachment, XmATTACH_FORM,
-			XmNleftOffset, 4,
+			Xm_Nleft_స్థానభ్రంశం, 4,
 			XmNrightAttachment, XmATTACH_WIDGET,
 			XmNrightWidget, buttons[0],
 			XmNbottomAttachment, XmATTACH_FORM,
-			XmNbottomOffset, 4,
-			NULL);
-		XtManageChild(sep_form);
+			Xm_Nbottom_స్థానభ్రంశం, 4,
+			ఖాళీ);
+		Xt_Manage_బిడ్డ(sep_form);
 	    }
-	    else
-		XtVaSetValues(buttons[0],
+	    లేకపోతే
+		Xt_Va_సమితి_విలువలు(buttons[0],
 			XmNleftAttachment, XmATTACH_FORM,
-			XmNleftOffset, 4,
-			NULL);
+			Xm_Nleft_స్థానభ్రంశం, 4,
+			ఖాళీ);
 	}
 
-	XtAddCallback(buttons[butcount], XmNactivateCallback,
-			  (XtCallbackProc)butproc, (XtPointer)(long)butcount);
-	p = next;
+	Xt_కూడు_Callback(buttons[butcount], XmNactivateCallback,
+			  (XtCallbackProc)butproc, (Xt_సూచిక)(దీర్ఘ)butcount);
+	p = తదుపరి;
     }
     vim_free(buts);
 
     separator = (Widget) 0;
-    if (butcount > 0)
+    ఒకవేళ (butcount > 0)
     {
 	// Create the separator for beauty.
 	n = 0;
-	XtSetArg(args[n], XmNorientation, XmHORIZONTAL); n++;
-	XtSetArg(args[n], XmNbottomAttachment, XmATTACH_WIDGET); n++;
-	XtSetArg(args[n], XmNbottomWidget, buttons[0]); n++;
-	XtSetArg(args[n], XmNbottomOffset, 4); n++;
-	XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	separator = XmCreateSeparatorGadget(dialogform, "separator", args, n);
-	XtManageChild(separator);
+	Xt_సమితి_Arg(వాదనలు[n], XmNorientation, XmHORIZONTAL); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_WIDGET); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNbottomWidget, buttons[0]); n++;
+	Xt_సమితి_Arg(వాదనలు[n], Xm_Nbottom_స్థానభ్రంశం, 4); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	separator = XmCreateSeparatorGadget(dialogform, "separator", వాదనలు, n);
+	Xt_Manage_బిడ్డ(separator);
     }
 
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
     {
 	dialogtextfield = XtVaCreateWidget("textField",
-		xmTextFieldWidgetClass, dialogform,
+		xm_పాఠ్యం_క్షేత్రం_Widget_Class, dialogform,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	if (butcount > 0)
-	    XtVaSetValues(dialogtextfield,
+		ఖాళీ);
+	ఒకవేళ (butcount > 0)
+	    Xt_Va_సమితి_విలువలు(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(dialogtextfield,
+		    ఖాళీ);
+	లేకపోతే
+	    Xt_Va_సమితి_విలువలు(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ఖాళీ);
 
-	set_fontlist(dialogtextfield);
-	XmTextFieldSetString(dialogtextfield, (char *)textfield);
-	XtManageChild(dialogtextfield);
-	XtAddEventHandler(dialogtextfield, KeyPressMask, False,
-			    (XtEventHandler)keyhit_callback, (XtPointer)NULL);
+	సమితి_fontlist(dialogtextfield);
+	Xm_పాఠ్యం_క్షేత్రం_సమితి_String(dialogtextfield, (అక్షరం *)textfield);
+	Xt_Manage_బిడ్డ(dialogtextfield);
+	Xt_కూడు_Event_Handler(dialogtextfield, కీలకం_Press_ముసుగు, False,
+			    (XtEventHandler)keyhit_callback, (Xt_సూచిక)ఖాళీ);
     }
 
     // Form holding both message and pixmap labels
@@ -2686,43 +2686,43 @@ gui_mch_dialog(
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    NULL);
-    XtManageChild(form);
+	    ఖాళీ);
+    Xt_Manage_బిడ్డ(form);
 
 # ifdef HAVE_XPM
     // Add a pixmap, left of the message.
-    switch (type)
+    ఎంపిక (type)
     {
-	case VIM_GENERIC:
-	    icon_data = generic_xpm;
-	    break;
-	case VIM_ERROR:
-	    icon_data = error_xpm;
-	    break;
-	case VIM_WARNING:
-	    icon_data = alert_xpm;
-	    break;
-	case VIM_INFO:
-	    icon_data = info_xpm;
-	    break;
-	case VIM_QUESTION:
-	    icon_data = quest_xpm;
-	    break;
-	default:
-	    icon_data = generic_xpm;
+	స్థితి VIM_GENERIC:
+	    icon_దత్తాంశం_2 = generic_xpm;
+	    ఆపు;
+	స్థితి VIM_ERROR:
+	    icon_దత్తాంశం_2 = error_xpm;
+	    ఆపు;
+	స్థితి VIM_WARNING:
+	    icon_దత్తాంశం_2 = alert_xpm;
+	    ఆపు;
+	స్థితి VIM_INFO:
+	    icon_దత్తాంశం_2 = info_xpm;
+	    ఆపు;
+	స్థితి VIM_QUESTION:
+	    icon_దత్తాంశం_2 = quest_xpm;
+	    ఆపు;
+	అప్రమేయ:
+	    icon_దత్తాంశం_2 = generic_xpm;
     }
 
     n = 0;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNtopOffset, 8); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNbottomOffset, 8); n++;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNleftOffset, 8); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Ntop_స్థానభ్రంశం, 8); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nbottom_స్థానభ్రంశం, 8); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nleft_స్థానభ్రంశం, 8); n++;
 
     dialogpixmap = create_pixmap_label(form, "dialogPixmap",
-	    icon_data, args, n);
-    XtManageChild(dialogpixmap);
+	    icon_దత్తాంశం_2, వాదనలు, n);
+    Xt_Manage_బిడ్డ(dialogpixmap);
 # endif
 
     // Create the dialog message.
@@ -2730,255 +2730,255 @@ gui_mch_dialog(
     // properly localized string, we use LtoR here. The symptom is that the
     // string is not shown properly in multiple lines as it does in native
     // Motif.
-    label = XmStringCreateLtoR((char *)message, STRING_TAG);
-    if (label == NULL)
+    label = XmStringCreateLtoR((అక్షరం *)సందేశం_2, STRING_ట్యాగ్);
+    ఒకవేళ (label == ఖాళీ)
     {
 	vim_free(buttons);
-	return -1;
+	తిరిగి -1;
     }
     w = XtVaCreateManagedWidget("dialogMessage",
 				xmLabelGadgetClass, form,
 				XmNlabelString, label,
 				XmNalignment, XmALIGNMENT_BEGINNING,
 				XmNtopAttachment, XmATTACH_FORM,
-				XmNtopOffset, 8,
+				Xm_Ntop_స్థానభ్రంశం, 8,
 # ifdef HAVE_XPM
 				XmNleftAttachment, XmATTACH_WIDGET,
 				XmNleftWidget, dialogpixmap,
-# else
+# లేకపోతే
 				XmNleftAttachment, XmATTACH_FORM,
 # endif
-				XmNleftOffset, 8,
+				Xm_Nleft_స్థానభ్రంశం, 8,
 				XmNrightAttachment, XmATTACH_FORM,
-				XmNrightOffset, 8,
+				Xm_Nright_స్థానభ్రంశం, 8,
 				XmNbottomAttachment, XmATTACH_FORM,
-				XmNbottomOffset, 8,
-				NULL);
+				Xm_Nbottom_స్థానభ్రంశం, 8,
+				ఖాళీ);
     XmStringFree(label);
-    set_fontlist(w);
+    సమితి_fontlist(w);
 
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
     {
-	XtVaSetValues(form,
+	Xt_Va_సమితి_విలువలు(form,
 		XmNbottomAttachment, XmATTACH_WIDGET,
 		XmNbottomWidget, dialogtextfield,
-		NULL);
+		ఖాళీ);
     }
-    else
+    లేకపోతే
     {
-	if (butcount > 0)
-	    XtVaSetValues(form,
+	ఒకవేళ (butcount > 0)
+	    Xt_Va_సమితి_విలువలు(form,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(form,
+		    ఖాళీ);
+	లేకపోతే
+	    Xt_Va_సమితి_విలువలు(form,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ఖాళీ);
     }
 
-    if (dfltbutton < 1)
+    ఒకవేళ (dfltbutton < 1)
 	dfltbutton = 1;
-    if (dfltbutton > butcount)
+    ఒకవేళ (dfltbutton > butcount)
 	dfltbutton = butcount;
-    XtVaSetValues(dialogform,
-	    XmNdefaultButton, buttons[dfltbutton - 1], NULL);
-    if (textfield != NULL)
-	XtVaSetValues(dialogform, XmNinitialFocus, dialogtextfield, NULL);
-    else
-	XtVaSetValues(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
-									NULL);
+    Xt_Va_సమితి_విలువలు(dialogform,
+	    XmNdefaultButton, buttons[dfltbutton - 1], ఖాళీ);
+    ఒకవేళ (textfield != ఖాళీ)
+	Xt_Va_సమితి_విలువలు(dialogform, XmNinitialFocus, dialogtextfield, ఖాళీ);
+    లేకపోతే
+	Xt_Va_సమితి_విలువలు(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
+									ఖాళీ);
 
     manage_centered(dialogform);
     activate_dialog_mnemonics(dialogform);
 
-    if (textfield != NULL && *textfield != NUL)
+    ఒకవేళ (textfield != ఖాళీ && *textfield != NUL)
     {
 	// This only works after the textfield has been realised.
-	XmTextFieldSetSelection(dialogtextfield,
-			 (XmTextPosition)0, (XmTextPosition)STRLEN(textfield),
-					   XtLastTimestampProcessed(gui.dpy));
-	XmTextFieldSetCursorPosition(dialogtextfield,
-					   (XmTextPosition)STRLEN(textfield));
+	Xm_పాఠ్యం_క్షేత్రం_సమితి_Selection(dialogtextfield,
+			 (Xm_పాఠ్యం_Position)0, (Xm_పాఠ్యం_Position)STRLEN(textfield),
+					   Xt_చివరి_Timestamp_Processed(gui.dpy));
+	Xm_పాఠ్యం_క్షేత్రం_సమితి_Cursor_Position(dialogtextfield,
+					   (Xm_పాఠ్యం_Position)STRLEN(textfield));
     }
 
-    app = XtWidgetToApplicationContext(dialogform);
+    app = Xt_Widget_గమ్యం_Application_Context(dialogform);
 
     // Loop until a button is pressed or the dialog is killed somehow.
-    dialogStatus = -1;
-    for (;;)
+    dialog_స్థితి = -1;
+    కొరకు (;;)
     {
-	XtAppProcessEvent(app, (XtInputMask)XtIMAll);
-	if (dialogStatus >= 0 || !XtIsManaged(dialogform))
-	    break;
+	XtAppProcessEvent(app, (Xt_ఆదానం_ముసుగు)XtIMAll);
+	ఒకవేళ (dialog_స్థితి >= 0 || !XtIsManaged(dialogform))
+	    ఆపు;
     }
 
     vim_free(buttons);
 
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
     {
-	p = (char_u *)XmTextGetString(dialogtextfield);
-	if (p == NULL || dialogStatus < 0)
+	p = (char_u *)Xm_పాఠ్యం_Get_String(dialogtextfield);
+	ఒకవేళ (p == ఖాళీ || dialog_స్థితి < 0)
 	    *textfield = NUL;
-	else
+	లేకపోతే
 	    vim_strncpy(textfield, p, IOSIZE - 1);
-	XtFree((char *)p);
+	XtFree((అక్షరం *)p);
     }
 
     suppress_dialog_mnemonics(dialogform);
     XtDestroyWidget(dialogform);
 
-    return dialogStatus;
+    తిరిగి dialog_స్థితి;
 }
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ఒకవేళ defined(FEAT_TOOLBAR)
+    శూన్య
+gui_mch_show_toolbar(పూర్ణాంకం showit)
 {
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	అంకె_Children;	    // how many children toolBar has
 
-    if (toolBar == (Widget)0)
-	return;
-    XtVaGetValues(toolBar, XmNnumChildren, &numChildren, NULL);
-    if (showit && numChildren > 0)
+    ఒకవేళ (toolBar == (Widget)0)
+	తిరిగి;
+    Xt_Va_Get_విలువలు(toolBar, XmNnumChildren, &అంకె_Children, ఖాళీ);
+    ఒకవేళ (showit && అంకె_Children > 0)
     {
 	// Assume that we want to show the toolbar if p_toolbar contains
 	// valid option settings, therefore p_toolbar must not be NULL.
 	WidgetList  children;
 
-	XtVaGetValues(toolBar, XmNchildren, &children, NULL);
+	Xt_Va_Get_విలువలు(toolBar, XmNchildren, &children, ఖాళీ);
 	{
-	    void    (*action)(BalloonEval *);
-	    int	    text = 0;
+	    శూన్య    (*action)(BalloonEval *);
+	    పూర్ణాంకం	    పాఠ్యం = 0;
 
-	    if (strstr((const char *)p_toolbar, "tooltips"))
+	    ఒకవేళ (అక్షరశ్రేణి_శోధన((స్థిరరాశి అక్షరం *)p_toolbar, "tooltips"))
 		action = &gui_mch_enable_beval_area;
-	    else
+	    లేకపోతే
 		action = &gui_mch_disable_beval_area;
-	    if (strstr((const char *)p_toolbar, "text"))
-		text = 1;
-	    else if (strstr((const char *)p_toolbar, "icons"))
-		text = -1;
-	    if (text != 0)
+	    ఒకవేళ (అక్షరశ్రేణి_శోధన((స్థిరరాశి అక్షరం *)p_toolbar, "text"))
+		పాఠ్యం = 1;
+	    లేకపోతే ఒకవేళ (అక్షరశ్రేణి_శోధన((స్థిరరాశి అక్షరం *)p_toolbar, "icons"))
+		పాఠ్యం = -1;
+	    ఒకవేళ (పాఠ్యం != 0)
 	    {
 		vimmenu_T   *toolbar;
 		vimmenu_T   *cur;
 
 		FOR_ALL_MENUS(toolbar)
-		    if (menu_is_toolbar(toolbar->dname))
-			break;
+		    ఒకవేళ (menu_is_toolbar(toolbar->dname))
+			ఆపు;
 		// Assumption: toolbar is NULL if there is no toolbar,
 		//	       otherwise it contains the toolbar menu structure.
 		//
 		// Assumption: "numChildren" == the number of items in the list
 		//	       of items beginning with toolbar->children.
-		if (toolbar)
+		ఒకవేళ (toolbar)
 		{
-		    for (cur = toolbar->children; cur; cur = cur->next)
+		    కొరకు (cur = toolbar->children; cur; cur = cur->తదుపరి)
 		    {
-			Arg	    args[1];
-			int	    n = 0;
+			Arg	    వాదనలు[1];
+			పూర్ణాంకం	    n = 0;
 
 			// Enable/Disable tooltip (OK to enable while
 			// currently enabled).
-			if (cur->tip != NULL)
+			ఒకవేళ (cur->tip != ఖాళీ)
 			    (*action)(cur->tip);
-			if (!menu_is_separator(cur->name))
+			ఒకవేళ (!menu_is_separator(cur->name))
 			{
-			    if (text == 1 || cur->xpm == NULL)
+			    ఒకవేళ (పాఠ్యం == 1 || cur->xpm == ఖాళీ)
 			    {
-				XtSetArg(args[n], XmNlabelType, XmSTRING);
+				Xt_సమితి_Arg(వాదనలు[n], XmNlabelType, XmSTRING);
 				++n;
 			    }
-			    if (cur->id != NULL)
+			    ఒకవేళ (cur->id != ఖాళీ)
 			    {
-				XtUnmanageChild(cur->id);
-				XtSetValues(cur->id, args, n);
-				XtManageChild(cur->id);
+				Xt_Unmanage_బిడ్డ(cur->id);
+				Xt_సమితి_విలువలు(cur->id, వాదనలు, n);
+				Xt_Manage_బిడ్డ(cur->id);
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	gui.toolbar_height = gui_mch_compute_toolbar_height();
-	XtManageChild(XtParent(toolBar));
+	gui.toolbar_ఎత్తు = gui_mch_compute_toolbar_ఎత్తు();
+	Xt_Manage_బిడ్డ(Xt_మాతృ(toolBar));
 # ifdef FEAT_GUI_TABLINE
-	if (showing_tabline)
+	ఒకవేళ (showing_tabline)
 	{
-	    XtVaSetValues(tabLine,
+	    Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	    XtVaSetValues(textAreaForm,
+			  XmNtopWidget, Xt_మాతృ(toolBar),
+			  ఖాళీ);
+	    Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_పంక్తి,
+			  ఖాళీ);
 	}
-	else
+	లేకపోతే
 # endif
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	if (XtIsManaged(menuBar))
-	    XtVaSetValues(XtParent(toolBar),
+			  XmNtopWidget, Xt_మాతృ(toolBar),
+			  ఖాళీ);
+	ఒకవేళ (XtIsManaged(menuBar))
+	    Xt_Va_సమితి_విలువలు(Xt_మాతృ(toolBar),
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, menuBar,
-		    NULL);
-	else
-	    XtVaSetValues(XtParent(toolBar),
+		    ఖాళీ);
+	లేకపోతే
+	    Xt_Va_సమితి_విలువలు(Xt_మాతృ(toolBar),
 		    XmNtopAttachment, XmATTACH_FORM,
-		    NULL);
+		    ఖాళీ);
     }
-    else
+    లేకపోతే
     {
-	gui.toolbar_height = 0;
-	if (XtIsManaged(menuBar))
+	gui.toolbar_ఎత్తు = 0;
+	ఒకవేళ (XtIsManaged(menuBar))
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      ఖాళీ);
 	}
-	else
+	లేకపోతే
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ఒకవేళ (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ఖాళీ);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_పంక్తి,
+			      ఖాళీ);
 	    }
-	    else
+	    లేకపోతే
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      ఖాళీ);
 	}
 
-	XtUnmanageChild(XtParent(toolBar));
+	Xt_Unmanage_బిడ్డ(Xt_మాతృ(toolBar));
     }
-    gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
+    gui_సమితి_shellsize(FALSE, FALSE, RESIZE_VERT);
 }
 
 /*
@@ -2986,61 +2986,61 @@ gui_mch_show_toolbar(int showit)
  * such that the user can type page up/down etc. and have the
  * input go to the editor window, not the button
  */
-    static void
-reset_focus(void)
+    స్థిర శూన్య
+reset_focus(శూన్య)
 {
-    if (textArea != NULL)
-	XmProcessTraversal(textArea, XmTRAVERSE_CURRENT);
+    ఒకవేళ (పాఠ్యం_Area != ఖాళీ)
+	XmProcessTraversal(పాఠ్యం_Area, XmTRAVERSE_CURRENT);
 }
 
-    int
-gui_mch_compute_toolbar_height(void)
+    పూర్ణాంకం
+gui_mch_compute_toolbar_ఎత్తు(శూన్య)
 {
     Dimension	borders;
-    Dimension	height;		    // total Toolbar height
+    Dimension	ఎత్తు;		    // total Toolbar height
     Dimension	whgt;		    // height of each widget
     WidgetList	children;	    // list of toolBar's children
-    Cardinal	numChildren;	    // how many children toolBar has
-    int		i;
+    Cardinal	అంకె_Children;	    // how many children toolBar has
+    పూర్ణాంకం		i;
 
     borders = 0;
-    height = 0;
-    if (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
+    ఎత్తు = 0;
+    ఒకవేళ (toolBar != (Widget)0 && tool_Bar_చట్రం != (Widget)0)
     {				    // get height of XmFrame parent
 	Dimension	fst;
 	Dimension	fmh;
 	Dimension	tst;
 	Dimension	tmh;
 
-	XtVaGetValues(toolBarFrame,
+	Xt_Va_Get_విలువలు(tool_Bar_చట్రం,
 		XmNshadowThickness, &fst,
-		XmNmarginHeight, &fmh,
-		NULL);
+		Xm_Nmargin_ఎత్తు, &fmh,
+		ఖాళీ);
 	borders += fst + fmh;
-	XtVaGetValues(toolBar,
+	Xt_Va_Get_విలువలు(toolBar,
 		XmNshadowThickness, &tst,
-		XmNmarginHeight, &tmh,
+		Xm_Nmargin_ఎత్తు, &tmh,
 		XmNchildren, &children,
-		XmNnumChildren, &numChildren, NULL);
+		XmNnumChildren, &అంకె_Children, ఖాళీ);
 	borders += tst + tmh;
-	for (i = 0; i < (int)numChildren; i++)
+	కొరకు (i = 0; i < (పూర్ణాంకం)అంకె_Children; i++)
 	{
 	    whgt = 0;
-	    XtVaGetValues(children[i], XmNheight, &whgt, NULL);
-	    if (height < whgt)
-		height = whgt;
+	    Xt_Va_Get_విలువలు(children[i], XmNheight, &whgt, ఖాళీ);
+	    ఒకవేళ (ఎత్తు < whgt)
+		ఎత్తు = whgt;
 	}
     }
-# ifdef LESSTIF_VERSION
+# ifdef LESSTIF_సంస్కరణ
     // Hack: When starting up we get wrong dimensions.
-    if (height < 10)
-	height = 24;
+    ఒకవేళ (ఎత్తు < 10)
+	ఎత్తు = 24;
 # endif
 
-    return (int)(height + (borders << 1));
+    తిరిగి (పూర్ణాంకం)(ఎత్తు + (borders << 1));
 }
 
-    void
+    శూన్య
 motif_get_toolbar_colors(
     Pixel       *bgp,
     Pixel       *fgp,
@@ -3048,75 +3048,75 @@ motif_get_toolbar_colors(
     Pixel       *tsp,
     Pixel       *hsp)
 {
-    XtVaGetValues(toolBar,
+    Xt_Va_Get_విలువలు(toolBar,
 	    XmNbackground, bgp,
 	    XmNforeground, fgp,
 	    XmNbottomShadowColor, bsp,
 	    XmNtopShadowColor, tsp,
 	    XmNhighlightColor, hsp,
-	    NULL);
+	    ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    శూన్య
+gui_mch_show_tabline(పూర్ణాంకం showit)
 {
-    if (tabLine == (Widget)0)
-	return;
+    ఒకవేళ (tab_పంక్తి == (Widget)0)
+	తిరిగి;
 
-    if (!showit != !showing_tabline)
+    ఒకవేళ (!showit != !showing_tabline)
     {
-	if (showit)
+	ఒకవేళ (showit)
 	{
-	    XtManageChild(tabLine);
-	    XtUnmanageChild(XtNameToWidget(tabLine, "PageScroller"));
-	    XtUnmanageChild(XtNameToWidget(tabLine, "MinorTabScrollerNext"));
-	    XtUnmanageChild(XtNameToWidget(tabLine,
+	    Xt_Manage_బిడ్డ(tab_పంక్తి);
+	    Xt_Unmanage_బిడ్డ(Xt_Name_గమ్యం_Widget(tab_పంక్తి, "PageScroller"));
+	    Xt_Unmanage_బిడ్డ(Xt_Name_గమ్యం_Widget(tab_పంక్తి, "MinorTabScrollerNext"));
+	    Xt_Unmanage_బిడ్డ(Xt_Name_గమ్యం_Widget(tab_పంక్తి,
 					   "MinorTabScrollerPrevious"));
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(tabLine,
+	    ఒకవేళ (XtIsManaged(Xt_మాతృ(toolBar)))
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, Xt_మాతృ(toolBar), ఖాళీ);
+	    లేకపోతే
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(tabLine,
+		ఒకవేళ (XtIsManaged(menuBar))
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, ఖాళీ);
+	    లేకపోతే
 # endif
-		XtVaSetValues(tabLine,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
-	    XtVaSetValues(textAreaForm,
+		Xt_Va_సమితి_విలువలు(tab_పంక్తి,
+			      XmNtopAttachment, XmATTACH_FORM, ఖాళీ);
+	    Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_పంక్తి,
+			  ఖాళీ);
 	}
-	else
+	లేకపోతే
 	{
-	    XtUnmanageChild(tabLine);
+	    Xt_Unmanage_బిడ్డ(tab_పంక్తి);
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(textAreaForm,
+	    ఒకవేళ (XtIsManaged(Xt_మాతృ(toolBar)))
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, Xt_మాతృ(toolBar), ఖాళీ);
+	    లేకపోతే
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(textAreaForm,
+		ఒకవేళ (XtIsManaged(menuBar))
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, ఖాళీ);
+	    లేకపోతే
 # endif
-		XtVaSetValues(textAreaForm,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
+		Xt_Va_సమితి_విలువలు(పాఠ్యం_Area_Form,
+			      XmNtopAttachment, XmATTACH_FORM, ఖాళీ);
 	}
 	showing_tabline = showit;
     }
@@ -3125,209 +3125,209 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    పూర్ణాంకం
+gui_mch_showing_tabline(శూన్య)
 {
-    return tabLine != (Widget)0 && showing_tabline;
+    తిరిగి tab_పంక్తి != (Widget)0 && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    శూన్య
+gui_mch_update_tabline(శూన్య)
 {
     tabpage_T		*tp;
-    int			nr = 1, n;
-    Arg			args[10];
-    int			curtabidx = 0, currentpage;
+    పూర్ణాంకం			nr = 1, n;
+    Arg			వాదనలు[10];
+    పూర్ణాంకం			curtabidx = 0, currentpage;
     Widget		tab;
-    XmNotebookPageInfo	page_info;
-    XmNotebookPageStatus page_status;
-    int			last_page, tab_count;
+    Xm_Notebook_పుట_Info	పుట_info;
+    Xm_Notebook_పుట_స్థితి పుట_స్థితి;
+    పూర్ణాంకం			చివరి_పుట, tab_లెక్క;
     XmString		label_str;
-    char		*label_cstr;
+    అక్షరం		*label_cstr;
     BalloonEval		*beval;
 
-    if (tabLine == (Widget)0)
-	return;
+    ఒకవేళ (tab_పంక్తి == (Widget)0)
+	తిరిగి;
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ; tp = tp->tp_తదుపరి, ++nr)
     {
-	if (tp == curtab)
+	ఒకవేళ (tp == curtab)
 	    curtabidx = nr;
 
-	page_status = XmNotebookGetPageInfo(tabLine, nr, &page_info);
-	if (page_status == XmPAGE_INVALID
-		|| page_info.major_tab_widget == (Widget)0)
+	పుట_స్థితి = Xm_Notebook_Get_పుట_Info(tab_పంక్తి, nr, &పుట_info);
+	ఒకవేళ (పుట_స్థితి == Xm_పుట_INVALID
+		|| పుట_info.major_tab_widget == (Widget)0)
 	{
 	    // Add the tab
 	    n = 0;
-	    XtSetArg(args[n], XmNnotebookChildType, XmMAJOR_TAB); n++;
-	    XtSetArg(args[n], XmNtraversalOn, False); n++;
-	    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
-	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
-	    XtSetArg(args[n], XmNshadowThickness , 1); n++;
-	    tab = XmCreatePushButton(tabLine, "-Empty-", args, n);
-	    XtManageChild(tab);
-	    beval = gui_mch_create_beval_area(tab, NULL, tabline_balloon_cb,
-									NULL);
-	    XtVaSetValues(tab, XmNuserData, beval, NULL);
+	    Xt_సమితి_Arg(వాదనలు[n], Xm_Nnotebook_బిడ్డ_Type, XmMAJOR_TAB); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNtraversalOn, False); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNhighlightThickness, 1); n++;
+	    Xt_సమితి_Arg(వాదనలు[n], XmNshadowThickness , 1); n++;
+	    tab = Xm_Create_నెట్టు_Button(tab_పంక్తి, "-Empty-", వాదనలు, n);
+	    Xt_Manage_బిడ్డ(tab);
+	    beval = gui_mch_create_beval_area(tab, ఖాళీ, tabline_balloon_cb,
+									ఖాళీ);
+	    Xt_Va_సమితి_విలువలు(tab, Xm_Nuser_దత్తాంశం, beval, ఖాళీ);
 	}
-	else
-	    tab = page_info.major_tab_widget;
+	లేకపోతే
+	    tab = పుట_info.major_tab_widget;
 
-	XtVaSetValues(tab, XmNpageNumber, nr, NULL);
+	Xt_Va_సమితి_విలువలు(tab, Xm_Npage_సంఖ్య, nr, ఖాళీ);
 
 	/*
 	 * Change the label text only if it is different
 	 */
-	XtVaGetValues(tab, XmNlabelString, &label_str, NULL);
-	if (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
+	Xt_Va_Get_విలువలు(tab, XmNlabelString, &label_str, ఖాళీ);
+	ఒకవేళ (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
 	{
 	    get_tabline_label(tp, FALSE);
-	    if (STRCMP(label_cstr, NameBuff) != 0)
+	    ఒకవేళ (STRCMP(label_cstr, NameBuff) != 0)
 	    {
-		XtVaSetValues(tab, XtVaTypedArg, XmNlabelString, XmRString,
-			      NameBuff, STRLEN(NameBuff) + 1, NULL);
+		Xt_Va_సమితి_విలువలు(tab, XtVaTypedArg, XmNlabelString, XmRString,
+			      NameBuff, STRLEN(NameBuff) + 1, ఖాళీ);
 		/*
 		 * Force a resize of the tab label button
 		 */
-		XtUnmanageChild(tab);
-		XtManageChild(tab);
+		Xt_Unmanage_బిడ్డ(tab);
+		Xt_Manage_బిడ్డ(tab);
 	    }
 	    XtFree(label_cstr);
 	}
     }
 
-    tab_count = nr - 1;
+    tab_లెక్క = nr - 1;
 
-    XtVaGetValues(tabLine, XmNlastPageNumber, &last_page, NULL);
+    Xt_Va_Get_విలువలు(tab_పంక్తి, Xm_Nlast_పుట_సంఖ్య, &చివరి_పుట, ఖాళీ);
 
     // Remove any old labels.
-    while (nr <= last_page)
+    అయితే (nr <= చివరి_పుట)
     {
-	if (XmNotebookGetPageInfo(tabLine, nr, &page_info) != XmPAGE_INVALID
-	    && page_info.page_number == nr
-	    && page_info.major_tab_widget != (Widget)0)
+	ఒకవేళ (Xm_Notebook_Get_పుట_Info(tab_పంక్తి, nr, &పుట_info) != Xm_పుట_INVALID
+	    && పుట_info.పుట_సంఖ్య == nr
+	    && పుట_info.major_tab_widget != (Widget)0)
 	{
-	    XtVaGetValues(page_info.major_tab_widget, XmNuserData, &beval, NULL);
-	    if (beval != NULL)
+	    Xt_Va_Get_విలువలు(పుట_info.major_tab_widget, Xm_Nuser_దత్తాంశం, &beval, ఖాళీ);
+	    ఒకవేళ (beval != ఖాళీ)
 		gui_mch_destroy_beval_area(beval);
-	    XtUnmanageChild(page_info.major_tab_widget);
-	    XtDestroyWidget(page_info.major_tab_widget);
+	    Xt_Unmanage_బిడ్డ(పుట_info.major_tab_widget);
+	    XtDestroyWidget(పుట_info.major_tab_widget);
 	}
 	nr++;
     }
 
-    XtVaSetValues(tabLine, XmNlastPageNumber, tab_count, NULL);
+    Xt_Va_సమితి_విలువలు(tab_పంక్తి, Xm_Nlast_పుట_సంఖ్య, tab_లెక్క, ఖాళీ);
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != curtabidx)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, curtabidx, NULL);
+    Xt_Va_Get_విలువలు(tab_పంక్తి, Xm_Ncurrent_పుట_సంఖ్య, &currentpage, ఖాళీ);
+    ఒకవేళ (currentpage != curtabidx)
+	Xt_Va_సమితి_విలువలు(tab_పంక్తి, Xm_Ncurrent_పుట_సంఖ్య, curtabidx, ఖాళీ);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    శూన్య
+gui_mch_సమితి_curtab(పూర్ణాంకం nr)
 {
-    int		currentpage;
+    పూర్ణాంకం		currentpage;
 
-    if (tabLine == (Widget)0)
-	return;
+    ఒకవేళ (tab_పంక్తి == (Widget)0)
+	తిరిగి;
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != nr)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, nr, NULL);
+    Xt_Va_Get_విలువలు(tab_పంక్తి, Xm_Ncurrent_పుట_సంఖ్య, &currentpage, ఖాళీ);
+    ఒకవేళ (currentpage != nr)
+	Xt_Va_సమితి_విలువలు(tab_పంక్తి, Xm_Ncurrent_పుట_సంఖ్య, nr, ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the colors of Widget "id" to the menu colors.
  */
-    static void
+    స్థిర శూన్య
 gui_motif_menu_colors(Widget id)
 {
-    if (gui.menu_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    ఒకవేళ (gui.menu_bg_pixel != INVALCOLOR)
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
 	XmChangeColor(id, gui.menu_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.menu_bg_pixel, NULL);
-#endif
-    if (gui.menu_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.menu_fg_pixel, NULL);
+#లేకపోతే
+	Xt_Va_సమితి_విలువలు(id, XmNbackground, gui.menu_bg_pixel, ఖాళీ);
+#అయితే_ముగింపు
+    ఒకవేళ (gui.menu_fg_pixel != INVALCOLOR)
+	Xt_Va_సమితి_విలువలు(id, XmNforeground, gui.menu_fg_pixel, ఖాళీ);
 }
 
 /*
  * Set the colors of Widget "id" to the scrollbar colors.
  */
-    static void
+    స్థిర శూన్య
 gui_motif_scroll_colors(Widget id)
 {
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    ఒకవేళ (gui.scroll_bg_pixel != INVALCOLOR)
+#ఒకవేళ (Xm_సంస్కరణ >= 1002)
 	XmChangeColor(id, gui.scroll_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.scroll_bg_pixel, NULL);
-#endif
-    if (gui.scroll_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.scroll_fg_pixel, NULL);
+#లేకపోతే
+	Xt_Va_సమితి_విలువలు(id, XmNbackground, gui.scroll_bg_pixel, ఖాళీ);
+#అయితే_ముగింపు
+    ఒకవేళ (gui.scroll_fg_pixel != INVALCOLOR)
+	Xt_Va_సమితి_విలువలు(id, XmNforeground, gui.scroll_fg_pixel, ఖాళీ);
 }
 
 /*
  * Set the fontlist for Widget "id" to use gui.menu_fontset or gui.menu_font.
  */
-    void
-gui_motif_menu_fontlist(Widget id UNUSED)
+    శూన్య
+gui_motif_menu_fontlist(Widget id వాడని)
 {
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 # ifdef FONTSET_ALWAYS
-    if (gui.menu_fontset != NOFONTSET)
+    ఒకవేళ (gui.menu_fontset != NOFONTSET)
     {
 	XmFontList fl;
 
-	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.menu_fontset);
-	if (fl != NULL)
+	fl = gui_motif_fontset2fontlist((XFont_సమితి *)&gui.menu_fontset);
+	ఒకవేళ (fl != ఖాళీ)
 	{
-	    if (XtIsManaged(id))
+	    ఒకవేళ (XtIsManaged(id))
 	    {
-		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Unmanage_బిడ్డ(id);
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 		// We should force the widget to recalculate its
 		// geometry now.
-		XtManageChild(id);
+		Xt_Manage_బిడ్డ(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    లేకపోతే
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.menu_font != NOFONT)
+# లేకపోతే
+    ఒకవేళ (gui.menu_font != NOFONT)
     {
 	XmFontList fl;
 
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.menu_font);
-	if (fl != NULL)
+	ఒకవేళ (fl != ఖాళీ)
 	{
-	    if (XtIsManaged(id))
+	    ఒకవేళ (XtIsManaged(id))
 	    {
-		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Unmanage_బిడ్డ(id);
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 		// We should force the widget to recalculate its
 		// geometry now.
-		XtManageChild(id);
+		Xt_Manage_బిడ్డ(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    లేకపోతే
+		Xt_Va_సమితి_విలువలు(id, XmNfontList, fl, ఖాళీ);
 	    XmFontListFree(fl);
 	}
     }
 # endif
-#endif
+#అయితే_ముగింపు
 }
 
 
@@ -3335,326 +3335,326 @@ gui_motif_menu_fontlist(Widget id UNUSED)
  * We don't create it twice for the sake of speed.
  */
 
-typedef struct _SharedFindReplace
+రకనిర్వచనం నిర్మాణం Shared_కనుగొను_Replace
 {
     Widget dialog;	// the main dialog widget
     Widget wword;	// 'Exact match' check button
     Widget mcase;	// 'match case' check button
-    Widget up;		// search direction 'Up' radio button
-    Widget down;	// search direction 'Down' radio button
+    Widget పైకి;		// search direction 'Up' radio button
+    Widget కిందికి;	// search direction 'Down' radio button
     Widget what;	// 'Find what' entry text widget
     Widget with;	// 'Replace with' entry text widget
-    Widget find;	// 'Find Next' action button
+    Widget కనుగొను;	// 'Find Next' action button
     Widget replace;	// 'Replace With' action button
     Widget all;		// 'Replace All' action button
     Widget undo;	// 'Undo' action button
 
     Widget cancel;
-} SharedFindReplace;
+} Shared_కనుగొను_Replace_2;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+స్థిర Shared_కనుగొను_Replace_2 కనుగొను_widgets = {ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ};
+స్థిర Shared_కనుగొను_Replace_2 repl_widgets = {ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ, ఖాళీ};
 
-    static void
-find_replace_destroy_callback(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    స్థిర శూన్య
+కనుగొను_replace_destroy_callback(
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    SharedFindReplace *cd = (SharedFindReplace *)client_data;
+    Shared_కనుగొను_Replace_2 *cd = (Shared_కనుగొను_Replace_2 *)client_దత్తాంశం_2;
 
-    if (cd != NULL)
+    ఒకవేళ (cd != ఖాళీ)
        // suppress_dialog_mnemonics(cd->dialog);
 	cd->dialog = (Widget)0;
 }
 
-    static void
-find_replace_dismiss_callback(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    స్థిర శూన్య
+కనుగొను_replace_dismiss_callback(
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    SharedFindReplace *cd = (SharedFindReplace *)client_data;
+    Shared_కనుగొను_Replace_2 *cd = (Shared_కనుగొను_Replace_2 *)client_దత్తాంశం_2;
 
-    if (cd != NULL)
-	XtUnmanageChild(cd->dialog);
+    ఒకవేళ (cd != ఖాళీ)
+	Xt_Unmanage_బిడ్డ(cd->dialog);
 }
 
-    static void
-entry_activate_callback(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    స్థిర శూన్య
+నమోదు_activate_callback(
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    XmProcessTraversal((Widget)client_data, XmTRAVERSE_CURRENT);
+    XmProcessTraversal((Widget)client_దత్తాంశం_2, XmTRAVERSE_CURRENT);
 }
 
-    static void
-find_replace_callback(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    స్థిర శూన్య
+కనుగొను_replace_callback(
+    Widget	w వాడని,
+    Xt_సూచిక	client_దత్తాంశం_2,
+    Xt_సూచిక	call_దత్తాంశం వాడని)
 {
-    long_u	flags = (long_u)client_data;
-    char	*find_text, *repl_text;
-    Boolean	direction_down = TRUE;
+    long_u	flags = (long_u)client_దత్తాంశం_2;
+    అక్షరం	*కనుగొను_పాఠ్యం, *repl_పాఠ్యం;
+    Boolean	direction_కిందికి = TRUE;
     Boolean	wword;
     Boolean	mcase;
-    SharedFindReplace *sfr;
+    Shared_కనుగొను_Replace_2 *sfr;
 
-    if (flags == FRD_UNDO)
+    ఒకవేళ (flags == FRD_UNDO)
     {
 	char_u	*save_cpo = p_cpo;
 
 	// No need to be Vi compatible here.
-	p_cpo = empty_option;
+	p_cpo = ఖాళీలు_option;
 	u_undo(1);
 	p_cpo = save_cpo;
 	gui_update_screen();
-	return;
+	తిరిగి;
     }
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    ఒకవేళ (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
-	sfr = &find_widgets;
+	repl_పాఠ్యం = ఖాళీ;
+	sfr = &కనుగొను_widgets;
     }
-    else
+    లేకపోతే
     {
-	repl_text = XmTextFieldGetString(repl_widgets.with);
+	repl_పాఠ్యం = Xm_పాఠ్యం_క్షేత్రం_Get_String(repl_widgets.with);
 	sfr = &repl_widgets;
     }
-    find_text = XmTextFieldGetString(sfr->what);
-    XtVaGetValues(sfr->down, XmNset, &direction_down, NULL);
-    XtVaGetValues(sfr->wword, XmNset, &wword, NULL);
-    XtVaGetValues(sfr->mcase, XmNset, &mcase, NULL);
-    if (wword)
-	flags |= FRD_WHOLE_WORD;
-    if (mcase)
-	flags |= FRD_MATCH_CASE;
+    కనుగొను_పాఠ్యం = Xm_పాఠ్యం_క్షేత్రం_Get_String(sfr->what);
+    Xt_Va_Get_విలువలు(sfr->కిందికి, XmNset, &direction_కిందికి, ఖాళీ);
+    Xt_Va_Get_విలువలు(sfr->wword, XmNset, &wword, ఖాళీ);
+    Xt_Va_Get_విలువలు(sfr->mcase, XmNset, &mcase, ఖాళీ);
+    ఒకవేళ (wword)
+	flags |= FRD_సంపూర్ణ_మాట;
+    ఒకవేళ (mcase)
+	flags |= FRD_సరిపోలిక_CASE;
 
-    (void)gui_do_findrepl((int)flags, (char_u *)find_text, (char_u *)repl_text,
-							      direction_down);
+    (శూన్య)gui_do_findrepl((పూర్ణాంకం)flags, (char_u *)కనుగొను_పాఠ్యం, (char_u *)repl_పాఠ్యం,
+							      direction_కిందికి);
 
-    if (find_text != NULL)
-	XtFree(find_text);
-    if (repl_text != NULL)
-	XtFree(repl_text);
+    ఒకవేళ (కనుగొను_పాఠ్యం != ఖాళీ)
+	XtFree(కనుగొను_పాఠ్యం);
+    ఒకవేళ (repl_పాఠ్యం != ఖాళీ)
+	XtFree(repl_పాఠ్యం);
 }
 
-    static void
-find_replace_keypress(
-    Widget		w UNUSED,
-    SharedFindReplace	*frdp,
+    స్థిర శూన్య
+కనుగొను_replace_keypress(
+    Widget		w వాడని,
+    Shared_కనుగొను_Replace_2	*frdp,
     XKeyEvent		*event,
-    Boolean		*b UNUSED)
+    Boolean		*b వాడని)
 {
-    KeySym keysym;
+    కీలకం_Sym keysym;
 
-    if (frdp == NULL)
-	return;
+    ఒకవేళ (frdp == ఖాళీ)
+	తిరిగి;
 
     keysym = XLookupKeysym(event, 0);
 
     // the scape key pops the whole dialog down
-    if (keysym == XK_Escape)
-	XtUnmanageChild(frdp->dialog);
+    ఒకవేళ (keysym == XK_Escape)
+	Xt_Unmanage_బిడ్డ(frdp->dialog);
 }
 
-    static void
-set_label(Widget w, char *label)
+    స్థిర శూన్య
+సమితి_label(Widget w, అక్షరం *label)
 {
     XmString	str;
-    char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    char_u	*p, *తదుపరి;
+    కీలకం_Sym	mnemonic = NUL;
 
-    if (!w)
-	return;
+    ఒకవేళ (!w)
+	తిరిగి;
 
     p = vim_strsave((char_u *)label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
+    కొరకు (తదుపరి = p; *తదుపరి; ++తదుపరి)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	ఒకవేళ (*తదుపరి == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    పూర్ణాంకం len = STRLEN(తదుపరి);
 
-	    if (len > 0)
+	    ఒకవేళ (len > 0)
 	    {
-		mch_memmove(next, next + 1, len);
-		mnemonic = next[0];
+		mch_memmove(తదుపరి, తదుపరి + 1, len);
+		mnemonic = తదుపరి[0];
 	    }
 	}
     }
 
-    str = XmStringCreateSimple((char *)p);
+    str = XmStringCreateSimple((అక్షరం *)p);
     vim_free(p);
-    if (str)
+    ఒకవేళ (str)
     {
-	XtVaSetValues(w,
+	Xt_Va_సమితి_విలువలు(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		ఖాళీ);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    స్థిర శూన్య
+కనుగొను_replace_dialog_create(char_u *arg, పూర్ణాంకం do_replace)
 {
-    SharedFindReplace	*frdp;
+    Shared_కనుగొను_Replace_2	*frdp;
     Widget		separator;
-    Widget		input_form;
+    Widget		ఆదానం_form;
     Widget		button_form;
     Widget		toggle_form;
-    Widget		frame;
+    Widget		చట్రం;
     XmString		str;
-    int			n;
-    Arg			args[6];
-    int			wword = FALSE;
-    int			mcase = !p_ic;
-    Dimension		width;
+    పూర్ణాంకం			n;
+    Arg			వాదనలు[6];
+    పూర్ణాంకం			wword = FALSE;
+    పూర్ణాంకం			mcase = !p_ic;
+    Dimension		వెడల్పు;
     Dimension		widest;
-    char_u		*entry_text;
+    char_u		*నమోదు_పాఠ్యం;
 
-    frdp = do_replace ? &repl_widgets : &find_widgets;
+    frdp = do_replace ? &repl_widgets : &కనుగొను_widgets;
 
     // Get the search string to use.
-    entry_text = get_find_dialog_text(arg, &wword, &mcase);
+    నమోదు_పాఠ్యం = get_కనుగొను_dialog_పాఠ్యం(arg, &wword, &mcase);
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog)
+    ఒకవేళ (frdp->dialog)
     {
 	gui_motif_synch_fonts();
 
 	// If the window is already up, just pop it to the top
-	if (XtIsManaged(frdp->dialog))
+	ఒకవేళ (XtIsManaged(frdp->dialog))
 	    XMapRaised(XtDisplay(frdp->dialog),
-					    XtWindow(XtParent(frdp->dialog)));
-	else
-	    XtManageChild(frdp->dialog);
-	XtPopup(XtParent(frdp->dialog), XtGrabNone);
+					    Xt_కిటికీ(Xt_మాతృ(frdp->dialog)));
+	లేకపోతే
+	    Xt_Manage_బిడ్డ(frdp->dialog);
+	XtPopup(Xt_మాతృ(frdp->dialog), XtGrabNone);
 	XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 
-	if (entry_text != NULL)
-	    XmTextFieldSetString(frdp->what, (char *)entry_text);
-	vim_free(entry_text);
+	ఒకవేళ (నమోదు_పాఠ్యం != ఖాళీ)
+	    Xm_పాఠ్యం_క్షేత్రం_సమితి_String(frdp->what, (అక్షరం *)నమోదు_పాఠ్యం);
+	vim_free(నమోదు_పాఠ్యం);
 
-	XtVaSetValues(frdp->wword, XmNset, wword, NULL);
-	return;
+	Xt_Va_సమితి_విలువలు(frdp->wword, XmNset, wword, ఖాళీ);
+	తిరిగి;
     }
 
     // Create a fresh new dialog window
-    if (do_replace)
+    ఒకవేళ (do_replace)
 	 str = XmStringCreateSimple(_("VIM - Search and Replace..."));
-    else
+    లేకపోతే
 	 str = XmStringCreateSimple(_("VIM - Search..."));
 
     n = 0;
-    XtSetArg(args[n], XmNautoUnmanage, False); n++;
-    XtSetArg(args[n], XmNnoResize, True); n++;
-    XtSetArg(args[n], XmNdialogTitle, str); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNautoUnmanage, False); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNnoResize, True); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNdialogTitle, str); n++;
 
-    frdp->dialog = XmCreateFormDialog(vimShell, "findReplaceDialog", args, n);
+    frdp->dialog = XmCreateFormDialog(vimShell, "findReplaceDialog", వాదనలు, n);
     XmStringFree(str);
-    XtAddCallback(frdp->dialog, XmNdestroyCallback,
-	    find_replace_destroy_callback, frdp);
+    Xt_కూడు_Callback(frdp->dialog, XmNdestroyCallback,
+	    కనుగొను_replace_destroy_callback, frdp);
 
     button_form = XtVaCreateWidget("buttonForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
-	    NULL);
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
+	    ఖాళీ);
 
-    frdp->find = XtVaCreateManagedWidget("findButton",
-	    xmPushButtonWidgetClass, button_form,
+    frdp->కనుగొను = XtVaCreateManagedWidget("findButton",
+	    xm_నెట్టు_Button_Widget_Class, button_form,
 	    XmNsensitive, True,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
-    set_label(frdp->find, _("Find &Next"));
+	    ఖాళీ);
+    సమితి_label(frdp->కనుగొను, _("Find &Next"));
 
-    XtAddCallback(frdp->find, XmNactivateCallback,
-	    find_replace_callback,
-	    (do_replace ? (XtPointer)FRD_R_FINDNEXT : (XtPointer)FRD_FINDNEXT));
+    Xt_కూడు_Callback(frdp->కనుగొను, XmNactivateCallback,
+	    కనుగొను_replace_callback,
+	    (do_replace ? (Xt_సూచిక)FRD_R_FINDNEXT : (Xt_సూచిక)FRD_FINDNEXT));
 
-    if (do_replace)
+    ఒకవేళ (do_replace)
     {
 	frdp->replace = XtVaCreateManagedWidget("replaceButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_నెట్టు_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, frdp->find,
+		XmNtopWidget, frdp->కనుగొను,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	set_label(frdp->replace, _("&Replace"));
-	XtAddCallback(frdp->replace, XmNactivateCallback,
-		find_replace_callback, (XtPointer)FRD_REPLACE);
+		ఖాళీ);
+	సమితి_label(frdp->replace, _("&Replace"));
+	Xt_కూడు_Callback(frdp->replace, XmNactivateCallback,
+		కనుగొను_replace_callback, (Xt_సూచిక)FRD_REPLACE);
 
 	frdp->all = XtVaCreateManagedWidget("replaceAllButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_నెట్టు_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->replace,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	set_label(frdp->all, _("Replace &All"));
-	XtAddCallback(frdp->all, XmNactivateCallback,
-		find_replace_callback, (XtPointer)FRD_REPLACEALL);
+		ఖాళీ);
+	సమితి_label(frdp->all, _("Replace &All"));
+	Xt_కూడు_Callback(frdp->all, XmNactivateCallback,
+		కనుగొను_replace_callback, (Xt_సూచిక)FRD_REPLACEALL);
 
 	frdp->undo = XtVaCreateManagedWidget("undoButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_నెట్టు_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->all,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	set_label(frdp->undo, _("&Undo"));
-	XtAddCallback(frdp->undo, XmNactivateCallback,
-		find_replace_callback, (XtPointer)FRD_UNDO);
+		ఖాళీ);
+	సమితి_label(frdp->undo, _("&Undo"));
+	Xt_కూడు_Callback(frdp->undo, XmNactivateCallback,
+		కనుగొను_replace_callback, (Xt_సూచిక)FRD_UNDO);
     }
 
     frdp->cancel = XtVaCreateManagedWidget("closeButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_నెట్టు_Button_Widget_Class, button_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    NULL);
-    set_label(frdp->cancel, _("&Cancel"));
-    XtAddCallback(frdp->cancel, XmNactivateCallback,
-	    find_replace_dismiss_callback, frdp);
+	    ఖాళీ);
+    సమితి_label(frdp->cancel, _("&Cancel"));
+    Xt_కూడు_Callback(frdp->cancel, XmNactivateCallback,
+	    కనుగొను_replace_dismiss_callback, frdp);
     gui_motif_menu_fontlist(frdp->cancel);
 
-    XtManageChild(button_form);
+    Xt_Manage_బిడ్డ(button_form);
 
     n = 0;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
-    XtSetArg(args[n], XmNrightWidget, button_form); n++;
-    XtSetArg(args[n], XmNrightOffset, 4); n++;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    separator = XmCreateSeparatorGadget(frdp->dialog, "separator", args, n);
-    XtManageChild(separator);
+    Xt_సమితి_Arg(వాదనలు[n], XmNorientation, XmVERTICAL); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightWidget, button_form); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nright_స్థానభ్రంశం, 4); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    separator = XmCreateSeparatorGadget(frdp->dialog, "separator", వాదనలు, n);
+    Xt_Manage_బిడ్డ(separator);
 
-    input_form = XtVaCreateWidget("inputForm",
+    ఆదానం_form = XtVaCreateWidget("inputForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
-	    NULL);
+	    Xm_Ntop_స్థానభ్రంశం, 4,
+	    ఖాళీ);
 
     {
 	Widget label_what;
@@ -3662,47 +3662,47 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	str = XmStringCreateSimple(_("Find what:"));
 	label_what = XtVaCreateManagedWidget("whatLabel",
-		xmLabelGadgetClass, input_form,
+		xmLabelGadgetClass, ఆదానం_form,
 		XmNlabelString, str,
 		XmNleftAttachment,	XmATTACH_FORM,
 		XmNtopAttachment, XmATTACH_FORM,
-		XmNtopOffset, 4,
-		NULL);
+		Xm_Ntop_స్థానభ్రంశం, 4,
+		ఖాళీ);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(label_what);
 
 	frdp->what = XtVaCreateManagedWidget("whatText",
-		xmTextFieldWidgetClass, input_form,
+		xm_పాఠ్యం_క్షేత్రం_Widget_Class, ఆదానం_form,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
 		XmNleftAttachment, XmATTACH_FORM,
-		NULL);
+		ఖాళీ);
 
-	if (do_replace)
+	ఒకవేళ (do_replace)
 	{
 	    frdp->with = XtVaCreateManagedWidget("withText",
-		    xmTextFieldWidgetClass,	input_form,
+		    xm_పాఠ్యం_క్షేత్రం_Widget_Class,	ఆదానం_form,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
-		    XmNtopOffset, 4,
+		    Xm_Ntop_స్థానభ్రంశం, 4,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNrightAttachment, XmATTACH_FORM,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ఖాళీ);
 
-	    XtAddCallback(frdp->with, XmNactivateCallback,
-		    find_replace_callback, (XtPointer) FRD_R_FINDNEXT);
+	    Xt_కూడు_Callback(frdp->with, XmNactivateCallback,
+		    కనుగొను_replace_callback, (Xt_సూచిక) FRD_R_FINDNEXT);
 
 	    str = XmStringCreateSimple(_("Replace with:"));
 	    label_with = XtVaCreateManagedWidget("withLabel",
-		    xmLabelGadgetClass, input_form,
+		    xmLabelGadgetClass, ఆదానం_form,
 		    XmNlabelString, str,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
-		    XmNtopOffset, 4,
+		    Xm_Ntop_స్థానభ్రంశం, 4,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ఖాళీ);
 	    XmStringFree(str);
 	    gui_motif_menu_fontlist(label_with);
 
@@ -3710,119 +3710,119 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	     * Make the entry activation only change the input focus onto the
 	     * with item.
 	     */
-	    XtAddCallback(frdp->what, XmNactivateCallback,
-		    entry_activate_callback, frdp->with);
-	    XtAddEventHandler(frdp->with, KeyPressMask, False,
-			    (XtEventHandler)find_replace_keypress,
-			    (XtPointer) frdp);
+	    Xt_కూడు_Callback(frdp->what, XmNactivateCallback,
+		    నమోదు_activate_callback, frdp->with);
+	    Xt_కూడు_Event_Handler(frdp->with, కీలకం_Press_ముసుగు, False,
+			    (XtEventHandler)కనుగొను_replace_keypress,
+			    (Xt_సూచిక) frdp);
 
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Make the entry activation do the search.
 	     */
-	    XtAddCallback(frdp->what, XmNactivateCallback,
-		    find_replace_callback, (XtPointer)FRD_FINDNEXT);
+	    Xt_కూడు_Callback(frdp->what, XmNactivateCallback,
+		    కనుగొను_replace_callback, (Xt_సూచిక)FRD_FINDNEXT);
 	}
-	XtAddEventHandler(frdp->what, KeyPressMask, False,
-			    (XtEventHandler)find_replace_keypress,
-			    (XtPointer)frdp);
+	Xt_కూడు_Event_Handler(frdp->what, కీలకం_Press_ముసుగు, False,
+			    (XtEventHandler)కనుగొను_replace_keypress,
+			    (Xt_సూచిక)frdp);
 
 	// Get the maximum width between the label widgets and line them up.
 	n = 0;
-	XtSetArg(args[n], XmNwidth, &width); n++;
-	XtGetValues(label_what, args, n);
-	widest = width;
-	if (do_replace)
+	Xt_సమితి_Arg(వాదనలు[n], XmNwidth, &వెడల్పు); n++;
+	Xt_Get_విలువలు(label_what, వాదనలు, n);
+	widest = వెడల్పు;
+	ఒకవేళ (do_replace)
 	{
-	    XtGetValues(label_with, args, n);
-	    if (width > widest)
-		widest = width;
+	    Xt_Get_విలువలు(label_with, వాదనలు, n);
+	    ఒకవేళ (వెడల్పు > widest)
+		widest = వెడల్పు;
 	}
 
-	XtVaSetValues(frdp->what, XmNleftOffset, widest, NULL);
-	if (do_replace)
-	    XtVaSetValues(frdp->with, XmNleftOffset, widest, NULL);
+	Xt_Va_సమితి_విలువలు(frdp->what, Xm_Nleft_స్థానభ్రంశం, widest, ఖాళీ);
+	ఒకవేళ (do_replace)
+	    Xt_Va_సమితి_విలువలు(frdp->with, Xm_Nleft_స్థానభ్రంశం, widest, ఖాళీ);
 
     }
 
-    XtManageChild(input_form);
+    Xt_Manage_బిడ్డ(ఆదానం_form);
 
     {
 	Widget radio_box;
 	Widget w;
 
-	frame = XtVaCreateWidget("directionFrame",
-		xmFrameWidgetClass, frdp->dialog,
+	చట్రం = XtVaCreateWidget("directionFrame",
+		xm_చట్రం_Widget_Class, frdp->dialog,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, input_form,
-		XmNtopOffset, 4,
+		XmNtopWidget, ఆదానం_form,
+		Xm_Ntop_స్థానభ్రంశం, 4,
 		XmNbottomAttachment, XmATTACH_FORM,
-		XmNbottomOffset, 4,
+		Xm_Nbottom_స్థానభ్రంశం, 4,
 		XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
-		XmNrightWidget, input_form,
-		NULL);
+		XmNrightWidget, ఆదానం_form,
+		ఖాళీ);
 
 	str = XmStringCreateSimple(_("Direction"));
 	w = XtVaCreateManagedWidget("directionFrameLabel",
-		xmLabelGadgetClass, frame,
+		xmLabelGadgetClass, చట్రం,
 		XmNlabelString, str,
 		XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
-		XmNchildType, XmFRAME_TITLE_CHILD,
-		NULL);
+		XmNchildType, Xm_చట్రం_TITLE_బిడ్డ,
+		ఖాళీ);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(w);
 
-	radio_box = XmCreateRadioBox(frame, "radioBox",
-		(ArgList)NULL, 0);
+	radio_box = XmCreateRadioBox(చట్రం, "radioBox",
+		(ArgList)ఖాళీ, 0);
 
 	str = XmStringCreateSimple( _("Up"));
-	frdp->up = XtVaCreateManagedWidget("upRadioButton",
+	frdp->పైకి = XtVaCreateManagedWidget("upRadioButton",
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, False,
-		NULL);
+		ఖాళీ);
 	XmStringFree(str);
-	gui_motif_menu_fontlist(frdp->up);
+	gui_motif_menu_fontlist(frdp->పైకి);
 
 	str = XmStringCreateSimple(_("Down"));
-	frdp->down = XtVaCreateManagedWidget("downRadioButton",
+	frdp->కిందికి = XtVaCreateManagedWidget("downRadioButton",
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, True,
-		NULL);
+		ఖాళీ);
 	XmStringFree(str);
-	gui_motif_menu_fontlist(frdp->down);
+	gui_motif_menu_fontlist(frdp->కిందికి);
 
-	XtManageChild(radio_box);
-	XtManageChild(frame);
+	Xt_Manage_బిడ్డ(radio_box);
+	Xt_Manage_బిడ్డ(చట్రం);
     }
 
     toggle_form = XtVaCreateWidget("toggleForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
-	    XmNrightWidget, frame,
-	    XmNrightOffset, 4,
+	    XmNrightWidget, చట్రం,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, input_form,
-	    XmNtopOffset, 4,
+	    XmNtopWidget, ఆదానం_form,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
-	    NULL);
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
+	    ఖాళీ);
 
     str = XmStringCreateSimple(_("Match whole word only"));
     frdp->wword = XtVaCreateManagedWidget("wordToggle",
 	    xmToggleButtonGadgetClass, toggle_form,
 	    XmNlabelString, str,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNset, wword,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(str);
 
     str = XmStringCreateSimple(_("Match case"));
@@ -3830,21 +3830,21 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    xmToggleButtonGadgetClass, toggle_form,
 	    XmNlabelString, str,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
 	    XmNtopWidget, frdp->wword,
-	    XmNtopOffset, 4,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNset, mcase,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(str);
     gui_motif_menu_fontlist(frdp->wword);
     gui_motif_menu_fontlist(frdp->mcase);
 
-    XtManageChild(toggle_form);
+    Xt_Manage_బిడ్డ(toggle_form);
 
-    if (entry_text != NULL)
-	XmTextFieldSetString(frdp->what, (char *)entry_text);
-    vim_free(entry_text);
+    ఒకవేళ (నమోదు_పాఠ్యం != ఖాళీ)
+	Xm_పాఠ్యం_క్షేత్రం_సమితి_String(frdp->what, (అక్షరం *)నమోదు_పాఠ్యం);
+    vim_free(నమోదు_పాఠ్యం);
 
     gui_motif_synch_fonts();
 
@@ -3853,23 +3853,23 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 }
 
-   void
-gui_mch_find_dialog(exarg_T *eap)
+   శూన్య
+gui_mch_కనుగొను_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
-    find_replace_dialog_create(eap->arg, FALSE);
+    కనుగొను_replace_dialog_create(eap->arg, FALSE);
 }
 
 
-    void
+    శూన్య
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి;
 
-    find_replace_dialog_create(eap->arg, TRUE);
+    కనుగొను_replace_dialog_create(eap->arg, TRUE);
 }
 
 /*
@@ -3878,31 +3878,31 @@ gui_mch_replace_dialog(exarg_T *eap)
  * If you don't understand why this should be needed, please try to
  * search for "pi\xea\xb6\xe6" in iso8859-2.
  */
-    void
-gui_motif_synch_fonts(void)
+    శూన్య
+gui_motif_synch_fonts(శూన్య)
 {
-    SharedFindReplace *frdp;
-    int		    do_replace;
+    Shared_కనుగొను_Replace_2 *frdp;
+    పూర్ణాంకం		    do_replace;
     XFontStruct	    *font;
     XmFontList	    font_list;
 
     // FIXME: Unless we find out how to create a XmFontList from a XFontSet,
     // we just give up here on font synchronization.
     font = (XFontStruct *)gui.norm_font;
-    if (font == NULL)
-	return;
+    ఒకవేళ (font == ఖాళీ)
+	తిరిగి;
 
     font_list = gui_motif_create_fontlist(font);
 
     // OK this loop is a bit tricky...
-    for (do_replace = 0; do_replace <= 1; ++do_replace)
+    కొరకు (do_replace = 0; do_replace <= 1; ++do_replace)
     {
-	frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
-	if (frdp->dialog)
+	frdp = (do_replace) ? (&repl_widgets) : (&కనుగొను_widgets);
+	ఒకవేళ (frdp->dialog)
 	{
-	    XtVaSetValues(frdp->what, XmNfontList, font_list, NULL);
-	    if (do_replace)
-		XtVaSetValues(frdp->with, XmNfontList, font_list, NULL);
+	    Xt_Va_సమితి_విలువలు(frdp->what, XmNfontList, font_list, ఖాళీ);
+	    ఒకవేళ (do_replace)
+		Xt_Va_సమితి_విలువలు(frdp->with, XmNfontList, font_list, ఖాళీ);
 	}
     }
 

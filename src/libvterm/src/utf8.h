@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+గుర్తులేని పూర్ణాంకం utf8_seqlen(దీర్ఘ codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#ఒకవేళ defined(DEFINE_INLINES) || USE_INLINE
+INLINE గుర్తులేని పూర్ణాంకం utf8_seqlen(దీర్ఘ codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  ఒకవేళ(codepoint < 0x0000080) తిరిగి 1;
+  ఒకవేళ(codepoint < 0x0000800) తిరిగి 2;
+  ఒకవేళ(codepoint < 0x0010000) తిరిగి 3;
+  ఒకవేళ(codepoint < 0x0200000) తిరిగి 4;
+  ఒకవేళ(codepoint < 0x4000000) తిరిగి 5;
+  తిరిగి 6;
 }
-#endif
+#అయితే_ముగింపు
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+పూర్ణాంకం fill_utf8(దీర్ఘ codepoint, అక్షరం *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#ఒకవేళ defined(DEFINE_INLINES) || USE_INLINE
+INLINE పూర్ణాంకం fill_utf8(దీర్ఘ codepoint, అక్షరం *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  పూర్ణాంకం nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  పూర్ణాంకం b = nbytes;
+  అయితే(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  ఎంపిక(nbytes) {
+    స్థితి 1: str[0] =        (codepoint & 0x7f); ఆపు;
+    స్థితి 2: str[0] = 0xc0 | (codepoint & 0x1f); ఆపు;
+    స్థితి 3: str[0] = 0xe0 | (codepoint & 0x0f); ఆపు;
+    స్థితి 4: str[0] = 0xf0 | (codepoint & 0x07); ఆపు;
+    స్థితి 5: str[0] = 0xf8 | (codepoint & 0x03); ఆపు;
+    స్థితి 6: str[0] = 0xfc | (codepoint & 0x01); ఆపు;
   }
 
-  return nbytes;
+  తిరిగి nbytes;
 }
-#endif
+#అయితే_ముగింపు
 /* end copy */

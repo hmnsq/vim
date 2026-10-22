@@ -20,36 +20,36 @@
  *
  */
 
-#if !defined(XDIFFI_H)
-#define XDIFFI_H
+#ఒకవేళ !defined(XDIFFI_H)
+#నిర్వచించు XDIFFI_H
 
 
-typedef struct s_xdalgoenv {
-	long mxcost;
-	long snake_cnt;
-	long heur_min;
+రకనిర్వచనం నిర్మాణం s_xdalgoenv {
+	దీర్ఘ mxcost;
+	దీర్ఘ snake_cnt;
+	దీర్ఘ heur_min;
 } xdalgoenv_t;
 
-typedef struct s_xdchange {
-	struct s_xdchange *next;
-	long i1, i2;
-	long chg1, chg2;
-	int ignore;
+రకనిర్వచనం నిర్మాణం s_xdchange {
+	నిర్మాణం s_xdchange *తదుపరి;
+	దీర్ఘ i1, i2;
+	దీర్ఘ chg1, chg2;
+	పూర్ణాంకం ignore;
 } xdchange_t;
 
 
 
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
-		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv);
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+పూర్ణాంకం xdl_recs_cmp(xdfile_t *xdf1, దీర్ఘ off1, దీర్ఘ lim1,
+		 xdfile_t *xdf2, దీర్ఘ off2, దీర్ఘ lim2,
+		 దీర్ఘ *kvdf, దీర్ఘ *kvdb, పూర్ణాంకం need_min, xdalgoenv_t *xenv);
+పూర్ణాంకం xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t స్థిరరాశి *xpp,
 		xdfenv_t *xe);
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags);
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
-void xdl_free_script(xdchange_t *xscr);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env);
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env);
+పూర్ణాంకం xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, దీర్ఘ flags);
+పూర్ణాంకం xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
+శూన్య xdl_free_script(xdchange_t *xscr);
+పూర్ణాంకం xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t స్థిరరాశి *xecfg);
+పూర్ణాంకం xdl_do_patience_diff(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env);
+పూర్ణాంకం xdl_do_histogram_diff(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env);
 
-#endif /* #if !defined(XDIFFI_H) */
+#అయితే_ముగింపు /* #if !defined(XDIFFI_H) */

@@ -11,14 +11,14 @@
  * Highlighting stuff.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#define SG_TERM		1	// term has been set
-#define SG_CTERM	2	// cterm has been set
-#define SG_GUI		4	// gui has been set
-#define SG_LINK		8	// link has been set
+#నిర్వచించు SG_పదం		1	// term has been set
+#నిర్వచించు SG_CTERM	2	// cterm has been set
+#నిర్వచించు SG_GUI		4	// gui has been set
+#నిర్వచించు SG_LINK		8	// link has been set
 
-#define MAX_SYN_NAME	200
+#నిర్వచించు MAX_SYN_NAME	200
 
 /*
  * The "term", "cterm" and "gui" arguments can be any combination of the
@@ -26,25 +26,25 @@
  */
 // must be sorted by the 'value' field because it is used by bsearch()!
 // note: inverse and reverse use the same key
-static keyvalue_T highlight_tab[] = {
-    KEYVALUE_ENTRY(HL_BOLD, "bold"),			    // index 0
-    KEYVALUE_ENTRY(HL_INVERSE, "inverse"),		    // index 1
-    KEYVALUE_ENTRY(HL_ITALIC, "italic"),		    // index 2
-    KEYVALUE_ENTRY(HL_NOCOMBINE, "nocombine"),		    // index 3
-    KEYVALUE_ENTRY(HL_NORMAL, "NONE"),			    // index 4
-    KEYVALUE_ENTRY(HL_INVERSE, "reverse"),		    // index 5
-    KEYVALUE_ENTRY(HL_STANDOUT, "standout"),		    // index 6
-    KEYVALUE_ENTRY(HL_STRIKETHROUGH, "strikethrough"),	    // index 7
-    KEYVALUE_ENTRY(HL_UNDERCURL, "undercurl"),		    // index 8
-    KEYVALUE_ENTRY(HL_UNDERDASHED, "underdashed"),	    // index 9
-    KEYVALUE_ENTRY(HL_UNDERDOTTED, "underdotted"),	    // index 10
-    KEYVALUE_ENTRY(HL_UNDERDOUBLE, "underdouble"),	    // index 11
-    KEYVALUE_ENTRY(HL_UNDERLINE, "underline")		    // index 12
+స్థిర keyvalue_T highlight_tab[] = {
+    KEYVALUE_నమోదు(HL_BOLD, "bold"),			    // index 0
+    KEYVALUE_నమోదు(HL_INVERSE, "inverse"),		    // index 1
+    KEYVALUE_నమోదు(HL_ITALIC, "italic"),		    // index 2
+    KEYVALUE_నమోదు(HL_NOCOMBINE, "nocombine"),		    // index 3
+    KEYVALUE_నమోదు(HL_సాధారణ, "NONE"),			    // index 4
+    KEYVALUE_నమోదు(HL_INVERSE, "reverse"),		    // index 5
+    KEYVALUE_నమోదు(HL_STANDOUT, "standout"),		    // index 6
+    KEYVALUE_నమోదు(HL_STRIKETHROUGH, "strikethrough"),	    // index 7
+    KEYVALUE_నమోదు(HL_UNDERCURL, "undercurl"),		    // index 8
+    KEYVALUE_నమోదు(HL_UNDERDASHED, "underdashed"),	    // index 9
+    KEYVALUE_నమోదు(HL_UNDERDOTTED, "underdotted"),	    // index 10
+    KEYVALUE_నమోదు(HL_UNDERDOUBLE, "underdouble"),	    // index 11
+    KEYVALUE_నమోదు(HL_UNDERLINE, "underline")		    // index 12
 };
 
 // this table is used to display highlight names in the "correct" sequence.
 // keep this in sync with highlight_tab[].
-static keyvalue_T *highlight_index_tab[] = {
+స్థిర keyvalue_T *highlight_సూచీ_tab[] = {
     &highlight_tab[0],					    // HL_BOLD
     &highlight_tab[6],					    // HL_STANDOUT
     &highlight_tab[12],					    // HL_UNDERLINE
@@ -61,11 +61,11 @@ static keyvalue_T *highlight_index_tab[] = {
 };
 
 // length of all attribute names, plus commas, together (and a bit more)
-#define MAX_ATTR_LEN 120
+#నిర్వచించు MAX_ATTR_LEN 120
 
-#define ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
+#నిర్వచించు ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
 
-enum {
+గణన {
     BLACK = 0,
     DARKBLUE,
     DARKGREEN,
@@ -74,7 +74,7 @@ enum {
     DARKMAGENTA,
     BROWN,
     DARKYELLOW,
-    GRAY,
+    బూడిద,
     GREY,
     LIGHTGRAY,
     LIGHTGREY,
@@ -97,35 +97,35 @@ enum {
 };
 
 // must be sorted by the 'value' field because it is used by bsearch()!
-static keyvalue_T color_name_tab[] = {
-    KEYVALUE_ENTRY(BLACK, "Black"),
-    KEYVALUE_ENTRY(BLUE, "Blue"),
-    KEYVALUE_ENTRY(BROWN, "Brown"),
-    KEYVALUE_ENTRY(CYAN, "Cyan"),
-    KEYVALUE_ENTRY(DARKBLUE, "DarkBlue"),
-    KEYVALUE_ENTRY(DARKCYAN, "DarkCyan"),
-    KEYVALUE_ENTRY(DARKGRAY, "DarkGray"),
-    KEYVALUE_ENTRY(DARKGREEN, "DarkGreen"),
-    KEYVALUE_ENTRY(DARKGREY, "DarkGrey"),
-    KEYVALUE_ENTRY(DARKMAGENTA, "DarkMagenta"),
-    KEYVALUE_ENTRY(DARKRED, "DarkRed"),
-    KEYVALUE_ENTRY(DARKYELLOW, "DarkYellow"),
-    KEYVALUE_ENTRY(GRAY, "Gray"),
-    KEYVALUE_ENTRY(GREEN, "Green"),
-    KEYVALUE_ENTRY(GREY, "Grey"),
-    KEYVALUE_ENTRY(LIGHTBLUE, "LightBlue"),
-    KEYVALUE_ENTRY(LIGHTCYAN, "LightCyan"),
-    KEYVALUE_ENTRY(LIGHTGRAY, "LightGray"),
-    KEYVALUE_ENTRY(LIGHTGREEN, "LightGreen"),
-    KEYVALUE_ENTRY(LIGHTGREY, "LightGrey"),
-    KEYVALUE_ENTRY(LIGHTMAGENTA, "LightMagenta"),
-    KEYVALUE_ENTRY(LIGHTRED, "LightRed"),
-    KEYVALUE_ENTRY(LIGHTYELLOW, "LightYellow"),
-    KEYVALUE_ENTRY(MAGENTA, "Magenta"),
-    KEYVALUE_ENTRY(NONE, "NONE"),
-    KEYVALUE_ENTRY(RED, "Red"),
-    KEYVALUE_ENTRY(WHITE, "White"),
-    KEYVALUE_ENTRY(YELLOW, "Yellow")
+స్థిర keyvalue_T color_name_tab[] = {
+    KEYVALUE_నమోదు(BLACK, "Black"),
+    KEYVALUE_నమోదు(BLUE, "Blue"),
+    KEYVALUE_నమోదు(BROWN, "Brown"),
+    KEYVALUE_నమోదు(CYAN, "Cyan"),
+    KEYVALUE_నమోదు(DARKBLUE, "DarkBlue"),
+    KEYVALUE_నమోదు(DARKCYAN, "DarkCyan"),
+    KEYVALUE_నమోదు(DARKGRAY, "DarkGray"),
+    KEYVALUE_నమోదు(DARKGREEN, "DarkGreen"),
+    KEYVALUE_నమోదు(DARKGREY, "DarkGrey"),
+    KEYVALUE_నమోదు(DARKMAGENTA, "DarkMagenta"),
+    KEYVALUE_నమోదు(DARKRED, "DarkRed"),
+    KEYVALUE_నమోదు(DARKYELLOW, "DarkYellow"),
+    KEYVALUE_నమోదు(బూడిద, "Gray"),
+    KEYVALUE_నమోదు(GREEN, "Green"),
+    KEYVALUE_నమోదు(GREY, "Grey"),
+    KEYVALUE_నమోదు(LIGHTBLUE, "LightBlue"),
+    KEYVALUE_నమోదు(LIGHTCYAN, "LightCyan"),
+    KEYVALUE_నమోదు(LIGHTGRAY, "LightGray"),
+    KEYVALUE_నమోదు(LIGHTGREEN, "LightGreen"),
+    KEYVALUE_నమోదు(LIGHTGREY, "LightGrey"),
+    KEYVALUE_నమోదు(LIGHTMAGENTA, "LightMagenta"),
+    KEYVALUE_నమోదు(LIGHTRED, "LightRed"),
+    KEYVALUE_నమోదు(LIGHTYELLOW, "LightYellow"),
+    KEYVALUE_నమోదు(MAGENTA, "Magenta"),
+    KEYVALUE_నమోదు(NONE, "NONE"),
+    KEYVALUE_నమోదు(RED, "Red"),
+    KEYVALUE_నమోదు(WHITE, "White"),
+    KEYVALUE_నమోదు(YELLOW, "Yellow")
 };
 
 /*
@@ -133,117 +133,117 @@ static keyvalue_T color_name_tab[] = {
  * The ID of a highlight group is also called group ID.  It is the index in
  * the highlight_ga array PLUS ONE.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     char_u	*sg_name;	// highlight group name
     char_u	*sg_name_u;	// uppercase of sg_name
-    int		sg_cleared;	// "hi clear" was used
+    పూర్ణాంకం		sg_cleared;	// "hi clear" was used
 // for normal terminals
-    int		sg_term;	// "term=" highlighting attributes
-    char_u	*sg_start;	// terminal string for start highl
+    పూర్ణాంకం		sg_పదం;	// "term=" highlighting attributes
+    char_u	*sg_ప్రారంభం;	// terminal string for start highl
     char_u	*sg_stop;	// terminal string for stop highl
-    int		sg_term_attr;	// Screen attr for term mode
+    పూర్ణాంకం		sg_పదం_attr;	// Screen attr for term mode
 // for color terminals
-    int		sg_cterm;	// "cterm=" highlighting attr
-    int		sg_cterm_bold;	// bold attr was set for light color
-    int		sg_cterm_fg;	// terminal fg color number + 1
-    int		sg_cterm_bg;	// terminal bg color number + 1
-    int		sg_cterm_ul;	// terminal ul color number + 1
-    int		sg_cterm_attr;	// Screen attr for color term mode
-    int		sg_cterm_font;	// terminal alternative font (0 for normal)
+    పూర్ణాంకం		sg_cterm;	// "cterm=" highlighting attr
+    పూర్ణాంకం		sg_cterm_bold;	// bold attr was set for light color
+    పూర్ణాంకం		sg_cterm_fg;	// terminal fg color number + 1
+    పూర్ణాంకం		sg_cterm_bg;	// terminal bg color number + 1
+    పూర్ణాంకం		sg_cterm_ul;	// terminal ul color number + 1
+    పూర్ణాంకం		sg_cterm_attr;	// Screen attr for color term mode
+    పూర్ణాంకం		sg_cterm_font;	// terminal alternative font (0 for normal)
 // for when using the GUI
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     guicolor_T	sg_gui_fg;	// GUI foreground color handle
     guicolor_T	sg_gui_bg;	// GUI background color handle
     guicolor_T	sg_gui_sp;	// GUI special color handle
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
     GuiFont	sg_font;	// GUI font handle
 # ifdef FEAT_XFONTSET
     GuiFontset	sg_fontset;	// GUI fontset handle
 # endif
     char_u	*sg_font_name;  // GUI font or fontset name
-    int		sg_gui_attr;    // Screen attr for GUI mode
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+    పూర్ణాంకం		sg_gui_attr;    // Screen attr for GUI mode
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
 // Store the sp color name for the GUI or synIDattr()
-    int		sg_gui;		// "gui=" highlighting attributes
+    పూర్ణాంకం		sg_gui;		// "gui=" highlighting attributes
     char_u	*sg_gui_fg_name;// GUI foreground color name
     char_u	*sg_gui_bg_name;// GUI background color name
     char_u	*sg_gui_sp_name;// GUI special color name
-#endif
-    int		sg_link;	// link to this highlight group ID
-    int		sg_deflink;	// default link; restored in highlight_clear()
-    int		sg_set;		// combination of SG_* flags
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+    పూర్ణాంకం		sg_link;	// link to this highlight group ID
+    పూర్ణాంకం		sg_deflink;	// default link; restored in highlight_clear()
+    పూర్ణాంకం		sg_సమితి;		// combination of SG_* flags
+#నిర్వచితమైతే FEAT_EVAL
     sctx_T	sg_deflink_sctx;  // script where the default link was set
     sctx_T	sg_script_ctx;	// script in which the group was last set
-#endif
-} hl_group_T;
+#అయితే_ముగింపు
+} hl_సమూహం_T;
 
-typedef struct hl_overrides_S hl_overrides_T;
-struct hl_overrides_S
+రకనిర్వచనం నిర్మాణం hl_overrides_S hl_overrides_T;
+నిర్మాణం hl_overrides_S
 {
     hl_override_T   *arr;   // May be NULL if "arr" was freed or no highlight
 			    // overrides (all values set to default)
-    int		    len;
-    hl_overrides_T  *next;  // Used to handle recursive calls
+    పూర్ణాంకం		    len;
+    hl_overrides_T  *తదుపరి;  // Used to handle recursive calls
 
-    int attr[HLF_COUNT];    // highlight_attr[] before being updated.
+    పూర్ణాంకం attr[HLF_లెక్క];    // highlight_attr[] before being updated.
 };
 
-static hl_overrides_T *overrides = NULL;
+స్థిర hl_overrides_T *overrides = ఖాళీ;
 
 // Synced with highlight_attr, each is the highlight group id for each attr. If
 // an element is 0, then there is no attr for it. If an element is -1, then it
 // means it was set to itself.
-static int highlight_ids[HLF_COUNT];
+స్థిర పూర్ణాంకం highlight_ids[HLF_లెక్క];
 
 // Same as highlight_attr[] but is not modified by highlight group overrides
-static int highlight_attr_raw[HLF_COUNT];
+స్థిర పూర్ణాంకం highlight_attr_raw[HLF_లెక్క];
 
-static int hl_flags[HLF_COUNT] = HL_FLAGS;
+స్థిర పూర్ణాంకం hl_flags[HLF_లెక్క] = HL_FLAGS;
 
 // highlight groups for 'highlight' option
-static garray_T highlight_ga;
-#define HL_TABLE()	((hl_group_T *)((highlight_ga.ga_data)))
+స్థిర garray_T highlight_ga;
+#నిర్వచించు HL_పట్టిక()	((hl_సమూహం_T *)((highlight_ga.ga_దత్తాంశం)))
 
 // Wrapper struct for hashtable entries: stores the highlight group ID alongside
 // the uppercase name used as a hash key.  Uses the same offsetof pattern as
 // signgroup_T / HI2SG.
-typedef struct {
-    int		hn_id;		// highlight group ID (1-based)
-    char_u	hn_key[1];	// uppercase name (stretchable array)
+రకనిర్వచనం నిర్మాణం {
+    పూర్ణాంకం		hn_id;		// highlight group ID (1-based)
+    char_u	hn_కీలకం[1];	// uppercase name (stretchable array)
 } hlname_T;
 
-#define HLNAME_KEY_OFF	offsetof(hlname_T, hn_key)
-#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_key - HLNAME_KEY_OFF))
+#నిర్వచించు HLNAME_కీలకం_OFF	offsetof(hlname_T, hn_కీలకం)
+#నిర్వచించు HI2HLNAME(hi)	((hlname_T *)((hi)->hi_కీలకం - HLNAME_కీలకం_OFF))
 
 // hashtable for quick highlight group name lookup
-static hashtab_T highlight_ht;
-static bool	 highlight_ht_inited = false;
+స్థిర hashtab_T highlight_ht;
+స్థిర bool	 highlight_ht_inited = false;
 
 /*
  * An attribute number is the index in attr_table plus ATTR_OFF.
  */
-#define ATTR_OFF (HL_ALL + 1)
+#నిర్వచించు ATTR_OFF (HL_ALL + 1)
 
-static void syn_unadd_group(void);
-static void set_hl_attr(int idx);
-static void highlight_list_one(int id);
-static int highlight_list_arg(int id, int didh, int type, int iarg, char_u *sarg, char *name);
-static int syn_add_group(char_u *name);
-static int syn_name2id_len(char_u *name, int len);
-static int hl_has_settings(int idx, int check_link);
-static void highlight_clear(int idx);
+స్థిర శూన్య syn_unadd_సమూహం(శూన్య);
+స్థిర శూన్య సమితి_hl_attr(పూర్ణాంకం idx);
+స్థిర శూన్య highlight_list_one(పూర్ణాంకం id);
+స్థిర పూర్ణాంకం highlight_list_arg(పూర్ణాంకం id, పూర్ణాంకం didh, పూర్ణాంకం type, పూర్ణాంకం iarg, char_u *sarg, అక్షరం *name);
+స్థిర పూర్ణాంకం syn_కూడు_సమూహం(char_u *name);
+స్థిర పూర్ణాంకం syn_name2id_len(char_u *name, పూర్ణాంకం len);
+స్థిర పూర్ణాంకం hl_has_settings(పూర్ణాంకం idx, పూర్ణాంకం check_link);
+స్థిర శూన్య highlight_clear(పూర్ణాంకం idx);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-static void gui_do_one_color(int idx, int do_menu, int do_tooltip);
-#endif
-#ifdef FEAT_GUI
-static int  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, int do_menu, int use_norm, int do_tooltip);
-static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_tooltip, int free_font);
-#endif
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+స్థిర శూన్య gui_do_one_color(పూర్ణాంకం idx, పూర్ణాంకం do_menu, పూర్ణాంకం do_tooltip);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
+స్థిర పూర్ణాంకం  సమితి_సమూహం_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, పూర్ణాంకం do_menu, పూర్ణాంకం use_norm, పూర్ణాంకం do_tooltip);
+స్థిర శూన్య hl_do_font(పూర్ణాంకం idx, char_u *arg, పూర్ణాంకం do_సాధారణ, పూర్ణాంకం do_menu, పూర్ణాంకం do_tooltip, పూర్ణాంకం free_font);
+#అయితే_ముగింపు
 
 /*
  * The default highlight groups.  These are compiled-in for fast startup and
@@ -252,12 +252,12 @@ static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_
  * The #ifdefs are needed to reduce the amount of static data.  Helps to make
  * the 16 bit DOS (museum) version compile.
  */
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
 # define CENT(a, b) b
-#else
+#లేకపోతే
 # define CENT(a, b) a
-#endif
-static char *(highlight_init_both[]) = {
+#అయితే_ముగింపు
+స్థిర అక్షరం *(highlight_init_both[]) = {
     CENT("ErrorMsg term=standout ctermbg=DarkRed ctermfg=White",
 	 "ErrorMsg term=standout ctermbg=DarkRed ctermfg=White guibg=Red guifg=White"),
     CENT("IncSearch term=reverse,bold,underline cterm=reverse",
@@ -274,15 +274,15 @@ static char *(highlight_init_both[]) = {
     CENT("VertSplit term=reverse cterm=reverse",
 	 "VertSplit term=reverse cterm=reverse gui=reverse"),
     "default link VertSplitNC VertSplit",
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     CENT("VisualNOS term=underline,bold cterm=underline,bold",
 	 "VisualNOS term=underline,bold cterm=underline,bold gui=underline,bold"),
-#endif
-#ifdef FEAT_DIFF
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DIFF
     CENT("DiffText term=reverse cterm=bold ctermbg=Red ctermfg=Black",
 	 "DiffText term=reverse cterm=bold ctermbg=Red ctermfg=Black gui=bold guibg=Red"),
     "default link DiffTextAdd DiffText",
-#endif
+#అయితే_ముగింపు
     CENT("PmenuSbar term=NONE ctermbg=Grey",
 	 "PmenuSbar term=NONE ctermbg=Grey guibg=Grey"),
     CENT("TabLineSel term=bold cterm=bold",
@@ -292,14 +292,14 @@ static char *(highlight_init_both[]) = {
     "default link TabPanel TabLine",
     "default link TabPanelSel TabLineSel",
     "default link TabPanelFill TabLineFill",
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     "Cursor guibg=fg guifg=bg",
     "lCursor guibg=fg guifg=bg", // should be different, but what?
-#endif
-#ifdef FEAT_GUI_MSWIN
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_MSWIN
     "TitleBar guibg=bg guifg=fg",
     "TitleBarNC guibg=NONE guifg=NONE",
-#endif
+#అయితే_ముగింపు
     "default link QuickFixLine Search",
     "default link CursorLineSign SignColumn",
     "default link CursorLineFold FoldColumn",
@@ -319,11 +319,11 @@ static char *(highlight_init_both[]) = {
     "default link PopupNotification WarningMsg",
     "default link PreInsert Added",
     CENT("Normal cterm=NONE", "Normal gui=NONE"),
-    NULL
+    ఖాళీ
 };
 
 // Default colors only used with a light background.
-static char *(highlight_init_light[]) = {
+స్థిర అక్షరం *(highlight_init_light[]) = {
     CENT("Directory term=bold ctermfg=DarkBlue",
 	 "Directory term=bold ctermfg=DarkBlue guifg=Blue"),
     CENT("LineNr term=NONE ctermfg=Brown",
@@ -336,7 +336,7 @@ static char *(highlight_init_light[]) = {
 	 "Question term=standout ctermfg=DarkGreen gui=bold guifg=SeaGreen"),
     CENT("Search term=reverse ctermbg=Yellow ctermfg=NONE",
 	 "Search term=reverse ctermbg=Yellow ctermfg=NONE guibg=Yellow guifg=NONE"),
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
     CENT("SpellBad term=reverse ctermbg=LightRed",
 	 "SpellBad term=reverse ctermbg=LightRed guisp=Red gui=undercurl"),
     CENT("SpellCap term=reverse ctermbg=LightBlue",
@@ -345,7 +345,7 @@ static char *(highlight_init_light[]) = {
 	 "SpellRare term=reverse ctermbg=LightMagenta guisp=Magenta gui=undercurl"),
     CENT("SpellLocal term=underline ctermbg=Cyan",
 	 "SpellLocal term=underline ctermbg=Cyan guisp=DarkCyan gui=undercurl"),
-#endif
+#అయితే_ముగింపు
     CENT("PmenuThumb term=reverse ctermbg=Black",
 	 "PmenuThumb term=reverse ctermbg=Black guibg=Black"),
     CENT("PmenuShadow term=NONE ctermbg=Black ctermfg=DarkGrey",
@@ -362,59 +362,59 @@ static char *(highlight_init_light[]) = {
 	 "WarningMsg term=standout ctermfg=DarkRed guifg=Red"),
     CENT("WildMenu term=underline ctermbg=Yellow ctermfg=Black",
 	 "WildMenu term=underline ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     CENT("Folded term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "Folded term=standout ctermbg=Grey ctermfg=DarkBlue guibg=LightGrey guifg=DarkBlue"),
     CENT("FoldColumn term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "FoldColumn term=standout ctermbg=Grey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue"),
-#endif
-#ifdef FEAT_SIGNS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SIGNS
     CENT("SignColumn term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "SignColumn term=standout ctermbg=Grey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue"),
-#endif
+#అయితే_ముగింపు
     CENT("Visual ctermbg=Grey ctermfg=Black",
 	 "Visual ctermbg=Grey ctermfg=Black guibg=LightGrey guifg=Black"),
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     CENT("DiffAdd term=bold ctermbg=LightBlue ctermfg=Black",
 	 "DiffAdd term=bold ctermbg=LightBlue ctermfg=Black guibg=LightBlue"),
     CENT("DiffChange term=bold ctermbg=LightMagenta ctermfg=Black",
 	 "DiffChange term=bold ctermbg=LightMagenta ctermfg=Black guibg=LightMagenta"),
     CENT("DiffDelete term=bold ctermfg=Blue ctermbg=LightCyan",
 	 "DiffDelete term=bold ctermfg=Blue ctermbg=LightCyan gui=bold guifg=Blue guibg=LightCyan"),
-#endif
+#అయితే_ముగింపు
     CENT("TabLine term=underline cterm=underline ctermfg=black ctermbg=LightGrey",
 	 "TabLine term=underline cterm=underline ctermfg=black ctermbg=LightGrey gui=underline guibg=LightGrey"),
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     CENT("CursorColumn term=reverse ctermbg=LightGrey",
 	 "CursorColumn term=reverse ctermbg=LightGrey guibg=Grey90"),
     CENT("CursorLine term=underline cterm=underline",
 	 "CursorLine term=underline cterm=underline guibg=Grey90"),
     CENT("ColorColumn term=reverse ctermbg=LightRed",
 	 "ColorColumn term=reverse ctermbg=LightRed guibg=LightRed"),
-#endif
-#ifdef FEAT_CONCEAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CONCEAL
     CENT("Conceal ctermbg=DarkGrey ctermfg=LightGrey",
 	 "Conceal ctermbg=DarkGrey ctermfg=LightGrey guibg=DarkGrey guifg=LightGrey"),
-#endif
+#అయితే_ముగింపు
     CENT("MatchParen term=reverse ctermbg=Cyan",
 	 "MatchParen term=reverse ctermbg=Cyan guibg=Cyan"),
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
     CENT("StatusLineTerm term=reverse,bold cterm=bold ctermfg=White ctermbg=DarkGreen",
 	 "StatusLineTerm term=reverse,bold cterm=bold ctermfg=White ctermbg=DarkGreen gui=bold guifg=bg guibg=DarkGreen"),
     CENT("StatusLineTermNC term=reverse ctermfg=White ctermbg=DarkGreen",
 	 "StatusLineTermNC term=reverse ctermfg=White ctermbg=DarkGreen guifg=bg guibg=DarkGreen"),
-#endif
-#ifdef FEAT_MENU
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
     CENT("ToolbarLine term=underline ctermbg=LightGrey",
 	 "ToolbarLine term=underline ctermbg=LightGrey guibg=LightGrey"),
     CENT("ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey",
 	 "ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey gui=bold guifg=White guibg=Grey40"),
-#endif
-    NULL
+#అయితే_ముగింపు
+    ఖాళీ
 };
 
 // Default colors only used with a dark background.
-static char *(highlight_init_dark[]) = {
+స్థిర అక్షరం *(highlight_init_dark[]) = {
     CENT("Directory term=bold ctermfg=LightCyan",
 	 "Directory term=bold ctermfg=LightCyan guifg=Cyan"),
     CENT("LineNr term=NONE ctermfg=Yellow",
@@ -429,7 +429,7 @@ static char *(highlight_init_dark[]) = {
 	 "Search term=reverse ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
     CENT("SpecialKey term=NONE ctermfg=LightBlue",
 	 "SpecialKey term=NONE ctermfg=LightBlue guifg=Cyan"),
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
     CENT("SpellBad term=reverse ctermbg=Red",
 	 "SpellBad term=reverse ctermbg=Red guisp=Red gui=undercurl"),
     CENT("SpellCap term=reverse ctermbg=Blue",
@@ -438,7 +438,7 @@ static char *(highlight_init_dark[]) = {
 	 "SpellRare term=reverse ctermbg=Magenta guisp=Magenta gui=undercurl"),
     CENT("SpellLocal term=underline ctermbg=Cyan",
 	 "SpellLocal term=underline ctermbg=Cyan guisp=Cyan gui=undercurl"),
-#endif
+#అయితే_ముగింపు
     CENT("PmenuThumb term=reverse ctermbg=White",
 	 "PmenuThumb term=reverse ctermbg=White guibg=White"),
     CENT("PmenuShadow term=NONE ctermbg=Black ctermfg=DarkGrey",
@@ -453,230 +453,230 @@ static char *(highlight_init_dark[]) = {
 	 "WarningMsg term=standout ctermfg=LightRed guifg=Red"),
     CENT("WildMenu term=underline ctermbg=Yellow ctermfg=Black",
 	 "WildMenu term=underline ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     CENT("Folded term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "Folded term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=DarkGrey guifg=Cyan"),
     CENT("FoldColumn term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "FoldColumn term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=Grey guifg=Cyan"),
-#endif
-#ifdef FEAT_SIGNS
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SIGNS
     CENT("SignColumn term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "SignColumn term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=Grey guifg=Cyan"),
-#endif
+#అయితే_ముగింపు
     CENT("Visual ctermbg=Grey ctermfg=Black",
 	 "Visual ctermbg=Grey ctermfg=Black guibg=#575757 guifg=LightGrey"),
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     CENT("DiffAdd term=bold ctermbg=DarkBlue",
 	 "DiffAdd term=bold ctermbg=DarkBlue guibg=DarkBlue"),
     CENT("DiffChange term=bold ctermbg=DarkMagenta",
 	 "DiffChange term=bold ctermbg=DarkMagenta guibg=DarkMagenta"),
     CENT("DiffDelete term=bold ctermfg=Blue ctermbg=DarkCyan",
 	 "DiffDelete term=bold ctermfg=Blue ctermbg=DarkCyan gui=bold guifg=Blue guibg=DarkCyan"),
-#endif
+#అయితే_ముగింపు
     CENT("TabLine term=underline cterm=underline ctermfg=white ctermbg=DarkGrey",
 	 "TabLine term=underline cterm=underline ctermfg=white ctermbg=DarkGrey gui=underline guibg=DarkGrey"),
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     CENT("CursorColumn term=reverse ctermbg=DarkGrey",
 	 "CursorColumn term=reverse ctermbg=DarkGrey guibg=Grey40"),
     CENT("CursorLine term=underline cterm=underline",
 	 "CursorLine term=underline cterm=underline guibg=Grey40"),
     CENT("ColorColumn term=reverse ctermbg=DarkRed",
 	 "ColorColumn term=reverse ctermbg=DarkRed guibg=DarkRed"),
-#endif
+#అయితే_ముగింపు
     CENT("MatchParen term=reverse ctermbg=DarkCyan",
 	 "MatchParen term=reverse ctermbg=DarkCyan guibg=DarkCyan"),
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
     CENT("Conceal ctermbg=DarkGrey ctermfg=LightGrey",
 	 "Conceal ctermbg=DarkGrey ctermfg=LightGrey guibg=DarkGrey guifg=LightGrey"),
-#endif
-#ifdef FEAT_TERMINAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMINAL
     CENT("StatusLineTerm term=reverse,bold cterm=bold ctermfg=Black ctermbg=LightGreen",
 	 "StatusLineTerm term=reverse,bold cterm=bold ctermfg=Black ctermbg=LightGreen gui=bold guifg=bg guibg=LightGreen"),
     CENT("StatusLineTermNC term=reverse ctermfg=Black ctermbg=LightGreen",
 	 "StatusLineTermNC term=reverse ctermfg=Black ctermbg=LightGreen guifg=bg guibg=LightGreen"),
-#endif
-#ifdef FEAT_MENU
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_MENU
     CENT("ToolbarLine term=underline ctermbg=DarkGrey",
 	 "ToolbarLine term=underline ctermbg=DarkGrey guibg=Grey50"),
     CENT("ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey",
 	 "ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey gui=bold guifg=Black guibg=LightGrey"),
-#endif
-    NULL
+#అయితే_ముగింపు
+    ఖాళీ
 };
 
-#if defined(FEAT_SYN_HL)
+#ఒకవేళ defined(FEAT_SYN_HL)
 /*
  * Returns the number of highlight groups.
  */
-    int
-highlight_num_groups(void)
+    పూర్ణాంకం
+highlight_అంకె_groups(శూన్య)
 {
-    return highlight_ga.ga_len;
+    తిరిగి highlight_ga.ga_len;
 }
 
 /*
  * Returns the name of a highlight group.
  */
     char_u *
-highlight_group_name(int id)
+highlight_సమూహం_name(పూర్ణాంకం id)
 {
-    return HL_TABLE()[id].sg_name;
+    తిరిగి HL_పట్టిక()[id].sg_name;
 }
 
 /*
  * Returns the ID of the link to a highlight group.
  */
-    int
-highlight_link_id(int id)
+    పూర్ణాంకం
+highlight_link_id(పూర్ణాంకం id)
 {
-    return HL_TABLE()[id].sg_link;
+    తిరిగి HL_పట్టిక()[id].sg_link;
 }
-#endif
+#అయితే_ముగింపు
 
-static void resolve_fallback_fg_to_rgb(void);
-static void resolve_fallback_bg_to_rgb(void);
+స్థిర శూన్య resolve_fallback_fg_గమ్యం_rgb(శూన్య);
+స్థిర శూన్య resolve_fallback_bg_గమ్యం_rgb(శూన్య);
 
-    void
+    శూన్య
 init_highlight(
-    int		both,	    // include groups where 'bg' doesn't matter
-    int		reset)	    // clear group first
+    పూర్ణాంకం		both,	    // include groups where 'bg' doesn't matter
+    పూర్ణాంకం		reset)	    // clear group first
 {
-    int		i;
-    char	**pp;
-    static int	had_both = FALSE;
-#ifdef FEAT_EVAL
+    పూర్ణాంకం		i;
+    అక్షరం	**pp;
+    స్థిర పూర్ణాంకం	had_both = FALSE;
+#నిర్వచితమైతే FEAT_EVAL
     char_u	*p;
 
     // Try finding the color scheme file.  Used when a color file was loaded
     // and 'background' or 't_Co' is changed.
-    p = get_var_value((char_u *)"g:colors_name");
-    if (p != NULL)
+    p = get_var_విలువ((char_u *)"g:colors_name");
+    ఒకవేళ (p != ఖాళీ)
     {
 	// The value of g:colors_name could be freed when sourcing the script,
 	// making "p" invalid, so copy it.
 	char_u *copy_p = vim_strsave(p);
-	int    r;
+	పూర్ణాంకం    r;
 
-	if (copy_p != NULL)
+	ఒకవేళ (copy_p != ఖాళీ)
 	{
-	    r = load_colors(copy_p);
+	    r = ఎక్కించు_colors(copy_p);
 	    vim_free(copy_p);
-	    if (r == OK)
-		return;
+	    ఒకవేళ (r == OK)
+		తిరిగి;
 	}
     }
 
-#endif
+#అయితే_ముగింపు
 
     // Didn't use a color file, use the compiled-in colors.
-    if (both)
+    ఒకవేళ (both)
     {
 	had_both = TRUE;
 	pp = highlight_init_both;
-	for (i = 0; pp[i] != NULL; ++i)
+	కొరకు (i = 0; pp[i] != ఖాళీ; ++i)
 	    do_highlight((char_u *)pp[i], reset, TRUE);
     }
-    else if (!had_both)
+    లేకపోతే ఒకవేళ (!had_both)
 	// Don't do anything before the call with both == TRUE from main().
 	// Not everything has been setup then, and that call will overrule
 	// everything anyway.
-	return;
+	తిరిగి;
 
-    if (*p_bg == 'l')
+    ఒకవేళ (*p_bg == 'l')
 	pp = highlight_init_light;
-    else
+    లేకపోతే
 	pp = highlight_init_dark;
-    for (i = 0; pp[i] != NULL; ++i)
+    కొరకు (i = 0; pp[i] != ఖాళీ; ++i)
 	do_highlight((char_u *)pp[i], reset, TRUE);
 
     // Reverse looks ugly, but grey may not work for less than 8 colors.  Thus
     // let it depend on the number of colors available.
-    if (t_colors < 8)
+    ఒకవేళ (t_colors < 8)
 	do_highlight((char_u *)"Visual term=reverse cterm=reverse ctermbg=NONE ctermfg=NONE",
 		FALSE, TRUE);
     // With 8 colors brown is equal to yellow, need to use black for Search fg
     // to avoid Statement highlighted text disappears.
     // Clear the attributes, needed when changing the t_Co value.
-    if (t_colors <= 8)
+    ఒకవేళ (t_colors <= 8)
     {
-	if (*p_bg == 'l')
+	ఒకవేళ (*p_bg == 'l')
 	    do_highlight((char_u *)"Search ctermfg=black", FALSE, TRUE);
     }
 
-#ifdef FEAT_SYN_HL
+#నిర్వచితమైతే FEAT_SYN_HL
     // If syntax highlighting is enabled load the highlighting for it.
-    if (get_var_value((char_u *)"g:syntax_on") != NULL)
+    ఒకవేళ (get_var_విలువ((char_u *)"g:syntax_on") != ఖాళీ)
     {
-	static int	recursive = 0;
+	స్థిర పూర్ణాంకం	recursive = 0;
 
-	if (recursive >= 5)
+	ఒకవేళ (recursive >= 5)
 	    emsg(_(e_recursive_loop_loading_syncolor_vim));
-	else
+	లేకపోతే
 	{
 	    ++recursive;
-	    (void)source_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
+	    (శూన్య)ఆధారం_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
 	    --recursive;
 	}
     }
-#endif
-    resolve_fallback_fg_to_rgb();
-    resolve_fallback_bg_to_rgb();
+#అయితే_ముగింపు
+    resolve_fallback_fg_గమ్యం_rgb();
+    resolve_fallback_bg_గమ్యం_rgb();
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 /*
  * Load a default color list. Intended to support legacy color names but allows
  * the user to override the color values. Only loaded once.
  */
-    static void
-load_default_colors_lists(void)
+    స్థిర శూన్య
+ఎక్కించు_default_colors_lists(శూన్య)
 {
     // Lacking a default color list isn't the end of the world but it is likely
     // an inconvenience so users should know when it is missing.
-    if (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
-	msg("failed to load colors/lists/default.vim");
+    ఒకవేళ (ఆధారం_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
+	సందేశం("failed to load colors/lists/default.vim");
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Load color file "name".
  * Return OK for success, FAIL for failure.
  */
-    int
-load_colors(char_u *name)
+    పూర్ణాంకం
+ఎక్కించు_colors(char_u *name)
 {
     char_u	*buf;
-    int		retval = FAIL;
-    static int	recursive = FALSE;
+    పూర్ణాంకం		retval = FAIL;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
 
     // When being called recursively, this is probably because setting
     // 'background' caused the highlighting to be reloaded.  This means it is
     // working, thus we should return OK.
-    if (recursive)
-	return OK;
+    ఒకవేళ (recursive)
+	తిరిగి OK;
 
     recursive = TRUE;
     buf = alloc(STRLEN(name) + 12);
-    if (buf != NULL)
+    ఒకవేళ (buf != ఖాళీ)
     {
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	load_default_colors_lists();
-#endif
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	ఎక్కించు_default_colors_lists();
+#అయితే_ముగింపు
 	apply_autocmds(EVENT_COLORSCHEMEPRE, name,
 					       curbuf->b_fname, FALSE, curbuf);
-	sprintf((char *)buf, "colors/%s.vim", name);
-	retval = source_runtime(buf, DIP_START + DIP_OPT);
+	sprintf((అక్షరం *)buf, "colors/%s.vim", name);
+	retval = ఆధారం_runtime(buf, DIP_ప్రారంభం + DIP_OPT);
 	vim_free(buf);
-	if (retval == OK)
+	ఒకవేళ (retval == OK)
 	    apply_autocmds(EVENT_COLORSCHEME, name, curbuf->b_fname,
 								FALSE, curbuf);
     }
     recursive = FALSE;
 
-    return retval;
+    తిరిగి retval;
 }
 
-static int color_numbers_16[28] = {0, 1, 2, 3,
+స్థిర పూర్ణాంకం color_numbers_16[28] = {0, 1, 2, 3,
 				 4, 5, 6, 6,
 				 7, 7, 7, 7,
 				 8, 8,
@@ -684,7 +684,7 @@ static int color_numbers_16[28] = {0, 1, 2, 3,
 				 11, 11, 12, 12, 13,
 				 13, 14, 14, 15, -1};
 // for xterm with 88 colors...
-static int color_numbers_88[28] = {0, 4, 2, 6,
+స్థిర పూర్ణాంకం color_numbers_88[28] = {0, 4, 2, 6,
 				 1, 5, 32, 72,
 				 84, 84, 7, 7,
 				 82, 82,
@@ -692,7 +692,7 @@ static int color_numbers_88[28] = {0, 4, 2, 6,
 				 14, 63, 9, 74, 13,
 				 75, 11, 78, 15, -1};
 // for xterm with 256 colors...
-static int color_numbers_256[28] = {0, 4, 2, 6,
+స్థిర పూర్ణాంకం color_numbers_256[28] = {0, 4, 2, 6,
 				 1, 5, 130, 3,
 				 248, 248, 7, 7,
 				 242, 242,
@@ -700,7 +700,7 @@ static int color_numbers_256[28] = {0, 4, 2, 6,
 				 14, 159, 9, 224, 13,
 				 225, 11, 229, 15, -1};
 // for terminals with less than 16 colors...
-static int color_numbers_8[28] = {0, 4, 2, 6,
+స్థిర పూర్ణాంకం color_numbers_8[28] = {0, 4, 2, 6,
 				 1, 5, 3, 3,
 				 7, 7, 7, 7,
 				 0+8, 0+8,
@@ -714,65 +714,65 @@ static int color_numbers_8[28] = {0, 4, 2, 6,
  * "boldp" will be set to TRUE or FALSE for a foreground color when using 8
  * colors, otherwise it will be unchanged.
  */
-    static int
-lookup_color(int idx, int foreground, int *boldp)
+    స్థిర పూర్ణాంకం
+lookup_color(పూర్ణాంకం idx, పూర్ణాంకం foreground, పూర్ణాంకం *boldp)
 {
-    int		color = color_numbers_16[idx];
+    పూర్ణాంకం		color = color_numbers_16[idx];
     char_u	*p;
 
     // Use the _16 table to check if it's a valid color name.
-    if (color < 0)
-	return -1;
+    ఒకవేళ (color < 0)
+	తిరిగి -1;
 
-    if (t_colors == 8)
+    ఒకవేళ (t_colors == 8)
     {
 	// t_Co is 8: use the 8 colors table
-#if defined(__QNXNTO__)
+#ఒకవేళ defined(__QNXNTO__)
 	// On qnx, the 8 & 16 color arrays are the same
-	if (STRNCMP(T_NAME, "qansi", 5) == 0)
+	ఒకవేళ (STRNCMP(T_NAME, "qansi", 5) == 0)
 	    color = color_numbers_16[idx];
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    color = color_numbers_8[idx];
-	if (foreground)
+	ఒకవేళ (foreground)
 	{
 	    // set/reset bold attribute to get light foreground
 	    // colors (on some terminals, e.g. "linux")
-	    if (color & 8)
+	    ఒకవేళ (color & 8)
 		*boldp = TRUE;
-	    else
+	    లేకపోతే
 		*boldp = FALSE;
 	}
 	color &= 7;	// truncate to 8 colors
     }
-    else if (t_colors == 16 || t_colors == 88
+    లేకపోతే ఒకవేళ (t_colors == 16 || t_colors == 88
 					   || t_colors >= 256)
     {
 	// Guess: if the termcap entry ends in 'm', it is
 	// probably an xterm-like terminal.  Use the changed
 	// order for colors.
-	if (*T_CAF != NUL)
+	ఒకవేళ (*T_CAF != NUL)
 	    p = T_CAF;
-	else
+	లేకపోతే
 	    p = T_CSF;
-	if (*p != NUL && (t_colors > 256
+	ఒకవేళ (*p != NUL && (t_colors > 256
 			      || *(p + STRLEN(p) - 1) == 'm'))
 	{
-	    if (t_colors == 88)
+	    ఒకవేళ (t_colors == 88)
 		color = color_numbers_88[idx];
-	    else if (t_colors >= 256)
+	    లేకపోతే ఒకవేళ (t_colors >= 256)
 		color = color_numbers_256[idx];
-	    else
+	    లేకపోతే
 		color = color_numbers_8[idx];
 	}
-#ifdef FEAT_TERMRESPONSE
-	if (t_colors >= 256 && color == 15 && is_mac_terminal)
+#నిర్వచితమైతే FEAT_TERMRESPONSE
+	ఒకవేళ (t_colors >= 256 && color == 15 && is_mac_terminal)
 	    // Terminal.app has a bug: 15 is light grey. Use white
 	    // from the color cube instead.
 	    color = 231;
-#endif
+#అయితే_ముగింపు
     }
-    return color;
+    తిరిగి color;
 }
 
 /*
@@ -781,67 +781,67 @@ lookup_color(int idx, int foreground, int *boldp)
  * 'forceit' is set to TRUE for ":highlight! link"
  * 'init' is set to TRUE when initializing all the highlight groups.
  */
-    static void
-highlight_group_link(
+    స్థిర శూన్య
+highlight_సమూహం_link(
 	char_u	*from_hg,
-	int	from_len,
-	char_u	*to_hg,
-	int	to_len,
-	int	dodefault,
-	int	forceit,
-	int	init)
+	పూర్ణాంకం	from_len,
+	char_u	*గమ్యం_hg,
+	పూర్ణాంకం	గమ్యం_len,
+	పూర్ణాంకం	dodefault,
+	పూర్ణాంకం	forceit,
+	పూర్ణాంకం	init)
 {
-    int		from_id;
-    int		to_id;
-    hl_group_T	*hlgroup = NULL;
+    పూర్ణాంకం		from_id;
+    పూర్ణాంకం		గమ్యం_id;
+    hl_సమూహం_T	*hlgroup = ఖాళీ;
 
-    from_id = syn_check_group(from_hg, from_len);
-    if (STRNCMP(to_hg, "NONE", 4) == 0)
-	to_id = 0;
-    else
-	to_id = syn_check_group(to_hg, to_len);
+    from_id = syn_check_సమూహం(from_hg, from_len);
+    ఒకవేళ (STRNCMP(గమ్యం_hg, "NONE", 4) == 0)
+	గమ్యం_id = 0;
+    లేకపోతే
+	గమ్యం_id = syn_check_సమూహం(గమ్యం_hg, గమ్యం_len);
 
-    if (from_id > 0)
+    ఒకవేళ (from_id > 0)
     {
-	hlgroup = &HL_TABLE()[from_id - 1];
-	if (dodefault && (forceit || hlgroup->sg_deflink == 0))
+	hlgroup = &HL_పట్టిక()[from_id - 1];
+	ఒకవేళ (dodefault && (forceit || hlgroup->sg_deflink == 0))
 	{
-	    hlgroup->sg_deflink = to_id;
-#ifdef FEAT_EVAL
+	    hlgroup->sg_deflink = గమ్యం_id;
+#నిర్వచితమైతే FEAT_EVAL
 	    hlgroup->sg_deflink_sctx = current_sctx;
 	    hlgroup->sg_deflink_sctx.sc_lnum += SOURCING_LNUM;
-#endif
+#అయితే_ముగింపు
 	}
     }
 
-    if (from_id > 0 && (!init || hlgroup->sg_set == 0))
+    ఒకవేళ (from_id > 0 && (!init || hlgroup->sg_సమితి == 0))
     {
 	// Don't allow a link when there already is some highlighting
 	// for the group, unless '!' is used
-	if (to_id > 0 && !forceit && !init
+	ఒకవేళ (గమ్యం_id > 0 && !forceit && !init
 		&& hl_has_settings(from_id - 1, dodefault))
 	{
-	    if (SOURCING_NAME == NULL && !dodefault)
-		emsg(_(e_group_has_settings_highlight_link_ignored));
+	    ఒకవేళ (SOURCING_NAME == ఖాళీ && !dodefault)
+		emsg(_(e_సమూహం_has_settings_highlight_link_ignored));
 	}
-	else if (hlgroup->sg_link != to_id
-#ifdef FEAT_EVAL
+	లేకపోతే ఒకవేళ (hlgroup->sg_link != గమ్యం_id
+#నిర్వచితమైతే FEAT_EVAL
 		|| hlgroup->sg_script_ctx.sc_sid != current_sctx.sc_sid
-#endif
+#అయితే_ముగింపు
 		|| hlgroup->sg_cleared)
 	{
-	    if (!init)
-		hlgroup->sg_set |= SG_LINK;
-	    hlgroup->sg_link = to_id;
-#ifdef FEAT_EVAL
+	    ఒకవేళ (!init)
+		hlgroup->sg_సమితి |= SG_LINK;
+	    hlgroup->sg_link = గమ్యం_id;
+#నిర్వచితమైతే FEAT_EVAL
 	    hlgroup->sg_script_ctx = current_sctx;
 	    hlgroup->sg_script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
+#అయితే_ముగింపు
 	    hlgroup->sg_cleared = FALSE;
 	    redraw_all_later(UPD_SOME_VALID);
 
 	    // Only call highlight_changed() once after multiple changes.
-	    need_highlight_changed = TRUE;
+	    need_highlight_మారింది = TRUE;
 	}
     }
 
@@ -851,32 +851,32 @@ highlight_group_link(
  * Reset all highlighting to the defaults. Removes all highlighting for the
  * groups added by the user.
  */
-    static void
-highlight_reset_all(void)
+    స్థిర శూన్య
+highlight_reset_all(శూన్య)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // First, we do not destroy the old values, but allocate the new
     // ones and update the display. THEN we destroy the old values.
     // If we destroy the old values first, then the old values
     // (such as GuiFont's or GuiFontset's) will still be displayed but
     // invalid because they were free'd.
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
     {
 # ifdef FEAT_BEVAL_TIP
 	gui_init_tooltip_font();
 # endif
-# if defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
+# ఒకవేళ defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
 	gui_init_menu_font();
 # endif
     }
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
+# ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
     gui_mch_def_colors();
 # endif
 # ifdef FEAT_GUI_MSWIN
-    if (gui.in_use)
-	gui_mch_set_titlebar_colors();
+    ఒకవేళ (gui.లోపల_use)
+	gui_mch_సమితి_titlebar_colors();
 # endif
 # ifdef FEAT_GUI_X11
 #  ifdef FEAT_MENU
@@ -885,7 +885,7 @@ highlight_reset_all(void)
     // group defined by default, which IS currently the case.
     gui_mch_new_menu_colors();
 #  endif
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
     {
 	gui_new_scrollbar_colors();
 #  ifdef FEAT_BEVAL_GUI
@@ -900,22 +900,22 @@ highlight_reset_all(void)
     // Ok, we're done allocating the new default graphics items.
     // The screen should already be refreshed at this point.
     // It is now Ok to clear out the old data.
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
     do_unlet((char_u *)"g:colors_name", TRUE);
-#endif
+#అయితే_ముగింపు
     restore_cterm_colors();
 
     // Clear all default highlight groups and load the defaults.
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    కొరకు (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	highlight_clear(idx);
     init_highlight(TRUE, TRUE);
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (USE_24_బిట్టు)
 	highlight_gui_started();
-    else
-#endif
-	highlight_changed();
+    లేకపోతే
+#అయితే_ముగింపు
+	highlight_మారింది();
     redraw_later_clear();
 }
 
@@ -927,214 +927,214 @@ highlight_reset_all(void)
  * 'init' is set to TRUE when initializing all the highlight groups.
  * Returns TRUE if the attributes are set.
  */
-    static int
-highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
+    స్థిర పూర్ణాంకం
+highlight_సమితి_termgui_attr(పూర్ణాంకం idx, char_u *కీలకం, char_u *arg, పూర్ణాంకం init)
 {
-    int		attr;
+    పూర్ణాంకం		attr;
     size_t	off;
-    keyvalue_T	target;
-    keyvalue_T	*entry;
+    keyvalue_T	లక్ష్యం;
+    keyvalue_T	*నమోదు_2;
 
     attr = 0;
     off = 0;
-    target.key = 0;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_ni()
-    while (arg[off] != NUL)
+    లక్ష్యం.కీలకం = 0;
+    లక్ష్యం.విలువ.నిడివి = 0;	// not used, see cmp_keyvalue_value_ni()
+    అయితే (arg[off] != NUL)
     {
-	target.value.string = arg + off;
-	entry = (keyvalue_T *)bsearch(&target, &highlight_tab,
-		ARRAY_LENGTH(highlight_tab), sizeof(highlight_tab[0]),
-		cmp_keyvalue_value_ni);
-	if (entry == NULL)
+	లక్ష్యం.విలువ.string = arg + off;
+	నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &highlight_tab,
+		ARRAY_నిడివి(highlight_tab), పరిమాణం(highlight_tab[0]),
+		cmp_keyvalue_విలువ_ni);
+	ఒకవేళ (నమోదు_2 == ఖాళీ)
 	{
-	    semsg(_(e_illegal_value_str), arg);
-	    return FALSE;
+	    semsg(_(e_illegal_విలువ_str), arg);
+	    తిరిగి FALSE;
 	}
 
-	attr |= entry->key;
-	off += entry->value.length;
-	if (arg[off] == ',')		// another one follows
+	attr |= నమోదు_2->కీలకం;
+	off += నమోదు_2->విలువ.నిడివి;
+	ఒకవేళ (arg[off] == ',')		// another one follows
 	    ++off;
     }
-    if (*key == 'T')
+    ఒకవేళ (*కీలకం == 'T')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
+	ఒకవేళ (!init || !(HL_పట్టిక()[idx].sg_సమితి & SG_పదం))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_TERM;
-	    HL_TABLE()[idx].sg_term = attr;
+	    ఒకవేళ (!init)
+		HL_పట్టిక()[idx].sg_సమితి |= SG_పదం;
+	    HL_పట్టిక()[idx].sg_పదం = attr;
 	}
     }
-    else if (*key == 'C')
+    లేకపోతే ఒకవేళ (*కీలకం == 'C')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
+	ఒకవేళ (!init || !(HL_పట్టిక()[idx].sg_సమితి & SG_CTERM))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_CTERM;
-	    HL_TABLE()[idx].sg_cterm = attr;
-	    HL_TABLE()[idx].sg_cterm_bold = FALSE;
+	    ఒకవేళ (!init)
+		HL_పట్టిక()[idx].sg_సమితి |= SG_CTERM;
+	    HL_పట్టిక()[idx].sg_cterm = attr;
+	    HL_పట్టిక()[idx].sg_cterm_bold = FALSE;
 	}
     }
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    else
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    లేకపోతే
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
+	ఒకవేళ (!init || !(HL_పట్టిక()[idx].sg_సమితి & SG_GUI))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_GUI;
-	    HL_TABLE()[idx].sg_gui = attr;
+	    ఒకవేళ (!init)
+		HL_పట్టిక()[idx].sg_సమితి |= SG_GUI;
+	    HL_పట్టిక()[idx].sg_gui = attr;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 /*
  * Set the font for the highlight group at 'idx'.
  * 'arg' is the font name.
  * Returns TRUE if the font is changed.
  */
-    static int
-highlight_set_font(
-	int	idx,
+    స్థిర పూర్ణాంకం
+highlight_సమితి_font(
+	పూర్ణాంకం	idx,
 	char_u	*arg,
-	int	is_normal_group,
-	int	is_menu_group,
-	int	is_tooltip_group)
+	పూర్ణాంకం	is_సాధారణ_సమూహం,
+	పూర్ణాంకం	is_menu_సమూహం,
+	పూర్ణాంకం	is_tooltip_సమూహం)
 {
-    int		did_change = FALSE;
+    పూర్ణాంకం		did_change = FALSE;
 
     // in non-GUI fonts are simply ignored
-    if (HL_TABLE()[idx].sg_font_name != NULL
-	    && STRCMP(HL_TABLE()[idx].sg_font_name, arg) == 0)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_font_name != ఖాళీ
+	    && STRCMP(HL_పట్టిక()[idx].sg_font_name, arg) == 0)
     {
 	// Font name didn't change, ignore.
     }
-    else if (!gui.shell_created)
+    లేకపోతే ఒకవేళ (!gui.shell_created)
     {
 	// GUI not started yet, always accept the name.
-	vim_free(HL_TABLE()[idx].sg_font_name);
-	HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
+	vim_free(HL_పట్టిక()[idx].sg_font_name);
+	HL_పట్టిక()[idx].sg_font_name = vim_strsave(arg);
 	did_change = TRUE;
     }
-    else
+    లేకపోతే
     {
-	GuiFont temp_sg_font = HL_TABLE()[idx].sg_font;
+	GuiFont తాత్కాలిక_sg_font = HL_పట్టిక()[idx].sg_font;
 # ifdef FEAT_XFONTSET
-	GuiFontset temp_sg_fontset = HL_TABLE()[idx].sg_fontset;
+	GuiFontset తాత్కాలిక_sg_fontset = HL_పట్టిక()[idx].sg_fontset;
 # endif
 	// First, save the current font/fontset.
 	// Then try to allocate the font/fontset.
 	// If the allocation fails, HL_TABLE()[idx].sg_font OR
 	// sg_fontset will be set to NOFONT or NOFONTSET respectively.
 
-	HL_TABLE()[idx].sg_font = NOFONT;
+	HL_పట్టిక()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-	HL_TABLE()[idx].sg_fontset = NOFONTSET;
+	HL_పట్టిక()[idx].sg_fontset = NOFONTSET;
 # endif
-	hl_do_font(idx, arg, is_normal_group, is_menu_group,
-		is_tooltip_group, FALSE);
+	hl_do_font(idx, arg, is_సాధారణ_సమూహం, is_menu_సమూహం,
+		is_tooltip_సమూహం, FALSE);
 
 # ifdef FEAT_XFONTSET
-	if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+	ఒకవేళ (HL_పట్టిక()[idx].sg_fontset != NOFONTSET)
 	{
 	    // New fontset was accepted. Free the old one, if there
 	    // was one.
-	    gui_mch_free_fontset(temp_sg_fontset);
+	    gui_mch_free_fontset(తాత్కాలిక_sg_fontset);
 	    did_change = TRUE;
 	}
-	else
-	    HL_TABLE()[idx].sg_fontset = temp_sg_fontset;
+	లేకపోతే
+	    HL_పట్టిక()[idx].sg_fontset = తాత్కాలిక_sg_fontset;
 # endif
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	ఒకవేళ (HL_పట్టిక()[idx].sg_font != NOFONT)
 	{
 	    // New font was accepted. Free the old one, if there was
 	    // one.
-	    gui_mch_free_font(temp_sg_font);
+	    gui_mch_free_font(తాత్కాలిక_sg_font);
 	    did_change = TRUE;
 	}
-	else
-	    HL_TABLE()[idx].sg_font = temp_sg_font;
+	లేకపోతే
+	    HL_పట్టిక()[idx].sg_font = తాత్కాలిక_sg_font;
 	// Update sg_font_name once here, after both font and fontset results
 	// are known.
-	if (did_change)
+	ఒకవేళ (did_change)
 	{
-	    vim_free(HL_TABLE()[idx].sg_font_name);
-	    HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
+	    vim_free(HL_పట్టిక()[idx].sg_font_name);
+	    HL_పట్టిక()[idx].sg_font_name = vim_strsave(arg);
 	}
     }
 
-    return did_change;
+    తిరిగి did_change;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the cterm foreground color for the Normal highlight group to "color" and
  * the bold attribute to "bold".
  */
-    static void
-hl_set_ctermfg_normal_group(int color, int bold)
+    స్థిర శూన్య
+hl_సమితి_ctermfg_సాధారణ_సమూహం(పూర్ణాంకం color, పూర్ణాంకం bold)
 {
-    cterm_normal_fg_color = color + 1;
-    cterm_normal_fg_bold = bold;
-#ifdef FEAT_GUI
+    cterm_సాధారణ_fg_color = color + 1;
+    cterm_సాధారణ_fg_bold = bold;
+#నిర్వచితమైతే FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ఒకవేళ (!gui.లోపల_use && !gui.starting)
+#అయితే_ముగింపు
     {
-	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
-	    term_fg_color(color);
+	సమితి_must_redraw(UPD_CLEAR);
+	ఒకవేళ (termcap_చురుకైన && color >= 0)
+	    పదం_fg_color(color);
     }
 }
 
 /*
  * Set the cterm foreground color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermfg(int idx, int color, int is_normal_group)
+    స్థిర శూన్య
+highlight_సమితి_ctermfg(పూర్ణాంకం idx, పూర్ణాంకం color, పూర్ణాంకం is_సాధారణ_సమూహం)
 {
-    HL_TABLE()[idx].sg_cterm_fg = color + 1;
-    if (is_normal_group)
-	hl_set_ctermfg_normal_group(color,
-					(HL_TABLE()[idx].sg_cterm & HL_BOLD));
+    HL_పట్టిక()[idx].sg_cterm_fg = color + 1;
+    ఒకవేళ (is_సాధారణ_సమూహం)
+	hl_సమితి_ctermfg_సాధారణ_సమూహం(color,
+					(HL_పట్టిక()[idx].sg_cterm & HL_BOLD));
 }
 
 /*
  * Set the cterm background color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermbg_normal_group(int color)
+    స్థిర శూన్య
+hl_సమితి_ctermbg_సాధారణ_సమూహం(పూర్ణాంకం color)
 {
-    cterm_normal_bg_color = color + 1;
-#ifdef FEAT_GUI
+    cterm_సాధారణ_bg_color = color + 1;
+#నిర్వచితమైతే FEAT_GUI
     // Don't mess with 'background' if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ఒకవేళ (!gui.లోపల_use && !gui.starting)
+#అయితే_ముగింపు
     {
-	set_must_redraw(UPD_CLEAR);
-	if (color >= 0)
+	సమితి_must_redraw(UPD_CLEAR);
+	ఒకవేళ (color >= 0)
 	{
-	    int dark = -1;
+	    పూర్ణాంకం dark = -1;
 
-	    if (termcap_active)
-		term_bg_color(color);
-	    if (t_colors < 16)
+	    ఒకవేళ (termcap_చురుకైన)
+		పదం_bg_color(color);
+	    ఒకవేళ (t_colors < 16)
 		dark = (color == 0 || color == 4);
 	    // Limit the heuristic to the standard 16 colors
-	    else if (color < 16)
+	    లేకపోతే ఒకవేళ (color < 16)
 		dark = (color < 7 || color == 8);
 	    // Set the 'background' option if the value is
 	    // wrong.
-	    if (dark != -1
+	    ఒకవేళ (dark != -1
 		    && dark != (*p_bg == 'd')
-		    && !option_was_set((char_u *)"bg"))
+		    && !option_was_సమితి((char_u *)"bg"))
 	    {
-		set_option_value_give_err((char_u *)"bg",
+		సమితి_option_విలువ_give_err((char_u *)"bg",
 			0L, (char_u *)(dark ? "dark" : "light"), 0);
-		reset_option_was_set((char_u *)"bg");
+		reset_option_was_సమితి((char_u *)"bg");
 	    }
 	}
     }
@@ -1143,41 +1143,41 @@ hl_set_ctermbg_normal_group(int color)
 /*
  * Set the cterm background color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermbg(int idx, int color, int is_normal_group)
+    స్థిర శూన్య
+highlight_సమితి_ctermbg(పూర్ణాంకం idx, పూర్ణాంకం color, పూర్ణాంకం is_సాధారణ_సమూహం)
 {
-    HL_TABLE()[idx].sg_cterm_bg = color + 1;
-    if (is_normal_group)
-	hl_set_ctermbg_normal_group(color);
+    HL_పట్టిక()[idx].sg_cterm_bg = color + 1;
+    ఒకవేళ (is_సాధారణ_సమూహం)
+	hl_సమితి_ctermbg_సాధారణ_సమూహం(color);
 }
 
 /*
  * Set the cterm underline color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermul_normal_group(int color)
+    స్థిర శూన్య
+hl_సమితి_ctermul_సాధారణ_సమూహం(పూర్ణాంకం color)
 {
-    cterm_normal_ul_color = color + 1;
-#ifdef FEAT_GUI
+    cterm_సాధారణ_ul_color = color + 1;
+#నిర్వచితమైతే FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ఒకవేళ (!gui.లోపల_use && !gui.starting)
+#అయితే_ముగింపు
     {
-	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
-	    term_ul_color(color);
+	సమితి_must_redraw(UPD_CLEAR);
+	ఒకవేళ (termcap_చురుకైన && color >= 0)
+	    పదం_ul_color(color);
     }
 }
 
 /*
  * Set the cterm underline color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermul(int idx, int color, int is_normal_group)
+    స్థిర శూన్య
+highlight_సమితి_ctermul(పూర్ణాంకం idx, పూర్ణాంకం color, పూర్ణాంకం is_సాధారణ_సమూహం)
 {
-    HL_TABLE()[idx].sg_cterm_ul = color + 1;
-    if (is_normal_group)
-	hl_set_ctermul_normal_group(color);
+    HL_పట్టిక()[idx].sg_cterm_ul = color + 1;
+    ఒకవేళ (is_సాధారణ_సమూహం)
+	hl_సమితి_ctermul_సాధారణ_సమూహం(color);
 }
 
 /*
@@ -1188,29 +1188,29 @@ highlight_set_ctermul(int idx, int color, int is_normal_group)
  *
  * Returns TRUE if the font is set.
  */
-    static int
-highlight_set_cterm_font(
-	int	idx,
+    స్థిర పూర్ణాంకం
+highlight_సమితి_cterm_font(
+	పూర్ణాంకం	idx,
 	char_u	*arg,
-	int	init)
+	పూర్ణాంకం	init)
 {
-    int		font;
+    పూర్ణాంకం		font;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    ఒకవేళ (init && (HL_పట్టిక()[idx].sg_సమితి & SG_CTERM))
+	తిరిగి FALSE;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_CTERM;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_CTERM;
 
-    if (VIM_ISDIGIT(*arg))
-	font = atoi((char *)arg);
-    else if (STRICMP(arg, "NONE") == 0)
+    ఒకవేళ (VIM_ISDIGIT(*arg))
+	font = atoi((అక్షరం *)arg);
+    లేకపోతే ఒకవేళ (STRICMP(arg, "NONE") == 0)
 	font = -1;
-    else
-	return FALSE;
+    లేకపోతే
+	తిరిగి FALSE;
 
-    HL_TABLE()[idx].sg_cterm_font = font + 1;
-    return TRUE;
+    HL_పట్టిక()[idx].sg_cterm_font = font + 1;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1224,178 +1224,178 @@ highlight_set_cterm_font(
  *
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_cterm_color(
-	int	idx,
-	char_u	*key,
-	char_u	*key_start,
+    స్థిర పూర్ణాంకం
+highlight_సమితి_cterm_color(
+	పూర్ణాంకం	idx,
+	char_u	*కీలకం,
+	char_u	*కీలకం_ప్రారంభం,
 	char_u	*arg,
-	int	is_normal_group,
-	int	init)
+	పూర్ణాంకం	is_సాధారణ_సమూహం,
+	పూర్ణాంకం	init)
 {
-    int		color;
+    పూర్ణాంకం		color;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    ఒకవేళ (init && (HL_పట్టిక()[idx].sg_సమితి & SG_CTERM))
+	తిరిగి FALSE;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_CTERM;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_CTERM;
 
     // When setting the foreground color, and previously the "bold"
     // flag was set for a light color, reset it now
-    if (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
+    ఒకవేళ (కీలకం[5] == 'F' && HL_పట్టిక()[idx].sg_cterm_bold)
     {
-	HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
-	HL_TABLE()[idx].sg_cterm_bold = FALSE;
+	HL_పట్టిక()[idx].sg_cterm &= ~HL_BOLD;
+	HL_పట్టిక()[idx].sg_cterm_bold = FALSE;
     }
 
-    if (VIM_ISDIGIT(*arg))
-	color = atoi((char *)arg);
-    else if (STRICMP(arg, "fg") == 0)
+    ఒకవేళ (VIM_ISDIGIT(*arg))
+	color = atoi((అక్షరం *)arg);
+    లేకపోతే ఒకవేళ (STRICMP(arg, "fg") == 0)
     {
-	if (cterm_normal_fg_color)
-	    color = cterm_normal_fg_color - 1;
-	else
+	ఒకవేళ (cterm_సాధారణ_fg_color)
+	    color = cterm_సాధారణ_fg_color - 1;
+	లేకపోతే
 	{
 	    emsg(_(e_fg_color_unknown));
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
-    else if (STRICMP(arg, "bg") == 0)
+    లేకపోతే ఒకవేళ (STRICMP(arg, "bg") == 0)
     {
-	if (cterm_normal_bg_color > 0)
-	    color = cterm_normal_bg_color - 1;
-	else
+	ఒకవేళ (cterm_సాధారణ_bg_color > 0)
+	    color = cterm_సాధారణ_bg_color - 1;
+	లేకపోతే
 	{
 	    emsg(_(e_bg_color_unknown));
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
-    else if (STRICMP(arg, "ul") == 0)
+    లేకపోతే ఒకవేళ (STRICMP(arg, "ul") == 0)
     {
-	if (cterm_normal_ul_color > 0)
-	    color = cterm_normal_ul_color - 1;
-	else
+	ఒకవేళ (cterm_సాధారణ_ul_color > 0)
+	    color = cterm_సాధారణ_ul_color - 1;
+	లేకపోతే
 	{
 	    emsg(_(e_ul_color_unknown));
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
-    else
+    లేకపోతే
     {
-	int bold = MAYBE;
-	keyvalue_T target;
-	keyvalue_T *entry;
+	పూర్ణాంకం bold = MAYBE;
+	keyvalue_T లక్ష్యం;
+	keyvalue_T *నమోదు_2;
 
-	target.key = 0;
-	target.value.string = arg;
-	target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
-	entry = (keyvalue_T *)bsearch(&target, &color_name_tab,
-		ARRAY_LENGTH(color_name_tab), sizeof(color_name_tab[0]),
-		cmp_keyvalue_value_i);
-	if (entry == NULL)
+	లక్ష్యం.కీలకం = 0;
+	లక్ష్యం.విలువ.string = arg;
+	లక్ష్యం.విలువ.నిడివి = 0;	// not used, see cmp_keyvalue_value_i()
+	నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &color_name_tab,
+		ARRAY_నిడివి(color_name_tab), పరిమాణం(color_name_tab[0]),
+		cmp_keyvalue_విలువ_i);
+	ఒకవేళ (నమోదు_2 == ఖాళీ)
 	{
-	    semsg(_(e_color_name_or_number_not_recognized_str), key_start);
-	    return FALSE;
+	    semsg(_(e_color_name_or_సంఖ్య_not_recognized_str), కీలకం_ప్రారంభం);
+	    తిరిగి FALSE;
 	}
 
-	color = lookup_color(entry->key, key[5] == 'F', &bold);
+	color = lookup_color(నమోదు_2->కీలకం, కీలకం[5] == 'F', &bold);
 
 	// set/reset bold attribute to get light foreground
 	// colors (on some terminals, e.g. "linux")
-	if (bold == TRUE)
+	ఒకవేళ (bold == TRUE)
 	{
-	    HL_TABLE()[idx].sg_cterm |= HL_BOLD;
-	    HL_TABLE()[idx].sg_cterm_bold = TRUE;
+	    HL_పట్టిక()[idx].sg_cterm |= HL_BOLD;
+	    HL_పట్టిక()[idx].sg_cterm_bold = TRUE;
 	}
-	else if (bold == FALSE)
-	    HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
+	లేకపోతే ఒకవేళ (bold == FALSE)
+	    HL_పట్టిక()[idx].sg_cterm &= ~HL_BOLD;
     }
 
     // Add one to the argument, to avoid zero.  Zero is used for
     // "NONE", then "color" is -1.
-    if (key[5] == 'F')
-	highlight_set_ctermfg(idx, color, is_normal_group);
-    else if (key[5] == 'B')
-	highlight_set_ctermbg(idx, color, is_normal_group);
-    else // ctermul
-	highlight_set_ctermul(idx, color, is_normal_group);
+    ఒకవేళ (కీలకం[5] == 'F')
+	highlight_సమితి_ctermfg(idx, color, is_సాధారణ_సమూహం);
+    లేకపోతే ఒకవేళ (కీలకం[5] == 'B')
+	highlight_సమితి_ctermbg(idx, color, is_సాధారణ_సమూహం);
+    లేకపోతే // ctermul
+	highlight_సమితి_ctermul(idx, color, is_సాధారణ_సమూహం);
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
 /*
  * Set the GUI foreground color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guifg(
-	int	idx,
+    స్థిర పూర్ణాంకం
+highlight_సమితి_guifg(
+	పూర్ణాంకం	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	పూర్ణాంకం	is_menu_సమూహం వాడని,
+	పూర్ణాంకం	is_scrollbar_సమూహం వాడని,
+	పూర్ణాంకం	is_tooltip_సమూహం వాడని,
+	పూర్ణాంకం	is_titlebar_సమూహం వాడని,
+	పూర్ణాంకం	is_titlebarnc_సమూహం వాడని,
+	పూర్ణాంకం	*do_colors వాడని,
+	పూర్ణాంకం	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    long	i;
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    దీర్ఘ	i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    పూర్ణాంకం		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ఒకవేళ (init && (HL_పట్టిక()[idx].sg_సమితి & SG_GUI))
+	తిరిగి FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_fg_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_పట్టిక()[idx].sg_gui_fg_name;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guifg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ఒకవేళ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_బిట్టు)
     {
-	HL_TABLE()[idx].sg_gui_fg = i;
+	HL_పట్టిక()[idx].sg_gui_fg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ఒకవేళ (*namep == ఖాళీ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ఒకవేళ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    లేకపోతే
+		*namep = ఖాళీ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_fg_pixel != i)
+	ఒకవేళ (is_titlebar_సమూహం && gui.title_fg_pixel != i)
 	{
 	    gui.title_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
+	ఒకవేళ (is_titlebarnc_సమూహం && gui.titlenc_fg_pixel != i)
 	{
 	    gui.titlenc_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_fg_pixel != i)
+	ఒకవేళ (is_menu_సమూహం && gui.menu_fg_pixel != i)
 	{
 	    gui.menu_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_fg_pixel != i)
+	ఒకవేళ (is_scrollbar_సమూహం && gui.scroll_fg_pixel != i)
 	{
 	    gui.scroll_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_fg_pixel != i)
+	ఒకవేళ (is_tooltip_సమూహం && gui.tooltip_fg_pixel != i)
 	{
 	    gui.tooltip_fg_pixel = i;
 	    *do_colors = TRUE;
@@ -1405,80 +1405,80 @@ highlight_set_guifg(
     }
 # endif
 
-    return did_change;
+    తిరిగి did_change;
 }
 
 /*
  * Set the GUI background color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guibg(
-	int	idx,
+    స్థిర పూర్ణాంకం
+highlight_సమితి_guibg(
+	పూర్ణాంకం	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	పూర్ణాంకం	is_menu_సమూహం వాడని,
+	పూర్ణాంకం	is_scrollbar_సమూహం వాడని,
+	పూర్ణాంకం	is_tooltip_సమూహం వాడని,
+	పూర్ణాంకం	is_titlebar_సమూహం వాడని,
+	పూర్ణాంకం	is_titlebarnc_సమూహం వాడని,
+	పూర్ణాంకం	*do_colors వాడని,
+	పూర్ణాంకం	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    పూర్ణాంకం		i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    పూర్ణాంకం		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ఒకవేళ (init && (HL_పట్టిక()[idx].sg_సమితి & SG_GUI))
+	తిరిగి FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_bg_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_పట్టిక()[idx].sg_gui_bg_name;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guibg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ఒకవేళ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_బిట్టు)
     {
-	HL_TABLE()[idx].sg_gui_bg = i;
+	HL_పట్టిక()[idx].sg_gui_bg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ఒకవేళ (*namep == ఖాళీ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ఒకవేళ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    లేకపోతే
+		*namep = ఖాళీ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_bg_pixel != i)
+	ఒకవేళ (is_titlebar_సమూహం && gui.title_bg_pixel != i)
 	{
 	    gui.title_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
+	ఒకవేళ (is_titlebarnc_సమూహం && gui.titlenc_bg_pixel != i)
 	{
 	    gui.titlenc_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_bg_pixel != i)
+	ఒకవేళ (is_menu_సమూహం && gui.menu_bg_pixel != i)
 	{
 	    gui.menu_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_bg_pixel != i)
+	ఒకవేళ (is_scrollbar_సమూహం && gui.scroll_bg_pixel != i)
 	{
 	    gui.scroll_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_bg_pixel != i)
+	ఒకవేళ (is_tooltip_సమూహం && gui.tooltip_bg_pixel != i)
 	{
 	    gui.tooltip_bg_pixel = i;
 	    *do_colors = TRUE;
@@ -1488,133 +1488,133 @@ highlight_set_guibg(
     }
 # endif
 
-    return did_change;
+    తిరిగి did_change;
 }
 
 /*
  * Set the GUI undercurl/strikethrough color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guisp(int idx, char_u *arg, int init)
+    స్థిర పూర్ణాంకం
+highlight_సమితి_guisp(పూర్ణాంకం idx, char_u *arg, పూర్ణాంకం init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    పూర్ణాంకం		i;
 # endif
-    int		did_change = FALSE;
+    పూర్ణాంకం		did_change = FALSE;
     char_u	**namep;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ఒకవేళ (init && (HL_పట్టిక()[idx].sg_సమితి & SG_GUI))
+	తిరిగి FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_sp_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_పట్టిక()[idx].sg_gui_sp_name;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guisp colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ఒకవేళ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_బిట్టు)
     {
-	HL_TABLE()[idx].sg_gui_sp = i;
+	HL_పట్టిక()[idx].sg_gui_sp = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ఒకవేళ (*namep == ఖాళీ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ఒకవేళ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    లేకపోతే
+		*namep = ఖాళీ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     }
 # endif
 
-    return did_change;
+    తిరిగి did_change;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the start/stop terminal codes for a highlight group.
  * Returns TRUE if the terminal code is set.
  */
-    static int
-highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
+    స్థిర పూర్ణాంకం
+highlight_సమితి_startstop_termcode(పూర్ణాంకం idx, char_u *కీలకం, char_u *arg, పూర్ణాంకం init)
 {
-    int		off;
+    పూర్ణాంకం		off;
     char_u	buf[100];
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*tname;
     char_u	*p;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_TERM;
+    ఒకవేళ (!init)
+	HL_పట్టిక()[idx].sg_సమితి |= SG_పదం;
 
     // The "start" and "stop"  arguments can be a literal escape
     // sequence, or a comma separated list of terminal codes.
-    if (STRNCMP(arg, "t_", 2) == 0)
+    ఒకవేళ (STRNCMP(arg, "t_", 2) == 0)
     {
 	off = 0;
 	buf[0] = 0;
-	while (arg[off] != NUL)
+	అయితే (arg[off] != NUL)
 	{
 	    // Isolate one termcap name
-	    for (len = 0; arg[off + len] &&
+	    కొరకు (len = 0; arg[off + len] &&
 		    arg[off + len] != ','; ++len)
 		;
 	    tname = vim_strnsave(arg + off, len);
-	    if (tname == NULL)		// out of memory
-		return FALSE;
+	    ఒకవేళ (tname == ఖాళీ)		// out of memory
+		తిరిగి FALSE;
 	    // lookup the escape sequence for the item
-	    p = get_term_code(tname);
+	    p = get_పదం_సంకేతం(tname);
 	    vim_free(tname);
-	    if (p == NULL)	    // ignore non-existing things
+	    ఒకవేళ (p == ఖాళీ)	    // ignore non-existing things
 		p = (char_u *)"";
 
 	    // Append it to the already found stuff
-	    if ((int)(STRLEN(buf) + STRLEN(p)) >= 99)
+	    ఒకవేళ ((పూర్ణాంకం)(STRLEN(buf) + STRLEN(p)) >= 99)
 	    {
-		semsg(_(e_terminal_code_too_long_str), arg);
-		return FALSE;
+		semsg(_(e_terminal_సంకేతం_too_long_str), arg);
+		తిరిగి FALSE;
 	    }
 	    STRCAT(buf, p);
 
 	    // Advance to the next item
 	    off += len;
-	    if (arg[off] == ',')	    // another one follows
+	    ఒకవేళ (arg[off] == ',')	    // another one follows
 		++off;
 	}
     }
-    else
+    లేకపోతే
     {
 	// Copy characters from arg[] to buf[], translating <> codes.
-	for (p = arg, off = 0; off < 100 - 6 && *p; )
+	కొరకు (p = arg, off = 0; off < 100 - 6 && *p; )
 	{
-	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, NULL);
-	    if (len > 0)	    // recognized special char
+	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, ఖాళీ);
+	    ఒకవేళ (len > 0)	    // recognized special char
 		off += len;
-	    else		    // copy as normal char
+	    లేకపోతే		    // copy as normal char
 		buf[off++] = *p++;
 	}
 	buf[off] = NUL;
     }
 
-    if (STRCMP(buf, "NONE") == 0)	// resetting the value
-	p = NULL;
-    else
+    ఒకవేళ (STRCMP(buf, "NONE") == 0)	// resetting the value
+	p = ఖాళీ;
+    లేకపోతే
 	p = vim_strsave(buf);
-    if (key[2] == 'A')
+    ఒకవేళ (కీలకం[2] == 'A')
     {
-	vim_free(HL_TABLE()[idx].sg_start);
-	HL_TABLE()[idx].sg_start = p;
+	vim_free(HL_పట్టిక()[idx].sg_ప్రారంభం);
+	HL_పట్టిక()[idx].sg_ప్రారంభం = p;
     }
-    else
+    లేకపోతే
     {
-	vim_free(HL_TABLE()[idx].sg_stop);
-	HL_TABLE()[idx].sg_stop = p;
+	vim_free(HL_పట్టిక()[idx].sg_stop);
+	HL_పట్టిక()[idx].sg_stop = p;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1622,686 +1622,686 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
  * When using ":hi clear" this is called recursively for each group with
  * "forceit" and "init" both TRUE.
  */
-    void
+    శూన్య
 do_highlight(
-    char_u	*line,
-    int		forceit,
-    int		init)	    // TRUE when called for initializing
+    char_u	*పంక్తి,
+    పూర్ణాంకం		forceit,
+    పూర్ణాంకం		init)	    // TRUE when called for initializing
 {
-    char_u	*name_end;
+    char_u	*name_చివర;
     char_u	*linep;
-    char_u	*key_start;
-    char_u	*arg_start;
-    char_u	*key = NULL, *arg = NULL;
-    long	i;
-    int		id;
-    int		idx;
-    hl_group_T	item_before;
-    int		did_change = FALSE;
-    int		dodefault = FALSE;
-    int		doclear = FALSE;
-    int		dolink = FALSE;
-    int		error = FALSE;
-    int		is_normal_group = FALSE;	// "Normal" group
-#ifdef FEAT_GUI_MSWIN
-    int		is_titlebar_group = FALSE;	// "TitleBar" group
-    int		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
-#else
-# define is_titlebar_group 0
-# define is_titlebarnc_group 0
-#endif
-#ifdef FEAT_GUI_X11
-    int		is_menu_group = FALSE;		// "Menu" group
-    int		is_scrollbar_group = FALSE;	// "Scrollbar" group
-    int		is_tooltip_group = FALSE;	// "Tooltip" group
-#else
-# define is_menu_group 0
-# define is_tooltip_group 0
-# define is_scrollbar_group 0
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    int		do_colors = FALSE;		// need to update colors?
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		did_highlight_changed = FALSE;
-#endif
+    char_u	*కీలకం_ప్రారంభం;
+    char_u	*arg_ప్రారంభం;
+    char_u	*కీలకం = ఖాళీ, *arg = ఖాళీ;
+    దీర్ఘ	i;
+    పూర్ణాంకం		id;
+    పూర్ణాంకం		idx;
+    hl_సమూహం_T	అంశం_before;
+    పూర్ణాంకం		did_change = FALSE;
+    పూర్ణాంకం		dodefault = FALSE;
+    పూర్ణాంకం		doclear = FALSE;
+    పూర్ణాంకం		dolink = FALSE;
+    పూర్ణాంకం		error = FALSE;
+    పూర్ణాంకం		is_సాధారణ_సమూహం = FALSE;	// "Normal" group
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    పూర్ణాంకం		is_titlebar_సమూహం = FALSE;	// "TitleBar" group
+    పూర్ణాంకం		is_titlebarnc_సమూహం = FALSE;	// "TitleBarNC" group
+#లేకపోతే
+# define is_titlebar_సమూహం 0
+# define is_titlebarnc_సమూహం 0
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_X11
+    పూర్ణాంకం		is_menu_సమూహం = FALSE;		// "Menu" group
+    పూర్ణాంకం		is_scrollbar_సమూహం = FALSE;	// "Scrollbar" group
+    పూర్ణాంకం		is_tooltip_సమూహం = FALSE;	// "Tooltip" group
+#లేకపోతే
+# define is_menu_సమూహం 0
+# define is_tooltip_సమూహం 0
+# define is_scrollbar_సమూహం 0
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    పూర్ణాంకం		do_colors = FALSE;		// need to update colors?
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    పూర్ణాంకం		did_highlight_మారింది = FALSE;
+#అయితే_ముగింపు
 
     // If no argument, list current highlighting.
-    if (!init && ends_excmd2(line - 1, line))
+    ఒకవేళ (!init && చివర్లు_excmd2(పంక్తి - 1, పంక్తి))
     {
-	for (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
+	కొరకు (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
 	    // TODO: only call when the group has attributes set
-	    highlight_list_one((int)i);
-	return;
+	    highlight_list_one((పూర్ణాంకం)i);
+	తిరిగి;
     }
 
     // Isolate the name.
-    name_end = skiptowhite(line);
-    linep = skipwhite(name_end);
+    name_చివర = skiptowhite(పంక్తి);
+    linep = skipwhite(name_చివర);
 
     // Check for "default" argument.
-    if (STRNCMP(line, "default", name_end - line) == 0)
+    ఒకవేళ (STRNCMP(పంక్తి, "default", name_చివర - పంక్తి) == 0)
     {
 	dodefault = TRUE;
-	line = linep;
-	name_end = skiptowhite(line);
-	linep = skipwhite(name_end);
+	పంక్తి = linep;
+	name_చివర = skiptowhite(పంక్తి);
+	linep = skipwhite(name_చివర);
     }
 
     // Check for "clear" or "link" argument.
-    if (STRNCMP(line, "clear", name_end - line) == 0)
+    ఒకవేళ (STRNCMP(పంక్తి, "clear", name_చివర - పంక్తి) == 0)
 	doclear = TRUE;
-    if (STRNCMP(line, "link", name_end - line) == 0)
+    ఒకవేళ (STRNCMP(పంక్తి, "link", name_చివర - పంక్తి) == 0)
 	dolink = TRUE;
 
     // ":highlight {group-name}": list highlighting for one group.
-    if (!doclear && !dolink && ends_excmd2(line, linep))
+    ఒకవేళ (!doclear && !dolink && చివర్లు_excmd2(పంక్తి, linep))
     {
-	id = syn_namen2id(line, (int)(name_end - line));
-	if (id == 0)
-	    semsg(_(e_highlight_group_name_not_found_str), line);
-	else
+	id = syn_namen2id(పంక్తి, (పూర్ణాంకం)(name_చివర - పంక్తి));
+	ఒకవేళ (id == 0)
+	    semsg(_(e_highlight_సమూహం_name_not_దొరికింది_str), పంక్తి);
+	లేకపోతే
 	    highlight_list_one(id);
-	return;
+	తిరిగి;
     }
 
     // Handle ":highlight link {from} {to}" command.
-    if (dolink)
+    ఒకవేళ (dolink)
     {
-	char_u	    *from_start = linep;
-	char_u	    *from_end;
-	int	    from_len;
-	char_u	    *to_start;
-	char_u	    *to_end;
-	int	    to_len;
+	char_u	    *from_ప్రారంభం = linep;
+	char_u	    *from_చివర;
+	పూర్ణాంకం	    from_len;
+	char_u	    *గమ్యం_ప్రారంభం;
+	char_u	    *గమ్యం_చివర;
+	పూర్ణాంకం	    గమ్యం_len;
 
-	from_end = skiptowhite(from_start);
-	to_start = skipwhite(from_end);
-	to_end	 = skiptowhite(to_start);
+	from_చివర = skiptowhite(from_ప్రారంభం);
+	గమ్యం_ప్రారంభం = skipwhite(from_చివర);
+	గమ్యం_చివర	 = skiptowhite(గమ్యం_ప్రారంభం);
 
-	if (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
+	ఒకవేళ (చివర్లు_excmd2(పంక్తి, from_ప్రారంభం) || చివర్లు_excmd2(పంక్తి, గమ్యం_ప్రారంభం))
 	{
-	    semsg(_(e_not_enough_arguments_highlight_link_str), from_start);
-	    return;
+	    semsg(_(e_not_enough_arguments_highlight_link_str), from_ప్రారంభం);
+	    తిరిగి;
 	}
 
-	if (!ends_excmd2(line, skipwhite(to_end)))
+	ఒకవేళ (!చివర్లు_excmd2(పంక్తి, skipwhite(గమ్యం_చివర)))
 	{
-	    semsg(_(e_too_many_arguments_highlight_link_str), from_start);
-	    return;
+	    semsg(_(e_too_many_arguments_highlight_link_str), from_ప్రారంభం);
+	    తిరిగి;
 	}
 
-	from_len = (int)(from_end - from_start);
-	to_len = (int)(to_end - to_start);
-	highlight_group_link(from_start, from_len, to_start, to_len,
+	from_len = (పూర్ణాంకం)(from_చివర - from_ప్రారంభం);
+	గమ్యం_len = (పూర్ణాంకం)(గమ్యం_చివర - గమ్యం_ప్రారంభం);
+	highlight_సమూహం_link(from_ప్రారంభం, from_len, గమ్యం_ప్రారంభం, గమ్యం_len,
 						dodefault, forceit, init);
-	return;
+	తిరిగి;
     }
 
-    if (doclear)
+    ఒకవేళ (doclear)
     {
 	// ":highlight clear [group]" command.
-	if (ends_excmd2(line, linep))
+	ఒకవేళ (చివర్లు_excmd2(పంక్తి, linep))
 	{
 	    // ":highlight clear" without group name
 	    highlight_reset_all();
-	    return;
+	    తిరిగి;
 	}
-	line = linep;
-	name_end = skiptowhite(line);
-	linep = skipwhite(name_end);
+	పంక్తి = linep;
+	name_చివర = skiptowhite(పంక్తి);
+	linep = skipwhite(name_చివర);
     }
 
     // Find the group name in the table.  If it does not exist yet, add it.
-    id = syn_check_group(line, (int)(name_end - line));
-    if (id == 0)	// failed (out of memory)
-	return;
+    id = syn_check_సమూహం(పంక్తి, (పూర్ణాంకం)(name_చివర - పంక్తి));
+    ఒకవేళ (id == 0)	// failed (out of memory)
+	తిరిగి;
     idx = id - 1;	// index is ID minus one
 
     // Return if "default" was used and the group already has settings.
-    if (dodefault && hl_has_settings(idx, TRUE))
-	return;
+    ఒకవేళ (dodefault && hl_has_settings(idx, TRUE))
+	తిరిగి;
 
     // Make a copy so we can check if any attribute actually changed.
-    item_before = HL_TABLE()[idx];
+    అంశం_before = HL_పట్టిక()[idx];
 
-    if (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
-	is_normal_group = TRUE;
-#ifdef FEAT_GUI_MSWIN
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
-	is_titlebar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
-	is_titlebarnc_group = TRUE;
-#endif
-#ifdef FEAT_GUI_X11
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
-	is_menu_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
-	is_scrollbar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
-	is_tooltip_group = TRUE;
-#endif
+    ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "NORMAL") == 0)
+	is_సాధారణ_సమూహం = TRUE;
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+    లేకపోతే ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "TITLEBAR") == 0)
+	is_titlebar_సమూహం = TRUE;
+    లేకపోతే ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "TITLEBARNC") == 0)
+	is_titlebarnc_సమూహం = TRUE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_X11
+    లేకపోతే ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "MENU") == 0)
+	is_menu_సమూహం = TRUE;
+    లేకపోతే ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "SCROLLBAR") == 0)
+	is_scrollbar_సమూహం = TRUE;
+    లేకపోతే ఒకవేళ (STRCMP(HL_పట్టిక()[idx].sg_name_u, "TOOLTIP") == 0)
+	is_tooltip_సమూహం = TRUE;
+#అయితే_ముగింపు
 
     // Clear the highlighting for ":hi clear {group}" and ":hi clear".
-    if (doclear || (forceit && init))
+    ఒకవేళ (doclear || (forceit && init))
     {
 	highlight_clear(idx);
-	if (!doclear)
-	    HL_TABLE()[idx].sg_set = 0;
+	ఒకవేళ (!doclear)
+	    HL_పట్టిక()[idx].sg_సమితి = 0;
     }
 
-    if (!doclear)
-	while (!ends_excmd2(line, linep))
+    ఒకవేళ (!doclear)
+	అయితే (!చివర్లు_excmd2(పంక్తి, linep))
 	{
-	    key_start = linep;
-	    if (*linep == '=')
+	    కీలకం_ప్రారంభం = linep;
+	    ఒకవేళ (*linep == '=')
 	    {
-		semsg(_(e_unexpected_equal_sign_str), key_start);
+		semsg(_(e_unexpected_equal_sign_str), కీలకం_ప్రారంభం);
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
 
 	    // Note: Keep this in sync with get_highlight_group_key.
 
 	    // Isolate the key ("term", "ctermfg", "ctermbg", "font", "guifg"
 	    // or "guibg").
-	    while (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
+	    అయితే (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
 		++linep;
-	    vim_free(key);
-	    key = vim_strnsave_up(key_start, linep - key_start);
-	    if (key == NULL)
+	    vim_free(కీలకం);
+	    కీలకం = vim_strnsave_పైకి(కీలకం_ప్రారంభం, linep - కీలకం_ప్రారంభం);
+	    ఒకవేళ (కీలకం == ఖాళీ)
 	    {
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
 	    linep = skipwhite(linep);
 
-	    if (STRCMP(key, "NONE") == 0)
+	    ఒకవేళ (STRCMP(కీలకం, "NONE") == 0)
 	    {
-		if (!init || HL_TABLE()[idx].sg_set == 0)
+		ఒకవేళ (!init || HL_పట్టిక()[idx].sg_సమితి == 0)
 		{
-		    if (!init)
-			HL_TABLE()[idx].sg_set |= SG_TERM+SG_CTERM+SG_GUI;
+		    ఒకవేళ (!init)
+			HL_పట్టిక()[idx].sg_సమితి |= SG_పదం+SG_CTERM+SG_GUI;
 		    highlight_clear(idx);
 		}
-		continue;
+		కొనసాగు;
 	    }
 
 	    // Check for the equal sign.
-	    if (*linep != '=')
+	    ఒకవేళ (*linep != '=')
 	    {
-		semsg(_(e_missing_equal_sign_str_2), key_start);
+		semsg(_(e_missing_equal_sign_str_2), కీలకం_ప్రారంభం);
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
 	    ++linep;
 
 	    // Isolate the argument.
 	    linep = skipwhite(linep);
-	    if (*linep == '\'')		// guifg='color name'
+	    ఒకవేళ (*linep == '\'')		// guifg='color name'
 	    {
-		arg_start = ++linep;
+		arg_ప్రారంభం = ++linep;
 		linep = vim_strchr(linep, '\'');
-		if (linep == NULL)
+		ఒకవేళ (linep == ఖాళీ)
 		{
-		    semsg(_(e_invalid_argument_str), key_start);
+		    semsg(_(e_invalid_వాదం_str), కీలకం_ప్రారంభం);
 		    error = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		arg_start = linep;
+		arg_ప్రారంభం = linep;
 		linep = skiptowhite(linep);
 	    }
-	    if (linep == arg_start)
+	    ఒకవేళ (linep == arg_ప్రారంభం)
 	    {
-		semsg(_(e_missing_argument_str), key_start);
+		semsg(_(e_missing_వాదం_str), కీలకం_ప్రారంభం);
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
 	    vim_free(arg);
-	    arg = vim_strnsave(arg_start, linep - arg_start);
-	    if (arg == NULL)
+	    arg = vim_strnsave(arg_ప్రారంభం, linep - arg_ప్రారంభం);
+	    ఒకవేళ (arg == ఖాళీ)
 	    {
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
-	    if (*linep == '\'')
+	    ఒకవేళ (*linep == '\'')
 		++linep;
 
 	    // Store the argument.
-	    if (STRCMP(key, "TERM") == 0
-		    || STRCMP(key, "CTERM") == 0
-		    || STRCMP(key, "GUI") == 0)
+	    ఒకవేళ (STRCMP(కీలకం, "TERM") == 0
+		    || STRCMP(కీలకం, "CTERM") == 0
+		    || STRCMP(కీలకం, "GUI") == 0)
 	    {
-		if (!highlight_set_termgui_attr(idx, key, arg, init))
+		ఒకవేళ (!highlight_సమితి_termgui_attr(idx, కీలకం, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    else if (STRCMP(key, "FONT") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "FONT") == 0)
 	    {
 		// in non-GUI fonts are simply ignored
-#ifdef FEAT_GUI
-		if (highlight_set_font(idx, arg, is_normal_group,
-					      is_menu_group, is_tooltip_group))
+#నిర్వచితమైతే FEAT_GUI
+		ఒకవేళ (highlight_సమితి_font(idx, arg, is_సాధారణ_సమూహం,
+					      is_menu_సమూహం, is_tooltip_సమూహం))
 		    did_change = TRUE;
-#endif
+#అయితే_ముగింపు
 	    }
-	    else if (STRCMP(key, "CTERMFG") == 0
-		    || STRCMP(key, "CTERMBG") == 0
-		    || STRCMP(key, "CTERMUL") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "CTERMFG") == 0
+		    || STRCMP(కీలకం, "CTERMBG") == 0
+		    || STRCMP(కీలకం, "CTERMUL") == 0)
 	    {
-		if (!highlight_set_cterm_color(idx, key, key_start, arg,
-							is_normal_group, init))
+		ఒకవేళ (!highlight_సమితి_cterm_color(idx, కీలకం, కీలకం_ప్రారంభం, arg,
+							is_సాధారణ_సమూహం, init))
 		{
 		    error = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    else if (STRCMP(key, "CTERMFONT") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "CTERMFONT") == 0)
 	    {
-		if (!highlight_set_cterm_font(idx, arg, init))
+		ఒకవేళ (!highlight_సమితి_cterm_font(idx, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    else if (STRCMP(key, "GUIFG") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "GUIFG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guifg(idx, arg, is_menu_group,
-			    is_scrollbar_group, is_tooltip_group,
-			    is_titlebar_group, is_titlebarnc_group,
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ఒకవేళ (highlight_సమితి_guifg(idx, arg, is_menu_సమూహం,
+			    is_scrollbar_సమూహం, is_tooltip_సమూహం,
+			    is_titlebar_సమూహం, is_titlebarnc_సమూహం,
 			    &do_colors, init))
 		    did_change = TRUE;
-#endif
+#అయితే_ముగింపు
 	    }
-	    else if (STRCMP(key, "GUIBG") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "GUIBG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guibg(idx, arg, is_menu_group,
-			    is_scrollbar_group, is_tooltip_group,
-			    is_titlebar_group, is_titlebarnc_group,
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ఒకవేళ (highlight_సమితి_guibg(idx, arg, is_menu_సమూహం,
+			    is_scrollbar_సమూహం, is_tooltip_సమూహం,
+			    is_titlebar_సమూహం, is_titlebarnc_సమూహం,
 			    &do_colors, init))
 		    did_change = TRUE;
-#endif
+#అయితే_ముగింపు
 	    }
-	    else if (STRCMP(key, "GUISP") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "GUISP") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guisp(idx, arg, init))
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ఒకవేళ (highlight_సమితి_guisp(idx, arg, init))
 		    did_change = TRUE;
-#endif
+#అయితే_ముగింపు
 	    }
-	    else if (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(కీలకం, "START") == 0 || STRCMP(కీలకం, "STOP") == 0)
 	    {
-		if (!highlight_set_startstop_termcode(idx, key, arg, init))
+		ఒకవేళ (!highlight_సమితి_startstop_termcode(idx, కీలకం, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		semsg(_(e_illegal_argument_str_3), key_start);
+		semsg(_(e_illegal_వాదం_str_3), కీలకం_ప్రారంభం);
 		error = TRUE;
-		break;
+		ఆపు;
 	    }
-	    HL_TABLE()[idx].sg_cleared = FALSE;
+	    HL_పట్టిక()[idx].sg_cleared = FALSE;
 
 	    // When highlighting has been given for a group, don't link it.
-	    if (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
-		HL_TABLE()[idx].sg_link = 0;
+	    ఒకవేళ (!init || !(HL_పట్టిక()[idx].sg_సమితి & SG_LINK))
+		HL_పట్టిక()[idx].sg_link = 0;
 
 	    // Continue with next argument.
 	    linep = skipwhite(linep);
 	}
 
     // If there is an error, and it's a new entry, remove it from the table.
-    if (error && idx == highlight_ga.ga_len)
-	syn_unadd_group();
-    else
+    ఒకవేళ (error && idx == highlight_ga.ga_len)
+	syn_unadd_సమూహం();
+    లేకపోతే
     {
-	if (is_normal_group)
+	ఒకవేళ (is_సాధారణ_సమూహం)
 	{
-	    HL_TABLE()[idx].sg_term_attr = 0;
-	    HL_TABLE()[idx].sg_cterm_attr = 0;
-#ifdef FEAT_GUI
-	    HL_TABLE()[idx].sg_gui_attr = 0;
+	    HL_పట్టిక()[idx].sg_పదం_attr = 0;
+	    HL_పట్టిక()[idx].sg_cterm_attr = 0;
+#నిర్వచితమైతే FEAT_GUI
+	    HL_పట్టిక()[idx].sg_gui_attr = 0;
 	    // Need to update all groups, because they might be using "bg"
 	    // and/or "fg", which have been changed now.
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    if (USE_24BIT)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    ఒకవేళ (USE_24_బిట్టు)
 	    {
 		highlight_gui_started();
-		did_highlight_changed = TRUE;
+		did_highlight_మారింది = TRUE;
 		redraw_all_later(UPD_NOT_VALID);
 	    }
-#endif
-	    resolve_fallback_fg_to_rgb();
-	    resolve_fallback_bg_to_rgb();
-#ifdef FEAT_VTP
+#అయితే_ముగింపు
+	    resolve_fallback_fg_గమ్యం_rgb();
+	    resolve_fallback_bg_గమ్యం_rgb();
+#నిర్వచితమైతే FEAT_VTP
 	    control_console_color_rgb();
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef FEAT_GUI_MSWIN
-	else if (is_titlebar_group)
+#నిర్వచితమైతే FEAT_GUI_MSWIN
+	లేకపోతే ఒకవేళ (is_titlebar_సమూహం)
 	{
-	    if (gui.in_use && do_colors)
-		gui_mch_set_titlebar_colors();
+	    ఒకవేళ (gui.లోపల_use && do_colors)
+		gui_mch_సమితి_titlebar_colors();
 	}
-	else if (is_titlebarnc_group)
+	లేకపోతే ఒకవేళ (is_titlebarnc_సమూహం)
 	{
-	    if (gui.in_use && do_colors)
-		gui_mch_set_titlebar_colors();
+	    ఒకవేళ (gui.లోపల_use && do_colors)
+		gui_mch_సమితి_titlebar_colors();
 	}
-#endif
-#ifdef FEAT_GUI_X11
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_X11
 # ifdef FEAT_MENU
-	else if (is_menu_group)
+	లేకపోతే ఒకవేళ (is_menu_సమూహం)
 	{
-	    if (gui.in_use && do_colors)
+	    ఒకవేళ (gui.లోపల_use && do_colors)
 		gui_mch_new_menu_colors();
 	}
 # endif
-	else if (is_scrollbar_group)
+	లేకపోతే ఒకవేళ (is_scrollbar_సమూహం)
 	{
-	    if (gui.in_use && do_colors)
+	    ఒకవేళ (gui.లోపల_use && do_colors)
 		gui_new_scrollbar_colors();
-	    else
-		set_hl_attr(idx);
+	    లేకపోతే
+		సమితి_hl_attr(idx);
 	}
 # ifdef FEAT_BEVAL_GUI
-	else if (is_tooltip_group)
+	లేకపోతే ఒకవేళ (is_tooltip_సమూహం)
 	{
-	    if (gui.in_use && do_colors)
+	    ఒకవేళ (gui.లోపల_use && do_colors)
 		gui_mch_new_tooltip_colors();
 	}
 # endif
-#endif
-	else
-	    set_hl_attr(idx);
-#ifdef FEAT_EVAL
-	HL_TABLE()[idx].sg_script_ctx = current_sctx;
-	HL_TABLE()[idx].sg_script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
+#అయితే_ముగింపు
+	లేకపోతే
+	    సమితి_hl_attr(idx);
+#నిర్వచితమైతే FEAT_EVAL
+	HL_పట్టిక()[idx].sg_script_ctx = current_sctx;
+	HL_పట్టిక()[idx].sg_script_ctx.sc_lnum += SOURCING_LNUM;
+#అయితే_ముగింపు
     }
 
-    vim_free(key);
+    vim_free(కీలకం);
     vim_free(arg);
 
     // Only call highlight_changed() once, after a sequence of highlight
     // commands, and only if an attribute actually changed.
-    if ((did_change
-	   || memcmp(&HL_TABLE()[idx], &item_before, sizeof(item_before)) != 0)
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    && !did_highlight_changed
-#endif
+    ఒకవేళ ((did_change
+	   || memcmp(&HL_పట్టిక()[idx], &అంశం_before, పరిమాణం(అంశం_before)) != 0)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    && !did_highlight_మారింది
+#అయితే_ముగింపు
        )
     {
 	// Do not trigger a redraw when highlighting is changed while
 	// redrawing.  This may happen when evaluating 'statusline' changes the
 	// StatusLine group.
-	if (!updating_screen)
+	ఒకవేళ (!updating_screen)
 	    redraw_all_later(UPD_NOT_VALID);
-	need_highlight_changed = TRUE;
+	need_highlight_మారింది = TRUE;
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_highlight(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_highlight(శూన్య)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
 
-    for (i = 0; i < highlight_ga.ga_len; ++i)
+    కొరకు (i = 0; i < highlight_ga.ga_len; ++i)
     {
 	highlight_clear(i);
-	vim_free(HL_TABLE()[i].sg_name);
-	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_KEY_OFF);
+	vim_free(HL_పట్టిక()[i].sg_name);
+	vim_free(HL_పట్టిక()[i].sg_name_u - HLNAME_కీలకం_OFF);
     }
     ga_clear(&highlight_ga);
     hash_clear(&highlight_ht);
     highlight_ht_inited = false;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Reset the cterm colors to what they were before Vim was started, if
  * possible.  Otherwise reset them to zero.
  */
-    void
-restore_cterm_colors(void)
+    శూన్య
+restore_cterm_colors(శూన్య)
 {
-#if defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
+#ఒకవేళ defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
     // Since t_me has been set, this probably means that the user
     // wants to use this as default colors.  Need to reset default
     // background/foreground colors.
-    mch_set_normal_colors();
-#else
+    mch_సమితి_సాధారణ_colors();
+#లేకపోతే
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
     {
-	mch_set_normal_colors();
-	return;
+	mch_సమితి_సాధారణ_colors();
+	తిరిగి;
     }
 # endif
-    cterm_normal_fg_color = 0;
-    cterm_normal_fg_bold = 0;
-    cterm_normal_bg_color = 0;
+    cterm_సాధారణ_fg_color = 0;
+    cterm_సాధారణ_fg_bold = 0;
+    cterm_సాధారణ_bg_color = 0;
 # ifdef FEAT_TERMGUICOLORS
-    cterm_normal_fg_gui_color = INVALCOLOR;
-    cterm_normal_bg_gui_color = INVALCOLOR;
-    cterm_normal_ul_gui_color = INVALCOLOR;
+    cterm_సాధారణ_fg_gui_color = INVALCOLOR;
+    cterm_సాధారణ_bg_gui_color = INVALCOLOR;
+    cterm_సాధారణ_ul_gui_color = INVALCOLOR;
 # endif
     fallback_fg_rgb = INVALCOLOR;
     fallback_bg_rgb = INVALCOLOR;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Return TRUE if highlight group "idx" has any settings.
  * When "check_link" is TRUE also check for an existing link.
  */
-    static int
-hl_has_settings(int idx, int check_link)
+    స్థిర పూర్ణాంకం
+hl_has_settings(పూర్ణాంకం idx, పూర్ణాంకం check_link)
 {
-    return HL_TABLE()[idx].sg_cleared == 0
-	 && (  HL_TABLE()[idx].sg_term_attr != 0
-	    || HL_TABLE()[idx].sg_cterm_attr != 0
-	    || HL_TABLE()[idx].sg_cterm_fg != 0
-	    || HL_TABLE()[idx].sg_cterm_bg != 0
-	    || HL_TABLE()[idx].sg_cterm_font != 0
-#ifdef FEAT_GUI
-	    || HL_TABLE()[idx].sg_gui_attr != 0
-	    || HL_TABLE()[idx].sg_gui_fg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_bg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_sp_name != NULL
-	    || HL_TABLE()[idx].sg_font_name != NULL
-#endif
-	    || (check_link && (HL_TABLE()[idx].sg_set & SG_LINK)));
+    తిరిగి HL_పట్టిక()[idx].sg_cleared == 0
+	 && (  HL_పట్టిక()[idx].sg_పదం_attr != 0
+	    || HL_పట్టిక()[idx].sg_cterm_attr != 0
+	    || HL_పట్టిక()[idx].sg_cterm_fg != 0
+	    || HL_పట్టిక()[idx].sg_cterm_bg != 0
+	    || HL_పట్టిక()[idx].sg_cterm_font != 0
+#నిర్వచితమైతే FEAT_GUI
+	    || HL_పట్టిక()[idx].sg_gui_attr != 0
+	    || HL_పట్టిక()[idx].sg_gui_fg_name != ఖాళీ
+	    || HL_పట్టిక()[idx].sg_gui_bg_name != ఖాళీ
+	    || HL_పట్టిక()[idx].sg_gui_sp_name != ఖాళీ
+	    || HL_పట్టిక()[idx].sg_font_name != ఖాళీ
+#అయితే_ముగింపు
+	    || (check_link && (HL_పట్టిక()[idx].sg_సమితి & SG_LINK)));
 }
 
 /*
  * Clear highlighting for one group.
  */
-    static void
-highlight_clear(int idx)
+    స్థిర శూన్య
+highlight_clear(పూర్ణాంకం idx)
 {
-    HL_TABLE()[idx].sg_cleared = TRUE;
+    HL_పట్టిక()[idx].sg_cleared = TRUE;
 
-    HL_TABLE()[idx].sg_term = 0;
-    VIM_CLEAR(HL_TABLE()[idx].sg_start);
-    VIM_CLEAR(HL_TABLE()[idx].sg_stop);
-    HL_TABLE()[idx].sg_term_attr = 0;
-    HL_TABLE()[idx].sg_cterm = 0;
-    HL_TABLE()[idx].sg_cterm_bold = FALSE;
-    HL_TABLE()[idx].sg_cterm_fg = 0;
-    HL_TABLE()[idx].sg_cterm_bg = 0;
-    HL_TABLE()[idx].sg_cterm_attr = 0;
-    HL_TABLE()[idx].sg_cterm_font = 0;
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    HL_TABLE()[idx].sg_gui = 0;
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_fg_name);
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_bg_name);
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_sp_name);
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    HL_TABLE()[idx].sg_gui_fg = INVALCOLOR;
-    HL_TABLE()[idx].sg_gui_bg = INVALCOLOR;
-    HL_TABLE()[idx].sg_gui_sp = INVALCOLOR;
-#endif
-#ifdef FEAT_GUI
-    gui_mch_free_font(HL_TABLE()[idx].sg_font);
-    HL_TABLE()[idx].sg_font = NOFONT;
+    HL_పట్టిక()[idx].sg_పదం = 0;
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_ప్రారంభం);
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_stop);
+    HL_పట్టిక()[idx].sg_పదం_attr = 0;
+    HL_పట్టిక()[idx].sg_cterm = 0;
+    HL_పట్టిక()[idx].sg_cterm_bold = FALSE;
+    HL_పట్టిక()[idx].sg_cterm_fg = 0;
+    HL_పట్టిక()[idx].sg_cterm_bg = 0;
+    HL_పట్టిక()[idx].sg_cterm_attr = 0;
+    HL_పట్టిక()[idx].sg_cterm_font = 0;
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    HL_పట్టిక()[idx].sg_gui = 0;
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_gui_fg_name);
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_gui_bg_name);
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_gui_sp_name);
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    HL_పట్టిక()[idx].sg_gui_fg = INVALCOLOR;
+    HL_పట్టిక()[idx].sg_gui_bg = INVALCOLOR;
+    HL_పట్టిక()[idx].sg_gui_sp = INVALCOLOR;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
+    gui_mch_free_font(HL_పట్టిక()[idx].sg_font);
+    HL_పట్టిక()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-    HL_TABLE()[idx].sg_fontset = NOFONTSET;
+    gui_mch_free_fontset(HL_పట్టిక()[idx].sg_fontset);
+    HL_పట్టిక()[idx].sg_fontset = NOFONTSET;
 # endif
-    VIM_CLEAR(HL_TABLE()[idx].sg_font_name);
-    HL_TABLE()[idx].sg_gui_attr = 0;
-#endif
+    VIM_CLEAR(HL_పట్టిక()[idx].sg_font_name);
+    HL_పట్టిక()[idx].sg_gui_attr = 0;
+#అయితే_ముగింపు
     // Restore default link and context if they exist. Otherwise clears.
-    HL_TABLE()[idx].sg_link = HL_TABLE()[idx].sg_deflink;
-#ifdef FEAT_EVAL
+    HL_పట్టిక()[idx].sg_link = HL_పట్టిక()[idx].sg_deflink;
+#నిర్వచితమైతే FEAT_EVAL
     // Since we set the default link, set the location to where the default
     // link was set.
-    HL_TABLE()[idx].sg_script_ctx = HL_TABLE()[idx].sg_deflink_sctx;
-#endif
+    HL_పట్టిక()[idx].sg_script_ctx = HL_పట్టిక()[idx].sg_deflink_sctx;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Set the normal foreground and background colors according to the "Normal"
  * highlighting group.  For X11 also set "Menu", "Scrollbar" and "Tooltip"
  * colors.  For MS-Windows also set "TitleBar" and "TitleBarNC" colors.
  */
-    void
-set_normal_colors(void)
+    శూన్య
+సమితి_సాధారణ_colors(శూన్య)
 {
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 #  endif
     {
-	if (set_group_colors((char_u *)"Normal",
-				 &gui.norm_pixel, &gui.back_pixel,
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"Normal",
+				 &gui.norm_pixel, &gui.వెనుక_pixel,
 				 FALSE, TRUE, FALSE))
 	{
 	    gui_mch_new_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
 #  ifdef FEAT_GUI_MSWIN
-	if (set_group_colors((char_u *)"TitleBar",
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"TitleBar",
 				 &gui.title_fg_pixel, &gui.title_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
-	    gui_mch_set_titlebar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    gui_mch_సమితి_titlebar_colors();
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
-	if (set_group_colors((char_u *)"TitleBarNC",
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"TitleBarNC",
 				 &gui.titlenc_fg_pixel, &gui.titlenc_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
-	    gui_mch_set_titlebar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    gui_mch_సమితి_titlebar_colors();
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (set_group_colors((char_u *)"Menu",
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"Menu",
 			     &gui.menu_fg_pixel, &gui.menu_bg_pixel,
 			     TRUE, FALSE, FALSE))
 	{
 #   ifdef FEAT_MENU
 	    gui_mch_new_menu_colors();
 #   endif
-	    set_must_redraw(UPD_CLEAR);
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (set_group_colors((char_u *)"Tooltip",
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"Tooltip",
 			     &gui.tooltip_fg_pixel, &gui.tooltip_bg_pixel,
 			     FALSE, FALSE, TRUE))
 	{
 #    ifdef FEAT_TOOLBAR
 	    gui_mch_new_tooltip_colors();
 #    endif
-	    set_must_redraw(UPD_CLEAR);
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
 #   endif
-	if (set_group_colors((char_u *)"Scrollbar",
+	ఒకవేళ (సమితి_సమూహం_colors((char_u *)"Scrollbar",
 			&gui.scroll_fg_pixel, &gui.scroll_bg_pixel,
 			FALSE, FALSE, FALSE))
 	{
 	    gui_new_scrollbar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    సమితి_must_redraw(UPD_CLEAR);
 	}
 #  endif
     }
 # endif
 # ifdef FEAT_TERMGUICOLORS
 #  ifdef FEAT_GUI
-    else
+    లేకపోతే
 #  endif
     {
-	int		idx;
+	పూర్ణాంకం		idx;
 
 	idx = syn_name2id((char_u *)"Normal") - 1;
-	if (idx >= 0)
+	ఒకవేళ (idx >= 0)
 	{
 	    gui_do_one_color(idx, FALSE, FALSE);
 
 	    // If the normal fg or bg color changed a complete redraw is
 	    // required.
-	    if (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
-		    || cterm_normal_bg_gui_color != HL_TABLE()[idx].sg_gui_bg)
+	    ఒకవేళ (cterm_సాధారణ_fg_gui_color != HL_పట్టిక()[idx].sg_gui_fg
+		    || cterm_సాధారణ_bg_gui_color != HL_పట్టిక()[idx].sg_gui_bg)
 	    {
 		// if the GUI color is INVALCOLOR then we use the default cterm
 		// color
-		cterm_normal_fg_gui_color = HL_TABLE()[idx].sg_gui_fg;
-		cterm_normal_bg_gui_color = HL_TABLE()[idx].sg_gui_bg;
-		set_must_redraw(UPD_CLEAR);
+		cterm_సాధారణ_fg_gui_color = HL_పట్టిక()[idx].sg_gui_fg;
+		cterm_సాధారణ_bg_gui_color = HL_పట్టిక()[idx].sg_gui_bg;
+		సమితి_must_redraw(UPD_CLEAR);
 	    }
 	}
     }
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 /*
  * Set the colors for "Normal", "Menu", "TitleBar", "TitleBarNC", "Tooltip" or
  * "Scrollbar".
  */
-    static int
-set_group_colors(
+    స్థిర పూర్ణాంకం
+సమితి_సమూహం_colors(
     char_u	*name,
     guicolor_T	*fgp,
     guicolor_T	*bgp,
-    int		do_menu,
-    int		use_norm,
-    int		do_tooltip)
+    పూర్ణాంకం		do_menu,
+    పూర్ణాంకం		use_norm,
+    పూర్ణాంకం		do_tooltip)
 {
-    int		idx;
+    పూర్ణాంకం		idx;
 
     idx = syn_name2id(name) - 1;
-    if (idx < 0)
-	return FALSE;
+    ఒకవేళ (idx < 0)
+	తిరిగి FALSE;
 
     gui_do_one_color(idx, do_menu, do_tooltip);
 
-    if (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
-	*fgp = HL_TABLE()[idx].sg_gui_fg;
-    else if (use_norm)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_gui_fg != INVALCOLOR)
+	*fgp = HL_పట్టిక()[idx].sg_gui_fg;
+    లేకపోతే ఒకవేళ (use_norm)
 	*fgp = gui.def_norm_pixel;
-    if (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
-	*bgp = HL_TABLE()[idx].sg_gui_bg;
-    else if (use_norm)
-	*bgp = gui.def_back_pixel;
-    return TRUE;
+    ఒకవేళ (HL_పట్టిక()[idx].sg_gui_bg != INVALCOLOR)
+	*bgp = HL_పట్టిక()[idx].sg_gui_bg;
+    లేకపోతే ఒకవేళ (use_norm)
+	*bgp = gui.def_వెనుక_pixel;
+    తిరిగి TRUE;
 }
 
 /*
@@ -2309,91 +2309,91 @@ set_group_colors(
  * Returns "" when it's not found or not set.
  */
     char_u *
-hl_get_font_name(void)
+hl_get_font_name(శూన్య)
 {
-    int		id;
+    పూర్ణాంకం		id;
     char_u	*s;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0)
+    ఒకవేళ (id > 0)
     {
-	s = HL_TABLE()[id - 1].sg_font_name;
-	if (s != NULL)
-	    return s;
+	s = HL_పట్టిక()[id - 1].sg_font_name;
+	ఒకవేళ (s != ఖాళీ)
+	    తిరిగి s;
     }
-    return (char_u *)"";
+    తిరిగి (char_u *)"";
 }
 
 /*
  * Set font for "Normal" group.  Called by gui_mch_init_font() when a font has
  * actually chosen to be used.
  */
-    void
-hl_set_font_name(char_u *font_name)
+    శూన్య
+hl_సమితి_font_name(char_u *font_name)
 {
-    int	    id;
+    పూర్ణాంకం	    id;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ఒకవేళ (id <= 0)
+	తిరిగి;
 
-    vim_free(HL_TABLE()[id - 1].sg_font_name);
-    HL_TABLE()[id - 1].sg_font_name = vim_strsave(font_name);
+    vim_free(HL_పట్టిక()[id - 1].sg_font_name);
+    HL_పట్టిక()[id - 1].sg_font_name = vim_strsave(font_name);
 }
 
 /*
  * Set background color for "Normal" group.  Called by gui_set_bg_color()
  * when the color is known.
  */
-    void
-hl_set_bg_color_name(
+    శూన్య
+hl_సమితి_bg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    పూర్ణాంకం	    id;
 
-    if (name == NULL)
-	return;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ఒకవేళ (id <= 0)
+	తిరిగి;
 
-    vim_free(HL_TABLE()[id - 1].sg_gui_bg_name);
-    HL_TABLE()[id - 1].sg_gui_bg_name = name;
+    vim_free(HL_పట్టిక()[id - 1].sg_gui_bg_name);
+    HL_పట్టిక()[id - 1].sg_gui_bg_name = name;
 }
 
 /*
  * Set foreground color for "Normal" group.  Called by gui_set_fg_color()
  * when the color is known.
  */
-    void
-hl_set_fg_color_name(
+    శూన్య
+hl_సమితి_fg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    పూర్ణాంకం	    id;
 
-    if (name == NULL)
-	return;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ఒకవేళ (id <= 0)
+	తిరిగి;
 
-    vim_free(HL_TABLE()[id - 1].sg_gui_fg_name);
-    HL_TABLE()[id - 1].sg_gui_fg_name = name;
+    vim_free(HL_పట్టిక()[id - 1].sg_gui_fg_name);
+    HL_పట్టిక()[id - 1].sg_gui_fg_name = name;
 }
 
 /*
  * Return the handle for a font name.
  * Returns NOFONT when failed.
  */
-    static GuiFont
+    స్థిర GuiFont
 font_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONT;
+    ఒకవేళ (STRCMP(name, "NONE") == 0)
+	తిరిగి NOFONT;
 
-    return gui_mch_get_font(name, TRUE);
+    తిరిగి gui_mch_get_font(name, TRUE);
 }
 
 # ifdef FEAT_XFONTSET
@@ -2401,32 +2401,32 @@ font_name2handle(char_u *name)
  * Return the handle for a fontset name.
  * Returns NOFONTSET when failed.
  */
-    static GuiFontset
-fontset_name2handle(char_u *name, int fixed_width)
+    స్థిర GuiFontset
+fontset_name2handle(char_u *name, పూర్ణాంకం fixed_వెడల్పు)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONTSET;
+    ఒకవేళ (STRCMP(name, "NONE") == 0)
+	తిరిగి NOFONTSET;
 
-    return gui_mch_get_fontset(name, TRUE, fixed_width);
+    తిరిగి gui_mch_get_fontset(name, TRUE, fixed_వెడల్పు);
 }
 # endif
 
 /*
  * Get the font or fontset for one highlight group.
  */
-    static void
+    స్థిర శూన్య
 hl_do_font(
-    int		idx,
+    పూర్ణాంకం		idx,
     char_u	*arg,
-    int		do_normal,		// set normal font
-    int		do_menu UNUSED,		// set menu font
-    int		do_tooltip UNUSED,	// set tooltip font
-    int		free_font)		// free current font/fontset
+    పూర్ణాంకం		do_సాధారణ,		// set normal font
+    పూర్ణాంకం		do_menu వాడని,		// set menu font
+    పూర్ణాంకం		do_tooltip వాడని,	// set tooltip font
+    పూర్ణాంకం		free_font)		// free current font/fontset
 {
 # ifdef FEAT_XFONTSET
     // If 'guifontset' is not empty, first try using the name as a
     // fontset.  If that doesn't work, use it as a font name.
-    if (*p_guifontset != NUL
+    ఒకవేళ (*p_guifontset != NUL
 #  ifdef FONTSET_ALWAYS
 	|| do_menu
 #  endif
@@ -2436,9 +2436,9 @@ hl_do_font(
 #  endif
 	    )
     {
-	if (free_font)
-	    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-	HL_TABLE()[idx].sg_fontset = fontset_name2handle(arg, 0
+	ఒకవేళ (free_font)
+	    gui_mch_free_fontset(HL_పట్టిక()[idx].sg_fontset);
+	HL_పట్టిక()[idx].sg_fontset = fontset_name2handle(arg, 0
 #  ifdef FONTSET_ALWAYS
 		|| do_menu
 #  endif
@@ -2447,54 +2447,54 @@ hl_do_font(
 #  endif
 		);
     }
-    if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_fontset != NOFONTSET)
     {
 	// If it worked and it's the Normal group, use it as the normal
 	// fontset.  Same for the Menu group.
-	if (do_normal)
+	ఒకవేళ (do_సాధారణ)
 	    gui_init_font(arg, TRUE);
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	if (do_menu)
+#  ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	ఒకవేళ (do_menu)
 	{
 #   ifdef FONTSET_ALWAYS
-	    gui.menu_fontset = HL_TABLE()[idx].sg_fontset;
-#   else
+	    gui.menu_fontset = HL_పట్టిక()[idx].sg_fontset;
+#   లేకపోతే
 	    // YIKES!  This is a bug waiting to crash the program
-	    gui.menu_font = HL_TABLE()[idx].sg_fontset;
+	    gui.menu_font = HL_పట్టిక()[idx].sg_fontset;
 #   endif
 	    gui_mch_new_menu_font();
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (do_tooltip)
+	ఒకవేళ (do_tooltip)
 	{
 	    // The Athena widget set could not handle switching between
 	    // displaying a single font and a fontset.
 	    // If the XtNinternational resource is set to True at widget
 	    // creation, then a fontset is always used, otherwise an
 	    // XFontStruct is used.
-	    gui.tooltip_fontset = (XFontSet)HL_TABLE()[idx].sg_fontset;
+	    gui.tooltip_fontset = (XFont_సమితి)HL_పట్టిక()[idx].sg_fontset;
 	    gui_mch_new_tooltip_font();
 	}
 #   endif
 #  endif
     }
-    else
+    లేకపోతే
 # endif
     {
-	if (free_font)
-	    gui_mch_free_font(HL_TABLE()[idx].sg_font);
-	HL_TABLE()[idx].sg_font = font_name2handle(arg);
+	ఒకవేళ (free_font)
+	    gui_mch_free_font(HL_పట్టిక()[idx].sg_font);
+	HL_పట్టిక()[idx].sg_font = font_name2handle(arg);
 	// If it worked and it's the Normal group, use it as the
 	// normal font.  Same for the Menu group.
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	ఒకవేళ (HL_పట్టిక()[idx].sg_font != NOFONT)
 	{
-	    if (do_normal)
+	    ఒకవేళ (do_సాధారణ)
 		gui_init_font(arg, FALSE);
 # ifndef FONTSET_ALWAYS
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	    if (do_menu)
+#  ఒకవేళ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	    ఒకవేళ (do_menu)
 	    {
-		gui.menu_font = HL_TABLE()[idx].sg_font;
+		gui.menu_font = HL_పట్టిక()[idx].sg_font;
 		gui_mch_new_menu_font();
 	    }
 #  endif
@@ -2503,9 +2503,9 @@ hl_do_font(
     }
 }
 
-#endif // FEAT_GUI
+#అయితే_ముగింపు // FEAT_GUI
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return the handle for a color name.
  * Returns INVALCOLOR when failed.
@@ -2513,47 +2513,47 @@ hl_do_font(
     guicolor_T
 color_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return INVALCOLOR;
+    ఒకవేళ (STRCMP(name, "NONE") == 0)
+	తిరిగి INVALCOLOR;
 
-    if (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
+    ఒకవేళ (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# ఒకవేళ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	ఒకవేళ (gui.లోపల_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.norm_pixel;
+	    తిరిగి gui.norm_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_fg_gui_color != INVALCOLOR)
-	    return cterm_normal_fg_gui_color;
+	ఒకవేళ (cterm_సాధారణ_fg_gui_color != INVALCOLOR)
+	    తిరిగి cterm_సాధారణ_fg_gui_color;
 	// Guess that the foreground is black or white.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
+	తిరిగి GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
 # endif
     }
-    if (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
+    ఒకవేళ (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# ఒకవేళ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	ఒకవేళ (gui.లోపల_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.back_pixel;
+	    తిరిగి gui.వెనుక_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_bg_gui_color != INVALCOLOR)
-	    return cterm_normal_bg_gui_color;
+	ఒకవేళ (cterm_సాధారణ_bg_gui_color != INVALCOLOR)
+	    తిరిగి cterm_సాధారణ_bg_gui_color;
 	// Guess that the background is white or black.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
+	తిరిగి GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
 # endif
     }
 
-    return GUI_GET_COLOR(name);
+    తిరిగి GUI_GET_COLOR(name);
 }
 
 // On MS-Windows an RGB macro is available and it produces 0x00bbggrr color
 // values as used by the MS-Windows GDI api.  It should be used only for
 // MS-Windows GDI builds.
-# if defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
+# ఒకవేళ defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
 #  undef RGB
 # endif
 # ifndef RGB
@@ -2561,44 +2561,44 @@ color_name2handle(char_u *name)
 # endif
 
 # ifdef VIMDLL
-    static guicolor_T
+    స్థిర guicolor_T
 gui_adjust_rgb(guicolor_T c)
 {
-    if (gui.in_use)
-	return c;
-    else
-	return ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి c;
+    లేకపోతే
+	తిరిగి ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
 }
-# else
+# లేకపోతే
 #  define gui_adjust_rgb(c) (c)
 # endif
 
-    static int
-hex_digit(int c)
+    స్థిర పూర్ణాంకం
+hex_digit(పూర్ణాంకం c)
 {
-    if (SAFE_isdigit(c))
-	return c - '0';
+    ఒకవేళ (సురక్షిత_isdigit(c))
+	తిరిగి c - '0';
     c = TOLOWER_ASC(c);
-    if (c >= 'a' && c <= 'f')
-	return c - 'a' + 10;
-    return 0x1ffffff;
+    ఒకవేళ (c >= 'a' && c <= 'f')
+	తిరిగి c - 'a' + 10;
+    తిరిగి 0x1ffffff;
 }
 
-    static guicolor_T
+    స్థిర guicolor_T
 decode_hex_color(char_u *hex)
 {
     guicolor_T color;
 
-    if (hex[0] != '#' || STRLEN(hex) != 7)
-	return INVALCOLOR;
+    ఒకవేళ (hex[0] != '#' || STRLEN(hex) != 7)
+	తిరిగి INVALCOLOR;
 
     // Name is in "#rrggbb" format
     color = RGB(((hex_digit(hex[1]) << 4) + hex_digit(hex[2])),
 		((hex_digit(hex[3]) << 4) + hex_digit(hex[4])),
 		((hex_digit(hex[5]) << 4) + hex_digit(hex[6])));
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    ఒకవేళ (color > 0xffffff)
+	తిరిగి INVALCOLOR;
+    తిరిగి gui_adjust_rgb(color);
 }
 
 # ifdef FEAT_EVAL
@@ -2606,45 +2606,45 @@ decode_hex_color(char_u *hex)
 // such name exists in the color table. The convention is to use lowercase for
 // all keys in the v:colornames dictionary. The value can be either a string in
 // the form #rrggbb or a number, either of which is converted to a guicolor_T.
-    static guicolor_T
+    స్థిర guicolor_T
 colorname2rgb(char_u *name)
 {
-    dict_T      *colornames_table = get_vim_var_dict(VV_COLORNAMES);
+    dict_T      *colornames_పట్టిక = get_vim_var_dict(VV_COLORNAMES);
     char_u      *lc_name;
     dictitem_T  *colentry;
     char_u      *colstr;
     varnumber_T colnum;
 
     lc_name = strlow_save(name);
-    if (lc_name == NULL)
-	return INVALCOLOR;
+    ఒకవేళ (lc_name == ఖాళీ)
+	తిరిగి INVALCOLOR;
 
-    colentry = dict_find(colornames_table, lc_name, -1);
+    colentry = dict_కనుగొను(colornames_పట్టిక, lc_name, -1);
     vim_free(lc_name);
-    if (colentry == NULL)
-	return INVALCOLOR;
+    ఒకవేళ (colentry == ఖాళీ)
+	తిరిగి INVALCOLOR;
 
-    if (colentry->di_tv.v_type == VAR_STRING)
+    ఒకవేళ (colentry->di_tv.v_type == VAR_STRING)
     {
 	colstr = tv_get_string_strict(&colentry->di_tv);
-	if ((STRLEN(colstr) == 7) && (*colstr == '#'))
+	ఒకవేళ ((STRLEN(colstr) == 7) && (*colstr == '#'))
 	{
-	    return decode_hex_color(colstr);
+	    తిరిగి decode_hex_color(colstr);
 	}
-	else
+	లేకపోతే
 	{
 	    semsg(_(e_bad_color_string_str), colstr);
-	    return INVALCOLOR;
+	    తిరిగి INVALCOLOR;
 	}
     }
 
-    if (colentry->di_tv.v_type == VAR_NUMBER)
+    ఒకవేళ (colentry->di_tv.v_type == VAR_సంఖ్య)
     {
-	colnum = tv_get_number(&colentry->di_tv);
-	return (guicolor_T)colnum;
+	colnum = tv_get_సంఖ్య(&colentry->di_tv);
+	తిరిగి (guicolor_T)colnum;
     }
 
-    return INVALCOLOR;
+    తిరిగి INVALCOLOR;
 }
 
 # endif
@@ -2656,101 +2656,101 @@ gui_get_color_cmn(char_u *name)
     // Only non X11 colors (not present in rgb.txt) and colors in
     // color_name_tab[], useful when $VIMRUNTIME is not found,.
     // must be sorted by the 'value' field because it is used by bsearch()!
-    static keyvalue_T rgb_tab[] = {
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0x00), "black"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0xFF), "blue"),
-	KEYVALUE_ENTRY(RGB(0xA5, 0x2A, 0x2A), "brown"),
-	KEYVALUE_ENTRY(RGB(0x00, 0xFF, 0xFF), "cyan"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0x8B), "darkblue"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x8B, 0x8B), "darkcyan"),
-	KEYVALUE_ENTRY(RGB(0xA9, 0xA9, 0xA9), "darkgray"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x64, 0x00), "darkgreen"),
-	KEYVALUE_ENTRY(RGB(0xA9, 0xA9, 0xA9), "darkgrey"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x00, 0x8B), "darkmagenta"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x00, 0x00), "darkred"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x8B, 0x00), "darkyellow"),	 // No X11
-	KEYVALUE_ENTRY(RGB(0xBE, 0xBE, 0xBE), "gray"),
-	KEYVALUE_ENTRY(RGB(0x00, 0xFF, 0x00), "green"),
-	KEYVALUE_ENTRY(RGB(0xBE, 0xBE, 0xBE), "grey"),
-	KEYVALUE_ENTRY(RGB(0x66, 0x66, 0x66), "grey40"),
-	KEYVALUE_ENTRY(RGB(0x7F, 0x7F, 0x7F), "grey50"),
-	KEYVALUE_ENTRY(RGB(0xE5, 0xE5, 0xE5), "grey90"),
-	KEYVALUE_ENTRY(RGB(0xAD, 0xD8, 0xE6), "lightblue"),
-	KEYVALUE_ENTRY(RGB(0xE0, 0xFF, 0xFF), "lightcyan"),
-	KEYVALUE_ENTRY(RGB(0xD3, 0xD3, 0xD3), "lightgray"),
-	KEYVALUE_ENTRY(RGB(0x90, 0xEE, 0x90), "lightgreen"),
-	KEYVALUE_ENTRY(RGB(0xD3, 0xD3, 0xD3), "lightgrey"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x8B, 0xFF), "lightmagenta"),     // No XX
-	KEYVALUE_ENTRY(RGB(0xFF, 0x8B, 0x8B), "lightred"),	 // No XX
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0xE0), "lightyellow"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x00, 0xFF), "magenta"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x00, 0x00), "red"),
-	KEYVALUE_ENTRY(RGB(0x2E, 0x8B, 0x57), "seagreen"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0xFF), "white"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0x00), "yellow")
+    స్థిర keyvalue_T rgb_tab[] = {
+	KEYVALUE_నమోదు(RGB(0x00, 0x00, 0x00), "black"),
+	KEYVALUE_నమోదు(RGB(0x00, 0x00, 0xFF), "blue"),
+	KEYVALUE_నమోదు(RGB(0xA5, 0x2A, 0x2A), "brown"),
+	KEYVALUE_నమోదు(RGB(0x00, 0xFF, 0xFF), "cyan"),
+	KEYVALUE_నమోదు(RGB(0x00, 0x00, 0x8B), "darkblue"),
+	KEYVALUE_నమోదు(RGB(0x00, 0x8B, 0x8B), "darkcyan"),
+	KEYVALUE_నమోదు(RGB(0xA9, 0xA9, 0xA9), "darkgray"),
+	KEYVALUE_నమోదు(RGB(0x00, 0x64, 0x00), "darkgreen"),
+	KEYVALUE_నమోదు(RGB(0xA9, 0xA9, 0xA9), "darkgrey"),
+	KEYVALUE_నమోదు(RGB(0x8B, 0x00, 0x8B), "darkmagenta"),
+	KEYVALUE_నమోదు(RGB(0x8B, 0x00, 0x00), "darkred"),
+	KEYVALUE_నమోదు(RGB(0x8B, 0x8B, 0x00), "darkyellow"),	 // No X11
+	KEYVALUE_నమోదు(RGB(0xBE, 0xBE, 0xBE), "gray"),
+	KEYVALUE_నమోదు(RGB(0x00, 0xFF, 0x00), "green"),
+	KEYVALUE_నమోదు(RGB(0xBE, 0xBE, 0xBE), "grey"),
+	KEYVALUE_నమోదు(RGB(0x66, 0x66, 0x66), "grey40"),
+	KEYVALUE_నమోదు(RGB(0x7F, 0x7F, 0x7F), "grey50"),
+	KEYVALUE_నమోదు(RGB(0xE5, 0xE5, 0xE5), "grey90"),
+	KEYVALUE_నమోదు(RGB(0xAD, 0xD8, 0xE6), "lightblue"),
+	KEYVALUE_నమోదు(RGB(0xE0, 0xFF, 0xFF), "lightcyan"),
+	KEYVALUE_నమోదు(RGB(0xD3, 0xD3, 0xD3), "lightgray"),
+	KEYVALUE_నమోదు(RGB(0x90, 0xEE, 0x90), "lightgreen"),
+	KEYVALUE_నమోదు(RGB(0xD3, 0xD3, 0xD3), "lightgrey"),
+	KEYVALUE_నమోదు(RGB(0xFF, 0x8B, 0xFF), "lightmagenta"),     // No XX
+	KEYVALUE_నమోదు(RGB(0xFF, 0x8B, 0x8B), "lightred"),	 // No XX
+	KEYVALUE_నమోదు(RGB(0xFF, 0xFF, 0xE0), "lightyellow"),
+	KEYVALUE_నమోదు(RGB(0xFF, 0x00, 0xFF), "magenta"),
+	KEYVALUE_నమోదు(RGB(0xFF, 0x00, 0x00), "red"),
+	KEYVALUE_నమోదు(RGB(0x2E, 0x8B, 0x57), "seagreen"),
+	KEYVALUE_నమోదు(RGB(0xFF, 0xFF, 0xFF), "white"),
+	KEYVALUE_నమోదు(RGB(0xFF, 0xFF, 0x00), "yellow")
     };
-    keyvalue_T target;
-    keyvalue_T *entry;
+    keyvalue_T లక్ష్యం;
+    keyvalue_T *నమోదు_2;
 
     color = decode_hex_color(name);
-    if (color != INVALCOLOR)
-	return color;
+    ఒకవేళ (color != INVALCOLOR)
+	తిరిగి color;
 
-    target.key = 0;
-    target.value.string = name;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
-    entry = (keyvalue_T *)bsearch(&target, &rgb_tab, ARRAY_LENGTH(rgb_tab),
-	    sizeof(rgb_tab[0]), cmp_keyvalue_value_i);
-    if (entry != NULL)
-	return gui_adjust_rgb((guicolor_T)entry->key);
+    లక్ష్యం.కీలకం = 0;
+    లక్ష్యం.విలువ.string = name;
+    లక్ష్యం.విలువ.నిడివి = 0;	// not used, see cmp_keyvalue_value_i()
+    నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &rgb_tab, ARRAY_నిడివి(rgb_tab),
+	    పరిమాణం(rgb_tab[0]), cmp_keyvalue_విలువ_i);
+    ఒకవేళ (నమోదు_2 != ఖాళీ)
+	తిరిగి gui_adjust_rgb((guicolor_T)నమోదు_2->కీలకం);
 
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
     /*
      * Not a traditional color. Load additional color aliases and then consult the alias table.
      */
 
     color = colorname2rgb(name);
-    if (color == INVALCOLOR)
+    ఒకవేళ (color == INVALCOLOR)
     {
-	load_default_colors_lists();
+	ఎక్కించు_default_colors_lists();
 	color = colorname2rgb(name);
     }
 
-    return color;
-# else
-    return INVALCOLOR;
+    తిరిగి color;
+# లేకపోతే
+    తిరిగి INVALCOLOR;
 # endif
 }
 
     guicolor_T
-gui_get_rgb_color_cmn(int r, int g, int b)
+gui_get_rgb_color_cmn(పూర్ణాంకం r, పూర్ణాంకం g, పూర్ణాంకం b)
 {
     guicolor_T  color = RGB(r, g, b);
 
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    ఒకవేళ (color > 0xffffff)
+	తిరిగి INVALCOLOR;
+    తిరిగి gui_adjust_rgb(color);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Table with the specifications for an attribute number.
  * Note that this table is used by ALL buffers.  This is required because the
  * GUI can redraw at any time for any buffer.
  */
-static garray_T	term_attr_table = {0, 0, 0, 0, NULL};
+స్థిర garray_T	పదం_attr_పట్టిక = {0, 0, 0, 0, ఖాళీ};
 
-#define TERM_ATTR_ENTRY(idx) ((attrentry_T *)term_attr_table.ga_data)[idx]
+#నిర్వచించు పదం_ATTR_నమోదు(idx) ((attrentry_T *)పదం_attr_పట్టిక.ga_దత్తాంశం)[idx]
 
-static garray_T	cterm_attr_table = {0, 0, 0, 0, NULL};
+స్థిర garray_T	cterm_attr_పట్టిక = {0, 0, 0, 0, ఖాళీ};
 
-#define CTERM_ATTR_ENTRY(idx) ((attrentry_T *)cterm_attr_table.ga_data)[idx]
+#నిర్వచించు CTERM_ATTR_నమోదు(idx) ((attrentry_T *)cterm_attr_పట్టిక.ga_దత్తాంశం)[idx]
 
-#ifdef FEAT_GUI
-static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
+#నిర్వచితమైతే FEAT_GUI
+స్థిర garray_T	gui_attr_పట్టిక = {0, 0, 0, 0, ఖాళీ};
 
-# define GUI_ATTR_ENTRY(idx) ((attrentry_T *)gui_attr_table.ga_data)[idx]
-#endif
+# define GUI_ATTR_నమోదు(idx) ((attrentry_T *)gui_attr_పట్టిక.ga_దత్తాంశం)[idx]
+#అయితే_ముగింపు
 
 /*
  * Return the attr number for a set of colors and font.
@@ -2758,25 +2758,25 @@ static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
  * if the combination is new.
  * Return 0 for error (no more room).
  */
-    static int
-get_attr_entry(garray_T *table, attrentry_T *aep)
+    స్థిర పూర్ణాంకం
+get_attr_నమోదు(garray_T *పట్టిక, attrentry_T *aep)
 {
-    int		i;
+    పూర్ణాంకం		i;
     attrentry_T	*taep;
-    static int	recursive = FALSE;
+    స్థిర పూర్ణాంకం	recursive = FALSE;
 
     // Init the table, in case it wasn't done yet.
-    table->ga_itemsize = sizeof(attrentry_T);
-    table->ga_growsize = 7;
+    పట్టిక->ga_itemsize = పరిమాణం(attrentry_T);
+    పట్టిక->ga_growsize = 7;
 
     // Try to find an entry with the same specifications.
-    for (i = 0; i < table->ga_len; ++i)
+    కొరకు (i = 0; i < పట్టిక->ga_len; ++i)
     {
-	taep = &(((attrentry_T *)table->ga_data)[i]);
-	if (	   aep->ae_attr == taep->ae_attr
+	taep = &(((attrentry_T *)పట్టిక->ga_దత్తాంశం)[i]);
+	ఒకవేళ (	   aep->ae_attr == taep->ae_attr
 		&& (
-#ifdef FEAT_GUI
-		       (table == &gui_attr_table
+#నిర్వచితమైతే FEAT_GUI
+		       (పట్టిక == &gui_attr_పట్టిక
 			&& (aep->ae_u.gui.fg_color == taep->ae_u.gui.fg_color
 			    && aep->ae_u.gui.bg_color
 						    == taep->ae_u.gui.bg_color
@@ -2788,19 +2788,19 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 # endif
 			    ))
 		    ||
-#endif
-		       (table == &term_attr_table
-			&& (aep->ae_u.term.start == NULL)
-					    == (taep->ae_u.term.start == NULL)
-			&& (aep->ae_u.term.start == NULL
-			    || STRCMP(aep->ae_u.term.start,
-						  taep->ae_u.term.start) == 0)
-			&& (aep->ae_u.term.stop == NULL)
-					     == (taep->ae_u.term.stop == NULL)
-			&& (aep->ae_u.term.stop == NULL
-			    || STRCMP(aep->ae_u.term.stop,
-						  taep->ae_u.term.stop) == 0))
-		    || (table == &cterm_attr_table
+#అయితే_ముగింపు
+		       (పట్టిక == &పదం_attr_పట్టిక
+			&& (aep->ae_u.పదం.ప్రారంభం == ఖాళీ)
+					    == (taep->ae_u.పదం.ప్రారంభం == ఖాళీ)
+			&& (aep->ae_u.పదం.ప్రారంభం == ఖాళీ
+			    || STRCMP(aep->ae_u.పదం.ప్రారంభం,
+						  taep->ae_u.పదం.ప్రారంభం) == 0)
+			&& (aep->ae_u.పదం.stop == ఖాళీ)
+					     == (taep->ae_u.పదం.stop == ఖాళీ)
+			&& (aep->ae_u.పదం.stop == ఖాళీ
+			    || STRCMP(aep->ae_u.పదం.stop,
+						  taep->ae_u.పదం.stop) == 0))
+		    || (పట్టిక == &cterm_attr_పట్టిక
 			    && aep->ae_u.cterm.fg_color
 						  == taep->ae_u.cterm.fg_color
 			    && aep->ae_u.cterm.bg_color
@@ -2809,50 +2809,50 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 						  == taep->ae_u.cterm.ul_color
 			    && aep->ae_u.cterm.font
 						  == taep->ae_u.cterm.font
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 			    && aep->ae_u.cterm.fg_rgb
 						    == taep->ae_u.cterm.fg_rgb
 			    && aep->ae_u.cterm.bg_rgb
 						    == taep->ae_u.cterm.bg_rgb
 			    && aep->ae_u.cterm.ul_rgb
 						    == taep->ae_u.cterm.ul_rgb
-#endif
+#అయితే_ముగింపు
 		       )))
 
-	return i + ATTR_OFF;
+	తిరిగి i + ATTR_OFF;
     }
 
-    if (table->ga_len + ATTR_OFF > MAX_TYPENR)
+    ఒకవేళ (పట్టిక->ga_len + ATTR_OFF > MAX_TYPENR)
     {
 	// Running out of attribute entries!  remove all attributes, and
 	// compute new ones for all groups.
 	// When called recursively, we are really out of numbers.
-	if (recursive)
+	ఒకవేళ (recursive)
 	{
-	    emsg(_(e_too_many_different_highlighting_attributes_in_use));
-	    return 0;
+	    emsg(_(e_too_many_different_highlighting_లక్షణాలు_లోపల_use));
+	    తిరిగి 0;
 	}
 	recursive = TRUE;
 
 	clear_hl_tables();
 
-	set_must_redraw(UPD_CLEAR);
+	సమితి_must_redraw(UPD_CLEAR);
 
-	for (i = 0; i < highlight_ga.ga_len; ++i)
-	    set_hl_attr(i);
+	కొరకు (i = 0; i < highlight_ga.ga_len; ++i)
+	    సమితి_hl_attr(i);
 
 	recursive = FALSE;
     }
 
     // This is a new combination of colors and font, add an entry.
-    if (ga_grow(table, 1) == FAIL)
-	return 0;
+    ఒకవేళ (ga_grow(పట్టిక, 1) == FAIL)
+	తిరిగి 0;
 
-    taep = &(((attrentry_T *)table->ga_data)[table->ga_len]);
-    CLEAR_POINTER(taep);
+    taep = &(((attrentry_T *)పట్టిక->ga_దత్తాంశం)[పట్టిక->ga_len]);
+    CLEAR_సూచిక(taep);
     taep->ae_attr = aep->ae_attr;
-#ifdef FEAT_GUI
-    if (table == &gui_attr_table)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (పట్టిక == &gui_attr_పట్టిక)
     {
 	taep->ae_u.gui.fg_color = aep->ae_u.gui.fg_color;
 	taep->ae_u.gui.bg_color = aep->ae_u.gui.bg_color;
@@ -2862,45 +2862,45 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 	taep->ae_u.gui.fontset = aep->ae_u.gui.fontset;
 # endif
     }
-#endif
-    if (table == &term_attr_table)
+#అయితే_ముగింపు
+    ఒకవేళ (పట్టిక == &పదం_attr_పట్టిక)
     {
-	if (aep->ae_u.term.start == NULL)
-	    taep->ae_u.term.start = NULL;
-	else
-	    taep->ae_u.term.start = vim_strsave(aep->ae_u.term.start);
-	if (aep->ae_u.term.stop == NULL)
-	    taep->ae_u.term.stop = NULL;
-	else
-	    taep->ae_u.term.stop = vim_strsave(aep->ae_u.term.stop);
+	ఒకవేళ (aep->ae_u.పదం.ప్రారంభం == ఖాళీ)
+	    taep->ae_u.పదం.ప్రారంభం = ఖాళీ;
+	లేకపోతే
+	    taep->ae_u.పదం.ప్రారంభం = vim_strsave(aep->ae_u.పదం.ప్రారంభం);
+	ఒకవేళ (aep->ae_u.పదం.stop == ఖాళీ)
+	    taep->ae_u.పదం.stop = ఖాళీ;
+	లేకపోతే
+	    taep->ae_u.పదం.stop = vim_strsave(aep->ae_u.పదం.stop);
     }
-    else if (table == &cterm_attr_table)
+    లేకపోతే ఒకవేళ (పట్టిక == &cterm_attr_పట్టిక)
     {
 	taep->ae_u.cterm.fg_color = aep->ae_u.cterm.fg_color;
 	taep->ae_u.cterm.bg_color = aep->ae_u.cterm.bg_color;
 	taep->ae_u.cterm.ul_color = aep->ae_u.cterm.ul_color;
 	taep->ae_u.cterm.font = aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	taep->ae_u.cterm.fg_rgb = aep->ae_u.cterm.fg_rgb;
 	taep->ae_u.cterm.bg_rgb = aep->ae_u.cterm.bg_rgb;
 	taep->ae_u.cterm.ul_rgb = aep->ae_u.cterm.ul_rgb;
-#endif
+#అయితే_ముగింపు
     }
-    ++table->ga_len;
-    return (table->ga_len - 1 + ATTR_OFF);
+    ++పట్టిక->ga_len;
+    తిరిగి (పట్టిక->ga_len - 1 + ATTR_OFF);
 }
 
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_cterm_attr_idx(int attr, int fg, int bg)
+    పూర్ణాంకం
+get_cterm_attr_idx(పూర్ణాంకం attr, పూర్ణాంకం fg, పూర్ణాంకం bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_క్షేత్రం(at_en);
 # ifdef FEAT_TERMGUICOLORS
     at_en.ae_u.cterm.fg_rgb = INVALCOLOR;
     at_en.ae_u.cterm.bg_rgb = INVALCOLOR;
@@ -2911,77 +2911,77 @@ get_cterm_attr_idx(int attr, int fg, int bg)
     at_en.ae_u.cterm.bg_color = bg;
     at_en.ae_u.cterm.ul_color = 0;
     at_en.ae_u.cterm.font = 0;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    తిరిగి get_attr_నమోదు(&cterm_attr_పట్టిక, &at_en);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
 /*
  * Get an attribute index for a 'termguicolors' entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_tgc_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    పూర్ణాంకం
+get_tgc_attr_idx(పూర్ణాంకం attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_క్షేత్రం(at_en);
     at_en.ae_attr = attr;
-    if (fg == INVALCOLOR && bg == INVALCOLOR)
+    ఒకవేళ (fg == INVALCOLOR && bg == INVALCOLOR)
     {
 	// If both GUI colors are not set fall back to the cterm colors.  Helps
 	// if the GUI only has an attribute, such as undercurl.
 	at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
     }
-    else
+    లేకపోతే
     {
 	at_en.ae_u.cterm.fg_rgb = fg;
 	at_en.ae_u.cterm.bg_rgb = bg;
     }
     at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    తిరిగి get_attr_నమోదు(&cterm_attr_పట్టిక, &at_en);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_TERMINAL) && defined(FEAT_GUI)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    పూర్ణాంకం
+get_gui_attr_idx(పూర్ణాంకం attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_క్షేత్రం(at_en);
     at_en.ae_attr = attr;
     at_en.ae_u.gui.fg_color = fg;
     at_en.ae_u.gui.bg_color = bg;
-    return get_attr_entry(&gui_attr_table, &at_en);
+    తిరిగి get_attr_నమోదు(&gui_attr_పట్టిక, &at_en);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Clear all highlight tables.
  */
-    void
-clear_hl_tables(void)
+    శూన్య
+clear_hl_tables(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
     attrentry_T	*taep;
 
-#ifdef FEAT_GUI
-    ga_clear(&gui_attr_table);
-#endif
-    for (i = 0; i < term_attr_table.ga_len; ++i)
+#నిర్వచితమైతే FEAT_GUI
+    ga_clear(&gui_attr_పట్టిక);
+#అయితే_ముగింపు
+    కొరకు (i = 0; i < పదం_attr_పట్టిక.ga_len; ++i)
     {
-	taep = &(((attrentry_T *)term_attr_table.ga_data)[i]);
-	vim_free(taep->ae_u.term.start);
-	vim_free(taep->ae_u.term.stop);
+	taep = &(((attrentry_T *)పదం_attr_పట్టిక.ga_దత్తాంశం)[i]);
+	vim_free(taep->ae_u.పదం.ప్రారంభం);
+	vim_free(taep->ae_u.పదం.stop);
     }
-    ga_clear(&term_attr_table);
-    ga_clear(&cterm_attr_table);
+    ga_clear(&పదం_attr_పట్టిక);
+    ga_clear(&cterm_attr_పట్టిక);
 }
 
 /*
@@ -2993,149 +2993,149 @@ clear_hl_tables(void)
  * result.
  * Return the resulting attributes.
  */
-    int
-hl_combine_attr(int char_attr, int prim_attr)
+    పూర్ణాంకం
+hl_combine_attr(పూర్ణాంకం char_attr, పూర్ణాంకం prim_attr)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = ఖాళీ;
     attrentry_T *prim_aep;
     attrentry_T new_en;
 
-    if (char_attr == 0)
-	return prim_attr;
-    if (char_attr <= HL_ALL && prim_attr <= HL_ALL)
-	return ATTR_COMBINE(char_attr, prim_attr);
-#ifdef FEAT_GUI
-    if (gui.in_use)
+    ఒకవేళ (char_attr == 0)
+	తిరిగి prim_attr;
+    ఒకవేళ (char_attr <= HL_ALL && prim_attr <= HL_ALL)
+	తిరిగి ATTR_COMBINE(char_attr, prim_attr);
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
-	if (char_attr > HL_ALL)
+	ఒకవేళ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ఒకవేళ (char_aep != ఖాళీ)
 	    new_en = *char_aep;
-	else
+	లేకపోతే
 	{
-	    CLEAR_FIELD(new_en);
+	    CLEAR_క్షేత్రం(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    ఒకవేళ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	ఒకవేళ (prim_attr <= HL_ALL)
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	లేకపోతే
 	{
 	    prim_aep = syn_gui_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    ఒకవేళ (prim_aep != ఖాళీ)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
+		ఒకవేళ (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
 		    new_en.ae_u.gui.fg_color = prim_aep->ae_u.gui.fg_color;
-		if (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
+		ఒకవేళ (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
 		    new_en.ae_u.gui.bg_color = prim_aep->ae_u.gui.bg_color;
-		if (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
+		ఒకవేళ (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
 		    new_en.ae_u.gui.sp_color = prim_aep->ae_u.gui.sp_color;
-		if (prim_aep->ae_u.gui.font != NOFONT)
+		ఒకవేళ (prim_aep->ae_u.gui.font != NOFONT)
 		    new_en.ae_u.gui.font = prim_aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-		if (prim_aep->ae_u.gui.fontset != NOFONTSET)
+		ఒకవేళ (prim_aep->ae_u.gui.fontset != NOFONTSET)
 		    new_en.ae_u.gui.fontset = prim_aep->ae_u.gui.fontset;
 # endif
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	తిరిగి get_attr_నమోదు(&gui_attr_పట్టిక, &new_en);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (IS_CTERM)
+    ఒకవేళ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	ఒకవేళ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ఒకవేళ (char_aep != ఖాళీ)
 	    new_en = *char_aep;
-	else
+	లేకపోతే
 	{
-	    CLEAR_FIELD(new_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_క్షేత్రం(new_en);
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    new_en.ae_u.cterm.bg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-#endif
-	    if (char_attr <= HL_ALL)
+#అయితే_ముగింపు
+	    ఒకవేళ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	ఒకవేళ (prim_attr <= HL_ALL)
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	లేకపోతే
 	{
 	    prim_aep = syn_cterm_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    ఒకవేళ (prim_aep != ఖాళీ)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.cterm.fg_color > 0)
+		ఒకవేళ (prim_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = prim_aep->ae_u.cterm.fg_color;
-		if (prim_aep->ae_u.cterm.bg_color > 0)
+		ఒకవేళ (prim_aep->ae_u.cterm.bg_color > 0)
 		    new_en.ae_u.cterm.bg_color = prim_aep->ae_u.cterm.bg_color;
-		if (prim_aep->ae_u.cterm.ul_color > 0)
+		ఒకవేళ (prim_aep->ae_u.cterm.ul_color > 0)
 		    new_en.ae_u.cterm.ul_color = prim_aep->ae_u.cterm.ul_color;
-		if (prim_aep->ae_u.cterm.font > 0)
+		ఒకవేళ (prim_aep->ae_u.cterm.font > 0)
 		    new_en.ae_u.cterm.font = prim_aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 		// If both fg and bg are not set fall back to cterm colors.
 		// Helps for SpellBad which uses undercurl in the GUI.
-		if (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
+		ఒకవేళ (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
 			&& COLOR_INVALID(prim_aep->ae_u.cterm.bg_rgb))
 		{
-		    if (prim_aep->ae_u.cterm.fg_color > 0)
+		    ఒకవేళ (prim_aep->ae_u.cterm.fg_color > 0)
 			new_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
-		    if (prim_aep->ae_u.cterm.bg_color > 0)
+		    ఒకవేళ (prim_aep->ae_u.cterm.bg_color > 0)
 			new_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 		}
-		else
+		లేకపోతే
 		{
-		    if (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+		    ఒకవేళ (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.fg_rgb = prim_aep->ae_u.cterm.fg_rgb;
-		    if (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+		    ఒకవేళ (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.bg_rgb = prim_aep->ae_u.cterm.bg_rgb;
 		}
-		if (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+		ఒకవేళ (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
 		    new_en.ae_u.cterm.ul_rgb = prim_aep->ae_u.cterm.ul_rgb;
-#endif
+#అయితే_ముగింపు
 	    }
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	తిరిగి get_attr_నమోదు(&cterm_attr_పట్టిక, &new_en);
     }
 
-    if (char_attr > HL_ALL)
-	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    ఒకవేళ (char_attr > HL_ALL)
+	char_aep = syn_పదం_attr2entry(char_attr);
+    ఒకవేళ (char_aep != ఖాళీ)
 	new_en = *char_aep;
-    else
+    లేకపోతే
     {
-	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	CLEAR_క్షేత్రం(new_en);
+	ఒకవేళ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
-    if (prim_attr <= HL_ALL)
+    ఒకవేళ (prim_attr <= HL_ALL)
 	new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-    else
+    లేకపోతే
     {
-	prim_aep = syn_term_attr2entry(prim_attr);
-	if (prim_aep != NULL)
+	prim_aep = syn_పదం_attr2entry(prim_attr);
+	ఒకవేళ (prim_aep != ఖాళీ)
 	{
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_aep->ae_attr);
-	    if (prim_aep->ae_u.term.start != NULL)
+	    ఒకవేళ (prim_aep->ae_u.పదం.ప్రారంభం != ఖాళీ)
 	    {
-		new_en.ae_u.term.start = prim_aep->ae_u.term.start;
-		new_en.ae_u.term.stop = prim_aep->ae_u.term.stop;
+		new_en.ae_u.పదం.ప్రారంభం = prim_aep->ae_u.పదం.ప్రారంభం;
+		new_en.ae_u.పదం.stop = prim_aep->ae_u.పదం.stop;
 	    }
 	}
     }
-    return get_attr_entry(&term_attr_table, &new_en);
+    తిరిగి get_attr_నమోదు(&పదం_attr_పట్టిక, &new_en);
 }
 
 // ANSI color order: Black, Red, Green, Yellow, Blue, Magenta,
@@ -3143,61 +3143,61 @@ hl_combine_attr(int char_attr, int prim_attr)
 // only a cterm color number is known (no guifg/guibg).  Real terminal
 // palettes may differ if the user reconfigured their emulator, but
 // these are reasonable xterm-ish defaults.
-static const long_u cterm_color_16[16] = {
+స్థిర స్థిరరాశి long_u cterm_color_16[16] = {
     0x000000, 0xc00000, 0x008000, 0x808000,
     0x0000c0, 0xc000c0, 0x004080, 0xc0c0c0,
     0x808080, 0xff8080, 0x00ff00, 0xffff00,
     0x6060ff, 0xff40ff, 0x00ffff, 0xffffff
 };
 
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 /*
  * Convert a cterm color number (1-16) to an RGB value.
  * Used as a fallback when 'termguicolors' is set but only cterm colors are
  * specified (no guifg/guibg).
  * Returns INVALCOLOR if the color number is out of range.
  */
-    static guicolor_T
-cterm_color_to_rgb(int color_nr)
+    స్థిర guicolor_T
+cterm_color_గమ్యం_rgb(పూర్ణాంకం color_nr)
 {
-    if (color_nr < 1 || color_nr > 16)
-	return INVALCOLOR;
-    return (guicolor_T)cterm_color_16[color_nr - 1];
+    ఒకవేళ (color_nr < 1 || color_nr > 16)
+	తిరిగి INVALCOLOR;
+    తిరిగి (guicolor_T)cterm_color_16[color_nr - 1];
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Convert an xterm 256-color index (0-255) to an approximate RGB triple.
  * Uses the standard xterm palette: 0-15 ANSI (cterm_color_16), 16-231
  * 6x6x6 cube, 232-255 grayscale ramp.
  */
-    static void
-cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
+    స్థిర శూన్య
+cterm_idx_గమ్యం_rgb(పూర్ణాంకం idx, పూర్ణాంకం *r, పూర్ణాంకం *g, పూర్ణాంకం *b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    స్థిర స్థిరరాశి పూర్ణాంకం cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
 
-    if (idx < 0 || idx > 255)
+    ఒకవేళ (idx < 0 || idx > 255)
     {
 	*r = *g = *b = 0;
-	return;
+	తిరిగి;
     }
-    if (idx < 16)
+    ఒకవేళ (idx < 16)
     {
 	long_u rgb = cterm_color_16[idx];
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
     }
-    else if (idx < 232)
+    లేకపోతే ఒకవేళ (idx < 232)
     {
-	int n = idx - 16;
+	పూర్ణాంకం n = idx - 16;
 	*r = cube[n / 36 % 6];
 	*g = cube[n / 6  % 6];
 	*b = cube[n      % 6];
     }
-    else
+    లేకపోతే
     {
-	int v = 8 + (idx - 232) * 10;
+	పూర్ణాంకం v = 8 + (idx - 232) * 10;
 	*r = *g = *b = v;
     }
 }
@@ -3206,40 +3206,40 @@ cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
  * Approximate an RGB triple to the nearest xterm 256-color index.
  * Searches the 6x6x6 cube and the grayscale ramp; returns 0-255.
  */
-    static int
-rgb_to_cterm_idx(int r, int g, int b)
+    స్థిర పూర్ణాంకం
+rgb_గమ్యం_cterm_idx(పూర్ణాంకం r, పూర్ణాంకం g, పూర్ణాంకం b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
-    int best = 0;
-    long best_d = -1;
-    int i;
+    స్థిర స్థిరరాశి పూర్ణాంకం cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    పూర్ణాంకం ఉత్తమ = 0;
+    దీర్ఘ ఉత్తమ_d = -1;
+    పూర్ణాంకం i;
 
     // Search the 6x6x6 cube.
-    for (i = 16; i < 232; ++i)
+    కొరకు (i = 16; i < 232; ++i)
     {
-	int n = i - 16;
-	int cr = cube[n / 36 % 6];
-	int cg = cube[n / 6  % 6];
-	int cb = cube[n      % 6];
-	long d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
-	if (best_d < 0 || d < best_d)
+	పూర్ణాంకం n = i - 16;
+	పూర్ణాంకం cr = cube[n / 36 % 6];
+	పూర్ణాంకం cg = cube[n / 6  % 6];
+	పూర్ణాంకం cb = cube[n      % 6];
+	దీర్ఘ d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
+	ఒకవేళ (ఉత్తమ_d < 0 || d < ఉత్తమ_d)
 	{
-	    best_d = d;
-	    best = i;
+	    ఉత్తమ_d = d;
+	    ఉత్తమ = i;
 	}
     }
     // Search the grayscale ramp.
-    for (i = 232; i < 256; ++i)
+    కొరకు (i = 232; i < 256; ++i)
     {
-	int v = 8 + (i - 232) * 10;
-	long d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
-	if (d < best_d)
+	పూర్ణాంకం v = 8 + (i - 232) * 10;
+	దీర్ఘ d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
+	ఒకవేళ (d < ఉత్తమ_d)
 	{
-	    best_d = d;
-	    best = i;
+	    ఉత్తమ_d = d;
+	    ఉత్తమ = i;
 	}
     }
-    return best;
+    తిరిగి ఉత్తమ;
 }
 
 /*
@@ -3248,71 +3248,71 @@ rgb_to_cterm_idx(int r, int g, int b)
  * Returns true on success; false when no color is defined.
  * cterm_c is 1-based (0 means "no color").
  */
-    static bool
-resolve_color_to_rgb(int cterm_c, guicolor_T rgb UNUSED, int *r, int *g, int *b)
+    స్థిర bool
+resolve_color_గమ్యం_rgb(పూర్ణాంకం cterm_c, guicolor_T rgb వాడని, పూర్ణాంకం *r, పూర్ణాంకం *g, పూర్ణాంకం *b)
 {
-#ifdef FEAT_TERMGUICOLORS
-    if (!COLOR_INVALID(rgb))
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+    ఒకవేళ (!COLOR_INVALID(rgb))
     {
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
-	return true;
+	తిరిగి true;
     }
-#endif
-    if (cterm_c > 0)
+#అయితే_ముగింపు
+    ఒకవేళ (cterm_c > 0)
     {
-	cterm_idx_to_rgb(cterm_c - 1, r, g, b);
-	return true;
+	cterm_idx_గమ్యం_rgb(cterm_c - 1, r, g, b);
+	తిరిగి true;
     }
-    return false;
+    తిరిగి false;
 }
 
 /*
  * get a RGB fallback color from gui, cterm or default color
  */
-    static guicolor_T
-resolve_fallback_color(int cterm_c, guicolor_T rgb, guicolor_T default_rgb)
+    స్థిర guicolor_T
+resolve_fallback_color(పూర్ణాంకం cterm_c, guicolor_T rgb, guicolor_T default_rgb)
 {
-    int red, green, blue;
-    if (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
-	return default_rgb;
-    else
-	return (red << 16) | (green << 8) | blue;
+    పూర్ణాంకం red, green, blue;
+    ఒకవేళ (!resolve_color_గమ్యం_rgb(cterm_c, rgb, &red, &green, &blue))
+	తిరిగి default_rgb;
+    లేకపోతే
+	తిరిగి (red << 16) | (green << 8) | blue;
 }
 
 /*
  * get a RGB fallback foreground color from guifg, ctermfg or deduced from background
  */
-    static void
-resolve_fallback_fg_to_rgb(void)
+    స్థిర శూన్య
+resolve_fallback_fg_గమ్యం_rgb(శూన్య)
 {
     guicolor_T fgcolor_or_gui_fgcolor = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-    fgcolor_or_gui_fgcolor = cterm_normal_fg_gui_color;
-#endif
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+    fgcolor_or_gui_fgcolor = cterm_సాధారణ_fg_gui_color;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	fgcolor_or_gui_fgcolor = gui.norm_pixel;
-#endif
-    fallback_fg_rgb = resolve_fallback_color(cterm_normal_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
+#అయితే_ముగింపు
+    fallback_fg_rgb = resolve_fallback_color(cterm_సాధారణ_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
 }
 
 /*
  * get a RGB fallback background color from guifg, ctermbg or deduced from background
  */
-    static void
-resolve_fallback_bg_to_rgb(void)
+    స్థిర శూన్య
+resolve_fallback_bg_గమ్యం_rgb(శూన్య)
 {
     guicolor_T bgcolor_or_gui_bgcolor = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-    bgcolor_or_gui_bgcolor = cterm_normal_bg_gui_color;
-#endif
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	bgcolor_or_gui_bgcolor = gui.back_pixel;
-#endif
-    fallback_bg_rgb = resolve_fallback_color(cterm_normal_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+    bgcolor_or_gui_bgcolor = cterm_సాధారణ_bg_gui_color;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
+	bgcolor_or_gui_bgcolor = gui.వెనుక_pixel;
+#అయితే_ముగింపు
+    fallback_bg_rgb = resolve_fallback_color(cterm_సాధారణ_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
 }
 
 /*
@@ -3328,59 +3328,59 @@ resolve_fallback_bg_to_rgb(void)
  *
  * Requires t_colors >= 256; otherwise returns popup_c unchanged.
  */
-    static int
-blend_cterm_colors(int popup_c, guicolor_T popup_rgb,
-		   int under_c, guicolor_T under_rgb,
-		   int default_rgb,
-		   int blend_val)
+    స్థిర పూర్ణాంకం
+blend_cterm_colors(పూర్ణాంకం popup_c, guicolor_T popup_rgb,
+		   పూర్ణాంకం under_c, guicolor_T under_rgb,
+		   పూర్ణాంకం default_rgb,
+		   పూర్ణాంకం blend_val)
 {
-    int pr, pg, pb, ur, ug, ub, r, g, b;
+    పూర్ణాంకం pr, pg, pb, ur, ug, ub, r, g, b;
 
-    if (t_colors < 256)
-	return popup_c;
-    if (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
-	return under_c;
-    if (blend_val <= 0)
-	return rgb_to_cterm_idx(pr, pg, pb) + 1;
-    if (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
+    ఒకవేళ (t_colors < 256)
+	తిరిగి popup_c;
+    ఒకవేళ (!resolve_color_గమ్యం_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
+	తిరిగి under_c;
+    ఒకవేళ (blend_val <= 0)
+	తిరిగి rgb_గమ్యం_cterm_idx(pr, pg, pb) + 1;
+    ఒకవేళ (!resolve_color_గమ్యం_rgb(under_c, under_rgb, &ur, &ug, &ub))
     {
 	ur = (default_rgb >> 16) & 0xFF;
 	ug = (default_rgb >> 8) & 0xFF;
 	ub = default_rgb & 0xFF;
     }
-    if (blend_val >= 100)
-	return rgb_to_cterm_idx(ur, ug, ub) + 1;
+    ఒకవేళ (blend_val >= 100)
+	తిరిగి rgb_గమ్యం_cterm_idx(ur, ug, ub) + 1;
     r = pr + (ur - pr) * blend_val / 100;
     g = pg + (ug - pg) * blend_val / 100;
     b = pb + (ub - pb) * blend_val / 100;
-    return rgb_to_cterm_idx(r, g, b) + 1;
+    తిరిగి rgb_గమ్యం_cterm_idx(r, g, b) + 1;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Blend two RGB colors based on blend value (0-100).
  * blend: 0=return first argument color, 100=return second argument color
  * If bg_color is INVALCOLOR, high blend means more visible (return INVALCOLOR).
  */
-    static guicolor_T
-blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
+    స్థిర guicolor_T
+blend_colors(guicolor_T popup_color, guicolor_T bg_color, పూర్ణాంకం blend_val)
 {
-    int r1, g1, b1, r2, g2, b2, r, g, b;
+    పూర్ణాంకం r1, g1, b1, r2, g2, b2, r, g, b;
 
     // CTERMCOLOR is a sentinel meaning "use the cterm color"; for blending
     // it has no real RGB so treat it like INVALCOLOR.
-    if (COLOR_INVALID(popup_color))
-	return INVALCOLOR;
+    ఒకవేళ (COLOR_INVALID(popup_color))
+	తిరిగి INVALCOLOR;
 
     // Fully transparent: use underlying color as-is.
-    if (blend_val >= 100)
-	return bg_color;
+    ఒకవేళ (blend_val >= 100)
+	తిరిగి bg_color;
 
     r1 = (popup_color >> 16) & 0xFF;
     g1 = (popup_color >> 8) & 0xFF;
     b1 = popup_color & 0xFF;
 
-    if (COLOR_INVALID(bg_color))
+    ఒకవేళ (COLOR_INVALID(bg_color))
 	bg_color = fallback_bg_rgb;
 
     r2 = (bg_color >> 16) & 0xFF;
@@ -3391,9 +3391,9 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
     g = g1 + (g2 - g1) * blend_val / 100;
     b = b1 + (b2 - b1) * blend_val / 100;
 
-    return (r << 16) | (g << 8) | b;
+    తిరిగి (r << 16) | (g << 8) | b;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Blend attributes for popup windows and menus with opacity.
@@ -3401,39 +3401,39 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
  * blend: 0 = opaque (use popup colors), 100 = transparent (use background colors)
  * blend_fg: TRUE to blend foreground color, FALSE to keep popup foreground
  */
-    static int
+    స్థిర పూర్ణాంకం
 hl_blend_attr_common(
-    int		char_attr,
-    int		popup_attr,
-    int		blend,
-    int		blend_fg)
+    పూర్ణాంకం		char_attr,
+    పూర్ణాంకం		popup_attr,
+    పూర్ణాంకం		blend,
+    పూర్ణాంకం		blend_fg)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = ఖాళీ;
     attrentry_T *popup_aep;
     attrentry_T new_en;
     attrentry_T tmp_en;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
-	if (char_attr > HL_ALL)
+	ఒకవేళ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ఒకవేళ (char_aep != ఖాళీ)
 	    new_en = *char_aep;
-	else
+	లేకపోతే
 	{
-	    CLEAR_FIELD(new_en);
+	    CLEAR_క్షేత్రం(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    ఒకవేళ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	ఒకవేళ (popup_attr <= HL_ALL)
 	{
-	    CLEAR_FIELD(tmp_en);
+	    CLEAR_క్షేత్రం(tmp_en);
 	    tmp_en.ae_u.gui.fg_color = INVALCOLOR;
 	    tmp_en.ae_u.gui.bg_color = INVALCOLOR;
 	    tmp_en.ae_u.gui.sp_color = INVALCOLOR;
@@ -3443,28 +3443,28 @@ hl_blend_attr_common(
 
 	    popup_aep->ae_u.gui.bg_color = fallback_bg_rgb;
 	}
-	else
+	లేకపోతే
 	    popup_aep = syn_gui_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	ఒకవేళ (popup_aep != ఖాళీ)
 	{
 	    guicolor_T popup_bg_rgb = popup_aep->ae_u.gui.bg_color;
-	    if (COLOR_INVALID(popup_bg_rgb))
+	    ఒకవేళ (COLOR_INVALID(popup_bg_rgb))
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (blend_fg)
+	    ఒకవేళ (blend_fg)
 	    {
 		// blend_fg=TRUE: fade underlying text toward popup bg.
 		{
-		    int base_fg = fallback_fg_rgb;
-		    if (char_aep != NULL
+		    పూర్ణాంకం పునాది_fg = fallback_fg_rgb;
+		    ఒకవేళ (char_aep != ఖాళీ
 			    && char_aep->ae_u.gui.fg_color != INVALCOLOR)
-			base_fg = char_aep->ae_u.gui.fg_color;
+			పునాది_fg = char_aep->ae_u.gui.fg_color;
 		    new_en.ae_u.gui.fg_color = blend_colors(
-			    popup_bg_rgb, base_fg, blend);
+			    popup_bg_rgb, పునాది_fg, blend);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, special color
@@ -3483,7 +3483,7 @@ hl_blend_attr_common(
 	    // Blend background color: blend popup bg toward underlying bg
 	    {
 		guicolor_T underlying_bg = fallback_bg_rgb;
-		if (char_aep != NULL
+		ఒకవేళ (char_aep != ఖాళీ
 			&& !COLOR_INVALID(char_aep->ae_u.gui.bg_color))
 		    underlying_bg = char_aep->ae_u.gui.bg_color;
 		new_en.ae_u.gui.bg_color = blend_colors(
@@ -3491,65 +3491,65 @@ hl_blend_attr_common(
 			underlying_bg, blend);
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	తిరిగి get_attr_నమోదు(&gui_attr_పట్టిక, &new_en);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (IS_CTERM)
+    ఒకవేళ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	ఒకవేళ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ఒకవేళ (char_aep != ఖాళీ)
 	    new_en = *char_aep;
-	else
+	లేకపోతే
 	{
-	    CLEAR_FIELD(new_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_క్షేత్రం(new_en);
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    new_en.ae_u.cterm.bg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-#endif
-	    if (char_attr <= HL_ALL)
+#అయితే_ముగింపు
+	    ఒకవేళ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	ఒకవేళ (popup_attr <= HL_ALL)
 	{
-	    CLEAR_FIELD(tmp_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_క్షేత్రం(tmp_en);
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    tmp_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    tmp_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 	    // allow blending with termguicolors
 	    tmp_en.ae_u.cterm.bg_rgb = fallback_bg_rgb;
-#endif
+#అయితే_ముగింపు
 	    // preserve attributes other than color
 	    tmp_en.ae_attr = popup_attr;
 	    popup_aep = &tmp_en;
 
 	    // allow blending with notermguicolors
-	    popup_aep->ae_u.cterm.bg_color = cterm_normal_bg_color;
+	    popup_aep->ae_u.cterm.bg_color = cterm_సాధారణ_bg_color;
 	}
-	else
+	లేకపోతే
 	    popup_aep = syn_cterm_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	ఒకవేళ (popup_aep != ఖాళీ)
 	{
 	    guicolor_T popup_bg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    // Fall back to cterm color converted to RGB when gui color is not set.
 	    popup_bg_rgb = popup_aep->ae_u.cterm.bg_rgb;
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    ఒకవేళ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color > 0)
-		popup_bg_rgb = cterm_color_to_rgb(
+		popup_bg_rgb = cterm_color_గమ్యం_rgb(
 			popup_aep->ae_u.cterm.bg_color);
-#endif
+#అయితే_ముగింపు
 	    // assign default color if guibg and ctermbg are not set for popup
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    ఒకవేళ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color == 0)
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (!blend_fg)
+	    ఒకవేళ (!blend_fg)
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, underline color
@@ -3560,32 +3560,32 @@ hl_blend_attr_common(
 		// text is still readable instead of taking on whatever
 		// the underlying cell happened to have.
 		new_en.ae_attr = popup_aep->ae_attr;
-		if (popup_aep->ae_u.cterm.fg_color > 0)
+		ఒకవేళ (popup_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color =
 			popup_aep->ae_u.cterm.fg_color;
-		else if (cterm_normal_fg_color > 0)
-		    new_en.ae_u.cterm.fg_color = cterm_normal_fg_color;
-		else
+		లేకపోతే ఒకవేళ (cterm_సాధారణ_fg_color > 0)
+		    new_en.ae_u.cterm.fg_color = cterm_సాధారణ_fg_color;
+		లేకపోతే
 		    // black-ish or white-ish
 		    new_en.ae_u.cterm.fg_color = (*p_bg == 'l') ? 1 : 16;
 		new_en.ae_u.cterm.ul_color = popup_aep->ae_u.cterm.ul_color;
 		new_en.ae_u.cterm.font = popup_aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 		new_en.ae_u.cterm.ul_rgb = popup_aep->ae_u.cterm.ul_rgb;
-#endif
+#అయితే_ముగింపు
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// blend_fg=TRUE: fade underlying fg toward popup bg in
 		// the 256-color palette.  Used when the popup is over a
 		// cell rendered with cterm colors (no termguicolors RGB).
-		int under_fg = (char_aep != NULL)
+		పూర్ణాంకం under_fg = (char_aep != ఖాళీ)
 		    ? char_aep->ae_u.cterm.fg_color : 0;
 		guicolor_T under_fg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+		ఒకవేళ (char_aep != ఖాళీ)
 		    under_fg_rgb = char_aep->ae_u.cterm.fg_rgb;
-#endif
+#అయితే_ముగింపు
 		new_en.ae_u.cterm.fg_color = blend_cterm_colors(
 			popup_aep->ae_u.cterm.bg_color, popup_bg_rgb,
 			under_fg, under_fg_rgb, fallback_fg_rgb, blend);
@@ -3593,37 +3593,37 @@ hl_blend_attr_common(
 	    // Approximate cterm bg by blending with the underlying bg
 	    // in the 256-color palette and mapping to the nearest entry.
 	    {
-		int under_bg = (char_aep != NULL)
+		పూర్ణాంకం under_bg = (char_aep != ఖాళీ)
 		    ? char_aep->ae_u.cterm.bg_color : 0;
 		guicolor_T under_bg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+		ఒకవేళ (char_aep != ఖాళీ)
 		    under_bg_rgb = char_aep->ae_u.cterm.bg_rgb;
-#endif
+#అయితే_ముగింపు
 		new_en.ae_u.cterm.bg_color = blend_cterm_colors(
 			popup_aep->ae_u.cterm.bg_color, popup_bg_rgb,
 			under_bg, under_bg_rgb, fallback_bg_rgb, blend);
 	    }
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    // Blend RGB colors for termguicolors mode.
 	    {
-		if (blend_fg)
+		ఒకవేళ (blend_fg)
 		{
 		    // blend_fg=TRUE: fade underlying text toward popup bg.
-		    if (popup_bg_rgb != INVALCOLOR)
+		    ఒకవేళ (popup_bg_rgb != INVALCOLOR)
 		    {
-			int base_fg = fallback_fg_rgb;
+			పూర్ణాంకం పునాది_fg = fallback_fg_rgb;
 			// CTERMCOLOR is a sentinel meaning "use the cterm
 			// color"; treat it as no underlying color so it is
 			// not blended in as a real near-white pixel.
-			if (char_aep != NULL
+			ఒకవేళ (char_aep != ఖాళీ
 				&& !COLOR_INVALID(char_aep->ae_u.cterm.fg_rgb))
-			    base_fg = char_aep->ae_u.cterm.fg_rgb;
+			    పునాది_fg = char_aep->ae_u.cterm.fg_rgb;
 			new_en.ae_u.cterm.fg_rgb = blend_colors(
-				popup_bg_rgb, base_fg, blend);
+				popup_bg_rgb, పునాది_fg, blend);
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    // blend_fg=FALSE: popup text is opaque.  Replace fg with
 		    // popup's so the underlying syntax highlighting fg does
@@ -3635,386 +3635,386 @@ hl_blend_attr_common(
 		    // color is not set.
 		    guicolor_T popup_fg = popup_aep->ae_u.cterm.fg_rgb;
 
-		    if (COLOR_INVALID(popup_fg)
+		    ఒకవేళ (COLOR_INVALID(popup_fg)
 			    && popup_aep->ae_u.cterm.fg_color > 0)
-			popup_fg = cterm_color_to_rgb(
+			popup_fg = cterm_color_గమ్యం_rgb(
 				popup_aep->ae_u.cterm.fg_color);
 
-		    if (!COLOR_INVALID(popup_fg))
+		    ఒకవేళ (!COLOR_INVALID(popup_fg))
 			new_en.ae_u.cterm.fg_rgb = popup_fg;
-		    else if (!COLOR_INVALID(cterm_normal_fg_gui_color))
-			new_en.ae_u.cterm.fg_rgb = cterm_normal_fg_gui_color;
-		    else
+		    లేకపోతే ఒకవేళ (!COLOR_INVALID(cterm_సాధారణ_fg_gui_color))
+			new_en.ae_u.cterm.fg_rgb = cterm_సాధారణ_fg_gui_color;
+		    లేకపోతే
 			new_en.ae_u.cterm.fg_rgb = fallback_fg_rgb;
 		}
-		if (popup_bg_rgb != INVALCOLOR)
+		ఒకవేళ (popup_bg_rgb != INVALCOLOR)
 		{
 		    // Blend popup bg toward underlying bg
 		    guicolor_T underlying_bg = fallback_bg_rgb;
-		    if (char_aep != NULL
+		    ఒకవేళ (char_aep != ఖాళీ
 			    && !COLOR_INVALID(char_aep->ae_u.cterm.bg_rgb))
 			underlying_bg = char_aep->ae_u.cterm.bg_rgb;
 		    new_en.ae_u.cterm.bg_rgb = blend_colors(
 			    popup_bg_rgb, underlying_bg, blend);
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	తిరిగి get_attr_నమోదు(&cterm_attr_పట్టిక, &new_en);
     }
 
-    if (char_attr > HL_ALL)
-	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    ఒకవేళ (char_attr > HL_ALL)
+	char_aep = syn_పదం_attr2entry(char_attr);
+    ఒకవేళ (char_aep != ఖాళీ)
 	new_en = *char_aep;
-    else
+    లేకపోతే
     {
-	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	CLEAR_క్షేత్రం(new_en);
+	ఒకవేళ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
     // For term mode, no separate background color handling.
-    return get_attr_entry(&term_attr_table, &new_en);
+    తిరిగి get_attr_నమోదు(&పదం_attr_పట్టిక, &new_en);
 }
 
 /*
  * Blend attributes for popup windows with opacity.
  */
-    int
-hl_blend_attr(int char_attr, int popup_attr, int blend, int blend_fg)
+    పూర్ణాంకం
+hl_blend_attr(పూర్ణాంకం char_attr, పూర్ణాంకం popup_attr, పూర్ణాంకం blend, పూర్ణాంకం blend_fg)
 {
-    if (blend >= 100 && blend_fg)
-	return char_attr;
+    ఒకవేళ (blend >= 100 && blend_fg)
+	తిరిగి char_attr;
 
-    return hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
+    తిరిగి hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
 }
 
 /*
  * Blend underlying foreground and background colors for pum space cells.
  */
-    int
-hl_pum_blend_attr(int char_attr, int popup_attr, int blend)
+    పూర్ణాంకం
+hl_pum_blend_attr(పూర్ణాంకం char_attr, పూర్ణాంకం popup_attr, పూర్ణాంకం blend)
 {
-    return hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
+    తిరిగి hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
 }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     attrentry_T *
-syn_gui_attr2entry(int attr)
+syn_gui_attr2entry(పూర్ణాంకం attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(GUI_ATTR_ENTRY(attr));
+    ఒకవేళ (attr >= gui_attr_పట్టిక.ga_len)	    // did ":syntax clear"
+	తిరిగి ఖాళీ;
+    తిరిగి &(GUI_ATTR_నమోదు(attr));
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get the highlight attributes (HL_BOLD etc.) from an attribute nr.
  * Only to be used when "attr" > HL_ALL.
  */
-    int
-syn_attr2attr(int attr)
+    పూర్ణాంకం
+syn_attr2attr(పూర్ణాంకం attr)
 {
     attrentry_T	*aep;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
 	aep = syn_gui_attr2entry(attr);
-    else
-#endif
-	if (IS_CTERM)
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
-	    aep = syn_term_attr2entry(attr);
+	లేకపోతే
+	    aep = syn_పదం_attr2entry(attr);
 
-    if (aep == NULL)	    // highlighting not set
-	return 0;
-    return aep->ae_attr;
+    ఒకవేళ (aep == ఖాళీ)	    // highlighting not set
+	తిరిగి 0;
+    తిరిగి aep->ae_attr;
 }
 
 
     attrentry_T *
-syn_term_attr2entry(int attr)
+syn_పదం_attr2entry(పూర్ణాంకం attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(TERM_ATTR_ENTRY(attr));
+    ఒకవేళ (attr >= పదం_attr_పట్టిక.ga_len)	    // did ":syntax clear"
+	తిరిగి ఖాళీ;
+    తిరిగి &(పదం_ATTR_నమోదు(attr));
 }
 
     attrentry_T *
-syn_cterm_attr2entry(int attr)
+syn_cterm_attr2entry(పూర్ణాంకం attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
-	return NULL;
-    return &(CTERM_ATTR_ENTRY(attr));
+    ఒకవేళ (attr >= cterm_attr_పట్టిక.ga_len)	// did ":syntax clear"
+	తిరిగి ఖాళీ;
+    తిరిగి &(CTERM_ATTR_నమోదు(attr));
 }
 
-#define LIST_ATTR   1
-#define LIST_STRING 2
-#define LIST_INT    3
+#నిర్వచించు LIST_ATTR   1
+#నిర్వచించు LIST_STRING 2
+#నిర్వచించు LIST_INT    3
 
-    static void
-highlight_list_one(int id)
+    స్థిర శూన్య
+highlight_list_one(పూర్ణాంకం id)
 {
-    hl_group_T	    *sgp;
-    int		    didh = FALSE;
+    hl_సమూహం_T	    *sgp;
+    పూర్ణాంకం		    didh = FALSE;
 
-    sgp = &HL_TABLE()[id - 1];	    // index is ID minus one
+    sgp = &HL_పట్టిక()[id - 1];	    // index is ID minus one
 
-    if (message_filtered(sgp->sg_name))
-	return;
+    ఒకవేళ (సందేశం_filtered(sgp->sg_name))
+	తిరిగి;
 
     // Note: Keep this in sync with expand_highlight_group().
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_term, NULL, "term");
+				    sgp->sg_పదం, ఖాళీ, "term");
     didh = highlight_list_arg(id, didh, LIST_STRING,
-				    0, sgp->sg_start, "start");
+				    0, sgp->sg_ప్రారంభం, "start");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_stop, "stop");
 
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_cterm, NULL, "cterm");
+				    sgp->sg_cterm, ఖాళీ, "cterm");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_fg, NULL, "ctermfg");
+				    sgp->sg_cterm_fg, ఖాళీ, "ctermfg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_bg, NULL, "ctermbg");
+				    sgp->sg_cterm_bg, ఖాళీ, "ctermbg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_ul, NULL, "ctermul");
+				    sgp->sg_cterm_ul, ఖాళీ, "ctermul");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_font, NULL, "ctermfont");
+				    sgp->sg_cterm_font, ఖాళీ, "ctermfont");
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_gui, NULL, "gui");
+				    sgp->sg_gui, ఖాళీ, "gui");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_fg_name, "guifg");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_bg_name, "guibg");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_sp_name, "guisp");
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_font_name, "font");
-#endif
+#అయితే_ముగింపు
 
-    if (sgp->sg_link && !got_int)
+    ఒకవేళ (sgp->sg_link && !got_int)
     {
-	(void)syn_list_header(didh, 9999, id);
+	(శూన్య)syn_list_శీర్షిక(didh, 9999, id);
 	didh = TRUE;
-	msg_puts_attr("links to", HL_ATTR(HLF_D));
-	msg_putchar(' ');
-	msg_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
+	సందేశం_puts_attr("links to", HL_ATTR(HLF_D));
+	సందేశం_putchar(' ');
+	సందేశం_outtrans(HL_పట్టిక()[HL_పట్టిక()[id - 1].sg_link - 1].sg_name);
     }
 
-    if (!didh)
+    ఒకవేళ (!didh)
 	highlight_list_arg(id, didh, LIST_STRING, 0, (char_u *)"cleared", "");
-#ifdef FEAT_EVAL
-    if (p_verbose > 0)
-	last_set_msg(sgp->sg_script_ctx);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (p_verbose > 0)
+	చివరి_సమితి_సందేశం(sgp->sg_script_ctx);
+#అయితే_ముగింపు
 }
 
-    static char_u*
-highlight_arg_to_string(
-    int		type,
-    int		iarg,
+    స్థిర char_u*
+highlight_arg_గమ్యం_string(
+    పూర్ణాంకం		type,
+    పూర్ణాంకం		iarg,
     char_u	*sarg,
     char_u	*buf)
 {
-    if (type == LIST_INT)
-	sprintf((char *)buf, "%d", iarg - 1);
-    else if (type == LIST_STRING)
-	return sarg;
-    else // type == LIST_ATTR
+    ఒకవేళ (type == LIST_INT)
+	sprintf((అక్షరం *)buf, "%d", iarg - 1);
+    లేకపోతే ఒకవేళ (type == LIST_STRING)
+	తిరిగి sarg;
+    లేకపోతే // type == LIST_ATTR
     {
 	size_t buflen;
 
 	buf[0] = NUL;
 	buflen = 0;
-	for (int i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+	కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(highlight_సూచీ_tab); ++i)
 	{
-	    if (iarg & highlight_index_tab[i]->key)
+	    ఒకవేళ (iarg & highlight_సూచీ_tab[i]->కీలకం)
 	    {
-		if (buflen > 0)
+		ఒకవేళ (buflen > 0)
 		{
 		    STRCPY(buf + buflen, (char_u *)",");
 		    ++buflen;
 		}
-		STRCPY(buf + buflen, highlight_index_tab[i]->value.string);
-		buflen += highlight_index_tab[i]->value.length;
-		iarg &= ~highlight_index_tab[i]->key;	    // don't want "inverse"/"reverse"
+		STRCPY(buf + buflen, highlight_సూచీ_tab[i]->విలువ.string);
+		buflen += highlight_సూచీ_tab[i]->విలువ.నిడివి;
+		iarg &= ~highlight_సూచీ_tab[i]->కీలకం;	    // don't want "inverse"/"reverse"
 	    }
 	}
     }
-    return buf;
+    తిరిగి buf;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 highlight_list_arg(
-    int		id,
-    int		didh,
-    int		type,
-    int		iarg,
+    పూర్ణాంకం		id,
+    పూర్ణాంకం		didh,
+    పూర్ణాంకం		type,
+    పూర్ణాంకం		iarg,
     char_u	*sarg,
-    char	*name)
+    అక్షరం	*name)
 {
     char_u	buf[MAX_ATTR_LEN];
     char_u	*ts;
 
-    if (got_int)
-	return FALSE;
+    ఒకవేళ (got_int)
+	తిరిగి FALSE;
 
-    if (type == LIST_STRING ? (sarg == NULL) : (iarg == 0))
-	return didh;
+    ఒకవేళ (type == LIST_STRING ? (sarg == ఖాళీ) : (iarg == 0))
+	తిరిగి didh;
 
-    ts = highlight_arg_to_string(type, iarg, sarg, buf);
+    ts = highlight_arg_గమ్యం_string(type, iarg, sarg, buf);
 
-    (void)syn_list_header(didh,
-	    (int)(vim_strsize(ts) + STRLEN(name) + 1), id);
+    (శూన్య)syn_list_శీర్షిక(didh,
+	    (పూర్ణాంకం)(vim_strsize(ts) + STRLEN(name) + 1), id);
     didh = TRUE;
-    if (!got_int)
+    ఒకవేళ (!got_int)
     {
-	if (*name != NUL)
+	ఒకవేళ (*name != NUL)
 	{
-	    msg_puts_attr(name, HL_ATTR(HLF_D));
-	    msg_puts_attr("=", HL_ATTR(HLF_D));
+	    సందేశం_puts_attr(name, HL_ATTR(HLF_D));
+	    సందేశం_puts_attr("=", HL_ATTR(HLF_D));
 	}
-	msg_outtrans(ts);
+	సందేశం_outtrans(ts);
     }
-    return didh;
+    తిరిగి didh;
 }
 
-#if ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
+#ఒకవేళ ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
 /*
  * Return "1" if highlight group "id" has attribute "flag".
  * Return NULL otherwise.
  */
     char_u *
 highlight_has_attr(
-    int		id,
-    int		flag,
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    పూర్ణాంకం		id,
+    పూర్ణాంకం		flag,
+    పూర్ణాంకం		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    int		attr;
+    పూర్ణాంకం		attr;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    ఒకవేళ (id <= 0 || id > highlight_ga.ga_len)
+	తిరిగి ఖాళీ;
 
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    if (modec == 'g')
-	attr = HL_TABLE()[id - 1].sg_gui;
-    else
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ఒకవేళ (modec == 'g')
+	attr = HL_పట్టిక()[id - 1].sg_gui;
+    లేకపోతే
 # endif
     {
-	if (modec == 'c')
-	    attr = HL_TABLE()[id - 1].sg_cterm;
-	else
-	    attr = HL_TABLE()[id - 1].sg_term;
+	ఒకవేళ (modec == 'c')
+	    attr = HL_పట్టిక()[id - 1].sg_cterm;
+	లేకపోతే
+	    attr = HL_పట్టిక()[id - 1].sg_పదం;
     }
 
-    if (attr & flag)
-	return (char_u *)"1";
-    return NULL;
+    ఒకవేళ (attr & flag)
+	తిరిగి (char_u *)"1";
+    తిరిగి ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
 /*
  * Return color name of highlight group "id".
  */
     char_u *
 highlight_color(
-    int		id,
+    పూర్ణాంకం		id,
     char_u	*what,	// "font", "fg", "bg", "sp", "ul", "fg#", "bg#" or "sp#"
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    పూర్ణాంకం		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    static char_u	name[20];
-    int			n;
-    int			fg = FALSE;
-    int			sp = FALSE;
-    int			ul = FALSE;
-    int			font = FALSE;
+    స్థిర char_u	name[20];
+    పూర్ణాంకం			n;
+    పూర్ణాంకం			fg = FALSE;
+    పూర్ణాంకం			sp = FALSE;
+    పూర్ణాంకం			ul = FALSE;
+    పూర్ణాంకం			font = FALSE;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    ఒకవేళ (id <= 0 || id > highlight_ga.ga_len)
+	తిరిగి ఖాళీ;
 
-    if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
+    ఒకవేళ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
 	fg = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
+    లేకపోతే ఒకవేళ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
 	     && TOLOWER_ASC(what[2]) == 'n' && TOLOWER_ASC(what[3]) == 't')
 	font = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
+    లేకపోతే ఒకవేళ (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
 	sp = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
+    లేకపోతే ఒకవేళ (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
 	ul = TRUE;
-    else if (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
-	return NULL;
-    if (modec == 'g')
+    లేకపోతే ఒకవేళ (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
+	తిరిగి ఖాళీ;
+    ఒకవేళ (modec == 'g')
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI
 	// return font name
-	if (font)
-	    return HL_TABLE()[id - 1].sg_font_name;
+	ఒకవేళ (font)
+	    తిరిగి HL_పట్టిక()[id - 1].sg_font_name;
 #  endif
 
 	// return #RRGGBB form (only possible when GUI is running)
-	if ((USE_24BIT) && what[2] == '#')
+	ఒకవేళ ((USE_24_బిట్టు) && what[2] == '#')
 	{
 	    guicolor_T		color;
 	    long_u		rgb;
-	    static char_u	buf[10];
+	    స్థిర char_u	buf[10];
 
-	    if (fg)
-		color = HL_TABLE()[id - 1].sg_gui_fg;
-	    else if (sp)
-		color = HL_TABLE()[id - 1].sg_gui_sp;
-	    else
-		color = HL_TABLE()[id - 1].sg_gui_bg;
-	    if (color == INVALCOLOR)
-		return NULL;
+	    ఒకవేళ (fg)
+		color = HL_పట్టిక()[id - 1].sg_gui_fg;
+	    లేకపోతే ఒకవేళ (sp)
+		color = HL_పట్టిక()[id - 1].sg_gui_sp;
+	    లేకపోతే
+		color = HL_పట్టిక()[id - 1].sg_gui_bg;
+	    ఒకవేళ (color == INVALCOLOR)
+		తిరిగి ఖాళీ;
 	    rgb = (long_u)GUI_MCH_GET_RGB(color);
-	    sprintf((char *)buf, "#%02x%02x%02x",
-				      (unsigned)(rgb >> 16),
-				      (unsigned)(rgb >> 8) & 255,
-				      (unsigned)rgb & 255);
-	    return buf;
+	    sprintf((అక్షరం *)buf, "#%02x%02x%02x",
+				      (గుర్తులేని)(rgb >> 16),
+				      (గుర్తులేని)(rgb >> 8) & 255,
+				      (గుర్తులేని)rgb & 255);
+	    తిరిగి buf;
 	}
 # endif
-	if (fg)
-	    return (HL_TABLE()[id - 1].sg_gui_fg_name);
-	if (sp)
-	    return (HL_TABLE()[id - 1].sg_gui_sp_name);
-	return (HL_TABLE()[id - 1].sg_gui_bg_name);
+	ఒకవేళ (fg)
+	    తిరిగి (HL_పట్టిక()[id - 1].sg_gui_fg_name);
+	ఒకవేళ (sp)
+	    తిరిగి (HL_పట్టిక()[id - 1].sg_gui_sp_name);
+	తిరిగి (HL_పట్టిక()[id - 1].sg_gui_bg_name);
     }
-    if (sp)
-	return NULL;
-    if (modec == 'c')
+    ఒకవేళ (sp)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (modec == 'c')
     {
-	if (fg)
-	    n = HL_TABLE()[id - 1].sg_cterm_fg - 1;
-	else if (ul)
-	    n = HL_TABLE()[id - 1].sg_cterm_ul - 1;
-	else if (font)
-	    n = HL_TABLE()[id - 1].sg_cterm_font - 1;
-	else
-	    n = HL_TABLE()[id - 1].sg_cterm_bg - 1;
-	if (n < 0)
-	    return NULL;
-	sprintf((char *)name, "%d", n);
-	return name;
+	ఒకవేళ (fg)
+	    n = HL_పట్టిక()[id - 1].sg_cterm_fg - 1;
+	లేకపోతే ఒకవేళ (ul)
+	    n = HL_పట్టిక()[id - 1].sg_cterm_ul - 1;
+	లేకపోతే ఒకవేళ (font)
+	    n = HL_పట్టిక()[id - 1].sg_cterm_font - 1;
+	లేకపోతే
+	    n = HL_పట్టిక()[id - 1].sg_cterm_bg - 1;
+	ఒకవేళ (n < 0)
+	    తిరిగి ఖాళీ;
+	sprintf((అక్షరం *)name, "%d", n);
+	తిరిగి name;
     }
     // term doesn't have color
-    return NULL;
+    తిరిగి ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SYN_HL) \
+#ఒకవేళ defined(FEAT_SYN_HL) \
 	    && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)) \
 	&& defined(FEAT_PRINTER)
 /*
@@ -4022,99 +4022,99 @@ highlight_color(
  */
     long_u
 highlight_gui_color_rgb(
-    int		id,
-    int		fg)	// TRUE = fg, FALSE = bg
+    పూర్ణాంకం		id,
+    పూర్ణాంకం		fg)	// TRUE = fg, FALSE = bg
 {
     guicolor_T	color;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return 0L;
+    ఒకవేళ (id <= 0 || id > highlight_ga.ga_len)
+	తిరిగి 0L;
 
-    if (fg)
-	color = HL_TABLE()[id - 1].sg_gui_fg;
-    else
-	color = HL_TABLE()[id - 1].sg_gui_bg;
+    ఒకవేళ (fg)
+	color = HL_పట్టిక()[id - 1].sg_gui_fg;
+    లేకపోతే
+	color = HL_పట్టిక()[id - 1].sg_gui_bg;
 
-    if (color == INVALCOLOR)
-	return 0L;
+    ఒకవేళ (color == INVALCOLOR)
+	తిరిగి 0L;
 
-    return GUI_MCH_GET_RGB(color);
+    తిరిగి GUI_MCH_GET_RGB(color);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Output the syntax list header.
  * Return TRUE when started a new line.
  */
-    int
-syn_list_header(
-    int	    did_header,		// did header already
-    int	    outlen,		// length of string that comes
-    int	    id)			// highlight group id
+    పూర్ణాంకం
+syn_list_శీర్షిక(
+    పూర్ణాంకం	    did_శీర్షిక,		// did header already
+    పూర్ణాంకం	    outlen,		// length of string that comes
+    పూర్ణాంకం	    id)			// highlight group id
 {
-    int	    endcol = 19;
-    int	    newline = TRUE;
-    int	    name_col = 0;
+    పూర్ణాంకం	    endcol = 19;
+    పూర్ణాంకం	    newline = TRUE;
+    పూర్ణాంకం	    name_నిలువు = 0;
 
-    if (!did_header)
+    ఒకవేళ (!did_శీర్షిక)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
-	msg_outtrans(HL_TABLE()[id - 1].sg_name);
-	name_col = msg_col;
+	సందేశం_putchar('\n');
+	ఒకవేళ (got_int)
+	    తిరిగి TRUE;
+	సందేశం_outtrans(HL_పట్టిక()[id - 1].sg_name);
+	name_నిలువు = సందేశం_నిలువు;
 	endcol = 15;
     }
-    else if (msg_col + outlen + 1 >= cmdline_width)
+    లేకపోతే ఒకవేళ (సందేశం_నిలువు + outlen + 1 >= cmdline_వెడల్పు)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
+	సందేశం_putchar('\n');
+	ఒకవేళ (got_int)
+	    తిరిగి TRUE;
     }
-    else
+    లేకపోతే
     {
-	if (msg_col >= endcol)	// wrap around is like starting a new line
+	ఒకవేళ (సందేశం_నిలువు >= endcol)	// wrap around is like starting a new line
 	    newline = FALSE;
     }
 
-    if (msg_col >= endcol)	// output at least one space
-	endcol = msg_col + 1;
-    if (cmdline_width <= endcol)	// avoid hang for tiny window
-	endcol = cmdline_width - 1;
+    ఒకవేళ (సందేశం_నిలువు >= endcol)	// output at least one space
+	endcol = సందేశం_నిలువు + 1;
+    ఒకవేళ (cmdline_వెడల్పు <= endcol)	// avoid hang for tiny window
+	endcol = cmdline_వెడల్పు - 1;
 
-    msg_advance(endcol);
+    సందేశం_advance(endcol);
 
     // Show "xxx" with the attributes.
-    if (!did_header)
+    ఒకవేళ (!did_శీర్షిక)
     {
-	if (endcol == cmdline_width - 1 && endcol <= name_col)
-	    msg_putchar(' ');
-	msg_puts_attr("xxx", syn_id2attr(id));
-	msg_putchar(' ');
+	ఒకవేళ (endcol == cmdline_వెడల్పు - 1 && endcol <= name_నిలువు)
+	    సందేశం_putchar(' ');
+	సందేశం_puts_attr("xxx", syn_id2attr(id));
+	సందేశం_putchar(' ');
     }
 
-    return newline;
+    తిరిగి newline;
 }
 
 /*
  * Set the attribute numbers for a highlight group.
  * Called after one of the attributes has changed.
  */
-    static void
-set_hl_attr(
-    int		idx)	    // index in array
+    స్థిర శూన్య
+సమితి_hl_attr(
+    పూర్ణాంకం		idx)	    // index in array
 {
     attrentry_T	    at_en;
-    hl_group_T	    *sgp = HL_TABLE() + idx;
+    hl_సమూహం_T	    *sgp = HL_పట్టిక() + idx;
 
     // The "Normal" group doesn't need an attribute number
-    if (sgp->sg_name_u != NULL && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
-	return;
+    ఒకవేళ (sgp->sg_name_u != ఖాళీ && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
+	తిరిగి;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // For the GUI mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_gui_fg == INVALCOLOR
+    ఒకవేళ (sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
 	    && sgp->sg_font == NOFONT
@@ -4125,7 +4125,7 @@ set_hl_attr(
     {
 	sgp->sg_gui_attr = sgp->sg_gui;
     }
-    else
+    లేకపోతే
     {
 	at_en.ae_attr = sgp->sg_gui;
 	at_en.ae_u.gui.fg_color = sgp->sg_gui_fg;
@@ -4135,50 +4135,50 @@ set_hl_attr(
 # ifdef FEAT_XFONTSET
 	at_en.ae_u.gui.fontset = sgp->sg_fontset;
 # endif
-	sgp->sg_gui_attr = get_attr_entry(&gui_attr_table, &at_en);
+	sgp->sg_gui_attr = get_attr_నమోదు(&gui_attr_పట్టిక, &at_en);
     }
-#endif
+#అయితే_ముగింపు
     // For the term mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_start == NULL && sgp->sg_stop == NULL)
-	sgp->sg_term_attr = sgp->sg_term;
-    else
+    ఒకవేళ (sgp->sg_ప్రారంభం == ఖాళీ && sgp->sg_stop == ఖాళీ)
+	sgp->sg_పదం_attr = sgp->sg_పదం;
+    లేకపోతే
     {
-	at_en.ae_attr = sgp->sg_term;
-	at_en.ae_u.term.start = sgp->sg_start;
-	at_en.ae_u.term.stop = sgp->sg_stop;
-	sgp->sg_term_attr = get_attr_entry(&term_attr_table, &at_en);
+	at_en.ae_attr = sgp->sg_పదం;
+	at_en.ae_u.పదం.ప్రారంభం = sgp->sg_ప్రారంభం;
+	at_en.ae_u.పదం.stop = sgp->sg_stop;
+	sgp->sg_పదం_attr = get_attr_నమోదు(&పదం_attr_పట్టిక, &at_en);
     }
 
     // For the color term mode: If there are other than "normal"
     // highlighting attributes, need to allocate an attr number.
-    if (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
+    ఒకవేళ (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
 	sgp->sg_cterm_ul == 0 && sgp->sg_cterm_font == 0
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	    && sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
-#endif
+#అయితే_ముగింపు
 	    )
 	sgp->sg_cterm_attr = sgp->sg_cterm;
-    else
+    లేకపోతే
     {
 	at_en.ae_attr = sgp->sg_cterm;
 	at_en.ae_u.cterm.fg_color = sgp->sg_cterm_fg;
 	at_en.ae_u.cterm.bg_color = sgp->sg_cterm_bg;
 	at_en.ae_u.cterm.ul_color = sgp->sg_cterm_ul;
 	at_en.ae_u.cterm.font = sgp->sg_cterm_font;
-#ifdef FEAT_TERMGUICOLORS
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
 	at_en.ae_u.cterm.fg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_fg);
 	at_en.ae_u.cterm.bg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_bg);
 	// Only use the underline/undercurl color when used, it may clear the
 	// background color if not supported.
-	if (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
+	ఒకవేళ (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
 			   | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED))
 	    at_en.ae_u.cterm.ul_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_sp);
-	else
+	లేకపోతే
 	    at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-	if (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
+	ఒకవేళ (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
 		&& at_en.ae_u.cterm.bg_rgb == INVALCOLOR)
 	{
 	    // If both fg and bg are invalid fall back to the cterm colors.
@@ -4186,8 +4186,8 @@ set_hl_attr(
 	    at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	    at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 	}
-#endif
-	sgp->sg_cterm_attr = get_attr_entry(&cterm_attr_table, &at_en);
+#అయితే_ముగింపు
+	sgp->sg_cterm_attr = get_attr_నమోదు(&cterm_attr_పట్టిక, &at_en);
     }
 }
 
@@ -4195,96 +4195,96 @@ set_hl_attr(
  * Check if highlight id is overridden, and return the overriding highlight id.
  * Otherwise return the original id if no override.
  */
-    static int
-syn_override(int id)
+    స్థిర పూర్ణాంకం
+syn_override(పూర్ణాంకం id)
 {
-    if (overrides != NULL && overrides->arr != NULL)
-	for (int k = 0; k < overrides->len; k++)
-	    if (overrides->arr[k].from == id)
-		return overrides->arr[k].to;
-    return id;
+    ఒకవేళ (overrides != ఖాళీ && overrides->arr != ఖాళీ)
+	కొరకు (పూర్ణాంకం k = 0; k < overrides->len; k++)
+	    ఒకవేళ (overrides->arr[k].from == id)
+		తిరిగి overrides->arr[k].గమ్యం;
+    తిరిగి id;
 }
 
 /*
  * Lookup a highlight group name by pointer and length.
  * If it is not found, 0 is returned.
  */
-    static int
-syn_name2id_len(char_u *name, int len)
+    స్థిర పూర్ణాంకం
+syn_name2id_len(char_u *name, పూర్ణాంకం len)
 {
     char_u	name_u[MAX_SYN_NAME + 1];
     hashitem_T	*hi;
 
-    if (len > MAX_SYN_NAME)
+    ఒకవేళ (len > MAX_SYN_NAME)
 	len = MAX_SYN_NAME;
     mch_memmove(name_u, name, len);
     name_u[len] = NUL;
     vim_strup(name_u);
-    if (!highlight_ht_inited)
-	return 0;
-    hi = hash_find(&highlight_ht, name_u);
-    if (HASHITEM_EMPTY(hi))
-	return 0;
-    return HI2HLNAME(hi)->hn_id;
+    ఒకవేళ (!highlight_ht_inited)
+	తిరిగి 0;
+    hi = hash_కనుగొను(&highlight_ht, name_u);
+    ఒకవేళ (HASHITEM_ఖాళీలు(hi))
+	తిరిగి 0;
+    తిరిగి HI2HLNAME(hi)->hn_id;
 }
 
 /*
  * Lookup a highlight group name and return its ID.
  * If it is not found, 0 is returned.
  */
-    int
+    పూర్ణాంకం
 syn_name2id(char_u *name)
 {
     // Avoid using stricmp() too much, it's slow on some systems.
-    return syn_name2id_len(name, (int)STRLEN(name));
+    తిరిగి syn_name2id_len(name, (పూర్ణాంకం)STRLEN(name));
 }
 
 /*
  * Lookup a highlight group name and return its attributes.
  * Return zero if not found.
  */
-    int
+    పూర్ణాంకం
 syn_name2attr(char_u *name)
 {
-    int id = syn_name2id(name);
+    పూర్ణాంకం id = syn_name2id(name);
 
-    if (id != 0)
-	return syn_id2attr(id);
-    return 0;
+    ఒకవేళ (id != 0)
+	తిరిగి syn_id2attr(id);
+    తిరిగి 0;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if highlight group "name" exists.
  */
-    int
+    పూర్ణాంకం
 highlight_exists(char_u *name)
 {
-    return (syn_name2id(name) > 0);
+    తిరిగి (syn_name2id(name) > 0);
 }
 
-# if defined(FEAT_SEARCH_EXTRA)
+# ఒకవేళ defined(FEAT_శోధన_EXTRA)
 /*
  * Return the name of highlight group "id".
  * When not a valid ID return an empty string.
  */
     char_u *
-syn_id2name(int id)
+syn_id2name(పూర్ణాంకం id)
 {
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return (char_u *)"";
-    return HL_TABLE()[id - 1].sg_name;
+    ఒకవేళ (id <= 0 || id > highlight_ga.ga_len)
+	తిరిగి (char_u *)"";
+    తిరిగి HL_పట్టిక()[id - 1].sg_name;
 }
 # endif
-#endif
+#అయితే_ముగింపు
 
 /*
  * Like syn_name2id(), but take a pointer + length argument.
  */
-    int
-syn_namen2id(char_u *linep, int len)
+    పూర్ణాంకం
+syn_namen2id(char_u *linep, పూర్ణాంకం len)
 {
-    return syn_name2id_len(linep, len);
+    తిరిగి syn_name2id_len(linep, len);
 }
 
 /*
@@ -4293,26 +4293,26 @@ syn_namen2id(char_u *linep, int len)
  * If it doesn't exist yet, a new entry is created.
  * Return 0 for failure.
  */
-    int
-syn_check_group(char_u *pp, int len)
+    పూర్ణాంకం
+syn_check_సమూహం(char_u *pp, పూర్ణాంకం len)
 {
-    int	    id;
+    పూర్ణాంకం	    id;
     char_u  *name;
 
-    if (len > MAX_SYN_NAME)
+    ఒకవేళ (len > MAX_SYN_NAME)
     {
-	emsg(_(e_highlight_group_name_too_long));
-	return 0;
+	emsg(_(e_highlight_సమూహం_name_too_long));
+	తిరిగి 0;
     }
     id = syn_name2id_len(pp, len);
-    if (id == 0)			// doesn't exist yet
+    ఒకవేళ (id == 0)			// doesn't exist yet
     {
 	name = vim_strnsave(pp, len);
-	if (name == NULL)
-	    return 0;
-	id = syn_add_group(name);
+	ఒకవేళ (name == ఖాళీ)
+	    తిరిగి 0;
+	id = syn_కూడు_సమూహం(name);
     }
-    return id;
+    తిరిగి id;
 }
 
 /*
@@ -4320,332 +4320,332 @@ syn_check_group(char_u *pp, int len)
  * "name" must be an allocated string, it will be consumed.
  * Return 0 for failure.
  */
-    static int
-syn_add_group(char_u *name)
+    స్థిర పూర్ణాంకం
+syn_కూడు_సమూహం(char_u *name)
 {
     char_u	*p;
-    char_u	*name_up;
+    char_u	*name_పైకి;
 
     // Check that the name is valid (ASCII letters, digits, underscores, dots, or hyphens).
-    for (p = name; *p != NUL; ++p)
+    కొరకు (p = name; *p != NUL; ++p)
     {
-	if (!vim_isprintc(*p))
+	ఒకవేళ (!vim_isprintc(*p))
 	{
-	    emsg(_(e_unprintable_character_in_group_name));
+	    emsg(_(e_unprintable_character_లోపల_సమూహం_name));
 	    vim_free(name);
-	    return 0;
+	    తిరిగి 0;
 	}
-	else if (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
+	లేకపోతే ఒకవేళ (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
 	{
 	    // This is an error, but since there previously was no check only
 	    // give a warning.
-	    msg_source(HL_ATTR(HLF_W));
-	    msg(_("W18: Invalid character in group name"));
-	    break;
+	    సందేశం_ఆధారం(HL_ATTR(HLF_W));
+	    సందేశం(_("W18: Invalid character in group name"));
+	    ఆపు;
 	}
     }
 
     // First call for this growarray: init growing array.
-    if (highlight_ga.ga_data == NULL)
+    ఒకవేళ (highlight_ga.ga_దత్తాంశం == ఖాళీ)
     {
-	highlight_ga.ga_itemsize = sizeof(hl_group_T);
+	highlight_ga.ga_itemsize = పరిమాణం(hl_సమూహం_T);
 	highlight_ga.ga_growsize = 10;
 	hash_init(&highlight_ht);
 	highlight_ht_inited = true;
     }
 
-    if (highlight_ga.ga_len >= MAX_HL_ID)
+    ఒకవేళ (highlight_ga.ga_len >= MAX_HL_ID)
     {
 	emsg(_(e_too_many_highlight_and_syntax_groups));
 	vim_free(name);
-	return 0;
+	తిరిగి 0;
     }
 
     // Make room for at least one other syntax_highlight entry.
-    if (ga_grow(&highlight_ga, 1) == FAIL)
+    ఒకవేళ (ga_grow(&highlight_ga, 1) == FAIL)
     {
 	vim_free(name);
-	return 0;
+	తిరిగి 0;
     }
 
     {
 	hlname_T    *hn;
-	int	    len = (int)STRLEN(name);
+	పూర్ణాంకం	    len = (పూర్ణాంకం)STRLEN(name);
 
-	hn = alloc(offsetof(hlname_T, hn_key) + len + 1);
-	if (hn == NULL)
+	hn = alloc(offsetof(hlname_T, hn_కీలకం) + len + 1);
+	ఒకవేళ (hn == ఖాళీ)
 	{
 	    vim_free(name);
-	    return 0;
+	    తిరిగి 0;
 	}
-	vim_strncpy(hn->hn_key, name, len);
-	vim_strup(hn->hn_key);
+	vim_strncpy(hn->hn_కీలకం, name, len);
+	vim_strup(hn->hn_కీలకం);
 	hn->hn_id = highlight_ga.ga_len + 1;	// ID is index plus one
-	name_up = hn->hn_key;
+	name_పైకి = hn->hn_కీలకం;
     }
 
-    CLEAR_POINTER(&(HL_TABLE()[highlight_ga.ga_len]));
-    HL_TABLE()[highlight_ga.ga_len].sg_name = name;
-    HL_TABLE()[highlight_ga.ga_len].sg_name_u = name_up;
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
-#endif
-    hash_add(&highlight_ht, name_up, "highlight");
+    CLEAR_సూచిక(&(HL_పట్టిక()[highlight_ga.ga_len]));
+    HL_పట్టిక()[highlight_ga.ga_len].sg_name = name;
+    HL_పట్టిక()[highlight_ga.ga_len].sg_name_u = name_పైకి;
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    HL_పట్టిక()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
+    HL_పట్టిక()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
+    HL_పట్టిక()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
+#అయితే_ముగింపు
+    hash_కూడు(&highlight_ht, name_పైకి, "highlight");
     ++highlight_ga.ga_len;
 
-    return highlight_ga.ga_len;		    // ID is index plus one
+    తిరిగి highlight_ga.ga_len;		    // ID is index plus one
 }
 
 /*
  * When, just after calling syn_add_group(), an error is discovered, this
  * function deletes the new name.
  */
-    static void
-syn_unadd_group(void)
+    స్థిర శూన్య
+syn_unadd_సమూహం(శూన్య)
 {
     hashitem_T *hi;
 
     --highlight_ga.ga_len;
-    hi = hash_find(&highlight_ht, HL_TABLE()[highlight_ga.ga_len].sg_name_u);
-    if (!HASHITEM_EMPTY(hi))
+    hi = hash_కనుగొను(&highlight_ht, HL_పట్టిక()[highlight_ga.ga_len].sg_name_u);
+    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	hash_remove(&highlight_ht, hi, "highlight");
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name);
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_KEY_OFF);
+    vim_free(HL_పట్టిక()[highlight_ga.ga_len].sg_name);
+    vim_free(HL_పట్టిక()[highlight_ga.ga_len].sg_name_u - HLNAME_కీలకం_OFF);
 }
 
 /*
  * Translate a group ID to highlight attributes.
  * "hl_id" must be valid: > 0, caller must check.
  */
-    int
-syn_id2attr(int hl_id)
+    పూర్ణాంకం
+syn_id2attr(పూర్ణాంకం hl_id)
 {
-    int		attr;
-    hl_group_T	*sgp;
+    పూర్ణాంకం		attr;
+    hl_సమూహం_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ప్రతిజ్ఞా(hl_id > 0);
+    sgp = &HL_పట్టిక()[hl_id - 1];	    // index is ID minus one
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Only use GUI attr when the GUI is being used.
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 	attr = sgp->sg_gui_attr;
-    else
-#endif
-	if (IS_CTERM)
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (IS_CTERM)
 	    attr = sgp->sg_cterm_attr;
-	else
-	    attr = sgp->sg_term_attr;
+	లేకపోతే
+	    attr = sgp->sg_పదం_attr;
 
-    return attr;
+    తిరిగి attr;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Get the GUI colors and attributes for a group ID.
  * NOTE: the colors will be INVALCOLOR when not set, the color otherwise.
  */
-    int
-syn_id2colors(int hl_id, guicolor_T *fgp, guicolor_T *bgp)
+    పూర్ణాంకం
+syn_id2colors(పూర్ణాంకం hl_id, guicolor_T *fgp, guicolor_T *bgp)
 {
-    hl_group_T	*sgp;
+    hl_సమూహం_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ప్రతిజ్ఞా(hl_id > 0);
+    sgp = &HL_పట్టిక()[hl_id - 1];	    // index is ID minus one
 
     *fgp = sgp->sg_gui_fg;
     *bgp = sgp->sg_gui_bg;
-    return sgp->sg_gui;
+    తిరిగి sgp->sg_gui;
 }
-#endif
+#అయితే_ముగింపు
 
-#if (defined(MSWIN) \
+#ఒకవేళ (defined(MSWIN) \
 	    && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL)) \
 	    && defined(FEAT_TERMGUICOLORS)) \
 	|| defined(FEAT_TERMINAL)
-    void
-syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
+    శూన్య
+syn_id2cterm_bg(పూర్ణాంకం hl_id, పూర్ణాంకం *fgp, పూర్ణాంకం *bgp)
 {
-    hl_group_T	*sgp;
+    hl_సమూహం_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ప్రతిజ్ఞా(hl_id > 0);
+    sgp = &HL_పట్టిక()[hl_id - 1];	    // index is ID minus one
     *fgp = sgp->sg_cterm_fg - 1;
     *bgp = sgp->sg_cterm_bg - 1;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Translate a group ID to the final group ID (following links).
  */
-    int
-syn_get_final_id(int hl_id)
+    పూర్ణాంకం
+syn_get_final_id(పూర్ణాంకం hl_id)
 {
-    int		count;
-    hl_group_T	*sgp;
+    పూర్ణాంకం		లెక్క;
+    hl_సమూహం_T	*sgp;
 
-    if (hl_id > highlight_ga.ga_len || hl_id < 1)
-	return 0;			// Can be called from eval!!
+    ఒకవేళ (hl_id > highlight_ga.ga_len || hl_id < 1)
+	తిరిగి 0;			// Can be called from eval!!
 
     // Follow links until there is no more.
     // Look out for loops!  Break after 100 links.
-    for (count = 100; --count >= 0; )
+    కొరకు (లెక్క = 100; --లెక్క >= 0; )
     {
-	int tmp = hl_id;
+	పూర్ణాంకం tmp = hl_id;
 
-	sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
-	if (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
-	    break;
+	sgp = &HL_పట్టిక()[hl_id - 1];	    // index is ID minus one
+	ఒకవేళ (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
+	    ఆపు;
 
 	// This is to handle highlight groups that are overridden but are in the
 	// middle of a link chain.
 	hl_id = syn_override(hl_id);
-	if (tmp != hl_id)
-	    continue;
+	ఒకవేళ (tmp != hl_id)
+	    కొనసాగు;
 	hl_id = sgp->sg_link;
     }
-    return syn_override(hl_id);
+    తిరిగి syn_override(hl_id);
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Call this function just after the GUI has started.
  * Also called when 'termguicolors' was set, gui.in_use will be FALSE then.
  * It finds the font and color handles for the highlighting groups.
  */
-    void
-highlight_gui_started(void)
+    శూన్య
+highlight_gui_started(శూన్య)
 {
-    int	    idx;
+    పూర్ణాంకం	    idx;
 
     // First get the colors from the "Normal" and "Menu" group, if set
-    if (USE_24BIT)
-	set_normal_colors();
+    ఒకవేళ (USE_24_బిట్టు)
+	సమితి_సాధారణ_colors();
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    కొరకు (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	gui_do_one_color(idx, FALSE, FALSE);
 
-    highlight_changed();
+    highlight_మారింది();
 }
 
-    static void
+    స్థిర శూన్య
 gui_do_one_color(
-    int		idx,
-    int		do_menu UNUSED,	   // TRUE: might set the menu font
-    int		do_tooltip UNUSED) // TRUE: might set the tooltip font
+    పూర్ణాంకం		idx,
+    పూర్ణాంకం		do_menu వాడని,	   // TRUE: might set the menu font
+    పూర్ణాంకం		do_tooltip వాడని) // TRUE: might set the tooltip font
 {
-    int		didit = FALSE;
+    పూర్ణాంకం		didit = FALSE;
 
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    ఒకవేళ (gui.లోపల_use)
 #  endif
-	if (HL_TABLE()[idx].sg_font_name != NULL)
+	ఒకవేళ (HL_పట్టిక()[idx].sg_font_name != ఖాళీ)
 	{
-	    hl_do_font(idx, HL_TABLE()[idx].sg_font_name, FALSE, do_menu,
+	    hl_do_font(idx, HL_పట్టిక()[idx].sg_font_name, FALSE, do_menu,
 							    do_tooltip, TRUE);
 	    didit = TRUE;
 	}
 # endif
-    if (HL_TABLE()[idx].sg_gui_fg_name != NULL)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_gui_fg_name != ఖాళీ)
     {
-	HL_TABLE()[idx].sg_gui_fg =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_fg_name);
+	HL_పట్టిక()[idx].sg_gui_fg =
+			    color_name2handle(HL_పట్టిక()[idx].sg_gui_fg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_bg_name != NULL)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_gui_bg_name != ఖాళీ)
     {
-	HL_TABLE()[idx].sg_gui_bg =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_bg_name);
+	HL_పట్టిక()[idx].sg_gui_bg =
+			    color_name2handle(HL_పట్టిక()[idx].sg_gui_bg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_sp_name != NULL)
+    ఒకవేళ (HL_పట్టిక()[idx].sg_gui_sp_name != ఖాళీ)
     {
-	HL_TABLE()[idx].sg_gui_sp =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_sp_name);
+	HL_పట్టిక()[idx].sg_gui_sp =
+			    color_name2handle(HL_పట్టిక()[idx].sg_gui_sp_name);
 	didit = TRUE;
     }
-    if (didit)	// need to get a new attr number
-	set_hl_attr(idx);
+    ఒకవేళ (didit)	// need to get a new attr number
+	సమితి_hl_attr(idx);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
+#ఒకవేళ defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
 /*
  * Apply difference between User[1-9] and HLF_S to HLF_SNC, HLF_ST or HLF_STNC.
  */
-    static void
+    స్థిర శూన్య
 combine_stl_hlt(
-	int id,
-	int id_S,
-	int id_alt,
-	int hlcnt,
-	int i,
-	int hlf,
-	int *table)
+	పూర్ణాంకం id,
+	పూర్ణాంకం id_S,
+	పూర్ణాంకం id_alt,
+	పూర్ణాంకం hlcnt,
+	పూర్ణాంకం i,
+	పూర్ణాంకం hlf,
+	పూర్ణాంకం *పట్టిక)
 {
-    hl_group_T *hlt = HL_TABLE();
+    hl_సమూహం_T *hlt = HL_పట్టిక();
 
-    if (id_alt == 0)
+    ఒకవేళ (id_alt == 0)
     {
-	CLEAR_POINTER(&hlt[hlcnt + i]);
-	hlt[hlcnt + i].sg_term = highlight_attr[hlf];
+	CLEAR_సూచిక(&hlt[hlcnt + i]);
+	hlt[hlcnt + i].sg_పదం = highlight_attr[hlf];
 	hlt[hlcnt + i].sg_cterm = highlight_attr[hlf];
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
 	hlt[hlcnt + i].sg_gui = highlight_attr[hlf];
 # endif
     }
-    else
+    లేకపోతే
 	mch_memmove(&hlt[hlcnt + i],
 		    &hlt[id_alt - 1],
-		    sizeof(hl_group_T));
+		    పరిమాణం(hl_సమూహం_T));
     hlt[hlcnt + i].sg_link = 0;
 
-    hlt[hlcnt + i].sg_term ^=
-	hlt[id - 1].sg_term ^ hlt[id_S - 1].sg_term;
-    if (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
-	hlt[hlcnt + i].sg_start = hlt[id - 1].sg_start;
-    if (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
+    hlt[hlcnt + i].sg_పదం ^=
+	hlt[id - 1].sg_పదం ^ hlt[id_S - 1].sg_పదం;
+    ఒకవేళ (hlt[id - 1].sg_ప్రారంభం != hlt[id_S - 1].sg_ప్రారంభం)
+	hlt[hlcnt + i].sg_ప్రారంభం = hlt[id - 1].sg_ప్రారంభం;
+    ఒకవేళ (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
 	hlt[hlcnt + i].sg_stop = hlt[id - 1].sg_stop;
     hlt[hlcnt + i].sg_cterm ^=
 	hlt[id - 1].sg_cterm ^ hlt[id_S - 1].sg_cterm;
-    if (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
+    ఒకవేళ (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
 	hlt[hlcnt + i].sg_cterm_fg = hlt[id - 1].sg_cterm_fg;
-    if (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
+    ఒకవేళ (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
 	hlt[hlcnt + i].sg_cterm_bg = hlt[id - 1].sg_cterm_bg;
-    if (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
+    ఒకవేళ (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
 	hlt[hlcnt + i].sg_cterm_font = hlt[id - 1].sg_cterm_font;
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_EVAL)
     hlt[hlcnt + i].sg_gui ^=
 	hlt[id - 1].sg_gui ^ hlt[id_S - 1].sg_gui;
 # endif
 # ifdef FEAT_GUI
-    if (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
+    ఒకవేళ (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
 	hlt[hlcnt + i].sg_gui_fg = hlt[id - 1].sg_gui_fg;
-    if (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
+    ఒకవేళ (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
 	hlt[hlcnt + i].sg_gui_bg = hlt[id - 1].sg_gui_bg;
-    if (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
+    ఒకవేళ (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
 	hlt[hlcnt + i].sg_gui_sp = hlt[id - 1].sg_gui_sp;
-    if (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
+    ఒకవేళ (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
 	hlt[hlcnt + i].sg_font = hlt[id - 1].sg_font;
 #  ifdef FEAT_XFONTSET
-    if (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
+    ఒకవేళ (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
 	hlt[hlcnt + i].sg_fontset = hlt[id - 1].sg_fontset;
 #  endif
 # endif
     highlight_ga.ga_len = hlcnt + i + 1;
-    set_hl_attr(hlcnt + i);	// At long last we can apply
-    table[i] = syn_id2attr(hlcnt + i + 1);
+    సమితి_hl_attr(hlcnt + i);	// At long last we can apply
+    పట్టిక[i] = syn_id2attr(hlcnt + i + 1);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Translate the 'highlight' option into attributes in highlight_attr[] and
@@ -4655,39 +4655,39 @@ combine_stl_hlt(
  * screen redraw after any :highlight command.
  * Return FAIL when an invalid flag is found in 'highlight'.  OK otherwise.
  */
-    int
-highlight_changed(void)
+    పూర్ణాంకం
+highlight_మారింది(శూన్య)
 {
-    int		hlf;
-    int		i;
+    పూర్ణాంకం		hlf;
+    పూర్ణాంకం		i;
     char_u	*p;
     char_u	*default_hl;
-    int		attr;
-    char_u	*end;
-    int		id;
-#ifdef USER_HIGHLIGHT
+    పూర్ణాంకం		attr;
+    char_u	*చివర;
+    పూర్ణాంకం		id;
+#నిర్వచితమైతే USER_HIGHLIGHT
     char_u      userhl[30];  // use 30 to avoid compiler warning
 # ifdef FEAT_STL_OPT
-    int		id_S = -1;
-    int		id_SNC = 0;
+    పూర్ణాంకం		id_S = -1;
+    పూర్ణాంకం		id_SNC = 0;
 #  ifdef FEAT_TERMINAL
-    int		id_ST = 0;
-    int		id_STNC = 0;
+    పూర్ణాంకం		id_ST = 0;
+    పూర్ణాంకం		id_STNC = 0;
 #  endif
-    int		hlcnt;
+    పూర్ణాంకం		hlcnt;
 # endif
-#endif
+#అయితే_ముగింపు
     win_T	*wp;
 
-    need_highlight_changed = FALSE;
+    need_highlight_మారింది = FALSE;
 
-#ifdef FEAT_TERMINAL
-    term_update_colors_all();
-    term_update_hlfwin_all();
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    పదం_update_colors_all();
+    పదం_update_hlfwin_all();
+#అయితే_ముగింపు
 
     // Clear all attributes.
-    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+    కొరకు (hlf = 0; hlf < (పూర్ణాంకం)HLF_లెక్క; ++hlf)
     {
 	highlight_attr[hlf] = 0;
 	highlight_attr_raw[hlf] = 0;
@@ -4699,116 +4699,116 @@ highlight_changed(void)
     // First set all attributes to their default value.
     // Then use the attributes from the 'highlight' option, unless it already
     // matches the default and would repeat the same work.
-    for (i = 0; i < 2; ++i)
+    కొరకు (i = 0; i < 2; ++i)
     {
-	if (i)
+	ఒకవేళ (i)
 	{
-	    if (default_hl != NULL && p_hl != NULL
+	    ఒకవేళ (default_hl != ఖాళీ && p_hl != ఖాళీ
 				      && STRCMP(default_hl, p_hl) == 0)
-		continue;
+		కొనసాగు;
 	    p = p_hl;
 	}
-	else
+	లేకపోతే
 	    p = default_hl;
-	if (p == NULL)	    // just in case
-	    continue;
+	ఒకవేళ (p == ఖాళీ)	    // just in case
+	    కొనసాగు;
 
-	while (*p)
+	అయితే (*p)
 	{
-	    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		if (hl_flags[hlf] == *p)
-		    break;
+	    కొరకు (hlf = 0; hlf < (పూర్ణాంకం)HLF_లెక్క; ++hlf)
+		ఒకవేళ (hl_flags[hlf] == *p)
+		    ఆపు;
 	    ++p;
-	    if (hlf == (int)HLF_COUNT || *p == NUL)
-		return FAIL;
+	    ఒకవేళ (hlf == (పూర్ణాంకం)HLF_లెక్క || *p == NUL)
+		తిరిగి FAIL;
 
 	    // Allow several hl_flags to be combined, like "bu" for
 	    // bold-underlined.
 	    attr = 0;
 	    id = 0;
-	    for ( ; *p && *p != ','; ++p)	    // parse up to comma
+	    కొరకు ( ; *p && *p != ','; ++p)	    // parse up to comma
 	    {
-		if (VIM_ISWHITE(*p))		    // ignore white space
-		    continue;
+		ఒకవేళ (VIM_ISWHITE(*p))		    // ignore white space
+		    కొనసాగు;
 
-		if (attr > HL_ALL)  // Combination with ':' is not allowed.
-		    return FAIL;
+		ఒకవేళ (attr > HL_ALL)  // Combination with ':' is not allowed.
+		    తిరిగి FAIL;
 
 		// Note: Keep this in sync with expand_set_highlight().
-		switch (*p)
+		ఎంపిక (*p)
 		{
-		    case 'b':	attr |= HL_BOLD;
-				break;
-		    case 'i':	attr |= HL_ITALIC;
-				break;
-		    case '-':
-		    case 'n':			    // no highlighting
-				break;
-		    case 'r':	attr |= HL_INVERSE;
-				break;
-		    case 's':	attr |= HL_STANDOUT;
-				break;
-		    case 'u':	attr |= HL_UNDERLINE;
-				break;
-		    case 'c':	attr |= HL_UNDERCURL;
-				break;
-		    case '2':	attr |= HL_UNDERDOUBLE;
-				break;
-		    case 'd':	attr |= HL_UNDERDOTTED;
-				break;
-		    case '=':	attr |= HL_UNDERDASHED;
-				break;
-		    case 't':	attr |= HL_STRIKETHROUGH;
-				break;
-		    case ':':	++p;		    // highlight group name
-				if (attr || *p == NUL)	 // no combinations
-				    return FAIL;
-				end = vim_strchr(p, ',');
-				if (end == NULL)
-				    end = p + STRLEN(p);
-				id = syn_check_group(p, (int)(end - p));
-				if (id == 0)
-				    return FAIL;
+		    స్థితి 'b':	attr |= HL_BOLD;
+				ఆపు;
+		    స్థితి 'i':	attr |= HL_ITALIC;
+				ఆపు;
+		    స్థితి '-':
+		    స్థితి 'n':			    // no highlighting
+				ఆపు;
+		    స్థితి 'r':	attr |= HL_INVERSE;
+				ఆపు;
+		    స్థితి 's':	attr |= HL_STANDOUT;
+				ఆపు;
+		    స్థితి 'u':	attr |= HL_UNDERLINE;
+				ఆపు;
+		    స్థితి 'c':	attr |= HL_UNDERCURL;
+				ఆపు;
+		    స్థితి '2':	attr |= HL_UNDERDOUBLE;
+				ఆపు;
+		    స్థితి 'd':	attr |= HL_UNDERDOTTED;
+				ఆపు;
+		    స్థితి '=':	attr |= HL_UNDERDASHED;
+				ఆపు;
+		    స్థితి 't':	attr |= HL_STRIKETHROUGH;
+				ఆపు;
+		    స్థితి ':':	++p;		    // highlight group name
+				ఒకవేళ (attr || *p == NUL)	 // no combinations
+				    తిరిగి FAIL;
+				చివర = vim_strchr(p, ',');
+				ఒకవేళ (చివర == ఖాళీ)
+				    చివర = p + STRLEN(p);
+				id = syn_check_సమూహం(p, (పూర్ణాంకం)(చివర - p));
+				ఒకవేళ (id == 0)
+				    తిరిగి FAIL;
 				attr = syn_id2attr(id);
-				p = end - 1;
-#if defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
-				if (hlf == (int)HLF_SNC)
+				p = చివర - 1;
+#ఒకవేళ defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
+				ఒకవేళ (hlf == (పూర్ణాంకం)HLF_SNC)
 				    id_SNC = syn_get_final_id(id);
 # ifdef FEAT_TERMINAL
-				else if (hlf == (int)HLF_ST)
+				లేకపోతే ఒకవేళ (hlf == (పూర్ణాంకం)HLF_ST)
 				    id_ST = syn_get_final_id(id);
-				else if (hlf == (int)HLF_STNC)
+				లేకపోతే ఒకవేళ (hlf == (పూర్ణాంకం)HLF_STNC)
 				    id_STNC = syn_get_final_id(id);
 # endif
-				else if (hlf == (int)HLF_S)
+				లేకపోతే ఒకవేళ (hlf == (పూర్ణాంకం)HLF_S)
 				    id_S = syn_get_final_id(id);
-#endif
-				break;
-		    default:	return FAIL;
+#అయితే_ముగింపు
+				ఆపు;
+		    అప్రమేయ:	తిరిగి FAIL;
 		}
 	    }
 	    highlight_attr[hlf] = attr;
 	    highlight_attr_raw[hlf] = attr;
 	    highlight_ids[hlf] = id;
 
-	    p = skip_to_option_part(p);	    // skip comma and spaces
+	    p = skip_గమ్యం_option_part(p);	    // skip comma and spaces
 	}
     }
 
     // Highlight ids may have been changed, so keep windows up to date
     FOR_ALL_WINDOWS(wp)
     {
-	char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+	అక్షరం *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-	if (errmsg != NULL)
+	ఒకవేళ (errmsg != ఖాళీ)
 	    emsg(_(errmsg));
     }
 
-#ifdef FEAT_TERMINAL
-    term_update_hlfwin_all();
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    పదం_update_hlfwin_all();
+#అయితే_ముగింపు
 
-#ifdef USER_HIGHLIGHT
+#నిర్వచితమైతే USER_HIGHLIGHT
     // Setup the user highlights
     //
     // Temporarily utilize 28 more hl entries:
@@ -4819,23 +4819,23 @@ highlight_changed(void)
     // Have to be in there simultaneously in case of table overflows in
     // get_attr_entry()
 # ifdef FEAT_STL_OPT
-    if (ga_grow(&highlight_ga, 28) == FAIL)
-	return FAIL;
+    ఒకవేళ (ga_grow(&highlight_ga, 28) == FAIL)
+	తిరిగి FAIL;
     hlcnt = highlight_ga.ga_len;
-    if (id_S == -1)
+    ఒకవేళ (id_S == -1)
     {
 	// Make sure id_S is always valid to simplify code below. Use the last
 	// entry.
-	CLEAR_POINTER(&HL_TABLE()[hlcnt + 27]);
-	HL_TABLE()[hlcnt + 18].sg_term = highlight_attr[HLF_S];
+	CLEAR_సూచిక(&HL_పట్టిక()[hlcnt + 27]);
+	HL_పట్టిక()[hlcnt + 18].sg_పదం = highlight_attr[HLF_S];
 	id_S = hlcnt + 19;
     }
 # endif
-    for (i = 0; i < 9; i++)
+    కొరకు (i = 0; i < 9; i++)
     {
-	sprintf((char *)userhl, "User%d", i + 1);
+	sprintf((అక్షరం *)userhl, "User%d", i + 1);
 	id = syn_name2id(userhl);
-	if (id == 0)
+	ఒకవేళ (id == 0)
 	{
 	    highlight_user[i] = 0;
 # ifdef FEAT_STL_OPT
@@ -4846,7 +4846,7 @@ highlight_changed(void)
 #  endif
 # endif
 	}
-	else
+	లేకపోతే
 	{
 	    highlight_user[i] = syn_id2attr(id);
 # ifdef FEAT_STL_OPT
@@ -4865,130 +4865,130 @@ highlight_changed(void)
     highlight_ga.ga_len = hlcnt;
 # endif
 
-#endif // USER_HIGHLIGHT
+#అయితే_ముగింపు // USER_HIGHLIGHT
 
-    return OK;
+    తిరిగి OK;
 }
 
-static void highlight_list(void);
-static void highlight_list_two(int cnt, int attr);
+స్థిర శూన్య highlight_list(శూన్య);
+స్థిర శూన్య highlight_list_two(పూర్ణాంకం cnt, పూర్ణాంకం attr);
 
 // context for :highlight <group> <arg> expansion
-static int expand_hi_synid = 0;	    // ID for highlight group being completed
-static int expand_hi_equal_col = 0; // column where the '=' is
-static int expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
-static char_u *expand_hi_curvalue = NULL;   // the existing current value
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-static dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
-#endif
+స్థిర పూర్ణాంకం expand_hi_synid = 0;	    // ID for highlight group being completed
+స్థిర పూర్ణాంకం expand_hi_equal_నిలువు = 0; // column where the '=' is
+స్థిర పూర్ణాంకం expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
+స్థిర char_u *expand_hi_curvalue = ఖాళీ;   // the existing current value
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+స్థిర dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
+#అయితే_ముగింపు
 
 /*
  * Handle command line completion for :highlight command.
  */
-    void
-set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
+    శూన్య
+సమితి_context_లోపల_highlight_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
-    int		expand_group = TRUE;
+    పూర్ణాంకం		expand_సమూహం = TRUE;
 
     // Default: expand group names
     xp->xp_context = EXPAND_HIGHLIGHT;
-    xp->xp_pattern = arg;
+    xp->xp_నమూనా = arg;
     include_none = 0;
     include_link = 2;
     include_default = 1;
 
-    if (*arg == NUL)
-	return;
+    ఒకవేళ (*arg == NUL)
+	తిరిగి;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    ఒకవేళ (*p == NUL)
+	తిరిగి;
 
     // past "default" or group name
     include_default = 0;
-    if (STRNCMP("default", arg, p - arg) == 0)
+    ఒకవేళ (STRNCMP("default", arg, p - arg) == 0)
     {
 	arg = skipwhite(p);
-	xp->xp_pattern = arg;
+	xp->xp_నమూనా = arg;
 	p = skiptowhite(arg);
     }
-    if (*p == NUL)
-	return;
+    ఒకవేళ (*p == NUL)
+	తిరిగి;
 
     // past group name
     include_link = 0;
-    if (arg[1] == 'i' && arg[0] == 'N')
+    ఒకవేళ (arg[1] == 'i' && arg[0] == 'N')
     {
 	highlight_list();
-	expand_group = FALSE;
+	expand_సమూహం = FALSE;
     }
-    if (STRNCMP("link", arg, p - arg) == 0)
+    ఒకవేళ (STRNCMP("link", arg, p - arg) == 0)
     {
-	xp->xp_pattern = skipwhite(p);
-	p = skiptowhite(xp->xp_pattern);
-	if (*p != NUL)		// past first group name
+	xp->xp_నమూనా = skipwhite(p);
+	p = skiptowhite(xp->xp_నమూనా);
+	ఒకవేళ (*p != NUL)		// past first group name
 	{
-	    xp->xp_pattern = skipwhite(p);
-	    p = skiptowhite(xp->xp_pattern);
+	    xp->xp_నమూనా = skipwhite(p);
+	    p = skiptowhite(xp->xp_నమూనా);
 	    include_none = 1;
 	}
-	expand_group = FALSE;
+	expand_సమూహం = FALSE;
     }
-    else if (STRNCMP("clear", arg, p - arg) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP("clear", arg, p - arg) == 0)
     {
-	xp->xp_pattern = skipwhite(p);
-	p = skiptowhite(xp->xp_pattern);
-	expand_group = FALSE;
+	xp->xp_నమూనా = skipwhite(p);
+	p = skiptowhite(xp->xp_నమూనా);
+	expand_సమూహం = FALSE;
     }
-    if (*p != NUL)			// past group name(s)
+    ఒకవేళ (*p != NUL)			// past group name(s)
     {
-	if (expand_group)
+	ఒకవేళ (expand_సమూహం)
 	{
 	    // expansion will be done in expand_highlight_group()
-	    xp->xp_context = EXPAND_HIGHLIGHT_GROUP;
+	    xp->xp_context = EXPAND_HIGHLIGHT_సమూహం;
 
-	    expand_hi_synid = syn_namen2id(arg, (int)(p - arg));
+	    expand_hi_synid = syn_namen2id(arg, (పూర్ణాంకం)(p - arg));
 
-	    while (*p != NUL)
+	    అయితే (*p != NUL)
 	    {
 		arg = skipwhite(p);
 		p = skiptowhite(arg);
 	    }
 
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    ఒకవేళ (p == ఖాళీ)
 	    {
 		// Didn't find a key=<value> pattern
-		xp->xp_pattern = arg;
-		expand_hi_equal_col = -1;
+		xp->xp_నమూనా = arg;
+		expand_hi_equal_నిలువు = -1;
 		expand_hi_include_orig = FALSE;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Found key=<value> pattern, record the exact location
-		expand_hi_equal_col = (int)(p - xp->xp_line);
+		expand_hi_equal_నిలువు = (పూర్ణాంకం)(p - xp->xp_పంక్తి);
 
 		// Only include the original value if the pattern is empty
-		if (*(p + 1) == NUL)
+		ఒకవేళ (*(p + 1) == NUL)
 		    expand_hi_include_orig = TRUE;
-		else
+		లేకపోతే
 		    expand_hi_include_orig = FALSE;
 
 		// Account for comma-separated values
-		if (STRNCMP(arg, "term=", 5) == 0 ||
+		ఒకవేళ (STRNCMP(arg, "term=", 5) == 0 ||
 			STRNCMP(arg, "cterm=", 6) == 0 ||
 			STRNCMP(arg, "gui=", 4) == 0)
 		{
 		    char_u *comma = vim_strrchr(p + 1, ',');
-		    if (comma != NULL)
+		    ఒకవేళ (comma != ఖాళీ)
 			p = comma;
 		}
-		xp->xp_pattern = p + 1;
+		xp->xp_నమూనా = p + 1;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	}
@@ -4998,33 +4998,33 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 /*
  * List highlighting matches in a nice way.
  */
-    static void
-highlight_list(void)
+    స్థిర శూన్య
+highlight_list(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 10; --i >= 0; )
+    కొరకు (i = 10; --i >= 0; )
 	highlight_list_two(i, HL_ATTR(HLF_D));
-    for (i = 40; --i >= 0; )
+    కొరకు (i = 40; --i >= 0; )
 	highlight_list_two(99, 0);
 }
 
-    static void
-highlight_list_two(int cnt, int attr)
+    స్థిర శూన్య
+highlight_list_two(పూర్ణాంకం cnt, పూర్ణాంకం attr)
 {
-    msg_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
-    msg_clr_eos();
-    out_flush();
-    ui_delay(cnt == 99 ? 40L : (long)cnt * 50L, FALSE);
+    సందేశం_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
+    సందేశం_clr_eos();
+    బహిర్గతం_flush();
+    ui_delay(cnt == 99 ? 40L : (దీర్ఘ)cnt * 50L, FALSE);
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of group names.
  */
     char_u *
-get_highlight_name(expand_T *xp UNUSED, int idx)
+get_highlight_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    return get_highlight_name_ext(xp, idx, TRUE);
+    తిరిగి get_highlight_name_ext(xp, idx, TRUE);
 }
 
 /*
@@ -5032,123 +5032,123 @@ get_highlight_name(expand_T *xp UNUSED, int idx)
  * When "skip_cleared" is TRUE don't return a cleared entry.
  */
     char_u *
-get_highlight_name_ext(expand_T *xp UNUSED, int idx, int skip_cleared)
+get_highlight_name_ext(expand_T *xp వాడని, పూర్ణాంకం idx, పూర్ణాంకం skip_cleared)
 {
-    if (idx < 0)
-	return NULL;
+    ఒకవేళ (idx < 0)
+	తిరిగి ఖాళీ;
 
     // Items are never removed from the table, skip the ones that were
     // cleared.
-    if (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
-	return (char_u *)"";
+    ఒకవేళ (skip_cleared && idx < highlight_ga.ga_len && HL_పట్టిక()[idx].sg_cleared)
+	తిరిగి (char_u *)"";
 
-    if (idx == highlight_ga.ga_len && include_none != 0)
-	return (char_u *)"NONE";
-    if (idx == highlight_ga.ga_len + include_none && include_default != 0)
-	return (char_u *)"default";
-    if (idx == highlight_ga.ga_len + include_none + include_default
+    ఒకవేళ (idx == highlight_ga.ga_len && include_none != 0)
+	తిరిగి (char_u *)"NONE";
+    ఒకవేళ (idx == highlight_ga.ga_len + include_none && include_default != 0)
+	తిరిగి (char_u *)"default";
+    ఒకవేళ (idx == highlight_ga.ga_len + include_none + include_default
 							 && include_link != 0)
-	return (char_u *)"link";
-    if (idx == highlight_ga.ga_len + include_none + include_default + 1
+	తిరిగి (char_u *)"link";
+    ఒకవేళ (idx == highlight_ga.ga_len + include_none + include_default + 1
 							 && include_link != 0)
-	return (char_u *)"clear";
-    if (idx >= highlight_ga.ga_len)
-	return NULL;
-    return HL_TABLE()[idx].sg_name;
+	తిరిగి (char_u *)"clear";
+    ఒకవేళ (idx >= highlight_ga.ga_len)
+	తిరిగి ఖాళీ;
+    తిరిగి HL_పట్టిక()[idx].sg_name;
 }
 
-    static char_u *
-get_highlight_attr_name(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_highlight_attr_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx == 0)
+    ఒకవేళ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ఒకవేళ (expand_hi_curvalue != ఖాళీ)
+	    తిరిగి expand_hi_curvalue;
+	లేకపోతే
+	    తిరిగి (char_u*)"";
     }
-    if (idx < (int)ARRAY_LENGTH(highlight_index_tab) + 1)
+    ఒకవేళ (idx < (పూర్ణాంకం)ARRAY_నిడివి(highlight_సూచీ_tab) + 1)
     {
-	char_u *value = highlight_index_tab[idx-1]->value.string;
-	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
+	char_u *విలువ = highlight_సూచీ_tab[idx-1]->విలువ.string;
+	ఒకవేళ (expand_hi_curvalue != ఖాళీ && STRCMP(expand_hi_curvalue, విలువ) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    తిరిగి (char_u*)"";
 	}
-	return value;
+	తిరిగి విలువ;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static char_u *
-get_highlight_cterm_color(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_highlight_cterm_color(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx == 0)
+    ఒకవేళ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ఒకవేళ (expand_hi_curvalue != ఖాళీ)
+	    తిరిగి expand_hi_curvalue;
+	లేకపోతే
+	    తిరిగి (char_u*)"";
     }
     // See highlight_set_cterm_color()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    if (idx < (int)ARRAY_LENGTH(color_name_tab) + 3)
+    లేకపోతే ఒకవేళ (idx == 1)
+	తిరిగి (char_u*)"fg";
+    లేకపోతే ఒకవేళ (idx == 2)
+	తిరిగి (char_u*)"bg";
+    ఒకవేళ (idx < (పూర్ణాంకం)ARRAY_నిడివి(color_name_tab) + 3)
     {
-	char_u *value = color_name_tab[idx-3].value.string;
-	return value;
+	char_u *విలువ = color_name_tab[idx-3].విలువ.string;
+	తిరిగి విలువ;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-    static char_u *
-get_highlight_gui_color(expand_T *xp UNUSED, int idx)
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+    స్థిర char_u *
+get_highlight_gui_color(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx == 0)
+    ఒకవేళ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ఒకవేళ (expand_hi_curvalue != ఖాళీ)
+	    తిరిగి expand_hi_curvalue;
+	లేకపోతే
+	    తిరిగి (char_u*)"";
     }
     // See color_name2handle()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    else if (idx == 3)
-	return (char_u*)"NONE";
+    లేకపోతే ఒకవేళ (idx == 1)
+	తిరిగి (char_u*)"fg";
+    లేకపోతే ఒకవేళ (idx == 2)
+	తిరిగి (char_u*)"bg";
+    లేకపోతే ఒకవేళ (idx == 3)
+	తిరిగి (char_u*)"NONE";
 
     // Complete from v:colornames. Don't do platform specific names for now.
-    typval_T *tv_result;
-    char_u *colorname = dict_iterate_next(&expand_colornames_iter, &tv_result);
-    if (colorname != NULL)
+    typval_T *tv_ఫలితం;
+    char_u *colorname = dict_iterate_తదుపరి(&expand_colornames_iter, &tv_ఫలితం);
+    ఒకవేళ (colorname != ఖాళీ)
     {
 	// :hi command doesn't allow space, so don't suggest any malformed items
-	if (vim_strchr(colorname, ' ') != NULL)
-	    return (char_u*)"";
+	ఒకవేళ (vim_strchr(colorname, ' ') != ఖాళీ)
+	    తిరిగి (char_u*)"";
 
-	if (expand_hi_curvalue != NULL && STRICMP(expand_hi_curvalue, colorname) == 0)
+	ఒకవేళ (expand_hi_curvalue != ఖాళీ && STRICMP(expand_hi_curvalue, colorname) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    తిరిగి (char_u*)"";
 	}
     }
-    return colorname;
+    తిరిగి colorname;
 }
-#endif
+#అయితే_ముగింపు
 
-    static char_u *
-get_highlight_group_key(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_highlight_సమూహం_కీలకం(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     // Note: Keep this in sync with do_highlight.
-    static char *(p_hi_group_key_values[]) =
+    స్థిర అక్షరం *(p_hi_సమూహం_కీలకం_విలువలు[]) =
     {
 	"term=",
 	"start=",
@@ -5158,219 +5158,219 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"ctermbg=",
 	"ctermul=",
 	"ctermfont=",
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	"gui=",
 	"guifg=",
 	"guibg=",
 	"guisp=",
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
 	"font=",
-#endif
+#అయితే_ముగింపు
 	"NONE",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_hi_group_key_values))
-	return (char_u*)p_hi_group_key_values[idx];
-    return NULL;
+    ఒకవేళ (idx < (పూర్ణాంకం)ARRAY_నిడివి(p_hi_సమూహం_కీలకం_విలువలు))
+	తిరిగి (char_u*)p_hi_సమూహం_కీలకం_విలువలు[idx];
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Command-line expansion for :hi {group-name} <args>...
  */
-    int
-expand_highlight_group(
+    పూర్ణాంకం
+expand_highlight_సమూహం(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	పూర్ణాంకం	    *అంకె_Matches)
 {
-    if (expand_hi_equal_col != -1)
+    ఒకవేళ (expand_hi_equal_నిలువు != -1)
     {
 	// List the values. First fill in the current value, then if possible colors
 	// or attribute names.
-	char_u	    *(*expandfunc)(expand_T *, int) = NULL;
-	int	    type = 0;
-	hl_group_T  *sgp = NULL;
-	int	    iarg = 0;
-	char_u	    *sarg = NULL;
+	char_u	    *(*expandfunc)(expand_T *, పూర్ణాంకం) = ఖాళీ;
+	పూర్ణాంకం	    type = 0;
+	hl_సమూహం_T  *sgp = ఖాళీ;
+	పూర్ణాంకం	    iarg = 0;
+	char_u	    *sarg = ఖాళీ;
 
-	int	    unsortedItems = -1; // don't sort by default
+	పూర్ణాంకం	    unsorted_వస్తువులు = -1; // don't sort by default
 
-	if (expand_hi_synid != 0)
-	    sgp = &HL_TABLE()[expand_hi_synid - 1]; // index is ID minus one
+	ఒకవేళ (expand_hi_synid != 0)
+	    sgp = &HL_పట్టిక()[expand_hi_synid - 1]; // index is ID minus one
 
 	// Note: Keep this in sync with highlight_list_one().
-	char_u	    *name_end = xp->xp_line + expand_hi_equal_col;
-	if (name_end - xp->xp_line >= 5
-		&& STRNCMP(name_end - 5, " term", 5) == 0)
+	char_u	    *name_చివర = xp->xp_పంక్తి + expand_hi_equal_నిలువు;
+	ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 5
+		&& STRNCMP(name_చివర - 5, " term", 5) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_ATTR;
-		iarg = sgp->sg_term;
+		iarg = sgp->sg_పదం;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " cterm", 6) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 6
+		&& STRNCMP(name_చివర - 6, " cterm", 6) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_cterm;
 	    }
 	}
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	else if (name_end - xp->xp_line >= 4
-		&& STRNCMP(name_end - 4, " gui", 4) == 0)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 4
+		&& STRNCMP(name_చివర - 4, " gui", 4) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_gui;
 	    }
 	}
-#endif
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermfg", 8) == 0)
+#అయితే_ముగింపు
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 8
+		&& STRNCMP(name_చివర - 8, " ctermfg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_fg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermbg", 8) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 8
+		&& STRNCMP(name_చివర - 8, " ctermbg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_bg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermul", 8) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 8
+		&& STRNCMP(name_చివర - 8, " ctermul", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_ul;
 	    }
 	}
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guifg", 6) == 0)
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 6
+		&& STRNCMP(name_చివర - 6, " guifg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_fg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guibg", 6) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 6
+		&& STRNCMP(name_చివర - 6, " guibg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_bg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guisp", 6) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 6
+		&& STRNCMP(name_చివర - 6, " guisp", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ఒకవేళ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_sp_name;
 	    }
 	}
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	if (expandfunc == get_highlight_gui_color)
+#ఒకవేళ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	ఒకవేళ (expandfunc == get_highlight_gui_color)
 	{
 	    // Top 4 items are special, after that sort all the color names
-	    unsortedItems = 4;
+	    unsorted_వస్తువులు = 4;
 
-	    dict_T *colornames_table = get_vim_var_dict(VV_COLORNAMES);
+	    dict_T *colornames_పట్టిక = get_vim_var_dict(VV_COLORNAMES);
 	    typval_T colornames_val;
 	    colornames_val.v_type = VAR_DICT;
-	    colornames_val.vval.v_dict = colornames_table;
-	    dict_iterate_start(&colornames_val, &expand_colornames_iter);
+	    colornames_val.vval.v_dict = colornames_పట్టిక;
+	    dict_iterate_ప్రారంభం(&colornames_val, &expand_colornames_iter);
 	}
-#endif
+#అయితే_ముగింపు
 
 	char_u	    buf[MAX_ATTR_LEN];
 
-	expand_hi_curvalue = NULL;
-	if (expand_hi_include_orig)
+	expand_hi_curvalue = ఖాళీ;
+	ఒకవేళ (expand_hi_include_orig)
 	{
-	    if (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
-		(type == LIST_STRING && sarg != NULL))
+	    ఒకవేళ (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
+		(type == LIST_STRING && sarg != ఖాళీ))
 	    {
 		// Retrieve the current value to go first in completion
-		expand_hi_curvalue = highlight_arg_to_string(
+		expand_hi_curvalue = highlight_arg_గమ్యం_string(
 			type, iarg, sarg, buf);
 	    }
 	}
 
-	if (expandfunc != NULL)
+	ఒకవేళ (expandfunc != ఖాళీ)
 	{
-	    return ExpandGenericExt(
+	    తిరిగి ExpandGenericExt(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    అంకె_Matches,
 		    expandfunc,
 		    FALSE,
-		    unsortedItems);
+		    unsorted_వస్తువులు);
 	}
 
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // List all the key names
-    return ExpandGenericExt(
+    తిరిగి ExpandGenericExt(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
-	    get_highlight_group_key,
+	    అంకె_Matches,
+	    get_highlight_సమూహం_కీలకం,
 	    FALSE,
 	    -1);
 }
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 /*
  * Free all the highlight group fonts.
  * Used when quitting for systems which need it.
  */
-    void
-free_highlight_fonts(void)
+    శూన్య
+free_highlight_fonts(శూన్య)
 {
-    int	    idx;
+    పూర్ణాంకం	    idx;
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    కొరకు (idx = 0; idx < highlight_ga.ga_len; ++idx)
     {
-	gui_mch_free_font(HL_TABLE()[idx].sg_font);
-	HL_TABLE()[idx].sg_font = NOFONT;
+	gui_mch_free_font(HL_పట్టిక()[idx].sg_font);
+	HL_పట్టిక()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-	gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-	HL_TABLE()[idx].sg_fontset = NOFONTSET;
+	gui_mch_free_fontset(HL_పట్టిక()[idx].sg_fontset);
+	HL_పట్టిక()[idx].sg_fontset = NOFONTSET;
 # endif
     }
 
@@ -5384,36 +5384,36 @@ free_highlight_fonts(void)
     gui_mch_free_font(gui.boldital_font);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Convert each of the highlight attribute bits (bold, standout, underline,
  * etc.) set in 'hlattr' into a separate boolean item in a Dictionary with
  * the attribute name as the key.
  */
-    static dict_T *
-highlight_get_attr_dict(int hlattr)
+    స్థిర dict_T *
+highlight_get_attr_dict(పూర్ణాంకం hlattr)
 {
     dict_T	*dict;
-    int		i;
+    పూర్ణాంకం		i;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ఒకవేళ (dict == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(highlight_సూచీ_tab); ++i)
     {
-	if (hlattr & highlight_index_tab[i]->key)
+	ఒకవేళ (hlattr & highlight_సూచీ_tab[i]->కీలకం)
 	{
-	    dict_add_bool(dict, (char *)highlight_index_tab[i]->value.string,
+	    dict_కూడు_bool(dict, (అక్షరం *)highlight_సూచీ_tab[i]->విలువ.string,
 		    VVAL_TRUE);
 	    // don't want "inverse"/"reverse"
-	    hlattr &= ~highlight_index_tab[i]->key;
+	    hlattr &= ~highlight_సూచీ_tab[i]->కీలకం;
 	}
     }
 
-    return dict;
+    తిరిగి dict;
 }
 
 /*
@@ -5421,127 +5421,127 @@ highlight_get_attr_dict(int hlattr)
  * Dictionary. If 'resolve_link' is TRUE, then resolves the highlight group
  * links recursively.
  */
-    static dict_T *
-highlight_get_info(int hl_idx, int resolve_link)
+    స్థిర dict_T *
+highlight_get_info(పూర్ణాంకం hl_idx, పూర్ణాంకం resolve_link)
 {
     dict_T	*dict;
-    hl_group_T	*sgp;
-    dict_T	*attr_dict = NULL;
-    int		hlgid;
+    hl_సమూహం_T	*sgp;
+    dict_T	*attr_dict = ఖాళీ;
+    పూర్ణాంకం		hlgid;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return dict;
+    ఒకవేళ (dict == ఖాళీ)
+	తిరిగి dict;
 
-    sgp = &HL_TABLE()[hl_idx];
+    sgp = &HL_పట్టిక()[hl_idx];
     // highlight group id is 1-based
     hlgid = hl_idx + 1;
 
-    if (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
-	goto error;
-    if (dict_add_number(dict, "id", hlgid) == FAIL)
-	goto error;
+    ఒకవేళ (dict_కూడు_string(dict, "name", sgp->sg_name) == FAIL)
+	వెళ్ళు error;
+    ఒకవేళ (dict_కూడు_సంఖ్య(dict, "id", hlgid) == FAIL)
+	వెళ్ళు error;
 
-    if (resolve_link)
+    ఒకవేళ (resolve_link)
     {
 	// resolve the highlight group link recursively
-	while (sgp->sg_link)
+	అయితే (sgp->sg_link)
 	{
 	    hlgid = sgp->sg_link;
-	    sgp = &HL_TABLE()[sgp->sg_link - 1];
+	    sgp = &HL_పట్టిక()[sgp->sg_link - 1];
 	}
     }
 
-    if (sgp->sg_term != 0)
+    ఒకవేళ (sgp->sg_పదం != 0)
     {
-	attr_dict = highlight_get_attr_dict(sgp->sg_term);
-	if (attr_dict != NULL)
+	attr_dict = highlight_get_attr_dict(sgp->sg_పదం);
+	ఒకవేళ (attr_dict != ఖాళీ)
 	{
-	    if (dict_add_dict(dict, "term", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ఒకవేళ (dict_కూడు_dict(dict, "term", attr_dict) == FAIL)
+		వెళ్ళు error;
+	    attr_dict = ఖాళీ;
 	}
     }
-    if (sgp->sg_start != NULL)
-	if (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
-	    goto error;
-    if (sgp->sg_stop != NULL)
-	if (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm != 0)
+    ఒకవేళ (sgp->sg_ప్రారంభం != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "start", sgp->sg_ప్రారంభం) == FAIL)
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_stop != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "stop", sgp->sg_stop) == FAIL)
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_cterm != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_cterm);
-	if (attr_dict != NULL)
+	ఒకవేళ (attr_dict != ఖాళీ)
 	{
-	    if (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ఒకవేళ (dict_కూడు_dict(dict, "cterm", attr_dict) == FAIL)
+		వెళ్ళు error;
+	    attr_dict = ఖాళీ;
 	}
     }
-    if (sgp->sg_cterm_fg != 0)
-	if (dict_add_string(dict, "ctermfg",
+    ఒకవేళ (sgp->sg_cterm_fg != 0)
+	ఒకవేళ (dict_కూడు_string(dict, "ctermfg",
 		    highlight_color(hlgid, (char_u *)"fg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_bg != 0)
-	if (dict_add_string(dict, "ctermbg",
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_cterm_bg != 0)
+	ఒకవేళ (dict_కూడు_string(dict, "ctermbg",
 			highlight_color(hlgid, (char_u *)"bg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_ul != 0)
-	if (dict_add_string(dict, "ctermul",
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_cterm_ul != 0)
+	ఒకవేళ (dict_కూడు_string(dict, "ctermul",
 			highlight_color(hlgid, (char_u *)"ul", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_font != 0)
-	if (dict_add_string(dict, "ctermfont",
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_cterm_font != 0)
+	ఒకవేళ (dict_కూడు_string(dict, "ctermfont",
 			highlight_color(hlgid, (char_u *)"font", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui != 0)
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_gui != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_gui);
-	if (attr_dict != NULL)
+	ఒకవేళ (attr_dict != ఖాళీ)
 	{
-	    if (dict_add_dict(dict, "gui", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ఒకవేళ (dict_కూడు_dict(dict, "gui", attr_dict) == FAIL)
+		వెళ్ళు error;
+	    attr_dict = ఖాళీ;
 	}
     }
-    if (sgp->sg_gui_fg_name != NULL)
-	if (dict_add_string(dict, "guifg",
+    ఒకవేళ (sgp->sg_gui_fg_name != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "guifg",
 			highlight_color(hlgid, (char_u *)"fg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_bg_name != NULL)
-	if (dict_add_string(dict, "guibg",
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_gui_bg_name != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "guibg",
 			highlight_color(hlgid, (char_u *)"bg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_sp_name != NULL)
-	if (dict_add_string(dict, "guisp",
+	    వెళ్ళు error;
+    ఒకవేళ (sgp->sg_gui_sp_name != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "guisp",
 			highlight_color(hlgid, (char_u *)"sp", 'g')) == FAIL)
-	    goto error;
+	    వెళ్ళు error;
 # ifdef FEAT_GUI
-    if (sgp->sg_font_name != NULL)
-	if (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
-	    goto error;
+    ఒకవేళ (sgp->sg_font_name != ఖాళీ)
+	ఒకవేళ (dict_కూడు_string(dict, "font", sgp->sg_font_name) == FAIL)
+	    వెళ్ళు error;
 # endif
-    if (sgp->sg_link)
+    ఒకవేళ (sgp->sg_link)
     {
 	char_u	*link;
 
-	link = HL_TABLE()[sgp->sg_link - 1].sg_name;
-	if (link != NULL && dict_add_string(dict, "linksto", link) == FAIL)
-	    goto error;
+	link = HL_పట్టిక()[sgp->sg_link - 1].sg_name;
+	ఒకవేళ (link != ఖాళీ && dict_కూడు_string(dict, "linksto", link) == FAIL)
+	    వెళ్ళు error;
 
-	if (sgp->sg_deflink)
-	    dict_add_bool(dict, "default", VVAL_TRUE);
+	ఒకవేళ (sgp->sg_deflink)
+	    dict_కూడు_bool(dict, "default", VVAL_TRUE);
     }
-    if (dict_len(dict) == 2)
+    ఒకవేళ (dict_len(dict) == 2)
 	// If only 'name' is present, then the highlight group is cleared.
-	dict_add_bool(dict, "cleared", VVAL_TRUE);
+	dict_కూడు_bool(dict, "cleared", VVAL_TRUE);
 
-    return dict;
+    తిరిగి dict;
 
 error:
     dict_unref(attr_dict);
     dict_unref(dict);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -5549,47 +5549,47 @@ error:
  * Return the attributes of a specific highlight group (if specified) or all
  * the highlight groups.
  */
-    void
+    శూన్య
 f_hlget(typval_T *argvars, typval_T *rettv)
 {
     list_T	*list;
     dict_T	*dict;
-    int		i;
-    char_u	*hlarg = NULL;
-    int		resolve_link = FALSE;
+    పూర్ణాంకం		i;
+    char_u	*hlarg = ఖాళీ;
+    పూర్ణాంకం		resolve_link = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (check_for_opt_string_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_opt_string_arg(argvars, 0) == FAIL
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		&& check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// highlight group name supplied
 	hlarg = tv_get_string_chk(&argvars[0]);
-	if (hlarg == NULL)
-	    return;
+	ఒకవేళ (hlarg == ఖాళీ)
+	    తిరిగి;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    int error = FALSE;
+	    పూర్ణాంకం error = FALSE;
 
 	    resolve_link = tv_get_bool_chk(&argvars[1], &error);
-	    if (error)
-		return;
+	    ఒకవేళ (error)
+		తిరిగి;
 	}
     }
 
     list = rettv->vval.v_list;
-    for (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
+    కొరకు (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
     {
-	if (hlarg == NULL || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
+	ఒకవేళ (hlarg == ఖాళీ || STRICMP(hlarg, HL_పట్టిక()[i].sg_name) == 0)
 	{
 	    dict = highlight_get_info(i, resolve_link);
-	    if (dict != NULL && list_append_dict(list, dict) == FAIL)
+	    ఒకవేళ (dict != ఖాళీ && list_append_dict(list, dict) == FAIL)
 		dict_unref(dict);
 	}
     }
@@ -5600,24 +5600,24 @@ f_hlget(typval_T *argvars, typval_T *rettv)
  * 'dict' or the value is not a string type. If the value is not a string type
  * or is NULL, then 'error' is set to TRUE.
  */
-    static char_u *
-hldict_get_string(dict_T *dict, char_u *key, int *error)
+    స్థిర char_u *
+hldict_get_string(dict_T *dict, char_u *కీలకం, పూర్ణాంకం *error)
 {
     dictitem_T	*di;
 
     *error = FALSE;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_కనుగొను(dict, కీలకం, -1);
+    ఒకవేళ (di == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == NULL)
+    ఒకవేళ (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == ఖాళీ)
     {
 	emsg(_(e_string_required));
 	*error = TRUE;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return di->di_tv.vval.v_string;
+    తిరిగి di->di_tv.vval.v_string;
 }
 
 /*
@@ -5625,118 +5625,118 @@ hldict_get_string(dict_T *dict, char_u *key, int *error)
  * value in 'attr_str' of length 'len'. Returns FALSE if 'dict[key]' is not a
  * Dictionary or is NULL.
  */
-    static int
-hldict_attr_to_str(
+    స్థిర పూర్ణాంకం
+hldict_attr_గమ్యం_str(
 	dict_T	*dict,
-	char_u	*key,
+	char_u	*కీలకం,
 	char_u	*attr_str,
 	size_t	len)
 {
     dictitem_T	*di;
     dict_T	*attrdict;
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p;
 
     attr_str[0] = NUL;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return TRUE;
+    di = dict_కనుగొను(dict, కీలకం, -1);
+    ఒకవేళ (di == ఖాళీ)
+	తిరిగి TRUE;
 
-    if (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == NULL)
+    ఒకవేళ (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == ఖాళీ)
     {
 	emsg(_(e_dictionary_required));
-	return FALSE;
+	తిరిగి FALSE;
     }
 
     attrdict = di->di_tv.vval.v_dict;
 
     // If the attribute dict is empty, then return NONE to clear the attributes
-    if (dict_len(attrdict) == 0)
+    ఒకవేళ (dict_len(attrdict) == 0)
     {
 	vim_strcat(attr_str, (char_u *)"NONE", len);
-	return TRUE;
+	తిరిగి TRUE;
     }
 
     p = attr_str;
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_tab); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(highlight_tab); ++i)
     {
-	if (dict_get_bool(attrdict, (char *)highlight_tab[i].value.string,
+	ఒకవేళ (dict_get_bool(attrdict, (అక్షరం *)highlight_tab[i].విలువ.string,
 		    VVAL_FALSE) == VVAL_TRUE)
 	{
-	    if (p != attr_str && (size_t)(p - attr_str + 2) < len)
+	    ఒకవేళ (p != attr_str && (size_t)(p - attr_str + 2) < len)
 		STRCPY(p, (char_u *)",");
-	    if (p - attr_str + highlight_tab[i].value.length + 1 < len)
+	    ఒకవేళ (p - attr_str + highlight_tab[i].విలువ.నిడివి + 1 < len)
 	    {
-		STRCPY(p, highlight_tab[i].value.string);
-		p += highlight_tab[i].value.length;
+		STRCPY(p, highlight_tab[i].విలువ.string);
+		p += highlight_tab[i].విలువ.నిడివి;
 	    }
 	}
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 // Temporary buffer used to store the command string produced by hlset().
 // IObuff cannot be used for this as the error messages produced by hlset()
 // internally use IObuff.
 # define	HLSETBUFSZ  512
-static char_u hlsetBuf[HLSETBUFSZ + 1];
+స్థిర char_u hlsetBuf[HLSETBUFSZ + 1];
 
 /*
  * Add the highlight attribute "attr" of length "attrlen" and "value" at
  * "dptr", which points into "hlsetBuf".
  * Returns the updated pointer.
  */
-    static char_u *
-add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
+    స్థిర char_u *
+కూడు_attr_and_విలువ(char_u *dptr, char_u *attr, పూర్ణాంకం attrlen, char_u *విలువ)
 {
     size_t	vallen;
 
     // Do nothing if the value is not specified or is empty
-    if (value == NULL || *value == NUL)
-	return dptr;
+    ఒకవేళ (విలువ == ఖాళీ || *విలువ == NUL)
+	తిరిగి dptr;
 
-    vallen = STRLEN(value);
+    vallen = STRLEN(విలువ);
     // When the value contains a space and the attribute has an "=" (i.e. it
     // is a key=value pair), surround the value with single quotes so that
     // do_highlight() can parse it correctly.
-    if (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
+    ఒకవేళ (vim_strchr(విలువ, ' ') != ఖాళీ && vim_strchr(attr, '=') != ఖాళీ)
     {
-	if (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
+	ఒకవేళ (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
 	{
 	    STRCPY(dptr, attr);
 	    dptr += attrlen;
 	    *dptr++ = '\'';
-	    STRCPY(dptr, value);
+	    STRCPY(dptr, విలువ);
 	    dptr += vallen;
 	    *dptr++ = '\'';
 	    *dptr = NUL;
 	}
     }
-    else if (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
+    లేకపోతే ఒకవేళ (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
     {
 	STRCPY(dptr, attr);
 	dptr += attrlen;
-	STRCPY(dptr, value);
+	STRCPY(dptr, విలువ);
 	dptr += vallen;
     }
 
-    return dptr;
+    తిరిగి dptr;
 }
 
 /*
  * Add or update a highlight group using 'dict' items. Returns TRUE if
  * successfully updated the highlight group.
  */
-    static int
-hlg_add_or_update(dict_T *dict)
+    స్థిర పూర్ణాంకం
+hlg_కూడు_or_update(dict_T *dict)
 {
     char_u	*name;
-    int		error;
-    char_u	term_attr[MAX_ATTR_LEN];
+    పూర్ణాంకం		error;
+    char_u	పదం_attr[MAX_ATTR_LEN];
     char_u	cterm_attr[MAX_ATTR_LEN];
     char_u	gui_attr[MAX_ATTR_LEN];
-    char_u	*start;
+    char_u	*ప్రారంభం;
     char_u	*stop;
     char_u	*ctermfg;
     char_u	*ctermbg;
@@ -5748,194 +5748,194 @@ hlg_add_or_update(dict_T *dict)
 # ifdef FEAT_GUI
     char_u	*font;
 # endif
-    int		forceit = FALSE;
-    int		dodefault = FALSE;
-    int		done = FALSE;
+    పూర్ణాంకం		forceit = FALSE;
+    పూర్ణాంకం		dodefault = FALSE;
+    పూర్ణాంకం		పూర్తి = FALSE;
     char_u	*p;
 
     name = hldict_get_string(dict, (char_u *)"name", &error);
-    if (name == NULL || *name == NUL || error)
-	return FALSE;
+    ఒకవేళ (name == ఖాళీ || *name == NUL || error)
+	తిరిగి FALSE;
 
-    if (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
+    ఒకవేళ (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
 	forceit = TRUE;
 
-    if (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
+    ఒకవేళ (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
 	dodefault = TRUE;
 
-    if (dict_has_key(dict, "cleared"))
+    ఒకవేళ (dict_has_కీలకం(dict, "cleared"))
     {
 	varnumber_T	cleared;
 
 	// clear a highlight group
 	cleared = dict_get_bool(dict, "cleared", FALSE);
-	if (cleared == TRUE)
+	ఒకవేళ (cleared == TRUE)
 	{
-	    vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
+	    vim_snprintf((అక్షరం *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
 	    do_highlight(hlsetBuf, forceit, FALSE);
-	    done = TRUE;
+	    పూర్తి = TRUE;
 	}
     }
 
-    if (dict_has_key(dict, "linksto"))
+    ఒకవేళ (dict_has_కీలకం(dict, "linksto"))
     {
 	char_u	*linksto;
 
 	// link highlight groups
 	linksto = hldict_get_string(dict, (char_u *)"linksto", &error);
-	if (linksto == NULL || *linksto == NUL || error)
-	    return FALSE;
+	ఒకవేళ (linksto == ఖాళీ || *linksto == NUL || error)
+	    తిరిగి FALSE;
 
-	vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
+	vim_snprintf((అక్షరం *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
 				dodefault ? "default " : "", name, linksto);
 	do_highlight(hlsetBuf, forceit, FALSE);
 
-	done = TRUE;
+	పూర్తి = TRUE;
     }
 
     // If 'cleared' or 'linksto' are specified, then don't process the other
     // attributes.
-    if (done)
-	return TRUE;
+    ఒకవేళ (పూర్తి)
+	తిరిగి TRUE;
 
-    start = hldict_get_string(dict, (char_u *)"start", &error);
-    if (error)
-	return FALSE;
+    ప్రారంభం = hldict_get_string(dict, (char_u *)"start", &error);
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     stop = hldict_get_string(dict, (char_u *)"stop", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
-							    sizeof(term_attr)))
-	return FALSE;
+    ఒకవేళ (!hldict_attr_గమ్యం_str(dict, (char_u *)"term", పదం_attr,
+							    పరిమాణం(పదం_attr)))
+	తిరిగి FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
-							   sizeof(cterm_attr)))
-	return FALSE;
+    ఒకవేళ (!hldict_attr_గమ్యం_str(dict, (char_u *)"cterm", cterm_attr,
+							   పరిమాణం(cterm_attr)))
+	తిరిగి FALSE;
 
     ctermfg = hldict_get_string(dict, (char_u *)"ctermfg", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     ctermbg = hldict_get_string(dict, (char_u *)"ctermbg", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     ctermul = hldict_get_string(dict, (char_u *)"ctermul", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     ctermfont = hldict_get_string(dict, (char_u *)"ctermfont", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, sizeof(gui_attr)))
-	return FALSE;
+    ఒకవేళ (!hldict_attr_గమ్యం_str(dict, (char_u *)"gui", gui_attr, పరిమాణం(gui_attr)))
+	తిరిగి FALSE;
 
     guifg = hldict_get_string(dict, (char_u *)"guifg", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     guibg = hldict_get_string(dict, (char_u *)"guibg", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
     guisp = hldict_get_string(dict, (char_u *)"guisp", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 
 # ifdef FEAT_GUI
     font = hldict_get_string(dict, (char_u *)"font", &error);
-    if (error)
-	return FALSE;
+    ఒకవేళ (error)
+	తిరిగి FALSE;
 # endif
 
     // If none of the attributes are specified, then do nothing.
-    if (term_attr[0] == NUL && start == NULL && stop == NULL
-	    && cterm_attr[0] == NUL && ctermfg == NULL && ctermbg == NULL
-	    && ctermul == NULL && ctermfont == NULL && gui_attr[0] == NUL
+    ఒకవేళ (పదం_attr[0] == NUL && ప్రారంభం == ఖాళీ && stop == ఖాళీ
+	    && cterm_attr[0] == NUL && ctermfg == ఖాళీ && ctermbg == ఖాళీ
+	    && ctermul == ఖాళీ && ctermfont == ఖాళీ && gui_attr[0] == NUL
 # ifdef FEAT_GUI
-	    && font == NULL
+	    && font == ఖాళీ
 # endif
-	    && guifg == NULL && guibg == NULL && guisp == NULL
+	    && guifg == ఖాళీ && guibg == ఖాళీ && guisp == ఖాళీ
 	    )
-	return TRUE;
+	తిరిగి TRUE;
 
     hlsetBuf[0] = NUL;
     p = hlsetBuf;
-    if (dodefault)
-	p = add_attr_and_value(p, (char_u *)"default", 7, (char_u *)" ");
-    p = add_attr_and_value(p, (char_u *)"", 0, name);
-    p = add_attr_and_value(p, (char_u *)" term=", 6, term_attr);
-    p = add_attr_and_value(p, (char_u *)" start=", 7, start);
-    p = add_attr_and_value(p, (char_u *)" stop=", 6, stop);
-    p = add_attr_and_value(p, (char_u *)" cterm=", 7, cterm_attr);
-    p = add_attr_and_value(p, (char_u *)" ctermfg=", 9, ctermfg);
-    p = add_attr_and_value(p, (char_u *)" ctermbg=", 9, ctermbg);
-    p = add_attr_and_value(p, (char_u *)" ctermul=", 9, ctermul);
-    p = add_attr_and_value(p, (char_u *)" ctermfont=", 11, ctermfont);
-    p = add_attr_and_value(p, (char_u *)" gui=", 5, gui_attr);
+    ఒకవేళ (dodefault)
+	p = కూడు_attr_and_విలువ(p, (char_u *)"default", 7, (char_u *)" ");
+    p = కూడు_attr_and_విలువ(p, (char_u *)"", 0, name);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" term=", 6, పదం_attr);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" start=", 7, ప్రారంభం);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" stop=", 6, stop);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" cterm=", 7, cterm_attr);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" ctermfg=", 9, ctermfg);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" ctermbg=", 9, ctermbg);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" ctermul=", 9, ctermul);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" ctermfont=", 11, ctermfont);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" gui=", 5, gui_attr);
 # ifdef FEAT_GUI
-    p = add_attr_and_value(p, (char_u *)" font=", 6, font);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" font=", 6, font);
 # endif
-    p = add_attr_and_value(p, (char_u *)" guifg=", 7, guifg);
-    p = add_attr_and_value(p, (char_u *)" guibg=", 7, guibg);
-    (void)add_attr_and_value(p, (char_u *)" guisp=", 7, guisp);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" guifg=", 7, guifg);
+    p = కూడు_attr_and_విలువ(p, (char_u *)" guibg=", 7, guibg);
+    (శూన్య)కూడు_attr_and_విలువ(p, (char_u *)" guisp=", 7, guisp);
 
     do_highlight(hlsetBuf, forceit, FALSE);
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * "hlset([{highlight_attr}])" function
  * Add or modify highlight groups
  */
-    void
+    శూన్య
 f_hlset(typval_T *argvars, typval_T *rettv)
 {
     listitem_T	*li;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_list_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    FOR_ALL_LIST_ITEMS(argvars->vval.v_list, li)
+    FOR_ALL_LIST_వస్తువులు(argvars->vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
+	ఒకవేళ (li->li_tv.v_type != VAR_DICT)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    తిరిగి;
 	}
 
 	dict = li->li_tv.vval.v_dict;
-	if (!hlg_add_or_update(dict))
-	    return;
+	ఒకవేళ (!hlg_కూడు_or_update(dict))
+	    తిరిగి;
     }
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_సంఖ్య = 0;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * If "old" is in the override stack, then update it to "hl_new". Does not free
  * "old".
  */
-    void
-update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen)
+    శూన్య
+update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, పూర్ణాంకం newlen)
 {
-    if (old == NULL)
-	return;
+    ఒకవేళ (old == ఖాళీ)
+	తిరిగి;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    కొరకు (hl_overrides_T *సమితి_2 = overrides; సమితి_2 != ఖాళీ; సమితి_2 = సమితి_2->తదుపరి)
     {
-	if (set->arr == old)
+	ఒకవేళ (సమితి_2->arr == old)
 	{
-	    set->arr = hl_new;
-	    set->len = newlen;
+	    సమితి_2->arr = hl_new;
+	    సమితి_2->len = newlen;
 	}
     }
 }
@@ -5943,18 +5943,18 @@ update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen
 /*
  * If "arr" is in the highlight overrides list, then mark it as invalid.
  */
-    void
+    శూన్య
 remove_highlight_overrides(hl_override_T *arr)
 {
-    if (arr == NULL || overrides == NULL)
-	return;
+    ఒకవేళ (arr == ఖాళీ || overrides == ఖాళీ)
+	తిరిగి;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    కొరకు (hl_overrides_T *సమితి_2 = overrides; సమితి_2 != ఖాళీ; సమితి_2 = సమితి_2->తదుపరి)
     {
-	if (set->arr == arr)
+	ఒకవేళ (సమితి_2->arr == arr)
 	{
-	    set->arr = NULL;
-	    break;
+	    సమితి_2->arr = ఖాళీ;
+	    ఆపు;
 	}
     }
 }
@@ -5963,49 +5963,49 @@ remove_highlight_overrides(hl_override_T *arr)
  * Update highlight_attr[] array. If "update_ids" is true, then update
  * highlight_ids[] array instead.
  */
-    static void
-set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
+    స్థిర శూన్య
+సమితి_highlight_attr(hl_override_T *arr, పూర్ణాంకం len, bool update_ids)
 {
-    for (int i = 0; i < len; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < len; i++)
     {
 	hl_override_T	*override = arr + i;
-	int		hlf = -1, attr;
+	పూర్ణాంకం		hlf = -1, attr;
 
-	if (override->from <= 0)
+	ఒకవేళ (override->from <= 0)
 	    // Directly map to highlight_attr
 	    hlf = -override->from;
-	else
+	లేకపోతే
 	{
-	    for (int k = 0; k < HLF_COUNT; k++)
-		if (override->from == highlight_ids[k])
+	    కొరకు (పూర్ణాంకం k = 0; k < HLF_లెక్క; k++)
+		ఒకవేళ (override->from == highlight_ids[k])
 		{
 		    hlf = k;
-		    break;
+		    ఆపు;
 		}
 
-	    if (hlf == -1)
-		continue;
+	    ఒకవేళ (hlf == -1)
+		కొనసాగు;
 	}
 
-	if (update_ids)
+	ఒకవేళ (update_ids)
 	{
-	    if (override->to <= 0)
+	    ఒకవేళ (override->గమ్యం <= 0)
 	    {
-		if (hlf == -override->to)
+		ఒకవేళ (hlf == -override->గమ్యం)
 		    highlight_ids[hlf] = -1;
-		else
-		    highlight_ids[hlf] = highlight_ids[-override->to];
+		లేకపోతే
+		    highlight_ids[hlf] = highlight_ids[-override->గమ్యం];
 	    }
-	    else
-		highlight_ids[hlf] = override->to;
+	    లేకపోతే
+		highlight_ids[hlf] = override->గమ్యం;
 	}
-	else
+	లేకపోతే
 	{
-	    if (override->to <= 0)
+	    ఒకవేళ (override->గమ్యం <= 0)
 		// Directly use highlight_attr[]
-		attr = highlight_attr[-override->to];
-	    else
-		attr = syn_id2attr(override->to);
+		attr = highlight_attr[-override->గమ్యం];
+	    లేకపోతే
+		attr = syn_id2attr(override->గమ్యం);
 
 	    highlight_attr[hlf] = attr;
 	}
@@ -6016,180 +6016,180 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
  * Set the current highlight override to "arr". Returns true if successful
  */
     bool
-push_highlight_overrides(hl_override_T *arr, int len)
+నెట్టు_highlight_overrides(hl_override_T *arr, పూర్ణాంకం len)
 {
     // Don't want to do anything if "arr" is already the current override. If
     // "arr" is NULL (but overrides->arr is not), then still push an override,
     // but "->arr" will just be NULL so any previous overrides are cleared.
-    if (overrides != NULL && overrides->arr == arr)
-	return false;
+    ఒకవేళ (overrides != ఖాళీ && overrides->arr == arr)
+	తిరిగి false;
 
-    hl_overrides_T *set;
+    hl_overrides_T *సమితి_2;
 
-    set = ALLOC_ONE(hl_overrides_T);
-    if (set == NULL)
-	return false;
+    సమితి_2 = ALLOC_ONE(hl_overrides_T);
+    ఒకవేళ (సమితి_2 == ఖాళీ)
+	తిరిగి false;
 
-    set->arr = arr;
-    set->len = len;
+    సమితి_2->arr = arr;
+    సమితి_2->len = len;
 
     // Push to front of list
-    set->next = overrides;
-    overrides = set;
+    సమితి_2->తదుపరి = overrides;
+    overrides = సమితి_2;
 
     // Save current highlight_attr[], so it can be restored later after this
     // override is popped.
-    memcpy(set->attr, highlight_attr, sizeof(highlight_attr));
+    జ్ఞాపకం_నకలు(సమితి_2->attr, highlight_attr, పరిమాణం(highlight_attr));
 
     // Reset highlight_attr[] to default values, as we don't want changes from
     // other overrides.
-    memcpy(highlight_attr, highlight_attr_raw, sizeof(highlight_attr));
+    జ్ఞాపకం_నకలు(highlight_attr, highlight_attr_raw, పరిమాణం(highlight_attr));
 
     // Update highlight_attr[] array
-    if (arr != NULL)
-	set_highlight_attr(arr, len, false);
+    ఒకవేళ (arr != ఖాళీ)
+	సమితి_highlight_attr(arr, len, false);
 
-    return true;
+    తిరిగి true;
 }
 
 /*
  * Pop the current highlight override (if any) from the stack. This should
  * always be paired with a *successful* push.
  */
-    void
-pop_highlight_overrides(void)
+    శూన్య
+తీయి_highlight_overrides(శూన్య)
 {
-    hl_overrides_T *set = overrides;
+    hl_overrides_T *సమితి_2 = overrides;
 
-    if (overrides == NULL)
-	return;
+    ఒకవేళ (overrides == ఖాళీ)
+	తిరిగి;
 
-    overrides = set->next;
+    overrides = సమితి_2->తదుపరి;
 
     // Set highlight_attr[] to state before override was pushed.
-    memcpy(highlight_attr, set->attr, sizeof(highlight_attr));
-    vim_free(set);
+    జ్ఞాపకం_నకలు(highlight_attr, సమితి_2->attr, పరిమాణం(highlight_attr));
+    vim_free(సమితి_2);
 }
 
 /*
  * Parse the 'winhighlight' option and return array. Returns NULL on failure or
  * if empty option. If failure, then errmsg is set.
  */
-    static hl_override_T *
-parse_winhighlight(char_u *opt, int *len, char **errmsg)
+    స్థిర hl_override_T *
+parse_winhighlight(char_u *opt, పూర్ణాంకం *len, అక్షరం **errmsg)
 {
     char_u	    *p = opt;
     hl_override_T   *arr;
-    int		    i = 0;
-    int		    num = 1;
-    int		    n_colons = 0;
+    పూర్ణాంకం		    i = 0;
+    పూర్ణాంకం		    అంకె = 1;
+    పూర్ణాంకం		    n_colons = 0;
 
-    if (*p == NUL)
-	return NULL;
+    ఒకవేళ (*p == NUL)
+	తిరిగి ఖాళీ;
 
     // Get number of overrides first so we can allocate array
-    while ((p = vim_strchr(p, ',')) != NULL)
+    అయితే ((p = vim_strchr(p, ',')) != ఖాళీ)
     {
 	p++;
-	num++;
+	అంకె++;
     }
     p = opt;
     // Check if number of ':' matches number of ','
-    while ((p = vim_strchr(p, ':')) != NULL)
+    అయితే ((p = vim_strchr(p, ':')) != ఖాళీ)
     {
 	p++;
 	n_colons++;
     }
 
-    if (num != n_colons)
+    ఒకవేళ (అంకె != n_colons)
     {
-	*errmsg = e_invalid_argument;
-	return NULL;
+	*errmsg = e_invalid_వాదం;
+	తిరిగి ఖాళీ;
     }
 
-    arr = ALLOC_MULT(hl_override_T, num);
-    if (arr == NULL)
+    arr = ALLOC_MULT(hl_override_T, అంకె);
+    ఒకవేళ (arr == ఖాళీ)
     {
-	*errmsg = e_out_of_memory;
-	return NULL;
+	*errmsg = e_బహిర్గతం_యొక్క_జ్ఞాపకం;
+	తిరిగి ఖాళీ;
     }
 
     p = opt;
 
-    while (true)
+    అయితే (true)
     {
 	hl_override_T *override = arr + i++;
 	char_u	*fromname = p, *toname;
 	char_u	*tmp;
-	char_u	**names[2] = {&fromname, &toname};
-	int	fromlen, tolen;
-	int	*lens[2] = {&fromlen, &tolen};
-	int	fromid, toid;
-	int	*ids[2] = {&fromid, &toid};
+	char_u	**పేర్లు[2] = {&fromname, &toname};
+	పూర్ణాంకం	fromlen, tolen;
+	పూర్ణాంకం	*lens[2] = {&fromlen, &tolen};
+	పూర్ణాంకం	fromid, toid;
+	పూర్ణాంకం	*ids[2] = {&fromid, &toid};
 
 	p = vim_strchr(p, ':');
 
-	if (p == NULL)
-	    goto fail;
+	ఒకవేళ (p == ఖాళీ)
+	    వెళ్ళు fail;
 
 	fromlen = p - fromname; // Get hl for "from"
-	if (fromlen == 0)
-	    goto fail;
+	ఒకవేళ (fromlen == 0)
+	    వెళ్ళు fail;
 	p++; // Skip colon ':'
-	if (*p == NUL)
-	    goto fail;
+	ఒకవేళ (*p == NUL)
+	    వెళ్ళు fail;
 
 	toname = p;
 	tmp = vim_strchr(p, ',');
 
 	// Get hl for "to", must check for no trailing comma in case last
 	// element.
-	if (tmp == NULL)
-	    tolen = (int)STRLEN(p);
-	else
+	ఒకవేళ (tmp == ఖాళీ)
+	    tolen = (పూర్ణాంకం)STRLEN(p);
+	లేకపోతే
 	{
 	    tolen = tmp - toname;
 	    p = ++tmp;
 	}
-	if (tolen == 0)
-	    goto fail;
+	ఒకవేళ (tolen == 0)
+	    వెళ్ళు fail;
 
-	for (int k = 0; k < 2; k++)
+	కొరకు (పూర్ణాంకం k = 0; k < 2; k++)
 	{
-	    char_u  *name = *names[k];
-	    int	    nlen = *lens[k];
+	    char_u  *name = *పేర్లు[k];
+	    పూర్ణాంకం	    nlen = *lens[k];
 
-	    if (*name == '!')
+	    ఒకవేళ (*name == '!')
 	    {
 		// If starts with "!", then it maps directly to a 'highlight'
 		// occasion.
-		int hlf;
+		పూర్ణాంకం hlf;
 
-		if (nlen != 2)
-		    goto fail;
+		ఒకవేళ (nlen != 2)
+		    వెళ్ళు fail;
 
-		for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		    if (hl_flags[hlf] == name[1])
-			break;
+		కొరకు (hlf = 0; hlf < (పూర్ణాంకం)HLF_లెక్క; ++hlf)
+		    ఒకవేళ (hl_flags[hlf] == name[1])
+			ఆపు;
 
-		if (hlf >= HLF_COUNT)
-		    goto fail;
+		ఒకవేళ (hlf >= HLF_లెక్క)
+		    వెళ్ళు fail;
 
 		*ids[k] = -hlf;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Otherwise get the highlight group id.
-		if (syn_check_group(name, nlen) == 0)
-		    goto fail;
+		ఒకవేళ (syn_check_సమూహం(name, nlen) == 0)
+		    వెళ్ళు fail;
 
 		*ids[k] = syn_namen2id(name, nlen);
-		if (*ids[k] == 0)
-		    goto fail;
+		ఒకవేళ (*ids[k] == 0)
+		    వెళ్ళు fail;
 
 		// Always map "Normal" group to HLF_WIN
-		if (ids[k] == &fromid &&
-			STRCMP(HL_TABLE()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
+		ఒకవేళ (ids[k] == &fromid &&
+			STRCMP(HL_పట్టిక()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
 		    *ids[k] = -HLF_WIN;
 	    }
 	}
@@ -6198,87 +6198,87 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	// been set (even to itself e.g. "Normal"), and therefore know to use
 	// its attr instead.
 	override->from = fromid;
-	override->to = toid;
+	override->గమ్యం = toid;
 
-	if (tmp == NULL)
-	    break;
+	ఒకవేళ (tmp == ఖాళీ)
+	    ఆపు;
     }
 
-    *len = num;
-    return arr;
+    *len = అంకె;
+    తిరిగి arr;
 fail:
     vim_free(arr);
-    *errmsg = e_invalid_argument;
-    return NULL;
+    *errmsg = e_invalid_వాదం;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Update w_hl for "wp" using given option value. Returns error
  * message on failure, otherwise NULL.
  */
-    char *
+    అక్షరం *
 update_winhighlight(win_T *wp, char_u *opt)
 {
-    char	    *err = NULL;
+    అక్షరం	    *err = ఖాళీ;
     hl_override_T   *arr;
-    int		    num = 1;
+    పూర్ణాంకం		    అంకె = 1;
 
-    arr = parse_winhighlight(opt, &num, &err);
+    arr = parse_winhighlight(opt, &అంకె, &err);
 
-    if (arr == NULL && err != NULL)
-	return err;
+    ఒకవేళ (arr == ఖాళీ && err != ఖాళీ)
+	తిరిగి err;
 
-    if (arr == NULL && wp->w_hl == NULL)
-	return NULL;
+    ఒకవేళ (arr == ఖాళీ && wp->w_hl == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    update_highlight_overrides(wp->w_hl, arr, num);
+    update_highlight_overrides(wp->w_hl, arr, అంకె);
 
     vim_free(wp->w_hl);
     wp->w_hl = arr;
-    wp->w_hl_len = num;
+    wp->w_hl_len = అంకె;
 
     wp->w_hlfwin_id = hlf_get_id(wp, HLF_WIN);
 
-#ifdef FEAT_TERMINAL
-    term_update_hlfwin(wp);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    పదం_update_hlfwin(wp);
+#అయితే_ముగింపు
 
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
     // May be NULL (such as in after_copy_winopt())
-    if (wp->w_buffer != NULL)
+    ఒకవేళ (wp->w_బఫరు != ఖాళీ)
     {
 	// Make sure terminal highlighting is updated
-	bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	bool ret = నెట్టు_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	if (wp->w_buffer->b_term != NULL)
-	    term_init_default_colors(wp->w_buffer->b_term);
-	if (ret)
-	    pop_highlight_overrides();
+	ఒకవేళ (wp->w_బఫరు->b_పదం != ఖాళీ)
+	    పదం_init_default_colors(wp->w_బఫరు->b_పదం);
+	ఒకవేళ (ret)
+	    తీయి_highlight_overrides();
     }
-#endif
+#అయితే_ముగింపు
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Get id that the hlf attr is using in window "wp", otherwise zero. Note that
  * -1 may be returned if the hlf was set to itself.
  */
-    int
-hlf_get_id(win_T *wp, int hlf)
+    పూర్ణాంకం
+hlf_get_id(win_T *wp, పూర్ణాంకం hlf)
 {
-    int id;
-    static int prev[HLF_COUNT];
+    పూర్ణాంకం id;
+    స్థిర పూర్ణాంకం prev[HLF_లెక్క];
 
-    if (wp->w_hl == NULL)
-	return highlight_ids[hlf];
+    ఒకవేళ (wp->w_hl == ఖాళీ)
+	తిరిగి highlight_ids[hlf];
 
-    memcpy(prev, highlight_ids, sizeof(highlight_ids));
-    set_highlight_attr(wp->w_hl, wp->w_hl_len, true);
+    జ్ఞాపకం_నకలు(prev, highlight_ids, పరిమాణం(highlight_ids));
+    సమితి_highlight_attr(wp->w_hl, wp->w_hl_len, true);
     id = highlight_ids[hlf];
-    memcpy(highlight_ids, prev, sizeof(highlight_ids));
+    జ్ఞాపకం_నకలు(highlight_ids, prev, పరిమాణం(highlight_ids));
 
-    return id;
+    తిరిగి id;
 }
 
 /*
@@ -6286,25 +6286,25 @@ hlf_get_id(win_T *wp, int hlf)
  * message on failure otherwise NULL. Does not update the actual 'wincolor'
  * value, but does update the 'winhighlight' value.
  */
-    char *
+    అక్షరం *
 update_wincolor(win_T *wp, char_u *opt)
 {
-    char_u  *str = *opt == NUL ? "" : alloc(sizeof("!(:") + STRLEN(opt));
-    char    *errmsg;
+    char_u  *str = *opt == NUL ? "" : alloc(పరిమాణం("!(:") + STRLEN(opt));
+    అక్షరం    *errmsg;
 
-    if (str == NULL)
-	return e_out_of_memory;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి e_బహిర్గతం_యొక్క_జ్ఞాపకం;
 
-    if (*opt != NUL)
-	sprintf((char *)str, "!(:%s", opt);
+    ఒకవేళ (*opt != NUL)
+	sprintf((అక్షరం *)str, "!(:%s", opt);
 
     errmsg = update_winhighlight(wp, str);
 
-    if (errmsg == NULL)
-	set_string_option_direct_in_win(wp, (char_u *)"winhighlight", -1,
+    ఒకవేళ (errmsg == ఖాళీ)
+	సమితి_string_option_ప్రత్యక్ష_లోపల_win(wp, (char_u *)"winhighlight", -1,
 		str, OPT_FREE|OPT_LOCAL, 0);
 
-    if (*opt != NUL)
-	free(str);
-    return errmsg;
+    ఒకవేళ (*opt != NUL)
+	విడుదల(str);
+    తిరిగి errmsg;
 }

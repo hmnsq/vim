@@ -41,330 +41,330 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#అన్తర్భావ "xinclude.h"
 
-#define MAX_PTR	UINT_MAX
-#define MAX_CNT	UINT_MAX
+#నిర్వచించు MAX_PTR	UINT_MAX
+#నిర్వచించు MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#నిర్వచించు పంక్తి_చివర_2(n) (పంక్తి##n + లెక్క##n - 1)
+#నిర్వచించు పంక్తి_చివర_PTR(n) (*పంక్తి##n + *లెక్క##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
-	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+నిర్మాణం histindex {
+	నిర్మాణం రికార్డు {
+		గుర్తులేని పూర్ణాంకం ptr, cnt;
+		నిర్మాణం రికార్డు *తదుపరి;
+	} **రికార్డులు, /* an occurrence */
+	  **పంక్తి_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
-		     records_size,
-		     line_map_size;
+	గుర్తులేని పూర్ణాంకం *తదుపరి_ptrs;
+	గుర్తులేని పూర్ణాంకం పట్టిక_బిట్లు,
+		     రికార్డులు_కొలత,
+		     పంక్తి_map_కొలత;
 
-	unsigned int max_chain_length,
-		     key_shift,
-		     ptr_shift;
+	గుర్తులేని పూర్ణాంకం max_chain_నిడివి,
+		     కీలకం_జరుపు,
+		     ptr_జరుపు;
 
-	unsigned int cnt,
+	గుర్తులేని పూర్ణాంకం cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t స్థిరరాశి *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+నిర్మాణం region {
+	గుర్తులేని పూర్ణాంకం begin1, end1;
+	గుర్తులేని పూర్ణాంకం begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#నిర్వచించు పంక్తి_MAP(i, a) (i->పంక్తి_map[(a) - i->ptr_జరుపు])
 
-#define NEXT_PTR(index, ptr) \
-	(index->next_ptrs[(ptr) - index->ptr_shift])
+#నిర్వచించు తదుపరి_PTR(సూచీ, ptr) \
+	(సూచీ->తదుపరి_ptrs[(ptr) - సూచీ->ptr_జరుపు])
 
-#define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+#నిర్వచించు CNT(సూచీ, ptr) \
+	((పంక్తి_MAP(సూచీ, ptr))->cnt)
 
-#define REC(env, s, l) \
+#నిర్వచించు REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+స్థిర పూర్ణాంకం cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	తిరిగి r1->ha == r2->ha;
 
 }
 
-#define CMP(i, s1, l1, s2, l2) \
+#నిర్వచించు CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#నిర్వచించు పట్టిక_HASH(సూచీ, side, పంక్తి) \
+	XDL_HASHLONG((REC(సూచీ->env, side, పంక్తి))->ha, సూచీ->పట్టిక_బిట్లు)
 
-static int scanA(struct histindex *index, int line1, int count1)
+స్థిర పూర్ణాంకం పరిశీలన_A(నిర్మాణం histindex *సూచీ, పూర్ణాంకం line1, పూర్ణాంకం count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	గుర్తులేని పూర్ణాంకం ptr, tbl_idx;
+	గుర్తులేని పూర్ణాంకం chain_len;
+	నిర్మాణం రికార్డు **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
-		tbl_idx = TABLE_HASH(index, 1, ptr);
-		rec_chain = index->records + tbl_idx;
+	కొరకు (ptr = పంక్తి_చివర_2(1); (గుర్తులేని పూర్ణాంకం)line1 <= ptr; ptr--) {
+		tbl_idx = పట్టిక_HASH(సూచీ, 1, ptr);
+		rec_chain = సూచీ->రికార్డులు + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		అయితే (rec) {
+			ఒకవేళ (CMP(సూచీ, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
 				 * chain.
 				 */
-				NEXT_PTR(index, ptr) = rec->ptr;
+				తదుపరి_PTR(సూచీ, ptr) = rec->ptr;
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				పంక్తి_MAP(సూచీ, ptr) = rec;
+				వెళ్ళు continue_పరిశీలన;
 			}
 
-			rec = rec->next;
+			rec = rec->తదుపరి;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		ఒకవేళ (chain_len == సూచీ->max_chain_నిడివి)
+			తిరిగి -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		ఒకవేళ (!(rec = xdl_cha_alloc(&సూచీ->rcha)))
+			తిరిగి -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
-		rec->next = *rec_chain;
+		rec->తదుపరి = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		పంక్తి_MAP(సూచీ, ptr) = rec;
 
-continue_scan:
+continue_పరిశీలన:
 		; /* no op */
 	}
 
-	return 0;
+	తిరిగి 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+స్థిర పూర్ణాంకం try_lcs(నిర్మాణం histindex *సూచీ, నిర్మాణం region *lcs, పూర్ణాంకం b_ptr,
+	పూర్ణాంకం line1, పూర్ణాంకం count1, పూర్ణాంకం line2, పూర్ణాంకం count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	గుర్తులేని పూర్ణాంకం b_తదుపరి = b_ptr + 1;
+	నిర్మాణం రికార్డు *rec = సూచీ->రికార్డులు[పట్టిక_HASH(సూచీ, 2, b_ptr)];
+	గుర్తులేని పూర్ణాంకం as, ae, bs, be, np, rc;
+	పూర్ణాంకం should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
-				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+	కొరకు (; rec; rec = rec->తదుపరి) {
+		ఒకవేళ (rec->cnt > సూచీ->cnt) {
+			ఒకవేళ (!సూచీ->has_common)
+				సూచీ->has_common = CMP(సూచీ, 1, rec->ptr, 2, b_ptr);
+			కొనసాగు;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		ఒకవేళ (!CMP(సూచీ, 1, as, 2, b_ptr))
+			కొనసాగు;
 
-		index->has_common = 1;
-		for (;;) {
+		సూచీ->has_common = 1;
+		కొరకు (;;) {
 			should_break = 0;
-			np = NEXT_PTR(index, as);
+			np = తదుపరి_PTR(సూచీ, as);
 			bs = b_ptr;
 			ae = as;
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
-				&& CMP(index, 1, as - 1, 2, bs - 1)) {
+			అయితే ((గుర్తులేని పూర్ణాంకం)line1 < as && (గుర్తులేని పూర్ణాంకం)line2 < bs
+				&& CMP(సూచీ, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, as));
+				ఒకవేళ (1 < rc)
+					rc = XDL_MIN(rc, CNT(సూచీ, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
-				&& CMP(index, 1, ae + 1, 2, be + 1)) {
+			అయితే (ae < (గుర్తులేని పూర్ణాంకం)పంక్తి_చివర_2(1) && be < (గుర్తులేని పూర్ణాంకం)పంక్తి_చివర_2(2)
+				&& CMP(సూచీ, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, ae));
+				ఒకవేళ (1 < rc)
+					rc = XDL_MIN(rc, CNT(సూచీ, ae));
 			}
 
-			if (b_next <= be)
-				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			ఒకవేళ (b_తదుపరి <= be)
+				b_తదుపరి = be + 1;
+			ఒకవేళ (lcs->end1 - lcs->begin1 < ae - as || rc < సూచీ->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
 				lcs->end2 = be;
-				index->cnt = rc;
+				సూచీ->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			ఒకవేళ (np == 0)
+				ఆపు;
 
-			while (np <= ae) {
-				np = NEXT_PTR(index, np);
-				if (np == 0) {
+			అయితే (np <= ae) {
+				np = తదుపరి_PTR(సూచీ, np);
+				ఒకవేళ (np == 0) {
 					should_break = 1;
-					break;
+					ఆపు;
 				}
 			}
 
-			if (should_break)
-				break;
+			ఒకవేళ (should_break)
+				ఆపు;
 
 			as = np;
 		}
 	}
-	return b_next;
+	తిరిగి b_తదుపరి;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+స్థిర పూర్ణాంకం fall_వెనుక_గమ్యం_classic_diff(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env,
+		పూర్ణాంకం line1, పూర్ణాంకం count1, పూర్ణాంకం line2, పూర్ణాంకం count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
-	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
+	memset(&xpparam, 0, పరిమాణం(xpparam));
+	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_ముసుగు;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	తిరిగి xdl_fall_వెనుక_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+స్థిర అంతఃవరుస శూన్య free_సూచీ(నిర్మాణం histindex *సూచీ)
 {
-	xdl_free(index->records);
-	xdl_free(index->line_map);
-	xdl_free(index->next_ptrs);
-	xdl_cha_free(&index->rcha);
+	xdl_free(సూచీ->రికార్డులు);
+	xdl_free(సూచీ->పంక్తి_map);
+	xdl_free(సూచీ->తదుపరి_ptrs);
+	xdl_cha_free(&సూచీ->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+స్థిర పూర్ణాంకం కనుగొను_lcs(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env,
+		    నిర్మాణం region *lcs,
+		    పూర్ణాంకం line1, పూర్ణాంకం count1, పూర్ణాంకం line2, పూర్ణాంకం count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	పూర్ణాంకం b_ptr;
+	పూర్ణాంకం ret = -1;
+	నిర్మాణం histindex సూచీ;
 
-	memset(&index, 0, sizeof(index));
+	memset(&సూచీ, 0, పరిమాణం(సూచీ));
 
-	index.env = env;
-	index.xpp = xpp;
+	సూచీ.env = env;
+	సూచీ.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	సూచీ.రికార్డులు = ఖాళీ;
+	సూచీ.పంక్తి_map = ఖాళీ;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	సూచీ.rcha.తల = ఖాళీ;
 
-	index.table_bits = xdl_hashbits(count1);
-	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	సూచీ.పట్టిక_బిట్లు = xdl_hashbits(count1);
+	సూచీ.రికార్డులు_కొలత = 1 << సూచీ.పట్టిక_బిట్లు;
+	ఒకవేళ (!XDL_CALLOC_ARRAY(సూచీ.రికార్డులు, సూచీ.రికార్డులు_కొలత))
+		వెళ్ళు cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	సూచీ.పంక్తి_map_కొలత = count1;
+	ఒకవేళ (!XDL_CALLOC_ARRAY(సూచీ.పంక్తి_map, సూచీ.పంక్తి_map_కొలత))
+		వెళ్ళు cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	ఒకవేళ (!XDL_CALLOC_ARRAY(సూచీ.తదుపరి_ptrs, సూచీ.పంక్తి_map_కొలత))
+		వెళ్ళు cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	ఒకవేళ (xdl_cha_init(&సూచీ.rcha, పరిమాణం(నిర్మాణం రికార్డు), count1 / 4 + 1) < 0)
+		వెళ్ళు cleanup;
 
-	index.ptr_shift = line1;
-	index.max_chain_length = 64;
+	సూచీ.ptr_జరుపు = line1;
+	సూచీ.max_chain_నిడివి = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	ఒకవేళ (పరిశీలన_A(&సూచీ, line1, count1))
+		వెళ్ళు cleanup;
 
-	index.cnt = index.max_chain_length + 1;
+	సూచీ.cnt = సూచీ.max_chain_నిడివి + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
-		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
+	కొరకు (b_ptr = line2; b_ptr <= పంక్తి_చివర_2(2); )
+		b_ptr = try_lcs(&సూచీ, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	ఒకవేళ (సూచీ.has_common && సూచీ.max_chain_నిడివి < సూచీ.cnt)
 		ret = 1;
-	else
+	లేకపోతే
 		ret = 0;
 
 cleanup:
-	free_index(&index);
-	return ret;
+	free_సూచీ(&సూచీ);
+	తిరిగి ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+స్థిర పూర్ణాంకం histogram_diff(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env,
+	పూర్ణాంకం line1, పూర్ణాంకం count1, పూర్ణాంకం line2, పూర్ణాంకం count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	నిర్మాణం region lcs;
+	పూర్ణాంకం lcs_దొరికింది;
+	పూర్ణాంకం ఫలితం;
 redo:
-	result = -1;
+	ఫలితం = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	ఒకవేళ (count1 <= 0 && count2 <= 0)
+		తిరిగి 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	ఒకవేళ ((గుర్తులేని పూర్ణాంకం)పంక్తి_చివర_2(1) >= MAX_PTR)
+		తిరిగి -1;
 
-	if (!count1) {
-		while(count2--)
-			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
-			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+	ఒకవేళ (!count1) {
+		అయితే(count2--)
+			env->xdf2.మారింది[line2++ - 1] = true;
+		తిరిగి 0;
+	} లేకపోతే ఒకవేళ (!count2) {
+		అయితే(count1--)
+			env->xdf1.మారింది[line1++ - 1] = true;
+		తిరిగి 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
-	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
-		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
-				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
-				env->xdf2.changed[line2++ - 1] = true;
-			result = 0;
-		} else {
-			result = histogram_diff(xpp, env,
+	memset(&lcs, 0, పరిమాణం(lcs));
+	lcs_దొరికింది = కనుగొను_lcs(xpp, env, &lcs, line1, count1, line2, count2);
+	ఒకవేళ (lcs_దొరికింది < 0)
+		వెళ్ళు బహిర్గతం;
+	లేకపోతే ఒకవేళ (lcs_దొరికింది)
+		ఫలితం = fall_వెనుక_గమ్యం_classic_diff(xpp, env, line1, count1, line2, count2);
+	లేకపోతే {
+		ఒకవేళ (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			అయితే (count1--)
+				env->xdf1.మారింది[line1++ - 1] = true;
+			అయితే (count2--)
+				env->xdf2.మారింది[line2++ - 1] = true;
+			ఫలితం = 0;
+		} లేకపోతే {
+			ఫలితం = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			ఒకవేళ (ఫలితం)
+				వెళ్ళు బహిర్గతం;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = పంక్తి_చివర_2(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = పంక్తి_చివర_2(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			వెళ్ళు redo;
 		}
 	}
-out:
-	return result;
+బహిర్గతం:
+	తిరిగి ఫలితం;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+పూర్ణాంకం xdl_do_histogram_diff(xpparam_t స్థిరరాశి *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	తిరిగి histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

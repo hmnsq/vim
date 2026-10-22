@@ -1,101 +1,101 @@
-#include "vterm_internal.h"
+#అన్తర్భావ "vterm_internal.h"
 
-#include "utf8.h"
+#అన్తర్భావ "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+స్థిర శూన్య output_mouse(VTermState *state, పూర్ణాంకం సంకేతం_2, పూర్ణాంకం pressed, పూర్ణాంకం modifiers, పూర్ణాంకం నిలువు, పూర్ణాంకం అడ్డువరుస)
 {
   modifiers <<= 2;
 
-  switch(state->mouse_protocol) {
-  case MOUSE_X10:
-    if(col + 0x21 > 0xff)
-      col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
-      row = 0xff - 0x21;
+  ఎంపిక(state->mouse_protocol) {
+  స్థితి MOUSE_X10:
+    ఒకవేళ(నిలువు + 0x21 > 0xff)
+      నిలువు = 0xff - 0x21;
+    ఒకవేళ(అడ్డువరుస + 0x21 > 0xff)
+      అడ్డువరుస = 0xff - 0x21;
 
-    if(!pressed)
-      code = 3;
+    ఒకవేళ(!pressed)
+      సంకేతం_2 = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
-        (code | modifiers) + 0x20, col + 0x21, row + 0x21);
-    break;
+    vterm_నెట్టు_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
+        (సంకేతం_2 | modifiers) + 0x20, నిలువు + 0x21, అడ్డువరుస + 0x21);
+    ఆపు;
 
-  case MOUSE_UTF8:
+  స్థితి MOUSE_UTF8:
     {
-      char utf8[18]; size_t len = 0;
+      అక్షరం utf8[18]; size_t len = 0;
 
-      if(!pressed)
-        code = 3;
+      ఒకవేళ(!pressed)
+        సంకేతం_2 = 3;
 
-      len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
-      len += fill_utf8(col + 0x21, utf8 + len);
-      len += fill_utf8(row + 0x21, utf8 + len);
+      len += fill_utf8((సంకేతం_2 | modifiers) + 0x20, utf8 + len);
+      len += fill_utf8(నిలువు + 0x21, utf8 + len);
+      len += fill_utf8(అడ్డువరుస + 0x21, utf8 + len);
       utf8[len] = 0;
 
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
+      vterm_నెట్టు_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
-    break;
+    ఆపు;
 
-  case MOUSE_SGR:
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
-        code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
-    break;
+  స్థితి MOUSE_SGR:
+    vterm_నెట్టు_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
+        సంకేతం_2 | modifiers, నిలువు + 1, అడ్డువరుస + 1, pressed ? 'M' : 'm');
+    ఆపు;
 
-  case MOUSE_RXVT:
-    if(!pressed)
-      code = 3;
+  స్థితి MOUSE_RXVT:
+    ఒకవేళ(!pressed)
+      సంకేతం_2 = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
-        code | modifiers, col + 1, row + 1);
-    break;
+    vterm_నెట్టు_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
+        సంకేతం_2 | modifiers, నిలువు + 1, అడ్డువరుస + 1);
+    ఆపు;
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+శూన్య vterm_mouse_move(VTerm *vt, పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  ఒకవేళ(నిలువు == state->mouse_నిలువు && అడ్డువరుస == state->mouse_అడ్డువరుస)
+    తిరిగి;
 
-  state->mouse_col = col;
-  state->mouse_row = row;
+  state->mouse_నిలువు = నిలువు;
+  state->mouse_అడ్డువరుస = అడ్డువరుస;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  ఒకవేళ((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
-                 state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
-                 state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
-    output_mouse(state, button-1 + 0x20, 1, mod, col, row);
+    పూర్ణాంకం button = state->mouse_buttons & MOUSE_BUTTON_ఎడమ ? 1 :
+                 state->mouse_buttons & MOUSE_BUTTON_మధ్య ? 2 :
+                 state->mouse_buttons & MOUSE_BUTTON_కుడి ? 3 : 4;
+    output_mouse(state, button-1 + 0x20, 1, mod, నిలువు, అడ్డువరుస);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+శూన్య vterm_mouse_button(VTerm *vt, పూర్ణాంకం button, పూర్ణాంకం pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  పూర్ణాంకం old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  ఒకవేళ(button > 0 && button <= 3) {
+    ఒకవేళ(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    లేకపోతే
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  ఒకవేళ(state->mouse_buttons == old_buttons && button < 4)
+    తిరిగి;
+  ఒకవేళ (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    తిరిగి;
 
-  if(!state->mouse_flags)
-    return;
+  ఒకవేళ(!state->mouse_flags)
+    తిరిగి;
 
-  if(button < 4) {
-    output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
+  ఒకవేళ(button < 4) {
+    output_mouse(state, button-1, pressed, mod, state->mouse_నిలువు, state->mouse_అడ్డువరుస);
   }
-  else if(button < 8) {
-    output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
+  లేకపోతే ఒకవేళ(button < 8) {
+    output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_నిలువు, state->mouse_అడ్డువరుస);
   }
 }

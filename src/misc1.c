@@ -11,22 +11,22 @@
  * misc1.c: functions that didn't seem to fit elsewhere
  */
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
-#if defined(__HAIKU__)
+#ఒకవేళ defined(__HAIKU__)
 # include <storage/FindDirectory.h>
-#endif
+#అయితే_ముగింపు
 
-#if defined(MSWIN)
+#ఒకవేళ defined(MSWIN)
 # include <lm.h>
-#endif
+#అయితే_ముగింపు
 
-#define URL_SLASH	1		// path_is_url() has found "://"
-#define URL_BACKSLASH	2		// path_is_url() has found ":\\"
+#నిర్వచించు URL_SLASH	1		// path_is_url() has found "://"
+#నిర్వచించు URL_BACKSLASH	2		// path_is_url() has found ":\\"
 
 // All user names (for ~user completion as done by shell).
-static garray_T	ga_users;
+స్థిర garray_T	ga_users;
 
 /*
  * get_leader_len() returns the length in bytes of the prefix of the given
@@ -38,142 +38,142 @@ static garray_T	ga_users;
  * If "include_space" is set, include trailing whitespace while calculating the
  * length.
  */
-    int
+    పూర్ణాంకం
 get_leader_len(
-    char_u	*line,
+    char_u	*పంక్తి,
     char_u	**flags,
-    int		backward,
-    int		include_space)
+    పూర్ణాంకం		backward,
+    పూర్ణాంకం		include_space)
 {
-    int		i, j;
-    int		result;
-    int		got_com = FALSE;
-    int		found_one;
+    పూర్ణాంకం		i, j;
+    పూర్ణాంకం		ఫలితం;
+    పూర్ణాంకం		got_com = FALSE;
+    పూర్ణాంకం		దొరికింది_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
     char_u	*string;		// pointer to comment string
     char_u	*list;
-    int		middle_match_len = 0;
+    పూర్ణాంకం		మధ్య_సరిపోలిక_len = 0;
     char_u	*prev_list;
-    char_u	*saved_flags = NULL;
+    char_u	*saved_flags = ఖాళీ;
 
-    result = i = 0;
-    while (VIM_ISWHITE(line[i]))    // leading white space is ignored
+    ఫలితం = i = 0;
+    అయితే (VIM_ISWHITE(పంక్తి[i]))    // leading white space is ignored
 	++i;
 
     /*
      * Repeat to match several nested comment strings.
      */
-    while (line[i] != NUL)
+    అయితే (పంక్తి[i] != NUL)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	దొరికింది_one = FALSE;
+	కొరకు (list = curbuf->b_p_com; *list; )
 	{
 	    // Get one option part into part_buf[].  Advance "list" to next
 	    // one.  Put "string" at start of string.
-	    if (!got_com && flags != NULL)
+	    ఒకవేళ (!got_com && flags != ఖాళీ)
 		*flags = list;	    // remember where flags started
 	    prev_list = list;
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (శూన్య)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	    // missing ':', ignore this part
-		continue;
+	    ఒకవేళ (string == ఖాళీ)	    // missing ':', ignore this part
+		కొనసాగు;
 	    *string++ = NUL;	    // isolate flags from string
 
 	    // If we found a middle match previously, use that match when this
 	    // is not a middle or end.
-	    if (middle_match_len != 0
-		    && vim_strchr(part_buf, COM_MIDDLE) == NULL
-		    && vim_strchr(part_buf, COM_END) == NULL)
-		break;
+	    ఒకవేళ (మధ్య_సరిపోలిక_len != 0
+		    && vim_strchr(part_buf, COM_మధ్య) == ఖాళీ
+		    && vim_strchr(part_buf, COM_చివర) == ఖాళీ)
+		ఆపు;
 
 	    // When we already found a nested comment, only accept further
 	    // nested comments.
-	    if (got_com && vim_strchr(part_buf, COM_NEST) == NULL)
-		continue;
+	    ఒకవేళ (got_com && vim_strchr(part_buf, COM_NEST) == ఖాళీ)
+		కొనసాగు;
 
 	    // When 'O' flag present and using "O" command skip this one.
-	    if (backward && vim_strchr(part_buf, COM_NOBACK) != NULL)
-		continue;
+	    ఒకవేళ (backward && vim_strchr(part_buf, COM_NOBACK) != ఖాళీ)
+		కొనసాగు;
 
 	    // Line contents and string must match.
 	    // When string starts with white space, must have some white space
 	    // (but the amount does not need to match, there might be a mix of
 	    // TABs and spaces).
-	    if (VIM_ISWHITE(string[0]))
+	    ఒకవేళ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;  // missing white space
-		while (VIM_ISWHITE(string[0]))
+		ఒకవేళ (i == 0 || !VIM_ISWHITE(పంక్తి[i - 1]))
+		    కొనసాగు;  // missing white space
+		అయితే (VIM_ISWHITE(string[0]))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    కొరకు (j = 0; string[j] != NUL && string[j] == పంక్తి[i + j]; ++j)
 		;
-	    if (string[j] != NUL)
-		continue;  // string doesn't match
+	    ఒకవేళ (string[j] != NUL)
+		కొనసాగు;  // string doesn't match
 
 	    // When 'b' flag used, there must be white space or an
 	    // end-of-line after the string in the line.
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-			   && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ఒకవేళ (vim_strchr(part_buf, COM_BLANK) != ఖాళీ
+			   && !VIM_ISWHITE(పంక్తి[i + j]) && పంక్తి[i + j] != NUL)
+		కొనసాగు;
 
 	    // We have found a match, stop searching unless this is a middle
 	    // comment. The middle comment can be a substring of the end
 	    // comment in which case it's better to return the length of the
 	    // end comment and its flags.  Thus we keep searching with middle
 	    // and end matches and use an end match if it matches better.
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ఒకవేళ (vim_strchr(part_buf, COM_మధ్య) != ఖాళీ)
 	    {
-		if (middle_match_len == 0)
+		ఒకవేళ (మధ్య_సరిపోలిక_len == 0)
 		{
-		    middle_match_len = j;
+		    మధ్య_సరిపోలిక_len = j;
 		    saved_flags = prev_list;
 		}
-		continue;
+		కొనసాగు;
 	    }
-	    if (middle_match_len != 0 && j > middle_match_len)
+	    ఒకవేళ (మధ్య_సరిపోలిక_len != 0 && j > మధ్య_సరిపోలిక_len)
 		// Use this match instead of the middle match, since it's a
 		// longer thus better match.
-		middle_match_len = 0;
+		మధ్య_సరిపోలిక_len = 0;
 
-	    if (middle_match_len == 0)
+	    ఒకవేళ (మధ్య_సరిపోలిక_len == 0)
 		i += j;
-	    found_one = TRUE;
-	    break;
+	    దొరికింది_one = TRUE;
+	    ఆపు;
 	}
 
-	if (middle_match_len != 0)
+	ఒకవేళ (మధ్య_సరిపోలిక_len != 0)
 	{
 	    // Use the previously found middle match after failing to find a
 	    // match with an end.
-	    if (!got_com && flags != NULL)
+	    ఒకవేళ (!got_com && flags != ఖాళీ)
 		*flags = saved_flags;
-	    i += middle_match_len;
-	    found_one = TRUE;
+	    i += మధ్య_సరిపోలిక_len;
+	    దొరికింది_one = TRUE;
 	}
 
 	// No match found, stop scanning.
-	if (!found_one)
-	    break;
+	ఒకవేళ (!దొరికింది_one)
+	    ఆపు;
 
-	result = i;
+	ఫలితం = i;
 
 	// Include any trailing white space.
-	while (VIM_ISWHITE(line[i]))
+	అయితే (VIM_ISWHITE(పంక్తి[i]))
 	    ++i;
 
-	if (include_space)
-	    result = i;
+	ఒకవేళ (include_space)
+	    ఫలితం = i;
 
 	// If this comment doesn't nest, stop here.
 	got_com = TRUE;
-	if (vim_strchr(part_buf, COM_NEST) == NULL)
-	    break;
+	ఒకవేళ (vim_strchr(part_buf, COM_NEST) == ఖాళీ)
+	    ఆపు;
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -183,30 +183,30 @@ get_leader_len(
  * When "flags" is not null, it is set to point to the flags describing the
  * recognized comment leader.
  */
-    int
-get_last_leader_offset(char_u *line, char_u **flags)
+    పూర్ణాంకం
+get_చివరి_leader_స్థానభ్రంశం(char_u *పంక్తి, char_u **flags)
 {
-    int		result = -1;
-    int		i, j;
-    int		lower_check_bound = 0;
+    పూర్ణాంకం		ఫలితం = -1;
+    పూర్ణాంకం		i, j;
+    పూర్ణాంకం		క్రింది_check_bound = 0;
     char_u	*string;
     char_u	*com_leader;
     char_u	*com_flags;
     char_u	*list;
-    int		found_one;
+    పూర్ణాంకం		దొరికింది_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
 
     /*
      * Repeat to match several nested comment strings.
      */
-    i = (int)STRLEN(line);
-    while (--i >= lower_check_bound)
+    i = (పూర్ణాంకం)STRLEN(పంక్తి);
+    అయితే (--i >= క్రింది_check_bound)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	దొరికింది_one = FALSE;
+	కొరకు (list = curbuf->b_p_com; *list; )
 	{
 	    char_u *flags_save = list;
 
@@ -214,11 +214,11 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * Get one option part into part_buf[].  Advance list to next one.
 	     * put string at start of string.
 	     */
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (శూన్య)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	// If everything is fine, this cannot actually
+	    ఒకవేళ (string == ఖాళీ)	// If everything is fine, this cannot actually
 				// happen.
-		continue;
+		కొనసాగు;
 	    *string++ = NUL;	// Isolate flags from string.
 	    com_leader = string;
 
@@ -228,126 +228,126 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * (but the amount does not need to match, there might be a mix of
 	     * TABs and spaces).
 	     */
-	    if (VIM_ISWHITE(string[0]))
+	    ఒకవేళ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;
-		while (VIM_ISWHITE(*string))
+		ఒకవేళ (i == 0 || !VIM_ISWHITE(పంక్తి[i - 1]))
+		    కొనసాగు;
+		అయితే (VIM_ISWHITE(*string))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    కొరకు (j = 0; string[j] != NUL && string[j] == పంక్తి[i + j]; ++j)
 		/* do nothing */;
-	    if (string[j] != NUL)
-		continue;
+	    ఒకవేళ (string[j] != NUL)
+		కొనసాగు;
 
 	    /*
 	     * When 'b' flag used, there must be white space or an
 	     * end-of-line after the string in the line.
 	     */
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-		    && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ఒకవేళ (vim_strchr(part_buf, COM_BLANK) != ఖాళీ
+		    && !VIM_ISWHITE(పంక్తి[i + j]) && పంక్తి[i + j] != NUL)
+		కొనసాగు;
 
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ఒకవేళ (vim_strchr(part_buf, COM_మధ్య) != ఖాళీ)
 	    {
 		// For a middlepart comment, only consider it to match if
 		// everything before the current position in the line is
 		// whitespace.  Otherwise we would think we are inside a
 		// comment if the middle part appears somewhere in the middle
 		// of the line.  E.g. for C the "*" appears often.
-		for (j = 0; VIM_ISWHITE(line[j]) && j <= i; j++)
+		కొరకు (j = 0; VIM_ISWHITE(పంక్తి[j]) && j <= i; j++)
 		    ;
-		if (j < i)
-		    continue;
+		ఒకవేళ (j < i)
+		    కొనసాగు;
 	    }
 
 	    /*
 	     * We have found a match, stop searching.
 	     */
-	    found_one = TRUE;
+	    దొరికింది_one = TRUE;
 
-	    if (flags)
+	    ఒకవేళ (flags)
 		*flags = flags_save;
 	    com_flags = flags_save;
 
-	    break;
+	    ఆపు;
 	}
 
-	if (found_one)
+	ఒకవేళ (దొరికింది_one)
 	{
 	    char_u  part_buf2[COM_MAX_LEN];	// buffer for one option part
-	    int     len1, len2, off;
+	    పూర్ణాంకం     len1, len2, off;
 
-	    result = i;
+	    ఫలితం = i;
 	    /*
 	     * If this comment nests, continue searching.
 	     */
-	    if (vim_strchr(part_buf, COM_NEST) != NULL)
-		continue;
+	    ఒకవేళ (vim_strchr(part_buf, COM_NEST) != ఖాళీ)
+		కొనసాగు;
 
-	    lower_check_bound = i;
+	    క్రింది_check_bound = i;
 
 	    // Let's verify whether the comment leader found is a substring
 	    // of other comment leaders. If it is, let's adjust the
 	    // lower_check_bound so that we make sure that we have determined
 	    // the comment leader correctly.
 
-	    while (VIM_ISWHITE(*com_leader))
+	    అయితే (VIM_ISWHITE(*com_leader))
 		++com_leader;
-	    len1 = (int)STRLEN(com_leader);
+	    len1 = (పూర్ణాంకం)STRLEN(com_leader);
 
-	    for (list = curbuf->b_p_com; *list; )
+	    కొరకు (list = curbuf->b_p_com; *list; )
 	    {
 		char_u *flags_save = list;
 
-		(void)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
-		if (flags_save == com_flags)
-		    continue;
+		(శూన్య)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
+		ఒకవేళ (flags_save == com_flags)
+		    కొనసాగు;
 		string = vim_strchr(part_buf2, ':');
 		++string;
-		while (VIM_ISWHITE(*string))
+		అయితే (VIM_ISWHITE(*string))
 		    ++string;
-		len2 = (int)STRLEN(string);
-		if (len2 == 0)
-		    continue;
+		len2 = (పూర్ణాంకం)STRLEN(string);
+		ఒకవేళ (len2 == 0)
+		    కొనసాగు;
 
 		// Now we have to verify whether string ends with a substring
 		// beginning the com_leader.
-		for (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
+		కొరకు (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
 		{
 		    --off;
-		    if (STRNCMP(string + off, com_leader, len2 - off) == 0)
+		    ఒకవేళ (STRNCMP(string + off, com_leader, len2 - off) == 0)
 		    {
-			if (i - off < lower_check_bound)
-			    lower_check_bound = i - off;
+			ఒకవేళ (i - off < క్రింది_check_bound)
+			    క్రింది_check_bound = i - off;
 		    }
 		}
 	    }
 	}
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Return the number of window lines occupied by buffer line "lnum".
  * Includes any filler lines.
  */
-    int
+    పూర్ణాంకం
 plines(linenr_T lnum)
 {
-    return plines_win(curwin, lnum, TRUE);
+    తిరిగి plines_win(curwin, lnum, TRUE);
 }
 
-    int
+    పూర్ణాంకం
 plines_win(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    పూర్ణాంకం		హద్దు_winheight)	// when TRUE limit to window height
 {
-#if defined(FEAT_DIFF)
+#ఒకవేళ defined(FEAT_DIFF)
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    return plines_win_nofill(wp, lnum, limit_winheight)
+    తిరిగి plines_win_nofill(wp, lnum, హద్దు_winheight)
 						   + diff_check_fill(wp, lnum);
 }
 
@@ -355,120 +355,120 @@ plines_win(
  * Return the number of window lines occupied by buffer line "lnum".
  * Does not include filler lines.
  */
-    int
+    పూర్ణాంకం
 plines_nofill(linenr_T lnum)
 {
-    return plines_win_nofill(curwin, lnum, TRUE);
+    తిరిగి plines_win_nofill(curwin, lnum, TRUE);
 }
 
-    int
+    పూర్ణాంకం
 plines_win_nofill(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    పూర్ణాంకం		హద్దు_winheight)	// when TRUE limit to window height
 {
-#endif
-    int		lines;
+#అయితే_ముగింపు
+    పూర్ణాంకం		పంక్తులు;
 
-    if (wp->w_width == 0)
-	return 1;
+    ఒకవేళ (wp->w_వెడల్పు == 0)
+	తిరిగి 1;
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // Folded lines are handled just like an empty line.
     // NOTE: Caller must handle lines that are MAYBE folded.
-    if (lineFolded(wp, lnum) == TRUE)
-	return 1;
-#endif
+    ఒకవేళ (పంక్తి_Folded(wp, lnum) == TRUE)
+	తిరిగి 1;
+#అయితే_ముగింపు
 
-    if (!wp->w_p_wrap)
-	lines = 1
-#ifdef FEAT_PROP_POPUP
+    ఒకవేళ (!wp->w_p_wrap)
+	పంక్తులు = 1
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // add a line for each "above" and "below" aligned text property
-	    + prop_count_above_below(wp->w_buffer, lnum)
-#endif
+	    + prop_లెక్క_above_క్రింద(wp->w_బఫరు, lnum)
+#అయితే_ముగింపు
 	;
-    else
-	lines = plines_win_nofold(wp, lnum);
+    లేకపోతే
+	పంక్తులు = plines_win_nofold(wp, lnum);
 
-    if (limit_winheight && lines > wp->w_height)
-	return wp->w_height;
-    return lines;
+    ఒకవేళ (హద్దు_winheight && పంక్తులు > wp->w_ఎత్తు)
+	తిరిగి wp->w_ఎత్తు;
+    తిరిగి పంక్తులు;
 }
 
 /*
  * Return number of window lines physical line "lnum" will occupy in window
  * "wp".  Does not care about folding, 'wrap' or 'diff'.
  */
-    int
+    పూర్ణాంకం
 plines_win_nofold(win_T *wp, linenr_T lnum)
 {
     char_u	*s;
-    long	col;
-    int		width;
+    దీర్ఘ	నిలువు;
+    పూర్ణాంకం		వెడల్పు;
     chartabsize_T cts;
 
-    s = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    s = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
     init_chartabsize_arg(&cts, wp, lnum, 0, s, s);
-    if (*s == NUL
-#ifdef FEAT_PROP_POPUP
-	    && !cts.cts_has_prop_with_text
-#endif
+    ఒకవేళ (*s == NUL
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    && !cts.cts_has_prop_with_పాఠ్యం
+#అయితే_ముగింపు
 	    )
-	return 1; // be quick for an empty line
+	తిరిగి 1; // be quick for an empty line
     win_linetabsize_cts(&cts, (colnr_T)MAXCOL);
     clear_chartabsize_arg(&cts);
-    col = (int)cts.cts_vcol;
+    నిలువు = (పూర్ణాంకం)cts.cts_vcol;
 
     // If list mode is on, then the '$' at the end of the line may take up one
     // extra column.
-    if (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
-	col += 1;
+    ఒకవేళ (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
+	నిలువు += 1;
 
     /*
      * Add column offset for 'number', 'relativenumber' and 'foldcolumn'.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 32000;
-    if (col <= width)
-	return 1;
-    col -= width;
-    width += win_col_off2(wp);
-    return (col + (width - 1)) / width + 1;
+    వెడల్పు = wp->w_వెడల్పు - win_నిలువు_off(wp);
+    ఒకవేళ (వెడల్పు <= 0)
+	తిరిగి 32000;
+    ఒకవేళ (నిలువు <= వెడల్పు)
+	తిరిగి 1;
+    నిలువు -= వెడల్పు;
+    వెడల్పు += win_నిలువు_off2(wp);
+    తిరిగి (నిలువు + (వెడల్పు - 1)) / వెడల్పు + 1;
 }
 
 /*
  * Like plines_win(), but only reports the number of physical screen lines
  * used from the start of the line to the given byte column.
  */
-    int
-plines_win_col(win_T *wp, linenr_T lnum, long column)
+    పూర్ణాంకం
+plines_win_నిలువు(win_T *wp, linenr_T lnum, దీర్ఘ స్తంభం)
 {
-    long	col;
-    int		lines = 0;
-    int		width;
-    char_u	*line;
+    దీర్ఘ	నిలువు;
+    పూర్ణాంకం		పంక్తులు = 0;
+    పూర్ణాంకం		వెడల్పు;
+    char_u	*పంక్తి;
     chartabsize_T cts;
 
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    lines = diff_check_fill(wp, lnum);
-#endif
+    పంక్తులు = diff_check_fill(wp, lnum);
+#అయితే_ముగింపు
 
-    if (!wp->w_p_wrap)
-	return lines + 1;
+    ఒకవేళ (!wp->w_p_wrap)
+	తిరిగి పంక్తులు + 1;
 
-    if (wp->w_width == 0)
-	return lines + 1;
+    ఒకవేళ (wp->w_వెడల్పు == 0)
+	తిరిగి పంక్తులు + 1;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    పంక్తి = ml_get_buf(wp->w_బఫరు, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, పంక్తి, పంక్తి);
     // "column" is a byte index, advance the pointer until it is reached.
-    while (*cts.cts_ptr != NUL && cts.cts_ptr < line + column)
+    అయితే (*cts.cts_ptr != NUL && cts.cts_ptr < పంక్తి + స్తంభం)
     {
-	cts.cts_vcol += win_lbr_chartabsize(&cts, NULL, NULL);
+	cts.cts_vcol += win_lbr_chartabsize(&cts, ఖాళీ, ఖాళీ);
 	MB_PTR_ADV(cts.cts_ptr);
     }
 
@@ -479,23 +479,23 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
      * error when the TAB wraps from one screen line to the next (when
      * 'columns' is not a multiple of 'ts') -- webb.
      */
-    col = cts.cts_vcol;
-    if (*cts.cts_ptr == TAB && (State & MODE_NORMAL)
+    నిలువు = cts.cts_vcol;
+    ఒకవేళ (*cts.cts_ptr == TAB && (State & బహుళకం_సాధారణ)
 				    && (!wp->w_p_list || wp->w_lcs_chars.tab1))
-	col += win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+	నిలువు += win_lbr_chartabsize(&cts, ఖాళీ, ఖాళీ) - 1;
     clear_chartabsize_arg(&cts);
 
     /*
      * Add column offset for 'number', 'relativenumber', 'foldcolumn', etc.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 9999;
+    వెడల్పు = wp->w_వెడల్పు - win_నిలువు_off(wp);
+    ఒకవేళ (వెడల్పు <= 0)
+	తిరిగి 9999;
 
-    lines += 1;
-    if (col > width)
-	lines += (col - width) / (width + win_col_off2(wp)) + 1;
-    return lines;
+    పంక్తులు += 1;
+    ఒకవేళ (నిలువు > వెడల్పు)
+	పంక్తులు += (నిలువు - వెడల్పు) / (వెడల్పు + win_నిలువు_off2(wp)) + 1;
+    తిరిగి పంక్తులు;
 }
 
 /*
@@ -503,127 +503,127 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
  * "last" will occupy in window "wp". Takes into account folding, 'wrap',
  * topfill and filler lines beyond the end of the buffer. Limit to "max" lines.
  */
-    int
-plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
+    పూర్ణాంకం
+plines_m_win(win_T *wp, linenr_T మొదటి, linenr_T చివరి, పూర్ణాంకం max)
 {
-    int		count = 0;
+    పూర్ణాంకం		లెక్క = 0;
 
-    while (first <= last && count < max)
+    అయితే (మొదటి <= చివరి && లెక్క < max)
     {
-#ifdef FEAT_FOLDING
-	int	x;
+#నిర్వచితమైతే FEAT_FOLDING
+	పూర్ణాంకం	x;
 
 	// Check if there are any really folded lines, but also included lines
 	// that are maybe folded.
-	x = foldedCount(wp, first, NULL);
-	if (x > 0)
+	x = folded_లెక్క(wp, మొదటి, ఖాళీ);
+	ఒకవేళ (x > 0)
 	{
-	    ++count;	    // count 1 for "+-- folded" line
-	    first += x;
+	    ++లెక్క;	    // count 1 for "+-- folded" line
+	    మొదటి += x;
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-#ifdef FEAT_DIFF
-	    if (first == wp->w_topline)
-		count += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
-	    else
-#endif
-		count += plines_win(wp, first, FALSE);
-	    ++first;
+#నిర్వచితమైతే FEAT_DIFF
+	    ఒకవేళ (మొదటి == wp->w_topline)
+		లెక్క += plines_win_nofill(wp, మొదటి, FALSE) + wp->w_topfill;
+	    లేకపోతే
+#అయితే_ముగింపు
+		లెక్క += plines_win(wp, మొదటి, FALSE);
+	    ++మొదటి;
 	}
     }
-#ifdef FEAT_DIFF
-    if (first == wp->w_buffer->b_ml.ml_line_count + 1)
-	count += diff_check_fill(wp, first);
-#endif
-    return MIN(max, count);
+#నిర్వచితమైతే FEAT_DIFF
+    ఒకవేళ (మొదటి == wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క + 1)
+	లెక్క += diff_check_fill(wp, మొదటి);
+#అయితే_ముగింపు
+    తిరిగి MIN(max, లెక్క);
 }
 
-    int
+    పూర్ణాంకం
 gchar_pos(pos_T *pos)
 {
     char_u	*ptr;
-    int		ptrlen;
+    పూర్ణాంకం		ptrlen;
 
     // When searching columns is sometimes put at the end of a line.
-    if (pos->col == MAXCOL)
-	return NUL;
+    ఒకవేళ (pos->నిలువు == MAXCOL)
+	తిరిగి NUL;
     ptrlen = ml_get_len(pos->lnum);
     ptr = ml_get_pos(pos);
-    if (pos->col > ptrlen)
-	return NUL;
-    if (has_mbyte)
-	return (*mb_ptr2char)(ptr);
-    return (int)*ptr;
+    ఒకవేళ (pos->నిలువు > ptrlen)
+	తిరిగి NUL;
+    ఒకవేళ (has_mbyte)
+	తిరిగి (*mb_ptr2char)(ptr);
+    తిరిగి (పూర్ణాంకం)*ptr;
 }
 
-    int
-gchar_cursor(void)
+    పూర్ణాంకం
+gchar_cursor(శూన్య)
 {
-    if (has_mbyte)
-	return (*mb_ptr2char)(ml_get_cursor());
-    return (int)*ml_get_cursor();
+    ఒకవేళ (has_mbyte)
+	తిరిగి (*mb_ptr2char)(ml_get_cursor());
+    తిరిగి (పూర్ణాంకం)*ml_get_cursor();
 }
 
 /*
  * Return the character immediately before the cursor.
  */
-    int
-char_before_cursor(void)
+    పూర్ణాంకం
+char_before_cursor(శూన్య)
 {
-    if (curwin->w_cursor.col == 0)
-	return -1;
+    ఒకవేళ (curwin->w_cursor.నిలువు == 0)
+	తిరిగి -1;
 
-    char_u *line = ml_get_curline();
+    char_u *పంక్తి = ml_get_curline();
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	char_u *p = line + curwin->w_cursor.col;
-	int prev_len = (*mb_head_off)(line, p - 1) + 1;
-	return mb_ptr2char(p - prev_len);
+	char_u *p = పంక్తి + curwin->w_cursor.నిలువు;
+	పూర్ణాంకం prev_len = (*mb_తల_off)(పంక్తి, p - 1) + 1;
+	తిరిగి mb_ptr2char(p - prev_len);
     }
-    return line[curwin->w_cursor.col - 1];
+    తిరిగి పంక్తి[curwin->w_cursor.నిలువు - 1];
 }
 
 /*
  * Write a character at the current cursor position.
  * It is directly written into the block.
  */
-    void
-pchar_cursor(int c)
+    శూన్య
+pchar_cursor(పూర్ణాంకం c)
 {
     *(ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE)
-						  + curwin->w_cursor.col) = c;
+						  + curwin->w_cursor.నిలువు) = c;
 }
 
 /*
  * Skip to next part of an option argument: Skip space and comma.
  */
     char_u *
-skip_to_option_part(char_u *p)
+skip_గమ్యం_option_part(char_u *p)
 {
-    if (*p == ',')
+    ఒకవేళ (*p == ',')
 	++p;
-    while (*p == ' ')
+    అయితే (*p == ' ')
 	++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
  * check_status: called when the status bars for the buffer 'buf'
  *		 need to be updated
  */
-    void
-check_status(buf_T *buf)
+    శూన్య
+check_స్థితి(buf_T *buf)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf && wp->w_status_height)
+	ఒకవేళ (wp->w_బఫరు == buf && wp->w_స్థితి_ఎత్తు)
 	{
-	    wp->w_redr_status = true;
-	    set_must_redraw(UPD_VALID);
+	    wp->w_redr_స్థితి = true;
+	    సమితి_must_redraw(UPD_VALID);
 	}
 }
 
@@ -637,46 +637,46 @@ check_status(buf_T *buf)
  *
  * return the 'y' or 'n'
  */
-    int
-ask_yesno(char_u *str, int direct)
+    పూర్ణాంకం
+ask_yesno(char_u *str, పూర్ణాంకం ప్రత్యక్ష)
 {
-    int	    r = ' ';
-    int	    save_State = State;
+    పూర్ణాంకం	    r = ' ';
+    పూర్ణాంకం	    save_State = State;
 
-    if (exiting)		// put terminal in raw mode for this question
+    ఒకవేళ (exiting)		// put terminal in raw mode for this question
 	settmode(TMODE_RAW);
     ++no_wait_return;
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
-    State = MODE_CONFIRM;	// mouse behaves like with :confirm
+#అయితే_ముగింపు
+    State = బహుళకం_CONFIRM;	// mouse behaves like with :confirm
     setmouse();			// disables mouse for xterm
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_కీలకాలు;		// no mapping here, but recognize keys
 
-    while (r != 'y' && r != 'n')
+    అయితే (r != 'y' && r != 'n')
     {
 	// same highlighting as for wait_return()
 	smsg_attr(HL_ATTR(HLF_R), "%s (y/n)?", str);
-	if (direct)
+	ఒకవేళ (ప్రత్యక్ష)
 	    r = get_keystroke();
-	else
+	లేకపోతే
 	    r = plain_vgetc();
-	if (r == Ctrl_C || r == ESC)
+	ఒకవేళ (r == Ctrl_C || r == ESC)
 	    r = 'n';
-	msg_putchar(r);	    // show what you typed
-	out_flush();
+	సందేశం_putchar(r);	    // show what you typed
+	బహిర్గతం_flush();
     }
     --no_wait_return;
     State = save_State;
     setmouse();
     --no_mapping;
-    --allow_keys;
+    --allow_కీలకాలు;
 
-    return r;
+    తిరిగి r;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * Returns the current mode as a string in "buf[MODE_MAX_LENGTH]", NUL
@@ -684,96 +684,96 @@ ask_yesno(char_u *str, int direct)
  * The first character represents the major mode, the following ones the minor
  * ones.
  */
-    void
-get_mode(char_u *buf)
+    శూన్య
+get_బహుళకం(char_u *buf)
 {
-    int		i = 0;
+    పూర్ణాంకం		i = 0;
 
-    if (time_for_testing == 93784)
+    ఒకవేళ (సమయం_for_testing == 93784)
     {
 	// Testing the two-character code.
 	buf[i++] = 'x';
 	buf[i++] = '!';
     }
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
+    లేకపోతే ఒకవేళ (పదం_use_loop())
     {
-	if (State & MODE_CMDLINE)
+	ఒకవేళ (State & బహుళకం_CMDLINE)
 	    buf[i++] = 'c';
 	buf[i++] = 't';
     }
 # endif
-    else if (State == MODE_HITRETURN || State == MODE_ASKMORE
-						      || State == MODE_SETWSIZE
-		|| State == MODE_CONFIRM)
+    లేకపోతే ఒకవేళ (State == బహుళకం_HITRETURN || State == బహుళకం_ASKMORE
+						      || State == బహుళకం_SETWSIZE
+		|| State == బహుళకం_CONFIRM)
     {
 	buf[i++] = 'r';
-	if (State == MODE_ASKMORE)
+	ఒకవేళ (State == బహుళకం_ASKMORE)
 	    buf[i++] = 'm';
-	else if (State == MODE_CONFIRM)
+	లేకపోతే ఒకవేళ (State == బహుళకం_CONFIRM)
 	    buf[i++] = '?';
     }
-    else if (State == MODE_EXTERNCMD)
+    లేకపోతే ఒకవేళ (State == బహుళకం_EXTERNCMD)
 	buf[i++] = '!';
-    else if (State & MODE_INSERT)
+    లేకపోతే ఒకవేళ (State & బహుళకం_చొప్పించు)
     {
-	if (State & VREPLACE_FLAG)
+	ఒకవేళ (State & VREPLACE_FLAG)
 	{
 	    buf[i++] = 'R';
 	    buf[i++] = 'v';
 	}
-	else
+	లేకపోతే
 	{
-	    if (State & REPLACE_FLAG)
+	    ఒకవేళ (State & REPLACE_FLAG)
 		buf[i++] = 'R';
-	    else
+	    లేకపోతే
 		buf[i++] = 'i';
 	}
 
-	if (ins_compl_active())
+	ఒకవేళ (ins_compl_చురుకైన())
 	    buf[i++] = 'c';
-	else if (ctrl_x_mode_not_defined_yet())
+	లేకపోతే ఒకవేళ (ctrl_x_బహుళకం_not_defined_yet())
 	    buf[i++] = 'x';
     }
-    else if ((State & MODE_CMDLINE) || exmode_active)
+    లేకపోతే ఒకవేళ ((State & బహుళకం_CMDLINE) || exmode_చురుకైన)
     {
 	buf[i++] = 'c';
-	if (exmode_active == EXMODE_VIM)
+	ఒకవేళ (exmode_చురుకైన == EXMODE_VIM)
 	    buf[i++] = 'v';
-	else if (exmode_active == EXMODE_NORMAL)
+	లేకపోతే ఒకవేళ (exmode_చురుకైన == EXMODE_సాధారణ)
 	    buf[i++] = 'e';
-	if ((State & MODE_CMDLINE) && cmdline_overstrike())
+	ఒకవేళ ((State & బహుళకం_CMDLINE) && cmdline_overstrike())
 	    buf[i++] = 'r';
     }
-    else if (VIsual_active)
+    లేకపోతే ఒకవేళ (VIsual_చురుకైన)
     {
-	if (VIsual_select)
-	    buf[i++] = VIsual_mode + 's' - 'v';
-	else
+	ఒకవేళ (VIsual_select)
+	    buf[i++] = VIsual_బహుళకం + 's' - 'v';
+	లేకపోతే
 	{
-	    buf[i++] = VIsual_mode;
-	    if (restart_VIsual_select)
+	    buf[i++] = VIsual_బహుళకం;
+	    ఒకవేళ (restart_VIsual_select)
 		buf[i++] = 's';
 	}
     }
-    else
+    లేకపోతే
     {
 	buf[i++] = 'n';
-	if (finish_op)
+	ఒకవేళ (ముగింపు_op)
 	{
 	    buf[i++] = 'o';
 	    // to be able to detect force-linewise/blockwise/characterwise
 	    // operations
 	    buf[i++] = motion_force;
 	}
-	else if (restart_edit == 'I' || restart_edit == 'R'
+	లేకపోతే ఒకవేళ (restart_edit == 'I' || restart_edit == 'R'
 							|| restart_edit == 'V')
 	{
 	    buf[i++] = 'i';
 	    buf[i++] = restart_edit;
 	}
 # ifdef FEAT_TERMINAL
-	else if (term_in_normal_mode(curbuf))
+	లేకపోతే ఒకవేళ (పదం_లోపల_సాధారణ_బహుళకం(curbuf))
 	    buf[i++] = 't';
 # endif
     }
@@ -784,74 +784,74 @@ get_mode(char_u *buf)
 /*
  * "mode()" function
  */
-    void
-f_mode(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_బహుళకం(typval_T *argvars, typval_T *rettv)
 {
-    char_u	buf[MODE_MAX_LENGTH];
+    char_u	buf[బహుళకం_MAX_నిడివి];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    get_mode(buf);
+    get_బహుళకం(buf);
 
     // Clear out the minor mode when the argument is not a non-zero number or
     // non-empty string.
-    if (!non_zero_arg(&argvars[0]))
+    ఒకవేళ (!non_zero_arg(&argvars[0]))
 	buf[1] = NUL;
 
     rettv->vval.v_string = vim_strsave(buf);
     rettv->v_type = VAR_STRING;
 }
 
-    static void
-may_add_state_char(garray_T *gap, char_u *include, int c)
+    స్థిర శూన్య
+may_కూడు_state_char(garray_T *gap, char_u *include, పూర్ణాంకం c)
 {
-    if (include == NULL || vim_strchr(include, c) != NULL)
+    ఒకవేళ (include == ఖాళీ || vim_strchr(include, c) != ఖాళీ)
 	ga_append(gap, c);
 }
 
 /*
  * "state()" function
  */
-    void
+    శూన్య
 f_state(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    char_u	*include = NULL;
-    int		i;
+    char_u	*include = ఖాళీ;
+    పూర్ణాంకం		i;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     ga_init2(&ga, 1, 20);
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[0].v_type != VAR_UNKNOWN)
 	include = tv_get_string(&argvars[0]);
 
-    if (!(stuff_empty() && typebuf.tb_len == 0 && scriptin[curscript] == NULL))
-	may_add_state_char(&ga, include, 'm');
-    if (op_pending())
-	may_add_state_char(&ga, include, 'o');
-    if (autocmd_busy)
-	may_add_state_char(&ga, include, 'x');
-    if (ins_compl_active())
-	may_add_state_char(&ga, include, 'a');
+    ఒకవేళ (!(stuff_ఖాళీలు() && typebuf.tb_len == 0 && scriptin[curscript] == ఖాళీ))
+	may_కూడు_state_char(&ga, include, 'm');
+    ఒకవేళ (op_pending())
+	may_కూడు_state_char(&ga, include, 'o');
+    ఒకవేళ (autocmd_busy)
+	may_కూడు_state_char(&ga, include, 'x');
+    ఒకవేళ (ins_compl_చురుకైన())
+	may_కూడు_state_char(&ga, include, 'a');
 
-# ifdef FEAT_JOB_CHANNEL
-    if (channel_in_blocking_wait())
-	may_add_state_char(&ga, include, 'w');
+# ifdef FEAT_పని_CHANNEL
+    ఒకవేళ (channel_లోపల_blocking_wait())
+	may_కూడు_state_char(&ga, include, 'w');
 # endif
-    if (!get_was_safe_state())
-	may_add_state_char(&ga, include, 'S');
-    for (i = 0; i < get_callback_depth() && i < 3; ++i)
-	may_add_state_char(&ga, include, 'c');
-    if (msg_scrolled > 0)
-	may_add_state_char(&ga, include, 's');
+    ఒకవేళ (!get_was_సురక్షిత_state())
+	may_కూడు_state_char(&ga, include, 'S');
+    కొరకు (i = 0; i < get_callback_లోతు() && i < 3; ++i)
+	may_కూడు_state_char(&ga, include, 'c');
+    ఒకవేళ (సందేశం_scrolled > 0)
+	may_కూడు_state_char(&ga, include, 's');
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_దత్తాంశం;
 }
 
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
 /*
  * Get a key stroke directly from the user.
@@ -861,31 +861,31 @@ f_state(typval_T *argvars, typval_T *rettv)
  * Disadvantage: typeahead is ignored.
  * Translates the interrupt character for unix to ESC.
  */
-    int
-get_keystroke(void)
+    పూర్ణాంకం
+get_keystroke(శూన్య)
 {
-    char_u	*buf = NULL;
-    int		buflen = 150;
-    int		maxlen;
-    int		len = 0;
-    int		n;
-    int		save_mapped_ctrl_c = mapped_ctrl_c;
-    int		waited = 0;
+    char_u	*buf = ఖాళీ;
+    పూర్ణాంకం		buflen = 150;
+    పూర్ణాంకం		maxlen;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		save_mapped_ctrl_c = mapped_ctrl_c;
+    పూర్ణాంకం		waited = 0;
 
-    mod_mask = 0;
+    mod_ముసుగు = 0;
     mapped_ctrl_c = FALSE;	// mappings are not used here
-    for (;;)
+    కొరకు (;;)
     {
 	cursor_on();
-	out_flush();
+	బహిర్గతం_flush();
 
 	// Leave some room for check_termcode() to insert a key code into (max
 	// 5 chars plus NUL).  And fix_input_buffer() can triple the number of
 	// bytes.
 	maxlen = (buflen - 6 - len) / 3;
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	    buf = alloc(buflen);
-	else if (maxlen < 10)
+	లేకపోతే ఒకవేళ (maxlen < 10)
 	{
 	    char_u  *t_buf = buf;
 
@@ -893,175 +893,175 @@ get_keystroke(void)
 	    // escape sequence.
 	    buflen += 100;
 	    buf = vim_realloc(buf, buflen);
-	    if (buf == NULL)
+	    ఒకవేళ (buf == ఖాళీ)
 		vim_free(t_buf);
 	    maxlen = (buflen - 6 - len) / 3;
 	}
-	if (buf == NULL)
+	ఒకవేళ (buf == ఖాళీ)
 	{
-	    do_outofmem_msg((long_u)buflen);
-	    return ESC;  // panic!
+	    do_outofmem_సందేశం((long_u)buflen);
+	    తిరిగి ESC;  // panic!
 	}
 
 	// First time: blocking wait.  Second time: wait up to 100ms for a
 	// terminal code to complete.
 	n = ui_inchar(buf + len, maxlen, len == 0 ? -1L : 100L, 0);
-	if (n > 0)
+	ఒకవేళ (n > 0)
 	{
 	    // Replace zero and CSI by a special key code.
-	    n = fix_input_buffer(buf + len, n);
+	    n = fix_ఆదానం_బఫరు(buf + len, n);
 	    len += n;
 	    waited = 0;
 	}
-	else if (len > 0)
+	లేకపోతే ఒకవేళ (len > 0)
 	    ++waited;	    // keep track of the waiting time
 
 	// Incomplete termcode and not timed out yet: get more characters
-	if ((n = check_termcode(1, buf, buflen, &len)) < 0
+	ఒకవేళ ((n = check_termcode(1, buf, buflen, &len)) < 0
 	       && (!p_ttimeout || waited * 100L < (p_ttm < 0 ? p_tm : p_ttm)))
-	    continue;
+	    కొనసాగు;
 
-	if (n == KEYLEN_REMOVED)  // key code removed
+	ఒకవేళ (n == KEYLEN_REMOVED)  // key code removed
 	{
-	    if (must_redraw != 0 && !need_wait_return && (State
-			& (MODE_CMDLINE | MODE_HITRETURN | MODE_ASKMORE)) == 0)
+	    ఒకవేళ (must_redraw != 0 && !need_wait_return && (State
+			& (బహుళకం_CMDLINE | బహుళకం_HITRETURN | బహుళకం_ASKMORE)) == 0)
 	    {
 		// Redrawing was postponed, do it now.
 		update_screen(0);
 		setcursor(); // put cursor back where it belongs
 	    }
-	    continue;
+	    కొనసాగు;
 	}
-	if (n > 0)		// found a termcode: adjust length
+	ఒకవేళ (n > 0)		// found a termcode: adjust length
 	    len = n;
-	if (len == 0)		// nothing typed yet
-	    continue;
+	ఒకవేళ (len == 0)		// nothing typed yet
+	    కొనసాగు;
 
 	// Handle modifier and/or special key code.
 	n = buf[0];
-	if (n == K_SPECIAL)
+	ఒకవేళ (n == K_SPECIAL)
 	{
-	    n = TO_SPECIAL(buf[1], buf[2]);
-	    if (buf[1] == KS_MODIFIER
+	    n = గమ్యం_SPECIAL(buf[1], buf[2]);
+	    ఒకవేళ (buf[1] == KS_MODIFIER
 		    || n == K_IGNORE
-		    || (is_mouse_key(n) && n != K_LEFTMOUSE)
-#ifdef FEAT_GUI
+		    || (is_mouse_కీలకం(n) && n != K_LEFTMOUSE)
+#నిర్వచితమైతే FEAT_GUI
 		    || n == K_VER_SCROLLBAR
 		    || n == K_HOR_SCROLLBAR
-#endif
+#అయితే_ముగింపు
 	       )
 	    {
-		if (buf[1] == KS_MODIFIER)
-		    mod_mask = buf[2];
+		ఒకవేళ (buf[1] == KS_MODIFIER)
+		    mod_ముసుగు = buf[2];
 		len -= 3;
-		if (len > 0)
+		ఒకవేళ (len > 0)
 		    mch_memmove(buf, buf + 3, (size_t)len);
-		continue;
+		కొనసాగు;
 	    }
-	    break;
+	    ఆపు;
 	}
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    if (MB_BYTE2LEN(n) > len)
-		continue;	// more bytes to get
+	    ఒకవేళ (MB_BYTE2LEN(n) > len)
+		కొనసాగు;	// more bytes to get
 	    buf[len >= buflen ? buflen - 1 : len] = NUL;
 	    n = (*mb_ptr2char)(buf);
 	}
-#ifdef UNIX
-	if (n == intr_char)
+#నిర్వచితమైతే UNIX
+	ఒకవేళ (n == intr_char)
 	    n = ESC;
-#endif
-	break;
+#అయితే_ముగింపు
+	ఆపు;
     }
     vim_free(buf);
 
     mapped_ctrl_c = save_mapped_ctrl_c;
-    return merge_modifyOtherKeys(n, &mod_mask);
+    తిరిగి విలీనం_modify_Other_కీలకాలు(n, &mod_ముసుగు);
 }
 
 // For overflow detection, add a digit safely to an int value.
-    static int
-vim_append_digit_int(int *value, int digit)
+    స్థిర పూర్ణాంకం
+vim_append_digit_int(పూర్ణాంకం *విలువ, పూర్ణాంకం digit)
 {
-    int x = *value;
-    if (x > ((INT_MAX - digit) / 10))
-	return FAIL;
-    *value = x * 10 + digit;
-    return OK;
+    పూర్ణాంకం x = *విలువ;
+    ఒకవేళ (x > ((గరిష్ఠ_పూర్ణాంకం - digit) / 10))
+	తిరిగి FAIL;
+    *విలువ = x * 10 + digit;
+    తిరిగి OK;
 }
 
 /*
  * Get a number from the user.
  * When "mouse_used" is not NULL allow using the mouse.
  */
-    int
-get_number(
-    int	    colon,			// allow colon to abort
-    int	    *mouse_used)
+    పూర్ణాంకం
+get_సంఖ్య(
+    పూర్ణాంకం	    colon,			// allow colon to abort
+    పూర్ణాంకం	    *mouse_వాడిన)
 {
-    int	n = 0;
-    int	c;
-    int typed = 0;
+    పూర్ణాంకం	n = 0;
+    పూర్ణాంకం	c;
+    పూర్ణాంకం typed = 0;
 
-    if (mouse_used != NULL)
-	*mouse_used = FALSE;
+    ఒకవేళ (mouse_వాడిన != ఖాళీ)
+	*mouse_వాడిన = FALSE;
 
     // When not printing messages, the user won't know what to type, return a
     // zero (as if CR was hit).
-    if (msg_silent != 0)
-	return 0;
+    ఒకవేళ (సందేశం_silent != 0)
+	తిరిగి 0;
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#అయితే_ముగింపు
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
-    for (;;)
+    ++allow_కీలకాలు;		// no mapping here, but recognize keys
+    కొరకు (;;)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col);
-	c = safe_vgetc();
-	if (VIM_ISDIGIT(c))
+	windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
+	c = సురక్షిత_vgetc();
+	ఒకవేళ (VIM_ISDIGIT(c))
 	{
-	    if (vim_append_digit_int(&n, c - '0') == FAIL)
-		return 0;
-	    msg_putchar(c);
+	    ఒకవేళ (vim_append_digit_int(&n, c - '0') == FAIL)
+		తిరిగి 0;
+	    సందేశం_putchar(c);
 	    ++typed;
 	}
-	else if (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
+	లేకపోతే ఒకవేళ (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
 	{
-	    if (typed > 0)
+	    ఒకవేళ (typed > 0)
 	    {
-		msg_puts("\b \b");
+		సందేశం_puts("\b \b");
 		--typed;
 	    }
 	    n /= 10;
 	}
-	else if (mouse_used != NULL && c == K_LEFTMOUSE)
+	లేకపోతే ఒకవేళ (mouse_వాడిన != ఖాళీ && c == K_LEFTMOUSE)
 	{
-	    *mouse_used = TRUE;
-	    n = mouse_row + 1;
-	    break;
+	    *mouse_వాడిన = TRUE;
+	    n = mouse_అడ్డువరుస + 1;
+	    ఆపు;
 	}
-	else if (n == 0 && c == ':' && colon)
+	లేకపోతే ఒకవేళ (n == 0 && c == ':' && colon)
 	{
 	    stuffcharReadbuff(':');
-	    if (!exmode_active)
-		cmdline_row = msg_row;
+	    ఒకవేళ (!exmode_చురుకైన)
+		cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 	    skip_redraw = TRUE;	    // skip redraw once
 	    do_redraw = FALSE;
-	    break;
+	    ఆపు;
 	}
-	else if (c == Ctrl_C || c == ESC || c == 'q')
+	లేకపోతే ఒకవేళ (c == Ctrl_C || c == ESC || c == 'q')
 	{
 	    n = 0;
-	    break;
+	    ఆపు;
 	}
-	else if (c == CAR || c == NL )
-	    break;
+	లేకపోతే ఒకవేళ (c == CAR || c == NL )
+	    ఆపు;
     }
     --no_mapping;
-    --allow_keys;
-    return n;
+    --allow_కీలకాలు;
+    తిరిగి n;
 }
 
 /*
@@ -1069,83 +1069,83 @@ get_number(
  * When "mouse_used" is not NULL allow using the mouse and in that case return
  * the line number.
  */
-    int
-prompt_for_number(int *mouse_used)
+    పూర్ణాంకం
+prompt_for_సంఖ్య(పూర్ణాంకం *mouse_వాడిన)
 {
-    int		i;
-    int		save_cmdline_row;
-    int		save_State;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		save_cmdline_అడ్డువరుస;
+    పూర్ణాంకం		save_State;
 
     // When using ":silent" assume that <CR> was entered.
-    if (mouse_used != NULL)
-	msg_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
-    else
-	msg_puts(_("Type number and <Enter> (q or empty cancels): "));
+    ఒకవేళ (mouse_వాడిన != ఖాళీ)
+	సందేశం_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
+    లేకపోతే
+	సందేశం_puts(_("Type number and <Enter> (q or empty cancels): "));
 
     // Set the state such that text can be selected/copied/pasted and we still
     // get mouse events. redraw_after_callback() will not redraw if cmdline_row
     // is zero.
-    save_cmdline_row = cmdline_row;
-    cmdline_row = 0;
+    save_cmdline_అడ్డువరుస = cmdline_అడ్డువరుస;
+    cmdline_అడ్డువరుస = 0;
     save_State = State;
-    State = MODE_CMDLINE;
+    State = బహుళకం_CMDLINE;
     // May show different mouse shape.
     setmouse();
 
-    i = get_number(TRUE, mouse_used);
-    if (KeyTyped)
+    i = get_సంఖ్య(TRUE, mouse_వాడిన);
+    ఒకవేళ (కీలకం_Typed)
     {
 	// don't call wait_return() now
-	if (msg_row > 0)
-	    cmdline_row = msg_row - 1;
+	ఒకవేళ (సందేశం_అడ్డువరుస > 0)
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస - 1;
 	need_wait_return = FALSE;
-	msg_didany = FALSE;
-	msg_didout = FALSE;
+	సందేశం_didany = FALSE;
+	సందేశం_didout = FALSE;
     }
-    else
-	cmdline_row = save_cmdline_row;
+    లేకపోతే
+	cmdline_అడ్డువరుస = save_cmdline_అడ్డువరుస;
     State = save_State;
     // May need to restore mouse shape.
     setmouse();
 
-    return i;
+    తిరిగి i;
 }
 
-    void
-msgmore(long n)
+    శూన్య
+msgmore(దీర్ఘ n)
 {
-    long pn;
+    దీర్ఘ pn;
 
-    if (global_busy	    // no messages now, wait until global is finished
+    ఒకవేళ (global_busy	    // no messages now, wait until global is finished
 	    || !messaging())  // 'lazyredraw' set, don't do messages now
-	return;
+	తిరిగి;
 
     // We don't want to overwrite another important message, but do overwrite
     // a previous "more lines" or "fewer lines" message, so that "5dd" and
     // then "put" reports the last action.
-    if (keep_msg != NULL && !keep_msg_more)
-	return;
+    ఒకవేళ (keep_సందేశం != ఖాళీ && !keep_సందేశం_మరిన్ని)
+	తిరిగి;
 
-    if (n > 0)
+    ఒకవేళ (n > 0)
 	pn = n;
-    else
+    లేకపోతే
 	pn = -n;
 
-    if (pn > p_report)
+    ఒకవేళ (pn > p_report)
     {
-	if (n > 0)
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	ఒకవేళ (n > 0)
+	    vim_snprintf(సందేశం_buf, సందేశం_BUF_LEN,
 		    NGETTEXT("%ld more line", "%ld more lines", pn), pn);
-	else
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	లేకపోతే
+	    vim_snprintf(సందేశం_buf, సందేశం_BUF_LEN,
 		    NGETTEXT("%ld line less", "%ld fewer lines", pn), pn);
-	if (got_int)
-	    vim_strcat((char_u *)msg_buf, (char_u *)_(" (Interrupted)"),
-								  MSG_BUF_LEN);
-	if (msg(msg_buf))
+	ఒకవేళ (got_int)
+	    vim_strcat((char_u *)సందేశం_buf, (char_u *)_(" (Interrupted)"),
+								  సందేశం_BUF_LEN);
+	ఒకవేళ (సందేశం(సందేశం_buf))
 	{
-	    set_keep_msg((char_u *)msg_buf, 0);
-	    keep_msg_more = TRUE;
+	    సమితి_keep_సందేశం((char_u *)సందేశం_buf, 0);
+	    keep_సందేశం_మరిన్ని = TRUE;
 	}
     }
 }
@@ -1153,12 +1153,12 @@ msgmore(long n)
 /*
  * flush map and typeahead buffers and give a warning for an error
  */
-    void
-beep_flush(void)
+    శూన్య
+beep_flush(శూన్య)
 {
-    if (emsg_silent == 0)
+    ఒకవేళ (emsg_silent == 0)
     {
-	flush_buffers(FLUSH_MINIMAL);
+	flush_buffers(FLUSH_కనీస);
 	vim_beep(BO_ERROR);
     }
 }
@@ -1166,41 +1166,41 @@ beep_flush(void)
 /*
  * Give a warning for an error. "val" is one of the BO_ values, e.g., BO_OPER.
  */
-    void
-vim_beep(unsigned val)
+    శూన్య
+vim_beep(గుర్తులేని val)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     called_vim_beep = TRUE;
-#endif
+#అయితే_ముగింపు
 
-    if (emsg_silent != 0 || in_assert_fails)
-	return;
+    ఒకవేళ (emsg_silent != 0 || లోపల_assert_fails)
+	తిరిగి;
 
-    if (!((bo_flags & val) || (bo_flags & BO_ALL)))
+    ఒకవేళ (!((bo_flags & val) || (bo_flags & BO_ALL)))
     {
-#ifdef ELAPSED_FUNC
-	static int		did_init = FALSE;
-	static elapsed_T	start_tv;
+#నిర్వచితమైతే ELAPSED_FUNC
+	స్థిర పూర్ణాంకం		did_init = FALSE;
+	స్థిర elapsed_T	ప్రారంభం_tv;
 
 	// Only beep once per half a second, otherwise a sequence of beeps
 	// would freeze Vim.
-	if (!did_init || ELAPSED_FUNC(start_tv) > 500)
+	ఒకవేళ (!did_init || ELAPSED_FUNC(ప్రారంభం_tv) > 500)
 	{
 	    did_init = TRUE;
-	    ELAPSED_INIT(start_tv);
-#endif
-	    if (p_vb
-#ifdef FEAT_GUI
+	    ELAPSED_INIT(ప్రారంభం_tv);
+#అయితే_ముగింపు
+	    ఒకవేళ (p_vb
+#నిర్వచితమైతే FEAT_GUI
 		    // While the GUI is starting up the termcap is set for
 		    // the GUI but the output still goes to a terminal.
-		    && !(gui.in_use && gui.starting)
-#endif
+		    && !(gui.లోపల_use && gui.starting)
+#అయితే_ముగింపు
 	       )
 	    {
-		out_str_cf(T_VB);
-#ifdef FEAT_VTP
+		బహిర్గతం_str_cf(T_VB);
+#నిర్వచితమైతే FEAT_VTP
 		// No restore color information, refresh the screen.
-		if (has_vtp_working() != 0
+		ఒకవేళ (has_vtp_working() != 0
 # ifdef FEAT_TERMGUICOLORS
 			&& (p_tgc || (!p_tgc && t_colors >= 256))
 # endif
@@ -1210,22 +1210,22 @@ vim_beep(unsigned val)
 		    update_screen(0);
 		    redrawcmd();
 		}
-#endif
+#అయితే_ముగింపు
 	    }
-	    else
-		out_char(BELL);
-#ifdef ELAPSED_FUNC
+	    లేకపోతే
+		బహిర్గతం_char(BELL);
+#నిర్వచితమైతే ELAPSED_FUNC
 	}
-#endif
+#అయితే_ముగింపు
     }
 
     // When 'debug' contains "beep" produce a message.  If we are sourcing
     // a script or executing a function give the user a hint where the beep
     // comes from.
-    if (vim_strchr(p_debug, 'e') != NULL)
+    ఒకవేళ (vim_strchr(p_debug, 'e') != ఖాళీ)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg_attr(_("Beep!"), HL_ATTR(HLF_W));
+	సందేశం_ఆధారం(HL_ATTR(HLF_W));
+	సందేశం_attr(_("Beep!"), HL_ATTR(HLF_W));
     }
 }
 
@@ -1240,45 +1240,45 @@ vim_beep(unsigned val)
  * For Windows:
  *  This code is duplicated in init_homedir() in dosinst.c.  Keep in sync!
  */
-    void
-init_homedir(void)
+    శూన్య
+init_homedir(శూన్య)
 {
     char_u  *var;
 
     // In case we are called a second time (when 'encoding' changes).
     VIM_CLEAR(homedir);
 
-#ifdef VMS
+#నిర్వచితమైతే VMS
     var = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#లేకపోతే
     var = mch_getenv((char_u *)"HOME");
-#endif
+#అయితే_ముగింపు
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     /*
      * Typically, $HOME is not defined on Windows, unless the user has
      * specifically defined it for Vim's sake.  However, on Windows NT
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    ఒకవేళ (var == ఖాళీ || *var == NUL)
     {
 	char_u *homedrive, *homepath;
 
 	homedrive = mch_getenv((char_u *)"HOMEDRIVE");
 	homepath = mch_getenv((char_u *)"HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	ఒకవేళ (homepath == ఖాళీ || *homepath == NUL)
 	    homepath = (char_u *)"\\";
-	if (homedrive != NULL
+	ఒకవేళ (homedrive != ఖాళీ
 			   && STRLEN(homedrive) + STRLEN(homepath) < MAXPATHL)
 	{
-	    sprintf((char *)NameBuff, "%s%s", homedrive, homepath);
-	    if (NameBuff[0] != NUL)
+	    sprintf((అక్షరం *)NameBuff, "%s%s", homedrive, homepath);
+	    ఒకవేళ (NameBuff[0] != NUL)
 		var = NameBuff;
 	}
     }
 
-    if (var == NULL)
+    ఒకవేళ (var == ఖాళీ)
 	var = mch_getenv((char_u *)"USERPROFILE");
 
     /*
@@ -1286,40 +1286,40 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    ఒకవేళ (var != ఖాళీ && *var == '%')
     {
 	char_u	*p;
-	char_u	*exp;
+	char_u	*ఘాతాంకం;
 
 	p = vim_strchr(var + 1, '%');
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    vim_strncpy(NameBuff, var + 1, p - (var + 1));
-	    exp = mch_getenv(NameBuff);
-	    if (exp != NULL && *exp != NUL
-					&& STRLEN(exp) + STRLEN(p) < MAXPATHL)
+	    ఘాతాంకం = mch_getenv(NameBuff);
+	    ఒకవేళ (ఘాతాంకం != ఖాళీ && *ఘాతాంకం != NUL
+					&& STRLEN(ఘాతాంకం) + STRLEN(p) < MAXPATHL)
 	    {
-		vim_snprintf((char *)NameBuff, MAXPATHL, "%s%s", exp, p + 1);
+		vim_snprintf((అక్షరం *)NameBuff, MAXPATHL, "%s%s", ఘాతాంకం, p + 1);
 		var = NameBuff;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    ఒకవేళ (var != ఖాళీ && *var == NUL)	// empty is same as not set
+	var = ఖాళీ;
 
-    if (enc_utf8 && var != NULL)
+    ఒకవేళ (enc_utf8 && var != ఖాళీ)
     {
-	int	len;
-	char_u  *pp = NULL;
+	పూర్ణాంకం	len;
+	char_u  *pp = ఖాళీ;
 
 	// Convert from active codepage to UTF-8.  Other conversions are
 	// not done, because they would fail for non-ASCII characters.
-	acp_to_enc(var, (int)STRLEN(var), &pp, &len);
-	if (pp != NULL)
+	acp_గమ్యం_enc(var, (పూర్ణాంకం)STRLEN(var), &pp, &len);
+	ఒకవేళ (pp != ఖాళీ)
 	{
 	    homedir = pp;
-	    return;
+	    తిరిగి;
 	}
     }
 
@@ -1327,52 +1327,52 @@ init_homedir(void)
      * Default home dir is C:/
      * Best assumption we can make in such a situation.
      */
-    if (var == NULL)
+    ఒకవేళ (var == ఖాళీ)
 	var = (char_u *)"C:/";
-#endif
+#అయితే_ముగింపు
 
-    if (var != NULL)
+    ఒకవేళ (var != ఖాళీ)
     {
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 	/*
 	 * Change to the directory and get the actual path.  This resolves
 	 * links.  Don't do it when we can't return.
 	 */
-	if (mch_dirname(NameBuff, MAXPATHL) == OK
-					  && mch_chdir((char *)NameBuff) == 0)
+	ఒకవేళ (mch_dirname(NameBuff, MAXPATHL) == OK
+					  && mch_chdir((అక్షరం *)NameBuff) == 0)
 	{
-	    if (!mch_chdir((char *)var) && mch_dirname(IObuff, IOSIZE) == OK)
+	    ఒకవేళ (!mch_chdir((అక్షరం *)var) && mch_dirname(IObuff, IOSIZE) == OK)
 		var = IObuff;
-	    if (mch_chdir((char *)NameBuff) != 0)
-		emsg(_(e_cannot_go_back_to_previous_directory));
+	    ఒకవేళ (mch_chdir((అక్షరం *)NameBuff) != 0)
+		emsg(_(e_cannot_go_వెనుక_గమ్యం_మునుపటి_directory));
 	}
-#endif
+#అయితే_ముగింపు
 	homedir = vim_strsave(var);
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_homedir(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_homedir(శూన్య)
 {
     vim_free(homedir);
 }
 
-    void
-free_users(void)
+    శూన్య
+free_users(శూన్య)
 {
-    ga_clear_strings(&ga_users);
+    ga_clear_అక్షరశ్రేణులు(&ga_users);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(MSWIN)
+#ఒకవేళ defined(MSWIN)
 /*
  * Initialize $VIM and $VIMRUNTIME when 'enc' is updated.
  */
-    void
-init_vimdir(void)
+    శూన్య
+init_vimdir(శూన్య)
 {
-    int	    mustfree;
+    పూర్ణాంకం	    mustfree;
     char_u  *p;
 
     mch_get_exe_name();
@@ -1380,16 +1380,16 @@ init_vimdir(void)
     mustfree = FALSE;
     didset_vim = FALSE;
     p = vim_getenv((char_u *)"VIM", &mustfree);
-    if (mustfree)
+    ఒకవేళ (mustfree)
 	vim_free(p);
 
     mustfree = FALSE;
     didset_vimruntime = FALSE;
     p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-    if (mustfree)
+    ఒకవేళ (mustfree)
 	vim_free(p);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Call expand_env() and store the result in an allocated string.
@@ -1399,7 +1399,7 @@ init_vimdir(void)
     char_u *
 expand_env_save(char_u *src)
 {
-    return expand_env_save_opt(src, FALSE, NULL);
+    తిరిగి expand_env_save_opt(src, FALSE, ఖాళీ);
 }
 
 /*
@@ -1407,14 +1407,14 @@ expand_env_save(char_u *src)
  * expand "~" at the start.
  */
     char_u *
-expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
+expand_env_save_opt(char_u *src, పూర్ణాంకం one, char_u *esc_chars)
 {
     char_u	*p;
 
     p = alloc(MAXPATHL);
-    if (p != NULL)
-	expand_env_esc(src, p, MAXPATHL, esc_chars, one, NULL);
-    return p;
+    ఒకవేళ (p != ఖాళీ)
+	expand_env_esc(src, p, MAXPATHL, esc_chars, one, ఖాళీ);
+    తిరిగి p;
 }
 
 /*
@@ -1427,67 +1427,67 @@ expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
 expand_env(
     char_u	*src,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen)		// maximum length of the result
+    పూర్ణాంకం		dstlen)		// maximum length of the result
 {
-    return expand_env_esc(src, dst, dstlen, NULL, FALSE, NULL);
+    తిరిగి expand_env_esc(src, dst, dstlen, ఖాళీ, FALSE, ఖాళీ);
 }
 
     size_t
 expand_env_esc(
     char_u	*srcp,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen,		// maximum length of the result
+    పూర్ణాంకం		dstlen,		// maximum length of the result
     char_u	*esc_chars,	// chars to escape in expanded vars
-    int		one,		// "srcp" is one file name
+    పూర్ణాంకం		one,		// "srcp" is one file name
     char_u	*startstr)	// start again after this (can be NULL)
 {
     char_u	*src;
-    char_u	*tail;
-    int		c;
+    char_u	*తోక;
+    పూర్ణాంకం		c;
     char_u	*var;
-    int		copy_char;
-    int		mustfree;	// var was allocated, need to free it later
-    int		at_start = TRUE; // at start of a name
-    int		startstr_len = 0;
-    char_u	*dst_start = dst;
+    పూర్ణాంకం		copy_char;
+    పూర్ణాంకం		mustfree;	// var was allocated, need to free it later
+    పూర్ణాంకం		at_ప్రారంభం = TRUE; // at start of a name
+    పూర్ణాంకం		startstr_len = 0;
+    char_u	*dst_ప్రారంభం = dst;
 
-    if (startstr != NULL)
-	startstr_len = (int)STRLEN(startstr);
+    ఒకవేళ (startstr != ఖాళీ)
+	startstr_len = (పూర్ణాంకం)STRLEN(startstr);
 
     src = skipwhite(srcp);
     --dstlen;		    // leave one char space for "\,"
-    while (*src && dstlen > 0)
+    అయితే (*src && dstlen > 0)
     {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// Skip over `=expr`.
-	if (src[0] == '`' && src[1] == '=')
+	ఒకవేళ (src[0] == '`' && src[1] == '=')
 	{
 	    size_t len;
 
 	    var = src;
 	    src += 2;
-	    (void)skip_expr(&src, NULL);
-	    if (*src == '`')
+	    (శూన్య)skip_సమాసం(&src, ఖాళీ);
+	    ఒకవేళ (*src == '`')
 		++src;
 	    len = src - var;
-	    if (len > (size_t)dstlen)
+	    ఒకవేళ (len > (size_t)dstlen)
 		len = dstlen;
 	    vim_strncpy(dst, var, len);
 	    dst += len;
-	    dstlen -= (int)len;
-	    continue;
+	    dstlen -= (పూర్ణాంకం)len;
+	    కొనసాగు;
 	}
-#endif
+#అయితే_ముగింపు
 	copy_char = TRUE;
-	if ((*src == '$'
-#ifdef VMS
-		    && at_start
-#endif
+	ఒకవేళ ((*src == '$'
+#నిర్వచితమైతే VMS
+		    && at_ప్రారంభం
+#అయితే_ముగింపు
 	   )
-#if defined(MSWIN)
+#ఒకవేళ defined(MSWIN)
 		|| *src == '%'
-#endif
-		|| (*src == '~' && at_start))
+#అయితే_ముగింపు
+		|| (*src == '~' && at_ప్రారంభం))
 	{
 	    mustfree = FALSE;
 
@@ -1495,75 +1495,75 @@ expand_env_esc(
 	     * The variable name is copied into dst temporarily, because it may
 	     * be a string in read-only memory and a NUL needs to be appended.
 	     */
-	    if (*src != '~')				// environment var
+	    ఒకవేళ (*src != '~')				// environment var
 	    {
-		tail = src + 1;
+		తోక = src + 1;
 		var = dst;
 		c = dstlen - 1;
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		// Unix has ${var-name} type environment vars
-		if (*tail == '{' && !vim_isIDc('{'))
+		ఒకవేళ (*తోక == '{' && !vim_isIDc('{'))
 		{
-		    tail++;	// ignore '{'
-		    while (c-- > 0 && *tail && *tail != '}')
-			*var++ = *tail++;
+		    తోక++;	// ignore '{'
+		    అయితే (c-- > 0 && *తోక && *తోక != '}')
+			*var++ = *తోక++;
 		}
-		else
-#endif
+		లేకపోతే
+#అయితే_ముగింపు
 		{
-		    while (c-- > 0 && *tail != NUL && ((vim_isIDc(*tail))
-#if defined(MSWIN)
-			    || (*src == '%' && *tail != '%')
-#endif
+		    అయితే (c-- > 0 && *తోక != NUL && ((vim_isIDc(*తోక))
+#ఒకవేళ defined(MSWIN)
+			    || (*src == '%' && *తోక != '%')
+#అయితే_ముగింపు
 			    ))
-			*var++ = *tail++;
+			*var++ = *తోక++;
 		}
 
-#if defined(MSWIN) || defined(UNIX)
+#ఒకవేళ defined(MSWIN) || defined(UNIX)
 # ifdef UNIX
-		if (src[1] == '{' && *tail != '}')
-# else
-		if (*src == '%' && *tail != '%')
+		ఒకవేళ (src[1] == '{' && *తోక != '}')
+# లేకపోతే
+		ఒకవేళ (*src == '%' && *తోక != '%')
 # endif
-		    var = NULL;
-		else
+		    var = ఖాళీ;
+		లేకపోతే
 		{
 # ifdef UNIX
-		    if (src[1] == '{')
-# else
-		    if (*src == '%')
+		    ఒకవేళ (src[1] == '{')
+# లేకపోతే
+		    ఒకవేళ (*src == '%')
 # endif
-			++tail;
-#endif
+			++తోక;
+#అయితే_ముగింపు
 		    *var = NUL;
 		    var = vim_getenv(dst, &mustfree);
-#if defined(MSWIN) || defined(UNIX)
+#ఒకవేళ defined(MSWIN) || defined(UNIX)
 		}
-#endif
+#అయితే_ముగింపు
 	    }
 							// home directory
-	    else if (  src[1] == NUL
+	    లేకపోతే ఒకవేళ (  src[1] == NUL
 		    || vim_ispathsep(src[1])
-		    || vim_strchr((char_u *)" ,\t\n", src[1]) != NULL)
+		    || vim_strchr((char_u *)" ,\t\n", src[1]) != ఖాళీ)
 	    {
 		var = homedir;
-		tail = src + 1;
+		తోక = src + 1;
 	    }
-	    else					// user directory
+	    లేకపోతే					// user directory
 	    {
-#if defined(UNIX) || (defined(VMS) && defined(USER_HOME))
+#ఒకవేళ defined(UNIX) || (defined(VMS) && defined(USER_HOME))
 		/*
 		 * Copy ~user to dst[], so we can put a NUL after it.
 		 */
-		tail = src;
+		తోక = src;
 		var = dst;
 		c = dstlen - 1;
-		while (	   c-- > 0
-			&& *tail
-			&& vim_isfilec(*tail)
-			&& !vim_ispathsep(*tail))
-		    *var++ = *tail++;
+		అయితే (	   c-- > 0
+			&& *తోక
+			&& vim_isfilec(*తోక)
+			&& !vim_ispathsep(*తోక))
+		    *var++ = *తోక++;
 		*var = NUL;
 # ifdef UNIX
 		/*
@@ -1572,28 +1572,28 @@ expand_env_esc(
 		 * expand ~user.  This is slower and may fail if the shell
 		 * does not support ~user (old versions of /bin/sh).
 		 */
-#  if defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
+#  ఒకవేళ defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
 		{
 		    // Note: memory allocated by getpwnam() is never freed.
 		    // Calling endpwent() apparently doesn't help.
-		    struct passwd *pw = (*dst == NUL)
-					? NULL : getpwnam((char *)dst + 1);
+		    నిర్మాణం passwd *pw = (*dst == NUL)
+					? ఖాళీ : getpwnam((అక్షరం *)dst + 1);
 
-		    var = (pw == NULL) ? NULL : (char_u *)pw->pw_dir;
+		    var = (pw == ఖాళీ) ? ఖాళీ : (char_u *)pw->pw_dir;
 		}
-		if (var == NULL)
+		ఒకవేళ (var == ఖాళీ)
 #  endif
 		{
 		    expand_T	xpc;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    var = ExpandOne(&xpc, dst, NULL,
-				WILD_ADD_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
+		    var = ExpandOne(&xpc, dst, ఖాళీ,
+				WILD_కూడు_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
 		    mustfree = TRUE;
 		}
 
-# else	// !UNIX, thus VMS
+# లేకపోతే	// !UNIX, thus VMS
 		/*
 		 * USER_HOME is a comma-separated list of
 		 * directories to search for the user account in.
@@ -1601,194 +1601,194 @@ expand_env_esc(
 		{
 		    char_u	test[MAXPATHL], paths[MAXPATHL];
 		    size_t	testlen;
-		    char_u	*path, *next_path, *ptr;
+		    char_u	*మార్గం, *తదుపరి_మార్గం, *ptr;
 		    stat_T	st;
 
 		    STRCPY(paths, USER_HOME);
-		    next_path = paths;
-		    while (*next_path)
+		    తదుపరి_మార్గం = paths;
+		    అయితే (*తదుపరి_మార్గం)
 		    {
-			for (path = next_path; *next_path && *next_path != ',';
-				next_path++);
-			if (*next_path)
-			    *next_path++ = NUL;
+			కొరకు (మార్గం = తదుపరి_మార్గం; *తదుపరి_మార్గం && *తదుపరి_మార్గం != ',';
+				తదుపరి_మార్గం++);
+			ఒకవేళ (*తదుపరి_మార్గం)
+			    *తదుపరి_మార్గం++ = NUL;
 			testlen = vim_snprintf_safelen(
-			    (char *)test,
-			    sizeof(test),
+			    (అక్షరం *)test,
+			    పరిమాణం(test),
 			    "%s/%s",
-			    path,
+			    మార్గం,
 			    dst + 1);
-			if (mch_stat(test, &st) == 0)
+			ఒకవేళ (mch_stat(test, &st) == 0)
 			{
 			    var = alloc(testlen + 1);
-			    if (var != NULL)
+			    ఒకవేళ (var != ఖాళీ)
 			    {
 				STRCPY(var, test);
 				mustfree = TRUE;
 			    }
-			    break;
+			    ఆపు;
 			}
 		    }
 		}
 # endif // UNIX
-#else
+#లేకపోతే
 		// cannot expand user's home directory, so don't try
-		var = NULL;
-		tail = (char_u *)"";	// for gcc
-#endif // UNIX || VMS
+		var = ఖాళీ;
+		తోక = (char_u *)"";	// for gcc
+#అయితే_ముగింపు // UNIX || VMS
 	    }
 
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 	    // If 'shellslash' is set change backslashes to forward slashes.
 	    // Can't use slash_adjust(), p_ssl may be set temporarily.
-	    if (p_ssl && var != NULL && vim_strchr(var, '\\') != NULL)
+	    ఒకవేళ (p_ssl && var != ఖాళీ && vim_strchr(var, '\\') != ఖాళీ)
 	    {
 		char_u	*p = vim_strsave(var);
 
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    if (mustfree)
+		    ఒకవేళ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		    forward_slash(var);
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 
 	    // If "var" contains any character from "esc_chars", escape it
 	    // with a backslash.  The historical use is escaping spaces so
 	    // that ":e ~/tt" works when $HOME contains a space.
-	    if (esc_chars != NULL && var != NULL
-		    && vim_strpbrk(var, esc_chars) != NULL)
+	    ఒకవేళ (esc_chars != ఖాళీ && var != ఖాళీ
+		    && vim_strpbrk(var, esc_chars) != ఖాళీ)
 	    {
 		char_u	*p = vim_strsave_escaped(var, esc_chars);
 
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    if (mustfree)
+		    ఒకవేళ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		}
 	    }
 
-	    if (var != NULL && *var != NUL)
+	    ఒకవేళ (var != ఖాళీ && *var != NUL)
 	    {
-		c = (int)STRLEN(var);
+		c = (పూర్ణాంకం)STRLEN(var);
 
-		if (c + STRLEN(tail) + 1 < (unsigned)dstlen)
+		ఒకవేళ (c + STRLEN(తోక) + 1 < (గుర్తులేని)dstlen)
 		{
 		    STRCPY(dst, var);
 		    dstlen -= c;
 		    // if var[] ends in a path separator and tail[] starts
 		    // with it, skip a character
-		    if (after_pathsep(dst, dst + c)
-#if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA)
+		    ఒకవేళ (after_pathsep(dst, dst + c)
+#ఒకవేళ defined(BACKSLASH_లోపల_FILENAME) || defined(AMIGA)
 			    && dst[c - 1] != ':'
-#endif
-			    && vim_ispathsep(*tail))
-			++tail;
+#అయితే_ముగింపు
+			    && vim_ispathsep(*తోక))
+			++తోక;
 		    dst += c;
-		    src = tail;
+		    src = తోక;
 		    copy_char = FALSE;
 		}
 	    }
-	    if (mustfree)
+	    ఒకవేళ (mustfree)
 		vim_free(var);
 	}
 
-	if (copy_char)	    // copy at least one char
+	ఒకవేళ (copy_char)	    // copy at least one char
 	{
 	    /*
 	     * Recognize the start of a new name, for '~'.
 	     * Don't do this when "one" is TRUE, to avoid expanding "~" in
 	     * ":edit foo ~ foo".
 	     */
-	    at_start = FALSE;
-	    if (src[0] == '\\' && src[1] != NUL)
+	    at_ప్రారంభం = FALSE;
+	    ఒకవేళ (src[0] == '\\' && src[1] != NUL)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 	    }
-	    else if ((src[0] == ' ' || src[0] == ',') && !one)
-		at_start = TRUE;
-	    if (dstlen > 0)
+	    లేకపోతే ఒకవేళ ((src[0] == ' ' || src[0] == ',') && !one)
+		at_ప్రారంభం = TRUE;
+	    ఒకవేళ (dstlen > 0)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 
-		if (startstr != NULL && src - startstr_len >= srcp
+		ఒకవేళ (startstr != ఖాళీ && src - startstr_len >= srcp
 			&& STRNCMP(src - startstr_len, startstr,
 							    startstr_len) == 0)
-		    at_start = TRUE;
+		    at_ప్రారంభం = TRUE;
 	    }
 	}
 
     }
     *dst = NUL;
 
-    return (size_t)(dst - dst_start);
+    తిరిగి (size_t)(dst - dst_ప్రారంభం);
 }
 
 /*
  * If the string between "p" and "pend" ends in "name/", return "pend" minus
  * the length of "name/".  Otherwise return "pend".
  */
-    static char_u *
-remove_tail(char_u *p, char_u *pend, char_u *name)
+    స్థిర char_u *
+remove_తోక(char_u *p, char_u *pend, char_u *name)
 {
-    int		len = (int)STRLEN(name) + 1;
+    పూర్ణాంకం		len = (పూర్ణాంకం)STRLEN(name) + 1;
     char_u	*newend = pend - len;
 
-    if (newend >= p
+    ఒకవేళ (newend >= p
 	    && fnamencmp(newend, name, len - 1) == 0
 	    && (newend == p || after_pathsep(p, newend)))
-	return newend;
-    return pend;
+	తిరిగి newend;
+    తిరిగి pend;
 }
 
 /*
  * Check if the directory "vimdir/<version>" or "vimdir/runtime" exists.
  * Return NULL if not, return its name in allocated memory otherwise.
  */
-    static char_u *
-vim_version_dir(char_u *vimdir)
+    స్థిర char_u *
+vim_సంస్కరణ_dir(char_u *vimdir)
 {
     string_T	p;
     size_t	vimdir_len;
 
-    if (vimdir == NULL || *vimdir == NUL)
-	return NULL;
+    ఒకవేళ (vimdir == ఖాళీ || *vimdir == NUL)
+	తిరిగి ఖాళీ;
     vimdir_len = STRLEN(vimdir);
     concat_fnames(vimdir, vimdir_len,
-	(char_u *)VIM_VERSION_NODOT, STRLEN_LITERAL(VIM_VERSION_NODOT), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
-	return p.string;
+	(char_u *)VIM_సంస్కరణ_NODOT, STRLEN_LITERAL(VIM_సంస్కరణ_NODOT), TRUE, &p);
+    ఒకవేళ (p.string != ఖాళీ && mch_isdir(p.string))
+	తిరిగి p.string;
     vim_free(p.string);
     concat_fnames(vimdir, vimdir_len,
 	(char_u *)RUNTIME_DIRNAME, STRLEN_LITERAL(RUNTIME_DIRNAME), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
+    ఒకవేళ (p.string != ఖాళీ && mch_isdir(p.string))
     {
 	string_T    fname;
 
-	concat_fnames(p.string, p.length,
+	concat_fnames(p.string, p.నిడివి,
 	    (char_u *)"defaults.vim", STRLEN_LITERAL("defaults.vim"), TRUE, &fname);
 
 	// Check that "defaults.vim" exists in this directory, to avoid picking
 	// up a stray "runtime" directory, it would make many tests fail in
 	// mysterious ways.
-	if (fname.string != NULL)
+	ఒకవేళ (fname.string != ఖాళీ)
 	{
-	    int exists = file_is_readable(fname.string);
+	    పూర్ణాంకం exists = file_is_readable(fname.string);
 
 	    vim_free(fname.string);
-	    if (exists)
-		return p.string;
+	    ఒకవేళ (exists)
+		తిరిగి p.string;
 	}
     }
     vim_free(p.string);
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -1799,105 +1799,105 @@ vim_version_dir(char_u *vimdir)
  * initialized to FALSE by the caller.
  */
     char_u *
-vim_getenv(char_u *name, int *mustfree)
+vim_getenv(char_u *name, పూర్ణాంకం *mustfree)
 {
-    char_u	*p = NULL;
+    char_u	*p = ఖాళీ;
     char_u	*pend;
-    int		vimruntime;
-#ifdef MSWIN
+    పూర్ణాంకం		vimruntime;
+#నిర్వచితమైతే MSWIN
     WCHAR	*wn, *wp;
 
     // use "C:/" when $HOME is not set
-    if (STRCMP(name, "HOME") == 0)
-	return homedir;
+    ఒకవేళ (STRCMP(name, "HOME") == 0)
+	తిరిగి homedir;
 
     // Use Wide function
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NULL;
+    wn = enc_గమ్యం_utf16(name, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     wp = _wgetenv(wn);
     vim_free(wn);
 
-    if (wp != NULL && *wp == NUL)   // empty is the same as not set
-	wp = NULL;
+    ఒకవేళ (wp != ఖాళీ && *wp == NUL)   // empty is the same as not set
+	wp = ఖాళీ;
 
-    if (wp != NULL)
+    ఒకవేళ (wp != ఖాళీ)
     {
-	p = utf16_to_enc(wp, NULL);
-	if (p == NULL)
-	    return NULL;
+	p = utf16_గమ్యం_enc(wp, ఖాళీ);
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
 	*mustfree = TRUE;
-	return p;
+	తిరిగి p;
     }
-#else
+#లేకపోతే
     p = mch_getenv(name);
-    if (p != NULL && *p == NUL)	    // empty is the same as not set
-	p = NULL;
+    ఒకవేళ (p != ఖాళీ && *p == NUL)	    // empty is the same as not set
+	p = ఖాళీ;
 
-    if (p != NULL)
-	return p;
+    ఒకవేళ (p != ఖాళీ)
+	తిరిగి p;
 
 # ifdef __HAIKU__
     // special handling for user settings directory...
-    if (STRCMP(name, "BE_USER_SETTINGS") == 0)
+    ఒకవేళ (STRCMP(name, "BE_USER_SETTINGS") == 0)
     {
-	static char userSettingsPath[MAXPATHL];
+	స్థిర అక్షరం user_Settings_మార్గం[MAXPATHL];
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
-					   userSettingsPath, MAXPATHL) == B_OK)
-	    return (char_u *)userSettingsPath;
-	else
-	    return NULL;
+	ఒకవేళ (కనుగొను_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
+					   user_Settings_మార్గం, MAXPATHL) == B_OK)
+	    తిరిగి (char_u *)user_Settings_మార్గం;
+	లేకపోతే
+	    తిరిగి ఖాళీ;
     }
 # endif
-#endif
+#అయితే_ముగింపు
 
     // handling $VIMRUNTIME and $VIM is below, bail out if it's another name.
     vimruntime = (STRCMP(name, "VIMRUNTIME") == 0);
-    if (!vimruntime && STRCMP(name, "VIM") != 0)
-	return NULL;
+    ఒకవేళ (!vimruntime && STRCMP(name, "VIM") != 0)
+	తిరిగి ఖాళీ;
 
     /*
      * When expanding $VIMRUNTIME fails, try using $VIM/vim<version> or $VIM.
      * Don't do this when default_vimruntime_dir is non-empty.
      */
-    if (vimruntime
-#ifdef HAVE_PATHDEF
+    ఒకవేళ (vimruntime
+#నిర్వచితమైతే HAVE_PATHDEF
 	    && *default_vimruntime_dir == NUL
-#endif
+#అయితే_ముగింపు
        )
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// Use Wide function
 	wp = _wgetenv(L"VIM");
-	if (wp != NULL && *wp == NUL)	    // empty is the same as not set
-	    wp = NULL;
-	if (wp != NULL)
+	ఒకవేళ (wp != ఖాళీ && *wp == NUL)	    // empty is the same as not set
+	    wp = ఖాళీ;
+	ఒకవేళ (wp != ఖాళీ)
 	{
-	    char_u *q = utf16_to_enc(wp, NULL);
-	    if (q != NULL)
+	    char_u *q = utf16_గమ్యం_enc(wp, ఖాళీ);
+	    ఒకవేళ (q != ఖాళీ)
 	    {
-		p = vim_version_dir(q);
+		p = vim_సంస్కరణ_dir(q);
 		*mustfree = TRUE;
-		if (p == NULL)
+		ఒకవేళ (p == ఖాళీ)
 		    p = q;
 	    }
 	}
-#else
+#లేకపోతే
 	p = mch_getenv((char_u *)"VIM");
-	if (p != NULL && *p == NUL)	    // empty is the same as not set
-	    p = NULL;
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ && *p == NUL)	    // empty is the same as not set
+	    p = ఖాళీ;
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    p = vim_version_dir(p);
-	    if (p != NULL)
+	    p = vim_సంస్కరణ_dir(p);
+	    ఒకవేళ (p != ఖాళీ)
 		*mustfree = TRUE;
-	    else
+	    లేకపోతే
 		p = mch_getenv((char_u *)"VIM");
 	}
-#endif
+#అయితే_ముగింపు
     }
 
     /*
@@ -1905,39 +1905,39 @@ vim_getenv(char_u *name, int *mustfree)
      * - the directory name from 'helpfile' (unless it contains '$')
      * - the executable name from argv[0]
      */
-    if (p == NULL)
+    ఒకవేళ (p == ఖాళీ)
     {
-	if (p_hf != NULL && vim_strchr(p_hf, '$') == NULL)
+	ఒకవేళ (p_hf != ఖాళీ && vim_strchr(p_hf, '$') == ఖాళీ)
 	    p = p_hf;
-#ifdef USE_EXE_NAME
+#నిర్వచితమైతే USE_EXE_NAME
 	/*
 	 * Use the name of the executable, obtained from argv[0].
 	 */
-	else
+	లేకపోతే
 	    p = exe_name;
-#endif
-	if (p != NULL)
+#అయితే_ముగింపు
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    // remove the file name
 	    pend = gettail(p);
 
 	    // remove "doc/" from 'helpfile', if present
-	    if (p == p_hf)
-		pend = remove_tail(p, pend, (char_u *)"doc");
+	    ఒకవేళ (p == p_hf)
+		pend = remove_తోక(p, pend, (char_u *)"doc");
 
-#ifdef USE_EXE_NAME
+#నిర్వచితమైతే USE_EXE_NAME
 # ifdef MACOS_X
 	    // remove "MacOS" from exe_name and add "Resources/vim"
-	    if (p == exe_name)
+	    ఒకవేళ (p == exe_name)
 	    {
 		char_u	*pend1;
 		char_u	*pnew;
 
-		pend1 = remove_tail(p, pend, (char_u *)"MacOS");
-		if (pend1 != pend)
+		pend1 = remove_తోక(p, pend, (char_u *)"MacOS");
+		ఒకవేళ (pend1 != pend)
 		{
 		    pnew = alloc(pend1 - p + 15);
-		    if (pnew != NULL)
+		    ఒకవేళ (pnew != ఖాళీ)
 		    {
 			STRNCPY(pnew, p, (pend1 - p));
 			STRCPY(pnew + (pend1 - p), "Resources/vim");
@@ -1948,139 +1948,139 @@ vim_getenv(char_u *name, int *mustfree)
 	    }
 # endif
 	    // remove "src/" from exe_name, if present
-	    if (p == exe_name)
-		pend = remove_tail(p, pend, (char_u *)"src");
-#endif
+	    ఒకవేళ (p == exe_name)
+		pend = remove_తోక(p, pend, (char_u *)"src");
+#అయితే_ముగింపు
 
 	    // for $VIM, remove "runtime/" or "vim54/", if present
-	    if (!vimruntime)
+	    ఒకవేళ (!vimruntime)
 	    {
-		pend = remove_tail(p, pend, (char_u *)RUNTIME_DIRNAME);
-		pend = remove_tail(p, pend, (char_u *)VIM_VERSION_NODOT);
+		pend = remove_తోక(p, pend, (char_u *)RUNTIME_DIRNAME);
+		pend = remove_తోక(p, pend, (char_u *)VIM_సంస్కరణ_NODOT);
 	    }
 
 	    // remove trailing path separator
-	    if (pend > p && after_pathsep(p, pend))
+	    ఒకవేళ (pend > p && after_pathsep(p, pend))
 		--pend;
 
-#ifdef MACOS_X
-	    if (p == exe_name || p == p_hf)
-#endif
+#నిర్వచితమైతే MACOS_X
+	    ఒకవేళ (p == exe_name || p == p_hf)
+#అయితే_ముగింపు
 		// check that the result is a directory name
 		p = vim_strnsave(p, pend - p);
 
-	    if (p != NULL && !mch_isdir(p))
+	    ఒకవేళ (p != ఖాళీ && !mch_isdir(p))
 		VIM_CLEAR(p);
-	    else
+	    లేకపోతే
 	    {
-#ifdef USE_EXE_NAME
+#నిర్వచితమైతే USE_EXE_NAME
 		// may add "/vim54" or "/runtime" if it exists
-		if (vimruntime && (pend = vim_version_dir(p)) != NULL)
+		ఒకవేళ (vimruntime && (pend = vim_సంస్కరణ_dir(p)) != ఖాళీ)
 		{
 		    vim_free(p);
 		    p = pend;
 		}
-#endif
+#అయితే_ముగింపు
 		*mustfree = TRUE;
 	    }
 	}
     }
 
-#ifdef HAVE_PATHDEF
+#నిర్వచితమైతే HAVE_PATHDEF
     // When there is a pathdef.c file we can use default_vim_dir and
     // default_vimruntime_dir
-    if (p == NULL)
+    ఒకవేళ (p == ఖాళీ)
     {
 	// Only use default_vimruntime_dir when it is not empty
-	if (vimruntime && *default_vimruntime_dir != NUL)
+	ఒకవేళ (vimruntime && *default_vimruntime_dir != NUL)
 	{
 	    p = default_vimruntime_dir;
 	    *mustfree = FALSE;
 	}
-	else if (*default_vim_dir != NUL)
+	లేకపోతే ఒకవేళ (*default_vim_dir != NUL)
 	{
-	    if (vimruntime && (p = vim_version_dir(default_vim_dir)) != NULL)
+	    ఒకవేళ (vimruntime && (p = vim_సంస్కరణ_dir(default_vim_dir)) != ఖాళీ)
 		*mustfree = TRUE;
-	    else
+	    లేకపోతే
 	    {
 		p = default_vim_dir;
 		*mustfree = FALSE;
 	    }
 	}
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Set the environment variable, so that the new value can be found fast
      * next time, and others can also use it (e.g. Perl).
      */
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	if (vimruntime)
+	ఒకవేళ (vimruntime)
 	{
 	    vim_setenv((char_u *)"VIMRUNTIME", p);
 	    didset_vimruntime = TRUE;
 	}
-	else
+	లేకపోతే
 	{
 	    vim_setenv((char_u *)"VIM", p);
 	    didset_vim = TRUE;
 	}
     }
-    return p;
+    తిరిగి p;
 }
 
-    void
+    శూన్య
 vim_unsetenv(char_u *var)
 {
-#ifdef HAVE_UNSETENV
-    unsetenv((char *)var);
-#else
+#నిర్వచితమైతే HAVE_UNSETENV
+    unsetenv((అక్షరం *)var);
+#లేకపోతే
     vim_setenv(var, (char_u *)"");
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Removes environment variable "name" and take care of side effects.
  */
-    void
+    శూన్య
 vim_unsetenv_ext(char_u *var)
 {
     vim_unsetenv(var);
 
     // "homedir" is not cleared, keep using the old value until $HOME is set.
-    if (STRICMP(var, "VIM") == 0)
+    ఒకవేళ (STRICMP(var, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (STRICMP(var, "VIMRUNTIME") == 0)
+    లేకపోతే ఒకవేళ (STRICMP(var, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Set environment variable "name" and take care of side effects.
  */
-    void
+    శూన్య
 vim_setenv_ext(char_u *name, char_u *val)
 {
     vim_setenv(name, val);
-    if (STRICMP(name, "HOME") == 0)
+    ఒకవేళ (STRICMP(name, "HOME") == 0)
 	init_homedir();
-    else if (didset_vim && STRICMP(name, "VIM") == 0)
+    లేకపోతే ఒకవేళ (didset_vim && STRICMP(name, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
+    లేకపోతే ఒకవేళ (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Our portable version of setenv.
  */
-    void
+    శూన్య
 vim_setenv(char_u *name, char_u *val)
 {
-#ifdef HAVE_SETENV
-    mch_setenv((char *)name, (char *)val, 1);
-#else
+#నిర్వచితమైతే HAVE_SETENV
+    mch_setenv((అక్షరం *)name, (అక్షరం *)val, 1);
+#లేకపోతే
     char_u	*envbuf;
 
     /*
@@ -2088,28 +2088,28 @@ vim_setenv(char_u *name, char_u *val)
      * valid.  The allocated memory will never be freed.
      */
     envbuf = alloc(STRLEN(name) + STRLEN(val) + 2);
-    if (envbuf != NULL)
+    ఒకవేళ (envbuf != ఖాళీ)
     {
-	sprintf((char *)envbuf, "%s=%s", name, val);
-	putenv((char *)envbuf);
+	sprintf((అక్షరం *)envbuf, "%s=%s", name, val);
+	putenv((అక్షరం *)envbuf);
     }
-#endif
-#ifdef FEAT_GETTEXT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GETTEXT
     /*
      * When setting $VIMRUNTIME adjust the directory to find message
      * translations to $VIMRUNTIME/lang.
      */
-    if (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
+    ఒకవేళ (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
     {
 	char_u	*buf = concat_str(val, (char_u *)"/lang");
 
-	if (buf != NULL)
+	ఒకవేళ (buf != ఖాళీ)
 	{
-	    bindtextdomain(VIMPACKAGE, (char *)buf);
+	    bindtextdomain(VIMPACKAGE, (అక్షరం *)buf);
 	    vim_free(buf);
 	}
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -2117,94 +2117,94 @@ vim_setenv(char_u *name, char_u *val)
  */
     char_u *
 get_env_name(
-    expand_T	*xp UNUSED,
-    int		idx)
+    expand_T	*xp వాడని,
+    పూర్ణాంకం		idx)
 {
-#if defined(AMIGA)
+#ఒకవేళ defined(AMIGA)
     // No environ[] on the Amiga.
-    return NULL;
-#else
+    తిరిగి ఖాళీ;
+#లేకపోతే
 # ifndef __WIN32__
     // Borland C++ 5.2 has this in a header file.
-    extern char		**environ;
+    బాహ్య అక్షరం		**environ;
 # endif
     char_u		*str;
-    int			n;
+    పూర్ణాంకం			n;
 
     str = (char_u *)environ[idx];
-    if (str == NULL)
-	return NULL;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
+    కొరకు (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
     {
-	if (str[n] == '=' || str[n] == NUL)
-	    break;
+	ఒకవేళ (str[n] == '=' || str[n] == NUL)
+	    ఆపు;
 	xp->xp_buf[n] = str[n];
     }
     xp->xp_buf[n] = NUL;
-    return xp->xp_buf;
-#endif
+    తిరిగి xp->xp_buf;
+#అయితే_ముగింపు
 }
 
 /*
  * Add a user name to the list of users in ga_users.
  * Do nothing if user name is NULL or empty.
  */
-    static void
-add_user(char_u *user, int need_copy)
+    స్థిర శూన్య
+కూడు_user(char_u *user, పూర్ణాంకం need_copy)
 {
-    char_u	*user_copy = (user != NULL && need_copy)
+    char_u	*user_copy = (user != ఖాళీ && need_copy)
 						    ? vim_strsave(user) : user;
 
-    if (user_copy == NULL || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
+    ఒకవేళ (user_copy == ఖాళీ || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
     {
-	if (need_copy)
+	ఒకవేళ (need_copy)
 	    vim_free(user_copy);
-	return;
+	తిరిగి;
     }
-    ((char_u **)(ga_users.ga_data))[ga_users.ga_len++] = user_copy;
+    ((char_u **)(ga_users.ga_దత్తాంశం))[ga_users.ga_len++] = user_copy;
 }
 
 /*
  * Find all user names for user completion.
  * Done only once and then cached.
  */
-    static void
-init_users(void)
+    స్థిర శూన్య
+init_users(శూన్య)
 {
-    static int	lazy_init_done = FALSE;
+    స్థిర పూర్ణాంకం	lazy_init_పూర్తి = FALSE;
 
-    if (lazy_init_done)
-	return;
+    ఒకవేళ (lazy_init_పూర్తి)
+	తిరిగి;
 
-    lazy_init_done = TRUE;
-    ga_init2(&ga_users, sizeof(char_u *), 20);
+    lazy_init_పూర్తి = TRUE;
+    ga_init2(&ga_users, పరిమాణం(char_u *), 20);
 
-#if defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
+#ఒకవేళ defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
     {
-	struct passwd*	pw;
+	నిర్మాణం passwd*	pw;
 
 	setpwent();
-	while ((pw = getpwent()) != NULL)
-	    add_user((char_u *)pw->pw_name, TRUE);
+	అయితే ((pw = getpwent()) != ఖాళీ)
+	    కూడు_user((char_u *)pw->pw_name, TRUE);
 	endpwent();
     }
-#elif defined(MSWIN)
+#లేదావేళ defined(MSWIN)
     {
 	DWORD		nusers = 0, ntotal = 0, i;
 	PUSER_INFO_0	uinfo;
 
-	if (NetUserEnum(NULL, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_LENGTH,
-				       &nusers, &ntotal, NULL) == NERR_Success)
+	ఒకవేళ (NetUserEnum(ఖాళీ, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_నిడివి,
+				       &nusers, &ntotal, ఖాళీ) == NERR_Success)
 	{
-	    for (i = 0; i < nusers; i++)
-		add_user(utf16_to_enc(uinfo[i].usri0_name, NULL), FALSE);
+	    కొరకు (i = 0; i < nusers; i++)
+		కూడు_user(utf16_గమ్యం_enc(uinfo[i].usri0_name, ఖాళీ), FALSE);
 
-	    NetApiBufferFree(uinfo);
+	    Net_Api_బఫరు_Free(uinfo);
 	}
     }
-#endif
-#if defined(HAVE_GETPWNAM)
+#అయితే_ముగింపు
+#ఒకవేళ defined(HAVE_GETPWNAM)
     {
 	char_u	*user_env = mch_getenv((char_u *)"USER");
 
@@ -2214,40 +2214,40 @@ init_users(void)
 	// is a valid remote user name using getpwnam() and if it is, add it to
 	// the list of user names.
 
-	if (user_env != NULL && *user_env != NUL)
+	ఒకవేళ (user_env != ఖాళీ && *user_env != NUL)
 	{
-	    int	i;
+	    పూర్ణాంకం	i;
 
-	    for (i = 0; i < ga_users.ga_len; i++)
+	    కొరకు (i = 0; i < ga_users.ga_len; i++)
 	    {
-		char_u	*local_user = ((char_u **)ga_users.ga_data)[i];
+		char_u	*local_user = ((char_u **)ga_users.ga_దత్తాంశం)[i];
 
-		if (STRCMP(local_user, user_env) == 0)
-		    break;
+		ఒకవేళ (STRCMP(local_user, user_env) == 0)
+		    ఆపు;
 	    }
 
-	    if (i == ga_users.ga_len)
+	    ఒకవేళ (i == ga_users.ga_len)
 	    {
-		struct passwd	*pw = getpwnam((char *)user_env);
+		నిర్మాణం passwd	*pw = getpwnam((అక్షరం *)user_env);
 
-		if (pw != NULL)
-		    add_user((char_u *)pw->pw_name, TRUE);
+		ఒకవేళ (pw != ఖాళీ)
+		    కూడు_user((char_u *)pw->pw_name, TRUE);
 	    }
 	}
     }
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Function given to ExpandGeneric() to obtain user names.
  */
     char_u*
-get_users(expand_T *xp UNUSED, int idx)
+get_users(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     init_users();
-    if (idx < ga_users.ga_len)
-	return ((char_u **)ga_users.ga_data)[idx];
-    return NULL;
+    ఒకవేళ (idx < ga_users.ga_len)
+	తిరిగి ((char_u **)ga_users.ga_దత్తాంశం)[idx];
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -2256,48 +2256,48 @@ get_users(expand_T *xp UNUSED, int idx)
  * 1 if name partially matches the beginning of a user name.
  * 2 is name fully matches a user name.
  */
-    int
-match_user(char_u *name)
+    పూర్ణాంకం
+సరిపోలిక_user(char_u *name)
 {
-    int i;
-    int n = (int)STRLEN(name);
-    int result = 0;
+    పూర్ణాంకం i;
+    పూర్ణాంకం n = (పూర్ణాంకం)STRLEN(name);
+    పూర్ణాంకం ఫలితం = 0;
 
     init_users();
-    for (i = 0; i < ga_users.ga_len; i++)
+    కొరకు (i = 0; i < ga_users.ga_len; i++)
     {
-	if (STRCMP(((char_u **)ga_users.ga_data)[i], name) == 0)
-	    return 2; // full match
-	if (STRNCMP(((char_u **)ga_users.ga_data)[i], name, n) == 0)
-	    result = 1; // partial match
+	ఒకవేళ (STRCMP(((char_u **)ga_users.ga_దత్తాంశం)[i], name) == 0)
+	    తిరిగి 2; // full match
+	ఒకవేళ (STRNCMP(((char_u **)ga_users.ga_దత్తాంశం)[i], name, n) == 0)
+	    ఫలితం = 1; // partial match
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
-    static void
-prepare_to_exit(void)
+    స్థిర శూన్య
+prepare_గమ్యం_exit(శూన్య)
 {
-#if defined(SIGHUP) && defined(SIG_IGN)
+#ఒకవేళ defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
     mch_signal(SIGHUP, SIG_IGN);
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
 	gui.dying = true;
-	out_trash();	// trash any pending output
+	బహిర్గతం_trash();	// trash any pending output
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	windgoto((int)Rows - 1, cmdline_col_off);
+	windgoto((పూర్ణాంకం)అడ్డువరుసలు - 1, cmdline_నిలువు_off);
 
 	// When "full_screen" was reset, e.g. by deathtrap(), settmode() below
 	// returns without switching the mouse off, so do it here.
-	if (!full_screen)
+	ఒకవేళ (!నిండిన_screen)
 	    mch_setmouse(FALSE);
 
 	/*
@@ -2306,7 +2306,7 @@ prepare_to_exit(void)
 	 */
 	settmode(TMODE_COOK);
 	stoptermcap();
-	out_flush();
+	బహిర్గతం_flush();
     }
 }
 
@@ -2316,38 +2316,38 @@ prepare_to_exit(void)
  * NOTE: This may be called from deathtrap() in a signal handler, avoid unsafe
  * functions, such as allocating memory.
  */
-    void
-preserve_exit(void)
+    శూన్య
+preserve_exit(శూన్య)
 {
     buf_T	*buf;
 
-    prepare_to_exit();
+    prepare_గమ్యం_exit();
 
     // Setting this will prevent free() calls.  That avoids calling free()
     // recursively when free() was invoked with a bad pointer.
     really_exiting = TRUE;
 
-    out_str(IObuff);
-    screen_start();		    // don't know where cursor is now
-    out_flush();
+    బహిర్గతం_str(IObuff);
+    screen_ప్రారంభం();		    // don't know where cursor is now
+    బహిర్గతం_flush();
 
     ml_close_notmod();		    // close all not-modified buffers
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp != NULL && buf->b_ml.ml_mfp->mf_fname != NULL)
+	ఒకవేళ (buf->b_ml.ml_mfp != ఖాళీ && buf->b_ml.ml_mfp->mf_fname != ఖాళీ)
 	{
-	    OUT_STR("Vim: preserving files...\r\n");
-	    screen_start();	    // don't know where cursor is now
-	    out_flush();
+	    బహిర్గతం_STR("Vim: preserving files...\r\n");
+	    screen_ప్రారంభం();	    // don't know where cursor is now
+	    బహిర్గతం_flush();
 	    ml_sync_all(FALSE, FALSE);	// preserve all swap files
-	    break;
+	    ఆపు;
 	}
     }
 
     ml_close_all(FALSE);	    // close all memfiles, without deleting
 
-    OUT_STR("Vim: Finished.\r\n");
+    బహిర్గతం_STR("Vim: Finished.\r\n");
 
     getout(1);
 }
@@ -2359,18 +2359,18 @@ preserve_exit(void)
  * time, because it can be a system call.
  */
 
-#ifndef BREAKCHECK_SKIP
+#నిర్వచితం_కాకపోతే BREAKCHECK_SKIP
 # define BREAKCHECK_SKIP 1000
-#endif
+#అయితే_ముగింపు
 
-static int	breakcheck_count = 0;
+స్థిర పూర్ణాంకం	breakcheck_లెక్క = 0;
 
-    void
-line_breakcheck(void)
+    శూన్య
+పంక్తి_breakcheck(శూన్య)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP)
+    ఒకవేళ (++breakcheck_లెక్క >= BREAKCHECK_SKIP)
     {
-	breakcheck_count = 0;
+	breakcheck_లెక్క = 0;
 	ui_breakcheck();
     }
 }
@@ -2378,32 +2378,32 @@ line_breakcheck(void)
 /*
  * Like line_breakcheck() but check 10 times less often.
  */
-    void
-fast_breakcheck(void)
+    శూన్య
+fast_breakcheck(శూన్య)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 10)
+    ఒకవేళ (++breakcheck_లెక్క >= BREAKCHECK_SKIP * 10)
     {
-	breakcheck_count = 0;
+	breakcheck_లెక్క = 0;
 	ui_breakcheck();
     }
 }
 
-#if defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_SPELL)
 /*
  * Like line_breakcheck() but check 100 times less often.
  */
-    void
-veryfast_breakcheck(void)
+    శూన్య
+veryfast_breakcheck(శూన్య)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 100)
+    ఒకవేళ (++breakcheck_లెక్క >= BREAKCHECK_SKIP * 100)
     {
-	breakcheck_count = 0;
+	breakcheck_లెక్క = 0;
 	ui_breakcheck();
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#ఒకవేళ defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 
 # ifndef SEEK_SET
 #  define SEEK_SET 0
@@ -2422,31 +2422,31 @@ veryfast_breakcheck(void)
 get_cmd_output(
     char_u	*cmd,
     char_u	*infile,	// optional input file name
-    int		flags,		// can be SHELL_SILENT
-    int		*ret_len)
+    పూర్ణాంకం		flags,		// can be SHELL_SILENT
+    పూర్ణాంకం		*ret_len)
 {
     char_u	*tempname;
     char_u	*command;
-    char_u	*buffer = NULL;
-    int		len;
-    int		i = 0;
+    char_u	*బఫరు = ఖాళీ;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i = 0;
     FILE	*fd;
 
-    if (check_restricted() || check_secure())
-	return NULL;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి ఖాళీ;
 
     // Keep the file reserved until the shell opens it.  On MS-Windows,
     // deleting it here would let another Vim process reuse the same name.
-    if ((tempname = vim_tempname('o', TRUE)) == NULL)
+    ఒకవేళ ((tempname = vim_tempname('o', TRUE)) == ఖాళీ)
     {
-	emsg(_(e_cant_get_temp_file_name));
-	return NULL;
+	emsg(_(e_cant_get_తాత్కాలిక_file_name));
+	తిరిగి ఖాళీ;
     }
 
     // Add the redirection stuff
     command = make_filter_cmd(cmd, infile, tempname);
-    if (command == NULL)
-	goto done;
+    ఒకవేళ (command == ఖాళీ)
+	వెళ్ళు పూర్తి;
 
     /*
      * Call the shell to execute the command (errors are ignored).
@@ -2463,195 +2463,195 @@ get_cmd_output(
      */
 # ifdef VMS
     // created temporary file is not always readable as binary
-    fd = mch_fopen((char *)tempname, "r");
-# else
-    fd = mch_fopen((char *)tempname, READBIN);
+    fd = mch_fopen((అక్షరం *)tempname, "r");
+# లేకపోతే
+    fd = mch_fopen((అక్షరం *)tempname, READBIN);
 # endif
 
     // Not being able to seek means we can't read the file.
-    if (fd == NULL
+    ఒకవేళ (fd == ఖాళీ
 	    || fseek(fd, 0L, SEEK_END) == -1
 	    || (len = ftell(fd)) == -1		// get size of temp file
 	    || fseek(fd, 0L, SEEK_SET) == -1)	// back to the start
     {
 	semsg(_(e_cannot_read_from_str_2), tempname);
-	if (fd != NULL)
+	ఒకవేళ (fd != ఖాళీ)
 	    fclose(fd);
-	goto done;
+	వెళ్ళు పూర్తి;
     }
 
-    buffer = alloc(len + 1);
-    if (buffer != NULL)
-	i = (int)fread((char *)buffer, (size_t)1, (size_t)len, fd);
+    బఫరు = alloc(len + 1);
+    ఒకవేళ (బఫరు != ఖాళీ)
+	i = (పూర్ణాంకం)fread((అక్షరం *)బఫరు, (size_t)1, (size_t)len, fd);
     fclose(fd);
-    if (buffer == NULL)
-	goto done;
+    ఒకవేళ (బఫరు == ఖాళీ)
+	వెళ్ళు పూర్తి;
 # ifdef VMS
     len = i;	// VMS doesn't give us what we asked for...
 # endif
-    if (i != len)
+    ఒకవేళ (i != len)
     {
 	semsg(_(e_cant_read_file_str), tempname);
-	VIM_CLEAR(buffer);
+	VIM_CLEAR(బఫరు);
     }
-    else if (ret_len == NULL)
+    లేకపోతే ఒకవేళ (ret_len == ఖాళీ)
     {
 	// Change NUL into SOH, otherwise the string is truncated.
-	for (i = 0; i < len; ++i)
-	    if (buffer[i] == NUL)
-		buffer[i] = 1;
+	కొరకు (i = 0; i < len; ++i)
+	    ఒకవేళ (బఫరు[i] == NUL)
+		బఫరు[i] = 1;
 
-	buffer[len] = NUL;	// make sure the buffer is terminated
+	బఫరు[len] = NUL;	// make sure the buffer is terminated
     }
-    else
+    లేకపోతే
 	*ret_len = len;
 
-done:
+పూర్తి:
     mch_remove(tempname);
     vim_free(tempname);
-    return buffer;
+    తిరిగి బఫరు;
 }
 
-# if defined(FEAT_EVAL)
+# ఒకవేళ defined(FEAT_EVAL)
 
-    static void
+    స్థిర శూన్య
 get_cmd_output_as_rettv(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		retlist)
+    పూర్ణాంకం		retlist)
 {
-    char_u	*res = NULL;
+    char_u	*res = ఖాళీ;
     char_u	*p;
-    char_u	*infile = NULL;
-    int		err = FALSE;
+    char_u	*infile = ఖాళీ;
+    పూర్ణాంకం		err = FALSE;
     FILE	*fd;
-    list_T	*list = NULL;
-    int		flags = SHELL_SILENT;
-    int		use_argv = FALSE;
-    char	**argv = NULL;
-    int		argc = 0;
+    list_T	*list = ఖాళీ;
+    పూర్ణాంకం		flags = SHELL_SILENT;
+    పూర్ణాంకం		use_argv = FALSE;
+    అక్షరం	**argv = ఖాళీ;
+    పూర్ణాంకం		argc = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (check_restricted() || check_secure())
-	goto errret;
+    rettv->vval.v_string = ఖాళీ;
+    ఒకవేళ (check_restricted() || check_secure())
+	వెళ్ళు errret;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_or_list_arg(argvars, 1)
+		|| check_for_opt_string_or_సంఖ్య_or_list_arg(argvars, 1)
 								      == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	/*
 	 * Write the text to a temp file, to be used for input of the shell
 	 * command.
 	 */
-	if ((infile = vim_tempname('i', TRUE)) == NULL)
+	ఒకవేళ ((infile = vim_tempname('i', TRUE)) == ఖాళీ)
 	{
-	    emsg(_(e_cant_get_temp_file_name));
-	    goto errret;
+	    emsg(_(e_cant_get_తాత్కాలిక_file_name));
+	    వెళ్ళు errret;
 	}
 
-	fd = mch_fopen((char *)infile, WRITEBIN);
-	if (fd == NULL)
+	fd = mch_fopen((అక్షరం *)infile, WRITEBIN);
+	ఒకవేళ (fd == ఖాళీ)
 	{
 	    semsg(_(e_cant_open_file_str), infile);
-	    goto errret;
+	    వెళ్ళు errret;
 	}
-	if (argvars[1].v_type == VAR_NUMBER)
+	ఒకవేళ (argvars[1].v_type == VAR_సంఖ్య)
 	{
 	    linenr_T	lnum;
 	    buf_T	*buf;
 
-	    buf = buflist_findnr(argvars[1].vval.v_number);
-	    if (buf == NULL)
+	    buf = buflist_findnr(argvars[1].vval.v_సంఖ్య);
+	    ఒకవేళ (buf == ఖాళీ)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_number);
+		semsg(_(e_బఫరు_nr_does_not_exist), argvars[1].vval.v_సంఖ్య);
 		fclose(fd);
-		goto errret;
+		వెళ్ళు errret;
 	    }
 
-	    for (lnum = 1; lnum <= buf->b_ml.ml_line_count; lnum++)
+	    కొరకు (lnum = 1; lnum <= buf->b_ml.ml_పంక్తి_లెక్క; lnum++)
 	    {
-		for (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
-		    if (putc(*p == '\n' ? NUL : *p, fd) == EOF)
+		కొరకు (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
+		    ఒకవేళ (putc(*p == '\n' ? NUL : *p, fd) == EOF)
 		    {
 			err = TRUE;
-			break;
+			ఆపు;
 		    }
-		if (putc(NL, fd) == EOF)
+		ఒకవేళ (putc(NL, fd) == EOF)
 		{
 		    err = TRUE;
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	లేకపోతే ఒకవేళ (argvars[1].v_type == VAR_LIST)
 	{
-	    if (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
+	    ఒకవేళ (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
 		err = TRUE;
 	}
-	else
+	లేకపోతే
 	{
 	    size_t	len;
 	    char_u	buf[NUMBUFLEN];
 
 	    p = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (p == NULL)
+	    ఒకవేళ (p == ఖాళీ)
 	    {
 		fclose(fd);
-		goto errret;		// type error; errmsg already given
+		వెళ్ళు errret;		// type error; errmsg already given
 	    }
 	    len = STRLEN(p);
-	    if (len > 0 && fwrite(p, len, 1, fd) != 1)
+	    ఒకవేళ (len > 0 && fwrite(p, len, 1, fd) != 1)
 		err = TRUE;
 	}
-	if (fclose(fd) != 0)
+	ఒకవేళ (fclose(fd) != 0)
 	    err = TRUE;
-	if (err)
+	ఒకవేళ (err)
 	{
-	    emsg(_(e_error_writing_temp_file));
-	    goto errret;
+	    emsg(_(e_error_writing_తాత్కాలిక_file));
+	    వెళ్ళు errret;
 	}
     }
 
     // When the command is a List, execute directly without the shell.
-    if (argvars[0].v_type == VAR_LIST)
+    ఒకవేళ (argvars[0].v_type == VAR_LIST)
     {
 	list_T	*l = argvars[0].vval.v_list;
 
-	if (l == NULL || l->lv_len < 1)
+	ఒకవేళ (l == ఖాళీ || l->lv_len < 1)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_వాదం));
+	    వెళ్ళు errret;
 	}
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
-	    goto errret;
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	ఒకవేళ (build_argv_from_list(l, &argv, &argc) == FAIL)
+	    వెళ్ళు errret;
+	ఒకవేళ (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_వాదం));
+	    వెళ్ళు errret;
 	}
 	use_argv = TRUE;
 
-	if (p_verbose > 3)
+	ఒకవేళ (p_verbose > 3)
 	{
-	    int		i;
+	    పూర్ణాంకం		i;
 	    garray_T	ga;
 
 	    verbose_enter();
 	    ga_init2(&ga, 1, 200);
-	    for (i = 0; i < argc; ++i)
+	    కొరకు (i = 0; i < argc; ++i)
 	    {
-		if (i > 0)
+		ఒకవేళ (i > 0)
 		    ga_append(&ga, ' ');
 		ga_concat(&ga, (char_u *)argv[i]);
 	    }
 	    ga_append(&ga, NUL);
-	    smsg(_("Executing directly: \"%s\""), (char *)ga.ga_data);
-	    msg_putchar_attr('\n', 0);
+	    smsg(_("Executing directly: \"%s\""), (అక్షరం *)ga.ga_దత్తాంశం);
+	    సందేశం_putchar_attr('\n', 0);
 	    cursor_on();
 	    verbose_leave();
 	    ga_clear(&ga);
@@ -2660,75 +2660,75 @@ get_cmd_output_as_rettv(
 
     // Omit SHELL_COOKED when invoked with ":silent".  Avoids that the shell
     // echoes typeahead, that messes up the display.
-    if (!msg_silent)
+    ఒకవేళ (!సందేశం_silent)
 	flags += SHELL_COOKED;
 
-    if (retlist)
+    ఒకవేళ (retlist)
     {
-	int		len;
+	పూర్ణాంకం		len;
 	listitem_T	*li;
-	char_u		*s = NULL;
-	char_u		*start;
-	char_u		*end;
-	int		i;
+	char_u		*s = ఖాళీ;
+	char_u		*ప్రారంభం;
+	char_u		*చివర;
+	పూర్ణాంకం		i;
 
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, &len);
-	else
+	ఒకవేళ (use_argv)
+	    res = mch_get_cmd_output_ప్రత్యక్ష(argv, infile, flags, &len);
+	లేకపోతే
 	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, &len);
-	if (res == NULL)
-	    goto errret;
+	ఒకవేళ (res == ఖాళీ)
+	    వెళ్ళు errret;
 
 	list = list_alloc();
-	if (list == NULL)
-	    goto errret;
+	ఒకవేళ (list == ఖాళీ)
+	    వెళ్ళు errret;
 
-	for (i = 0; i < len; ++i)
+	కొరకు (i = 0; i < len; ++i)
 	{
-	    start = res + i;
-	    while (i < len && res[i] != NL)
+	    ప్రారంభం = res + i;
+	    అయితే (i < len && res[i] != NL)
 		++i;
-	    end = res + i;
+	    చివర = res + i;
 
-	    s = alloc(end - start + 1);
-	    if (s == NULL)
-		goto errret;
+	    s = alloc(చివర - ప్రారంభం + 1);
+	    ఒకవేళ (s == ఖాళీ)
+		వెళ్ళు errret;
 
-	    for (p = s; start < end; ++p, ++start)
-		*p = *start == NUL ? NL : *start;
+	    కొరకు (p = s; ప్రారంభం < చివర; ++p, ++ప్రారంభం)
+		*p = *ప్రారంభం == NUL ? NL : *ప్రారంభం;
 	    *p = NUL;
 
 	    li = listitem_alloc();
-	    if (li == NULL)
+	    ఒకవేళ (li == ఖాళీ)
 	    {
 		vim_free(s);
-		goto errret;
+		వెళ్ళు errret;
 	    }
 	    li->li_tv.v_type = VAR_STRING;
-	    li->li_tv.v_lock = 0;
+	    li->li_tv.v_తాళం = 0;
 	    li->li_tv.vval.v_string = s;
 	    list_append(list, li);
 	}
 
-	rettv_list_set(rettv, list);
-	list = NULL;
+	rettv_list_సమితి(rettv, list);
+	list = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, NULL);
-	else
-	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, NULL);
+	ఒకవేళ (use_argv)
+	    res = mch_get_cmd_output_ప్రత్యక్ష(argv, infile, flags, ఖాళీ);
+	లేకపోతే
+	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, ఖాళీ);
 #  ifdef USE_CRNL
 	// translate <CR><NL> into <NL>
-	if (res != NULL)
+	ఒకవేళ (res != ఖాళీ)
 	{
 	    char_u	*s, *d;
 
 	    d = res;
-	    for (s = res; *s; ++s)
+	    కొరకు (s = res; *s; ++s)
 	    {
-		if (s[0] == CAR && s[1] == NL)
+		ఒకవేళ (s[0] == CAR && s[1] == NL)
 		    ++s;
 		*d++ = *s;
 	    }
@@ -2736,32 +2736,32 @@ get_cmd_output_as_rettv(
 	}
 #  endif
 	rettv->vval.v_string = res;
-	res = NULL;
+	res = ఖాళీ;
     }
 
 errret:
-    if (argv != NULL)
+    ఒకవేళ (argv != ఖాళీ)
     {
-	int i;
-	for (i = 0; argv[i] != NULL; i++)
+	పూర్ణాంకం i;
+	కొరకు (i = 0; argv[i] != ఖాళీ; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
-    if (infile != NULL)
+    ఒకవేళ (infile != ఖాళీ)
     {
 	mch_remove(infile);
 	vim_free(infile);
     }
-    if (res != NULL)
+    ఒకవేళ (res != ఖాళీ)
 	vim_free(res);
-    if (list != NULL)
+    ఒకవేళ (list != ఖాళీ)
 	list_free(list);
 }
 
 /*
  * "system()" function
  */
-    void
+    శూన్య
 f_system(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, FALSE);
@@ -2770,24 +2770,24 @@ f_system(typval_T *argvars, typval_T *rettv)
 /*
  * "systemlist()" function
  */
-    void
+    శూన్య
 f_systemlist(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, TRUE);
 }
 # endif // FEAT_EVAL
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE when need to go to Insert mode because of 'insertmode'.
  * Don't do this when still processing a command or a mapping.
  * Don't do this when inside a ":normal" command.
  */
-    int
-goto_im(void)
+    పూర్ణాంకం
+goto_im(శూన్య)
 {
-    return (p_im && stuff_empty() && typebuf_typed());
+    తిరిగి (p_im && stuff_ఖాళీలు() && typebuf_typed());
 }
 
 /*
@@ -2800,33 +2800,33 @@ goto_im(void)
  * Returns NULL when out of memory.
  */
     char_u *
-get_isolated_shell_name(void)
+get_isolated_shell_name(శూన్య)
 {
     char_u *p;
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     p = gettail(p_sh);
     p = vim_strnsave(p, skiptowhite(p) - p);
-#else
+#లేకపోతే
     p = skiptowhite(p_sh);
-    if (*p == NUL)
+    ఒకవేళ (*p == NUL)
     {
 	// No white space, use the tail.
 	p = vim_strsave(gettail(p_sh));
     }
-    else
+    లేకపోతే
     {
 	char_u  *p1, *p2;
 
 	// Find the last path separator before the space.
 	p1 = p_sh;
-	for (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
-	    if (vim_ispathsep(*p2))
+	కొరకు (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
+	    ఒకవేళ (vim_ispathsep(*p2))
 		p1 = p2 + 1;
 	p = vim_strnsave(p1, p - p1);
     }
-#endif
-    return p;
+#అయితే_ముగింపు
+    తిరిగి p;
 }
 
 /*
@@ -2834,14 +2834,14 @@ get_isolated_shell_name(void)
  * Also check for ":\\", which MS Internet Explorer accepts, return
  * URL_BACKSLASH.
  */
-    int
-path_is_url(char_u *p)
+    పూర్ణాంకం
+మార్గం_is_url(char_u *p)
 {
-    if (STRNCMP(p, "://", (size_t)3) == 0)
-	return URL_SLASH;
-    else if (STRNCMP(p, ":\\\\", (size_t)3) == 0)
-	return URL_BACKSLASH;
-    return 0;
+    ఒకవేళ (STRNCMP(p, "://", (size_t)3) == 0)
+	తిరిగి URL_SLASH;
+    లేకపోతే ఒకవేళ (STRNCMP(p, ":\\\\", (size_t)3) == 0)
+	తిరిగి URL_BACKSLASH;
+    తిరిగి 0;
 }
 
 /*
@@ -2849,8 +2849,8 @@ path_is_url(char_u *p)
  * Return URL_SLASH for "name://", URL_BACKSLASH for "name:\\".
  * Return zero otherwise.
  */
-    int
-path_with_url(char_u *fname)
+    పూర్ణాంకం
+మార్గం_with_url(char_u *fname)
 {
     char_u *p;
 
@@ -2859,22 +2859,22 @@ path_with_url(char_u *fname)
     // non-URL text.
 
     // first character must be alpha
-    if (!ASCII_ISALPHA(*fname))
-	return 0;
+    ఒకవేళ (!ASCII_ISALPHA(*fname))
+	తిరిగి 0;
 
     // check body: alpha or dash
-    for (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
+    కొరకు (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
 	;
 
     // check last char is not a dash
-    if (p[-1] == '-')
-	return 0;
+    ఒకవేళ (p[-1] == '-')
+	తిరిగి 0;
 
     // "://" or ":\\" must follow
-    return path_is_url(p);
+    తిరిగి మార్గం_is_url(p);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return the dictionary of v:event.
  * Save and clear the value in case it already has items.
@@ -2884,80 +2884,80 @@ get_v_event(save_v_event_T *sve)
 {
     dict_T	*v_event = get_vim_var_dict(VV_EVENT);
 
-    if (v_event->dv_hashtab.ht_used > 0)
+    ఒకవేళ (v_event->dv_hashtab.ht_వాడిన > 0)
     {
 	// recursive use of v:event, save, make empty and restore later
 	sve->sve_did_save = TRUE;
 	sve->sve_hashtab = v_event->dv_hashtab;
 	hash_init(&v_event->dv_hashtab);
     }
-    else
+    లేకపోతే
 	sve->sve_did_save = FALSE;
-    return v_event;
+    తిరిగి v_event;
 }
 
-    void
+    శూన్య
 restore_v_event(dict_T *v_event, save_v_event_T *sve)
 {
     dict_free_contents(v_event);
-    if (sve->sve_did_save)
+    ఒకవేళ (sve->sve_did_save)
 	v_event->dv_hashtab = sve->sve_hashtab;
-    else
+    లేకపోతే
 	hash_init(&v_event->dv_hashtab);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Fires a ModeChanged autocmd event if appropriate.
  */
-    void
-may_trigger_modechanged(void)
+    శూన్య
+may_trigger_modechanged(శూన్య)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     dict_T	    *v_event;
     save_v_event_T  save_v_event;
-    char_u	    curr_mode[MODE_MAX_LENGTH];
-    char_u	    pattern_buf[2 * MODE_MAX_LENGTH];
+    char_u	    curr_బహుళకం[బహుళకం_MAX_నిడివి];
+    char_u	    నమూనా_buf[2 * బహుళకం_MAX_నిడివి];
 
     // Skip this when got_int is set, the autocommand will not be executed.
     // Better trigger it next time.
-    if (!has_modechanged() || got_int)
-	return;
+    ఒకవేళ (!has_modechanged() || got_int)
+	తిరిగి;
 
-    get_mode(curr_mode);
-    if (STRCMP(curr_mode, last_mode) == 0)
-	return;
+    get_బహుళకం(curr_బహుళకం);
+    ఒకవేళ (STRCMP(curr_బహుళకం, చివరి_బహుళకం) == 0)
+	తిరిగి;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "new_mode", curr_mode);
-    (void)dict_add_string(v_event, "old_mode", last_mode);
-    dict_set_items_ro(v_event);
+    (శూన్య)dict_కూడు_string(v_event, "new_mode", curr_బహుళకం);
+    (శూన్య)dict_కూడు_string(v_event, "old_mode", చివరి_బహుళకం);
+    dict_సమితి_వస్తువులు_ro(v_event);
 
     // concatenate modes in format "old_mode:new_mode"
-    vim_snprintf((char *)pattern_buf, sizeof(pattern_buf), "%s:%s", last_mode,
-	    curr_mode);
+    vim_snprintf((అక్షరం *)నమూనా_buf, పరిమాణం(నమూనా_buf), "%s:%s", చివరి_బహుళకం,
+	    curr_బహుళకం);
 
-    apply_autocmds(EVENT_MODECHANGED, pattern_buf, NULL, FALSE, curbuf);
-    STRCPY(last_mode, curr_mode);
+    apply_autocmds(EVENT_MODECHANGED, నమూనా_buf, ఖాళీ, FALSE, curbuf);
+    STRCPY(చివరి_బహుళకం, curr_బహుళకం);
 
     restore_v_event(v_event, &save_v_event);
-#endif
+#అయితే_ముగింపు
 }
 
 // For overflow detection, add a digit safely to a long value.
-    int
-vim_append_digit_long(long *value, int digit)
+    పూర్ణాంకం
+vim_append_digit_long(దీర్ఘ *విలువ, పూర్ణాంకం digit)
 {
-    long x = *value;
-    if (x > ((LONG_MAX - (long)digit) / 10))
-	return FAIL;
-    *value = x * 10 + (long)digit;
-    return OK;
+    దీర్ఘ x = *విలువ;
+    ఒకవేళ (x > ((LONG_MAX - (దీర్ఘ)digit) / 10))
+	తిరిగి FAIL;
+    *విలువ = x * 10 + (దీర్ఘ)digit;
+    తిరిగి OK;
 }
 
 // Return something that fits into an int.
-    int
-trim_to_int(vimlong_T x)
+    పూర్ణాంకం
+trim_గమ్యం_int(vimlong_T x)
 {
-    return x > INT_MAX ? INT_MAX : x < INT_MIN ? INT_MIN : x;
+    తిరిగి x > గరిష్ఠ_పూర్ణాంకం ? గరిష్ఠ_పూర్ణాంకం : x < INT_MIN ? INT_MIN : x;
 }

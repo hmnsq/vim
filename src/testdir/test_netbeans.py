@@ -5,42 +5,42 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import socket
-import sys
-import time
-import threading
-import re
+తః __future__ దిగుమతి print_function
+దిగుమతి socket
+దిగుమతి sys
+దిగుమతి సమయం
+దిగుమతి threading
+దిగుమతి re
 
-try:
+ప్రయత్నించు:
     # Python 3
-    import socketserver
-except ImportError:
+    దిగుమతి socketserver
+మినహాయింపు ImportError:
     # Python 2
-    import SocketServer as socketserver
+    దిగుమతి SocketServer ఇవ socketserver
 
-class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+తరగతి ThreadedTCPRequestHandler(socketserver.పునాది_Request_Handler):
 
-    def process_msgs(self, msgbuf):
+    నిర్వచనం process_msgs(self, msgbuf):
         # Process all the received netbeans commands/responses/events from Vim.
         # Each one is separated by a newline character. If a partial command
         # is received, process it later after the rest of it is received.
-        while True:
-            (line, sep, rest) = msgbuf.partition('\n')
-            if sep == '':
+        అయితే నిజం:
+            (పంక్తి, sep, rest) = msgbuf.విభజన('\n')
+            ఒకవేళ sep == '':
                 # received partial line
-                return line
+                తిరిగి పంక్తి
             msgbuf = rest
 
             # Process a command only after receiving a newline.
             response = ''
-            if line.find('Xcmdbuf') > 0:
-                name = line.split('"')[1]
+            ఒకవేళ పంక్తి.కనుగొను('Xcmdbuf') > 0:
+                name = పంక్తి.విభజించు('"')[1]
                 response = '1:putBufferNumber!15 "' + name + '"\n'
                 response += '1:startDocumentListen!16\n'
-            elif re.match('1:insert=.* "\\\\n"', line):
+            లేదావేళ re.సరిపోలిక('1:insert=.* "\\\\n"', పంక్తి):
                 # extract the command from the previous line
-                cmd = re.search('.*"(.*)"', self.prev_line).group(1)
+                cmd = re.శోధన('.*"(.*)"', self.prev_పంక్తి).సమూహం(1)
 
                 # map of test names and the netbeans commands/functions
                 testmap = {
@@ -111,62 +111,62 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                   'nbbufwrite_Test' : '4:editFile!92 "XnbBuffer"\n4:netbeansBuffer!93 T\n',
                   'startAtomic_Test' : '0:startAtomic!94\n',
                   'endAtomic_Test' : '0:endAtomic!95\n',
-                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' for i in range(2, 26)]),
+                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' కొరకు i లో శ్రేణి(2, 26)]),
                   'detach_Test' : '2:close!96\n1:close!97\nDETACH\n',
                   'specialKeys_overflow_Test' : '0:specialKeys!200 "' + 'A'*80 + '-X"\n',
                   'defineAnnoType_injection_Test': '1:defineAnnoType!1 "MySign guifg=red|call writefile([\'inject\'],\'Xinject\')|" "tooltip" "glyphFile" 1 2\n'
                 }
                 # execute the specified test
-                if cmd not in testmap:
-                  print("=== invalid command %s ===" % (cmd))
-                else:
+                ఒకవేళ cmd కాదు లో testmap:
+                  ముద్రించు("=== invalid command %s ===" % (cmd))
+                లేకపోతే:
                   response = testmap[cmd]
-            elif line.find('disconnect') > 0:
+            లేదావేళ పంక్తి.కనుగొను('disconnect') > 0:
                 # we're done
                 self.server.shutdown()
-                return
+                తిరిగి
 
             # save the current line, this is used as the test to run after
             # receiving a newline only line.
-            self.prev_line = line
+            self.prev_పంక్తి = పంక్తి
 
-            if len(response) > 0:
+            ఒకవేళ పొడవు(response) > 0:
                 self.request.sendall(response.encode('utf-8'))
                 # Write the response into the file, so that the test can knows
                 # the command was sent.
-                with open("Xnetbeans", "a") as myfile:
-                    myfile.write('send: ' + response)
-                if self.debug:
-                    with open("save_Xnetbeans", "a") as myfile:
-                        myfile.write('send: ' + response)
+                తోడుగా open("Xnetbeans", "a") ఇవ myfile:
+                    myfile.లిఖ('send: ' + response)
+                ఒకవేళ self.debug:
+                    తోడుగా open("save_Xnetbeans", "a") ఇవ myfile:
+                        myfile.లిఖ('send: ' + response)
 
-    def handle(self):
-        print("=== socket opened ===")
+    నిర్వచనం handle(self):
+        ముద్రించు("=== socket opened ===")
         # To preserve the Xnetbeans file as save_Xnetbeans, set debug to 1
         self.debug = 0
-        self.prev_line = ''
+        self.prev_పంక్తి = ''
         msgbuf = ''
-        while True:
-            try:
+        అయితే నిజం:
+            ప్రయత్నించు:
                 received = self.request.recv(4096).decode('utf-8')
-            except socket.error:
-                print("=== socket error ===")
-                break
-            except IOError:
-                print("=== socket closed ===")
-                break
-            if received == '':
-                print("=== socket closed ===")
-                break
-            print("received: {0}".format(received))
+            మినహాయింపు socket.error:
+                ముద్రించు("=== socket error ===")
+                ఆపు
+            మినహాయింపు IOError:
+                ముద్రించు("=== socket closed ===")
+                ఆపు
+            ఒకవేళ received == '':
+                ముద్రించు("=== socket closed ===")
+                ఆపు
+            ముద్రించు("received: {0}".format(received))
 
             # Write the received line into the file, so that the test can check
             # what happened.
-            with open("Xnetbeans", "a") as myfile:
-                myfile.write(received)
-            if self.debug:
-                with open("save_Xnetbeans", "a") as myfile:
-                    myfile.write(received)
+            తోడుగా open("Xnetbeans", "a") ఇవ myfile:
+                myfile.లిఖ(received)
+            ఒకవేళ self.debug:
+                తోడుగా open("save_Xnetbeans", "a") ఇవ myfile:
+                    myfile.లిఖ(received)
 
             # Can receive more than one line in a response or a partial line.
             # Accumulate all the received characters and process one line at
@@ -174,39 +174,39 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             msgbuf += received
             msgbuf = self.process_msgs(msgbuf)
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
+తరగతి ThreadedTCPServer(socketserver.Threading_Mix_లోపల, socketserver.TCPServer):
+    దాటు
 
-def writePortInFile(port):
+నిర్వచనం write_పోర్టు_లోపల_File(పోర్టు):
     # Write the port number in Xportnr, so that the test knows it.
     f = open("Xportnr", "w")
-    f.write("{0}".format(port))
+    f.లిఖ("{0}".format(పోర్టు))
     f.close()
 
-if __name__ == "__main__":
-    HOST, PORT = "localhost", 0
+ఒకవేళ __name__ == "__main__":
+    HOST, పోర్టు_2 = "localhost", 0
 
-    addrs = socket.getaddrinfo(HOST, PORT, 0, 0, socket.IPPROTO_TCP)
+    addrs = socket.getaddrinfo(HOST, పోర్టు_2, 0, 0, socket.IPPROTO_TCP)
     # Each addr is a (family, type, proto, canonname, sockaddr) tuple
     sockaddr = addrs[0][4]
-    ThreadedTCPServer.address_family = addrs[0][0]
+    ThreadedTCPServer.చిరునామా_family = addrs[0][0]
 
     server = ThreadedTCPServer(sockaddr[0:2], ThreadedTCPRequestHandler)
-    ip, port = server.server_address[0:2]
+    ip, పోర్టు = server.server_చిరునామా[0:2]
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.start()
+    server_thread = threading.తంతువు(లక్ష్యం=server.serve_forever)
+    server_thread.ప్రారంభం()
 
-    writePortInFile(port)
+    write_పోర్టు_లోపల_File(పోర్టు)
 
-    print("Listening on port {0}".format(port))
+    ముద్రించు("Listening on port {0}".format(పోర్టు))
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    ప్రయత్నించు:
+        అయితే server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    మినహాయింపు (Keyboard_అంతరాయం, SystemExit):
         server.shutdown()

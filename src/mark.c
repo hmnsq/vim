@@ -11,7 +11,7 @@
  * mark.c: functions for setting marks and jumping to them
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * This file contains routines to maintain and manipulate marks.
@@ -24,23 +24,23 @@
  * There are marks 'A - 'Z (set by user) and '0 to '9 (set when writing
  * viminfo).
  */
-static xfmark_T namedfm[NMARKS + EXTRA_MARKS];		// marks with file nr
+స్థిర xfmark_T namedfm[NMARKS + EXTRA_MARKS];		// marks with file nr
 
-static void fname2fnum(xfmark_T *fm);
-static void fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf);
-static char_u *mark_line(pos_T *mp, int lead_len);
-static void show_one_mark(int, char_u *, pos_T *, char_u *, int current);
-static void mark_adjust_internal(linenr_T line1, linenr_T line2, long amount,
-    long amount_after, int adjust_folds);
+స్థిర శూన్య fname2fnum(xfmark_T *fm);
+స్థిర శూన్య fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf);
+స్థిర char_u *mark_పంక్తి(pos_T *mp, పూర్ణాంకం lead_len);
+స్థిర శూన్య show_one_mark(పూర్ణాంకం, char_u *, pos_T *, char_u *, పూర్ణాంకం current);
+స్థిర శూన్య mark_adjust_అంతర్గత(linenr_T line1, linenr_T line2, దీర్ఘ amount,
+    దీర్ఘ amount_after, పూర్ణాంకం adjust_folds);
 
 /*
  * Set named mark "c" at current cursor position.
  * Returns OK on success, FAIL if bad name given.
  */
-    int
-setmark(int c)
+    పూర్ణాంకం
+setmark(పూర్ణాంకం c)
 {
-    return setmark_pos(c, &curwin->w_cursor, curbuf->b_fnum);
+    తిరిగి setmark_pos(c, &curwin->w_cursor, curbuf->b_fnum);
 }
 
 /*
@@ -48,116 +48,116 @@ setmark(int c)
  * When "c" is upper case use file "fnum".
  * Returns OK on success, FAIL if bad name given.
  */
-    int
-setmark_pos(int c, pos_T *pos, int fnum)
+    పూర్ణాంకం
+setmark_pos(పూర్ణాంకం c, pos_T *pos, పూర్ణాంకం fnum)
 {
-    int		i;
+    పూర్ణాంకం		i;
     buf_T	*buf;
 
     // Check for a special key (may cause islower() to crash).
-    if (c < 0)
-	return FAIL;
+    ఒకవేళ (c < 0)
+	తిరిగి FAIL;
 
-    if (c == '\'' || c == '`')
+    ఒకవేళ (c == '\'' || c == '`')
     {
-	if (pos == &curwin->w_cursor)
+	ఒకవేళ (pos == &curwin->w_cursor)
 	{
 	    setpcmark();
 	    // keep it even when the cursor doesn't move
 	    curwin->w_prev_pcmark = curwin->w_pcmark;
 	}
-	else
+	లేకపోతే
 	    curwin->w_pcmark = *pos;
-	return OK;
+	తిరిగి OK;
     }
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return FAIL;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (c == '"')
+    ఒకవేళ (c == '"')
     {
-	buf->b_last_cursor = *pos;
-	return OK;
+	buf->b_చివరి_cursor = *pos;
+	తిరిగి OK;
     }
 
     // Allow setting '[ and '] for an autocommand that simulates reading a
     // file.
-    if (c == '[')
+    ఒకవేళ (c == '[')
     {
-	buf->b_op_start = *pos;
-	return OK;
+	buf->b_op_ప్రారంభం = *pos;
+	తిరిగి OK;
     }
-    if (c == ']')
+    ఒకవేళ (c == ']')
     {
-	buf->b_op_end = *pos;
-	return OK;
+	buf->b_op_చివర = *pos;
+	తిరిగి OK;
     }
 
-    if (c == '<' || c == '>')
+    ఒకవేళ (c == '<' || c == '>')
     {
-	if (c == '<')
-	    buf->b_visual.vi_start = *pos;
-	else
-	    buf->b_visual.vi_end = *pos;
-	if (buf->b_visual.vi_mode == NUL)
+	ఒకవేళ (c == '<')
+	    buf->b_visual.vi_ప్రారంభం = *pos;
+	లేకపోతే
+	    buf->b_visual.vi_చివర = *pos;
+	ఒకవేళ (buf->b_visual.vi_బహుళకం == NUL)
 	    // Visual_mode has not yet been set, use a sane default.
-	    buf->b_visual.vi_mode = 'v';
-	return OK;
+	    buf->b_visual.vi_బహుళకం = 'v';
+	తిరిగి OK;
     }
 
-    if (ASCII_ISLOWER(c))
+    ఒకవేళ (ASCII_ISLOWER(c))
     {
 	i = c - 'a';
 	buf->b_namedm[i] = *pos;
-	return OK;
+	తిరిగి OK;
     }
-    if (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))
+    ఒకవేళ (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))
     {
-	if (VIM_ISDIGIT(c))
+	ఒకవేళ (VIM_ISDIGIT(c))
 	    i = c - '0' + NMARKS;
-	else
+	లేకపోతే
 	    i = c - 'A';
 	namedfm[i].fmark.mark = *pos;
 	namedfm[i].fmark.fnum = fnum;
 	VIM_CLEAR(namedfm[i].fname);
-#ifdef FEAT_VIMINFO
-	namedfm[i].time_set = vim_time();
-#endif
-	return OK;
+#నిర్వచితమైతే FEAT_VIMINFO
+	namedfm[i].సమయం_సమితి = vim_సమయం();
+#అయితే_ముగింపు
+	తిరిగి OK;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Delete every entry referring to file 'fnum' from both the jumplist and the
  * tag stack.
  */
-    void
-mark_forget_file(win_T *wp, int fnum)
+    శూన్య
+mark_forget_file(win_T *wp, పూర్ణాంకం fnum)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = wp->w_jumplistlen - 1; i >= 0; --i)
-	if (wp->w_jumplist[i].fmark.fnum == fnum)
+    కొరకు (i = wp->w_jumplistlen - 1; i >= 0; --i)
+	ఒకవేళ (wp->w_jumplist[i].fmark.fnum == fnum)
 	{
 	    vim_free(wp->w_jumplist[i].fname);
-	    if (wp->w_jumplistidx > i)
+	    ఒకవేళ (wp->w_jumplistidx > i)
 		--wp->w_jumplistidx;
 	    --wp->w_jumplistlen;
 	    mch_memmove(&wp->w_jumplist[i], &wp->w_jumplist[i + 1],
-			(wp->w_jumplistlen - i) * sizeof(wp->w_jumplist[i]));
+			(wp->w_jumplistlen - i) * పరిమాణం(wp->w_jumplist[i]));
 	}
 
-    for (i = wp->w_tagstacklen - 1; i >= 0; --i)
-	if (wp->w_tagstack[i].fmark.fnum == fnum)
+    కొరకు (i = wp->w_tagstacklen - 1; i >= 0; --i)
+	ఒకవేళ (wp->w_tagstack[i].fmark.fnum == fnum)
 	{
-	    tagstack_clear_entry(&wp->w_tagstack[i]);
-	    if (wp->w_tagstackidx > i)
+	    tagstack_clear_నమోదు(&wp->w_tagstack[i]);
+	    ఒకవేళ (wp->w_tagstackidx > i)
 		--wp->w_tagstackidx;
 	    --wp->w_tagstacklen;
 	    mch_memmove(&wp->w_tagstack[i], &wp->w_tagstack[i + 1],
-			(wp->w_tagstacklen - i) * sizeof(wp->w_tagstack[i]));
+			(wp->w_tagstacklen - i) * పరిమాణం(wp->w_tagstack[i]));
 	}
 }
 
@@ -165,35 +165,35 @@ mark_forget_file(win_T *wp, int fnum)
  * Set the previous context mark to the current position and add it to the
  * jump list.
  */
-    void
-setpcmark(void)
+    శూన్య
+setpcmark(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
     xfmark_T	*fm;
 
     // for :global the mark is set only once
-    if (global_busy || listcmd_busy || (cmdmod.cmod_flags & CMOD_KEEPJUMPS))
-	return;
+    ఒకవేళ (global_busy || listcmd_busy || (cmdmod.cmod_flags & CMOD_KEEPJUMPS))
+	తిరిగి;
 
     curwin->w_prev_pcmark = curwin->w_pcmark;
     curwin->w_pcmark = curwin->w_cursor;
 
-    if (jop_flags & JOP_STACK)
+    ఒకవేళ (jop_flags & JOP_దొంతర)
     {
 	// jumpoptions=stack: if we're somewhere in the middle of the jumplist
 	// discard everything after the current index.
-	if (curwin->w_jumplistidx < curwin->w_jumplistlen - 1)
+	ఒకవేళ (curwin->w_jumplistidx < curwin->w_jumplistlen - 1)
 	    // Discard the rest of the jumplist by cutting the length down to
 	    // contain nothing beyond the current index.
 	    curwin->w_jumplistlen = curwin->w_jumplistidx + 1;
     }
 
     // If jumplist is full: remove oldest entry
-    if (++curwin->w_jumplistlen > JUMPLISTSIZE)
+    ఒకవేళ (++curwin->w_jumplistlen > JUMPLISTSIZE)
     {
 	curwin->w_jumplistlen = JUMPLISTSIZE;
 	vim_free(curwin->w_jumplist[0].fname);
-	for (i = 1; i < JUMPLISTSIZE; ++i)
+	కొరకు (i = 1; i < JUMPLISTSIZE; ++i)
 	    curwin->w_jumplist[i - 1] = curwin->w_jumplist[i];
     }
     curwin->w_jumplistidx = curwin->w_jumplistlen;
@@ -201,10 +201,10 @@ setpcmark(void)
 
     fm->fmark.mark = curwin->w_pcmark;
     fm->fmark.fnum = curbuf->b_fnum;
-    fm->fname = NULL;
-#ifdef FEAT_VIMINFO
-    fm->time_set = vim_time();
-#endif
+    fm->fname = ఖాళీ;
+#నిర్వచితమైతే FEAT_VIMINFO
+    fm->సమయం_సమితి = vim_సమయం();
+#అయితే_ముగింపు
 }
 
 /*
@@ -213,10 +213,10 @@ setpcmark(void)
  * context will only be changed if the cursor moved to a different line.
  * If pcmark was deleted (with "dG") the previous mark is restored.
  */
-    void
-checkpcmark(void)
+    శూన్య
+checkpcmark(శూన్య)
 {
-    if (curwin->w_prev_pcmark.lnum != 0
+    ఒకవేళ (curwin->w_prev_pcmark.lnum != 0
 	    && (EQUAL_POS(curwin->w_pcmark, curwin->w_cursor)
 		|| curwin->w_pcmark.lnum == 0))
 	curwin->w_pcmark = curwin->w_prev_pcmark;
@@ -227,60 +227,60 @@ checkpcmark(void)
  * move "count" positions in the jump list (count may be negative)
  */
     pos_T *
-movemark(int count)
+movemark(పూర్ణాంకం లెక్క)
 {
     pos_T	*pos;
     xfmark_T	*jmp;
 
     cleanup_jumplist(curwin, TRUE);
 
-    if (curwin->w_jumplistlen == 0)	    // nothing to jump to
-	return (pos_T *)NULL;
+    ఒకవేళ (curwin->w_jumplistlen == 0)	    // nothing to jump to
+	తిరిగి (pos_T *)ఖాళీ;
 
-    for (;;)
+    కొరకు (;;)
     {
-	if (curwin->w_jumplistidx + count < 0
-		|| curwin->w_jumplistidx + count >= curwin->w_jumplistlen)
-	    return (pos_T *)NULL;
+	ఒకవేళ (curwin->w_jumplistidx + లెక్క < 0
+		|| curwin->w_jumplistidx + లెక్క >= curwin->w_jumplistlen)
+	    తిరిగి (pos_T *)ఖాళీ;
 
 	/*
 	 * if first CTRL-O or CTRL-I command after a jump, add cursor position
 	 * to list.  Careful: If there are duplicates (CTRL-O immediately after
 	 * starting Vim on a file), another entry may have been removed.
 	 */
-	if (curwin->w_jumplistidx == curwin->w_jumplistlen)
+	ఒకవేళ (curwin->w_jumplistidx == curwin->w_jumplistlen)
 	{
 	    setpcmark();
 	    --curwin->w_jumplistidx;	// skip the new entry
-	    if (curwin->w_jumplistidx + count < 0)
-		return (pos_T *)NULL;
+	    ఒకవేళ (curwin->w_jumplistidx + లెక్క < 0)
+		తిరిగి (pos_T *)ఖాళీ;
 	}
 
-	curwin->w_jumplistidx += count;
+	curwin->w_jumplistidx += లెక్క;
 
 	jmp = curwin->w_jumplist + curwin->w_jumplistidx;
-	if (jmp->fmark.fnum == 0)
+	ఒకవేళ (jmp->fmark.fnum == 0)
 	    fname2fnum(jmp);
-	if (jmp->fmark.fnum != curbuf->b_fnum)
+	ఒకవేళ (jmp->fmark.fnum != curbuf->b_fnum)
 	{
 	    // Make a copy, an autocommand may make "jmp" invalid.
 	    fmark_T fmark = jmp->fmark;
 
 	    // jump to the file with the mark
-	    if (buflist_findnr(fmark.fnum) == NULL)
+	    ఒకవేళ (buflist_findnr(fmark.fnum) == ఖాళీ)
 	    {					     // Skip this one ..
-		count += count < 0 ? -1 : 1;
-		continue;
+		లెక్క += లెక్క < 0 ? -1 : 1;
+		కొనసాగు;
 	    }
-	    if (buflist_getfile(fmark.fnum, fmark.mark.lnum, 0, FALSE) == FAIL)
-		return (pos_T *)NULL;
+	    ఒకవేళ (buflist_getfile(fmark.fnum, fmark.mark.lnum, 0, FALSE) == FAIL)
+		తిరిగి (pos_T *)ఖాళీ;
 	    // Set lnum again, autocommands my have changed it
 	    curwin->w_cursor = fmark.mark;
 	    pos = (pos_T *)-1;
 	}
-	else
+	లేకపోతే
 	    pos = &(jmp->fmark.mark);
-	return pos;
+	తిరిగి pos;
     }
 }
 
@@ -288,30 +288,30 @@ movemark(int count)
  * Move "count" positions in the changelist (count may be negative).
  */
     pos_T *
-movechangelist(int count)
+movechangelist(పూర్ణాంకం లెక్క)
 {
-    int		n;
+    పూర్ణాంకం		n;
 
-    if (curbuf->b_changelistlen == 0)	    // nothing to jump to
-	return (pos_T *)NULL;
+    ఒకవేళ (curbuf->b_changelistlen == 0)	    // nothing to jump to
+	తిరిగి (pos_T *)ఖాళీ;
 
     n = curwin->w_changelistidx;
-    if (n + count < 0)
+    ఒకవేళ (n + లెక్క < 0)
     {
-	if (n == 0)
-	    return (pos_T *)NULL;
+	ఒకవేళ (n == 0)
+	    తిరిగి (pos_T *)ఖాళీ;
 	n = 0;
     }
-    else if (n + count >= curbuf->b_changelistlen)
+    లేకపోతే ఒకవేళ (n + లెక్క >= curbuf->b_changelistlen)
     {
-	if (n == curbuf->b_changelistlen - 1)
-	    return (pos_T *)NULL;
+	ఒకవేళ (n == curbuf->b_changelistlen - 1)
+	    తిరిగి (pos_T *)ఖాళీ;
 	n = curbuf->b_changelistlen - 1;
     }
-    else
-	n += count;
+    లేకపోతే
+	n += లెక్క;
     curwin->w_changelistidx = n;
-    return curbuf->b_changelist + n;
+    తిరిగి curbuf->b_changelist + n;
 }
 
 /*
@@ -326,60 +326,60 @@ movechangelist(int count)
  * - -1 if mark is in other file and jumped there (only if changefile is TRUE)
  */
     pos_T *
-getmark_buf(buf_T *buf, int c, int changefile)
+getmark_buf(buf_T *buf, పూర్ణాంకం c, పూర్ణాంకం changefile)
 {
-    return getmark_buf_fnum(buf, c, changefile, NULL);
+    తిరిగి getmark_buf_fnum(buf, c, changefile, ఖాళీ);
 }
 
     pos_T *
-getmark(int c, int changefile)
+getmark(పూర్ణాంకం c, పూర్ణాంకం changefile)
 {
-    return getmark_buf_fnum(curbuf, c, changefile, NULL);
+    తిరిగి getmark_buf_fnum(curbuf, c, changefile, ఖాళీ);
 }
 
     pos_T *
 getmark_buf_fnum(
     buf_T	*buf,
-    int		c,
-    int		changefile,
-    int		*fnum)
+    పూర్ణాంకం		c,
+    పూర్ణాంకం		changefile,
+    పూర్ణాంకం		*fnum)
 {
     pos_T		*posp;
     pos_T		*startp, *endp;
-    static pos_T	pos_copy;
+    స్థిర pos_T	pos_copy;
 
-    posp = NULL;
+    posp = ఖాళీ;
 
     // Check for special key, can't be a mark name and might cause islower()
     // to crash.
-    if (c < 0)
-	return posp;
-    if (c > '~')			// check for islower()/isupper()
+    ఒకవేళ (c < 0)
+	తిరిగి posp;
+    ఒకవేళ (c > '~')			// check for islower()/isupper()
 	;
-    else if (c == '\'' || c == '`')	// previous context mark
+    లేకపోతే ఒకవేళ (c == '\'' || c == '`')	// previous context mark
     {
 	pos_copy = curwin->w_pcmark;	// need to make a copy because
 	posp = &pos_copy;		//   w_pcmark may be changed soon
     }
-    else if (c == '"')			// to pos when leaving buffer
-	posp = &(buf->b_last_cursor);
-    else if (c == '^')			// to where Insert mode stopped
-	posp = &(buf->b_last_insert);
-    else if (c == '.')			// to where last change was made
-	posp = &(buf->b_last_change);
-    else if (c == '[')			// to start of previous operator
-	posp = &(buf->b_op_start);
-    else if (c == ']')			// to end of previous operator
-	posp = &(buf->b_op_end);
-    else if (c == '{' || c == '}')	// to previous/next paragraph
+    లేకపోతే ఒకవేళ (c == '"')			// to pos when leaving buffer
+	posp = &(buf->b_చివరి_cursor);
+    లేకపోతే ఒకవేళ (c == '^')			// to where Insert mode stopped
+	posp = &(buf->b_చివరి_చొప్పించు);
+    లేకపోతే ఒకవేళ (c == '.')			// to where last change was made
+	posp = &(buf->b_చివరి_change);
+    లేకపోతే ఒకవేళ (c == '[')			// to start of previous operator
+	posp = &(buf->b_op_ప్రారంభం);
+    లేకపోతే ఒకవేళ (c == ']')			// to end of previous operator
+	posp = &(buf->b_op_చివర);
+    లేకపోతే ఒకవేళ (c == '{' || c == '}')	// to previous/next paragraph
     {
 	pos_T	pos;
 	oparg_T	oa;
-	int	slcb = listcmd_busy;
+	పూర్ణాంకం	slcb = listcmd_busy;
 
 	pos = curwin->w_cursor;
 	listcmd_busy = TRUE;	    // avoid that '' is changed
-	if (findpar(&oa.inclusive,
+	ఒకవేళ (findpar(&oa.inclusive,
 			       c == '}' ? FORWARD : BACKWARD, 1L, NUL, FALSE))
 	{
 	    pos_copy = curwin->w_cursor;
@@ -388,14 +388,14 @@ getmark_buf_fnum(
 	curwin->w_cursor = pos;
 	listcmd_busy = slcb;
     }
-    else if (c == '(' || c == ')')	// to previous/next sentence
+    లేకపోతే ఒకవేళ (c == '(' || c == ')')	// to previous/next sentence
     {
 	pos_T	pos;
-	int	slcb = listcmd_busy;
+	పూర్ణాంకం	slcb = listcmd_busy;
 
 	pos = curwin->w_cursor;
 	listcmd_busy = TRUE;	    // avoid that '' is changed
-	if (findsent(c == ')' ? FORWARD : BACKWARD, 1L))
+	ఒకవేళ (findsent(c == ')' ? FORWARD : BACKWARD, 1L))
 	{
 	    pos_copy = curwin->w_cursor;
 	    posp = &pos_copy;
@@ -403,70 +403,70 @@ getmark_buf_fnum(
 	curwin->w_cursor = pos;
 	listcmd_busy = slcb;
     }
-    else if (c == '<' || c == '>')	// start/end of visual area
+    లేకపోతే ఒకవేళ (c == '<' || c == '>')	// start/end of visual area
     {
-	startp = &buf->b_visual.vi_start;
-	endp = &buf->b_visual.vi_end;
-	if (((c == '<') == LT_POS(*startp, *endp) || endp->lnum == 0)
+	startp = &buf->b_visual.vi_ప్రారంభం;
+	endp = &buf->b_visual.vi_చివర;
+	ఒకవేళ (((c == '<') == LT_POS(*startp, *endp) || endp->lnum == 0)
 							  && startp->lnum != 0)
 	    posp = startp;
-	else
+	లేకపోతే
 	    posp = endp;
 	/*
 	 * For Visual line mode, set mark at begin or end of line
 	 */
-	if (buf->b_visual.vi_mode == 'V')
+	ఒకవేళ (buf->b_visual.vi_బహుళకం == 'V')
 	{
 	    pos_copy = *posp;
 	    posp = &pos_copy;
-	    if (c == '<')
-		pos_copy.col = 0;
-	    else
-		pos_copy.col = MAXCOL;
+	    ఒకవేళ (c == '<')
+		pos_copy.నిలువు = 0;
+	    లేకపోతే
+		pos_copy.నిలువు = MAXCOL;
 	    pos_copy.coladd = 0;
 	}
     }
-    else if (ASCII_ISLOWER(c))		// normal named mark
+    లేకపోతే ఒకవేళ (ASCII_ISLOWER(c))		// normal named mark
     {
 	posp = &(buf->b_namedm[c - 'a']);
     }
-    else if (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))	// named file mark
+    లేకపోతే ఒకవేళ (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))	// named file mark
     {
-	if (VIM_ISDIGIT(c))
+	ఒకవేళ (VIM_ISDIGIT(c))
 	    c = c - '0' + NMARKS;
-	else
+	లేకపోతే
 	    c -= 'A';
 	posp = &(namedfm[c].fmark.mark);
 
-	if (namedfm[c].fmark.fnum == 0)
+	ఒకవేళ (namedfm[c].fmark.fnum == 0)
 	    fname2fnum(&namedfm[c]);
 
-	if (fnum != NULL)
+	ఒకవేళ (fnum != ఖాళీ)
 	    *fnum = namedfm[c].fmark.fnum;
-	else if (namedfm[c].fmark.fnum != buf->b_fnum)
+	లేకపోతే ఒకవేళ (namedfm[c].fmark.fnum != buf->b_fnum)
 	{
 	    // mark is in another file
 	    posp = &pos_copy;
 
-	    if (namedfm[c].fmark.mark.lnum != 0
+	    ఒకవేళ (namedfm[c].fmark.mark.lnum != 0
 				       && changefile && namedfm[c].fmark.fnum)
 	    {
-		if (buflist_getfile(namedfm[c].fmark.fnum,
+		ఒకవేళ (buflist_getfile(namedfm[c].fmark.fnum,
 				      (linenr_T)1, GETF_SETMARK, FALSE) == OK)
 		{
 		    // Set the lnum now, autocommands could have changed it
 		    curwin->w_cursor = namedfm[c].fmark.mark;
-		    return (pos_T *)-1;
+		    తిరిగి (pos_T *)-1;
 		}
 		pos_copy.lnum = -1;	// can't get file
 	    }
-	    else
+	    లేకపోతే
 		pos_copy.lnum = 0;	// mark exists, but is not valid in
 					// current buffer
 	}
     }
 
-    return posp;
+    తిరిగి posp;
 }
 
 /*
@@ -477,11 +477,11 @@ getmark_buf_fnum(
     pos_T *
 getnextmark(
     pos_T	*startpos,	// where to start
-    int		dir,	// direction for search
-    int		begin_line)
+    పూర్ణాంకం		dir,	// direction for search
+    పూర్ణాంకం		begin_పంక్తి)
 {
-    int		i;
-    pos_T	*result = NULL;
+    పూర్ణాంకం		i;
+    pos_T	*ఫలితం = ఖాళీ;
     pos_T	pos;
 
     pos = *startpos;
@@ -490,31 +490,31 @@ getnextmark(
     // position must be in a previous line.
     // When searching forward and leaving the cursor on the first non-blank,
     // position must be in a next line.
-    if (dir == BACKWARD && begin_line)
-	pos.col = 0;
-    else if (dir == FORWARD && begin_line)
-	pos.col = MAXCOL;
+    ఒకవేళ (dir == BACKWARD && begin_పంక్తి)
+	pos.నిలువు = 0;
+    లేకపోతే ఒకవేళ (dir == FORWARD && begin_పంక్తి)
+	pos.నిలువు = MAXCOL;
 
-    for (i = 0; i < NMARKS; i++)
+    కొరకు (i = 0; i < NMARKS; i++)
     {
-	if (curbuf->b_namedm[i].lnum > 0)
+	ఒకవేళ (curbuf->b_namedm[i].lnum > 0)
 	{
-	    if (dir == FORWARD)
+	    ఒకవేళ (dir == FORWARD)
 	    {
-		if ((result == NULL || LT_POS(curbuf->b_namedm[i], *result))
+		ఒకవేళ ((ఫలితం == ఖాళీ || LT_POS(curbuf->b_namedm[i], *ఫలితం))
 			&& LT_POS(pos, curbuf->b_namedm[i]))
-		    result = &curbuf->b_namedm[i];
+		    ఫలితం = &curbuf->b_namedm[i];
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if ((result == NULL || LT_POS(*result, curbuf->b_namedm[i]))
+		ఒకవేళ ((ఫలితం == ఖాళీ || LT_POS(*ఫలితం, curbuf->b_namedm[i]))
 			&& LT_POS(curbuf->b_namedm[i], pos))
-		    result = &curbuf->b_namedm[i];
+		    ఫలితం = &curbuf->b_namedm[i];
 	    }
 	}
     }
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -522,22 +522,22 @@ getnextmark(
  * This is used for marks obtained from the .viminfo file.  It's postponed
  * until the mark is used to avoid a long startup delay.
  */
-    static void
+    స్థిర శూన్య
 fname2fnum(xfmark_T *fm)
 {
     char_u	*p;
 
-    if (fm->fname == NULL)
-	return;
+    ఒకవేళ (fm->fname == ఖాళీ)
+	తిరిగి;
 
     /*
      * First expand "~/" in the file name to the home directory.
      * Don't expand the whole name, it may contain other '~' chars.
      */
-    if (fm->fname[0] == '~' && (fm->fname[1] == '/'
-#ifdef BACKSLASH_IN_FILENAME
+    ఒకవేళ (fm->fname[0] == '~' && (fm->fname[1] == '/'
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 		|| fm->fname[1] == '\\'
-#endif
+#అయితే_ముగింపు
 		))
     {
 	size_t len;
@@ -545,7 +545,7 @@ fname2fnum(xfmark_T *fm)
 	len = expand_env((char_u *)"~/", NameBuff, MAXPATHL);
 	vim_strncpy(NameBuff + len, fm->fname + 2, MAXPATHL - len - 1);
     }
-    else
+    లేకపోతే
 	vim_strncpy(NameBuff, fm->fname, MAXPATHL - 1);
 
     // Try to shorten the file name.
@@ -553,7 +553,7 @@ fname2fnum(xfmark_T *fm)
     p = shorten_fname(NameBuff, IObuff);
 
     // buflist_new() will call fmarks_check_names()
-    (void)buflist_new(NameBuff, p, (linenr_T)1, 0);
+    (శూన్య)buflist_new(NameBuff, p, (linenr_T)1, 0);
 }
 
 /*
@@ -561,37 +561,37 @@ fname2fnum(xfmark_T *fm)
  * May replace the name with an fnum.
  * Used for marks that come from the .viminfo file.
  */
-    void
-fmarks_check_names(buf_T *buf)
+    శూన్య
+fmarks_check_పేర్లు(buf_T *buf)
 {
     char_u	*name;
-    int		i;
+    పూర్ణాంకం		i;
     win_T	*wp;
 
-    if (buf->b_ffname == NULL)
-	return;
+    ఒకవేళ (buf->b_ffname == ఖాళీ)
+	తిరిగి;
 
     name = home_replace_save(buf, buf->b_ffname);
-    if (name == NULL)
-	return;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి;
 
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    కొరకు (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
 	fmarks_check_one(&namedfm[i], name, buf);
 
     FOR_ALL_WINDOWS(wp)
     {
-	for (i = 0; i < wp->w_jumplistlen; ++i)
+	కొరకు (i = 0; i < wp->w_jumplistlen; ++i)
 	    fmarks_check_one(&wp->w_jumplist[i], name, buf);
     }
 
     vim_free(name);
 }
 
-    static void
+    స్థిర శూన్య
 fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf)
 {
-    if (fm->fmark.fnum == 0
-	    && fm->fname != NULL
+    ఒకవేళ (fm->fmark.fnum == 0
+	    && fm->fname != ఖాళీ
 	    && fnamecmp(name, fm->fname) == 0)
     {
 	fm->fmark.fnum = buf->b_fnum;
@@ -603,28 +603,28 @@ fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf)
  * Check a if a position from a mark is valid.
  * Give and error message and return FAIL if not.
  */
-    int
+    పూర్ణాంకం
 check_mark(pos_T *pos)
 {
-    if (pos == NULL)
+    ఒకవేళ (pos == ఖాళీ)
     {
 	emsg(_(e_unknown_mark));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    if (pos->lnum <= 0)
+    ఒకవేళ (pos->lnum <= 0)
     {
 	// lnum is negative if mark is in another file can can't get that
 	// file, error message already give then.
-	if (pos->lnum == 0)
-	    emsg(_(e_mark_not_set));
-	return FAIL;
+	ఒకవేళ (pos->lnum == 0)
+	    emsg(_(e_mark_not_సమితి));
+	తిరిగి FAIL;
     }
-    if (pos->lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (pos->lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	emsg(_(e_mark_has_invalid_line_number));
-	return FAIL;
+	emsg(_(e_mark_has_invalid_పంక్తి_సంఖ్య));
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -632,30 +632,30 @@ check_mark(pos_T *pos)
  *
  * Used mainly when trashing the entire buffer during ":e" type commands
  */
-    void
+    శూన్య
 clrallmarks(buf_T *buf)
 {
-    static int		i = -1;
+    స్థిర పూర్ణాంకం		i = -1;
 
-    if (i == -1)	// first call ever: initialize
-	for (i = 0; i < NMARKS + 1; i++)
+    ఒకవేళ (i == -1)	// first call ever: initialize
+	కొరకు (i = 0; i < NMARKS + 1; i++)
 	{
 	    namedfm[i].fmark.mark.lnum = 0;
-	    namedfm[i].fname = NULL;
-#ifdef FEAT_VIMINFO
-	    namedfm[i].time_set = 0;
-#endif
+	    namedfm[i].fname = ఖాళీ;
+#నిర్వచితమైతే FEAT_VIMINFO
+	    namedfm[i].సమయం_సమితి = 0;
+#అయితే_ముగింపు
 	}
 
-    for (i = 0; i < NMARKS; i++)
+    కొరకు (i = 0; i < NMARKS; i++)
 	buf->b_namedm[i].lnum = 0;
-    buf->b_op_start.lnum = 0;		// start/end op mark cleared
-    buf->b_op_end.lnum = 0;
-    buf->b_last_cursor.lnum = 1;	// '" mark cleared
-    buf->b_last_cursor.col = 0;
-    buf->b_last_cursor.coladd = 0;
-    buf->b_last_insert.lnum = 0;	// '^ mark cleared
-    buf->b_last_change.lnum = 0;	// '. mark cleared
+    buf->b_op_ప్రారంభం.lnum = 0;		// start/end op mark cleared
+    buf->b_op_చివర.lnum = 0;
+    buf->b_చివరి_cursor.lnum = 1;	// '" mark cleared
+    buf->b_చివరి_cursor.నిలువు = 0;
+    buf->b_చివరి_cursor.coladd = 0;
+    buf->b_చివరి_చొప్పించు.lnum = 0;	// '^ mark cleared
+    buf->b_చివరి_change.lnum = 0;	// '. mark cleared
     buf->b_changelistlen = 0;
 }
 
@@ -665,152 +665,152 @@ clrallmarks(buf_T *buf)
  * Returns an allocated string.
  */
     char_u *
-fm_getname(fmark_T *fmark, int lead_len)
+fm_getname(fmark_T *fmark, పూర్ణాంకం lead_len)
 {
-    if (fmark->fnum == curbuf->b_fnum)		    // current buffer
-	return mark_line(&(fmark->mark), lead_len);
-    return buflist_nr2name(fmark->fnum, FALSE, TRUE);
+    ఒకవేళ (fmark->fnum == curbuf->b_fnum)		    // current buffer
+	తిరిగి mark_పంక్తి(&(fmark->mark), lead_len);
+    తిరిగి buflist_nr2name(fmark->fnum, FALSE, TRUE);
 }
 
 /*
  * Return the line at mark "mp".  Truncate to fit in window.
  * The returned string has been allocated.
  */
-    static char_u *
-mark_line(pos_T *mp, int lead_len)
+    స్థిర char_u *
+mark_పంక్తి(pos_T *mp, పూర్ణాంకం lead_len)
 {
     char_u	*s, *p;
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_line_count)
-	return vim_strsave((char_u *)"-invalid-");
+    ఒకవేళ (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి vim_strsave((char_u *)"-invalid-");
     // Allow for up to 5 bytes per character.
     s = vim_strnsave(skipwhite(ml_get(mp->lnum)), Columns * 5);
-    if (s == NULL)
-	return NULL;
+    ఒకవేళ (s == ఖాళీ)
+	తిరిగి ఖాళీ;
     // Truncate the line to fit it in the window.
     len = 0;
-    for (p = s; *p != NUL; MB_PTR_ADV(p))
+    కొరకు (p = s; *p != NUL; MB_PTR_ADV(p))
     {
 	len += ptr2cells(p);
-	if (len >= Columns - lead_len)
-	    break;
+	ఒకవేళ (len >= Columns - lead_len)
+	    ఆపు;
     }
     *p = NUL;
-    return s;
+    తిరిగి s;
 }
 
 /*
  * print the marks
  */
-    void
+    శూన్య
 ex_marks(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*name;
     pos_T	*posp, *startp, *endp;
 
-    if (arg != NULL && *arg == NUL)
-	arg = NULL;
+    ఒకవేళ (arg != ఖాళీ && *arg == NUL)
+	arg = ఖాళీ;
 
-    show_one_mark('\'', arg, &curwin->w_pcmark, NULL, TRUE);
-    for (i = 0; i < NMARKS; ++i)
-	show_one_mark(i + 'a', arg, &curbuf->b_namedm[i], NULL, TRUE);
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    show_one_mark('\'', arg, &curwin->w_pcmark, ఖాళీ, TRUE);
+    కొరకు (i = 0; i < NMARKS; ++i)
+	show_one_mark(i + 'a', arg, &curbuf->b_namedm[i], ఖాళీ, TRUE);
+    కొరకు (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
     {
-	if (namedfm[i].fmark.fnum != 0)
+	ఒకవేళ (namedfm[i].fmark.fnum != 0)
 	    name = fm_getname(&namedfm[i].fmark, 15);
-	else
+	లేకపోతే
 	    name = namedfm[i].fname;
-	if (name != NULL)
+	ఒకవేళ (name != ఖాళీ)
 	{
 	    show_one_mark(i >= NMARKS ? i - NMARKS + '0' : i + 'A',
 		    arg, &namedfm[i].fmark.mark, name,
 		    namedfm[i].fmark.fnum == curbuf->b_fnum);
-	    if (namedfm[i].fmark.fnum != 0)
+	    ఒకవేళ (namedfm[i].fmark.fnum != 0)
 		vim_free(name);
 	}
     }
-    show_one_mark('"', arg, &curbuf->b_last_cursor, NULL, TRUE);
-    show_one_mark('[', arg, &curbuf->b_op_start, NULL, TRUE);
-    show_one_mark(']', arg, &curbuf->b_op_end, NULL, TRUE);
-    show_one_mark('^', arg, &curbuf->b_last_insert, NULL, TRUE);
-    show_one_mark('.', arg, &curbuf->b_last_change, NULL, TRUE);
+    show_one_mark('"', arg, &curbuf->b_చివరి_cursor, ఖాళీ, TRUE);
+    show_one_mark('[', arg, &curbuf->b_op_ప్రారంభం, ఖాళీ, TRUE);
+    show_one_mark(']', arg, &curbuf->b_op_చివర, ఖాళీ, TRUE);
+    show_one_mark('^', arg, &curbuf->b_చివరి_చొప్పించు, ఖాళీ, TRUE);
+    show_one_mark('.', arg, &curbuf->b_చివరి_change, ఖాళీ, TRUE);
 
     // Show the marks as where they will jump to.
-    startp = &curbuf->b_visual.vi_start;
-    endp = &curbuf->b_visual.vi_end;
-    if ((LT_POS(*startp, *endp) || endp->lnum == 0) && startp->lnum != 0)
+    startp = &curbuf->b_visual.vi_ప్రారంభం;
+    endp = &curbuf->b_visual.vi_చివర;
+    ఒకవేళ ((LT_POS(*startp, *endp) || endp->lnum == 0) && startp->lnum != 0)
 	posp = startp;
-    else
+    లేకపోతే
 	posp = endp;
-    show_one_mark('<', arg, posp, NULL, TRUE);
-    show_one_mark('>', arg, posp == startp ? endp : startp, NULL, TRUE);
+    show_one_mark('<', arg, posp, ఖాళీ, TRUE);
+    show_one_mark('>', arg, posp == startp ? endp : startp, ఖాళీ, TRUE);
 
-    show_one_mark(-1, arg, NULL, NULL, FALSE);
+    show_one_mark(-1, arg, ఖాళీ, ఖాళీ, FALSE);
 }
 
-    static void
+    స్థిర శూన్య
 show_one_mark(
-    int		c,
+    పూర్ణాంకం		c,
     char_u	*arg,
     pos_T	*p,
     char_u	*name_arg,
-    int		current)	// in current file
+    పూర్ణాంకం		current)	// in current file
 {
-    static int	did_title = FALSE;
-    int		mustfree = FALSE;
+    స్థిర పూర్ణాంకం	did_title = FALSE;
+    పూర్ణాంకం		mustfree = FALSE;
     char_u	*name = name_arg;
 
-    if (c == -1)			    // finish up
+    ఒకవేళ (c == -1)			    // finish up
     {
-	if (did_title)
+	ఒకవేళ (did_title)
 	    did_title = FALSE;
-	else
+	లేకపోతే
 	{
-	    if (arg == NULL)
-		msg(_("No marks set"));
-	    else
+	    ఒకవేళ (arg == ఖాళీ)
+		సందేశం(_("No marks set"));
+	    లేకపోతే
 		semsg(_(e_no_marks_matching_str), arg);
 	}
     }
     // don't output anything if 'q' typed at --more-- prompt
-    else if (!got_int
-	    && (arg == NULL || vim_strchr(arg, c) != NULL)
+    లేకపోతే ఒకవేళ (!got_int
+	    && (arg == ఖాళీ || vim_strchr(arg, c) != ఖాళీ)
 	    && p->lnum != 0)
     {
-	if (name == NULL && current)
+	ఒకవేళ (name == ఖాళీ && current)
 	{
-	    name = mark_line(p, 15);
-	    if (name == NULL)
+	    name = mark_పంక్తి(p, 15);
+	    ఒకవేళ (name == ఖాళీ)
 	    {
-		emsg(_(e_out_of_memory));
-		return;
+		emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
+		తిరిగి;
 	    }
 	    mustfree = TRUE;
 	}
-	if (!message_filtered(name))
+	ఒకవేళ (!సందేశం_filtered(name))
 	{
-	    if (!did_title)
+	    ఒకవేళ (!did_title)
 	    {
 		// Highlight title
-		msg_puts_title(_("\nmark line  col file/text"));
+		సందేశం_puts_title(_("\nmark line  col file/text"));
 		did_title = TRUE;
 	    }
-	    msg_putchar('\n');
-	    if (!got_int)
+	    సందేశం_putchar('\n');
+	    ఒకవేళ (!got_int)
 	    {
-		sprintf((char *)IObuff, " %c %6ld %4d ", c, p->lnum, p->col);
-		msg_outtrans(IObuff);
-		if (name != NULL)
+		sprintf((అక్షరం *)IObuff, " %c %6ld %4d ", c, p->lnum, p->నిలువు);
+		సందేశం_outtrans(IObuff);
+		ఒకవేళ (name != ఖాళీ)
 		{
-		    msg_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
+		    సందేశం_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
 		}
 	    }
-	    out_flush();		    // show one line at a time
+	    బహిర్గతం_flush();		    // show one line at a time
 	}
-	if (mustfree)
+	ఒకవేళ (mustfree)
 	    vim_free(name);
     }
 }
@@ -818,83 +818,83 @@ show_one_mark(
 /*
  * ":delmarks[!] [marks]"
  */
-    void
+    శూన్య
 ex_delmarks(exarg_T *eap)
 {
     char_u	*p;
-    int		from, to;
-    int		i;
-    int		lower;
-    int		digit;
-    int		n;
+    పూర్ణాంకం		from, గమ్యం;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		క్రింది;
+    పూర్ణాంకం		digit;
+    పూర్ణాంకం		n;
 
-    if (*eap->arg == NUL && eap->forceit)
+    ఒకవేళ (*eap->arg == NUL && eap->forceit)
 	// clear all marks
 	clrallmarks(curbuf);
-    else if (eap->forceit)
-	emsg(_(e_invalid_argument));
-    else if (*eap->arg == NUL)
-	emsg(_(e_argument_required));
-    else
+    లేకపోతే ఒకవేళ (eap->forceit)
+	emsg(_(e_invalid_వాదం));
+    లేకపోతే ఒకవేళ (*eap->arg == NUL)
+	emsg(_(e_వాదం_required));
+    లేకపోతే
     {
 	// clear specified marks only
-	for (p = eap->arg; *p != NUL; ++p)
+	కొరకు (p = eap->arg; *p != NUL; ++p)
 	{
-	    lower = ASCII_ISLOWER(*p);
+	    క్రింది = ASCII_ISLOWER(*p);
 	    digit = VIM_ISDIGIT(*p);
-	    if (lower || digit || ASCII_ISUPPER(*p))
+	    ఒకవేళ (క్రింది || digit || ASCII_ISUPPER(*p))
 	    {
-		if (p[1] == '-')
+		ఒకవేళ (p[1] == '-')
 		{
 		    // clear range of marks
 		    from = *p;
-		    to = p[2];
-		    if (!(lower ? ASCII_ISLOWER(p[2])
+		    గమ్యం = p[2];
+		    ఒకవేళ (!(క్రింది ? ASCII_ISLOWER(p[2])
 				: (digit ? VIM_ISDIGIT(p[2])
 				    : ASCII_ISUPPER(p[2])))
-			    || to < from)
+			    || గమ్యం < from)
 		    {
-			semsg(_(e_invalid_argument_str), p);
-			return;
+			semsg(_(e_invalid_వాదం_str), p);
+			తిరిగి;
 		    }
 		    p += 2;
 		}
-		else
+		లేకపోతే
 		    // clear one lower case mark
-		    from = to = *p;
+		    from = గమ్యం = *p;
 
-		for (i = from; i <= to; ++i)
+		కొరకు (i = from; i <= గమ్యం; ++i)
 		{
-		    if (lower)
+		    ఒకవేళ (క్రింది)
 			curbuf->b_namedm[i - 'a'].lnum = 0;
-		    else
+		    లేకపోతే
 		    {
-			if (digit)
+			ఒకవేళ (digit)
 			    n = i - '0' + NMARKS;
-			else
+			లేకపోతే
 			    n = i - 'A';
 			namedfm[n].fmark.mark.lnum = 0;
 			namedfm[n].fmark.fnum = 0;
 			VIM_CLEAR(namedfm[n].fname);
-#ifdef FEAT_VIMINFO
-			namedfm[n].time_set = digit ? 0 : vim_time();
-#endif
+#నిర్వచితమైతే FEAT_VIMINFO
+			namedfm[n].సమయం_సమితి = digit ? 0 : vim_సమయం();
+#అయితే_ముగింపు
 		    }
 		}
 	    }
-	    else
-		switch (*p)
+	    లేకపోతే
+		ఎంపిక (*p)
 		{
-		    case '"': curbuf->b_last_cursor.lnum = 0; break;
-		    case '^': curbuf->b_last_insert.lnum = 0; break;
-		    case '.': curbuf->b_last_change.lnum = 0; break;
-		    case '[': curbuf->b_op_start.lnum    = 0; break;
-		    case ']': curbuf->b_op_end.lnum      = 0; break;
-		    case '<': curbuf->b_visual.vi_start.lnum = 0; break;
-		    case '>': curbuf->b_visual.vi_end.lnum   = 0; break;
-		    case ' ': break;
-		    default:  semsg(_(e_invalid_argument_str), p);
-			      return;
+		    స్థితి '"': curbuf->b_చివరి_cursor.lnum = 0; ఆపు;
+		    స్థితి '^': curbuf->b_చివరి_చొప్పించు.lnum = 0; ఆపు;
+		    స్థితి '.': curbuf->b_చివరి_change.lnum = 0; ఆపు;
+		    స్థితి '[': curbuf->b_op_ప్రారంభం.lnum    = 0; ఆపు;
+		    స్థితి ']': curbuf->b_op_చివర.lnum      = 0; ఆపు;
+		    స్థితి '<': curbuf->b_visual.vi_ప్రారంభం.lnum = 0; ఆపు;
+		    స్థితి '>': curbuf->b_visual.vi_చివర.lnum   = 0; ఆపు;
+		    స్థితి ' ': ఆపు;
+		    అప్రమేయ:  semsg(_(e_invalid_వాదం_str), p);
+			      తిరిగి;
 		}
 	}
     }
@@ -903,60 +903,60 @@ ex_delmarks(exarg_T *eap)
 /*
  * print the jumplist
  */
-    void
-ex_jumps(exarg_T *eap UNUSED)
+    శూన్య
+ex_jumps(exarg_T *eap వాడని)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*name;
 
     cleanup_jumplist(curwin, TRUE);
 
     // Highlight title
-    msg_puts_title(_("\n jump line  col file/text"));
-    for (i = 0; i < curwin->w_jumplistlen && !got_int; ++i)
+    సందేశం_puts_title(_("\n jump line  col file/text"));
+    కొరకు (i = 0; i < curwin->w_jumplistlen && !got_int; ++i)
     {
-	if (curwin->w_jumplist[i].fmark.mark.lnum != 0)
+	ఒకవేళ (curwin->w_jumplist[i].fmark.mark.lnum != 0)
 	{
 	    name = fm_getname(&curwin->w_jumplist[i].fmark, 16);
 
 	    // Make sure to output the current indicator, even when on an wiped
 	    // out buffer.  ":filter" may still skip it.
-	    if (name == NULL && i == curwin->w_jumplistidx)
+	    ఒకవేళ (name == ఖాళీ && i == curwin->w_jumplistidx)
 		name = vim_strsave((char_u *)"-invalid-");
 	    // apply :filter /pat/ or file name not available
-	    if (name == NULL || message_filtered(name))
+	    ఒకవేళ (name == ఖాళీ || సందేశం_filtered(name))
 	    {
 		vim_free(name);
-		continue;
+		కొనసాగు;
 	    }
 
-	    msg_putchar('\n');
-	    if (got_int)
+	    సందేశం_putchar('\n');
+	    ఒకవేళ (got_int)
 	    {
 		vim_free(name);
-		break;
+		ఆపు;
 	    }
-	    sprintf((char *)IObuff, "%c %2d %5ld %4d ",
+	    sprintf((అక్షరం *)IObuff, "%c %2d %5ld %4d ",
 		i == curwin->w_jumplistidx ? '>' : ' ',
 		i > curwin->w_jumplistidx ? i - curwin->w_jumplistidx
 					  : curwin->w_jumplistidx - i,
 		curwin->w_jumplist[i].fmark.mark.lnum,
-		curwin->w_jumplist[i].fmark.mark.col);
-	    msg_outtrans(IObuff);
-	    msg_outtrans_attr(name,
+		curwin->w_jumplist[i].fmark.mark.నిలువు);
+	    సందేశం_outtrans(IObuff);
+	    సందేశం_outtrans_attr(name,
 			    curwin->w_jumplist[i].fmark.fnum == curbuf->b_fnum
 							? HL_ATTR(HLF_D) : 0);
 	    vim_free(name);
 	    ui_breakcheck();
 	}
-	out_flush();
+	బహిర్గతం_flush();
     }
-    if (curwin->w_jumplistidx == curwin->w_jumplistlen)
-	msg_puts("\n>");
+    ఒకవేళ (curwin->w_jumplistidx == curwin->w_jumplistlen)
+	సందేశం_puts("\n>");
 }
 
-    void
-ex_clearjumps(exarg_T *eap UNUSED)
+    శూన్య
+ex_clearjumps(exarg_T *eap వాడని)
 {
     free_jumplist(curwin);
     curwin->w_jumplistlen = 0;
@@ -966,87 +966,87 @@ ex_clearjumps(exarg_T *eap UNUSED)
 /*
  * print the changelist
  */
-    void
-ex_changes(exarg_T *eap UNUSED)
+    శూన్య
+ex_changes(exarg_T *eap వాడని)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*name;
 
     // Highlight title
-    msg_puts_title(_("\nchange line  col text"));
+    సందేశం_puts_title(_("\nchange line  col text"));
 
-    for (i = 0; i < curbuf->b_changelistlen && !got_int; ++i)
+    కొరకు (i = 0; i < curbuf->b_changelistlen && !got_int; ++i)
     {
-	if (curbuf->b_changelist[i].lnum != 0)
+	ఒకవేళ (curbuf->b_changelist[i].lnum != 0)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
-	    sprintf((char *)IObuff, "%c %3d %5ld %4d ",
+	    సందేశం_putchar('\n');
+	    ఒకవేళ (got_int)
+		ఆపు;
+	    sprintf((అక్షరం *)IObuff, "%c %3d %5ld %4d ",
 		    i == curwin->w_changelistidx ? '>' : ' ',
 		    i > curwin->w_changelistidx ? i - curwin->w_changelistidx
 						: curwin->w_changelistidx - i,
-		    (long)curbuf->b_changelist[i].lnum,
-		    curbuf->b_changelist[i].col);
-	    msg_outtrans(IObuff);
-	    name = mark_line(&curbuf->b_changelist[i], 17);
-	    if (name == NULL)
-		break;
-	    msg_outtrans_attr(name, HL_ATTR(HLF_D));
+		    (దీర్ఘ)curbuf->b_changelist[i].lnum,
+		    curbuf->b_changelist[i].నిలువు);
+	    సందేశం_outtrans(IObuff);
+	    name = mark_పంక్తి(&curbuf->b_changelist[i], 17);
+	    ఒకవేళ (name == ఖాళీ)
+		ఆపు;
+	    సందేశం_outtrans_attr(name, HL_ATTR(HLF_D));
 	    vim_free(name);
 	    ui_breakcheck();
 	}
-	out_flush();
+	బహిర్గతం_flush();
     }
-    if (curwin->w_changelistidx == curbuf->b_changelistlen)
-	msg_puts("\n>");
+    ఒకవేళ (curwin->w_changelistidx == curbuf->b_changelistlen)
+	సందేశం_puts("\n>");
 }
 
-#define one_adjust(add) \
+#నిర్వచించు one_adjust(కూడు) \
     { \
-	lp = add; \
-	if (*lp >= line1 && *lp <= line2) \
+	lp = కూడు; \
+	ఒకవేళ (*lp >= line1 && *lp <= line2) \
 	{ \
-	    if (amount == MAXLNUM) \
+	    ఒకవేళ (amount == MAXLNUM) \
 		*lp = 0; \
-	    else \
+	    లేకపోతే \
 		*lp += amount; \
 	} \
-	else if (amount_after && *lp > line2) \
+	లేకపోతే ఒకవేళ (amount_after && *lp > line2) \
 	    *lp += amount_after; \
     }
 
 // don't delete the line, just put at first deleted line
-#define one_adjust_nodel(add) \
+#నిర్వచించు one_adjust_nodel(కూడు) \
     { \
-	lp = add; \
-	if (*lp >= line1 && *lp <= line2) \
+	lp = కూడు; \
+	ఒకవేళ (*lp >= line1 && *lp <= line2) \
 	{ \
-	    if (amount == MAXLNUM) \
+	    ఒకవేళ (amount == MAXLNUM) \
 		*lp = line1; \
-	    else \
+	    లేకపోతే \
 		*lp += amount; \
 	} \
-	else if (amount_after && *lp > line2) \
+	లేకపోతే ఒకవేళ (amount_after && *lp > line2) \
 	    *lp += amount_after; \
     }
 
 // Like one_adjust_nodel(), but if the position is within the deleted range,
 // move it to the start of the line before the range.
-#define one_adjust_cursor(pp) \
+#నిర్వచించు one_adjust_cursor(pp) \
     { \
 	pos_T *posp = pp; \
-	if (posp->lnum >= line1 && posp->lnum <= line2) \
+	ఒకవేళ (posp->lnum >= line1 && posp->lnum <= line2) \
 	{ \
-	    if (amount == MAXLNUM) /* line with cursor is deleted */ \
+	    ఒకవేళ (amount == MAXLNUM) /* line with cursor is deleted */ \
 	    { \
 		posp->lnum = MAX(line1 - 1, 1); \
-		posp->col = 0; \
+		posp->నిలువు = 0; \
 	    } \
-	    else /* keep cursor on the same line */ \
+	    లేకపోతే /* keep cursor on the same line */ \
 		posp->lnum += amount; \
 	} \
-	else if (amount_after && posp->lnum > line2) \
+	లేకపోతే ఒకవేళ (amount_after && posp->lnum > line2) \
 	    posp->lnum += amount_after; \
     }
 
@@ -1061,90 +1061,90 @@ ex_changes(exarg_T *eap UNUSED)
  * Example: Insert two lines below 55: mark_adjust(56, MAXLNUM, 2, 0);
  *				   or: mark_adjust(56, 55, MAXLNUM, 2);
  */
-    void
+    శూన్య
 mark_adjust(
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    దీర్ఘ	amount,
+    దీర్ఘ	amount_after)
 {
-    mark_adjust_internal(line1, line2, amount, amount_after, TRUE);
+    mark_adjust_అంతర్గత(line1, line2, amount, amount_after, TRUE);
 }
 
-    void
+    శూన్య
 mark_adjust_nofold(
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    దీర్ఘ	amount,
+    దీర్ఘ	amount_after)
 {
-    mark_adjust_internal(line1, line2, amount, amount_after, FALSE);
+    mark_adjust_అంతర్గత(line1, line2, amount, amount_after, FALSE);
 }
 
-    static void
-mark_adjust_internal(
+    స్థిర శూన్య
+mark_adjust_అంతర్గత(
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after,
-    int		adjust_folds UNUSED)
+    దీర్ఘ	amount,
+    దీర్ఘ	amount_after,
+    పూర్ణాంకం		adjust_folds వాడని)
 {
-    int		i;
-    int		fnum = curbuf->b_fnum;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		fnum = curbuf->b_fnum;
     linenr_T	*lp;
     win_T	*win;
     tabpage_T	*tab;
     wininfo_T	*wip;
-    static pos_T initpos = {1, 0, 0};
+    స్థిర pos_T initpos = {1, 0, 0};
 
-    if (line2 < line1 && amount_after == 0L)	    // nothing to do
-	return;
+    ఒకవేళ (line2 < line1 && amount_after == 0L)	    // nothing to do
+	తిరిగి;
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ఒకవేళ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// named marks, lower case and upper case
-	for (i = 0; i < NMARKS; i++)
+	కొరకు (i = 0; i < NMARKS; i++)
 	{
 	    one_adjust(&(curbuf->b_namedm[i].lnum));
-	    if (namedfm[i].fmark.fnum == fnum)
+	    ఒకవేళ (namedfm[i].fmark.fnum == fnum)
 		one_adjust_nodel(&(namedfm[i].fmark.mark.lnum));
 	}
-	for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+	కొరకు (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
 	{
-	    if (namedfm[i].fmark.fnum == fnum)
+	    ఒకవేళ (namedfm[i].fmark.fnum == fnum)
 		one_adjust_nodel(&(namedfm[i].fmark.mark.lnum));
 	}
 
 	// last Insert position
-	one_adjust(&(curbuf->b_last_insert.lnum));
+	one_adjust(&(curbuf->b_చివరి_చొప్పించు.lnum));
 
 	// last change position
-	one_adjust(&(curbuf->b_last_change.lnum));
+	one_adjust(&(curbuf->b_చివరి_change.lnum));
 
 	// last cursor position, if it was set
-	if (!EQUAL_POS(curbuf->b_last_cursor, initpos))
-	    one_adjust(&(curbuf->b_last_cursor.lnum));
+	ఒకవేళ (!EQUAL_POS(curbuf->b_చివరి_cursor, initpos))
+	    one_adjust(&(curbuf->b_చివరి_cursor.lnum));
 
 
 	// list of change positions
-	for (i = 0; i < curbuf->b_changelistlen; ++i)
+	కొరకు (i = 0; i < curbuf->b_changelistlen; ++i)
 	    one_adjust_nodel(&(curbuf->b_changelist[i].lnum));
 
 	// Visual area
-	one_adjust_nodel(&(curbuf->b_visual.vi_start.lnum));
-	one_adjust_nodel(&(curbuf->b_visual.vi_end.lnum));
+	one_adjust_nodel(&(curbuf->b_visual.vi_ప్రారంభం.lnum));
+	one_adjust_nodel(&(curbuf->b_visual.vi_చివర.lnum));
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
 	// quickfix marks
-	qf_mark_adjust(NULL, line1, line2, amount, amount_after);
+	qf_mark_adjust(ఖాళీ, line1, line2, amount, amount_after);
 	// location lists
 	FOR_ALL_TAB_WINDOWS(tab, win)
 	    qf_mark_adjust(win, line1, line2, amount, amount_after);
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_SIGNS
+#నిర్వచితమైతే FEAT_SIGNS
 	sign_mark_adjust(line1, line2, amount, amount_after);
-#endif
+#అయితే_ముగింపు
     }
 
     // previous context mark
@@ -1154,7 +1154,7 @@ mark_adjust_internal(
     one_adjust(&(curwin->w_prev_pcmark.lnum));
 
     // saved cursor for formatting
-    if (saved_cursor.lnum != 0)
+    ఒకవేళ (saved_cursor.lnum != 0)
 	one_adjust_nodel(&(saved_cursor.lnum));
 
     /*
@@ -1162,23 +1162,23 @@ mark_adjust_internal(
      */
     FOR_ALL_TAB_WINDOWS(tab, win)
     {
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	ఒకవేళ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	    // Marks in the jumplist.  When deleting lines, this may create
 	    // duplicate marks in the jumplist, they will be removed later.
-	    for (i = 0; i < win->w_jumplistlen; ++i)
-		if (win->w_jumplist[i].fmark.fnum == fnum)
+	    కొరకు (i = 0; i < win->w_jumplistlen; ++i)
+		ఒకవేళ (win->w_jumplist[i].fmark.fnum == fnum)
 		    one_adjust_nodel(&(win->w_jumplist[i].fmark.mark.lnum));
 
-	if (win->w_buffer == curbuf)
+	ఒకవేళ (win->w_బఫరు == curbuf)
 	{
-	    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	    ఒకవేళ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 		// marks in the tag stack
-		for (i = 0; i < win->w_tagstacklen; i++)
-		    if (win->w_tagstack[i].fmark.fnum == fnum)
+		కొరకు (i = 0; i < win->w_tagstacklen; i++)
+		    ఒకవేళ (win->w_tagstack[i].fmark.fnum == fnum)
 			one_adjust_nodel(&(win->w_tagstack[i].fmark.mark.lnum));
 
 	    // the displayed Visual area
-	    if (win->w_old_cursor_lnum != 0)
+	    ఒకవేళ (win->w_old_cursor_lnum != 0)
 	    {
 		one_adjust_nodel(&(win->w_old_cursor_lnum));
 		one_adjust_nodel(&(win->w_old_visual_lnum));
@@ -1186,47 +1186,47 @@ mark_adjust_internal(
 
 	    // topline and cursor position for windows with the same buffer
 	    // other than the current window
-	    if (win != curwin)
+	    ఒకవేళ (win != curwin)
 	    {
-		if (win->w_topline >= line1 && win->w_topline <= line2)
+		ఒకవేళ (win->w_topline >= line1 && win->w_topline <= line2)
 		{
-		    if (amount == MAXLNUM)	    // topline is deleted
+		    ఒకవేళ (amount == MAXLNUM)	    // topline is deleted
 		    {
-			if (line1 <= 1)
+			ఒకవేళ (line1 <= 1)
 			    win->w_topline = 1;
-			else
+			లేకపోతే
 			    win->w_topline = line1 - 1;
 		    }
-		    else if (win->w_topline > line1)
+		    లేకపోతే ఒకవేళ (win->w_topline > line1)
 			// keep topline on the same line, unless inserting just
 			// above it (we probably want to see that line then)
 			win->w_topline += amount;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 		    win->w_topfill = 0;
-#endif
+#అయితే_ముగింపు
 		}
-		else if (amount_after && win->w_topline > line2)
+		లేకపోతే ఒకవేళ (amount_after && win->w_topline > line2)
 		{
 		    win->w_topline += amount_after;
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
 		    win->w_topfill = 0;
-#endif
+#అయితే_ముగింపు
 		}
 		one_adjust_cursor(&(win->w_cursor));
 	    }
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 	    // adjust folds
-	    if (adjust_folds)
+	    ఒకవేళ (adjust_folds)
 		foldMarkAdjust(win, line1, line2, amount, amount_after);
-#endif
+#అయితే_ముగింపు
 	}
     }
 
-#ifdef FEAT_DIFF
+#నిర్వచితమైతే FEAT_DIFF
     // adjust diffs
     diff_mark_adjust(line1, line2, amount, amount_after);
-#endif
+#అయితే_ముగింపు
 
     // adjust per-window "last cursor" positions
     FOR_ALL_BUF_WININFO(curbuf, wip)
@@ -1234,18 +1234,18 @@ mark_adjust_internal(
 }
 
 // This code is used often, needs to be fast.
-#define col_adjust(pp) \
+#నిర్వచించు నిలువు_adjust(pp) \
     { \
 	posp = pp; \
-	if (posp->lnum == lnum && posp->col >= mincol) \
+	ఒకవేళ (posp->lnum == lnum && posp->నిలువు >= mincol) \
 	{ \
 	    posp->lnum += lnum_amount; \
-	    if (col_amount < 0 && posp->col <= (colnr_T)-col_amount) \
-		posp->col = 0; \
-	    else if (posp->col < spaces_removed) \
-		posp->col = col_amount + spaces_removed; \
-	    else \
-		posp->col += col_amount; \
+	    ఒకవేళ (నిలువు_amount < 0 && posp->నిలువు <= (colnr_T)-నిలువు_amount) \
+		posp->నిలువు = 0; \
+	    లేకపోతే ఒకవేళ (posp->నిలువు < spaces_removed) \
+		posp->నిలువు = నిలువు_amount + spaces_removed; \
+	    లేకపోతే \
+		posp->నిలువు += నిలువు_amount; \
 	} \
     }
 
@@ -1256,58 +1256,58 @@ mark_adjust_internal(
  * "spaces_removed" is the number of spaces that were removed, matters when the
  * cursor is inside them.
  */
-    void
-mark_col_adjust(
+    శూన్య
+mark_నిలువు_adjust(
     linenr_T	lnum,
     colnr_T	mincol,
-    long	lnum_amount,
-    long	col_amount,
-    int		spaces_removed)
+    దీర్ఘ	lnum_amount,
+    దీర్ఘ	నిలువు_amount,
+    పూర్ణాంకం		spaces_removed)
 {
-    int		i;
-    int		fnum = curbuf->b_fnum;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		fnum = curbuf->b_fnum;
     win_T	*win;
     pos_T	*posp;
 
-    if ((col_amount == 0L && lnum_amount == 0L)
+    ఒకవేళ ((నిలువు_amount == 0L && lnum_amount == 0L)
 				       || (cmdmod.cmod_flags & CMOD_LOCKMARKS))
-	return; // nothing to do
+	తిరిగి; // nothing to do
 
     // named marks, lower case and upper case
-    for (i = 0; i < NMARKS; i++)
+    కొరకు (i = 0; i < NMARKS; i++)
     {
-	col_adjust(&(curbuf->b_namedm[i]));
-	if (namedfm[i].fmark.fnum == fnum)
-	    col_adjust(&(namedfm[i].fmark.mark));
+	నిలువు_adjust(&(curbuf->b_namedm[i]));
+	ఒకవేళ (namedfm[i].fmark.fnum == fnum)
+	    నిలువు_adjust(&(namedfm[i].fmark.mark));
     }
-    for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+    కొరకు (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
     {
-	if (namedfm[i].fmark.fnum == fnum)
-	    col_adjust(&(namedfm[i].fmark.mark));
+	ఒకవేళ (namedfm[i].fmark.fnum == fnum)
+	    నిలువు_adjust(&(namedfm[i].fmark.mark));
     }
 
     // last Insert position
-    col_adjust(&(curbuf->b_last_insert));
+    నిలువు_adjust(&(curbuf->b_చివరి_చొప్పించు));
 
     // last change position
-    col_adjust(&(curbuf->b_last_change));
+    నిలువు_adjust(&(curbuf->b_చివరి_change));
 
     // list of change positions
-    for (i = 0; i < curbuf->b_changelistlen; ++i)
-	col_adjust(&(curbuf->b_changelist[i]));
+    కొరకు (i = 0; i < curbuf->b_changelistlen; ++i)
+	నిలువు_adjust(&(curbuf->b_changelist[i]));
 
     // Visual area
-    col_adjust(&(curbuf->b_visual.vi_start));
-    col_adjust(&(curbuf->b_visual.vi_end));
+    నిలువు_adjust(&(curbuf->b_visual.vi_ప్రారంభం));
+    నిలువు_adjust(&(curbuf->b_visual.vi_చివర));
 
     // previous context mark
-    col_adjust(&(curwin->w_pcmark));
+    నిలువు_adjust(&(curwin->w_pcmark));
 
     // previous pcmark
-    col_adjust(&(curwin->w_prev_pcmark));
+    నిలువు_adjust(&(curwin->w_prev_pcmark));
 
     // saved cursor for formatting
-    col_adjust(&saved_cursor);
+    నిలువు_adjust(&saved_cursor);
 
     /*
      * Adjust items in all windows related to the current buffer.
@@ -1315,20 +1315,20 @@ mark_col_adjust(
     FOR_ALL_WINDOWS(win)
     {
 	// marks in the jumplist
-	for (i = 0; i < win->w_jumplistlen; ++i)
-	    if (win->w_jumplist[i].fmark.fnum == fnum)
-		col_adjust(&(win->w_jumplist[i].fmark.mark));
+	కొరకు (i = 0; i < win->w_jumplistlen; ++i)
+	    ఒకవేళ (win->w_jumplist[i].fmark.fnum == fnum)
+		నిలువు_adjust(&(win->w_jumplist[i].fmark.mark));
 
-	if (win->w_buffer == curbuf)
+	ఒకవేళ (win->w_బఫరు == curbuf)
 	{
 	    // marks in the tag stack
-	    for (i = 0; i < win->w_tagstacklen; i++)
-		if (win->w_tagstack[i].fmark.fnum == fnum)
-		    col_adjust(&(win->w_tagstack[i].fmark.mark));
+	    కొరకు (i = 0; i < win->w_tagstacklen; i++)
+		ఒకవేళ (win->w_tagstack[i].fmark.fnum == fnum)
+		    నిలువు_adjust(&(win->w_tagstack[i].fmark.mark));
 
 	    // cursor position for other windows with the same buffer
-	    if (win != curwin)
-		col_adjust(&win->w_cursor);
+	    ఒకవేళ (win != curwin)
+		నిలువు_adjust(&win->w_cursor);
 	}
     }
 }
@@ -1339,213 +1339,213 @@ mark_col_adjust(
  * When "loadfiles" is TRUE first ensure entries have the "fnum" field set
  * (this may be a bit slow).
  */
-    void
-cleanup_jumplist(win_T *wp, int loadfiles)
+    శూన్య
+cleanup_jumplist(win_T *wp, పూర్ణాంకం loadfiles)
 {
-    int	    i;
-    int	    from, to;
-    int	    mustfree;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    from, గమ్యం;
+    పూర్ణాంకం	    mustfree;
 
-    if (loadfiles)
+    ఒకవేళ (loadfiles)
     {
 	// If specified, load all the files from the jump list. This is
 	// needed to properly clean up duplicate entries, but will take some
 	// time.
-	for (i = 0; i < wp->w_jumplistlen; ++i)
+	కొరకు (i = 0; i < wp->w_jumplistlen; ++i)
 	{
-	    if ((wp->w_jumplist[i].fmark.fnum == 0) &&
+	    ఒకవేళ ((wp->w_jumplist[i].fmark.fnum == 0) &&
 		    (wp->w_jumplist[i].fmark.mark.lnum != 0))
 		fname2fnum(&wp->w_jumplist[i]);
 	}
     }
 
-    to = 0;
-    for (from = 0; from < wp->w_jumplistlen; ++from)
+    గమ్యం = 0;
+    కొరకు (from = 0; from < wp->w_jumplistlen; ++from)
     {
-	if (wp->w_jumplistidx == from)
-	    wp->w_jumplistidx = to;
-	for (i = from + 1; i < wp->w_jumplistlen; ++i)
-	    if (wp->w_jumplist[i].fmark.fnum
+	ఒకవేళ (wp->w_jumplistidx == from)
+	    wp->w_jumplistidx = గమ్యం;
+	కొరకు (i = from + 1; i < wp->w_jumplistlen; ++i)
+	    ఒకవేళ (wp->w_jumplist[i].fmark.fnum
 					== wp->w_jumplist[from].fmark.fnum
 		    && wp->w_jumplist[from].fmark.fnum != 0
 		    && wp->w_jumplist[i].fmark.mark.lnum
 				  == wp->w_jumplist[from].fmark.mark.lnum)
-		break;
-	if (i >= wp->w_jumplistlen)	// not duplicate
+		ఆపు;
+	ఒకవేళ (i >= wp->w_jumplistlen)	// not duplicate
 	    mustfree = FALSE;
-	else if (i > from + 1)		// non-adjacent duplicate
+	లేకపోతే ఒకవేళ (i > from + 1)		// non-adjacent duplicate
 	    // jumpoptions=stack: remove duplicates only when adjacent.
-	    mustfree = !(jop_flags & JOP_STACK);
-	else				// adjacent duplicate
+	    mustfree = !(jop_flags & JOP_దొంతర);
+	లేకపోతే				// adjacent duplicate
 	    mustfree = TRUE;
 
-	if (mustfree)
+	ఒకవేళ (mustfree)
 	    vim_free(wp->w_jumplist[from].fname);
-	else
-	    wp->w_jumplist[to++] = wp->w_jumplist[from];
+	లేకపోతే
+	    wp->w_jumplist[గమ్యం++] = wp->w_jumplist[from];
     }
-    if (wp->w_jumplistidx == wp->w_jumplistlen)
-	wp->w_jumplistidx = to;
-    wp->w_jumplistlen = to;
+    ఒకవేళ (wp->w_jumplistidx == wp->w_jumplistlen)
+	wp->w_jumplistidx = గమ్యం;
+    wp->w_jumplistlen = గమ్యం;
 }
 
 /*
  * Copy the jumplist from window "from" to window "to".
  */
-    void
-copy_jumplist(win_T *from, win_T *to)
+    శూన్య
+copy_jumplist(win_T *from, win_T *గమ్యం)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < from->w_jumplistlen; ++i)
+    కొరకు (i = 0; i < from->w_jumplistlen; ++i)
     {
-	to->w_jumplist[i] = from->w_jumplist[i];
-	if (from->w_jumplist[i].fname != NULL)
-	    to->w_jumplist[i].fname = vim_strsave(from->w_jumplist[i].fname);
+	గమ్యం->w_jumplist[i] = from->w_jumplist[i];
+	ఒకవేళ (from->w_jumplist[i].fname != ఖాళీ)
+	    గమ్యం->w_jumplist[i].fname = vim_strsave(from->w_jumplist[i].fname);
     }
-    to->w_jumplistlen = from->w_jumplistlen;
-    to->w_jumplistidx = from->w_jumplistidx;
+    గమ్యం->w_jumplistlen = from->w_jumplistlen;
+    గమ్యం->w_jumplistidx = from->w_jumplistidx;
 }
 
 /*
  * Free items in the jumplist of window "wp".
  */
-    void
+    శూన్య
 free_jumplist(win_T *wp)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < wp->w_jumplistlen; ++i)
+    కొరకు (i = 0; i < wp->w_jumplistlen; ++i)
 	vim_free(wp->w_jumplist[i].fname);
 }
 
-    void
-set_last_cursor(win_T *win)
+    శూన్య
+సమితి_చివరి_cursor(win_T *win)
 {
-    if (win->w_buffer != NULL)
-	win->w_buffer->b_last_cursor = win->w_cursor;
+    ఒకవేళ (win->w_బఫరు != ఖాళీ)
+	win->w_బఫరు->b_చివరి_cursor = win->w_cursor;
 }
 
-#if defined(EXITFREE)
-    void
-free_all_marks(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_all_marks(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < NMARKS + EXTRA_MARKS; i++)
-	if (namedfm[i].fmark.mark.lnum != 0)
+    కొరకు (i = 0; i < NMARKS + EXTRA_MARKS; i++)
+	ఒకవేళ (namedfm[i].fmark.mark.lnum != 0)
 	    vim_free(namedfm[i].fname);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_VIMINFO)
+#ఒకవేళ defined(FEAT_VIMINFO)
 /*
  * Return a pointer to the named file marks.
  */
     xfmark_T *
-get_namedfm(void)
+get_namedfm(శూన్య)
 {
-    return namedfm;
+    తిరిగి namedfm;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Add information about mark 'mname' to list 'l'
  */
-    static int
-add_mark(list_T *l, char_u *mname, size_t mnamelen, pos_T *pos, int bufnr, char_u *fname)
+    స్థిర పూర్ణాంకం
+కూడు_mark(list_T *l, char_u *mname, size_t mnamelen, pos_T *pos, పూర్ణాంకం bufnr, char_u *fname)
 {
     dict_T	*d;
     list_T	*lpos;
 
-    if (pos->lnum <= 0)
-	return OK;
+    ఒకవేళ (pos->lnum <= 0)
+	తిరిగి OK;
 
     d = dict_alloc();
-    if (d == NULL)
-	return FAIL;
+    ఒకవేళ (d == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (list_append_dict(l, d) == FAIL)
+    ఒకవేళ (list_append_dict(l, d) == FAIL)
     {
 	dict_unref(d);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     lpos = list_alloc();
-    if (lpos == NULL)
-	return FAIL;
+    ఒకవేళ (lpos == ఖాళీ)
+	తిరిగి FAIL;
 
-    list_append_number(lpos, bufnr);
-    list_append_number(lpos, pos->lnum);
-    list_append_number(lpos, pos->col < MAXCOL ? pos->col + 1 : MAXCOL);
-    list_append_number(lpos, pos->coladd);
+    list_append_సంఖ్య(lpos, bufnr);
+    list_append_సంఖ్య(lpos, pos->lnum);
+    list_append_సంఖ్య(lpos, pos->నిలువు < MAXCOL ? pos->నిలువు + 1 : MAXCOL);
+    list_append_సంఖ్య(lpos, pos->coladd);
 
-    if (dict_add_string_len(d, "mark", mname, (int)mnamelen) == FAIL
-	    || dict_add_list(d, "pos", lpos) == FAIL
-	    || (fname != NULL && dict_add_string(d, "file", fname) == FAIL))
+    ఒకవేళ (dict_కూడు_string_len(d, "mark", mname, (పూర్ణాంకం)mnamelen) == FAIL
+	    || dict_కూడు_list(d, "pos", lpos) == FAIL
+	    || (fname != ఖాళీ && dict_కూడు_string(d, "file", fname) == FAIL))
     {
-	if (lpos->lv_refcount == 0)
+	ఒకవేళ (lpos->lv_refcount == 0)
 	    list_free(lpos);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Get information about marks local to a buffer.
  */
-    static void
+    స్థిర శూన్య
 get_buf_local_marks(buf_T *buf, list_T *l)
 {
     char_u	mname[3] = "' ";
     size_t	mnamelen = STRLEN_LITERAL("' ");
-    int		i;
+    పూర్ణాంకం		i;
 
     // Marks 'a' to 'z'
-    for (i = 0; i < NMARKS; ++i)
+    కొరకు (i = 0; i < NMARKS; ++i)
     {
 	mname[1] = 'a' + i;
-	add_mark(l, mname, mnamelen, &buf->b_namedm[i], buf->b_fnum, NULL);
+	కూడు_mark(l, mname, mnamelen, &buf->b_namedm[i], buf->b_fnum, ఖాళీ);
     }
 
     // Mark '' is a window local mark and not a buffer local mark
-    add_mark(l, (char_u *)"''", STRLEN_LITERAL("''"), &curwin->w_pcmark, curbuf->b_fnum, NULL);
+    కూడు_mark(l, (char_u *)"''", STRLEN_LITERAL("''"), &curwin->w_pcmark, curbuf->b_fnum, ఖాళీ);
 
-    add_mark(l, (char_u *)"'\"", STRLEN_LITERAL("'\""), &buf->b_last_cursor, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'[", STRLEN_LITERAL("'["), &buf->b_op_start, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"']", STRLEN_LITERAL("']"), &buf->b_op_end, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_last_insert, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'.", STRLEN_LITERAL("'."), &buf->b_last_change, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'<", STRLEN_LITERAL("'<"), &buf->b_visual.vi_start, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'>", STRLEN_LITERAL("'>"), &buf->b_visual.vi_end, buf->b_fnum, NULL);
+    కూడు_mark(l, (char_u *)"'\"", STRLEN_LITERAL("'\""), &buf->b_చివరి_cursor, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"'[", STRLEN_LITERAL("'["), &buf->b_op_ప్రారంభం, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"']", STRLEN_LITERAL("']"), &buf->b_op_చివర, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_చివరి_చొప్పించు, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"'.", STRLEN_LITERAL("'."), &buf->b_చివరి_change, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"'<", STRLEN_LITERAL("'<"), &buf->b_visual.vi_ప్రారంభం, buf->b_fnum, ఖాళీ);
+    కూడు_mark(l, (char_u *)"'>", STRLEN_LITERAL("'>"), &buf->b_visual.vi_చివర, buf->b_fnum, ఖాళీ);
 }
 
 /*
  * Get information about global marks ('A' to 'Z' and '0' to '9')
  */
-    static void
+    స్థిర శూన్య
 get_global_marks(list_T *l)
 {
     char_u	mname[3] = "' ";
     size_t	mnamelen = STRLEN_LITERAL("' ");
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*name;
 
     // Marks 'A' to 'Z' and '0' to '9'
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    కొరకు (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
     {
-	if (namedfm[i].fmark.fnum != 0)
+	ఒకవేళ (namedfm[i].fmark.fnum != 0)
 	    name = buflist_nr2name(namedfm[i].fmark.fnum, TRUE, TRUE);
-	else
+	లేకపోతే
 	    name = namedfm[i].fname;
-	if (name != NULL)
+	ఒకవేళ (name != ఖాళీ)
 	{
 	    mname[1] = i >= NMARKS ? i - NMARKS + '0' : i + 'A';
-	    add_mark(l, mname, mnamelen, &namedfm[i].fmark.mark,
+	    కూడు_mark(l, mname, mnamelen, &namedfm[i].fmark.mark,
 		    namedfm[i].fmark.fnum, name);
-	    if (namedfm[i].fmark.fnum != 0)
+	    ఒకవేళ (namedfm[i].fmark.fnum != 0)
 		vim_free(name);
 	}
     }
@@ -1554,27 +1554,27 @@ get_global_marks(list_T *l)
 /*
  * getmarklist() function
  */
-    void
+    శూన్య
 f_getmarklist(typval_T *argvars, typval_T *rettv)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[0].v_type == VAR_UNKNOWN)
     {
 	get_global_marks(rettv->vval.v_list);
-	return;
+	తిరిగి;
     }
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
     get_buf_local_marks(buf, rettv->vval.v_list);
 }
-#endif
+#అయితే_ముగింపు

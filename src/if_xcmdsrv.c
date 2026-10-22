@@ -11,10 +11,10 @@
  *
  */
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
-#if (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
+#ఒకవేళ (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
 
 # ifdef FEAT_X11
 #  include <X11/Intrinsic.h>
@@ -62,18 +62,18 @@
  * It's unlikely, but possible.
  */
 
-typedef struct PendingCommand
+రకనిర్వచనం నిర్మాణం PendingCommand
 {
-    int	    serial;	// Serial number expected in result.
-    int	    code;	// Result Code. 0 is OK
-    char_u  *result;	// String result for command (malloc'ed).
+    పూర్ణాంకం	    serial;	// Serial number expected in result.
+    పూర్ణాంకం	    సంకేతం_2;	// Result Code. 0 is OK
+    char_u  *ఫలితం;	// String result for command (malloc'ed).
 			// NULL means command still pending.
-    struct PendingCommand *nextPtr;
+    నిర్మాణం PendingCommand *తదుపరి_Ptr;
 			// Next in list of all outstanding commands.
 			// NULL means end of list.
 } PendingCommand;
 
-static PendingCommand *pendingCommands = NULL;
+స్థిర PendingCommand *pendingCommands = ఖాళీ;
 				// List of all commands currently
 				// being waited for.
 
@@ -157,111 +157,111 @@ static PendingCommand *pendingCommands = NULL;
  * this module:
  */
 
-# define MAX_PROP_WORDS 100000
+# define MAX_PROP_పదాలు 100000
 
-struct ServerReply
+నిర్మాణం Server_జవాబు
 {
-    Window  id;
-    garray_T strings;
+    కిటికీ  id;
+    garray_T అక్షరశ్రేణులు;
 };
-static garray_T serverReply = { 0, 0, 0, 0, 0 };
-enum ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
+స్థిర garray_T server_జవాబు = { 0, 0, 0, 0, 0 };
+గణన Server_జవాబు_Op { SROP_కనుగొను, SROP_కూడు, SROP_Delete };
 
-typedef int (*EndCond)(void *);
+రకనిర్వచనం పూర్ణాంకం (*చివర_Cond)(శూన్య *);
 
-struct x_cmdqueue
+నిర్మాణం x_cmdqueue
 {
     char_u		*propInfo;
     long_u		len;
-    struct x_cmdqueue	*next;
-    struct x_cmdqueue	*prev;
+    నిర్మాణం x_cmdqueue	*తదుపరి;
+    నిర్మాణం x_cmdqueue	*prev;
 };
 
-typedef struct x_cmdqueue x_queue_T;
+రకనిర్వచనం నిర్మాణం x_cmdqueue x_వరుస_T;
 
 // dummy node, header for circular queue
-static x_queue_T head = {NULL, 0, NULL, NULL};
+స్థిర x_వరుస_T తల = {ఖాళీ, 0, ఖాళీ, ఖాళీ};
 
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
-static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose);
-static int	SendInit(Display *dpy);
-static int	DoRegisterName(Display *dpy, char_u *name);
-static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
-static int	WaitForPend(void *p);
-static int	WindowValid(Display *dpy, Window w);
-static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
-static int	x_error_check(Display *dpy, XErrorEvent *error_event);
-static int	IsSerialName(char_u *name);
-static void	save_in_queue(char_u *buf, long_u len);
-static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
+స్థిర కిటికీ	LookupName(Display *dpy, char_u *name, పూర్ణాంకం delete, char_u **loose);
+స్థిర పూర్ణాంకం	SendInit(Display *dpy);
+స్థిర పూర్ణాంకం	Do_రిజిస్టరు_Name(Display *dpy, char_u *name);
+స్థిర శూన్య	DeleteAnyLingerer(Display *dpy, కిటికీ w);
+స్థిర పూర్ణాంకం	GetRegProp(Display *dpy, char_u **regPropp, long_u *అంకె_Itemsp, పూర్ణాంకం domsg);
+స్థిర పూర్ణాంకం	WaitForPend(శూన్య *p);
+స్థిర పూర్ణాంకం	కిటికీ_Valid(Display *dpy, కిటికీ w);
+స్థిర శూన్య	ServerWait(Display *dpy, కిటికీ w, చివర_Cond చివర_Cond_2, శూన్య *చివర_దత్తాంశం, పూర్ణాంకం localLoop, పూర్ణాంకం seconds);
+స్థిర పూర్ణాంకం	AppendPropCarefully(Display *display, కిటికీ కిటికీ_2, Atom property, char_u *విలువ, పూర్ణాంకం నిడివి);
+స్థిర పూర్ణాంకం	x_error_check(Display *dpy, XErrorEvent *error_event);
+స్థిర పూర్ణాంకం	IsSerialName(char_u *name);
+స్థిర శూన్య	save_లోపల_వరుస(char_u *buf, long_u len);
+స్థిర శూన్య	server_parse_సందేశం(Display *dpy, char_u *propInfo, long_u అంకె_వస్తువులు);
 
 // Private variables for the "server" functionality
-static Atom	registryProperty = None;
-static Atom	vimProperty = None;
-static int	got_x_error = FALSE;
+స్థిర Atom	registryProperty = None;
+స్థిర Atom	vimProperty = None;
+స్థిర పూర్ణాంకం	got_x_error = FALSE;
 
-static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
+స్థిర char_u	*ఖాళీలు_prop = (char_u *)"";	// empty GetRegProp() result
 
 /*
  * Associate an ASCII name with Vim.  Try real hard to get a unique one.
  * Returns FAIL or OK.
  */
-    int
-serverRegisterName(
+    పూర్ణాంకం
+server_రిజిస్టరు_Name(
     Display	*dpy,		// display to register with
     char_u	*name)		// the name that will be used as a base
 {
-    int		i;
-    int		res;
-    char_u	*p = NULL;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		res;
+    char_u	*p = ఖాళీ;
 
-    res = DoRegisterName(dpy, name);
-    if (res >= 0)
-	return OK;
+    res = Do_రిజిస్టరు_Name(dpy, name);
+    ఒకవేళ (res >= 0)
+	తిరిగి OK;
 
     i = 1;
-    do
+    చేయి
     {
-	if (res < -1 || i >= 1000)
+	ఒకవేళ (res < -1 || i >= 1000)
 	{
-	    msg_attr(_("Unable to register a command server name"),
+	    సందేశం_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	    p = alloc(STRLEN(name) + 10);
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	{
 	    res = -10;
-	    continue;
+	    కొనసాగు;
 	}
-	sprintf((char *)p, "%s%d", name, i++);
-	res = DoRegisterName(dpy, p);
+	sprintf((అక్షరం *)p, "%s%d", name, i++);
+	res = Do_రిజిస్టరు_Name(dpy, p);
     }
-    while (res < 0)
+    అయితే (res < 0)
 	;
     vim_free(p);
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-DoRegisterName(Display *dpy, char_u *name)
+    స్థిర పూర్ణాంకం
+Do_రిజిస్టరు_Name(Display *dpy, char_u *name)
 {
-    Window	w;
+    కిటికీ	w;
     XErrorHandler old_handler;
-# define MAX_NAME_LENGTH 100
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+# define MAX_NAME_నిడివి 100
+    char_u	propInfo[MAX_NAME_నిడివి + 20];
 
-    if (commProperty == None)
+    ఒకవేళ (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	ఒకవేళ (SendInit(dpy) < 0)
+	    తిరిగి -2;
     }
 
     /*
@@ -272,13 +272,13 @@ DoRegisterName(Display *dpy, char_u *name)
      * server!
      */
     XGrabServer(dpy);
-    w = LookupName(dpy, name, FALSE, NULL);
-    if (w != (Window)0)
+    w = LookupName(dpy, name, FALSE, ఖాళీ);
+    ఒకవేళ (w != (కిటికీ)0)
     {
-	Status		status;
-	int		dummyInt;
-	unsigned int	dummyUns;
-	Window		dummyWin;
+	స్థితి_3		స్థితి_2;
+	పూర్ణాంకం		dummyInt;
+	గుర్తులేని పూర్ణాంకం	dummyUns;
+	కిటికీ		dummyWin;
 
 	/*
 	 * The name is currently registered.  See if the commWindow
@@ -288,73 +288,73 @@ DoRegisterName(Display *dpy, char_u *name)
 	 * registry).
 	 */
 	old_handler = XSetErrorHandler(x_error_check);
-	status = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
+	స్థితి_2 = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
 				  &dummyUns, &dummyUns, &dummyUns, &dummyUns);
-	(void)XSetErrorHandler(old_handler);
-	if (status != Success && w != commWindow)
+	(శూన్య)XSetErrorHandler(old_handler);
+	ఒకవేళ (స్థితి_2 != Success && w != comm_కిటికీ)
 	{
 	    XUngrabServer(dpy);
 	    XFlush(dpy);
-	    return -1;
+	    తిరిగి -1;
 	}
-	(void)LookupName(dpy, name, /*delete=*/TRUE, NULL);
+	(శూన్య)LookupName(dpy, name, /*delete=*/TRUE, ఖాళీ);
     }
-    sprintf((char *)propInfo, "%x %.*s", (int_u)commWindow,
-						       MAX_NAME_LENGTH, name);
+    sprintf((అక్షరం *)propInfo, "%x %.*s", (int_u)comm_కిటికీ,
+						       MAX_NAME_నిడివి, name);
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
-		    PropModeAppend, propInfo, STRLEN(propInfo) + 1);
+    XChangeProperty(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty, XA_STRING, 8,
+		    Prop_బహుళకం_Append, propInfo, STRLEN(propInfo) + 1);
     XUngrabServer(dpy);
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (శూన్య)XSetErrorHandler(old_handler);
 
-    if (!got_x_error)
+    ఒకవేళ (!got_x_error)
     {
 	size_t	namelen;
 
 	namelen = STRLEN(name);
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_SEND_SERVER, name, (int)namelen);
+	సమితి_vim_var_string(VV_SEND_SERVER, name, (పూర్ణాంకం)namelen);
 # endif
 	serverName = vim_strnsave(name, namelen);
 	need_maketitle = TRUE;
-	return 0;
+	తిరిగి 0;
     }
-    return -2;
+    తిరిగి -2;
 }
 
-# if defined(FEAT_GUI)
+# ఒకవేళ defined(FEAT_GUI)
 /*
  * Clean out new ID from registry and set it as comm win.
  * Change any registered window ID.
  */
-    void
-serverChangeRegisteredWindow(
+    శూన్య
+server_Change_Registered_కిటికీ(
     Display	*dpy,		// Display to register with
-    Window	newwin)		// Re-register to this ID
+    కిటికీ	newwin)		// Re-register to this ID
 {
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+    char_u	propInfo[MAX_NAME_నిడివి + 20];
 
-    commWindow = newwin;
+    comm_కిటికీ = newwin;
 
     // Always call SendInit() here, to make sure commWindow is marked as a Vim
     // window.
-    if (SendInit(dpy) < 0)
-	return;
+    ఒకవేళ (SendInit(dpy) < 0)
+	తిరిగి;
 
     // WARNING: Do not step through this while debugging, it will hangup the X
     // server!
     XGrabServer(dpy);
     DeleteAnyLingerer(dpy, newwin);
-    if (serverName != NULL)
+    ఒకవేళ (serverName != ఖాళీ)
     {
 	// Reinsert name if it was already registered
-	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
-	sprintf((char *)propInfo, "%x %.*s",
-		(int_u)newwin, MAX_NAME_LENGTH, serverName);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
-			PropModeAppend, (char_u *)propInfo,
+	(శూన్య)LookupName(dpy, serverName, /*delete=*/TRUE, ఖాళీ);
+	sprintf((అక్షరం *)propInfo, "%x %.*s",
+		(int_u)newwin, MAX_NAME_నిడివి, serverName);
+	XChangeProperty(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty, XA_STRING, 8,
+			Prop_బహుళకం_Append, (char_u *)propInfo,
 			STRLEN(propInfo) + 1);
     }
     XUngrabServer(dpy);
@@ -365,43 +365,43 @@ serverChangeRegisteredWindow(
  * Send to an instance of Vim via the X display.
  * Returns 0 for OK, negative for an error.
  */
-    int
-serverSendToVim(
+    పూర్ణాంకం
+server_Send_గమ్యం_Vim(
     Display	*dpy,			// Where to send.
     char_u	*name,			// Where to send.
     char_u	*cmd,			// What to send.
-    char_u	**result,		// Result of eval'ed expression
-    Window	*server,		// Actual ID of receiving app
-    Bool	asExpr,			// Interpret as keystrokes or expr ?
-    int		timeout,		// seconds to wait or zero
+    char_u	**ఫలితం,		// Result of eval'ed expression
+    కిటికీ	*server,		// Actual ID of receiving app
+    Bool	as_సమాసం,			// Interpret as keystrokes or expr ?
+    పూర్ణాంకం		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
-    int		silent)			// don't complain about no server
+    పూర్ణాంకం		silent)			// don't complain about no server
 {
-    Window	    w;
+    కిటికీ	    w;
     char_u	    *property;
-    int		    length;
-    int		    res;
-    static int	    serial = 0;	// Running count of sent commands.
+    పూర్ణాంకం		    నిడివి;
+    పూర్ణాంకం		    res;
+    స్థిర పూర్ణాంకం	    serial = 0;	// Running count of sent commands.
 				// Used to give each command a
 				// different serial number.
     PendingCommand  pending;
-    char_u	    *loosename = NULL;
+    char_u	    *loosename = ఖాళీ;
 
-    if (result != NULL)
-	*result = NULL;
-    if (name == NULL || *name == NUL)
+    ఒకవేళ (ఫలితం != ఖాళీ)
+	*ఫలితం = ఖాళీ;
+    ఒకవేళ (name == ఖాళీ || *name == NUL)
 	name = (char_u *)"GVIM";    // use a default name
 
-    if (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
-	return -1;
+    ఒకవేళ (commProperty == None && dpy != ఖాళీ && SendInit(dpy) < 0)
+	తిరిగి -1;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim(%s, %s)", name, cmd);
+# ఒకవేళ defined(FEAT_EVAL)
+    ch_log(ఖాళీ, "serverSendToVim(%s, %s)", name, cmd);
 # endif
 
     // Execute locally if no display or target is ourselves
-    if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+    ఒకవేళ (dpy == ఖాళీ || (serverName != ఖాళీ && STRICMP(name, serverName) == 0))
+	తిరిగి send_గమ్యం_Local_Vim(cmd, as_సమాసం, ఫలితం);
 
     /*
      * Bind the server name to a communication window.
@@ -411,31 +411,31 @@ serverSendToVim(
      *
      * Delete any lingering names from dead editors.
      */
-    while (TRUE)
+    అయితే (TRUE)
     {
 	w = LookupName(dpy, name, FALSE, &loosename);
 	// Check that the window is hot
-	if (w != None)
+	ఒకవేళ (w != None)
 	{
-	    if (!WindowValid(dpy, w))
+	    ఒకవేళ (!కిటికీ_Valid(dpy, w))
 	    {
 		LookupName(dpy, loosename ? loosename : name,
-			   /*DELETE=*/TRUE, NULL);
+			   /*DELETE=*/TRUE, ఖాళీ);
 		VIM_CLEAR(loosename);
-		continue;
+		కొనసాగు;
 	    }
 	}
-	break;
+	ఆపు;
     }
-    if (w == None)
+    ఒకవేళ (w == None)
     {
-	if (!silent)
+	ఒకవేళ (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	తిరిగి -1;
     }
-    else if (loosename != NULL)
+    లేకపోతే ఒకవేళ (loosename != ఖాళీ)
 	name = loosename;
-    if (server != NULL)
+    ఒకవేళ (server != ఖాళీ)
 	*server = w;
 
     /*
@@ -443,30 +443,30 @@ serverSendToVim(
      * comm window in the communication window.
      * Length must be computed exactly!
      */
-    length = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
-    property = alloc(length + 30);
+    నిడివి = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
+    property = alloc(నిడివి + 30);
 
-    sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
-		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
-    if (name == loosename)
+    sprintf((అక్షరం *)property, "%c%c%c-n %s%c-E %s%c-s %s",
+		      0, as_సమాసం ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
+    ఒకవేళ (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
     serial++;
-    sprintf((char *)property + length, "%c-r %x %d",
-						0, (int_u)commWindow, serial);
+    sprintf((అక్షరం *)property + నిడివి, "%c-r %x %d",
+						0, (int_u)comm_కిటికీ, serial);
     // Add length of what "-r %x %d" resulted in, skipping the NUL.
-    length += STRLEN(property + length + 1) + 1;
+    నిడివి += STRLEN(property + నిడివి + 1) + 1;
 
-    res = AppendPropCarefully(dpy, w, commProperty, property, length + 1);
+    res = AppendPropCarefully(dpy, w, commProperty, property, నిడివి + 1);
     vim_free(property);
-    if (res < 0)
+    ఒకవేళ (res < 0)
     {
-	emsg(_(e_failed_to_send_command_to_destination_program));
-	return -1;
+	emsg(_(e_failed_గమ్యం_send_command_గమ్యం_destination_కార్యక్రమం));
+	తిరిగి -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
-	return 0;
+    ఒకవేళ (!as_సమాసం) // There is no answer for this - Keys are sent async
+	తిరిగి 0;
 
     /*
      * Register the fact that we're waiting for a command to
@@ -474,9 +474,9 @@ serverSendToVim(
      * AppendErrorProc to pass back the command's results).
      */
     pending.serial = serial;
-    pending.code = 0;
-    pending.result = NULL;
-    pending.nextPtr = pendingCommands;
+    pending.సంకేతం_2 = 0;
+    pending.ఫలితం = ఖాళీ;
+    pending.తదుపరి_Ptr = pendingCommands;
     pendingCommands = &pending;
 
     ServerWait(dpy, w, WaitForPend, &pending, localLoop,
@@ -486,81 +486,81 @@ serverSendToVim(
      * Unregister the information about the pending command
      * and return the result.
      */
-    if (pendingCommands == &pending)
-	pendingCommands = pending.nextPtr;
-    else
+    ఒకవేళ (pendingCommands == &pending)
+	pendingCommands = pending.తదుపరి_Ptr;
+    లేకపోతే
     {
 	PendingCommand *pcPtr;
 
-	for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
-	    if (pcPtr->nextPtr == &pending)
+	కొరకు (pcPtr = pendingCommands; pcPtr != ఖాళీ; pcPtr = pcPtr->తదుపరి_Ptr)
+	    ఒకవేళ (pcPtr->తదుపరి_Ptr == &pending)
 	    {
-		pcPtr->nextPtr = pending.nextPtr;
-		break;
+		pcPtr->తదుపరి_Ptr = pending.తదుపరి_Ptr;
+		ఆపు;
 	    }
     }
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim() result: %s",
-	    pending.result == NULL ? "NULL" : (char *)pending.result);
+# ఒకవేళ defined(FEAT_EVAL)
+    ch_log(ఖాళీ, "serverSendToVim() result: %s",
+	    pending.ఫలితం == ఖాళీ ? "NULL" : (అక్షరం *)pending.ఫలితం);
 # endif
-    if (result != NULL)
-	*result = pending.result;
-    else
-	vim_free(pending.result);
+    ఒకవేళ (ఫలితం != ఖాళీ)
+	*ఫలితం = pending.ఫలితం;
+    లేకపోతే
+	vim_free(pending.ఫలితం);
 
-    return pending.code == 0 ? 0 : -1;
+    తిరిగి pending.సంకేతం_2 == 0 ? 0 : -1;
 }
 
-    static int
-WaitForPend(void *p)
+    స్థిర పూర్ణాంకం
+WaitForPend(శూన్య *p)
 {
     PendingCommand *pending = (PendingCommand *) p;
-    return pending->result != NULL;
+    తిరిగి pending->ఫలితం != ఖాళీ;
 }
 
 /*
  * Return TRUE if window "w" exists and has a "Vim" property on it.
  */
-    static int
-WindowValid(Display *dpy, Window w)
+    స్థిర పూర్ణాంకం
+కిటికీ_Valid(Display *dpy, కిటికీ w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
-    int		    i;
+    పూర్ణాంకం		    అంకె_Prop;
+    పూర్ణాంకం		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
-    plist = XListProperties(dpy, w, &numProp);
+    plist = XListProperties(dpy, w, &అంకె_Prop);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
-    if (plist == NULL || got_x_error)
-	return FALSE;
+    ఒకవేళ (plist == ఖాళీ || got_x_error)
+	తిరిగి FALSE;
 
-    for (i = 0; i < numProp; i++)
-	if (plist[i] == vimProperty)
+    కొరకు (i = 0; i < అంకె_Prop; i++)
+	ఒకవేళ (plist[i] == vimProperty)
 	{
 	    XFree(plist);
-	    return TRUE;
+	    తిరిగి TRUE;
 	}
     XFree(plist);
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Enter a loop processing X events & polling chars until we see a result
  */
-    static void
+    స్థిర శూన్య
 ServerWait(
     Display	*dpy,
-    Window	w,
-    EndCond	endCond,
-    void	*endData,
-    int		localLoop,
-    int		seconds)
+    కిటికీ	w,
+    చివర_Cond	చివర_Cond_2,
+    శూన్య	*చివర_దత్తాంశం,
+    పూర్ణాంకం		localLoop,
+    పూర్ణాంకం		seconds)
 {
-    time_t	    start;
+    time_t	    ప్రారంభం;
     time_t	    now;
     XEvent	    event;
 
@@ -570,55 +570,55 @@ ServerWait(
     fd_set	    fds;
 
     FD_ZERO(&fds);
-    FD_SET(ConnectionNumber(dpy), &fds);
-# else
-    struct pollfd   fds;
+    FD_SET(Connection_సంఖ్య(dpy), &fds);
+# లేకపోతే
+    నిర్మాణం pollfd   fds;
 
-    fds.fd = ConnectionNumber(dpy);
+    fds.fd = Connection_సంఖ్య(dpy);
     fds.events = POLLIN;
 # endif
 
-    time(&start);
-    while (TRUE)
+    సమయం(&ప్రారంభం);
+    అయితే (TRUE)
     {
-	while (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
+	అయితే (XCheck_కిటికీ_Event(dpy, comm_కిటికీ, Property_Change_ముసుగు, &event))
 	    serverEventProc(dpy, &event, 1);
 	server_parse_messages();
 
-	if (endCond(endData) != 0)
-	    break;
-	if (!WindowValid(dpy, w))
-	    break;
-	time(&now);
-	if (seconds >= 0 && (now - start) >= seconds)
-	    break;
+	ఒకవేళ (చివర_Cond_2(చివర_దత్తాంశం) != 0)
+	    ఆపు;
+	ఒకవేళ (!కిటికీ_Valid(dpy, w))
+	    ఆపు;
+	సమయం(&now);
+	ఒకవేళ (seconds >= 0 && (now - ప్రారంభం) >= seconds)
+	    ఆపు;
 
 # ifdef FEAT_TIMERS
 	check_due_timer();
 # endif
 
 	// Just look out for the answer without calling back into Vim
-	if (localLoop)
+	ఒకవేళ (localLoop)
 	{
 # ifdef HAVE_SELECT
-	    struct timeval  tv;
+	    నిర్మాణం timeval  tv;
 
 	    // Set the time every call, select() may change it to the remaining
 	    // time.
 	    tv.tv_sec = 0;
 	    tv.tv_usec =  SEND_MSEC_POLL * 1000;
-	    if (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
-		break;
-# else
-	    if (poll(&fds, 1, SEND_MSEC_POLL) < 0)
-		break;
+	    ఒకవేళ (select(FD_SETSIZE, &fds, ఖాళీ, ఖాళీ, &tv) < 0)
+		ఆపు;
+# లేకపోతే
+	    ఒకవేళ (poll(&fds, 1, SEND_MSEC_POLL) < 0)
+		ఆపు;
 # endif
 	}
-	else
+	లేకపోతే
 	{
-	    if (got_int)
-		break;
-	    ui_delay((long)UI_MSEC_DELAY, TRUE);
+	    ఒకవేళ (got_int)
+		ఆపు;
+	    ui_delay((దీర్ఘ)UI_MSEC_DELAY, TRUE);
 	    ui_breakcheck();
 	}
     }
@@ -632,152 +632,152 @@ ServerWait(
  * Returns a list of strings or NULL on failure.
  */
     list_T *
-serverGetVimNames(Display *dpy)
+server_Get_Vim_పేర్లు(Display *dpy)
 {
     char_u	*regProp;
-    char_u	*entry;
+    char_u	*నమోదు_2;
     char_u	*p;
-    long_u	numItems;
+    long_u	అంకె_వస్తువులు;
     int_u	w;
     list_T	*list;
 
-    if (registryProperty == None)
+    ఒకవేళ (registryProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return NULL;
+	ఒకవేళ (SendInit(dpy) < 0)
+	    తిరిగి ఖాళీ;
     }
 
     list = list_alloc();
-    if (list == NULL)
-	return NULL;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
-	return NULL;
+    ఒకవేళ (GetRegProp(dpy, &regProp, &అంకె_వస్తువులు, TRUE) == FAIL)
+	తిరిగి ఖాళీ;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    కొరకు (p = regProp; (long_u)(p - regProp) < అంకె_వస్తువులు; p++)
     {
-	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	నమోదు_2 = p;
+	అయితే (*p != 0 && !సురక్షిత_isspace(*p))
 	    p++;
-	if (*p != 0)
+	ఒకవేళ (*p != 0)
 	{
 	    w = None;
-	    sscanf((char *)entry, "%x", &w);
-	    if (WindowValid(dpy, (Window)w))
+	    అక్షరశ్రేణి_చదువు((అక్షరం *)నమోదు_2, "%x", &w);
+	    ఒకవేళ (కిటికీ_Valid(dpy, (కిటికీ)w))
 		list_append_string(list, p + 1, -1);
-	    while (*p != 0)
+	    అయితే (*p != 0)
 		p++;
 	}
     }
-    if (regProp != empty_prop)
+    ఒకవేళ (regProp != ఖాళీలు_prop)
 	XFree(regProp);
-    return list;
+    తిరిగి list;
 }
 
 /////////////////////////////////////////////////////////////
 // Reply stuff
 
-    static struct ServerReply *
-ServerReplyFind(Window w, enum ServerReplyOp op)
+    స్థిర నిర్మాణం Server_జవాబు *
+Server_జవాబు_కనుగొను(కిటికీ w, గణన Server_జవాబు_Op op)
 {
-    struct ServerReply *p;
-    struct ServerReply e;
-    int		i;
+    నిర్మాణం Server_జవాబు *p;
+    నిర్మాణం Server_జవాబు e;
+    పూర్ణాంకం		i;
 
-    p = (struct ServerReply *) serverReply.ga_data;
-    for (i = 0; i < serverReply.ga_len; i++, p++)
-	if (p->id == w)
-	    break;
-    if (i >= serverReply.ga_len)
-	p = NULL;
+    p = (నిర్మాణం Server_జవాబు *) server_జవాబు.ga_దత్తాంశం;
+    కొరకు (i = 0; i < server_జవాబు.ga_len; i++, p++)
+	ఒకవేళ (p->id == w)
+	    ఆపు;
+    ఒకవేళ (i >= server_జవాబు.ga_len)
+	p = ఖాళీ;
 
-    if (p == NULL && op == SROP_Add)
+    ఒకవేళ (p == ఖాళీ && op == SROP_కూడు)
     {
-	if (serverReply.ga_growsize == 0)
-	    ga_init2(&serverReply, sizeof(struct ServerReply), 1);
-	if (ga_grow(&serverReply, 1) == OK)
+	ఒకవేళ (server_జవాబు.ga_growsize == 0)
+	    ga_init2(&server_జవాబు, పరిమాణం(నిర్మాణం Server_జవాబు), 1);
+	ఒకవేళ (ga_grow(&server_జవాబు, 1) == OK)
 	{
-	    p = ((struct ServerReply *) serverReply.ga_data)
-		+ serverReply.ga_len;
+	    p = ((నిర్మాణం Server_జవాబు *) server_జవాబు.ga_దత్తాంశం)
+		+ server_జవాబు.ga_len;
 	    e.id = w;
-	    ga_init2(&e.strings, 1, 100);
-	    mch_memmove(p, &e, sizeof(e));
-	    serverReply.ga_len++;
+	    ga_init2(&e.అక్షరశ్రేణులు, 1, 100);
+	    mch_memmove(p, &e, పరిమాణం(e));
+	    server_జవాబు.ga_len++;
 	}
     }
-    else if (p != NULL && op == SROP_Delete)
+    లేకపోతే ఒకవేళ (p != ఖాళీ && op == SROP_Delete)
     {
-	ga_clear(&p->strings);
-	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * sizeof(*p));
-	serverReply.ga_len--;
+	ga_clear(&p->అక్షరశ్రేణులు);
+	mch_memmove(p, p + 1, (server_జవాబు.ga_len - i - 1) * పరిమాణం(*p));
+	server_జవాబు.ga_len--;
     }
 
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Convert string to windowid.
  * Issue an error if the id is invalid.
  */
-    Window
-serverStrToWin(char_u *str)
+    కిటికీ
+server_Str_గమ్యం_Win(char_u *str)
 {
-    unsigned  id = None;
+    గుర్తులేని  id = None;
 
-    sscanf((char *)str, "0x%x", &id);
-    if (id == None)
-	semsg(_(e_invalid_server_id_used_str), str);
+    అక్షరశ్రేణి_చదువు((అక్షరం *)str, "0x%x", &id);
+    ఒకవేళ (id == None)
+	semsg(_(e_invalid_server_id_వాడిన_str), str);
 
-    return (Window)id;
+    తిరిగి (కిటికీ)id;
 }
 
 /*
  * Send a reply string (notification) to client with id "name".
  * Return -1 if the window is invalid.
  */
-    int
-serverSendReply(char_u *name, char_u *str)
+    పూర్ణాంకం
+server_Send_జవాబు(char_u *name, char_u *str)
 {
     char_u	*property;
-    int		length;
-    int		res;
+    పూర్ణాంకం		నిడివి;
+    పూర్ణాంకం		res;
     Display	*dpy = X_DISPLAY;
-    Window	win = serverStrToWin(name);
+    కిటికీ	win = server_Str_గమ్యం_Win(name);
 
-    if (commProperty == None)
+    ఒకవేళ (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	ఒకవేళ (SendInit(dpy) < 0)
+	    తిరిగి -2;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
+    ఒకవేళ (!కిటికీ_Valid(dpy, win))
+	తిరిగి -1;
 
-    length = STRLEN(p_enc) + STRLEN(str) + 14;
-    if ((property = alloc(length + 30)) == NULL)
-	return -1;
+    నిడివి = STRLEN(p_enc) + STRLEN(str) + 14;
+    ఒకవేళ ((property = alloc(నిడివి + 30)) == ఖాళీ)
+	తిరిగి -1;
 
-    sprintf((char *)property, "%cn%c-E %s%c-n %s%c-w %x",
-	    0, 0, p_enc, 0, str, 0, (unsigned int)commWindow);
+    sprintf((అక్షరం *)property, "%cn%c-E %s%c-n %s%c-w %x",
+	    0, 0, p_enc, 0, str, 0, (గుర్తులేని పూర్ణాంకం)comm_కిటికీ);
     // Add length of what "%x" resulted in.
-    length += STRLEN(property + length);
-    res = AppendPropCarefully(dpy, win, commProperty, property, length + 1);
+    నిడివి += STRLEN(property + నిడివి);
+    res = AppendPropCarefully(dpy, win, commProperty, property, నిడివి + 1);
     vim_free(property);
 
-    return res;
+    తిరిగి res;
 }
 
-    static int
-WaitForReply(void *p)
+    స్థిర పూర్ణాంకం
+Wait_For_జవాబు(శూన్య *p)
 {
-    Window  *w = (Window *) p;
+    కిటికీ  *w = (కిటికీ *) p;
 
-    return ServerReplyFind(*w, SROP_Find) != NULL;
+    తిరిగి Server_జవాబు_కనుగొను(*w, SROP_కనుగొను) != ఖాళీ;
 }
 
 /*
@@ -786,60 +786,60 @@ WaitForReply(void *p)
  * Return 0 and the allocated string in "*str" when a reply is available.
  * Return -1 if the window becomes invalid while waiting.
  */
-    int
-serverReadReply(
+    పూర్ణాంకం
+server_Read_జవాబు(
     Display	*dpy,
-    Window	win,
+    కిటికీ	win,
     char_u	**str,
-    int		localLoop,
-    int		timeout)
+    పూర్ణాంకం		localLoop,
+    పూర్ణాంకం		timeout)
 {
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*s;
-    struct	ServerReply *p;
+    నిర్మాణం	Server_జవాబు *p;
 
-    ServerWait(dpy, win, WaitForReply, &win, localLoop,
+    ServerWait(dpy, win, Wait_For_జవాబు, &win, localLoop,
 						   timeout > 0 ? timeout : -1);
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    ఒకవేళ ((p = Server_జవాబు_కనుగొను(win, SROP_కనుగొను)) != ఖాళీ && p->అక్షరశ్రేణులు.ga_len > 0)
     {
-	*str = vim_strsave(p->strings.ga_data);
+	*str = vim_strsave(p->అక్షరశ్రేణులు.ga_దత్తాంశం);
 	len = STRLEN(*str) + 1;
-	if (len < p->strings.ga_len)
+	ఒకవేళ (len < p->అక్షరశ్రేణులు.ga_len)
 	{
-	    s = (char_u *) p->strings.ga_data;
-	    mch_memmove(s, s + len, p->strings.ga_len - len);
-	    p->strings.ga_len -= len;
+	    s = (char_u *) p->అక్షరశ్రేణులు.ga_దత్తాంశం;
+	    mch_memmove(s, s + len, p->అక్షరశ్రేణులు.ga_len - len);
+	    p->అక్షరశ్రేణులు.ga_len -= len;
 	}
-	else
+	లేకపోతే
 	{
 	    // Last string read.  Remove from list
-	    ga_clear(&p->strings);
-	    ServerReplyFind(win, SROP_Delete);
+	    ga_clear(&p->అక్షరశ్రేణులు);
+	    Server_జవాబు_కనుగొను(win, SROP_Delete);
 	}
-	return 0;
+	తిరిగి 0;
     }
-    return -1;
+    తిరిగి -1;
 }
 
 /*
  * Check for replies from id (win).
  * Return TRUE and a non-malloc'ed string if there is.  Else return FALSE.
  */
-    int
-serverPeekReply(Display *dpy, Window win, char_u **str)
+    పూర్ణాంకం
+server_Peek_జవాబు(Display *dpy, కిటికీ win, char_u **str)
 {
-    struct ServerReply *p;
+    నిర్మాణం Server_జవాబు *p;
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    ఒకవేళ ((p = Server_జవాబు_కనుగొను(win, SROP_కనుగొను)) != ఖాళీ && p->అక్షరశ్రేణులు.ga_len > 0)
     {
-	if (str != NULL)
-	    *str = p->strings.ga_data;
-	return 1;
+	ఒకవేళ (str != ఖాళీ)
+	    *str = p->అక్షరశ్రేణులు.ga_దత్తాంశం;
+	తిరిగి 1;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
-    return 0;
+    ఒకవేళ (!కిటికీ_Valid(dpy, win))
+	తిరిగి -1;
+    తిరిగి 0;
 }
 
 
@@ -847,7 +847,7 @@ serverPeekReply(Display *dpy, Window win, char_u **str)
  * Initialize the communication channels for sending commands and receiving
  * results.
  */
-    static int
+    స్థిర పూర్ణాంకం
 SendInit(Display *dpy)
 {
     XErrorHandler old_handler;
@@ -859,36 +859,36 @@ SendInit(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    if (commProperty == None)
+    ఒకవేళ (commProperty == None)
 	commProperty = XInternAtom(dpy, "Comm", False);
-    if (vimProperty == None)
+    ఒకవేళ (vimProperty == None)
 	vimProperty = XInternAtom(dpy, "Vim", False);
-    if (registryProperty == None)
+    ఒకవేళ (registryProperty == None)
 	registryProperty = XInternAtom(dpy, "VimRegistry", False);
 
-    if (commWindow == None)
+    ఒకవేళ (comm_కిటికీ == None)
     {
-	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
+	comm_కిటికీ = XCreate_Simple_కిటికీ(dpy, XDefault_మూలం_కిటికీ(dpy),
 				getpid(), 0, 10, 10, 0,
 				WhitePixel(dpy, DefaultScreen(dpy)),
 				WhitePixel(dpy, DefaultScreen(dpy)));
-	XSelectInput(dpy, commWindow, PropertyChangeMask);
+	XSelect_ఆదానం(dpy, comm_కిటికీ, Property_Change_ముసుగు);
 	// WARNING: Do not step through this while debugging, it will hangup
 	// the X server!
 	XGrabServer(dpy);
-	DeleteAnyLingerer(dpy, commWindow);
+	DeleteAnyLingerer(dpy, comm_కిటికీ);
 	XUngrabServer(dpy);
     }
 
     // Make window recognizable as a vim window
-    XChangeProperty(dpy, commWindow, vimProperty, XA_STRING,
-		    8, PropModeReplace, (char_u *)VIM_VERSION_SHORT,
-			(int)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
+    XChangeProperty(dpy, comm_కిటికీ, vimProperty, XA_STRING,
+		    8, Prop_బహుళకం_Replace, (char_u *)VIM_సంస్కరణ_SHORT,
+			(పూర్ణాంకం)STRLEN_LITERAL(VIM_సంస్కరణ_SHORT) + 1);
 
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (శూన్య)XSetErrorHandler(old_handler);
 
-    return got_x_error ? -1 : 0;
+    తిరిగి got_x_error ? -1 : 0;
 }
 
 /*
@@ -903,61 +903,61 @@ SendInit(Display *dpy)
  *	If "delete" is non-zero, then if the named server is found it is
  *	removed from the registry property.
  */
-    static Window
+    స్థిర కిటికీ
 LookupName(
     Display	*dpy,	    // Display whose registry to check.
     char_u	*name,	    // Name of a server.
-    int		delete,	    // If non-zero, delete info about name.
+    పూర్ణాంకం		delete,	    // If non-zero, delete info about name.
     char_u	**loose)    // Do another search matching -999 if not found
 			    // Return result here if a match is found
 {
-    char_u	*regProp, *entry;
+    char_u	*regProp, *నమోదు_2;
     char_u	*p;
-    long_u	numItems;
-    int_u	returnValue;
+    long_u	అంకె_వస్తువులు;
+    int_u	return_విలువ;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return 0;
+    ఒకవేళ (GetRegProp(dpy, &regProp, &అంకె_వస్తువులు, FALSE) == FAIL)
+	తిరిగి 0;
 
     /*
      * Scan the property for the desired name.
      */
-    returnValue = (int_u)None;
-    entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    return_విలువ = (int_u)None;
+    నమోదు_2 = ఖాళీ;	// Not needed, but eliminates compiler warning.
+    కొరకు (p = regProp; (long_u)(p - regProp) < అంకె_వస్తువులు; )
     {
-	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	నమోదు_2 = p;
+	అయితే (*p != 0 && !సురక్షిత_isspace(*p))
 	    p++;
-	if (*p != 0 && STRICMP(name, p + 1) == 0)
+	ఒకవేళ (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
-	    sscanf((char *)entry, "%x", &returnValue);
-	    break;
+	    అక్షరశ్రేణి_చదువు((అక్షరం *)నమోదు_2, "%x", &return_విలువ);
+	    ఆపు;
 	}
-	while (*p != 0)
+	అయితే (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    ఒకవేళ (loose != ఖాళీ && return_విలువ == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	కొరకు (p = regProp; (long_u)(p - regProp) < అంకె_వస్తువులు; )
 	{
-	    entry = p;
-	    while (*p != 0 && !SAFE_isspace(*p))
+	    నమోదు_2 = p;
+	    అయితే (*p != 0 && !సురక్షిత_isspace(*p))
 		p++;
-	    if (*p != 0 && IsSerialName(p + 1)
+	    ఒకవేళ (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
-			&& returnValue != (int_u)None)
+		ఒకవేళ (అక్షరశ్రేణి_చదువు((అక్షరం *)నమోదు_2, "%x", &return_విలువ) == 1
+			&& return_విలువ != (int_u)None)
 		    *loose = vim_strsave(p + 1);
-		break;
+		ఆపు;
 	    }
-	    while (*p != 0)
+	    అయితే (*p != 0)
 		p++;
 	    p++;
 	}
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    ఒకవేళ (delete && return_విలువ != (int_u)None)
     {
-	int count;
+	పూర్ణాంకం లెక్క;
 
-	while (*p != 0)
+	అయితే (*p != 0)
 	    p++;
 	p++;
-	count = numItems - (p - regProp);
-	if (count > 0)
-	    mch_memmove(entry, p, count);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
-			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+	లెక్క = అంకె_వస్తువులు - (p - regProp);
+	ఒకవేళ (లెక్క > 0)
+	    mch_memmove(నమోదు_2, p, లెక్క);
+	XChangeProperty(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty, XA_STRING,
+			8, Prop_బహుళకం_Replace, regProp,
+			(పూర్ణాంకం)(అంకె_వస్తువులు - (p - నమోదు_2)));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    ఒకవేళ (regProp != ఖాళీలు_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    తిరిగి (కిటికీ)return_విలువ;
 }
 
 /*
@@ -998,59 +998,59 @@ LookupName(
  * 2. We get that id for our commWindow but only want to send, not register.
  * 3. The window will mistakenly be regarded valid because of own commWindow
  */
-    static void
+    స్థిర శూన్య
 DeleteAnyLingerer(
     Display	*dpy,	// Display whose registry to check.
-    Window	win)	// Window to remove
+    కిటికీ	win)	// Window to remove
 {
-    char_u	*regProp, *entry = NULL;
+    char_u	*regProp, *నమోదు_2 = ఖాళీ;
     char_u	*p;
-    long_u	numItems;
+    long_u	అంకె_వస్తువులు;
     int_u	wwin;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return;
+    ఒకవేళ (GetRegProp(dpy, &regProp, &అంకె_వస్తువులు, FALSE) == FAIL)
+	తిరిగి;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    కొరకు (p = regProp; (long_u)(p - regProp) < అంకె_వస్తువులు; )
     {
-	if (*p != 0)
+	ఒకవేళ (*p != 0)
 	{
-	    sscanf((char *)p, "%x", &wwin);
-	    if ((Window)wwin == win)
+	    అక్షరశ్రేణి_చదువు((అక్షరం *)p, "%x", &wwin);
+	    ఒకవేళ ((కిటికీ)wwin == win)
 	    {
-		int lastHalf;
+		పూర్ణాంకం చివరి_Half;
 
 		// Copy down the remainder to delete entry
-		entry = p;
-		while (*p != 0)
+		నమోదు_2 = p;
+		అయితే (*p != 0)
 		    p++;
 		p++;
-		lastHalf = numItems - (p - regProp);
-		if (lastHalf > 0)
-		    mch_memmove(entry, p, lastHalf);
-		numItems = (entry - regProp) + lastHalf;
-		p = entry;
-		continue;
+		చివరి_Half = అంకె_వస్తువులు - (p - regProp);
+		ఒకవేళ (చివరి_Half > 0)
+		    mch_memmove(నమోదు_2, p, చివరి_Half);
+		అంకె_వస్తువులు = (నమోదు_2 - regProp) + చివరి_Half;
+		p = నమోదు_2;
+		కొనసాగు;
 	    }
 	}
-	while (*p != 0)
+	అయితే (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (entry != NULL)
+    ఒకవేళ (నమోదు_2 != ఖాళీ)
     {
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
-			XA_STRING, 8, PropModeReplace, regProp,
-			(int)(p - regProp));
+	XChangeProperty(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty,
+			XA_STRING, 8, Prop_బహుళకం_Replace, regProp,
+			(పూర్ణాంకం)(p - regProp));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    ఒకవేళ (regProp != ఖాళీలు_prop)
 	XFree(regProp);
 }
 
@@ -1060,52 +1060,52 @@ DeleteAnyLingerer(
  * exist yet.
  * Return OK when successful.
  */
-    static int
+    స్థిర పూర్ణాంకం
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
-    long_u	*numItemsp,
-    int		domsg)		// When TRUE give error message.
+    long_u	*అంకె_Itemsp,
+    పూర్ణాంకం		domsg)		// When TRUE give error message.
 {
-    int		result, actualFormat;
-    long_u	bytesAfter;
+    పూర్ణాంకం		ఫలితం, actualFormat;
+    long_u	బైట్లు_After;
     Atom	actualType;
     XErrorHandler old_handler;
 
-    *regPropp = NULL;
+    *regPropp = ఖాళీ;
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    result = XGetWindowProperty(dpy, RootWindow(dpy, 0), registryProperty, 0L,
-				(long)MAX_PROP_WORDS, False,
+    ఫలితం = XGet_కిటికీ_Property(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty, 0L,
+				(దీర్ఘ)MAX_PROP_పదాలు, False,
 				XA_STRING, &actualType,
-				&actualFormat, numItemsp, &bytesAfter,
+				&actualFormat, అంకె_Itemsp, &బైట్లు_After,
 				regPropp);
 
     XSync(dpy, FALSE);
-    (void)XSetErrorHandler(old_handler);
-    if (got_x_error)
-	return FAIL;
+    (శూన్య)XSetErrorHandler(old_handler);
+    ఒకవేళ (got_x_error)
+	తిరిగి FAIL;
 
-    if (actualType == None)
+    ఒకవేళ (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
-	*numItemsp = 0;
-	*regPropp = empty_prop;
-	return OK;
+	*అంకె_Itemsp = 0;
+	*regPropp = ఖాళీలు_prop;
+	తిరిగి OK;
     }
 
     // If the property is improperly formed, then delete it.
-    if (result != Success || actualFormat != 8 || actualType != XA_STRING)
+    ఒకవేళ (ఫలితం != Success || actualFormat != 8 || actualType != XA_STRING)
     {
-	if (*regPropp != NULL)
+	ఒకవేళ (*regPropp != ఖాళీ)
 	    XFree(*regPropp);
-	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
-	if (domsg)
+	XDeleteProperty(dpy, మూలం_కిటికీ_2(dpy, 0), registryProperty);
+	ఒకవేళ (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 
@@ -1117,92 +1117,92 @@ GetRegProp(
  * unintended behavior and should only be used for code that blocks for a
  * response.
  */
-    void
+    శూన్య
 serverEventProc(
     Display	*dpy,
     XEvent	*eventPtr,	// Information about event.
-    int		immediate)	// Run event immediately. Should mostly be 0.
+    పూర్ణాంకం		తక్షణ)	// Run event immediately. Should mostly be 0.
 {
     char_u	*propInfo;
-    int		result, actualFormat;
-    long_u	numItems, bytesAfter;
+    పూర్ణాంకం		ఫలితం, actualFormat;
+    long_u	అంకె_వస్తువులు, బైట్లు_After;
     Atom	actualType;
 
-    if (eventPtr != NULL)
+    ఒకవేళ (eventPtr != ఖాళీ)
     {
-	if (eventPtr->xproperty.atom != commProperty
-		|| eventPtr->xproperty.state != PropertyNewValue)
-	    return;
+	ఒకవేళ (eventPtr->xproperty.atom != commProperty
+		|| eventPtr->xproperty.state != Property_New_విలువ)
+	    తిరిగి;
     }
 
     /*
      * Read the comm property and delete it.
      */
-    propInfo = NULL;
-    result = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
-				(long)MAX_PROP_WORDS, True,
+    propInfo = ఖాళీ;
+    ఫలితం = XGet_కిటికీ_Property(dpy, comm_కిటికీ, commProperty, 0L,
+				(దీర్ఘ)MAX_PROP_పదాలు, True,
 				XA_STRING, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
+				&actualFormat, &అంకె_వస్తువులు, &బైట్లు_After,
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
-    if (result != Success || actualType != XA_STRING || actualFormat != 8)
+    ఒకవేళ (ఫలితం != Success || actualType != XA_STRING || actualFormat != 8)
     {
-	if (propInfo != NULL)
+	ఒకవేళ (propInfo != ఖాళీ)
 	    XFree(propInfo);
-	return;
+	తిరిగి;
     }
-    if (immediate)
-	server_parse_message(dpy, propInfo, numItems);
-    else
-	save_in_queue(propInfo, numItems);
+    ఒకవేళ (తక్షణ)
+	server_parse_సందేశం(dpy, propInfo, అంకె_వస్తువులు);
+    లేకపోతే
+	save_లోపల_వరుస(propInfo, అంకె_వస్తువులు);
 }
 
 /*
  * Saves x clientserver commands in a queue so that they can be called when
  * vim is idle.
  */
-    static void
-save_in_queue(char_u *propInfo, long_u len)
+    స్థిర శూన్య
+save_లోపల_వరుస(char_u *propInfo, long_u len)
 {
-    x_queue_T *node;
+    x_వరుస_T *కణుపు;
 
-    node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
-	return;	    // out of memory
-    node->propInfo = propInfo;
-    node->len = len;
+    కణుపు = ALLOC_ONE(x_వరుస_T);
+    ఒకవేళ (కణుపు == ఖాళీ)
+	తిరిగి;	    // out of memory
+    కణుపు->propInfo = propInfo;
+    కణుపు->len = len;
 
-    if (head.next == NULL)   // initialize circular queue
+    ఒకవేళ (తల.తదుపరి == ఖాళీ)   // initialize circular queue
     {
-	head.next = &head;
-	head.prev = &head;
+	తల.తదుపరి = &తల;
+	తల.prev = &తల;
     }
 
     // insert node at tail of queue
-    node->next = &head;
-    node->prev = head.prev;
-    head.prev->next = node;
-    head.prev = node;
+    కణుపు->తదుపరి = &తల;
+    కణుపు->prev = తల.prev;
+    తల.prev->తదుపరి = కణుపు;
+    తల.prev = కణుపు;
 }
 
 /*
  * Parses queued clientserver messages.
  */
-    void
-server_parse_messages(void)
+    శూన్య
+server_parse_messages(శూన్య)
 {
-    x_queue_T	*node;
+    x_వరుస_T	*కణుపు;
 
-    if (!X_DISPLAY)
-	return; // cannot happen?
-    while (head.next != NULL && head.next != &head)
+    ఒకవేళ (!X_DISPLAY)
+	తిరిగి; // cannot happen?
+    అయితే (తల.తదుపరి != ఖాళీ && తల.తదుపరి != &తల)
     {
-	node = head.next;
-	head.next = node->next;
-	node->next->prev = node->prev;
-	server_parse_message(X_DISPLAY, node->propInfo, node->len);
-	vim_free(node);
+	కణుపు = తల.తదుపరి;
+	తల.తదుపరి = కణుపు->తదుపరి;
+	కణుపు->తదుపరి->prev = కణుపు->prev;
+	server_parse_సందేశం(X_DISPLAY, కణుపు->propInfo, కణుపు->len);
+	vim_free(కణుపు);
     }
 }
 
@@ -1210,10 +1210,10 @@ server_parse_messages(void)
  * Returns a non-zero value if there are clientserver messages waiting
  * int the queue.
  */
-    int
-server_waiting(void)
+    పూర్ణాంకం
+server_నిరీక్షణ(శూన్య)
 {
-    return head.next != NULL && head.next != &head;
+    తిరిగి తల.తదుపరి != ఖాళీ && తల.తదుపరి != &తల;
 }
 
 /*
@@ -1221,18 +1221,18 @@ server_waiting(void)
  * commands.
  * "propInfo" will be freed.
  */
-    static void
-server_parse_message(
+    స్థిర శూన్య
+server_parse_సందేశం(
     Display	*dpy,
     char_u	*propInfo, // A string containing 0 or more X commands
-    long_u	numItems)  // The size of propInfo in bytes.
+    long_u	అంకె_వస్తువులు)  // The size of propInfo in bytes.
 {
     char_u	*p;
-    int		code;
+    పూర్ణాంకం		సంకేతం_2;
     char_u	*tofree;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
+# ఒకవేళ defined(FEAT_EVAL)
+    ch_log(ఖాళీ, "server_parse_message() numItems: %ld", అంకె_వస్తువులు);
 # endif
 
     /*
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    కొరకు (p = propInfo; (long_u)(p - propInfo) < అంకె_వస్తువులు; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1248,17 +1248,17 @@ server_parse_message(
 	 * is, we'll be able to tell that a new command/result is
 	 * starting.
 	 */
-	if (*p == 0)
+	ఒకవేళ (*p == 0)
 	{
 	    p++;
-	    continue;
+	    కొనసాగు;
 	}
 
-	if ((*p == 'c' || *p == 'k') && p[1] == 0)
+	ఒకవేళ ((*p == 'c' || *p == 'k') && p[1] == 0)
 	{
-	    Window	resWindow;
-	    char_u	*name, *script, *serial, *end;
-	    Bool	asKeys = *p == 'k';
+	    కిటికీ	res_కిటికీ;
+	    char_u	*name, *script, *serial, *చివర;
+	    Bool	as_కీలకాలు = *p == 'k';
 	    char_u	*enc;
 
 	    /*
@@ -1268,99 +1268,99 @@ server_parse_message(
 	     * like an option.
 	     */
 	    p += 2;
-	    name = NULL;
-	    resWindow = None;
+	    name = ఖాళీ;
+	    res_కిటికీ = None;
 	    serial = (char_u *)"";
-	    script = NULL;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    script = ఖాళీ;
+	    enc = ఖాళీ;
+	    అయితే ((long_u)(p - propInfo) < అంకె_వస్తువులు && *p == '-')
 	    {
-# if defined(FEAT_EVAL)
-		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
+# ఒకవేళ defined(FEAT_EVAL)
+		ch_log(ఖాళీ, "server_parse_message() item: %c, %s", p[-2], p);
 # endif
-		switch (p[1])
+		ఎంపిక (p[1])
 		{
-		    case 'r':
-			end = skipwhite(p + 2);
-			resWindow = 0;
-			while (vim_isxdigit(*end))
+		    స్థితి 'r':
+			చివర = skipwhite(p + 2);
+			res_కిటికీ = 0;
+			అయితే (vim_isxdigit(*చివర))
 			{
-			    resWindow = 16 * resWindow + (long_u)hex2nr(*end);
-			    ++end;
+			    res_కిటికీ = 16 * res_కిటికీ + (long_u)hex2nr(*చివర);
+			    ++చివర;
 			}
-			if (end == p + 2 || *end != ' ')
-			    resWindow = None;
-			else
+			ఒకవేళ (చివర == p + 2 || *చివర != ' ')
+			    res_కిటికీ = None;
+			లేకపోతే
 			{
-			    p = serial = end + 1;
-			    clientWindow = resWindow; // Remember in global
+			    p = serial = చివర + 1;
+			    client_కిటికీ = res_కిటికీ; // Remember in global
 			}
-			break;
-		    case 'n':
-			if (p[2] == ' ')
+			ఆపు;
+		    స్థితి 'n':
+			ఒకవేళ (p[2] == ' ')
 			    name = p + 3;
-			break;
-		    case 's':
-			if (p[2] == ' ')
+			ఆపు;
+		    స్థితి 's':
+			ఒకవేళ (p[2] == ' ')
 			    script = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			ఆపు;
+		    స్థితి 'E':
+			ఒకవేళ (p[2] == ' ')
 			    enc = p + 3;
-			break;
+			ఆపు;
 		}
-		while (*p != 0)
+		అయితే (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (script == NULL || name == NULL)
-		continue;
+	    ఒకవేళ (script == ఖాళీ || name == ఖాళీ)
+		కొనసాగు;
 
-	    if (serverName != NULL && STRICMP(name, serverName) == 0)
+	    ఒకవేళ (serverName != ఖాళీ && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
-		    server_to_input_buf(script);
-		else
+		ఒకవేళ (as_కీలకాలు)
+		    server_గమ్యం_ఆదానం_buf(script);
+		లేకపోతే
 		{
 		    char_u      *res;
 
-		    res = eval_client_expr_to_string(script);
-		    if (resWindow != None)
+		    res = eval_client_సమాసం_గమ్యం_string(script);
+		    ఒకవేళ (res_కిటికీ != None)
 		    {
-			garray_T    reply;
+			garray_T    జవాబు;
 
 			// Initialize the result property.
-			ga_init2(&reply, 1, 100);
-			(void)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
-			sprintf(reply.ga_data, "%cr%c-E %s%c-s %s%c-r ",
+			ga_init2(&జవాబు, 1, 100);
+			(శూన్య)ga_grow(&జవాబు, 50 + STRLEN(p_enc) + STRLEN(serial));
+			sprintf(జవాబు.ga_దత్తాంశం, "%cr%c-E %s%c-s %s%c-r ",
 						   0, 0, p_enc, 0, serial, 0);
-			reply.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
+			జవాబు.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
 
 			// Evaluate the expression and return the result.
-			if (res != NULL)
-			    ga_concat(&reply, res);
-			else
+			ఒకవేళ (res != ఖాళీ)
+			    ga_concat(&జవాబు, res);
+			లేకపోతే
 			{
-			    ga_concat(&reply,
-				   (char_u *)_(e_invalid_expression_received));
-			    ga_append(&reply, 0);
-			    GA_CONCAT_LITERAL(&reply, "-c 1");
+			    ga_concat(&జవాబు,
+				   (char_u *)_(e_invalid_వ్యక్తీకరణ_received));
+			    ga_append(&జవాబు, 0);
+			    GA_CONCAT_LITERAL(&జవాబు, "-c 1");
 			}
-			ga_append(&reply, NUL);
-			(void)AppendPropCarefully(dpy, resWindow, commProperty,
-						 reply.ga_data, reply.ga_len);
-			ga_clear(&reply);
+			ga_append(&జవాబు, NUL);
+			(శూన్య)AppendPropCarefully(dpy, res_కిటికీ, commProperty,
+						 జవాబు.ga_దత్తాంశం, జవాబు.ga_len);
+			ga_clear(&జవాబు);
 		    }
 		    vim_free(res);
 		}
 		vim_free(tofree);
 	    }
 	}
-	else if (*p == 'r' && p[1] == 0)
+	లేకపోతే ఒకవేళ (*p == 'r' && p[1] == 0)
 	{
-	    int		    serial, gotSerial;
+	    పూర్ణాంకం		    serial, gotSerial;
 	    char_u	    *res;
 	    PendingCommand  *pcPtr;
 	    char_u	    *enc;
@@ -1373,61 +1373,61 @@ server_parse_message(
 	    p += 2;
 	    gotSerial = 0;
 	    res = (char_u *)"";
-	    code = 0;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    సంకేతం_2 = 0;
+	    enc = ఖాళీ;
+	    అయితే ((long_u)(p - propInfo) < అంకె_వస్తువులు && *p == '-')
 	    {
-		switch (p[1])
+		ఎంపిక (p[1])
 		{
-		    case 'r':
-			if (p[2] == ' ')
+		    స్థితి 'r':
+			ఒకవేళ (p[2] == ' ')
 			    res = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			ఆపు;
+		    స్థితి 'E':
+			ఒకవేళ (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 's':
-			if (sscanf((char *)p + 2, " %d", &serial) == 1)
+			ఆపు;
+		    స్థితి 's':
+			ఒకవేళ (అక్షరశ్రేణి_చదువు((అక్షరం *)p + 2, " %d", &serial) == 1)
 			    gotSerial = 1;
-			break;
-		    case 'c':
-			if (sscanf((char *)p + 2, " %d", &code) != 1)
-			    code = 0;
-			break;
+			ఆపు;
+		    స్థితి 'c':
+			ఒకవేళ (అక్షరశ్రేణి_చదువు((అక్షరం *)p + 2, " %d", &సంకేతం_2) != 1)
+			    సంకేతం_2 = 0;
+			ఆపు;
 		}
-		while (*p != 0)
+		అయితే (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotSerial)
-		continue;
+	    ఒకవేళ (!gotSerial)
+		కొనసాగు;
 
 	    /*
 	     * Give the result information to anyone who's
 	     * waiting for it.
 	     */
-	    for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    కొరకు (pcPtr = pendingCommands; pcPtr != ఖాళీ; pcPtr = pcPtr->తదుపరి_Ptr)
 	    {
-		if (serial != pcPtr->serial || pcPtr->result != NULL)
-		    continue;
+		ఒకవేళ (serial != pcPtr->serial || pcPtr->ఫలితం != ఖాళీ)
+		    కొనసాగు;
 
-		pcPtr->code = code;
+		pcPtr->సంకేతం_2 = సంకేతం_2;
 		res = serverConvert(enc, res, &tofree);
-		if (tofree == NULL)
+		ఒకవేళ (tofree == ఖాళీ)
 		    res = vim_strsave(res);
-		pcPtr->result = res;
-		break;
+		pcPtr->ఫలితం = res;
+		ఆపు;
 	    }
 	}
-	else if (*p == 'n' && p[1] == 0)
+	లేకపోతే ఒకవేళ (*p == 'n' && p[1] == 0)
 	{
-	    Window	win = 0;
-	    unsigned int u;
-	    int		gotWindow;
+	    కిటికీ	win = 0;
+	    గుర్తులేని పూర్ణాంకం u;
+	    పూర్ణాంకం		got_కిటికీ;
 	    char_u	*str;
-	    struct	ServerReply *r;
+	    నిర్మాణం	Server_జవాబు *r;
 	    char_u	*enc;
 
 	    /*
@@ -1435,51 +1435,51 @@ server_parse_message(
 	     * script.  Execute any autocommand and save it for later retrieval
 	     */
 	    p += 2;
-	    gotWindow = 0;
+	    got_కిటికీ = 0;
 	    str = (char_u *)"";
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = ఖాళీ;
+	    అయితే ((long_u)(p - propInfo) < అంకె_వస్తువులు && *p == '-')
 	    {
-		switch (p[1])
+		ఎంపిక (p[1])
 		{
-		    case 'n':
-			if (p[2] == ' ')
+		    స్థితి 'n':
+			ఒకవేళ (p[2] == ' ')
 			    str = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			ఆపు;
+		    స్థితి 'E':
+			ఒకవేళ (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 'w':
-			if (sscanf((char *)p + 2, " %x", &u) == 1)
+			ఆపు;
+		    స్థితి 'w':
+			ఒకవేళ (అక్షరశ్రేణి_చదువు((అక్షరం *)p + 2, " %x", &u) == 1)
 			{
 			    win = u;
-			    gotWindow = 1;
+			    got_కిటికీ = 1;
 			}
-			break;
+			ఆపు;
 		}
-		while (*p != 0)
+		అయితే (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotWindow)
-		continue;
+	    ఒకవేళ (!got_కిటికీ)
+		కొనసాగు;
 	    str = serverConvert(enc, str, &tofree);
-	    if ((r = ServerReplyFind(win, SROP_Add)) != NULL)
+	    ఒకవేళ ((r = Server_జవాబు_కనుగొను(win, SROP_కూడు)) != ఖాళీ)
 	    {
-		ga_concat(&(r->strings), str);
-		ga_append(&(r->strings), NUL);
+		ga_concat(&(r->అక్షరశ్రేణులు), str);
+		ga_append(&(r->అక్షరశ్రేణులు), NUL);
 	    }
 	    {
 		char_u	winstr[30];
 
-		sprintf((char *)winstr, "0x%x", (unsigned int)win);
+		sprintf((అక్షరం *)winstr, "0x%x", (గుర్తులేని పూర్ణాంకం)win);
 		apply_autocmds(EVENT_REMOTEREPLY, winstr, str, TRUE, curbuf);
 	    }
 	    vim_free(tofree);
 	}
-	else
+	లేకపోతే
 	{
 	    /*
 	     * Didn't recognize this thing.  Just skip through the next
@@ -1487,7 +1487,7 @@ server_parse_message(
 	     * Even if we get an 'r'(eply) we will throw it away as we
 	     * never specify (and thus expect) one
 	     */
-	    while (*p != 0)
+	    అయితే (*p != 0)
 		p++;
 	    p++;
 	}
@@ -1501,45 +1501,45 @@ server_parse_message(
  * than having Xlib panic.
  * Return: 0 for OK, -1 for error
  */
-    static int
+    స్థిర పూర్ణాంకం
 AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
-    Window	window,		// Window whose property is to be modified.
+    కిటికీ	కిటికీ_2,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
-    char_u	*value,		// Characters  to append to property.
-    int		length)		// How much to append
+    char_u	*విలువ,		// Characters  to append to property.
+    పూర్ణాంకం		నిడివి)		// How much to append
 {
     XErrorHandler old_handler;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, window, property, XA_STRING, 8,
-					       PropModeAppend, value, length);
+    XChangeProperty(dpy, కిటికీ_2, property, XA_STRING, 8,
+					       Prop_బహుళకం_Append, విలువ, నిడివి);
     XSync(dpy, False);
-    (void) XSetErrorHandler(old_handler);
-    return got_x_error ? -1 : 0;
+    (శూన్య) XSetErrorHandler(old_handler);
+    తిరిగి got_x_error ? -1 : 0;
 }
 
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
-x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
+    స్థిర పూర్ణాంకం
+x_error_check(Display *dpy వాడని, XErrorEvent *error_event వాడని)
 {
     got_x_error = TRUE;
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Check if "str" looks like it had a serial number appended.
  * Actually just checks if the name ends in a digit.
  */
-    static int
+    స్థిర పూర్ణాంకం
 IsSerialName(char_u *str)
 {
-    int len = STRLEN(str);
+    పూర్ణాంకం len = STRLEN(str);
 
-    return (len > 1 && vim_isdigit(str[len - 1]));
+    తిరిగి (len > 1 && vim_isdigit(str[len - 1]));
 }
-#endif	// FEAT_CLIENTSERVER
+#అయితే_ముగింపు	// FEAT_CLIENTSERVER

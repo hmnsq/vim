@@ -2,55 +2,55 @@
  * Some utility functions on VTermRect structures
  */
 
-#define STRFrect "(%d,%d-%d,%d)"
-#define ARGSrect(r) (r).start_row, (r).start_col, (r).end_row, (r).end_col
+#నిర్వచించు STRFrect "(%d,%d-%d,%d)"
+#నిర్వచించు ARGSrect(r) (r).ప్రారంభం_అడ్డువరుస, (r).ప్రారంభం_నిలువు, (r).చివర_అడ్డువరుస, (r).చివర_నిలువు
 
 /* Expand dst to contain src as well */
-static void rect_expand(VTermRect *dst, VTermRect *src)
+స్థిర శూన్య rect_expand(VTermRect *dst, VTermRect *src)
 {
-  if(dst->start_row > src->start_row) dst->start_row = src->start_row;
-  if(dst->start_col > src->start_col) dst->start_col = src->start_col;
-  if(dst->end_row   < src->end_row)   dst->end_row   = src->end_row;
-  if(dst->end_col   < src->end_col)   dst->end_col   = src->end_col;
+  ఒకవేళ(dst->ప్రారంభం_అడ్డువరుస > src->ప్రారంభం_అడ్డువరుస) dst->ప్రారంభం_అడ్డువరుస = src->ప్రారంభం_అడ్డువరుస;
+  ఒకవేళ(dst->ప్రారంభం_నిలువు > src->ప్రారంభం_నిలువు) dst->ప్రారంభం_నిలువు = src->ప్రారంభం_నిలువు;
+  ఒకవేళ(dst->చివర_అడ్డువరుస   < src->చివర_అడ్డువరుస)   dst->చివర_అడ్డువరుస   = src->చివర_అడ్డువరుస;
+  ఒకవేళ(dst->చివర_నిలువు   < src->చివర_నిలువు)   dst->చివర_నిలువు   = src->చివర_నిలువు;
 }
 
 /* Clip the dst to ensure it does not step outside of bounds */
-static void rect_clip(VTermRect *dst, VTermRect *bounds)
+స్థిర శూన్య rect_clip(VTermRect *dst, VTermRect *bounds)
 {
-  if(dst->start_row < bounds->start_row) dst->start_row = bounds->start_row;
-  if(dst->start_col < bounds->start_col) dst->start_col = bounds->start_col;
-  if(dst->end_row   > bounds->end_row)   dst->end_row   = bounds->end_row;
-  if(dst->end_col   > bounds->end_col)   dst->end_col   = bounds->end_col;
+  ఒకవేళ(dst->ప్రారంభం_అడ్డువరుస < bounds->ప్రారంభం_అడ్డువరుస) dst->ప్రారంభం_అడ్డువరుస = bounds->ప్రారంభం_అడ్డువరుస;
+  ఒకవేళ(dst->ప్రారంభం_నిలువు < bounds->ప్రారంభం_నిలువు) dst->ప్రారంభం_నిలువు = bounds->ప్రారంభం_నిలువు;
+  ఒకవేళ(dst->చివర_అడ్డువరుస   > bounds->చివర_అడ్డువరుస)   dst->చివర_అడ్డువరుస   = bounds->చివర_అడ్డువరుస;
+  ఒకవేళ(dst->చివర_నిలువు   > bounds->చివర_నిలువు)   dst->చివర_నిలువు   = bounds->చివర_నిలువు;
   /* Ensure it doesn't end up negatively-sized */
-  if(dst->end_row < dst->start_row) dst->end_row = dst->start_row;
-  if(dst->end_col < dst->start_col) dst->end_col = dst->start_col;
+  ఒకవేళ(dst->చివర_అడ్డువరుస < dst->ప్రారంభం_అడ్డువరుస) dst->చివర_అడ్డువరుస = dst->ప్రారంభం_అడ్డువరుస;
+  ఒకవేళ(dst->చివర_నిలువు < dst->ప్రారంభం_నిలువు) dst->చివర_నిలువు = dst->ప్రారంభం_నిలువు;
 }
 
 /* True if the two rectangles are equal */
-static int rect_equal(VTermRect *a, VTermRect *b)
+స్థిర పూర్ణాంకం rect_equal(VTermRect *a, VTermRect *b)
 {
-  return (a->start_row == b->start_row) &&
-         (a->start_col == b->start_col) &&
-         (a->end_row   == b->end_row)   &&
-         (a->end_col   == b->end_col);
+  తిరిగి (a->ప్రారంభం_అడ్డువరుస == b->ప్రారంభం_అడ్డువరుస) &&
+         (a->ప్రారంభం_నిలువు == b->ప్రారంభం_నిలువు) &&
+         (a->చివర_అడ్డువరుస   == b->చివర_అడ్డువరుస)   &&
+         (a->చివర_నిలువు   == b->చివర_నిలువు);
 }
 
 /* True if small is contained entirely within big */
-static int rect_contains(VTermRect *big, VTermRect *small)
+స్థిర పూర్ణాంకం rect_కలిగియుంది(VTermRect *big, VTermRect *small)
 {
-  if(small->start_row < big->start_row) return 0;
-  if(small->start_col < big->start_col) return 0;
-  if(small->end_row   > big->end_row)   return 0;
-  if(small->end_col   > big->end_col)   return 0;
-  return 1;
+  ఒకవేళ(small->ప్రారంభం_అడ్డువరుస < big->ప్రారంభం_అడ్డువరుస) తిరిగి 0;
+  ఒకవేళ(small->ప్రారంభం_నిలువు < big->ప్రారంభం_నిలువు) తిరిగి 0;
+  ఒకవేళ(small->చివర_అడ్డువరుస   > big->చివర_అడ్డువరుస)   తిరిగి 0;
+  ఒకవేళ(small->చివర_నిలువు   > big->చివర_నిలువు)   తిరిగి 0;
+  తిరిగి 1;
 }
 
 /* True if the rectangles overlap at all */
-static int rect_intersects(VTermRect *a, VTermRect *b)
+స్థిర పూర్ణాంకం rect_intersects(VTermRect *a, VTermRect *b)
 {
-  if(a->start_row > b->end_row || b->start_row > a->end_row)
-    return 0;
-  if(a->start_col > b->end_col || b->start_col > a->end_col)
-    return 0;
-  return 1;
+  ఒకవేళ(a->ప్రారంభం_అడ్డువరుస > b->చివర_అడ్డువరుస || b->ప్రారంభం_అడ్డువరుస > a->చివర_అడ్డువరుస)
+    తిరిగి 0;
+  ఒకవేళ(a->ప్రారంభం_నిలువు > b->చివర_నిలువు || b->ప్రారంభం_నిలువు > a->చివర_నిలువు)
+    తిరిగి 0;
+  తిరిగి 1;
 }

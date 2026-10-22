@@ -11,14 +11,14 @@
  * Used by test_alloc_fail() to test memory allocation failures.
  * Each entry must be on exactly one line, GetAllocId() depends on that.
  */
-typedef enum {
+రకనిర్వచనం గణన {
     aid_none = 0,
-    aid_qf_dirname_start,
+    aid_qf_dirname_ప్రారంభం,
     aid_qf_dirname_now,
     aid_qf_namebuf,
     aid_qf_module,
     aid_qf_errmsg,
-    aid_qf_pattern,
+    aid_qf_నమూనా,
     aid_qf_efm_fmtstr,
     aid_qf_efm_fmtpart,
     aid_qf_title,
@@ -29,7 +29,7 @@ typedef enum {
     aid_qf_multiline_pfx,
     aid_qf_makecmd,
     aid_qf_linebuf,
-    aid_tagstack_items,
+    aid_tagstack_వస్తువులు,
     aid_tagstack_from,
     aid_tagstack_details,
     aid_sign_getdefined,
@@ -38,7 +38,7 @@ typedef enum {
     aid_sign_getlist,
     aid_sign_getplaced_dict,
     aid_sign_getplaced_list,
-    aid_insert_sign,
+    aid_చొప్పించు_sign,
     aid_sign_getinfo,
     aid_newbuf_bvars,
     aid_newwin_wvars,
@@ -47,6 +47,6 @@ typedef enum {
     aid_get_func,
     aid_defer,
     aid_tuple_append,
-    aid_tuple_type_args,
-    aid_last
+    aid_tuple_type_వాదనలు,
+    aid_చివరి
 } alloc_id_T;

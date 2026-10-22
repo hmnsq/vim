@@ -23,481 +23,481 @@
  * e.g., replace LONG with LONG_PTR, etc.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_DIRECTX)
+#ఒకవేళ defined(FEAT_DIRECTX)
 # include "gui_dwrite.h"
-#endif
+#అయితే_ముగింపు
 
 // values for "dead_key"
-#define DEAD_KEY_OFF			0	// no dead key
-#define DEAD_KEY_SET_DEFAULT		1	// dead key pressed
-#define DEAD_KEY_TRANSIENT_IN_ON_CHAR	2	// wait for next key press
-#define DEAD_KEY_SKIP_ON_CHAR		3	// skip next _OnChar()
+#నిర్వచించు DEAD_కీలకం_OFF			0	// no dead key
+#నిర్వచించు DEAD_కీలకం_సమితి_DEFAULT		1	// dead key pressed
+#నిర్వచించు DEAD_కీలకం_TRANSIENT_లోపల_ON_CHAR	2	// wait for next key press
+#నిర్వచించు DEAD_కీలకం_SKIP_ON_CHAR		3	// skip next _OnChar()
 
-#if defined(FEAT_DIRECTX)
-static DWriteContext *s_dwc = NULL;
-static int s_directx_enabled = 0;
-static int s_directx_load_attempted = 0;
-# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != NULL && enc_utf8)
-static int directx_enabled(void);
-static void directx_binddc(void);
-#endif
+#ఒకవేళ defined(FEAT_DIRECTX)
+స్థిర DWriteContext *s_dwc = ఖాళీ;
+స్థిర పూర్ణాంకం s_directx_enabled = 0;
+స్థిర పూర్ణాంకం s_directx_ఎక్కించు_attempted = 0;
+# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != ఖాళీ && enc_utf8)
+స్థిర పూర్ణాంకం directx_enabled(శూన్య);
+స్థిర శూన్య directx_binddc(శూన్య);
+#అయితే_ముగింపు
 
-#ifdef FEAT_MENU
-static int gui_mswin_get_menu_height(int fix_window);
-#else
-# define gui_mswin_get_menu_height(fix_window)	0
-#endif
+#నిర్వచితమైతే FEAT_MENU
+స్థిర పూర్ణాంకం gui_mswin_get_menu_ఎత్తు(పూర్ణాంకం fix_కిటికీ);
+#లేకపోతే
+# define gui_mswin_get_menu_ఎత్తు(fix_కిటికీ)	0
+#అయితే_ముగింపు
 
-typedef struct keycode_trans_strategy {
-    void (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_process_message_usual_key) (UINT /*vk*/, const MSG* /*pmsg*/);
-    int  (*ptr_get_active_modifiers)(void);
-    int  (*is_experimental)(void);
+రకనిర్వచనం నిర్మాణం keycode_trans_strategy {
+    శూన్య (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+    శూన్య (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+    శూన్య (*ptr_process_సందేశం_usual_కీలకం) (UINT /*vk*/, స్థిరరాశి సందేశం_3* /*pmsg*/);
+    పూర్ణాంకం  (*ptr_get_చురుకైన_modifiers)(శూన్య);
+    పూర్ణాంకం  (*is_experimental)(శూన్య);
 } keycode_trans_strategy;
 
 // forward declarations for input instance initializer
-static void _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_experimental(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_experimental(void);
-static int  is_experimental_true(void);
+స్థిర శూన్య _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+స్థిర శూన్య _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+స్థిర శూన్య process_సందేశం_usual_కీలకం_experimental(UINT /*vk*/, స్థిరరాశి సందేశం_3* /*pmsg*/);
+స్థిర పూర్ణాంకం  get_చురుకైన_modifiers_experimental(శూన్య);
+స్థిర పూర్ణాంకం  is_experimental_true(శూన్య);
 
 keycode_trans_strategy keycode_trans_strategy_experimental = {
       _OnChar_experimental      // ptr_on_char
     , _OnSysChar_experimental // ptr_on_sys_char
-    , process_message_usual_key_experimental // ptr_process_message_usual_key
-    , get_active_modifiers_experimental
+    , process_సందేశం_usual_కీలకం_experimental // ptr_process_message_usual_key
+    , get_చురుకైన_modifiers_experimental
     , is_experimental_true
 };
 
 // forward declarations for input instance initializer
-static void _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_classic(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_classic(void);
-static int  is_experimental_false(void);
+స్థిర శూన్య _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+స్థిర శూన్య _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, పూర్ణాంకం /*cRepeat UNUSED*/);
+స్థిర శూన్య process_సందేశం_usual_కీలకం_classic(UINT /*vk*/, స్థిరరాశి సందేశం_3* /*pmsg*/);
+స్థిర పూర్ణాంకం  get_చురుకైన_modifiers_classic(శూన్య);
+స్థిర పూర్ణాంకం  is_experimental_false(శూన్య);
 
 keycode_trans_strategy keycode_trans_strategy_classic = {
       _OnChar_classic      // ptr_on_char
     , _OnSysChar_classic // ptr_on_sys_char
-    , process_message_usual_key_classic // ptr_process_message_usual_key
-    , get_active_modifiers_classic
+    , process_సందేశం_usual_కీలకం_classic // ptr_process_message_usual_key
+    , get_చురుకైన_modifiers_classic
     , is_experimental_false
 };
 
-keycode_trans_strategy *keycode_trans_strategy_used = NULL;
+keycode_trans_strategy *keycode_trans_strategy_వాడిన = ఖాళీ;
 
-static int is_experimental_true(void)
+స్థిర పూర్ణాంకం is_experimental_true(శూన్య)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-static int is_experimental_false(void)
+స్థిర పూర్ణాంకం is_experimental_false(శూన్య)
 {
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Initialize the keycode translation strategy.
  */
-static void keycode_trans_strategy_init(void)
+స్థిర శూన్య keycode_trans_strategy_init(శూన్య)
 {
-    const char *strategy = NULL;
+    స్థిరరాశి అక్షరం *strategy = ఖాళీ;
 
     // set default value as fallback
-    keycode_trans_strategy_used = &keycode_trans_strategy_classic;
+    keycode_trans_strategy_వాడిన = &keycode_trans_strategy_classic;
 
     strategy = getenv("VIM_KEYCODE_TRANS_STRATEGY");
-    if (strategy == NULL)
+    ఒకవేళ (strategy == ఖాళీ)
     {
-	return;
+	తిరిగి;
     }
 
-    if (STRICMP(strategy, "classic") == 0)
+    ఒకవేళ (STRICMP(strategy, "classic") == 0)
     {
-	keycode_trans_strategy_used = &keycode_trans_strategy_classic;
-	return;
+	keycode_trans_strategy_వాడిన = &keycode_trans_strategy_classic;
+	తిరిగి;
     }
 
-    if (STRICMP(strategy, "experimental") == 0)
+    ఒకవేళ (STRICMP(strategy, "experimental") == 0)
     {
-	keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
-	return;
+	keycode_trans_strategy_వాడిన = &keycode_trans_strategy_experimental;
+	తిరిగి;
     }
 
 }
 
-#if defined(FEAT_RENDER_OPTIONS)
-    int
-gui_mch_set_rendering_options(char_u *s)
+#ఒకవేళ defined(FEAT_RENDER_OPTIONS)
+    పూర్ణాంకం
+gui_mch_సమితి_rendering_options(char_u *s)
 {
 # ifdef FEAT_DIRECTX
     char_u  *p, *q;
 
-    int	    dx_enable = 0;
-    int	    dx_flags = 0;
-    float   dx_gamma = 0.0f;
-    float   dx_contrast = 0.0f;
-    float   dx_level = 0.0f;
-    int	    dx_geom = 0;
-    int	    dx_renmode = 0;
-    int	    dx_taamode = 0;
+    పూర్ణాంకం	    dx_enable = 0;
+    పూర్ణాంకం	    dx_flags = 0;
+    దశాంశం   dx_gamma = 0.0f;
+    దశాంశం   dx_contrast = 0.0f;
+    దశాంశం   dx_level = 0.0f;
+    పూర్ణాంకం	    dx_geom = 0;
+    పూర్ణాంకం	    dx_renmode = 0;
+    పూర్ణాంకం	    dx_taamode = 0;
     // parse string as rendering options.
-    for (p = s; p != NULL && *p != NUL; )
+    కొరకు (p = s; p != ఖాళీ && *p != NUL; )
     {
-	char_u  item[256];
+	char_u  అంశం[256];
 	char_u  name[128];
-	char_u  value[128];
+	char_u  విలువ[128];
 
-	copy_option_part(&p, item, sizeof(item), ",");
-	if (p == NULL)
-	    break;
-	q = &item[0];
-	copy_option_part(&q, name, sizeof(name), ":");
-	if (q == NULL)
-	    return FAIL;
-	copy_option_part(&q, value, sizeof(value), ":");
+	copy_option_part(&p, అంశం, పరిమాణం(అంశం), ",");
+	ఒకవేళ (p == ఖాళీ)
+	    ఆపు;
+	q = &అంశం[0];
+	copy_option_part(&q, name, పరిమాణం(name), ":");
+	ఒకవేళ (q == ఖాళీ)
+	    తిరిగి FAIL;
+	copy_option_part(&q, విలువ, పరిమాణం(విలువ), ":");
 
-	if (STRCMP(name, "type") == 0)
+	ఒకవేళ (STRCMP(name, "type") == 0)
 	{
-	    if (STRCMP(value, "directx") == 0)
+	    ఒకవేళ (STRCMP(విలువ, "directx") == 0)
 		dx_enable = 1;
-	    else
-		return FAIL;
+	    లేకపోతే
+		తిరిగి FAIL;
 	}
-	else if (STRCMP(name, "gamma") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "gamma") == 0)
 	{
 	    dx_flags |= 1 << 0;
-	    dx_gamma = (float)atof((char *)value);
+	    dx_gamma = (దశాంశం)atof((అక్షరం *)విలువ);
 	}
-	else if (STRCMP(name, "contrast") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "contrast") == 0)
 	{
 	    dx_flags |= 1 << 1;
-	    dx_contrast = (float)atof((char *)value);
+	    dx_contrast = (దశాంశం)atof((అక్షరం *)విలువ);
 	}
-	else if (STRCMP(name, "level") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "level") == 0)
 	{
 	    dx_flags |= 1 << 2;
-	    dx_level = (float)atof((char *)value);
+	    dx_level = (దశాంశం)atof((అక్షరం *)విలువ);
 	}
-	else if (STRCMP(name, "geom") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "geom") == 0)
 	{
 	    dx_flags |= 1 << 3;
-	    dx_geom = atoi((char *)value);
-	    if (dx_geom < 0 || dx_geom > 2)
-		return FAIL;
+	    dx_geom = atoi((అక్షరం *)విలువ);
+	    ఒకవేళ (dx_geom < 0 || dx_geom > 2)
+		తిరిగి FAIL;
 	}
-	else if (STRCMP(name, "renmode") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "renmode") == 0)
 	{
 	    dx_flags |= 1 << 4;
-	    dx_renmode = atoi((char *)value);
-	    if (dx_renmode < 0 || dx_renmode > 6)
-		return FAIL;
+	    dx_renmode = atoi((అక్షరం *)విలువ);
+	    ఒకవేళ (dx_renmode < 0 || dx_renmode > 6)
+		తిరిగి FAIL;
 	}
-	else if (STRCMP(name, "taamode") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "taamode") == 0)
 	{
 	    dx_flags |= 1 << 5;
-	    dx_taamode = atoi((char *)value);
-	    if (dx_taamode < 0 || dx_taamode > 3)
-		return FAIL;
+	    dx_taamode = atoi((అక్షరం *)విలువ);
+	    ఒకవేళ (dx_taamode < 0 || dx_taamode > 3)
+		తిరిగి FAIL;
 	}
-	else if (STRCMP(name, "scrlines") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(name, "scrlines") == 0)
 	{
 	    // Deprecated.  Simply ignore it.
 	}
-	else
-	    return FAIL;
+	లేకపోతే
+	    తిరిగి FAIL;
     }
 
-    if (!gui.in_use)
-	return OK;  // only checking the syntax of the value
+    ఒకవేళ (!gui.లోపల_use)
+	తిరిగి OK;  // only checking the syntax of the value
 
     // Enable DirectX/DirectWrite
-    if (dx_enable)
+    ఒకవేళ (dx_enable)
     {
-	if (!directx_enabled())
-	    return FAIL;
-	DWriteContext_SetRenderingParams(s_dwc, NULL);
-	if (dx_flags)
+	ఒకవేళ (!directx_enabled())
+	    తిరిగి FAIL;
+	DWrite_Context_సమితి_Rendering_Params(s_dwc, ఖాళీ);
+	ఒకవేళ (dx_flags)
 	{
 	    DWriteRenderingParams param;
 	    DWriteContext_GetRenderingParams(s_dwc, &param);
-	    if (dx_flags & (1 << 0))
+	    ఒకవేళ (dx_flags & (1 << 0))
 		param.gamma = dx_gamma;
-	    if (dx_flags & (1 << 1))
+	    ఒకవేళ (dx_flags & (1 << 1))
 		param.enhancedContrast = dx_contrast;
-	    if (dx_flags & (1 << 2))
+	    ఒకవేళ (dx_flags & (1 << 2))
 		param.clearTypeLevel = dx_level;
-	    if (dx_flags & (1 << 3))
+	    ఒకవేళ (dx_flags & (1 << 3))
 		param.pixelGeometry = dx_geom;
-	    if (dx_flags & (1 << 4))
-		param.renderingMode = dx_renmode;
-	    if (dx_flags & (1 << 5))
-		param.textAntialiasMode = dx_taamode;
-	    DWriteContext_SetRenderingParams(s_dwc, &param);
+	    ఒకవేళ (dx_flags & (1 << 4))
+		param.rendering_బహుళకం = dx_renmode;
+	    ఒకవేళ (dx_flags & (1 << 5))
+		param.పాఠ్యం_Antialias_బహుళకం = dx_taamode;
+	    DWrite_Context_సమితి_Rendering_Params(s_dwc, &param);
 	}
     }
     s_directx_enabled = dx_enable;
     gui.directx_enabled = IS_ENABLE_DIRECTX();
 
-    return OK;
-# else
-    return FAIL;
+    తిరిగి OK;
+# లేకపోతే
+    తిరిగి FAIL;
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * These are new in Windows ME/XP, only defined in recent compilers.
  */
-#ifndef HANDLE_WM_XBUTTONUP
+#నిర్వచితం_కాకపోతే HANDLE_WM_XBUTTONUP
 # define HANDLE_WM_XBUTTONUP(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
-#endif
-#ifndef HANDLE_WM_XBUTTONDOWN
+   ((fn)((hwnd), (పూర్ణాంకం)(పొట్టి)LOWORD(lParam), (పూర్ణాంకం)(పొట్టి)HIWORD(lParam), (UINT)(wParam)), 0L)
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HANDLE_WM_XBUTTONDOWN
 # define HANDLE_WM_XBUTTONDOWN(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), FALSE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
-#endif
-#ifndef HANDLE_WM_XBUTTONDBLCLK
+   ((fn)((hwnd), FALSE, (పూర్ణాంకం)(పొట్టి)LOWORD(lParam), (పూర్ణాంకం)(పొట్టి)HIWORD(lParam), (UINT)(wParam)), 0L)
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HANDLE_WM_XBUTTONDBLCLK
 # define HANDLE_WM_XBUTTONDBLCLK(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), TRUE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
-#endif
+   ((fn)((hwnd), TRUE, (పూర్ణాంకం)(పొట్టి)LOWORD(lParam), (పూర్ణాంకం)(పొట్టి)HIWORD(lParam), (UINT)(wParam)), 0L)
+#అయితే_ముగింపు
 
 
-#include "version.h"	// used by dialog box routine for default title
-#ifdef DEBUG
+#అన్తర్భావ "version.h"	// used by dialog box routine for default title
+#నిర్వచితమైతే DEBUG
 # include <tchar.h>
-#endif
+#అయితే_ముగింపు
 
-#include <shellapi.h>
-#include <commctrl.h>
-#include <windowsx.h>
+#అన్తర్భావ <shellapi.h>
+#అన్తర్భావ <commctrl.h>
+#అన్తర్భావ <windowsx.h>
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 # define MENUHINTS		// show menu hints in command line
-#endif
+#అయితే_ముగింపు
 
 // Some parameters for dialog boxes.  All in pixels.
-#define DLG_PADDING_X		10
-#define DLG_PADDING_Y		10
-#define DLG_VERT_PADDING_X	4	// For vertical buttons
-#define DLG_VERT_PADDING_Y	4
-#define DLG_ICON_WIDTH		34
-#define DLG_ICON_HEIGHT		34
-#define DLG_MIN_WIDTH		150
-#define DLG_FONT_NAME		"MS Shell Dlg"
-#define DLG_FONT_POINT_SIZE	8
-#define DLG_MIN_MAX_WIDTH	400
-#define DLG_MIN_MAX_HEIGHT	400
+#నిర్వచించు DLG_PADDING_X		10
+#నిర్వచించు DLG_PADDING_Y		10
+#నిర్వచించు DLG_VERT_PADDING_X	4	// For vertical buttons
+#నిర్వచించు DLG_VERT_PADDING_Y	4
+#నిర్వచించు DLG_ICON_వెడల్పు		34
+#నిర్వచించు DLG_ICON_ఎత్తు		34
+#నిర్వచించు DLG_MIN_వెడల్పు		150
+#నిర్వచించు DLG_FONT_NAME		"MS Shell Dlg"
+#నిర్వచించు DLG_FONT_బిందువు_కొలత	8
+#నిర్వచించు DLG_MIN_MAX_వెడల్పు	400
+#నిర్వచించు DLG_MIN_MAX_ఎత్తు	400
 
-#define DLG_NONBUTTON_CONTROL	5000	// First ID of non-button controls
+#నిర్వచించు DLG_NONBUTTON_CONTROL	5000	// First ID of non-button controls
 
-#ifndef WM_DPICHANGED
+#నిర్వచితం_కాకపోతే WM_DPICHANGED
 # define WM_DPICHANGED			0x02E0
-#endif
+#అయితే_ముగింపు
 
-#ifndef WM_GETDPISCALEDSIZE
+#నిర్వచితం_కాకపోతే WM_GETDPISCALEDSIZE
 # define WM_GETDPISCALEDSIZE		0x02E4
-#endif
+#అయితే_ముగింపు
 
-#ifndef WM_MOUSEHWHEEL
+#నిర్వచితం_కాకపోతే WM_MOUSEHWHEEL
 # define WM_MOUSEHWHEEL			0x020E
-#endif
+#అయితే_ముగింపు
 
-#ifndef SPI_GETWHEELSCROLLCHARS
+#నిర్వచితం_కాకపోతే SPI_GETWHEELSCROLLCHARS
 # define SPI_GETWHEELSCROLLCHARS	0x006C
-#endif
+#అయితే_ముగింపు
 
-#ifndef SPI_SETWHEELSCROLLCHARS
+#నిర్వచితం_కాకపోతే SPI_SETWHEELSCROLLCHARS
 # define SPI_SETWHEELSCROLLCHARS	0x006D
-#endif
+#అయితే_ముగింపు
 
-#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-# define DWMWA_USE_IMMERSIVE_DARK_MODE	20
-#endif
+#నిర్వచితం_కాకపోతే DWMWA_USE_IMMERSIVE_DARK_బహుళకం
+# define DWMWA_USE_IMMERSIVE_DARK_బహుళకం	20
+#అయితే_ముగింపు
 
-#ifndef DWMWA_CAPTION_COLOR
+#నిర్వచితం_కాకపోతే DWMWA_CAPTION_COLOR
 # define DWMWA_CAPTION_COLOR		35
-#endif
+#అయితే_ముగింపు
 
-#ifndef DWMWA_TEXT_COLOR
-# define DWMWA_TEXT_COLOR		36
-#endif
+#నిర్వచితం_కాకపోతే DWMWA_పాఠ్యం_COLOR
+# define DWMWA_పాఠ్యం_COLOR		36
+#అయితే_ముగింపు
 
-static void _OnPaint(HWND hwnd);
-static void fill_rect(const RECT *rcp, HBRUSH hbr, COLORREF color);
-static void clear_rect(RECT *rcp);
+స్థిర శూన్య _OnPaint(HWND hwnd);
+స్థిర శూన్య fill_rect(స్థిరరాశి RECT *rcp, HBRUSH hbr, COLORREF color);
+స్థిర శూన్య clear_rect(RECT *rcp);
 
-static WORD		s_dlgfntheight;		// height of the dialog font
-static WORD		s_dlgfntwidth;		// width of the dialog font
+స్థిర మాట_2		s_dlgfntheight;		// height of the dialog font
+స్థిర మాట_2		s_dlgfntwidth;		// width of the dialog font
 
-#ifdef FEAT_MENU
-static HMENU		s_menuBar = NULL;
-#endif
-#ifdef FEAT_TEAROFF
-static void rebuild_tearoff(vimmenu_T *menu);
-static HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
-#endif
+#నిర్వచితమైతే FEAT_MENU
+స్థిర HMENU		s_menuBar = ఖాళీ;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TEAROFF
+స్థిర శూన్య rebuild_tearoff(vimmenu_T *menu);
+స్థిర HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
+#అయితే_ముగింపు
 
 // Flag that is set while processing a message that must not be interrupted by
 // processing another message.
-static int		s_busy_processing = FALSE;
+స్థిర పూర్ణాంకం		s_busy_processing = FALSE;
 
-static int		destroying = FALSE;	// call DestroyWindow() ourselves
+స్థిర పూర్ణాంకం		destroying = FALSE;	// call DestroyWindow() ourselves
 
-#ifdef MSWIN_FIND_REPLACE
-static UINT		s_findrep_msg = 0;
-static FINDREPLACEW	s_findrep_struct;
-static HWND		s_findrep_hwnd = NULL;
-static int		s_findrep_is_find;	// TRUE for find dialog, FALSE
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
+స్థిర UINT		s_findrep_సందేశం = 0;
+స్థిర FINDREPLACEW	s_findrep_struct;
+స్థిర HWND		s_findrep_hwnd = ఖాళీ;
+స్థిర పూర్ణాంకం		s_findrep_is_కనుగొను;	// TRUE for find dialog, FALSE
 						// for find/replace dialog
-#endif
+#అయితే_ముగింపు
 
-HWND			s_hwnd = NULL;
-static HDC		s_hdc = NULL;
-static HBRUSH		s_brush = NULL;
+HWND			s_hwnd = ఖాళీ;
+స్థిర HDC		s_hdc = ఖాళీ;
+స్థిర HBRUSH		s_brush = ఖాళీ;
 
-#ifdef FEAT_TOOLBAR
-static HWND		s_toolbarhwnd = NULL;
-static WNDPROC		s_toolbar_wndproc = NULL;
-#endif
+#నిర్వచితమైతే FEAT_TOOLBAR
+స్థిర HWND		s_toolbarhwnd = ఖాళీ;
+స్థిర WNDPROC		s_toolbar_wndproc = ఖాళీ;
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-static HWND		s_tabhwnd = NULL;
-static WNDPROC		s_tabline_wndproc = NULL;
-static int		showing_tabline = 0;
-#endif
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+స్థిర HWND		s_tabhwnd = ఖాళీ;
+స్థిర WNDPROC		s_tabline_wndproc = ఖాళీ;
+స్థిర పూర్ణాంకం		showing_tabline = 0;
+#అయితే_ముగింపు
 
-static WPARAM		s_wParam = 0;
+స్థిర WPARAM		s_wParam = 0;
 
-static HWND		s_textArea = NULL;
+స్థిర HWND		s_పాఠ్యం_Area = ఖాళీ;
 
 // Set when the text area was painted with the background color only, because
 // the screen contents were not available yet.
-static bool		s_textarea_bg_only = false;
+స్థిర bool		s_textarea_bg_only = false;
 
-static UINT		s_uMsg = 0;
+స్థిర UINT		s_u_సందేశం = 0;
 
-static char_u		*s_textfield; // Used by dialogs to pass back strings
+స్థిర char_u		*s_textfield; // Used by dialogs to pass back strings
 
-static int		s_need_activate = FALSE;
+స్థిర పూర్ణాంకం		s_need_activate = FALSE;
 
 // This variable is set when waiting for an event, which is the only moment
 // scrollbar dragging can be done directly.  It's not allowed while commands
 // are executed, because it may move the cursor and that may cause unexpected
 // problems (e.g., while ":s" is working).
-static int allow_scrollbar = FALSE;
+స్థిర పూర్ణాంకం allow_scrollbar = FALSE;
 
-#ifndef _DPI_AWARENESS_CONTEXTS_
-typedef HANDLE DPI_AWARENESS_CONTEXT;
+#నిర్వచితం_కాకపోతే _DPI_AWARENESS_CONTEXTS_
+రకనిర్వచనం HANDLE DPI_AWARENESS_CONTEXT;
 
-typedef enum DPI_AWARENESS {
+రకనిర్వచనం గణన DPI_AWARENESS {
     DPI_AWARENESS_INVALID	    = -1,
     DPI_AWARENESS_UNAWARE	    = 0,
     DPI_AWARENESS_SYSTEM_AWARE	    = 1,
-    DPI_AWARENESS_PER_MONITOR_AWARE = 2
+    DPI_AWARENESS_చొప్పున_MONITOR_AWARE = 2
 } DPI_AWARENESS;
 
 # define DPI_AWARENESS_CONTEXT_UNAWARE		    ((DPI_AWARENESS_CONTEXT)-1)
 # define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE	    ((DPI_AWARENESS_CONTEXT)-2)
-# define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE    ((DPI_AWARENESS_CONTEXT)-3)
-# define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ((DPI_AWARENESS_CONTEXT)-4)
+# define DPI_AWARENESS_CONTEXT_చొప్పున_MONITOR_AWARE    ((DPI_AWARENESS_CONTEXT)-3)
+# define DPI_AWARENESS_CONTEXT_చొప్పున_MONITOR_AWARE_V2 ((DPI_AWARENESS_CONTEXT)-4)
 # define DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED    ((DPI_AWARENESS_CONTEXT)-5)
-#endif
+#అయితే_ముగింపు
 
-#define DEFAULT_DPI	96
-static int		s_dpi = DEFAULT_DPI;
-static BOOL		s_in_dpichanged = FALSE;
-#ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
-#endif
-static RECT		s_suggested_rect;
+#నిర్వచించు DEFAULT_DPI	96
+స్థిర పూర్ణాంకం		s_dpi = DEFAULT_DPI;
+స్థిర BOOL		s_లోపల_dpichanged = FALSE;
+#నిర్వచితమైతే FEAT_MBYTE_IME
+స్థిర DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
+#అయితే_ముగింపు
+స్థిర RECT		s_suggested_rect;
 
-static UINT (WINAPI *pGetDpiForSystem)(void) = NULL;
-static UINT (WINAPI *pGetDpiForWindow)(HWND hwnd) = NULL;
-static int (WINAPI *pGetSystemMetricsForDpi)(int, UINT) = NULL;
+స్థిర UINT (WINAPI *pGetDpiForSystem)(శూన్య) = ఖాళీ;
+స్థిర UINT (WINAPI *p_Get_Dpi_For_కిటికీ)(HWND hwnd) = ఖాళీ;
+స్థిర పూర్ణాంకం (WINAPI *pGetSystemMetricsForDpi)(పూర్ణాంకం, UINT) = ఖాళీ;
 //static INT (WINAPI *pGetWindowDpiAwarenessContext)(HWND hwnd) = NULL;
-static DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext) = NULL;
-#ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = NULL;
-#endif
+స్థిర DPI_AWARENESS_CONTEXT (WINAPI *p_సమితి_Thread_Dpi_Awareness_Context)(DPI_AWARENESS_CONTEXT dpiContext) = ఖాళీ;
+#నిర్వచితమైతే FEAT_MBYTE_IME
+స్థిర DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = ఖాళీ;
+#అయితే_ముగింపు
 
-static HINSTANCE hLibDwm = NULL;
-static HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND, DWORD, LPCVOID, DWORD);
-static void dyn_dwm_load(void);
+స్థిర HINSTANCE hLibDwm = ఖాళీ;
+స్థిర HRESULT (WINAPI *p_Dwm_సమితి_కిటికీ_Attribute)(HWND, DWORD, LPCVOID, DWORD);
+స్థిర శూన్య dyn_dwm_ఎక్కించు(శూన్య);
 
-static int fullscreen_on = FALSE;
+స్థిర పూర్ణాంకం fullscreen_on = FALSE;
 
-#ifdef FEAT_GUI_DARKTHEME
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
 
-static HINSTANCE hUxThemeLib = NULL;
-static DWORD (WINAPI *pSetPreferredAppMode)(DWORD) = NULL;
-static void (WINAPI *pFlushMenuThemes)(void) = NULL;
-static void dyn_uxtheme_load(void);
-#endif
+స్థిర HINSTANCE hUxThemeLib = ఖాళీ;
+స్థిర DWORD (WINAPI *p_సమితి_Preferred_App_బహుళకం)(DWORD) = ఖాళీ;
+స్థిర శూన్య (WINAPI *pFlushMenuThemes)(శూన్య) = ఖాళీ;
+స్థిర శూన్య dyn_uxtheme_ఎక్కించు(శూన్య);
+#అయితే_ముగింపు
 
-    static int WINAPI
-stubGetSystemMetricsForDpi(int nIndex, UINT dpi UNUSED)
+    స్థిర పూర్ణాంకం WINAPI
+stubGetSystemMetricsForDpi(పూర్ణాంకం n_సూచీ, UINT dpi వాడని)
 {
-    return GetSystemMetrics(nIndex);
+    తిరిగి GetSystemMetrics(n_సూచీ);
 }
 
-    static int
-adjust_fontsize_by_dpi(int size)
+    స్థిర పూర్ణాంకం
+adjust_fontsize_by_dpi(పూర్ణాంకం కొలత)
 {
-    return size * s_dpi / (int)pGetDpiForSystem();
+    తిరిగి కొలత * s_dpi / (పూర్ణాంకం)pGetDpiForSystem();
 }
 
-    static int
-adjust_by_system_dpi(int size)
+    స్థిర పూర్ణాంకం
+adjust_by_system_dpi(పూర్ణాంకం కొలత)
 {
-    return size * (int)pGetDpiForSystem() / DEFAULT_DPI;
+    తిరిగి కొలత * (పూర్ణాంకం)pGetDpiForSystem() / DEFAULT_DPI;
 }
 
-#if defined(FEAT_DIRECTX)
-    static int
-directx_enabled(void)
+#ఒకవేళ defined(FEAT_DIRECTX)
+    స్థిర పూర్ణాంకం
+directx_enabled(శూన్య)
 {
-    if (s_dwc != NULL)
-	return 1;
-    else if (s_directx_load_attempted)
-	return 0;
+    ఒకవేళ (s_dwc != ఖాళీ)
+	తిరిగి 1;
+    లేకపోతే ఒకవేళ (s_directx_ఎక్కించు_attempted)
+	తిరిగి 0;
     // load DirectX
     DWrite_Init();
-    s_directx_load_attempted = 1;
+    s_directx_ఎక్కించు_attempted = 1;
     s_dwc = DWriteContext_Open();
     directx_binddc();
-    return s_dwc != NULL ? 1 : 0;
+    తిరిగి s_dwc != ఖాళీ ? 1 : 0;
 }
 
-    static void
-directx_binddc(void)
+    స్థిర శూన్య
+directx_binddc(శూన్య)
 {
-    if (s_textArea == NULL)
-	return;
+    ఒకవేళ (s_పాఠ్యం_Area == ఖాళీ)
+	తిరిగి;
 
     RECT	rect;
-    GetClientRect(s_textArea, &rect);
+    GetClientRect(s_పాఠ్యం_Area, &rect);
     DWriteContext_BindDC(s_dwc, s_hdc, &rect);
 }
-#endif
+#అయితే_ముగింపు
 
-extern int current_font_height;	    // this is in os_mswin.c
+బాహ్య పూర్ణాంకం current_font_ఎత్తు;	    // this is in os_mswin.c
 
-static struct
+స్థిర నిర్మాణం
 {
-    UINT    key_sym;
+    UINT    కీలకం_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_కీలకాలు[] =
 {
-    {VK_UP,		'k', 'u'},
-    {VK_DOWN,		'k', 'd'},
-    {VK_LEFT,		'k', 'l'},
-    {VK_RIGHT,		'k', 'r'},
+    {VK_పైకి,		'k', 'u'},
+    {VK_కిందికి,		'k', 'd'},
+    {VK_ఎడమ,		'k', 'l'},
+    {VK_కుడి,		'k', 'r'},
 
     {VK_F1,		'k', '1'},
     {VK_F2,		'k', '2'},
@@ -522,24 +522,24 @@ static struct
     {VK_F20,		'F', 'A'},
 
     {VK_F21,		'F', 'B'},
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     {VK_PAUSE,		'F', 'B'},	// Pause == F21 (see gui_gtk_x11.c)
-#endif
+#అయితే_ముగింపు
     {VK_F22,		'F', 'C'},
     {VK_F23,		'F', 'D'},
     {VK_F24,		'F', 'E'},	// winuser.h defines up to F24
 
     {VK_HELP,		'%', '1'},
-    {VK_BACK,		'k', 'b'},
-    {VK_INSERT,		'k', 'I'},
+    {VK_వెనుక,		'k', 'b'},
+    {VK_చొప్పించు,		'k', 'I'},
     {VK_DELETE,		'k', 'D'},
     {VK_HOME,		'k', 'h'},
-    {VK_END,		'@', '7'},
-    {VK_PRIOR,		'k', 'P'},
-    {VK_NEXT,		'k', 'N'},
+    {VK_చివర,		'@', '7'},
+    {VK_పూర్వ,		'k', 'P'},
+    {VK_తదుపరి,		'k', 'N'},
     {VK_PRINT,		'%', '9'},
-    {VK_ADD,		'K', '6'},
-    {VK_SUBTRACT,	'K', '7'},
+    {VK_కూడు,		'K', '6'},
+    {VK_వ్యవకలనం,	'K', '7'},
     {VK_DIVIDE,		'K', '8'},
     {VK_MULTIPLY,	'K', '9'},
     {VK_SEPARATOR,	'K', 'A'},	// Keypad Enter
@@ -568,64 +568,64 @@ static struct
 };
 
 // Local variables
-static int	s_button_pending = -1;
+స్థిర పూర్ణాంకం	s_button_pending = -1;
 
 // s_getting_focus is set when we got focus but didn't see mouse-up event yet,
 // so don't reset s_button_pending.
-static int	s_getting_focus = FALSE;
+స్థిర పూర్ణాంకం	s_getting_focus = FALSE;
 
-static int	s_x_pending;
-static int	s_y_pending;
-static UINT	s_kFlags_pending;
-static UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
-static int	s_timed_out = FALSE;
-static int	dead_key = DEAD_KEY_OFF;
-static UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
+స్థిర పూర్ణాంకం	s_x_pending;
+స్థిర పూర్ణాంకం	s_y_pending;
+స్థిర UINT	s_kFlags_pending;
+స్థిర UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
+స్థిర పూర్ణాంకం	s_timed_బహిర్గతం = FALSE;
+స్థిర పూర్ణాంకం	dead_కీలకం = DEAD_కీలకం_OFF;
+స్థిర UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
 					  // else a high surrogate
 
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
 // balloon-eval WM_NOTIFY_HANDLER
-static void Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
-static void track_user_activity(UINT uMsg);
-#endif
+స్థిర శూన్య Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
+స్థిర శూన్య track_user_activity(UINT u_సందేశం);
+#అయితే_ముగింపు
 
 /*
  * For control IME.
  *
  * These LOGFONTW used for IME.
  */
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 // holds LOGFONTW for 'guifontwide' if available, otherwise 'guifont'
-static LOGFONTW norm_logfont;
+స్థిర LOGFONTW norm_logfont;
 // holds LOGFONTW for 'guifont' always.
-static LOGFONTW sub_logfont;
-#endif
+స్థిర LOGFONTW sub_logfont;
+#అయితే_ముగింపు
 
-#ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData);
-#endif
+#నిర్వచితమైతే FEAT_MBYTE_IME
+స్థిర LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dw_దత్తాంశం);
+#అయితే_ముగింపు
 
-#if defined(FEAT_BROWSE)
-static char_u *convert_filter(char_u *s);
-#endif
+#ఒకవేళ defined(FEAT_BROWSE)
+స్థిర char_u *convert_filter(char_u *s);
+#అయితే_ముగింపు
 
-#ifdef DEBUG_PRINT_ERROR
+#నిర్వచితమైతే DEBUG_PRINT_ERROR
 /*
  * Print out the last Windows error message
  */
-    static void
-print_windows_error(void)
+    స్థిర శూన్య
+print_windows_error(శూన్య)
 {
-    LPVOID  lpMsgBuf;
+    LPVOID  lp_సందేశం_Buf;
 
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		  NULL, GetLastError(),
+    Format_సందేశం(FORMAT_సందేశం_ALLOCATE_బఫరు | FORMAT_సందేశం_FROM_SYSTEM,
+		  ఖాళీ, Get_చివరి_Error(),
 		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		  (LPTSTR) &lpMsgBuf, 0, NULL);
-    TRACE1("Error: %s\n", lpMsgBuf);
-    LocalFree(lpMsgBuf);
+		  (LPTSTR) &lp_సందేశం_Buf, 0, ఖాళీ);
+    TRACE1("Error: %s\n", lp_సందేశం_Buf);
+    LocalFree(lp_సందేశం_Buf);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Cursor blink functions.
@@ -636,81 +636,81 @@ print_windows_error(void)
  * BLINK_ON	blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#నిర్వచించు BLINK_NONE  0
+#నిర్వచించు BLINK_OFF   1
+#నిర్వచించు BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static UINT_PTR		blink_timer = 0;
+స్థిర పూర్ణాంకం		blink_state = BLINK_NONE;
+స్థిర long_u		blink_waittime = 700;
+స్థిర long_u		blink_ontime = 400;
+స్థిర long_u		blink_offtime = 250;
+స్థిర UINT_PTR		blink_timer = 0;
 
-    int
-gui_mch_is_blinking(void)
+    పూర్ణాంకం
+gui_mch_is_blinking(శూన్య)
 {
-    return blink_state != BLINK_NONE;
+    తిరిగి blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    పూర్ణాంకం
+gui_mch_is_blink_off(శూన్య)
 {
-    return blink_state == BLINK_OFF;
+    తిరిగి blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long wait, long on, long off)
+    శూన్య
+gui_mch_సమితి_blinking(దీర్ఘ wait, దీర్ఘ on, దీర్ఘ off)
 {
     blink_waittime = wait;
     blink_ontime = on;
     blink_offtime = off;
 }
 
-    static VOID CALLBACK
+    స్థిర VOID CALLBACK
 _OnBlinkTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_సందేశం వాడని,
     UINT_PTR idEvent,
-    DWORD dwTime UNUSED)
+    DWORD dw_సమయం వాడని)
 {
-    MSG msg;
+    సందేశం_3 సందేశం;
 
     /*
     TRACE2("Got timer event, id %d, blink_timer %d\n", idEvent, blink_timer);
     */
 
-    KillTimer(NULL, idEvent);
+    KillTimer(ఖాళీ, idEvent);
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    అయితే (Peek_సందేశం_W(&సందేశం, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
 
-    if (blink_state == BLINK_ON)
+    ఒకవేళ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_offtime, _OnBlinkTimer);
+	blink_timer = సమితి_Timer(ఖాళీ, 0, (UINT)blink_offtime, _OnBlinkTimer);
     }
-    else
+    లేకపోతే
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_ontime, _OnBlinkTimer);
+	blink_timer = సమితి_Timer(ఖాళీ, 0, (UINT)blink_ontime, _OnBlinkTimer);
     }
     gui_mch_flush();
 }
 
-    static void
-gui_mswin_rm_blink_timer(void)
+    స్థిర శూన్య
+gui_mswin_rm_blink_timer(శూన్య)
 {
-    MSG msg;
+    సందేశం_3 సందేశం;
 
-    if (blink_timer == 0)
-	return;
+    ఒకవేళ (blink_timer == 0)
+	తిరిగి;
 
-    KillTimer(NULL, blink_timer);
+    KillTimer(ఖాళీ, blink_timer);
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    అయితే (Peek_సందేశం_W(&సందేశం, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
     blink_timer = 0;
 }
@@ -718,11 +718,11 @@ gui_mswin_rm_blink_timer(void)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    శూన్య
+gui_mch_stop_blink(పూర్ణాంకం may_call_gui_update_cursor)
 {
     gui_mswin_rm_blink_timer();
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ఒకవేళ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
     {
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -734,15 +734,15 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    శూన్య
+gui_mch_ప్రారంభం_blink(శూన్య)
 {
     gui_mswin_rm_blink_timer();
 
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ఒకవేళ (blink_waittime && blink_ontime && blink_offtime && gui.లోపల_focus)
     {
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_waittime, _OnBlinkTimer);
+	blink_timer = సమితి_Timer(ఖాళీ, 0, (UINT)blink_waittime, _OnBlinkTimer);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -753,35 +753,35 @@ gui_mch_start_blink(void)
  * Call-back routines.
  */
 
-    static VOID CALLBACK
+    స్థిర VOID CALLBACK
 _OnTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_సందేశం వాడని,
     UINT_PTR idEvent,
-    DWORD dwTime UNUSED)
+    DWORD dw_సమయం వాడని)
 {
-    MSG msg;
+    సందేశం_3 సందేశం;
 
     /*
     TRACE2("Got timer event, id %d, s_wait_timer %d\n", idEvent, s_wait_timer);
     */
-    KillTimer(NULL, idEvent);
-    s_timed_out = TRUE;
+    KillTimer(ఖాళీ, idEvent);
+    s_timed_బహిర్గతం = TRUE;
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    అయితే (Peek_సందేశం_W(&సందేశం, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
-    if (idEvent == s_wait_timer)
+    ఒకవేళ (idEvent == s_wait_timer)
 	s_wait_timer = 0;
 }
 
-    static void
+    స్థిర శూన్య
 _OnDeadChar(
-    HWND hwnd UNUSED,
-    UINT ch UNUSED,
-    int cRepeat UNUSED)
+    HWND hwnd వాడని,
+    UINT ch వాడని,
+    పూర్ణాంకం cRepeat వాడని)
 {
-    dead_key = DEAD_KEY_SET_DEFAULT;
+    dead_కీలకం = DEAD_కీలకం_సమితి_DEFAULT;
 }
 
 /*
@@ -795,15 +795,15 @@ _OnDeadChar(
  * of UTF-16 code units to a single Unicode code point, presuming it is the
  * matching low surrogate.
  */
-    static int
-char_to_string(int ch, char_u *string, int slen, int had_alt)
+    స్థిర పూర్ణాంకం
+char_గమ్యం_string(పూర్ణాంకం ch, char_u *string, పూర్ణాంకం slen, పూర్ణాంకం had_alt)
 {
-    int		len;
-    int		i;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
     WCHAR	wstring[2];
-    char_u	*ws = NULL;
+    char_u	*ws = ఖాళీ;
 
-    if (surrogate_pending_ch != 0)
+    ఒకవేళ (surrogate_pending_ch != 0)
     {
 	// We don't guarantee ch is a low surrogate to match the high surrogate
 	// we already have; it should be, but if it isn't, tough luck.
@@ -812,14 +812,14 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
 	surrogate_pending_ch = 0;
 	len = 2;
     }
-    else if (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
+    లేకపోతే ఒకవేళ (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
     {
 	// We don't have the entire code point yet, only the first UTF-16 code
 	// unit; so just remember it and use it in the next call.
 	surrogate_pending_ch = ch;
-	return 0;
+	తిరిగి 0;
     }
-    else
+    లేకపోతే
     {
 	wstring[0] = ch;
 	len = 1;
@@ -828,54 +828,54 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
     // "ch" is a UTF-16 character.  Convert it to a string of bytes.  When
     // "enc_codepage" is non-zero use the standard Win32 function,
     // otherwise use our own conversion function (e.g., for UTF-8).
-    if (enc_codepage > 0)
+    ఒకవేళ (enc_codepage > 0)
     {
-	len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		(LPSTR)string, slen, 0, NULL);
+	len = Wide_Char_గమ్యం_Multi_Byte(enc_codepage, 0, wstring, len,
+		(LPSTR)string, slen, 0, ఖాళీ);
 	// If we had included the ALT key into the character but now the
 	// upper bit is no longer set, that probably means the conversion
 	// failed.  Convert the original character and set the upper bit
 	// afterwards.
-	if (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
+	ఒకవేళ (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
 	{
 	    wstring[0] = ch & 0x7f;
-	    len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		    (LPSTR)string, slen, 0, NULL);
-	    if (len == 1) // safety check
+	    len = Wide_Char_గమ్యం_Multi_Byte(enc_codepage, 0, wstring, len,
+		    (LPSTR)string, slen, 0, ఖాళీ);
+	    ఒకవేళ (len == 1) // safety check
 		string[0] |= 0x80;
 	}
     }
-    else
+    లేకపోతే
     {
-	ws = utf16_to_enc(wstring, &len);
-	if (ws == NULL)
+	ws = utf16_గమ్యం_enc(wstring, &len);
+	ఒకవేళ (ws == ఖాళీ)
 	    len = 0;
-	else
+	లేకపోతే
 	{
-	    if (len > slen)	// just in case
+	    ఒకవేళ (len > slen)	// just in case
 		len = slen;
 	    mch_memmove(string, ws, len);
 	    vim_free(ws);
 	}
     }
 
-    if (len == 0)
+    ఒకవేళ (len == 0)
     {
 	string[0] = ch;
 	len = 1;
     }
 
-    for (i = 0; i < len; ++i)
-	if (string[i] == CSI && len <= slen - 2)
+    కొరకు (i = 0; i < len; ++i)
+	ఒకవేళ (string[i] == CSI && len <= slen - 2)
 	{
 	    // Insert CSI as K_CSI.
 	    mch_memmove(string + i + 3, string + i + 1, len - i - 1);
 	    string[++i] = KS_EXTRA;
-	    string[++i] = (int)KE_CSI;
+	    string[++i] = (పూర్ణాంకం)KE_CSI;
 	    len += 2;
 	}
 
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -887,43 +887,43 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
  * area, and usages not via "get_active_modifiers_via_ptr" should
  * be watched.
  */
-    static int
-get_active_modifiers_experimental(void)
+    స్థిర పూర్ణాంకం
+get_చురుకైన_modifiers_experimental(శూన్య)
 {
-    int modifiers = 0;
+    పూర్ణాంకం modifiers = 0;
 
-    if (GetKeyState(VK_CONTROL) & 0x8000)
-	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
-	modifiers |= MOD_MASK_SHIFT;
+    ఒకవేళ (Get_కీలకం_State(VK_CONTROL) & 0x8000)
+	modifiers |= MOD_ముసుగు_CTRL;
+    ఒకవేళ (Get_కీలకం_State(VK_జరుపు) & 0x8000)
+	modifiers |= MOD_ముసుగు_జరుపు;
     // Windows handles Ctrl + Alt as AltGr and vice-versa. We can distinguish
     // the two cases by checking whether the left or the right Alt key is
     // pressed.
-    if (GetKeyState(VK_LMENU) & 0x8000)
-	modifiers |= MOD_MASK_ALT;
-    if ((modifiers & MOD_MASK_CTRL) && (GetKeyState(VK_RMENU) & 0x8000))
-	modifiers &= ~MOD_MASK_CTRL;
+    ఒకవేళ (Get_కీలకం_State(VK_LMENU) & 0x8000)
+	modifiers |= MOD_ముసుగు_ALT;
+    ఒకవేళ ((modifiers & MOD_ముసుగు_CTRL) && (Get_కీలకం_State(VK_RMENU) & 0x8000))
+	modifiers &= ~MOD_ముసుగు_CTRL;
     // Add RightALT only if it is hold alone (without Ctrl), because if AltGr
     // is pressed, Windows claims that Ctrl is hold as well. That way we can
     // recognize Right-ALT alone and be sure that not AltGr is hold.
-    if (!(GetKeyState(VK_CONTROL) & 0x8000)
-	    &&  (GetKeyState(VK_RMENU) & 0x8000)
-	    && !(GetKeyState(VK_LMENU) & 0x8000)) // seems AltGr has both set
-	modifiers |= MOD_MASK_ALT;
+    ఒకవేళ (!(Get_కీలకం_State(VK_CONTROL) & 0x8000)
+	    &&  (Get_కీలకం_State(VK_RMENU) & 0x8000)
+	    && !(Get_కీలకం_State(VK_LMENU) & 0x8000)) // seems AltGr has both set
+	modifiers |= MOD_ముసుగు_ALT;
 
-    return modifiers;
+    తిరిగి modifiers;
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static int
-get_active_modifiers_classic(void)
+    స్థిర పూర్ణాంకం
+get_చురుకైన_modifiers_classic(శూన్య)
 {
-    int modifiers = 0;
+    పూర్ణాంకం modifiers = 0;
 
-    if (GetKeyState(VK_SHIFT) & 0x8000)
-	modifiers |= MOD_MASK_SHIFT;
+    ఒకవేళ (Get_కీలకం_State(VK_జరుపు) & 0x8000)
+	modifiers |= MOD_ముసుగు_జరుపు;
     /*
      * Don't use caps-lock as shift, because these are special keys
      * being considered here, and we only want letters to get
@@ -933,207 +933,207 @@ get_active_modifiers_classic(void)
     if (GetKeyState(VK_CAPITAL) & 0x0001)
 	modifiers ^= MOD_MASK_SHIFT;
     */
-    if (GetKeyState(VK_CONTROL) & 0x8000)
-	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_MENU) & 0x8000)
-	modifiers |= MOD_MASK_ALT;
+    ఒకవేళ (Get_కీలకం_State(VK_CONTROL) & 0x8000)
+	modifiers |= MOD_ముసుగు_CTRL;
+    ఒకవేళ (Get_కీలకం_State(VK_MENU) & 0x8000)
+	modifiers |= MOD_ముసుగు_ALT;
 
-    return modifiers;
+    తిరిగి modifiers;
 }
 
-    static int
-get_active_modifiers(void)
+    స్థిర పూర్ణాంకం
+get_చురుకైన_modifiers(శూన్య)
 {
-    return get_active_modifiers_experimental();
+    తిరిగి get_చురుకైన_modifiers_experimental();
 }
 
-    static int
-get_active_modifiers_via_ptr(void)
+    స్థిర పూర్ణాంకం
+get_చురుకైన_modifiers_ద్వారా_ptr(శూన్య)
 {
     // marshal to corresponding implementation
-    return keycode_trans_strategy_used->ptr_get_active_modifiers();
+    తిరిగి keycode_trans_strategy_వాడిన->ptr_get_చురుకైన_modifiers();
 }
 
 /*
  * Key hit, add it to the input buffer.
  */
-    static void
+    స్థిర శూన్య
 _OnChar(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT cch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     // marshal to corresponding implementation
-    keycode_trans_strategy_used->ptr_on_char(hwnd, cch, cRepeat);
+    keycode_trans_strategy_వాడిన->ptr_on_char(hwnd, cch, cRepeat);
 }
 
 /*
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    స్థిర శూన్య
 _OnChar_experimental(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT cch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     char_u	string[40];
-    int		len = 0;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		modifiers;
+    పూర్ణాంకం		ch = cch;   // special keys are negative
 
-    if (dead_key == DEAD_KEY_SKIP_ON_CHAR)
-	return;
+    ఒకవేళ (dead_కీలకం == DEAD_కీలకం_SKIP_ON_CHAR)
+	తిరిగి;
 
     //  keep DEAD_KEY_TRANSIENT_IN_ON_CHAR value for later handling in
     //  process_message()
-    if (dead_key != DEAD_KEY_TRANSIENT_IN_ON_CHAR)
-	dead_key = DEAD_KEY_OFF;
+    ఒకవేళ (dead_కీలకం != DEAD_కీలకం_TRANSIENT_లోపల_ON_CHAR)
+	dead_కీలకం = DEAD_కీలకం_OFF;
 
-    modifiers = get_active_modifiers_experimental();
+    modifiers = get_చురుకైన_modifiers_experimental();
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_కీలకం(ch, &modifiers);
 
     // Some keys need adjustment when the Ctrl modifier is used.
-    ++no_reduce_keys;
-    ch = may_adjust_key_for_ctrl(modifiers, ch);
-    --no_reduce_keys;
+    ++no_reduce_కీలకాలు;
+    ch = may_adjust_కీలకం_for_ctrl(modifiers, ch);
+    --no_reduce_కీలకాలు;
 
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
-    modifiers = may_remove_shift_modifier(modifiers, ch);
+    modifiers = may_remove_జరుపు_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = వెలికితీయి_modifiers(ch, &modifiers, FALSE, ఖాళీ);
+    ఒకవేళ (ch == CSI)
 	ch = K_CSI;
 
-    if (modifiers)
+    ఒకవేళ (modifiers)
     {
 	string[0] = CSI;
 	string[1] = KS_MODIFIER;
 	string[2] = modifiers;
-	add_to_input_buf(string, 3);
+	కూడు_గమ్యం_ఆదానం_buf(string, 3);
     }
 
-    len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    len = char_గమ్యం_string(ch, string, 40, FALSE);
+    ఒకవేళ (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_ఆదానం_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    కూడు_గమ్యం_ఆదానం_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    స్థిర శూన్య
 _OnChar_classic(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT ch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     char_u	string[40];
-    int		len = 0;
+    పూర్ణాంకం		len = 0;
 
-    dead_key = 0;
+    dead_కీలకం = 0;
 
-    len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    len = char_గమ్యం_string(ch, string, 40, FALSE);
+    ఒకవేళ (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_ఆదానం_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    కూడు_గమ్యం_ఆదానం_buf(string, len);
 }
 
 /*
  * Alt-Key hit, add it to the input buffer.
  */
-    static void
+    స్థిర శూన్య
 _OnSysChar(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT cch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     // marshal to corresponding implementation
-    keycode_trans_strategy_used->ptr_on_sys_char(hwnd, cch, cRepeat);
+    keycode_trans_strategy_వాడిన->ptr_on_sys_char(hwnd, cch, cRepeat);
 }
 
 /*
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    స్థిర శూన్య
 _OnSysChar_experimental(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT cch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		modifiers;
+    పూర్ణాంకం		ch = cch;   // special keys are negative
 
-    dead_key = DEAD_KEY_OFF;
+    dead_కీలకం = DEAD_కీలకం_OFF;
 
     // OK, we have a character key (given by ch) which was entered with the
     // ALT key pressed. Eg, if the user presses Alt-A, then ch == 'A'. Note
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
-    modifiers = get_active_modifiers_experimental();
-    ch = simplify_key(ch, &modifiers);
+    modifiers = get_చురుకైన_modifiers_experimental();
+    ch = simplify_కీలకం(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
-    modifiers = may_remove_shift_modifier(modifiers, ch);
+    modifiers = may_remove_జరుపు_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = వెలికితీయి_modifiers(ch, &modifiers, FALSE, ఖాళీ);
+    ఒకవేళ (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    ఒకవేళ (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    ఒకవేళ (IS_SPECIAL((పూర్ణాంకం)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_రెండవ((పూర్ణాంకం)ch);
+	string[len++] = K_మూడవ((పూర్ణాంకం)ch);
     }
-    else
+    లేకపోతే
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
-	len += char_to_string(ch, string + len, 40 - len, TRUE);
+	len += char_గమ్యం_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    కూడు_గమ్యం_ఆదానం_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    స్థిర శూన్య
 _OnSysChar_classic(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     UINT cch,
-    int cRepeat UNUSED)
+    పూర్ణాంకం cRepeat వాడని)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		modifiers;
+    పూర్ణాంకం		ch = cch;   // special keys are negative
 
-    dead_key = 0;
+    dead_కీలకం = 0;
 
     // TRACE("OnSysChar(%d, %c)\n", ch, ch);
 
@@ -1141,141 +1141,141 @@ _OnSysChar_classic(
     // ALT key pressed. Eg, if the user presses Alt-A, then ch == 'A'. Note
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
-    modifiers = MOD_MASK_ALT;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
-	modifiers |= MOD_MASK_SHIFT;
-    if (GetKeyState(VK_CONTROL) & 0x8000)
-	modifiers |= MOD_MASK_CTRL;
+    modifiers = MOD_ముసుగు_ALT;
+    ఒకవేళ (Get_కీలకం_State(VK_జరుపు) & 0x8000)
+	modifiers |= MOD_ముసుగు_జరుపు;
+    ఒకవేళ (Get_కీలకం_State(VK_CONTROL) & 0x8000)
+	modifiers |= MOD_ముసుగు_CTRL;
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_కీలకం(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
-    modifiers = may_remove_shift_modifier(modifiers, ch);
+    modifiers = may_remove_జరుపు_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = వెలికితీయి_modifiers(ch, &modifiers, FALSE, ఖాళీ);
+    ఒకవేళ (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    ఒకవేళ (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    ఒకవేళ (IS_SPECIAL((పూర్ణాంకం)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_రెండవ((పూర్ణాంకం)ch);
+	string[len++] = K_మూడవ((పూర్ణాంకం)ch);
     }
-    else
+    లేకపోతే
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
-	len += char_to_string(ch, string + len, 40 - len, TRUE);
+	len += char_గమ్యం_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    కూడు_గమ్యం_ఆదానం_buf(string, len);
 }
 
-    static void
+    స్థిర శూన్య
 _OnMouseEvent(
-    int button,
-    int x,
-    int y,
-    int repeated_click,
-    UINT keyFlags)
+    పూర్ణాంకం button,
+    పూర్ణాంకం x,
+    పూర్ణాంకం y,
+    పూర్ణాంకం repeated_click,
+    UINT కీలకం_Flags)
 {
-    int vim_modifiers = 0x0;
+    పూర్ణాంకం vim_modifiers = 0x0;
 
     s_getting_focus = FALSE;
 
-    if (keyFlags & MK_SHIFT)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (keyFlags & MK_CONTROL)
+    ఒకవేళ (కీలకం_Flags & MK_జరుపు)
+	vim_modifiers |= MOUSE_జరుపు;
+    ఒకవేళ (కీలకం_Flags & MK_CONTROL)
 	vim_modifiers |= MOUSE_CTRL;
-    if (GetKeyState(VK_LMENU) & 0x8000)
+    ఒకవేళ (Get_కీలకం_State(VK_LMENU) & 0x8000)
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
 }
 
-    static void
-_OnMouseButtonDown(
-    HWND hwnd UNUSED,
-    BOOL fDoubleClick UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    స్థిర శూన్య
+On_Mouse_Button_కిందికి(
+    HWND hwnd వాడని,
+    BOOL fDoubleClick వాడని,
+    పూర్ణాంకం x,
+    పూర్ణాంకం y,
+    UINT కీలకం_Flags)
 {
-    static LONG	s_prevTime = 0;
+    స్థిర LONG	s_prev_సమయం = 0;
 
-    LONG    currentTime = GetMessageTime();
-    int	    button = -1;
-    int	    repeated_click;
+    LONG    current_సమయం = Get_సందేశం_సమయం();
+    పూర్ణాంకం	    button = -1;
+    పూర్ణాంకం	    repeated_click;
 
     // Give main window the focus: this is so the cursor isn't hollow.
-    (void)SetFocus(s_hwnd);
+    (శూన్య)సమితి_Focus(s_hwnd);
 
-    if (s_uMsg == WM_LBUTTONDOWN || s_uMsg == WM_LBUTTONDBLCLK)
-	button = MOUSE_LEFT;
-    else if (s_uMsg == WM_MBUTTONDOWN || s_uMsg == WM_MBUTTONDBLCLK)
-	button = MOUSE_MIDDLE;
-    else if (s_uMsg == WM_RBUTTONDOWN || s_uMsg == WM_RBUTTONDBLCLK)
-	button = MOUSE_RIGHT;
-    else if (s_uMsg == WM_XBUTTONDOWN || s_uMsg == WM_XBUTTONDBLCLK)
+    ఒకవేళ (s_u_సందేశం == WM_LBUTTONDOWN || s_u_సందేశం == WM_LBUTTONDBLCLK)
+	button = MOUSE_ఎడమ;
+    లేకపోతే ఒకవేళ (s_u_సందేశం == WM_MBUTTONDOWN || s_u_సందేశం == WM_MBUTTONDBLCLK)
+	button = MOUSE_మధ్య;
+    లేకపోతే ఒకవేళ (s_u_సందేశం == WM_RBUTTONDOWN || s_u_సందేశం == WM_RBUTTONDBLCLK)
+	button = MOUSE_కుడి;
+    లేకపోతే ఒకవేళ (s_u_సందేశం == WM_XBUTTONDOWN || s_u_సందేశం == WM_XBUTTONDBLCLK)
     {
 	button = ((GET_XBUTTON_WPARAM(s_wParam) == 1) ? MOUSE_X1 : MOUSE_X2);
     }
-    else if (s_uMsg == WM_CAPTURECHANGED)
+    లేకపోతే ఒకవేళ (s_u_సందేశం == WM_CAPTURECHANGED)
     {
 	// on W95/NT4, somehow you get in here with an odd Msg
 	// if you press one button while holding down the other..
-	if (s_button_pending == MOUSE_LEFT)
-	    button = MOUSE_RIGHT;
-	else
-	    button = MOUSE_LEFT;
+	ఒకవేళ (s_button_pending == MOUSE_ఎడమ)
+	    button = MOUSE_కుడి;
+	లేకపోతే
+	    button = MOUSE_ఎడమ;
     }
 
-    if (button < 0)
-	return;
+    ఒకవేళ (button < 0)
+	తిరిగి;
 
-    repeated_click = ((int)(currentTime - s_prevTime) < p_mouset);
+    repeated_click = ((పూర్ణాంకం)(current_సమయం - s_prev_సమయం) < p_mouset);
 
     /*
      * Holding down the left and right buttons simulates pushing the middle
      * button.
      */
-    if (repeated_click
-	    && ((button == MOUSE_LEFT && s_button_pending == MOUSE_RIGHT)
-		|| (button == MOUSE_RIGHT
-		    && s_button_pending == MOUSE_LEFT)))
+    ఒకవేళ (repeated_click
+	    && ((button == MOUSE_ఎడమ && s_button_pending == MOUSE_కుడి)
+		|| (button == MOUSE_కుడి
+		    && s_button_pending == MOUSE_ఎడమ)))
     {
 	/*
 	 * Hmm, gui.c will ignore more than one button down at a time, so
 	 * pretend we let go of it first.
 	 */
 	gui_send_mouse_event(MOUSE_RELEASE, x, y, FALSE, 0x0);
-	button = MOUSE_MIDDLE;
+	button = MOUSE_మధ్య;
 	repeated_click = FALSE;
 	s_button_pending = -1;
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, కీలకం_Flags);
     }
-    else if ((repeated_click)
-	    || (mouse_model_popup() && (button == MOUSE_RIGHT)))
+    లేకపోతే ఒకవేళ ((repeated_click)
+	    || (mouse_model_popup() && (button == MOUSE_కుడి)))
     {
-	if (s_button_pending > -1)
+	ఒకవేళ (s_button_pending > -1)
 	{
-	    _OnMouseEvent(s_button_pending, x, y, FALSE, keyFlags);
+	    _OnMouseEvent(s_button_pending, x, y, FALSE, కీలకం_Flags);
 	    s_button_pending = -1;
 	}
 	// TRACE("Button down at x %d, y %d\n", x, y);
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, కీలకం_Flags);
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * If this is the first press (i.e. not a multiple click) don't
@@ -1293,230 +1293,230 @@ _OnMouseButtonDown(
 	s_button_pending = button;
 	s_x_pending = x;
 	s_y_pending = y;
-	s_kFlags_pending = keyFlags;
+	s_kFlags_pending = కీలకం_Flags;
     }
 
-    s_prevTime = currentTime;
+    s_prev_సమయం = current_సమయం;
 }
 
-    static void
+    స్థిర శూన్య
 _OnMouseMoveOrRelease(
-    HWND hwnd UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    HWND hwnd వాడని,
+    పూర్ణాంకం x,
+    పూర్ణాంకం y,
+    UINT కీలకం_Flags)
 {
-    int button;
+    పూర్ణాంకం button;
 
     s_getting_focus = FALSE;
-    if (s_button_pending > -1)
+    ఒకవేళ (s_button_pending > -1)
     {
 	// Delayed action for mouse down event
 	_OnMouseEvent(s_button_pending, s_x_pending,
 					s_y_pending, FALSE, s_kFlags_pending);
 	s_button_pending = -1;
     }
-    if (s_uMsg == WM_MOUSEMOVE)
+    ఒకవేళ (s_u_సందేశం == WM_MOUSEMOVE)
     {
 	/*
 	 * It's only a MOUSE_DRAG if one or more mouse buttons are being held
 	 * down.
 	 */
-	if (!(keyFlags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
+	ఒకవేళ (!(కీలకం_Flags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
 						| MK_XBUTTON1 | MK_XBUTTON2)))
 	{
 	    gui_mouse_moved(x, y);
-	    return;
+	    తిరిగి;
 	}
 
 	/*
 	 * While button is down, keep grabbing mouse move events when
 	 * the mouse goes outside the window
 	 */
-	SetCapture(s_textArea);
+	సమితి_Capture(s_పాఠ్యం_Area);
 	button = MOUSE_DRAG;
 	// TRACE("  move at x %d, y %d\n", x, y);
     }
-    else
+    లేకపోతే
     {
 	ReleaseCapture();
 	button = MOUSE_RELEASE;
 	// TRACE("  up at x %d, y %d\n", x, y);
     }
 
-    _OnMouseEvent(button, x, y, FALSE, keyFlags);
+    _OnMouseEvent(button, x, y, FALSE, కీలకం_Flags);
 }
 
-    static void
-_OnSizeTextArea(
-    HWND hwnd UNUSED,
-    UINT state UNUSED,
-    int cx UNUSED,
-    int cy UNUSED)
+    స్థిర శూన్య
+On_కొలత_పాఠ్యం_Area(
+    HWND hwnd వాడని,
+    UINT state వాడని,
+    పూర్ణాంకం cx వాడని,
+    పూర్ణాంకం cy వాడని)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	directx_binddc();
-#endif
+#అయితే_ముగింపు
 }
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 /*
  * Find the vimmenu_T with the given id
  */
-    static vimmenu_T *
-gui_mswin_find_menu(
+    స్థిర vimmenu_T *
+gui_mswin_కనుగొను_menu(
     vimmenu_T	*pMenu,
-    int		id)
+    పూర్ణాంకం		id)
 {
-    vimmenu_T	*pChildMenu;
+    vimmenu_T	*p_బిడ్డ_Menu;
 
-    while (pMenu)
+    అయితే (pMenu)
     {
-	if (pMenu->id == (UINT)id)
-	    break;
-	if (pMenu->children != NULL)
+	ఒకవేళ (pMenu->id == (UINT)id)
+	    ఆపు;
+	ఒకవేళ (pMenu->children != ఖాళీ)
 	{
-	    pChildMenu = gui_mswin_find_menu(pMenu->children, id);
-	    if (pChildMenu)
+	    p_బిడ్డ_Menu = gui_mswin_కనుగొను_menu(pMenu->children, id);
+	    ఒకవేళ (p_బిడ్డ_Menu)
 	    {
-		pMenu = pChildMenu;
-		break;
+		pMenu = p_బిడ్డ_Menu;
+		ఆపు;
 	    }
 	}
-	pMenu = pMenu->next;
+	pMenu = pMenu->తదుపరి;
     }
-    return pMenu;
+    తిరిగి pMenu;
 }
 
-    static void
+    స్థిర శూన్య
 _OnMenu(
-    HWND	hwnd UNUSED,
-    int		id,
-    HWND	hwndCtl UNUSED,
-    UINT	codeNotify UNUSED)
+    HWND	hwnd వాడని,
+    పూర్ణాంకం		id,
+    HWND	hwndCtl వాడని,
+    UINT	సంకేతం_Notify వాడని)
 {
     vimmenu_T	*pMenu;
 
-    pMenu = gui_mswin_find_menu(root_menu, id);
-    if (pMenu)
+    pMenu = gui_mswin_కనుగొను_menu(మూలం_menu, id);
+    ఒకవేళ (pMenu)
 	gui_menu_cb(pMenu);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef MSWIN_FIND_REPLACE
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
 /*
  * Handle a Find/Replace window message.
  */
-    static void
-_OnFindRepl(void)
+    స్థిర శూన్య
+On_కనుగొను_Repl(శూన్య)
 {
-    int	    flags = 0;
-    int	    down;
+    పూర్ణాంకం	    flags = 0;
+    పూర్ణాంకం	    కిందికి;
 
-    if (s_findrep_struct.Flags & FR_DIALOGTERM)
+    ఒకవేళ (s_findrep_struct.Flags & FR_DIALOGTERM)
 	// Give main window the focus back.
-	(void)SetFocus(s_hwnd);
+	(శూన్య)సమితి_Focus(s_hwnd);
 
-    if (s_findrep_struct.Flags & FR_FINDNEXT)
+    ఒకవేళ (s_findrep_struct.Flags & FR_FINDNEXT)
     {
 	flags = FRD_FINDNEXT;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(శూన్య)సమితి_Focus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACE)
+    లేకపోతే ఒకవేళ (s_findrep_struct.Flags & FR_REPLACE)
     {
 	flags = FRD_REPLACE;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(శూన్య)సమితి_Focus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACEALL)
+    లేకపోతే ఒకవేళ (s_findrep_struct.Flags & FR_REPLACEALL)
     {
 	flags = FRD_REPLACEALL;
     }
 
-    if (flags == 0)
-	return;
+    ఒకవేళ (flags == 0)
+	తిరిగి;
 
     char_u	*p, *q;
 
     // Call the generic GUI function to do the actual work.
-    if (s_findrep_struct.Flags & FR_WHOLEWORD)
-	flags |= FRD_WHOLE_WORD;
-    if (s_findrep_struct.Flags & FR_MATCHCASE)
-	flags |= FRD_MATCH_CASE;
-    down = (s_findrep_struct.Flags & FR_DOWN) != 0;
-    p = utf16_to_enc(s_findrep_struct.lpstrFindWhat, NULL);
-    q = utf16_to_enc(s_findrep_struct.lpstrReplaceWith, NULL);
-    if (p != NULL && q != NULL)
-	gui_do_findrepl(flags, p, q, down);
+    ఒకవేళ (s_findrep_struct.Flags & FR_WHOLEWORD)
+	flags |= FRD_సంపూర్ణ_మాట;
+    ఒకవేళ (s_findrep_struct.Flags & FR_MATCHCASE)
+	flags |= FRD_సరిపోలిక_CASE;
+    కిందికి = (s_findrep_struct.Flags & FR_కిందికి) != 0;
+    p = utf16_గమ్యం_enc(s_findrep_struct.lpstr_కనుగొను_What, ఖాళీ);
+    q = utf16_గమ్యం_enc(s_findrep_struct.lpstrReplaceWith, ఖాళీ);
+    ఒకవేళ (p != ఖాళీ && q != ఖాళీ)
+	gui_do_findrepl(flags, p, q, కిందికి);
     vim_free(p);
     vim_free(q);
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-HandleMouseHide(UINT uMsg, LPARAM lParam)
+    స్థిర శూన్య
+HandleMouseHide(UINT u_సందేశం, LPARAM lParam)
 {
-    static LPARAM last_lParam = 0L;
+    స్థిర LPARAM చివరి_l_Param = 0L;
 
     // We sometimes get a mousemove when the mouse didn't move...
-    if (uMsg == WM_MOUSEMOVE || uMsg == WM_NCMOUSEMOVE)
+    ఒకవేళ (u_సందేశం == WM_MOUSEMOVE || u_సందేశం == WM_NCMOUSEMOVE)
     {
-	if (lParam == last_lParam)
-	    return;
-	last_lParam = lParam;
+	ఒకవేళ (lParam == చివరి_l_Param)
+	    తిరిగి;
+	చివరి_l_Param = lParam;
     }
 
     // Handle specially, to centralise coding. We need to be sure we catch all
     // possible events which should cause us to restore the cursor (as it is a
     // shared resource, we take full responsibility for it).
-    switch (uMsg)
+    ఎంపిక (u_సందేశం)
     {
-    case WM_KEYUP:
-    case WM_CHAR:
+    స్థితి WM_KEYUP:
+    స్థితి WM_CHAR:
 	/*
 	 * blank out the pointer if necessary
 	 */
-	if (p_mh)
+	ఒకవేళ (p_mh)
 	    gui_mch_mousehide(TRUE);
-	break;
+	ఆపు;
 
-    case WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
-    case WM_SYSCHAR:
-    case WM_MOUSEMOVE:	 // show the pointer on any mouse action
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_NCMOUSEMOVE:
-    case WM_NCLBUTTONDOWN:
-    case WM_NCLBUTTONUP:
-    case WM_NCMBUTTONDOWN:
-    case WM_NCMBUTTONUP:
-    case WM_NCRBUTTONDOWN:
-    case WM_NCRBUTTONUP:
-    case WM_KILLFOCUS:
+    స్థితి WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
+    స్థితి WM_SYSCHAR:
+    స్థితి WM_MOUSEMOVE:	 // show the pointer on any mouse action
+    స్థితి WM_LBUTTONDOWN:
+    స్థితి WM_LBUTTONUP:
+    స్థితి WM_MBUTTONDOWN:
+    స్థితి WM_MBUTTONUP:
+    స్థితి WM_RBUTTONDOWN:
+    స్థితి WM_RBUTTONUP:
+    స్థితి WM_XBUTTONDOWN:
+    స్థితి WM_XBUTTONUP:
+    స్థితి WM_NCMOUSEMOVE:
+    స్థితి WM_NCLBUTTONDOWN:
+    స్థితి WM_NCLBUTTONUP:
+    స్థితి WM_NCMBUTTONDOWN:
+    స్థితి WM_NCMBUTTONUP:
+    స్థితి WM_NCRBUTTONDOWN:
+    స్థితి WM_NCRBUTTONUP:
+    స్థితి WM_KILLFOCUS:
 	/*
 	 * if the pointer is currently hidden, then we should show it.
 	 */
 	gui_mch_mousehide(FALSE);
-	break;
+	ఆపు;
     }
 }
 
-    static LRESULT CALLBACK
-_TextAreaWndProc(
+    స్థిర LRESULT CALLBACK
+పాఠ్యం_Area_Wnd_Proc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_సందేశం,
     WPARAM wParam,
     LPARAM lParam)
 {
@@ -1525,61 +1525,61 @@ _TextAreaWndProc(
 	  hwnd, uMsg, wParam, lParam);
     */
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_సందేశం, lParam);
 
-    s_uMsg = uMsg;
+    s_u_సందేశం = u_సందేశం;
     s_wParam = wParam;
 
-#ifdef FEAT_BEVAL_GUI
-    track_user_activity(uMsg);
-#endif
+#నిర్వచితమైతే FEAT_BEVAL_GUI
+    track_user_activity(u_సందేశం);
+#అయితే_ముగింపు
 
-    switch (uMsg)
+    ఎంపిక (u_సందేశం)
     {
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_PAINT,	_OnPaint);
-	HANDLE_MSG(hwnd, WM_RBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_XBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSizeTextArea);
+	HANDLE_సందేశం(hwnd, WM_LBUTTONDBLCLK,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_LBUTTONDOWN,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_సందేశం(hwnd, WM_MBUTTONDBLCLK,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_MBUTTONDOWN,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_సందేశం(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
+	HANDLE_సందేశం(hwnd, WM_PAINT,	_OnPaint);
+	HANDLE_సందేశం(hwnd, WM_RBUTTONDBLCLK,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_RBUTTONDOWN,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_సందేశం(hwnd, WM_XBUTTONDBLCLK,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_XBUTTONDOWN,On_Mouse_Button_కిందికి);
+	HANDLE_సందేశం(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_సందేశం(hwnd, WM_కొలత,	On_కొలత_పాఠ్యం_Area);
 
-#ifdef FEAT_BEVAL_GUI
-	case WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
-	    return TRUE;
-#endif
-	default:
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+#నిర్వచితమైతే FEAT_BEVAL_GUI
+	స్థితి WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
+	    తిరిగి TRUE;
+#అయితే_ముగింపు
+	అప్రమేయ:
+	    తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
     }
 }
 
-    static void
-dyn_dwm_load(void)
+    స్థిర శూన్య
+dyn_dwm_ఎక్కించు(శూన్య)
 {
-    hLibDwm = vimLoadLib("dwmapi.dll");
-    if (hLibDwm == NULL)
-	return;
+    hLibDwm = vim_ఎక్కించు_Lib("dwmapi.dll");
+    ఒకవేళ (hLibDwm == ఖాళీ)
+	తిరిగి;
 
-    pDwmSetWindowAttribute = (HRESULT (WINAPI *)(HWND, DWORD, LPCVOID, DWORD))
-	GetProcAddress(hLibDwm, "DwmSetWindowAttribute");
+    p_Dwm_సమితి_కిటికీ_Attribute = (HRESULT (WINAPI *)(HWND, DWORD, LPCVOID, DWORD))
+	Get_Proc_చిరునామా(hLibDwm, "DwmSetWindowAttribute");
 
-    if (pDwmSetWindowAttribute == NULL)
+    ఒకవేళ (p_Dwm_సమితి_కిటికీ_Attribute == ఖాళీ)
     {
 	FreeLibrary(hLibDwm);
-	hLibDwm = NULL;
-	return;
+	hLibDwm = ఖాళీ;
+	తిరిగి;
     }
 }
 
-extern DWORD win_version; // this is in os_mswin.c
+బాహ్య DWORD win_సంస్కరణ; // this is in os_mswin.c
 
 /*
  * Set TitleBar's color. Handle hl-TitleBar and hl-TitleBarNC.
@@ -1588,160 +1588,160 @@ extern DWORD win_version; // this is in os_mswin.c
  * if "TitleBar guibg=NONE guifg=NONE" reset the window back to using the
  * system's default behavior for the border color.
  */
-    void
-gui_mch_set_titlebar_colors(void)
+    శూన్య
+gui_mch_సమితి_titlebar_colors(శూన్య)
 {
-#define DWMWA_COLOR_DEFAULT 0xFFFFFFFF
-    if (pDwmSetWindowAttribute == NULL || win_version < MAKE_VER(10, 0, 22000))
-	return;
+#నిర్వచించు DWMWA_COLOR_DEFAULT 0xFFFFFFFF
+    ఒకవేళ (p_Dwm_సమితి_కిటికీ_Attribute == ఖాళీ || win_సంస్కరణ < MAKE_VER(10, 0, 22000))
+	తిరిగి;
 
     guicolor_T captionColor = DWMWA_COLOR_DEFAULT;
-    guicolor_T textColor = DWMWA_COLOR_DEFAULT;
+    guicolor_T పాఠ్యం_Color = DWMWA_COLOR_DEFAULT;
 
-    if (vim_strchr(p_go, GO_TITLEBAR) != NULL)
+    ఒకవేళ (vim_strchr(p_go, GO_TITLEBAR) != ఖాళీ)
     {
-	if (gui.in_focus)
+	ఒకవేళ (gui.లోపల_focus)
 	{
 	    captionColor = gui.title_bg_pixel;
-	    textColor = gui.title_fg_pixel;
+	    పాఠ్యం_Color = gui.title_fg_pixel;
 	}
-	else
+	లేకపోతే
 	{
 	    captionColor = gui.titlenc_bg_pixel;
-	    textColor = gui.titlenc_fg_pixel;
+	    పాఠ్యం_Color = gui.titlenc_fg_pixel;
 	}
 
-	if (captionColor == INVALCOLOR)
+	ఒకవేళ (captionColor == INVALCOLOR)
 	    captionColor = DWMWA_COLOR_DEFAULT;
-	if (textColor == INVALCOLOR)
-	    textColor = DWMWA_COLOR_DEFAULT;
+	ఒకవేళ (పాఠ్యం_Color == INVALCOLOR)
+	    పాఠ్యం_Color = DWMWA_COLOR_DEFAULT;
     }
 
-    pDwmSetWindowAttribute(s_hwnd, DWMWA_CAPTION_COLOR,
-	    &captionColor, sizeof(captionColor));
-    pDwmSetWindowAttribute(s_hwnd, DWMWA_TEXT_COLOR,
-	    &textColor, sizeof(textColor));
+    p_Dwm_సమితి_కిటికీ_Attribute(s_hwnd, DWMWA_CAPTION_COLOR,
+	    &captionColor, పరిమాణం(captionColor));
+    p_Dwm_సమితి_కిటికీ_Attribute(s_hwnd, DWMWA_పాఠ్యం_COLOR,
+	    &పాఠ్యం_Color, పరిమాణం(పాఠ్యం_Color));
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    శూన్య
+gui_mch_new_colors(శూన్య)
 {
     HBRUSH prevBrush;
 
-    s_brush = CreateSolidBrush(gui.back_pixel);
-    prevBrush = (HBRUSH)SetClassLongPtr(
+    s_brush = CreateSolidBrush(gui.వెనుక_pixel);
+    prevBrush = (HBRUSH)సమితి_Class_Long_Ptr(
 				s_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)s_brush);
-    InvalidateRect(s_hwnd, NULL, TRUE);
+    InvalidateRect(s_hwnd, ఖాళీ, TRUE);
     // The text area is a child window, the invalidation above does not
     // include it.
-    if (s_textarea_bg_only && s_textArea != NULL)
-	InvalidateRect(s_textArea, NULL, TRUE);
+    ఒకవేళ (s_textarea_bg_only && s_పాఠ్యం_Area != ఖాళీ)
+	InvalidateRect(s_పాఠ్యం_Area, ఖాళీ, TRUE);
     DeleteObject(prevBrush);
 }
 
 /*
  * Set the colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    శూన్య
+gui_mch_def_colors(శూన్య)
 {
     gui.norm_pixel = GetSysColor(COLOR_WINDOWTEXT);
-    gui.back_pixel = GetSysColor(COLOR_WINDOW);
+    gui.వెనుక_pixel = GetSysColor(COLOR_కిటికీ);
     gui.def_norm_pixel = gui.norm_pixel;
-    gui.def_back_pixel = gui.back_pixel;
+    gui.def_వెనుక_pixel = gui.వెనుక_pixel;
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    పూర్ణాంకం
+gui_mch_open(శూన్య)
 {
     // Actually open the window, if not already visible
     // (may be done already in gui_mch_set_shellsize)
-    if (!IsWindowVisible(s_hwnd))
+    ఒకవేళ (!Is_కిటికీ_Visible(s_hwnd))
     {
-	ShowWindow(s_hwnd, SW_SHOWDEFAULT);
+	Show_కిటికీ(s_hwnd, SW_SHOWDEFAULT);
 
 	// Waiting for the message loop leaves the window undrawn while a
 	// slow VimEnter autocommand runs. The flush presents the DirectX draw.
-	if (s_textArea != NULL)
+	ఒకవేళ (s_పాఠ్యం_Area != ఖాళీ)
 	{
-	    UpdateWindow(s_textArea);
+	    Update_కిటికీ(s_పాఠ్యం_Area);
 	    gui_mch_flush();
 	}
     }
 
-#ifdef MSWIN_FIND_REPLACE
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
     // Init replace string here, so that we keep it when re-opening the
     // dialog.
     s_findrep_struct.lpstrReplaceWith[0] = NUL;
-#endif
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    పూర్ణాంకం
+gui_mch_get_winpos(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
     RECT    rect;
 
-    GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    Get_కిటికీ_Rect(s_hwnd, &rect);
+    *x = rect.ఎడమ_2;
+    *y = rect.శిఖరం;
+    తిరిగి OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    శూన్య
+gui_mch_సమితి_winpos(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    సమితి_కిటికీ_Pos(s_hwnd, ఖాళీ, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    శూన్య
+gui_mch_సమితి_పాఠ్యం_area_pos(పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h)
 {
-    static int oldx = 0;
-    static int oldy = 0;
+    స్థిర పూర్ణాంకం oldx = 0;
+    స్థిర పూర్ణాంకం oldy = 0;
 
-    SetWindowPos(s_textArea, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+    సమితి_కిటికీ_Pos(s_పాఠ్యం_Area, ఖాళీ, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 
-#ifdef FEAT_TOOLBAR
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-	SendMessage(s_toolbarhwnd, WM_SIZE,
-	      (WPARAM)0, MAKELPARAM(w, gui.toolbar_height));
-#endif
-#if defined(FEAT_GUI_TABLINE)
-    if (showing_tabline)
+#నిర్వచితమైతే FEAT_TOOLBAR
+    ఒకవేళ (vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
+	Send_సందేశం(s_toolbarhwnd, WM_కొలత,
+	      (WPARAM)0, MAKELPARAM(w, gui.toolbar_ఎత్తు));
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+    ఒకవేళ (showing_tabline)
     {
-	int	top = 0;
+	పూర్ణాంకం	శిఖరం = 0;
 	RECT	rect;
 
 # ifdef FEAT_TOOLBAR
-	if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-	    top = gui.toolbar_height;
+	ఒకవేళ (vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ)
+	    శిఖరం = gui.toolbar_ఎత్తు;
 # endif
 	GetClientRect(s_hwnd, &rect);
-	MoveWindow(s_tabhwnd, 0, top, rect.right, gui.tabline_height, TRUE);
+	Move_కిటికీ(s_tabhwnd, 0, శిఖరం, rect.కుడి_2, gui.tabline_ఎత్తు, TRUE);
     }
-#endif
+#అయితే_ముగింపు
 
     // When side scroll bar is unshown, the size of window will change.
     // then, the text area move left or right. thus client rect should be
     // forcedly redrawn. (Yasuhiro Matsumoto)
-    if (oldx != x || oldy != y)
+    ఒకవేళ (oldx != x || oldy != y)
     {
-	InvalidateRect(s_hwnd, NULL, FALSE);
+	InvalidateRect(s_hwnd, ఖాళీ, FALSE);
 	oldx = x;
 	oldy = y;
     }
@@ -1752,10 +1752,10 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Scrollbar stuff:
  */
 
-    void
+    శూన్య
 gui_mch_enable_scrollbar(
     scrollbar_T     *sb,
-    int		    flag)
+    పూర్ణాంకం		    flag)
 {
     ShowScrollBar(sb->id, SB_CTL, flag);
 
@@ -1764,120 +1764,120 @@ gui_mch_enable_scrollbar(
     // NT 4.0 it's not...
 }
 
-    void
-gui_mch_set_scrollbar_pos(
+    శూన్య
+gui_mch_సమితి_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    పూర్ణాంకం		x,
+    పూర్ణాంకం		y,
+    పూర్ణాంకం		w,
+    పూర్ణాంకం		h)
 {
-    SetWindowPos(sb->id, NULL, x, y, w, h,
+    సమితి_కిటికీ_Pos(sb->id, ఖాళీ, x, y, w, h,
 			      SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_xpadding(శూన్య)
 {
     RECT    rcTxt, rcWnd;
-    int	    xpad;
+    పూర్ణాంకం	    xpad;
 
-    GetWindowRect(s_textArea, &rcTxt);
-    GetWindowRect(s_hwnd, &rcWnd);
-    xpad = rcWnd.right - rcTxt.right - gui.scrollbar_width
+    Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rcTxt);
+    Get_కిటికీ_Rect(s_hwnd, &rcWnd);
+    xpad = rcWnd.కుడి_2 - rcTxt.కుడి_2 - gui.scrollbar_వెడల్పు
 	- pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (xpad < 0) ? 0 : xpad;
+    తిరిగి (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    పూర్ణాంకం
+gui_mch_get_scrollbar_ypadding(శూన్య)
 {
     RECT    rcTxt, rcWnd;
-    int	    ypad;
+    పూర్ణాంకం	    ypad;
 
-    GetWindowRect(s_textArea, &rcTxt);
-    GetWindowRect(s_hwnd, &rcWnd);
-    ypad = rcWnd.bottom - rcTxt.bottom - gui.scrollbar_height
+    Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rcTxt);
+    Get_కిటికీ_Rect(s_hwnd, &rcWnd);
+    ypad = rcWnd.bottom - rcTxt.bottom - gui.scrollbar_ఎత్తు
 	- pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (ypad < 0) ? 0 : ypad;
+    తిరిగి (ypad < 0) ? 0 : ypad;
 }
 
-    void
+    శూన్య
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    పూర్ణాంకం		orient)	// SBAR_VERT or SBAR_HORIZ
 {
-    sb->id = CreateWindow(
+    sb->id = Create_కిటికీ(
 	"SCROLLBAR", "Scrollbar",
-	WS_CHILD | ((orient == SBAR_VERT) ? SBS_VERT : SBS_HORZ), 0, 0,
+	WS_బిడ్డ | ((orient == SBAR_VERT) ? SBS_VERT : SBS_HORZ), 0, 0,
 	10,				// Any value will do for now
 	10,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, ఖాళీ,
+	g_hinst, ఖాళీ);
 }
 
 /*
  * Find the scrollbar with the given hwnd.
  */
-    static scrollbar_T *
-gui_mswin_find_scrollbar(HWND hwnd)
+    స్థిర scrollbar_T *
+gui_mswin_కనుగొను_scrollbar(HWND hwnd)
 {
     win_T	*wp;
 
-    if (gui.bottom_sbar.id == hwnd)
-	return &gui.bottom_sbar;
+    ఒకవేళ (gui.bottom_sbar.id == hwnd)
+	తిరిగి &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	ఒకవేళ (wp->w_scrollbars[SBAR_ఎడమ].id == hwnd)
+	    తిరిగి &wp->w_scrollbars[SBAR_ఎడమ];
+	ఒకవేళ (wp->w_scrollbars[SBAR_కుడి].id == hwnd)
+	    తిరిగి &wp->w_scrollbars[SBAR_కుడి];
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-    static void
-update_scrollbar_size(void)
+    స్థిర శూన్య
+update_scrollbar_కొలత(శూన్య)
 {
-    gui.scrollbar_width = pGetSystemMetricsForDpi(SM_CXVSCROLL, s_dpi);
-    gui.scrollbar_height = pGetSystemMetricsForDpi(SM_CYHSCROLL, s_dpi);
+    gui.scrollbar_వెడల్పు = pGetSystemMetricsForDpi(SM_CXVSCROLL, s_dpi);
+    gui.scrollbar_ఎత్తు = pGetSystemMetricsForDpi(SM_CYHSCROLL, s_dpi);
 }
 
 /*
  * Get the average character size of a font.
  */
-    static void
-GetAverageFontSize(HDC hdc, SIZE *size)
+    స్థిర శూన్య
+Get_సరాసరి_Font_కొలత(HDC hdc, కొలత_3 *కొలత)
 {
     // GetTextMetrics() may not return the right value in tmAveCharWidth
     // for some fonts.  Do our own average computation.
-    GetTextExtentPoint(hdc,
+    Get_పాఠ్యం_Extent_బిందువు(hdc,
 	    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-	    52, size);
-    size->cx = (size->cx / 26 + 1) / 2;
+	    52, కొలత);
+    కొలత->cx = (కొలత->cx / 26 + 1) / 2;
 }
 
 /*
  * Get the character size of a font.
  */
-    static void
-GetFontSize(GuiFont font, int *char_width, int *char_height)
+    స్థిర శూన్య
+Get_Font_కొలత(GuiFont font, పూర్ణాంకం *char_వెడల్పు, పూర్ణాంకం *char_ఎత్తు)
 {
-    HWND    hwnd = GetDesktopWindow();
-    HDC	    hdc = GetWindowDC(hwnd);
+    HWND    hwnd = Get_Desktop_కిటికీ();
+    HDC	    hdc = Get_కిటికీ_DC(hwnd);
     HFONT   hfntOld = SelectFont(hdc, (HFONT)font);
-    SIZE    size;
+    కొలత_3    కొలత;
     TEXTMETRIC tm;
 
-    GetTextMetrics(hdc, &tm);
-    GetAverageFontSize(hdc, &size);
+    Get_పాఠ్యం_Metrics(hdc, &tm);
+    Get_సరాసరి_Font_కొలత(hdc, &కొలత);
 
-    if (char_width)
-	*char_width = size.cx + tm.tmOverhang;
-    if (char_height)
-	*char_height = tm.tmHeight + p_linespace;
+    ఒకవేళ (char_వెడల్పు)
+	*char_వెడల్పు = కొలత.cx + tm.tmOverhang;
+    ఒకవేళ (char_ఎత్తు)
+	*char_ఎత్తు = tm.tm_ఎత్తు + p_linespace;
 
     SelectFont(hdc, hfntOld);
 
@@ -1887,90 +1887,90 @@ GetFontSize(GuiFont font, int *char_width, int *char_height)
 /*
  * Update the character size in "gui" structure with the specified font.
  */
-    static void
-UpdateFontSize(GuiFont font)
+    స్థిర శూన్య
+Update_Font_కొలత(GuiFont font)
 {
-    GetFontSize(font, &gui.char_width, &gui.char_height);
+    Get_Font_కొలత(font, &gui.char_వెడల్పు, &gui.char_ఎత్తు);
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    పూర్ణాంకం
+gui_mch_adjust_charheight(శూన్య)
 {
-    UpdateFontSize(gui.norm_font);
-    return OK;
+    Update_Font_కొలత(gui.norm_font);
+    తిరిగి OK;
 }
 
-    static GuiFont
+    స్థిర GuiFont
 get_font_handle(LOGFONTW *lf)
 {
-    HFONT   font = NULL;
+    HFONT   font = ఖాళీ;
 
     // Load the font
-    font = CreateFontIndirectW(lf);
+    font = Create_Font_పరోక్ష_W(lf);
 
-    if (font == NULL)
-	return NOFONT;
+    ఒకవేళ (font == ఖాళీ)
+	తిరిగి NOFONT;
 
-    return (GuiFont)font;
+    తిరిగి (GuiFont)font;
 }
 
-    static int
-pixels_to_points(int pixels, int vertical)
+    స్థిర పూర్ణాంకం
+pixels_గమ్యం_points(పూర్ణాంకం pixels, పూర్ణాంకం vertical)
 {
-    int		points;
+    పూర్ణాంకం		points;
     HWND	hwnd;
     HDC		hdc;
 
-    hwnd = GetDesktopWindow();
-    hdc = GetWindowDC(hwnd);
+    hwnd = Get_Desktop_కిటికీ();
+    hdc = Get_కిటికీ_DC(hwnd);
 
     points = MulDiv(pixels, 72,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX));
 
     ReleaseDC(hwnd, hdc);
 
-    return points;
+    తిరిగి points;
 }
 
     GuiFont
 gui_mch_get_font(
     char_u	*name,
-    int		giveErrorIfMissing)
+    పూర్ణాంకం		giveErrorIfMissing)
 {
     LOGFONTW	lf;
     GuiFont	font = NOFONT;
 
-    if (get_logfont(&lf, name, NULL, giveErrorIfMissing) == OK)
+    ఒకవేళ (get_logfont(&lf, name, ఖాళీ, giveErrorIfMissing) == OK)
     {
-	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
+	lf.lf_ఎత్తు = adjust_fontsize_by_dpi(lf.lf_ఎత్తు);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT && giveErrorIfMissing)
+    ఒకవేళ (font == NOFONT && giveErrorIfMissing)
 	semsg(_(e_unknown_font_str), name);
-    return font;
+    తిరిగి font;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
  */
     char_u *
-gui_mch_get_fontname(GuiFont font UNUSED, char_u *name)
+gui_mch_get_fontname(GuiFont font వాడని, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి vim_strsave(name);
 }
-#endif
+#అయితే_ముగింపు
 
-    void
+    శూన్య
 gui_mch_free_font(GuiFont font)
 {
-    if (font)
+    ఒకవేళ (font)
 	DeleteObject((HFONT)font);
 }
 
@@ -1981,21 +1981,21 @@ gui_mch_free_font(GuiFont font)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    typedef struct SysColorTable
+    రకనిర్వచనం నిర్మాణం Sys_Color_పట్టిక
     {
-	char	    *name;
-	int	    color;
-    } SysColorTable;
+	అక్షరం	    *name;
+	పూర్ణాంకం	    color;
+    } Sys_Color_పట్టిక;
 
-    static SysColorTable sys_table[] =
+    స్థిర Sys_Color_పట్టిక sys_పట్టిక[] =
     {
 	{"SYS_3DDKSHADOW", COLOR_3DDKSHADOW},
 	{"SYS_3DHILIGHT", COLOR_3DHILIGHT},
-#ifdef COLOR_3DHIGHLIGHT
+#నిర్వచితమైతే COLOR_3DHIGHLIGHT
 	{"SYS_3DHIGHLIGHT", COLOR_3DHIGHLIGHT},
-#endif
+#అయితే_ముగింపు
 	{"SYS_BTNHILIGHT", COLOR_BTNHILIGHT},
 	{"SYS_BTNHIGHLIGHT", COLOR_BTNHIGHLIGHT},
 	{"SYS_3DLIGHT", COLOR_3DLIGHT},
@@ -2021,7 +2021,7 @@ gui_mch_get_color(char_u *name)
 	{"SYS_MENU", COLOR_MENU},
 	{"SYS_MENUTEXT", COLOR_MENUTEXT},
 	{"SYS_SCROLLBAR", COLOR_SCROLLBAR},
-	{"SYS_WINDOW", COLOR_WINDOW},
+	{"SYS_WINDOW", COLOR_కిటికీ},
 	{"SYS_WINDOWFRAME", COLOR_WINDOWFRAME},
 	{"SYS_WINDOWTEXT", COLOR_WINDOWTEXT}
     };
@@ -2029,110 +2029,110 @@ gui_mch_get_color(char_u *name)
     /*
      * Try to look up a system colour.
      */
-    for (i = 0; i < (int)ARRAY_LENGTH(sys_table); i++)
-	if (STRICMP(name, sys_table[i].name) == 0)
-	    return GetSysColor(sys_table[i].color);
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(sys_పట్టిక); i++)
+	ఒకవేళ (STRICMP(name, sys_పట్టిక[i].name) == 0)
+	    తిరిగి GetSysColor(sys_పట్టిక[i].color);
 
-    return gui_get_color_cmn(name);
+    తిరిగి gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(పూర్ణాంకం r, పూర్ణాంకం g, పూర్ణాంకం b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    తిరిగి gui_get_rgb_color_cmn(r, g, b);
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    పూర్ణాంకం
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; special_keys[i].vim_code1 != NUL; i++)
-	if (name[0] == special_keys[i].vim_code0
-				       && name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    కొరకు (i = 0; special_కీలకాలు[i].vim_code1 != NUL; i++)
+	ఒకవేళ (name[0] == special_కీలకాలు[i].vim_code0
+				       && name[1] == special_కీలకాలు[i].vim_code1)
+	    తిరిగి OK;
+    తిరిగి FAIL;
 }
 
-    void
-gui_mch_beep(void)
+    శూన్య
+gui_mch_beep(శూన్య)
 {
-    MessageBeep((UINT)-1);
+    సందేశం_Beep((UINT)-1);
 }
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    శూన్య
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    పూర్ణాంకం	    r,
+    పూర్ణాంకం	    c,
+    పూర్ణాంకం	    nr,
+    పూర్ణాంకం	    nc)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(c);
-    rc.top = FILL_Y(r);
-    rc.right = rc.left + nc * gui.char_width;
-    rc.bottom = rc.top + nr * gui.char_height;
+    rc.ఎడమ_2 = FILL_X(c);
+    rc.శిఖరం = FILL_Y(r);
+    rc.కుడి_2 = rc.ఎడమ_2 + nc * gui.char_వెడల్పు;
+    rc.bottom = rc.శిఖరం + nr * gui.char_ఎత్తు;
     InvertRect(s_hdc, &rc);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    శూన్య
+gui_mch_iconify(శూన్య)
 {
-    ShowWindow(s_hwnd, SW_MINIMIZE);
+    Show_కిటికీ(s_hwnd, SW_MINIMIZE);
 }
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    శూన్య
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     HBRUSH  hbr;
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 
     /*
      * Note: FrameRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row);
-    rc.right = rc.left + gui.char_width;
-    if (mb_lefthalve(gui.row, gui.col))
-	rc.right += gui.char_width;
-    rc.bottom = rc.top + gui.char_height;
+    rc.ఎడమ_2 = FILL_X(gui.నిలువు);
+    rc.శిఖరం = FILL_Y(gui.అడ్డువరుస);
+    rc.కుడి_2 = rc.ఎడమ_2 + gui.char_వెడల్పు;
+    ఒకవేళ (mb_lefthalve(gui.అడ్డువరుస, gui.నిలువు))
+	rc.కుడి_2 += gui.char_వెడల్పు;
+    rc.bottom = rc.శిఖరం + gui.char_ఎత్తు;
     hbr = CreateSolidBrush(color);
-    FrameRect(s_hdc, &rc, hbr);
+    చట్రం_Rect(s_hdc, &rc, hbr);
     DeleteBrush(hbr);
 }
 /*
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
+    శూన్య
 gui_mch_draw_part_cursor(
-    int		w,
-    int		h,
+    పూర్ణాంకం		w,
+    పూర్ణాంకం		h,
     guicolor_T	color)
 {
     RECT	rc;
@@ -2140,17 +2140,17 @@ gui_mch_draw_part_cursor(
     /*
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left =
-#ifdef FEAT_RIGHTLEFT
+    rc.ఎడమ_2 =
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		// vertical line should be on the right of current point
-		CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-		    FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row) + gui.char_height - h;
-    rc.right = rc.left + w;
-    rc.bottom = rc.top + h;
+		CURSOR_BAR_కుడి ? FILL_X(gui.నిలువు + 1) - w :
+#అయితే_ముగింపు
+		    FILL_X(gui.నిలువు);
+    rc.శిఖరం = FILL_Y(gui.అడ్డువరుస) + gui.char_ఎత్తు - h;
+    rc.కుడి_2 = rc.ఎడమ_2 + w;
+    rc.bottom = rc.శిఖరం + h;
 
-    fill_rect(&rc, NULL, color);
+    fill_rect(&rc, ఖాళీ, color);
 }
 
 
@@ -2158,71 +2158,71 @@ gui_mch_draw_part_cursor(
  * Generates a VK_SPACE when the internal dead_key flag is set to output the
  * dead key's nominal character and re-post the original message.
  */
-    static void
-outputDeadKey_rePost_Ex(MSG originalMsg, int dead_key2set)
+    స్థిర శూన్య
+output_Dead_కీలకం_re_Post_Ex(సందేశం_3 original_సందేశం, పూర్ణాంకం dead_key2set)
 {
-    static MSG deadCharExpel;
+    స్థిర సందేశం_3 deadCharExpel;
 
-    if (dead_key == DEAD_KEY_OFF)
-	return;
+    ఒకవేళ (dead_కీలకం == DEAD_కీలకం_OFF)
+	తిరిగి;
 
-    dead_key = dead_key2set;
+    dead_కీలకం = dead_key2set;
 
     // Make Windows generate the dead key's character
-    deadCharExpel.message = originalMsg.message;
-    deadCharExpel.hwnd    = originalMsg.hwnd;
+    deadCharExpel.సందేశం_2 = original_సందేశం.సందేశం_2;
+    deadCharExpel.hwnd    = original_సందేశం.hwnd;
     deadCharExpel.wParam  = VK_SPACE;
 
-    TranslateMessage(&deadCharExpel);
+    Translate_సందేశం(&deadCharExpel);
 
     // re-generate the current character free of the dead char influence
-    PostMessage(originalMsg.hwnd, originalMsg.message, originalMsg.wParam,
-							  originalMsg.lParam);
+    Post_సందేశం(original_సందేశం.hwnd, original_సందేశం.సందేశం_2, original_సందేశం.wParam,
+							  original_సందేశం.lParam);
 }
 
 /*
  * Wrapper for outputDeadKey_rePost_Ex which always reset dead_key value.
  */
-    static void
-outputDeadKey_rePost(MSG originalMsg)
+    స్థిర శూన్య
+output_Dead_కీలకం_re_Post(సందేశం_3 original_సందేశం)
 {
-    outputDeadKey_rePost_Ex(originalMsg, DEAD_KEY_OFF);
+    output_Dead_కీలకం_re_Post_Ex(original_సందేశం, DEAD_కీలకం_OFF);
 }
 
 /*
  * Refactored out part of process_message(), responsible for
  * handling the case of "not a special key"
  */
-static void process_message_usual_key(UINT vk, const MSG *pmsg)
+స్థిర శూన్య process_సందేశం_usual_కీలకం(UINT vk, స్థిరరాశి సందేశం_3 *pmsg)
 {
     // marshal to corresponding implementation
-    keycode_trans_strategy_used->ptr_process_message_usual_key(vk, pmsg);
+    keycode_trans_strategy_వాడిన->ptr_process_సందేశం_usual_కీలకం(vk, pmsg);
 }
 
 /*
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
-process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
+    స్థిర శూన్య
+process_సందేశం_usual_కీలకం_experimental(UINT vk, స్థిరరాశి సందేశం_3 *pmsg)
 {
     WCHAR	ch[8];
-    int		len;
-    int		i;
-    UINT	scan_code;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    UINT	పరిశీలన_సంకేతం;
     BYTE	keyboard_state[256];
 
     // Construct the state table with only a few modifiers, we don't
     // really care about the presence of Ctrl/Alt as those modifiers are
     // handled by Vim separately.
     memset(keyboard_state, 0, 256);
-    if (GetKeyState(VK_SHIFT) & 0x8000)
-	keyboard_state[VK_SHIFT] = 0x80;
-    if (GetKeyState(VK_CAPITAL) & 0x0001)
+    ఒకవేళ (Get_కీలకం_State(VK_జరుపు) & 0x8000)
+	keyboard_state[VK_జరుపు] = 0x80;
+    ఒకవేళ (Get_కీలకం_State(VK_CAPITAL) & 0x0001)
 	keyboard_state[VK_CAPITAL] = 0x01;
     // Alt-Gr is synthesized as Alt + Ctrl.
-    if ((GetKeyState(VK_RMENU) & 0x8000)
-				 && (GetKeyState(VK_CONTROL) & 0x8000))
+    ఒకవేళ ((Get_కీలకం_State(VK_RMENU) & 0x8000)
+				 && (Get_కీలకం_State(VK_CONTROL) & 0x8000))
     {
 	keyboard_state[VK_MENU] = 0x80;
 	keyboard_state[VK_CONTROL] = 0x80;
@@ -2230,161 +2230,161 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 
     // Translate the virtual key according to the current keyboard
     // layout.
-    scan_code = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
+    పరిశీలన_సంకేతం = Map_Virtual_కీలకం(vk, MAPVK_VK_గమ్యం_VSC);
     // Convert the scan-code into a sequence of zero or more unicode
     // codepoints.
     // If this is a dead key ToUnicode returns a negative value.
-    len = ToUnicode(vk, scan_code, keyboard_state, ch, ARRAY_LENGTH(ch),
+    len = గమ్యం_Unicode(vk, పరిశీలన_సంకేతం, keyboard_state, ch, ARRAY_నిడివి(ch),
 	    0);
-    if (len < 0)
-	dead_key = DEAD_KEY_SET_DEFAULT;
+    ఒకవేళ (len < 0)
+	dead_కీలకం = DEAD_కీలకం_సమితి_DEFAULT;
 
-    if (len <= 0)
+    ఒకవేళ (len <= 0)
     {
-	int wm_char = NUL;
+	పూర్ణాంకం wm_char = NUL;
 
-	if (dead_key == DEAD_KEY_SET_DEFAULT
-		&& (GetKeyState(VK_CONTROL) & 0x8000))
+	ఒకవేళ (dead_కీలకం == DEAD_కీలకం_సమితి_DEFAULT
+		&& (Get_కీలకం_State(VK_CONTROL) & 0x8000))
 	{
-	    if (   // AZERTY CTRL+dead_circumflex
-		   (vk == 221 && scan_code == 26)
+	    ఒకవేళ (   // AZERTY CTRL+dead_circumflex
+		   (vk == 221 && పరిశీలన_సంకేతం == 26)
 		   // QWERTZ CTRL+dead_circumflex
-		|| (vk == 220 && scan_code == 41))
+		|| (vk == 220 && పరిశీలన_సంకేతం == 41))
 		wm_char = '[';
-	    if (   // QWERTZ CTRL+dead_two-overdots
-		   (vk == 192 && scan_code == 27))
+	    ఒకవేళ (   // QWERTZ CTRL+dead_two-overdots
+		   (vk == 192 && పరిశీలన_సంకేతం == 27))
 		wm_char = ']';
 	}
-	if (wm_char != NUL)
+	ఒకవేళ (wm_char != NUL)
 	{
 	    // post WM_CHAR='[' - which will be interpreted with CTRL
 	    // still hold as ESC
-	    PostMessageW(pmsg->hwnd, WM_CHAR, wm_char, pmsg->lParam);
+	    Post_సందేశం_W(pmsg->hwnd, WM_CHAR, wm_char, pmsg->lParam);
 	    // ask _OnChar() to not touch this state, wait for next key
 	    // press and maintain knowledge that we are "poisoned" with
 	    // "dead state"
-	    dead_key = DEAD_KEY_TRANSIENT_IN_ON_CHAR;
+	    dead_కీలకం = DEAD_కీలకం_TRANSIENT_లోపల_ON_CHAR;
 	}
-	return;
+	తిరిగి;
     }
 
     // Post the message as TranslateMessage would do.
-    if (pmsg->message == WM_KEYDOWN)
+    ఒకవేళ (pmsg->సందేశం_2 == WM_KEYDOWN)
     {
-	for (i = 0; i < len; i++)
-	    PostMessageW(pmsg->hwnd, WM_CHAR, ch[i], pmsg->lParam);
+	కొరకు (i = 0; i < len; i++)
+	    Post_సందేశం_W(pmsg->hwnd, WM_CHAR, ch[i], pmsg->lParam);
     }
-    else
+    లేకపోతే
     {
-	for (i = 0; i < len; i++)
-	    PostMessageW(pmsg->hwnd, WM_SYSCHAR, ch[i], pmsg->lParam);
+	కొరకు (i = 0; i < len; i++)
+	    Post_సందేశం_W(pmsg->hwnd, WM_SYSCHAR, ch[i], pmsg->lParam);
     }
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
-process_message_usual_key_classic(UINT vk, const MSG *pmsg)
+    స్థిర శూన్య
+process_సందేశం_usual_కీలకం_classic(UINT vk, స్థిరరాశి సందేశం_3 *pmsg)
 {
     char_u	string[40];
 
     // Some keys need C-S- where they should only need C-.
     // Ignore 0xff, Windows XP sends it when NUMLOCK has changed since
     // system startup (Helmut Stiegler, 2003 Oct 3).
-    if (vk != 0xff
-	    && (GetKeyState(VK_CONTROL) & 0x8000)
-	    && !(GetKeyState(VK_SHIFT) & 0x8000)
-	    && !(GetKeyState(VK_MENU) & 0x8000))
+    ఒకవేళ (vk != 0xff
+	    && (Get_కీలకం_State(VK_CONTROL) & 0x8000)
+	    && !(Get_కీలకం_State(VK_జరుపు) & 0x8000)
+	    && !(Get_కీలకం_State(VK_MENU) & 0x8000))
     {
 	// CTRL-6 is '^'; Japanese keyboard maps '^' to vk == 0xDE
-	if (vk == '6' || MapVirtualKey(vk, 2) == (UINT)'^')
+	ఒకవేళ (vk == '6' || Map_Virtual_కీలకం(vk, 2) == (UINT)'^')
 	{
 	    string[0] = Ctrl_HAT;
-	    add_to_input_buf(string, 1);
+	    కూడు_గమ్యం_ఆదానం_buf(string, 1);
 	}
 	// vk == 0xBD AZERTY for CTRL-'-', but CTRL-[ for * QWERTY!
-	else if (vk == 0xBD)	// QWERTY for CTRL-'-'
+	లేకపోతే ఒకవేళ (vk == 0xBD)	// QWERTY for CTRL-'-'
 	{
 	    string[0] = Ctrl__;
-	    add_to_input_buf(string, 1);
+	    కూడు_గమ్యం_ఆదానం_buf(string, 1);
 	}
 	// CTRL-2 is '@'; Japanese keyboard maps '@' to vk == 0xC0
-	else if (vk == '2' || MapVirtualKey(vk, 2) == (UINT)'@')
+	లేకపోతే ఒకవేళ (vk == '2' || Map_Virtual_కీలకం(vk, 2) == (UINT)'@')
 	{
 	    string[0] = Ctrl_AT;
-	    add_to_input_buf(string, 1);
+	    కూడు_గమ్యం_ఆదానం_buf(string, 1);
 	}
-	else
-	    TranslateMessage(pmsg);
+	లేకపోతే
+	    Translate_సందేశం(pmsg);
     }
-    else
-	TranslateMessage(pmsg);
+    లేకపోతే
+	Translate_సందేశం(pmsg);
 }
 
 /*
  * Process a single Windows message.
  * If one is not available we hang until one is.
  */
-    static void
-process_message(void)
+    స్థిర శూన్య
+process_సందేశం(శూన్య)
 {
-    MSG		msg;
+    సందేశం_3		సందేశం;
     UINT	vk = 0;		// Virtual key
     char_u	string[40];
-    int		i;
-    int		modifiers = 0;
-    int		key;
-#ifdef FEAT_MENU
-    static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
-#endif
-    static int  keycode_trans_strategy_initialized = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		modifiers = 0;
+    పూర్ణాంకం		కీలకం;
+#నిర్వచితమైతే FEAT_MENU
+    స్థిర char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+#అయితే_ముగింపు
+    స్థిర పూర్ణాంకం  keycode_trans_strategy_initialized = 0;
 
     // lazy initialize - first time only
-    if (!keycode_trans_strategy_initialized)
+    ఒకవేళ (!keycode_trans_strategy_initialized)
     {
 	keycode_trans_strategy_initialized = 1;
 	keycode_trans_strategy_init();
     }
 
-    GetMessageW(&msg, NULL, 0, 0);
+    Get_సందేశం_W(&సందేశం, ఖాళీ, 0, 0);
 
-#ifdef FEAT_OLE
+#నిర్వచితమైతే FEAT_OLE
     // Look after OLE Automation commands
-    if (msg.message == WM_OLE)
+    ఒకవేళ (సందేశం.సందేశం_2 == WM_OLE)
     {
-	char_u *str = (char_u *)msg.lParam;
-	if (str == NULL || *str == NUL)
+	char_u *str = (char_u *)సందేశం.lParam;
+	ఒకవేళ (str == ఖాళీ || *str == NUL)
 	{
 	    // Message can't be ours, forward it.  Fixes problem with Ultramon
 	    // 3.0.4
-	    DispatchMessageW(&msg);
+	    Dispatch_సందేశం_W(&సందేశం);
 	}
-	else
+	లేకపోతే
 	{
-	    add_to_input_buf(str, (int)STRLEN(str));
+	    కూడు_గమ్యం_ఆదానం_buf(str, (పూర్ణాంకం)STRLEN(str));
 	    vim_free(str);  // was allocated in CVim::SendKeys()
 	}
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef MSWIN_FIND_REPLACE
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
     // Don't process messages used by the dialog
-    if (s_findrep_hwnd != NULL && IsDialogMessageW(s_findrep_hwnd, &msg))
+    ఒకవేళ (s_findrep_hwnd != ఖాళీ && Is_Dialog_సందేశం_W(s_findrep_hwnd, &సందేశం))
     {
-	HandleMouseHide(msg.message, msg.lParam);
-	return;
+	HandleMouseHide(సందేశం.సందేశం_2, సందేశం.lParam);
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Check if it's a special key that we recognise.  If not, call
      * TranslateMessage().
      */
-    if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN)
+    ఒకవేళ (సందేశం.సందేశం_2 == WM_KEYDOWN || సందేశం.సందేశం_2 == WM_SYSKEYDOWN)
     {
-	vk = (int) msg.wParam;
+	vk = (పూర్ణాంకం) సందేశం.wParam;
 
 	/*
 	 * Handle dead keys in special conditions in other cases we let Windows
@@ -2405,13 +2405,13 @@ process_message(void)
 	 * We are at the moment after WM_CHAR with DEAD_KEY_SKIP_ON_CHAR event
 	 * was handled by _WndProc, this keypress we want to process normally
 	 */
-	if (keycode_trans_strategy_used->is_experimental()
-		&& dead_key == DEAD_KEY_SKIP_ON_CHAR)
+	ఒకవేళ (keycode_trans_strategy_వాడిన->is_experimental()
+		&& dead_కీలకం == DEAD_కీలకం_SKIP_ON_CHAR)
 	{
-	    dead_key = DEAD_KEY_OFF;
+	    dead_కీలకం = DEAD_కీలకం_OFF;
 	}
 
-	if (dead_key != DEAD_KEY_OFF)
+	ఒకవేళ (dead_కీలకం != DEAD_కీలకం_OFF)
 	{
 	    /*
 	     * Expel the dead key pressed with Ctrl in a special way.
@@ -2431,18 +2431,18 @@ process_message(void)
 	     * outputDeadKey_rePost() since we do not wish to reset dead_key
 	     * value.
 	     */
-	    if (keycode_trans_strategy_used->is_experimental() &&
-		    dead_key == DEAD_KEY_TRANSIENT_IN_ON_CHAR)
+	    ఒకవేళ (keycode_trans_strategy_వాడిన->is_experimental() &&
+		    dead_కీలకం == DEAD_కీలకం_TRANSIENT_లోపల_ON_CHAR)
 	    {
-		outputDeadKey_rePost_Ex(msg,
-				       /*dead_key2set=*/DEAD_KEY_SKIP_ON_CHAR);
-		return;
+		output_Dead_కీలకం_re_Post_Ex(సందేశం,
+				       /*dead_key2set=*/DEAD_కీలకం_SKIP_ON_CHAR);
+		తిరిగి;
 	    }
 
-	    if (dead_key != DEAD_KEY_SET_DEFAULT)
+	    ఒకవేళ (dead_కీలకం != DEAD_కీలకం_సమితి_DEFAULT)
 	    {
 		// should never happen - is there a way to make ASSERT here?
-		return;
+		తిరిగి;
 	    }
 
 	    /*
@@ -2457,44 +2457,44 @@ process_message(void)
 	     * char and VK_BACK or VK_ESCAPE. That is most likely what the
 	     * user expects.
 	     */
-	    if ((vk == VK_SPACE || vk == VK_BACK || vk == VK_ESCAPE))
+	    ఒకవేళ ((vk == VK_SPACE || vk == VK_వెనుక || vk == VK_ESCAPE))
 	    {
-		dead_key = DEAD_KEY_OFF;
-		TranslateMessage(&msg);
-		return;
+		dead_కీలకం = DEAD_కీలకం_OFF;
+		Translate_సందేశం(&సందేశం);
+		తిరిగి;
 	    }
 	    // In modes where we are not typing, dead keys should behave
 	    // normally
-	    else if ((get_real_state()
-			    & (MODE_INSERT | MODE_CMDLINE | MODE_SELECT)) == 0)
+	    లేకపోతే ఒకవేళ ((get_real_state()
+			    & (బహుళకం_చొప్పించు | బహుళకం_CMDLINE | బహుళకం_SELECT)) == 0)
 	    {
-		outputDeadKey_rePost(msg);
-		return;
+		output_Dead_కీలకం_re_Post(సందేశం);
+		తిరిగి;
 	    }
 	}
 
 	// Check for CTRL-BREAK
-	if (vk == VK_CANCEL)
+	ఒకవేళ (vk == VK_CANCEL)
 	{
-	    trash_input_buf();
+	    trash_ఆదానం_buf();
 	    got_int = TRUE;
 	    ctrl_break_was_pressed = TRUE;
 	    string[0] = Ctrl_C;
-	    add_to_input_buf(string, 1);
+	    కూడు_గమ్యం_ఆదానం_buf(string, 1);
 	}
 
 	// This is an IME event or a synthetic keystroke, let Windows handle it.
-	if (vk == VK_PROCESSKEY || vk == VK_PACKET)
+	ఒకవేళ (vk == VK_PROCESSKEY || vk == VK_PACKET)
 	{
-	    TranslateMessage(&msg);
-	    return;
+	    Translate_సందేశం(&సందేశం);
+	    తిరిగి;
 	}
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	కొరకు (i = 0; special_కీలకాలు[i].కీలకం_sym != 0; i++)
 	{
 	    // ignore VK_SPACE when ALT key pressed: system menu
-	    if (special_keys[i].key_sym == vk
-		    && (vk != VK_SPACE || !(GetKeyState(VK_MENU) & 0x8000)))
+	    ఒకవేళ (special_కీలకాలు[i].కీలకం_sym == vk
+		    && (vk != VK_SPACE || !(Get_కీలకం_State(VK_MENU) & 0x8000)))
 	    {
 		/*
 		 * Behave as expected if we have a dead key and the special key
@@ -2502,83 +2502,83 @@ process_message(void)
 		 * character output (such as a NUMPAD printable character or
 		 * the TAB key, etc...).
 		 */
-		if (dead_key == DEAD_KEY_SET_DEFAULT
-			&& (special_keys[i].vim_code0 == 'K'
+		ఒకవేళ (dead_కీలకం == DEAD_కీలకం_సమితి_DEFAULT
+			&& (special_కీలకాలు[i].vim_code0 == 'K'
 						|| vk == VK_TAB || vk == CAR))
 		{
-		    outputDeadKey_rePost(msg);
-		    return;
+		    output_Dead_కీలకం_re_Post(సందేశం);
+		    తిరిగి;
 		}
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 		// Check for <F10>: Windows selects the menu.  When <F10> is
 		// mapped we want to use the mapping instead.
-		if (vk == VK_F10
-			&& gui.menu_is_active
+		ఒకవేళ (vk == VK_F10
+			&& gui.menu_is_చురుకైన
 			&& check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
-		    break;
-#endif
-		modifiers = get_active_modifiers_via_ptr();
+							  ఖాళీ, ఖాళీ) == ఖాళీ)
+		    ఆపు;
+#అయితే_ముగింపు
+		modifiers = get_చురుకైన_modifiers_ద్వారా_ptr();
 
-		if (special_keys[i].vim_code1 == NUL)
-		    key = special_keys[i].vim_code0;
-		else
-		    key = TO_SPECIAL(special_keys[i].vim_code0,
-						   special_keys[i].vim_code1);
-		key = simplify_key(key, &modifiers);
-		if (key == CSI)
-		    key = K_CSI;
+		ఒకవేళ (special_కీలకాలు[i].vim_code1 == NUL)
+		    కీలకం = special_కీలకాలు[i].vim_code0;
+		లేకపోతే
+		    కీలకం = గమ్యం_SPECIAL(special_కీలకాలు[i].vim_code0,
+						   special_కీలకాలు[i].vim_code1);
+		కీలకం = simplify_కీలకం(కీలకం, &modifiers);
+		ఒకవేళ (కీలకం == CSI)
+		    కీలకం = K_CSI;
 
-		if (modifiers)
+		ఒకవేళ (modifiers)
 		{
 		    string[0] = CSI;
 		    string[1] = KS_MODIFIER;
 		    string[2] = modifiers;
-		    add_to_input_buf(string, 3);
+		    కూడు_గమ్యం_ఆదానం_buf(string, 3);
 		}
 
-		if (IS_SPECIAL(key))
+		ఒకవేళ (IS_SPECIAL(కీలకం))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
-		    add_to_input_buf(string, 3);
+		    string[1] = K_రెండవ(కీలకం);
+		    string[2] = K_మూడవ(కీలకం);
+		    కూడు_గమ్యం_ఆదానం_buf(string, 3);
 		}
-		else
+		లేకపోతే
 		{
-		    int	len;
+		    పూర్ణాంకం	len;
 
 		    // Handle "key" as a Unicode character.
-		    len = char_to_string(key, string, 40, FALSE);
-		    add_to_input_buf(string, len);
+		    len = char_గమ్యం_string(కీలకం, string, 40, FALSE);
+		    కూడు_గమ్యం_ఆదానం_buf(string, len);
 		}
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Not a special key.
-	if (special_keys[i].key_sym == 0)
+	ఒకవేళ (special_కీలకాలు[i].కీలకం_sym == 0)
 	{
-	    process_message_usual_key(vk, &msg);
+	    process_సందేశం_usual_కీలకం(vk, &సందేశం);
 	}
     }
-#ifdef FEAT_MBYTE_IME
-    else if (msg.message == WM_IME_NOTIFY)
-	_OnImeNotify(msg.hwnd, (DWORD)msg.wParam, (DWORD)msg.lParam);
-    else if (msg.message == WM_KEYUP && im_get_status())
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    లేకపోతే ఒకవేళ (సందేశం.సందేశం_2 == WM_IME_NOTIFY)
+	_OnImeNotify(సందేశం.hwnd, (DWORD)సందేశం.wParam, (DWORD)సందేశం.lParam);
+    లేకపోతే ఒకవేళ (సందేశం.సందేశం_2 == WM_KEYUP && im_get_స్థితి())
 	// added for non-MS IME (Yasuhiro Matsumoto)
-	TranslateMessage(&msg);
-#endif
+	Translate_సందేశం(&సందేశం);
+#అయితే_ముగింపు
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     // Check for <F10>: Default effect is to select the menu.  When <F10> is
     // mapped we need to stop it here to avoid strange effects (e.g., for the
     // key-up event)
-    if (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
-#endif
-	DispatchMessageW(&msg);
+    ఒకవేళ (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
+							  ఖాళీ, ఖాళీ) == ఖాళీ)
+#అయితే_ముగింపు
+	Dispatch_సందేశం_W(&సందేశం);
 }
 
 /*
@@ -2587,47 +2587,47 @@ process_message(void)
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    శూన్య
+gui_mch_update(శూన్య)
 {
-    MSG	    msg;
+    సందేశం_3	    సందేశం;
 
-    if (!s_busy_processing)
-	while (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)
-						  && !vim_is_input_buf_full())
-	    process_message();
+    ఒకవేళ (!s_busy_processing)
+	అయితే (Peek_సందేశం_W(&సందేశం, ఖాళీ, 0, 0, PM_NOREMOVE)
+						  && !vim_is_ఆదానం_buf_నిండిన())
+	    process_సందేశం();
 }
 
-    static void
-remove_any_timer(void)
+    స్థిర శూన్య
+remove_any_timer(శూన్య)
 {
-    MSG		msg;
+    సందేశం_3		సందేశం;
 
-    if (s_wait_timer != 0 && !s_timed_out)
+    ఒకవేళ (s_wait_timer != 0 && !s_timed_బహిర్గతం)
     {
-	KillTimer(NULL, s_wait_timer);
+	KillTimer(ఖాళీ, s_wait_timer);
 
 	// Eat spurious WM_TIMER messages
-	while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+	అయితే (Peek_సందేశం_W(&సందేశం, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	    ;
 	s_wait_timer = 0;
     }
 }
 
-#ifdef FEAT_CLIENTSERVER
+#నిర్వచితమైతే FEAT_CLIENTSERVER
 // A client message may be handled re-entrantly, e.g. during a redraw while a
 // command line is being read; inserting the keys into the typeahead buffer
 // then corrupts it. Store them here until a safe point.
-static garray_T	server_pending_ga = {0, 0, 0, 0, NULL};
+స్థిర garray_T	server_pending_ga = {0, 0, 0, 0, ఖాళీ};
 
 /*
  * Store keys received from a client, to be inserted into the typeahead buffer
  * later by server_flush_input().
  */
-    void
-server_add_input(char_u *str)
+    శూన్య
+server_కూడు_ఆదానం(char_u *str)
 {
-    if (server_pending_ga.ga_data == NULL)
+    ఒకవేళ (server_pending_ga.ga_దత్తాంశం == ఖాళీ)
 	ga_init2(&server_pending_ga, 1, 200);
     ga_concat(&server_pending_ga, str);
 }
@@ -2637,22 +2637,22 @@ server_add_input(char_u *str)
  * buffer is empty, so that they are not mixed into a command that is currently
  * being read.
  */
-    static void
-server_flush_input(void)
+    స్థిర శూన్య
+server_flush_ఆదానం(శూన్య)
 {
     char_u  *str;
 
-    if (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
-	return;
-    str = vim_strnsave(server_pending_ga.ga_data, server_pending_ga.ga_len);
+    ఒకవేళ (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
+	తిరిగి;
+    str = vim_strnsave(server_pending_ga.ga_దత్తాంశం, server_pending_ga.ga_len);
     server_pending_ga.ga_len = 0;
-    if (str != NULL)
+    ఒకవేళ (str != ఖాళీ)
     {
-	server_to_input_buf(str);
+	server_గమ్యం_ఆదానం_buf(str);
 	vim_free(str);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * GUI input routine called by gui_wait_for_chars().  Waits for a character
@@ -2663,85 +2663,85 @@ server_flush_input(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_mch_wait_for_chars(long wtime)
+    పూర్ణాంకం
+gui_mch_wait_for_chars(దీర్ఘ wtime)
 {
-    int		focus;
+    పూర్ణాంకం		focus;
 
-    s_timed_out = FALSE;
+    s_timed_బహిర్గతం = FALSE;
 
-    if (wtime >= 0)
+    ఒకవేళ (wtime >= 0)
     {
 	// Don't do anything while processing a (scroll) message.
-	if (s_busy_processing)
-	    return FAIL;
+	ఒకవేళ (s_busy_processing)
+	    తిరిగి FAIL;
 
 	// When called with "wtime" zero, just want one msec.
-	s_wait_timer = SetTimer(NULL, 0, (UINT)(wtime == 0 ? 1 : wtime),
+	s_wait_timer = సమితి_Timer(ఖాళీ, 0, (UINT)(wtime == 0 ? 1 : wtime),
 								_OnTimer);
     }
 
     allow_scrollbar = TRUE;
 
-    focus = gui.in_focus;
-    while (!s_timed_out)
+    focus = gui.లోపల_focus;
+    అయితే (!s_timed_బహిర్గతం)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ఒకవేళ (gui.లోపల_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ఒకవేళ (gui.లోపల_focus)
+		gui_mch_ప్రారంభం_blink();
+	    లేకపోతే
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.లోపల_focus;
 	}
 
-	if (s_need_activate)
+	ఒకవేళ (s_need_activate)
 	{
-	    (void)SetForegroundWindow(s_hwnd);
+	    (శూన్య)సమితి_Foreground_కిటికీ(s_hwnd);
 	    s_need_activate = FALSE;
 	}
 
-#ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
-#endif
-#ifdef MESSAGE_QUEUE
+#నిర్వచితమైతే FEAT_TIMERS
+	did_కూడు_timer = FALSE;
+#అయితే_ముగింపు
+#నిర్వచితమైతే సందేశం_వరుస
 	// Check channel I/O while waiting for a message.
-	for (;;)
+	కొరకు (;;)
 	{
-	    MSG msg;
+	    సందేశం_3 సందేశం;
 
 	    parse_queued_messages();
 # ifdef FEAT_CLIENTSERVER
 	    // Insert keys from a client that were postponed to this safe point.
-	    server_flush_input();
+	    server_flush_ఆదానం();
 # endif
 # ifdef FEAT_TIMERS
-	    if (did_add_timer)
-		break;
+	    ఒకవేళ (did_కూడు_timer)
+		ఆపు;
 # endif
-	    if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE))
+	    ఒకవేళ (Peek_సందేశం_W(&సందేశం, ఖాళీ, 0, 0, PM_NOREMOVE))
 	    {
-		process_message();
-		break;
+		process_సందేశం();
+		ఆపు;
 	    }
-	    else if (input_available()
+	    లేకపోతే ఒకవేళ (ఆదానం_అందుబాటు()
 		    // TODO: The 10 msec is a compromise between laggy response
 		    // and consuming more CPU time.  Better would be to handle
 		    // channel messages when they arrive.
-		    || MsgWaitForMultipleObjects(0, NULL, FALSE, 10,
+		    || సందేశం_Wait_For_గుణిజం_Objects(0, ఖాళీ, FALSE, 10,
 						  QS_ALLINPUT) != WAIT_TIMEOUT)
-		break;
+		ఆపు;
 	}
-#else
+#లేకపోతే
 	// Don't use gui_mch_update() because then we will spin-lock until a
 	// char arrives, instead we use GetMessage() to hang until an
 	// event arrives.  No need to check for input_buf_full because we are
 	// returning as soon as it contains a single char -- webb
-	process_message();
-#endif
+	process_సందేశం();
+#అయితే_ముగింపు
 
-	if (input_available())
+	ఒకవేళ (ఆదానం_అందుబాటు())
 	{
 	    remove_any_timer();
 	    allow_scrollbar = FALSE;
@@ -2749,35 +2749,35 @@ gui_mch_wait_for_chars(long wtime)
 	    // Clear pending mouse button, the release event may have been
 	    // taken by the dialog window.  But don't do this when getting
 	    // focus, we need the mouse-up event then.
-	    if (!s_getting_focus)
+	    ఒకవేళ (!s_getting_focus)
 		s_button_pending = -1;
 
-	    return OK;
+	    తిరిగి OK;
 	}
 
-#ifdef FEAT_TIMERS
-	if (did_add_timer)
+#నిర్వచితమైతే FEAT_TIMERS
+	ఒకవేళ (did_కూడు_timer)
 	{
 	    // Need to recompute the waiting time.
 	    remove_any_timer();
-	    break;
+	    ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
     allow_scrollbar = FALSE;
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    శూన్య
+gui_mch_clear_ఖండం(
+    పూర్ణాంకం		row1,
+    పూర్ణాంకం		col1,
+    పూర్ణాంకం		row2,
+    పూర్ణాంకం		col2)
 {
     RECT	rc;
 
@@ -2786,9 +2786,9 @@ gui_mch_clear_block(
      * spilled over to the window border.
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(col1);
-    rc.top = FILL_Y(row1);
-    rc.right = FILL_X(col2 + 1) + (col2 == Columns - 1);
+    rc.ఎడమ_2 = FILL_X(col1);
+    rc.శిఖరం = FILL_Y(row1);
+    rc.కుడి_2 = FILL_X(col2 + 1) + (col2 == Columns - 1);
     rc.bottom = FILL_Y(row2 + 1);
     clear_rect(&rc);
 }
@@ -2796,47 +2796,47 @@ gui_mch_clear_block(
 /*
  * Clear the whole text window.
  */
-    void
-gui_mch_clear_all(void)
+    శూన్య
+gui_mch_clear_all(శూన్య)
 {
     RECT    rc;
 
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = Columns * gui.char_width + 2 * gui.border_width;
-    rc.bottom = Rows * gui.char_height + 2 * gui.border_width;
+    rc.ఎడమ_2 = 0;
+    rc.శిఖరం = 0;
+    rc.కుడి_2 = Columns * gui.char_వెడల్పు + 2 * gui.border_వెడల్పు;
+    rc.bottom = అడ్డువరుసలు * gui.char_ఎత్తు + 2 * gui.border_వెడల్పు;
     clear_rect(&rc);
 }
 /*
  * Menu stuff.
  */
 
-    void
-gui_mch_enable_menu(int flag)
+    శూన్య
+gui_mch_enable_menu(పూర్ణాంకం flag)
 {
-#ifdef FEAT_MENU
-    SetMenu(s_hwnd, flag ? s_menuBar : NULL);
-#endif
+#నిర్వచితమైతే FEAT_MENU
+    సమితి_Menu(s_hwnd, flag ? s_menuBar : ఖాళీ);
+#అయితే_ముగింపు
 }
 
-    void
-gui_mch_set_menu_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    శూన్య
+gui_mch_సమితి_menu_pos(
+    పూర్ణాంకం	    x వాడని,
+    పూర్ణాంకం	    y వాడని,
+    పూర్ణాంకం	    w వాడని,
+    పూర్ణాంకం	    h వాడని)
 {
     // It will be in the right place anyway
 }
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Make menu item hidden or not hidden
  */
-    void
+    శూన్య
 gui_mch_menu_hidden(
     vimmenu_T	*menu,
-    int		hidden)
+    పూర్ణాంకం		hidden)
 {
     /*
      * This doesn't do what we want.  Hmm, just grey the menu items for now.
@@ -2853,12 +2853,12 @@ gui_mch_menu_hidden(
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    శూన్య
+gui_mch_draw_menubar(శూన్య)
 {
     DrawMenuBar(s_hwnd);
 }
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 /*
  * Return the RGB value of a pixel as a long.
@@ -2866,237 +2866,237 @@ gui_mch_draw_menubar(void)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
+    తిరిగి (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
 							   + GetBValue(pixel));
 }
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 /*
  * Convert pixels in X to dialog units
  */
-    static WORD
-PixelToDialogX(int numPixels)
+    స్థిర మాట_2
+Pixel_గమ్యం_Dialog_X(పూర్ణాంకం అంకె_Pixels)
 {
-    return (WORD)((numPixels * 4) / s_dlgfntwidth);
+    తిరిగి (మాట_2)((అంకె_Pixels * 4) / s_dlgfntwidth);
 }
 
 /*
  * Convert pixels in Y to dialog units
  */
-    static WORD
-PixelToDialogY(int numPixels)
+    స్థిర మాట_2
+Pixel_గమ్యం_Dialog_Y(పూర్ణాంకం అంకె_Pixels)
 {
-    return (WORD)((numPixels * 8) / s_dlgfntheight);
+    తిరిగి (మాట_2)((అంకె_Pixels * 8) / s_dlgfntheight);
 }
 
 /*
  * Return the width in pixels of the given text in the given DC.
  */
-    static int
-GetTextWidth(HDC hdc, char_u *str, int len)
+    స్థిర పూర్ణాంకం
+Get_పాఠ్యం_వెడల్పు(HDC hdc, char_u *str, పూర్ణాంకం len)
 {
-    SIZE    size;
+    కొలత_3    కొలత;
 
-    GetTextExtentPoint(hdc, (LPCSTR)str, len, &size);
-    return size.cx;
+    Get_పాఠ్యం_Extent_బిందువు(hdc, (LPCSTR)str, len, &కొలత);
+    తిరిగి కొలత.cx;
 }
 
 /*
  * Return the width in pixels of the given text in the given DC, taking care
  * of 'encoding' to active codepage conversion.
  */
-    static int
-GetTextWidthEnc(HDC hdc, char_u *str, int len)
+    స్థిర పూర్ణాంకం
+Get_పాఠ్యం_వెడల్పు_Enc(HDC hdc, char_u *str, పూర్ణాంకం len)
 {
-    SIZE	size;
+    కొలత_3	కొలత;
     WCHAR	*wstr;
-    int		n;
-    int		wlen = len;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		wlen = len;
 
-    wstr = enc_to_utf16(str, &wlen);
-    if (wstr == NULL)
-	return 0;
+    wstr = enc_గమ్యం_utf16(str, &wlen);
+    ఒకవేళ (wstr == ఖాళీ)
+	తిరిగి 0;
 
-    n = GetTextExtentPointW(hdc, wstr, wlen, &size);
+    n = Get_పాఠ్యం_Extent_బిందువు_W(hdc, wstr, wlen, &కొలత);
     vim_free(wstr);
-    if (n)
-	return size.cx;
-    return 0;
+    ఒకవేళ (n)
+	తిరిగి కొలత.cx;
+    తిరిగి 0;
 }
 
-static void get_work_area(RECT *spi_rect);
+స్థిర శూన్య get_work_area(RECT *spi_rect);
 
 /*
  * A quick little routine that will center one window over another, handy for
  * dialog boxes.  Taken from the Win32SDK samples and modified for multiple
  * monitors.
  */
-    static BOOL
-CenterWindow(
-    HWND hwndChild,
-    HWND hwndParent)
+    స్థిర BOOL
+Center_కిటికీ(
+    HWND hwnd_బిడ్డ,
+    HWND hwnd_మాతృ)
 {
     HMONITOR	    mon;
     MONITORINFO	    moninfo;
-    RECT	    rChild, rParent, rScreen;
-    int		    wChild, hChild, wParent, hParent;
-    int		    xNew, yNew;
+    RECT	    r_బిడ్డ, r_మాతృ, rScreen;
+    పూర్ణాంకం		    w_బిడ్డ, h_బిడ్డ, w_మాతృ, h_మాతృ;
+    పూర్ణాంకం		    xNew, yNew;
     HDC		    hdc;
 
-    GetWindowRect(hwndChild, &rChild);
-    wChild = rChild.right - rChild.left;
-    hChild = rChild.bottom - rChild.top;
+    Get_కిటికీ_Rect(hwnd_బిడ్డ, &r_బిడ్డ);
+    w_బిడ్డ = r_బిడ్డ.కుడి_2 - r_బిడ్డ.ఎడమ_2;
+    h_బిడ్డ = r_బిడ్డ.bottom - r_బిడ్డ.శిఖరం;
 
     // If Vim is minimized put the window in the middle of the screen.
-    if (hwndParent == NULL || IsMinimized(hwndParent))
-	get_work_area(&rParent);
-    else
-	GetWindowRect(hwndParent, &rParent);
-    wParent = rParent.right - rParent.left;
-    hParent = rParent.bottom - rParent.top;
+    ఒకవేళ (hwnd_మాతృ == ఖాళీ || IsMinimized(hwnd_మాతృ))
+	get_work_area(&r_మాతృ);
+    లేకపోతే
+	Get_కిటికీ_Rect(hwnd_మాతృ, &r_మాతృ);
+    w_మాతృ = r_మాతృ.కుడి_2 - r_మాతృ.ఎడమ_2;
+    h_మాతృ = r_మాతృ.bottom - r_మాతృ.శిఖరం;
 
-    moninfo.cbSize = sizeof(MONITORINFO);
-    mon = MonitorFromWindow(hwndChild, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL && GetMonitorInfo(mon, &moninfo))
+    moninfo.cb_కొలత = పరిమాణం(MONITORINFO);
+    mon = Monitor_From_కిటికీ(hwnd_బిడ్డ, MONITOR_DEFAULTTOPRIMARY);
+    ఒకవేళ (mon != ఖాళీ && GetMonitorInfo(mon, &moninfo))
     {
 	rScreen = moninfo.rcWork;
     }
-    else
+    లేకపోతే
     {
-	hdc = GetDC(hwndChild);
-	rScreen.left = 0;
-	rScreen.top = 0;
-	rScreen.right = GetDeviceCaps(hdc, HORZRES);
+	hdc = GetDC(hwnd_బిడ్డ);
+	rScreen.ఎడమ_2 = 0;
+	rScreen.శిఖరం = 0;
+	rScreen.కుడి_2 = GetDeviceCaps(hdc, HORZRES);
 	rScreen.bottom = GetDeviceCaps(hdc, VERTRES);
-	ReleaseDC(hwndChild, hdc);
+	ReleaseDC(hwnd_బిడ్డ, hdc);
     }
 
-    xNew = rParent.left + ((wParent - wChild) / 2);
-    if (xNew < rScreen.left)
-	xNew = rScreen.left;
-    else if ((xNew + wChild) > rScreen.right)
-	xNew = rScreen.right - wChild;
+    xNew = r_మాతృ.ఎడమ_2 + ((w_మాతృ - w_బిడ్డ) / 2);
+    ఒకవేళ (xNew < rScreen.ఎడమ_2)
+	xNew = rScreen.ఎడమ_2;
+    లేకపోతే ఒకవేళ ((xNew + w_బిడ్డ) > rScreen.కుడి_2)
+	xNew = rScreen.కుడి_2 - w_బిడ్డ;
 
-    yNew = rParent.top + ((hParent - hChild) / 2);
-    if (yNew < rScreen.top)
-	yNew = rScreen.top;
-    else if ((yNew + hChild) > rScreen.bottom)
-	yNew = rScreen.bottom - hChild;
+    yNew = r_మాతృ.శిఖరం + ((h_మాతృ - h_బిడ్డ) / 2);
+    ఒకవేళ (yNew < rScreen.శిఖరం)
+	yNew = rScreen.శిఖరం;
+    లేకపోతే ఒకవేళ ((yNew + h_బిడ్డ) > rScreen.bottom)
+	yNew = rScreen.bottom - h_బిడ్డ;
 
-    return SetWindowPos(hwndChild, NULL, xNew, yNew, 0, 0,
+    తిరిగి సమితి_కిటికీ_Pos(hwnd_బిడ్డ, ఖాళీ, xNew, yNew, 0, 0,
 						   SWP_NOSIZE | SWP_NOZORDER);
 }
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ఒకవేళ defined(FEAT_TOOLBAR)
+    శూన్య
+gui_mch_show_toolbar(పూర్ణాంకం showit)
 {
-    if (s_toolbarhwnd == NULL)
-	return;
+    ఒకవేళ (s_toolbarhwnd == ఖాళీ)
+	తిరిగి;
 
-    if (showit)
+    ఒకవేళ (showit)
     {
 	// Enable unicode support
-	SendMessage(s_toolbarhwnd, TB_SETUNICODEFORMAT, (WPARAM)TRUE,
+	Send_సందేశం(s_toolbarhwnd, TB_SETUNICODEFORMAT, (WPARAM)TRUE,
 								(LPARAM)0);
-	ShowWindow(s_toolbarhwnd, SW_SHOW);
+	Show_కిటికీ(s_toolbarhwnd, SW_SHOW);
     }
-    else
-	ShowWindow(s_toolbarhwnd, SW_HIDE);
+    లేకపోతే
+	Show_కిటికీ(s_toolbarhwnd, SW_HIDE);
 }
 
 // The number of bitmaps is fixed.  Exit is missing!
-# define TOOLBAR_BITMAP_COUNT 31
+# define TOOLBAR_BITMAP_లెక్క 31
 
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
-add_tabline_popup_menu_entry(HMENU pmenu, UINT item_id, char_u *item_text)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+    స్థిర శూన్య
+కూడు_tabline_popup_menu_నమోదు(HMENU pmenu, UINT అంశం_id, char_u *అంశం_పాఠ్యం)
 {
     WCHAR	    *wn;
     MENUITEMINFOW   infow;
 
-    wn = enc_to_utf16(item_text, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_గమ్యం_utf16(అంశం_పాఠ్యం, ఖాళీ);
+    ఒకవేళ (wn == ఖాళీ)
+	తిరిగి;
 
-    infow.cbSize = sizeof(infow);
-    infow.fMask = MIIM_TYPE | MIIM_ID;
-    infow.wID = item_id;
+    infow.cb_కొలత = పరిమాణం(infow);
+    infow.f_ముసుగు = MIIM_TYPE | MIIM_ID;
+    infow.wID = అంశం_id;
     infow.fType = MFT_STRING;
-    infow.dwTypeData = wn;
+    infow.dw_Type_దత్తాంశం = wn;
     infow.cch = (UINT)wcslen(wn);
-    InsertMenuItemW(pmenu, item_id, FALSE, &infow);
+    చొప్పించు_Menu_అంశం_W(pmenu, అంశం_id, FALSE, &infow);
     vim_free(wn);
 }
 
-    static void
-show_tabline_popup_menu(void)
+    స్థిర శూన్య
+show_tabline_popup_menu(శూన్య)
 {
     HMENU	    tab_pmenu;
-    long	    rval;
-    POINT	    pt;
+    దీర్ఘ	    rval;
+    బిందువు_2	    pt;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    ఒకవేళ (hold_gui_events || cmdwin_type != 0)
+	తిరిగి;
 
     tab_pmenu = CreatePopupMenu();
-    if (tab_pmenu == NULL)
-	return;
+    ఒకవేళ (tab_pmenu == ఖాళీ)
+	తిరిగి;
 
-    if (first_tabpage->tp_next != NULL)
-	add_tabline_popup_menu_entry(tab_pmenu,
+    ఒకవేళ (మొదటి_tabpage->tp_తదుపరి != ఖాళీ)
+	కూడు_tabline_popup_menu_నమోదు(tab_pmenu,
 				TABLINE_MENU_CLOSE, (char_u *)_("Close tab"));
-    add_tabline_popup_menu_entry(tab_pmenu,
+    కూడు_tabline_popup_menu_నమోదు(tab_pmenu,
 				TABLINE_MENU_NEW, (char_u *)_("New tab"));
-    add_tabline_popup_menu_entry(tab_pmenu,
+    కూడు_tabline_popup_menu_నమోదు(tab_pmenu,
 				TABLINE_MENU_OPEN, (char_u *)_("Open tab..."));
 
     GetCursorPos(&pt);
     rval = TrackPopupMenuEx(tab_pmenu, TPM_RETURNCMD, pt.x, pt.y, s_tabhwnd,
-									NULL);
+									ఖాళీ);
 
     DestroyMenu(tab_pmenu);
 
     // Add the string cmd into input buffer
-    if (rval > 0)
+    ఒకవేళ (rval > 0)
     {
 	TCHITTESTINFO htinfo;
-	int idx;
+	పూర్ణాంకం idx;
 
-	if (ScreenToClient(s_tabhwnd, &pt) == 0)
-	    return;
+	ఒకవేళ (Screen_గమ్యం_Client(s_tabhwnd, &pt) == 0)
+	    తిరిగి;
 
 	htinfo.pt.x = pt.x;
 	htinfo.pt.y = pt.y;
-	idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	if (idx == -1)
+	idx = Tab_Ctrl_తగిలింది_Test(s_tabhwnd, &htinfo);
+	ఒకవేళ (idx == -1)
 	    idx = 0;
-	else
+	లేకపోతే
 	    idx += 1;
 
-	send_tabline_menu_event(idx, (int)rval);
+	send_tabline_menu_event(idx, (పూర్ణాంకం)rval);
     }
 }
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    శూన్య
+gui_mch_show_tabline(పూర్ణాంకం showit)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    ఒకవేళ (s_tabhwnd == ఖాళీ)
+	తిరిగి;
 
-    if (!showit != !showing_tabline)
+    ఒకవేళ (!showit != !showing_tabline)
     {
-	if (showit)
-	    ShowWindow(s_tabhwnd, SW_SHOW);
-	else
-	    ShowWindow(s_tabhwnd, SW_HIDE);
+	ఒకవేళ (showit)
+	    Show_కిటికీ(s_tabhwnd, SW_SHOW);
+	లేకపోతే
+	    Show_కిటికీ(s_tabhwnd, SW_HIDE);
 	showing_tabline = showit;
     }
 }
@@ -3104,199 +3104,199 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    పూర్ణాంకం
+gui_mch_showing_tabline(శూన్య)
 {
-    return s_tabhwnd != NULL && showing_tabline;
+    తిరిగి s_tabhwnd != ఖాళీ && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    శూన్య
+gui_mch_update_tabline(శూన్య)
 {
     tabpage_T	*tp;
     TCITEM	tie;
-    int		nr = 0;
-    int		curtabidx = 0;
-    int		tabadded = 0;
-    WCHAR	*wstr = NULL;
+    పూర్ణాంకం		nr = 0;
+    పూర్ణాంకం		curtabidx = 0;
+    పూర్ణాంకం		tabadded = 0;
+    WCHAR	*wstr = ఖాళీ;
 
-    if (s_tabhwnd == NULL)
-	return;
+    ఒకవేళ (s_tabhwnd == ఖాళీ)
+	తిరిగి;
 
     // Enable unicode support
-    SendMessage(s_tabhwnd, CCM_SETUNICODEFORMAT, (WPARAM)TRUE, (LPARAM)0);
+    Send_సందేశం(s_tabhwnd, CCM_SETUNICODEFORMAT, (WPARAM)TRUE, (LPARAM)0);
 
-    tie.mask = TCIF_TEXT;
+    tie.ముసుగు = TCIF_పాఠ్యం;
     tie.iImage = -1;
 
     // Disable redraw for tab updates to eliminate O(N^2) draws.
-    SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)FALSE, 0);
+    Send_సందేశం(s_tabhwnd, WM_SETREDRAW, (WPARAM)FALSE, 0);
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ; tp = tp->tp_తదుపరి, ++nr)
     {
-	if (tp == curtab)
+	ఒకవేళ (tp == curtab)
 	    curtabidx = nr;
 
-	if (nr >= TabCtrl_GetItemCount(s_tabhwnd))
+	ఒకవేళ (nr >= Tab_Ctrl_Get_అంశం_లెక్క(s_tabhwnd))
 	{
 	    // Add the tab
-	    tie.pszText = "-Empty-";
-	    TabCtrl_InsertItem(s_tabhwnd, nr, &tie);
+	    tie.psz_పాఠ్యం = "-Empty-";
+	    Tab_Ctrl_చొప్పించు_అంశం(s_tabhwnd, nr, &tie);
 	    tabadded = 1;
 	}
 
 	get_tabline_label(tp, FALSE);
-	tie.pszText = (LPSTR)NameBuff;
+	tie.psz_పాఠ్యం = (LPSTR)NameBuff;
 
-	wstr = enc_to_utf16(NameBuff, NULL);
-	if (wstr != NULL)
+	wstr = enc_గమ్యం_utf16(NameBuff, ఖాళీ);
+	ఒకవేళ (wstr != ఖాళీ)
 	{
 	    TCITEMW		tiw;
 
-	    tiw.mask = TCIF_TEXT;
+	    tiw.ముసుగు = TCIF_పాఠ్యం;
 	    tiw.iImage = -1;
-	    tiw.pszText = wstr;
-	    SendMessage(s_tabhwnd, TCM_SETITEMW, (WPARAM)nr, (LPARAM)&tiw);
+	    tiw.psz_పాఠ్యం = wstr;
+	    Send_సందేశం(s_tabhwnd, TCM_SETITEMW, (WPARAM)nr, (LPARAM)&tiw);
 	    vim_free(wstr);
 	}
     }
 
     // Remove any old labels.
-    while (nr < TabCtrl_GetItemCount(s_tabhwnd))
-	TabCtrl_DeleteItem(s_tabhwnd, nr);
+    అయితే (nr < Tab_Ctrl_Get_అంశం_లెక్క(s_tabhwnd))
+	Tab_Ctrl_Delete_అంశం(s_tabhwnd, nr);
 
-    if (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
-	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
+    ఒకవేళ (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+	Tab_Ctrl_సమితి_Cur_Sel(s_tabhwnd, curtabidx);
 
     // Re-enable redraw and redraw.
-    SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)TRUE, 0);
-    RedrawWindow(s_tabhwnd, NULL, NULL,
-		    RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+    Send_సందేశం(s_tabhwnd, WM_SETREDRAW, (WPARAM)TRUE, 0);
+    Redraw_కిటికీ(s_tabhwnd, ఖాళీ, ఖాళీ,
+		    RDW_ERASE | RDW_చట్రం | RDW_INVALIDATE | RDW_ALLCHILDREN);
 
-    if (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
-	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
+    ఒకవేళ (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+	Tab_Ctrl_సమితి_Cur_Sel(s_tabhwnd, curtabidx);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    శూన్య
+gui_mch_సమితి_curtab(పూర్ణాంకం nr)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    ఒకవేళ (s_tabhwnd == ఖాళీ)
+	తిరిగి;
 
-    if (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
-	TabCtrl_SetCurSel(s_tabhwnd, nr - 1);
+    ఒకవేళ (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
+	Tab_Ctrl_సమితి_Cur_Sel(s_tabhwnd, nr - 1);
 }
 
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_DARKTHEME
-    void
-gui_mch_set_dark_theme(int dark)
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
+    శూన్య
+gui_mch_సమితి_dark_theme(పూర్ణాంకం dark)
 {
-    if (pDwmSetWindowAttribute != NULL && win_version >= MAKE_VER(10, 0, 18985))
-	pDwmSetWindowAttribute(s_hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark,
-		sizeof(dark));
+    ఒకవేళ (p_Dwm_సమితి_కిటికీ_Attribute != ఖాళీ && win_సంస్కరణ >= MAKE_VER(10, 0, 18985))
+	p_Dwm_సమితి_కిటికీ_Attribute(s_hwnd, DWMWA_USE_IMMERSIVE_DARK_బహుళకం, &dark,
+		పరిమాణం(dark));
 
-    if (pSetPreferredAppMode != NULL && win_version >= MAKE_VER(10, 0, 18362))
-	pSetPreferredAppMode(dark);
+    ఒకవేళ (p_సమితి_Preferred_App_బహుళకం != ఖాళీ && win_సంస్కరణ >= MAKE_VER(10, 0, 18362))
+	p_సమితి_Preferred_App_బహుళకం(dark);
 
-    if (pFlushMenuThemes != NULL && win_version >= MAKE_VER(10, 0, 18362))
+    ఒకవేళ (pFlushMenuThemes != ఖాళీ && win_సంస్కరణ >= MAKE_VER(10, 0, 18362))
 	pFlushMenuThemes();
 }
 
-    static void
-dyn_uxtheme_load(void)
+    స్థిర శూన్య
+dyn_uxtheme_ఎక్కించు(శూన్య)
 {
-    hUxThemeLib = vimLoadLib("uxtheme.dll");
-    if (hUxThemeLib == NULL)
-	return;
+    hUxThemeLib = vim_ఎక్కించు_Lib("uxtheme.dll");
+    ఒకవేళ (hUxThemeLib == ఖాళీ)
+	తిరిగి;
 
-    pSetPreferredAppMode = (DWORD (WINAPI *)(DWORD))
-	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(135));
-    pFlushMenuThemes = (void (WINAPI *)(void))
-	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(136));
+    p_సమితి_Preferred_App_బహుళకం = (DWORD (WINAPI *)(DWORD))
+	Get_Proc_చిరునామా(hUxThemeLib, MAKEINTRESOURCE(135));
+    pFlushMenuThemes = (శూన్య (WINAPI *)(శూన్య))
+	Get_Proc_చిరునామా(hUxThemeLib, MAKEINTRESOURCE(136));
 
-    if (pSetPreferredAppMode == NULL || pFlushMenuThemes == NULL)
+    ఒకవేళ (p_సమితి_Preferred_App_బహుళకం == ఖాళీ || pFlushMenuThemes == ఖాళీ)
     {
 	FreeLibrary(hUxThemeLib);
-	hUxThemeLib = NULL;
-	return;
+	hUxThemeLib = ఖాళీ;
+	తిరిగి;
     }
 }
 
-#endif // FEAT_GUI_DARKTHEME
+#అయితే_ముగింపు // FEAT_GUI_DARKTHEME
 
 /*
  * When flag is true, set fullscreen on.
  * When flag is false, set fullscreen off.
  */
-    void
-gui_mch_set_fullscreen(int flag)
+    శూన్య
+gui_mch_సమితి_fullscreen(పూర్ణాంకం flag)
 {
-    static RECT normal_rect;
-    static LONG_PTR normal_style, normal_exstyle;
+    స్థిర RECT సాధారణ_rect;
+    స్థిర LONG_PTR సాధారణ_style, సాధారణ_exstyle;
     HMONITOR	mon;
     MONITORINFO	moninfo;
     RECT	rc;
 
-    if (!full_screen) // Windows not set yet.
-	return;
+    ఒకవేళ (!నిండిన_screen) // Windows not set yet.
+	తిరిగి;
 
-    if (flag)
+    ఒకవేళ (flag)
     {
-	if (fullscreen_on)
-	    return;
+	ఒకవేళ (fullscreen_on)
+	    తిరిగి;
 
 	// Enter fullscreen mode
-	GetWindowRect(s_hwnd, &rc);
+	Get_కిటికీ_Rect(s_hwnd, &rc);
 
-	moninfo.cbSize = sizeof(MONITORINFO);
+	moninfo.cb_కొలత = పరిమాణం(MONITORINFO);
 	mon = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
-	if (mon == NULL || !GetMonitorInfo(mon, &moninfo))
-	    return;
+	ఒకవేళ (mon == ఖాళీ || !GetMonitorInfo(mon, &moninfo))
+	    తిరిగి;
 
 	// Save current window state
-	GetWindowRect(s_hwnd, &normal_rect);
-	normal_style = GetWindowLongPtr(s_hwnd, GWL_STYLE);
-	normal_exstyle = GetWindowLongPtr(s_hwnd, GWL_EXSTYLE);
+	Get_కిటికీ_Rect(s_hwnd, &సాధారణ_rect);
+	సాధారణ_style = Get_కిటికీ_Long_Ptr(s_hwnd, GWL_STYLE);
+	సాధారణ_exstyle = Get_కిటికీ_Long_Ptr(s_hwnd, GWL_EXSTYLE);
 
 	// Set fullscreen styles
-	SetWindowLongPtr(s_hwnd, GWL_STYLE,
-		normal_style & ~(WS_CAPTION | WS_THICKFRAME));
-	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE,
-		normal_exstyle & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
+	సమితి_కిటికీ_Long_Ptr(s_hwnd, GWL_STYLE,
+		సాధారణ_style & ~(WS_CAPTION | WS_THICKFRAME));
+	సమితి_కిటికీ_Long_Ptr(s_hwnd, GWL_EXSTYLE,
+		సాధారణ_exstyle & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
 		    WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-	SetWindowPos(s_hwnd, NULL,
-		moninfo.rcMonitor.left,
-		moninfo.rcMonitor.top,
-		moninfo.rcMonitor.right - moninfo.rcMonitor.left,
-		moninfo.rcMonitor.bottom - moninfo.rcMonitor.top,
+	సమితి_కిటికీ_Pos(s_hwnd, ఖాళీ,
+		moninfo.rcMonitor.ఎడమ_2,
+		moninfo.rcMonitor.శిఖరం,
+		moninfo.rcMonitor.కుడి_2 - moninfo.rcMonitor.ఎడమ_2,
+		moninfo.rcMonitor.bottom - moninfo.rcMonitor.శిఖరం,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = TRUE;
     }
-    else
+    లేకపోతే
     {
-	if (!fullscreen_on)
-	    return;
+	ఒకవేళ (!fullscreen_on)
+	    తిరిగి;
 
 	// Exit fullscreen mode
-	SetWindowLongPtr(s_hwnd, GWL_STYLE, normal_style);
-	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE, normal_exstyle);
+	సమితి_కిటికీ_Long_Ptr(s_hwnd, GWL_STYLE, సాధారణ_style);
+	సమితి_కిటికీ_Long_Ptr(s_hwnd, GWL_EXSTYLE, సాధారణ_exstyle);
 
 	// Restore original window position and size
-	SetWindowPos(s_hwnd, NULL,
-		normal_rect.left,
-		normal_rect.top,
-		normal_rect.right - normal_rect.left,
-		normal_rect.bottom - normal_rect.top,
+	సమితి_కిటికీ_Pos(s_hwnd, ఖాళీ,
+		సాధారణ_rect.ఎడమ_2,
+		సాధారణ_rect.శిఖరం,
+		సాధారణ_rect.కుడి_2 - సాధారణ_rect.ఎడమ_2,
+		సాధారణ_rect.bottom - సాధారణ_rect.శిఖరం,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = FALSE;
@@ -3306,34 +3306,34 @@ gui_mch_set_fullscreen(int flag)
 /*
  * ":simalt" command.
  */
-    void
+    శూన్య
 ex_simalt(exarg_T *eap)
 {
-    char_u	*keys = eap->arg;
-    int		fill_typebuf = FALSE;
-    char_u	key_name[4];
+    char_u	*కీలకాలు = eap->arg;
+    పూర్ణాంకం		fill_typebuf = FALSE;
+    char_u	కీలకం_name[4];
 
-    PostMessage(s_hwnd, WM_SYSCOMMAND, (WPARAM)SC_KEYMENU, (LPARAM)0);
-    while (*keys)
+    Post_సందేశం(s_hwnd, WM_SYSCOMMAND, (WPARAM)SC_KEYMENU, (LPARAM)0);
+    అయితే (*కీలకాలు)
     {
-	if (*keys == '~')
-	    *keys = ' ';	    // for showing system menu
-	PostMessage(s_hwnd, WM_CHAR, (WPARAM)*keys, (LPARAM)0);
-	keys++;
+	ఒకవేళ (*కీలకాలు == '~')
+	    *కీలకాలు = ' ';	    // for showing system menu
+	Post_సందేశం(s_hwnd, WM_CHAR, (WPARAM)*కీలకాలు, (LPARAM)0);
+	కీలకాలు++;
 	fill_typebuf = TRUE;
     }
-    if (fill_typebuf)
+    ఒకవేళ (fill_typebuf)
     {
 	// Put a NOP in the typeahead buffer so that the message will get
 	// processed.
-	key_name[0] = K_SPECIAL;
-	key_name[1] = KS_EXTRA;
-	key_name[2] = KE_NOP;
-	key_name[3] = NUL;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	కీలకం_name[0] = K_SPECIAL;
+	కీలకం_name[1] = KS_EXTRA;
+	కీలకం_name[2] = KE_NOP;
+	కీలకం_name[3] = NUL;
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	typebuf_was_filled = TRUE;
-#endif
-	(void)ins_typebuf(key_name, REMAP_NONE, 0, TRUE, FALSE);
+#అయితే_ముగింపు
+	(శూన్య)ins_typebuf(కీలకం_name, REMAP_NONE, 0, TRUE, FALSE);
     }
 }
 
@@ -3342,145 +3342,145 @@ ex_simalt(exarg_T *eap)
  * You can't have both at once: ":find" when replace is showing, destroys
  * the replace dialog first, and the other way around.
  */
-#ifdef MSWIN_FIND_REPLACE
-    static void
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
+    స్థిర శూన్య
 initialise_findrep(char_u *initial_string)
 {
-    int		wword = FALSE;
-    int		mcase = !p_ic;
-    char_u	*entry_text;
+    పూర్ణాంకం		wword = FALSE;
+    పూర్ణాంకం		mcase = !p_ic;
+    char_u	*నమోదు_పాఠ్యం;
 
     // Get the search string to use.
-    entry_text = get_find_dialog_text(initial_string, &wword, &mcase);
+    నమోదు_పాఠ్యం = get_కనుగొను_dialog_పాఠ్యం(initial_string, &wword, &mcase);
 
     s_findrep_struct.hwndOwner = s_hwnd;
-    s_findrep_struct.Flags = FR_DOWN;
-    if (mcase)
+    s_findrep_struct.Flags = FR_కిందికి;
+    ఒకవేళ (mcase)
 	s_findrep_struct.Flags |= FR_MATCHCASE;
-    if (wword)
+    ఒకవేళ (wword)
 	s_findrep_struct.Flags |= FR_WHOLEWORD;
-    if (entry_text != NULL && *entry_text != NUL)
+    ఒకవేళ (నమోదు_పాఠ్యం != ఖాళీ && *నమోదు_పాఠ్యం != NUL)
     {
-	WCHAR *p = enc_to_utf16(entry_text, NULL);
-	if (p != NULL)
+	WCHAR *p = enc_గమ్యం_utf16(నమోదు_పాఠ్యం, ఖాళీ);
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    int len = s_findrep_struct.wFindWhatLen - 1;
+	    పూర్ణాంకం len = s_findrep_struct.w_కనుగొను_What_Len - 1;
 
-	    wcsncpy(s_findrep_struct.lpstrFindWhat, p, len);
-	    s_findrep_struct.lpstrFindWhat[len] = NUL;
+	    wcsncpy(s_findrep_struct.lpstr_కనుగొను_What, p, len);
+	    s_findrep_struct.lpstr_కనుగొను_What[len] = NUL;
 	    vim_free(p);
 	}
     }
-    vim_free(entry_text);
+    vim_free(నమోదు_పాఠ్యం);
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-set_window_title(HWND hwnd, char *title)
+    స్థిర శూన్య
+సమితి_కిటికీ_title(HWND hwnd, అక్షరం *title)
 {
-    if (title != NULL)
+    ఒకవేళ (title != ఖాళీ)
     {
 	WCHAR	*wbuf;
 
 	// Convert the title from 'encoding' to UTF-16.
-	wbuf = (WCHAR *)enc_to_utf16((char_u *)title, NULL);
-	if (wbuf != NULL)
+	wbuf = (WCHAR *)enc_గమ్యం_utf16((char_u *)title, ఖాళీ);
+	ఒకవేళ (wbuf != ఖాళీ)
 	{
-	    SetWindowTextW(hwnd, wbuf);
+	    సమితి_కిటికీ_పాఠ్యం_W(hwnd, wbuf);
 	    vim_free(wbuf);
 	}
     }
-    else
-	(void)SetWindowTextW(hwnd, NULL);
+    లేకపోతే
+	(శూన్య)సమితి_కిటికీ_పాఠ్యం_W(hwnd, ఖాళీ);
 }
 
-    void
-gui_mch_find_dialog(exarg_T *eap)
+    శూన్య
+gui_mch_కనుగొను_dialog(exarg_T *eap)
 {
-#ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
+    ఒకవేళ (s_findrep_సందేశం != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && !s_findrep_is_find)
-	    DestroyWindow(s_findrep_hwnd);
+	ఒకవేళ (Is_కిటికీ(s_findrep_hwnd) && !s_findrep_is_కనుగొను)
+	    Destroy_కిటికీ(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	ఒకవేళ (!Is_కిటికీ(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
-	    s_findrep_hwnd = FindTextW(&s_findrep_struct);
+	    s_findrep_hwnd = కనుగొను_పాఠ్యం_W(&s_findrep_struct);
 	}
 
-	set_window_title(s_findrep_hwnd, _("Find string"));
-	(void)SetFocus(s_findrep_hwnd);
+	సమితి_కిటికీ_title(s_findrep_hwnd, _("Find string"));
+	(శూన్య)సమితి_Focus(s_findrep_hwnd);
 
-	s_findrep_is_find = TRUE;
+	s_findrep_is_కనుగొను = TRUE;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 
-    void
+    శూన్య
 gui_mch_replace_dialog(exarg_T *eap)
 {
-#ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
+    ఒకవేళ (s_findrep_సందేశం != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && s_findrep_is_find)
-	    DestroyWindow(s_findrep_hwnd);
+	ఒకవేళ (Is_కిటికీ(s_findrep_hwnd) && s_findrep_is_కనుగొను)
+	    Destroy_కిటికీ(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	ఒకవేళ (!Is_కిటికీ(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
-	    s_findrep_hwnd = ReplaceTextW(&s_findrep_struct);
+	    s_findrep_hwnd = Replace_పాఠ్యం_W(&s_findrep_struct);
 	}
 
-	set_window_title(s_findrep_hwnd, _("Find & Replace"));
-	(void)SetFocus(s_findrep_hwnd);
+	సమితి_కిటికీ_title(s_findrep_hwnd, _("Find & Replace"));
+	(శూన్య)సమితి_Focus(s_findrep_hwnd);
 
-	s_findrep_is_find = FALSE;
+	s_findrep_is_కనుగొను = FALSE;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 
 /*
  * Set visibility of the pointer.
  */
-    void
-gui_mch_mousehide(int hide)
+    శూన్య
+gui_mch_mousehide(పూర్ణాంకం hide)
 {
-    if (hide == gui.pointer_hidden)
-	return;
+    ఒకవేళ (hide == gui.సూచిక_hidden)
+	తిరిగి;
 
     ShowCursor(!hide);
-    gui.pointer_hidden = hide;
+    gui.సూచిక_hidden = hide;
 }
 
-#ifdef FEAT_MENU
-    static void
-gui_mch_show_popupmenu_at(vimmenu_T *menu, int x, int y)
+#నిర్వచితమైతే FEAT_MENU
+    స్థిర శూన్య
+gui_mch_show_popupmenu_at(vimmenu_T *menu, పూర్ణాంకం x, పూర్ణాంకం y)
 {
     // Unhide the mouse, we don't get move events here.
     gui_mch_mousehide(FALSE);
 
-    (void)TrackPopupMenu(
+    (శూన్య)TrackPopupMenu(
 	(HMENU)menu->submenu_id,
 	TPM_LEFTALIGN | TPM_LEFTBUTTON,
 	x, y,
-	(int)0,	    //reserved param
+	(పూర్ణాంకం)0,	    //reserved param
 	s_hwnd,
-	NULL);
+	ఖాళీ);
     /*
      * NOTE: The pop-up menu can eat the mouse up event.
      * We deal with this in normal.c.
      */
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Got a message when the system will go down.
  */
-    static void
-_OnEndSession(void)
+    స్థిర శూన్య
+On_చివర_Session(శూన్య)
 {
     getout_preserve_modified(1);
 }
@@ -3489,8 +3489,8 @@ _OnEndSession(void)
  * Get this message when the user clicks on the cross in the top right corner
  * of a Windows95 window.
  */
-    static void
-_OnClose(HWND hwnd UNUSED)
+    స్థిర శూన్య
+_OnClose(HWND hwnd వాడని)
 {
     gui_shell_closed();
 }
@@ -3498,97 +3498,97 @@ _OnClose(HWND hwnd UNUSED)
 /*
  * Get a message when the window is being destroyed.
  */
-    static void
+    స్థిర శూన్య
 _OnDestroy(HWND hwnd)
 {
-    if (!destroying)
+    ఒకవేళ (!destroying)
 	_OnClose(hwnd);
 }
 
-    static void
+    స్థిర శూన్య
 _OnPaint(
     HWND hwnd)
 {
-    if (IsMinimized(hwnd))
-	return;
+    ఒకవేళ (IsMinimized(hwnd))
+	తిరిగి;
 
     PAINTSTRUCT ps;
 
-    out_flush();	    // make sure all output has been processed
-    (void)BeginPaint(hwnd, &ps);
+    బహిర్గతం_flush();	    // make sure all output has been processed
+    (శూన్య)BeginPaint(hwnd, &ps);
 
     // prevent multi-byte characters from misprinting on an invalid
     // rectangle
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
-	ps.rcPaint.left = rect.left;
-	ps.rcPaint.right = rect.right;
+	ps.rcPaint.ఎడమ_2 = rect.ఎడమ_2;
+	ps.rcPaint.కుడి_2 = rect.కుడి_2;
     }
 
-    if (!IsRectEmpty(&ps.rcPaint))
+    ఒకవేళ (!Is_Rect_ఖాళీలు(&ps.rcPaint))
     {
 	// The text area has no background brush, thus undefined pixels remain
 	// visible until the screen contents are drawn.
-	if (!screen_cleared || ScreenLines == NULL)
+	ఒకవేళ (!screen_cleared || Screen_పంక్తులు == ఖాళీ)
 	{
 	    clear_rect(&ps.rcPaint);
 	    s_textarea_bg_only = true;
 	}
-	else
+	లేకపోతే
 	    s_textarea_bg_only = false;
-	gui_redraw(ps.rcPaint.left, ps.rcPaint.top,
-		ps.rcPaint.right - ps.rcPaint.left + 1,
-		ps.rcPaint.bottom - ps.rcPaint.top + 1);
+	gui_redraw(ps.rcPaint.ఎడమ_2, ps.rcPaint.శిఖరం,
+		ps.rcPaint.కుడి_2 - ps.rcPaint.ఎడమ_2 + 1,
+		ps.rcPaint.bottom - ps.rcPaint.శిఖరం + 1);
     }
 
-    EndPaint(hwnd, &ps);
+    చివర_Paint(hwnd, &ps);
 }
 
-    static void
-_OnSize(
+    స్థిర శూన్య
+On_కొలత(
     HWND hwnd,
-    UINT state UNUSED,
-    int cx,
-    int cy)
+    UINT state వాడని,
+    పూర్ణాంకం cx,
+    పూర్ణాంకం cy)
 {
-    if (!IsMinimized(hwnd) && !s_in_dpichanged)
+    ఒకవేళ (!IsMinimized(hwnd) && !s_లోపల_dpichanged)
     {
 	gui_resize_shell(cx, cy);
 
 	// Menu bar may wrap differently now
-	gui_mswin_get_menu_height(TRUE);
+	gui_mswin_get_menu_ఎత్తు(TRUE);
     }
 }
 
-    static void
-_OnSetFocus(
+    స్థిర శూన్య
+On_సమితి_Focus(
     HWND hwnd,
     HWND hwndOldFocus)
 {
     gui_focus_change(TRUE);
     s_getting_focus = TRUE;
-    (void)DefWindowProcW(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
+    (శూన్య)Def_కిటికీ_Proc_W(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
 }
 
-    static void
+    స్థిర శూన్య
 _OnKillFocus(
     HWND hwnd,
     HWND hwndNewFocus)
 {
-    if (destroying)
-	return;
+    ఒకవేళ (destroying)
+	తిరిగి;
     gui_focus_change(FALSE);
     s_getting_focus = FALSE;
-    (void)DefWindowProcW(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
+    (శూన్య)Def_కిటికీ_Proc_W(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
 }
 
 /*
  * Get a message when the user switches back to vim
  */
-    static LRESULT
+    స్థిర LRESULT
 _OnActivateApp(
     HWND hwnd,
     BOOL fActivate,
@@ -3596,89 +3596,89 @@ _OnActivateApp(
 {
     // we call gui_focus_change() in _OnSetFocus()
     // gui_focus_change((int)fActivate);
-    return DefWindowProcW(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
+    తిరిగి Def_కిటికీ_Proc_W(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
 }
 
-    void
+    శూన్య
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    DestroyWindow(sb->id);
+    Destroy_కిటికీ(sb->id);
 }
 
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    శూన్య
+gui_mch_getmouse(పూర్ణాంకం *x, పూర్ణాంకం *y)
 {
     RECT rct;
-    POINT mp;
+    బిందువు_2 mp;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)GetCursorPos(&mp);
-    *x = (int)(mp.x - rct.left);
-    *y = (int)(mp.y - rct.top);
+    (శూన్య)Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rct);
+    (శూన్య)GetCursorPos(&mp);
+    *x = (పూర్ణాంకం)(mp.x - rct.ఎడమ_2);
+    *y = (పూర్ణాంకం)(mp.y - rct.శిఖరం);
 }
 
 /*
  * Move mouse pointer to character at (x, y).
  */
-    void
-gui_mch_setmouse(int x, int y)
+    శూన్య
+gui_mch_setmouse(పూర్ణాంకం x, పూర్ణాంకం y)
 {
     RECT rct;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)SetCursorPos(x + gui.border_offset + rct.left,
-		       y + gui.border_offset + rct.top);
+    (శూన్య)Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rct);
+    (శూన్య)సమితి_Cursor_Pos(x + gui.border_స్థానభ్రంశం + rct.ఎడమ_2,
+		       y + gui.border_స్థానభ్రంశం + rct.శిఖరం);
 }
 
-    static void
+    స్థిర శూన్య
 gui_mswin_get_valid_dimensions(
-    int w,
-    int h,
-    int *valid_w,
-    int *valid_h,
-    int *cols,
-    int *rows)
+    పూర్ణాంకం w,
+    పూర్ణాంకం h,
+    పూర్ణాంకం *valid_w,
+    పూర్ణాంకం *valid_h,
+    పూర్ణాంకం *నిలువుల_సంఖ్య,
+    పూర్ణాంకం *అడ్డువరుసలు_2)
 {
-    int	    base_width, base_height;
+    పూర్ణాంకం	    పునాది_వెడల్పు, పునాది_ఎత్తు;
 
-    base_width = gui_get_base_width()
+    పునాది_వెడల్పు = gui_get_పునాది_వెడల్పు()
 	+ (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 	   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2;
-    base_height = gui_get_base_height()
+    పునాది_ఎత్తు = gui_get_పునాది_ఎత్తు()
 	+ (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 	   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 	+ pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
-	+ gui_mswin_get_menu_height(FALSE);
-    *cols = (w - base_width) / gui.char_width;
-    *rows = (h - base_height) / gui.char_height;
-    *valid_w = base_width + *cols * gui.char_width;
-    *valid_h = base_height + *rows * gui.char_height;
+	+ gui_mswin_get_menu_ఎత్తు(FALSE);
+    *నిలువుల_సంఖ్య = (w - పునాది_వెడల్పు) / gui.char_వెడల్పు;
+    *అడ్డువరుసలు_2 = (h - పునాది_ఎత్తు) / gui.char_ఎత్తు;
+    *valid_w = పునాది_వెడల్పు + *నిలువుల_సంఖ్య * gui.char_వెడల్పు;
+    *valid_h = పునాది_ఎత్తు + *అడ్డువరుసలు_2 * gui.char_ఎత్తు;
 }
 
-    void
-gui_mch_flash(int msec)
+    శూన్య
+gui_mch_flash(పూర్ణాంకం msec)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = gui.num_cols * gui.char_width;
-    rc.bottom = gui.num_rows * gui.char_height;
+    rc.ఎడమ_2 = 0;
+    rc.శిఖరం = 0;
+    rc.కుడి_2 = gui.అంకె_నిలువుల_సంఖ్య * gui.char_వెడల్పు;
+    rc.bottom = gui.అంకె_అడ్డువరుసలు * gui.char_ఎత్తు;
     InvertRect(s_hdc, &rc);
     gui_mch_flush();			// make sure it's displayed
 
-    ui_delay((long)msec, TRUE);	// wait for a few msec
+    ui_delay((దీర్ఘ)msec, TRUE);	// wait for a few msec
 
     InvertRect(s_hdc, &rc);
 }
@@ -3686,12 +3686,12 @@ gui_mch_flash(int msec)
 /*
  * Check if the specified point is on-screen. (multi-monitor aware)
  */
-    static BOOL
-is_point_onscreen(int x, int y)
+    స్థిర BOOL
+is_బిందువు_onscreen(పూర్ణాంకం x, పూర్ణాంకం y)
 {
-    POINT   pt = {x, y};
+    బిందువు_2   pt = {x, y};
 
-    return MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) != NULL;
+    తిరిగి Monitor_From_బిందువు(pt, MONITOR_DEFAULTTONULL) != ఖాళీ;
 }
 
 /*
@@ -3701,29 +3701,29 @@ is_point_onscreen(int x, int y)
  * the window portion that is off-screen.  Scrolling by DWriteContext_Scroll()
  * only works when the whole window is on-screen.
  */
-    static BOOL
-is_window_onscreen(HWND hwnd)
+    స్థిర BOOL
+is_కిటికీ_onscreen(HWND hwnd)
 {
     RECT    rc;
-    POINT   p1, p2;
+    బిందువు_2   p1, p2;
 
     GetClientRect(hwnd, &rc);
-    p1.x = rc.left;
-    p1.y = rc.top;
-    p2.x = rc.right - 1;
+    p1.x = rc.ఎడమ_2;
+    p1.y = rc.శిఖరం;
+    p2.x = rc.కుడి_2 - 1;
     p2.y = rc.bottom - 1;
-    ClientToScreen(hwnd, &p1);
-    ClientToScreen(hwnd, &p2);
+    Client_గమ్యం_Screen(hwnd, &p1);
+    Client_గమ్యం_Screen(hwnd, &p2);
 
-    if (!is_point_onscreen(p1.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p1.x, p2.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p2.y))
-	return FALSE;
-    return TRUE;
+    ఒకవేళ (!is_బిందువు_onscreen(p1.x, p1.y))
+	తిరిగి FALSE;
+    ఒకవేళ (!is_బిందువు_onscreen(p1.x, p2.y))
+	తిరిగి FALSE;
+    ఒకవేళ (!is_బిందువు_onscreen(p2.x, p1.y))
+	తిరిగి FALSE;
+    ఒకవేళ (!is_బిందువు_onscreen(p2.x, p2.y))
+	తిరిగి FALSE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -3731,26 +3731,26 @@ is_window_onscreen(HWND hwnd)
  * The SW_INVALIDATE is required when part of the window is covered or
  * off-screen. Refer to MS KB Q75236.
  */
-    static int
-get_scroll_flags(void)
+    స్థిర పూర్ణాంకం
+get_scroll_flags(శూన్య)
 {
     HWND	hwnd;
     RECT	rcVim, rcOther, rcDest;
 
     // Check if the window is (partly) off-screen.
-    if (!is_window_onscreen(s_hwnd))
-	return SW_INVALIDATE;
+    ఒకవేళ (!is_కిటికీ_onscreen(s_hwnd))
+	తిరిగి SW_INVALIDATE;
 
     // Check if there is a window (partly) on top of us.
-    GetWindowRect(s_hwnd, &rcVim);
-    for (hwnd = s_hwnd; (hwnd = GetWindow(hwnd, GW_HWNDPREV)) != (HWND)0; )
-	if (IsWindowVisible(hwnd))
+    Get_కిటికీ_Rect(s_hwnd, &rcVim);
+    కొరకు (hwnd = s_hwnd; (hwnd = Get_కిటికీ(hwnd, GW_HWNDPREV)) != (HWND)0; )
+	ఒకవేళ (Is_కిటికీ_Visible(hwnd))
 	{
-	    GetWindowRect(hwnd, &rcOther);
-	    if (IntersectRect(&rcDest, &rcVim, &rcOther))
-		return SW_INVALIDATE;
+	    Get_కిటికీ_Rect(hwnd, &rcOther);
+	    ఒకవేళ (IntersectRect(&rcDest, &rcVim, &rcOther))
+		తిరిగి SW_INVALIDATE;
 	}
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -3761,44 +3761,44 @@ get_scroll_flags(void)
  * The problem can be avoided by calling GetPixel() to get a pixel in
  * the region before ScrollWindowEx().
  */
-    static void
-intel_gpu_workaround(void)
+    స్థిర శూన్య
+intel_gpu_workaround(శూన్య)
 {
-    GetPixel(s_hdc, FILL_X(gui.col), FILL_Y(gui.row));
+    GetPixel(s_hdc, FILL_X(gui.నిలువు), FILL_Y(gui.అడ్డువరుస));
 }
 
 /*
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(
-    int	    row,
-    int	    num_lines)
+    శూన్య
+gui_mch_delete_పంక్తులు(
+    పూర్ణాంకం	    అడ్డువరుస,
+    పూర్ణాంకం	    అంకె_పంక్తులు)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.ఎడమ_2 = FILL_X(gui.scroll_region_ఎడమ);
+    rc.కుడి_2 = FILL_X(gui.scroll_region_కుడి + 1);
+    rc.శిఖరం = FILL_Y(అడ్డువరుస);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX() && is_కిటికీ_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, -num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, -అంకె_పంక్తులు * gui.char_ఎత్తు, &rc);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+	ఒకవేళ (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 	intel_gpu_workaround();
-	ScrollWindowEx(s_textArea, 0, -num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
-	UpdateWindow(s_textArea);
+	Scroll_కిటికీ_Ex(s_పాఠ్యం_Area, 0, -అంకె_పంక్తులు * gui.char_ఎత్తు,
+				    &rc, &rc, ఖాళీ, ఖాళీ, get_scroll_flags());
+	Update_కిటికీ(s_పాఠ్యం_Area);
     }
 
     // This seems to be required to avoid the cursor disappearing when
@@ -3807,177 +3807,177 @@ gui_mch_delete_lines(
     // It's probably fixed by disabling drawing the cursor while scrolling.
     // gui.cursor_is_valid = false;
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-	gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_ఖండం(gui.scroll_region_bot - అంకె_పంక్తులు + 1,
+						       gui.scroll_region_ఎడమ,
+	gui.scroll_region_bot, gui.scroll_region_కుడి);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(
-    int		row,
-    int		num_lines)
+    శూన్య
+gui_mch_చొప్పించు_పంక్తులు(
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		అంకె_పంక్తులు)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.ఎడమ_2 = FILL_X(gui.scroll_region_ఎడమ);
+    rc.కుడి_2 = FILL_X(gui.scroll_region_కుడి + 1);
+    rc.శిఖరం = FILL_Y(అడ్డువరుస);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX() && is_కిటికీ_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, అంకె_పంక్తులు * gui.char_ఎత్తు, &rc);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+	ఒకవేళ (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 	intel_gpu_workaround();
 	// The SW_INVALIDATE is required when part of the window is covered or
 	// off-screen.  How do we avoid it when it's not needed?
-	ScrollWindowEx(s_textArea, 0, num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
-	UpdateWindow(s_textArea);
+	Scroll_కిటికీ_Ex(s_పాఠ్యం_Area, 0, అంకె_పంక్తులు * gui.char_ఎత్తు,
+				    &rc, &rc, ఖాళీ, ఖాళీ, get_scroll_flags());
+	Update_కిటికీ(s_పాఠ్యం_Area);
     }
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_ఖండం(అడ్డువరుస, gui.scroll_region_ఎడమ,
+				అడ్డువరుస + అంకె_పంక్తులు - 1, gui.scroll_region_కుడి);
 }
 
 
-    void
-gui_mch_exit(int rc UNUSED)
+    శూన్య
+gui_mch_exit(పూర్ణాంకం rc వాడని)
 {
-#if defined(FEAT_DIRECTX)
+#ఒకవేళ defined(FEAT_DIRECTX)
     DWriteContext_Close(s_dwc);
     DWrite_Final();
-    s_dwc = NULL;
-#endif
+    s_dwc = ఖాళీ;
+#అయితే_ముగింపు
 
-    ReleaseDC(s_textArea, s_hdc);
+    ReleaseDC(s_పాఠ్యం_Area, s_hdc);
     DeleteObject(s_brush);
 
-#ifdef FEAT_TEAROFF
+#నిర్వచితమైతే FEAT_TEAROFF
     // Unload the tearoff bitmap
-    (void)DeleteObject((HGDIOBJ)s_htearbitmap);
-#endif
+    (శూన్య)DeleteObject((HGDIOBJ)s_htearbitmap);
+#అయితే_ముగింపు
 
     // Destroy our window (if we have one).
-    if (s_hwnd != NULL)
+    ఒకవేళ (s_hwnd != ఖాళీ)
     {
 	destroying = TRUE;	// ignore WM_DESTROY message now
-	DestroyWindow(s_hwnd);
+	Destroy_కిటికీ(s_hwnd);
     }
 }
 
-    static char_u *
+    స్థిర char_u *
 logfont2name(LOGFONTW lf)
 {
-    char	*charset_name;
-    char	*quality_name;
-    char	*font_name;
-    size_t	res_size;
-    char	*res;
+    అక్షరం	*charset_name;
+    అక్షరం	*quality_name;
+    అక్షరం	*font_name;
+    size_t	res_కొలత;
+    అక్షరం	*res;
 
-    font_name = (char *)utf16_to_enc(lf.lfFaceName, NULL);
-    if (font_name == NULL)
-	return NULL;
-    charset_name = charset_id2name((int)lf.lfCharSet);
-    quality_name = quality_id2name((int)lf.lfQuality);
+    font_name = (అక్షరం *)utf16_గమ్యం_enc(lf.lfFaceName, ఖాళీ);
+    ఒకవేళ (font_name == ఖాళీ)
+	తిరిగి ఖాళీ;
+    charset_name = charset_id2name((పూర్ణాంకం)lf.lf_Char_సమితి);
+    quality_name = quality_id2name((పూర్ణాంకం)lf.lfQuality);
 
-    res_size = STRLEN(font_name) + 30
-		    + (charset_name == NULL ? 0 : STRLEN(charset_name) + 2)
-		    + (quality_name == NULL ? 0 : STRLEN(quality_name) + 2);
-    res = alloc(res_size);
-    if (res != NULL)
+    res_కొలత = STRLEN(font_name) + 30
+		    + (charset_name == ఖాళీ ? 0 : STRLEN(charset_name) + 2)
+		    + (quality_name == ఖాళీ ? 0 : STRLEN(quality_name) + 2);
+    res = alloc(res_కొలత);
+    ఒకవేళ (res != ఖాళీ)
     {
-	char	*p;
-	int	points;
+	అక్షరం	*p;
+	పూర్ణాంకం	points;
 	size_t	res_len;
 
 	// replace spaces in font_name with underscores.
-	for (p = font_name; *p != NUL; ++p)
+	కొరకు (p = font_name; *p != NUL; ++p)
 	{
-	    if (isspace(*p))
+	    ఒకవేళ (ఖాళీనా(*p))
 		*p = '_';
 	}
 
 	// make a normal font string out of the lf thing:
-	points = pixels_to_points(
-			 lf.lfHeight < 0 ? -lf.lfHeight : lf.lfHeight, TRUE);
-	if (lf.lfWeight == FW_NORMAL || lf.lfWeight == FW_BOLD)
+	points = pixels_గమ్యం_points(
+			 lf.lf_ఎత్తు < 0 ? -lf.lf_ఎత్తు : lf.lf_ఎత్తు, TRUE);
+	ఒకవేళ (lf.lf_బరువు == FW_సాధారణ || lf.lf_బరువు == FW_BOLD)
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d", font_name, points);
-	else
+		(అక్షరం *)res, res_కొలత, "%s:h%d", font_name, points);
+	లేకపోతే
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d:W%ld", font_name, points, lf.lfWeight);
+		(అక్షరం *)res, res_కొలత, "%s:h%d:W%ld", font_name, points, lf.lf_బరువు);
 
 	res_len += vim_snprintf_safelen(
-	    (char *)res + res_len,
-	    res_size - res_len,
+	    (అక్షరం *)res + res_len,
+	    res_కొలత - res_len,
 	    "%s%s%s%s",
 	    lf.lfItalic ? ":i" : "",
-	    lf.lfWeight == FW_BOLD ? ":b" : "",
+	    lf.lf_బరువు == FW_BOLD ? ":b" : "",
 	    lf.lfUnderline ? ":u" : "",
-	    lf.lfStrikeOut ? ":s" : "");
+	    lf.lf_Strike_బహిర్గతం ? ":s" : "");
 
-	if (charset_name != NULL)
-	    res_len += vim_snprintf_safelen((char *)res + res_len,
-		res_size - res_len, ":c%s", charset_name);
-	if (quality_name != NULL)
-	    vim_snprintf((char *)res + res_len,
-		res_size - res_len, ":q%s", quality_name);
+	ఒకవేళ (charset_name != ఖాళీ)
+	    res_len += vim_snprintf_safelen((అక్షరం *)res + res_len,
+		res_కొలత - res_len, ":c%s", charset_name);
+	ఒకవేళ (quality_name != ఖాళీ)
+	    vim_snprintf((అక్షరం *)res + res_len,
+		res_కొలత - res_len, ":q%s", quality_name);
     }
 
     vim_free(font_name);
-    return (char_u *)res;
+    తిరిగి (char_u *)res;
 }
 
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 /*
  * Set correct LOGFONTW to IME.  Use 'guifontwide' if available, otherwise use
  * 'guifont'.
  */
-    static void
-update_im_font(void)
+    స్థిర శూన్య
+update_im_font(శూన్య)
 {
     LOGFONTW	lf_wide, lf;
 
-    if (p_guifontwide != NULL && *p_guifontwide != NUL
+    ఒకవేళ (p_guifontwide != ఖాళీ && *p_guifontwide != NUL
 	    && gui.wide_font != NOFONT
-	    && GetObjectW((HFONT)gui.wide_font, sizeof(lf_wide), &lf_wide))
+	    && GetObjectW((HFONT)gui.wide_font, పరిమాణం(lf_wide), &lf_wide))
 	norm_logfont = lf_wide;
-    else
+    లేకపోతే
 	norm_logfont = sub_logfont;
 
     lf = norm_logfont;
-    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+    ఒకవేళ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	// Work around when PerMonitorV2 is not enabled in the process level.
-	lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
-    im_set_font(&lf);
+	lf.lf_ఎత్తు = lf.lf_ఎత్తు * DEFAULT_DPI / s_dpi;
+    im_సమితి_font(&lf);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Handler of gui.wide_font (p_guifontwide) changed notification.
  */
-    void
-gui_mch_wide_font_changed(void)
+    శూన్య
+gui_mch_wide_font_మారింది(శూన్య)
 {
     LOGFONTW lf;
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
     update_im_font();
-#endif
+#అయితే_ముగింపు
 
     gui_mch_free_font(gui.wide_ital_font);
     gui.wide_ital_font = NOFONT;
@@ -3986,20 +3986,20 @@ gui_mch_wide_font_changed(void)
     gui_mch_free_font(gui.wide_boldital_font);
     gui.wide_boldital_font = NOFONT;
 
-    if (gui.wide_font
-	&& GetObjectW((HFONT)gui.wide_font, sizeof(lf), &lf))
+    ఒకవేళ (gui.wide_font
+	&& GetObjectW((HFONT)gui.wide_font, పరిమాణం(lf), &lf))
     {
-	if (!lf.lfItalic)
+	ఒకవేళ (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.wide_ital_font = get_font_handle(&lf);
 	    lf.lfItalic = FALSE;
 	}
-	if (lf.lfWeight < FW_BOLD)
+	ఒకవేళ (lf.lf_బరువు < FW_BOLD)
 	{
-	    lf.lfWeight = FW_BOLD;
+	    lf.lf_బరువు = FW_BOLD;
 	    gui.wide_bold_font = get_font_handle(&lf);
-	    if (!lf.lfItalic)
+	    ఒకవేళ (!lf.lfItalic)
 	    {
 		lf.lfItalic = TRUE;
 		gui.wide_boldital_font = get_font_handle(&lf);
@@ -4012,102 +4012,102 @@ gui_mch_wide_font_changed(void)
  * Initialise vim to use the font with the given name.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    పూర్ణాంకం
+gui_mch_init_font(char_u *font_name, పూర్ణాంకం fontset వాడని)
 {
     LOGFONTW	lf, lfOrig;
     GuiFont	font = NOFONT;
     char_u	*p;
 
     // Load the font
-    if (get_logfont(&lf, font_name, NULL, TRUE) == OK)
+    ఒకవేళ (get_logfont(&lf, font_name, ఖాళీ, TRUE) == OK)
     {
 	lfOrig = lf;
-	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
+	lf.lf_ఎత్తు = adjust_fontsize_by_dpi(lf.lf_ఎత్తు);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT)
-	return FAIL;
+    ఒకవేళ (font == NOFONT)
+	తిరిగి FAIL;
 
-#if defined(FEAT_DIRECTX)
+#ఒకవేళ defined(FEAT_DIRECTX)
     // Parse font features from guifont (e.g., ":fss19=1:fcalt=0:fliga=1").
     {
 	DWriteFontFeature features[DWRITE_MAX_FONT_FEATURES];
-	int		    feat_count = 0;
+	పూర్ణాంకం		    feat_లెక్క = 0;
 	char_u		    *fp;
 
-	if (font_name != NULL)
+	ఒకవేళ (font_name != ఖాళీ)
 	{
 	    // Find each ":f" option in font_name.
-	    for (fp = font_name; *fp != NUL; fp++)
+	    కొరకు (fp = font_name; *fp != NUL; fp++)
 	    {
-		if (*fp == ':' && *(fp + 1) == 'f')
+		ఒకవేళ (*fp == ':' && *(fp + 1) == 'f')
 		{
-		    char_u tag[5];
-		    int    ti = 0;
-		    unsigned int param = 1;
+		    char_u ట్యాగ్[5];
+		    పూర్ణాంకం    ti = 0;
+		    గుర్తులేని పూర్ణాంకం param = 1;
 
 		    fp += 2;  // skip ":f"
-		    while (*fp != NUL && *fp != '=' && *fp != ':'
+		    అయితే (*fp != NUL && *fp != '=' && *fp != ':'
 			    && ti < 4)
-			tag[ti++] = *fp++;
-		    tag[ti] = NUL;
+			ట్యాగ్[ti++] = *fp++;
+		    ట్యాగ్[ti] = NUL;
 
-		    if (ti != 4)
-			continue;  // invalid tag length
+		    ఒకవేళ (ti != 4)
+			కొనసాగు;  // invalid tag length
 
-		    if (*fp == '=')
+		    ఒకవేళ (*fp == '=')
 		    {
 			fp++;
-			param = (unsigned int)atoi((char *)fp);
-			while (*fp >= '0' && *fp <= '9')
+			param = (గుర్తులేని పూర్ణాంకం)atoi((అక్షరం *)fp);
+			అయితే (*fp >= '0' && *fp <= '9')
 			    fp++;
 		    }
 
-		    if (feat_count < DWRITE_MAX_FONT_FEATURES)
+		    ఒకవేళ (feat_లెక్క < DWRITE_MAX_FONT_FEATURES)
 		    {
-			features[feat_count].tag =
-			    ((unsigned int)tag[0])
-			    | ((unsigned int)tag[1] << 8)
-			    | ((unsigned int)tag[2] << 16)
-			    | ((unsigned int)tag[3] << 24);
-			features[feat_count].parameter = param;
-			feat_count++;
+			features[feat_లెక్క].ట్యాగ్ =
+			    ((గుర్తులేని పూర్ణాంకం)ట్యాగ్[0])
+			    | ((గుర్తులేని పూర్ణాంకం)ట్యాగ్[1] << 8)
+			    | ((గుర్తులేని పూర్ణాంకం)ట్యాగ్[2] << 16)
+			    | ((గుర్తులేని పూర్ణాంకం)ట్యాగ్[3] << 24);
+			features[feat_లెక్క].parameter = param;
+			feat_లెక్క++;
 		    }
 
 		    fp--;  // adjust for loop increment
 		}
 	    }
 	}
-	DWriteContext_SetFontFeatures(s_dwc, features, feat_count);
+	DWrite_Context_సమితి_Font_Features(s_dwc, features, feat_లెక్క);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (font_name == NULL)
+    ఒకవేళ (font_name == ఖాళీ)
 	font_name = (char_u *)"";
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
     norm_logfont = lf;
     sub_logfont = lf;
-    if (!s_in_dpichanged)
+    ఒకవేళ (!s_లోపల_dpichanged)
 	update_im_font();
-#endif
+#అయితే_ముగింపు
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font;
-    current_font_height = lfOrig.lfHeight;
-    UpdateFontSize(font);
+    current_font_ఎత్తు = lfOrig.lf_ఎత్తు;
+    Update_Font_కొలత(font);
 
     p = logfont2name(lfOrig);
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	hl_set_font_name(p);
+	hl_సమితి_font_name(p);
 
 	// When setting 'guifont' to "*" replace it with the actual font name.
-	if (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
+	ఒకవేళ (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
 	{
 	    vim_free(p_guifont);
 	    p_guifont = p;
 	}
-	else
+	లేకపోతే
 	    vim_free(p);
     }
 
@@ -4118,55 +4118,55 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     gui_mch_free_font(gui.boldital_font);
     gui.boldital_font = NOFONT;
 
-    if (!lf.lfItalic)
+    ఒకవేళ (!lf.lfItalic)
     {
 	lf.lfItalic = TRUE;
 	gui.ital_font = get_font_handle(&lf);
 	lf.lfItalic = FALSE;
     }
-    if (lf.lfWeight < FW_BOLD)
+    ఒకవేళ (lf.lf_బరువు < FW_BOLD)
     {
-	lf.lfWeight = FW_BOLD;
+	lf.lf_బరువు = FW_BOLD;
 	gui.bold_font = get_font_handle(&lf);
-	if (!lf.lfItalic)
+	ఒకవేళ (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.boldital_font = get_font_handle(&lf);
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE if the GUI window is maximized, filling the whole screen.
  * Also return TRUE if the window is snapped.
  */
-    int
-gui_mch_maximized(void)
+    పూర్ణాంకం
+gui_mch_maximized(శూన్య)
 {
     WINDOWPLACEMENT wp;
     RECT	    rc;
 
-    wp.length = sizeof(WINDOWPLACEMENT);
-    if (GetWindowPlacement(s_hwnd, &wp))
+    wp.నిడివి = పరిమాణం(WINDOWPLACEMENT);
+    ఒకవేళ (Get_కిటికీ_Placement(s_hwnd, &wp))
     {
-	if (wp.showCmd == SW_SHOWMAXIMIZED
+	ఒకవేళ (wp.showCmd == SW_SHOWMAXIMIZED
 	    || (wp.showCmd == SW_SHOWMINIMIZED
 		    && wp.flags == WPF_RESTORETOMAXIMIZED))
-	    return TRUE;
-	if (wp.showCmd == SW_SHOWMINIMIZED)
-	    return FALSE;
+	    తిరిగి TRUE;
+	ఒకవేళ (wp.showCmd == SW_SHOWMINIMIZED)
+	    తిరిగి FALSE;
 
 	// Assume the window is snapped when the sizes from two APIs differ.
-	GetWindowRect(s_hwnd, &rc);
-	if ((rc.right - rc.left !=
-		    wp.rcNormalPosition.right - wp.rcNormalPosition.left)
-		|| (rc.bottom - rc.top !=
-		    wp.rcNormalPosition.bottom - wp.rcNormalPosition.top))
-	    return TRUE;
+	Get_కిటికీ_Rect(s_hwnd, &rc);
+	ఒకవేళ ((rc.కుడి_2 - rc.ఎడమ_2 !=
+		    wp.rc_సాధారణ_Position.కుడి_2 - wp.rc_సాధారణ_Position.ఎడమ_2)
+		|| (rc.bottom - rc.శిఖరం !=
+		    wp.rc_సాధారణ_Position.bottom - wp.rc_సాధారణ_Position.శిఖరం))
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -4174,46 +4174,46 @@ gui_mch_maximized(void)
  * is set.  Compute the new Rows and Columns.  This is like resizing the
  * window.
  */
-    void
-gui_mch_newfont(void)
+    శూన్య
+gui_mch_newfont(శూన్య)
 {
     RECT	rect;
 
-    GetWindowRect(s_hwnd, &rect);
-    if (win_socket_id == 0)
+    Get_కిటికీ_Rect(s_hwnd, &rect);
+    ఒకవేళ (win_socket_id == 0)
     {
-	gui_resize_shell(rect.right - rect.left
+	gui_resize_shell(rect.కుడి_2 - rect.ఎడమ_2
 	    - (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2,
-	    rect.bottom - rect.top
+	    rect.bottom - rect.శిఖరం
 	    - (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 	    - pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
-	    - gui_mswin_get_menu_height(FALSE));
+	    - gui_mswin_get_menu_ఎత్తు(FALSE));
     }
-    else
+    లేకపోతే
     {
 	// Inside another window, don't use the frame and border.
-	gui_resize_shell(rect.right - rect.left,
-	    rect.bottom - rect.top - gui_mswin_get_menu_height(FALSE));
+	gui_resize_shell(rect.కుడి_2 - rect.ఎడమ_2,
+	    rect.bottom - rect.శిఖరం - gui_mswin_get_menu_ఎత్తు(FALSE));
     }
 }
 
 /*
  * Set the window title
  */
-    void
+    శూన్య
 gui_mch_settitle(
     char_u  *title,
-    char_u  *icon UNUSED)
+    char_u  *icon వాడని)
 {
-    set_window_title(s_hwnd, (title == NULL ? "VIM" : (char *)title));
+    సమితి_కిటికీ_title(s_hwnd, (title == ఖాళీ ? "VIM" : (అక్షరం *)title));
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ఒకవేళ defined(FEAT_MOUSESHAPE)
 // Table for shape IDCs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static LPCSTR mshape_idcs[] =
+స్థిర LPCSTR mshape_idcs[] =
 {
     IDC_ARROW,			// arrow
     MAKEINTRESOURCE(0),		// blank
@@ -4234,51 +4234,51 @@ static LPCSTR mshape_idcs[] =
     IDC_ARROW			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    శూన్య
+mch_సమితి_mouse_shape(పూర్ణాంకం shape)
 {
     LPCSTR idc;
 
-    if (shape == MSHAPE_HIDE)
+    ఒకవేళ (shape == MSHAPE_HIDE)
 	ShowCursor(FALSE);
-    else
+    లేకపోతే
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ఒకవేళ (shape >= MSHAPE_NUMBERED)
 	    idc = IDC_ARROW;
-	else
+	లేకపోతే
 	    idc = mshape_idcs[shape];
-	SetClassLongPtr(s_textArea, GCLP_HCURSOR, (LONG_PTR)LoadCursor(NULL, idc));
-	if (!p_mh)
+	సమితి_Class_Long_Ptr(s_పాఠ్యం_Area, GCLP_HCURSOR, (LONG_PTR)ఎక్కించు_Cursor(ఖాళీ, idc));
+	ఒకవేళ (!p_mh)
 	{
-	    POINT mp;
+	    బిందువు_2 mp;
 
 	    // Set the position to make it redrawn with the new shape.
-	    (void)GetCursorPos(&mp);
-	    (void)SetCursorPos(mp.x, mp.y);
+	    (శూన్య)GetCursorPos(&mp);
+	    (శూన్య)సమితి_Cursor_Pos(mp.x, mp.y);
 	    ShowCursor(TRUE);
 	}
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_BROWSE)
+#ఒకవేళ defined(FEAT_BROWSE)
 /*
  * Wide version of convert_filter().
  */
-    static WCHAR *
+    స్థిర WCHAR *
 convert_filterW(char_u *s)
 {
     char_u *tmp;
-    int len;
+    పూర్ణాంకం len;
     WCHAR *res;
 
     tmp = convert_filter(s);
-    if (tmp == NULL)
-	return NULL;
-    len = (int)STRLEN(s) + 3;
-    res = enc_to_utf16(tmp, &len);
+    ఒకవేళ (tmp == ఖాళీ)
+	తిరిగి ఖాళీ;
+    len = (పూర్ణాంకం)STRLEN(s) + 3;
+    res = enc_గమ్యం_utf16(tmp, &len);
     vim_free(tmp);
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -4293,7 +4293,7 @@ convert_filterW(char_u *s)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	పూర్ణాంకం saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
@@ -4305,24 +4305,24 @@ gui_mch_browse(
     OPENFILENAMEW	fileStruct;
     WCHAR		fileBuf[MAXPATHL];
     WCHAR		*wp;
-    int			i;
-    WCHAR		*titlep = NULL;
-    WCHAR		*extp = NULL;
-    WCHAR		*initdirp = NULL;
+    పూర్ణాంకం			i;
+    WCHAR		*titlep = ఖాళీ;
+    WCHAR		*extp = ఖాళీ;
+    WCHAR		*initdirp = ఖాళీ;
     WCHAR		*filterp;
     char_u		*p, *q;
     BOOL		ret;
 
-    if (dflt == NULL)
+    ఒకవేళ (dflt == ఖాళీ)
 	fileBuf[0] = NUL;
-    else
+    లేకపోతే
     {
-	wp = enc_to_utf16(dflt, NULL);
-	if (wp == NULL)
+	wp = enc_గమ్యం_utf16(dflt, ఖాళీ);
+	ఒకవేళ (wp == ఖాళీ)
 	    fileBuf[0] = NUL;
-	else
+	లేకపోతే
 	{
-	    for (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
+	    కొరకు (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
 		fileBuf[i] = wp[i];
 	    fileBuf[i] = NUL;
 	    vim_free(wp);
@@ -4332,20 +4332,20 @@ gui_mch_browse(
     // Convert the filter to Windows format.
     filterp = convert_filterW(filter);
 
-    CLEAR_FIELD(fileStruct);
-# ifdef OPENFILENAME_SIZE_VERSION_400W
+    CLEAR_క్షేత్రం(fileStruct);
+# ifdef OPENFILENAME_కొలత_సంస్కరణ_400_W
     // be compatible with Windows NT 4.0
-    fileStruct.lStructSize = OPENFILENAME_SIZE_VERSION_400W;
-# else
-    fileStruct.lStructSize = sizeof(fileStruct);
+    fileStruct.l_Struct_కొలత = OPENFILENAME_కొలత_సంస్కరణ_400_W;
+# లేకపోతే
+    fileStruct.l_Struct_కొలత = పరిమాణం(fileStruct);
 # endif
 
-    if (title != NULL)
-	titlep = enc_to_utf16(title, NULL);
+    ఒకవేళ (title != ఖాళీ)
+	titlep = enc_గమ్యం_utf16(title, ఖాళీ);
     fileStruct.lpstrTitle = titlep;
 
-    if (ext != NULL)
-	extp = enc_to_utf16(ext, NULL);
+    ఒకవేళ (ext != ఖాళీ)
+	extp = enc_గమ్యం_utf16(ext, ఖాళీ);
     fileStruct.lpstrDefExt = extp;
 
     fileStruct.lpstrFile = fileBuf;
@@ -4353,14 +4353,14 @@ gui_mch_browse(
     fileStruct.lpstrFilter = filterp;
     fileStruct.hwndOwner = s_hwnd;		// main Vim window is owner
     // has an initial dir been specified?
-    if (initdir != NULL && *initdir != NUL)
+    ఒకవేళ (initdir != ఖాళీ && *initdir != NUL)
     {
 	// Must have backslashes here, no matter what 'shellslash' says
-	initdirp = enc_to_utf16(initdir, NULL);
-	if (initdirp != NULL)
+	initdirp = enc_గమ్యం_utf16(initdir, ఖాళీ);
+	ఒకవేళ (initdirp != ఖాళీ)
 	{
-	    for (wp = initdirp; *wp != NUL; ++wp)
-		if (*wp == '/')
+	    కొరకు (wp = initdirp; *wp != NUL; ++wp)
+		ఒకవేళ (*wp == '/')
 		    *wp = '\\';
 	}
 	fileStruct.lpstrInitialDir = initdirp;
@@ -4376,12 +4376,12 @@ gui_mch_browse(
      */
     fileStruct.Flags = (OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY);
 # ifdef FEAT_SHORTCUT
-    if (curbuf->b_p_bin)
+    ఒకవేళ (curbuf->b_p_bin)
 	fileStruct.Flags |= OFN_NODEREFERENCELINKS;
 # endif
-    if (saving)
+    ఒకవేళ (saving)
 	ret = GetSaveFileNameW(&fileStruct);
-    else
+    లేకపోతే
 	ret = GetOpenFileNameW(&fileStruct);
 
     vim_free(filterp);
@@ -4389,21 +4389,21 @@ gui_mch_browse(
     vim_free(titlep);
     vim_free(extp);
 
-    if (!ret)
-	return NULL;
+    ఒకవేళ (!ret)
+	తిరిగి ఖాళీ;
 
     // Convert from UTF-16 to 'encoding'.
-    p = utf16_to_enc(fileBuf, NULL);
-    if (p == NULL)
-	return NULL;
+    p = utf16_గమ్యం_enc(fileBuf, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Give focus back to main window (when using MDI).
-    SetFocus(s_hwnd);
+    సమితి_Focus(s_hwnd);
 
     // Shorten the file name if possible
     q = vim_strsave(shorten_fname1(p));
     vim_free(p);
-    return q;
+    తిరిగి q;
 }
 
 
@@ -4414,27 +4414,27 @@ gui_mch_browse(
  *
  * Keep in sync with convert_filterW() above!
  */
-    static char_u *
+    స్థిర char_u *
 convert_filter(char_u *s)
 {
     char_u	*res;
-    unsigned	s_len = (unsigned)STRLEN(s);
-    unsigned	i;
+    గుర్తులేని	s_len = (గుర్తులేని)STRLEN(s);
+    గుర్తులేని	i;
 
     res = alloc(s_len + 3);
-    if (res != NULL)
+    ఒకవేళ (res != ఖాళీ)
     {
-	for (i = 0; i < s_len; ++i)
-	    if (s[i] == '\t' || s[i] == '\n')
+	కొరకు (i = 0; i < s_len; ++i)
+	    ఒకవేళ (s[i] == '\t' || s[i] == '\n')
 		res[i] = '\0';
-	    else
+	    లేకపోతే
 		res[i] = s[i];
 	res[s_len] = NUL;
 	// Add two extra NULs to make sure it's properly terminated.
 	res[s_len + 1] = NUL;
 	res[s_len + 2] = NUL;
     }
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -4445,58 +4445,58 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     // We fake this: Use a filter that doesn't select anything and a default
     // file name that won't be used.
-    return gui_mch_browse(0, title, (char_u *)_("Not Used"), NULL,
+    తిరిగి gui_mch_browse(0, title, (char_u *)_("Not Used"), ఖాళీ,
 			      initdir, (char_u *)_("Directory\t*.nothing\n"));
 }
-#endif // FEAT_BROWSE
+#అయితే_ముగింపు // FEAT_BROWSE
 
-    static void
+    స్థిర శూన్య
 _OnDropFiles(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     HDROP hDrop)
 {
-#define BUFPATHLEN _MAX_PATH
-#define DRAGQVAL 0xFFFFFFFF
+#నిర్వచించు BUFPATHLEN MAX_మార్గం_2
+#నిర్వచించు DRAGQVAL 0xFFFFFFFF
     WCHAR   wszFile[BUFPATHLEN];
-    char    szFile[BUFPATHLEN];
-    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, NULL, 0);
+    అక్షరం    szFile[BUFPATHLEN];
+    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, ఖాళీ, 0);
     UINT    i;
     char_u  **fnames;
-    POINT   pt;
+    బిందువు_2   pt;
     int_u   modifiers = 0;
 
     // Obtain dropped position
-    DragQueryPoint(hDrop, &pt);
-    MapWindowPoints(s_hwnd, s_textArea, &pt, 1);
+    Drag_Query_బిందువు(hDrop, &pt);
+    Map_కిటికీ_Points(s_hwnd, s_పాఠ్యం_Area, &pt, 1);
 
     reset_VIsual();
 
     fnames = ALLOC_MULT(char_u *, cFiles);
 
-    if (fnames != NULL)
-	for (i = 0; i < cFiles; ++i)
+    ఒకవేళ (fnames != ఖాళీ)
+	కొరకు (i = 0; i < cFiles; ++i)
 	{
-	    if (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
-		fnames[i] = utf16_to_enc(wszFile, NULL);
-	    else
+	    ఒకవేళ (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
+		fnames[i] = utf16_గమ్యం_enc(wszFile, ఖాళీ);
+	    లేకపోతే
 	    {
 		DragQueryFile(hDrop, i, szFile, BUFPATHLEN);
 		fnames[i] = vim_strsave((char_u *)szFile);
 	    }
 	}
 
-    DragFinish(hDrop);
+    Drag_ముగింపు(hDrop);
 
-    if (fnames == NULL)
-	return;
+    ఒకవేళ (fnames == ఖాళీ)
+	తిరిగి;
 
-    int kbd_modifiers = get_active_modifiers();
+    పూర్ణాంకం kbd_modifiers = get_చురుకైన_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
-	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_జరుపు) != 0)
+	modifiers |= MOUSE_జరుపు;
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     gui_handle_drop(pt.x, pt.y, modifiers, fnames, cFiles);
@@ -4504,28 +4504,28 @@ _OnDropFiles(
     s_need_activate = TRUE;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 _OnScroll(
-    HWND hwnd UNUSED,
+    HWND hwnd వాడని,
     HWND hwndCtl,
-    UINT code,
-    int pos)
+    UINT సంకేతం_2,
+    పూర్ణాంకం pos)
 {
-    static UINT	prev_code = 0;   // code of previous call
+    స్థిర UINT	prev_సంకేతం = 0;   // code of previous call
     scrollbar_T *sb, *sb_info;
-    long	val;
-    int		dragging = FALSE;
-    int		dont_scroll_save = dont_scroll;
+    దీర్ఘ	val;
+    పూర్ణాంకం		dragging = FALSE;
+    పూర్ణాంకం		dont_scroll_save = dont_scroll;
     SCROLLINFO	si;
 
-    si.cbSize = sizeof(si);
-    si.fMask = SIF_POS;
+    si.cb_కొలత = పరిమాణం(si);
+    si.f_ముసుగు = SIF_POS;
 
-    sb = gui_mswin_find_scrollbar(hwndCtl);
-    if (sb == NULL)
-	return 0;
+    sb = gui_mswin_కనుగొను_scrollbar(hwndCtl);
+    ఒకవేళ (sb == ఖాళీ)
+	తిరిగి 0;
 
-    if (sb->wp != NULL)		// Left or right scrollbar
+    ఒకవేళ (sb->wp != ఖాళీ)		// Left or right scrollbar
     {
 	/*
 	 * Careful: need to get scrollbar info out of first (left) scrollbar
@@ -4534,38 +4534,38 @@ _OnScroll(
 	 */
 	sb_info = &sb->wp->w_scrollbars[0];
     }
-    else	    // Bottom scrollbar
+    లేకపోతే	    // Bottom scrollbar
 	sb_info = sb;
-    val = sb_info->value;
+    val = sb_info->విలువ;
 
-    switch (code)
+    ఎంపిక (సంకేతం_2)
     {
-	case SB_THUMBTRACK:
+	స్థితి SB_THUMBTRACK:
 	    val = pos;
 	    dragging = TRUE;
-	    if (sb->scroll_shift > 0)
-		val <<= sb->scroll_shift;
-	    break;
-	case SB_LINEDOWN:
+	    ఒకవేళ (sb->scroll_జరుపు > 0)
+		val <<= sb->scroll_జరుపు;
+	    ఆపు;
+	స్థితి SB_LINEDOWN:
 	    val++;
-	    break;
-	case SB_LINEUP:
+	    ఆపు;
+	స్థితి SB_LINEUP:
 	    val--;
-	    break;
-	case SB_PAGEDOWN:
-	    val += (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_PAGEUP:
-	    val -= (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_TOP:
+	    ఆపు;
+	స్థితి SB_PAGEDOWN:
+	    val += (sb_info->కొలత > 2 ? sb_info->కొలత - 2 : 1);
+	    ఆపు;
+	స్థితి SB_PAGEUP:
+	    val -= (sb_info->కొలత > 2 ? sb_info->కొలత - 2 : 1);
+	    ఆపు;
+	స్థితి SB_శిఖరం:
 	    val = 0;
-	    break;
-	case SB_BOTTOM:
+	    ఆపు;
+	స్థితి SB_BOTTOM:
 	    val = sb_info->max;
-	    break;
-	case SB_ENDSCROLL:
-	    if (prev_code == SB_THUMBTRACK)
+	    ఆపు;
+	స్థితి SB_ENDSCROLL:
+	    ఒకవేళ (prev_సంకేతం == SB_THUMBTRACK)
 	    {
 		/*
 		 * "pos" only gives us 16-bit data.  In case of large file,
@@ -4573,29 +4573,29 @@ _OnScroll(
 		 * is not valid while the scrollbar is being dragged.
 		 */
 		val = GetScrollPos(hwndCtl, SB_CTL);
-		if (sb->scroll_shift > 0)
-		    val <<= sb->scroll_shift;
+		ఒకవేళ (sb->scroll_జరుపు > 0)
+		    val <<= sb->scroll_జరుపు;
 	    }
-	    break;
+	    ఆపు;
 
-	default:
+	అప్రమేయ:
 	    // TRACE("Unknown scrollbar event %d\n", code);
-	    return 0;
+	    తిరిగి 0;
     }
-    prev_code = code;
+    prev_సంకేతం = సంకేతం_2;
 
-    si.nPos = (sb->scroll_shift > 0) ? val >> sb->scroll_shift : val;
-    SetScrollInfo(hwndCtl, SB_CTL, &si, TRUE);
+    si.nPos = (sb->scroll_జరుపు > 0) ? val >> sb->scroll_జరుపు : val;
+    సమితి_Scroll_Info(hwndCtl, SB_CTL, &si, TRUE);
 
     /*
      * When moving a vertical scrollbar, move the other vertical scrollbar too.
      */
-    if (sb->wp != NULL)
+    ఒకవేళ (sb->wp != ఖాళీ)
     {
 	scrollbar_T *sba = sb->wp->w_scrollbars;
-	HWND    id = sba[ (sb == sba + SBAR_LEFT) ? SBAR_RIGHT : SBAR_LEFT].id;
+	HWND    id = sba[ (sb == sba + SBAR_ఎడమ) ? SBAR_కుడి : SBAR_ఎడమ].id;
 
-	SetScrollInfo(id, SB_CTL, &si, TRUE);
+	సమితి_Scroll_Info(id, SB_CTL, &si, TRUE);
     }
 
     // Don't let us be interrupted here by another message.
@@ -4613,161 +4613,161 @@ _OnScroll(
     s_busy_processing = FALSE;
     dont_scroll = dont_scroll_save;
 
-    return 0;
+    తిరిగి 0;
 }
 
 
-#ifdef FEAT_XPM_W32
+#నిర్వచితమైతే FEAT_XPM_W32
 # include "xpm_w32.h"
-#endif
+#అయితే_ముగింపు
 
 
 // Some parameters for tearoff menus.  All in pixels.
-#define TEAROFF_PADDING_X	2
-#define TEAROFF_BUTTON_PAD_X	8
-#define TEAROFF_MIN_WIDTH	200
-#define TEAROFF_SUBMENU_LABEL	">>"
-#define TEAROFF_COLUMN_PADDING	3	// # spaces to pad column with.
+#నిర్వచించు TEAROFF_PADDING_X	2
+#నిర్వచించు TEAROFF_BUTTON_PAD_X	8
+#నిర్వచించు TEAROFF_MIN_వెడల్పు	200
+#నిర్వచించు TEAROFF_SUBMENU_LABEL	">>"
+#నిర్వచించు TEAROFF_స్తంభం_PADDING	3	// # spaces to pad column with.
 
 
-#ifdef FEAT_BEVAL_GUI
+#నిర్వచితమైతే FEAT_BEVAL_GUI
 # define ID_BEVAL_TOOLTIP   200
-# define BEVAL_TEXT_LEN	    MAXPATHL
+# define BEVAL_పాఠ్యం_LEN	    MAXPATHL
 
-static BalloonEval  *cur_beval = NULL;
-static UINT_PTR	    beval_timer_id = 0;
-static DWORD	    last_user_activity = 0;
-#endif // defined(FEAT_BEVAL_GUI)
+స్థిర BalloonEval  *cur_beval = ఖాళీ;
+స్థిర UINT_PTR	    beval_timer_id = 0;
+స్థిర DWORD	    చివరి_user_activity = 0;
+#అయితే_ముగింపు // defined(FEAT_BEVAL_GUI)
 
 
 // Local variables:
 
-#ifdef FEAT_MENU
-static UINT	s_menu_id = 100;
-#endif
+#నిర్వచితమైతే FEAT_MENU
+స్థిర UINT	s_menu_id = 100;
+#అయితే_ముగింపు
 
 /*
  * Use the system font for dialogs and tear-off menus.  Remove this line to
  * use DLG_FONT_NAME.
  */
-#define USE_SYSMENU_FONT
+#నిర్వచించు USE_SYSMENU_FONT
 
-#define VIM_NAME	"vim"
-#define VIM_CLASSW	L"Vim"
+#నిర్వచించు VIM_NAME	"vim"
+#నిర్వచించు VIM_CLASSW	L"Vim"
 
 // Initial size for the dialog template.  For gui_mch_dialog() it's fixed,
 // thus there should be room for every dialog.  For tearoffs it's made bigger
 // when needed.
-#define DLG_ALLOC_SIZE 16 * 1024
+#నిర్వచించు DLG_ALLOC_కొలత 16 * 1024
 
 /*
  * stuff for dialogs, menus, tearoffs etc.
  */
-static PWORD
-add_dialog_element(
+స్థిర PWORD
+కూడు_dialog_element(
 	PWORD p,
 	DWORD lStyle,
-	WORD x,
-	WORD y,
-	WORD w,
-	WORD h,
-	WORD Id,
-	WORD clss,
-	const char *caption);
-static LPWORD lpwAlign(LPWORD);
-static int nCopyAnsiToWideChar(LPWORD, LPSTR, BOOL);
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-static void gui_mch_tearoff(char_u *title, vimmenu_T *menu, int initX, int initY);
-#endif
-static void get_dialog_font_metrics(void);
+	మాట_2 x,
+	మాట_2 y,
+	మాట_2 w,
+	మాట_2 h,
+	మాట_2 Id,
+	మాట_2 clss,
+	స్థిరరాశి అక్షరం *caption);
+స్థిర LPWORD lpwAlign(LPWORD);
+స్థిర పూర్ణాంకం n_Copy_Ansi_గమ్యం_Wide_Char(LPWORD, LPSTR, BOOL);
+#ఒకవేళ defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+స్థిర శూన్య gui_mch_tearoff(char_u *title, vimmenu_T *menu, పూర్ణాంకం initX, పూర్ణాంకం initY);
+#అయితే_ముగింపు
+స్థిర శూన్య get_dialog_font_metrics(శూన్య);
 
-static int dialog_default_button = -1;
+స్థిర పూర్ణాంకం dialog_default_button = -1;
 
-#ifdef FEAT_TOOLBAR
-static void initialise_toolbar(void);
-static void update_toolbar_size(void);
-static LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-static int get_toolbar_bitmap(vimmenu_T *menu);
-#else
-# define update_toolbar_size()
-#endif
+#నిర్వచితమైతే FEAT_TOOLBAR
+స్థిర శూన్య initialise_toolbar(శూన్య);
+స్థిర శూన్య update_toolbar_కొలత(శూన్య);
+స్థిర LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT u_సందేశం, WPARAM wParam, LPARAM lParam);
+స్థిర పూర్ణాంకం get_toolbar_bitmap(vimmenu_T *menu);
+#లేకపోతే
+# define update_toolbar_కొలత()
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_TABLINE
-static void initialise_tabline(void);
-static LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-#endif
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+స్థిర శూన్య initialise_tabline(శూన్య);
+స్థిర LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT u_సందేశం, WPARAM wParam, LPARAM lParam);
+#అయితే_ముగింపు
 
-#ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
-static char_u *GetResultStr(HWND hwnd, int GCS, int *lenp);
-#endif
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+#నిర్వచితమైతే FEAT_MBYTE_IME
+స్థిర LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
+స్థిర char_u *Get_ఫలితం_Str(HWND hwnd, పూర్ణాంకం GCS, పూర్ణాంకం *lenp);
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
 # ifdef NOIME
-typedef struct tagCOMPOSITIONFORM {
+రకనిర్వచనం నిర్మాణం ట్యాగ్_COMPOSITIONFORM {
     DWORD dwStyle;
-    POINT ptCurrentPos;
+    బిందువు_2 ptCurrentPos;
     RECT  rcArea;
 } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, FAR *LPCOMPOSITIONFORM;
-typedef HANDLE HIMC;
+రకనిర్వచనం HANDLE HIMC;
 # endif
 
-static HINSTANCE hLibImm = NULL;
-static LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
-static HIMC (WINAPI *pImmGetContext)(HWND);
-static HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmGetOpenStatus)(HIMC);
-static BOOL (WINAPI *pImmSetOpenStatus)(HIMC, BOOL);
-static BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
-static BOOL (WINAPI *pImmGetConversionStatus)(HIMC, LPDWORD, LPDWORD);
-static BOOL (WINAPI *pImmSetConversionStatus)(HIMC, DWORD, DWORD);
-static void dyn_imm_load(void);
-#else
+స్థిర HINSTANCE hLibImm = ఖాళీ;
+స్థిర LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
+స్థిర HIMC (WINAPI *pImmGetContext)(HWND);
+స్థిర HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
+స్థిర BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
+స్థిర BOOL (WINAPI *p_Imm_Get_Open_స్థితి)(HIMC);
+స్థిర BOOL (WINAPI *p_Imm_సమితి_Open_స్థితి)(HIMC, BOOL);
+స్థిర BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
+స్థిర BOOL (WINAPI *p_Imm_సమితి_Composition_Font_W)(HIMC, LPLOGFONTW);
+స్థిర BOOL (WINAPI *p_Imm_సమితి_Composition_కిటికీ)(HIMC, LPCOMPOSITIONFORM);
+స్థిర BOOL (WINAPI *p_Imm_Get_Conversion_స్థితి)(HIMC, LPDWORD, LPDWORD);
+స్థిర BOOL (WINAPI *p_Imm_సమితి_Conversion_స్థితి)(HIMC, DWORD, DWORD);
+స్థిర శూన్య dyn_imm_ఎక్కించు(శూన్య);
+#లేకపోతే
 # define pImmGetCompositionStringW ImmGetCompositionStringW
 # define pImmGetContext		  ImmGetContext
 # define pImmAssociateContext	  ImmAssociateContext
 # define pImmReleaseContext	  ImmReleaseContext
-# define pImmGetOpenStatus	  ImmGetOpenStatus
-# define pImmSetOpenStatus	  ImmSetOpenStatus
+# define p_Imm_Get_Open_స్థితి	  Imm_Get_Open_స్థితి
+# define p_Imm_సమితి_Open_స్థితి	  Imm_సమితి_Open_స్థితి
 # define pImmGetCompositionFontW  ImmGetCompositionFontW
-# define pImmSetCompositionFontW  ImmSetCompositionFontW
-# define pImmSetCompositionWindow ImmSetCompositionWindow
-# define pImmGetConversionStatus  ImmGetConversionStatus
-# define pImmSetConversionStatus  ImmSetConversionStatus
-#endif
+# define p_Imm_సమితి_Composition_Font_W  Imm_సమితి_Composition_Font_W
+# define p_Imm_సమితి_Composition_కిటికీ Imm_సమితి_Composition_కిటికీ
+# define p_Imm_Get_Conversion_స్థితి  Imm_Get_Conversion_స్థితి
+# define p_Imm_సమితి_Conversion_స్థితి  Imm_సమితి_Conversion_స్థితి
+#అయితే_ముగింపు
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 /*
  * Figure out how high the menu bar is at the moment.
  */
-    static int
-gui_mswin_get_menu_height(
-    int	    fix_window)	    // If TRUE, resize window if menu height changed
+    స్థిర పూర్ణాంకం
+gui_mswin_get_menu_ఎత్తు(
+    పూర్ణాంకం	    fix_కిటికీ)	    // If TRUE, resize window if menu height changed
 {
-    static int	old_menu_height = -1;
+    స్థిర పూర్ణాంకం	old_menu_ఎత్తు = -1;
 
     RECT    rc1, rc2;
-    int	    num;
-    int	    menu_height;
+    పూర్ణాంకం	    అంకె;
+    పూర్ణాంకం	    menu_ఎత్తు;
 
-    if (gui.menu_is_active)
-	num = GetMenuItemCount(s_menuBar);
-    else
-	num = 0;
+    ఒకవేళ (gui.menu_is_చురుకైన)
+	అంకె = Get_Menu_అంశం_లెక్క(s_menuBar);
+    లేకపోతే
+	అంకె = 0;
 
-    if (num == 0)
-	menu_height = 0;
-    else if (IsMinimized(s_hwnd))
+    ఒకవేళ (అంకె == 0)
+	menu_ఎత్తు = 0;
+    లేకపోతే ఒకవేళ (IsMinimized(s_hwnd))
     {
 	// The height of the menu cannot be determined while the window is
 	// minimized.  Take the previous height if the menu is changed in that
 	// state, to avoid that Vim's vertical window size accidentally
 	// increases due to the unaccounted-for menu height.
-	menu_height = old_menu_height == -1 ? 0 : old_menu_height;
+	menu_ఎత్తు = old_menu_ఎత్తు == -1 ? 0 : old_menu_ఎత్తు;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * In case 'lines' is set in _vimrc/_gvimrc window width doesn't
@@ -4776,88 +4776,88 @@ gui_mswin_get_menu_height(
 	 * single menu item.  Will still be wrong when the menu really
 	 * should wrap over more than one line.
 	 */
-	GetMenuItemRect(s_hwnd, s_menuBar, 0, &rc1);
-	if (gui.starting)
-	    menu_height = rc1.bottom - rc1.top + 1;
-	else
+	Get_Menu_అంశం_Rect(s_hwnd, s_menuBar, 0, &rc1);
+	ఒకవేళ (gui.starting)
+	    menu_ఎత్తు = rc1.bottom - rc1.శిఖరం + 1;
+	లేకపోతే
 	{
-	    GetMenuItemRect(s_hwnd, s_menuBar, num - 1, &rc2);
-	    menu_height = rc2.bottom - rc1.top + 1;
+	    Get_Menu_అంశం_Rect(s_hwnd, s_menuBar, అంకె - 1, &rc2);
+	    menu_ఎత్తు = rc2.bottom - rc1.శిఖరం + 1;
 	}
     }
 
-    if (fix_window && menu_height != old_menu_height)
-	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-    old_menu_height = menu_height;
+    ఒకవేళ (fix_కిటికీ && menu_ఎత్తు != old_menu_ఎత్తు)
+	gui_సమితి_shellsize(FALSE, FALSE, RESIZE_VERT);
+    old_menu_ఎత్తు = menu_ఎత్తు;
 
-    return menu_height;
+    తిరిగి menu_ఎత్తు;
 }
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 
 /*
  * Setup for the Intellimouse
  */
-    static long
-mouse_vertical_scroll_step(void)
+    స్థిర దీర్ఘ
+mouse_vertical_scroll_అడుగు(శూన్య)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
-	return (val != WHEEL_PAGESCROLL) ? (long)val : -1;
-    return 3; // Safe default;
+    ఒకవేళ (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
+	తిరిగి (val != WHEEL_PAGESCROLL) ? (దీర్ఘ)val : -1;
+    తిరిగి 3; // Safe default;
 }
 
-    static long
-mouse_horizontal_scroll_step(void)
+    స్థిర దీర్ఘ
+mouse_horizontal_scroll_అడుగు(శూన్య)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
-	return (long)val;
-    return 3; // Safe default;
+    ఒకవేళ (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
+	తిరిగి (దీర్ఘ)val;
+    తిరిగి 3; // Safe default;
 }
 
-    static void
-init_mouse_wheel(void)
+    స్థిర శూన్య
+init_mouse_wheel(శూన్య)
 {
     // Get the default values for the horizontal and vertical scroll steps from
     // the system.
-    mouse_set_vert_scroll_step(mouse_vertical_scroll_step());
-    mouse_set_hor_scroll_step(mouse_horizontal_scroll_step());
+    mouse_సమితి_vert_scroll_అడుగు(mouse_vertical_scroll_అడుగు());
+    mouse_సమితి_hor_scroll_అడుగు(mouse_horizontal_scroll_అడుగు());
 }
 
 /*
  * Mouse scroll event handler.
  */
-    static void
-_OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
+    స్థిర శూన్య
+_OnMouseWheel(HWND hwnd వాడని, WPARAM wParam, LPARAM lParam, పూర్ణాంకం horizontal)
 {
-    int		button;
+    పూర్ణాంకం		button;
     win_T	*wp;
-    int		modifiers = 0;
-    int		kbd_modifiers;
-    int		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-    POINT	pt;
+    పూర్ణాంకం		modifiers = 0;
+    పూర్ణాంకం		kbd_modifiers;
+    పూర్ణాంకం		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+    బిందువు_2	pt;
 
-    wp = gui_mouse_window(FIND_POPUP);
+    wp = gui_mouse_కిటికీ(కనుగొను_POPUP);
 
-#ifdef FEAT_PROP_POPUP
-    if (wp != NULL && popup_is_popup(wp))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (wp != ఖాళీ && popup_is_popup(wp))
     {
 	cmdarg_T cap;
 	oparg_T	oa;
 
 	// Mouse hovers over popup window, scroll it if possible.
-	mouse_row = wp->w_winrow;
-	mouse_col = wp->w_wincol;
-	CLEAR_FIELD(cap);
-	if (horizontal)
+	mouse_అడ్డువరుస = wp->w_winrow;
+	mouse_నిలువు = wp->w_wincol;
+	CLEAR_క్షేత్రం(cap);
+	ఒకవేళ (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_ఎడమ : MSCR_కుడి;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	లేకపోతే
 	{
-	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
+	    cap.arg = zDelta < 0 ? MSCR_పైకి : MSCR_కిందికి;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
 	}
 	clear_oparg(&oa);
@@ -4865,66 +4865,66 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
 	nv_mousescroll(&cap);
 	update_screen(0);
 	setcursor();
-	out_flush();
+	బహిర్గతం_flush();
     }
-#endif
+#అయితే_ముగింపు
 
-    if (wp == NULL || !p_scf)
+    ఒకవేళ (wp == ఖాళీ || !p_scf)
 	wp = curwin;
 
     // Translate the scroll event into an event that Vim can process so that
     // the user has a chance to map the scrollwheel buttons.
-    if (horizontal)
+    ఒకవేళ (horizontal)
 	button = zDelta >= 0 ? MOUSE_6 : MOUSE_7;
-    else
+    లేకపోతే
 	button = zDelta >= 0 ? MOUSE_4 : MOUSE_5;
 
-    kbd_modifiers = get_active_modifiers();
+    kbd_modifiers = get_చురుకైన_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
-	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_జరుపు) != 0)
+	modifiers |= MOUSE_జరుపు;
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    ఒకవేళ ((kbd_modifiers & MOD_ముసుగు_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     // The cursor position is relative to the upper-left corner of the screen.
     pt.x = GET_X_LPARAM(lParam);
     pt.y = GET_Y_LPARAM(lParam);
-    ScreenToClient(s_textArea, &pt);
+    Screen_గమ్యం_Client(s_పాఠ్యం_Area, &pt);
 
     gui_send_mouse_event(button, pt.x, pt.y, FALSE, modifiers);
 }
 
-#ifdef USE_SYSMENU_FONT
+#నిర్వచితమైతే USE_SYSMENU_FONT
 /*
  * Get Menu Font.
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 gui_w32_get_menu_font(LOGFONTW *lf)
 {
     NONCLIENTMETRICSW nm;
 
-    nm.cbSize = sizeof(NONCLIENTMETRICSW);
-    if (!SystemParametersInfoW(
+    nm.cb_కొలత = పరిమాణం(NONCLIENTMETRICSW);
+    ఒకవేళ (!SystemParametersInfoW(
 	    SPI_GETNONCLIENTMETRICS,
-	    sizeof(NONCLIENTMETRICSW),
+	    పరిమాణం(NONCLIENTMETRICSW),
 	    &nm,
 	    0))
-	return FAIL;
+	తిరిగి FAIL;
     *lf = nm.lfMenuFont;
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
 
-#if defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
+#ఒకవేళ defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
 /*
  * Set the GUI tabline font to the system menu font
  */
-    static void
-set_tabline_font(void)
+    స్థిర శూన్య
+సమితి_tabline_font(శూన్య)
 {
     LOGFONTW	lfSysmenu;
     HFONT	font;
@@ -4933,22 +4933,22 @@ set_tabline_font(void)
     HFONT	hfntOld;
     TEXTMETRIC	tm;
 
-    if (gui_w32_get_menu_font(&lfSysmenu) != OK)
-	return;
+    ఒకవేళ (gui_w32_get_menu_font(&lfSysmenu) != OK)
+	తిరిగి;
 
-    lfSysmenu.lfHeight = adjust_fontsize_by_dpi(lfSysmenu.lfHeight);
-    font = CreateFontIndirectW(&lfSysmenu);
+    lfSysmenu.lf_ఎత్తు = adjust_fontsize_by_dpi(lfSysmenu.lf_ఎత్తు);
+    font = Create_Font_పరోక్ష_W(&lfSysmenu);
 
-    SendMessage(s_tabhwnd, WM_SETFONT, (WPARAM)font, TRUE);
+    Send_సందేశం(s_tabhwnd, WM_SETFONT, (WPARAM)font, TRUE);
 
     /*
      * Compute the height of the font used for the tab text
      */
-    hwnd = GetDesktopWindow();
-    hdc = GetWindowDC(hwnd);
+    hwnd = Get_Desktop_కిటికీ();
+    hdc = Get_కిటికీ_DC(hwnd);
     hfntOld = SelectFont(hdc, font);
 
-    GetTextMetrics(hdc, &tm);
+    Get_పాఠ్యం_Metrics(hdc, &tm);
 
     SelectFont(hdc, hfntOld);
     ReleaseDC(hwnd, hdc);
@@ -4957,225 +4957,225 @@ set_tabline_font(void)
      * The space used by the tab border and the space between the tab label
      * and the tab border is included as 7.
      */
-    gui.tabline_height = tm.tmHeight + tm.tmInternalLeading + 7;
+    gui.tabline_ఎత్తు = tm.tm_ఎత్తు + tm.tm_అంతర్గత_Leading + 7;
 }
-#else
-# define set_tabline_font()
-#endif
+#లేకపోతే
+# define సమితి_tabline_font()
+#అయితే_ముగింపు
 
 /*
  * Invoked when a setting was changed.
  */
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 _OnSettingChange(UINT param)
 {
-    switch (param)
+    ఎంపిక (param)
     {
-	case SPI_SETWHEELSCROLLLINES:
-	    mouse_set_vert_scroll_step(mouse_vertical_scroll_step());
-	    break;
-	case SPI_SETWHEELSCROLLCHARS:
-	    mouse_set_hor_scroll_step(mouse_horizontal_scroll_step());
-	    break;
-	case SPI_SETNONCLIENTMETRICS:
-	    set_tabline_font();
-	    break;
-	default:
-	    break;
+	స్థితి SPI_SETWHEELSCROLLLINES:
+	    mouse_సమితి_vert_scroll_అడుగు(mouse_vertical_scroll_అడుగు());
+	    ఆపు;
+	స్థితి SPI_SETWHEELSCROLLCHARS:
+	    mouse_సమితి_hor_scroll_అడుగు(mouse_horizontal_scroll_అడుగు());
+	    ఆపు;
+	స్థితి SPI_SETNONCLIENTMETRICS:
+	    సమితి_tabline_font();
+	    ఆపు;
+	అప్రమేయ:
+	    ఆపు;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-#ifdef FEAT_NETBEANS_INTG
-    static void
-_OnWindowPosChanged(
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+    స్థిర శూన్య
+On_కిటికీ_Pos_మారింది(
     HWND hwnd,
-    const LPWINDOWPOS lpwpos)
+    స్థిరరాశి LPWINDOWPOS lpwpos)
 {
-    static int x = 0, y = 0, cx = 0, cy = 0;
-    extern int WSInitialized;
+    స్థిర పూర్ణాంకం x = 0, y = 0, cx = 0, cy = 0;
+    బాహ్య పూర్ణాంకం WSInitialized;
 
-    if (WSInitialized && (lpwpos->x != x || lpwpos->y != y
+    ఒకవేళ (WSInitialized && (lpwpos->x != x || lpwpos->y != y
 				     || lpwpos->cx != cx || lpwpos->cy != cy))
     {
 	x = lpwpos->x;
 	y = lpwpos->y;
 	cx = lpwpos->cx;
 	cy = lpwpos->cy;
-	netbeans_frame_moved(x, y);
+	netbeans_చట్రం_moved(x, y);
     }
     // Allow to send WM_SIZE and WM_MOVE
-    FORWARD_WM_WINDOWPOSCHANGED(hwnd, lpwpos, DefWindowProcW);
+    FORWARD_WM_WINDOWPOSCHANGED(hwnd, lpwpos, Def_కిటికీ_Proc_W);
 }
-#endif
+#అయితే_ముగింపు
 
 
-static HWND hwndTip = NULL;
+స్థిర HWND hwndTip = ఖాళీ;
 
-    static void
-show_sizing_tip(int cols, int rows)
+    స్థిర శూన్య
+show_sizing_tip(పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం అడ్డువరుసలు_2)
 {
     TOOLINFOA ti;
-    char buf[32];
+    అక్షరం buf[32];
 
-    ti.cbSize = sizeof(ti);
+    ti.cb_కొలత = పరిమాణం(ti);
     ti.hwnd = s_hwnd;
     ti.uId = (UINT_PTR)s_hwnd;
     ti.uFlags = TTF_SUBCLASS | TTF_IDISHWND;
-    ti.lpszText = buf;
-    sprintf(buf, "%dx%d", cols, rows);
-    if (hwndTip == NULL)
+    ti.lpsz_పాఠ్యం = buf;
+    sprintf(buf, "%dx%d", నిలువుల_సంఖ్య, అడ్డువరుసలు_2);
+    ఒకవేళ (hwndTip == ఖాళీ)
     {
-	hwndTip = CreateWindowExA(0, TOOLTIPS_CLASSA, NULL,
+	hwndTip = Create_కిటికీ_Ex_A(0, TOOLTIPS_CLASSA, ఖాళీ,
 		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		s_hwnd, NULL, GetModuleHandle(NULL), NULL);
-	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
-	SendMessage(hwndTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
+		s_hwnd, ఖాళీ, GetModuleHandle(ఖాళీ), ఖాళీ);
+	Send_సందేశం(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
+	Send_సందేశం(hwndTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
     }
-    else
+    లేకపోతే
     {
-	SendMessage(hwndTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
+	Send_సందేశం(hwndTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
     }
-    SendMessage(hwndTip, TTM_POPUP, 0, 0);
+    Send_సందేశం(hwndTip, TTM_POPUP, 0, 0);
 }
 
-    static void
-destroy_sizing_tip(void)
+    స్థిర శూన్య
+destroy_sizing_tip(శూన్య)
 {
-    if (hwndTip == NULL)
-	return;
+    ఒకవేళ (hwndTip == ఖాళీ)
+	తిరిగి;
 
-    DestroyWindow(hwndTip);
-    hwndTip = NULL;
+    Destroy_కిటికీ(hwndTip);
+    hwndTip = ఖాళీ;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 _DuringSizing(
     UINT fwSide,
     LPRECT lprc)
 {
-    int	    w, h;
-    int	    valid_w, valid_h;
-    int	    w_offset, h_offset;
-    int	    cols, rows;
+    పూర్ణాంకం	    w, h;
+    పూర్ణాంకం	    valid_w, valid_h;
+    పూర్ణాంకం	    w_స్థానభ్రంశం, h_స్థానభ్రంశం;
+    పూర్ణాంకం	    నిలువుల_సంఖ్య, అడ్డువరుసలు_2;
 
-    w = lprc->right - lprc->left;
-    h = lprc->bottom - lprc->top;
-    gui_mswin_get_valid_dimensions(w, h, &valid_w, &valid_h, &cols, &rows);
-    w_offset = w - valid_w;
-    h_offset = h - valid_h;
+    w = lprc->కుడి_2 - lprc->ఎడమ_2;
+    h = lprc->bottom - lprc->శిఖరం;
+    gui_mswin_get_valid_dimensions(w, h, &valid_w, &valid_h, &నిలువుల_సంఖ్య, &అడ్డువరుసలు_2);
+    w_స్థానభ్రంశం = w - valid_w;
+    h_స్థానభ్రంశం = h - valid_h;
 
-    if (fwSide == WMSZ_LEFT || fwSide == WMSZ_TOPLEFT
+    ఒకవేళ (fwSide == WMSZ_ఎడమ || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_BOTTOMLEFT)
-	lprc->left += w_offset;
-    else if (fwSide == WMSZ_RIGHT || fwSide == WMSZ_TOPRIGHT
+	lprc->ఎడమ_2 += w_స్థానభ్రంశం;
+    లేకపోతే ఒకవేళ (fwSide == WMSZ_కుడి || fwSide == WMSZ_TOPRIGHT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
-	lprc->right -= w_offset;
+	lprc->కుడి_2 -= w_స్థానభ్రంశం;
 
-    if (fwSide == WMSZ_TOP || fwSide == WMSZ_TOPLEFT
+    ఒకవేళ (fwSide == WMSZ_శిఖరం || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_TOPRIGHT)
-	lprc->top += h_offset;
-    else if (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
+	lprc->శిఖరం += h_స్థానభ్రంశం;
+    లేకపోతే ఒకవేళ (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
-	lprc->bottom -= h_offset;
+	lprc->bottom -= h_స్థానభ్రంశం;
 
-    show_sizing_tip(cols, rows);
-    return TRUE;
+    show_sizing_tip(నిలువుల_సంఖ్య, అడ్డువరుసలు_2);
+    తిరిగి TRUE;
 }
 
-#ifdef FEAT_GUI_TABLINE
-    static void
-_OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    స్థిర శూన్య
+On_RButton_పైకి(HWND hwnd, పూర్ణాంకం x, పూర్ణాంకం y, UINT కీలకం_Flags)
 {
-    if (gui_mch_showing_tabline())
+    ఒకవేళ (gui_mch_showing_tabline())
     {
-	POINT pt;
+	బిందువు_2 pt;
 	RECT rect;
 
 	/*
 	 * If the cursor is on the tabline, display the tab menu
 	 */
 	GetCursorPos(&pt);
-	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rect);
+	ఒకవేళ (pt.y < rect.శిఖరం)
 	{
 	    show_tabline_popup_menu();
-	    return;
+	    తిరిగి;
 	}
     }
-    FORWARD_WM_RBUTTONUP(hwnd, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_RBUTTONUP(hwnd, x, y, కీలకం_Flags, Def_కిటికీ_Proc_W);
 }
 
-    static void
-_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+    స్థిర శూన్య
+On_LButton_కిందికి(HWND hwnd, BOOL fDoubleClick, పూర్ణాంకం x, పూర్ణాంకం y, UINT కీలకం_Flags)
 {
     /*
      * If the user double clicked the tabline, create a new tab
      */
-    if (gui_mch_showing_tabline())
+    ఒకవేళ (gui_mch_showing_tabline())
     {
-	POINT pt;
+	బిందువు_2 pt;
 	RECT rect;
 
 	GetCursorPos(&pt);
-	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rect);
+	ఒకవేళ (pt.y < rect.శిఖరం)
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
     }
-    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, కీలకం_Flags, Def_కిటికీ_Proc_W);
 }
-#endif
+#అయితే_ముగింపు
 
-    static UINT
-_OnNCHitTest(HWND hwnd, int xPos, int yPos)
+    స్థిర UINT
+_OnNCHitTest(HWND hwnd, పూర్ణాంకం xPos, పూర్ణాంకం yPos)
 {
-    UINT	result;
-    int		x, y;
+    UINT	ఫలితం;
+    పూర్ణాంకం		x, y;
 
-    result = FORWARD_WM_NCHITTEST(hwnd, xPos, yPos, DefWindowProcW);
-    if (result != HTCLIENT)
-	return result;
+    ఫలితం = FORWARD_WM_NCHITTEST(hwnd, xPos, yPos, Def_కిటికీ_Proc_W);
+    ఒకవేళ (ఫలితం != HTCLIENT)
+	తిరిగి ఫలితం;
 
-#ifdef FEAT_GUI_TABLINE
-    if (gui_mch_showing_tabline())
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+    ఒకవేళ (gui_mch_showing_tabline())
     {
 	RECT rct;
 
 	// If the cursor is on the GUI tabline, don't process this event
-	GetWindowRect(s_textArea, &rct);
-	if (yPos < rct.top)
-	    return result;
+	Get_కిటికీ_Rect(s_పాఠ్యం_Area, &rct);
+	ఒకవేళ (yPos < rct.శిఖరం)
+	    తిరిగి ఫలితం;
     }
-#endif
-    (void)gui_mch_get_winpos(&x, &y);
+#అయితే_ముగింపు
+    (శూన్య)gui_mch_get_winpos(&x, &y);
     xPos -= x;
 
-    if (xPos < 48) // <VN> TODO should use system metric?
-	return HTBOTTOMLEFT;
-    else
-	return HTBOTTOMRIGHT;
+    ఒకవేళ (xPos < 48) // <VN> TODO should use system metric?
+	తిరిగి HTBOTTOMLEFT;
+    లేకపోతే
+	తిరిగి HTBOTTOMRIGHT;
 }
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    static LRESULT
+#ఒకవేళ defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    స్థిర LRESULT
 _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 {
-    switch (hdr->code)
+    ఎంపిక (hdr->సంకేతం_2)
     {
-	case TTN_GETDISPINFOW:
-	case TTN_GETDISPINFO:
+	స్థితి TTN_GETDISPINFOW:
+	స్థితి TTN_GETDISPINFO:
 	    {
-		char_u		*str = NULL;
-		static void	*tt_text = NULL;
+		char_u		*str = ఖాళీ;
+		స్థిర శూన్య	*tt_పాఠ్యం = ఖాళీ;
 
-		VIM_CLEAR(tt_text);
+		VIM_CLEAR(tt_పాఠ్యం);
 
 # ifdef FEAT_GUI_TABLINE
-		if (gui_mch_showing_tabline()
+		ఒకవేళ (gui_mch_showing_tabline()
 			&& hdr->hwndFrom == TabCtrl_GetToolTips(s_tabhwnd))
 		{
-		    POINT	pt;
+		    బిందువు_2	pt;
 		    /*
 		     * Mouse is over the GUI tabline. Display the
 		     * tooltip for the tab under the cursor
@@ -5183,23 +5183,23 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 		     * Get the cursor position within the tab control
 		     */
 		    GetCursorPos(&pt);
-		    if (ScreenToClient(s_tabhwnd, &pt) != 0)
+		    ఒకవేళ (Screen_గమ్యం_Client(s_tabhwnd, &pt) != 0)
 		    {
 			TCHITTESTINFO htinfo;
-			int idx;
+			పూర్ణాంకం idx;
 
 			/*
 			 * Get the tab under the cursor
 			 */
 			htinfo.pt.x = pt.x;
 			htinfo.pt.y = pt.y;
-			idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-			if (idx != -1)
+			idx = Tab_Ctrl_తగిలింది_Test(s_tabhwnd, &htinfo);
+			ఒకవేళ (idx != -1)
 			{
 			    tabpage_T *tp;
 
-			    tp = find_tabpage(idx + 1);
-			    if (tp != NULL)
+			    tp = కనుగొను_tabpage(idx + 1);
+			    ఒకవేళ (tp != ఖాళీ)
 			    {
 				get_tabline_label(tp, TRUE);
 				str = NameBuff;
@@ -5210,326 +5210,326 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 # endif
 # ifdef FEAT_TOOLBAR
 #  ifdef FEAT_GUI_TABLINE
-		else
+		లేకపోతే
 #  endif
 		{
 		    UINT	idButton;
 		    vimmenu_T	*pMenu;
 
 		    idButton = (UINT) hdr->idFrom;
-		    pMenu = gui_mswin_find_menu(root_menu, idButton);
-		    if (pMenu)
-			str = pMenu->strings[MENU_INDEX_TIP];
+		    pMenu = gui_mswin_కనుగొను_menu(మూలం_menu, idButton);
+		    ఒకవేళ (pMenu)
+			str = pMenu->అక్షరశ్రేణులు[MENU_సూచీ_TIP];
 		}
 # endif
-		if (str == NULL)
-		    break;
+		ఒకవేళ (str == ఖాళీ)
+		    ఆపు;
 
 		// Set the maximum width, this also enables using \n for
 		// line break.
-		SendMessage(hdr->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
+		Send_సందేశం(hdr->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
 
-		if (hdr->code == TTN_GETDISPINFOW)
+		ఒకవేళ (hdr->సంకేతం_2 == TTN_GETDISPINFOW)
 		{
 		    LPNMTTDISPINFOW	lpdi = (LPNMTTDISPINFOW)hdr;
 
-		    tt_text = enc_to_utf16(str, NULL);
-		    lpdi->lpszText = tt_text;
+		    tt_పాఠ్యం = enc_గమ్యం_utf16(str, ఖాళీ);
+		    lpdi->lpsz_పాఠ్యం = tt_పాఠ్యం;
 		    // can't show tooltip if failed
 		}
-		else
+		లేకపోతే
 		{
 		    LPNMTTDISPINFO	lpdi = (LPNMTTDISPINFO)hdr;
 		    size_t		len = STRLEN(str);
 
-		    if (len < sizeof(lpdi->szText)
-			    || ((tt_text = vim_strnsave(str, len)) == NULL))
-			vim_strncpy((char_u *)lpdi->szText, str,
-				sizeof(lpdi->szText) - 1);
-		    else
-			lpdi->lpszText = tt_text;
+		    ఒకవేళ (len < పరిమాణం(lpdi->sz_పాఠ్యం)
+			    || ((tt_పాఠ్యం = vim_strnsave(str, len)) == ఖాళీ))
+			vim_strncpy((char_u *)lpdi->sz_పాఠ్యం, str,
+				పరిమాణం(lpdi->sz_పాఠ్యం) - 1);
+		    లేకపోతే
+			lpdi->lpsz_పాఠ్యం = tt_పాఠ్యం;
 		}
 	    }
-	    break;
+	    ఆపు;
 
 # ifdef FEAT_GUI_TABLINE
-	case TCN_SELCHANGE:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	స్థితి TCN_SELCHANGE:
+	    ఒకవేళ (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		send_tabline_event(TabCtrl_GetCurSel(s_tabhwnd) + 1);
-		return 0L;
+		తిరిగి 0L;
 	    }
-	    break;
+	    ఆపు;
 
-	case NM_RCLICK:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	స్థితి NM_RCLICK:
+	    ఒకవేళ (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		show_tabline_popup_menu();
-		return 0L;
+		తిరిగి 0L;
 	    }
-	    break;
+	    ఆపు;
 # endif
 
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
     }
-    return DefWindowProcW(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
+    తిరిగి Def_కిటికీ_Proc_W(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    static LRESULT
+#ఒకవేళ defined(MENUHINTS) && defined(FEAT_MENU)
+    స్థిర LRESULT
 _OnMenuSelect(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
-    if (((UINT) HIWORD(wParam)
+    ఒకవేళ (((UINT) HIWORD(wParam)
 		& (0xffff ^ (MF_MOUSESELECT + MF_BITMAP + MF_POPUP)))
 	    == MF_HILITE
-	    && (State & MODE_CMDLINE) == 0)
+	    && (State & బహుళకం_CMDLINE) == 0)
     {
 	vimmenu_T   *pMenu;
-	static int  did_menu_tip = FALSE;
+	స్థిర పూర్ణాంకం  did_menu_tip = FALSE;
 
-	if (did_menu_tip)
+	ఒకవేళ (did_menu_tip)
 	{
-	    msg_clr_cmdline();
+	    సందేశం_clr_cmdline();
 	    setcursor();
-	    out_flush();
+	    బహిర్గతం_flush();
 	    did_menu_tip = FALSE;
 	}
 
-	pMenu = gui_mswin_find_menu(root_menu, (UINT)LOWORD(wParam));
-	if (pMenu != NULL && pMenu->strings[MENU_INDEX_TIP] != NULL)
+	pMenu = gui_mswin_కనుగొను_menu(మూలం_menu, (UINT)LOWORD(wParam));
+	ఒకవేళ (pMenu != ఖాళీ && pMenu->అక్షరశ్రేణులు[MENU_సూచీ_TIP] != ఖాళీ)
 	{
 	    MENUITEMINFO menuinfo;
 
-	    menuinfo.cbSize = sizeof(MENUITEMINFO);
-	    menuinfo.fMask = MIIM_ID;		    // We only want to check if the menu item exists,
+	    menuinfo.cb_కొలత = పరిమాణం(MENUITEMINFO);
+	    menuinfo.f_ముసుగు = MIIM_ID;		    // We only want to check if the menu item exists,
 						    // so retrieve something simple.
-	    if (GetMenuItemInfo(s_menuBar, pMenu->id, FALSE, &menuinfo))
+	    ఒకవేళ (Get_Menu_అంశం_Info(s_menuBar, pMenu->id, FALSE, &menuinfo))
 	    {
-		++msg_hist_off;
-		msg((char *)pMenu->strings[MENU_INDEX_TIP]);
-		--msg_hist_off;
+		++సందేశం_hist_off;
+		సందేశం((అక్షరం *)pMenu->అక్షరశ్రేణులు[MENU_సూచీ_TIP]);
+		--సందేశం_hist_off;
 		setcursor();
-		out_flush();
+		బహిర్గతం_flush();
 		did_menu_tip = TRUE;
 	    }
 	}
-	return 0L;
+	తిరిగి 0L;
     }
-    return DefWindowProcW(hwnd, WM_MENUSELECT, wParam, lParam);
+    తిరిగి Def_కిటికీ_Proc_W(hwnd, WM_MENUSELECT, wParam, lParam);
 }
-#endif
+#అయితే_ముగింపు
 
-    static BOOL
-_OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
+    స్థిర BOOL
+On_Get_Dpi_Scaled_కొలత(HWND hwnd వాడని, UINT dpi, కొలత_3 *కొలత)
 {
-    int		old_width, old_height;
-    int		new_width, new_height;
+    పూర్ణాంకం		old_వెడల్పు, old_ఎత్తు;
+    పూర్ణాంకం		new_వెడల్పు, new_ఎత్తు;
     LOGFONTW	lf;
     HFONT	font;
 
     //TRACE("DPI: %d, SIZE=(%d,%d), s_dpi: %d", dpi, size->cx, size->cy, s_dpi);
 
     // Calculate new approximate size.
-    GetFontSize(gui.norm_font, &old_width, &old_height);    // Current size
-    GetObjectW((HFONT)gui.norm_font, sizeof(lf), &lf);
-    lf.lfHeight = lf.lfHeight * (int)dpi / s_dpi;
-    font = CreateFontIndirectW(&lf);
-    if (font)
+    Get_Font_కొలత(gui.norm_font, &old_వెడల్పు, &old_ఎత్తు);    // Current size
+    GetObjectW((HFONT)gui.norm_font, పరిమాణం(lf), &lf);
+    lf.lf_ఎత్తు = lf.lf_ఎత్తు * (పూర్ణాంకం)dpi / s_dpi;
+    font = Create_Font_పరోక్ష_W(&lf);
+    ఒకవేళ (font)
     {
-	GetFontSize((GuiFont)font, &new_width, &new_height);	// New size
+	Get_Font_కొలత((GuiFont)font, &new_వెడల్పు, &new_ఎత్తు);	// New size
 	DeleteFont(font);
     }
-    else
+    లేకపోతే
     {
-	new_width = old_width;
-	new_height = old_height;
+	new_వెడల్పు = old_వెడల్పు;
+	new_ఎత్తు = old_ఎత్తు;
     }
-    size->cx = size->cx * new_width / old_width;
-    size->cy = size->cy * new_height / old_height;
+    కొలత->cx = కొలత->cx * new_వెడల్పు / old_వెడల్పు;
+    కొలత->cy = కొలత->cy * new_ఎత్తు / old_ఎత్తు;
     //TRACE("New approx. SIZE=(%d,%d)", size->cx, size->cy);
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    static LRESULT
-_OnDpiChanged(HWND hwnd, UINT xdpi UNUSED, UINT ydpi, RECT *rc)
+    స్థిర LRESULT
+On_Dpi_మారింది(HWND hwnd, UINT xdpi వాడని, UINT ydpi, RECT *rc)
 {
     s_dpi = ydpi;
-    s_in_dpichanged = TRUE;
+    s_లోపల_dpichanged = TRUE;
     //TRACE("DPI: %d", ydpi);
 
     s_suggested_rect = *rc;
     //TRACE("Suggested pos&size: %d,%d %d,%d", rc->left, rc->top,
     //		rc->right - rc->left, rc->bottom - rc->top);
 
-    update_scrollbar_size();
-    update_toolbar_size();
-    set_tabline_font();
+    update_scrollbar_కొలత();
+    update_toolbar_కొలత();
+    సమితి_tabline_font();
 
     gui_init_font(*p_guifont == NUL ? hl_get_font_name() : p_guifont, FALSE);
     gui_get_wide_font();
-    gui_mswin_get_menu_height(FALSE);
-#ifdef FEAT_MBYTE_IME
-    im_set_position(gui.row, gui.col);
-#endif
-    InvalidateRect(hwnd, NULL, TRUE);
+    gui_mswin_get_menu_ఎత్తు(FALSE);
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    im_సమితి_position(gui.అడ్డువరుస, gui.నిలువు);
+#అయితే_ముగింపు
+    InvalidateRect(hwnd, ఖాళీ, TRUE);
 
-    s_in_dpichanged = FALSE;
-    return 0L;
+    s_లోపల_dpichanged = FALSE;
+    తిరిగి 0L;
 }
 
 
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 _WndProc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_సందేశం,
     WPARAM wParam,
     LPARAM lParam)
 {
     // ch_log(NULL, "WndProc: hwnd = %08x, msg = %x, wParam = %x, lParam = %x",
 	    // hwnd, uMsg, wParam, lParam);
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_సందేశం, lParam);
 
-    s_uMsg = uMsg;
+    s_u_సందేశం = u_సందేశం;
     s_wParam = wParam;
 
-    switch (uMsg)
+    ఎంపిక (u_సందేశం)
     {
-	HANDLE_MSG(hwnd, WM_DEADCHAR,	_OnDeadChar);
-	HANDLE_MSG(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
+	HANDLE_సందేశం(hwnd, WM_DEADCHAR,	_OnDeadChar);
+	HANDLE_సందేశం(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
 	// HANDLE_MSG(hwnd, WM_ACTIVATE,    _OnActivate);
-	HANDLE_MSG(hwnd, WM_CLOSE,	_OnClose);
+	HANDLE_సందేశం(hwnd, WM_CLOSE,	_OnClose);
 	// HANDLE_MSG(hwnd, WM_COMMAND,	_OnCommand);
-	HANDLE_MSG(hwnd, WM_DESTROY,	_OnDestroy);
-	HANDLE_MSG(hwnd, WM_DROPFILES,	_OnDropFiles);
-	HANDLE_MSG(hwnd, WM_HSCROLL,	_OnScroll);
-	HANDLE_MSG(hwnd, WM_KILLFOCUS,	_OnKillFocus);
-#ifdef FEAT_MENU
-	HANDLE_MSG(hwnd, WM_COMMAND,	_OnMenu);
-#endif
+	HANDLE_సందేశం(hwnd, WM_DESTROY,	_OnDestroy);
+	HANDLE_సందేశం(hwnd, WM_DROPFILES,	_OnDropFiles);
+	HANDLE_సందేశం(hwnd, WM_HSCROLL,	_OnScroll);
+	HANDLE_సందేశం(hwnd, WM_KILLFOCUS,	_OnKillFocus);
+#నిర్వచితమైతే FEAT_MENU
+	HANDLE_సందేశం(hwnd, WM_COMMAND,	_OnMenu);
+#అయితే_ముగింపు
 	// HANDLE_MSG(hwnd, WM_MOVE,	    _OnMove);
 	// HANDLE_MSG(hwnd, WM_NCACTIVATE,  _OnNCActivate);
-	HANDLE_MSG(hwnd, WM_SETFOCUS,	_OnSetFocus);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSize);
+	HANDLE_సందేశం(hwnd, WM_SETFOCUS,	On_సమితి_Focus);
+	HANDLE_సందేశం(hwnd, WM_కొలత,	On_కొలత);
 	// HANDLE_MSG(hwnd, WM_SYSCOMMAND,  _OnSysCommand);
 	// HANDLE_MSG(hwnd, WM_SYSKEYDOWN,  _OnAltKey);
-	HANDLE_MSG(hwnd, WM_VSCROLL,	_OnScroll);
+	HANDLE_సందేశం(hwnd, WM_VSCROLL,	_OnScroll);
 	// HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGING,	_OnWindowPosChanging);
-	HANDLE_MSG(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
-#ifdef FEAT_NETBEANS_INTG
-	HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGED, _OnWindowPosChanged);
-#endif
-#ifdef FEAT_GUI_TABLINE
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnRButtonUp);
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,  _OnLButtonDown);
-#endif
-	HANDLE_MSG(hwnd, WM_NCHITTEST,	_OnNCHitTest);
+	HANDLE_సందేశం(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	HANDLE_సందేశం(hwnd, WM_WINDOWPOSCHANGED, On_కిటికీ_Pos_మారింది);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	HANDLE_సందేశం(hwnd, WM_RBUTTONUP,	On_RButton_పైకి);
+	HANDLE_సందేశం(hwnd, WM_LBUTTONDBLCLK,  On_LButton_కిందికి);
+#అయితే_ముగింపు
+	HANDLE_సందేశం(hwnd, WM_NCHITTEST,	_OnNCHitTest);
 
-    case WM_QUERYENDSESSION:	// System wants to go down.
+    స్థితి WM_QUERYENDSESSION:	// System wants to go down.
 	gui_shell_closed();	// Will exit when no changed buffers.
-	return FALSE;		// Do NOT allow system to go down.
+	తిరిగి FALSE;		// Do NOT allow system to go down.
 
-    case WM_ENDSESSION:
-	if (wParam)	// system only really goes down when wParam is TRUE
+    స్థితి WM_ENDSESSION:
+	ఒకవేళ (wParam)	// system only really goes down when wParam is TRUE
 	{
-	    _OnEndSession();
-	    return 0L;
+	    On_చివర_Session();
+	    తిరిగి 0L;
 	}
-	break;
+	ఆపు;
 
-    case WM_CHAR:
+    స్థితి WM_CHAR:
 	// Don't use HANDLE_MSG() for WM_CHAR, it truncates wParam to a single
 	// byte while we want the UTF-16 character value.
-	_OnChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	return 0L;
+	_OnChar(hwnd, (UINT)wParam, (పూర్ణాంకం)(పొట్టి)LOWORD(lParam));
+	తిరిగి 0L;
 
-    case WM_SYSCHAR:
+    స్థితి WM_SYSCHAR:
 	/*
 	 * if 'winaltkeys' is "no", or it's "menu" and it's not a menu
 	 * shortcut key, handle like a typed ALT key, otherwise call Windows
 	 * ALT key handling.
 	 */
-#ifdef FEAT_MENU
-	if (	!gui.menu_is_active
+#నిర్వచితమైతే FEAT_MENU
+	ఒకవేళ (	!gui.menu_is_చురుకైన
 		|| p_wak[0] == 'n'
-		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((int)wParam))
+		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((పూర్ణాంకం)wParam))
 		)
-#endif
+#అయితే_ముగింపు
 	{
-	    _OnSysChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	    return 0L;
+	    _OnSysChar(hwnd, (UINT)wParam, (పూర్ణాంకం)(పొట్టి)LOWORD(lParam));
+	    తిరిగి 0L;
 	}
-#ifdef FEAT_MENU
-	else
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-#endif
+#నిర్వచితమైతే FEAT_MENU
+	లేకపోతే
+	    తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
+#అయితే_ముగింపు
 
-    case WM_SYSKEYUP:
-#ifdef FEAT_MENU
+    స్థితి WM_SYSKEYUP:
+#నిర్వచితమైతే FEAT_MENU
 	// This used to be done only when menu is active: ALT key is used for
 	// that.  But that caused problems when menu is disabled and using
 	// Alt-Tab-Esc: get into a strange state where no mouse-moved events
 	// are received, mouse pointer remains hidden.
-	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-#else
-	return 0L;
-#endif
+	తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
+#లేకపోతే
+	తిరిగి 0L;
+#అయితే_ముగింపు
 
-    case WM_EXITSIZEMOVE:
+    స్థితి WM_EXITSIZEMOVE:
 	destroy_sizing_tip();
-	break;
+	ఆపు;
 
-    case WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
-	return _DuringSizing((UINT)wParam, (LPRECT)lParam);
+    స్థితి WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
+	తిరిగి _DuringSizing((UINT)wParam, (LPRECT)lParam);
 
-    case WM_MOUSEWHEEL:
-    case WM_MOUSEHWHEEL:
-	_OnMouseWheel(hwnd, wParam, lParam, uMsg == WM_MOUSEHWHEEL);
-	return 0L;
+    స్థితి WM_MOUSEWHEEL:
+    స్థితి WM_MOUSEHWHEEL:
+	_OnMouseWheel(hwnd, wParam, lParam, u_సందేశం == WM_MOUSEHWHEEL);
+	తిరిగి 0L;
 
 	// Notification for change in SystemParametersInfo()
-    case WM_SETTINGCHANGE:
-	return _OnSettingChange((UINT)wParam);
+    స్థితి WM_SETTINGCHANGE:
+	తిరిగి _OnSettingChange((UINT)wParam);
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    case WM_NOTIFY:
-	return _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
-#endif
+#ఒకవేళ defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    స్థితి WM_NOTIFY:
+	తిరిగి _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
+#అయితే_ముగింపు
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    case WM_MENUSELECT:
-	return _OnMenuSelect(hwnd, wParam, lParam);
-#endif
+#ఒకవేళ defined(MENUHINTS) && defined(FEAT_MENU)
+    స్థితి WM_MENUSELECT:
+	తిరిగి _OnMenuSelect(hwnd, wParam, lParam);
+#అయితే_ముగింపు
 
-#ifdef FEAT_MBYTE_IME
-    case WM_IME_NOTIFY:
-	if (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    స్థితి WM_IME_NOTIFY:
+	ఒకవేళ (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
+	    తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
+	తిరిగి 1L;
 
-    case WM_IME_COMPOSITION:
-	if (!_OnImeComposition(hwnd, wParam, lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
-#endif
-    case WM_GETDPISCALEDSIZE:
-	return _OnGetDpiScaledSize(hwnd, (UINT)wParam, (SIZE *)lParam);
-    case WM_DPICHANGED:
-	return _OnDpiChanged(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
+    స్థితి WM_IME_COMPOSITION:
+	ఒకవేళ (!_OnImeComposition(hwnd, wParam, lParam))
+	    తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
+	తిరిగి 1L;
+#అయితే_ముగింపు
+    స్థితి WM_GETDPISCALEDSIZE:
+	తిరిగి On_Get_Dpi_Scaled_కొలత(hwnd, (UINT)wParam, (కొలత_3 *)lParam);
+    స్థితి WM_DPICHANGED:
+	తిరిగి On_Dpi_మారింది(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
 		(RECT*)lParam);
 
-    default:
-#ifdef MSWIN_FIND_REPLACE
-	if (uMsg == s_findrep_msg && s_findrep_msg != 0)
-	    _OnFindRepl();
-#endif
-	break;
+    అప్రమేయ:
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
+	ఒకవేళ (u_సందేశం == s_findrep_సందేశం && s_findrep_సందేశం != 0)
+	    On_కనుగొను_Repl();
+#అయితే_ముగింపు
+	ఆపు;
     }
 
-    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    తిరిగి Def_కిటికీ_Proc_W(hwnd, u_సందేశం, wParam, lParam);
 }
 
 /*
@@ -5537,151 +5537,151 @@ _WndProc(
  */
 
 // parent window, if specified with -P
-HWND vim_parent_hwnd = NULL;
+HWND vim_మాతృ_hwnd = ఖాళీ;
 
-    static BOOL CALLBACK
-FindWindowTitle(HWND hwnd, LPARAM lParam)
+    స్థిర BOOL CALLBACK
+కనుగొను_కిటికీ_Title(HWND hwnd, LPARAM lParam)
 {
-    char	buf[2048];
-    char	*title = (char *)lParam;
+    అక్షరం	buf[2048];
+    అక్షరం	*title = (అక్షరం *)lParam;
 
-    if (GetWindowText(hwnd, buf, sizeof(buf)))
+    ఒకవేళ (Get_కిటికీ_పాఠ్యం(hwnd, buf, పరిమాణం(buf)))
     {
-	if (strstr(buf, title) != NULL)
+	ఒకవేళ (అక్షరశ్రేణి_శోధన(buf, title) != ఖాళీ)
 	{
 	    // Found it.  Store the window ref. and quit searching if MDI
 	    // works.
-	    vim_parent_hwnd = FindWindowEx(hwnd, NULL, "MDIClient", NULL);
-	    if (vim_parent_hwnd != NULL)
-		return FALSE;
+	    vim_మాతృ_hwnd = కనుగొను_కిటికీ_Ex(hwnd, ఖాళీ, "MDIClient", ఖాళీ);
+	    ఒకవేళ (vim_మాతృ_hwnd != ఖాళీ)
+		తిరిగి FALSE;
 	}
     }
-    return TRUE;	// continue searching
+    తిరిగి TRUE;	// continue searching
 }
 
 /*
  * Invoked for '-P "title"' argument: search for parent application to open
  * our window in.
  */
-    void
-gui_mch_set_parent(char *title)
+    శూన్య
+gui_mch_సమితి_మాతృ(అక్షరం *title)
 {
-    EnumWindows(FindWindowTitle, (LPARAM)title);
-    if (vim_parent_hwnd == NULL)
+    EnumWindows(కనుగొను_కిటికీ_Title, (LPARAM)title);
+    ఒకవేళ (vim_మాతృ_hwnd == ఖాళీ)
     {
-	semsg(_(e_cannot_find_window_title_str), title);
+	semsg(_(e_cannot_కనుగొను_కిటికీ_title_str), title);
 	mch_exit(2);
     }
 }
 
-#ifndef FEAT_OLE
-    static void
-ole_error(char *arg)
+#నిర్వచితం_కాకపోతే FEAT_OLE
+    స్థిర శూన్య
+ole_error(అక్షరం *arg)
 {
-    char buf[IOSIZE];
+    అక్షరం buf[IOSIZE];
 
 # ifdef VIMDLL
-    gui.in_use = mch_is_gui_executable();
+    gui.లోపల_use = mch_is_gui_executable();
 # endif
 
     // Can't use emsg() here, we have not finished initialisation yet.
     vim_snprintf(buf, IOSIZE,
-			 _(e_argument_not_supported_str_use_ole_version), arg);
+			 _(e_వాదం_not_supported_str_use_ole_సంస్కరణ), arg);
     mch_errmsg(buf);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(GUI_MAY_SPAWN)
-    static char *
-gvim_error(void)
+#ఒకవేళ defined(GUI_MAY_SPAWN)
+    స్థిర అక్షరం *
+gvim_error(శూన్య)
 {
-    char *msg = _(e_gui_cannot_be_used_cannot_execute_gvim_exe);
+    అక్షరం *సందేశం = _(e_gui_cannot_be_వాడిన_cannot_execute_gvim_exe);
 
-    if (starting)
+    ఒకవేళ (starting)
     {
-	mch_errmsg(msg);
+	mch_errmsg(సందేశం);
 	mch_errmsg("\n");
 	mch_exit(2);
     }
-    return msg;
+    తిరిగి సందేశం;
 }
 
-    char *
+    అక్షరం *
 gui_mch_do_spawn(char_u *arg)
 {
-    int			len;
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    char_u		*session = NULL;
-    LPWSTR		tofree1 = NULL;
+    పూర్ణాంకం			len;
+# ఒకవేళ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    char_u		*session = ఖాళీ;
+    LPWSTR		tofree1 = ఖాళీ;
 # endif
-    WCHAR		name[MAX_PATH];
-    LPWSTR		cmd, newcmd = NULL, p, warg, tofree2 = NULL;
-    STARTUPINFOW	si = {sizeof(si)};
+    WCHAR		name[MAX_మార్గం];
+    LPWSTR		cmd, newcmd = ఖాళీ, p, warg, tofree2 = ఖాళీ;
+    STARTUPINFOW	si = {పరిమాణం(si)};
     PROCESS_INFORMATION pi;
 
-    if (!GetModuleFileNameW(g_hinst, name, MAX_PATH))
-	goto error;
+    ఒకవేళ (!GetModuleFileNameW(g_hinst, name, MAX_మార్గం))
+	వెళ్ళు error;
     p = wcsrchr(name, L'\\');
-    if (p == NULL)
-	goto error;
+    ఒకవేళ (p == ఖాళీ)
+	వెళ్ళు error;
     // Replace the executable name from vim(d).exe to gvim(d).exe.
 # ifdef DEBUG
     wcscpy(p + 1, L"gvimd.exe");
-# else
+# లేకపోతే
     wcscpy(p + 1, L"gvim.exe");
 # endif
 
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (starting)
+# ఒకవేళ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    ఒకవేళ (starting)
 # endif
     {
 	// Pass the command line to the new process.
-	p = GetCommandLineW();
+	p = Get_Command_పంక్తి_W();
 	// Skip 1st argument.
-	while (*p && *p != L' ' && *p != L'\t')
+	అయితే (*p && *p != L' ' && *p != L'\t')
 	{
-	    if (*p == L'"')
+	    ఒకవేళ (*p == L'"')
 	    {
 		// Skip quoted strings
-		while (*++p && *p != L'"');
+		అయితే (*++p && *p != L'"');
 	    }
 
 	    ++p;
 	}
 	cmd = p;
     }
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    else
+# ఒకవేళ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    లేకపోతే
     {
 	// Create a session file and pass it to the new process.
 	LPWSTR	wsession;
 	char_u	*savebg;
-	int	ret;
+	పూర్ణాంకం	ret;
 
 	session = vim_tempname('s', FALSE);
-	if (session == NULL)
-	    goto error;
+	ఒకవేళ (session == ఖాళీ)
+	    వెళ్ళు error;
 	savebg = p_bg;
 	p_bg = vim_strnsave((char_u *)"light", 5);	// Set 'bg' to "light".
-	if (p_bg == NULL)
+	ఒకవేళ (p_bg == ఖాళీ)
 	{
 	    p_bg = savebg;
-	    goto error;
+	    వెళ్ళు error;
 	}
 	ret = write_session_file(session);
 	vim_free(p_bg);
 	p_bg = savebg;
-	if (!ret)
-	    goto error;
-	wsession = enc_to_utf16(session, NULL);
-	if (wsession == NULL)
-	    goto error;
-	len = (int)wcslen(wsession) * 2 + 27 + 1;
+	ఒకవేళ (!ret)
+	    వెళ్ళు error;
+	wsession = enc_గమ్యం_utf16(session, ఖాళీ);
+	ఒకవేళ (wsession == ఖాళీ)
+	    వెళ్ళు error;
+	len = (పూర్ణాంకం)wcslen(wsession) * 2 + 27 + 1;
 	cmd = ALLOC_MULT(WCHAR, len);
-	if (cmd == NULL)
+	ఒకవేళ (cmd == ఖాళీ)
 	{
 	    vim_free(wsession);
-	    goto error;
+	    వెళ్ళు error;
 	}
 	tofree1 = cmd;
 	_snwprintf(cmd, len, L" -S \"%s\" -c \"call delete('%s')\"",
@@ -5691,296 +5691,296 @@ gui_mch_do_spawn(char_u *arg)
 # endif
 
     // Check additional arguments to the `:gui` command.
-    if (arg != NULL)
+    ఒకవేళ (arg != ఖాళీ)
     {
-	warg = enc_to_utf16(arg, NULL);
-	if (warg == NULL)
-	    goto error;
+	warg = enc_గమ్యం_utf16(arg, ఖాళీ);
+	ఒకవేళ (warg == ఖాళీ)
+	    వెళ్ళు error;
 	tofree2 = warg;
     }
-    else
+    లేకపోతే
 	warg = L"";
 
     // Set up the new command line.
-    len = (int)wcslen(name) + (int)wcslen(cmd) + (int)wcslen(warg) + 4;
+    len = (పూర్ణాంకం)wcslen(name) + (పూర్ణాంకం)wcslen(cmd) + (పూర్ణాంకం)wcslen(warg) + 4;
     newcmd = ALLOC_MULT(WCHAR, len);
-    if (newcmd == NULL)
-	goto error;
+    ఒకవేళ (newcmd == ఖాళీ)
+	వెళ్ళు error;
     _snwprintf(newcmd, len, L"\"%s\"%s %s", name, cmd, warg);
 
     // Spawn a new GUI process.
-    if (!CreateProcessW(NULL, newcmd, NULL, NULL, TRUE, 0,
-		NULL, NULL, &si, &pi))
-	goto error;
+    ఒకవేళ (!CreateProcessW(ఖాళీ, newcmd, ఖాళీ, ఖాళీ, TRUE, 0,
+		ఖాళీ, ఖాళీ, &si, &pi))
+	వెళ్ళు error;
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     mch_exit(0);
 
 error:
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (session)
+# ఒకవేళ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    ఒకవేళ (session)
 	mch_remove(session);
     vim_free(session);
     vim_free(tofree1);
 # endif
     vim_free(newcmd);
     vim_free(tofree2);
-    return gvim_error();
+    తిరిగి gvim_error();
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Parse the GUI related command-line arguments.  Any arguments used are
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when Vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    శూన్య
+gui_mch_prepare(పూర్ణాంకం *argc, అక్షరం **argv)
 {
-    int		silent = FALSE;
-    int		idx;
+    పూర్ణాంకం		silent = FALSE;
+    పూర్ణాంకం		idx;
 
     // Check for special OLE command line parameters
-    if ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
+    ఒకవేళ ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
     {
 	// Check for a "-silent" argument first.
-	if (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
+	ఒకవేళ (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
 		&& (argv[2][0] == '-' || argv[2][0] == '/'))
 	{
 	    silent = TRUE;
 	    idx = 2;
 	}
-	else
+	లేకపోతే
 	    idx = 1;
 
 	// Register Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "register") == 0)
+	ఒకవేళ (STRICMP(argv[idx] + 1, "register") == 0)
 	{
-#ifdef FEAT_OLE
-	    RegisterMe(silent);
+#నిర్వచితమైతే FEAT_OLE
+	    రిజిస్టరు_Me(silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#లేకపోతే
+	    ఒకవేళ (!silent)
 		ole_error("register");
 	    mch_exit(2);
-#endif
+#అయితే_ముగింపు
 	}
 
 	// Unregister Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "unregister") == 0)
+	ఒకవేళ (STRICMP(argv[idx] + 1, "unregister") == 0)
 	{
-#ifdef FEAT_OLE
+#నిర్వచితమైతే FEAT_OLE
 	    UnregisterMe(!silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#లేకపోతే
+	    ఒకవేళ (!silent)
 		ole_error("unregister");
 	    mch_exit(2);
-#endif
+#అయితే_ముగింపు
 	}
 
 	// Ignore an -embedding argument. It is only relevant if the
 	// application wants to treat the case when it is started manually
 	// differently from the case where it is started via automation (and
 	// we don't).
-	if (STRICMP(argv[idx] + 1, "embedding") == 0)
+	ఒకవేళ (STRICMP(argv[idx] + 1, "embedding") == 0)
 	{
-#ifdef FEAT_OLE
+#నిర్వచితమైతే FEAT_OLE
 	    *argc = 1;
-#else
+#లేకపోతే
 	    ole_error("embedding");
 	    mch_exit(2);
-#endif
+#అయితే_ముగింపు
 	}
     }
 
-#ifdef FEAT_OLE
+#నిర్వచితమైతే FEAT_OLE
 # ifdef VIMDLL
-    if (mch_is_gui_executable())
+    ఒకవేళ (mch_is_gui_executable())
 # endif
     {
-	int	bDoRestart = FALSE;
+	పూర్ణాంకం	bDoRestart = FALSE;
 
 	InitOLE(&bDoRestart);
 	// automatically exit after registering
-	if (bDoRestart)
+	ఒకవేళ (bDoRestart)
 	    mch_exit(0);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     {
 	// stolen from gui_x11.c
-	int arg;
+	పూర్ణాంకం arg;
 
-	for (arg = 1; arg < *argc; arg++)
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	కొరకు (arg = 1; arg < *argc; arg++)
+	    ఒకవేళ (అక్షరశ్రేణి_పోలిక("-nb", argv[arg], 3) == 0)
 	    {
 		netbeansArg = argv[arg];
 		mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-		argv[*argc] = NULL;
-		break;	// enough?
+					    (--*argc - arg) * పరిమాణం(అక్షరం *));
+		argv[*argc] = ఖాళీ;
+		ఆపు;	// enough?
 	    }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-    static void
-load_dpi_func(void)
+    స్థిర శూన్య
+ఎక్కించు_dpi_func(శూన్య)
 {
     HMODULE	hUser32;
 
     hUser32 = GetModuleHandle("user32.dll");
-    if (hUser32 == NULL)
-	goto fail;
+    ఒకవేళ (hUser32 == ఖాళీ)
+	వెళ్ళు fail;
 
-    pGetDpiForSystem = (UINT (WINAPI *)(void))GetProcAddress(hUser32, "GetDpiForSystem");
-    pGetDpiForWindow = (UINT (WINAPI *)(HWND))GetProcAddress(hUser32, "GetDpiForWindow");
-    pGetSystemMetricsForDpi = (int (WINAPI *)(int, UINT))GetProcAddress(hUser32, "GetSystemMetricsForDpi");
+    pGetDpiForSystem = (UINT (WINAPI *)(శూన్య))Get_Proc_చిరునామా(hUser32, "GetDpiForSystem");
+    p_Get_Dpi_For_కిటికీ = (UINT (WINAPI *)(HWND))Get_Proc_చిరునామా(hUser32, "GetDpiForWindow");
+    pGetSystemMetricsForDpi = (పూర్ణాంకం (WINAPI *)(పూర్ణాంకం, UINT))Get_Proc_చిరునామా(hUser32, "GetSystemMetricsForDpi");
     //pGetWindowDpiAwarenessContext = (void*)GetProcAddress(hUser32, "GetWindowDpiAwarenessContext");
-    pSetThreadDpiAwarenessContext = (DPI_AWARENESS_CONTEXT (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
-#ifdef FEAT_MBYTE_IME
-    pGetAwarenessFromDpiAwarenessContext = (DPI_AWARENESS (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "GetAwarenessFromDpiAwarenessContext");
-#endif
+    p_సమితి_Thread_Dpi_Awareness_Context = (DPI_AWARENESS_CONTEXT (WINAPI *)(DPI_AWARENESS_CONTEXT))Get_Proc_చిరునామా(hUser32, "SetThreadDpiAwarenessContext");
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    pGetAwarenessFromDpiAwarenessContext = (DPI_AWARENESS (WINAPI *)(DPI_AWARENESS_CONTEXT))Get_Proc_చిరునామా(hUser32, "GetAwarenessFromDpiAwarenessContext");
+#అయితే_ముగింపు
 
-    if (pSetThreadDpiAwarenessContext != NULL)
+    ఒకవేళ (p_సమితి_Thread_Dpi_Awareness_Context != ఖాళీ)
     {
-	DPI_AWARENESS_CONTEXT oldctx = pSetThreadDpiAwarenessContext(
-		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-	if (oldctx != NULL)
+	DPI_AWARENESS_CONTEXT oldctx = p_సమితి_Thread_Dpi_Awareness_Context(
+		DPI_AWARENESS_CONTEXT_చొప్పున_MONITOR_AWARE_V2);
+	ఒకవేళ (oldctx != ఖాళీ)
 	{
 	    TRACE("DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 enabled");
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 	    s_process_dpi_aware = pGetAwarenessFromDpiAwarenessContext(oldctx);
 # ifdef DEBUG
-	    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	    ఒకవేళ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	    {
 		TRACE("WARNING: PerMonitorV2 is not enabled in the process level for some reasons. IME window may not shown correctly.");
 	    }
 # endif
-#endif
-	    return;
+#అయితే_ముగింపు
+	    తిరిగి;
 	}
     }
 
 fail:
     // Disable PerMonitorV2 APIs.
     pGetDpiForSystem = vimGetDpiForSystem;
-    pGetDpiForWindow = NULL;
+    p_Get_Dpi_For_కిటికీ = ఖాళీ;
     pGetSystemMetricsForDpi = stubGetSystemMetricsForDpi;
-    pSetThreadDpiAwarenessContext = NULL;
-#ifdef FEAT_MBYTE_IME
-    pGetAwarenessFromDpiAwarenessContext = NULL;
-#endif
+    p_సమితి_Thread_Dpi_Awareness_Context = ఖాళీ;
+#నిర్వచితమైతే FEAT_MBYTE_IME
+    pGetAwarenessFromDpiAwarenessContext = ఖాళీ;
+#అయితే_ముగింపు
 }
 
 /*
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
-gui_mch_init(void)
+    పూర్ణాంకం
+gui_mch_init(శూన్య)
 {
-    const WCHAR szVimWndClassW[] = VIM_CLASSW;
-    const WCHAR szTextAreaClassW[] = L"VimTextArea";
+    స్థిరరాశి WCHAR szVimWndClassW[] = VIM_CLASSW;
+    స్థిరరాశి WCHAR sz_పాఠ్యం_Area_Class_W[] = L"VimTextArea";
     WNDCLASSW wndclassw;
 
     // Return here if the window was already opened (happens when
     // gui_mch_dialog() is called early).
-    if (s_hwnd != NULL)
-	goto theend;
+    ఒకవేళ (s_hwnd != ఖాళీ)
+	వెళ్ళు theend;
 
     /*
      * Load the tearoff bitmap
      */
-#ifdef FEAT_TEAROFF
-    s_htearbitmap = LoadBitmap(g_hinst, "IDB_TEAROFF");
-#endif
+#నిర్వచితమైతే FEAT_TEAROFF
+    s_htearbitmap = ఎక్కించు_Bitmap(g_hinst, "IDB_TEAROFF");
+#అయితే_ముగింపు
 
-    load_dpi_func();
+    ఎక్కించు_dpi_func();
 
-#ifdef FEAT_GUI_DARKTHEME
-    dyn_uxtheme_load();
-#endif
+#నిర్వచితమైతే FEAT_GUI_DARKTHEME
+    dyn_uxtheme_ఎక్కించు();
+#అయితే_ముగింపు
 
-    dyn_dwm_load();
+    dyn_dwm_ఎక్కించు();
 
     s_dpi = pGetDpiForSystem();
-    update_scrollbar_size();
+    update_scrollbar_కొలత();
 
-#ifdef FEAT_MENU
-    gui.menu_height = 0;	// Windows takes care of this
-#endif
-    gui.border_width = 0;
-#ifdef FEAT_TOOLBAR
-    gui.toolbar_height = TOOLBAR_BUTTON_HEIGHT + TOOLBAR_BORDER_HEIGHT;
-#endif
+#నిర్వచితమైతే FEAT_MENU
+    gui.menu_ఎత్తు = 0;	// Windows takes care of this
+#అయితే_ముగింపు
+    gui.border_వెడల్పు = 0;
+#నిర్వచితమైతే FEAT_TOOLBAR
+    gui.toolbar_ఎత్తు = TOOLBAR_BUTTON_ఎత్తు + TOOLBAR_BORDER_ఎత్తు;
+#అయితే_ముగింపు
 
     s_brush = CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
 
     // First try using the wide version, so that we can use any title.
     // Otherwise only characters in the active codepage will work.
-    if (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
+    ఒకవేళ (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
     {
 	wndclassw.style = CS_DBLCLKS;
 	wndclassw.lpfnWndProc = _WndProc;
 	wndclassw.cbClsExtra = 0;
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
-	wndclassw.hIcon = LoadIcon(wndclassw.hInstance, "IDR_VIM");
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclassw.hIcon = ఎక్కించు_Icon(wndclassw.hInstance, "IDR_VIM");
+	wndclassw.hCursor = ఎక్కించు_Cursor(ఖాళీ, IDC_ARROW);
 	wndclassw.hbrBackground = s_brush;
-	wndclassw.lpszMenuName = NULL;
+	wndclassw.lpszMenuName = ఖాళీ;
 	wndclassw.lpszClassName = szVimWndClassW;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	ఒకవేళ (రిజిస్టరు_Class_W(&wndclassw) == 0)
+	    తిరిగి FAIL;
     }
 
-    if (vim_parent_hwnd != NULL)
+    ఒకవేళ (vim_మాతృ_hwnd != ఖాళీ)
     {
-#ifdef HAVE_TRY_EXCEPT
+#నిర్వచితమైతే HAVE_TRY_EXCEPT
 	__try
 	{
-#endif
+#అయితే_ముగింపు
 	    // Open inside the specified parent window.
 	    // TODO: last argument should point to a CLIENTCREATESTRUCT
 	    // structure.
-	    s_hwnd = CreateWindowExW(
+	    s_hwnd = Create_కిటికీ_Ex_W(
 		WS_EX_MDICHILD,
 		szVimWndClassW, L"Vim MSWindows GUI",
-		WS_OVERLAPPEDWINDOW | WS_CHILD
+		WS_OVERLAPPEDWINDOW | WS_బిడ్డ
 				 | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | 0xC000,
 		gui_win_x == -1 ? CW_USEDEFAULT : gui_win_x,
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		vim_parent_hwnd, NULL,
-		g_hinst, NULL);
-#ifdef HAVE_TRY_EXCEPT
+		vim_మాతృ_hwnd, ఖాళీ,
+		g_hinst, ఖాళీ);
+#నిర్వచితమైతే HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
 	    // NOP
 	}
-#endif
-	if (s_hwnd == NULL)
+#అయితే_ముగింపు
+	ఒకవేళ (s_hwnd == ఖాళీ)
 	{
-	    emsg(_(e_unable_to_open_window_inside_mdi_application));
+	    emsg(_(e_unable_గమ్యం_open_కిటికీ_inside_mdi_application));
 	    mch_exit(2);
 	}
     }
-    else
+    లేకపోతే
     {
 	// If the provided windowid is not valid reset it to zero, so that it
 	// is ignored and we open our own window.
-	if (IsWindow((HWND)win_socket_id) <= 0)
+	ఒకవేళ (Is_కిటికీ((HWND)win_socket_id) <= 0)
 	    win_socket_id = 0;
 
 	// Create a window.  If win_socket_id is not zero without border and
 	// titlebar, it will be reparented below.
-	s_hwnd = CreateWindowW(
+	s_hwnd = Create_కిటికీ_W(
 		szVimWndClassW, L"Vim MSWindows GUI",
 		(win_socket_id == 0 ? WS_OVERLAPPEDWINDOW : WS_POPUP)
 					  | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
@@ -5988,73 +5988,73 @@ gui_mch_init(void)
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		NULL, NULL,
-		g_hinst, NULL);
-	if (s_hwnd != NULL && win_socket_id != 0)
+		ఖాళీ, ఖాళీ,
+		g_hinst, ఖాళీ);
+	ఒకవేళ (s_hwnd != ఖాళీ && win_socket_id != 0)
 	{
-	    SetParent(s_hwnd, (HWND)win_socket_id);
-	    ShowWindow(s_hwnd, SW_SHOWMAXIMIZED);
+	    సమితి_మాతృ(s_hwnd, (HWND)win_socket_id);
+	    Show_కిటికీ(s_hwnd, SW_SHOWMAXIMIZED);
 	}
     }
 
-    if (s_hwnd == NULL)
-	return FAIL;
+    ఒకవేళ (s_hwnd == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (pGetDpiForWindow != NULL)
+    ఒకవేళ (p_Get_Dpi_For_కిటికీ != ఖాళీ)
     {
-	s_dpi = pGetDpiForWindow(s_hwnd);
-	update_scrollbar_size();
+	s_dpi = p_Get_Dpi_For_కిటికీ(s_hwnd);
+	update_scrollbar_కొలత();
 	//TRACE("System DPI: %d, DPI: %d", pGetDpiForSystem(), s_dpi);
     }
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
-    dyn_imm_load();
-#endif
+#ఒకవేళ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+    dyn_imm_ఎక్కించు();
+#అయితే_ముగింపు
 
     // Create the text area window
-    if (GetClassInfoW(g_hinst, szTextAreaClassW, &wndclassw) == 0)
+    ఒకవేళ (GetClassInfoW(g_hinst, sz_పాఠ్యం_Area_Class_W, &wndclassw) == 0)
     {
 	wndclassw.style = CS_OWNDC;
-	wndclassw.lpfnWndProc = _TextAreaWndProc;
+	wndclassw.lpfnWndProc = పాఠ్యం_Area_Wnd_Proc;
 	wndclassw.cbClsExtra = 0;
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
-	wndclassw.hIcon = NULL;
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclassw.hbrBackground = NULL;
-	wndclassw.lpszMenuName = NULL;
-	wndclassw.lpszClassName = szTextAreaClassW;
+	wndclassw.hIcon = ఖాళీ;
+	wndclassw.hCursor = ఎక్కించు_Cursor(ఖాళీ, IDC_ARROW);
+	wndclassw.hbrBackground = ఖాళీ;
+	wndclassw.lpszMenuName = ఖాళీ;
+	wndclassw.lpszClassName = sz_పాఠ్యం_Area_Class_W;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	ఒకవేళ (రిజిస్టరు_Class_W(&wndclassw) == 0)
+	    తిరిగి FAIL;
     }
 
-    s_textArea = CreateWindowExW(
+    s_పాఠ్యం_Area = Create_కిటికీ_Ex_W(
 	0,
-	szTextAreaClassW, L"Vim text area",
-	WS_CHILD | WS_VISIBLE, 0, 0,
+	sz_పాఠ్యం_Area_Class_W, L"Vim text area",
+	WS_బిడ్డ | WS_VISIBLE, 0, 0,
 	100,				// Any value will do for now
 	100,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, ఖాళీ,
+	g_hinst, ఖాళీ);
 
-    if (s_textArea == NULL)
-	return FAIL;
+    ఒకవేళ (s_పాఠ్యం_Area == ఖాళీ)
+	తిరిగి FAIL;
 
-#ifdef FEAT_LIBCALL
+#నిర్వచితమైతే FEAT_LIBCALL
     // Try loading an icon from $RUNTIMEPATH/bitmaps/vim.ico.
     {
-	HANDLE	hIcon = NULL;
+	HANDLE	hIcon = ఖాళీ;
 
-	if (mch_icon_load(&hIcon) == OK && hIcon != NULL)
-	    SendMessage(s_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+	ఒకవేళ (mch_icon_ఎక్కించు(&hIcon) == OK && hIcon != ఖాళీ)
+	    Send_సందేశం(s_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
     s_menuBar = CreateMenu();
-#endif
-    s_hdc = GetDC(s_textArea);
+#అయితే_ముగింపు
+    s_hdc = GetDC(s_పాఠ్యం_Area);
 
     DragAcceptFiles(s_hwnd, TRUE);
 
@@ -6066,7 +6066,7 @@ gui_mch_init(void)
 
     // Get the colors from the "Normal" group (set in syntax.c or in a vimrc
     // file)
-    set_normal_colors();
+    సమితి_సాధారణ_colors();
 
     /*
      * Check that none of the colors are the same as the background color.
@@ -6074,7 +6074,7 @@ gui_mch_init(void)
      */
     gui_check_colors();
     gui.def_norm_pixel = gui.norm_pixel;
-    gui.def_back_pixel = gui.back_pixel;
+    gui.def_వెనుక_pixel = gui.వెనుక_pixel;
 
     // Get the colors for the highlight groups (gui_check_colors() might have
     // changed them)
@@ -6083,7 +6083,7 @@ gui_mch_init(void)
     /*
      * Start out by adding the configured border width into the border offset.
      */
-    gui.border_offset = gui.border_width;
+    gui.border_స్థానభ్రంశం = gui.border_వెడల్పు;
 
     /*
      * Set up for Intellimouse processing
@@ -6094,70 +6094,70 @@ gui_mch_init(void)
      * compute a couple of metrics used for the dialogs
      */
     get_dialog_font_metrics();
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
     /*
      * Create the toolbar
      */
     initialise_toolbar();
-#endif
-#ifdef FEAT_GUI_TABLINE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
     /*
      * Create the tabline
      */
     initialise_tabline();
-#endif
-#ifdef MSWIN_FIND_REPLACE
+#అయితే_ముగింపు
+#నిర్వచితమైతే MSWIN_కనుగొను_REPLACE
     /*
      * Initialise the dialog box stuff
      */
-    s_findrep_msg = RegisterWindowMessage(FINDMSGSTRING);
+    s_findrep_సందేశం = రిజిస్టరు_కిటికీ_సందేశం(FINDMSGSTRING);
 
     // Initialise the struct
-    s_findrep_struct.lStructSize = sizeof(s_findrep_struct);
-    s_findrep_struct.lpstrFindWhat = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
-    s_findrep_struct.lpstrFindWhat[0] = NUL;
+    s_findrep_struct.l_Struct_కొలత = పరిమాణం(s_findrep_struct);
+    s_findrep_struct.lpstr_కనుగొను_What = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
+    s_findrep_struct.lpstr_కనుగొను_What[0] = NUL;
     s_findrep_struct.lpstrReplaceWith = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
     s_findrep_struct.lpstrReplaceWith[0] = NUL;
-    s_findrep_struct.wFindWhatLen = MSWIN_FR_BUFSIZE;
+    s_findrep_struct.w_కనుగొను_What_Len = MSWIN_FR_BUFSIZE;
     s_findrep_struct.wReplaceWithLen = MSWIN_FR_BUFSIZE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // set the v:windowid variable
-    set_vim_var_nr(VV_WINDOWID, HandleToLong(s_hwnd));
-#endif
+    సమితి_vim_var_nr(VV_WINDOWID, Handle_గమ్యం_Long(s_hwnd));
+#అయితే_ముగింపు
 
-#ifdef FEAT_RENDER_OPTIONS
-    if (p_rop)
-	(void)gui_mch_set_rendering_options(p_rop);
-#endif
+#నిర్వచితమైతే FEAT_RENDER_OPTIONS
+    ఒకవేళ (p_rop)
+	(శూన్య)gui_mch_సమితి_rendering_options(p_rop);
+#అయితే_ముగింపు
 
 theend:
     // Display any pending error messages
     display_errors();
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Get the size of the screen, taking position on multiple monitors into
  * account (if supported).
  */
-    static void
+    స్థిర శూన్య
 get_work_area(RECT *spi_rect)
 {
     HMONITOR	    mon;
     MONITORINFO	    moninfo;
 
     // work out which monitor the window is on, and get *its* work area
-    mon = MonitorFromWindow(s_hwnd, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL)
+    mon = Monitor_From_కిటికీ(s_hwnd, MONITOR_DEFAULTTOPRIMARY);
+    ఒకవేళ (mon != ఖాళీ)
     {
-	moninfo.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(mon, &moninfo))
+	moninfo.cb_కొలత = పరిమాణం(MONITORINFO);
+	ఒకవేళ (GetMonitorInfo(mon, &moninfo))
 	{
 	    *spi_rect = moninfo.rcWork;
-	    return;
+	    తిరిగి;
 	}
     }
     // this is the old method...
@@ -6167,19 +6167,19 @@ get_work_area(RECT *spi_rect)
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-    void
-gui_mch_set_shellsize(
-	int width,
-	int height,
-	int min_width UNUSED,
-	int min_height UNUSED,
-	int base_width UNUSED,
-	int base_height UNUSED,
-	int direction)
+    శూన్య
+gui_mch_సమితి_shellsize(
+	పూర్ణాంకం వెడల్పు,
+	పూర్ణాంకం ఎత్తు,
+	పూర్ణాంకం min_వెడల్పు వాడని,
+	పూర్ణాంకం min_ఎత్తు వాడని,
+	పూర్ణాంకం పునాది_వెడల్పు వాడని,
+	పూర్ణాంకం పునాది_ఎత్తు వాడని,
+	పూర్ణాంకం direction)
 {
     RECT	workarea_rect;
-    RECT	window_rect;
-    int		win_width, win_height;
+    RECT	కిటికీ_rect;
+    పూర్ణాంకం		win_వెడల్పు, win_ఎత్తు;
 
     // Try to keep window completely on screen.
     // Get position of the screen work area.  This is the part that is not
@@ -6189,105 +6189,105 @@ gui_mch_set_shellsize(
     // Resizing a maximized window looks very strange, unzoom it first.
     // But don't do it when still starting up, it may have been requested in
     // the shortcut.
-    if (IsZoomed(s_hwnd) && starting == 0)
-	ShowWindow(s_hwnd, SW_SHOWNORMAL);
+    ఒకవేళ (IsZoomed(s_hwnd) && starting == 0)
+	Show_కిటికీ(s_hwnd, SW_SHOWNORMAL);
 
-    if (s_in_dpichanged)
+    ఒకవేళ (s_లోపల_dpichanged)
 	// Use the suggested position when in WM_DPICHANGED.
-	window_rect = s_suggested_rect;
-    else
+	కిటికీ_rect = s_suggested_rect;
+    లేకపోతే
 	// Use current position.
-	GetWindowRect(s_hwnd, &window_rect);
+	Get_కిటికీ_Rect(s_hwnd, &కిటికీ_rect);
 
     // compute the size of the outside of the window
-    win_width = width + (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
+    win_వెడల్పు = వెడల్పు + (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 		     pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2;
-    win_height = height + (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
+    win_ఎత్తు = ఎత్తు + (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 		       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 			+ pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
-			+ gui_mswin_get_menu_height(FALSE);
+			+ gui_mswin_get_menu_ఎత్తు(FALSE);
 
     // The following should take care of keeping Vim on the same monitor, no
     // matter if the secondary monitor is left or right of the primary
     // monitor.
-    window_rect.right = window_rect.left + win_width;
-    window_rect.bottom = window_rect.top + win_height;
+    కిటికీ_rect.కుడి_2 = కిటికీ_rect.ఎడమ_2 + win_వెడల్పు;
+    కిటికీ_rect.bottom = కిటికీ_rect.శిఖరం + win_ఎత్తు;
 
     // If the window is going off the screen, move it on to the screen.
     // Don't adjust the position when in WM_DPICHANGED.
-    if (!s_in_dpichanged)
+    ఒకవేళ (!s_లోపల_dpichanged)
     {
-	if ((direction & RESIZE_HOR)
-		&& window_rect.right > workarea_rect.right)
-	    OffsetRect(&window_rect,
-		    workarea_rect.right - window_rect.right, 0);
+	ఒకవేళ ((direction & RESIZE_HOR)
+		&& కిటికీ_rect.కుడి_2 > workarea_rect.కుడి_2)
+	    స్థానభ్రంశం_Rect(&కిటికీ_rect,
+		    workarea_rect.కుడి_2 - కిటికీ_rect.కుడి_2, 0);
 
-	if ((direction & RESIZE_HOR)
-		&& window_rect.left < workarea_rect.left)
-	    OffsetRect(&window_rect,
-		    workarea_rect.left - window_rect.left, 0);
+	ఒకవేళ ((direction & RESIZE_HOR)
+		&& కిటికీ_rect.ఎడమ_2 < workarea_rect.ఎడమ_2)
+	    స్థానభ్రంశం_Rect(&కిటికీ_rect,
+		    workarea_rect.ఎడమ_2 - కిటికీ_rect.ఎడమ_2, 0);
 
-	if ((direction & RESIZE_VERT)
-		&& window_rect.bottom > workarea_rect.bottom)
-	    OffsetRect(&window_rect,
-		    0, workarea_rect.bottom - window_rect.bottom);
+	ఒకవేళ ((direction & RESIZE_VERT)
+		&& కిటికీ_rect.bottom > workarea_rect.bottom)
+	    స్థానభ్రంశం_Rect(&కిటికీ_rect,
+		    0, workarea_rect.bottom - కిటికీ_rect.bottom);
 
-	if ((direction & RESIZE_VERT)
-		&& window_rect.top < workarea_rect.top)
-	    OffsetRect(&window_rect,
-		    0, workarea_rect.top - window_rect.top);
+	ఒకవేళ ((direction & RESIZE_VERT)
+		&& కిటికీ_rect.శిఖరం < workarea_rect.శిఖరం)
+	    స్థానభ్రంశం_Rect(&కిటికీ_rect,
+		    0, workarea_rect.శిఖరం - కిటికీ_rect.శిఖరం);
     }
 
-    MoveWindow(s_hwnd, window_rect.left, window_rect.top,
-						win_width, win_height, TRUE);
+    Move_కిటికీ(s_hwnd, కిటికీ_rect.ఎడమ_2, కిటికీ_rect.శిఖరం,
+						win_వెడల్పు, win_ఎత్తు, TRUE);
 
     //TRACE("New pos: %d,%d  New size: %d,%d",
     //	    window_rect.left, window_rect.top, win_width, win_height);
 
-    SetActiveWindow(s_hwnd);
-    SetFocus(s_hwnd);
+    సమితి_చురుకైన_కిటికీ(s_hwnd);
+    సమితి_Focus(s_hwnd);
 
     // Menu may wrap differently now
-    gui_mswin_get_menu_height(!gui.starting);
+    gui_mswin_get_menu_ఎత్తు(!gui.starting);
 }
 
 
-    void
-gui_mch_set_scrollbar_thumb(
+    శూన్య
+gui_mch_సమితి_scrollbar_thumb(
     scrollbar_T *sb,
-    long	val,
-    long	size,
-    long	max)
+    దీర్ఘ	val,
+    దీర్ఘ	కొలత,
+    దీర్ఘ	max)
 {
     SCROLLINFO	info;
 
-    sb->scroll_shift = 0;
-    while (max > 32767)
+    sb->scroll_జరుపు = 0;
+    అయితే (max > 32767)
     {
 	max = (max + 1) >> 1;
 	val  >>= 1;
-	size >>= 1;
-	++sb->scroll_shift;
+	కొలత >>= 1;
+	++sb->scroll_జరుపు;
     }
 
-    if (sb->scroll_shift > 0)
-	++size;
+    ఒకవేళ (sb->scroll_జరుపు > 0)
+	++కొలత;
 
-    info.cbSize = sizeof(info);
-    info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+    info.cb_కొలత = పరిమాణం(info);
+    info.f_ముసుగు = SIF_POS | SIF_RANGE | SIF_పుట;
     info.nPos = val;
     info.nMin = 0;
     info.nMax = max;
-    info.nPage = size;
-    SetScrollInfo(sb->id, SB_CTL, &info, TRUE);
+    info.n_పుట = కొలత;
+    సమితి_Scroll_Info(sb->id, SB_CTL, &info, TRUE);
 }
 
 
 /*
  * Set the current text font.
  */
-    void
-gui_mch_set_font(GuiFont font)
+    శూన్య
+gui_mch_సమితి_font(GuiFont font)
 {
     gui.currFont = font;
 }
@@ -6296,8 +6296,8 @@ gui_mch_set_font(GuiFont font)
 /*
  * Set the current text foreground color.
  */
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_fg_color(guicolor_T color)
 {
     gui.currFgColor = color;
 }
@@ -6305,8 +6305,8 @@ gui_mch_set_fg_color(guicolor_T color)
 /*
  * Set the current text background color.
  */
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_bg_color(guicolor_T color)
 {
     gui.currBgColor = color;
 }
@@ -6314,13 +6314,13 @@ gui_mch_set_bg_color(guicolor_T color)
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    శూన్య
+gui_mch_సమితి_sp_color(guicolor_T color)
 {
     gui.currSpColor = color;
 }
 
-#ifdef FEAT_MBYTE_IME
+#నిర్వచితమైతే FEAT_MBYTE_IME
 /*
  * Multi-byte handling, originally by Sung-Hoon Baek.
  * First static functions (no prototypes generated).
@@ -6333,77 +6333,77 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * handle WM_IME_NOTIFY message
  */
-    static LRESULT
-_OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
+    స్థిర LRESULT
+_OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dw_దత్తాంశం వాడని)
 {
-    LRESULT lResult = 0;
+    LRESULT l_ఫలితం = 0;
     HIMC hImc;
 
-    if (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
-	return lResult;
-    switch (dwCommand)
+    ఒకవేళ (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
+	తిరిగి l_ఫలితం;
+    ఎంపిక (dwCommand)
     {
-	case IMN_SETOPENSTATUS:
-	    if (pImmGetOpenStatus(hImc))
+	స్థితి IMN_SETOPENSTATUS:
+	    ఒకవేళ (p_Imm_Get_Open_స్థితి(hImc))
 	    {
 		LOGFONTW lf = norm_logfont;
-		if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+		ఒకవేళ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 		    // Work around when PerMonitorV2 is not enabled in the process level.
-		    lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
-		pImmSetCompositionFontW(hImc, &lf);
-		im_set_position(gui.row, gui.col);
+		    lf.lf_ఎత్తు = lf.lf_ఎత్తు * DEFAULT_DPI / s_dpi;
+		p_Imm_సమితి_Composition_Font_W(hImc, &lf);
+		im_సమితి_position(gui.అడ్డువరుస, gui.నిలువు);
 
 		// Disable langmap
-		State &= ~MODE_LANGMAP;
-		if (State & MODE_INSERT)
+		State &= ~బహుళకం_LANGMAP;
+		ఒకవేళ (State & బహుళకం_చొప్పించు)
 		{
-# if defined(FEAT_KEYMAP)
+# ఒకవేళ defined(FEAT_KEYMAP)
 		    // Unshown 'keymap' in status lines
-		    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+		    ఒకవేళ (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		    {
 			// Save cursor position
-			int old_row = gui.row;
-			int old_col = gui.col;
+			పూర్ణాంకం old_అడ్డువరుస = gui.అడ్డువరుస;
+			పూర్ణాంకం old_నిలువు = gui.నిలువు;
 
 			// This must be called here before
 			// status_redraw_curbuf(), otherwise the mode
 			// message may appear in the wrong position.
 			showmode();
-			status_redraw_curbuf();
+			స్థితి_redraw_curbuf();
 			update_screen(0);
 			// Restore cursor position
-			gui.row = old_row;
-			gui.col = old_col;
+			gui.అడ్డువరుస = old_అడ్డువరుస;
+			gui.నిలువు = old_నిలువు;
 		    }
 # endif
 		}
 	    }
 	    gui_update_cursor(TRUE, FALSE);
 	    gui_mch_flush();
-	    lResult = 0;
-	    break;
+	    l_ఫలితం = 0;
+	    ఆపు;
     }
     pImmReleaseContext(hWnd, hImc);
-    return lResult;
+    తిరిగి l_ఫలితం;
 }
 
-    static LRESULT
-_OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
+    స్థిర LRESULT
+_OnImeComposition(HWND hwnd, WPARAM dbcs వాడని, LPARAM param)
 {
     char_u	*ret;
-    int		len;
+    పూర్ణాంకం		len;
 
-    if ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
-	return 0;
+    ఒకవేళ ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
+	తిరిగి 0;
 
-    ret = GetResultStr(hwnd, GCS_RESULTSTR, &len);
-    if (ret != NULL)
+    ret = Get_ఫలితం_Str(hwnd, GCS_RESULTSTR, &len);
+    ఒకవేళ (ret != ఖాళీ)
     {
-	add_to_input_buf_csi(ret, len);
+	కూడు_గమ్యం_ఆదానం_buf_csi(ret, len);
 	vim_free(ret);
-	return 1;
+	తిరిగి 1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -6412,52 +6412,52 @@ _OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
  * This handles WM_IME_COMPOSITION with GCS_RESULTSTR flag on.
  * get complete composition string
  */
-    static char_u *
-GetResultStr(HWND hwnd, int GCS, int *lenp)
+    స్థిర char_u *
+Get_ఫలితం_Str(HWND hwnd, పూర్ణాంకం GCS, పూర్ణాంకం *lenp)
 {
     HIMC	hIMC;		// Input context handle.
     LONG	ret;
-    WCHAR	*buf = NULL;
-    char_u	*convbuf = NULL;
+    WCHAR	*buf = ఖాళీ;
+    char_u	*convbuf = ఖాళీ;
 
-    if (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
-	return NULL;
+    ఒకవేళ (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
+	తిరిగి ఖాళీ;
 
     // Get the length of the composition string.
-    ret = pImmGetCompositionStringW(hIMC, GCS, NULL, 0);
-    if (ret <= 0)
-	return NULL;
+    ret = pImmGetCompositionStringW(hIMC, GCS, ఖాళీ, 0);
+    ఒకవేళ (ret <= 0)
+	తిరిగి ఖాళీ;
 
     // Allocate the requested buffer plus space for the NUL character.
-    buf = alloc(ret + sizeof(WCHAR));
-    if (buf == NULL)
-	return NULL;
+    buf = alloc(ret + పరిమాణం(WCHAR));
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Reads in the composition string.
     pImmGetCompositionStringW(hIMC, GCS, buf, ret);
-    *lenp = ret / sizeof(WCHAR);
+    *lenp = ret / పరిమాణం(WCHAR);
 
-    convbuf = utf16_to_enc(buf, lenp);
+    convbuf = utf16_గమ్యం_enc(buf, lenp);
     pImmReleaseContext(hwnd, hIMC);
     vim_free(buf);
-    return convbuf;
+    తిరిగి convbuf;
 }
-#endif
+#అయితే_ముగింపు
 
 // For global functions we need prototypes.
-#if defined(FEAT_MBYTE_IME)
+#ఒకవేళ defined(FEAT_MBYTE_IME)
 
 /*
  * set font to IM.
  */
-    void
-im_set_font(LOGFONTW *lf)
+    శూన్య
+im_సమితి_font(LOGFONTW *lf)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ఒకవేళ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
-	pImmSetCompositionFontW(hImc, lf);
+	p_Imm_సమితి_Composition_Font_W(hImc, lf);
 	pImmReleaseContext(s_hwnd, hImc);
     }
 }
@@ -6465,26 +6465,26 @@ im_set_font(LOGFONTW *lf)
 /*
  * Notify cursor position to IM.
  */
-    void
-im_set_position(int row, int col)
+    శూన్య
+im_సమితి_position(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ఒకవేళ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	COMPOSITIONFORM	cfs;
 
-	cfs.dwStyle = CFS_POINT;
-	cfs.ptCurrentPos.x = FILL_X(col);
-	cfs.ptCurrentPos.y = FILL_Y(row);
-	MapWindowPoints(s_textArea, s_hwnd, &cfs.ptCurrentPos, 1);
-	if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	cfs.dwStyle = CFS_బిందువు;
+	cfs.ptCurrentPos.x = FILL_X(నిలువు);
+	cfs.ptCurrentPos.y = FILL_Y(అడ్డువరుస);
+	Map_కిటికీ_Points(s_పాఠ్యం_Area, s_hwnd, &cfs.ptCurrentPos, 1);
+	ఒకవేళ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	{
 	    // Work around when PerMonitorV2 is not enabled in the process level.
 	    cfs.ptCurrentPos.x = cfs.ptCurrentPos.x * DEFAULT_DPI / s_dpi;
 	    cfs.ptCurrentPos.y = cfs.ptCurrentPos.y * DEFAULT_DPI / s_dpi;
 	}
-	pImmSetCompositionWindow(hImc, &cfs);
+	p_Imm_సమితి_Composition_కిటికీ(hImc, &cfs);
 
 	pImmReleaseContext(s_hwnd, hImc);
     }
@@ -6493,69 +6493,69 @@ im_set_position(int row, int col)
 /*
  * Set IM status on ("active" is TRUE) or off ("active" is FALSE).
  */
-    void
-im_set_active(int active)
+    శూన్య
+im_సమితి_చురుకైన(పూర్ణాంకం చురుకైన)
 {
     HIMC	hImc;
-    static HIMC	hImcOld = (HIMC)0;
+    స్థిర HIMC	hImcOld = (HIMC)0;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
+    ఒకవేళ (!gui.లోపల_use && !gui.starting)
     {
-	mbyte_im_set_active(active);
-	return;
+	mbyte_im_సమితి_చురుకైన(చురుకైన);
+	తిరిగి;
     }
 # endif
 
-    if (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
-	return;
+    ఒకవేళ (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
+	తిరిగి;
 
-    if (p_imdisable)
+    ఒకవేళ (p_imdisable)
     {
-	if (hImcOld == (HIMC)0)
+	ఒకవేళ (hImcOld == (HIMC)0)
 	{
 	    hImcOld = pImmGetContext(s_hwnd);
-	    if (hImcOld)
+	    ఒకవేళ (hImcOld)
 		pImmAssociateContext(s_hwnd, (HIMC)0);
 	}
-	active = FALSE;
+	చురుకైన = FALSE;
     }
-    else if (hImcOld != (HIMC)0)
+    లేకపోతే ఒకవేళ (hImcOld != (HIMC)0)
     {
 	pImmAssociateContext(s_hwnd, hImcOld);
 	hImcOld = (HIMC)0;
     }
 
     hImc = pImmGetContext(s_hwnd);
-    if (!hImc)
-	return;
+    ఒకవేళ (!hImc)
+	తిరిగి;
 
     /*
      * for Korean ime
      */
     HKL hKL = GetKeyboardLayout(0);
 
-    if (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
+    ఒకవేళ (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
     {
-	static DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
-	static BOOL bSaved = FALSE;
+	స్థిర DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
+	స్థిర BOOL bSaved = FALSE;
 
-	if (active)
+	ఒకవేళ (చురుకైన)
 	{
 	    // if we have a saved conversion status, restore it
-	    if (bSaved)
-		pImmSetConversionStatus(hImc, dwConversionSaved,
+	    ఒకవేళ (bSaved)
+		p_Imm_సమితి_Conversion_స్థితి(hImc, dwConversionSaved,
 			dwSentenceSaved);
 	    bSaved = FALSE;
 	}
-	else
+	లేకపోతే
 	{
 	    // save conversion status and disable korean
-	    if (pImmGetConversionStatus(hImc, &dwConversionSaved,
+	    ఒకవేళ (p_Imm_Get_Conversion_స్థితి(hImc, &dwConversionSaved,
 			&dwSentenceSaved))
 	    {
 		bSaved = TRUE;
-		pImmSetConversionStatus(hImc,
+		p_Imm_సమితి_Conversion_స్థితి(hImc,
 			dwConversionSaved & ~(IME_CMODE_NATIVE
 			    | IME_CMODE_FULLSHAPE),
 			dwSentenceSaved);
@@ -6563,62 +6563,62 @@ im_set_active(int active)
 	}
     }
 
-    pImmSetOpenStatus(hImc, active);
+    p_Imm_సమితి_Open_స్థితి(hImc, చురుకైన);
     pImmReleaseContext(s_hwnd, hImc);
 }
 
 /*
  * Get IM status.  When IM is on, return not 0.  Else return 0.
  */
-    int
-im_get_status(void)
+    పూర్ణాంకం
+im_get_స్థితి(శూన్య)
 {
-    int		status = 0;
+    పూర్ణాంకం		స్థితి_2 = 0;
     HIMC	hImc;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
-	return mbyte_im_get_status();
+    ఒకవేళ (!gui.లోపల_use && !gui.starting)
+	తిరిగి mbyte_im_get_స్థితి();
 # endif
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ఒకవేళ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
-	status = pImmGetOpenStatus(hImc) ? 1 : 0;
+	స్థితి_2 = p_Imm_Get_Open_స్థితి(hImc) ? 1 : 0;
 	pImmReleaseContext(s_hwnd, hImc);
     }
-    return status;
+    తిరిగి స్థితి_2;
 }
 
-#endif // FEAT_MBYTE_IME
+#అయితే_ముగింపు // FEAT_MBYTE_IME
 
 
 /*
  * Convert latin9 text "text[len]" to ucs-2 in "unicodebuf".
  */
-    static void
-latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
+    స్థిర శూన్య
+latin9_గమ్యం_ucs(char_u *పాఠ్యం, పూర్ణాంకం len, WCHAR *unicodebuf)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
-    while (--len >= 0)
+    అయితే (--len >= 0)
     {
-	c = *text++;
-	switch (c)
+	c = *పాఠ్యం++;
+	ఎంపిక (c)
 	{
-	    case 0xa4: c = 0x20ac; break;   // euro
-	    case 0xa6: c = 0x0160; break;   // S hat
-	    case 0xa8: c = 0x0161; break;   // S -hat
-	    case 0xb4: c = 0x017d; break;   // Z hat
-	    case 0xb8: c = 0x017e; break;   // Z -hat
-	    case 0xbc: c = 0x0152; break;   // OE
-	    case 0xbd: c = 0x0153; break;   // oe
-	    case 0xbe: c = 0x0178; break;   // Y
+	    స్థితి 0xa4: c = 0x20ac; ఆపు;   // euro
+	    స్థితి 0xa6: c = 0x0160; ఆపు;   // S hat
+	    స్థితి 0xa8: c = 0x0161; ఆపు;   // S -hat
+	    స్థితి 0xb4: c = 0x017d; ఆపు;   // Z hat
+	    స్థితి 0xb8: c = 0x017e; ఆపు;   // Z -hat
+	    స్థితి 0xbc: c = 0x0152; ఆపు;   // OE
+	    స్థితి 0xbd: c = 0x0153; ఆపు;   // oe
+	    స్థితి 0xbe: c = 0x0178; ఆపు;   // Y
 	}
 	*unicodebuf++ = c;
     }
 }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 /*
  * What is this for?  In the case where you are using Win98 or Win2K or later,
  * and you are using a Hebrew font (or Arabic!), Windows does you a favor and
@@ -6631,102 +6631,102 @@ latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
  * 'rightleft' mode.  It makes display take *slightly* longer, but not
  * noticeably so.
  */
-    static void
-RevOut( HDC hdc,
-	int col,
-	int row,
+    స్థిర శూన్య
+Rev_బహిర్గతం( HDC hdc,
+	పూర్ణాంకం నిలువు,
+	పూర్ణాంకం అడ్డువరుస,
 	UINT foptions,
 	CONST RECT *pcliprect,
-	LPCTSTR text,
+	LPCTSTR పాఠ్యం,
 	UINT len,
 	CONST INT *padding)
 {
-    int		ix;
+    పూర్ణాంకం		ix;
 
-    for (ix = 0; ix < (int)len; ++ix)
-	ExtTextOut(hdc, col + TEXT_X(ix), row, foptions,
-					pcliprect, text + ix, 1, padding);
+    కొరకు (ix = 0; ix < (పూర్ణాంకం)len; ++ix)
+	Ext_పాఠ్యం_బహిర్గతం(hdc, నిలువు + పాఠ్యం_X(ix), అడ్డువరుస, foptions,
+					pcliprect, పాఠ్యం + ix, 1, padding);
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-draw_line(
-    int		x1,
-    int		y1,
-    int		x2,
-    int		y2,
+    స్థిర శూన్య
+draw_పంక్తి(
+    పూర్ణాంకం		x1,
+    పూర్ణాంకం		y1,
+    పూర్ణాంకం		x2,
+    పూర్ణాంకం		y2,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
-	DWriteContext_DrawLine(s_dwc, x1, y1, x2, y2, color);
-    else
-#endif
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
+	DWrite_Context_Draw_పంక్తి(s_dwc, x1, y1, x2, y2, color);
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	HPEN	hpen = CreatePen(PS_SOLID, 1, color);
 	HPEN	old_pen = SelectObject(s_hdc, hpen);
-	MoveToEx(s_hdc, x1, y1, NULL);
+	Move_గమ్యం_Ex(s_hdc, x1, y1, ఖాళీ);
 	// Note: LineTo() excludes the last pixel in the line.
-	LineTo(s_hdc, x2, y2);
+	పంక్తి_గమ్యం(s_hdc, x2, y2);
 	DeleteObject(SelectObject(s_hdc, old_pen));
     }
 }
 
-    static void
-set_pixel(
-    int		x,
-    int		y,
+    స్థిర శూన్య
+సమితి_pixel(
+    పూర్ణాంకం		x,
+    పూర్ణాంకం		y,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
-	DWriteContext_SetPixel(s_dwc, x, y, color);
-    else
-#endif
-	SetPixel(s_hdc, x, y, color);
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
+	DWrite_Context_సమితి_Pixel(s_dwc, x, y, color);
+    లేకపోతే
+#అయితే_ముగింపు
+	సమితి_Pixel(s_hdc, x, y, color);
 }
 
-    static void
+    స్థిర శూన్య
 fill_rect(
-    const RECT	*rcp,
+    స్థిరరాశి RECT	*rcp,
     HBRUSH	hbr,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_FillRect(s_dwc, rcp, color);
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	HBRUSH	hbr2;
 
-	if (hbr == NULL)
+	ఒకవేళ (hbr == ఖాళీ)
 	    hbr2 = CreateSolidBrush(color);
-	else
+	లేకపోతే
 	    hbr2 = hbr;
 	FillRect(s_hdc, rcp, hbr2);
-	if (hbr == NULL)
+	ఒకవేళ (hbr == ఖాళీ)
 	    DeleteBrush(hbr2);
     }
 }
 
-    void
+    శూన్య
 gui_mch_draw_string(
-    int		row,
-    int		col,
-    char_u	*text,
-    int		len,
-    int		flags)
+    పూర్ణాంకం		అడ్డువరుస,
+    పూర్ణాంకం		నిలువు,
+    char_u	*పాఠ్యం,
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		flags)
 {
-    static int	*padding = NULL;
-    static int	pad_size = 0;
-    const RECT	*pcliprect = NULL;
+    స్థిర పూర్ణాంకం	*padding = ఖాళీ;
+    స్థిర పూర్ణాంకం	pad_కొలత = 0;
+    స్థిరరాశి RECT	*pcliprect = ఖాళీ;
     UINT	foptions = 0;
-    static WCHAR *unicodebuf = NULL;
-    static int   *unicodepdy = NULL;
-    static int	unibuflen = 0;
-    int		n = 0;
-    int		y;
+    స్థిర WCHAR *unicodebuf = ఖాళీ;
+    స్థిర పూర్ణాంకం   *unicodepdy = ఖాళీ;
+    స్థిర పూర్ణాంకం	unibuflen = 0;
+    పూర్ణాంకం		n = 0;
+    పూర్ణాంకం		y;
 
     /*
      * Italic and bold text seems to have an extra row of pixels at the bottom
@@ -6741,44 +6741,44 @@ gui_mch_draw_string(
      * pixels.	We still need this code because otherwise the top row of pixels
      * becomes a problem. - webb.
      */
-    static HBRUSH	hbr_cache[2] = {NULL, NULL};
-    static guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
-    static int		brush_lru = 0;
+    స్థిర HBRUSH	hbr_cache[2] = {ఖాళీ, ఖాళీ};
+    స్థిర guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
+    స్థిర పూర్ణాంకం		brush_lru = 0;
     HBRUSH		hbr;
     RECT		rc;
 
-    if (!(flags & DRAW_TRANSP))
+    ఒకవేళ (!(flags & DRAW_TRANSP))
     {
 	/*
 	 * Clear background first.
 	 * Note: FillRect() excludes right and bottom of rectangle.
 	 */
-	rc.left = FILL_X(col);
-	rc.top = FILL_Y(row);
-	if (has_mbyte)
+	rc.ఎడమ_2 = FILL_X(నిలువు);
+	rc.శిఖరం = FILL_Y(అడ్డువరుస);
+	ఒకవేళ (has_mbyte)
 	{
 	    // Compute the length in display cells.
-	    rc.right = FILL_X(col + mb_string2cells(text, len));
+	    rc.కుడి_2 = FILL_X(నిలువు + mb_string2cells(పాఠ్యం, len));
 	}
-	else
-	    rc.right = FILL_X(col + len);
-	rc.bottom = FILL_Y(row + 1);
+	లేకపోతే
+	    rc.కుడి_2 = FILL_X(నిలువు + len);
+	rc.bottom = FILL_Y(అడ్డువరుస + 1);
 
 	// Cache the created brush, that saves a lot of time.  We need two:
 	// one for cursor background and one for the normal background.
-	if (gui.currBgColor == brush_color[0])
+	ఒకవేళ (gui.currBgColor == brush_color[0])
 	{
 	    hbr = hbr_cache[0];
 	    brush_lru = 1;
 	}
-	else if (gui.currBgColor == brush_color[1])
+	లేకపోతే ఒకవేళ (gui.currBgColor == brush_color[1])
 	{
 	    hbr = hbr_cache[1];
 	    brush_lru = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    if (hbr_cache[brush_lru] != NULL)
+	    ఒకవేళ (hbr_cache[brush_lru] != ఖాళీ)
 		DeleteBrush(hbr_cache[brush_lru]);
 	    hbr_cache[brush_lru] = CreateSolidBrush(gui.currBgColor);
 	    brush_color[brush_lru] = gui.currBgColor;
@@ -6788,49 +6788,49 @@ gui_mch_draw_string(
 
 	fill_rect(&rc, hbr, gui.currBgColor);
 
-	SetBkMode(s_hdc, TRANSPARENT);
+	సమితి_Bk_బహుళకం(s_hdc, TRANSPARENT);
 
 	/*
 	 * When drawing block cursor, prevent inverted character spilling
 	 * over character cell (can happen with bold/italic)
 	 */
-	if (flags & DRAW_CURSOR)
+	ఒకవేళ (flags & DRAW_CURSOR)
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
 	}
-#ifdef FEAT_DIRECTX
+#నిర్వచితమైతే FEAT_DIRECTX
 	// DirectWrite anti-aliasing can extend glyph pixels beyond cell
 	// boundaries, leaving artifacts when adjacent cells are not
 	// redrawn.  Clip to the cell rect to prevent this.
-	else if (IS_ENABLE_DIRECTX())
+	లేకపోతే ఒకవేళ (IS_ENABLE_DIRECTX())
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
 	}
-#endif
+#అయితే_ముగింపు
     }
-    SetTextColor(s_hdc, gui.currFgColor);
+    సమితి_పాఠ్యం_Color(s_hdc, gui.currFgColor);
     SelectFont(s_hdc, gui.currFont);
 
-#ifdef FEAT_DIRECTX
-    if (IS_ENABLE_DIRECTX())
-	DWriteContext_SetFont(s_dwc, (HFONT)gui.currFont);
-#endif
+#నిర్వచితమైతే FEAT_DIRECTX
+    ఒకవేళ (IS_ENABLE_DIRECTX())
+	DWrite_Context_సమితి_Font(s_dwc, (HFONT)gui.currFont);
+#అయితే_ముగింపు
 
-    if (pad_size != Columns || padding == NULL || padding[0] != gui.char_width)
+    ఒకవేళ (pad_కొలత != Columns || padding == ఖాళీ || padding[0] != gui.char_వెడల్పు)
     {
-	int	i;
+	పూర్ణాంకం	i;
 
 	vim_free(padding);
-	pad_size = Columns;
+	pad_కొలత = Columns;
 
 	// Don't give an out-of-memory message here, it would call us
 	// recursively.
-	padding = LALLOC_MULT(int, pad_size);
-	if (padding != NULL)
-	    for (i = 0; i < pad_size; i++)
-		padding[i] = gui.char_width;
+	padding = LALLOC_MULT(పూర్ణాంకం, pad_కొలత);
+	ఒకవేళ (padding != ఖాళీ)
+	    కొరకు (i = 0; i < pad_కొలత; i++)
+		padding[i] = gui.char_వెడల్పు;
     }
 
     /*
@@ -6842,183 +6842,183 @@ gui_mch_draw_string(
 
     // Check if there are any UTF-8 characters.  If not, use normal text
     // output to speed up output.
-    if (enc_utf8)
-	for (n = 0; n < len; ++n)
-	    if (text[n] >= 0x80)
-		break;
+    ఒకవేళ (enc_utf8)
+	కొరకు (n = 0; n < len; ++n)
+	    ఒకవేళ (పాఠ్యం[n] >= 0x80)
+		ఆపు;
 
-#if defined(FEAT_DIRECTX)
+#ఒకవేళ defined(FEAT_DIRECTX)
     // Quick hack to enable DirectWrite.  To use DirectWrite (antialias), it is
     // required that unicode drawing routine, currently.  So this forces it
     // enabled.
-    if (IS_ENABLE_DIRECTX())
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	n = 0; // Keep n < len, to enter block for unicode.
-#endif
+#అయితే_ముగింపు
 
     // Check if the Unicode buffer exists and is big enough.  Create it
     // with the same length as the multi-byte string, the number of wide
     // characters is always equal or smaller.
-    if ((enc_utf8
-		|| (enc_codepage > 0 && (int)GetACP() != enc_codepage)
+    ఒకవేళ ((enc_utf8
+		|| (enc_codepage > 0 && (పూర్ణాంకం)GetACP() != enc_codepage)
 		|| enc_latin9)
-	    && (unicodebuf == NULL || len > unibuflen))
+	    && (unicodebuf == ఖాళీ || len > unibuflen))
     {
 	vim_free(unicodebuf);
 	unicodebuf = LALLOC_MULT(WCHAR, len);
 
 	vim_free(unicodepdy);
-	unicodepdy = LALLOC_MULT(int, len);
+	unicodepdy = LALLOC_MULT(పూర్ణాంకం, len);
 
 	unibuflen = len;
     }
 
-    if (enc_utf8 && n < len && unicodebuf != NULL)
+    ఒకవేళ (enc_utf8 && n < len && unicodebuf != ఖాళీ)
     {
 	// Output UTF-8 characters.  Composing characters should be
 	// handled here.
-	int		i;
-	int		wlen;	// string length in words
-	int		cells;	// cell width of string up to composing char
-	int		cw;	// width of current cell
-	int		c;
+	పూర్ణాంకం		i;
+	పూర్ణాంకం		wlen;	// string length in words
+	పూర్ణాంకం		cells;	// cell width of string up to composing char
+	పూర్ణాంకం		cw;	// width of current cell
+	పూర్ణాంకం		c;
 
 	wlen = 0;
 	cells = 0;
-	for (i = 0; i < len; )
+	కొరకు (i = 0; i < len; )
 	{
-	    c = utf_ptr2char(text + i);
-	    if (c >= 0x10000)
+	    c = utf_ptr2char(పాఠ్యం + i);
+	    ఒకవేళ (c >= 0x10000)
 	    {
 		// Turn into UTF-16 encoding.
 		unicodebuf[wlen++] = ((c - 0x10000) >> 10) + 0xD800;
 		unicodebuf[wlen++] = ((c - 0x10000) & 0x3ff) + 0xDC00;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		unicodebuf[wlen++] = c;
 	    }
 
-	    if (utf_iscomposing(c))
+	    ఒకవేళ (utf_iscomposing(c))
 		cw = 0;
-	    else
+	    లేకపోతే
 	    {
 		cw = utf_char2cells(c);
-		if (cw > 2)		// don't use 4 for unprintable char
+		ఒకవేళ (cw > 2)		// don't use 4 for unprintable char
 		    cw = 1;
 	    }
 
-	    if (unicodepdy != NULL)
+	    ఒకవేళ (unicodepdy != ఖాళీ)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (c >= 0x10000)
+		ఒకవేళ (c >= 0x10000)
 		{
-		    unicodepdy[wlen - 2] = cw * gui.char_width;
+		    unicodepdy[wlen - 2] = cw * gui.char_వెడల్పు;
 		    unicodepdy[wlen - 1] = 0;
 		}
-		else
-		    unicodepdy[wlen - 1] = cw * gui.char_width;
+		లేకపోతే
+		    unicodepdy[wlen - 1] = cw * gui.char_వెడల్పు;
 	    }
 	    cells += cw;
-	    i += utf_ptr2len_len(text + i, len - i);
+	    i += utf_ptr2len_len(పాఠ్యం + i, len - i);
 	}
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+	ఒకవేళ (IS_ENABLE_DIRECTX())
 	{
 	    // Add one to "cells" for italics.
-	    DWriteContext_DrawText(s_dwc, unicodebuf, wlen,
-		    TEXT_X(col), TEXT_Y(row),
+	    DWrite_Context_Draw_పాఠ్యం(s_dwc, unicodebuf, wlen,
+		    పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస),
 		    FILL_X(cells + 1), FILL_Y(1) - p_linespace,
-		    gui.char_width, gui.currFgColor,
+		    gui.char_వెడల్పు, gui.currFgColor,
 		    foptions, pcliprect, unicodepdy);
 	}
-	else
-#endif
-	    ExtTextOutW(s_hdc, TEXT_X(col), TEXT_Y(row),
+	లేకపోతే
+#అయితే_ముగింపు
+	    Ext_పాఠ్యం_బహిర్గతం_W(s_hdc, పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస),
 		    foptions, pcliprect, unicodebuf, wlen, unicodepdy);
 	len = cells;	// used for underlining
     }
-    else if ((enc_codepage > 0 && (int)GetACP() != enc_codepage) || enc_latin9)
+    లేకపోతే ఒకవేళ ((enc_codepage > 0 && (పూర్ణాంకం)GetACP() != enc_codepage) || enc_latin9)
     {
 	// If we want to display codepage data, and the current CP is not the
 	// ANSI one, we need to go via Unicode.
-	if (unicodebuf != NULL)
+	ఒకవేళ (unicodebuf != ఖాళీ)
 	{
-	    if (enc_latin9)
-		latin9_to_ucs(text, len, unicodebuf);
-	    else
-		len = MultiByteToWideChar(enc_codepage,
+	    ఒకవేళ (enc_latin9)
+		latin9_గమ్యం_ucs(పాఠ్యం, len, unicodebuf);
+	    లేకపోతే
+		len = Multi_Byte_గమ్యం_Wide_Char(enc_codepage,
 			MB_PRECOMPOSED,
-			(char *)text, len,
+			(అక్షరం *)పాఠ్యం, len,
 			(LPWSTR)unicodebuf, unibuflen);
-	    if (len != 0)
+	    ఒకవేళ (len != 0)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (unicodepdy != NULL)
+		ఒకవేళ (unicodepdy != ఖాళీ)
 		{
-		    int i;
-		    int cw;
+		    పూర్ణాంకం i;
+		    పూర్ణాంకం cw;
 
-		    for (i = 0; i < len; ++i)
+		    కొరకు (i = 0; i < len; ++i)
 		    {
 			cw = utf_char2cells(unicodebuf[i]);
-			if (cw > 2)
+			ఒకవేళ (cw > 2)
 			    cw = 1;
-			unicodepdy[i] = cw * gui.char_width;
+			unicodepdy[i] = cw * gui.char_వెడల్పు;
 		    }
 		}
-		ExtTextOutW(s_hdc, TEXT_X(col), TEXT_Y(row),
+		Ext_పాఠ్యం_బహిర్గతం_W(s_hdc, పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస),
 			    foptions, pcliprect, unicodebuf, len, unicodepdy);
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 	// Windows will mess up RL text, so we have to draw it character by
 	// character.  Only do this if RL is on, since it's slow.
-	if (curwin->w_p_rl)
-	    RevOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
-	else
-#endif
-	    ExtTextOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
+	ఒకవేళ (curwin->w_p_rl)
+	    Rev_బహిర్గతం(s_hdc, పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస),
+			 foptions, pcliprect, (అక్షరం *)పాఠ్యం, len, padding);
+	లేకపోతే
+#అయితే_ముగింపు
+	    Ext_పాఠ్యం_బహిర్గతం(s_hdc, పాఠ్యం_X(నిలువు), పాఠ్యం_Y(అడ్డువరుస),
+			 foptions, pcliprect, (అక్షరం *)పాఠ్యం, len, padding);
     }
 
     // Underline
-    if (flags & DRAW_UNDERL)
+    ఒకవేళ (flags & DRAW_UNDERL)
     {
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	y = FILL_Y(row + 1) - 1;
-	if (p_linespace > 1)
+	y = FILL_Y(అడ్డువరుస + 1) - 1;
+	ఒకవేళ (p_linespace > 1)
 	    y -= p_linespace - 1;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currFgColor);
+	draw_పంక్తి(FILL_X(నిలువు), y, FILL_X(నిలువు + len), y, gui.currFgColor);
     }
 
     // Strikethrough
-    if (flags & DRAW_STRIKE)
+    ఒకవేళ (flags & DRAW_STRIKE)
     {
-	y = FILL_Y(row + 1) - gui.char_height/2;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currSpColor);
+	y = FILL_Y(అడ్డువరుస + 1) - gui.char_ఎత్తు/2;
+	draw_పంక్తి(FILL_X(నిలువు), y, FILL_X(నిలువు + len), y, gui.currSpColor);
     }
 
     // Undercurl
-    if (flags & DRAW_UNDERC)
+    ఒకవేళ (flags & DRAW_UNDERC)
     {
-	int			x;
-	int			offset;
-	static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+	పూర్ణాంకం			x;
+	పూర్ణాంకం			స్థానభ్రంశం;
+	స్థిర స్థిరరాశి పూర్ణాంకం	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
-	y = FILL_Y(row + 1) - 1;
-	for (x = FILL_X(col); x < FILL_X(col + len); ++x)
+	y = FILL_Y(అడ్డువరుస + 1) - 1;
+	కొరకు (x = FILL_X(నిలువు); x < FILL_X(నిలువు + len); ++x)
 	{
-	    offset = val[x % 8];
-	    set_pixel(x, y - offset, gui.currSpColor);
+	    స్థానభ్రంశం = val[x % 8];
+	    సమితి_pixel(x, y - స్థానభ్రంశం, gui.currSpColor);
 	}
     }
 }
@@ -7031,143 +7031,143 @@ gui_mch_draw_string(
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    శూన్య
+gui_mch_flush(శూన్య)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
-#endif
+#అయితే_ముగింపు
 
     GdiFlush();
 }
 
-    static void
+    స్థిర శూన్య
 clear_rect(RECT *rcp)
 {
-    fill_rect(rcp, NULL, gui.back_pixel);
+    fill_rect(rcp, ఖాళీ, gui.వెనుక_pixel);
 }
 
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    శూన్య
+gui_mch_get_screen_dimensions(పూర్ణాంకం *screen_w, పూర్ణాంకం *screen_h)
 {
     RECT	workarea_rect;
 
     get_work_area(&workarea_rect);
 
-    *screen_w = workarea_rect.right - workarea_rect.left
+    *screen_w = workarea_rect.కుడి_2 - workarea_rect.ఎడమ_2
 		- (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2;
 
     // FIXME: dirty trick: Because the gui_get_base_height() doesn't include
     // the menubar for MSwin, we subtract it from the screen height, so that
     // the window size can be made to fit on the screen.
-    *screen_h = workarea_rect.bottom - workarea_rect.top
+    *screen_h = workarea_rect.bottom - workarea_rect.శిఖరం
 		- (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 		- pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
-		- gui_mswin_get_menu_height(FALSE);
+		- gui_mswin_get_menu_ఎత్తు(FALSE);
 }
 
 
-#if defined(FEAT_MENU)
+#ఒకవేళ defined(FEAT_MENU)
 /*
  * Add a sub menu to the menu bar.
  */
-    void
-gui_mch_add_menu(
+    శూన్య
+gui_mch_కూడు_menu(
     vimmenu_T	*menu,
-    int		pos)
+    పూర్ణాంకం		pos)
 {
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
     menu->submenu_id = CreatePopupMenu();
     menu->id = s_menu_id++;
 
-    if (menu_is_menubar(menu->name))
+    ఒకవేళ (menu_is_menubar(menu->name))
     {
 	WCHAR	*wn;
 	MENUITEMINFOW	infow;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn == NULL)
-	    return;
+	wn = enc_గమ్యం_utf16(menu->name, ఖాళీ);
+	ఒకవేళ (wn == ఖాళీ)
+	    తిరిగి;
 
-	infow.cbSize = sizeof(infow);
-	infow.fMask = MIIM_DATA | MIIM_TYPE | MIIM_ID
+	infow.cb_కొలత = పరిమాణం(infow);
+	infow.f_ముసుగు = MIIM_దత్తాంశం | MIIM_TYPE | MIIM_ID
 	    | MIIM_SUBMENU;
-	infow.dwItemData = (long_u)menu;
+	infow.dw_అంశం_దత్తాంశం = (long_u)menu;
 	infow.wID = menu->id;
 	infow.fType = MFT_STRING;
-	infow.dwTypeData = wn;
+	infow.dw_Type_దత్తాంశం = wn;
 	infow.cch = (UINT)wcslen(wn);
 	infow.hSubMenu = menu->submenu_id;
-	InsertMenuItemW((parent == NULL)
-		? s_menuBar : parent->submenu_id,
+	చొప్పించు_Menu_అంశం_W((మాతృ == ఖాళీ)
+		? s_menuBar : మాతృ->submenu_id,
 		(UINT)pos, TRUE, &infow);
 	vim_free(wn);
     }
 
     // Fix window size if menu may have wrapped
-    if (parent == NULL)
-	gui_mswin_get_menu_height(!gui.starting);
+    ఒకవేళ (మాతృ == ఖాళీ)
+	gui_mswin_get_menu_ఎత్తు(!gui.starting);
 # ifdef FEAT_TEAROFF
-    else if (IsWindow(parent->tearoff_handle))
-	rebuild_tearoff(parent);
+    లేకపోతే ఒకవేళ (Is_కిటికీ(మాతృ->tearoff_handle))
+	rebuild_tearoff(మాతృ);
 # endif
 }
 
-    void
+    శూన్య
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    POINT mp;
+    బిందువు_2 mp;
 
-    (void)GetCursorPos(&mp);
-    gui_mch_show_popupmenu_at(menu, (int)mp.x, (int)mp.y);
+    (శూన్య)GetCursorPos(&mp);
+    gui_mch_show_popupmenu_at(menu, (పూర్ణాంకం)mp.x, (పూర్ణాంకం)mp.y);
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    శూన్య
+gui_make_popup(char_u *మార్గం_name, పూర్ణాంకం mouse_pos)
 {
-    vimmenu_T	*menu = gui_find_menu(path_name);
+    vimmenu_T	*menu = gui_కనుగొను_menu(మార్గం_name);
 
-    if (menu == NULL)
-	return;
+    ఒకవేళ (menu == ఖాళీ)
+	తిరిగి;
 
-    POINT	p;
+    బిందువు_2	p;
 
     // Find the position of the current cursor
     GetDCOrgEx(s_hdc, &p);
-    if (mouse_pos)
+    ఒకవేళ (mouse_pos)
     {
-	int	mx, my;
+	పూర్ణాంకం	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	p.x += mx;
 	p.y += my;
     }
-    else if (curwin != NULL)
+    లేకపోతే ఒకవేళ (curwin != ఖాళీ)
     {
-	p.x += TEXT_X(curwin->w_wincol + curwin->w_wcol + 1);
-	p.y += TEXT_Y(W_WINROW(curwin) + curwin->w_wrow + 1);
+	p.x += పాఠ్యం_X(curwin->w_wincol + curwin->w_wcol + 1);
+	p.y += పాఠ్యం_Y(W_WINROW(curwin) + curwin->w_wrow + 1);
     }
-    msg_scroll = FALSE;
-    gui_mch_show_popupmenu_at(menu, (int)p.x, (int)p.y);
+    సందేశం_scroll = FALSE;
+    gui_mch_show_popupmenu_at(menu, (పూర్ణాంకం)p.x, (పూర్ణాంకం)p.y);
 }
 
-# if defined(FEAT_TEAROFF)
+# ఒకవేళ defined(FEAT_TEAROFF)
 /*
  * Given a menu descriptor, e.g. "File.New", find it in the menu hierarchy and
  * create it as a pseudo-"tearoff menu".
  */
-    void
-gui_make_tearoff(char_u *path_name)
+    శూన్య
+gui_make_tearoff(char_u *మార్గం_name)
 {
-    vimmenu_T	*menu = gui_find_menu(path_name);
+    vimmenu_T	*menu = gui_కనుగొను_menu(మార్గం_name);
 
     // Found the menu, so tear it off.
-    if (menu != NULL)
+    ఒకవేళ (menu != ఖాళీ)
 	gui_mch_tearoff(menu->dname, menu, 0xffffL, 0xffffL);
 }
 # endif
@@ -7175,36 +7175,36 @@ gui_make_tearoff(char_u *path_name)
 /*
  * Add a menu item to a menu
  */
-    void
-gui_mch_add_menu_item(
+    శూన్య
+gui_mch_కూడు_menu_అంశం(
     vimmenu_T	*menu,
-    int		idx)
+    పూర్ణాంకం		idx)
 {
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*మాతృ = menu->మాతృ;
 
     menu->id = s_menu_id++;
-    menu->submenu_id = NULL;
+    menu->submenu_id = ఖాళీ;
 
 # ifdef FEAT_TEAROFF
-    if (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
+    ఒకవేళ (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
     {
-	InsertMenu(parent->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
+	చొప్పించు_Menu(మాతృ->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
 		(UINT)menu->id, (LPCTSTR) s_htearbitmap);
     }
-    else
+    లేకపోతే
 # endif
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ఒకవేళ (menu_is_toolbar(మాతృ->name))
     {
 	TBBUTTON newtb;
 
-	CLEAR_FIELD(newtb);
-	if (menu_is_separator(menu->name))
+	CLEAR_క్షేత్రం(newtb);
+	ఒకవేళ (menu_is_separator(menu->name))
 	{
 	    newtb.iBitmap = 0;
 	    newtb.fsStyle = TBSTYLE_SEP;
 	}
-	else
+	లేకపోతే
 	{
 	    newtb.iBitmap = get_toolbar_bitmap(menu);
 	    newtb.fsStyle = TBSTYLE_BUTTON;
@@ -7212,27 +7212,27 @@ gui_mch_add_menu_item(
 	newtb.idCommand = menu->id;
 	newtb.fsState = TBSTATE_ENABLED;
 	newtb.iString = 0;
-	SendMessage(s_toolbarhwnd, TB_INSERTBUTTON, (WPARAM)idx,
+	Send_సందేశం(s_toolbarhwnd, TB_INSERTBUTTON, (WPARAM)idx,
 							     (LPARAM)&newtb);
 	menu->submenu_id = (HMENU)-1;
     }
-    else
+    లేకపోతే
 # endif
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn != NULL)
+	wn = enc_గమ్యం_utf16(menu->name, ఖాళీ);
+	ఒకవేళ (wn != ఖాళీ)
 	{
-	    InsertMenuW(parent->submenu_id, (UINT)idx,
+	    చొప్పించు_Menu_W(మాతృ->submenu_id, (UINT)idx,
 		    (menu_is_separator(menu->name)
 		     ? MF_SEPARATOR : MF_STRING) | MF_BYPOSITION,
 		    (UINT)menu->id, wn);
 	    vim_free(wn);
 	}
 # ifdef FEAT_TEAROFF
-	if (IsWindow(parent->tearoff_handle))
-	    rebuild_tearoff(parent);
+	ఒకవేళ (Is_కిటికీ(మాతృ->tearoff_handle))
+	    rebuild_tearoff(మాతృ);
 # endif
     }
 }
@@ -7240,49 +7240,49 @@ gui_mch_add_menu_item(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    శూన్య
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
+    ఒకవేళ (menu->submenu_id == (HMENU)-1)
     {
-	int iButton;
+	పూర్ణాంకం iButton;
 
-	iButton = (int)SendMessage(s_toolbarhwnd, TB_COMMANDTOINDEX,
+	iButton = (పూర్ణాంకం)Send_సందేశం(s_toolbarhwnd, TB_COMMANDTOINDEX,
 							 (WPARAM)menu->id, 0);
-	SendMessage(s_toolbarhwnd, TB_DELETEBUTTON, (WPARAM)iButton, 0);
+	Send_సందేశం(s_toolbarhwnd, TB_DELETEBUTTON, (WPARAM)iButton, 0);
     }
-    else
+    లేకపోతే
 # endif
     {
-	if (menu->parent != NULL
-		&& menu_is_popup(menu->parent->dname)
-		&& menu->parent->submenu_id != NULL)
-	    RemoveMenu(menu->parent->submenu_id, menu->id, MF_BYCOMMAND);
-	else
+	ఒకవేళ (menu->మాతృ != ఖాళీ
+		&& menu_is_popup(menu->మాతృ->dname)
+		&& menu->మాతృ->submenu_id != ఖాళీ)
+	    RemoveMenu(menu->మాతృ->submenu_id, menu->id, MF_BYCOMMAND);
+	లేకపోతే
 	    RemoveMenu(s_menuBar, menu->id, MF_BYCOMMAND);
-	if (menu->submenu_id != NULL)
+	ఒకవేళ (menu->submenu_id != ఖాళీ)
 	    DestroyMenu(menu->submenu_id);
 # ifdef FEAT_TEAROFF
-	if (IsWindow(menu->tearoff_handle))
-	    DestroyWindow(menu->tearoff_handle);
-	if (menu->parent != NULL
-		&& menu->parent->children != NULL
-		&& IsWindow(menu->parent->tearoff_handle))
+	ఒకవేళ (Is_కిటికీ(menu->tearoff_handle))
+	    Destroy_కిటికీ(menu->tearoff_handle);
+	ఒకవేళ (menu->మాతృ != ఖాళీ
+		&& menu->మాతృ->children != ఖాళీ
+		&& Is_కిటికీ(menu->మాతృ->tearoff_handle))
 	{
 	    // This menu must not show up when rebuilding the tearoff window.
 	    menu->modes = 0;
-	    rebuild_tearoff(menu->parent);
+	    rebuild_tearoff(menu->మాతృ);
 	}
 # endif
     }
 }
 
 # ifdef FEAT_TEAROFF
-    static void
+    స్థిర శూన్య
 rebuild_tearoff(vimmenu_T *menu)
 {
     //hackish
@@ -7290,31 +7290,31 @@ rebuild_tearoff(vimmenu_T *menu)
     RECT	trect;
     RECT	rct;
     RECT	roct;
-    int		x, y;
+    పూర్ణాంకం		x, y;
 
     HWND thwnd = menu->tearoff_handle;
 
-    GetWindowText(thwnd, (LPSTR)tbuf, 127);
-    if (GetWindowRect(thwnd, &trect)
-	    && GetWindowRect(s_hwnd, &rct)
+    Get_కిటికీ_పాఠ్యం(thwnd, (LPSTR)tbuf, 127);
+    ఒకవేళ (Get_కిటికీ_Rect(thwnd, &trect)
+	    && Get_కిటికీ_Rect(s_hwnd, &rct)
 	    && GetClientRect(s_hwnd, &roct))
     {
-	x = trect.left - rct.left;
-	y = (trect.top -  rct.bottom  + roct.bottom);
+	x = trect.ఎడమ_2 - rct.ఎడమ_2;
+	y = (trect.శిఖరం -  rct.bottom  + roct.bottom);
     }
-    else
+    లేకపోతే
     {
 	x = y = 0xffffL;
     }
-    DestroyWindow(thwnd);
-    if (menu->children != NULL)
+    Destroy_కిటికీ(thwnd);
+    ఒకవేళ (menu->children != ఖాళీ)
     {
 	gui_mch_tearoff(tbuf, menu, x, y);
-	if (IsWindow(menu->tearoff_handle))
-	    (void) SetWindowPos(menu->tearoff_handle,
-				NULL,
-				(int)trect.left,
-				(int)trect.top,
+	ఒకవేళ (Is_కిటికీ(menu->tearoff_handle))
+	    (శూన్య) సమితి_కిటికీ_Pos(menu->tearoff_handle,
+				ఖాళీ,
+				(పూర్ణాంకం)trect.ఎడమ_2,
+				(పూర్ణాంకం)trect.శిఖరం,
 				0, 0,
 				SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
@@ -7324,53 +7324,53 @@ rebuild_tearoff(vimmenu_T *menu)
 /*
  * Make a menu either grey or not grey.
  */
-    void
+    శూన్య
 gui_mch_menu_grey(
     vimmenu_T	*menu,
-    int	    grey)
+    పూర్ణాంకం	    grey)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
-	SendMessage(s_toolbarhwnd, TB_ENABLEBUTTON,
+    ఒకవేళ (menu->submenu_id == (HMENU)-1)
+	Send_సందేశం(s_toolbarhwnd, TB_ENABLEBUTTON,
 		(WPARAM)menu->id, (LPARAM) MAKELONG((grey ? FALSE : TRUE), 0));
-    else
+    లేకపోతే
 # endif
-	(void)EnableMenuItem(menu->parent ? menu->parent->submenu_id : s_menuBar,
+	(శూన్య)Enable_Menu_అంశం(menu->మాతృ ? menu->మాతృ->submenu_id : s_menuBar,
 		menu->id, MF_BYCOMMAND | (grey ? MF_GRAYED : MF_ENABLED));
 
 # ifdef FEAT_TEAROFF
-    if ((menu->parent != NULL) && (IsWindow(menu->parent->tearoff_handle)))
+    ఒకవేళ ((menu->మాతృ != ఖాళీ) && (Is_కిటికీ(menu->మాతృ->tearoff_handle)))
     {
-	WORD menuID;
+	మాట_2 menuID;
 	HWND menuHandle;
 
 	/*
 	 * A tearoff button has changed state.
 	 */
-	if (menu->children == NULL)
-	    menuID = (WORD)(menu->id);
-	else
-	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
-	menuHandle = GetDlgItem(menu->parent->tearoff_handle, menuID);
-	if (menuHandle)
-	    EnableWindow(menuHandle, !grey);
+	ఒకవేళ (menu->children == ఖాళీ)
+	    menuID = (మాట_2)(menu->id);
+	లేకపోతే
+	    menuID = (మాట_2)((long_u)(menu->submenu_id) | (DWORD)0x8000);
+	menuHandle = Get_Dlg_అంశం(menu->మాతృ->tearoff_handle, menuID);
+	ఒకవేళ (menuHandle)
+	    Enable_కిటికీ(menuHandle, !grey);
 
     }
 # endif
 }
 
-#endif // FEAT_MENU
+#అయితే_ముగింపు // FEAT_MENU
 
 
 // define some macros used to make the dialogue creation more readable
 
-#define add_word(x)		*p++ = (x)
-#define add_long(x)		dwp = (DWORD *)p; *dwp++ = (x); p = (WORD *)dwp
+#నిర్వచించు కూడు_మాట(x)		*p++ = (x)
+#నిర్వచించు కూడు_long(x)		dwp = (DWORD *)p; *dwp++ = (x); p = (మాట_2 *)dwp
 
-#if defined(FEAT_GUI_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG)
 /*
  * stuff for dialogs
  */
@@ -7382,45 +7382,45 @@ gui_mch_menu_grey(
  * pressed, return that button's ID - IDCANCEL (2), which is the button's
  * number.
  */
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 dialog_callback(
     HWND hwnd,
-    UINT message,
+    UINT సందేశం_2,
     WPARAM wParam,
-    LPARAM lParam UNUSED)
+    LPARAM lParam వాడని)
 {
-    if (message == WM_INITDIALOG)
+    ఒకవేళ (సందేశం_2 == WM_INITDIALOG)
     {
-	CenterWindow(hwnd, GetWindow(hwnd, GW_OWNER));
+	Center_కిటికీ(hwnd, Get_కిటికీ(hwnd, GW_OWNER));
 	// Set focus to the dialog.  Set the default button, if specified.
-	(void)SetFocus(hwnd);
-	if (dialog_default_button > IDCANCEL)
-	    (void)SetFocus(GetDlgItem(hwnd, dialog_default_button));
-	else
+	(శూన్య)సమితి_Focus(hwnd);
+	ఒకవేళ (dialog_default_button > IDCANCEL)
+	    (శూన్య)సమితి_Focus(Get_Dlg_అంశం(hwnd, dialog_default_button));
+	లేకపోతే
 	    // We don't have a default, set focus on another element of the
 	    // dialog window, probably the icon
-	    (void)SetFocus(GetDlgItem(hwnd, DLG_NONBUTTON_CONTROL));
-	return FALSE;
+	    (శూన్య)సమితి_Focus(Get_Dlg_అంశం(hwnd, DLG_NONBUTTON_CONTROL));
+	తిరిగి FALSE;
     }
 
-    if (message == WM_COMMAND)
+    ఒకవేళ (సందేశం_2 == WM_COMMAND)
     {
-	int	button = LOWORD(wParam);
+	పూర్ణాంకం	button = LOWORD(wParam);
 
 	// Don't end the dialog if something was selected that was
 	// not a button.
-	if (button >= DLG_NONBUTTON_CONTROL)
-	    return TRUE;
+	ఒకవేళ (button >= DLG_NONBUTTON_CONTROL)
+	    తిరిగి TRUE;
 
 	// If the edit box exists, copy the string.
-	if (s_textfield != NULL)
+	ఒకవేళ (s_textfield != ఖాళీ)
 	{
 	    WCHAR  *wp = ALLOC_MULT(WCHAR, IOSIZE);
 	    char_u *p;
 
-	    GetDlgItemTextW(hwnd, DLG_NONBUTTON_CONTROL + 2, wp, IOSIZE);
-	    p = utf16_to_enc(wp, NULL);
-	    if (p != NULL)
+	    Get_Dlg_అంశం_పాఠ్యం_W(hwnd, DLG_NONBUTTON_CONTROL + 2, wp, IOSIZE);
+	    p = utf16_గమ్యం_enc(wp, ఖాళీ);
+	    ఒకవేళ (p != ఖాళీ)
 	    {
 		vim_strncpy(s_textfield, p, IOSIZE);
 		vim_free(p);
@@ -7432,22 +7432,22 @@ dialog_callback(
 	 * Need to check for IDOK because if the user just hits Return to
 	 * accept the default value, some reason this is what we get.
 	 */
-	if (button == IDOK)
+	ఒకవేళ (button == IDOK)
 	{
-	    if (dialog_default_button > IDCANCEL)
-		EndDialog(hwnd, dialog_default_button);
+	    ఒకవేళ (dialog_default_button > IDCANCEL)
+		చివర_Dialog(hwnd, dialog_default_button);
 	}
-	else
-	    EndDialog(hwnd, button - IDCANCEL);
-	return TRUE;
+	లేకపోతే
+	    చివర_Dialog(hwnd, button - IDCANCEL);
+	తిరిగి TRUE;
     }
 
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    ఒకవేళ ((సందేశం_2 == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
-	EndDialog(hwnd, 0);
-	return TRUE;
+	చివర_Dialog(hwnd, 0);
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -7467,7 +7467,7 @@ dialog_callback(
  * If stubbing out this fn, return 1.
  */
 
-static const char *dlg_icons[] = // must match names in resource file
+స్థిర స్థిరరాశి అక్షరం *dlg_icons[] = // must match names in resource file
 {
     "IDR_VIM",
     "IDR_VIM_ERROR",
@@ -7476,83 +7476,83 @@ static const char *dlg_icons[] = // must match names in resource file
     "IDR_VIM_QUESTION"
 };
 
-    int
+    పూర్ణాంకం
 gui_mch_dialog(
-    int		 type,
+    పూర్ణాంకం		 type,
     char_u	*title,
-    char_u	*message,
+    char_u	*సందేశం_2,
     char_u	*buttons,
-    int		 dfltbutton,
+    పూర్ణాంకం		 dfltbutton,
     char_u	*textfield,
-    int		ex_cmd UNUSED)
+    పూర్ణాంకం		ex_cmd వాడని)
 {
-    WORD	*p, *pdlgtemplate, *pnumitems;
+    మాట_2	*p, *pdlgtemplate, *pnumitems;
     DWORD	*dwp;
-    int		numButtons;
-    int		*buttonWidths, *buttonPositions;
-    int		buttonYpos;
-    int		nchar, i;
+    పూర్ణాంకం		అంకె_Buttons;
+    పూర్ణాంకం		*buttonWidths, *buttonPositions;
+    పూర్ణాంకం		buttonYpos;
+    పూర్ణాంకం		nchar, i;
     DWORD	lStyle;
-    int		dlgwidth = 0;
-    int		dlgheight;
-    int		editboxheight;
-    int		horizWidth = 0;
-    int		msgheight;
+    పూర్ణాంకం		dlgwidth = 0;
+    పూర్ణాంకం		dlgheight;
+    పూర్ణాంకం		editboxheight;
+    పూర్ణాంకం		horiz_వెడల్పు = 0;
+    పూర్ణాంకం		msgheight;
     char_u	*pstart;
     char_u	*pend;
-    char_u	*last_white;
+    char_u	*చివరి_white;
     char_u	*tbuffer;
     RECT	rect;
     HWND	hwnd;
     HDC		hdc;
     HFONT	font, oldFont;
     TEXTMETRIC	fontInfo;
-    int		fontHeight;
-    int		textWidth, minButtonWidth, messageWidth;
-    int		maxDialogWidth;
-    int		maxDialogHeight;
-    int		scroll_flag = 0;
-    int		vertical;
-    int		dlgPaddingX;
-    int		dlgPaddingY;
+    పూర్ణాంకం		font_ఎత్తు_2;
+    పూర్ణాంకం		పాఠ్యం_వెడల్పు_2, min_Button_వెడల్పు, సందేశం_వెడల్పు;
+    పూర్ణాంకం		max_Dialog_వెడల్పు;
+    పూర్ణాంకం		max_Dialog_ఎత్తు;
+    పూర్ణాంకం		scroll_flag = 0;
+    పూర్ణాంకం		vertical;
+    పూర్ణాంకం		dlgPaddingX;
+    పూర్ణాంకం		dlgPaddingY;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    పూర్ణాంకం		use_lfSysmenu = FALSE;
 # endif
     garray_T	ga;
-    int		l;
-    int		dlg_icon_width;
-    int		dlg_icon_height;
-    int		dpi;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		dlg_icon_వెడల్పు;
+    పూర్ణాంకం		dlg_icon_ఎత్తు;
+    పూర్ణాంకం		dpi;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    ఒకవేళ (!(gui.లోపల_use || gui.starting))
 #  endif
-	if (silent_mode)
-	    return dfltbutton;   // return default option
+	ఒకవేళ (silent_బహుళకం)
+	    తిరిగి dfltbutton;   // return default option
 # endif
 
-    if (s_hwnd == NULL)
+    ఒకవేళ (s_hwnd == ఖాళీ)
     {
-	load_dpi_func();
+	ఎక్కించు_dpi_func();
 	s_dpi = dpi = pGetDpiForSystem();
 	get_dialog_font_metrics();
     }
-    else
+    లేకపోతే
 	dpi = pGetDpiForSystem();
 
-    if ((type < 0) || (type > VIM_LAST_TYPE))
+    ఒకవేళ ((type < 0) || (type > VIM_చివరి_TYPE))
 	type = 0;
 
     // allocate some memory for dialog template
     // TODO should compute this really
     pdlgtemplate = p = (PWORD)LocalAlloc(LPTR,
-					DLG_ALLOC_SIZE + STRLEN(message) * 2);
+					DLG_ALLOC_కొలత + STRLEN(సందేశం_2) * 2);
 
-    if (p == NULL)
-	return -1;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి -1;
 
     /*
      * make a copy of 'buttons' to fiddle with it.  compiler grizzles because
@@ -7560,288 +7560,288 @@ gui_mch_dialog(
      * const.
      */
     tbuffer = vim_strsave(buttons);
-    if (tbuffer == NULL)
-	return -1;
+    ఒకవేళ (tbuffer == ఖాళీ)
+	తిరిగి -1;
 
     --dfltbutton;   // Change from one-based to zero-based
 
     // Count buttons
-    numButtons = 1;
-    for (i = 0; tbuffer[i] != '\0'; i++)
+    అంకె_Buttons = 1;
+    కొరకు (i = 0; tbuffer[i] != '\0'; i++)
     {
-	if (tbuffer[i] == DLG_BUTTON_SEP)
-	    numButtons++;
+	ఒకవేళ (tbuffer[i] == DLG_BUTTON_SEP)
+	    అంకె_Buttons++;
     }
-    if (dfltbutton >= numButtons)
+    ఒకవేళ (dfltbutton >= అంకె_Buttons)
 	dfltbutton = -1;
 
     // Allocate array to hold the width of each button
-    buttonWidths = ALLOC_MULT(int, numButtons);
-    if (buttonWidths == NULL)
-	return -1;
+    buttonWidths = ALLOC_MULT(పూర్ణాంకం, అంకె_Buttons);
+    ఒకవేళ (buttonWidths == ఖాళీ)
+	తిరిగి -1;
 
     // Allocate array to hold the X position of each button
-    buttonPositions = ALLOC_MULT(int, numButtons);
-    if (buttonPositions == NULL)
-	return -1;
+    buttonPositions = ALLOC_MULT(పూర్ణాంకం, అంకె_Buttons);
+    ఒకవేళ (buttonPositions == ఖాళీ)
+	తిరిగి -1;
 
     /*
      * Calculate how big the dialog must be.
      */
-    hwnd = GetDesktopWindow();
-    hdc = GetWindowDC(hwnd);
+    hwnd = Get_Desktop_కిటికీ();
+    hdc = Get_కిటికీ_DC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    ఒకవేళ (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
-	font = CreateFontIndirectW(&lfSysmenu);
+	font = Create_Font_పరోక్ష_W(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    లేకపోతే
 # endif
-	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
+	font = CreateFont(-DLG_FONT_బిందువు_కొలత, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
 
     oldFont = SelectFont(hdc, font);
     dlgPaddingX = DLG_PADDING_X;
     dlgPaddingY = DLG_PADDING_Y;
 
-    GetTextMetrics(hdc, &fontInfo);
-    fontHeight = fontInfo.tmHeight;
+    Get_పాఠ్యం_Metrics(hdc, &fontInfo);
+    font_ఎత్తు_2 = fontInfo.tm_ఎత్తు;
 
     // Minimum width for horizontal button
-    minButtonWidth = GetTextWidth(hdc, (char_u *)"Cancel", 6);
+    min_Button_వెడల్పు = Get_పాఠ్యం_వెడల్పు(hdc, (char_u *)"Cancel", 6);
 
     // Maximum width of a dialog, if possible
-    if (s_hwnd == NULL)
+    ఒకవేళ (s_hwnd == ఖాళీ)
     {
 	RECT	workarea_rect;
 
 	// We don't have a window, use the desktop area.
 	get_work_area(&workarea_rect);
-	maxDialogWidth = workarea_rect.right - workarea_rect.left - 100;
-	if (maxDialogWidth > adjust_by_system_dpi(600))
-	    maxDialogWidth = adjust_by_system_dpi(600);
+	max_Dialog_వెడల్పు = workarea_rect.కుడి_2 - workarea_rect.ఎడమ_2 - 100;
+	ఒకవేళ (max_Dialog_వెడల్పు > adjust_by_system_dpi(600))
+	    max_Dialog_వెడల్పు = adjust_by_system_dpi(600);
 	// Leave some room for the taskbar.
-	maxDialogHeight = workarea_rect.bottom - workarea_rect.top - 150;
+	max_Dialog_ఎత్తు = workarea_rect.bottom - workarea_rect.శిఖరం - 150;
     }
-    else
+    లేకపోతే
     {
 	// Use our own window for the size, unless it's very small.
-	GetWindowRect(s_hwnd, &rect);
-	maxDialogWidth = rect.right - rect.left
+	Get_కిటికీ_Rect(s_hwnd, &rect);
+	max_Dialog_వెడల్పు = rect.కుడి_2 - rect.ఎడమ_2
 		       - (pGetSystemMetricsForDpi(SM_CXFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 2;
-	if (maxDialogWidth < adjust_by_system_dpi(DLG_MIN_MAX_WIDTH))
-	    maxDialogWidth = adjust_by_system_dpi(DLG_MIN_MAX_WIDTH);
+	ఒకవేళ (max_Dialog_వెడల్పు < adjust_by_system_dpi(DLG_MIN_MAX_వెడల్పు))
+	    max_Dialog_వెడల్పు = adjust_by_system_dpi(DLG_MIN_MAX_వెడల్పు);
 
-	maxDialogHeight = rect.bottom - rect.top
+	max_Dialog_ఎత్తు = rect.bottom - rect.శిఖరం
 		       - (pGetSystemMetricsForDpi(SM_CYFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 4
 		       - pGetSystemMetricsForDpi(SM_CYCAPTION, dpi);
-	if (maxDialogHeight < adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT))
-	    maxDialogHeight = adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT);
+	ఒకవేళ (max_Dialog_ఎత్తు < adjust_by_system_dpi(DLG_MIN_MAX_ఎత్తు))
+	    max_Dialog_ఎత్తు = adjust_by_system_dpi(DLG_MIN_MAX_ఎత్తు);
     }
 
     // Set dlgwidth to width of message.
     // Copy the message into "ga", changing NL to CR-NL and inserting line
     // breaks where needed.
-    pstart = message;
-    messageWidth = 0;
+    pstart = సందేశం_2;
+    సందేశం_వెడల్పు = 0;
     msgheight = 0;
-    ga_init2(&ga, sizeof(char), 500);
-    do
+    ga_init2(&ga, పరిమాణం(అక్షరం), 500);
+    చేయి
     {
-	msgheight += fontHeight;    // at least one line
+	msgheight += font_ఎత్తు_2;    // at least one line
 
 	// Need to figure out where to break the string.  The system does it
 	// at a word boundary, which would mean we can't compute the number of
 	// wrapped lines.
-	textWidth = 0;
-	last_white = NULL;
-	for (pend = pstart; *pend != NUL && *pend != '\n'; )
+	పాఠ్యం_వెడల్పు_2 = 0;
+	చివరి_white = ఖాళీ;
+	కొరకు (pend = pstart; *pend != NUL && *pend != '\n'; )
 	{
 	    l = (*mb_ptr2len)(pend);
-	    if (l == 1 && VIM_ISWHITE(*pend)
-					&& textWidth > maxDialogWidth * 3 / 4)
-		last_white = pend;
-	    textWidth += GetTextWidthEnc(hdc, pend, l);
-	    if (textWidth >= maxDialogWidth)
+	    ఒకవేళ (l == 1 && VIM_ISWHITE(*pend)
+					&& పాఠ్యం_వెడల్పు_2 > max_Dialog_వెడల్పు * 3 / 4)
+		చివరి_white = pend;
+	    పాఠ్యం_వెడల్పు_2 += Get_పాఠ్యం_వెడల్పు_Enc(hdc, pend, l);
+	    ఒకవేళ (పాఠ్యం_వెడల్పు_2 >= max_Dialog_వెడల్పు)
 	    {
 		// Line will wrap.
-		messageWidth = maxDialogWidth;
-		msgheight += fontHeight;
-		textWidth = 0;
+		సందేశం_వెడల్పు = max_Dialog_వెడల్పు;
+		msgheight += font_ఎత్తు_2;
+		పాఠ్యం_వెడల్పు_2 = 0;
 
-		if (last_white != NULL)
+		ఒకవేళ (చివరి_white != ఖాళీ)
 		{
 		    // break the line just after a space
-		    if (pend > last_white)
-			ga.ga_len -= (int)(pend - (last_white + 1));
-		    pend = last_white + 1;
-		    last_white = NULL;
+		    ఒకవేళ (pend > చివరి_white)
+			ga.ga_len -= (పూర్ణాంకం)(pend - (చివరి_white + 1));
+		    pend = చివరి_white + 1;
+		    చివరి_white = ఖాళీ;
 		}
 		ga_append(&ga, '\r');
 		ga_append(&ga, '\n');
-		continue;
+		కొనసాగు;
 	    }
 
-	    while (--l >= 0)
+	    అయితే (--l >= 0)
 		ga_append(&ga, *pend++);
 	}
-	if (textWidth > messageWidth)
-	    messageWidth = textWidth;
+	ఒకవేళ (పాఠ్యం_వెడల్పు_2 > సందేశం_వెడల్పు)
+	    సందేశం_వెడల్పు = పాఠ్యం_వెడల్పు_2;
 
 	ga_append(&ga, '\r');
 	ga_append(&ga, '\n');
 	pstart = pend + 1;
-    } while (*pend != NUL);
+    } అయితే (*pend != NUL);
 
-    if (ga.ga_data != NULL)
-	message = ga.ga_data;
+    ఒకవేళ (ga.ga_దత్తాంశం != ఖాళీ)
+	సందేశం_2 = ga.ga_దత్తాంశం;
 
-    messageWidth += 10;		// roundoff space
+    సందేశం_వెడల్పు += 10;		// roundoff space
 
-    dlg_icon_width = adjust_by_system_dpi(DLG_ICON_WIDTH);
-    dlg_icon_height = adjust_by_system_dpi(DLG_ICON_HEIGHT);
+    dlg_icon_వెడల్పు = adjust_by_system_dpi(DLG_ICON_వెడల్పు);
+    dlg_icon_ఎత్తు = adjust_by_system_dpi(DLG_ICON_ఎత్తు);
 
     // Add width of icon to dlgwidth, and some space
-    dlgwidth = messageWidth + dlg_icon_width + 3 * dlgPaddingX
+    dlgwidth = సందేశం_వెడల్పు + dlg_icon_వెడల్పు + 3 * dlgPaddingX
 			     + pGetSystemMetricsForDpi(SM_CXVSCROLL, dpi);
 
-    if (msgheight < dlg_icon_height)
-	msgheight = dlg_icon_height;
+    ఒకవేళ (msgheight < dlg_icon_ఎత్తు)
+	msgheight = dlg_icon_ఎత్తు;
 
     /*
      * Check button names.  A long one will make the dialog wider.
      * When called early (-register error message) p_go isn't initialized.
      */
-    vertical = (p_go != NULL && vim_strchr(p_go, GO_VERTICAL) != NULL);
-    if (!vertical)
+    vertical = (p_go != ఖాళీ && vim_strchr(p_go, GO_VERTICAL) != ఖాళీ);
+    ఒకవేళ (!vertical)
     {
 	// Place buttons horizontally if they fit.
-	horizWidth = dlgPaddingX;
+	horiz_వెడల్పు = dlgPaddingX;
 	pstart = tbuffer;
 	i = 0;
-	do
+	చేయి
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    ఒకవేళ (pend == ఖాళీ)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
-	    if (textWidth < minButtonWidth)
-		textWidth = minButtonWidth;
-	    textWidth += dlgPaddingX;	    // Padding within button
-	    buttonWidths[i] = textWidth;
-	    buttonPositions[i++] = horizWidth;
-	    horizWidth += textWidth + dlgPaddingX; // Pad between buttons
+	    పాఠ్యం_వెడల్పు_2 = Get_పాఠ్యం_వెడల్పు_Enc(hdc, pstart, (పూర్ణాంకం)(pend - pstart));
+	    ఒకవేళ (పాఠ్యం_వెడల్పు_2 < min_Button_వెడల్పు)
+		పాఠ్యం_వెడల్పు_2 = min_Button_వెడల్పు;
+	    పాఠ్యం_వెడల్పు_2 += dlgPaddingX;	    // Padding within button
+	    buttonWidths[i] = పాఠ్యం_వెడల్పు_2;
+	    buttonPositions[i++] = horiz_వెడల్పు;
+	    horiz_వెడల్పు += పాఠ్యం_వెడల్పు_2 + dlgPaddingX; // Pad between buttons
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} అయితే (*pend != NUL);
 
-	if (horizWidth > maxDialogWidth)
+	ఒకవేళ (horiz_వెడల్పు > max_Dialog_వెడల్పు)
 	    vertical = TRUE;	// Too wide to fit on the screen.
-	else if (horizWidth > dlgwidth)
-	    dlgwidth = horizWidth;
+	లేకపోతే ఒకవేళ (horiz_వెడల్పు > dlgwidth)
+	    dlgwidth = horiz_వెడల్పు;
     }
 
-    if (vertical)
+    ఒకవేళ (vertical)
     {
 	// Stack buttons vertically.
 	pstart = tbuffer;
-	do
+	చేయి
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    ఒకవేళ (pend == ఖాళీ)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
-	    textWidth += dlgPaddingX;		// Padding within button
-	    textWidth += DLG_VERT_PADDING_X * 2; // Padding around button
-	    if (textWidth > dlgwidth)
-		dlgwidth = textWidth;
+	    పాఠ్యం_వెడల్పు_2 = Get_పాఠ్యం_వెడల్పు_Enc(hdc, pstart, (పూర్ణాంకం)(pend - pstart));
+	    పాఠ్యం_వెడల్పు_2 += dlgPaddingX;		// Padding within button
+	    పాఠ్యం_వెడల్పు_2 += DLG_VERT_PADDING_X * 2; // Padding around button
+	    ఒకవేళ (పాఠ్యం_వెడల్పు_2 > dlgwidth)
+		dlgwidth = పాఠ్యం_వెడల్పు_2;
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} అయితే (*pend != NUL);
     }
 
-    if (dlgwidth < DLG_MIN_WIDTH)
-	dlgwidth = DLG_MIN_WIDTH;	// Don't allow a really thin dialog!
+    ఒకవేళ (dlgwidth < DLG_MIN_వెడల్పు)
+	dlgwidth = DLG_MIN_వెడల్పు;	// Don't allow a really thin dialog!
 
     // start to fill in the dlgtemplate information.  addressing by WORDs
     lStyle = DS_MODALFRAME | WS_CAPTION | DS_3DLOOK | WS_VISIBLE | DS_SETFONT;
 
-    add_long(lStyle);
-    add_long(0);	// (lExtendedStyle)
+    కూడు_long(lStyle);
+    కూడు_long(0);	// (lExtendedStyle)
     pnumitems = p;	//save where the number of items must be stored
-    add_word(0);	// NumberOfItems(will change later)
-    add_word(10);	// x
-    add_word(10);	// y
-    add_word(PixelToDialogX(dlgwidth));	// cx
+    కూడు_మాట(0);	// NumberOfItems(will change later)
+    కూడు_మాట(10);	// x
+    కూడు_మాట(10);	// y
+    కూడు_మాట(Pixel_గమ్యం_Dialog_X(dlgwidth));	// cx
 
     // Dialog height.
-    if (vertical)
+    ఒకవేళ (vertical)
 	dlgheight = msgheight + 2 * dlgPaddingY
-			   + DLG_VERT_PADDING_Y + 2 * fontHeight * numButtons;
-    else
-	dlgheight = msgheight + 3 * dlgPaddingY + 2 * fontHeight;
+			   + DLG_VERT_PADDING_Y + 2 * font_ఎత్తు_2 * అంకె_Buttons;
+    లేకపోతే
+	dlgheight = msgheight + 3 * dlgPaddingY + 2 * font_ఎత్తు_2;
 
     // Dialog needs to be taller if contains an edit box.
-    editboxheight = fontHeight + dlgPaddingY + 4 * DLG_VERT_PADDING_Y;
-    if (textfield != NULL)
+    editboxheight = font_ఎత్తు_2 + dlgPaddingY + 4 * DLG_VERT_PADDING_Y;
+    ఒకవేళ (textfield != ఖాళీ)
 	dlgheight += editboxheight;
 
     // Restrict the size to a maximum.  Causes a scrollbar to show up.
-    if (dlgheight > maxDialogHeight)
+    ఒకవేళ (dlgheight > max_Dialog_ఎత్తు)
     {
-	msgheight = msgheight - (dlgheight - maxDialogHeight);
-	dlgheight = maxDialogHeight;
+	msgheight = msgheight - (dlgheight - max_Dialog_ఎత్తు);
+	dlgheight = max_Dialog_ఎత్తు;
 	scroll_flag = WS_VSCROLL;
 	// Make sure scrollbar doesn't appear in the middle of the dialog
-	messageWidth = dlgwidth - dlg_icon_width - 3 * dlgPaddingX;
+	సందేశం_వెడల్పు = dlgwidth - dlg_icon_వెడల్పు - 3 * dlgPaddingX;
     }
 
-    add_word(PixelToDialogY(dlgheight));
+    కూడు_మాట(Pixel_గమ్యం_Dialog_Y(dlgheight));
 
-    add_word(0);	// Menu
-    add_word(0);	// Class
+    కూడు_మాట(0);	// Menu
+    కూడు_మాట(0);	// Class
 
     // copy the title of the dialog
-    nchar = nCopyAnsiToWideChar(p, (title ? (LPSTR)title
-				   : (LPSTR)("Vim "VIM_VERSION_MEDIUM)), TRUE);
+    nchar = n_Copy_Ansi_గమ్యం_Wide_Char(p, (title ? (LPSTR)title
+				   : (LPSTR)("Vim "VIM_సంస్కరణ_MEDIUM)), TRUE);
     p += nchar;
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    ఒకవేళ (use_lfSysmenu)
     {
 	// point size
-	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
+	*p++ = -MulDiv(lfSysmenu.lf_ఎత్తు, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (పూర్ణాంకం)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    లేకపోతే
 # endif
     {
-	*p++ = DLG_FONT_POINT_SIZE;		// point size
-	nchar = nCopyAnsiToWideChar(p, DLG_FONT_NAME, FALSE);
+	*p++ = DLG_FONT_బిందువు_కొలత;		// point size
+	nchar = n_Copy_Ansi_గమ్యం_Wide_Char(p, DLG_FONT_NAME, FALSE);
     }
     p += nchar;
 
     buttonYpos = msgheight + 2 * dlgPaddingY;
 
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
 	buttonYpos += editboxheight;
 
     pstart = tbuffer;
-    if (!vertical)
-	horizWidth = (dlgwidth - horizWidth) / 2;	// Now it's X offset
-    for (i = 0; i < numButtons; i++)
+    ఒకవేళ (!vertical)
+	horiz_వెడల్పు = (dlgwidth - horiz_వెడల్పు) / 2;	// Now it's X offset
+    కొరకు (i = 0; i < అంకె_Buttons; i++)
     {
 	// get end of this button.
-	for (	pend = pstart;
+	కొరకు (	pend = pstart;
 		*pend && (*pend != DLG_BUTTON_SEP);
 		pend++)
 	    ;
 
-	if (*pend)
+	ఒకవేళ (*pend)
 	    *pend = '\0';
 
 	/*
@@ -7857,59 +7857,59 @@ gui_mch_dialog(
 	 * dialog.  Also needed for when the textfield is the default control.
 	 * It appears to work now (perhaps not on Win95?).
 	 */
-	if (vertical)
+	ఒకవేళ (vertical)
 	{
-	    p = add_dialog_element(p,
+	    p = కూడు_dialog_element(p,
 		    (i == dfltbutton
 			    ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON) | WS_TABSTOP,
-		    PixelToDialogX(DLG_VERT_PADDING_X),
-		    PixelToDialogY(buttonYpos // TBK
-				   + 2 * fontHeight * i),
-		    PixelToDialogX(dlgwidth - 2 * DLG_VERT_PADDING_X),
-		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    Pixel_గమ్యం_Dialog_X(DLG_VERT_PADDING_X),
+		    Pixel_గమ్యం_Dialog_Y(buttonYpos // TBK
+				   + 2 * font_ఎత్తు_2 * i),
+		    Pixel_గమ్యం_Dialog_X(dlgwidth - 2 * DLG_VERT_PADDING_X),
+		    (మాట_2)(Pixel_గమ్యం_Dialog_Y(2 * font_ఎత్తు_2) - 1),
+		    (మాట_2)(IDCANCEL + 1 + i), (మాట_2)0x0080, (అక్షరం *)pstart);
 	}
-	else
+	లేకపోతే
 	{
-	    p = add_dialog_element(p,
+	    p = కూడు_dialog_element(p,
 		    (i == dfltbutton
 			    ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON) | WS_TABSTOP,
-		    PixelToDialogX(horizWidth + buttonPositions[i]),
-		    PixelToDialogY(buttonYpos), // TBK
-		    PixelToDialogX(buttonWidths[i]),
-		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    Pixel_గమ్యం_Dialog_X(horiz_వెడల్పు + buttonPositions[i]),
+		    Pixel_గమ్యం_Dialog_Y(buttonYpos), // TBK
+		    Pixel_గమ్యం_Dialog_X(buttonWidths[i]),
+		    (మాట_2)(Pixel_గమ్యం_Dialog_Y(2 * font_ఎత్తు_2) - 1),
+		    (మాట_2)(IDCANCEL + 1 + i), (మాట_2)0x0080, (అక్షరం *)pstart);
 	}
 	pstart = pend + 1;	//next button
     }
-    *pnumitems += numButtons;
+    *pnumitems += అంకె_Buttons;
 
     // Vim icon
-    p = add_dialog_element(p, SS_ICON,
-	    PixelToDialogX(dlgPaddingX),
-	    PixelToDialogY(dlgPaddingY),
-	    PixelToDialogX(dlg_icon_width),
-	    PixelToDialogY(dlg_icon_height),
-	    DLG_NONBUTTON_CONTROL + 0, (WORD)0x0082,
+    p = కూడు_dialog_element(p, SS_ICON,
+	    Pixel_గమ్యం_Dialog_X(dlgPaddingX),
+	    Pixel_గమ్యం_Dialog_Y(dlgPaddingY),
+	    Pixel_గమ్యం_Dialog_X(dlg_icon_వెడల్పు),
+	    Pixel_గమ్యం_Dialog_Y(dlg_icon_ఎత్తు),
+	    DLG_NONBUTTON_CONTROL + 0, (మాట_2)0x0082,
 	    dlg_icons[type]);
 
     // Dialog message
-    p = add_dialog_element(p, ES_LEFT|scroll_flag|ES_MULTILINE|ES_READONLY,
-	    PixelToDialogX(2 * dlgPaddingX + dlg_icon_width),
-	    PixelToDialogY(dlgPaddingY),
-	    (WORD)(PixelToDialogX(messageWidth) + 1),
-	    PixelToDialogY(msgheight),
-	    DLG_NONBUTTON_CONTROL + 1, (WORD)0x0081, (char *)message);
+    p = కూడు_dialog_element(p, ES_ఎడమ|scroll_flag|ES_MULTILINE|ES_READONLY,
+	    Pixel_గమ్యం_Dialog_X(2 * dlgPaddingX + dlg_icon_వెడల్పు),
+	    Pixel_గమ్యం_Dialog_Y(dlgPaddingY),
+	    (మాట_2)(Pixel_గమ్యం_Dialog_X(సందేశం_వెడల్పు) + 1),
+	    Pixel_గమ్యం_Dialog_Y(msgheight),
+	    DLG_NONBUTTON_CONTROL + 1, (మాట_2)0x0081, (అక్షరం *)సందేశం_2);
 
     // Edit box
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
     {
-	p = add_dialog_element(p, ES_LEFT|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
-		PixelToDialogX(2 * dlgPaddingX),
-		PixelToDialogY(2 * dlgPaddingY + msgheight),
-		PixelToDialogX(dlgwidth - 4 * dlgPaddingX),
-		PixelToDialogY(fontHeight + dlgPaddingY),
-		DLG_NONBUTTON_CONTROL + 2, (WORD)0x0081, (char *)textfield);
+	p = కూడు_dialog_element(p, ES_ఎడమ|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
+		Pixel_గమ్యం_Dialog_X(2 * dlgPaddingX),
+		Pixel_గమ్యం_Dialog_Y(2 * dlgPaddingY + msgheight),
+		Pixel_గమ్యం_Dialog_X(dlgwidth - 4 * dlgPaddingX),
+		Pixel_గమ్యం_Dialog_Y(font_ఎత్తు_2 + dlgPaddingY),
+		DLG_NONBUTTON_CONTROL + 2, (మాట_2)0x0081, (అక్షరం *)textfield);
 	*pnumitems += 1;
     }
 
@@ -7923,19 +7923,19 @@ gui_mch_dialog(
     // If we have an edit box, make that the default. We also need to tell
     // dialog_callback() if this dialog contains an edit box or not. We do
     // this by setting s_textfield if it does.
-    if (textfield != NULL)
+    ఒకవేళ (textfield != ఖాళీ)
     {
 	dialog_default_button = DLG_NONBUTTON_CONTROL + 2;
 	s_textfield = textfield;
     }
-    else
+    లేకపోతే
     {
 	dialog_default_button = IDCANCEL + 1 + dfltbutton;
-	s_textfield = NULL;
+	s_textfield = ఖాళీ;
     }
 
     // show the dialog box modally and get a return value
-    nchar = (int)DialogBoxIndirect(
+    nchar = (పూర్ణాంకం)Dialog_Box_పరోక్ష(
 	    g_hinst,
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
@@ -7945,15 +7945,15 @@ gui_mch_dialog(
     vim_free(tbuffer);
     vim_free(buttonWidths);
     vim_free(buttonPositions);
-    vim_free(ga.ga_data);
+    vim_free(ga.ga_దత్తాంశం);
 
     // Focus back to our window (for when MDI is used).
-    (void)SetFocus(s_hwnd);
+    (శూన్య)సమితి_Focus(s_hwnd);
 
-    return nchar;
+    తిరిగి nchar;
 }
 
-#endif // FEAT_GUI_DIALOG
+#అయితే_ముగింపు // FEAT_GUI_DIALOG
 
 /*
  * Put a simple element (basic class) onto a dialog template in memory.
@@ -7971,22 +7971,22 @@ gui_mch_dialog(
  *  TODO: use the length information noted here to enable the dialog creation
  *  routines to work out more exactly how much memory they need to alloc.
  */
-    static PWORD
-add_dialog_element(
+    స్థిర PWORD
+కూడు_dialog_element(
     PWORD p,
     DWORD lStyle,
-    WORD x,
-    WORD y,
-    WORD w,
-    WORD h,
-    WORD Id,
-    WORD clss,
-    const char *caption)
+    మాట_2 x,
+    మాట_2 y,
+    మాట_2 w,
+    మాట_2 h,
+    మాట_2 Id,
+    మాట_2 clss,
+    స్థిరరాశి అక్షరం *caption)
 {
-    int nchar;
+    పూర్ణాంకం nchar;
 
     p = lpwAlign(p);	// Align to dword boundary
-    lStyle = lStyle | WS_VISIBLE | WS_CHILD;
+    lStyle = lStyle | WS_VISIBLE | WS_బిడ్డ;
     *p++ = LOWORD(lStyle);
     *p++ = HIWORD(lStyle);
     *p++ = 0;		// LOWORD (lExtendedStyle)
@@ -7997,15 +7997,15 @@ add_dialog_element(
     *p++ = h;
     *p++ = Id;		//9 or 10 words in all
 
-    *p++ = (WORD)0xffff;
+    *p++ = (మాట_2)0xffff;
     *p++ = clss;			//2 more here
 
-    nchar = nCopyAnsiToWideChar(p, (LPSTR)caption, TRUE); //strlen(caption)+1
+    nchar = n_Copy_Ansi_గమ్యం_Wide_Char(p, (LPSTR)caption, TRUE); //strlen(caption)+1
     p += nchar;
 
     *p++ = 0;  // advance pointer over nExtraStuff WORD   - 2 more
 
-    return p;	// total = 15 + strlen(caption) words
+    తిరిగి p;	// total = 15 + strlen(caption) words
 		// bytes read = 2 * total
 }
 
@@ -8014,17 +8014,17 @@ add_dialog_element(
  * Helper routine.  Take an input pointer, return closest pointer that is
  * aligned on a DWORD (4 byte) boundary.  Taken from the Win32SDK samples.
  */
-    static LPWORD
+    స్థిర LPWORD
 lpwAlign(
-    LPWORD lpIn)
+    LPWORD lp_లోపల)
 {
     long_u ul;
 
-    ul = (long_u)lpIn;
+    ul = (long_u)lp_లోపల;
     ul += 3;
     ul >>= 2;
     ul <<= 2;
-    return (LPWORD)ul;
+    తిరిగి (LPWORD)ul;
 }
 
 /*
@@ -8034,62 +8034,62 @@ lpwAlign(
  * char NULL).  Partly taken from the Win32SDK samples.
  * If "use_enc" is TRUE, 'encoding' is used for "lpAnsiIn". If FALSE, current
  * ACP is used for "lpAnsiIn". */
-    static int
-nCopyAnsiToWideChar(
+    స్థిర పూర్ణాంకం
+n_Copy_Ansi_గమ్యం_Wide_Char(
     LPWORD lpWCStr,
-    LPSTR lpAnsiIn,
+    LPSTR lp_Ansi_లోపల,
     BOOL use_enc)
 {
-    int		nChar = 0;
-    int		len = lstrlen(lpAnsiIn) + 1;	// include NUL character
-    int		i;
+    పూర్ణాంకం		nChar = 0;
+    పూర్ణాంకం		len = lstrlen(lp_Ansi_లోపల) + 1;	// include NUL character
+    పూర్ణాంకం		i;
     WCHAR	*wn;
 
-    if (use_enc && enc_codepage >= 0 && (int)GetACP() != enc_codepage)
+    ఒకవేళ (use_enc && enc_codepage >= 0 && (పూర్ణాంకం)GetACP() != enc_codepage)
     {
 	// Not a codepage, use our own conversion function.
-	wn = enc_to_utf16((char_u *)lpAnsiIn, NULL);
-	if (wn != NULL)
+	wn = enc_గమ్యం_utf16((char_u *)lp_Ansi_లోపల, ఖాళీ);
+	ఒకవేళ (wn != ఖాళీ)
 	{
 	    wcscpy(lpWCStr, wn);
-	    nChar = (int)wcslen(wn) + 1;
+	    nChar = (పూర్ణాంకం)wcslen(wn) + 1;
 	    vim_free(wn);
 	}
     }
-    if (nChar == 0)
+    ఒకవేళ (nChar == 0)
 	// Use Win32 conversion function.
-	nChar = MultiByteToWideChar(
+	nChar = Multi_Byte_గమ్యం_Wide_Char(
 		enc_codepage > 0 ? enc_codepage : CP_ACP,
 		MB_PRECOMPOSED,
-		lpAnsiIn, len,
+		lp_Ansi_లోపల, len,
 		lpWCStr, len);
-    for (i = 0; i < nChar; ++i)
-	if (lpWCStr[i] == (WORD)'\t')	// replace tabs with spaces
-	    lpWCStr[i] = (WORD)' ';
+    కొరకు (i = 0; i < nChar; ++i)
+	ఒకవేళ (lpWCStr[i] == (మాట_2)'\t')	// replace tabs with spaces
+	    lpWCStr[i] = (మాట_2)' ';
 
-    return nChar;
+    తిరిగి nChar;
 }
 
 
-#ifdef FEAT_TEAROFF
+#నిర్వచితమైతే FEAT_TEAROFF
 /*
  * Lookup menu handle from "menu_id".
  */
-    static HMENU
+    స్థిర HMENU
 tearoff_lookup_menuhandle(
     vimmenu_T *menu,
-    WORD menu_id)
+    మాట_2 menu_id)
 {
-    for ( ; menu != NULL; menu = menu->next)
+    కొరకు ( ; menu != ఖాళీ; menu = menu->తదుపరి)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
-	    continue;
-	if ((WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
-	    return menu->submenu_id;
+	ఒకవేళ (menu->modes == 0)	// this menu has just been deleted
+	    కొనసాగు;
+	ఒకవేళ (menu_is_separator(menu->dname))
+	    కొనసాగు;
+	ఒకవేళ ((మాట_2)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
+	    తిరిగి menu->submenu_id;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -8097,72 +8097,72 @@ tearoff_lookup_menuhandle(
  * "tearoff menus" Very simple - forward button presses (to fool Vim into
  * thinking its menus have been clicked), and go away when closed.
  */
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 tearoff_callback(
     HWND hwnd,
-    UINT message,
+    UINT సందేశం_2,
     WPARAM wParam,
     LPARAM lParam)
 {
-    if (message == WM_INITDIALOG)
+    ఒకవేళ (సందేశం_2 == WM_INITDIALOG)
     {
-	SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-	return (TRUE);
+	సమితి_కిటికీ_Long_Ptr(hwnd, DWLP_USER, (LONG_PTR)lParam);
+	తిరిగి (TRUE);
     }
 
     // May show the mouse pointer again.
-    HandleMouseHide(message, lParam);
+    HandleMouseHide(సందేశం_2, lParam);
 
-    if (message == WM_COMMAND)
+    ఒకవేళ (సందేశం_2 == WM_COMMAND)
     {
-	if ((WORD)(LOWORD(wParam)) & 0x8000)
+	ఒకవేళ ((మాట_2)(LOWORD(wParam)) & 0x8000)
 	{
-	    POINT   mp;
+	    బిందువు_2   mp;
 	    RECT    rect;
 
-	    if (GetCursorPos(&mp) && GetWindowRect(hwnd, &rect))
+	    ఒకవేళ (GetCursorPos(&mp) && Get_కిటికీ_Rect(hwnd, &rect))
 	    {
 		vimmenu_T *menu;
 
-		menu = (vimmenu_T*)GetWindowLongPtr(hwnd, DWLP_USER);
-		(void)TrackPopupMenu(
+		menu = (vimmenu_T*)Get_కిటికీ_Long_Ptr(hwnd, DWLP_USER);
+		(శూన్య)TrackPopupMenu(
 			 tearoff_lookup_menuhandle(menu, LOWORD(wParam)),
 			 TPM_LEFTALIGN | TPM_LEFTBUTTON,
-			 (int)rect.right - 8,
-			 (int)mp.y,
-			 (int)0,	    // reserved param
+			 (పూర్ణాంకం)rect.కుడి_2 - 8,
+			 (పూర్ణాంకం)mp.y,
+			 (పూర్ణాంకం)0,	    // reserved param
 			 s_hwnd,
-			 NULL);
+			 ఖాళీ);
 		/*
 		 * NOTE: The pop-up menu can eat the mouse up event.
 		 * We deal with this in normal.c.
 		 */
 	    }
 	}
-	else
+	లేకపోతే
 	    // Pass on messages to the main Vim window
-	    PostMessage(s_hwnd, WM_COMMAND, LOWORD(wParam), 0);
+	    Post_సందేశం(s_hwnd, WM_COMMAND, LOWORD(wParam), 0);
 	/*
 	 * Give main window the focus back: this is so after
 	 * choosing a tearoff button you can start typing again
 	 * straight away.
 	 */
-	(void)SetFocus(s_hwnd);
-	return TRUE;
+	(శూన్య)సమితి_Focus(s_hwnd);
+	తిరిగి TRUE;
     }
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    ఒకవేళ ((సందేశం_2 == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
-	DestroyWindow(hwnd);
-	return TRUE;
+	Destroy_కిటికీ(hwnd);
+	తిరిగి TRUE;
     }
 
     // When moved around, give main window the focus back.
-    if (message == WM_EXITSIZEMOVE)
-	(void)SetActiveWindow(s_hwnd);
+    ఒకవేళ (సందేశం_2 == WM_EXITSIZEMOVE)
+	(శూన్య)సమితి_చురుకైన_కిటికీ(s_hwnd);
 
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 
 /*
@@ -8170,166 +8170,166 @@ tearoff_callback(
  * We don't use the GetDialogBaseUnits() API, because we don't use the
  * (old-style) system font.
  */
-    static void
-get_dialog_font_metrics(void)
+    స్థిర శూన్య
+get_dialog_font_metrics(శూన్య)
 {
     HDC		    hdc;
     HFONT	    hfontTools = 0;
-    SIZE	    size;
-#ifdef USE_SYSMENU_FONT
+    కొలత_3	    కొలత;
+#నిర్వచితమైతే USE_SYSMENU_FONT
     LOGFONTW	    lfSysmenu;
-#endif
+#అయితే_ముగింపు
 
-#ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
-	hfontTools = CreateFontIndirectW(&lfSysmenu);
-    else
-#endif
-	hfontTools = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
+#నిర్వచితమైతే USE_SYSMENU_FONT
+    ఒకవేళ (gui_w32_get_menu_font(&lfSysmenu) == OK)
+	hfontTools = Create_Font_పరోక్ష_W(&lfSysmenu);
+    లేకపోతే
+#అయితే_ముగింపు
+	hfontTools = CreateFont(-DLG_FONT_బిందువు_కొలత, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
 
     hdc = GetDC(s_hwnd);
     SelectObject(hdc, hfontTools);
-    GetAverageFontSize(hdc, &size);
+    Get_సరాసరి_Font_కొలత(hdc, &కొలత);
     ReleaseDC(s_hwnd, hdc);
 
-    s_dlgfntwidth = (WORD)size.cx;
-    s_dlgfntheight = (WORD)size.cy;
+    s_dlgfntwidth = (మాట_2)కొలత.cx;
+    s_dlgfntheight = (మాట_2)కొలత.cy;
 }
 
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#ఒకవేళ defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 /*
  * Create a pseudo-"tearoff menu" based on the child
  * items of a given menu pointer.
  */
-    static void
+    స్థిర శూన్య
 gui_mch_tearoff(
     char_u	*title,
     vimmenu_T	*menu,
-    int		initX,
-    int		initY)
+    పూర్ణాంకం		initX,
+    పూర్ణాంకం		initY)
 {
-    WORD	*p, *pdlgtemplate, *pnumitems, *ptrueheight;
-    int		template_len;
-    int		nchar, textWidth, submenuWidth;
+    మాట_2	*p, *pdlgtemplate, *pnumitems, *ptrueheight;
+    పూర్ణాంకం		template_len;
+    పూర్ణాంకం		nchar, పాఠ్యం_వెడల్పు_2, submenu_వెడల్పు;
     DWORD	lStyle;
     DWORD	lExtendedStyle;
-    WORD	dlgwidth;
-    WORD	menuID;
+    మాట_2	dlgwidth;
+    మాట_2	menuID;
     vimmenu_T	*pmenu;
-    vimmenu_T	*top_menu;
+    vimmenu_T	*శిఖరం_menu;
     vimmenu_T	*the_menu = menu;
     HWND	hwnd;
     HDC		hdc;
     HFONT	font, oldFont;
-    int		col, spaceWidth, len;
-    int		columnWidths[2];
-    char_u	*label, *text;
-    int		acLen = 0;
-    int		nameLen;
-    int		padding0, padding1, padding2 = 0;
-    int		sepPadding=0;
-    int		x;
-    int		y;
+    పూర్ణాంకం		నిలువు, space_వెడల్పు, len;
+    పూర్ణాంకం		స్తంభం_Widths[2];
+    char_u	*label, *పాఠ్యం;
+    పూర్ణాంకం		acLen = 0;
+    పూర్ణాంకం		nameLen;
+    పూర్ణాంకం		padding0, padding1, padding2 = 0;
+    పూర్ణాంకం		sepPadding=0;
+    పూర్ణాంకం		x;
+    పూర్ణాంకం		y;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    పూర్ణాంకం		use_lfSysmenu = FALSE;
 # endif
 
     /*
      * If this menu is already torn off, move it to the mouse position.
      */
-    if (IsWindow(menu->tearoff_handle))
+    ఒకవేళ (Is_కిటికీ(menu->tearoff_handle))
     {
-	POINT mp;
-	if (GetCursorPos(&mp))
+	బిందువు_2 mp;
+	ఒకవేళ (GetCursorPos(&mp))
 	{
-	    SetWindowPos(menu->tearoff_handle, NULL, mp.x, mp.y, 0, 0,
+	    సమితి_కిటికీ_Pos(menu->tearoff_handle, ఖాళీ, mp.x, mp.y, 0, 0,
 		    SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
 	}
-	return;
+	తిరిగి;
     }
 
     /*
      * Create a new tearoff.
      */
-    if (*title == MNU_HIDDEN_CHAR)
+    ఒకవేళ (*title == MNU_HIDDEN_CHAR)
 	title++;
 
     // Allocate memory to store the dialog template.  It's made bigger when
     // needed.
-    template_len = DLG_ALLOC_SIZE;
-    pdlgtemplate = p = (WORD *)LocalAlloc(LPTR, template_len);
-    if (p == NULL)
-	return;
+    template_len = DLG_ALLOC_కొలత;
+    pdlgtemplate = p = (మాట_2 *)LocalAlloc(LPTR, template_len);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
-    hwnd = GetDesktopWindow();
-    hdc = GetWindowDC(hwnd);
+    hwnd = Get_Desktop_కిటికీ();
+    hdc = Get_కిటికీ_DC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    ఒకవేళ (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
-	font = CreateFontIndirectW(&lfSysmenu);
+	font = Create_Font_పరోక్ష_W(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    లేకపోతే
 # endif
-	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
+	font = CreateFont(-DLG_FONT_బిందువు_కొలత, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
 
     oldFont = SelectFont(hdc, font);
 
     // Calculate width of a single space.  Used for padding columns to the
     // right width.
-    spaceWidth = GetTextWidth(hdc, (char_u *)" ", 1);
+    space_వెడల్పు = Get_పాఠ్యం_వెడల్పు(hdc, (char_u *)" ", 1);
 
     // Figure out max width of the text column, the accelerator column and the
     // optional submenu column.
-    submenuWidth = 0;
-    for (col = 0; col < 2; col++)
+    submenu_వెడల్పు = 0;
+    కొరకు (నిలువు = 0; నిలువు < 2; నిలువు++)
     {
-	columnWidths[col] = 0;
-	FOR_ALL_CHILD_MENUS(menu, pmenu)
+	స్తంభం_Widths[నిలువు] = 0;
+	FOR_ALL_బిడ్డ_MENUS(menu, pmenu)
 	{
 	    // Use "dname" here to compute the width of the visible text.
-	    text = (col == 0) ? pmenu->dname : pmenu->actext;
-	    if (text != NULL && *text != NUL)
+	    పాఠ్యం = (నిలువు == 0) ? pmenu->dname : pmenu->actext;
+	    ఒకవేళ (పాఠ్యం != ఖాళీ && *పాఠ్యం != NUL)
 	    {
-		textWidth = GetTextWidthEnc(hdc, text, (int)STRLEN(text));
-		if (textWidth > columnWidths[col])
-		    columnWidths[col] = textWidth;
+		పాఠ్యం_వెడల్పు_2 = Get_పాఠ్యం_వెడల్పు_Enc(hdc, పాఠ్యం, (పూర్ణాంకం)STRLEN(పాఠ్యం));
+		ఒకవేళ (పాఠ్యం_వెడల్పు_2 > స్తంభం_Widths[నిలువు])
+		    స్తంభం_Widths[నిలువు] = పాఠ్యం_వెడల్పు_2;
 	    }
-	    if (pmenu->children != NULL)
-		submenuWidth = TEAROFF_COLUMN_PADDING * spaceWidth;
+	    ఒకవేళ (pmenu->children != ఖాళీ)
+		submenu_వెడల్పు = TEAROFF_స్తంభం_PADDING * space_వెడల్పు;
 	}
     }
-    if (columnWidths[1] == 0)
+    ఒకవేళ (స్తంభం_Widths[1] == 0)
     {
 	// no accelerators
-	if (submenuWidth != 0)
-	    columnWidths[0] += submenuWidth;
-	else
-	    columnWidths[0] += spaceWidth;
+	ఒకవేళ (submenu_వెడల్పు != 0)
+	    స్తంభం_Widths[0] += submenu_వెడల్పు;
+	లేకపోతే
+	    స్తంభం_Widths[0] += space_వెడల్పు;
     }
-    else
+    లేకపోతే
     {
 	// there is an accelerator column
-	columnWidths[0] += TEAROFF_COLUMN_PADDING * spaceWidth;
-	columnWidths[1] += submenuWidth;
+	స్తంభం_Widths[0] += TEAROFF_స్తంభం_PADDING * space_వెడల్పు;
+	స్తంభం_Widths[1] += submenu_వెడల్పు;
     }
 
     /*
      * Now find the total width of our 'menu'.
      */
-    textWidth = columnWidths[0] + columnWidths[1];
-    if (submenuWidth != 0)
+    పాఠ్యం_వెడల్పు_2 = స్తంభం_Widths[0] + స్తంభం_Widths[1];
+    ఒకవేళ (submenu_వెడల్పు != 0)
     {
-	submenuWidth = GetTextWidth(hdc, (char_u *)TEAROFF_SUBMENU_LABEL,
-				  (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
-	textWidth += submenuWidth;
+	submenu_వెడల్పు = Get_పాఠ్యం_వెడల్పు(hdc, (char_u *)TEAROFF_SUBMENU_LABEL,
+				  (పూర్ణాంకం)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
+	పాఠ్యం_వెడల్పు_2 += submenu_వెడల్పు;
     }
-    dlgwidth = GetTextWidthEnc(hdc, title, (int)STRLEN(title));
-    if (textWidth > dlgwidth)
-	dlgwidth = textWidth;
+    dlgwidth = Get_పాఠ్యం_వెడల్పు_Enc(hdc, title, (పూర్ణాంకం)STRLEN(title));
+    ఒకవేళ (పాఠ్యం_వెడల్పు_2 > dlgwidth)
+	dlgwidth = పాఠ్యం_వెడల్పు_2;
     dlgwidth += 2 * TEAROFF_PADDING_X + TEAROFF_BUTTON_PAD_X;
 
     // start to fill in the dlgtemplate information.  addressing by WORDs
@@ -8343,41 +8343,41 @@ gui_mch_tearoff(
     pnumitems = p;	// save where the number of items must be stored
     *p++ = 0;		// NumberOfItems(will change later)
     gui_mch_getmouse(&x, &y);
-    if (initX == 0xffffL)
-	*p++ = PixelToDialogX(x); // x
-    else
-	*p++ = PixelToDialogX(initX); // x
-    if (initY == 0xffffL)
-	*p++ = PixelToDialogY(y); // y
-    else
-	*p++ = PixelToDialogY(initY); // y
-    *p++ = PixelToDialogX(dlgwidth);    // cx
+    ఒకవేళ (initX == 0xffffL)
+	*p++ = Pixel_గమ్యం_Dialog_X(x); // x
+    లేకపోతే
+	*p++ = Pixel_గమ్యం_Dialog_X(initX); // x
+    ఒకవేళ (initY == 0xffffL)
+	*p++ = Pixel_గమ్యం_Dialog_Y(y); // y
+    లేకపోతే
+	*p++ = Pixel_గమ్యం_Dialog_Y(initY); // y
+    *p++ = Pixel_గమ్యం_Dialog_X(dlgwidth);    // cx
     ptrueheight = p;
     *p++ = 0;		// dialog height: changed later anyway
     *p++ = 0;		// Menu
     *p++ = 0;		// Class
 
     // copy the title of the dialog
-    nchar = nCopyAnsiToWideChar(p, ((*title)
+    nchar = n_Copy_Ansi_గమ్యం_Wide_Char(p, ((*title)
 			    ? (LPSTR)title
-			    : (LPSTR)("Vim "VIM_VERSION_MEDIUM)), TRUE);
+			    : (LPSTR)("Vim "VIM_సంస్కరణ_MEDIUM)), TRUE);
     p += nchar;
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    ఒకవేళ (use_lfSysmenu)
     {
 	// point size
-	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
+	*p++ = -MulDiv(lfSysmenu.lf_ఎత్తు, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (పూర్ణాంకం)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    లేకపోతే
 # endif
     {
-	*p++ = DLG_FONT_POINT_SIZE;		// point size
-	nchar = nCopyAnsiToWideChar(p, DLG_FONT_NAME, FALSE);
+	*p++ = DLG_FONT_బిందువు_కొలత;		// point size
+	nchar = n_Copy_Ansi_గమ్యం_Wide_Char(p, DLG_FONT_NAME, FALSE);
     }
     p += nchar;
 
@@ -8385,33 +8385,33 @@ gui_mch_tearoff(
      * Loop over all the items in the menu.
      * But skip over the tearbar.
      */
-    if (STRCMP(menu->children->name, TEAR_STRING) == 0)
-	menu = menu->children->next;
-    else
+    ఒకవేళ (STRCMP(menu->children->name, TEAR_STRING) == 0)
+	menu = menu->children->తదుపరి;
+    లేకపోతే
 	menu = menu->children;
-    top_menu = menu;
-    for ( ; menu != NULL; menu = menu->next)
+    శిఖరం_menu = menu;
+    కొరకు ( ; menu != ఖాళీ; menu = menu->తదుపరి)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
+	ఒకవేళ (menu->modes == 0)	// this menu has just been deleted
+	    కొనసాగు;
+	ఒకవేళ (menu_is_separator(menu->dname))
 	{
 	    sepPadding += 3;
-	    continue;
+	    కొనసాగు;
 	}
 
 	// Check if there still is plenty of room in the template.  Make it
 	// larger when needed.
-	if (((char *)p - (char *)pdlgtemplate) + 1000 > template_len)
+	ఒకవేళ (((అక్షరం *)p - (అక్షరం *)pdlgtemplate) + 1000 > template_len)
 	{
-	    WORD    *newp;
+	    మాట_2    *newp;
 
-	    newp = (WORD *)LocalAlloc(LPTR, template_len + 4096);
-	    if (newp != NULL)
+	    newp = (మాట_2 *)LocalAlloc(LPTR, template_len + 4096);
+	    ఒకవేళ (newp != ఖాళీ)
 	    {
 		template_len += 4096;
 		mch_memmove(newp, pdlgtemplate,
-					    (char *)p - (char *)pdlgtemplate);
+					    (అక్షరం *)p - (అక్షరం *)pdlgtemplate);
 		p = newp + (p - pdlgtemplate);
 		pnumitems = newp + (pnumitems - pdlgtemplate);
 		ptrueheight = newp + (ptrueheight - pdlgtemplate);
@@ -8423,89 +8423,89 @@ gui_mch_tearoff(
 	// Figure out minimal length of this menu label.  Use "name" for the
 	// actual text, "dname" for estimating the displayed size.  "name"
 	// has "&a" for mnemonic and includes the accelerator.
-	len = nameLen = (int)STRLEN(menu->name);
-	padding0 = (columnWidths[0] - GetTextWidthEnc(hdc, menu->dname,
-				      (int)STRLEN(menu->dname))) / spaceWidth;
+	len = nameLen = (పూర్ణాంకం)STRLEN(menu->name);
+	padding0 = (స్తంభం_Widths[0] - Get_పాఠ్యం_వెడల్పు_Enc(hdc, menu->dname,
+				      (పూర్ణాంకం)STRLEN(menu->dname))) / space_వెడల్పు;
 	len += padding0;
 
-	if (menu->actext != NULL)
+	ఒకవేళ (menu->actext != ఖాళీ)
 	{
-	    acLen = (int)STRLEN(menu->actext);
+	    acLen = (పూర్ణాంకం)STRLEN(menu->actext);
 	    len += acLen;
-	    textWidth = GetTextWidthEnc(hdc, menu->actext, acLen);
+	    పాఠ్యం_వెడల్పు_2 = Get_పాఠ్యం_వెడల్పు_Enc(hdc, menu->actext, acLen);
 	}
-	else
-	    textWidth = 0;
-	padding1 = (columnWidths[1] - textWidth) / spaceWidth;
+	లేకపోతే
+	    పాఠ్యం_వెడల్పు_2 = 0;
+	padding1 = (స్తంభం_Widths[1] - పాఠ్యం_వెడల్పు_2) / space_వెడల్పు;
 	len += padding1;
 
-	if (menu->children == NULL)
+	ఒకవేళ (menu->children == ఖాళీ)
 	{
-	    padding2 = submenuWidth / spaceWidth;
+	    padding2 = submenu_వెడల్పు / space_వెడల్పు;
 	    len += padding2;
-	    menuID = (WORD)(menu->id);
+	    menuID = (మాట_2)(menu->id);
 	}
-	else
+	లేకపోతే
 	{
-	    len += (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
-	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
+	    len += (పూర్ణాంకం)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
+	    menuID = (మాట_2)((long_u)(menu->submenu_id) | (DWORD)0x8000);
 	}
 
 	// Allocate menu label and fill it in
-	text = label = alloc(len + 1);
-	if (label == NULL)
-	    break;
+	పాఠ్యం = label = alloc(len + 1);
+	ఒకవేళ (label == ఖాళీ)
+	    ఆపు;
 
-	vim_strncpy(text, menu->name, nameLen);
-	text = vim_strchr(text, TAB);	    // stop at TAB before actext
-	if (text == NULL)
-	    text = label + nameLen;	    // no actext, use whole name
-	while (padding0-- > 0)
-	    *text++ = ' ';
-	if (menu->actext != NULL)
+	vim_strncpy(పాఠ్యం, menu->name, nameLen);
+	పాఠ్యం = vim_strchr(పాఠ్యం, TAB);	    // stop at TAB before actext
+	ఒకవేళ (పాఠ్యం == ఖాళీ)
+	    పాఠ్యం = label + nameLen;	    // no actext, use whole name
+	అయితే (padding0-- > 0)
+	    *పాఠ్యం++ = ' ';
+	ఒకవేళ (menu->actext != ఖాళీ)
 	{
-	    STRNCPY(text, menu->actext, acLen);
-	    text += acLen;
+	    STRNCPY(పాఠ్యం, menu->actext, acLen);
+	    పాఠ్యం += acLen;
 	}
-	while (padding1-- > 0)
-	    *text++ = ' ';
-	if (menu->children != NULL)
+	అయితే (padding1-- > 0)
+	    *పాఠ్యం++ = ' ';
+	ఒకవేళ (menu->children != ఖాళీ)
 	{
-	    STRCPY(text, TEAROFF_SUBMENU_LABEL);
-	    text += STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
+	    STRCPY(పాఠ్యం, TEAROFF_SUBMENU_LABEL);
+	    పాఠ్యం += STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
 	}
-	else
+	లేకపోతే
 	{
-	    while (padding2-- > 0)
-		*text++ = ' ';
+	    అయితే (padding2-- > 0)
+		*పాఠ్యం++ = ' ';
 	}
-	*text = NUL;
+	*పాఠ్యం = NUL;
 
 	/*
 	 * BS_LEFT will just be ignored on Win32s/NT3.5x - on
 	 * W95/NT4 it makes the tear-off look more like a menu.
 	 */
-	p = add_dialog_element(p,
-		BS_PUSHBUTTON|BS_LEFT,
-		(WORD)PixelToDialogX(TEAROFF_PADDING_X),
-		(WORD)(sepPadding + 1 + 13 * (*pnumitems)),
-		(WORD)PixelToDialogX(dlgwidth - 2 * TEAROFF_PADDING_X),
-		(WORD)12,
-		menuID, (WORD)0x0080, (char *)label);
+	p = కూడు_dialog_element(p,
+		BS_PUSHBUTTON|BS_ఎడమ,
+		(మాట_2)Pixel_గమ్యం_Dialog_X(TEAROFF_PADDING_X),
+		(మాట_2)(sepPadding + 1 + 13 * (*pnumitems)),
+		(మాట_2)Pixel_గమ్యం_Dialog_X(dlgwidth - 2 * TEAROFF_PADDING_X),
+		(మాట_2)12,
+		menuID, (మాట_2)0x0080, (అక్షరం *)label);
 	vim_free(label);
 	(*pnumitems)++;
     }
 
-    *ptrueheight = (WORD)(sepPadding + 1 + 13 * (*pnumitems));
+    *ptrueheight = (మాట_2)(sepPadding + 1 + 13 * (*pnumitems));
 
 
     // show modelessly
-    the_menu->tearoff_handle = CreateDialogIndirectParam(
+    the_menu->tearoff_handle = Create_Dialog_పరోక్ష_Param(
 	    g_hinst,
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
 	    (DLGPROC)tearoff_callback,
-	    (LPARAM)top_menu);
+	    (LPARAM)శిఖరం_menu);
 
     LocalFree(LocalHandle(pdlgtemplate));
     SelectFont(hdc, oldFont);
@@ -8517,14 +8517,14 @@ gui_mch_tearoff(
      * a tearoff, the user doesn't have to click with the mouse just to start
      * typing again!
      */
-    (void)SetActiveWindow(s_hwnd);
+    (శూన్య)సమితి_చురుకైన_కిటికీ(s_hwnd);
 
     // make sure the right buttons are enabled
     force_menu_update = TRUE;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_TOOLBAR)
+#ఒకవేళ defined(FEAT_TOOLBAR)
 # include "gui_w32_rc.h"
 
 /*
@@ -8532,55 +8532,55 @@ gui_mch_tearoff(
  *  (just like the menu, there are no defaults, it's all
  *  set up through menu.vim)
  */
-    static void
-initialise_toolbar(void)
+    స్థిర శూన్య
+initialise_toolbar(శూన్య)
 {
     InitCommonControls();
     s_toolbarhwnd = CreateToolbarEx(
 		    s_hwnd,
-		    WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT,
+		    WS_బిడ్డ | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT,
 		    4000,		//any old big number
 		    31,			//number of images in initial bitmap
 		    g_hinst,
 		    IDR_TOOLBAR1,	// id of initial bitmap
-		    NULL,
+		    ఖాళీ,
 		    0,			// initial number of buttons
-		    TOOLBAR_BUTTON_WIDTH, //api guide is wrong!
-		    TOOLBAR_BUTTON_HEIGHT,
-		    TOOLBAR_BUTTON_WIDTH,
-		    TOOLBAR_BUTTON_HEIGHT,
-		    sizeof(TBBUTTON)
+		    TOOLBAR_BUTTON_వెడల్పు, //api guide is wrong!
+		    TOOLBAR_BUTTON_ఎత్తు,
+		    TOOLBAR_BUTTON_వెడల్పు,
+		    TOOLBAR_BUTTON_ఎత్తు,
+		    పరిమాణం(TBBUTTON)
 		    );
 
     // Remove transparency from the toolbar to prevent the main window
     // background colour showing through
-    SendMessage(s_toolbarhwnd, TB_SETSTYLE, 0,
-	SendMessage(s_toolbarhwnd, TB_GETSTYLE, 0, 0) & ~TBSTYLE_TRANSPARENT);
+    Send_సందేశం(s_toolbarhwnd, TB_SETSTYLE, 0,
+	Send_సందేశం(s_toolbarhwnd, TB_GETSTYLE, 0, 0) & ~TBSTYLE_TRANSPARENT);
 
-    s_toolbar_wndproc = SubclassWindow(s_toolbarhwnd, toolbar_wndproc);
+    s_toolbar_wndproc = Subclass_కిటికీ(s_toolbarhwnd, toolbar_wndproc);
 
-    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != NULL);
+    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != ఖాళీ);
 
-    update_toolbar_size();
+    update_toolbar_కొలత();
 }
 
-    static void
-update_toolbar_size(void)
+    స్థిర శూన్య
+update_toolbar_కొలత(శూన్య)
 {
-    int		w, h;
+    పూర్ణాంకం		w, h;
     TBMETRICS	tbm;
 
-    tbm.cbSize = sizeof(TBMETRICS);
-    tbm.dwMask = TBMF_PAD | TBMF_BUTTONSPACING;
-    SendMessage(s_toolbarhwnd, TB_GETMETRICS, 0, (LPARAM)&tbm);
+    tbm.cb_కొలత = పరిమాణం(TBMETRICS);
+    tbm.dw_ముసుగు = TBMF_PAD | TBMF_BUTTONSPACING;
+    Send_సందేశం(s_toolbarhwnd, TB_GETMETRICS, 0, (LPARAM)&tbm);
     //TRACE("Pad: %d, %d", tbm.cxPad, tbm.cyPad);
     //TRACE("ButtonSpacing: %d, %d", tbm.cxButtonSpacing, tbm.cyButtonSpacing);
 
-    w = (TOOLBAR_BUTTON_WIDTH + tbm.cxPad) * s_dpi / DEFAULT_DPI;
-    h = (TOOLBAR_BUTTON_HEIGHT + tbm.cyPad) * s_dpi / DEFAULT_DPI;
+    w = (TOOLBAR_BUTTON_వెడల్పు + tbm.cxPad) * s_dpi / DEFAULT_DPI;
+    h = (TOOLBAR_BUTTON_ఎత్తు + tbm.cyPad) * s_dpi / DEFAULT_DPI;
     //TRACE("button size: %d, %d", w, h);
-    SendMessage(s_toolbarhwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(w, h));
-    gui.toolbar_height = h + 6;
+    Send_సందేశం(s_toolbarhwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(w, h));
+    gui.toolbar_ఎత్తు = h + 6;
 
     //DWORD s = SendMessage(s_toolbarhwnd, TB_GETBUTTONSIZE, 0, 0);
     //TRACE("actual button size: %d, %d", LOWORD(s), HIWORD(s));
@@ -8590,39 +8590,39 @@ update_toolbar_size(void)
     // It would be nice if the toolbar images are resized based on DPI.
 }
 
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 toolbar_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_సందేశం,
     WPARAM wParam,
     LPARAM lParam)
 {
-    HandleMouseHide(uMsg, lParam);
-    return CallWindowProc(s_toolbar_wndproc, hwnd, uMsg, wParam, lParam);
+    HandleMouseHide(u_సందేశం, lParam);
+    తిరిగి Call_కిటికీ_Proc(s_toolbar_wndproc, hwnd, u_సందేశం, wParam, lParam);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 get_toolbar_bitmap(vimmenu_T *menu)
 {
-    int i = -1;
+    పూర్ణాంకం i = -1;
 
     /*
      * Check user bitmaps first, unless builtin is specified.
      */
-    if (!menu->icon_builtin)
+    ఒకవేళ (!menu->icon_builtin)
     {
 	char_u fname[MAXPATHL];
-	HANDLE hbitmap = NULL;
+	HANDLE hbitmap = ఖాళీ;
 
-	if (menu->iconfile != NULL)
+	ఒకవేళ (menu->iconfile != ఖాళీ)
 	{
-	    gui_find_iconfile(menu->iconfile, fname, "bmp");
-	    hbitmap = LoadImage(
-			NULL,
+	    gui_కనుగొను_iconfile(menu->iconfile, fname, "bmp");
+	    hbitmap = ఎక్కించు_Image(
+			ఖాళీ,
 			(LPCSTR)fname,
 			IMAGE_BITMAP,
-			TOOLBAR_BUTTON_WIDTH,
-			TOOLBAR_BUTTON_HEIGHT,
+			TOOLBAR_BUTTON_వెడల్పు,
+			TOOLBAR_BUTTON_ఎత్తు,
 			LR_LOADFROMFILE |
 			LR_LOADMAP3DCOLORS
 			);
@@ -8632,140 +8632,140 @@ get_toolbar_bitmap(vimmenu_T *menu)
 	 * If the LoadImage call failed, or the "icon=" file
 	 * didn't exist or wasn't specified, try the menu name
 	 */
-	if (hbitmap == NULL
-		&& (gui_find_bitmap(
+	ఒకవేళ (hbitmap == ఖాళీ
+		&& (gui_కనుగొను_bitmap(
 # ifdef FEAT_MULTI_LANG
-			    menu->en_dname != NULL ? menu->en_dname :
+			    menu->en_dname != ఖాళీ ? menu->en_dname :
 # endif
 					menu->dname, fname, "bmp") == OK))
-	    hbitmap = LoadImage(
-		    NULL,
+	    hbitmap = ఎక్కించు_Image(
+		    ఖాళీ,
 		    (LPCSTR)fname,
 		    IMAGE_BITMAP,
-		    TOOLBAR_BUTTON_WIDTH,
-		    TOOLBAR_BUTTON_HEIGHT,
+		    TOOLBAR_BUTTON_వెడల్పు,
+		    TOOLBAR_BUTTON_ఎత్తు,
 		    LR_LOADFROMFILE |
 		    LR_LOADMAP3DCOLORS
 		);
 
-	if (hbitmap != NULL)
+	ఒకవేళ (hbitmap != ఖాళీ)
 	{
-	    TBADDBITMAP tbAddBitmap;
+	    TBADDBITMAP tb_కూడు_Bitmap;
 
-	    tbAddBitmap.hInst = NULL;
-	    tbAddBitmap.nID = (long_u)hbitmap;
+	    tb_కూడు_Bitmap.hInst = ఖాళీ;
+	    tb_కూడు_Bitmap.nID = (long_u)hbitmap;
 
-	    i = (int)SendMessage(s_toolbarhwnd, TB_ADDBITMAP,
-			    (WPARAM)1, (LPARAM)&tbAddBitmap);
+	    i = (పూర్ణాంకం)Send_సందేశం(s_toolbarhwnd, TB_ADDBITMAP,
+			    (WPARAM)1, (LPARAM)&tb_కూడు_Bitmap);
 	    // i will be set to -1 if it fails
 	}
     }
-    if (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_COUNT)
+    ఒకవేళ (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_లెక్క)
 	i = menu->iconidx;
 
-    return i;
+    తిరిగి i;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
-initialise_tabline(void)
+#ఒకవేళ defined(FEAT_GUI_TABLINE)
+    స్థిర శూన్య
+initialise_tabline(శూన్య)
 {
     InitCommonControls();
 
-    s_tabhwnd = CreateWindow(WC_TABCONTROL, "Vim tabline",
-	    WS_CHILD|TCS_FOCUSNEVER|TCS_TOOLTIPS,
+    s_tabhwnd = Create_కిటికీ(WC_TABCONTROL, "Vim tabline",
+	    WS_బిడ్డ|TCS_FOCUSNEVER|TCS_TOOLTIPS,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    CW_USEDEFAULT, s_hwnd, NULL, g_hinst, NULL);
-    s_tabline_wndproc = SubclassWindow(s_tabhwnd, tabline_wndproc);
+	    CW_USEDEFAULT, s_hwnd, ఖాళీ, g_hinst, ఖాళీ);
+    s_tabline_wndproc = Subclass_కిటికీ(s_tabhwnd, tabline_wndproc);
 
-    gui.tabline_height = TABLINE_HEIGHT;
+    gui.tabline_ఎత్తు = TABLINE_ఎత్తు;
 
-    set_tabline_font();
+    సమితి_tabline_font();
 }
 
 /*
  * Get tabpage_T from POINT.
  */
-    static tabpage_T *
-GetTabFromPoint(
+    స్థిర tabpage_T *
+Get_Tab_From_బిందువు(
     HWND    hWnd,
-    POINT   pt)
+    బిందువు_2   pt)
 {
-    tabpage_T	*ptp = NULL;
+    tabpage_T	*ptp = ఖాళీ;
 
-    if (gui_mch_showing_tabline())
+    ఒకవేళ (gui_mch_showing_tabline())
     {
 	TCHITTESTINFO htinfo;
 	htinfo.pt = pt;
 	// ignore if a window under cursor is not tabcontrol.
-	if (s_tabhwnd == hWnd)
+	ఒకవేళ (s_tabhwnd == hWnd)
 	{
-	    int idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	    if (idx != -1)
-		ptp = find_tabpage(idx + 1);
+	    పూర్ణాంకం idx = Tab_Ctrl_తగిలింది_Test(s_tabhwnd, &htinfo);
+	    ఒకవేళ (idx != -1)
+		ptp = కనుగొను_tabpage(idx + 1);
 	}
     }
-    return ptp;
+    తిరిగి ptp;
 }
 
-static POINT	    s_pt = {0, 0};
-static HCURSOR      s_hCursor = NULL;
+స్థిర బిందువు_2	    s_pt = {0, 0};
+స్థిర HCURSOR      s_hCursor = ఖాళీ;
 
-    static LRESULT CALLBACK
+    స్థిర LRESULT CALLBACK
 tabline_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_సందేశం,
     WPARAM wParam,
     LPARAM lParam)
 {
-    POINT	pt;
+    బిందువు_2	pt;
     tabpage_T	*tp;
     RECT	rect;
-    int		nCenter;
-    int		idx0;
-    int		idx1;
+    పూర్ణాంకం		nCenter;
+    పూర్ణాంకం		idx0;
+    పూర్ణాంకం		idx1;
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_సందేశం, lParam);
 
-    switch (uMsg)
+    ఎంపిక (u_సందేశం)
     {
-	case WM_LBUTTONDOWN:
+	స్థితి WM_LBUTTONDOWN:
 	    {
 		s_pt.x = GET_X_LPARAM(lParam);
 		s_pt.y = GET_Y_LPARAM(lParam);
-		SetCapture(hwnd);
+		సమితి_Capture(hwnd);
 		s_hCursor = GetCursor(); // backup default cursor
-		break;
+		ఆపు;
 	    }
-	case WM_MOUSEMOVE:
-	    if (GetCapture() == hwnd
+	స్థితి WM_MOUSEMOVE:
+	    ఒకవేళ (GetCapture() == hwnd
 		    && ((wParam & MK_LBUTTON)) != 0)
 	    {
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = s_pt.y;
-		if (abs(pt.x - s_pt.x) >
+		ఒకవేళ (నిరపేక్ష(pt.x - s_pt.x) >
 			pGetSystemMetricsForDpi(SM_CXDRAG, s_dpi))
 		{
-		    SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+		    సమితి_Cursor(ఎక్కించు_Cursor(ఖాళీ, IDC_SIZEWE));
 
-		    tp = GetTabFromPoint(hwnd, pt);
-		    if (tp != NULL)
+		    tp = Get_Tab_From_బిందువు(hwnd, pt);
+		    ఒకవేళ (tp != ఖాళీ)
 		    {
-			idx0 = tabpage_index(curtab) - 1;
-			idx1 = tabpage_index(tp) - 1;
+			idx0 = tabpage_సూచీ(curtab) - 1;
+			idx1 = tabpage_సూచీ(tp) - 1;
 
-			TabCtrl_GetItemRect(hwnd, idx1, &rect);
-			nCenter = rect.left + (rect.right - rect.left) / 2;
+			Tab_Ctrl_Get_అంశం_Rect(hwnd, idx1, &rect);
+			nCenter = rect.ఎడమ_2 + (rect.కుడి_2 - rect.ఎడమ_2) / 2;
 
 			// Check if the mouse cursor goes over the center of
 			// the next tab to prevent "flickering".
-			if ((idx0 < idx1) && (nCenter < pt.x))
+			ఒకవేళ ((idx0 < idx1) && (nCenter < pt.x))
 			{
 			    tabpage_move(idx1 + 1);
 			    update_screen(0);
 			}
-			else if ((idx1 < idx0) && (pt.x < nCenter))
+			లేకపోతే ఒకవేళ ((idx1 < idx0) && (pt.x < nCenter))
 			{
 			    tabpage_move(idx1);
 			    update_screen(0);
@@ -8773,112 +8773,112 @@ tabline_wndproc(
 		    }
 		}
 	    }
-	    break;
-	case WM_LBUTTONUP:
+	    ఆపు;
+	స్థితి WM_LBUTTONUP:
 	    {
-		if (GetCapture() == hwnd)
+		ఒకవేళ (GetCapture() == hwnd)
 		{
-		    SetCursor(s_hCursor);
+		    సమితి_Cursor(s_hCursor);
 		    ReleaseCapture();
 		}
-		break;
+		ఆపు;
 	    }
-	case WM_MBUTTONUP:
+	స్థితి WM_MBUTTONUP:
 	    {
 		TCHITTESTINFO htinfo;
 
 		htinfo.pt.x = GET_X_LPARAM(lParam);
 		htinfo.pt.y = GET_Y_LPARAM(lParam);
-		idx0 = TabCtrl_HitTest(hwnd, &htinfo);
-		if (idx0 != -1)
+		idx0 = Tab_Ctrl_తగిలింది_Test(hwnd, &htinfo);
+		ఒకవేళ (idx0 != -1)
 		{
 		    idx0 += 1;
 		    send_tabline_menu_event(idx0, TABLINE_MENU_CLOSE);
 		}
-		break;
+		ఆపు;
 	    }
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
     }
 
-    return CallWindowProc(s_tabline_wndproc, hwnd, uMsg, wParam, lParam);
+    తిరిగి Call_కిటికీ_Proc(s_tabline_wndproc, hwnd, u_సందేశం, wParam, lParam);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_OLE) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_OLE) || defined(FEAT_EVAL)
 /*
  * Make the GUI window come to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    శూన్య
+gui_mch_సమితి_foreground(శూన్య)
 {
-    if (IsIconic(s_hwnd))
-	 SendMessage(s_hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
-    SetForegroundWindow(s_hwnd);
+    ఒకవేళ (IsIconic(s_hwnd))
+	 Send_సందేశం(s_hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+    సమితి_Foreground_కిటికీ(s_hwnd);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
-    static void
-dyn_imm_load(void)
+#ఒకవేళ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+    స్థిర శూన్య
+dyn_imm_ఎక్కించు(శూన్య)
 {
-    hLibImm = vimLoadLib("imm32.dll");
-    if (hLibImm == NULL)
-	return;
+    hLibImm = vim_ఎక్కించు_Lib("imm32.dll");
+    ఒకవేళ (hLibImm == ఖాళీ)
+	తిరిగి;
 
     pImmGetCompositionStringW
-	    = (LONG (WINAPI *)(HIMC, DWORD, LPVOID, DWORD))GetProcAddress(hLibImm, "ImmGetCompositionStringW");
+	    = (LONG (WINAPI *)(HIMC, DWORD, LPVOID, DWORD))Get_Proc_చిరునామా(hLibImm, "ImmGetCompositionStringW");
     pImmGetContext
-	    = (HIMC (WINAPI *)(HWND))GetProcAddress(hLibImm, "ImmGetContext");
+	    = (HIMC (WINAPI *)(HWND))Get_Proc_చిరునామా(hLibImm, "ImmGetContext");
     pImmAssociateContext
-	    = (HIMC (WINAPI *)(HWND, HIMC))GetProcAddress(hLibImm, "ImmAssociateContext");
+	    = (HIMC (WINAPI *)(HWND, HIMC))Get_Proc_చిరునామా(hLibImm, "ImmAssociateContext");
     pImmReleaseContext
-	    = (BOOL (WINAPI *)(HWND, HIMC))GetProcAddress(hLibImm, "ImmReleaseContext");
-    pImmGetOpenStatus
-	    = (BOOL (WINAPI *)(HIMC))GetProcAddress(hLibImm, "ImmGetOpenStatus");
-    pImmSetOpenStatus
-	    = (BOOL (WINAPI *)(HIMC, BOOL))GetProcAddress(hLibImm, "ImmSetOpenStatus");
+	    = (BOOL (WINAPI *)(HWND, HIMC))Get_Proc_చిరునామా(hLibImm, "ImmReleaseContext");
+    p_Imm_Get_Open_స్థితి
+	    = (BOOL (WINAPI *)(HIMC))Get_Proc_చిరునామా(hLibImm, "ImmGetOpenStatus");
+    p_Imm_సమితి_Open_స్థితి
+	    = (BOOL (WINAPI *)(HIMC, BOOL))Get_Proc_చిరునామా(hLibImm, "ImmSetOpenStatus");
     pImmGetCompositionFontW
-	    = (BOOL (WINAPI *)(HIMC, LPLOGFONTW))GetProcAddress(hLibImm, "ImmGetCompositionFontW");
-    pImmSetCompositionFontW
-	    = (BOOL (WINAPI *)(HIMC, LPLOGFONTW))GetProcAddress(hLibImm, "ImmSetCompositionFontW");
-    pImmSetCompositionWindow
-	    = (BOOL (WINAPI *)(HIMC, LPCOMPOSITIONFORM))GetProcAddress(hLibImm, "ImmSetCompositionWindow");
-    pImmGetConversionStatus
-	    = (BOOL (WINAPI *)(HIMC, LPDWORD, LPDWORD))GetProcAddress(hLibImm, "ImmGetConversionStatus");
-    pImmSetConversionStatus
-	    = (BOOL (WINAPI *)(HIMC, DWORD, DWORD))GetProcAddress(hLibImm, "ImmSetConversionStatus");
+	    = (BOOL (WINAPI *)(HIMC, LPLOGFONTW))Get_Proc_చిరునామా(hLibImm, "ImmGetCompositionFontW");
+    p_Imm_సమితి_Composition_Font_W
+	    = (BOOL (WINAPI *)(HIMC, LPLOGFONTW))Get_Proc_చిరునామా(hLibImm, "ImmSetCompositionFontW");
+    p_Imm_సమితి_Composition_కిటికీ
+	    = (BOOL (WINAPI *)(HIMC, LPCOMPOSITIONFORM))Get_Proc_చిరునామా(hLibImm, "ImmSetCompositionWindow");
+    p_Imm_Get_Conversion_స్థితి
+	    = (BOOL (WINAPI *)(HIMC, LPDWORD, LPDWORD))Get_Proc_చిరునామా(hLibImm, "ImmGetConversionStatus");
+    p_Imm_సమితి_Conversion_స్థితి
+	    = (BOOL (WINAPI *)(HIMC, DWORD, DWORD))Get_Proc_చిరునామా(hLibImm, "ImmSetConversionStatus");
 
-    if (       pImmGetCompositionStringW == NULL
-	    || pImmGetContext == NULL
-	    || pImmAssociateContext == NULL
-	    || pImmReleaseContext == NULL
-	    || pImmGetOpenStatus == NULL
-	    || pImmSetOpenStatus == NULL
-	    || pImmGetCompositionFontW == NULL
-	    || pImmSetCompositionFontW == NULL
-	    || pImmSetCompositionWindow == NULL
-	    || pImmGetConversionStatus == NULL
-	    || pImmSetConversionStatus == NULL)
+    ఒకవేళ (       pImmGetCompositionStringW == ఖాళీ
+	    || pImmGetContext == ఖాళీ
+	    || pImmAssociateContext == ఖాళీ
+	    || pImmReleaseContext == ఖాళీ
+	    || p_Imm_Get_Open_స్థితి == ఖాళీ
+	    || p_Imm_సమితి_Open_స్థితి == ఖాళీ
+	    || pImmGetCompositionFontW == ఖాళీ
+	    || p_Imm_సమితి_Composition_Font_W == ఖాళీ
+	    || p_Imm_సమితి_Composition_కిటికీ == ఖాళీ
+	    || p_Imm_Get_Conversion_స్థితి == ఖాళీ
+	    || p_Imm_సమితి_Conversion_స్థితి == ఖాళీ)
     {
 	FreeLibrary(hLibImm);
-	hLibImm = NULL;
-	pImmGetContext = NULL;
-	return;
+	hLibImm = ఖాళీ;
+	pImmGetContext = ఖాళీ;
+	తిరిగి;
     }
 
-    return;
+    తిరిగి;
 }
 
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_SIGN_ICONS)
+#ఒకవేళ defined(FEAT_SIGN_ICONS)
 
 # ifdef FEAT_XPM_W32
 #  define IMAGE_XPM   100
 # endif
 
-typedef struct _signicon_t
+రకనిర్వచనం నిర్మాణం _signicon_t
 {
     HANDLE	hImage;
     UINT	uType;
@@ -8887,44 +8887,44 @@ typedef struct _signicon_t
 # endif
 } signicon_t;
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    శూన్య
+gui_mch_drawsign(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు, పూర్ణాంకం typenr)
 {
     signicon_t *sign;
-    int x, y, w, h;
+    పూర్ణాంకం x, y, w, h;
 
-    if (!gui.in_use || (sign = (signicon_t *)sign_get_image(typenr)) == NULL)
-	return;
+    ఒకవేళ (!gui.లోపల_use || (sign = (signicon_t *)sign_get_image(typenr)) == ఖాళీ)
+	తిరిగి;
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    x = TEXT_X(col);
-    y = TEXT_Y(row);
-    w = gui.char_width * 2;
-    h = gui.char_height;
-    switch (sign->uType)
+    x = పాఠ్యం_X(నిలువు);
+    y = పాఠ్యం_Y(అడ్డువరుస);
+    w = gui.char_వెడల్పు * 2;
+    h = gui.char_ఎత్తు;
+    ఎంపిక (sign->uType)
     {
-	case IMAGE_BITMAP:
+	స్థితి IMAGE_BITMAP:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
 
 		hdcMem = CreateCompatibleDC(s_hdc);
 		hbmpOld = (HBITMAP)SelectObject(hdcMem, sign->hImage);
-		BitBlt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCCOPY);
+		బిట్టు_Blt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCCOPY);
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
-	case IMAGE_ICON:
-	case IMAGE_CURSOR:
-	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, NULL, DI_NORMAL);
-	    break;
+	    ఆపు;
+	స్థితి IMAGE_ICON:
+	స్థితి IMAGE_CURSOR:
+	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, ఖాళీ, DI_సాధారణ);
+	    ఆపు;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	స్థితి IMAGE_XPM:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
@@ -8932,106 +8932,106 @@ gui_mch_drawsign(int row, int col, int typenr)
 		hdcMem = CreateCompatibleDC(s_hdc);
 		hbmpOld = (HBITMAP)SelectObject(hdcMem, sign->hShape);
 		// Make hole
-		BitBlt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCAND);
+		బిట్టు_Blt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCAND);
 
 		SelectObject(hdcMem, sign->hImage);
 		// Paint sign
-		BitBlt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCPAINT);
+		బిట్టు_Blt(s_hdc, x, y, w, h, hdcMem, 0, 0, SRCPAINT);
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
+	    ఆపు;
 # endif
     }
 }
 
-    static void
+    స్థిర శూన్య
 close_signicon_image(signicon_t *sign)
 {
-    if (sign == NULL)
-	return;
+    ఒకవేళ (sign == ఖాళీ)
+	తిరిగి;
 
-    switch (sign->uType)
+    ఎంపిక (sign->uType)
     {
-	case IMAGE_BITMAP:
+	స్థితి IMAGE_BITMAP:
 	    DeleteObject((HGDIOBJ)sign->hImage);
-	    break;
-	case IMAGE_CURSOR:
+	    ఆపు;
+	స్థితి IMAGE_CURSOR:
 	    DestroyCursor((HCURSOR)sign->hImage);
-	    break;
-	case IMAGE_ICON:
+	    ఆపు;
+	స్థితి IMAGE_ICON:
 	    DestroyIcon((HICON)sign->hImage);
-	    break;
+	    ఆపు;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	స్థితి IMAGE_XPM:
 	    DeleteObject((HBITMAP)sign->hImage);
 	    DeleteObject((HBITMAP)sign->hShape);
-	    break;
+	    ఆపు;
 # endif
     }
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    శూన్య *
+gui_mch_రిజిస్టరు_sign(char_u *signfile)
 {
     signicon_t	sign, *psign;
     char_u	*ext;
 
-    sign.hImage = NULL;
+    sign.hImage = ఖాళీ;
     ext = signfile + STRLEN(signfile) - 4; // get extension
-    if (ext > signfile)
+    ఒకవేళ (ext > signfile)
     {
-	int do_load = 1;
+	పూర్ణాంకం do_ఎక్కించు = 1;
 
-	if (STRICMP(ext, ".bmp") == 0)
+	ఒకవేళ (STRICMP(ext, ".bmp") == 0)
 	    sign.uType =  IMAGE_BITMAP;
-	else if (STRICMP(ext, ".ico") == 0)
+	లేకపోతే ఒకవేళ (STRICMP(ext, ".ico") == 0)
 	    sign.uType =  IMAGE_ICON;
-	else if (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
+	లేకపోతే ఒకవేళ (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
 	    sign.uType =  IMAGE_CURSOR;
-	else
-	    do_load = 0;
+	లేకపోతే
+	    do_ఎక్కించు = 0;
 
-	if (do_load)
-	    sign.hImage = (HANDLE)LoadImage(NULL, (LPCSTR)signfile, sign.uType,
-		    gui.char_width * 2, gui.char_height,
+	ఒకవేళ (do_ఎక్కించు)
+	    sign.hImage = (HANDLE)ఎక్కించు_Image(ఖాళీ, (LPCSTR)signfile, sign.uType,
+		    gui.char_వెడల్పు * 2, gui.char_ఎత్తు,
 		    LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 # ifdef FEAT_XPM_W32
-	if (STRICMP(ext, ".xpm") == 0)
+	ఒకవేళ (STRICMP(ext, ".xpm") == 0)
 	{
 	    sign.uType = IMAGE_XPM;
-	    LoadXpmImage((char *)signfile, (HBITMAP *)&sign.hImage,
+	    ఎక్కించు_Xpm_Image((అక్షరం *)signfile, (HBITMAP *)&sign.hImage,
 		    (HBITMAP *)&sign.hShape);
 	}
 # endif
     }
 
-    psign = NULL;
-    if (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != NULL)
+    psign = ఖాళీ;
+    ఒకవేళ (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != ఖాళీ)
 	*psign = sign;
 
-    if (!psign)
+    ఒకవేళ (!psign)
     {
-	if (sign.hImage)
+	ఒకవేళ (sign.hImage)
 	    close_signicon_image(&sign);
-	emsg(_(e_couldnt_read_in_sign_data));
+	emsg(_(e_couldnt_read_లోపల_sign_దత్తాంశం));
     }
-    return (void *)psign;
+    తిరిగి (శూన్య *)psign;
 
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    శూన్య
+gui_mch_destroy_sign(శూన్య *sign)
 {
-    if (sign == NULL)
-	return;
+    ఒకవేళ (sign == ఖాళీ)
+	తిరిగి;
 
     close_signicon_image((signicon_t *)sign);
     vim_free(sign);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_BEVAL_GUI)
+#ఒకవేళ defined(FEAT_BEVAL_GUI)
 
 /*
  * BALLOON-EVAL IMPLEMENTATION FOR WINDOWS.
@@ -9054,50 +9054,50 @@ gui_mch_destroy_sign(void *sign)
  * 5) WM_NOTIFY:TTN_POP destroys created tooltip
  */
 
-    static void
-make_tooltip(BalloonEval *beval, char *text, POINT pt)
+    స్థిర శూన్య
+make_tooltip(BalloonEval *beval, అక్షరం *పాఠ్యం, బిందువు_2 pt)
 {
     TOOLINFOW	*pti;
     RECT	rect;
 
     pti = ALLOC_ONE(TOOLINFOW);
-    if (pti == NULL)
-	return;
+    ఒకవేళ (pti == ఖాళీ)
+	తిరిగి;
 
-    beval->balloon = CreateWindowExW(WS_EX_TOPMOST, TOOLTIPS_CLASSW,
-	    NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+    beval->balloon = Create_కిటికీ_Ex_W(WS_EX_TOPMOST, TOOLTIPS_CLASSW,
+	    ఖాళీ, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    beval->target, NULL, g_hinst, NULL);
+	    beval->లక్ష్యం, ఖాళీ, g_hinst, ఖాళీ);
 
-    SetWindowPos(beval->balloon, HWND_TOPMOST, 0, 0, 0, 0,
+    సమితి_కిటికీ_Pos(beval->balloon, HWND_TOPMOST, 0, 0, 0, 0,
 	    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
-    pti->cbSize = sizeof(TOOLINFOW);
+    pti->cb_కొలత = పరిమాణం(TOOLINFOW);
     pti->uFlags = TTF_SUBCLASS;
-    pti->hwnd = beval->target;
+    pti->hwnd = beval->లక్ష్యం;
     pti->hinst = 0; // Don't use string resources
     pti->uId = ID_BEVAL_TOOLTIP;
 
-    pti->lpszText = LPSTR_TEXTCALLBACKW;
-    beval->tofree = enc_to_utf16((char_u*)text, NULL);
+    pti->lpsz_పాఠ్యం = LPSTR_TEXTCALLBACKW;
+    beval->tofree = enc_గమ్యం_utf16((char_u*)పాఠ్యం, ఖాళీ);
     pti->lParam = (LPARAM)beval->tofree;
     // switch multiline tooltips on
-    if (GetClientRect(s_textArea, &rect))
-	SendMessageW(beval->balloon, TTM_SETMAXTIPWIDTH, 0,
-		(LPARAM)rect.right);
+    ఒకవేళ (GetClientRect(s_పాఠ్యం_Area, &rect))
+	Send_సందేశం_W(beval->balloon, TTM_SETMAXTIPWIDTH, 0,
+		(LPARAM)rect.కుడి_2);
 
     // Limit ballooneval bounding rect to CursorPos neighbourhood.
-    pti->rect.left = pt.x - 3;
-    pti->rect.top = pt.y - 3;
-    pti->rect.right = pt.x + 3;
+    pti->rect.ఎడమ_2 = pt.x - 3;
+    pti->rect.శిఖరం = pt.y - 3;
+    pti->rect.కుడి_2 = pt.x + 3;
     pti->rect.bottom = pt.y + 3;
 
-    SendMessageW(beval->balloon, TTM_ADDTOOLW, 0, (LPARAM)pti);
+    Send_సందేశం_W(beval->balloon, TTM_ADDTOOLW, 0, (LPARAM)pti);
     // Make tooltip appear sooner.
-    SendMessageW(beval->balloon, TTM_SETDELAYTIME, TTDT_INITIAL, 10);
+    Send_సందేశం_W(beval->balloon, TTM_SETDELAYTIME, TTDT_INITIAL, 10);
     // I've performed some tests and it seems the longest possible life time
     // of tooltip is 30 seconds.
-    SendMessageW(beval->balloon, TTM_SETDELAYTIME, TTDT_AUTOPOP, 30000);
+    Send_సందేశం_W(beval->balloon, TTM_SETDELAYTIME, TTDT_AUTOPOP, 30000);
     /*
      * HACK: force tooltip to appear, because it'll not appear until
      * first mouse move. D*mn M$
@@ -9108,39 +9108,39 @@ make_tooltip(BalloonEval *beval, char *text, POINT pt)
     vim_free(pti);
 }
 
-    static void
+    స్థిర శూన్య
 delete_tooltip(BalloonEval *beval)
 {
-    PostMessage(beval->balloon, WM_CLOSE, 0, 0);
+    Post_సందేశం(beval->balloon, WM_CLOSE, 0, 0);
 }
 
-    static VOID CALLBACK
+    స్థిర VOID CALLBACK
 beval_timer_proc(
-    HWND	hwnd UNUSED,
-    UINT	uMsg UNUSED,
-    UINT_PTR	idEvent UNUSED,
-    DWORD	dwTime)
+    HWND	hwnd వాడని,
+    UINT	u_సందేశం వాడని,
+    UINT_PTR	idEvent వాడని,
+    DWORD	dw_సమయం)
 {
-    POINT	pt;
+    బిందువు_2	pt;
     RECT	rect;
 
-    if (cur_beval == NULL || cur_beval->showState == ShS_SHOWING || !p_beval)
-	return;
+    ఒకవేళ (cur_beval == ఖాళీ || cur_beval->showState == ShS_SHOWING || !p_beval)
+	తిరిగి;
 
     GetCursorPos(&pt);
-    if (WindowFromPoint(pt) != s_textArea)
-	return;
+    ఒకవేళ (కిటికీ_From_బిందువు(pt) != s_పాఠ్యం_Area)
+	తిరిగి;
 
-    ScreenToClient(s_textArea, &pt);
-    GetClientRect(s_textArea, &rect);
-    if (!PtInRect(&rect, pt))
-	return;
+    Screen_గమ్యం_Client(s_పాఠ్యం_Area, &pt);
+    GetClientRect(s_పాఠ్యం_Area, &rect);
+    ఒకవేళ (!Pt_లోపల_Rect(&rect, pt))
+	తిరిగి;
 
-    if (last_user_activity > 0
-	    && (dwTime - last_user_activity) >= (DWORD)p_bdlay
+    ఒకవేళ (చివరి_user_activity > 0
+	    && (dw_సమయం - చివరి_user_activity) >= (DWORD)p_bdlay
 	    && (cur_beval->showState != ShS_PENDING
-		|| abs(cur_beval->x - pt.x) > 3
-		|| abs(cur_beval->y - pt.y) > 3))
+		|| నిరపేక్ష(cur_beval->x - pt.x) > 3
+		|| నిరపేక్ష(cur_beval->y - pt.y) > 3))
     {
 	// Pointer resting in one place long enough, it's time to show
 	// the tooltip.
@@ -9148,136 +9148,136 @@ beval_timer_proc(
 	cur_beval->x = pt.x;
 	cur_beval->y = pt.y;
 
-	if (cur_beval->msgCB != NULL)
-	    (*cur_beval->msgCB)(cur_beval, 0);
+	ఒకవేళ (cur_beval->సందేశం_CB != ఖాళీ)
+	    (*cur_beval->సందేశం_CB)(cur_beval, 0);
     }
 }
 
-    void
-gui_mch_disable_beval_area(BalloonEval *beval UNUSED)
+    శూన్య
+gui_mch_disable_beval_area(BalloonEval *beval వాడని)
 {
-    KillTimer(s_textArea, beval_timer_id);
+    KillTimer(s_పాఠ్యం_Area, beval_timer_id);
 }
 
-    void
+    శూన్య
 gui_mch_enable_beval_area(BalloonEval *beval)
 {
-    if (beval == NULL)
-	return;
-    beval_timer_id = SetTimer(s_textArea, 0, (UINT)(p_bdlay / 2),
+    ఒకవేళ (beval == ఖాళీ)
+	తిరిగి;
+    beval_timer_id = సమితి_Timer(s_పాఠ్యం_Area, 0, (UINT)(p_bdlay / 2),
 							     beval_timer_proc);
 }
 
-    void
+    శూన్య
 gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
 {
-    POINT   pt;
+    బిందువు_2   pt;
 
-    vim_free(beval->msg);
-    beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-    if (beval->msg == NULL)
+    vim_free(beval->సందేశం);
+    beval->సందేశం = mesg == ఖాళీ ? ఖాళీ : vim_strsave(mesg);
+    ఒకవేళ (beval->సందేశం == ఖాళీ)
     {
 	delete_tooltip(beval);
 	beval->showState = ShS_NEUTRAL;
-	return;
+	తిరిగి;
     }
 
-    if (beval->showState == ShS_SHOWING)
-	return;
+    ఒకవేళ (beval->showState == ShS_SHOWING)
+	తిరిగి;
     GetCursorPos(&pt);
-    ScreenToClient(s_textArea, &pt);
+    Screen_గమ్యం_Client(s_పాఠ్యం_Area, &pt);
 
-    if (abs(beval->x - pt.x) < 3 && abs(beval->y - pt.y) < 3)
+    ఒకవేళ (నిరపేక్ష(beval->x - pt.x) < 3 && నిరపేక్ష(beval->y - pt.y) < 3)
     {
 	// cursor is still here
 	gui_mch_disable_beval_area(cur_beval);
 	beval->showState = ShS_SHOWING;
-	make_tooltip(beval, (char *)mesg, pt);
+	make_tooltip(beval, (అక్షరం *)mesg, pt);
     }
 }
 
     BalloonEval *
 gui_mch_create_beval_area(
-    void	*target UNUSED,	// ignored, always use s_textArea
+    శూన్య	*లక్ష్యం వాడని,	// ignored, always use s_textArea
     char_u	*mesg,
-    void	(*mesgCB)(BalloonEval *, int),
-    void	*clientData)
+    శూన్య	(*mesgCB)(BalloonEval *, పూర్ణాంకం),
+    శూన్య	*client_దత్తాంశం)
 {
     // partially stolen from gui_beval.c
     BalloonEval	*beval;
 
-    if (mesg != NULL && mesgCB != NULL)
+    ఒకవేళ (mesg != ఖాళీ && mesgCB != ఖాళీ)
     {
-	iemsg(e_cannot_create_ballooneval_with_both_message_and_callback);
-	return NULL;
+	iemsg(e_cannot_create_ballooneval_with_both_సందేశం_and_callback);
+	తిరిగి ఖాళీ;
     }
 
     beval = ALLOC_CLEAR_ONE(BalloonEval);
-    if (beval != NULL)
+    ఒకవేళ (beval != ఖాళీ)
     {
-	beval->target = s_textArea;
+	beval->లక్ష్యం = s_పాఠ్యం_Area;
 
 	beval->showState = ShS_NEUTRAL;
-	beval->msg = mesg;
-	beval->msgCB = mesgCB;
-	beval->clientData = clientData;
+	beval->సందేశం = mesg;
+	beval->సందేశం_CB = mesgCB;
+	beval->client_దత్తాంశం = client_దత్తాంశం;
 
 	InitCommonControls();
 	cur_beval = beval;
 
-	if (p_beval)
+	ఒకవేళ (p_beval)
 	    gui_mch_enable_beval_area(beval);
     }
-    return beval;
+    తిరిగి beval;
 }
 
-    static void
-Handle_WM_Notify(HWND hwnd UNUSED, LPNMHDR pnmh)
+    స్థిర శూన్య
+Handle_WM_Notify(HWND hwnd వాడని, LPNMHDR pnmh)
 {
-    if (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
-	return;
+    ఒకవేళ (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
+	తిరిగి;
 
-    if (cur_beval == NULL)
-	return;
+    ఒకవేళ (cur_beval == ఖాళీ)
+	తిరిగి;
 
-    switch (pnmh->code)
+    ఎంపిక (pnmh->సంకేతం_2)
     {
-	case TTN_SHOW:
-	    break;
-	case TTN_POP: // Before tooltip disappear
+	స్థితి TTN_SHOW:
+	    ఆపు;
+	స్థితి TTN_తీయి: // Before tooltip disappear
 	    delete_tooltip(cur_beval);
 	    gui_mch_enable_beval_area(cur_beval);
 
 	    cur_beval->showState = ShS_NEUTRAL;
-	    break;
-	case TTN_GETDISPINFO:
+	    ఆపు;
+	స్థితి TTN_GETDISPINFO:
 	    {
 		// if you get there then we have new common controls
 		NMTTDISPINFO *info = (NMTTDISPINFO *)pnmh;
-		info->lpszText = (LPSTR)info->lParam;
+		info->lpsz_పాఠ్యం = (LPSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
-	case TTN_GETDISPINFOW:
+	    ఆపు;
+	స్థితి TTN_GETDISPINFOW:
 	    {
 		// if we get here then we have new common controls
 		NMTTDISPINFOW *info = (NMTTDISPINFOW *)pnmh;
-		info->lpszText = (LPWSTR)info->lParam;
+		info->lpsz_పాఠ్యం = (LPWSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
+	    ఆపు;
     }
 }
 
-    static void
-track_user_activity(UINT uMsg)
+    స్థిర శూన్య
+track_user_activity(UINT u_సందేశం)
 {
-    if ((uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST)
-	    || (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST))
-	last_user_activity = GetTickCount();
+    ఒకవేళ ((u_సందేశం >= WM_MOUSEFIRST && u_సందేశం <= WM_MOUSELAST)
+	    || (u_సందేశం >= WM_KEYFIRST && u_సందేశం <= WM_KEYLAST))
+	చివరి_user_activity = Get_Tick_లెక్క();
 }
 
-    void
+    శూన్య
 gui_mch_destroy_beval_area(BalloonEval *beval)
 {
 # ifdef FEAT_VARTABS
@@ -9286,261 +9286,261 @@ gui_mch_destroy_beval_area(BalloonEval *beval)
     vim_free(beval->tofree);
     vim_free(beval);
 }
-#endif // FEAT_BEVAL_GUI
+#అయితే_ముగింపు // FEAT_BEVAL_GUI
 
-#if defined(FEAT_NETBEANS_INTG)
+#ఒకవేళ defined(FEAT_NETBEANS_INTG)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator (down-arrow) instead. This is the Win32 version.
  */
-    void
-netbeans_draw_multisign_indicator(int row)
+    శూన్య
+netbeans_draw_multisign_indicator(పూర్ణాంకం అడ్డువరుస)
 {
-    int i;
-    int y;
-    int x;
+    పూర్ణాంకం i;
+    పూర్ణాంకం y;
+    పూర్ణాంకం x;
 
-    if (!netbeans_active())
-	return;
+    ఒకవేళ (!netbeans_చురుకైన())
+	తిరిగి;
 
     x = 0;
-    y = TEXT_Y(row);
+    y = పాఠ్యం_Y(అడ్డువరుస);
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# ఒకవేళ defined(FEAT_DIRECTX)
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
-	SetPixel(s_hdc, x+2, y++, gui.currFgColor);
+    కొరకు (i = 0; i < gui.char_ఎత్తు - 3; i++)
+	సమితి_Pixel(s_hdc, x+2, y++, gui.currFgColor);
 
-    SetPixel(s_hdc, x+0, y, gui.currFgColor);
-    SetPixel(s_hdc, x+2, y, gui.currFgColor);
-    SetPixel(s_hdc, x+4, y++, gui.currFgColor);
-    SetPixel(s_hdc, x+1, y, gui.currFgColor);
-    SetPixel(s_hdc, x+2, y, gui.currFgColor);
-    SetPixel(s_hdc, x+3, y++, gui.currFgColor);
-    SetPixel(s_hdc, x+2, y, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+0, y, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+2, y, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+4, y++, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+1, y, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+2, y, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+3, y++, gui.currFgColor);
+    సమితి_Pixel(s_hdc, x+2, y, gui.currFgColor);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 // TODO: at the moment, this is just a copy of test_gui_mouse_event.
 // But, we could instead generate actual Win32 mouse event messages,
 // ie. to make it consistent with test_gui_w32_sendevent_keyboard.
-    static int
-test_gui_w32_sendevent_mouse(dict_T *args)
+    స్థిర పూర్ణాంకం
+test_gui_w32_sendevent_mouse(dict_T *వాదనలు)
 {
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    ఒకవేళ (!dict_has_కీలకం(వాదనలు, "row") || !dict_has_కీలకం(వాదనలు, "col"))
+	తిరిగి FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    int move = (int)dict_get_bool(args, "move", FALSE);
+    పూర్ణాంకం move = (పూర్ణాంకం)dict_get_bool(వాదనలు, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    ఒకవేళ (!move && (!dict_has_కీలకం(వాదనలు, "button")
+	    || !dict_has_కీలకం(వాదనలు, "multiclick")
+	    || !dict_has_కీలకం(వాదనలు, "modifiers")))
+	తిరిగి FALSE;
 
-    int row = (int)dict_get_number(args, "row");
-    int col = (int)dict_get_number(args, "col");
+    పూర్ణాంకం అడ్డువరుస = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "row");
+    పూర్ణాంకం నిలువు = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "col");
 
-    if (move)
+    ఒకవేళ (move)
     {
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	ఒకవేళ (dict_get_bool(వాదనలు, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
-	    int pY = (row - 1) * gui.char_height + gui.char_height / 2;
-	    int pX = (col - 1) * gui.char_width + gui.char_width / 2;
+	    పూర్ణాంకం pY = (అడ్డువరుస - 1) * gui.char_ఎత్తు + gui.char_ఎత్తు / 2;
+	    పూర్ణాంకం pX = (నిలువు - 1) * gui.char_వెడల్పు + gui.char_వెడల్పు / 2;
 	    gui_mouse_moved(pX, pY);
 	}
-	else
-	    gui_mouse_moved(col, row);
+	లేకపోతే
+	    gui_mouse_moved(నిలువు, అడ్డువరుస);
     }
-    else
+    లేకపోతే
     {
-	int button = (int)dict_get_number(args, "button");
-	int repeated_click = (int)dict_get_number(args, "multiclick");
-	int_u mods = (int)dict_get_number(args, "modifiers");
+	పూర్ణాంకం button = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "button");
+	పూర్ణాంకం repeated_click = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "multiclick");
+	int_u mods = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
-	mouse_set_hor_scroll_step(6);
-	mouse_set_vert_scroll_step(3);
+	mouse_సమితి_hor_scroll_అడుగు(6);
+	mouse_సమితి_vert_scroll_అడుగు(3);
 
-	gui_send_mouse_event(button, TEXT_X(col - 1), TEXT_Y(row - 1),
+	gui_send_mouse_event(button, పాఠ్యం_X(నిలువు - 1), పాఠ్యం_Y(అడ్డువరుస - 1),
 							repeated_click, mods);
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    static int
-test_gui_w32_sendevent_keyboard(dict_T *args)
+    స్థిర పూర్ణాంకం
+test_gui_w32_sendevent_keyboard(dict_T *వాదనలు)
 {
-    INPUT inputs[1];
-    INPUT modkeys[3];
-    SecureZeroMemory(inputs, sizeof(INPUT));
-    SecureZeroMemory(modkeys, 3 * sizeof(INPUT));
+    ఆదానం_2 inputs[1];
+    ఆదానం_2 modkeys[3];
+    Secure_Zero_జ్ఞాపకం(inputs, పరిమాణం(ఆదానం_2));
+    Secure_Zero_జ్ఞాపకం(modkeys, 3 * పరిమాణం(ఆదానం_2));
 
-    char_u *event = dict_get_string(args, "event", TRUE);
+    char_u *event = dict_get_string(వాదనలు, "event", TRUE);
 
-    if (event && (STRICMP(event, "keydown") == 0
+    ఒకవేళ (event && (STRICMP(event, "keydown") == 0
 				      || STRICMP(event, "keyup") == 0))
     {
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	మాట_2 vk_సంకేతం = dict_get_సంఖ్య_def(వాదనలు, "keycode", 0);
+	ఒకవేళ (vk_సంకేతం <= 0 || vk_సంకేతం >= 0xFF)
 	{
-	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    semsg(_(e_invalid_వాదం_nr), (దీర్ఘ)vk_సంకేతం);
+	    తిరిగి FALSE;
 	}
 
-	BOOL isModKey = (vkCode == VK_SHIFT || vkCode == VK_CONTROL
-	    || vkCode == VK_MENU || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT
-	    || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL
-	    || vkCode == VK_LMENU || vkCode == VK_RMENU );
+	BOOL is_Mod_కీలకం = (vk_సంకేతం == VK_జరుపు || vk_సంకేతం == VK_CONTROL
+	    || vk_సంకేతం == VK_MENU || vk_సంకేతం == VK_LSHIFT || vk_సంకేతం == VK_RSHIFT
+	    || vk_సంకేతం == VK_LCONTROL || vk_సంకేతం == VK_RCONTROL
+	    || vk_సంకేతం == VK_LMENU || vk_సంకేతం == VK_RMENU );
 
 	BOOL unwrapMods = FALSE;
-	int mods = (int)dict_get_number(args, "modifiers");
+	పూర్ణాంకం mods = (పూర్ణాంకం)dict_get_సంఖ్య(వాదనలు, "modifiers");
 
 	// If there are modifiers in the args, and it is not a keyup event and
 	// vkCode is not a modifier key, then we generate virtual modifier key
 	// messages before sending the actual key message.
-	if (mods && STRICMP(event, "keydown") == 0 && !isModKey)
+	ఒకవేళ (mods && STRICMP(event, "keydown") == 0 && !is_Mod_కీలకం)
 	{
-	    int n = 0;
-	    if (mods & MOD_MASK_SHIFT)
+	    పూర్ణాంకం n = 0;
+	    ఒకవేళ (mods & MOD_ముసుగు_జరుపు)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ఆదానం_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LSHIFT;
 		n++;
 	    }
-	    if (mods & MOD_MASK_CTRL)
+	    ఒకవేళ (mods & MOD_ముసుగు_CTRL)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ఆదానం_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LCONTROL;
 		n++;
 	    }
-	    if (mods & MOD_MASK_ALT)
+	    ఒకవేళ (mods & MOD_ముసుగు_ALT)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ఆదానం_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LMENU;
 		n++;
 	    }
-	    if (n)
+	    ఒకవేళ (n)
 	    {
-		(void)SetForegroundWindow(s_hwnd);
-		SendInput(n, modkeys, sizeof(INPUT));
+		(శూన్య)సమితి_Foreground_కిటికీ(s_hwnd);
+		Send_ఆదానం(n, modkeys, పరిమాణం(ఆదానం_2));
 	    }
 	}
 
-	inputs[0].type = INPUT_KEYBOARD;
-	inputs[0].ki.wVk = vkCode;
-	if (STRICMP(event, "keyup") == 0)
+	inputs[0].type = ఆదానం_KEYBOARD;
+	inputs[0].ki.wVk = vk_సంకేతం;
+	ఒకవేళ (STRICMP(event, "keyup") == 0)
 	{
 	    inputs[0].ki.dwFlags = KEYEVENTF_KEYUP;
-	    if (!isModKey)
+	    ఒకవేళ (!is_Mod_కీలకం)
 		unwrapMods = TRUE;
 	}
 
-	(void)SetForegroundWindow(s_hwnd);
-	SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+	(శూన్య)సమితి_Foreground_కిటికీ(s_hwnd);
+	Send_ఆదానం(ARRAYSIZE(inputs), inputs, పరిమాణం(ఆదానం_2));
 	vim_free(event);
 
-	if (unwrapMods)
+	ఒకవేళ (unwrapMods)
 	{
-	    modkeys[0].type = INPUT_KEYBOARD;
+	    modkeys[0].type = ఆదానం_KEYBOARD;
 	    modkeys[0].ki.wVk = VK_LSHIFT;
 	    modkeys[0].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[1].type = INPUT_KEYBOARD;
+	    modkeys[1].type = ఆదానం_KEYBOARD;
 	    modkeys[1].ki.wVk = VK_LCONTROL;
 	    modkeys[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[2].type = INPUT_KEYBOARD;
+	    modkeys[2].type = ఆదానం_KEYBOARD;
 	    modkeys[2].ki.wVk = VK_LMENU;
 	    modkeys[2].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    (void)SetForegroundWindow(s_hwnd);
-	    SendInput(3, modkeys, sizeof(INPUT));
+	    (శూన్య)సమితి_Foreground_కిటికీ(s_hwnd);
+	    Send_ఆదానం(3, modkeys, పరిమాణం(ఆదానం_2));
 	}
     }
-    else
+    లేకపోతే
     {
-	if (event == NULL)
+	ఒకవేళ (event == ఖాళీ)
 	{
-	    semsg(_(e_missing_argument_str), "event");
+	    semsg(_(e_missing_వాదం_str), "event");
 	}
-	else
+	లేకపోతే
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", event);
+	    semsg(_(e_invalid_విలువ_for_వాదం_str_str), "event", event);
 	    vim_free(event);
 	}
-	return FALSE;
+	తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    static int
-test_gui_w32_sendevent_set_keycode_trans_strategy(dict_T *args)
+    స్థిర పూర్ణాంకం
+test_gui_w32_sendevent_సమితి_keycode_trans_strategy(dict_T *వాదనలు)
 {
-    int handled = 0;
-    char_u *strategy = dict_get_string(args, "strategy", TRUE);
+    పూర్ణాంకం handled = 0;
+    char_u *strategy = dict_get_string(వాదనలు, "strategy", TRUE);
 
-    if (strategy)
+    ఒకవేళ (strategy)
     {
-	if (STRICMP(strategy, "classic") == 0)
+	ఒకవేళ (STRICMP(strategy, "classic") == 0)
 	{
 	    handled = 1;
-	    keycode_trans_strategy_used = &keycode_trans_strategy_classic;
+	    keycode_trans_strategy_వాడిన = &keycode_trans_strategy_classic;
 	}
-	else if (STRICMP(strategy, "experimental") == 0)
+	లేకపోతే ఒకవేళ (STRICMP(strategy, "experimental") == 0)
 	{
 	    handled = 1;
-	    keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
+	    keycode_trans_strategy_వాడిన = &keycode_trans_strategy_experimental;
 	}
     }
 
-    if (!handled)
+    ఒకవేళ (!handled)
     {
-	if (strategy == NULL)
+	ఒకవేళ (strategy == ఖాళీ)
 	{
-	    semsg(_(e_missing_argument_str), "strategy");
+	    semsg(_(e_missing_వాదం_str), "strategy");
 	}
-	else
+	లేకపోతే
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "strategy", strategy);
+	    semsg(_(e_invalid_విలువ_for_వాదం_str_str), "strategy", strategy);
 	    vim_free(strategy);
 	}
-	return FALSE;
+	తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 
-    int
-test_gui_w32_sendevent(char_u *event, dict_T *args)
+    పూర్ణాంకం
+test_gui_w32_sendevent(char_u *event, dict_T *వాదనలు)
 {
-    if (STRICMP(event, "key") == 0)
-	return test_gui_w32_sendevent_keyboard(args);
-    else if (STRICMP(event, "mouse") == 0)
-	return test_gui_w32_sendevent_mouse(args);
-    else if (STRICMP(event, "set_keycode_trans_strategy") == 0)
-	return test_gui_w32_sendevent_set_keycode_trans_strategy(args);
-    else
+    ఒకవేళ (STRICMP(event, "key") == 0)
+	తిరిగి test_gui_w32_sendevent_keyboard(వాదనలు);
+    లేకపోతే ఒకవేళ (STRICMP(event, "mouse") == 0)
+	తిరిగి test_gui_w32_sendevent_mouse(వాదనలు);
+    లేకపోతే ఒకవేళ (STRICMP(event, "set_keycode_trans_strategy") == 0)
+	తిరిగి test_gui_w32_sendevent_సమితి_keycode_trans_strategy(వాదనలు);
+    లేకపోతే
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_విలువ_for_వాదం_str_str), "event", event);
+	తిరిగి FALSE;
     }
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_IMAGE_GUI)
+#ఒకవేళ defined(FEAT_IMAGE_GUI)
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
     HBITMAP hbm;
     HDC	    hdc;
@@ -9552,48 +9552,48 @@ typedef struct
  * has 4 bytes per pixel and the alpha channel is flattened onto the GUI window
  * background colour (pre-multiplied blend).
  */
-    static void
-upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_format_T fmt)
+    స్థిర శూన్య
+upload_popup_image_pixels(uint8_t *dst, uint8_t *src, పూర్ణాంకం iw, పూర్ణాంకం ih, image_format_T fmt)
 {
-    int		y, x;
-    int		stride = iw * 4;
-    int		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
-    COLORREF	bg = fmt == IMAGE_FORMAT_RGBA ? gui_mch_get_rgb(gui.back_pixel) : 0;
+    పూర్ణాంకం		y, x;
+    పూర్ణాంకం		stride = iw * 4;
+    పూర్ణాంకం		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
+    COLORREF	bg = fmt == IMAGE_FORMAT_RGBA ? gui_mch_get_rgb(gui.వెనుక_pixel) : 0;
     BYTE	bg_r = GetRValue(bg);
     BYTE	bg_g = GetGValue(bg);
     BYTE	bg_b = GetBValue(bg);
 
-    for (y = 0; y < ih; y++)
+    కొరకు (y = 0; y < ih; y++)
     {
 	uint8_t *s = src + (size_t)y * iw * src_bpp;
 	uint8_t *d = dst + (size_t)y * stride;
 
-	for (x = 0; x < iw; x++)
+	కొరకు (x = 0; x < iw; x++)
 	{
-	    if (fmt == IMAGE_FORMAT_RGBA)
+	    ఒకవేళ (fmt == IMAGE_FORMAT_RGBA)
 	    {
-		int a = s[3];
+		పూర్ణాంకం a = s[3];
 
-		if (a == 255)
+		ఒకవేళ (a == 255)
 		{
 		    d[0] = s[2];
 		    d[1] = s[1];
 		    d[2] = s[0];
 		}
-		else if (a == 0)
+		లేకపోతే ఒకవేళ (a == 0)
 		{
 		    d[0] = (uint8_t )bg_b;
 		    d[1] = (uint8_t)bg_g;
 		    d[2] = (uint8_t)bg_r;
 		}
-		else
+		లేకపోతే
 		{
 		    d[0] = (uint8_t)((s[2] * a + bg_b * (255 - a)) / 255);
 		    d[1] = (uint8_t)((s[1] * a + bg_g * (255 - a)) / 255);
 		    d[2] = (uint8_t)((s[0] * a + bg_r * (255 - a)) / 255);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		d[0] = s[2];	// B
 		d[1] = s[1];	// G
@@ -9606,113 +9606,113 @@ upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_form
     }
 }
 
-    int
+    పూర్ణాంకం
 image_gui_init(image_T *img)
 {
     image_gdi_T *ctx = ALLOC_CLEAR_ONE(image_gdi_T);
     BITMAPINFO	bmi;
     HBITMAP	hbm;
     HDC		mem_dc;
-    int		iw, ih;
-    void	*bits = NULL;
+    పూర్ణాంకం		iw, ih;
+    శూన్య	*బిట్లు = ఖాళీ;
 
-    if (ctx == NULL)
-	return FAIL;
+    ఒకవేళ (ctx == ఖాళీ)
+	తిరిగి FAIL;
 
     image_get_dimensions(img, &iw, &ih);
 
-    CLEAR_FIELD(bmi);
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = iw;
-    bmi.bmiHeader.biHeight = -ih; // Top-down
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32;
-    bmi.bmiHeader.biCompression = BI_RGB;
+    CLEAR_క్షేత్రం(bmi);
+    bmi.bmi_శీర్షిక.bi_కొలత = పరిమాణం(BITMAPINFOHEADER);
+    bmi.bmi_శీర్షిక.bi_వెడల్పు = iw;
+    bmi.bmi_శీర్షిక.bi_ఎత్తు = -ih; // Top-down
+    bmi.bmi_శీర్షిక.biPlanes = 1;
+    bmi.bmi_శీర్షిక.bi_బిట్టు_లెక్క = 32;
+    bmi.bmi_శీర్షిక.biCompression = BI_RGB;
 
-    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &bits, NULL, 0);
-    if (hbm == NULL || bits == NULL)
+    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &బిట్లు, ఖాళీ, 0);
+    ఒకవేళ (hbm == ఖాళీ || బిట్లు == ఖాళీ)
     {
-	if (hbm != NULL)
+	ఒకవేళ (hbm != ఖాళీ)
 	    DeleteObject(hbm);
-	return false;
+	తిరిగి false;
     }
 
     mem_dc = CreateCompatibleDC(s_hdc);
-    if (mem_dc == NULL)
+    ఒకవేళ (mem_dc == ఖాళీ)
     {
 	DeleteObject(hbm);
-	return false;
+	తిరిగి false;
     }
 
     SelectObject(mem_dc, hbm);
-    upload_popup_image_pixels((uint8_t *)bits, img->data, iw, ih, img->fmt);
+    upload_popup_image_pixels((uint8_t *)బిట్లు, img->దత్తాంశం, iw, ih, img->fmt);
 
     ctx->hbm = hbm;
     ctx->hdc = mem_dc;
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_దత్తాంశం = ctx;
+    తిరిగి OK;
 }
 
-    void
+    శూన్య
 image_gui_uninit(image_T *img)
 {
-    image_gdi_T *ctx = img->backend_data;
+    image_gdi_T *ctx = img->backend_దత్తాంశం;
 
     DeleteObject(ctx->hbm);
     DeleteDC(ctx->hdc);
     vim_free(ctx);
 }
 
-    int
-image_placement_gui_init(image_placement_T *place UNUSED)
+    పూర్ణాంకం
+image_placement_gui_init(image_placement_T *ఉంచు వాడని)
 {
-    return OK;
+    తిరిగి OK;
 }
 
-    void
-image_placement_gui_uninit(image_placement_T *place UNUSED)
+    శూన్య
+image_placement_gui_uninit(image_placement_T *ఉంచు వాడని)
 {
 }
 
-    void
-image_placement_gui_draw(image_placement_T *place)
+    శూన్య
+image_placement_gui_draw(image_placement_T *ఉంచు)
 {
-    image_T	    *img = place->img;
-    image_gdi_T	    *ictx = img->backend_data;
+    image_T	    *img = ఉంచు->img;
+    image_gdi_T	    *ictx = img->backend_దత్తాంశం;
     pixman_box32_t  *rects;
-    int		    n_rects;
+    పూర్ణాంకం		    n_rects;
 
-    rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    rects = pixman_region32_rectangles(&ఉంచు->visible, &n_rects);
+    ఒకవేళ (rects == ఖాళీ || n_rects == 0)
+	తిరిగి;
 
-# if defined(FEAT_DIRECTX)
+# ఒకవేళ defined(FEAT_DIRECTX)
     // Commit any pending DirectWrite output so popup text and borders are on
     // s_hdc before we blit on top.
-    if (IS_ENABLE_DIRECTX())
+    ఒకవేళ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (int i = 0; i < n_rects; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
+	పూర్ణాంకం		అడ్డువరుస, నిలువు;
+	పూర్ణాంకం		posx, posy;
+	పూర్ణాంకం		x, y, w, h;
 
-	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, true);
-	posx = FILL_X(col);
-	posy = FILL_Y(row);
+	image_placement_subrect(ఉంచు, rect, &అడ్డువరుస, &నిలువు, &x, &y, &w, &h, true);
+	posx = FILL_X(నిలువు);
+	posy = FILL_Y(అడ్డువరుస);
 
-	BitBlt(s_hdc, posx, posy, w, h, ictx->hdc, x, y, SRCCOPY);
+	బిట్టు_Blt(s_hdc, posx, posy, w, h, ictx->hdc, x, y, SRCCOPY);
 
     }
 }
 
-    void
-image_placement_gui_clear(image_placement_T *place UNUSED)
+    శూన్య
+image_placement_gui_clear(image_placement_T *ఉంచు వాడని)
 {
 }
 
-#endif // FEAT_IMAGE_GUI
+#అయితే_ముగింపు // FEAT_IMAGE_GUI

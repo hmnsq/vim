@@ -11,40 +11,40 @@
  * ex_docmd.c: functions for executing an Ex command line.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-static int	quitmore = 0;
-static int	ex_pressedreturn = FALSE;
-#ifndef FEAT_PRINTER
+స్థిర పూర్ణాంకం	quitmore = 0;
+స్థిర పూర్ణాంకం	ex_pressedreturn = FALSE;
+#నిర్వచితం_కాకపోతే FEAT_PRINTER
 # define ex_hardcopy	ex_ni
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_EVAL
-static char_u	*do_one_cmd(char_u **, int, cstack_T *, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-#else
-static char_u	*do_one_cmd(char_u **, int, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-static int	if_level = 0;		// depth in :if
-#endif
-static void	append_command(char_u *cmd);
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర char_u	*do_one_cmd(char_u **, పూర్ణాంకం, cstack_T *, char_u *(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T), శూన్య *cookie);
+#లేకపోతే
+స్థిర char_u	*do_one_cmd(char_u **, పూర్ణాంకం, char_u *(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T), శూన్య *cookie);
+స్థిర పూర్ణాంకం	if_level = 0;		// depth in :if
+#అయితే_ముగింపు
+స్థిర శూన్య	append_command(char_u *cmd);
 
-#ifndef FEAT_MENU
+#నిర్వచితం_కాకపోతే FEAT_MENU
 # define ex_emenu		ex_ni
 # define ex_menu		ex_ni
 # define ex_menutranslate	ex_ni
-#endif
-static void	ex_autocmd(exarg_T *eap);
-static void	ex_doautocmd(exarg_T *eap);
-static void	ex_bunload(exarg_T *eap);
-static void	ex_buffer(exarg_T *eap);
-static void	do_exbuffer(exarg_T *eap);
-static void	ex_bmodified(exarg_T *eap);
-static void	ex_bnext(exarg_T *eap);
-static void	ex_bprevious(exarg_T *eap);
-static void	ex_brewind(exarg_T *eap);
-static void	ex_blast(exarg_T *eap);
-static char_u	*getargcmd(char_u **);
-static int	getargopt(exarg_T *eap);
-#ifndef FEAT_QUICKFIX
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_autocmd(exarg_T *eap);
+స్థిర శూన్య	ex_doautocmd(exarg_T *eap);
+స్థిర శూన్య	ex_bunload(exarg_T *eap);
+స్థిర శూన్య	ex_బఫరు(exarg_T *eap);
+స్థిర శూన్య	do_exbuffer(exarg_T *eap);
+స్థిర శూన్య	ex_bmodified(exarg_T *eap);
+స్థిర శూన్య	ex_bnext(exarg_T *eap);
+స్థిర శూన్య	ex_bprevious(exarg_T *eap);
+స్థిర శూన్య	ex_brewind(exarg_T *eap);
+స్థిర శూన్య	ex_blast(exarg_T *eap);
+స్థిర char_u	*getargcmd(char_u **);
+స్థిర పూర్ణాంకం	getargopt(exarg_T *eap);
+#నిర్వచితం_కాకపోతే FEAT_QUICKFIX
 # define ex_make		ex_ni
 # define ex_cbuffer		ex_ni
 # define ex_cc			ex_ni
@@ -60,213 +60,213 @@ static int	getargopt(exarg_T *eap);
 # define ex_copen		ex_ni
 # define ex_cwindow		ex_ni
 # define ex_cbottom		ex_ni
-#endif
-#if !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
 # define ex_cexpr		ex_ni
-#endif
+#అయితే_ముగింపు
 
-static linenr_T default_address(exarg_T *eap);
-static void address_default_all(exarg_T *eap);
-static void	get_flags(exarg_T *eap);
-#if !defined(FEAT_PERL) \
+స్థిర linenr_T default_చిరునామా(exarg_T *eap);
+స్థిర శూన్య చిరునామా_default_all(exarg_T *eap);
+స్థిర శూన్య	get_flags(exarg_T *eap);
+#ఒకవేళ !defined(FEAT_PERL) \
 	|| !defined(FEAT_PYTHON) || !defined(FEAT_PYTHON3) \
 	|| !defined(FEAT_TCL) \
 	|| !defined(FEAT_RUBY) \
 	|| !defined(FEAT_LUA) \
 	|| !defined(FEAT_MZSCHEME)
 # define HAVE_EX_SCRIPT_NI
-static void	ex_script_ni(exarg_T *eap);
-#endif
-static char	*invalid_range(exarg_T *eap);
-static void	correct_range(exarg_T *eap);
-#ifdef FEAT_QUICKFIX
-static char_u	*replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep);
-#endif
-static char_u	*repl_cmdline(exarg_T *eap, char_u *src, size_t srclen, char_u *repl, char_u **cmdlinep);
-static void	ex_highlight(exarg_T *eap);
-static void	ex_colorscheme(exarg_T *eap);
-static void	ex_cquit(exarg_T *eap);
-static void	ex_quit_all(exarg_T *eap);
-static void	ex_close(exarg_T *eap);
-static void	ex_win_close(int forceit, win_T *win, tabpage_T *tp);
-static void	ex_only(exarg_T *eap);
-static void	ex_resize(exarg_T *eap);
-static void	ex_stag(exarg_T *eap);
-static void	ex_tabclose(exarg_T *eap);
-static void	ex_tabonly(exarg_T *eap);
-static void	ex_tabnext(exarg_T *eap);
-static void	ex_tabmove(exarg_T *eap);
-static void	ex_tabs(exarg_T *eap);
-#if defined(FEAT_QUICKFIX)
-static void	ex_pclose(exarg_T *eap);
-static void	ex_ptag(exarg_T *eap);
-static void	ex_pedit(exarg_T *eap);
-static void	ex_pbuffer(exarg_T *eap);
-static void	prepare_preview_window(void);
-static void	back_to_current_window(win_T *curwin_save);
-#else
+స్థిర శూన్య	ex_script_ni(exarg_T *eap);
+#అయితే_ముగింపు
+స్థిర అక్షరం	*invalid_range(exarg_T *eap);
+స్థిర శూన్య	correct_range(exarg_T *eap);
+#నిర్వచితమైతే FEAT_QUICKFIX
+స్థిర char_u	*replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep);
+#అయితే_ముగింపు
+స్థిర char_u	*repl_cmdline(exarg_T *eap, char_u *src, size_t srclen, char_u *repl, char_u **cmdlinep);
+స్థిర శూన్య	ex_highlight(exarg_T *eap);
+స్థిర శూన్య	ex_colorscheme(exarg_T *eap);
+స్థిర శూన్య	ex_cquit(exarg_T *eap);
+స్థిర శూన్య	ex_quit_all(exarg_T *eap);
+స్థిర శూన్య	ex_close(exarg_T *eap);
+స్థిర శూన్య	ex_win_close(పూర్ణాంకం forceit, win_T *win, tabpage_T *tp);
+స్థిర శూన్య	ex_only(exarg_T *eap);
+స్థిర శూన్య	ex_resize(exarg_T *eap);
+స్థిర శూన్య	ex_stag(exarg_T *eap);
+స్థిర శూన్య	ex_tabclose(exarg_T *eap);
+స్థిర శూన్య	ex_tabonly(exarg_T *eap);
+స్థిర శూన్య	ex_tabnext(exarg_T *eap);
+స్థిర శూన్య	ex_tabmove(exarg_T *eap);
+స్థిర శూన్య	ex_tabs(exarg_T *eap);
+#ఒకవేళ defined(FEAT_QUICKFIX)
+స్థిర శూన్య	ex_pclose(exarg_T *eap);
+స్థిర శూన్య	ex_ptag(exarg_T *eap);
+స్థిర శూన్య	ex_pedit(exarg_T *eap);
+స్థిర శూన్య	ex_pbuffer(exarg_T *eap);
+స్థిర శూన్య	prepare_preview_కిటికీ(శూన్య);
+స్థిర శూన్య	వెనుక_గమ్యం_current_కిటికీ(win_T *curwin_save);
+#లేకపోతే
 # define ex_pclose		ex_ni
 # define ex_ptag		ex_ni
 # define ex_pedit		ex_ni
 # define ex_pbuffer		ex_ni
-#endif
-static void	ex_hide(exarg_T *eap);
-static void	ex_exit(exarg_T *eap);
-static void	ex_print(exarg_T *eap);
-#ifdef FEAT_BYTEOFF
-static void	ex_goto(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_hide(exarg_T *eap);
+స్థిర శూన్య	ex_exit(exarg_T *eap);
+స్థిర శూన్య	ex_print(exarg_T *eap);
+#నిర్వచితమైతే FEAT_BYTEOFF
+స్థిర శూన్య	ex_goto(exarg_T *eap);
+#లేకపోతే
 # define ex_goto		ex_ni
-#endif
-static void	ex_shell(exarg_T *eap);
-static void	ex_preserve(exarg_T *eap);
-static void	ex_recover(exarg_T *eap);
-static void	ex_mode(exarg_T *eap);
-static void	ex_wrongmodifier(exarg_T *eap);
-static void	ex_find(exarg_T *eap);
-static void	ex_open(exarg_T *eap);
-static void	ex_edit(exarg_T *eap);
-#ifndef FEAT_GUI
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_shell(exarg_T *eap);
+స్థిర శూన్య	ex_preserve(exarg_T *eap);
+స్థిర శూన్య	ex_recover(exarg_T *eap);
+స్థిర శూన్య	ex_బహుళకం(exarg_T *eap);
+స్థిర శూన్య	ex_wrongmodifier(exarg_T *eap);
+స్థిర శూన్య	ex_కనుగొను(exarg_T *eap);
+స్థిర శూన్య	ex_open(exarg_T *eap);
+స్థిర శూన్య	ex_edit(exarg_T *eap);
+#నిర్వచితం_కాకపోతే FEAT_GUI
 # define ex_gui			ex_nogui
-static void	ex_nogui(exarg_T *eap);
-#endif
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-static void	ex_tearoff(exarg_T *eap);
-#else
+స్థిర శూన్య	ex_nogui(exarg_T *eap);
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+స్థిర శూన్య	ex_tearoff(exarg_T *eap);
+#లేకపోతే
 # define ex_tearoff		ex_ni
-#endif
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
-	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
-static void	ex_popup(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+#ఒకవేళ (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+	|| defined(FEAT_పదం_POPUP_MENU)) && defined(FEAT_MENU)
+స్థిర శూన్య	ex_popup(exarg_T *eap);
+#లేకపోతే
 # define ex_popup		ex_ni
-#endif
-#ifndef FEAT_GUI_MSWIN
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_GUI_MSWIN
 # define ex_simalt		ex_ni
-#endif
-#if !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
-# define gui_mch_find_dialog	ex_ni
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
+# define gui_mch_కనుగొను_dialog	ex_ni
 # define gui_mch_replace_dialog ex_ni
-#endif
-#if !defined(FEAT_GUI_GTK)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_GUI_GTK)
 # define ex_helpfind		ex_ni
-#endif
-#ifndef FEAT_CSCOPE
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_CSCOPE
 # define ex_cscope		ex_ni
 # define ex_scscope		ex_ni
 # define ex_cstag		ex_ni
-#endif
-#ifndef FEAT_SYN_HL
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_SYN_HL
 # define ex_syntax		ex_ni
 # define ex_ownsyntax		ex_ni
-#endif
-#if !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
 # define ex_syntime		ex_ni
-#endif
-#ifndef FEAT_SPELL
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_SPELL
 # define ex_spell		ex_ni
 # define ex_mkspell		ex_ni
 # define ex_spelldump		ex_ni
 # define ex_spellinfo		ex_ni
 # define ex_spellrepall		ex_ni
-#endif
-#ifndef FEAT_PERSISTENT_UNDO
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_PERSISTENT_UNDO
 # define ex_rundo		ex_ni
 # define ex_wundo		ex_ni
-#endif
-#ifndef FEAT_LUA
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_LUA
 # define ex_lua			ex_script_ni
 # define ex_luado		ex_ni
 # define ex_luafile		ex_ni
-#endif
-#ifndef FEAT_MZSCHEME
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_MZSCHEME
 # define ex_mzscheme		ex_script_ni
 # define ex_mzfile		ex_ni
-#endif
-#ifndef FEAT_PERL
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_PERL
 # define ex_perl		ex_script_ni
 # define ex_perldo		ex_ni
-#endif
-#ifndef FEAT_PYTHON
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_PYTHON
 # define ex_python		ex_script_ni
 # define ex_pydo		ex_ni
 # define ex_pyfile		ex_ni
-#endif
-#ifndef FEAT_PYTHON3
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_PYTHON3
 # define ex_py3			ex_script_ni
 # define ex_py3do		ex_ni
 # define ex_py3file		ex_ni
-#endif
-#if !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
 # define ex_pyx			ex_script_ni
 # define ex_pyxdo		ex_ni
 # define ex_pyxfile		ex_ni
-#endif
-#ifndef FEAT_TCL
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_TCL
 # define ex_tcl			ex_script_ni
 # define ex_tcldo		ex_ni
 # define ex_tclfile		ex_ni
-#endif
-#ifndef FEAT_RUBY
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_RUBY
 # define ex_ruby		ex_script_ni
 # define ex_rubydo		ex_ni
 # define ex_rubyfile		ex_ni
-#endif
-#ifndef FEAT_KEYMAP
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_KEYMAP
 # define ex_loadkeymap		ex_ni
-#endif
-static void	ex_swapname(exarg_T *eap);
-static void	ex_syncbind(exarg_T *eap);
-static void	ex_read(exarg_T *eap);
-static void	ex_pwd(exarg_T *eap);
-static void	ex_equal(exarg_T *eap);
-static void	ex_sleep(exarg_T *eap);
-static void	ex_winsize(exarg_T *eap);
-static void	ex_wincmd(exarg_T *eap);
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
-static void	ex_winpos(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_swapname(exarg_T *eap);
+స్థిర శూన్య	ex_syncbind(exarg_T *eap);
+స్థిర శూన్య	ex_read(exarg_T *eap);
+స్థిర శూన్య	ex_pwd(exarg_T *eap);
+స్థిర శూన్య	ex_equal(exarg_T *eap);
+స్థిర శూన్య	ex_sleep(exarg_T *eap);
+స్థిర శూన్య	ex_winsize(exarg_T *eap);
+స్థిర శూన్య	ex_wincmd(exarg_T *eap);
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+స్థిర శూన్య	ex_winpos(exarg_T *eap);
+#లేకపోతే
 # define ex_winpos	    ex_ni
-#endif
-static void	ex_operators(exarg_T *eap);
-static void	ex_put(exarg_T *eap);
-static void	ex_iput(exarg_T *eap);
-static void	ex_copymove(exarg_T *eap);
-static void	ex_submagic(exarg_T *eap);
-static void	ex_join(exarg_T *eap);
-static void	ex_at(exarg_T *eap);
-static void	ex_bang(exarg_T *eap);
-static void	ex_undo(exarg_T *eap);
-#ifdef FEAT_PERSISTENT_UNDO
-static void	ex_wundo(exarg_T *eap);
-static void	ex_rundo(exarg_T *eap);
-#endif
-static void	ex_redo(exarg_T *eap);
-static void	ex_later(exarg_T *eap);
-static void	ex_redir(exarg_T *eap);
-static void	ex_redrawstatus(exarg_T *eap);
-static void	ex_redrawtabline(exarg_T *eap);
-static void	ex_redrawtabpanel(exarg_T *eap);
-static void	close_redir(void);
-static void	ex_mark(exarg_T *eap);
-static void	ex_startinsert(exarg_T *eap);
-static void	ex_stopinsert(exarg_T *eap);
-#ifdef FEAT_FIND_ID
-static void	ex_checkpath(exarg_T *eap);
-static void	ex_findpat(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_operators(exarg_T *eap);
+స్థిర శూన్య	ex_put(exarg_T *eap);
+స్థిర శూన్య	ex_iput(exarg_T *eap);
+స్థిర శూన్య	ex_copymove(exarg_T *eap);
+స్థిర శూన్య	ex_submagic(exarg_T *eap);
+స్థిర శూన్య	ex_join(exarg_T *eap);
+స్థిర శూన్య	ex_at(exarg_T *eap);
+స్థిర శూన్య	ex_bang(exarg_T *eap);
+స్థిర శూన్య	ex_undo(exarg_T *eap);
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
+స్థిర శూన్య	ex_wundo(exarg_T *eap);
+స్థిర శూన్య	ex_rundo(exarg_T *eap);
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_redo(exarg_T *eap);
+స్థిర శూన్య	ex_later(exarg_T *eap);
+స్థిర శూన్య	ex_redir(exarg_T *eap);
+స్థిర శూన్య	ex_redrawstatus(exarg_T *eap);
+స్థిర శూన్య	ex_redrawtabline(exarg_T *eap);
+స్థిర శూన్య	ex_redrawtabpanel(exarg_T *eap);
+స్థిర శూన్య	close_redir(శూన్య);
+స్థిర శూన్య	ex_mark(exarg_T *eap);
+స్థిర శూన్య	ex_startinsert(exarg_T *eap);
+స్థిర శూన్య	ex_stopinsert(exarg_T *eap);
+#నిర్వచితమైతే FEAT_కనుగొను_ID
+స్థిర శూన్య	ex_checkpath(exarg_T *eap);
+స్థిర శూన్య	ex_findpat(exarg_T *eap);
+#లేకపోతే
 # define ex_findpat		ex_ni
 # define ex_checkpath		ex_ni
-#endif
-#if defined(FEAT_FIND_ID) && defined(FEAT_QUICKFIX)
-static void	ex_psearch(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_కనుగొను_ID) && defined(FEAT_QUICKFIX)
+స్థిర శూన్య	ex_psearch(exarg_T *eap);
+#లేకపోతే
 # define ex_psearch		ex_ni
-#endif
-static void	ex_tag(exarg_T *eap);
-static void	ex_tag_cmd(exarg_T *eap, char_u *name);
-#ifndef FEAT_EVAL
-# define ex_block		ex_ni
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_ట్యాగ్(exarg_T *eap);
+స్థిర శూన్య	ex_ట్యాగ్_cmd(exarg_T *eap, char_u *name);
+#నిర్వచితం_కాకపోతే FEAT_EVAL
+# define ex_ఖండం		ex_ni
 # define ex_break		ex_ni
 # define ex_breakadd		ex_ni
 # define ex_breakdel		ex_ni
@@ -293,7 +293,7 @@ static void	ex_tag_cmd(exarg_T *eap, char_u *name);
 # define ex_execute		ex_ni
 # define ex_finally		ex_ni
 # define ex_incdec		ex_ni
-# define ex_finish		ex_ni
+# define ex_ముగింపు		ex_ni
 # define ex_function		ex_ni
 # define ex_if			ex_ni
 # define ex_let			ex_ni
@@ -312,91 +312,91 @@ static void	ex_tag_cmd(exarg_T *eap, char_u *name);
 # define ex_while		ex_ni
 # define ex_import		ex_ni
 # define ex_export		ex_ni
-#endif
-#ifndef FEAT_SESSION
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_SESSION
 # define ex_loadview		ex_ni
-#endif
-#ifndef FEAT_VIMINFO
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_VIMINFO
 # define ex_viminfo		ex_ni
-#endif
-static void	ex_behave(exarg_T *eap);
-static void	ex_filetype(exarg_T *eap);
-static void	ex_setfiletype(exarg_T *eap);
-#ifndef FEAT_DIFF
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_behave(exarg_T *eap);
+స్థిర శూన్య	ex_filetype(exarg_T *eap);
+స్థిర శూన్య	ex_setfiletype(exarg_T *eap);
+#నిర్వచితం_కాకపోతే FEAT_DIFF
 # define ex_diffoff		ex_ni
 # define ex_diffpatch		ex_ni
 # define ex_diffgetput		ex_ni
 # define ex_diffsplit		ex_ni
 # define ex_diffthis		ex_ni
 # define ex_diffupdate		ex_ni
-#endif
-static void	ex_digraphs(exarg_T *eap);
-#ifdef FEAT_SEARCH_EXTRA
-static void	ex_nohlsearch(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+స్థిర శూన్య	ex_digraphs(exarg_T *eap);
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+స్థిర శూన్య	ex_nohlsearch(exarg_T *eap);
+#లేకపోతే
 # define ex_nohlsearch		ex_ni
-# define ex_match		ex_ni
-#endif
-#ifdef FEAT_CRYPT
-static void	ex_X(exarg_T *eap);
-#else
+# define ex_సరిపోలిక		ex_ni
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_CRYPT
+స్థిర శూన్య	ex_X(exarg_T *eap);
+#లేకపోతే
 # define ex_X			ex_ni
-#endif
-#ifdef FEAT_FOLDING
-static void	ex_fold(exarg_T *eap);
-static void	ex_foldopen(exarg_T *eap);
-static void	ex_folddo(exarg_T *eap);
-#else
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_FOLDING
+స్థిర శూన్య	ex_fold(exarg_T *eap);
+స్థిర శూన్య	ex_foldopen(exarg_T *eap);
+స్థిర శూన్య	ex_folddo(exarg_T *eap);
+#లేకపోతే
 # define ex_fold		ex_ni
 # define ex_foldopen		ex_ni
 # define ex_folddo		ex_ni
-#endif
-#if !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#అయితే_ముగింపు
+#ఒకవేళ !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 # define ex_language		ex_ni
-#endif
-#ifndef FEAT_SIGNS
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_SIGNS
 # define ex_sign		ex_ni
-#endif
-#ifndef FEAT_NETBEANS_INTG
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_NETBEANS_INTG
 # define ex_nbclose		ex_ni
 # define ex_nbkey		ex_ni
 # define ex_nbstart		ex_ni
-#endif
+#అయితే_ముగింపు
 
-#ifndef FEAT_PROFILE
+#నిర్వచితం_కాకపోతే FEAT_PROFILE
 # define ex_profile		ex_ni
-#endif
-#ifndef FEAT_TERMINAL
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_TERMINAL
 # define ex_terminal		ex_ni
-#endif
-#if !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
 # define ex_xrestore		ex_ni
-#endif
-#if !defined(FEAT_WAYLAND)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_WAYLAND)
 # define ex_wlrestore		ex_ni
-#endif
-#if !defined(HAVE_CLIPMETHOD)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(HAVE_CLIPMETHOD)
 # define ex_clipreset		ex_ni
-#endif
-#if !defined(FEAT_PROP_POPUP)
+#అయితే_ముగింపు
+#ఒకవేళ !defined(FEAT_PROP_POPUP)
 # define ex_popupclear		ex_ni
-#endif
+#అయితే_ముగింపు
 
 /*
  * Declare cmdnames[].
  */
-#define DO_DECLARE_EXCMD
-#include "ex_cmds.h"
-#include "ex_cmdidxs.h"
+#నిర్వచించు DO_DECLARE_EXCMD
+#అన్తర్భావ "ex_cmds.h"
+#అన్తర్భావ "ex_cmdidxs.h"
 
-static char_u dollar_command[2] = {'$', 0};
+స్థిర char_u dollar_command[2] = {'$', 0};
 
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 // Struct for storing a line inside a while/for loop
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    char_u	*line;		// command line
+    char_u	*పంక్తి;		// command line
     linenr_T	lnum;		// sourcing_lnum of the line
 } wcmd_T;
 
@@ -405,44 +405,44 @@ typedef struct
  * This is required, because do_one_cmd() may invoke ex_function(), which
  * reads more lines that may come from the while/for loop.
  */
-struct loop_cookie
+నిర్మాణం loop_cookie
 {
-    garray_T	*lines_gap;		// growarray with line info
-    int		current_line;		// last read line from growarray
-    int		repeating;		// TRUE when looping a second time
+    garray_T	*పంక్తులు_gap;		// growarray with line info
+    పూర్ణాంకం		current_పంక్తి;		// last read line from growarray
+    పూర్ణాంకం		repeating;		// TRUE when looping a second time
     // When "repeating" is FALSE use "getline" and "cookie" to get lines
-    char_u	*(*lc_getline)(int, void *, int, getline_opt_T);
-    void	*cookie;
+    char_u	*(*lc_getline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T);
+    శూన్య	*cookie;
 };
 
-static char_u	*get_loop_line(int c, void *cookie, int indent, getline_opt_T options);
-static int	store_loop_line(garray_T *gap, char_u *line);
-static void	free_cmdlines(garray_T *gap);
+స్థిర char_u	*get_loop_పంక్తి(పూర్ణాంకం c, శూన్య *cookie, పూర్ణాంకం indent, getline_opt_T options);
+స్థిర పూర్ణాంకం	store_loop_పంక్తి(garray_T *gap, char_u *పంక్తి);
+స్థిర శూన్య	free_cmdlines(garray_T *gap);
 
 // Struct to save a few things while debugging.  Used in do_cmdline() only.
-struct dbg_stuff
+నిర్మాణం dbg_stuff
 {
-    int		trylevel;
-    int		force_abort;
-    except_T	*caught_stack;
+    పూర్ణాంకం		trylevel;
+    పూర్ణాంకం		force_abort;
+    except_T	*caught_దొంతర;
     char_u	*vv_exception;
     char_u	*vv_throwpoint;
-    int		did_emsg;
-    int		got_int;
-    int		did_throw;
-    int		need_rethrow;
-    int		check_cstack;
+    పూర్ణాంకం		did_emsg;
+    పూర్ణాంకం		got_int;
+    పూర్ణాంకం		did_throw;
+    పూర్ణాంకం		need_rethrow;
+    పూర్ణాంకం		check_cstack;
     except_T	*current_exception;
 };
 
-    static void
-save_dbg_stuff(struct dbg_stuff *dsp)
+    స్థిర శూన్య
+save_dbg_stuff(నిర్మాణం dbg_stuff *dsp)
 {
     dsp->trylevel	= trylevel;		trylevel = 0;
     dsp->force_abort	= force_abort;		force_abort = FALSE;
-    dsp->caught_stack	= caught_stack;		caught_stack = NULL;
-    dsp->vv_exception	= v_exception(NULL);
-    dsp->vv_throwpoint	= v_throwpoint(NULL);
+    dsp->caught_దొంతర	= caught_దొంతర;		caught_దొంతర = ఖాళీ;
+    dsp->vv_exception	= v_exception(ఖాళీ);
+    dsp->vv_throwpoint	= v_throwpoint(ఖాళీ);
 
     // Necessary for debugging an inactive ":catch", ":finally", ":endtry"
     dsp->did_emsg	= did_emsg;		did_emsg     = FALSE;
@@ -450,18 +450,18 @@ save_dbg_stuff(struct dbg_stuff *dsp)
     dsp->did_throw	= did_throw;		did_throw    = FALSE;
     dsp->need_rethrow	= need_rethrow;		need_rethrow = FALSE;
     dsp->check_cstack	= check_cstack;		check_cstack = FALSE;
-    dsp->current_exception = current_exception;	current_exception = NULL;
+    dsp->current_exception = current_exception;	current_exception = ఖాళీ;
 }
 
-    static void
-restore_dbg_stuff(struct dbg_stuff *dsp)
+    స్థిర శూన్య
+restore_dbg_stuff(నిర్మాణం dbg_stuff *dsp)
 {
     suppress_errthrow = FALSE;
     trylevel = dsp->trylevel;
     force_abort = dsp->force_abort;
-    caught_stack = dsp->caught_stack;
-    (void)v_exception(dsp->vv_exception);
-    (void)v_throwpoint(dsp->vv_throwpoint);
+    caught_దొంతర = dsp->caught_దొంతర;
+    (శూన్య)v_exception(dsp->vv_exception);
+    (శూన్య)v_throwpoint(dsp->vv_throwpoint);
     did_emsg = dsp->did_emsg;
     got_int = dsp->got_int;
     did_throw = dsp->did_throw;
@@ -469,7 +469,7 @@ restore_dbg_stuff(struct dbg_stuff *dsp)
     check_cstack = dsp->check_cstack;
     current_exception = dsp->current_exception;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check if ffname differs from fnum.
@@ -478,149 +478,149 @@ restore_dbg_stuff(struct dbg_stuff *dsp)
  * ffname is a full path to where a buffer lives on-disk or would live on-disk.
  *
  */
-    static int
-is_other_file(int fnum, char_u *ffname)
+    స్థిర పూర్ణాంకం
+is_other_file(పూర్ణాంకం fnum, char_u *ffname)
 {
-    if (fnum != 0)
+    ఒకవేళ (fnum != 0)
     {
-	if (fnum == curbuf->b_fnum)
-	    return FALSE;
+	ఒకవేళ (fnum == curbuf->b_fnum)
+	    తిరిగి FALSE;
 
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    if (ffname == NULL)
-	return TRUE;
+    ఒకవేళ (ffname == ఖాళీ)
+	తిరిగి TRUE;
 
-    if (*ffname == NUL)
-	return FALSE;
+    ఒకవేళ (*ffname == NUL)
+	తిరిగి FALSE;
 
     // TODO: Need a reliable way to know whether a buffer is meant to live
     // on-disk !curbuf->b_dev_valid is not always available (example: missing
     // on Windows)
-    if (curbuf->b_sfname != NULL
+    ఒకవేళ (curbuf->b_sfname != ఖాళీ
 	    && *curbuf->b_sfname != NUL)
 	// This occurs with unsaved buffers. In which case `ffname` actually
 	// corresponds to curbuf->b_sfname
-	return fnamecmp(ffname, curbuf->b_sfname) != 0;
+	తిరిగి fnamecmp(ffname, curbuf->b_sfname) != 0;
 
-    return otherfile(ffname);
+    తిరిగి otherfile(ffname);
 }
 
 /*
  * do_exmode(): Repeatedly get commands for the "Ex" mode, until the ":vi"
  * command is given.
  */
-    void
+    శూన్య
 do_exmode(
-    int		improved)	    // TRUE for "improved Ex" mode
+    పూర్ణాంకం		improved)	    // TRUE for "improved Ex" mode
 {
-    int		save_msg_scroll;
-    int		prev_msg_row;
-    linenr_T	prev_line;
+    పూర్ణాంకం		save_సందేశం_scroll;
+    పూర్ణాంకం		prev_సందేశం_అడ్డువరుస;
+    linenr_T	prev_పంక్తి;
     varnumber_T	changedtick;
 
-    if (improved)
-	exmode_active = EXMODE_VIM;
-    else
-	exmode_active = EXMODE_NORMAL;
-    State = MODE_NORMAL;
+    ఒకవేళ (improved)
+	exmode_చురుకైన = EXMODE_VIM;
+    లేకపోతే
+	exmode_చురుకైన = EXMODE_సాధారణ;
+    State = బహుళకం_సాధారణ;
     may_trigger_modechanged();
 
     // When using ":global /pat/ visual" and then "Q" we return to continue
     // the :global command.
-    if (global_busy)
-	return;
+    ఒకవేళ (global_busy)
+	తిరిగి;
 
-    save_msg_scroll = msg_scroll;
+    save_సందేశం_scroll = సందేశం_scroll;
     ++RedrawingDisabled;	    // don't redisplay the window
     ++no_wait_return;		    // don't wait for return
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // Ignore scrollbar and mouse events in Ex mode
     ++hold_gui_events;
-#endif
+#అయితే_ముగింపు
 
-    msg(_("Entering Ex mode.  Type \"visual\" to go to Normal mode."));
-    while (exmode_active)
+    సందేశం(_("Entering Ex mode.  Type \"visual\" to go to Normal mode."));
+    అయితే (exmode_చురుకైన)
     {
 	// Check for a ":normal" command and no more characters left.
-	if (ex_normal_busy > 0 && typebuf.tb_len == 0)
+	ఒకవేళ (ex_సాధారణ_busy > 0 && typebuf.tb_len == 0)
 	{
-	    exmode_active = FALSE;
-	    break;
+	    exmode_చురుకైన = FALSE;
+	    ఆపు;
 	}
-	msg_scroll = TRUE;
+	సందేశం_scroll = TRUE;
 	need_wait_return = FALSE;
 	ex_pressedreturn = FALSE;
 	ex_no_reprint = FALSE;
 	changedtick = CHANGEDTICK(curbuf);
-	prev_msg_row = msg_row;
-	prev_line = curwin->w_cursor.lnum;
-	if (improved)
+	prev_సందేశం_అడ్డువరుస = సందేశం_అడ్డువరుస;
+	prev_పంక్తి = curwin->w_cursor.lnum;
+	ఒకవేళ (improved)
 	{
-	    cmdline_row = msg_row;
-	    do_cmdline(NULL, getexline, NULL, 0);
+	    cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
+	    do_cmdline(ఖాళీ, getexline, ఖాళీ, 0);
 	}
-	else
-	    do_cmdline(NULL, getexmodeline, NULL, DOCMD_NOWAIT);
-	lines_left = Rows - 1;
+	లేకపోతే
+	    do_cmdline(ఖాళీ, getexmodeline, ఖాళీ, DOCMD_NOWAIT);
+	పంక్తులు_ఎడమ = అడ్డువరుసలు - 1;
 
-	if ((prev_line != curwin->w_cursor.lnum
+	ఒకవేళ ((prev_పంక్తి != curwin->w_cursor.lnum
 		   || changedtick != CHANGEDTICK(curbuf)) && !ex_no_reprint)
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-		emsg(_(e_empty_buffer));
-	    else
+	    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
+		emsg(_(e_ఖాళీలు_బఫరు));
+	    లేకపోతే
 	    {
-		if (ex_pressedreturn)
+		ఒకవేళ (ex_pressedreturn)
 		{
 		    // go up one line, to overwrite the ":<CR>" line, so the
 		    // output doesn't contain empty lines.
-		    msg_row = prev_msg_row;
-		    if (prev_msg_row == Rows - 1)
-			msg_row--;
+		    సందేశం_అడ్డువరుస = prev_సందేశం_అడ్డువరుస;
+		    ఒకవేళ (prev_సందేశం_అడ్డువరుస == అడ్డువరుసలు - 1)
+			సందేశం_అడ్డువరుస--;
 		}
-		msg_col = 0;
-		print_line_no_prefix(curwin->w_cursor.lnum, FALSE, FALSE);
-		msg_clr_eos();
+		సందేశం_నిలువు = 0;
+		print_పంక్తి_no_ఉపసర్గ(curwin->w_cursor.lnum, FALSE, FALSE);
+		సందేశం_clr_eos();
 	    }
 	}
-	else if (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
+	లేకపోతే ఒకవేళ (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-		emsg(_(e_empty_buffer));
-	    else
-		emsg(_(e_at_end_of_file));
+	    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
+		emsg(_(e_ఖాళీలు_బఫరు));
+	    లేకపోతే
+		emsg(_(e_at_చివర_యొక్క_file));
 	}
     }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     --hold_gui_events;
-#endif
-    if (RedrawingDisabled > 0)
+#అయితే_ముగింపు
+    ఒకవేళ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     update_screen(UPD_CLEAR);
     need_wait_return = FALSE;
-    msg_scroll = save_msg_scroll;
+    సందేశం_scroll = save_సందేశం_scroll;
 }
 
 /*
  * Print the executed command for when 'verbose' is set.
  * When "lnum" is 0 only print the command.
  */
-    static void
-msg_verbose_cmd(linenr_T lnum, char_u *cmd)
+    స్థిర శూన్య
+సందేశం_verbose_cmd(linenr_T lnum, char_u *cmd)
 {
     ++no_wait_return;
     verbose_enter_scroll();
 
-    if (lnum == 0)
+    ఒకవేళ (lnum == 0)
 	smsg(_("Executing: %s"), cmd);
-    else
-	smsg(_("line %ld: %s"), (long)lnum, cmd);
-    if (msg_silent == 0)
-	msg_puts("\n");   // don't overwrite this
+    లేకపోతే
+	smsg(_("line %ld: %s"), (దీర్ఘ)lnum, cmd);
+    ఒకవేళ (సందేశం_silent == 0)
+	సందేశం_puts("\n");   // don't overwrite this
 
     verbose_leave_scroll();
     --no_wait_return;
@@ -629,10 +629,10 @@ msg_verbose_cmd(linenr_T lnum, char_u *cmd)
 /*
  * Execute a simple command line.  Used for translated commands like "*".
  */
-    int
+    పూర్ణాంకం
 do_cmdline_cmd(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    తిరిగి do_cmdline(cmd, ఖాళీ, ఖాళీ,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 }
 
@@ -640,10 +640,10 @@ do_cmdline_cmd(char_u *cmd)
  * Execute the "+cmd" argument of "edit +cmd fname" and the like.
  * This allows for using a range without ":" in Vim9 script.
  */
-    static int
-do_cmd_argument(char_u *cmd)
+    స్థిర పూర్ణాంకం
+do_cmd_వాదం(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    తిరిగి do_cmdline(cmd, ఖాళీ, ఖాళీ,
 		      DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED|DOCMD_RANGEOK);
 }
 
@@ -666,107 +666,107 @@ do_cmd_argument(char_u *cmd)
  *
  * return FAIL if cmdline could not be executed, OK otherwise
  */
-    int
+    పూర్ణాంకం
 do_cmdline(
     char_u	*cmdline,
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie,		// argument for fgetline()
-    int		flags)
+    char_u	*(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T),
+    శూన్య	*cookie,		// argument for fgetline()
+    పూర్ణాంకం		flags)
 {
-    char_u	*next_cmdline;		// next cmd to execute
-    char_u	*cmdline_copy = NULL;	// copy of cmd line
-    int		used_getline = FALSE;	// used "fgetline" to obtain command
-    static int	recursive = 0;		// recursive depth
-    int		msg_didout_before_start = 0;
-    int		count = 0;		// line number count
-    int		did_inc_RedrawingDisabled = FALSE;
-    int		retval = OK;
-#ifdef FEAT_EVAL
+    char_u	*తదుపరి_cmdline;		// next cmd to execute
+    char_u	*cmdline_copy = ఖాళీ;	// copy of cmd line
+    పూర్ణాంకం		వాడిన_getline = FALSE;	// used "fgetline" to obtain command
+    స్థిర పూర్ణాంకం	recursive = 0;		// recursive depth
+    పూర్ణాంకం		సందేశం_didout_before_ప్రారంభం = 0;
+    పూర్ణాంకం		లెక్క = 0;		// line number count
+    పూర్ణాంకం		did_inc_RedrawingDisabled = FALSE;
+    పూర్ణాంకం		retval = OK;
+#నిర్వచితమైతే FEAT_EVAL
     cstack_T	cstack;			// conditional stack
-    garray_T	lines_ga;		// keep lines for ":while"/":for"
-    int		current_line = 0;	// active line in lines_ga
-    int		current_line_before = 0;
-    char_u	*fname = NULL;		// function or script name
-    linenr_T	*breakpoint = NULL;	// ptr to breakpoint field in cookie
-    int		*dbg_tick = NULL;	// ptr to dbg_tick field in cookie
-    struct dbg_stuff debug_saved;	// saved things for debug mode
-    int		initial_trylevel;
-    msglist_T	**saved_msg_list = NULL;
-    msglist_T	*private_msg_list = NULL;
+    garray_T	పంక్తులు_ga;		// keep lines for ":while"/":for"
+    పూర్ణాంకం		current_పంక్తి = 0;	// active line in lines_ga
+    పూర్ణాంకం		current_పంక్తి_before = 0;
+    char_u	*fname = ఖాళీ;		// function or script name
+    linenr_T	*breakpoint = ఖాళీ;	// ptr to breakpoint field in cookie
+    పూర్ణాంకం		*dbg_tick = ఖాళీ;	// ptr to dbg_tick field in cookie
+    నిర్మాణం dbg_stuff debug_saved;	// saved things for debug mode
+    పూర్ణాంకం		initial_trylevel;
+    msglist_T	**saved_సందేశం_list = ఖాళీ;
+    msglist_T	*వ్యక్తిగత_సందేశం_list = ఖాళీ;
 
     // "fgetline" and "cookie" passed to do_one_cmd()
-    char_u	*(*cmd_getline)(int, void *, int, getline_opt_T);
-    void	*cmd_cookie;
-    struct loop_cookie cmd_loop_cookie;
-    void	*real_cookie;
-    int		getline_is_func;
-#else
+    char_u	*(*cmd_getline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T);
+    శూన్య	*cmd_cookie;
+    నిర్మాణం loop_cookie cmd_loop_cookie;
+    శూన్య	*real_cookie;
+    పూర్ణాంకం		getline_is_func;
+#లేకపోతే
 # define cmd_getline fgetline
 # define cmd_cookie cookie
-#endif
-    static int	call_depth = 0;		// recursiveness
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+    స్థిర పూర్ణాంకం	call_లోతు = 0;		// recursiveness
+#నిర్వచితమైతే FEAT_EVAL
     // For every pair of do_cmdline()/do_one_cmd() calls, use an extra memory
     // location for storing error messages to be converted to an exception.
     // This ensures that the do_errthrow() call in do_one_cmd() does not
     // combine the messages stored by an earlier invocation of do_one_cmd()
     // with the command name of the later one.  This would happen when
     // BufWritePost autocommands are executed after a write error.
-    saved_msg_list = msg_list;
-    msg_list = &private_msg_list;
-#endif
+    saved_సందేశం_list = సందేశం_list;
+    సందేశం_list = &వ్యక్తిగత_సందేశం_list;
+#అయితే_ముగింపు
 
     // It's possible to create an endless loop with ":execute", catch that
     // here.  The value of 200 allows nested function calls, ":source", etc.
     // Allow 200 or 'maxfuncdepth', whatever is larger.
-    if (call_depth >= 200
-#ifdef FEAT_EVAL
-	    && call_depth >= p_mfd
-#endif
+    ఒకవేళ (call_లోతు >= 200
+#నిర్వచితమైతే FEAT_EVAL
+	    && call_లోతు >= p_mfd
+#అయితే_ముగింపు
 	    )
     {
 	emsg(_(e_command_too_recursive));
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// When converting to an exception, we do not include the command name
 	// since this is not an error of the specific command.
-	do_errthrow((cstack_T *)NULL, (char_u *)NULL);
-	msg_list = saved_msg_list;
-#endif
-	return FAIL;
+	do_errthrow((cstack_T *)ఖాళీ, (char_u *)ఖాళీ);
+	సందేశం_list = saved_సందేశం_list;
+#అయితే_ముగింపు
+	తిరిగి FAIL;
     }
-    ++call_depth;
+    ++call_లోతు;
 
-#ifdef FEAT_EVAL
-    CLEAR_FIELD(cstack);
+#నిర్వచితమైతే FEAT_EVAL
+    CLEAR_క్షేత్రం(cstack);
     cstack.cs_idx = -1;
-    ga_init2(&lines_ga, sizeof(wcmd_T), 10);
+    ga_init2(&పంక్తులు_ga, పరిమాణం(wcmd_T), 10);
 
     real_cookie = getline_cookie(fgetline, cookie);
 
     // Inside a function use a higher nesting level.
-    getline_is_func = getline_equal(fgetline, cookie, get_func_line);
-    if (getline_is_func && ex_nesting_level == func_level(real_cookie))
+    getline_is_func = getline_equal(fgetline, cookie, get_func_పంక్తి);
+    ఒకవేళ (getline_is_func && ex_nesting_level == func_level(real_cookie))
 	++ex_nesting_level;
 
     // Get the function or script name and the address where the next breakpoint
     // line and the debug tick for a function or script are stored.
-    if (getline_is_func)
+    ఒకవేళ (getline_is_func)
     {
 	fname = func_name(real_cookie);
 	breakpoint = func_breakpoint(real_cookie);
 	dbg_tick = func_dbg_tick(real_cookie);
     }
-    else if (getline_equal(fgetline, cookie, getsourceline))
+    లేకపోతే ఒకవేళ (getline_equal(fgetline, cookie, getsourceline))
     {
 	fname = SOURCING_NAME;
-	breakpoint = source_breakpoint(real_cookie);
-	dbg_tick = source_dbg_tick(real_cookie);
+	breakpoint = ఆధారం_breakpoint(real_cookie);
+	dbg_tick = ఆధారం_dbg_tick(real_cookie);
     }
 
     /*
      * Initialize "force_abort"  and "suppress_errthrow" at the top level.
      */
-    if (!recursive)
+    ఒకవేళ (!recursive)
     {
 	force_abort = FALSE;
 	suppress_errthrow = FALSE;
@@ -777,10 +777,10 @@ do_cmdline(
      * exception handling (used when debugging).  Otherwise clear it to avoid
      * a bogus compiler warning when the optimizer uses inline functions...
      */
-    if (flags & DOCMD_EXCRESET)
+    ఒకవేళ (flags & DOCMD_EXCRESET)
 	save_dbg_stuff(&debug_saved);
-    else
-	CLEAR_FIELD(debug_saved);
+    లేకపోతే
+	CLEAR_క్షేత్రం(debug_saved);
 
     initial_trylevel = trylevel;
 
@@ -788,24 +788,24 @@ do_cmdline(
      * "did_throw" will be set to TRUE when an exception is being thrown.
      */
     did_throw = FALSE;
-#endif
+#అయితే_ముగింపు
     /*
      * "did_emsg" will be set to TRUE when emsg() is used, in which case we
      * cancel the whole command line, and any if/endif or loop.
      * If force_abort is set, we cancel everything.
      */
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     did_emsg_cumul += did_emsg;
-#endif
+#అయితే_ముగింపు
     did_emsg = FALSE;
 
     /*
      * KeyTyped is only set when calling vgetc().  Reset it here when not
      * calling vgetc() (sourced command lines).
      */
-    if (!(flags & DOCMD_KEYTYPED)
+    ఒకవేళ (!(flags & DOCMD_KEYTYPED)
 			       && !getline_equal(fgetline, cookie, getexline))
-	KeyTyped = FALSE;
+	కీలకం_Typed = FALSE;
 
     /*
      * Continue executing command lines:
@@ -813,25 +813,25 @@ do_cmdline(
      * - for multiple commands on one line, separated with '|'
      * - when repeating until there are no more lines (for ":source")
      */
-    next_cmdline = cmdline;
-    do
+    తదుపరి_cmdline = cmdline;
+    చేయి
     {
-#ifdef FEAT_EVAL
-	getline_is_func = getline_equal(fgetline, cookie, get_func_line);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	getline_is_func = getline_equal(fgetline, cookie, get_func_పంక్తి);
+#అయితే_ముగింపు
 
 	// stop skipping cmds for an error msg after all endif/while/for
-	if (next_cmdline == NULL
-#ifdef FEAT_EVAL
+	ఒకవేళ (తదుపరి_cmdline == ఖాళీ
+#నిర్వచితమైతే FEAT_EVAL
 		&& !force_abort
 		&& cstack.cs_idx < 0
 		&& !(getline_is_func && func_has_abort(real_cookie))
-#endif
+#అయితే_ముగింపు
 							)
 	{
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	    did_emsg_cumul += did_emsg;
-#endif
+#అయితే_ముగింపు
 	    did_emsg = FALSE;
 	}
 
@@ -841,9 +841,9 @@ do_cmdline(
 	 * 3. If a line is given: Make a copy, so we can mess with it.
 	 */
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// 1. If repeating, get a previous line from lines_ga.
-	if (cstack.cs_looplevel > 0 && current_line < lines_ga.ga_len)
+	ఒకవేళ (cstack.cs_looplevel > 0 && current_పంక్తి < పంక్తులు_ga.ga_len)
 	{
 	    // Each '|' separated command is stored separately in lines_ga, to
 	    // be able to jump to it.  Don't use next_cmdline now.
@@ -851,122 +851,122 @@ do_cmdline(
 
 	    // Check if a function has returned or, unless it has an unclosed
 	    // try conditional, aborted.
-	    if (getline_is_func)
+	    ఒకవేళ (getline_is_func)
 	    {
 # ifdef FEAT_PROFILE
-		if (do_profiling == PROF_YES)
-		    func_line_end(real_cookie);
+		ఒకవేళ (do_profiling == PROF_YES)
+		    func_పంక్తి_చివర(real_cookie);
 # endif
-		if (func_has_ended(real_cookie))
+		ఒకవేళ (func_has_ended(real_cookie))
 		{
 		    retval = FAIL;
-		    break;
+		    ఆపు;
 		}
 	    }
 # ifdef FEAT_PROFILE
-	    else if (do_profiling == PROF_YES
+	    లేకపోతే ఒకవేళ (do_profiling == PROF_YES
 			    && getline_equal(fgetline, cookie, getsourceline))
-		script_line_end();
+		script_పంక్తి_చివర();
 # endif
 
 	    // Check if a sourced file hit a ":finish" command.
-	    if (source_finished(fgetline, cookie))
+	    ఒకవేళ (ఆధారం_ముగిసిన(fgetline, cookie))
 	    {
 		retval = FAIL;
-		break;
+		ఆపు;
 	    }
 
 	    // If breakpoints have been added/deleted need to check for it.
-	    if (breakpoint != NULL && dbg_tick != NULL
+	    ఒకవేళ (breakpoint != ఖాళీ && dbg_tick != ఖాళీ
 						   && *dbg_tick != debug_tick)
 	    {
-		*breakpoint = dbg_find_breakpoint(
+		*breakpoint = dbg_కనుగొను_breakpoint(
 				getline_equal(fgetline, cookie, getsourceline),
 							fname, SOURCING_LNUM);
 		*dbg_tick = debug_tick;
 	    }
 
-	    next_cmdline = ((wcmd_T *)(lines_ga.ga_data))[current_line].line;
-	    SOURCING_LNUM = ((wcmd_T *)(lines_ga.ga_data))[current_line].lnum;
+	    తదుపరి_cmdline = ((wcmd_T *)(పంక్తులు_ga.ga_దత్తాంశం))[current_పంక్తి].పంక్తి;
+	    SOURCING_LNUM = ((wcmd_T *)(పంక్తులు_ga.ga_దత్తాంశం))[current_పంక్తి].lnum;
 
 	    // Did we encounter a breakpoint?
-	    if (breakpoint != NULL && *breakpoint != 0
+	    ఒకవేళ (breakpoint != ఖాళీ && *breakpoint != 0
 					      && *breakpoint <= SOURCING_LNUM)
 	    {
 		dbg_breakpoint(fname, SOURCING_LNUM);
 		// Find next breakpoint.
-		*breakpoint = dbg_find_breakpoint(
+		*breakpoint = dbg_కనుగొను_breakpoint(
 			       getline_equal(fgetline, cookie, getsourceline),
 							fname, SOURCING_LNUM);
 		*dbg_tick = debug_tick;
 	    }
 # ifdef FEAT_PROFILE
-	    if (do_profiling == PROF_YES)
+	    ఒకవేళ (do_profiling == PROF_YES)
 	    {
-		if (getline_is_func)
-		    func_line_start(real_cookie, SOURCING_LNUM);
-		else if (getline_equal(fgetline, cookie, getsourceline))
-		    script_line_start();
+		ఒకవేళ (getline_is_func)
+		    func_పంక్తి_ప్రారంభం(real_cookie, SOURCING_LNUM);
+		లేకపోతే ఒకవేళ (getline_equal(fgetline, cookie, getsourceline))
+		    script_పంక్తి_ప్రారంభం();
 	    }
 # endif
 	}
-#endif
+#అయితే_ముగింపు
 
 	// 2. If no line given, get an allocated line with fgetline().
-	if (next_cmdline == NULL)
+	ఒకవేళ (తదుపరి_cmdline == ఖాళీ)
 	{
 	    /*
 	     * Need to set msg_didout for the first line after an ":if",
 	     * otherwise the ":if" will be overwritten.
 	     */
-	    if (count == 1 && getline_equal(fgetline, cookie, getexline))
-		msg_didout = TRUE;
-	    if (fgetline == NULL || (next_cmdline = fgetline(':', cookie,
-#ifdef FEAT_EVAL
+	    ఒకవేళ (లెక్క == 1 && getline_equal(fgetline, cookie, getexline))
+		సందేశం_didout = TRUE;
+	    ఒకవేళ (fgetline == ఖాళీ || (తదుపరి_cmdline = fgetline(':', cookie,
+#నిర్వచితమైతే FEAT_EVAL
 		    cstack.cs_idx < 0 ? 0 : (cstack.cs_idx + 1) * 2
-#else
+#లేకపోతే
 		    0
-#endif
-		    , in_vim9script() ? GETLINE_CONCAT_CONTBAR
-					       : GETLINE_CONCAT_CONT)) == NULL)
+#అయితే_ముగింపు
+		    , లోపల_vim9script() ? GETLINE_CONCAT_CONTBAR
+					       : GETLINE_CONCAT_CONT)) == ఖాళీ)
 	    {
 		// Don't call wait_return() for aborted command line.  The NULL
 		// returned for the end of a sourced file or executed function
 		// doesn't do this.
-		if (KeyTyped && !(flags & DOCMD_REPEAT))
+		ఒకవేళ (కీలకం_Typed && !(flags & DOCMD_REPEAT))
 		    need_wait_return = FALSE;
 		retval = FAIL;
-		break;
+		ఆపు;
 	    }
-	    used_getline = TRUE;
+	    వాడిన_getline = TRUE;
 
 	    /*
 	     * Keep the first typed line.  Clear it when more lines are typed.
 	     */
-	    if (flags & DOCMD_KEEPLINE)
+	    ఒకవేళ (flags & DOCMD_KEEPLINE)
 	    {
 		vim_free(repeat_cmdline);
-		if (count == 0)
-		    repeat_cmdline = vim_strsave(next_cmdline);
-		else
-		    repeat_cmdline = NULL;
+		ఒకవేళ (లెక్క == 0)
+		    repeat_cmdline = vim_strsave(తదుపరి_cmdline);
+		లేకపోతే
+		    repeat_cmdline = ఖాళీ;
 	    }
 	}
 
 	// 3. Make a copy of the command so we can mess with it.
-	else if (cmdline_copy == NULL)
+	లేకపోతే ఒకవేళ (cmdline_copy == ఖాళీ)
 	{
-	    next_cmdline = vim_strsave(next_cmdline);
-	    if (next_cmdline == NULL)
+	    తదుపరి_cmdline = vim_strsave(తదుపరి_cmdline);
+	    ఒకవేళ (తదుపరి_cmdline == ఖాళీ)
 	    {
-		emsg(_(e_out_of_memory));
+		emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 		retval = FAIL;
-		break;
+		ఆపు;
 	    }
 	}
-	cmdline_copy = next_cmdline;
+	cmdline_copy = తదుపరి_cmdline;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	/*
 	 * Inside a while/for loop, and when the command looks like a ":while"
 	 * or ":for", the line is stored, because we may need it later when
@@ -981,35 +981,35 @@ do_cmdline(
 	 * possible to define a function inside a while/for loop and handles
 	 * line continuation.
 	 */
-	if ((cstack.cs_looplevel > 0 || has_loop_cmd(next_cmdline)))
+	ఒకవేళ ((cstack.cs_looplevel > 0 || has_loop_cmd(తదుపరి_cmdline)))
 	{
-	    cmd_getline = get_loop_line;
-	    cmd_cookie = (void *)&cmd_loop_cookie;
-	    cmd_loop_cookie.lines_gap = &lines_ga;
-	    cmd_loop_cookie.current_line = current_line;
+	    cmd_getline = get_loop_పంక్తి;
+	    cmd_cookie = (శూన్య *)&cmd_loop_cookie;
+	    cmd_loop_cookie.పంక్తులు_gap = &పంక్తులు_ga;
+	    cmd_loop_cookie.current_పంక్తి = current_పంక్తి;
 	    cmd_loop_cookie.lc_getline = fgetline;
 	    cmd_loop_cookie.cookie = cookie;
-	    cmd_loop_cookie.repeating = (current_line < lines_ga.ga_len);
+	    cmd_loop_cookie.repeating = (current_పంక్తి < పంక్తులు_ga.ga_len);
 
 	    // Save the current line when encountering it the first time.
-	    if (current_line == lines_ga.ga_len
-		    && store_loop_line(&lines_ga, next_cmdline) == FAIL)
+	    ఒకవేళ (current_పంక్తి == పంక్తులు_ga.ga_len
+		    && store_loop_పంక్తి(&పంక్తులు_ga, తదుపరి_cmdline) == FAIL)
 	    {
 		retval = FAIL;
-		break;
+		ఆపు;
 	    }
-	    current_line_before = current_line;
+	    current_పంక్తి_before = current_పంక్తి;
 	}
-	else
+	లేకపోతే
 	{
 	    cmd_getline = fgetline;
 	    cmd_cookie = cookie;
 	}
 
 	did_endif = FALSE;
-#endif
+#అయితే_ముగింపు
 
-	if (count++ == 0)
+	ఒకవేళ (లెక్క++ == 0)
 	{
 	    /*
 	     * All output from the commands is put below each other, without
@@ -1017,20 +1017,20 @@ do_cmdline(
 	     * from a script or when being called recursive (e.g. for ":e
 	     * +command file").
 	     */
-	    if (!(flags & DOCMD_NOWAIT) && !recursive)
+	    ఒకవేళ (!(flags & DOCMD_NOWAIT) && !recursive)
 	    {
-		msg_didout_before_start = msg_didout;
-		msg_didany = FALSE; // no output yet
-		msg_start();
-		msg_scroll = TRUE;  // put messages below each other
+		సందేశం_didout_before_ప్రారంభం = సందేశం_didout;
+		సందేశం_didany = FALSE; // no output yet
+		సందేశం_ప్రారంభం();
+		సందేశం_scroll = TRUE;  // put messages below each other
 		++no_wait_return;   // don't wait for return until finished
 		++RedrawingDisabled;
 		did_inc_RedrawingDisabled = TRUE;
 	    }
 	}
 
-	if ((p_verbose >= 15 && SOURCING_NAME != NULL) || p_verbose >= 16)
-	    msg_verbose_cmd(SOURCING_LNUM, cmdline_copy);
+	ఒకవేళ ((p_verbose >= 15 && SOURCING_NAME != ఖాళీ) || p_verbose >= 16)
+	    సందేశం_verbose_cmd(SOURCING_LNUM, cmdline_copy);
 
 	/*
 	 * 2. Execute one '|' separated command.
@@ -1038,21 +1038,21 @@ do_cmdline(
 	 *    "cmdline_copy" can change, e.g. for '%' and '#' expansion.
 	 */
 	++recursive;
-	next_cmdline = do_one_cmd(&cmdline_copy, flags,
-#ifdef FEAT_EVAL
+	తదుపరి_cmdline = do_one_cmd(&cmdline_copy, flags,
+#నిర్వచితమైతే FEAT_EVAL
 				&cstack,
-#endif
+#అయితే_ముగింపు
 				cmd_getline, cmd_cookie);
 	--recursive;
 
-#ifdef FEAT_EVAL
-	if (cmd_cookie == (void *)&cmd_loop_cookie)
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (cmd_cookie == (శూన్య *)&cmd_loop_cookie)
 	    // Use "current_line" from "cmd_loop_cookie", it may have been
 	    // incremented when defining a function.
-	    current_line = cmd_loop_cookie.current_line;
-#endif
+	    current_పంక్తి = cmd_loop_cookie.current_పంక్తి;
+#అయితే_ముగింపు
 
-	if (next_cmdline == NULL)
+	ఒకవేళ (తదుపరి_cmdline == ఖాళీ)
 	{
 	    VIM_CLEAR(cmdline_copy);
 
@@ -1060,36 +1060,36 @@ do_cmdline(
 	     * If the command was typed, remember it for the ':' register.
 	     * Do this AFTER executing the command to make :@: work.
 	     */
-	    if (getline_equal(fgetline, cookie, getexline)
-						  && new_last_cmdline != NULL)
+	    ఒకవేళ (getline_equal(fgetline, cookie, getexline)
+						  && new_చివరి_cmdline != ఖాళీ)
 	    {
-		vim_free(last_cmdline);
-		last_cmdline = new_last_cmdline;
-		new_last_cmdline = NULL;
+		vim_free(చివరి_cmdline);
+		చివరి_cmdline = new_చివరి_cmdline;
+		new_చివరి_cmdline = ఖాళీ;
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // need to copy the command after the '|' to cmdline_copy, for the
 	    // next do_one_cmd()
-	    STRMOVE(cmdline_copy, next_cmdline);
-	    next_cmdline = cmdline_copy;
+	    STRMOVE(cmdline_copy, తదుపరి_cmdline);
+	    తదుపరి_cmdline = cmdline_copy;
 	}
 
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// reset did_emsg for a function that is not aborted by an error
-	if (did_emsg && !force_abort
-		&& getline_equal(fgetline, cookie, get_func_line)
+	ఒకవేళ (did_emsg && !force_abort
+		&& getline_equal(fgetline, cookie, get_func_పంక్తి)
 					      && !func_has_abort(real_cookie))
 	{
 	    // did_emsg_cumul is not set here
 	    did_emsg = FALSE;
 	}
 
-	if (cstack.cs_looplevel > 0)
+	ఒకవేళ (cstack.cs_looplevel > 0)
 	{
-	    ++current_line;
+	    ++current_పంక్తి;
 
 	    /*
 	     * An ":endwhile", ":endfor" and ":continue" is handled here.
@@ -1097,7 +1097,7 @@ do_cmdline(
 	     * ":for".
 	     * If we were not executing commands, decrement cs_looplevel.
 	     */
-	    if (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
+	    ఒకవేళ (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
 	    {
 		cstack.cs_lflags &= ~(CSL_HAD_CONT | CSL_HAD_ENDLOOP);
 
@@ -1105,33 +1105,33 @@ do_cmdline(
 		// not to use a cs_line[] from an entry that isn't a ":while"
 		// or ":for": It would make "current_line" invalid and can
 		// cause a crash.
-		if (!did_emsg && !got_int && !did_throw
+		ఒకవేళ (!did_emsg && !got_int && !did_throw
 			&& cstack.cs_idx >= 0
 			&& (cstack.cs_flags[cstack.cs_idx]
 						      & (CSF_WHILE | CSF_FOR))
-			&& cstack.cs_line[cstack.cs_idx] >= 0
-			&& (cstack.cs_flags[cstack.cs_idx] & CSF_ACTIVE))
+			&& cstack.cs_పంక్తి[cstack.cs_idx] >= 0
+			&& (cstack.cs_flags[cstack.cs_idx] & CSF_చురుకైన))
 		{
-		    current_line = cstack.cs_line[cstack.cs_idx];
+		    current_పంక్తి = cstack.cs_పంక్తి[cstack.cs_idx];
 						// remember we jumped there
 		    cstack.cs_lflags |= CSL_HAD_LOOP;
-		    line_breakcheck();		// check if CTRL-C typed
+		    పంక్తి_breakcheck();		// check if CTRL-C typed
 
 		    // Check for the next breakpoint at or after the ":while"
 		    // or ":for".
-		    if (breakpoint != NULL && lines_ga.ga_len > current_line)
+		    ఒకవేళ (breakpoint != ఖాళీ && పంక్తులు_ga.ga_len > current_పంక్తి)
 		    {
-			*breakpoint = dbg_find_breakpoint(
+			*breakpoint = dbg_కనుగొను_breakpoint(
 			       getline_equal(fgetline, cookie, getsourceline),
 									fname,
-			   ((wcmd_T *)lines_ga.ga_data)[current_line].lnum-1);
+			   ((wcmd_T *)పంక్తులు_ga.ga_దత్తాంశం)[current_పంక్తి].lnum-1);
 			*dbg_tick = debug_tick;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    // can only get here with ":endwhile" or ":endfor"
-		    if (cstack.cs_idx >= 0)
+		    ఒకవేళ (cstack.cs_idx >= 0)
 			rewind_conditionals(&cstack, cstack.cs_idx - 1,
 				   CSF_WHILE | CSF_FOR, &cstack.cs_looplevel);
 		}
@@ -1140,32 +1140,32 @@ do_cmdline(
 	    /*
 	     * For a ":while" or ":for" we need to remember the line number.
 	     */
-	    else if (cstack.cs_lflags & CSL_HAD_LOOP)
+	    లేకపోతే ఒకవేళ (cstack.cs_lflags & CSL_HAD_LOOP)
 	    {
 		cstack.cs_lflags &= ~CSL_HAD_LOOP;
-		cstack.cs_line[cstack.cs_idx] = current_line_before;
+		cstack.cs_పంక్తి[cstack.cs_idx] = current_పంక్తి_before;
 	    }
 	}
 
 	// Check for the next breakpoint after a watchexpression
-	if (breakpoint != NULL && has_watchexpr())
+	ఒకవేళ (breakpoint != ఖాళీ && has_watchexpr())
 	{
-	    *breakpoint = dbg_find_breakpoint(FALSE, fname, SOURCING_LNUM);
+	    *breakpoint = dbg_కనుగొను_breakpoint(FALSE, fname, SOURCING_LNUM);
 	    *dbg_tick = debug_tick;
 	}
 
 	/*
 	 * When not inside any ":while" loop, clear remembered lines.
 	 */
-	if (cstack.cs_looplevel == 0)
+	ఒకవేళ (cstack.cs_looplevel == 0)
 	{
-	    if (lines_ga.ga_len > 0)
+	    ఒకవేళ (పంక్తులు_ga.ga_len > 0)
 	    {
 		SOURCING_LNUM =
-		       ((wcmd_T *)lines_ga.ga_data)[lines_ga.ga_len - 1].lnum;
-		free_cmdlines(&lines_ga);
+		       ((wcmd_T *)పంక్తులు_ga.ga_దత్తాంశం)[పంక్తులు_ga.ga_len - 1].lnum;
+		free_cmdlines(&పంక్తులు_ga);
 	    }
-	    current_line = 0;
+	    current_పంక్తి = 0;
 	}
 
 	/*
@@ -1175,14 +1175,14 @@ do_cmdline(
 	 * This includes the case where a missing ":endif", ":endwhile" or
 	 * ":endfor" was detected by the ":finally" itself.
 	 */
-	if (cstack.cs_lflags & CSL_HAD_FINA)
+	ఒకవేళ (cstack.cs_lflags & CSL_HAD_FINA)
 	{
 	    cstack.cs_lflags &= ~CSL_HAD_FINA;
 	    report_make_pending(cstack.cs_pending[cstack.cs_idx]
-		    & (CSTP_ERROR | CSTP_INTERRUPT | CSTP_THROW),
-		    did_throw ? (void *)current_exception : NULL);
+		    & (CSTP_ERROR | CSTP_అంతరాయం | CSTP_THROW),
+		    did_throw ? (శూన్య *)current_exception : ఖాళీ);
 	    did_emsg = got_int = did_throw = FALSE;
-	    cstack.cs_flags[cstack.cs_idx] |= CSF_ACTIVE | CSF_FINALLY;
+	    cstack.cs_flags[cstack.cs_idx] |= CSF_చురుకైన | CSF_FINALLY;
 	}
 
 	// Update global "trylevel" for recursive calls to do_cmdline() from
@@ -1196,12 +1196,12 @@ do_cmdline(
 	 * force_abort to get the non-EH compatible abortion behavior for
 	 * the rest of the script.
 	 */
-	if (trylevel == 0 && !did_emsg && !got_int && !did_throw)
+	ఒకవేళ (trylevel == 0 && !did_emsg && !got_int && !did_throw)
 	    force_abort = FALSE;
 
 	// Convert an interrupt to an exception if appropriate.
-	(void)do_intthrow(&cstack);
-#endif // FEAT_EVAL
+	(శూన్య)do_intthrow(&cstack);
+#అయితే_ముగింపు // FEAT_EVAL
 
     }
     /*
@@ -1213,39 +1213,39 @@ do_cmdline(
      * - there is a command after '|', inside a :if, :while, :for or :try, or
      *   looping for ":source" command or function call.
      */
-    while (!((got_int
-#ifdef FEAT_EVAL
-		    || (did_emsg && (force_abort || in_vim9script()))
+    అయితే (!((got_int
+#నిర్వచితమైతే FEAT_EVAL
+		    || (did_emsg && (force_abort || లోపల_vim9script()))
 		    || did_throw
-#endif
+#అయితే_ముగింపు
 	     )
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		&& cstack.cs_trylevel == 0
-#endif
+#అయితే_ముగింపు
 	    )
 	    && !(did_emsg
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		// Keep going when inside try/catch, so that the error can be
 		// deal with, except when it is a syntax error, it may cause
 		// the :endtry to be missed.
 		&& (cstack.cs_trylevel == 0 || did_emsg_syntax)
-#endif
-		&& used_getline
+#అయితే_ముగింపు
+		&& వాడిన_getline
 			    && (getline_equal(fgetline, cookie, getexmodeline)
 			       || getline_equal(fgetline, cookie, getexline)))
-	    && (next_cmdline != NULL
-#ifdef FEAT_EVAL
+	    && (తదుపరి_cmdline != ఖాళీ
+#నిర్వచితమైతే FEAT_EVAL
 			|| cstack.cs_idx >= 0
-#endif
+#అయితే_ముగింపు
 			|| (flags & DOCMD_REPEAT)));
 
     vim_free(cmdline_copy);
     did_emsg_syntax = FALSE;
-#ifdef FEAT_EVAL
-    free_cmdlines(&lines_ga);
-    ga_clear(&lines_ga);
+#నిర్వచితమైతే FEAT_EVAL
+    free_cmdlines(&పంక్తులు_ga);
+    ga_clear(&పంక్తులు_ga);
 
-    if (cstack.cs_idx >= 0)
+    ఒకవేళ (cstack.cs_idx >= 0)
     {
 	/*
 	 * If a sourced file or executed function ran to its end, report the
@@ -1253,20 +1253,20 @@ do_cmdline(
 	 * In Vim9 script do not give a second error, executing aborts after
 	 * the first one.
 	 */
-	if (!got_int && !did_throw && !aborting()
-		&& !(did_emsg && in_vim9script())
+	ఒకవేళ (!got_int && !did_throw && !aborting()
+		&& !(did_emsg && లోపల_vim9script())
 		&& ((getline_equal(fgetline, cookie, getsourceline)
-			&& !source_finished(fgetline, cookie))
-		    || (getline_equal(fgetline, cookie, get_func_line)
+			&& !ఆధారం_ముగిసిన(fgetline, cookie))
+		    || (getline_equal(fgetline, cookie, get_func_పంక్తి)
 					    && !func_has_ended(real_cookie))))
 	{
-	    if (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
+	    ఒకవేళ (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
 		emsg(_(e_missing_endtry));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
+	    లేకపోతే ఒకవేళ (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
 		emsg(_(e_missing_endwhile));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
+	    లేకపోతే ఒకవేళ (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
 		emsg(_(e_missing_endfor));
-	    else
+	    లేకపోతే
 		emsg(_(e_missing_endif));
 	}
 
@@ -1277,29 +1277,29 @@ do_cmdline(
 	 * If it is in a catch clause, finish the caught exception.
 	 * Also cleanup any "cs_forinfo" structures.
 	 */
-	do
+	చేయి
 	{
-	    int idx = cleanup_conditionals(&cstack, 0, TRUE);
+	    పూర్ణాంకం idx = cleanup_conditionals(&cstack, 0, TRUE);
 
-	    if (idx >= 0)
+	    ఒకవేళ (idx >= 0)
 		--idx;	    // remove try block not in its finally clause
 	    rewind_conditionals(&cstack, idx, CSF_WHILE | CSF_FOR,
 							&cstack.cs_looplevel);
 	}
-	while (cstack.cs_idx >= 0);
+	అయితే (cstack.cs_idx >= 0);
 	trylevel = initial_trylevel;
     }
 
     // If a missing ":endtry", ":endwhile", ":endfor", or ":endif" or a memory
     // lack was reported above and the error message is to be converted to an
     // exception, do this now after rewinding the cstack.
-    do_errthrow(&cstack, getline_equal(fgetline, cookie, get_func_line)
-				  ? (char_u *)"endfunction" : (char_u *)NULL);
+    do_errthrow(&cstack, getline_equal(fgetline, cookie, get_func_పంక్తి)
+				  ? (char_u *)"endfunction" : (char_u *)ఖాళీ);
 
-    if (trylevel == 0)
+    ఒకవేళ (trylevel == 0)
     {
 	// Just in case did_throw got set but current_exception wasn't.
-	if (current_exception == NULL)
+	ఒకవేళ (current_exception == ఖాళీ)
 	    did_throw = FALSE;
 
 	/*
@@ -1308,7 +1308,7 @@ do_cmdline(
 	 * of interrupts or errors to exceptions, and ensure that no more
 	 * commands are executed.
 	 */
-	if (did_throw)
+	ఒకవేళ (did_throw)
 	    handle_did_throw();
 
 	/*
@@ -1318,7 +1318,7 @@ do_cmdline(
 	 * when force_abort is set and did_emsg unset in case of an interrupt
 	 * from a finally clause after an error.
 	 */
-	else if (got_int || (did_emsg && force_abort))
+	లేకపోతే ఒకవేళ (got_int || (did_emsg && force_abort))
 	    suppress_errthrow = TRUE;
     }
 
@@ -1330,27 +1330,27 @@ do_cmdline(
      * will have to be checked for finally clauses to be executed due to the
      * ":return" or ":finish".  This is done in do_one_cmd().
      */
-    if (did_throw)
+    ఒకవేళ (did_throw)
 	need_rethrow = TRUE;
-    if ((getline_equal(fgetline, cookie, getsourceline)
-		&& ex_nesting_level > source_level(real_cookie))
-	    || (getline_equal(fgetline, cookie, get_func_line)
+    ఒకవేళ ((getline_equal(fgetline, cookie, getsourceline)
+		&& ex_nesting_level > ఆధారం_level(real_cookie))
+	    || (getline_equal(fgetline, cookie, get_func_పంక్తి)
 		&& ex_nesting_level > func_level(real_cookie) + 1))
     {
-	if (!did_throw)
+	ఒకవేళ (!did_throw)
 	    check_cstack = TRUE;
     }
-    else
+    లేకపోతే
     {
 	// When leaving a function, reduce nesting level.
-	if (getline_equal(fgetline, cookie, get_func_line))
+	ఒకవేళ (getline_equal(fgetline, cookie, get_func_పంక్తి))
 	    --ex_nesting_level;
 	/*
 	 * Go to debug mode when returning from a function in which we are
 	 * single-stepping.
 	 */
-	if ((getline_equal(fgetline, cookie, getsourceline)
-		    || getline_equal(fgetline, cookie, get_func_line))
+	ఒకవేళ ((getline_equal(fgetline, cookie, getsourceline)
+		    || getline_equal(fgetline, cookie, get_func_పంక్తి))
 		&& ex_nesting_level + 1 <= debug_break_level)
 	    do_debug(getline_equal(fgetline, cookie, getsourceline)
 		    ? (char_u *)_("End of sourced file")
@@ -1361,84 +1361,84 @@ do_cmdline(
      * Restore the exception environment (done after returning from the
      * debugger).
      */
-    if (flags & DOCMD_EXCRESET)
+    ఒకవేళ (flags & DOCMD_EXCRESET)
 	restore_dbg_stuff(&debug_saved);
 
-    msg_list = saved_msg_list;
+    సందేశం_list = saved_సందేశం_list;
 
     // Cleanup if "cs_emsg_silent_list" remains.
-    if (cstack.cs_emsg_silent_list != NULL)
+    ఒకవేళ (cstack.cs_emsg_silent_list != ఖాళీ)
     {
-	eslist_T *elem, *temp;
+	eslist_T *elem, *తాత్కాలిక;
 
-	for (elem = cstack.cs_emsg_silent_list; elem != NULL; elem = temp)
+	కొరకు (elem = cstack.cs_emsg_silent_list; elem != ఖాళీ; elem = తాత్కాలిక)
 	{
-	    temp = elem->next;
+	    తాత్కాలిక = elem->తదుపరి;
 	    vim_free(elem);
 	}
     }
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
     /*
      * If there was too much output to fit on the command line, ask the user to
      * hit return before redrawing the screen. With the ":global" command we do
      * this only once after the command is finished.
      */
-    if (did_inc_RedrawingDisabled)
+    ఒకవేళ (did_inc_RedrawingDisabled)
     {
-	if (RedrawingDisabled > 0)
+	ఒకవేళ (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
 	--no_wait_return;
-	msg_scroll = FALSE;
+	సందేశం_scroll = FALSE;
 
 	/*
 	 * When just finished an ":if"-":else" which was typed, no need to
 	 * wait for hit-return.  Also for an error situation.
 	 */
-	if (retval == FAIL
-#ifdef FEAT_EVAL
-		|| (did_endif && KeyTyped && !did_emsg)
-#endif
+	ఒకవేళ (retval == FAIL
+#నిర్వచితమైతే FEAT_EVAL
+		|| (did_endif && కీలకం_Typed && !did_emsg)
+#అయితే_ముగింపు
 					    )
 	{
 	    need_wait_return = FALSE;
-	    msg_didany = FALSE;		// don't wait when restarting edit
+	    సందేశం_didany = FALSE;		// don't wait when restarting edit
 	}
-	else if (need_wait_return)
+	లేకపోతే ఒకవేళ (need_wait_return)
 	{
 	    /*
 	     * The msg_start() above clears msg_didout. The wait_return() we do
 	     * here should not overwrite the command that may be shown before
 	     * doing that.
 	     */
-	    msg_didout |= msg_didout_before_start;
+	    సందేశం_didout |= సందేశం_didout_before_ప్రారంభం;
 	    wait_return(FALSE);
 	}
     }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     did_endif = FALSE;  // in case do_cmdline used recursively
-#else
+#లేకపోతే
     /*
      * Reset if_level, in case a sourced script file contains more ":if" than
      * ":endif" (could be ":if x | foo | endif").
      */
     if_level = 0;
-#endif
+#అయితే_ముగింపు
 
-    --call_depth;
-    return retval;
+    --call_లోతు;
+    తిరిగి retval;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Handle when "did_throw" is set after executing commands.
  */
-    void
-handle_did_throw(void)
+    శూన్య
+handle_did_throw(శూన్య)
 {
-    char	*p = NULL;
-    msglist_T	*messages = NULL;
+    అక్షరం	*p = ఖాళీ;
+    msglist_T	*messages = ఖాళీ;
     ESTACK_CHECK_DECLARATION;
 
     /*
@@ -1447,217 +1447,217 @@ handle_did_throw(void)
      * message now.  For an interrupt exception, do nothing; the
      * interrupt message is given elsewhere.
      */
-    switch (current_exception->type)
+    ఎంపిక (current_exception->type)
     {
-	case ET_USER:
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	స్థితి ET_USER:
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		    _(e_exception_not_caught_str),
-		    current_exception->value);
-	    p = (char *)vim_strsave(IObuff);
-	    break;
-	case ET_ERROR:
+		    current_exception->విలువ);
+	    p = (అక్షరం *)vim_strsave(IObuff);
+	    ఆపు;
+	స్థితి ET_ERROR:
 	    messages = current_exception->messages;
-	    current_exception->messages = NULL;
-	    break;
-	case ET_INTERRUPT:
-	    break;
+	    current_exception->messages = ఖాళీ;
+	    ఆపు;
+	స్థితి ET_అంతరాయం:
+	    ఆపు;
     }
 
-    estack_push(ETYPE_EXCEPT, current_exception->throw_name,
+    estack_నెట్టు(ETYPE_EXCEPT, current_exception->throw_name,
 					current_exception->throw_lnum);
-    ESTACK_CHECK_SETUP;
-    current_exception->throw_name = NULL;
+    ESTACK_CHECK_అమరిక;
+    current_exception->throw_name = ఖాళీ;
 
     discard_current_exception();	// uses IObuff if 'verbose'
 
     // If "silent!" is active the uncaught exception is not fatal.
-    if (emsg_silent == 0)
+    ఒకవేళ (emsg_silent == 0)
     {
 	suppress_errthrow = TRUE;
 	force_abort = TRUE;
     }
 
-    if (messages != NULL)
+    ఒకవేళ (messages != ఖాళీ)
     {
-	do
+	చేయి
 	{
-	    msglist_T	*next = messages->next;
-	    int		save_compiling = estack_compiling;
+	    msglist_T	*తదుపరి = messages->తదుపరి;
+	    పూర్ణాంకం		save_compiling = estack_compiling;
 
-	    estack_compiling = messages->msg_compiling;
-	    emsg(messages->msg);
-	    vim_free(messages->msg);
+	    estack_compiling = messages->సందేశం_compiling;
+	    emsg(messages->సందేశం);
+	    vim_free(messages->సందేశం);
 	    vim_free(messages->sfile);
 	    vim_free(messages);
-	    messages = next;
+	    messages = తదుపరి;
 	    estack_compiling = save_compiling;
 	}
-	while (messages != NULL);
+	అయితే (messages != ఖాళీ);
     }
-    else if (p != NULL)
+    లేకపోతే ఒకవేళ (p != ఖాళీ)
     {
 	emsg(p);
 	vim_free(p);
     }
     vim_free(SOURCING_NAME);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_తీయి();
 }
 
 /*
  * Obtain a line when inside a ":while" or ":for" loop.
  */
-    static char_u *
-get_loop_line(int c, void *cookie, int indent, getline_opt_T options)
+    స్థిర char_u *
+get_loop_పంక్తి(పూర్ణాంకం c, శూన్య *cookie, పూర్ణాంకం indent, getline_opt_T options)
 {
-    struct loop_cookie	*cp = (struct loop_cookie *)cookie;
+    నిర్మాణం loop_cookie	*cp = (నిర్మాణం loop_cookie *)cookie;
     wcmd_T		*wp;
-    char_u		*line;
+    char_u		*పంక్తి;
 
-    if (cp->current_line + 1 >= cp->lines_gap->ga_len)
+    ఒకవేళ (cp->current_పంక్తి + 1 >= cp->పంక్తులు_gap->ga_len)
     {
-	if (cp->repeating)
-	    return NULL;	// trying to read past ":endwhile"/":endfor"
+	ఒకవేళ (cp->repeating)
+	    తిరిగి ఖాళీ;	// trying to read past ":endwhile"/":endfor"
 
 	// First time inside the ":while"/":for": get line normally.
-	if (cp->lc_getline == NULL)
-	    line = getcmdline(c, 0L, indent, 0);
-	else
-	    line = cp->lc_getline(c, cp->cookie, indent, options);
-	if (line != NULL && store_loop_line(cp->lines_gap, line) == OK)
-	    ++cp->current_line;
+	ఒకవేళ (cp->lc_getline == ఖాళీ)
+	    పంక్తి = getcmdline(c, 0L, indent, 0);
+	లేకపోతే
+	    పంక్తి = cp->lc_getline(c, cp->cookie, indent, options);
+	ఒకవేళ (పంక్తి != ఖాళీ && store_loop_పంక్తి(cp->పంక్తులు_gap, పంక్తి) == OK)
+	    ++cp->current_పంక్తి;
 
-	return line;
+	తిరిగి పంక్తి;
     }
 
-    KeyTyped = FALSE;
-    ++cp->current_line;
-    wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line;
+    కీలకం_Typed = FALSE;
+    ++cp->current_పంక్తి;
+    wp = (wcmd_T *)(cp->పంక్తులు_gap->ga_దత్తాంశం) + cp->current_పంక్తి;
     SOURCING_LNUM = wp->lnum;
-    return vim_strsave(wp->line);
+    తిరిగి vim_strsave(wp->పంక్తి);
 }
 
 /*
  * Store a line in "gap" so that a ":while" loop can execute it again.
  */
-    static int
-store_loop_line(garray_T *gap, char_u *line)
+    స్థిర పూర్ణాంకం
+store_loop_పంక్తి(garray_T *gap, char_u *పంక్తి)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    ((wcmd_T *)(gap->ga_data))[gap->ga_len].line = vim_strsave(line);
-    ((wcmd_T *)(gap->ga_data))[gap->ga_len].lnum = SOURCING_LNUM;
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి FAIL;
+    ((wcmd_T *)(gap->ga_దత్తాంశం))[gap->ga_len].పంక్తి = vim_strsave(పంక్తి);
+    ((wcmd_T *)(gap->ga_దత్తాంశం))[gap->ga_len].lnum = SOURCING_LNUM;
     ++gap->ga_len;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Free the lines stored for a ":while" or ":for" loop.
  */
-    static void
+    స్థిర శూన్య
 free_cmdlines(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    అయితే (gap->ga_len > 0)
     {
-	vim_free(((wcmd_T *)(gap->ga_data))[gap->ga_len - 1].line);
+	vim_free(((wcmd_T *)(gap->ga_దత్తాంశం))[gap->ga_len - 1].పంక్తి);
 	--gap->ga_len;
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * If "fgetline" is get_loop_line(), return TRUE if the getline it uses equals
  * "func".  * Otherwise return TRUE when "fgetline" equals "func".
  */
-    int
+    పూర్ణాంకం
 getline_equal(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie UNUSED,		// argument for fgetline()
-    char_u	*(*func)(int, void *, int, getline_opt_T))
+    char_u	*(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T),
+    శూన్య	*cookie వాడని,		// argument for fgetline()
+    char_u	*(*func)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T))
 {
-#ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie *cp;
+#నిర్వచితమైతే FEAT_EVAL
+    char_u		*(*gp)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T);
+    నిర్మాణం loop_cookie *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // function that's originally used to obtain the lines.  This may be
     // nested several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (నిర్మాణం loop_cookie *)cookie;
+    అయితే (gp == get_loop_పంక్తి)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return gp == func;
-#else
-    return fgetline == func;
-#endif
+    తిరిగి gp == func;
+#లేకపోతే
+    తిరిగి fgetline == func;
+#అయితే_ముగింపు
 }
 
 /*
  * If "fgetline" is get_loop_line(), return the cookie used by the original
  * getline function.  Otherwise return "cookie".
  */
-    void *
+    శూన్య *
 getline_cookie(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
-    void	*cookie)		// argument for fgetline()
+    char_u	*(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T) వాడని,
+    శూన్య	*cookie)		// argument for fgetline()
 {
-#ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie  *cp;
+#నిర్వచితమైతే FEAT_EVAL
+    char_u		*(*gp)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T);
+    నిర్మాణం loop_cookie  *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // cookie that's originally used to obtain the lines.  This may be nested
     // several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (నిర్మాణం loop_cookie *)cookie;
+    అయితే (gp == get_loop_పంక్తి)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return cp;
-#else
-    return cookie;
-#endif
+    తిరిగి cp;
+#లేకపోతే
+    తిరిగి cookie;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Get the next line source line without advancing.
  */
     char_u *
 getline_peek(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
-    void	*cookie)		// argument for fgetline()
+    char_u	*(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T) వాడని,
+    శూన్య	*cookie)		// argument for fgetline()
 {
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie  *cp;
+    char_u		*(*gp)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T);
+    నిర్మాణం loop_cookie  *cp;
     wcmd_T		*wp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // cookie that's originally used to obtain the lines.  This may be nested
     // several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (నిర్మాణం loop_cookie *)cookie;
+    అయితే (gp == get_loop_పంక్తి)
     {
-	if (cp->current_line + 1 < cp->lines_gap->ga_len)
+	ఒకవేళ (cp->current_పంక్తి + 1 < cp->పంక్తులు_gap->ga_len)
 	{
 	    // executing lines a second time, use the stored copy
-	    wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line + 1;
-	    return wp->line;
+	    wp = (wcmd_T *)(cp->పంక్తులు_gap->ga_దత్తాంశం) + cp->current_పంక్తి + 1;
+	    తిరిగి wp->పంక్తి;
 	}
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    if (gp == getsourceline)
-	return source_nextline(cp);
-    return NULL;
+    ఒకవేళ (gp == getsourceline)
+	తిరిగి ఆధారం_nextline(cp);
+    తిరిగి ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
 
 /*
@@ -1665,91 +1665,91 @@ getline_peek(
  * ":bwipeout", etc.
  * Returns the buffer number.
  */
-    static int
-compute_buffer_local_count(int addr_type, int lnum, int offset)
+    స్థిర పూర్ణాంకం
+compute_బఫరు_local_లెక్క(పూర్ణాంకం addr_type, పూర్ణాంకం lnum, పూర్ణాంకం స్థానభ్రంశం)
 {
     buf_T   *buf;
     buf_T   *nextbuf;
-    int     count = offset;
+    పూర్ణాంకం     లెక్క = స్థానభ్రంశం;
 
     buf = firstbuf;
-    while (buf->b_next != NULL && buf->b_fnum < lnum)
-	buf = buf->b_next;
-    while (count != 0)
+    అయితే (buf->b_తదుపరి != ఖాళీ && buf->b_fnum < lnum)
+	buf = buf->b_తదుపరి;
+    అయితే (లెక్క != 0)
     {
-	count += (offset < 0) ? 1 : -1;
-	nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-	if (nextbuf == NULL)
-	    break;
+	లెక్క += (స్థానభ్రంశం < 0) ? 1 : -1;
+	nextbuf = (స్థానభ్రంశం < 0) ? buf->b_prev : buf->b_తదుపరి;
+	ఒకవేళ (nextbuf == ఖాళీ)
+	    ఆపు;
 	buf = nextbuf;
-	if (addr_type == ADDR_LOADED_BUFFERS)
+	ఒకవేళ (addr_type == ADDR_LOADED_BUFFERS)
 	    // skip over unloaded buffers
-	    while (buf->b_ml.ml_mfp == NULL)
+	    అయితే (buf->b_ml.ml_mfp == ఖాళీ)
 	    {
-		nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-		if (nextbuf == NULL)
-		    break;
+		nextbuf = (స్థానభ్రంశం < 0) ? buf->b_prev : buf->b_తదుపరి;
+		ఒకవేళ (nextbuf == ఖాళీ)
+		    ఆపు;
 		buf = nextbuf;
 	    }
     }
     // we might have gone too far, last buffer is not loadedd
-    if (addr_type == ADDR_LOADED_BUFFERS)
-	while (buf->b_ml.ml_mfp == NULL)
+    ఒకవేళ (addr_type == ADDR_LOADED_BUFFERS)
+	అయితే (buf->b_ml.ml_mfp == ఖాళీ)
 	{
-	    nextbuf = (offset >= 0) ? buf->b_prev : buf->b_next;
-	    if (nextbuf == NULL)
-		break;
+	    nextbuf = (స్థానభ్రంశం >= 0) ? buf->b_prev : buf->b_తదుపరి;
+	    ఒకవేళ (nextbuf == ఖాళీ)
+		ఆపు;
 	    buf = nextbuf;
 	}
-    return buf->b_fnum;
+    తిరిగి buf->b_fnum;
 }
 
 /*
  * Return the window number of "win".
  * When "win" is NULL return the number of windows.
  */
-    static int
+    స్థిర పూర్ణాంకం
 current_win_nr(win_T *win)
 {
     win_T	*wp;
-    int		nr = 0;
+    పూర్ణాంకం		nr = 0;
 
     FOR_ALL_WINDOWS(wp)
     {
 	++nr;
-	if (wp == win)
-	    break;
+	ఒకవేళ (wp == win)
+	    ఆపు;
     }
-    return nr;
+    తిరిగి nr;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 current_tab_nr(tabpage_T *tab)
 {
     tabpage_T	*tp;
-    int		nr = 0;
+    పూర్ణాంకం		nr = 0;
 
     FOR_ALL_TABPAGES(tp)
     {
 	++nr;
-	if (tp == tab)
-	    break;
+	ఒకవేళ (tp == tab)
+	    ఆపు;
     }
-    return nr;
+    తిరిగి nr;
 }
 
-    static int
-comment_start(char_u *p, int starts_with_colon UNUSED)
+    స్థిర పూర్ణాంకం
+comment_ప్రారంభం(char_u *p, పూర్ణాంకం starts_with_colon వాడని)
 {
-    if (in_vim9script())
-	return p[0] == '#' && !starts_with_colon;
-    return *p == '"';
+    ఒకవేళ (లోపల_vim9script())
+	తిరిగి p[0] == '#' && !starts_with_colon;
+    తిరిగి *p == '"';
 }
 
-#define CURRENT_WIN_NR current_win_nr(curwin)
-#define LAST_WIN_NR current_win_nr(NULL)
-#define CURRENT_TAB_NR current_tab_nr(curtab)
-#define LAST_TAB_NR current_tab_nr(NULL)
+#నిర్వచించు CURRENT_WIN_NR current_win_nr(curwin)
+#నిర్వచించు చివరి_WIN_NR current_win_nr(ఖాళీ)
+#నిర్వచించు CURRENT_TAB_NR current_tab_nr(curtab)
+#నిర్వచించు చివరి_TAB_NR current_tab_nr(ఖాళీ)
 
 /*
  * Execute one Ex command.
@@ -1769,48 +1769,48 @@ comment_start(char_u *p, int starts_with_colon UNUSED)
  *
  * This function may be called recursively!
  */
-    static char_u *
+    స్థిర char_u *
 do_one_cmd(
     char_u	**cmdlinep,
-    int		flags,
-#ifdef FEAT_EVAL
+    పూర్ణాంకం		flags,
+#నిర్వచితమైతే FEAT_EVAL
     cstack_T	*cstack,
-#endif
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie)		// argument for fgetline()
+#అయితే_ముగింపు
+    char_u	*(*fgetline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T),
+    శూన్య	*cookie)		// argument for fgetline()
 {
     char_u	*p;
     linenr_T	lnum;
-    long	n;
-    char	*errormsg = NULL;	// error message
-    char_u	*after_modifier = NULL;
+    దీర్ఘ	n;
+    అక్షరం	*errormsg = ఖాళీ;	// error message
+    char_u	*after_modifier = ఖాళీ;
     exarg_T	ea;			// Ex command arguments
     cmdmod_T	save_cmdmod;
-    int		save_reg_executing = reg_executing;
-    int		save_pending_end_reg_executing = pending_end_reg_executing;
-    int		ni;			// set when Not Implemented
+    పూర్ణాంకం		save_reg_executing = reg_executing;
+    పూర్ణాంకం		save_pending_చివర_reg_executing = pending_చివర_reg_executing;
+    పూర్ణాంకం		ni;			// set when Not Implemented
     char_u	*cmd;
-    int		starts_with_colon = FALSE;
-    int		may_have_range;
-#ifdef FEAT_EVAL
-    int		did_set_expr_line = FALSE;
-#endif
-    int		sourcing = flags & DOCMD_VERBOSE;
-    int		did_append_cmd = FALSE;
+    పూర్ణాంకం		starts_with_colon = FALSE;
+    పూర్ణాంకం		may_have_range;
+#నిర్వచితమైతే FEAT_EVAL
+    పూర్ణాంకం		did_సమితి_సమాసం_పంక్తి = FALSE;
+#అయితే_ముగింపు
+    పూర్ణాంకం		sourcing = flags & DOCMD_VERBOSE;
+    పూర్ణాంకం		did_append_cmd = FALSE;
 
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
     ea.line1 = 1;
     ea.line2 = 1;
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     ++ex_nesting_level;
-#endif
+#అయితే_ముగింపు
 
     // When the last file has not been edited :q has to be typed twice.
-    if (quitmore
-#ifdef FEAT_EVAL
+    ఒకవేళ (quitmore
+#నిర్వచితమైతే FEAT_EVAL
 	    // avoid that a function call in 'statusline' does this
-	    && !getline_equal(fgetline, cookie, get_func_line)
-#endif
+	    && !getline_equal(fgetline, cookie, get_func_పంక్తి)
+#అయితే_ముగింపు
 	    // avoid that an autocommand, e.g. QuitPre, does this
 	    && !getline_equal(fgetline, cookie, getnextac))
 	--quitmore;
@@ -1822,8 +1822,8 @@ do_one_cmd(
     save_cmdmod = cmdmod;
 
     // "#!anything" is handled like a comment.
-    if ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
-	goto doend;
+    ఒకవేళ ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
+	వెళ్ళు doend;
 
 /*
  * 1. Skip comment lines and leading white space and colons.
@@ -1834,21 +1834,21 @@ do_one_cmd(
     ea.cmdlinep = cmdlinep;
     ea.ea_getline = fgetline;
     ea.cookie = cookie;
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     ea.cstack = cstack;
     starts_with_colon = *skipwhite(ea.cmd) == ':';
-#endif
-    if (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
-	goto doend;
+#అయితే_ముగింపు
+    ఒకవేళ (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
+	వెళ్ళు doend;
     apply_cmdmod(&cmdmod);
     after_modifier = ea.cmd;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     ea.skip = did_emsg || got_int || did_throw || (cstack->cs_idx >= 0
-			 && !(cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE));
-#else
+			 && !(cstack->cs_flags[cstack->cs_idx] & CSF_చురుకైన));
+#లేకపోతే
     ea.skip = (if_level > 0);
-#endif
+#అయితే_ముగింపు
 
 /*
  * 3. Skip over the range to find the command.  Let "p" point to after it.
@@ -1859,106 +1859,106 @@ do_one_cmd(
 
     // In Vim9 script a colon is required before the range.  This may also be
     // after command modifiers.
-    int vim9script = in_vim9script();
-    if (vim9script && (flags & DOCMD_RANGEOK) == 0)
+    పూర్ణాంకం vim9script = లోపల_vim9script();
+    ఒకవేళ (vim9script && (flags & DOCMD_RANGEOK) == 0)
     {
 	may_have_range = FALSE;
-	for (p = ea.cmd; p >= *cmdlinep; --p)
+	కొరకు (p = ea.cmd; p >= *cmdlinep; --p)
 	{
-	    if (*p == ':')
+	    ఒకవేళ (*p == ':')
 		may_have_range = TRUE;
-	    if (p < ea.cmd && !VIM_ISWHITE(*p))
-		break;
+	    ఒకవేళ (p < ea.cmd && !VIM_ISWHITE(*p))
+		ఆపు;
 	}
     }
-    else
+    లేకపోతే
 	may_have_range = TRUE;
-    if (may_have_range)
-	ea.cmd = skip_range(ea.cmd, TRUE, NULL);
+    ఒకవేళ (may_have_range)
+	ea.cmd = skip_range(ea.cmd, TRUE, ఖాళీ);
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // Handle ":export" - it functions almost like a command modifier.
     // ":export var Name: type"
     // ":export def Name(..."
     // etc.
-    if (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
+    ఒకవేళ (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
 	is_export = TRUE;
-#endif
+#అయితే_ముగింపు
 
-    if (vim9script && !may_have_range)
+    ఒకవేళ (vim9script && !may_have_range)
     {
-	if (ea.cmd == cmd + 1 && *cmd == '$')
+	ఒకవేళ (ea.cmd == cmd + 1 && *cmd == '$')
 	    // should be "$VAR = val"
 	    --ea.cmd;
-#ifdef FEAT_EVAL
-	p = find_ex_command(&ea, NULL, lookup_scriptitem, NULL);
-#else
-	p = find_ex_command(&ea, NULL, NULL, NULL);
-#endif
-	if (ea.cmdidx == CMD_SIZE)
+#నిర్వచితమైతే FEAT_EVAL
+	p = కనుగొను_ex_command(&ea, ఖాళీ, lookup_scriptitem, ఖాళీ);
+#లేకపోతే
+	p = కనుగొను_ex_command(&ea, ఖాళీ, ఖాళీ, ఖాళీ);
+#అయితే_ముగింపు
+	ఒకవేళ (ea.cmdidx == CMD_కొలత)
 	{
-	    char_u *ar = skip_range(ea.cmd, TRUE, NULL);
+	    char_u *ar = skip_range(ea.cmd, TRUE, ఖాళీ);
 
 	    // If a ':' before the range is missing, give a clearer error
 	    // message.
-	    if (ar > ea.cmd && !ea.skip)
+	    ఒకవేళ (ar > ea.cmd && !ea.skip)
 	    {
 		semsg(_(e_colon_required_before_range_str), ea.cmd);
-		goto doend;
+		వెళ్ళు doend;
 	    }
 	}
     }
-    else
-	p = find_ex_command(&ea, NULL, NULL, NULL);
+    లేకపోతే
+	p = కనుగొను_ex_command(&ea, ఖాళీ, ఖాళీ, ఖాళీ);
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 # ifdef FEAT_PROFILE
     // Count this line for profiling if skip is TRUE.
-    if (do_profiling == PROF_YES
+    ఒకవేళ (do_profiling == PROF_YES
 	    && (!ea.skip || cstack->cs_idx == 0 || (cstack->cs_idx > 0
-		     && (cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE))))
+		     && (cstack->cs_flags[cstack->cs_idx - 1] & CSF_చురుకైన))))
     {
-	int skip = did_emsg || got_int || did_throw;
+	పూర్ణాంకం skip = did_emsg || got_int || did_throw;
 
-	if (ea.cmdidx == CMD_catch)
+	ఒకవేళ (ea.cmdidx == CMD_catch)
 	    skip = !skip && !(cstack->cs_idx >= 0
 			  && (cstack->cs_flags[cstack->cs_idx] & CSF_THROWN)
 			  && !(cstack->cs_flags[cstack->cs_idx] & CSF_CAUGHT));
-	else if (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
+	లేకపోతే ఒకవేళ (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
 	    skip = skip || !(cstack->cs_idx >= 0
 			  && !(cstack->cs_flags[cstack->cs_idx]
-						  & (CSF_ACTIVE | CSF_TRUE)));
-	else if (ea.cmdidx == CMD_finally)
+						  & (CSF_చురుకైన | CSF_TRUE)));
+	లేకపోతే ఒకవేళ (ea.cmdidx == CMD_finally)
 	    skip = FALSE;
-	else if (ea.cmdidx != CMD_endif
+	లేకపోతే ఒకవేళ (ea.cmdidx != CMD_endif
 		&& ea.cmdidx != CMD_endfor
 		&& ea.cmdidx != CMD_endtry
 		&& ea.cmdidx != CMD_endwhile)
 	    skip = ea.skip;
 
-	if (!skip)
+	ఒకవేళ (!skip)
 	{
-	    if (getline_equal(fgetline, cookie, get_func_line))
-		func_line_exec(getline_cookie(fgetline, cookie));
-	    else if (getline_equal(fgetline, cookie, getsourceline))
-		script_line_exec();
+	    ఒకవేళ (getline_equal(fgetline, cookie, get_func_పంక్తి))
+		func_పంక్తి_exec(getline_cookie(fgetline, cookie));
+	    లేకపోతే ఒకవేళ (getline_equal(fgetline, cookie, getsourceline))
+		script_పంక్తి_exec();
 	}
     }
 # endif
-#endif
+#అయితే_ముగింపు
 
     ea.cmd = cmd;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // May go to debug mode.  If this happens and the ">quit" debug command is
     // used, throw an interrupt exception and skip the next command.
     dbg_check_breakpoint(&ea);
-    if (!ea.skip && got_int)
+    ఒకవేళ (!ea.skip && got_int)
     {
 	ea.skip = TRUE;
-	(void)do_intthrow(cstack);
+	(శూన్య)do_intthrow(cstack);
     }
-#endif
+#అయితే_ముగింపు
 
 /*
  * 4. parse a range specifier of the form: addr [,addr] [;addr] ..
@@ -1978,27 +1978,27 @@ do_one_cmd(
  */
 
     // ea.addr_type for user commands is set by find_ucmd
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    ఒకవేళ (!IS_USER_CMDIDX(ea.cmdidx))
     {
-	if (ea.cmdidx != CMD_SIZE)
-	    ea.addr_type = cmdnames[(int)ea.cmdidx].cmd_addr_type;
-	else
-	    ea.addr_type = ADDR_LINES;
+	ఒకవేళ (ea.cmdidx != CMD_కొలత)
+	    ea.addr_type = cmdnames[(పూర్ణాంకం)ea.cmdidx].cmd_addr_type;
+	లేకపోతే
+	    ea.addr_type = ADDR_పంక్తులు;
 
 	// :wincmd range depends on the argument.
-	if (ea.cmdidx == CMD_wincmd && p != NULL)
+	ఒకవేళ (ea.cmdidx == CMD_wincmd && p != ఖాళీ)
 	    get_wincmd_addr_type(skipwhite(p), &ea);
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
 	// :.cc in quickfix window uses line number
-	if ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
+	ఒకవేళ ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
 	    ea.addr_type = ADDR_OTHER;
-#endif
+#అయితే_ముగింపు
     }
 
-    if (!may_have_range)
-	ea.line1 = ea.line2 = default_address(&ea);
-    else if (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
-	goto doend;
+    ఒకవేళ (!may_have_range)
+	ea.line1 = ea.line2 = default_చిరునామా(&ea);
+    లేకపోతే ఒకవేళ (parse_cmd_చిరునామా(&ea, &errormsg, FALSE) == FAIL)
+	వెళ్ళు doend;
 
 /*
  * 5. Parse the command.
@@ -2008,15 +2008,15 @@ do_one_cmd(
      * Skip ':' and any white space
      */
     ea.cmd = skipwhite(ea.cmd);
-    while (*ea.cmd == ':')
+    అయితే (*ea.cmd == ':')
 	ea.cmd = skipwhite(ea.cmd + 1);
 
     /*
      * If we got a line, but no command, then go to the line.
      * If we find a '|' or '\n' we set ea.nextcmd.
      */
-    if (*ea.cmd == NUL || comment_start(ea.cmd, starts_with_colon)
-			       || (ea.nextcmd = check_nextcmd(ea.cmd)) != NULL)
+    ఒకవేళ (*ea.cmd == NUL || comment_ప్రారంభం(ea.cmd, starts_with_colon)
+			       || (ea.nextcmd = check_nextcmd(ea.cmd)) != ఖాళీ)
     {
 	/*
 	 * strange vi behaviour:
@@ -2024,144 +2024,144 @@ do_one_cmd(
 	 * ":3|..."	prints line 3  (not in Vim9 script)
 	 * ":|"		prints current line  (not in Vim9 script)
 	 */
-	if (ea.skip)	    // skip this if inside :if
-	    goto doend;
+	ఒకవేళ (ea.skip)	    // skip this if inside :if
+	    వెళ్ళు doend;
 	errormsg = ex_range_without_command(&ea);
-	goto doend;
+	వెళ్ళు doend;
     }
 
     // If this looks like an undefined user command and there are CmdUndefined
     // autocommands defined, trigger the matching autocommands.
-    if (p != NULL && ea.cmdidx == CMD_SIZE && !ea.skip
+    ఒకవేళ (p != ఖాళీ && ea.cmdidx == CMD_కొలత && !ea.skip
 	    && ASCII_ISUPPER(*ea.cmd)
 	    && has_cmdundefined())
     {
-	int ret;
+	పూర్ణాంకం ret;
 
 	p = ea.cmd;
-	while (ASCII_ISALNUM(*p))
+	అయితే (ASCII_ISALNUM(*p))
 	    ++p;
 	p = vim_strnsave(ea.cmd, p - ea.cmd);
-	ret = apply_autocmds(EVENT_CMDUNDEFINED, p, p, TRUE, NULL);
+	ret = apply_autocmds(EVENT_CMDUNDEFINED, p, p, TRUE, ఖాళీ);
 	vim_free(p);
 	// If the autocommands did something and didn't cause an error, try
 	// finding the command again.
 	p = (ret
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		&& !aborting()
-#endif
-		) ? find_ex_command(&ea, NULL, NULL, NULL) : ea.cmd;
+#అయితే_ముగింపు
+		) ? కనుగొను_ex_command(&ea, ఖాళీ, ఖాళీ, ఖాళీ) : ea.cmd;
     }
 
-    if (p == NULL)
+    ఒకవేళ (p == ఖాళీ)
     {
-	if (!ea.skip)
-	    errormsg = _(e_ambiguous_use_of_user_defined_command);
-	goto doend;
+	ఒకవేళ (!ea.skip)
+	    errormsg = _(e_ambiguous_use_యొక్క_user_defined_command);
+	వెళ్ళు doend;
     }
     // Check for wrong commands.
-    if (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
+    ఒకవేళ (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	errormsg = uc_fun_cmd();
-	goto doend;
+	వెళ్ళు doend;
     }
 
-    if (ea.cmdidx == CMD_SIZE)
+    ఒకవేళ (ea.cmdidx == CMD_కొలత)
     {
-	if (!ea.skip)
+	ఒకవేళ (!ea.skip)
 	{
 	    STRCPY(IObuff, _(e_not_an_editor_command));
-	    if (!sourcing)
+	    ఒకవేళ (!sourcing)
 	    {
 		// If the modifier was parsed OK the error must be in the
 		// following command
-		if (after_modifier != NULL)
+		ఒకవేళ (after_modifier != ఖాళీ)
 		    append_command(after_modifier);
-		else
+		లేకపోతే
 		    append_command(*cmdlinep);
 		did_append_cmd = TRUE;
 	    }
-	    errormsg = (char *)IObuff;
+	    errormsg = (అక్షరం *)IObuff;
 	    did_emsg_syntax = TRUE;
 	}
-	goto doend;
+	వెళ్ళు doend;
     }
 
     ni = (!IS_USER_CMDIDX(ea.cmdidx)
 	    && (cmdnames[ea.cmdidx].cmd_func == ex_ni
-#ifdef HAVE_EX_SCRIPT_NI
+#నిర్వచితమైతే HAVE_EX_SCRIPT_NI
 	     || cmdnames[ea.cmdidx].cmd_func == ex_script_ni
-#endif
+#అయితే_ముగింపు
 	     ));
 
-#ifndef FEAT_EVAL
+#నిర్వచితం_కాకపోతే FEAT_EVAL
     /*
      * When the expression evaluation is disabled, recognize the ":if" and
      * ":endif" commands and ignore everything in between it.
      */
-    if (ea.cmdidx == CMD_if)
+    ఒకవేళ (ea.cmdidx == CMD_if)
 	++if_level;
-    if (if_level)
+    ఒకవేళ (if_level)
     {
-	if (ea.cmdidx == CMD_endif)
+	ఒకవేళ (ea.cmdidx == CMD_endif)
 	    --if_level;
-	goto doend;
+	వెళ్ళు doend;
     }
 
-#endif
+#అయితే_ముగింపు
 
     // forced commands
-    if (*p == '!' && ea.cmdidx != CMD_substitute
+    ఒకవేళ (*p == '!' && ea.cmdidx != CMD_substitute
 	    && ea.cmdidx != CMD_smagic && ea.cmdidx != CMD_snomagic)
     {
 	++p;
 	ea.forceit = TRUE;
     }
-    else
+    లేకపోతే
 	ea.forceit = FALSE;
 
 /*
  * 6. Parse arguments.  Then check for errors.
  */
-    if (!IS_USER_CMDIDX(ea.cmdidx))
-	ea.argt = (long)cmdnames[(int)ea.cmdidx].cmd_argt;
+    ఒకవేళ (!IS_USER_CMDIDX(ea.cmdidx))
+	ea.argt = (దీర్ఘ)cmdnames[(పూర్ణాంకం)ea.cmdidx].cmd_argt;
 
-    if (!ea.skip)
+    ఒకవేళ (!ea.skip)
     {
-#ifdef HAVE_SANDBOX
-	if (sandbox != 0 && !(ea.argt & EX_SBOXOK))
+#నిర్వచితమైతే HAVE_SANDBOX
+	ఒకవేళ (sandbox != 0 && !(ea.argt & EX_SBOXOK))
 	{
 	    // Command not allowed in sandbox.
-	    errormsg = _(e_not_allowed_in_sandbox);
-	    goto doend;
+	    errormsg = _(e_not_allowed_లోపల_sandbox);
+	    వెళ్ళు doend;
 	}
-#endif
-	if (restricted != 0 && (ea.argt & EX_RESTRICT))
+#అయితే_ముగింపు
+	ఒకవేళ (restricted != 0 && (ea.argt & EX_RESTRICT))
 	{
-	    errormsg = _(e_command_not_allowed_in_rvim);
-	    goto doend;
+	    errormsg = _(e_command_not_allowed_లోపల_rvim);
+	    వెళ్ళు doend;
 	}
-	if (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
+	ఒకవేళ (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
 	{
 	    // Command not allowed in non-'modifiable' buffer
 	    errormsg = _(e_cannot_make_changes_modifiable_is_off);
-	    goto doend;
+	    వెళ్ళు doend;
 	}
 
-	if (!IS_USER_CMDIDX(ea.cmdidx))
+	ఒకవేళ (!IS_USER_CMDIDX(ea.cmdidx))
 	{
-	    if (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
+	    ఒకవేళ (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
 	    {
 		// Command not allowed in the command line window
-		errormsg = _(e_invalid_in_cmdline_window);
-		goto doend;
+		errormsg = _(e_invalid_లోపల_cmdline_కిటికీ);
+		వెళ్ళు doend;
 	    }
-	    if (text_locked() && !(ea.argt & EX_LOCK_OK))
+	    ఒకవేళ (పాఠ్యం_locked() && !(ea.argt & EX_తాళం_OK))
 	    {
 		// Command not allowed when text is locked
-		errormsg = _(get_text_locked_msg());
-		goto doend;
+		errormsg = _(get_పాఠ్యం_locked_సందేశం());
+		వెళ్ళు doend;
 	    }
 	}
 
@@ -2169,148 +2169,148 @@ do_one_cmd(
 	// Do allow ":checktime" (it is postponed).
 	// Do allow ":edit" (check for an argument later).
 	// Do allow ":file" with no arguments (check for an argument later).
-	if (!(ea.argt & (EX_CMDWIN | EX_LOCK_OK))
+	ఒకవేళ (!(ea.argt & (EX_CMDWIN | EX_తాళం_OK))
 		&& ea.cmdidx != CMD_checktime
 		&& ea.cmdidx != CMD_edit
 		&& ea.cmdidx != CMD_file
 		&& !IS_USER_CMDIDX(ea.cmdidx)
 		&& curbuf_locked())
-	    goto doend;
+	    వెళ్ళు doend;
 
-	if (!ni && !(ea.argt & EX_RANGE) && ea.addr_count > 0)
+	ఒకవేళ (!ni && !(ea.argt & EX_RANGE) && ea.addr_లెక్క > 0)
 	{
 	    errormsg = _(e_no_range_allowed);
-	    goto doend;
+	    వెళ్ళు doend;
 	}
     }
 
-    if (!ni && !(ea.argt & EX_BANG) && ea.forceit)
+    ఒకవేళ (!ni && !(ea.argt & EX_BANG) && ea.forceit)
     {
 	errormsg = _(e_no_bang_allowed);
-	goto doend;
+	వెళ్ళు doend;
     }
 
     /*
      * Don't complain about the range if it is not used
      * (could happen if line_count is accidentally set to 0).
      */
-    if (!ea.skip && !ni && (ea.argt & EX_RANGE))
+    ఒకవేళ (!ea.skip && !ni && (ea.argt & EX_RANGE))
     {
 	/*
 	 * If the range is backwards, ask for confirmation and, if given, swap
 	 * ea.line1 & ea.line2 so it's forwards again.
 	 * When global command is busy, don't ask, will fail below.
 	 */
-	if (!global_busy && ea.line1 > ea.line2)
+	ఒకవేళ (!global_busy && ea.line1 > ea.line2)
 	{
-	    if (msg_silent == 0)
+	    ఒకవేళ (సందేశం_silent == 0)
 	    {
-		if (sourcing || exmode_active)
+		ఒకవేళ (sourcing || exmode_చురుకైన)
 		{
 		    errormsg = _(e_backwards_range_given);
-		    goto doend;
+		    వెళ్ళు doend;
 		}
-		if (ask_yesno((char_u *)
+		ఒకవేళ (ask_yesno((char_u *)
 			_("Backwards range given, OK to swap"), FALSE) != 'y')
-		    goto doend;
+		    వెళ్ళు doend;
 	    }
 	    lnum = ea.line1;
 	    ea.line1 = ea.line2;
 	    ea.line2 = lnum;
 	}
-	if ((errormsg = invalid_range(&ea)) != NULL)
-	    goto doend;
+	ఒకవేళ ((errormsg = invalid_range(&ea)) != ఖాళీ)
+	    వెళ్ళు doend;
     }
 
-    if ((ea.addr_type == ADDR_OTHER) && ea.addr_count == 0)
+    ఒకవేళ ((ea.addr_type == ADDR_OTHER) && ea.addr_లెక్క == 0)
 	// default is 1, not cursor
 	ea.line2 = 1;
 
     correct_range(&ea);
 
-#ifdef FEAT_FOLDING
-    if (((ea.argt & EX_WHOLEFOLD) || ea.addr_count >= 2) && !global_busy
-	    && ea.addr_type == ADDR_LINES)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ (((ea.argt & EX_WHOLEFOLD) || ea.addr_లెక్క >= 2) && !global_busy
+	    && ea.addr_type == ADDR_పంక్తులు)
     {
 	// Put the first line at the start of a closed fold, put the last line
 	// at the end of a closed fold.
-	(void)hasFolding(ea.line1, &ea.line1, NULL);
-	(void)hasFolding(ea.line2, NULL, &ea.line2);
+	(శూన్య)hasFolding(ea.line1, &ea.line1, ఖాళీ);
+	(శూన్య)hasFolding(ea.line2, ఖాళీ, &ea.line2);
     }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
     /*
      * For the ":make" and ":grep" commands we insert the 'makeprg'/'grepprg'
      * option here, so things like % get expanded.
      */
     p = replace_makeprg(&ea, p, cmdlinep);
-    if (p == NULL)
-	goto doend;
-#endif
+    ఒకవేళ (p == ఖాళీ)
+	వెళ్ళు doend;
+#అయితే_ముగింపు
 
     /*
      * Skip to start of argument.
      * Don't do this for the ":!" command, because ":!! -l" needs the space.
      */
-    if (ea.cmdidx == CMD_bang)
+    ఒకవేళ (ea.cmdidx == CMD_bang)
 	ea.arg = p;
-    else
+    లేకపోతే
 	ea.arg = skipwhite(p);
 
     // ":file" cannot be run with an argument when "curbuf_lock" is set
-    if (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
-	goto doend;
+    ఒకవేళ (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
+	వెళ్ళు doend;
 
     /*
      * Check for "++opt=val" argument.
      * Must be first, allow ":w ++enc=utf8 !cmd"
      */
-    if (ea.argt & EX_ARGOPT)
-	while (ea.arg[0] == '+' && ea.arg[1] == '+')
-	    if (getargopt(&ea) == FAIL && !ni)
+    ఒకవేళ (ea.argt & EX_ARGOPT)
+	అయితే (ea.arg[0] == '+' && ea.arg[1] == '+')
+	    ఒకవేళ (getargopt(&ea) == FAIL && !ni)
 	    {
-		errormsg = _(e_invalid_argument);
-		goto doend;
+		errormsg = _(e_invalid_వాదం);
+		వెళ్ళు doend;
 	    }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    ఒకవేళ (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*ea.arg == '>')			// append
+	ఒకవేళ (*ea.arg == '>')			// append
 	{
-	    if (*++ea.arg != '>')		// typed wrong
+	    ఒకవేళ (*++ea.arg != '>')		// typed wrong
 	    {
 		errormsg = _(e_use_w_or_w_gt_gt);
-		goto doend;
+		వెళ్ళు doend;
 	    }
 	    ea.arg = skipwhite(ea.arg + 1);
 	    ea.append = TRUE;
 	}
-	else if (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
+	లేకపోతే ఒకవేళ (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    ఒకవేళ (ea.cmdidx == CMD_read)
     {
-	if (ea.forceit)
+	ఒకవేళ (ea.forceit)
 	{
 	    ea.usefilter = TRUE;		// :r! filter if ea.forceit
 	    ea.forceit = FALSE;
 	}
-	else if (*ea.arg == '!')		// :r !filter
+	లేకపోతే ఒకవేళ (*ea.arg == '!')		// :r !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    ఒకవేళ (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
 	ea.amount = 1;
-	while (*ea.arg == *ea.cmd)		// count number of '>' or '<'
+	అయితే (*ea.arg == *ea.cmd)		// count number of '>' or '<'
 	{
 	    ++ea.arg;
 	    ++ea.amount;
@@ -2322,7 +2322,7 @@ do_one_cmd(
      * Check for "+command" argument, before checking for next command.
      * Don't do this for ":read !cmd" and ":write !cmd".
      */
-    if ((ea.argt & EX_CMDARG) && !ea.usefilter)
+    ఒకవేళ ((ea.argt & EX_CMDARG) && !ea.usefilter)
 	ea.do_ecmd_cmd = getargcmd(&ea.arg);
 
     /*
@@ -2334,68 +2334,68 @@ do_one_cmd(
      * Also do this inside a { - } block after :command and :autocmd.
      * Any others?
      */
-    if ((ea.argt & EX_TRLBAR) && !ea.usefilter)
+    ఒకవేళ ((ea.argt & EX_TRLBAR) && !ea.usefilter)
     {
 	separate_nextcmd(&ea, FALSE);
     }
-    else if (ea.cmdidx == CMD_bang
+    లేకపోతే ఒకవేళ (ea.cmdidx == CMD_bang
 	    || ea.cmdidx == CMD_terminal
 	    || ea.cmdidx == CMD_global
 	    || ea.cmdidx == CMD_vglobal
 	    || ea.usefilter
-#ifdef FEAT_EVAL
-	    || inside_block(&ea)
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	    || inside_ఖండం(&ea)
+#అయితే_ముగింపు
 	    )
     {
-	for (p = ea.arg; *p; ++p)
+	కొరకు (p = ea.arg; *p; ++p)
 	{
 	    // Remove one backslash before a newline
-	    if (*p == '\\' && p[1] == '\n')
+	    ఒకవేళ (*p == '\\' && p[1] == '\n')
 		STRMOVE(p, p + 1);
-	    else if (*p == '\n' && !(ea.argt & EX_EXPR_ARG))
+	    లేకపోతే ఒకవేళ (*p == '\n' && !(ea.argt & EX_సమాసం_ARG))
 	    {
 		ea.nextcmd = p + 1;
 		*p = NUL;
-		break;
+		ఆపు;
 	    }
 	}
     }
 
-    if ((ea.argt & EX_DFLALL) && ea.addr_count == 0)
-	address_default_all(&ea);
+    ఒకవేళ ((ea.argt & EX_DFLALL) && ea.addr_లెక్క == 0)
+	చిరునామా_default_all(&ea);
 
     // accept numbered register only when no count allowed (:put)
-    if (       (ea.argt & EX_REGSTR)
+    ఒకవేళ (       (ea.argt & EX_REGSTR)
 	    && *ea.arg != NUL
 	       // Do not allow register = for user commands
 	    && (!IS_USER_CMDIDX(ea.cmdidx) || *ea.arg != '=')
-	    && !((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)))
+	    && !((ea.argt & EX_లెక్క) && VIM_ISDIGIT(*ea.arg)))
     {
-#if !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
+#ఒకవేళ !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
 	// check these explicitly for a more specific error message
-	if (*ea.arg == '*' || *ea.arg == '+')
+	ఒకవేళ (*ea.arg == '*' || *ea.arg == '+')
 	{
-	    errormsg = _(e_invalid_register_name);
-	    goto doend;
+	    errormsg = _(e_invalid_రిజిస్టరు_name);
+	    వెళ్ళు doend;
 	}
-#endif
-	if (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
+#అయితే_ముగింపు
+	ఒకవేళ (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
 			    && ea.cmdidx != CMD_put && ea.cmdidx != CMD_iput)))
 	{
 	    ea.regname = *ea.arg++;
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	    // for '=' register: accept the rest of the line as an expression
-	    if (ea.arg[-1] == '=' && ea.arg[0] != NUL)
+	    ఒకవేళ (ea.arg[-1] == '=' && ea.arg[0] != NUL)
 	    {
-		if (!ea.skip)
+		ఒకవేళ (!ea.skip)
 		{
-		    set_expr_line(vim_strsave(ea.arg), &ea);
-		    did_set_expr_line = TRUE;
+		    సమితి_సమాసం_పంక్తి(vim_strsave(ea.arg), &ea);
+		    did_సమితి_సమాసం_పంక్తి = TRUE;
 		}
 		ea.arg += STRLEN(ea.arg);
 	    }
-#endif
+#అయితే_ముగింపు
 	    ea.arg = skipwhite(ea.arg);
 	}
     }
@@ -2404,191 +2404,191 @@ do_one_cmd(
      * Check for a count.  When accepting a EX_BUFNAME, don't use "123foo" as a
      * count, it's a buffer name.
      */
-    if ((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)
+    ఒకవేళ ((ea.argt & EX_లెక్క) && VIM_ISDIGIT(*ea.arg)
 	    && (!(ea.argt & EX_BUFNAME) || *(p = skipdigits(ea.arg + 1)) == NUL
 							  || VIM_ISWHITE(*p)))
     {
 	n = getdigits_quoted(&ea.arg);
 	ea.arg = skipwhite(ea.arg);
-	if (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
+	ఒకవేళ (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
 	{
-	    errormsg = _(e_positive_count_required);
-	    goto doend;
+	    errormsg = _(e_ధనాత్మక_లెక్క_required);
+	    వెళ్ళు doend;
 	}
-	if (ea.addr_type != ADDR_LINES)	// e.g. :buffer 2, :sleep 3
+	ఒకవేళ (ea.addr_type != ADDR_పంక్తులు)	// e.g. :buffer 2, :sleep 3
 	{
 	    ea.line2 = n;
-	    if (ea.addr_count == 0)
-		ea.addr_count = 1;
+	    ఒకవేళ (ea.addr_లెక్క == 0)
+		ea.addr_లెక్క = 1;
 	}
-	else
+	లేకపోతే
 	{
 	    ea.line1 = ea.line2;
-	    if (ea.line2 >= LONG_MAX - (n - 1))
+	    ఒకవేళ (ea.line2 >= LONG_MAX - (n - 1))
 		ea.line2 = LONG_MAX;  // avoid overflow
-	    else
+	    లేకపోతే
 		ea.line2 += n - 1;
-	    ++ea.addr_count;
+	    ++ea.addr_లెక్క;
 	    /*
 	     * Be vi compatible: no error message for out of range.
 	     */
-	    if (ea.line2 > curbuf->b_ml.ml_line_count)
-		ea.line2 = curbuf->b_ml.ml_line_count;
+	    ఒకవేళ (ea.line2 > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		ea.line2 = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	}
     }
 
     /*
      * Check for flags: 'l', 'p' and '#'.
      */
-    if (ea.argt & EX_FLAGS)
+    ఒకవేళ (ea.argt & EX_FLAGS)
 	get_flags(&ea);
-    if (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
+    ఒకవేళ (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
 	    && *ea.arg != '"' && (*ea.arg != '|' || (ea.argt & EX_TRLBAR) == 0))
     {
 	// no arguments allowed but there is something
 	errormsg = ex_errmsg(e_trailing_characters_str, ea.arg);
-	goto doend;
+	వెళ్ళు doend;
     }
 
-    if (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
+    ఒకవేళ (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
     {
-	errormsg = _(e_argument_required);
-	goto doend;
+	errormsg = _(e_వాదం_required);
+	వెళ్ళు doend;
     }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     /*
      * Skip the command when it's not going to be executed.
      * The commands like :if, :endif, etc. always need to be executed.
      * Also make an exception for commands that handle a trailing command
      * themselves.
      */
-    if (ea.skip)
+    ఒకవేళ (ea.skip)
     {
-	switch (ea.cmdidx)
+	ఎంపిక (ea.cmdidx)
 	{
 	    // commands that need evaluation
-	    case CMD_while:
-	    case CMD_endwhile:
-	    case CMD_for:
-	    case CMD_endfor:
-	    case CMD_if:
-	    case CMD_elseif:
-	    case CMD_else:
-	    case CMD_endif:
-	    case CMD_try:
-	    case CMD_catch:
-	    case CMD_finally:
-	    case CMD_endtry:
-	    case CMD_function:
-	    case CMD_def:
-				break;
+	    స్థితి CMD_while:
+	    స్థితి CMD_endwhile:
+	    స్థితి CMD_for:
+	    స్థితి CMD_endfor:
+	    స్థితి CMD_if:
+	    స్థితి CMD_elseif:
+	    స్థితి CMD_else:
+	    స్థితి CMD_endif:
+	    స్థితి CMD_try:
+	    స్థితి CMD_catch:
+	    స్థితి CMD_finally:
+	    స్థితి CMD_endtry:
+	    స్థితి CMD_function:
+	    స్థితి CMD_def:
+				ఆపు;
 
 	    // commands that read a block of lines
-	    case CMD_abstract:
-	    case CMD_append:
-	    case CMD_autocmd:
-	    case CMD_change:
-	    case CMD_class:
-	    case CMD_command:
-	    case CMD_enum:
-	    case CMD_insert:
-	    case CMD_interface:
-	    case CMD_loadkeymap:
-				break;
+	    స్థితి CMD_abstract:
+	    స్థితి CMD_append:
+	    స్థితి CMD_autocmd:
+	    స్థితి CMD_change:
+	    స్థితి CMD_class:
+	    స్థితి CMD_command:
+	    స్థితి CMD_enum:
+	    స్థితి CMD_చొప్పించు:
+	    స్థితి CMD_interface:
+	    స్థితి CMD_loadkeymap:
+				ఆపు;
 
 	    // Commands that handle '|' themselves.  Check: A command should
 	    // either have the EX_TRLBAR flag, appear in this list or appear in
 	    // the list at ":help :bar".
-	    case CMD_aboveleft:
-	    case CMD_and:
-	    case CMD_belowright:
-	    case CMD_botright:
-	    case CMD_browse:
-	    case CMD_call:
-	    case CMD_confirm:
-	    case CMD_const:
-	    case CMD_delfunction:
-	    case CMD_djump:
-	    case CMD_dlist:
-	    case CMD_dsearch:
-	    case CMD_dsplit:
-	    case CMD_echo:
-	    case CMD_echoerr:
-	    case CMD_echomsg:
-	    case CMD_echon:
-	    case CMD_eval:
-	    case CMD_execute:
-	    case CMD_filter:
-	    case CMD_final:
-	    case CMD_help:
-	    case CMD_hide:
-	    case CMD_horizontal:
-	    case CMD_ijump:
-	    case CMD_ilist:
-	    case CMD_isearch:
-	    case CMD_isplit:
-	    case CMD_keepalt:
-	    case CMD_keepjumps:
-	    case CMD_keepmarks:
-	    case CMD_keeppatterns:
-	    case CMD_leftabove:
-	    case CMD_let:
-	    case CMD_lockmarks:
-	    case CMD_lockvar:
-	    case CMD_lua:
-	    case CMD_match:
-	    case CMD_mzscheme:
-	    case CMD_noautocmd:
-	    case CMD_noswapfile:
-	    case CMD_perl:
-	    case CMD_psearch:
-	    case CMD_py3:
-	    case CMD_python3:
-	    case CMD_python:
-	    case CMD_return:
-	    case CMD_rightbelow:
-	    case CMD_ruby:
-	    case CMD_silent:
-	    case CMD_smagic:
-	    case CMD_snomagic:
-	    case CMD_substitute:
-	    case CMD_syntax:
-	    case CMD_tab:
-	    case CMD_tcl:
-	    case CMD_throw:
-	    case CMD_tilde:
-	    case CMD_topleft:
-	    case CMD_unlet:
-	    case CMD_unlockvar:
-	    case CMD_var:
-	    case CMD_verbose:
-	    case CMD_vertical:
-	    case CMD_wincmd:
-				break;
+	    స్థితి CMD_aboveleft:
+	    స్థితి CMD_and:
+	    స్థితి CMD_belowright:
+	    స్థితి CMD_botright:
+	    స్థితి CMD_browse:
+	    స్థితి CMD_call:
+	    స్థితి CMD_confirm:
+	    స్థితి CMD_const:
+	    స్థితి CMD_delfunction:
+	    స్థితి CMD_djump:
+	    స్థితి CMD_dlist:
+	    స్థితి CMD_dsearch:
+	    స్థితి CMD_dsplit:
+	    స్థితి CMD_echo:
+	    స్థితి CMD_echoerr:
+	    స్థితి CMD_echomsg:
+	    స్థితి CMD_echon:
+	    స్థితి CMD_eval:
+	    స్థితి CMD_execute:
+	    స్థితి CMD_filter:
+	    స్థితి CMD_final:
+	    స్థితి CMD_help:
+	    స్థితి CMD_hide:
+	    స్థితి CMD_horizontal:
+	    స్థితి CMD_ijump:
+	    స్థితి CMD_ilist:
+	    స్థితి CMD_isearch:
+	    స్థితి CMD_isplit:
+	    స్థితి CMD_keepalt:
+	    స్థితి CMD_keepjumps:
+	    స్థితి CMD_keepmarks:
+	    స్థితి CMD_keeppatterns:
+	    స్థితి CMD_leftabove:
+	    స్థితి CMD_let:
+	    స్థితి CMD_lockmarks:
+	    స్థితి CMD_lockvar:
+	    స్థితి CMD_lua:
+	    స్థితి CMD_సరిపోలిక:
+	    స్థితి CMD_mzscheme:
+	    స్థితి CMD_noautocmd:
+	    స్థితి CMD_noswapfile:
+	    స్థితి CMD_perl:
+	    స్థితి CMD_psearch:
+	    స్థితి CMD_py3:
+	    స్థితి CMD_python3:
+	    స్థితి CMD_python:
+	    స్థితి CMD_return:
+	    స్థితి CMD_rightbelow:
+	    స్థితి CMD_ruby:
+	    స్థితి CMD_silent:
+	    స్థితి CMD_smagic:
+	    స్థితి CMD_snomagic:
+	    స్థితి CMD_substitute:
+	    స్థితి CMD_syntax:
+	    స్థితి CMD_tab:
+	    స్థితి CMD_tcl:
+	    స్థితి CMD_throw:
+	    స్థితి CMD_tilde:
+	    స్థితి CMD_topleft:
+	    స్థితి CMD_unlet:
+	    స్థితి CMD_unlockvar:
+	    స్థితి CMD_var:
+	    స్థితి CMD_verbose:
+	    స్థితి CMD_vertical:
+	    స్థితి CMD_wincmd:
+				ఆపు;
 
-	    default:		goto doend;
+	    అప్రమేయ:		వెళ్ళు doend;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    if ((ea.argt & EX_XFILE)
+    ఒకవేళ ((ea.argt & EX_XFILE)
 	    && expand_filename(&ea, cmdlinep, &errormsg) == FAIL)
-	goto doend;
+	వెళ్ళు doend;
 
-#ifdef FEAT_EVAL
-    if (is_export && (ea.argt & EX_EXPORT) == 0)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (is_export && (ea.argt & EX_EXPORT) == 0)
     {
 	emsg(_(e_invalid_command_after_export));
-	goto doend;
+	వెళ్ళు doend;
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Accept buffer name.  Cannot be used at the same time with a buffer
      * number.  Don't do this for a user command.
      */
-    if ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_count == 0
+    ఒకవేళ ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_లెక్క == 0
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
@@ -2596,29 +2596,29 @@ do_one_cmd(
 	 * by spaces: find next space (skipping over escaped characters).
 	 * The others take one argument: ignore trailing spaces.
 	 */
-	if (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
+	ఒకవేళ (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
 						  || ea.cmdidx == CMD_bunload)
 	    p = skiptowhite_esc(ea.arg);
-	else
+	లేకపోతే
 	{
 	    p = ea.arg + STRLEN(ea.arg);
-	    while (p > ea.arg && VIM_ISWHITE(p[-1]))
+	    అయితే (p > ea.arg && VIM_ISWHITE(p[-1]))
 		--p;
 	}
 	ea.line2 = buflist_findpat(ea.arg, p, (ea.argt & EX_BUFUNL) != 0,
 								FALSE, FALSE);
-	if (ea.line2 < 0)	    // failed
-	    goto doend;
-	ea.addr_count = 1;
+	ఒకవేళ (ea.line2 < 0)	    // failed
+	    వెళ్ళు doend;
+	ea.addr_లెక్క = 1;
 	ea.arg = skipwhite(p);
     }
 
     // The :try command saves the emsg_silent flag, reset it here when
     // ":silent! try" was used, it should only apply to :try itself.
-    if (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
+    ఒకవేళ (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
     {
 	emsg_silent -= cmdmod.cmod_did_esilent;
-	if (emsg_silent < 0)
+	ఒకవేళ (emsg_silent < 0)
 	    emsg_silent = 0;
 	cmdmod.cmod_did_esilent = 0;
     }
@@ -2627,41 +2627,41 @@ do_one_cmd(
  * 7. Execute the command.
  */
 
-    if (IS_USER_CMDIDX(ea.cmdidx))
+    ఒకవేళ (IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
 	 * Execute a user-defined command.
 	 */
 	do_ucmd(&ea);
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Call the function to execute the builtin command.
 	 */
 	(cmdnames[ea.cmdidx].cmd_func)(&ea);
-	if (ea.errmsg != NULL)
+	ఒకవేళ (ea.errmsg != ఖాళీ)
 	    errormsg = ea.errmsg;
     }
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // A command will reset "is_export" when exporting an item.  If it is still
     // set something went wrong or the command was never executed.
-    if (!ea.skip && is_export)
+    ఒకవేళ (!ea.skip && is_export)
     {
-	if (errormsg == NULL)
-	    errormsg = _(e_export_with_invalid_argument);
+	ఒకవేళ (errormsg == ఖాళీ)
+	    errormsg = _(e_export_with_invalid_వాదం);
 	is_export = FALSE;
     }
 
     // Set flag that any command was executed, used by ex_vim9script().
     // Not if this was a command that wasn't executed or :endif.
-    if (sourcing_a_script(&ea)
+    ఒకవేళ (sourcing_a_script(&ea)
 	    && current_sctx.sc_sid > 0
 	    && ea.cmdidx != CMD_endif
 	    && (cstack->cs_idx < 0
-		    || (cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE)))
-	SCRIPT_ITEM(current_sctx.sc_sid)->sn_state = SN_STATE_HAD_COMMAND;
+		    || (cstack->cs_flags[cstack->cs_idx] & CSF_చురుకైన)))
+	SCRIPT_అంశం(current_sctx.sc_sid)->sn_state = SN_STATE_HAD_COMMAND;
 
     /*
      * If the command just executed called do_cmdline(), any throw or ":return"
@@ -2670,133 +2670,133 @@ do_one_cmd(
      * exception, or reanimate a returned function or finished script file and
      * return or finish it again.
      */
-    if (need_rethrow)
+    ఒకవేళ (need_rethrow)
 	do_throw(cstack);
-    else if (check_cstack)
+    లేకపోతే ఒకవేళ (check_cstack)
     {
-	if (source_finished(fgetline, cookie))
-	    do_finish(&ea, TRUE);
-	else if (getline_equal(fgetline, cookie, get_func_line)
+	ఒకవేళ (ఆధారం_ముగిసిన(fgetline, cookie))
+	    do_ముగింపు(&ea, TRUE);
+	లేకపోతే ఒకవేళ (getline_equal(fgetline, cookie, get_func_పంక్తి)
 						   && current_func_returned())
-	    do_return(&ea, TRUE, FALSE, NULL);
+	    do_return(&ea, TRUE, FALSE, ఖాళీ);
     }
     need_rethrow = check_cstack = FALSE;
-#endif
+#అయితే_ముగింపు
 
 doend:
-    if (curwin->w_cursor.lnum == 0)	// can happen with zero line number
+    ఒకవేళ (curwin->w_cursor.lnum == 0)	// can happen with zero line number
     {
 	curwin->w_cursor.lnum = 1;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.నిలువు = 0;
     }
 
-    if (errormsg != NULL && *errormsg != NUL && !did_emsg)
+    ఒకవేళ (errormsg != ఖాళీ && *errormsg != NUL && !did_emsg)
     {
-	if ((sourcing || !KeyTyped) && !did_append_cmd)
+	ఒకవేళ ((sourcing || !కీలకం_Typed) && !did_append_cmd)
 	{
-	    if (errormsg != (char *)IObuff)
+	    ఒకవేళ (errormsg != (అక్షరం *)IObuff)
 	    {
 		STRCPY(IObuff, errormsg);
-		errormsg = (char *)IObuff;
+		errormsg = (అక్షరం *)IObuff;
 	    }
 	    append_command(*cmdlinep);
 	}
 	emsg(errormsg);
     }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     do_errthrow(cstack,
-	    (ea.cmdidx != CMD_SIZE && !IS_USER_CMDIDX(ea.cmdidx))
-			? cmdnames[(int)ea.cmdidx].cmd_name : (char_u *)NULL);
+	    (ea.cmdidx != CMD_కొలత && !IS_USER_CMDIDX(ea.cmdidx))
+			? cmdnames[(పూర్ణాంకం)ea.cmdidx].cmd_name : (char_u *)ఖాళీ);
 
-    if (did_set_expr_line)
-	set_expr_line(NULL, NULL);
+    ఒకవేళ (did_సమితి_సమాసం_పంక్తి)
+	సమితి_సమాసం_పంక్తి(ఖాళీ, ఖాళీ);
     is_export = FALSE;
-#endif
+#అయితే_ముగింపు
 
     undo_cmdmod(&cmdmod);
     cmdmod = save_cmdmod;
     reg_executing = save_reg_executing;
-    pending_end_reg_executing = save_pending_end_reg_executing;
+    pending_చివర_reg_executing = save_pending_చివర_reg_executing;
 
-    if (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
-	ea.nextcmd = NULL;
+    ఒకవేళ (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
+	ea.nextcmd = ఖాళీ;
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     --ex_nesting_level;
     vim_free(ea.cmdline_tofree);
-#endif
+#అయితే_ముగింపు
 
-    return ea.nextcmd;
+    తిరిగి ea.nextcmd;
 }
 
-static char ex_error_buf[MSG_BUF_LEN];
+స్థిర అక్షరం ex_error_buf[సందేశం_BUF_LEN];
 
 /*
  * Return an error message with argument included.
  * Uses a static buffer, only the last error will be kept.
  * "msg" will be translated, caller should use N_().
  */
-    char *
-ex_errmsg(char *msg, char_u *arg)
+    అక్షరం *
+ex_errmsg(అక్షరం *సందేశం, char_u *arg)
 {
-    vim_snprintf(ex_error_buf, MSG_BUF_LEN, _(msg), arg);
-    return ex_error_buf;
+    vim_snprintf(ex_error_buf, సందేశం_BUF_LEN, _(సందేశం), arg);
+    తిరిగి ex_error_buf;
 }
 
 /*
  * The "+" string used in place of an empty command in Ex mode.
  * This string is used in pointer comparison.
  */
-static const char exmode_plus[] = "+";
+స్థిర స్థిరరాశి అక్షరం exmode_plus[] = "+";
 
 /*
  * Handle a range without a command.
  * Returns an error message on failure.
  */
-    char *
+    అక్షరం *
 ex_range_without_command(exarg_T *eap)
 {
-    char *errormsg = NULL;
+    అక్షరం *errormsg = ఖాళీ;
 
-    if ((*eap->cmd == '|' ||
-		(exmode_active && eap->cmd != (char_u *)exmode_plus + 1))
-#ifdef FEAT_EVAL
-	    && !in_vim9script()
-#endif
+    ఒకవేళ ((*eap->cmd == '|' ||
+		(exmode_చురుకైన && eap->cmd != (char_u *)exmode_plus + 1))
+#నిర్వచితమైతే FEAT_EVAL
+	    && !లోపల_vim9script()
+#అయితే_ముగింపు
        )
     {
 	eap->cmdidx = CMD_print;
-	eap->argt = EX_RANGE+EX_COUNT+EX_TRLBAR;
-	if ((errormsg = invalid_range(eap)) == NULL)
+	eap->argt = EX_RANGE+EX_లెక్క+EX_TRLBAR;
+	ఒకవేళ ((errormsg = invalid_range(eap)) == ఖాళీ)
 	{
 	    correct_range(eap);
 	    ex_print(eap);
 	}
     }
-    else if (eap->addr_count != 0)
+    లేకపోతే ఒకవేళ (eap->addr_లెక్క != 0)
     {
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
+	ఒకవేళ (eap->line2 > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    // With '-' in 'cpoptions' a line number past the file is an
 	    // error, otherwise put it at the end of the file.
-	    if (vim_strchr(p_cpo, CPO_MINUS) != NULL)
+	    ఒకవేళ (vim_strchr(p_cpo, CPO_MINUS) != ఖాళీ)
 		eap->line2 = -1;
-	    else
-		eap->line2 = curbuf->b_ml.ml_line_count;
+	    లేకపోతే
+		eap->line2 = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	}
 
-	if (eap->line2 < 0)
+	ఒకవేళ (eap->line2 < 0)
 	    errormsg = _(e_invalid_range);
-	else
+	లేకపోతే
 	{
-	    if (eap->line2 == 0)
+	    ఒకవేళ (eap->line2 == 0)
 		curwin->w_cursor.lnum = 1;
-	    else
+	    లేకపోతే
 		curwin->w_cursor.lnum = eap->line2;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
-    return errormsg;
+    తిరిగి errormsg;
 }
 
 /*
@@ -2804,51 +2804,51 @@ ex_range_without_command(exarg_T *eap)
  * If there is a match advance "pp" to the argument and return TRUE.
  * If "noparen" is TRUE do not recognize the command followed by "(" or ".".
  */
-    static int
+    స్థిర పూర్ణాంకం
 checkforcmd_opt(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len,		// required length
-    int		noparen)
+    అక్షరం	*cmd,		// name of command
+    పూర్ణాంకం		len,		// required length
+    పూర్ణాంకం		noparen)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; cmd[i] != NUL; ++i)
-	if (((char_u *)cmd)[i] != (*pp)[i])
-	    break;
-    if (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
+    కొరకు (i = 0; cmd[i] != NUL; ++i)
+	ఒకవేళ (((char_u *)cmd)[i] != (*pp)[i])
+	    ఆపు;
+    ఒకవేళ (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
 			 && (!noparen || ((*pp)[i] != '(' && (*pp)[i] != '.')))
     {
 	*pp = skipwhite(*pp + i);
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Check for an Ex command with optional tail.
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    పూర్ణాంకం
 checkforcmd(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len)		// required length
+    అక్షరం	*cmd,		// name of command
+    పూర్ణాంకం		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, FALSE);
+    తిరిగి checkforcmd_opt(pp, cmd, len, FALSE);
 }
 
 /*
  * Check for an Ex command with optional tail, not followed by "(" or ".".
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    పూర్ణాంకం
 checkforcmd_noparen(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len)		// required length
+    అక్షరం	*cmd,		// name of command
+    పూర్ణాంకం		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, TRUE);
+    తిరిగి checkforcmd_opt(pp, cmd, len, TRUE);
 }
 
 /*
@@ -2856,22 +2856,22 @@ checkforcmd_noparen(
  * the command name.  Returns NULL when there is none.  Does not modify "arg"
  * and gives no error messages.
  */
-    static char_u *
-find_ucmd_repl(char_u *arg)
+    స్థిర char_u *
+కనుగొను_ucmd_repl(char_u *arg)
 {
     char_u	*p = arg;
 
     // Skip over the attributes.
-    while (*p == '-')
+    అయితే (*p == '-')
 	p = skipwhite(skiptowhite(p));
 
     // Skip over the command name.
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
-    while (ASCII_ISALNUM(*p))
+    ఒకవేళ (!ASCII_ISALPHA(*p))
+	తిరిగి ఖాళీ;
+    అయితే (ASCII_ISALNUM(*p))
 	++p;
 
-    return *p == NUL ? NULL : skipwhite(p);
+    తిరిగి *p == NUL ? ఖాళీ : skipwhite(p);
 }
 
 /*
@@ -2881,34 +2881,34 @@ find_ucmd_repl(char_u *arg)
  * Returns NULL when the line does not start such a block.
  */
     char_u *
-find_cmd_block_start(char_u *line)
+కనుగొను_cmd_ఖండం_ప్రారంభం(char_u *పంక్తి)
 {
-    char_u	*p = skipwhite(line);
+    char_u	*p = skipwhite(పంక్తి);
 
-    for (;;)
+    కొరకు (;;)
     {
 	char_u	*arg = p;
 
-	if (*p == '{' && ends_excmd2(p, skipwhite(p + 1)))
-	    return p;
+	ఒకవేళ (*p == '{' && చివర్లు_excmd2(p, skipwhite(p + 1)))
+	    తిరిగి p;
 
-	if (checkforcmd_noparen(&arg, "autocmd", 2))
+	ఒకవేళ (checkforcmd_noparen(&arg, "autocmd", 2))
 	{
-	    if (*arg == '!')
+	    ఒకవేళ (*arg == '!')
 		arg = skipwhite(arg + 1);
-	    p = au_find_cmd_arg(arg);
+	    p = au_కనుగొను_cmd_arg(arg);
 	}
-	else if (checkforcmd_noparen(&arg, "command", 3))
+	లేకపోతే ఒకవేళ (checkforcmd_noparen(&arg, "command", 3))
 	{
-	    if (*arg == '!')
+	    ఒకవేళ (*arg == '!')
 		arg = skipwhite(arg + 1);
-	    p = find_ucmd_repl(arg);
+	    p = కనుగొను_ucmd_repl(arg);
 	}
-	else
-	    return NULL;
+	లేకపోతే
+	    తిరిగి ఖాళీ;
 
-	if (p == NULL)
-	    return NULL;
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	p = skipwhite(p);
     }
 }
@@ -2930,94 +2930,94 @@ find_cmd_block_start(char_u *line)
  * Return FAIL when the command is not to be executed.
  * May set "errormsg" to an error message.
  */
-    int
+    పూర్ణాంకం
 parse_command_modifiers(
 	exarg_T	    *eap,
-	char	    **errormsg,
+	అక్షరం	    **errormsg,
 	cmdmod_T    *cmod,
-	int	    skip_only)
+	పూర్ణాంకం	    skip_only)
 {
     char_u  *orig_cmd = eap->cmd;
-    char_u  *cmd_start = NULL;
-    int	    use_plus_cmd = FALSE;
-    int	    starts_with_colon = FALSE;
-    int	    vim9script = in_vim9script();
-    int	    has_visual_range = FALSE;
+    char_u  *cmd_ప్రారంభం = ఖాళీ;
+    పూర్ణాంకం	    use_plus_cmd = FALSE;
+    పూర్ణాంకం	    starts_with_colon = FALSE;
+    పూర్ణాంకం	    vim9script = లోపల_vim9script();
+    పూర్ణాంకం	    has_visual_range = FALSE;
 
-    CLEAR_POINTER(cmod);
+    CLEAR_సూచిక(cmod);
     cmod->cmod_flags = sticky_cmdmod_flags;
 
-    if (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
+    ఒకవేళ (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
     {
 	// The automatically inserted Visual area range is skipped, so that
 	// typing ":cmdmod cmd" in Visual mode works without having to move the
 	// range to after the modifiers. The command will be "'<,'>cmdmod cmd",
 	// parse "cmdmod cmd" and then put back "'<,'>" before "cmd" below.
 	eap->cmd += 5;
-	cmd_start = eap->cmd;
+	cmd_ప్రారంభం = eap->cmd;
 	has_visual_range = TRUE;
     }
 
     // Repeat until no more command modifiers are found.
-    for (;;)
+    కొరకు (;;)
     {
 	char_u  *p;
 
-	while (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
+	అయితే (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
 	{
-	    if (*eap->cmd == ':')
+	    ఒకవేళ (*eap->cmd == ':')
 		starts_with_colon = TRUE;
 	    ++eap->cmd;
 	}
 
 	// in ex mode, an empty command (after modifiers) works like :+
-	if (*eap->cmd == NUL && exmode_active
+	ఒకవేళ (*eap->cmd == NUL && exmode_చురుకైన
 		   && (getline_equal(eap->ea_getline, eap->cookie, getexmodeline)
 		       || getline_equal(eap->ea_getline, eap->cookie, getexline))
-			&& curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+			&& curwin->w_cursor.lnum < curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    use_plus_cmd = TRUE;
-	    if (!skip_only)
+	    ఒకవేళ (!skip_only)
 		ex_pressedreturn = TRUE;
-	    break;  // no modifiers following
+	    ఆపు;  // no modifiers following
 	}
 
 	// ignore comment and empty lines
-	if (comment_start(eap->cmd, starts_with_colon))
+	ఒకవేళ (comment_ప్రారంభం(eap->cmd, starts_with_colon))
 	{
 	    // a comment ends at a NL
 	    eap->nextcmd = vim_strchr(eap->cmd, '\n');
-	    if (eap->nextcmd != NULL)
+	    ఒకవేళ (eap->nextcmd != ఖాళీ)
 		++eap->nextcmd;
-	    if (vim9script)
+	    ఒకవేళ (vim9script)
 	    {
-		if (has_cmdmod(cmod, FALSE))
+		ఒకవేళ (has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
-#ifdef FEAT_EVAL
-		if (eap->cmd[0] == '#' && eap->cmd[1] == '{'
+#నిర్వచితమైతే FEAT_EVAL
+		ఒకవేళ (eap->cmd[0] == '#' && eap->cmd[1] == '{'
 							 && eap->cmd[2] != '{')
-		    *errormsg = _(e_cannot_use_hash_curly_to_start_comment);
-#endif
+		    *errormsg = _(e_cannot_use_hash_curly_గమ్యం_ప్రారంభం_comment);
+#అయితే_ముగింపు
 	    }
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (*eap->cmd == '\n')
+	ఒకవేళ (*eap->cmd == '\n')
 	{
 	    eap->nextcmd = eap->cmd + 1;
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (*eap->cmd == NUL)
+	ఒకవేళ (*eap->cmd == NUL)
 	{
-	    if (!skip_only)
+	    ఒకవేళ (!skip_only)
 	    {
 		ex_pressedreturn = TRUE;
-		if (vim9script && has_cmdmod(cmod, FALSE))
+		ఒకవేళ (vim9script && has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
 	    }
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	p = skip_range(eap->cmd, TRUE, NULL);
+	p = skip_range(eap->cmd, TRUE, ఖాళీ);
 
 	// In Vim9 script a variable can shadow a command modifier:
 	//   verbose = 123
@@ -3027,370 +3027,370 @@ parse_command_modifiers(
 	//   verbose[expr] = 2
 	// But not:
 	//   verbose [a, b] = list
-	if (vim9script)
+	ఒకవేళ (vim9script)
 	{
 	    char_u *s, *n;
 
-	    for (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
+	    కొరకు (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
 		;
 	    n = skipwhite(s);
-	    if (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
+	    ఒకవేళ (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
 		    || *s == '[')
-		break;
+		ఆపు;
 	}
 
-	switch (*p)
+	ఎంపిక (*p)
 	{
 	    // When adding an entry, also modify cmdmod_info_tab[].
-	    case 'a':	if (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
-			    break;
-			cmod->cmod_split |= WSP_ABOVE;
-			continue;
+	    స్థితి 'a':	ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
+			    ఆపు;
+			cmod->cmod_విభజించు |= WSP_ABOVE;
+			కొనసాగు;
 
-	    case 'b':	if (checkforcmd_noparen(&eap->cmd, "belowright", 3))
+	    స్థితి 'b':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "belowright", 3))
 			{
-			    cmod->cmod_split |= WSP_BELOW;
-			    continue;
+			    cmod->cmod_విభజించు |= WSP_క్రింద;
+			    కొనసాగు;
 			}
-			if (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
+			ఒకవేళ (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
 			{
-#ifdef FEAT_BROWSE_CMD
+#నిర్వచితమైతే FEAT_BROWSE_CMD
 			    cmod->cmod_flags |= CMOD_BROWSE;
-#endif
-			    continue;
+#అయితే_ముగింపు
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "botright", 2))
-			    break;
-			cmod->cmod_split |= WSP_BOT;
-			continue;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "botright", 2))
+			    ఆపు;
+			cmod->cmod_విభజించు |= WSP_BOT;
+			కొనసాగు;
 
-	    case 'c':	if (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
-			    break;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    స్థితి 'c':	ఒకవేళ (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
+			    ఆపు;
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 			cmod->cmod_flags |= CMOD_CONFIRM;
-#endif
-			continue;
+#అయితే_ముగింపు
+			కొనసాగు;
 
-	    case 'k':	if (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
+	    స్థితి 'k':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPMARKS;
-			    continue;
+			    కొనసాగు;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
+			ఒకవేళ (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPALT;
-			    continue;
+			    కొనసాగు;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
+			ఒకవేళ (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPPATTERNS;
-			    continue;
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
-			    break;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
+			    ఆపు;
 			cmod->cmod_flags |= CMOD_KEEPJUMPS;
-			continue;
+			కొనసాగు;
 
-	    case 'f':	// only accept ":filter {pat} cmd"
+	    స్థితి 'f':	// only accept ":filter {pat} cmd"
 			{
 			    char_u  *reg_pat;
-			    char_u  *nulp = NULL;
-			    int	    c = 0;
+			    char_u  *nulp = ఖాళీ;
+			    పూర్ణాంకం	    c = 0;
 
-			    if (!checkforcmd_noparen(&p, "filter", 4)
+			    ఒకవేళ (!checkforcmd_noparen(&p, "filter", 4)
 				    || *p == NUL
-				    || (ends_excmd(*p)
-#ifdef FEAT_EVAL
+				    || (చివర్లు_excmd(*p)
+#నిర్వచితమైతే FEAT_EVAL
 					// in ":filter #pat# cmd" # does not
 					// start a comment
 				     && (!vim9script || VIM_ISWHITE(p[1]))
-#endif
+#అయితే_ముగింపు
 				     ))
-				break;
-			    if (*p == '!')
+				ఆపు;
+			    ఒకవేళ (*p == '!')
 			    {
 				cmod->cmod_filter_force = TRUE;
 				p = skipwhite(p + 1);
-				if (*p == NUL || ends_excmd(*p))
-				    break;
+				ఒకవేళ (*p == NUL || చివర్లు_excmd(*p))
+				    ఆపు;
 			    }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 			    // Avoid that "filter(arg)" is recognized.
-			    if (vim9script && !VIM_ISWHITE(p[-1]))
-				break;
-#endif
-			    if (skip_only)
-				p = skip_vimgrep_pat(p, NULL, NULL);
-			    else
+			    ఒకవేళ (vim9script && !VIM_ISWHITE(p[-1]))
+				ఆపు;
+#అయితే_ముగింపు
+			    ఒకవేళ (skip_only)
+				p = skip_vimgrep_pat(p, ఖాళీ, ఖాళీ);
+			    లేకపోతే
 				// NOTE: This puts a NUL after the pattern.
-				p = skip_vimgrep_pat_ext(p, &reg_pat, NULL,
+				p = skip_vimgrep_pat_ext(p, &reg_pat, ఖాళీ,
 								    &nulp, &c);
-			    if (p == NULL || *p == NUL)
-				break;
-			    if (!skip_only)
+			    ఒకవేళ (p == ఖాళీ || *p == NUL)
+				ఆపు;
+			    ఒకవేళ (!skip_only)
 			    {
 				cmod->cmod_filter_regmatch.regprog =
 						vim_regcomp(reg_pat, RE_MAGIC);
-				if (cmod->cmod_filter_regmatch.regprog == NULL)
-				    break;
+				ఒకవేళ (cmod->cmod_filter_regmatch.regprog == ఖాళీ)
+				    ఆపు;
 				// restore the character overwritten by NUL
-				if (nulp != NULL)
+				ఒకవేళ (nulp != ఖాళీ)
 				    *nulp = c;
 			    }
 			    eap->cmd = p;
-			    continue;
+			    కొనసాగు;
 			}
 
-	    case 'h':	if (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
+	    స్థితి 'h':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
 			{
-			    cmod->cmod_split |= WSP_HOR;
-			    continue;
+			    cmod->cmod_విభజించు |= WSP_HOR;
+			    కొనసాగు;
 			}
 			// ":hide" and ":hide | cmd" are not modifiers
-			if (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
-					       || *p == NUL || ends_excmd(*p))
-			    break;
+			ఒకవేళ (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
+					       || *p == NUL || చివర్లు_excmd(*p))
+			    ఆపు;
 			eap->cmd = p;
 			cmod->cmod_flags |= CMOD_HIDE;
-			continue;
+			కొనసాగు;
 
-	    case 'l':	if (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
+	    స్థితి 'l':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_LOCKMARKS;
-			    continue;
+			    కొనసాగు;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "legacy", 3))
+			ఒకవేళ (checkforcmd_noparen(&eap->cmd, "legacy", 3))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    ఒకవేళ (చివర్లు_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_legacy_must_be_followed_by_command);
-				return FAIL;
+				తిరిగి FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
 			    cmod->cmod_flags &= ~CMOD_VIM9CMD;
 			    cmod->cmod_flags |= CMOD_LEGACY;
-			    continue;
+			    కొనసాగు;
 			}
 
-			if (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
-			    break;
-			cmod->cmod_split |= WSP_ABOVE;
-			continue;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
+			    ఆపు;
+			cmod->cmod_విభజించు |= WSP_ABOVE;
+			కొనసాగు;
 
-	    case 'n':	if (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
+	    స్థితి 'n':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
 			{
 			    cmod->cmod_flags |= CMOD_NOAUTOCMD;
-			    continue;
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
-			    break;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
+			    ఆపు;
 			cmod->cmod_flags |= CMOD_NOSWAPFILE;
-			continue;
+			కొనసాగు;
 
-	    case 'r':	if (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
-			    break;
-			cmod->cmod_split |= WSP_BELOW;
-			continue;
+	    స్థితి 'r':	ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
+			    ఆపు;
+			cmod->cmod_విభజించు |= WSP_క్రింద;
+			కొనసాగు;
 
-	    case 's':	if (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
+	    స్థితి 's':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
 			{
 			    cmod->cmod_flags |= CMOD_SANDBOX;
-			    continue;
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "silent", 3))
-			    break;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "silent", 3))
+			    ఆపు;
 			cmod->cmod_flags |= CMOD_SILENT;
-			if (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
+			ఒకవేళ (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
 			{
 			    // ":silent!", but not "silent !cmd"
 			    eap->cmd = skipwhite(eap->cmd + 1);
 			    cmod->cmod_flags |= CMOD_ERRSILENT;
 			}
-			continue;
+			కొనసాగు;
 
-	    case 't':	if (checkforcmd_noparen(&p, "tab", 3))
+	    స్థితి 't':	ఒకవేళ (checkforcmd_noparen(&p, "tab", 3))
 			{
-			    if (!skip_only)
+			    ఒకవేళ (!skip_only)
 			    {
-				long tabnr = get_address(eap, &eap->cmd,
+				దీర్ఘ tabnr = get_చిరునామా(eap, &eap->cmd,
 						    ADDR_TABS, eap->skip,
 						    skip_only, FALSE, 1);
-				if (tabnr == MAXLNUM)
-				    cmod->cmod_tab = tabpage_index(curtab) + 1;
-				else
+				ఒకవేళ (tabnr == MAXLNUM)
+				    cmod->cmod_tab = tabpage_సూచీ(curtab) + 1;
+				లేకపోతే
 				{
-				    if (tabnr < 0 || tabnr > LAST_TAB_NR)
+				    ఒకవేళ (tabnr < 0 || tabnr > చివరి_TAB_NR)
 				    {
 					*errormsg = _(e_invalid_range);
-					return FAIL;
+					తిరిగి FAIL;
 				    }
 				    cmod->cmod_tab = tabnr + 1;
 				}
 			    }
 			    eap->cmd = p;
-			    continue;
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
-			    break;
-			cmod->cmod_split |= WSP_TOP;
-			continue;
+			ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
+			    ఆపు;
+			cmod->cmod_విభజించు |= WSP_శిఖరం;
+			కొనసాగు;
 
-	    case 'u':	if (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
-			    break;
+	    స్థితి 'u':	ఒకవేళ (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
+			    ఆపు;
 			cmod->cmod_flags |= CMOD_UNSILENT;
-			continue;
+			కొనసాగు;
 
-	    case 'v':	if (checkforcmd_noparen(&eap->cmd, "vertical", 4))
+	    స్థితి 'v':	ఒకవేళ (checkforcmd_noparen(&eap->cmd, "vertical", 4))
 			{
-			    cmod->cmod_split |= WSP_VERT;
-			    continue;
+			    cmod->cmod_విభజించు |= WSP_VERT;
+			    కొనసాగు;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
+			ఒకవేళ (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    ఒకవేళ (చివర్లు_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_vim9cmd_must_be_followed_by_command);
-				return FAIL;
+				తిరిగి FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
 			    cmod->cmod_flags &= ~CMOD_LEGACY;
 			    cmod->cmod_flags |= CMOD_VIM9CMD;
-			    continue;
+			    కొనసాగు;
 			}
-			if (!checkforcmd_noparen(&p, "verbose", 4))
-			    break;
-			if (vim_isdigit(*eap->cmd))
+			ఒకవేళ (!checkforcmd_noparen(&p, "verbose", 4))
+			    ఆపు;
+			ఒకవేళ (vim_isdigit(*eap->cmd))
 			{
 			    // zero means not set, one is verbose == 0, etc.
-			    cmod->cmod_verbose = atoi((char *)eap->cmd) + 1;
+			    cmod->cmod_verbose = atoi((అక్షరం *)eap->cmd) + 1;
 			}
-			else
+			లేకపోతే
 			    cmod->cmod_verbose = 2;  // default: verbose == 1
 			eap->cmd = p;
-			continue;
+			కొనసాగు;
 	}
-	break;
+	ఆపు;
     }
 
-    if (has_visual_range)
+    ఒకవేళ (has_visual_range)
     {
-	if (eap->cmd > cmd_start)
+	ఒకవేళ (eap->cmd > cmd_ప్రారంభం)
 	{
 	    // Move the '<,'> range to after the modifiers and insert a colon.
 	    // Since the modifiers have been parsed put the colon on top of the
 	    // space: "'<,'>mod cmd" -> "mod:'<,'>cmd
 	    // Put eap->cmd after the colon.
-	    if (use_plus_cmd)
+	    ఒకవేళ (use_plus_cmd)
 	    {
-		size_t len = STRLEN(cmd_start);
+		size_t len = STRLEN(cmd_ప్రారంభం);
 
 		// Special case: empty command uses "+":
 		//  "'<,'>mods" -> "mods *+
 		//  Use "*" instead of "'<,'>" to avoid the command getting
 		//  longer, in case it was allocated.
-		mch_memmove(orig_cmd, cmd_start, len);
+		mch_memmove(orig_cmd, cmd_ప్రారంభం, len);
 		STRCPY(orig_cmd + len, " *+");
 	    }
-	    else
+	    లేకపోతే
 	    {
-		mch_memmove(cmd_start - 5, cmd_start, eap->cmd - cmd_start);
+		mch_memmove(cmd_ప్రారంభం - 5, cmd_ప్రారంభం, eap->cmd - cmd_ప్రారంభం);
 		eap->cmd -= 5;
 		mch_memmove(eap->cmd - 1, ":'<,'>", 6);
 	    }
 	}
-	else
+	లేకపోతే
 	    // No modifiers, move the pointer back.
 	    // Special case: change empty command to "+".
-	    if (use_plus_cmd)
+	    ఒకవేళ (use_plus_cmd)
 		eap->cmd = (char_u *)"'<,'>+";
-	    else
+	    లేకపోతే
 		eap->cmd = orig_cmd;
     }
-    else if (use_plus_cmd)
+    లేకపోతే ఒకవేళ (use_plus_cmd)
 	eap->cmd = (char_u *)exmode_plus;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE if "cmod" has anything set.
  */
-    int
-has_cmdmod(cmdmod_T *cmod, int ignore_silent)
+    పూర్ణాంకం
+has_cmdmod(cmdmod_T *cmod, పూర్ణాంకం ignore_silent)
 {
-    return (cmod->cmod_flags != 0 && (!ignore_silent
+    తిరిగి (cmod->cmod_flags != 0 && (!ignore_silent
 		|| (cmod->cmod_flags
 		      & ~(CMOD_SILENT | CMOD_ERRSILENT | CMOD_UNSILENT)) != 0))
-	    || cmod->cmod_split != 0
+	    || cmod->cmod_విభజించు != 0
 	    || cmod->cmod_verbose > 0
 	    || cmod->cmod_tab != 0
-	    || cmod->cmod_filter_regmatch.regprog != NULL;
+	    || cmod->cmod_filter_regmatch.regprog != ఖాళీ;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * If Vim9 script and "cmdmod" has anything set give an error and return TRUE.
  */
-    int
-cmdmod_error(int ignore_silent)
+    పూర్ణాంకం
+cmdmod_error(పూర్ణాంకం ignore_silent)
 {
-    if (in_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
+    ఒకవేళ (లోపల_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
     {
 	emsg(_(e_misplaced_command_modifier));
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Apply the command modifiers.  Saves current state in "cmdmod", call
  * undo_cmdmod() later.
  */
-    void
+    శూన్య
 apply_cmdmod(cmdmod_T *cmod)
 {
-#ifdef HAVE_SANDBOX
-    if ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
+#నిర్వచితమైతే HAVE_SANDBOX
+    ఒకవేళ ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
     {
 	++sandbox;
 	cmod->cmod_did_sandbox = TRUE;
     }
-#endif
-    if (cmod->cmod_verbose > 0)
+#అయితే_ముగింపు
+    ఒకవేళ (cmod->cmod_verbose > 0)
     {
-	if (cmod->cmod_verbose_save == 0)
+	ఒకవేళ (cmod->cmod_verbose_save == 0)
 	    cmod->cmod_verbose_save = p_verbose + 1;
 	p_verbose = cmod->cmod_verbose - 1;
     }
 
-    if ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
-	    && cmod->cmod_save_msg_silent == 0)
+    ఒకవేళ ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
+	    && cmod->cmod_save_సందేశం_silent == 0)
     {
-	cmod->cmod_save_msg_silent = msg_silent + 1;
-	cmod->cmod_save_msg_scroll = msg_scroll;
+	cmod->cmod_save_సందేశం_silent = సందేశం_silent + 1;
+	cmod->cmod_save_సందేశం_scroll = సందేశం_scroll;
     }
-    if (cmod->cmod_flags & CMOD_SILENT)
-	++msg_silent;
-    if (cmod->cmod_flags & CMOD_UNSILENT)
-	msg_silent = 0;
+    ఒకవేళ (cmod->cmod_flags & CMOD_SILENT)
+	++సందేశం_silent;
+    ఒకవేళ (cmod->cmod_flags & CMOD_UNSILENT)
+	సందేశం_silent = 0;
 
-    if (cmod->cmod_flags & CMOD_ERRSILENT)
+    ఒకవేళ (cmod->cmod_flags & CMOD_ERRSILENT)
     {
 	++emsg_silent;
 	++cmod->cmod_did_esilent;
     }
 
-    if ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == NULL)
+    ఒకవేళ ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == ఖాళీ)
     {
 	// Set 'eventignore' to "all".
 	// First save the existing option value for restoring it later.
 	cmod->cmod_save_ei = vim_strsave(p_ei);
-	set_string_option_direct((char_u *)"ei", -1,
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ei", -1,
 					  (char_u *)"all", OPT_FREE, SID_NONE);
     }
 }
@@ -3398,53 +3398,53 @@ apply_cmdmod(cmdmod_T *cmod)
 /*
  * Undo and free contents of "cmod".
  */
-    void
+    శూన్య
 undo_cmdmod(cmdmod_T *cmod)
 {
-    if (cmod->cmod_verbose_save > 0)
+    ఒకవేళ (cmod->cmod_verbose_save > 0)
     {
 	p_verbose = cmod->cmod_verbose_save - 1;
 	cmod->cmod_verbose_save = 0;
     }
 
-#ifdef HAVE_SANDBOX
-    if (cmod->cmod_did_sandbox)
+#నిర్వచితమైతే HAVE_SANDBOX
+    ఒకవేళ (cmod->cmod_did_sandbox)
     {
 	--sandbox;
 	cmod->cmod_did_sandbox = FALSE;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (cmod->cmod_save_ei != NULL)
+    ఒకవేళ (cmod->cmod_save_ei != ఖాళీ)
     {
 	// Restore 'eventignore' to the value before ":noautocmd".
-	set_string_option_direct((char_u *)"ei", -1, cmod->cmod_save_ei,
+	సమితి_string_option_ప్రత్యక్ష((char_u *)"ei", -1, cmod->cmod_save_ei,
 							   OPT_FREE, SID_NONE);
 	free_string_option(cmod->cmod_save_ei);
-	cmod->cmod_save_ei = NULL;
+	cmod->cmod_save_ei = ఖాళీ;
     }
 
     vim_regfree(cmod->cmod_filter_regmatch.regprog);
 
-    if (cmod->cmod_save_msg_silent > 0)
+    ఒకవేళ (cmod->cmod_save_సందేశం_silent > 0)
     {
 	// messages could be enabled for a serious error, need to check if the
 	// counters don't become negative
-	if (!did_emsg || msg_silent > cmod->cmod_save_msg_silent - 1)
-	    msg_silent = cmod->cmod_save_msg_silent - 1;
+	ఒకవేళ (!did_emsg || సందేశం_silent > cmod->cmod_save_సందేశం_silent - 1)
+	    సందేశం_silent = cmod->cmod_save_సందేశం_silent - 1;
 	emsg_silent -= cmod->cmod_did_esilent;
-	if (emsg_silent < 0)
+	ఒకవేళ (emsg_silent < 0)
 	    emsg_silent = 0;
 	// Restore msg_scroll, it's set by file I/O commands, even when no
 	// message is actually displayed.
-	msg_scroll = cmod->cmod_save_msg_scroll;
+	సందేశం_scroll = cmod->cmod_save_సందేశం_scroll;
 
 	// "silent reg" or "silent echo x" inside "redir" leaves msg_col
 	// somewhere in the line.  Put it back in the first column.
-	if (redirecting())
-	    msg_col = 0;
+	ఒకవేళ (redirecting())
+	    సందేశం_నిలువు = 0;
 
-	cmod->cmod_save_msg_silent = 0;
+	cmod->cmod_save_సందేశం_silent = 0;
 	cmod->cmod_did_esilent = 0;
     }
 }
@@ -3454,132 +3454,132 @@ undo_cmdmod(cmdmod_T *cmod)
  * May set the last search pattern, unless "silent" is TRUE.
  * Return FAIL and set "errormsg" or return OK.
  */
-    int
-parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
+    పూర్ణాంకం
+parse_cmd_చిరునామా(exarg_T *eap, అక్షరం **errormsg, పూర్ణాంకం silent)
 {
-    int		address_count = 1;
+    పూర్ణాంకం		చిరునామా_లెక్క = 1;
     linenr_T	lnum;
-    int		need_check_cursor = FALSE;
-    int		ret = FAIL;
+    పూర్ణాంకం		need_check_cursor = FALSE;
+    పూర్ణాంకం		ret = FAIL;
 
     // Repeat for all ',' or ';' separated addresses.
-    for (;;)
+    కొరకు (;;)
     {
 	eap->line1 = eap->line2;
-	eap->line2 = default_address(eap);
+	eap->line2 = default_చిరునామా(eap);
 	eap->cmd = skipwhite(eap->cmd);
-	lnum = get_address(eap, &eap->cmd, eap->addr_type, eap->skip, silent,
-					eap->addr_count == 0, address_count++);
-	if (eap->cmd == NULL)	// error detected
-	    goto theend;
-	if (lnum == MAXLNUM)
+	lnum = get_చిరునామా(eap, &eap->cmd, eap->addr_type, eap->skip, silent,
+					eap->addr_లెక్క == 0, చిరునామా_లెక్క++);
+	ఒకవేళ (eap->cmd == ఖాళీ)	// error detected
+	    వెళ్ళు theend;
+	ఒకవేళ (lnum == MAXLNUM)
 	{
-	    if (*eap->cmd == '%')   // '%' - all lines
+	    ఒకవేళ (*eap->cmd == '%')   // '%' - all lines
 	    {
 		++eap->cmd;
-		switch (eap->addr_type)
+		ఎంపిక (eap->addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    స్థితి ADDR_పంక్తులు:
+		    స్థితి ADDR_OTHER:
 			eap->line1 = 1;
-			eap->line2 = curbuf->b_ml.ml_line_count;
-			break;
-		    case ADDR_LOADED_BUFFERS:
+			eap->line2 = curbuf->b_ml.ml_పంక్తి_లెక్క;
+			ఆపు;
+		    స్థితి ADDR_LOADED_BUFFERS:
 			{
 			    buf_T	*buf = firstbuf;
 
-			    while (buf->b_next != NULL
-						  && buf->b_ml.ml_mfp == NULL)
-				buf = buf->b_next;
+			    అయితే (buf->b_తదుపరి != ఖాళీ
+						  && buf->b_ml.ml_mfp == ఖాళీ)
+				buf = buf->b_తదుపరి;
 			    eap->line1 = buf->b_fnum;
 			    buf = lastbuf;
-			    while (buf->b_prev != NULL
-						  && buf->b_ml.ml_mfp == NULL)
+			    అయితే (buf->b_prev != ఖాళీ
+						  && buf->b_ml.ml_mfp == ఖాళీ)
 				buf = buf->b_prev;
 			    eap->line2 = buf->b_fnum;
-			    break;
+			    ఆపు;
 			}
-		    case ADDR_BUFFERS:
+		    స్థితి ADDR_BUFFERS:
 			eap->line1 = firstbuf->b_fnum;
 			eap->line2 = lastbuf->b_fnum;
-			break;
-		    case ADDR_WINDOWS:
-		    case ADDR_TABS:
-			if (IS_USER_CMDIDX(eap->cmdidx))
+			ఆపు;
+		    స్థితి ADDR_WINDOWS:
+		    స్థితి ADDR_TABS:
+			ఒకవేళ (IS_USER_CMDIDX(eap->cmdidx))
 			{
 			    eap->line1 = 1;
 			    eap->line2 = eap->addr_type == ADDR_WINDOWS
-						  ? LAST_WIN_NR : LAST_TAB_NR;
+						  ? చివరి_WIN_NR : చివరి_TAB_NR;
 			}
-			else
+			లేకపోతే
 			{
 			    // there is no Vim command which uses '%' and
 			    // ADDR_WINDOWS or ADDR_TABS
 			    *errormsg = _(e_invalid_range);
-			    goto theend;
+			    వెళ్ళు theend;
 			}
-			break;
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
-		    case ADDR_QUICKFIX:
+			ఆపు;
+		    స్థితి ADDR_TABS_RELATIVE:
+		    స్థితి ADDR_UNSIGNED:
+		    స్థితి ADDR_QUICKFIX:
 			*errormsg = _(e_invalid_range);
-			goto theend;
-		    case ADDR_ARGUMENTS:
-			if (ARGCOUNT == 0)
+			వెళ్ళు theend;
+		    స్థితి ADDR_ARGUMENTS:
+			ఒకవేళ (ARGCOUNT == 0)
 			    eap->line1 = eap->line2 = 0;
-			else
+			లేకపోతే
 			{
 			    eap->line1 = 1;
 			    eap->line2 = ARGCOUNT;
 			}
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
 			eap->line1 = 1;
-			eap->line2 = qf_get_valid_size(eap);
-			if (eap->line2 == 0)
+			eap->line2 = qf_get_valid_కొలత(eap);
+			ఒకవేళ (eap->line2 == 0)
 			    eap->line2 = 1;
-#endif
-			break;
-		    case ADDR_NONE:
+#అయితే_ముగింపు
+			ఆపు;
+		    స్థితి ADDR_NONE:
 			// Will give an error later if a range is found.
-			break;
+			ఆపు;
 		}
-		++eap->addr_count;
+		++eap->addr_లెక్క;
 	    }
-	    else if (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	    లేకపోతే ఒకవేళ (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_నక్షత్రం) == ఖాళీ)
 	    {
 		pos_T	    *fp;
 
 		// '*' - visual area
-		if (eap->addr_type != ADDR_LINES)
+		ఒకవేళ (eap->addr_type != ADDR_పంక్తులు)
 		{
 		    *errormsg = _(e_invalid_range);
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 
 		++eap->cmd;
-		if (!eap->skip)
+		ఒకవేళ (!eap->skip)
 		{
 		    fp = getmark('<', FALSE);
-		    if (check_mark(fp) == FAIL)
-			goto theend;
+		    ఒకవేళ (check_mark(fp) == FAIL)
+			వెళ్ళు theend;
 		    eap->line1 = fp->lnum;
 		    fp = getmark('>', FALSE);
-		    if (check_mark(fp) == FAIL)
-			goto theend;
+		    ఒకవేళ (check_mark(fp) == FAIL)
+			వెళ్ళు theend;
 		    eap->line2 = fp->lnum;
-		    ++eap->addr_count;
+		    ++eap->addr_లెక్క;
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	    eap->line2 = lnum;
-	eap->addr_count++;
+	eap->addr_లెక్క++;
 
-	if (*eap->cmd == ';')
+	ఒకవేళ (*eap->cmd == ';')
 	{
-	    if (!eap->skip)
+	    ఒకవేళ (!eap->skip)
 	    {
 		curwin->w_cursor.lnum = eap->line2;
 
@@ -3587,32 +3587,32 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 		// accept zero as address, so 0;/PATTERN/ works correctly
 		// (where zero usually means to use the first line).
 		// Check the cursor position before returning.
-		if (eap->line2 > 0)
+		ఒకవేళ (eap->line2 > 0)
 		    check_cursor();
-		else
-		    check_cursor_col();
+		లేకపోతే
+		    check_cursor_నిలువు();
 		need_check_cursor = TRUE;
 	    }
 	}
-	else if (*eap->cmd != ',')
-	    break;
+	లేకపోతే ఒకవేళ (*eap->cmd != ',')
+	    ఆపు;
 	++eap->cmd;
     }
 
     // One address given: set start and end lines.
-    if (eap->addr_count == 1)
+    ఒకవేళ (eap->addr_లెక్క == 1)
     {
 	eap->line1 = eap->line2;
 	// ... but only implicit: really no address given
-	if (lnum == MAXLNUM)
-	    eap->addr_count = 0;
+	ఒకవేళ (lnum == MAXLNUM)
+	    eap->addr_లెక్క = 0;
     }
     ret = OK;
 
 theend:
-    if (need_check_cursor)
+    ఒకవేళ (need_check_cursor)
 	check_cursor();
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -3620,60 +3620,60 @@ theend:
  * Takes care of limiting the length and handling 0xa0, which would be
  * invisible otherwise.
  */
-    static void
+    స్థిర శూన్య
 append_command(char_u *cmd)
 {
     size_t  len = STRLEN(IObuff);
     char_u  *s = cmd;
     char_u  *d;
 
-    if (len > IOSIZE - 100)
+    ఒకవేళ (len > IOSIZE - 100)
     {
 	// Not enough space, truncate and put in "...".
 	d = IObuff + IOSIZE - 100;
-	d -= mb_head_off(IObuff, d);
+	d -= mb_తల_off(IObuff, d);
 	STRCPY(d, "...");
     }
     STRCAT(IObuff, ": ");
     d = IObuff + STRLEN(IObuff);
-    while (*s != NUL && d - IObuff + 5 < IOSIZE)
+    అయితే (*s != NUL && d - IObuff + 5 < IOSIZE)
     {
-	if (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
+	ఒకవేళ (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
 	{
 	    s += enc_utf8 ? 2 : 1;
 	    STRCPY(d, "<a0>");
 	    d += 4;
 	}
-	else if (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
-	    break;
-	else
+	లేకపోతే ఒకవేళ (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
+	    ఆపు;
+	లేకపోతే
 	    MB_COPY_CHAR(s, d);
     }
     *d = NUL;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * If "start" points "&opt", "&l:opt", "&g:opt" or "$ENV" return a pointer to
  * the name.  Otherwise just return "start".
  */
     char_u *
-skip_option_env_lead(char_u *start)
+skip_option_env_lead(char_u *ప్రారంభం)
 {
-    char_u *name = start;
+    char_u *name = ప్రారంభం;
 
-    if (*start == '&')
+    ఒకవేళ (*ప్రారంభం == '&')
     {
-	if ((start[1] == 'l' || start[1] == 'g') && start[2] == ':')
+	ఒకవేళ ((ప్రారంభం[1] == 'l' || ప్రారంభం[1] == 'g') && ప్రారంభం[2] == ':')
 	    name += 3;
-	else
+	లేకపోతే
 	    name += 1;
     }
-    else if (*start == '$')
+    లేకపోతే ఒకవేళ (*ప్రారంభం == '$')
 	name += 1;
-    return name;
+    తిరిగి name;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE and set "*idx" if "p" points to a one letter command.
@@ -3685,18 +3685,18 @@ skip_option_env_lead(char_u *start)
  *	    but :sre[wind] is another command, as are :scr[iptnames],
  *	    :scs[cope], :sim[alt], :sig[ns] and :sil[ent].
  */
-    static int
+    స్థిర పూర్ణాంకం
 one_letter_cmd(char_u *p, cmdidx_T *idx)
 {
-    if (in_vim9script())
-	return FALSE;
-    if (p[0] == 'k'
+    ఒకవేళ (లోపల_vim9script())
+	తిరిగి FALSE;
+    ఒకవేళ (p[0] == 'k'
 	    && (p[1] != 'e' || (p[1] == 'e' && p[2] != 'e')))
     {
 	*idx = CMD_k;
-	return TRUE;
+	తిరిగి TRUE;
     }
-    if (p[0] == 's'
+    ఒకవేళ (p[0] == 's'
 	    && ((p[1] == 'c' && (p[2] == NUL || (p[2] != 's' && p[2] != 'r'
 			&& (p[3] == NUL || (p[3] != 'i' && p[4] != 'p')))))
 		|| p[1] == 'g'
@@ -3705,24 +3705,24 @@ one_letter_cmd(char_u *p, cmdidx_T *idx)
 		|| (p[1] == 'r' && p[2] != 'e')))
     {
 	*idx = CMD_substitute;
-	return TRUE;
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return TRUE if "cmd" starts with "123->", a number followed by a method
  * call.
  */
-    int
-number_method(char_u *cmd)
+    పూర్ణాంకం
+సంఖ్య_పద్ధతి(char_u *cmd)
 {
     char_u *p = skipdigits(cmd);
 
-    return p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
+    తిరిగి p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Find an Ex command by its name, either built-in or user.
@@ -3737,78 +3737,78 @@ number_method(char_u *cmd)
  * Returns NULL for an ambiguous user command.
  */
     char_u *
-find_ex_command(
+కనుగొను_ex_command(
 	exarg_T *eap,
-	int	*full UNUSED,
-	int	(*lookup)(char_u *, size_t, int cmd, cctx_T *) UNUSED,
-	cctx_T	*cctx UNUSED)
+	పూర్ణాంకం	*నిండిన వాడని,
+	పూర్ణాంకం	(*lookup)(char_u *, size_t, పూర్ణాంకం cmd, cctx_T *) వాడని,
+	cctx_T	*cctx వాడని)
 {
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*p;
-    int		i;
-#ifndef FEAT_EVAL
-    int		vim9 = FALSE;
-#else
-    int		vim9 = in_vim9script();
+    పూర్ణాంకం		i;
+#నిర్వచితం_కాకపోతే FEAT_EVAL
+    పూర్ణాంకం		vim9 = FALSE;
+#లేకపోతే
+    పూర్ణాంకం		vim9 = లోపల_vim9script();
 
     /*
      * Recognize a Vim9 script function/method call and assignment:
      * "lvar = value", "lvar(arg)", "[1, 2 3]->Func()"
      */
     p = eap->cmd;
-    if (lookup != NULL)
+    ఒకవేళ (lookup != ఖాళీ)
     {
 	char_u *pskip = skip_option_env_lead(eap->cmd);
 
-	if (vim_strchr((char_u *)"{('[\"@&$", *p) != NULL
-	       || ((p = to_name_const_end(pskip)) > eap->cmd && *p != NUL)
+	ఒకవేళ (vim_strchr((char_u *)"{('[\"@&$", *p) != ఖాళీ
+	       || ((p = గమ్యం_name_const_చివర(pskip)) > eap->cmd && *p != NUL)
 	       || (p[0] == '0' && p[1] == 'z'))
 	{
-	    int	    oplen;
-	    int	    heredoc;
+	    పూర్ణాంకం	    oplen;
+	    పూర్ణాంకం	    heredoc;
 	    char_u  *swp;
 
-	    if (*eap->cmd == '&'
+	    ఒకవేళ (*eap->cmd == '&'
 		    || (eap->cmd[0] == '$'
 				  && eap->cmd[1] != '\'' && eap->cmd[1] != '"')
 		    || (eap->cmd[0] == '@'
 					&& (valid_yank_reg(eap->cmd[1], FALSE)
 						       || eap->cmd[1] == '@')))
 	    {
-		if (*eap->cmd == '&')
+		ఒకవేళ (*eap->cmd == '&')
 		{
 		    p = eap->cmd + 1;
-		    if (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
+		    ఒకవేళ (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
 			p += 2;
-		    p = to_name_end(p, FALSE);
+		    p = గమ్యం_name_చివర(p, FALSE);
 		}
-		else if (*eap->cmd == '$')
-		    p = to_name_end(eap->cmd + 1, FALSE);
-		else
+		లేకపోతే ఒకవేళ (*eap->cmd == '$')
+		    p = గమ్యం_name_చివర(eap->cmd + 1, FALSE);
+		లేకపోతే
 		    p = eap->cmd + 2;
-		if (ends_excmd(*skipwhite(p)))
+		ఒకవేళ (చివర్లు_excmd(*skipwhite(p)))
 		{
 		    // "&option <NL>", "$ENV <NL>" and "@r <NL>" are the start
 		    // of an expression.
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    తిరిగి eap->cmd;
 		}
 		// "&option" can be followed by "->" or "=", check below
 	    }
 
-	    if (vim9 && *p == '<')
+	    ఒకవేళ (vim9 && *p == '<')
 	    {
 		// generic function type args
-		if (skip_generic_func_type_args(&p) == FAIL)
+		ఒకవేళ (skip_generic_func_type_వాదనలు(&p) == FAIL)
 		{
-		    eap->cmdidx = CMD_SIZE;
-		    return p;
+		    eap->cmdidx = CMD_కొలత;
+		    తిరిగి p;
 		}
 	    }
 
 	    swp = skipwhite(p);
 
-	    if (
+	    ఒకవేళ (
 		// "(..." is an expression.
 		// "funcname(" is always a function call.
 		*p == '('
@@ -3832,17 +3832,17 @@ find_ex_command(
 			    // "varname->func()" is an expression.
 			: (*swp == '-' && swp[1] == '>')))
 	    {
-		if (*eap->cmd == '{' && ends_excmd(*skipwhite(eap->cmd + 1)))
+		ఒకవేళ (*eap->cmd == '{' && చివర్లు_excmd(*skipwhite(eap->cmd + 1)))
 		{
 		    // "{" by itself is the start of a block.
-		    eap->cmdidx = CMD_block;
-		    return eap->cmd + 1;
+		    eap->cmdidx = CMD_ఖండం;
+		    తిరిగి eap->cmd + 1;
 		}
 		eap->cmdidx = CMD_eval;
-		return eap->cmd;
+		తిరిగి eap->cmd;
 	    }
 
-	    if ((p != eap->cmd && (
+	    ఒకవేళ ((p != eap->cmd && (
 			    // "varname[]" is an expression.
 			    *p == '['
 			    // "varname.key" is an expression.
@@ -3862,16 +3862,16 @@ find_ex_command(
 		//	etc.
 		eap->cmdidx = CMD_eval;
 		++emsg_off;
-		if (skip_expr(&after, NULL) == OK)
+		ఒకవేళ (skip_సమాసం(&after, ఖాళీ) == OK)
 		{
 		    after = skipwhite(after);
-		    if (*after == '=' || (*after != NUL && after[1] == '=')
+		    ఒకవేళ (*after == '=' || (*after != NUL && after[1] == '=')
 					 || (after[0] == '.' && after[1] == '.'
 							   && after[2] == '='))
 			eap->cmdidx = CMD_var;
 		}
 		--emsg_off;
-		return eap->cmd;
+		తిరిగి eap->cmd;
 	    }
 
 	    // "[...]->Method()" is a list expression, but "[a, b] = Func()" is
@@ -3881,38 +3881,38 @@ find_ex_command(
 	    // follows.
 	    // If "[...]" has a line break "p" still points at the "[" and it
 	    // can't be an assignment.
-	    if (*eap->cmd == '[')
+	    ఒకవేళ (*eap->cmd == '[')
 	    {
 		char_u	    *eq;
 
-		p = to_name_const_end(eap->cmd);
-		if (p == eap->cmd && *p == '[')
+		p = గమ్యం_name_const_చివర(eap->cmd);
+		ఒకవేళ (p == eap->cmd && *p == '[')
 		{
-		    int count = 0;
-		    int	semicolon = FALSE;
+		    పూర్ణాంకం లెక్క = 0;
+		    పూర్ణాంకం	semicolon = FALSE;
 
-		    p = skip_var_list(eap->cmd, TRUE, &count, &semicolon, TRUE);
+		    p = skip_var_list(eap->cmd, TRUE, &లెక్క, &semicolon, TRUE);
 		}
 		eq = p;
-		if (eq != NULL)
+		ఒకవేళ (eq != ఖాళీ)
 		{
 		    eq = skipwhite(eq);
-		    if (vim_strchr((char_u *)"+-*/%.", *eq) != NULL)
+		    ఒకవేళ (vim_strchr((char_u *)"+-*/%.", *eq) != ఖాళీ)
 		    {
-			if (eq[0] == '.' && eq[1] == '.')
+			ఒకవేళ (eq[0] == '.' && eq[1] == '.')
 			    ++eq;
 			++eq;
 		    }
 		}
-		if (p == NULL || p == eap->cmd || *eq != '=')
+		ఒకవేళ (p == ఖాళీ || p == eap->cmd || *eq != '=')
 		{
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    తిరిగి eap->cmd;
 		}
-		if (p > eap->cmd && *eq == '=')
+		ఒకవేళ (p > eap->cmd && *eq == '=')
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    తిరిగి eap->cmd;
 		}
 	    }
 
@@ -3924,9 +3924,9 @@ find_ex_command(
 	    // (variable declaration might have been skipped).
 	    // Not "redir => var" (when skipping).
 	    oplen = assignment_len(skipwhite(p), &heredoc);
-	    if (oplen > 0)
+	    ఒకవేళ (oplen > 0)
 	    {
-		if (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
+		ఒకవేళ (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
 			|| *eap->cmd == '&'
 			|| *eap->cmd == '$'
 			|| *eap->cmd == '@'
@@ -3935,186 +3935,186 @@ find_ex_command(
 			|| lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK)
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    తిరిగి eap->cmd;
 		}
 	    }
 
 	    // Recognize trying to use a type for a w:, b:, t: or g: variable:
 	    // "w:varname: number = 123".
-	    if (eap->cmd[1] == ':' && *p == ':')
+	    ఒకవేళ (eap->cmd[1] == ':' && *p == ':')
 	    {
 		eap->cmdidx = CMD_var;
-		return eap->cmd;
+		తిరిగి eap->cmd;
 	    }
 	}
 
 	// 1234->func() is a method call
-	if (number_method(eap->cmd))
+	ఒకవేళ (సంఖ్య_పద్ధతి(eap->cmd))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    తిరిగి eap->cmd;
 	}
 
 	// "g:", "s:" and "l:" are always assumed to be a variable, thus start
 	// an expression.  A global/substitute/list command needs to use a
 	// longer name.
-	if (vim_strchr((char_u *)"gsl", *p) != NULL && p[1] == ':')
+	ఒకవేళ (vim_strchr((char_u *)"gsl", *p) != ఖాళీ && p[1] == ':')
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    తిరిగి eap->cmd;
 	}
 
 	// If it is an ID it might be a variable with an operator on the next
 	// line, if the variable exists it can't be an Ex command.
-	if (p > eap->cmd && ends_excmd(*skipwhite(p))
+	ఒకవేళ (p > eap->cmd && చివర్లు_excmd(*skipwhite(p))
 		&& (lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK
 		    || (ASCII_ISALPHA(eap->cmd[0]) && eap->cmd[1] == ':')))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    తిరిగి eap->cmd;
 	}
 
 	// Check for "++nr" and "--nr".
-	if (p == eap->cmd && p[0] != NUL && p[0] == p[1]
+	ఒకవేళ (p == eap->cmd && p[0] != NUL && p[0] == p[1]
 						   && (*p == '+' || *p == '-'))
 	{
 	    eap->cmdidx = *p == '+' ? CMD_increment : CMD_decrement;
-	    return eap->cmd + 2;
+	    తిరిగి eap->cmd + 2;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Isolate the command and search for it in the command table.
      */
     p = eap->cmd;
-    if (one_letter_cmd(p, &eap->cmdidx))
+    ఒకవేళ (one_letter_cmd(p, &eap->cmdidx))
     {
 	++p;
-	if (full != NULL)
-	    *full = TRUE;
+	ఒకవేళ (నిండిన != ఖాళీ)
+	    *నిండిన = TRUE;
     }
-    else
+    లేకపోతే
     {
-	while (ASCII_ISALPHA(*p))
+	అయితే (ASCII_ISALPHA(*p))
 	    ++p;
 	// for python 3.x support ":py3", ":python3", ":py3file", etc.
-	if (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
+	ఒకవేళ (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
 	{
-	    while (ASCII_ISALNUM(*p))
+	    అయితే (ASCII_ISALNUM(*p))
 		++p;
 	}
-	else if (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
+	లేకపోతే ఒకవేళ (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
 	{
 	    // include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
 	    ++p;
-	    while (ASCII_ISALPHA(*p))
+	    అయితే (ASCII_ISALPHA(*p))
 		++p;
 	}
 
 	// check for non-alpha command
-	if (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != NULL)
+	ఒకవేళ (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != ఖాళీ)
 	    ++p;
-	len = (int)(p - eap->cmd);
+	len = (పూర్ణాంకం)(p - eap->cmd);
 	// The "d" command can directly be followed by 'l' or 'p' flag, when
 	// not in Vim9 script.
-	if (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
+	ఒకవేళ (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
 	{
 	    // Check for ":dl", ":dell", etc. to ":deletel": that's
 	    // :delete with the 'l' flag.  Same for 'p'.
-	    for (i = 0; i < len; ++i)
-		if (eap->cmd[i] != ((char_u *)"delete")[i])
-		    break;
-	    if (i == len - 1)
+	    కొరకు (i = 0; i < len; ++i)
+		ఒకవేళ (eap->cmd[i] != ((char_u *)"delete")[i])
+		    ఆపు;
+	    ఒకవేళ (i == len - 1)
 	    {
 		--len;
-		if (p[-1] == 'l')
+		ఒకవేళ (p[-1] == 'l')
 		    eap->flags |= EXFLAG_LIST;
-		else
+		లేకపోతే
 		    eap->flags |= EXFLAG_PRINT;
 	    }
 	}
 
-	if (ASCII_ISLOWER(eap->cmd[0]))
+	ఒకవేళ (ASCII_ISLOWER(eap->cmd[0]))
 	{
-	    int c1 = eap->cmd[0];
-	    int c2 = len == 1 ? NUL : eap->cmd[1];
+	    పూర్ణాంకం c1 = eap->cmd[0];
+	    పూర్ణాంకం c2 = len == 1 ? NUL : eap->cmd[1];
 
-	    if (command_count != (int)CMD_SIZE)
+	    ఒకవేళ (command_లెక్క != (పూర్ణాంకం)CMD_కొలత)
 	    {
-		iemsg(e_command_table_needs_to_be_updated_run_make_cmdidxs);
+		iemsg(e_command_పట్టిక_needs_గమ్యం_be_updated_నిరంతరం_make_cmdidxs);
 		getout(1);
 	    }
 
 	    // Use a precomputed index for fast look-up in cmdnames[]
 	    // taking into account the first 2 letters of eap->cmd.
-	    eap->cmdidx = cmdidxs1[CharOrdLow(c1)];
-	    if (ASCII_ISLOWER(c2))
-		eap->cmdidx += cmdidxs2[CharOrdLow(c1)][CharOrdLow(c2)];
+	    eap->cmdidx = cmdidxs1[Char_Ord_దిగువ(c1)];
+	    ఒకవేళ (ASCII_ISLOWER(c2))
+		eap->cmdidx += cmdidxs2[Char_Ord_దిగువ(c1)][Char_Ord_దిగువ(c2)];
 	}
-	else if (ASCII_ISUPPER(eap->cmd[0]))
-	    eap->cmdidx = CMD_Next;
-	else
+	లేకపోతే ఒకవేళ (ASCII_ISUPPER(eap->cmd[0]))
+	    eap->cmdidx = CMD_తదుపరి_3;
+	లేకపోతే
 	    eap->cmdidx = CMD_bang;
 
-	for ( ; (int)eap->cmdidx < (int)CMD_SIZE;
-			       eap->cmdidx = (cmdidx_T)((int)eap->cmdidx + 1))
-	    if (STRNCMP(cmdnames[(int)eap->cmdidx].cmd_name, (char *)eap->cmd,
+	కొరకు ( ; (పూర్ణాంకం)eap->cmdidx < (పూర్ణాంకం)CMD_కొలత;
+			       eap->cmdidx = (cmdidx_T)((పూర్ణాంకం)eap->cmdidx + 1))
+	    ఒకవేళ (STRNCMP(cmdnames[(పూర్ణాంకం)eap->cmdidx].cmd_name, (అక్షరం *)eap->cmd,
 							    (size_t)len) == 0)
 	    {
-#ifdef FEAT_EVAL
-		if (full != NULL && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
-		    *full = TRUE;
-#endif
-		break;
+#నిర్వచితమైతే FEAT_EVAL
+		ఒకవేళ (నిండిన != ఖాళీ && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
+		    *నిండిన = TRUE;
+#అయితే_ముగింపు
+		ఆపు;
 	    }
 
 	// :Print and :mode are not supported in Vim9 script.
 	// Some commands cannot be shortened in Vim9 script.
-	if (vim9 && eap->cmdidx != CMD_SIZE)
+	ఒకవేళ (vim9 && eap->cmdidx != CMD_కొలత)
 	{
-	    if (eap->cmdidx == CMD_mode || eap->cmdidx == CMD_Print)
-		eap->cmdidx = CMD_SIZE;
-	    else if ((cmdnames[eap->cmdidx].cmd_argt & EX_WHOLE)
-			  && len < (int)cmdnames[eap->cmdidx].cmd_namelen)
+	    ఒకవేళ (eap->cmdidx == CMD_బహుళకం || eap->cmdidx == CMD_Print)
+		eap->cmdidx = CMD_కొలత;
+	    లేకపోతే ఒకవేళ ((cmdnames[eap->cmdidx].cmd_argt & EX_సంపూర్ణ)
+			  && len < (పూర్ణాంకం)cmdnames[eap->cmdidx].cmd_namelen)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), eap->cmd);
-		eap->cmdidx = CMD_SIZE;
+		eap->cmdidx = CMD_కొలత;
 	    }
 	}
 
 	// Do not recognize ":*" as the star command unless '*' is in
 	// 'cpoptions'.
-	if (eap->cmdidx == CMD_star && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	ఒకవేళ (eap->cmdidx == CMD_నక్షత్రం && vim_strchr(p_cpo, CPO_నక్షత్రం) == ఖాళీ)
 	    p = eap->cmd;
 
 	// Look for a user defined command as a last resort.  Let ":Print" be
 	// overruled by a user defined command.
-	if ((eap->cmdidx == CMD_SIZE || eap->cmdidx == CMD_Print)
+	ఒకవేళ ((eap->cmdidx == CMD_కొలత || eap->cmdidx == CMD_Print)
 		&& *eap->cmd >= 'A' && *eap->cmd <= 'Z')
 	{
 	    // User defined commands may contain digits.
-	    while (ASCII_ISALNUM(*p))
+	    అయితే (ASCII_ISALNUM(*p))
 		++p;
-	    p = find_ucmd(eap, p, full, NULL, NULL);
+	    p = కనుగొను_ucmd(eap, p, నిండిన, ఖాళీ, ఖాళీ);
 	}
-	if (p == NULL || p == eap->cmd)
-	    eap->cmdidx = CMD_SIZE;
+	ఒకవేళ (p == ఖాళీ || p == eap->cmd)
+	    eap->cmdidx = CMD_కొలత;
     }
 
     // ":fina" means ":finally" in legacy script, for backwards compatibility.
-    if (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
+    ఒకవేళ (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
 	eap->cmdidx = CMD_finally;
 
      // Force ":ho" to be unresolved.  Without this, find_ex_command()
      // matches it to CMD_horizontal (the only "ho*" entry), which makes
      // fullcommand("ho") return "horizontal" even though ":ho" cannot be
      // used as the modifier (cmdmods[] requires 3 chars, "hor").
-    if (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
-	eap->cmdidx = CMD_SIZE;
+    ఒకవేళ (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
+	eap->cmdidx = CMD_కొలత;
 
-#ifdef FEAT_EVAL
-    if (eap->cmdidx < CMD_SIZE
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (eap->cmdidx < CMD_కొలత
 	    && vim9
 	    && !IS_WHITE_NL_OR_NUL(*p) && *p != '!' && *p != '|'
 	    && (eap->cmdidx < 0 ||
@@ -4123,7 +4123,7 @@ find_ex_command(
 	// A name that goes on with an underscore is not this command with an
 	// argument: "ch_log" is not ":change".  Leave it to be reported as an
 	// invalid command.
-	if (*p != '_')
+	ఒకవేళ (*p != '_')
 	{
 	    char_u *cmd = vim_strnsave(eap->cmd, p - eap->cmd);
 
@@ -4131,22 +4131,22 @@ find_ex_command(
 								    eap->cmd);
 	    vim_free(cmd);
 	}
-	eap->cmdidx = CMD_SIZE;
+	eap->cmdidx = CMD_కొలత;
     }
-#endif
+#అయితే_ముగింపు
 
-    return p;
+    తిరిగి p;
 }
 
-#if defined(FEAT_EVAL)
-typedef struct
+#ఒకవేళ defined(FEAT_EVAL)
+రకనిర్వచనం నిర్మాణం
 {
-    char	*name;
-    int		minlen;
-    int		has_count;  // :123verbose  :3tab
+    అక్షరం	*name;
+    పూర్ణాంకం		minlen;
+    పూర్ణాంకం		has_లెక్క;  // :123verbose  :3tab
 } cmdmod_info_T;
 
-static cmdmod_info_T cmdmod_info_tab[] = {
+స్థిర cmdmod_info_T cmdmod_info_tab[] = {
     {"aboveleft", 3, FALSE},
     {"belowright", 3, FALSE},
     {"botright", 2, FALSE},
@@ -4179,28 +4179,28 @@ static cmdmod_info_T cmdmod_info_tab[] = {
  * Return length of a command modifier (including optional count).
  * Return zero when it's not a modifier.
  */
-    int
+    పూర్ణాంకం
 modifier_len(char_u *cmd)
 {
-    int		i, j;
+    పూర్ణాంకం		i, j;
     char_u	*p = cmd;
 
-    if (VIM_ISDIGIT(*cmd))
+    ఒకవేళ (VIM_ISDIGIT(*cmd))
 	p = skipwhite(skipdigits(cmd + 1));
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(cmdmod_info_tab); ++i)
     {
 	// cmdmod_info_tab[] is sorted by name: once the first letter is past
 	// the command's first letter no later entry can match.
-	if (cmdmod_info_tab[i].name[0] > *p)
-	    break;
-	for (j = 0; p[j] != NUL; ++j)
-	    if (p[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
-					&& (p == cmd || cmdmod_info_tab[i].has_count))
-	    return j + (int)(p - cmd);
+	ఒకవేళ (cmdmod_info_tab[i].name[0] > *p)
+	    ఆపు;
+	కొరకు (j = 0; p[j] != NUL; ++j)
+	    ఒకవేళ (p[j] != cmdmod_info_tab[i].name[j])
+		ఆపు;
+	ఒకవేళ (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
+					&& (p == cmd || cmdmod_info_tab[i].has_లెక్క))
+	    తిరిగి j + (పూర్ణాంకం)(p - cmd);
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -4208,23 +4208,23 @@ modifier_len(char_u *cmd)
  * Return 2 if there is an exact match.
  * Return 3 if there is an ambiguous match.
  */
-    int
+    పూర్ణాంకం
 cmd_exists(char_u *name)
 {
     exarg_T	ea;
-    int		full = FALSE;
-    int		i;
-    int		j;
+    పూర్ణాంకం		నిండిన = FALSE;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
     char_u	*p;
 
     // Check command modifiers.
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
-	    return (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
+	కొరకు (j = 0; name[j] != NUL; ++j)
+	    ఒకవేళ (name[j] != cmdmod_info_tab[i].name[j])
+		ఆపు;
+	ఒకవేళ (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	    తిరిగి (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
     }
 
     // Check built-in commands and user defined commands.
@@ -4232,14 +4232,14 @@ cmd_exists(char_u *name)
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
     ea.flags = 0;
-    p = find_ex_command(&ea, &full, NULL, NULL);
-    if (p == NULL)
-	return 3;
-    if (vim_isdigit(*name) && ea.cmdidx != CMD_match)
-	return 0;
-    if (*skipwhite(p) != NUL)
-	return 0;	// trailing garbage
-    return (ea.cmdidx == CMD_SIZE ? 0 : (full ? 2 : 1));
+    p = కనుగొను_ex_command(&ea, &నిండిన, ఖాళీ, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి 3;
+    ఒకవేళ (vim_isdigit(*name) && ea.cmdidx != CMD_సరిపోలిక)
+	తిరిగి 0;
+    ఒకవేళ (*skipwhite(p) != NUL)
+	తిరిగి 0;	// trailing garbage
+    తిరిగి (ea.cmdidx == CMD_కొలత ? 0 : (నిండిన ? 2 : 1));
 }
 
 /*
@@ -4247,42 +4247,42 @@ cmd_exists(char_u *name)
  * "argt" are the EX_ flags, "addr_type" the address type and "def" the
  * default for a range or count, -1 when there is none.
  */
-    void
-ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
+    శూన్య
+ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, దీర్ఘ def)
 {
-    static char *addr_names[] = {
+    స్థిర అక్షరం *addr_పేర్లు[] = {
 	"lines", "windows", "arguments", "loaded_buffers", "buffers", "tabs",
 	"tabs_relative", "quickfix_valid", "quickfix", "unsigned", "other",
 	"none"
     };
-    char	*nargs;
+    అక్షరం	*nargs;
 
-    if (!(argt & EX_EXTRA))
+    ఒకవేళ (!(argt & EX_EXTRA))
 	nargs = "0";
-    else if (!(argt & EX_NOSPC))
+    లేకపోతే ఒకవేళ (!(argt & EX_NOSPC))
 	nargs = (argt & EX_NEEDARG) ? "+" : "*";
-    else if (!(argt & EX_NEEDARG))
+    లేకపోతే ఒకవేళ (!(argt & EX_NEEDARG))
 	nargs = "?";
-    else
+    లేకపోతే
 	nargs = (argt & EX_ARGSPACE) ? "_" : "1";
-    dict_add_string(d, "nargs", (char_u *)nargs);
+    dict_కూడు_string(d, "nargs", (char_u *)nargs);
 
-    if (!(argt & EX_RANGE))
-	dict_add_bool(d, "range", FALSE);
-    else if (argt & EX_DFLALL)
-	dict_add_string(d, "range", (char_u *)"%");
-    else if (def >= 0 && !(argt & EX_COUNT))
-	dict_add_number(d, "range", def);
-    else
-	dict_add_string(d, "range", (char_u *)".");
-    if (!(argt & EX_COUNT))
-	dict_add_bool(d, "count", FALSE);
-    else
-	dict_add_number(d, "count", def < 0 ? 0 : def);
-    dict_add_bool(d, "bang", (argt & EX_BANG) != 0);
-    dict_add_bool(d, "bar", (argt & EX_TRLBAR) != 0);
-    dict_add_bool(d, "register", (argt & EX_REGSTR) != 0);
-    dict_add_string(d, "addr", (char_u *)addr_names[addr_type]);
+    ఒకవేళ (!(argt & EX_RANGE))
+	dict_కూడు_bool(d, "range", FALSE);
+    లేకపోతే ఒకవేళ (argt & EX_DFLALL)
+	dict_కూడు_string(d, "range", (char_u *)"%");
+    లేకపోతే ఒకవేళ (def >= 0 && !(argt & EX_లెక్క))
+	dict_కూడు_సంఖ్య(d, "range", def);
+    లేకపోతే
+	dict_కూడు_string(d, "range", (char_u *)".");
+    ఒకవేళ (!(argt & EX_లెక్క))
+	dict_కూడు_bool(d, "count", FALSE);
+    లేకపోతే
+	dict_కూడు_సంఖ్య(d, "count", def < 0 ? 0 : def);
+    dict_కూడు_bool(d, "bang", (argt & EX_BANG) != 0);
+    dict_కూడు_bool(d, "bar", (argt & EX_TRLBAR) != 0);
+    dict_కూడు_bool(d, "register", (argt & EX_REGSTR) != 0);
+    dict_కూడు_string(d, "addr", (char_u *)addr_పేర్లు[addr_type]);
 }
 
 /*
@@ -4292,32 +4292,32 @@ ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
  * Returns FAIL when there is no such command or the abbreviation is
  * ambiguous.
  */
-    int
-ex_command_info(char_u *name, int vim9, dict_T *d)
+    పూర్ణాంకం
+ex_command_info(char_u *name, పూర్ణాంకం vim9, dict_T *d)
 {
     exarg_T	ea;
     char_u	*p;
-    int		i;
-    int		j;
-    int		save_cmod_flags = cmdmod.cmod_flags;
-    int		ret = OK;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
+    పూర్ణాంకం		save_cmod_flags = cmdmod.cmod_flags;
+    పూర్ణాంకం		ret = OK;
 
-    if (vim9 != -1)
+    ఒకవేళ (vim9 != -1)
     {
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9 ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
     // An abbreviation of a command modifier, like ":bo" for ":botright".
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)ARRAY_నిడివి(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	కొరకు (j = 0; name[j] != NUL; ++j)
+	    ఒకవేళ (name[j] != cmdmod_info_tab[i].name[j])
+		ఆపు;
+	ఒకవేళ (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
 	{
 	    name = (char_u *)cmdmod_info_tab[i].name;
-	    break;
+	    ఆపు;
 	}
     }
 
@@ -4325,87 +4325,87 @@ ex_command_info(char_u *name, int vim9, dict_T *d)
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
     ea.flags = 0;
-    ea.addr_count = 0;
+    ea.addr_లెక్క = 0;
     // Don't complain about using "en" or ":let" in Vim9 script.
     ++emsg_silent;
-    p = find_ex_command(&ea, NULL, NULL, NULL);
-    if (p == NULL || ea.cmdidx == CMD_SIZE
-	    || (vim_isdigit(*name) && ea.cmdidx != CMD_match)
+    p = కనుగొను_ex_command(&ea, ఖాళీ, ఖాళీ, ఖాళీ);
+    ఒకవేళ (p == ఖాళీ || ea.cmdidx == CMD_కొలత
+	    || (vim_isdigit(*name) && ea.cmdidx != CMD_సరిపోలిక)
 	    || *skipwhite(p) != NUL
-	    || not_in_vim9(&ea, true) == FAIL)
+	    || not_లోపల_vim9(&ea, true) == FAIL)
 	ret = FAIL;
     --emsg_silent;
 
-    if (ret == FAIL)
+    ఒకవేళ (ret == FAIL)
 	;
-    else if (IS_USER_CMDIDX(ea.cmdidx))
+    లేకపోతే ఒకవేళ (IS_USER_CMDIDX(ea.cmdidx))
 	ret = user_command_info(ea.useridx, ea.cmdidx, d);
-    else
+    లేకపోతే
     {
-	int	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
+	పూర్ణాంకం	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
 # ifdef HAVE_EX_SCRIPT_NI
 			    || cmdnames[ea.cmdidx].cmd_func == ex_script_ni
 # endif
 			    ;
 
-	dict_add_string(d, "name", cmdnames[ea.cmdidx].cmd_name);
-	dict_add_string(d, "kind", (char_u *)(
+	dict_కూడు_string(d, "name", cmdnames[ea.cmdidx].cmd_name);
+	dict_కూడు_string(d, "kind", (char_u *)(
 		    cmdnames[ea.cmdidx].cmd_func == ex_wrongmodifier
 						    ? "modifier" : "builtin"));
-	dict_add_bool(d, "available", !notimpl);
+	dict_కూడు_bool(d, "available", !notimpl);
 	ex_command_attrs(d, cmdnames[ea.cmdidx].cmd_argt,
 				       cmdnames[ea.cmdidx].cmd_addr_type, -1);
     }
     cmdmod.cmod_flags = save_cmod_flags;
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * "fullcommand" function
  */
-    void
+    శూన్య
 f_fullcommand(typval_T *argvars, typval_T *rettv)
 {
     exarg_T	ea;
     char_u	*name;
     char_u	*p;
-    int		vim9script = in_vim9script();
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
+    పూర్ణాంకం		save_cmod_flags = cmdmod.cmod_flags;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL)
-	return;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	vim9script = tv_get_bool(&argvars[1]);
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9script ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
-    while (*name == ':')
+    అయితే (*name == ':')
 	name++;
-    name = skip_range(name, TRUE, NULL);
+    name = skip_range(name, TRUE, ఖాళీ);
 
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
-    ea.addr_count = 0;
+    ea.addr_లెక్క = 0;
     ++emsg_silent;  // don't complain about using "en" in Vim9 script
-    p = find_ex_command(&ea, NULL, NULL, NULL);
+    p = కనుగొను_ex_command(&ea, ఖాళీ, ఖాళీ, ఖాళీ);
     --emsg_silent;
-    if (p == NULL || ea.cmdidx == CMD_SIZE)
-	goto theend;
+    ఒకవేళ (p == ఖాళీ || ea.cmdidx == CMD_కొలత)
+	వెళ్ళు theend;
 
-    if (vim9script && not_in_vim9(&ea, true) == FAIL)
-	goto theend;
+    ఒకవేళ (vim9script && not_లోపల_vim9(&ea, true) == FAIL)
+	వెళ్ళు theend;
 
     rettv->vval.v_string = vim_strsave(IS_USER_CMDIDX(ea.cmdidx)
 				 ? get_user_command_name(ea.useridx, ea.cmdidx)
@@ -4413,26 +4413,26 @@ f_fullcommand(typval_T *argvars, typval_T *rettv)
 theend:
     cmdmod.cmod_flags = save_cmod_flags;
 }
-#endif
+#అయితే_ముగింపు
 
     cmdidx_T
-excmd_get_cmdidx(char_u *cmd, int len)
+excmd_get_cmdidx(char_u *cmd, పూర్ణాంకం len)
 {
     cmdidx_T idx;
 
-    if (!one_letter_cmd(cmd, &idx))
-	for (idx = (cmdidx_T)0; (int)idx < (int)CMD_SIZE;
-		idx = (cmdidx_T)((int)idx + 1))
-	    if (STRNCMP(cmdnames[(int)idx].cmd_name, cmd, (size_t)len) == 0)
-		break;
+    ఒకవేళ (!one_letter_cmd(cmd, &idx))
+	కొరకు (idx = (cmdidx_T)0; (పూర్ణాంకం)idx < (పూర్ణాంకం)CMD_కొలత;
+		idx = (cmdidx_T)((పూర్ణాంకం)idx + 1))
+	    ఒకవేళ (STRNCMP(cmdnames[(పూర్ణాంకం)idx].cmd_name, cmd, (size_t)len) == 0)
+		ఆపు;
 
-    return idx;
+    తిరిగి idx;
 }
 
-    long
+    దీర్ఘ
 excmd_get_argt(cmdidx_T idx)
 {
-    return (long)cmdnames[(int)idx].cmd_argt;
+    తిరిగి (దీర్ఘ)cmdnames[(పూర్ణాంకం)idx].cmd_argt;
 }
 
 /*
@@ -4446,124 +4446,124 @@ excmd_get_argt(cmdidx_T idx)
  */
     char_u *
 skip_range(
-    char_u	*cmd_start,
-    int		skip_star,	// skip "*" used for Visual range
-    int		*ctx)		// pointer to xp_context or NULL
+    char_u	*cmd_ప్రారంభం,
+    పూర్ణాంకం		skip_నక్షత్రం,	// skip "*" used for Visual range
+    పూర్ణాంకం		*ctx)		// pointer to xp_context or NULL
 {
-    char_u	*cmd = cmd_start;
-    unsigned	delim;
+    char_u	*cmd = cmd_ప్రారంభం;
+    గుర్తులేని	delim;
 
-    while (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != NULL)
+    అయితే (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != ఖాళీ)
     {
-	if (*cmd == '\\')
+	ఒకవేళ (*cmd == '\\')
 	{
-	    if (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
+	    ఒకవేళ (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
 		++cmd;
-	    else
-		break;
+	    లేకపోతే
+		ఆపు;
 	}
-	else if (*cmd == '\'')
+	లేకపోతే ఒకవేళ (*cmd == '\'')
 	{
 	    char_u *p = cmd;
 
 	    // a quote is only valid at the start or after a separator
-	    while (p > cmd_start)
+	    అయితే (p > cmd_ప్రారంభం)
 	    {
 		--p;
-		if (!VIM_ISWHITE(*p))
-		    break;
+		ఒకవేళ (!VIM_ISWHITE(*p))
+		    ఆపు;
 	    }
-	    if (cmd > cmd_start && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
-		break;
-	    if (*++cmd == NUL && ctx != NULL)
+	    ఒకవేళ (cmd > cmd_ప్రారంభం && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
+		ఆపు;
+	    ఒకవేళ (*++cmd == NUL && ctx != ఖాళీ)
 		*ctx = EXPAND_NOTHING;
 	}
-	else if (*cmd == '/' || *cmd == '?')
+	లేకపోతే ఒకవేళ (*cmd == '/' || *cmd == '?')
 	{
 	    delim = *cmd++;
-	    while (*cmd != NUL && *cmd != delim)
-		if (*cmd++ == '\\' && *cmd != NUL)
+	    అయితే (*cmd != NUL && *cmd != delim)
+		ఒకవేళ (*cmd++ == '\\' && *cmd != NUL)
 		    ++cmd;
-	    if (*cmd == NUL && ctx != NULL)
+	    ఒకవేళ (*cmd == NUL && ctx != ఖాళీ)
 		*ctx = EXPAND_NOTHING;
 	}
-	if (*cmd != NUL)
+	ఒకవేళ (*cmd != NUL)
 	    ++cmd;
     }
 
     // Skip ":" and white space.
-    while (*cmd == ':')
+    అయితే (*cmd == ':')
 	cmd = skipwhite(cmd + 1);
 
     // Skip "*" used for Visual range.
-    if (skip_star && *cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+    ఒకవేళ (skip_నక్షత్రం && *cmd == '*' && vim_strchr(p_cpo, CPO_నక్షత్రం) == ఖాళీ)
 	cmd = skipwhite(cmd + 1);
 
-    return cmd;
+    తిరిగి cmd;
 }
 
-    static void
+    స్థిర శూన్య
 addr_error(cmd_addr_T addr_type)
 {
-    if (addr_type == ADDR_NONE)
+    ఒకవేళ (addr_type == ADDR_NONE)
 	emsg(_(e_no_range_allowed));
-    else
+    లేకపోతే
 	emsg(_(e_invalid_range));
 }
 
 /*
  * Return the default address for an address type.
  */
-    static linenr_T
-default_address(exarg_T *eap)
+    స్థిర linenr_T
+default_చిరునామా(exarg_T *eap)
 {
     linenr_T lnum = 0;
 
-    switch (eap->addr_type)
+    ఎంపిక (eap->addr_type)
     {
-	case ADDR_LINES:
-	case ADDR_OTHER:
+	స్థితి ADDR_పంక్తులు:
+	స్థితి ADDR_OTHER:
 	    // Default is the cursor line number.  Avoid using an invalid
 	    // line number though.
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    ఒకవేళ (curwin->w_cursor.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+		lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	    లేకపోతే
 		lnum = curwin->w_cursor.lnum;
-	    break;
-	case ADDR_WINDOWS:
+	    ఆపు;
+	స్థితి ADDR_WINDOWS:
 	    lnum = CURRENT_WIN_NR;
-	    break;
-	case ADDR_ARGUMENTS:
+	    ఆపు;
+	స్థితి ADDR_ARGUMENTS:
 	    lnum = curwin->w_arg_idx + 1;
-	    if (lnum > ARGCOUNT)
+	    ఒకవేళ (lnum > ARGCOUNT)
 		lnum = ARGCOUNT;
-	    break;
-	case ADDR_LOADED_BUFFERS:
-	case ADDR_BUFFERS:
+	    ఆపు;
+	స్థితి ADDR_LOADED_BUFFERS:
+	స్థితి ADDR_BUFFERS:
 	    lnum = curbuf->b_fnum;
-	    break;
-	case ADDR_TABS:
+	    ఆపు;
+	స్థితి ADDR_TABS:
 	    lnum = CURRENT_TAB_NR;
-	    break;
-	case ADDR_TABS_RELATIVE:
-	case ADDR_UNSIGNED:
+	    ఆపు;
+	స్థితి ADDR_TABS_RELATIVE:
+	స్థితి ADDR_UNSIGNED:
 	    lnum = 1;
-	    break;
-	case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+	    ఆపు;
+	స్థితి ADDR_QUICKFIX:
+#నిర్వచితమైతే FEAT_QUICKFIX
 	    lnum = qf_get_cur_idx(eap);
-#endif
-	    break;
-	case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#అయితే_ముగింపు
+	    ఆపు;
+	స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
 	    lnum = qf_get_cur_valid_idx(eap);
-#endif
-	    break;
-	case ADDR_NONE:
+#అయితే_ముగింపు
+	    ఆపు;
+	స్థితి ADDR_NONE:
 	    // Will give an error later if a range is found.
-	    break;
+	    ఆపు;
     }
-    return lnum;
+    తిరిగి lnum;
 }
 
 /*
@@ -4576,18 +4576,18 @@ default_address(exarg_T *eap)
  * Return MAXLNUM when no Ex address was found.
  */
     linenr_T
-get_address(
-    exarg_T	*eap UNUSED,
+get_చిరునామా(
+    exarg_T	*eap వాడని,
     char_u	**ptr,
     cmd_addr_T	addr_type,
-    int		skip,		// only skip the address, don't use it
-    int		silent,		// no errors or side effects
-    int		to_other_file,  // flag: may jump to other file
-    int		address_count UNUSED) // 1 for first address, >1 after comma
+    పూర్ణాంకం		skip,		// only skip the address, don't use it
+    పూర్ణాంకం		silent,		// no errors or side effects
+    పూర్ణాంకం		గమ్యం_other_file,  // flag: may jump to other file
+    పూర్ణాంకం		చిరునామా_లెక్క వాడని) // 1 for first address, >1 after comma
 {
-    int		c;
-    int		i;
-    long	n;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		i;
+    దీర్ఘ	n;
     char_u	*cmd;
     pos_T	pos;
     pos_T	*fp;
@@ -4596,167 +4596,167 @@ get_address(
 
     cmd = skipwhite(*ptr);
     lnum = MAXLNUM;
-    do
+    చేయి
     {
-	switch (*cmd)
+	ఎంపిక (*cmd)
 	{
-	    case '.':			    // '.' - Cursor position
+	    స్థితి '.':			    // '.' - Cursor position
 		++cmd;
-		switch (addr_type)
+		ఎంపిక (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    స్థితి ADDR_పంక్తులు:
+		    స్థితి ADDR_OTHER:
 			lnum = curwin->w_cursor.lnum;
-			break;
-		    case ADDR_WINDOWS:
+			ఆపు;
+		    స్థితి ADDR_WINDOWS:
 			lnum = CURRENT_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+			ఆపు;
+		    స్థితి ADDR_ARGUMENTS:
 			lnum = curwin->w_arg_idx + 1;
-			break;
-		    case ADDR_LOADED_BUFFERS:
-		    case ADDR_BUFFERS:
+			ఆపు;
+		    స్థితి ADDR_LOADED_BUFFERS:
+		    స్థితి ADDR_BUFFERS:
 			lnum = curbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
+			ఆపు;
+		    స్థితి ADDR_TABS:
 			lnum = CURRENT_TAB_NR;
-			break;
-		    case ADDR_NONE:
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
+			ఆపు;
+		    స్థితి ADDR_NONE:
+		    స్థితి ADDR_TABS_RELATIVE:
+		    స్థితి ADDR_UNSIGNED:
 			addr_error(addr_type);
-			cmd = NULL;
-			goto error;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+			cmd = ఖాళీ;
+			వెళ్ళు error;
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX:
+#నిర్వచితమైతే FEAT_QUICKFIX
 			lnum = qf_get_cur_idx(eap);
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#అయితే_ముగింపు
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
 			lnum = qf_get_cur_valid_idx(eap);
-#endif
-			break;
+#అయితే_ముగింపు
+			ఆపు;
 		}
-		break;
+		ఆపు;
 
-	    case '$':			    // '$' - last line
+	    స్థితి '$':			    // '$' - last line
 		++cmd;
-		switch (addr_type)
+		ఎంపిక (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
-			lnum = curbuf->b_ml.ml_line_count;
-			break;
-		    case ADDR_WINDOWS:
-			lnum = LAST_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+		    స్థితి ADDR_పంక్తులు:
+		    స్థితి ADDR_OTHER:
+			lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+			ఆపు;
+		    స్థితి ADDR_WINDOWS:
+			lnum = చివరి_WIN_NR;
+			ఆపు;
+		    స్థితి ADDR_ARGUMENTS:
 			lnum = ARGCOUNT;
-			break;
-		    case ADDR_LOADED_BUFFERS:
+			ఆపు;
+		    స్థితి ADDR_LOADED_BUFFERS:
 			buf = lastbuf;
-			while (buf->b_ml.ml_mfp == NULL)
+			అయితే (buf->b_ml.ml_mfp == ఖాళీ)
 			{
-			    if (buf->b_prev == NULL)
-				break;
+			    ఒకవేళ (buf->b_prev == ఖాళీ)
+				ఆపు;
 			    buf = buf->b_prev;
 			}
 			lnum = buf->b_fnum;
-			break;
-		    case ADDR_BUFFERS:
+			ఆపు;
+		    స్థితి ADDR_BUFFERS:
 			lnum = lastbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
-			lnum = LAST_TAB_NR;
-			break;
-		    case ADDR_NONE:
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
+			ఆపు;
+		    స్థితి ADDR_TABS:
+			lnum = చివరి_TAB_NR;
+			ఆపు;
+		    స్థితి ADDR_NONE:
+		    స్థితి ADDR_TABS_RELATIVE:
+		    స్థితి ADDR_UNSIGNED:
 			addr_error(addr_type);
-			cmd = NULL;
-			goto error;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
-			lnum = qf_get_size(eap);
-			if (lnum == 0)
+			cmd = ఖాళీ;
+			వెళ్ళు error;
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX:
+#నిర్వచితమైతే FEAT_QUICKFIX
+			lnum = qf_get_కొలత(eap);
+			ఒకవేళ (lnum == 0)
 			    lnum = 1;
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-			lnum = qf_get_valid_size(eap);
-			if (lnum == 0)
+#అయితే_ముగింపు
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
+			lnum = qf_get_valid_కొలత(eap);
+			ఒకవేళ (lnum == 0)
 			    lnum = 1;
-#endif
-			break;
+#అయితే_ముగింపు
+			ఆపు;
 		}
-		break;
+		ఆపు;
 
-	    case '\'':			    // ''' - mark
-		if (*++cmd == NUL)
+	    స్థితి '\'':			    // ''' - mark
+		ఒకవేళ (*++cmd == NUL)
 		{
-		    cmd = NULL;
-		    goto error;
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
-		if (addr_type != ADDR_LINES)
+		ఒకవేళ (addr_type != ADDR_పంక్తులు)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
-		if (skip)
+		ఒకవేళ (skip)
 		    ++cmd;
-		else
+		లేకపోతే
 		{
 		    // Only accept a mark in another file when it is
 		    // used by itself: ":'M".
-		    fp = getmark(*cmd, to_other_file && cmd[1] == NUL);
+		    fp = getmark(*cmd, గమ్యం_other_file && cmd[1] == NUL);
 		    ++cmd;
-		    if (fp == (pos_T *)-1)
+		    ఒకవేళ (fp == (pos_T *)-1)
 			// Jumped to another file.
 			lnum = curwin->w_cursor.lnum;
-		    else
+		    లేకపోతే
 		    {
-			if (check_mark(fp) == FAIL)
+			ఒకవేళ (check_mark(fp) == FAIL)
 			{
-			    cmd = NULL;
-			    goto error;
+			    cmd = ఖాళీ;
+			    వెళ్ళు error;
 			}
 			lnum = fp->lnum;
 		    }
 		}
-		break;
+		ఆపు;
 
-	    case '/':
-	    case '?':			// '/' or '?' - search
+	    స్థితి '/':
+	    స్థితి '?':			// '/' or '?' - search
 		c = *cmd++;
-		if (addr_type != ADDR_LINES)
+		ఒకవేళ (addr_type != ADDR_పంక్తులు)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
-		if (skip)	// skip "/pat/"
+		ఒకవేళ (skip)	// skip "/pat/"
 		{
 		    cmd = skip_regexp(cmd, c, magic_isset());
-		    if (*cmd == c)
+		    ఒకవేళ (*cmd == c)
 			++cmd;
 		}
-		else
+		లేకపోతే
 		{
-		    int flags;
+		    పూర్ణాంకం flags;
 
 		    pos = curwin->w_cursor; // save curwin->w_cursor
 
 		    // When '/' or '?' follows another address, start from
 		    // there.
-		    if (lnum > 0 && lnum != MAXLNUM)
+		    ఒకవేళ (lnum > 0 && lnum != MAXLNUM)
 			curwin->w_cursor.lnum =
-				lnum > curbuf->b_ml.ml_line_count
-					   ? curbuf->b_ml.ml_line_count : lnum;
+				lnum > curbuf->b_ml.ml_పంక్తి_లెక్క
+					   ? curbuf->b_ml.ml_పంక్తి_లెక్క : lnum;
 
 		    // Start a forward search at the end of the line (unless
 		    // before the first line).
@@ -4764,246 +4764,246 @@ get_address(
 		    // This makes sure we never match in the current
 		    // line, and can match anywhere in the
 		    // next/previous line.
-		    if (c == '/' && curwin->w_cursor.lnum > 0)
-			curwin->w_cursor.col = MAXCOL;
-		    else
-			curwin->w_cursor.col = 0;
+		    ఒకవేళ (c == '/' && curwin->w_cursor.lnum > 0)
+			curwin->w_cursor.నిలువు = MAXCOL;
+		    లేకపోతే
+			curwin->w_cursor.నిలువు = 0;
 		    searchcmdlen = 0;
-		    flags = silent ? SEARCH_KEEP : SEARCH_HIS | SEARCH_MSG;
-		    if (!do_search(NULL, c, c, cmd, STRLEN(cmd), 1L, flags, NULL))
+		    flags = silent ? శోధన_KEEP : శోధన_HIS | శోధన_సందేశం;
+		    ఒకవేళ (!do_శోధన(ఖాళీ, c, c, cmd, STRLEN(cmd), 1L, flags, ఖాళీ))
 		    {
 			curwin->w_cursor = pos;
-			cmd = NULL;
-			goto error;
+			cmd = ఖాళీ;
+			వెళ్ళు error;
 		    }
 		    lnum = curwin->w_cursor.lnum;
 		    curwin->w_cursor = pos;
 		    // adjust command string pointer
 		    cmd += searchcmdlen;
 		}
-		break;
+		ఆపు;
 
-	    case '\\':		    // "\?", "\/" or "\&", repeat search
+	    స్థితి '\\':		    // "\?", "\/" or "\&", repeat search
 		++cmd;
-		if (addr_type != ADDR_LINES)
+		ఒకవేళ (addr_type != ADDR_పంక్తులు)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
-		if (*cmd == '&')
+		ఒకవేళ (*cmd == '&')
 		    i = RE_SUBST;
-		else if (*cmd == '?' || *cmd == '/')
-		    i = RE_SEARCH;
-		else
+		లేకపోతే ఒకవేళ (*cmd == '?' || *cmd == '/')
+		    i = RE_శోధన;
+		లేకపోతే
 		{
 		    emsg(_(e_backslash_should_be_followed_by));
-		    cmd = NULL;
-		    goto error;
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
 
-		if (!skip)
+		ఒకవేళ (!skip)
 		{
 		    /*
 		     * When search follows another address, start from
 		     * there.
 		     */
-		    if (lnum != MAXLNUM)
+		    ఒకవేళ (lnum != MAXLNUM)
 			pos.lnum = lnum;
-		    else
+		    లేకపోతే
 			pos.lnum = curwin->w_cursor.lnum;
 
 		    /*
 		     * Start the search just like for the above
 		     * do_search().
 		     */
-		    if (*cmd != '?')
-			pos.col = MAXCOL;
-		    else
-			pos.col = 0;
+		    ఒకవేళ (*cmd != '?')
+			pos.నిలువు = MAXCOL;
+		    లేకపోతే
+			pos.నిలువు = 0;
 		    pos.coladd = 0;
-		    if (searchit(curwin, curbuf, &pos, NULL,
+		    ఒకవేళ (searchit(curwin, curbuf, &pos, ఖాళీ,
 				*cmd == '?' ? BACKWARD : FORWARD,
-				(char_u *)"", 0, 1L, SEARCH_MSG, i, NULL) != FAIL)
+				(char_u *)"", 0, 1L, శోధన_సందేశం, i, ఖాళీ) != FAIL)
 			lnum = pos.lnum;
-		    else
+		    లేకపోతే
 		    {
-			cmd = NULL;
-			goto error;
+			cmd = ఖాళీ;
+			వెళ్ళు error;
 		    }
 		}
 		++cmd;
-		break;
+		ఆపు;
 
-	    default:
-		if (VIM_ISDIGIT(*cmd))	// absolute line number
+	    అప్రమేయ:
+		ఒకవేళ (VIM_ISDIGIT(*cmd))	// absolute line number
 		    lnum = getdigits(&cmd);
 	}
 
-	for (;;)
+	కొరకు (;;)
 	{
 	    cmd = skipwhite(cmd);
-	    if (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
-		break;
+	    ఒకవేళ (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
+		ఆపు;
 
-	    if (lnum == MAXLNUM)
+	    ఒకవేళ (lnum == MAXLNUM)
 	    {
-		switch (addr_type)
+		ఎంపిక (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    స్థితి ADDR_పంక్తులు:
+		    స్థితి ADDR_OTHER:
 			// "+1" is same as ".+1"
 			lnum = curwin->w_cursor.lnum;
-			break;
-		    case ADDR_WINDOWS:
+			ఆపు;
+		    స్థితి ADDR_WINDOWS:
 			lnum = CURRENT_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+			ఆపు;
+		    స్థితి ADDR_ARGUMENTS:
 			lnum = curwin->w_arg_idx + 1;
-			break;
-		    case ADDR_LOADED_BUFFERS:
-		    case ADDR_BUFFERS:
+			ఆపు;
+		    స్థితి ADDR_LOADED_BUFFERS:
+		    స్థితి ADDR_BUFFERS:
 			lnum = curbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
+			ఆపు;
+		    స్థితి ADDR_TABS:
 			lnum = CURRENT_TAB_NR;
-			break;
-		    case ADDR_TABS_RELATIVE:
+			ఆపు;
+		    స్థితి ADDR_TABS_RELATIVE:
 			lnum = 1;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX:
+#నిర్వచితమైతే FEAT_QUICKFIX
 			lnum = qf_get_cur_idx(eap);
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#అయితే_ముగింపు
+			ఆపు;
+		    స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
 			lnum = qf_get_cur_valid_idx(eap);
-#endif
-			break;
-		    case ADDR_NONE:
-		    case ADDR_UNSIGNED:
+#అయితే_ముగింపు
+			ఆపు;
+		    స్థితి ADDR_NONE:
+		    స్థితి ADDR_UNSIGNED:
 			lnum = 0;
-			break;
+			ఆపు;
 		}
 	    }
 
-	    if (VIM_ISDIGIT(*cmd))
+	    ఒకవేళ (VIM_ISDIGIT(*cmd))
 		i = '+';		// "number" is same as "+number"
-	    else
+	    లేకపోతే
 		i = *cmd++;
-	    if (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
+	    ఒకవేళ (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
 		n = 1;
-	    else
+	    లేకపోతే
 	    {
 		// "number", "+number" or "-number"
 		n = getdigits(&cmd);
-		if (n == MAXLNUM)
+		ఒకవేళ (n == MAXLNUM)
 		{
-		    emsg(_(e_line_number_out_of_range));
-		    cmd = NULL;
-		    goto error;
+		    emsg(_(e_పంక్తి_సంఖ్య_బహిర్గతం_యొక్క_range));
+		    cmd = ఖాళీ;
+		    వెళ్ళు error;
 		}
 	    }
 
-	    if (addr_type == ADDR_TABS_RELATIVE)
+	    ఒకవేళ (addr_type == ADDR_TABS_RELATIVE)
 	    {
 		emsg(_(e_invalid_range));
-		cmd = NULL;
-		goto error;
+		cmd = ఖాళీ;
+		వెళ్ళు error;
 	    }
-	    else if (addr_type == ADDR_LOADED_BUFFERS
+	    లేకపోతే ఒకవేళ (addr_type == ADDR_LOADED_BUFFERS
 		    || addr_type == ADDR_BUFFERS)
-		lnum = compute_buffer_local_count(
+		lnum = compute_బఫరు_local_లెక్క(
 				    addr_type, lnum, (i == '-') ? -1 * n : n);
-	    else
+	    లేకపోతే
 	    {
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
 		// Relative line addressing: need to adjust for lines in a
 		// closed fold after the first address.
-		if (addr_type == ADDR_LINES && (i == '-' || i == '+')
-							 && address_count >= 2)
-		    (void)hasFolding(lnum, NULL, &lnum);
-#endif
-		if (i == '-')
+		ఒకవేళ (addr_type == ADDR_పంక్తులు && (i == '-' || i == '+')
+							 && చిరునామా_లెక్క >= 2)
+		    (శూన్య)hasFolding(lnum, ఖాళీ, &lnum);
+#అయితే_ముగింపు
+		ఒకవేళ (i == '-')
 		    lnum -= n;
-		else
+		లేకపోతే
 		{
-		    if (lnum >= 0 && n >= LONG_MAX - lnum)
+		    ఒకవేళ (lnum >= 0 && n >= LONG_MAX - lnum)
 		    {
-			emsg(_(e_line_number_out_of_range));
-			cmd = NULL;
-			goto error;
+			emsg(_(e_పంక్తి_సంఖ్య_బహిర్గతం_యొక్క_range));
+			cmd = ఖాళీ;
+			వెళ్ళు error;
 		    }
 		    lnum += n;
 		}
 	    }
 	}
-    } while (*cmd == '/' || *cmd == '?');
+    } అయితే (*cmd == '/' || *cmd == '?');
 
 error:
     *ptr = cmd;
-    return lnum;
+    తిరిగి lnum;
 }
 
 /*
  * Set eap->line1 and eap->line2 to the whole range.
  * Used for commands with the EX_DFLALL flag and no range given.
  */
-    static void
-address_default_all(exarg_T *eap)
+    స్థిర శూన్య
+చిరునామా_default_all(exarg_T *eap)
 {
     eap->line1 = 1;
-    switch (eap->addr_type)
+    ఎంపిక (eap->addr_type)
     {
-	case ADDR_LINES:
-	case ADDR_OTHER:
-	    eap->line2 = curbuf->b_ml.ml_line_count;
-	    break;
-	case ADDR_LOADED_BUFFERS:
+	స్థితి ADDR_పంక్తులు:
+	స్థితి ADDR_OTHER:
+	    eap->line2 = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	    ఆపు;
+	స్థితి ADDR_LOADED_BUFFERS:
 	    {
 		buf_T *buf = firstbuf;
 
-		while (buf->b_next != NULL && buf->b_ml.ml_mfp == NULL)
-		    buf = buf->b_next;
+		అయితే (buf->b_తదుపరి != ఖాళీ && buf->b_ml.ml_mfp == ఖాళీ)
+		    buf = buf->b_తదుపరి;
 		eap->line1 = buf->b_fnum;
 		buf = lastbuf;
-		while (buf->b_prev != NULL && buf->b_ml.ml_mfp == NULL)
+		అయితే (buf->b_prev != ఖాళీ && buf->b_ml.ml_mfp == ఖాళీ)
 		    buf = buf->b_prev;
 		eap->line2 = buf->b_fnum;
 	    }
-	    break;
-	case ADDR_BUFFERS:
+	    ఆపు;
+	స్థితి ADDR_BUFFERS:
 	    eap->line1 = firstbuf->b_fnum;
 	    eap->line2 = lastbuf->b_fnum;
-	    break;
-	case ADDR_WINDOWS:
-	    eap->line2 = LAST_WIN_NR;
-	    break;
-	case ADDR_TABS:
-	    eap->line2 = LAST_TAB_NR;
-	    break;
-	case ADDR_TABS_RELATIVE:
+	    ఆపు;
+	స్థితి ADDR_WINDOWS:
+	    eap->line2 = చివరి_WIN_NR;
+	    ఆపు;
+	స్థితి ADDR_TABS:
+	    eap->line2 = చివరి_TAB_NR;
+	    ఆపు;
+	స్థితి ADDR_TABS_RELATIVE:
 	    eap->line2 = 1;
-	    break;
-	case ADDR_ARGUMENTS:
-	    if (ARGCOUNT == 0)
+	    ఆపు;
+	స్థితి ADDR_ARGUMENTS:
+	    ఒకవేళ (ARGCOUNT == 0)
 		eap->line1 = eap->line2 = 0;
-	    else
+	    లేకపోతే
 		eap->line2 = ARGCOUNT;
-	    break;
-	case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-	    eap->line2 = qf_get_valid_size(eap);
-	    if (eap->line2 == 0)
+	    ఆపు;
+	స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
+	    eap->line2 = qf_get_valid_కొలత(eap);
+	    ఒకవేళ (eap->line2 == 0)
 		eap->line2 = 1;
-#endif
-	    break;
-	case ADDR_NONE:
-	case ADDR_UNSIGNED:
-	case ADDR_QUICKFIX:
+#అయితే_ముగింపు
+	    ఆపు;
+	స్థితి ADDR_NONE:
+	స్థితి ADDR_UNSIGNED:
+	స్థితి ADDR_QUICKFIX:
 	    iemsg("Cannot use EX_DFLALL with ADDR_NONE, ADDR_UNSIGNED or ADDR_QUICKFIX");
-	    break;
+	    ఆపు;
     }
 }
 
@@ -5011,16 +5011,16 @@ address_default_all(exarg_T *eap)
 /*
  * Get flags from an Ex command argument.
  */
-    static void
+    స్థిర శూన్య
 get_flags(exarg_T *eap)
 {
-    while (vim_strchr((char_u *)"lp#", *eap->arg) != NULL)
+    అయితే (vim_strchr((char_u *)"lp#", *eap->arg) != ఖాళీ)
     {
-	if (*eap->arg == 'l')
+	ఒకవేళ (*eap->arg == 'l')
 	    eap->flags |= EXFLAG_LIST;
-	else if (*eap->arg == 'p')
+	లేకపోతే ఒకవేళ (*eap->arg == 'p')
 	    eap->flags |= EXFLAG_PRINT;
-	else
+	లేకపోతే
 	    eap->flags |= EXFLAG_NR;
 	eap->arg = skipwhite(eap->arg + 1);
     }
@@ -5029,271 +5029,271 @@ get_flags(exarg_T *eap)
 /*
  * Function called for command which is Not Implemented.  NI!
  */
-    void
+    శూన్య
 ex_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    ఒకవేళ (!eap->skip)
 	eap->errmsg =
-		_(e_sorry_command_is_not_available_in_this_version);
+		_(e_sorry_command_is_not_అందుబాటు_లోపల_this_సంస్కరణ);
 }
 
-#ifdef HAVE_EX_SCRIPT_NI
+#నిర్వచితమైతే HAVE_EX_SCRIPT_NI
 /*
  * Function called for script command which is Not Implemented.  NI!
  * Skips over ":perl <<EOF" constructs.
  */
-    static void
+    స్థిర శూన్య
 ex_script_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    ఒకవేళ (!eap->skip)
 	ex_ni(eap);
-    else
+    లేకపోతే
 	vim_free(script_get(eap, eap->arg));
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check range in Ex command for validity.
  * Return NULL when valid, error message when invalid.
  */
-    static char *
+    స్థిర అక్షరం *
 invalid_range(exarg_T *eap)
 {
     buf_T	*buf;
 
-    if (       eap->line1 < 0
+    ఒకవేళ (       eap->line1 < 0
 	    || eap->line2 < 0
 	    || eap->line1 > eap->line2)
-	return _(e_invalid_range);
+	తిరిగి _(e_invalid_range);
 
-    if (eap->argt & EX_RANGE)
+    ఒకవేళ (eap->argt & EX_RANGE)
     {
-	switch (eap->addr_type)
+	ఎంపిక (eap->addr_type)
 	{
-	    case ADDR_LINES:
-		if (eap->line2 > curbuf->b_ml.ml_line_count
-#ifdef FEAT_DIFF
+	    స్థితి ADDR_పంక్తులు:
+		ఒకవేళ (eap->line2 > curbuf->b_ml.ml_పంక్తి_లెక్క
+#నిర్వచితమైతే FEAT_DIFF
 			    + (eap->cmdidx == CMD_diffget ||
 				eap->cmdidx == CMD_diffput)
-#endif
+#అయితే_ముగింపు
 		   )
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_ARGUMENTS:
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_ARGUMENTS:
 		// add 1 if ARGCOUNT is 0
-		if (eap->line2 > ARGCOUNT + (!ARGCOUNT))
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_BUFFERS:
+		ఒకవేళ (eap->line2 > ARGCOUNT + (!ARGCOUNT))
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_BUFFERS:
 		// Only a boundary check, not whether the buffers actually
 		// exist.
-		if (eap->line1 < 1 || eap->line2 > get_highest_fnum())
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_LOADED_BUFFERS:
+		ఒకవేళ (eap->line1 < 1 || eap->line2 > get_highest_fnum())
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_LOADED_BUFFERS:
 		buf = firstbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		అయితే (buf->b_ml.ml_mfp == ఖాళీ)
 		{
-		    if (buf->b_next == NULL)
-			return _(e_invalid_range);
-		    buf = buf->b_next;
+		    ఒకవేళ (buf->b_తదుపరి == ఖాళీ)
+			తిరిగి _(e_invalid_range);
+		    buf = buf->b_తదుపరి;
 		}
-		if (eap->line1 < buf->b_fnum)
-		    return _(e_invalid_range);
+		ఒకవేళ (eap->line1 < buf->b_fnum)
+		    తిరిగి _(e_invalid_range);
 		buf = lastbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		అయితే (buf->b_ml.ml_mfp == ఖాళీ)
 		{
-		    if (buf->b_prev == NULL)
-			return _(e_invalid_range);
+		    ఒకవేళ (buf->b_prev == ఖాళీ)
+			తిరిగి _(e_invalid_range);
 		    buf = buf->b_prev;
 		}
-		if (eap->line2 > buf->b_fnum)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_WINDOWS:
-		if (eap->line2 > LAST_WIN_NR)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_TABS:
-		if (eap->line2 > LAST_TAB_NR)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_TABS_RELATIVE:
-	    case ADDR_OTHER:
+		ఒకవేళ (eap->line2 > buf->b_fnum)
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_WINDOWS:
+		ఒకవేళ (eap->line2 > చివరి_WIN_NR)
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_TABS:
+		ఒకవేళ (eap->line2 > చివరి_TAB_NR)
+		    తిరిగి _(e_invalid_range);
+		ఆపు;
+	    స్థితి ADDR_TABS_RELATIVE:
+	    స్థితి ADDR_OTHER:
 		// Any range is OK.
-		break;
-	    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+		ఆపు;
+	    స్థితి ADDR_QUICKFIX:
+#నిర్వచితమైతే FEAT_QUICKFIX
 		// No error for value that is too big, will use the last entry.
-		if (eap->line2 <= 0)
+		ఒకవేళ (eap->line2 <= 0)
 		{
-		    if (eap->addr_count == 0)
-			return _(e_no_errors);
-		    return _(e_invalid_range);
+		    ఒకవేళ (eap->addr_లెక్క == 0)
+			తిరిగి _(e_no_errors);
+		    తిరిగి _(e_invalid_range);
 		}
-#endif
-		break;
-	    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-		if ((eap->line2 != 1 && eap->line2 > qf_get_valid_size(eap))
+#అయితే_ముగింపు
+		ఆపు;
+	    స్థితి ADDR_QUICKFIX_VALID:
+#నిర్వచితమైతే FEAT_QUICKFIX
+		ఒకవేళ ((eap->line2 != 1 && eap->line2 > qf_get_valid_కొలత(eap))
 			|| eap->line2 < 0)
-		    return _(e_invalid_range);
-#endif
-		break;
-	    case ADDR_UNSIGNED:
-	    case ADDR_NONE:
+		    తిరిగి _(e_invalid_range);
+#అయితే_ముగింపు
+		ఆపు;
+	    స్థితి ADDR_UNSIGNED:
+	    స్థితి ADDR_NONE:
 		// Will give an error elsewhere.
-		break;
+		ఆపు;
 	}
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Correct the range for zero line number, if required.
  */
-    static void
+    స్థిర శూన్య
 correct_range(exarg_T *eap)
 {
-    if (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
+    ఒకవేళ (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
     {
-	if (eap->line1 == 0)
+	ఒకవేళ (eap->line1 == 0)
 	    eap->line1 = 1;
-	if (eap->line2 == 0)
+	ఒకవేళ (eap->line2 == 0)
 	    eap->line2 = 1;
     }
 }
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
 /*
  * For a ":vimgrep" or ":vimgrepadd" command return a pointer past the
  * pattern.  Otherwise return eap->arg.
  */
-    static char_u *
+    స్థిర char_u *
 skip_grep_pat(exarg_T *eap)
 {
     char_u	*p = eap->arg;
 
-    if (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
+    ఒకవేళ (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
 		|| eap->cmdidx == CMD_vimgrepadd
 		|| eap->cmdidx == CMD_lvimgrepadd
-		|| grep_internal(eap->cmdidx)))
+		|| grep_అంతర్గత(eap->cmdidx)))
     {
-	p = skip_vimgrep_pat(p, NULL, NULL);
-	if (p == NULL)
+	p = skip_vimgrep_pat(p, ఖాళీ, ఖాళీ);
+	ఒకవేళ (p == ఖాళీ)
 	    p = eap->arg;
     }
-    return p;
+    తిరిగి p;
 }
 
 /*
  * For the ":make" and ":grep" commands insert the 'makeprg'/'grepprg' option
  * in the command line, so that things like % get expanded.
  */
-    static char_u *
+    స్థిర char_u *
 replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
 {
     char_u	*new_cmdline;
-    char_u	*program;
+    char_u	*కార్యక్రమం;
     char_u	*pos;
     char_u	*ptr;
-    int		len;
-    int		i;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
 
     /*
      * Don't do it when ":vimgrep" is used for ":grep".
      */
-    if ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
+    ఒకవేళ ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
 		     || eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 		     || eap->cmdidx == CMD_grepadd
 		     || eap->cmdidx == CMD_lgrepadd)
-	    && !grep_internal(eap->cmdidx))
+	    && !grep_అంతర్గత(eap->cmdidx))
     {
-	if (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
+	ఒకవేళ (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 	    || eap->cmdidx == CMD_grepadd || eap->cmdidx == CMD_lgrepadd)
 	{
-	    if (*curbuf->b_p_gp == NUL)
-		program = p_gp;
-	    else
-		program = curbuf->b_p_gp;
+	    ఒకవేళ (*curbuf->b_p_gp == NUL)
+		కార్యక్రమం = p_gp;
+	    లేకపోతే
+		కార్యక్రమం = curbuf->b_p_gp;
 	}
-	else
+	లేకపోతే
 	{
-	    if (*curbuf->b_p_mp == NUL)
-		program = p_mp;
-	    else
-		program = curbuf->b_p_mp;
+	    ఒకవేళ (*curbuf->b_p_mp == NUL)
+		కార్యక్రమం = p_mp;
+	    లేకపోతే
+		కార్యక్రమం = curbuf->b_p_mp;
 	}
 
 	p = skipwhite(p);
 
-	if ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	ఒకవేళ ((pos = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)కార్యక్రమం, "$*")) != ఖాళీ)
 	{
 	    // replace $* by given arguments
 	    i = 1;
-	    while ((pos = (char_u *)strstr((char *)pos + 2, "$*")) != NULL)
+	    అయితే ((pos = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)pos + 2, "$*")) != ఖాళీ)
 		++i;
-	    len = (int)STRLEN(p);
-	    new_cmdline = alloc(STRLEN(program) + (size_t)i * (len - 2) + 1);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
+	    len = (పూర్ణాంకం)STRLEN(p);
+	    new_cmdline = alloc(STRLEN(కార్యక్రమం) + (size_t)i * (len - 2) + 1);
+	    ఒకవేళ (new_cmdline == ఖాళీ)
+		తిరిగి ఖాళీ;			// out of memory
 	    ptr = new_cmdline;
-	    while ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	    అయితే ((pos = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)కార్యక్రమం, "$*")) != ఖాళీ)
 	    {
-		i = (int)(pos - program);
-		STRNCPY(ptr, program, i);
+		i = (పూర్ణాంకం)(pos - కార్యక్రమం);
+		STRNCPY(ptr, కార్యక్రమం, i);
 		STRCPY(ptr += i, p);
 		ptr += len;
-		program = pos + 2;
+		కార్యక్రమం = pos + 2;
 	    }
-	    STRCPY(ptr, program);
+	    STRCPY(ptr, కార్యక్రమం);
 	}
-	else
+	లేకపోతే
 	{
-	    size_t program_len = STRLEN(program);
+	    size_t కార్యక్రమం_len = STRLEN(కార్యక్రమం);
 
-	    new_cmdline = alloc(program_len + STRLEN(p) + 2);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
-	    STRCPY(new_cmdline, program);
-	    STRCPY(new_cmdline + program_len, " ");
-	    STRCPY(new_cmdline + program_len + 1, p);
+	    new_cmdline = alloc(కార్యక్రమం_len + STRLEN(p) + 2);
+	    ఒకవేళ (new_cmdline == ఖాళీ)
+		తిరిగి ఖాళీ;			// out of memory
+	    STRCPY(new_cmdline, కార్యక్రమం);
+	    STRCPY(new_cmdline + కార్యక్రమం_len, " ");
+	    STRCPY(new_cmdline + కార్యక్రమం_len + 1, p);
 	}
-	msg_make(p);
+	సందేశం_make(p);
 
 	// 'eap->cmd' is not set here, because it is not used at CMD_make
 	vim_free(*cmdlinep);
 	*cmdlinep = new_cmdline;
 	p = new_cmdline;
     }
-    return p;
+    తిరిగి p;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Expand file name in Ex command argument.
  * When an error is detected, "errormsgp" is set to a non-NULL pointer.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 expand_filename(
     exarg_T	*eap,
     char_u	**cmdlinep,
-    char	**errormsgp)
+    అక్షరం	**errormsgp)
 {
-    int		has_wildcards;	// need to expand wildcards
+    పూర్ణాంకం		has_wildcards;	// need to expand wildcards
     char_u	*repl;
     size_t	srclen;
     char_u	*p;
-    int		n;
-    int		escaped;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		escaped;
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
     // Skip a regexp pattern for ":vimgrep[add] pat file..."
     p = skip_grep_pat(eap);
-#else
+#లేకపోతే
     p = eap->arg;
-#endif
+#అయితే_ముగింపు
 
     /*
      * Decide to expand wildcards *before* replacing '%', '#', etc.  If
@@ -5301,27 +5301,27 @@ expand_filename(
      * (it will be expanded anyway if there is a wildcard before replacing).
      */
     has_wildcards = mch_has_wildcard(p);
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// Skip over `=expr`, wildcards in it are not expanded.
-	if (p[0] == '`' && p[1] == '=')
+	ఒకవేళ (p[0] == '`' && p[1] == '=')
 	{
 	    p += 2;
-	    (void)skip_expr(&p, NULL);
-	    if (*p == '`')
+	    (శూన్య)skip_సమాసం(&p, ఖాళీ);
+	    ఒకవేళ (*p == '`')
 		++p;
-	    continue;
+	    కొనసాగు;
 	}
-#endif
+#అయితే_ముగింపు
 	/*
 	 * Quick check if this cannot be the start of a special string.
 	 * Also removes backslash before '%', '#' and '<'.
 	 */
-	if (vim_strchr((char_u *)"%#<", *p) == NULL)
+	ఒకవేళ (vim_strchr((char_u *)"%#<", *p) == ఖాళీ)
 	{
 	    ++p;
-	    continue;
+	    కొనసాగు;
 	}
 
 	/*
@@ -5329,17 +5329,17 @@ expand_filename(
 	 */
 	repl = eval_vars(p, eap->arg, &srclen, &(eap->do_ecmd_lnum),
 						    errormsgp, &escaped, TRUE);
-	if (*errormsgp != NULL)		// error detected
-	    return FAIL;
-	if (repl == NULL)		// no match found
+	ఒకవేళ (*errormsgp != ఖాళీ)		// error detected
+	    తిరిగి FAIL;
+	ఒకవేళ (repl == ఖాళీ)		// no match found
 	{
 	    p += srclen;
-	    continue;
+	    కొనసాగు;
 	}
 
 	// Wildcards won't be expanded below, the replacement is taken
 	// literally.  But do expand "~/file", "~user/file" and "$HOME/file".
-	if (vim_strchr(repl, '$') != NULL || vim_strchr(repl, '~') != NULL)
+	ఒకవేళ (vim_strchr(repl, '$') != ఖాళీ || vim_strchr(repl, '~') != ఖాళీ)
 	{
 	    char_u *l = repl;
 
@@ -5353,7 +5353,7 @@ expand_filename(
 	// - shell commands (may have to use quotes instead).
 	// - non-unix systems when there is a single argument (spaces don't
 	//   separate arguments then).
-	if (!eap->usefilter
+	ఒకవేళ (!eap->usefilter
 		&& !escaped
 		&& eap->cmdidx != CMD_bang
 		&& eap->cmdidx != CMD_grep
@@ -5364,43 +5364,43 @@ expand_filename(
 		&& eap->cmdidx != CMD_lmake
 		&& eap->cmdidx != CMD_make
 		&& eap->cmdidx != CMD_terminal
-#ifndef UNIX
+#నిర్వచితం_కాకపోతే UNIX
 		&& !(eap->argt & EX_NOSPC)
-#endif
+#అయితే_ముగింపు
 		)
 	{
 	    char_u	*l;
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 	    // Don't escape a backslash here, because rem_backslash() doesn't
 	    // remove it later.
-	    static char_u *nobslash = (char_u *)" \t\"|";
+	    స్థిర char_u *nobslash = (char_u *)" \t\"|";
 # define ESCAPE_CHARS nobslash
-#else
+#లేకపోతే
 # define ESCAPE_CHARS escape_chars
-#endif
+#అయితే_ముగింపు
 
-	    for (l = repl; *l; ++l)
-		if (vim_strchr(ESCAPE_CHARS, *l) != NULL)
+	    కొరకు (l = repl; *l; ++l)
+		ఒకవేళ (vim_strchr(ESCAPE_CHARS, *l) != ఖాళీ)
 		{
 		    l = vim_strsave_escaped(repl, ESCAPE_CHARS);
-		    if (l != NULL)
+		    ఒకవేళ (l != ఖాళీ)
 		    {
 			vim_free(repl);
 			repl = l;
 		    }
-		    break;
+		    ఆపు;
 		}
 	}
 
 	// For a shell command a '!' must be escaped.
-	if ((eap->usefilter || eap->cmdidx == CMD_bang
+	ఒకవేళ ((eap->usefilter || eap->cmdidx == CMD_bang
 						|| eap->cmdidx == CMD_terminal)
-			    && vim_strpbrk(repl, (char_u *)"!") != NULL)
+			    && vim_strpbrk(repl, (char_u *)"!") != ఖాళీ)
 	{
 	    char_u	*l;
 
 	    l = vim_strsave_escaped(repl, (char_u *)"!");
-	    if (l != NULL)
+	    ఒకవేళ (l != ఖాళీ)
 	    {
 		vim_free(repl);
 		repl = l;
@@ -5409,39 +5409,39 @@ expand_filename(
 
 	p = repl_cmdline(eap, p, srclen, repl, cmdlinep);
 	vim_free(repl);
-	if (p == NULL)
-	    return FAIL;
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి FAIL;
     }
 
     /*
      * One file argument: Expand wildcards.
      * Don't do this with ":r !command" or ":w !command".
      */
-    if ((eap->argt & EX_NOSPC) && !eap->usefilter)
+    ఒకవేళ ((eap->argt & EX_NOSPC) && !eap->usefilter)
     {
 	/*
 	 * May do this twice:
 	 * 1. Replace environment variables.
 	 * 2. Replace any other wildcards, remove backslashes.
 	 */
-	for (n = 1; n <= 2; ++n)
+	కొరకు (n = 1; n <= 2; ++n)
 	{
-	    if (n == 2)
+	    ఒకవేళ (n == 2)
 	    {
 		/*
 		 * Halve the number of backslashes (this is Vi compatible).
 		 * For Unix and OS/2, when wildcards are expanded, this is
 		 * done by ExpandOne() below.
 		 */
-#if defined(UNIX)
-		if (!has_wildcards)
-#endif
+#ఒకవేళ defined(UNIX)
+		ఒకవేళ (!has_wildcards)
+#అయితే_ముగింపు
 		    backslash_halve(eap->arg);
 	    }
 
-	    if (has_wildcards)
+	    ఒకవేళ (has_wildcards)
 	    {
-		if (n == 1)
+		ఒకవేళ (n == 1)
 		{
 		    /*
 		     * First loop: May expand environment variables.  This
@@ -5450,44 +5450,44 @@ expand_filename(
 		     * After expanding environment variables, check again
 		     * if there are still wildcards present.
 		     */
-		    if (vim_strchr(eap->arg, '$') != NULL
-			    || vim_strchr(eap->arg, '~') != NULL)
+		    ఒకవేళ (vim_strchr(eap->arg, '$') != ఖాళీ
+			    || vim_strchr(eap->arg, '~') != ఖాళీ)
 		    {
 			expand_env_esc(eap->arg, NameBuff, MAXPATHL,
-					(char_u *)(" \t" PATH_ESC_WILDCARDS),
-					TRUE, NULL);
+					(char_u *)(" \t" మార్గం_ESC_WILDCARDS),
+					TRUE, ఖాళీ);
 			has_wildcards = mch_has_wildcard(NameBuff);
 			p = NameBuff;
 		    }
-		    else
-			p = NULL;
+		    లేకపోతే
+			p = ఖాళీ;
 		}
-		else // n == 2
+		లేకపోతే // n == 2
 		{
 		    expand_T	xpc;
-		    int		options = WILD_LIST_NOTFOUND
-					       | WILD_NOERROR | WILD_ADD_SLASH;
+		    పూర్ణాంకం		options = WILD_LIST_NOTFOUND
+					       | WILD_NOERROR | WILD_కూడు_SLASH;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    if (p_wic)
+		    ఒకవేళ (p_wic)
 			options += WILD_ICASE;
-		    p = ExpandOne(&xpc, eap->arg, NULL,
+		    p = ExpandOne(&xpc, eap->arg, ఖాళీ,
 						   options, WILD_EXPAND_FREE);
-		    if (p == NULL)
-			return FAIL;
+		    ఒకవేళ (p == ఖాళీ)
+			తిరిగి FAIL;
 		}
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    (void)repl_cmdline(eap, eap->arg, STRLEN(eap->arg),
+		    (శూన్య)repl_cmdline(eap, eap->arg, STRLEN(eap->arg),
 								 p, cmdlinep);
-		    if (n == 2)	// p came from ExpandOne()
+		    ఒకవేళ (n == 2)	// p came from ExpandOne()
 			vim_free(p);
 		}
 	    }
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -5498,7 +5498,7 @@ expand_filename(
  * Returns a pointer to the character after the replaced string.
  * Returns NULL for failure.
  */
-    static char_u *
+    స్థిర char_u *
 repl_cmdline(
     exarg_T	*eap,
     char_u	*src,
@@ -5520,10 +5520,10 @@ repl_cmdline(
     repllen = STRLEN(repl);
     taillen = STRLEN(src + srclen);
     i = (src - *cmdlinep) + repllen + taillen + 3;
-    if (eap->nextcmd != NULL)
+    ఒకవేళ (eap->nextcmd != ఖాళీ)
 	i += STRLEN(eap->nextcmd);	// add space for next command
-    if ((new_cmdline = alloc(i)) == NULL)
-	return NULL;			// out of memory!
+    ఒకవేళ ((new_cmdline = alloc(i)) == ఖాళీ)
+	తిరిగి ఖాళీ;			// out of memory!
 
     /*
      * Copy the stuff before the expanded part.
@@ -5539,7 +5539,7 @@ repl_cmdline(
     STRCPY(new_cmdline + new_cmdlinelen, src + srclen);
     src = new_cmdline + new_cmdlinelen;	// remember where to continue
 
-    if (eap->nextcmd != NULL)		// append next command
+    ఒకవేళ (eap->nextcmd != ఖాళీ)		// append next command
     {
 	new_cmdlinelen += taillen + 1;
 	STRCPY(new_cmdline + new_cmdlinelen, eap->nextcmd);
@@ -5547,61 +5547,61 @@ repl_cmdline(
     }
     eap->cmd = new_cmdline + (eap->cmd - *cmdlinep);
     eap->arg = new_cmdline + (eap->arg - *cmdlinep);
-    if (eap->do_ecmd_cmd != NULL && eap->do_ecmd_cmd != dollar_command)
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ && eap->do_ecmd_cmd != dollar_command)
 	eap->do_ecmd_cmd = new_cmdline + (eap->do_ecmd_cmd - *cmdlinep);
     vim_free(*cmdlinep);
     *cmdlinep = new_cmdline;
 
-    return src;
+    తిరిగి src;
 }
 
 /*
  * Check for '|' to separate commands and '"' to start comments.
  * If "keep_backslash" is TRUE do not remove any backslash.
  */
-    void
-separate_nextcmd(exarg_T *eap, int keep_backslash)
+    శూన్య
+separate_nextcmd(exarg_T *eap, పూర్ణాంకం keep_backslash)
 {
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
     char_u	*p;
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
     p = skip_grep_pat(eap);
-#else
+#లేకపోతే
     p = eap->arg;
-#endif
+#అయితే_ముగింపు
 
-    for ( ; *p; MB_PTR_ADV(p))
+    కొరకు ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == Ctrl_V)
+	ఒకవేళ (*p == Ctrl_V)
 	{
-	    if ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
+	    ఒకవేళ ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
 		++p;		// skip CTRL-V and next char
-	    else
+	    లేకపోతే
 				// remove CTRL-V and skip next char
 		STRMOVE(p, p + 1);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
-		break;
+	    ఒకవేళ (*p == NUL)		// stop at NUL after CTRL-V
+		ఆపు;
 	}
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// Skip over `=expr` when wildcards are expanded.
-	else if (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
+	లేకపోతే ఒకవేళ (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
 	{
 	    p += 2;
-	    (void)skip_expr(&p, NULL);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
-		break;
+	    (శూన్య)skip_సమాసం(&p, ఖాళీ);
+	    ఒకవేళ (*p == NUL)		// stop at NUL after CTRL-V
+		ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
 
 	// Check for '"'/'#': start of comment or '|': next command
 	// :@" and :*" do not start a comment!
 	// :redir @" doesn't either.
-	else if ((*p == '"'
+	లేకపోతే ఒకవేళ ((*p == '"'
 		    && !vim9script
 		    && !(eap->argt & EX_NOTRLCOM)
-		    && ((eap->cmdidx != CMD_at && eap->cmdidx != CMD_star)
+		    && ((eap->cmdidx != CMD_at && eap->cmdidx != CMD_నక్షత్రం)
 							      || p != eap->arg)
 		    && (eap->cmdidx != CMD_redir
 					 || p != eap->arg + 1 || p[-1] != '@'))
@@ -5612,61 +5612,61 @@ separate_nextcmd(exarg_T *eap, int keep_backslash)
 		|| (*p == '|'
 		    && eap->cmdidx != CMD_append
 		    && eap->cmdidx != CMD_change
-		    && eap->cmdidx != CMD_insert)
+		    && eap->cmdidx != CMD_చొప్పించు)
 		|| *p == '\n')
 	{
 	    /*
 	     * We remove the '\' before the '|', unless EX_CTRLV is used
 	     * AND 'b' is present in 'cpoptions'.
 	     */
-	    if ((vim_strchr(p_cpo, CPO_BAR) == NULL
+	    ఒకవేళ ((vim_strchr(p_cpo, CPO_BAR) == ఖాళీ
 			      || !(eap->argt & EX_CTRLV)) && *(p - 1) == '\\')
 	    {
-		if (!keep_backslash)
+		ఒకవేళ (!keep_backslash)
 		{
 		    STRMOVE(p - 1, p);	// remove the '\'
 		    --p;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		set_nextcmd(eap, p);
+		సమితి_nextcmd(eap, p);
 		*p = NUL;
-		break;
+		ఆపు;
 	    }
 	}
     }
 
-    if (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
+    ఒకవేళ (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
 	del_trailing_spaces(eap->arg);
 }
 
 /*
  * get + command from ex argument
  */
-    static char_u *
+    స్థిర char_u *
 getargcmd(char_u **argp)
 {
     char_u *arg = *argp;
-    char_u *command = NULL;
+    char_u *command = ఖాళీ;
 
-    if (*arg == '+')	    // +[command]
+    ఒకవేళ (*arg == '+')	    // +[command]
     {
 	++arg;
-	if (vim_isspace(*arg) || *arg == NUL)
+	ఒకవేళ (vim_isspace(*arg) || *arg == NUL)
 	    command = dollar_command;
-	else
+	లేకపోతే
 	{
 	    command = arg;
 	    arg = skip_cmd_arg(command, TRUE);
-	    if (*arg != NUL)
+	    ఒకవేళ (*arg != NUL)
 		*arg++ = NUL;		// terminate command with NUL
 	}
 
 	arg = skipwhite(arg);	// skip over spaces
 	*argp = arg;
     }
-    return command;
+    తిరిగి command;
 }
 
 /*
@@ -5675,158 +5675,158 @@ getargcmd(char_u **argp)
     char_u *
 skip_cmd_arg(
     char_u *p,
-    int	   rembs)	// TRUE to halve the number of backslashes
+    పూర్ణాంకం	   rembs)	// TRUE to halve the number of backslashes
 {
-    while (*p && !vim_isspace(*p))
+    అయితే (*p && !vim_isspace(*p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ఒకవేళ (*p == '\\' && p[1] != NUL)
 	{
-	    if (rembs)
+	    ఒకవేళ (rembs)
 		STRMOVE(p, p + 1);
-	    else
+	    లేకపోతే
 		++p;
 	}
 	MB_PTR_ADV(p);
     }
-    return p;
+    తిరిగి p;
 }
 
-    int
+    పూర్ణాంకం
 get_bad_opt(char_u *p, exarg_T *eap)
 {
-    if (STRICMP(p, "keep") == 0)
+    ఒకవేళ (STRICMP(p, "keep") == 0)
 	eap->bad_char = BAD_KEEP;
-    else if (STRICMP(p, "drop") == 0)
+    లేకపోతే ఒకవేళ (STRICMP(p, "drop") == 0)
 	eap->bad_char = BAD_DROP;
-    else if (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
+    లేకపోతే ఒకవేళ (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
 	eap->bad_char = *p;
-    else
-	return FAIL;
-    return OK;
+    లేకపోతే
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of bad= names.
  */
-    static char_u *
-get_bad_name(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_bad_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     // Note: Keep this in sync with getargopt.
-    static char *(p_bad_values[]) =
+    స్థిర అక్షరం *(p_bad_విలువలు[]) =
     {
 	"?",
 	"keep",
 	"drop",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_bad_values))
-	return NULL;
+    ఒకవేళ (idx < 0 || idx >= (పూర్ణాంకం)ARRAY_నిడివి(p_bad_విలువలు))
+	తిరిగి ఖాళీ;
 
-    return (char_u*)p_bad_values[idx];
+    తిరిగి (char_u*)p_bad_విలువలు[idx];
 }
 
 /*
  * Get "++opt=arg" argument.
  * Return FAIL or OK.
  */
-    static int
+    స్థిర పూర్ణాంకం
 getargopt(exarg_T *eap)
 {
     char_u	*arg = eap->arg + 2;
-    int		*pp = NULL;
-    int		bad_char_idx;
+    పూర్ణాంకం		*pp = ఖాళీ;
+    పూర్ణాంకం		bad_char_idx;
     char_u	*p;
 
     // Note: Keep this in sync with get_argopt_name.
 
     // ":edit ++[no]bin[ary] file"
-    if (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
+    ఒకవేళ (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
     {
-	if (*arg == 'n')
+	ఒకవేళ (*arg == 'n')
 	{
 	    arg += 2;
 	    eap->force_bin = FORCE_NOBIN;
 	}
-	else
+	లేకపోతే
 	    eap->force_bin = FORCE_BIN;
-	if (!checkforcmd(&arg, "binary", 3))
-	    return FAIL;
+	ఒకవేళ (!checkforcmd(&arg, "binary", 3))
+	    తిరిగి FAIL;
 	eap->arg = skipwhite(arg);
-	return OK;
+	తిరిగి OK;
     }
 
     // ":read ++edit file"
-    if (STRNCMP(arg, "edit", 4) == 0)
+    ఒకవేళ (STRNCMP(arg, "edit", 4) == 0)
     {
 	eap->read_edit = TRUE;
 	eap->arg = skipwhite(arg + 4);
-	return OK;
+	తిరిగి OK;
     }
 
-    if (STRNCMP(arg, "ff", 2) == 0)
+    ఒకవేళ (STRNCMP(arg, "ff", 2) == 0)
     {
 	arg += 2;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "fileformat", 10) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(arg, "fileformat", 10) == 0)
     {
 	arg += 10;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "enc", 3) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(arg, "enc", 3) == 0)
     {
-	if (STRNCMP(arg, "encoding", 8) == 0)
+	ఒకవేళ (STRNCMP(arg, "encoding", 8) == 0)
 	    arg += 8;
-	else
+	లేకపోతే
 	    arg += 3;
 	pp = &eap->force_enc;
     }
-    else if (STRNCMP(arg, "bad", 3) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(arg, "bad", 3) == 0)
     {
 	arg += 3;
 	pp = &bad_char_idx;
     }
 
-    if (pp == NULL || *arg != '=')
-	return FAIL;
+    ఒకవేళ (pp == ఖాళీ || *arg != '=')
+	తిరిగి FAIL;
 
     ++arg;
-    *pp = (int)(arg - eap->cmd);
+    *pp = (పూర్ణాంకం)(arg - eap->cmd);
     arg = skip_cmd_arg(arg, FALSE);
     eap->arg = skipwhite(arg);
     *arg = NUL;
 
-    if (pp == &eap->force_ff)
+    ఒకవేళ (pp == &eap->force_ff)
     {
-	if (check_ff_value(eap->cmd + eap->force_ff) == FAIL)
-	    return FAIL;
+	ఒకవేళ (check_ff_విలువ(eap->cmd + eap->force_ff) == FAIL)
+	    తిరిగి FAIL;
 	eap->force_ff = eap->cmd[eap->force_ff];
     }
-    else if (pp == &eap->force_enc)
+    లేకపోతే ఒకవేళ (pp == &eap->force_enc)
     {
 	// Make 'fileencoding' lower case.
-	for (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
+	కొరకు (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
 	    *p = TOLOWER_ASC(*p);
     }
-    else
+    లేకపోతే
     {
 	// Check ++bad= argument.  Must be a single-byte character, "keep" or
 	// "drop".
-	if (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
-	    return FAIL;
+	ఒకవేళ (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
+	    తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of ++opt names.
  */
-    static char_u *
-get_argopt_name(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_argopt_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     // Note: Keep this in sync with getargopt.
-    static char *(p_opt_values[]) =
+    స్థిర అక్షరం *(p_opt_విలువలు[]) =
     {
 	"fileformat=",
 	"encoding=",
@@ -5836,119 +5836,119 @@ get_argopt_name(expand_T *xp UNUSED, int idx)
 	"edit",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_opt_values))
-	return NULL;
+    ఒకవేళ (idx < 0 || idx >= (పూర్ణాంకం)ARRAY_నిడివి(p_opt_విలువలు))
+	తిరిగి ఖాళీ;
 
-    return (char_u*)p_opt_values[idx];
+    తిరిగి (char_u*)p_opt_విలువలు[idx];
 }
 
 /*
  * Command-line expansion for ++opt=name.
  */
-    int
+    పూర్ణాంకం
 expand_argopt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	పూర్ణాంకం	    *అంకె_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    ఒకవేళ (xp->xp_నమూనా > xp->xp_పంక్తి && *(xp->xp_నమూనా-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, పూర్ణాంకం) = ఖాళీ;
 
-	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 2
-		&& STRNCMP(name_end - 2, "ff", 2) == 0)
+	char_u *name_చివర = xp->xp_నమూనా - 1;
+	ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 2
+		&& STRNCMP(name_చివర - 2, "ff", 2) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 10
-		&& STRNCMP(name_end - 10, "fileformat", 10) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 10
+		&& STRNCMP(name_చివర - 10, "fileformat", 10) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 3
-		&& STRNCMP(name_end - 3, "enc", 3) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 3
+		&& STRNCMP(name_చివర - 3, "enc", 3) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, "encoding", 8) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 8
+		&& STRNCMP(name_చివర - 8, "encoding", 8) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 3
-		&& STRNCMP(name_end - 3, "bad", 3) == 0)
+	లేకపోతే ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 3
+		&& STRNCMP(name_చివర - 3, "bad", 3) == 0)
 	    cb = get_bad_name;
 
-	if (cb != NULL)
+	ఒకవేళ (cb != ఖాళీ)
 	{
-	    return ExpandGeneric(
+	    తిరిగి ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    అంకె_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // Special handling of "ff" which acts as a short form of
     // "fileformat", as "ff" is not a substring of it.
-    if (xp->xp_pattern_len == 2
-	    && STRNCMP(xp->xp_pattern, "ff", xp->xp_pattern_len) == 0)
+    ఒకవేళ (xp->xp_నమూనా_len == 2
+	    && STRNCMP(xp->xp_నమూనా, "ff", xp->xp_నమూనా_len) == 0)
     {
 	*matches = ALLOC_MULT(char_u *, 1);
-	if (*matches == NULL)
-	    return FAIL;
-	*numMatches = 1;
+	ఒకవేళ (*matches == ఖాళీ)
+	    తిరిగి FAIL;
+	*అంకె_Matches = 1;
 	(*matches)[0] = vim_strsave((char_u*)"fileformat=");
-	return OK;
+	తిరిగి OK;
     }
 
-    return ExpandGeneric(
+    తిరిగి ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    అంకె_Matches,
 	    get_argopt_name,
 	    FALSE);
 }
 
-    static void
+    స్థిర శూన్య
 ex_autocmd(exarg_T *eap)
 {
-    if (eap->skip)
+    ఒకవేళ (eap->skip)
     {
-	skip_cmd_block(eap);
-	return;
+	skip_cmd_ఖండం(eap);
+	తిరిగి;
     }
 
     /*
      * Disallow autocommands from .exrc and .vimrc in current
      * directory for security reasons.
      */
-    if (secure)
+    ఒకవేళ (secure)
     {
 	secure = 2;
 	eap->errmsg =
-	      _(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search);
+	      _(e_command_not_allowed_from_vimrc_లోపల_current_dir_or_ట్యాగ్_శోధన);
     }
-    else if (eap->cmdidx == CMD_autocmd)
+    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_autocmd)
 	do_autocmd(eap, eap->arg, eap->forceit);
-    else
+    లేకపోతే
 	do_augroup(eap->arg, eap->forceit);
 }
 
 /*
  * ":doautocmd": Apply the automatic commands to the current buffer.
  */
-    static void
+    స్థిర శూన్య
 ex_doautocmd(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    పూర్ణాంకం		call_do_modelines = check_nomodeline(&arg);
+    పూర్ణాంకం		did_aucmd;
 
-    (void)do_doautocmd(arg, TRUE, &did_aucmd);
+    (శూన్య)do_doautocmd(arg, TRUE, &did_aucmd);
     // Only when there is no <nomodeline>.
-    if (call_do_modelines && did_aucmd)
+    ఒకవేళ (call_do_modelines && did_aucmd)
 	do_modelines(0);
 }
 
@@ -5957,46 +5957,46 @@ ex_doautocmd(exarg_T *eap)
  * :[N]bdelete[!] [N] [bufname] delete buffer from buffer list
  * :[N]bwipeout[!] [N] [bufname] delete buffer really
  */
-    static void
+    స్థిర శూన్య
 ex_bunload(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
     eap->errmsg = do_bufdel(
 	    eap->cmdidx == CMD_bdelete ? DOBUF_DEL
 		: eap->cmdidx == CMD_bwipeout ? DOBUF_WIPE
 		: DOBUF_UNLOAD, eap->arg,
-	    eap->addr_count, (int)eap->line1, (int)eap->line2, eap->forceit);
+	    eap->addr_లెక్క, (పూర్ణాంకం)eap->line1, (పూర్ణాంకం)eap->line2, eap->forceit);
 }
 
 /*
  * :[N]buffer [N]	to buffer N
  * :[N]sbuffer [N]	to buffer N
  */
-    static void
-ex_buffer(exarg_T *eap)
+    స్థిర శూన్య
+ex_బఫరు(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
     do_exbuffer(eap);
 }
 
 /*
  * ":buffer" command and alike.
  */
-    static void
+    స్థిర శూన్య
 do_exbuffer(exarg_T *eap)
 {
-    if (*eap->arg)
+    ఒకవేళ (*eap->arg)
 	eap->errmsg = ex_errmsg(e_trailing_characters_str, eap->arg);
-    else
+    లేకపోతే
     {
-	if (eap->addr_count == 0)	// default is current buffer
-	    goto_buffer(eap, DOBUF_CURRENT, FORWARD, 0);
-	else
-	    goto_buffer(eap, DOBUF_FIRST, FORWARD, (int)eap->line2);
-	if (eap->do_ecmd_cmd != NULL)
-	    do_cmd_argument(eap->do_ecmd_cmd);
+	ఒకవేళ (eap->addr_లెక్క == 0)	// default is current buffer
+	    goto_బఫరు(eap, DOBUF_CURRENT, FORWARD, 0);
+	లేకపోతే
+	    goto_బఫరు(eap, DOBUF_మొదటి, FORWARD, (పూర్ణాంకం)eap->line2);
+	ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	    do_cmd_వాదం(eap->do_ecmd_cmd);
     }
 }
 
@@ -6004,27 +6004,27 @@ do_exbuffer(exarg_T *eap)
  * :[N]bmodified [N]	to next mod. buffer
  * :[N]sbmodified [N]	to next mod. buffer
  */
-    static void
+    స్థిర శూన్య
 ex_bmodified(exarg_T *eap)
 {
-    goto_buffer(eap, DOBUF_MOD, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_బఫరు(eap, DOBUF_MOD, FORWARD, (పూర్ణాంకం)eap->line2);
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	do_cmd_వాదం(eap->do_ecmd_cmd);
 }
 
 /*
  * :[N]bnext [N]	to next buffer
  * :[N]sbnext [N]	split and to next buffer
  */
-    static void
+    స్థిర శూన్య
 ex_bnext(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
-    goto_buffer(eap, DOBUF_CURRENT, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_బఫరు(eap, DOBUF_CURRENT, FORWARD, (పూర్ణాంకం)eap->line2);
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	do_cmd_వాదం(eap->do_ecmd_cmd);
 }
 
 /*
@@ -6033,15 +6033,15 @@ ex_bnext(exarg_T *eap)
  * :[N]sbNext [N]	split and to previous buffer
  * :[N]sbprevious [N]	split and to previous buffer
  */
-    static void
+    స్థిర శూన్య
 ex_bprevious(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
-    goto_buffer(eap, DOBUF_CURRENT, BACKWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_బఫరు(eap, DOBUF_CURRENT, BACKWARD, (పూర్ణాంకం)eap->line2);
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	do_cmd_వాదం(eap->do_ecmd_cmd);
 }
 
 /*
@@ -6050,81 +6050,81 @@ ex_bprevious(exarg_T *eap)
  * :sbrewind		split and to first buffer
  * :sbfirst		split and to first buffer
  */
-    static void
+    స్థిర శూన్య
 ex_brewind(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
-    goto_buffer(eap, DOBUF_FIRST, FORWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_బఫరు(eap, DOBUF_మొదటి, FORWARD, 0);
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	do_cmd_వాదం(eap->do_ecmd_cmd);
 }
 
 /*
  * :blast		to last buffer
  * :sblast		split and to last buffer
  */
-    static void
+    స్థిర శూన్య
 ex_blast(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
-    goto_buffer(eap, DOBUF_LAST, BACKWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_బఫరు(eap, DOBUF_చివరి, BACKWARD, 0);
+    ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	do_cmd_వాదం(eap->do_ecmd_cmd);
 }
 
 /*
  * Check if "c" ends an Ex command.
  * In Vim9 script does not check for white space before #.
  */
-    int
-ends_excmd(int c)
+    పూర్ణాంకం
+చివర్లు_excmd(పూర్ణాంకం c)
 {
-    int comment_char = '"';
+    పూర్ణాంకం comment_char = '"';
 
-    if (in_vim9script())
+    ఒకవేళ (లోపల_vim9script())
 	comment_char = '#';
-    return (c == NUL || c == '|' || c == comment_char || c == '\n');
+    తిరిగి (c == NUL || c == '|' || c == comment_char || c == '\n');
 }
 
 /*
  * Like ends_excmd() but checks that a # in Vim9 script either has "cmd" equal
  * to "cmd_start" or has a white space character before it.
  */
-    int
-ends_excmd2(char_u *cmd_start UNUSED, char_u *cmd)
+    పూర్ణాంకం
+చివర్లు_excmd2(char_u *cmd_ప్రారంభం వాడని, char_u *cmd)
 {
-    int c = *cmd;
+    పూర్ణాంకం c = *cmd;
 
-    if (c == NUL || c == '|' || c == '\n')
-	return TRUE;
-    if (in_vim9script())
+    ఒకవేళ (c == NUL || c == '|' || c == '\n')
+	తిరిగి TRUE;
+    ఒకవేళ (లోపల_vim9script())
 	//  # starts a comment, #{ might be a mistake, #{{ can start a fold
-	return c == '#' && (cmd[1] != '{' || cmd[2] == '{')
-				 && (cmd == cmd_start || VIM_ISWHITE(cmd[-1]));
-    return c == '"';
+	తిరిగి c == '#' && (cmd[1] != '{' || cmd[2] == '{')
+				 && (cmd == cmd_ప్రారంభం || VIM_ISWHITE(cmd[-1]));
+    తిరిగి c == '"';
 }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_SYN_HL) || defined(FEAT_శోధన_EXTRA) || defined(FEAT_EVAL)
 /*
  * Return the next command, after the first '|' or '\n'.
  * Return NULL if not found.
  */
     char_u *
-find_nextcmd(char_u *p)
+కనుగొను_nextcmd(char_u *p)
 {
-    while (*p != '|' && *p != '\n')
+    అయితే (*p != '|' && *p != '\n')
     {
-	if (*p == NUL)
-	    return NULL;
+	ఒకవేళ (*p == NUL)
+	    తిరిగి ఖాళీ;
 	++p;
     }
-    return (p + 1);
+    తిరిగి (p + 1);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Check if *p is a separator between Ex commands, skipping over white space.
@@ -6135,34 +6135,34 @@ check_nextcmd(char_u *p)
 {
     char_u *s = skipwhite(p);
 
-    if (*s == '|' || *s == '\n')
-	return (s + 1);
-    else
-	return NULL;
+    ఒకవేళ (*s == '|' || *s == '\n')
+	తిరిగి (s + 1);
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
 /*
  * If "eap->nextcmd" is not set, check for a next command at "p".
  */
-    void
-set_nextcmd(exarg_T *eap, char_u *arg)
+    శూన్య
+సమితి_nextcmd(exarg_T *eap, char_u *arg)
 {
     char_u *p = skipwhite(arg);
 
-    if (in_vim9script() && *p == '#')
+    ఒకవేళ (లోపల_vim9script() && *p == '#')
     {
 	char_u *nl = vim_strchr(p, NL);
-	if (nl != NULL)
+	ఒకవేళ (nl != ఖాళీ)
 	    p = nl;
     }
 
     p = check_nextcmd(p);
 
-    if (eap->nextcmd == NULL)
+    ఒకవేళ (eap->nextcmd == ఖాళీ)
 	eap->nextcmd = p;
-    else if (p != NULL)
+    లేకపోతే ఒకవేళ (p != ఖాళీ)
 	// cannot use "| command" inside a  {} block
-	semsg(_(e_cannot_use_bar_to_separate_commands_here_str), arg);
+	semsg(_(e_cannot_use_bar_గమ్యం_separate_commands_ఇక్కడ_str), arg);
 }
 
 /*
@@ -6173,101 +6173,101 @@ set_nextcmd(exarg_T *eap, char_u *arg)
  *    return FAIL and give error message if 'message' TRUE
  * return OK otherwise
  */
-    static int
-check_more(
-    int message,	    // when FALSE check only, no messages
-    int forceit)
+    స్థిర పూర్ణాంకం
+check_మరిన్ని(
+    పూర్ణాంకం సందేశం_2,	    // when FALSE check only, no messages
+    పూర్ణాంకం forceit)
 {
-    int	    n = ARGCOUNT - curwin->w_arg_idx - 1;
+    పూర్ణాంకం	    n = ARGCOUNT - curwin->w_arg_idx - 1;
 
-    if (!forceit && only_one_window()
-	    && ARGCOUNT > 1 && !arg_had_last && n > 0 && quitmore == 0)
+    ఒకవేళ (!forceit && only_one_కిటికీ()
+	    && ARGCOUNT > 1 && !arg_had_చివరి && n > 0 && quitmore == 0)
     {
-	if (message)
+	ఒకవేళ (సందేశం_2)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
-						    && curbuf->b_fname != NULL)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ఒకవేళ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+						    && curbuf->b_fname != ఖాళీ)
 	    {
-		char_u	buff[DIALOG_MSG_SIZE];
+		char_u	buff[DIALOG_సందేశం_కొలత];
 
-		vim_snprintf((char *)buff, DIALOG_MSG_SIZE,
+		vim_snprintf((అక్షరం *)buff, DIALOG_సందేశం_కొలత,
 			NGETTEXT("%d more file to edit.  Quit anyway?",
 			    "%d more files to edit.  Quit anyway?", n), n);
-		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1) == VIM_YES)
-		    return OK;
-		return FAIL;
+		ఒకవేళ (vim_dialog_yesno(VIM_QUESTION, ఖాళీ, buff, 1) == VIM_YES)
+		    తిరిగి OK;
+		తిరిగి FAIL;
 	    }
-#endif
-	    semsg(NGETTEXT(e_nr_more_file_to_edit,
-			   e_nr_more_files_to_edit , n), n);
+#అయితే_ముగింపు
+	    semsg(NGETTEXT(e_nr_మరిన్ని_file_గమ్యం_edit,
+			   e_nr_మరిన్ని_files_గమ్యం_edit , n), n);
 	    quitmore = 2;	    // next try to quit is allowed
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of command names.
  */
     char_u *
-get_command_name(expand_T *xp UNUSED, int idx)
+get_command_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx >= (int)CMD_SIZE)
-	return expand_user_command_name(idx);
+    ఒకవేళ (idx >= (పూర్ణాంకం)CMD_కొలత)
+	తిరిగి expand_user_command_name(idx);
     // the following are no real commands
-    if (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
+    ఒకవేళ (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
 	STRNCMP(cmdnames[idx].cmd_name, "}", 1) == 0)
-	return (char_u *)"";
-    return cmdnames[idx].cmd_name;
+	తిరిగి (char_u *)"";
+    తిరిగి cmdnames[idx].cmd_name;
 }
 
-    static void
+    స్థిర శూన్య
 ex_colorscheme(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
     {
-#ifdef FEAT_EVAL
-	char_u *expr = vim_strsave((char_u *)"g:colors_name");
-	char_u *p = NULL;
+#నిర్వచితమైతే FEAT_EVAL
+	char_u *సమాసం = vim_strsave((char_u *)"g:colors_name");
+	char_u *p = ఖాళీ;
 
-	if (expr != NULL)
+	ఒకవేళ (సమాసం != ఖాళీ)
 	{
 	    ++emsg_off;
-	    p = eval_to_string(expr, FALSE, FALSE);
+	    p = eval_గమ్యం_string(సమాసం, FALSE, FALSE);
 	    --emsg_off;
-	    vim_free(expr);
+	    vim_free(సమాసం);
 	}
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    msg((char *)p);
+	    సందేశం((అక్షరం *)p);
 	    vim_free(p);
 	}
-	else
-	    msg("default");
-#else
-	msg(_("unknown"));
-#endif
+	లేకపోతే
+	    సందేశం("default");
+#లేకపోతే
+	సందేశం(_("unknown"));
+#అయితే_ముగింపు
     }
-    else if (load_colors(eap->arg) == FAIL)
-	semsg(_(e_cannot_find_color_scheme_str), eap->arg);
+    లేకపోతే ఒకవేళ (ఎక్కించు_colors(eap->arg) == FAIL)
+	semsg(_(e_cannot_కనుగొను_color_scheme_str), eap->arg);
 
-#ifdef FEAT_VTP
-    else if (has_vtp_working())
+#నిర్వచితమైతే FEAT_VTP
+    లేకపోతే ఒకవేళ (has_vtp_working())
     {
 	// background color change requires clear + redraw
 	update_screen(UPD_CLEAR);
 	redrawcmd();
     }
-#endif
+#అయితే_ముగింపు
 }
 
-    static void
+    స్థిర శూన్య
 ex_highlight(exarg_T *eap)
 {
-    if (*eap->arg == NUL && eap->cmd[2] == '!')
-	msg(_("Greetings, Vim user!"));
+    ఒకవేళ (*eap->arg == NUL && eap->cmd[2] == '!')
+	సందేశం(_("Greetings, Vim user!"));
     do_highlight(eap->arg, eap->forceit, FALSE);
 }
 
@@ -6276,38 +6276,38 @@ ex_highlight(exarg_T *eap)
  * Call this function if we thought we were going to exit, but we won't
  * (because of an error).  May need to restore the terminal mode.
  */
-    void
-not_exiting(int save_exiting)
+    శూన్య
+not_exiting(పూర్ణాంకం save_exiting)
 {
     exiting = save_exiting;
     settmode(TMODE_RAW);
 }
 
-    int
-before_quit_autocmds(win_T *wp, int quit_all, int forceit)
+    పూర్ణాంకం
+before_quit_autocmds(win_T *wp, పూర్ణాంకం quit_all, పూర్ణాంకం forceit)
 {
-    apply_autocmds(EVENT_QUITPRE, NULL, NULL, FALSE, wp->w_buffer);
+    apply_autocmds(EVENT_QUITPRE, ఖాళీ, ఖాళీ, FALSE, wp->w_బఫరు);
 
     // Bail out when autocommands closed the window.
     // Refuse to quit when the buffer in the last window is being closed (can
     // only happen in autocommands).
-    if (!win_valid(wp)
+    ఒకవేళ (!win_valid(wp)
 	    || curbuf_locked()
-	    || (wp->w_buffer->b_nwindows == 1 && wp->w_buffer->b_locked > 0))
-	return TRUE;
+	    || (wp->w_బఫరు->b_nwindows == 1 && wp->w_బఫరు->b_locked > 0))
+	తిరిగి TRUE;
 
-    if (quit_all || (check_more(FALSE, forceit) == OK && only_one_window()))
+    ఒకవేళ (quit_all || (check_మరిన్ని(FALSE, forceit) == OK && only_one_కిటికీ()))
     {
-	apply_autocmds(EVENT_EXITPRE, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_EXITPRE, ఖాళీ, ఖాళీ, FALSE, curbuf);
 	// Refuse to quit when locked or when the window was closed or the
 	// buffer in the last window is being closed (can only happen in
 	// autocommands).
-	if (!win_valid(wp) || curbuf_locked()
+	ఒకవేళ (!win_valid(wp) || curbuf_locked()
 			  || (curbuf->b_nwindows == 1 && curbuf->b_locked > 0))
-	    return TRUE;
+	    తిరిగి TRUE;
     }
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -6315,61 +6315,61 @@ before_quit_autocmds(win_T *wp, int quit_all, int forceit)
  * ":{nr}quit": quit window {nr}
  * Also used when closing a terminal window that's the last one.
  */
-    void
+    శూన్య
 ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    if (cmdwin_type != 0)
+    ఒకవేళ (cmdwin_type != 0)
     {
-	cmdwin_result = Ctrl_C;
-	return;
+	cmdwin_ఫలితం = Ctrl_C;
+	తిరిగి;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    ఒకవేళ (పాఠ్యం_locked())
     {
-	text_locked_msg();
-	return;
+	పాఠ్యం_locked_సందేశం();
+	తిరిగి;
     }
-    if (eap->addr_count > 0)
+    ఒకవేళ (eap->addr_లెక్క > 0)
     {
-	int	wnr = eap->line2;
+	పూర్ణాంకం	wnr = eap->line2;
 
-	for (wp = firstwin; wp->w_next != NULL; wp = wp->w_next)
-	    if (--wnr <= 0)
-		break;
+	కొరకు (wp = firstwin; wp->w_తదుపరి != ఖాళీ; wp = wp->w_తదుపరి)
+	    ఒకవేళ (--wnr <= 0)
+		ఆపు;
     }
-    else
+    లేకపోతే
 	wp = curwin;
 
     // Refuse to quit when locked.
-    if (curbuf_locked())
-	return;
+    ఒకవేళ (curbuf_locked())
+	తిరిగి;
 
     // Trigger QuitPre and maybe ExitPre
-    if (before_quit_autocmds(wp, FALSE, eap->forceit))
-	return;
+    ఒకవేళ (before_quit_autocmds(wp, FALSE, eap->forceit))
+	తిరిగి;
 
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
     netbeansForcedQuit = eap->forceit;
-#endif
+#అయితే_ముగింపు
 
-    int save_exiting = exiting;
+    పూర్ణాంకం save_exiting = exiting;
     /*
      * If there is only one relevant window we will exit.
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    ఒకవేళ (check_మరిన్ని(FALSE, eap->forceit) == OK && only_one_కిటికీ())
 	exiting = TRUE;
-    if ((!buf_hide(wp->w_buffer)
-		&& check_changed(wp->w_buffer, (p_awa ? CCGD_AW : 0)
+    ఒకవేళ ((!buf_hide(wp->w_బఫరు)
+		&& check_మారింది(wp->w_బఫరు, (p_awa ? CCGD_AW : 0)
 				       | (eap->forceit ? CCGD_FORCEIT : 0)
 				       | CCGD_EXCMD))
-	    || check_more(TRUE, eap->forceit) == FAIL
-	    || (only_one_window() && check_changed_any(eap->forceit, TRUE)))
+	    || check_మరిన్ని(TRUE, eap->forceit) == FAIL
+	    || (only_one_కిటికీ() && check_మారింది_any(eap->forceit, TRUE)))
     {
 	not_exiting(save_exiting);
     }
-    else
+    లేకపోతే
     {
 	// quit last window
 	// Note: only_one_window() returns true, even so a help window is
@@ -6377,67 +6377,67 @@ ex_quit(exarg_T *eap)
 	// specified. Example:
 	// :h|wincmd w|1q     - don't quit
 	// :h|wincmd w|q      - quit
-	if (only_one_window() && (ONE_WINDOW || eap->addr_count == 0))
+	ఒకవేళ (only_one_కిటికీ() && (ONE_కిటికీ || eap->addr_లెక్క == 0))
 	    getout(0);
 	not_exiting(save_exiting);
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 	// close window; may free buffer
-	win_close(wp, !buf_hide(wp->w_buffer) || eap->forceit);
+	win_close(wp, !buf_hide(wp->w_బఫరు) || eap->forceit);
     }
 }
 
 /*
  * ":cquit".
  */
-    static void
-ex_cquit(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_cquit(exarg_T *eap వాడని)
 {
     // this does not always pass on the exit code to the Manx compiler. why?
-    getout(eap->addr_count > 0 ? (int)eap->line2 : EXIT_FAILURE);
+    getout(eap->addr_లెక్క > 0 ? (పూర్ణాంకం)eap->line2 : EXIT_FAILURE);
 }
 
 /*
  * Do preparations for "qall" and "wqall".
  * Returns FAIL when quitting should be aborted.
  */
-    int
+    పూర్ణాంకం
 before_quit_all(exarg_T *eap)
 {
-    if (cmdwin_type != 0)
+    ఒకవేళ (cmdwin_type != 0)
     {
-	if (eap->forceit)
-	    cmdwin_result = K_XF1;	// ex_window() takes care of this
-	else
-	    cmdwin_result = K_XF2;
-	return FAIL;
+	ఒకవేళ (eap->forceit)
+	    cmdwin_ఫలితం = K_XF1;	// ex_window() takes care of this
+	లేకపోతే
+	    cmdwin_ఫలితం = K_XF2;
+	తిరిగి FAIL;
     }
 
     // Don't quit while editing the command line.
-    if (text_locked())
+    ఒకవేళ (పాఠ్యం_locked())
     {
-	text_locked_msg();
-	return FAIL;
+	పాఠ్యం_locked_సందేశం();
+	తిరిగి FAIL;
     }
 
-    if (before_quit_autocmds(curwin, TRUE, eap->forceit))
-	return FAIL;
+    ఒకవేళ (before_quit_autocmds(curwin, TRUE, eap->forceit))
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * ":qall": try to quit all windows
  */
-    static void
+    స్థిర శూన్య
 ex_quit_all(exarg_T *eap)
 {
-    if (before_quit_all(eap) == FAIL)
-	return;
-    int save_exiting = exiting;
+    ఒకవేళ (before_quit_all(eap) == FAIL)
+	తిరిగి;
+    పూర్ణాంకం save_exiting = exiting;
     exiting = TRUE;
-    if (eap->forceit || !check_changed_any(FALSE, FALSE))
+    ఒకవేళ (eap->forceit || !check_మారింది_any(FALSE, FALSE))
 	getout(0);
     not_exiting(save_exiting);
 }
@@ -6445,122 +6445,122 @@ ex_quit_all(exarg_T *eap)
 /*
  * ":close": close current window, unless it is the last one
  */
-    static void
+    స్థిర శూన్య
 ex_close(exarg_T *eap)
 {
     win_T	*win;
-    int		winnr = 0;
-    if (cmdwin_type != 0)
-	cmdwin_result = Ctrl_C;
-    else
-	if (!text_locked() && !curbuf_locked())
+    పూర్ణాంకం		winnr = 0;
+    ఒకవేళ (cmdwin_type != 0)
+	cmdwin_ఫలితం = Ctrl_C;
+    లేకపోతే
+	ఒకవేళ (!పాఠ్యం_locked() && !curbuf_locked())
 	{
-	    if (eap->addr_count == 0)
-		ex_win_close(eap->forceit, curwin, NULL);
-	    else
+	    ఒకవేళ (eap->addr_లెక్క == 0)
+		ex_win_close(eap->forceit, curwin, ఖాళీ);
+	    లేకపోతే
 	    {
 		FOR_ALL_WINDOWS(win)
 		{
 		    winnr++;
-		    if (winnr == eap->line2)
-			break;
+		    ఒకవేళ (winnr == eap->line2)
+			ఆపు;
 		}
-		if (win == NULL)
+		ఒకవేళ (win == ఖాళీ)
 		    win = lastwin;
-		ex_win_close(eap->forceit, win, NULL);
+		ex_win_close(eap->forceit, win, ఖాళీ);
 	    }
 	}
 }
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
 /*
  * ":pclose": Close any preview window.
  */
-    static void
+    స్థిర శూన్య
 ex_pclose(exarg_T *eap)
 {
     win_T	*win;
 
     // First close any normal window.
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw)
+	ఒకవేళ (win->w_p_pvw)
 	{
-	    ex_win_close(eap->forceit, win, NULL);
-	    return;
+	    ex_win_close(eap->forceit, win, ఖాళీ);
+	    తిరిగి;
 	}
 # ifdef FEAT_PROP_POPUP
     // Also when 'previewpopup' is empty, it might have been cleared.
     popup_close_preview();
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Close window "win" and take care of handling closing the last window for a
  * modified buffer.
  */
-    static void
+    స్థిర శూన్య
 ex_win_close(
-    int		forceit,
+    పూర్ణాంకం		forceit,
     win_T	*win,
     tabpage_T	*tp)		// NULL or the tab page "win" is in
 {
-    int		need_hide;
-    buf_T	*buf = win->w_buffer;
+    పూర్ణాంకం		need_hide;
+    buf_T	*buf = win->w_బఫరు;
 
     // Never close the autocommand window.
-    if (is_aucmd_win(win))
+    ఒకవేళ (is_aucmd_win(win))
     {
-	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return;
+	emsg(_(e_cannot_close_autocmd_or_popup_కిటికీ));
+	తిరిగి;
     }
-    if (window_layout_locked(CMD_close))
-	return;
+    ఒకవేళ (కిటికీ_layout_locked(CMD_close))
+	తిరిగి;
 
-    need_hide = (bufIsChanged(buf) && buf->b_nwindows <= 1);
-    if (need_hide && !buf_hide(buf) && !forceit)
+    need_hide = (buf_Is_మారింది(buf) && buf->b_nwindows <= 1);
+    ఒకవేళ (need_hide && !buf_hide(buf) && !forceit)
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	ఒకవేళ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    ఒకవేళ (పదం_పని_running(buf->b_పదం))
 	    {
-		if (term_confirm_stop(buf) == FAIL)
-		    return;
+		ఒకవేళ (పదం_confirm_stop(buf) == FAIL)
+		    తిరిగి;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(buf);
 		need_hide = FALSE;
 	    }
-	    else
+	    లేకపోతే
 # endif
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
-		dialog_changed(buf, FALSE);
-		if (bufref_valid(&bufref) && bufIsChanged(buf))
-		    return;
+		సమితి_bufref(&bufref, buf);
+		dialog_మారింది(buf, FALSE);
+		ఒకవేళ (bufref_valid(&bufref) && buf_Is_మారింది(buf))
+		    తిరిగి;
 		need_hide = FALSE;
 	    }
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
-	    no_write_message();
-	    return;
+	    no_write_సందేశం();
+	    తిరిగి;
 	}
     }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 
     // free buffer when not hiding it or when it's a scratch buffer
-    if (tp == NULL)
+    ఒకవేళ (tp == ఖాళీ)
 	win_close(win, !need_hide && !buf_hide(buf));
-    else
+    లేకపోతే
 	win_close_othertab(win, !need_hide && !buf_hide(buf), tp);
 }
 
@@ -6569,221 +6569,221 @@ ex_win_close(
  * Returns a tabpage number.
  * When an error is encountered then eap->errmsg is set.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_tabpage_arg(exarg_T *eap)
 {
-    int tab_number;
-    int unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
+    పూర్ణాంకం tab_సంఖ్య;
+    పూర్ణాంకం unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
 
-    if (eap->arg && *eap->arg != NUL)
+    ఒకవేళ (eap->arg && *eap->arg != NUL)
     {
 	char_u *p = eap->arg;
 	char_u *p_save;
-	int    relative = 0; // argument +N/-N means: go to N places to the
+	పూర్ణాంకం    relative = 0; // argument +N/-N means: go to N places to the
 			     // right/left relative to the current position.
 
-	if (*p == '-')
+	ఒకవేళ (*p == '-')
 	{
 	    relative = -1;
 	    p++;
 	}
-	else if (*p == '+')
+	లేకపోతే ఒకవేళ (*p == '+')
 	{
 	    relative = 1;
 	    p++;
 	}
 
 	p_save = p;
-	tab_number = getdigits(&p);
+	tab_సంఖ్య = getdigits(&p);
 
-	if (relative == 0)
+	ఒకవేళ (relative == 0)
 	{
-	    if (STRCMP(p, "$") == 0)
-		tab_number = LAST_TAB_NR;
-	    else if (STRCMP(p, "#") == 0)
-		if (valid_tabpage(lastused_tabpage))
-		    tab_number = tabpage_index(lastused_tabpage);
-		else
+	    ఒకవేళ (STRCMP(p, "$") == 0)
+		tab_సంఖ్య = చివరి_TAB_NR;
+	    లేకపోతే ఒకవేళ (STRCMP(p, "#") == 0)
+		ఒకవేళ (valid_tabpage(lastused_tabpage))
+		    tab_సంఖ్య = tabpage_సూచీ(lastused_tabpage);
+		లేకపోతే
 		{
-		    eap->errmsg = ex_errmsg(e_invalid_value_for_argument_str,
+		    eap->errmsg = ex_errmsg(e_invalid_విలువ_for_వాదం_str,
 								     eap->arg);
-		    tab_number = 0;
-		    goto theend;
+		    tab_సంఖ్య = 0;
+		    వెళ్ళు theend;
 		}
-	    else if (p == p_save || *p_save == '-' || *p != NUL
-		    || tab_number > LAST_TAB_NR)
+	    లేకపోతే ఒకవేళ (p == p_save || *p_save == '-' || *p != NUL
+		    || tab_సంఖ్య > చివరి_TAB_NR)
 	    {
 		// No numbers as argument.
-		eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		goto theend;
+		eap->errmsg = ex_errmsg(e_invalid_వాదం_str, eap->arg);
+		వెళ్ళు theend;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (*p_save == NUL)
-		tab_number = 1;
-	    else if (p == p_save || *p_save == '-' || *p != NUL
-		    || tab_number == 0)
+	    ఒకవేళ (*p_save == NUL)
+		tab_సంఖ్య = 1;
+	    లేకపోతే ఒకవేళ (p == p_save || *p_save == '-' || *p != NUL
+		    || tab_సంఖ్య == 0)
 	    {
 		// No numbers as argument.
-		eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		goto theend;
+		eap->errmsg = ex_errmsg(e_invalid_వాదం_str, eap->arg);
+		వెళ్ళు theend;
 	    }
-	    tab_number = tab_number * relative + tabpage_index(curtab);
-	    if (!unaccept_arg0 && relative == -1)
-		--tab_number;
+	    tab_సంఖ్య = tab_సంఖ్య * relative + tabpage_సూచీ(curtab);
+	    ఒకవేళ (!unaccept_arg0 && relative == -1)
+		--tab_సంఖ్య;
 	}
-	if (tab_number < unaccept_arg0 || tab_number > LAST_TAB_NR)
-	    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
+	ఒకవేళ (tab_సంఖ్య < unaccept_arg0 || tab_సంఖ్య > చివరి_TAB_NR)
+	    eap->errmsg = ex_errmsg(e_invalid_వాదం_str, eap->arg);
     }
-    else if (eap->addr_count > 0)
+    లేకపోతే ఒకవేళ (eap->addr_లెక్క > 0)
     {
-	if (unaccept_arg0 && eap->line2 == 0)
+	ఒకవేళ (unaccept_arg0 && eap->line2 == 0)
 	{
 	    eap->errmsg = _(e_invalid_range);
-	    tab_number = 0;
+	    tab_సంఖ్య = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    tab_number = eap->line2;
-	    if (!unaccept_arg0)
+	    tab_సంఖ్య = eap->line2;
+	    ఒకవేళ (!unaccept_arg0)
 	    {
 		char_u *cmdp = eap->cmd;
 
-		while (--cmdp > *eap->cmdlinep
+		అయితే (--cmdp > *eap->cmdlinep
 			&& (VIM_ISWHITE(*cmdp) || VIM_ISDIGIT(*cmdp)))
 		    ;
-		if (*cmdp == '-')
+		ఒకవేళ (*cmdp == '-')
 		{
-		    --tab_number;
-		    if (tab_number < unaccept_arg0)
+		    --tab_సంఖ్య;
+		    ఒకవేళ (tab_సంఖ్య < unaccept_arg0)
 			eap->errmsg = _(e_invalid_range);
 		}
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
-	switch (eap->cmdidx)
+	ఎంపిక (eap->cmdidx)
 	{
-	case CMD_tabnext:
-	    tab_number = tabpage_index(curtab) + 1;
-	    if (tab_number > LAST_TAB_NR)
-		tab_number = 1;
-	    break;
-	case CMD_tabmove:
-	    tab_number = LAST_TAB_NR;
-	    break;
-	default:
-	    tab_number = tabpage_index(curtab);
+	స్థితి CMD_tabnext:
+	    tab_సంఖ్య = tabpage_సూచీ(curtab) + 1;
+	    ఒకవేళ (tab_సంఖ్య > చివరి_TAB_NR)
+		tab_సంఖ్య = 1;
+	    ఆపు;
+	స్థితి CMD_tabmove:
+	    tab_సంఖ్య = చివరి_TAB_NR;
+	    ఆపు;
+	అప్రమేయ:
+	    tab_సంఖ్య = tabpage_సూచీ(curtab);
 	}
     }
 
 theend:
-    return tab_number;
+    తిరిగి tab_సంఖ్య;
 }
 
 /*
  * ":tabclose": close current tab page, unless it is the last one.
  * ":tabclose N": close tab page N.
  */
-    static void
+    స్థిర శూన్య
 ex_tabclose(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		tab_number;
+    పూర్ణాంకం		tab_సంఖ్య;
 
-    if (cmdwin_type != 0)
+    ఒకవేళ (cmdwin_type != 0)
     {
-	cmdwin_result = K_IGNORE;
-	return;
+	cmdwin_ఫలితం = K_IGNORE;
+	తిరిగి;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    ఒకవేళ (మొదటి_tabpage->tp_తదుపరి == ఖాళీ)
     {
-	emsg(_(e_cannot_close_last_tab_page));
-	return;
+	emsg(_(e_cannot_close_చివరి_tab_పుట));
+	తిరిగి;
     }
 
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    ఒకవేళ (కిటికీ_layout_locked(CMD_tabclose))
+	తిరిగి;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    tab_సంఖ్య = get_tabpage_arg(eap);
+    ఒకవేళ (eap->errmsg != ఖాళీ)
+	తిరిగి;
 
-    tp = find_tabpage(tab_number);
-    if (tp == NULL)
+    tp = కనుగొను_tabpage(tab_సంఖ్య);
+    ఒకవేళ (tp == ఖాళీ)
     {
 	beep_flush();
-	return;
+	తిరిగి;
     }
-    if (tp != curtab)
+    ఒకవేళ (tp != curtab)
     {
 	tabpage_close_other(tp, eap->forceit);
-	return;
+	తిరిగి;
     }
-    else if (!text_locked() && !curbuf_locked())
+    లేకపోతే ఒకవేళ (!పాఠ్యం_locked() && !curbuf_locked())
 	tabpage_close(eap->forceit);
 }
 
 /*
  * ":tabonly": close all tab pages except the current one
  */
-    static void
+    స్థిర శూన్య
 ex_tabonly(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		done;
-    int		tab_number;
+    పూర్ణాంకం		పూర్తి;
+    పూర్ణాంకం		tab_సంఖ్య;
 
-    if (cmdwin_type != 0)
+    ఒకవేళ (cmdwin_type != 0)
     {
-	cmdwin_result = K_IGNORE;
-	return;
+	cmdwin_ఫలితం = K_IGNORE;
+	తిరిగి;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    ఒకవేళ (మొదటి_tabpage->tp_తదుపరి == ఖాళీ)
     {
-	msg(_("Already only one tab page"));
-	return;
+	సందేశం(_("Already only one tab page"));
+	తిరిగి;
     }
 
-    if (window_layout_locked(CMD_tabonly))
-	return;
+    ఒకవేళ (కిటికీ_layout_locked(CMD_tabonly))
+	తిరిగి;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    tab_సంఖ్య = get_tabpage_arg(eap);
+    ఒకవేళ (eap->errmsg != ఖాళీ)
+	తిరిగి;
 
-    goto_tabpage(tab_number);
+    goto_tabpage(tab_సంఖ్య);
     // Repeat this up to a 1000 times, because autocommands may
     // mess up the lists.
-    for (done = 0; done < 1000; ++done)
+    కొరకు (పూర్తి = 0; పూర్తి < 1000; ++పూర్తి)
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_topframe != topframe)
+	    ఒకవేళ (tp->tp_topframe != topframe)
 	    {
 		tabpage_close_other(tp, eap->forceit);
 		// if we failed to close it quit
-		if (valid_tabpage(tp))
-		    done = 1000;
+		ఒకవేళ (valid_tabpage(tp))
+		    పూర్తి = 1000;
 		// start over, "tp" is now invalid
-		break;
+		ఆపు;
 	    }
-	if (first_tabpage->tp_next == NULL)
-	    break;
+	ఒకవేళ (మొదటి_tabpage->tp_తదుపరి == ఖాళీ)
+	    ఆపు;
     }
 }
 
 /*
  * Close the current tab page.
  */
-    void
-tabpage_close(int forceit)
+    శూన్య
+tabpage_close(పూర్ణాంకం forceit)
 {
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    ఒకవేళ (కిటికీ_layout_locked(CMD_tabclose))
+	తిరిగి;
 
     trigger_tabclosedpre(curtab);
     curtab->tp_did_tabclosedpre = TRUE;
@@ -6791,17 +6791,17 @@ tabpage_close(int forceit)
 
     // First close all the windows but the current one.  If that worked then
     // close the last window in this tab, that will close it.
-    if (!ONE_WINDOW)
+    ఒకవేళ (!ONE_కిటికీ)
 	close_others(TRUE, forceit);
-    if (ONE_WINDOW)
-	ex_win_close(forceit, curwin, NULL);
-    if (curtab == save_curtab)
+    ఒకవేళ (ONE_కిటికీ)
+	ex_win_close(forceit, curwin, ఖాళీ);
+    ఒకవేళ (curtab == save_curtab)
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	curtab->tp_did_tabclosedpre = FALSE;
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -6810,99 +6810,99 @@ tabpage_close(int forceit)
  * Also takes care of the tab pages line disappearing when closing the
  * last-but-one tab page.
  */
-    void
-tabpage_close_other(tabpage_T *tp, int forceit)
+    శూన్య
+tabpage_close_other(tabpage_T *tp, పూర్ణాంకం forceit)
 {
-    int		done = 0;
+    పూర్ణాంకం		పూర్తి = 0;
     win_T	*wp;
 
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    ఒకవేళ (కిటికీ_layout_locked(CMD_కొలత))
+	తిరిగి;
 
     trigger_tabclosedpre(tp);
     tp->tp_did_tabclosedpre = TRUE;
 
     // Limit to 1000 windows, autocommands may add a window while we close
     // one.  OK, so I'm paranoid...
-    while (++done < 1000)
+    అయితే (++పూర్తి < 1000)
     {
 	wp = tp->tp_firstwin;
 	ex_win_close(forceit, wp, tp);
 
 	// Autocommands may delete the tab page under our fingers.
-	if (!valid_tabpage(tp))
-	    break;
+	ఒకవేళ (!valid_tabpage(tp))
+	    ఆపు;
 	// We may fail to close a window with a modified buffer.
-	if (tp->tp_firstwin == wp)
+	ఒకవేళ (tp->tp_firstwin == wp)
 	{
-	    done = 1000;
-	    break;
+	    పూర్తి = 1000;
+	    ఆపు;
 	}
     }
-    if (done >= 1000)
+    ఒకవేళ (పూర్తి >= 1000)
     {
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	tp->tp_did_tabclosedpre = FALSE;
-	return;
+	తిరిగి;
     }
 
-    apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_TABCLOSED, ఖాళీ, ఖాళీ, FALSE, curbuf);
 }
 
 /*
  * ":only".
  */
-    static void
+    స్థిర శూన్య
 ex_only(exarg_T *eap)
 {
-    if (window_layout_locked(CMD_only))
-	return;
-#ifdef FEAT_GUI
+    ఒకవేళ (కిటికీ_layout_locked(CMD_only))
+	తిరిగి;
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    if (eap->addr_count > 0)
+#అయితే_ముగింపు
+    ఒకవేళ (eap->addr_లెక్క > 0)
     {
 	win_T   *wp;
-	int	wnr = eap->line2;
-	for (wp = firstwin; --wnr > 0; )
+	పూర్ణాంకం	wnr = eap->line2;
+	కొరకు (wp = firstwin; --wnr > 0; )
 	{
-	    if (wp->w_next == NULL)
-		break;
-	    else
-		wp = wp->w_next;
+	    ఒకవేళ (wp->w_తదుపరి == ఖాళీ)
+		ఆపు;
+	    లేకపోతే
+		wp = wp->w_తదుపరి;
 	}
 	win_goto(wp);
     }
     close_others(TRUE, eap->forceit);
 }
 
-    static void
-ex_hide(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_hide(exarg_T *eap వాడని)
 {
     // ":hide" or ":hide | cmd": hide current window
-    if (eap->skip)
-	return;
+    ఒకవేళ (eap->skip)
+	తిరిగి;
 
-    if (window_layout_locked(CMD_hide))
-	return;
-#ifdef FEAT_GUI
+    ఒకవేళ (కిటికీ_layout_locked(CMD_hide))
+	తిరిగి;
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    if (eap->addr_count == 0)
+#అయితే_ముగింపు
+    ఒకవేళ (eap->addr_లెక్క == 0)
 	win_close(curwin, FALSE);	// don't free buffer
-    else
+    లేకపోతే
     {
-	int	winnr = 0;
+	పూర్ణాంకం	winnr = 0;
 	win_T	*win;
 
 	FOR_ALL_WINDOWS(win)
 	{
 	    winnr++;
-	    if (winnr == eap->line2)
-		break;
+	    ఒకవేళ (winnr == eap->line2)
+		ఆపు;
 	}
-	if (win == NULL)
+	ఒకవేళ (win == ఖాళీ)
 	    win = lastwin;
 	win_close(win, FALSE);
     }
@@ -6911,105 +6911,105 @@ ex_hide(exarg_T *eap UNUSED)
 /*
  * ":stop" and ":suspend": Suspend Vim.
  */
-    void
+    శూన్య
 ex_stop(exarg_T *eap)
 {
     /*
      * Disallow suspending for "rvim".
      */
-    if (check_restricted())
-	return;
+    ఒకవేళ (check_restricted())
+	తిరిగి;
 
-    if (!eap->forceit)
+    ఒకవేళ (!eap->forceit)
 	autowrite_all();
-    apply_autocmds(EVENT_VIMSUSPEND, NULL, NULL, FALSE, NULL);
-    windgoto((int)Rows - 1, cmdline_col_off);
-    out_char('\n');
-    out_flush();
+    apply_autocmds(EVENT_VIMSUSPEND, ఖాళీ, ఖాళీ, FALSE, ఖాళీ);
+    windgoto((పూర్ణాంకం)అడ్డువరుసలు - 1, cmdline_నిలువు_off);
+    బహిర్గతం_char('\n');
+    బహిర్గతం_flush();
     stoptermcap();
-    out_flush();		// needed for SUN to restore xterm buffer
+    బహిర్గతం_flush();		// needed for SUN to restore xterm buffer
     mch_restore_title(SAVE_RESTORE_BOTH);	// restore window titles
     ui_suspend();		// call machine specific function
     maketitle();
     resettitle();		// force updating the title
     starttermcap();
-    scroll_start();		// scroll screen before redrawing
+    scroll_ప్రారంభం();		// scroll screen before redrawing
     redraw_later_clear();
     shell_resized();	// may have resized window
-    apply_autocmds(EVENT_VIMRESUME, NULL, NULL, FALSE, NULL);
+    apply_autocmds(EVENT_VIMRESUME, ఖాళీ, ఖాళీ, FALSE, ఖాళీ);
 }
 
 /*
  * ":exit", ":xit" and ":wq": Write file and quit the current window.
  */
-    static void
+    స్థిర శూన్య
 ex_exit(exarg_T *eap)
 {
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    if (cmdwin_type != 0)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (not_లోపల_vim9(eap, false) == FAIL)
+	తిరిగి;
+#అయితే_ముగింపు
+    ఒకవేళ (cmdwin_type != 0)
     {
-	cmdwin_result = Ctrl_C;
-	return;
+	cmdwin_ఫలితం = Ctrl_C;
+	తిరిగి;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    ఒకవేళ (పాఠ్యం_locked())
     {
-	text_locked_msg();
-	return;
+	పాఠ్యం_locked_సందేశం();
+	తిరిగి;
     }
 
-    int save_exiting = exiting;
+    పూర్ణాంకం save_exiting = exiting;
     /*
      * we plan to exit if there is only one relevant window
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    ఒకవేళ (check_మరిన్ని(FALSE, eap->forceit) == OK && only_one_కిటికీ())
 	exiting = TRUE;
 
     // Write the buffer for ":wq" or when it was changed.
     // Trigger QuitPre and ExitPre.
     // Check if we can exit now, after autocommands have changed things.
-    if (((eap->cmdidx == CMD_wq || curbufIsChanged()) && do_write(eap) == FAIL)
+    ఒకవేళ (((eap->cmdidx == CMD_wq || curbuf_Is_మారింది()) && do_write(eap) == FAIL)
 	    || before_quit_autocmds(curwin, FALSE, eap->forceit)
-	    || check_more(TRUE, eap->forceit) == FAIL
-	    || (only_one_window() && check_changed_any(eap->forceit, FALSE)))
+	    || check_మరిన్ని(TRUE, eap->forceit) == FAIL
+	    || (only_one_కిటికీ() && check_మారింది_any(eap->forceit, FALSE)))
     {
 	not_exiting(save_exiting);
     }
-    else
+    లేకపోతే
     {
-	if (only_one_window())	    // quit last window, exit Vim
+	ఒకవేళ (only_one_కిటికీ())	    // quit last window, exit Vim
 	    getout(0);
 	not_exiting(save_exiting);
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 	// Quit current window, may free the buffer.
-	win_close(curwin, !buf_hide(curwin->w_buffer));
+	win_close(curwin, !buf_hide(curwin->w_బఫరు));
     }
 }
 
 /*
  * ":print", ":list", ":number".
  */
-    static void
+    స్థిర శూన్య
 ex_print(exarg_T *eap)
 {
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-	emsg(_(e_empty_buffer));
-    else
+    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
+	emsg(_(e_ఖాళీలు_బఫరు));
+    లేకపోతే
     {
-	for ( ;!got_int; ui_breakcheck())
+	కొరకు ( ;!got_int; ui_breakcheck())
 	{
-	    print_line(eap->line1,
-		    (eap->cmdidx == CMD_number || eap->cmdidx == CMD_pound
+	    print_పంక్తి(eap->line1,
+		    (eap->cmdidx == CMD_సంఖ్య || eap->cmdidx == CMD_pound
 						 || (eap->flags & EXFLAG_NR)),
 		    eap->cmdidx == CMD_list || (eap->flags & EXFLAG_LIST));
-	    if (++eap->line1 > eap->line2)
-		break;
-	    out_flush();	    // show one line at a time
+	    ఒకవేళ (++eap->line1 > eap->line2)
+		ఆపు;
+	    బహిర్గతం_flush();	    // show one line at a time
 	}
 	setpcmark();
 	// put cursor at last line
@@ -7020,37 +7020,37 @@ ex_print(exarg_T *eap)
     ex_no_reprint = TRUE;
 }
 
-#ifdef FEAT_BYTEOFF
-    static void
+#నిర్వచితమైతే FEAT_BYTEOFF
+    స్థిర శూన్య
 ex_goto(exarg_T *eap)
 {
     goto_byte(eap->line2);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":shell".
  */
-    static void
-ex_shell(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_shell(exarg_T *eap వాడని)
 {
-    do_shell(NULL, 0);
+    do_shell(ఖాళీ, 0);
 }
 
-#if defined(HAVE_DROP_FILE)
+#ఒకవేళ defined(HAVE_DROP_FILE)
 
-static int drop_busy = FALSE;
-static int drop_filec;
-static char_u **drop_filev = NULL;
-static int drop_split;
-static void (*drop_callback)(void *);
-static void *drop_cookie;
+స్థిర పూర్ణాంకం drop_busy = FALSE;
+స్థిర పూర్ణాంకం drop_filec;
+స్థిర char_u **drop_filev = ఖాళీ;
+స్థిర పూర్ణాంకం drop_విభజించు;
+స్థిర శూన్య (*drop_callback)(శూన్య *);
+స్థిర శూన్య *drop_cookie;
 
-    static void
-handle_drop_internal(void)
+    స్థిర శూన్య
+handle_drop_అంతర్గత(శూన్య)
 {
     exarg_T	ea;
-    int		save_msg_scroll = msg_scroll;
+    పూర్ణాంకం		save_సందేశం_scroll = సందేశం_scroll;
 
     // Setting the argument list may cause screen updates and being called
     // recursively.  Avoid that by setting drop_busy.
@@ -7060,16 +7060,16 @@ handle_drop_internal(void)
     // to split the current window or data could be lost.
     // We don't need to check if the 'hidden' option is set, as in this
     // case the buffer won't be lost.
-    if (!buf_hide(curbuf) && !drop_split)
+    ఒకవేళ (!buf_hide(curbuf) && !drop_విభజించు)
     {
 	++emsg_off;
-	drop_split = check_changed(curbuf, CCGD_AW);
+	drop_విభజించు = check_మారింది(curbuf, CCGD_AW);
 	--emsg_off;
     }
-    if (drop_split)
+    ఒకవేళ (drop_విభజించు)
     {
-	if (win_split(0, 0) == FAIL)
-	    return;
+	ఒకవేళ (win_విభజించు(0, 0) == FAIL)
+	    తిరిగి;
 	RESET_BINDING(curwin);
 
 	// When splitting the window, create a new alist.  Otherwise the
@@ -7081,29 +7081,29 @@ handle_drop_internal(void)
     /*
      * Set up the new argument list.
      */
-    alist_set(ALIST(curwin), drop_filec, drop_filev, FALSE, NULL, 0);
+    alist_సమితి(ALIST(curwin), drop_filec, drop_filev, FALSE, ఖాళీ, 0);
 
     /*
      * Move to the first file.
      */
     // Fake up a minimal "next" command for do_argfile()
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
     ea.cmd = (char_u *)"next";
     do_argfile(&ea, 0);
 
     // do_ecmd() may set need_start_insertmode, but since we never left Insert
     // mode that is not needed here.
-    need_start_insertmode = FALSE;
+    need_ప్రారంభం_insertmode = FALSE;
 
     // Restore msg_scroll, otherwise a following command may cause scrolling
     // unexpectedly.  The screen will be redrawn by the caller, thus
     // msg_scroll being set by displaying a message is irrelevant.
-    msg_scroll = save_msg_scroll;
+    సందేశం_scroll = save_సందేశం_scroll;
 
-    if (drop_callback != NULL)
+    ఒకవేళ (drop_callback != ఖాళీ)
 	drop_callback(drop_cookie);
 
-    drop_filev = NULL;
+    drop_filev = ఖాళీ;
     drop_busy = FALSE;
 }
 
@@ -7118,26 +7118,26 @@ handle_drop_internal(void)
  * in the list. This function takes over responsibility for freeing the "filev"
  * list.
  */
-    void
+    శూన్య
 handle_drop(
-    int		filec,		// the number of files dropped
+    పూర్ణాంకం		filec,		// the number of files dropped
     char_u	**filev,	// the list of files dropped
-    int		split,		// force splitting the window
-    void	(*callback)(void *), // to be called after setting the argument
+    పూర్ణాంకం		విభజించు,		// force splitting the window
+    శూన్య	(*callback)(శూన్య *), // to be called after setting the argument
 				     // list
-    void	*cookie)	// argument for "callback" (allocated)
+    శూన్య	*cookie)	// argument for "callback" (allocated)
 {
     // Cannot handle recursive drops, finish the pending one.
-    if (drop_busy)
+    ఒకవేళ (drop_busy)
     {
 	FreeWild(filec, filev);
 	vim_free(cookie);
-	return;
+	తిరిగి;
     }
 
     // When calling handle_drop() more than once in a row we only use the last
     // one.
-    if (drop_filev != NULL)
+    ఒకవేళ (drop_filev != ఖాళీ)
     {
 	FreeWild(drop_filec, drop_filev);
 	vim_free(drop_cookie);
@@ -7145,7 +7145,7 @@ handle_drop(
 
     drop_filec = filec;
     drop_filev = filev;
-    drop_split = split;
+    drop_విభజించు = విభజించు;
     drop_callback = callback;
     drop_cookie = cookie;
 
@@ -7155,30 +7155,30 @@ handle_drop(
     // - updating the screen
     // As it may change buffers and window structures that are in use and cause
     // freed memory to be used.
-    if (text_locked() || curbuf_locked() || updating_screen)
-	return;
+    ఒకవేళ (పాఠ్యం_locked() || curbuf_locked() || updating_screen)
+	తిరిగి;
 
-    handle_drop_internal();
+    handle_drop_అంతర్గత();
 }
 
 /*
  * To be called when text is unlocked, curbuf is unlocked or updating_screen is
  * reset: Handle a postponed drop.
  */
-    void
-handle_any_postponed_drop(void)
+    శూన్య
+handle_any_postponed_drop(శూన్య)
 {
-    if (!drop_busy && drop_filev != NULL
-	     && !text_locked() && !curbuf_locked() && !updating_screen)
-	handle_drop_internal();
+    ఒకవేళ (!drop_busy && drop_filev != ఖాళీ
+	     && !పాఠ్యం_locked() && !curbuf_locked() && !updating_screen)
+	handle_drop_అంతర్గత();
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":preserve".
  */
-    static void
-ex_preserve(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_preserve(exarg_T *eap వాడని)
 {
     curbuf->b_flags |= BF_PRESERVED;
     ml_preserve(curbuf, TRUE);
@@ -7187,18 +7187,18 @@ ex_preserve(exarg_T *eap UNUSED)
 /*
  * ":recover".
  */
-    static void
+    స్థిర శూన్య
 ex_recover(exarg_T *eap)
 {
     // Set recoverymode right away to avoid the ATTENTION prompt.
     recoverymode = TRUE;
-    if (!check_changed(curbuf, (p_awa ? CCGD_AW : 0)
+    ఒకవేళ (!check_మారింది(curbuf, (p_awa ? CCGD_AW : 0)
 			     | CCGD_MULTWIN
 			     | (eap->forceit ? CCGD_FORCEIT : 0)
 			     | CCGD_EXCMD)
 
 	    && (*eap->arg == NUL
-			     || setfname(curbuf, eap->arg, NULL, TRUE) == OK))
+			     || setfname(curbuf, eap->arg, ఖాళీ, TRUE) == OK))
 	ml_recover(TRUE);
     recoverymode = FALSE;
 }
@@ -7207,41 +7207,41 @@ ex_recover(exarg_T *eap)
  * Command modifier used in a wrong way.  Also for other commands that can't
  * appear at the toplevel.
  */
-    static void
+    స్థిర శూన్య
 ex_wrongmodifier(exarg_T *eap)
 {
     eap->errmsg = ex_errmsg(e_invalid_command_str, eap->cmd);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 // callback function for 'findfunc'
-static callback_T ffu_cb;
+స్థిర callback_T ffu_cb;
 
-    static callback_T *
-get_findfunc_callback(void)
+    స్థిర callback_T *
+get_findfunc_callback(శూన్య)
 {
-    return *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
+    తిరిగి *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
 }
 
 /*
  * Call 'findfunc' to obtain a list of file names.
  */
-    static list_T *
-call_findfunc(char_u *pat, int cmdcomplete)
+    స్థిర list_T *
+call_findfunc(char_u *pat, పూర్ణాంకం cmdcomplete)
 {
-    typval_T	args[3];
+    typval_T	వాదనలు[3];
     callback_T	*cb;
     typval_T	rettv;
-    int		retval;
+    పూర్ణాంకం		retval;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
-    args[0].v_type = VAR_STRING;
-    args[0].vval.v_string = pat;
-    args[1].v_type = VAR_BOOL;
-    args[1].vval.v_number = cmdcomplete;
-    args[2].v_type = VAR_UNKNOWN;
+    వాదనలు[0].v_type = VAR_STRING;
+    వాదనలు[0].vval.v_string = pat;
+    వాదనలు[1].v_type = VAR_BOOL;
+    వాదనలు[1].vval.v_సంఖ్య = cmdcomplete;
+    వాదనలు[2].v_type = VAR_UNKNOWN;
 
     // Lock the text to prevent weird things from happening.  Also disallow
     // switching to another window, it should not be needed and may end up in
@@ -7249,29 +7249,29 @@ call_findfunc(char_u *pat, int cmdcomplete)
     ++textlock;
 
     ctx = get_option_sctx("findfunc");
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	current_sctx = *ctx;
 
     cb = get_findfunc_callback();
-    retval = call_callback(cb, -1, &rettv, 2, args);
+    retval = call_callback(cb, -1, &rettv, 2, వాదనలు);
 
     current_sctx = saved_sctx;
 
     --textlock;
 
-    list_T *retlist = NULL;
+    list_T *retlist = ఖాళీ;
 
-    if (retval == OK)
+    ఒకవేళ (retval == OK)
     {
-	if (rettv.v_type == VAR_LIST)
+	ఒకవేళ (rettv.v_type == VAR_LIST)
 	    retlist = list_copy(rettv.vval.v_list, FALSE, FALSE, get_copyID());
-	else
+	లేకపోతే
 	    emsg(_(e_invalid_return_type_from_findfunc));
 
 	clear_tv(&rettv);
     }
 
-    return retlist;
+    తిరిగి retlist;
 }
 
 /*
@@ -7279,121 +7279,121 @@ call_findfunc(char_u *pat, int cmdcomplete)
  * Used for expanding the :find, :sfind and :tabfind command argument.
  * Returns OK on success and FAIL otherwise.
  */
-    int
-expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, int *numMatches)
+    పూర్ణాంకం
+expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, పూర్ణాంకం *అంకె_Matches)
 {
     list_T	*l;
-    int		len;
+    పూర్ణాంకం		len;
 
-    *numMatches = 0;
-    *files = NULL;
+    *అంకె_Matches = 0;
+    *files = ఖాళీ;
 
     l = call_findfunc(pat, VVAL_TRUE);
 
-    if (l == NULL)
-	return FAIL;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి FAIL;
 
     len = list_len(l);
-    if (len == 0)	    // empty List
+    ఒకవేళ (len == 0)	    // empty List
     {
 	list_free(l);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    expand_process_user_list(l, files, numMatches, xp);
+    expand_process_user_list(l, files, అంకె_Matches, xp);
     list_free(l);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Use 'findfunc' to find file 'findarg'.  The 'count' argument is used to find
  * the n'th matching file.
  */
-    static char_u *
-findfunc_find_file(char_u *findarg, int findarg_len, int count)
+    స్థిర char_u *
+findfunc_కనుగొను_file(char_u *findarg, పూర్ణాంకం findarg_len, పూర్ణాంకం లెక్క)
 {
     list_T	*fname_list;
-    char_u	*ret_fname = NULL;
+    char_u	*ret_fname = ఖాళీ;
     char_u	cc;
-    int		fname_count;
+    పూర్ణాంకం		fname_లెక్క;
 
     cc = findarg[findarg_len];
     findarg[findarg_len] = NUL;
 
     fname_list = call_findfunc(findarg, VVAL_FALSE);
-    fname_count = list_len(fname_list);
+    fname_లెక్క = list_len(fname_list);
 
-    if (fname_count == 0)
-	semsg(_(e_cant_find_file_str_in_path), findarg);
-    else
+    ఒకవేళ (fname_లెక్క == 0)
+	semsg(_(e_cant_కనుగొను_file_str_లోపల_మార్గం), findarg);
+    లేకపోతే
     {
-	if (count > fname_count)
-	    semsg(_(e_no_more_file_str_found_in_path), findarg);
-	else
+	ఒకవేళ (లెక్క > fname_లెక్క)
+	    semsg(_(e_no_మరిన్ని_file_str_దొరికింది_లోపల_మార్గం), findarg);
+	లేకపోతే
 	{
-	    listitem_T *li = list_find(fname_list, count - 1);
+	    listitem_T *li = list_కనుగొను(fname_list, లెక్క - 1);
 
-	    if (li != NULL)
+	    ఒకవేళ (li != ఖాళీ)
 	    {
 		typval_T *tv = &li->li_tv;
 
-		if (tv->v_type == VAR_STRING && tv->vval.v_string != NULL)
+		ఒకవేళ (tv->v_type == VAR_STRING && tv->vval.v_string != ఖాళీ)
 		    ret_fname = vim_strsave(tv->vval.v_string);
-		else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+		లేకపోతే ఒకవేళ (tv->v_type == VAR_DICT && tv->vval.v_dict != ఖాళీ)
 		    ret_fname = dict_get_string(tv->vval.v_dict, "word", TRUE);
 	    }
 	}
     }
 
-    if (fname_list != NULL)
+    ఒకవేళ (fname_list != ఖాళీ)
 	list_free(fname_list);
 
     findarg[findarg_len] = cc;
 
-    return ret_fname;
+    తిరిగి ret_fname;
 }
 
 /*
  * Process the 'findfunc' option value.
  * Returns NULL on success and an error message on failure.
  */
-    char *
-did_set_findfunc(optset_T *args UNUSED)
+    అక్షరం *
+did_సమితి_findfunc(optset_T *వాదనలు వాడని)
 {
-    int	retval;
+    పూర్ణాంకం	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    ఒకవేళ (వాదనలు->os_flags & OPT_LOCAL)
 	// buffer-local option set
-	retval = option_set_callback_func(curbuf->b_p_ffu, &curbuf->b_ffu_cb);
-    else
+	retval = option_సమితి_callback_func(curbuf->b_p_ffu, &curbuf->b_ffu_cb);
+    లేకపోతే
     {
 	// global option set
-	retval = option_set_callback_func(p_ffu, &ffu_cb);
+	retval = option_సమితి_callback_func(p_ffu, &ffu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	ఒకవేళ (!(వాదనలు->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_ffu_cb);
     }
 
-    if (retval == FAIL)
-	return e_invalid_argument;
+    ఒకవేళ (retval == FAIL)
+	తిరిగి e_invalid_వాదం;
 
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)వాదనలు->os_varp;
     char_u	*name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    ఒకవేళ (name != ఖాళీ)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-# if defined(EXITFREE)
-    void
-free_findfunc_option(void)
+# ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_findfunc_option(శూన్య)
 {
     free_callback(&ffu_cb);
 }
@@ -7403,14 +7403,14 @@ free_findfunc_option(void)
  * Mark the global 'findfunc' callback with "copyID" so that it is not
  * garbage collected.
  */
-    int
-set_ref_in_findfunc(int copyID UNUSED)
+    పూర్ణాంకం
+సమితి_ref_లోపల_findfunc(పూర్ణాంకం copyID వాడని)
 {
-    int abort = FALSE;
-    abort = set_ref_in_callback(&ffu_cb, copyID);
-    return abort;
+    పూర్ణాంకం abort = FALSE;
+    abort = సమితి_ref_లోపల_callback(&ffu_cb, copyID);
+    తిరిగి abort;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * :sview [+command] file	split window with new file, read-only
@@ -7425,126 +7425,126 @@ set_ref_in_findfunc(int copyID UNUSED)
  * :tabnew [[+command] file]	just like :tabedit
  * :tabfind [+command] file	open new Tab page and find "file"
  */
-    void
+    శూన్య
 ex_splitview(exarg_T *eap)
 {
     win_T	*old_curwin = curwin;
-    char_u	*fname = NULL;
-#ifdef FEAT_BROWSE
-    char_u	dot_path[] = ".";
-    int		save_cmod_flags = cmdmod.cmod_flags;
-#endif
-    int		use_tab = eap->cmdidx == CMD_tabedit
+    char_u	*fname = ఖాళీ;
+#నిర్వచితమైతే FEAT_BROWSE
+    char_u	dot_మార్గం[] = ".";
+    పూర్ణాంకం		save_cmod_flags = cmdmod.cmod_flags;
+#అయితే_ముగింపు
+    పూర్ణాంకం		use_tab = eap->cmdidx == CMD_tabedit
 		       || eap->cmdidx == CMD_tabfind
 		       || eap->cmdidx == CMD_tabnew;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
     // A ":split" in the quickfix window works like ":new".  Don't want two
     // quickfix windows.  But it's OK when doing ":tab split".
-    if (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
+    ఒకవేళ (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
     {
-	if (eap->cmdidx == CMD_split)
+	ఒకవేళ (eap->cmdidx == CMD_విభజించు)
 	    eap->cmdidx = CMD_new;
-	if (eap->cmdidx == CMD_vsplit)
+	ఒకవేళ (eap->cmdidx == CMD_vsplit)
 	    eap->cmdidx = CMD_vnew;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
+    ఒకవేళ (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_గమ్యం_కనుగొను = ఖాళీ;
+	అక్షరం	*శోధన_ctx = ఖాళీ;
 
-	if (*get_findfunc() != NUL)
+	ఒకవేళ (*get_findfunc() != NUL)
 	{
-#ifdef FEAT_EVAL
-	    fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
-				       eap->addr_count > 0 ? eap->line2 : 1);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	    fname = findfunc_కనుగొను_file(eap->arg, (పూర్ణాంకం)STRLEN(eap->arg),
+				       eap->addr_లెక్క > 0 ? eap->line2 : 1);
+#అయితే_ముగింపు
 	}
-	else
+	లేకపోతే
 	{
-	    fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg),
+	    fname = కనుగొను_file_లోపల_మార్గం(eap->arg, (పూర్ణాంకం)STRLEN(eap->arg),
 					      FNAME_MESS, TRUE, curbuf->b_ffname,
-					      &file_to_find, &search_ctx);
-	    vim_free(file_to_find);
-	    vim_findfile_cleanup(search_ctx);
+					      &file_గమ్యం_కనుగొను, &శోధన_ctx);
+	    vim_free(file_గమ్యం_కనుగొను);
+	    vim_findfile_cleanup(శోధన_ctx);
 	}
-	if (fname == NULL)
-	    goto theend;
+	ఒకవేళ (fname == ఖాళీ)
+	    వెళ్ళు theend;
 	eap->arg = fname;
     }
-#ifdef FEAT_BROWSE
-    else if ((cmdmod.cmod_flags & CMOD_BROWSE)
+#నిర్వచితమైతే FEAT_BROWSE
+    లేకపోతే ఒకవేళ ((cmdmod.cmod_flags & CMOD_BROWSE)
 	    && eap->cmdidx != CMD_vnew
 	    && eap->cmdidx != CMD_new)
     {
-	if (
+	ఒకవేళ (
 # ifdef FEAT_GUI
-	    !gui.in_use &&
+	    !gui.లోపల_use &&
 # endif
-		au_has_group((char_u *)"FileExplorer"))
+		au_has_సమూహం((char_u *)"FileExplorer"))
 	{
 	    // No browsing supported but we do have the file explorer:
 	    // Edit the directory.
-	    if (*eap->arg == NUL || !mch_isdir(eap->arg))
-		eap->arg = dot_path;
+	    ఒకవేళ (*eap->arg == NUL || !mch_isdir(eap->arg))
+		eap->arg = dot_మార్గం;
 	}
-	else
+	లేకపోతే
 	{
 	    fname = do_browse(0, (char_u *)(use_tab
 			? _("Edit File in new tab page")
 			: _("Edit File in new window")),
-					  eap->arg, NULL, NULL, NULL, curbuf);
-	    if (fname == NULL)
-		goto theend;
+					  eap->arg, ఖాళీ, ఖాళీ, ఖాళీ, curbuf);
+	    ఒకవేళ (fname == ఖాళీ)
+		వెళ్ళు theend;
 	    eap->arg = fname;
 	}
     }
     cmdmod.cmod_flags &= ~CMOD_BROWSE;	// Don't browse again in do_ecmd().
-#endif
+#అయితే_ముగింపు
 
     /*
      * Either open new tab page or split the window.
      */
-    if (use_tab)
+    ఒకవేళ (use_tab)
     {
-	if (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
-			 : eap->addr_count == 0 ? 0
-					       : (int)eap->line2 + 1) != FAIL)
+	ఒకవేళ (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
+			 : eap->addr_లెక్క == 0 ? 0
+					       : (పూర్ణాంకం)eap->line2 + 1) != FAIL)
 	{
 	    do_exedit(eap, old_curwin);
 
 	    // set the alternate buffer for the window we came from
-	    if (curwin != old_curwin
+	    ఒకవేళ (curwin != old_curwin
 		    && win_valid(old_curwin)
-		    && old_curwin->w_buffer != curbuf
+		    && old_curwin->w_బఫరు != curbuf
 		    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		old_curwin->w_alt_fnum = curbuf->b_fnum;
 	}
     }
-    else if (win_split(eap->addr_count > 0 ? (int)eap->line2 : 0,
+    లేకపోతే ఒకవేళ (win_విభజించు(eap->addr_లెక్క > 0 ? (పూర్ణాంకం)eap->line2 : 0,
 				     *eap->cmd == 'v' ? WSP_VERT : 0) != FAIL)
     {
 	// Reset 'scrollbind' when editing another file, but keep it when
 	// doing ":split" without arguments.
-	if (*eap->arg != NUL)
+	ఒకవేళ (*eap->arg != NUL)
 	    RESET_BINDING(curwin);
-	else
+	లేకపోతే
 	    do_check_scrollbind(FALSE);
 	do_exedit(eap, old_curwin);
     }
 
-#ifdef FEAT_BROWSE
+#నిర్వచితమైతే FEAT_BROWSE
     cmdmod.cmod_flags = save_cmod_flags;
-#endif
+#అయితే_ముగింపు
 
 theend:
     vim_free(fname);
@@ -7553,12 +7553,12 @@ theend:
 /*
  * Open a new tab page.
  */
-    void
-tabpage_new(void)
+    శూన్య
+tabpage_new(శూన్య)
 {
     exarg_T	ea;
 
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
     ea.cmdidx = CMD_tabnew;
     ea.cmd = (char_u *)"tabn";
     ea.arg = (char_u *)"";
@@ -7568,113 +7568,113 @@ tabpage_new(void)
 /*
  * :tabnext command
  */
-    static void
+    స్థిర శూన్య
 ex_tabnext(exarg_T *eap)
 {
-    int tab_number;
+    పూర్ణాంకం tab_సంఖ్య;
 
-    if (ERROR_IF_POPUP_WINDOW)
-	return;
-    switch (eap->cmdidx)
+    ఒకవేళ (ERROR_IF_POPUP_కిటికీ)
+	తిరిగి;
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_tabfirst:
-	case CMD_tabrewind:
+	స్థితి CMD_tabfirst:
+	స్థితి CMD_tabrewind:
 	    goto_tabpage(1);
-	    break;
-	case CMD_tablast:
+	    ఆపు;
+	స్థితి CMD_tablast:
 	    goto_tabpage(9999);
-	    break;
-	case CMD_tabprevious:
-	case CMD_tabNext:
-	    if (eap->arg && *eap->arg != NUL)
+	    ఆపు;
+	స్థితి CMD_tabprevious:
+	స్థితి CMD_tab_తదుపరి:
+	    ఒకవేళ (eap->arg && *eap->arg != NUL)
 	    {
 		char_u *p = eap->arg;
 		char_u *p_save = p;
 
-		tab_number = getdigits(&p);
-		if (p == p_save || *p_save == '-' || *p != NUL
-			    || tab_number == 0)
+		tab_సంఖ్య = getdigits(&p);
+		ఒకవేళ (p == p_save || *p_save == '-' || *p != NUL
+			    || tab_సంఖ్య == 0)
 		{
 		    // No numbers as argument.
-		    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		    return;
+		    eap->errmsg = ex_errmsg(e_invalid_వాదం_str, eap->arg);
+		    తిరిగి;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (eap->addr_count == 0)
-		    tab_number = 1;
-		else
+		ఒకవేళ (eap->addr_లెక్క == 0)
+		    tab_సంఖ్య = 1;
+		లేకపోతే
 		{
-		    tab_number = eap->line2;
-		    if (tab_number < 1)
+		    tab_సంఖ్య = eap->line2;
+		    ఒకవేళ (tab_సంఖ్య < 1)
 		    {
 			eap->errmsg = _(e_invalid_range);
-			return;
+			తిరిగి;
 		    }
 		}
 	    }
-	    goto_tabpage(-tab_number);
-	    break;
-	default: // CMD_tabnext
-	    tab_number = get_tabpage_arg(eap);
-	    if (eap->errmsg == NULL)
-		goto_tabpage(tab_number);
-	    break;
+	    goto_tabpage(-tab_సంఖ్య);
+	    ఆపు;
+	అప్రమేయ: // CMD_tabnext
+	    tab_సంఖ్య = get_tabpage_arg(eap);
+	    ఒకవేళ (eap->errmsg == ఖాళీ)
+		goto_tabpage(tab_సంఖ్య);
+	    ఆపు;
     }
 }
 
 /*
  * :tabmove command
  */
-    static void
+    స్థిర శూన్య
 ex_tabmove(exarg_T *eap)
 {
-    int tab_number;
+    పూర్ణాంకం tab_సంఖ్య;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg == NULL)
-	tabpage_move(tab_number);
+    tab_సంఖ్య = get_tabpage_arg(eap);
+    ఒకవేళ (eap->errmsg == ఖాళీ)
+	tabpage_move(tab_సంఖ్య);
 }
 
 /*
  * :tabs command: List tabs and their contents.
  */
-    static void
-ex_tabs(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_tabs(exarg_T *eap వాడని)
 {
     tabpage_T	*tp;
     win_T	*wp;
-    int		tabcount = 1;
+    పూర్ణాంకం		tabcount = 1;
 
-    msg_start();
-    msg_scroll = TRUE;
-    for (tp = first_tabpage; tp != NULL && !got_int; tp = tp->tp_next)
+    సందేశం_ప్రారంభం();
+    సందేశం_scroll = TRUE;
+    కొరకు (tp = మొదటి_tabpage; tp != ఖాళీ && !got_int; tp = tp->tp_తదుపరి)
     {
-	msg_putchar('\n');
-	vim_snprintf((char *)IObuff, IOSIZE, _("Tab page %d"), tabcount++);
-	msg_outtrans_attr(IObuff, HL_ATTR(HLF_T));
-	out_flush();	    // output one line at a time
+	సందేశం_putchar('\n');
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE, _("Tab page %d"), tabcount++);
+	సందేశం_outtrans_attr(IObuff, HL_ATTR(HLF_T));
+	బహిర్గతం_flush();	    // output one line at a time
 	ui_breakcheck();
 
-	if (tp  == curtab)
+	ఒకవేళ (tp  == curtab)
 	    wp = firstwin;
-	else
+	లేకపోతే
 	    wp = tp->tp_firstwin;
-	for ( ; wp != NULL && !got_int; wp = wp->w_next)
+	కొరకు ( ; wp != ఖాళీ && !got_int; wp = wp->w_తదుపరి)
 	{
-	    msg_putchar('\n');
-	    msg_putchar(wp == curwin ? '>' : ' ');
-	    msg_putchar(' ');
-	    msg_putchar(bufIsChanged(wp->w_buffer) ? '+' : ' ');
-	    msg_putchar(' ');
-	    if (buf_spname(wp->w_buffer) != NULL)
-		vim_strncpy(IObuff, buf_spname(wp->w_buffer), IOSIZE - 1);
-	    else
-		home_replace(wp->w_buffer, wp->w_buffer->b_fname,
+	    సందేశం_putchar('\n');
+	    సందేశం_putchar(wp == curwin ? '>' : ' ');
+	    సందేశం_putchar(' ');
+	    సందేశం_putchar(buf_Is_మారింది(wp->w_బఫరు) ? '+' : ' ');
+	    సందేశం_putchar(' ');
+	    ఒకవేళ (buf_spname(wp->w_బఫరు) != ఖాళీ)
+		vim_strncpy(IObuff, buf_spname(wp->w_బఫరు), IOSIZE - 1);
+	    లేకపోతే
+		home_replace(wp->w_బఫరు, wp->w_బఫరు->b_fname,
 							IObuff, IOSIZE, TRUE);
-	    msg_outtrans(IObuff);
-	    out_flush();	    // output one line at a time
+	    సందేశం_outtrans(IObuff);
+	    బహిర్గతం_flush();	    // output one line at a time
 	    ui_breakcheck();
 	}
     }
@@ -7684,49 +7684,49 @@ ex_tabs(exarg_T *eap UNUSED)
  * ":mode": Set screen mode.
  * If no argument given, just get the screen size and redraw.
  */
-    static void
-ex_mode(exarg_T *eap)
+    స్థిర శూన్య
+ex_బహుళకం(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
 	shell_resized();
-    else
-	emsg(_(e_screen_mode_setting_not_supported));
+    లేకపోతే
+	emsg(_(e_screen_బహుళకం_setting_not_supported));
 }
 
 /*
  * ":resize".
  * set, increment or decrement current window height
  */
-    static void
+    స్థిర శూన్య
 ex_resize(exarg_T *eap)
 {
-    int		n;
+    పూర్ణాంకం		n;
     win_T	*wp = curwin;
 
-    if (eap->addr_count > 0)
+    ఒకవేళ (eap->addr_లెక్క > 0)
     {
 	n = eap->line2;
-	for (wp = firstwin; wp->w_next != NULL && --n > 0; wp = wp->w_next)
+	కొరకు (wp = firstwin; wp->w_తదుపరి != ఖాళీ && --n > 0; wp = wp->w_తదుపరి)
 	    ;
     }
 
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    n = atol((char *)eap->arg);
-    if (cmdmod.cmod_split & WSP_VERT)
+#అయితే_ముగింపు
+    n = atol((అక్షరం *)eap->arg);
+    ఒకవేళ (cmdmod.cmod_విభజించు & WSP_VERT)
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
-	    n += wp->w_width;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very wide
+	ఒకవేళ (*eap->arg == '-' || *eap->arg == '+')
+	    n += wp->w_వెడల్పు;
+	లేకపోతే ఒకవేళ (n == 0 && eap->arg[0] == NUL)	// default is very wide
 	    n = 9999;
 	win_setwidth_win(n, wp);
     }
-    else
+    లేకపోతే
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
-	    n += wp->w_height;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very high
+	ఒకవేళ (*eap->arg == '-' || *eap->arg == '+')
+	    n += wp->w_ఎత్తు;
+	లేకపోతే ఒకవేళ (n == 0 && eap->arg[0] == NUL)	// default is very high
 	    n = 9999;
 	win_setheight_win(n, wp);
     }
@@ -7735,87 +7735,87 @@ ex_resize(exarg_T *eap)
 /*
  * ":find [+command] <file>" command.
  */
-    static void
-ex_find(exarg_T *eap)
+    స్థిర శూన్య
+ex_కనుగొను(exarg_T *eap)
 {
-    if (!check_can_set_curbuf_forceit(eap->forceit))
-	return;
+    ఒకవేళ (!check_can_సమితి_curbuf_forceit(eap->forceit))
+	తిరిగి;
 
-    char_u	*fname = NULL;
-    int		count;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    char_u	*fname = ఖాళీ;
+    పూర్ణాంకం		లెక్క;
+    char_u	*file_గమ్యం_కనుగొను = ఖాళీ;
+    అక్షరం	*శోధన_ctx = ఖాళీ;
 
-    if (*get_findfunc() != NUL)
+    ఒకవేళ (*get_findfunc() != NUL)
     {
-#ifdef FEAT_EVAL
-	fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
-					eap->addr_count > 0 ? eap->line2 : 1);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	fname = findfunc_కనుగొను_file(eap->arg, (పూర్ణాంకం)STRLEN(eap->arg),
+					eap->addr_లెక్క > 0 ? eap->line2 : 1);
+#అయితే_ముగింపు
     }
-    else
+    లేకపోతే
     {
-	fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg), FNAME_MESS,
-			       TRUE, curbuf->b_ffname, &file_to_find, &search_ctx);
-	if (eap->addr_count > 0)
+	fname = కనుగొను_file_లోపల_మార్గం(eap->arg, (పూర్ణాంకం)STRLEN(eap->arg), FNAME_MESS,
+			       TRUE, curbuf->b_ffname, &file_గమ్యం_కనుగొను, &శోధన_ctx);
+	ఒకవేళ (eap->addr_లెక్క > 0)
 	{
 	    // Repeat finding the file "count" times.  This matters when it appears
 	    // several times in the path.
-	    count = eap->line2;
-	    while (fname != NULL && --count > 0)
+	    లెక్క = eap->line2;
+	    అయితే (fname != ఖాళీ && --లెక్క > 0)
 	    {
 		vim_free(fname);
-		fname = find_file_in_path(NULL, 0, FNAME_MESS,
-			      FALSE, curbuf->b_ffname, &file_to_find, &search_ctx);
+		fname = కనుగొను_file_లోపల_మార్గం(ఖాళీ, 0, FNAME_MESS,
+			      FALSE, curbuf->b_ffname, &file_గమ్యం_కనుగొను, &శోధన_ctx);
 	    }
 	}
-	VIM_CLEAR(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	VIM_CLEAR(file_గమ్యం_కనుగొను);
+	vim_findfile_cleanup(శోధన_ctx);
     }
 
-    if (fname == NULL)
-	return;
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి;
 
     eap->arg = fname;
-    do_exedit(eap, NULL);
+    do_exedit(eap, ఖాళీ);
     vim_free(fname);
 }
 
 /*
  * ":open" simulation: for now works just like ":visual".
  */
-    static void
+    స్థిర శూన్య
 ex_open(exarg_T *eap)
 {
     regmatch_T	regmatch;
     char_u	*p;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (not_లోపల_vim9(eap, false) == FAIL)
+	తిరిగి;
+#అయితే_ముగింపు
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_SOL | BL_FIX);
-    if (*eap->arg == '/')
+    ఒకవేళ (*eap->arg == '/')
     {
 	// ":open /pattern/": put cursor in column found with pattern
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
 	*p = NUL;
 	regmatch.regprog = vim_regcomp(eap->arg, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog != NULL)
+	ఒకవేళ (regmatch.regprog != ఖాళీ)
 	{
 	    // make a copy of the line, when searching for a mark it might be
 	    // flushed
-	    char_u *line = vim_strsave(ml_get_curline());
+	    char_u *పంక్తి = vim_strsave(ml_get_curline());
 
 	    regmatch.rm_ic = p_ic;
-	    if (vim_regexec(&regmatch, line, (colnr_T)0))
-		curwin->w_cursor.col = (colnr_T)(regmatch.startp[0] - line);
-	    else
-		emsg(_(e_no_match));
+	    ఒకవేళ (vim_regexec(&regmatch, పంక్తి, (colnr_T)0))
+		curwin->w_cursor.నిలువు = (colnr_T)(regmatch.startp[0] - పంక్తి);
+	    లేకపోతే
+		emsg(_(e_no_సరిపోలిక));
 	    vim_regfree(regmatch.regprog);
-	    vim_free(line);
+	    vim_free(పంక్తి);
 	}
 	// Move to the NUL, ignore any other arguments.
 	eap->arg += STRLEN(eap->arg);
@@ -7823,167 +7823,167 @@ ex_open(exarg_T *eap)
     check_cursor();
 
     eap->cmdidx = CMD_visual;
-    do_exedit(eap, NULL);
+    do_exedit(eap, ఖాళీ);
 }
 
 /*
  * ":edit", ":badd", ":balt", ":visual".
  */
-    static void
+    స్థిర శూన్య
 ex_edit(exarg_T *eap)
 {
-    char_u *ffname = eap->cmdidx == CMD_enew ? NULL : eap->arg;
+    char_u *ffname = eap->cmdidx == CMD_enew ? ఖాళీ : eap->arg;
 
     // Exclude commands which keep the window's current buffer
-    if (
+    ఒకవేళ (
 	    eap->cmdidx != CMD_badd
 	    && eap->cmdidx != CMD_balt
 	    // All other commands must obey 'winfixbuf' / ! rules
-	    && (is_other_file(0, ffname) && !check_can_set_curbuf_forceit(eap->forceit))
+	    && (is_other_file(0, ffname) && !check_can_సమితి_curbuf_forceit(eap->forceit))
     )
-	return;
+	తిరిగి;
 
-    do_exedit(eap, NULL);
+    do_exedit(eap, ఖాళీ);
 }
 
 /*
  * ":edit <file>" command and alike.
  */
-    void
+    శూన్య
 do_exedit(
     exarg_T	*eap,
     win_T	*old_curwin)	    // curwin before doing a split or NULL
 {
-    int		n;
-    int		need_hide;
-    int		exmode_was = exmode_active;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		need_hide;
+    పూర్ణాంకం		exmode_was = exmode_చురుకైన;
 
-    if ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_WINDOW)
-						 || ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    ఒకవేళ ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_కిటికీ)
+						 || ERROR_IF_పదం_POPUP_కిటికీ)
+	తిరిగి;
     /*
      * ":vi" command ends Ex mode.
      */
-    if (exmode_active && (eap->cmdidx == CMD_visual
+    ఒకవేళ (exmode_చురుకైన && (eap->cmdidx == CMD_visual
 						|| eap->cmdidx == CMD_view))
     {
-	exmode_active = FALSE;
+	exmode_చురుకైన = FALSE;
 	ex_pressedreturn = FALSE;
-	if (*eap->arg == NUL)
+	ఒకవేళ (*eap->arg == NUL)
 	{
 	    // Special case:  ":global/pat/visual\NLvi-commands"
-	    if (global_busy)
+	    ఒకవేళ (global_busy)
 	    {
-		if (eap->nextcmd != NULL)
+		ఒకవేళ (eap->nextcmd != ఖాళీ)
 		{
 		    stuffReadbuff(eap->nextcmd);
-		    eap->nextcmd = NULL;
+		    eap->nextcmd = ఖాళీ;
 		}
 
-		if (exmode_was != EXMODE_VIM)
+		ఒకవేళ (exmode_was != EXMODE_VIM)
 		    settmode(TMODE_RAW);
-		int save_RedrawingDisabled = RedrawingDisabled;
+		పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
 		RedrawingDisabled = 0;
-		int save_nwr = no_wait_return;
+		పూర్ణాంకం save_nwr = no_wait_return;
 		no_wait_return = 0;
 		need_wait_return = FALSE;
-		int save_ms = msg_scroll;
-		msg_scroll = 0;
-#ifdef FEAT_GUI
-		int save_he = hold_gui_events;
+		పూర్ణాంకం save_ms = సందేశం_scroll;
+		సందేశం_scroll = 0;
+#నిర్వచితమైతే FEAT_GUI
+		పూర్ణాంకం save_he = hold_gui_events;
 		hold_gui_events = 0;
-#endif
-		set_must_redraw(UPD_CLEAR);
-		pending_exmode_active = TRUE;
+#అయితే_ముగింపు
+		సమితి_must_redraw(UPD_CLEAR);
+		pending_exmode_చురుకైన = TRUE;
 
 		main_loop(FALSE, TRUE);
 
-		pending_exmode_active = FALSE;
+		pending_exmode_చురుకైన = FALSE;
 		RedrawingDisabled = save_RedrawingDisabled;
 		no_wait_return = save_nwr;
-		msg_scroll = save_ms;
-#ifdef FEAT_GUI
+		సందేశం_scroll = save_ms;
+#నిర్వచితమైతే FEAT_GUI
 		hold_gui_events = save_he;
-#endif
+#అయితే_ముగింపు
 	    }
-	    return;
+	    తిరిగి;
 	}
     }
 
-    if ((eap->cmdidx == CMD_new
+    ఒకవేళ ((eap->cmdidx == CMD_new
 		|| eap->cmdidx == CMD_tabnew
 		|| eap->cmdidx == CMD_tabedit
 		|| eap->cmdidx == CMD_vnew) && *eap->arg == NUL)
     {
 	// ":new" or ":tabnew" without argument: edit a new empty buffer
 	setpcmark();
-	(void)do_ecmd(0, NULL, NULL, eap, ECMD_ONE,
+	(శూన్య)do_ecmd(0, ఖాళీ, ఖాళీ, eap, ECMD_ONE,
 		      ECMD_HIDE + (eap->forceit ? ECMD_FORCEIT : 0),
-		      old_curwin == NULL ? curwin : NULL);
+		      old_curwin == ఖాళీ ? curwin : ఖాళీ);
     }
-    else if ((eap->cmdidx != CMD_split && eap->cmdidx != CMD_vsplit)
+    లేకపోతే ఒకవేళ ((eap->cmdidx != CMD_విభజించు && eap->cmdidx != CMD_vsplit)
 	    || *eap->arg != NUL
-#ifdef FEAT_BROWSE
+#నిర్వచితమైతే FEAT_BROWSE
 	    || (cmdmod.cmod_flags & CMOD_BROWSE)
-#endif
+#అయితే_ముగింపు
 	    )
     {
 	// Can't edit another file when "textlock" or "curbuf_lock" is set.
 	// Only ":edit" or ":script" can bring us here, others are stopped
 	// earlier.
-	if (*eap->arg != NUL && text_or_buf_locked())
-	    return;
+	ఒకవేళ (*eap->arg != NUL && పాఠ్యం_or_buf_locked())
+	    తిరిగి;
 
 	n = readonlymode;
-	if (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
+	ఒకవేళ (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
 	    readonlymode = TRUE;
-	else if (eap->cmdidx == CMD_enew)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_enew)
 	    readonlymode = FALSE;   // 'readonly' doesn't make sense in an
 				    // empty buffer
-	if (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
+	ఒకవేళ (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
 	    setpcmark();
-	if (do_ecmd(0, (eap->cmdidx == CMD_enew ? NULL : eap->arg),
-		    NULL, eap,
+	ఒకవేళ (do_ecmd(0, (eap->cmdidx == CMD_enew ? ఖాళీ : eap->arg),
+		    ఖాళీ, eap,
 		    // ":edit" goes to first line if Vi compatible
 		    (*eap->arg == NUL && eap->do_ecmd_lnum == 0
-				      && vim_strchr(p_cpo, CPO_GOTO1) != NULL)
+				      && vim_strchr(p_cpo, CPO_GOTO1) != ఖాళీ)
 					       ? ECMD_ONE : eap->do_ecmd_lnum,
 		    (buf_hide(curbuf) ? ECMD_HIDE : 0)
 		    + (eap->forceit ? ECMD_FORCEIT : 0)
 		      // after a split we can use an existing buffer
-		    + (old_curwin != NULL ? ECMD_OLDBUF : 0)
+		    + (old_curwin != ఖాళీ ? ECMD_OLDBUF : 0)
 		    + (eap->cmdidx == CMD_badd ? ECMD_ADDBUF : 0)
 		    + (eap->cmdidx == CMD_balt ? ECMD_ALTBUF : 0)
-		    , old_curwin == NULL ? curwin : NULL) == FAIL)
+		    , old_curwin == ఖాళీ ? curwin : ఖాళీ) == FAIL)
 	{
 	    // Editing the file failed.  If the window was split, close it.
-	    if (old_curwin != NULL)
+	    ఒకవేళ (old_curwin != ఖాళీ)
 	    {
-		need_hide = (curbufIsChanged() && curbuf->b_nwindows <= 1);
-		if (!need_hide || buf_hide(curbuf))
+		need_hide = (curbuf_Is_మారింది() && curbuf->b_nwindows <= 1);
+		ఒకవేళ (!need_hide || buf_hide(curbuf))
 		{
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 		    cleanup_T   cs;
 
 		    // Reset the error/interrupt/exception state here so that
 		    // aborting() returns FALSE when closing a window.
 		    enter_cleanup(&cs);
-#endif
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
+#అయితే_ముగింపు
 		    win_close(curwin, !need_hide && !buf_hide(curbuf));
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 		    // Restore the error/interrupt/exception state if not
 		    // discarded by a new aborting error, interrupt, or
 		    // uncaught exception.
 		    leave_cleanup(&cs);
-#endif
+#అయితే_ముగింపు
 		}
 	    }
 	}
-	else if (readonlymode && curbuf->b_nwindows == 1)
+	లేకపోతే ఒకవేళ (readonlymode && curbuf->b_nwindows == 1)
 	{
 	    // When editing an already visited buffer, 'readonly' won't be set
 	    // but the previous value is kept.  With ":view" and ":sview" we
@@ -7993,13 +7993,13 @@ do_exedit(
 	}
 	readonlymode = n;
     }
-    else
+    లేకపోతే
     {
-	if (eap->do_ecmd_cmd != NULL)
-	    do_cmd_argument(eap->do_ecmd_cmd);
+	ఒకవేళ (eap->do_ecmd_cmd != ఖాళీ)
+	    do_cmd_వాదం(eap->do_ecmd_cmd);
 	n = curwin->w_arg_idx_invalid;
 	check_arg_idx(curwin);
-	if (n != curwin->w_arg_idx_invalid)
+	ఒకవేళ (n != curwin->w_arg_idx_invalid)
 	    maketitle();
     }
 
@@ -8007,61 +8007,61 @@ do_exedit(
      * if ":split file" worked, set alternate file name in old window to new
      * file
      */
-    if (old_curwin != NULL
+    ఒకవేళ (old_curwin != ఖాళీ
 	    && *eap->arg != NUL
 	    && curwin != old_curwin
 	    && win_valid(old_curwin)
-	    && old_curwin->w_buffer != curbuf
+	    && old_curwin->w_బఫరు != curbuf
 	    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	old_curwin->w_alt_fnum = curbuf->b_fnum;
 
     ex_no_reprint = TRUE;
 }
 
-#ifndef FEAT_GUI
+#నిర్వచితం_కాకపోతే FEAT_GUI
 /*
  * ":gui" and ":gvim" when there is no GUI.
  */
-    static void
+    స్థిర శూన్య
 ex_nogui(exarg_T *eap)
 {
-    eap->errmsg = _(e_gui_cannot_be_used_not_enabled_at_compile_time);
+    eap->errmsg = _(e_gui_cannot_be_వాడిన_not_enabled_at_compile_సమయం);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-    static void
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+    స్థిర శూన్య
 ex_tearoff(exarg_T *eap)
 {
     gui_make_tearoff(eap->arg);
 }
-#endif
+#అయితే_ముగింపు
 
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
-	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
-    static void
+#ఒకవేళ (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+	|| defined(FEAT_పదం_POPUP_MENU)) && defined(FEAT_MENU)
+    స్థిర శూన్య
 ex_popup(exarg_T *eap)
 {
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    if (gui.in_use)
+# ఒకవేళ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    ఒకవేళ (gui.లోపల_use)
 	gui_make_popup(eap->arg, eap->forceit);
-#  ifdef FEAT_TERM_POPUP_MENU
-    else
+#  ifdef FEAT_పదం_POPUP_MENU
+    లేకపోతే
 #  endif
 # endif
-# ifdef FEAT_TERM_POPUP_MENU
+# ifdef FEAT_పదం_POPUP_MENU
 	pum_make_popup(eap->arg, eap->forceit);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-ex_swapname(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_swapname(exarg_T *eap వాడని)
 {
-    if (curbuf->b_ml.ml_mfp == NULL || curbuf->b_ml.ml_mfp->mf_fname == NULL)
-	msg(_("No swap file"));
-    else
-	msg((char *)curbuf->b_ml.ml_mfp->mf_fname);
+    ఒకవేళ (curbuf->b_ml.ml_mfp == ఖాళీ || curbuf->b_ml.ml_mfp->mf_fname == ఖాళీ)
+	సందేశం(_("No swap file"));
+    లేకపోతే
+	సందేశం((అక్షరం *)curbuf->b_ml.ml_mfp->mf_fname);
 }
 
 /*
@@ -8069,14 +8069,14 @@ ex_swapname(exarg_T *eap UNUSED)
  * offset.
  * (1998-11-02 16:21:01  R. Edward Ralston <eralston@computer.org>)
  */
-    static void
-ex_syncbind(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_syncbind(exarg_T *eap వాడని)
 {
     win_T	*wp;
     win_T	*save_curwin = curwin;
     buf_T	*save_curbuf = curbuf;
-    long	topline;
-    long	y;
+    దీర్ఘ	topline;
+    దీర్ఘ	y;
     linenr_T	old_linenr = curwin->w_cursor.lnum;
 
     setpcmark();
@@ -8084,22 +8084,22 @@ ex_syncbind(exarg_T *eap UNUSED)
     /*
      * determine max topline
      */
-    if (curwin->w_p_scb)
+    ఒకవేళ (curwin->w_p_scb)
     {
 	topline = curwin->w_topline;
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_p_scb && wp->w_buffer)
+	    ఒకవేళ (wp->w_p_scb && wp->w_బఫరు)
 	    {
-		y = wp->w_buffer->b_ml.ml_line_count - get_scrolloff_value();
-		if (topline > y)
+		y = wp->w_బఫరు->b_ml.ml_పంక్తి_లెక్క - get_scrolloff_విలువ();
+		ఒకవేళ (topline > y)
 		    topline = y;
 	    }
 	}
-	if (topline < 1)
+	ఒకవేళ (topline < 1)
 	    topline = 1;
     }
-    else
+    లేకపోతే
     {
 	topline = 1;
     }
@@ -8110,27 +8110,27 @@ ex_syncbind(exarg_T *eap UNUSED)
      */
     FOR_ALL_WINDOWS(curwin)
     {
-	if (curwin->w_p_scb)
+	ఒకవేళ (curwin->w_p_scb)
 	{
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_బఫరు;
 	    y = topline - curwin->w_topline;
-	    if (y > 0)
+	    ఒకవేళ (y > 0)
 		scrollup(y, TRUE);
-	    else
+	    లేకపోతే
 		scrolldown(-y, TRUE);
 	    curwin->w_scbind_pos = topline;
 	    redraw_later(UPD_VALID);
 	    cursor_correct();
-	    curwin->w_redr_status = true;
+	    curwin->w_redr_స్థితి = true;
 	}
     }
     curwin = save_curwin;
     curbuf = save_curbuf;
-    if (curwin->w_p_scb)
+    ఒకవేళ (curwin->w_p_scb)
     {
 	did_syncbind = TRUE;
 	checkpcmark();
-	if (old_linenr != curwin->w_cursor.lnum)
+	ఒకవేళ (old_linenr != curwin->w_cursor.lnum)
 	{
 	    char_u ctrl_o[2];
 
@@ -8142,107 +8142,107 @@ ex_syncbind(exarg_T *eap UNUSED)
 }
 
 
-    static void
+    స్థిర శూన్య
 ex_read(exarg_T *eap)
 {
-    int		i;
-    int		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		ఖాళీలు_2 = (curbuf->b_ml.ml_flags & ML_ఖాళీలు);
     linenr_T	lnum;
 
-    if (eap->usefilter)			// :r!cmd
+    ఒకవేళ (eap->usefilter)			// :r!cmd
     {
 	do_bang(1, eap, FALSE, FALSE, TRUE);
-	return;
+	తిరిగి;
     }
 
-    if (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    ఒకవేళ (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
+	తిరిగి;
 
-#ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+#నిర్వచితమైతే FEAT_BROWSE
+    ఒకవేళ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	char_u *browseFile;
 
 	browseFile = do_browse(0, (char_u *)_("Append File"), eap->arg,
-		NULL, NULL, NULL, curbuf);
-	if (browseFile != NULL)
+		ఖాళీ, ఖాళీ, ఖాళీ, curbuf);
+	ఒకవేళ (browseFile != ఖాళీ)
 	{
-	    i = readfile(browseFile, NULL,
+	    i = readfile(browseFile, ఖాళీ,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	    vim_free(browseFile);
 	}
-	else
+	లేకపోతే
 	    i = OK;
     }
-    else
-#endif
-	if (*eap->arg == NUL)
+    లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (*eap->arg == NUL)
 	{
-	    if (check_fname() == FAIL)	// check for no file name
-		return;
+	    ఒకవేళ (check_fname() == FAIL)	// check for no file name
+		తిరిగి;
 	    i = readfile(curbuf->b_ffname, curbuf->b_fname,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	}
-	else
+	లేకపోతే
 	{
-	    if (vim_strchr(p_cpo, CPO_ALTREAD) != NULL)
-		(void)setaltfname(eap->arg, eap->arg, (linenr_T)1);
-	    i = readfile(eap->arg, NULL,
+	    ఒకవేళ (vim_strchr(p_cpo, CPO_ALTREAD) != ఖాళీ)
+		(శూన్య)setaltfname(eap->arg, eap->arg, (linenr_T)1);
+	    i = readfile(eap->arg, ఖాళీ,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 
 	}
-    if (i != OK)
+    ఒకవేళ (i != OK)
     {
-#if defined(FEAT_EVAL)
-	if (!aborting())
-#endif
+#ఒకవేళ defined(FEAT_EVAL)
+	ఒకవేళ (!aborting())
+#అయితే_ముగింపు
 	    semsg(_(e_cant_open_file_str), eap->arg);
     }
-    else
+    లేకపోతే
     {
-	if (empty && exmode_active)
+	ఒకవేళ (ఖాళీలు_2 && exmode_చురుకైన)
 	{
 	    // Delete the empty line that remains.  Historically ex does
 	    // this but vi doesn't.
-	    if (eap->line2 == 0)
-		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    ఒకవేళ (eap->line2 == 0)
+		lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	    లేకపోతే
 		lnum = 1;
-	    if (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
+	    ఒకవేళ (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
 	    {
 		ml_delete(lnum);
-		if (curwin->w_cursor.lnum > 1
+		ఒకవేళ (curwin->w_cursor.lnum > 1
 			&& curwin->w_cursor.lnum >= lnum)
 		    --curwin->w_cursor.lnum;
-		deleted_lines_mark(lnum, 1L);
+		deleted_పంక్తులు_mark(lnum, 1L);
 	    }
 	}
 	redraw_curbuf_later(UPD_VALID);
     }
 }
 
-static char_u	*prev_dir = NULL;
+స్థిర char_u	*prev_dir = ఖాళీ;
 
-#if defined(EXITFREE)
-    void
-free_cd_dir(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_cd_dir(శూన్య)
 {
     VIM_CLEAR(prev_dir);
     VIM_CLEAR(globaldir);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get the previous directory for the given chdir scope.
  */
-    static char_u *
+    స్థిర char_u *
 get_prevdir(cdscope_T scope)
 {
-    if (scope == CDSCOPE_WINDOW)
-	return curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
-	return curtab->tp_prevdir;
-    return prev_dir;
+    ఒకవేళ (scope == CDSCOPE_కిటికీ)
+	తిరిగి curwin->w_prevdir;
+    లేకపోతే ఒకవేళ (scope == CDSCOPE_TABPAGE)
+	తిరిగి curtab->tp_prevdir;
+    తిరిగి prev_dir;
 }
 
 /*
@@ -8250,59 +8250,59 @@ get_prevdir(cdscope_T scope)
  * When 'scope' is CDSCOPE_TABPAGE then this was after an ":tcd" command.
  * When 'scope' is CDSCOPE_WINDOW then this was after an ":lcd" command.
  */
-    void
+    శూన్య
 post_chdir(cdscope_T scope)
 {
-    if (scope != CDSCOPE_WINDOW)
+    ఒకవేళ (scope != CDSCOPE_కిటికీ)
 	// Clear tab local directory for both :cd and :tcd
 	VIM_CLEAR(curtab->tp_localdir);
     VIM_CLEAR(curwin->w_localdir);
-    if (scope != CDSCOPE_GLOBAL)
+    ఒకవేళ (scope != CDSCOPE_GLOBAL)
     {
 	char_u	*pdir = get_prevdir(scope);
 
 	// If still in the global directory, need to remember current
 	// directory as the global directory.
-	if (globaldir == NULL && pdir != NULL)
+	ఒకవేళ (globaldir == ఖాళీ && pdir != ఖాళీ)
 	    globaldir = vim_strsave(pdir);
 
 	// Remember this local directory for the window.
-	if (mch_dirname(NameBuff, MAXPATHL) == OK)
+	ఒకవేళ (mch_dirname(NameBuff, MAXPATHL) == OK)
 	{
-	    if (scope == CDSCOPE_TABPAGE)
+	    ఒకవేళ (scope == CDSCOPE_TABPAGE)
 		curtab->tp_localdir = vim_strsave(NameBuff);
-	    else
+	    లేకపోతే
 		curwin->w_localdir = vim_strsave(NameBuff);
 	}
     }
-    else
+    లేకపోతే
     {
 	// We are now in the global directory, no need to remember its name.
 	VIM_CLEAR(globaldir);
     }
 
-    last_chdir_reason = NULL;
-    shorten_fnames(vim_strchr(p_cpo, CPO_NOSYMLINKS) == NULL);
+    చివరి_chdir_reason = ఖాళీ;
+    shorten_fnames(vim_strchr(p_cpo, CPO_NOSYMLINKS) == ఖాళీ);
 }
 
 /*
  * Trigger DirChangedPre for "acmd_fname" with directory "new_dir".
  */
-    void
-trigger_DirChangedPre(char_u *acmd_fname, char_u *new_dir)
+    శూన్య
+trigger_Dir_మారింది_Pre(char_u *acmd_fname, char_u *new_dir)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     dict_T	    *v_event;
     save_v_event_T  save_v_event;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "directory", new_dir);
-    dict_set_items_ro(v_event);
-#endif
+    (శూన్య)dict_కూడు_string(v_event, "directory", new_dir);
+    dict_సమితి_వస్తువులు_ro(v_event);
+#అయితే_ముగింపు
     apply_autocmds(EVENT_DIRCHANGEDPRE, acmd_fname, new_dir, FALSE, curbuf);
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     restore_v_event(v_event, &save_v_event);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -8313,133 +8313,133 @@ trigger_DirChangedPre(char_u *acmd_fname, char_u *new_dir)
  * Otherwise: changes the global directory
  * Returns TRUE if the directory is successfully changed.
  */
-    int
+    పూర్ణాంకం
 changedir_func(
 	char_u		*new_dir,
-	int		forceit,
+	పూర్ణాంకం		forceit,
 	cdscope_T	scope)
 {
-    char_u	*pdir = NULL;
-    int		dir_differs;
-    char_u	*acmd_fname = NULL;
+    char_u	*pdir = ఖాళీ;
+    పూర్ణాంకం		dir_differs;
+    char_u	*acmd_fname = ఖాళీ;
     char_u	**pp;
     char_u	*tofree;
 
-    if (new_dir == NULL || allbuf_locked())
-	return FALSE;
+    ఒకవేళ (new_dir == ఖాళీ || allbuf_locked())
+	తిరిగి FALSE;
 
-    if (vim_strchr(p_cpo, CPO_CHDIR) != NULL && curbufIsChanged() && !forceit)
+    ఒకవేళ (vim_strchr(p_cpo, CPO_CHDIR) != ఖాళీ && curbuf_Is_మారింది() && !forceit)
     {
-	emsg(_(e_cannot_change_directory_buffer_is_modified_add_bang_to_override));
-	return FALSE;
+	emsg(_(e_cannot_change_directory_బఫరు_is_modified_కూడు_bang_గమ్యం_override));
+	తిరిగి FALSE;
     }
 
     // ":cd -": Change to previous directory
-    if (STRCMP(new_dir, "-") == 0)
+    ఒకవేళ (STRCMP(new_dir, "-") == 0)
     {
 	pdir = get_prevdir(scope);
-	if (pdir == NULL)
+	ఒకవేళ (pdir == ఖాళీ)
 	{
-	    emsg(_(e_no_previous_directory));
-	    return FALSE;
+	    emsg(_(e_no_మునుపటి_directory));
+	    తిరిగి FALSE;
 	}
 	new_dir = pdir;
     }
 
     // Save current directory for next ":cd -"
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    ఒకవేళ (mch_dirname(NameBuff, MAXPATHL) == OK)
 	pdir = vim_strsave(NameBuff);
-    else
-	pdir = NULL;
+    లేకపోతే
+	pdir = ఖాళీ;
 
     // For UNIX ":cd" means: go to home directory.
     // On other systems too if 'cdhome' is set.
-#if defined(UNIX) || defined(VMS)
-    if (*new_dir == NUL)
-#else
-    if (*new_dir == NUL && p_cdh)
-#endif
+#ఒకవేళ defined(UNIX) || defined(VMS)
+    ఒకవేళ (*new_dir == NUL)
+#లేకపోతే
+    ఒకవేళ (*new_dir == NUL && p_cdh)
+#అయితే_ముగింపు
     {
 	// use NameBuff for home directory name
-#ifdef VMS
+#నిర్వచితమైతే VMS
 	char_u	*p;
 
 	p = mch_getenv((char_u *)"SYS$LOGIN");
-	if (p == NULL || *p == NUL)	// empty is the same as not set
+	ఒకవేళ (p == ఖాళీ || *p == NUL)	// empty is the same as not set
 	    NameBuff[0] = NUL;
-	else
+	లేకపోతే
 	    vim_strncpy(NameBuff, p, MAXPATHL - 1);
-#else
+#లేకపోతే
 	expand_env((char_u *)"$HOME", NameBuff, MAXPATHL);
-#endif
+#అయితే_ముగింపు
 	new_dir = NameBuff;
     }
-    dir_differs = pdir == NULL
-			    || pathcmp((char *)pdir, (char *)new_dir, -1) != 0;
-    if (dir_differs)
+    dir_differs = pdir == ఖాళీ
+			    || pathcmp((అక్షరం *)pdir, (అక్షరం *)new_dir, -1) != 0;
+    ఒకవేళ (dir_differs)
     {
-	if (scope == CDSCOPE_WINDOW)
+	ఒకవేళ (scope == CDSCOPE_కిటికీ)
 	    acmd_fname = (char_u *)"window";
-	else if (scope == CDSCOPE_TABPAGE)
+	లేకపోతే ఒకవేళ (scope == CDSCOPE_TABPAGE)
 	    acmd_fname = (char_u *)"tabpage";
-	else
+	లేకపోతే
 	    acmd_fname = (char_u *)"global";
-	trigger_DirChangedPre(acmd_fname, new_dir);
+	trigger_Dir_మారింది_Pre(acmd_fname, new_dir);
 
-	if (vim_chdir(new_dir))
+	ఒకవేళ (vim_chdir(new_dir))
 	{
 	    emsg(_(e_command_failed));
 	    vim_free(pdir);
-	    return FALSE;
+	    తిరిగి FALSE;
 	}
     }
 
-    if (scope == CDSCOPE_WINDOW)
+    ఒకవేళ (scope == CDSCOPE_కిటికీ)
 	pp = &curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
+    లేకపోతే ఒకవేళ (scope == CDSCOPE_TABPAGE)
 	pp = &curtab->tp_prevdir;
-    else
+    లేకపోతే
 	pp = &prev_dir;
     tofree = *pp;  // new_dir may use this
     *pp = pdir;
 
     post_chdir(scope);
 
-    if (dir_differs)
+    ఒకవేళ (dir_differs)
 	apply_autocmds(EVENT_DIRCHANGED, acmd_fname, new_dir, FALSE, curbuf);
     vim_free(tofree);
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * ":cd", ":tcd", ":lcd", ":chdir" ":tchdir" and ":lchdir".
  */
-    void
+    శూన్య
 ex_cd(exarg_T *eap)
 {
     char_u	*new_dir;
 
     new_dir = eap->arg;
-#if !defined(UNIX) && !defined(VMS)
+#ఒకవేళ !defined(UNIX) && !defined(VMS)
     // for non-UNIX ":cd" means: print current directory unless 'cdhome' is set
-    if (*new_dir == NUL && !p_cdh)
+    ఒకవేళ (*new_dir == NUL && !p_cdh)
     {
-	ex_pwd(NULL);
-	return;
+	ex_pwd(ఖాళీ);
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
-    if (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
-	scope = CDSCOPE_WINDOW;
-    else if (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
+    ఒకవేళ (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
+	scope = CDSCOPE_కిటికీ;
+    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
 	scope = CDSCOPE_TABPAGE;
 
-    if (changedir_func(new_dir, eap->forceit, scope))
+    ఒకవేళ (changedir_func(new_dir, eap->forceit, scope))
     {
 	// Echo the new current directory if the command was typed.
-	if (KeyTyped || p_verbose >= 5)
+	ఒకవేళ (కీలకం_Typed || p_verbose >= 5)
 	    ex_pwd(eap);
     }
 }
@@ -8447,62 +8447,62 @@ ex_cd(exarg_T *eap)
 /*
  * ":pwd".
  */
-    static void
-ex_pwd(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_pwd(exarg_T *eap వాడని)
 {
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    ఒకవేళ (mch_dirname(NameBuff, MAXPATHL) == OK)
     {
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
 	slash_adjust(NameBuff);
-#endif
-	if (p_verbose > 0)
+#అయితే_ముగింపు
+	ఒకవేళ (p_verbose > 0)
 	{
-	    char *context = "global";
+	    అక్షరం *context = "global";
 
-	    if (last_chdir_reason != NULL)
-		context = last_chdir_reason;
-	    else if (curwin->w_localdir != NULL)
+	    ఒకవేళ (చివరి_chdir_reason != ఖాళీ)
+		context = చివరి_chdir_reason;
+	    లేకపోతే ఒకవేళ (curwin->w_localdir != ఖాళీ)
 		context = "window";
-	    else if (curtab->tp_localdir != NULL)
+	    లేకపోతే ఒకవేళ (curtab->tp_localdir != ఖాళీ)
 		context = "tabpage";
-	    smsg("[%s] %s", context, (char *)NameBuff);
+	    smsg("[%s] %s", context, (అక్షరం *)NameBuff);
 	}
-	else
-	    msg((char *)NameBuff);
+	లేకపోతే
+	    సందేశం((అక్షరం *)NameBuff);
     }
-    else
+    లేకపోతే
 	emsg(_(e_directory_unknown));
 }
 
 /*
  * ":=".
  */
-    static void
+    స్థిర శూన్య
 ex_equal(exarg_T *eap)
 {
-    smsg("%ld", (long)eap->line2);
+    smsg("%ld", (దీర్ఘ)eap->line2);
     ex_may_print(eap);
 }
 
-    static void
+    స్థిర శూన్య
 ex_sleep(exarg_T *eap)
 {
-    int		n;
-    long	len;
+    పూర్ణాంకం		n;
+    దీర్ఘ	len;
 
-    if (cursor_valid())
+    ఒకవేళ (cursor_valid())
     {
-	n = W_WINROW(curwin) + curwin->w_wrow - msg_scrolled;
-	if (n >= 0)
+	n = W_WINROW(curwin) + curwin->w_wrow - సందేశం_scrolled;
+	ఒకవేళ (n >= 0)
 	    windgoto(n, curwin->w_wincol + curwin->w_wcol);
     }
 
     len = eap->line2;
-    switch (*eap->arg)
+    ఎంపిక (*eap->arg)
     {
-	case 'm': break;
-	case NUL: len *= 1000L; break;
-	default: semsg(_(e_invalid_argument_str), eap->arg); return;
+	స్థితి 'm': ఆపు;
+	స్థితి NUL: len *= 1000L; ఆపు;
+	అప్రమేయ: semsg(_(e_invalid_వాదం_str), eap->arg); తిరిగి;
     }
 
     // Hide the cursor if invoked with !
@@ -8513,257 +8513,257 @@ ex_sleep(exarg_T *eap)
  * Sleep for "msec" milliseconds, but keep checking for a CTRL-C every second.
  * Hide the cursor if "hide_cursor" is TRUE.
  */
-    void
-do_sleep(long msec, int hide_cursor)
+    శూన్య
+do_sleep(దీర్ఘ msec, పూర్ణాంకం hide_cursor)
 {
-    long	done = 0;
-    long	wait_now;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    దీర్ఘ	పూర్తి = 0;
+    దీర్ఘ	wait_now;
+#నిర్వచితమైతే ELAPSED_FUNC
+    elapsed_T	ప్రారంభం_tv;
 
     // Remember at what time we started, so that we know how much longer we
     // should wait after waiting for a bit.
-    ELAPSED_INIT(start_tv);
-#endif
+    ELAPSED_INIT(ప్రారంభం_tv);
+#అయితే_ముగింపు
 
-    if (hide_cursor)
+    ఒకవేళ (hide_cursor)
 	cursor_sleep();
-    else
+    లేకపోతే
 	cursor_on();
 
-    out_flush_cursor(FALSE, FALSE);
-    while (!got_int && done < msec)
+    బహిర్గతం_flush_cursor(FALSE, FALSE);
+    అయితే (!got_int && పూర్తి < msec)
     {
-	wait_now = msec - done > 1000L ? 1000L : msec - done;
-#ifdef FEAT_TIMERS
+	wait_now = msec - పూర్తి > 1000L ? 1000L : msec - పూర్తి;
+#నిర్వచితమైతే FEAT_TIMERS
 	{
-	    long    due_time = check_due_timer();
+	    దీర్ఘ    due_సమయం = check_due_timer();
 
-	    if (due_time > 0 && due_time < wait_now)
-		wait_now = due_time;
+	    ఒకవేళ (due_సమయం > 0 && due_సమయం < wait_now)
+		wait_now = due_సమయం;
 	}
-#endif
-#ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel() && wait_now > 20L)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	ఒకవేళ (has_any_channel() && wait_now > 20L)
 	    wait_now = 20L;
-#endif
-#ifdef FEAT_SOUND
-	if (has_any_sound_callback() && wait_now > 20L)
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SOUND
+	ఒకవేళ (has_any_sound_callback() && wait_now > 20L)
 	    wait_now = 20L;
-#endif
+#అయితే_ముగింపు
 	ui_delay(wait_now, TRUE);
 
-#ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	ఒకవేళ (has_any_channel())
 	    ui_breakcheck_force(TRUE);
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    ui_breakcheck();
-#ifdef MESSAGE_QUEUE
+#నిర్వచితమైతే సందేశం_వరుస
 	// Process the netbeans and clientserver messages that may have been
 	// received in the call to ui_breakcheck() when the GUI is in use. This
 	// may occur when running a test case.
 	parse_queued_messages();
-#endif
+#అయితే_ముగింపు
 
-#ifdef ELAPSED_FUNC
+#నిర్వచితమైతే ELAPSED_FUNC
 	// actual time passed
-	done = ELAPSED_FUNC(start_tv);
-#else
+	పూర్తి = ELAPSED_FUNC(ప్రారంభం_tv);
+#లేకపోతే
 	// guesstimate time passed (will actually be more)
-	done += wait_now;
-#endif
+	పూర్తి += wait_now;
+#అయితే_ముగింపు
     }
 
     // If CTRL-C was typed to interrupt the sleep, drop the CTRL-C from the
     // input buffer, otherwise a following call to input() fails.
-    if (got_int)
-	(void)vpeekc();
+    ఒకవేళ (got_int)
+	(శూన్య)vpeekc();
 
-    if (hide_cursor)
+    ఒకవేళ (hide_cursor)
 	cursor_unsleep();
 }
 
 /*
  * ":winsize" command (obsolete).
  */
-    static void
+    స్థిర శూన్య
 ex_winsize(exarg_T *eap)
 {
-    int		w, h;
+    పూర్ణాంకం		w, h;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (!SAFE_isdigit(*arg))
+    ఒకవేళ (!సురక్షిత_isdigit(*arg))
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return;
+	semsg(_(e_invalid_వాదం_str), arg);
+	తిరిగి;
     }
     w = getdigits(&arg);
     arg = skipwhite(arg);
     p = arg;
     h = getdigits(&arg);
-    if (*p != NUL && *arg == NUL)
-	set_shellsize(w, h, TRUE);
-    else
-	emsg(_(e_winsize_requires_two_number_arguments));
+    ఒకవేళ (*p != NUL && *arg == NUL)
+	సమితి_shellsize(w, h, TRUE);
+    లేకపోతే
+	emsg(_(e_winsize_requires_two_సంఖ్య_arguments));
 }
 
-    static void
+    స్థిర శూన్య
 ex_wincmd(exarg_T *eap)
 {
-    int		xchar = NUL;
+    పూర్ణాంకం		xchar = NUL;
     char_u	*p;
 
-    if (*eap->arg == 'g' || *eap->arg == Ctrl_G)
+    ఒకవేళ (*eap->arg == 'g' || *eap->arg == Ctrl_G)
     {
 	// CTRL-W g and CTRL-W CTRL-G  have an extra command character
-	if (eap->arg[1] == NUL)
+	ఒకవేళ (eap->arg[1] == NUL)
 	{
-	    emsg(_(e_invalid_argument));
-	    return;
+	    emsg(_(e_invalid_వాదం));
+	    తిరిగి;
 	}
 	xchar = eap->arg[1];
 	p = eap->arg + 2;
     }
-    else
+    లేకపోతే
 	p = eap->arg + 1;
 
-    set_nextcmd(eap, p);
+    సమితి_nextcmd(eap, p);
     p = skipwhite(p);
-    if (*p != NUL && *p != (
-#ifdef FEAT_EVAL
-	    in_vim9script() ? '#' :
-#endif
+    ఒకవేళ (*p != NUL && *p != (
+#నిర్వచితమైతే FEAT_EVAL
+	    లోపల_vim9script() ? '#' :
+#అయితే_ముగింపు
 		'"')
-	    && eap->nextcmd == NULL)
-	emsg(_(e_invalid_argument));
-    else if (!eap->skip)
+	    && eap->nextcmd == ఖాళీ)
+	emsg(_(e_invalid_వాదం));
+    లేకపోతే ఒకవేళ (!eap->skip)
     {
 	// Pass flags on for ":vertical wincmd ]".
-	postponed_split_flags = cmdmod.cmod_split;
-	postponed_split_tab = cmdmod.cmod_tab;
-	do_window(*eap->arg, eap->addr_count > 0 ? eap->line2 : 0L, xchar);
-	postponed_split_flags = 0;
-	postponed_split_tab = 0;
+	postponed_విభజించు_flags = cmdmod.cmod_విభజించు;
+	postponed_విభజించు_tab = cmdmod.cmod_tab;
+	do_కిటికీ(*eap->arg, eap->addr_లెక్క > 0 ? eap->line2 : 0L, xchar);
+	postponed_విభజించు_flags = 0;
+	postponed_విభజించు_tab = 0;
     }
 }
 
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+#ఒకవేళ defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
 /*
  * ":winpos".
  */
-    static void
+    స్థిర శూన్య
 ex_winpos(exarg_T *eap)
 {
-    int		x, y;
+    పూర్ణాంకం		x, y;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (*arg == NUL)
+    ఒకవేళ (*arg == NUL)
     {
-# if defined(FEAT_GUI) || defined(MSWIN)
+# ఒకవేళ defined(FEAT_GUI) || defined(MSWIN)
 #  ifdef VIMDLL
-	if (gui.in_use ? gui_mch_get_winpos(&x, &y) != FAIL :
+	ఒకవేళ (gui.లోపల_use ? gui_mch_get_winpos(&x, &y) != FAIL :
 		mch_get_winpos(&x, &y) != FAIL)
 #  elif defined(FEAT_GUI)
-	if (gui.in_use && gui_mch_get_winpos(&x, &y) != FAIL)
-#  else
-	if (mch_get_winpos(&x, &y) != FAIL)
+	ఒకవేళ (gui.లోపల_use && gui_mch_get_winpos(&x, &y) != FAIL)
+#  లేకపోతే
+	ఒకవేళ (mch_get_winpos(&x, &y) != FAIL)
 #  endif
 	{
-	    sprintf((char *)IObuff, _("Window position: X %d, Y %d"), x, y);
-	    msg((char *)IObuff);
+	    sprintf((అక్షరం *)IObuff, _("Window position: X %d, Y %d"), x, y);
+	    సందేశం((అక్షరం *)IObuff);
 	}
-	else
+	లేకపోతే
 # endif
-	    emsg(_(e_obtaining_window_position_not_implemented_for_this_platform));
+	    emsg(_(e_obtaining_కిటికీ_position_not_implemented_for_this_platform));
     }
-    else
+    లేకపోతే
     {
 	x = getdigits(&arg);
 	arg = skipwhite(arg);
 	p = arg;
 	y = getdigits(&arg);
-	if (*p == NUL || *arg != NUL)
+	ఒకవేళ (*p == NUL || *arg != NUL)
 	{
-	    emsg(_(e_winpos_requires_two_number_arguments));
-	    return;
+	    emsg(_(e_winpos_requires_two_సంఖ్య_arguments));
+	    తిరిగి;
 	}
 # ifdef FEAT_GUI
-	if (gui.in_use)
-	    gui_mch_set_winpos(x, y);
-	else if (gui.starting)
+	ఒకవేళ (gui.లోపల_use)
+	    gui_mch_సమితి_winpos(x, y);
+	లేకపోతే ఒకవేళ (gui.starting)
 	{
 	    // Remember the coordinates for when the window is opened.
 	    gui_win_x = x;
 	    gui_win_y = y;
 	}
-#  if defined(HAVE_TGETENT) || defined(VIMDLL)
-	else
+#  ఒకవేళ defined(HAVE_TGETENT) || defined(VIMDLL)
+	లేకపోతే
 #  endif
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
-	    mch_set_winpos(x, y);
+# ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+	    mch_సమితి_winpos(x, y);
 # endif
 # ifdef HAVE_TGETENT
-	if (*T_CWP)
-	    term_set_winpos(x, y);
+	ఒకవేళ (*T_CWP)
+	    పదం_సమితి_winpos(x, y);
 # endif
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Handle command that work like operators: ":delete", ":yank", ":>" and ":<".
  */
-    static void
+    స్థిర శూన్య
 ex_operators(exarg_T *eap)
 {
     oparg_T	oa;
 
     clear_oparg(&oa);
     oa.regname = eap->regname;
-    oa.start.lnum = eap->line1;
-    oa.end.lnum = eap->line2;
-    oa.line_count = eap->line2 - eap->line1 + 1;
+    oa.ప్రారంభం.lnum = eap->line1;
+    oa.చివర.lnum = eap->line2;
+    oa.పంక్తి_లెక్క = eap->line2 - eap->line1 + 1;
     oa.motion_type = MLINE;
     virtual_op = FALSE;
-    if (eap->cmdidx != CMD_yank)	// position cursor for undo
+    ఒకవేళ (eap->cmdidx != CMD_yank)	// position cursor for undo
     {
 	setpcmark();
 	curwin->w_cursor.lnum = eap->line1;
 	beginline(BL_SOL | BL_FIX);
     }
 
-    if (VIsual_active)
-	end_visual_mode();
+    ఒకవేళ (VIsual_చురుకైన)
+	చివర_visual_బహుళకం();
 
-    switch (eap->cmdidx)
+    ఎంపిక (eap->cmdidx)
     {
-	case CMD_delete:
+	స్థితి CMD_delete:
 	    oa.op_type = OP_DELETE;
 	    op_delete(&oa);
-	    break;
+	    ఆపు;
 
-	case CMD_yank:
+	స్థితి CMD_yank:
 	    oa.op_type = OP_YANK;
-	    (void)op_yank(&oa, FALSE, TRUE);
-	    break;
+	    (శూన్య)op_yank(&oa, FALSE, TRUE);
+	    ఆపు;
 
-	default:    // CMD_rshift or CMD_lshift
-	    if (
-#ifdef FEAT_RIGHTLEFT
+	అప్రమేయ:    // CMD_rshift or CMD_lshift
+	    ఒకవేళ (
+#నిర్వచితమైతే FEAT_RIGHTLEFT
 		(eap->cmdidx == CMD_rshift) ^ curwin->w_p_rl
-#else
+#లేకపోతే
 		eap->cmdidx == CMD_rshift
-#endif
+#అయితే_ముగింపు
 						)
 		oa.op_type = OP_RSHIFT;
-	    else
+	    లేకపోతే
 		oa.op_type = OP_LSHIFT;
-	    op_shift(&oa, FALSE, eap->amount);
-	    break;
+	    op_జరుపు(&oa, FALSE, eap->amount);
+	    ఆపు;
     }
     virtual_op = MAYBE;
     ex_may_print(eap);
@@ -8772,75 +8772,75 @@ ex_operators(exarg_T *eap)
 /*
  * ":put".
  */
-    static void
+    స్థిర శూన్య
 ex_put(exarg_T *eap)
 {
     // ":0put" works like ":1put!".
-    if (eap->line2 == 0)
+    ఒకవేళ (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
     }
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
-    do_put(eap->regname, NULL, eap->forceit ? BACKWARD : FORWARD, 1L,
-						       PUT_LINE|PUT_CURSLINE);
+    check_cursor_నిలువు();
+    do_put(eap->regname, ఖాళీ, eap->forceit ? BACKWARD : FORWARD, 1L,
+						       PUT_పంక్తి|PUT_CURSLINE);
 }
 
 /*
  * ":iput".
  */
-    static void
+    స్థిర శూన్య
 ex_iput(exarg_T *eap)
 {
     // ":0iput" works like ":1iput!".
-    if (eap->line2 == 0)
+    ఒకవేళ (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
     }
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
-    do_put(eap->regname, NULL, eap->forceit ? BACKWARD : FORWARD, 1L,
-						      PUT_LINE|PUT_CURSLINE
+    check_cursor_నిలువు();
+    do_put(eap->regname, ఖాళీ, eap->forceit ? BACKWARD : FORWARD, 1L,
+						      PUT_పంక్తి|PUT_CURSLINE
 						      |PUT_FIXINDENT);
 }
 
 /*
  * Handle ":copy" and ":move".
  */
-    static void
+    స్థిర శూన్య
 ex_copymove(exarg_T *eap)
 {
-    long	n;
+    దీర్ఘ	n;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    n = get_address(eap, &eap->arg, eap->addr_type, FALSE, FALSE, FALSE, 1);
-    if (eap->arg == NULL)	    // error detected
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (not_లోపల_vim9(eap, false) == FAIL)
+	తిరిగి;
+#అయితే_ముగింపు
+    n = get_చిరునామా(eap, &eap->arg, eap->addr_type, FALSE, FALSE, FALSE, 1);
+    ఒకవేళ (eap->arg == ఖాళీ)	    // error detected
     {
-	eap->nextcmd = NULL;
-	return;
+	eap->nextcmd = ఖాళీ;
+	తిరిగి;
     }
     get_flags(eap);
 
     /*
      * move or copy lines from 'eap->line1'-'eap->line2' to below line 'n'
      */
-    if (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
 	emsg(_(e_invalid_range));
-	return;
+	తిరిగి;
     }
 
-    if (eap->cmdidx == CMD_move)
+    ఒకవేళ (eap->cmdidx == CMD_move)
     {
-	if (do_move(eap->line1, eap->line2, n) == FAIL)
-	    return;
+	ఒకవేళ (do_move(eap->line1, eap->line2, n) == FAIL)
+	    తిరిగి;
     }
-    else
+    లేకపోతే
 	ex_copy(eap->line1, eap->line2, n);
     u_clearline();
     beginline(BL_SOL | BL_FIX);
@@ -8850,12 +8850,12 @@ ex_copymove(exarg_T *eap)
 /*
  * Print the current line if flags were given to the Ex command.
  */
-    void
+    శూన్య
 ex_may_print(exarg_T *eap)
 {
-    if (eap->flags != 0)
+    ఒకవేళ (eap->flags != 0)
     {
-	print_line(curwin->w_cursor.lnum, (eap->flags & EXFLAG_NR),
+	print_పంక్తి(curwin->w_cursor.lnum, (eap->flags & EXFLAG_NR),
 						  (eap->flags & EXFLAG_LIST));
 	ex_no_reprint = TRUE;
     }
@@ -8864,7 +8864,7 @@ ex_may_print(exarg_T *eap)
 /*
  * ":smagic" and ":snomagic".
  */
-    static void
+    స్థిర శూన్య
 ex_submagic(exarg_T *eap)
 {
     optmagic_T saved = magic_overruled;
@@ -8878,22 +8878,22 @@ ex_submagic(exarg_T *eap)
 /*
  * ":join".
  */
-    static void
+    స్థిర శూన్య
 ex_join(exarg_T *eap)
 {
     curwin->w_cursor.lnum = eap->line1;
-    if (eap->line1 == eap->line2)
+    ఒకవేళ (eap->line1 == eap->line2)
     {
-	if (eap->addr_count >= 2)   // :2,2join does nothing
-	    return;
-	if (eap->line2 == curbuf->b_ml.ml_line_count)
+	ఒకవేళ (eap->addr_లెక్క >= 2)   // :2,2join does nothing
+	    తిరిగి;
+	ఒకవేళ (eap->line2 == curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    beep_flush();
-	    return;
+	    తిరిగి;
 	}
 	++eap->line2;
     }
-    (void)do_join(eap->line2 - eap->line1 + 1, !eap->forceit, TRUE, TRUE, TRUE);
+    (శూన్య)do_join(eap->line2 - eap->line1 + 1, !eap->forceit, TRUE, TRUE, TRUE);
     beginline(BL_WHITE | BL_FIX);
     ex_may_print(eap);
 }
@@ -8901,32 +8901,32 @@ ex_join(exarg_T *eap)
 /*
  * ":[addr]@r" or ":[addr]*r": execute register
  */
-    static void
+    స్థిర శూన్య
 ex_at(exarg_T *eap)
 {
-    int		c;
-    int		prev_len = typebuf.tb_len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		prev_len = typebuf.tb_len;
 
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
+    check_cursor_నిలువు();
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#అయితే_ముగింపు
 
     // get the register name.  No name means to use the previous one
     c = *eap->arg;
-    if (c == NUL || (c == '*' && *eap->cmd == '*'))
+    ఒకవేళ (c == NUL || (c == '*' && *eap->cmd == '*'))
 	c = '@';
     // Put the register in the typeahead buffer with the "silent" flag.
-    if (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != NULL, TRUE)
+    ఒకవేళ (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != ఖాళీ, TRUE)
 								      == FAIL)
     {
 	beep_flush();
-	return;
+	తిరిగి;
     }
 
-    int	save_efr = exec_from_reg;
+    పూర్ణాంకం	save_efr = exec_from_reg;
 
     exec_from_reg = TRUE;
 
@@ -8935,8 +8935,8 @@ ex_at(exarg_T *eap)
      * Continue until the stuff buffer is empty and all added characters
      * have been consumed.
      */
-    while (!stuff_empty() || typebuf.tb_len > prev_len)
-	(void)do_cmdline(NULL, getexline, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
+    అయితే (!stuff_ఖాళీలు() || typebuf.tb_len > prev_len)
+	(శూన్య)do_cmdline(ఖాళీ, getexline, ఖాళీ, DOCMD_NOWAIT|DOCMD_VERBOSE);
 
     exec_from_reg = save_efr;
 }
@@ -8944,49 +8944,49 @@ ex_at(exarg_T *eap)
 /*
  * ":!".
  */
-    static void
+    స్థిర శూన్య
 ex_bang(exarg_T *eap)
 {
-    do_bang(eap->addr_count, eap, eap->forceit, TRUE, TRUE);
+    do_bang(eap->addr_లెక్క, eap, eap->forceit, TRUE, TRUE);
 }
 
 /*
  * ":undo".
  */
-    static void
+    స్థిర శూన్య
 ex_undo(exarg_T *eap)
 {
-    if (eap->addr_count == 1)	    // :undo 123
-	undo_time(eap->line2, FALSE, FALSE, TRUE);
-    else
+    ఒకవేళ (eap->addr_లెక్క == 1)	    // :undo 123
+	undo_సమయం(eap->line2, FALSE, FALSE, TRUE);
+    లేకపోతే
 	u_undo(1);
 }
 
-#ifdef FEAT_PERSISTENT_UNDO
-    static void
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
+    స్థిర శూన్య
 ex_wundo(exarg_T *eap)
 {
-    char_u hash[UNDO_HASH_SIZE];
+    char_u hash[UNDO_HASH_కొలత];
 
     u_compute_hash(hash);
     u_write_undo(eap->arg, eap->forceit, curbuf, hash);
 }
 
-    static void
+    స్థిర శూన్య
 ex_rundo(exarg_T *eap)
 {
-    char_u hash[UNDO_HASH_SIZE];
+    char_u hash[UNDO_HASH_కొలత];
 
     u_compute_hash(hash);
-    u_read_undo(eap->arg, hash, NULL);
+    u_read_undo(eap->arg, hash, ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":redo".
  */
-    static void
-ex_redo(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_redo(exarg_T *eap వాడని)
 {
     u_redo(1);
 }
@@ -8994,103 +8994,103 @@ ex_redo(exarg_T *eap UNUSED)
 /*
  * ":earlier" and ":later".
  */
-    static void
+    స్థిర శూన్య
 ex_later(exarg_T *eap)
 {
-    long	count = 0;
-    int		sec = FALSE;
-    int		file = FALSE;
+    దీర్ఘ	లెక్క = 0;
+    పూర్ణాంకం		sec = FALSE;
+    పూర్ణాంకం		file = FALSE;
     char_u	*p = eap->arg;
 
-    if (*p == NUL)
-	count = 1;
-    else if (SAFE_isdigit(*p))
+    ఒకవేళ (*p == NUL)
+	లెక్క = 1;
+    లేకపోతే ఒకవేళ (సురక్షిత_isdigit(*p))
     {
-	count = getdigits(&p);
-	switch (*p)
+	లెక్క = getdigits(&p);
+	ఎంపిక (*p)
 	{
-	    case 's': ++p; sec = TRUE; break;
-	    case 'm': ++p; sec = TRUE; count *= 60; break;
-	    case 'h': ++p; sec = TRUE; count *= 60 * 60; break;
-	    case 'd': ++p; sec = TRUE; count *= 24 * 60 * 60; break;
-	    case 'f': ++p; file = TRUE; break;
+	    స్థితి 's': ++p; sec = TRUE; ఆపు;
+	    స్థితి 'm': ++p; sec = TRUE; లెక్క *= 60; ఆపు;
+	    స్థితి 'h': ++p; sec = TRUE; లెక్క *= 60 * 60; ఆపు;
+	    స్థితి 'd': ++p; sec = TRUE; లెక్క *= 24 * 60 * 60; ఆపు;
+	    స్థితి 'f': ++p; file = TRUE; ఆపు;
 	}
     }
 
-    if (*p != NUL)
-	semsg(_(e_invalid_argument_str), eap->arg);
-    else
-	undo_time(eap->cmdidx == CMD_earlier ? -count : count,
+    ఒకవేళ (*p != NUL)
+	semsg(_(e_invalid_వాదం_str), eap->arg);
+    లేకపోతే
+	undo_సమయం(eap->cmdidx == CMD_earlier ? -లెక్క : లెక్క,
 							    sec, file, FALSE);
 }
 
 /*
  * ":redir": start/stop redirection.
  */
-    static void
+    స్థిర శూన్య
 ex_redir(exarg_T *eap)
 {
-    char	*mode;
+    అక్షరం	*బహుళకం;
     char_u	*fname;
     char_u	*arg = eap->arg;
 
-#ifdef FEAT_EVAL
-    if (redir_execute)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (redir_execute)
     {
 	emsg(_(e_cannot_use_redir_inside_execute));
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (STRICMP(eap->arg, "END") == 0)
+    ఒకవేళ (STRICMP(eap->arg, "END") == 0)
 	close_redir();
-    else
+    లేకపోతే
     {
-	if (*arg == '>')
+	ఒకవేళ (*arg == '>')
 	{
 	    ++arg;
-	    if (*arg == '>')
+	    ఒకవేళ (*arg == '>')
 	    {
 		++arg;
-		mode = "a";
+		బహుళకం = "a";
 	    }
-	    else
-		mode = "w";
+	    లేకపోతే
+		బహుళకం = "w";
 	    arg = skipwhite(arg);
 
 	    close_redir();
 
 	    // Expand environment variables and "~/".
 	    fname = expand_env_save(arg);
-	    if (fname == NULL)
-		return;
-#ifdef FEAT_BROWSE
-	    if (cmdmod.cmod_flags & CMOD_BROWSE)
+	    ఒకవేళ (fname == ఖాళీ)
+		తిరిగి;
+#నిర్వచితమైతే FEAT_BROWSE
+	    ఒకవేళ (cmdmod.cmod_flags & CMOD_BROWSE)
 	    {
 		char_u	*browseFile;
 
 		browseFile = do_browse(BROWSE_SAVE,
 			(char_u *)_("Save Redirection"),
-			fname, NULL, NULL,
+			fname, ఖాళీ, ఖాళీ,
 			(char_u *)_(BROWSE_FILTER_ALL_FILES), curbuf);
-		if (browseFile == NULL)
-		    return;		// operation cancelled
+		ఒకవేళ (browseFile == ఖాళీ)
+		    తిరిగి;		// operation cancelled
 		vim_free(fname);
 		fname = browseFile;
 		eap->forceit = TRUE;	// since dialog already asked
 	    }
-#endif
+#అయితే_ముగింపు
 
-	    redir_fd = open_exfile(fname, eap->forceit, mode);
+	    redir_fd = open_exfile(fname, eap->forceit, బహుళకం);
 	    vim_free(fname);
 	}
-#ifdef FEAT_EVAL
-	else if (*arg == '@')
+#నిర్వచితమైతే FEAT_EVAL
+	లేకపోతే ఒకవేళ (*arg == '@')
 	{
 	    // redirect to a register a-z (resp. A-Z for appending)
 	    close_redir();
 	    ++arg;
-	    if (ASCII_ISALPHA(*arg)
+	    ఒకవేళ (ASCII_ISALPHA(*arg)
 # ifdef HAVE_CLIPMETHOD
 		    || (clipmethod == CLIPMETHOD_PROVIDER
 			&& (*arg == '*' || *arg == '+'))
@@ -9102,58 +9102,58 @@ ex_redir(exarg_T *eap)
 		    || *arg == '"')
 	    {
 		redir_reg = *arg++;
-		if (*arg == '>' && arg[1] == '>')  // append
+		ఒకవేళ (*arg == '>' && arg[1] == '>')  // append
 		    arg += 2;
-		else
+		లేకపోతే
 		{
 		    // Can use both "@a" and "@a>".
-		    if (*arg == '>')
+		    ఒకవేళ (*arg == '>')
 			arg++;
 		    // Make register empty when not using @A-@Z and the
 		    // command is valid.
-		    if (*arg == NUL && !SAFE_isupper(redir_reg))
+		    ఒకవేళ (*arg == NUL && !సురక్షిత_isupper(redir_reg))
 			write_reg_contents(redir_reg, (char_u *)"", -1, FALSE);
 		}
 	    }
-	    if (*arg != NUL)
+	    ఒకవేళ (*arg != NUL)
 	    {
 		redir_reg = 0;
-		semsg(_(e_invalid_argument_str), eap->arg);
+		semsg(_(e_invalid_వాదం_str), eap->arg);
 	    }
 	}
-	else if (*arg == '=' && arg[1] == '>')
+	లేకపోతే ఒకవేళ (*arg == '=' && arg[1] == '>')
 	{
-	    int append;
+	    పూర్ణాంకం append;
 
 	    // redirect to a variable
 	    close_redir();
 	    arg += 2;
 
-	    if (*arg == '>')
+	    ఒకవేళ (*arg == '>')
 	    {
 		++arg;
 		append = TRUE;
 	    }
-	    else
+	    లేకపోతే
 		append = FALSE;
 
-	    if (var_redir_start(skipwhite(arg), append) == OK)
+	    ఒకవేళ (var_redir_ప్రారంభం(skipwhite(arg), append) == OK)
 		redir_vname = 1;
 	}
-#endif
+#అయితే_ముగింపు
 
 	// TODO: redirect to a buffer
 
-	else
-	    semsg(_(e_invalid_argument_str), eap->arg);
+	లేకపోతే
+	    semsg(_(e_invalid_వాదం_str), eap->arg);
     }
 
     // Make sure redirection is not off.  Can happen for cmdline completion
     // that indirectly invokes a command to catch its output.
-    if (redir_fd != NULL
-#ifdef FEAT_EVAL
+    ఒకవేళ (redir_fd != ఖాళీ
+#నిర్వచితమైతే FEAT_EVAL
 			  || redir_reg || redir_vname
-#endif
+#అయితే_ముగింపు
 							)
 	redir_off = FALSE;
 }
@@ -9161,7 +9161,7 @@ ex_redir(exarg_T *eap)
 /*
  * ":redraw": force redraw, with clear for ":redraw!".
  */
-    void
+    శూన్య
 ex_redraw(exarg_T *eap)
 {
     redraw_cmd(eap->forceit);
@@ -9170,28 +9170,28 @@ ex_redraw(exarg_T *eap)
 /*
  * ":redraw": force redraw, with clear if "clear" is TRUE.
  */
-    void
-redraw_cmd(int clear)
+    శూన్య
+redraw_cmd(పూర్ణాంకం clear)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    పూర్ణాంకం save_p_lz = p_lz;
     p_lz = FALSE;
 
     validate_cursor();
     update_topline();
-    update_screen(clear ? UPD_CLEAR : VIsual_active ? UPD_INVERTED : 0);
-    if ((State & MODE_CMDLINE) == 0)
+    update_screen(clear ? UPD_CLEAR : VIsual_చురుకైన ? UPD_INVERTED : 0);
+    ఒకవేళ ((State & బహుళకం_CMDLINE) == 0)
 	setcursor(); // put cursor back where it belongs
-    if (need_maketitle)
+    ఒకవేళ (need_maketitle)
 	maketitle();
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ఒకవేళ (!gui.లోపల_use)
 # endif
 	resize_console_buf();
-#endif
+#అయితే_ముగింపు
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
 
@@ -9199,120 +9199,120 @@ redraw_cmd(int clear)
     screen_stop_highlight();
 
     // Reset msg_didout, so that a message that's there is overwritten.
-    msg_didout = FALSE;
-    msg_col = 0;
+    సందేశం_didout = FALSE;
+    సందేశం_నిలువు = 0;
 
     // No need to wait after an intentional redraw.
     need_wait_return = FALSE;
 
     // When invoked from a callback or autocmd the command line may be active.
-    if (State & MODE_CMDLINE)
+    ఒకవేళ (State & బహుళకం_CMDLINE)
 	redrawcmdline();
 
-    out_flush();
+    బహిర్గతం_flush();
 }
 
 /*
  * ":redrawstatus": force redraw of status line(s)
  */
-    static void
-ex_redrawstatus(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_redrawstatus(exarg_T *eap వాడని)
 {
-    if (eap->forceit)
-	status_redraw_all();
-    else
-	status_redraw_curbuf();
+    ఒకవేళ (eap->forceit)
+	స్థితి_redraw_all();
+    లేకపోతే
+	స్థితి_redraw_curbuf();
     redraw_vseps = TRUE;
-    if (msg_scrolled && (State & MODE_CMDLINE))
-	return;  // redraw later
+    ఒకవేళ (సందేశం_scrolled && (State & బహుళకం_CMDLINE))
+	తిరిగి;  // redraw later
 
-    int save_RedrawingDisabled = RedrawingDisabled;
+    పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    పూర్ణాంకం save_p_lz = p_lz;
     p_lz = FALSE;
 
-    if (State & MODE_CMDLINE)
+    ఒకవేళ (State & బహుళకం_CMDLINE)
 	redraw_statuslines();
-    else
-	update_screen(VIsual_active ? UPD_INVERTED : 0);
+    లేకపోతే
+	update_screen(VIsual_చురుకైన ? UPD_INVERTED : 0);
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    బహిర్గతం_flush();
 }
 
 /*
  * ":redrawtabline": force redraw of the tabline
  */
-    static void
-ex_redrawtabline(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_redrawtabline(exarg_T *eap వాడని)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    పూర్ణాంకం save_p_lz = p_lz;
     p_lz = FALSE;
 
     draw_tabline();
 
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    బహిర్గతం_flush();
 }
 
 /*
  * ":redrawtabpanel": force redraw of the tabpanel
  */
-    static void
-ex_redrawtabpanel(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_redrawtabpanel(exarg_T *eap వాడని)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    పూర్ణాంకం save_p_lz = p_lz;
     p_lz = FALSE;
 
-#if defined(FEAT_TABPANEL)
+#ఒకవేళ defined(FEAT_TABPANEL)
     draw_tabpanel();
-#else
+#లేకపోతే
     emsg(_(e_cannot_not_support_redrawtabpanel));
-#endif
+#అయితే_ముగింపు
 
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    బహిర్గతం_flush();
 }
 
-    static void
-close_redir(void)
+    స్థిర శూన్య
+close_redir(శూన్య)
 {
-    if (redir_fd != NULL)
+    ఒకవేళ (redir_fd != ఖాళీ)
     {
 	fclose(redir_fd);
-	redir_fd = NULL;
+	redir_fd = ఖాళీ;
     }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     redir_reg = 0;
-    if (redir_vname)
+    ఒకవేళ (redir_vname)
     {
 	var_redir_stop();
 	redir_vname = 0;
     }
-#endif
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_EVAL)
-    int
-vim_mkdir_emsg(char_u *name, int prot UNUSED)
+#ఒకవేళ defined(FEAT_SESSION) || defined(FEAT_EVAL)
+    పూర్ణాంకం
+vim_mkdir_emsg(char_u *name, పూర్ణాంకం prot వాడని)
 {
-    if (vim_mkdir(name, prot) != 0)
+    ఒకవేళ (vim_mkdir(name, prot) != 0)
     {
 	semsg(_(e_cannot_create_directory_str), name);
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Open a file for writing for an Ex command, with some checks.
@@ -9321,72 +9321,72 @@ vim_mkdir_emsg(char_u *name, int prot UNUSED)
     FILE *
 open_exfile(
     char_u	*fname,
-    int		forceit,
-    char	*mode)	    // "w" for create new file or "a" for append
+    పూర్ణాంకం		forceit,
+    అక్షరం	*బహుళకం)	    // "w" for create new file or "a" for append
 {
     FILE	*fd;
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
     // with Unix it is possible to open a directory
-    if (mch_isdir(fname))
+    ఒకవేళ (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-#endif
-    if (!forceit && *mode != 'a' && vim_fexists(fname))
+#అయితే_ముగింపు
+    ఒకవేళ (!forceit && *బహుళకం != 'a' && vim_fexists(fname))
     {
-	semsg(_(e_str_exists_add_bang_to_override), fname);
-	return NULL;
+	semsg(_(e_str_exists_కూడు_bang_గమ్యం_override), fname);
+	తిరిగి ఖాళీ;
     }
 
-    if ((fd = mch_fopen((char *)fname, mode)) == NULL)
+    ఒకవేళ ((fd = mch_fopen((అక్షరం *)fname, బహుళకం)) == ఖాళీ)
 	semsg(_(e_cannot_open_str_for_writing_2), fname);
 
-    return fd;
+    తిరిగి fd;
 }
 
 /*
  * ":mark" and ":k".
  */
-    static void
+    స్థిర శూన్య
 ex_mark(exarg_T *eap)
 {
     pos_T	pos;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    if (*eap->arg == NUL)		// No argument?
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (not_లోపల_vim9(eap, false) == FAIL)
+	తిరిగి;
+#అయితే_ముగింపు
+    ఒకవేళ (*eap->arg == NUL)		// No argument?
     {
-	emsg(_(e_argument_required));
-	return;
+	emsg(_(e_వాదం_required));
+	తిరిగి;
     }
 
-    if (eap->arg[1] != NUL)	// more than one character?
+    ఒకవేళ (eap->arg[1] != NUL)	// more than one character?
     {
 	semsg(_(e_trailing_characters_str), eap->arg);
-	return;
+	తిరిగి;
     }
 
     pos = curwin->w_cursor;		// save curwin->w_cursor
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_WHITE | BL_FIX);
-    if (setmark(*eap->arg) == FAIL)	// set mark
-	emsg(_(e_argument_must_be_letter_or_forward_backward_quote));
+    ఒకవేళ (setmark(*eap->arg) == FAIL)	// set mark
+	emsg(_(e_వాదం_must_be_letter_or_forward_backward_quote));
     curwin->w_cursor = pos;		// restore curwin->w_cursor
 }
 
 /*
  * Update w_topline, w_leftcol and the cursor position.
  */
-    void
-update_topline_cursor(void)
+    శూన్య
+update_topline_cursor(శూన్య)
 {
     check_cursor();		// put cursor on valid line
     update_topline();
-    if (!curwin->w_p_wrap)
+    ఒకవేళ (!curwin->w_p_wrap)
 	validate_cursor();
     update_curswant();
 }
@@ -9395,25 +9395,25 @@ update_topline_cursor(void)
  * Save the current State and go to Normal mode.
  * Return TRUE if the typeahead could be saved.
  */
-    int
+    పూర్ణాంకం
 save_current_state(save_state_T *sst)
 {
-    sst->save_msg_scroll = msg_scroll;
+    sst->save_సందేశం_scroll = సందేశం_scroll;
     sst->save_restart_edit = restart_edit;
-    sst->save_msg_didout = msg_didout;
+    sst->save_సందేశం_didout = సందేశం_didout;
     sst->save_State = State;
     sst->save_insertmode = p_im;
-    sst->save_finish_op = finish_op;
+    sst->save_ముగింపు_op = ముగింపు_op;
     sst->save_opcount = opcount;
     sst->save_reg_executing = reg_executing;
-    sst->save_pending_end_reg_executing = pending_end_reg_executing;
+    sst->save_pending_చివర_reg_executing = pending_చివర_reg_executing;
 
-    msg_scroll = FALSE;		    // no msg scrolling in Normal mode
+    సందేశం_scroll = FALSE;		    // no msg scrolling in Normal mode
     restart_edit = 0;		    // don't go to Insert mode
     p_im = FALSE;		    // don't use 'insertmode'
 
-    sst->save_script_version = current_sctx.sc_version;
-    current_sctx.sc_version = 1;    // not in Vim9 script
+    sst->save_script_సంస్కరణ = current_sctx.sc_సంస్కరణ;
+    current_sctx.sc_సంస్కరణ = 1;    // not in Vim9 script
 
     /*
      * Save the current typeahead.  This is required to allow using ":normal"
@@ -9421,53 +9421,53 @@ save_current_state(save_state_T *sst)
      * ends with half a command.
      */
     save_typeahead(&sst->tabuf);
-    return sst->tabuf.typebuf_valid;
+    తిరిగి sst->tabuf.typebuf_valid;
 }
 
-    void
+    శూన్య
 restore_current_state(save_state_T *sst)
 {
     // Restore the previous typeahead.
     restore_typeahead(&sst->tabuf, FALSE);
 
-    msg_scroll = sst->save_msg_scroll;
+    సందేశం_scroll = sst->save_సందేశం_scroll;
     restart_edit = sst->save_restart_edit;
     p_im = sst->save_insertmode;
-    finish_op = sst->save_finish_op;
+    ముగింపు_op = sst->save_ముగింపు_op;
     opcount = sst->save_opcount;
     reg_executing = sst->save_reg_executing;
-    pending_end_reg_executing = sst->save_pending_end_reg_executing;
-    msg_didout |= sst->save_msg_didout;	// don't reset msg_didout now
-    current_sctx.sc_version = sst->save_script_version;
+    pending_చివర_reg_executing = sst->save_pending_చివర_reg_executing;
+    సందేశం_didout |= sst->save_సందేశం_didout;	// don't reset msg_didout now
+    current_sctx.sc_సంస్కరణ = sst->save_script_సంస్కరణ;
 
     // Restore the state (needed when called from a function executed for
     // 'indentexpr'). Update the mouse and cursor, they may have changed.
     State = sst->save_State;
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * ":normal[!] {commands}": Execute normal mode commands.
  */
-    void
-ex_normal(exarg_T *eap)
+    శూన్య
+ex_సాధారణ(exarg_T *eap)
 {
     save_state_T save_state;
-    char_u	*arg = NULL;
-    int		l;
+    char_u	*arg = ఖాళీ;
+    పూర్ణాంకం		l;
     char_u	*p;
 
-    if (ex_normal_lock > 0)
+    ఒకవేళ (ex_సాధారణ_తాళం > 0)
     {
-	emsg(_(e_not_allowed_here));
-	return;
+	emsg(_(e_not_allowed_ఇక్కడ));
+	తిరిగి;
     }
-    if (ex_normal_busy >= p_mmd)
+    ఒకవేళ (ex_సాధారణ_busy >= p_mmd)
     {
-	emsg(_(e_recursive_use_of_normal_too_deep));
-	return;
+	emsg(_(e_recursive_use_యొక్క_సాధారణ_too_deep));
+	తిరిగి;
     }
 
     /*
@@ -9475,56 +9475,56 @@ ex_normal(exarg_T *eap)
      * this for the K_SPECIAL leading byte, otherwise special keys will not
      * work.
      */
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	int	len = 0;
+	పూర్ణాంకం	len = 0;
 
 	// Count the number of characters to be escaped.
-	for (p = eap->arg; *p != NUL; ++p)
+	కొరకు (p = eap->arg; *p != NUL; ++p)
 	{
-#ifdef FEAT_GUI
-	    if (*p == CSI)  // leadbyte CSI
+#నిర్వచితమైతే FEAT_GUI
+	    ఒకవేళ (*p == CSI)  // leadbyte CSI
 		len += 2;
-#endif
-	    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
-		if (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
-#ifdef FEAT_GUI
+#అయితే_ముగింపు
+	    కొరకు (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+		ఒకవేళ (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
+#నిర్వచితమైతే FEAT_GUI
 			|| *p == CSI
-#endif
+#అయితే_ముగింపు
 			)
 		    len += 2;
 	}
-	if (len > 0)
+	ఒకవేళ (len > 0)
 	{
 	    arg = alloc(STRLEN(eap->arg) + len + 1);
-	    if (arg != NULL)
+	    ఒకవేళ (arg != ఖాళీ)
 	    {
 		len = 0;
-		for (p = eap->arg; *p != NUL; ++p)
+		కొరకు (p = eap->arg; *p != NUL; ++p)
 		{
 		    arg[len++] = *p;
-#ifdef FEAT_GUI
-		    if (*p == CSI)
+#నిర్వచితమైతే FEAT_GUI
+		    ఒకవేళ (*p == CSI)
 		    {
 			arg[len++] = KS_EXTRA;
-			arg[len++] = (int)KE_CSI;
+			arg[len++] = (పూర్ణాంకం)KE_CSI;
 		    }
-#endif
-		    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+#అయితే_ముగింపు
+		    కొరకు (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
 		    {
 			arg[len++] = *++p;
-			if (*p == K_SPECIAL)
+			ఒకవేళ (*p == K_SPECIAL)
 			{
 			    arg[len++] = KS_SPECIAL;
 			    arg[len++] = KE_FILLER;
 			}
-#ifdef FEAT_GUI
-			else if (*p == CSI)
+#నిర్వచితమైతే FEAT_GUI
+			లేకపోతే ఒకవేళ (*p == CSI)
 			{
 			    arg[len++] = KS_EXTRA;
-			    arg[len++] = (int)KE_CSI;
+			    arg[len++] = (పూర్ణాంకం)KE_CSI;
 			}
-#endif
+#అయితే_ముగింపు
 		    }
 		    arg[len] = NUL;
 		}
@@ -9532,39 +9532,39 @@ ex_normal(exarg_T *eap)
 	}
     }
 
-    ++ex_normal_busy;
-    if (save_current_state(&save_state))
+    ++ex_సాధారణ_busy;
+    ఒకవేళ (save_current_state(&save_state))
     {
 	/*
 	 * Repeat the :normal command for each line in the range.  When no
 	 * range given, execute it just once, without positioning the cursor
 	 * first.
 	 */
-	do
+	చేయి
 	{
-	    if (eap->addr_count != 0)
+	    ఒకవేళ (eap->addr_లెక్క != 0)
 	    {
 		curwin->w_cursor.lnum = eap->line1++;
-		curwin->w_cursor.col = 0;
+		curwin->w_cursor.నిలువు = 0;
 		check_cursor_moved(curwin);
 	    }
 
-	    exec_normal_cmd(arg != NULL
+	    exec_సాధారణ_cmd(arg != ఖాళీ
 		     ? arg
 		     : eap->arg, eap->forceit ? REMAP_NONE : REMAP_YES, FALSE);
 	}
-	while (eap->addr_count > 0 && eap->line1 <= eap->line2 && !got_int);
+	అయితే (eap->addr_లెక్క > 0 && eap->line1 <= eap->line2 && !got_int);
     }
 
     // Might not return to the main loop when in an event handler.
     update_topline_cursor();
 
     restore_current_state(&save_state);
-    --ex_normal_busy;
+    --ex_సాధారణ_busy;
     setmouse();
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 
     vim_free(arg);
 }
@@ -9572,65 +9572,65 @@ ex_normal(exarg_T *eap)
 /*
  * ":startinsert", ":startreplace" and ":startgreplace"
  */
-    static void
+    స్థిర శూన్య
 ex_startinsert(exarg_T *eap)
 {
-#ifdef FEAT_TERMINAL
+#నిర్వచితమైతే FEAT_TERMINAL
     // Ignore this when running in an active terminal.
-    if (term_job_running(curbuf->b_term))
-	return;
-#endif
-    if (!curbuf->b_p_ma && !p_im)
+    ఒకవేళ (పదం_పని_running(curbuf->b_పదం))
+	తిరిగి;
+#అయితే_ముగింపు
+    ఒకవేళ (!curbuf->b_p_ma && !p_im)
     {
 	// Only give this error when 'insertmode' is off.
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	తిరిగి;
     }
-    if (eap->forceit)
+    ఒకవేళ (eap->forceit)
     {
 	// cursor line can be zero on startup
-	if (!curwin->w_cursor.lnum)
+	ఒకవేళ (!curwin->w_cursor.lnum)
 	    curwin->w_cursor.lnum = 1;
-	set_cursor_for_append_to_line();
+	సమితి_cursor_for_append_గమ్యం_పంక్తి();
     }
 
     // Ignore the command when already in Insert mode.  Inserting an
     // expression register that invokes a function can do this.
-    if (State & MODE_INSERT)
-	return;
+    ఒకవేళ (State & బహుళకం_చొప్పించు)
+	తిరిగి;
 
-    if (eap->cmdidx == CMD_startinsert)
+    ఒకవేళ (eap->cmdidx == CMD_startinsert)
 	restart_edit = 'a';
-    else if (eap->cmdidx == CMD_startreplace)
+    లేకపోతే ఒకవేళ (eap->cmdidx == CMD_startreplace)
 	restart_edit = 'R';
-    else
+    లేకపోతే
 	restart_edit = 'V';
 
-    if (!eap->forceit)
+    ఒకవేళ (!eap->forceit)
     {
-	if (eap->cmdidx == CMD_startinsert)
+	ఒకవేళ (eap->cmdidx == CMD_startinsert)
 	    restart_edit = 'i';
 	curwin->w_curswant = 0;	    // avoid MAXCOL
     }
 
-    if (VIsual_active)
+    ఒకవేళ (VIsual_చురుకైన)
 	showmode();
 }
 
 /*
  * ":stopinsert"
  */
-    static void
-ex_stopinsert(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_stopinsert(exarg_T *eap వాడని)
 {
     restart_edit = 0;
-    stop_insert_mode = TRUE;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    stop_చొప్పించు_బహుళకం = TRUE;
+#ఒకవేళ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     // when called from remote_expr in insert mode, make sure insert mode is
     // ended by adding K_NOP to the typeahead buffer
-    if (vgetc_busy)
+    ఒకవేళ (vgetc_busy)
 	ins_char_typebuf(K_NOP, 0);
-#endif
+#అయితే_ముగింపు
     clearmode();
 }
 
@@ -9638,66 +9638,66 @@ ex_stopinsert(exarg_T *eap UNUSED)
  * Execute normal mode command "cmd".
  * "remap" can be REMAP_NONE or REMAP_YES.
  */
-    void
-exec_normal_cmd(char_u *cmd, int remap, int silent)
+    శూన్య
+exec_సాధారణ_cmd(char_u *cmd, పూర్ణాంకం remap, పూర్ణాంకం silent)
 {
     // Stuff the argument into the typeahead buffer.
     ins_typebuf(cmd, remap, 0, TRUE, silent);
-    exec_normal(FALSE, FALSE, FALSE);
+    exec_సాధారణ(FALSE, FALSE, FALSE);
 }
 
 /*
  * Execute normal_cmd() until there is no typeahead left.
  * When "use_vpeekc" is TRUE use vpeekc() to check for available chars.
  */
-    void
-exec_normal(int was_typed, int use_vpeekc, int may_use_terminal_loop UNUSED)
+    శూన్య
+exec_సాధారణ(పూర్ణాంకం was_typed, పూర్ణాంకం use_vpeekc, పూర్ణాంకం may_use_terminal_loop వాడని)
 {
     oparg_T	oa;
-    int		c;
+    పూర్ణాంకం		c;
 
     // When calling vpeekc() from feedkeys() it will return Ctrl_C when there
     // is nothing to get, so also check for Ctrl_C.
     clear_oparg(&oa);
-    finish_op = FALSE;
-    while ((!stuff_empty()
+    ముగింపు_op = FALSE;
+    అయితే ((!stuff_ఖాళీలు()
 		|| ((was_typed || !typebuf_typed()) && typebuf.tb_len > 0)
 		|| (use_vpeekc && (c = vpeekc()) != NUL && c != Ctrl_C))
 	    && !got_int)
     {
 	update_topline_cursor();
-#ifdef FEAT_TERMINAL
-	if (may_use_terminal_loop && term_use_loop()
+#నిర్వచితమైతే FEAT_TERMINAL
+	ఒకవేళ (may_use_terminal_loop && పదం_use_loop()
 		&& oa.op_type == OP_NOP && oa.regname == NUL
-		&& !VIsual_active)
+		&& !VIsual_చురుకైన)
 	{
 	    // If terminal_loop() returns OK we got a key that is handled
 	    // in Normal model.  With FAIL we first need to position the
 	    // cursor and the screen needs to be redrawn.
-	    if (terminal_loop(TRUE) == OK)
-		normal_cmd(&oa, TRUE);
+	    ఒకవేళ (terminal_loop(TRUE) == OK)
+		సాధారణ_cmd(&oa, TRUE);
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    // execute a Normal mode cmd
-	    normal_cmd(&oa, TRUE);
+	    సాధారణ_cmd(&oa, TRUE);
     }
 }
 
-#ifdef FEAT_FIND_ID
-    static void
+#నిర్వచితమైతే FEAT_కనుగొను_ID
+    స్థిర శూన్య
 ex_checkpath(exarg_T *eap)
 {
-    find_pattern_in_path(NULL, 0, 0, FALSE, FALSE, CHECK_PATH, 1L,
+    కనుగొను_నమూనా_లోపల_మార్గం(ఖాళీ, 0, 0, FALSE, FALSE, CHECK_మార్గం, 1L,
 	    eap->forceit ? ACTION_SHOW_ALL : ACTION_SHOW,
 	    (linenr_T)1, (linenr_T)MAXLNUM, eap->forceit, FALSE);
 }
 
-# if defined(FEAT_QUICKFIX)
+# ఒకవేళ defined(FEAT_QUICKFIX)
 /*
  * ":psearch"
  */
-    static void
+    స్థిర శూన్య
 ex_psearch(exarg_T *eap)
 {
     g_do_tagpreview = p_pvh;
@@ -9706,121 +9706,121 @@ ex_psearch(exarg_T *eap)
 }
 # endif
 
-    static void
+    స్థిర శూన్య
 ex_findpat(exarg_T *eap)
 {
-    int		whole = TRUE;
-    long	n;
+    పూర్ణాంకం		సంపూర్ణ = TRUE;
+    దీర్ఘ	n;
     char_u	*p;
-    int		action;
+    పూర్ణాంకం		action;
 
-    switch (cmdnames[eap->cmdidx].cmd_name[2])
+    ఎంపిక (cmdnames[eap->cmdidx].cmd_name[2])
     {
-	case 'e':	// ":psearch", ":isearch" and ":dsearch"
-		if (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
+	స్థితి 'e':	// ":psearch", ":isearch" and ":dsearch"
+		ఒకవేళ (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
 		    action = ACTION_GOTO;
-		else
+		లేకపోతే
 		    action = ACTION_SHOW;
-		break;
-	case 'i':	// ":ilist" and ":dlist"
+		ఆపు;
+	స్థితి 'i':	// ":ilist" and ":dlist"
 		action = ACTION_SHOW_ALL;
-		break;
-	case 'u':	// ":ijump" and ":djump"
+		ఆపు;
+	స్థితి 'u':	// ":ijump" and ":djump"
 		action = ACTION_GOTO;
-		break;
-	default:	// ":isplit" and ":dsplit"
-		action = ACTION_SPLIT;
-		break;
+		ఆపు;
+	అప్రమేయ:	// ":isplit" and ":dsplit"
+		action = ACTION_విభజించు;
+		ఆపు;
     }
 
     n = 1;
-    if (vim_isdigit(*eap->arg))	// get count
+    ఒకవేళ (vim_isdigit(*eap->arg))	// get count
     {
 	n = getdigits(&eap->arg);
 	eap->arg = skipwhite(eap->arg);
     }
-    if (*eap->arg == '/')   // Match regexp, not just whole words
+    ఒకవేళ (*eap->arg == '/')   // Match regexp, not just whole words
     {
-	whole = FALSE;
+	సంపూర్ణ = FALSE;
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
-	if (*p)
+	ఒకవేళ (*p)
 	{
 	    *p++ = NUL;
 	    p = skipwhite(p);
 
 	    // Check for trailing illegal characters
-	    if (!ends_excmd2(eap->arg, p))
+	    ఒకవేళ (!చివర్లు_excmd2(eap->arg, p))
 		eap->errmsg = ex_errmsg(e_trailing_characters_str, p);
-	    else
-		set_nextcmd(eap, p);
+	    లేకపోతే
+		సమితి_nextcmd(eap, p);
 	}
     }
-    if (!eap->skip)
-	find_pattern_in_path(eap->arg, 0, (int)STRLEN(eap->arg),
-		whole, !eap->forceit,
-		*eap->cmd == 'd' ? FIND_DEFINE : FIND_ANY, n, action,
+    ఒకవేళ (!eap->skip)
+	కనుగొను_నమూనా_లోపల_మార్గం(eap->arg, 0, (పూర్ణాంకం)STRLEN(eap->arg),
+		సంపూర్ణ, !eap->forceit,
+		*eap->cmd == 'd' ? కనుగొను_DEFINE : కనుగొను_ANY, n, action,
 		eap->line1, eap->line2, eap->forceit, FALSE);
 }
-#endif
+#అయితే_ముగింపు
 
 
-#ifdef FEAT_QUICKFIX
+#నిర్వచితమైతే FEAT_QUICKFIX
 /*
  * ":ptag", ":ptselect", ":ptjump", ":ptnext", etc.
  */
-    static void
+    స్థిర శూన్య
 ex_ptag(exarg_T *eap)
 {
     g_do_tagpreview = p_pvh;  // will be reset to 0 in ex_tag_cmd()
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
+    ex_ట్యాగ్_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
 }
 
 /*
  * ":pedit"
  */
-    static void
+    స్థిర శూన్య
 ex_pedit(exarg_T *eap)
 {
     win_T	*curwin_save = curwin;
-    prepare_preview_window();
+    prepare_preview_కిటికీ();
 
     // Edit the file.
-    do_exedit(eap, NULL);
+    do_exedit(eap, ఖాళీ);
 
-    back_to_current_window(curwin_save);
+    వెనుక_గమ్యం_current_కిటికీ(curwin_save);
 }
 
 /*
  * ":pbuffer"
  */
-    static void
+    స్థిర శూన్య
 ex_pbuffer(exarg_T *eap)
 {
     win_T	*curwin_save = curwin;
-    prepare_preview_window();
+    prepare_preview_కిటికీ();
 
     // Go to the buffer.
     do_exbuffer(eap);
 
-    back_to_current_window(curwin_save);
+    వెనుక_గమ్యం_current_కిటికీ(curwin_save);
 }
 
-    static void
-prepare_preview_window(void)
+    స్థిర శూన్య
+prepare_preview_కిటికీ(శూన్య)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ఒకవేళ (ERROR_IF_ANY_POPUP_కిటికీ)
+	తిరిగి;
 
     // Open the preview window or popup and make it the current window.
     g_do_tagpreview = p_pvh;
     prepare_tagpreview(TRUE, TRUE, FALSE);
 }
 
-    static void
-back_to_current_window(win_T *curwin_save)
+    స్థిర శూన్య
+వెనుక_గమ్యం_current_కిటికీ(win_T *curwin_save)
 {
-    if (curwin != curwin_save && win_valid(curwin_save))
+    ఒకవేళ (curwin != curwin_save && win_valid(curwin_save))
     {
 	// Return cursor to where we were
 	validate_cursor();
@@ -9828,7 +9828,7 @@ back_to_current_window(win_T *curwin_save)
 	win_enter(curwin_save, TRUE);
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    లేకపోతే ఒకవేళ (WIN_IS_POPUP(curwin))
     {
 	// can't keep focus in popup window
 	win_enter(firstwin, TRUE);
@@ -9836,82 +9836,82 @@ back_to_current_window(win_T *curwin_save)
 # endif
     g_do_tagpreview = 0;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":stag", ":stselect" and ":stjump".
  */
-    static void
+    స్థిర శూన్య
 ex_stag(exarg_T *eap)
 {
-    postponed_split = -1;
-    postponed_split_flags = cmdmod.cmod_split;
-    postponed_split_tab = cmdmod.cmod_tab;
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
-    postponed_split_flags = 0;
-    postponed_split_tab = 0;
+    postponed_విభజించు = -1;
+    postponed_విభజించు_flags = cmdmod.cmod_విభజించు;
+    postponed_విభజించు_tab = cmdmod.cmod_tab;
+    ex_ట్యాగ్_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
+    postponed_విభజించు_flags = 0;
+    postponed_విభజించు_tab = 0;
 }
 
 /*
  * ":tag", ":tselect", ":tjump", ":tnext", etc.
  */
-    static void
-ex_tag(exarg_T *eap)
+    స్థిర శూన్య
+ex_ట్యాగ్(exarg_T *eap)
 {
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name);
+    ex_ట్యాగ్_cmd(eap, cmdnames[eap->cmdidx].cmd_name);
 }
 
-    static void
-ex_tag_cmd(exarg_T *eap, char_u *name)
+    స్థిర శూన్య
+ex_ట్యాగ్_cmd(exarg_T *eap, char_u *name)
 {
-    int		cmd;
+    పూర్ణాంకం		cmd;
 
-    switch (name[1])
+    ఎంపిక (name[1])
     {
-	case 'j': cmd = DT_JUMP;	// ":tjump"
-		  break;
-	case 's': cmd = DT_SELECT;	// ":tselect"
-		  break;
-	case 'p': cmd = DT_PREV;	// ":tprevious"
-		  break;
-	case 'N': cmd = DT_PREV;	// ":tNext"
-		  break;
-	case 'n': cmd = DT_NEXT;	// ":tnext"
-		  break;
-	case 'o': cmd = DT_POP;		// ":pop"
-		  break;
-	case 'f':			// ":tfirst"
-	case 'r': cmd = DT_FIRST;	// ":trewind"
-		  break;
-	case 'l': cmd = DT_LAST;	// ":tlast"
-		  break;
-	default:			// ":tag"
-#ifdef FEAT_CSCOPE
-		  if (p_cst && *eap->arg != NUL)
+	స్థితి 'j': cmd = DT_JUMP;	// ":tjump"
+		  ఆపు;
+	స్థితి 's': cmd = DT_SELECT;	// ":tselect"
+		  ఆపు;
+	స్థితి 'p': cmd = DT_PREV;	// ":tprevious"
+		  ఆపు;
+	స్థితి 'N': cmd = DT_PREV;	// ":tNext"
+		  ఆపు;
+	స్థితి 'n': cmd = DT_తదుపరి;	// ":tnext"
+		  ఆపు;
+	స్థితి 'o': cmd = DT_తీయి;		// ":pop"
+		  ఆపు;
+	స్థితి 'f':			// ":tfirst"
+	స్థితి 'r': cmd = DT_మొదటి;	// ":trewind"
+		  ఆపు;
+	స్థితి 'l': cmd = DT_చివరి;	// ":tlast"
+		  ఆపు;
+	అప్రమేయ:			// ":tag"
+#నిర్వచితమైతే FEAT_CSCOPE
+		  ఒకవేళ (p_cst && *eap->arg != NUL)
 		  {
 		      ex_cstag(eap);
-		      return;
+		      తిరిగి;
 		  }
-#endif
-		  cmd = DT_TAG;
-		  break;
+#అయితే_ముగింపు
+		  cmd = DT_ట్యాగ్;
+		  ఆపు;
     }
 
-    if (name[0] == 'l')
+    ఒకవేళ (name[0] == 'l')
     {
-#ifndef FEAT_QUICKFIX
+#నిర్వచితం_కాకపోతే FEAT_QUICKFIX
 	ex_ni(eap);
-	return;
-#else
+	తిరిగి;
+#లేకపోతే
 	cmd = DT_LTAG;
-#endif
+#అయితే_ముగింపు
     }
 
-    do_tag(eap->arg, cmd, eap->addr_count > 0 ? (int)eap->line2 : 1,
+    do_ట్యాగ్(eap->arg, cmd, eap->addr_లెక్క > 0 ? (పూర్ణాంకం)eap->line2 : 1,
 							  eap->forceit, TRUE);
 }
 
-enum {
+గణన {
     SPEC_PERC = 0,
     SPEC_HASH,
     SPEC_CWORD,	    // cursor word
@@ -9920,16 +9920,16 @@ enum {
     SPEC_CFILE,	    // cursor path name
     SPEC_SFILE,	    // ":so" file name
     SPEC_SLNUM,	    // ":so" file line number
-    SPEC_STACK,	    // call stack
+    SPEC_దొంతర,	    // call stack
     SPEC_SCRIPT,    // script file name
     SPEC_AFILE,	    // autocommand file name
     SPEC_ABUF,	    // autocommand buffer number
     SPEC_AMATCH,    // autocommand match name
     SPEC_SFLNUM,    // script file line number
     SPEC_SID	    // script ID: <SNR>123_
-#ifdef FEAT_CLIENTSERVER
+#నిర్వచితమైతే FEAT_CLIENTSERVER
     , SPEC_CLIENT
-#endif
+#అయితే_ముగింపు
 };
 
 /*
@@ -9937,60 +9937,60 @@ enum {
  * If found return one of the SPEC_ values and set "*usedlen" to the length of
  * the variable.  Otherwise return -1 and "*usedlen" is unchanged.
  */
-    int
-find_cmdline_var(char_u *src, size_t *usedlen)
+    పూర్ణాంకం
+కనుగొను_cmdline_var(char_u *src, size_t *usedlen)
 {
     // must be sorted by the 'value' field because it is used by bsearch()!
-    static keyvalue_T spec_str_tab[] = {
-	KEYVALUE_ENTRY(SPEC_SID, "SID>"),	    // script ID: <SNR>123_
-	KEYVALUE_ENTRY(SPEC_ABUF, "abuf>"),	    // autocommand buffer number
-	KEYVALUE_ENTRY(SPEC_AFILE, "afile>"),	    // autocommand file name
-	KEYVALUE_ENTRY(SPEC_AMATCH, "amatch>"),	    // autocommand match name
-	KEYVALUE_ENTRY(SPEC_CCWORD, "cWORD>"),	    // cursor WORD
-	KEYVALUE_ENTRY(SPEC_CEXPR, "cexpr>"),	    // expr under cursor
-	KEYVALUE_ENTRY(SPEC_CFILE, "cfile>"),	    // cursor path name
-#ifdef FEAT_CLIENTSERVER
-	KEYVALUE_ENTRY(SPEC_CLIENT, "client>"),
-#endif
-	KEYVALUE_ENTRY(SPEC_CWORD, "cword>"),	    // cursor word
-	KEYVALUE_ENTRY(SPEC_SCRIPT, "script>"),	    // script file name
-	KEYVALUE_ENTRY(SPEC_SFILE, "sfile>"),	    // ":so" file name
-	KEYVALUE_ENTRY(SPEC_SFLNUM, "sflnum>"),	    // script file line number
-	KEYVALUE_ENTRY(SPEC_SLNUM, "slnum>"),	    // ":so" file line number
-	KEYVALUE_ENTRY(SPEC_STACK, "stack>")	    // call stack
+    స్థిర keyvalue_T spec_str_tab[] = {
+	KEYVALUE_నమోదు(SPEC_SID, "SID>"),	    // script ID: <SNR>123_
+	KEYVALUE_నమోదు(SPEC_ABUF, "abuf>"),	    // autocommand buffer number
+	KEYVALUE_నమోదు(SPEC_AFILE, "afile>"),	    // autocommand file name
+	KEYVALUE_నమోదు(SPEC_AMATCH, "amatch>"),	    // autocommand match name
+	KEYVALUE_నమోదు(SPEC_CCWORD, "cWORD>"),	    // cursor WORD
+	KEYVALUE_నమోదు(SPEC_CEXPR, "cexpr>"),	    // expr under cursor
+	KEYVALUE_నమోదు(SPEC_CFILE, "cfile>"),	    // cursor path name
+#నిర్వచితమైతే FEAT_CLIENTSERVER
+	KEYVALUE_నమోదు(SPEC_CLIENT, "client>"),
+#అయితే_ముగింపు
+	KEYVALUE_నమోదు(SPEC_CWORD, "cword>"),	    // cursor word
+	KEYVALUE_నమోదు(SPEC_SCRIPT, "script>"),	    // script file name
+	KEYVALUE_నమోదు(SPEC_SFILE, "sfile>"),	    // ":so" file name
+	KEYVALUE_నమోదు(SPEC_SFLNUM, "sflnum>"),	    // script file line number
+	KEYVALUE_నమోదు(SPEC_SLNUM, "slnum>"),	    // ":so" file line number
+	KEYVALUE_నమోదు(SPEC_దొంతర, "stack>")	    // call stack
     };
-    keyvalue_T target;
-    keyvalue_T *entry;
+    keyvalue_T లక్ష్యం;
+    keyvalue_T *నమోదు_2;
 
-    switch (*src)
+    ఎంపిక (*src)
     {
-    case '%':
+    స్థితి '%':
 	*usedlen = 1;
-	return SPEC_PERC;
+	తిరిగి SPEC_PERC;
 
-    case '#':
+    స్థితి '#':
 	*usedlen = 1;
-	return SPEC_HASH;
+	తిరిగి SPEC_HASH;
 
-    case '<':
-	target.key = 0;
-	target.value.string = src + 1;	    // skip over '<'
-	target.value.length = 0;	    // not used, see cmp_keyvalue_value_n()
+    స్థితి '<':
+	లక్ష్యం.కీలకం = 0;
+	లక్ష్యం.విలువ.string = src + 1;	    // skip over '<'
+	లక్ష్యం.విలువ.నిడివి = 0;	    // not used, see cmp_keyvalue_value_n()
 
-	entry = (keyvalue_T *)bsearch(&target, &spec_str_tab,
-		ARRAY_LENGTH(spec_str_tab), sizeof(spec_str_tab[0]),
-		cmp_keyvalue_value_n);
-	if (entry == NULL)
-	    return -1;
+	నమోదు_2 = (keyvalue_T *)bsearch(&లక్ష్యం, &spec_str_tab,
+		ARRAY_నిడివి(spec_str_tab), పరిమాణం(spec_str_tab[0]),
+		cmp_keyvalue_విలువ_n);
+	ఒకవేళ (నమోదు_2 == ఖాళీ)
+	    తిరిగి -1;
 
-	*usedlen = entry->value.length + 1;
-	return entry->key;
+	*usedlen = నమోదు_2->విలువ.నిడివి + 1;
+	తిరిగి నమోదు_2->కీలకం;
 
-    default:
-	break;
+    అప్రమేయ:
+	ఆపు;
     }
 
-    return -1;
+    తిరిగి -1;
 }
 
 /*
@@ -10023,62 +10023,62 @@ eval_vars(
     char_u	*srcstart,	// beginning of valid memory for src
     size_t	*usedlen,	// characters after src that are used
     linenr_T	*lnump,		// line number for :e command, or NULL
-    char	**errormsg,	// pointer to error message
-    int		*escaped,	// return value has escaped white space (can
+    అక్షరం	**errormsg,	// pointer to error message
+    పూర్ణాంకం		*escaped,	// return value has escaped white space (can
 				// be NULL)
-    int		empty_is_error)	// empty result is considered an error
+    పూర్ణాంకం		ఖాళీలు_is_error)	// empty result is considered an error
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*s;
-    char_u	*result = (char_u *)"";
-    char_u	*resultbuf = NULL;
+    char_u	*ఫలితం = (char_u *)"";
+    char_u	*resultbuf = ఖాళీ;
     size_t	resultlen;
     buf_T	*buf;
-    int		valid = VALID_HEAD + VALID_PATH;    // assume valid result
-    int		spec_idx;
-    int		tilde_file = FALSE;
-    int		skip_mod = FALSE;
+    పూర్ణాంకం		valid = VALID_తల + VALID_మార్గం;    // assume valid result
+    పూర్ణాంకం		spec_idx;
+    పూర్ణాంకం		tilde_file = FALSE;
+    పూర్ణాంకం		skip_mod = FALSE;
     char_u	strbuf[30];
 
-    *errormsg = NULL;
-    if (escaped != NULL)
+    *errormsg = ఖాళీ;
+    ఒకవేళ (escaped != ఖాళీ)
 	*escaped = FALSE;
 
     /*
      * Check if there is something to do.
      */
-    spec_idx = find_cmdline_var(src, usedlen);
-    if (spec_idx < 0)	// no match
+    spec_idx = కనుగొను_cmdline_var(src, usedlen);
+    ఒకవేళ (spec_idx < 0)	// no match
     {
 	*usedlen = 1;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     /*
      * Skip when preceded with a backslash "\%" and "\#".
      * Note: In "\\%" the % is also not recognized!
      */
-    if (src > srcstart && src[-1] == '\\')
+    ఒకవేళ (src > srcstart && src[-1] == '\\')
     {
 	*usedlen = 0;
 	STRMOVE(src - 1, src);	// remove backslash
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     /*
      * word or WORD under cursor
      */
-    if (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
+    ఒకవేళ (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
 						     || spec_idx == SPEC_CEXPR)
     {
-	resultlen = find_ident_under_cursor(&result,
-		spec_idx == SPEC_CWORD ? (FIND_IDENT | FIND_STRING)
-	      : spec_idx == SPEC_CEXPR ? (FIND_IDENT | FIND_STRING | FIND_EVAL)
-	      : FIND_STRING);
-	if (resultlen == 0)
+	resultlen = కనుగొను_ident_under_cursor(&ఫలితం,
+		spec_idx == SPEC_CWORD ? (కనుగొను_IDENT | కనుగొను_STRING)
+	      : spec_idx == SPEC_CEXPR ? (కనుగొను_IDENT | కనుగొను_STRING | కనుగొను_EVAL)
+	      : కనుగొను_STRING);
+	ఒకవేళ (resultlen == 0)
 	{
 	    *errormsg = "";
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
 
@@ -10089,274 +10089,274 @@ eval_vars(
      *	    File name for autocommand
      *	and following modifiers
      */
-    else
+    లేకపోతే
     {
 	size_t off = 0;
 
-	switch (spec_idx)
+	ఎంపిక (spec_idx)
 	{
-	case SPEC_PERC:
-#ifdef FEAT_EVAL
-		if (!in_vim9script() || src[1] != '%')
-#endif
+	స్థితి SPEC_PERC:
+#నిర్వచితమైతే FEAT_EVAL
+		ఒకవేళ (!లోపల_vim9script() || src[1] != '%')
+#అయితే_ముగింపు
 		{
 		    // '%': current file
-		    if (curbuf->b_fname == NULL)
+		    ఒకవేళ (curbuf->b_fname == ఖాళీ)
 		    {
-			result = (char_u *)"";
+			ఫలితం = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    లేకపోతే
 		    {
-			result = curbuf->b_fname;
-			tilde_file = STRCMP(result, "~") == 0;
+			ఫలితం = curbuf->b_fname;
+			tilde_file = STRCMP(ఫలితం, "~") == 0;
 		    }
-		    break;
+		    ఆపు;
 		}
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 		// "%%" alternate file
 		off = 1;
-#endif
+#అయితే_ముగింపు
 		// FALLTHROUGH
-	case SPEC_HASH:		// '#' or "#99": alternate file
-		if (off == 0 ? src[1] == '#' : src[2] == '%')
+	స్థితి SPEC_HASH:		// '#' or "#99": alternate file
+		ఒకవేళ (off == 0 ? src[1] == '#' : src[2] == '%')
 		{
 		    // "##" or "%%%": the argument list
-		    result = arg_all();
-		    resultbuf = result;
+		    ఫలితం = arg_all();
+		    resultbuf = ఫలితం;
 		    *usedlen = off + 2;
-		    if (escaped != NULL)
+		    ఒకవేళ (escaped != ఖాళీ)
 			*escaped = TRUE;
 		    skip_mod = TRUE;
-		    break;
+		    ఆపు;
 		}
 		s = src + off + 1;
-		if (*s == '<')		// "#<99" uses v:oldfiles
+		ఒకవేళ (*s == '<')		// "#<99" uses v:oldfiles
 		    ++s;
-		i = (int)getdigits(&s);
-		if (s == src + off + 2 && src[off + 1] == '-')
+		i = (పూర్ణాంకం)getdigits(&s);
+		ఒకవేళ (s == src + off + 2 && src[off + 1] == '-')
 		    // just a minus sign, don't skip over it
 		    s--;
-		*usedlen = (int)(s - src); // length of what we expand
+		*usedlen = (పూర్ణాంకం)(s - src); // length of what we expand
 
-		if (src[off + 1] == '<' && i != 0)
+		ఒకవేళ (src[off + 1] == '<' && i != 0)
 		{
-		    if (*usedlen < off + 2)
+		    ఒకవేళ (*usedlen < off + 2)
 		    {
 			// Should we give an error message for #<text?
 			*usedlen = off + 1;
-			return NULL;
+			తిరిగి ఖాళీ;
 		    }
-#ifdef FEAT_EVAL
-		    result = list_find_str(get_vim_var_list(VV_OLDFILES),
-								     (long)i);
-		    if (result == NULL)
+#నిర్వచితమైతే FEAT_EVAL
+		    ఫలితం = list_కనుగొను_str(get_vim_var_list(VV_OLDFILES),
+								     (దీర్ఘ)i);
+		    ఒకవేళ (ఫలితం == ఖాళీ)
 		    {
 			*errormsg = "";
-			return NULL;
+			తిరిగి ఖాళీ;
 		    }
-#else
-		    *errormsg = _(e_hashsmall_is_not_available_without_the_eval_feature);
-		    return NULL;
-#endif
+#లేకపోతే
+		    *errormsg = _(e_hashsmall_is_not_అందుబాటు_without_the_eval_feature);
+		    తిరిగి ఖాళీ;
+#అయితే_ముగింపు
 		}
-		else
+		లేకపోతే
 		{
-		    if (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
+		    ఒకవేళ (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
 			*usedlen = off + 1;
 		    buf = buflist_findnr(i);
-		    if (buf == NULL)
+		    ఒకవేళ (buf == ఖాళీ)
 		    {
-			*errormsg = _(e_no_alternate_file_name_to_substitute_for_hash);
-			return NULL;
+			*errormsg = _(e_no_alternate_file_name_గమ్యం_substitute_for_hash);
+			తిరిగి ఖాళీ;
 		    }
-		    if (lnump != NULL)
-			*lnump = ECMD_LAST;
-		    if (buf->b_fname == NULL)
+		    ఒకవేళ (lnump != ఖాళీ)
+			*lnump = ECMD_చివరి;
+		    ఒకవేళ (buf->b_fname == ఖాళీ)
 		    {
-			result = (char_u *)"";
+			ఫలితం = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    లేకపోతే
 		    {
-			result = buf->b_fname;
-			tilde_file = STRCMP(result, "~") == 0;
+			ఫలితం = buf->b_fname;
+			tilde_file = STRCMP(ఫలితం, "~") == 0;
 		    }
 		}
-		break;
+		ఆపు;
 
-	case SPEC_CFILE:	// file name under cursor
-		result = file_name_at_cursor(FNAME_MESS|FNAME_HYP, 1L, NULL);
-		if (result == NULL)
+	స్థితి SPEC_CFILE:	// file name under cursor
+		ఫలితం = file_name_at_cursor(FNAME_MESS|FNAME_HYP, 1L, ఖాళీ);
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
 		    *errormsg = "";
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
+		resultbuf = ఫలితం;	    // remember allocated string
+		ఆపు;
 
-	case SPEC_AFILE:	// file name for autocommand
-		result = autocmd_fname;
-		if (result != NULL && !autocmd_fname_full)
+	స్థితి SPEC_AFILE:	// file name for autocommand
+		ఫలితం = autocmd_fname;
+		ఒకవేళ (ఫలితం != ఖాళీ && !autocmd_fname_నిండిన)
 		{
 		    // Still need to turn the fname into a full path.  It is
 		    // postponed to avoid a delay when <afile> is not used.
-		    autocmd_fname_full = TRUE;
-		    result = FullName_save(autocmd_fname, FALSE);
+		    autocmd_fname_నిండిన = TRUE;
+		    ఫలితం = నిండిన_Name_save(autocmd_fname, FALSE);
 		    vim_free(autocmd_fname);
-		    autocmd_fname = result;
+		    autocmd_fname = ఫలితం;
 		}
-		if (result == NULL)
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
-		    *errormsg = _(e_no_autocommand_file_name_to_substitute_for_afile);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_file_name_గమ్యం_substitute_for_afile);
+		    తిరిగి ఖాళీ;
 		}
-		result = shorten_fname1(result);
-		break;
+		ఫలితం = shorten_fname1(ఫలితం);
+		ఆపు;
 
-	case SPEC_ABUF:		// buffer number for autocommand
-		if (autocmd_bufnr <= 0)
+	స్థితి SPEC_ABUF:		// buffer number for autocommand
+		ఒకవేళ (autocmd_bufnr <= 0)
 		{
-		    *errormsg = _(e_no_autocommand_buffer_number_to_substitute_for_abuf);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_బఫరు_సంఖ్య_గమ్యం_substitute_for_abuf);
+		    తిరిగి ఖాళీ;
 		}
-		sprintf((char *)strbuf, "%d", autocmd_bufnr);
-		result = strbuf;
-		break;
+		sprintf((అక్షరం *)strbuf, "%d", autocmd_bufnr);
+		ఫలితం = strbuf;
+		ఆపు;
 
-	case SPEC_AMATCH:	// match name for autocommand
-		result = autocmd_match;
-		if (result == NULL)
+	స్థితి SPEC_AMATCH:	// match name for autocommand
+		ఫలితం = autocmd_సరిపోలిక;
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
-		    *errormsg = _(e_no_autocommand_match_name_to_substitute_for_amatch);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_సరిపోలిక_name_గమ్యం_substitute_for_amatch);
+		    తిరిగి ఖాళీ;
 		}
-		break;
+		ఆపు;
 
-	case SPEC_SFILE:	// file name for ":so" command
-		result = estack_sfile(ESTACK_SFILE);
-		if (result == NULL)
+	స్థితి SPEC_SFILE:	// file name for ":so" command
+		ఫలితం = estack_sfile(ESTACK_SFILE);
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
-		    *errormsg = _(e_no_source_file_name_to_substitute_for_sfile);
-		    return NULL;
+		    *errormsg = _(e_no_ఆధారం_file_name_గమ్యం_substitute_for_sfile);
+		    తిరిగి ఖాళీ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
-	case SPEC_STACK:	// call stack
-		result = estack_sfile(ESTACK_STACK);
-		if (result == NULL)
+		resultbuf = ఫలితం;	    // remember allocated string
+		ఆపు;
+	స్థితి SPEC_దొంతర:	// call stack
+		ఫలితం = estack_sfile(ESTACK_దొంతర);
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
-		    *errormsg = _(e_no_call_stack_to_substitute_for_stack);
-		    return NULL;
+		    *errormsg = _(e_no_call_దొంతర_గమ్యం_substitute_for_దొంతర);
+		    తిరిగి ఖాళీ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
-	case SPEC_SCRIPT:	// script file name
-		result = estack_sfile(ESTACK_SCRIPT);
-		if (result == NULL)
+		resultbuf = ఫలితం;	    // remember allocated string
+		ఆపు;
+	స్థితి SPEC_SCRIPT:	// script file name
+		ఫలితం = estack_sfile(ESTACK_SCRIPT);
+		ఒకవేళ (ఫలితం == ఖాళీ)
 		{
-		    *errormsg = _(e_no_script_file_name_to_substitute_for_script);
-		    return NULL;
+		    *errormsg = _(e_no_script_file_name_గమ్యం_substitute_for_script);
+		    తిరిగి ఖాళీ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
+		resultbuf = ఫలితం;	    // remember allocated string
+		ఆపు;
 
-	case SPEC_SLNUM:	// line in file for ":so" command
-		if (SOURCING_NAME == NULL || SOURCING_LNUM == 0)
+	స్థితి SPEC_SLNUM:	// line in file for ":so" command
+		ఒకవేళ (SOURCING_NAME == ఖాళీ || SOURCING_LNUM == 0)
 		{
-		    *errormsg = _(e_no_line_number_to_use_for_slnum);
-		    return NULL;
+		    *errormsg = _(e_no_పంక్తి_సంఖ్య_గమ్యం_use_for_slnum);
+		    తిరిగి ఖాళీ;
 		}
-		sprintf((char *)strbuf, "%ld", SOURCING_LNUM);
-		result = strbuf;
-		break;
+		sprintf((అక్షరం *)strbuf, "%ld", SOURCING_LNUM);
+		ఫలితం = strbuf;
+		ఆపు;
 
-#ifdef FEAT_EVAL
-	case SPEC_SFLNUM:	// line in script file
-		if (current_sctx.sc_lnum + SOURCING_LNUM == 0)
+#నిర్వచితమైతే FEAT_EVAL
+	స్థితి SPEC_SFLNUM:	// line in script file
+		ఒకవేళ (current_sctx.sc_lnum + SOURCING_LNUM == 0)
 		{
-		    *errormsg = _(e_no_line_number_to_use_for_sflnum);
-		    return NULL;
+		    *errormsg = _(e_no_పంక్తి_సంఖ్య_గమ్యం_use_for_sflnum);
+		    తిరిగి ఖాళీ;
 		}
-		sprintf((char *)strbuf, "%ld",
-				 (long)(current_sctx.sc_lnum + SOURCING_LNUM));
-		result = strbuf;
-		break;
+		sprintf((అక్షరం *)strbuf, "%ld",
+				 (దీర్ఘ)(current_sctx.sc_lnum + SOURCING_LNUM));
+		ఫలితం = strbuf;
+		ఆపు;
 
-	case SPEC_SID:
-		if (current_sctx.sc_sid <= 0)
+	స్థితి SPEC_SID:
+		ఒకవేళ (current_sctx.sc_sid <= 0)
 		{
-		    *errormsg = _(e_using_sid_not_in_script_context);
-		    return NULL;
+		    *errormsg = _(e_using_sid_not_లోపల_script_context);
+		    తిరిగి ఖాళీ;
 		}
-		sprintf((char *)strbuf, "<SNR>%d_", current_sctx.sc_sid);
-		result = strbuf;
-		break;
-#endif
+		sprintf((అక్షరం *)strbuf, "<SNR>%d_", current_sctx.sc_sid);
+		ఫలితం = strbuf;
+		ఆపు;
+#అయితే_ముగింపు
 
-#ifdef FEAT_CLIENTSERVER
-	case SPEC_CLIENT:	// Source of last submitted input
+#నిర్వచితమైతే FEAT_CLIENTSERVER
+	స్థితి SPEC_CLIENT:	// Source of last submitted input
 # ifdef MSWIN
-		sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
-							(long_u)clientWindow);
-		result = strbuf;
-# else
+		sprintf((అక్షరం *)strbuf, PRINTF_HEX_LONG_U,
+							(long_u)client_కిటికీ);
+		ఫలితం = strbuf;
+# లేకపోతే
 #  ifdef FEAT_SOCKETSERVER
-		if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+		ఒకవేళ (clientserver_పద్ధతి == CLIENTSERVER_పద్ధతి_SOCKET)
 		{
-		    if (client_socket == NULL)
-			result = (char_u *)"";
-		    else
-			result = client_socket;
+		    ఒకవేళ (client_socket == ఖాళీ)
+			ఫలితం = (char_u *)"";
+		    లేకపోతే
+			ఫలితం = client_socket;
 		}
 #  endif
 #  ifdef FEAT_X11
-		if (clientserver_method == CLIENTSERVER_METHOD_X11)
+		ఒకవేళ (clientserver_పద్ధతి == CLIENTSERVER_పద్ధతి_X11)
 		{
-		    sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
-							(long_u)clientWindow);
-		    result = strbuf;
+		    sprintf((అక్షరం *)strbuf, PRINTF_HEX_LONG_U,
+							(long_u)client_కిటికీ);
+		    ఫలితం = strbuf;
 		}
 #  endif
 # endif
-		break;
-#endif
+		ఆపు;
+#అయితే_ముగింపు
 	}
 
-	resultlen = STRLEN(result);	// length of new string
-	if (src[*usedlen] == '<')	// remove the file name extension
+	resultlen = STRLEN(ఫలితం);	// length of new string
+	ఒకవేళ (src[*usedlen] == '<')	// remove the file name extension
 	{
 	    ++*usedlen;
-	    if ((s = vim_strrchr(result, '.')) != NULL && s >= gettail(result))
-		resultlen = s - result;
+	    ఒకవేళ ((s = vim_strrchr(ఫలితం, '.')) != ఖాళీ && s >= gettail(ఫలితం))
+		resultlen = s - ఫలితం;
 	}
-	else if (!skip_mod)
+	లేకపోతే ఒకవేళ (!skip_mod)
 	{
-	    valid |= modify_fname(src, tilde_file, usedlen, &result, &resultbuf,
+	    valid |= modify_fname(src, tilde_file, usedlen, &ఫలితం, &resultbuf,
 								  &resultlen);
-	    if (result == NULL)
+	    ఒకవేళ (ఫలితం == ఖాళీ)
 	    {
 		*errormsg = "";
-		return NULL;
+		తిరిగి ఖాళీ;
 	    }
 	}
     }
 
-    if (resultlen == 0 || valid != VALID_HEAD + VALID_PATH)
+    ఒకవేళ (resultlen == 0 || valid != VALID_తల + VALID_మార్గం)
     {
-	if (empty_is_error)
+	ఒకవేళ (ఖాళీలు_is_error)
 	{
-	    if (valid != VALID_HEAD + VALID_PATH)
-		*errormsg = _(e_empty_file_name_for_percent_or_hash_only_works_with_ph);
-	    else
-		*errormsg = _(e_evaluates_to_an_empty_string);
+	    ఒకవేళ (valid != VALID_తల + VALID_మార్గం)
+		*errormsg = _(e_ఖాళీలు_file_name_for_percent_or_hash_only_పనిచేస్తుంది_with_ph);
+	    లేకపోతే
+		*errormsg = _(e_evaluates_గమ్యం_an_ఖాళీలు_string);
 	}
-	result = NULL;
+	ఫలితం = ఖాళీ;
     }
-    else
-	result = vim_strnsave(result, resultlen);
+    లేకపోతే
+	ఫలితం = vim_strnsave(ఫలితం, resultlen);
     vim_free(resultbuf);
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -10367,8 +10367,8 @@ eval_vars(
     char_u *
 expand_sfile(char_u *arg)
 {
-    char	*errormsg;
-    char_u	*result;
+    అక్షరం	*errormsg;
+    char_u	*ఫలితం;
     size_t	resultlen;
     char_u	*newres;
     size_t	len;
@@ -10378,101 +10378,101 @@ expand_sfile(char_u *arg)
     char_u	*p;
 
     resultlen = STRLEN(arg);
-    result = vim_strnsave(arg, resultlen);
-    if (result == NULL)
-	return NULL;
+    ఫలితం = vim_strnsave(arg, resultlen);
+    ఒకవేళ (ఫలితం == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (p = result; *p; )
+    కొరకు (p = ఫలితం; *p; )
     {
-	if (STRNCMP(p, "<sfile>", 7) != 0)
+	ఒకవేళ (STRNCMP(p, "<sfile>", 7) != 0)
 	    ++p;
-	else
+	లేకపోతే
 	{
 	    // replace "<sfile>" with the sourced file name, and do ":" stuff
-	    repl = eval_vars(p, result, &srclen, NULL, &errormsg, NULL, TRUE);
-	    if (errormsg != NULL)
+	    repl = eval_vars(p, ఫలితం, &srclen, ఖాళీ, &errormsg, ఖాళీ, TRUE);
+	    ఒకవేళ (errormsg != ఖాళీ)
 	    {
-		if (*errormsg)
+		ఒకవేళ (*errormsg)
 		    emsg(errormsg);
-		vim_free(result);
-		return NULL;
+		vim_free(ఫలితం);
+		తిరిగి ఖాళీ;
 	    }
-	    if (repl == NULL)		// no match (cannot happen)
+	    ఒకవేళ (repl == ఖాళీ)		// no match (cannot happen)
 	    {
 		p += srclen;
-		continue;
+		కొనసాగు;
 	    }
 	    repllen = STRLEN(repl);
 	    resultlen += repllen - srclen;
 	    newres = alloc(resultlen + 1);
-	    if (newres == NULL)
+	    ఒకవేళ (newres == ఖాళీ)
 	    {
 		vim_free(repl);
-		vim_free(result);
-		return NULL;
+		vim_free(ఫలితం);
+		తిరిగి ఖాళీ;
 	    }
-	    len = p - result;
-	    mch_memmove(newres, result, len);
+	    len = p - ఫలితం;
+	    mch_memmove(newres, ఫలితం, len);
 	    STRCPY(newres + len, repl);
 	    len += repllen;
 	    STRCPY(newres + len, p + srclen);
 	    vim_free(repl);
-	    vim_free(result);
-	    result = newres;
+	    vim_free(ఫలితం);
+	    ఫలితం = newres;
 	    p = newres + len;		// continue after the match
 	}
     }
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 /*
  * Make a dialog message in "buff[DIALOG_MSG_SIZE]".
  * "format" must contain "%s".
  */
-    void
-dialog_msg(char_u *buff, char *format, char_u *fname)
+    శూన్య
+dialog_సందేశం(char_u *buff, అక్షరం *format, char_u *fname)
 {
-    if (fname == NULL)
+    ఒకవేళ (fname == ఖాళీ)
 	fname = (char_u *)_("Untitled");
-    vim_snprintf((char *)buff, DIALOG_MSG_SIZE, format, fname);
+    vim_snprintf((అక్షరం *)buff, DIALOG_సందేశం_కొలత, format, fname);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * ":behave {mswin,xterm}"
  */
-    static void
+    స్థిర శూన్య
 ex_behave(exarg_T *eap)
 {
-    if (STRCMP(eap->arg, "mswin") == 0)
+    ఒకవేళ (STRCMP(eap->arg, "mswin") == 0)
     {
-	set_option_value_give_err((char_u *)"selection",
+	సమితి_option_విలువ_give_err((char_u *)"selection",
 						 0L, (char_u *)"exclusive", 0);
-	set_option_value_give_err((char_u *)"selectmode",
+	సమితి_option_విలువ_give_err((char_u *)"selectmode",
 						 0L, (char_u *)"mouse,key", 0);
-	set_option_value_give_err((char_u *)"mousemodel",
+	సమితి_option_విలువ_give_err((char_u *)"mousemodel",
 						     0L, (char_u *)"popup", 0);
-	set_option_value_give_err((char_u *)"keymodel",
+	సమితి_option_విలువ_give_err((char_u *)"keymodel",
 					  0L, (char_u *)"startsel,stopsel", 0);
     }
-    else if (STRCMP(eap->arg, "xterm") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(eap->arg, "xterm") == 0)
     {
-	set_option_value_give_err((char_u *)"selection",
+	సమితి_option_విలువ_give_err((char_u *)"selection",
 						 0L, (char_u *)"inclusive", 0);
-	set_option_value_give_err((char_u *)"selectmode", 0L, (char_u *)"", 0);
-	set_option_value_give_err((char_u *)"mousemodel",
+	సమితి_option_విలువ_give_err((char_u *)"selectmode", 0L, (char_u *)"", 0);
+	సమితి_option_విలువ_give_err((char_u *)"mousemodel",
 						    0L, (char_u *)"extend", 0);
-	set_option_value_give_err((char_u *)"keymodel", 0L, (char_u *)"", 0);
+	సమితి_option_విలువ_give_err((char_u *)"keymodel", 0L, (char_u *)"", 0);
     }
-    else
-	semsg(_(e_invalid_argument_str), eap->arg);
+    లేకపోతే
+	semsg(_(e_invalid_వాదం_str), eap->arg);
 }
 
-static int filetype_detect = FALSE;
-static int filetype_plugin = FALSE;
-static int filetype_indent = FALSE;
+స్థిర పూర్ణాంకం filetype_detect = FALSE;
+స్థిర పూర్ణాంకం filetype_plugin = FALSE;
+స్థిర పూర్ణాంకం filetype_indent = FALSE;
 
 /*
  * ":filetype [plugin] [indent] {on,off,detect}"
@@ -10483,218 +10483,218 @@ static int filetype_indent = FALSE;
  * indent on: load filetype.vim and indent.vim
  * indent off: load indoff.vim
  */
-    static void
+    స్థిర శూన్య
 ex_filetype(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		plugin = FALSE;
-    int		indent = FALSE;
+    పూర్ణాంకం		plugin = FALSE;
+    పూర్ణాంకం		indent = FALSE;
 
-    if (*eap->arg == NUL)
+    ఒకవేళ (*eap->arg == NUL)
     {
 	// Print current status.
 	smsg("filetype detection:%s  plugin:%s  indent:%s",
 		filetype_detect ? "ON" : "OFF",
 		filetype_plugin ? (filetype_detect ? "ON" : "(on)") : "OFF",
 		filetype_indent ? (filetype_detect ? "ON" : "(on)") : "OFF");
-	return;
+	తిరిగి;
     }
 
     // Accept "plugin" and "indent" in any order.
-    for (;;)
+    కొరకు (;;)
     {
-	if (STRNCMP(arg, "plugin", 6) == 0)
+	ఒకవేళ (STRNCMP(arg, "plugin", 6) == 0)
 	{
 	    plugin = TRUE;
 	    arg = skipwhite(arg + 6);
-	    continue;
+	    కొనసాగు;
 	}
-	if (STRNCMP(arg, "indent", 6) == 0)
+	ఒకవేళ (STRNCMP(arg, "indent", 6) == 0)
 	{
 	    indent = TRUE;
 	    arg = skipwhite(arg + 6);
-	    continue;
+	    కొనసాగు;
 	}
-	break;
+	ఆపు;
     }
-    if (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
+    ఒకవేళ (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
     {
-	if (*arg == 'o' || !filetype_detect)
+	ఒకవేళ (*arg == 'o' || !filetype_detect)
 	{
-	    source_runtime((char_u *)FILETYPE_FILE, DIP_ALL);
+	    ఆధారం_runtime((char_u *)FILETYPE_FILE, DIP_ALL);
 	    filetype_detect = TRUE;
-	    if (plugin)
+	    ఒకవేళ (plugin)
 	    {
-		source_runtime((char_u *)FTPLUGIN_FILE, DIP_ALL);
+		ఆధారం_runtime((char_u *)FTPLUGIN_FILE, DIP_ALL);
 		filetype_plugin = TRUE;
 	    }
-	    if (indent)
+	    ఒకవేళ (indent)
 	    {
-		source_runtime((char_u *)INDENT_FILE, DIP_ALL);
+		ఆధారం_runtime((char_u *)INDENT_FILE, DIP_ALL);
 		filetype_indent = TRUE;
 	    }
 	}
-	if (*arg == 'd')
+	ఒకవేళ (*arg == 'd')
 	{
-	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", TRUE, NULL);
+	    (శూన్య)do_doautocmd((char_u *)"filetypedetect BufRead", TRUE, ఖాళీ);
 	    do_modelines(0);
 	}
     }
-    else if (STRCMP(arg, "off") == 0)
+    లేకపోతే ఒకవేళ (STRCMP(arg, "off") == 0)
     {
-	if (plugin || indent)
+	ఒకవేళ (plugin || indent)
 	{
-	    if (plugin)
+	    ఒకవేళ (plugin)
 	    {
-		source_runtime((char_u *)FTPLUGOF_FILE, DIP_ALL);
+		ఆధారం_runtime((char_u *)FTPLUGOF_FILE, DIP_ALL);
 		filetype_plugin = FALSE;
 	    }
-	    if (indent)
+	    ఒకవేళ (indent)
 	    {
-		source_runtime((char_u *)INDOFF_FILE, DIP_ALL);
+		ఆధారం_runtime((char_u *)INDOFF_FILE, DIP_ALL);
 		filetype_indent = FALSE;
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    source_runtime((char_u *)FTOFF_FILE, DIP_ALL);
+	    ఆధారం_runtime((char_u *)FTOFF_FILE, DIP_ALL);
 	    filetype_detect = FALSE;
 	}
     }
-    else
-	semsg(_(e_invalid_argument_str), arg);
+    లేకపోతే
+	semsg(_(e_invalid_వాదం_str), arg);
 }
 
 /*
  * ":setfiletype [FALLBACK] {name}"
  */
-    static void
+    స్థిర శూన్య
 ex_setfiletype(exarg_T *eap)
 {
-    if (curbuf->b_did_filetype)
-	return;
+    ఒకవేళ (curbuf->b_did_filetype)
+	తిరిగి;
 
     char_u *arg = eap->arg;
-    if (STRNCMP(arg, "FALLBACK ", 9) == 0)
+    ఒకవేళ (STRNCMP(arg, "FALLBACK ", 9) == 0)
 	arg += 9;
 
-    set_option_value_give_err((char_u *)"filetype", 0L, arg, OPT_LOCAL);
-    if (arg != eap->arg)
+    సమితి_option_విలువ_give_err((char_u *)"filetype", 0L, arg, OPT_LOCAL);
+    ఒకవేళ (arg != eap->arg)
 	curbuf->b_did_filetype = false;
 }
 
-    static void
-ex_digraphs(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_digraphs(exarg_T *eap వాడని)
 {
-#ifdef FEAT_DIGRAPHS
-    if (*eap->arg != NUL)
+#నిర్వచితమైతే FEAT_DIGRAPHS
+    ఒకవేళ (*eap->arg != NUL)
 	putdigraph(eap->arg);
-    else
+    లేకపోతే
 	listdigraphs(eap->forceit);
-#else
-    emsg(_(e_no_digraphs_version));
-#endif
+#లేకపోతే
+    emsg(_(e_no_digraphs_సంస్కరణ));
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
-    void
-set_no_hlsearch(int flag)
+#ఒకవేళ defined(FEAT_శోధన_EXTRA)
+    శూన్య
+సమితి_no_hlsearch(పూర్ణాంకం flag)
 {
     no_hlsearch = flag;
 # ifdef FEAT_EVAL
-    set_vim_var_nr(VV_HLSEARCH, !no_hlsearch && p_hls);
+    సమితి_vim_var_nr(VV_HLSEARCH, !no_hlsearch && p_hls);
 # endif
 }
 
 /*
  * ":nohlsearch"
  */
-    static void
-ex_nohlsearch(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_nohlsearch(exarg_T *eap వాడని)
 {
-    set_no_hlsearch(TRUE);
+    సమితి_no_hlsearch(TRUE);
     redraw_all_later(UPD_SOME_VALID);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_CRYPT
+#నిర్వచితమైతే FEAT_CRYPT
 /*
  * ":X": Get crypt key
  */
-    static void
-ex_X(exarg_T *eap UNUSED)
+    స్థిర శూన్య
+ex_X(exarg_T *eap వాడని)
 {
-    crypt_check_current_method();
-    (void)crypt_get_key(TRUE, TRUE);
+    crypt_check_current_పద్ధతి();
+    (శూన్య)crypt_get_కీలకం(TRUE, TRUE);
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_FOLDING
-    static void
+#నిర్వచితమైతే FEAT_FOLDING
+    స్థిర శూన్య
 ex_fold(exarg_T *eap)
 {
-    if (foldManualAllowed(TRUE))
+    ఒకవేళ (foldManualAllowed(TRUE))
 	foldCreate(eap->line1, eap->line2);
 }
 
-    static void
+    స్థిర శూన్య
 ex_foldopen(exarg_T *eap)
 {
     opFoldRange(eap->line1, eap->line2, eap->cmdidx == CMD_foldopen,
 							 eap->forceit, FALSE);
 }
 
-    static void
+    స్థిర శూన్య
 ex_folddo(exarg_T *eap)
 {
     linenr_T	lnum;
 
 # ifdef FEAT_CLIPBOARD
-    start_global_changes();
+    ప్రారంభం_global_changes();
 # endif
 # ifdef FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
 # endif
 
     // First set the marks for all lines closed/open.
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
-	if (hasFolding(lnum, NULL, NULL) == (eap->cmdidx == CMD_folddoclosed))
+    కొరకు (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+	ఒకవేళ (hasFolding(lnum, ఖాళీ, ఖాళీ) == (eap->cmdidx == CMD_folddoclosed))
 	    ml_setmarked(lnum);
 
     // Execute the command on the marked lines.
     global_exe(eap->arg);
     ml_clearmarked();	   // clear rest of the marks
 # ifdef FEAT_CLIPBOARD
-    end_global_changes();
+    చివర_global_changes();
 # endif
 # ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_QUICKFIX)
+#ఒకవేళ defined(FEAT_QUICKFIX)
 /*
  * Returns TRUE if the supplied Ex cmdidx is for a location list command
  * instead of a quickfix command.
  */
-    int
-is_loclist_cmd(int cmdidx)
+    పూర్ణాంకం
+is_loclist_cmd(పూర్ణాంకం cmdidx)
 {
-    if (cmdidx < 0 || cmdidx >= CMD_SIZE)
-	return FALSE;
-    return cmdnames[cmdidx].cmd_name[0] == 'l';
+    ఒకవేళ (cmdidx < 0 || cmdidx >= CMD_కొలత)
+	తిరిగి FALSE;
+    తిరిగి cmdnames[cmdidx].cmd_name[0] == 'l';
 }
-#endif
+#అయితే_ముగింపు
 
-    int
-get_pressedreturn(void)
+    పూర్ణాంకం
+get_pressedreturn(శూన్య)
 {
-    return ex_pressedreturn;
+    తిరిగి ex_pressedreturn;
 }
 
-    void
-set_pressedreturn(int val)
+    శూన్య
+సమితి_pressedreturn(పూర్ణాంకం val)
 {
     ex_pressedreturn = val;
 }

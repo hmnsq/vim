@@ -1,4 +1,4 @@
 #!/usr/bin/python3
 
-import sys
-print(sys.version)
+దిగుమతి sys
+ముద్రించు(sys.సంస్కరణ_2)

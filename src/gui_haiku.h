@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+నిర్మాణం BMenu;
+నిర్మాణం BMenu_అంశం;
+నిర్మాణం BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+నిర్మాణం VimApp;
+నిర్మాణం VimFormView;
+నిర్మాణం Vim_పాఠ్యం_Area_View;
+నిర్మాణం Vim_కిటికీ;
+నిర్మాణం VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+బాహ్య పూర్ణాంకం vim_తాళం_screen();
+బాహ్య శూన్య vim_unlock_screen();
 
-#ifndef __cplusplus
+#నిర్వచితం_కాకపోతే __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+రకనిర్వచనం నిర్మాణం BMenu BMenu;
+రకనిర్వచనం నిర్మాణం BMenu_అంశం BMenu_అంశం;
+రకనిర్వచనం నిర్మాణం BPictureButton BPictureButton;
+రకనిర్వచనం నిర్మాణం Vim_కిటికీ Vim_కిటికీ;
+రకనిర్వచనం నిర్మాణం VimFormView VimFormView;
+రకనిర్వచనం నిర్మాణం Vim_పాఠ్యం_Area_View Vim_పాఠ్యం_Area_View;
+రకనిర్వచనం నిర్మాణం VimApp VimApp;
+రకనిర్వచనం నిర్మాణం VimScrollBar VimScrollBar;
 
-#endif
+#అయితే_ముగింపు

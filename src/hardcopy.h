@@ -11,36 +11,36 @@
  * hardcopy.h: common stuff for hardcopy feature
  */
 
-#ifndef HARDCOPY_H
-#define HARDCOPY_H
+#నిర్వచితం_కాకపోతే HARDCOPY_H
+#నిర్వచించు HARDCOPY_H
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_PRINTER)
+#ఒకవేళ defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+బాహ్య పూర్ణాంకం	prt_curr_italic;
+బాహ్య పూర్ణాంకం	prt_curr_bold;
+బాహ్య పూర్ణాంకం	prt_curr_underline;
+బాహ్య long_u	prt_curr_bg;
+బాహ్య long_u	prt_curr_fg;
+బాహ్య పూర్ణాంకం	prt_పుట_లెక్క;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# ఒకవేళ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+రకనిర్వచనం నిర్మాణం
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    అక్షరం	*name;
+    ద్విగుణ	వెడల్పు; // Width and height in points for portrait
+    ద్విగుణ	ఎత్తు;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+బాహ్య prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
-#endif
+#అయితే_ముగింపు
 
-#endif
+#అయితే_ముగింపు

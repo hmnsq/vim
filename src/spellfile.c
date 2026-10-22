@@ -237,91 +237,91 @@
  *			    few bytes as possible, see offset2bytes())
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_SPELL)
 
-#include <time.h>	// for time_t
+#అన్తర్భావ <time.h>	// for time_t
 
 // Special byte values for <byte>.  Some are only used in the tree for
 // postponed prefixes, some only in the other trees.  This is a bit messy...
-#define BY_NOFLAGS	0	// end of word without flags or region; for
+#నిర్వచించు BY_NOFLAGS	0	// end of word without flags or region; for
 				// postponed prefix: no <pflags>
-#define BY_INDEX	1	// child is shared, index follows
-#define BY_FLAGS	2	// end of word, <flags> byte follows; for
+#నిర్వచించు BY_సూచీ	1	// child is shared, index follows
+#నిర్వచించు BY_FLAGS	2	// end of word, <flags> byte follows; for
 				// postponed prefix: <pflags> follows
-#define BY_FLAGS2	3	// end of word, <flags> and <flags2> bytes
+#నిర్వచించు BY_FLAGS2	3	// end of word, <flags> and <flags2> bytes
 				// follow; never used in prefix tree
-#define BY_SPECIAL  BY_FLAGS2	// highest special byte value
+#నిర్వచించు BY_SPECIAL  BY_FLAGS2	// highest special byte value
 
-#define ZERO_FLAG	65009	// used when flag is zero: "0"
+#నిర్వచించు ZERO_FLAG	65009	// used when flag is zero: "0"
 
 // Flags used in .spl file for soundsalike flags.
-#define SAL_F0LLOWUP		1
-#define SAL_COLLAPSE		2
-#define SAL_REM_ACCENTS		4
+#నిర్వచించు SAL_F0LLOWUP		1
+#నిర్వచించు SAL_COLLAPSE		2
+#నిర్వచించు SAL_REM_ACCENTS		4
 
-#define VIMSPELLMAGIC "VIMspell"  // string at start of Vim spell file
-#define VIMSPELLMAGICL 8
-#define VIMSPELLVERSION 50
+#నిర్వచించు VIMSPELLMAGIC "VIMspell"  // string at start of Vim spell file
+#నిర్వచించు VIMSPELLMAGICL 8
+#నిర్వచించు VIMSPELLVERSION 50
 
 // Section IDs.  Only renumber them when VIMSPELLVERSION changes!
-#define SN_REGION	0	// <regionname> section
-#define SN_CHARFLAGS	1	// charflags section
-#define SN_MIDWORD	2	// <midword> section
-#define SN_PREFCOND	3	// <prefcond> section
-#define SN_REP		4	// REP items section
-#define SN_SAL		5	// SAL items section
-#define SN_SOFO		6	// soundfolding section
-#define SN_MAP		7	// MAP items section
-#define SN_COMPOUND	8	// compound words section
-#define SN_SYLLABLE	9	// syllable section
-#define SN_NOBREAK	10	// NOBREAK section
-#define SN_SUGFILE	11	// timestamp for .sug file
-#define SN_REPSAL	12	// REPSAL items section
-#define SN_WORDS	13	// common words
-#define SN_NOSPLITSUGS	14	// don't split word for suggestions
-#define SN_INFO		15	// info section
-#define SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
-#define SN_END		255	// end of sections
+#నిర్వచించు SN_REGION	0	// <regionname> section
+#నిర్వచించు SN_CHARFLAGS	1	// charflags section
+#నిర్వచించు SN_MIDWORD	2	// <midword> section
+#నిర్వచించు SN_PREFCOND	3	// <prefcond> section
+#నిర్వచించు SN_REP		4	// REP items section
+#నిర్వచించు SN_SAL		5	// SAL items section
+#నిర్వచించు SN_SOFO		6	// soundfolding section
+#నిర్వచించు SN_MAP		7	// MAP items section
+#నిర్వచించు SN_COMPOUND	8	// compound words section
+#నిర్వచించు SN_SYLLABLE	9	// syllable section
+#నిర్వచించు SN_NOBREAK	10	// NOBREAK section
+#నిర్వచించు SN_SUGFILE	11	// timestamp for .sug file
+#నిర్వచించు SN_REPSAL	12	// REPSAL items section
+#నిర్వచించు SN_పదాలు	13	// common words
+#నిర్వచించు SN_NOSPLITSUGS	14	// don't split word for suggestions
+#నిర్వచించు SN_INFO		15	// info section
+#నిర్వచించు SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
+#నిర్వచించు SN_చివర		255	// end of sections
 
-#define SNF_REQUIRED	1	// <sectionflags>: required section
+#నిర్వచించు SNF_REQUIRED	1	// <sectionflags>: required section
 
-#define CF_WORD		0x01
-#define CF_UPPER	0x02
+#నిర్వచించు CF_మాట		0x01
+#నిర్వచించు CF_పై	0x02
 
 // Max allowed length for COMPOUND section
-#define COMPOUND_MAX_LEN	100000
+#నిర్వచించు COMPOUND_MAX_LEN	100000
 
 /*
  * Loop through all the siblings of a node (including the node)
  */
-#define FOR_ALL_NODE_SIBLINGS(node, np) \
-    for ((np) = (node); (np) != NULL; (np) = (np)->wn_sibling)
+#నిర్వచించు FOR_ALL_కణుపు_SIBLINGS(కణుపు, np) \
+    కొరకు ((np) = (కణుపు); (np) != ఖాళీ; (np) = (np)->wn_sibling)
 
-static int set_spell_finish(spelltab_T	*new_st);
-static int write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
-static int read_region_section(FILE *fd, slang_T *slang, int len);
-static int read_charflags_section(FILE *fd);
-static int read_prefcond_section(FILE *fd, slang_T *lp);
-static int read_rep_section(FILE *fd, garray_T *gap, short *first);
-static int read_sal_section(FILE *fd, slang_T *slang);
-static int read_words_section(FILE *fd, slang_T *lp, int len);
-static int read_sofo_section(FILE *fd, slang_T *slang);
-static int read_compound(FILE *fd, slang_T *slang, int len);
-static int set_sofo(slang_T *lp, char_u *from, char_u *to);
-static void set_sal_first(slang_T *lp);
-static int *mb_str2wide(char_u *s);
-static int spell_read_tree(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, int prefixtree, int prefixcnt);
-static idx_T read_tree_node(FILE *fd, char_u *byts, idx_T *idxs, int maxidx, idx_T startidx, int prefixtree, int maxprefcondnr, int depth);
-static void set_spell_charflags(char_u *flags, int cnt, char_u *upp);
-static int set_spell_chartab(char_u *fol, char_u *low, char_u *upp);
-static void set_map_str(slang_T *lp, char_u *map);
+స్థిర పూర్ణాంకం సమితి_spell_ముగింపు(spelltab_T	*new_st);
+స్థిర పూర్ణాంకం write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
+స్థిర పూర్ణాంకం read_region_section(FILE *fd, slang_T *slang, పూర్ణాంకం len);
+స్థిర పూర్ణాంకం read_charflags_section(FILE *fd);
+స్థిర పూర్ణాంకం read_prefcond_section(FILE *fd, slang_T *lp);
+స్థిర పూర్ణాంకం read_rep_section(FILE *fd, garray_T *gap, పొట్టి *మొదటి);
+స్థిర పూర్ణాంకం read_sal_section(FILE *fd, slang_T *slang);
+స్థిర పూర్ణాంకం read_పదాలు_section(FILE *fd, slang_T *lp, పూర్ణాంకం len);
+స్థిర పూర్ణాంకం read_sofo_section(FILE *fd, slang_T *slang);
+స్థిర పూర్ణాంకం read_compound(FILE *fd, slang_T *slang, పూర్ణాంకం len);
+స్థిర పూర్ణాంకం సమితి_sofo(slang_T *lp, char_u *from, char_u *గమ్యం);
+స్థిర శూన్య సమితి_sal_మొదటి(slang_T *lp);
+స్థిర పూర్ణాంకం *mb_str2wide(char_u *s);
+స్థిర పూర్ణాంకం spell_read_వృక్షం(FILE *fd, char_u **bytsp, దీర్ఘ *bytsp_len, idx_T **idxsp, పూర్ణాంకం prefixtree, పూర్ణాంకం prefixcnt);
+స్థిర idx_T read_వృక్షం_కణుపు(FILE *fd, char_u *byts, idx_T *idxs, పూర్ణాంకం maxidx, idx_T startidx, పూర్ణాంకం prefixtree, పూర్ణాంకం maxprefcondnr, పూర్ణాంకం లోతు);
+స్థిర శూన్య సమితి_spell_charflags(char_u *flags, పూర్ణాంకం cnt, char_u *upp);
+స్థిర పూర్ణాంకం సమితి_spell_chartab(char_u *fol, char_u *దిగువ, char_u *upp);
+స్థిర శూన్య సమితి_map_str(slang_T *lp, char_u *map);
 
 
-static char *e_afftrailing = N_("Trailing text in %s line %d: %s");
-static char *e_affname = N_("Affix name too long in %s line %d: %s");
-static char *msg_compressing = N_("Compressing word tree...");
+స్థిర అక్షరం *e_afftrailing = N_("Trailing text in %s line %d: %s");
+స్థిర అక్షరం *e_affname = N_("Affix name too long in %s line %d: %s");
+స్థిర అక్షరం *సందేశం_compressing = N_("Compressing word tree...");
 
 /*
  * Load one spell file and store the info into a slang_T.
@@ -337,86 +337,86 @@ static char *msg_compressing = N_("Compressing word tree...");
  * Returns the slang_T the spell file was loaded into.  NULL for error.
  */
     slang_T *
-spell_load_file(
+spell_ఎక్కించు_file(
     char_u	*fname,
     char_u	*lang,
     slang_T	*old_lp,
-    int		silent)		// no error if file doesn't exist
+    పూర్ణాంకం		silent)		// no error if file doesn't exist
 {
     FILE	*fd;
     char_u	buf[VIMSPELLMAGICL];
     char_u	*p;
-    int		i;
-    int		n;
-    int		len;
-    slang_T	*lp = NULL;
-    int		c = 0;
-    int		res;
-    int		did_estack_push = FALSE;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		len;
+    slang_T	*lp = ఖాళీ;
+    పూర్ణాంకం		c = 0;
+    పూర్ణాంకం		res;
+    పూర్ణాంకం		did_estack_నెట్టు = FALSE;
     ESTACK_CHECK_DECLARATION;
 
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "r");
+    ఒకవేళ (fd == ఖాళీ)
     {
-	if (!silent)
+	ఒకవేళ (!silent)
 	    semsg(_(e_cant_open_file_str), fname);
-	else if (p_verbose > 2)
+	లేకపోతే ఒకవేళ (p_verbose > 2)
 	{
 	    verbose_enter();
-	    smsg((const char *)e_cant_open_file_str, fname);
+	    smsg((స్థిరరాశి అక్షరం *)e_cant_open_file_str, fname);
 	    verbose_leave();
 	}
-	goto endFAIL;
+	వెళ్ళు చివర_FAIL;
     }
-    if (p_verbose > 2)
+    ఒకవేళ (p_verbose > 2)
     {
 	verbose_enter();
 	smsg(_("Reading spell file \"%s\""), fname);
 	verbose_leave();
     }
 
-    if (old_lp == NULL)
+    ఒకవేళ (old_lp == ఖాళీ)
     {
 	lp = slang_alloc(lang);
-	if (lp == NULL)
-	    goto endFAIL;
+	ఒకవేళ (lp == ఖాళీ)
+	    వెళ్ళు చివర_FAIL;
 
 	// Remember the file name, used to reload the file when it's updated.
 	lp->sl_fname = vim_strsave(fname);
-	if (lp->sl_fname == NULL)
-	    goto endFAIL;
+	ఒకవేళ (lp->sl_fname == ఖాళీ)
+	    వెళ్ళు చివర_FAIL;
 
 	// Check for .add.spl (_add.spl for VMS).
-	lp->sl_add = strstr((char *)gettail(fname), SPL_FNAME_ADD) != NULL;
+	lp->sl_కూడు = అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(fname), SPL_FNAME_కూడు) != ఖాళీ;
     }
-    else
+    లేకపోతే
 	lp = old_lp;
 
     // Set sourcing_name, so that error messages mention the file name.
-    estack_push(ETYPE_SPELL, fname, 0);
-    ESTACK_CHECK_SETUP;
-    did_estack_push = TRUE;
+    estack_నెట్టు(ETYPE_SPELL, fname, 0);
+    ESTACK_CHECK_అమరిక;
+    did_estack_నెట్టు = TRUE;
 
     /*
      * <HEADER>: <fileID>
      */
-    for (i = 0; i < VIMSPELLMAGICL; ++i)
+    కొరకు (i = 0; i < VIMSPELLMAGICL; ++i)
 	buf[i] = (c = getc(fd)) == EOF ? 0 : c;		// <fileID>
-    if (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
+    ఒకవేళ (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
     {
 	emsg(_(e_this_does_not_look_like_spell_file));
-	goto endFAIL;
+	వెళ్ళు చివర_FAIL;
     }
     c = getc(fd);					// <versionnr>
-    if (c < VIMSPELLVERSION)
+    ఒకవేళ (c < VIMSPELLVERSION)
     {
-	emsg(_(e_old_spell_file_needs_to_be_updated));
-	goto endFAIL;
+	emsg(_(e_old_spell_file_needs_గమ్యం_be_updated));
+	వెళ్ళు చివర_FAIL;
     }
-    else if (c > VIMSPELLVERSION)
+    లేకపోతే ఒకవేళ (c > VIMSPELLVERSION)
     {
-	emsg(_(e_spell_file_is_for_newer_version_of_vim));
-	goto endFAIL;
+	emsg(_(e_spell_file_is_for_newer_సంస్కరణ_యొక్క_vim));
+	వెళ్ళు చివర_FAIL;
     }
 
 
@@ -424,231 +424,231 @@ spell_load_file(
      * <SECTIONS>: <section> ... <sectionend>
      * <section>: <sectionID> <sectionflags> <sectionlen> (section contents)
      */
-    for (;;)
+    కొరకు (;;)
     {
 	n = getc(fd);			    // <sectionID> or <sectionend>
-	if (n == SN_END)
-	    break;
+	ఒకవేళ (n == SN_చివర)
+	    ఆపు;
 	c = getc(fd);					// <sectionflags>
 	len = get4c(fd);				// <sectionlen>
-	if (len < 0)
-	    goto truncerr;
+	ఒకవేళ (len < 0)
+	    వెళ్ళు truncerr;
 
 	res = 0;
-	switch (n)
+	ఎంపిక (n)
 	{
-	    case SN_INFO:
+	    స్థితి SN_INFO:
 		lp->sl_info = read_string(fd, len);	// <infotext>
-		if (lp->sl_info == NULL)
-		    goto endFAIL;
-		break;
+		ఒకవేళ (lp->sl_info == ఖాళీ)
+		    వెళ్ళు చివర_FAIL;
+		ఆపు;
 
-	    case SN_REGION:
+	    స్థితి SN_REGION:
 		res = read_region_section(fd, lp, len);
-		break;
+		ఆపు;
 
-	    case SN_CHARFLAGS:
+	    స్థితి SN_CHARFLAGS:
 		res = read_charflags_section(fd);
-		break;
+		ఆపు;
 
-	    case SN_MIDWORD:
+	    స్థితి SN_MIDWORD:
 		lp->sl_midword = read_string(fd, len);	// <midword>
-		if (lp->sl_midword == NULL)
-		    goto endFAIL;
-		break;
+		ఒకవేళ (lp->sl_midword == ఖాళీ)
+		    వెళ్ళు చివర_FAIL;
+		ఆపు;
 
-	    case SN_PREFCOND:
+	    స్థితి SN_PREFCOND:
 		res = read_prefcond_section(fd, lp);
-		break;
+		ఆపు;
 
-	    case SN_REP:
-		res = read_rep_section(fd, &lp->sl_rep, lp->sl_rep_first);
-		break;
+	    స్థితి SN_REP:
+		res = read_rep_section(fd, &lp->sl_rep, lp->sl_rep_మొదటి);
+		ఆపు;
 
-	    case SN_REPSAL:
-		res = read_rep_section(fd, &lp->sl_repsal, lp->sl_repsal_first);
-		break;
+	    స్థితి SN_REPSAL:
+		res = read_rep_section(fd, &lp->sl_repsal, lp->sl_repsal_మొదటి);
+		ఆపు;
 
-	    case SN_SAL:
+	    స్థితి SN_SAL:
 		res = read_sal_section(fd, lp);
-		break;
+		ఆపు;
 
-	    case SN_SOFO:
+	    స్థితి SN_SOFO:
 		res = read_sofo_section(fd, lp);
-		break;
+		ఆపు;
 
-	    case SN_MAP:
+	    స్థితి SN_MAP:
 		p = read_string(fd, len);		// <mapstr>
-		if (p == NULL)
-		    goto endFAIL;
-		set_map_str(lp, p);
+		ఒకవేళ (p == ఖాళీ)
+		    వెళ్ళు చివర_FAIL;
+		సమితి_map_str(lp, p);
 		vim_free(p);
-		break;
+		ఆపు;
 
-	    case SN_WORDS:
-		res = read_words_section(fd, lp, len);
-		break;
+	    స్థితి SN_పదాలు:
+		res = read_పదాలు_section(fd, lp, len);
+		ఆపు;
 
-	    case SN_SUGFILE:
+	    స్థితి SN_SUGFILE:
 		lp->sl_sugtime = get8ctime(fd);		// <timestamp>
-		break;
+		ఆపు;
 
-	    case SN_NOSPLITSUGS:
+	    స్థితి SN_NOSPLITSUGS:
 		lp->sl_nosplitsugs = TRUE;
-		break;
+		ఆపు;
 
-	    case SN_NOCOMPOUNDSUGS:
+	    స్థితి SN_NOCOMPOUNDSUGS:
 		lp->sl_nocompoundsugs = TRUE;
-		break;
+		ఆపు;
 
-	    case SN_COMPOUND:
+	    స్థితి SN_COMPOUND:
 		res = read_compound(fd, lp, len);
-		break;
+		ఆపు;
 
-	    case SN_NOBREAK:
+	    స్థితి SN_NOBREAK:
 		lp->sl_nobreak = TRUE;
-		break;
+		ఆపు;
 
-	    case SN_SYLLABLE:
+	    స్థితి SN_SYLLABLE:
 		lp->sl_syllable = read_string(fd, len);	// <syllable>
-		if (lp->sl_syllable == NULL)
-		    goto endFAIL;
-		if (init_syl_tab(lp) != OK)
-		    goto endFAIL;
-		break;
+		ఒకవేళ (lp->sl_syllable == ఖాళీ)
+		    వెళ్ళు చివర_FAIL;
+		ఒకవేళ (init_syl_tab(lp) != OK)
+		    వెళ్ళు చివర_FAIL;
+		ఆపు;
 
-	    default:
+	    అప్రమేయ:
 		// Unsupported section.  When it's required give an error
 		// message.  When it's not required skip the contents.
-		if (c & SNF_REQUIRED)
+		ఒకవేళ (c & SNF_REQUIRED)
 		{
-		    emsg(_(e_unsupported_section_in_spell_file));
-		    goto endFAIL;
+		    emsg(_(e_unsupported_section_లోపల_spell_file));
+		    వెళ్ళు చివర_FAIL;
 		}
-		while (--len >= 0)
-		    if (getc(fd) < 0)
-			goto truncerr;
-		break;
+		అయితే (--len >= 0)
+		    ఒకవేళ (getc(fd) < 0)
+			వెళ్ళు truncerr;
+		ఆపు;
 	}
 someerror:
-	if (res == SP_FORMERROR)
+	ఒకవేళ (res == SP_FORMERROR)
 	{
-	    emsg(_(e_format_error_in_spell_file));
-	    goto endFAIL;
+	    emsg(_(e_format_error_లోపల_spell_file));
+	    వెళ్ళు చివర_FAIL;
 	}
-	if (res == SP_TRUNCERROR)
+	ఒకవేళ (res == SP_TRUNCERROR)
 	{
 truncerr:
 	    emsg(_(e_truncated_spell_file));
-	    goto endFAIL;
+	    వెళ్ళు చివర_FAIL;
 	}
-	if (res == SP_OTHERERROR)
-	    goto endFAIL;
+	ఒకవేళ (res == SP_OTHERERROR)
+	    వెళ్ళు చివర_FAIL;
     }
 
     // <LWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
+    res = spell_read_వృక్షం(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
 						      &lp->sl_fidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    ఒకవేళ (res != 0)
+	వెళ్ళు someerror;
 
     // <KWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_kbyts, NULL, &lp->sl_kidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    res = spell_read_వృక్షం(fd, &lp->sl_kbyts, ఖాళీ, &lp->sl_kidxs, FALSE, 0);
+    ఒకవేళ (res != 0)
+	వెళ్ళు someerror;
 
     // <PREFIXTREE>
-    res = spell_read_tree(fd, &lp->sl_pbyts, NULL, &lp->sl_pidxs, TRUE,
+    res = spell_read_వృక్షం(fd, &lp->sl_pbyts, ఖాళీ, &lp->sl_pidxs, TRUE,
 							    lp->sl_prefixcnt);
-    if (res != 0)
-	goto someerror;
+    ఒకవేళ (res != 0)
+	వెళ్ళు someerror;
 
     // For a new file link it in the list of spell files.
-    if (old_lp == NULL && lang != NULL)
+    ఒకవేళ (old_lp == ఖాళీ && lang != ఖాళీ)
     {
-	lp->sl_next = first_lang;
-	first_lang = lp;
+	lp->sl_తదుపరి = మొదటి_lang;
+	మొదటి_lang = lp;
     }
 
-    goto endOK;
+    వెళ్ళు చివర_OK;
 
-endFAIL:
-    if (lang != NULL)
+చివర_FAIL:
+    ఒకవేళ (lang != ఖాళీ)
 	// truncating the name signals the error to spell_load_lang()
 	*lang = NUL;
-    if (lp != NULL && old_lp == NULL)
+    ఒకవేళ (lp != ఖాళీ && old_lp == ఖాళీ)
 	slang_free(lp);
-    lp = NULL;
+    lp = ఖాళీ;
 
-endOK:
-    if (fd != NULL)
+చివర_OK:
+    ఒకవేళ (fd != ఖాళీ)
 	fclose(fd);
-    if (did_estack_push)
+    ఒకవేళ (did_estack_నెట్టు)
     {
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_తీయి();
     }
 
-    return lp;
+    తిరిగి lp;
 }
 
 /*
  * Fill in the wordcount fields for a trie.
  * Returns the total number of words.
  */
-    static void
-tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
+    స్థిర శూన్య
+వృక్షం_లెక్క_పదాలు(char_u *byts, దీర్ఘ byts_len, idx_T *idxs)
 {
-    int		depth;
+    పూర్ణాంకం		లోతు;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
-    int		c;
+    పూర్ణాంకం		curi[MAXWLEN];
+    పూర్ణాంకం		c;
     idx_T	n;
-    int		wordcount[MAXWLEN];
+    పూర్ణాంకం		wordcount[MAXWLEN];
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
-    depth = 0;
-    while (depth >= 0 && !got_int)
+    లోతు = 0;
+    అయితే (లోతు >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	ఒకవేళ (curi[లోతు] > byts[arridx[లోతు]])
 	{
 	    // Done all bytes at this node, go up one level.
-	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
-		wordcount[depth - 1] += wordcount[depth];
+	    idxs[arridx[లోతు]] = wordcount[లోతు];
+	    ఒకవేళ (లోతు > 0)
+		wordcount[లోతు - 1] += wordcount[లోతు];
 
-	    --depth;
+	    --లోతు;
 	    fast_breakcheck();
 	}
-	else
+	లేకపోతే
 	{
 	    // Do one more byte at this node.
-	    n = arridx[depth] + curi[depth];
-	    ++curi[depth];
+	    n = arridx[లోతు] + curi[లోతు];
+	    ++curi[లోతు];
 
 	    c = byts[n];
-	    if (c == 0)
+	    ఒకవేళ (c == 0)
 	    {
 		// End of word, count it.
-		++wordcount[depth];
+		++wordcount[లోతు];
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < byts_len && byts[n + 1] == 0)
+		అయితే (n + 1 < byts_len && byts[n + 1] == 0)
 		{
 		    ++n;
-		    ++curi[depth];
+		    ++curi[లోతు];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    లేకపోతే ఒకవేళ (లోతు < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper to count the words.
-		++depth;
-		arridx[depth] = idxs[n];
-		curi[depth] = 1;
-		wordcount[depth] = 0;
+		++లోతు;
+		arridx[లోతు] = idxs[n];
+		curi[లోతు] = 1;
+		wordcount[లోతు] = 0;
 	    }
 	}
     }
@@ -657,28 +657,28 @@ tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
 /*
  * Load the .sug files for languages that have one and weren't loaded yet.
  */
-    void
-suggest_load_files(void)
+    శూన్య
+suggest_ఎక్కించు_files(శూన్య)
 {
     langp_T	*lp;
-    int		lpi;
+    పూర్ణాంకం		lpi;
     slang_T	*slang;
     char_u	*dotp;
     FILE	*fd;
     char_u	buf[MAXWLEN];
-    int		i;
+    పూర్ణాంకం		i;
     time_t	timestamp;
-    int		wcount;
-    int		wordnr;
+    పూర్ణాంకం		wcount;
+    పూర్ణాంకం		wordnr;
     garray_T	ga;
-    int		c;
+    పూర్ణాంకం		c;
 
     // Do this for all languages that support sound folding.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    కొరకు (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
-	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
+	lp = LANGP_నమోదు(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
+	ఒకవేళ (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
 	{
 	    // Change ".spl" to ".sug" and open the file.  When the file isn't
 	    // found silently skip it.  Do set "sl_sugloaded" so that we
@@ -686,60 +686,60 @@ suggest_load_files(void)
 	    slang->sl_sugloaded = TRUE;
 
 	    dotp = vim_strrchr(slang->sl_fname, '.');
-	    if (dotp == NULL || fnamecmp(dotp, ".spl") != 0)
-		continue;
+	    ఒకవేళ (dotp == ఖాళీ || fnamecmp(dotp, ".spl") != 0)
+		కొనసాగు;
 	    STRCPY(dotp, ".sug");
-	    fd = mch_fopen((char *)slang->sl_fname, "r");
-	    if (fd == NULL)
-		goto nextone;
+	    fd = mch_fopen((అక్షరం *)slang->sl_fname, "r");
+	    ఒకవేళ (fd == ఖాళీ)
+		వెళ్ళు nextone;
 
 	    /*
 	     * <SUGHEADER>: <fileID> <versionnr> <timestamp>
 	     */
-	    for (i = 0; i < VIMSUGMAGICL; ++i)
+	    కొరకు (i = 0; i < VIMSUGMAGICL; ++i)
 		buf[i] = (c = getc(fd)) == EOF ? 0 : c;	// <fileID>
-	    if (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
+	    ఒకవేళ (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
 	    {
 		semsg(_(e_this_does_not_look_like_sug_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		వెళ్ళు nextone;
 	    }
 	    c = getc(fd);				// <versionnr>
-	    if (c < VIMSUGVERSION)
+	    ఒకవేళ (c < VIMSUGVERSION)
 	    {
-		semsg(_(e_old_sug_file_needs_to_be_updated_str),
+		semsg(_(e_old_sug_file_needs_గమ్యం_be_updated_str),
 							     slang->sl_fname);
-		goto nextone;
+		వెళ్ళు nextone;
 	    }
-	    else if (c > VIMSUGVERSION)
+	    లేకపోతే ఒకవేళ (c > VIMSUGVERSION)
 	    {
-		semsg(_(e_sug_file_is_for_newer_version_of_vim_str),
+		semsg(_(e_sug_file_is_for_newer_సంస్కరణ_యొక్క_vim_str),
 							     slang->sl_fname);
-		goto nextone;
+		వెళ్ళు nextone;
 	    }
 
 	    // Check the timestamp, it must be exactly the same as the one in
 	    // the .spl file.  Otherwise the word numbers won't match.
 	    timestamp = get8ctime(fd);			// <timestamp>
-	    if (timestamp != slang->sl_sugtime)
+	    ఒకవేళ (timestamp != slang->sl_sugtime)
 	    {
-		semsg(_(e_sug_file_doesnt_match_spl_file_str),
+		semsg(_(e_sug_file_doesnt_సరిపోలిక_spl_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		వెళ్ళు nextone;
 	    }
 
 	    /*
 	     * <SUGWORDTREE>: <wordtree>
 	     * Read the trie with the soundfolded words.
 	     */
-	    if (spell_read_tree(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
+	    ఒకవేళ (spell_read_వృక్షం(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
 			&slang->sl_sidxs, FALSE, 0) != 0)
 	    {
 someerror:
 		semsg(_(e_error_while_reading_sug_file_str),
 							     slang->sl_fname);
 		slang_clear_sug(slang);
-		goto nextone;
+		వెళ్ళు nextone;
 	    }
 
 	    /*
@@ -750,31 +750,31 @@ someerror:
 	     * possible to swap the info and save on memory use.
 	     */
 	    slang->sl_sugbuf = open_spellbuf();
-	    if (slang->sl_sugbuf == NULL)
-		goto someerror;
+	    ఒకవేళ (slang->sl_sugbuf == ఖాళీ)
+		వెళ్ళు someerror;
 							    // <sugwcount>
 	    wcount = get4c(fd);
-	    if (wcount < 0)
-		goto someerror;
+	    ఒకవేళ (wcount < 0)
+		వెళ్ళు someerror;
 
 	    // Read all the wordnr lists into the buffer, one NUL terminated
 	    // list per line.
 	    ga_init2(&ga, 1, 100);
-	    for (wordnr = 0; wordnr < wcount; ++wordnr)
+	    కొరకు (wordnr = 0; wordnr < wcount; ++wordnr)
 	    {
 		ga.ga_len = 0;
-		for (;;)
+		కొరకు (;;)
 		{
 		    c = getc(fd);			    // <sugline>
-		    if (c < 0 || ga_grow(&ga, 1) == FAIL)
-			goto someerror;
-		    ((char_u *)ga.ga_data)[ga.ga_len++] = c;
-		    if (c == NUL)
-			break;
+		    ఒకవేళ (c < 0 || ga_grow(&ga, 1) == FAIL)
+			వెళ్ళు someerror;
+		    ((char_u *)ga.ga_దత్తాంశం)[ga.ga_len++] = c;
+		    ఒకవేళ (c == NUL)
+			ఆపు;
 		}
-		if (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
-					 ga.ga_data, ga.ga_len, TRUE) == FAIL)
-		    goto someerror;
+		ఒకవేళ (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
+					 ga.ga_దత్తాంశం, ga.ga_len, TRUE) == FAIL)
+		    వెళ్ళు someerror;
 	    }
 	    ga_clear(&ga);
 
@@ -782,13 +782,13 @@ someerror:
 	     * Need to put word counts in the word tries, so that we can find
 	     * a word by its number.
 	     */
-	    tree_count_words(slang->sl_fbyts, slang->sl_fbyts_len,
+	    వృక్షం_లెక్క_పదాలు(slang->sl_fbyts, slang->sl_fbyts_len,
 		    slang->sl_fidxs);
-	    tree_count_words(slang->sl_sbyts, slang->sl_sbyts_len,
+	    వృక్షం_లెక్క_పదాలు(slang->sl_sbyts, slang->sl_sbyts_len,
 		    slang->sl_sidxs);
 
 nextone:
-	    if (fd != NULL)
+	    ఒకవేళ (fd != ఖాళీ)
 		fclose(fd);
 	    STRCPY(dotp, ".spl");
 	}
@@ -803,51 +803,51 @@ nextone:
  * Sets "*cntp" to SP_*ERROR when there is an error, length of the result
  * otherwise.
  */
-    static char_u *
-read_cnt_string(FILE *fd, int cnt_bytes, int *cntp)
+    స్థిర char_u *
+read_cnt_string(FILE *fd, పూర్ణాంకం cnt_బైట్లు, పూర్ణాంకం *cntp)
 {
-    int		cnt = 0;
-    int		i;
+    పూర్ణాంకం		cnt = 0;
+    పూర్ణాంకం		i;
     char_u	*str;
 
     // read the length bytes, MSB first
-    for (i = 0; i < cnt_bytes; ++i)
+    కొరకు (i = 0; i < cnt_బైట్లు; ++i)
     {
-	int c = getc(fd);
+	పూర్ణాంకం c = getc(fd);
 
-	if (c == EOF)
+	ఒకవేళ (c == EOF)
 	{
 	    *cntp = SP_TRUNCERROR;
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	cnt = (cnt << 8) + (unsigned)c;
+	cnt = (cnt << 8) + (గుర్తులేని)c;
     }
     *cntp = cnt;
-    if (cnt == 0)
-	return NULL;	    // nothing to read, return NULL
+    ఒకవేళ (cnt == 0)
+	తిరిగి ఖాళీ;	    // nothing to read, return NULL
 
     str = read_string(fd, cnt);
-    if (str == NULL)
+    ఒకవేళ (str == ఖాళీ)
 	*cntp = SP_OTHERERROR;
-    return str;
+    తిరిగి str;
 }
 
 /*
  * Read SN_REGION: <regionname> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_region_section(FILE *fd, slang_T *lp, int len)
+    స్థిర పూర్ణాంకం
+read_region_section(FILE *fd, slang_T *lp, పూర్ణాంకం len)
 {
-    int		i;
-    int		c = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c = 0;
 
-    if (len > MAXREGIONS * 2)
-	return SP_FORMERROR;
-    for (i = 0; i < len; ++i)
+    ఒకవేళ (len > MAXREGIONS * 2)
+	తిరిగి SP_FORMERROR;
+    కొరకు (i = 0; i < len; ++i)
 	lp->sl_regions[i] = (c = getc(fd)) == EOF ? 0 : c; // <regionname>
     lp->sl_regions[len] = NUL;
-    return c == EOF ? SP_TRUNCERROR : 0;
+    తిరిగి c == EOF ? SP_TRUNCERROR : 0;
 }
 
 /*
@@ -855,353 +855,353 @@ read_region_section(FILE *fd, slang_T *lp, int len)
  *				<folcharslen> <folchars>
  * Return SP_*ERROR flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 read_charflags_section(FILE *fd)
 {
     char_u	*flags;
     char_u	*fol;
-    int		flagslen, follen;
+    పూర్ణాంకం		flagslen, follen;
 
     // <charflagslen> <charflags>
     flags = read_cnt_string(fd, 1, &flagslen);
-    if (flagslen < 0)
-	return flagslen;
+    ఒకవేళ (flagslen < 0)
+	తిరిగి flagslen;
 
     // <folcharslen> <folchars>
     fol = read_cnt_string(fd, 2, &follen);
-    if (follen < 0)
+    ఒకవేళ (follen < 0)
     {
 	vim_free(flags);
-	return follen;
+	తిరిగి follen;
     }
 
     // Set the word-char flags and fill SPELL_ISUPPER() table.
-    if (flags != NULL && fol != NULL)
-	set_spell_charflags(flags, flagslen, fol);
+    ఒకవేళ (flags != ఖాళీ && fol != ఖాళీ)
+	సమితి_spell_charflags(flags, flagslen, fol);
 
     vim_free(flags);
     vim_free(fol);
 
     // When <charflagslen> is zero then <fcharlen> must also be zero.
-    if ((flags == NULL) != (fol == NULL))
-	return SP_FORMERROR;
-    return 0;
+    ఒకవేళ ((flags == ఖాళీ) != (fol == ఖాళీ))
+	తిరిగి SP_FORMERROR;
+    తిరిగి 0;
 }
 
 /*
  * Read SN_PREFCOND section.
  * Return SP_*ERROR flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 read_prefcond_section(FILE *fd, slang_T *lp)
 {
-    int		cnt;
-    int		i;
-    int		n;
-    int		c;
+    పూర్ణాంకం		cnt;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		c;
     char_u	*p;
     char_u	buf[MAXWLEN + 1];
 
     // <prefcondcnt> <prefcond> ...
     cnt = get2c(fd);					// <prefcondcnt>
-    if (cnt <= 0)
-	return SP_FORMERROR;
+    ఒకవేళ (cnt <= 0)
+	తిరిగి SP_FORMERROR;
 
     lp->sl_prefprog = ALLOC_CLEAR_MULT(regprog_T *, cnt);
-    if (lp->sl_prefprog == NULL)
-	return SP_OTHERERROR;
+    ఒకవేళ (lp->sl_prefprog == ఖాళీ)
+	తిరిగి SP_OTHERERROR;
     lp->sl_prefixcnt = cnt;
 
-    for (i = 0; i < cnt; ++i)
+    కొరకు (i = 0; i < cnt; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
 	n = getc(fd);					// <condlen>
-	if (n < 0 || n >= MAXWLEN)
-	    return SP_FORMERROR;
+	ఒకవేళ (n < 0 || n >= MAXWLEN)
+	    తిరిగి SP_FORMERROR;
 
 	// When <condlen> is zero we have an empty condition.  Otherwise
 	// compile the regexp program used to check for the condition.
-	if (n > 0)
+	ఒకవేళ (n > 0)
 	{
 	    buf[0] = '^';	    // always match at one position only
 	    p = buf + 1;
-	    while (n-- > 0)
+	    అయితే (n-- > 0)
 		*p++ = (c = getc(fd)) == EOF ? 0 : c;	    // <condstr>
-	    if (c == EOF)
-		break;
+	    ఒకవేళ (c == EOF)
+		ఆపు;
 	    *p = NUL;
 	    lp->sl_prefprog[i] = vim_regcomp(buf, RE_MAGIC + RE_STRING);
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Read REP or REPSAL items section from "fd": <repcount> <rep> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_rep_section(FILE *fd, garray_T *gap, short *first)
+    స్థిర పూర్ణాంకం
+read_rep_section(FILE *fd, garray_T *gap, పొట్టి *మొదటి)
 {
-    int		cnt;
+    పూర్ణాంకం		cnt;
     fromto_T	*ftp;
-    int		i;
+    పూర్ణాంకం		i;
 
     cnt = get2c(fd);					// <repcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    ఒకవేళ (cnt < 0)
+	తిరిగి SP_TRUNCERROR;
 
-    if (ga_grow(gap, cnt) == FAIL)
-	return SP_OTHERERROR;
+    ఒకవేళ (ga_grow(gap, cnt) == FAIL)
+	తిరిగి SP_OTHERERROR;
 
     // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    కొరకు (; gap->ga_len < cnt; ++gap->ga_len)
     {
-	ftp = &((fromto_T *)gap->ga_data)[gap->ga_len];
+	ftp = &((fromto_T *)gap->ga_దత్తాంశం)[gap->ga_len];
 	ftp->ft_from = read_cnt_string(fd, 1, &i);
-	if (i < 0)
-	    return i;
-	if (i == 0)
-	    return SP_FORMERROR;
-	ftp->ft_to = read_cnt_string(fd, 1, &i);
-	if (i <= 0)
+	ఒకవేళ (i < 0)
+	    తిరిగి i;
+	ఒకవేళ (i == 0)
+	    తిరిగి SP_FORMERROR;
+	ftp->ft_గమ్యం = read_cnt_string(fd, 1, &i);
+	ఒకవేళ (i <= 0)
 	{
 	    vim_free(ftp->ft_from);
-	    if (i < 0)
-		return i;
-	    return SP_FORMERROR;
+	    ఒకవేళ (i < 0)
+		తిరిగి i;
+	    తిరిగి SP_FORMERROR;
 	}
     }
 
     // Fill the first-index table.
-    for (i = 0; i < 256; ++i)
-	first[i] = -1;
-    for (i = 0; i < gap->ga_len; ++i)
+    కొరకు (i = 0; i < 256; ++i)
+	మొదటి[i] = -1;
+    కొరకు (i = 0; i < gap->ga_len; ++i)
     {
-	ftp = &((fromto_T *)gap->ga_data)[i];
-	if (first[*ftp->ft_from] == -1)
-	    first[*ftp->ft_from] = i;
+	ftp = &((fromto_T *)gap->ga_దత్తాంశం)[i];
+	ఒకవేళ (మొదటి[*ftp->ft_from] == -1)
+	    మొదటి[*ftp->ft_from] = i;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Read SN_SAL section: <salflags> <salcount> <sal> ...
  * Return SP_*ERROR flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 read_sal_section(FILE *fd, slang_T *slang)
 {
-    int		i;
-    int		cnt;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		cnt;
     garray_T	*gap;
     salitem_T	*smp;
-    int		ccnt;
+    పూర్ణాంకం		ccnt;
     char_u	*p;
 
     slang->sl_sofo = FALSE;
 
     i = getc(fd);				// <salflags>
-    if (i & SAL_F0LLOWUP)
+    ఒకవేళ (i & SAL_F0LLOWUP)
 	slang->sl_followup = TRUE;
-    if (i & SAL_COLLAPSE)
+    ఒకవేళ (i & SAL_COLLAPSE)
 	slang->sl_collapse = TRUE;
-    if (i & SAL_REM_ACCENTS)
+    ఒకవేళ (i & SAL_REM_ACCENTS)
 	slang->sl_rem_accents = TRUE;
 
     cnt = get2c(fd);				// <salcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    ఒకవేళ (cnt < 0)
+	తిరిగి SP_TRUNCERROR;
 
     gap = &slang->sl_sal;
-    ga_init2(gap, sizeof(salitem_T), 10);
-    if (ga_grow(gap, cnt + 1) == FAIL)
-	return SP_OTHERERROR;
+    ga_init2(gap, పరిమాణం(salitem_T), 10);
+    ఒకవేళ (ga_grow(gap, cnt + 1) == FAIL)
+	తిరిగి SP_OTHERERROR;
 
     // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    కొరకు (; gap->ga_len < cnt; ++gap->ga_len)
     {
-	int	c = NUL;
+	పూర్ణాంకం	c = NUL;
 
-	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
+	smp = &((salitem_T *)gap->ga_దత్తాంశం)[gap->ga_len];
 	ccnt = getc(fd);			// <salfromlen>
-	if (ccnt < 0)
-	    return SP_TRUNCERROR;
-	if ((p = alloc(ccnt + 2)) == NULL)
-	    return SP_OTHERERROR;
+	ఒకవేళ (ccnt < 0)
+	    తిరిగి SP_TRUNCERROR;
+	ఒకవేళ ((p = alloc(ccnt + 2)) == ఖాళీ)
+	    తిరిగి SP_OTHERERROR;
 	smp->sm_lead = p;
 
 	// Read up to the first special char into sm_lead.
-	for (i = 0; i < ccnt; ++i)
+	కొరకు (i = 0; i < ccnt; ++i)
 	{
 	    c = getc(fd);			// <salfrom>
-	    if (vim_strchr((char_u *)"0123456789(-<^$", c) != NULL)
-		break;
+	    ఒకవేళ (vim_strchr((char_u *)"0123456789(-<^$", c) != ఖాళీ)
+		ఆపు;
 	    *p++ = c;
 	}
-	smp->sm_leadlen = (int)(p - smp->sm_lead);
+	smp->sm_leadlen = (పూర్ణాంకం)(p - smp->sm_lead);
 	*p++ = NUL;
 
 	// Put (abc) chars in sm_oneof, if any.
-	if (c == '(')
+	ఒకవేళ (c == '(')
 	{
 	    smp->sm_oneof = p;
-	    for (++i; i < ccnt; ++i)
+	    కొరకు (++i; i < ccnt; ++i)
 	    {
 		c = getc(fd);			// <salfrom>
-		if (c == ')')
-		    break;
+		ఒకవేళ (c == ')')
+		    ఆపు;
 		*p++ = c;
 	    }
 	    *p++ = NUL;
-	    if (++i < ccnt)
+	    ఒకవేళ (++i < ccnt)
 		c = getc(fd);
 	}
-	else
-	    smp->sm_oneof = NULL;
+	లేకపోతే
+	    smp->sm_oneof = ఖాళీ;
 
 	// Any following chars go in sm_rules.
-	smp->sm_rules = p;
-	if (i < ccnt)
+	smp->sm_నియమాలు = p;
+	ఒకవేళ (i < ccnt)
 	    // store the char we got while checking for end of sm_lead
 	    *p++ = c;
-	for (++i; i < ccnt; ++i)
+	కొరకు (++i; i < ccnt; ++i)
 	    *p++ = (c = getc(fd)) == EOF ? 0 : c;	// <salfrom>
 	*p++ = NUL;
 
 	// <saltolen> <salto>
-	smp->sm_to = read_cnt_string(fd, 1, &ccnt);
-	if (ccnt < 0)
+	smp->sm_గమ్యం = read_cnt_string(fd, 1, &ccnt);
+	ఒకవేళ (ccnt < 0)
 	{
 	    vim_free(smp->sm_lead);
-	    return ccnt;
+	    తిరిగి ccnt;
 	}
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    // convert the multi-byte strings to wide char strings
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = mb_charlen(smp->sm_lead);
-	    if (smp->sm_oneof == NULL)
-		smp->sm_oneof_w = NULL;
-	    else
+	    ఒకవేళ (smp->sm_oneof == ఖాళీ)
+		smp->sm_oneof_w = ఖాళీ;
+	    లేకపోతే
 		smp->sm_oneof_w = mb_str2wide(smp->sm_oneof);
-	    if (smp->sm_to == NULL)
-		smp->sm_to_w = NULL;
-	    else
-		smp->sm_to_w = mb_str2wide(smp->sm_to);
-	    if (smp->sm_lead_w == NULL
-		    || (smp->sm_oneof_w == NULL && smp->sm_oneof != NULL)
-		    || (smp->sm_to_w == NULL && smp->sm_to != NULL))
+	    ఒకవేళ (smp->sm_గమ్యం == ఖాళీ)
+		smp->sm_గమ్యం_w = ఖాళీ;
+	    లేకపోతే
+		smp->sm_గమ్యం_w = mb_str2wide(smp->sm_గమ్యం);
+	    ఒకవేళ (smp->sm_lead_w == ఖాళీ
+		    || (smp->sm_oneof_w == ఖాళీ && smp->sm_oneof != ఖాళీ)
+		    || (smp->sm_గమ్యం_w == ఖాళీ && smp->sm_గమ్యం != ఖాళీ))
 	    {
 		vim_free(smp->sm_lead);
-		vim_free(smp->sm_to);
+		vim_free(smp->sm_గమ్యం);
 		vim_free(smp->sm_lead_w);
 		vim_free(smp->sm_oneof_w);
-		vim_free(smp->sm_to_w);
-		return SP_OTHERERROR;
+		vim_free(smp->sm_గమ్యం_w);
+		తిరిగి SP_OTHERERROR;
 	    }
 	}
     }
 
-    if (gap->ga_len > 0)
+    ఒకవేళ (gap->ga_len > 0)
     {
 	// Add one extra entry to mark the end with an empty sm_lead.  Avoids
 	// that we need to check the index every time.
-	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
-	if ((p = alloc(1)) == NULL)
-	    return SP_OTHERERROR;
+	smp = &((salitem_T *)gap->ga_దత్తాంశం)[gap->ga_len];
+	ఒకవేళ ((p = alloc(1)) == ఖాళీ)
+	    తిరిగి SP_OTHERERROR;
 	p[0] = NUL;
 	smp->sm_lead = p;
 	smp->sm_leadlen = 0;
-	smp->sm_oneof = NULL;
-	smp->sm_rules = p;
-	smp->sm_to = NULL;
-	if (has_mbyte)
+	smp->sm_oneof = ఖాళీ;
+	smp->sm_నియమాలు = p;
+	smp->sm_గమ్యం = ఖాళీ;
+	ఒకవేళ (has_mbyte)
 	{
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = 0;
-	    smp->sm_oneof_w = NULL;
-	    smp->sm_to_w = NULL;
+	    smp->sm_oneof_w = ఖాళీ;
+	    smp->sm_గమ్యం_w = ఖాళీ;
 	}
 	++gap->ga_len;
     }
 
     // Fill the first-index table.
-    set_sal_first(slang);
+    సమితి_sal_మొదటి(slang);
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Read SN_WORDS: <word> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_words_section(FILE *fd, slang_T *lp, int len)
+    స్థిర పూర్ణాంకం
+read_పదాలు_section(FILE *fd, slang_T *lp, పూర్ణాంకం len)
 {
-    int		done = 0;
-    int		i;
-    int		c;
-    char_u	word[MAXWLEN];
+    పూర్ణాంకం		పూర్తి = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
+    char_u	మాట[MAXWLEN];
 
-    while (done < len)
+    అయితే (పూర్తి < len)
     {
 	// Read one word at a time.
-	for (i = 0; ; ++i)
+	కొరకు (i = 0; ; ++i)
 	{
 	    c = getc(fd);
-	    if (c == EOF)
-		return SP_TRUNCERROR;
-	    word[i] = c;
-	    if (word[i] == NUL)
-		break;
-	    if (i == MAXWLEN - 1)
-		return SP_FORMERROR;
+	    ఒకవేళ (c == EOF)
+		తిరిగి SP_TRUNCERROR;
+	    మాట[i] = c;
+	    ఒకవేళ (మాట[i] == NUL)
+		ఆపు;
+	    ఒకవేళ (i == MAXWLEN - 1)
+		తిరిగి SP_FORMERROR;
 	}
 
 	// Init the count to 10.
-	count_common_word(lp, word, -1, 10);
-	done += i + 1;
+	లెక్క_common_మాట(lp, మాట, -1, 10);
+	పూర్తి += i + 1;
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
  * Return SP_*ERROR flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 read_sofo_section(FILE *fd, slang_T *slang)
 {
-    int		cnt;
-    char_u	*from, *to;
-    int		res;
+    పూర్ణాంకం		cnt;
+    char_u	*from, *గమ్యం;
+    పూర్ణాంకం		res;
 
     // <sofofromlen> <sofofrom>
     from = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
-	return cnt;
+    ఒకవేళ (cnt < 0)
+	తిరిగి cnt;
 
     // <sofotolen> <sofoto>
-    to = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
+    గమ్యం = read_cnt_string(fd, 2, &cnt);
+    ఒకవేళ (cnt < 0)
     {
 	vim_free(from);
-	return cnt;
+	తిరిగి cnt;
     }
 
     // Store the info in slang->sl_sal and/or slang->sl_sal_first.
-    if (from != NULL && to != NULL)
-	res = set_sofo(slang, from, to);
-    else if (from != NULL || to != NULL)
+    ఒకవేళ (from != ఖాళీ && గమ్యం != ఖాళీ)
+	res = సమితి_sofo(slang, from, గమ్యం);
+    లేకపోతే ఒకవేళ (from != ఖాళీ || గమ్యం != ఖాళీ)
 	res = SP_FORMERROR;    // only one of two strings is an error
-    else
+    లేకపోతే
 	res = 0;
 
     vim_free(from);
-    vim_free(to);
-    return res;
+    vim_free(గమ్యం);
+    తిరిగి res;
 }
 
 /*
@@ -1209,47 +1209,47 @@ read_sofo_section(FILE *fd, slang_T *slang)
  *	<compmax> <compminlen> <compsylmax> <compoptions> <compflags>
  * Returns SP_*ERROR flags.
  */
-    static int
-read_compound(FILE *fd, slang_T *slang, int len)
+    స్థిర పూర్ణాంకం
+read_compound(FILE *fd, slang_T *slang, పూర్ణాంకం len)
 {
-    int		todo = len;
-    int		c;
-    int		atstart;
+    పూర్ణాంకం		todo = len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		atstart;
     char_u	*pat;
     char_u	*pp;
     char_u	*cp;
     char_u	*ap;
     char_u	*crp;
-    int		cnt;
+    పూర్ణాంకం		cnt;
     garray_T	*gap;
     size_t	patsize;
     size_t	flagsize;
 
-    if (todo < 2)
-	return SP_FORMERROR;	// need at least two bytes
+    ఒకవేళ (todo < 2)
+	తిరిగి SP_FORMERROR;	// need at least two bytes
 
     --todo;
     c = getc(fd);					// <compmax>
-    if (c < 2)
+    ఒకవేళ (c < 2)
 	c = MAXWLEN;
     slang->sl_compmax = c;
 
     --todo;
     c = getc(fd);					// <compminlen>
-    if (c < 1)
+    ఒకవేళ (c < 1)
 	c = 0;
     slang->sl_compminlen = c;
 
     --todo;
     c = getc(fd);					// <compsylmax>
-    if (c < 1)
+    ఒకవేళ (c < 1)
 	c = MAXWLEN;
     slang->sl_compsylmax = c;
 
     c = getc(fd);					// <compoptions>
-    if (c != 0)
+    ఒకవేళ (c != 0)
 	ungetc(c, fd);	    // be backwards compatible with Vim 7.0b
-    else
+    లేకపోతే
     {
 	--todo;
 	c = getc(fd);	    // only use the lower byte for now
@@ -1258,54 +1258,54 @@ read_compound(FILE *fd, slang_T *slang, int len)
 
 	gap = &slang->sl_comppat;
 	c = get2c(fd);					// <comppatcount>
-	if (c < 0)
-	    return SP_TRUNCERROR;
+	ఒకవేళ (c < 0)
+	    తిరిగి SP_TRUNCERROR;
 	todo -= 2;
-	ga_init2(gap, sizeof(char_u *), c);
-	if (ga_grow(gap, c) == OK)
-	    while (--c >= 0)
+	ga_init2(gap, పరిమాణం(char_u *), c);
+	ఒకవేళ (ga_grow(gap, c) == OK)
+	    అయితే (--c >= 0)
 	    {
-		((char_u **)(gap->ga_data))[gap->ga_len++] =
+		((char_u **)(gap->ga_దత్తాంశం))[gap->ga_len++] =
 						  read_cnt_string(fd, 1, &cnt);
 					    // <comppatlen> <comppattext>
-		if (cnt < 0)
-		    return cnt;
+		ఒకవేళ (cnt < 0)
+		    తిరిగి cnt;
 		todo -= cnt + 1;
 	    }
     }
-    if (todo < 0)
-	return SP_FORMERROR;
+    ఒకవేళ (todo < 0)
+	తిరిగి SP_FORMERROR;
 
     // Turn the COMPOUNDRULE items into a regexp pattern:
     // "a[bc]/a*b+" -> "^\(a[bc]\|a*b\+\)$".
     // Inserting backslashes may double the length, "^\(\)$<Nul>" is 7 bytes.
     // Conversion to utf-8 may double the size.
-    if ((size_t)todo > COMPOUND_MAX_LEN)
-	return SP_FORMERROR;
+    ఒకవేళ ((size_t)todo > COMPOUND_MAX_LEN)
+	తిరిగి SP_FORMERROR;
     patsize = (size_t)todo * 2 + 7;
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
 	patsize += (size_t)todo * 2;
     flagsize = (size_t)todo + 1;
     pat = alloc(patsize);
-    if (pat == NULL)
-	return SP_OTHERERROR;
+    ఒకవేళ (pat == ఖాళీ)
+	తిరిగి SP_OTHERERROR;
 
     // We also need a list of all flags that can appear at the start and one
     // for all flags.
     cp = alloc(flagsize);
-    if (cp == NULL)
+    ఒకవేళ (cp == ఖాళీ)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	తిరిగి SP_OTHERERROR;
     }
     slang->sl_compstartflags = cp;
     *cp = NUL;
 
     ap = alloc(flagsize);
-    if (ap == NULL)
+    ఒకవేళ (ap == ఖాళీ)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	తిరిగి SP_OTHERERROR;
     }
     slang->sl_compallflags = ap;
     *ap = NUL;
@@ -1322,68 +1322,68 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '(';
 
     atstart = 1;
-    while (todo-- > 0)
+    అయితే (todo-- > 0)
     {
 	c = getc(fd);					// <compflags>
-	if (c == EOF)
+	ఒకవేళ (c == EOF)
 	{
 	    vim_free(pat);
-	    return SP_TRUNCERROR;
+	    తిరిగి SP_TRUNCERROR;
 	}
 
 	// Add all flags to "sl_compallflags".
-	if (vim_strchr((char_u *)"?*+[]/", c) == NULL
-		&& !byte_in_str(slang->sl_compallflags, c))
+	ఒకవేళ (vim_strchr((char_u *)"?*+[]/", c) == ఖాళీ
+		&& !byte_లోపల_str(slang->sl_compallflags, c))
 	{
 	    *ap++ = c;
 	    *ap = NUL;
 	}
 
-	if (atstart != 0)
+	ఒకవేళ (atstart != 0)
 	{
 	    // At start of item: copy flags to "sl_compstartflags".  For a
 	    // [abc] item set "atstart" to 2 and copy up to the ']'.
-	    if (c == '[')
+	    ఒకవేళ (c == '[')
 		atstart = 2;
-	    else if (c == ']')
+	    లేకపోతే ఒకవేళ (c == ']')
 		atstart = 0;
-	    else
+	    లేకపోతే
 	    {
-		if (!byte_in_str(slang->sl_compstartflags, c))
+		ఒకవేళ (!byte_లోపల_str(slang->sl_compstartflags, c))
 		{
 		    *cp++ = c;
 		    *cp = NUL;
 		}
-		if (atstart == 1)
+		ఒకవేళ (atstart == 1)
 		    atstart = 0;
 	    }
 	}
 
 	// Copy flag to "sl_comprules", unless we run into a wildcard.
-	if (crp != NULL)
+	ఒకవేళ (crp != ఖాళీ)
 	{
-	    if (c == '?' || c == '+' || c == '*')
+	    ఒకవేళ (c == '?' || c == '+' || c == '*')
 	    {
 		VIM_CLEAR(slang->sl_comprules);
-		crp = NULL;
+		crp = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 		*crp++ = c;
 	}
 
-	if (c == '/')	    // slash separates two items
+	ఒకవేళ (c == '/')	    // slash separates two items
 	{
 	    *pp++ = '\\';
 	    *pp++ = '|';
 	    atstart = 1;
 	}
-	else		    // normal char, "[abc]" and '*' are copied as-is
+	లేకపోతే		    // normal char, "[abc]" and '*' are copied as-is
 	{
-	    if (c == '?' || c == '+' || c == '~')
+	    ఒకవేళ (c == '?' || c == '+' || c == '~')
 		*pp++ = '\\';	    // "a?" becomes "a\?", "a+" becomes "a\+"
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 		pp += mb_char2bytes(c, pp);
-	    else
+	    లేకపోతే
 		*pp++ = c;
 	}
     }
@@ -1393,153 +1393,153 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '$';
     *pp = NUL;
 
-    if (crp != NULL)
+    ఒకవేళ (crp != ఖాళీ)
 	*crp = NUL;
 
     slang->sl_compprog = vim_regcomp(pat, RE_MAGIC + RE_STRING + RE_STRICT);
     vim_free(pat);
-    if (slang->sl_compprog == NULL)
-	return SP_FORMERROR;
+    ఒకవేళ (slang->sl_compprog == ఖాళీ)
+	తిరిగి SP_FORMERROR;
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Set the SOFOFROM and SOFOTO items in language "lp".
  * Returns SP_*ERROR flags when there is something wrong.
  */
-    static int
-set_sofo(slang_T *lp, char_u *from, char_u *to)
+    స్థిర పూర్ణాంకం
+సమితి_sofo(slang_T *lp, char_u *from, char_u *గమ్యం)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
     garray_T	*gap;
     char_u	*s;
     char_u	*p;
-    int		c;
-    int		*inp;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		*inp;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	free_sal_items(&lp->sl_sal);
+	free_sal_వస్తువులు(&lp->sl_sal);
 
 	// Use "sl_sal" as an array with 256 pointers to a list of wide
 	// characters.  The index is the low byte of the character.
 	// The list contains from-to pairs with a terminating NUL.
 	// sl_sal_first[] is used for latin1 "from" characters.
 	gap = &lp->sl_sal;
-	ga_init2(gap, sizeof(int *), 1);
-	if (ga_grow(gap, 256) == FAIL)
-	    return SP_OTHERERROR;
-	vim_memset(gap->ga_data, 0, sizeof(int *) * 256);
+	ga_init2(gap, పరిమాణం(పూర్ణాంకం *), 1);
+	ఒకవేళ (ga_grow(gap, 256) == FAIL)
+	    తిరిగి SP_OTHERERROR;
+	vim_memset(gap->ga_దత్తాంశం, 0, పరిమాణం(పూర్ణాంకం *) * 256);
 	gap->ga_len = 256;
 	lp->sl_sofo = TRUE;
 
 	// First count the number of items for each list.  Temporarily use
 	// sl_sal_first[] for this.  Reset it first: a preceding SN_SAL section
 	// may have set the entries to -1 via set_sal_first().
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_మొదటి, 0, పరిమాణం(salfirst_T) * 256);
+	కొరకు (p = from, s = గమ్యం; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    MB_CPTR_ADV(s);
-	    if (c >= 256)
-		++lp->sl_sal_first[c & 0xff];
+	    ఒకవేళ (c >= 256)
+		++lp->sl_sal_మొదటి[c & 0xff];
 	}
-	if (*p != NUL || *s != NUL)	    // lengths differ
-	    return SP_FORMERROR;
+	ఒకవేళ (*p != NUL || *s != NUL)	    // lengths differ
+	    తిరిగి SP_FORMERROR;
 
 	// Allocate the lists.
-	for (i = 0; i < 256; ++i)
-	    if (lp->sl_sal_first[i] > 0)
+	కొరకు (i = 0; i < 256; ++i)
+	    ఒకవేళ (lp->sl_sal_మొదటి[i] > 0)
 	    {
-		p = alloc(sizeof(int) * (lp->sl_sal_first[i] * 2 + 1));
-		if (p == NULL)
-		    return SP_OTHERERROR;
-		((int **)gap->ga_data)[i] = (int *)p;
-		*(int *)p = 0;
+		p = alloc(పరిమాణం(పూర్ణాంకం) * (lp->sl_sal_మొదటి[i] * 2 + 1));
+		ఒకవేళ (p == ఖాళీ)
+		    తిరిగి SP_OTHERERROR;
+		((పూర్ణాంకం **)gap->ga_దత్తాంశం)[i] = (పూర్ణాంకం *)p;
+		*(పూర్ణాంకం *)p = 0;
 	    }
 
 	// Put the characters up to 255 in sl_sal_first[] the rest in a sl_sal
 	// list.
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_మొదటి, 0, పరిమాణం(salfirst_T) * 256);
+	కొరకు (p = from, s = గమ్యం; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    i = mb_cptr2char_adv(&s);
-	    if (c >= 256)
+	    ఒకవేళ (c >= 256)
 	    {
 		// Append the from-to chars at the end of the list with
 		// the low byte.
-		inp = ((int **)gap->ga_data)[c & 0xff];
-		while (*inp != 0)
+		inp = ((పూర్ణాంకం **)gap->ga_దత్తాంశం)[c & 0xff];
+		అయితే (*inp != 0)
 		    ++inp;
 		*inp++ = c;		// from char
 		*inp++ = i;		// to char
 		*inp++ = NUL;		// NUL at the end
 	    }
-	    else
+	    లేకపోతే
 		// mapping byte to char is done in sl_sal_first[]
-		lp->sl_sal_first[c] = i;
+		lp->sl_sal_మొదటి[c] = i;
 	}
     }
-    else
+    లేకపోతే
     {
 	// mapping bytes to bytes is done in sl_sal_first[]
-	if (STRLEN(from) != STRLEN(to))
-	    return SP_FORMERROR;
+	ఒకవేళ (STRLEN(from) != STRLEN(గమ్యం))
+	    తిరిగి SP_FORMERROR;
 
-	for (i = 0; to[i] != NUL; ++i)
-	    lp->sl_sal_first[from[i]] = to[i];
+	కొరకు (i = 0; గమ్యం[i] != NUL; ++i)
+	    lp->sl_sal_మొదటి[from[i]] = గమ్యం[i];
 	lp->sl_sal.ga_len = 1;		// indicates we have soundfolding
 	lp->sl_sofo = TRUE;
     }
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Fill the first-index table for "lp".
  */
-    static void
-set_sal_first(slang_T *lp)
+    స్థిర శూన్య
+సమితి_sal_మొదటి(slang_T *lp)
 {
     salfirst_T	*sfirst;
-    int		i;
+    పూర్ణాంకం		i;
     salitem_T	*smp;
-    int		c;
+    పూర్ణాంకం		c;
     garray_T	*gap = &lp->sl_sal;
 
-    sfirst = lp->sl_sal_first;
-    for (i = 0; i < 256; ++i)
+    sfirst = lp->sl_sal_మొదటి;
+    కొరకు (i = 0; i < 256; ++i)
 	sfirst[i] = -1;
-    smp = (salitem_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    smp = (salitem_T *)gap->ga_దత్తాంశం;
+    కొరకు (i = 0; i < gap->ga_len; ++i)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    // Use the lowest byte of the first character.  For latin1 it's
 	    // the character, for other encodings it should differ for most
 	    // characters.
 	    c = *smp[i].sm_lead_w & 0xff;
-	else
+	లేకపోతే
 	    c = *smp[i].sm_lead;
-	if (sfirst[c] == -1)
+	ఒకవేళ (sfirst[c] == -1)
 	{
 	    sfirst[c] = i;
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
-		int		n;
+		పూర్ణాంకం		n;
 
 		// Make sure all entries with this byte are following each
 		// other.  Move the ones that are in the wrong position.  Do
 		// keep the same ordering!
-		while (i + 1 < gap->ga_len
+		అయితే (i + 1 < gap->ga_len
 				       && (*smp[i + 1].sm_lead_w & 0xff) == c)
 		    // Skip over entry with same index byte.
 		    ++i;
 
-		for (n = 1; i + n < gap->ga_len; ++n)
-		    if ((*smp[i + n].sm_lead_w & 0xff) == c)
+		కొరకు (n = 1; i + n < gap->ga_len; ++n)
+		    ఒకవేళ ((*smp[i + n].sm_lead_w & 0xff) == c)
 		    {
 			salitem_T  tsal;
 
@@ -1549,7 +1549,7 @@ set_sal_first(slang_T *lp)
 			--n;
 			tsal = smp[i + n];
 			mch_memmove(smp + i + 1, smp + i,
-						       sizeof(salitem_T) * n);
+						       పరిమాణం(salitem_T) * n);
 			smp[i] = tsal;
 		    }
 	    }
@@ -1561,21 +1561,21 @@ set_sal_first(slang_T *lp)
  * Turn a multi-byte string into a wide character string.
  * Return it in allocated memory (NULL for out-of-memory)
  */
-    static int *
+    స్థిర పూర్ణాంకం *
 mb_str2wide(char_u *s)
 {
-    int		*res;
+    పూర్ణాంకం		*res;
     char_u	*p;
-    int		i = 0;
+    పూర్ణాంకం		i = 0;
 
-    res = ALLOC_MULT(int, mb_charlen(s) + 1);
-    if (res == NULL)
-	return NULL;
+    res = ALLOC_MULT(పూర్ణాంకం, mb_charlen(s) + 1);
+    ఒకవేళ (res == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (p = s; *p != NUL; )
+    కొరకు (p = s; *p != NUL; )
 	res[i++] = mb_ptr2char_adv(&p);
     res[i] = NUL;
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -1584,55 +1584,55 @@ mb_str2wide(char_u *s)
  * This is skipped when the tree has zero length.
  * Returns zero when OK, SP_ value for an error.
  */
-    static int
-spell_read_tree(
+    స్థిర పూర్ణాంకం
+spell_read_వృక్షం(
     FILE	*fd,
     char_u	**bytsp,
-    long	*bytsp_len,
+    దీర్ఘ	*bytsp_len,
     idx_T	**idxsp,
-    int		prefixtree,	// TRUE for the prefix tree
-    int		prefixcnt)	// when "prefixtree" is TRUE: prefix count
+    పూర్ణాంకం		prefixtree,	// TRUE for the prefix tree
+    పూర్ణాంకం		prefixcnt)	// when "prefixtree" is TRUE: prefix count
 {
-    long	len;
-    int		idx;
+    దీర్ఘ	len;
+    పూర్ణాంకం		idx;
     char_u	*bp;
     idx_T	*ip;
 
     // The tree size was computed when writing the file, so that we can
     // allocate it as one long block. <nodecount>
     len = get4c(fd);
-    if (len < 0)
-	return SP_TRUNCERROR;
-    if ((size_t)len > SIZE_MAX / sizeof(int))
+    ఒకవేళ (len < 0)
+	తిరిగి SP_TRUNCERROR;
+    ఒకవేళ ((size_t)len > కొలత_MAX / పరిమాణం(పూర్ణాంకం))
 	// Invalid length, multiply with sizeof(int) would overflow.
-	return SP_FORMERROR;
-    if (len <= 0)
-	return 0;
+	తిరిగి SP_FORMERROR;
+    ఒకవేళ (len <= 0)
+	తిరిగి 0;
 
     // Allocate the byte array.  Zero-initialize so that any position the
     // tree does not visit reads as 0; a stray BY_INDEX shared reference
     // into such a slot then behaves as end-of-word in spellsuggest()
     // instead of consuming an arbitrary heap byte as a siblingcount.
     bp = alloc_clear(len);
-    if (bp == NULL)
-	return SP_OTHERERROR;
+    ఒకవేళ (bp == ఖాళీ)
+	తిరిగి SP_OTHERERROR;
     *bytsp = bp;
-    if (bytsp_len != NULL)
+    ఒకవేళ (bytsp_len != ఖాళీ)
 	*bytsp_len = len;
 
     // Allocate the index array.
-    ip = lalloc_clear(len * sizeof(int), TRUE);
-    if (ip == NULL)
-	return SP_OTHERERROR;
+    ip = lalloc_clear(len * పరిమాణం(పూర్ణాంకం), TRUE);
+    ఒకవేళ (ip == ఖాళీ)
+	తిరిగి SP_OTHERERROR;
     *idxsp = ip;
 
     // Recursively read the tree and store it in the array.
-    idx = read_tree_node(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
-    if (idx < 0)
-	return idx;
-    if (idx != len)
-	return SP_FORMERROR;
-    return 0;
+    idx = read_వృక్షం_కణుపు(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
+    ఒకవేళ (idx < 0)
+	తిరిగి idx;
+    ఒకవేళ (idx != len)
+	తిరిగి SP_FORMERROR;
+    తిరిగి 0;
 }
 
 /*
@@ -1645,109 +1645,109 @@ spell_read_tree(
  * Returns SP_TRUNCERROR if the file is shorter than expected.
  * Returns SP_FORMERROR if there is a format error.
  */
-    static idx_T
-read_tree_node(
+    స్థిర idx_T
+read_వృక్షం_కణుపు(
     FILE	*fd,
     char_u	*byts,
     idx_T	*idxs,
-    int		maxidx,		    // size of arrays
+    పూర్ణాంకం		maxidx,		    // size of arrays
     idx_T	startidx,	    // current index in "byts" and "idxs"
-    int		prefixtree,	    // TRUE for reading PREFIXTREE
-    int		maxprefcondnr,	    // maximum for <prefcondnr>
-    int		depth)		    // recursion level
+    పూర్ణాంకం		prefixtree,	    // TRUE for reading PREFIXTREE
+    పూర్ణాంకం		maxprefcondnr,	    // maximum for <prefcondnr>
+    పూర్ణాంకం		లోతు)		    // recursion level
 {
-    int		len;
-    int		i;
-    int		n;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		n;
     idx_T	idx = startidx;
-    int		c;
-    int		c2;
-#define SHARED_MASK	0x8000000
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		c2;
+#నిర్వచించు SHARED_ముసుగు	0x8000000
 
     // Bail out on a crafted .spl whose tree recurses beyond the maximum
     // word length: each tree level corresponds to one byte of a word, so
     // any well-formed file has depth <= MAXWLEN.
-    if (depth > MAXWLEN)
-	return SP_FORMERROR;
+    ఒకవేళ (లోతు > MAXWLEN)
+	తిరిగి SP_FORMERROR;
 
     len = getc(fd);					// <siblingcount>
-    if (len <= 0)
-	return SP_TRUNCERROR;
+    ఒకవేళ (len <= 0)
+	తిరిగి SP_TRUNCERROR;
 
-    if (len >= maxidx - startidx)
-	return SP_FORMERROR;
+    ఒకవేళ (len >= maxidx - startidx)
+	తిరిగి SP_FORMERROR;
     byts[idx++] = len;
 
     // Read the byte values, flag/region bytes and shared indexes.
-    for (i = 1; i <= len; ++i)
+    కొరకు (i = 1; i <= len; ++i)
     {
 	c = getc(fd);					// <byte>
-	if (c < 0)
-	    return SP_TRUNCERROR;
-	if (c <= BY_SPECIAL)
+	ఒకవేళ (c < 0)
+	    తిరిగి SP_TRUNCERROR;
+	ఒకవేళ (c <= BY_SPECIAL)
 	{
-	    if (c == BY_NOFLAGS && !prefixtree)
+	    ఒకవేళ (c == BY_NOFLAGS && !prefixtree)
 	    {
 		// No flags, all regions.
 		idxs[idx] = 0;
 		c = 0;
 	    }
-	    else if (c != BY_INDEX)
+	    లేకపోతే ఒకవేళ (c != BY_సూచీ)
 	    {
-		if (prefixtree)
+		ఒకవేళ (prefixtree)
 		{
 		    // Read the optional pflags byte, the prefix ID and the
 		    // condition nr.  In idxs[] store the prefix ID in the low
 		    // byte, the condition index shifted up 8 bits, the flags
 		    // shifted up 24 bits.
-		    if (c == BY_FLAGS)
+		    ఒకవేళ (c == BY_FLAGS)
 		    {
 			n = getc(fd);			// <pflags>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			ఒకవేళ (n < 0)
+			    తిరిగి SP_TRUNCERROR;
 			c = n << 24;
 		    }
-		    else
+		    లేకపోతే
 			c = 0;
 
 		    n = getc(fd);			// <affixID>
-		    if (n < 0)
-			return SP_TRUNCERROR;
+		    ఒకవేళ (n < 0)
+			తిరిగి SP_TRUNCERROR;
 		    c |= n;
 
 		    n = get2c(fd);			// <prefcondnr>
-		    if (n < 0 || n >= maxprefcondnr)
-			return SP_FORMERROR;
+		    ఒకవేళ (n < 0 || n >= maxprefcondnr)
+			తిరిగి SP_FORMERROR;
 		    c |= (n << 8);
 		}
-		else // c must be BY_FLAGS or BY_FLAGS2
+		లేకపోతే // c must be BY_FLAGS or BY_FLAGS2
 		{
 		    // Read flags and optional region and prefix ID.  In
 		    // idxs[] the flags go in the low two bytes, region above
 		    // that and prefix ID above the region.
 		    c2 = c;
 		    c = getc(fd);			// <flags>
-		    if (c < 0)
-			return SP_TRUNCERROR;
-		    if (c2 == BY_FLAGS2)
+		    ఒకవేళ (c < 0)
+			తిరిగి SP_TRUNCERROR;
+		    ఒకవేళ (c2 == BY_FLAGS2)
 		    {
 			n = getc(fd);			// <flags2>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			ఒకవేళ (n < 0)
+			    తిరిగి SP_TRUNCERROR;
 			c = (n << 8) + c;
 		    }
-		    if (c & WF_REGION)
+		    ఒకవేళ (c & WF_REGION)
 		    {
 			n = getc(fd);			// <region>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			ఒకవేళ (n < 0)
+			    తిరిగి SP_TRUNCERROR;
 			c = (n << 16) + c;
 		    }
-		    if (c & WF_AFX)
+		    ఒకవేళ (c & WF_AFX)
 		    {
 			n = getc(fd);			// <affixID>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			ఒకవేళ (n < 0)
+			    తిరిగి SP_TRUNCERROR;
 			c = (n << 24) + c;
 		    }
 		}
@@ -1755,13 +1755,13 @@ read_tree_node(
 		idxs[idx] = c;
 		c = 0;
 	    }
-	    else // c == BY_INDEX
+	    లేకపోతే // c == BY_INDEX
 	    {
 							// <nodeidx>
 		n = get3c(fd);
-		if (n < 0 || n >= maxidx)
-		    return SP_FORMERROR;
-		idxs[idx] = n + SHARED_MASK;
+		ఒకవేళ (n < 0 || n >= maxidx)
+		    తిరిగి SP_FORMERROR;
+		idxs[idx] = n + SHARED_ముసుగు;
 		c = getc(fd);				// <xbyte>
 	    }
 	}
@@ -1771,41 +1771,41 @@ read_tree_node(
     // Recursively read the children for non-shared siblings.
     // Skip the end-of-word ones (zero byte value) and the shared ones (and
     // remove SHARED_MASK)
-    for (i = 1; i <= len; ++i)
-	if (byts[startidx + i] != 0)
+    కొరకు (i = 1; i <= len; ++i)
+	ఒకవేళ (byts[startidx + i] != 0)
 	{
-	    if (idxs[startidx + i] & SHARED_MASK)
-		idxs[startidx + i] &= ~SHARED_MASK;
-	    else
+	    ఒకవేళ (idxs[startidx + i] & SHARED_ముసుగు)
+		idxs[startidx + i] &= ~SHARED_ముసుగు;
+	    లేకపోతే
 	    {
 		idxs[startidx + i] = idx;
-		idx = read_tree_node(fd, byts, idxs, maxidx, idx,
-					prefixtree, maxprefcondnr, depth + 1);
-		if (idx < 0)
-		    break;
+		idx = read_వృక్షం_కణుపు(fd, byts, idxs, maxidx, idx,
+					prefixtree, maxprefcondnr, లోతు + 1);
+		ఒకవేళ (idx < 0)
+		    ఆపు;
 	    }
 	}
 
-    return idx;
+    తిరిగి idx;
 }
 
 /*
  * Reload the spell file "fname" if it's loaded.
  */
-    static void
+    స్థిర శూన్య
 spell_reload_one(
     char_u	*fname,
-    int		added_word)	// invoked through "zg"
+    పూర్ణాంకం		added_మాట)	// invoked through "zg"
 {
     slang_T	*slang;
-    int		didit = FALSE;
+    పూర్ణాంకం		didit = FALSE;
 
     FOR_ALL_SPELL_LANGS(slang)
     {
-	if (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	ఒకవేళ (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
 	{
 	    slang_clear(slang);
-	    if (spell_load_file(fname, NULL, slang, FALSE) == NULL)
+	    ఒకవేళ (spell_ఎక్కించు_file(fname, ఖాళీ, slang, FALSE) == ఖాళీ)
 		// reloading failed, clear the language
 		slang_clear(slang);
 	    redraw_all_later(UPD_SOME_VALID);
@@ -1815,7 +1815,7 @@ spell_reload_one(
 
     // When "zg" was used and the file wasn't loaded yet, should redo
     // 'spelllang' to load it now.
-    if (added_word && !didit)
+    ఒకవేళ (added_మాట && !didit)
 	parse_spelllang(curwin);
 }
 
@@ -1824,76 +1824,76 @@ spell_reload_one(
  * Functions for ":mkspell".
  */
 
-#define MAXLINELEN  500		// Maximum length in bytes of a line in a .aff
+#నిర్వచించు MAXLINELEN  500		// Maximum length in bytes of a line in a .aff
 				// and .dic file.
 /*
  * Main structure to store the contents of a ".aff" file.
  */
-typedef struct afffile_S
+రకనిర్వచనం నిర్మాణం afffile_S
 {
     char_u	*af_enc;	// "SET", normalized, alloc'ed string or NULL
-    int		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
-    unsigned	af_rare;	// RARE ID for rare word
-    unsigned	af_keepcase;	// KEEPCASE ID for keep-case word
-    unsigned	af_bad;		// BAD ID for banned word
-    unsigned	af_needaffix;	// NEEDAFFIX ID
-    unsigned	af_circumfix;	// CIRCUMFIX ID
-    unsigned	af_needcomp;	// NEEDCOMPOUND ID
-    unsigned	af_comproot;	// COMPOUNDROOT ID
-    unsigned	af_compforbid;	// COMPOUNDFORBIDFLAG ID
-    unsigned	af_comppermit;	// COMPOUNDPERMITFLAG ID
-    unsigned	af_nosuggest;	// NOSUGGEST ID
-    int		af_pfxpostpone;	// postpone prefixes without chop string and
+    పూర్ణాంకం		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
+    గుర్తులేని	af_rare;	// RARE ID for rare word
+    గుర్తులేని	af_keepcase;	// KEEPCASE ID for keep-case word
+    గుర్తులేని	af_bad;		// BAD ID for banned word
+    గుర్తులేని	af_needaffix;	// NEEDAFFIX ID
+    గుర్తులేని	af_circumfix;	// CIRCUMFIX ID
+    గుర్తులేని	af_needcomp;	// NEEDCOMPOUND ID
+    గుర్తులేని	af_comproot;	// COMPOUNDROOT ID
+    గుర్తులేని	af_compforbid;	// COMPOUNDFORBIDFLAG ID
+    గుర్తులేని	af_comppermit;	// COMPOUNDPERMITFLAG ID
+    గుర్తులేని	af_nosuggest;	// NOSUGGEST ID
+    పూర్ణాంకం		af_pfxpostpone;	// postpone prefixes without chop string and
 				// without flags
-    int		af_ignoreextra;	// IGNOREEXTRA present
+    పూర్ణాంకం		af_ignoreextra;	// IGNOREEXTRA present
     hashtab_T	af_pref;	// hashtable for prefixes, affheader_T
     hashtab_T	af_suff;	// hashtable for suffixes, affheader_T
     hashtab_T	af_comp;	// hashtable for compound flags, compitem_T
 } afffile_T;
 
-#define AFT_CHAR	0	// flags are one character
-#define AFT_LONG	1	// flags are two characters
-#define AFT_CAPLONG	2	// flags are one or two characters
-#define AFT_NUM		3	// flags are numbers, comma separated
+#నిర్వచించు AFT_CHAR	0	// flags are one character
+#నిర్వచించు AFT_LONG	1	// flags are two characters
+#నిర్వచించు AFT_CAPLONG	2	// flags are one or two characters
+#నిర్వచించు AFT_అంకె		3	// flags are numbers, comma separated
 
-typedef struct affentry_S affentry_T;
+రకనిర్వచనం నిర్మాణం affentry_S affentry_T;
 // Affix entry from ".aff" file.  Used for prefixes and suffixes.
-struct affentry_S
+నిర్మాణం affentry_S
 {
-    affentry_T	*ae_next;	// next affix with same name/number
+    affentry_T	*ae_తదుపరి;	// next affix with same name/number
     char_u	*ae_chop;	// text to chop off basic word (can be NULL)
-    char_u	*ae_add;	// text to add to basic word (can be NULL)
+    char_u	*ae_కూడు;	// text to add to basic word (can be NULL)
     char_u	*ae_flags;	// flags on the affix (can be NULL)
     char_u	*ae_cond;	// condition (NULL for ".")
     regprog_T	*ae_prog;	// regexp program for ae_cond or NULL
-    char	ae_compforbid;	// COMPOUNDFORBIDFLAG found
-    char	ae_comppermit;	// COMPOUNDPERMITFLAG found
+    అక్షరం	ae_compforbid;	// COMPOUNDFORBIDFLAG found
+    అక్షరం	ae_comppermit;	// COMPOUNDPERMITFLAG found
 };
 
-#define AH_KEY_LEN 17		// 2 x 8 bytes + NUL
+#నిర్వచించు AH_కీలకం_LEN 17		// 2 x 8 bytes + NUL
 
 // Affix header from ".aff" file.  Used for af_pref and af_suff.
-typedef struct affheader_S
+రకనిర్వచనం నిర్మాణం affheader_S
 {
-    char_u	ah_key[AH_KEY_LEN]; // key for hashtab == name of affix
-    unsigned	ah_flag;	// affix name as number, uses "af_flagtype"
-    int		ah_newID;	// prefix ID after renumbering; 0 if not used
-    int		ah_combine;	// suffix may combine with prefix
-    int		ah_follows;	// another affix block should be following
-    affentry_T	*ah_first;	// first affix entry
+    char_u	ah_కీలకం[AH_కీలకం_LEN]; // key for hashtab == name of affix
+    గుర్తులేని	ah_flag;	// affix name as number, uses "af_flagtype"
+    పూర్ణాంకం		ah_newID;	// prefix ID after renumbering; 0 if not used
+    పూర్ణాంకం		ah_combine;	// suffix may combine with prefix
+    పూర్ణాంకం		ah_follows;	// another affix block should be following
+    affentry_T	*ah_మొదటి;	// first affix entry
 } affheader_T;
 
-#define HI2AH(hi)   ((affheader_T *)(hi)->hi_key)
+#నిర్వచించు HI2AH(hi)   ((affheader_T *)(hi)->hi_కీలకం)
 
 // Flag used in compound items.
-typedef struct compitem_S
+రకనిర్వచనం నిర్మాణం compitem_S
 {
-    char_u	ci_key[AH_KEY_LEN]; // key for hashtab == name of compound
-    unsigned	ci_flag;	// affix name as number, uses "af_flagtype"
-    int		ci_newID;	// affix ID after renumbering.
+    char_u	ci_కీలకం[AH_కీలకం_LEN]; // key for hashtab == name of compound
+    గుర్తులేని	ci_flag;	// affix name as number, uses "af_flagtype"
+    పూర్ణాంకం		ci_newID;	// affix ID after renumbering.
 } compitem_T;
 
-#define HI2CI(hi)   ((compitem_T *)(hi)->hi_key)
+#నిర్వచించు HI2CI(hi)   ((compitem_T *)(hi)->hi_కీలకం)
 
 /*
  * Structure that is used to store the items in the word tree.  This avoids
@@ -1903,36 +1903,36 @@ typedef struct compitem_S
  * "sb_data" is correct for systems where pointers must be aligned on
  * pointer-size boundaries and sizeof(pointer) > sizeof(int) (e.g., Sparc).
  */
-#define  SBLOCKSIZE 16000	// size of sb_data
-typedef struct sblock_S sblock_T;
-struct sblock_S
+#నిర్వచించు  SBLOCKSIZE 16000	// size of sb_data
+రకనిర్వచనం నిర్మాణం sblock_S sblock_T;
+నిర్మాణం sblock_S
 {
-    int		sb_used;	// nr of bytes already in use
-    sblock_T	*sb_next;	// next block in list
-    char_u	sb_data[1];	// data, actually longer
+    పూర్ణాంకం		sb_వాడిన;	// nr of bytes already in use
+    sblock_T	*sb_తదుపరి;	// next block in list
+    char_u	sb_దత్తాంశం[1];	// data, actually longer
 };
 
 /*
  * A node in the tree.
  */
-typedef struct wordnode_S wordnode_T;
-struct wordnode_S
+రకనిర్వచనం నిర్మాణం wordnode_S wordnode_T;
+నిర్మాణం wordnode_S
 {
-    union   // shared to save space
+    సంఘం   // shared to save space
     {
 	char_u	hashkey[6];	// the hash key, only used while compressing
-	int	index;		// index in written nodes (valid after first
+	పూర్ణాంకం	సూచీ;		// index in written nodes (valid after first
 				// round)
     } wn_u1;
-    union   // shared to save space
+    సంఘం   // shared to save space
     {
-	wordnode_T *next;	// next node with same hash key
+	wordnode_T *తదుపరి;	// next node with same hash key
 	wordnode_T *wnode;	// parent node that will write this node
     } wn_u2;
-    wordnode_T	*wn_child;	// child (next byte in word)
+    wordnode_T	*wn_బిడ్డ;	// child (next byte in word)
     wordnode_T  *wn_sibling;	// next sibling (alternate byte in word,
 				// always sorted)
-    int		wn_refs;	// Nr. of references to this node.  Only
+    పూర్ణాంకం		wn_refs;	// Nr. of references to this node.  Only
 				// relevant for first node in a list of
 				// siblings, in following siblings it is
 				// always one.
@@ -1944,56 +1944,56 @@ struct wordnode_S
     // "wn_region" the LSW of the wordnr.
     char_u	wn_affixID;	// supported/required prefix ID or 0
     short_u	wn_flags;	// WF_ flags
-    short	wn_region;	// region mask
+    పొట్టి	wn_region;	// region mask
 
-#ifdef SPELL_PRINTTREE
-    int		wn_nr;		// sequence nr for printing
-#endif
+#నిర్వచితమైతే SPELL_PRINTTREE
+    పూర్ణాంకం		wn_nr;		// sequence nr for printing
+#అయితే_ముగింపు
 };
 
-#define WN_MASK	 0xffff		// mask relevant bits of "wn_flags"
+#నిర్వచించు WN_ముసుగు	 0xffff		// mask relevant bits of "wn_flags"
 
-#define HI2WN(hi)    (wordnode_T *)((hi)->hi_key)
+#నిర్వచించు HI2WN(hi)    (wordnode_T *)((hi)->hi_కీలకం)
 
 /*
  * Info used while reading the spell files.
  */
-typedef struct spellinfo_S
+రకనిర్వచనం నిర్మాణం spellinfo_S
 {
     wordnode_T	*si_foldroot;	// tree with case-folded words
-    long	si_foldwcount;	// nr of words in si_foldroot
+    దీర్ఘ	si_foldwcount;	// nr of words in si_foldroot
 
     wordnode_T	*si_keeproot;	// tree with keep-case words
-    long	si_keepwcount;	// nr of words in si_keeproot
+    దీర్ఘ	si_keepwcount;	// nr of words in si_keeproot
 
     wordnode_T	*si_prefroot;	// tree with postponed prefixes
 
-    long	si_sugtree;	// creating the soundfolding trie
+    దీర్ఘ	si_sugtree;	// creating the soundfolding trie
 
-    sblock_T	*si_blocks;	// memory blocks used
-    long	si_blocks_cnt;	// memory blocks allocated
-    int		si_did_emsg;	// TRUE when ran out of memory
+    sblock_T	*si_ఖండాలు;	// memory blocks used
+    దీర్ఘ	si_ఖండాలు_cnt;	// memory blocks allocated
+    పూర్ణాంకం		si_did_emsg;	// TRUE when ran out of memory
 
-    long	si_compress_cnt;    // words to add before lowering
+    దీర్ఘ	si_compress_cnt;    // words to add before lowering
 				    // compression limit
-    wordnode_T	*si_first_free; // List of nodes that have been freed during
+    wordnode_T	*si_మొదటి_free; // List of nodes that have been freed during
 				// compression, linked by "wn_child" field.
-    long	si_free_count;	// number of nodes in si_first_free
-#ifdef SPELL_PRINTTREE
-    int		si_wordnode_nr;	// sequence nr for nodes
-#endif
+    దీర్ఘ	si_free_లెక్క;	// number of nodes in si_first_free
+#నిర్వచితమైతే SPELL_PRINTTREE
+    పూర్ణాంకం		si_wordnode_nr;	// sequence nr for nodes
+#అయితే_ముగింపు
     buf_T	*si_spellbuf;	// buffer used to store soundfold word table
 
-    int		si_ascii;	// handling only ASCII words
-    int		si_add;		// addition file
-    int		si_clear_chartab;   // when TRUE clear char tables
-    int		si_region;	// region mask
+    పూర్ణాంకం		si_ascii;	// handling only ASCII words
+    పూర్ణాంకం		si_కూడు;		// addition file
+    పూర్ణాంకం		si_clear_chartab;   // when TRUE clear char tables
+    పూర్ణాంకం		si_region;	// region mask
     vimconv_T	si_conv;	// for conversion to 'encoding'
-    int		si_memtot;	// runtime memory used
-    int		si_verbose;	// verbose messages
-    int		si_msg_count;	// number of words added since last message
+    పూర్ణాంకం		si_memtot;	// runtime memory used
+    పూర్ణాంకం		si_verbose;	// verbose messages
+    పూర్ణాంకం		si_సందేశం_లెక్క;	// number of words added since last message
     char_u	*si_info;	// info text chars or NULL
-    int		si_region_count; // number of regions supported (1 when there
+    పూర్ణాంకం		si_region_లెక్క; // number of regions supported (1 when there
 				 // are no regions)
     char_u	si_region_name[MAXREGIONS * 2 + 1];
 				// region names; used only if
@@ -2004,20 +2004,20 @@ typedef struct spellinfo_S
     garray_T	si_sal;		// list of fromto_T entries from SAL lines
     char_u	*si_sofofr;	// SOFOFROM text
     char_u	*si_sofoto;	// SOFOTO text
-    int		si_nosugfile;	// NOSUGFILE item found
-    int		si_nosplitsugs;	// NOSPLITSUGS item found
-    int		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
-    int		si_followup;	// soundsalike: ?
-    int		si_collapse;	// soundsalike: ?
+    పూర్ణాంకం		si_nosugfile;	// NOSUGFILE item found
+    పూర్ణాంకం		si_nosplitsugs;	// NOSPLITSUGS item found
+    పూర్ణాంకం		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
+    పూర్ణాంకం		si_followup;	// soundsalike: ?
+    పూర్ణాంకం		si_collapse;	// soundsalike: ?
     hashtab_T	si_commonwords;	// hashtable for common words
     time_t	si_sugtime;	// timestamp for .sug file
-    int		si_rem_accents;	// soundsalike: remove accents
+    పూర్ణాంకం		si_rem_accents;	// soundsalike: remove accents
     garray_T	si_map;		// MAP info concatenated
     char_u	*si_midword;	// MIDWORD chars or NULL
-    int		si_compmax;	// max nr of words for compounding
-    int		si_compminlen;	// minimal length for compounding
-    int		si_compsylmax;	// max nr of syllables for compounding
-    int		si_compoptions;	// COMP_ flags
+    పూర్ణాంకం		si_compmax;	// max nr of words for compounding
+    పూర్ణాంకం		si_compminlen;	// minimal length for compounding
+    పూర్ణాంకం		si_compsylmax;	// max nr of syllables for compounding
+    పూర్ణాంకం		si_compoptions;	// COMP_ flags
     garray_T	si_comppat;	// CHECKCOMPOUNDPATTERN items, each stored as
 				// a string
     char_u	*si_compflags;	// flags used for compounding
@@ -2025,105 +2025,105 @@ typedef struct spellinfo_S
     char_u	*si_syllable;	// syllable string
     garray_T	si_prefcond;	// table with conditions for postponed
 				// prefixes, each stored as a string
-    int		si_newprefID;	// current value for ah_newID
-    int		si_newcompID;	// current value for compound ID
+    పూర్ణాంకం		si_newprefID;	// current value for ah_newID
+    పూర్ణాంకం		si_newcompID;	// current value for compound ID
 } spellinfo_T;
 
-static int is_aff_rule(char_u **items, int itemcnt, char *rulename, int	 mincount);
-static void aff_process_flags(afffile_T *affile, affentry_T *entry);
-static int spell_info_item(char_u *s);
-static unsigned affitem2flag(int flagtype, char_u *item, char_u	*fname, int lnum);
-static unsigned get_affitem(int flagtype, char_u **pp);
-static void process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
-static void check_renumber(spellinfo_T *spin);
-static void aff_check_number(int spinval, int affval, char *name);
-static void aff_check_string(char_u *spinval, char_u *affval, char *name);
-static int str_equal(char_u *s1, char_u	*s2);
-static void add_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *to);
-static int sal_to_bool(char_u *s);
-static int get_affix_flags(afffile_T *affile, char_u *afflist);
-static int get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int store_aff_word(spellinfo_T *spin, char_u *word, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, int condit, int flags, char_u *pfxlist, int pfxlen);
-static void *getroom(spellinfo_T *spin, size_t len, int align);
-static char_u *getroom_save(spellinfo_T *spin, char_u *s);
-static int store_word(spellinfo_T *spin, char_u *word, int flags, int region, char_u *pfxlist, int need_affix);
-static int tree_add_word(spellinfo_T *spin, char_u *word, wordnode_T *tree, int flags, int region, int affixID);
-static wordnode_T *get_wordnode(spellinfo_T *spin);
-static void free_wordnode(spellinfo_T *spin, wordnode_T *n);
-static void wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name);
-static long node_compress(spellinfo_T *spin, wordnode_T *node, hashtab_T *ht, long *tot);
-static int node_equal(wordnode_T *n1, wordnode_T *n2);
-static void clear_node(wordnode_T *node);
-static int put_node(FILE *fd, wordnode_T *node, int idx, int regionmask, int prefixtree);
-static int sug_filltree(spellinfo_T *spin, slang_T *slang);
-static int sug_maketable(spellinfo_T *spin);
-static int sug_filltable(spellinfo_T *spin, wordnode_T *node, int startwordnr, garray_T *gap);
-static int offset2bytes(int nr, char_u *buf);
-static void sug_write(spellinfo_T *spin, char_u *fname);
-static void spell_message(spellinfo_T *spin, char_u *str);
-static void init_spellfile(void);
+స్థిర పూర్ణాంకం is_aff_నియమం(char_u **వస్తువులు, పూర్ణాంకం itemcnt, అక్షరం *rulename, పూర్ణాంకం	 mincount);
+స్థిర శూన్య aff_process_flags(afffile_T *affile, affentry_T *నమోదు_2);
+స్థిర పూర్ణాంకం spell_info_అంశం(char_u *s);
+స్థిర గుర్తులేని affitem2flag(పూర్ణాంకం flagtype, char_u *అంశం, char_u	*fname, పూర్ణాంకం lnum);
+స్థిర గుర్తులేని get_affitem(పూర్ణాంకం flagtype, char_u **pp);
+స్థిర శూన్య process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
+స్థిర శూన్య check_renumber(spellinfo_T *spin);
+స్థిర శూన్య aff_check_సంఖ్య(పూర్ణాంకం spinval, పూర్ణాంకం affval, అక్షరం *name);
+స్థిర శూన్య aff_check_string(char_u *spinval, char_u *affval, అక్షరం *name);
+స్థిర పూర్ణాంకం str_equal(char_u *s1, char_u	*s2);
+స్థిర శూన్య కూడు_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *గమ్యం);
+స్థిర పూర్ణాంకం sal_గమ్యం_bool(char_u *s);
+స్థిర పూర్ణాంకం get_affix_flags(afffile_T *affile, char_u *afflist);
+స్థిర పూర్ణాంకం get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, పూర్ణాంకం *cntp);
+స్థిర పూర్ణాంకం get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, పూర్ణాంకం *cntp);
+స్థిర పూర్ణాంకం store_aff_మాట(spellinfo_T *spin, char_u *మాట, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, పూర్ణాంకం condit, పూర్ణాంకం flags, char_u *pfxlist, పూర్ణాంకం pfxlen);
+స్థిర శూన్య *getroom(spellinfo_T *spin, size_t len, పూర్ణాంకం align);
+స్థిర char_u *getroom_save(spellinfo_T *spin, char_u *s);
+స్థిర పూర్ణాంకం store_మాట(spellinfo_T *spin, char_u *మాట, పూర్ణాంకం flags, పూర్ణాంకం region, char_u *pfxlist, పూర్ణాంకం need_affix);
+స్థిర పూర్ణాంకం వృక్షం_కూడు_మాట(spellinfo_T *spin, char_u *మాట, wordnode_T *వృక్షం, పూర్ణాంకం flags, పూర్ణాంకం region, పూర్ణాంకం affixID);
+స్థిర wordnode_T *get_wordnode(spellinfo_T *spin);
+స్థిర శూన్య free_wordnode(spellinfo_T *spin, wordnode_T *n);
+స్థిర శూన్య wordtree_compress(spellinfo_T *spin, wordnode_T *మూలం, అక్షరం *name);
+స్థిర దీర్ఘ కణుపు_compress(spellinfo_T *spin, wordnode_T *కణుపు, hashtab_T *ht, దీర్ఘ *tot);
+స్థిర పూర్ణాంకం కణుపు_equal(wordnode_T *n1, wordnode_T *n2);
+స్థిర శూన్య clear_కణుపు(wordnode_T *కణుపు);
+స్థిర పూర్ణాంకం put_కణుపు(FILE *fd, wordnode_T *కణుపు, పూర్ణాంకం idx, పూర్ణాంకం regionmask, పూర్ణాంకం prefixtree);
+స్థిర పూర్ణాంకం sug_filltree(spellinfo_T *spin, slang_T *slang);
+స్థిర పూర్ణాంకం sug_maketable(spellinfo_T *spin);
+స్థిర పూర్ణాంకం sug_filltable(spellinfo_T *spin, wordnode_T *కణుపు, పూర్ణాంకం startwordnr, garray_T *gap);
+స్థిర పూర్ణాంకం offset2bytes(పూర్ణాంకం nr, char_u *buf);
+స్థిర శూన్య sug_write(spellinfo_T *spin, char_u *fname);
+స్థిర శూన్య spell_సందేశం(spellinfo_T *spin, char_u *str);
+స్థిర శూన్య init_spellfile(శూన్య);
 
 // In the postponed prefixes tree wn_flags is used to store the WFP_ flags,
 // but it must be negative to indicate the prefix tree to tree_add_word().
 // Use a negative number with the lower 8 bits zero.
-#define PFX_FLAGS	(-256)
+#నిర్వచించు PFX_FLAGS	(-256)
 
 // flags for "condit" argument of store_aff_word()
-#define CONDIT_COMB	1	// affix must combine
-#define CONDIT_CFIX	2	// affix must have CIRCUMFIX flag
-#define CONDIT_SUF	4	// add a suffix for matching flags
-#define CONDIT_AFF	8	// word already has an affix
+#నిర్వచించు CONDIT_COMB	1	// affix must combine
+#నిర్వచించు CONDIT_CFIX	2	// affix must have CIRCUMFIX flag
+#నిర్వచించు CONDIT_SUF	4	// add a suffix for matching flags
+#నిర్వచించు CONDIT_AFF	8	// word already has an affix
 
 /*
  * Tunable parameters for when the tree is compressed.  Filled from the
  * 'mkspellmem' option.
  */
-static long compress_start = 30000;	// memory / SBLOCKSIZE
-static long compress_inc = 100;		// memory / SBLOCKSIZE
-static long compress_added = 500000;	// word count
+స్థిర దీర్ఘ compress_ప్రారంభం = 30000;	// memory / SBLOCKSIZE
+స్థిర దీర్ఘ compress_inc = 100;		// memory / SBLOCKSIZE
+స్థిర దీర్ఘ compress_added = 500000;	// word count
 
 /*
  * Check the 'mkspellmem' option.  Return FAIL if it's wrong.
  * Sets "sps_flags".
  */
-    int
-spell_check_msm(void)
+    పూర్ణాంకం
+spell_check_msm(శూన్య)
 {
     char_u	*p = p_msm;
-    long	start = 0;
-    long	incr = 0;
-    long	added = 0;
+    దీర్ఘ	ప్రారంభం = 0;
+    దీర్ఘ	incr = 0;
+    దీర్ఘ	added = 0;
 
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    ఒకవేళ (!VIM_ISDIGIT(*p))
+	తిరిగి FAIL;
     // block count = (value * 1024) / SBLOCKSIZE (but avoid overflow)
-    start = (getdigits(&p) * 10) / (SBLOCKSIZE / 102);
-    if (*p != ',')
-	return FAIL;
+    ప్రారంభం = (getdigits(&p) * 10) / (SBLOCKSIZE / 102);
+    ఒకవేళ (*p != ',')
+	తిరిగి FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    ఒకవేళ (!VIM_ISDIGIT(*p))
+	తిరిగి FAIL;
     incr = (getdigits(&p) * 102) / (SBLOCKSIZE / 10);
-    if (*p != ',')
-	return FAIL;
+    ఒకవేళ (*p != ',')
+	తిరిగి FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    ఒకవేళ (!VIM_ISDIGIT(*p))
+	తిరిగి FAIL;
     added = getdigits(&p) * 1024;
-    if (*p != NUL)
-	return FAIL;
+    ఒకవేళ (*p != NUL)
+	తిరిగి FAIL;
 
-    if (start == 0 || incr == 0 || added == 0 || incr > start)
-	return FAIL;
+    ఒకవేళ (ప్రారంభం == 0 || incr == 0 || added == 0 || incr > ప్రారంభం)
+	తిరిగి FAIL;
 
-    compress_start = start;
+    compress_ప్రారంభం = ప్రారంభం;
     compress_inc = incr;
     compress_added = added;
-    return OK;
+    తిరిగి OK;
 }
 
-#ifdef SPELL_PRINTTREE
+#నిర్వచితమైతే SPELL_PRINTTREE
 /*
  * For debugging the tree code: print the current tree in a (more or less)
  * readable format, so that we can see what happens when adding a word and/or
@@ -2133,150 +2133,150 @@ spell_check_msm(void)
 # define PRINTLINESIZE	1000
 # define PRINTWIDTH	6
 
-# define PRINTSOME(l, depth, fmt, a1, a2) vim_snprintf(l + depth * PRINTWIDTH, \
-	    PRINTLINESIZE - PRINTWIDTH * depth, fmt, a1, a2)
+# define PRINTSOME(l, లోతు, fmt, a1, a2) vim_snprintf(l + లోతు * PRINTWIDTH, \
+	    PRINTLINESIZE - PRINTWIDTH * లోతు, fmt, a1, a2)
 
-static char line1[PRINTLINESIZE];
-static char line2[PRINTLINESIZE];
-static char line3[PRINTLINESIZE];
+స్థిర అక్షరం line1[PRINTLINESIZE];
+స్థిర అక్షరం line2[PRINTLINESIZE];
+స్థిర అక్షరం line3[PRINTLINESIZE];
 
-    static void
-spell_clear_flags(wordnode_T *node)
+    స్థిర శూన్య
+spell_clear_flags(wordnode_T *కణుపు)
 {
     wordnode_T	*np;
 
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
     {
-	np->wn_u1.index = FALSE;
-	spell_clear_flags(np->wn_child);
+	np->wn_u1.సూచీ = FALSE;
+	spell_clear_flags(np->wn_బిడ్డ);
     }
 }
 
-    static void
-spell_print_node(wordnode_T *node, int depth)
+    స్థిర శూన్య
+spell_print_కణుపు(wordnode_T *కణుపు, పూర్ణాంకం లోతు)
 {
-    if (node->wn_u1.index)
+    ఒకవేళ (కణుపు->wn_u1.సూచీ)
     {
 	// Done this node before, print the reference.
-	PRINTSOME(line1, depth, "(%d)", node->wn_nr, 0);
-	PRINTSOME(line2, depth, "    ", 0, 0);
-	PRINTSOME(line3, depth, "    ", 0, 0);
-	msg(line1);
-	msg(line2);
-	msg(line3);
+	PRINTSOME(line1, లోతు, "(%d)", కణుపు->wn_nr, 0);
+	PRINTSOME(line2, లోతు, "    ", 0, 0);
+	PRINTSOME(line3, లోతు, "    ", 0, 0);
+	సందేశం(line1);
+	సందేశం(line2);
+	సందేశం(line3);
     }
-    else
+    లేకపోతే
     {
-	node->wn_u1.index = TRUE;
+	కణుపు->wn_u1.సూచీ = TRUE;
 
-	if (node->wn_byte != NUL)
+	ఒకవేళ (కణుపు->wn_byte != NUL)
 	{
-	    if (node->wn_child != NULL)
-		PRINTSOME(line1, depth, " %c -> ", node->wn_byte, 0);
-	    else
+	    ఒకవేళ (కణుపు->wn_బిడ్డ != ఖాళీ)
+		PRINTSOME(line1, లోతు, " %c -> ", కణుపు->wn_byte, 0);
+	    లేకపోతే
 		// Cannot happen?
-		PRINTSOME(line1, depth, " %c ???", node->wn_byte, 0);
+		PRINTSOME(line1, లోతు, " %c ???", కణుపు->wn_byte, 0);
 	}
-	else
-	    PRINTSOME(line1, depth, " $    ", 0, 0);
+	లేకపోతే
+	    PRINTSOME(line1, లోతు, " $    ", 0, 0);
 
-	PRINTSOME(line2, depth, "%d/%d    ", node->wn_nr, node->wn_refs);
+	PRINTSOME(line2, లోతు, "%d/%d    ", కణుపు->wn_nr, కణుపు->wn_refs);
 
-	if (node->wn_sibling != NULL)
-	    PRINTSOME(line3, depth, " |    ", 0, 0);
-	else
-	    PRINTSOME(line3, depth, "      ", 0, 0);
+	ఒకవేళ (కణుపు->wn_sibling != ఖాళీ)
+	    PRINTSOME(line3, లోతు, " |    ", 0, 0);
+	లేకపోతే
+	    PRINTSOME(line3, లోతు, "      ", 0, 0);
 
-	if (node->wn_byte == NUL)
+	ఒకవేళ (కణుపు->wn_byte == NUL)
 	{
-	    msg(line1);
-	    msg(line2);
-	    msg(line3);
+	    సందేశం(line1);
+	    సందేశం(line2);
+	    సందేశం(line3);
 	}
 
 	// do the children
-	if (node->wn_byte != NUL && node->wn_child != NULL)
-	    spell_print_node(node->wn_child, depth + 1);
+	ఒకవేళ (కణుపు->wn_byte != NUL && కణుపు->wn_బిడ్డ != ఖాళీ)
+	    spell_print_కణుపు(కణుపు->wn_బిడ్డ, లోతు + 1);
 
 	// do the siblings
-	if (node->wn_sibling != NULL)
+	ఒకవేళ (కణుపు->wn_sibling != ఖాళీ)
 	{
 	    // get rid of all parent details except |
 	    STRCPY(line1, line3);
 	    STRCPY(line2, line3);
-	    spell_print_node(node->wn_sibling, depth);
+	    spell_print_కణుపు(కణుపు->wn_sibling, లోతు);
 	}
     }
 }
 
-    static void
-spell_print_tree(wordnode_T *root)
+    స్థిర శూన్య
+spell_print_వృక్షం(wordnode_T *మూలం)
 {
-    if (root == NULL)
-	return;
+    ఒకవేళ (మూలం == ఖాళీ)
+	తిరిగి;
 
     // Clear the "wn_u1.index" fields, used to remember what has been done.
-    spell_clear_flags(root);
+    spell_clear_flags(మూలం);
 
     // Recursively print the tree.
-    spell_print_node(root, 0);
+    spell_print_కణుపు(మూలం, 0);
 }
-#endif // SPELL_PRINTTREE
+#అయితే_ముగింపు // SPELL_PRINTTREE
 
 /*
  * Read the affix file "fname".
  * Returns an afffile_T, NULL for complete failure.
  */
-    static afffile_T *
+    స్థిర afffile_T *
 spell_read_aff(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
     afffile_T	*aff;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
-#define MAXITEMCNT  30
-    char_u	*(items[MAXITEMCNT]);
-    int		itemcnt;
+    char_u	*పంక్తి;
+    char_u	*pc = ఖాళీ;
+#నిర్వచించు MAXITEMCNT  30
+    char_u	*(వస్తువులు[MAXITEMCNT]);
+    పూర్ణాంకం		itemcnt;
     char_u	*p;
-    int		lnum = 0;
-    affheader_T	*cur_aff = NULL;
-    int		did_postpone_prefix = FALSE;
-    int		aff_todo = 0;
+    పూర్ణాంకం		lnum = 0;
+    affheader_T	*cur_aff = ఖాళీ;
+    పూర్ణాంకం		did_postpone_ఉపసర్గ = FALSE;
+    పూర్ణాంకం		aff_todo = 0;
     hashtab_T	*tp;
-    char_u	*low = NULL;
-    char_u	*fol = NULL;
-    char_u	*upp = NULL;
-    int		do_rep;
-    int		do_repsal;
-    int		do_sal;
-    int		do_mapline;
-    int		found_map = FALSE;
+    char_u	*దిగువ = ఖాళీ;
+    char_u	*fol = ఖాళీ;
+    char_u	*upp = ఖాళీ;
+    పూర్ణాంకం		do_rep;
+    పూర్ణాంకం		do_repsal;
+    పూర్ణాంకం		do_sal;
+    పూర్ణాంకం		do_mapline;
+    పూర్ణాంకం		దొరికింది_map = FALSE;
     hashitem_T	*hi;
-    int		l;
-    int		compminlen = 0;		// COMPOUNDMIN value
-    int		compsylmax = 0;		// COMPOUNDSYLMAX value
-    int		compoptions = 0;	// COMP_ flags
-    int		compmax = 0;		// COMPOUNDWORDMAX value
-    char_u	*compflags = NULL;	// COMPOUNDFLAG and COMPOUNDRULE
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		compminlen = 0;		// COMPOUNDMIN value
+    పూర్ణాంకం		compsylmax = 0;		// COMPOUNDSYLMAX value
+    పూర్ణాంకం		compoptions = 0;	// COMP_ flags
+    పూర్ణాంకం		compmax = 0;		// COMPOUNDWORDMAX value
+    char_u	*compflags = ఖాళీ;	// COMPOUNDFLAG and COMPOUNDRULE
 					// concatenated
-    char_u	*midword = NULL;	// MIDWORD value
-    char_u	*syllable = NULL;	// SYLLABLE value
-    char_u	*sofofrom = NULL;	// SOFOFROM value
-    char_u	*sofoto = NULL;		// SOFOTO value
+    char_u	*midword = ఖాళీ;	// MIDWORD value
+    char_u	*syllable = ఖాళీ;	// SYLLABLE value
+    char_u	*sofofrom = ఖాళీ;	// SOFOFROM value
+    char_u	*sofoto = ఖాళీ;		// SOFOTO value
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "r");
+    ఒకవేళ (fd == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
-    spell_message(spin, IObuff);
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
+    spell_సందేశం(spin, IObuff);
 
     // Only do REP lines when not done in another .aff file already.
     do_rep = spin->si_rep.ga_len == 0;
@@ -2293,11 +2293,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Allocate and init the afffile_T structure.
      */
-    aff = (afffile_T *)getroom(spin, sizeof(afffile_T), TRUE);
-    if (aff == NULL)
+    aff = (afffile_T *)getroom(spin, పరిమాణం(afffile_T), TRUE);
+    ఒకవేళ (aff == ఖాళీ)
     {
 	fclose(fd);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     hash_init(&aff->af_pref);
     hash_init(&aff->af_suff);
@@ -2306,85 +2306,85 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    అయితే (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	పంక్తి_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	ఒకవేళ (*rline == '#')
+	    కొనసాగు;
 
 	// Convert from "SET" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	ఒకవేళ (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, ఖాళీ);
+	    ఒకవేళ (pc == ఖాళీ)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
 							   fname, lnum, rline);
-		continue;
+		కొనసాగు;
 	    }
-	    line = pc;
+	    పంక్తి = pc;
 	}
-	else
+	లేకపోతే
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = ఖాళీ;
+	    పంక్తి = rline;
 	}
 
 	// Split the line up in white separated items.  Put a NUL after each
 	// item.
 	itemcnt = 0;
-	for (p = line; ; )
+	కొరకు (p = పంక్తి; ; )
 	{
-	    while (*p != NUL && *p <= ' ')  // skip white space and CR/NL
+	    అయితే (*p != NUL && *p <= ' ')  // skip white space and CR/NL
 		++p;
-	    if (*p == NUL)
-		break;
-	    if (itemcnt == MAXITEMCNT)	    // too many items
-		break;
-	    items[itemcnt++] = p;
+	    ఒకవేళ (*p == NUL)
+		ఆపు;
+	    ఒకవేళ (itemcnt == MAXITEMCNT)	    // too many items
+		ఆపు;
+	    వస్తువులు[itemcnt++] = p;
 	    // A few items have arbitrary text argument, don't split them.
-	    if (itemcnt == 2 && spell_info_item(items[0]))
-		while (*p >= ' ' || *p == TAB)    // skip until CR/NL
+	    ఒకవేళ (itemcnt == 2 && spell_info_అంశం(వస్తువులు[0]))
+		అయితే (*p >= ' ' || *p == TAB)    // skip until CR/NL
 		    ++p;
-	    else
-		while (*p > ' ')    // skip until white space or CR/NL
+	    లేకపోతే
+		అయితే (*p > ' ')    // skip until white space or CR/NL
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    ఒకవేళ (*p == NUL)
+		ఆపు;
 	    *p++ = NUL;
 	}
 
 	// Handle non-empty lines.
-	if (itemcnt > 0)
+	ఒకవేళ (itemcnt > 0)
 	{
-	    if (is_aff_rule(items, itemcnt, "SET", 2) && aff->af_enc == NULL)
+	    ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "SET", 2) && aff->af_enc == ఖాళీ)
 	    {
 		// Setup for conversion from "ENC" to 'encoding'.
-		aff->af_enc = enc_canonize(items[1]);
-		if (aff->af_enc != NULL && !spin->si_ascii
-			&& convert_setup(&spin->si_conv, aff->af_enc,
+		aff->af_enc = enc_canonize(వస్తువులు[1]);
+		ఒకవేళ (aff->af_enc != ఖాళీ && !spin->si_ascii
+			&& convert_అమరిక(&spin->si_conv, aff->af_enc,
 							       p_enc) == FAIL)
 		    smsg(_("Conversion in %s not supported: from %s to %s"),
 					       fname, aff->af_enc, p_enc);
 		spin->si_conv.vc_fail = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FLAG", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "FLAG", 2)
 					      && aff->af_flagtype == AFT_CHAR)
 	    {
-		if (STRCMP(items[1], "long") == 0)
+		ఒకవేళ (STRCMP(వస్తువులు[1], "long") == 0)
 		    aff->af_flagtype = AFT_LONG;
-		else if (STRCMP(items[1], "num") == 0)
-		    aff->af_flagtype = AFT_NUM;
-		else if (STRCMP(items[1], "caplong") == 0)
+		లేకపోతే ఒకవేళ (STRCMP(వస్తువులు[1], "num") == 0)
+		    aff->af_flagtype = AFT_అంకె;
+		లేకపోతే ఒకవేళ (STRCMP(వస్తువులు[1], "caplong") == 0)
 		    aff->af_flagtype = AFT_CAPLONG;
-		else
+		లేకపోతే
 		    smsg(_("Invalid value for FLAG in %s line %d: %s"),
-			    fname, lnum, items[1]);
-		if (aff->af_rare != 0
+			    fname, lnum, వస్తువులు[1]);
+		ఒకవేళ (aff->af_rare != 0
 			|| aff->af_keepcase != 0
 			|| aff->af_bad != 0
 			|| aff->af_needaffix != 0
@@ -2392,291 +2392,291 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			|| aff->af_needcomp != 0
 			|| aff->af_comproot != 0
 			|| aff->af_nosuggest != 0
-			|| compflags != NULL
-			|| aff->af_suff.ht_used > 0
-			|| aff->af_pref.ht_used > 0)
+			|| compflags != ఖాళీ
+			|| aff->af_suff.ht_వాడిన > 0
+			|| aff->af_pref.ht_వాడిన > 0)
 		    smsg(_("FLAG after using flags in %s line %d: %s"),
-			    fname, lnum, items[1]);
+			    fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (spell_info_item(items[0]))
+	    లేకపోతే ఒకవేళ (spell_info_అంశం(వస్తువులు[0]))
 	    {
 		    p = (char_u *)getroom(spin,
-			    (spin->si_info == NULL ? 0 : STRLEN(spin->si_info))
-			    + STRLEN(items[0])
-			    + STRLEN(items[1]) + 3, FALSE);
-		    if (p != NULL)
+			    (spin->si_info == ఖాళీ ? 0 : STRLEN(spin->si_info))
+			    + STRLEN(వస్తువులు[0])
+			    + STRLEN(వస్తువులు[1]) + 3, FALSE);
+		    ఒకవేళ (p != ఖాళీ)
 		    {
-			if (spin->si_info != NULL)
+			ఒకవేళ (spin->si_info != ఖాళీ)
 			{
 			    STRCPY(p, spin->si_info);
 			    STRCAT(p, "\n");
 			}
-			STRCAT(p, items[0]);
+			STRCAT(p, వస్తువులు[0]);
 			STRCAT(p, " ");
-			STRCAT(p, items[1]);
+			STRCAT(p, వస్తువులు[1]);
 			spin->si_info = p;
 		    }
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MIDWORD", 2)
-							   && midword == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "MIDWORD", 2)
+							   && midword == ఖాళీ)
 	    {
-		midword = getroom_save(spin, items[1]);
+		midword = getroom_save(spin, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "TRY", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "TRY", 2))
 	    {
 		// ignored, we look in the tree for what chars may appear
 	    }
 	    // TODO: remove "RAR" later
-	    else if ((is_aff_rule(items, itemcnt, "RAR", 2)
-			|| is_aff_rule(items, itemcnt, "RARE", 2))
+	    లేకపోతే ఒకవేళ ((is_aff_నియమం(వస్తువులు, itemcnt, "RAR", 2)
+			|| is_aff_నియమం(వస్తువులు, itemcnt, "RARE", 2))
 							 && aff->af_rare == 0)
 	    {
-		aff->af_rare = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_rare = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
 	    // TODO: remove "KEP" later
-	    else if ((is_aff_rule(items, itemcnt, "KEP", 2)
-			|| is_aff_rule(items, itemcnt, "KEEPCASE", 2))
+	    లేకపోతే ఒకవేళ ((is_aff_నియమం(వస్తువులు, itemcnt, "KEP", 2)
+			|| is_aff_నియమం(వస్తువులు, itemcnt, "KEEPCASE", 2))
 						     && aff->af_keepcase == 0)
 	    {
-		aff->af_keepcase = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_keepcase = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "BAD", 2)
-			|| is_aff_rule(items, itemcnt, "FORBIDDENWORD", 2))
+	    లేకపోతే ఒకవేళ ((is_aff_నియమం(వస్తువులు, itemcnt, "BAD", 2)
+			|| is_aff_నియమం(వస్తువులు, itemcnt, "FORBIDDENWORD", 2))
 							  && aff->af_bad == 0)
 	    {
-		aff->af_bad = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_bad = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NEEDAFFIX", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NEEDAFFIX", 2)
 						    && aff->af_needaffix == 0)
 	    {
-		aff->af_needaffix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needaffix = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CIRCUMFIX", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CIRCUMFIX", 2)
 						    && aff->af_circumfix == 0)
 	    {
-		aff->af_circumfix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_circumfix = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGGEST", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NOSUGGEST", 2)
 						    && aff->af_nosuggest == 0)
 	    {
-		aff->af_nosuggest = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_nosuggest = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "NEEDCOMPOUND", 2)
-			|| is_aff_rule(items, itemcnt, "ONLYINCOMPOUND", 2))
+	    లేకపోతే ఒకవేళ ((is_aff_నియమం(వస్తువులు, itemcnt, "NEEDCOMPOUND", 2)
+			|| is_aff_నియమం(వస్తువులు, itemcnt, "ONLYINCOMPOUND", 2))
 						     && aff->af_needcomp == 0)
 	    {
-		aff->af_needcomp = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needcomp = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDROOT", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDROOT", 2)
 						     && aff->af_comproot == 0)
 	    {
-		aff->af_comproot = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comproot = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFORBIDFLAG", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDFORBIDFLAG", 2)
 						   && aff->af_compforbid == 0)
 	    {
-		aff->af_compforbid = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_compforbid = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		ఒకవేళ (aff->af_pref.ht_వాడిన > 0)
 		    smsg(_("Defining COMPOUNDFORBIDFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDPERMITFLAG", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDPERMITFLAG", 2)
 						   && aff->af_comppermit == 0)
 	    {
-		aff->af_comppermit = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comppermit = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		ఒకవేళ (aff->af_pref.ht_వాడిన > 0)
 		    smsg(_("Defining COMPOUNDPERMITFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFLAG", 2)
-							 && compflags == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDFLAG", 2)
+							 && compflags == ఖాళీ)
 	    {
 		// Turn flag "c" into COMPOUNDRULE compatible string "c+",
 		// "Na" into "Na+", "1234" into "1234+".
-		p = getroom(spin, STRLEN(items[1]) + 2, FALSE);
-		if (p != NULL)
+		p = getroom(spin, STRLEN(వస్తువులు[1]) + 2, FALSE);
+		ఒకవేళ (p != ఖాళీ)
 		{
-		    STRCPY(p, items[1]);
+		    STRCPY(p, వస్తువులు[1]);
 		    STRCAT(p, "+");
 		    compflags = p;
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULES", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDRULES", 2))
 	    {
 		// We don't use the count, but do check that it's a number and
 		// not COMPOUNDRULE mistyped.
-		if (atoi((char *)items[1]) == 0)
+		ఒకవేళ (atoi((అక్షరం *)వస్తువులు[1]) == 0)
 		    smsg(_("Wrong COMPOUNDRULES value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULE", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDRULE", 2))
 	    {
 		// Don't use the first rule if it is a number.
-		if (compflags != NULL || *skipdigits(items[1]) != NUL)
+		ఒకవేళ (compflags != ఖాళీ || *skipdigits(వస్తువులు[1]) != NUL)
 		{
 		    // Concatenate this string to previously defined ones,
 		    // using a slash to separate them.
-		    l = (int)STRLEN(items[1]) + 1;
-		    if (compflags != NULL)
-			l += (int)STRLEN(compflags) + 1;
+		    l = (పూర్ణాంకం)STRLEN(వస్తువులు[1]) + 1;
+		    ఒకవేళ (compflags != ఖాళీ)
+			l += (పూర్ణాంకం)STRLEN(compflags) + 1;
 		    p = getroom(spin, l, FALSE);
-		    if (p != NULL)
+		    ఒకవేళ (p != ఖాళీ)
 		    {
-			if (compflags != NULL)
+			ఒకవేళ (compflags != ఖాళీ)
 			{
 			    STRCPY(p, compflags);
 			    STRCAT(p, "/");
 			}
-			STRCAT(p, items[1]);
+			STRCAT(p, వస్తువులు[1]);
 			compflags = p;
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDWORDMAX", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDWORDMAX", 2)
 							      && compmax == 0)
 	    {
-		compmax = atoi((char *)items[1]);
-		if (compmax == 0)
+		compmax = atoi((అక్షరం *)వస్తువులు[1]);
+		ఒకవేళ (compmax == 0)
 		    smsg(_("Wrong COMPOUNDWORDMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDMIN", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDMIN", 2)
 							   && compminlen == 0)
 	    {
-		compminlen = atoi((char *)items[1]);
-		if (compminlen == 0)
+		compminlen = atoi((అక్షరం *)వస్తువులు[1]);
+		ఒకవేళ (compminlen == 0)
 		    smsg(_("Wrong COMPOUNDMIN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDSYLMAX", 2)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "COMPOUNDSYLMAX", 2)
 							   && compsylmax == 0)
 	    {
-		compsylmax = atoi((char *)items[1]);
-		if (compsylmax == 0)
+		compsylmax = atoi((అక్షరం *)వస్తువులు[1]);
+		ఒకవేళ (compsylmax == 0)
 		    smsg(_("Wrong COMPOUNDSYLMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDDUP", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDDUP", 1))
 	    {
 		compoptions |= COMP_CHECKDUP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDREP", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDREP", 1))
 	    {
 		compoptions |= COMP_CHECKREP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDCASE", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDCASE", 1))
 	    {
 		compoptions |= COMP_CHECKCASE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
 	    {
 		compoptions |= COMP_CHECKTRIPLE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
 	    {
-		if (atoi((char *)items[1]) == 0)
+		ఒకవేళ (atoi((అక్షరం *)వస్తువులు[1]) == 0)
 		    smsg(_("Wrong CHECKCOMPOUNDPATTERN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
 	    {
 		garray_T    *gap = &spin->si_comppat;
-		int	    i;
+		పూర్ణాంకం	    i;
 
 		// Only add the couple if it isn't already there.
-		for (i = 0; i < gap->ga_len - 1; i += 2)
-		    if (STRCMP(((char_u **)(gap->ga_data))[i], items[1]) == 0
-			    && STRCMP(((char_u **)(gap->ga_data))[i + 1],
-							       items[2]) == 0)
-			break;
-		if (i >= gap->ga_len && ga_grow(gap, 2) == OK)
+		కొరకు (i = 0; i < gap->ga_len - 1; i += 2)
+		    ఒకవేళ (STRCMP(((char_u **)(gap->ga_దత్తాంశం))[i], వస్తువులు[1]) == 0
+			    && STRCMP(((char_u **)(gap->ga_దత్తాంశం))[i + 1],
+							       వస్తువులు[2]) == 0)
+			ఆపు;
+		ఒకవేళ (i >= gap->ga_len && ga_grow(gap, 2) == OK)
 		{
-		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[1]);
-		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[2]);
+		    ((char_u **)(gap->ga_దత్తాంశం))[gap->ga_len++]
+					       = getroom_save(spin, వస్తువులు[1]);
+		    ((char_u **)(gap->ga_దత్తాంశం))[gap->ga_len++]
+					       = getroom_save(spin, వస్తువులు[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SYLLABLE", 2)
-							  && syllable == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "SYLLABLE", 2)
+							  && syllable == ఖాళీ)
 	    {
-		syllable = getroom_save(spin, items[1]);
+		syllable = getroom_save(spin, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOBREAK", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NOBREAK", 1))
 	    {
 		spin->si_nobreak = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSPLITSUGS", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NOSPLITSUGS", 1))
 	    {
 		spin->si_nosplitsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOCOMPOUNDSUGS", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NOCOMPOUNDSUGS", 1))
 	    {
 		spin->si_nocompoundsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGFILE", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "NOSUGFILE", 1))
 	    {
 		spin->si_nosugfile = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "PFXPOSTPONE", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "PFXPOSTPONE", 1))
 	    {
 		aff->af_pfxpostpone = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "IGNOREEXTRA", 1))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "IGNOREEXTRA", 1))
 	    {
 		aff->af_ignoreextra = TRUE;
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    లేకపోతే ఒకవేళ ((STRCMP(వస్తువులు[0], "PFX") == 0
+					      || STRCMP(వస్తువులు[0], "SFX") == 0)
 		    && aff_todo == 0
 		    && itemcnt >= 4)
 	    {
-		int	lasti = 4;
-		char_u	key[AH_KEY_LEN];
+		పూర్ణాంకం	lasti = 4;
+		char_u	కీలకం[AH_కీలకం_LEN];
 
-		if (*items[0] == 'P')
+		ఒకవేళ (*వస్తువులు[0] == 'P')
 		    tp = &aff->af_pref;
-		else
+		లేకపోతే
 		    tp = &aff->af_suff;
 
 		// Myspell allows the same affix name to be used multiple
 		// times.  The affix files that do this have an undocumented
 		// "S" flag on all but the last block, thus we check for that
 		// and store it in ah_follows.
-		vim_strncpy(key, items[1], AH_KEY_LEN - 1);
-		hi = hash_find(tp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(కీలకం, వస్తువులు[1], AH_కీలకం_LEN - 1);
+		hi = hash_కనుగొను(tp, కీలకం);
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		{
 		    cur_aff = HI2AH(hi);
-		    if (cur_aff->ah_combine != (*items[2] == 'Y'))
+		    ఒకవేళ (cur_aff->ah_combine != (*వస్తువులు[2] == 'Y'))
 			smsg(_("Different combining flag in continued affix block in %s line %d: %s"),
-						   fname, lnum, items[1]);
-		    if (!cur_aff->ah_follows)
+						   fname, lnum, వస్తువులు[1]);
+		    ఒకవేళ (!cur_aff->ah_follows)
 			smsg(_("Duplicate affix in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, వస్తువులు[1]);
 		}
-		else
+		లేకపోతే
 		{
 		    // New affix letter.
 		    cur_aff = (affheader_T *)getroom(spin,
-						   sizeof(affheader_T), TRUE);
-		    if (cur_aff == NULL)
-			break;
-		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, items[1],
+						   పరిమాణం(affheader_T), TRUE);
+		    ఒకవేళ (cur_aff == ఖాళీ)
+			ఆపు;
+		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, వస్తువులు[1],
 								 fname, lnum);
-		    if (cur_aff->ah_flag == 0 || STRLEN(items[1]) >= AH_KEY_LEN)
-			break;
-		    if (cur_aff->ah_flag == aff->af_bad
+		    ఒకవేళ (cur_aff->ah_flag == 0 || STRLEN(వస్తువులు[1]) >= AH_కీలకం_LEN)
+			ఆపు;
+		    ఒకవేళ (cur_aff->ah_flag == aff->af_bad
 			    || cur_aff->ah_flag == aff->af_rare
 			    || cur_aff->ah_flag == aff->af_keepcase
 			    || cur_aff->ah_flag == aff->af_needaffix
@@ -2685,35 +2685,35 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    || cur_aff->ah_flag == aff->af_needcomp
 			    || cur_aff->ah_flag == aff->af_comproot)
 			smsg(_("Affix also used for BAD/RARE/KEEPCASE/NEEDAFFIX/NEEDCOMPOUND/NOSUGGEST in %s line %d: %s"),
-						       fname, lnum, items[1]);
-		    STRCPY(cur_aff->ah_key, items[1]);
-		    hash_add(tp, cur_aff->ah_key, "spelling");
+						       fname, lnum, వస్తువులు[1]);
+		    STRCPY(cur_aff->ah_కీలకం, వస్తువులు[1]);
+		    hash_కూడు(tp, cur_aff->ah_కీలకం, "spelling");
 
-		    cur_aff->ah_combine = (*items[2] == 'Y');
+		    cur_aff->ah_combine = (*వస్తువులు[2] == 'Y');
 		}
 
 		// Check for the "S" flag, which apparently means that another
 		// block with the same affix name is following.
-		if (itemcnt > lasti && STRCMP(items[lasti], "S") == 0)
+		ఒకవేళ (itemcnt > lasti && STRCMP(వస్తువులు[lasti], "S") == 0)
 		{
 		    ++lasti;
 		    cur_aff->ah_follows = TRUE;
 		}
-		else
+		లేకపోతే
 		    cur_aff->ah_follows = FALSE;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter.
-		if (itemcnt > lasti && *items[lasti] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		ఒకవేళ (itemcnt > lasti && *వస్తువులు[lasti] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, వస్తువులు[lasti]);
 
-		if (STRCMP(items[2], "Y") != 0 && STRCMP(items[2], "N") != 0)
+		ఒకవేళ (STRCMP(వస్తువులు[2], "Y") != 0 && STRCMP(వస్తువులు[2], "N") != 0)
 		    smsg(_("Expected Y or N in %s line %d: %s"),
-						       fname, lnum, items[2]);
+						       fname, lnum, వస్తువులు[2]);
 
-		if (*items[0] == 'P' && aff->af_pfxpostpone)
+		ఒకవేళ (*వస్తువులు[0] == 'P' && aff->af_pfxpostpone)
 		{
-		    if (cur_aff->ah_newID == 0)
+		    ఒకవేళ (cur_aff->ah_newID == 0)
 		    {
 			// Use a new number in the .spl file later, to be able
 			// to handle multiple .aff files.
@@ -2723,138 +2723,138 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			// We only really use ah_newID if the prefix is
 			// postponed.  We know that only after handling all
 			// the items.
-			did_postpone_prefix = FALSE;
+			did_postpone_ఉపసర్గ = FALSE;
 		    }
-		    else
+		    లేకపోతే
 			// Did use the ID in a previous block.
-			did_postpone_prefix = TRUE;
+			did_postpone_ఉపసర్గ = TRUE;
 		}
 
-		aff_todo = atoi((char *)items[3]);
+		aff_todo = atoi((అక్షరం *)వస్తువులు[3]);
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    లేకపోతే ఒకవేళ ((STRCMP(వస్తువులు[0], "PFX") == 0
+					      || STRCMP(వస్తువులు[0], "SFX") == 0)
 		    && aff_todo > 0
-		    && STRCMP(cur_aff->ah_key, items[1]) == 0
+		    && STRCMP(cur_aff->ah_కీలకం, వస్తువులు[1]) == 0
 		    && itemcnt >= 5)
 	    {
-		affentry_T	*aff_entry;
-		int		upper = FALSE;
-		int		lasti = 5;
+		affentry_T	*aff_నమోదు;
+		పూర్ణాంకం		పై_2 = FALSE;
+		పూర్ణాంకం		lasti = 5;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter,
 		// unless IGNOREEXTRA is used.  Hunspell uses a "-" item.
-		if (itemcnt > lasti
+		ఒకవేళ (itemcnt > lasti
 			&& !aff->af_ignoreextra
-			&& *items[lasti] != '#'
-			&& (STRCMP(items[lasti], "-") != 0
+			&& *వస్తువులు[lasti] != '#'
+			&& (STRCMP(వస్తువులు[lasti], "-") != 0
 						     || itemcnt != lasti + 1))
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		    smsg(_(e_afftrailing), fname, lnum, వస్తువులు[lasti]);
 
 		// New item for an affix letter.
 		--aff_todo;
-		aff_entry = (affentry_T *)getroom(spin,
-						    sizeof(affentry_T), TRUE);
-		if (aff_entry == NULL)
-		    break;
+		aff_నమోదు = (affentry_T *)getroom(spin,
+						    పరిమాణం(affentry_T), TRUE);
+		ఒకవేళ (aff_నమోదు == ఖాళీ)
+		    ఆపు;
 
-		if (STRCMP(items[2], "0") != 0)
-		    aff_entry->ae_chop = getroom_save(spin, items[2]);
-		if (STRCMP(items[3], "0") != 0)
+		ఒకవేళ (STRCMP(వస్తువులు[2], "0") != 0)
+		    aff_నమోదు->ae_chop = getroom_save(spin, వస్తువులు[2]);
+		ఒకవేళ (STRCMP(వస్తువులు[3], "0") != 0)
 		{
-		    aff_entry->ae_add = getroom_save(spin, items[3]);
+		    aff_నమోదు->ae_కూడు = getroom_save(spin, వస్తువులు[3]);
 
 		    // Recognize flags on the affix: abcd/XYZ
-		    aff_entry->ae_flags = vim_strchr(aff_entry->ae_add, '/');
-		    if (aff_entry->ae_flags != NULL)
+		    aff_నమోదు->ae_flags = vim_strchr(aff_నమోదు->ae_కూడు, '/');
+		    ఒకవేళ (aff_నమోదు->ae_flags != ఖాళీ)
 		    {
-			*aff_entry->ae_flags++ = NUL;
-			aff_process_flags(aff, aff_entry);
+			*aff_నమోదు->ae_flags++ = NUL;
+			aff_process_flags(aff, aff_నమోదు);
 		    }
 		}
 
 		// Don't use an affix entry with non-ASCII characters when
 		// "spin->si_ascii" is TRUE.
-		if (!spin->si_ascii || !(has_non_ascii(aff_entry->ae_chop)
-					  || has_non_ascii(aff_entry->ae_add)))
+		ఒకవేళ (!spin->si_ascii || !(has_non_ascii(aff_నమోదు->ae_chop)
+					  || has_non_ascii(aff_నమోదు->ae_కూడు)))
 		{
-		    aff_entry->ae_next = cur_aff->ah_first;
-		    cur_aff->ah_first = aff_entry;
+		    aff_నమోదు->ae_తదుపరి = cur_aff->ah_మొదటి;
+		    cur_aff->ah_మొదటి = aff_నమోదు;
 
-		    if (STRCMP(items[4], ".") != 0)
+		    ఒకవేళ (STRCMP(వస్తువులు[4], ".") != 0)
 		    {
 			char_u	buf[MAXLINELEN];
 
-			aff_entry->ae_cond = getroom_save(spin, items[4]);
+			aff_నమోదు->ae_cond = getroom_save(spin, వస్తువులు[4]);
 			// Note: this silently truncates the buffer, but this should
 			// not happen in practice
-			if (*items[0] == 'P')
-			    vim_snprintf((char *)buf, sizeof(buf), "^%s", items[4]);
-			else
-			    vim_snprintf((char *)buf, sizeof(buf), "%s$", items[4]);
-			aff_entry->ae_prog = vim_regcomp(buf,
+			ఒకవేళ (*వస్తువులు[0] == 'P')
+			    vim_snprintf((అక్షరం *)buf, పరిమాణం(buf), "^%s", వస్తువులు[4]);
+			లేకపోతే
+			    vim_snprintf((అక్షరం *)buf, పరిమాణం(buf), "%s$", వస్తువులు[4]);
+			aff_నమోదు->ae_prog = vim_regcomp(buf,
 					    RE_MAGIC + RE_STRING + RE_STRICT);
-			if (aff_entry->ae_prog == NULL)
+			ఒకవేళ (aff_నమోదు->ae_prog == ఖాళీ)
 			    smsg(_("Broken condition in %s line %d: %s"),
-						       fname, lnum, items[4]);
+						       fname, lnum, వస్తువులు[4]);
 		    }
 
 		    // For postponed prefixes we need an entry in si_prefcond
 		    // for the condition.  Use an existing one if possible.
 		    // Can't be done for an affix with flags, ignoring
 		    // COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG.
-		    if (*items[0] == 'P' && aff->af_pfxpostpone
-					       && aff_entry->ae_flags == NULL)
+		    ఒకవేళ (*వస్తువులు[0] == 'P' && aff->af_pfxpostpone
+					       && aff_నమోదు->ae_flags == ఖాళీ)
 		    {
 			// When the chop string is one lower-case letter and
 			// the add string ends in the upper-case letter we set
 			// the "upper" flag, clear "ae_chop" and remove the
 			// letters from "ae_add".  The condition must either
 			// be empty or start with the same letter.
-			if (aff_entry->ae_chop != NULL
-				&& aff_entry->ae_add != NULL
-				&& aff_entry->ae_chop[(*mb_ptr2len)(
-						   aff_entry->ae_chop)] == NUL)
+			ఒకవేళ (aff_నమోదు->ae_chop != ఖాళీ
+				&& aff_నమోదు->ae_కూడు != ఖాళీ
+				&& aff_నమోదు->ae_chop[(*mb_ptr2len)(
+						   aff_నమోదు->ae_chop)] == NUL)
 			{
-			    int		c, c_up;
+			    పూర్ణాంకం		c, c_పైకి;
 
-			    c = PTR2CHAR(aff_entry->ae_chop);
-			    c_up = SPELL_TOUPPER(c);
-			    if (c_up != c
-				    && (aff_entry->ae_cond == NULL
-					|| PTR2CHAR(aff_entry->ae_cond) == c))
+			    c = PTR2CHAR(aff_నమోదు->ae_chop);
+			    c_పైకి = SPELL_TOUPPER(c);
+			    ఒకవేళ (c_పైకి != c
+				    && (aff_నమోదు->ae_cond == ఖాళీ
+					|| PTR2CHAR(aff_నమోదు->ae_cond) == c))
 			    {
-				p = aff_entry->ae_add
-						  + STRLEN(aff_entry->ae_add);
-				MB_PTR_BACK(aff_entry->ae_add, p);
-				if (PTR2CHAR(p) == c_up)
+				p = aff_నమోదు->ae_కూడు
+						  + STRLEN(aff_నమోదు->ae_కూడు);
+				MB_PTR_వెనుక(aff_నమోదు->ae_కూడు, p);
+				ఒకవేళ (PTR2CHAR(p) == c_పైకి)
 				{
-				    upper = TRUE;
-				    aff_entry->ae_chop = NULL;
+				    పై_2 = TRUE;
+				    aff_నమోదు->ae_chop = ఖాళీ;
 				    *p = NUL;
 
 				    // The condition is matched with the
 				    // actual word, thus must check for the
 				    // upper-case letter.
-				    if (aff_entry->ae_cond != NULL)
+				    ఒకవేళ (aff_నమోదు->ae_cond != ఖాళీ)
 				    {
 					char_u	buf[MAXLINELEN];
 
-					if (has_mbyte)
+					ఒకవేళ (has_mbyte)
 					{
-					    onecap_copy(items[4], buf, TRUE);
-					    aff_entry->ae_cond = getroom_save(
+					    onecap_copy(వస్తువులు[4], buf, TRUE);
+					    aff_నమోదు->ae_cond = getroom_save(
 								   spin, buf);
 					}
-					else
-					    *aff_entry->ae_cond = c_up;
-					if (aff_entry->ae_cond != NULL)
+					లేకపోతే
+					    *aff_నమోదు->ae_cond = c_పైకి;
+					ఒకవేళ (aff_నమోదు->ae_cond != ఖాళీ)
 					{
-					    sprintf((char *)buf, "^%s",
-							  aff_entry->ae_cond);
-					    vim_regfree(aff_entry->ae_prog);
-					    aff_entry->ae_prog = vim_regcomp(
+					    sprintf((అక్షరం *)buf, "^%s",
+							  aff_నమోదు->ae_cond);
+					    vim_regfree(aff_నమోదు->ae_prog);
+					    aff_నమోదు->ae_prog = vim_regcomp(
 						    buf, RE_MAGIC + RE_STRING);
 					}
 				    }
@@ -2862,58 +2862,58 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    }
 			}
 
-			if (aff_entry->ae_chop == NULL
-					       && aff_entry->ae_flags == NULL)
+			ఒకవేళ (aff_నమోదు->ae_chop == ఖాళీ
+					       && aff_నమోదు->ae_flags == ఖాళీ)
 			{
-			    int		idx;
+			    పూర్ణాంకం		idx;
 			    char_u	**pp;
-			    int		n;
+			    పూర్ణాంకం		n;
 
 			    // Find a previously used condition.
-			    for (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
+			    కొరకు (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
 									--idx)
 			    {
-				p = ((char_u **)spin->si_prefcond.ga_data)[idx];
-				if (str_equal(p, aff_entry->ae_cond))
-				    break;
+				p = ((char_u **)spin->si_prefcond.ga_దత్తాంశం)[idx];
+				ఒకవేళ (str_equal(p, aff_నమోదు->ae_cond))
+				    ఆపు;
 			    }
-			    if (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
+			    ఒకవేళ (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
 			    {
 				// Not found, add a new condition.
 				idx = spin->si_prefcond.ga_len++;
-				pp = ((char_u **)spin->si_prefcond.ga_data)
+				pp = ((char_u **)spin->si_prefcond.ga_దత్తాంశం)
 									+ idx;
-				if (aff_entry->ae_cond == NULL)
-				    *pp = NULL;
-				else
+				ఒకవేళ (aff_నమోదు->ae_cond == ఖాళీ)
+				    *pp = ఖాళీ;
+				లేకపోతే
 				    *pp = getroom_save(spin,
-							  aff_entry->ae_cond);
+							  aff_నమోదు->ae_cond);
 			    }
 
 			    // Add the prefix to the prefix tree.
-			    if (aff_entry->ae_add == NULL)
+			    ఒకవేళ (aff_నమోదు->ae_కూడు == ఖాళీ)
 				p = (char_u *)"";
-			    else
-				p = aff_entry->ae_add;
+			    లేకపోతే
+				p = aff_నమోదు->ae_కూడు;
 
 			    // PFX_FLAGS is a negative number, so that
 			    // tree_add_word() knows this is the prefix tree.
 			    n = PFX_FLAGS;
-			    if (!cur_aff->ah_combine)
+			    ఒకవేళ (!cur_aff->ah_combine)
 				n |= WFP_NC;
-			    if (upper)
-				n |= WFP_UP;
-			    if (aff_entry->ae_comppermit)
+			    ఒకవేళ (పై_2)
+				n |= WFP_పైకి;
+			    ఒకవేళ (aff_నమోదు->ae_comppermit)
 				n |= WFP_COMPPERMIT;
-			    if (aff_entry->ae_compforbid)
+			    ఒకవేళ (aff_నమోదు->ae_compforbid)
 				n |= WFP_COMPFORBID;
-			    tree_add_word(spin, p, spin->si_prefroot, n,
+			    వృక్షం_కూడు_మాట(spin, p, spin->si_prefroot, n,
 						      idx, cur_aff->ah_newID);
-			    did_postpone_prefix = TRUE;
+			    did_postpone_ఉపసర్గ = TRUE;
 			}
 
 			// Didn't actually use ah_newID, backup si_newprefID.
-			if (aff_todo == 0 && !did_postpone_prefix)
+			ఒకవేళ (aff_todo == 0 && !did_postpone_ఉపసర్గ)
 			{
 			    --spin->si_newprefID;
 			    cur_aff->ah_newID = 0;
@@ -2921,138 +2921,138 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FOL", 2) && fol == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "FOL", 2) && fol == ఖాళీ)
 	    {
-		fol = vim_strsave(items[1]);
+		fol = vim_strsave(వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "LOW", 2) && low == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "LOW", 2) && దిగువ == ఖాళీ)
 	    {
-		low = vim_strsave(items[1]);
+		దిగువ = vim_strsave(వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "UPP", 2) && upp == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "UPP", 2) && upp == ఖాళీ)
 	    {
-		upp = vim_strsave(items[1]);
+		upp = vim_strsave(వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "REP", 2)
-		     || is_aff_rule(items, itemcnt, "REPSAL", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "REP", 2)
+		     || is_aff_నియమం(వస్తువులు, itemcnt, "REPSAL", 2))
 	    {
 		// Ignore REP/REPSAL count
-		if (!SAFE_isdigit(*items[1]))
+		ఒకవేళ (!సురక్షిత_isdigit(*వస్తువులు[1]))
 		    smsg(_("Expected REP(SAL) count in %s line %d"),
 								 fname, lnum);
 	    }
-	    else if ((STRCMP(items[0], "REP") == 0
-			|| STRCMP(items[0], "REPSAL") == 0)
+	    లేకపోతే ఒకవేళ ((STRCMP(వస్తువులు[0], "REP") == 0
+			|| STRCMP(వస్తువులు[0], "REPSAL") == 0)
 		    && itemcnt >= 3)
 	    {
 		// REP/REPSAL item
 		// Myspell ignores extra arguments, we require it starts with
 		// # to detect mistakes.
-		if (itemcnt > 3 && items[3][0] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[3]);
-		if (items[0][3] == 'S' ? do_repsal : do_rep)
+		ఒకవేళ (itemcnt > 3 && వస్తువులు[3][0] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, వస్తువులు[3]);
+		ఒకవేళ (వస్తువులు[0][3] == 'S' ? do_repsal : do_rep)
 		{
 		    // Replace underscore with space (can't include a space
 		    // directly).
-		    for (p = items[1]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    కొరకు (p = వస్తువులు[1]; *p != NUL; MB_PTR_ADV(p))
+			ఒకవేళ (*p == '_')
 			    *p = ' ';
-		    for (p = items[2]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    కొరకు (p = వస్తువులు[2]; *p != NUL; MB_PTR_ADV(p))
+			ఒకవేళ (*p == '_')
 			    *p = ' ';
-		    add_fromto(spin, items[0][3] == 'S'
+		    కూడు_fromto(spin, వస్తువులు[0][3] == 'S'
 					 ? &spin->si_repsal
-					 : &spin->si_rep, items[1], items[2]);
+					 : &spin->si_rep, వస్తువులు[1], వస్తువులు[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MAP", 2))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "MAP", 2))
 	    {
 		// MAP item or count
-		if (!found_map)
+		ఒకవేళ (!దొరికింది_map)
 		{
 		    // First line contains the count.
-		    found_map = TRUE;
-		    if (!SAFE_isdigit(*items[1]))
+		    దొరికింది_map = TRUE;
+		    ఒకవేళ (!సురక్షిత_isdigit(*వస్తువులు[1]))
 			smsg(_("Expected MAP count in %s line %d"),
 								 fname, lnum);
 		}
-		else if (do_mapline)
+		లేకపోతే ఒకవేళ (do_mapline)
 		{
-		    int		c;
+		    పూర్ణాంకం		c;
 
 		    // Check that every character appears only once.
-		    for (p = items[1]; *p != NUL; )
+		    కొరకు (p = వస్తువులు[1]; *p != NUL; )
 		    {
 			c = mb_ptr2char_adv(&p);
-			if ((spin->si_map.ga_len > 0
-				    && vim_strchr(spin->si_map.ga_data, c)
-								      != NULL)
-				|| vim_strchr(p, c) != NULL)
+			ఒకవేళ ((spin->si_map.ga_len > 0
+				    && vim_strchr(spin->si_map.ga_దత్తాంశం, c)
+								      != ఖాళీ)
+				|| vim_strchr(p, c) != ఖాళీ)
 			    smsg(_("Duplicate character in MAP in %s line %d"),
 								 fname, lnum);
 		    }
 
 		    // We simply concatenate all the MAP strings, separated by
 		    // slashes.
-		    ga_concat(&spin->si_map, items[1]);
+		    ga_concat(&spin->si_map, వస్తువులు[1]);
 		    ga_append(&spin->si_map, '/');
 		}
 	    }
 	    // Accept "SAL from to" and "SAL from to  #comment".
-	    else if (is_aff_rule(items, itemcnt, "SAL", 3))
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "SAL", 3))
 	    {
-		if (do_sal)
+		ఒకవేళ (do_sal)
 		{
 		    // SAL item (sounds-a-like)
 		    // Either one of the known keys or a from-to pair.
-		    if (STRCMP(items[1], "followup") == 0)
-			spin->si_followup = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "collapse_result") == 0)
-			spin->si_collapse = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "remove_accents") == 0)
-			spin->si_rem_accents = sal_to_bool(items[2]);
-		    else
+		    ఒకవేళ (STRCMP(వస్తువులు[1], "followup") == 0)
+			spin->si_followup = sal_గమ్యం_bool(వస్తువులు[2]);
+		    లేకపోతే ఒకవేళ (STRCMP(వస్తువులు[1], "collapse_result") == 0)
+			spin->si_collapse = sal_గమ్యం_bool(వస్తువులు[2]);
+		    లేకపోతే ఒకవేళ (STRCMP(వస్తువులు[1], "remove_accents") == 0)
+			spin->si_rem_accents = sal_గమ్యం_bool(వస్తువులు[2]);
+		    లేకపోతే
 			// when "to" is "_" it means empty
-			add_fromto(spin, &spin->si_sal, items[1],
-				     STRCMP(items[2], "_") == 0 ? (char_u *)""
-								: items[2]);
+			కూడు_fromto(spin, &spin->si_sal, వస్తువులు[1],
+				     STRCMP(వస్తువులు[2], "_") == 0 ? (char_u *)""
+								: వస్తువులు[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOFROM", 2)
-							  && sofofrom == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "SOFOFROM", 2)
+							  && sofofrom == ఖాళీ)
 	    {
-		sofofrom = getroom_save(spin, items[1]);
+		sofofrom = getroom_save(spin, వస్తువులు[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOTO", 2)
-							    && sofoto == NULL)
+	    లేకపోతే ఒకవేళ (is_aff_నియమం(వస్తువులు, itemcnt, "SOFOTO", 2)
+							    && sofoto == ఖాళీ)
 	    {
-		sofoto = getroom_save(spin, items[1]);
+		sofoto = getroom_save(spin, వస్తువులు[1]);
 	    }
-	    else if (STRCMP(items[0], "COMMON") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(వస్తువులు[0], "COMMON") == 0)
 	    {
-		int	i;
+		పూర్ణాంకం	i;
 
-		for (i = 1; i < itemcnt; ++i)
+		కొరకు (i = 1; i < itemcnt; ++i)
 		{
-		    if (HASHITEM_EMPTY(hash_find(&spin->si_commonwords,
-								   items[i])))
+		    ఒకవేళ (HASHITEM_ఖాళీలు(hash_కనుగొను(&spin->si_commonwords,
+								   వస్తువులు[i])))
 		    {
-			p = vim_strsave(items[i]);
-			if (p == NULL)
-			    break;
-			hash_add(&spin->si_commonwords, p, "spelling");
+			p = vim_strsave(వస్తువులు[i]);
+			ఒకవేళ (p == ఖాళీ)
+			    ఆపు;
+			hash_కూడు(&spin->si_commonwords, p, "spelling");
 		    }
 		}
 	    }
-	    else
+	    లేకపోతే
 		smsg(_("Unrecognized or duplicate item in %s line %d: %s"),
-						       fname, lnum, items[0]);
+						       fname, lnum, వస్తువులు[0]);
 	}
     }
 
-    if (fol != NULL || low != NULL || upp != NULL)
+    ఒకవేళ (fol != ఖాళీ || దిగువ != ఖాళీ || upp != ఖాళీ)
     {
-	if (spin->si_clear_chartab)
+	ఒకవేళ (spin->si_clear_chartab)
 	{
 	    // Clear the char type tables, don't want to use any of the
 	    // currently used spell properties.
@@ -3066,74 +3066,74 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	 * Don't write one for utf-8 either, we use utf_*() and
 	 * mb_get_class(), the list of chars in the file will be incomplete.
 	 */
-	if (!spin->si_ascii && !enc_utf8)
+	ఒకవేళ (!spin->si_ascii && !enc_utf8)
 	{
-	    if (fol == NULL || low == NULL || upp == NULL)
+	    ఒకవేళ (fol == ఖాళీ || దిగువ == ఖాళీ || upp == ఖాళీ)
 		smsg(_("Missing FOL/LOW/UPP line in %s"), fname);
-	    else
-		(void)set_spell_chartab(fol, low, upp);
+	    లేకపోతే
+		(శూన్య)సమితి_spell_chartab(fol, దిగువ, upp);
 	}
 
 	vim_free(fol);
-	vim_free(low);
+	vim_free(దిగువ);
 	vim_free(upp);
     }
 
     // Use compound specifications of the .aff file for the spell info.
-    if (compmax != 0)
+    ఒకవేళ (compmax != 0)
     {
-	aff_check_number(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
+	aff_check_సంఖ్య(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
 	spin->si_compmax = compmax;
     }
 
-    if (compminlen != 0)
+    ఒకవేళ (compminlen != 0)
     {
-	aff_check_number(spin->si_compminlen, compminlen, "COMPOUNDMIN");
+	aff_check_సంఖ్య(spin->si_compminlen, compminlen, "COMPOUNDMIN");
 	spin->si_compminlen = compminlen;
     }
 
-    if (compsylmax != 0)
+    ఒకవేళ (compsylmax != 0)
     {
-	if (syllable == NULL)
+	ఒకవేళ (syllable == ఖాళీ)
 	    smsg(_("COMPOUNDSYLMAX used without SYLLABLE"));
-	aff_check_number(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
+	aff_check_సంఖ్య(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
 	spin->si_compsylmax = compsylmax;
     }
 
-    if (compoptions != 0)
+    ఒకవేళ (compoptions != 0)
     {
-	aff_check_number(spin->si_compoptions, compoptions, "COMPOUND options");
+	aff_check_సంఖ్య(spin->si_compoptions, compoptions, "COMPOUND options");
 	spin->si_compoptions |= compoptions;
     }
 
-    if (compflags != NULL)
+    ఒకవేళ (compflags != ఖాళీ)
 	process_compflags(spin, aff, compflags);
 
     // Check that we didn't use too many renumbered flags.
-    if (spin->si_newcompID < spin->si_newprefID)
+    ఒకవేళ (spin->si_newcompID < spin->si_newprefID)
     {
-	if (spin->si_newcompID == 127 || spin->si_newcompID == 255)
-	    msg(_("Too many postponed prefixes"));
-	else if (spin->si_newprefID == 0 || spin->si_newprefID == 127)
-	    msg(_("Too many compound flags"));
-	else
-	    msg(_("Too many postponed prefixes and/or compound flags"));
+	ఒకవేళ (spin->si_newcompID == 127 || spin->si_newcompID == 255)
+	    సందేశం(_("Too many postponed prefixes"));
+	లేకపోతే ఒకవేళ (spin->si_newprefID == 0 || spin->si_newprefID == 127)
+	    సందేశం(_("Too many compound flags"));
+	లేకపోతే
+	    సందేశం(_("Too many postponed prefixes and/or compound flags"));
     }
 
-    if (syllable != NULL)
+    ఒకవేళ (syllable != ఖాళీ)
     {
 	aff_check_string(spin->si_syllable, syllable, "SYLLABLE");
 	spin->si_syllable = syllable;
     }
 
-    if (sofofrom != NULL || sofoto != NULL)
+    ఒకవేళ (sofofrom != ఖాళీ || sofoto != ఖాళీ)
     {
-	if (sofofrom == NULL || sofoto == NULL)
+	ఒకవేళ (sofofrom == ఖాళీ || sofoto == ఖాళీ)
 	    smsg(_("Missing SOFO%s line in %s"),
-				     sofofrom == NULL ? "FROM" : "TO", fname);
-	else if (spin->si_sal.ga_len > 0)
+				     sofofrom == ఖాళీ ? "FROM" : "TO", fname);
+	లేకపోతే ఒకవేళ (spin->si_sal.ga_len > 0)
 	    smsg(_("Both SAL and SOFO lines in %s"), fname);
-	else
+	లేకపోతే
 	{
 	    aff_check_string(spin->si_sofofr, sofofrom, "SOFOFROM");
 	    aff_check_string(spin->si_sofoto, sofoto, "SOFOTO");
@@ -3142,7 +3142,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	}
     }
 
-    if (midword != NULL)
+    ఒకవేళ (midword != ఖాళీ)
     {
 	aff_check_string(spin->si_midword, midword, "MIDWORD");
 	spin->si_midword = midword;
@@ -3150,67 +3150,67 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
     vim_free(pc);
     fclose(fd);
-    return aff;
+    తిరిగి aff;
 }
 
 /*
  * Return TRUE when items[0] equals "rulename", there are "mincount" items or
  * a comment is following after item "mincount".
  */
-    static int
-is_aff_rule(
-    char_u	**items,
-    int		itemcnt,
-    char	*rulename,
-    int		mincount)
+    స్థిర పూర్ణాంకం
+is_aff_నియమం(
+    char_u	**వస్తువులు,
+    పూర్ణాంకం		itemcnt,
+    అక్షరం	*rulename,
+    పూర్ణాంకం		mincount)
 {
-    return (STRCMP(items[0], rulename) == 0
+    తిరిగి (STRCMP(వస్తువులు[0], rulename) == 0
 	    && (itemcnt == mincount
-		|| (itemcnt > mincount && items[mincount][0] == '#')));
+		|| (itemcnt > mincount && వస్తువులు[mincount][0] == '#')));
 }
 
 /*
  * For affix "entry" move COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG from
  * ae_flags to ae_comppermit and ae_compforbid.
  */
-    static void
-aff_process_flags(afffile_T *affile, affentry_T *entry)
+    స్థిర శూన్య
+aff_process_flags(afffile_T *affile, affentry_T *నమోదు_2)
 {
     char_u	*p;
     char_u	*prevp;
-    unsigned	flag;
+    గుర్తులేని	flag;
 
-    if (entry->ae_flags != NULL
+    ఒకవేళ (నమోదు_2->ae_flags != ఖాళీ
 		&& (affile->af_compforbid != 0 || affile->af_comppermit != 0))
     {
-	for (p = entry->ae_flags; *p != NUL; )
+	కొరకు (p = నమోదు_2->ae_flags; *p != NUL; )
 	{
 	    prevp = p;
 	    flag = get_affitem(affile->af_flagtype, &p);
-	    if (flag == affile->af_comppermit || flag == affile->af_compforbid)
+	    ఒకవేళ (flag == affile->af_comppermit || flag == affile->af_compforbid)
 	    {
 		STRMOVE(prevp, p);
 		p = prevp;
-		if (flag == affile->af_comppermit)
-		    entry->ae_comppermit = TRUE;
-		else
-		    entry->ae_compforbid = TRUE;
+		ఒకవేళ (flag == affile->af_comppermit)
+		    నమోదు_2->ae_comppermit = TRUE;
+		లేకపోతే
+		    నమోదు_2->ae_compforbid = TRUE;
 	    }
-	    if (affile->af_flagtype == AFT_NUM && *p == ',')
+	    ఒకవేళ (affile->af_flagtype == AFT_అంకె && *p == ',')
 		++p;
 	}
-	if (*entry->ae_flags == NUL)
-	    entry->ae_flags = NULL;	// nothing left
+	ఒకవేళ (*నమోదు_2->ae_flags == NUL)
+	    నమోదు_2->ae_flags = ఖాళీ;	// nothing left
     }
 }
 
 /*
  * Return TRUE if "s" is the name of an info item in the affix file.
  */
-    static int
-spell_info_item(char_u *s)
+    స్థిర పూర్ణాంకం
+spell_info_అంశం(char_u *s)
 {
-    return STRCMP(s, "NAME") == 0
+    తిరిగి STRCMP(s, "NAME") == 0
 	|| STRCMP(s, "HOME") == 0
 	|| STRCMP(s, "VERSION") == 0
 	|| STRCMP(s, "AUTHOR") == 0
@@ -3222,33 +3222,33 @@ spell_info_item(char_u *s)
  * Turn an affix flag name into a number, according to the FLAG type.
  * returns zero for failure.
  */
-    static unsigned
+    స్థిర గుర్తులేని
 affitem2flag(
-    int		flagtype,
-    char_u	*item,
+    పూర్ణాంకం		flagtype,
+    char_u	*అంశం,
     char_u	*fname,
-    int		lnum)
+    పూర్ణాంకం		lnum)
 {
-    unsigned	res;
-    char_u	*p = item;
+    గుర్తులేని	res;
+    char_u	*p = అంశం;
 
     res = get_affitem(flagtype, &p);
-    if (res == 0)
+    ఒకవేళ (res == 0)
     {
-	if (flagtype == AFT_NUM)
+	ఒకవేళ (flagtype == AFT_అంకె)
 	    smsg(_("Flag is not a number in %s line %d: %s"),
-							   fname, lnum, item);
-	else
+							   fname, lnum, అంశం);
+	లేకపోతే
 	    smsg(_("Illegal flag in %s line %d: %s"),
-							   fname, lnum, item);
+							   fname, lnum, అంశం);
     }
-    if (*p != NUL)
+    ఒకవేళ (*p != NUL)
     {
-	smsg(_(e_affname), fname, lnum, item);
-	return 0;
+	smsg(_(e_affname), fname, lnum, అంశం);
+	తిరిగి 0;
     }
 
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -3256,34 +3256,34 @@ affitem2flag(
  * Returns ZERO_FLAG for "0".
  * Returns zero for an error, still advances the pointer then.
  */
-    static unsigned
-get_affitem(int flagtype, char_u **pp)
+    స్థిర గుర్తులేని
+get_affitem(పూర్ణాంకం flagtype, char_u **pp)
 {
-    int		res;
+    పూర్ణాంకం		res;
 
-    if (flagtype == AFT_NUM)
+    ఒకవేళ (flagtype == AFT_అంకె)
     {
-	if (!VIM_ISDIGIT(**pp))
+	ఒకవేళ (!VIM_ISDIGIT(**pp))
 	{
 	    ++*pp;	// always advance, avoid getting stuck
-	    return 0;
+	    తిరిగి 0;
 	}
 	res = getdigits(pp);
-	if (res == 0)
+	ఒకవేళ (res == 0)
 	    res = ZERO_FLAG;
     }
-    else
+    లేకపోతే
     {
 	res = mb_ptr2char_adv(pp);
-	if (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
+	ఒకవేళ (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
 						 && res >= 'A' && res <= 'Z'))
 	{
-	    if (**pp == NUL)
-		return 0;
+	    ఒకవేళ (**pp == NUL)
+		తిరిగి 0;
 	    res = mb_ptr2char_adv(pp) + (res << 16);
 	}
     }
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -3292,7 +3292,7 @@ get_affitem(int flagtype, char_u **pp)
  * The processing involves changing the affix names to ID numbers, so that
  * they fit in one byte.
  */
-    static void
+    స్థిర శూన్య
 process_compflags(
     spellinfo_T	*spin,
     afffile_T	*aff,
@@ -3300,24 +3300,24 @@ process_compflags(
 {
     char_u	*p;
     char_u	*prevp;
-    unsigned	flag;
+    గుర్తులేని	flag;
     compitem_T	*ci;
-    int		id;
-    int		len;
+    పూర్ణాంకం		id;
+    పూర్ణాంకం		len;
     char_u	*tp;
-    char_u	key[AH_KEY_LEN];
+    char_u	కీలకం[AH_కీలకం_LEN];
     hashitem_T	*hi;
 
     // Make room for the old and the new compflags, concatenated with a / in
     // between.  Processing it makes it shorter, but we don't know by how
     // much, thus allocate the maximum.
-    len = (int)STRLEN(compflags) + 1;
-    if (spin->si_compflags != NULL)
-	len += (int)STRLEN(spin->si_compflags) + 1;
+    len = (పూర్ణాంకం)STRLEN(compflags) + 1;
+    ఒకవేళ (spin->si_compflags != ఖాళీ)
+	len += (పూర్ణాంకం)STRLEN(spin->si_compflags) + 1;
     p = getroom(spin, len, FALSE);
-    if (p == NULL)
-	return;
-    if (spin->si_compflags != NULL)
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (spin->si_compflags != ఖాళీ)
     {
 	STRCPY(p, spin->si_compflags);
 	STRCAT(p, "/");
@@ -3325,44 +3325,44 @@ process_compflags(
     spin->si_compflags = p;
     tp = p + STRLEN(p);
 
-    for (p = compflags; *p != NUL; )
+    కొరకు (p = compflags; *p != NUL; )
     {
-	if (vim_strchr((char_u *)"/?*+[]", *p) != NULL)
+	ఒకవేళ (vim_strchr((char_u *)"/?*+[]", *p) != ఖాళీ)
 	    // Copy non-flag characters directly.
 	    *tp++ = *p++;
-	else
+	లేకపోతే
 	{
 	    // First get the flag number, also checks validity.
 	    prevp = p;
 	    flag = get_affitem(aff->af_flagtype, &p);
-	    if (flag != 0)
+	    ఒకవేళ (flag != 0)
 	    {
 		// Find the flag in the hashtable.  If it was used before, use
 		// the existing ID.  Otherwise add a new entry.
-		vim_strncpy(key, prevp, p - prevp);
-		hi = hash_find(&aff->af_comp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(కీలకం, prevp, p - prevp);
+		hi = hash_కనుగొను(&aff->af_comp, కీలకం);
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		    id = HI2CI(hi)->ci_newID;
-		else
+		లేకపోతే
 		{
-		    ci = (compitem_T *)getroom(spin, sizeof(compitem_T), TRUE);
-		    if (ci == NULL)
-			break;
-		    STRCPY(ci->ci_key, key);
+		    ci = (compitem_T *)getroom(spin, పరిమాణం(compitem_T), TRUE);
+		    ఒకవేళ (ci == ఖాళీ)
+			ఆపు;
+		    STRCPY(ci->ci_కీలకం, కీలకం);
 		    ci->ci_flag = flag;
 		    // Avoid using a flag ID that has a special meaning in a
 		    // regexp (also inside []).
-		    do
+		    చేయి
 		    {
 			check_renumber(spin);
 			id = spin->si_newcompID--;
-		    } while (vim_strchr((char_u *)"/?*+[]\\-^", id) != NULL);
+		    } అయితే (vim_strchr((char_u *)"/?*+[]\\-^", id) != ఖాళీ);
 		    ci->ci_newID = id;
-		    hash_add(&aff->af_comp, ci->ci_key, "spelling");
+		    hash_కూడు(&aff->af_comp, ci->ci_కీలకం, "spelling");
 		}
 		*tp++ = id;
 	    }
-	    if (aff->af_flagtype == AFT_NUM && *p == ',')
+	    ఒకవేళ (aff->af_flagtype == AFT_అంకె && *p == ',')
 		++p;
 	}
     }
@@ -3376,10 +3376,10 @@ process_compflags(
  * using two bytes for utf-8.  When the 0-127 range is used up go to 128-255.
  * When that is used up an error message is given.
  */
-    static void
+    స్థిర శూన్య
 check_renumber(spellinfo_T *spin)
 {
-    if (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
+    ఒకవేళ (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
     {
 	spin->si_newprefID = 127;
 	spin->si_newcompID = 255;
@@ -3390,82 +3390,82 @@ check_renumber(spellinfo_T *spin)
  * Append one affix or compound ID to "store_afflist".
  * Returns FAIL when this would overrun the fixed-size buffer.
  */
-    static int
-store_afflist_add(
+    స్థిర పూర్ణాంకం
+store_afflist_కూడు(
     char_u	*store_afflist,
-    int		*cntp,
-    int		id)
+    పూర్ణాంకం		*cntp,
+    పూర్ణాంకం		id)
 {
-    if (*cntp >= MAXWLEN - 1)
+    ఒకవేళ (*cntp >= MAXWLEN - 1)
     {
 	emsg(_(e_too_many_postponed_prefixes_spell));
-	return FAIL;
+	తిరిగి FAIL;
     }
     store_afflist[(*cntp)++] = id;
     store_afflist[*cntp] = NUL;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Return TRUE if flag "flag" appears in affix list "afflist".
  */
-    static int
-flag_in_afflist(int flagtype, char_u *afflist, unsigned flag)
+    స్థిర పూర్ణాంకం
+flag_లోపల_afflist(పూర్ణాంకం flagtype, char_u *afflist, గుర్తులేని flag)
 {
     char_u	*p;
-    unsigned	n;
+    గుర్తులేని	n;
 
-    switch (flagtype)
+    ఎంపిక (flagtype)
     {
-	case AFT_CHAR:
-	    return vim_strchr(afflist, flag) != NULL;
+	స్థితి AFT_CHAR:
+	    తిరిగి vim_strchr(afflist, flag) != ఖాళీ;
 
-	case AFT_CAPLONG:
-	case AFT_LONG:
-	    for (p = afflist; *p != NUL; )
+	స్థితి AFT_CAPLONG:
+	స్థితి AFT_LONG:
+	    కొరకు (p = afflist; *p != NUL; )
 	    {
 		n = mb_ptr2char_adv(&p);
-		if ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
+		ఒకవేళ ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
 								 && *p != NUL)
 		    n = mb_ptr2char_adv(&p) + (n << 16);
-		if (n == flag)
-		    return TRUE;
+		ఒకవేళ (n == flag)
+		    తిరిగి TRUE;
 	    }
-	    break;
+	    ఆపు;
 
-	case AFT_NUM:
-	    for (p = afflist; *p != NUL; )
+	స్థితి AFT_అంకె:
+	    కొరకు (p = afflist; *p != NUL; )
 	    {
 		n = getdigits(&p);
-		if (n == 0)
+		ఒకవేళ (n == 0)
 		    n = ZERO_FLAG;
-		if (n == flag)
-		    return TRUE;
-		if (*p != NUL)	// skip over comma
+		ఒకవేళ (n == flag)
+		    తిరిగి TRUE;
+		ఒకవేళ (*p != NUL)	// skip over comma
 		    ++p;
 	    }
-	    break;
+	    ఆపు;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Give a warning when "spinval" and "affval" numbers are set and not the same.
  */
-    static void
-aff_check_number(int spinval, int affval, char *name)
+    స్థిర శూన్య
+aff_check_సంఖ్య(పూర్ణాంకం spinval, పూర్ణాంకం affval, అక్షరం *name)
 {
-    if (spinval != 0 && spinval != affval)
+    ఒకవేళ (spinval != 0 && spinval != affval)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
 /*
  * Give a warning when "spinval" and "affval" strings are set and not the same.
  */
-    static void
-aff_check_string(char_u *spinval, char_u *affval, char *name)
+    స్థిర శూన్య
+aff_check_string(char_u *spinval, char_u *affval, అక్షరం *name)
 {
-    if (spinval != NULL && STRCMP(spinval, affval) != 0)
+    ఒకవేళ (spinval != ఖాళీ && STRCMP(spinval, affval) != 0)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
@@ -3473,78 +3473,78 @@ aff_check_string(char_u *spinval, char_u *affval, char *name)
  * Return TRUE if strings "s1" and "s2" are equal.  Also consider both being
  * NULL as equal.
  */
-    static int
+    స్థిర పూర్ణాంకం
 str_equal(char_u *s1, char_u *s2)
 {
-    if (s1 == NULL || s2 == NULL)
-	return s1 == s2;
-    return STRCMP(s1, s2) == 0;
+    ఒకవేళ (s1 == ఖాళీ || s2 == ఖాళీ)
+	తిరిగి s1 == s2;
+    తిరిగి STRCMP(s1, s2) == 0;
 }
 
 /*
  * Add a from-to item to "gap".  Used for REP and SAL items.
  * They are stored case-folded.
  */
-    static void
-add_fromto(
+    స్థిర శూన్య
+కూడు_fromto(
     spellinfo_T	*spin,
     garray_T	*gap,
     char_u	*from,
-    char_u	*to)
+    char_u	*గమ్యం)
 {
     fromto_T	*ftp;
-    char_u	word[MAXWLEN];
+    char_u	మాట[MAXWLEN];
 
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి;
 
-    ftp = ((fromto_T *)gap->ga_data) + gap->ga_len;
-    (void)spell_casefold(curwin, from, (int)STRLEN(from), word, MAXWLEN);
-    ftp->ft_from = getroom_save(spin, word);
-    (void)spell_casefold(curwin, to, (int)STRLEN(to), word, MAXWLEN);
-    ftp->ft_to = getroom_save(spin, word);
+    ftp = ((fromto_T *)gap->ga_దత్తాంశం) + gap->ga_len;
+    (శూన్య)spell_casefold(curwin, from, (పూర్ణాంకం)STRLEN(from), మాట, MAXWLEN);
+    ftp->ft_from = getroom_save(spin, మాట);
+    (శూన్య)spell_casefold(curwin, గమ్యం, (పూర్ణాంకం)STRLEN(గమ్యం), మాట, MAXWLEN);
+    ftp->ft_గమ్యం = getroom_save(spin, మాట);
     ++gap->ga_len;
 }
 
 /*
  * Convert a boolean argument in a SAL line to TRUE or FALSE;
  */
-    static int
-sal_to_bool(char_u *s)
+    స్థిర పూర్ణాంకం
+sal_గమ్యం_bool(char_u *s)
 {
-    return STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
+    తిరిగి STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
 }
 
 /*
  * Free the structure filled by spell_read_aff().
  */
-    static void
+    స్థిర శూన్య
 spell_free_aff(afffile_T *aff)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
-    int		todo;
+    పూర్ణాంకం		todo;
     affheader_T	*ah;
     affentry_T	*ae;
 
     vim_free(aff->af_enc);
 
     // All this trouble to free the "ae_prog" items...
-    for (ht = &aff->af_pref; ; ht = &aff->af_suff)
+    కొరకు (ht = &aff->af_pref; ; ht = &aff->af_suff)
     {
-	todo = (int)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	todo = (పూర్ణాంకం)ht->ht_వాడిన;
+	FOR_ALL_HASHTAB_వస్తువులు(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
 		--todo;
 		ah = HI2AH(hi);
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		కొరకు (ae = ah->ah_మొదటి; ae != ఖాళీ; ae = ae->ae_తదుపరి)
 		    vim_regfree(ae->ae_prog);
 	    }
 	}
-	if (ht == &aff->af_suff)
-	    break;
+	ఒకవేళ (ht == &aff->af_suff)
+	    ఆపు;
     }
 
     hash_clear(&aff->af_pref);
@@ -3556,220 +3556,220 @@ spell_free_aff(afffile_T *aff)
  * Read dictionary file "fname".
  * Returns OK or FAIL;
  */
-    static int
+    స్థిర పూర్ణాంకం
 spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 {
     hashtab_T	ht;
-    char_u	line[MAXLINELEN];
+    char_u	పంక్తి[MAXLINELEN];
     char_u	*p;
     char_u	*afflist;
     char_u	store_afflist[MAXWLEN];
-    int		pfxlen;
-    int		totlen;
-    int		need_affix;
+    పూర్ణాంకం		pfxlen;
+    పూర్ణాంకం		totlen;
+    పూర్ణాంకం		need_affix;
     char_u	*dw;
     char_u	*pc;
     char_u	*w;
-    int		l;
+    పూర్ణాంకం		l;
     hash_T	hash;
     hashitem_T	*hi;
     FILE	*fd;
-    int		lnum = 1;
-    int		non_ascii = 0;
-    int		retval = OK;
-    char_u	message[MAXLINELEN + MAXWLEN];
-    int		flags;
-    int		duplicate = 0;
-    time_T	last_msg_time = 0;
+    పూర్ణాంకం		lnum = 1;
+    పూర్ణాంకం		non_ascii = 0;
+    పూర్ణాంకం		retval = OK;
+    char_u	సందేశం_2[MAXLINELEN + MAXWLEN];
+    పూర్ణాంకం		flags;
+    పూర్ణాంకం		duplicate = 0;
+    సమయం_T	చివరి_సందేశం_సమయం = 0;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "r");
+    ఒకవేళ (fd == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // The hashtable is only used to detect duplicated words.
     hash_init(&ht);
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 				  _("Reading dictionary file %s..."), fname);
-    spell_message(spin, IObuff);
+    spell_సందేశం(spin, IObuff);
 
     // start with a message for the first line
-    spin->si_msg_count = 999999;
+    spin->si_సందేశం_లెక్క = 999999;
 
     // Read and ignore the first line: word count.
-    if (vim_fgets(line, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(line)))
-	semsg(_(e_no_word_count_in_str), fname);
+    ఒకవేళ (vim_fgets(పంక్తి, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(పంక్తి)))
+	semsg(_(e_no_మాట_లెక్క_లోపల_str), fname);
 
     /*
      * Read all the lines in the file one by one.
      * The words are converted to 'encoding' here, before being added to
      * the hashtable.
      */
-    while (!vim_fgets(line, MAXLINELEN, fd) && !got_int)
+    అయితే (!vim_fgets(పంక్తి, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	పంక్తి_breakcheck();
 	++lnum;
-	if (line[0] == '#' || line[0] == '/')
-	    continue;	// comment line
+	ఒకవేళ (పంక్తి[0] == '#' || పంక్తి[0] == '/')
+	    కొనసాగు;	// comment line
 
 	// Remove CR, LF and white space from the end.  White space halfway
 	// the word is kept to allow e.g., "et al.".
-	l = (int)STRLEN(line);
-	while (l > 0 && line[l - 1] <= ' ')
+	l = (పూర్ణాంకం)STRLEN(పంక్తి);
+	అయితే (l > 0 && పంక్తి[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty line
-	line[l] = NUL;
+	ఒకవేళ (l == 0)
+	    కొనసాగు;	// empty line
+	పంక్తి[l] = NUL;
 
 	// Convert from "SET" to 'encoding' when needed.
-	if (spin->si_conv.vc_type != CONV_NONE)
+	ఒకవేళ (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, line, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, పంక్తి, ఖాళీ);
+	    ఒకవేళ (pc == ఖాళీ)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
-						       fname, lnum, line);
-		continue;
+						       fname, lnum, పంక్తి);
+		కొనసాగు;
 	    }
 	    w = pc;
 	}
-	else
+	లేకపోతే
 	{
-	    pc = NULL;
-	    w = line;
+	    pc = ఖాళీ;
+	    w = పంక్తి;
 	}
 
 	// Truncate the word at the "/", set "afflist" to what follows.
 	// Replace "\/" by "/" and "\\" by "\".
-	afflist = NULL;
-	for (p = w; *p != NUL; MB_PTR_ADV(p))
+	afflist = ఖాళీ;
+	కొరకు (p = w; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
+	    ఒకవేళ (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
 		STRMOVE(p, p + 1);
-	    else if (*p == '/')
+	    లేకపోతే ఒకవేళ (*p == '/')
 	    {
 		*p = NUL;
 		afflist = p + 1;
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(w))
+	ఒకవేళ (spin->si_ascii && has_non_ascii(w))
 	{
 	    ++non_ascii;
 	    vim_free(pc);
-	    continue;
+	    కొనసాగు;
 	}
 
 	// This takes time, print a message every 10000 words, but not more
 	// often than once per second.
-	if (spin->si_verbose && spin->si_msg_count > 10000)
+	ఒకవేళ (spin->si_verbose && spin->si_సందేశం_లెక్క > 10000)
 	{
-	    spin->si_msg_count = 0;
-	    if (vim_time() > last_msg_time)
+	    spin->si_సందేశం_లెక్క = 0;
+	    ఒకవేళ (vim_సమయం() > చివరి_సందేశం_సమయం)
 	    {
-		last_msg_time = vim_time();
-		vim_snprintf((char *)message, sizeof(message),
+		చివరి_సందేశం_సమయం = vim_సమయం();
+		vim_snprintf((అక్షరం *)సందేశం_2, పరిమాణం(సందేశం_2),
 			_("line %6d, word %6ld - %s"),
 			   lnum, spin->si_foldwcount + spin->si_keepwcount, w);
-		msg_start();
-		msg_outtrans_long_attr(message, 0);
-		msg_clr_eos();
-		msg_didout = FALSE;
-		msg_col = 0;
-		out_flush();
+		సందేశం_ప్రారంభం();
+		సందేశం_outtrans_long_attr(సందేశం_2, 0);
+		సందేశం_clr_eos();
+		సందేశం_didout = FALSE;
+		సందేశం_నిలువు = 0;
+		బహిర్గతం_flush();
 	    }
 	}
 
 	// Store the word in the hashtable to be able to find duplicates.
 	dw = getroom_save(spin, w);
-	if (dw == NULL)
+	ఒకవేళ (dw == ఖాళీ)
 	{
 	    retval = FAIL;
 	    vim_free(pc);
-	    break;
+	    ఆపు;
 	}
 
 	hash = hash_hash(dw);
 	hi = hash_lookup(&ht, dw, hash);
-	if (!HASHITEM_EMPTY(hi))
+	ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	{
-	    if (p_verbose > 0)
+	    ఒకవేళ (p_verbose > 0)
 		smsg(_("Duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
-	    else if (duplicate == 0)
+	    లేకపోతే ఒకవేళ (duplicate == 0)
 		smsg(_("First duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
 	    ++duplicate;
 	}
-	else
-	    hash_add_item(&ht, hi, dw, hash);
+	లేకపోతే
+	    hash_కూడు_అంశం(&ht, hi, dw, hash);
 
 	flags = 0;
 	store_afflist[0] = NUL;
 	pfxlen = 0;
 	totlen = 0;
 	need_affix = FALSE;
-	if (afflist != NULL)
+	ఒకవేళ (afflist != ఖాళీ)
 	{
 	    // Extract flags from the affix list.
 	    flags |= get_affix_flags(affile, afflist);
 
-	    if (affile->af_needaffix != 0 && flag_in_afflist(
+	    ఒకవేళ (affile->af_needaffix != 0 && flag_లోపల_afflist(
 			  affile->af_flagtype, afflist, affile->af_needaffix))
 		need_affix = TRUE;
 
-	    if (affile->af_pfxpostpone)
+	    ఒకవేళ (affile->af_pfxpostpone)
 	    {
 		// Need to store the list of prefix IDs with the word.
-		if (get_pfxlist(affile, afflist, store_afflist, &totlen)
+		ఒకవేళ (get_pfxlist(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    ఆపు;
 		}
 		pfxlen = totlen;
 	    }
 
-	    if (spin->si_compflags != NULL)
+	    ఒకవేళ (spin->si_compflags != ఖాళీ)
 	    {
 		// Need to store the list of compound flags with the word.
 		// Concatenate them to the list of prefix IDs.
-		if (get_compflags(affile, afflist, store_afflist, &totlen)
+		ఒకవేళ (get_compflags(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    ఆపు;
 		}
 	    }
 	}
 
 	// Add the word to the word tree(s).
-	if (store_word(spin, dw, flags, spin->si_region,
+	ఒకవేళ (store_మాట(spin, dw, flags, spin->si_region,
 					   store_afflist, need_affix) == FAIL)
 	    retval = FAIL;
 
-	if (afflist != NULL)
+	ఒకవేళ (afflist != ఖాళీ)
 	{
 	    // Find all matching suffixes and add the resulting words.
 	    // Additionally do matching prefixes that combine.
-	    if (store_aff_word(spin, dw, afflist, affile,
+	    ఒకవేళ (store_aff_మాట(spin, dw, afflist, affile,
 			   &affile->af_suff, &affile->af_pref,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 
 	    // Find all matching prefixes and add the resulting words.
-	    if (store_aff_word(spin, dw, afflist, affile,
-			  &affile->af_pref, NULL,
+	    ఒకవేళ (store_aff_మాట(spin, dw, afflist, affile,
+			  &affile->af_pref, ఖాళీ,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 	}
@@ -3777,45 +3777,45 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 	vim_free(pc);
     }
 
-    if (duplicate > 0)
+    ఒకవేళ (duplicate > 0)
 	smsg(_("%d duplicate word(s) in %s"), duplicate, fname);
-    if (spin->si_ascii && non_ascii > 0)
+    ఒకవేళ (spin->si_ascii && non_ascii > 0)
 	smsg(_("Ignored %d word(s) with non-ASCII characters in %s"),
 							    non_ascii, fname);
     hash_clear(&ht);
 
     fclose(fd);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Check for affix flags in "afflist" that are turned into word flags.
  * Return WF_ flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_affix_flags(afffile_T *affile, char_u *afflist)
 {
-    int		flags = 0;
+    పూర్ణాంకం		flags = 0;
 
-    if (affile->af_keepcase != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_keepcase != 0 && flag_లోపల_afflist(
 			   affile->af_flagtype, afflist, affile->af_keepcase))
 	flags |= WF_KEEPCAP | WF_FIXCAP;
-    if (affile->af_rare != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_rare != 0 && flag_లోపల_afflist(
 			       affile->af_flagtype, afflist, affile->af_rare))
 	flags |= WF_RARE;
-    if (affile->af_bad != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_bad != 0 && flag_లోపల_afflist(
 				affile->af_flagtype, afflist, affile->af_bad))
 	flags |= WF_BANNED;
-    if (affile->af_needcomp != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_needcomp != 0 && flag_లోపల_afflist(
 			   affile->af_flagtype, afflist, affile->af_needcomp))
 	flags |= WF_NEEDCOMP;
-    if (affile->af_comproot != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_comproot != 0 && flag_లోపల_afflist(
 			   affile->af_flagtype, afflist, affile->af_comproot))
 	flags |= WF_COMPROOT;
-    if (affile->af_nosuggest != 0 && flag_in_afflist(
+    ఒకవేళ (affile->af_nosuggest != 0 && flag_లోపల_afflist(
 			  affile->af_flagtype, afflist, affile->af_nosuggest))
 	flags |= WF_NOSUGGEST;
-    return flags;
+    తిరిగి flags;
 }
 
 /*
@@ -3824,40 +3824,40 @@ get_affix_flags(afffile_T *affile, char_u *afflist)
  * Put the resulting flags in "store_afflist[MAXWLEN]" with a terminating NUL.
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_pfxlist(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    పూర్ణాంకం		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    int		id;
-    char_u	key[AH_KEY_LEN];
+    పూర్ణాంకం		id;
+    char_u	కీలకం[AH_కీలకం_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    కొరకు (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	ఒకవేళ (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a postponed prefix flag if it appears in "af_pref"
 	    // and its ID is not zero.
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_pref, key);
-	    if (!HASHITEM_EMPTY(hi))
+	    vim_strncpy(కీలకం, prevp, p - prevp);
+	    hi = hash_కనుగొను(&affile->af_pref, కీలకం);
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
 		id = HI2AH(hi)->ah_newID;
-		if (id != 0 && store_afflist_add(store_afflist, cntp, id) == FAIL)
-		    return FAIL;
+		ఒకవేళ (id != 0 && store_afflist_కూడు(store_afflist, cntp, id) == FAIL)
+		    తిరిగి FAIL;
 	    }
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	ఒకవేళ (affile->af_flagtype == AFT_అంకె && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3866,36 +3866,36 @@ get_pfxlist(
  * Puts the flags in "store_afflist[]".
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_compflags(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    పూర్ణాంకం		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    char_u	key[AH_KEY_LEN];
+    char_u	కీలకం[AH_కీలకం_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    కొరకు (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	ఒకవేళ (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a compound flag if it appears in "af_comp".
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_comp, key);
-	    if (!HASHITEM_EMPTY(hi)
-		    && store_afflist_add(store_afflist, cntp,
+	    vim_strncpy(కీలకం, prevp, p - prevp);
+	    hi = hash_కనుగొను(&affile->af_comp, కీలకం);
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi)
+		    && store_afflist_కూడు(store_afflist, cntp,
 					      HI2CI(hi)->ci_newID) == FAIL)
-		return FAIL;
+		తిరిగి FAIL;
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	ఒకవేళ (affile->af_flagtype == AFT_అంకె && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3907,53 +3907,53 @@ get_compflags(
  *
  * Returns FAIL when out of memory.
  */
-    static int
-store_aff_word(
+    స్థిర పూర్ణాంకం
+store_aff_మాట(
     spellinfo_T	*spin,		// spell info
-    char_u	*word,		// basic word start
+    char_u	*మాట,		// basic word start
     char_u	*afflist,	// list of names of supported affixes
     afffile_T	*affile,
     hashtab_T	*ht,
     hashtab_T	*xht,
-    int		condit,		// CONDIT_SUF et al.
-    int		flags,		// flags for the word
+    పూర్ణాంకం		condit,		// CONDIT_SUF et al.
+    పూర్ణాంకం		flags,		// flags for the word
     char_u	*pfxlist,	// list of prefix IDs
-    int		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
+    పూర్ణాంకం		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
 				// is compound flags
 {
-    int		todo;
+    పూర్ణాంకం		todo;
     hashitem_T	*hi;
     affheader_T	*ah;
     affentry_T	*ae;
     char_u	newword[MAXWLEN];
-    int		retval = OK;
-    int		i, j;
+    పూర్ణాంకం		retval = OK;
+    పూర్ణాంకం		i, j;
     char_u	*p;
-    int		use_flags;
+    పూర్ణాంకం		use_flags;
     char_u	*use_pfxlist;
-    int		use_pfxlen;
-    int		need_affix;
+    పూర్ణాంకం		use_pfxlen;
+    పూర్ణాంకం		need_affix;
     char_u	store_afflist[MAXWLEN];
     char_u	pfx_pfxlist[MAXWLEN];
-    size_t	wordlen = STRLEN(word);
-    int		use_condit;
+    size_t	wordlen = STRLEN(మాట);
+    పూర్ణాంకం		use_condit;
 
-    todo = (int)ht->ht_used;
-    for (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
+    todo = (పూర్ణాంకం)ht->ht_వాడిన;
+    కొరకు (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	{
 	    --todo;
 	    ah = HI2AH(hi);
 
 	    // Check that the affix combines, if required, and that the word
 	    // supports this affix.
-	    if (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
-		    && flag_in_afflist(affile->af_flagtype, afflist,
+	    ఒకవేళ (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
+		    && flag_లోపల_afflist(affile->af_flagtype, afflist,
 								 ah->ah_flag))
 	    {
 		// Loop over all affix entries with this name.
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		కొరకు (ae = ah->ah_మొదటి; ae != ఖాళీ; ae = ae->ae_తదుపరి)
 		{
 		    // Check the condition.  It's not logical to match case
 		    // here, but it is required for compatibility with
@@ -3965,62 +3965,62 @@ store_aff_word(
 		    // When a previously added affix had CIRCUMFIX this one
 		    // must have it too, if it had not then this one must not
 		    // have one either.
-		    if ((xht != NULL || !affile->af_pfxpostpone
-				|| ae->ae_chop != NULL
-				|| ae->ae_flags != NULL)
-			    && (ae->ae_chop == NULL
+		    ఒకవేళ ((xht != ఖాళీ || !affile->af_pfxpostpone
+				|| ae->ae_chop != ఖాళీ
+				|| ae->ae_flags != ఖాళీ)
+			    && (ae->ae_chop == ఖాళీ
 				|| STRLEN(ae->ae_chop) < wordlen)
-			    && (ae->ae_prog == NULL
+			    && (ae->ae_prog == ఖాళీ
 				|| vim_regexec_prog(&ae->ae_prog, FALSE,
-							    word, (colnr_T)0))
+							    మాట, (colnr_T)0))
 			    && (((condit & CONDIT_CFIX) == 0)
 				== ((condit & CONDIT_AFF) == 0
-				    || ae->ae_flags == NULL
-				    || !flag_in_afflist(affile->af_flagtype,
+				    || ae->ae_flags == ఖాళీ
+				    || !flag_లోపల_afflist(affile->af_flagtype,
 					ae->ae_flags, affile->af_circumfix))))
 		    {
 			// Match.  Remove the chop and add the affix.
-			if (xht == NULL)
+			ఒకవేళ (xht == ఖాళీ)
 			{
 			    // prefix: chop/add at the start of the word
-			    if (ae->ae_add == NULL)
+			    ఒకవేళ (ae->ae_కూడు == ఖాళీ)
 				*newword = NUL;
-			    else
-				vim_strncpy(newword, ae->ae_add, MAXWLEN - 1);
-			    p = word;
-			    if (ae->ae_chop != NULL)
+			    లేకపోతే
+				vim_strncpy(newword, ae->ae_కూడు, MAXWLEN - 1);
+			    p = మాట;
+			    ఒకవేళ (ae->ae_chop != ఖాళీ)
 			    {
 				// Skip chop string.
-				if (has_mbyte)
+				ఒకవేళ (has_mbyte)
 				{
 				    i = mb_charlen(ae->ae_chop);
-				    for ( ; i > 0; --i)
+				    కొరకు ( ; i > 0; --i)
 					MB_PTR_ADV(p);
 				}
-				else
+				లేకపోతే
 				    p += STRLEN(ae->ae_chop);
 			    }
 			    // Note: this silently truncates the buffer, but this should
 			    // not happen in practice
 			    STRNCAT(newword, p, MAXWLEN - STRLEN(newword) - 1);
 			}
-			else
+			లేకపోతే
 			{
 			    // suffix: chop/add at the end of the word
-			    vim_strncpy(newword, word, MAXWLEN - 1);
-			    if (ae->ae_chop != NULL)
+			    vim_strncpy(newword, మాట, MAXWLEN - 1);
+			    ఒకవేళ (ae->ae_chop != ఖాళీ)
 			    {
 				// Remove chop string.
 				p = newword + STRLEN(newword);
-				i = (int)MB_CHARLEN(ae->ae_chop);
-				for ( ; i > 0; --i)
-				    MB_PTR_BACK(newword, p);
+				i = (పూర్ణాంకం)MB_CHARLEN(ae->ae_chop);
+				కొరకు ( ; i > 0; --i)
+				    MB_PTR_వెనుక(newword, p);
 				*p = NUL;
 			    }
-			    if (ae->ae_add != NULL)
+			    ఒకవేళ (ae->ae_కూడు != ఖాళీ)
 				// Note: this silently truncates the buffer, but this should
 				// not happen in practice
-				STRNCAT(newword, ae->ae_add, MAXWLEN - STRLEN(newword) - 1);
+				STRNCAT(newword, ae->ae_కూడు, MAXWLEN - STRLEN(newword) - 1);
 			}
 
 			use_flags = flags;
@@ -4028,12 +4028,12 @@ store_aff_word(
 			use_pfxlen = pfxlen;
 			need_affix = FALSE;
 			use_condit = condit | CONDIT_COMB | CONDIT_AFF;
-			if (ae->ae_flags != NULL)
+			ఒకవేళ (ae->ae_flags != ఖాళీ)
 			{
 			    // Extract flags from the affix list.
 			    use_flags |= get_affix_flags(affile, ae->ae_flags);
 
-			    if (affile->af_needaffix != 0 && flag_in_afflist(
+			    ఒకవేళ (affile->af_needaffix != 0 && flag_లోపల_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_needaffix))
 				need_affix = TRUE;
@@ -4041,102 +4041,102 @@ store_aff_word(
 			    // When there is a CIRCUMFIX flag the other affix
 			    // must also have it and we don't add the word
 			    // with one affix.
-			    if (affile->af_circumfix != 0 && flag_in_afflist(
+			    ఒకవేళ (affile->af_circumfix != 0 && flag_లోపల_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_circumfix))
 			    {
 				use_condit |= CONDIT_CFIX;
-				if ((condit & CONDIT_CFIX) == 0)
+				ఒకవేళ ((condit & CONDIT_CFIX) == 0)
 				    need_affix = TRUE;
 			    }
 
-			    if (affile->af_pfxpostpone
-						|| spin->si_compflags != NULL)
+			    ఒకవేళ (affile->af_pfxpostpone
+						|| spin->si_compflags != ఖాళీ)
 			    {
-				int listlen = 0;
+				పూర్ణాంకం listlen = 0;
 
-				if (affile->af_pfxpostpone)
+				ఒకవేళ (affile->af_pfxpostpone)
 				{
 				    // Get prefix IDS from the affix list.
-				    if (get_pfxlist(affile, ae->ae_flags,
+				    ఒకవేళ (get_pfxlist(affile, ae->ae_flags,
 						    store_afflist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					ఆపు;
 				    }
 				    use_pfxlen = listlen;
 				}
-				else
+				లేకపోతే
 				    use_pfxlen = 0;
 				use_pfxlist = store_afflist;
 
 				// Combine the prefix IDs. Avoid adding the
 				// same ID twice.
-				for (i = 0; i < pfxlen; ++i)
+				కొరకు (i = 0; i < pfxlen; ++i)
 				{
-				    for (j = 0; j < use_pfxlen; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (j == use_pfxlen
-					    && store_afflist_add(use_pfxlist,
+				    కొరకు (j = 0; j < use_pfxlen; ++j)
+					ఒకవేళ (pfxlist[i] == use_pfxlist[j])
+					    ఆపు;
+				    ఒకవేళ (j == use_pfxlen
+					    && store_afflist_కూడు(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					ఆపు;
 				    }
 				    use_pfxlen = listlen;
 				}
-				if (retval == FAIL)
-				    break;
+				ఒకవేళ (retval == FAIL)
+				    ఆపు;
 
-				if (spin->si_compflags != NULL)
+				ఒకవేళ (spin->si_compflags != ఖాళీ)
 				    // Get compound IDS from the affix list.
-				    if (get_compflags(affile, ae->ae_flags,
+				    ఒకవేళ (get_compflags(affile, ae->ae_flags,
 						      use_pfxlist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					ఆపు;
 				    }
-				if (retval == FAIL)
-				    break;
+				ఒకవేళ (retval == FAIL)
+				    ఆపు;
 
 				// Combine the list of compound flags.
 				// Concatenate them to the prefix IDs list.
 				// Avoid adding the same ID twice.
-				for (i = pfxlen; pfxlist[i] != NUL; ++i)
+				కొరకు (i = pfxlen; pfxlist[i] != NUL; ++i)
 				{
-				    for (j = use_pfxlen;
+				    కొరకు (j = use_pfxlen;
 						   use_pfxlist[j] != NUL; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (use_pfxlist[j] == NUL
-					    && store_afflist_add(use_pfxlist,
+					ఒకవేళ (pfxlist[i] == use_pfxlist[j])
+					    ఆపు;
+				    ఒకవేళ (use_pfxlist[j] == NUL
+					    && store_afflist_కూడు(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					ఆపు;
 				    }
 				}
-				if (retval == FAIL)
-				    break;
+				ఒకవేళ (retval == FAIL)
+				    ఆపు;
 			    }
 			}
 
 			// Obey a "COMPOUNDFORBIDFLAG" of the affix: don't
 			// use the compound flags.
-			if (use_pfxlist != NULL && ae->ae_compforbid)
+			ఒకవేళ (use_pfxlist != ఖాళీ && ae->ae_compforbid)
 			{
 			    vim_strncpy(pfx_pfxlist, use_pfxlist, use_pfxlen);
 			    use_pfxlist = pfx_pfxlist;
 			}
 
 			// When there are postponed prefixes...
-			if (spin->si_prefroot != NULL
-				&& spin->si_prefroot->wn_sibling != NULL)
+			ఒకవేళ (spin->si_prefroot != ఖాళీ
+				&& spin->si_prefroot->wn_sibling != ఖాళీ)
 			{
 			    // ... add a flag to indicate an affix was used.
 			    use_flags |= WF_HAS_AFF;
@@ -4144,33 +4144,33 @@ store_aff_word(
 			    // ... don't use a prefix list if combining
 			    // affixes is not allowed.  But do use the
 			    // compound flags after them.
-			    if (!ah->ah_combine && use_pfxlist != NULL)
+			    ఒకవేళ (!ah->ah_combine && use_pfxlist != ఖాళీ)
 				use_pfxlist += use_pfxlen;
 			}
 
 			// When compounding is supported and there is no
 			// "COMPOUNDPERMITFLAG" then forbid compounding on the
 			// side where the affix is applied.
-			if (spin->si_compflags != NULL && !ae->ae_comppermit)
+			ఒకవేళ (spin->si_compflags != ఖాళీ && !ae->ae_comppermit)
 			{
-			    if (xht != NULL)
+			    ఒకవేళ (xht != ఖాళీ)
 				use_flags |= WF_NOCOMPAFT;
-			    else
+			    లేకపోతే
 				use_flags |= WF_NOCOMPBEF;
 			}
 
 			// Store the modified word.
-			if (store_word(spin, newword, use_flags,
+			ఒకవేళ (store_మాట(spin, newword, use_flags,
 						 spin->si_region, use_pfxlist,
 							  need_affix) == FAIL)
 			    retval = FAIL;
 
 			// When added a prefix or a first suffix and the affix
 			// has flags may add a(nother) suffix.  RECURSIVE!
-			if ((condit & CONDIT_SUF) && ae->ae_flags != NULL)
-			    if (store_aff_word(spin, newword, ae->ae_flags,
+			ఒకవేళ ((condit & CONDIT_SUF) && ae->ae_flags != ఖాళీ)
+			    ఒకవేళ (store_aff_మాట(spin, newword, ae->ae_flags,
 					affile, &affile->af_suff, xht,
-					   use_condit & (xht == NULL
+					   use_condit & (xht == ఖాళీ
 							? ~0 :  ~CONDIT_SUF),
 				      use_flags, use_pfxlist, pfxlen) == FAIL)
 				retval = FAIL;
@@ -4178,17 +4178,17 @@ store_aff_word(
 			// When added a suffix and combining is allowed also
 			// try adding a prefix additionally.  Both for the
 			// word flags and for the affix flags.  RECURSIVE!
-			if (xht != NULL && ah->ah_combine)
+			ఒకవేళ (xht != ఖాళీ && ah->ah_combine)
 			{
-			    if (store_aff_word(spin, newword,
+			    ఒకవేళ (store_aff_మాట(spin, newword,
 					afflist, affile,
-					xht, NULL, use_condit,
+					xht, ఖాళీ, use_condit,
 					use_flags, use_pfxlist,
 					pfxlen) == FAIL
-				    || (ae->ae_flags != NULL
-					&& store_aff_word(spin, newword,
+				    || (ae->ae_flags != ఖాళీ
+					&& store_aff_మాట(spin, newword,
 					    ae->ae_flags, affile,
-					    xht, NULL, use_condit,
+					    xht, ఖాళీ, use_condit,
 					    use_flags, use_pfxlist,
 					    pfxlen) == FAIL))
 				retval = FAIL;
@@ -4199,205 +4199,205 @@ store_aff_word(
 	}
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Read a file with a list of words.
  */
-    static int
+    స్థిర పూర్ణాంకం
 spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    long	lnum = 0;
+    దీర్ఘ	lnum = 0;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
+    char_u	*పంక్తి;
+    char_u	*pc = ఖాళీ;
     char_u	*p;
-    int		l;
-    int		retval = OK;
-    int		did_word = FALSE;
-    int		non_ascii = 0;
-    int		flags;
-    int		regionmask;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		retval = OK;
+    పూర్ణాంకం		did_మాట = FALSE;
+    పూర్ణాంకం		non_ascii = 0;
+    పూర్ణాంకం		flags;
+    పూర్ణాంకం		regionmask;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "r");
+    ఒకవేళ (fd == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
-    spell_message(spin, IObuff);
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
+    spell_సందేశం(spin, IObuff);
 
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    అయితే (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	పంక్తి_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	ఒకవేళ (*rline == '#')
+	    కొనసాగు;
 
 	// Remove CR, LF and white space from the end.
-	l = (int)STRLEN(rline);
-	while (l > 0 && rline[l - 1] <= ' ')
+	l = (పూర్ణాంకం)STRLEN(rline);
+	అయితే (l > 0 && rline[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty or blank line
+	ఒకవేళ (l == 0)
+	    కొనసాగు;	// empty or blank line
 	rline[l] = NUL;
 
 	// Convert from "/encoding={encoding}" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	ఒకవేళ (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, ఖాళీ);
+	    ఒకవేళ (pc == ఖాళీ)
 	    {
 		smsg(_("Conversion failure for word in %s line %ld: %s"),
 							   fname, lnum, rline);
-		continue;
+		కొనసాగు;
 	    }
-	    line = pc;
+	    పంక్తి = pc;
 	}
-	else
+	లేకపోతే
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = ఖాళీ;
+	    పంక్తి = rline;
 	}
 
-	if (*line == '/')
+	ఒకవేళ (*పంక్తి == '/')
 	{
-	    ++line;
-	    if (STRNCMP(line, "encoding=", 9) == 0)
+	    ++పంక్తి;
+	    ఒకవేళ (STRNCMP(పంక్తి, "encoding=", 9) == 0)
 	    {
-		if (spin->si_conv.vc_type != CONV_NONE)
+		ఒకవేళ (spin->si_conv.vc_type != CONV_NONE)
 		    smsg(_("Duplicate /encoding= line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else if (did_word)
+						       fname, lnum, పంక్తి - 1);
+		లేకపోతే ఒకవేళ (did_మాట)
 		    smsg(_("/encoding= line after word ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else
+						       fname, lnum, పంక్తి - 1);
+		లేకపోతే
 		{
 		    char_u	*enc;
 
 		    // Setup for conversion to 'encoding'.
-		    line += 9;
-		    enc = enc_canonize(line);
-		    if (enc != NULL && !spin->si_ascii
-			    && convert_setup(&spin->si_conv, enc,
+		    పంక్తి += 9;
+		    enc = enc_canonize(పంక్తి);
+		    ఒకవేళ (enc != ఖాళీ && !spin->si_ascii
+			    && convert_అమరిక(&spin->si_conv, enc,
 							       p_enc) == FAIL)
 			smsg(_("Conversion in %s not supported: from %s to %s"),
-							  fname, line, p_enc);
+							  fname, పంక్తి, p_enc);
 		    vim_free(enc);
 		    spin->si_conv.vc_fail = TRUE;
 		}
-		continue;
+		కొనసాగు;
 	    }
 
-	    if (STRNCMP(line, "regions=", 8) == 0)
+	    ఒకవేళ (STRNCMP(పంక్తి, "regions=", 8) == 0)
 	    {
-		if (spin->si_region_count > 1)
+		ఒకవేళ (spin->si_region_లెక్క > 1)
 		    smsg(_("Duplicate /regions= line ignored in %s line %ld: %s"),
-						       fname, lnum, line);
-		else
+						       fname, lnum, పంక్తి);
+		లేకపోతే
 		{
-		    line += 8;
-		    if (STRLEN(line) > MAXREGIONS * 2)
+		    పంక్తి += 8;
+		    ఒకవేళ (STRLEN(పంక్తి) > MAXREGIONS * 2)
 			smsg(_("Too many regions in %s line %ld: %s"),
-						       fname, lnum, line);
-		    else
+						       fname, lnum, పంక్తి);
+		    లేకపోతే
 		    {
-			spin->si_region_count = (int)STRLEN(line) / 2;
-			STRCPY(spin->si_region_name, line);
+			spin->si_region_లెక్క = (పూర్ణాంకం)STRLEN(పంక్తి) / 2;
+			STRCPY(spin->si_region_name, పంక్తి);
 
 			// Adjust the mask for a word valid in all regions.
-			spin->si_region = (1 << spin->si_region_count) - 1;
+			spin->si_region = (1 << spin->si_region_లెక్క) - 1;
 		    }
 		}
-		continue;
+		కొనసాగు;
 	    }
 
 	    smsg(_("/ line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-	    continue;
+						       fname, lnum, పంక్తి - 1);
+	    కొనసాగు;
 	}
 
 	flags = 0;
 	regionmask = spin->si_region;
 
 	// Check for flags and region after a slash.
-	p = vim_strchr(line, '/');
-	if (p != NULL)
+	p = vim_strchr(పంక్తి, '/');
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    *p++ = NUL;
-	    while (*p != NUL)
+	    అయితే (*p != NUL)
 	    {
-		if (*p == '=')		// keep-case word
+		ఒకవేళ (*p == '=')		// keep-case word
 		    flags |= WF_KEEPCAP | WF_FIXCAP;
-		else if (*p == '!')	// Bad, bad, wicked word.
+		లేకపోతే ఒకవేళ (*p == '!')	// Bad, bad, wicked word.
 		    flags |= WF_BANNED;
-		else if (*p == '?')	// Rare word.
+		లేకపోతే ఒకవేళ (*p == '?')	// Rare word.
 		    flags |= WF_RARE;
-		else if (VIM_ISDIGIT(*p)) // region number(s)
+		లేకపోతే ఒకవేళ (VIM_ISDIGIT(*p)) // region number(s)
 		{
-		    if ((flags & WF_REGION) == 0)   // first one
+		    ఒకవేళ ((flags & WF_REGION) == 0)   // first one
 			regionmask = 0;
 		    flags |= WF_REGION;
 
 		    l = *p - '0';
-		    if (l == 0 || l > spin->si_region_count)
+		    ఒకవేళ (l == 0 || l > spin->si_region_లెక్క)
 		    {
 			smsg(_("Invalid region nr in %s line %ld: %s"),
 							  fname, lnum, p);
-			break;
+			ఆపు;
 		    }
 		    regionmask |= 1 << (l - 1);
 		}
-		else
+		లేకపోతే
 		{
 		    smsg(_("Unrecognized flags in %s line %ld: %s"),
 							      fname, lnum, p);
-		    break;
+		    ఆపు;
 		}
 		++p;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(line))
+	ఒకవేళ (spin->si_ascii && has_non_ascii(పంక్తి))
 	{
 	    ++non_ascii;
-	    continue;
+	    కొనసాగు;
 	}
 
 	// Normal word: store it.
-	if (store_word(spin, line, flags, regionmask, NULL, FALSE) == FAIL)
+	ఒకవేళ (store_మాట(spin, పంక్తి, flags, regionmask, ఖాళీ, FALSE) == FAIL)
 	{
 	    retval = FAIL;
-	    break;
+	    ఆపు;
 	}
-	did_word = TRUE;
+	did_మాట = TRUE;
     }
 
     vim_free(pc);
     fclose(fd);
 
-    if (spin->si_ascii && non_ascii > 0)
+    ఒకవేళ (spin->si_ascii && non_ascii > 0)
     {
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		  _("Ignored %d words with non-ASCII characters"), non_ascii);
-	spell_message(spin, IObuff);
+	spell_సందేశం(spin, IObuff);
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -4407,78 +4407,78 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
  * The memory is cleared to all zeros.
  * Returns NULL when out of memory.
  */
-    static void *
+    స్థిర శూన్య *
 getroom(
     spellinfo_T *spin,
     size_t	len,		// length needed
-    int		align)		// align for pointer
+    పూర్ణాంకం		align)		// align for pointer
 {
     char_u	*p;
-    sblock_T	*bl = spin->si_blocks;
+    sblock_T	*bl = spin->si_ఖండాలు;
 
-    if (align && bl != NULL)
+    ఒకవేళ (align && bl != ఖాళీ)
 	// Round size up for alignment.  On some systems structures need to be
 	// aligned to the size of a pointer (e.g., SPARC).
-	bl->sb_used = (bl->sb_used + sizeof(char *) - 1)
-						      & ~(sizeof(char *) - 1);
+	bl->sb_వాడిన = (bl->sb_వాడిన + పరిమాణం(అక్షరం *) - 1)
+						      & ~(పరిమాణం(అక్షరం *) - 1);
 
-    if (bl == NULL || bl->sb_used + len > SBLOCKSIZE)
+    ఒకవేళ (bl == ఖాళీ || bl->sb_వాడిన + len > SBLOCKSIZE)
     {
-	if (len >= SBLOCKSIZE)
-	    bl = NULL;
-	else
+	ఒకవేళ (len >= SBLOCKSIZE)
+	    bl = ఖాళీ;
+	లేకపోతే
 	    // Allocate a block of memory. It is not freed until much later.
-	    bl = alloc_clear(offsetof(sblock_T, sb_data) + SBLOCKSIZE + 1);
-	if (bl == NULL)
+	    bl = alloc_clear(offsetof(sblock_T, sb_దత్తాంశం) + SBLOCKSIZE + 1);
+	ఒకవేళ (bl == ఖాళీ)
 	{
-	    if (!spin->si_did_emsg)
+	    ఒకవేళ (!spin->si_did_emsg)
 	    {
-		emsg(_(e_insufficient_memory_word_list_will_be_incomplete));
+		emsg(_(e_insufficient_జ్ఞాపకం_మాట_list_will_be_incomplete));
 		spin->si_did_emsg = TRUE;
 	    }
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	bl->sb_next = spin->si_blocks;
-	spin->si_blocks = bl;
-	bl->sb_used = 0;
-	++spin->si_blocks_cnt;
+	bl->sb_తదుపరి = spin->si_ఖండాలు;
+	spin->si_ఖండాలు = bl;
+	bl->sb_వాడిన = 0;
+	++spin->si_ఖండాలు_cnt;
     }
 
-    p = bl->sb_data + bl->sb_used;
-    bl->sb_used += (int)len;
+    p = bl->sb_దత్తాంశం + bl->sb_వాడిన;
+    bl->sb_వాడిన += (పూర్ణాంకం)len;
 
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Make a copy of a string into memory allocated with getroom().
  * Returns NULL when out of memory.
  */
-    static char_u *
+    స్థిర char_u *
 getroom_save(spellinfo_T *spin, char_u *s)
 {
     char_u	*sc;
 
     sc = (char_u *)getroom(spin, STRLEN(s) + 1, FALSE);
-    if (sc != NULL)
+    ఒకవేళ (sc != ఖాళీ)
 	STRCPY(sc, s);
-    return sc;
+    తిరిగి sc;
 }
 
 
 /*
  * Free the list of allocated sblock_T.
  */
-    static void
-free_blocks(sblock_T *bl)
+    స్థిర శూన్య
+free_ఖండాలు(sblock_T *bl)
 {
-    sblock_T	*next;
+    sblock_T	*తదుపరి;
 
-    while (bl != NULL)
+    అయితే (bl != ఖాళీ)
     {
-	next = bl->sb_next;
+	తదుపరి = bl->sb_తదుపరి;
 	vim_free(bl);
-	bl = next;
+	bl = తదుపరి;
     }
 }
 
@@ -4486,27 +4486,27 @@ free_blocks(sblock_T *bl)
  * Allocate the root of a word tree.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    స్థిర wordnode_T *
 wordtree_alloc(spellinfo_T *spin)
 {
-    return (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
+    తిరిగి (wordnode_T *)getroom(spin, పరిమాణం(wordnode_T), TRUE);
 }
 
 /*
  * Return TRUE if "word" contains valid word characters.
  * Control characters and trailing '/' are invalid.  Space is OK.
  */
-    static int
-valid_spell_word(char_u *word, char_u *end)
+    స్థిర పూర్ణాంకం
+valid_spell_మాట(char_u *మాట, char_u *చివర)
 {
     char_u *p;
 
-    if (enc_utf8 && !utf_valid_string(word, end))
-	return FALSE;
-    for (p = word; *p != NUL && p < end; p += mb_ptr2len(p))
-	if (*p < ' ' || (p[0] == '/' && p[1] == NUL))
-	    return FALSE;
-    return TRUE;
+    ఒకవేళ (enc_utf8 && !utf_valid_string(మాట, చివర))
+	తిరిగి FALSE;
+    కొరకు (p = మాట; *p != NUL && p < చివర; p += mb_ptr2len(p))
+	ఒకవేళ (*p < ' ' || (p[0] == '/' && p[1] == NUL))
+	    తిరిగి FALSE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -4518,49 +4518,49 @@ valid_spell_word(char_u *word, char_u *end)
  * When "pfxlist" is not NULL store the word for each postponed prefix ID and
  * compound flag.
  */
-    static int
-store_word(
+    స్థిర పూర్ణాంకం
+store_మాట(
     spellinfo_T	*spin,
-    char_u	*word,
-    int		flags,		// extra flags, WF_BANNED
-    int		region,		// supported region(s)
+    char_u	*మాట,
+    పూర్ణాంకం		flags,		// extra flags, WF_BANNED
+    పూర్ణాంకం		region,		// supported region(s)
     char_u	*pfxlist,	// list of prefix IDs or NULL
-    int		need_affix)	// only store word with affix ID
+    పూర్ణాంకం		need_affix)	// only store word with affix ID
 {
-    int		len = (int)STRLEN(word);
-    int		ct = captype(word, word + len);
+    పూర్ణాంకం		len = (పూర్ణాంకం)STRLEN(మాట);
+    పూర్ణాంకం		ct = captype(మాట, మాట + len);
     char_u	foldword[MAXWLEN];
-    int		res = OK;
+    పూర్ణాంకం		res = OK;
     char_u	*p;
 
     // Avoid adding illegal bytes to the word tree.
-    if (!valid_spell_word(word, word + len))
-	return FAIL;
+    ఒకవేళ (!valid_spell_మాట(మాట, మాట + len))
+	తిరిగి FAIL;
 
-    (void)spell_casefold(curwin, word, len, foldword, MAXWLEN);
-    for (p = pfxlist; res == OK; ++p)
+    (శూన్య)spell_casefold(curwin, మాట, len, foldword, MAXWLEN);
+    కొరకు (p = pfxlist; res == OK; ++p)
     {
-	if (!need_affix || (p != NULL && *p != NUL))
-	    res = tree_add_word(spin, foldword, spin->si_foldroot, ct | flags,
-						  region, p == NULL ? 0 : *p);
-	if (p == NULL || *p == NUL)
-	    break;
+	ఒకవేళ (!need_affix || (p != ఖాళీ && *p != NUL))
+	    res = వృక్షం_కూడు_మాట(spin, foldword, spin->si_foldroot, ct | flags,
+						  region, p == ఖాళీ ? 0 : *p);
+	ఒకవేళ (p == ఖాళీ || *p == NUL)
+	    ఆపు;
     }
     ++spin->si_foldwcount;
 
-    if (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
+    ఒకవేళ (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
     {
-	for (p = pfxlist; res == OK; ++p)
+	కొరకు (p = pfxlist; res == OK; ++p)
 	{
-	    if (!need_affix || (p != NULL && *p != NUL))
-		res = tree_add_word(spin, word, spin->si_keeproot, flags,
-						  region, p == NULL ? 0 : *p);
-	    if (p == NULL || *p == NUL)
-		break;
+	    ఒకవేళ (!need_affix || (p != ఖాళీ && *p != NUL))
+		res = వృక్షం_కూడు_మాట(spin, మాట, spin->si_keeproot, flags,
+						  region, p == ఖాళీ ? 0 : *p);
+	    ఒకవేళ (p == ఖాళీ || *p == NUL)
+		ఆపు;
 	}
 	++spin->si_keepwcount;
     }
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -4569,42 +4569,42 @@ store_word(
  * "rare" and "region" is the condition nr.
  * Returns FAIL when out of memory.
  */
-    static int
-tree_add_word(
+    స్థిర పూర్ణాంకం
+వృక్షం_కూడు_మాట(
     spellinfo_T	*spin,
-    char_u	*word,
-    wordnode_T	*root,
-    int		flags,
-    int		region,
-    int		affixID)
+    char_u	*మాట,
+    wordnode_T	*మూలం,
+    పూర్ణాంకం		flags,
+    పూర్ణాంకం		region,
+    పూర్ణాంకం		affixID)
 {
-    wordnode_T	*node = root;
+    wordnode_T	*కణుపు = మూలం;
     wordnode_T	*np;
     wordnode_T	*copyp, **copyprev;
-    wordnode_T	**prev = NULL;
-    int		i;
+    wordnode_T	**prev = ఖాళీ;
+    పూర్ణాంకం		i;
 
     // Add each byte of the word to the tree, including the NUL at the end.
-    for (i = 0; ; ++i)
+    కొరకు (i = 0; ; ++i)
     {
 	// When there is more than one reference to this node we need to make
 	// a copy, so that we can modify it.  Copy the whole list of siblings
 	// (we don't optimize for a partly shared list of siblings).
-	if (node != NULL && node->wn_refs > 1)
+	ఒకవేళ (కణుపు != ఖాళీ && కణుపు->wn_refs > 1)
 	{
-	    --node->wn_refs;
+	    --కణుపు->wn_refs;
 	    copyprev = prev;
-	    FOR_ALL_NODE_SIBLINGS(node, copyp)
+	    FOR_ALL_కణుపు_SIBLINGS(కణుపు, copyp)
 	    {
 		// Allocate a new node and copy the info.
 		np = get_wordnode(spin);
-		if (np == NULL)
-		    return FAIL;
-		np->wn_child = copyp->wn_child;
-		if (np->wn_child != NULL)
-		    ++np->wn_child->wn_refs;	// child gets extra ref
+		ఒకవేళ (np == ఖాళీ)
+		    తిరిగి FAIL;
+		np->wn_బిడ్డ = copyp->wn_బిడ్డ;
+		ఒకవేళ (np->wn_బిడ్డ != ఖాళీ)
+		    ++np->wn_బిడ్డ->wn_refs;	// child gets extra ref
 		np->wn_byte = copyp->wn_byte;
-		if (np->wn_byte == NUL)
+		ఒకవేళ (np->wn_byte == NUL)
 		{
 		    np->wn_flags = copyp->wn_flags;
 		    np->wn_region = copyp->wn_region;
@@ -4613,13 +4613,13 @@ tree_add_word(
 
 		// Link the new node in the list, there will be one ref.
 		np->wn_refs = 1;
-		if (copyprev != NULL)
+		ఒకవేళ (copyprev != ఖాళీ)
 		    *copyprev = np;
 		copyprev = &np->wn_sibling;
 
 		// Let "node" point to the head of the copied list.
-		if (copyp == node)
-		    node = np;
+		ఒకవేళ (copyp == కణుపు)
+		    కణుపు = np;
 	    }
 	}
 
@@ -4627,75 +4627,75 @@ tree_add_word(
 	// on byte value, thus stop searching when a sibling is found with a
 	// higher byte value.  For zero bytes (end of word) the sorting is
 	// done on flags and then on affixID.
-	while (node != NULL
-		&& (node->wn_byte < word[i]
-		    || (node->wn_byte == NUL
+	అయితే (కణుపు != ఖాళీ
+		&& (కణుపు->wn_byte < మాట[i]
+		    || (కణుపు->wn_byte == NUL
 			&& (flags < 0
-			    ? node->wn_affixID < (unsigned)affixID
-			    : (node->wn_flags < (unsigned)(flags & WN_MASK)
-				|| (node->wn_flags == (flags & WN_MASK)
+			    ? కణుపు->wn_affixID < (గుర్తులేని)affixID
+			    : (కణుపు->wn_flags < (గుర్తులేని)(flags & WN_ముసుగు)
+				|| (కణుపు->wn_flags == (flags & WN_ముసుగు)
 				    && (spin->si_sugtree
-					? (node->wn_region & 0xffff) < region
-					: node->wn_affixID
-						    < (unsigned)affixID)))))))
+					? (కణుపు->wn_region & 0xffff) < region
+					: కణుపు->wn_affixID
+						    < (గుర్తులేని)affixID)))))))
 	{
-	    prev = &node->wn_sibling;
-	    node = *prev;
+	    prev = &కణుపు->wn_sibling;
+	    కణుపు = *prev;
 	}
-	if (node == NULL
-		|| node->wn_byte != word[i]
-		|| (word[i] == NUL
+	ఒకవేళ (కణుపు == ఖాళీ
+		|| కణుపు->wn_byte != మాట[i]
+		|| (మాట[i] == NUL
 		    && (flags < 0
 			|| spin->si_sugtree
-			|| node->wn_flags != (flags & WN_MASK)
-			|| node->wn_affixID != affixID)))
+			|| కణుపు->wn_flags != (flags & WN_ముసుగు)
+			|| కణుపు->wn_affixID != affixID)))
 	{
 	    // Allocate a new node.
 	    np = get_wordnode(spin);
-	    if (np == NULL)
-		return FAIL;
-	    np->wn_byte = word[i];
+	    ఒకవేళ (np == ఖాళీ)
+		తిరిగి FAIL;
+	    np->wn_byte = మాట[i];
 
 	    // If "node" is NULL this is a new child or the end of the sibling
 	    // list: ref count is one.  Otherwise use ref count of sibling and
 	    // make ref count of sibling one (matters when inserting in front
 	    // of the list of siblings).
-	    if (node == NULL)
+	    ఒకవేళ (కణుపు == ఖాళీ)
 		np->wn_refs = 1;
-	    else
+	    లేకపోతే
 	    {
-		np->wn_refs = node->wn_refs;
-		node->wn_refs = 1;
+		np->wn_refs = కణుపు->wn_refs;
+		కణుపు->wn_refs = 1;
 	    }
-	    if (prev != NULL)
+	    ఒకవేళ (prev != ఖాళీ)
 		*prev = np;
-	    np->wn_sibling = node;
-	    node = np;
+	    np->wn_sibling = కణుపు;
+	    కణుపు = np;
 	}
 
-	if (word[i] == NUL)
+	ఒకవేళ (మాట[i] == NUL)
 	{
-	    node->wn_flags = flags;
-	    node->wn_region |= region;
-	    node->wn_affixID = affixID;
-	    break;
+	    కణుపు->wn_flags = flags;
+	    కణుపు->wn_region |= region;
+	    కణుపు->wn_affixID = affixID;
+	    ఆపు;
 	}
-	prev = &node->wn_child;
-	node = *prev;
+	prev = &కణుపు->wn_బిడ్డ;
+	కణుపు = *prev;
     }
-#ifdef SPELL_PRINTTREE
-    smsg("Added \"%s\"", word);
-    spell_print_tree(root->wn_sibling);
-#endif
+#నిర్వచితమైతే SPELL_PRINTTREE
+    smsg("Added \"%s\"", మాట);
+    spell_print_వృక్షం(మూలం->wn_sibling);
+#అయితే_ముగింపు
 
     // count nr of words added since last message
-    ++spin->si_msg_count;
+    ++spin->si_సందేశం_లెక్క;
 
-    if (spin->si_compress_cnt > 1)
+    ఒకవేళ (spin->si_compress_cnt > 1)
     {
-	if (--spin->si_compress_cnt == 1)
+	ఒకవేళ (--spin->si_compress_cnt == 1)
 	    // Did enough words to lower the block count limit.
-	    spin->si_blocks_cnt += compress_inc;
+	    spin->si_ఖండాలు_cnt += compress_inc;
     }
 
     /*
@@ -4710,27 +4710,27 @@ tree_add_word(
      *    (si_compress_cnt == 1) and the number of free nodes drops below the
      *    maximum word length.
      */
-#ifndef SPELL_COMPRESS_ALWAYS
-    if (spin->si_compress_cnt == 1
-	    ? spin->si_free_count < MAXWLEN
-	    : spin->si_blocks_cnt >= compress_start)
-#endif
+#నిర్వచితం_కాకపోతే SPELL_COMPRESS_ALWAYS
+    ఒకవేళ (spin->si_compress_cnt == 1
+	    ? spin->si_free_లెక్క < MAXWLEN
+	    : spin->si_ఖండాలు_cnt >= compress_ప్రారంభం)
+#అయితే_ముగింపు
     {
 	// Decrement the block counter.  The effect is that we compress again
 	// when the freed up room has been used and another "compress_inc"
 	// blocks have been allocated.  Unless "compress_added" words have
 	// been added, then the limit is put back again.
-	spin->si_blocks_cnt -= compress_inc;
+	spin->si_ఖండాలు_cnt -= compress_inc;
 	spin->si_compress_cnt = compress_added;
 
-	if (spin->si_verbose)
+	ఒకవేళ (spin->si_verbose)
 	{
-	    msg_start();
-	    msg_puts(_(msg_compressing));
-	    msg_clr_eos();
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    out_flush();
+	    సందేశం_ప్రారంభం();
+	    సందేశం_puts(_(సందేశం_compressing));
+	    సందేశం_clr_eos();
+	    సందేశం_didout = FALSE;
+	    సందేశం_నిలువు = 0;
+	    బహిర్గతం_flush();
 	}
 
 	// Compress both trees.  Either they both have many nodes, which makes
@@ -4738,11 +4738,11 @@ tree_add_word(
 	// compression goes fast.  But when filling the soundfold word tree
 	// there is no keep-case tree.
 	wordtree_compress(spin, spin->si_foldroot, "case-folded");
-	if (affixID >= 0)
+	ఒకవేళ (affixID >= 0)
 	    wordtree_compress(spin, spin->si_keeproot, "keep-case");
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4750,25 +4750,25 @@ tree_add_word(
  * allocate a new one.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    స్థిర wordnode_T *
 get_wordnode(spellinfo_T *spin)
 {
     wordnode_T *n;
 
-    if (spin->si_first_free == NULL)
-	n = (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
-    else
+    ఒకవేళ (spin->si_మొదటి_free == ఖాళీ)
+	n = (wordnode_T *)getroom(spin, పరిమాణం(wordnode_T), TRUE);
+    లేకపోతే
     {
-	n = spin->si_first_free;
-	spin->si_first_free = n->wn_child;
-	CLEAR_POINTER(n);
-	--spin->si_free_count;
+	n = spin->si_మొదటి_free;
+	spin->si_మొదటి_free = n->wn_బిడ్డ;
+	CLEAR_సూచిక(n);
+	--spin->si_free_లెక్క;
     }
-#ifdef SPELL_PRINTTREE
-    if (n != NULL)
+#నిర్వచితమైతే SPELL_PRINTTREE
+    ఒకవేళ (n != ఖాళీ)
 	n->wn_nr = ++spin->si_wordnode_nr;
-#endif
-    return n;
+#అయితే_ముగింపు
+    తిరిగి n;
 }
 
 /*
@@ -4777,75 +4777,75 @@ get_wordnode(spellinfo_T *spin)
  * siblings.
  * Returns the number of nodes actually freed.
  */
-    static int
-deref_wordnode(spellinfo_T *spin, wordnode_T *node)
+    స్థిర పూర్ణాంకం
+deref_wordnode(spellinfo_T *spin, wordnode_T *కణుపు)
 {
     wordnode_T	*np;
-    int		cnt = 0;
+    పూర్ణాంకం		cnt = 0;
 
-    if (--node->wn_refs == 0)
+    ఒకవేళ (--కణుపు->wn_refs == 0)
     {
-	FOR_ALL_NODE_SIBLINGS(node, np)
+	FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
 	{
-	    if (np->wn_child != NULL)
-		cnt += deref_wordnode(spin, np->wn_child);
+	    ఒకవేళ (np->wn_బిడ్డ != ఖాళీ)
+		cnt += deref_wordnode(spin, np->wn_బిడ్డ);
 	    free_wordnode(spin, np);
 	    ++cnt;
 	}
 	++cnt;	    // length field
     }
-    return cnt;
+    తిరిగి cnt;
 }
 
 /*
  * Free a wordnode_T for re-use later.
  * Only the "wn_child" field becomes invalid.
  */
-    static void
+    స్థిర శూన్య
 free_wordnode(spellinfo_T *spin, wordnode_T *n)
 {
-    n->wn_child = spin->si_first_free;
-    spin->si_first_free = n;
-    ++spin->si_free_count;
+    n->wn_బిడ్డ = spin->si_మొదటి_free;
+    spin->si_మొదటి_free = n;
+    ++spin->si_free_లెక్క;
 }
 
 /*
  * Compress a tree: find tails that are identical and can be shared.
  */
-    static void
-wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
+    స్థిర శూన్య
+wordtree_compress(spellinfo_T *spin, wordnode_T *మూలం, అక్షరం *name)
 {
     hashtab_T	    ht;
-    long	    n;
-    long	    tot = 0;
-    long	    perc;
+    దీర్ఘ	    n;
+    దీర్ఘ	    tot = 0;
+    దీర్ఘ	    perc;
 
     // Skip the root itself, it's not actually used.  The first sibling is the
     // start of the tree.
-    if (root->wn_sibling == NULL)
-	return;
+    ఒకవేళ (మూలం->wn_sibling == ఖాళీ)
+	తిరిగి;
 
     hash_init(&ht);
-    n = node_compress(spin, root->wn_sibling, &ht, &tot);
+    n = కణుపు_compress(spin, మూలం->wn_sibling, &ht, &tot);
 
-#ifndef SPELL_PRINTTREE
-    if (spin->si_verbose || p_verbose > 2)
-#endif
+#నిర్వచితం_కాకపోతే SPELL_PRINTTREE
+    ఒకవేళ (spin->si_verbose || p_verbose > 2)
+#అయితే_ముగింపు
     {
-	if (tot > 1000000)
+	ఒకవేళ (tot > 1000000)
 	    perc = (tot - n) / (tot / 100);
-	else if (tot == 0)
+	లేకపోతే ఒకవేళ (tot == 0)
 	    perc = 0;
-	else
+	లేకపోతే
 	    perc = (tot - n) * 100 / tot;
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		_("Compressed %s: %ld of %ld nodes; %ld (%ld%%) remaining"),
 		name, n, tot, tot - n, perc);
-	spell_message(spin, IObuff);
+	spell_సందేశం(spin, IObuff);
     }
-#ifdef SPELL_PRINTTREE
-    spell_print_tree(root->wn_sibling);
-#endif
+#నిర్వచితమైతే SPELL_PRINTTREE
+    spell_print_వృక్షం(మూలం->wn_sibling);
+#అయితే_ముగింపు
     hash_clear(&ht);
 }
 
@@ -4853,22 +4853,22 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
  * Compress a node, its siblings and its children, depth first.
  * Returns the number of compressed nodes.
  */
-    static long
-node_compress(
+    స్థిర దీర్ఘ
+కణుపు_compress(
     spellinfo_T	*spin,
-    wordnode_T	*node,
+    wordnode_T	*కణుపు,
     hashtab_T	*ht,
-    long	*tot)	    // total count of nodes before compressing,
+    దీర్ఘ	*tot)	    // total count of nodes before compressing,
 			    // incremented while going through the tree
 {
     wordnode_T	*np;
     wordnode_T	*tp;
-    wordnode_T	*child;
+    wordnode_T	*బిడ్డ;
     hash_T	hash;
     hashitem_T	*hi;
-    long	len = 0;
-    unsigned	nr, n;
-    long	compressed = 0;
+    దీర్ఘ	len = 0;
+    గుర్తులేని	nr, n;
+    దీర్ఘ	compressed = 0;
 
     /*
      * Go through the list of siblings.  Compress each child and then try
@@ -4876,47 +4876,47 @@ node_compress(
      * Note that with "child" we mean not just the node that is pointed to,
      * but the whole list of siblings of which the child node is the first.
      */
-    for (np = node; np != NULL && !got_int; np = np->wn_sibling)
+    కొరకు (np = కణుపు; np != ఖాళీ && !got_int; np = np->wn_sibling)
     {
 	++len;
-	if ((child = np->wn_child) != NULL)
+	ఒకవేళ ((బిడ్డ = np->wn_బిడ్డ) != ఖాళీ)
 	{
 	    // Compress the child first.  This fills hashkey.
-	    compressed += node_compress(spin, child, ht, tot);
+	    compressed += కణుపు_compress(spin, బిడ్డ, ht, tot);
 
 	    // Try to find an identical child.
-	    hash = hash_hash(child->wn_u1.hashkey);
-	    hi = hash_lookup(ht, child->wn_u1.hashkey, hash);
-	    if (!HASHITEM_EMPTY(hi))
+	    hash = hash_hash(బిడ్డ->wn_u1.hashkey);
+	    hi = hash_lookup(ht, బిడ్డ->wn_u1.hashkey, hash);
+	    ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 	    {
 		// There are children we encountered before with a hash value
 		// identical to the current child.  Now check if there is one
 		// that is really identical.
-		for (tp = HI2WN(hi); tp != NULL; tp = tp->wn_u2.next)
-		    if (node_equal(child, tp))
+		కొరకు (tp = HI2WN(hi); tp != ఖాళీ; tp = tp->wn_u2.తదుపరి)
+		    ఒకవేళ (కణుపు_equal(బిడ్డ, tp))
 		    {
 			// Found one!  Now use that child in place of the
 			// current one.  This means the current child and all
 			// its siblings is unlinked from the tree.
 			++tp->wn_refs;
-			compressed += deref_wordnode(spin, child);
-			np->wn_child = tp;
-			break;
+			compressed += deref_wordnode(spin, బిడ్డ);
+			np->wn_బిడ్డ = tp;
+			ఆపు;
 		    }
-		if (tp == NULL)
+		ఒకవేళ (tp == ఖాళీ)
 		{
 		    // No other child with this hash value equals the child of
 		    // the node, add it to the linked list after the first
 		    // item.
 		    tp = HI2WN(hi);
-		    child->wn_u2.next = tp->wn_u2.next;
-		    tp->wn_u2.next = child;
+		    బిడ్డ->wn_u2.తదుపరి = tp->wn_u2.తదుపరి;
+		    tp->wn_u2.తదుపరి = బిడ్డ;
 		}
 	    }
-	    else
+	    లేకపోతే
 		// No other child has this hash value, add it to the
 		// hashtable.
-		hash_add_item(ht, hi, child->wn_u1.hashkey, hash);
+		hash_కూడు_అంశం(ht, hi, బిడ్డ->wn_u1.hashkey, hash);
 	}
     }
     *tot += len + 1;	// add one for the node that stores the length
@@ -4926,107 +4926,107 @@ node_compress(
      * find a lookalike node.  This must be done after compressing the sibling
      * list, otherwise the hash key would become invalid by the compression.
      */
-    node->wn_u1.hashkey[0] = len;
+    కణుపు->wn_u1.hashkey[0] = len;
     nr = 0;
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
     {
-	if (np->wn_byte == NUL)
+	ఒకవేళ (np->wn_byte == NUL)
 	    // end node: use wn_flags, wn_region and wn_affixID
 	    n = np->wn_flags + (np->wn_region << 8) + (np->wn_affixID << 16);
-	else
+	లేకపోతే
 	    // byte node: use the byte value and the child pointer
-	    n = (unsigned)(np->wn_byte + ((long_u)np->wn_child << 8));
+	    n = (గుర్తులేని)(np->wn_byte + ((long_u)np->wn_బిడ్డ << 8));
 	nr = nr * 101 + n;
     }
 
     // Avoid NUL bytes, it terminates the hash key.
     n = nr & 0xff;
-    node->wn_u1.hashkey[1] = n == 0 ? 1 : n;
+    కణుపు->wn_u1.hashkey[1] = n == 0 ? 1 : n;
     n = (nr >> 8) & 0xff;
-    node->wn_u1.hashkey[2] = n == 0 ? 1 : n;
+    కణుపు->wn_u1.hashkey[2] = n == 0 ? 1 : n;
     n = (nr >> 16) & 0xff;
-    node->wn_u1.hashkey[3] = n == 0 ? 1 : n;
+    కణుపు->wn_u1.hashkey[3] = n == 0 ? 1 : n;
     n = (nr >> 24) & 0xff;
-    node->wn_u1.hashkey[4] = n == 0 ? 1 : n;
-    node->wn_u1.hashkey[5] = NUL;
+    కణుపు->wn_u1.hashkey[4] = n == 0 ? 1 : n;
+    కణుపు->wn_u1.hashkey[5] = NUL;
 
     // Check for CTRL-C pressed now and then.
     veryfast_breakcheck();
 
-    return compressed;
+    తిరిగి compressed;
 }
 
 /*
  * Return TRUE when two nodes have identical siblings and children.
  */
-    static int
-node_equal(wordnode_T *n1, wordnode_T *n2)
+    స్థిర పూర్ణాంకం
+కణుపు_equal(wordnode_T *n1, wordnode_T *n2)
 {
     wordnode_T	*p1;
     wordnode_T	*p2;
 
-    for (p1 = n1, p2 = n2; p1 != NULL && p2 != NULL;
+    కొరకు (p1 = n1, p2 = n2; p1 != ఖాళీ && p2 != ఖాళీ;
 				     p1 = p1->wn_sibling, p2 = p2->wn_sibling)
-	if (p1->wn_byte != p2->wn_byte
+	ఒకవేళ (p1->wn_byte != p2->wn_byte
 		|| (p1->wn_byte == NUL
 		    ? (p1->wn_flags != p2->wn_flags
 			|| p1->wn_region != p2->wn_region
 			|| p1->wn_affixID != p2->wn_affixID)
-		    : (p1->wn_child != p2->wn_child)))
-	    break;
+		    : (p1->wn_బిడ్డ != p2->wn_బిడ్డ)))
+	    ఆపు;
 
-    return p1 == NULL && p2 == NULL;
+    తిరిగి p1 == ఖాళీ && p2 == ఖాళీ;
 }
 
-static int rep_compare(const void *s1, const void *s2);
+స్థిర పూర్ణాంకం rep_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2);
 
 /*
  * Function given to qsort() to sort the REP items on "from" string.
  */
-    static int
-rep_compare(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+rep_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
     fromto_T	*p1 = (fromto_T *)s1;
     fromto_T	*p2 = (fromto_T *)s2;
 
-    return STRCMP(p1->ft_from, p2->ft_from);
+    తిరిగి STRCMP(p1->ft_from, p2->ft_from);
 }
 
 /*
  * Write the Vim .spl file "fname".
  * Return FAIL or OK;
  */
-    static int
+    స్థిర పూర్ణాంకం
 write_vim_spell(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    int		regionmask;
-    int		round;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		i;
-    int		l;
+    పూర్ణాంకం		regionmask;
+    పూర్ణాంకం		విడత;
+    wordnode_T	*వృక్షం;
+    పూర్ణాంకం		nodecount;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		l;
     garray_T	*gap;
     fromto_T	*ftp;
     char_u	*p;
-    int		rr;
-    int		retval = OK;
+    పూర్ణాంకం		rr;
+    పూర్ణాంకం		retval = OK;
     size_t	fwv = 1;  // collect return value of fwrite() to avoid
 			  // warnings from picky compiler
 
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "w");
+    ఒకవేళ (fd == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // <HEADER>: <fileID> <versionnr>
 							    // <fileID>
     fwv &= fwrite(VIMSPELLMAGIC, VIMSPELLMAGICL, (size_t)1, fd);
-    if (fwv != (size_t)1)
+    ఒకవేళ (fwv != (size_t)1)
 	// Catch first write error, don't try writing more.
-	goto theend;
+	వెళ్ళు theend;
 
     putc(VIMSPELLVERSION, fd);				    // <versionnr>
 
@@ -5035,29 +5035,29 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
      */
 
     // SN_INFO: <infotext>
-    if (spin->si_info != NULL)
+    ఒకవేళ (spin->si_info != ఖాళీ)
     {
 	putc(SN_INFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	i = (int)STRLEN(spin->si_info);
-	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
+	i = (పూర్ణాంకం)STRLEN(spin->si_info);
+	put_బైట్లు(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_info, (size_t)i, (size_t)1, fd); // <infotext>
     }
 
     // SN_REGION: <regionname> ...
     // Write the region names only if there is more than one.
-    if (spin->si_region_count > 1)
+    ఒకవేళ (spin->si_region_లెక్క > 1)
     {
 	putc(SN_REGION, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
-	l = spin->si_region_count * 2;
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = spin->si_region_లెక్క * 2;
+	put_బైట్లు(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_region_name, (size_t)l, (size_t)1, fd);
 							// <regionname> ...
-	regionmask = (1 << spin->si_region_count) - 1;
+	regionmask = (1 << spin->si_region_లెక్క) - 1;
     }
-    else
+    లేకపోతే
 	regionmask = 0;
 
     // SN_CHARFLAGS: <charflagslen> <charflags> <folcharslen> <folchars>
@@ -5069,60 +5069,60 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // 'encoding'.
     // Also skip this for an .add.spl file, the main spell file must contain
     // the table (avoids that it conflicts).  File is shorter too.
-    if (!spin->si_ascii && !spin->si_add)
+    ఒకవేళ (!spin->si_ascii && !spin->si_కూడు)
     {
 	char_u	folchars[128 * 8];
-	int	flags;
+	పూర్ణాంకం	flags;
 
 	putc(SN_CHARFLAGS, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
 	// Form the <folchars> string first, we need to know its length.
 	l = 0;
-	for (i = 128; i < 256; ++i)
+	కొరకు (i = 128; i < 256; ++i)
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		l += mb_char2bytes(spelltab.st_fold[i], folchars + l);
-	    else
+	    లేకపోతే
 		folchars[l++] = spelltab.st_fold[i];
 	}
-	put_bytes(fd, (long_u)(1 + 128 + 2 + l), 4);	// <sectionlen>
+	put_బైట్లు(fd, (long_u)(1 + 128 + 2 + l), 4);	// <sectionlen>
 
 	fputc(128, fd);					// <charflagslen>
-	for (i = 128; i < 256; ++i)
+	కొరకు (i = 128; i < 256; ++i)
 	{
 	    flags = 0;
-	    if (spelltab.st_isw[i])
-		flags |= CF_WORD;
-	    if (spelltab.st_isu[i])
-		flags |= CF_UPPER;
+	    ఒకవేళ (spelltab.st_isw[i])
+		flags |= CF_మాట;
+	    ఒకవేళ (spelltab.st_isu[i])
+		flags |= CF_పై;
 	    fputc(flags, fd);				// <charflags>
 	}
 
-	put_bytes(fd, (long_u)l, 2);			// <folcharslen>
+	put_బైట్లు(fd, (long_u)l, 2);			// <folcharslen>
 	fwv &= fwrite(folchars, (size_t)l, (size_t)1, fd); // <folchars>
     }
 
     // SN_MIDWORD: <midword>
-    if (spin->si_midword != NULL)
+    ఒకవేళ (spin->si_midword != ఖాళీ)
     {
 	putc(SN_MIDWORD, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	i = (int)STRLEN(spin->si_midword);
-	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
+	i = (పూర్ణాంకం)STRLEN(spin->si_midword);
+	put_బైట్లు(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_midword, (size_t)i, (size_t)1, fd);
 							// <midword>
     }
 
     // SN_PREFCOND: <prefcondcnt> <prefcond> ...
-    if (spin->si_prefcond.ga_len > 0)
+    ఒకవేళ (spin->si_prefcond.ga_len > 0)
     {
 	putc(SN_PREFCOND, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	l = write_spell_prefcond(NULL, &spin->si_prefcond, &fwv);
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = write_spell_prefcond(ఖాళీ, &spin->si_prefcond, &fwv);
+	put_బైట్లు(fd, (long_u)l, 4);			// <sectionlen>
 
 	write_spell_prefcond(fd, &spin->si_prefcond, &fwv);
     }
@@ -5134,30 +5134,30 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // round 1: SN_REP section
     // round 2: SN_SAL section (unless SN_SOFO is used)
     // round 3: SN_REPSAL section
-    for (round = 1; round <= 3; ++round)
+    కొరకు (విడత = 1; విడత <= 3; ++విడత)
     {
-	if (round == 1)
+	ఒకవేళ (విడత == 1)
 	    gap = &spin->si_rep;
-	else if (round == 2)
+	లేకపోతే ఒకవేళ (విడత == 2)
 	{
 	    // Don't write SN_SAL when using a SN_SOFO section
-	    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
-		continue;
+	    ఒకవేళ (spin->si_sofofr != ఖాళీ && spin->si_sofoto != ఖాళీ)
+		కొనసాగు;
 	    gap = &spin->si_sal;
 	}
-	else
+	లేకపోతే
 	    gap = &spin->si_repsal;
 
 	// Don't write the section if there are no items.
-	if (gap->ga_len == 0)
-	    continue;
+	ఒకవేళ (gap->ga_len == 0)
+	    కొనసాగు;
 
 	// Sort the REP/REPSAL items.
-	if (round != 2)
-	    qsort(gap->ga_data, (size_t)gap->ga_len,
-					       sizeof(fromto_T), rep_compare);
+	ఒకవేళ (విడత != 2)
+	    qsort(gap->ga_దత్తాంశం, (size_t)gap->ga_len,
+					       పరిమాణం(fromto_T), rep_compare);
 
-	i = round == 1 ? SN_REP : (round == 2 ? SN_SAL : SN_REPSAL);
+	i = విడత == 1 ? SN_REP : (విడత == 2 ? SN_SAL : SN_REPSAL);
 	putc(i, fd);					// <sectionID>
 
 	// This is for making suggestions, section is not required.
@@ -5165,40 +5165,40 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
 	// Compute the length of what follows.
 	l = 2;	    // count <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	కొరకు (i = 0; i < gap->ga_len; ++i)
 	{
-	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    l += 1 + (int)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
-	    l += 1 + (int)STRLEN(ftp->ft_to);    // count <*tolen> and <*to>
+	    ftp = &((fromto_T *)gap->ga_దత్తాంశం)[i];
+	    l += 1 + (పూర్ణాంకం)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
+	    l += 1 + (పూర్ణాంకం)STRLEN(ftp->ft_గమ్యం);    // count <*tolen> and <*to>
 	}
-	if (round == 2)
+	ఒకవేళ (విడత == 2)
 	    ++l;	// count <salflags>
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	put_బైట్లు(fd, (long_u)l, 4);			// <sectionlen>
 
-	if (round == 2)
+	ఒకవేళ (విడత == 2)
 	{
 	    i = 0;
-	    if (spin->si_followup)
+	    ఒకవేళ (spin->si_followup)
 		i |= SAL_F0LLOWUP;
-	    if (spin->si_collapse)
+	    ఒకవేళ (spin->si_collapse)
 		i |= SAL_COLLAPSE;
-	    if (spin->si_rem_accents)
+	    ఒకవేళ (spin->si_rem_accents)
 		i |= SAL_REM_ACCENTS;
 	    putc(i, fd);			// <salflags>
 	}
 
-	put_bytes(fd, (long_u)gap->ga_len, 2);	// <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	put_బైట్లు(fd, (long_u)gap->ga_len, 2);	// <repcount> or <salcount>
+	కొరకు (i = 0; i < gap->ga_len; ++i)
 	{
 	    // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
 	    // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
-	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    for (rr = 1; rr <= 2; ++rr)
+	    ftp = &((fromto_T *)gap->ga_దత్తాంశం)[i];
+	    కొరకు (rr = 1; rr <= 2; ++rr)
 	    {
-		p = rr == 1 ? ftp->ft_from : ftp->ft_to;
-		l = (int)STRLEN(p);
+		p = rr == 1 ? ftp->ft_from : ftp->ft_గమ్యం;
+		l = (పూర్ణాంకం)STRLEN(p);
 		putc(l, fd);
-		if (l > 0)
+		ఒకవేళ (l > 0)
 		    fwv &= fwrite(p, l, (size_t)1, fd);
 	    }
 	}
@@ -5207,62 +5207,62 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
     // SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
     // This is for making suggestions, section is not required.
-    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
+    ఒకవేళ (spin->si_sofofr != ఖాళీ && spin->si_sofoto != ఖాళీ)
     {
 	putc(SN_SOFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_sofofr);
-	put_bytes(fd, (long_u)(l + STRLEN(spin->si_sofoto) + 4), 4);
+	l = (పూర్ణాంకం)STRLEN(spin->si_sofofr);
+	put_బైట్లు(fd, (long_u)(l + STRLEN(spin->si_sofoto) + 4), 4);
 							// <sectionlen>
 
-	put_bytes(fd, (long_u)l, 2);			// <sofofromlen>
+	put_బైట్లు(fd, (long_u)l, 2);			// <sofofromlen>
 	fwv &= fwrite(spin->si_sofofr, l, (size_t)1, fd); // <sofofrom>
 
-	l = (int)STRLEN(spin->si_sofoto);
-	put_bytes(fd, (long_u)l, 2);			// <sofotolen>
+	l = (పూర్ణాంకం)STRLEN(spin->si_sofoto);
+	put_బైట్లు(fd, (long_u)l, 2);			// <sofotolen>
 	fwv &= fwrite(spin->si_sofoto, l, (size_t)1, fd); // <sofoto>
     }
 
     // SN_WORDS: <word> ...
     // This is for making suggestions, section is not required.
-    if (spin->si_commonwords.ht_used > 0)
+    ఒకవేళ (spin->si_commonwords.ht_వాడిన > 0)
     {
-	putc(SN_WORDS, fd);				// <sectionID>
+	putc(SN_పదాలు, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// round 1: count the bytes
 	// round 2: write the bytes
-	for (round = 1; round <= 2; ++round)
+	కొరకు (విడత = 1; విడత <= 2; ++విడత)
 	{
-	    int		todo;
-	    int		len = 0;
+	    పూర్ణాంకం		todo;
+	    పూర్ణాంకం		len = 0;
 	    hashitem_T	*hi;
 
-	    todo = (int)spin->si_commonwords.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&spin->si_commonwords, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (పూర్ణాంకం)spin->si_commonwords.ht_వాడిన;
+	    FOR_ALL_HASHTAB_వస్తువులు(&spin->si_commonwords, hi, todo)
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		{
-		    l = (int)STRLEN(hi->hi_key) + 1;
+		    l = (పూర్ణాంకం)STRLEN(hi->hi_కీలకం) + 1;
 		    len += l;
-		    if (round == 2)			// <word>
-			fwv &= fwrite(hi->hi_key, (size_t)l, (size_t)1, fd);
+		    ఒకవేళ (విడత == 2)			// <word>
+			fwv &= fwrite(hi->hi_కీలకం, (size_t)l, (size_t)1, fd);
 		    --todo;
 		}
-	    if (round == 1)
-		put_bytes(fd, (long_u)len, 4);		// <sectionlen>
+	    ఒకవేళ (విడత == 1)
+		put_బైట్లు(fd, (long_u)len, 4);		// <sectionlen>
 	}
     }
 
     // SN_MAP: <mapstr>
     // This is for making suggestions, section is not required.
-    if (spin->si_map.ga_len > 0)
+    ఒకవేళ (spin->si_map.ga_len > 0)
     {
 	putc(SN_MAP, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 	l = spin->si_map.ga_len;
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
-	fwv &= fwrite(spin->si_map.ga_data, (size_t)l, (size_t)1, fd);
+	put_బైట్లు(fd, (long_u)l, 4);			// <sectionlen>
+	fwv &= fwrite(spin->si_map.ga_దత్తాంశం, (size_t)l, (size_t)1, fd);
 							// <mapstr>
     }
 
@@ -5271,63 +5271,63 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // same time allows for checking that a .sug file that is found matches
     // with this .spl file.  That's because the word numbers must be exactly
     // right.
-    if (!spin->si_nosugfile
+    ఒకవేళ (!spin->si_nosugfile
 	    && (spin->si_sal.ga_len > 0
-		     || (spin->si_sofofr != NULL && spin->si_sofoto != NULL)))
+		     || (spin->si_sofofr != ఖాళీ && spin->si_sofoto != ఖాళీ)))
     {
 	putc(SN_SUGFILE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)8, 4);			// <sectionlen>
+	put_బైట్లు(fd, (long_u)8, 4);			// <sectionlen>
 
 	// Set si_sugtime and write it to the file.
-	spin->si_sugtime = time(NULL);
-	put_time(fd, spin->si_sugtime);			// <timestamp>
+	spin->si_sugtime = సమయం(ఖాళీ);
+	put_సమయం(fd, spin->si_sugtime);			// <timestamp>
     }
 
     // SN_NOSPLITSUGS: nothing
     // This is used to notify that no suggestions with word splits are to be
     // made.
-    if (spin->si_nosplitsugs)
+    ఒకవేళ (spin->si_nosplitsugs)
     {
 	putc(SN_NOSPLITSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_బైట్లు(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_NOCOMPUNDSUGS: nothing
     // This is used to notify that no suggestions with compounds are to be
     // made.
-    if (spin->si_nocompoundsugs)
+    ఒకవేళ (spin->si_nocompoundsugs)
     {
 	putc(SN_NOCOMPOUNDSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_బైట్లు(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_COMPOUND: compound info.
     // We don't mark it required, when not supported all compound words will
     // be bad words.
-    if (spin->si_compflags != NULL)
+    ఒకవేళ (spin->si_compflags != ఖాళీ)
     {
 	putc(SN_COMPOUND, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_compflags);
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
-	    l += (int)STRLEN(((char_u **)(spin->si_comppat.ga_data))[i]) + 1;
-	put_bytes(fd, (long_u)(l + 7), 4);		// <sectionlen>
+	l = (పూర్ణాంకం)STRLEN(spin->si_compflags);
+	కొరకు (i = 0; i < spin->si_comppat.ga_len; ++i)
+	    l += (పూర్ణాంకం)STRLEN(((char_u **)(spin->si_comppat.ga_దత్తాంశం))[i]) + 1;
+	put_బైట్లు(fd, (long_u)(l + 7), 4);		// <sectionlen>
 
 	putc(spin->si_compmax, fd);			// <compmax>
 	putc(spin->si_compminlen, fd);			// <compminlen>
 	putc(spin->si_compsylmax, fd);			// <compsylmax>
 	putc(0, fd);		// for Vim 7.0b compatibility
 	putc(spin->si_compoptions, fd);			// <compoptions>
-	put_bytes(fd, (long_u)spin->si_comppat.ga_len, 2);
+	put_బైట్లు(fd, (long_u)spin->si_comppat.ga_len, 2);
 							// <comppatcount>
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
+	కొరకు (i = 0; i < spin->si_comppat.ga_len; ++i)
 	{
-	    p = ((char_u **)(spin->si_comppat.ga_data))[i];
-	    putc((int)STRLEN(p), fd);			// <comppatlen>
+	    p = ((char_u **)(spin->si_comppat.ga_దత్తాంశం))[i];
+	    putc((పూర్ణాంకం)STRLEN(p), fd);			// <comppatlen>
 	    fwv &= fwrite(p, (size_t)STRLEN(p), (size_t)1, fd);
 							// <comppattext>
 	}
@@ -5337,75 +5337,75 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     }
 
     // SN_NOBREAK: NOBREAK flag
-    if (spin->si_nobreak)
+    ఒకవేళ (spin->si_nobreak)
     {
 	putc(SN_NOBREAK, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// It's empty, the presence of the section flags the feature.
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_బైట్లు(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_SYLLABLE: syllable info.
     // We don't mark it required, when not supported syllables will not be
     // counted.
-    if (spin->si_syllable != NULL)
+    ఒకవేళ (spin->si_syllable != ఖాళీ)
     {
 	putc(SN_SYLLABLE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_syllable);
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = (పూర్ణాంకం)STRLEN(spin->si_syllable);
+	put_బైట్లు(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_syllable, (size_t)l, (size_t)1, fd);
 							// <syllable>
     }
 
     // end of <SECTIONS>
-    putc(SN_END, fd);					// <sectionend>
+    putc(SN_చివర, fd);					// <sectionend>
 
 
     /*
      * <LWORDTREE>  <KWORDTREE>  <PREFIXTREE>
      */
     spin->si_memtot = 0;
-    for (round = 1; round <= 3; ++round)
+    కొరకు (విడత = 1; విడత <= 3; ++విడత)
     {
-	if (round == 1)
-	    tree = spin->si_foldroot->wn_sibling;
-	else if (round == 2)
-	    tree = spin->si_keeproot->wn_sibling;
-	else
-	    tree = spin->si_prefroot->wn_sibling;
+	ఒకవేళ (విడత == 1)
+	    వృక్షం = spin->si_foldroot->wn_sibling;
+	లేకపోతే ఒకవేళ (విడత == 2)
+	    వృక్షం = spin->si_keeproot->wn_sibling;
+	లేకపోతే
+	    వృక్షం = spin->si_prefroot->wn_sibling;
 
 	// Clear the index and wnode fields in the tree.
-	clear_node(tree);
+	clear_కణుపు(వృక్షం);
 
 	// Count the number of nodes.  Needed to be able to allocate the
 	// memory when reading the nodes.  Also fills in index for shared
 	// nodes.
-	nodecount = put_node(NULL, tree, 0, regionmask, round == 3);
+	nodecount = put_కణుపు(ఖాళీ, వృక్షం, 0, regionmask, విడత == 3);
 
 	// number of nodes in 4 bytes
-	put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-	spin->si_memtot += nodecount + nodecount * sizeof(int);
+	put_బైట్లు(fd, (long_u)nodecount, 4);	// <nodecount>
+	spin->si_memtot += nodecount + nodecount * పరిమాణం(పూర్ణాంకం);
 
 	// Write the nodes.
-	(void)put_node(fd, tree, 0, regionmask, round == 3);
+	(శూన్య)put_కణుపు(fd, వృక్షం, 0, regionmask, విడత == 3);
     }
 
     // Write another byte to check for errors (file system full).
-    if (putc(0, fd) == EOF)
+    ఒకవేళ (putc(0, fd) == EOF)
 	retval = FAIL;
 theend:
-    if (fclose(fd) == EOF)
+    ఒకవేళ (fclose(fd) == EOF)
 	retval = FAIL;
 
-    if (fwv != (size_t)1)
+    ఒకవేళ (fwv != (size_t)1)
 	retval = FAIL;
-    if (retval == FAIL)
+    ఒకవేళ (retval == FAIL)
 	emsg(_(e_error_while_writing));
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -5413,19 +5413,19 @@ theend:
  * children.  This is needed because they are a union with other items to save
  * space.
  */
-    static void
-clear_node(wordnode_T *node)
+    స్థిర శూన్య
+clear_కణుపు(wordnode_T *కణుపు)
 {
     wordnode_T	*np;
 
-    if (node != NULL)
-	FOR_ALL_NODE_SIBLINGS(node, np)
+    ఒకవేళ (కణుపు != ఖాళీ)
+	FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
 	{
-	    np->wn_u1.index = 0;
-	    np->wn_u2.wnode = NULL;
+	    np->wn_u1.సూచీ = 0;
+	    np->wn_u2.wnode = ఖాళీ;
 
-	    if (np->wn_byte != NUL)
-		clear_node(np->wn_child);
+	    ఒకవేళ (np->wn_byte != NUL)
+		clear_కణుపు(np->wn_బిడ్డ);
 	}
 }
 
@@ -5442,114 +5442,114 @@ clear_node(wordnode_T *node)
  *
  * Returns the number of nodes used.
  */
-    static int
-put_node(
+    స్థిర పూర్ణాంకం
+put_కణుపు(
     FILE	*fd,		// NULL when only counting
-    wordnode_T	*node,
-    int		idx,
-    int		regionmask,
-    int		prefixtree)	// TRUE for PREFIXTREE
+    wordnode_T	*కణుపు,
+    పూర్ణాంకం		idx,
+    పూర్ణాంకం		regionmask,
+    పూర్ణాంకం		prefixtree)	// TRUE for PREFIXTREE
 {
-    int		newindex = idx;
-    int		siblingcount = 0;
+    పూర్ణాంకం		newindex = idx;
+    పూర్ణాంకం		siblingcount = 0;
     wordnode_T	*np;
-    int		flags;
+    పూర్ణాంకం		flags;
 
     // If "node" is zero the tree is empty.
-    if (node == NULL)
-	return 0;
+    ఒకవేళ (కణుపు == ఖాళీ)
+	తిరిగి 0;
 
     // Store the index where this node is written.
-    node->wn_u1.index = idx;
+    కణుపు->wn_u1.సూచీ = idx;
 
     // Count the number of siblings.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
 	++siblingcount;
 
     // Write the sibling count.
-    if (fd != NULL)
+    ఒకవేళ (fd != ఖాళీ)
 	putc(siblingcount, fd);				// <siblingcount>
 
     // Write each sibling byte and optionally extra info.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
     {
-	if (np->wn_byte == 0)
+	ఒకవేళ (np->wn_byte == 0)
 	{
-	    if (fd != NULL)
+	    ఒకవేళ (fd != ఖాళీ)
 	    {
 		// For a NUL byte (end of word) write the flags etc.
-		if (prefixtree)
+		ఒకవేళ (prefixtree)
 		{
 		    // In PREFIXTREE write the required affixID and the
 		    // associated condition nr (stored in wn_region).  The
 		    // byte value is misused to store the "rare" and "not
 		    // combining" flags
-		    if (np->wn_flags == (short_u)PFX_FLAGS)
+		    ఒకవేళ (np->wn_flags == (short_u)PFX_FLAGS)
 			putc(BY_NOFLAGS, fd);		// <byte>
-		    else
+		    లేకపోతే
 		    {
 			putc(BY_FLAGS, fd);		// <byte>
 			putc(np->wn_flags, fd);		// <pflags>
 		    }
 		    putc(np->wn_affixID, fd);		// <affixID>
-		    put_bytes(fd, (long_u)np->wn_region, 2); // <prefcondnr>
+		    put_బైట్లు(fd, (long_u)np->wn_region, 2); // <prefcondnr>
 		}
-		else
+		లేకపోతే
 		{
 		    // For word trees we write the flag/region items.
 		    flags = np->wn_flags;
-		    if (regionmask != 0 && np->wn_region != regionmask)
+		    ఒకవేళ (regionmask != 0 && np->wn_region != regionmask)
 			flags |= WF_REGION;
-		    if (np->wn_affixID != 0)
+		    ఒకవేళ (np->wn_affixID != 0)
 			flags |= WF_AFX;
-		    if (flags == 0)
+		    ఒకవేళ (flags == 0)
 		    {
 			// word without flags or region
 			putc(BY_NOFLAGS, fd);			// <byte>
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (np->wn_flags >= 0x100)
+			ఒకవేళ (np->wn_flags >= 0x100)
 			{
 			    putc(BY_FLAGS2, fd);		// <byte>
 			    putc(flags, fd);			// <flags>
-			    putc((unsigned)flags >> 8, fd);	// <flags2>
+			    putc((గుర్తులేని)flags >> 8, fd);	// <flags2>
 			}
-			else
+			లేకపోతే
 			{
 			    putc(BY_FLAGS, fd);			// <byte>
 			    putc(flags, fd);			// <flags>
 			}
-			if (flags & WF_REGION)
+			ఒకవేళ (flags & WF_REGION)
 			    putc(np->wn_region, fd);		// <region>
-			if (flags & WF_AFX)
+			ఒకవేళ (flags & WF_AFX)
 			    putc(np->wn_affixID, fd);		// <affixID>
 		    }
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (np->wn_child->wn_u1.index != 0
-					 && np->wn_child->wn_u2.wnode != node)
+	    ఒకవేళ (np->wn_బిడ్డ->wn_u1.సూచీ != 0
+					 && np->wn_బిడ్డ->wn_u2.wnode != కణుపు)
 	    {
 		// The child is written elsewhere, write the reference.
-		if (fd != NULL)
+		ఒకవేళ (fd != ఖాళీ)
 		{
-		    putc(BY_INDEX, fd);			// <byte>
+		    putc(BY_సూచీ, fd);			// <byte>
 							// <nodeidx>
-		    put_bytes(fd, (long_u)np->wn_child->wn_u1.index, 3);
+		    put_బైట్లు(fd, (long_u)np->wn_బిడ్డ->wn_u1.సూచీ, 3);
 		}
 	    }
-	    else if (np->wn_child->wn_u2.wnode == NULL)
+	    లేకపోతే ఒకవేళ (np->wn_బిడ్డ->wn_u2.wnode == ఖాళీ)
 		// We will write the child below and give it an index.
-		np->wn_child->wn_u2.wnode = node;
+		np->wn_బిడ్డ->wn_u2.wnode = కణుపు;
 
-	    if (fd != NULL)
-		if (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
+	    ఒకవేళ (fd != ఖాళీ)
+		ఒకవేళ (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
 		{
 		    emsg(_(e_error_while_writing));
-		    return 0;
+		    తిరిగి 0;
 		}
 	}
     }
@@ -5559,12 +5559,12 @@ put_node(
     newindex += siblingcount + 1;
 
     // Recursively dump the children of each sibling.
-    FOR_ALL_NODE_SIBLINGS(node, np)
-	if (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == node)
-	    newindex = put_node(fd, np->wn_child, newindex, regionmask,
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, np)
+	ఒకవేళ (np->wn_byte != 0 && np->wn_బిడ్డ->wn_u2.wnode == కణుపు)
+	    newindex = put_కణుపు(fd, np->wn_బిడ్డ, newindex, regionmask,
 								  prefixtree);
 
-    return newindex;
+    తిరిగి newindex;
 }
 
 
@@ -5572,23 +5572,23 @@ put_node(
  * ":mkspell [-ascii] outfile  infile ..."
  * ":mkspell [-ascii] addfile"
  */
-    void
+    శూన్య
 ex_mkspell(exarg_T *eap)
 {
-    int		fcount;
+    పూర్ణాంకం		fcount;
     char_u	**fnames;
     char_u	*arg = eap->arg;
-    int		ascii = FALSE;
+    పూర్ణాంకం		ascii = FALSE;
 
-    if (STRNCMP(arg, "-ascii", 6) == 0)
+    ఒకవేళ (STRNCMP(arg, "-ascii", 6) == 0)
     {
 	ascii = TRUE;
 	arg = skipwhite(arg + 6);
     }
 
     // Expand all the remaining arguments (e.g., $VIMRUNTIME).
-    if (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
-	return;
+    ఒకవేళ (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
+	తిరిగి;
 
     mkspell(fcount, fnames, ascii, eap->forceit, FALSE);
     FreeWild(fcount, fnames);
@@ -5599,13 +5599,13 @@ ex_mkspell(exarg_T *eap)
  * Uses the soundfold info in "spin".
  * Writes the file with the name "wfname", with ".spl" changed to ".sug".
  */
-    static void
+    స్థిర శూన్య
 spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
 {
-    char_u	*fname = NULL;
-    int		len;
+    char_u	*fname = ఖాళీ;
+    పూర్ణాంకం		len;
     slang_T	*slang;
-    int		free_slang = FALSE;
+    పూర్ణాంకం		free_slang = FALSE;
 
     /*
      * Read back the .spl file that was written.  This fills the required
@@ -5615,34 +5615,34 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * It might have been done already by spell_reload_one().
      */
     FOR_ALL_SPELL_LANGS(slang)
-	if (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-	    break;
-    if (slang == NULL)
+	ఒకవేళ (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	    ఆపు;
+    ఒకవేళ (slang == ఖాళీ)
     {
-	spell_message(spin, (char_u *)_("Reading back spell file..."));
-	slang = spell_load_file(wfname, NULL, NULL, FALSE);
-	if (slang == NULL)
-	    return;
+	spell_సందేశం(spin, (char_u *)_("Reading back spell file..."));
+	slang = spell_ఎక్కించు_file(wfname, ఖాళీ, ఖాళీ, FALSE);
+	ఒకవేళ (slang == ఖాళీ)
+	    తిరిగి;
 	free_slang = TRUE;
     }
 
     /*
      * Clear the info in "spin" that is used.
      */
-    spin->si_blocks = NULL;
-    spin->si_blocks_cnt = 0;
+    spin->si_ఖండాలు = ఖాళీ;
+    spin->si_ఖండాలు_cnt = 0;
     spin->si_compress_cnt = 0;	    // will stay at 0 all the time
-    spin->si_free_count = 0;
-    spin->si_first_free = NULL;
+    spin->si_free_లెక్క = 0;
+    spin->si_మొదటి_free = ఖాళీ;
     spin->si_foldwcount = 0;
 
     /*
      * Go through the trie of good words, soundfold each word and add it to
      * the soundfold trie.
      */
-    spell_message(spin, (char_u *)_("Performing soundfolding..."));
-    if (sug_filltree(spin, slang) == FAIL)
-	goto theend;
+    spell_సందేశం(spin, (char_u *)_("Performing soundfolding..."));
+    ఒకవేళ (sug_filltree(spin, slang) == FAIL)
+	వెళ్ళు theend;
 
     /*
      * Create the table which links each soundfold word with a list of the
@@ -5650,16 +5650,16 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * This also removes the wordnr from the NUL byte entries to make
      * compression possible.
      */
-    if (sug_maketable(spin) == FAIL)
-	goto theend;
+    ఒకవేళ (sug_maketable(spin) == FAIL)
+	వెళ్ళు theend;
 
     smsg(_("Number of words after soundfolding: %ld"),
-				 (long)spin->si_spellbuf->b_ml.ml_line_count);
+				 (దీర్ఘ)spin->si_spellbuf->b_ml.ml_పంక్తి_లెక్క);
 
     /*
      * Compress the soundfold trie.
      */
-    spell_message(spin, (char_u *)_(msg_compressing));
+    spell_సందేశం(spin, (char_u *)_(సందేశం_compressing));
     wordtree_compress(spin, spin->si_foldroot, "case-folded");
 
     /*
@@ -5667,44 +5667,44 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * Make the file name by changing ".spl" to ".sug".
      */
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	goto theend;
+    ఒకవేళ (fname == ఖాళీ)
+	వెళ్ళు theend;
     vim_strncpy(fname, wfname, MAXPATHL - 1);
-    len = (int)STRLEN(fname);
+    len = (పూర్ణాంకం)STRLEN(fname);
     fname[len - 2] = 'u';
     fname[len - 1] = 'g';
     sug_write(spin, fname);
 
 theend:
     vim_free(fname);
-    if (free_slang)
+    ఒకవేళ (free_slang)
 	slang_free(slang);
-    free_blocks(spin->si_blocks);
+    free_ఖండాలు(spin->si_ఖండాలు);
     close_spellbuf(spin->si_spellbuf);
 }
 
 /*
  * Build the soundfold trie for language "slang".
  */
-    static int
+    స్థిర పూర్ణాంకం
 sug_filltree(spellinfo_T *spin, slang_T *slang)
 {
     char_u	*byts;
     idx_T	*idxs;
-    int		depth;
+    పూర్ణాంకం		లోతు;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    పూర్ణాంకం		curi[MAXWLEN];
     char_u	tword[MAXWLEN];
     char_u	tsalword[MAXWLEN];
-    int		c;
+    పూర్ణాంకం		c;
     idx_T	n;
-    unsigned	words_done = 0;
-    int		wordcount[MAXWLEN];
+    గుర్తులేని	పదాలు_పూర్తి = 0;
+    పూర్ణాంకం		wordcount[MAXWLEN];
 
     // We use si_foldroot for the soundfolded trie.
     spin->si_foldroot = wordtree_alloc(spin);
-    if (spin->si_foldroot == NULL)
-	return FAIL;
+    ఒకవేళ (spin->si_foldroot == ఖాళీ)
+	తిరిగి FAIL;
 
     // let tree_add_word() know we're adding to the soundfolded tree
     spin->si_sugtree = TRUE;
@@ -5715,76 +5715,76 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
      */
     byts = slang->sl_fbyts;
     idxs = slang->sl_fidxs;
-    if (byts == NULL || idxs == NULL)
-	return FAIL;
+    ఒకవేళ (byts == ఖాళీ || idxs == ఖాళీ)
+	తిరిగి FAIL;
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
 
-    depth = 0;
-    while (depth >= 0 && !got_int)
+    లోతు = 0;
+    అయితే (లోతు >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	ఒకవేళ (curi[లోతు] > byts[arridx[లోతు]])
 	{
 	    // Done all bytes at this node, go up one level.
-	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
-		wordcount[depth - 1] += wordcount[depth];
+	    idxs[arridx[లోతు]] = wordcount[లోతు];
+	    ఒకవేళ (లోతు > 0)
+		wordcount[లోతు - 1] += wordcount[లోతు];
 
-	    --depth;
-	    line_breakcheck();
+	    --లోతు;
+	    పంక్తి_breakcheck();
 	}
-	else
+	లేకపోతే
 	{
 
 	    // Do one more byte at this node.
-	    n = arridx[depth] + curi[depth];
-	    ++curi[depth];
+	    n = arridx[లోతు] + curi[లోతు];
+	    ++curi[లోతు];
 
 	    c = byts[n];
-	    if (c == 0)
+	    ఒకవేళ (c == 0)
 	    {
 		// Sound-fold the word.
-		tword[depth] = NUL;
+		tword[లోతు] = NUL;
 		spell_soundfold(slang, tword, TRUE, tsalword);
 
 		// We use the "flags" field for the MSB of the wordnr,
 		// "region" for the LSB of the wordnr.
-		if (tree_add_word(spin, tsalword, spin->si_foldroot,
-				words_done >> 16, words_done & 0xffff,
+		ఒకవేళ (వృక్షం_కూడు_మాట(spin, tsalword, spin->si_foldroot,
+				పదాలు_పూర్తి >> 16, పదాలు_పూర్తి & 0xffff,
 							   0) == FAIL)
-		    return FAIL;
+		    తిరిగి FAIL;
 
-		++words_done;
-		++wordcount[depth];
+		++పదాలు_పూర్తి;
+		++wordcount[లోతు];
 
 		// Reset the block count each time to avoid compression
 		// kicking in.
-		spin->si_blocks_cnt = 0;
+		spin->si_ఖండాలు_cnt = 0;
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
+		అయితే (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
 		{
 		    ++n;
-		    ++curi[depth];
+		    ++curi[లోతు];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    లేకపోతే ఒకవేళ (లోతు < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper.
-		tword[depth++] = c;
-		arridx[depth] = idxs[n];
-		curi[depth] = 1;
-		wordcount[depth] = 0;
+		tword[లోతు++] = c;
+		arridx[లోతు] = idxs[n];
+		curi[లోతు] = 1;
+		wordcount[లోతు] = 0;
 	    }
 	}
     }
 
-    smsg(_("Total number of words: %d"), words_done);
+    smsg(_("Total number of words: %d"), పదాలు_పూర్తి);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -5794,28 +5794,28 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
  * the table efficiently.
  * Returns FAIL when out of memory.
  */
-    static int
+    స్థిర పూర్ణాంకం
 sug_maketable(spellinfo_T *spin)
 {
     garray_T	ga;
-    int		res = OK;
+    పూర్ణాంకం		res = OK;
 
     // Allocate a buffer, open a memline for it and create the swap file
     // (uses a temp file, not a .swp file).
     spin->si_spellbuf = open_spellbuf();
-    if (spin->si_spellbuf == NULL)
-	return FAIL;
+    ఒకవేళ (spin->si_spellbuf == ఖాళీ)
+	తిరిగి FAIL;
 
     // Use a buffer to store the line info, avoids allocating many small
     // pieces of memory.
     ga_init2(&ga, 1, 100);
 
     // recursively go through the tree
-    if (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
+    ఒకవేళ (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
 	res = FAIL;
 
     ga_clear(&ga);
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -5823,28 +5823,28 @@ sug_maketable(spellinfo_T *spin)
  * Returns the wordnr at the start of the node.
  * Returns -1 when out of memory.
  */
-    static int
+    స్థిర పూర్ణాంకం
 sug_filltable(
     spellinfo_T	*spin,
-    wordnode_T	*node,
-    int		startwordnr,
+    wordnode_T	*కణుపు,
+    పూర్ణాంకం		startwordnr,
     garray_T	*gap)	    // place to store line of numbers
 {
     wordnode_T	*p, *np;
-    int		wordnr = startwordnr;
-    int		nr;
-    int		prev_nr;
+    పూర్ణాంకం		wordnr = startwordnr;
+    పూర్ణాంకం		nr;
+    పూర్ణాంకం		prev_nr;
 
-    FOR_ALL_NODE_SIBLINGS(node, p)
+    FOR_ALL_కణుపు_SIBLINGS(కణుపు, p)
     {
-	if (p->wn_byte == NUL)
+	ఒకవేళ (p->wn_byte == NUL)
 	{
 	    gap->ga_len = 0;
 	    prev_nr = 0;
-	    for (np = p; np != NULL && np->wn_byte == NUL; np = np->wn_sibling)
+	    కొరకు (np = p; np != ఖాళీ && np->wn_byte == NUL; np = np->wn_sibling)
 	    {
-		if (ga_grow(gap, 10) == FAIL)
-		    return -1;
+		ఒకవేళ (ga_grow(gap, 10) == FAIL)
+		    తిరిగి -1;
 
 		nr = (np->wn_flags << 16) + (np->wn_region & 0xffff);
 		// Compute the offset from the previous nr and store the
@@ -5854,20 +5854,20 @@ sug_filltable(
 		nr -= prev_nr;
 		prev_nr += nr;
 		gap->ga_len += offset2bytes(nr,
-					 (char_u *)gap->ga_data + gap->ga_len);
+					 (char_u *)gap->ga_దత్తాంశం + gap->ga_len);
 	    }
 
 	    // add the NUL byte
-	    ((char_u *)gap->ga_data)[gap->ga_len++] = NUL;
+	    ((char_u *)gap->ga_దత్తాంశం)[gap->ga_len++] = NUL;
 
-	    if (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
-				     gap->ga_data, gap->ga_len, TRUE) == FAIL)
-		return -1;
+	    ఒకవేళ (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
+				     gap->ga_దత్తాంశం, gap->ga_len, TRUE) == FAIL)
+		తిరిగి -1;
 	    ++wordnr;
 
 	    // Remove extra NUL entries, we no longer need them. We don't
 	    // bother freeing the nodes, they won't be reused anyway.
-	    while (p->wn_sibling != NULL && p->wn_sibling->wn_byte == NUL)
+	    అయితే (p->wn_sibling != ఖాళీ && p->wn_sibling->wn_byte == NUL)
 		p->wn_sibling = p->wn_sibling->wn_sibling;
 
 	    // Clear the flags on the remaining NUL node, so that compression
@@ -5875,14 +5875,14 @@ sug_filltable(
 	    p->wn_flags = 0;
 	    p->wn_region = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    wordnr = sug_filltable(spin, p->wn_child, wordnr, gap);
-	    if (wordnr == -1)
-		return -1;
+	    wordnr = sug_filltable(spin, p->wn_బిడ్డ, wordnr, gap);
+	    ఒకవేళ (wordnr == -1)
+		తిరిగి -1;
 	}
     }
-    return wordnr;
+    తిరిగి wordnr;
 }
 
 /*
@@ -5890,11 +5890,11 @@ sug_filltable(
  * Similar to utf_char2byters, but use 8 bits in followup bytes and avoid NUL
  * bytes.
  */
-    static int
-offset2bytes(int nr, char_u *buf)
+    స్థిర పూర్ణాంకం
+offset2bytes(పూర్ణాంకం nr, char_u *buf)
 {
-    int	    rem;
-    int	    b1, b2, b3, b4;
+    పూర్ణాంకం	    rem;
+    పూర్ణాంకం	    b1, b2, b3, b4;
 
     // Split the number in parts of base 255.  We need to avoid NUL bytes.
     b1 = nr % 255 + 1;
@@ -5904,118 +5904,118 @@ offset2bytes(int nr, char_u *buf)
     b3 = rem % 255 + 1;
     b4 = rem / 255 + 1;
 
-    if (b4 > 1 || b3 > 0x1f)	// 4 bytes
+    ఒకవేళ (b4 > 1 || b3 > 0x1f)	// 4 bytes
     {
 	buf[0] = 0xe0 + b4;
 	buf[1] = b3;
 	buf[2] = b2;
 	buf[3] = b1;
-	return 4;
+	తిరిగి 4;
     }
-    if (b3 > 1 || b2 > 0x3f )	// 3 bytes
+    ఒకవేళ (b3 > 1 || b2 > 0x3f )	// 3 bytes
     {
 	buf[0] = 0xc0 + b3;
 	buf[1] = b2;
 	buf[2] = b1;
-	return 3;
+	తిరిగి 3;
     }
-    if (b2 > 1 || b1 > 0x7f )	// 2 bytes
+    ఒకవేళ (b2 > 1 || b1 > 0x7f )	// 2 bytes
     {
 	buf[0] = 0x80 + b2;
 	buf[1] = b1;
-	return 2;
+	తిరిగి 2;
     }
 				// 1 byte
     buf[0] = b1;
-    return 1;
+    తిరిగి 1;
 }
 
 /*
  * Write the .sug file in "fname".
  */
-    static void
+    స్థిర శూన్య
 sug_write(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		wcount;
-    char_u	*line;
+    wordnode_T	*వృక్షం;
+    పూర్ణాంకం		nodecount;
+    పూర్ణాంకం		wcount;
+    char_u	*పంక్తి;
     linenr_T	lnum;
-    int		len;
+    పూర్ణాంకం		len;
 
     // Create the file.  Note that an existing file is silently overwritten!
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((అక్షరం *)fname, "w");
+    ఒకవేళ (fd == ఖాళీ)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return;
+	తిరిగి;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 				  _("Writing suggestion file %s..."), fname);
-    spell_message(spin, IObuff);
+    spell_సందేశం(spin, IObuff);
 
     /*
      * <SUGHEADER>: <fileID> <versionnr> <timestamp>
      */
-    if (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
+    ఒకవేళ (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
     {
 	emsg(_(e_error_while_writing));
-	goto theend;
+	వెళ్ళు theend;
     }
     putc(VIMSUGVERSION, fd);				// <versionnr>
 
     // Write si_sugtime to the file.
-    put_time(fd, spin->si_sugtime);			// <timestamp>
+    put_సమయం(fd, spin->si_sugtime);			// <timestamp>
 
     /*
      * <SUGWORDTREE>
      */
     spin->si_memtot = 0;
-    tree = spin->si_foldroot->wn_sibling;
+    వృక్షం = spin->si_foldroot->wn_sibling;
 
     // Clear the index and wnode fields in the tree.
-    clear_node(tree);
+    clear_కణుపు(వృక్షం);
 
     // Count the number of nodes.  Needed to be able to allocate the
     // memory when reading the nodes.  Also fills in index for shared
     // nodes.
-    nodecount = put_node(NULL, tree, 0, 0, FALSE);
+    nodecount = put_కణుపు(ఖాళీ, వృక్షం, 0, 0, FALSE);
 
     // number of nodes in 4 bytes
-    put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-    spin->si_memtot += nodecount + nodecount * sizeof(int);
+    put_బైట్లు(fd, (long_u)nodecount, 4);	// <nodecount>
+    spin->si_memtot += nodecount + nodecount * పరిమాణం(పూర్ణాంకం);
 
     // Write the nodes.
-    (void)put_node(fd, tree, 0, 0, FALSE);
+    (శూన్య)put_కణుపు(fd, వృక్షం, 0, 0, FALSE);
 
     /*
      * <SUGTABLE>: <sugwcount> <sugline> ...
      */
-    wcount = spin->si_spellbuf->b_ml.ml_line_count;
-    put_bytes(fd, (long_u)wcount, 4);	// <sugwcount>
+    wcount = spin->si_spellbuf->b_ml.ml_పంక్తి_లెక్క;
+    put_బైట్లు(fd, (long_u)wcount, 4);	// <sugwcount>
 
-    for (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
+    కొరకు (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
     {
 	// <sugline>: <sugnr> ... NUL
-	line = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
+	పంక్తి = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
 	len = ml_get_buf_len(spin->si_spellbuf, lnum) + 1;
-	if (fwrite(line, (size_t)len, (size_t)1, fd) == 0)
+	ఒకవేళ (fwrite(పంక్తి, (size_t)len, (size_t)1, fd) == 0)
 	{
 	    emsg(_(e_error_while_writing));
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 	spin->si_memtot += len;
     }
 
     // Write another byte to check for errors.
-    if (putc(0, fd) == EOF)
+    ఒకవేళ (putc(0, fd) == EOF)
 	emsg(_(e_error_while_writing));
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin->si_memtot);
-    spell_message(spin, IObuff);
+    spell_సందేశం(spin, IObuff);
 
 theend:
     // close the file
@@ -6030,36 +6030,36 @@ theend:
  * Exception: when "fnames[0]" ends in ".add" it's used as the input file name
  * and ".spl" is appended to make the output file name.
  */
-    void
+    శూన్య
 mkspell(
-    int		fcount,
+    పూర్ణాంకం		fcount,
     char_u	**fnames,
-    int		ascii,		    // -ascii argument given
-    int		over_write,	    // overwrite existing output file
-    int		added_word)	    // invoked through "zg"
+    పూర్ణాంకం		ascii,		    // -ascii argument given
+    పూర్ణాంకం		over_write,	    // overwrite existing output file
+    పూర్ణాంకం		added_మాట)	    // invoked through "zg"
 {
-    char_u	*fname = NULL;
+    char_u	*fname = ఖాళీ;
     char_u	*wfname;
     char_u	**innames;
-    int		incount;
+    పూర్ణాంకం		incount;
     afffile_T	*(afile[MAXREGIONS]);
-    int		i;
-    int		len;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		len;
     stat_T	st;
-    int		error = FALSE;
+    పూర్ణాంకం		error = FALSE;
     spellinfo_T spin;
 
-    CLEAR_FIELD(spin);
-    spin.si_verbose = !added_word;
+    CLEAR_క్షేత్రం(spin);
+    spin.si_verbose = !added_మాట;
     spin.si_ascii = ascii;
     spin.si_followup = TRUE;
     spin.si_rem_accents = TRUE;
-    ga_init2(&spin.si_rep, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_repsal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_sal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_map, sizeof(char_u), 100);
-    ga_init2(&spin.si_comppat, sizeof(char_u *), 20);
-    ga_init2(&spin.si_prefcond, sizeof(char_u *), 50);
+    ga_init2(&spin.si_rep, పరిమాణం(fromto_T), 20);
+    ga_init2(&spin.si_repsal, పరిమాణం(fromto_T), 20);
+    ga_init2(&spin.si_sal, పరిమాణం(fromto_T), 20);
+    ga_init2(&spin.si_map, పరిమాణం(char_u), 100);
+    ga_init2(&spin.si_comppat, పరిమాణం(char_u *), 20);
+    ga_init2(&spin.si_prefcond, పరిమాణం(char_u *), 50);
     hash_init(&spin.si_commonwords);
     spin.si_newcompID = 127;	// start compound ID at first maximum
 
@@ -6069,103 +6069,103 @@ mkspell(
     incount = fcount - 1;
 
     wfname = alloc(MAXPATHL);
-    if (wfname == NULL)
-	return;
+    ఒకవేళ (wfname == ఖాళీ)
+	తిరిగి;
 
-    if (fcount >= 1)
+    ఒకవేళ (fcount >= 1)
     {
-	len = (int)STRLEN(fnames[0]);
-	if (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
+	len = (పూర్ణాంకం)STRLEN(fnames[0]);
+	ఒకవేళ (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
 	{
 	    // For ":mkspell path/en.latin1.add" output file is
 	    // "path/en.latin1.add.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, "%s.spl", fnames[0]);
+	    vim_snprintf((అక్షరం *)wfname, MAXPATHL, "%s.spl", fnames[0]);
 	}
-	else if (fcount == 1)
+	లేకపోతే ఒకవేళ (fcount == 1)
 	{
 	    // For ":mkspell path/vim" output file is "path/vim.latin1.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((అక్షరం *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 	}
-	else if (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
+	లేకపోతే ఒకవేళ (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
 	{
 	    // Name ends in ".spl", use as the file name.
 	    vim_strncpy(wfname, fnames[0], MAXPATHL - 1);
 	}
-	else
+	లేకపోతే
 	    // Name should be language, make the file name from it.
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((అక్షరం *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 
 	// Check for .ascii.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ASCII) != NULL)
+	ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(wfname), SPL_FNAME_ASCII) != ఖాళీ)
 	    spin.si_ascii = TRUE;
 
 	// Check for .add.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ADD) != NULL)
-	    spin.si_add = TRUE;
+	ఒకవేళ (అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(wfname), SPL_FNAME_కూడు) != ఖాళీ)
+	    spin.si_కూడు = TRUE;
     }
 
-    if (incount <= 0)
-	emsg(_(e_invalid_argument));	// need at least output and input names
-    else if (vim_strchr(gettail(wfname), '_') != NULL)
+    ఒకవేళ (incount <= 0)
+	emsg(_(e_invalid_వాదం));	// need at least output and input names
+    లేకపోతే ఒకవేళ (vim_strchr(gettail(wfname), '_') != ఖాళీ)
 	emsg(_(e_output_file_name_must_not_have_region_name));
-    else if (incount > MAXREGIONS)
-	semsg(_(e_only_up_to_nr_regions_supported), MAXREGIONS);
-    else
+    లేకపోతే ఒకవేళ (incount > MAXREGIONS)
+	semsg(_(e_only_పైకి_గమ్యం_nr_regions_supported), MAXREGIONS);
+    లేకపోతే
     {
 	// Check for overwriting before doing things that may take a lot of
 	// time.
-	if (!over_write && mch_stat((char *)wfname, &st) >= 0)
+	ఒకవేళ (!over_write && mch_stat((అక్షరం *)wfname, &st) >= 0)
 	{
 	    emsg(_(e_file_exists));
-	    goto theend;
+	    వెళ్ళు theend;
 	}
-	if (mch_isdir(wfname))
+	ఒకవేళ (mch_isdir(wfname))
 	{
 	    semsg(_(e_str_is_directory), wfname);
-	    goto theend;
+	    వెళ్ళు theend;
 	}
 
 	fname = alloc(MAXPATHL);
-	if (fname == NULL)
-	    goto theend;
+	ఒకవేళ (fname == ఖాళీ)
+	    వెళ్ళు theend;
 
 	/*
 	 * Init the aff and dic pointers.
 	 * Get the region names if there are more than 2 arguments.
 	 */
-	for (i = 0; i < incount; ++i)
+	కొరకు (i = 0; i < incount; ++i)
 	{
-	    afile[i] = NULL;
+	    afile[i] = ఖాళీ;
 
-	    if (incount > 1)
+	    ఒకవేళ (incount > 1)
 	    {
-		len = (int)STRLEN(innames[i]);
-		if (STRLEN(gettail(innames[i])) < 5
+		len = (పూర్ణాంకం)STRLEN(innames[i]);
+		ఒకవేళ (STRLEN(gettail(innames[i])) < 5
 						|| innames[i][len - 3] != '_')
 		{
-		    semsg(_(e_invalid_region_in_str), innames[i]);
-		    goto theend;
+		    semsg(_(e_invalid_region_లోపల_str), innames[i]);
+		    వెళ్ళు theend;
 		}
 		spin.si_region_name[i * 2] = TOLOWER_ASC(innames[i][len - 2]);
 		spin.si_region_name[i * 2 + 1] =
 					     TOLOWER_ASC(innames[i][len - 1]);
 	    }
 	}
-	spin.si_region_count = incount;
+	spin.si_region_లెక్క = incount;
 
 	spin.si_foldroot = wordtree_alloc(&spin);
 	spin.si_keeproot = wordtree_alloc(&spin);
 	spin.si_prefroot = wordtree_alloc(&spin);
-	if (spin.si_foldroot == NULL
-		|| spin.si_keeproot == NULL
-		|| spin.si_prefroot == NULL)
+	ఒకవేళ (spin.si_foldroot == ఖాళీ
+		|| spin.si_keeproot == ఖాళీ
+		|| spin.si_prefroot == ఖాళీ)
 	{
-	    free_blocks(spin.si_blocks);
-	    goto theend;
+	    free_ఖండాలు(spin.si_ఖండాలు);
+	    వెళ్ళు theend;
 	}
 
 	// When not producing a .add.spl file clear the character table when
@@ -6173,7 +6173,7 @@ mkspell(
 	// one in the .spl file if the .aff file doesn't define one.  That's
 	// better than guessing the contents, the table will match a
 	// previously loaded spell file.
-	if (!spin.si_add)
+	ఒకవేళ (!spin.si_కూడు)
 	    spin.si_clear_chartab = TRUE;
 
 	/*
@@ -6181,75 +6181,75 @@ mkspell(
 	 * Text is converted to 'encoding'.
 	 * Words are stored in the case-folded and keep-case trees.
 	 */
-	for (i = 0; i < incount && !error; ++i)
+	కొరకు (i = 0; i < incount && !error; ++i)
 	{
 	    spin.si_conv.vc_type = CONV_NONE;
 	    spin.si_region = 1 << i;
 
-	    vim_snprintf((char *)fname, MAXPATHL, "%s.aff", innames[i]);
-	    if (mch_stat((char *)fname, &st) >= 0)
+	    vim_snprintf((అక్షరం *)fname, MAXPATHL, "%s.aff", innames[i]);
+	    ఒకవేళ (mch_stat((అక్షరం *)fname, &st) >= 0)
 	    {
 		// Read the .aff file.  Will init "spin->si_conv" based on the
 		// "SET" line.
 		afile[i] = spell_read_aff(&spin, fname);
-		if (afile[i] == NULL)
+		ఒకవేళ (afile[i] == ఖాళీ)
 		    error = TRUE;
-		else
+		లేకపోతే
 		{
 		    // Read the .dic file and store the words in the trees.
-		    vim_snprintf((char *)fname, MAXPATHL, "%s.dic",
+		    vim_snprintf((అక్షరం *)fname, MAXPATHL, "%s.dic",
 								  innames[i]);
-		    if (spell_read_dic(&spin, fname, afile[i]) == FAIL)
+		    ఒకవేళ (spell_read_dic(&spin, fname, afile[i]) == FAIL)
 			error = TRUE;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// No .aff file, try reading the file as a word list.  Store
 		// the words in the trees.
-		if (spell_read_wordfile(&spin, innames[i]) == FAIL)
+		ఒకవేళ (spell_read_wordfile(&spin, innames[i]) == FAIL)
 		    error = TRUE;
 	    }
 
 	    // Free any conversion stuff.
-	    convert_setup(&spin.si_conv, NULL, NULL);
+	    convert_అమరిక(&spin.si_conv, ఖాళీ, ఖాళీ);
 	}
 
-	if (spin.si_compflags != NULL && spin.si_nobreak)
-	    msg(_("Warning: both compounding and NOBREAK specified"));
+	ఒకవేళ (spin.si_compflags != ఖాళీ && spin.si_nobreak)
+	    సందేశం(_("Warning: both compounding and NOBREAK specified"));
 
-	if (!error && !got_int)
+	ఒకవేళ (!error && !got_int)
 	{
 	    /*
 	     * Combine tails in the tree.
 	     */
-	    spell_message(&spin, (char_u *)_(msg_compressing));
+	    spell_సందేశం(&spin, (char_u *)_(సందేశం_compressing));
 	    wordtree_compress(&spin, spin.si_foldroot, "case-folded");
 	    wordtree_compress(&spin, spin.si_keeproot, "keep-case");
 	    wordtree_compress(&spin, spin.si_prefroot, "prefixes");
 	}
 
-	if (!error && !got_int)
+	ఒకవేళ (!error && !got_int)
 	{
 	    /*
 	     * Write the info in the spell file.
 	     */
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 				      _("Writing spell file %s..."), wfname);
-	    spell_message(&spin, IObuff);
+	    spell_సందేశం(&spin, IObuff);
 
 	    error = write_vim_spell(&spin, wfname) == FAIL;
 
-	    spell_message(&spin, (char_u *)_("Done!"));
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    spell_సందేశం(&spin, (char_u *)_("Done!"));
+	    vim_snprintf((అక్షరం *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin.si_memtot);
-	    spell_message(&spin, IObuff);
+	    spell_సందేశం(&spin, IObuff);
 
 	    /*
 	     * If the file is loaded need to reload it.
 	     */
-	    if (!error)
-		spell_reload_one(wfname, added_word);
+	    ఒకవేళ (!error)
+		spell_reload_one(wfname, added_మాట);
 	}
 
 	// Free the allocated memory.
@@ -6262,18 +6262,18 @@ mkspell(
 	hash_clear_all(&spin.si_commonwords, 0);
 
 	// Free the .aff file structures.
-	for (i = 0; i < incount; ++i)
-	    if (afile[i] != NULL)
+	కొరకు (i = 0; i < incount; ++i)
+	    ఒకవేళ (afile[i] != ఖాళీ)
 		spell_free_aff(afile[i]);
 
 	// Free all the bits and pieces at once.
-	free_blocks(spin.si_blocks);
+	free_ఖండాలు(spin.si_ఖండాలు);
 
 	/*
 	 * If there is soundfolding info and no NOSUGFILE item create the
 	 * .sug file with the soundfolded word trie.
 	 */
-	if (spin.si_sugtime != 0 && !error && !got_int)
+	ఒకవేళ (spin.si_sugtime != 0 && !error && !got_int)
 	    spell_make_sugfile(&spin, wfname);
 
     }
@@ -6287,16 +6287,16 @@ theend:
  * Display a message for spell file processing when 'verbose' is set or using
  * ":mkspell".  "str" can be IObuff.
  */
-    static void
-spell_message(spellinfo_T *spin, char_u *str)
+    స్థిర శూన్య
+spell_సందేశం(spellinfo_T *spin, char_u *str)
 {
-    if (spin->si_verbose || p_verbose > 2)
+    ఒకవేళ (spin->si_verbose || p_verbose > 2)
     {
-	if (!spin->si_verbose)
+	ఒకవేళ (!spin->si_verbose)
 	    verbose_enter();
-	msg((char *)str);
-	out_flush();
-	if (!spin->si_verbose)
+	సందేశం((అక్షరం *)str);
+	బహిర్గతం_flush();
+	ఒకవేళ (!spin->si_verbose)
 	    verbose_leave();
     }
 }
@@ -6307,151 +6307,151 @@ spell_message(spellinfo_T *spin, char_u *str)
  * ":[count]spellundo  {word}"
  * ":[count]spellrare  {word}"
  */
-    void
+    శూన్య
 ex_spell(exarg_T *eap)
 {
-    spell_add_word(eap->arg, (int)STRLEN(eap->arg),
-		eap->cmdidx == CMD_spellwrong ? SPELL_ADD_BAD :
-		eap->cmdidx == CMD_spellrare ? SPELL_ADD_RARE : SPELL_ADD_GOOD,
-				   eap->forceit ? 0 : (int)eap->line2,
+    spell_కూడు_మాట(eap->arg, (పూర్ణాంకం)STRLEN(eap->arg),
+		eap->cmdidx == CMD_spellwrong ? SPELL_కూడు_BAD :
+		eap->cmdidx == CMD_spellrare ? SPELL_కూడు_RARE : SPELL_కూడు_GOOD,
+				   eap->forceit ? 0 : (పూర్ణాంకం)eap->line2,
 				   eap->cmdidx == CMD_spellundo);
 }
 
 /*
  * Add "word[len]" to 'spellfile' as a good, rare or bad word.
  */
-    void
-spell_add_word(
-    char_u	*word,
-    int		len,
-    int		what,	    // SPELL_ADD_ values
-    int		idx,	    // "zG" and "zW": zero, otherwise index in
+    శూన్య
+spell_కూడు_మాట(
+    char_u	*మాట,
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		what,	    // SPELL_ADD_ values
+    పూర్ణాంకం		idx,	    // "zG" and "zW": zero, otherwise index in
 			    // 'spellfile'
-    int		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
+    పూర్ణాంకం		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
 {
-    FILE	*fd = NULL;
-    buf_T	*buf = NULL;
-    int		new_spf = FALSE;
+    FILE	*fd = ఖాళీ;
+    buf_T	*buf = ఖాళీ;
+    పూర్ణాంకం		new_spf = FALSE;
     char_u	*fname;
-    char_u	*fnamebuf = NULL;
-    char_u	line[MAXWLEN * 2];
-    long	fpos, fpos_next = 0;
-    int		i;
+    char_u	*fnamebuf = ఖాళీ;
+    char_u	పంక్తి[MAXWLEN * 2];
+    దీర్ఘ	fpos, fpos_తదుపరి = 0;
+    పూర్ణాంకం		i;
     size_t	linelen;
     char_u	*spf;
 
-    if (!valid_spell_word(word, word + len))
+    ఒకవేళ (!valid_spell_మాట(మాట, మాట + len))
     {
-	emsg(_(e_illegal_character_in_word));
-	return;
+	emsg(_(e_illegal_character_లోపల_మాట));
+	తిరిగి;
     }
 
-    if (idx == 0)	    // use internal wordlist
+    ఒకవేళ (idx == 0)	    // use internal wordlist
     {
-	if (int_wordlist == NULL)
+	ఒకవేళ (int_wordlist == ఖాళీ)
 	{
 	    int_wordlist = vim_tempname('s', FALSE);
-	    if (int_wordlist == NULL)
-		return;
+	    ఒకవేళ (int_wordlist == ఖాళీ)
+		తిరిగి;
 	}
 	fname = int_wordlist;
     }
-    else
+    లేకపోతే
     {
 	// If 'spellfile' isn't set figure out a good default value.
-	if (*curwin->w_s->b_p_spf == NUL)
+	ఒకవేళ (*curwin->w_s->b_p_spf == NUL)
 	{
 	    init_spellfile();
 	    new_spf = TRUE;
 	}
 
-	if (*curwin->w_s->b_p_spf == NUL)
+	ఒకవేళ (*curwin->w_s->b_p_spf == NUL)
 	{
-	    semsg(_(e_option_str_is_not_set), "spellfile");
-	    return;
+	    semsg(_(e_option_str_is_not_సమితి), "spellfile");
+	    తిరిగి;
 	}
 	fnamebuf = alloc(MAXPATHL);
-	if (fnamebuf == NULL)
-	    return;
+	ఒకవేళ (fnamebuf == ఖాళీ)
+	    తిరిగి;
 
-	for (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
+	కొరకు (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
 	{
 	    copy_option_part(&spf, fnamebuf, MAXPATHL, ",");
-	    if (i == idx)
-		break;
-	    if (*spf == NUL)
+	    ఒకవేళ (i == idx)
+		ఆపు;
+	    ఒకవేళ (*spf == NUL)
 	    {
 		semsg(_(e_spellfile_does_not_have_nr_entries), idx);
 		vim_free(fnamebuf);
-		return;
+		తిరిగి;
 	    }
 	}
 
 	// Check that the user isn't editing the .add file somewhere.
 	buf = buflist_findname_exp(fnamebuf);
-	if (buf != NULL && buf->b_ml.ml_mfp == NULL)
-	    buf = NULL;
-	if (buf != NULL && bufIsChanged(buf))
+	ఒకవేళ (buf != ఖాళీ && buf->b_ml.ml_mfp == ఖాళీ)
+	    buf = ఖాళీ;
+	ఒకవేళ (buf != ఖాళీ && buf_Is_మారింది(buf))
 	{
-	    emsg(_(e_file_is_loaded_in_another_buffer));
+	    emsg(_(e_file_is_loaded_లోపల_another_బఫరు));
 	    vim_free(fnamebuf);
-	    return;
+	    తిరిగి;
 	}
 
 	fname = fnamebuf;
     }
 
-    if (what == SPELL_ADD_BAD || undo)
+    ఒకవేళ (what == SPELL_కూడు_BAD || undo)
     {
 	// When the word appears as good word we need to remove that one,
 	// since its flags sort before the one with WF_BANNED.
-	fd = mch_fopen((char *)fname, "r");
-	if (fd != NULL)
+	fd = mch_fopen((అక్షరం *)fname, "r");
+	ఒకవేళ (fd != ఖాళీ)
 	{
-	    while (!vim_fgets(line, MAXWLEN * 2, fd))
+	    అయితే (!vim_fgets(పంక్తి, MAXWLEN * 2, fd))
 	    {
-		fpos = fpos_next;
-		fpos_next = ftell(fd);
-		if (fpos_next < 0)
-		    break;  // should never happen
-		linelen = STRLEN(line);
-		if (linelen >= (size_t)len
-			&& STRNCMP(word, line, len) == 0
-			&& (line[len] == '/' || line[len] < ' '))
+		fpos = fpos_తదుపరి;
+		fpos_తదుపరి = ftell(fd);
+		ఒకవేళ (fpos_తదుపరి < 0)
+		    ఆపు;  // should never happen
+		linelen = STRLEN(పంక్తి);
+		ఒకవేళ (linelen >= (size_t)len
+			&& STRNCMP(మాట, పంక్తి, len) == 0
+			&& (పంక్తి[len] == '/' || పంక్తి[len] < ' '))
 		{
 		    // Found duplicate word.  Remove it by writing a '#' at
 		    // the start of the line.  Mixing reading and writing
 		    // doesn't work for all systems, close the file first.
 		    fclose(fd);
-		    fd = mch_fopen((char *)fname, "r+");
-		    if (fd == NULL)
-			break;
-		    if (fseek(fd, fpos, SEEK_SET) == 0)
+		    fd = mch_fopen((అక్షరం *)fname, "r+");
+		    ఒకవేళ (fd == ఖాళీ)
+			ఆపు;
+		    ఒకవేళ (fseek(fd, fpos, SEEK_SET) == 0)
 		    {
 			fputc('#', fd);
-			if (undo)
+			ఒకవేళ (undo)
 			{
-			    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
+			    home_replace(ఖాళీ, fname, NameBuff, MAXPATHL, TRUE);
 			    smsg(_("Word '%.*s' removed from %s"),
-							 len, word, NameBuff);
+							 len, మాట, NameBuff);
 			}
 		    }
-		    if (fseek(fd, fpos_next, SEEK_SET) != 0)
+		    ఒకవేళ (fseek(fd, fpos_తదుపరి, SEEK_SET) != 0)
 		    {
 			PERROR(_("Seek error in spellfile"));
-			break;
+			ఆపు;
 		    }
 		}
 	    }
-	    if (fd != NULL)
+	    ఒకవేళ (fd != ఖాళీ)
 		fclose(fd);
 	}
     }
 
-    if (!undo)
+    ఒకవేళ (!undo)
     {
-	fd = mch_fopen((char *)fname, "a");
-	if (fd == NULL && new_spf)
+	fd = mch_fopen((అక్షరం *)fname, "a");
+	ఒకవేళ (fd == ఖాళీ && new_spf)
 	{
 	    char_u *p;
 
@@ -6459,44 +6459,44 @@ spell_add_word(
 	    // file.  We may need to create the "spell" directory first.  We
 	    // already checked the runtime directory is writable in
 	    // init_spellfile().
-	    if (!dir_of_file_exists(fname) && (p = gettail_sep(fname)) != fname)
+	    ఒకవేళ (!dir_యొక్క_file_exists(fname) && (p = gettail_sep(fname)) != fname)
 	    {
-		int c = *p;
+		పూర్ణాంకం c = *p;
 
 		// The directory doesn't exist.  Try creating it and opening
 		// the file again.
 		*p = NUL;
 		vim_mkdir(fname, 0755);
 		*p = c;
-		fd = mch_fopen((char *)fname, "a");
+		fd = mch_fopen((అక్షరం *)fname, "a");
 	    }
 	}
 
-	if (fd == NULL)
+	ఒకవేళ (fd == ఖాళీ)
 	    semsg(_(e_cant_open_file_str), fname);
-	else
+	లేకపోతే
 	{
-	    if (what == SPELL_ADD_BAD)
-		fprintf(fd, "%.*s/!\n", len, word);
-	    else if (what == SPELL_ADD_RARE)
-		fprintf(fd, "%.*s/?\n", len, word);
-	    else
-		fprintf(fd, "%.*s\n", len, word);
+	    ఒకవేళ (what == SPELL_కూడు_BAD)
+		fprintf(fd, "%.*s/!\n", len, మాట);
+	    లేకపోతే ఒకవేళ (what == SPELL_కూడు_RARE)
+		fprintf(fd, "%.*s/?\n", len, మాట);
+	    లేకపోతే
+		fprintf(fd, "%.*s\n", len, మాట);
 	    fclose(fd);
 
-	    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
-	    smsg(_("Word '%.*s' added to %s"), len, word, NameBuff);
+	    home_replace(ఖాళీ, fname, NameBuff, MAXPATHL, TRUE);
+	    smsg(_("Word '%.*s' added to %s"), len, మాట, NameBuff);
 	}
     }
 
-    if (fd != NULL)
+    ఒకవేళ (fd != ఖాళీ)
     {
 	// Update the .add.spl file.
 	mkspell(1, &fname, FALSE, TRUE, TRUE);
 
 	// If the .add file is edited somewhere, reload it.
-	if (buf != NULL)
-	    buf_reload(buf, buf->b_orig_mode, FALSE);
+	ఒకవేళ (buf != ఖాళీ)
+	    buf_reload(buf, buf->b_orig_బహుళకం, FALSE);
 
 	redraw_all_later(UPD_SOME_VALID);
     }
@@ -6506,30 +6506,30 @@ spell_add_word(
 /*
  * Initialize 'spellfile' for the current buffer.
  */
-    static void
-init_spellfile(void)
+    స్థిర శూన్య
+init_spellfile(శూన్య)
 {
     string_T	buf;
     char_u	*fname;
     char_u	*rtp;
     char_u	*lend;
-    int		aspath = FALSE;
+    పూర్ణాంకం		aspath = FALSE;
     char_u	*lstart = curbuf->b_s.b_p_spl;
 
-    if (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
-	return;
+    ఒకవేళ (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
+	తిరిగి;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    ఒకవేళ (buf.string == ఖాళీ)
+	తిరిగి;
 
-    buf.length = 0;
+    buf.నిడివి = 0;
 
     // Find the end of the language name.  Exclude the region.  If there
     // is a path separator remember the start of the tail.
-    for (lend = curwin->w_s->b_p_spl; *lend != NUL
-	    && vim_strchr((char_u *)",._", *lend) == NULL; ++lend)
-	if (vim_ispathsep(*lend))
+    కొరకు (lend = curwin->w_s->b_p_spl; *lend != NUL
+	    && vim_strchr((char_u *)",._", *lend) == ఖాళీ; ++lend)
+	ఒకవేళ (vim_ispathsep(*lend))
 	{
 	    aspath = TRUE;
 	    lstart = lend + 1;
@@ -6538,51 +6538,51 @@ init_spellfile(void)
     // Loop over all entries in 'runtimepath'.  Use the first one where we
     // are allowed to write.
     rtp = p_rtp;
-    while (*rtp != NUL)
+    అయితే (*rtp != NUL)
     {
-	if (aspath)
+	ఒకవేళ (aspath)
 	    // Use directory of an entry with path, e.g., for
 	    // "/dir/lg.utf-8.spl" use "/dir".
 	    vim_strncpy(buf.string, curbuf->b_s.b_p_spl,
 		    lstart - curbuf->b_s.b_p_spl - 1);
-	else
+	లేకపోతే
 	    // Copy the path from 'runtimepath' to buf[].
-	    buf.length = (size_t)copy_option_part(&rtp, buf.string, MAXPATHL, ",");
-	if (filewritable(buf.string) == 2)
+	    buf.నిడివి = (size_t)copy_option_part(&rtp, buf.string, MAXPATHL, ",");
+	ఒకవేళ (filewritable(buf.string) == 2)
 	{
 	    // Use the first language name from 'spelllang' and the
 	    // encoding used in the first loaded .spl file.
-	    if (aspath)
+	    ఒకవేళ (aspath)
 	    {
-		buf.length = (size_t)(lend - curbuf->b_s.b_p_spl);
-		vim_strncpy(buf.string, curbuf->b_s.b_p_spl, buf.length);
+		buf.నిడివి = (size_t)(lend - curbuf->b_s.b_p_spl);
+		vim_strncpy(buf.string, curbuf->b_s.b_p_spl, buf.నిడివి);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Create the "spell" directory if it doesn't exist yet.
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		    MAXPATHL - buf.length, "/spell");
-		if (filewritable(buf.string) != 2)
+		buf.నిడివి += vim_snprintf_safelen((అక్షరం *)buf.string + buf.నిడివి,
+		    MAXPATHL - buf.నిడివి, "/spell");
+		ఒకవేళ (filewritable(buf.string) != 2)
 		{
-		    if (vim_mkdir(buf.string, 0755) != 0)
+		    ఒకవేళ (vim_mkdir(buf.string, 0755) != 0)
 		    {
 			vim_free(buf.string);
-			return;
+			తిరిగి;
 		    }
 		}
 
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		    MAXPATHL - buf.length, "/%.*s", (int)(lend - lstart), lstart);
+		buf.నిడివి += vim_snprintf_safelen((అక్షరం *)buf.string + buf.నిడివి,
+		    MAXPATHL - buf.నిడివి, "/%.*s", (పూర్ణాంకం)(lend - lstart), lstart);
 	    }
-	    fname = LANGP_ENTRY(curwin->w_s->b_langp, 0)
+	    fname = LANGP_నమోదు(curwin->w_s->b_langp, 0)
 		->lp_slang->sl_fname;
-	    vim_snprintf((char *)buf.string + buf.length, MAXPATHL - buf.length,
+	    vim_snprintf((అక్షరం *)buf.string + buf.నిడివి, MAXPATHL - buf.నిడివి,
 		".%s.add",
-		fname != NULL && strstr((char *)gettail(fname), ".ascii.") != NULL
+		fname != ఖాళీ && అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(fname), ".ascii.") != ఖాళీ
 		    ? (char_u *)"ascii" : spell_enc());
-	    set_option_value_give_err((char_u *)"spellfile",
+	    సమితి_option_విలువ_give_err((char_u *)"spellfile",
 		    0L, buf.string, OPT_LOCAL);
-	    break;
+	    ఆపు;
 	}
 	aspath = FALSE;
     }
@@ -6595,44 +6595,44 @@ init_spellfile(void)
 /*
  * Set the spell character tables from strings in the affix file.
  */
-    static int
-set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
+    స్థిర పూర్ణాంకం
+సమితి_spell_chartab(char_u *fol, char_u *దిగువ, char_u *upp)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    char_u	*pf = fol, *pl = low, *pu = upp;
-    int		f, l, u;
+    char_u	*pf = fol, *pl = దిగువ, *pu = upp;
+    పూర్ణాంకం		f, l, u;
 
     clear_spell_chartab(&new_st);
 
-    while (*pf != NUL)
+    అయితే (*pf != NUL)
     {
-	if (*pl == NUL || *pu == NUL)
+	ఒకవేళ (*pl == NUL || *pu == NUL)
 	{
-	    emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	    return FAIL;
+	    emsg(_(e_format_error_లోపల_affix_file_fol_దిగువ_or_upp));
+	    తిరిగి FAIL;
 	}
 	f = mb_ptr2char_adv(&pf);
 	l = mb_ptr2char_adv(&pl);
 	u = mb_ptr2char_adv(&pu);
 
 	// Every character that appears is a word character.
-	if (f < 256)
+	ఒకవేళ (f < 256)
 	    new_st.st_isw[f] = TRUE;
-	if (l < 256)
+	ఒకవేళ (l < 256)
 	    new_st.st_isw[l] = TRUE;
-	if (u < 256)
+	ఒకవేళ (u < 256)
 	    new_st.st_isw[u] = TRUE;
 
 	// if "LOW" and "FOL" are not the same the "LOW" char needs
 	// case-folding
-	if (l < 256 && l != f)
+	ఒకవేళ (l < 256 && l != f)
 	{
-	    if (f >= 256)
+	    ఒకవేళ (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_లోపల_fol_దిగువ_or_upp_is_బహిర్గతం_యొక్క_range));
+		తిరిగి FAIL;
 	    }
 	    new_st.st_fold[l] = f;
 	}
@@ -6640,154 +6640,154 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	// if "UPP" and "FOL" are not the same the "UPP" char needs
 	// case-folding, it's upper case and the "UPP" is the upper case of
 	// "FOL" .
-	if (u < 256 && u != f)
+	ఒకవేళ (u < 256 && u != f)
 	{
-	    if (f >= 256)
+	    ఒకవేళ (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_లోపల_fol_దిగువ_or_upp_is_బహిర్గతం_యొక్క_range));
+		తిరిగి FAIL;
 	    }
 	    new_st.st_fold[u] = f;
 	    new_st.st_isu[u] = TRUE;
-	    new_st.st_upper[f] = u;
+	    new_st.st_పై[f] = u;
 	}
     }
 
-    if (*pl != NUL || *pu != NUL)
+    ఒకవేళ (*pl != NUL || *pu != NUL)
     {
-	emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	return FAIL;
+	emsg(_(e_format_error_లోపల_affix_file_fol_దిగువ_or_upp));
+	తిరిగి FAIL;
     }
 
-    return set_spell_finish(&new_st);
+    తిరిగి సమితి_spell_ముగింపు(&new_st);
 }
 
 /*
  * Set the spell character tables from strings in the .spl file.
  */
-    static void
-set_spell_charflags(
+    స్థిర శూన్య
+సమితి_spell_charflags(
     char_u	*flags,
-    int		cnt,	    // length of "flags"
+    పూర్ణాంకం		cnt,	    // length of "flags"
     char_u	*fol)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p = fol;
-    int		c;
+    పూర్ణాంకం		c;
 
     clear_spell_chartab(&new_st);
 
-    for (i = 0; i < 128; ++i)
+    కొరకు (i = 0; i < 128; ++i)
     {
-	if (i < cnt)
+	ఒకవేళ (i < cnt)
 	{
-	    new_st.st_isw[i + 128] = (flags[i] & CF_WORD) != 0;
-	    new_st.st_isu[i + 128] = (flags[i] & CF_UPPER) != 0;
+	    new_st.st_isw[i + 128] = (flags[i] & CF_మాట) != 0;
+	    new_st.st_isu[i + 128] = (flags[i] & CF_పై) != 0;
 	}
 
-	if (*p != NUL)
+	ఒకవేళ (*p != NUL)
 	{
 	    c = mb_ptr2char_adv(&p);
 	    new_st.st_fold[i + 128] = c;
-	    if (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
-		new_st.st_upper[c] = i + 128;
+	    ఒకవేళ (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
+		new_st.st_పై[c] = i + 128;
 	}
     }
 
-    (void)set_spell_finish(&new_st);
+    (శూన్య)సమితి_spell_ముగింపు(&new_st);
 }
 
-    static int
-set_spell_finish(spelltab_T *new_st)
+    స్థిర పూర్ణాంకం
+సమితి_spell_ముగింపు(spelltab_T *new_st)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (did_set_spelltab)
+    ఒకవేళ (did_సమితి_spelltab)
     {
 	// check that it's the same table
-	for (i = 0; i < 256; ++i)
+	కొరకు (i = 0; i < 256; ++i)
 	{
-	    if (spelltab.st_isw[i] != new_st->st_isw[i]
+	    ఒకవేళ (spelltab.st_isw[i] != new_st->st_isw[i]
 		    || spelltab.st_isu[i] != new_st->st_isu[i]
 		    || spelltab.st_fold[i] != new_st->st_fold[i]
-		    || spelltab.st_upper[i] != new_st->st_upper[i])
+		    || spelltab.st_పై[i] != new_st->st_పై[i])
 	    {
-		emsg(_(e_word_characters_differ_between_spell_files));
-		return FAIL;
+		emsg(_(e_మాట_characters_తేడా_between_spell_files));
+		తిరిగి FAIL;
 	    }
 	}
     }
-    else
+    లేకపోతే
     {
 	// copy the new spelltab into the one being used
 	spelltab = *new_st;
-	did_set_spelltab = TRUE;
+	did_సమితి_spelltab = TRUE;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Write the table with prefix conditions to the .spl file.
  * When "fd" is NULL only count the length of what is written and return it.
  */
-    static int
+    స్థిర పూర్ణాంకం
 write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv)
 {
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*p;
-    int		len;
-    int		totlen;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		totlen;
 
-    if (fd != NULL)
-	put_bytes(fd, (long_u)gap->ga_len, 2);	    // <prefcondcnt>
+    ఒకవేళ (fd != ఖాళీ)
+	put_బైట్లు(fd, (long_u)gap->ga_len, 2);	    // <prefcondcnt>
 
     totlen = 2 + gap->ga_len; // length of <prefcondcnt> and <condlen> bytes
 
-    for (i = 0; i < gap->ga_len; ++i)
+    కొరకు (i = 0; i < gap->ga_len; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
-	p = ((char_u **)gap->ga_data)[i];
-	if (p != NULL)
+	p = ((char_u **)gap->ga_దత్తాంశం)[i];
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    len = (int)STRLEN(p);
-	    if (fd != NULL)
+	    len = (పూర్ణాంకం)STRLEN(p);
+	    ఒకవేళ (fd != ఖాళీ)
 	    {
 		fputc(len, fd);
 		*fwv &= fwrite(p, (size_t)len, (size_t)1, fd);
 	    }
 	    totlen += len;
 	}
-	else if (fd != NULL)
+	లేకపోతే ఒకవేళ (fd != ఖాళీ)
 	    fputc(0, fd);
     }
 
-    return totlen;
+    తిరిగి totlen;
 }
 
 /*
  * Use map string "map" for languages "lp".
  */
-    static void
-set_map_str(slang_T *lp, char_u *map)
+    స్థిర శూన్య
+సమితి_map_str(slang_T *lp, char_u *map)
 {
     char_u	*p;
-    int		headc = 0;
-    int		c;
-    int		i;
+    పూర్ణాంకం		headc = 0;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		i;
 
-    if (*map == NUL)
+    ఒకవేళ (*map == NUL)
     {
 	lp->sl_has_map = FALSE;
-	return;
+	తిరిగి;
     }
     lp->sl_has_map = TRUE;
 
     // Init the array and hash tables empty.
-    for (i = 0; i < 256; ++i)
+    కొరకు (i = 0; i < 256; ++i)
 	lp->sl_map_array[i] = 0;
     hash_init(&lp->sl_map_hash);
 
@@ -6796,50 +6796,50 @@ set_map_str(slang_T *lp, char_u *map)
      * "aaa/bbb/ccc/".  Fill sl_map_array[c] with the character before c and
      * before the same slash.  For characters above 255 sl_map_hash is used.
      */
-    for (p = map; *p != NUL; )
+    కొరకు (p = map; *p != NUL; )
     {
 	c = mb_cptr2char_adv(&p);
-	if (c == '/')
+	ఒకవేళ (c == '/')
 	    headc = 0;
-	else
+	లేకపోతే
 	{
-	    if (headc == 0)
+	    ఒకవేళ (headc == 0)
 		 headc = c;
 
 	    // Characters above 255 don't fit in sl_map_array[], put them in
 	    // the hash table.  Each entry is the char, a NUL the headchar and
 	    // a NUL.
-	    if (c >= 256)
+	    ఒకవేళ (c >= 256)
 	    {
-		int	    cl = mb_char2len(c);
-		int	    headcl = mb_char2len(headc);
+		పూర్ణాంకం	    cl = mb_char2len(c);
+		పూర్ణాంకం	    headcl = mb_char2len(headc);
 		char_u	    *b;
 		hash_T	    hash;
 		hashitem_T  *hi;
 
 		b = alloc(cl + headcl + 2);
-		if (b == NULL)
-		    return;
+		ఒకవేళ (b == ఖాళీ)
+		    తిరిగి;
 		mb_char2bytes(c, b);
 		b[cl] = NUL;
 		mb_char2bytes(headc, b + cl + 1);
 		b[cl + 1 + headcl] = NUL;
 		hash = hash_hash(b);
 		hi = hash_lookup(&lp->sl_map_hash, b, hash);
-		if (HASHITEM_EMPTY(hi))
-		    hash_add_item(&lp->sl_map_hash, hi, b, hash);
-		else
+		ఒకవేళ (HASHITEM_ఖాళీలు(hi))
+		    hash_కూడు_అంశం(&lp->sl_map_hash, hi, b, hash);
+		లేకపోతే
 		{
 		    // This should have been checked when generating the .spl
 		    // file.
-		    emsg(_(e_duplicate_char_in_map_entry));
+		    emsg(_(e_duplicate_char_లోపల_map_నమోదు));
 		    vim_free(b);
 		}
 	    }
-	    else
+	    లేకపోతే
 		lp->sl_map_array[c] = headc;
 	}
     }
 }
 
-#endif  // FEAT_SPELL
+#అయితే_ముగింపు  // FEAT_SPELL

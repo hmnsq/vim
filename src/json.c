@@ -12,29 +12,29 @@
  *
  * Follows this standard: https://tools.ietf.org/html/rfc7159.html
  */
-#define USING_FLOAT_STUFF
+#నిర్వచించు USING_FLOAT_STUFF
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
-static int json_encode_item(garray_T *gap, typval_T *val, int copyID, int options);
+స్థిర పూర్ణాంకం json_encode_అంశం(garray_T *gap, typval_T *val, పూర్ణాంకం copyID, పూర్ణాంకం options);
 
 /*
  * Encode "val" into a JSON format string.
  * The result is added to "gap"
  * Returns FAIL on failure and makes gap->ga_data empty.
  */
-    static int
-json_encode_gap(garray_T *gap, typval_T *val, int options)
+    స్థిర పూర్ణాంకం
+json_encode_gap(garray_T *gap, typval_T *val, పూర్ణాంకం options)
 {
-    if (json_encode_item(gap, val, get_copyID(), options) == FAIL)
+    ఒకవేళ (json_encode_అంశం(gap, val, get_copyID(), options) == FAIL)
     {
 	ga_clear(gap);
-	gap->ga_data = vim_strsave((char_u *)"");
-	return FAIL;
+	gap->ga_దత్తాంశం = vim_strsave((char_u *)"");
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -44,49 +44,49 @@ json_encode_gap(garray_T *gap, typval_T *val, int options)
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  */
     char_u *
-json_encode(typval_T *val, int options)
+json_encode(typval_T *val, పూర్ణాంకం options)
 {
     garray_T ga;
 
     // Store bytes in the growarray.
     ga_init2(&ga, 1, 4000);
     json_encode_gap(&ga, val, options);
-    if (options & JSON_NL)
+    ఒకవేళ (options & JSON_NL)
 	ga_append(&ga, NL);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    తిరిగి ga.ga_దత్తాంశం;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
 /*
  * Encode ["nr", "val"] into a JSON format string in allocated memory.
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_సమాసం(పూర్ణాంకం nr, typval_T *val, పూర్ణాంకం options)
 {
     typval_T	listtv;
     typval_T	nrtv;
     garray_T	ga;
 
-    nrtv.v_type = VAR_NUMBER;
-    nrtv.vval.v_number = nr;
-    if (rettv_list_alloc(&listtv) == FAIL)
-	return NULL;
-    if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
+    nrtv.v_type = VAR_సంఖ్య;
+    nrtv.vval.v_సంఖ్య = nr;
+    ఒకవేళ (rettv_list_alloc(&listtv) == FAIL)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
 	    || list_append_tv(listtv.vval.v_list, val) == FAIL)
     {
 	list_unref(listtv.vval.v_list);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
+    ఒకవేళ (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
 	ga_append(&ga, '\n');
     list_unref(listtv.vval.v_list);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    తిరిగి ga.ga_దత్తాంశం;
 }
 
 /*
@@ -94,33 +94,33 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_lsp_msg(typval_T *val)
+json_encode_lsp_సందేశం(typval_T *val)
 {
     garray_T	ga;
     garray_T	lspga;
     size_t	IObufflen;
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, val, 0) == FAIL)
-	return NULL;
+    ఒకవేళ (json_encode_gap(&ga, val, 0) == FAIL)
+	తిరిగి ఖాళీ;
     ga_append(&ga, NUL);
 
     ga_init2(&lspga, 1, 4000);
     // Header according to LSP specification.
-    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
+    IObufflen = vim_snprintf_safelen((అక్షరం *)IObuff, IOSIZE,
 	    "Content-Length: %u\r\n\r\n",
 	    ga.ga_len - 1);
     ga_concat_len(&lspga, IObuff, IObufflen);
-    ga_concat_len(&lspga, ga.ga_data, ga.ga_len);
+    ga_concat_len(&lspga, ga.ga_దత్తాంశం, ga.ga_len);
     ga_clear(&ga);
-    return lspga.ga_data;
+    తిరిగి lspga.ga_దత్తాంశం;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Lookup table to quickly know if the given ASCII character must be escaped.
  */
-static const char ascii_needs_escape[128] = {
+స్థిర స్థిరరాశి అక్షరం ascii_needs_escape[128] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x0.
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x1.
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x2.
@@ -134,75 +134,75 @@ static const char ascii_needs_escape[128] = {
 /*
  * Encode the utf-8 encoded string "str" into "gap".
  */
-    static void
+    స్థిర శూన్య
 write_string(garray_T *gap, char_u *str)
 {
     char_u	*res = str;
     char_u	numbuf[NUMBUFLEN];
     char_u	*from;
-#if defined(USE_ICONV)
+#ఒకవేళ defined(USE_ICONV)
     vimconv_T   conv;
-    char_u	*converted = NULL;
-#endif
-    int		c;
+    char_u	*converted = ఖాళీ;
+#అయితే_ముగింపు
+    పూర్ణాంకం		c;
 
-    if (res == NULL)
+    ఒకవేళ (res == ఖాళీ)
     {
 	GA_CONCAT_LITERAL(gap, "\"\"");
-	return;
+	తిరిగి;
     }
 
-#if defined(USE_ICONV)
-    if (!enc_utf8)
+#ఒకవేళ defined(USE_ICONV)
+    ఒకవేళ (!enc_utf8)
     {
 	// Convert the text from 'encoding' to utf-8, because a JSON string is
 	// always utf-8.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, p_enc, (char_u*)"utf-8");
-	if (conv.vc_type != CONV_NONE)
-	    converted = res = string_convert(&conv, res, NULL);
-	convert_setup(&conv, NULL, NULL);
+	convert_అమరిక(&conv, p_enc, (char_u*)"utf-8");
+	ఒకవేళ (conv.vc_type != CONV_NONE)
+	    converted = res = string_convert(&conv, res, ఖాళీ);
+	convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
     }
-#endif
+#అయితే_ముగింపు
     ga_append(gap, '"');
     // Pre-grow for the common case: input length + quotes + some escapes.
-    ga_grow(gap, (int)STRLEN(res) + 2);
+    ga_grow(gap, (పూర్ణాంకం)STRLEN(res) + 2);
     // `from` is the beginning of a sequence of bytes we can directly copy from
     // the input string, avoiding the overhead associated to decoding/encoding
     // them.
     from = res;
-    while ((c = *res) != NUL)
+    అయితే ((c = *res) != NUL)
     {
 	// always use utf-8 encoding, ignore 'encoding'
-	if (c < 0x80)
+	ఒకవేళ (c < 0x80)
 	{
-	    if (!ascii_needs_escape[c])
+	    ఒకవేళ (!ascii_needs_escape[c])
 	    {
 		res += 1;
-		continue;
+		కొనసాగు;
 	    }
 
-	    if (res != from)
+	    ఒకవేళ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
-	    switch (c)
+	    ఎంపిక (c)
 	    {
-		case 0x08:
-		    GA_CONCAT_LITERAL(gap, "\\b"); break;
-		case 0x09:
-		    GA_CONCAT_LITERAL(gap, "\\t"); break;
-		case 0x0a:
-		    GA_CONCAT_LITERAL(gap, "\\n"); break;
-		case 0x0c:
-		    GA_CONCAT_LITERAL(gap, "\\f"); break;
-		case 0x0d:
-		    GA_CONCAT_LITERAL(gap, "\\r"); break;
-		case 0x22: // "
-		    GA_CONCAT_LITERAL(gap, "\\\""); break;
-		case 0x5c: // backslash
-		    GA_CONCAT_LITERAL(gap, "\\\\"); break;
-		default:
+		స్థితి 0x08:
+		    GA_CONCAT_LITERAL(gap, "\\b"); ఆపు;
+		స్థితి 0x09:
+		    GA_CONCAT_LITERAL(gap, "\\t"); ఆపు;
+		స్థితి 0x0a:
+		    GA_CONCAT_LITERAL(gap, "\\n"); ఆపు;
+		స్థితి 0x0c:
+		    GA_CONCAT_LITERAL(gap, "\\f"); ఆపు;
+		స్థితి 0x0d:
+		    GA_CONCAT_LITERAL(gap, "\\r"); ఆపు;
+		స్థితి 0x22: // "
+		    GA_CONCAT_LITERAL(gap, "\\\""); ఆపు;
+		స్థితి 0x5c: // backslash
+		    GA_CONCAT_LITERAL(gap, "\\\\"); ఆపు;
+		అప్రమేయ:
 		{
 		    char_u escaped[] = "\\u0000";
 
@@ -215,20 +215,20 @@ write_string(garray_T *gap, char_u *str)
 
 	    res += 1;
 	}
-	else
+	లేకపోతే
 	{
-	    int	    l = utf_ptr2len(res);
+	    పూర్ణాంకం	    l = utf_ptr2len(res);
 	    size_t  numbuflen;
 
-	    if (l > 1)
+	    ఒకవేళ (l > 1)
 	    {
 		res += l;
-		continue;
+		కొనసాగు;
 	    }
 
 	    // Invalid utf-8 sequence, replace it with the Unicode replacement
 	    // character U+FFFD.
-	    if (res != from)
+	    ఒకవేళ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -240,13 +240,13 @@ write_string(garray_T *gap, char_u *str)
 	}
     }
 
-    if (res != from)
+    ఒకవేళ (res != from)
 	ga_concat_len(gap, from, res - from);
 
     ga_append(gap, '"');
-#if defined(USE_ICONV)
+#ఒకవేళ defined(USE_ICONV)
     vim_free(converted);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -254,53 +254,53 @@ write_string(garray_T *gap, char_u *str)
  * That is when it starts with a letter and only contains letters, digits and
  * underscore.
  */
-    static int
-is_simple_key(char_u *key)
+    స్థిర పూర్ణాంకం
+is_simple_కీలకం(char_u *కీలకం)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
-	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
-	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
-	    return FALSE;
-    return TRUE;
+    ఒకవేళ (!ASCII_ISALPHA(*కీలకం))
+	తిరిగి FALSE;
+    కొరకు (p = కీలకం + 1; *p != NUL; ++p)
+	ఒకవేళ (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
+	    తిరిగి FALSE;
+    తిరిగి TRUE;
 }
 
-typedef enum {
+రకనిర్వచనం గణన {
     ENC_LIST,
     ENC_TUPLE,
     ENC_DICT,
 } json_enc_type_T;
 
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     json_enc_type_T je_type;
-    int		    je_options;	    // options when this container was entered
-    union {
-	struct {
+    పూర్ణాంకం		    je_options;	    // options when this container was entered
+    సంఘం {
+	నిర్మాణం {
 	    list_T	*list;
 	    listitem_T	*li;	    // current item
 	} l;
-	struct {
+	నిర్మాణం {
 	    tuple_T	*tuple;
-	    int		idx;	    // current index
-	    int		len;
+	    పూర్ణాంకం		idx;	    // current index
+	    పూర్ణాంకం		len;
 	} t;
-	struct {
+	నిర్మాణం {
 	    dict_T	*dict;
 	    hashitem_T	*hi;	    // current entry
-	    int		todo;	    // remaining entries
+	    పూర్ణాంకం		todo;	    // remaining entries
 	} d;
     } je_u;
-} json_enc_frame_T;
+} json_enc_చట్రం_T;
 
 /*
  * Encode "val" into "gap".
  * Uses an explicit stack to avoid deep recursion on nested structures.
  * Return FAIL or OK.
  */
-    static int
-json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
+    స్థిర పూర్ణాంకం
+json_encode_అంశం(garray_T *gap, typval_T *val, పూర్ణాంకం copyID, పూర్ణాంకం options)
 {
     char_u		numbuf[NUMBUFLEN];
     char_u		*res;
@@ -308,418 +308,418 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     list_T		*l;
     tuple_T		*tuple;
     dict_T		*d;
-    int			i;
-    garray_T		stack;
+    పూర్ణాంకం			i;
+    garray_T		దొంతర;
     typval_T		*cur_val;
-    json_enc_frame_T	*frame;
+    json_enc_చట్రం_T	*చట్రం;
 
-    ga_init2(&stack, sizeof(json_enc_frame_T), 100);
+    ga_init2(&దొంతర, పరిమాణం(json_enc_చట్రం_T), 100);
     cur_val = val;
 
-    for (;;)
+    కొరకు (;;)
     {
-    switch (cur_val->v_type)
+    ఎంపిక (cur_val->v_type)
     {
-	case VAR_BOOL:
-	    switch ((long)cur_val->vval.v_number)
+	స్థితి VAR_BOOL:
+	    ఎంపిక ((దీర్ఘ)cur_val->vval.v_సంఖ్య)
 	    {
-		case VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); break;
-		case VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); break;
+		స్థితి VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); ఆపు;
+		స్థితి VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); ఆపు;
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_SPECIAL:
-	    switch ((long)cur_val->vval.v_number)
+	స్థితి VAR_SPECIAL:
+	    ఎంపిక ((దీర్ఘ)cur_val->vval.v_సంఖ్య)
 	    {
-		case VVAL_NONE: if ((options & JSON_JS) != 0
+		స్థితి VVAL_NONE: ఒకవేళ ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
 				    // empty item
-				    break;
+				    ఆపు;
 				// FALLTHROUGH
-		case VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); break;
+		స్థితి VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); ఆపు;
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_NUMBER:
+	స్థితి VAR_సంఖ్య:
 	    {
 		size_t  numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
-		    "%lld", (varnumber_T)cur_val->vval.v_number);
+		numbuflen = vim_snprintf_safelen((అక్షరం *)numbuf, పరిమాణం(numbuf),
+		    "%lld", (varnumber_T)cur_val->vval.v_సంఖ్య);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_STRING:
+	స్థితి VAR_STRING:
 	    res = cur_val->vval.v_string;
 	    write_string(gap, res);
-	    break;
+	    ఆపు;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	స్థితి VAR_FUNC:
+	స్థితి VAR_PARTIAL:
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_CLASS:
+	స్థితి VAR_OBJECT:
+	స్థితి VAR_TYPEALIAS:
 	    semsg(_(e_cannot_json_encode_str), vartype_name(cur_val->v_type));
-	    goto theend;
+	    వెళ్ళు theend;
 
-	case VAR_BLOB:
+	స్థితి VAR_BLOB:
 	    b = cur_val->vval.v_blob;
-	    if (b == NULL || b->bv_ga.ga_len == 0)
+	    ఒకవేళ (b == ఖాళీ || b->bv_ga.ga_len == 0)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    లేకపోతే
 	    {
-		int	blen = b->bv_ga.ga_len;
+		పూర్ణాంకం	blen = b->bv_ga.ga_len;
 		char_u	*src;
 		char_u	*dst;
 
 		// Worst case: '[' + ']' + per-byte 3 digits + comma = 2 + 4*blen
-		if (ga_grow(gap, 2 + 4 * blen) == FAIL)
-		    goto theend;
-		src = (char_u *)b->bv_ga.ga_data;
-		dst = (char_u *)gap->ga_data + gap->ga_len;
+		ఒకవేళ (ga_grow(gap, 2 + 4 * blen) == FAIL)
+		    వెళ్ళు theend;
+		src = (char_u *)b->bv_ga.ga_దత్తాంశం;
+		dst = (char_u *)gap->ga_దత్తాంశం + gap->ga_len;
 		*dst++ = '[';
-		for (i = 0; i < blen; i++)
+		కొరకు (i = 0; i < blen; i++)
 		{
-		    int	    byte = src[i];
+		    పూర్ణాంకం	    byte = src[i];
 
-		    if (i > 0)
+		    ఒకవేళ (i > 0)
 			*dst++ = ',';
-		    if (byte >= 100)
+		    ఒకవేళ (byte >= 100)
 		    {
 			*dst++ = '0' + byte / 100;
 			*dst++ = '0' + (byte / 10) % 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else if (byte >= 10)
+		    లేకపోతే ఒకవేళ (byte >= 10)
 		    {
 			*dst++ = '0' + byte / 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else
+		    లేకపోతే
 			*dst++ = '0' + byte;
 		}
 		*dst++ = ']';
-		gap->ga_len = (int)(dst - (char_u *)gap->ga_data);
+		gap->ga_len = (పూర్ణాంకం)(dst - (char_u *)gap->ga_దత్తాంశం);
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_LIST:
+	స్థితి VAR_LIST:
 	    l = cur_val->vval.v_list;
-	    if (l == NULL)
+	    ఒకవేళ (l == ఖాళీ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    లేకపోతే
 	    {
-		if (l->lv_copyID == copyID)
+		ఒకవేళ (l->lv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		లేకపోతే
 		{
 		    l->lv_copyID = copyID;
 		    ga_append(gap, '[');
 		    CHECK_LIST_MATERIALIZE(l);
-		    if (l->lv_first != NULL)
+		    ఒకవేళ (l->lv_మొదటి != ఖాళీ)
 		    {
-			if (stack.ga_len >= p_mfd)
+			ఒకవేళ (దొంతర.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_లోతు_is_higher_than_maxfuncdepth));
+			    వెళ్ళు theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_LIST;
-			frame->je_options = options;
-			frame->je_u.l.list = l;
-			frame->je_u.l.li = l->lv_first;
-			++stack.ga_len;
+			ఒకవేళ (ga_grow(&దొంతర, 1) == FAIL)
+			    వెళ్ళు theend;
+			చట్రం = ((json_enc_చట్రం_T *)దొంతర.ga_దత్తాంశం)
+							    + దొంతర.ga_len;
+			చట్రం->je_type = ENC_LIST;
+			చట్రం->je_options = options;
+			చట్రం->je_u.l.list = l;
+			చట్రం->je_u.l.li = l->lv_మొదటి;
+			++దొంతర.ga_len;
 			options = options & JSON_JS;
-			cur_val = &l->lv_first->li_tv;
-			continue;
+			cur_val = &l->lv_మొదటి->li_tv;
+			కొనసాగు;
 		    }
 		    ga_append(gap, ']');
 		    l->lv_copyID = 0;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_TUPLE:
+	స్థితి VAR_TUPLE:
 	    tuple = cur_val->vval.v_tuple;
-	    if (tuple == NULL)
+	    ఒకవేళ (tuple == ఖాళీ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    లేకపోతే
 	    {
-		if (tuple->tv_copyID == copyID)
+		ఒకవేళ (tuple->tv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		లేకపోతే
 		{
-		    int		len = TUPLE_LEN(tuple);
+		    పూర్ణాంకం		len = TUPLE_LEN(tuple);
 
-		    if (len > 0)
+		    ఒకవేళ (len > 0)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			ఒకవేళ (దొంతర.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_లోతు_is_higher_than_maxfuncdepth));
+			    వెళ్ళు theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_TUPLE;
-			frame->je_options = options;
-			frame->je_u.t.tuple = tuple;
-			frame->je_u.t.idx = 0;
-			frame->je_u.t.len = len;
-			++stack.ga_len;
+			ఒకవేళ (ga_grow(&దొంతర, 1) == FAIL)
+			    వెళ్ళు theend;
+			చట్రం = ((json_enc_చట్రం_T *)దొంతర.ga_దత్తాంశం)
+							    + దొంతర.ga_len;
+			చట్రం->je_type = ENC_TUPLE;
+			చట్రం->je_options = options;
+			చట్రం->je_u.t.tuple = tuple;
+			చట్రం->je_u.t.idx = 0;
+			చట్రం->je_u.t.len = len;
+			++దొంతర.ga_len;
 			options = options & JSON_JS;
-			cur_val = TUPLE_ITEM(tuple, 0);
-			continue;
+			cur_val = TUPLE_అంశం(tuple, 0);
+			కొనసాగు;
 		    }
-		    else
+		    లేకపోతే
 			GA_CONCAT_LITERAL(gap, "[]");
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_DICT:
+	స్థితి VAR_DICT:
 	    d = cur_val->vval.v_dict;
-	    if (d == NULL)
+	    ఒకవేళ (d == ఖాళీ)
 		GA_CONCAT_LITERAL(gap, "{}");
-	    else
+	    లేకపోతే
 	    {
-		if (d->dv_copyID == copyID)
+		ఒకవేళ (d->dv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "{}");
-		else
+		లేకపోతే
 		{
-		    int		todo = (int)d->dv_hashtab.ht_used;
+		    పూర్ణాంకం		todo = (పూర్ణాంకం)d->dv_hashtab.ht_వాడిన;
 		    hashitem_T	*hi;
 
-		    if (todo > 0)
+		    ఒకవేళ (todo > 0)
 		    {
 			d->dv_copyID = copyID;
 			ga_append(gap, '{');
 
 			// Find first non-empty hash entry
-			for (hi = d->dv_hashtab.ht_array;
-						  HASHITEM_EMPTY(hi); ++hi)
+			కొరకు (hi = d->dv_hashtab.ht_array;
+						  HASHITEM_ఖాళీలు(hi); ++hi)
 			    ;
 			--todo;
 
 			// Write first key
-			if ((options & JSON_JS)
-						 && is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			ఒకవేళ ((options & JSON_JS)
+						 && is_simple_కీలకం(hi->hi_కీలకం))
+			    ga_concat(gap, hi->hi_కీలకం);
+			లేకపోతే
+			    write_string(gap, hi->hi_కీలకం);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			ఒకవేళ (దొంతర.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_లోతు_is_higher_than_maxfuncdepth));
+			    వెళ్ళు theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_DICT;
-			frame->je_options = options;
-			frame->je_u.d.dict = d;
-			frame->je_u.d.hi = hi;
-			frame->je_u.d.todo = todo;
-			++stack.ga_len;
+			ఒకవేళ (ga_grow(&దొంతర, 1) == FAIL)
+			    వెళ్ళు theend;
+			చట్రం = ((json_enc_చట్రం_T *)దొంతర.ga_దత్తాంశం)
+							    + దొంతర.ga_len;
+			చట్రం->je_type = ENC_DICT;
+			చట్రం->je_options = options;
+			చట్రం->je_u.d.dict = d;
+			చట్రం->je_u.d.hi = hi;
+			చట్రం->je_u.d.todo = todo;
+			++దొంతర.ga_len;
 			options = options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
-			continue;
+			కొనసాగు;
 		    }
-		    else
+		    లేకపోతే
 			GA_CONCAT_LITERAL(gap, "{}");
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_FLOAT:
-#if defined(HAVE_MATH_H)
-	    if (isnan(cur_val->vval.v_float))
+	స్థితి VAR_FLOAT:
+#ఒకవేళ defined(HAVE_MATH_H)
+	    ఒకవేళ (isnan(cur_val->vval.v_float))
 		GA_CONCAT_LITERAL(gap, "NaN");
-	    else if (isinf(cur_val->vval.v_float))
+	    లేకపోతే ఒకవేళ (isinf(cur_val->vval.v_float))
 	    {
-		if (cur_val->vval.v_float < 0.0)
+		ఒకవేళ (cur_val->vval.v_float < 0.0)
 		    GA_CONCAT_LITERAL(gap, "-Infinity");
-		else
+		లేకపోతే
 		    GA_CONCAT_LITERAL(gap, "Infinity");
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    {
 		size_t	numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
+		numbuflen = vim_snprintf_safelen((అక్షరం *)numbuf, పరిమాణం(numbuf),
 		    "%g", cur_val->vval.v_float);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    internal_error_no_abort("json_encode_item()");
-	    goto theend;
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	    అంతర్గత_error_no_abort("json_encode_item()");
+	    వెళ్ళు theend;
     }
 
 	// Process the completed item by advancing containers or
 	// returning when the stack is empty.
-	for (;;)
+	కొరకు (;;)
 	{
-	    int		advance = FALSE;
+	    పూర్ణాంకం		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    ఒకవేళ (దొంతర.ga_len == 0)
 	    {
-		ga_clear(&stack);
-		return OK;
+		ga_clear(&దొంతర);
+		తిరిగి OK;
 	    }
 
-	    frame = ((json_enc_frame_T *)stack.ga_data)
-							+ stack.ga_len - 1;
-	    switch (frame->je_type)
+	    చట్రం = ((json_enc_చట్రం_T *)దొంతర.ga_దత్తాంశం)
+							+ దొంతర.ga_len - 1;
+	    ఎంపిక (చట్రం->je_type)
 	    {
-		case ENC_LIST:
+		స్థితి ENC_LIST:
 		{
-		    listitem_T	*li = frame->je_u.l.li;
+		    listitem_T	*li = చట్రం->je_u.l.li;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS)
-			    && li->li_next == NULL
+		    ఒకవేళ ((చట్రం->je_options & JSON_JS)
+			    && li->li_తదుపరి == ఖాళీ
 			    && li->li_tv.v_type == VAR_SPECIAL
-			    && li->li_tv.vval.v_number == VVAL_NONE)
+			    && li->li_tv.vval.v_సంఖ్య == VVAL_NONE)
 			ga_append(gap, ',');
 
-		    li = li->li_next;
-		    frame->je_u.l.li = li;
-		    if (li != NULL && !got_int)
+		    li = li->li_తదుపరి;
+		    చట్రం->je_u.l.li = li;
+		    ఒకవేళ (li != ఖాళీ && !got_int)
 		    {
 			ga_append(gap, ',');
-			options = frame->je_options & JSON_JS;
+			options = చట్రం->je_options & JSON_JS;
 			cur_val = &li->li_tv;
 			advance = TRUE;
-			break;
+			ఆపు;
 		    }
 		    ga_append(gap, ']');
-		    frame->je_u.l.list->lv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    చట్రం->je_u.l.list->lv_copyID = 0;
+		    --దొంతర.ga_len;
+		    ఆపు;
 		}
 
-		case ENC_TUPLE:
+		స్థితి ENC_TUPLE:
 		{
-		    int	    idx = frame->je_u.t.idx;
-		    int	    len = frame->je_u.t.len;
+		    పూర్ణాంకం	    idx = చట్రం->je_u.t.idx;
+		    పూర్ణాంకం	    len = చట్రం->je_u.t.len;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS) && idx == len - 1)
+		    ఒకవేళ ((చట్రం->je_options & JSON_JS) && idx == len - 1)
 		    {
-			typval_T *t_item =
-				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
+			typval_T *t_అంశం =
+				    TUPLE_అంశం(చట్రం->je_u.t.tuple, idx);
 
-			if (t_item->v_type == VAR_SPECIAL
-				&& t_item->vval.v_number == VVAL_NONE)
+			ఒకవేళ (t_అంశం->v_type == VAR_SPECIAL
+				&& t_అంశం->vval.v_సంఖ్య == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
 		    ++idx;
-		    frame->je_u.t.idx = idx;
-		    if (idx < len && !got_int)
+		    చట్రం->je_u.t.idx = idx;
+		    ఒకవేళ (idx < len && !got_int)
 		    {
 			ga_append(gap, ',');
-			options = frame->je_options & JSON_JS;
-			cur_val = TUPLE_ITEM(frame->je_u.t.tuple, idx);
+			options = చట్రం->je_options & JSON_JS;
+			cur_val = TUPLE_అంశం(చట్రం->je_u.t.tuple, idx);
 			advance = TRUE;
-			break;
+			ఆపు;
 		    }
 		    ga_append(gap, ']');
-		    frame->je_u.t.tuple->tv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    చట్రం->je_u.t.tuple->tv_copyID = 0;
+		    --దొంతర.ga_len;
+		    ఆపు;
 		}
 
-		case ENC_DICT:
+		స్థితి ENC_DICT:
 		{
-		    hashitem_T	*hi = frame->je_u.d.hi;
-		    int		todo = frame->je_u.d.todo;
+		    hashitem_T	*hi = చట్రం->je_u.d.hi;
+		    పూర్ణాంకం		todo = చట్రం->je_u.d.todo;
 
-		    if (todo > 0 && !got_int)
+		    ఒకవేళ (todo > 0 && !got_int)
 		    {
 			// Advance to next non-empty entry
-			for (++hi; HASHITEM_EMPTY(hi); ++hi)
+			కొరకు (++hi; HASHITEM_ఖాళీలు(hi); ++hi)
 			    ;
 			--todo;
-			frame->je_u.d.hi = hi;
-			frame->je_u.d.todo = todo;
+			చట్రం->je_u.d.hi = hi;
+			చట్రం->je_u.d.todo = todo;
 
 			ga_append(gap, ',');
-			if ((frame->je_options & JSON_JS)
-				&& is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			ఒకవేళ ((చట్రం->je_options & JSON_JS)
+				&& is_simple_కీలకం(hi->hi_కీలకం))
+			    ga_concat(gap, hi->hi_కీలకం);
+			లేకపోతే
+			    write_string(gap, hi->hi_కీలకం);
 			ga_append(gap, ':');
 
-			options = frame->je_options | JSON_NO_NONE;
+			options = చట్రం->je_options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
 			advance = TRUE;
-			break;
+			ఆపు;
 		    }
 		    ga_append(gap, '}');
-		    frame->je_u.d.dict->dv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    చట్రం->je_u.d.dict->dv_copyID = 0;
+		    --దొంతర.ga_len;
+		    ఆపు;
 		}
 	    }
-	    if (advance)
-		break;
+	    ఒకవేళ (advance)
+		ఆపు;
 	}
     }
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    కొరకు (i = 0; i < దొంతర.ga_len; i++)
     {
-	frame = ((json_enc_frame_T *)stack.ga_data) + i;
-	switch (frame->je_type)
+	చట్రం = ((json_enc_చట్రం_T *)దొంతర.ga_దత్తాంశం) + i;
+	ఎంపిక (చట్రం->je_type)
 	{
-	    case ENC_LIST:
-		frame->je_u.l.list->lv_copyID = 0;
-		break;
-	    case ENC_TUPLE:
-		frame->je_u.t.tuple->tv_copyID = 0;
-		break;
-	    case ENC_DICT:
-		frame->je_u.d.dict->dv_copyID = 0;
-		break;
+	    స్థితి ENC_LIST:
+		చట్రం->je_u.l.list->lv_copyID = 0;
+		ఆపు;
+	    స్థితి ENC_TUPLE:
+		చట్రం->je_u.t.tuple->tv_copyID = 0;
+		ఆపు;
+	    స్థితి ENC_DICT:
+		చట్రం->je_u.d.dict->dv_copyID = 0;
+		ఆపు;
 	}
     }
-    ga_clear(&stack);
-    return FAIL;
+    ga_clear(&దొంతర);
+    తిరిగి FAIL;
 }
 
 /*
  * When "reader" has less than NUMBUFLEN bytes available, call the fill
  * callback to get more.
  */
-    static void
+    స్థిర శూన్య
 fill_numbuflen(js_read_T *reader)
 {
-    if (reader->js_fill != NULL && (int)(reader->js_end - reader->js_buf)
-						- reader->js_used < NUMBUFLEN)
+    ఒకవేళ (reader->js_fill != ఖాళీ && (పూర్ణాంకం)(reader->js_చివర - reader->js_buf)
+						- reader->js_వాడిన < NUMBUFLEN)
     {
-	if (reader->js_fill(reader))
-	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+	ఒకవేళ (reader->js_fill(reader))
+	    reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
     }
 }
 
@@ -728,113 +728,113 @@ fill_numbuflen(js_read_T *reader)
  * space.
  * Also tops up readahead when needed.
  */
-    static void
+    స్థిర శూన్య
 json_skip_white(js_read_T *reader)
 {
-    int c;
+    పూర్ణాంకం c;
 
-    for (;;)
+    కొరకు (;;)
     {
-	c = reader->js_buf[reader->js_used];
-	if (reader->js_fill != NULL && c == NUL)
+	c = reader->js_buf[reader->js_వాడిన];
+	ఒకవేళ (reader->js_fill != ఖాళీ && c == NUL)
 	{
-	    if (reader->js_fill(reader))
+	    ఒకవేళ (reader->js_fill(reader))
 	    {
-		reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-		continue;
+		reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
+		కొనసాగు;
 	    }
 	}
-	if (c == NUL || c > ' ')
-	    break;
-	++reader->js_used;
+	ఒకవేళ (c == NUL || c > ' ')
+	    ఆపు;
+	++reader->js_వాడిన;
     }
     fill_numbuflen(reader);
 }
 
-    static int
-json_decode_string(js_read_T *reader, typval_T *res, int quote)
+    స్థిర పూర్ణాంకం
+json_decode_string(js_read_T *reader, typval_T *res, పూర్ణాంకం quote)
 {
     garray_T    ga;
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*p;
-    int		c;
+    పూర్ణాంకం		c;
     varnumber_T	nr;
 
-    if (res != NULL)
+    ఒకవేళ (res != ఖాళీ)
 	ga_init2(&ga, 1, 200);
 
-    p = reader->js_buf + reader->js_used + 1; // skip over " or '
-    while (*p != quote)
+    p = reader->js_buf + reader->js_వాడిన + 1; // skip over " or '
+    అయితే (*p != quote)
     {
 	// The JSON is always expected to be utf-8, thus use utf functions
 	// here. The string is converted below if needed.
-	if (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
+	ఒకవేళ (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
 	{
 	    // Not enough bytes to make a character or end of the string. Get
 	    // more if possible.
-	    if (reader->js_fill == NULL)
-		break;
-	    len = (int)(reader->js_end - p);
-	    reader->js_used = (int)(p - reader->js_buf);
-	    if (!reader->js_fill(reader))
-		break; // didn't get more
-	    p = reader->js_buf + reader->js_used;
-	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-	    continue;
+	    ఒకవేళ (reader->js_fill == ఖాళీ)
+		ఆపు;
+	    len = (పూర్ణాంకం)(reader->js_చివర - p);
+	    reader->js_వాడిన = (పూర్ణాంకం)(p - reader->js_buf);
+	    ఒకవేళ (!reader->js_fill(reader))
+		ఆపు; // didn't get more
+	    p = reader->js_buf + reader->js_వాడిన;
+	    reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
+	    కొనసాగు;
 	}
 
-	if (*p == '\\')
+	ఒకవేళ (*p == '\\')
 	{
 	    c = -1;
-	    switch (p[1])
+	    ఎంపిక (p[1])
 	    {
-		case '\\': c = '\\'; break;
-		case '"': c = '"'; break;
-		case 'b': c = BS; break;
-		case 't': c = TAB; break;
-		case 'n': c = NL; break;
-		case 'f': c = FF; break;
-		case 'r': c = CAR; break;
-		case 'u':
-		    if (reader->js_fill != NULL
-				     && (int)(reader->js_end - p) < NUMBUFLEN)
+		స్థితి '\\': c = '\\'; ఆపు;
+		స్థితి '"': c = '"'; ఆపు;
+		స్థితి 'b': c = BS; ఆపు;
+		స్థితి 't': c = TAB; ఆపు;
+		స్థితి 'n': c = NL; ఆపు;
+		స్థితి 'f': c = FF; ఆపు;
+		స్థితి 'r': c = CAR; ఆపు;
+		స్థితి 'u':
+		    ఒకవేళ (reader->js_fill != ఖాళీ
+				     && (పూర్ణాంకం)(reader->js_చివర - p) < NUMBUFLEN)
 		    {
-			reader->js_used = (int)(p - reader->js_buf);
-			if (reader->js_fill(reader))
+			reader->js_వాడిన = (పూర్ణాంకం)(p - reader->js_buf);
+			ఒకవేళ (reader->js_fill(reader))
 			{
-			    p = reader->js_buf + reader->js_used;
-			    reader->js_end = reader->js_buf
+			    p = reader->js_buf + reader->js_వాడిన;
+			    reader->js_చివర = reader->js_buf
 						     + STRLEN(reader->js_buf);
 			}
 		    }
 		    nr = 0;
 		    len = 0;
-		    vim_str2nr(p + 2, NULL, &len,
-			     STR2NR_HEX + STR2NR_FORCE, &nr, NULL, 4, TRUE, NULL);
-		    if (len == 0)
+		    vim_str2nr(p + 2, ఖాళీ, &len,
+			     STR2NR_HEX + STR2NR_FORCE, &nr, ఖాళీ, 4, TRUE, ఖాళీ);
+		    ఒకవేళ (len == 0)
 		    {
-			if (res != NULL)
+			ఒకవేళ (res != ఖాళీ)
 			    ga_clear(&ga);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		    p += len + 2;
-		    if (0xd800 <= nr && nr <= 0xdbff
-			    && (int)(reader->js_end - p) >= 6
+		    ఒకవేళ (0xd800 <= nr && nr <= 0xdbff
+			    && (పూర్ణాంకం)(reader->js_చివర - p) >= 6
 			    && *p == '\\' && *(p+1) == 'u')
 		    {
 			varnumber_T	nr2 = 0;
 
 			// decode surrogate pair: \ud812\u3456
 			len = 0;
-			vim_str2nr(p + 2, NULL, &len, STR2NR_HEX + STR2NR_FORCE,
-						    &nr2, NULL, 4, TRUE, NULL);
-			if (len == 0)
+			vim_str2nr(p + 2, ఖాళీ, &len, STR2NR_HEX + STR2NR_FORCE,
+						    &nr2, ఖాళీ, 4, TRUE, ఖాళీ);
+			ఒకవేళ (len == 0)
 			{
-			    if (res != NULL)
+			    ఒకవేళ (res != ఖాళీ)
 				ga_clear(&ga);
-			    return FAIL;
+			    తిరిగి FAIL;
 			}
-			if (0xdc00 <= nr2 && nr2 <= 0xdfff)
+			ఒకవేళ (0xdc00 <= nr2 && nr2 <= 0xdfff)
 			{
 			    p += len + 2;
 			    nr = (((nr - 0xd800) << 10) |
@@ -842,102 +842,102 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			}
 		    }
 		    // Lone surrogate is invalid.
-		    if (0xd800 <= nr && nr <= 0xdfff)
+		    ఒకవేళ (0xd800 <= nr && nr <= 0xdfff)
 		    {
-			if (res != NULL)
+			ఒకవేళ (res != ఖాళీ)
 			    ga_clear(&ga);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
-		    if (res != NULL)
+		    ఒకవేళ (res != ఖాళీ)
 		    {
 			char_u	buf[NUMBUFLEN];
 			size_t	buflen;
 
-			buflen = utf_char2bytes((int)nr, buf);
+			buflen = utf_char2bytes((పూర్ణాంకం)nr, buf);
 			buf[buflen] = NUL;
 			ga_concat_len(&ga, buf, buflen);
 		    }
-		    break;
-		default:
+		    ఆపు;
+		అప్రమేయ:
 		    // not a special char, skip over backslash
 		    ++p;
-		    continue;
+		    కొనసాగు;
 	    }
-	    if (c > 0)
+	    ఒకవేళ (c > 0)
 	    {
 		p += 2;
-		if (res != NULL)
+		ఒకవేళ (res != ఖాళీ)
 		    ga_append(&ga, c);
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    len = utf_ptr2len(p);
-	    if (res != NULL)
+	    ఒకవేళ (res != ఖాళీ)
 	    {
-		if (ga_grow(&ga, len) == FAIL)
+		ఒకవేళ (ga_grow(&ga, len) == FAIL)
 		{
 		    ga_clear(&ga);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
-		mch_memmove((char *)ga.ga_data + ga.ga_len, p, (size_t)len);
+		mch_memmove((అక్షరం *)ga.ga_దత్తాంశం + ga.ga_len, p, (size_t)len);
 		ga.ga_len += len;
 	    }
 	    p += len;
 	}
     }
 
-    reader->js_used = (int)(p - reader->js_buf);
-    if (*p == quote)
+    reader->js_వాడిన = (పూర్ణాంకం)(p - reader->js_buf);
+    ఒకవేళ (*p == quote)
     {
-	++reader->js_used;
-	if (res != NULL)
+	++reader->js_వాడిన;
+	ఒకవేళ (res != ఖాళీ)
 	{
 	    ga_append(&ga, NUL);
 	    res->v_type = VAR_STRING;
-#if defined(USE_ICONV)
-	    if (!enc_utf8)
+#ఒకవేళ defined(USE_ICONV)
+	    ఒకవేళ (!enc_utf8)
 	    {
 		vimconv_T   conv;
 
 		// Convert the utf-8 string to 'encoding'.
 		conv.vc_type = CONV_NONE;
-		convert_setup(&conv, (char_u*)"utf-8", p_enc);
-		if (conv.vc_type != CONV_NONE)
+		convert_అమరిక(&conv, (char_u*)"utf-8", p_enc);
+		ఒకవేళ (conv.vc_type != CONV_NONE)
 		{
 		    res->vval.v_string =
-				      string_convert(&conv, ga.ga_data, NULL);
-		    vim_free(ga.ga_data);
+				      string_convert(&conv, ga.ga_దత్తాంశం, ఖాళీ);
+		    vim_free(ga.ga_దత్తాంశం);
 		}
-		convert_setup(&conv, NULL, NULL);
+		convert_అమరిక(&conv, ఖాళీ, ఖాళీ);
 	    }
-	    else
-#endif
-		res->vval.v_string = ga.ga_data;
+	    లేకపోతే
+#అయితే_ముగింపు
+		res->vval.v_string = ga.ga_దత్తాంశం;
 	}
-	return OK;
+	తిరిగి OK;
     }
-    if (res != NULL)
+    ఒకవేళ (res != ఖాళీ)
     {
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_సంఖ్య = VVAL_NONE;
 	ga_clear(&ga);
     }
-    return MAYBE;
+    తిరిగి MAYBE;
 }
 
-typedef enum {
+రకనిర్వచనం గణన {
     JSON_ARRAY,		// parsing items in an array
-    JSON_OBJECT_KEY,	// parsing key of an object
+    JSON_OBJECT_కీలకం,	// parsing key of an object
     JSON_OBJECT		// parsing item in an object, after the key
 } json_decode_T;
 
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     json_decode_T jd_type;
     typval_T	  jd_tv;	// the list or dict
-    typval_T	  jd_key_tv;
-    char_u	  *jd_key;
-} json_dec_item_T;
+    typval_T	  jd_కీలకం_tv;
+    char_u	  *jd_కీలకం;
+} json_dec_అంశం_T;
 
 /*
  * Decode one item and put it in "res".  If "res" is NULL only advance.
@@ -946,502 +946,502 @@ typedef struct {
  * Return FAIL for a decoding error (and give an error).
  * Return MAYBE for an incomplete message.
  */
-    static int
-json_decode_item(js_read_T *reader, typval_T *res, int options)
+    స్థిర పూర్ణాంకం
+json_decode_అంశం(js_read_T *reader, typval_T *res, పూర్ణాంకం options)
 {
     char_u	*p;
-    int		i;
-    int		len;
-    int		retval;
-    garray_T	stack;
-    typval_T	item;
-    typval_T	*cur_item;
-    json_dec_item_T *top_item;
-    char_u	key_buf[NUMBUFLEN];
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		retval;
+    garray_T	దొంతర;
+    typval_T	అంశం;
+    typval_T	*cur_అంశం;
+    json_dec_అంశం_T *శిఖరం_అంశం;
+    char_u	కీలకం_buf[NUMBUFLEN];
 
-    ga_init2(&stack, sizeof(json_dec_item_T), 100);
-    cur_item = res;
-    init_tv(&item);
-    if (res != NULL)
+    ga_init2(&దొంతర, పరిమాణం(json_dec_అంశం_T), 100);
+    cur_అంశం = res;
+    init_tv(&అంశం);
+    ఒకవేళ (res != ఖాళీ)
 	init_tv(res);
 
     fill_numbuflen(reader);
-    p = reader->js_buf + reader->js_used;
-    for (;;)
+    p = reader->js_buf + reader->js_వాడిన;
+    కొరకు (;;)
     {
-	top_item = NULL;
-	if (stack.ga_len > 0)
+	శిఖరం_అంశం = ఖాళీ;
+	ఒకవేళ (దొంతర.ga_len > 0)
 	{
-	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
+	    శిఖరం_అంశం = ((json_dec_అంశం_T *)దొంతర.ga_దత్తాంశం) + దొంతర.ga_len - 1;
 	    json_skip_white(reader);
-	    p = reader->js_buf + reader->js_used;
-	    if (*p == NUL)
+	    p = reader->js_buf + reader->js_వాడిన;
+	    ఒకవేళ (*p == NUL)
 	    {
 		retval = MAYBE;
-		goto theend;
+		వెళ్ళు theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
-					    || top_item->jd_type == JSON_ARRAY)
+	    ఒకవేళ (శిఖరం_అంశం->jd_type == JSON_OBJECT_కీలకం
+					    || శిఖరం_అంశం->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		ఒకవేళ (*p == (శిఖరం_అంశం->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
-		    ++reader->js_used; // consume the ']' or '}'
-		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    ++reader->js_వాడిన; // consume the ']' or '}'
+		    --దొంతర.ga_len;
+		    ఒకవేళ (దొంతర.ga_len == 0)
 		    {
 			retval = OK;
-			goto theend;
+			వెళ్ళు theend;
 		    }
-		    if (cur_item != NULL)
-			cur_item = &top_item->jd_tv;
-		    goto item_end;
+		    ఒకవేళ (cur_అంశం != ఖాళీ)
+			cur_అంశం = &శిఖరం_అంశం->jd_tv;
+		    వెళ్ళు అంశం_చివర;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	ఒకవేళ (శిఖరం_అంశం != ఖాళీ && శిఖరం_అంశం->jd_type == JSON_OBJECT_కీలకం
 		&& (options & JSON_JS)
-		&& reader->js_buf[reader->js_used] != '"'
-		&& reader->js_buf[reader->js_used] != '\''
-		&& reader->js_buf[reader->js_used] != '['
-		&& reader->js_buf[reader->js_used] != '{')
+		&& reader->js_buf[reader->js_వాడిన] != '"'
+		&& reader->js_buf[reader->js_వాడిన] != '\''
+		&& reader->js_buf[reader->js_వాడిన] != '['
+		&& reader->js_buf[reader->js_వాడిన] != '{')
 	{
-	    char_u *key;
+	    char_u *కీలకం;
 
 	    // accept an object key that is not in quotes
-	    key = p = reader->js_buf + reader->js_used;
-	    while (*p != NUL && *p != ':' && *p > ' ')
+	    కీలకం = p = reader->js_buf + reader->js_వాడిన;
+	    అయితే (*p != NUL && *p != ':' && *p > ' ')
 		++p;
-	    if (cur_item != NULL)
+	    ఒకవేళ (cur_అంశం != ఖాళీ)
 	    {
-		cur_item->v_type = VAR_STRING;
-		cur_item->vval.v_string = vim_strnsave(key, p - key);
-		top_item->jd_key = cur_item->vval.v_string;
+		cur_అంశం->v_type = VAR_STRING;
+		cur_అంశం->vval.v_string = vim_strnsave(కీలకం, p - కీలకం);
+		శిఖరం_అంశం->jd_కీలకం = cur_అంశం->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_వాడిన += (పూర్ణాంకం)(p - కీలకం);
 	}
-	else
+	లేకపోతే
 	{
-	    switch (*p)
+	    ఎంపిక (*p)
 	    {
-		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		స్థితి '[': // start of array
+		    ఒకవేళ (శిఖరం_అంశం && శిఖరం_అంశం->jd_type == JSON_OBJECT_కీలకం)
 		    {
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    ఒకవేళ (దొంతర.ga_len >= p_mfd)
 		    {
-			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
+			emsg(_(e_function_call_లోతు_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    ఒకవేళ (ga_grow(&దొంతర, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
+		    ఒకవేళ (cur_అంశం != ఖాళీ && rettv_list_alloc(cur_అంశం) == FAIL)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_అంశం->v_type = VAR_SPECIAL;
+			cur_అంశం->vval.v_సంఖ్య = VVAL_NONE;
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
 
-		    ++reader->js_used; // consume the '['
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_ARRAY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ++reader->js_వాడిన; // consume the '['
+		    శిఖరం_అంశం = ((json_dec_అంశం_T *)దొంతర.ga_దత్తాంశం)
+								+ దొంతర.ga_len;
+		    శిఖరం_అంశం->jd_type = JSON_ARRAY;
+		    ++దొంతర.ga_len;
+		    ఒకవేళ (cur_అంశం != ఖాళీ)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &item;
+			శిఖరం_అంశం->jd_tv = *cur_అంశం;
+			cur_అంశం = &అంశం;
 		    }
-		    continue;
+		    కొనసాగు;
 
-		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		స్థితి '{': // start of object
+		    ఒకవేళ (శిఖరం_అంశం && శిఖరం_అంశం->jd_type == JSON_OBJECT_కీలకం)
 		    {
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    ఒకవేళ (దొంతర.ga_len >= p_mfd)
 		    {
-			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
+			emsg(_(e_function_call_లోతు_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    ఒకవేళ (ga_grow(&దొంతర, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
-		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
+		    ఒకవేళ (cur_అంశం != ఖాళీ && rettv_dict_alloc(cur_అంశం) == FAIL)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_అంశం->v_type = VAR_SPECIAL;
+			cur_అంశం->vval.v_సంఖ్య = VVAL_NONE;
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
 
-		    ++reader->js_used; // consume the '{'
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_OBJECT_KEY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ++reader->js_వాడిన; // consume the '{'
+		    శిఖరం_అంశం = ((json_dec_అంశం_T *)దొంతర.ga_దత్తాంశం)
+								+ దొంతర.ga_len;
+		    శిఖరం_అంశం->jd_type = JSON_OBJECT_కీలకం;
+		    ++దొంతర.ga_len;
+		    ఒకవేళ (cur_అంశం != ఖాళీ)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &top_item->jd_key_tv;
+			శిఖరం_అంశం->jd_tv = *cur_అంశం;
+			cur_అంశం = &శిఖరం_అంశం->jd_కీలకం_tv;
 		    }
-		    continue;
+		    కొనసాగు;
 
-		case '"': // string
-		    retval = json_decode_string(reader, cur_item, *p);
-		    break;
+		స్థితి '"': // string
+		    retval = json_decode_string(reader, cur_అంశం, *p);
+		    ఆపు;
 
-		case '\'':
-		    if (options & JSON_JS)
-			retval = json_decode_string(reader, cur_item, *p);
-		    else
+		స్థితి '\'':
+		    ఒకవేళ (options & JSON_JS)
+			retval = json_decode_string(reader, cur_అంశం, *p);
+		    లేకపోతే
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    break;
+		    ఆపు;
 
-		case ',': // comma: empty item
-		    if ((options & JSON_JS) == 0)
+		స్థితి ',': // comma: empty item
+		    ఒకవేళ ((options & JSON_JS) == 0)
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
-			break;
+			ఆపు;
 		    }
 		    // FALLTHROUGH
-		case NUL: // empty
-		    if (cur_item != NULL)
+		స్థితి NUL: //ఖాళీలు
+		    ఒకవేళ (cur_అంశం != ఖాళీ)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_అంశం->v_type = VAR_SPECIAL;
+			cur_అంశం->vval.v_సంఖ్య = VVAL_NONE;
 		    }
 		    retval = OK;
-		    break;
+		    ఆపు;
 
-		default:
-		    if (VIM_ISDIGIT(*p) || (*p == '-'
+		అప్రమేయ:
+		    ఒకవేళ (VIM_ISDIGIT(*p) || (*p == '-'
 					&& (VIM_ISDIGIT(p[1]) || p[1] == NUL)))
 		    {
 			char_u  *sp = p;
 
-			if (*sp == '-')
+			ఒకవేళ (*sp == '-')
 			{
 			    ++sp;
-			    if (*sp == NUL)
+			    ఒకవేళ (*sp == NUL)
 			    {
 				retval = MAYBE;
-				break;
+				ఆపు;
 			    }
-			    if (!VIM_ISDIGIT(*sp))
+			    ఒకవేళ (!VIM_ISDIGIT(*sp))
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				break;
+				ఆపు;
 			    }
 			}
 			sp = skipdigits(sp);
-			if (*sp == '.' || *sp == 'e' || *sp == 'E')
+			ఒకవేళ (*sp == '.' || *sp == 'e' || *sp == 'E')
 			{
-			    if (cur_item == NULL)
+			    ఒకవేళ (cur_అంశం == ఖాళీ)
 			    {
 				float_T f;
 
 				len = string2float(p, &f, FALSE);
 			    }
-			    else
+			    లేకపోతే
 			    {
-				cur_item->v_type = VAR_FLOAT;
-				len = string2float(p, &cur_item->vval.v_float,
+				cur_అంశం->v_type = VAR_FLOAT;
+				len = string2float(p, &cur_అంశం->vval.v_float,
 									FALSE);
 			    }
 			}
-			else
+			లేకపోతే
 			{
 			    varnumber_T nr;
 
-			    vim_str2nr(reader->js_buf + reader->js_used,
-				    NULL, &len, 0, // what
-				    &nr, NULL, 0, TRUE, NULL);
-			    if (len == 0)
+			    vim_str2nr(reader->js_buf + reader->js_వాడిన,
+				    ఖాళీ, &len, 0, // what
+				    &nr, ఖాళీ, 0, TRUE, ఖాళీ);
+			    ఒకవేళ (len == 0)
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				goto theend;
+				వెళ్ళు theend;
 			    }
-			    if (cur_item != NULL)
+			    ఒకవేళ (cur_అంశం != ఖాళీ)
 			    {
-				cur_item->v_type = VAR_NUMBER;
-				cur_item->vval.v_number = nr;
+				cur_అంశం->v_type = VAR_సంఖ్య;
+				cur_అంశం->vval.v_సంఖ్య = nr;
 			    }
 			}
-			reader->js_used += len;
+			reader->js_వాడిన += len;
 			retval = OK;
-			break;
+			ఆపు;
 		    }
 		    // In strinct JSON mode, keywords must be lowercase.
 		    // In JS mode, keywords are case-insensitive.
-#define MATCH_KW(p, kw, len) \
+#నిర్వచించు సరిపోలిక_KW(p, kw, len) \
     ((options & JSON_JS) \
-     ? STRNICMP((char *)(p), (kw), (len)) == 0 \
-     : STRNCMP((char *)(p), (kw), (len)) == 0)
-		    if (MATCH_KW(p, "false", 5))
+     ? STRNICMP((అక్షరం *)(p), (kw), (len)) == 0 \
+     : STRNCMP((అక్షరం *)(p), (kw), (len)) == 0)
+		    ఒకవేళ (సరిపోలిక_KW(p, "false", 5))
 		    {
-			reader->js_used += 5;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 5;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_FALSE;
+			    cur_అంశం->v_type = VAR_BOOL;
+			    cur_అంశం->vval.v_సంఖ్య = VVAL_FALSE;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-		    if (MATCH_KW(p, "true", 4))
+		    ఒకవేళ (సరిపోలిక_KW(p, "true", 4))
 		    {
-			reader->js_used += 4;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 4;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_TRUE;
+			    cur_అంశం->v_type = VAR_BOOL;
+			    cur_అంశం->vval.v_సంఖ్య = VVAL_TRUE;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-		    if (MATCH_KW(p, "null", 4))
+		    ఒకవేళ (సరిపోలిక_KW(p, "null", 4))
 		    {
-			reader->js_used += 4;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 4;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_SPECIAL;
-			    cur_item->vval.v_number = VVAL_NULL;
+			    cur_అంశం->v_type = VAR_SPECIAL;
+			    cur_అంశం->vval.v_సంఖ్య = VVAL_NULL;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-		    if (MATCH_KW(p, "NaN", 3))
+		    ఒకవేళ (సరిపోలిక_KW(p, "NaN", 3))
 		    {
-			reader->js_used += 3;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 3;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = NAN;
+			    cur_అంశం->v_type = VAR_FLOAT;
+			    cur_అంశం->vval.v_float = NAN;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-		    if (MATCH_KW(p, "-Infinity", 9))
+		    ఒకవేళ (సరిపోలిక_KW(p, "-Infinity", 9))
 		    {
-			reader->js_used += 9;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 9;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = -INFINITY;
+			    cur_అంశం->v_type = VAR_FLOAT;
+			    cur_అంశం->vval.v_float = -INFINITY;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-		    if (MATCH_KW(p, "Infinity", 8))
+		    ఒకవేళ (సరిపోలిక_KW(p, "Infinity", 8))
 		    {
-			reader->js_used += 8;
-			if (cur_item != NULL)
+			reader->js_వాడిన += 8;
+			ఒకవేళ (cur_అంశం != ఖాళీ)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = INFINITY;
+			    cur_అంశం->v_type = VAR_FLOAT;
+			    cur_అంశం->vval.v_float = INFINITY;
 			}
 			retval = OK;
-			break;
+			ఆపు;
 		    }
-#undef MATCH_KW
+#నిర్వచనం_రద్దు సరిపోలిక_KW
 		    // check for truncated name
-		    len = (int)(reader->js_end
-					 - (reader->js_buf + reader->js_used));
-		    if (
-			    (len < 5 && STRNICMP((char *)p, "false", len) == 0)
+		    len = (పూర్ణాంకం)(reader->js_చివర
+					 - (reader->js_buf + reader->js_వాడిన));
+		    ఒకవేళ (
+			    (len < 5 && STRNICMP((అక్షరం *)p, "false", len) == 0)
 			    || (len < 9
-				 && STRNICMP((char *)p, "-Infinity", len) == 0)
+				 && STRNICMP((అక్షరం *)p, "-Infinity", len) == 0)
 			    || (len < 8
-				  && STRNICMP((char *)p, "Infinity", len) == 0)
-			    || (len < 3 && STRNICMP((char *)p, "NaN", len) == 0)
+				  && STRNICMP((అక్షరం *)p, "Infinity", len) == 0)
+			    || (len < 3 && STRNICMP((అక్షరం *)p, "NaN", len) == 0)
 			    || (len < 4
-				  && (STRNICMP((char *)p, "true", len) == 0
-				    || STRNICMP((char *)p, "null", len) == 0)))
+				  && (STRNICMP((అక్షరం *)p, "true", len) == 0
+				    || STRNICMP((అక్షరం *)p, "null", len) == 0)))
 
 			retval = MAYBE;
-		    else
+		    లేకపోతే
 			retval = FAIL;
-		    break;
+		    ఆపు;
 	    }
 
 	    // We are finished when retval is FAIL or MAYBE and when at the
 	    // toplevel.
-	    if (retval == FAIL)
-		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
-		goto theend;
+	    ఒకవేళ (retval == FAIL)
+		ఆపు;
+	    ఒకవేళ (retval == MAYBE || దొంతర.ga_len == 0)
+		వెళ్ళు theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
-		    && cur_item != NULL)
+	    ఒకవేళ (శిఖరం_అంశం != ఖాళీ && శిఖరం_అంశం->jd_type == JSON_OBJECT_కీలకం
+		    && cur_అంశం != ఖాళీ)
 	    {
-		if (cur_item->v_type == VAR_FLOAT)
+		ఒకవేళ (cur_అంశం->v_type == VAR_FLOAT)
 		{
 		    // cannot use a float as a key
 		    emsg(_(e_using_float_as_string));
 		    retval = FAIL;
-		    goto theend;
+		    వెళ్ళు theend;
 		}
-		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		శిఖరం_అంశం->jd_కీలకం = tv_get_string_buf_chk(cur_అంశం, కీలకం_buf);
+		ఒకవేళ (శిఖరం_అంశం->jd_కీలకం == ఖాళీ)
 		{
-		    emsg(_(e_invalid_argument));
+		    emsg(_(e_invalid_వాదం));
 		    retval = FAIL;
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 	    }
 	}
 
-item_end:
-	top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
-	switch (top_item->jd_type)
+అంశం_చివర:
+	శిఖరం_అంశం = ((json_dec_అంశం_T *)దొంతర.ga_దత్తాంశం) + దొంతర.ga_len - 1;
+	ఎంపిక (శిఖరం_అంశం->jd_type)
 	{
-	    case JSON_ARRAY:
-		if (res != NULL)
+	    స్థితి JSON_ARRAY:
+		ఒకవేళ (res != ఖాళీ)
 		{
 		    listitem_T	*li = listitem_alloc();
 
-		    if (li == NULL)
+		    ఒకవేళ (li == ఖాళీ)
 		    {
-			clear_tv(cur_item);
+			clear_tv(cur_అంశం);
 			retval = FAIL;
-			goto theend;
+			వెళ్ళు theend;
 		    }
-		    li->li_tv = *cur_item;
-		    list_append(top_item->jd_tv.vval.v_list, li);
+		    li->li_tv = *cur_అంశం;
+		    list_append(శిఖరం_అంశం->jd_tv.vval.v_list, li);
 		}
-		if (cur_item != NULL)
-		    cur_item = &item;
+		ఒకవేళ (cur_అంశం != ఖాళీ)
+		    cur_అంశం = &అంశం;
 
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
-		    ++reader->js_used;
-		else if (*p != ']')
+		p = reader->js_buf + reader->js_వాడిన;
+		ఒకవేళ (*p == ',')
+		    ++reader->js_వాడిన;
+		లేకపోతే ఒకవేళ (*p != ']')
 		{
-		    if (*p == NUL)
+		    ఒకవేళ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    లేకపోతే
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    వెళ్ళు theend;
 		}
-		break;
+		ఆపు;
 
-	    case JSON_OBJECT_KEY:
+	    స్థితి JSON_OBJECT_కీలకం:
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p != ':')
+		p = reader->js_buf + reader->js_వాడిన;
+		ఒకవేళ (*p != ':')
 		{
-		    if (cur_item != NULL)
-			clear_tv(cur_item);
-		    if (*p == NUL)
+		    ఒకవేళ (cur_అంశం != ఖాళీ)
+			clear_tv(cur_అంశం);
+		    ఒకవేళ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    లేకపోతే
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    వెళ్ళు theend;
 		}
-		++reader->js_used;
+		++reader->js_వాడిన;
 		json_skip_white(reader);
-		top_item->jd_type = JSON_OBJECT;
-		if (cur_item != NULL)
-		    cur_item = &item;
-		break;
+		శిఖరం_అంశం->jd_type = JSON_OBJECT;
+		ఒకవేళ (cur_అంశం != ఖాళీ)
+		    cur_అంశం = &అంశం;
+		ఆపు;
 
-	    case JSON_OBJECT:
-		if (cur_item != NULL
-			&& dict_has_key(top_item->jd_tv.vval.v_dict,
-						(char *)top_item->jd_key))
+	    స్థితి JSON_OBJECT:
+		ఒకవేళ (cur_అంశం != ఖాళీ
+			&& dict_has_కీలకం(శిఖరం_అంశం->jd_tv.vval.v_dict,
+						(అక్షరం *)శిఖరం_అంశం->jd_కీలకం))
 		{
-		    semsg(_(e_duplicate_key_in_json_str), top_item->jd_key);
-		    clear_tv(cur_item);
+		    semsg(_(e_duplicate_కీలకం_లోపల_json_str), శిఖరం_అంశం->jd_కీలకం);
+		    clear_tv(cur_అంశం);
 		    retval = FAIL;
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 
-		if (cur_item != NULL)
+		ఒకవేళ (cur_అంశం != ఖాళీ)
 		{
-		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
+		    dictitem_T *di = dictitem_alloc(శిఖరం_అంశం->jd_కీలకం);
 
-		    clear_tv(&top_item->jd_key_tv);
-		    if (di == NULL)
+		    clear_tv(&శిఖరం_అంశం->jd_కీలకం_tv);
+		    ఒకవేళ (di == ఖాళీ)
 		    {
-			clear_tv(cur_item);
+			clear_tv(cur_అంశం);
 			retval = FAIL;
-			goto theend;
+			వెళ్ళు theend;
 		    }
-		    di->di_tv = *cur_item;
-		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    di->di_tv = *cur_అంశం;
+		    di->di_tv.v_తాళం = 0;
+		    ఒకవేళ (dict_కూడు(శిఖరం_అంశం->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
-			goto theend;
+			వెళ్ళు theend;
 		    }
 		}
 
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
-		    ++reader->js_used;
-		else if (*p != '}')
+		p = reader->js_buf + reader->js_వాడిన;
+		ఒకవేళ (*p == ',')
+		    ++reader->js_వాడిన;
+		లేకపోతే ఒకవేళ (*p != '}')
 		{
-		    if (*p == NUL)
+		    ఒకవేళ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    లేకపోతే
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    వెళ్ళు theend;
 		}
-		top_item->jd_type = JSON_OBJECT_KEY;
-		if (cur_item != NULL)
-		    cur_item = &top_item->jd_key_tv;
-		break;
+		శిఖరం_అంశం->jd_type = JSON_OBJECT_కీలకం;
+		ఒకవేళ (cur_అంశం != ఖాళీ)
+		    cur_అంశం = &శిఖరం_అంశం->jd_కీలకం_tv;
+		ఆపు;
 	}
     }
 
     // Get here when parsing failed.
-    if (res != NULL)
+    ఒకవేళ (res != ఖాళీ)
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_సంఖ్య = VVAL_NONE;
     }
     // "p" may dangle into a buffer freed by a js_fill() refill in
     // json_decode_string(); report the position from the current reader.
-    semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
+    semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_వాడిన);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
-	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
-    ga_clear(&stack);
+    కొరకు (i = 0; i < దొంతర.ga_len; i++)
+	clear_tv(&(((json_dec_అంశం_T *)దొంతర.ga_దత్తాంశం) + i)->jd_కీలకం_tv);
+    ga_clear(&దొంతర);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1449,31 +1449,31 @@ theend:
  * "options" can be JSON_JS or zero;
  * Return FAIL if not the whole message was consumed.
  */
-    static int
-json_decode_all(js_read_T *reader, typval_T *res, int options)
+    స్థిర పూర్ణాంకం
+json_decode_all(js_read_T *reader, typval_T *res, పూర్ణాంకం options)
 {
-    int ret;
+    పూర్ణాంకం ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, res, options);
-    if (ret != OK)
+    ret = json_decode_అంశం(reader, res, options);
+    ఒకవేళ (ret != OK)
     {
-	if (ret == MAYBE)
+	ఒకవేళ (ret == MAYBE)
 	    semsg(_(e_json_decode_error_at_str), reader->js_buf);
-	return FAIL;
+	తిరిగి FAIL;
     }
     json_skip_white(reader);
-    if (reader->js_buf[reader->js_used] != NUL)
+    ఒకవేళ (reader->js_buf[reader->js_వాడిన] != NUL)
     {
-	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_used);
-	return FAIL;
+	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_వాడిన);
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ఒకవేళ defined(FEAT_పని_CHANNEL)
 /*
  * Decode the JSON from "reader" and store the result in "res".
  * "options" can be JSON_JS or zero;
@@ -1481,20 +1481,20 @@ json_decode_all(js_read_T *reader, typval_T *res, int options)
  * Return MAYBE for an incomplete message.
  * Consumes the message anyway.
  */
-    int
-json_decode(js_read_T *reader, typval_T *res, int options)
+    పూర్ణాంకం
+json_decode(js_read_T *reader, typval_T *res, పూర్ణాంకం options)
 {
-    int ret;
+    పూర్ణాంకం ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, res, options);
+    ret = json_decode_అంశం(reader, res, options);
     json_skip_white(reader);
 
-    return ret;
+    తిరిగి ret;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Decode the JSON from "reader" to find the end of the message.
@@ -1506,42 +1506,42 @@ json_decode(js_read_T *reader, typval_T *res, int options)
  * string.  A number might be truncated without knowing.
  * Does not advance the reader.
  */
-    int
-json_find_end(js_read_T *reader, int options)
+    పూర్ణాంకం
+json_కనుగొను_చివర(js_read_T *reader, పూర్ణాంకం options)
 {
-    int used_save = reader->js_used;
-    int ret;
+    పూర్ణాంకం వాడిన_save = reader->js_వాడిన;
+    పూర్ణాంకం ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_చివర = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, NULL, options);
-    reader->js_used = used_save;
-    return ret;
+    ret = json_decode_అంశం(reader, ఖాళీ, options);
+    reader->js_వాడిన = వాడిన_save;
+    తిరిగి ret;
 }
 
 /*
  * "js_decode()" function
  */
-    void
+    శూన్య
 f_js_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
-    reader.js_used = 0;
-    if (json_decode_all(&reader, rettv, JSON_JS) != OK)
-	emsg(_(e_invalid_argument));
+    reader.js_fill = ఖాళీ;
+    reader.js_వాడిన = 0;
+    ఒకవేళ (json_decode_all(&reader, rettv, JSON_JS) != OK)
+	emsg(_(e_invalid_వాదం));
 }
 
 /*
  * "js_encode()" function
  */
-    void
+    శూన్య
 f_js_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
@@ -1551,27 +1551,27 @@ f_js_encode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_decode()" function
  */
-    void
+    శూన్య
 f_json_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
-    reader.js_used = 0;
+    reader.js_fill = ఖాళీ;
+    reader.js_వాడిన = 0;
     json_decode_all(&reader, rettv, 0);
 }
 
 /*
  * "json_encode()" function
  */
-    void
+    శూన్య
 f_json_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = json_encode(&argvars[0], 0);
 }
-#endif
+#అయితే_ముగింపు

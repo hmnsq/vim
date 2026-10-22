@@ -12,34 +12,34 @@
  * os_qnx.c
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
-#endif
+#ఒకవేళ defined(FEAT_GUI_PHOTON)
+పూర్ణాంకం is_photon_అందుబాటు;
+#అయితే_ముగింపు
 
-void qnx_init(void)
+శూన్య qnx_init(శూన్య)
 {
-#if defined(FEAT_GUI_PHOTON)
+#ఒకవేళ defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
-    CLEAR_FIELD(parms);
-    parms.flags = Ph_DYNAMIC_BUFFER;
+    CLEAR_క్షేత్రం(parms);
+    parms.flags = Ph_DYNAMIC_బఫరు;
 
-    is_photon_available = (PhAttach(NULL, &parms) != NULL) ? TRUE : FALSE;
-#endif
+    is_photon_అందుబాటు = (PhAttach(ఖాళీ, &parms) != ఖాళీ) ? TRUE : FALSE;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#ఒకవేళ defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
-# define CLIP_TYPE_TEXT "TEXT"
+# define CLIP_TYPE_పాఠ్యం "TEXT"
 
 // Turn on the clipboard for a console vim when photon is running
-void qnx_clip_init(void)
+శూన్య qnx_clip_init(శూన్య)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    ఒకవేళ (is_photon_అందుబాటు == TRUE && !gui.లోపల_use)
 	clip_init(TRUE);
 }
 
@@ -47,109 +47,109 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+పూర్ణాంకం
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-void
+శూన్య
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
 }
 
-void
+శూన్య
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
-    void	    *cbdata;
-    PhClipHeader    *clip_header;
-    char_u	    *clip_text = NULL;
+    పూర్ణాంకం		    type = MLINE, clip_నిడివి = 0, is_type_సమితి = FALSE;
+    శూన్య	    *cbdata;
+    Ph_Clip_శీర్షిక    *clip_శీర్షిక;
+    char_u	    *clip_పాఠ్యం = ఖాళీ;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    cbdata = Ph_Clipboard_Paste_ప్రారంభం(Ph_ఆదానం_సమూహం(ఖాళీ));
+    ఒకవేళ (cbdata == ఖాళీ)
+	తిరిగి;
 
     // Look for the vim specific clip first
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    clip_శీర్షిక = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
+    ఒకవేళ (clip_శీర్షిక != ఖాళీ && clip_శీర్షిక->దత్తాంశం != ఖాళీ)
     {
-	switch(*(char *) clip_header->data)
+	ఎంపిక(*(అక్షరం *) clip_శీర్షిక->దత్తాంశం)
 	{
-	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    అప్రమేయ: // fallthrough to line type
+	    స్థితి 'L': type = MLINE; ఆపు;
+	    స్థితి 'C': type = MCHAR; ఆపు;
+	    స్థితి 'B': type = MBLOCK; ఆపు;
 	}
-	is_type_set = TRUE;
+	is_type_సమితి = TRUE;
     }
 
     // Try for just normal text
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    clip_శీర్షిక = PhClipboardPasteType(cbdata, CLIP_TYPE_పాఠ్యం);
+    ఒకవేళ (clip_శీర్షిక != ఖాళీ)
     {
-	clip_text = clip_header->data;
-	clip_length  = clip_header->length - 1;
+	clip_పాఠ్యం = clip_శీర్షిక->దత్తాంశం;
+	clip_నిడివి  = clip_శీర్షిక->నిడివి - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	ఒకవేళ (clip_పాఠ్యం != ఖాళీ && is_type_సమితి == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
-	clip_yank_selection(type, clip_text, clip_length, cbd);
+    ఒకవేళ ((clip_పాఠ్యం != ఖాళీ) && (clip_నిడివి > 0))
+	clip_yank_selection(type, clip_పాఠ్యం, clip_నిడివి, cbd);
 
-    PhClipboardPasteFinish(cbdata);
+    Ph_Clipboard_Paste_ముగింపు(cbdata);
 }
 
-void
-clip_mch_set_selection(Clipboard_T *cbd)
+శూన్య
+clip_mch_సమితి_selection(Clipboard_T *cbd)
 {
-    int type;
+    పూర్ణాంకం type;
     long_u  len;
-    char_u *text_clip, vim_clip[2], *str = NULL;
-    PhClipHeader clip_header[2];
+    char_u *పాఠ్యం_clip, vim_clip[2], *str = ఖాళీ;
+    Ph_Clip_శీర్షిక clip_శీర్షిక[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    ఒకవేళ (cbd->owned == TRUE)
+	తిరిగి;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    ఒకవేళ (type >= 0)
     {
-	text_clip = alloc(len + 1); // Normal text
+	పాఠ్యం_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	ఒకవేళ (పాఠ్యం_clip && vim_clip)
 	{
-	    CLEAR_FIELD(clip_header);
+	    CLEAR_క్షేత్రం(clip_శీర్షిక);
 
-	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
-	    clip_header[0].data   = vim_clip;
+	    STRNCPY(clip_శీర్షిక[0].type, CLIP_TYPE_VIM, 8);
+	    clip_శీర్షిక[0].నిడివి = పరిమాణం(vim_clip);
+	    clip_శీర్షిక[0].దత్తాంశం   = vim_clip;
 
-	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
-	    clip_header[1].length = len + 1;
-	    clip_header[1].data   = text_clip;
+	    STRNCPY(clip_శీర్షిక[1].type, CLIP_TYPE_పాఠ్యం, 8);
+	    clip_శీర్షిక[1].నిడివి = len + 1;
+	    clip_శీర్షిక[1].దత్తాంశం   = పాఠ్యం_clip;
 
-	    switch(type)
+	    ఎంపిక(type)
 	    {
-		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		అప్రమేయ: // fallthrough to MLINE
+		స్థితి MLINE:	*vim_clip = 'L'; ఆపు;
+		స్థితి MCHAR:	*vim_clip = 'C'; ఆపు;
+		స్థితి MBLOCK:	*vim_clip = 'B'; ఆపు;
 	    }
 
-	    vim_strncpy(text_clip, str, len);
+	    vim_strncpy(పాఠ్యం_clip, str, len);
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_ఆదానం_సమూహం(ఖాళీ), 2, clip_శీర్షిక);
 	}
-	vim_free(text_clip);
+	vim_free(పాఠ్యం_clip);
     }
     vim_free(str);
 }
-#endif
+#అయితే_ముగింపు

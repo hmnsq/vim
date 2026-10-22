@@ -10,394 +10,394 @@
  * THIS FILE IS DISTRIBUTED UNDER THE VIM LICENSE.
  */
 
-#define WIN32_LEAN_AND_MEAN
+#నిర్వచించు WIN32_LEAN_AND_సగటు
 
-#ifndef DYNAMIC_DIRECTX
-# if WINVER < 0x0600
-#  error WINVER must be 0x0600 or above to use DirectWrite(DirectX)
+#నిర్వచితం_కాకపోతే DYNAMIC_DIRECTX
+# ఒకవేళ WINVER < 0x0600
+#  error WINVER must be 0x0600 or above గమ్యం use ప్రత్యక్ష_Write(ప్రత్యక్ష_X)
 # endif
-#endif
+#అయితే_ముగింపు
 
-#include <windows.h>
-#include <crtdbg.h>
-#include <assert.h>
-#include <math.h>
-#include <d2d1.h>
-#include <d2d1helper.h>
+#అన్తర్భావ <windows.h>
+#అన్తర్భావ <crtdbg.h>
+#అన్తర్భావ <assert.h>
+#అన్తర్భావ <math.h>
+#అన్తర్భావ <d2d1.h>
+#అన్తర్భావ <d2d1helper.h>
 
 // Disable these macros to compile with old VC and newer SDK (V8.1 or later).
-#if defined(_MSC_VER) && (_MSC_VER < 1700)
+#ఒకవేళ defined(_MSC_VER) && (_MSC_VER < 1700)
 # define _COM_Outptr_ __out
-# define _In_reads_(s)
-# define _In_reads_opt_(s)
+# define లోపల_reads(s)
+# define లోపల_reads_opt(s)
 # define _Maybenull_
-# define _Out_writes_(s)
-# define _Out_writes_opt_(s)
-# define _Out_writes_to_(x, y)
-# define _Out_writes_to_opt_(x, y)
+# define బహిర్గతం_writes(s)
+# define బహిర్గతం_writes_opt(s)
+# define బహిర్గతం_writes_గమ్యం(x, y)
+# define బహిర్గతం_writes_గమ్యం_opt(x, y)
 # define _Outptr_
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
 # include <dwrite_2.h>
-#else
+#లేకపోతే
 # include <dwrite.h>
-#endif
+#అయితే_ముగింపు
 
-#include "gui_dwrite.h"
+#అన్తర్భావ "gui_dwrite.h"
 
-#ifdef __MINGW32__
+#నిర్వచితమైతే __MINGW32__
 # define __maybenull	SAL__maybenull
-# define __in		SAL__in
-# define __out		SAL__out
-#endif
+# define __in		SAL_లోపల
+# define __out		SAL_బహిర్గతం
+#అయితే_ముగింపు
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#నిర్వచితమైతే __MINGW32__
+# define వాడని __attribute__((వాడని_2))
+#లేకపోతే
+# define వాడని
+#అయితే_ముగింపు
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#ఒకవేళ (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#లేకపోతే
 # define FINAL
-#endif
+#అయితే_ముగింపు
 
-#ifdef DYNAMIC_DIRECTX
-extern "C" HINSTANCE vimLoadLib(const char *name);
+#నిర్వచితమైతే DYNAMIC_DIRECTX
+బాహ్య "C" HINSTANCE vim_ఎక్కించు_Lib(స్థిరరాశి అక్షరం *name);
 
-typedef int (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, int);
-typedef HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
-	REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
+రకనిర్వచనం పూర్ణాంకం (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, పూర్ణాంకం);
+రకనిర్వచనం HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
+	REFIID, స్థిరరాశి D2D1_FACTORY_OPTIONS *, శూన్య **);
+రకనిర్వచనం HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
 	REFIID, IUnknown **);
 
-static HINSTANCE hD2D1DLL = NULL;
-static HINSTANCE hDWriteDLL = NULL;
+స్థిర HINSTANCE hD2D1DLL = ఖాళీ;
+స్థిర HINSTANCE hDWriteDLL = ఖాళీ;
 
-static PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = NULL;
-static PD2D1CREATEFACTORY pD2D1CreateFactory = NULL;
-static PDWRITECREATEFACTORY pDWriteCreateFactory = NULL;
+స్థిర PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = ఖాళీ;
+స్థిర PD2D1CREATEFACTORY pD2D1CreateFactory = ఖాళీ;
+స్థిర PDWRITECREATEFACTORY pDWriteCreateFactory = ఖాళీ;
 
-#define GetUserDefaultLocaleName	(*pGetUserDefaultLocaleName)
-#define D2D1CreateFactory		(*pD2D1CreateFactory)
-#define DWriteCreateFactory		(*pDWriteCreateFactory)
+#నిర్వచించు GetUserDefaultLocaleName	(*pGetUserDefaultLocaleName)
+#నిర్వచించు D2D1CreateFactory		(*pD2D1CreateFactory)
+#నిర్వచించు DWriteCreateFactory		(*pDWriteCreateFactory)
 
-    static void
+    స్థిర శూన్య
 unload(HINSTANCE &hinst)
 {
-    if (hinst != NULL)
+    ఒకవేళ (hinst != ఖాళీ)
     {
 	FreeLibrary(hinst);
-	hinst = NULL;
+	hinst = ఖాళీ;
     }
 }
-#endif // DYNAMIC_DIRECTX
+#అయితే_ముగింపు // DYNAMIC_DIRECTX
 
-template <class T> inline void SafeRelease(T **ppT)
+మూస <తరగతి T> అంతఃవరుస శూన్య సురక్షిత_Release(T **ppT)
 {
-    if (*ppT)
+    ఒకవేళ (*ppT)
     {
 	(*ppT)->Release();
-	*ppT = NULL;
+	*ppT = ఖాళీ;
     }
 }
 
-    static DWRITE_PIXEL_GEOMETRY
-ToPixelGeometry(int value)
+    స్థిర DWRITE_PIXEL_GEOMETRY
+గమ్యం_Pixel_Geometry(పూర్ణాంకం విలువ)
 {
-    switch (value)
+    ఎంపిక (విలువ)
     {
-	default:
-	case 0:
-	    return DWRITE_PIXEL_GEOMETRY_FLAT;
-	case 1:
-	    return DWRITE_PIXEL_GEOMETRY_RGB;
-	case 2:
-	    return DWRITE_PIXEL_GEOMETRY_BGR;
+	అప్రమేయ:
+	స్థితి 0:
+	    తిరిగి DWRITE_PIXEL_GEOMETRY_FLAT;
+	స్థితి 1:
+	    తిరిగి DWRITE_PIXEL_GEOMETRY_RGB;
+	స్థితి 2:
+	    తిరిగి DWRITE_PIXEL_GEOMETRY_BGR;
     }
 }
 
-    static int
-ToInt(DWRITE_PIXEL_GEOMETRY value)
+    స్థిర పూర్ణాంకం
+గమ్యం_Int(DWRITE_PIXEL_GEOMETRY విలువ)
 {
-    switch (value)
+    ఎంపిక (విలువ)
     {
-	case DWRITE_PIXEL_GEOMETRY_FLAT:
-	    return 0;
-	case DWRITE_PIXEL_GEOMETRY_RGB:
-	    return 1;
-	case DWRITE_PIXEL_GEOMETRY_BGR:
-	    return 2;
-	default:
-	    return -1;
+	స్థితి DWRITE_PIXEL_GEOMETRY_FLAT:
+	    తిరిగి 0;
+	స్థితి DWRITE_PIXEL_GEOMETRY_RGB:
+	    తిరిగి 1;
+	స్థితి DWRITE_PIXEL_GEOMETRY_BGR:
+	    తిరిగి 2;
+	అప్రమేయ:
+	    తిరిగి -1;
     }
 }
 
-    static DWRITE_RENDERING_MODE
-ToRenderingMode(int value)
+    స్థిర DWRITE_RENDERING_బహుళకం
+గమ్యం_Rendering_బహుళకం(పూర్ణాంకం విలువ)
 {
-    switch (value)
+    ఎంపిక (విలువ)
     {
-	default:
-	case 0:
-	    return DWRITE_RENDERING_MODE_DEFAULT;
-	case 1:
-	    return DWRITE_RENDERING_MODE_ALIASED;
-	case 2:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
-	case 3:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
-	case 4:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
-	case 5:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
-	case 6:
-	    return DWRITE_RENDERING_MODE_OUTLINE;
+	అప్రమేయ:
+	స్థితి 0:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_DEFAULT;
+	స్థితి 1:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_ALIASED;
+	స్థితి 2:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_CLEARTYPE_GDI_CLASSIC;
+	స్థితి 3:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_CLEARTYPE_GDI_NATURAL;
+	స్థితి 4:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_CLEARTYPE_NATURAL;
+	స్థితి 5:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_CLEARTYPE_NATURAL_సౌష్ఠవ;
+	స్థితి 6:
+	    తిరిగి DWRITE_RENDERING_బహుళకం_OUTLINE;
     }
 }
 
-    static D2D1_TEXT_ANTIALIAS_MODE
-ToTextAntialiasMode(int value)
+    స్థిర D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం
+గమ్యం_పాఠ్యం_Antialias_బహుళకం(పూర్ణాంకం విలువ)
 {
-    switch (value)
+    ఎంపిక (విలువ)
     {
-	default:
-	case 0:
-	    return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
-	case 1:
-	    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-	case 2:
-	    return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
-	case 3:
-	    return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
+	అప్రమేయ:
+	స్థితి 0:
+	    తిరిగి D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_DEFAULT;
+	స్థితి 1:
+	    తిరిగి D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_CLEARTYPE;
+	స్థితి 2:
+	    తిరిగి D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_GRAYSCALE;
+	స్థితి 3:
+	    తిరిగి D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_ALIASED;
     }
 }
 
-    static int
-ToInt(DWRITE_RENDERING_MODE value)
+    స్థిర పూర్ణాంకం
+గమ్యం_Int(DWRITE_RENDERING_బహుళకం విలువ)
 {
-    switch (value)
+    ఎంపిక (విలువ)
     {
-	case DWRITE_RENDERING_MODE_DEFAULT:
-	    return 0;
-	case DWRITE_RENDERING_MODE_ALIASED:
-	    return 1;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
-	    return 2;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
-	    return 3;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
-	    return 4;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
-	    return 5;
-	case DWRITE_RENDERING_MODE_OUTLINE:
-	    return 6;
-	default:
-	    return -1;
+	స్థితి DWRITE_RENDERING_బహుళకం_DEFAULT:
+	    తిరిగి 0;
+	స్థితి DWRITE_RENDERING_బహుళకం_ALIASED:
+	    తిరిగి 1;
+	స్థితి DWRITE_RENDERING_బహుళకం_CLEARTYPE_GDI_CLASSIC:
+	    తిరిగి 2;
+	స్థితి DWRITE_RENDERING_బహుళకం_CLEARTYPE_GDI_NATURAL:
+	    తిరిగి 3;
+	స్థితి DWRITE_RENDERING_బహుళకం_CLEARTYPE_NATURAL:
+	    తిరిగి 4;
+	స్థితి DWRITE_RENDERING_బహుళకం_CLEARTYPE_NATURAL_సౌష్ఠవ:
+	    తిరిగి 5;
+	స్థితి DWRITE_RENDERING_బహుళకం_OUTLINE:
+	    తిరిగి 6;
+	అప్రమేయ:
+	    తిరిగి -1;
     }
 }
 
-class FontCache {
-public:
-    struct Item {
+తరగతి FontCache {
+బహిరంగ:
+    నిర్మాణం అంశం_2 {
 	HFONT              hFont;
-	IDWriteTextFormat* pTextFormat;
-	DWRITE_FONT_WEIGHT fontWeight;
+	IDWrite_పాఠ్యం_Format* p_పాఠ్యం_Format;
+	DWRITE_FONT_బరువు font_బరువు;
 	DWRITE_FONT_STYLE  fontStyle;
 	FLOAT              fontAscent;
-	Item() : hFont(NULL), pTextFormat(NULL), fontAscent(0.0f) {}
+	అంశం_2() : hFont(ఖాళీ), p_పాఠ్యం_Format(ఖాళీ), fontAscent(0.0f) {}
     };
 
-private:
-    int mSize;
-    Item *mItems;
+అంతరంగ:
+    పూర్ణాంకం m_కొలత;
+    అంశం_2 *m_వస్తువులు;
 
-public:
-    FontCache(int size = 2) :
-	mSize(size),
-	mItems(new Item[size])
+బహిరంగ:
+    FontCache(పూర్ణాంకం కొలత = 2) :
+	m_కొలత(కొలత),
+	m_వస్తువులు(కొత్త అంశం_2[కొలత])
     {
     }
 
     ~FontCache()
     {
-	for (int i = 0; i < mSize; ++i)
-	    SafeRelease(&mItems[i].pTextFormat);
-	delete[] mItems;
+	కొరకు (పూర్ణాంకం i = 0; i < m_కొలత; ++i)
+	    సురక్షిత_Release(&m_వస్తువులు[i].p_పాఠ్యం_Format);
+	తొలగించు[] m_వస్తువులు;
     }
 
-    bool get(HFONT hFont, Item &item)
+    తార్కిక get(HFONT hFont, అంశం_2 &అంశం)
     {
-	int n = find(hFont);
-	if (n < 0)
-	    return false;
-	item = mItems[n];
+	పూర్ణాంకం n = కనుగొను(hFont);
+	ఒకవేళ (n < 0)
+	    తిరిగి అబద్ధం;
+	అంశం = m_వస్తువులు[n];
 	slide(n);
-	return true;
+	తిరిగి నిజం;
     }
 
-    void put(const Item& item)
+    శూన్య put(స్థిరరాశి అంశం_2& అంశం)
     {
-	int n = find(item.hFont);
-	if (n < 0)
-	    n = mSize - 1;
-	if (mItems[n].pTextFormat != item.pTextFormat)
+	పూర్ణాంకం n = కనుగొను(అంశం.hFont);
+	ఒకవేళ (n < 0)
+	    n = m_కొలత - 1;
+	ఒకవేళ (m_వస్తువులు[n].p_పాఠ్యం_Format != అంశం.p_పాఠ్యం_Format)
 	{
-	    SafeRelease(&mItems[n].pTextFormat);
-	    if (item.pTextFormat != NULL)
-		item.pTextFormat->AddRef();
+	    సురక్షిత_Release(&m_వస్తువులు[n].p_పాఠ్యం_Format);
+	    ఒకవేళ (అంశం.p_పాఠ్యం_Format != ఖాళీ)
+		అంశం.p_పాఠ్యం_Format->కూడు_Ref();
 	}
-	mItems[n] = item;
+	m_వస్తువులు[n] = అంశం;
 	slide(n);
     }
 
-private:
-    int find(HFONT hFont)
+అంతరంగ:
+    పూర్ణాంకం కనుగొను(HFONT hFont)
     {
-	for (int i = 0; i < mSize; ++i)
+	కొరకు (పూర్ణాంకం i = 0; i < m_కొలత; ++i)
 	{
-	    if (mItems[i].hFont == hFont)
-		return i;
+	    ఒకవేళ (m_వస్తువులు[i].hFont == hFont)
+		తిరిగి i;
 	}
-	return -1;
+	తిరిగి -1;
     }
 
-    void slide(int nextTop)
+    శూన్య slide(పూర్ణాంకం తదుపరి_శిఖరం)
     {
-	if (nextTop == 0)
-	    return;
-	Item tmp = mItems[nextTop];
-	for (int i = nextTop - 1; i >= 0; --i)
-	    mItems[i + 1] = mItems[i];
-	mItems[0] = tmp;
+	ఒకవేళ (తదుపరి_శిఖరం == 0)
+	    తిరిగి;
+	అంశం_2 tmp = m_వస్తువులు[తదుపరి_శిఖరం];
+	కొరకు (పూర్ణాంకం i = తదుపరి_శిఖరం - 1; i >= 0; --i)
+	    m_వస్తువులు[i + 1] = m_వస్తువులు[i];
+	m_వస్తువులు[0] = tmp;
     }
 };
 
-enum DrawingMode {
+గణన Drawing_బహుళకం {
     DM_GDI = 0,
     DM_DIRECTX = 1,
     DM_INTEROP = 2,
 };
 
-struct DWriteContext {
+నిర్మాణం DWriteContext {
     HDC mHDC;
     RECT mBindRect;
-    DrawingMode mDMode;
+    Drawing_బహుళకం mDMode;
     HDC mInteropHDC;
-    bool mDrawing;
-    bool mFallbackDC;
+    తార్కిక mDrawing;
+    తార్కిక mFallbackDC;
 
     ID2D1Factory *mD2D1Factory;
 
-    ID2D1DCRenderTarget *mRT;
-    ID2D1GdiInteropRenderTarget *mGDIRT;
+    ID2_D1_DCRender_లక్ష్యం *mRT;
+    ID2_D1_Gdi_Interop_Render_లక్ష్యం *mGDIRT;
     ID2D1SolidColorBrush *mBrush;
     ID2D1Bitmap *mBitmap;
 
     IDWriteFactory *mDWriteFactory;
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
     IDWriteFactory2 *mDWriteFactory2;
-#endif
+#అయితే_ముగింపు
 
     IDWriteGdiInterop *mGdiInterop;
     IDWriteRenderingParams *mRenderingParams;
 
     FontCache mFontCache;
-    IDWriteTextFormat *mTextFormat;
-    DWRITE_FONT_WEIGHT mFontWeight;
+    IDWrite_పాఠ్యం_Format *m_పాఠ్యం_Format;
+    DWRITE_FONT_బరువు m_Font_బరువు;
     DWRITE_FONT_STYLE mFontStyle;
-    FLOAT mFontSize;       // Font size in pixels (em height)
+    FLOAT m_Font_కొలత;       // Font size in pixels (em height)
     FLOAT mFontAscent;     // Font ascent in pixels
 
-    D2D1_TEXT_ANTIALIAS_MODE mTextAntialiasMode;
+    D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం m_పాఠ్యం_Antialias_బహుళకం;
 
     DWriteFontFeature mFontFeatures[DWRITE_MAX_FONT_FEATURES];
-    int mFontFeatureCount;
+    పూర్ణాంకం m_Font_Feature_లెక్క;
 
     // METHODS
 
     DWriteContext();
 
-    virtual ~DWriteContext();
+    మాయా ~DWriteContext();
 
     HRESULT CreateDeviceResources();
 
-    void DiscardDeviceResources();
+    శూన్య DiscardDeviceResources();
 
-    HRESULT CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
-	    IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent);
+    HRESULT Create_పాఠ్యం_Format_From_LOGFONT(స్థిరరాశి LOGFONTW &logFont,
+	    IDWrite_పాఠ్యం_Format **pp_పాఠ్యం_Format, FLOAT *pFontAscent);
 
-    HRESULT SetFontByLOGFONT(const LOGFONTW &logFont);
+    HRESULT సమితి_Font_By_LOGFONT(స్థిరరాశి LOGFONTW &logFont);
 
-    void SetFont(HFONT hFont);
+    శూన్య సమితి_Font(HFONT hFont);
 
-    void Rebind();
+    శూన్య Rebind();
 
-    void BindDC(HDC hdc, const RECT *rect);
+    శూన్య BindDC(HDC hdc, స్థిరరాశి RECT *rect);
 
-    HRESULT SetDrawingMode(DrawingMode mode);
+    HRESULT సమితి_Drawing_బహుళకం(Drawing_బహుళకం బహుళకం);
 
     ID2D1Brush* SolidBrush(COLORREF color);
 
-    void DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx);
+    శూన్య Draw_పాఠ్యం(స్థిరరాశి WCHAR *పాఠ్యం, పూర్ణాంకం len,
+	పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h, పూర్ణాంకం cell_వెడల్పు_2, COLORREF color,
+	UINT fuOptions, స్థిరరాశి RECT *lprc, స్థిరరాశి INT *lpDx);
 
-    void FillRect(const RECT *rc, COLORREF color);
+    శూన్య FillRect(స్థిరరాశి RECT *rc, COLORREF color);
 
-    void DrawLine(int x1, int y1, int x2, int y2, COLORREF color);
+    శూన్య Draw_పంక్తి(పూర్ణాంకం x1, పూర్ణాంకం y1, పూర్ణాంకం x2, పూర్ణాంకం y2, COLORREF color);
 
-    void SetPixel(int x, int y, COLORREF color);
+    శూన్య సమితి_Pixel(పూర్ణాంకం x, పూర్ణాంకం y, COLORREF color);
 
-    void Scroll(int x, int y, const RECT *rc);
+    శూన్య Scroll(పూర్ణాంకం x, పూర్ణాంకం y, స్థిరరాశి RECT *rc);
 
-    void Flush();
+    శూన్య Flush();
 
-    void SetRenderingParams(
-	    const DWriteRenderingParams *params);
+    శూన్య సమితి_Rendering_Params(
+	    స్థిరరాశి DWriteRenderingParams *params);
 
     DWriteRenderingParams *GetRenderingParams(
 	    DWriteRenderingParams *params);
 
-    void SetFontFeatures(const DWriteFontFeature *features, int count);
+    శూన్య సమితి_Font_Features(స్థిరరాశి DWriteFontFeature *features, పూర్ణాంకం లెక్క);
 };
 
-class AdjustedGlyphRun : public DWRITE_GLYPH_RUN
+తరగతి Adjusted_Glyph_నిరంతరం : బహిరంగ DWRITE_GLYPH_నిరంతరం
 {
-private:
+అంతరంగ:
     FLOAT &mAccum;
     FLOAT mDelta;
     FLOAT *mAdjustedAdvances;
 
-public:
-    AdjustedGlyphRun(
-	    const DWRITE_GLYPH_RUN *glyphRun,
-	    FLOAT cellWidth,
+బహిరంగ:
+    Adjusted_Glyph_నిరంతరం(
+	    స్థిరరాశి DWRITE_GLYPH_నిరంతరం *glyph_నిరంతరం,
+	    FLOAT cell_వెడల్పు_2,
 	    FLOAT &accum,
-	    const INT *lpDx,
-	    int *glyphIndex,
-	    int cchText) :
-	DWRITE_GLYPH_RUN(*glyphRun),
+	    స్థిరరాశి INT *lpDx,
+	    పూర్ణాంకం *glyph_సూచీ,
+	    పూర్ణాంకం cch_పాఠ్యం) :
+	DWRITE_GLYPH_నిరంతరం(*glyph_నిరంతరం),
 	mAccum(accum),
 	mDelta(0.0f),
-	mAdjustedAdvances(new FLOAT[glyphRun->glyphCount])
+	mAdjustedAdvances(కొత్త FLOAT[glyph_నిరంతరం->glyph_లెక్క])
     {
-	assert(cellWidth != 0.0f);
-	for (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
+	ప్రతిజ్ఞా(cell_వెడల్పు_2 != 0.0f);
+	కొరకు (UINT32 i = 0; i < glyph_నిరంతరం->glyph_లెక్క; ++i)
 	{
-	    FLOAT orig = glyphRun->glyphAdvances[i];
+	    FLOAT orig = glyph_నిరంతరం->glyphAdvances[i];
 	    FLOAT adjusted;
 
-	    if (*glyphIndex < cchText)
+	    ఒకవేళ (*glyph_సూచీ < cch_పాఠ్యం)
 	    {
-		adjusted = FLOAT(lpDx[*glyphIndex]);
-		(*glyphIndex)++;
+		adjusted = FLOAT(lpDx[*glyph_సూచీ]);
+		(*glyph_సూచీ)++;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		adjusted = adjustToCell(orig, cellWidth);
+		adjusted = adjust_గమ్యం_Cell(orig, cell_వెడల్పు_2);
 	    }
 
 	    mAdjustedAdvances[i] = adjusted;
@@ -406,265 +406,265 @@ public:
 	glyphAdvances = mAdjustedAdvances;
     }
 
-    ~AdjustedGlyphRun()
+    ~Adjusted_Glyph_నిరంతరం()
     {
 	mAccum += mDelta;
-	delete[] mAdjustedAdvances;
+	తొలగించు[] mAdjustedAdvances;
     }
 
-    static FLOAT adjustToCell(FLOAT value, FLOAT cellWidth)
+    స్థిర FLOAT adjust_గమ్యం_Cell(FLOAT విలువ, FLOAT cell_వెడల్పు_2)
     {
-	int cellCount = int(floor(value / cellWidth + 0.5f));
-	if (cellCount < 1)
-	    cellCount = 1;
-	return cellCount * cellWidth;
+	పూర్ణాంకం cell_లెక్క = పూర్ణాంకం(floor(విలువ / cell_వెడల్పు_2 + 0.5f));
+	ఒకవేళ (cell_లెక్క < 1)
+	    cell_లెక్క = 1;
+	తిరిగి cell_లెక్క * cell_వెడల్పు_2;
     }
 };
 
-struct TextRendererContext {
+నిర్మాణం పాఠ్యం_Renderer_Context {
     // const fields.
     COLORREF color;
-    FLOAT cellWidth;
-    const INT *lpDx;
-    int cchText;
+    FLOAT cell_వెడల్పు_2;
+    స్థిరరాశి INT *lpDx;
+    పూర్ణాంకం cch_పాఠ్యం;
     FLOAT baselineY;  // Fixed baseline Y coordinate
 
     // working fields.
-    FLOAT offsetX;
-    int glyphIndex;
+    FLOAT స్థానభ్రంశం_X;
+    పూర్ణాంకం glyph_సూచీ;
 };
 
-class TextRenderer FINAL : public IDWriteTextRenderer
+తరగతి పాఠ్యం_Renderer FINAL : బహిరంగ IDWrite_పాఠ్యం_Renderer
 {
-public:
-    TextRenderer(
+బహిరంగ:
+    పాఠ్యం_Renderer(
 	    DWriteContext* pDWC) :
-	cRefCount_(0),
+	c_Ref_లెక్క(0),
 	pDWC_(pDWC)
     {
-	AddRef();
+	కూడు_Ref();
     }
 
     // add "virtual" to avoid a compiler warning
-    virtual ~TextRenderer()
+    మాయా ~పాఠ్యం_Renderer()
     {
     }
 
     IFACEMETHOD(IsPixelSnappingDisabled)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull శూన్య* clientDrawingContext వాడని,
 	__out BOOL* isDisabled)
     {
 	*isDisabled = FALSE;
-	return S_OK;
+	తిరిగి S_OK;
     }
 
     IFACEMETHOD(GetCurrentTransform)(
-	__maybenull void* clientDrawingContext UNUSED,
-	__out DWRITE_MATRIX* transform)
+	__maybenull శూన్య* clientDrawingContext వాడని,
+	__out DWRITE_మాతృక* transform)
     {
 	// forward the render target's transform
 	pDWC_->mRT->GetTransform(
-		reinterpret_cast<D2D1_MATRIX_3X2_F*>(transform));
-	return S_OK;
+		reinterpret_cast<D2_D1_మాతృక_3_X2_F*>(transform));
+	తిరిగి S_OK;
     }
 
-    IFACEMETHOD(GetPixelsPerDip)(
-	__maybenull void* clientDrawingContext UNUSED,
-	__out FLOAT* pixelsPerDip)
+    IFACEMETHOD(Get_Pixels_చొప్పున_Dip)(
+	__maybenull శూన్య* clientDrawingContext వాడని,
+	__out FLOAT* pixels_చొప్పున_Dip)
     {
-	float dpiX, unused;
-	pDWC_->mRT->GetDpi(&dpiX, &unused);
-	*pixelsPerDip = dpiX / 96.0f;
-	return S_OK;
+	దశాంశం dpiX, వాడని_2;
+	pDWC_->mRT->GetDpi(&dpiX, &వాడని_2);
+	*pixels_చొప్పున_Dip = dpiX / 96.0f;
+	తిరిగి S_OK;
     }
 
     IFACEMETHOD(DrawUnderline)(
-	__maybenull void* clientDrawingContext UNUSED,
-	FLOAT baselineOriginX UNUSED,
-	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_UNDERLINE const* underline UNUSED,
-	IUnknown* clientDrawingEffect UNUSED)
+	__maybenull శూన్య* clientDrawingContext వాడని,
+	FLOAT baselineOriginX వాడని,
+	FLOAT baselineOriginY వాడని,
+	__in DWRITE_UNDERLINE స్థిరరాశి* underline వాడని,
+	IUnknown* clientDrawingEffect వాడని)
     {
-	return E_NOTIMPL;
+	తిరిగి E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawStrikethrough)(
-	__maybenull void* clientDrawingContext UNUSED,
-	FLOAT baselineOriginX UNUSED,
-	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_STRIKETHROUGH const* strikethrough UNUSED,
-	IUnknown* clientDrawingEffect UNUSED)
+	__maybenull శూన్య* clientDrawingContext వాడని,
+	FLOAT baselineOriginX వాడని,
+	FLOAT baselineOriginY వాడని,
+	__in DWRITE_STRIKETHROUGH స్థిరరాశి* strikethrough వాడని,
+	IUnknown* clientDrawingEffect వాడని)
     {
-	return E_NOTIMPL;
+	తిరిగి E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawInlineObject)(
-	__maybenull void* clientDrawingContext UNUSED,
-	FLOAT originX UNUSED,
-	FLOAT originY UNUSED,
-	IDWriteInlineObject* inlineObject UNUSED,
-	BOOL isSideways UNUSED,
-	BOOL isRightToLeft UNUSED,
-	IUnknown* clientDrawingEffect UNUSED)
+	__maybenull శూన్య* clientDrawingContext వాడని,
+	FLOAT originX వాడని,
+	FLOAT originY వాడని,
+	IDWriteInlineObject* inlineObject వాడని,
+	BOOL isSideways వాడని,
+	BOOL is_కుడి_గమ్యం_ఎడమ వాడని,
+	IUnknown* clientDrawingEffect వాడని)
     {
-	return E_NOTIMPL;
+	తిరిగి E_NOTIMPL;
     }
 
-    IFACEMETHOD(DrawGlyphRun)(
-	__maybenull void* clientDrawingContext,
+    IFACEMETHOD(Draw_Glyph_నిరంతరం)(
+	__maybenull శూన్య* clientDrawingContext,
 	FLOAT baselineOriginX,
 	FLOAT baselineOriginY,
-	DWRITE_MEASURING_MODE measuringMode UNUSED,
-	__in DWRITE_GLYPH_RUN const* glyphRun,
-	__in DWRITE_GLYPH_RUN_DESCRIPTION const* glyphRunDescription UNUSED,
-	IUnknown* clientDrawingEffect UNUSED)
+	DWRITE_MEASURING_బహుళకం measuring_బహుళకం వాడని,
+	__in DWRITE_GLYPH_నిరంతరం స్థిరరాశి* glyph_నిరంతరం,
+	__in DWRITE_GLYPH_నిరంతరం_DESCRIPTION స్థిరరాశి* glyph_నిరంతరం_Description వాడని,
+	IUnknown* clientDrawingEffect వాడని)
     {
-	TextRendererContext *context =
-	    reinterpret_cast<TextRendererContext*>(clientDrawingContext);
+	పాఠ్యం_Renderer_Context *context =
+	    reinterpret_cast<పాఠ్యం_Renderer_Context*>(clientDrawingContext);
 
 	// Use fixed baseline Y from context instead of DirectWrite's
 	// baselineOriginY to prevent vertical shifts when font fallback
 	// occurs (e.g., for CJK characters).
 	FLOAT fixedBaselineY = context->baselineY;
 
-	AdjustedGlyphRun adjustedGlyphRun(glyphRun, context->cellWidth,
-		context->offsetX, context->lpDx, &context->glyphIndex,
-		context->cchText);
+	Adjusted_Glyph_నిరంతరం adjusted_Glyph_నిరంతరం(glyph_నిరంతరం, context->cell_వెడల్పు_2,
+		context->స్థానభ్రంశం_X, context->lpDx, &context->glyph_సూచీ,
+		context->cch_పాఠ్యం);
 
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
-	if (pDWC_->mDWriteFactory2 != NULL)
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
+	ఒకవేళ (pDWC_->mDWriteFactory2 != ఖాళీ)
 	{
-	    IDWriteColorGlyphRunEnumerator *enumerator = NULL;
-	    HRESULT hr = pDWC_->mDWriteFactory2->TranslateColorGlyphRun(
-		baselineOriginX + context->offsetX,
+	    IDWrite_Color_Glyph_నిరంతరం_Enumerator *enumerator = ఖాళీ;
+	    HRESULT hr = pDWC_->mDWriteFactory2->Translate_Color_Glyph_నిరంతరం(
+		baselineOriginX + context->స్థానభ్రంశం_X,
 		baselineOriginY,
-		&adjustedGlyphRun,
-		NULL,
-		DWRITE_MEASURING_MODE_GDI_NATURAL,
-		NULL,
+		&adjusted_Glyph_నిరంతరం,
+		ఖాళీ,
+		DWRITE_MEASURING_బహుళకం_GDI_NATURAL,
+		ఖాళీ,
 		0,
 		&enumerator);
-	    if (SUCCEEDED(hr))
+	    ఒకవేళ (SUCCEEDED(hr))
 	    {
 		// Draw by IDWriteFactory2 for color emoji
-		BOOL hasRun = TRUE;
-		enumerator->MoveNext(&hasRun);
-		while (hasRun)
+		BOOL has_నిరంతరం = TRUE;
+		enumerator->Move_తదుపరి(&has_నిరంతరం);
+		అయితే (has_నిరంతరం)
 		{
-		    const DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
-		    enumerator->GetCurrentRun(&colorGlyphRun);
+		    స్థిరరాశి DWRITE_COLOR_GLYPH_నిరంతరం* color_Glyph_నిరంతరం;
+		    enumerator->Get_Current_నిరంతరం(&color_Glyph_నిరంతరం);
 
-		    pDWC_->mBrush->SetColor(colorGlyphRun->runColor);
-		    pDWC_->mRT->DrawGlyphRun(
+		    pDWC_->mBrush->సమితి_Color(color_Glyph_నిరంతరం->నిరంతరం_Color);
+		    pDWC_->mRT->Draw_Glyph_నిరంతరం(
 			    D2D1::Point2F(
-				colorGlyphRun->baselineOriginX,
+				color_Glyph_నిరంతరం->baselineOriginX,
 				fixedBaselineY),
-			    &colorGlyphRun->glyphRun,
+			    &color_Glyph_నిరంతరం->glyph_నిరంతరం,
 			    pDWC_->mBrush,
-			    DWRITE_MEASURING_MODE_NATURAL);
-		    enumerator->MoveNext(&hasRun);
+			    DWRITE_MEASURING_బహుళకం_NATURAL);
+		    enumerator->Move_తదుపరి(&has_నిరంతరం);
 		}
-		SafeRelease(&enumerator);
-		return S_OK;
+		సురక్షిత_Release(&enumerator);
+		తిరిగి S_OK;
 	    }
 	}
-#endif
+#అయితే_ముగింపు
 
 	// Draw by IDWriteFactory (without color emoji)
-	pDWC_->mRT->DrawGlyphRun(
+	pDWC_->mRT->Draw_Glyph_నిరంతరం(
 		D2D1::Point2F(
-		    baselineOriginX + context->offsetX,
+		    baselineOriginX + context->స్థానభ్రంశం_X,
 		    fixedBaselineY),
-		&adjustedGlyphRun,
+		&adjusted_Glyph_నిరంతరం,
 		pDWC_->SolidBrush(context->color),
-		DWRITE_MEASURING_MODE_NATURAL);
-	return S_OK;
+		DWRITE_MEASURING_బహుళకం_NATURAL);
+	తిరిగి S_OK;
     }
 
-public:
-    IFACEMETHOD_(unsigned long, AddRef) ()
+బహిరంగ:
+    IFACEMETHOD_(గుర్తులేని దీర్ఘ, కూడు_Ref) ()
     {
-	return InterlockedIncrement(&cRefCount_);
+	తిరిగి InterlockedIncrement(&c_Ref_లెక్క);
     }
 
-    IFACEMETHOD_(unsigned long, Release) ()
+    IFACEMETHOD_(గుర్తులేని దీర్ఘ, Release) ()
     {
-	long newCount = InterlockedDecrement(&cRefCount_);
+	దీర్ఘ new_లెక్క_2 = InterlockedDecrement(&c_Ref_లెక్క);
 
-	if (newCount == 0)
+	ఒకవేళ (new_లెక్క_2 == 0)
 	{
-	    delete this;
-	    return 0;
+	    తొలగించు ఇది;
+	    తిరిగి 0;
 	}
-	return newCount;
+	తిరిగి new_లెక్క_2;
     }
 
     IFACEMETHOD(QueryInterface)(
-	IID const& riid,
-	void** ppvObject)
+	IID స్థిరరాశి& riid,
+	శూన్య** ppvObject)
     {
-	if (__uuidof(IDWriteTextRenderer) == riid)
+	ఒకవేళ (__uuidof(IDWrite_పాఠ్యం_Renderer) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ఇది;
 	}
-	else if (__uuidof(IDWritePixelSnapping) == riid)
+	లేకపోతే ఒకవేళ (__uuidof(IDWritePixelSnapping) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ఇది;
 	}
-	else if (__uuidof(IUnknown) == riid)
+	లేకపోతే ఒకవేళ (__uuidof(IUnknown) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ఇది;
 	}
-	else
+	లేకపోతే
 	{
-	    *ppvObject = NULL;
-	    return E_FAIL;
+	    *ppvObject = ఖాళీ;
+	    తిరిగి E_FAIL;
 	}
 
-	return S_OK;
+	తిరిగి S_OK;
     }
 
-private:
-    long cRefCount_;
+అంతరంగ:
+    దీర్ఘ c_Ref_లెక్క;
     DWriteContext* pDWC_;
 };
 
 DWriteContext::DWriteContext() :
-    mHDC(NULL),
+    mHDC(ఖాళీ),
     mBindRect(),
     mDMode(DM_GDI),
-    mInteropHDC(NULL),
-    mDrawing(false),
-    mFallbackDC(false),
-    mD2D1Factory(NULL),
-    mRT(NULL),
-    mGDIRT(NULL),
-    mBrush(NULL),
-    mBitmap(NULL),
-    mDWriteFactory(NULL),
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
-    mDWriteFactory2(NULL),
-#endif
-    mGdiInterop(NULL),
-    mRenderingParams(NULL),
+    mInteropHDC(ఖాళీ),
+    mDrawing(అబద్ధం),
+    mFallbackDC(అబద్ధం),
+    mD2D1Factory(ఖాళీ),
+    mRT(ఖాళీ),
+    mGDIRT(ఖాళీ),
+    mBrush(ఖాళీ),
+    mBitmap(ఖాళీ),
+    mDWriteFactory(ఖాళీ),
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
+    mDWriteFactory2(ఖాళీ),
+#అయితే_ముగింపు
+    mGdiInterop(ఖాళీ),
+    mRenderingParams(ఖాళీ),
     mFontCache(8),
-    mTextFormat(NULL),
-    mFontWeight(DWRITE_FONT_WEIGHT_NORMAL),
-    mFontStyle(DWRITE_FONT_STYLE_NORMAL),
-    mFontSize(0.0f),
+    m_పాఠ్యం_Format(ఖాళీ),
+    m_Font_బరువు(DWRITE_FONT_బరువు_సాధారణ),
+    mFontStyle(DWRITE_FONT_STYLE_సాధారణ),
+    m_Font_కొలత(0.0f),
     mFontAscent(0.0f),
-    mTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_DEFAULT),
-    mFontFeatureCount(0)
+    m_పాఠ్యం_Antialias_బహుళకం(D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_DEFAULT),
+    m_Font_Feature_లెక్క(0)
 {
-    ZeroMemory(mFontFeatures, sizeof(mFontFeatures));
+    Zero_జ్ఞాపకం(mFontFeatures, పరిమాణం(mFontFeatures));
     HRESULT hr;
 
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
-	    __uuidof(ID2D1Factory), NULL,
-	    reinterpret_cast<void**>(&mD2D1Factory));
+	    __uuidof(ID2D1Factory), ఖాళీ,
+	    reinterpret_cast<శూన్య**>(&mD2D1Factory));
     _RPT2(_CRT_WARN, "D2D1CreateFactory: hr=%p p=%p\n", hr, mD2D1Factory);
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -674,8 +674,8 @@ DWriteContext::DWriteContext() :
 		mDWriteFactory);
     }
 
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
-    if (SUCCEEDED(hr))
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -683,15 +683,15 @@ DWriteContext::DWriteContext() :
 		reinterpret_cast<IUnknown**>(&mDWriteFactory2));
 	_RPT1(_CRT_WARN, "IDWriteFactory2: %s\n", SUCCEEDED(hr) ? "available" : "not available");
     }
-#endif
+#అయితే_ముగింపు
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->GetGdiInterop(&mGdiInterop);
 	_RPT2(_CRT_WARN, "GetGdiInterop: hr=%p p=%p\n", hr, mGdiInterop);
     }
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->CreateRenderingParams(&mRenderingParams);
 	_RPT2(_CRT_WARN, "CreateRenderingParams: hr=%p p=%p\n", hr,
@@ -701,18 +701,18 @@ DWriteContext::DWriteContext() :
 
 DWriteContext::~DWriteContext()
 {
-    SafeRelease(&mTextFormat);
-    SafeRelease(&mRenderingParams);
-    SafeRelease(&mGdiInterop);
-    SafeRelease(&mDWriteFactory);
-#ifdef FEAT_DIRECTX_COLOR_EMOJI
-    SafeRelease(&mDWriteFactory2);
-#endif
-    SafeRelease(&mBitmap);
-    SafeRelease(&mBrush);
-    SafeRelease(&mGDIRT);
-    SafeRelease(&mRT);
-    SafeRelease(&mD2D1Factory);
+    సురక్షిత_Release(&m_పాఠ్యం_Format);
+    సురక్షిత_Release(&mRenderingParams);
+    సురక్షిత_Release(&mGdiInterop);
+    సురక్షిత_Release(&mDWriteFactory);
+#నిర్వచితమైతే FEAT_DIRECTX_COLOR_EMOJI
+    సురక్షిత_Release(&mDWriteFactory2);
+#అయితే_ముగింపు
+    సురక్షిత_Release(&mBitmap);
+    సురక్షిత_Release(&mBrush);
+    సురక్షిత_Release(&mGDIRT);
+    సురక్షిత_Release(&mRT);
+    సురక్షిత_Release(&mD2D1Factory);
 }
 
     HRESULT
@@ -720,29 +720,29 @@ DWriteContext::CreateDeviceResources()
 {
     HRESULT hr;
 
-    if (mRT != NULL)
-	return S_OK;
+    ఒకవేళ (mRT != ఖాళీ)
+	తిరిగి S_OK;
 
-    D2D1_RENDER_TARGET_PROPERTIES props = {
-	D2D1_RENDER_TARGET_TYPE_DEFAULT,
-	{ DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE },
+    D2_D1_RENDER_లక్ష్యం_PROPERTIES props = {
+	D2_D1_RENDER_లక్ష్యం_TYPE_DEFAULT,
+	{ DXGI_FORMAT_B8G8R8A8_UNORM, D2_D1_ALPHA_బహుళకం_IGNORE },
 	0, 0,
-	D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE,
+	D2_D1_RENDER_లక్ష్యం_USAGE_GDI_COMPATIBLE,
 	D2D1_FEATURE_LEVEL_DEFAULT
     };
-    hr = mD2D1Factory->CreateDCRenderTarget(&props, &mRT);
+    hr = mD2D1Factory->Create_DCRender_లక్ష్యం(&props, &mRT);
     _RPT2(_CRT_WARN, "CreateDCRenderTarget: hr=%p p=%p\n", hr, mRT);
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	// This always succeeds.
 	mRT->QueryInterface(
-		__uuidof(ID2D1GdiInteropRenderTarget),
-		reinterpret_cast<void**>(&mGDIRT));
+		__uuidof(ID2_D1_Gdi_Interop_Render_లక్ష్యం),
+		reinterpret_cast<శూన్య**>(&mGDIRT));
 	_RPT1(_CRT_WARN, "GdiInteropRenderTarget: p=%p\n", mGDIRT);
     }
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = mRT->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Black),
@@ -750,51 +750,51 @@ DWriteContext::CreateDeviceResources()
 	_RPT2(_CRT_WARN, "CreateSolidColorBrush: hr=%p p=%p\n", hr, mBrush);
     }
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
 	Rebind();
 
-    return hr;
+    తిరిగి hr;
 }
 
-    void
+    శూన్య
 DWriteContext::DiscardDeviceResources()
 {
-    SafeRelease(&mBitmap);
-    SafeRelease(&mBrush);
-    SafeRelease(&mGDIRT);
-    SafeRelease(&mRT);
+    సురక్షిత_Release(&mBitmap);
+    సురక్షిత_Release(&mBrush);
+    సురక్షిత_Release(&mGDIRT);
+    సురక్షిత_Release(&mRT);
 }
 
     HRESULT
-DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
-	IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent)
+DWriteContext::Create_పాఠ్యం_Format_From_LOGFONT(స్థిరరాశి LOGFONTW &logFont,
+	IDWrite_పాఠ్యం_Format **pp_పాఠ్యం_Format, FLOAT *pFontAscent)
 {
     // Most of this function is copied from: https://github.com/Microsoft/Windows-classic-samples/blob/master/Samples/Win7Samples/multimedia/DirectWrite/RenderTest/TextHelpers.cpp
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWrite_పాఠ్యం_Format *p_పాఠ్యం_Format = ఖాళీ;
 
-    IDWriteFont *font = NULL;
-    IDWriteFontFamily *fontFamily = NULL;
-    IDWriteLocalizedStrings *localizedFamilyNames = NULL;
-    float fontSize = 0;
+    IDWriteFont *font = ఖాళీ;
+    IDWriteFontFamily *fontFamily = ఖాళీ;
+    IDWrite_Localized_అక్షరశ్రేణులు *localized_Family_పేర్లు = ఖాళీ;
+    దశాంశం font_కొలత = 0;
     DWRITE_FONT_METRICS fontMetrics = {};
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = mGdiInterop->CreateFontFromLOGFONT(&logFont, &font);
     }
 
     // Get the font family to which this font belongs.
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	hr = font->GetFontFamily(&fontFamily);
     }
 
     // Get the family names. This returns an object that encapsulates one or
     // more names with the same meaning but in different languages.
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	hr = fontFamily->GetFamilyNames(&localizedFamilyNames);
+	hr = fontFamily->Get_Family_పేర్లు(&localized_Family_పేర్లు);
     }
 
     // Get the family name at index zero. If we were going to display the name
@@ -802,344 +802,344 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // purposes of creating a text format object any language will do.
 
     wchar_t familyName[100];
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	hr = localizedFamilyNames->GetString(0, familyName,
+	hr = localized_Family_పేర్లు->GetString(0, familyName,
 		ARRAYSIZE(familyName));
     }
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	// Use lfHeight of the LOGFONT as font size.
-	fontSize = float(logFont.lfHeight);
+	font_కొలత = దశాంశం(logFont.lf_ఎత్తు);
 
 	font->GetMetrics(&fontMetrics);
 
 	// Convert lfHeight to DirectWrite font size
-	if (fontSize < 0)
+	ఒకవేళ (font_కొలత < 0)
 	{
 	    // Negative lfHeight represents the font's em height in pixels
-	    fontSize = -fontSize;
+	    font_కొలత = -font_కొలత;
 	}
-	else if (fontSize > 0)
+	లేకపోతే ఒకవేళ (font_కొలత > 0)
 	{
 	    // Positive lfHeight represents the font's cell height (ascent + descent)
 	    // Convert to em height
-	    fontSize = fontSize * float(fontMetrics.designUnitsPerEm)
-		/ float(fontMetrics.ascent + fontMetrics.descent + fontMetrics.lineGap);
+	    font_కొలత = font_కొలత * దశాంశం(fontMetrics.design_Units_చొప్పున_Em)
+		/ దశాంశం(fontMetrics.ascent + fontMetrics.descent + fontMetrics.పంక్తి_Gap);
 	}
     }
 
     // The text format includes a locale name. Ideally, this would be the
     // language of the text, which may or may not be the same as the primary
     // language of the user. However, for our purposes the user locale will do.
-    wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-    if (SUCCEEDED(hr))
+    wchar_t localeName[LOCALE_NAME_MAX_నిడివి];
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
-	    hr = HRESULT_FROM_WIN32(GetLastError());
+	ఒకవేళ (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_నిడివి) == 0)
+	    hr = HRESULT_FROM_WIN32(Get_చివరి_Error());
     }
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
 	// Create the text format object.
-	hr = mDWriteFactory->CreateTextFormat(
+	hr = mDWriteFactory->Create_పాఠ్యం_Format(
 		familyName,
-		NULL, // no custom font collection
-		font->GetWeight(),
+		ఖాళీ, // no custom font collection
+		font->Get_బరువు(),
 		font->GetStyle(),
 		font->GetStretch(),
-		fontSize,
+		font_కొలత,
 		localeName,
-		&pTextFormat);
+		&p_పాఠ్యం_Format);
     }
 
-    if (SUCCEEDED(hr))
-	hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    ఒకవేళ (SUCCEEDED(hr))
+	hr = p_పాఠ్యం_Format->సమితి_పాఠ్యం_Alignment(DWRITE_పాఠ్యం_ALIGNMENT_LEADING);
 
-    if (SUCCEEDED(hr))
-	hr = pTextFormat->SetParagraphAlignment(
+    ఒకవేళ (SUCCEEDED(hr))
+	hr = p_పాఠ్యం_Format->సమితి_Paragraph_Alignment(
 		DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
-    if (SUCCEEDED(hr))
-	hr = pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
+    ఒకవేళ (SUCCEEDED(hr))
+	hr = p_పాఠ్యం_Format->సమితి_మాట_Wrapping(DWRITE_మాట_WRAPPING_NO_WRAP);
 
-    SafeRelease(&localizedFamilyNames);
-    SafeRelease(&fontFamily);
-    SafeRelease(&font);
+    సురక్షిత_Release(&localized_Family_పేర్లు);
+    సురక్షిత_Release(&fontFamily);
+    సురక్షిత_Release(&font);
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	*ppTextFormat = pTextFormat;
-	if (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
+	*pp_పాఠ్యం_Format = p_పాఠ్యం_Format;
+	ఒకవేళ (pFontAscent != ఖాళీ && fontMetrics.design_Units_చొప్పున_Em != 0)
 	{
 	    // Calculate ascent ratio (0.0 to 1.0) relative to total font height
-	    FLOAT totalHeight = float(fontMetrics.ascent + fontMetrics.descent);
-	    if (totalHeight != 0.0f)
-		*pFontAscent = float(fontMetrics.ascent) / totalHeight;
-	    else
+	    FLOAT మొత్తం_ఎత్తు = దశాంశం(fontMetrics.ascent + fontMetrics.descent);
+	    ఒకవేళ (మొత్తం_ఎత్తు != 0.0f)
+		*pFontAscent = దశాంశం(fontMetrics.ascent) / మొత్తం_ఎత్తు;
+	    లేకపోతే
 		*pFontAscent = 0.83f; // fallback
 	}
     }
-    else
-	SafeRelease(&pTextFormat);
+    లేకపోతే
+	సురక్షిత_Release(&p_పాఠ్యం_Format);
 
-    return hr;
+    తిరిగి hr;
 }
 
     HRESULT
-DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
+DWriteContext::సమితి_Font_By_LOGFONT(స్థిరరాశి LOGFONTW &logFont)
 {
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWrite_పాఠ్యం_Format *p_పాఠ్యం_Format = ఖాళీ;
     FLOAT fontAscent = 0.0f;
 
-    hr = CreateTextFormatFromLOGFONT(logFont, &pTextFormat, &fontAscent);
+    hr = Create_పాఠ్యం_Format_From_LOGFONT(logFont, &p_పాఠ్యం_Format, &fontAscent);
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	SafeRelease(&mTextFormat);
-	mTextFormat = pTextFormat;
-	mFontWeight = static_cast<DWRITE_FONT_WEIGHT>(logFont.lfWeight);
+	సురక్షిత_Release(&m_పాఠ్యం_Format);
+	m_పాఠ్యం_Format = p_పాఠ్యం_Format;
+	m_Font_బరువు = static_cast<DWRITE_FONT_బరువు>(logFont.lf_బరువు);
 	mFontStyle = logFont.lfItalic ? DWRITE_FONT_STYLE_ITALIC
-	    : DWRITE_FONT_STYLE_NORMAL;
+	    : DWRITE_FONT_STYLE_సాధారణ;
 	mFontAscent = fontAscent;
     }
 
-    return hr;
+    తిరిగి hr;
 }
 
-    void
-DWriteContext::SetFont(HFONT hFont)
+    శూన్య
+DWriteContext::సమితి_Font(HFONT hFont)
 {
-    FontCache::Item item;
-    if (mFontCache.get(hFont, item))
+    FontCache::అంశం_2 అంశం;
+    ఒకవేళ (mFontCache.get(hFont, అంశం))
     {
-	if (item.pTextFormat != NULL)
+	ఒకవేళ (అంశం.p_పాఠ్యం_Format != ఖాళీ)
 	{
-	    item.pTextFormat->AddRef();
-	    SafeRelease(&mTextFormat);
-	    mTextFormat = item.pTextFormat;
-	    mFontWeight = item.fontWeight;
-	    mFontStyle = item.fontStyle;
-	    mFontAscent = item.fontAscent;
-	    mFallbackDC = false;
+	    అంశం.p_పాఠ్యం_Format->కూడు_Ref();
+	    సురక్షిత_Release(&m_పాఠ్యం_Format);
+	    m_పాఠ్యం_Format = అంశం.p_పాఠ్యం_Format;
+	    m_Font_బరువు = అంశం.font_బరువు;
+	    mFontStyle = అంశం.fontStyle;
+	    mFontAscent = అంశం.fontAscent;
+	    mFallbackDC = అబద్ధం;
 	}
-	else
-	    mFallbackDC = true;
-	return;
+	లేకపోతే
+	    mFallbackDC = నిజం;
+	తిరిగి;
     }
 
     HRESULT hr = E_FAIL;
     LOGFONTW lf;
-    if (GetObjectW(hFont, sizeof(lf), &lf))
-	hr = SetFontByLOGFONT(lf);
+    ఒకవేళ (GetObjectW(hFont, పరిమాణం(lf), &lf))
+	hr = సమితి_Font_By_LOGFONT(lf);
 
-    item.hFont = hFont;
-    if (SUCCEEDED(hr))
+    అంశం.hFont = hFont;
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	item.pTextFormat = mTextFormat;
-	item.fontWeight = mFontWeight;
-	item.fontStyle = mFontStyle;
-	item.fontAscent = mFontAscent;
-	mFallbackDC = false;
+	అంశం.p_పాఠ్యం_Format = m_పాఠ్యం_Format;
+	అంశం.font_బరువు = m_Font_బరువు;
+	అంశం.fontStyle = mFontStyle;
+	అంశం.fontAscent = mFontAscent;
+	mFallbackDC = అబద్ధం;
     }
-    else
-	mFallbackDC = true;
-    mFontCache.put(item);
+    లేకపోతే
+	mFallbackDC = నిజం;
+    mFontCache.put(అంశం);
 }
 
-    void
+    శూన్య
 DWriteContext::Rebind()
 {
-    SafeRelease(&mBitmap);
+    సురక్షిత_Release(&mBitmap);
 
     mRT->BindDC(mHDC, &mBindRect);
-    mRT->SetTransform(D2D1::IdentityMatrix());
+    mRT->సమితి_Transform(D2D1::తటస్థం_మాతృక());
 
     D2D1_BITMAP_PROPERTIES props = {
-	{DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE},
+	{DXGI_FORMAT_B8G8R8A8_UNORM, D2_D1_ALPHA_బహుళకం_IGNORE},
 	96.0f, 96.0f
     };
     mRT->CreateBitmap(
-	    D2D1::SizeU(mBindRect.right - mBindRect.left,
-		mBindRect.bottom - mBindRect.top),
+	    D2D1::కొలత_U(mBindRect.కుడి - mBindRect.ఎడమ,
+		mBindRect.bottom - mBindRect.శిఖరం),
 	    props, &mBitmap);
 }
 
-    void
-DWriteContext::BindDC(HDC hdc, const RECT *rect)
+    శూన్య
+DWriteContext::BindDC(HDC hdc, స్థిరరాశి RECT *rect)
 {
     mHDC = hdc;
     mBindRect = *rect;
 
-    if (mRT == NULL)
+    ఒకవేళ (mRT == ఖాళీ)
 	CreateDeviceResources();
-    else
+    లేకపోతే
     {
 	Flush();
 	Rebind();
     }
 }
 
-extern "C" void redraw_later_clear(void);
+బాహ్య "C" శూన్య redraw_later_clear(శూన్య);
 
     HRESULT
-DWriteContext::SetDrawingMode(DrawingMode mode)
+DWriteContext::సమితి_Drawing_బహుళకం(Drawing_బహుళకం బహుళకం)
 {
     HRESULT hr = S_OK;
 
-    switch (mode)
+    ఎంపిక (బహుళకం)
     {
-	default:
-	case DM_GDI:
-	    if (mInteropHDC != NULL)
+	అప్రమేయ:
+	స్థితి DM_GDI:
+	    ఒకవేళ (mInteropHDC != ఖాళీ)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(ఖాళీ);
+		mInteropHDC = ఖాళీ;
 	    }
-	    if (mDrawing)
+	    ఒకవేళ (mDrawing)
 	    {
-		hr = mRT->EndDraw();
-		if (hr == (HRESULT)D2DERR_RECREATE_TARGET)
+		hr = mRT->చివర_Draw();
+		ఒకవేళ (hr == (HRESULT)D2_DERR_RECREATE_లక్ష్యం)
 		{
 		    hr = S_OK;
 		    DiscardDeviceResources();
 		    CreateDeviceResources();
 		    redraw_later_clear();
 		}
-		mDrawing = false;
+		mDrawing = అబద్ధం;
 	    }
-	    break;
+	    ఆపు;
 
-	case DM_DIRECTX:
-	    if (mInteropHDC != NULL)
+	స్థితి DM_DIRECTX:
+	    ఒకవేళ (mInteropHDC != ఖాళీ)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(ఖాళీ);
+		mInteropHDC = ఖాళీ;
 	    }
-	    else if (mDrawing == false)
+	    లేకపోతే ఒకవేళ (mDrawing == అబద్ధం)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = నిజం;
 	    }
-	    break;
+	    ఆపు;
 
-	case DM_INTEROP:
-	    if (mDrawing == false)
+	స్థితి DM_INTEROP:
+	    ఒకవేళ (mDrawing == అబద్ధం)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = నిజం;
 	    }
-	    if (mInteropHDC == NULL)
-		hr = mGDIRT->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &mInteropHDC);
-	    break;
+	    ఒకవేళ (mInteropHDC == ఖాళీ)
+		hr = mGDIRT->GetDC(D2_D1_DC_INITIALIZE_బహుళకం_COPY, &mInteropHDC);
+	    ఆపు;
     }
-    mDMode = mode;
-    return hr;
+    mDMode = బహుళకం;
+    తిరిగి hr;
 }
 
     ID2D1Brush*
 DWriteContext::SolidBrush(COLORREF color)
 {
-    mBrush->SetColor(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
+    mBrush->సమితి_Color(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
 		UINT32(GetGValue(color)) << 8 | UINT32(GetBValue(color))));
-    return mBrush;
+    తిరిగి mBrush;
 }
 
-    void
-DWriteContext::DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx)
+    శూన్య
+DWriteContext::Draw_పాఠ్యం(స్థిరరాశి WCHAR *పాఠ్యం, పూర్ణాంకం len,
+	పూర్ణాంకం x, పూర్ణాంకం y, పూర్ణాంకం w, పూర్ణాంకం h, పూర్ణాంకం cell_వెడల్పు_2, COLORREF color,
+	UINT fuOptions, స్థిరరాశి RECT *lprc, స్థిరరాశి INT *lpDx)
 {
-    if (mFallbackDC)
+    ఒకవేళ (mFallbackDC)
     {
 	// Fall back to GDI rendering.
-	HRESULT hr = SetDrawingMode(DM_INTEROP);
-	if (SUCCEEDED(hr))
+	HRESULT hr = సమితి_Drawing_బహుళకం(DM_INTEROP);
+	ఒకవేళ (SUCCEEDED(hr))
 	{
 	    HGDIOBJ hFont = ::GetCurrentObject(mHDC, OBJ_FONT);
 	    HGDIOBJ hOldFont = ::SelectObject(mInteropHDC, hFont);
-	    ::SetTextColor(mInteropHDC, color);
-	    ::SetBkMode(mInteropHDC, ::GetBkMode(mHDC));
-	    ::ExtTextOutW(mInteropHDC, x, y, fuOptions, lprc, text, len, lpDx);
+	    ::సమితి_పాఠ్యం_Color(mInteropHDC, color);
+	    ::సమితి_Bk_బహుళకం(mInteropHDC, ::Get_Bk_బహుళకం(mHDC));
+	    ::Ext_పాఠ్యం_బహిర్గతం_W(mInteropHDC, x, y, fuOptions, lprc, పాఠ్యం, len, lpDx);
 	    ::SelectObject(mInteropHDC, hOldFont);
 	}
-	return;
+	తిరిగి;
     }
 
     HRESULT hr;
-    IDWriteTextLayout *textLayout = NULL;
+    IDWrite_పాఠ్యం_Layout *పాఠ్యం_Layout = ఖాళీ;
 
-    SetDrawingMode(DM_DIRECTX);
+    సమితి_Drawing_బహుళకం(DM_DIRECTX);
 
     // Apply clipping if ETO_CLIPPED is specified
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    ఒకవేళ ((fuOptions & ETO_CLIPPED) && lprc != ఖాళీ)
     {
-	mRT->PushAxisAlignedClip(
-	    D2D1::RectF(FLOAT(lprc->left), FLOAT(lprc->top),
-			FLOAT(lprc->right), FLOAT(lprc->bottom)),
-	    D2D1_ANTIALIAS_MODE_ALIASED);
+	mRT->నెట్టు_Axis_Aligned_Clip(
+	    D2D1::RectF(FLOAT(lprc->ఎడమ), FLOAT(lprc->శిఖరం),
+			FLOAT(lprc->కుడి), FLOAT(lprc->bottom)),
+	    D2_D1_ANTIALIAS_బహుళకం_ALIASED);
     }
 
-    hr = mDWriteFactory->CreateTextLayout(text, len, mTextFormat,
-	    FLOAT(w), FLOAT(h), &textLayout);
+    hr = mDWriteFactory->Create_పాఠ్యం_Layout(పాఠ్యం, len, m_పాఠ్యం_Format,
+	    FLOAT(w), FLOAT(h), &పాఠ్యం_Layout);
 
-    if (SUCCEEDED(hr))
+    ఒకవేళ (SUCCEEDED(hr))
     {
-	DWRITE_TEXT_RANGE textRange = { 0, UINT32(len) };
-	textLayout->SetFontWeight(mFontWeight, textRange);
-	textLayout->SetFontStyle(mFontStyle, textRange);
+	DWRITE_పాఠ్యం_RANGE పాఠ్యం_Range = { 0, UINT32(len) };
+	పాఠ్యం_Layout->సమితి_Font_బరువు(m_Font_బరువు, పాఠ్యం_Range);
+	పాఠ్యం_Layout->సమితి_Font_Style(mFontStyle, పాఠ్యం_Range);
 
-	if (mFontFeatureCount > 0)
+	ఒకవేళ (m_Font_Feature_లెక్క > 0)
 	{
 	    // Default OpenType features that DirectWrite normally enables.
 	    // SetTypography() overrides all defaults, so we must
 	    // re-add them here explicitly.
-	    static const DWRITE_FONT_FEATURE defaultFeatures[] = {
-		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_ALTERNATES, 1 },
-		{ DWRITE_FONT_FEATURE_TAG_STANDARD_LIGATURES, 1 },
-		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_LIGATURES, 1 },
-		{ DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES, 1 },
-		{ DWRITE_FONT_FEATURE_TAG_KERNING, 1 },
+	    స్థిర స్థిరరాశి DWRITE_FONT_FEATURE defaultFeatures[] = {
+		{ DWRITE_FONT_FEATURE_ట్యాగ్_CONTEXTUAL_ALTERNATES, 1 },
+		{ DWRITE_FONT_FEATURE_ట్యాగ్_STANDARD_LIGATURES, 1 },
+		{ DWRITE_FONT_FEATURE_ట్యాగ్_CONTEXTUAL_LIGATURES, 1 },
+		{ DWRITE_FONT_FEATURE_ట్యాగ్_REQUIRED_LIGATURES, 1 },
+		{ DWRITE_FONT_FEATURE_ట్యాగ్_KERNING, 1 },
 	    };
-	    static const int numDefaults = sizeof(defaultFeatures)
-		/ sizeof(defaultFeatures[0]);
+	    స్థిర స్థిరరాశి పూర్ణాంకం అంకె_Defaults = పరిమాణం(defaultFeatures)
+		/ పరిమాణం(defaultFeatures[0]);
 
-	    IDWriteTypography *typography = NULL;
+	    IDWriteTypography *typography = ఖాళీ;
 	    hr = mDWriteFactory->CreateTypography(&typography);
-	    if (SUCCEEDED(hr))
+	    ఒకవేళ (SUCCEEDED(hr))
 	    {
 		// Add default features, skipping any that the user
 		// has explicitly specified (either + or -).
-		for (int d = 0; d < numDefaults; ++d)
+		కొరకు (పూర్ణాంకం d = 0; d < అంకె_Defaults; ++d)
 		{
-		    int overridden = 0;
-		    for (int u = 0; u < mFontFeatureCount; ++u)
+		    పూర్ణాంకం overridden = 0;
+		    కొరకు (పూర్ణాంకం u = 0; u < m_Font_Feature_లెక్క; ++u)
 		    {
-			if ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
-				== defaultFeatures[d].nameTag)
+			ఒకవేళ ((DWRITE_FONT_FEATURE_ట్యాగ్)mFontFeatures[u].ట్యాగ్
+				== defaultFeatures[d].name_ట్యాగ్)
 			{
 			    overridden = 1;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    if (!overridden)
-			typography->AddFontFeature(defaultFeatures[d]);
+		    ఒకవేళ (!overridden)
+			typography->కూడు_Font_Feature(defaultFeatures[d]);
 		}
 		// Add user-specified features.
-		for (int i = 0; i < mFontFeatureCount; ++i)
+		కొరకు (పూర్ణాంకం i = 0; i < m_Font_Feature_లెక్క; ++i)
 		{
 		    DWRITE_FONT_FEATURE ff = {
-			(DWRITE_FONT_FEATURE_TAG)mFontFeatures[i].tag,
+			(DWRITE_FONT_FEATURE_ట్యాగ్)mFontFeatures[i].ట్యాగ్,
 			mFontFeatures[i].parameter
 		    };
-		    typography->AddFontFeature(ff);
+		    typography->కూడు_Font_Feature(ff);
 		}
-		textLayout->SetTypography(typography, textRange);
-		SafeRelease(&typography);
+		పాఠ్యం_Layout->సమితి_Typography(typography, పాఠ్యం_Range);
+		సురక్షిత_Release(&typography);
 	    }
 	}
 
@@ -1151,23 +1151,23 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	// vertical shifts during redraw.
 	FLOAT baselineY = roundf(FLOAT(y) + FLOAT(h) * mFontAscent + 0.5);
 
-	TextRenderer renderer(this);
-	TextRendererContext context = { color, FLOAT(cellWidth), lpDx, len,
+	పాఠ్యం_Renderer renderer(ఇది);
+	పాఠ్యం_Renderer_Context context = { color, FLOAT(cell_వెడల్పు_2), lpDx, len,
 		baselineY, 0.0f, 0 };
 
-	textLayout->Draw(&context, &renderer, FLOAT(x), FLOAT(y));
+	పాఠ్యం_Layout->Draw(&context, &renderer, FLOAT(x), FLOAT(y));
     }
 
-    SafeRelease(&textLayout);
+    సురక్షిత_Release(&పాఠ్యం_Layout);
 
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
-	mRT->PopAxisAlignedClip();
+    ఒకవేళ ((fuOptions & ETO_CLIPPED) && lprc != ఖాళీ)
+	mRT->తీయి_Axis_Aligned_Clip();
 }
 
-    void
-DWriteContext::FillRect(const RECT *rc, COLORREF color)
+    శూన్య
+DWriteContext::FillRect(స్థిరరాశి RECT *rc, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ఒకవేళ (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1175,139 +1175,139 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 	::FillRect(mInteropHDC, rc, hbr);
 	::DeleteObject(HGDIOBJ(hbr));
     }
-    else
+    లేకపోతే
     {
-	SetDrawingMode(DM_DIRECTX);
+	సమితి_Drawing_బహుళకం(DM_DIRECTX);
 	mRT->FillRectangle(
-		D2D1::RectF(FLOAT(rc->left), FLOAT(rc->top),
-		    FLOAT(rc->right), FLOAT(rc->bottom)),
+		D2D1::RectF(FLOAT(rc->ఎడమ), FLOAT(rc->శిఖరం),
+		    FLOAT(rc->కుడి), FLOAT(rc->bottom)),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
+    శూన్య
+DWriteContext::Draw_పంక్తి(పూర్ణాంకం x1, పూర్ణాంకం y1, పూర్ణాంకం x2, పూర్ణాంకం y2, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ఒకవేళ (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	HPEN hpen = ::CreatePen(PS_SOLID, 1, color);
 	HGDIOBJ old_pen = ::SelectObject(mInteropHDC, HGDIOBJ(hpen));
-	::MoveToEx(mInteropHDC, x1, y1, NULL);
-	::LineTo(mInteropHDC, x2, y2);
+	::Move_గమ్యం_Ex(mInteropHDC, x1, y1, ఖాళీ);
+	::పంక్తి_గమ్యం(mInteropHDC, x2, y2);
 	::SelectObject(mInteropHDC, old_pen);
 	::DeleteObject(HGDIOBJ(hpen));
     }
-    else
+    లేకపోతే
     {
-	SetDrawingMode(DM_DIRECTX);
-	mRT->DrawLine(
+	సమితి_Drawing_బహుళకం(DM_DIRECTX);
+	mRT->Draw_పంక్తి(
 		D2D1::Point2F(FLOAT(x1), FLOAT(y1) + 0.5f),
 		D2D1::Point2F(FLOAT(x2), FLOAT(y2) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::SetPixel(int x, int y, COLORREF color)
+    శూన్య
+DWriteContext::సమితి_Pixel(పూర్ణాంకం x, పూర్ణాంకం y, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ఒకవేళ (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
-	::SetPixel(mInteropHDC, x, y, color);
+	::సమితి_Pixel(mInteropHDC, x, y, color);
     }
-    else
+    లేకపోతే
     {
-	SetDrawingMode(DM_DIRECTX);
+	సమితి_Drawing_బహుళకం(DM_DIRECTX);
 	// Direct2D doesn't have SetPixel API.  Use DrawLine instead.
-	mRT->DrawLine(
+	mRT->Draw_పంక్తి(
 		D2D1::Point2F(FLOAT(x), FLOAT(y) + 0.5f),
 		D2D1::Point2F(FLOAT(x+1), FLOAT(y) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::Scroll(int x, int y, const RECT *rc)
+    శూన్య
+DWriteContext::Scroll(పూర్ణాంకం x, పూర్ణాంకం y, స్థిరరాశి RECT *rc)
 {
-    SetDrawingMode(DM_DIRECTX);
+    సమితి_Drawing_బహుళకం(DM_DIRECTX);
     mRT->Flush();
 
     D2D1_RECT_U srcRect;
-    D2D1_POINT_2U destPoint;
-    if (x >= 0)
+    D2_D1_బిందువు_2_U dest_బిందువు;
+    ఒకవేళ (x >= 0)
     {
-	srcRect.left = rc->left;
-	srcRect.right = rc->right - x;
-	destPoint.x = rc->left + x;
+	srcRect.ఎడమ = rc->ఎడమ;
+	srcRect.కుడి = rc->కుడి - x;
+	dest_బిందువు.x = rc->ఎడమ + x;
     }
-    else
+    లేకపోతే
     {
-	srcRect.left = rc->left - x;
-	srcRect.right = rc->right;
-	destPoint.x = rc->left;
+	srcRect.ఎడమ = rc->ఎడమ - x;
+	srcRect.కుడి = rc->కుడి;
+	dest_బిందువు.x = rc->ఎడమ;
     }
-    if (y >= 0)
+    ఒకవేళ (y >= 0)
     {
-	srcRect.top = rc->top;
+	srcRect.శిఖరం = rc->శిఖరం;
 	srcRect.bottom = rc->bottom - y;
-	destPoint.y = rc->top + y;
+	dest_బిందువు.y = rc->శిఖరం + y;
     }
-    else
+    లేకపోతే
     {
-	srcRect.top = rc->top - y;
+	srcRect.శిఖరం = rc->శిఖరం - y;
 	srcRect.bottom = rc->bottom;
-	destPoint.y = rc->top;
+	dest_బిందువు.y = rc->శిఖరం;
     }
-    mBitmap->CopyFromRenderTarget(&destPoint, mRT, &srcRect);
+    mBitmap->Copy_From_Render_లక్ష్యం(&dest_బిందువు, mRT, &srcRect);
 
     D2D1_RECT_F destRect = {
-	    FLOAT(destPoint.x), FLOAT(destPoint.y),
-	    FLOAT(destPoint.x + srcRect.right - srcRect.left),
-	    FLOAT(destPoint.y + srcRect.bottom - srcRect.top)
+	    FLOAT(dest_బిందువు.x), FLOAT(dest_బిందువు.y),
+	    FLOAT(dest_బిందువు.x + srcRect.కుడి - srcRect.ఎడమ),
+	    FLOAT(dest_బిందువు.y + srcRect.bottom - srcRect.శిఖరం)
     };
     mRT->DrawBitmap(mBitmap, destRect, 1.0F,
-	    D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, destRect);
+	    D2_D1_BITMAP_INTERPOLATION_బహుళకం_సమీప_NEIGHBOR, destRect);
 }
 
-    void
+    శూన్య
 DWriteContext::Flush()
 {
-    SetDrawingMode(DM_GDI);
+    సమితి_Drawing_బహుళకం(DM_GDI);
 }
 
-    void
-DWriteContext::SetRenderingParams(
-	const DWriteRenderingParams *params)
+    శూన్య
+DWriteContext::సమితి_Rendering_Params(
+	స్థిరరాశి DWriteRenderingParams *params)
 {
-    if (mDWriteFactory == NULL)
-	return;
+    ఒకవేళ (mDWriteFactory == ఖాళీ)
+	తిరిగి;
 
-    IDWriteRenderingParams *renderingParams = NULL;
-    D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode =
-	D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
+    IDWriteRenderingParams *renderingParams = ఖాళీ;
+    D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం పాఠ్యం_Antialias_బహుళకం =
+	D2_D1_పాఠ్యం_ANTIALIAS_బహుళకం_DEFAULT;
     HRESULT hr;
-    if (params != NULL)
+    ఒకవేళ (params != ఖాళీ)
     {
 	hr = mDWriteFactory->CreateCustomRenderingParams(params->gamma,
 		params->enhancedContrast, params->clearTypeLevel,
-		ToPixelGeometry(params->pixelGeometry),
-		ToRenderingMode(params->renderingMode), &renderingParams);
-	textAntialiasMode = ToTextAntialiasMode(params->textAntialiasMode);
+		గమ్యం_Pixel_Geometry(params->pixelGeometry),
+		గమ్యం_Rendering_బహుళకం(params->rendering_బహుళకం), &renderingParams);
+	పాఠ్యం_Antialias_బహుళకం = గమ్యం_పాఠ్యం_Antialias_బహుళకం(params->పాఠ్యం_Antialias_బహుళకం);
     }
-    else
+    లేకపోతే
 	hr = mDWriteFactory->CreateRenderingParams(&renderingParams);
-    if (SUCCEEDED(hr) && renderingParams != NULL)
+    ఒకవేళ (SUCCEEDED(hr) && renderingParams != ఖాళీ)
     {
-	SafeRelease(&mRenderingParams);
+	సురక్షిత_Release(&mRenderingParams);
 	mRenderingParams = renderingParams;
-	mTextAntialiasMode = textAntialiasMode;
+	m_పాఠ్యం_Antialias_బహుళకం = పాఠ్యం_Antialias_బహుళకం;
 
 	Flush();
-	mRT->SetTextRenderingParams(mRenderingParams);
-	mRT->SetTextAntialiasMode(mTextAntialiasMode);
+	mRT->సమితి_పాఠ్యం_Rendering_Params(mRenderingParams);
+	mRT->సమితి_పాఠ్యం_Antialias_బహుళకం(m_పాఠ్యం_Antialias_బహుళకం);
     }
 }
 
@@ -1315,149 +1315,149 @@ DWriteContext::SetRenderingParams(
 DWriteContext::GetRenderingParams(
 	DWriteRenderingParams *params)
 {
-    if (params != NULL && mRenderingParams != NULL)
+    ఒకవేళ (params != ఖాళీ && mRenderingParams != ఖాళీ)
     {
 	params->gamma = mRenderingParams->GetGamma();
 	params->enhancedContrast = mRenderingParams->GetEnhancedContrast();
 	params->clearTypeLevel = mRenderingParams->GetClearTypeLevel();
-	params->pixelGeometry = ToInt(mRenderingParams->GetPixelGeometry());
-	params->renderingMode = ToInt(mRenderingParams->GetRenderingMode());
-	params->textAntialiasMode = mTextAntialiasMode;
+	params->pixelGeometry = గమ్యం_Int(mRenderingParams->GetPixelGeometry());
+	params->rendering_బహుళకం = గమ్యం_Int(mRenderingParams->Get_Rendering_బహుళకం());
+	params->పాఠ్యం_Antialias_బహుళకం = m_పాఠ్యం_Antialias_బహుళకం;
     }
-    return params;
+    తిరిగి params;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // PUBLIC C INTERFACES
 
-    void
-DWrite_Init(void)
+    శూన్య
+DWrite_Init(శూన్య)
 {
-#ifdef DYNAMIC_DIRECTX
+#నిర్వచితమైతే DYNAMIC_DIRECTX
     // Load libraries.
-    hD2D1DLL = vimLoadLib("d2d1.dll");
-    hDWriteDLL = vimLoadLib("dwrite.dll");
-    if (hD2D1DLL == NULL || hDWriteDLL == NULL)
+    hD2D1DLL = vim_ఎక్కించు_Lib("d2d1.dll");
+    hDWriteDLL = vim_ఎక్కించు_Lib("dwrite.dll");
+    ఒకవేళ (hD2D1DLL == ఖాళీ || hDWriteDLL == ఖాళీ)
     {
 	DWrite_Final();
-	return;
+	తిరిగి;
     }
     // Get address of procedures.
-    pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)GetProcAddress(
+    pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)Get_Proc_చిరునామా(
 	    GetModuleHandle("kernel32.dll"), "GetUserDefaultLocaleName");
-    pD2D1CreateFactory = (PD2D1CREATEFACTORY)GetProcAddress(hD2D1DLL,
+    pD2D1CreateFactory = (PD2D1CREATEFACTORY)Get_Proc_చిరునామా(hD2D1DLL,
 	    "D2D1CreateFactory");
-    pDWriteCreateFactory = (PDWRITECREATEFACTORY)GetProcAddress(hDWriteDLL,
+    pDWriteCreateFactory = (PDWRITECREATEFACTORY)Get_Proc_చిరునామా(hDWriteDLL,
 	    "DWriteCreateFactory");
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-DWrite_Final(void)
+    శూన్య
+DWrite_Final(శూన్య)
 {
-#ifdef DYNAMIC_DIRECTX
-    pGetUserDefaultLocaleName = NULL;
-    pD2D1CreateFactory = NULL;
-    pDWriteCreateFactory = NULL;
+#నిర్వచితమైతే DYNAMIC_DIRECTX
+    pGetUserDefaultLocaleName = ఖాళీ;
+    pD2D1CreateFactory = ఖాళీ;
+    pDWriteCreateFactory = ఖాళీ;
     unload(hDWriteDLL);
     unload(hD2D1DLL);
-#endif
+#అయితే_ముగింపు
 }
 
     DWriteContext *
-DWriteContext_Open(void)
+DWriteContext_Open(శూన్య)
 {
-#ifdef DYNAMIC_DIRECTX
-    if (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
-	    || pDWriteCreateFactory == NULL)
-	return NULL;
-#endif
-    return new DWriteContext();
+#నిర్వచితమైతే DYNAMIC_DIRECTX
+    ఒకవేళ (pGetUserDefaultLocaleName == ఖాళీ || pD2D1CreateFactory == ఖాళీ
+	    || pDWriteCreateFactory == ఖాళీ)
+	తిరిగి ఖాళీ;
+#అయితే_ముగింపు
+    తిరిగి కొత్త DWriteContext();
 }
 
-    void
-DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect)
+    శూన్య
+DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, స్థిరరాశి RECT *rect)
 {
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	ctx->BindDC(hdc, rect);
 }
 
-    void
-DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
+    శూన్య
+DWrite_Context_సమితి_Font(DWriteContext *ctx, HFONT hFont)
 {
-    if (ctx != NULL)
-	ctx->SetFont(hFont);
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->సమితి_Font(hFont);
 }
 
-    void
-DWriteContext_DrawText(
+    శూన్య
+DWrite_Context_Draw_పాఠ్యం(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	స్థిరరాశి WCHAR *పాఠ్యం,
+	పూర్ణాంకం len,
+	పూర్ణాంకం x,
+	పూర్ణాంకం y,
+	పూర్ణాంకం w,
+	పూర్ణాంకం h,
+	పూర్ణాంకం cell_వెడల్పు_2,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx)
+	స్థిరరాశి RECT *lprc,
+	స్థిరరాశి INT *lpDx)
 {
-    if (ctx != NULL)
-	ctx->DrawText(text, len, x, y, w, h, cellWidth, color,
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->Draw_పాఠ్యం(పాఠ్యం, len, x, y, w, h, cell_వెడల్పు_2, color,
 		fuOptions, lprc, lpDx);
 }
 
-    void
-DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color)
+    శూన్య
+DWriteContext_FillRect(DWriteContext *ctx, స్థిరరాశి RECT *rc, COLORREF color)
 {
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	ctx->FillRect(rc, color);
 }
 
-    void
-DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+    శూన్య
+DWrite_Context_Draw_పంక్తి(DWriteContext *ctx, పూర్ణాంకం x1, పూర్ణాంకం y1, పూర్ణాంకం x2, పూర్ణాంకం y2,
 	COLORREF color)
 {
-    if (ctx != NULL)
-	ctx->DrawLine(x1, y1, x2, y2, color);
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->Draw_పంక్తి(x1, y1, x2, y2, color);
 }
 
-    void
-DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color)
+    శూన్య
+DWrite_Context_సమితి_Pixel(DWriteContext *ctx, పూర్ణాంకం x, పూర్ణాంకం y, COLORREF color)
 {
-    if (ctx != NULL)
-	ctx->SetPixel(x, y, color);
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->సమితి_Pixel(x, y, color);
 }
 
-    void
-DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc)
+    శూన్య
+DWriteContext_Scroll(DWriteContext *ctx, పూర్ణాంకం x, పూర్ణాంకం y, స్థిరరాశి RECT *rc)
 {
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	ctx->Scroll(x, y, rc);
 }
 
-    void
+    శూన్య
 DWriteContext_Flush(DWriteContext *ctx)
 {
-    if (ctx != NULL)
+    ఒకవేళ (ctx != ఖాళీ)
 	ctx->Flush();
 }
 
-    void
+    శూన్య
 DWriteContext_Close(DWriteContext *ctx)
 {
-    delete ctx;
+    తొలగించు ctx;
 }
 
-    void
-DWriteContext_SetRenderingParams(
+    శూన్య
+DWrite_Context_సమితి_Rendering_Params(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params)
+	స్థిరరాశి DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	ctx->SetRenderingParams(params);
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->సమితి_Rendering_Params(params);
 }
 
     DWriteRenderingParams *
@@ -1465,29 +1465,29 @@ DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	return ctx->GetRenderingParams(params);
-    else
-	return NULL;
+    ఒకవేళ (ctx != ఖాళీ)
+	తిరిగి ctx->GetRenderingParams(params);
+    లేకపోతే
+	తిరిగి ఖాళీ;
 }
 
-    void
-DWriteContext::SetFontFeatures(
-	const DWriteFontFeature *features, int count)
+    శూన్య
+DWriteContext::సమితి_Font_Features(
+	స్థిరరాశి DWriteFontFeature *features, పూర్ణాంకం లెక్క)
 {
-    if (count > DWRITE_MAX_FONT_FEATURES)
-	count = DWRITE_MAX_FONT_FEATURES;
-    mFontFeatureCount = count;
-    if (count > 0 && features != NULL)
-	memcpy(mFontFeatures, features, sizeof(DWriteFontFeature) * count);
+    ఒకవేళ (లెక్క > DWRITE_MAX_FONT_FEATURES)
+	లెక్క = DWRITE_MAX_FONT_FEATURES;
+    m_Font_Feature_లెక్క = లెక్క;
+    ఒకవేళ (లెక్క > 0 && features != ఖాళీ)
+	జ్ఞాపకం_నకలు(mFontFeatures, features, పరిమాణం(DWriteFontFeature) * లెక్క);
 }
 
-    void
-DWriteContext_SetFontFeatures(
+    శూన్య
+DWrite_Context_సమితి_Font_Features(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count)
+	స్థిరరాశి DWriteFontFeature *features,
+	పూర్ణాంకం లెక్క)
 {
-    if (ctx != NULL)
-	ctx->SetFontFeatures(features, count);
+    ఒకవేళ (ctx != ఖాళీ)
+	ctx->సమితి_Font_Features(features, లెక్క);
 }

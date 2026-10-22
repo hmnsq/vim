@@ -10,65 +10,65 @@
 /*
  * eval.c: Expression evaluation.
  */
-#define USING_FLOAT_STUFF
+#నిర్వచించు USING_FLOAT_STUFF
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
-#ifdef VMS
+#నిర్వచితమైతే VMS
 # include <float.h>
-#endif
+#అయితే_ముగింపు
 
-#define NAMESPACE_CHAR	(char_u *)"abglstvw"
+#నిర్వచించు NAMESPACE_CHAR	(char_u *)"abglstvw"
 
-static int eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
-static int eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9_leader(typval_T *rettv, int numeric_only, char_u *start_leader, char_u **end_leaderp);
+స్థిర పూర్ణాంకం eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+స్థిర పూర్ణాంకం eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, పూర్ణాంకం want_string);
+స్థిర పూర్ణాంకం eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, పూర్ణాంకం want_string);
+స్థిర పూర్ణాంకం eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, పూర్ణాంకం want_string);
+స్థిర పూర్ణాంకం eval9_leader(typval_T *rettv, పూర్ణాంకం numeric_only, char_u *ప్రారంభం_leader, char_u **చివర_leaderp);
 
-static char_u *make_expanded_name(char_u *in_start, char_u *expr_start, char_u *expr_end, char_u *in_end);
+స్థిర char_u *make_expanded_name(char_u *లోపల_ప్రారంభం, char_u *సమాసం_ప్రారంభం, char_u *సమాసం_చివర, char_u *లోపల_చివర);
 
 /*
  * Return "n1" divided by "n2", taking care of dividing by zero.
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_divide(varnumber_T n1, varnumber_T n2, int *failed)
+అంకె_divide(varnumber_T n1, varnumber_T n2, పూర్ణాంకం *failed)
 {
-    varnumber_T	result;
+    varnumber_T	ఫలితం;
 
-    if (n2 == 0)
+    ఒకవేళ (n2 == 0)
     {
-	if (in_vim9script())
+	ఒకవేళ (లోపల_vim9script())
 	{
 	    emsg(_(e_divide_by_zero));
-	    if (failed != NULL)
+	    ఒకవేళ (failed != ఖాళీ)
 		*failed = TRUE;
 	}
-	if (n1 == 0)
-	    result = VARNUM_MIN; // similar to NaN
-	else if (n1 < 0)
-	    result = -VARNUM_MAX;
-	else
-	    result = VARNUM_MAX;
+	ఒకవేళ (n1 == 0)
+	    ఫలితం = VARNUM_MIN; // similar to NaN
+	లేకపోతే ఒకవేళ (n1 < 0)
+	    ఫలితం = -VARNUM_MAX;
+	లేకపోతే
+	    ఫలితం = VARNUM_MAX;
     }
-    else if (n1 == VARNUM_MIN && n2 == -1)
+    లేకపోతే ఒకవేళ (n1 == VARNUM_MIN && n2 == -1)
     {
 	// specific case: trying to do VARNUM_MIN / -1 results in a positive
 	// number that doesn't fit in varnumber_T and causes an FPE
-	result = VARNUM_MAX;
+	ఫలితం = VARNUM_MAX;
     }
-    else
-	result = n1 / n2;
+    లేకపోతే
+	ఫలితం = n1 / n2;
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -76,30 +76,30 @@ num_divide(varnumber_T n1, varnumber_T n2, int *failed)
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_modulus(varnumber_T n1, varnumber_T n2, int *failed)
+అంకె_modulus(varnumber_T n1, varnumber_T n2, పూర్ణాంకం *failed)
 {
-    if (n2 == 0 && in_vim9script())
+    ఒకవేళ (n2 == 0 && లోపల_vim9script())
     {
 	emsg(_(e_divide_by_zero));
-	if (failed != NULL)
+	ఒకవేళ (failed != ఖాళీ)
 	    *failed = TRUE;
     }
-    return (n2 == 0) ? 0 : (n1 % n2);
+    తిరిగి (n2 == 0) ? 0 : (n1 % n2);
 }
 
 /*
  * Initialize the global and v: variables.
  */
-    void
-eval_init(void)
+    శూన్య
+eval_init(శూన్య)
 {
     evalvars_init();
     func_init();
 }
 
-#if defined(EXITFREE)
-    void
-eval_clear(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+eval_clear(శూన్య)
 {
     evalvars_clear();
     free_scriptnames();  // must come after evalvars_clear().
@@ -109,24 +109,24 @@ eval_clear(void)
     free_autoload_scriptnames();
 
     // unreferenced lists, tuples and dicts
-    (void)garbage_collect(FALSE);
+    (శూన్య)garbage_collect(FALSE);
 
     // functions not garbage collected
     free_all_functions();
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
+    శూన్య
+fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, పూర్ణాంకం skip)
 {
     init_evalarg(evalarg);
     evalarg->eval_flags = skip ? 0 : EVAL_EVALUATE;
 
-    if (eap == NULL)
-	return;
+    ఒకవేళ (eap == ఖాళీ)
+	తిరిగి;
 
     evalarg->eval_cstack = eap->cstack;
-    if (sourcing_a_script(eap) || eap->ea_getline == get_list_line)
+    ఒకవేళ (sourcing_a_script(eap) || eap->ea_getline == get_list_పంక్తి)
     {
 	evalarg->eval_getline = eap->ea_getline;
 	evalarg->eval_cookie = eap->cookie;
@@ -139,87 +139,87 @@ fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
  * Sets "error" to TRUE if there was an error.
  * Return TRUE or FALSE.
  */
-    int
-eval_to_bool(
+    పూర్ణాంకం
+eval_గమ్యం_bool(
     char_u	*arg,
-    int		*error,
+    పూర్ణాంకం		*error,
     exarg_T	*eap,
-    int		skip,	    // only parse, don't execute
-    int		use_simple_function)
+    పూర్ణాంకం		skip,	    // only parse, don't execute
+    పూర్ణాంకం		use_simple_function)
 {
     typval_T	tv;
     varnumber_T	retval = FALSE;
     evalarg_T	evalarg;
-    int		r;
+    పూర్ణాంకం		r;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
 
-    if (skip)
+    ఒకవేళ (skip)
 	++emsg_skip;
-    if (use_simple_function)
+    ఒకవేళ (use_simple_function)
 	r = eval0_simple_funccal(arg, &tv, eap, &evalarg);
-    else
+    లేకపోతే
 	r = eval0(arg, &tv, eap, &evalarg);
-    if (r == FAIL)
+    ఒకవేళ (r == FAIL)
 	*error = TRUE;
-    else
+    లేకపోతే
     {
 	*error = FALSE;
-	if (!skip)
+	ఒకవేళ (!skip)
 	{
-	    if (in_vim9script())
+	    ఒకవేళ (లోపల_vim9script())
 		retval = tv_get_bool_chk(&tv, error);
-	    else
-		retval = (tv_get_number_chk(&tv, error) != 0);
+	    లేకపోతే
+		retval = (tv_get_సంఖ్య_chk(&tv, error) != 0);
 	    clear_tv(&tv);
 	}
     }
-    if (skip)
+    ఒకవేళ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return (int)retval;
+    తిరిగి (పూర్ణాంకం)retval;
 }
 
 /*
  * Call eval1() and give an error message if not done at a lower level.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval1_emsg(char_u **arg, typval_T *rettv, exarg_T *eap)
 {
-    char_u	*start = *arg;
-    int		ret;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    char_u	*ప్రారంభం = *arg;
+    పూర్ణాంకం		ret;
+    పూర్ణాంకం		did_emsg_before = did_emsg;
+    పూర్ణాంకం		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ఖాళీ && eap->skip);
 
     ret = eval1(arg, rettv, &evalarg);
-    if (ret == FAIL)
+    ఒకవేళ (ret == FAIL)
     {
 	// Report the invalid expression unless the expression evaluation has
 	// been cancelled due to an aborting error, an interrupt, or an
 	// exception, or we already gave a more specific error.
 	// Also check called_emsg for when using assert_fails().
-	if (!aborting() && did_emsg == did_emsg_before
+	ఒకవేళ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
-	    semsg(_(e_invalid_expression_str), start);
+	    semsg(_(e_invalid_వ్యక్తీకరణ_str), ప్రారంభం);
     }
     clear_evalarg(&evalarg, eap);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * Return whether a typval is a valid expression to pass to eval_expr_typval()
  * or eval_expr_to_bool().  An empty string returns FALSE;
  */
-    int
-eval_expr_valid_arg(typval_T *tv)
+    పూర్ణాంకం
+eval_సమాసం_valid_arg(typval_T *tv)
 {
-    return tv->v_type != VAR_UNKNOWN
+    తిరిగి tv->v_type != VAR_UNKNOWN
 	    && (tv->v_type != VAR_STRING
-		  || (tv->vval.v_string != NULL && *tv->vval.v_string != NUL));
+		  || (tv->vval.v_string != ఖాళీ && *tv->vval.v_string != NUL));
 }
 
 /*
@@ -228,19 +228,19 @@ eval_expr_valid_arg(typval_T *tv)
  * When returning non-NULL remove_funccal() must be called later.
  */
     funccall_T *
-eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
+eval_సమాసం_get_funccal(typval_T *సమాసం, typval_T *rettv)
 {
-    if (expr->v_type != VAR_PARTIAL)
-	return NULL;
+    ఒకవేళ (సమాసం->v_type != VAR_PARTIAL)
+	తిరిగి ఖాళీ;
 
-    partial_T *partial = expr->vval.v_partial;
-    if (partial == NULL)
-	return NULL;
-    if (partial->pt_func == NULL
-	    || partial->pt_func->uf_def_status == UF_NOT_COMPILED)
-	return NULL;
+    partial_T *partial = సమాసం->vval.v_partial;
+    ఒకవేళ (partial == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (partial->pt_func == ఖాళీ
+	    || partial->pt_func->uf_def_స్థితి == UF_NOT_COMPILED)
+	తిరిగి ఖాళీ;
 
-    return create_funccal(partial->pt_func, rettv);
+    తిరిగి create_funccal(partial->pt_func, rettv);
 }
 
 /*
@@ -249,55 +249,55 @@ eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_partial(
-    typval_T	*expr,
+    స్థిర పూర్ణాంకం
+eval_సమాసం_partial(
+    typval_T	*సమాసం,
     typval_T	*argv,
-    int		argc,
+    పూర్ణాంకం		argc,
     funccall_T	*fc_arg,
     typval_T	*rettv)
 {
-    partial_T	*partial = expr->vval.v_partial;
+    partial_T	*partial = సమాసం->vval.v_partial;
 
-    if (partial == NULL)
-	return FAIL;
+    ఒకవేళ (partial == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (partial->pt_func != NULL
-			&& partial->pt_func->uf_def_status != UF_NOT_COMPILED)
+    ఒకవేళ (partial->pt_func != ఖాళీ
+			&& partial->pt_func->uf_def_స్థితి != UF_NOT_COMPILED)
     {
-	funccall_T	*fc = fc_arg != NULL ? fc_arg
+	funccall_T	*fc = fc_arg != ఖాళీ ? fc_arg
 				: create_funccal(partial->pt_func, rettv);
-	int		r;
+	పూర్ణాంకం		r;
 
-	if (fc == NULL)
-	    return FAIL;
+	ఒకవేళ (fc == ఖాళీ)
+	    తిరిగి FAIL;
 
 	// Shortcut to call a compiled function with minimal overhead.
-	if (partial->pt_obj != NULL)
+	ఒకవేళ (partial->pt_obj != ఖాళీ)
 	    partial->pt_obj->obj_refcount++;
 	r = call_def_function(partial->pt_func, argc, argv, DEF_USE_PT_ARGV,
 					partial, partial->pt_obj, fc, rettv);
-	if (fc_arg == NULL)
+	ఒకవేళ (fc_arg == ఖాళీ)
 	    remove_funccal();
-	if (r == FAIL)
-	    return FAIL;
+	ఒకవేళ (r == FAIL)
+	    తిరిగి FAIL;
     }
-    else
+    లేకపోతే
     {
 	char_u		*s = partial_name(partial);
 	funcexe_T	funcexe;
 
-	if (s == NULL || *s == NUL)
-	    return FAIL;
+	ఒకవేళ (s == ఖాళీ || *s == NUL)
+	    తిరిగి FAIL;
 
-	CLEAR_FIELD(funcexe);
+	CLEAR_క్షేత్రం(funcexe);
 	funcexe.fe_evaluate = TRUE;
 	funcexe.fe_partial = partial;
-	if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	    return FAIL;
+	ఒకవేళ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	    తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -305,60 +305,60 @@ eval_expr_partial(
  * Pass arguments "argv[argc]".
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_func(
-    typval_T	*expr,
+    స్థిర పూర్ణాంకం
+eval_సమాసం_func(
+    typval_T	*సమాసం,
     typval_T	*argv,
-    int		argc,
+    పూర్ణాంకం		argc,
     typval_T	*rettv)
 {
     funcexe_T	funcexe;
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (expr->v_type == VAR_FUNC)
-	s = expr->vval.v_string;
-    else
-	s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL || *s == NUL)
-	return FAIL;
+    ఒకవేళ (సమాసం->v_type == VAR_FUNC)
+	s = సమాసం->vval.v_string;
+    లేకపోతే
+	s = tv_get_string_buf_chk_strict(సమాసం, buf, లోపల_vim9script());
+    ఒకవేళ (s == ఖాళీ || *s == NUL)
+	తిరిగి FAIL;
 
-    CLEAR_FIELD(funcexe);
+    CLEAR_క్షేత్రం(funcexe);
     funcexe.fe_evaluate = TRUE;
-    if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	return FAIL;
+    ఒకవేళ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Evaluate an expression, which is a string.
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_string(
-    typval_T	*expr,
+    స్థిర పూర్ణాంకం
+eval_సమాసం_string(
+    typval_T	*సమాసం,
     typval_T	*rettv)
 {
     char_u	*s;
     char_u	buf[NUMBUFLEN];
 
-    s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL)
-	return FAIL;
+    s = tv_get_string_buf_chk_strict(సమాసం, buf, లోపల_vim9script());
+    ఒకవేళ (s == ఖాళీ)
+	తిరిగి FAIL;
 
     s = skipwhite(s);
-    if (eval1_emsg(&s, rettv, NULL) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval1_emsg(&s, rettv, ఖాళీ) == FAIL)
+	తిరిగి FAIL;
 
-    if (*skipwhite(s) != NUL)  // check for trailing chars after expr
+    ఒకవేళ (*skipwhite(s) != NUL)  // check for trailing chars after expr
     {
 	clear_tv(rettv);
-	semsg(_(e_invalid_expression_str), s);
-	return FAIL;
+	semsg(_(e_invalid_వ్యక్తీకరణ_str), s);
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -368,43 +368,43 @@ eval_expr_string(
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    int
-eval_expr_typval(
-	typval_T    *expr,
-	int	    want_func,
+    పూర్ణాంకం
+eval_సమాసం_typval(
+	typval_T    *సమాసం,
+	పూర్ణాంకం	    want_func,
 	typval_T    *argv,
-	int	    argc,
+	పూర్ణాంకం	    argc,
 	funccall_T  *fc_arg,
 	typval_T    *rettv)
 {
-    if (expr->v_type == VAR_PARTIAL)
-	return eval_expr_partial(expr, argv, argc, fc_arg, rettv);
-    if (expr->v_type == VAR_INSTR)
-	return exe_typval_instr(expr, rettv);
-    if (expr->v_type == VAR_FUNC || want_func)
-	return eval_expr_func(expr, argv, argc, rettv);
+    ఒకవేళ (సమాసం->v_type == VAR_PARTIAL)
+	తిరిగి eval_సమాసం_partial(సమాసం, argv, argc, fc_arg, rettv);
+    ఒకవేళ (సమాసం->v_type == VAR_INSTR)
+	తిరిగి exe_typval_instr(సమాసం, rettv);
+    ఒకవేళ (సమాసం->v_type == VAR_FUNC || want_func)
+	తిరిగి eval_సమాసం_func(సమాసం, argv, argc, rettv);
 
-    return eval_expr_string(expr, rettv);
+    తిరిగి eval_సమాసం_string(సమాసం, rettv);
 }
 
 /*
  * Like eval_to_bool() but using a typval_T instead of a string.
  * Works for string, funcref and partial.
  */
-    int
-eval_expr_to_bool(typval_T *expr, int *error)
+    పూర్ణాంకం
+eval_సమాసం_గమ్యం_bool(typval_T *సమాసం, పూర్ణాంకం *error)
 {
     typval_T	rettv;
-    int		res;
+    పూర్ణాంకం		res;
 
-    if (eval_expr_typval(expr, FALSE, NULL, 0, NULL, &rettv) == FAIL)
+    ఒకవేళ (eval_సమాసం_typval(సమాసం, FALSE, ఖాళీ, 0, ఖాళీ, &rettv) == FAIL)
     {
 	*error = TRUE;
-	return FALSE;
+	తిరిగి FALSE;
     }
     res = (tv_get_bool_chk(&rettv, error) != 0);
     clear_tv(&rettv);
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -413,74 +413,74 @@ eval_expr_to_bool(typval_T *expr, int *error)
  * pointer to allocated memory, or NULL for failure or when "skip" is TRUE.
  */
     char_u *
-eval_to_string_skip(
+eval_గమ్యం_string_skip(
     char_u	*arg,
     exarg_T	*eap,
-    int		skip)	    // only parse, don't execute
+    పూర్ణాంకం		skip)	    // only parse, don't execute
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
-    if (skip)
+    ఒకవేళ (skip)
 	++emsg_skip;
-    if (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
-	retval = NULL;
-    else
+    ఒకవేళ (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
+	retval = ఖాళీ;
+    లేకపోతే
     {
 	retval = vim_strsave(tv_get_string(&tv));
 	clear_tv(&tv);
     }
-    if (skip)
+    ఒకవేళ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Initialize "evalarg" for use.
  */
-    void
+    శూన్య
 init_evalarg(evalarg_T *evalarg)
 {
-    CLEAR_POINTER(evalarg);
-    ga_init2(&evalarg->eval_tofree_ga, sizeof(char_u *), 20);
+    CLEAR_సూచిక(evalarg);
+    ga_init2(&evalarg->eval_tofree_ga, పరిమాణం(char_u *), 20);
 }
 
 /*
  * If "evalarg->eval_tofree" is not NULL free it later.
  * Caller is expected to overwrite "evalarg->eval_tofree" next.
  */
-    static void
+    స్థిర శూన్య
 free_eval_tofree_later(evalarg_T *evalarg)
 {
-    if (evalarg->eval_tofree == NULL)
-	return;
+    ఒకవేళ (evalarg->eval_tofree == ఖాళీ)
+	తిరిగి;
 
-    if (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
-	((char_u **)evalarg->eval_tofree_ga.ga_data)
+    ఒకవేళ (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
+	((char_u **)evalarg->eval_tofree_ga.ga_దత్తాంశం)
 	    [evalarg->eval_tofree_ga.ga_len++]
 	    = evalarg->eval_tofree;
-    else
+    లేకపోతే
 	vim_free(evalarg->eval_tofree);
 }
 
 /*
  * After using "evalarg" filled from "eap": free the memory.
  */
-    void
+    శూన్య
 clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 {
-    if (evalarg == NULL)
-	return;
+    ఒకవేళ (evalarg == ఖాళీ)
+	తిరిగి;
 
     garray_T *etga = &evalarg->eval_tofree_ga;
 
-    if (evalarg->eval_tofree != NULL || evalarg->eval_using_cmdline)
+    ఒకవేళ (evalarg->eval_tofree != ఖాళీ || evalarg->eval_using_cmdline)
     {
-	if (eap != NULL)
+	ఒకవేళ (eap != ఖాళీ)
 	{
 	    // We may need to keep the original command line, e.g. for
 	    // ":let" it has the variable names.  But we may also need
@@ -488,23 +488,23 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 	    vim_free(eap->cmdline_tofree);
 	    eap->cmdline_tofree = *eap->cmdlinep;
 
-	    if (evalarg->eval_using_cmdline && etga->ga_len > 0)
+	    ఒకవేళ (evalarg->eval_using_cmdline && etga->ga_len > 0)
 	    {
 		// "nextcmd" points into the last line in eval_tofree_ga,
 		// need to keep it around.
 		--etga->ga_len;
-		*eap->cmdlinep = ((char_u **)etga->ga_data)[etga->ga_len];
+		*eap->cmdlinep = ((char_u **)etga->ga_దత్తాంశం)[etga->ga_len];
 		vim_free(evalarg->eval_tofree);
 	    }
-	    else
+	    లేకపోతే
 		*eap->cmdlinep = evalarg->eval_tofree;
 	}
-	else
+	లేకపోతే
 	    vim_free(evalarg->eval_tofree);
-	evalarg->eval_tofree = NULL;
+	evalarg->eval_tofree = ఖాళీ;
     }
 
-    ga_clear_strings(etga);
+    ga_clear_అక్షరశ్రేణులు(etga);
     VIM_CLEAR(evalarg->eval_tofree_lambda);
 }
 
@@ -512,13 +512,13 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
  * Skip over an expression at "*pp".
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr(char_u **pp, evalarg_T *evalarg)
+    పూర్ణాంకం
+skip_సమాసం(char_u **pp, evalarg_T *evalarg)
 {
     typval_T	rettv;
 
     *pp = skipwhite(*pp);
-    return eval1(pp, &rettv, evalarg);
+    తిరిగి eval1(pp, &rettv, evalarg);
 }
 
 /*
@@ -530,94 +530,94 @@ skip_expr(char_u **pp, evalarg_T *evalarg)
  * Also when the expression is copied to allocated memory.
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr_concatenate(
+    పూర్ణాంకం
+skip_సమాసం_concatenate(
 	char_u	    **arg,
-	char_u	    **start,
-	char_u	    **end,
+	char_u	    **ప్రారంభం,
+	char_u	    **చివర,
 	evalarg_T   *evalarg)
 {
     typval_T	rettv;
-    int		res;
-    int		vim9script = in_vim9script();
-    garray_T    *gap = evalarg == NULL ? NULL : &evalarg->eval_ga;
-    garray_T    *freegap = evalarg == NULL ? NULL : &evalarg->eval_freega;
-    int		save_flags = evalarg == NULL ? 0 : evalarg->eval_flags;
-    int		evaluate = evalarg == NULL
+    పూర్ణాంకం		res;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
+    garray_T    *gap = evalarg == ఖాళీ ? ఖాళీ : &evalarg->eval_ga;
+    garray_T    *freegap = evalarg == ఖాళీ ? ఖాళీ : &evalarg->eval_freega;
+    పూర్ణాంకం		save_flags = evalarg == ఖాళీ ? 0 : evalarg->eval_flags;
+    పూర్ణాంకం		evaluate = evalarg == ఖాళీ
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    if (vim9script && evaluate
-	       && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    ఒకవేళ (vim9script && evaluate
+	       && (evalarg->eval_cookie != ఖాళీ || evalarg->eval_cctx != ఖాళీ))
     {
-	ga_init2(gap, sizeof(char_u *), 10);
+	ga_init2(gap, పరిమాణం(char_u *), 10);
 	// leave room for "start"
-	if (ga_grow(gap, 1) == OK)
+	ఒకవేళ (ga_grow(gap, 1) == OK)
 	    ++gap->ga_len;
-	ga_init2(freegap, sizeof(char_u *), 10);
+	ga_init2(freegap, పరిమాణం(char_u *), 10);
     }
-    *start = *arg;
+    *ప్రారంభం = *arg;
 
     // Don't evaluate the expression.
-    if (evalarg != NULL)
+    ఒకవేళ (evalarg != ఖాళీ)
 	evalarg->eval_flags &= ~EVAL_EVALUATE;
     *arg = skipwhite(*arg);
     res = eval1(arg, &rettv, evalarg);
-    *end = *arg;
-    if (evalarg != NULL)
+    *చివర = *arg;
+    ఒకవేళ (evalarg != ఖాళీ)
 	evalarg->eval_flags = save_flags;
 
-    if (vim9script && evaluate
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    ఒకవేళ (vim9script && evaluate
+	    && (evalarg->eval_cookie != ఖాళీ || evalarg->eval_cctx != ఖాళీ))
     {
-	if (evalarg->eval_ga.ga_len == 1)
+	ఒకవేళ (evalarg->eval_ga.ga_len == 1)
 	{
 	    // just the one line, no need to concatenate
 	    ga_clear(gap);
 	    gap->ga_itemsize = 0;
 	}
-	else
+	లేకపోతే
 	{
 	    char_u	    *p;
 	    size_t	    endoff = STRLEN(*arg);
 
 	    // Line breaks encountered, concatenate all the lines.
-	    *((char_u **)gap->ga_data) = *start;
-	    p = ga_concat_strings(gap, " ");
+	    *((char_u **)gap->ga_దత్తాంశం) = *ప్రారంభం;
+	    p = ga_concat_అక్షరశ్రేణులు(gap, " ");
 
 	    // free the lines only when using getsourceline()
-	    if (evalarg->eval_cookie != NULL)
+	    ఒకవేళ (evalarg->eval_cookie != ఖాళీ)
 	    {
 		// Do not free the first line, the caller can still use it.
-		*((char_u **)gap->ga_data) = NULL;
+		*((char_u **)gap->ga_దత్తాంశం) = ఖాళీ;
 		// Do not free the last line, "arg" points into it, free it
 		// later.  Also free "eval_tofree" later if needed.
 		free_eval_tofree_later(evalarg);
 		evalarg->eval_tofree =
-				    ((char_u **)gap->ga_data)[gap->ga_len - 1];
-		((char_u **)gap->ga_data)[gap->ga_len - 1] = NULL;
-		ga_clear_strings(gap);
+				    ((char_u **)gap->ga_దత్తాంశం)[gap->ga_len - 1];
+		((char_u **)gap->ga_దత్తాంశం)[gap->ga_len - 1] = ఖాళీ;
+		ga_clear_అక్షరశ్రేణులు(gap);
 		ga_clear(freegap);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		ga_clear(gap);
 
 		// free lines that were explicitly marked for freeing
-		ga_clear_strings(freegap);
+		ga_clear_అక్షరశ్రేణులు(freegap);
 	    }
 
 	    gap->ga_itemsize = 0;
-	    if (p == NULL)
-		return FAIL;
-	    *start = p;
+	    ఒకవేళ (p == ఖాళీ)
+		తిరిగి FAIL;
+	    *ప్రారంభం = p;
 	    vim_free(evalarg->eval_tofree_lambda);
 	    evalarg->eval_tofree_lambda = p;
 	    // Compute "end" relative to the end.
-	    *end = *start + STRLEN(*start) - endoff;
+	    *చివర = *ప్రారంభం + STRLEN(*ప్రారంభం) - endoff;
 	}
     }
 
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -626,42 +626,42 @@ skip_expr_concatenate(
  * Returns an allocated string (NULL when out of memory).
  */
     char_u *
-typval2string(typval_T *tv, int join_list)
+typval2string(typval_T *tv, పూర్ణాంకం join_list)
 {
     garray_T	ga;
-    char_u	*retval = NULL;
+    char_u	*retval = ఖాళీ;
 
-    if (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
+    ఒకవేళ (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
     {
-	if (tv->v_type == VAR_LIST)
+	ఒకవేళ (tv->v_type == VAR_LIST)
 	{
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_list != NULL)
+	    ga_init2(&ga, పరిమాణం(అక్షరం), 80);
+	    ఒకవేళ (tv->vval.v_list != ఖాళీ)
 	    {
 		list_join(&ga, tv->vval.v_list, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (tv->vval.v_list->lv_len > 0)
+		ఒకవేళ (tv->vval.v_list->lv_len > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
-	    retval = (char_u *)ga.ga_data;
+	    retval = (char_u *)ga.ga_దత్తాంశం;
 	}
-	else
+	లేకపోతే
 	{
 	    // tuple
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_tuple != NULL)
+	    ga_init2(&ga, పరిమాణం(అక్షరం), 80);
+	    ఒకవేళ (tv->vval.v_tuple != ఖాళీ)
 	    {
 		tuple_join(&ga, tv->vval.v_tuple, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (TUPLE_LEN(tv->vval.v_tuple) > 0)
+		ఒకవేళ (TUPLE_LEN(tv->vval.v_tuple) > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
-	    retval = (char_u *)ga.ga_data;
+	    retval = (char_u *)ga.ga_దత్తాంశం;
 	}
     }
-    else if (tv->v_type == VAR_LIST
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_LIST
 	    || tv->v_type == VAR_TUPLE
 	    || tv->v_type == VAR_DICT)
     {
@@ -670,12 +670,12 @@ typval2string(typval_T *tv, int join_list)
 
 	retval = tv2string(tv, &tofree, numbuf, 0);
 	// Make a copy if we have a value but it's not in allocated memory.
-	if (retval != NULL && tofree == NULL)
+	ఒకవేళ (retval != ఖాళీ && tofree == ఖాళీ)
 	    retval = vim_strsave(retval);
     }
-    else
+    లేకపోతే
 	retval = vim_strsave(tv_get_string(tv));
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -686,41 +686,41 @@ typval2string(typval_T *tv, int join_list)
  * Return pointer to allocated memory, or NULL for failure.
  */
     char_u *
-eval_to_string_eap(
+eval_గమ్యం_string_eap(
     char_u	*arg,
-    int		join_list,
+    పూర్ణాంకం		join_list,
     exarg_T	*eap,
-    int		use_simple_function)
+    పూర్ణాంకం		use_simple_function)
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
-    int		r;
+    పూర్ణాంకం		r;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
-    if (use_simple_function)
-	r = eval0_simple_funccal(arg, &tv, NULL, &evalarg);
-    else
-	r = eval0(arg, &tv, NULL, &evalarg);
-    if (r == FAIL)
-	retval = NULL;
-    else
+    fill_evalarg_from_eap(&evalarg, eap, eap != ఖాళీ && eap->skip);
+    ఒకవేళ (use_simple_function)
+	r = eval0_simple_funccal(arg, &tv, ఖాళీ, &evalarg);
+    లేకపోతే
+	r = eval0(arg, &tv, ఖాళీ, &evalarg);
+    ఒకవేళ (r == FAIL)
+	retval = ఖాళీ;
+    లేకపోతే
     {
 	retval = typval2string(&tv, join_list);
 	clear_tv(&tv);
     }
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ఖాళీ);
 
-    return retval;
+    తిరిగి retval;
 }
 
     char_u *
-eval_to_string(
+eval_గమ్యం_string(
     char_u	*arg,
-    int		join_list,
-    int		use_simple_function)
+    పూర్ణాంకం		join_list,
+    పూర్ణాంకం		use_simple_function)
 {
-    return eval_to_string_eap(arg, join_list, NULL, use_simple_function);
+    తిరిగి eval_గమ్యం_string_eap(arg, join_list, ఖాళీ, use_simple_function);
 }
 
 /*
@@ -729,32 +729,32 @@ eval_to_string(
  * Use legacy Vim script syntax.
  */
     char_u *
-eval_to_string_safe(
+eval_గమ్యం_string_సురక్షిత(
     char_u	*arg,
-    int		use_sandbox,
-    int		keep_script_version,
-    int		use_simple_function)
+    పూర్ణాంకం		use_sandbox,
+    పూర్ణాంకం		keep_script_సంస్కరణ,
+    పూర్ణాంకం		use_simple_function)
 {
     char_u	*retval;
-    funccal_entry_T funccal_entry;
-    int		save_sc_version = current_sctx.sc_version;
-    int		save_garbage = may_garbage_collect;
+    funccal_నమోదు_T funccal_నమోదు;
+    పూర్ణాంకం		save_sc_సంస్కరణ = current_sctx.sc_సంస్కరణ;
+    పూర్ణాంకం		save_garbage = may_garbage_collect;
 
-    if (!keep_script_version)
-	current_sctx.sc_version = 1;
-    save_funccal(&funccal_entry);
-    if (use_sandbox)
+    ఒకవేళ (!keep_script_సంస్కరణ)
+	current_sctx.sc_సంస్కరణ = 1;
+    save_funccal(&funccal_నమోదు);
+    ఒకవేళ (use_sandbox)
 	++sandbox;
     ++textlock;
     may_garbage_collect = FALSE;
-    retval = eval_to_string(arg, FALSE, use_simple_function);
-    if (use_sandbox)
+    retval = eval_గమ్యం_string(arg, FALSE, use_simple_function);
+    ఒకవేళ (use_sandbox)
 	--sandbox;
     --textlock;
     may_garbage_collect = save_garbage;
     restore_funccal();
-    current_sctx.sc_version = save_sc_version;
-    return retval;
+    current_sctx.sc_సంస్కరణ = save_sc_సంస్కరణ;
+    తిరిగి retval;
 }
 
 /*
@@ -763,29 +763,29 @@ eval_to_string_safe(
  * Returns -1 for an error.
  */
     varnumber_T
-eval_to_number(char_u *expr, int use_simple_function)
+eval_గమ్యం_సంఖ్య(char_u *సమాసం, పూర్ణాంకం use_simple_function)
 {
     typval_T	rettv;
     varnumber_T	retval;
-    char_u	*p = skipwhite(expr);
-    int		r = NOTDONE;
+    char_u	*p = skipwhite(సమాసం);
+    పూర్ణాంకం		r = NOTDONE;
 
     ++emsg_off;
 
-    if (use_simple_function)
-	r = may_call_simple_func(expr, &rettv);
-    if (r == NOTDONE)
+    ఒకవేళ (use_simple_function)
+	r = may_call_simple_func(సమాసం, &rettv);
+    ఒకవేళ (r == NOTDONE)
 	r = eval1(&p, &rettv, &EVALARG_EVALUATE);
-    if (r == FAIL)
+    ఒకవేళ (r == FAIL)
 	retval = -1;
-    else
+    లేకపోతే
     {
-	retval = tv_get_number_chk(&rettv, NULL);
+	retval = tv_get_సంఖ్య_chk(&rettv, ఖాళీ);
 	clear_tv(&rettv);
     }
     --emsg_off;
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -794,35 +794,35 @@ eval_to_number(char_u *expr, int use_simple_function)
  * Returns NULL when there is an error.
  */
     typval_T *
-eval_expr(char_u *arg, exarg_T *eap)
+eval_సమాసం(char_u *arg, exarg_T *eap)
 {
-    return eval_expr_ext(arg, eap, FALSE);
+    తిరిగి eval_సమాసం_ext(arg, eap, FALSE);
 }
 
     typval_T *
-eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
+eval_సమాసం_ext(char_u *arg, exarg_T *eap, పూర్ణాంకం use_simple_function)
 {
     typval_T	*tv;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ఖాళీ && eap->skip);
 
     tv = ALLOC_ONE(typval_T);
-    if (tv != NULL)
+    ఒకవేళ (tv != ఖాళీ)
     {
-	int	r = NOTDONE;
+	పూర్ణాంకం	r = NOTDONE;
 
-	if (use_simple_function)
+	ఒకవేళ (use_simple_function)
 	    r = eval0_simple_funccal(arg, tv, eap, &evalarg);
-	if (r == NOTDONE)
+	ఒకవేళ (r == NOTDONE)
 	    r = eval0(arg, tv, eap, &evalarg);
 
-	if (r == FAIL)
+	ఒకవేళ (r == FAIL)
 	    VIM_CLEAR(tv);
     }
 
     clear_evalarg(&evalarg, eap);
-    return tv;
+    తిరిగి tv;
 }
 
 /*
@@ -832,78 +832,78 @@ eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
  * If "verbose" is FALSE no errors are given.
  * Return NULL for any failure.
  */
-    static char_u *
+    స్థిర char_u *
 deref_function_name(
 	    char_u	**arg,
 	    char_u	**tofree,
 	    evalarg_T	*evalarg,
-	    int		verbose)
+	    పూర్ణాంకం		verbose)
 {
     typval_T	ref;
     char_u	*name = *arg;
-    int		save_flags = 0;
-    int		evaluate = evalarg != NULL
+    పూర్ణాంకం		save_flags = 0;
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     ref.v_type = VAR_UNKNOWN;
-    if (evalarg != NULL)
+    ఒకవేళ (evalarg != ఖాళీ)
     {
 	// need to evaluate this to get an import, like in "a.Func"
 	save_flags = evalarg->eval_flags;
 	evalarg->eval_flags |= EVAL_EVALUATE;
     }
-    if (eval9(arg, &ref, evalarg, FALSE) == FAIL)
+    ఒకవేళ (eval9(arg, &ref, evalarg, FALSE) == FAIL)
     {
 	dictitem_T	*v;
 
 	// If <SID>VarName was used it would not be found, try another way.
-	v = find_var_also_in_script(name, NULL, FALSE);
-	if (v == NULL)
+	v = కనుగొను_var_also_లోపల_script(name, ఖాళీ, FALSE);
+	ఒకవేళ (v == ఖాళీ)
 	{
-	    name = NULL;
-	    goto theend;
+	    name = ఖాళీ;
+	    వెళ్ళు theend;
 	}
 	copy_tv(&v->di_tv, &ref);
     }
-    if (*skipwhite(*arg) != NUL)
+    ఒకవేళ (*skipwhite(*arg) != NUL)
     {
-	if (verbose)
+	ఒకవేళ (verbose)
 	    semsg(_(e_trailing_characters_str), *arg);
-	name = NULL;
+	name = ఖాళీ;
     }
-    else if (ref.v_type == VAR_FUNC && ref.vval.v_string != NULL)
+    లేకపోతే ఒకవేళ (ref.v_type == VAR_FUNC && ref.vval.v_string != ఖాళీ)
     {
 	name = ref.vval.v_string;
-	ref.vval.v_string = NULL;
+	ref.vval.v_string = ఖాళీ;
 	*tofree = name;
     }
-    else if (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != NULL)
+    లేకపోతే ఒకవేళ (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != ఖాళీ)
     {
-	if (ref.vval.v_partial->pt_argc > 0
-		|| ref.vval.v_partial->pt_dict != NULL)
+	ఒకవేళ (ref.vval.v_partial->pt_argc > 0
+		|| ref.vval.v_partial->pt_dict != ఖాళీ)
 	{
-	    if (verbose)
-		emsg(_(e_cannot_use_partial_here));
-	    name = NULL;
+	    ఒకవేళ (verbose)
+		emsg(_(e_cannot_use_partial_ఇక్కడ));
+	    name = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
 	    name = vim_strsave(partial_name(ref.vval.v_partial));
 	    *tofree = name;
 	}
     }
-    else if (evaluate)
+    లేకపోతే ఒకవేళ (evaluate)
     {
-	if (verbose)
+	ఒకవేళ (verbose)
 	    semsg(_(e_not_callable_type_str), name);
-	name = NULL;
+	name = ఖాళీ;
     }
 
 theend:
     clear_tv(&ref);
-    if (evalarg != NULL)
+    ఒకవేళ (evalarg != ఖాళీ)
 	evalarg->eval_flags = save_flags;
-    return name;
+    తిరిగి name;
 }
 
 /*
@@ -912,22 +912,22 @@ theend:
  * should have type VAR_UNKNOWN.
  * Returns OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 call_vim_function(
     char_u      *func,
-    int		argc,
+    పూర్ణాంకం		argc,
     typval_T	*argv,
     typval_T	*rettv)
 {
-    int		ret;
+    పూర్ణాంకం		ret;
     funcexe_T	funcexe;
     char_u	*arg;
     char_u	*name;
-    char_u	*tofree = NULL;
-    int		ignore_errors;
+    char_u	*tofree = ఖాళీ;
+    పూర్ణాంకం		ignore_errors;
 
     rettv->v_type = VAR_UNKNOWN;		// clear_tv() uses this
-    CLEAR_FIELD(funcexe);
+    CLEAR_క్షేత్రం(funcexe);
     funcexe.fe_firstline = curwin->w_cursor.lnum;
     funcexe.fe_lastline = curwin->w_cursor.lnum;
     funcexe.fe_evaluate = TRUE;
@@ -936,23 +936,23 @@ call_vim_function(
     // ignore errors for an undefined name.  But we do want errors when an
     // autoload script has errors.  Guess that when there is a dot in the name
     // showing errors is the right choice.
-    ignore_errors = vim_strchr(func, '.') == NULL;
+    ignore_errors = vim_strchr(func, '.') == ఖాళీ;
     arg = func;
-    if (ignore_errors)
+    ఒకవేళ (ignore_errors)
 	++emsg_off;
     name = deref_function_name(&arg, &tofree, &EVALARG_EVALUATE, FALSE);
-    if (ignore_errors)
+    ఒకవేళ (ignore_errors)
 	--emsg_off;
-    if (name == NULL)
+    ఒకవేళ (name == ఖాళీ)
 	name = func;
 
     ret = call_func(name, -1, rettv, argc, argv, &funcexe);
 
-    if (ret == FAIL)
+    ఒకవేళ (ret == FAIL)
 	clear_tv(rettv);
     vim_free(tofree);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -961,21 +961,21 @@ call_vim_function(
  * should have type VAR_UNKNOWN.
  * Returns NULL when calling the function fails.
  */
-    void *
+    శూన్య *
 call_func_retstr(
     char_u      *func,
-    int		argc,
+    పూర్ణాంకం		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
     char_u	*retval;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    ఒకవేళ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	తిరిగి ఖాళీ;
 
     retval = vim_strsave(tv_get_string(&rettv));
     clear_tv(&rettv);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -984,133 +984,133 @@ call_func_retstr(
  * Returns NULL when there is something wrong.
  * Gives an error when the returned value is not a list.
  */
-    void *
+    శూన్య *
 call_func_retlist(
     char_u      *func,
-    int		argc,
+    పూర్ణాంకం		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    ఒకవేళ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	తిరిగి ఖాళీ;
 
-    if (rettv.v_type != VAR_LIST)
+    ఒకవేళ (rettv.v_type != VAR_LIST)
     {
 	semsg(_(e_custom_list_completion_function_does_not_return_list_but_str),
 		vartype_name(rettv.v_type));
 	clear_tv(&rettv);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return rettv.vval.v_list;
+    తిరిగి rettv.vval.v_list;
 }
 
-#if defined(FEAT_FOLDING)
+#ఒకవేళ defined(FEAT_FOLDING)
 /*
  * Evaluate "arg", which is 'foldexpr'.
  * Note: caller must set "curwin" to match "arg".
  * Returns the foldlevel, and any character preceding it in "*cp".  Doesn't
  * give error messages.
  */
-    int
-eval_foldexpr(win_T *wp, int *cp)
+    పూర్ణాంకం
+eval_foldexpr(win_T *wp, పూర్ణాంకం *cp)
 {
     char_u	*arg;
     typval_T	tv;
     varnumber_T	retval;
     char_u	*s;
     sctx_T	saved_sctx = current_sctx;
-    int		use_sandbox = was_set_insecurely(wp, (char_u *)"foldexpr",
+    పూర్ణాంకం		use_sandbox = was_సమితి_insecurely(wp, (char_u *)"foldexpr",
 								    OPT_LOCAL);
 
     arg = skipwhite(wp->w_p_fde);
     current_sctx = wp->w_p_script_ctx[WV_FDE];
 
     ++emsg_off;
-    if (use_sandbox)
+    ఒకవేళ (use_sandbox)
 	++sandbox;
     ++textlock;
     *cp = NUL;
 
     // Evaluate the expression.  If the expression is "FuncName()" call the
     // function directly.
-    if (eval0_simple_funccal(arg, &tv, NULL, &EVALARG_EVALUATE) == FAIL)
+    ఒకవేళ (eval0_simple_funccal(arg, &tv, ఖాళీ, &EVALARG_EVALUATE) == FAIL)
 	retval = 0;
-    else
+    లేకపోతే
     {
 	// If the result is a number, just return the number.
-	if (tv.v_type == VAR_NUMBER)
-	    retval = tv.vval.v_number;
-	else if (tv.v_type != VAR_STRING || tv.vval.v_string == NULL)
+	ఒకవేళ (tv.v_type == VAR_సంఖ్య)
+	    retval = tv.vval.v_సంఖ్య;
+	లేకపోతే ఒకవేళ (tv.v_type != VAR_STRING || tv.vval.v_string == ఖాళీ)
 	    retval = 0;
-	else
+	లేకపోతే
 	{
 	    // If the result is a string, check if there is a non-digit before
 	    // the number.
 	    s = tv.vval.v_string;
-	    if (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
+	    ఒకవేళ (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
 		*cp = *s++;
-	    retval = atol((char *)s);
+	    retval = atol((అక్షరం *)s);
 	}
 	clear_tv(&tv);
     }
     --emsg_off;
-    if (use_sandbox)
+    ఒకవేళ (use_sandbox)
 	--sandbox;
     --textlock;
-    clear_evalarg(&EVALARG_EVALUATE, NULL);
+    clear_evalarg(&EVALARG_EVALUATE, ఖాళీ);
     current_sctx = saved_sctx;
 
-    return (int)retval;
+    తిరిగి (పూర్ణాంకం)retval;
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef LOG_LOCKVAR
-typedef struct flag_string_S
+#నిర్వచితమైతే LOG_LOCKVAR
+రకనిర్వచనం నిర్మాణం flag_string_S
 {
-    int	    flag;
-    char    *str;
+    పూర్ణాంకం	    flag;
+    అక్షరం    *str;
 } flag_string_T;
 
-    static char *
-flags_tostring(int flags, flag_string_T *_fstring, char *buf, size_t n)
+    స్థిర అక్షరం *
+flags_tostring(పూర్ణాంకం flags, flag_string_T *_fstring, అక్షరం *buf, size_t n)
 {
-    char *p = buf;
+    అక్షరం *p = buf;
     *p = NUL;
-    for (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
+    కొరకు (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
     {
-	if ((fstring->flag & flags) != 0)
+	ఒకవేళ ((fstring->flag & flags) != 0)
 	{
 	    size_t len = STRLEN(fstring->str);
-	    if (n > p - buf + len + 7)
+	    ఒకవేళ (n > p - buf + len + 7)
 	    {
 		STRCAT(p, fstring->str);
 		p += len;
 		STRCAT(p, " ");
 		++p;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		STRCAT(buf, "...");
-		break;
+		ఆపు;
 	    }
 	}
     }
-    return buf;
+    తిరిగి buf;
 }
 
-flag_string_T glv_flag_strings[] = {
+flag_string_T glv_flag_అక్షరశ్రేణులు[] = {
     { GLV_QUIET,		"QUIET" },
     { GLV_NO_AUTOLOAD,		"NO_AUTOLOAD" },
     { GLV_READ_ONLY,		"READ_ONLY" },
     { GLV_NO_DECL,		"NO_DECL" },
     { GLV_COMPILING,		"COMPILING" },
-    { GLV_ASSIGN_WITH_OP,	"ASSIGN_WITH_OP" },
+    { GLV_కేటాయించు_WITH_OP,	"ASSIGN_WITH_OP" },
     { GLV_PREFER_FUNC,		"PREFER_FUNC" },
-    { 0,			NULL }
+    { 0,			ఖాళీ }
 };
-#endif
+#అయితే_ముగింపు
 
 /*
  * Fill in "lp" using "root". This is used in a special case when
@@ -1130,99 +1130,99 @@ flag_string_T glv_flag_strings[] = {
  *	compile_lock_unlock - pushes object on stack (which becomes lval_root)
  *	execute_instructions: ISN_LOCKUNLOCK - sets lval_root from stack.
  */
-    static void
-fill_lval_from_lval_root(lval_T *lp, lval_root_T *lr)
+    స్థిర శూన్య
+fill_lval_from_lval_మూలం(lval_T *lp, lval_మూలం_T *lr)
 {
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
-						lp->ll_name, (void*)lr->lr_tv);
-#endif
-    if (lr->lr_tv == NULL)
-	return;
-    if (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
+#నిర్వచితమైతే LOG_LOCKVAR
+    ch_log(ఖాళీ, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
+						lp->ll_name, (శూన్య*)lr->lr_tv);
+#అయితే_ముగింపు
+    ఒకవేళ (lr->lr_tv == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
     {
-	if (lr->lr_tv->vval.v_class != NULL)
+	ఒకవేళ (lr->lr_tv->vval.v_class != ఖాళీ)
 	{
 	    // Special special case. Look for a bare class variable reference.
 	    class_T	*cl = lr->lr_tv->vval.v_class;
-	    int		m_idx;
+	    పూర్ణాంకం		m_idx;
 	    ocmember_T	*m = class_member_lookup(cl, lp->ll_name,
-					lp->ll_name_end - lp->ll_name, &m_idx);
-	    if (m != NULL)
+					lp->ll_name_చివర - lp->ll_name, &m_idx);
+	    ఒకవేళ (m != ఖాళీ)
 	    {
 		// Assuming "inside class" since bare reference.
 		lp->ll_class = lr->lr_tv->vval.v_class;
 		lp->ll_oi = m_idx;
 		lp->ll_valtype = m->ocm_type;
 		lp->ll_tv = &lp->ll_class->class_members_tv[m_idx];
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... class member %s.%s",
+#నిర్వచితమైతే LOG_LOCKVAR
+		ch_log(ఖాళీ, "LKVAR:    ... class member %s.%s",
 					lp->ll_class->class_name.string, lp->ll_name);
-#endif
-		return;
+#అయితే_ముగింపు
+		తిరిగి;
 	    }
 	}
     }
 
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+    ch_log(ఖాళీ, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
+#అయితే_ముగింపు
     lp->ll_tv = lr->lr_tv;
-    lp->ll_is_root = TRUE;
+    lp->ll_is_మూలం = TRUE;
 }
 
 /*
  * Check if the class has permission to access the member.
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_check_access(
     class_T	*cl_exec,   // executing class, NULL if :def or script level
     class_T	*cl,	    // class which contains the member
     ocmember_T	*om,	    // member being accessed
     char_u	*p,	    // char after member name
-    int		flags)	    // GLV flags to check if writing to lval
+    పూర్ణాంకం		flags)	    // GLV flags to check if writing to lval
 {
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
-						(void*)cl_exec, (void*)cl, *p);
-#endif
-    if (cl_exec != NULL && cl_exec == cl)
-	return OK;
+#నిర్వచితమైతే LOG_LOCKVAR
+    ch_log(ఖాళీ, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
+						(శూన్య*)cl_exec, (శూన్య*)cl, *p);
+#అయితే_ముగింపు
+    ఒకవేళ (cl_exec != ఖాళీ && cl_exec == cl)
+	తిరిగి OK;
 
-    char *msg = NULL;
-    switch (om->ocm_access)
+    అక్షరం *సందేశం = ఖాళీ;
+    ఎంపిక (om->ocm_access)
     {
-	case VIM_ACCESS_PRIVATE:
-	    msg = e_cannot_access_protected_variable_str;
-	    break;
-	case VIM_ACCESS_READ:
+	స్థితి VIM_ACCESS_వ్యక్తిగత:
+	    సందేశం = e_cannot_access_protected_variable_str;
+	    ఆపు;
+	స్థితి VIM_ACCESS_READ:
 	    // If [idx] or .key following, read only OK.
-	    if (*p == '[' || *p == '.')
-		break;
-	    if ((flags & GLV_READ_ONLY) == 0)
+	    ఒకవేళ (*p == '[' || *p == '.')
+		ఆపు;
+	    ఒకవేళ ((flags & GLV_READ_ONLY) == 0)
 	    {
-		if (IS_ENUM(cl))
+		ఒకవేళ (IS_ENUM(cl))
 		{
-		    if (om->ocm_type->tt_type == VAR_OBJECT)
+		    ఒకవేళ (om->ocm_type->tt_type == VAR_OBJECT)
 			semsg(_(e_enumvalue_str_cannot_be_modified),
 				cl->class_name.string, om->ocm_name.string);
-		    else
-			msg = e_variable_is_not_writable_str;
+		    లేకపోతే
+			సందేశం = e_variable_is_not_writable_str;
 		}
-		else
-		    msg = e_variable_is_not_writable_str;
+		లేకపోతే
+		    సందేశం = e_variable_is_not_writable_str;
 	    }
-	    break;
-	case VIM_ACCESS_ALL:
-	    break;
+	    ఆపు;
+	స్థితి VIM_ACCESS_ALL:
+	    ఆపు;
     }
-    if (msg != NULL)
+    ఒకవేళ (సందేశం != ఖాళీ)
     {
-	emsg_var_cl_define(msg, om->ocm_name.string, 0, cl);
-	return FAIL;
+	emsg_var_cl_define(సందేశం, om->ocm_name.string, 0, cl);
+	తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1236,57 +1236,57 @@ get_lval_check_access(
  * Returns NULL if the variable is not exported or typval is not found or the
  * rhs type doesn't match the lhs type or the variable is not writable.
  */
-    static char_u *
+    స్థిర char_u *
 get_lval_imported(
     lval_T	*lp,
     scid_T	imp_sid,
     char_u	*p,
     dictitem_T	**dip,
-    int		fne_flags)
+    పూర్ణాంకం		fne_flags)
 {
     ufunc_T	*ufunc;
-    type_T	*type = NULL;
-    int		cc;
-    int		rc = FAIL;
+    type_T	*type = ఖాళీ;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		rc = FAIL;
 
     p = skipwhite(p);
 
     import_check_sourced_sid(&imp_sid);
     lp->ll_sid = imp_sid;
     lp->ll_name = p;
-    p = find_name_end(lp->ll_name, NULL, NULL, fne_flags);
-    lp->ll_name_end = p;
+    p = కనుగొను_name_చివర(lp->ll_name, ఖాళీ, ఖాళీ, fne_flags);
+    lp->ll_name_చివర = p;
 
     // check the item is exported
     cc = *p;
     *p = NUL;
-    if (find_exported(imp_sid, lp->ll_name, &ufunc, &type, NULL, NULL,
+    ఒకవేళ (కనుగొను_exported(imp_sid, lp->ll_name, &ufunc, &type, ఖాళీ, ఖాళీ,
 								TRUE) == -1)
-	goto failed;
+	వెళ్ళు failed;
 
     // Get the typval for the exported item
     hashtab_T *ht = &SCRIPT_VARS(imp_sid);
-    if (ht == NULL)
-	goto failed;
+    ఒకవేళ (ht == ఖాళీ)
+	వెళ్ళు failed;
 
-    dictitem_T *di = find_var_in_ht(ht, 0, lp->ll_name, TRUE);
-    if (di == NULL)
+    dictitem_T *di = కనుగొను_var_లోపల_ht(ht, 0, lp->ll_name, TRUE);
+    ఒకవేళ (di == ఖాళీ)
 	// script is autoloaded.  So variable will be found later
-	goto success;
+	వెళ్ళు success;
 
     *dip = di;
 
     // Check whether the variable is writable.
-    svar_T *sv = find_typval_in_script(&di->di_tv, imp_sid, FALSE);
-    if (sv != NULL && sv->sv_const != 0)
+    svar_T *sv = కనుగొను_typval_లోపల_script(&di->di_tv, imp_sid, FALSE);
+    ఒకవేళ (sv != ఖాళీ && sv->sv_const != 0)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), lp->ll_name);
-	goto failed;
+	వెళ్ళు failed;
     }
 
     // check whether variable is locked
-    if (value_check_lock(di->di_tv.v_lock, lp->ll_name, FALSE))
-	goto failed;
+    ఒకవేళ (విలువ_check_తాళం(di->di_tv.v_తాళం, lp->ll_name, FALSE))
+	వెళ్ళు failed;
 
     lp->ll_tv = &di->di_tv;
     lp->ll_valtype = type;
@@ -1296,14 +1296,14 @@ success:
 
 failed:
     *p = cc;
-    return rc == OK ? p : NULL;
+    తిరిగి rc == OK ? p : ఖాళీ;
 }
 
-typedef enum {
+రకనిర్వచనం గణన {
     GLV_FAIL,
     GLV_OK,
     GLV_STOP
-} glv_status_T;
+} glv_స్థితి_T;
 
 /*
  * Get an Dict lval variable that can be assigned a value to: "name",
@@ -1322,112 +1322,112 @@ typedef enum {
  * failure.  Returns GLV_STOP to stop processing the characters following
  * 'key_end'.
  */
-    static int
-get_lval_dict_item(
+    స్థిర పూర్ణాంకం
+get_lval_dict_అంశం(
     lval_T	*lp,
     char_u	*name,
-    char_u	*key,
-    int		len,
-    char_u	**key_end,
+    char_u	*కీలకం,
+    పూర్ణాంకం		len,
+    char_u	**కీలకం_చివర,
     typval_T	*var1,
-    int		flags,
-    int		unlet,
+    పూర్ణాంకం		flags,
+    పూర్ణాంకం		unlet,
     typval_T	*rettv)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*p = *key_end;
+    పూర్ణాంకం		quiet = flags & GLV_QUIET;
+    char_u	*p = *కీలకం_చివర;
 
-    if (len == -1)
+    ఒకవేళ (len == -1)
     {
 	// "[key]": get key from "var1"
-	key = tv_get_string_chk(var1);	// is number or string
-	if (key == NULL)
-	    return GLV_FAIL;
+	కీలకం = tv_get_string_chk(var1);	// is number or string
+	ఒకవేళ (కీలకం == ఖాళీ)
+	    తిరిగి GLV_FAIL;
     }
-    lp->ll_list = NULL;
-    lp->ll_list = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ఖాళీ;
+    lp->ll_list = ఖాళీ;
+    lp->ll_blob = ఖాళీ;
+    lp->ll_object = ఖాళీ;
+    lp->ll_class = ఖాళీ;
+    lp->ll_tuple = ఖాళీ;
 
     // a NULL dict is equivalent with an empty dict
-    if (lp->ll_tv->vval.v_dict == NULL)
+    ఒకవేళ (lp->ll_tv->vval.v_dict == ఖాళీ)
     {
 	lp->ll_tv->vval.v_dict = dict_alloc();
-	if (lp->ll_tv->vval.v_dict == NULL)
-	    return GLV_FAIL;
+	ఒకవేళ (lp->ll_tv->vval.v_dict == ఖాళీ)
+	    తిరిగి GLV_FAIL;
 	++lp->ll_tv->vval.v_dict->dv_refcount;
     }
     lp->ll_dict = lp->ll_tv->vval.v_dict;
 
-    lp->ll_di = dict_find(lp->ll_dict, key, len);
+    lp->ll_di = dict_కనుగొను(lp->ll_dict, కీలకం, len);
 
     // When assigning to a scope dictionary check that a function and
     // variable name is valid (only variable name unless it is l: or
     // g: dictionary). Disallow overwriting a builtin function.
-    if (rettv != NULL && lp->ll_dict->dv_scope != 0)
+    ఒకవేళ (rettv != ఖాళీ && lp->ll_dict->dv_scope != 0)
     {
-	int prevval;
+	పూర్ణాంకం prevval;
 
-	if (len != -1)
+	ఒకవేళ (len != -1)
 	{
-	    prevval = key[len];
-	    key[len] = NUL;
+	    prevval = కీలకం[len];
+	    కీలకం[len] = NUL;
 	}
-	else
+	లేకపోతే
 	    prevval = 0; // avoid compiler warning
-	int wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
+	పూర్ణాంకం wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
 		&& (rettv->v_type == VAR_FUNC
 		    || rettv->v_type == VAR_PARTIAL)
-		&& var_wrong_func_name(key, lp->ll_di == NULL))
-	    || !valid_varname(key, -1, TRUE);
-	if (len != -1)
-	    key[len] = prevval;
-	if (wrong)
-	    return GLV_FAIL;
+		&& var_wrong_func_name(కీలకం, lp->ll_di == ఖాళీ))
+	    || !valid_varname(కీలకం, -1, TRUE);
+	ఒకవేళ (len != -1)
+	    కీలకం[len] = prevval;
+	ఒకవేళ (wrong)
+	    తిరిగి GLV_FAIL;
     }
 
-    if (lp->ll_valtype != NULL)
+    ఒకవేళ (lp->ll_valtype != ఖాళీ)
 	// use the type of the member
 	lp->ll_valtype = lp->ll_valtype->tt_member;
 
-    if (lp->ll_di == NULL)
+    ఒకవేళ (lp->ll_di == ఖాళీ)
     {
 	// Can't add "v:" or "a:" variable.
-	if (lp->ll_dict == get_vimvar_dict()
-		|| &lp->ll_dict->dv_hashtab == get_funccal_args_ht())
+	ఒకవేళ (lp->ll_dict == get_vimvar_dict()
+		|| &lp->ll_dict->dv_hashtab == get_funccal_వాదనలు_ht())
 	{
 	    semsg(_(e_illegal_variable_name_str), name);
-	    return GLV_FAIL;
+	    తిరిగి GLV_FAIL;
 	}
 
 	// Key does not exist in dict: may need to add it.
-	if (*p == '[' || *p == '.' || unlet)
+	ఒకవేళ (*p == '[' || *p == '.' || unlet)
 	{
-	    if (!quiet)
-		semsg(_(e_key_not_present_in_dictionary_str), key);
-	    return GLV_FAIL;
+	    ఒకవేళ (!quiet)
+		semsg(_(e_కీలకం_not_present_లోపల_dictionary_str), కీలకం);
+	    తిరిగి GLV_FAIL;
 	}
-	if (len == -1)
-	    lp->ll_newkey = vim_strsave(key);
-	else
-	    lp->ll_newkey = vim_strnsave(key, len);
-	if (lp->ll_newkey == NULL)
-	    p = NULL;
+	ఒకవేళ (len == -1)
+	    lp->ll_newkey = vim_strsave(కీలకం);
+	లేకపోతే
+	    lp->ll_newkey = vim_strnsave(కీలకం, len);
+	ఒకవేళ (lp->ll_newkey == ఖాళీ)
+	    p = ఖాళీ;
 
-	*key_end = p;
-	return GLV_STOP;
+	*కీలకం_చివర = p;
+	తిరిగి GLV_STOP;
     }
     // existing variable, need to check if it can be changed
-    else if ((flags & GLV_READ_ONLY) == 0
+    లేకపోతే ఒకవేళ ((flags & GLV_READ_ONLY) == 0
 	    && (var_check_ro(lp->ll_di->di_flags, name, FALSE)
-		|| var_check_lock(lp->ll_di->di_flags, name, FALSE)))
-	return GLV_FAIL;
+		|| var_check_తాళం(lp->ll_di->di_flags, name, FALSE)))
+	తిరిగి GLV_FAIL;
 
     lp->ll_tv = &lp->ll_di->di_tv;
 
-    return GLV_OK;
+    తిరిగి GLV_OK;
 }
 
 /*
@@ -1441,47 +1441,47 @@ get_lval_dict_item(
  *
  * The blob is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_blob(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		quiet)
+    పూర్ణాంకం		empty1,
+    పూర్ణాంకం		quiet)
 {
-    long	bloblen = blob_len(lp->ll_tv->vval.v_blob);
+    దీర్ఘ	bloblen = blob_len(lp->ll_tv->vval.v_blob);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ఖాళీ;
+    lp->ll_dict = ఖాళీ;
+    lp->ll_object = ఖాళీ;
+    lp->ll_class = ఖాళీ;
+    lp->ll_tuple = ఖాళీ;
 
     // Get the number and item for the only or first index of a List or Tuple.
-    if (empty1)
+    ఒకవేళ (empty1)
 	lp->ll_n1 = 0;
-    else
+    లేకపోతే
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (దీర్ఘ)tv_get_సంఖ్య(var1);
 
-    if (check_blob_index(bloblen, lp->ll_n1, quiet) == FAIL)
-	return FAIL;
-    if (lp->ll_range && !lp->ll_empty2)
+    ఒకవేళ (check_blob_సూచీ(bloblen, lp->ll_n1, quiet) == FAIL)
+	తిరిగి FAIL;
+    ఒకవేళ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
-	if (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	lp->ll_n2 = (దీర్ఘ)tv_get_సంఖ్య(var2);
+	ఒకవేళ (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
+	    తిరిగి FAIL;
     }
 
-    if (!lp->ll_range)
+    ఒకవేళ (!lp->ll_range)
 	// Indexing a single byte in a blob.  So the rhs type is a
 	// number.
-	lp->ll_valtype = &t_number;
+	lp->ll_valtype = &t_సంఖ్య;
 
     lp->ll_blob = lp->ll_tv->vval.v_blob;
-    lp->ll_tv = NULL;
+    lp->ll_tv = ఖాళీ;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1495,40 +1495,40 @@ get_lval_blob(
  *
  * The List is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_list(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		flags,
-    int		quiet)
+    పూర్ణాంకం		empty1,
+    పూర్ణాంకం		flags,
+    పూర్ణాంకం		quiet)
 {
     /*
      * Get the number and item for the only or first index of the List.
      */
-    if (empty1)
+    ఒకవేళ (empty1)
 	lp->ll_n1 = 0;
-    else
+    లేకపోతే
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (దీర్ఘ)tv_get_సంఖ్య(var1);
 
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ఖాళీ;
+    lp->ll_object = ఖాళీ;
+    lp->ll_class = ఖాళీ;
+    lp->ll_tuple = ఖాళీ;
     lp->ll_list = lp->ll_tv->vval.v_list;
-    lp->ll_li = check_range_index_one(lp->ll_list, &lp->ll_n1,
-				(flags & GLV_ASSIGN_WITH_OP) == 0, quiet);
-    if (lp->ll_li == NULL)
-	return FAIL;
+    lp->ll_li = check_range_సూచీ_one(lp->ll_list, &lp->ll_n1,
+				(flags & GLV_కేటాయించు_WITH_OP) == 0, quiet);
+    ఒకవేళ (lp->ll_li == ఖాళీ)
+	తిరిగి FAIL;
 
-    if (lp->ll_valtype != NULL && !lp->ll_range)
+    ఒకవేళ (lp->ll_valtype != ఖాళీ && !lp->ll_range)
     {
 	// use the type of the member
-	if (lp->ll_valtype->tt_member != NULL)
+	ఒకవేళ (lp->ll_valtype->tt_member != ఖాళీ)
 	    lp->ll_valtype = lp->ll_valtype->tt_member;
-	else
+	లేకపోతే
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the list item (after indexing)
 	    lp->ll_valtype = typval2type(&lp->ll_li->li_tv, get_copyID(),
@@ -1542,18 +1542,18 @@ get_lval_list(
      * When no index given: "lp->ll_empty2" is TRUE.
      * Otherwise "lp->ll_n2" is set to the second index.
      */
-    if (lp->ll_range && !lp->ll_empty2)
+    ఒకవేళ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
+	lp->ll_n2 = (దీర్ఘ)tv_get_సంఖ్య(var2);
 	// is number or string
-	if (check_range_index_two(lp->ll_list,
+	ఒకవేళ (check_range_సూచీ_two(lp->ll_list,
 			&lp->ll_n1, lp->ll_li, &lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
     }
 
     lp->ll_tv = &lp->ll_li->li_tv;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1567,51 +1567,51 @@ get_lval_list(
  * The typval is returned in 'lp'.  Returns GLV_OK on success and GLV_FAIL on
  * failure.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_tuple(
     lval_T	*lp,
     typval_T	*idx,
-    int		quiet)
+    పూర్ణాంకం		quiet)
 {
     // is number or string
-    lp->ll_n1 = (long)tv_get_number(idx);
+    lp->ll_n1 = (దీర్ఘ)tv_get_సంఖ్య(idx);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
+    lp->ll_list = ఖాళీ;
+    lp->ll_dict = ఖాళీ;
+    lp->ll_blob = ఖాళీ;
+    lp->ll_object = ఖాళీ;
+    lp->ll_class = ఖాళీ;
 
     lp->ll_tuple = lp->ll_tv->vval.v_tuple;
-    lp->ll_tv = tuple_find(lp->ll_tuple, lp->ll_n1);
-    if (lp->ll_tv == NULL)
+    lp->ll_tv = tuple_కనుగొను(lp->ll_tuple, lp->ll_n1);
+    ఒకవేళ (lp->ll_tv == ఖాళీ)
     {
-	if (!quiet)
-	    semsg(_(e_tuple_index_out_of_range_nr), lp->ll_n1);
-	return GLV_FAIL;
+	ఒకవేళ (!quiet)
+	    semsg(_(e_tuple_సూచీ_బహిర్గతం_యొక్క_range_nr), lp->ll_n1);
+	తిరిగి GLV_FAIL;
     }
 
     // use the type of the member
-    if (lp->ll_valtype != NULL)
+    ఒకవేళ (lp->ll_valtype != ఖాళీ)
     {
-	if (lp->ll_valtype != NULL
+	ఒకవేళ (lp->ll_valtype != ఖాళీ
 		&& lp->ll_valtype->tt_type == VAR_TUPLE
 		&& lp->ll_valtype->tt_argcount == 1)
 	{
 	    // a variadic tuple or a single item tuple
-	    if (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
-		lp->ll_valtype = lp->ll_valtype->tt_args[0]->tt_member;
-	    else
-		lp->ll_valtype = lp->ll_valtype->tt_args[0];
+	    ఒకవేళ (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
+		lp->ll_valtype = lp->ll_valtype->tt_వాదనలు[0]->tt_member;
+	    లేకపోతే
+		lp->ll_valtype = lp->ll_valtype->tt_వాదనలు[0];
 	}
-	else
+	లేకపోతే
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the tuple item (after indexing)
 	    lp->ll_valtype = typval2type(lp->ll_tv, get_copyID(),
 					&lp->ll_type_list, TVTT_DO_MEMBER);
     }
 
-    return GLV_OK;
+    తిరిగి GLV_OK;
 }
 
 /*
@@ -1622,39 +1622,39 @@ get_lval_tuple(
  * The method index, method function pointer and method type are returned in
  * "lp".
  */
-    static int
-get_lval_oc_method(
+    స్థిర పూర్ణాంకం
+get_lval_oc_పద్ధతి(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*కీలకం,
+    char_u	**కీలకం_చివర,
     vartype_T	v_type)
 {
     // Look for a method with this name.
     // round 1: class functions (skipped for an object)
     // round 2: object methods
-    for (int round = v_type == VAR_OBJECT ? 2 : 1; round <= 2; ++round)
+    కొరకు (పూర్ణాంకం విడత = v_type == VAR_OBJECT ? 2 : 1; విడత <= 2; ++విడత)
     {
-	int	m_idx;
+	పూర్ణాంకం	m_idx;
 	ufunc_T	*fp;
 
-	fp = method_lookup(cl, round == 1 ? VAR_CLASS : VAR_OBJECT,
-						key, *key_end - key, &m_idx);
+	fp = పద్ధతి_lookup(cl, విడత == 1 ? VAR_CLASS : VAR_OBJECT,
+						కీలకం, *కీలకం_చివర - కీలకం, &m_idx);
 	lp->ll_oi = m_idx;
 
 	// process generic method (if present)
-	if (fp && (fp = eval_generic_func(fp, key, key_end)) == NULL)
-	    return FAIL;
+	ఒకవేళ (fp && (fp = eval_generic_func(fp, కీలకం, కీలకం_చివర)) == ఖాళీ)
+	    తిరిగి FAIL;
 
-	if (fp != NULL)
+	ఒకవేళ (fp != ఖాళీ)
 	{
 	    lp->ll_ufunc = fp;
 	    lp->ll_valtype = fp->uf_func_type;
-	    break;
+	    ఆపు;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1666,42 +1666,42 @@ get_lval_oc_method(
  * The variable index, typval and type are returned in "lp".  Returns FAIL if
  * the variable is not writable.  Otherwise returns OK.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_oc_variable(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	*key_end,
+    char_u	*కీలకం,
+    char_u	*కీలకం_చివర,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags)
+    పూర్ణాంకం		flags)
 {
-    int		m_idx;
+    పూర్ణాంకం		m_idx;
     ocmember_T	*om;
 
-    om = member_lookup(cl, v_type, key, key_end - key, &m_idx);
+    om = member_lookup(cl, v_type, కీలకం, కీలకం_చివర - కీలకం, &m_idx);
     lp->ll_oi = m_idx;
-    if (om == NULL)
-	return OK;
+    ఒకవేళ (om == ఖాళీ)
+	తిరిగి OK;
 
     // Check variable is accessible
-    if (get_lval_check_access(cl_exec, cl, om, key_end, flags) == FAIL)
-	return FAIL;
+    ఒకవేళ (get_lval_check_access(cl_exec, cl, om, కీలకం_చివర, flags) == FAIL)
+	తిరిగి FAIL;
 
     // When lhs is used to modify the variable, check it is not a read-only
     // variable.
-    if ((flags & GLV_READ_ONLY) == 0 && (*key_end != '.' && *key_end != '[')
+    ఒకవేళ ((flags & GLV_READ_ONLY) == 0 && (*కీలకం_చివర != '.' && *కీలకం_చివర != '[')
 	    && oc_var_check_ro(cl, om))
-	return FAIL;
+	తిరిగి FAIL;
 
     lp->ll_valtype = om->ocm_type;
 
-    if (v_type == VAR_OBJECT)
+    ఒకవేళ (v_type == VAR_OBJECT)
 	lp->ll_tv = ((typval_T *)(lp->ll_tv->vval.v_object + 1)) + m_idx;
-    else
+    లేకపోతే
 	lp->ll_tv = &cl->class_members_tv[m_idx];
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1716,64 +1716,64 @@ get_lval_oc_variable(
  * The Class or Object is returned in 'lp'.  Returns OK on success and FAIL on
  * failure.
  */
-    static int
+    స్థిర పూర్ణాంకం
 get_lval_class_or_obj(
     lval_T	*lp,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*కీలకం,
+    char_u	**కీలకం_చివర,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags,
-    int		quiet)
+    పూర్ణాంకం		flags,
+    పూర్ణాంకం		quiet)
 {
-    lp->ll_dict = NULL;
-    lp->ll_list = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ఖాళీ;
+    lp->ll_list = ఖాళీ;
+    lp->ll_tuple = ఖాళీ;
 
     class_T *cl;
-    if (v_type == VAR_OBJECT)
+    ఒకవేళ (v_type == VAR_OBJECT)
     {
-	if (lp->ll_tv->vval.v_object == NULL)
+	ఒకవేళ (lp->ll_tv->vval.v_object == ఖాళీ)
 	{
-	    if (!quiet)
+	    ఒకవేళ (!quiet)
 		emsg(_(e_using_null_object));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	cl = lp->ll_tv->vval.v_object->obj_class;
 	lp->ll_object = lp->ll_tv->vval.v_object;
     }
-    else
+    లేకపోతే
     {
 	cl = lp->ll_tv->vval.v_class;
-	lp->ll_object = NULL;
+	lp->ll_object = ఖాళీ;
     }
     lp->ll_class = cl;
 
-    if (cl == NULL)
+    ఒకవేళ (cl == ఖాళీ)
 	// TODO: what if class is NULL?
-	return OK;
+	తిరిగి OK;
 
-    lp->ll_valtype = NULL;
+    lp->ll_valtype = ఖాళీ;
 
-    if (flags & GLV_PREFER_FUNC)
-	if (get_lval_oc_method(lp, cl, key, key_end, v_type) == FAIL)
-	    return FAIL;
+    ఒకవేళ (flags & GLV_PREFER_FUNC)
+	ఒకవేళ (get_lval_oc_పద్ధతి(lp, cl, కీలకం, కీలకం_చివర, v_type) == FAIL)
+	    తిరిగి FAIL;
 
     // Look for object/class member variable
-    if (lp->ll_valtype == NULL)
+    ఒకవేళ (lp->ll_valtype == ఖాళీ)
     {
-	if (get_lval_oc_variable(lp, cl, key, *key_end, v_type, cl_exec, flags)
+	ఒకవేళ (get_lval_oc_variable(lp, cl, కీలకం, *కీలకం_చివర, v_type, cl_exec, flags)
 								== FAIL)
-	    return FAIL;
+	    తిరిగి FAIL;
     }
 
-    if (lp->ll_valtype == NULL)
+    ఒకవేళ (lp->ll_valtype == ఖాళీ)
     {
-	member_not_found_msg(cl, v_type, key, *key_end - key);
-	return FAIL;
+	member_not_దొరికింది_సందేశం(cl, v_type, కీలకం, *కీలకం_చివర - కీలకం);
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1781,18 +1781,18 @@ get_lval_class_or_obj(
  * "v_type".  Only Dict, Class and Object types support a dot after the name.
  * Returns TRUE if dot is allowed after the name.
  */
-    static int
-dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    స్థిర పూర్ణాంకం
+dot_allowed_after_type(char_u *name, vartype_T v_type, పూర్ణాంకం quiet)
 {
-    if (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
+    ఒకవేళ (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
     {
-	if (!quiet)
+	ఒకవేళ (!quiet)
 	    semsg(_(e_dot_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1800,18 +1800,18 @@ dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * type "v_type".  Only Dict, List, Tuple and Blob types support a bracket
  * after the variable name.  Returns TRUE if bracket is allowed after the name.
  */
-    static int
-bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    స్థిర పూర్ణాంకం
+bracket_allowed_after_type(char_u *name, vartype_T v_type, పూర్ణాంకం quiet)
 {
-    if (v_type == VAR_CLASS || v_type == VAR_OBJECT)
+    ఒకవేళ (v_type == VAR_CLASS || v_type == VAR_OBJECT)
     {
-	if (!quiet)
-	    semsg(_(e_index_not_allowed_after_str_str),
+	ఒకవేళ (!quiet)
+	    semsg(_(e_సూచీ_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1819,23 +1819,23 @@ bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * index.  Only Dict, List, Tuple, Blob, Object and Class types support
  * indexing.  Returns TRUE if indexing is allowed after the name.
  */
-    static int
-index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    స్థిర పూర్ణాంకం
+సూచీ_allowed_after_type(char_u *name, vartype_T v_type, పూర్ణాంకం quiet)
 {
-    if (v_type != VAR_LIST
+    ఒకవేళ (v_type != VAR_LIST
 	    && v_type != VAR_TUPLE
 	    && v_type != VAR_DICT
 	    && v_type != VAR_BLOB
 	    && v_type != VAR_OBJECT
 	    && v_type != VAR_CLASS)
     {
-	if (!quiet)
-	    semsg(_(e_index_not_allowed_after_str_str),
+	ఒకవేళ (!quiet)
+	    semsg(_(e_సూచీ_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1848,7 +1848,7 @@ index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * Returns a pointer to the character after the subscript on success or NULL on
  * failure.
  */
-    static char_u *
+    స్థిర char_u *
 get_lval_subscript(
     lval_T	*lp,
     char_u	*p,
@@ -1856,17 +1856,17 @@ get_lval_subscript(
     typval_T	*rettv,
     hashtab_T	*ht,
     dictitem_T	*v,
-    int		unlet,
-    int		flags,	    // GLV_ values
+    పూర్ణాంకం		unlet,
+    పూర్ణాంకం		flags,	    // GLV_ values
     class_T	*cl_exec)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*key = NULL;
-    int		len;
+    పూర్ణాంకం		quiet = flags & GLV_QUIET;
+    char_u	*కీలకం = ఖాళీ;
+    పూర్ణాంకం		len;
     typval_T	var1;
     typval_T	var2;
-    int		empty1 = FALSE;
-    int		rc = FAIL;
+    పూర్ణాంకం		empty1 = FALSE;
+    పూర్ణాంకం		rc = FAIL;
 
     /*
      * Loop until no more [idx] or .key is following.
@@ -1874,183 +1874,183 @@ get_lval_subscript(
     var1.v_type = VAR_UNKNOWN;
     var2.v_type = VAR_UNKNOWN;
 
-    while (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
+    అయితే (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
     {
 	vartype_T v_type = lp->ll_tv->v_type;
 
-	if (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ఒకవేళ (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
+	    వెళ్ళు పూర్తి;
 
-	if (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ఒకవేళ (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
+	    వెళ్ళు పూర్తి;
 
-	if (!index_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ఒకవేళ (!సూచీ_allowed_after_type(name, v_type, quiet))
+	    వెళ్ళు పూర్తి;
 
 	// A NULL list/blob works like an empty list/blob, allocate one now.
-	int r = OK;
-	if (v_type == VAR_LIST && lp->ll_tv->vval.v_list == NULL)
+	పూర్ణాంకం r = OK;
+	ఒకవేళ (v_type == VAR_LIST && lp->ll_tv->vval.v_list == ఖాళీ)
 	    r = rettv_list_alloc(lp->ll_tv);
-	else if (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == NULL)
+	లేకపోతే ఒకవేళ (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == ఖాళీ)
 	    r = rettv_blob_alloc(lp->ll_tv);
-	if (r == FAIL)
-	    goto done;
+	ఒకవేళ (r == FAIL)
+	    వెళ్ళు పూర్తి;
 
-	if (lp->ll_range)
+	ఒకవేళ (lp->ll_range)
 	{
-	    if (!quiet)
-		emsg(_(e_slice_must_come_last));
-	    goto done;
+	    ఒకవేళ (!quiet)
+		emsg(_(e_ముక్క_must_come_చివరి));
+	    వెళ్ళు పూర్తి;
 	}
-#ifdef LOG_LOCKVAR
-	ch_log(NULL, "LKVAR: get_lval() loop: p: %s, type: %s", p,
+#నిర్వచితమైతే LOG_LOCKVAR
+	ch_log(ఖాళీ, "LKVAR: get_lval() loop: p: %s, type: %s", p,
 		vartype_name(v_type));
-#endif
+#అయితే_ముగింపు
 
-	if (current_script_is_vim9() && lp->ll_valtype == NULL
-		&& v != NULL
+	ఒకవేళ (current_script_is_vim9() && lp->ll_valtype == ఖాళీ
+		&& v != ఖాళీ
 		&& lp->ll_tv == &v->di_tv
-		&& ht != NULL && ht == get_script_local_ht())
+		&& ht != ఖాళీ && ht == get_script_local_ht())
 	{
-	    svar_T  *sv = find_typval_in_script(lp->ll_tv, 0, TRUE);
+	    svar_T  *sv = కనుగొను_typval_లోపల_script(lp->ll_tv, 0, TRUE);
 
 	    // Vim9 script local variable: get the type
-	    if (sv != NULL)
+	    ఒకవేళ (sv != ఖాళీ)
 	    {
 		lp->ll_valtype = sv->sv_type;
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... loop: vim9 assign type: %s",
+#నిర్వచితమైతే LOG_LOCKVAR
+		ch_log(ఖాళీ, "LKVAR:    ... loop: vim9 assign type: %s",
 			vartype_name(lp->ll_valtype->tt_type));
-#endif
+#అయితే_ముగింపు
 	    }
 	}
 
 	len = -1;
-	if (*p == '.')
+	ఒకవేళ (*p == '.')
 	{
-	    key = p + 1;
+	    కీలకం = p + 1;
 
-	    for (len = 0; ASCII_ISALNUM(key[len]) || key[len] == '_'; ++len)
+	    కొరకు (len = 0; ASCII_ISALNUM(కీలకం[len]) || కీలకం[len] == '_'; ++len)
 		;
-	    if (len == 0)
+	    ఒకవేళ (len == 0)
 	    {
-		if (!quiet)
-		    emsg(_(e_cannot_use_empty_key_for_dictionary));
-		goto done;
+		ఒకవేళ (!quiet)
+		    emsg(_(e_cannot_use_ఖాళీలు_కీలకం_for_dictionary));
+		వెళ్ళు పూర్తి;
 	    }
-	    p = key + len;
+	    p = కీలకం + len;
 	}
-	else
+	లేకపోతే
 	{
 	    // Get the index [expr] or the first index [expr: ].
 	    p = skipwhite(p + 1);
-	    if (*p == ':')
+	    ఒకవేళ (*p == ':')
 		empty1 = TRUE;
-	    else
+	    లేకపోతే
 	    {
 		empty1 = FALSE;
-		if (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
-		    goto done;
-		if (tv_get_string_chk(&var1) == NULL)
+		ఒకవేళ (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
+		    వెళ్ళు పూర్తి;
+		ఒకవేళ (tv_get_string_chk(&var1) == ఖాళీ)
 		    // not a number or string
-		    goto done;
+		    వెళ్ళు పూర్తి;
 		p = skipwhite(p);
 	    }
 
 	    // Optionally get the second index [ :expr].
-	    if (*p == ':')
+	    ఒకవేళ (*p == ':')
 	    {
-		if (v_type == VAR_DICT)
+		ఒకవేళ (v_type == VAR_DICT)
 		{
-		    if (!quiet)
-			emsg(_(e_cannot_slice_dictionary));
-		    goto done;
+		    ఒకవేళ (!quiet)
+			emsg(_(e_cannot_ముక్క_dictionary));
+		    వెళ్ళు పూర్తి;
 		}
-		if (v_type == VAR_TUPLE)
+		ఒకవేళ (v_type == VAR_TUPLE)
 		{
-		    if (!quiet)
-			emsg(_(e_cannot_slice_tuple));
-		    goto done;
+		    ఒకవేళ (!quiet)
+			emsg(_(e_cannot_ముక్క_tuple));
+		    వెళ్ళు పూర్తి;
 		}
-		if (rettv != NULL
+		ఒకవేళ (rettv != ఖాళీ
 			&& !(rettv->v_type == VAR_LIST
-			    && rettv->vval.v_list != NULL)
+			    && rettv->vval.v_list != ఖాళీ)
 			&& !(rettv->v_type == VAR_BLOB
-			    && rettv->vval.v_blob != NULL))
+			    && rettv->vval.v_blob != ఖాళీ))
 		{
-		    if (!quiet)
-			emsg(_(e_slice_requires_list_or_blob_value));
-		    goto done;
+		    ఒకవేళ (!quiet)
+			emsg(_(e_ముక్క_requires_list_or_blob_విలువ));
+		    వెళ్ళు పూర్తి;
 		}
 		p = skipwhite(p + 1);
-		if (*p == ']')
+		ఒకవేళ (*p == ']')
 		    lp->ll_empty2 = TRUE;
-		else
+		లేకపోతే
 		{
 		    lp->ll_empty2 = FALSE;
 		    // recursive!
-		    if (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
-			goto done;
-		    if (tv_get_string_chk(&var2) == NULL)
+		    ఒకవేళ (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
+			వెళ్ళు పూర్తి;
+		    ఒకవేళ (tv_get_string_chk(&var2) == ఖాళీ)
 			// not a number or string
-			goto done;
+			వెళ్ళు పూర్తి;
 		}
 		lp->ll_range = TRUE;
 	    }
-	    else
+	    లేకపోతే
 		lp->ll_range = FALSE;
 
-	    if (*p != ']')
+	    ఒకవేళ (*p != ']')
 	    {
-		if (!quiet)
-		    emsg(_(e_missing_closing_square_brace));
-		goto done;
+		ఒకవేళ (!quiet)
+		    emsg(_(e_missing_closing_వర్గం_brace));
+		వెళ్ళు పూర్తి;
 	    }
 
 	    // Skip to past ']'.
 	    ++p;
 	}
-#ifdef LOG_LOCKVAR
-	if (len == -1)
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
-		    empty1 ? ":" : (char*)tv_get_string(&var1));
-	else
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '.' key: %s", p, key);
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+	ఒకవేళ (len == -1)
+	    ch_log(ఖాళీ, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
+		    empty1 ? ":" : (అక్షరం*)tv_get_string(&var1));
+	లేకపోతే
+	    ch_log(ఖాళీ, "LKVAR:    ... loop: p: %s, '.' key: %s", p, కీలకం);
+#అయితే_ముగింపు
 
-	if (v_type == VAR_DICT)
+	ఒకవేళ (v_type == VAR_DICT)
 	{
-	    glv_status_T glv_status;
+	    glv_స్థితి_T glv_స్థితి;
 
-	    glv_status = get_lval_dict_item(lp, name, key, len, &p, &var1,
+	    glv_స్థితి = get_lval_dict_అంశం(lp, name, కీలకం, len, &p, &var1,
 							flags, unlet, rettv);
-	    if (glv_status == GLV_FAIL)
-		goto done;
-	    if (glv_status == GLV_STOP)
-		break;
+	    ఒకవేళ (glv_స్థితి == GLV_FAIL)
+		వెళ్ళు పూర్తి;
+	    ఒకవేళ (glv_స్థితి == GLV_STOP)
+		ఆపు;
 	}
-	else if (v_type == VAR_BLOB)
+	లేకపోతే ఒకవేళ (v_type == VAR_BLOB)
 	{
-	    if (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
-		goto done;
+	    ఒకవేళ (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
+		వెళ్ళు పూర్తి;
 
-	    break;
+	    ఆపు;
 	}
-	else if (v_type == VAR_LIST)
+	లేకపోతే ఒకవేళ (v_type == VAR_LIST)
 	{
-	    if (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
-		goto done;
+	    ఒకవేళ (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
+		వెళ్ళు పూర్తి;
 	}
-	else if (v_type == VAR_TUPLE)
+	లేకపోతే ఒకవేళ (v_type == VAR_TUPLE)
 	{
-	    if (get_lval_tuple(lp, &var1, quiet) == FAIL)
-		goto done;
+	    ఒకవేళ (get_lval_tuple(lp, &var1, quiet) == FAIL)
+		వెళ్ళు పూర్తి;
 	}
-	else  // v_type == VAR_CLASS || v_type == VAR_OBJECT
+	లేకపోతే  // v_type == VAR_CLASS || v_type == VAR_OBJECT
 	{
-	    if (get_lval_class_or_obj(lp, key, &p, v_type, cl_exec, flags,
+	    ఒకవేళ (get_lval_class_or_obj(lp, కీలకం, &p, v_type, cl_exec, flags,
 							quiet) == FAIL)
-		goto done;
+		వెళ్ళు పూర్తి;
 	}
 
 	clear_tv(&var1);
@@ -2059,19 +2059,19 @@ get_lval_subscript(
 	var2.v_type = VAR_UNKNOWN;
     }
 
-    if (lp->ll_tuple != NULL && (flags & GLV_READ_ONLY) == 0)
+    ఒకవేళ (lp->ll_tuple != ఖాళీ && (flags & GLV_READ_ONLY) == 0)
     {
-	if (!quiet)
+	ఒకవేళ (!quiet)
 	    emsg(_(e_tuple_is_immutable));
-	goto done;
+	వెళ్ళు పూర్తి;
     }
 
     rc = OK;
 
-done:
+పూర్తి:
     clear_tv(&var1);
     clear_tv(&var2);
-    return rc == OK ? p : NULL;
+    తిరిగి rc == OK ? p : ఖాళీ;
 }
 
 /*
@@ -2098,236 +2098,236 @@ get_lval(
     char_u	*name,
     typval_T	*rettv,
     lval_T	*lp,
-    int		unlet,
-    int		skip,
-    int		flags,	    // GLV_ values
-    int		fne_flags)  // flags for find_name_end()
+    పూర్ణాంకం		unlet,
+    పూర్ణాంకం		skip,
+    పూర్ణాంకం		flags,	    // GLV_ values
+    పూర్ణాంకం		fne_flags)  // flags for find_name_end()
 {
     char_u	*p;
-    char_u	*expr_start, *expr_end;
-    int		cc;
-    dictitem_T	*v = NULL;
-    hashtab_T	*ht = NULL;
-    int		quiet = flags & GLV_QUIET;
-    int		writing = 0;
-    int		vim9script = in_vim9script();
-    class_T	*cl_exec = NULL;    // class that is executing, or NULL.
+    char_u	*సమాసం_ప్రారంభం, *సమాసం_చివర;
+    పూర్ణాంకం		cc;
+    dictitem_T	*v = ఖాళీ;
+    hashtab_T	*ht = ఖాళీ;
+    పూర్ణాంకం		quiet = flags & GLV_QUIET;
+    పూర్ణాంకం		writing = 0;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
+    class_T	*cl_exec = ఖాళీ;    // class that is executing, or NULL.
 
-#ifdef LOG_LOCKVAR
-    if (lval_root == NULL)
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
-    else
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
-			name, (void*)lval_root->lr_tv, lval_root->lr_is_arg);
-    char buf[80];
-    ch_log(NULL, "LKVAR:    ...: GLV flags: %s",
-		    flags_tostring(flags, glv_flag_strings, buf, sizeof(buf)));
-#endif
+#నిర్వచితమైతే LOG_LOCKVAR
+    ఒకవేళ (lval_మూలం == ఖాళీ)
+	ch_log(ఖాళీ, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
+    లేకపోతే
+	ch_log(ఖాళీ, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
+			name, (శూన్య*)lval_మూలం->lr_tv, lval_మూలం->lr_is_arg);
+    అక్షరం buf[80];
+    ch_log(ఖాళీ, "LKVAR:    ...: GLV flags: %s",
+		    flags_tostring(flags, glv_flag_అక్షరశ్రేణులు, buf, పరిమాణం(buf)));
+#అయితే_ముగింపు
 
     // Clear everything in "lp".
-    CLEAR_POINTER(lp);
-    ga_init2(&lp->ll_type_list, sizeof(type_T *), 10);
+    CLEAR_సూచిక(lp);
+    ga_init2(&lp->ll_type_list, పరిమాణం(type_T *), 10);
 
-    if (skip || (flags & GLV_COMPILING))
+    ఒకవేళ (skip || (flags & GLV_COMPILING))
     {
 	// When skipping or compiling just find the end of the name.
 	lp->ll_name = name;
-	lp->ll_name_end = find_name_end(name, NULL, NULL,
+	lp->ll_name_చివర = కనుగొను_name_చివర(name, ఖాళీ, ఖాళీ,
 						      FNE_INCL_BR | fne_flags);
-	return lp->ll_name_end;
+	తిరిగి lp->ll_name_చివర;
     }
 
     // Cannot use "s:var" at the Vim9 script level.  "s: type" is OK.
-    if (vim9script && at_script_level()
+    ఒకవేళ (vim9script && at_script_level()
 		  && name[0] == 's' && name[1] == ':' && !VIM_ISWHITE(name[2]))
     {
-	semsg(_(e_cannot_use_s_colon_in_vim9_script_str), name);
-	return NULL;
+	semsg(_(e_cannot_use_s_colon_లోపల_vim9_script_str), name);
+	తిరిగి ఖాళీ;
     }
 
     // Find the end of the name.
-    p = find_name_end(name, &expr_start, &expr_end, fne_flags);
-    lp->ll_name_end = p;
-    if (expr_start != NULL)
+    p = కనుగొను_name_చివర(name, &సమాసం_ప్రారంభం, &సమాసం_చివర, fne_flags);
+    lp->ll_name_చివర = p;
+    ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ)
     {
 	// Don't expand the name when we already know there is an error.
-	if (unlet && !VIM_ISWHITE(*p) && !ends_excmd(*p)
+	ఒకవేళ (unlet && !VIM_ISWHITE(*p) && !చివర్లు_excmd(*p)
 						    && *p != '[' && *p != '.')
 	{
 	    semsg(_(e_trailing_characters_str), p);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
 
-	lp->ll_exp_name = make_expanded_name(name, expr_start, expr_end, p);
-	if (lp->ll_exp_name == NULL)
+	lp->ll_exp_name = make_expanded_name(name, సమాసం_ప్రారంభం, సమాసం_చివర, p);
+	ఒకవేళ (lp->ll_exp_name == ఖాళీ)
 	{
 	    // Report an invalid expression in braces, unless the
 	    // expression evaluation has been cancelled due to an
 	    // aborting error, an interrupt, or an exception.
-	    if (!aborting() && !quiet)
+	    ఒకవేళ (!aborting() && !quiet)
 	    {
 		emsg_severe = TRUE;
-		semsg(_(e_invalid_argument_str), name);
-		return NULL;
+		semsg(_(e_invalid_వాదం_str), name);
+		తిరిగి ఖాళీ;
 	    }
 	}
 	lp->ll_name = lp->ll_exp_name;
     }
-    else
+    లేకపోతే
     {
 	lp->ll_name = name;
 
-	if (vim9script)
+	ఒకవేళ (vim9script)
 	{
 	    // "a: type" is declaring variable "a" with a type, not "a:".
 	    // However, "g:[key]" is indexing a dictionary.
-	    if (p == name + 2 && p[-1] == ':' && *p != '[')
+	    ఒకవేళ (p == name + 2 && p[-1] == ':' && *p != '[')
 	    {
 		--p;
-		lp->ll_name_end = p;
+		lp->ll_name_చివర = p;
 	    }
-	    if (*skipwhite(p) == ':')
+	    ఒకవేళ (*skipwhite(p) == ':')
 	    {
 		char_u	    *tp = skipwhite(p + 1);
 
-		if (is_scoped_variable(name))
+		ఒకవేళ (is_scoped_variable(name))
 		{
 		    semsg(_(e_cannot_use_type_with_this_variable_str), name);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
-		if (VIM_ISWHITE(*p))
+		ఒకవేళ (VIM_ISWHITE(*p))
 		{
 		    semsg(_(e_no_white_space_allowed_before_colon_str), p);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
-		if (tp == p + 1 && !quiet)
+		ఒకవేళ (tp == p + 1 && !quiet)
 		{
 		    semsg(_(e_white_space_required_after_str_str), ":", p);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
-		if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+		ఒకవేళ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
 		{
-		    semsg(_(e_using_type_not_in_script_context_str), p);
-		    return NULL;
+		    semsg(_(e_using_type_not_లోపల_script_context_str), p);
+		    తిరిగి ఖాళీ;
 		}
-		if (vim9script && (flags & GLV_NO_DECL) &&
+		ఒకవేళ (vim9script && (flags & GLV_NO_DECL) &&
 			!(flags & GLV_FOR_LOOP))
 		{
 		    // Using a type and not in a "var" declaration.
 		    semsg(_(e_trailing_characters_str), p);
-		    return NULL;
+		    తిరిగి ఖాళీ;
 		}
 
 
 		// parse the type after the name
 		lp->ll_type = parse_type(&tp,
-			       &SCRIPT_ITEM(current_sctx.sc_sid)->sn_type_list,
-			       NULL, NULL, !quiet);
-		if (!quiet && (lp->ll_type == NULL
+			       &SCRIPT_అంశం(current_sctx.sc_sid)->sn_type_list,
+			       ఖాళీ, ఖాళీ, !quiet);
+		ఒకవేళ (!quiet && (lp->ll_type == ఖాళీ
 			    || !valid_declaration_type(lp->ll_type)))
-		    return NULL;
-		lp->ll_name_end = tp;
+		    తిరిగి ఖాళీ;
+		lp->ll_name_చివర = tp;
 	    }
 	    // TODO: check inside class?
 	}
     }
-    if (lp->ll_name == NULL)
-	return p;
+    ఒకవేళ (lp->ll_name == ఖాళీ)
+	తిరిగి p;
 
-    if (*p == '.')
+    ఒకవేళ (*p == '.')
     {
 	// In legacy script, when a local variable and import exists with this name,
 	// prioritize local variable over imports to avoid conflicts.
-	int var_exists = FALSE;
-	if (!vim9script)
+	పూర్ణాంకం var_exists = FALSE;
+	ఒకవేళ (!vim9script)
 	{
 	    cc = *p;
 	    *p = NUL;
 	    hashtab_T *local_ht = get_funccal_local_ht();
-	    if (local_ht != NULL)
+	    ఒకవేళ (local_ht != ఖాళీ)
 	    {
-		hashitem_T *hi = hash_find(local_ht, lp->ll_name);
-		if (!HASHITEM_EMPTY(hi))
+		hashitem_T *hi = hash_కనుగొను(local_ht, lp->ll_name);
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		    var_exists = TRUE;
 	    }
 	    *p = cc;
 	}
 
-	if (!var_exists)
+	ఒకవేళ (!var_exists)
 	{
-	    imported_T *import = find_imported(lp->ll_name, p - lp->ll_name, TRUE);
-	    if (import != NULL)
+	    imported_T *import = కనుగొను_imported(lp->ll_name, p - lp->ll_name, TRUE);
+	    ఒకవేళ (import != ఖాళీ)
 	    {
 		p++;	// skip '.'
 		p = get_lval_imported(lp, import->imp_sid, p, &v, fne_flags);
-		if (p == NULL)
-		    return NULL;
+		ఒకవేళ (p == ఖాళీ)
+		    తిరిగి ఖాళీ;
 	    }
 	}
     }
 
     // Without [idx] or .key we are done.
-    if (*p != '[' && *p != '.')
+    ఒకవేళ (*p != '[' && *p != '.')
     {
-	if (lval_root != NULL)
-	    fill_lval_from_lval_root(lp, lval_root);
-	return p;
+	ఒకవేళ (lval_మూలం != ఖాళీ)
+	    fill_lval_from_lval_మూలం(lp, lval_మూలం);
+	తిరిగి p;
     }
 
-    if (vim9script && lval_root != NULL)
-	cl_exec = lval_root->lr_cl_exec;
-    if (vim9script && lval_root != NULL && lval_root->lr_tv != NULL)
+    ఒకవేళ (vim9script && lval_మూలం != ఖాళీ)
+	cl_exec = lval_మూలం->lr_cl_exec;
+    ఒకవేళ (vim9script && lval_మూలం != ఖాళీ && lval_మూలం->lr_tv != ఖాళీ)
     {
 	// using local variable
-	lp->ll_tv = lval_root->lr_tv;
-	v = NULL;
+	lp->ll_tv = lval_మూలం->lr_tv;
+	v = ఖాళీ;
     }
-    else if (lp->ll_tv == NULL)
+    లేకపోతే ఒకవేళ (lp->ll_tv == ఖాళీ)
     {
 	cc = *p;
 	*p = NUL;
 	// When we would write to the variable pass &ht and prevent autoload.
 	writing = !(flags & GLV_READ_ONLY);
-	v = find_var(lp->ll_name, writing ? &ht : NULL,
+	v = కనుగొను_var(lp->ll_name, writing ? &ht : ఖాళీ,
 					 (flags & GLV_NO_AUTOLOAD) || writing);
-	if (v == NULL && !quiet)
+	ఒకవేళ (v == ఖాళీ && !quiet)
 	    semsg(_(e_undefined_variable_str), lp->ll_name);
 	*p = cc;
-	if (v == NULL)
-	    return NULL;
+	ఒకవేళ (v == ఖాళీ)
+	    తిరిగి ఖాళీ;
 	lp->ll_tv = &v->di_tv;
     }
 
-    if (vim9script && (flags & GLV_NO_DECL) == 0)
+    ఒకవేళ (vim9script && (flags & GLV_NO_DECL) == 0)
     {
-	if (!quiet)
+	ఒకవేళ (!quiet)
 	    semsg(_(e_variable_already_declared_str), lp->ll_name);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     // If the next character is a "." or a "[", then process the subitem.
     p = get_lval_subscript(lp, p, name, rettv, ht, v, unlet, flags, cl_exec);
-    if (p == NULL)
-	return NULL;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (vim9script && lp->ll_valtype != NULL && rettv != NULL)
+    ఒకవేళ (vim9script && lp->ll_valtype != ఖాళీ && rettv != ఖాళీ)
     {
 	where_T	    where = WHERE_INIT;
 
 	// In a Vim9 script, do type check and make sure the variable is
 	// writable.
-	if (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
-	    return NULL;
+	ఒకవేళ (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
+	    తిరిగి ఖాళీ;
     }
 
-    lp->ll_name_end = p;
-    return p;
+    lp->ll_name_చివర = p;
+    తిరిగి p;
 }
 
 /*
  * Clear lval "lp" that was filled by get_lval().
  */
-    void
+    శూన్య
 clear_lval(lval_T *lp)
 {
     vim_free(lp->ll_exp_name);
@@ -2341,202 +2341,202 @@ clear_lval(lval_T *lp)
  * "op" is NULL, "+" for "+=", "-" for "-=", "*" for "*=", "/" for "/=",
  * "%" for "%=", "." for ".=" or "=" for "=".
  */
-    void
-set_var_lval(
+    శూన్య
+సమితి_var_lval(
     lval_T	*lp,
     char_u	*endp,
     typval_T	*rettv,
-    int		copy,
-    int		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
+    పూర్ణాంకం		copy,
+    పూర్ణాంకం		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
     char_u	*op,
-    int		var_idx)    // index for "let [a, b] = list"
+    పూర్ణాంకం		var_idx)    // index for "let [a, b] = list"
 {
-    int		cc;
+    పూర్ణాంకం		cc;
     dictitem_T	*di;
 
-    if (lp->ll_tv == NULL)
+    ఒకవేళ (lp->ll_tv == ఖాళీ)
     {
 	cc = *endp;
 	*endp = NUL;
-	if (in_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
-	    return;
+	ఒకవేళ (లోపల_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
+	    తిరిగి;
 
-	if (lp->ll_blob != NULL)
+	ఒకవేళ (lp->ll_blob != ఖాళీ)
 	{
-	    int	    error = FALSE;
+	    పూర్ణాంకం	    error = FALSE;
 
-	    if (op != NULL && *op != '=')
+	    ఒకవేళ (op != ఖాళీ && *op != '=')
 	    {
 		semsg(_(e_wrong_variable_type_for_str_equal), op);
-		return;
+		తిరిగి;
 	    }
-	    if (value_check_lock(lp->ll_blob->bv_lock, lp->ll_name, FALSE))
-		return;
+	    ఒకవేళ (విలువ_check_తాళం(lp->ll_blob->bv_తాళం, lp->ll_name, FALSE))
+		తిరిగి;
 
-	    if (lp->ll_range && rettv->v_type == VAR_BLOB)
+	    ఒకవేళ (lp->ll_range && rettv->v_type == VAR_BLOB)
 	    {
-		if (lp->ll_empty2)
+		ఒకవేళ (lp->ll_empty2)
 		    lp->ll_n2 = blob_len(lp->ll_blob) - 1;
 
-		if (blob_set_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
+		ఒకవేళ (blob_సమితి_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
 								rettv) == FAIL)
-		    return;
+		    తిరిగి;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		varnumber_T	val = tv_get_number_chk(rettv, &error);
-		if (!error)
+		varnumber_T	val = tv_get_సంఖ్య_chk(rettv, &error);
+		ఒకవేళ (!error)
 		{
-		    if (val < 0 || val > 255)
-			semsg(_(e_invalid_value_for_blob_nr), val);
-		    else
-			blob_set_append(lp->ll_blob, lp->ll_n1, val);
+		    ఒకవేళ (val < 0 || val > 255)
+			semsg(_(e_invalid_విలువ_for_blob_nr), val);
+		    లేకపోతే
+			blob_సమితి_append(lp->ll_blob, lp->ll_n1, val);
 		}
 	    }
 	}
-	else if (op != NULL && *op != '=')
+	లేకపోతే ఒకవేళ (op != ఖాళీ && *op != '=')
 	{
 	    typval_T tv;
 
-	    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	    ఒకవేళ ((flags & (కేటాయించు_CONST | కేటాయించు_FINAL))
+					     && (flags & కేటాయించు_FOR_LOOP) == 0)
 	    {
 		emsg(_(e_cannot_modify_existing_variable));
 		*endp = cc;
-		return;
+		తిరిగి;
 	    }
 
 	    // handle +=, -=, *=, /=, %= and .=
-	    di = NULL;
-	    if (eval_variable(lp->ll_name, (int)STRLEN(lp->ll_name),
+	    di = ఖాళీ;
+	    ఒకవేళ (eval_variable(lp->ll_name, (పూర్ణాంకం)STRLEN(lp->ll_name),
 				 lp->ll_sid, &tv, &di, EVAL_VAR_VERBOSE) == OK)
 	    {
-		if (di != NULL && check_typval_is_value(&di->di_tv) == FAIL)
+		ఒకవేళ (di != ఖాళీ && check_typval_is_విలువ(&di->di_tv) == FAIL)
 		{
 		    clear_tv(&tv);
-		    return;
+		    తిరిగి;
 		}
 
 		// In Vim9 script a String v: variable only takes a String.
-		if (in_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
+		ఒకవేళ (లోపల_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
 			&& tv.v_type == VAR_STRING)
 		{
 		    where_T	where = WHERE_INIT;
 
-		    if (check_typval_type(&t_string, rettv, where) == FAIL)
+		    ఒకవేళ (check_typval_type(&t_string, rettv, where) == FAIL)
 		    {
 			clear_tv(&tv);
 			*endp = cc;
-			return;
+			తిరిగి;
 		    }
 		}
 
-		if ((di == NULL
+		ఒకవేళ ((di == ఖాళీ
 			 || (!var_check_ro(di->di_flags, lp->ll_name, FALSE)
-			   && !tv_check_lock(&di->di_tv, lp->ll_name, FALSE)))
+			   && !tv_check_తాళం(&di->di_tv, lp->ll_name, FALSE)))
 			&& tv_op(&tv, rettv, op) == OK)
-		    set_var_const(lp->ll_name, lp->ll_sid, NULL, &tv, FALSE,
-				ASSIGN_NO_DECL | ASSIGN_COMPOUND_OP, 0);
+		    సమితి_var_const(lp->ll_name, lp->ll_sid, ఖాళీ, &tv, FALSE,
+				కేటాయించు_NO_DECL | కేటాయించు_COMPOUND_OP, 0);
 		clear_tv(&tv);
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (lp->ll_type != NULL && check_typval_arg_type(lp->ll_type, rettv,
-							      NULL, 0) == FAIL)
-		return;
-	    set_var_const(lp->ll_name, lp->ll_sid, lp->ll_type, rettv, copy,
+	    ఒకవేళ (lp->ll_type != ఖాళీ && check_typval_arg_type(lp->ll_type, rettv,
+							      ఖాళీ, 0) == FAIL)
+		తిరిగి;
+	    సమితి_var_const(lp->ll_name, lp->ll_sid, lp->ll_type, rettv, copy,
 							       flags, var_idx);
 	}
 	*endp = cc;
     }
-    else if (value_check_lock(lp->ll_newkey == NULL
-		? lp->ll_tv->v_lock
-		: lp->ll_tv->vval.v_dict->dv_lock, lp->ll_name, FALSE))
+    లేకపోతే ఒకవేళ (విలువ_check_తాళం(lp->ll_newkey == ఖాళీ
+		? lp->ll_tv->v_తాళం
+		: lp->ll_tv->vval.v_dict->dv_తాళం, lp->ll_name, FALSE))
 	;
-    else if (lp->ll_range)
+    లేకపోతే ఒకవేళ (lp->ll_range)
     {
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	ఒకవేళ ((flags & (కేటాయించు_CONST | కేటాయించు_FINAL))
+					     && (flags & కేటాయించు_FOR_LOOP) == 0)
 	{
-	    emsg(_(e_cannot_lock_range));
-	    return;
+	    emsg(_(e_cannot_తాళం_range));
+	    తిరిగి;
 	}
 
-	(void)list_assign_range(lp->ll_list, rettv->vval.v_list,
+	(శూన్య)list_కేటాయించు_range(lp->ll_list, rettv->vval.v_list,
 			 lp->ll_n1, lp->ll_n2, lp->ll_empty2, op, lp->ll_name);
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * Assign to a List, Dictionary or Object item.
 	 */
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	ఒకవేళ ((flags & (కేటాయించు_CONST | కేటాయించు_FINAL))
+					     && (flags & కేటాయించు_FOR_LOOP) == 0)
 	{
-	    emsg(_(e_cannot_lock_list_or_dict));
-	    return;
+	    emsg(_(e_cannot_తాళం_list_or_dict));
+	    తిరిగి;
 	}
 
-	if (lp->ll_valtype != NULL
+	ఒకవేళ (lp->ll_valtype != ఖాళీ
 		    && check_typval_arg_type(lp->ll_valtype, rettv,
-							      NULL, 0) == FAIL)
+							      ఖాళీ, 0) == FAIL)
 	{
-	    lp->ll_name_end = NULL;
-	    return;
+	    lp->ll_name_చివర = ఖాళీ;
+	    తిరిగి;
 	}
 
 	// If the lval is a List and the type of the list is not yet set,
 	// then set the item type from the declared type of the variable.
-	if (in_vim9script() && rettv->v_type == VAR_LIST
-				&& rettv->vval.v_list != NULL
-				&& rettv->vval.v_list->lv_type == NULL)
+	ఒకవేళ (లోపల_vim9script() && rettv->v_type == VAR_LIST
+				&& rettv->vval.v_list != ఖాళీ
+				&& rettv->vval.v_list->lv_type == ఖాళీ)
 	{
-	    if (lp->ll_tv->v_type == VAR_LIST
-		    && lp->ll_tv->vval.v_list != NULL
-		    && lp->ll_tv->vval.v_list->lv_type != NULL)
-		set_tv_type(rettv, lp->ll_tv->vval.v_list->lv_type);
+	    ఒకవేళ (lp->ll_tv->v_type == VAR_LIST
+		    && lp->ll_tv->vval.v_list != ఖాళీ
+		    && lp->ll_tv->vval.v_list->lv_type != ఖాళీ)
+		సమితి_tv_type(rettv, lp->ll_tv->vval.v_list->lv_type);
 	}
 
-	if (lp->ll_newkey != NULL)
+	ఒకవేళ (lp->ll_newkey != ఖాళీ)
 	{
-	    if (op != NULL && *op != '=')
+	    ఒకవేళ (op != ఖాళీ && *op != '=')
 	    {
-		semsg(_(e_key_not_present_in_dictionary_str), lp->ll_newkey);
-		return;
+		semsg(_(e_కీలకం_not_present_లోపల_dictionary_str), lp->ll_newkey);
+		తిరిగి;
 	    }
-	    if (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
+	    ఒకవేళ (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
 								lp->ll_newkey))
-		return;
+		తిరిగి;
 
 	    // Need to add an item to the Dictionary.
 	    di = dictitem_alloc(lp->ll_newkey);
-	    if (di == NULL)
-		return;
-	    if (dict_add(lp->ll_tv->vval.v_dict, di) == FAIL)
+	    ఒకవేళ (di == ఖాళీ)
+		తిరిగి;
+	    ఒకవేళ (dict_కూడు(lp->ll_tv->vval.v_dict, di) == FAIL)
 	    {
 		vim_free(di);
-		return;
+		తిరిగి;
 	    }
 	    lp->ll_tv = &di->di_tv;
 	}
-	else if (op != NULL && *op != '=')
+	లేకపోతే ఒకవేళ (op != ఖాళీ && *op != '=')
 	{
 	    tv_op(lp->ll_tv, rettv, op);
-	    return;
+	    తిరిగి;
 	}
-	else
+	లేకపోతే
 	    clear_tv(lp->ll_tv);
 
 	/*
 	 * Assign the value to the variable or list item.
 	 */
-	if (copy)
+	ఒకవేళ (copy)
 	    copy_tv(rettv, lp->ll_tv);
-	else
+	లేకపోతే
 	{
 	    *lp->ll_tv = *rettv;
-	    lp->ll_tv->v_lock = 0;
+	    lp->ll_tv->v_తాళం = 0;
 	    init_tv(rettv);
 	}
     }
@@ -2546,63 +2546,63 @@ set_var_lval(
  * Handle "blob1 += blob2".
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 tv_op_blob(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_BLOB)
-	return FAIL;
+    ఒకవేళ (*op != '+' || tv2->v_type != VAR_BLOB)
+	తిరిగి FAIL;
 
     // Blob += Blob
-    if (tv2->vval.v_blob == NULL)
-	return OK;
+    ఒకవేళ (tv2->vval.v_blob == ఖాళీ)
+	తిరిగి OK;
 
-    if (tv1->vval.v_blob == NULL)
+    ఒకవేళ (tv1->vval.v_blob == ఖాళీ)
     {
 	tv1->vval.v_blob = tv2->vval.v_blob;
 	++tv1->vval.v_blob->bv_refcount;
-	return OK;
+	తిరిగి OK;
     }
 
     blob_T	*b1 = tv1->vval.v_blob;
     blob_T	*b2 = tv2->vval.v_blob;
-    int		len = blob_len(b2);
+    పూర్ణాంకం		len = blob_len(b2);
 
-    if (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
+    ఒకవేళ (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
     {
-	mch_memmove((char_u *)b1->bv_ga.ga_data + b1->bv_ga.ga_len,
-		    (char_u *)b2->bv_ga.ga_data, (size_t)len);
+	mch_memmove((char_u *)b1->bv_ga.ga_దత్తాంశం + b1->bv_ga.ga_len,
+		    (char_u *)b2->bv_ga.ga_దత్తాంశం, (size_t)len);
 	b1->bv_ga.ga_len += len;
     }
-    else
-	for (int i = 0; i < len; i++)
-	    (void)ga_append(&b1->bv_ga, blob_get(b2, i));
+    లేకపోతే
+	కొరకు (పూర్ణాంకం i = 0; i < len; i++)
+	    (శూన్య)ga_append(&b1->bv_ga, blob_get(b2, i));
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Handle "list1 += list2".
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_LIST)
-	return FAIL;
+    ఒకవేళ (*op != '+' || tv2->v_type != VAR_LIST)
+	తిరిగి FAIL;
 
     // List += List
-    if (tv2->vval.v_list == NULL)
-	return OK;
+    ఒకవేళ (tv2->vval.v_list == ఖాళీ)
+	తిరిగి OK;
 
-    if (tv1->vval.v_list == NULL)
+    ఒకవేళ (tv1->vval.v_list == ఖాళీ)
     {
 	tv1->vval.v_list = tv2->vval.v_list;
 	++tv1->vval.v_list->lv_refcount;
     }
-    else
-	list_extend(tv1->vval.v_list, tv2->vval.v_list, NULL);
+    లేకపోతే
+	list_extend(tv1->vval.v_list, tv2->vval.v_list, ఖాళీ);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2611,88 +2611,88 @@ tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
  *
  * Returns OK or FAIL.
  */
-    static int
-tv_op_number(typval_T *tv1, typval_T *tv2, char_u *op)
+    స్థిర పూర్ణాంకం
+tv_op_సంఖ్య(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     varnumber_T	n;
-    int		failed = FALSE;
+    పూర్ణాంకం		failed = FALSE;
 
-    n = tv_get_number(tv1);
-    if (tv2->v_type == VAR_FLOAT)
+    n = tv_get_సంఖ్య(tv1);
+    ఒకవేళ (tv2->v_type == VAR_FLOAT)
     {
 	float_T f = n;
 
-	if (*op == '%')
-	    return FAIL;
-	switch (*op)
+	ఒకవేళ (*op == '%')
+	    తిరిగి FAIL;
+	ఎంపిక (*op)
 	{
-	    case '+': f += tv2->vval.v_float; break;
-	    case '-': f -= tv2->vval.v_float; break;
-	    case '*': f *= tv2->vval.v_float; break;
-	    case '/': f /= tv2->vval.v_float; break;
+	    స్థితి '+': f += tv2->vval.v_float; ఆపు;
+	    స్థితి '-': f -= tv2->vval.v_float; ఆపు;
+	    స్థితి '*': f *= tv2->vval.v_float; ఆపు;
+	    స్థితి '/': f /= tv2->vval.v_float; ఆపు;
 	}
 	clear_tv(tv1);
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f;
     }
-    else
+    లేకపోతే
     {
-	switch (*op)
+	ఎంపిక (*op)
 	{
-	    case '+': n += tv_get_number(tv2); break;
-	    case '-': n -= tv_get_number(tv2); break;
-	    case '*': n *= tv_get_number(tv2); break;
-	    case '/': n = num_divide(n, tv_get_number(tv2), &failed); break;
-	    case '%': n = num_modulus(n, tv_get_number(tv2), &failed); break;
+	    స్థితి '+': n += tv_get_సంఖ్య(tv2); ఆపు;
+	    స్థితి '-': n -= tv_get_సంఖ్య(tv2); ఆపు;
+	    స్థితి '*': n *= tv_get_సంఖ్య(tv2); ఆపు;
+	    స్థితి '/': n = అంకె_divide(n, tv_get_సంఖ్య(tv2), &failed); ఆపు;
+	    స్థితి '%': n = అంకె_modulus(n, tv_get_సంఖ్య(tv2), &failed); ఆపు;
 	}
 	clear_tv(tv1);
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n;
+	tv1->v_type = VAR_సంఖ్య;
+	tv1->vval.v_సంఖ్య = n;
     }
 
-    return failed ? FAIL : OK;
+    తిరిగి failed ? FAIL : OK;
 }
 
 /*
  * Append string "s2" to the string in "tv1".
  * Returns OK if "tv1" was grown in place, FAIL otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 grow_string_tv(typval_T *tv1, char_u *s2)
 {
-    if (tv1->v_type != VAR_STRING || tv1->vval.v_string == NULL)
-	return FAIL;
+    ఒకవేళ (tv1->v_type != VAR_STRING || tv1->vval.v_string == ఖాళీ)
+	తిరిగి FAIL;
 
     size_t len1 = STRLEN(tv1->vval.v_string);
     size_t len2 = STRLEN(s2);
     char_u *p = vim_realloc(tv1->vval.v_string, len1 + len2 + 1);
 
-    if (p == NULL)
-	return FAIL;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి FAIL;
 
     mch_memmove(p + len1, s2, len2 + 1);
     tv1->vval.v_string = p;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Handle "str1 .= str2"
  * Returns OK or FAIL.
  */
-    static int
-tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
+    స్థిర పూర్ణాంకం
+tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op వాడని)
 {
     char_u	numbuf[NUMBUFLEN];
     char_u	*s;
     char_u	*s2;
 
-    if (tv2->v_type == VAR_FLOAT)
-	return FAIL;
+    ఒకవేళ (tv2->v_type == VAR_FLOAT)
+	తిరిగి FAIL;
 
     // str .= str
     s2 = tv_get_string_buf(tv2, numbuf);
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    ఒకవేళ (grow_string_tv(tv1, s2) == OK)
+	తిరిగి OK;
 
     s = tv_get_string(tv1);
     s = concat_str(s, s2);
@@ -2700,7 +2700,7 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = s;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2708,46 +2708,46 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 tv_op_nr_or_string(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (tv2->v_type == VAR_LIST)
-	return FAIL;
+    ఒకవేళ (tv2->v_type == VAR_LIST)
+	తిరిగి FAIL;
 
-    if (vim_strchr((char_u *)"+-*/%", *op) != NULL)
-	return tv_op_number(tv1, tv2, op);
+    ఒకవేళ (vim_strchr((char_u *)"+-*/%", *op) != ఖాళీ)
+	తిరిగి tv_op_సంఖ్య(tv1, tv2, op);
 
-    return tv_op_string(tv1, tv2, op);
+    తిరిగి tv_op_string(tv1, tv2, op);
 }
 
 /*
  * Handle "f1 += f2", "f1 -= f2", "f1 *= f2", "f1 /= f2".
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     float_T f;
 
-    if (*op == '%' || *op == '.'
+    ఒకవేళ (*op == '%' || *op == '.'
 	    || (tv2->v_type != VAR_FLOAT
-		&& tv2->v_type != VAR_NUMBER
+		&& tv2->v_type != VAR_సంఖ్య
 		&& tv2->v_type != VAR_STRING))
-	return FAIL;
+	తిరిగి FAIL;
 
-    if (tv2->v_type == VAR_FLOAT)
+    ఒకవేళ (tv2->v_type == VAR_FLOAT)
 	f = tv2->vval.v_float;
-    else
-	f = tv_get_number(tv2);
-    switch (*op)
+    లేకపోతే
+	f = tv_get_సంఖ్య(tv2);
+    ఎంపిక (*op)
     {
-	case '+': tv1->vval.v_float += f; break;
-	case '-': tv1->vval.v_float -= f; break;
-	case '*': tv1->vval.v_float *= f; break;
-	case '/': tv1->vval.v_float /= f; break;
+	స్థితి '+': tv1->vval.v_float += f; ఆపు;
+	స్థితి '-': tv1->vval.v_float -= f; ఆపు;
+	స్థితి '*': tv1->vval.v_float *= f; ఆపు;
+	స్థితి '/': tv1->vval.v_float /= f; ఆపు;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -2755,61 +2755,61 @@ tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     // Can't do anything with a Funcref or Dict on the right.
     // v:true and friends only work with "..=".
-    if (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
+    ఒకవేళ (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
 		|| ((tv2->v_type == VAR_BOOL || tv2->v_type == VAR_SPECIAL)
 							&& *op != '.'))
     {
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    int retval = FAIL;
-    switch (tv1->v_type)
+    పూర్ణాంకం retval = FAIL;
+    ఎంపిక (tv1->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_DICT:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	case VAR_TUPLE:
-	    break;
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	స్థితి VAR_DICT:
+	స్థితి VAR_FUNC:
+	స్థితి VAR_PARTIAL:
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_OBJECT:
+	స్థితి VAR_CLASS:
+	స్థితి VAR_TYPEALIAS:
+	స్థితి VAR_TUPLE:
+	    ఆపు;
 
-	case VAR_BLOB:
+	స్థితి VAR_BLOB:
 	    retval = tv_op_blob(tv1, tv2, op);
-	    break;
+	    ఆపు;
 
-	case VAR_LIST:
+	స్థితి VAR_LIST:
 	    retval = tv_op_list(tv1, tv2, op);
-	    break;
+	    ఆపు;
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	స్థితి VAR_సంఖ్య:
+	స్థితి VAR_STRING:
 	    retval = tv_op_nr_or_string(tv1, tv2, op);
-	    break;
+	    ఆపు;
 
-	case VAR_FLOAT:
+	స్థితి VAR_FLOAT:
 	    retval = tv_op_float(tv1, tv2, op);
-	    break;
+	    ఆపు;
     }
 
-    if (retval != OK)
+    ఒకవేళ (retval != OK)
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -2818,60 +2818,60 @@ tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
  * Set "*errp" to TRUE for an error, FALSE otherwise;
  * Return a pointer that holds the info.  Null when there is an error.
  */
-    void *
-eval_for_line(
+    శూన్య *
+eval_for_పంక్తి(
     char_u	*arg,
-    int		*errp,
+    పూర్ణాంకం		*errp,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
     forinfo_T	*fi;
-    char_u	*var_list_end;
-    char_u	*expr;
+    char_u	*var_list_చివర;
+    char_u	*సమాసం;
     typval_T	tv;
     list_T	*l;
     tuple_T	*tuple;
-    int		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
+    పూర్ణాంకం		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
 
     *errp = TRUE;	// default: there is an error
 
     fi = ALLOC_CLEAR_ONE(forinfo_T);
-    if (fi == NULL)
-	return NULL;
+    ఒకవేళ (fi == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    var_list_end = skip_var_list(arg, TRUE, &fi->fi_varcount,
+    var_list_చివర = skip_var_list(arg, TRUE, &fi->fi_varcount,
 						     &fi->fi_semicolon, FALSE);
-    if (var_list_end == NULL)
-	return fi;
+    ఒకవేళ (var_list_చివర == ఖాళీ)
+	తిరిగి fi;
 
-    expr = skipwhite_and_linebreak(var_list_end, evalarg);
-    if (expr[0] != 'i' || expr[1] != 'n'
-				  || !(expr[2] == NUL || VIM_ISWHITE(expr[2])))
+    సమాసం = skipwhite_and_linebreak(var_list_చివర, evalarg);
+    ఒకవేళ (సమాసం[0] != 'i' || సమాసం[1] != 'n'
+				  || !(సమాసం[2] == NUL || VIM_ISWHITE(సమాసం[2])))
     {
-	if (in_vim9script() && *expr == ':' && expr != var_list_end)
-	    semsg(_(e_no_white_space_allowed_before_colon_str), expr);
-	else
-	    emsg(_(e_missing_in_after_for));
-	return fi;
+	ఒకవేళ (లోపల_vim9script() && *సమాసం == ':' && సమాసం != var_list_చివర)
+	    semsg(_(e_no_white_space_allowed_before_colon_str), సమాసం);
+	లేకపోతే
+	    emsg(_(e_missing_లోపల_after_for));
+	తిరిగి fi;
     }
 
-    if (skip)
+    ఒకవేళ (skip)
 	++emsg_skip;
-    expr = skipwhite_and_linebreak(expr + 2, evalarg);
-    if (eval0(expr, &tv, eap, evalarg) == OK)
+    సమాసం = skipwhite_and_linebreak(సమాసం + 2, evalarg);
+    ఒకవేళ (eval0(సమాసం, &tv, eap, evalarg) == OK)
     {
 	*errp = FALSE;
-	if (!skip)
+	ఒకవేళ (!skip)
 	{
-	    if (tv.v_type == VAR_LIST)
+	    ఒకవేళ (tv.v_type == VAR_LIST)
 	    {
 		l = tv.vval.v_list;
-		if (l == NULL)
+		ఒకవేళ (l == ఖాళీ)
 		{
 		    // a null list is like an empty list: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		లేకపోతే
 		{
 		    // Need a real list here.
 		    CHECK_LIST_MATERIALIZE(l);
@@ -2879,19 +2879,19 @@ eval_for_line(
 		    // No need to increment the refcount, it's already set for
 		    // the list being used in "tv".
 		    fi->fi_list = l;
-		    list_add_watch(l, &fi->fi_lw);
-		    fi->fi_lw.lw_item = l->lv_first;
+		    list_కూడు_watch(l, &fi->fi_lw);
+		    fi->fi_lw.lw_అంశం = l->lv_మొదటి;
 		}
 	    }
-	    else if (tv.v_type == VAR_TUPLE)
+	    లేకపోతే ఒకవేళ (tv.v_type == VAR_TUPLE)
 	    {
 		tuple = tv.vval.v_tuple;
-		if (tuple == NULL)
+		ఒకవేళ (tuple == ఖాళీ)
 		{
 		    // a null tuple is like an empty tuple: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		లేకపోతే
 		{
 		    // No need to increment the refcount, it's already set for
 		    // the tuple being used in "tv".
@@ -2899,10 +2899,10 @@ eval_for_line(
 		    fi->fi_tuple_idx = 0;
 		}
 	    }
-	    else if (tv.v_type == VAR_BLOB)
+	    లేకపోతే ఒకవేళ (tv.v_type == VAR_BLOB)
 	    {
 		fi->fi_bi = 0;
-		if (tv.vval.v_blob != NULL)
+		ఒకవేళ (tv.vval.v_blob != ఖాళీ)
 		{
 		    // Make a copy, so that the iteration still works when the
 		    // blob is changed.
@@ -2910,39 +2910,39 @@ eval_for_line(
 		}
 		clear_tv(&tv);
 	    }
-	    else if (tv.v_type == VAR_STRING)
+	    లేకపోతే ఒకవేళ (tv.v_type == VAR_STRING)
 	    {
 		fi->fi_byte_idx = 0;
 		fi->fi_string = tv.vval.v_string;
-		tv.vval.v_string = NULL;
-		if (fi->fi_string == NULL)
+		tv.vval.v_string = ఖాళీ;
+		ఒకవేళ (fi->fi_string == ఖాళీ)
 		    fi->fi_string = vim_strsave((char_u *)"");
 	    }
-	    else
+	    లేకపోతే
 	    {
 		emsg(_(e_string_list_tuple_or_blob_required));
 		clear_tv(&tv);
 	    }
 	}
     }
-    if (skip)
+    ఒకవేళ (skip)
 	--emsg_skip;
-    fi->fi_break_count = evalarg->eval_break_count;
+    fi->fi_break_లెక్క = evalarg->eval_break_లెక్క;
 
-    return fi;
+    తిరిగి fi;
 }
 
 /*
  * Used when looping over a :for line, skip the "in expr" part.
  */
-    void
-skip_for_lines(void *fi_void, evalarg_T *evalarg)
+    శూన్య
+skip_for_పంక్తులు(శూన్య *fi_void, evalarg_T *evalarg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < fi->fi_break_count; ++i)
-	eval_next_line(NULL, evalarg);
+    కొరకు (i = 0; i < fi->fi_break_లెక్క; ++i)
+	eval_తదుపరి_పంక్తి(ఖాళీ, evalarg);
 }
 
 /*
@@ -2951,252 +2951,252 @@ skip_for_lines(void *fi_void, evalarg_T *evalarg)
  * Return TRUE when a valid item was found, FALSE when at end of list or
  * something wrong.
  */
-    int
-next_for_item(void *fi_void, char_u *arg)
+    పూర్ణాంకం
+తదుపరి_for_అంశం(శూన్య *fi_void, char_u *arg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		result;
-    int		flag = ASSIGN_FOR_LOOP | (in_vim9script()
-			 ? (ASSIGN_FINAL
+    పూర్ణాంకం		ఫలితం;
+    పూర్ణాంకం		flag = కేటాయించు_FOR_LOOP | (లోపల_vim9script()
+			 ? (కేటాయించు_FINAL
 			     // first round: error if variable exists
-			     | (fi->fi_bi == 0 ? 0 : ASSIGN_DECL)
-			     | ASSIGN_NO_MEMBER_TYPE
-			     | ASSIGN_UPDATE_BLOCK_ID)
+			     | (fi->fi_bi == 0 ? 0 : కేటాయించు_DECL)
+			     | కేటాయించు_NO_MEMBER_TYPE
+			     | కేటాయించు_UPDATE_ఖండం_ID)
 			 : 0);
-    listitem_T	*item;
-    int		skip_assign = in_vim9script() && arg[0] == '_'
+    listitem_T	*అంశం;
+    పూర్ణాంకం		skip_కేటాయించు = లోపల_vim9script() && arg[0] == '_'
 						      && !eval_isnamec(arg[1]);
 
-    if (fi->fi_blob != NULL)
+    ఒకవేళ (fi->fi_blob != ఖాళీ)
     {
 	typval_T	tv;
 
-	if (fi->fi_bi >= blob_len(fi->fi_blob))
-	    return FALSE;
-	tv.v_type = VAR_NUMBER;
-	tv.v_lock = VAR_FIXED;
-	tv.vval.v_number = blob_get(fi->fi_blob, fi->fi_bi);
+	ఒకవేళ (fi->fi_bi >= blob_len(fi->fi_blob))
+	    తిరిగి FALSE;
+	tv.v_type = VAR_సంఖ్య;
+	tv.v_తాళం = VAR_FIXED;
+	tv.vval.v_సంఖ్య = blob_get(fi->fi_blob, fi->fi_bi);
 	++fi->fi_bi;
-	if (skip_assign)
-	    return TRUE;
-	return ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ఒకవేళ (skip_కేటాయించు)
+	    తిరిగి TRUE;
+	తిరిగి ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ఖాళీ) == OK;
     }
 
-    if (fi->fi_string != NULL)
+    ఒకవేళ (fi->fi_string != ఖాళీ)
     {
 	typval_T	tv;
-	int		len;
+	పూర్ణాంకం		len;
 
 	len = mb_ptr2len(fi->fi_string + fi->fi_byte_idx);
-	if (len == 0)
-	    return FALSE;
+	ఒకవేళ (len == 0)
+	    తిరిగి FALSE;
 	tv.v_type = VAR_STRING;
-	tv.v_lock = VAR_FIXED;
+	tv.v_తాళం = VAR_FIXED;
 	tv.vval.v_string = vim_strnsave(fi->fi_string + fi->fi_byte_idx, len);
 	fi->fi_byte_idx += len;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ఒకవేళ (skip_కేటాయించు)
+	    ఫలితం = TRUE;
+	లేకపోతే
+	    ఫలితం = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ఖాళీ) == OK;
 	vim_free(tv.vval.v_string);
-	return result;
+	తిరిగి ఫలితం;
     }
 
-    if (fi->fi_tuple != NULL)
+    ఒకవేళ (fi->fi_tuple != ఖాళీ)
     {
 	typval_T	tv;
 
-	if (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
-	    return FALSE;
+	ఒకవేళ (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
+	    తిరిగి FALSE;
 
-	copy_tv(TUPLE_ITEM(fi->fi_tuple, fi->fi_tuple_idx), &tv);
+	copy_tv(TUPLE_అంశం(fi->fi_tuple, fi->fi_tuple_idx), &tv);
 	++fi->fi_tuple_idx;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ఒకవేళ (skip_కేటాయించు)
+	    ఫలితం = TRUE;
+	లేకపోతే
+	    ఫలితం = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ఖాళీ) == OK;
 	clear_tv(&tv);
-	return result;
+	తిరిగి ఫలితం;
     }
 
-    item = fi->fi_lw.lw_item;
-    if (item == NULL)
-	result = FALSE;
-    else
+    అంశం = fi->fi_lw.lw_అంశం;
+    ఒకవేళ (అంశం == ఖాళీ)
+	ఫలితం = FALSE;
+    లేకపోతే
     {
-	fi->fi_lw.lw_item = item->li_next;
+	fi->fi_lw.lw_అంశం = అంశం->li_తదుపరి;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = (ex_let_vars(arg, &item->li_tv, TRUE, fi->fi_semicolon,
-					   fi->fi_varcount, flag, NULL) == OK);
+	ఒకవేళ (skip_కేటాయించు)
+	    ఫలితం = TRUE;
+	లేకపోతే
+	    ఫలితం = (ex_let_vars(arg, &అంశం->li_tv, TRUE, fi->fi_semicolon,
+					   fi->fi_varcount, flag, ఖాళీ) == OK);
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
  * Free the structure used to store info used by ":for".
  */
-    void
-free_for_info(void *fi_void)
+    శూన్య
+free_for_info(శూన్య *fi_void)
 {
     forinfo_T    *fi = (forinfo_T *)fi_void;
 
-    if (fi == NULL)
-	return;
-    if (fi->fi_list != NULL)
+    ఒకవేళ (fi == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (fi->fi_list != ఖాళీ)
     {
 	list_rem_watch(fi->fi_list, &fi->fi_lw);
 	list_unref(fi->fi_list);
     }
-    else if (fi->fi_blob != NULL)
+    లేకపోతే ఒకవేళ (fi->fi_blob != ఖాళీ)
 	blob_unref(fi->fi_blob);
-    else if (fi->fi_tuple != NULL)
+    లేకపోతే ఒకవేళ (fi->fi_tuple != ఖాళీ)
 	tuple_unref(fi->fi_tuple);
-    else
+    లేకపోతే
 	vim_free(fi->fi_string);
     vim_free(fi);
 }
 
-    void
-set_context_for_expression(
+    శూన్య
+సమితి_context_for_వ్యక్తీకరణ(
     expand_T	*xp,
     char_u	*arg,
     cmdidx_T	cmdidx)
 {
-    int		has_expr = cmdidx != CMD_let && cmdidx != CMD_var;
-    int		c;
+    పూర్ణాంకం		has_సమాసం = cmdidx != CMD_let && cmdidx != CMD_var;
+    పూర్ణాంకం		c;
     char_u	*p;
 
-    if (cmdidx == CMD_let || cmdidx == CMD_var
+    ఒకవేళ (cmdidx == CMD_let || cmdidx == CMD_var
 				 || cmdidx == CMD_const || cmdidx == CMD_final)
     {
 	xp->xp_context = EXPAND_USER_VARS;
-	if (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == NULL)
+	ఒకవేళ (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == ఖాళీ)
 	{
 	    // ":let var1 var2 ...": find last space.
-	    for (p = arg + STRLEN(arg); p >= arg; )
+	    కొరకు (p = arg + STRLEN(arg); p >= arg; )
 	    {
-		xp->xp_pattern = p;
-		MB_PTR_BACK(arg, p);
-		if (VIM_ISWHITE(*p))
-		    break;
+		xp->xp_నమూనా = p;
+		MB_PTR_వెనుక(arg, p);
+		ఒకవేళ (VIM_ISWHITE(*p))
+		    ఆపు;
 	    }
-	    return;
+	    తిరిగి;
 	}
     }
-    else
+    లేకపోతే
 	xp->xp_context = cmdidx == CMD_call ? EXPAND_FUNCTIONS
-							  : EXPAND_EXPRESSION;
-    while ((xp->xp_pattern = vim_strpbrk(arg,
-				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != NULL)
+							  : EXPAND_వ్యక్తీకరణ;
+    అయితే ((xp->xp_నమూనా = vim_strpbrk(arg,
+				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != ఖాళీ)
     {
-	c = *xp->xp_pattern;
-	if (c == '&')
+	c = *xp->xp_నమూనా;
+	ఒకవేళ (c == '&')
 	{
-	    c = xp->xp_pattern[1];
-	    if (c == '&')
+	    c = xp->xp_నమూనా[1];
+	    ఒకవేళ (c == '&')
 	    {
-		++xp->xp_pattern;
-		xp->xp_context = has_expr ? EXPAND_EXPRESSION : EXPAND_NOTHING;
+		++xp->xp_నమూనా;
+		xp->xp_context = has_సమాసం ? EXPAND_వ్యక్తీకరణ : EXPAND_NOTHING;
 	    }
-	    else if (c != ' ')
+	    లేకపోతే ఒకవేళ (c != ' ')
 	    {
 		xp->xp_context = EXPAND_SETTINGS;
-		if ((c == 'l' || c == 'g') && xp->xp_pattern[2] == ':')
-		    xp->xp_pattern += 2;
+		ఒకవేళ ((c == 'l' || c == 'g') && xp->xp_నమూనా[2] == ':')
+		    xp->xp_నమూనా += 2;
 
 	    }
 	}
-	else if (c == '$')
+	లేకపోతే ఒకవేళ (c == '$')
 	{
 	    // environment variable
 	    xp->xp_context = EXPAND_ENV_VARS;
 	}
-	else if (c == '=')
+	లేకపోతే ఒకవేళ (c == '=')
 	{
-	    has_expr = TRUE;
-	    xp->xp_context = EXPAND_EXPRESSION;
+	    has_సమాసం = TRUE;
+	    xp->xp_context = EXPAND_వ్యక్తీకరణ;
 	}
-	else if (c == '#'
-		&& xp->xp_context == EXPAND_EXPRESSION)
+	లేకపోతే ఒకవేళ (c == '#'
+		&& xp->xp_context == EXPAND_వ్యక్తీకరణ)
 	{
 	    // Autoload function/variable contains '#'.
-	    break;
+	    ఆపు;
 	}
-	else if ((c == '<' || c == '#')
+	లేకపోతే ఒకవేళ ((c == '<' || c == '#')
 		&& xp->xp_context == EXPAND_FUNCTIONS
-		&& vim_strchr(xp->xp_pattern, '(') == NULL)
+		&& vim_strchr(xp->xp_నమూనా, '(') == ఖాళీ)
 	{
 	    // Function name can start with "<SNR>" and contain '#'.
-	    break;
+	    ఆపు;
 	}
-	else if (has_expr)
+	లేకపోతే ఒకవేళ (has_సమాసం)
 	{
-	    if (c == '"')	    // string
+	    ఒకవేళ (c == '"')	    // string
 	    {
-		while ((c = *++xp->xp_pattern) != NUL && c != '"')
-		    if (c == '\\' && xp->xp_pattern[1] != NUL)
-			++xp->xp_pattern;
+		అయితే ((c = *++xp->xp_నమూనా) != NUL && c != '"')
+		    ఒకవేళ (c == '\\' && xp->xp_నమూనా[1] != NUL)
+			++xp->xp_నమూనా;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '\'')	    // literal string
+	    లేకపోతే ఒకవేళ (c == '\'')	    // literal string
 	    {
 		// Trick: '' is like stopping and starting a literal string.
-		while ((c = *++xp->xp_pattern) != NUL && c != '\'')
+		అయితే ((c = *++xp->xp_నమూనా) != NUL && c != '\'')
 		    /* skip */ ;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '|')
+	    లేకపోతే ఒకవేళ (c == '|')
 	    {
-		if (xp->xp_pattern[1] == '|')
+		ఒకవేళ (xp->xp_నమూనా[1] == '|')
 		{
-		    ++xp->xp_pattern;
-		    xp->xp_context = EXPAND_EXPRESSION;
+		    ++xp->xp_నమూనా;
+		    xp->xp_context = EXPAND_వ్యక్తీకరణ;
 		}
-		else
+		లేకపోతే
 		    xp->xp_context = EXPAND_COMMANDS;
 	    }
-	    else
-		xp->xp_context = EXPAND_EXPRESSION;
+	    లేకపోతే
+		xp->xp_context = EXPAND_వ్యక్తీకరణ;
 	}
-	else
+	లేకపోతే
 	    // Doesn't look like something valid, expand as an expression
 	    // anyway.
-	    xp->xp_context = EXPAND_EXPRESSION;
-	arg = xp->xp_pattern;
-	if (*arg != NUL)
-	    while ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
+	    xp->xp_context = EXPAND_వ్యక్తీకరణ;
+	arg = xp->xp_నమూనా;
+	ఒకవేళ (*arg != NUL)
+	    అయితే ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
 		/* skip */ ;
     }
 
     // ":exe one two" completes "two"
-    if ((cmdidx == CMD_execute
+    ఒకవేళ ((cmdidx == CMD_execute
 		|| cmdidx == CMD_echo
 		|| cmdidx == CMD_echon
 		|| cmdidx == CMD_echomsg
 		|| cmdidx == CMD_echoerr
 		|| cmdidx == CMD_echoconsole
 		|| cmdidx == CMD_echowindow)
-	    && xp->xp_context == EXPAND_EXPRESSION)
+	    && xp->xp_context == EXPAND_వ్యక్తీకరణ)
     {
-	for (;;)
+	కొరకు (;;)
 	{
 	    char_u *n = skiptowhite(arg);
 
-	    if (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
-		break;
+	    ఒకవేళ (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
+		ఆపు;
 	    arg = skipwhite(n);
 	}
     }
 
-    xp->xp_pattern = arg;
+    xp->xp_నమూనా = arg;
 }
 
 /*
@@ -3219,20 +3219,20 @@ set_context_for_expression(
  * eval_prog_pat and eval_prog_enc are non-NULL whenever eval_prog_cache is
  * non-NULL.
  */
-static regprog_T    *eval_prog_cache = NULL;
-static char_u	    *eval_prog_pat = NULL;	// pattern it was compiled for
-static char_u	    *eval_prog_enc = NULL;	// 'encoding' when compiled
-static long	    eval_prog_re;		// 'regexpengine' when compiled
+స్థిర regprog_T    *eval_prog_cache = ఖాళీ;
+స్థిర char_u	    *eval_prog_pat = ఖాళీ;	// pattern it was compiled for
+స్థిర char_u	    *eval_prog_enc = ఖాళీ;	// 'encoding' when compiled
+స్థిర దీర్ఘ	    eval_prog_re;		// 'regexpengine' when compiled
 // State sampled by eval_regcomp() for the eval_regfree() call that gives the
 // program back: user code run in between, e.g. an object's string() method
 // invoked by match() on a list, can change these options, and then the
 // program must not be cached under the changed values.  eval_compile_enc is
 // only ever compared against p_enc, never dereferenced.
-static long	    eval_compile_re;
-static char_u	    *eval_compile_enc;
-static int	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
+స్థిర దీర్ఘ	    eval_compile_re;
+స్థిర char_u	    *eval_compile_enc;
+స్థిర పూర్ణాంకం	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
 					// that were not given back yet
-static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
+స్థిర పూర్ణాంకం	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
 						  // a program was handed out
 
 /*
@@ -3245,20 +3245,20 @@ static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
  * intentionally over-approximate, e.g. a literal "~" or "%." also matches;
  * such a pattern is compiled every time, which is never wrong.
  */
-    static bool
+    స్థిర bool
 eval_prog_volatile(char_u *pat)
 {
     char_u *p;
 
-    if (STRNCMP(pat, "\\%#=", 4) == 0)
-	return true;
-    for (p = pat; *p != NUL; ++p)
-	if (*p == '~'
+    ఒకవేళ (STRNCMP(pat, "\\%#=", 4) == 0)
+	తిరిగి true;
+    కొరకు (p = pat; *p != NUL; ++p)
+	ఒకవేళ (*p == '~'
 		|| (p[0] == '[' && (p[1] == ':' || p[1] == '=' || p[1] == '.'))
 		|| (p[0] == '%' && (p[1] == '.'
 			|| ((p[1] == '<' || p[1] == '>') && p[2] == '.'))))
-	    return true;
-    return false;
+	    తిరిగి true;
+    తిరిగి false;
 }
 
 /*
@@ -3275,12 +3275,12 @@ eval_regcomp(char_u *pat)
     // did not change while the caller was using the program.
     eval_compile_re = p_re;
     eval_compile_enc = p_enc;
-    if (eval_prog_busy > 0)
+    ఒకవేళ (eval_prog_busy > 0)
 	// The samples above no longer describe the program already handed
 	// out: its eval_regfree() must drop it instead of caching it.
 	eval_prog_reentered = TRUE;
 
-    if (eval_prog_cache != NULL
+    ఒకవేళ (eval_prog_cache != ఖాళీ
 	    && *p_cpo == NUL
 	    && eval_prog_cache->re_flags == RE_MAGIC + RE_STRING
 	    && eval_prog_re == p_re
@@ -3290,13 +3290,13 @@ eval_regcomp(char_u *pat)
 	prog = eval_prog_cache;
 	// The caller now owns the program, eval_regfree() adopts the
 	// program the caller ends up with.
-	eval_prog_cache = NULL;
+	eval_prog_cache = ఖాళీ;
     }
-    else
+    లేకపోతే
 	prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (prog != NULL)
+    ఒకవేళ (prog != ఖాళీ)
 	++eval_prog_busy;	// paired with the eval_regfree() call
-    return prog;
+    తిరిగి prog;
 }
 
 /*
@@ -3304,25 +3304,25 @@ eval_regcomp(char_u *pat)
  * keeping it in the cache for the next use.  "pat" must be the same string
  * the program was compiled for and must still be valid.
  */
-    void
+    శూన్య
 eval_regfree(char_u *pat, regprog_T *prog)
 {
-    int	    reentered = eval_prog_reentered;
+    పూర్ణాంకం	    reentered = eval_prog_reentered;
 
-    if (eval_prog_busy > 0 && --eval_prog_busy == 0)
+    ఒకవేళ (eval_prog_busy > 0 && --eval_prog_busy == 0)
 	eval_prog_reentered = FALSE;
-    if (prog == NULL)
-	return;
-    if (reentered || *p_cpo != NUL
+    ఒకవేళ (prog == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (reentered || *p_cpo != NUL
 	    || eval_compile_re != p_re || eval_compile_enc != p_enc)
     {
 	// 'cpoptions' is not empty, an option in the cache key changed, or
 	// another program was handed out while the caller was using this
 	// one: the samples may not describe this program, do not cache it.
 	vim_regfree(prog);
-	return;
+	తిరిగి;
     }
-    if (eval_prog_pat == NULL || STRCMP(eval_prog_pat, pat) != 0
+    ఒకవేళ (eval_prog_pat == ఖాళీ || STRCMP(eval_prog_pat, pat) != 0
 	    || STRCMP(eval_prog_enc, p_enc) != 0)
     {
 	char_u	*pat_copy;
@@ -3330,20 +3330,20 @@ eval_regfree(char_u *pat, regprog_T *prog)
 
 	// A cached pattern is known not to be volatile, thus the scan is
 	// only needed when installing a new key.
-	if (eval_prog_volatile(pat))
+	ఒకవేళ (eval_prog_volatile(pat))
 	{
 	    // compiling depends on state the cache key does not cover
 	    vim_regfree(prog);
-	    return;
+	    తిరిగి;
 	}
 	pat_copy = vim_strsave(pat);
 	enc_copy = vim_strsave(p_enc);
-	if (pat_copy == NULL || enc_copy == NULL)
+	ఒకవేళ (pat_copy == ఖాళీ || enc_copy == ఖాళీ)
 	{
 	    vim_free(pat_copy);
 	    vim_free(enc_copy);
 	    vim_regfree(prog);
-	    return;
+	    తిరిగి;
 	}
 	vim_free(eval_prog_pat);
 	vim_free(eval_prog_enc);
@@ -3358,42 +3358,42 @@ eval_regfree(char_u *pat, regprog_T *prog)
     eval_prog_re = eval_compile_re;
 }
 
-#if defined(EXITFREE)
-    void
-free_eval_regcomp_cache(void)
+#ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_eval_regcomp_cache(శూన్య)
 {
     vim_regfree(eval_prog_cache);
-    eval_prog_cache = NULL;
+    eval_prog_cache = ఖాళీ;
     VIM_CLEAR(eval_prog_pat);
     VIM_CLEAR(eval_prog_enc);
     eval_prog_busy = 0;
     eval_prog_reentered = FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if "pat" matches "text".
  * Does not use 'cpo' and always uses 'magic'.
  */
-    int
-pattern_match(char_u *pat, char_u *text, int ic)
+    పూర్ణాంకం
+నమూనా_సరిపోలిక(char_u *pat, char_u *పాఠ్యం, పూర్ణాంకం ic)
 {
-    int		matches = FALSE;
+    పూర్ణాంకం		matches = FALSE;
     char_u	*save_cpo;
     regmatch_T	regmatch;
 
     // avoid 'l' flag in 'cpoptions'
     save_cpo = p_cpo;
-    p_cpo = empty_option;
+    p_cpo = ఖాళీలు_option;
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    ఒకవేళ (regmatch.regprog != ఖాళీ)
     {
 	regmatch.rm_ic = ic;
-	matches = vim_regexec_nl(&regmatch, text, (colnr_T)0);
+	matches = vim_regexec_nl(&regmatch, పాఠ్యం, (colnr_T)0);
 	eval_regfree(pat, regmatch.regprog);
     }
     p_cpo = save_cpo;
-    return matches;
+    తిరిగి matches;
 }
 
 /*
@@ -3401,57 +3401,57 @@ pattern_match(char_u *pat, char_u *text, int ic)
  * "expr->name(arg)".
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval_func(
 	char_u	    **arg,	// points to "(", will be advanced
 	evalarg_T   *evalarg,
 	char_u	    *name,
-	int	    name_len,
+	పూర్ణాంకం	    name_len,
 	typval_T    *rettv,
-	int	    flags,
+	పూర్ణాంకం	    flags,
 	typval_T    *basetv)	// "expr" for "expr->name(arg)"
 {
-    int		evaluate = flags & EVAL_EVALUATE;
+    పూర్ణాంకం		evaluate = flags & EVAL_EVALUATE;
     char_u	*s = name;
-    int		len = name_len;
+    పూర్ణాంకం		len = name_len;
     partial_T	*partial;
-    int		ret = OK;
-    type_T	*type = NULL;
-    int		found_var = FALSE;
+    పూర్ణాంకం		ret = OK;
+    type_T	*type = ఖాళీ;
+    పూర్ణాంకం		దొరికింది_var = FALSE;
 
-    if (!evaluate)
+    ఒకవేళ (!evaluate)
 	check_vars(s, len);
 
     // If "s" is the name of a variable of type VAR_FUNC
     // use its contents.
     s = deref_func_name(s, &len, &partial,
-		 in_vim9script() ? &type : NULL, !evaluate, FALSE, &found_var);
+		 లోపల_vim9script() ? &type : ఖాళీ, !evaluate, FALSE, &దొరికింది_var);
 
     // Need to make a copy, in case evaluating the arguments makes
     // the name invalid.
     s = vim_strsave(s);
-    if (s == NULL || (evaluate && *s == NUL))
+    ఒకవేళ (s == ఖాళీ || (evaluate && *s == NUL))
 	ret = FAIL;
-    else
+    లేకపోతే
     {
 	funcexe_T funcexe;
 
 	// Invoke the function.
-	CLEAR_FIELD(funcexe);
+	CLEAR_క్షేత్రం(funcexe);
 	funcexe.fe_firstline = curwin->w_cursor.lnum;
 	funcexe.fe_lastline = curwin->w_cursor.lnum;
 	funcexe.fe_evaluate = evaluate;
 	funcexe.fe_partial = partial;
-	if (partial != NULL)
+	ఒకవేళ (partial != ఖాళీ)
 	{
 	    funcexe.fe_object = partial->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    ఒకవేళ (funcexe.fe_object != ఖాళీ)
 		++funcexe.fe_object->obj_refcount;
 	}
 	funcexe.fe_basetv = basetv;
 	funcexe.fe_check_type = type;
-	funcexe.fe_found_var = found_var;
-	if (evalarg != NULL)
+	funcexe.fe_దొరికింది_var = దొరికింది_var;
+	ఒకవేళ (evalarg != ఖాళీ)
 	    funcexe.fe_cctx = evalarg->eval_cctx;
 	ret = get_func_tv(s, len, rettv, arg, evalarg, &funcexe);
     }
@@ -3460,51 +3460,51 @@ eval_func(
     // If evaluate is FALSE rettv->v_type was not set in
     // get_func_tv, but it's needed in handle_subscript() to parse
     // what follows. So set it here.
-    if (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
+    ఒకవేళ (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
     {
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ఖాళీ;
 	rettv->v_type = VAR_FUNC;
     }
 
     // Stop the expression evaluation when immediately
     // aborting on error, or when an interrupt occurred or
     // an exception was thrown but not caught.
-    if (evaluate && aborting())
+    ఒకవేళ (evaluate && aborting())
     {
-	if (ret == OK)
+	ఒకవేళ (ret == OK)
 	    clear_tv(rettv);
 	ret = FAIL;
     }
-    return ret;
+    తిరిగి ret;
 }
 
 /*
  * After a NL, skip over empty lines and comment-only lines.
  */
-    static char_u *
+    స్థిర char_u *
 newline_skip_comments(char_u *arg)
 {
     char_u *p = arg + 1;
 
-    for (;;)
+    కొరకు (;;)
     {
 	p = skipwhite(p);
 
-	if (*p == NUL)
-	    break;
-	if (vim9_comment_start(p))
+	ఒకవేళ (*p == NUL)
+	    ఆపు;
+	ఒకవేళ (vim9_comment_ప్రారంభం(p))
 	{
 	    char_u *nl = vim_strchr(p, NL);
 
-	    if (nl == NULL)
-		break;
+	    ఒకవేళ (nl == ఖాళీ)
+		ఆపు;
 	    p = nl;
 	}
-	if (*p != NL)
-	    break;
+	ఒకవేళ (*p != NL)
+	    ఆపు;
 	++p;  // skip another NL
     }
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -3512,24 +3512,24 @@ newline_skip_comments(char_u *arg)
  * lines.
  * Only called for Vim9 script.
  */
-    static char_u *
+    స్థిర char_u *
 getline_peek_skip_comments(evalarg_T *evalarg)
 {
-    for (;;)
+    కొరకు (;;)
     {
-	char_u *next = getline_peek(evalarg->eval_getline,
+	char_u *తదుపరి = getline_peek(evalarg->eval_getline,
 							 evalarg->eval_cookie);
 	char_u *p;
 
-	if (next == NULL)
-	    break;
-	p = skipwhite(next);
-	if (*p != NUL && !vim9_comment_start(p))
-	    return next;
-	if (eval_next_line(NULL, evalarg) == NULL)
-	    break;
+	ఒకవేళ (తదుపరి == ఖాళీ)
+	    ఆపు;
+	p = skipwhite(తదుపరి);
+	ఒకవేళ (*p != NUL && !vim9_comment_ప్రారంభం(p))
+	    తిరిగి తదుపరి;
+	ఒకవేళ (eval_తదుపరి_పంక్తి(ఖాళీ, evalarg) == ఖాళీ)
+	    ఆపు;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -3541,34 +3541,34 @@ getline_peek_skip_comments(evalarg_T *evalarg)
  * "arg" must point somewhere inside a line, not at the start.
  */
     char_u *
-eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
+eval_తదుపరి_non_blank(char_u *arg, evalarg_T *evalarg, పూర్ణాంకం *getnext)
 {
     char_u *p = skipwhite(arg);
 
     *getnext = FALSE;
-    if (in_vim9script()
-	    && evalarg != NULL
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL
+    ఒకవేళ (లోపల_vim9script()
+	    && evalarg != ఖాళీ
+	    && (evalarg->eval_cookie != ఖాళీ || evalarg->eval_cctx != ఖాళీ
 								   || *p == NL)
 	    && (*p == NUL || *p == NL
-			     || (vim9_comment_start(p) && VIM_ISWHITE(p[-1]))))
+			     || (vim9_comment_ప్రారంభం(p) && VIM_ISWHITE(p[-1]))))
     {
-	char_u *next;
+	char_u *తదుపరి;
 
-	if (*p == NL)
-	    next = newline_skip_comments(p);
-	else if (evalarg->eval_cookie != NULL)
-	    next = getline_peek_skip_comments(evalarg);
-	else
-	    next = peek_next_line_from_context(evalarg->eval_cctx);
+	ఒకవేళ (*p == NL)
+	    తదుపరి = newline_skip_comments(p);
+	లేకపోతే ఒకవేళ (evalarg->eval_cookie != ఖాళీ)
+	    తదుపరి = getline_peek_skip_comments(evalarg);
+	లేకపోతే
+	    తదుపరి = peek_తదుపరి_పంక్తి_from_context(evalarg->eval_cctx);
 
-	if (next != NULL)
+	ఒకవేళ (తదుపరి != ఖాళీ)
 	{
 	    *getnext = *p != NL;
-	    return skipwhite(next);
+	    తిరిగి skipwhite(తదుపరి);
 	}
     }
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -3579,49 +3579,49 @@ eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
  * "arg".
  */
     char_u *
-eval_next_line(char_u *arg, evalarg_T *evalarg)
+eval_తదుపరి_పంక్తి(char_u *arg, evalarg_T *evalarg)
 {
     garray_T	*gap = &evalarg->eval_ga;
-    char_u	*line;
+    char_u	*పంక్తి;
 
-    if (arg != NULL)
+    ఒకవేళ (arg != ఖాళీ)
     {
-	if (*arg == NL)
-	    return newline_skip_comments(arg);
+	ఒకవేళ (*arg == NL)
+	    తిరిగి newline_skip_comments(arg);
 	// Truncate before a trailing comment, so that concatenating the lines
 	// won't turn the rest into a comment.
-	if (*skipwhite(arg) == '#')
+	ఒకవేళ (*skipwhite(arg) == '#')
 	    *arg = NUL;
     }
 
-    if (evalarg->eval_cookie != NULL)
-	line = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
+    ఒకవేళ (evalarg->eval_cookie != ఖాళీ)
+	పంక్తి = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
 							   GETLINE_CONCAT_ALL);
-    else
-	line = next_line_from_context(evalarg->eval_cctx, TRUE);
-    if (line == NULL)
-	return NULL;
+    లేకపోతే
+	పంక్తి = తదుపరి_పంక్తి_from_context(evalarg->eval_cctx, TRUE);
+    ఒకవేళ (పంక్తి == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    ++evalarg->eval_break_count;
-    if (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
+    ++evalarg->eval_break_లెక్క;
+    ఒకవేళ (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
     {
-	char_u *p = skipwhite(line);
+	char_u *p = skipwhite(పంక్తి);
 
 	// Going to concatenate the lines after parsing.  For an empty or
 	// comment line use an empty string.
-	if (*p == NUL || vim9_comment_start(p))
+	ఒకవేళ (*p == NUL || vim9_comment_ప్రారంభం(p))
 	{
-	    vim_free(line);
-	    line = vim_strsave((char_u *)"");
+	    vim_free(పంక్తి);
+	    పంక్తి = vim_strsave((char_u *)"");
 	}
 
-	((char_u **)gap->ga_data)[gap->ga_len] = line;
+	((char_u **)gap->ga_దత్తాంశం)[gap->ga_len] = పంక్తి;
 	++gap->ga_len;
     }
-    else if (evalarg->eval_cookie != NULL)
+    లేకపోతే ఒకవేళ (evalarg->eval_cookie != ఖాళీ)
     {
 	free_eval_tofree_later(evalarg);
-	evalarg->eval_tofree = line;
+	evalarg->eval_tofree = పంక్తి;
     }
 
     // Advanced to the next line, "arg" no longer points into the previous
@@ -3629,9 +3629,9 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     // If "arg" is NULL, then the return value is discarded.  In that case,
     // "arg" still points to the previous line.  So don't reset
     // "eval_using_cmdline".
-    if (arg != NULL)
+    ఒకవేళ (arg != ఖాళీ)
 	evalarg->eval_using_cmdline = FALSE;
-    return skipwhite(line);
+    తిరిగి skipwhite(పంక్తి);
 }
 
 /*
@@ -3640,15 +3640,15 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     char_u *
 skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
 {
-    int	    getnext;
+    పూర్ణాంకం	    getnext;
     char_u  *p = skipwhite_and_nl(arg);
 
-    if (evalarg == NULL)
-	return skipwhite(arg);
-    eval_next_non_blank(p, evalarg, &getnext);
-    if (getnext)
-	return eval_next_line(arg, evalarg);
-    return p;
+    ఒకవేళ (evalarg == ఖాళీ)
+	తిరిగి skipwhite(arg);
+    eval_తదుపరి_non_blank(p, evalarg, &getnext);
+    ఒకవేళ (getnext)
+	తిరిగి eval_తదుపరి_పంక్తి(arg, evalarg);
+    తిరిగి p;
 }
 
 /*
@@ -3665,62 +3665,62 @@ skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
  * "evalarg" can be NULL, EVALARG_EVALUATE or a pointer.
  * Return OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 eval0(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    return eval0_retarg(arg, rettv, eap, evalarg, NULL);
+    తిరిగి eval0_retarg(arg, rettv, eap, evalarg, ఖాళీ);
 }
 
 /*
  * If "arg" is a simple function call without arguments then call it and return
  * the result.  Otherwise return NOTDONE.
  */
-    int
+    పూర్ణాంకం
 may_call_simple_func(
     char_u	*arg,
     typval_T	*rettv)
 {
-    char_u  *parens = (char_u *)strstr((char *)arg, "()");
-    int	    r = NOTDONE;
+    char_u  *parens = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)arg, "()");
+    పూర్ణాంకం	    r = NOTDONE;
 
     // If the expression is "FuncName()" then we can skip a lot of overhead.
-    if (parens != NULL && *skipwhite(parens + 2) == NUL)
+    ఒకవేళ (parens != ఖాళీ && *skipwhite(parens + 2) == NUL)
     {
 	char_u *p = STRNCMP(arg, "<SNR>", 5) == 0 ? skipdigits(arg + 5) : arg;
 
-	if (to_name_end(p, TRUE) == parens)
+	ఒకవేళ (గమ్యం_name_చివర(p, TRUE) == parens)
 	    r = call_simple_func(arg, (size_t)(parens - arg), rettv);
     }
-    return r;
+    తిరిగి r;
 }
 
 /*
  * Handle zero level expression with optimization for a simple function call.
  * Same arguments and return value as eval0().
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval0_simple_funccal(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    int	    r = may_call_simple_func(arg, rettv);
+    పూర్ణాంకం	    r = may_call_simple_func(arg, rettv);
 
-    if (r == NOTDONE)
-	r = eval0_retarg(arg, rettv, eap, evalarg, NULL);
-    return r;
+    ఒకవేళ (r == NOTDONE)
+	r = eval0_retarg(arg, rettv, eap, evalarg, ఖాళీ);
+    తిరిగి r;
 }
 
 /*
  * Like eval0() but when "retarg" is not NULL store the pointer to after the
  * expression and don't check what comes after the expression.
  */
-    int
+    పూర్ణాంకం
 eval0_retarg(
     char_u	*arg,
     typval_T	*rettv,
@@ -3728,45 +3728,45 @@ eval0_retarg(
     evalarg_T	*evalarg,
     char_u	**retarg)
 {
-    int		ret;
+    పూర్ణాంకం		ret;
     char_u	*p;
-    char_u	*expr_end;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
-    int		check_for_end = retarg == NULL;
-    int		end_error = FALSE;
+    char_u	*సమాసం_చివర;
+    పూర్ణాంకం		did_emsg_before = did_emsg;
+    పూర్ణాంకం		called_emsg_before = called_emsg;
+    పూర్ణాంకం		check_for_చివర = retarg == ఖాళీ;
+    పూర్ణాంకం		చివర_error = FALSE;
 
     p = skipwhite(arg);
     ret = eval1(&p, rettv, evalarg);
 
-    if (ret != FAIL)
+    ఒకవేళ (ret != FAIL)
     {
-	expr_end = p;
+	సమాసం_చివర = p;
 	p = skipwhite(p);
 
 	// In Vim9 script a command block is not split at NL characters for
 	// commands using an expression argument.  Skip over a '#' comment to
 	// check for a following NL.  Require white space before the '#'.
-	if (in_vim9script() && p > expr_end && retarg == NULL)
-	    while (*p == '#')
+	ఒకవేళ (లోపల_vim9script() && p > సమాసం_చివర && retarg == ఖాళీ)
+	    అయితే (*p == '#')
 	    {
 		char_u *nl = vim_strchr(p, NL);
 
-		if (nl == NULL)
-		    break;
+		ఒకవేళ (nl == ఖాళీ)
+		    ఆపు;
 		p = skipwhite(nl + 1);
-		if (eap != NULL && *p != NUL)
+		ఒకవేళ (eap != ఖాళీ && *p != NUL)
 		    eap->nextcmd = p;
-		check_for_end = FALSE;
+		check_for_చివర = FALSE;
 	    }
 
-	if (check_for_end)
-	    end_error = !ends_excmd2(arg, p);
+	ఒకవేళ (check_for_చివర)
+	    చివర_error = !చివర్లు_excmd2(arg, p);
     }
 
-    if (ret == FAIL || end_error)
+    ఒకవేళ (ret == FAIL || చివర_error)
     {
-	if (ret != FAIL)
+	ఒకవేళ (ret != FAIL)
 	    clear_tv(rettv);
 	/*
 	 * Report the invalid expression unless the expression evaluation has
@@ -3774,35 +3774,35 @@ eval0_retarg(
 	 * exception, or we already gave a more specific error.
 	 * Also check called_emsg for when using assert_fails().
 	 */
-	if (!aborting()
+	ఒకవేళ (!aborting()
 		&& did_emsg == did_emsg_before
 		&& called_emsg == called_emsg_before
-		&& (!in_vim9script() || !vim9_bad_comment(p)))
+		&& (!లోపల_vim9script() || !vim9_bad_comment(p)))
 	{
-	    if (end_error)
+	    ఒకవేళ (చివర_error)
 		semsg(_(e_trailing_characters_str), p);
-	    else
-		semsg(_(e_invalid_expression_str), arg);
+	    లేకపోతే
+		semsg(_(e_invalid_వ్యక్తీకరణ_str), arg);
 	}
 
-	if (eap != NULL && p != NULL)
+	ఒకవేళ (eap != ఖాళీ && p != ఖాళీ)
 	{
 	    // Some of the expression may not have been consumed.
 	    // Only execute a next command if it cannot be a "||" operator.
 	    // The next command may be "catch".
 	    char_u *nextcmd = check_nextcmd(p);
-	    if (nextcmd != NULL && *nextcmd != '|')
+	    ఒకవేళ (nextcmd != ఖాళీ && *nextcmd != '|')
 		eap->nextcmd = nextcmd;
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (retarg != NULL)
+    ఒకవేళ (retarg != ఖాళీ)
 	*retarg = p;
-    else if (check_for_end && eap != NULL)
-	set_nextcmd(eap, p);
+    లేకపోతే ఒకవేళ (check_for_చివర && eap != ఖాళీ)
+	సమితి_nextcmd(eap, p);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -3815,124 +3815,124 @@ eval0_retarg(
  *
  * Return OK or FAIL.
  */
-    int
+    పూర్ణాంకం
 eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u  *p;
-    int	    getnext;
+    పూర్ణాంకం	    getnext;
 
-    CLEAR_POINTER(rettv);
+    CLEAR_సూచిక(rettv);
 
     /*
      * Get the first variable.
      */
-    if (eval2(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval2(arg, rettv, evalarg) == FAIL)
+	తిరిగి FAIL;
 
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (*p == '?')
+    p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
+    ఒకవేళ (*p == '?')
     {
-	int		op_falsy = p[1] == '?';
-	int		result;
+	పూర్ణాంకం		op_falsy = p[1] == '?';
+	పూర్ణాంకం		ఫలితం;
 	typval_T	var2;
-	evalarg_T	*evalarg_used = evalarg;
+	evalarg_T	*evalarg_వాడిన = evalarg;
 	evalarg_T	local_evalarg;
-	int		orig_flags;
-	int		evaluate;
-	int		vim9script = in_vim9script();
+	పూర్ణాంకం		orig_flags;
+	పూర్ణాంకం		evaluate;
+	పూర్ణాంకం		vim9script = లోపల_vim9script();
 
-	if (evalarg == NULL)
+	ఒకవేళ (evalarg == ఖాళీ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_వాడిన = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
-	evaluate = evalarg_used->eval_flags & EVAL_EVALUATE;
+	orig_flags = evalarg_వాడిన->eval_flags;
+	evaluate = evalarg_వాడిన->eval_flags & EVAL_EVALUATE;
 
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg_used);
-	else
+	ఒకవేళ (getnext)
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg_వాడిన);
+	లేకపోతే
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+	    ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 	    {
 		error_white_both(p, op_falsy ? 2 : 1);
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    *arg = p;
 	}
 
-	result = FALSE;
-	if (evaluate)
+	ఫలితం = FALSE;
+	ఒకవేళ (evaluate)
 	{
-	    int		error = FALSE;
+	    పూర్ణాంకం		error = FALSE;
 
-	    if (op_falsy)
+	    ఒకవేళ (op_falsy)
 	    {
 		// Is this typeval supported with the falsy operator?
-		if (check_typval_is_value(rettv) == FAIL)
+		ఒకవేళ (check_typval_is_విలువ(rettv) == FAIL)
 		{
 		    clear_tv(rettv);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
-		result = tv2bool(rettv);
+		ఫలితం = tv2bool(rettv);
 	    }
-	    else if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
-		result = TRUE;
-	    if (error || !op_falsy || !result)
+	    లేకపోతే ఒకవేళ (vim9script)
+		ఫలితం = tv_get_bool_chk(rettv, &error);
+	    లేకపోతే ఒకవేళ (tv_get_సంఖ్య_chk(rettv, &error) != 0)
+		ఫలితం = TRUE;
+	    ఒకవేళ (error || !op_falsy || !ఫలితం)
 		clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ఒకవేళ (error)
+		తిరిగి FAIL;
 	}
 
 	/*
 	 * Get the second variable.  Recursive!
 	 */
-	if (op_falsy)
+	ఒకవేళ (op_falsy)
 	    ++*arg;
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg - (op_falsy ? 1 : 0), op_falsy ? 2 : 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	*arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
-	evalarg_used->eval_flags = (op_falsy ? !result : result)
+	*arg = skipwhite_and_linebreak(*arg + 1, evalarg_వాడిన);
+	evalarg_వాడిన->eval_flags = (op_falsy ? !ఫలితం : ఫలితం)
 				  ? orig_flags : (orig_flags & ~EVAL_EVALUATE);
-	if (eval1(arg, &var2, evalarg_used) == FAIL)
+	ఒకవేళ (eval1(arg, &var2, evalarg_వాడిన) == FAIL)
 	{
-	    evalarg_used->eval_flags = orig_flags;
-	    return FAIL;
+	    evalarg_వాడిన->eval_flags = orig_flags;
+	    తిరిగి FAIL;
 	}
-	if (!op_falsy || !result)
+	ఒకవేళ (!op_falsy || !ఫలితం)
 	    *rettv = var2;
 
-	if (!op_falsy)
+	ఒకవేళ (!op_falsy)
 	{
 	    /*
 	     * Check for the ":".
 	     */
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
-	    if (*p != ':')
+	    p = eval_తదుపరి_non_blank(*arg, evalarg_వాడిన, &getnext);
+	    ఒకవేళ (*p != ':')
 	    {
 		emsg(_(e_missing_colon_after_questionmark));
-		if (evaluate && result)
+		ఒకవేళ (evaluate && ఫలితం)
 		    clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_వాడిన->eval_flags = orig_flags;
+		తిరిగి FAIL;
 	    }
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ఒకవేళ (getnext)
+		*arg = eval_తదుపరి_పంక్తి(*arg, evalarg_వాడిన);
+	    లేకపోతే
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 1);
 		    clear_tv(rettv);
-		    evalarg_used->eval_flags = orig_flags;
-		    return FAIL;
+		    evalarg_వాడిన->eval_flags = orig_flags;
+		    తిరిగి FAIL;
 		}
 		*arg = p;
 	    }
@@ -3940,34 +3940,34 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the third variable.  Recursive!
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	    ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_వాడిన->eval_flags = orig_flags;
+		తిరిగి FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
-	    evalarg_used->eval_flags = !result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 1, evalarg_వాడిన);
+	    evalarg_వాడిన->eval_flags = !ఫలితం ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval1(arg, &var2, evalarg_used) == FAIL)
+	    ఒకవేళ (eval1(arg, &var2, evalarg_వాడిన) == FAIL)
 	    {
-		if (evaluate && result)
+		ఒకవేళ (evaluate && ఫలితం)
 		    clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_వాడిన->eval_flags = orig_flags;
+		తిరిగి FAIL;
 	    }
-	    if (evaluate && !result)
+	    ఒకవేళ (evaluate && !ఫలితం)
 		*rettv = var2;
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ఒకవేళ (evalarg == ఖాళీ)
+	    clear_evalarg(&local_evalarg, ఖాళీ);
+	లేకపోతే
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3979,65 +3979,65 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    పూర్ణాంకం		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval3(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval3(arg, rettv, evalarg) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * Handle the  "||" operator.
      */
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '|' && p[1] == '|')
+    p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
+    ఒకవేళ (p[0] == '|' && p[1] == '|')
     {
-	evalarg_T   *evalarg_used = evalarg;
+	evalarg_T   *evalarg_వాడిన = evalarg;
 	evalarg_T   local_evalarg;
-	int	    evaluate;
-	int	    orig_flags;
-	long	    result = FALSE;
+	పూర్ణాంకం	    evaluate;
+	పూర్ణాంకం	    orig_flags;
+	దీర్ఘ	    ఫలితం = FALSE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	పూర్ణాంకం	    error = FALSE;
+	పూర్ణాంకం	    vim9script = లోపల_vim9script();
 
-	if (evalarg == NULL)
+	ఒకవేళ (evalarg == ఖాళీ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_వాడిన = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
+	orig_flags = evalarg_వాడిన->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
-	    if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
-		result = TRUE;
+	    ఒకవేళ (vim9script)
+		ఫలితం = tv_get_bool_chk(rettv, &error);
+	    లేకపోతే ఒకవేళ (tv_get_సంఖ్య_chk(rettv, &error) != 0)
+		ఫలితం = TRUE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ఒకవేళ (error)
+		తిరిగి FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "||".
 	 */
-	while (p[0] == '|' && p[1] == '|')
+	అయితే (p[0] == '|' && p[1] == '|')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ఒకవేళ (getnext)
+		*arg = eval_తదుపరి_పంక్తి(*arg, evalarg_వాడిన);
+	    లేకపోతే
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 		*arg = p;
 	    }
@@ -4045,55 +4045,55 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
-	    evalarg_used->eval_flags = !result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_వాడిన);
+	    evalarg_వాడిన->eval_flags = !ఫలితం ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval3(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    ఒకవేళ (eval3(arg, &var2, evalarg_వాడిన) == FAIL)
+		తిరిగి FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && !result)
+	    ఒకవేళ (evaluate && !ఫలితం)
 	    {
-		if (vim9script)
-		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) != 0)
-		    result = TRUE;
+		ఒకవేళ (vim9script)
+		    ఫలితం = tv_get_bool_chk(&var2, &error);
+		లేకపోతే ఒకవేళ (tv_get_సంఖ్య_chk(&var2, &error) != 0)
+		    ఫలితం = TRUE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		ఒకవేళ (error)
+		    తిరిగి FAIL;
 	    }
-	    if (evaluate)
+	    ఒకవేళ (evaluate)
 	    {
-		if (vim9script)
+		ఒకవేళ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_సంఖ్య = ఫలితం ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		లేకపోతే
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_సంఖ్య;
+		    rettv->vval.v_సంఖ్య = ఫలితం;
 		}
 	    }
 
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
+	    p = eval_తదుపరి_non_blank(*arg, evalarg_వాడిన, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ఒకవేళ (evalarg == ఖాళీ)
+	    clear_evalarg(&local_evalarg, ఖాళీ);
+	లేకపోతే
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4105,65 +4105,65 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    పూర్ణాంకం		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval4(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval4(arg, rettv, evalarg) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * Handle the "&&" operator.
      */
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '&' && p[1] == '&')
+    p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
+    ఒకవేళ (p[0] == '&' && p[1] == '&')
     {
-	evalarg_T   *evalarg_used = evalarg;
+	evalarg_T   *evalarg_వాడిన = evalarg;
 	evalarg_T   local_evalarg;
-	int	    orig_flags;
-	int	    evaluate;
-	long	    result = TRUE;
+	పూర్ణాంకం	    orig_flags;
+	పూర్ణాంకం	    evaluate;
+	దీర్ఘ	    ఫలితం = TRUE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	పూర్ణాంకం	    error = FALSE;
+	పూర్ణాంకం	    vim9script = లోపల_vim9script();
 
-	if (evalarg == NULL)
+	ఒకవేళ (evalarg == ఖాళీ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_వాడిన = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
+	orig_flags = evalarg_వాడిన->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
-	    if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) == 0)
-		result = FALSE;
+	    ఒకవేళ (vim9script)
+		ఫలితం = tv_get_bool_chk(rettv, &error);
+	    లేకపోతే ఒకవేళ (tv_get_సంఖ్య_chk(rettv, &error) == 0)
+		ఫలితం = FALSE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ఒకవేళ (error)
+		తిరిగి FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "&&".
 	 */
-	while (p[0] == '&' && p[1] == '&')
+	అయితే (p[0] == '&' && p[1] == '&')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ఒకవేళ (getnext)
+		*arg = eval_తదుపరి_పంక్తి(*arg, evalarg_వాడిన);
+	    లేకపోతే
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 		*arg = p;
 	    }
@@ -4171,56 +4171,56 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
-	    evalarg_used->eval_flags = result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_వాడిన);
+	    evalarg_వాడిన->eval_flags = ఫలితం ? orig_flags
 					      : (orig_flags & ~EVAL_EVALUATE);
-	    CLEAR_FIELD(var2);
-	    if (eval4(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    CLEAR_క్షేత్రం(var2);
+	    ఒకవేళ (eval4(arg, &var2, evalarg_వాడిన) == FAIL)
+		తిరిగి FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && result)
+	    ఒకవేళ (evaluate && ఫలితం)
 	    {
-		if (vim9script)
-		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) == 0)
-		    result = FALSE;
+		ఒకవేళ (vim9script)
+		    ఫలితం = tv_get_bool_chk(&var2, &error);
+		లేకపోతే ఒకవేళ (tv_get_సంఖ్య_chk(&var2, &error) == 0)
+		    ఫలితం = FALSE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		ఒకవేళ (error)
+		    తిరిగి FAIL;
 	    }
-	    if (evaluate)
+	    ఒకవేళ (evaluate)
 	    {
-		if (vim9script)
+		ఒకవేళ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_సంఖ్య = ఫలితం ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		లేకపోతే
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_సంఖ్య;
+		    rettv->vval.v_సంఖ్య = ఫలితం;
 		}
 	    }
 
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
+	    p = eval_తదుపరి_non_blank(*arg, evalarg_వాడిన, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ఒకవేళ (evalarg == ఖాళీ)
+	    clear_evalarg(&local_evalarg, ఖాళీ);
+	లేకపోతే
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4241,191 +4241,191 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
-    exprtype_T	type = EXPR_UNKNOWN;
-    int		len = 2;
-    int		type_is = FALSE;
+    పూర్ణాంకం		getnext;
+    exprtype_T	type = సమాసం_UNKNOWN;
+    పూర్ణాంకం		len = 2;
+    పూర్ణాంకం		type_is = FALSE;
 
     /*
      * Get the first expression.
      */
-    if (eval5(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval5(arg, rettv, evalarg) == FAIL)
+	తిరిగి FAIL;
 
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
+    p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
 
     type = get_compare_type(p, &len, &type_is);
 
     /*
      * If there is a comparative operator, use it.
      */
-    if (type != EXPR_UNKNOWN)
+    ఒకవేళ (type != సమాసం_UNKNOWN)
     {
 	typval_T    var2;
-	int	    ic;
-	int	    vim9script = in_vim9script();
-	int	    evaluate = evalarg == NULL
+	పూర్ణాంకం	    ic;
+	పూర్ణాంకం	    vim9script = లోపల_vim9script();
+	పూర్ణాంకం	    evaluate = evalarg == ఖాళీ
 				   ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	long	    comp_lnum = SOURCING_LNUM;
+	దీర్ఘ	    comp_lnum = SOURCING_LNUM;
 
-	if (getnext)
+	ఒకవేళ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	లేకపోతే ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	if (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
+	ఒకవేళ (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
 	{
-	    semsg(_(e_invalid_expression_str), p);
+	    semsg(_(e_invalid_వ్యక్తీకరణ_str), p);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
 	// extra question mark appended: ignore case
-	if (p[len] == '?')
+	ఒకవేళ (p[len] == '?')
 	{
 	    ic = TRUE;
 	    ++len;
 	}
 	// extra '#' appended: match case
-	else if (p[len] == '#')
+	లేకపోతే ఒకవేళ (p[len] == '#')
 	{
 	    ic = FALSE;
 	    ++len;
 	}
 	// nothing appended: use 'ignorecase' if not in Vim script
-	else
+	లేకపోతే
 	    ic = vim9script ? FALSE : p_ic;
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
+	ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
 	{
 	    error_white_both(p, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + len, evalarg);
-	if (eval5(arg, &var2, evalarg) == FAIL)
+	ఒకవేళ (eval5(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
-	    int ret;
+	    పూర్ణాంకం ret;
 
 	    // use the line of the comparison for messages
 	    SOURCING_LNUM = comp_lnum;
-	    if (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
+	    ఒకవేళ (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
 	    {
 		ret = FAIL;
 		clear_tv(rettv);
 	    }
-	    else
+	    లేకపోతే
 		ret = typval_compare(rettv, &var2, type, ic);
 	    clear_tv(&var2);
-	    return ret;
+	    తిరిగి ret;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Make a copy of blob "tv1" and append blob "tv2".
  */
-    void
+    శూన్య
 eval_addblob(typval_T *tv1, typval_T *tv2)
 {
     blob_T  *b1 = tv1->vval.v_blob;
     blob_T  *b2 = tv2->vval.v_blob;
     blob_T  *b = blob_alloc();
-    long    len1, len2;
-    long    totallen;
+    దీర్ఘ    len1, len2;
+    దీర్ఘ    totallen;
 
-    if (b == NULL)
-	return;
+    ఒకవేళ (b == ఖాళీ)
+	తిరిగి;
 
     len1 = blob_len(b1);
     len2 = blob_len(b2);
     totallen = len1 + len2;
 
-    if (totallen > 0 && totallen <= INT_MAX
-				    && ga_grow(&b->bv_ga, (int)totallen) == OK)
+    ఒకవేళ (totallen > 0 && totallen <= గరిష్ఠ_పూర్ణాంకం
+				    && ga_grow(&b->bv_ga, (పూర్ణాంకం)totallen) == OK)
     {
-	if (len1 > 0)
-	    mch_memmove((char_u *)b->bv_ga.ga_data,
-		    (char_u *)b1->bv_ga.ga_data, (size_t)len1);
-	if (len2 > 0)
-	    mch_memmove((char_u *)b->bv_ga.ga_data + len1,
-		    (char_u *)b2->bv_ga.ga_data, (size_t)len2);
-	b->bv_ga.ga_len = (int)totallen;
+	ఒకవేళ (len1 > 0)
+	    mch_memmove((char_u *)b->bv_ga.ga_దత్తాంశం,
+		    (char_u *)b1->bv_ga.ga_దత్తాంశం, (size_t)len1);
+	ఒకవేళ (len2 > 0)
+	    mch_memmove((char_u *)b->bv_ga.ga_దత్తాంశం + len1,
+		    (char_u *)b2->bv_ga.ga_దత్తాంశం, (size_t)len2);
+	b->bv_ga.ga_len = (పూర్ణాంకం)totallen;
     }
 
     clear_tv(tv1);
-    rettv_blob_set(tv1, b);
+    rettv_blob_సమితి(tv1, b);
 }
 
 /*
  * Make a copy of list "tv1" and append list "tv2".
  */
-    int
+    పూర్ణాంకం
 eval_addlist(typval_T *tv1, typval_T *tv2)
 {
     typval_T var3;
 
     // concatenate Lists
-    if (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
+    ఒకవేళ (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	తిరిగి FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Make a copy of tuple "tv1" and append tuple "tv2".
  */
-    int
+    పూర్ణాంకం
 eval_addtuple(typval_T *tv1, typval_T *tv2)
 {
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
     typval_T	var3;
 
-    if (vim9script && tv1->vval.v_tuple != NULL && tv2->vval.v_tuple != NULL
-	    && tv1->vval.v_tuple->tv_type != NULL
-	    && tv2->vval.v_tuple->tv_type != NULL)
+    ఒకవేళ (vim9script && tv1->vval.v_tuple != ఖాళీ && tv2->vval.v_tuple != ఖాళీ
+	    && tv1->vval.v_tuple->tv_type != ఖాళీ
+	    && tv2->vval.v_tuple->tv_type != ఖాళీ)
     {
-	if (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
+	ఒకవేళ (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
 						tv2->vval.v_tuple->tv_type))
-	    return FAIL;
+	    తిరిగి FAIL;
     }
 
     // concatenate tuples
-    if (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
+    ఒకవేళ (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	తిరిగి FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4434,32 +4434,32 @@ eval_addtuple(typval_T *tv1, typval_T *tv2)
  *
  * Return OK or FAIL.
  */
-    static int
-eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
+    స్థిర పూర్ణాంకం
+eval_జరుపు_సంఖ్య(typval_T *tv1, typval_T *tv2, పూర్ణాంకం జరుపు_type)
 {
-    if (tv2->v_type != VAR_NUMBER || tv2->vval.v_number < 0)
+    ఒకవేళ (tv2->v_type != VAR_సంఖ్య || tv2->vval.v_సంఖ్య < 0)
     {
 	// right operand should be a positive number
-	if (tv2->v_type != VAR_NUMBER)
-	    emsg(_(e_bitshift_ops_must_be_number));
-	else
-	    emsg(_(e_bitshift_ops_must_be_positive));
+	ఒకవేళ (tv2->v_type != VAR_సంఖ్య)
+	    emsg(_(e_bitshift_ops_must_be_సంఖ్య));
+	లేకపోతే
+	    emsg(_(e_bitshift_ops_must_be_ధనాత్మక));
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (tv2->vval.v_number > MAX_LSHIFT_BITS)
+    ఒకవేళ (tv2->vval.v_సంఖ్య > MAX_LSHIFT_బిట్లు)
 	// shifting more bits than we have always results in zero
-	tv1->vval.v_number = 0;
-    else if (shift_type == EXPR_LSHIFT)
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number << tv2->vval.v_number;
-    else
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number >> tv2->vval.v_number;
+	tv1->vval.v_సంఖ్య = 0;
+    లేకపోతే ఒకవేళ (జరుపు_type == సమాసం_LSHIFT)
+	tv1->vval.v_సంఖ్య =
+	    (uvarnumber_T)tv1->vval.v_సంఖ్య << tv2->vval.v_సంఖ్య;
+    లేకపోతే
+	tv1->vval.v_సంఖ్య =
+	    (uvarnumber_T)tv1->vval.v_సంఖ్య >> tv2->vval.v_సంఖ్య;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4472,150 +4472,150 @@ eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval6(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval6(arg, rettv, evalarg) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * Repeat computing, until no '<<' or '>>' is following.
      */
-    for (;;)
+    కొరకు (;;)
     {
 	char_u		*p;
-	int		getnext;
+	పూర్ణాంకం		getnext;
 	exprtype_T	exprtype;
-	int		evaluate;
+	పూర్ణాంకం		evaluate;
 	typval_T	var2;
-	int		vim9script;
+	పూర్ణాంకం		vim9script;
 
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (p[0] == '<' && p[1] == '<')
-	    exprtype = EXPR_LSHIFT;
-	else if (p[0] == '>' && p[1] == '>')
-	    exprtype = EXPR_RSHIFT;
-	else
-	    return OK;
+	p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
+	ఒకవేళ (p[0] == '<' && p[1] == '<')
+	    exprtype = సమాసం_LSHIFT;
+	లేకపోతే ఒకవేళ (p[0] == '>' && p[1] == '>')
+	    exprtype = సమాసం_RSHIFT;
+	లేకపోతే
+	    తిరిగి OK;
 
 	// Handle a bitwise left or right shift operator
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (evaluate && rettv->v_type != VAR_NUMBER)
+	evaluate = evalarg == ఖాళీ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	ఒకవేళ (evaluate && rettv->v_type != VAR_సంఖ్య)
 	{
 	    // left operand should be a number
-	    emsg(_(e_bitshift_ops_must_be_number));
+	    emsg(_(e_bitshift_ops_must_be_సంఖ్య));
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	vim9script = in_vim9script();
-	if (getnext)
+	vim9script = లోపల_vim9script();
+	ఒకవేళ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	లేకపోతే ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
+	ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
 	{
 	    error_white_both(p, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + 2, evalarg);
-	if (eval6(arg, &var2, evalarg) == FAIL)
+	ఒకవేళ (eval6(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
-	    if (eval_shift_number(rettv, &var2, exprtype) == FAIL)
-		return FAIL;
+	    ఒకవేళ (eval_జరుపు_సంఖ్య(rettv, &var2, exprtype) == FAIL)
+		తిరిగి FAIL;
 	}
 
 	clear_tv(&var2);
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Concatenate strings "tv1" and "tv2" and store the result in "tv1".
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval_concat_str(typval_T *tv1, typval_T *tv2)
 {
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
     char_u	*s1 = tv_get_string_buf(tv1, buf1);
-    char_u	*s2 = NULL;
+    char_u	*s2 = ఖాళీ;
     char_u	*p;
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
-    if (vim9script && (tv2->v_type == VAR_VOID
+    ఒకవేళ (vim9script && (tv2->v_type == VAR_VOID
 		|| tv2->v_type == VAR_CHANNEL
-		|| tv2->v_type == VAR_JOB))
-	semsg(_(e_using_invalid_value_as_string_str),
+		|| tv2->v_type == VAR_పని))
+	semsg(_(e_using_invalid_విలువ_as_string_str),
 		vartype_name(tv2->v_type));
-    else if (vim9script && tv2->v_type == VAR_FLOAT)
+    లేకపోతే ఒకవేళ (vim9script && tv2->v_type == VAR_FLOAT)
     {
-	vim_snprintf((char *)buf2, NUMBUFLEN, "%g",
+	vim_snprintf((అక్షరం *)buf2, NUMBUFLEN, "%g",
 		tv2->vval.v_float);
 	s2 = buf2;
     }
-    else
+    లేకపోతే
 	s2 = tv_get_string_buf_chk(tv2, buf2);
-    if (s2 == NULL)		// type error ?
+    ఒకవేళ (s2 == ఖాళీ)		// type error ?
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // When possible, grow the existing string in place to avoid alloc/free.
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    ఒకవేళ (grow_string_tv(tv1, s2) == OK)
+	తిరిగి OK;
 
     p = concat_str(s1, s2);
     clear_tv(tv1);
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = p;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Add or subtract numbers "tv1" and "tv2" and store the result in "tv1".
  * The numbers can be whole numbers or floats.
  */
-    static int
-eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
+    స్థిర పూర్ణాంకం
+eval_addsub_సంఖ్య(typval_T *tv1, typval_T *tv2, పూర్ణాంకం op)
 {
-    int		error = FALSE;
+    పూర్ణాంకం		error = FALSE;
     varnumber_T	n1, n2;
     float_T	f1 = 0, f2 = 0;
 
-    if (tv1->v_type == VAR_FLOAT)
+    ఒకవేళ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	n1 = 0;
     }
-    else
+    లేకపోతే
     {
-	n1 = tv_get_number_chk(tv1, &error);
-	if (error)
+	n1 = tv_get_సంఖ్య_chk(tv1, &error);
+	ఒకవేళ (error)
 	{
 	    // This can only happen for "list + non-list" or
 	    // "blob + non-blob".  For "non-list + ..." or
@@ -4623,51 +4623,51 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
 	    // 2nd operand.
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (tv2->v_type == VAR_FLOAT)
+	ఒకవేళ (tv2->v_type == VAR_FLOAT)
 	    f1 = n1;
     }
-    if (tv2->v_type == VAR_FLOAT)
+    ఒకవేళ (tv2->v_type == VAR_FLOAT)
     {
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    లేకపోతే
     {
-	n2 = tv_get_number_chk(tv2, &error);
-	if (error)
+	n2 = tv_get_సంఖ్య_chk(tv2, &error);
+	ఒకవేళ (error)
 	{
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (tv1->v_type == VAR_FLOAT)
+	ఒకవేళ (tv1->v_type == VAR_FLOAT)
 	    f2 = n2;
     }
     clear_tv(tv1);
 
     // If there is a float on either side the result is a float.
-    if (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+    ఒకవేళ (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
     {
-	if (op == '+')
+	ఒకవేళ (op == '+')
 	    f1 = f1 + f2;
-	else
+	లేకపోతే
 	    f1 = f1 - f2;
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    లేకపోతే
     {
-	if (op == '+')
+	ఒకవేళ (op == '+')
 	    n1 = n1 + n2;
-	else
+	లేకపోతే
 	    n1 = n1 - n2;
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_సంఖ్య;
+	tv1->vval.v_సంఖ్య = n1;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4682,63 +4682,63 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval7(arg, rettv, evalarg, FALSE) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval7(arg, rettv, evalarg, FALSE) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * Repeat computing, until no '+', '-' or '.' is following.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	పూర్ణాంకం	    evaluate;
+	పూర్ణాంకం	    getnext;
 	char_u	    *p;
-	int	    op;
-	int	    oplen;
-	int	    concat;
+	పూర్ణాంకం	    op;
+	పూర్ణాంకం	    oplen;
+	పూర్ణాంకం	    concat;
 	typval_T    var2;
-	int	    vim9script = in_vim9script();
-	long	    op_lnum = SOURCING_LNUM;
+	పూర్ణాంకం	    vim9script = లోపల_vim9script();
+	దీర్ఘ	    op_lnum = SOURCING_LNUM;
 
 	// "." is only string concatenation when scriptversion is 1
 	// "+=", "-=" and "..=" are assignments
 	// "++" and "--" on the next line are a separate command.
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
+	p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
 	op = *p;
-	concat = op == '.' && (*(p + 1) == '.' || in_old_script(2));
-	if ((op != '+' && op != '-' && !concat) || p[1] == '='
+	concat = op == '.' && (*(p + 1) == '.' || లోపల_old_script(2));
+	ఒకవేళ ((op != '+' && op != '-' && !concat) || p[1] == '='
 					       || (p[1] == '.' && p[2] == '='))
-	    break;
-	if (getnext && (op == '+' || op == '-') && p[0] == p[1])
-	    break;
+	    ఆపు;
+	ఒకవేళ (getnext && (op == '+' || op == '-') && p[0] == p[1])
+	    ఆపు;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	evaluate = evalarg == ఖాళీ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
 	oplen = (concat && p[1] == '.') ? 2 : 1;
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	ఒకవేళ (getnext)
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg);
+	లేకపోతే
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	    ఒకవేళ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, oplen);
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    *arg = p;
 	}
-	if ((op != '+' || (rettv->v_type != VAR_LIST
+	ఒకవేళ ((op != '+' || (rettv->v_type != VAR_LIST
 						&& rettv->v_type != VAR_TUPLE
 						&& rettv->v_type != VAR_BLOB))
 		&& (op == '.' || rettv->v_type != VAR_FLOAT)
 		&& evaluate)
 	{
-	    int		error = FALSE;
+	    పూర్ణాంకం		error = FALSE;
 
 	    // For "list + ...", an illegal use of the first operand as
 	    // a number cannot be determined before evaluating the 2nd
@@ -4747,102 +4747,102 @@ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    // we know that the first operand needs to be a string or number
 	    // without evaluating the 2nd operand.  So check before to avoid
 	    // side effects after an error.
-	    if (op != '.')
-		tv_get_number_chk(rettv, &error);
-	    if ((op == '.' && tv_get_string_chk(rettv) == NULL) || error)
+	    ఒకవేళ (op != '.')
+		tv_get_సంఖ్య_chk(rettv, &error);
+	    ఒకవేళ ((op == '.' && tv_get_string_chk(rettv) == ఖాళీ) || error)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
+	ఒకవేళ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
 	{
 	    error_white_both(*arg, oplen);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + oplen, evalarg);
-	if (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
+	ఒకవేళ (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	{
 	    /*
 	     * Compute the result.
 	     */
 	    // use the line of the operation for messages
 	    SOURCING_LNUM = op_lnum;
-	    if (op == '.')
+	    ఒకవేళ (op == '.')
 	    {
-		if (eval_concat_str(rettv, &var2) == FAIL)
-		    return FAIL;
+		ఒకవేళ (eval_concat_str(rettv, &var2) == FAIL)
+		    తిరిగి FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_BLOB
+	    లేకపోతే ఒకవేళ (op == '+' && rettv->v_type == VAR_BLOB
 						   && var2.v_type == VAR_BLOB)
 		eval_addblob(rettv, &var2);
-	    else if (op == '+' && rettv->v_type == VAR_LIST
+	    లేకపోతే ఒకవేళ (op == '+' && rettv->v_type == VAR_LIST
 						   && var2.v_type == VAR_LIST)
 	    {
-		if (eval_addlist(rettv, &var2) == FAIL)
-		    return FAIL;
+		ఒకవేళ (eval_addlist(rettv, &var2) == FAIL)
+		    తిరిగి FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_TUPLE
+	    లేకపోతే ఒకవేళ (op == '+' && rettv->v_type == VAR_TUPLE
 					   && var2.v_type == VAR_TUPLE)
 	    {
-		if (eval_addtuple(rettv, &var2) == FAIL)
-		    return FAIL;
+		ఒకవేళ (eval_addtuple(rettv, &var2) == FAIL)
+		    తిరిగి FAIL;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (eval_addsub_number(rettv, &var2, op) == FAIL)
-		    return FAIL;
+		ఒకవేళ (eval_addsub_సంఖ్య(rettv, &var2, op) == FAIL)
+		    తిరిగి FAIL;
 	    }
 	    clear_tv(&var2);
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Multiply or divide or compute the modulo of numbers "tv1" and "tv2" and
  * store the result in "tv1".  The numbers can be whole numbers or floats.
  */
-    static int
-eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
+    స్థిర పూర్ణాంకం
+eval_multdiv_సంఖ్య(typval_T *tv1, typval_T *tv2, పూర్ణాంకం op)
 {
     varnumber_T	n1, n2;
     float_T	f1, f2;
-    int		error;
-    int		use_float = FALSE;
+    పూర్ణాంకం		error;
+    పూర్ణాంకం		use_float = FALSE;
 
     f1 = 0;
     f2 = 0;
     error = FALSE;
-    if (tv1->v_type == VAR_FLOAT)
+    ఒకవేళ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	use_float = TRUE;
 	n1 = 0;
     }
-    else
-	n1 = tv_get_number_chk(tv1, &error);
+    లేకపోతే
+	n1 = tv_get_సంఖ్య_chk(tv1, &error);
     clear_tv(tv1);
-    if (error)
+    ఒకవేళ (error)
     {
 	clear_tv(tv2);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (tv2->v_type == VAR_FLOAT)
+    ఒకవేళ (tv2->v_type == VAR_FLOAT)
     {
-	if (!use_float)
+	ఒకవేళ (!use_float)
 	{
 	    f1 = n1;
 	    use_float = TRUE;
@@ -4850,13 +4850,13 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    లేకపోతే
     {
-	n2 = tv_get_number_chk(tv2, &error);
+	n2 = tv_get_సంఖ్య_chk(tv2, &error);
 	clear_tv(tv2);
-	if (error)
-	    return FAIL;
-	if (use_float)
+	ఒకవేళ (error)
+	    తిరిగి FAIL;
+	ఒకవేళ (use_float)
 	    f2 = n2;
     }
 
@@ -4864,57 +4864,57 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
      * Compute the result.
      * When either side is a float the result is a float.
      */
-    if (use_float)
+    ఒకవేళ (use_float)
     {
-	if (op == '*')
+	ఒకవేళ (op == '*')
 	    f1 = f1 * f2;
-	else if (op == '/')
+	లేకపోతే ఒకవేళ (op == '/')
 	{
-#ifdef VMS
+#నిర్వచితమైతే VMS
 	    // VMS crashes on divide by zero, work around it
-	    if (f2 == 0.0)
+	    ఒకవేళ (f2 == 0.0)
 	    {
-		if (f1 == 0)
+		ఒకవేళ (f1 == 0)
 		    f1 = -1 * __F_FLT_MAX - 1L;   // similar to NaN
-		else if (f1 < 0)
+		లేకపోతే ఒకవేళ (f1 < 0)
 		    f1 = -1 * __F_FLT_MAX;
-		else
+		లేకపోతే
 		    f1 = __F_FLT_MAX;
 	    }
-	    else
+	    లేకపోతే
 		f1 = f1 / f2;
-#else
+#లేకపోతే
 	    // We rely on the floating point library to handle divide
 	    // by zero to result in "inf" and not a crash.
 	    f1 = f1 / f2;
-#endif
+#అయితే_ముగింపు
 	}
-	else
+	లేకపోతే
 	{
 	    emsg(_(e_cannot_use_percent_with_float));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    లేకపోతే
     {
-	int	    failed = FALSE;
+	పూర్ణాంకం	    failed = FALSE;
 
-	if (op == '*')
+	ఒకవేళ (op == '*')
 	    n1 = n1 * n2;
-	else if (op == '/')
-	    n1 = num_divide(n1, n2, &failed);
-	else
-	    n1 = num_modulus(n1, n2, &failed);
-	if (failed)
-	    return FAIL;
+	లేకపోతే ఒకవేళ (op == '/')
+	    n1 = అంకె_divide(n1, n2, &failed);
+	లేకపోతే
+	    n1 = అంకె_modulus(n1, n2, &failed);
+	ఒకవేళ (failed)
+	    తిరిగి FAIL;
 
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_సంఖ్య;
+	tv1->vval.v_సంఖ్య = n1;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -4928,46 +4928,46 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval7(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)  // after "." operator
+    పూర్ణాంకం		want_string)  // after "." operator
 {
     /*
      * Get the first expression.
      */
-    if (eval8(arg, rettv, evalarg, want_string) == FAIL)
-	return FAIL;
+    ఒకవేళ (eval8(arg, rettv, evalarg, want_string) == FAIL)
+	తిరిగి FAIL;
 
     /*
      * Repeat computing, until no '*', '/' or '%' is following.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	పూర్ణాంకం	    evaluate;
+	పూర్ణాంకం	    getnext;
 	typval_T    var2;
 	char_u	    *p;
-	int	    op;
+	పూర్ణాంకం	    op;
 
 	// "*=", "/=" and "%=" are assignments
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
+	p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
 	op = *p;
-	if ((op != '*' && op != '/' && op != '%') || p[1] == '=')
-	    break;
+	ఒకవేళ ((op != '*' && op != '/' && op != '%') || p[1] == '=')
+	    ఆపు;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	evaluate = evalarg == ఖాళీ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	ఒకవేళ (getnext)
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg);
+	లేకపోతే
 	{
-	    if (evaluate && in_vim9script() && !VIM_ISWHITE(**arg))
+	    ఒకవేళ (evaluate && లోపల_vim9script() && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    *arg = p;
 	}
@@ -4975,23 +4975,23 @@ eval7(
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && in_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
+	ఒకవేళ (evaluate && లోపల_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg, 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval8(arg, &var2, evalarg, FALSE) == FAIL)
-	    return FAIL;
+	ఒకవేళ (eval8(arg, &var2, evalarg, FALSE) == FAIL)
+	    తిరిగి FAIL;
 
-	if (evaluate)
+	ఒకవేళ (evaluate)
 	    // Compute the result.
-	    if (eval_multdiv_number(rettv, &var2, op) == FAIL)
-		return FAIL;
+	    ఒకవేళ (eval_multdiv_సంఖ్య(rettv, &var2, op) == FAIL)
+		తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -5001,47 +5001,47 @@ eval7(
  * "arg" is advanced to just after the recognized expression.
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval8(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    పూర్ణాంకం		want_string)	// after "." operator
 {
-    type_T	*want_type = NULL;
+    type_T	*want_type = ఖాళీ;
     garray_T	type_list;	    // list of pointers to allocated types
-    int		res;
-    int		evaluate = evalarg == NULL ? 0
+    పూర్ణాంకం		res;
+    పూర్ణాంకం		evaluate = evalarg == ఖాళీ ? 0
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
 
     // Recognize <type> in Vim9 script only.
-    if (in_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
+    ఒకవేళ (లోపల_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
 					     && STRNCMP(*arg, "<SNR>", 5) != 0)
     {
 	++*arg;
-	ga_init2(&type_list, sizeof(type_T *), 10);
-	if (!evaluate)
+	ga_init2(&type_list, పరిమాణం(type_T *), 10);
+	ఒకవేళ (!evaluate)
 	    // Only skip over the type, it may use a type variable that is only
 	    // known when the expression is compiled, e.g. in a lambda.
 	    *arg = skip_type(*arg, FALSE);
-	else
+	లేకపోతే
 	{
-	    want_type = parse_type(arg, &type_list, NULL, NULL, TRUE);
-	    if (want_type == NULL)
+	    want_type = parse_type(arg, &type_list, ఖాళీ, ఖాళీ, TRUE);
+	    ఒకవేళ (want_type == ఖాళీ)
 	    {
 		clear_type_list(&type_list);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
-	if (**arg != '>')
+	ఒకవేళ (**arg != '>')
 	{
-	    if (*skipwhite(*arg) == '>')
+	    ఒకవేళ (*skipwhite(*arg) == '>')
 		semsg(_(e_no_white_space_allowed_before_str_str), ">", *arg);
-	    else
+	    లేకపోతే
 		emsg(_(e_missing_gt));
 	    clear_type_list(&type_list);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	++*arg;
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
@@ -5049,27 +5049,27 @@ eval8(
 
     res = eval9(arg, rettv, evalarg, want_string);
 
-    if (want_type != NULL)
+    ఒకవేళ (want_type != ఖాళీ)
     {
-	if (evaluate && res == OK)
+	ఒకవేళ (evaluate && res == OK)
 	{
 	    type_T *actual = typval2type(rettv, get_copyID(), &type_list,
 							       TVTT_DO_MEMBER);
 
-	    if (!equal_type(want_type, actual, 0))
+	    ఒకవేళ (!equal_type(want_type, actual, 0))
 	    {
-		if (want_type->tt_type == VAR_BOOL
+		ఒకవేళ (want_type->tt_type == VAR_BOOL
 					&& actual->tt_type != VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		{
-		    int n = tv2bool(rettv);
+		    పూర్ణాంకం n = tv2bool(rettv);
 
 		    // can use "0" and "1" for boolean in some places
 		    clear_tv(rettv);
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = n ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_సంఖ్య = n ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		లేకపోతే
 		{
 		    where_T where = WHERE_INIT;
 
@@ -5080,239 +5080,239 @@ eval8(
 	clear_type_list(&type_list);
     }
 
-    return res;
+    తిరిగి res;
 }
 
-    int
-eval_leader(char_u **arg, int vim9)
+    పూర్ణాంకం
+eval_leader(char_u **arg, పూర్ణాంకం vim9)
 {
     char_u	*s = *arg;
     char_u	*p = *arg;
 
-    while (*p == '!' || *p == '-' || *p == '+')
+    అయితే (*p == '!' || *p == '-' || *p == '+')
     {
 	char_u *n = skipwhite(p + 1);
 
 	// ++, --, -+ and +- are not accepted in Vim9 script
-	if (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
+	ఒకవేళ (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
 	{
-	    semsg(_(e_invalid_expression_str), s);
-	    return FAIL;
+	    semsg(_(e_invalid_వ్యక్తీకరణ_str), s);
+	    తిరిగి FAIL;
 	}
 	p = n;
     }
     *arg = p;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Check for a predefined value "true", "false" and "null.*".
  * Return OK when recognized.
  */
-    int
-handle_predefined(char_u *s, int len, typval_T *rettv)
+    పూర్ణాంకం
+handle_predefined(char_u *s, పూర్ణాంకం len, typval_T *rettv)
 {
-    switch (len)
+    ఎంపిక (len)
     {
-	case 4: if (STRNCMP(s, "true", 4) == 0)
+	స్థితి 4: ఒకవేళ (STRNCMP(s, "true", 4) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_TRUE;
-		    return OK;
+		    rettv->vval.v_సంఖ్య = VVAL_TRUE;
+		    తిరిగి OK;
 		}
-		if (STRNCMP(s, "null", 4) == 0)
+		ఒకవేళ (STRNCMP(s, "null", 4) == 0)
 		{
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-		    return OK;
+		    rettv->vval.v_సంఖ్య = VVAL_NULL;
+		    తిరిగి OK;
 		}
-		break;
-	case 5: if (STRNCMP(s, "false", 5) == 0)
+		ఆపు;
+	స్థితి 5: ఒకవేళ (STRNCMP(s, "false", 5) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_FALSE;
-		    return OK;
+		    rettv->vval.v_సంఖ్య = VVAL_FALSE;
+		    తిరిగి OK;
 		}
-		break;
-	case 8: if (STRNCMP(s, "null_job", 8) == 0)
+		ఆపు;
+	స్థితి 8: ఒకవేళ (STRNCMP(s, "null_job", 8) == 0)
 		{
-#ifdef FEAT_JOB_CHANNEL
-		    rettv->v_type = VAR_JOB;
-		    rettv->vval.v_job = NULL;
-#else
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+		    rettv->v_type = VAR_పని;
+		    rettv->vval.v_పని = ఖాళీ;
+#లేకపోతే
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-#endif
-		    return OK;
+		    rettv->vval.v_సంఖ్య = VVAL_NULL;
+#అయితే_ముగింపు
+		    తిరిగి OK;
 		}
-		break;
-	case 9:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		ఆపు;
+	స్థితి 9:
+		ఒకవేళ (STRNCMP(s, "null_", 5) != 0)
+		    ఆపు;
 		// null_list
-		if (STRNCMP(s + 5, "list", 4) == 0)
+		ఒకవేళ (STRNCMP(s + 5, "list", 4) == 0)
 		{
 		    rettv->v_type = VAR_LIST;
-		    rettv->vval.v_list = NULL;
-		    return OK;
+		    rettv->vval.v_list = ఖాళీ;
+		    తిరిగి OK;
 		}
 		// null_dict
-		if (STRNCMP(s + 5, "dict", 4) == 0)
+		ఒకవేళ (STRNCMP(s + 5, "dict", 4) == 0)
 		{
 		    rettv->v_type = VAR_DICT;
-		    rettv->vval.v_dict = NULL;
-		    return OK;
+		    rettv->vval.v_dict = ఖాళీ;
+		    తిరిగి OK;
 		}
 		// null_blob
-		if (STRNCMP(s + 5, "blob", 4) == 0)
+		ఒకవేళ (STRNCMP(s + 5, "blob", 4) == 0)
 		{
 		    rettv->v_type = VAR_BLOB;
-		    rettv->vval.v_blob = NULL;
-		    return OK;
+		    rettv->vval.v_blob = ఖాళీ;
+		    తిరిగి OK;
 		}
-		break;
-	case 10:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		ఆపు;
+	స్థితి 10:
+		ఒకవేళ (STRNCMP(s, "null_", 5) != 0)
+		    ఆపు;
 		// null_class
-		if (STRNCMP(s + 5, "class", 5) == 0)
+		ఒకవేళ (STRNCMP(s + 5, "class", 5) == 0)
 		{
 		    rettv->v_type = VAR_CLASS;
-		    rettv->vval.v_class = NULL;
-		    return OK;
+		    rettv->vval.v_class = ఖాళీ;
+		    తిరిగి OK;
 		}
-		if (STRNCMP(s + 5, "tuple", 5) == 0)
+		ఒకవేళ (STRNCMP(s + 5, "tuple", 5) == 0)
 		{
 		    rettv->v_type = VAR_TUPLE;
-		    rettv->vval.v_tuple = NULL;
-		    return OK;
+		    rettv->vval.v_tuple = ఖాళీ;
+		    తిరిగి OK;
 		}
-		break;
-	case 11: if (STRNCMP(s, "null_string", 11) == 0)
+		ఆపు;
+	స్థితి 11: ఒకవేళ (STRNCMP(s, "null_string", 11) == 0)
 		{
 		    rettv->v_type = VAR_STRING;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ఖాళీ;
+		    తిరిగి OK;
 		}
-		if (STRNCMP(s, "null_object", 11) == 0)
+		ఒకవేళ (STRNCMP(s, "null_object", 11) == 0)
 		{
 		    rettv->v_type = VAR_OBJECT;
-		    rettv->vval.v_object = NULL;
-		    return OK;
+		    rettv->vval.v_object = ఖాళీ;
+		    తిరిగి OK;
 		}
-		break;
-	case 12:
-		if (STRNCMP(s, "null_channel", 12) == 0)
+		ఆపు;
+	స్థితి 12:
+		ఒకవేళ (STRNCMP(s, "null_channel", 12) == 0)
 		{
-#ifdef FEAT_JOB_CHANNEL
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 		    rettv->v_type = VAR_CHANNEL;
-		    rettv->vval.v_channel = NULL;
-#else
+		    rettv->vval.v_channel = ఖాళీ;
+#లేకపోతే
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-#endif
-		    return OK;
+		    rettv->vval.v_సంఖ్య = VVAL_NULL;
+#అయితే_ముగింపు
+		    తిరిగి OK;
 		}
-		if (STRNCMP(s, "null_partial", 12) == 0)
+		ఒకవేళ (STRNCMP(s, "null_partial", 12) == 0)
 		{
 		    rettv->v_type = VAR_PARTIAL;
-		    rettv->vval.v_partial = NULL;
-		    return OK;
+		    rettv->vval.v_partial = ఖాళీ;
+		    తిరిగి OK;
 		}
-		break;
-	case 13: if (STRNCMP(s, "null_function", 13) == 0)
+		ఆపు;
+	స్థితి 13: ఒకవేళ (STRNCMP(s, "null_function", 13) == 0)
 		{
 		    rettv->v_type = VAR_FUNC;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ఖాళీ;
+		    తిరిగి OK;
 		}
-		break;
+		ఆపు;
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Handle register contents: @r.
  */
-    static void
+    స్థిర శూన్య
 eval9_reg_contents(
     char_u	**arg,
     typval_T	*rettv,
-    int		evaluate)
+    పూర్ణాంకం		evaluate)
 {
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
     ++*arg;	// skip '@'
-    if (evaluate)
+    ఒకవేళ (evaluate)
     {
-	if (vim9script && IS_WHITE_OR_NUL(**arg))
+	ఒకవేళ (vim9script && IS_WHITE_OR_NUL(**arg))
 	    semsg(_(e_syntax_error_at_str), *arg);
-	else if (vim9script && !valid_yank_reg(**arg, FALSE))
+	లేకపోతే ఒకవేళ (vim9script && !valid_yank_reg(**arg, FALSE))
 	    emsg_invreg(**arg);
-	else
+	లేకపోతే
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = get_reg_contents(**arg,
-		    GREG_EXPR_SRC);
+		    GREG_సమాసం_SRC);
 	}
     }
-    if (**arg != NUL)
+    ఒకవేళ (**arg != NUL)
 	++*arg;
 }
 
 /*
  * Handle a nested expression: (expression) or lambda: (arg) => expr
  */
-    static int
-eval9_nested_expr(
+    స్థిర పూర్ణాంకం
+eval9_nested_సమాసం(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate)
+    పూర్ణాంకం		evaluate)
 {
-    int		ret = NOTDONE;
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		ret = NOTDONE;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
-    if (vim9script)
+    ఒకవేళ (vim9script)
     {
-	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, NULL);
-	if (ret == OK && evaluate)
+	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, ఖాళీ);
+	ఒకవేళ (ret == OK && evaluate)
 	{
 	    ufunc_T *ufunc = rettv->vval.v_partial->pt_func;
 
 	    // Compile it here to get the return type.  The return
 	    // type is optional, when it's missing use t_unknown.
 	    // This is recognized in compile_return().
-	    if (ufunc->uf_ret_type->tt_type == VAR_VOID)
+	    ఒకవేళ (ufunc->uf_ret_type->tt_type == VAR_VOID)
 		ufunc->uf_ret_type = &t_unknown;
-	    if (compile_def_function(ufunc, FALSE,
-				get_compile_type(ufunc), NULL) == FAIL)
+	    ఒకవేళ (compile_def_function(ufunc, FALSE,
+				get_compile_type(ufunc), ఖాళీ) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
     }
-    if (ret == NOTDONE)
+    ఒకవేళ (ret == NOTDONE)
     {
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ')')
+	ఒకవేళ (**arg == ')')
 	    // empty tuple
 	    ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	else
+	లేకపోతే
 	{
 	    ret = eval1(arg, rettv, evalarg);	// recursive!
-	    if (ret != OK)
-		return ret;
+	    ఒకవేళ (ret != OK)
+		తిరిగి ret;
 
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
 
-	    if (**arg == ',')
+	    ఒకవేళ (**arg == ',')
 		// tuple
 		ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	    else if (**arg == ')')
+	    లేకపోతే ఒకవేళ (**arg == ')')
 		++*arg;
-	    else if (ret == OK)
+	    లేకపోతే ఒకవేళ (ret == OK)
 	    {
 		emsg(_(e_missing_closing_paren));
 		clear_tv(rettv);
@@ -5321,90 +5321,90 @@ eval9_nested_expr(
 	}
     }
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
 * Handle be a variable or function name.
 * Can also be a curly-braces kind of name: {expr}.
 */
-    static int
+    స్థిర పూర్ణాంకం
 eval9_var_func_name(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate,
-    char_u	**name_start)
+    పూర్ణాంకం		evaluate,
+    char_u	**name_ప్రారంభం)
 {
     char_u	*s;
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*alias;
-    int		ret = OK;
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		ret = OK;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
     s = *arg;
     len = get_name_len(arg, &alias, evaluate, TRUE);
-    if (alias != NULL)
+    ఒకవేళ (alias != ఖాళీ)
 	s = alias;
 
-    if (len <= 0)
+    ఒకవేళ (len <= 0)
 	ret = FAIL;
-    else
+    లేకపోతే
     {
-	int	flags = evalarg == NULL ? 0 : evalarg->eval_flags;
+	పూర్ణాంకం	flags = evalarg == ఖాళీ ? 0 : evalarg->eval_flags;
 
-	if (evaluate && vim9script && len == 1 && *s == '_')
+	ఒకవేళ (evaluate && vim9script && len == 1 && *s == '_')
 	{
-	    emsg(_(e_cannot_use_underscore_here));
+	    emsg(_(e_cannot_use_underscore_ఇక్కడ));
 	    ret = FAIL;
 	}
-	else if (evaluate && vim9script && len > 2
+	లేకపోతే ఒకవేళ (evaluate && vim9script && len > 2
 						&& s[0] == 's' && s[1] == ':')
 	{
-	    semsg(_(e_cannot_use_s_colon_in_vim9_script_str), s);
+	    semsg(_(e_cannot_use_s_colon_లోపల_vim9_script_str), s);
 	    ret = FAIL;
 	}
-	else if ((vim9script ? **arg : *skipwhite(*arg)) == '('
+	లేకపోతే ఒకవేళ ((vim9script ? **arg : *skipwhite(*arg)) == '('
 				|| (vim9script && generic_func_call(arg)))
 	{
 	    // "name(..."  recursive!
 	    *arg = skipwhite(*arg);
-	    ret = eval_func(arg, evalarg, s, len, rettv, flags, NULL);
+	    ret = eval_func(arg, evalarg, s, len, rettv, flags, ఖాళీ);
 	}
-	else if (evaluate)
+	లేకపోతే ఒకవేళ (evaluate)
 	{
 	    // get the value of "true", "false", etc. or a variable
 	    ret = FAIL;
-	    if (vim9script)
+	    ఒకవేళ (vim9script)
 		ret = handle_predefined(s, len, rettv);
-	    if (ret == FAIL)
+	    ఒకవేళ (ret == FAIL)
 	    {
-		*name_start = s;
-		ret = eval_variable(s, len, 0, rettv, NULL,
+		*name_ప్రారంభం = s;
+		ret = eval_variable(s, len, 0, rettv, ఖాళీ,
 					EVAL_VAR_VERBOSE + EVAL_VAR_IMPORT);
 
 		// skip the generic function arguments (if present)
 		// they are already processed by eval_variable
-		if (ret == OK && vim9script && **arg == '<'
+		ఒకవేళ (ret == OK && vim9script && **arg == '<'
 						&& rettv->v_type == VAR_FUNC)
-		    ret = skip_generic_func_type_args(arg);
+		    ret = skip_generic_func_type_వాదనలు(arg);
 	    }
 	}
-	else
+	లేకపోతే
 	{
 	    // skip the name
 	    check_vars(s, len);
 
 	    // Skip the type arguments of a generic function, its name starts
 	    // with an uppercase letter.
-	    if (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
-		skip_generic_func_type_args(arg);
+	    ఒకవేళ (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
+		skip_generic_func_type_వాదనలు(arg);
 	    ret = OK;
 	}
     }
     vim_free(alias);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -5438,20 +5438,20 @@ eval9_var_func_name(
  *
  * Return OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval9(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    పూర్ణాంకం		want_string)	// after "." operator
 {
-    int		evaluate = evalarg != NULL
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    char_u	*name_start = NULL;
-    char_u	*start_leader, *end_leader;
-    int		ret = OK;
-    static int	recurse = 0;
-    int		vim9script = in_vim9script();
+    char_u	*name_ప్రారంభం = ఖాళీ;
+    char_u	*ప్రారంభం_leader, *చివర_leader;
+    పూర్ణాంకం		ret = OK;
+    స్థిర పూర్ణాంకం	recurse = 0;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
     /*
      * Initialise variable so that clear_tv() can't mistake this for a
@@ -5462,149 +5462,149 @@ eval9(
     /*
      * Skip '!', '-' and '+' characters.  They are handled later.
      */
-    start_leader = *arg;
-    if (eval_leader(arg, vim9script) == FAIL)
-	return FAIL;
-    end_leader = *arg;
+    ప్రారంభం_leader = *arg;
+    ఒకవేళ (eval_leader(arg, vim9script) == FAIL)
+	తిరిగి FAIL;
+    చివర_leader = *arg;
 
-    if (**arg == '.' && (!SAFE_isdigit(*(*arg + 1)) || in_old_script(2)))
+    ఒకవేళ (**arg == '.' && (!సురక్షిత_isdigit(*(*arg + 1)) || లోపల_old_script(2)))
     {
-	semsg(_(e_invalid_expression_str), *arg);
+	semsg(_(e_invalid_వ్యక్తీకరణ_str), *arg);
 	++*arg;
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // Limit recursion to 1000 levels.  At least at 10000 we run out of stack
     // and crash.  With MSVC the stack is smaller.
-    if (recurse ==
-#ifdef _MSC_VER
+    ఒకవేళ (recurse ==
+#నిర్వచితమైతే _MSC_VER
 		    300
-#else
+#లేకపోతే
 		    1000
-#endif
+#అయితే_ముగింపు
 		    )
     {
-	semsg(_(e_expression_too_recursive_str), *arg);
-	return FAIL;
+	semsg(_(e_వ్యక్తీకరణ_too_recursive_str), *arg);
+	తిరిగి FAIL;
     }
     ++recurse;
 
-    switch (**arg)
+    ఎంపిక (**arg)
     {
     /*
      * Number constant.
      */
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-    case '.':	ret = eval_number(arg, rettv, evaluate, want_string);
+    స్థితి '0':
+    స్థితి '1':
+    స్థితి '2':
+    స్థితి '3':
+    స్థితి '4':
+    స్థితి '5':
+    స్థితి '6':
+    స్థితి '7':
+    స్థితి '8':
+    స్థితి '9':
+    స్థితి '.':	ret = eval_సంఖ్య(arg, rettv, evaluate, want_string);
 
 		// Apply prefixed "-" and "+" now.  Matters especially when
 		// "->" follows.
-		if (ret == OK && evaluate && end_leader > start_leader
+		ఒకవేళ (ret == OK && evaluate && చివర_leader > ప్రారంభం_leader
 						  && rettv->v_type != VAR_BLOB)
-		    ret = eval9_leader(rettv, TRUE, start_leader, &end_leader);
-		break;
+		    ret = eval9_leader(rettv, TRUE, ప్రారంభం_leader, &చివర_leader);
+		ఆపు;
 
     /*
      * String constant: "string".
      */
-    case '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
-		break;
+    స్థితి '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
+		ఆపు;
 
     /*
      * Literal string constant: 'str''ing'.
      */
-    case '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
-		break;
+    స్థితి '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
+		ఆపు;
 
     /*
      * List: [expr, expr]
      */
-    case '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
-		break;
+    స్థితి '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
+		ఆపు;
 
     /*
      * Literal Dictionary: #{key: val, key: val}
      */
-    case '#':	ret = eval_lit_dict(arg, rettv, evalarg);
-		break;
+    స్థితి '#':	ret = eval_lit_dict(arg, rettv, evalarg);
+		ఆపు;
 
     /*
      * Lambda: {arg, arg -> expr}
      * Dictionary: {'key': val, 'key': val}
      */
-    case '{':	if (vim9script)
+    స్థితి '{':	ఒకవేళ (vim9script)
 		    ret = NOTDONE;
-		else
-		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, NULL);
-		if (ret == NOTDONE)
+		లేకపోతే
+		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, ఖాళీ);
+		ఒకవేళ (ret == NOTDONE)
 		    ret = eval_dict(arg, rettv, evalarg, FALSE);
-		break;
+		ఆపు;
 
     /*
      * Option value: &name
      */
-    case '&':	ret = eval_option(arg, rettv, evaluate);
-		break;
+    స్థితి '&':	ret = eval_option(arg, rettv, evaluate);
+		ఆపు;
 
     /*
      * Environment variable: $VAR.
      * Interpolated string: $"string" or $'string'.
      */
-    case '$':	if ((*arg)[1] == '"' || (*arg)[1] == '\'')
+    స్థితి '$':	ఒకవేళ ((*arg)[1] == '"' || (*arg)[1] == '\'')
 		    ret = eval_interp_string(arg, rettv, evaluate);
-		else
+		లేకపోతే
 		    ret = eval_env_var(arg, rettv, evaluate);
-		break;
+		ఆపు;
 
     /*
      * Register contents: @r.
      */
-    case '@':	eval9_reg_contents(arg, rettv, evaluate);
-		break;
+    స్థితి '@':	eval9_reg_contents(arg, rettv, evaluate);
+		ఆపు;
 
     /*
      * nested expression: (expression).
      * or lambda: (arg) => expr
      * or tuple
      */
-    case '(':	ret = eval9_nested_expr(arg, rettv, evalarg, evaluate);
-		break;
+    స్థితి '(':	ret = eval9_nested_సమాసం(arg, rettv, evalarg, evaluate);
+		ఆపు;
 
-    default:	ret = NOTDONE;
-		break;
+    అప్రమేయ:	ret = NOTDONE;
+		ఆపు;
     }
 
-    if (ret == NOTDONE)
+    ఒకవేళ (ret == NOTDONE)
     {
 	/*
 	 * Must be a variable or function name.
 	 * Can also be a curly-braces kind of name: {expr}.
 	 */
-	ret = eval9_var_func_name(arg, rettv, evalarg, evaluate, &name_start);
+	ret = eval9_var_func_name(arg, rettv, evalarg, evaluate, &name_ప్రారంభం);
     }
 
     // Handle following '[', '(' and '.' for expr[expr], expr.name,
     // expr(expr), expr->name(expr)
-    if (ret == OK)
-	ret = handle_subscript(arg, name_start, rettv, evalarg, evaluate);
+    ఒకవేళ (ret == OK)
+	ret = handle_subscript(arg, name_ప్రారంభం, rettv, evalarg, evaluate);
 
     /*
      * Apply logical NOT and unary '-', from right to left, ignore '+'.
      */
-    if (ret == OK && evaluate && end_leader > start_leader)
-	ret = eval9_leader(rettv, FALSE, start_leader, &end_leader);
+    ఒకవేళ (ret == OK && evaluate && చివర_leader > ప్రారంభం_leader)
+	ret = eval9_leader(rettv, FALSE, ప్రారంభం_leader, &చివర_leader);
 
     --recurse;
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -5612,167 +5612,167 @@ eval9(
  * When "numeric_only" is TRUE only handle "+" and "-".
  * Adjusts "end_leaderp" until it is at "start_leader".
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval9_leader(
 	typval_T    *rettv,
-	int	    numeric_only,
-	char_u	    *start_leader,
-	char_u	    **end_leaderp)
+	పూర్ణాంకం	    numeric_only,
+	char_u	    *ప్రారంభం_leader,
+	char_u	    **చివర_leaderp)
 {
-    char_u	*end_leader = *end_leaderp;
-    int		ret = OK;
-    int		error = FALSE;
+    char_u	*చివర_leader = *చివర_leaderp;
+    పూర్ణాంకం		ret = OK;
+    పూర్ణాంకం		error = FALSE;
     varnumber_T val = 0;
     vartype_T	type = rettv->v_type;
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
     float_T	    f = 0.0;
 
-    if (rettv->v_type == VAR_FLOAT)
+    ఒకవేళ (rettv->v_type == VAR_FLOAT)
 	f = rettv->vval.v_float;
-    else
+    లేకపోతే
     {
-	while (VIM_ISWHITE(end_leader[-1]))
-	    --end_leader;
-	if (vim9script && end_leader[-1] == '!')
+	అయితే (VIM_ISWHITE(చివర_leader[-1]))
+	    --చివర_leader;
+	ఒకవేళ (vim9script && చివర_leader[-1] == '!')
 	{
 	    // Is this typeval supported with the ! operator?
-	    if (check_typval_is_value(rettv) == FAIL)
+	    ఒకవేళ (check_typval_is_విలువ(rettv) == FAIL)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    val = tv2bool(rettv);
 	}
-	else
-	    val = tv_get_number_chk(rettv, &error);
+	లేకపోతే
+	    val = tv_get_సంఖ్య_chk(rettv, &error);
     }
-    if (error)
+    ఒకవేళ (error)
     {
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
+    లేకపోతే
     {
-	while (end_leader > start_leader)
+	అయితే (చివర_leader > ప్రారంభం_leader)
 	{
-	    --end_leader;
-	    if (*end_leader == '!')
+	    --చివర_leader;
+	    ఒకవేళ (*చివర_leader == '!')
 	    {
-		if (numeric_only)
+		ఒకవేళ (numeric_only)
 		{
-		    ++end_leader;
-		    break;
+		    ++చివర_leader;
+		    ఆపు;
 		}
-		if (rettv->v_type == VAR_FLOAT)
+		ఒకవేళ (rettv->v_type == VAR_FLOAT)
 		{
 		    rettv->v_type = VAR_BOOL;
 		    val = f == 0.0 ? VVAL_TRUE : VVAL_FALSE;
 		    type = VAR_BOOL;
 		}
-		else
+		లేకపోతే
 		{
 		    val = !val;
 		    type = VAR_BOOL;
 		}
 	    }
-	    else if (*end_leader == '-')
+	    లేకపోతే ఒకవేళ (*చివర_leader == '-')
 	    {
-		if (rettv->v_type == VAR_FLOAT)
+		ఒకవేళ (rettv->v_type == VAR_FLOAT)
 		    f = -f;
-		else
+		లేకపోతే
 		{
 		    val = -val;
-		    type = VAR_NUMBER;
+		    type = VAR_సంఖ్య;
 		}
 	    }
 	}
-	if (rettv->v_type == VAR_FLOAT)
+	ఒకవేళ (rettv->v_type == VAR_FLOAT)
 	{
 	    clear_tv(rettv);
 	    rettv->vval.v_float = f;
 	}
-	else
+	లేకపోతే
 	{
 	    clear_tv(rettv);
-	    if (vim9script)
+	    ఒకవేళ (vim9script)
 		rettv->v_type = type;
-	    else
-		rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = val;
+	    లేకపోతే
+		rettv->v_type = VAR_సంఖ్య;
+	    rettv->vval.v_సంఖ్య = val;
 	}
     }
-    *end_leaderp = end_leader;
-    return ret;
+    *చివర_leaderp = చివర_leader;
+    తిరిగి ret;
 }
 
 /*
  * Call the function referred to in "rettv".
  */
-    static int
+    స్థిర పూర్ణాంకం
 call_func_rettv(
 	char_u	    **arg,
 	evalarg_T   *evalarg,
 	typval_T    *rettv,
-	int	    evaluate,
+	పూర్ణాంకం	    evaluate,
 	dict_T	    *selfdict,
 	typval_T    *basetv)
 {
-    partial_T	*pt = NULL;
+    partial_T	*pt = ఖాళీ;
     funcexe_T	funcexe;
     typval_T	functv;
     char_u	*s;
-    int		ret;
+    పూర్ణాంకం		ret;
 
     // need to copy the funcref so that we can clear rettv
-    if (evaluate)
+    ఒకవేళ (evaluate)
     {
 	functv = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	// Invoke the function.  Recursive!
-	if (functv.v_type == VAR_PARTIAL)
+	ఒకవేళ (functv.v_type == VAR_PARTIAL)
 	{
 	    pt = functv.vval.v_partial;
 	    s = partial_name(pt);
 	}
-	else
+	లేకపోతే
 	{
 	    s = functv.vval.v_string;
-	    if (s == NULL || *s == NUL)
+	    ఒకవేళ (s == ఖాళీ || *s == NUL)
 	    {
-		emsg(_(e_empty_function_name));
+		emsg(_(e_ఖాళీలు_function_name));
 		ret = FAIL;
-		goto theend;
+		వెళ్ళు theend;
 	    }
 	}
     }
-    else
+    లేకపోతే
 	s = (char_u *)"";
 
-    CLEAR_FIELD(funcexe);
+    CLEAR_క్షేత్రం(funcexe);
     funcexe.fe_firstline = curwin->w_cursor.lnum;
     funcexe.fe_lastline = curwin->w_cursor.lnum;
     funcexe.fe_evaluate = evaluate;
     funcexe.fe_partial = pt;
-    if (pt != NULL)
+    ఒకవేళ (pt != ఖాళీ)
     {
 	funcexe.fe_object = pt->pt_obj;
-	if (funcexe.fe_object != NULL)
+	ఒకవేళ (funcexe.fe_object != ఖాళీ)
 	    ++funcexe.fe_object->obj_refcount;
     }
     funcexe.fe_selfdict = selfdict;
     funcexe.fe_basetv = basetv;
-    if (evalarg != NULL)
+    ఒకవేళ (evalarg != ఖాళీ)
 	funcexe.fe_cctx = evalarg->eval_cctx;
     ret = get_func_tv(s, -1, rettv, arg, evalarg, &funcexe);
 
 theend:
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
+    ఒకవేళ (evaluate)
 	clear_tv(&functv);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -5780,68 +5780,68 @@ theend:
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
+    స్థిర పూర్ణాంకం
 eval_lambda(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    పూర్ణాంకం		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    typval_T	base = *rettv;
-    int		ret;
+    typval_T	పునాది = *rettv;
+    పూర్ణాంకం		ret;
 
     rettv->v_type = VAR_UNKNOWN;
 
-    if (**arg == '{')
+    ఒకవేళ (**arg == '{')
     {
 	// ->{lambda}()
-	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, NULL);
+	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, ఖాళీ);
     }
-    else
+    లేకపోతే
     {
 	// ->(lambda)()
 	++*arg;
 	ret = eval1(arg, rettv, evalarg);
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ')')
+	ఒకవేళ (**arg != ')')
 	{
 	    emsg(_(e_missing_closing_paren));
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	if (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
+	ఒకవేళ (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
 					       && rettv->v_type != VAR_PARTIAL)
 	{
-	    emsg(_(e_string_or_function_required_for_arrow_parens_expr));
-	    return FAIL;
+	    emsg(_(e_string_or_function_required_for_arrow_parens_సమాసం));
+	    తిరిగి FAIL;
 	}
 	++*arg;
     }
-    if (ret != OK)
-	return FAIL;
+    ఒకవేళ (ret != OK)
+	తిరిగి FAIL;
 
-    if (**arg != '(')
+    ఒకవేళ (**arg != '(')
     {
-	if (verbose)
+	ఒకవేళ (verbose)
 	{
-	    if (*skipwhite(*arg) == '(')
+	    ఒకవేళ (*skipwhite(*arg) == '(')
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
-	    else
+	    లేకపోతే
 		semsg(_(e_missing_parenthesis_str), "lambda");
 	}
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
-	ret = call_func_rettv(arg, evalarg, rettv, evaluate, NULL, &base);
+    లేకపోతే
+	ret = call_func_rettv(arg, evalarg, rettv, evaluate, ఖాళీ, &పునాది);
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
-	clear_tv(&base);
+    ఒకవేళ (evaluate)
+	clear_tv(&పునాది);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -5849,36 +5849,36 @@ eval_lambda(
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
-eval_method(
+    స్థిర పూర్ణాంకం
+eval_పద్ధతి(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    పూర్ణాంకం		verbose)	// give error messages
 {
     char_u	*name;
-    long	len;
+    దీర్ఘ	len;
     char_u	*alias;
-    char_u	*tofree = NULL;
-    typval_T	base = *rettv;
-    int		ret = OK;
-    int		evaluate = evalarg != NULL
+    char_u	*tofree = ఖాళీ;
+    typval_T	పునాది = *rettv;
+    పూర్ణాంకం		ret = OK;
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     rettv->v_type = VAR_UNKNOWN;
 
     name = *arg;
     len = get_name_len(arg, &alias, evaluate, evaluate);
-    if (alias != NULL)
+    ఒకవేళ (alias != ఖాళీ)
 	name = alias;
 
-    if (len <= 0)
+    ఒకవేళ (len <= 0)
     {
-	if (verbose)
-	    emsg(_(e_missing_name_after_method));
+	ఒకవేళ (verbose)
+	    emsg(_(e_missing_name_after_పద్ధతి));
 	ret = FAIL;
     }
-    else
+    లేకపోతే
     {
 	char_u *paren;
 
@@ -5887,70 +5887,70 @@ eval_method(
 	// Does not handle anything where "(" is part of the expression.
 	*arg = skipwhite(*arg);
 
-	if (**arg != '(' && alias == NULL
-				    && (paren = vim_strchr(*arg, '(')) != NULL)
+	ఒకవేళ (**arg != '(' && alias == ఖాళీ
+				    && (paren = vim_strchr(*arg, '(')) != ఖాళీ)
 	{
 	    *arg = name;
 
 	    // Truncate the name at the "(".  Avoid trying to get another line
 	    // by making "getline" NULL.
 	    *paren = NUL;
-	    char_u	*(*getline)(int, void *, int, getline_opt_T) = NULL;
-	    if (evalarg != NULL)
+	    char_u	*(*getline)(పూర్ణాంకం, శూన్య *, పూర్ణాంకం, getline_opt_T) = ఖాళీ;
+	    ఒకవేళ (evalarg != ఖాళీ)
 	    {
 		getline = evalarg->eval_getline;
-		evalarg->eval_getline = NULL;
+		evalarg->eval_getline = ఖాళీ;
 	    }
 
 	    char_u *deref = deref_function_name(arg, &tofree, evalarg, verbose);
-	    if (deref == NULL)
+	    ఒకవేళ (deref == ఖాళీ)
 	    {
 		*arg = name + len;
 		ret = FAIL;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		name = deref;
-		len = (long)STRLEN(name);
+		len = (దీర్ఘ)STRLEN(name);
 	    }
 
 	    *paren = '(';
-	    if (getline != NULL)
+	    ఒకవేళ (getline != ఖాళీ)
 		evalarg->eval_getline = getline;
 	}
 
-	if (ret == OK)
+	ఒకవేళ (ret == OK)
 	{
 	    *arg = skipwhite(*arg);
 
-	    if (**arg != '(')
+	    ఒకవేళ (**arg != '(')
 	    {
-		if (verbose)
+		ఒకవేళ (verbose)
 		    semsg(_(e_missing_parenthesis_str), name);
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE((*arg)[-1]))
+	    లేకపోతే ఒకవేళ (VIM_ISWHITE((*arg)[-1]))
 	    {
-		if (verbose)
+		ఒకవేళ (verbose)
 		    emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else
+	    లేకపోతే
 		ret = eval_func(arg, evalarg, name, len, rettv,
-					  evaluate ? EVAL_EVALUATE : 0, &base);
+					  evaluate ? EVAL_EVALUATE : 0, &పునాది);
 	}
     }
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
-	clear_tv(&base);
+    ఒకవేళ (evaluate)
+	clear_tv(&పునాది);
     vim_free(tofree);
 
-    if (alias != NULL)
+    ఒకవేళ (alias != ఖాళీ)
 	vim_free(alias);
 
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -5958,49 +5958,49 @@ eval_method(
  * "*arg" points to the '[' or '.'.
  * Returns FAIL or OK. "*arg" is advanced to after the ']'.
  */
-    static int
-eval_index(
+    స్థిర పూర్ణాంకం
+eval_సూచీ(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    పూర్ణాంకం		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		empty1 = FALSE, empty2 = FALSE;
+    పూర్ణాంకం		empty1 = FALSE, empty2 = FALSE;
     typval_T	var1, var2;
-    int		range = FALSE;
-    char_u	*key = NULL;
-    int		keylen = -1;
-    int		vim9script = in_vim9script();
+    పూర్ణాంకం		range = FALSE;
+    char_u	*కీలకం = ఖాళీ;
+    పూర్ణాంకం		keylen = -1;
+    పూర్ణాంకం		vim9script = లోపల_vim9script();
 
-    if (check_can_index(rettv, evaluate, verbose) == FAIL)
-	return FAIL;
+    ఒకవేళ (check_can_సూచీ(rettv, evaluate, verbose) == FAIL)
+	తిరిగి FAIL;
 
     init_tv(&var1);
     init_tv(&var2);
-    if (**arg == '.')
+    ఒకవేళ (**arg == '.')
     {
 	/*
 	 * dict.name
 	 */
-	key = *arg + 1;
-	for (keylen = 0; eval_isdictc(key[keylen]); ++keylen)
+	కీలకం = *arg + 1;
+	కొరకు (keylen = 0; eval_isdictc(కీలకం[keylen]); ++keylen)
 	    ;
-	if (keylen == 0)
-	    return FAIL;
-	if (vim9script && key[keylen] == '<')
+	ఒకవేళ (keylen == 0)
+	    తిరిగి FAIL;
+	ఒకవేళ (vim9script && కీలకం[keylen] == '<')
 	{
 	    // skip generic type arguments
-	    char_u	*p = &key[keylen];
+	    char_u	*p = &కీలకం[keylen];
 
-	    if (skip_generic_func_type_args(&p) == FAIL)
-		return FAIL;
-	    keylen = p - key;
+	    ఒకవేళ (skip_generic_func_type_వాదనలు(&p) == FAIL)
+		తిరిగి FAIL;
+	    keylen = p - కీలకం;
 	}
-	*arg = key + keylen;
+	*arg = కీలకం + keylen;
     }
-    else
+    లేకపోతే
     {
 	/*
 	 * something[idx]
@@ -6008,39 +6008,39 @@ eval_index(
 	 * Get the (first) variable from inside the [].
 	 */
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ':')
+	ఒకవేళ (**arg == ':')
 	    empty1 = TRUE;
-	else if (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
-	    return FAIL;
-	else if (vim9script && **arg == ':')
+	లేకపోతే ఒకవేళ (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
+	    తిరిగి FAIL;
+	లేకపోతే ఒకవేళ (vim9script && **arg == ':')
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 								    ":", *arg);
 	    clear_tv(&var1);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
-	else if (evaluate)
+	లేకపోతే ఒకవేళ (evaluate)
 	{
-	    int error = FALSE;
+	    పూర్ణాంకం error = FALSE;
 
 	    // allow for indexing with float
-	    if (vim9script && rettv->v_type == VAR_DICT
+	    ఒకవేళ (vim9script && rettv->v_type == VAR_DICT
 						   && var1.v_type == VAR_FLOAT)
 	    {
 		var1.vval.v_string = typval_tostring(&var1, TRUE);
 		var1.v_type = VAR_STRING;
 	    }
 
-	    if (vim9script && (rettv->v_type == VAR_LIST
+	    ఒకవేళ (vim9script && (rettv->v_type == VAR_LIST
 						|| rettv->v_type == VAR_TUPLE))
-		tv_get_number_chk(&var1, &error);
-	    else
-		error = tv_get_string_chk(&var1) == NULL;
-	    if (error)
+		tv_get_సంఖ్య_chk(&var1, &error);
+	    లేకపోతే
+		error = tv_get_string_chk(&var1) == ఖాళీ;
+	    ఒకవేళ (error)
 	    {
 		// not a number or string
 		clear_tv(&var1);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
@@ -6048,119 +6048,119 @@ eval_index(
 	 * Get the second variable from inside the [:].
 	 */
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ':')
+	ఒకవేళ (**arg == ':')
 	{
 	    range = TRUE;
 	    ++*arg;
-	    if (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
+	    ఒకవేళ (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
 	    {
 		semsg(_(e_white_space_required_before_and_after_str_at_str),
 								":", *arg - 1);
-		if (!empty1)
+		ఒకవేళ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
-	    if (**arg == ']')
+	    ఒకవేళ (**arg == ']')
 		empty2 = TRUE;
-	    else if (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
+	    లేకపోతే ఒకవేళ (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
 	    {
-		if (!empty1)
+		ఒకవేళ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    else if (evaluate && tv_get_string_chk(&var2) == NULL)
+	    లేకపోతే ఒకవేళ (evaluate && tv_get_string_chk(&var2) == ఖాళీ)
 	    {
 		// not a number or string
-		if (!empty1)
+		ఒకవేళ (!empty1)
 		    clear_tv(&var1);
 		clear_tv(&var2);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
 	}
 
 	// Check for the ']'.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ']')
+	ఒకవేళ (**arg != ']')
 	{
-	    if (verbose)
-		emsg(_(e_missing_closing_square_brace));
+	    ఒకవేళ (verbose)
+		emsg(_(e_missing_closing_వర్గం_brace));
 	    clear_tv(&var1);
-	    if (range)
+	    ఒకవేళ (range)
 		clear_tv(&var2);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	*arg = *arg + 1;	// skip over the ']'
     }
 
-    if (evaluate)
+    ఒకవేళ (evaluate)
     {
-	int res = eval_index_inner(rettv, range,
-		empty1 ? NULL : &var1, empty2 ? NULL : &var2, FALSE,
-		key, keylen, verbose);
+	పూర్ణాంకం res = eval_సూచీ_inner(rettv, range,
+		empty1 ? ఖాళీ : &var1, empty2 ? ఖాళీ : &var2, FALSE,
+		కీలకం, keylen, verbose);
 
-	if (!empty1)
+	ఒకవేళ (!empty1)
 	    clear_tv(&var1);
-	if (range)
+	ఒకవేళ (range)
 	    clear_tv(&var2);
-	return res;
+	తిరిగి res;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Check if "rettv" can have an [index] or [sli:ce]
  */
-    int
-check_can_index(typval_T *rettv, int evaluate, int verbose)
+    పూర్ణాంకం
+check_can_సూచీ(typval_T *rettv, పూర్ణాంకం evaluate, పూర్ణాంకం verbose)
 {
-    switch (rettv->v_type)
+    ఎంపిక (rettv->v_type)
     {
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    if (verbose)
-		emsg(_(e_cannot_index_a_funcref));
-	    return FAIL;
-	case VAR_FLOAT:
-	    if (verbose)
+	స్థితి VAR_FUNC:
+	స్థితి VAR_PARTIAL:
+	    ఒకవేళ (verbose)
+		emsg(_(e_cannot_సూచీ_a_funcref));
+	    తిరిగి FAIL;
+	స్థితి VAR_FLOAT:
+	    ఒకవేళ (verbose)
 		emsg(_(e_using_float_as_string));
-	    return FAIL;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	    if (verbose)
-		emsg(_(e_cannot_index_special_variable));
-	    return FAIL;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    if (verbose)
-		check_typval_is_value(rettv);
-	    return FAIL;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    if (evaluate)
+	    తిరిగి FAIL;
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_OBJECT:
+	    ఒకవేళ (verbose)
+		emsg(_(e_cannot_సూచీ_special_variable));
+	    తిరిగి FAIL;
+	స్థితి VAR_CLASS:
+	స్థితి VAR_TYPEALIAS:
+	    ఒకవేళ (verbose)
+		check_typval_is_విలువ(rettv);
+	    తిరిగి FAIL;
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	    ఒకవేళ (evaluate)
 	    {
-		emsg(_(e_cannot_index_special_variable));
-		return FAIL;
+		emsg(_(e_cannot_సూచీ_special_variable));
+		తిరిగి FAIL;
 	    }
 	    // FALLTHROUGH
 
-	case VAR_STRING:
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-	case VAR_BLOB:
-	    break;
-	case VAR_NUMBER:
-	    if (in_vim9script())
-		emsg(_(e_cannot_index_number));
-	    break;
+	స్థితి VAR_STRING:
+	స్థితి VAR_LIST:
+	స్థితి VAR_TUPLE:
+	స్థితి VAR_DICT:
+	స్థితి VAR_BLOB:
+	    ఆపు;
+	స్థితి VAR_సంఖ్య:
+	    ఒకవేళ (లోపల_vim9script())
+		emsg(_(e_cannot_సూచీ_సంఖ్య));
+	    ఆపు;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -6171,161 +6171,161 @@ check_can_index(typval_T *rettv, int evaluate, int verbose)
  * index for string.
  * Alternatively, "key" is not NULL, then key[keylen] is the dict index.
  */
-    int
-eval_index_inner(
+    పూర్ణాంకం
+eval_సూచీ_inner(
 	typval_T    *rettv,
-	int	    is_range,
+	పూర్ణాంకం	    is_range,
 	typval_T    *var1,
 	typval_T    *var2,
-	int	    exclusive,
-	char_u	    *key,
-	int	    keylen,
-	int	    verbose)
+	పూర్ణాంకం	    exclusive,
+	char_u	    *కీలకం,
+	పూర్ణాంకం	    keylen,
+	పూర్ణాంకం	    verbose)
 {
     varnumber_T	    n1, n2 = 0;
-    long	    len;
+    దీర్ఘ	    len;
 
     n1 = 0;
-    if (var1 != NULL && rettv->v_type != VAR_DICT)
-	n1 = tv_get_number(var1);
+    ఒకవేళ (var1 != ఖాళీ && rettv->v_type != VAR_DICT)
+	n1 = tv_get_సంఖ్య(var1);
 
-    if (is_range)
+    ఒకవేళ (is_range)
     {
-	if (rettv->v_type == VAR_DICT)
+	ఒకవేళ (rettv->v_type == VAR_DICT)
 	{
-	    if (verbose)
-		emsg(_(e_cannot_slice_dictionary));
-	    return FAIL;
+	    ఒకవేళ (verbose)
+		emsg(_(e_cannot_ముక్క_dictionary));
+	    తిరిగి FAIL;
 	}
-	if (var2 != NULL)
-	    n2 = tv_get_number(var2);
-	else
+	ఒకవేళ (var2 != ఖాళీ)
+	    n2 = tv_get_సంఖ్య(var2);
+	లేకపోతే
 	    n2 = VARNUM_MAX;
     }
 
-    switch (rettv->v_type)
+    ఎంపిక (rettv->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_FLOAT:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    break; // not evaluating, skipping over subscript
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	స్థితి VAR_FUNC:
+	స్థితి VAR_PARTIAL:
+	స్థితి VAR_FLOAT:
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_CLASS:
+	స్థితి VAR_OBJECT:
+	స్థితి VAR_TYPEALIAS:
+	    ఆపు; // not evaluating, skipping over subscript
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	స్థితి VAR_సంఖ్య:
+	స్థితి VAR_STRING:
 	    {
 		char_u	*s = tv_get_string(rettv);
 
-		len = (long)STRLEN(s);
-		if (in_vim9script() || exclusive)
+		len = (దీర్ఘ)STRLEN(s);
+		ఒకవేళ (లోపల_vim9script() || exclusive)
 		{
-		    if (is_range)
-			s = string_slice(s, n1, n2, exclusive);
-		    else
+		    ఒకవేళ (is_range)
+			s = string_ముక్క(s, n1, n2, exclusive);
+		    లేకపోతే
 			s = char_from_string(s, n1);
 		}
-		else if (is_range)
+		లేకపోతే ఒకవేళ (is_range)
 		{
 		    // The resulting variable is a substring.  If the indexes
 		    // are out of range the result is empty.
-		    if (n1 < 0)
+		    ఒకవేళ (n1 < 0)
 		    {
 			n1 = len + n1;
-			if (n1 < 0)
+			ఒకవేళ (n1 < 0)
 			    n1 = 0;
 		    }
-		    if (n2 < 0)
+		    ఒకవేళ (n2 < 0)
 			n2 = len + n2;
-		    else if (n2 >= len)
+		    లేకపోతే ఒకవేళ (n2 >= len)
 			n2 = len;
-		    if (n1 >= len || n2 < 0 || n1 > n2)
-			s = NULL;
-		    else
+		    ఒకవేళ (n1 >= len || n2 < 0 || n1 > n2)
+			s = ఖాళీ;
+		    లేకపోతే
 			s = vim_strnsave(s + n1, n2 - n1 + 1);
 		}
-		else
+		లేకపోతే
 		{
 		    // The resulting variable is a string of a single
 		    // character.  If the index is too big or negative the
 		    // result is empty.
-		    if (n1 >= len || n1 < 0)
-			s = NULL;
-		    else
+		    ఒకవేళ (n1 >= len || n1 < 0)
+			s = ఖాళీ;
+		    లేకపోతే
 			s = vim_strnsave(s + n1, 1);
 		}
 		clear_tv(rettv);
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = s;
 	    }
-	    break;
+	    ఆపు;
 
-	case VAR_BLOB:
-	    blob_slice_or_index(rettv->vval.v_blob, is_range, n1, n2,
+	స్థితి VAR_BLOB:
+	    blob_ముక్క_or_సూచీ(rettv->vval.v_blob, is_range, n1, n2,
 							     exclusive, rettv);
-	    break;
+	    ఆపు;
 
-	case VAR_LIST:
-	    if (var1 == NULL)
+	స్థితి VAR_LIST:
+	    ఒకవేళ (var1 == ఖాళీ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    ఒకవేళ (var2 == ఖాళీ)
 		n2 = VARNUM_MAX;
-	    if (list_slice_or_index(rettv->vval.v_list,
+	    ఒకవేళ (list_ముక్క_or_సూచీ(rettv->vval.v_list,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		తిరిగి FAIL;
+	    ఆపు;
 
-	case VAR_TUPLE:
-	    if (var1 == NULL)
+	స్థితి VAR_TUPLE:
+	    ఒకవేళ (var1 == ఖాళీ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    ఒకవేళ (var2 == ఖాళీ)
 		n2 = VARNUM_MAX;
-	    if (tuple_slice_or_index(rettv->vval.v_tuple,
+	    ఒకవేళ (tuple_ముక్క_or_సూచీ(rettv->vval.v_tuple,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		తిరిగి FAIL;
+	    ఆపు;
 
-	case VAR_DICT:
+	స్థితి VAR_DICT:
 	    {
-		dictitem_T	*item;
+		dictitem_T	*అంశం;
 		typval_T	tmp;
 
-		if (key == NULL)
+		ఒకవేళ (కీలకం == ఖాళీ)
 		{
-		    key = tv_get_string_chk(var1);
-		    if (key == NULL)
-			return FAIL;
+		    కీలకం = tv_get_string_chk(var1);
+		    ఒకవేళ (కీలకం == ఖాళీ)
+			తిరిగి FAIL;
 		}
 
-		item = dict_find(rettv->vval.v_dict, key, keylen);
+		అంశం = dict_కనుగొను(rettv->vval.v_dict, కీలకం, keylen);
 
-		if (item == NULL)
+		ఒకవేళ (అంశం == ఖాళీ)
 		{
-		    if (verbose)
+		    ఒకవేళ (verbose)
 		    {
-			if (keylen > 0)
-			    key[keylen] = NUL;
-			semsg(_(e_key_not_present_in_dictionary_str), key);
+			ఒకవేళ (keylen > 0)
+			    కీలకం[keylen] = NUL;
+			semsg(_(e_కీలకం_not_present_లోపల_dictionary_str), కీలకం);
 		    }
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 
-		copy_tv(&item->di_tv, &tmp);
+		copy_tv(&అంశం->di_tv, &tmp);
 		clear_tv(rettv);
 		*rettv = tmp;
 	    }
-	    break;
+	    ఆపు;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -6334,51 +6334,51 @@ eval_index_inner(
     char_u *
 partial_name(partial_T *pt)
 {
-    if (pt != NULL)
+    ఒకవేళ (pt != ఖాళీ)
     {
-	if (pt->pt_name != NULL)
-	    return pt->pt_name;
-	if (pt->pt_func != NULL)
-	    return pt->pt_func->uf_name;
+	ఒకవేళ (pt->pt_name != ఖాళీ)
+	    తిరిగి pt->pt_name;
+	ఒకవేళ (pt->pt_func != ఖాళీ)
+	    తిరిగి pt->pt_func->uf_name;
     }
-    return (char_u *)"";
+    తిరిగి (char_u *)"";
 }
 
-    static void
+    స్థిర శూన్య
 partial_free(partial_T *pt)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < pt->pt_argc; ++i)
+    కొరకు (i = 0; i < pt->pt_argc; ++i)
 	clear_tv(&pt->pt_argv[i]);
     vim_free(pt->pt_argv);
     dict_unref(pt->pt_dict);
-    if (pt->pt_name != NULL)
+    ఒకవేళ (pt->pt_name != ఖాళీ)
     {
 	func_unref(pt->pt_name);
 	vim_free(pt->pt_name);
     }
-    else
+    లేకపోతే
 	func_ptr_unref(pt->pt_func);
-    if (pt->pt_obj != NULL)
+    ఒకవేళ (pt->pt_obj != ఖాళీ)
 	object_unref(pt->pt_obj);
 
     // "out_up" is no longer used, decrement refcount on partial that owns it.
-    partial_unref(pt->pt_outer.out_up_partial);
+    partial_unref(pt->pt_outer.బహిర్గతం_పైకి_partial);
 
     // Using pt_outer from another partial.
     partial_unref(pt->pt_outer_partial);
 
     // Decrease the reference count for the context of a closure.  If down
     // to the minimum it may be time to free it.
-    if (pt->pt_funcstack != NULL)
+    ఒకవేళ (pt->pt_funcstack != ఖాళీ)
     {
 	--pt->pt_funcstack->fs_refcount;
 	funcstack_check_refcount(pt->pt_funcstack);
     }
     // Similarly for loop variables.
-    for (i = 0; i < MAX_LOOP_DEPTH; ++i)
-	if (pt->pt_loopvars[i] != NULL)
+    కొరకు (i = 0; i < MAX_LOOP_లోతు; ++i)
+	ఒకవేళ (pt->pt_loopvars[i] != ఖాళీ)
 	{
 	    --pt->pt_loopvars[i]->lvs_refcount;
 	    loopvars_check_refcount(pt->pt_loopvars[i]);
@@ -6391,34 +6391,34 @@ partial_free(partial_T *pt)
  * Unreference a closure: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    శూన్య
 partial_unref(partial_T *pt)
 {
-    if (pt == NULL)
-	return;
+    ఒకవేళ (pt == ఖాళీ)
+	తిరిగి;
 
-    int	done = FALSE;
+    పూర్ణాంకం	పూర్తి = FALSE;
 
-    if (--pt->pt_refcount <= 0)
+    ఒకవేళ (--pt->pt_refcount <= 0)
 	partial_free(pt);
 
     // If the reference count goes down to one, the funcstack may be the
     // only reference and can be freed if no other partials reference it.
-    else if (pt->pt_refcount == 1)
+    లేకపోతే ఒకవేళ (pt->pt_refcount == 1)
     {
 	// careful: if the funcstack is freed it may contain this partial
 	// and it gets freed as well
-	if (pt->pt_funcstack != NULL)
-	    done = funcstack_check_refcount(pt->pt_funcstack);
+	ఒకవేళ (pt->pt_funcstack != ఖాళీ)
+	    పూర్తి = funcstack_check_refcount(pt->pt_funcstack);
 
-	if (!done)
+	ఒకవేళ (!పూర్తి)
 	{
-	    int	depth;
+	    పూర్ణాంకం	లోతు;
 
-	    for (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
-		if (pt->pt_loopvars[depth] != NULL
-			&& loopvars_check_refcount(pt->pt_loopvars[depth]))
-		    break;
+	    కొరకు (లోతు = 0; లోతు < MAX_LOOP_లోతు; ++లోతు)
+		ఒకవేళ (pt->pt_loopvars[లోతు] != ఖాళీ
+			&& loopvars_check_refcount(pt->pt_loopvars[లోతు]))
+		    ఆపు;
 	}
     }
 }
@@ -6430,29 +6430,29 @@ partial_unref(partial_T *pt)
  * strings as "string()", otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 string_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		echo_style,
-    int		composite_val)
+    పూర్ణాంకం		echo_style,
+    పూర్ణాంకం		సంయుక్త_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
-    if (echo_style && !composite_val)
+    ఒకవేళ (echo_style && !సంయుక్త_val)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = tv->vval.v_string;
-	if (r == NULL)
+	ఒకవేళ (r == ఖాళీ)
 	    r = (char_u *)"";
     }
-    else
+    లేకపోతే
     {
 	*tofree = string_quote(tv->vval.v_string, FALSE);
 	r = *tofree;
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6462,38 +6462,38 @@ string_tv2string(
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    స్థిర char_u *
+func_tv2string(typval_T *tv, char_u **tofree, పూర్ణాంకం echo_style)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
     char_u	buf[MAX_FUNC_NAME_LEN];
 
-    if (echo_style)
+    ఒకవేళ (echo_style)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 
-	if (tv->vval.v_string == NULL)
+	ఒకవేళ (tv->vval.v_string == ఖాళీ)
 	    r = (char_u *)"function()";
-	else
+	లేకపోతే
 	{
 	    r = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
-	    if (r == buf)
+	    ఒకవేళ (r == buf)
 		r = *tofree = vim_strsave(buf);
 	}
     }
-    else
+    లేకపోతే
     {
-	char_u *s = NULL;
+	char_u *s = ఖాళీ;
 
-	if (tv->vval.v_string != NULL)
+	ఒకవేళ (tv->vval.v_string != ఖాళీ)
 	    s = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
 
 	r = *tofree = string_quote(s, TRUE);
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6503,28 +6503,28 @@ func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    స్థిర char_u *
+పద్ధతి_tv2string(typval_T *tv, char_u **tofree, పూర్ణాంకం echo_style)
 {
     char_u	buf[MAX_FUNC_NAME_LEN];
     partial_T	*pt = tv->vval.v_partial;
 
-    size_t len = vim_snprintf((char *)buf, sizeof(buf), "<SNR>%d_%s.%s",
+    size_t len = vim_snprintf((అక్షరం *)buf, పరిమాణం(buf), "<SNR>%d_%s.%s",
 			   pt->pt_func->uf_script_ctx.sc_sid,
 			   pt->pt_func->uf_class->class_name.string,
 			   pt->pt_func->uf_name);
-    if (len >= sizeof(buf))
+    ఒకవేళ (len >= పరిమాణం(buf))
     {
-	if (echo_style)
+	ఒకవేళ (echo_style)
 	{
-	    *tofree = NULL;
-	    return (char_u *)"function()";
+	    *tofree = ఖాళీ;
+	    తిరిగి (char_u *)"function()";
 	}
-	else
-	    return *tofree = string_quote((char_u*)"", TRUE);
+	లేకపోతే
+	    తిరిగి *tofree = string_quote((char_u*)"", TRUE);
     }
 
-    return *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
+    తిరిగి *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
 }
 
 /*
@@ -6532,51 +6532,51 @@ method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * "numbuf" is used for a number.  May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 partial_tv2string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    పూర్ణాంకం		copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
     partial_T	*pt;
     char_u	*fname;
     garray_T	ga;
-    int		i;
+    పూర్ణాంకం		i;
     char_u	*tf;
 
     pt = tv->vval.v_partial;
-    fname = string_quote(pt == NULL ? NULL : partial_name(pt), FALSE);
+    fname = string_quote(pt == ఖాళీ ? ఖాళీ : partial_name(pt), FALSE);
 
     ga_init2(&ga, 1, 100);
     GA_CONCAT_LITERAL(&ga, "function(");
-    if (fname != NULL)
+    ఒకవేళ (fname != ఖాళీ)
     {
 	// When using uf_name prepend "g:" for a global function.
-	if (pt != NULL && pt->pt_name == NULL && fname[0] == '\''
+	ఒకవేళ (pt != ఖాళీ && pt->pt_name == ఖాళీ && fname[0] == '\''
 						&& vim_isupper(fname[1]))
 	{
 	    GA_CONCAT_LITERAL(&ga, "'g:");
 	    ga_concat(&ga, fname + 1);
 	}
-	else
+	లేకపోతే
 	    ga_concat(&ga, fname);
 	vim_free(fname);
     }
-    if (pt != NULL && pt->pt_argc > 0)
+    ఒకవేళ (pt != ఖాళీ && pt->pt_argc > 0)
     {
 	GA_CONCAT_LITERAL(&ga, ", [");
-	for (i = 0; i < pt->pt_argc; ++i)
+	కొరకు (i = 0; i < pt->pt_argc; ++i)
 	{
-	    if (i > 0)
+	    ఒకవేళ (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
 	    ga_concat(&ga, tv2string(&pt->pt_argv[i], &tf, numbuf, copyID));
 	    vim_free(tf);
 	}
 	GA_CONCAT_LITERAL(&ga, "]");
     }
-    if (pt != NULL && pt->pt_dict != NULL)
+    ఒకవేళ (pt != ఖాళీ && pt->pt_dict != ఖాళీ)
     {
 	typval_T dtv;
 
@@ -6590,10 +6590,10 @@ partial_tv2string(
     GA_CONCAT_LITERAL(&ga, ")");
     ga_append(&ga, NUL);
 
-    *tofree = ga.ga_data;
+    *tofree = ga.ga_దత్తాంశం;
     r = *tofree;
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6603,41 +6603,41 @@ partial_tv2string(
  * "restore_copyID" is FALSE, repeated items in lists are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 list_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    పూర్ణాంకం		copyID,
+    పూర్ణాంకం		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
-    if (tv->vval.v_list == NULL)
+    ఒకవేళ (tv->vval.v_list == ఖాళీ)
     {
 	// NULL list is equivalent to empty list.
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"[]";
     }
-    else if (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
+    లేకపోతే ఒకవేళ (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
 	    && tv->vval.v_list->lv_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"[...]";
     }
-    else
+    లేకపోతే
     {
-	int old_copyID;
-	if (restore_copyID)
+	పూర్ణాంకం old_copyID;
+	ఒకవేళ (restore_copyID)
 	    old_copyID = tv->vval.v_list->lv_copyID;
 
 	tv->vval.v_list->lv_copyID = copyID;
 	*tofree = list2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ఒకవేళ (restore_copyID)
 	    tv->vval.v_list->lv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6647,42 +6647,42 @@ list_tv2string(
  * "restore_copyID" is FALSE, repeated items in tuples are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 tuple_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    పూర్ణాంకం		copyID,
+    పూర్ణాంకం		restore_copyID)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
-    if (tuple == NULL)
+    ఒకవేళ (tuple == ఖాళీ)
     {
 	// NULL tuple is equivalent to an empty tuple.
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"()";
     }
-    else if (copyID != 0 && tuple->tv_copyID == copyID
-					&& tuple->tv_items.ga_len > 0)
+    లేకపోతే ఒకవేళ (copyID != 0 && tuple->tv_copyID == copyID
+					&& tuple->tv_వస్తువులు.ga_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"(...)";
     }
-    else
+    లేకపోతే
     {
-	int old_copyID;
-	if (restore_copyID)
+	పూర్ణాంకం old_copyID;
+	ఒకవేళ (restore_copyID)
 	    old_copyID = tuple->tv_copyID;
 
 	tuple->tv_copyID = copyID;
 	*tofree = tuple2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ఒకవేళ (restore_copyID)
 	    tuple->tv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6692,41 +6692,41 @@ tuple_tv2string(
  * When "restore_copyID" is FALSE, repeated items in the dictionary are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 dict_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    పూర్ణాంకం		copyID,
+    పూర్ణాంకం		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
-    if (tv->vval.v_dict == NULL)
+    ఒకవేళ (tv->vval.v_dict == ఖాళీ)
     {
 	// NULL dict is equivalent to empty dict.
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"{}";
     }
-    else if (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
-	    && tv->vval.v_dict->dv_hashtab.ht_used != 0)
+    లేకపోతే ఒకవేళ (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
+	    && tv->vval.v_dict->dv_hashtab.ht_వాడిన != 0)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"{...}";
     }
-    else
+    లేకపోతే
     {
-	int old_copyID;
-	if (restore_copyID)
+	పూర్ణాంకం old_copyID;
+	ఒకవేళ (restore_copyID)
 	    old_copyID = tv->vval.v_dict->dv_copyID;
 
 	tv->vval.v_dict->dv_copyID = copyID;
 	*tofree = dict2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ఒకవేళ (restore_copyID)
 	    tv->vval.v_dict->dv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6737,31 +6737,31 @@ dict_tv2string(
  * otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 jobchan_tv2string(
-    typval_T	*tv UNUSED,
-    char_u	**tofree UNUSED,
-    char_u	*numbuf UNUSED,
-    int		composite_val UNUSED)
+    typval_T	*tv వాడని,
+    char_u	**tofree వాడని,
+    char_u	*numbuf వాడని,
+    పూర్ణాంకం		సంయుక్త_val వాడని)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
-#ifdef FEAT_JOB_CHANNEL
-    *tofree = NULL;
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    *tofree = ఖాళీ;
 
-    if (tv->v_type == VAR_JOB)
-	r = job_to_string_buf(tv, numbuf);
-    else
-	r = channel_to_string_buf(tv, numbuf);
+    ఒకవేళ (tv->v_type == VAR_పని)
+	r = పని_గమ్యం_string_buf(tv, numbuf);
+    లేకపోతే
+	r = channel_గమ్యం_string_buf(tv, numbuf);
 
-    if (composite_val)
+    ఒకవేళ (సంయుక్త_val)
     {
 	*tofree = string_quote(r, FALSE);
 	r = *tofree;
     }
-#endif
+#అయితే_ముగింపు
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6769,31 +6769,31 @@ jobchan_tv2string(
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 class_tv2string(typval_T *tv, char_u **tofree)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
     size_t	rsize;
     class_T	*cl = tv->vval.v_class;
     string_T	class_name = {(char_u *)"[unknown]", 9};
     string_T	s = {(char_u *)"class", 5};
 
-    if (cl != NULL)
+    ఒకవేళ (cl != ఖాళీ)
     {
 	class_name.string = cl->class_name.string;
-	class_name.length = cl->class_name.length;
-	if (IS_INTERFACE(cl))
-	    STR_LITERAL_SET(s, "interface");
-	else if (IS_ENUM(cl))
-	    STR_LITERAL_SET(s, "enum");
+	class_name.నిడివి = cl->class_name.నిడివి;
+	ఒకవేళ (IS_INTERFACE(cl))
+	    STR_LITERAL_సమితి(s, "interface");
+	లేకపోతే ఒకవేళ (IS_ENUM(cl))
+	    STR_LITERAL_సమితి(s, "enum");
     }
 
-    rsize = s.length + 1 + class_name.length + 1;
+    rsize = s.నిడివి + 1 + class_name.నిడివి + 1;
     r = *tofree = alloc(rsize);
-    if (r != NULL)
-	vim_snprintf((char *)r, rsize, "%s %s", s.string, (char *)class_name.string);
+    ఒకవేళ (r != ఖాళీ)
+	vim_snprintf((అక్షరం *)r, rsize, "%s %s", s.string, (అక్షరం *)class_name.string);
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6803,49 +6803,49 @@ class_tv2string(typval_T *tv, char_u **tofree)
  * When "restore_copyID" is FALSE, repeated items in the object are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    స్థిర char_u *
 object_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID,
+    పూర్ణాంకం		copyID,
+    పూర్ణాంకం		restore_copyID,
     char_u	*numbuf,
-    int		echo_style,
-    int		composite_val)
+    పూర్ణాంకం		echo_style,
+    పూర్ణాంకం		సంయుక్త_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ఖాళీ;
 
     object_T	*obj = tv->vval.v_object;
-    if (obj == NULL || obj->obj_class == NULL)
+    ఒకవేళ (obj == ఖాళీ || obj->obj_class == ఖాళీ)
     {
-	*tofree = NULL;
+	*tofree = ఖాళీ;
 	r = (char_u *)"object of [unknown]";
     }
-    else if (copyID != 0 && obj->obj_copyID == copyID
-	    && obj->obj_class->class_obj_member_count != 0)
+    లేకపోతే ఒకవేళ (copyID != 0 && obj->obj_copyID == copyID
+	    && obj->obj_class->class_obj_member_లెక్క != 0)
     {
-	size_t n = 25 + obj->obj_class->class_name.length;
+	size_t n = 25 + obj->obj_class->class_name.నిడివి;
 	r = alloc(n);
-	if (r != NULL)
-	    (void)vim_snprintf((char *)r, n, "object of %s {...}",
+	ఒకవేళ (r != ఖాళీ)
+	    (శూన్య)vim_snprintf((అక్షరం *)r, n, "object of %s {...}",
 						obj->obj_class->class_name.string);
 	*tofree = r;
     }
-    else
+    లేకపోతే
     {
-	int old_copyID;
-	if (restore_copyID)
+	పూర్ణాంకం old_copyID;
+	ఒకవేళ (restore_copyID)
 	    old_copyID = obj->obj_copyID;
 
 	obj->obj_copyID = copyID;
 	*tofree = object2string(obj, numbuf, copyID, echo_style,
-				restore_copyID, composite_val);
-	if (restore_copyID)
+				restore_copyID, సంయుక్త_val);
+	ఒకవేళ (restore_copyID)
 	    obj->obj_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6865,17 +6865,17 @@ echo_string_core(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID,
-    int		echo_style,
-    int		restore_copyID,
-    int		composite_val)
+    పూర్ణాంకం		copyID,
+    పూర్ణాంకం		echo_style,
+    పూర్ణాంకం		restore_copyID,
+    పూర్ణాంకం		సంయుక్త_val)
 {
-    static int	recurse = 0;
-    char_u	*r = NULL;
+    స్థిర పూర్ణాంకం	recurse = 0;
+    char_u	*r = ఖాళీ;
 
-    if (recurse >= DICT_MAXNEST)
+    ఒకవేళ (recurse >= DICT_MAXNEST)
     {
-	if (!did_echo_string_emsg)
+	ఒకవేళ (!did_echo_string_emsg)
 	{
 	    // Only give this message once for a recursive call to avoid
 	    // flooding the user with errors.  And stop iterating over lists
@@ -6883,95 +6883,95 @@ echo_string_core(
 	    did_echo_string_emsg = TRUE;
 	    emsg(_(e_variable_nested_too_deep_for_displaying));
 	}
-	*tofree = NULL;
-	return (char_u *)"{E724}";
+	*tofree = ఖాళీ;
+	తిరిగి (char_u *)"{E724}";
     }
     ++recurse;
 
-    switch (tv->v_type)
+    ఎంపిక (tv->v_type)
     {
-	case VAR_STRING:
-	    r = string_tv2string(tv, tofree, echo_style, composite_val);
-	    break;
+	స్థితి VAR_STRING:
+	    r = string_tv2string(tv, tofree, echo_style, సంయుక్త_val);
+	    ఆపు;
 
-	case VAR_FUNC:
+	స్థితి VAR_FUNC:
 	    r = func_tv2string(tv, tofree, echo_style);
-	    break;
+	    ఆపు;
 
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial == NULL
-		    || tv->vval.v_partial->pt_obj == NULL)
+	స్థితి VAR_PARTIAL:
+	    ఒకవేళ (tv->vval.v_partial == ఖాళీ
+		    || tv->vval.v_partial->pt_obj == ఖాళీ)
 		r = partial_tv2string(tv, tofree, numbuf, copyID);
-	    else
-		r = method_tv2string(tv, tofree, echo_style);
-	    break;
+	    లేకపోతే
+		r = పద్ధతి_tv2string(tv, tofree, echo_style);
+	    ఆపు;
 
-	case VAR_BLOB:
+	స్థితి VAR_BLOB:
 	    r = blob2string(tv->vval.v_blob, tofree, numbuf);
-	    break;
+	    ఆపు;
 
-	case VAR_LIST:
+	స్థితి VAR_LIST:
 	    r = list_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ఆపు;
 
-	case VAR_TUPLE:
+	స్థితి VAR_TUPLE:
 	    r = tuple_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ఆపు;
 
-	case VAR_DICT:
+	స్థితి VAR_DICT:
 	    r = dict_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ఆపు;
 
-	case VAR_NUMBER:
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    *tofree = NULL;
+	స్థితి VAR_సంఖ్య:
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	    *tofree = ఖాళీ;
 	    r = tv_get_string_buf(tv, numbuf);
-	    break;
+	    ఆపు;
 
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	    r = jobchan_tv2string(tv, tofree, numbuf, composite_val);
-	    break;
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	    r = jobchan_tv2string(tv, tofree, numbuf, సంయుక్త_val);
+	    ఆపు;
 
-	case VAR_INSTR:
-	    *tofree = NULL;
+	స్థితి VAR_INSTR:
+	    *tofree = ఖాళీ;
 	    r = (char_u *)"instructions";
-	    break;
+	    ఆపు;
 
-	case VAR_CLASS:
+	స్థితి VAR_CLASS:
 	    r = class_tv2string(tv, tofree);
-	    break;
+	    ఆపు;
 
-	case VAR_OBJECT:
+	స్థితి VAR_OBJECT:
 	    r = object_tv2string(tv, tofree, copyID, restore_copyID,
-					 numbuf, echo_style, composite_val);
-	    break;
+					 numbuf, echo_style, సంయుక్త_val);
+	    ఆపు;
 
-	case VAR_FLOAT:
-	    *tofree = NULL;
-	    vim_snprintf((char *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
+	స్థితి VAR_FLOAT:
+	    *tofree = ఖాళీ;
+	    vim_snprintf((అక్షరం *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
 	    r = numbuf;
-	    break;
+	    ఆపు;
 
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    *tofree = NULL;
-	    r = (char_u *)get_var_special_name(tv->vval.v_number);
-	    break;
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	    *tofree = ఖాళీ;
+	    r = (char_u *)get_var_special_name(tv->vval.v_సంఖ్య);
+	    ఆపు;
 
-	case VAR_TYPEALIAS:
+	స్థితి VAR_TYPEALIAS:
 	    *tofree = vim_strsave(tv->vval.v_typealias->ta_name);
 	    r = *tofree;
-	    if (r == NULL)
+	    ఒకవేళ (r == ఖాళీ)
 		r = (char_u *)"";
-	    break;
+	    ఆపు;
     }
 
-    if (--recurse == 0)
+    ఒకవేళ (--recurse == 0)
 	did_echo_string_emsg = FALSE;
-    return r;
+    తిరిగి r;
 }
 
 /*
@@ -6987,9 +6987,9 @@ echo_string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    పూర్ణాంకం		copyID)
 {
-    return echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
+    తిరిగి echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
 }
 
 /*
@@ -6997,38 +6997,38 @@ echo_string(
  * character index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
+    పూర్ణాంకం
+buf_byteidx_గమ్యం_charidx(buf_T *buf, పూర్ణాంకం lnum, పూర్ణాంకం byteidx)
 {
     char_u	*str;
     char_u	*t;
-    int		count;
+    పూర్ణాంకం		లెక్క;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
+	తిరిగి -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	lnum = buf->b_ml.ml_పంక్తి_లెక్క;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి -1;
 
-    if (*str == NUL)
-	return 0;
+    ఒకవేళ (*str == NUL)
+	తిరిగి 0;
 
     // count the number of characters
     t = str;
-    for (count = 0; *t != NUL && t <= str + byteidx; count++)
+    కొరకు (లెక్క = 0; *t != NUL && t <= str + byteidx; లెక్క++)
 	t += mb_ptr2len(t);
 
     // In insert mode, when the cursor is at the end of a non-empty line,
     // byteidx points to the NUL character immediately past the end of the
     // string. In this case, add one to the character count.
-    if (*t == NUL && byteidx != 0 && t == str + byteidx)
-	count++;
+    ఒకవేళ (*t == NUL && byteidx != 0 && t == str + byteidx)
+	లెక్క++;
 
-    return count - 1;
+    తిరిగి లెక్క - 1;
 }
 
 /*
@@ -7036,28 +7036,28 @@ buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
  * byte index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
+    పూర్ణాంకం
+buf_charidx_గమ్యం_byteidx(buf_T *buf, పూర్ణాంకం lnum, పూర్ణాంకం charidx)
 {
     char_u	*str;
     char_u	*t;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
+	తిరిగి -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	lnum = buf->b_ml.ml_పంక్తి_లెక్క;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి -1;
 
     // Convert the character offset to a byte offset
     t = str;
-    while (*t != NUL && --charidx > 0)
+    అయితే (*t != NUL && --charidx > 0)
 	t += mb_ptr2len(t);
 
-    return t - str;
+    తిరిగి t - str;
 }
 
 /*
@@ -7067,166 +7067,166 @@ buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
     pos_T *
 var2fpos(
     typval_T	*varp,
-    int		dollar_lnum,	// TRUE when $ is last line
-    int		*fnum,		// set to fnum for '0, 'A, etc.
-    int		charcol)	// return character column
+    పూర్ణాంకం		dollar_lnum,	// TRUE when $ is last line
+    పూర్ణాంకం		*fnum,		// set to fnum for '0, 'A, etc.
+    పూర్ణాంకం		charcol)	// return character column
 {
     char_u		*name;
-    static pos_T	pos;
+    స్థిర pos_T	pos;
     pos_T		*pp;
-    int			error = FALSE;
+    పూర్ణాంకం			error = FALSE;
 
     // Argument can be [lnum, col, coladd].
-    if (varp->v_type == VAR_LIST)
+    ఒకవేళ (varp->v_type == VAR_LIST)
     {
 	list_T		*l;
-	int		len;
+	పూర్ణాంకం		len;
 	listitem_T	*li;
 
 	l = varp->vval.v_list;
-	if (l == NULL)
-	    return NULL;
+	ఒకవేళ (l == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
 	// Get the line number
-	pos.lnum = list_find_nr(l, 0L, &error);
-	if (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_line_count)
-	    return NULL;	// invalid line number
-	if (charcol)
-	    len = (long)mb_charlen(ml_get(pos.lnum));
-	else
-	    len = (long)ml_get_len(pos.lnum);
+	pos.lnum = list_కనుగొను_nr(l, 0L, &error);
+	ఒకవేళ (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    తిరిగి ఖాళీ;	// invalid line number
+	ఒకవేళ (charcol)
+	    len = (దీర్ఘ)mb_charlen(ml_get(pos.lnum));
+	లేకపోతే
+	    len = (దీర్ఘ)ml_get_len(pos.lnum);
 
 	// Get the column number
 	// We accept "$" for the column number: last column.
-	li = list_find(l, 1L);
-	if (li != NULL && li->li_tv.v_type == VAR_STRING
-		&& li->li_tv.vval.v_string != NULL
+	li = list_కనుగొను(l, 1L);
+	ఒకవేళ (li != ఖాళీ && li->li_tv.v_type == VAR_STRING
+		&& li->li_tv.vval.v_string != ఖాళీ
 		&& STRCMP(li->li_tv.vval.v_string, "$") == 0)
 	{
-	    pos.col = len + 1;
+	    pos.నిలువు = len + 1;
 	}
-	else
+	లేకపోతే
 	{
-	    pos.col = list_find_nr(l, 1L, &error);
-	    if (error)
-		return NULL;
+	    pos.నిలువు = list_కనుగొను_nr(l, 1L, &error);
+	    ఒకవేళ (error)
+		తిరిగి ఖాళీ;
 	}
 
 	// Accept a position up to the NUL after the line.
-	if (pos.col == 0 || (int)pos.col > len + 1)
-	    return NULL;	// invalid column number
-	--pos.col;
+	ఒకవేళ (pos.నిలువు == 0 || (పూర్ణాంకం)pos.నిలువు > len + 1)
+	    తిరిగి ఖాళీ;	// invalid column number
+	--pos.నిలువు;
 
 	// Get the virtual offset.  Defaults to zero.
-	pos.coladd = list_find_nr(l, 2L, &error);
-	if (error)
+	pos.coladd = list_కనుగొను_nr(l, 2L, &error);
+	ఒకవేళ (error)
 	    pos.coladd = 0;
 
-	return &pos;
+	తిరిగి &pos;
     }
 
-    if (in_vim9script() && check_for_string_arg(varp, 0) == FAIL)
-	return NULL;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(varp, 0) == FAIL)
+	తిరిగి ఖాళీ;
 
     name = tv_get_string_chk(varp);
-    if (name == NULL)
-	return NULL;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     error = TRUE;
     pos.lnum = 0;
-    if (name[0] == '.')
+    ఒకవేళ (name[0] == '.')
     {
-	if (!in_vim9script() || name[1] == NUL)
+	ఒకవేళ (!లోపల_vim9script() || name[1] == NUL)
 	{
 	    error = FALSE;
 	    // cursor
 	    pos = curwin->w_cursor;
 	}
     }
-    else if (name[0] == 'v' && name[1] == NUL)
+    లేకపోతే ఒకవేళ (name[0] == 'v' && name[1] == NUL)
     {
 	// Visual start
-	if (VIsual_active)
+	ఒకవేళ (VIsual_చురుకైన)
 	    pos = VIsual;
-	else
+	లేకపోతే
 	    pos = curwin->w_cursor;
     }
-    else if (name[0] == '\'')
+    లేకపోతే ఒకవేళ (name[0] == '\'')
     {
-	if (!in_vim9script() || (name[1] != NUL && name[2] == NUL))
+	ఒకవేళ (!లోపల_vim9script() || (name[1] != NUL && name[2] == NUL))
 	{
 	    error = FALSE;
 	    // mark
 	    pp = getmark_buf_fnum(curbuf, name[1], FALSE, fnum);
-	    if (pp == NULL || pp == (pos_T *)-1 || pp->lnum <= 0)
-		return NULL;
+	    ఒకవేళ (pp == ఖాళీ || pp == (pos_T *)-1 || pp->lnum <= 0)
+		తిరిగి ఖాళీ;
 	    pos = *pp;
 	}
     }
-    if (pos.lnum != 0)
+    ఒకవేళ (pos.lnum != 0)
     {
-	if (charcol)
-	    pos.col = buf_byteidx_to_charidx(curbuf, pos.lnum, pos.col);
-	return &pos;
+	ఒకవేళ (charcol)
+	    pos.నిలువు = buf_byteidx_గమ్యం_charidx(curbuf, pos.lnum, pos.నిలువు);
+	తిరిగి &pos;
     }
 
     pos.coladd = 0;
 
-    if (name[0] == 'w' && dollar_lnum)
+    ఒకవేళ (name[0] == 'w' && dollar_lnum)
     {
 	// the "w_valid" flags are not reset when moving the cursor, but they
 	// do matter for update_topline() and validate_botline().
 	check_cursor_moved(curwin);
 
-	pos.col = 0;
-	if (name[1] == '0')		// "w0": first visible line
+	pos.నిలువు = 0;
+	ఒకవేళ (name[1] == '0')		// "w0": first visible line
 	{
-#ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
-				    && !term_in_normal_mode(curwin->w_buffer))
-		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+	    ఒకవేళ (bt_terminal(curwin->w_బఫరు)
+				    && curwin->w_బఫరు->b_పదం != ఖాళీ
+				    && !పదం_లోపల_సాధారణ_బహుళకం(curwin->w_బఫరు))
+		may_move_terminal_గమ్యం_బఫరు(curwin->w_బఫరు->b_పదం, TRUE);
+#అయితే_ముగింపు
 	    update_topline();
 	    // In silent Ex mode topline is zero, but that's not a valid line
 	    // number; use one instead.
 	    pos.lnum = curwin->w_topline > 0 ? curwin->w_topline : 1;
-	    return &pos;
+	    తిరిగి &pos;
 	}
-	else if (name[1] == '$')	// "w$": last visible line
+	లేకపోతే ఒకవేళ (name[1] == '$')	// "w$": last visible line
 	{
-#ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
-				    && !term_in_normal_mode(curwin->w_buffer))
-		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+	    ఒకవేళ (bt_terminal(curwin->w_బఫరు)
+				    && curwin->w_బఫరు->b_పదం != ఖాళీ
+				    && !పదం_లోపల_సాధారణ_బహుళకం(curwin->w_బఫరు))
+		may_move_terminal_గమ్యం_బఫరు(curwin->w_బఫరు->b_పదం, TRUE);
+#అయితే_ముగింపు
 	    validate_botline();
 	    // In silent Ex mode botline is zero, return zero then.
 	    pos.lnum = curwin->w_botline > 0 ? curwin->w_botline - 1 : 0;
-	    return &pos;
+	    తిరిగి &pos;
 	}
     }
-    else if (name[0] == '$')		// last column or line
+    లేకపోతే ఒకవేళ (name[0] == '$')		// last column or line
     {
-	if (dollar_lnum)
+	ఒకవేళ (dollar_lnum)
 	{
-	    pos.lnum = curbuf->b_ml.ml_line_count;
-	    pos.col = 0;
+	    pos.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	    pos.నిలువు = 0;
 	}
-	else
+	లేకపోతే
 	{
 	    pos.lnum = curwin->w_cursor.lnum;
-	    if (charcol)
-		pos.col = (colnr_T)mb_charlen(ml_get_curline());
-	    else
-		pos.col = ml_get_curline_len();
+	    ఒకవేళ (charcol)
+		pos.నిలువు = (colnr_T)mb_charlen(ml_get_curline());
+	    లేకపోతే
+		pos.నిలువు = ml_get_curline_len();
 	}
-	return &pos;
+	తిరిగి &pos;
     }
-    if (in_vim9script() && error)
-	semsg(_(e_invalid_value_for_line_number_str), name);
-    return NULL;
+    ఒకవేళ (లోపల_vim9script() && error)
+	semsg(_(e_invalid_విలువ_for_పంక్తి_సంఖ్య_str), name);
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -7239,70 +7239,70 @@ var2fpos(
  * Return FAIL when conversion is not possible, doesn't check the position for
  * validity.
  */
-    int
+    పూర్ణాంకం
 list2fpos(
     typval_T	*arg,
     pos_T	*posp,
-    int		*fnump,
+    పూర్ణాంకం		*fnump,
     colnr_T	*curswantp,
-    int		charcol)
+    పూర్ణాంకం		charcol)
 {
     list_T	*l = arg->vval.v_list;
-    long	i = 0;
-    long	n;
+    దీర్ఘ	i = 0;
+    దీర్ఘ	n;
 
     // List must be: [fnum, lnum, col, coladd, curswant], where "fnum" is only
     // there when "fnump" isn't NULL; "coladd" and "curswant" are optional.
-    if (arg->v_type != VAR_LIST
-	    || l == NULL
-	    || l->lv_len < (fnump == NULL ? 2 : 3)
-	    || l->lv_len > (fnump == NULL ? 4 : 5))
-	return FAIL;
+    ఒకవేళ (arg->v_type != VAR_LIST
+	    || l == ఖాళీ
+	    || l->lv_len < (fnump == ఖాళీ ? 2 : 3)
+	    || l->lv_len > (fnump == ఖాళీ ? 4 : 5))
+	తిరిగి FAIL;
 
-    if (fnump != NULL)
+    ఒకవేళ (fnump != ఖాళీ)
     {
-	n = list_find_nr(l, i++, NULL);	// fnum
-	if (n < 0)
-	    return FAIL;
-	if (n == 0)
+	n = list_కనుగొను_nr(l, i++, ఖాళీ);	// fnum
+	ఒకవేళ (n < 0)
+	    తిరిగి FAIL;
+	ఒకవేళ (n == 0)
 	    n = curbuf->b_fnum;		// current buffer
 	*fnump = n;
     }
 
-    n = list_find_nr(l, i++, NULL);	// lnum
-    if (n < 0)
-	return FAIL;
+    n = list_కనుగొను_nr(l, i++, ఖాళీ);	// lnum
+    ఒకవేళ (n < 0)
+	తిరిగి FAIL;
     posp->lnum = n;
 
-    n = list_find_nr(l, i++, NULL);	// col
-    if (n < 0)
-	return FAIL;
+    n = list_కనుగొను_nr(l, i++, ఖాళీ);	//నిలువు
+    ఒకవేళ (n < 0)
+	తిరిగి FAIL;
     // If character position is specified, then convert to byte position
     // If the line number is zero use the cursor line.
-    if (charcol)
+    ఒకవేళ (charcol)
     {
 	buf_T	*buf;
 
 	// Get the text for the specified line in a loaded buffer
-	buf = buflist_findnr(fnump == NULL ? curbuf->b_fnum : *fnump);
-	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	    return FAIL;
+	buf = buflist_findnr(fnump == ఖాళీ ? curbuf->b_fnum : *fnump);
+	ఒకవేళ (buf == ఖాళీ || buf->b_ml.ml_mfp == ఖాళీ)
+	    తిరిగి FAIL;
 
-	n = buf_charidx_to_byteidx(buf,
+	n = buf_charidx_గమ్యం_byteidx(buf,
 		  posp->lnum == 0 ? curwin->w_cursor.lnum : posp->lnum, n) + 1;
     }
-    posp->col = n;
+    posp->నిలువు = n;
 
-    n = list_find_nr(l, i, NULL);	// off
-    if (n < 0)
+    n = list_కనుగొను_nr(l, i, ఖాళీ);	// off
+    ఒకవేళ (n < 0)
 	posp->coladd = 0;
-    else
+    లేకపోతే
 	posp->coladd = n;
 
-    if (curswantp != NULL)
-	*curswantp = list_find_nr(l, i + 1, NULL);  // curswant
+    ఒకవేళ (curswantp != ఖాళీ)
+	*curswantp = list_కనుగొను_nr(l, i + 1, ఖాళీ);  // curswant
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -7310,20 +7310,20 @@ list2fpos(
  * Advance "arg" to the first character after the name.
  * Return 0 for error.
  */
-    int
+    పూర్ణాంకం
 get_env_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
 
-    for (p = *arg; vim_isIDc(*p); ++p)
+    కొరకు (p = *arg; vim_isIDc(*p); ++p)
 	;
-    if (p == *arg)	    // no name found
-	return 0;
+    ఒకవేళ (p == *arg)	    // no name found
+	తిరిగి 0;
 
-    len = (int)(p - *arg);
+    len = (పూర్ణాంకం)(p - *arg);
     *arg = p;
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -7331,32 +7331,32 @@ get_env_len(char_u **arg)
  * "arg" is advanced to after the name.
  * Return 0 if something is wrong.
  */
-    int
+    పూర్ణాంకం
 get_id_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
 
     // Find the end of the name.
-    for (p = *arg; eval_isnamec(*p); ++p)
+    కొరకు (p = *arg; eval_isnamec(*p); ++p)
     {
-	if (*p == ':')
+	ఒకవేళ (*p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace.
-	    len = (int)(p - *arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == NULL)
+	    len = (పూర్ణాంకం)(p - *arg);
+	    ఒకవేళ ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == ఖాళీ)
 		    || len > 1)
-		break;
+		ఆపు;
 	}
     }
-    if (p == *arg)	    // no name found
-	return 0;
+    ఒకవేళ (p == *arg)	    // no name found
+	తిరిగి 0;
 
-    len = (int)(p - *arg);
+    len = (పూర్ణాంకం)(p - *arg);
     *arg = p;
 
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -7368,29 +7368,29 @@ get_id_len(char_u **arg)
  * If the name contains 'magic' {}'s, expand them and return the
  * expanded name in an allocated string via 'alias' - caller must free.
  */
-    int
+    పూర్ణాంకం
 get_name_len(
     char_u	**arg,
     char_u	**alias,
-    int		evaluate,
-    int		verbose)
+    పూర్ణాంకం		evaluate,
+    పూర్ణాంకం		verbose)
 {
-    int		len;
+    పూర్ణాంకం		len;
     char_u	*p;
-    char_u	*expr_start;
-    char_u	*expr_end;
+    char_u	*సమాసం_ప్రారంభం;
+    char_u	*సమాసం_చివర;
 
-    *alias = NULL;  // default to no alias
+    *alias = ఖాళీ;  // default to no alias
 
-    if ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
-						  && (*arg)[2] == (int)KE_SNR)
+    ఒకవేళ ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
+						  && (*arg)[2] == (పూర్ణాంకం)KE_SNR)
     {
 	// hard coded <SNR>, already translated
 	*arg += 3;
-	return get_id_len(arg) + 3;
+	తిరిగి get_id_len(arg) + 3;
     }
     len = eval_fname_script(*arg);
-    if (len > 0)
+    ఒకవేళ (len > 0)
     {
 	// literal "<SID>", "s:" or "<SNR>"
 	*arg += len;
@@ -7399,38 +7399,38 @@ get_name_len(
     /*
      * Find the end of the name; check for {} construction.
      */
-    p = find_name_end(*arg, &expr_start, &expr_end,
-					       len > 0 ? 0 : FNE_CHECK_START);
-    if (expr_start != NULL)
+    p = కనుగొను_name_చివర(*arg, &సమాసం_ప్రారంభం, &సమాసం_చివర,
+					       len > 0 ? 0 : FNE_CHECK_ప్రారంభం);
+    ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ)
     {
-	char_u	*temp_string;
+	char_u	*తాత్కాలిక_string;
 
-	if (!evaluate)
+	ఒకవేళ (!evaluate)
 	{
-	    len += (int)(p - *arg);
+	    len += (పూర్ణాంకం)(p - *arg);
 	    *arg = skipwhite(p);
-	    return len;
+	    తిరిగి len;
 	}
 
 	/*
 	 * Include any <SID> etc in the expanded string:
 	 * Thus the -len here.
 	 */
-	temp_string = make_expanded_name(*arg - len, expr_start, expr_end, p);
-	if (temp_string == NULL)
-	    return -1;
-	*alias = temp_string;
+	తాత్కాలిక_string = make_expanded_name(*arg - len, సమాసం_ప్రారంభం, సమాసం_చివర, p);
+	ఒకవేళ (తాత్కాలిక_string == ఖాళీ)
+	    తిరిగి -1;
+	*alias = తాత్కాలిక_string;
 	*arg = skipwhite(p);
-	return (int)STRLEN(temp_string);
+	తిరిగి (పూర్ణాంకం)STRLEN(తాత్కాలిక_string);
     }
 
     len += get_id_len(arg);
     // Only give an error when there is something, otherwise it will be
     // reported at a higher level.
-    if (len == 0 && verbose && **arg != NUL)
-	semsg(_(e_invalid_expression_str), *arg);
+    ఒకవేళ (len == 0 && verbose && **arg != NUL)
+	semsg(_(e_invalid_వ్యక్తీకరణ_str), *arg);
 
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -7442,30 +7442,30 @@ get_name_len(
  * valid name.
  */
     char_u *
-find_name_end(
+కనుగొను_name_చివర(
     char_u	*arg,
-    char_u	**expr_start,
-    char_u	**expr_end,
-    int		flags)
+    char_u	**సమాసం_ప్రారంభం,
+    char_u	**సమాసం_చివర,
+    పూర్ణాంకం		flags)
 {
-    int		mb_nest = 0;
-    int		br_nest = 0;
+    పూర్ణాంకం		mb_nest = 0;
+    పూర్ణాంకం		br_nest = 0;
     char_u	*p;
-    int		len;
-    int		allow_curly = !in_vim9script();
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		allow_curly = !లోపల_vim9script();
 
-    if (expr_start != NULL)
+    ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ)
     {
-	*expr_start = NULL;
-	*expr_end = NULL;
+	*సమాసం_ప్రారంభం = ఖాళీ;
+	*సమాసం_చివర = ఖాళీ;
     }
 
     // Quick check for valid starting character.
-    if ((flags & FNE_CHECK_START) && !eval_isnamec1(*arg)
+    ఒకవేళ ((flags & FNE_CHECK_ప్రారంభం) && !eval_isnamec1(*arg)
 					      && (*arg != '{' || !allow_curly))
-	return arg;
+	తిరిగి arg;
 
-    for (p = arg; *p != NUL
+    కొరకు (p = arg; *p != NUL
 		    && (eval_isnamec(*p)
 			|| (*p == '{' && allow_curly)
 			|| ((flags & FNE_INCL_BR) && (*p == '['
@@ -7473,59 +7473,59 @@ find_name_end(
 			|| mb_nest != 0
 			|| br_nest != 0); MB_PTR_ADV(p))
     {
-	if (*p == '\'')
+	ఒకవేళ (*p == '\'')
 	{
 	    // skip over 'string' to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
+	    కొరకు (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
 		;
-	    if (*p == NUL)
-		break;
+	    ఒకవేళ (*p == NUL)
+		ఆపు;
 	}
-	else if (*p == '"')
+	లేకపోతే ఒకవేళ (*p == '"')
 	{
 	    // skip over "str\"ing" to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
-		if (*p == '\\' && p[1] != NUL)
+	    కొరకు (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
+		ఒకవేళ (*p == '\\' && p[1] != NUL)
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    ఒకవేళ (*p == NUL)
+		ఆపు;
 	}
-	else if (br_nest == 0 && mb_nest == 0 && *p == ':')
+	లేకపోతే ఒకవేళ (br_nest == 0 && mb_nest == 0 && *p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace. But {ns}: is.
-	    len = (int)(p - arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == NULL)
+	    len = (పూర్ణాంకం)(p - arg);
+	    ఒకవేళ ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == ఖాళీ)
 		    || (len > 1 && p[-1] != '}'))
-		break;
+		ఆపు;
 	}
 
-	if (mb_nest == 0)
+	ఒకవేళ (mb_nest == 0)
 	{
-	    if (*p == '[')
+	    ఒకవేళ (*p == '[')
 		++br_nest;
-	    else if (*p == ']')
+	    లేకపోతే ఒకవేళ (*p == ']')
 		--br_nest;
 	}
 
-	if (br_nest == 0 && allow_curly)
+	ఒకవేళ (br_nest == 0 && allow_curly)
 	{
-	    if (*p == '{')
+	    ఒకవేళ (*p == '{')
 	    {
 		mb_nest++;
-		if (expr_start != NULL && *expr_start == NULL)
-		    *expr_start = p;
+		ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ && *సమాసం_ప్రారంభం == ఖాళీ)
+		    *సమాసం_ప్రారంభం = p;
 	    }
-	    else if (*p == '}')
+	    లేకపోతే ఒకవేళ (*p == '}')
 	    {
 		mb_nest--;
-		if (expr_start != NULL && mb_nest == 0 && *expr_end == NULL)
-		    *expr_end = p;
+		ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ && mb_nest == 0 && *సమాసం_చివర == ఖాళీ)
+		    *సమాసం_చివర = p;
 	    }
 	}
     }
 
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -7541,101 +7541,101 @@ find_name_end(
  * Returns a new allocated string, which the caller must free.
  * Returns NULL for failure.
  */
-    static char_u *
+    స్థిర char_u *
 make_expanded_name(
-    char_u	*in_start,
-    char_u	*expr_start,
-    char_u	*expr_end,
-    char_u	*in_end)
+    char_u	*లోపల_ప్రారంభం,
+    char_u	*సమాసం_ప్రారంభం,
+    char_u	*సమాసం_చివర,
+    char_u	*లోపల_చివర)
 {
     char_u	c1;
-    char_u	*retval = NULL;
-    char_u	*temp_result;
+    char_u	*retval = ఖాళీ;
+    char_u	*తాత్కాలిక_ఫలితం;
 
-    if (expr_end == NULL || in_end == NULL)
-	return NULL;
-    *expr_start	= NUL;
-    *expr_end = NUL;
-    c1 = *in_end;
-    *in_end = NUL;
+    ఒకవేళ (సమాసం_చివర == ఖాళీ || లోపల_చివర == ఖాళీ)
+	తిరిగి ఖాళీ;
+    *సమాసం_ప్రారంభం	= NUL;
+    *సమాసం_చివర = NUL;
+    c1 = *లోపల_చివర;
+    *లోపల_చివర = NUL;
 
-    temp_result = eval_to_string(expr_start + 1, FALSE, FALSE);
-    if (temp_result != NULL)
+    తాత్కాలిక_ఫలితం = eval_గమ్యం_string(సమాసం_ప్రారంభం + 1, FALSE, FALSE);
+    ఒకవేళ (తాత్కాలిక_ఫలితం != ఖాళీ)
     {
-	size_t	retvalsize = (size_t)(expr_start - in_start)
-				+ STRLEN(temp_result)
-				+ (size_t)(in_end - expr_end) + 1;
+	size_t	retvalsize = (size_t)(సమాసం_ప్రారంభం - లోపల_ప్రారంభం)
+				+ STRLEN(తాత్కాలిక_ఫలితం)
+				+ (size_t)(లోపల_చివర - సమాసం_చివర) + 1;
 
 	retval = alloc(retvalsize);
-	if (retval != NULL)
-	    vim_snprintf((char *)retval, retvalsize, "%s%s%s",
-				in_start, temp_result, expr_end + 1);
+	ఒకవేళ (retval != ఖాళీ)
+	    vim_snprintf((అక్షరం *)retval, retvalsize, "%s%s%s",
+				లోపల_ప్రారంభం, తాత్కాలిక_ఫలితం, సమాసం_చివర + 1);
     }
-    vim_free(temp_result);
+    vim_free(తాత్కాలిక_ఫలితం);
 
-    *in_end = c1;		// put char back for error messages
-    *expr_start = '{';
-    *expr_end = '}';
+    *లోపల_చివర = c1;		// put char back for error messages
+    *సమాసం_ప్రారంభం = '{';
+    *సమాసం_చివర = '}';
 
-    if (retval != NULL)
+    ఒకవేళ (retval != ఖాళీ)
     {
-	temp_result = find_name_end(retval, &expr_start, &expr_end, 0);
-	if (expr_start != NULL)
+	తాత్కాలిక_ఫలితం = కనుగొను_name_చివర(retval, &సమాసం_ప్రారంభం, &సమాసం_చివర, 0);
+	ఒకవేళ (సమాసం_ప్రారంభం != ఖాళీ)
 	{
 	    // Further expansion!
-	    temp_result = make_expanded_name(retval, expr_start,
-						       expr_end, temp_result);
+	    తాత్కాలిక_ఫలితం = make_expanded_name(retval, సమాసం_ప్రారంభం,
+						       సమాసం_చివర, తాత్కాలిక_ఫలితం);
 	    vim_free(retval);
-	    retval = temp_result;
+	    retval = తాత్కాలిక_ఫలితం;
 	}
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return TRUE if character "c" can be used in a variable or function name.
  * Does not include '{' or '}' for magic braces.
  */
-    int
-eval_isnamec(int c)
+    పూర్ణాంకం
+eval_isnamec(పూర్ణాంకం c)
 {
-    return ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
+    తిరిగి ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character in a
  * variable or function name (excluding '{' and '}').
  */
-    int
-eval_isnamec1(int c)
+    పూర్ణాంకం
+eval_isnamec1(పూర్ణాంకం c)
 {
-    return ASCII_ISALPHA(c) || c == '_';
+    తిరిగి ASCII_ISALPHA(c) || c == '_';
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character of a
  * dictionary key.
  */
-    int
-eval_isdictc(int c)
+    పూర్ణాంకం
+eval_isdictc(పూర్ణాంకం c)
 {
-    return ASCII_ISALNUM(c) || c == '_';
+    తిరిగి ASCII_ISALNUM(c) || c == '_';
 }
 
 /*
  * Return true when "p" points to "->" followed by a method name or a lambda.
  * Only called for Vim9 script.
  */
-    static bool
-method_call_follows(char_u *p)
+    స్థిర bool
+పద్ధతి_call_follows(char_u *p)
 {
-    if (p[0] != '-' || p[1] != '>')
-	return false;
+    ఒకవేళ (p[0] != '-' || p[1] != '>')
+	తిరిగి false;
 
     char_u	*after = skipwhite(p + 2);
 
-    return ASCII_ISALPHA(*after) || *after == '(';
+    తిరిగి ASCII_ISALPHA(*after) || *after == '(';
 }
 
 /*
@@ -7648,177 +7648,177 @@ method_call_follows(char_u *p)
  * Can all be combined in any order: dict.func(expr)[idx]['func'](expr)->len()
  * "name_start" points to a variable before the subscript or is NULL.
  */
-    int
+    పూర్ణాంకం
 handle_subscript(
     char_u	**arg,
-    char_u	*name_start,
+    char_u	*name_ప్రారంభం,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    పూర్ణాంకం		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    పూర్ణాంకం		evaluate = evalarg != ఖాళీ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		ret = OK;
-    dict_T	*selfdict = NULL;
-    int		check_white = TRUE;
-    int		getnext;
+    పూర్ణాంకం		ret = OK;
+    dict_T	*selfdict = ఖాళీ;
+    పూర్ణాంకం		check_white = TRUE;
+    పూర్ణాంకం		getnext;
     char_u	*p;
 
-    while (ret == OK)
+    అయితే (ret == OK)
     {
 	// When at the end of the line and ".name" or a method call follows in
 	// the next line then consume the line break.
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (getnext
+	p = eval_తదుపరి_non_blank(*arg, evalarg, &getnext);
+	ఒకవేళ (getnext
 	    && ((*p == '.'
 		    && ((rettv->v_type == VAR_DICT && eval_isdictc(p[1]))
 			|| rettv->v_type == VAR_CLASS
 			|| rettv->v_type == VAR_OBJECT))
-		|| method_call_follows(p)))
+		|| పద్ధతి_call_follows(p)))
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_తదుపరి_పంక్తి(*arg, evalarg);
 	    p = *arg;
 	    check_white = FALSE;
 	}
 
-	if (rettv->v_type == VAR_ANY)
+	ఒకవేళ (rettv->v_type == VAR_ANY)
 	{
 	    char_u	*exp_name;
-	    int		cc;
-	    int		idx;
+	    పూర్ణాంకం		cc;
+	    పూర్ణాంకం		idx;
 	    ufunc_T	*ufunc;
 	    type_T	*type;
 
 	    // Found script from "import {name} as name", script item name must
 	    // follow.  "rettv->vval.v_number" has the script ID.
-	    if (**arg != '.')
+	    ఒకవేళ (**arg != '.')
 	    {
-		if (verbose)
+		ఒకవేళ (verbose)
 		    semsg(_(e_expected_dot_after_name_str),
-					name_start != NULL ? name_start: *arg);
+					name_ప్రారంభం != ఖాళీ ? name_ప్రారంభం: *arg);
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
 	    ++*arg;
-	    if (IS_WHITE_OR_NUL(**arg))
+	    ఒకవేళ (IS_WHITE_OR_NUL(**arg))
 	    {
-		if (verbose)
+		ఒకవేళ (verbose)
 		    emsg(_(e_no_white_space_allowed_after_dot));
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
 
 	    // isolate the name
 	    exp_name = *arg;
-	    while (eval_isnamec(**arg))
+	    అయితే (eval_isnamec(**arg))
 		++*arg;
 	    cc = **arg;
 	    **arg = NUL;
 
-	    idx = find_exported(rettv->vval.v_number, exp_name, &ufunc, &type,
-		       evalarg == NULL ? NULL : evalarg->eval_cctx,
-		       evalarg == NULL ? NULL : evalarg->eval_cstack, verbose);
+	    idx = కనుగొను_exported(rettv->vval.v_సంఖ్య, exp_name, &ufunc, &type,
+		       evalarg == ఖాళీ ? ఖాళీ : evalarg->eval_cctx,
+		       evalarg == ఖాళీ ? ఖాళీ : evalarg->eval_cstack, verbose);
 	    **arg = cc;
 
-	    if (idx < 0 && ufunc == NULL)
+	    ఒకవేళ (idx < 0 && ufunc == ఖాళీ)
 	    {
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
-	    if (idx >= 0)
+	    ఒకవేళ (idx >= 0)
 	    {
-		scriptitem_T    *si = SCRIPT_ITEM(rettv->vval.v_number);
-		svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+		scriptitem_T    *si = SCRIPT_అంశం(rettv->vval.v_సంఖ్య);
+		svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_దత్తాంశం) + idx;
 
 		copy_tv(sv->sv_tv, rettv);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		rettv->v_type = VAR_FUNC;
-		if (**arg == '<')
+		ఒకవేళ (**arg == '<')
 		{
 		    char_u *s = get_generic_func_name(ufunc, arg);
-		    if (s != NULL)
+		    ఒకవేళ (s != ఖాళీ)
 			rettv->vval.v_string = s;
-		    else
+		    లేకపోతే
 			ret = FAIL;
 		}
-		else
+		లేకపోతే
 		{
 		    rettv->vval.v_string =
 			vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
 		}
 	    }
-	    continue;
+	    కొనసాగు;
 	}
 
-	if ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
+	ఒకవేళ ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
 			    || rettv->v_type == VAR_PARTIAL))
 		    && (!check_white || !VIM_ISWHITE(*(*arg - 1))))
 	{
 	    ret = call_func_rettv(arg, evalarg, rettv, evaluate,
-							       selfdict, NULL);
+							       selfdict, ఖాళీ);
 
 	    // Stop the expression evaluation when immediately aborting on
 	    // error, or when an interrupt occurred or an exception was thrown
 	    // but not caught.
-	    if (aborting())
+	    ఒకవేళ (aborting())
 	    {
-		if (ret == OK)
+		ఒకవేళ (ret == OK)
 		    clear_tv(rettv);
 		ret = FAIL;
 	    }
 	    dict_unref(selfdict);
-	    selfdict = NULL;
+	    selfdict = ఖాళీ;
 	}
-	else if (p[0] == '-' && p[1] == '>')
+	లేకపోతే ఒకవేళ (p[0] == '-' && p[1] == '>')
 	{
-	    if (in_vim9script())
+	    ఒకవేళ (లోపల_vim9script())
 		*arg = skipwhite(p + 2);
-	    else
+	    లేకపోతే
 		*arg = p + 2;
-	    if (ret == OK && evaluate && rettv->v_type == VAR_VOID)
+	    ఒకవేళ (ret == OK && evaluate && rettv->v_type == VAR_VOID)
 	    {
-		if (verbose)
-		    emsg(_(e_cannot_use_void_value));
+		ఒకవేళ (verbose)
+		    emsg(_(e_cannot_use_void_విలువ));
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE(**arg))
+	    లేకపోతే ఒకవేళ (VIM_ISWHITE(**arg))
 	    {
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else if ((**arg == '{' && !in_vim9script()) || **arg == '(')
+	    లేకపోతే ఒకవేళ ((**arg == '{' && !లోపల_vim9script()) || **arg == '(')
 		// expr->{lambda}() or expr->(lambda)()
 		ret = eval_lambda(arg, rettv, evalarg, verbose);
-	    else
+	    లేకపోతే
 		// expr->name()
-		ret = eval_method(arg, rettv, evalarg, verbose);
+		ret = eval_పద్ధతి(arg, rettv, evalarg, verbose);
 	}
 	// "." is ".name" lookup when we found a dict or when evaluating and
 	// scriptversion is at least 2, where string concatenation is "..".
-	else if (**arg == '['
+	లేకపోతే ఒకవేళ (**arg == '['
 		|| (**arg == '.' && (rettv->v_type == VAR_DICT
 			|| (!evaluate
 			    && (*arg)[1] != '.'
-			    && !in_old_script(2)))))
+			    && !లోపల_old_script(2)))))
 	{
 	    dict_unref(selfdict);
-	    if (rettv->v_type == VAR_DICT)
+	    ఒకవేళ (rettv->v_type == VAR_DICT)
 	    {
 		selfdict = rettv->vval.v_dict;
-		if (selfdict != NULL)
+		ఒకవేళ (selfdict != ఖాళీ)
 		    ++selfdict->dv_refcount;
 	    }
-	    else
-		selfdict = NULL;
-	    if (eval_index(arg, rettv, evalarg, verbose) == FAIL)
+	    లేకపోతే
+		selfdict = ఖాళీ;
+	    ఒకవేళ (eval_సూచీ(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else if (**arg == '.' && (rettv->v_type == VAR_CLASS
+	లేకపోతే ఒకవేళ (**arg == '.' && (rettv->v_type == VAR_CLASS
 					       || rettv->v_type == VAR_OBJECT))
 	{
 	    // class member: SomeClass.varname
@@ -7826,28 +7826,28 @@ handle_subscript(
 	    // class constructor: SomeClass.new()
 	    // object member: someObject.varname
 	    // object method: someObject.SomeMethod()
-	    if (class_object_index(arg, rettv, evalarg, verbose) == FAIL)
+	    ఒకవేళ (class_object_సూచీ(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else
-	    break;
+	లేకపోతే
+	    ఆపు;
     }
 
     // Turn "dict.Func" into a partial for "Func" bound to "dict".
     // Don't do this when "Func" is already a partial that was bound
     // explicitly (pt_auto is FALSE).
-    if (selfdict != NULL
+    ఒకవేళ (selfdict != ఖాళీ
 	    && (rettv->v_type == VAR_FUNC
 		|| (rettv->v_type == VAR_PARTIAL
 		    && (rettv->vval.v_partial->pt_auto
-			|| rettv->vval.v_partial->pt_dict == NULL))))
+			|| rettv->vval.v_partial->pt_dict == ఖాళీ))))
 	selfdict = make_partial(selfdict, rettv);
 
     dict_unref(selfdict);
-    return ret;
+    తిరిగి ret;
 }
 
 /*
@@ -7858,168 +7858,168 @@ handle_subscript(
  * reference to an already copied list/dict can be used.
  * Returns FAIL or OK.
  */
-    int
-item_copy(
+    పూర్ణాంకం
+అంశం_copy(
     typval_T	*from,
-    typval_T	*to,
-    int		deep,
-    int		top,
-    int		copyID)
+    typval_T	*గమ్యం,
+    పూర్ణాంకం		deep,
+    పూర్ణాంకం		శిఖరం,
+    పూర్ణాంకం		copyID)
 {
-    static int	recurse = 0;
-    int		ret = OK;
+    స్థిర పూర్ణాంకం	recurse = 0;
+    పూర్ణాంకం		ret = OK;
 
-    if (recurse >= DICT_MAXNEST)
+    ఒకవేళ (recurse >= DICT_MAXNEST)
     {
 	emsg(_(e_variable_nested_too_deep_for_making_copy));
-	return FAIL;
+	తిరిగి FAIL;
     }
     ++recurse;
 
-    switch (from->v_type)
+    ఎంపిక (from->v_type)
     {
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    copy_tv(from, to);
-	    break;
-	case VAR_LIST:
-	    to->v_type = VAR_LIST;
-	    to->v_lock = 0;
-	    if (from->vval.v_list == NULL)
-		to->vval.v_list = NULL;
-	    else if (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
+	స్థితి VAR_సంఖ్య:
+	స్థితి VAR_FLOAT:
+	స్థితి VAR_STRING:
+	స్థితి VAR_FUNC:
+	స్థితి VAR_PARTIAL:
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	స్థితి VAR_పని:
+	స్థితి VAR_CHANNEL:
+	స్థితి VAR_INSTR:
+	స్థితి VAR_CLASS:
+	స్థితి VAR_OBJECT:
+	స్థితి VAR_TYPEALIAS:
+	    copy_tv(from, గమ్యం);
+	    ఆపు;
+	స్థితి VAR_LIST:
+	    గమ్యం->v_type = VAR_LIST;
+	    గమ్యం->v_తాళం = 0;
+	    ఒకవేళ (from->vval.v_list == ఖాళీ)
+		గమ్యం->vval.v_list = ఖాళీ;
+	    లేకపోతే ఒకవేళ (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_list = from->vval.v_list->lv_copylist;
-		++to->vval.v_list->lv_refcount;
+		గమ్యం->vval.v_list = from->vval.v_list->lv_copylist;
+		++గమ్యం->vval.v_list->lv_refcount;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		to->vval.v_list = list_copy(from->vval.v_list,
-							    deep, top, copyID);
-		if (to->vval.v_list == NULL)
+		గమ్యం->vval.v_list = list_copy(from->vval.v_list,
+							    deep, శిఖరం, copyID);
+		ఒకవేళ (గమ్యం->vval.v_list == ఖాళీ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_TUPLE:
-	    to->v_type = VAR_TUPLE;
-	    to->v_lock = 0;
-	    if (from->vval.v_tuple == NULL)
-		to->vval.v_tuple = NULL;
-	    else if (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
+	    ఆపు;
+	స్థితి VAR_TUPLE:
+	    గమ్యం->v_type = VAR_TUPLE;
+	    గమ్యం->v_తాళం = 0;
+	    ఒకవేళ (from->vval.v_tuple == ఖాళీ)
+		గమ్యం->vval.v_tuple = ఖాళీ;
+	    లేకపోతే ఒకవేళ (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_tuple = from->vval.v_tuple->tv_copytuple;
-		++to->vval.v_tuple->tv_refcount;
+		గమ్యం->vval.v_tuple = from->vval.v_tuple->tv_copytuple;
+		++గమ్యం->vval.v_tuple->tv_refcount;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		to->vval.v_tuple = tuple_copy(from->vval.v_tuple,
-							    deep, top, copyID);
-		if (to->vval.v_tuple == NULL)
+		గమ్యం->vval.v_tuple = tuple_copy(from->vval.v_tuple,
+							    deep, శిఖరం, copyID);
+		ఒకవేళ (గమ్యం->vval.v_tuple == ఖాళీ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_BLOB:
-	    to->v_type = VAR_BLOB;
-	    to->v_lock = 0;
-	    if (from->vval.v_blob == NULL)
-		to->vval.v_blob = NULL;
-	    else
+	    ఆపు;
+	స్థితి VAR_BLOB:
+	    గమ్యం->v_type = VAR_BLOB;
+	    గమ్యం->v_తాళం = 0;
+	    ఒకవేళ (from->vval.v_blob == ఖాళీ)
+		గమ్యం->vval.v_blob = ఖాళీ;
+	    లేకపోతే
 	    {
-		to->vval.v_blob = blob_copy(from->vval.v_blob);
-		if (to->vval.v_blob == NULL)
+		గమ్యం->vval.v_blob = blob_copy(from->vval.v_blob);
+		ఒకవేళ (గమ్యం->vval.v_blob == ఖాళీ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_DICT:
-	    to->v_type = VAR_DICT;
-	    to->v_lock = 0;
-	    if (from->vval.v_dict == NULL)
-		to->vval.v_dict = NULL;
-	    else if (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
+	    ఆపు;
+	స్థితి VAR_DICT:
+	    గమ్యం->v_type = VAR_DICT;
+	    గమ్యం->v_తాళం = 0;
+	    ఒకవేళ (from->vval.v_dict == ఖాళీ)
+		గమ్యం->vval.v_dict = ఖాళీ;
+	    లేకపోతే ఒకవేళ (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_dict = from->vval.v_dict->dv_copydict;
-		++to->vval.v_dict->dv_refcount;
+		గమ్యం->vval.v_dict = from->vval.v_dict->dv_copydict;
+		++గమ్యం->vval.v_dict->dv_refcount;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		to->vval.v_dict = dict_copy(from->vval.v_dict,
-							    deep, top, copyID);
-		if (to->vval.v_dict == NULL)
+		గమ్యం->vval.v_dict = dict_copy(from->vval.v_dict,
+							    deep, శిఖరం, copyID);
+		ఒకవేళ (గమ్యం->vval.v_dict == ఖాళీ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    internal_error_no_abort("item_copy(UNKNOWN)");
+	    ఆపు;
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	    అంతర్గత_error_no_abort("item_copy(UNKNOWN)");
 	    ret = FAIL;
     }
     --recurse;
-    return ret;
+    తిరిగి ret;
 }
 
-    void
-echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
+    శూన్య
+echo_one(typval_T *rettv, పూర్ణాంకం with_space, పూర్ణాంకం *atstart, పూర్ణాంకం *needclr)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     char_u	*p = echo_string(rettv, &tofree, numbuf, get_copyID());
 
-    if (*atstart)
+    ఒకవేళ (*atstart)
     {
 	*atstart = FALSE;
 	// Call msg_start() after eval1(), evaluating the expression
 	// may cause a message to appear.
-	if (with_space)
+	ఒకవేళ (with_space)
 	{
 	    // Mark the saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back
 	    // at the more prompt.
-	    msg_sb_eol();
-	    msg_start();
+	    సందేశం_sb_eol();
+	    సందేశం_ప్రారంభం();
 	}
     }
-    else if (with_space)
-	msg_puts_attr(" ", echo_attr);
+    లేకపోతే ఒకవేళ (with_space)
+	సందేశం_puts_attr(" ", echo_attr);
 
-    if (p != NULL)
-	for ( ; *p != NUL && !got_int; ++p)
+    ఒకవేళ (p != ఖాళీ)
+	కొరకు ( ; *p != NUL && !got_int; ++p)
 	{
-	    if (*p == '\n' || *p == '\r' || *p == TAB)
+	    ఒకవేళ (*p == '\n' || *p == '\r' || *p == TAB)
 	    {
-		if (*p != TAB && *needclr)
+		ఒకవేళ (*p != TAB && *needclr)
 		{
 		    // remove any text still there from the command
-		    msg_clr_eos();
+		    సందేశం_clr_eos();
 		    *needclr = FALSE;
 		}
-		msg_putchar_attr(*p, echo_attr);
+		సందేశం_putchar_attr(*p, echo_attr);
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
-		    int i = (*mb_ptr2len)(p);
+		    పూర్ణాంకం i = (*mb_ptr2len)(p);
 
-		    (void)msg_outtrans_len_attr(p, i, echo_attr);
+		    (శూన్య)సందేశం_outtrans_len_attr(p, i, echo_attr);
 		    p += i - 1;
 		}
-		else
-		    (void)msg_outtrans_len_attr(p, 1, echo_attr);
+		లేకపోతే
+		    (శూన్య)సందేశం_outtrans_len_attr(p, 1, echo_attr);
 	    }
 	}
     vim_free(tofree);
@@ -8030,50 +8030,50 @@ echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
  *			newline at the end.
  * ":echon expr1 ..."	print each argument plain.
  */
-    void
+    శూన్య
 ex_echo(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    char_u	*arg_start;
-    int		needclr = TRUE;
-    int		atstart = TRUE;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    char_u	*arg_ప్రారంభం;
+    పూర్ణాంకం		needclr = TRUE;
+    పూర్ణాంకం		atstart = TRUE;
+    పూర్ణాంకం		did_emsg_before = did_emsg;
+    పూర్ణాంకం		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    if (eap->skip)
+    ఒకవేళ (eap->skip)
 	++emsg_skip;
-    while ((!ends_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
+    అయితే ((!చివర్లు_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
     {
 	// If eval1() causes an error message the text from the command may
 	// still need to be cleared. E.g., "echo 22,44".
 	need_clr_eos = needclr;
 
-	arg_start = arg;
-	if (eval1(&arg, &rettv, &evalarg) == FAIL)
+	arg_ప్రారంభం = arg;
+	ఒకవేళ (eval1(&arg, &rettv, &evalarg) == FAIL)
 	{
 	    /*
 	     * Report the invalid expression unless the expression evaluation
 	     * has been cancelled due to an aborting error, an interrupt, or an
 	     * exception.
 	     */
-	    if (!aborting() && did_emsg == did_emsg_before
+	    ఒకవేళ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
-		semsg(_(e_invalid_expression_str), arg_start);
+		semsg(_(e_invalid_వ్యక్తీకరణ_str), arg_ప్రారంభం);
 	    need_clr_eos = FALSE;
-	    break;
+	    ఆపు;
 	}
 	need_clr_eos = FALSE;
 
-	if (!eap->skip)
+	ఒకవేళ (!eap->skip)
 	{
-	    if (rettv.v_type == VAR_VOID)
+	    ఒకవేళ (rettv.v_type == VAR_VOID)
 	    {
-		semsg(_(e_expression_does_not_result_in_value_str), arg_start);
-		break;
+		semsg(_(e_వ్యక్తీకరణ_does_not_ఫలితం_లోపల_విలువ_str), arg_ప్రారంభం);
+		ఆపు;
 	    }
 	    echo_one(&rettv, eap->cmdidx == CMD_echo, &atstart, &needclr);
 	}
@@ -8081,25 +8081,25 @@ ex_echo(exarg_T *eap)
 	clear_tv(&rettv);
 	arg = skipwhite(arg);
     }
-    set_nextcmd(eap, arg);
+    సమితి_nextcmd(eap, arg);
     clear_evalarg(&evalarg, eap);
 
-    if (eap->skip)
+    ఒకవేళ (eap->skip)
 	--emsg_skip;
-    else
+    లేకపోతే
     {
 	// remove text that may still be there from the command
-	if (needclr)
-	    msg_clr_eos();
-	if (eap->cmdidx == CMD_echo)
-	    msg_end();
+	ఒకవేళ (needclr)
+	    సందేశం_clr_eos();
+	ఒకవేళ (eap->cmdidx == CMD_echo)
+	    సందేశం_చివర();
     }
 }
 
 /*
  * ":echohl {name}".
  */
-    void
+    శూన్య
 ex_echohl(exarg_T *eap)
 {
     echo_attr = syn_name2attr(eap->arg);
@@ -8108,10 +8108,10 @@ ex_echohl(exarg_T *eap)
 /*
  * Returns the :echo attribute
  */
-    int
-get_echo_attr(void)
+    పూర్ణాంకం
+get_echo_attr(శూన్య)
 {
-    return echo_attr;
+    తిరిగి echo_attr;
 }
 
 /*
@@ -8123,60 +8123,60 @@ get_echo_attr(void)
  * Each gets spaces around each argument and a newline at the end for
  * echo commands
  */
-    void
+    శూన్య
 ex_execute(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    int		ret = OK;
+    పూర్ణాంకం		ret = OK;
     char_u	*p;
     garray_T	ga;
-    int		len;
-    long	start_lnum = SOURCING_LNUM;
+    పూర్ణాంకం		len;
+    దీర్ఘ	ప్రారంభం_lnum = SOURCING_LNUM;
 
     ga_init2(&ga, 1, 80);
 
-    if (eap->skip)
+    ఒకవేళ (eap->skip)
 	++emsg_skip;
-    while (!ends_excmd2(eap->cmd, arg) || *arg == '"')
+    అయితే (!చివర్లు_excmd2(eap->cmd, arg) || *arg == '"')
     {
 	ret = eval1_emsg(&arg, &rettv, eap);
-	if (ret == FAIL)
-	    break;
+	ఒకవేళ (ret == FAIL)
+	    ఆపు;
 
-	if (!eap->skip)
+	ఒకవేళ (!eap->skip)
 	{
 	    char_u   buf[NUMBUFLEN];
 
-	    if (eap->cmdidx == CMD_execute)
+	    ఒకవేళ (eap->cmdidx == CMD_execute)
 	    {
-		if (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_JOB)
+		ఒకవేళ (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_పని)
 		{
-		    semsg(_(e_using_invalid_value_as_string_str),
+		    semsg(_(e_using_invalid_విలువ_as_string_str),
 						  vartype_name(rettv.v_type));
-		    p = NULL;
+		    p = ఖాళీ;
 		}
-		else
+		లేకపోతే
 		    p = tv_get_string_buf(&rettv, buf);
 	    }
-	    else
+	    లేకపోతే
 		p = tv_stringify(&rettv, buf);
-	    if (p == NULL)
+	    ఒకవేళ (p == ఖాళీ)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
-	    len = (int)STRLEN(p);
-	    if (ga_grow(&ga, len + 2) == FAIL)
+	    len = (పూర్ణాంకం)STRLEN(p);
+	    ఒకవేళ (ga_grow(&ga, len + 2) == FAIL)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		ఆపు;
 	    }
-	    if (ga.ga_len)
-		((char_u *)(ga.ga_data))[ga.ga_len++] = ' ';
-	    STRCPY((char_u *)(ga.ga_data) + ga.ga_len, p);
+	    ఒకవేళ (ga.ga_len)
+		((char_u *)(ga.ga_దత్తాంశం))[ga.ga_len++] = ' ';
+	    STRCPY((char_u *)(ga.ga_దత్తాంశం) + ga.ga_len, p);
 	    ga.ga_len += len;
 	}
 
@@ -8184,58 +8184,58 @@ ex_execute(exarg_T *eap)
 	arg = skipwhite(arg);
     }
 
-    if (ret != FAIL && ga.ga_data != NULL)
+    ఒకవేళ (ret != FAIL && ga.ga_దత్తాంశం != ఖాళీ)
     {
 	// use the first line of continuation lines for messages
-	SOURCING_LNUM = start_lnum;
+	SOURCING_LNUM = ప్రారంభం_lnum;
 
-	if (eap->cmdidx == CMD_echomsg
+	ఒకవేళ (eap->cmdidx == CMD_echomsg
 		|| eap->cmdidx == CMD_echowindow
 		|| eap->cmdidx == CMD_echoerr)
 	{
 	    // Mark the already saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back at the
 	    // more prompt.
-	    msg_sb_eol();
+	    సందేశం_sb_eol();
 	}
 
-	if (eap->cmdidx == CMD_echomsg)
+	ఒకవేళ (eap->cmdidx == CMD_echomsg)
 	{
-	    msg_attr(ga.ga_data, echo_attr);
-	    out_flush();
+	    సందేశం_attr(ga.ga_దత్తాంశం, echo_attr);
+	    బహిర్గతం_flush();
 	}
-	else if (eap->cmdidx == CMD_echowindow)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_echowindow)
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    start_echowindow(eap->addr_count > 0 ? eap->line2 : 0);
-#endif
-	    msg_attr(ga.ga_data, echo_attr);
-#ifdef HAS_MESSAGE_WINDOW
-	    end_echowindow();
-#endif
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    ప్రారంభం_echowindow(eap->addr_లెక్క > 0 ? eap->line2 : 0);
+#అయితే_ముగింపు
+	    సందేశం_attr(ga.ga_దత్తాంశం, echo_attr);
+#నిర్వచితమైతే HAS_సందేశం_కిటికీ
+	    చివర_echowindow();
+#అయితే_ముగింపు
 	}
-	else if (eap->cmdidx == CMD_echoconsole)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_echoconsole)
 	{
-	    ui_write(ga.ga_data, (int)STRLEN(ga.ga_data), TRUE);
+	    ui_write(ga.ga_దత్తాంశం, (పూర్ణాంకం)STRLEN(ga.ga_దత్తాంశం), TRUE);
 	    ui_write((char_u *)"\r\n", 2, TRUE);
 	}
-	else if (eap->cmdidx == CMD_echoerr)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_echoerr)
 	{
-	    int		save_did_emsg = did_emsg;
+	    పూర్ణాంకం		save_did_emsg = did_emsg;
 
 	    // We don't want to abort following commands, restore did_emsg.
-	    emsg(ga.ga_data);
-	    if (!force_abort)
+	    emsg(ga.ga_దత్తాంశం);
+	    ఒకవేళ (!force_abort)
 		did_emsg = save_did_emsg;
 	}
-	else if (eap->cmdidx == CMD_execute)
+	లేకపోతే ఒకవేళ (eap->cmdidx == CMD_execute)
 	{
-	    int save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+	    పూర్ణాంకం save_sticky_cmdmod_flags = sticky_cmdmod_flags;
 
 	    // "legacy exe cmd" and "vim9cmd exe cmd" applies to "cmd".
 	    sticky_cmdmod_flags = cmdmod.cmod_flags
 						& (CMOD_LEGACY | CMOD_VIM9CMD);
-	    do_cmdline((char_u *)ga.ga_data,
+	    do_cmdline((char_u *)ga.ga_దత్తాంశం,
 		       eap->ea_getline, eap->cookie, DOCMD_NOWAIT|DOCMD_VERBOSE);
 	    sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 	}
@@ -8243,9 +8243,9 @@ ex_execute(exarg_T *eap)
 
     ga_clear(&ga);
 
-    if (eap->skip)
+    ఒకవేళ (eap->skip)
 	--emsg_skip;
-    set_nextcmd(eap, arg);
+    సమితి_nextcmd(eap, arg);
 }
 
 /*
@@ -8255,65 +8255,65 @@ ex_execute(exarg_T *eap)
  * after the option name.
  */
     char_u *
-find_option_end(char_u **arg, int *scope)
+కనుగొను_option_చివర(char_u **arg, పూర్ణాంకం *scope)
 {
     char_u	*p = *arg;
 
     ++p;
-    if (*p == 'g' && p[1] == ':')
+    ఒకవేళ (*p == 'g' && p[1] == ':')
     {
 	*scope = OPT_GLOBAL;
 	p += 2;
     }
-    else if (*p == 'l' && p[1] == ':')
+    లేకపోతే ఒకవేళ (*p == 'l' && p[1] == ':')
     {
 	*scope = OPT_LOCAL;
 	p += 2;
     }
-    else
+    లేకపోతే
 	*scope = 0;
 
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
+    ఒకవేళ (!ASCII_ISALPHA(*p))
+	తిరిగి ఖాళీ;
     *arg = p;
 
-    if (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
+    ఒకవేళ (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
 	p += 4;	    // termcap option
-    else
-	while (ASCII_ISALPHA(*p))
+    లేకపోతే
+	అయితే (ASCII_ISALPHA(*p))
 	    ++p;
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Display script name where an item was last set.
  * Should only be invoked when 'verbose' is non-zero.
  */
-    void
-last_set_msg(sctx_T script_ctx)
+    శూన్య
+చివరి_సమితి_సందేశం(sctx_T script_ctx)
 {
     char_u *p;
 
-    if (script_ctx.sc_sid == 0)
-	return;
+    ఒకవేళ (script_ctx.sc_sid == 0)
+	తిరిగి;
 
-    p = home_replace_save(NULL, get_scriptname(script_ctx.sc_sid));
-    if (p == NULL)
-	return;
+    p = home_replace_save(ఖాళీ, get_scriptname(script_ctx.sc_sid));
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
     verbose_enter();
-    msg_puts(_("\n\tLast set from "));
-    msg_puts((char *)p);
-    if (script_ctx.sc_lnum > 0)
+    సందేశం_puts(_("\n\tLast set from "));
+    సందేశం_puts((అక్షరం *)p);
+    ఒకవేళ (script_ctx.sc_lnum > 0)
     {
-	msg_puts(_(line_msg));
-	msg_outnum((long)script_ctx.sc_lnum);
+	సందేశం_puts(_(పంక్తి_సందేశం));
+	సందేశం_outnum((దీర్ఘ)script_ctx.sc_lnum);
     }
     verbose_leave();
     vim_free(p);
 }
 
-#endif // FEAT_EVAL
+#అయితే_ముగింపు // FEAT_EVAL
 
 /*
  * Perform a substitution on "str" with pattern "pat" and substitute "sub".
@@ -8327,7 +8327,7 @@ do_string_sub(
     size_t	len,
     char_u	*pat,
     char_u	*sub,
-    typval_T	*expr,
+    typval_T	*సమాసం,
     char_u	*flags,
     size_t	*ret_len)		// length of returned buffer
 {
@@ -8338,37 +8338,37 @@ do_string_sub(
 
     // Make 'cpoptions' empty, so that the 'l' flag doesn't work here
     save_cpo = p_cpo;
-    p_cpo = empty_option;
+    p_cpo = ఖాళీలు_option;
 
     ga_init2(&ga, 1, 200);
 
     regmatch.rm_ic = p_ic;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog != NULL)
+    ఒకవేళ (regmatch.regprog != ఖాళీ)
     {
-	char_u	*tail = str;
-	char_u	*end = str + len;
-	int	do_all = (flags[0] == 'g');
-	int	sublen;
-	int	i;
-	char_u	*zero_width = NULL;
+	char_u	*తోక = str;
+	char_u	*చివర = str + len;
+	పూర్ణాంకం	do_all = (flags[0] == 'g');
+	పూర్ణాంకం	sublen;
+	పూర్ణాంకం	i;
+	char_u	*zero_వెడల్పు = ఖాళీ;
 
-	while (vim_regexec_nl(&regmatch, str, (colnr_T)(tail - str)))
+	అయితే (vim_regexec_nl(&regmatch, str, (colnr_T)(తోక - str)))
 	{
 	    // Skip empty match except for first match.
-	    if (regmatch.startp[0] == regmatch.endp[0])
+	    ఒకవేళ (regmatch.startp[0] == regmatch.endp[0])
 	    {
-		if (zero_width == regmatch.startp[0])
+		ఒకవేళ (zero_వెడల్పు == regmatch.startp[0])
 		{
 		    // avoid getting stuck on a match with an empty string
-		    i = mb_ptr2len(tail);
-		    mch_memmove((char_u *)ga.ga_data + ga.ga_len, tail,
+		    i = mb_ptr2len(తోక);
+		    mch_memmove((char_u *)ga.ga_దత్తాంశం + ga.ga_len, తోక,
 								   (size_t)i);
 		    ga.ga_len += i;
-		    tail += i;
-		    continue;
+		    తోక += i;
+		    కొనసాగు;
 		}
-		zero_width = regmatch.startp[0];
+		zero_వెడల్పు = regmatch.startp[0];
 	    }
 
 	    /*
@@ -8378,64 +8378,64 @@ do_string_sub(
 	     * - The substituted text.
 	     * - The text after the match.
 	     */
-	    sublen = vim_regsub(&regmatch, sub, expr, tail, 0, REGSUB_MAGIC);
-	    if (sublen <= 0)
+	    sublen = vim_regsub(&regmatch, sub, సమాసం, తోక, 0, REGSUB_MAGIC);
+	    ఒకవేళ (sublen <= 0)
 	    {
 		ga_clear(&ga);
-		break;
+		ఆపు;
 	    }
-	    if (ga_grow(&ga, (int)((end - tail) + sublen -
+	    ఒకవేళ (ga_grow(&ga, (పూర్ణాంకం)((చివర - తోక) + sublen -
 			    (regmatch.endp[0] - regmatch.startp[0]))) == FAIL)
 	    {
 		ga_clear(&ga);
-		break;
+		ఆపు;
 	    }
 
 	    // copy the text up to where the match is
-	    i = (int)(regmatch.startp[0] - tail);
-	    mch_memmove((char_u *)ga.ga_data + ga.ga_len, tail, (size_t)i);
+	    i = (పూర్ణాంకం)(regmatch.startp[0] - తోక);
+	    mch_memmove((char_u *)ga.ga_దత్తాంశం + ga.ga_len, తోక, (size_t)i);
 	    // add the substituted text
-	    (void)vim_regsub(&regmatch, sub, expr,
-				  (char_u *)ga.ga_data + ga.ga_len + i, sublen,
+	    (శూన్య)vim_regsub(&regmatch, sub, సమాసం,
+				  (char_u *)ga.ga_దత్తాంశం + ga.ga_len + i, sublen,
 				  REGSUB_COPY | REGSUB_MAGIC);
 	    ga.ga_len += i + sublen - 1;
-	    tail = regmatch.endp[0];
-	    if (*tail == NUL)
-		break;
-	    if (!do_all)
-		break;
+	    తోక = regmatch.endp[0];
+	    ఒకవేళ (*తోక == NUL)
+		ఆపు;
+	    ఒకవేళ (!do_all)
+		ఆపు;
 	}
 
-	if (ga.ga_data != NULL)
+	ఒకవేళ (ga.ga_దత్తాంశం != ఖాళీ)
 	{
-	    STRCPY((char *)ga.ga_data + ga.ga_len, tail);
-	    ga.ga_len += (int)(end - tail);
+	    STRCPY((అక్షరం *)ga.ga_దత్తాంశం + ga.ga_len, తోక);
+	    ga.ga_len += (పూర్ణాంకం)(చివర - తోక);
 	}
 
 	vim_regfree(regmatch.regprog);
     }
 
-    if (ga.ga_data != NULL)
+    ఒకవేళ (ga.ga_దత్తాంశం != ఖాళీ)
     {
-	str = (char_u *)ga.ga_data;
+	str = (char_u *)ga.ga_దత్తాంశం;
 	len = (size_t)ga.ga_len;
     }
     ret = vim_strnsave(str, len);
     ga_clear(&ga);
-    if (p_cpo == empty_option)
+    ఒకవేళ (p_cpo == ఖాళీలు_option)
 	p_cpo = save_cpo;
-    else
+    లేకపోతే
     {
 	// Darn, evaluating {sub} expression or {expr} changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	ఒకవేళ (*p_cpo == NUL)
+	    సమితి_option_విలువ_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    if (ret_len != NULL)
+    ఒకవేళ (ret_len != ఖాళీ)
 	*ret_len = len;
 
-    return ret;
+    తిరిగి ret;
 }

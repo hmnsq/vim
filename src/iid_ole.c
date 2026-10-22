@@ -10,48 +10,48 @@
 // Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 // error checks: none
 //@@MIDL_FILE_HEADING(  )
-#ifdef __cplusplus
-extern "C"{
-#endif
+#నిర్వచితమైతే __cplusplus
+బాహ్య "C"{
+#అయితే_ముగింపు
 
-#ifdef __MINGW32__
+#నిర్వచితమైతే __MINGW32__
 # include <w32api.h>
 
-# if __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
+# ఒకవేళ __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
    // This define is missing from older MingW versions of w32api, even though
    // IID is defined.
 #  define __IID_DEFINED__
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifndef __IID_DEFINED__
+#నిర్వచితం_కాకపోతే __IID_DEFINED__
 # define __IID_DEFINED__
 
-typedef struct _IID
+రకనిర్వచనం నిర్మాణం _IID
 {
-    unsigned long x;
-    unsigned short s1;
-    unsigned short s2;
-    unsigned char  c[8];
+    గుర్తులేని దీర్ఘ x;
+    గుర్తులేని పొట్టి s1;
+    గుర్తులేని పొట్టి s2;
+    గుర్తులేని అక్షరం  c[8];
 } IID;
 
-#endif
+#అయితే_ముగింపు
 
-#ifndef CLSID_DEFINED
+#నిర్వచితం_కాకపోతే CLSID_DEFINED
 # define CLSID_DEFINED
-typedef IID CLSID;
-#endif
+రకనిర్వచనం IID CLSID;
+#అయితే_ముగింపు
 
-const IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
-
-
-const IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+స్థిరరాశి IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-const CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+స్థిరరాశి IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-#ifdef __cplusplus
+స్థిరరాశి CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+
+
+#నిర్వచితమైతే __cplusplus
 }
-#endif
+#అయితే_ముగింపు
 

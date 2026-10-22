@@ -18,40 +18,40 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <string.h>
 
-	int
-main(int argc, char **argv)
+	పూర్ణాంకం
+ప్రధాన(పూర్ణాంకం argc, అక్షరం **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	అక్షరం బఫరు[BUFSIZ];
+	అక్షరం *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	అయితే (fgets(బఫరు, BUFSIZ, stdin) != ఖాళీ)
 	{
-		for (p = buffer; *p != 0; p++)
+		కొరకు (p = బఫరు; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			ఒకవేళ (అక్షరశ్రేణి_పోలిక(p, "charset=utf-8", 13) == 0
+				|| అక్షరశ్రేణి_పోలిక(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			లేకపోతే ఒకవేళ (అక్షరశ్రేణి_పోలిక(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				అయితే (p[1] != '\n')
 					++p;
 			}
-			else
+			లేకపోతే
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				ఒకవేళ (*(గుర్తులేని అక్షరం *)p >= 0xA1)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					అక్షరం_రాయి(*p++);
+					ఒకవేళ (*p == '\\')
+						అక్షరం_రాయి(*p);
 				}
-				putchar(*p);
+				అక్షరం_రాయి(*p);
 			}
 		}
 	}

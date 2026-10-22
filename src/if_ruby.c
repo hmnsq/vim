@@ -11,46 +11,46 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "protodef.h"
-#ifdef HAVE_CONFIG_H
+#అన్తర్భావ "protodef.h"
+#నిర్వచితమైతే HAVE_CONFIG_H
 # include "auto/config.h"
-#endif
+#అయితే_ముగింపు
 
-#include <stdio.h>
-#include <string.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <string.h>
 
-#ifdef _WIN32
+#నిర్వచితమైతే _WIN32
 # ifndef DYNAMIC_RUBY
 #  define NT
 #  define IMPORT // For static dll usage __declspec(dllimport)
 #  define RUBYEXTERN __declspec(dllimport)
 # endif
-#endif
-#ifndef RUBYEXTERN
-# define RUBYEXTERN extern
-#endif
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే RUBYEXTERN
+# define RUBYEXTERN బాహ్య
+#అయితే_ముగింపు
 
-#ifdef DYNAMIC_RUBY
+#నిర్వచితమైతే DYNAMIC_RUBY
 /*
  * This is tricky.  In ruby.h there is (inline) function rb_class_of()
  * definition.  This function use these variables.  But we want function to
  * use dll_* variables.
  */
-# if RUBY_VERSION >= 24
+# ఒకవేళ RUBY_సంస్కరణ >= 24
 #  define USE_RUBY_INTEGER
 # endif
 
 # define rb_cFalseClass		(*dll_rb_cFalseClass)
 # define rb_cFixnum		(*dll_rb_cFixnum)
-# if defined(USE_RUBY_INTEGER)
+# ఒకవేళ defined(USE_RUBY_INTEGER)
 #  define rb_cInteger		(*dll_rb_cInteger)
 # endif
-# if RUBY_VERSION >= 20
+# ఒకవేళ RUBY_సంస్కరణ >= 20
 #  define rb_cFloat		(*dll_rb_cFloat)
 # endif
 # define rb_cNilClass		(*dll_rb_cNilClass)
 # define rb_cString		(*dll_rb_cString)
-# define rb_cSymbol		(*dll_rb_cSymbol)
+# define rb_c_చిహ్నం		(*dll_rb_c_చిహ్నం)
 # define rb_cTrueClass		(*dll_rb_cTrueClass)
 
 /*
@@ -66,83 +66,83 @@
 # define rb_num2long	rb_num2long_stub
 # define rb_int2big	rb_int2big_stub
 
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# ఒకవేళ RUBY_సంస్కరణ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
 // Ruby 1.9 defines a number of static functions which use rb_fix2int and
 // rb_num2int if VIM_SIZEOF_INT < VIM_SIZEOF_LONG (64bit)
 #  define rb_fix2int	rb_fix2int_stub
 #  define rb_num2int	rb_num2int_stub
 # endif
 
-# if RUBY_VERSION >= 20
+# ఒకవేళ RUBY_సంస్కరణ >= 20
 // USE_TYPEDDATA is not defined yet. We just check for 2.0.
 #  define rb_check_typeddata		rb_check_typeddata_stub
 # endif
 
-# if RUBY_VERSION == 21
+# ఒకవేళ RUBY_సంస్కరణ == 21
 // Ruby 2.1 adds new GC called RGenGC and RARRAY_PTR uses
 // rb_gc_writebarrier_unprotect_promoted if USE_RGENGC
 #  define rb_gc_writebarrier_unprotect_promoted	rb_gc_writebarrier_unprotect_promoted_stub
 # endif
 
-# if RUBY_VERSION >= 22
+# ఒకవేళ RUBY_సంస్కరణ >= 22
 #  define rb_gc_writebarrier_unprotect	rb_gc_writebarrier_unprotect_stub
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# ఒకవేళ RUBY_సంస్కరణ >= 26 && RUBY_సంస్కరణ <= 32
 #  define rb_ary_detransient	rb_ary_detransient_stub
 # endif
 
-# if RUBY_VERSION >= 30
+# ఒకవేళ RUBY_సంస్కరణ >= 30
 #  define rb_check_type			rb_check_type_stub
 #  define rb_num2uint			rb_num2uint_stub
-#  define ruby_malloc_size_overflow	ruby_malloc_size_overflow_stub
+#  define ruby_malloc_కొలత_అధికప్రవాహం	ruby_malloc_కొలత_అధికప్రవాహం_stub
 # endif
 
-# if RUBY_VERSION >= 31
+# ఒకవేళ RUBY_సంస్కరణ >= 31
 #  define rb_debug_rstring_null_ptr	rb_debug_rstring_null_ptr_stub
 #  define rb_unexpected_type		rb_unexpected_type_stub
 # endif
 
-#endif  // ifdef DYNAMIC_RUBY
+#అయితే_ముగింపు  // ifdef DYNAMIC_RUBY
 
 // On macOS pre-installed Ruby defines "SIZEOF_TIME_T" as "SIZEOF_LONG" so it
 // conflicts with the definition in config.h then causes a macro-redefined
 // warning.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#నిర్వచితమైతే SIZEOF_సమయం_T
+# undef SIZEOF_సమయం_T
+#అయితే_ముగింపు
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic push
+#ఒకవేళ defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic నెట్టు
 # pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#అయితే_ముగింపు
 
-#if defined(__clang__) && (__clang_major__ >= 21)
+#ఒకవేళ defined(__clang__) && (__clang_major__ >= 21)
 # pragma GCC diagnostic ignored "-Wdefault-const-init-field-unsafe"
-#endif
+#అయితే_ముగింపు
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#అన్తర్భావ <ruby.h>
+#అన్తర్భావ <ruby/encoding.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
+#ఒకవేళ defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic తీయి
+#అయితే_ముగింపు
 
 // See above.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#నిర్వచితమైతే SIZEOF_సమయం_T
+# undef SIZEOF_సమయం_T
+#అయితే_ముగింపు
 
-#undef off_t	// ruby defines off_t as _int64, Mingw uses long
-#undef EXTERN
-#undef _
+#నిర్వచనం_రద్దు off_t	// ruby defines off_t as _int64, Mingw uses long
+#నిర్వచనం_రద్దు EXTERN
+#నిర్వచనం_రద్దు _
 
 // T_DATA defined both by Ruby and Mac header files, hack around it...
-#if defined(MACOS_X)
+#ఒకవేళ defined(MACOS_X)
 # define __OPENTRANSPORT__
 # define __OPENTRANSPORTPROTOCOL__
 # define __OPENTRANSPORTPROVIDERS__
-#endif
+#అయితే_ముగింపు
 
 /*
  * The TypedData_XXX macro family can be used since Ruby 1.9.2 but
@@ -150,9 +150,9 @@
  * The old Data_XXX macro family was deprecated on Ruby 2.2.
  * Use TypedData_XXX if available.
  */
-#if defined(TypedData_Wrap_Struct) && (RUBY_VERSION >= 20)
+#ఒకవేళ defined(Typed_దత్తాంశం_Wrap_Struct) && (RUBY_సంస్కరణ >= 20)
 # define USE_TYPEDDATA	1
-#endif
+#అయితే_ముగింపు
 
 /*
  * Backward compatibility for Ruby 1.8 and earlier.
@@ -160,125 +160,125 @@
  * Ruby 1.9 does not provide RXXX(s)->len and RXXX(s)->ptr, instead
  * RXXX_LEN(s) and RXXX_PTR(s) are provided.
  */
-#ifndef StringValuePtr
-# define StringValuePtr(s) STR2CSTR(s)
-#endif
-#ifndef RARRAY_LEN
+#నిర్వచితం_కాకపోతే String_విలువ_Ptr
+# define String_విలువ_Ptr(s) STR2CSTR(s)
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే RARRAY_LEN
 # define RARRAY_LEN(s) RARRAY(s)->len
-#endif
-#ifndef RARRAY_PTR
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే RARRAY_PTR
 # define RARRAY_PTR(s) RARRAY(s)->ptr
-#endif
-#ifndef RSTRING_LEN
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే RSTRING_LEN
 # define RSTRING_LEN(s) RSTRING(s)->len
-#endif
-#ifndef RSTRING_PTR
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే RSTRING_PTR
 # define RSTRING_PTR(s) RSTRING(s)->ptr
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_DUP
+#నిర్వచితమైతే HAVE_DUP
 # undef HAVE_DUP
-#endif
-#ifdef HAVE_FSYNC
+#అయితే_ముగింపు
+#నిర్వచితమైతే HAVE_FSYNC
 # undef HAVE_FSYNC
-#endif
+#అయితే_ముగింపు
 
 // Avoid redefining TRUE/FALSE in vterm.h.
-#ifdef TRUE
+#నిర్వచితమైతే TRUE
 # undef TRUE
-#endif
-#ifdef FALSE
+#అయితే_ముగింపు
+#నిర్వచితమైతే FALSE
 # undef FALSE
-#endif
+#అయితే_ముగింపు
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
-#ifdef DYNAMIC_RUBY
+#నిర్వచితమైతే DYNAMIC_RUBY
 # ifdef MSWIN	// must come after including vim.h, where it is defined
 #  define RUBY_PROC FARPROC
-#  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define ఎక్కించు_dll vim_ఎక్కించు_Lib
+#  define చిహ్నం_from_dll Get_Proc_చిరునామా
 #  define close_dll FreeLibrary
-#  define load_dll_error GetWin32Error
-# else
+#  define ఎక్కించు_dll_error GetWin32Error
+# లేకపోతే
 #  include <dlfcn.h>
-#  define HINSTANCE void*
-#  define RUBY_PROC void*
-#  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define HINSTANCE శూన్య*
+#  define RUBY_PROC శూన్య*
+#  define ఎక్కించు_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#  define చిహ్నం_from_dll dlsym
 #  define close_dll dlclose
-#  define load_dll_error dlerror
+#  define ఎక్కించు_dll_error dlerror
 # endif
-#endif
+#అయితే_ముగింపు
 
-static int ruby_initialized = 0;
-static void *ruby_stack_start;
-static VALUE objtbl;
+స్థిర పూర్ణాంకం ruby_initialized = 0;
+స్థిర శూన్య *ruby_దొంతర_ప్రారంభం;
+స్థిర విలువ_3 objtbl;
 
-static VALUE mVIM;
-static VALUE cBuffer;
-static VALUE cVimWindow;
-static VALUE eDeletedBufferError;
-static VALUE eDeletedWindowError;
+స్థిర విలువ_3 mVIM;
+స్థిర విలువ_3 c_బఫరు;
+స్థిర విలువ_3 c_Vim_కిటికీ;
+స్థిర విలువ_3 e_Deleted_బఫరు_Error;
+స్థిర విలువ_3 e_Deleted_కిటికీ_Error;
 
-static int ensure_ruby_initialized(void);
-static void error_print(int);
-static void ruby_io_init(void);
-static void ruby_vim_init(void);
-static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
+స్థిర పూర్ణాంకం ensure_ruby_initialized(శూన్య);
+స్థిర శూన్య error_print(పూర్ణాంకం);
+స్థిర శూన్య ruby_io_init(శూన్య);
+స్థిర శూన్య ruby_vim_init(శూన్య);
+స్థిర పూర్ణాంకం ruby_convert_గమ్యం_vim_విలువ(విలువ_3 val, typval_T *rettv);
 
-#if defined(__ia64) && !defined(ruby_init_stack)
-# define ruby_init_stack(addr) ruby_init_stack((addr), rb_ia64_bsp())
-#endif
+#ఒకవేళ defined(__ia64) && !defined(ruby_init_దొంతర)
+# define ruby_init_దొంతర(addr) ruby_init_దొంతర((addr), rb_ia64_bsp())
+#అయితే_ముగింపు
 
-#if defined(DYNAMIC_RUBY)
+#ఒకవేళ defined(DYNAMIC_RUBY)
 
 /*
  * Wrapper defines
  */
 // Ruby 2.7 actually expands the following symbols as macro.
-# if RUBY_VERSION >= 27
+# ఒకవేళ RUBY_సంస్కరణ >= 27
 #  undef rb_define_global_function
-#  undef rb_define_method
+#  undef rb_define_పద్ధతి
 #  undef rb_define_module_function
-#  undef rb_define_singleton_method
+#  undef rb_define_singleton_పద్ధతి
 # endif
 
 # define rb_assoc_new			dll_rb_assoc_new
 # define rb_cObject			(*dll_rb_cObject)
 # define rb_class_new_instance		dll_rb_class_new_instance
-# if RUBY_VERSION < 30
+# ఒకవేళ RUBY_సంస్కరణ < 30
 #  define rb_check_type			dll_rb_check_type
 # endif
-# define rb_class_path			dll_rb_class_path
+# define rb_class_మార్గం			dll_rb_class_మార్గం
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-#   define rb_data_typed_object_wrap	dll_rb_data_typed_object_wrap
-#  else
-#   define rb_data_typed_object_alloc	dll_rb_data_typed_object_alloc
+#  ఒకవేళ RUBY_సంస్కరణ >= 23
+#   define rb_దత్తాంశం_typed_object_wrap	dll_rb_దత్తాంశం_typed_object_wrap
+#  లేకపోతే
+#   define rb_దత్తాంశం_typed_object_alloc	dll_rb_దత్తాంశం_typed_object_alloc
 #  endif
-# else
-#  define rb_data_object_alloc		dll_rb_data_object_alloc
+# లేకపోతే
+#  define rb_దత్తాంశం_object_alloc		dll_rb_దత్తాంశం_object_alloc
 # endif
 # define rb_define_class_under		dll_rb_define_class_under
 # define rb_define_const			dll_rb_define_const
 # define rb_define_global_function	dll_rb_define_global_function
-# define rb_define_method		dll_rb_define_method
+# define rb_define_పద్ధతి		dll_rb_define_పద్ధతి
 # define rb_define_module		dll_rb_define_module
 # define rb_define_module_function	dll_rb_define_module_function
-# define rb_define_singleton_method	dll_rb_define_singleton_method
+# define rb_define_singleton_పద్ధతి	dll_rb_define_singleton_పద్ధతి
 # define rb_define_virtual_variable	dll_rb_define_virtual_variable
 # define rb_stdout			(*dll_rb_stdout)
 # define rb_stderr			(*dll_rb_stderr)
 # define rb_eArgError			(*dll_rb_eArgError)
-# define rb_eIndexError			(*dll_rb_eIndexError)
+# define rb_e_సూచీ_Error			(*dll_rb_e_సూచీ_Error)
 # define rb_eRuntimeError		(*dll_rb_eRuntimeError)
 # define rb_eStandardError		(*dll_rb_eStandardError)
 # define rb_eval_string_protect		dll_rb_eval_string_protect
-# if RUBY_VERSION >= 21
+# ఒకవేళ RUBY_సంస్కరణ >= 21
 #  define rb_funcallv			dll_rb_funcallv
-# else
+# లేకపోతే
 #  define rb_funcall2			dll_rb_funcall2
 # endif
 # define rb_global_variable		dll_rb_global_variable
@@ -293,17 +293,17 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # undef rb_intern
 # define rb_intern			dll_rb_intern
 
-# if VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
-#  if RUBY_VERSION < 30
+# ఒకవేళ VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
+#  ఒకవేళ RUBY_సంస్కరణ < 30
 #   define rb_num2uint			dll_rb_num2uint
 #  endif
 # endif
 # define rb_num2dbl			dll_rb_num2dbl
 # define rb_lastline_get			dll_rb_lastline_get
-# define rb_lastline_set			dll_rb_lastline_set
+# define rb_lastline_సమితి			dll_rb_lastline_సమితి
 # define rb_protect			dll_rb_protect
-# define rb_load			dll_rb_load
-# if RUBY_VERSION < 20
+# define rb_ఎక్కించు			dll_rb_ఎక్కించు
+# ఒకవేళ RUBY_సంస్కరణ < 20
 #  define rb_num2ulong			dll_rb_num2ulong
 # endif
 # define rb_obj_alloc			dll_rb_obj_alloc
@@ -321,11 +321,11 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 // __builtin_constant_p extension.
 #  undef rb_str_new_cstr
 #  define rb_str_new_cstr		dll_rb_str_new_cstr
-# else
+# లేకపోతే
 #  define rb_str_new2			dll_rb_str_new2
 # endif
-# define rb_string_value		dll_rb_string_value
-# define rb_string_value_ptr		dll_rb_string_value_ptr
+# define rb_string_విలువ		dll_rb_string_విలువ
+# define rb_string_విలువ_ptr		dll_rb_string_విలువ_ptr
 # define rb_float_new			dll_rb_float_new
 # define rb_ary_new			dll_rb_ary_new
 # ifdef rb_ary_new4
@@ -333,13 +333,13 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 #  undef rb_ary_new4
 # endif
 # define rb_ary_new4			dll_rb_ary_new4
-# define rb_ary_push			dll_rb_ary_push
+# define rb_ary_నెట్టు			dll_rb_ary_నెట్టు
 # ifdef __ia64
 #  define rb_ia64_bsp			dll_rb_ia64_bsp
-#  undef ruby_init_stack
-#  define ruby_init_stack(addr)	dll_ruby_init_stack((addr), rb_ia64_bsp())
-# else
-#  define ruby_init_stack		dll_ruby_init_stack
+#  undef ruby_init_దొంతర
+#  define ruby_init_దొంతర(addr)	dll_ruby_init_దొంతర((addr), rb_ia64_bsp())
+# లేకపోతే
+#  define ruby_init_దొంతర		dll_ruby_init_దొంతర
 # endif
 # define rb_errinfo			dll_rb_errinfo
 # define ruby_init			dll_ruby_init
@@ -350,8 +350,8 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # endif
 
 # define ruby_script			dll_ruby_script
-# define rb_enc_find_index		dll_rb_enc_find_index
-# define rb_enc_find			dll_rb_enc_find
+# define rb_enc_కనుగొను_సూచీ		dll_rb_enc_కనుగొను_సూచీ
+# define rb_enc_కనుగొను			dll_rb_enc_కనుగొను
 # undef rb_enc_str_new
 # define rb_enc_str_new			dll_rb_enc_str_new
 # define rb_sprintf			dll_rb_sprintf
@@ -361,321 +361,321 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 /*
  * Pointers for dynamic link
  */
-static VALUE (*dll_rb_assoc_new) (VALUE, VALUE);
-VALUE *dll_rb_cFalseClass;
-VALUE *dll_rb_cFixnum;
-# if defined(USE_RUBY_INTEGER)
-VALUE *dll_rb_cInteger;
+స్థిర విలువ_3 (*dll_rb_assoc_new) (విలువ_3, విలువ_3);
+విలువ_3 *dll_rb_cFalseClass;
+విలువ_3 *dll_rb_cFixnum;
+# ఒకవేళ defined(USE_RUBY_INTEGER)
+విలువ_3 *dll_rb_cInteger;
 # endif
-# if RUBY_VERSION >= 20
-VALUE *dll_rb_cFloat;
+# ఒకవేళ RUBY_సంస్కరణ >= 20
+విలువ_3 *dll_rb_cFloat;
 # endif
-VALUE *dll_rb_cNilClass;
-static VALUE *dll_rb_cObject;
-VALUE *dll_rb_cString;
-VALUE *dll_rb_cSymbol;
-VALUE *dll_rb_cTrueClass;
-static VALUE (*dll_rb_class_new_instance) (int,VALUE*,VALUE);
-static void (*dll_rb_check_type) (VALUE,int);
+విలువ_3 *dll_rb_cNilClass;
+స్థిర విలువ_3 *dll_rb_cObject;
+విలువ_3 *dll_rb_cString;
+విలువ_3 *dll_rb_c_చిహ్నం;
+విలువ_3 *dll_rb_cTrueClass;
+స్థిర విలువ_3 (*dll_rb_class_new_instance) (పూర్ణాంకం,విలువ_3*,విలువ_3);
+స్థిర శూన్య (*dll_rb_check_type) (విలువ_3,పూర్ణాంకం);
 # ifdef USE_TYPEDDATA
-static void *(*dll_rb_check_typeddata) (VALUE,const rb_data_type_t *);
+స్థిర శూన్య *(*dll_rb_check_typeddata) (విలువ_3,స్థిరరాశి rb_దత్తాంశం_type_t *);
 # endif
-static VALUE (*dll_rb_class_path) (VALUE);
+స్థిర విలువ_3 (*dll_rb_class_మార్గం) (విలువ_3);
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-static VALUE (*dll_rb_data_typed_object_wrap) (VALUE, void*, const rb_data_type_t *);
-#  else
-static VALUE (*dll_rb_data_typed_object_alloc) (VALUE, void*, const rb_data_type_t *);
+#  ఒకవేళ RUBY_సంస్కరణ >= 23
+స్థిర విలువ_3 (*dll_rb_దత్తాంశం_typed_object_wrap) (విలువ_3, శూన్య*, స్థిరరాశి rb_దత్తాంశం_type_t *);
+#  లేకపోతే
+స్థిర విలువ_3 (*dll_rb_దత్తాంశం_typed_object_alloc) (విలువ_3, శూన్య*, స్థిరరాశి rb_దత్తాంశం_type_t *);
 #  endif
-# else
-static VALUE (*dll_rb_data_object_alloc) (VALUE, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
+# లేకపోతే
+స్థిర విలువ_3 (*dll_rb_దత్తాంశం_object_alloc) (విలువ_3, శూన్య*, RUBY_దత్తాంశం_FUNC, RUBY_దత్తాంశం_FUNC);
 # endif
-# if RUBY_VERSION >= 31
-static void (*dll_rb_debug_rstring_null_ptr) (const char*);
+# ఒకవేళ RUBY_సంస్కరణ >= 31
+స్థిర శూన్య (*dll_rb_debug_rstring_null_ptr) (స్థిరరాశి అక్షరం*);
 # endif
-static VALUE (*dll_rb_define_class_under) (VALUE, const char*, VALUE);
-static void (*dll_rb_define_const) (VALUE,const char*,VALUE);
-static void (*dll_rb_define_global_function) (const char*,VALUE(*)(int,VALUE*,VALUE),int);
-static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static VALUE (*dll_rb_define_module) (const char*);
-static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),int);
-static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static void (*dll_rb_define_virtual_variable) (const char*,VALUE(*)(ID,VALUE*),void(*)());
-static VALUE *dll_rb_stdout;
-static VALUE *dll_rb_stderr;
-static VALUE *dll_rb_eArgError;
-static VALUE *dll_rb_eIndexError;
-static VALUE *dll_rb_eRuntimeError;
-static VALUE *dll_rb_eStandardError;
-static VALUE (*dll_rb_eval_string_protect) (const char*, int*);
-# if RUBY_VERSION >= 21
-static VALUE (*dll_rb_funcallv) (VALUE, ID, int, const VALUE*);
-# else
-static VALUE (*dll_rb_funcall2) (VALUE, ID, int, const VALUE*);
+స్థిర విలువ_3 (*dll_rb_define_class_under) (విలువ_3, స్థిరరాశి అక్షరం*, విలువ_3);
+స్థిర శూన్య (*dll_rb_define_const) (విలువ_3,స్థిరరాశి అక్షరం*,విలువ_3);
+స్థిర శూన్య (*dll_rb_define_global_function) (స్థిరరాశి అక్షరం*,విలువ_3(*)(పూర్ణాంకం,విలువ_3*,విలువ_3),పూర్ణాంకం);
+స్థిర శూన్య (*dll_rb_define_పద్ధతి) (విలువ_3,స్థిరరాశి అక్షరం*,విలువ_3(*)(ANYARGS),పూర్ణాంకం);
+స్థిర విలువ_3 (*dll_rb_define_module) (స్థిరరాశి అక్షరం*);
+స్థిర శూన్య (*dll_rb_define_module_function) (విలువ_3,స్థిరరాశి అక్షరం*,విలువ_3(*)(విలువ_3,విలువ_3),పూర్ణాంకం);
+స్థిర శూన్య (*dll_rb_define_singleton_పద్ధతి) (విలువ_3,స్థిరరాశి అక్షరం*,విలువ_3(*)(ANYARGS),పూర్ణాంకం);
+స్థిర శూన్య (*dll_rb_define_virtual_variable) (స్థిరరాశి అక్షరం*,విలువ_3(*)(ID,విలువ_3*),శూన్య(*)());
+స్థిర విలువ_3 *dll_rb_stdout;
+స్థిర విలువ_3 *dll_rb_stderr;
+స్థిర విలువ_3 *dll_rb_eArgError;
+స్థిర విలువ_3 *dll_rb_e_సూచీ_Error;
+స్థిర విలువ_3 *dll_rb_eRuntimeError;
+స్థిర విలువ_3 *dll_rb_eStandardError;
+స్థిర విలువ_3 (*dll_rb_eval_string_protect) (స్థిరరాశి అక్షరం*, పూర్ణాంకం*);
+# ఒకవేళ RUBY_సంస్కరణ >= 21
+స్థిర విలువ_3 (*dll_rb_funcallv) (విలువ_3, ID, పూర్ణాంకం, స్థిరరాశి విలువ_3*);
+# లేకపోతే
+స్థిర విలువ_3 (*dll_rb_funcall2) (విలువ_3, ID, పూర్ణాంకం, స్థిరరాశి విలువ_3*);
 # endif
-static void (*dll_rb_global_variable) (VALUE*);
-static VALUE (*dll_rb_hash_aset) (VALUE, VALUE, VALUE);
-static VALUE (*dll_rb_hash_foreach) (VALUE, int (*)(VALUE, VALUE, VALUE), VALUE);
-static VALUE (*dll_rb_hash_new) (void);
-static VALUE (*dll_rb_inspect) (VALUE);
-static VALUE (*dll_rb_int2inum) (long);
-static ID (*dll_rb_intern) (const char*);
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-static long (*dll_rb_fix2int) (VALUE);
-static long (*dll_rb_num2int) (VALUE);
-static unsigned long (*dll_rb_num2uint) (VALUE);
+స్థిర శూన్య (*dll_rb_global_variable) (విలువ_3*);
+స్థిర విలువ_3 (*dll_rb_hash_aset) (విలువ_3, విలువ_3, విలువ_3);
+స్థిర విలువ_3 (*dll_rb_hash_foreach) (విలువ_3, పూర్ణాంకం (*)(విలువ_3, విలువ_3, విలువ_3), విలువ_3);
+స్థిర విలువ_3 (*dll_rb_hash_new) (శూన్య);
+స్థిర విలువ_3 (*dll_rb_inspect) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_int2inum) (దీర్ఘ);
+స్థిర ID (*dll_rb_intern) (స్థిరరాశి అక్షరం*);
+# ఒకవేళ RUBY_సంస్కరణ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+స్థిర దీర్ఘ (*dll_rb_fix2int) (విలువ_3);
+స్థిర దీర్ఘ (*dll_rb_num2int) (విలువ_3);
+స్థిర గుర్తులేని దీర్ఘ (*dll_rb_num2uint) (విలువ_3);
 # endif
-static double (*dll_rb_num2dbl) (VALUE);
-static VALUE (*dll_rb_lastline_get) (void);
-static void (*dll_rb_lastline_set) (VALUE);
-static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, int*);
-static void (*dll_rb_load) (VALUE, int);
-static long (*dll_rb_num2long) (VALUE);
-static unsigned long (*dll_rb_num2ulong) (VALUE);
-static VALUE (*dll_rb_obj_alloc) (VALUE);
-static VALUE (*dll_rb_obj_as_string) (VALUE);
-static VALUE (*dll_rb_obj_id) (VALUE);
-static void (*dll_rb_raise) (VALUE, const char*, ...);
-static VALUE (*dll_rb_string_value) (volatile VALUE*);
-static VALUE (*dll_rb_str_cat) (VALUE, const char*, long);
-static VALUE (*dll_rb_str_concat) (VALUE, VALUE);
-static VALUE (*dll_rb_str_new) (const char*, long);
+స్థిర ద్విగుణ (*dll_rb_num2dbl) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_lastline_get) (శూన్య);
+స్థిర శూన్య (*dll_rb_lastline_సమితి) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_protect) (విలువ_3 (*)(విలువ_3), విలువ_3, పూర్ణాంకం*);
+స్థిర శూన్య (*dll_rb_ఎక్కించు) (విలువ_3, పూర్ణాంకం);
+స్థిర దీర్ఘ (*dll_rb_num2long) (విలువ_3);
+స్థిర గుర్తులేని దీర్ఘ (*dll_rb_num2ulong) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_obj_alloc) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_obj_as_string) (విలువ_3);
+స్థిర విలువ_3 (*dll_rb_obj_id) (విలువ_3);
+స్థిర శూన్య (*dll_rb_raise) (విలువ_3, స్థిరరాశి అక్షరం*, ...);
+స్థిర విలువ_3 (*dll_rb_string_విలువ) (అస్థిర విలువ_3*);
+స్థిర విలువ_3 (*dll_rb_str_cat) (విలువ_3, స్థిరరాశి అక్షరం*, దీర్ఘ);
+స్థిర విలువ_3 (*dll_rb_str_concat) (విలువ_3, విలువ_3);
+స్థిర విలువ_3 (*dll_rb_str_new) (స్థిరరాశి అక్షరం*, దీర్ఘ);
 # ifdef need_rb_str_new_cstr
 // Ruby may #define rb_str_new2 to use rb_str_new_cstr.
-static VALUE (*dll_rb_str_new_cstr) (const char*);
-# else
-static VALUE (*dll_rb_str_new2) (const char*);
+స్థిర విలువ_3 (*dll_rb_str_new_cstr) (స్థిరరాశి అక్షరం*);
+# లేకపోతే
+స్థిర విలువ_3 (*dll_rb_str_new2) (స్థిరరాశి అక్షరం*);
 # endif
-static VALUE (*dll_rb_errinfo) (void);
-static void (*dll_ruby_init) (void);
-static void (*dll_ruby_init_loadpath) (void);
+స్థిర విలువ_3 (*dll_rb_errinfo) (శూన్య);
+స్థిర శూన్య (*dll_ruby_init) (శూన్య);
+స్థిర శూన్య (*dll_ruby_init_loadpath) (శూన్య);
 # ifdef MSWIN
-static void (*dll_ruby_sysinit) (int*, char***);
-static int (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
+స్థిర శూన్య (*dll_ruby_sysinit) (పూర్ణాంకం*, అక్షరం***);
+స్థిర పూర్ణాంకం (*dll_rb_w32_snprintf)(అక్షరం*, size_t, స్థిరరాశి అక్షరం*, ...);
 # endif
-# if RUBY_VERSION >= 31
+# ఒకవేళ RUBY_సంస్కరణ >= 31
 #  ifdef _MSC_VER
-static void (*dll_rb_unexpected_type) (VALUE, int);
-#  else
-NORETURN(static void (*dll_rb_unexpected_type) (VALUE, int));
+స్థిర శూన్య (*dll_rb_unexpected_type) (విలువ_3, పూర్ణాంకం);
+#  లేకపోతే
+NORETURN(స్థిర శూన్య (*dll_rb_unexpected_type) (విలువ_3, పూర్ణాంకం));
 #  endif
 # endif
-static char * (*dll_rb_string_value_ptr) (volatile VALUE*);
-static VALUE (*dll_rb_float_new) (double);
-static VALUE (*dll_rb_ary_new) (void);
-static VALUE (*dll_rb_ary_new4) (long n, const VALUE *elts);
-static VALUE (*dll_rb_ary_push) (VALUE, VALUE);
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-static void (*dll_rb_ary_detransient) (VALUE);
+స్థిర అక్షరం * (*dll_rb_string_విలువ_ptr) (అస్థిర విలువ_3*);
+స్థిర విలువ_3 (*dll_rb_float_new) (ద్విగుణ);
+స్థిర విలువ_3 (*dll_rb_ary_new) (శూన్య);
+స్థిర విలువ_3 (*dll_rb_ary_new4) (దీర్ఘ n, స్థిరరాశి విలువ_3 *elts);
+స్థిర విలువ_3 (*dll_rb_ary_నెట్టు) (విలువ_3, విలువ_3);
+# ఒకవేళ RUBY_సంస్కరణ >= 26 && RUBY_సంస్కరణ <= 32
+స్థిర శూన్య (*dll_rb_ary_detransient) (విలువ_3);
 # endif
 # ifdef __ia64
-static void * (*dll_rb_ia64_bsp) (void);
-static void (*dll_ruby_init_stack)(VALUE*, void*);
-# else
-static void (*dll_ruby_init_stack)(VALUE*);
+స్థిర శూన్య * (*dll_rb_ia64_bsp) (శూన్య);
+స్థిర శూన్య (*dll_ruby_init_దొంతర)(విలువ_3*, శూన్య*);
+# లేకపోతే
+స్థిర శూన్య (*dll_ruby_init_దొంతర)(విలువ_3*);
 # endif
-static VALUE (*dll_rb_int2big)(SIGNED_VALUE);
+స్థిర విలువ_3 (*dll_rb_int2big)(SIGNED_విలువ);
 
-static void (*dll_ruby_script) (const char*);
-static int (*dll_rb_enc_find_index) (const char*);
-static rb_encoding* (*dll_rb_enc_find) (const char*);
-static VALUE (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
-static VALUE (*dll_rb_sprintf) (const char*, ...);
-static VALUE (*dll_rb_require) (const char*);
-static void* (*dll_ruby_options)(int, char**);
+స్థిర శూన్య (*dll_ruby_script) (స్థిరరాశి అక్షరం*);
+స్థిర పూర్ణాంకం (*dll_rb_enc_కనుగొను_సూచీ) (స్థిరరాశి అక్షరం*);
+స్థిర rb_encoding* (*dll_rb_enc_కనుగొను) (స్థిరరాశి అక్షరం*);
+స్థిర విలువ_3 (*dll_rb_enc_str_new) (స్థిరరాశి అక్షరం*, దీర్ఘ, rb_encoding*);
+స్థిర విలువ_3 (*dll_rb_sprintf) (స్థిరరాశి అక్షరం*, ...);
+స్థిర విలువ_3 (*dll_rb_require) (స్థిరరాశి అక్షరం*);
+స్థిర శూన్య* (*dll_ruby_options)(పూర్ణాంకం, అక్షరం**);
 
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
-static void (*dll_rb_gc_writebarrier_unprotect_promoted)(VALUE);
-#  else
-static void (*dll_rb_gc_writebarrier_unprotect)(VALUE obj);
+# ఒకవేళ defined(USE_RGENGC) && USE_RGENGC
+#  ఒకవేళ RUBY_సంస్కరణ == 21
+స్థిర శూన్య (*dll_rb_gc_writebarrier_unprotect_promoted)(విలువ_3);
+#  లేకపోతే
+స్థిర శూన్య (*dll_rb_gc_writebarrier_unprotect)(విలువ_3 obj);
 #  endif
 # endif
 
-# if RUBY_VERSION >= 30
+# ఒకవేళ RUBY_సంస్కరణ >= 30
 #  ifdef _MSC_VER
-static void (*dll_ruby_malloc_size_overflow)(size_t, size_t);
-#  else
-NORETURN(static void (*dll_ruby_malloc_size_overflow)(size_t, size_t));
+స్థిర శూన్య (*dll_ruby_malloc_కొలత_అధికప్రవాహం)(size_t, size_t);
+#  లేకపోతే
+NORETURN(స్థిర శూన్య (*dll_ruby_malloc_కొలత_అధికప్రవాహం)(size_t, size_t));
 #  endif
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-void rb_ary_detransient_stub(VALUE x);
+# ఒకవేళ RUBY_సంస్కరణ >= 26 && RUBY_సంస్కరణ <= 32
+శూన్య rb_ary_detransient_stub(విలువ_3 x);
 # endif
 
 // Do not generate a prototype here, VALUE isn't always defined.
 # ifndef PROTO
-#  if RUBY_VERSION >= 22
-    long
-rb_num2long_stub(VALUE x)
-#  else
-    SIGNED_VALUE
-rb_num2long_stub(VALUE x)
+#  ఒకవేళ RUBY_సంస్కరణ >= 22
+    దీర్ఘ
+rb_num2long_stub(విలువ_3 x)
+#  లేకపోతే
+    SIGNED_విలువ
+rb_num2long_stub(విలువ_3 x)
 #  endif
 {
-    return dll_rb_num2long(x);
+    తిరిగి dll_rb_num2long(x);
 }
-#  if RUBY_VERSION >= 26
-    VALUE
+#  ఒకవేళ RUBY_సంస్కరణ >= 26
+    విలువ_3
 rb_int2big_stub(intptr_t x)
-#  else
-    VALUE
-rb_int2big_stub(SIGNED_VALUE x)
+#  లేకపోతే
+    విలువ_3
+rb_int2big_stub(SIGNED_విలువ x)
 #  endif
 {
-    return dll_rb_int2big(x);
+    తిరిగి dll_rb_int2big(x);
 }
-#  if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-    long
-rb_fix2int_stub(VALUE x)
+#  ఒకవేళ RUBY_సంస్కరణ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+    దీర్ఘ
+rb_fix2int_stub(విలువ_3 x)
 {
-    return dll_rb_fix2int(x);
+    తిరిగి dll_rb_fix2int(x);
 }
-    long
-rb_num2int_stub(VALUE x)
+    దీర్ఘ
+rb_num2int_stub(విలువ_3 x)
 {
-    return dll_rb_num2int(x);
+    తిరిగి dll_rb_num2int(x);
 }
 #  endif
-#  if RUBY_VERSION >= 20
-    VALUE
-rb_float_new_in_heap(double d)
+#  ఒకవేళ RUBY_సంస్కరణ >= 20
+    విలువ_3
+rb_float_new_లోపల_కుప్ప(ద్విగుణ d)
 {
-    return dll_rb_float_new(d);
+    తిరిగి dll_rb_float_new(d);
 }
-#   if RUBY_VERSION >= 22
-    unsigned long
-rb_num2ulong(VALUE x)
-#   else
-    VALUE
-rb_num2ulong(VALUE x)
+#   ఒకవేళ RUBY_సంస్కరణ >= 22
+    గుర్తులేని దీర్ఘ
+rb_num2ulong(విలువ_3 x)
+#   లేకపోతే
+    విలువ_3
+rb_num2ulong(విలువ_3 x)
 #   endif
 {
-    return (long)RSHIFT((SIGNED_VALUE)(x),1);
+    తిరిగి (దీర్ఘ)RSHIFT((SIGNED_విలువ)(x),1);
 }
 #  endif
-#  if defined(USE_RGENGC) && USE_RGENGC
-#   if RUBY_VERSION == 21
-    void
-rb_gc_writebarrier_unprotect_promoted_stub(VALUE obj)
+#  ఒకవేళ defined(USE_RGENGC) && USE_RGENGC
+#   ఒకవేళ RUBY_సంస్కరణ == 21
+    శూన్య
+rb_gc_writebarrier_unprotect_promoted_stub(విలువ_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect_promoted(obj);
 }
-#   else
-    void
-rb_gc_writebarrier_unprotect_stub(VALUE obj)
+#   లేకపోతే
+    శూన్య
+rb_gc_writebarrier_unprotect_stub(విలువ_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect(obj);
 }
 #   endif
 #  endif
-#  if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-    void
-rb_ary_detransient_stub(VALUE x)
+#  ఒకవేళ RUBY_సంస్కరణ >= 26 && RUBY_సంస్కరణ <= 32
+    శూన్య
+rb_ary_detransient_stub(విలువ_3 x)
 {
     dll_rb_ary_detransient(x);
 }
 #  endif
-#  if RUBY_VERSION >= 30
-    void
-rb_check_type_stub(VALUE obj, int t)
+#  ఒకవేళ RUBY_సంస్కరణ >= 30
+    శూన్య
+rb_check_type_stub(విలువ_3 obj, పూర్ణాంకం t)
 {
     dll_rb_check_type(obj, t);
 }
-    unsigned long
-rb_num2uint_stub(VALUE x)
+    గుర్తులేని దీర్ఘ
+rb_num2uint_stub(విలువ_3 x)
 {
-    return dll_rb_num2uint(x);
+    తిరిగి dll_rb_num2uint(x);
 }
-    void
-ruby_malloc_size_overflow_stub(size_t x, size_t y)
+    శూన్య
+ruby_malloc_కొలత_అధికప్రవాహం_stub(size_t x, size_t y)
 {
-    dll_ruby_malloc_size_overflow(x, y);
+    dll_ruby_malloc_కొలత_అధికప్రవాహం(x, y);
 }
 #  endif
-#  if RUBY_VERSION >= 31
-    void
-rb_debug_rstring_null_ptr_stub(const char *func)
+#  ఒకవేళ RUBY_సంస్కరణ >= 31
+    శూన్య
+rb_debug_rstring_null_ptr_stub(స్థిరరాశి అక్షరం *func)
 {
     dll_rb_debug_rstring_null_ptr(func);
 }
-    void
-rb_unexpected_type_stub(VALUE self, int t)
+    శూన్య
+rb_unexpected_type_stub(విలువ_3 self, పూర్ణాంకం t)
 {
     dll_rb_unexpected_type(self, t);
 }
 #  endif
 #  ifdef USE_TYPEDDATA
-void *rb_check_typeddata_stub(VALUE obj, const rb_data_type_t *data_type)
+శూన్య *rb_check_typeddata_stub(విలువ_3 obj, స్థిరరాశి rb_దత్తాంశం_type_t *దత్తాంశం_type)
 {
-    return dll_rb_check_typeddata(obj, data_type);
+    తిరిగి dll_rb_check_typeddata(obj, దత్తాంశం_type);
 }
 #  endif
 # endif // ifndef PROTO
 
-static HINSTANCE hinstRuby = NULL; // Instance of ruby.dll
+స్థిర HINSTANCE hinstRuby = ఖాళీ; // Instance of ruby.dll
 
 /*
  * Table of name to function pointer of ruby.
  */
-static struct
+స్థిర నిర్మాణం
 {
-    char *name;
+    అక్షరం *name;
     RUBY_PROC *ptr;
-} ruby_funcname_table[] =
+} ruby_funcname_పట్టిక[] =
 {
     {"rb_assoc_new", (RUBY_PROC*)&dll_rb_assoc_new},
     {"rb_cFalseClass", (RUBY_PROC*)&dll_rb_cFalseClass},
-# if defined(USE_RUBY_INTEGER)
+# ఒకవేళ defined(USE_RUBY_INTEGER)
     {"rb_cInteger", (RUBY_PROC*)&dll_rb_cInteger},
-# else
+# లేకపోతే
     {"rb_cFixnum", (RUBY_PROC*)&dll_rb_cFixnum},
 # endif
-# if RUBY_VERSION >= 20
+# ఒకవేళ RUBY_సంస్కరణ >= 20
     {"rb_cFloat", (RUBY_PROC*)&dll_rb_cFloat},
 # endif
     {"rb_cNilClass", (RUBY_PROC*)&dll_rb_cNilClass},
     {"rb_cObject", (RUBY_PROC*)&dll_rb_cObject},
     {"rb_cString", (RUBY_PROC*)&dll_rb_cString},
-    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_cSymbol},
+    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_c_చిహ్నం},
     {"rb_cTrueClass", (RUBY_PROC*)&dll_rb_cTrueClass},
     {"rb_class_new_instance", (RUBY_PROC*)&dll_rb_class_new_instance},
     {"rb_check_type", (RUBY_PROC*)&dll_rb_check_type},
 # ifdef USE_TYPEDDATA
     {"rb_check_typeddata", (RUBY_PROC*)&dll_rb_check_typeddata},
 # endif
-    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_path},
+    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_మార్గం},
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_data_typed_object_wrap},
-#  else
-    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_data_typed_object_alloc},
+#  ఒకవేళ RUBY_సంస్కరణ >= 23
+    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_దత్తాంశం_typed_object_wrap},
+#  లేకపోతే
+    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_దత్తాంశం_typed_object_alloc},
 #  endif
-# else
-    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_data_object_alloc},
+# లేకపోతే
+    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_దత్తాంశం_object_alloc},
 # endif
-# if RUBY_VERSION >= 31
+# ఒకవేళ RUBY_సంస్కరణ >= 31
     {"rb_debug_rstring_null_ptr", (RUBY_PROC*)&dll_rb_debug_rstring_null_ptr},
 # endif
     {"rb_define_class_under", (RUBY_PROC*)&dll_rb_define_class_under},
     {"rb_define_const", (RUBY_PROC*)&dll_rb_define_const},
     {"rb_define_global_function", (RUBY_PROC*)&dll_rb_define_global_function},
-    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_method},
+    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_పద్ధతి},
     {"rb_define_module", (RUBY_PROC*)&dll_rb_define_module},
     {"rb_define_module_function", (RUBY_PROC*)&dll_rb_define_module_function},
-    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_method},
+    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_పద్ధతి},
     {"rb_define_virtual_variable", (RUBY_PROC*)&dll_rb_define_virtual_variable},
     {"rb_stdout", (RUBY_PROC*)&dll_rb_stdout},
     {"rb_stderr", (RUBY_PROC*)&dll_rb_stderr},
     {"rb_eArgError", (RUBY_PROC*)&dll_rb_eArgError},
-    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_eIndexError},
+    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_e_సూచీ_Error},
     {"rb_eRuntimeError", (RUBY_PROC*)&dll_rb_eRuntimeError},
     {"rb_eStandardError", (RUBY_PROC*)&dll_rb_eStandardError},
     {"rb_eval_string_protect", (RUBY_PROC*)&dll_rb_eval_string_protect},
-# if RUBY_VERSION >= 21
+# ఒకవేళ RUBY_సంస్కరణ >= 21
     {"rb_funcallv", (RUBY_PROC*)&dll_rb_funcallv},
-# else
+# లేకపోతే
     {"rb_funcall2", (RUBY_PROC*)&dll_rb_funcall2},
 # endif
     {"rb_global_variable", (RUBY_PROC*)&dll_rb_global_variable},
@@ -685,29 +685,29 @@ static struct
     {"rb_inspect", (RUBY_PROC*)&dll_rb_inspect},
     {"rb_int2inum", (RUBY_PROC*)&dll_rb_int2inum},
     {"rb_intern", (RUBY_PROC*)&dll_rb_intern},
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# ఒకవేళ RUBY_సంస్కరణ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     {"rb_fix2int", (RUBY_PROC*)&dll_rb_fix2int},
     {"rb_num2int", (RUBY_PROC*)&dll_rb_num2int},
     {"rb_num2uint", (RUBY_PROC*)&dll_rb_num2uint},
 # endif
     {"rb_num2dbl", (RUBY_PROC*)&dll_rb_num2dbl},
     {"rb_lastline_get", (RUBY_PROC*)&dll_rb_lastline_get},
-    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_set},
+    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_సమితి},
     {"rb_protect", (RUBY_PROC*)&dll_rb_protect},
-    {"rb_load", (RUBY_PROC*)&dll_rb_load},
+    {"rb_load", (RUBY_PROC*)&dll_rb_ఎక్కించు},
     {"rb_num2long", (RUBY_PROC*)&dll_rb_num2long},
     {"rb_num2ulong", (RUBY_PROC*)&dll_rb_num2ulong},
     {"rb_obj_alloc", (RUBY_PROC*)&dll_rb_obj_alloc},
     {"rb_obj_as_string", (RUBY_PROC*)&dll_rb_obj_as_string},
     {"rb_obj_id", (RUBY_PROC*)&dll_rb_obj_id},
     {"rb_raise", (RUBY_PROC*)&dll_rb_raise},
-    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_value},
+    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_విలువ},
     {"rb_str_cat", (RUBY_PROC*)&dll_rb_str_cat},
     {"rb_str_concat", (RUBY_PROC*)&dll_rb_str_concat},
     {"rb_str_new", (RUBY_PROC*)&dll_rb_str_new},
 # ifdef need_rb_str_new_cstr
     {"rb_str_new_cstr", (RUBY_PROC*)&dll_rb_str_new_cstr},
-# else
+# లేకపోతే
     {"rb_str_new2", (RUBY_PROC*)&dll_rb_str_new2},
 # endif
     {"rb_errinfo", (RUBY_PROC*)&dll_rb_errinfo},
@@ -717,29 +717,29 @@ static struct
     {"ruby_sysinit", (RUBY_PROC*)&dll_ruby_sysinit},
     {"rb_w32_snprintf", (RUBY_PROC*)&dll_rb_w32_snprintf},
 # endif
-# if RUBY_VERSION >= 31
+# ఒకవేళ RUBY_సంస్కరణ >= 31
     {"rb_unexpected_type", (RUBY_PROC*)&dll_rb_unexpected_type},
 # endif
-    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_value_ptr},
-# if RUBY_VERSION >= 20
+    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_విలువ_ptr},
+# ఒకవేళ RUBY_సంస్కరణ >= 20
     {"rb_float_new_in_heap", (RUBY_PROC*)&dll_rb_float_new},
-# else
+# లేకపోతే
     {"rb_float_new", (RUBY_PROC*)&dll_rb_float_new},
 # endif
     {"rb_ary_new", (RUBY_PROC*)&dll_rb_ary_new},
 # ifdef RB_ARY_NEW4_MACRO
     {"rb_ary_new_from_values", (RUBY_PROC*)&dll_rb_ary_new4},
-# else
+# లేకపోతే
     {"rb_ary_new4", (RUBY_PROC*)&dll_rb_ary_new4},
 # endif
-    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_push},
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_నెట్టు},
+# ఒకవేళ RUBY_సంస్కరణ >= 26 && RUBY_సంస్కరణ <= 32
     {"rb_ary_detransient", (RUBY_PROC*)&dll_rb_ary_detransient},
 # endif
     {"rb_int2big", (RUBY_PROC*)&dll_rb_int2big},
     {"ruby_script", (RUBY_PROC*)&dll_ruby_script},
-    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_find_index},
-    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_find},
+    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_కనుగొను_సూచీ},
+    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_కనుగొను},
     {"rb_enc_str_new", (RUBY_PROC*)&dll_rb_enc_str_new},
     {"rb_sprintf", (RUBY_PROC*)&dll_rb_sprintf},
     {"rb_require", (RUBY_PROC*)&dll_rb_require},
@@ -747,18 +747,18 @@ static struct
 # ifdef __ia64
     {"rb_ia64_bsp", (RUBY_PROC*)&dll_rb_ia64_bsp},
 # endif
-    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_stack},
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
+    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_దొంతర},
+# ఒకవేళ defined(USE_RGENGC) && USE_RGENGC
+#  ఒకవేళ RUBY_సంస్కరణ == 21
     {"rb_gc_writebarrier_unprotect_promoted", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect_promoted},
-#  else
+#  లేకపోతే
     {"rb_gc_writebarrier_unprotect", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect},
 #  endif
 # endif
-# if RUBY_VERSION >= 30
-    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_size_overflow},
+# ఒకవేళ RUBY_సంస్కరణ >= 30
+    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_కొలత_అధికప్రవాహం},
 # endif
-    {"", NULL},
+    {"", ఖాళీ},
 };
 
 /*
@@ -766,66 +766,66 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-ruby_runtime_link_init(char *libname, int verbose)
+    స్థిర పూర్ణాంకం
+ruby_runtime_link_init(అక్షరం *libname, పూర్ణాంకం verbose)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (hinstRuby)
-	return OK;
-    hinstRuby = load_dll(libname);
-    if (!hinstRuby)
+    ఒకవేళ (hinstRuby)
+	తిరిగి OK;
+    hinstRuby = ఎక్కించు_dll(libname);
+    ఒకవేళ (!hinstRuby)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ఒకవేళ (verbose)
+	    semsg(_(e_could_not_ఎక్కించు_library_str_str), libname, ఎక్కించు_dll_error());
+	తిరిగి FAIL;
     }
 
-    for (i = 0; ruby_funcname_table[i].ptr; ++i)
+    కొరకు (i = 0; ruby_funcname_పట్టిక[i].ptr; ++i)
     {
-	if (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
-			ruby_funcname_table[i].name)))
+	ఒకవేళ (!(*ruby_funcname_పట్టిక[i].ptr = చిహ్నం_from_dll(hinstRuby,
+			ruby_funcname_పట్టిక[i].name)))
 	{
 	    close_dll(hinstRuby);
-	    hinstRuby = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), ruby_funcname_table[i].name);
-	    return FAIL;
+	    hinstRuby = ఖాళీ;
+	    ఒకవేళ (verbose)
+		semsg(_(e_could_not_ఎక్కించు_library_function_str), ruby_funcname_పట్టిక[i].name);
+	    తిరిగి FAIL;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * If ruby is enabled (there is installed ruby on Windows system) return TRUE,
  * else FALSE.
  */
-    int
-ruby_enabled(int verbose)
+    పూర్ణాంకం
+ruby_enabled(పూర్ణాంకం verbose)
 {
-    return ruby_runtime_link_init((char *)p_rubydll, verbose) == OK;
+    తిరిగి ruby_runtime_link_init((అక్షరం *)p_rubydll, verbose) == OK;
 }
-#endif // defined(DYNAMIC_RUBY)
+#అయితే_ముగింపు // defined(DYNAMIC_RUBY)
 
-    void
-ruby_end(void)
+    శూన్య
+ruby_చివర(శూన్య)
 {
 }
 
-    void
+    శూన్య
 ex_ruby(exarg_T *eap)
 {
-    int state;
-    char *script = NULL;
+    పూర్ణాంకం state;
+    అక్షరం *script = ఖాళీ;
 
-    script = (char *)script_get(eap, eap->arg);
-    if (!eap->skip && ensure_ruby_initialized())
+    script = (అక్షరం *)script_get(eap, eap->arg);
+    ఒకవేళ (!eap->skip && ensure_ruby_initialized())
     {
-	if (script == NULL)
-	    rb_eval_string_protect((char *)eap->arg, &state);
-	else
+	ఒకవేళ (script == ఖాళీ)
+	    rb_eval_string_protect((అక్షరం *)eap->arg, &state);
+	లేకపోతే
 	    rb_eval_string_protect(script, &state);
-	if (state)
+	ఒకవేళ (state)
 	    error_print(state);
     }
     vim_free(script);
@@ -836,156 +836,156 @@ ex_ruby(exarg_T *eap)
  *  conversion buffer string of vim to ruby String object using
  *  VIM encoding option.
  */
-    static VALUE
-vim_str2rb_enc_str(const char *s)
+    స్థిర విలువ_3
+vim_str2rb_enc_str(స్థిరరాశి అక్షరం *s)
 {
-    long lval;
+    దీర్ఘ lval;
     char_u *sval;
     rb_encoding *enc;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    ఒకవేళ (get_option_విలువ((char_u *)"enc", &lval, &sval, ఖాళీ, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_కనుగొను((అక్షరం *)sval);
 	vim_free(sval);
-	if (enc)
-	    return rb_enc_str_new(s, (long)strlen(s), enc);
+	ఒకవేళ (enc)
+	    తిరిగి rb_enc_str_new(s, (దీర్ఘ)అక్షరశ్రేణి_పొడవు(s), enc);
     }
-    return rb_str_new2(s);
+    తిరిగి rb_str_new2(s);
 }
 
-    static VALUE
-eval_enc_string_protect(const char *str, int *state)
+    స్థిర విలువ_3
+eval_enc_string_protect(స్థిరరాశి అక్షరం *str, పూర్ణాంకం *state)
 {
-    long lval;
+    దీర్ఘ lval;
     char_u *sval;
     rb_encoding *enc;
-    VALUE v;
+    విలువ_3 v;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    ఒకవేళ (get_option_విలువ((char_u *)"enc", &lval, &sval, ఖాళీ, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_కనుగొను((అక్షరం *)sval);
 	vim_free(sval);
-	if (enc)
+	ఒకవేళ (enc)
 	{
 	    v = rb_sprintf("#-*- coding:%s -*-\n%s", rb_enc_name(enc), str);
-	    return rb_eval_string_protect(StringValuePtr(v), state);
+	    తిరిగి rb_eval_string_protect(String_విలువ_Ptr(v), state);
 	}
     }
-    return rb_eval_string_protect(str, state);
+    తిరిగి rb_eval_string_protect(str, state);
 }
 
-    void
+    శూన్య
 ex_rubydo(exarg_T *eap)
 {
-    int state;
+    పూర్ణాంకం state;
     linenr_T i;
     buf_T   *was_curbuf = curbuf;
 
-    if (!ensure_ruby_initialized())
-	return;
+    ఒకవేళ (!ensure_ruby_initialized())
+	తిరిగి;
 
-    if (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
-	return;
-    for (i = eap->line1; i <= eap->line2; i++)
+    ఒకవేళ (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
+	తిరిగి;
+    కొరకు (i = eap->line1; i <= eap->line2; i++)
     {
-	VALUE line;
+	విలువ_3 పంక్తి;
 
-	if (i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = vim_str2rb_enc_str((char *)ml_get(i));
-	rb_lastline_set(line);
-	eval_enc_string_protect((char *) eap->arg, &state);
-	if (state)
+	ఒకవేళ (i > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    ఆపు;
+	పంక్తి = vim_str2rb_enc_str((అక్షరం *)ml_get(i));
+	rb_lastline_సమితి(పంక్తి);
+	eval_enc_string_protect((అక్షరం *) eap->arg, &state);
+	ఒకవేళ (state)
 	{
 	    error_print(state);
-	    break;
+	    ఆపు;
 	}
-	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = rb_lastline_get();
-	if (!NIL_P(line))
+	ఒకవేళ (was_curbuf != curbuf || i > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    ఆపు;
+	పంక్తి = rb_lastline_get();
+	ఒకవేళ (!NIL_P(పంక్తి))
 	{
-	    if (TYPE(line) != T_STRING)
+	    ఒకవేళ (TYPE(పంక్తి) != T_STRING)
 	    {
-		emsg(_(e_dollar_must_be_an_instance_of_string));
-		return;
+		emsg(_(e_dollar_must_be_an_instance_యొక్క_string));
+		తిరిగి;
 	    }
-	    ml_replace(i, (char_u *) StringValuePtr(line), 1);
-	    changed();
-#ifdef SYNTAX_HL
-	    syn_changed(i); // recompute syntax hl. for this line
-#endif
+	    ml_replace(i, (char_u *) String_విలువ_Ptr(పంక్తి), 1);
+	    మారింది();
+#నిర్వచితమైతే SYNTAX_HL
+	    syn_మారింది(i); // recompute syntax hl. for this line
+#అయితే_ముగింపు
 	}
     }
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static VALUE
-rb_load_wrap(VALUE file_to_load)
+    స్థిర విలువ_3
+rb_ఎక్కించు_wrap(విలువ_3 file_గమ్యం_ఎక్కించు)
 {
-    rb_load(file_to_load, 0);
-    return Qnil;
+    rb_ఎక్కించు(file_గమ్యం_ఎక్కించు, 0);
+    తిరిగి Qnil;
 }
 
-    void
+    శూన్య
 ex_rubyfile(exarg_T *eap)
 {
-    int state;
+    పూర్ణాంకం state;
 
-    if (!ensure_ruby_initialized())
-	return;
+    ఒకవేళ (!ensure_ruby_initialized())
+	తిరిగి;
 
-    VALUE file_to_load = rb_str_new2((const char *)eap->arg);
-    rb_protect(rb_load_wrap, file_to_load, &state);
-    if (state)
+    విలువ_3 file_గమ్యం_ఎక్కించు = rb_str_new2((స్థిరరాశి అక్షరం *)eap->arg);
+    rb_protect(rb_ఎక్కించు_wrap, file_గమ్యం_ఎక్కించు, &state);
+    ఒకవేళ (state)
 	error_print(state);
 }
 
-    void
-ruby_buffer_free(buf_T *buf)
+    శూన్య
+ruby_బఫరు_free(buf_T *buf)
 {
-    if (buf->b_ruby_ref == NULL)
-	return;
+    ఒకవేళ (buf->b_ruby_ref == ఖాళీ)
+	తిరిగి;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) buf->b_ruby_ref), Qnil);
-    RDATA(buf->b_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((విలువ_3) buf->b_ruby_ref), Qnil);
+    RDATA(buf->b_ruby_ref)->దత్తాంశం = ఖాళీ;
 }
 
-    void
-ruby_window_free(win_T *win)
+    శూన్య
+ruby_కిటికీ_free(win_T *win)
 {
-    if (win->w_ruby_ref == NULL)
-	return;
+    ఒకవేళ (win->w_ruby_ref == ఖాళీ)
+	తిరిగి;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) win->w_ruby_ref), Qnil);
-    RDATA(win->w_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((విలువ_3) win->w_ruby_ref), Qnil);
+    RDATA(win->w_ruby_ref)->దత్తాంశం = ఖాళీ;
 }
 
-    static int
-ensure_ruby_initialized(void)
+    స్థిర పూర్ణాంకం
+ensure_ruby_initialized(శూన్య)
 {
-    if (ruby_initialized)
-	return ruby_initialized;
+    ఒకవేళ (ruby_initialized)
+	తిరిగి ruby_initialized;
 
-#ifdef DYNAMIC_RUBY
-    if (ruby_enabled(TRUE))
-#endif
+#నిర్వచితమైతే DYNAMIC_RUBY
+    ఒకవేళ (ruby_enabled(TRUE))
+#అయితే_ముగింపు
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// suggested by Ariya Mizutani
-	int argc = 1;
-	char *argv[] = {"gvim.exe"};
-	char **argvp = argv;
+	పూర్ణాంకం argc = 1;
+	అక్షరం *argv[] = {"gvim.exe"};
+	అక్షరం **argvp = argv;
 	ruby_sysinit(&argc, &argvp);
-#endif
+#అయితే_ముగింపు
 	{
-	    ruby_init_stack(ruby_stack_start);
+	    ruby_init_దొంతర(ruby_దొంతర_ప్రారంభం);
 	    ruby_init();
 	}
 	{
-	    int dummy_argc = 2;
-	    char *dummy_argv[] = {"vim-ruby", "-e_=0"};
+	    పూర్ణాంకం dummy_argc = 2;
+	    అక్షరం *dummy_argv[] = {"vim-ruby", "-e_=0"};
 	    ruby_options(dummy_argc, dummy_argv);
 	}
 	ruby_script("vim-ruby");
@@ -993,235 +993,235 @@ ensure_ruby_initialized(void)
 	ruby_vim_init();
 	ruby_initialized = 1;
     }
-#ifdef DYNAMIC_RUBY
-    else
+#నిర్వచితమైతే DYNAMIC_RUBY
+    లేకపోతే
     {
 	emsg(_(e_sorry_this_command_is_disabled_the_ruby_library_could_not_be_loaded));
-	return 0;
+	తిరిగి 0;
     }
-#endif
+#అయితే_ముగింపు
 
-    return ruby_initialized;
+    తిరిగి ruby_initialized;
 }
 
-    static void
-error_print(int state)
+    స్థిర శూన్య
+error_print(పూర్ణాంకం state)
 {
-    VALUE error;
-    VALUE eclass;
-    VALUE einfo;
-    VALUE bt;
-    int attr;
-    char buff[BUFSIZ];
-    long i;
+    విలువ_3 error;
+    విలువ_3 eclass;
+    విలువ_3 einfo;
+    విలువ_3 bt;
+    పూర్ణాంకం attr;
+    అక్షరం buff[BUFSIZ];
+    దీర్ఘ i;
 
-#define TAG_RETURN	0x1
-#define TAG_BREAK	0x2
-#define TAG_NEXT	0x3
-#define TAG_RETRY	0x4
-#define TAG_REDO	0x5
-#define TAG_RAISE	0x6
-#define TAG_THROW	0x7
-#define TAG_FATAL	0x8
-#define TAG_MASK	0xf
+#నిర్వచించు ట్యాగ్_RETURN	0x1
+#నిర్వచించు ట్యాగ్_BREAK	0x2
+#నిర్వచించు ట్యాగ్_తదుపరి	0x3
+#నిర్వచించు ట్యాగ్_RETRY	0x4
+#నిర్వచించు ట్యాగ్_REDO	0x5
+#నిర్వచించు ట్యాగ్_RAISE	0x6
+#నిర్వచించు ట్యాగ్_THROW	0x7
+#నిర్వచించు ట్యాగ్_FATAL	0x8
+#నిర్వచించు ట్యాగ్_ముసుగు	0xf
 
-    switch (state)
+    ఎంపిక (state)
     {
-	case TAG_RETURN:
+	స్థితి ట్యాగ్_RETURN:
 	    emsg(_(e_unexpected_return));
-	    break;
-	case TAG_NEXT:
-	    emsg(_(e_unexpected_next));
-	    break;
-	case TAG_BREAK:
+	    ఆపు;
+	స్థితి ట్యాగ్_తదుపరి:
+	    emsg(_(e_unexpected_తదుపరి));
+	    ఆపు;
+	స్థితి ట్యాగ్_BREAK:
 	    emsg(_(e_unexpected_break));
-	    break;
-	case TAG_REDO:
+	    ఆపు;
+	స్థితి ట్యాగ్_REDO:
 	    emsg(_(e_unexpected_redo));
-	    break;
-	case TAG_RETRY:
-	    emsg(_(e_retry_outside_of_rescue_clause));
-	    break;
-	case TAG_RAISE:
-	case TAG_FATAL:
+	    ఆపు;
+	స్థితి ట్యాగ్_RETRY:
+	    emsg(_(e_retry_outside_యొక్క_rescue_clause));
+	    ఆపు;
+	స్థితి ట్యాగ్_RAISE:
+	స్థితి ట్యాగ్_FATAL:
 	    error = rb_errinfo();
-	    eclass = CLASS_OF(error);
+	    eclass = CLASS_యొక్క(error);
 	    einfo = rb_obj_as_string(error);
-	    if (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
+	    ఒకవేళ (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
 	    {
 		emsg(_(e_unhandled_exception));
 	    }
-	    else
+	    లేకపోతే
 	    {
-		VALUE epath;
-		char *p;
+		విలువ_3 epath;
+		అక్షరం *p;
 
-		epath = rb_class_path(eclass);
+		epath = rb_class_మార్గం(eclass);
 		vim_snprintf(buff, BUFSIZ, "%s: %s",
 			 RSTRING_PTR(epath), RSTRING_PTR(einfo));
 		p = strchr(buff, '\n');
-		if (p) *p = '\0';
+		ఒకవేళ (p) *p = '\0';
 		emsg(buff);
 	    }
 
 	    attr = syn_name2attr((char_u *)"Error");
-#if RUBY_VERSION >= 21
+#ఒకవేళ RUBY_సంస్కరణ >= 21
 	    bt = rb_funcallv(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
-#else
+	    కొరకు (i = 0; i < RARRAY_LEN(bt); i++)
+		సందేశం_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
+#లేకపోతే
 	    bt = rb_funcall2(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
-#endif
-	    break;
-	default:
-	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_status_nr), state);
+	    కొరకు (i = 0; i < RARRAY_LEN(bt); i++)
+		సందేశం_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
+#అయితే_ముగింపు
+	    ఆపు;
+	అప్రమేయ:
+	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_స్థితి_nr), state);
 	    emsg(buff);
-	    break;
+	    ఆపు;
     }
 }
 
-    static VALUE
-vim_message(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+vim_సందేశం(విలువ_3 self వాడని, విలువ_3 str)
 {
-    char *buff, *p;
+    అక్షరం *buff, *p;
 
     str = rb_obj_as_string(str);
-    if (RSTRING_LEN(str) > 0)
+    ఒకవేళ (RSTRING_LEN(str) > 0)
     {
 	// Only do this when the string isn't empty, alloc(0) causes trouble.
-	buff = ALLOCA_N(char, RSTRING_LEN(str) + 1);
+	buff = ALLOCA_N(అక్షరం, RSTRING_LEN(str) + 1);
 	strcpy(buff, RSTRING_PTR(str));
 	p = strchr(buff, '\n');
-	if (p) *p = '\0';
-	msg(buff);
+	ఒకవేళ (p) *p = '\0';
+	సందేశం(buff);
     }
-    else
+    లేకపోతే
     {
-	msg("");
+	సందేశం("");
     }
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-vim_set_option(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+vim_సమితి_option(విలువ_3 self వాడని, విలువ_3 str)
 {
-    do_set((char_u *)StringValuePtr(str), 0);
+    do_సమితి((char_u *)String_విలువ_Ptr(str), 0);
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-vim_command(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+vim_command(విలువ_3 self వాడని, విలువ_3 str)
 {
-    do_cmdline_cmd((char_u *)StringValuePtr(str));
-    return Qnil;
+    do_cmdline_cmd((char_u *)String_విలువ_Ptr(str));
+    తిరిగి Qnil;
 }
 
-#ifdef FEAT_EVAL
-    static VALUE
-vim_to_ruby(typval_T *tv)
+#నిర్వచితమైతే FEAT_EVAL
+    స్థిర విలువ_3
+vim_గమ్యం_ruby(typval_T *tv)
 {
-    VALUE result = Qnil;
+    విలువ_3 ఫలితం = Qnil;
 
-    if (tv->v_type == VAR_STRING)
+    ఒకవేళ (tv->v_type == VAR_STRING)
     {
-	result = rb_str_new2(tv->vval.v_string == NULL
-					  ? "" : (char *)(tv->vval.v_string));
+	ఫలితం = rb_str_new2(tv->vval.v_string == ఖాళీ
+					  ? "" : (అక్షరం *)(tv->vval.v_string));
     }
-    else if (tv->v_type == VAR_NUMBER)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_సంఖ్య)
     {
-	result = INT2NUM(tv->vval.v_number);
+	ఫలితం = INT2_అంకె(tv->vval.v_సంఖ్య);
     }
-    else if (tv->v_type == VAR_FLOAT)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_FLOAT)
     {
-	result = rb_float_new(tv->vval.v_float);
+	ఫలితం = rb_float_new(tv->vval.v_float);
     }
-    else if (tv->v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_LIST)
     {
 	list_T      *list = tv->vval.v_list;
 	listitem_T  *curr;
 
-	result = rb_ary_new();
+	ఫలితం = rb_ary_new();
 
-	if (list != NULL)
+	ఒకవేళ (list != ఖాళీ)
 	{
-	    FOR_ALL_LIST_ITEMS(list, curr)
-		rb_ary_push(result, vim_to_ruby(&curr->li_tv));
+	    FOR_ALL_LIST_వస్తువులు(list, curr)
+		rb_ary_నెట్టు(ఫలితం, vim_గమ్యం_ruby(&curr->li_tv));
 	}
     }
-    else if (tv->v_type == VAR_DICT)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_DICT)
     {
-	result = rb_hash_new();
+	ఫలితం = rb_hash_new();
 
-	if (tv->vval.v_dict != NULL)
+	ఒకవేళ (tv->vval.v_dict != ఖాళీ)
 	{
 	    hashtab_T   *ht = &tv->vval.v_dict->dv_hashtab;
-	    long_u      todo = ht->ht_used;
+	    long_u      todo = ht->ht_వాడిన;
 	    hashitem_T  *hi;
 	    dictitem_T  *di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_వస్తువులు(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
-		    rb_hash_aset(result, rb_str_new2((char *)hi->hi_key),
-						     vim_to_ruby(&di->di_tv));
+		    rb_hash_aset(ఫలితం, rb_str_new2((అక్షరం *)hi->hi_కీలకం),
+						     vim_గమ్యం_ruby(&di->di_tv));
 		}
 	    }
 	}
     }
-    else if (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
     {
-	if (tv->vval.v_number == VVAL_TRUE)
-	    result = Qtrue;
-	else if (tv->vval.v_number == VVAL_FALSE)
-	    result = Qfalse;
+	ఒకవేళ (tv->vval.v_సంఖ్య == VVAL_TRUE)
+	    ఫలితం = Qtrue;
+	లేకపోతే ఒకవేళ (tv->vval.v_సంఖ్య == VVAL_FALSE)
+	    ఫలితం = Qfalse;
     }
-    else if (tv->v_type == VAR_BLOB)
+    లేకపోతే ఒకవేళ (tv->v_type == VAR_BLOB)
     {
-	result = rb_str_new(tv->vval.v_blob->bv_ga.ga_data,
+	ఫలితం = rb_str_new(tv->vval.v_blob->bv_ga.ga_దత్తాంశం,
 		tv->vval.v_blob->bv_ga.ga_len);
     }
     // else return Qnil;
 
-    return result;
+    తిరిగి ఫలితం;
 }
-#endif
+#అయితే_ముగింపు
 
-    static VALUE
-vim_evaluate(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+vim_evaluate(విలువ_3 self వాడని, విలువ_3 str)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     typval_T    *tv;
-    VALUE       result;
+    విలువ_3       ఫలితం;
 
-    tv = eval_expr((char_u *)StringValuePtr(str), NULL);
-    if (tv == NULL)
-	return Qnil;
-    result = vim_to_ruby(tv);
+    tv = eval_సమాసం((char_u *)String_విలువ_Ptr(str), ఖాళీ);
+    ఒకవేళ (tv == ఖాళీ)
+	తిరిగి Qnil;
+    ఫలితం = vim_గమ్యం_ruby(tv);
 
     free_tv(tv);
 
-    return result;
-#else
-    return Qnil;
-#endif
+    తిరిగి ఫలితం;
+#లేకపోతే
+    తిరిగి Qnil;
+#అయితే_ముగింపు
 }
 
-#ifdef USE_TYPEDDATA
-static size_t buffer_dsize(const void *buf);
+#నిర్వచితమైతే USE_TYPEDDATA
+స్థిర size_t బఫరు_dsize(స్థిరరాశి శూన్య *buf);
 
-static const rb_data_type_t buffer_type = {
+స్థిర స్థిరరాశి rb_దత్తాంశం_type_t బఫరు_type = {
     "vim_buffer",
-    {0, 0, buffer_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, బఫరు_dsize,
+# ఒకవేళ RUBY_సంస్కరణ >= 27
 	0, {0}
-# else
+# లేకపోతే
 	{0, 0}
 # endif
     },
@@ -1231,174 +1231,174 @@ static const rb_data_type_t buffer_type = {
 # endif
 };
 
-    static size_t
-buffer_dsize(const void *buf UNUSED)
+    స్థిర size_t
+బఫరు_dsize(స్థిరరాశి శూన్య *buf వాడని)
 {
-    return sizeof(buf_T);
+    తిరిగి పరిమాణం(buf_T);
 }
-#endif
+#అయితే_ముగింపు
 
-    static VALUE
-buffer_new(buf_T *buf)
+    స్థిర విలువ_3
+బఫరు_new(buf_T *buf)
 {
-    if (buf->b_ruby_ref)
+    ఒకవేళ (buf->b_ruby_ref)
     {
-	return (VALUE) buf->b_ruby_ref;
+	తిరిగి (విలువ_3) buf->b_ruby_ref;
     }
-    else
+    లేకపోతే
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
-#else
-	VALUE obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
-#endif
-	buf->b_ruby_ref = (void *) obj;
+#నిర్వచితమైతే USE_TYPEDDATA
+	విలువ_3 obj = Typed_దత్తాంశం_Wrap_Struct(c_బఫరు, &బఫరు_type, buf);
+#లేకపోతే
+	విలువ_3 obj = దత్తాంశం_Wrap_Struct(c_బఫరు, 0, 0, buf);
+#అయితే_ముగింపు
+	buf->b_ruby_ref = (శూన్య *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	తిరిగి obj;
     }
 }
 
-    static buf_T *
-get_buf(VALUE obj)
+    స్థిర buf_T *
+get_buf(విలువ_3 obj)
 {
     buf_T *buf;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, buf_T, &buffer_type, buf);
-#else
-    Data_Get_Struct(obj, buf_T, buf);
-#endif
-    if (buf == NULL)
-	rb_raise(eDeletedBufferError, "attempt to refer to deleted buffer");
-    return buf;
+#నిర్వచితమైతే USE_TYPEDDATA
+    Typed_దత్తాంశం_Get_Struct(obj, buf_T, &బఫరు_type, buf);
+#లేకపోతే
+    దత్తాంశం_Get_Struct(obj, buf_T, buf);
+#అయితే_ముగింపు
+    ఒకవేళ (buf == ఖాళీ)
+	rb_raise(e_Deleted_బఫరు_Error, "attempt to refer to deleted buffer");
+    తిరిగి buf;
 }
 
-    static VALUE
-vim_blob(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+vim_blob(విలువ_3 self వాడని, విలువ_3 str)
 {
-    VALUE result = rb_str_new("0z", 2);
-    char    buf[4];
-    int	i;
-    for (i = 0; i < RSTRING_LEN(str); i++)
+    విలువ_3 ఫలితం = rb_str_new("0z", 2);
+    అక్షరం    buf[4];
+    పూర్ణాంకం	i;
+    కొరకు (i = 0; i < RSTRING_LEN(str); i++)
     {
-	sprintf(buf, "%02X", (unsigned char)(RSTRING_PTR(str)[i]));
-	rb_str_concat(result, rb_str_new2(buf));
+	sprintf(buf, "%02X", (గుర్తులేని అక్షరం)(RSTRING_PTR(str)[i]));
+	rb_str_concat(ఫలితం, rb_str_new2(buf));
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
-    static VALUE
-buffer_s_current(VALUE self UNUSED)
+    స్థిర విలువ_3
+బఫరు_s_current(విలువ_3 self వాడని)
 {
-    return buffer_new(curbuf);
+    తిరిగి బఫరు_new(curbuf);
 }
 
-    static VALUE
-buffer_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    స్థిర విలువ_3
+బఫరు_s_current_getter(ID id వాడని, విలువ_3 *x వాడని)
 {
-    return buffer_new(curbuf);
+    తిరిగి బఫరు_new(curbuf);
 }
 
-    static VALUE
-buffer_s_count(VALUE self UNUSED)
+    స్థిర విలువ_3
+బఫరు_s_లెక్క(విలువ_3 self వాడని)
 {
     buf_T *b;
-    int n = 0;
+    పూర్ణాంకం n = 0;
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (b->b_p_bl)
+	ఒకవేళ (b->b_p_bl)
 	    n++;
     }
 
-    return INT2NUM(n);
+    తిరిగి INT2_అంకె(n);
 }
 
-    static VALUE
-buffer_s_aref(VALUE self UNUSED, VALUE num)
+    స్థిర విలువ_3
+బఫరు_s_aref(విలువ_3 self వాడని, విలువ_3 అంకె)
 {
     buf_T *b;
-    int n = NUM2INT(num);
+    పూర్ణాంకం n = NUM2INT(అంకె);
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (!b->b_p_bl)
-	    continue;
+	ఒకవేళ (!b->b_p_bl)
+	    కొనసాగు;
 
-	if (n == 0)
-	    return buffer_new(b);
+	ఒకవేళ (n == 0)
+	    తిరిగి బఫరు_new(b);
 
 	n--;
     }
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-buffer_name(VALUE self)
+    స్థిర విలువ_3
+బఫరు_name(విలువ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
+    తిరిగి buf->b_ffname ? rb_str_new2((అక్షరం *)buf->b_ffname) : Qnil;
 }
 
-    static VALUE
-buffer_number(VALUE self)
+    స్థిర విలువ_3
+బఫరు_సంఖ్య(విలువ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_fnum);
+    తిరిగి INT2_అంకె(buf->b_fnum);
 }
 
-    static VALUE
-buffer_count(VALUE self)
+    స్థిర విలువ_3
+బఫరు_లెక్క(విలువ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_ml.ml_line_count);
+    తిరిగి INT2_అంకె(buf->b_ml.ml_పంక్తి_లెక్క);
 }
 
-    static VALUE
-get_buffer_line(buf_T *buf, linenr_T n)
+    స్థిర విలువ_3
+get_బఫరు_పంక్తి(buf_T *buf, linenr_T n)
 {
-    if (n <= 0 || n > buf->b_ml.ml_line_count)
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
-    return vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
+    ఒకవేళ (n <= 0 || n > buf->b_ml.ml_పంక్తి_లెక్క)
+	rb_raise(rb_e_సూచీ_Error, "line number %ld out of range", (దీర్ఘ)n);
+    తిరిగి vim_str2rb_enc_str((అక్షరం *)ml_get_buf(buf, n, FALSE));
 }
 
-    static VALUE
-buffer_aref(VALUE self, VALUE num)
+    స్థిర విలువ_3
+బఫరు_aref(విలువ_3 self, విలువ_3 అంకె)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return get_buffer_line(buf, (linenr_T)NUM2LONG(num));
-    return Qnil; // For stop warning
+    ఒకవేళ (buf != ఖాళీ)
+	తిరిగి get_బఫరు_పంక్తి(buf, (linenr_T)NUM2LONG(అంకె));
+    తిరిగి Qnil; // For stop warning
 }
 
-    static VALUE
-set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
+    స్థిర విలువ_3
+సమితి_బఫరు_పంక్తి(buf_T *buf, linenr_T n, విలువ_3 str)
 {
-    char	*line = StringValuePtr(str);
+    అక్షరం	*పంక్తి = String_విలువ_Ptr(str);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
+    ఒకవేళ (n > 0 && n <= buf->b_ml.ml_పంక్తి_లెక్క && పంక్తి != ఖాళీ)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ఒకవేళ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savesub(n) == OK)
+	    ఒకవేళ (u_savesub(n) == OK)
 	    {
-		ml_replace(n, (char_u *)line, TRUE);
-		changed();
-#ifdef SYNTAX_HL
-		syn_changed(n); // recompute syntax hl. for this line
-#endif
+		ml_replace(n, (char_u *)పంక్తి, TRUE);
+		మారింది();
+#నిర్వచితమైతే SYNTAX_HL
+		syn_మారింది(n); // recompute syntax hl. for this line
+#అయితే_ముగింపు
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1408,46 +1408,46 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    లేకపోతే
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
+	rb_raise(rb_e_సూచీ_Error, "line number %ld out of range", (దీర్ఘ)n);
     }
-    return str;
+    తిరిగి str;
 }
 
-    static VALUE
-buffer_aset(VALUE self, VALUE num, VALUE str)
+    స్థిర విలువ_3
+బఫరు_aset(విలువ_3 self, విలువ_3 అంకె, విలువ_3 str)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
-    return str;
+    ఒకవేళ (buf != ఖాళీ)
+	తిరిగి సమితి_బఫరు_పంక్తి(buf, (linenr_T)NUM2LONG(అంకె), str);
+    తిరిగి str;
 }
 
-    static VALUE
-buffer_delete(VALUE self, VALUE num)
+    స్థిర విలువ_3
+బఫరు_delete(విలువ_3 self, విలువ_3 అంకె)
 {
     buf_T	*buf = get_buf(self);
-    long	n = NUM2LONG(num);
+    దీర్ఘ	n = NUM2LONG(అంకె);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count)
+    ఒకవేళ (n > 0 && n <= buf->b_ml.ml_పంక్తి_లెక్క)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ఒకవేళ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savedel(n, 1) == OK)
+	    ఒకవేళ (u_savedel(n, 1) == OK)
 	    {
 		ml_delete(n);
 
 		// Changes to non-active buffers should properly refresh
 		//   SegPhault - 01/09/05
-		deleted_lines_mark(n, 1L);
+		deleted_పంక్తులు_mark(n, 1L);
 
-		changed();
+		మారింది();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1457,41 +1457,41 @@ buffer_delete(VALUE self, VALUE num)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    లేకపోతే
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_సూచీ_Error, "line number %ld out of range", n);
     }
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-buffer_append(VALUE self, VALUE num, VALUE str)
+    స్థిర విలువ_3
+బఫరు_append(విలువ_3 self, విలువ_3 అంకె, విలువ_3 str)
 {
     buf_T	*buf = get_buf(self);
-    char	*line = StringValuePtr(str);
-    long	n = NUM2LONG(num);
+    అక్షరం	*పంక్తి = String_విలువ_Ptr(str);
+    దీర్ఘ	n = NUM2LONG(అంకె);
     aco_save_T	aco;
 
-    if (line == NULL)
+    ఒకవేళ (పంక్తి == ఖాళీ)
     {
-	rb_raise(rb_eIndexError, "NULL line");
+	rb_raise(rb_e_సూచీ_Error, "NULL line");
     }
-    else if (n >= 0 && n <= buf->b_ml.ml_line_count)
+    లేకపోతే ఒకవేళ (n >= 0 && n <= buf->b_ml.ml_పంక్తి_లెక్క)
     {
 	// set curwin/curbuf for "buf" and save some things
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ఒకవేళ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_inssub(n + 1) == OK)
+	    ఒకవేళ (u_inssub(n + 1) == OK)
 	    {
-		ml_append(n, (char_u *) line, (colnr_T) 0, FALSE);
+		ml_append(n, (char_u *) పంక్తి, (colnr_T) 0, FALSE);
 
 		//  Changes to non-active buffers should properly refresh screen
 		//    SegPhault - 12/20/04
-		appended_lines_mark(n, 1L);
+		appended_పంక్తులు_mark(n, 1L);
 
-		changed();
+		మారింది();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1501,22 +1501,22 @@ buffer_append(VALUE self, VALUE num, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    లేకపోతే
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_సూచీ_Error, "line number %ld out of range", n);
     }
-    return str;
+    తిరిగి str;
 }
 
-#ifdef USE_TYPEDDATA
-static size_t window_dsize(const void *buf);
+#నిర్వచితమైతే USE_TYPEDDATA
+స్థిర size_t కిటికీ_dsize(స్థిరరాశి శూన్య *buf);
 
-static const rb_data_type_t window_type = {
+స్థిర స్థిరరాశి rb_దత్తాంశం_type_t కిటికీ_type = {
     "vim_window",
-    {0, 0, window_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, కిటికీ_dsize,
+# ఒకవేళ RUBY_సంస్కరణ >= 27
 	0, {0}
-# else
+# లేకపోతే
 	{0, 0}
 # endif
     },
@@ -1526,224 +1526,224 @@ static const rb_data_type_t window_type = {
 # endif
 };
 
-    static size_t
-window_dsize(const void *win UNUSED)
+    స్థిర size_t
+కిటికీ_dsize(స్థిరరాశి శూన్య *win వాడని)
 {
-    return sizeof(win_T);
+    తిరిగి పరిమాణం(win_T);
 }
-#endif
+#అయితే_ముగింపు
 
-    static VALUE
-window_new(win_T *win)
+    స్థిర విలువ_3
+కిటికీ_new(win_T *win)
 {
-    if (win->w_ruby_ref)
+    ఒకవేళ (win->w_ruby_ref)
     {
-	return (VALUE) win->w_ruby_ref;
+	తిరిగి (విలువ_3) win->w_ruby_ref;
     }
-    else
+    లేకపోతే
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
-#else
-	VALUE obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
-#endif
-	win->w_ruby_ref = (void *) obj;
+#నిర్వచితమైతే USE_TYPEDDATA
+	విలువ_3 obj = Typed_దత్తాంశం_Wrap_Struct(c_Vim_కిటికీ, &కిటికీ_type, win);
+#లేకపోతే
+	విలువ_3 obj = దత్తాంశం_Wrap_Struct(c_Vim_కిటికీ, 0, 0, win);
+#అయితే_ముగింపు
+	win->w_ruby_ref = (శూన్య *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	తిరిగి obj;
     }
 }
 
-    static win_T *
-get_win(VALUE obj)
+    స్థిర win_T *
+get_win(విలువ_3 obj)
 {
     win_T *win;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, win_T, &window_type, win);
-#else
-    Data_Get_Struct(obj, win_T, win);
-#endif
-    if (win == NULL)
-	rb_raise(eDeletedWindowError, "attempt to refer to deleted window");
-    return win;
+#నిర్వచితమైతే USE_TYPEDDATA
+    Typed_దత్తాంశం_Get_Struct(obj, win_T, &కిటికీ_type, win);
+#లేకపోతే
+    దత్తాంశం_Get_Struct(obj, win_T, win);
+#అయితే_ముగింపు
+    ఒకవేళ (win == ఖాళీ)
+	rb_raise(e_Deleted_కిటికీ_Error, "attempt to refer to deleted window");
+    తిరిగి win;
 }
 
-    static VALUE
-window_s_current(VALUE self UNUSED)
+    స్థిర విలువ_3
+కిటికీ_s_current(విలువ_3 self వాడని)
 {
-    return window_new(curwin);
+    తిరిగి కిటికీ_new(curwin);
 }
 
-    static VALUE
-window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    స్థిర విలువ_3
+కిటికీ_s_current_getter(ID id వాడని, విలువ_3 *x వాడని)
 {
-    return window_new(curwin);
+    తిరిగి కిటికీ_new(curwin);
 }
 
 /*
  * Added line manipulation functions
  *    SegPhault - 03/07/05
  */
-    static VALUE
-line_s_current(VALUE self UNUSED)
+    స్థిర విలువ_3
+పంక్తి_s_current(విలువ_3 self వాడని)
 {
-    return get_buffer_line(curbuf, curwin->w_cursor.lnum);
+    తిరిగి get_బఫరు_పంక్తి(curbuf, curwin->w_cursor.lnum);
 }
 
-    static VALUE
-set_current_line(VALUE self UNUSED, VALUE str)
+    స్థిర విలువ_3
+సమితి_current_పంక్తి(విలువ_3 self వాడని, విలువ_3 str)
 {
-    return set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
+    తిరిగి సమితి_బఫరు_పంక్తి(curbuf, curwin->w_cursor.lnum, str);
 }
 
-    static VALUE
-current_line_number(VALUE self UNUSED)
+    స్థిర విలువ_3
+current_పంక్తి_సంఖ్య(విలువ_3 self వాడని)
 {
-    return INT2FIX((int)curwin->w_cursor.lnum);
+    తిరిగి INT2FIX((పూర్ణాంకం)curwin->w_cursor.lnum);
 }
 
-    static VALUE
-window_s_count(VALUE self UNUSED)
+    స్థిర విలువ_3
+కిటికీ_s_లెక్క(విలువ_3 self వాడని)
 {
     win_T	*w;
-    int n = 0;
+    పూర్ణాంకం n = 0;
 
     FOR_ALL_WINDOWS(w)
 	n++;
-    return INT2NUM(n);
+    తిరిగి INT2_అంకె(n);
 }
 
-    static VALUE
-window_s_aref(VALUE self UNUSED, VALUE num)
+    స్థిర విలువ_3
+కిటికీ_s_aref(విలువ_3 self వాడని, విలువ_3 అంకె)
 {
     win_T *w;
-    int n = NUM2INT(num);
+    పూర్ణాంకం n = NUM2INT(అంకె);
 
-    for (w = firstwin; w != NULL; w = w->w_next, --n)
-	if (n == 0)
-	    return window_new(w);
-    return Qnil;
+    కొరకు (w = firstwin; w != ఖాళీ; w = w->w_తదుపరి, --n)
+	ఒకవేళ (n == 0)
+	    తిరిగి కిటికీ_new(w);
+    తిరిగి Qnil;
 }
 
-    static VALUE
-window_buffer(VALUE self)
+    స్థిర విలువ_3
+కిటికీ_బఫరు(విలువ_3 self)
 {
     win_T *win = get_win(self);
 
-    return buffer_new(win->w_buffer);
+    తిరిగి బఫరు_new(win->w_బఫరు);
 }
 
-    static VALUE
-window_height(VALUE self)
+    స్థిర విలువ_3
+కిటికీ_ఎత్తు(విలువ_3 self)
 {
     win_T *win = get_win(self);
 
-    return INT2NUM(win->w_height);
+    తిరిగి INT2_అంకె(win->w_ఎత్తు);
 }
 
-    static VALUE
-window_set_height(VALUE self, VALUE height)
-{
-    win_T *win = get_win(self);
-    win_T *savewin = curwin;
-
-    curwin = win;
-    win_setheight(NUM2INT(height));
-    curwin = savewin;
-    return height;
-}
-
-    static VALUE
-window_width(VALUE self UNUSED)
-{
-    return INT2NUM(get_win(self)->w_width);
-}
-
-    static VALUE
-window_set_width(VALUE self UNUSED, VALUE width)
+    స్థిర విలువ_3
+కిటికీ_సమితి_ఎత్తు(విలువ_3 self, విలువ_3 ఎత్తు)
 {
     win_T *win = get_win(self);
     win_T *savewin = curwin;
 
     curwin = win;
-    win_setwidth(NUM2INT(width));
+    win_setheight(NUM2INT(ఎత్తు));
     curwin = savewin;
-    return width;
+    తిరిగి ఎత్తు;
 }
 
-    static VALUE
-window_cursor(VALUE self)
+    స్థిర విలువ_3
+కిటికీ_వెడల్పు(విలువ_3 self వాడని)
+{
+    తిరిగి INT2_అంకె(get_win(self)->w_వెడల్పు);
+}
+
+    స్థిర విలువ_3
+కిటికీ_సమితి_వెడల్పు(విలువ_3 self వాడని, విలువ_3 వెడల్పు)
+{
+    win_T *win = get_win(self);
+    win_T *savewin = curwin;
+
+    curwin = win;
+    win_setwidth(NUM2INT(వెడల్పు));
+    curwin = savewin;
+    తిరిగి వెడల్పు;
+}
+
+    స్థిర విలువ_3
+కిటికీ_cursor(విలువ_3 self)
 {
     win_T *win = get_win(self);
 
-    return rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
+    తిరిగి rb_assoc_new(INT2_అంకె(win->w_cursor.lnum), INT2_అంకె(win->w_cursor.నిలువు));
 }
 
-    static VALUE
-window_set_cursor(VALUE self, VALUE pos)
+    స్థిర విలువ_3
+కిటికీ_సమితి_cursor(విలువ_3 self, విలువ_3 pos)
 {
-    VALUE lnum, col;
+    విలువ_3 lnum, నిలువు;
     win_T *win = get_win(self);
 
     Check_Type(pos, T_ARRAY);
-    if (RARRAY_LEN(pos) != 2)
+    ఒకవేళ (RARRAY_LEN(pos) != 2)
 	rb_raise(rb_eArgError, "array length must be 2");
     lnum = RARRAY_PTR(pos)[0];
-    col = RARRAY_PTR(pos)[1];
+    నిలువు = RARRAY_PTR(pos)[1];
     win->w_cursor.lnum = NUM2LONG(lnum);
-    win->w_cursor.col = NUM2UINT(col);
-    win->w_set_curswant = true;
+    win->w_cursor.నిలువు = NUM2UINT(నిలువు);
+    win->w_సమితి_curswant = true;
     check_cursor();		    // put cursor on an existing line
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-f_nop(VALUE self UNUSED)
+    స్థిర విలువ_3
+f_nop(విలువ_3 self వాడని)
 {
-    return Qnil;
+    తిరిగి Qnil;
 }
 
-    static VALUE
-f_p(int argc, VALUE *argv, VALUE self UNUSED)
+    స్థిర విలువ_3
+f_p(పూర్ణాంకం argc, విలువ_3 *argv, విలువ_3 self వాడని)
 {
-    int i;
-    VALUE str = rb_str_new("", 0);
-    VALUE ret = Qnil;
+    పూర్ణాంకం i;
+    విలువ_3 str = rb_str_new("", 0);
+    విలువ_3 ret = Qnil;
 
-    for (i = 0; i < argc; i++)
+    కొరకు (i = 0; i < argc; i++)
     {
-	if (i > 0) rb_str_cat(str, ", ", 2);
+	ఒకవేళ (i > 0) rb_str_cat(str, ", ", 2);
 	rb_str_concat(str, rb_inspect(argv[i]));
     }
-    msg(RSTRING_PTR(str));
+    సందేశం(RSTRING_PTR(str));
 
-    if (argc == 1)
+    ఒకవేళ (argc == 1)
 	ret = argv[0];
-    else if (argc > 1)
+    లేకపోతే ఒకవేళ (argc > 1)
 	ret = rb_ary_new4(argc, argv);
-    return ret;
+    తిరిగి ret;
 }
 
-    static void
-ruby_io_init(void)
+    స్థిర శూన్య
+ruby_io_init(శూన్య)
 {
-#ifndef DYNAMIC_RUBY
-    RUBYEXTERN VALUE rb_stdout;
-    RUBYEXTERN VALUE rb_stderr;
-#endif
+#నిర్వచితం_కాకపోతే DYNAMIC_RUBY
+    RUBYEXTERN విలువ_3 rb_stdout;
+    RUBYEXTERN విలువ_3 rb_stderr;
+#అయితే_ముగింపు
 
     rb_stdout = rb_obj_alloc(rb_cObject);
     rb_stderr = rb_obj_alloc(rb_cObject);
-    rb_define_singleton_method(rb_stdout, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stdout, "flush", (void*)f_nop, 0);
-    rb_define_singleton_method(rb_stderr, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stderr, "flush", (void*)f_nop, 0);
+    rb_define_singleton_పద్ధతి(rb_stdout, "write", (శూన్య*)vim_సందేశం, 1);
+    rb_define_singleton_పద్ధతి(rb_stdout, "flush", (శూన్య*)f_nop, 0);
+    rb_define_singleton_పద్ధతి(rb_stderr, "write", (శూన్య*)vim_సందేశం, 1);
+    rb_define_singleton_పద్ధతి(rb_stderr, "flush", (శూన్య*)f_nop, 0);
     rb_define_global_function("p", f_p, -1);
 }
 
-    static void
-ruby_vim_init(void)
+    స్థిర శూన్య
+ruby_vim_init(శూన్య)
 {
     objtbl = rb_hash_new();
     rb_global_variable(&objtbl);
@@ -1752,139 +1752,139 @@ ruby_vim_init(void)
     // alias "VIM" for backwards compatibility.
     mVIM = rb_define_module("Vim");
     rb_define_const(rb_cObject, "VIM", mVIM);
-    rb_define_const(mVIM, "VERSION_MAJOR", INT2NUM(VIM_VERSION_MAJOR));
-    rb_define_const(mVIM, "VERSION_MINOR", INT2NUM(VIM_VERSION_MINOR));
-    rb_define_const(mVIM, "VERSION_BUILD", INT2NUM(VIM_VERSION_BUILD));
-    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2NUM(VIM_VERSION_PATCHLEVEL));
-    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_VERSION_SHORT));
-    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_VERSION_MEDIUM));
-    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_VERSION_LONG));
-    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_VERSION_LONG_DATE));
-    rb_define_module_function(mVIM, "message", vim_message, 1);
-    rb_define_module_function(mVIM, "set_option", vim_set_option, 1);
+    rb_define_const(mVIM, "VERSION_MAJOR", INT2_అంకె(VIM_సంస్కరణ_MAJOR));
+    rb_define_const(mVIM, "VERSION_MINOR", INT2_అంకె(VIM_సంస్కరణ_MINOR));
+    rb_define_const(mVIM, "VERSION_BUILD", INT2_అంకె(VIM_సంస్కరణ_BUILD));
+    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2_అంకె(VIM_సంస్కరణ_PATCHLEVEL));
+    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_సంస్కరణ_SHORT));
+    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_సంస్కరణ_MEDIUM));
+    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_సంస్కరణ_LONG));
+    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_సంస్కరణ_LONG_DATE));
+    rb_define_module_function(mVIM, "message", vim_సందేశం, 1);
+    rb_define_module_function(mVIM, "set_option", vim_సమితి_option, 1);
     rb_define_module_function(mVIM, "command", vim_command, 1);
     rb_define_module_function(mVIM, "evaluate", vim_evaluate, 1);
     rb_define_module_function(mVIM, "blob", vim_blob, 1);
 
-    eDeletedBufferError = rb_define_class_under(mVIM, "DeletedBufferError",
+    e_Deleted_బఫరు_Error = rb_define_class_under(mVIM, "DeletedBufferError",
 						rb_eStandardError);
-    eDeletedWindowError = rb_define_class_under(mVIM, "DeletedWindowError",
+    e_Deleted_కిటికీ_Error = rb_define_class_under(mVIM, "DeletedWindowError",
 						rb_eStandardError);
 
-    cBuffer = rb_define_class_under(mVIM, "Buffer", rb_cObject);
-    rb_define_singleton_method(cBuffer, "current", (void*)buffer_s_current, 0);
-    rb_define_singleton_method(cBuffer, "count", (void*)buffer_s_count, 0);
-    rb_define_singleton_method(cBuffer, "[]", (void*)buffer_s_aref, 1);
-    rb_define_method(cBuffer, "name", (void*)buffer_name, 0);
-    rb_define_method(cBuffer, "number", (void*)buffer_number, 0);
-    rb_define_method(cBuffer, "count", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "length", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "[]", (void*)buffer_aref, 1);
-    rb_define_method(cBuffer, "[]=", (void*)buffer_aset, 2);
-    rb_define_method(cBuffer, "delete", (void*)buffer_delete, 1);
-    rb_define_method(cBuffer, "append", (void*)buffer_append, 2);
+    c_బఫరు = rb_define_class_under(mVIM, "Buffer", rb_cObject);
+    rb_define_singleton_పద్ధతి(c_బఫరు, "current", (శూన్య*)బఫరు_s_current, 0);
+    rb_define_singleton_పద్ధతి(c_బఫరు, "count", (శూన్య*)బఫరు_s_లెక్క, 0);
+    rb_define_singleton_పద్ధతి(c_బఫరు, "[]", (శూన్య*)బఫరు_s_aref, 1);
+    rb_define_పద్ధతి(c_బఫరు, "name", (శూన్య*)బఫరు_name, 0);
+    rb_define_పద్ధతి(c_బఫరు, "number", (శూన్య*)బఫరు_సంఖ్య, 0);
+    rb_define_పద్ధతి(c_బఫరు, "count", (శూన్య*)బఫరు_లెక్క, 0);
+    rb_define_పద్ధతి(c_బఫరు, "length", (శూన్య*)బఫరు_లెక్క, 0);
+    rb_define_పద్ధతి(c_బఫరు, "[]", (శూన్య*)బఫరు_aref, 1);
+    rb_define_పద్ధతి(c_బఫరు, "[]=", (శూన్య*)బఫరు_aset, 2);
+    rb_define_పద్ధతి(c_బఫరు, "delete", (శూన్య*)బఫరు_delete, 1);
+    rb_define_పద్ధతి(c_బఫరు, "append", (శూన్య*)బఫరు_append, 2);
 
     // Added line manipulation functions
     //   SegPhault - 03/07/05
-    rb_define_method(cBuffer, "line_number", (void*)current_line_number, 0);
-    rb_define_method(cBuffer, "line", (void*)line_s_current, 0);
-    rb_define_method(cBuffer, "line=", (void*)set_current_line, 1);
+    rb_define_పద్ధతి(c_బఫరు, "line_number", (శూన్య*)current_పంక్తి_సంఖ్య, 0);
+    rb_define_పద్ధతి(c_బఫరు, "line", (శూన్య*)పంక్తి_s_current, 0);
+    rb_define_పద్ధతి(c_బఫరు, "line=", (శూన్య*)సమితి_current_పంక్తి, 1);
 
 
-    cVimWindow = rb_define_class_under(mVIM, "Window", rb_cObject);
-    rb_define_singleton_method(cVimWindow, "current", (void*)window_s_current, 0);
-    rb_define_singleton_method(cVimWindow, "count", (void*)window_s_count, 0);
-    rb_define_singleton_method(cVimWindow, "[]", (void*)window_s_aref, 1);
-    rb_define_method(cVimWindow, "buffer", (void*)window_buffer, 0);
-    rb_define_method(cVimWindow, "height", (void*)window_height, 0);
-    rb_define_method(cVimWindow, "height=", (void*)window_set_height, 1);
-    rb_define_method(cVimWindow, "width", (void*)window_width, 0);
-    rb_define_method(cVimWindow, "width=", (void*)window_set_width, 1);
-    rb_define_method(cVimWindow, "cursor", (void*)window_cursor, 0);
-    rb_define_method(cVimWindow, "cursor=", (void*)window_set_cursor, 1);
+    c_Vim_కిటికీ = rb_define_class_under(mVIM, "Window", rb_cObject);
+    rb_define_singleton_పద్ధతి(c_Vim_కిటికీ, "current", (శూన్య*)కిటికీ_s_current, 0);
+    rb_define_singleton_పద్ధతి(c_Vim_కిటికీ, "count", (శూన్య*)కిటికీ_s_లెక్క, 0);
+    rb_define_singleton_పద్ధతి(c_Vim_కిటికీ, "[]", (శూన్య*)కిటికీ_s_aref, 1);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "buffer", (శూన్య*)కిటికీ_బఫరు, 0);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "height", (శూన్య*)కిటికీ_ఎత్తు, 0);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "height=", (శూన్య*)కిటికీ_సమితి_ఎత్తు, 1);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "width", (శూన్య*)కిటికీ_వెడల్పు, 0);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "width=", (శూన్య*)కిటికీ_సమితి_వెడల్పు, 1);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "cursor", (శూన్య*)కిటికీ_cursor, 0);
+    rb_define_పద్ధతి(c_Vim_కిటికీ, "cursor=", (శూన్య*)కిటికీ_సమితి_cursor, 1);
 
-    rb_define_virtual_variable("$curbuf", buffer_s_current_getter, 0);
-    rb_define_virtual_variable("$curwin", window_s_current_getter, 0);
+    rb_define_virtual_variable("$curbuf", బఫరు_s_current_getter, 0);
+    rb_define_virtual_variable("$curwin", కిటికీ_s_current_getter, 0);
 }
 
-    void
-vim_ruby_init(void *stack_start)
+    శూన్య
+vim_ruby_init(శూన్య *దొంతర_ప్రారంభం)
 {
     // should get machine stack start address early in main function
-    ruby_stack_start = stack_start;
+    ruby_దొంతర_ప్రారంభం = దొంతర_ప్రారంభం;
 }
 
-    static int
-convert_hash2dict(VALUE key, VALUE val, VALUE arg)
+    స్థిర పూర్ణాంకం
+convert_hash2dict(విలువ_3 కీలకం, విలువ_3 val, విలువ_3 arg)
 {
     dict_T *d = (dict_T *)arg;
     dictitem_T *di;
 
-    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(key)));
-    if (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
-						     || dict_add(d, di) != OK)
+    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(కీలకం)));
+    ఒకవేళ (di == ఖాళీ || ruby_convert_గమ్యం_vim_విలువ(val, &di->di_tv) != OK
+						     || dict_కూడు(d, di) != OK)
     {
 	d->dv_hashtab.ht_flags |= HTFLAGS_ERROR;
-	return ST_STOP;
+	తిరిగి ST_STOP;
     }
-    return ST_CONTINUE;
+    తిరిగి ST_CONTINUE;
 }
 
-    static int
-ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
+    స్థిర పూర్ణాంకం
+ruby_convert_గమ్యం_vim_విలువ(విలువ_3 val, typval_T *rettv)
 {
-    switch (TYPE(val))
+    ఎంపిక (TYPE(val))
     {
-	case T_NIL:
+	స్థితి T_NIL:
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
-	    break;
-	case T_TRUE:
+	    rettv->vval.v_సంఖ్య = VVAL_NULL;
+	    ఆపు;
+	స్థితి T_TRUE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_TRUE;
-	    break;
-	case T_FALSE:
+	    rettv->vval.v_సంఖ్య = VVAL_TRUE;
+	    ఆపు;
+	స్థితి T_FALSE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_FALSE;
-	    break;
-	case T_BIGNUM:
-	case T_FIXNUM:
-	    rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = (varnumber_T)NUM2LONG(val);
-	    break;
-	case T_FLOAT:
+	    rettv->vval.v_సంఖ్య = VVAL_FALSE;
+	    ఆపు;
+	స్థితి T_BIGNUM:
+	స్థితి T_FIXNUM:
+	    rettv->v_type = VAR_సంఖ్య;
+	    rettv->vval.v_సంఖ్య = (varnumber_T)NUM2LONG(val);
+	    ఆపు;
+	స్థితి T_FLOAT:
 	    rettv->v_type = VAR_FLOAT;
 	    rettv->vval.v_float = (float_T)NUM2DBL(val);
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 	    val = rb_obj_as_string(val);
 	    // FALLTHROUGH
-	case T_STRING:
+	స్థితి T_STRING:
 	    {
-		VALUE str = (VALUE)RSTRING(val);
+		విలువ_3 str = (విలువ_3)RSTRING(val);
 
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = vim_strnsave((char_u *)RSTRING_PTR(str),
 							     RSTRING_LEN(str));
 	    }
-	    break;
-	case T_ARRAY:
+	    ఆపు;
+	స్థితి T_ARRAY:
 	    {
 		list_T *l;
-		long i;
+		దీర్ఘ i;
 		typval_T v;
 
 		l = list_alloc();
-		if (l == NULL)
-		    return FAIL;
+		ఒకవేళ (l == ఖాళీ)
+		    తిరిగి FAIL;
 
-		for (i = 0; i < RARRAY_LEN(val); ++i)
+		కొరకు (i = 0; i < RARRAY_LEN(val); ++i)
 		{
-		    if (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
+		    ఒకవేళ (ruby_convert_గమ్యం_vim_విలువ((విలువ_3)RARRAY_PTR(val)[i],
 									&v) != OK)
 		    {
 			list_unref(l);
-			return FAIL;
+			తిరిగి FAIL;
 		    }
 		    list_append_tv(l, &v);
 		    clear_tv(&v);
@@ -1894,50 +1894,50 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		rettv->vval.v_list = l;
 		++l->lv_refcount;
 	    }
-	    break;
-	case T_HASH:
+	    ఆపు;
+	స్థితి T_HASH:
 	    {
 		dict_T *d;
 
 		d = dict_alloc();
-		if (d == NULL)
-		    return FAIL;
+		ఒకవేళ (d == ఖాళీ)
+		    తిరిగి FAIL;
 
-		rb_hash_foreach(val, convert_hash2dict, (VALUE)d);
-		if (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
+		rb_hash_foreach(val, convert_hash2dict, (విలువ_3)d);
+		ఒకవేళ (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
 		{
 		    dict_unref(d);
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 
 		rettv->v_type = VAR_DICT;
 		rettv->vval.v_dict = d;
 		++d->dv_refcount;
 	    }
-	    break;
+	    ఆపు;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-    void
+    శూన్య
 do_rubyeval(char_u *str, typval_T *rettv)
 {
-    int retval = FAIL;
+    పూర్ణాంకం retval = FAIL;
 
-    if (ensure_ruby_initialized())
+    ఒకవేళ (ensure_ruby_initialized())
     {
-	int state;
-	VALUE obj;
+	పూర్ణాంకం state;
+	విలువ_3 obj;
 
-	obj = rb_eval_string_protect((const char *)str, &state);
-	if (state)
+	obj = rb_eval_string_protect((స్థిరరాశి అక్షరం *)str, &state);
+	ఒకవేళ (state)
 	    error_print(state);
-	else
-	    retval = ruby_convert_to_vim_value(obj, rettv);
+	లేకపోతే
+	    retval = ruby_convert_గమ్యం_vim_విలువ(obj, rettv);
     }
-    if (retval == FAIL)
+    ఒకవేళ (retval == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_సంఖ్య;
+	rettv->vval.v_సంఖ్య = 0;
     }
 }

@@ -38,37 +38,37 @@
  * in tl_scrollback are no longer used.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 
-#ifndef MIN
+#నిర్వచితం_కాకపోతే MIN
 # define MIN(x,y) ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే MAX
 # define MAX(x,y) ((x) > (y) ? (x) : (y))
-#endif
+#అయితే_ముగింపు
 
-#include "libvterm/include/vterm.h"
+#అన్తర్భావ "libvterm/include/vterm.h"
 
 // This is VTermScreenCell without the characters, thus much smaller.
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     VTermScreenCellAttrs	attrs;
-    char			width;
+    అక్షరం			వెడల్పు;
     VTermColor			fg;
     VTermColor			bg;
 } cellattr_T;
 
-typedef struct sb_line_S {
-    int		sb_cols;	// can differ per line
-    int		sb_bytes;	// length in bytes of text
+రకనిర్వచనం నిర్మాణం sb_పంక్తి_S {
+    పూర్ణాంకం		sb_నిలువుల_సంఖ్య;	// can differ per line
+    పూర్ణాంకం		sb_బైట్లు;	// length in bytes of text
     cellattr_T	*sb_cells;	// allocated
     cellattr_T	sb_fill_attr;	// for short line
-    char_u	*sb_text;	// for tl_scrollback_postponed
+    char_u	*sb_పాఠ్యం;	// for tl_scrollback_postponed
     char_u	continuation;
-} sb_line_T;
+} sb_పంక్తి_T;
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 # ifndef HPCON
 #  define HPCON VOID*
 # endif
@@ -78,174 +78,174 @@ typedef struct sb_line_S {
 # ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
 #  define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 # endif
-typedef struct _DYN_STARTUPINFOEXW
+రకనిర్వచనం నిర్మాణం _DYN_STARTUPINFOEXW
 {
     STARTUPINFOW StartupInfo;
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList;
 } DYN_STARTUPINFOEXW, *PDYN_STARTUPINFOEXW;
-#endif
+#అయితే_ముగింపు
 
 // typedef term_T in structs.h
-struct terminal_S {
-    term_T	*tl_next;
+నిర్మాణం terminal_S {
+    పదం_T	*tl_తదుపరి;
 
     VTerm	*tl_vterm;
-    job_T	*tl_job;
-    buf_T	*tl_buffer;
-#if defined(FEAT_GUI)
-    int		tl_system;	// when non-zero used for :!cmd output
-    int		tl_toprow;	// row with first line of system terminal
-#endif
+    పని_T	*tl_పని;
+    buf_T	*tl_బఫరు;
+#ఒకవేళ defined(FEAT_GUI)
+    పూర్ణాంకం		tl_system;	// when non-zero used for :!cmd output
+    పూర్ణాంకం		tl_toprow;	// row with first line of system terminal
+#అయితే_ముగింపు
 
     // Set when setting the size of a vterm, reset after redrawing.
-    int		tl_vterm_size_changed;
+    పూర్ణాంకం		tl_vterm_కొలత_మారింది;
 
-    int		tl_normal_mode; // TRUE: Terminal-Normal mode
-    int		tl_channel_closing;
-    int		tl_channel_closed;
-    int		tl_channel_recently_closed; // still need to handle tl_finish
+    పూర్ణాంకం		tl_సాధారణ_బహుళకం; // TRUE: Terminal-Normal mode
+    పూర్ణాంకం		tl_channel_closing;
+    పూర్ణాంకం		tl_channel_closed;
+    పూర్ణాంకం		tl_channel_recently_closed; // still need to handle tl_finish
 
-    int		tl_finish;
-#define TL_FINISH_UNSET	    NUL
-#define TL_FINISH_CLOSE	    'c'	// ++close or :terminal without argument
-#define TL_FINISH_NOCLOSE   'n'	// ++noclose
-#define TL_FINISH_OPEN	    'o'	// ++open
+    పూర్ణాంకం		tl_ముగింపు;
+#నిర్వచించు TL_ముగింపు_UNSET	    NUL
+#నిర్వచించు TL_ముగింపు_CLOSE	    'c'	// ++close or :terminal without argument
+#నిర్వచించు TL_ముగింపు_NOCLOSE   'n'	// ++noclose
+#నిర్వచించు TL_ముగింపు_OPEN	    'o'	// ++open
     char_u	*tl_opencmd;
     char_u	*tl_eof_chars;
     char_u	*tl_api;	// prefix for terminal API function
 
     char_u	*tl_arg0_cmd;	// To format the status bar
 
-#ifdef MSWIN
-    void	*tl_winpty_config;
-    void	*tl_winpty;
+#నిర్వచితమైతే MSWIN
+    శూన్య	*tl_winpty_config;
+    శూన్య	*tl_winpty;
 
     HPCON	tl_conpty;
     DYN_STARTUPINFOEXW tl_siex;	// Structure that always needs to be hold
 
-    FILE	*tl_out_fd;
-#endif
-#if defined(FEAT_SESSION)
+    FILE	*tl_బహిర్గతం_fd;
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_SESSION)
     char_u	*tl_command;
-#endif
+#అయితే_ముగింపు
     char_u	*tl_kill;
 
     // last known vterm size
-    int		tl_rows;
-    int		tl_cols;
+    పూర్ణాంకం		tl_అడ్డువరుసలు;
+    పూర్ణాంకం		tl_నిలువుల_సంఖ్య;
 
     char_u	*tl_title; // NULL or allocated
-    char_u	*tl_status_text; // NULL or allocated
+    char_u	*tl_స్థితి_పాఠ్యం; // NULL or allocated
 
     // Range of screen rows to update.  Zero based.
-    int		tl_dirty_row_start; // MAX_ROW if nothing dirty
-    int		tl_dirty_row_end;   // row below last one to update
-    int		tl_dirty_snapshot;  // text updated after making snapshot
-#ifdef FEAT_TIMERS
-    int		tl_timer_set;
+    పూర్ణాంకం		tl_dirty_అడ్డువరుస_ప్రారంభం; // MAX_ROW if nothing dirty
+    పూర్ణాంకం		tl_dirty_అడ్డువరుస_చివర;   // row below last one to update
+    పూర్ణాంకం		tl_dirty_snapshot;  // text updated after making snapshot
+#నిర్వచితమైతే FEAT_TIMERS
+    పూర్ణాంకం		tl_timer_సమితి;
     proftime_T	tl_timer_due;
-#endif
-    int		tl_postponed_scroll;	// to be scrolled up
+#అయితే_ముగింపు
+    పూర్ణాంకం		tl_postponed_scroll;	// to be scrolled up
 
     garray_T	tl_scrollback;
-    int		tl_scrollback_scrolled;
+    పూర్ణాంకం		tl_scrollback_scrolled;
     garray_T	tl_scrollback_postponed;
-    int		tl_scrollback_snapshot;
-    int		tl_buffer_scrolled;
+    పూర్ణాంకం		tl_scrollback_snapshot;
+    పూర్ణాంకం		tl_బఫరు_scrolled;
 
     char_u	*tl_highlight_name; // replaces "Terminal"; allocated
 
     cellattr_T	tl_default_color;
 
-    linenr_T	tl_top_diff_rows;   // rows of top diff file or zero
-    linenr_T	tl_bot_diff_rows;   // rows of bottom diff file
+    linenr_T	tl_శిఖరం_diff_అడ్డువరుసలు;   // rows of top diff file or zero
+    linenr_T	tl_bot_diff_అడ్డువరుసలు;   // rows of bottom diff file
 
     VTermPos	tl_cursor_pos;
-    int		tl_cursor_visible;
-    int		tl_cursor_blink;
-    int		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
+    పూర్ణాంకం		tl_cursor_visible;
+    పూర్ణాంకం		tl_cursor_blink;
+    పూర్ణాంకం		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
     char_u	*tl_cursor_color; // NULL or allocated
 
     long_u	*tl_palette; // array of 16 colors specified by term_start, can
 			     // be NULL
-    int		tl_using_altscreen;
+    పూర్ణాంకం		tl_using_altscreen;
     garray_T	tl_osc_buf;	    // incomplete OSC string
 };
 
-#define TMODE_ONCE 1	    // CTRL-\ CTRL-N used
-#define TMODE_LOOP 2	    // CTRL-W N used
+#నిర్వచించు TMODE_ONCE 1	    // CTRL-\ CTRL-N used
+#నిర్వచించు TMODE_LOOP 2	    // CTRL-W N used
 
 /*
  * List of all active terminals.
  */
-static term_T *first_term = NULL;
+స్థిర పదం_T *మొదటి_పదం = ఖాళీ;
 
 // Terminal active in terminal_loop().
-static term_T *in_terminal_loop = NULL;
+స్థిర పదం_T *లోపల_terminal_loop = ఖాళీ;
 
-#ifdef MSWIN
-static BOOL has_winpty = FALSE;
-static BOOL has_conpty = FALSE;
-#endif
+#నిర్వచితమైతే MSWIN
+స్థిర BOOL has_winpty = FALSE;
+స్థిర BOOL has_conpty = FALSE;
+#అయితే_ముగింపు
 
-#define MAX_ROW 999999	    // used for tl_dirty_row_end to update all rows
-#define KEY_BUF_LEN 200
+#నిర్వచించు MAX_అడ్డువరుస 999999	    // used for tl_dirty_row_end to update all rows
+#నిర్వచించు కీలకం_BUF_LEN 200
 
-#define FOR_ALL_TERMS(term)	\
-    for ((term) = first_term; (term) != NULL; (term) = (term)->tl_next)
+#నిర్వచించు FOR_ALL_TERMS(పదం)	\
+    కొరకు ((పదం) = మొదటి_పదం; (పదం) != ఖాళీ; (పదం) = (పదం)->tl_తదుపరి)
 
 /*
  * Functions with separate implementation for MS-Windows and Unix-like systems.
  */
-static int term_and_job_init(term_T *term, typval_T *argvar, char **argv, jobopt_T *opt, jobopt_T *orig_opt);
-static int create_pty_only(term_T *term, jobopt_T *opt);
-static void term_report_winsize(term_T *term, int rows, int cols);
-static void term_free_vterm(term_T *term);
-#ifdef FEAT_GUI
-static void update_system_term(term_T *term);
-#endif
+స్థిర పూర్ణాంకం పదం_and_పని_init(పదం_T *పదం, typval_T *argvar, అక్షరం **argv, jobopt_T *opt, jobopt_T *orig_opt);
+స్థిర పూర్ణాంకం create_pty_only(పదం_T *పదం, jobopt_T *opt);
+స్థిర శూన్య పదం_report_winsize(పదం_T *పదం, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య);
+స్థిర శూన్య పదం_free_vterm(పదం_T *పదం);
+#నిర్వచితమైతే FEAT_GUI
+స్థిర శూన్య update_system_పదం(పదం_T *పదం);
+#అయితే_ముగింపు
 
-static void handle_postponed_scrollback(term_T *term);
+స్థిర శూన్య handle_postponed_scrollback(పదం_T *పదం);
 
 // The character that we know (or assume) that the terminal expects for the
 // backspace key.
-static int term_backspace_char = BS;
+స్థిర పూర్ణాంకం పదం_backspace_char = BS;
 
 // Store the last set and the desired cursor properties, so that we only update
 // them when needed.  Doing it unnecessary may result in flicker.
-static char_u	*last_set_cursor_color = NULL;
-static char_u	*desired_cursor_color = NULL;
-static int	last_set_cursor_shape = -1;
-static int	desired_cursor_shape = -1;
-static int	last_set_cursor_blink = -1;
-static int	desired_cursor_blink = -1;
+స్థిర char_u	*చివరి_సమితి_cursor_color = ఖాళీ;
+స్థిర char_u	*desired_cursor_color = ఖాళీ;
+స్థిర పూర్ణాంకం	చివరి_సమితి_cursor_shape = -1;
+స్థిర పూర్ణాంకం	desired_cursor_shape = -1;
+స్థిర పూర్ణాంకం	చివరి_సమితి_cursor_blink = -1;
+స్థిర పూర్ణాంకం	desired_cursor_blink = -1;
 
 
 ///////////////////////////////////////
 // 1. Generic code for all systems.
 
-    static int
+    స్థిర పూర్ణాంకం
 cursor_color_equal(char_u *lhs_color, char_u *rhs_color)
 {
-    if (lhs_color != NULL && rhs_color != NULL)
-	return STRCMP(lhs_color, rhs_color) == 0;
-    return lhs_color == NULL && rhs_color == NULL;
+    ఒకవేళ (lhs_color != ఖాళీ && rhs_color != ఖాళీ)
+	తిరిగి STRCMP(lhs_color, rhs_color) == 0;
+    తిరిగి lhs_color == ఖాళీ && rhs_color == ఖాళీ;
 }
 
-    static void
-cursor_color_copy(char_u **to_color, char_u *from_color)
+    స్థిర శూన్య
+cursor_color_copy(char_u **గమ్యం_color, char_u *from_color)
 {
     // Avoid a free & alloc if the value is already right.
-    if (cursor_color_equal(*to_color, from_color))
-	return;
-    vim_free(*to_color);
-    *to_color = (from_color == NULL) ? NULL : vim_strsave(from_color);
+    ఒకవేళ (cursor_color_equal(*గమ్యం_color, from_color))
+	తిరిగి;
+    vim_free(*గమ్యం_color);
+    *గమ్యం_color = (from_color == ఖాళీ) ? ఖాళీ : vim_strsave(from_color);
 }
 
-    static char_u *
+    స్థిర char_u *
 cursor_color_get(char_u *color)
 {
-    return (color == NULL) ? (char_u *)"" : color;
+    తిరిగి (color == ఖాళీ) ? (char_u *)"" : color;
 }
 
 
@@ -255,89 +255,89 @@ cursor_color_get(char_u *color)
  * Sets "rows" and/or "cols" to zero when it should follow the window size.
  * Return TRUE if the size is the minimum size: "24*80".
  */
-    static int
-parse_termwinsize(win_T *wp, int *rows, int *cols)
+    స్థిర పూర్ణాంకం
+parse_termwinsize(win_T *wp, పూర్ణాంకం *అడ్డువరుసలు_2, పూర్ణాంకం *నిలువుల_సంఖ్య)
 {
-    int	minsize = FALSE;
+    పూర్ణాంకం	minsize = FALSE;
 
-    *rows = 0;
-    *cols = 0;
+    *అడ్డువరుసలు_2 = 0;
+    *నిలువుల_సంఖ్య = 0;
 
-    if (*wp->w_p_tws == NUL)
-	return FALSE;
+    ఒకవేళ (*wp->w_p_tws == NUL)
+	తిరిగి FALSE;
 
     char_u *p = vim_strchr(wp->w_p_tws, 'x');
 
     // Syntax of value was already checked when it's set.
-    if (p == NULL)
+    ఒకవేళ (p == ఖాళీ)
     {
 	minsize = TRUE;
 	p = vim_strchr(wp->w_p_tws, '*');
     }
-    *rows = atoi((char *)wp->w_p_tws);
-    *cols = atoi((char *)p + 1);
-    if (*rows > VTERM_MAX_ROWS)
-	*rows = VTERM_MAX_ROWS;
-    if (*cols > VTERM_MAX_COLS)
-	*cols = VTERM_MAX_COLS;
-    return minsize;
+    *అడ్డువరుసలు_2 = atoi((అక్షరం *)wp->w_p_tws);
+    *నిలువుల_సంఖ్య = atoi((అక్షరం *)p + 1);
+    ఒకవేళ (*అడ్డువరుసలు_2 > VTERM_MAX_అడ్డువరుసలు)
+	*అడ్డువరుసలు_2 = VTERM_MAX_అడ్డువరుసలు;
+    ఒకవేళ (*నిలువుల_సంఖ్య > VTERM_MAX_నిలువుల_సంఖ్య)
+	*నిలువుల_సంఖ్య = VTERM_MAX_నిలువుల_సంఖ్య;
+    తిరిగి minsize;
 }
 
 /*
  * Determine the terminal size from 'termwinsize' and the current window.
  */
-    static void
-set_term_and_win_size(term_T *term, jobopt_T *opt)
+    స్థిర శూన్య
+సమితి_పదం_and_win_కొలత(పదం_T *పదం, jobopt_T *opt)
 {
-    int rows, cols;
-    int	minsize;
+    పూర్ణాంకం అడ్డువరుసలు_2, నిలువుల_సంఖ్య;
+    పూర్ణాంకం	minsize;
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (పదం->tl_system)
     {
 	// Use the entire screen (excluding the tabpanel area) for the system
 	// commands.  However, it will start at the command line and scroll up
 	// as needed, using tl_toprow.
-	term->tl_rows = Rows;
-	term->tl_cols = topframe->fr_width;
-	return;
+	పదం->tl_అడ్డువరుసలు = అడ్డువరుసలు;
+	పదం->tl_నిలువుల_సంఖ్య = topframe->fr_వెడల్పు;
+	తిరిగి;
     }
-#endif
-    term->tl_rows = curwin->w_height;
-    term->tl_cols = curwin->w_width;
+#అయితే_ముగింపు
+    పదం->tl_అడ్డువరుసలు = curwin->w_ఎత్తు;
+    పదం->tl_నిలువుల_సంఖ్య = curwin->w_వెడల్పు;
 
-    minsize = parse_termwinsize(curwin, &rows, &cols);
-    if (minsize)
+    minsize = parse_termwinsize(curwin, &అడ్డువరుసలు_2, &నిలువుల_సంఖ్య);
+    ఒకవేళ (minsize)
     {
-	if (term->tl_rows < rows)
-	    term->tl_rows = rows;
-	if (term->tl_cols < cols)
-	    term->tl_cols = cols;
+	ఒకవేళ (పదం->tl_అడ్డువరుసలు < అడ్డువరుసలు_2)
+	    పదం->tl_అడ్డువరుసలు = అడ్డువరుసలు_2;
+	ఒకవేళ (పదం->tl_నిలువుల_సంఖ్య < నిలువుల_సంఖ్య)
+	    పదం->tl_నిలువుల_సంఖ్య = నిలువుల_సంఖ్య;
     }
-    if ((opt->jo_set2 & JO2_TERM_ROWS))
-	term->tl_rows = opt->jo_term_rows;
-    else if (rows != 0)
-	term->tl_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS))
-	term->tl_cols = opt->jo_term_cols;
-    else if (cols != 0)
-	term->tl_cols = cols;
+    ఒకవేళ ((opt->jo_set2 & JO2_పదం_అడ్డువరుసలు))
+	పదం->tl_అడ్డువరుసలు = opt->jo_పదం_అడ్డువరుసలు;
+    లేకపోతే ఒకవేళ (అడ్డువరుసలు_2 != 0)
+	పదం->tl_అడ్డువరుసలు = అడ్డువరుసలు_2;
+    ఒకవేళ ((opt->jo_set2 & JO2_పదం_నిలువుల_సంఖ్య))
+	పదం->tl_నిలువుల_సంఖ్య = opt->jo_పదం_నిలువుల_సంఖ్య;
+    లేకపోతే ఒకవేళ (నిలువుల_సంఖ్య != 0)
+	పదం->tl_నిలువుల_సంఖ్య = నిలువుల_సంఖ్య;
 
-    if (!opt->jo_hidden)
+    ఒకవేళ (!opt->jo_hidden)
     {
-	if (term->tl_rows != curwin->w_height)
-	    win_setheight_win(term->tl_rows, curwin);
-	if (term->tl_cols != curwin->w_width)
-	    win_setwidth_win(term->tl_cols, curwin);
+	ఒకవేళ (పదం->tl_అడ్డువరుసలు != curwin->w_ఎత్తు)
+	    win_setheight_win(పదం->tl_అడ్డువరుసలు, curwin);
+	ఒకవేళ (పదం->tl_నిలువుల_సంఖ్య != curwin->w_వెడల్పు)
+	    win_setwidth_win(పదం->tl_నిలువుల_సంఖ్య, curwin);
 
 	// Set 'winsize' now to avoid a resize at the next redraw.
-	if (!minsize && *curwin->w_p_tws != NUL)
+	ఒకవేళ (!minsize && *curwin->w_p_tws != NUL)
 	{
 	    char_u buf[100];
 
-	    vim_snprintf((char *)buf, 100, "%dx%d",
-						 term->tl_rows, term->tl_cols);
-	    set_option_value_give_err((char_u *)"termwinsize",
+	    vim_snprintf((అక్షరం *)buf, 100, "%dx%d",
+						 పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య);
+	    సమితి_option_విలువ_give_err((char_u *)"termwinsize",
 							   0L, buf, OPT_LOCAL);
 	}
     }
@@ -347,61 +347,61 @@ set_term_and_win_size(term_T *term, jobopt_T *opt)
  * Initialize job options for a terminal job.
  * Caller may overrule some of them.
  */
-    void
-init_job_options(jobopt_T *opt)
+    శూన్య
+init_పని_options(jobopt_T *opt)
 {
-    clear_job_options(opt);
+    clear_పని_options(opt);
 
-    opt->jo_mode = CH_MODE_RAW;
-    opt->jo_out_mode = CH_MODE_RAW;
-    opt->jo_err_mode = CH_MODE_RAW;
-    opt->jo_set = JO_MODE | JO_OUT_MODE | JO_ERR_MODE;
+    opt->jo_బహుళకం = CH_బహుళకం_RAW;
+    opt->jo_బహిర్గతం_బహుళకం = CH_బహుళకం_RAW;
+    opt->jo_err_బహుళకం = CH_బహుళకం_RAW;
+    opt->jo_సమితి = JO_బహుళకం | JO_బహిర్గతం_బహుళకం | JO_ERR_బహుళకం;
 }
 
 /*
  * Set job options mandatory for a terminal job.
  */
-    static void
-setup_job_options(jobopt_T *opt, int rows, int cols)
+    స్థిర శూన్య
+అమరిక_పని_options(jobopt_T *opt, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
-#ifndef MSWIN
+#నిర్వచితం_కాకపోతే MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stdout
     // here.
-    if (!(opt->jo_set & JO_OUT_IO))
-#endif
+    ఒకవేళ (!(opt->jo_సమితి & JO_బహిర్గతం_IO))
+#అయితే_ముగింపు
     {
 	// Connect stdout to the terminal.
-	opt->jo_io[PART_OUT] = JIO_BUFFER;
-	opt->jo_io_buf[PART_OUT] = curbuf->b_fnum;
-	opt->jo_modifiable[PART_OUT] = 0;
-	opt->jo_set |= JO_OUT_IO + JO_OUT_BUF + JO_OUT_MODIFIABLE;
+	opt->jo_io[PART_బహిర్గతం] = JIO_బఫరు;
+	opt->jo_io_buf[PART_బహిర్గతం] = curbuf->b_fnum;
+	opt->jo_modifiable[PART_బహిర్గతం] = 0;
+	opt->jo_సమితి |= JO_బహిర్గతం_IO + JO_బహిర్గతం_BUF + JO_బహిర్గతం_MODIFIABLE;
     }
 
-#ifndef MSWIN
+#నిర్వచితం_కాకపోతే MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stderr
     // here.
-    if (!(opt->jo_set & JO_ERR_IO))
-#endif
+    ఒకవేళ (!(opt->jo_సమితి & JO_ERR_IO))
+#అయితే_ముగింపు
     {
 	// Connect stderr to the terminal.
-	opt->jo_io[PART_ERR] = JIO_BUFFER;
+	opt->jo_io[PART_ERR] = JIO_బఫరు;
 	opt->jo_io_buf[PART_ERR] = curbuf->b_fnum;
 	opt->jo_modifiable[PART_ERR] = 0;
-	opt->jo_set |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
+	opt->jo_సమితి |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
     }
 
     opt->jo_pty = TRUE;
-    if ((opt->jo_set2 & JO2_TERM_ROWS) == 0)
-	opt->jo_term_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS) == 0)
-	opt->jo_term_cols = cols;
+    ఒకవేళ ((opt->jo_set2 & JO2_పదం_అడ్డువరుసలు) == 0)
+	opt->jo_పదం_అడ్డువరుసలు = అడ్డువరుసలు_2;
+    ఒకవేళ ((opt->jo_set2 & JO2_పదం_నిలువుల_సంఖ్య) == 0)
+	opt->jo_పదం_నిలువుల_సంఖ్య = నిలువుల_సంఖ్య;
 }
 
 /*
  * Flush messages on channels.
  */
-    static void
-term_flush_messages(void)
+    స్థిర శూన్య
+పదం_flush_messages(శూన్య)
 {
     mch_check_messages();
     parse_queued_messages();
@@ -411,22 +411,22 @@ term_flush_messages(void)
  * Close a terminal buffer (and its window).  Used when creating the terminal
  * fails.
  */
-    static void
-term_close_buffer(buf_T *buf, buf_T *old_curbuf)
+    స్థిర శూన్య
+పదం_close_బఫరు(buf_T *buf, buf_T *old_curbuf)
 {
     free_terminal(buf);
-    if (old_curbuf != NULL)
+    ఒకవేళ (old_curbuf != ఖాళీ)
     {
 	--curbuf->b_nwindows;
 	curbuf = old_curbuf;
-	curwin->w_buffer = curbuf;
+	curwin->w_బఫరు = curbuf;
 	++curbuf->b_nwindows;
     }
     CHECK_CURBUF;
 
     // Wiping out the buffer will also close the window and call
     // free_terminal().
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_బఫరు(DOBUF_WIPE, DOBUF_మొదటి, FORWARD, buf->b_fnum, TRUE);
 }
 
 /*
@@ -437,197 +437,197 @@ term_close_buffer(buf_T *buf, buf_T *old_curbuf)
  * Returns NULL when failed.
  */
     buf_T *
-term_start(
+పదం_ప్రారంభం(
 	typval_T    *argvar,
-	char	    **argv,
+	అక్షరం	    **argv,
 	jobopt_T    *opt,
-	int	    flags)
+	పూర్ణాంకం	    flags)
 {
-    exarg_T	split_ea;
+    exarg_T	విభజించు_ea;
     win_T	*old_curwin = curwin;
-    term_T	*term;
-    buf_T	*old_curbuf = NULL;
-    int		res;
+    పదం_T	*పదం;
+    buf_T	*old_curbuf = ఖాళీ;
+    పూర్ణాంకం		res;
     buf_T	*newbuf;
-    int		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
+    పూర్ణాంకం		vertical = opt->jo_vertical || (cmdmod.cmod_విభజించు & WSP_VERT);
     jobopt_T	orig_opt;  // only partly filled
     pos_T	save_cursor;
 
-    if (check_restricted() || check_secure())
-	return NULL;
-    if (cmdwin_type != 0)
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి ఖాళీ;
+    ఒకవేళ (cmdwin_type != 0)
     {
-	emsg(_(e_cannot_open_terminal_from_command_line_window));
-	return NULL;
+	emsg(_(e_cannot_open_terminal_from_command_పంక్తి_కిటికీ));
+	తిరిగి ఖాళీ;
     }
 
-    if ((opt->jo_set & (JO_IN_IO + JO_OUT_IO + JO_ERR_IO))
-					 == (JO_IN_IO + JO_OUT_IO + JO_ERR_IO)
-	|| (!(opt->jo_set & JO_OUT_IO) && (opt->jo_set & JO_OUT_BUF))
-	|| (!(opt->jo_set & JO_ERR_IO) && (opt->jo_set & JO_ERR_BUF))
-	|| (argvar != NULL
+    ఒకవేళ ((opt->jo_సమితి & (JO_లోపల_IO + JO_బహిర్గతం_IO + JO_ERR_IO))
+					 == (JO_లోపల_IO + JO_బహిర్గతం_IO + JO_ERR_IO)
+	|| (!(opt->jo_సమితి & JO_బహిర్గతం_IO) && (opt->jo_సమితి & JO_బహిర్గతం_BUF))
+	|| (!(opt->jo_సమితి & JO_ERR_IO) && (opt->jo_సమితి & JO_ERR_BUF))
+	|| (argvar != ఖాళీ
 	    && argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
-	    && argvar->vval.v_list->lv_first == &range_list_item))
+	    && argvar->vval.v_list != ఖాళీ
+	    && argvar->vval.v_list->lv_మొదటి == &range_list_అంశం))
     {
-	emsg(_(e_invalid_argument));
-	return NULL;
+	emsg(_(e_invalid_వాదం));
+	తిరిగి ఖాళీ;
     }
 
-    term = ALLOC_CLEAR_ONE(term_T);
-    if (term == NULL)
-	return NULL;
-    term->tl_dirty_row_end = MAX_ROW;
-    term->tl_cursor_visible = TRUE;
-    term->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_BLOCK;
-    term->tl_finish = opt->jo_term_finish;
-#ifdef FEAT_GUI
-    term->tl_system = (flags & TERM_START_SYSTEM);
-#endif
-    ga_init2(&term->tl_scrollback, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_scrollback_postponed, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_osc_buf, sizeof(char), 300);
+    పదం = ALLOC_CLEAR_ONE(పదం_T);
+    ఒకవేళ (పదం == ఖాళీ)
+	తిరిగి ఖాళీ;
+    పదం->tl_dirty_అడ్డువరుస_చివర = MAX_అడ్డువరుస;
+    పదం->tl_cursor_visible = TRUE;
+    పదం->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_ఖండం;
+    పదం->tl_ముగింపు = opt->jo_పదం_ముగింపు;
+#నిర్వచితమైతే FEAT_GUI
+    పదం->tl_system = (flags & పదం_ప్రారంభం_SYSTEM);
+#అయితే_ముగింపు
+    ga_init2(&పదం->tl_scrollback, పరిమాణం(sb_పంక్తి_T), 300);
+    ga_init2(&పదం->tl_scrollback_postponed, పరిమాణం(sb_పంక్తి_T), 300);
+    ga_init2(&పదం->tl_osc_buf, పరిమాణం(అక్షరం), 300);
 
     setpcmark();
-    CLEAR_FIELD(split_ea);
-    if (opt->jo_curwin)
+    CLEAR_క్షేత్రం(విభజించు_ea);
+    ఒకవేళ (opt->jo_curwin)
     {
 	// Create a new buffer in the current window.
-	if (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
+	ఒకవేళ (!can_abandon(curbuf, flags & పదం_ప్రారంభం_FORCEIT))
 	{
-	    no_write_message();
-	    vim_free(term);
-	    return NULL;
+	    no_write_సందేశం();
+	    vim_free(పదం);
+	    తిరిగి ఖాళీ;
 	}
-	if (do_ecmd(0, NULL, NULL, &split_ea, ECMD_ONE,
-		      (buf_hide(curwin->w_buffer) ? ECMD_HIDE : 0)
-			  + ((flags & TERM_START_FORCEIT) ? ECMD_FORCEIT : 0),
+	ఒకవేళ (do_ecmd(0, ఖాళీ, ఖాళీ, &విభజించు_ea, ECMD_ONE,
+		      (buf_hide(curwin->w_బఫరు) ? ECMD_HIDE : 0)
+			  + ((flags & పదం_ప్రారంభం_FORCEIT) ? ECMD_FORCEIT : 0),
 							       curwin) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(పదం);
+	    తిరిగి ఖాళీ;
 	}
     }
-    else if (opt->jo_hidden || (flags & TERM_START_SYSTEM))
+    లేకపోతే ఒకవేళ (opt->jo_hidden || (flags & పదం_ప్రారంభం_SYSTEM))
     {
 	buf_T *buf;
 
 	// Create a new buffer without a window. Make it the current buffer for
 	// a moment to be able to do the initializations.
-	buf = buflist_new((char_u *)"", NULL, (linenr_T)0,
+	buf = buflist_new((char_u *)"", ఖాళీ, (linenr_T)0,
 							 BLN_NEW | BLN_LISTED);
-	if (buf == NULL || ml_open(buf) == FAIL)
+	ఒకవేళ (buf == ఖాళీ || ml_open(buf) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(పదం);
+	    తిరిగి ఖాళీ;
 	}
 	old_curbuf = curbuf;
 	--curbuf->b_nwindows;
 	curbuf = buf;
 	save_cursor = curwin->w_cursor;
-	curwin->w_buffer = buf;
+	curwin->w_బఫరు = buf;
 	++curbuf->b_nwindows;
     }
-    else
+    లేకపోతే
     {
 	// Open a new window or tab.
-	split_ea.cmdidx = CMD_new;
-	split_ea.cmd = (char_u *)"new";
-	split_ea.arg = (char_u *)"";
-	if (opt->jo_term_rows > 0 && !vertical)
+	విభజించు_ea.cmdidx = CMD_new;
+	విభజించు_ea.cmd = (char_u *)"new";
+	విభజించు_ea.arg = (char_u *)"";
+	ఒకవేళ (opt->jo_పదం_అడ్డువరుసలు > 0 && !vertical)
 	{
-	    split_ea.line2 = opt->jo_term_rows;
-	    split_ea.addr_count = 1;
+	    విభజించు_ea.line2 = opt->jo_పదం_అడ్డువరుసలు;
+	    విభజించు_ea.addr_లెక్క = 1;
 	}
-	if (opt->jo_term_cols > 0 && vertical)
+	ఒకవేళ (opt->jo_పదం_నిలువుల_సంఖ్య > 0 && vertical)
 	{
-	    split_ea.line2 = opt->jo_term_cols;
-	    split_ea.addr_count = 1;
+	    విభజించు_ea.line2 = opt->jo_పదం_నిలువుల_సంఖ్య;
+	    విభజించు_ea.addr_లెక్క = 1;
 	}
 
-	int cmod_split_modified = FALSE;
-	if (vertical)
+	పూర్ణాంకం cmod_విభజించు_modified = FALSE;
+	ఒకవేళ (vertical)
 	{
-	    if (!(cmdmod.cmod_split & WSP_VERT))
-		cmod_split_modified = TRUE;
-	    cmdmod.cmod_split |= WSP_VERT;
+	    ఒకవేళ (!(cmdmod.cmod_విభజించు & WSP_VERT))
+		cmod_విభజించు_modified = TRUE;
+	    cmdmod.cmod_విభజించు |= WSP_VERT;
 	}
-	ex_splitview(&split_ea);
-	if (cmod_split_modified)
-	    cmdmod.cmod_split &= ~WSP_VERT;
-	if (curwin == old_curwin)
+	ex_splitview(&విభజించు_ea);
+	ఒకవేళ (cmod_విభజించు_modified)
+	    cmdmod.cmod_విభజించు &= ~WSP_VERT;
+	ఒకవేళ (curwin == old_curwin)
 	{
 	    // split failed
-	    vim_free(term);
-	    return NULL;
+	    vim_free(పదం);
+	    తిరిగి ఖాళీ;
 	}
     }
-    term->tl_buffer = curbuf;
-    curbuf->b_term = term;
+    పదం->tl_బఫరు = curbuf;
+    curbuf->b_పదం = పదం;
 
-    if (!opt->jo_hidden)
+    ఒకవేళ (!opt->jo_hidden)
     {
 	// Only one size was taken care of with :new, do the other one.  With
 	// "curwin" both need to be done.
-	if (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
-	    win_setheight(opt->jo_term_rows);
-	if (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
-	    win_setwidth(opt->jo_term_cols);
+	ఒకవేళ (opt->jo_పదం_అడ్డువరుసలు > 0 && (opt->jo_curwin || vertical))
+	    win_setheight(opt->jo_పదం_అడ్డువరుసలు);
+	ఒకవేళ (opt->jo_పదం_నిలువుల_సంఖ్య > 0 && (opt->jo_curwin || !vertical))
+	    win_setwidth(opt->jo_పదం_నిలువుల_సంఖ్య);
     }
 
     // Link the new terminal in the list of active terminals.
-    term->tl_next = first_term;
-    first_term = term;
+    పదం->tl_తదుపరి = మొదటి_పదం;
+    మొదటి_పదం = పదం;
 
-    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPRE, ఖాళీ, ఖాళీ, FALSE, curbuf);
 
-    if (opt->jo_term_name != NULL)
+    ఒకవేళ (opt->jo_పదం_name != ఖాళీ)
     {
 	vim_free(curbuf->b_ffname);
-	curbuf->b_ffname = vim_strsave(opt->jo_term_name);
+	curbuf->b_ffname = vim_strsave(opt->jo_పదం_name);
     }
-    else if (argv != NULL)
+    లేకపోతే ఒకవేళ (argv != ఖాళీ)
     {
 	vim_free(curbuf->b_ffname);
 	curbuf->b_ffname = vim_strsave((char_u *)"!system");
     }
-    else
+    లేకపోతే
     {
-	int	i;
+	పూర్ణాంకం	i;
 	size_t	len;
 	char_u	*cmd, *p;
 
-	if (argvar->v_type == VAR_STRING)
+	ఒకవేళ (argvar->v_type == VAR_STRING)
 	{
 	    cmd = argvar->vval.v_string;
-	    if (cmd == NULL)
+	    ఒకవేళ (cmd == ఖాళీ)
 		cmd = (char_u *)"";
-	    else if (STRCMP(cmd, "NONE") == 0)
+	    లేకపోతే ఒకవేళ (STRCMP(cmd, "NONE") == 0)
 		cmd = (char_u *)"pty";
 	}
-	else if (argvar->v_type != VAR_LIST
-		|| argvar->vval.v_list == NULL
+	లేకపోతే ఒకవేళ (argvar->v_type != VAR_LIST
+		|| argvar->vval.v_list == ఖాళీ
 		|| argvar->vval.v_list->lv_len == 0
 		|| (cmd = tv_get_string_chk(
-			       &argvar->vval.v_list->lv_first->li_tv)) == NULL)
+			       &argvar->vval.v_list->lv_మొదటి->li_tv)) == ఖాళీ)
 	    cmd = (char_u*)"";
 
 	len = STRLEN(cmd) + 10;
 	p = alloc(len);
 
-	for (i = 0; p != NULL; ++i)
+	కొరకు (i = 0; p != ఖాళీ; ++i)
 	{
 	    // Prepend a ! to the command name to avoid the buffer name equals
 	    // the executable, otherwise ":w!" would overwrite it.
-	    if (i == 0)
-		vim_snprintf((char *)p, len, "!%s", cmd);
-	    else
-		vim_snprintf((char *)p, len, "!%s (%d)", cmd, i);
-	    if (buflist_findname(p) == NULL)
+	    ఒకవేళ (i == 0)
+		vim_snprintf((అక్షరం *)p, len, "!%s", cmd);
+	    లేకపోతే
+		vim_snprintf((అక్షరం *)p, len, "!%s (%d)", cmd, i);
+	    ఒకవేళ (buflist_findname(p) == ఖాళీ)
 	    {
 		vim_free(curbuf->b_ffname);
 		curbuf->b_ffname = p;
-		break;
+		ఆపు;
 	    }
 	}
     }
@@ -635,15 +635,15 @@ term_start(
     curbuf->b_sfname = vim_strsave(curbuf->b_ffname);
     curbuf->b_fname = curbuf->b_ffname;
 
-    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPOST, ఖాళీ, ఖాళీ, FALSE, curbuf);
 
-    if (opt->jo_term_opencmd != NULL)
-	term->tl_opencmd = vim_strsave(opt->jo_term_opencmd);
+    ఒకవేళ (opt->jo_పదం_opencmd != ఖాళీ)
+	పదం->tl_opencmd = vim_strsave(opt->jo_పదం_opencmd);
 
-    if (opt->jo_eof_chars != NULL)
-	term->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
+    ఒకవేళ (opt->jo_eof_chars != ఖాళీ)
+	పదం->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
 
-    set_string_option_direct((char_u *)"buftype", -1,
+    సమితి_string_option_ప్రత్యక్ష((char_u *)"buftype", -1,
 				  (char_u *)"terminal", OPT_FREE|OPT_LOCAL, 0);
     // Avoid that 'buftype' is reset when this buffer is entered.
     curbuf->b_p_initialized = true;
@@ -652,132 +652,132 @@ term_start(
     // the job finished.
     curbuf->b_p_ma = FALSE;
 
-    set_term_and_win_size(term, opt);
-#ifdef MSWIN
-    mch_memmove(orig_opt.jo_io, opt->jo_io, sizeof(orig_opt.jo_io));
-#endif
-    setup_job_options(opt, term->tl_rows, term->tl_cols);
+    సమితి_పదం_and_win_కొలత(పదం, opt);
+#నిర్వచితమైతే MSWIN
+    mch_memmove(orig_opt.jo_io, opt->jo_io, పరిమాణం(orig_opt.jo_io));
+#అయితే_ముగింపు
+    అమరిక_పని_options(opt, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య);
 
-    if (flags & TERM_START_NOJOB)
-	return curbuf;
+    ఒకవేళ (flags & పదం_ప్రారంభం_NOJOB)
+	తిరిగి curbuf;
 
-#if defined(FEAT_SESSION)
+#ఒకవేళ defined(FEAT_SESSION)
     // Remember the command for the session file.
-    if (opt->jo_term_norestore || argv != NULL)
-	term->tl_command = vim_strsave((char_u *)"NONE");
-    else if (argvar->v_type == VAR_STRING)
+    ఒకవేళ (opt->jo_పదం_norestore || argv != ఖాళీ)
+	పదం->tl_command = vim_strsave((char_u *)"NONE");
+    లేకపోతే ఒకవేళ (argvar->v_type == VAR_STRING)
     {
 	char_u	*cmd = argvar->vval.v_string;
 
-	if (cmd != NULL && STRCMP(cmd, p_sh) != 0)
-	    term->tl_command = vim_strsave(cmd);
+	ఒకవేళ (cmd != ఖాళీ && STRCMP(cmd, p_sh) != 0)
+	    పదం->tl_command = vim_strsave(cmd);
     }
-    else if (argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
+    లేకపోతే ఒకవేళ (argvar->v_type == VAR_LIST
+	    && argvar->vval.v_list != ఖాళీ
 	    && argvar->vval.v_list->lv_len > 0)
     {
 	garray_T	ga;
-	listitem_T	*item;
+	listitem_T	*అంశం;
 
 	ga_init2(&ga, 1, 100);
-	FOR_ALL_LIST_ITEMS(argvar->vval.v_list, item)
+	FOR_ALL_LIST_వస్తువులు(argvar->vval.v_list, అంశం)
 	{
-	    char_u *s = tv_get_string_chk(&item->li_tv);
+	    char_u *s = tv_get_string_chk(&అంశం->li_tv);
 	    char_u *p;
 
-	    if (s == NULL)
-		break;
+	    ఒకవేళ (s == ఖాళీ)
+		ఆపు;
 	    p = vim_strsave_fnameescape(s, VSE_NONE);
-	    if (p == NULL)
-		break;
+	    ఒకవేళ (p == ఖాళీ)
+		ఆపు;
 	    ga_concat(&ga, p);
 	    vim_free(p);
 	    ga_append(&ga, ' ');
 	}
-	if (item == NULL)
+	ఒకవేళ (అంశం == ఖాళీ)
 	{
 	    ga_append(&ga, NUL);
-	    term->tl_command = ga.ga_data;
+	    పదం->tl_command = ga.ga_దత్తాంశం;
 	}
-	else
+	లేకపోతే
 	    ga_clear(&ga);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (opt->jo_term_kill != NULL)
+    ఒకవేళ (opt->jo_పదం_kill != ఖాళీ)
     {
-	char_u *p = skiptowhite(opt->jo_term_kill);
+	char_u *p = skiptowhite(opt->jo_పదం_kill);
 
-	term->tl_kill = vim_strnsave(opt->jo_term_kill, p - opt->jo_term_kill);
+	పదం->tl_kill = vim_strnsave(opt->jo_పదం_kill, p - opt->jo_పదం_kill);
     }
 
-    if (opt->jo_term_api != NULL)
+    ఒకవేళ (opt->jo_పదం_api != ఖాళీ)
     {
-	char_u *p = skiptowhite(opt->jo_term_api);
+	char_u *p = skiptowhite(opt->jo_పదం_api);
 
-	term->tl_api = vim_strnsave(opt->jo_term_api, p - opt->jo_term_api);
+	పదం->tl_api = vim_strnsave(opt->jo_పదం_api, p - opt->jo_పదం_api);
     }
-    else
-	term->tl_api = vim_strsave((char_u *)"Tapi_");
+    లేకపోతే
+	పదం->tl_api = vim_strsave((char_u *)"Tapi_");
 
-    if (opt->jo_set2 & JO2_TERM_HIGHLIGHT)
-	term->tl_highlight_name = vim_strsave(opt->jo_term_highlight);
+    ఒకవేళ (opt->jo_set2 & JO2_పదం_HIGHLIGHT)
+	పదం->tl_highlight_name = vim_strsave(opt->jo_పదం_highlight);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Save the user-defined palette, it is only used in GUI (or 'tgc' is on).
-    if (opt->jo_set2 & JO2_ANSI_COLORS)
+    ఒకవేళ (opt->jo_set2 & JO2_ANSI_COLORS)
     {
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-	if (term->tl_palette == NULL)
+	పదం->tl_palette = ALLOC_MULT(long_u, 16);
+	ఒకవేళ (పదం->tl_palette == ఖాళీ)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(పదం);
+	    తిరిగి ఖాళీ;
 	}
-	memcpy(term->tl_palette, opt->jo_ansi_colors, sizeof(long_u) * 16);
+	జ్ఞాపకం_నకలు(పదం->tl_palette, opt->jo_ansi_colors, పరిమాణం(long_u) * 16);
     }
-#endif
+#అయితే_ముగింపు
 
     // System dependent: setup the vterm and maybe start the job in it.
-    if (argv == NULL
+    ఒకవేళ (argv == ఖాళీ
 	    && argvar->v_type == VAR_STRING
-	    && argvar->vval.v_string != NULL
+	    && argvar->vval.v_string != ఖాళీ
 	    && STRCMP(argvar->vval.v_string, "NONE") == 0)
-	res = create_pty_only(term, opt);
-    else
-	res = term_and_job_init(term, argvar, argv, opt, &orig_opt);
+	res = create_pty_only(పదం, opt);
+    లేకపోతే
+	res = పదం_and_పని_init(పదం, argvar, argv, opt, &orig_opt);
 
     newbuf = curbuf;
-    if (res == OK)
+    ఒకవేళ (res == OK)
     {
 	// Get and remember the size we ended up with.  Update the pty.
-	vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-	term_report_winsize(term, term->tl_rows, term->tl_cols);
-#ifdef FEAT_GUI
-	if (term->tl_system)
+	vterm_get_కొలత(పదం->tl_vterm, &పదం->tl_అడ్డువరుసలు, &పదం->tl_నిలువుల_సంఖ్య);
+	పదం_report_winsize(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య);
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (పదం->tl_system)
 	{
 	    // display first line below typed command
-	    term->tl_toprow = msg_row + 1;
-	    term->tl_dirty_row_end = 0;
+	    పదం->tl_toprow = సందేశం_అడ్డువరుస + 1;
+	    పదం->tl_dirty_అడ్డువరుస_చివర = 0;
 	}
-#endif
+#అయితే_ముగింపు
 
 	// Make sure we don't get stuck on sending keys to the job, it leads to
 	// a deadlock if the job is waiting for Vim to read.
-	channel_set_nonblock(term->tl_job->jv_channel, PART_IN);
+	channel_సమితి_nonblock(పదం->tl_పని->jv_channel, PART_లోపల);
 
-	if (old_curbuf != NULL)
+	ఒకవేళ (old_curbuf != ఖాళీ)
 	{
 	    --curbuf->b_nwindows;
 	    curbuf = old_curbuf;
-	    curwin->w_buffer = curbuf;
+	    curwin->w_బఫరు = curbuf;
 	    curwin->w_cursor = save_cursor;
 	    ++curbuf->b_nwindows;
 	}
-	else if (vgetc_busy
-#ifdef FEAT_TIMERS
+	లేకపోతే ఒకవేళ (vgetc_busy
+#నిర్వచితమైతే FEAT_TIMERS
 		|| timer_busy
-#endif
-		|| input_busy)
+#అయితే_ముగింపు
+		|| ఆదానం_busy)
 	{
 	    char_u ignore[4];
 
@@ -791,211 +791,211 @@ term_start(
 	    typebuf_was_filled = TRUE;
 	}
     }
-    else
+    లేకపోతే
     {
-	term_close_buffer(curbuf, old_curbuf);
-	return NULL;
+	పదం_close_బఫరు(curbuf, old_curbuf);
+	తిరిగి ఖాళీ;
     }
 
-    apply_autocmds(EVENT_TERMINALOPEN, NULL, NULL, FALSE, newbuf);
-    if (!opt->jo_hidden && !(flags & TERM_START_SYSTEM))
-	apply_autocmds(EVENT_TERMINALWINOPEN, NULL, NULL, FALSE, newbuf);
-    return newbuf;
+    apply_autocmds(EVENT_TERMINALOPEN, ఖాళీ, ఖాళీ, FALSE, newbuf);
+    ఒకవేళ (!opt->jo_hidden && !(flags & పదం_ప్రారంభం_SYSTEM))
+	apply_autocmds(EVENT_TERMINALWINOPEN, ఖాళీ, ఖాళీ, FALSE, newbuf);
+    తిరిగి newbuf;
 }
 
 /*
  * ":terminal": open a terminal window and execute a job in it.
  */
-    void
+    శూన్య
 ex_terminal(exarg_T *eap)
 {
     typval_T	argvar[2];
     jobopt_T	opt;
-    int		opt_shell = FALSE;
+    పూర్ణాంకం		opt_shell = FALSE;
     char_u	*cmd;
-    char_u	*tofree = NULL;
-    int		scroll_save = msg_scroll;
+    char_u	*tofree = ఖాళీ;
+    పూర్ణాంకం		scroll_save = సందేశం_scroll;
 
-    msg_scroll = FALSE;		// don't scroll here
+    సందేశం_scroll = FALSE;		// don't scroll here
     autowrite_all();
-    msg_scroll = scroll_save;
+    సందేశం_scroll = scroll_save;
 
-    init_job_options(&opt);
+    init_పని_options(&opt);
 
     cmd = eap->arg;
-    while (*cmd == '+' && *(cmd + 1) == '+')
+    అయితే (*cmd == '+' && *(cmd + 1) == '+')
     {
 	char_u  *p, *ep;
 
 	cmd += 2;
 	p = skiptowhite(cmd);
 	ep = vim_strchr(cmd, '=');
-	if (ep != NULL)
+	ఒకవేళ (ep != ఖాళీ)
 	{
-	    if (ep < p)
+	    ఒకవేళ (ep < p)
 		p = ep;
-	    else
-		ep = NULL;
+	    లేకపోతే
+		ep = ఖాళీ;
 	}
 
 	// Note: Keep this in sync with get_terminalopt_name.
 
-#define OPTARG_HAS(name) ((int)(p - cmd) == sizeof(name) - 1 \
-				 && STRNICMP(cmd, name, sizeof(name) - 1) == 0)
-	if (OPTARG_HAS("close"))
-	    opt.jo_term_finish = 'c';
-	else if (OPTARG_HAS("noclose"))
-	    opt.jo_term_finish = 'n';
-	else if (OPTARG_HAS("open"))
-	    opt.jo_term_finish = 'o';
-	else if (OPTARG_HAS("curwin"))
+#నిర్వచించు OPTARG_HAS(name) ((పూర్ణాంకం)(p - cmd) == పరిమాణం(name) - 1 \
+				 && STRNICMP(cmd, name, పరిమాణం(name) - 1) == 0)
+	ఒకవేళ (OPTARG_HAS("close"))
+	    opt.jo_పదం_ముగింపు = 'c';
+	లేకపోతే ఒకవేళ (OPTARG_HAS("noclose"))
+	    opt.jo_పదం_ముగింపు = 'n';
+	లేకపోతే ఒకవేళ (OPTARG_HAS("open"))
+	    opt.jo_పదం_ముగింపు = 'o';
+	లేకపోతే ఒకవేళ (OPTARG_HAS("curwin"))
 	    opt.jo_curwin = 1;
-	else if (OPTARG_HAS("hidden"))
+	లేకపోతే ఒకవేళ (OPTARG_HAS("hidden"))
 	    opt.jo_hidden = 1;
-	else if (OPTARG_HAS("norestore"))
-	    opt.jo_term_norestore = 1;
-	else if (OPTARG_HAS("shell"))
+	లేకపోతే ఒకవేళ (OPTARG_HAS("norestore"))
+	    opt.jo_పదం_norestore = 1;
+	లేకపోతే ఒకవేళ (OPTARG_HAS("shell"))
 	    opt_shell = TRUE;
-	else if (OPTARG_HAS("kill") && ep != NULL)
+	లేకపోతే ఒకవేళ (OPTARG_HAS("kill") && ep != ఖాళీ)
 	{
-	    opt.jo_set2 |= JO2_TERM_KILL;
-	    opt.jo_term_kill = ep + 1;
+	    opt.jo_set2 |= JO2_పదం_KILL;
+	    opt.jo_పదం_kill = ep + 1;
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("api"))
+	లేకపోతే ఒకవేళ (OPTARG_HAS("api"))
 	{
-	    opt.jo_set2 |= JO2_TERM_API;
-	    if (ep != NULL)
+	    opt.jo_set2 |= JO2_పదం_API;
+	    ఒకవేళ (ep != ఖాళీ)
 	    {
-		opt.jo_term_api = ep + 1;
+		opt.jo_పదం_api = ep + 1;
 		p = skiptowhite(cmd);
 	    }
-	    else
-		opt.jo_term_api = NULL;
+	    లేకపోతే
+		opt.jo_పదం_api = ఖాళీ;
 	}
-	else if (OPTARG_HAS("rows") && ep != NULL && SAFE_isdigit(ep[1]))
+	లేకపోతే ఒకవేళ (OPTARG_HAS("rows") && ep != ఖాళీ && సురక్షిత_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_ROWS;
-	    opt.jo_term_rows = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_పదం_అడ్డువరుసలు;
+	    opt.jo_పదం_అడ్డువరుసలు = atoi((అక్షరం *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("cols") && ep != NULL && SAFE_isdigit(ep[1]))
+	లేకపోతే ఒకవేళ (OPTARG_HAS("cols") && ep != ఖాళీ && సురక్షిత_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_COLS;
-	    opt.jo_term_cols = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_పదం_నిలువుల_సంఖ్య;
+	    opt.jo_పదం_నిలువుల_సంఖ్య = atoi((అక్షరం *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("eof") && ep != NULL)
+	లేకపోతే ఒకవేళ (OPTARG_HAS("eof") && ep != ఖాళీ)
 	{
-	    char_u *buf = NULL;
-	    char_u *keys;
+	    char_u *buf = ఖాళీ;
+	    char_u *కీలకాలు;
 
 	    vim_free(opt.jo_eof_chars);
 	    p = skiptowhite(cmd);
 	    *p = NUL;
-	    keys = replace_termcodes(ep + 1, &buf, 0,
-		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, NULL);
+	    కీలకాలు = replace_termcodes(ep + 1, &buf, 0,
+		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, ఖాళీ);
 	    opt.jo_set2 |= JO2_EOF_CHARS;
-	    opt.jo_eof_chars = vim_strsave(keys);
+	    opt.jo_eof_chars = vim_strsave(కీలకాలు);
 	    vim_free(buf);
 	    *p = ' ';
 	}
-#ifdef MSWIN
-	else if ((int)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
-								 && ep != NULL)
+#నిర్వచితమైతే MSWIN
+	లేకపోతే ఒకవేళ ((పూర్ణాంకం)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
+								 && ep != ఖాళీ)
 	{
-	    int tty_type = NUL;
+	    పూర్ణాంకం tty_type = NUL;
 
 	    p = skiptowhite(cmd);
-	    if (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
+	    ఒకవేళ (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
 		tty_type = 'w';
-	    else if (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
+	    లేకపోతే ఒకవేళ (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
 		tty_type = 'c';
-	    else
+	    లేకపోతే
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "type");
-		goto theend;
+		semsg(_(e_invalid_విలువ_for_వాదం_str), "type");
+		వెళ్ళు theend;
 	    }
 	    opt.jo_set2 |= JO2_TTY_TYPE;
 	    opt.jo_tty_type = tty_type;
 	}
-#endif
-	else
+#అయితే_ముగింపు
+	లేకపోతే
 	{
-	    if (*p)
+	    ఒకవేళ (*p)
 		*p = NUL;
 	    semsg(_(e_invalid_attribute_str), cmd);
-	    goto theend;
+	    వెళ్ళు theend;
 	}
-#undef OPTARG_HAS
+#నిర్వచనం_రద్దు OPTARG_HAS
 	cmd = skipwhite(p);
     }
-    if (*cmd == NUL)
+    ఒకవేళ (*cmd == NUL)
     {
 	// Make a copy of 'shell', an autocommand may change the option.
 	tofree = cmd = vim_strsave(p_sh);
 
 	// default to close when the shell exits
-	if (opt.jo_term_finish == NUL)
-	    opt.jo_term_finish = TL_FINISH_CLOSE;
+	ఒకవేళ (opt.jo_పదం_ముగింపు == NUL)
+	    opt.jo_పదం_ముగింపు = TL_ముగింపు_CLOSE;
     }
 
-    if (eap->addr_count > 0)
+    ఒకవేళ (eap->addr_లెక్క > 0)
     {
 	// Write lines from current buffer to the job.
-	opt.jo_set |= JO_IN_IO | JO_IN_BUF | JO_IN_TOP | JO_IN_BOT;
-	opt.jo_io[PART_IN] = JIO_BUFFER;
-	opt.jo_io_buf[PART_IN] = curbuf->b_fnum;
-	opt.jo_in_top = eap->line1;
-	opt.jo_in_bot = eap->line2;
+	opt.jo_సమితి |= JO_లోపల_IO | JO_లోపల_BUF | JO_లోపల_శిఖరం | JO_లోపల_BOT;
+	opt.jo_io[PART_లోపల] = JIO_బఫరు;
+	opt.jo_io_buf[PART_లోపల] = curbuf->b_fnum;
+	opt.jo_లోపల_శిఖరం = eap->line1;
+	opt.jo_లోపల_bot = eap->line2;
     }
 
-    if (opt_shell && tofree == NULL)
+    ఒకవేళ (opt_shell && tofree == ఖాళీ)
     {
-#ifdef UNIX
-	char	**argv = NULL;
-	char_u	*tofree1 = NULL;
-	char_u	*tofree2 = NULL;
+#నిర్వచితమైతే UNIX
+	అక్షరం	**argv = ఖాళీ;
+	char_u	*tofree1 = ఖాళీ;
+	char_u	*tofree2 = ఖాళీ;
 
 	// :term ++shell command
-	if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
-	    term_start(NULL, argv, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+	ఒకవేళ (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
+	    పదం_ప్రారంభం(ఖాళీ, argv, &opt, eap->forceit ? పదం_ప్రారంభం_FORCEIT : 0);
 	vim_free(argv);
 	vim_free(tofree1);
 	vim_free(tofree2);
-	goto theend;
-#else
+	వెళ్ళు theend;
+#లేకపోతే
 # ifdef MSWIN
 	long_u	    cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 	char_u	    *newcmd;
 
 	newcmd = alloc(cmdlen);
-	if (newcmd == NULL)
-	    goto theend;
+	ఒకవేళ (newcmd == ఖాళీ)
+	    వెళ్ళు theend;
 	tofree = newcmd;
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	vim_snprintf((అక్షరం *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
 	cmd = newcmd;
-# else
+# లేకపోతే
 	emsg(_(e_sorry_plusplusshell_not_supported_on_this_system));
-	goto theend;
+	వెళ్ళు theend;
 # endif
-#endif
+#అయితే_ముగింపు
     }
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = cmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    term_start(argvar, NULL, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+    పదం_ప్రారంభం(argvar, ఖాళీ, &opt, eap->forceit ? పదం_ప్రారంభం_FORCEIT : 0);
 
 theend:
     vim_free(tofree);
     vim_free(opt.jo_eof_chars);
 }
 
-    static char_u *
-get_terminalopt_name(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_terminalopt_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     // Note: Keep this in sync with ex_terminal.
-    static char *(p_termopt_values[]) =
+    స్థిర అక్షరం *(p_termopt_విలువలు[]) =
     {
 	"close",
 	"noclose",
@@ -1012,18 +1012,18 @@ get_terminalopt_name(expand_T *xp UNUSED, int idx)
 	"api=",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termopt_values))
-	return (char_u*)p_termopt_values[idx];
-    return NULL;
+    ఒకవేళ (idx < (పూర్ణాంకం)ARRAY_నిడివి(p_termopt_విలువలు))
+	తిరిగి (char_u*)p_termopt_విలువలు[idx];
+    తిరిగి ఖాళీ;
 }
 
-    static char_u *
-get_termkill_name(expand_T *xp UNUSED, int idx)
+    స్థిర char_u *
+get_termkill_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
     // These are platform-specific values used for job_stop(). They are defined
     // in each platform's mch_signal_job(). Just use a unified auto-complete
     // list for simplicity.
-    static char *(p_termkill_values[]) =
+    స్థిర అక్షరం *(p_termkill_విలువలు[]) =
     {
 	"term",
 	"hup",
@@ -1033,160 +1033,160 @@ get_termkill_name(expand_T *xp UNUSED, int idx)
 	"winch",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termkill_values))
-	return (char_u*)p_termkill_values[idx];
-    return NULL;
+    ఒకవేళ (idx < (పూర్ణాంకం)ARRAY_నిడివి(p_termkill_విలువలు))
+	తిరిగి (char_u*)p_termkill_విలువలు[idx];
+    తిరిగి ఖాళీ;
 }
 
 /*
  * Command-line expansion for :terminal [options]
  */
-    int
+    పూర్ణాంకం
 expand_terminal_opt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	పూర్ణాంకం	    *అంకె_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    ఒకవేళ (xp->xp_నమూనా > xp->xp_పంక్తి && *(xp->xp_నమూనా-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, పూర్ణాంకం) = ఖాళీ;
 
-	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 4
-		&& STRNCMP(name_end - 4, "kill", 4) == 0)
+	char_u *name_చివర = xp->xp_నమూనా - 1;
+	ఒకవేళ (name_చివర - xp->xp_పంక్తి >= 4
+		&& STRNCMP(name_చివర - 4, "kill", 4) == 0)
 	    cb = get_termkill_name;
 
-	if (cb != NULL)
+	ఒకవేళ (cb != ఖాళీ)
 	{
-	    return ExpandGeneric(
+	    తిరిగి ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    అంకె_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	తిరిగి FAIL;
     }
-    return ExpandGeneric(
+    తిరిగి ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    అంకె_Matches,
 	    get_terminalopt_name,
 	    FALSE);
 }
 
-#if defined(FEAT_SESSION)
+#ఒకవేళ defined(FEAT_SESSION)
 /*
  * Write a :terminal command to the session file to restore the terminal in
  * window "wp".
  * Return FAIL if writing fails.
  */
-    int
-term_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
+    పూర్ణాంకం
+పదం_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
 {
-    const int	bufnr = wp->w_buffer->b_fnum;
-    term_T	*term = wp->w_buffer->b_term;
+    స్థిరరాశి పూర్ణాంకం	bufnr = wp->w_బఫరు->b_fnum;
+    పదం_T	*పదం = wp->w_బఫరు->b_పదం;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    ఒకవేళ (terminal_bufs != ఖాళీ && wp->w_బఫరు->b_nwindows > 1)
     {
 	// There are multiple views into this terminal buffer. We don't want to
 	// create the terminal multiple times. If it's the first time, create,
 	// otherwise link to the first buffer.
-	char	    id_as_str[NUMBUFLEN];
-	hashitem_T  *entry;
+	అక్షరం	    id_as_str[NUMBUFLEN];
+	hashitem_T  *నమోదు_2;
 
-	vim_snprintf(id_as_str, sizeof(id_as_str), "%d", bufnr);
+	vim_snprintf(id_as_str, పరిమాణం(id_as_str), "%d", bufnr);
 
-	entry = hash_find(terminal_bufs, (char_u *)id_as_str);
-	if (!HASHITEM_EMPTY(entry))
+	నమోదు_2 = hash_కనుగొను(terminal_bufs, (char_u *)id_as_str);
+	ఒకవేళ (!HASHITEM_ఖాళీలు(నమోదు_2))
 	{
 	    // we've already opened this terminal buffer
-	    if (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
-		return FAIL;
-	    return put_eol(fd);
+	    ఒకవేళ (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
+		తిరిగి FAIL;
+	    తిరిగి put_eol(fd);
 	}
     }
 
     // Create the terminal and run the command.  This is not without
     // risk, but let's assume the user only creates a session when this
     // will be OK.
-    if (fprintf(fd, "exe ':terminal ++curwin"
+    ఒకవేళ (fprintf(fd, "exe ':terminal ++curwin"
 		" ++cols=' .. ((&columns * %d + %ld) / %ld)"
 		" .. ' ++rows=' .. ((&lines * %d + %ld) / %ld) ",
-		term->tl_cols, Columns / 2, Columns,
-		term->tl_rows, Rows / 2, Rows) < 0)
-	return FAIL;
+		పదం->tl_నిలువుల_సంఖ్య, Columns / 2, Columns,
+		పదం->tl_అడ్డువరుసలు, అడ్డువరుసలు / 2, అడ్డువరుసలు) < 0)
+	తిరిగి FAIL;
 # ifdef MSWIN
-    if (fprintf(fd, ".. ' ++type=%s' ", term->tl_job->jv_tty_type) < 0)
-	return FAIL;
+    ఒకవేళ (fprintf(fd, ".. ' ++type=%s' ", పదం->tl_పని->jv_tty_type) < 0)
+	తిరిగి FAIL;
 # endif
-    if (term->tl_command != NULL)
+    ఒకవేళ (పదం->tl_command != ఖాళీ)
     {
-	char_u *quoted_command = string_quote(term->tl_command, FALSE);
-	if (quoted_command == NULL)
-	    return FAIL;
+	char_u *quoted_command = string_quote(పదం->tl_command, FALSE);
+	ఒకవేళ (quoted_command == ఖాళీ)
+	    తిరిగి FAIL;
 
-	int ret = fputs(".. ' ' .. ", fd) < 0
-		    || fputs((char *)quoted_command, fd) < 0;
+	పూర్ణాంకం ret = fputs(".. ' ' .. ", fd) < 0
+		    || fputs((అక్షరం *)quoted_command, fd) < 0;
 	vim_free(quoted_command);
-	if (ret)
-	    return FAIL;
+	ఒకవేళ (ret)
+	    తిరిగి FAIL;
     }
-    if (put_eol(fd) != OK)
-	return FAIL;
+    ఒకవేళ (put_eol(fd) != OK)
+	తిరిగి FAIL;
 
-    if (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
-	return FAIL;
+    ఒకవేళ (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
+	తిరిగి FAIL;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    ఒకవేళ (terminal_bufs != ఖాళీ && wp->w_బఫరు->b_nwindows > 1)
     {
-	char *hash_key = alloc(NUMBUFLEN);
+	అక్షరం *hash_కీలకం = alloc(NUMBUFLEN);
 
-	vim_snprintf(hash_key, NUMBUFLEN, "%d", bufnr);
-	hash_add(terminal_bufs, (char_u *)hash_key, "terminal session");
+	vim_snprintf(hash_కీలకం, NUMBUFLEN, "%d", bufnr);
+	hash_కూడు(terminal_bufs, (char_u *)hash_కీలకం, "terminal session");
     }
 
-    return put_eol(fd);
+    తిరిగి put_eol(fd);
 }
 
 /*
  * Return TRUE if "buf" has a terminal that should be restored.
  */
-    int
-term_should_restore(buf_T *buf)
+    పూర్ణాంకం
+పదం_should_restore(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
+    పదం_T	*పదం = buf->b_పదం;
 
-    return term != NULL && (term->tl_command == NULL
-				     || STRCMP(term->tl_command, "NONE") != 0);
+    తిరిగి పదం != ఖాళీ && (పదం->tl_command == ఖాళీ
+				     || STRCMP(పదం->tl_command, "NONE") != 0);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Free the scrollback buffer for "term".
  */
-    static void
-free_scrollback(term_T *term)
+    స్థిర శూన్య
+free_scrollback(పదం_T *పదం)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    for (i = 0; i < term->tl_scrollback.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback);
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback_postponed.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback_postponed);
+    కొరకు (i = 0; i < పదం->tl_scrollback.ga_len; ++i)
+	vim_free(((sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం + i)->sb_cells);
+    ga_clear(&పదం->tl_scrollback);
+    కొరకు (i = 0; i < పదం->tl_scrollback_postponed.ga_len; ++i)
+	vim_free(((sb_పంక్తి_T *)పదం->tl_scrollback_postponed.ga_దత్తాంశం + i)->sb_cells);
+    ga_clear(&పదం->tl_scrollback_postponed);
 }
 
 
 // Terminals that need to be freed soon.
-static term_T	*terminals_to_free = NULL;
+స్థిర పదం_T	*terminals_గమ్యం_free = ఖాళీ;
 
 /*
  * Free a terminal and everything it refers to.
@@ -1196,73 +1196,73 @@ static term_T	*terminals_to_free = NULL;
  * because callbacks may wipe out a buffer while the terminal is still
  * referenced.
  */
-    void
+    శూన్య
 free_terminal(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
-    term_T	*tp;
+    పదం_T	*పదం = buf->b_పదం;
+    పదం_T	*tp;
 
-    if (term == NULL)
-	return;
+    ఒకవేళ (పదం == ఖాళీ)
+	తిరిగి;
 
     // Unlink the terminal form the list of terminals.
-    if (first_term == term)
-	first_term = term->tl_next;
-    else
-	for (tp = first_term; tp->tl_next != NULL; tp = tp->tl_next)
-	    if (tp->tl_next == term)
+    ఒకవేళ (మొదటి_పదం == పదం)
+	మొదటి_పదం = పదం->tl_తదుపరి;
+    లేకపోతే
+	కొరకు (tp = మొదటి_పదం; tp->tl_తదుపరి != ఖాళీ; tp = tp->tl_తదుపరి)
+	    ఒకవేళ (tp->tl_తదుపరి == పదం)
 	    {
-		tp->tl_next = term->tl_next;
-		break;
+		tp->tl_తదుపరి = పదం->tl_తదుపరి;
+		ఆపు;
 	    }
 
-    if (term->tl_job != NULL)
+    ఒకవేళ (పదం->tl_పని != ఖాళీ)
     {
-	if (term->tl_job->jv_status != JOB_ENDED
-		&& term->tl_job->jv_status != JOB_FINISHED
-		&& term->tl_job->jv_status != JOB_FAILED)
-	    job_stop(term->tl_job, NULL, "kill");
-	job_unref(term->tl_job);
+	ఒకవేళ (పదం->tl_పని->jv_స్థితి != పని_ENDED
+		&& పదం->tl_పని->jv_స్థితి != పని_ముగిసిన
+		&& పదం->tl_పని->jv_స్థితి != పని_FAILED)
+	    పని_stop(పదం->tl_పని, ఖాళీ, "kill");
+	పని_unref(పదం->tl_పని);
     }
-    term->tl_next = terminals_to_free;
-    terminals_to_free = term;
+    పదం->tl_తదుపరి = terminals_గమ్యం_free;
+    terminals_గమ్యం_free = పదం;
 
-    buf->b_term = NULL;
-    if (in_terminal_loop == term)
-	in_terminal_loop = NULL;
+    buf->b_పదం = ఖాళీ;
+    ఒకవేళ (లోపల_terminal_loop == పదం)
+	లోపల_terminal_loop = ఖాళీ;
 }
 
-    void
-free_unused_terminals(void)
+    శూన్య
+free_వాడని_terminals(శూన్య)
 {
-    while (terminals_to_free != NULL)
+    అయితే (terminals_గమ్యం_free != ఖాళీ)
     {
-	term_T	    *term = terminals_to_free;
+	పదం_T	    *పదం = terminals_గమ్యం_free;
 
-	terminals_to_free = term->tl_next;
+	terminals_గమ్యం_free = పదం->tl_తదుపరి;
 
-	free_scrollback(term);
-	ga_clear(&term->tl_osc_buf);
+	free_scrollback(పదం);
+	ga_clear(&పదం->tl_osc_buf);
 
-	term_free_vterm(term);
-	vim_free(term->tl_api);
-	vim_free(term->tl_title);
-#ifdef FEAT_SESSION
-	vim_free(term->tl_command);
-#endif
-	vim_free(term->tl_kill);
-	vim_free(term->tl_status_text);
-	vim_free(term->tl_opencmd);
-	vim_free(term->tl_eof_chars);
-	vim_free(term->tl_arg0_cmd);
-#ifdef MSWIN
-	if (term->tl_out_fd != NULL)
-	    fclose(term->tl_out_fd);
-#endif
-	vim_free(term->tl_highlight_name);
-	vim_free(term->tl_cursor_color);
-	vim_free(term->tl_palette);
-	vim_free(term);
+	పదం_free_vterm(పదం);
+	vim_free(పదం->tl_api);
+	vim_free(పదం->tl_title);
+#నిర్వచితమైతే FEAT_SESSION
+	vim_free(పదం->tl_command);
+#అయితే_ముగింపు
+	vim_free(పదం->tl_kill);
+	vim_free(పదం->tl_స్థితి_పాఠ్యం);
+	vim_free(పదం->tl_opencmd);
+	vim_free(పదం->tl_eof_chars);
+	vim_free(పదం->tl_arg0_cmd);
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (పదం->tl_బహిర్గతం_fd != ఖాళీ)
+	    fclose(పదం->tl_బహిర్గతం_fd);
+#అయితే_ముగింపు
+	vim_free(పదం->tl_highlight_name);
+	vim_free(పదం->tl_cursor_color);
+	vim_free(పదం->tl_palette);
+	vim_free(పదం);
     }
 }
 
@@ -1271,304 +1271,304 @@ free_unused_terminals(void)
  * when writing buffer lines to the job it can be another.  This makes it
  * possible to do "1,5term vim -".
  */
-    static ch_part_T
-get_tty_part(term_T *term UNUSED)
+    స్థిర ch_part_T
+get_tty_part(పదం_T *పదం వాడని)
 {
-#ifdef UNIX
-    ch_part_T	parts[3] = {PART_IN, PART_OUT, PART_ERR};
-    int		i;
+#నిర్వచితమైతే UNIX
+    ch_part_T	parts[3] = {PART_లోపల, PART_బహిర్గతం, PART_ERR};
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < 3; ++i)
+    కొరకు (i = 0; i < 3; ++i)
     {
-	int fd = term->tl_job->jv_channel->ch_part[parts[i]].ch_fd;
+	పూర్ణాంకం fd = పదం->tl_పని->jv_channel->ch_part[parts[i]].ch_fd;
 
-	if (mch_isatty(fd))
-	    return parts[i];
+	ఒకవేళ (mch_isatty(fd))
+	    తిరిగి parts[i];
     }
-#endif
-    return PART_IN;
+#అయితే_ముగింపు
+    తిరిగి PART_లోపల;
 }
 
 /*
  * Read any vterm output and send it on the channel.
  */
-    static void
-term_forward_output(term_T *term)
+    స్థిర శూన్య
+పదం_forward_output(పదం_T *పదం)
 {
-    VTerm *vterm = term->tl_vterm;
-    char   buf[KEY_BUF_LEN];
-    size_t curlen = vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    VTerm *vterm = పదం->tl_vterm;
+    అక్షరం   buf[కీలకం_BUF_LEN];
+    size_t curlen = vterm_output_read(vterm, buf, కీలకం_BUF_LEN);
 
-    if (curlen > 0)
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-					     (char_u *)buf, (int)curlen, NULL);
+    ఒకవేళ (curlen > 0)
+	channel_send(పదం->tl_పని->jv_channel, get_tty_part(పదం),
+					     (char_u *)buf, (పూర్ణాంకం)curlen, ఖాళీ);
 }
 
 /*
  * Write job output "msg[len]" to the vterm.
  */
-    static void
-term_write_job_output(term_T *term, char_u *msg_arg, size_t len_arg)
+    స్థిర శూన్య
+పదం_write_పని_output(పదం_T *పదం, char_u *సందేశం_arg, size_t len_arg)
 {
-    char_u	*msg = msg_arg;
+    char_u	*సందేశం = సందేశం_arg;
     size_t	len = len_arg;
-    VTerm	*vterm = term->tl_vterm;
-    size_t	prevlen = vterm_output_get_buffer_current(vterm);
-    size_t	limit = term->tl_buffer->b_p_twsl * term->tl_cols * 3;
+    VTerm	*vterm = పదం->tl_vterm;
+    size_t	prevlen = vterm_output_get_బఫరు_current(vterm);
+    size_t	హద్దు = పదం->tl_బఫరు->b_p_twsl * పదం->tl_నిలువుల_సంఖ్య * 3;
 
     // Limit the length to 'termwinscroll' * cols * 3 bytes.  Keep the text at
     // the end.
-    if (len > limit)
+    ఒకవేళ (len > హద్దు)
     {
-	char_u *p = msg + len - limit;
+	char_u *p = సందేశం + len - హద్దు;
 
-	p -= (*mb_head_off)(msg, p);
-	len -= p - msg;
-	msg = p;
+	p -= (*mb_తల_off)(సందేశం, p);
+	len -= p - సందేశం;
+	సందేశం = p;
     }
 
-    vterm_input_write(vterm, (char *)msg, len);
+    vterm_ఆదానం_write(vterm, (అక్షరం *)సందేశం, len);
 
     // flush vterm buffer when vterm responded to control sequence
-    if (prevlen != vterm_output_get_buffer_current(vterm))
-	term_forward_output(term);
+    ఒకవేళ (prevlen != vterm_output_get_బఫరు_current(vterm))
+	పదం_forward_output(పదం);
 
     // this invokes the damage callbacks
     vterm_screen_flush_damage(vterm_obtain_screen(vterm));
 }
 
-    static void
+    స్థిర శూన్య
 position_cursor(win_T *wp, VTermPos *pos)
 {
-    wp->w_wrow = MIN(pos->row, MAX(0, wp->w_height - 1));
-    wp->w_wcol = MIN(pos->col, MAX(0, wp->w_width - 1));
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    wp->w_wrow = MIN(pos->అడ్డువరుస, MAX(0, wp->w_ఎత్తు - 1));
+    wp->w_wcol = MIN(pos->నిలువు, MAX(0, wp->w_వెడల్పు - 1));
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (popup_is_popup(wp))
     {
-	wp->w_wrow += popup_top_extra(wp);
-	wp->w_wcol += popup_left_extra(wp);
+	wp->w_wrow += popup_శిఖరం_extra(wp);
+	wp->w_wcol += popup_ఎడమ_extra(wp);
 	wp->w_flags |= WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED;
     }
-    else
+    లేకపోతే
 	wp->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
-#endif
+#అయితే_ముగింపు
     wp->w_valid |= (VALID_WCOL|VALID_WROW);
 }
 
-    static void
-update_cursor(term_T *term, int redraw)
+    స్థిర శూన్య
+update_cursor(పదం_T *పదం, పూర్ణాంకం redraw)
 {
-    if (term->tl_normal_mode)
-	return;
-#ifdef FEAT_GUI
-    if (term->tl_system)
-	windgoto(term->tl_cursor_pos.row + term->tl_toprow,
-		firstwin->w_wincol + term->tl_cursor_pos.col);
-    else
-#endif
-    if (!term_job_running(term))
+    ఒకవేళ (పదం->tl_సాధారణ_బహుళకం)
+	తిరిగి;
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (పదం->tl_system)
+	windgoto(పదం->tl_cursor_pos.అడ్డువరుస + పదం->tl_toprow,
+		firstwin->w_wincol + పదం->tl_cursor_pos.నిలువు);
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (!పదం_పని_running(పదం))
 	// avoid the cursor positioned below the last used line
 	setcursor();
-    else
+    లేకపోతే
     {
 	// do not use the window cursor position
-	position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
+	position_cursor(curwin, &curbuf->b_పదం->tl_cursor_pos);
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
 		 curwin->w_wincol + curwin->w_wcol);
     }
-    if (redraw)
+    ఒకవేళ (redraw)
     {
 	aco_save_T	aco;
 
-	if (term->tl_buffer == curbuf && term->tl_cursor_visible)
+	ఒకవేళ (పదం->tl_బఫరు == curbuf && పదం->tl_cursor_visible)
 	    cursor_on();
-	out_flush();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+	బహిర్గతం_flush();
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (gui.లోపల_use)
 	{
 	    gui_update_cursor(FALSE, FALSE);
 	    gui_mch_flush();
 	}
-#endif
+#అయితే_ముగింపు
 	// Make sure an invoked autocmd doesn't delete the buffer (and the
 	// terminal) under our fingers.
-	++term->tl_buffer->b_locked;
+	++పదం->tl_బఫరు->b_locked;
 
 	// save and restore curwin and curbuf, in case the autocmd changes them
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDT, NULL, NULL, FALSE, term->tl_buffer);
+	apply_autocmds(EVENT_TEXTCHANGEDT, ఖాళీ, ఖాళీ, FALSE, పదం->tl_బఫరు);
 	aucmd_restbuf(&aco);
 
-	--term->tl_buffer->b_locked;
+	--పదం->tl_బఫరు->b_locked;
     }
 }
 
 /*
  * Find the location of a scrollbackline in the buffer
  */
-    static void
-scrollbackline_pos_in_buf(term_T *term, int row, linenr_T *lnum, int *start_col, size_t *start_pos)
+    స్థిర శూన్య
+scrollbackline_pos_లోపల_buf(పదం_T *పదం, పూర్ణాంకం అడ్డువరుస, linenr_T *lnum, పూర్ణాంకం *ప్రారంభం_నిలువు, size_t *ప్రారంభం_pos)
 {
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_lnum = term->tl_buffer_scrolled;
+    sb_పంక్తి_T	*పంక్తులు = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం;
+    linenr_T    calc_lnum = పదం->tl_బఫరు_scrolled;
     size_t      calc_pos = 0;
-    int         calc_col = 0;
-    int         i;
+    పూర్ణాంకం         calc_నిలువు = 0;
+    పూర్ణాంకం         i;
 
-    if (row < 0 || row >= term->tl_scrollback.ga_len)
-	return;
+    ఒకవేళ (అడ్డువరుస < 0 || అడ్డువరుస >= పదం->tl_scrollback.ga_len)
+	తిరిగి;
 
-    if (row > term->tl_scrollback_scrolled)
+    ఒకవేళ (అడ్డువరుస > పదం->tl_scrollback_scrolled)
     {
 	// Lookback how far along in the top line we are
-	for (i = term->tl_scrollback_scrolled + 1; i > 0 && lines[i].continuation; --i)
+	కొరకు (i = పదం->tl_scrollback_scrolled + 1; i > 0 && పంక్తులు[i].continuation; --i)
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += పంక్తులు[i - 1].sb_బైట్లు;
+	    calc_నిలువు += పంక్తులు[i - 1].sb_నిలువుల_సంఖ్య;
 	}
-	i = term->tl_scrollback_scrolled + 1;
-	calc_lnum = term->tl_buffer_scrolled + 1;
+	i = పదం->tl_scrollback_scrolled + 1;
+	calc_lnum = పదం->tl_బఫరు_scrolled + 1;
 	// Do not count this line's bytes/cols twice
-	if (lines[i].continuation)
+	ఒకవేళ (పంక్తులు[i].continuation)
 	    ++i;
     }
-    else
+    లేకపోతే
     {
 	i = 1;
 	calc_lnum = 1;
     }
 
-    for (; i <= row; ++i)
+    కొరకు (; i <= అడ్డువరుస; ++i)
     {
-	if (!lines[i].continuation)
+	ఒకవేళ (!పంక్తులు[i].continuation)
 	{
 	    ++calc_lnum;
 	    calc_pos = 0;
-	    calc_col = 0;
+	    calc_నిలువు = 0;
 	}
-	else
+	లేకపోతే
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += పంక్తులు[i - 1].sb_బైట్లు;
+	    calc_నిలువు += పంక్తులు[i - 1].sb_నిలువుల_సంఖ్య;
 	}
     }
 
     *lnum = calc_lnum;
-    if (start_col)
-	*start_col = calc_col;
-    if (start_pos)
-	*start_pos = calc_pos;
+    ఒకవేళ (ప్రారంభం_నిలువు)
+	*ప్రారంభం_నిలువు = calc_నిలువు;
+    ఒకవేళ (ప్రారంభం_pos)
+	*ప్రారంభం_pos = calc_pos;
 }
 
 /*
  * Find the location of a buffer line in the scrollback
  */
-    static void
-bufline_pos_in_scrollback(term_T *term, linenr_T lnum, int col, int *row, int *wrapped_col)
+    స్థిర శూన్య
+bufline_pos_లోపల_scrollback(పదం_T *పదం, linenr_T lnum, పూర్ణాంకం నిలువు, పూర్ణాంకం *అడ్డువరుస, పూర్ణాంకం *wrapped_నిలువు)
 {
-    buf_T	*buf = term->tl_buffer;
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_row = term->tl_scrollback_scrolled;
-    int         calc_col = col;
+    buf_T	*buf = పదం->tl_బఫరు;
+    sb_పంక్తి_T	*పంక్తులు = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం;
+    linenr_T    calc_అడ్డువరుస = పదం->tl_scrollback_scrolled;
+    పూర్ణాంకం         calc_నిలువు = నిలువు;
     linenr_T    l;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	return;
+    ఒకవేళ (lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి;
 
-    if (lnum > term->tl_buffer_scrolled)
+    ఒకవేళ (lnum > పదం->tl_బఫరు_scrolled)
     {
-	calc_row = term->tl_scrollback_scrolled;
-	l = term->tl_buffer_scrolled + 1;
+	calc_అడ్డువరుస = పదం->tl_scrollback_scrolled;
+	l = పదం->tl_బఫరు_scrolled + 1;
 
-	while (calc_row < term->tl_scrollback.ga_len && lines[calc_row].continuation)
-	    ++calc_row;
+	అయితే (calc_అడ్డువరుస < పదం->tl_scrollback.ga_len && పంక్తులు[calc_అడ్డువరుస].continuation)
+	    ++calc_అడ్డువరుస;
     }
-    else
+    లేకపోతే
     {
-	calc_row = 0;
+	calc_అడ్డువరుస = 0;
 	l = 1;
     }
 
-    while (calc_row < term->tl_scrollback.ga_len && l < lnum)
+    అయితే (calc_అడ్డువరుస < పదం->tl_scrollback.ga_len && l < lnum)
     {
-	++calc_row;
-	if (!lines[calc_row].continuation)
+	++calc_అడ్డువరుస;
+	ఒకవేళ (!పంక్తులు[calc_అడ్డువరుస].continuation)
 	    ++l;
     }
 
-    while (calc_row + 1 < term->tl_scrollback.ga_len && lines[calc_row + 1].continuation
-	    && calc_col >= lines[calc_row].sb_cols)
+    అయితే (calc_అడ్డువరుస + 1 < పదం->tl_scrollback.ga_len && పంక్తులు[calc_అడ్డువరుస + 1].continuation
+	    && calc_నిలువు >= పంక్తులు[calc_అడ్డువరుస].sb_నిలువుల_సంఖ్య)
     {
-	calc_col -= lines[calc_row].sb_cols;
-	++calc_row;
+	calc_నిలువు -= పంక్తులు[calc_అడ్డువరుస].sb_నిలువుల_సంఖ్య;
+	++calc_అడ్డువరుస;
     }
 
-    if (row)
-	*row = calc_row;
-    if (wrapped_col)
-	*wrapped_col = calc_col;
+    ఒకవేళ (అడ్డువరుస)
+	*అడ్డువరుస = calc_అడ్డువరుస;
+    ఒకవేళ (wrapped_నిలువు)
+	*wrapped_నిలువు = calc_నిలువు;
 }
 
 /*
  * Invoked when "msg" output from a job was received.  Write it to the terminal
  * of "buffer".
  */
-    void
-write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
+    శూన్య
+write_గమ్యం_పదం(buf_T *బఫరు, char_u *సందేశం, channel_T *channel)
 {
-    size_t	len = STRLEN(msg);
-    term_T	*term = buffer->b_term;
+    size_t	len = STRLEN(సందేశం);
+    పదం_T	*పదం = బఫరు->b_పదం;
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     // Win32: Cannot redirect output of the job, intercept it here and write to
     // the file.
-    if (term->tl_out_fd != NULL)
+    ఒకవేళ (పదం->tl_బహిర్గతం_fd != ఖాళీ)
     {
-	ch_log(channel, "Writing %d bytes to output file", (int)len);
-	fwrite(msg, len, 1, term->tl_out_fd);
-	return;
+	ch_log(channel, "Writing %d bytes to output file", (పూర్ణాంకం)len);
+	fwrite(సందేశం, len, 1, పదం->tl_బహిర్గతం_fd);
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (term->tl_vterm == NULL)
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
     {
-	ch_log(channel, "NOT writing %d bytes to terminal", (int)len);
-	return;
+	ch_log(channel, "NOT writing %d bytes to terminal", (పూర్ణాంకం)len);
+	తిరిగి;
     }
-    ch_log(channel, "writing %d bytes to terminal", (int)len);
+    ch_log(channel, "writing %d bytes to terminal", (పూర్ణాంకం)len);
     cursor_off();
-    term_write_job_output(term, msg, len);
+    పదం_write_పని_output(పదం, సందేశం, len);
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (పదం->tl_system)
     {
 	// show system output, scrolling up the screen as needed
-	update_system_term(term);
-	update_cursor(term, TRUE);
+	update_system_పదం(పదం);
+	update_cursor(పదం, TRUE);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     // In Terminal-Normal mode we are displaying the buffer, not the terminal
     // contents, thus no screen update is needed.
-    if (!term->tl_normal_mode)
+    ఒకవేళ (!పదం->tl_సాధారణ_బహుళకం)
     {
 	// Don't use update_screen() when editing the command line, it gets
 	// cleared.
 	// TODO: only update once in a while.
-	ch_log(term->tl_job->jv_channel, "updating screen");
-	if (buffer == curbuf && (State & MODE_CMDLINE) == 0)
+	ch_log(పదం->tl_పని->jv_channel, "updating screen");
+	ఒకవేళ (బఫరు == curbuf && (State & బహుళకం_CMDLINE) == 0)
 	{
 	    update_screen(UPD_VALID_NO_UPDATE);
-#if defined(FEAT_TABPANEL)
-	    if (redraw_tabpanel)
+#ఒకవేళ defined(FEAT_TABPANEL)
+	    ఒకవేళ (redraw_tabpanel)
 		draw_tabpanel();
-#endif
+#అయితే_ముగింపు
 	    // update_screen() can be slow, check the terminal wasn't closed
 	    // already
-	    if (buffer == curbuf && curbuf->b_term != NULL)
-		update_cursor(curbuf->b_term, TRUE);
+	    ఒకవేళ (బఫరు == curbuf && curbuf->b_పదం != ఖాళీ)
+		update_cursor(curbuf->b_పదం, TRUE);
 	}
-	else
+	లేకపోతే
 	    redraw_after_callback(TRUE, FALSE);
     }
 }
@@ -1576,129 +1576,129 @@ write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
 /*
  * Send a mouse position and click to the vterm
  */
-    static int
-term_send_mouse(VTerm *vterm, int button, int pressed)
+    స్థిర పూర్ణాంకం
+పదం_send_mouse(VTerm *vterm, పూర్ణాంకం button, పూర్ణాంకం pressed)
 {
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    row = mouse_row - W_WINROW(curwin);
-    int		    col = mouse_col - curwin->w_wincol;
+    పూర్ణాంకం		    అడ్డువరుస = mouse_అడ్డువరుస - W_WINROW(curwin);
+    పూర్ణాంకం		    నిలువు = mouse_నిలువు - curwin->w_wincol;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(curwin))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (popup_is_popup(curwin))
     {
-	row -= popup_top_extra(curwin);
-	col -= popup_left_extra(curwin);
+	అడ్డువరుస -= popup_శిఖరం_extra(curwin);
+	నిలువు -= popup_ఎడమ_extra(curwin);
     }
-#endif
-    vterm_mouse_move(vterm, row, col, mod);
-    if (button != 0)
+#అయితే_ముగింపు
+    vterm_mouse_move(vterm, అడ్డువరుస, నిలువు, mod);
+    ఒకవేళ (button != 0)
 	vterm_mouse_button(vterm, button, pressed, mod);
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-static int enter_mouse_col = -1;
-static int enter_mouse_row = -1;
+స్థిర పూర్ణాంకం enter_mouse_నిలువు = -1;
+స్థిర పూర్ణాంకం enter_mouse_అడ్డువరుస = -1;
 
 /*
  * Handle a mouse click, drag or release.
  * Return TRUE when a mouse event is sent to the terminal.
  */
-    static int
-term_mouse_click(VTerm *vterm, int key)
+    స్థిర పూర్ణాంకం
+పదం_mouse_click(VTerm *vterm, పూర్ణాంకం కీలకం)
 {
-#if defined(FEAT_CLIPBOARD)
+#ఒకవేళ defined(FEAT_CLIPBOARD)
     // For modeless selection mouse drag and release events are ignored, unless
     // they are preceded with a mouse down event
-    static int	    ignore_drag_release = TRUE;
+    స్థిర పూర్ణాంకం	    ignore_drag_release = TRUE;
     VTermState	    *state;
     VTermMouseState mouse_state;
 
 
     state = vterm_obtain_state(vterm);
-    if (state == NULL)
-	return FALSE;
+    ఒకవేళ (state == ఖాళీ)
+	తిరిగి FALSE;
 
     vterm_state_get_mousestate(state, &mouse_state);
-    if (mouse_state.flags == 0)
+    ఒకవేళ (mouse_state.flags == 0)
     {
 	// Terminal is not using the mouse, use modeless selection.
-	switch (key)
+	ఎంపిక (కీలకం)
 	{
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	స్థితి K_LEFTDRAG:
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_RIGHTDRAG:
+	స్థితి K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
+		ఒకవేళ (ignore_drag_release)
 		{
-		    int save_mouse_col, save_mouse_row;
+		    పూర్ణాంకం save_mouse_నిలువు, save_mouse_అడ్డువరుస;
 
-		    if (enter_mouse_col < 0)
-			break;
+		    ఒకవేళ (enter_mouse_నిలువు < 0)
+			ఆపు;
 
 		    // mouse click in the window gave us focus, handle that
 		    // click now
-		    save_mouse_col = mouse_col;
-		    save_mouse_row = mouse_row;
-		    mouse_col = enter_mouse_col;
-		    mouse_row = enter_mouse_row;
-		    clip_modeless(MOUSE_LEFT, TRUE, FALSE);
-		    mouse_col = save_mouse_col;
-		    mouse_row = save_mouse_row;
+		    save_mouse_నిలువు = mouse_నిలువు;
+		    save_mouse_అడ్డువరుస = mouse_అడ్డువరుస;
+		    mouse_నిలువు = enter_mouse_నిలువు;
+		    mouse_అడ్డువరుస = enter_mouse_అడ్డువరుస;
+		    clip_modeless(MOUSE_ఎడమ, TRUE, FALSE);
+		    mouse_నిలువు = save_mouse_నిలువు;
+		    mouse_అడ్డువరుస = save_mouse_అడ్డువరుస;
 		}
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
-		if (key == K_LEFTRELEASE || key == K_RIGHTRELEASE)
+	స్థితి K_LEFTMOUSE:
+	స్థితి K_RIGHTMOUSE:
+		ఒకవేళ (కీలకం == K_LEFTRELEASE || కీలకం == K_RIGHTRELEASE)
 		    ignore_drag_release = TRUE;
-		else
+		లేకపోతే
 		    ignore_drag_release = FALSE;
 		// Should we call mouse_has() here?
-		if (clip_star.available)
+		ఒకవేళ (clip_నక్షత్రం.అందుబాటు)
 		{
-		    int	    button, is_click, is_drag;
+		    పూర్ణాంకం	    button, is_click, is_drag;
 
-		    button = get_mouse_button(KEY2TERMCAP1(key),
+		    button = get_mouse_button(KEY2TERMCAP1(కీలకం),
 							 &is_click, &is_drag);
-		    if (mouse_model_popup() && button == MOUSE_LEFT
-					       && (mod_mask & MOD_MASK_SHIFT))
+		    ఒకవేళ (mouse_model_popup() && button == MOUSE_ఎడమ
+					       && (mod_ముసుగు & MOD_ముసుగు_జరుపు))
 		    {
 			// Translate shift-left to right button.
-			button = MOUSE_RIGHT;
-			mod_mask &= ~MOD_MASK_SHIFT;
+			button = MOUSE_కుడి;
+			mod_ముసుగు &= ~MOD_ముసుగు_జరుపు;
 		    }
 		    clip_modeless(button, is_click, is_drag);
 		}
-		break;
+		ఆపు;
 
-	case K_MIDDLEMOUSE:
-		if (clip_star.available)
-		    insert_reg('*', TRUE);
-		break;
+	స్థితి K_MIDDLEMOUSE:
+		ఒకవేళ (clip_నక్షత్రం.అందుబాటు)
+		    చొప్పించు_reg('*', TRUE);
+		ఆపు;
 	}
-	enter_mouse_col = -1;
-	return FALSE;
+	enter_mouse_నిలువు = -1;
+	తిరిగి FALSE;
     }
-#endif
-    enter_mouse_col = -1;
+#అయితే_ముగింపు
+    enter_mouse_నిలువు = -1;
 
-    switch (key)
+    ఎంపిక (కీలకం)
     {
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTDRAG:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:	term_send_mouse(vterm, 1, 0); break;
-	case K_MOUSEMOVE:	term_send_mouse(vterm, 0, 0); break;
-	case K_MIDDLEMOUSE:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLEDRAG:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLERELEASE:	term_send_mouse(vterm, 2, 0); break;
-	case K_RIGHTMOUSE:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTDRAG:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTRELEASE:	term_send_mouse(vterm, 3, 0); break;
+	స్థితి K_LEFTMOUSE:
+	స్థితి K_LEFTMOUSE_NM:	పదం_send_mouse(vterm, 1, 1); ఆపు;
+	స్థితి K_LEFTDRAG:	పదం_send_mouse(vterm, 1, 1); ఆపు;
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_LEFTRELEASE_NM:	పదం_send_mouse(vterm, 1, 0); ఆపు;
+	స్థితి K_MOUSEMOVE:	పదం_send_mouse(vterm, 0, 0); ఆపు;
+	స్థితి K_MIDDLEMOUSE:	పదం_send_mouse(vterm, 2, 1); ఆపు;
+	స్థితి K_MIDDLEDRAG:	పదం_send_mouse(vterm, 2, 1); ఆపు;
+	స్థితి K_MIDDLERELEASE:	పదం_send_mouse(vterm, 2, 0); ఆపు;
+	స్థితి K_RIGHTMOUSE:	పదం_send_mouse(vterm, 3, 1); ఆపు;
+	స్థితి K_RIGHTDRAG:	పదం_send_mouse(vterm, 3, 1); ఆపు;
+	స్థితి K_RIGHTRELEASE:	పదం_send_mouse(vterm, 3, 0); ఆపు;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -1706,181 +1706,181 @@ term_mouse_click(VTerm *vterm, int key)
  * job.
  * Return the number of bytes in "buf".
  */
-    static int
-term_convert_key(term_T *term, int c, int modmask, char *buf)
+    స్థిర పూర్ణాంకం
+పదం_convert_కీలకం(పదం_T *పదం, పూర్ణాంకం c, పూర్ణాంకం modmask, అక్షరం *buf)
 {
-    VTerm	    *vterm = term->tl_vterm;
-    VTermKey	    key = VTERM_KEY_NONE;
+    VTerm	    *vterm = పదం->tl_vterm;
+    VTerm_కీలకం	    కీలకం = VTERM_కీలకం_NONE;
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    other = FALSE;
+    పూర్ణాంకం		    other = FALSE;
 
-    switch (c)
+    ఎంపిక (c)
     {
 	// don't use VTERM_KEY_ENTER, it may do an unwanted conversion
 
-	case K_BS:
-#ifdef MSWIN
+	స్థితి K_BS:
+#నిర్వచితమైతే MSWIN
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    else
-#endif
+	    ఒకవేళ (పదం->tl_conpty)
+		కీలకం = VTERM_కీలకం_BACKSPACE;
+	    లేకపోతే
+#అయితే_ముగింపు
 		// don't use VTERM_KEY_BACKSPACE, it always becomes 0x7f DEL
-		c = term_backspace_char;
-	    break;
+		c = పదం_backspace_char;
+	    ఆపు;
 
-#ifdef MSWIN
-	case BS:
+#నిర్వచితమైతే MSWIN
+	స్థితి BS:
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    break;
-#endif
+	    ఒకవేళ (పదం->tl_conpty)
+		కీలకం = VTERM_కీలకం_BACKSPACE;
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case ESC:		key = VTERM_KEY_ESCAPE; break;
-	case K_DEL:		key = VTERM_KEY_DEL; break;
-	case K_DOWN:		key = VTERM_KEY_DOWN; break;
-	case K_S_DOWN:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_DOWN; break;
-	case K_END:		key = VTERM_KEY_END; break;
-	case K_S_END:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_END; break;
-	case K_C_END:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_END; break;
-	case K_F10:		key = VTERM_KEY_FUNCTION(10); break;
-	case K_F11:		key = VTERM_KEY_FUNCTION(11); break;
-	case K_F12:		key = VTERM_KEY_FUNCTION(12); break;
-	case K_F1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_F2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_F3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_F4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_F5:		key = VTERM_KEY_FUNCTION(5); break;
-	case K_F6:		key = VTERM_KEY_FUNCTION(6); break;
-	case K_F7:		key = VTERM_KEY_FUNCTION(7); break;
-	case K_F8:		key = VTERM_KEY_FUNCTION(8); break;
-	case K_F9:		key = VTERM_KEY_FUNCTION(9); break;
-	case K_HOME:		key = VTERM_KEY_HOME; break;
-	case K_S_HOME:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_HOME; break;
-	case K_C_HOME:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_HOME; break;
-	case K_INS:		key = VTERM_KEY_INS; break;
-	case K_K0:		key = VTERM_KEY_KP_0; break;
-	case K_K1:		key = VTERM_KEY_KP_1; break;
-	case K_K2:		key = VTERM_KEY_KP_2; break;
-	case K_K3:		key = VTERM_KEY_KP_3; break;
-	case K_K4:		key = VTERM_KEY_KP_4; break;
-	case K_K5:		key = VTERM_KEY_KP_5; break;
-	case K_K6:		key = VTERM_KEY_KP_6; break;
-	case K_K7:		key = VTERM_KEY_KP_7; break;
-	case K_K8:		key = VTERM_KEY_KP_8; break;
-	case K_K9:		key = VTERM_KEY_KP_9; break;
-	case K_KDEL:		key = VTERM_KEY_DEL; break; // TODO
-	case K_KDIVIDE:		key = VTERM_KEY_KP_DIVIDE; break;
-	case K_KEND:		key = VTERM_KEY_KP_1; break; // TODO
-	case K_KENTER:		key = VTERM_KEY_KP_ENTER; break;
-	case K_KHOME:		key = VTERM_KEY_KP_7; break; // TODO
-	case K_KINS:		key = VTERM_KEY_KP_0; break; // TODO
-	case K_KMINUS:		key = VTERM_KEY_KP_MINUS; break;
-	case K_KMULTIPLY:	key = VTERM_KEY_KP_MULT; break;
-	case K_KPAGEDOWN:	key = VTERM_KEY_KP_3; break; // TODO
-	case K_KPAGEUP:		key = VTERM_KEY_KP_9; break; // TODO
-	case K_KPLUS:		key = VTERM_KEY_KP_PLUS; break;
-	case K_KPOINT:		key = VTERM_KEY_KP_PERIOD; break;
-	case K_LEFT:		key = VTERM_KEY_LEFT; break;
-	case K_S_LEFT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_LEFT; break;
-	case K_C_LEFT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_LEFT; break;
-	case K_PAGEDOWN:	key = VTERM_KEY_PAGEDOWN; break;
-	case K_PAGEUP:		key = VTERM_KEY_PAGEUP; break;
-	case K_RIGHT:		key = VTERM_KEY_RIGHT; break;
-	case K_S_RIGHT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_RIGHT; break;
-	case K_C_RIGHT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_RIGHT; break;
-	case K_UP:		key = VTERM_KEY_UP; break;
-	case K_S_UP:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_UP; break;
-	case TAB:		key = VTERM_KEY_TAB; break;
-	case K_S_TAB:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_TAB; break;
+	స్థితి ESC:		కీలకం = VTERM_కీలకం_ESCAPE; ఆపు;
+	స్థితి K_DEL:		కీలకం = VTERM_కీలకం_DEL; ఆపు;
+	స్థితి K_కిందికి:		కీలకం = VTERM_కీలకం_కిందికి; ఆపు;
+	స్థితి K_S_కిందికి:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_కిందికి; ఆపు;
+	స్థితి K_చివర:		కీలకం = VTERM_కీలకం_చివర; ఆపు;
+	స్థితి K_S_చివర:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_చివర; ఆపు;
+	స్థితి K_C_చివర:		mod = VTERM_MOD_CTRL;
+				కీలకం = VTERM_కీలకం_చివర; ఆపు;
+	స్థితి K_F10:		కీలకం = VTERM_కీలకం_FUNCTION(10); ఆపు;
+	స్థితి K_F11:		కీలకం = VTERM_కీలకం_FUNCTION(11); ఆపు;
+	స్థితి K_F12:		కీలకం = VTERM_కీలకం_FUNCTION(12); ఆపు;
+	స్థితి K_F1:		కీలకం = VTERM_కీలకం_FUNCTION(1); ఆపు;
+	స్థితి K_F2:		కీలకం = VTERM_కీలకం_FUNCTION(2); ఆపు;
+	స్థితి K_F3:		కీలకం = VTERM_కీలకం_FUNCTION(3); ఆపు;
+	స్థితి K_F4:		కీలకం = VTERM_కీలకం_FUNCTION(4); ఆపు;
+	స్థితి K_F5:		కీలకం = VTERM_కీలకం_FUNCTION(5); ఆపు;
+	స్థితి K_F6:		కీలకం = VTERM_కీలకం_FUNCTION(6); ఆపు;
+	స్థితి K_F7:		కీలకం = VTERM_కీలకం_FUNCTION(7); ఆపు;
+	స్థితి K_F8:		కీలకం = VTERM_కీలకం_FUNCTION(8); ఆపు;
+	స్థితి K_F9:		కీలకం = VTERM_కీలకం_FUNCTION(9); ఆపు;
+	స్థితి K_HOME:		కీలకం = VTERM_కీలకం_HOME; ఆపు;
+	స్థితి K_S_HOME:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_HOME; ఆపు;
+	స్థితి K_C_HOME:		mod = VTERM_MOD_CTRL;
+				కీలకం = VTERM_కీలకం_HOME; ఆపు;
+	స్థితి K_INS:		కీలకం = VTERM_కీలకం_INS; ఆపు;
+	స్థితి K_K0:		కీలకం = VTERM_కీలకం_KP_0; ఆపు;
+	స్థితి K_K1:		కీలకం = VTERM_కీలకం_KP_1; ఆపు;
+	స్థితి K_K2:		కీలకం = VTERM_కీలకం_KP_2; ఆపు;
+	స్థితి K_K3:		కీలకం = VTERM_కీలకం_KP_3; ఆపు;
+	స్థితి K_K4:		కీలకం = VTERM_కీలకం_KP_4; ఆపు;
+	స్థితి K_K5:		కీలకం = VTERM_కీలకం_KP_5; ఆపు;
+	స్థితి K_K6:		కీలకం = VTERM_కీలకం_KP_6; ఆపు;
+	స్థితి K_K7:		కీలకం = VTERM_కీలకం_KP_7; ఆపు;
+	స్థితి K_K8:		కీలకం = VTERM_కీలకం_KP_8; ఆపు;
+	స్థితి K_K9:		కీలకం = VTERM_కీలకం_KP_9; ఆపు;
+	స్థితి K_KDEL:		కీలకం = VTERM_కీలకం_DEL; ఆపు; // TODO
+	స్థితి K_KDIVIDE:		కీలకం = VTERM_కీలకం_KP_DIVIDE; ఆపు;
+	స్థితి K_KEND:		కీలకం = VTERM_కీలకం_KP_1; ఆపు; // TODO
+	స్థితి K_KENTER:		కీలకం = VTERM_కీలకం_KP_ENTER; ఆపు;
+	స్థితి K_KHOME:		కీలకం = VTERM_కీలకం_KP_7; ఆపు; // TODO
+	స్థితి K_KINS:		కీలకం = VTERM_కీలకం_KP_0; ఆపు; // TODO
+	స్థితి K_KMINUS:		కీలకం = VTERM_కీలకం_KP_MINUS; ఆపు;
+	స్థితి K_KMULTIPLY:	కీలకం = VTERM_కీలకం_KP_MULT; ఆపు;
+	స్థితి K_KPAGEDOWN:	కీలకం = VTERM_కీలకం_KP_3; ఆపు; // TODO
+	స్థితి K_KPAGEUP:		కీలకం = VTERM_కీలకం_KP_9; ఆపు; // TODO
+	స్థితి K_KPLUS:		కీలకం = VTERM_కీలకం_KP_PLUS; ఆపు;
+	స్థితి K_KPOINT:		కీలకం = VTERM_కీలకం_KP_PERIOD; ఆపు;
+	స్థితి K_ఎడమ:		కీలకం = VTERM_కీలకం_ఎడమ; ఆపు;
+	స్థితి K_S_ఎడమ:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_ఎడమ; ఆపు;
+	స్థితి K_C_ఎడమ:		mod = VTERM_MOD_CTRL;
+				కీలకం = VTERM_కీలకం_ఎడమ; ఆపు;
+	స్థితి K_PAGEDOWN:	కీలకం = VTERM_కీలకం_PAGEDOWN; ఆపు;
+	స్థితి K_PAGEUP:		కీలకం = VTERM_కీలకం_PAGEUP; ఆపు;
+	స్థితి K_కుడి:		కీలకం = VTERM_కీలకం_కుడి; ఆపు;
+	స్థితి K_S_కుడి:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_కుడి; ఆపు;
+	స్థితి K_C_కుడి:		mod = VTERM_MOD_CTRL;
+				కీలకం = VTERM_కీలకం_కుడి; ఆపు;
+	స్థితి K_పైకి:		కీలకం = VTERM_కీలకం_పైకి; ఆపు;
+	స్థితి K_S_పైకి:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_పైకి; ఆపు;
+	స్థితి TAB:		కీలకం = VTERM_కీలకం_TAB; ఆపు;
+	స్థితి K_S_TAB:		mod = VTERM_MOD_జరుపు;
+				కీలకం = VTERM_కీలకం_TAB; ఆపు;
 
-	case K_MOUSEUP:		other = term_send_mouse(vterm, 5, 1); break;
-	case K_MOUSEDOWN:	other = term_send_mouse(vterm, 4, 1); break;
-	case K_MOUSELEFT:	other = term_send_mouse(vterm, 7, 1); break;
-	case K_MOUSERIGHT:	other = term_send_mouse(vterm, 6, 1); break;
+	స్థితి K_MOUSEUP:		other = పదం_send_mouse(vterm, 5, 1); ఆపు;
+	స్థితి K_MOUSEDOWN:	other = పదం_send_mouse(vterm, 4, 1); ఆపు;
+	స్థితి K_MOUSELEFT:	other = పదం_send_mouse(vterm, 7, 1); ఆపు;
+	స్థితి K_MOUSERIGHT:	other = పదం_send_mouse(vterm, 6, 1); ఆపు;
 
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:	if (!term_mouse_click(vterm, c))
-				    return 0;
+	స్థితి K_LEFTMOUSE:
+	స్థితి K_LEFTMOUSE_NM:
+	స్థితి K_LEFTDRAG:
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_LEFTRELEASE_NM:
+	స్థితి K_MOUSEMOVE:
+	స్థితి K_MIDDLEMOUSE:
+	స్థితి K_MIDDLEDRAG:
+	స్థితి K_MIDDLERELEASE:
+	స్థితి K_RIGHTMOUSE:
+	స్థితి K_RIGHTDRAG:
+	స్థితి K_RIGHTRELEASE:	ఒకవేళ (!పదం_mouse_click(vterm, c))
+				    తిరిగి 0;
 				other = TRUE;
-				break;
+				ఆపు;
 
-	case K_X1MOUSE:		/* TODO */ return 0;
-	case K_X1DRAG:		/* TODO */ return 0;
-	case K_X1RELEASE:	/* TODO */ return 0;
-	case K_X2MOUSE:		/* TODO */ return 0;
-	case K_X2DRAG:		/* TODO */ return 0;
-	case K_X2RELEASE:	/* TODO */ return 0;
+	స్థితి K_X1MOUSE:		/* TODO */ తిరిగి 0;
+	స్థితి K_X1DRAG:		/* TODO */ తిరిగి 0;
+	స్థితి K_X1RELEASE:	/* TODO */ తిరిగి 0;
+	స్థితి K_X2MOUSE:		/* TODO */ తిరిగి 0;
+	స్థితి K_X2DRAG:		/* TODO */ తిరిగి 0;
+	స్థితి K_X2RELEASE:	/* TODO */ తిరిగి 0;
 
-	case K_IGNORE:		return 0;
-	case K_NOP:		return 0;
-	case K_UNDO:		return 0;
-	case K_HELP:		return 0;
-	case K_XF1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_XF2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_XF3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_XF4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_SELECT:		return 0;
-#ifdef FEAT_GUI
-	case K_VER_SCROLLBAR:	return 0;
-	case K_HOR_SCROLLBAR:	return 0;
-#endif
-#ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:		return 0;
-	case K_TABMENU:		return 0;
-#endif
-#ifdef FEAT_NETBEANS_INTG
-	case K_F21:		key = VTERM_KEY_FUNCTION(21); break;
-#endif
-#ifdef FEAT_DND
-	case K_DROP:		return 0;
-#endif
-	case K_CURSORHOLD:	return 0;
-	case K_PS:		vterm_keyboard_start_paste(vterm);
+	స్థితి K_IGNORE:		తిరిగి 0;
+	స్థితి K_NOP:		తిరిగి 0;
+	స్థితి K_UNDO:		తిరిగి 0;
+	స్థితి K_HELP:		తిరిగి 0;
+	స్థితి K_XF1:		కీలకం = VTERM_కీలకం_FUNCTION(1); ఆపు;
+	స్థితి K_XF2:		కీలకం = VTERM_కీలకం_FUNCTION(2); ఆపు;
+	స్థితి K_XF3:		కీలకం = VTERM_కీలకం_FUNCTION(3); ఆపు;
+	స్థితి K_XF4:		కీలకం = VTERM_కీలకం_FUNCTION(4); ఆపు;
+	స్థితి K_SELECT:		తిరిగి 0;
+#నిర్వచితమైతే FEAT_GUI
+	స్థితి K_VER_SCROLLBAR:	తిరిగి 0;
+	స్థితి K_HOR_SCROLLBAR:	తిరిగి 0;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	స్థితి K_TABLINE:		తిరిగి 0;
+	స్థితి K_TABMENU:		తిరిగి 0;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+	స్థితి K_F21:		కీలకం = VTERM_కీలకం_FUNCTION(21); ఆపు;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_DND
+	స్థితి K_DROP:		తిరిగి 0;
+#అయితే_ముగింపు
+	స్థితి K_CURSORHOLD:	తిరిగి 0;
+	స్థితి K_PS:		vterm_keyboard_ప్రారంభం_paste(vterm);
 				other = TRUE;
-				break;
-	case K_PE:		vterm_keyboard_end_paste(vterm);
+				ఆపు;
+	స్థితి K_PE:		vterm_keyboard_చివర_paste(vterm);
 				other = TRUE;
-				break;
+				ఆపు;
     }
 
     // add modifiers for the typed key
-    if (modmask & MOD_MASK_SHIFT)
-	mod |= VTERM_MOD_SHIFT;
-    if (modmask & MOD_MASK_CTRL)
+    ఒకవేళ (modmask & MOD_ముసుగు_జరుపు)
+	mod |= VTERM_MOD_జరుపు;
+    ఒకవేళ (modmask & MOD_ముసుగు_CTRL)
 	mod |= VTERM_MOD_CTRL;
-    if (modmask & (MOD_MASK_ALT | MOD_MASK_META))
+    ఒకవేళ (modmask & (MOD_ముసుగు_ALT | MOD_ముసుగు_META))
 	mod |= VTERM_MOD_ALT;
 
     // Ctrl-Shift-i may have the key "I" instead of "i", but for the kitty
     // keyboard protocol should use "i".  Applies to all ascii letters.
-    if (ASCII_ISUPPER(c)
+    ఒకవేళ (ASCII_ISUPPER(c)
 	    && vterm_is_kitty_keyboard(vterm)
-	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_SHIFT))
+	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_జరుపు))
 	c = TOLOWER_ASC(c);
 
     /*
@@ -1888,15 +1888,15 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
      * - Write keys to vterm: vterm_keyboard_key()
      * - Write output to channel.
      */
-    if (key != VTERM_KEY_NONE)
+    ఒకవేళ (కీలకం != VTERM_కీలకం_NONE)
 	// Special key, let vterm convert it.
-	vterm_keyboard_key(vterm, key, mod);
-    else if (!other)
+	vterm_keyboard_కీలకం(vterm, కీలకం, mod);
+    లేకపోతే ఒకవేళ (!other)
 	// Normal character, let vterm convert it.
 	vterm_keyboard_unichar(vterm, c, mod);
 
     // Read back the converted escape sequence.
-    return (int)vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    తిరిగి (పూర్ణాంకం)vterm_output_read(vterm, buf, కీలకం_BUF_LEN);
 }
 
 /*
@@ -1904,58 +1904,58 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
  * If "check_job_status" is TRUE update the job status.
  * NOTE: "term" may be freed by callbacks.
  */
-    static int
-term_job_running_check(term_T *term, int check_job_status)
+    స్థిర పూర్ణాంకం
+పదం_పని_running_check(పదం_T *పదం, పూర్ణాంకం check_పని_స్థితి)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    if (term == NULL
-	|| term->tl_job == NULL
-	|| !channel_is_open(term->tl_job->jv_channel))
-	return FALSE;
+    ఒకవేళ (పదం == ఖాళీ
+	|| పదం->tl_పని == ఖాళీ
+	|| !channel_is_open(పదం->tl_పని->jv_channel))
+	తిరిగి FALSE;
 
-    job_T *job = term->tl_job;
+    పని_T *పని = పదం->tl_పని;
 
     // Careful: Checking the job status may invoke callbacks, which close
     // the buffer and terminate "term".  However, "job" will not be freed
     // yet.
-    if (check_job_status)
-	job_status(job);
-    return (job->jv_status == JOB_STARTED
-	    || (job->jv_channel != NULL && job->jv_channel->ch_keep_open));
+    ఒకవేళ (check_పని_స్థితి)
+	పని_స్థితి(పని);
+    తిరిగి (పని->jv_స్థితి == పని_STARTED
+	    || (పని->jv_channel != ఖాళీ && పని->jv_channel->ch_keep_open));
 }
 
 /*
  * Return TRUE if the job for "term" is still running.
  */
-    int
-term_job_running(term_T *term)
+    పూర్ణాంకం
+పదం_పని_running(పదం_T *పదం)
 {
-    return term_job_running_check(term, FALSE);
+    తిరిగి పదం_పని_running_check(పదం, FALSE);
 }
 
 /*
  * Return TRUE if the job for "term" is still running, ignoring the job was
  * "NONE".
  */
-    int
-term_job_running_not_none(term_T *term)
+    పూర్ణాంకం
+పదం_పని_running_not_none(పదం_T *పదం)
 {
-    return term_job_running(term) && !term_none_open(term);
+    తిరిగి పదం_పని_running(పదం) && !పదం_none_open(పదం);
 }
 
 /*
  * Return TRUE if "term" has an active channel and used ":term NONE".
  */
-    int
-term_none_open(term_T *term)
+    పూర్ణాంకం
+పదం_none_open(పదం_T *పదం)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    return term != NULL
-	&& term->tl_job != NULL
-	&& channel_is_open(term->tl_job->jv_channel)
-	&& term->tl_job->jv_channel->ch_keep_open;
+    తిరిగి పదం != ఖాళీ
+	&& పదం->tl_పని != ఖాళీ
+	&& channel_is_open(పదం->tl_పని->jv_channel)
+	&& పదం->tl_పని->jv_channel->ch_keep_open;
 }
 
 //
@@ -1963,18 +1963,18 @@ term_none_open(term_T *term)
 // Return OK when the user confirms to kill it.
 // Return FAIL if the user selects otherwise.
 //
-    int
-term_confirm_stop(buf_T *buf)
+    పూర్ణాంకం
+పదం_confirm_stop(buf_T *buf)
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int	ret;
+    char_u	buff[DIALOG_సందేశం_కొలత];
+    పూర్ణాంకం	ret;
 
-    dialog_msg(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
-    ret = vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1);
-    if (ret == VIM_YES)
-	return OK;
-    else
-	return FAIL;
+    dialog_సందేశం(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
+    ret = vim_dialog_yesno(VIM_QUESTION, ఖాళీ, buff, 1);
+    ఒకవేళ (ret == VIM_YES)
+	తిరిగి OK;
+    లేకపోతే
+	తిరిగి FAIL;
 }
 
 /*
@@ -1982,125 +1982,125 @@ term_confirm_stop(buf_T *buf)
  * Return OK when the job finished.
  * Return FAIL when the job is still running.
  */
-    int
-term_try_stop_job(buf_T *buf)
+    పూర్ణాంకం
+పదం_try_stop_పని(buf_T *buf)
 {
-    int	    count;
-    char    *how = (char *)buf->b_term->tl_kill;
+    పూర్ణాంకం	    లెక్క;
+    అక్షరం    *how = (అక్షరం *)buf->b_పదం->tl_kill;
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-    if ((how == NULL || *how == NUL)
+#ఒకవేళ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+    ఒకవేళ ((how == ఖాళీ || *how == NUL)
 			  && (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
     {
-	if (term_confirm_stop(buf) == OK)
+	ఒకవేళ (పదం_confirm_stop(buf) == OK)
 	    how = "kill";
-	else
-	    return FAIL;
+	లేకపోతే
+	    తిరిగి FAIL;
     }
-#endif
-    if (how == NULL || *how == NUL)
-	return FAIL;
+#అయితే_ముగింపు
+    ఒకవేళ (how == ఖాళీ || *how == NUL)
+	తిరిగి FAIL;
 
-    job_stop(buf->b_term->tl_job, NULL, how);
+    పని_stop(buf->b_పదం->tl_పని, ఖాళీ, how);
 
     // wait for up to a second for the job to die
-    for (count = 0; count < 100; ++count)
+    కొరకు (లెక్క = 0; లెక్క < 100; ++లెక్క)
     {
-	job_T *job;
+	పని_T *పని;
 
 	// buffer, terminal and job may be cleaned up while waiting
-	if (!buf_valid(buf)
-		|| buf->b_term == NULL
-		|| buf->b_term->tl_job == NULL)
-	    return OK;
-	job = buf->b_term->tl_job;
+	ఒకవేళ (!buf_valid(buf)
+		|| buf->b_పదం == ఖాళీ
+		|| buf->b_పదం->tl_పని == ఖాళీ)
+	    తిరిగి OK;
+	పని = buf->b_పదం->tl_పని;
 
 	// Call job_status() to update jv_status. It may cause the job to be
 	// cleaned up but it won't be freed.
-	job_status(job);
-	if (job->jv_status >= JOB_ENDED)
-	    return OK;
+	పని_స్థితి(పని);
+	ఒకవేళ (పని->jv_స్థితి >= పని_ENDED)
+	    తిరిగి OK;
 
 	ui_delay(10L, TRUE);
-	term_flush_messages();
+	పదం_flush_messages();
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Add the last line of the scrollback buffer to the buffer in the window.
  */
-    static void
-add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
+    స్థిర శూన్య
+కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం_T *పదం, char_u *పాఠ్యం, పూర్ణాంకం len, పూర్ణాంకం append)
 {
-    buf_T	*buf = term->tl_buffer;
-    int		empty = (buf->b_ml.ml_flags & ML_EMPTY);
-    linenr_T	lnum = buf->b_ml.ml_line_count;
+    buf_T	*buf = పదం->tl_బఫరు;
+    పూర్ణాంకం		ఖాళీలు_2 = (buf->b_ml.ml_flags & ML_ఖాళీలు);
+    linenr_T	lnum = buf->b_ml.ml_పంక్తి_లెక్క;
 
-#ifdef MSWIN
-    char_u *tmp = text;
-    if (!enc_utf8 && enc_codepage > 0)
+#నిర్వచితమైతే MSWIN
+    char_u *tmp = పాఠ్యం;
+    ఒకవేళ (!enc_utf8 && enc_codepage > 0)
     {
-	WCHAR   *ret = NULL;
-	int	length = 0;
+	WCHAR   *ret = ఖాళీ;
+	పూర్ణాంకం	నిడివి = 0;
 
-	MultiByteToWideChar_alloc(CP_UTF8, 0, (char*)text, len + 1,
-							   &ret, &length);
-	if (ret != NULL)
+	Multi_Byte_గమ్యం_Wide_Char_alloc(CP_UTF8, 0, (అక్షరం*)పాఠ్యం, len + 1,
+							   &ret, &నిడివి);
+	ఒకవేళ (ret != ఖాళీ)
 	{
-	    WideCharToMultiByte_alloc(enc_codepage, 0,
-				      ret, length, (char **)&text, &len, 0, 0);
+	    Wide_Char_గమ్యం_Multi_Byte_alloc(enc_codepage, 0,
+				      ret, నిడివి, (అక్షరం **)&పాఠ్యం, &len, 0, 0);
 	    vim_free(ret);
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    if (append)
+    ఒకవేళ (append)
     {
-	char_u *prev_text = ml_get_buf(buf, lnum, FALSE);
-	size_t prev_len = STRLEN(prev_text);
+	char_u *prev_పాఠ్యం = ml_get_buf(buf, lnum, FALSE);
+	size_t prev_len = STRLEN(prev_పాఠ్యం);
 
 	char_u *both = alloc(len + prev_len + 2);
-	if (both == NULL)
-	    return;
-	vim_strncpy(both, prev_text, prev_len + 1);
-	vim_strncpy(both + prev_len, text, len + 1);
+	ఒకవేళ (both == ఖాళీ)
+	    తిరిగి;
+	vim_strncpy(both, prev_పాఠ్యం, prev_len + 1);
+	vim_strncpy(both + prev_len, పాఠ్యం, len + 1);
 
 	curbuf = buf;
 	ml_replace(lnum, both, FALSE);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
     }
-    else
-	ml_append_buf(buf, lnum, text, len + 1, FALSE);
+    లేకపోతే
+	ml_append_buf(buf, lnum, పాఠ్యం, len + 1, FALSE);
 
-#ifdef MSWIN
-    if (tmp != text)
-	vim_free(text);
-#endif
-    if (empty)
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (tmp != పాఠ్యం)
+	vim_free(పాఠ్యం);
+#అయితే_ముగింపు
+    ఒకవేళ (ఖాళీలు_2)
     {
 	// Delete the empty line that was in the empty buffer.
 	curbuf = buf;
 	ml_delete(1);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_బఫరు;
     }
 }
 
-    static void
-cell2cellattr(const VTermScreenCell *cell, cellattr_T *attr)
+    స్థిర శూన్య
+cell2cellattr(స్థిరరాశి VTermScreenCell *cell, cellattr_T *attr)
 {
-    attr->width = cell->width;
+    attr->వెడల్పు = cell->వెడల్పు;
     attr->attrs = cell->attrs;
     attr->fg = cell->fg;
     attr->bg = cell->bg;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 equal_celattr(cellattr_T *a, cellattr_T *b)
 {
     // We only compare the RGB colors, ignoring the ANSI index and type.
     // Thus black set explicitly is equal the background black.
-    return a->fg.red == b->fg.red
+    తిరిగి a->fg.red == b->fg.red
 	&& a->fg.green == b->fg.green
 	&& a->fg.blue == b->fg.blue
 	&& a->bg.red == b->bg.red
@@ -2112,31 +2112,31 @@ equal_celattr(cellattr_T *a, cellattr_T *b)
  * Add an empty scrollback line to "term".  When "lnum" is not zero, add the
  * line at this position.  Otherwise at the end.
  */
-    static int
-add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
+    స్థిర పూర్ణాంకం
+కూడు_ఖాళీలు_scrollback(పదం_T *పదం, cellattr_T *fill_attr, పూర్ణాంకం lnum)
 {
-    if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	return FALSE;
+    ఒకవేళ (ga_grow(&పదం->tl_scrollback, 1) == FAIL)
+	తిరిగి FALSE;
 
-    sb_line_T *line = (sb_line_T *)term->tl_scrollback.ga_data
-	+ term->tl_scrollback.ga_len;
+    sb_పంక్తి_T *పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం
+	+ పదం->tl_scrollback.ga_len;
 
-    if (lnum > 0)
+    ఒకవేళ (lnum > 0)
     {
-	int i;
+	పూర్ణాంకం i;
 
-	for (i = 0; i < term->tl_scrollback.ga_len - lnum; ++i)
+	కొరకు (i = 0; i < పదం->tl_scrollback.ga_len - lnum; ++i)
 	{
-	    *line = *(line - 1);
-	    --line;
+	    *పంక్తి = *(పంక్తి - 1);
+	    --పంక్తి;
 	}
     }
-    line->sb_cols = 0;
-    line->sb_bytes = 0;
-    line->sb_cells = NULL;
-    line->sb_fill_attr = *fill_attr;
-    ++term->tl_scrollback.ga_len;
-    return OK;
+    పంక్తి->sb_నిలువుల_సంఖ్య = 0;
+    పంక్తి->sb_బైట్లు = 0;
+    పంక్తి->sb_cells = ఖాళీ;
+    పంక్తి->sb_fill_attr = *fill_attr;
+    ++పదం->tl_scrollback.ga_len;
+    తిరిగి OK;
 }
 
 /*
@@ -2144,187 +2144,187 @@ add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
  * Used before adding a new scrollback line or updating the buffer for lines
  * displayed in the terminal.
  */
-    static void
-cleanup_scrollback(term_T *term)
+    స్థిర శూన్య
+cleanup_scrollback(పదం_T *పదం)
 {
-    sb_line_T	*line;
+    sb_పంక్తి_T	*పంక్తి;
     garray_T	*gap;
     char_u	*bufline;
-    size_t      bufline_length;
+    size_t      bufline_నిడివి;
 
-    curbuf = term->tl_buffer;
-    gap = &term->tl_scrollback;
-    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-    bufline_length = STRLEN(bufline);
-    while (term->tl_scrollback_snapshot && gap->ga_len > 0)
+    curbuf = పదం->tl_బఫరు;
+    gap = &పదం->tl_scrollback;
+    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_పంక్తి_లెక్క, FALSE);
+    bufline_నిడివి = STRLEN(bufline);
+    అయితే (పదం->tl_scrollback_snapshot && gap->ga_len > 0)
     {
-	line = (sb_line_T *)gap->ga_data + gap->ga_len - 1;
-	if (line->sb_bytes < 0 || (size_t)line->sb_bytes > bufline_length)
-	    break;
-	bufline_length -= line->sb_bytes;
-	if (!bufline_length)
+	పంక్తి = (sb_పంక్తి_T *)gap->ga_దత్తాంశం + gap->ga_len - 1;
+	ఒకవేళ (పంక్తి->sb_బైట్లు < 0 || (size_t)పంక్తి->sb_బైట్లు > bufline_నిడివి)
+	    ఆపు;
+	bufline_నిడివి -= పంక్తి->sb_బైట్లు;
+	ఒకవేళ (!bufline_నిడివి)
 	{
-	    ml_delete(curbuf->b_ml.ml_line_count);
-	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-	    bufline_length = STRLEN(bufline);
+	    ml_delete(curbuf->b_ml.ml_పంక్తి_లెక్క);
+	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_పంక్తి_లెక్క, FALSE);
+	    bufline_నిడివి = STRLEN(bufline);
 	}
-	vim_free(line->sb_cells);
+	vim_free(పంక్తి->sb_cells);
 	--gap->ga_len;
-	--term->tl_scrollback_snapshot;
+	--పదం->tl_scrollback_snapshot;
     }
-    if (bufline_length < STRLEN(bufline))
+    ఒకవేళ (bufline_నిడివి < STRLEN(bufline))
     {
-	char_u *shortened = vim_strnsave(bufline, bufline_length);
-	ml_replace(curbuf->b_ml.ml_line_count, shortened, FALSE);
+	char_u *shortened = vim_strnsave(bufline, bufline_నిడివి);
+	ml_replace(curbuf->b_ml.ml_పంక్తి_లెక్క, shortened, FALSE);
     }
-    curbuf = curwin->w_buffer;
-    if (curbuf == term->tl_buffer)
+    curbuf = curwin->w_బఫరు;
+    ఒకవేళ (curbuf == పదం->tl_బఫరు)
 	check_cursor();
 }
 
 /*
  * Add the current lines of the terminal to scrollback and to the buffer.
  */
-    static void
-update_snapshot(term_T *term)
+    స్థిర శూన్య
+update_snapshot(పదం_T *పదం)
 {
     VTermScreen	    *screen;
     VTermState	    *state;
-    int		    len;
-    int		    lines_skipped = 0;
+    పూర్ణాంకం		    len;
+    పూర్ణాంకం		    పంక్తులు_skipped = 0;
     VTermPos	    pos;
     VTermScreenCell cell;
     cellattr_T	    fill_attr, new_fill_attr;
     cellattr_T	    *p;
 
-    ch_log(term->tl_job == NULL ? NULL : term->tl_job->jv_channel,
+    ch_log(పదం->tl_పని == ఖాళీ ? ఖాళీ : పదం->tl_పని->jv_channel,
 				  "Adding terminal window snapshot to buffer");
 
     // First remove the lines that were appended before, they might be
     // outdated.
-    cleanup_scrollback(term);
+    cleanup_scrollback(పదం);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
-    fill_attr = new_fill_attr = term->tl_default_color;
-    for (pos.row = 0; pos.row < term->tl_rows; ++pos.row)
+    screen = vterm_obtain_screen(పదం->tl_vterm);
+    state = vterm_obtain_state(పదం->tl_vterm);
+    fill_attr = new_fill_attr = పదం->tl_default_color;
+    కొరకు (pos.అడ్డువరుస = 0; pos.అడ్డువరుస < పదం->tl_అడ్డువరుసలు; ++pos.అడ్డువరుస)
     {
 	len = 0;
-	for (pos.col = 0; pos.col < term->tl_cols; ++pos.col)
-	    if (vterm_screen_get_cell(screen, pos, &cell) != 0
+	కొరకు (pos.నిలువు = 0; pos.నిలువు < పదం->tl_నిలువుల_సంఖ్య; ++pos.నిలువు)
+	    ఒకవేళ (vterm_screen_get_cell(screen, pos, &cell) != 0
 						       && cell.chars[0] != NUL)
 	    {
-		len = pos.col + 1;
-		new_fill_attr = term->tl_default_color;
+		len = pos.నిలువు + 1;
+		new_fill_attr = పదం->tl_default_color;
 	    }
-	    else
+	    లేకపోతే
 		// Assume the last attr is the filler attr.
 		cell2cellattr(&cell, &new_fill_attr);
 
-	if (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
-	    ++lines_skipped;
-	else
+	ఒకవేళ (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
+	    ++పంక్తులు_skipped;
+	లేకపోతే
 	{
-	    while (lines_skipped > 0)
+	    అయితే (పంక్తులు_skipped > 0)
 	    {
 		// Line was skipped, add an empty line.
-		--lines_skipped;
-		if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+		--పంక్తులు_skipped;
+		ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &fill_attr, 0) == OK)
 		{
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		    ++term->tl_scrollback_snapshot;
+		    కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, (char_u *)"", 0, 0);
+		    ++పదం->tl_scrollback_snapshot;
 		}
 	    }
 
-	    if (len == 0)
-		p = NULL;
-	    else
+	    ఒకవేళ (len == 0)
+		p = ఖాళీ;
+	    లేకపోతే
 		p = ALLOC_MULT(cellattr_T, len);
-	    if ((p != NULL || len == 0)
-				     && ga_grow(&term->tl_scrollback, 1) == OK)
+	    ఒకవేళ ((p != ఖాళీ || len == 0)
+				     && ga_grow(&పదం->tl_scrollback, 1) == OK)
 	    {
 		garray_T    ga;
-		int	    width;
-		const VTermLineInfo *lineinfo;
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		పూర్ణాంకం	    వెడల్పు;
+		స్థిరరాశి VTerm_పంక్తి_Info *lineinfo;
+		sb_పంక్తి_T   *పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం
+						  + పదం->tl_scrollback.ga_len;
 
-		lineinfo = vterm_state_get_lineinfo(state, pos.row);
+		lineinfo = vterm_state_get_lineinfo(state, pos.అడ్డువరుస);
 
 		ga_init2(&ga, 1, 100);
-		for (pos.col = 0; pos.col < len; pos.col += width)
+		కొరకు (pos.నిలువు = 0; pos.నిలువు < len; pos.నిలువు += వెడల్పు)
 		{
-		    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		    ఒకవేళ (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		    {
-			width = 1;
-			CLEAR_POINTER(p + pos.col);
-			if (ga_grow(&ga, 1) == OK)
+			వెడల్పు = 1;
+			CLEAR_సూచిక(p + pos.నిలువు);
+			ఒకవేళ (ga_grow(&ga, 1) == OK)
 			    ga.ga_len += utf_char2bytes(' ',
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_దత్తాంశం + ga.ga_len);
 		    }
-		    else
+		    లేకపోతే
 		    {
-			width = cell.width;
+			వెడల్పు = cell.వెడల్పు;
 
-			cell2cellattr(&cell, &p[pos.col]);
-			if (width == 2)
+			cell2cellattr(&cell, &p[pos.నిలువు]);
+			ఒకవేళ (వెడల్పు == 2)
 			    // second cell of double-width character has the
 			    // same attributes.
-			    p[pos.col + 1] = p[pos.col];
+			    p[pos.నిలువు + 1] = p[pos.నిలువు];
 
 			// Each character can be up to 6 bytes.
-			if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 6) == OK)
+			ఒకవేళ (ga_grow(&ga, VTERM_MAX_CHARS_చొప్పున_CELL * 6) == OK)
 			{
-			    int	    i;
-			    int	    c;
+			    పూర్ణాంకం	    i;
+			    పూర్ణాంకం	    c;
 
-			    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
+			    కొరకు (i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL &&
 				    ((c = cell.chars[i]) > 0 || i == 0); ++i)
 				ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_దత్తాంశం + ga.ga_len);
 			}
 		    }
 		}
-		line->sb_cols = len;
-		line->sb_bytes = ga.ga_len;
-		line->sb_cells = p;
-		line->sb_fill_attr = new_fill_attr;
-		line->continuation = (char_u)lineinfo->continuation;
+		పంక్తి->sb_నిలువుల_సంఖ్య = len;
+		పంక్తి->sb_బైట్లు = ga.ga_len;
+		పంక్తి->sb_cells = p;
+		పంక్తి->sb_fill_attr = new_fill_attr;
+		పంక్తి->continuation = (char_u)lineinfo->continuation;
 		fill_attr = new_fill_attr;
-		++term->tl_scrollback.ga_len;
-		++term->tl_scrollback_snapshot;
+		++పదం->tl_scrollback.ga_len;
+		++పదం->tl_scrollback_snapshot;
 
-		if (ga_grow(&ga, 1) == FAIL)
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		else
+		ఒకవేళ (ga_grow(&ga, 1) == FAIL)
+		    కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, (char_u *)"", 0, 0);
+		లేకపోతే
 		{
-		    *((char_u *)ga.ga_data + ga.ga_len) = NUL;
-		    add_scrollback_line_to_buffer(term, ga.ga_data, ga.ga_len,
+		    *((char_u *)ga.ga_దత్తాంశం + ga.ga_len) = NUL;
+		    కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, ga.ga_దత్తాంశం, ga.ga_len,
 						  lineinfo->continuation);
 		}
 		ga_clear(&ga);
 	    }
-	    else
+	    లేకపోతే
 		vim_free(p);
 	}
     }
 
     // Add trailing empty lines.
-    for (pos.row = term->tl_scrollback.ga_len;
-	    pos.row < term->tl_scrollback_scrolled + term->tl_cursor_pos.row;
-	    ++pos.row)
+    కొరకు (pos.అడ్డువరుస = పదం->tl_scrollback.ga_len;
+	    pos.అడ్డువరుస < పదం->tl_scrollback_scrolled + పదం->tl_cursor_pos.అడ్డువరుస;
+	    ++pos.అడ్డువరుస)
     {
-	if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+	ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &fill_attr, 0) == OK)
 	{
-	    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-	    ++term->tl_scrollback_snapshot;
+	    కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, (char_u *)"", 0, 0);
+	    ++పదం->tl_scrollback_snapshot;
 	}
     }
 
-    term->tl_dirty_snapshot = FALSE;
-#ifdef FEAT_TIMERS
-    term->tl_timer_set = FALSE;
-#endif
+    పదం->tl_dirty_snapshot = FALSE;
+#నిర్వచితమైతే FEAT_TIMERS
+    పదం->tl_timer_సమితి = FALSE;
+#అయితే_ముగింపు
 }
 
 /*
@@ -2332,20 +2332,20 @@ update_snapshot(term_T *term)
  * encountered when using a terminal in a popup window.
  * Return TRUE if "*wp" was set to the next window.
  */
-    static int
-for_all_windows_and_curwin(win_T **wp, int *did_curwin)
+    స్థిర పూర్ణాంకం
+for_all_windows_and_curwin(win_T **wp, పూర్ణాంకం *did_curwin)
 {
-    if (*wp == NULL)
+    ఒకవేళ (*wp == ఖాళీ)
 	*wp = firstwin;
-    else if ((*wp)->w_next != NULL)
-	*wp = (*wp)->w_next;
-    else if (!*did_curwin)
+    లేకపోతే ఒకవేళ ((*wp)->w_తదుపరి != ఖాళీ)
+	*wp = (*wp)->w_తదుపరి;
+    లేకపోతే ఒకవేళ (!*did_curwin)
 	*wp = curwin;
-    else
-	return FALSE;
-    if (*wp == curwin)
+    లేకపోతే
+	తిరిగి FALSE;
+    ఒకవేళ (*wp == curwin)
 	*did_curwin = TRUE;
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -2354,35 +2354,35 @@ for_all_windows_and_curwin(win_T **wp, int *did_curwin)
  * Terminal-Normal mode.
  * When "redraw" is TRUE redraw the windows that show the terminal.
  */
-    void
-may_move_terminal_to_buffer(term_T *term, int redraw)
+    శూన్య
+may_move_terminal_గమ్యం_బఫరు(పదం_T *పదం, పూర్ణాంకం redraw)
 {
-    if (term->tl_vterm == NULL)
-	return;
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
     // Update the snapshot only if something changes or the buffer does not
     // have all the lines.
-    if (term->tl_dirty_snapshot || term->tl_buffer->b_ml.ml_line_count
-					       <= term->tl_buffer_scrolled)
-	update_snapshot(term);
+    ఒకవేళ (పదం->tl_dirty_snapshot || పదం->tl_బఫరు->b_ml.ml_పంక్తి_లెక్క
+					       <= పదం->tl_బఫరు_scrolled)
+	update_snapshot(పదం);
 
-    if (redraw)
+    ఒకవేళ (redraw)
     {
-	win_T	    *wp = NULL;
-	int	    did_curwin = FALSE;
+	win_T	    *wp = ఖాళీ;
+	పూర్ణాంకం	    did_curwin = FALSE;
 
-	while (for_all_windows_and_curwin(&wp, &did_curwin))
+	అయితే (for_all_windows_and_curwin(&wp, &did_curwin))
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
 	    {
-		wp->w_cursor.lnum = term->tl_buffer->b_ml.ml_line_count;
-		wp->w_cursor.col = 0;
+		wp->w_cursor.lnum = పదం->tl_బఫరు->b_ml.ml_పంక్తి_లెక్క;
+		wp->w_cursor.నిలువు = 0;
 		wp->w_valid = 0;
-		if (wp->w_cursor.lnum >= wp->w_height)
+		ఒకవేళ (wp->w_cursor.lnum >= wp->w_ఎత్తు)
 		{
-		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_height + 1;
+		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_ఎత్తు + 1;
 
-		    if (wp->w_topline < min_topline)
+		    ఒకవేళ (wp->w_topline < min_topline)
 			wp->w_topline = min_topline;
 		}
 		redraw_win_later(wp, UPD_NOT_VALID);
@@ -2391,51 +2391,51 @@ may_move_terminal_to_buffer(term_T *term, int redraw)
     }
 }
 
-#if defined(FEAT_TIMERS)
+#ఒకవేళ defined(FEAT_TIMERS)
 /*
  * Check if any terminal timer expired.  If so, copy text from the terminal to
  * the buffer.
  * Return the time until the next timer will expire.
  */
-    int
-term_check_timers(int next_due_arg, proftime_T *now)
+    పూర్ణాంకం
+పదం_check_timers(పూర్ణాంకం తదుపరి_due_arg, proftime_T *now)
 {
-    term_T  *term;
-    int	    next_due = next_due_arg;
+    పదం_T  *పదం;
+    పూర్ణాంకం	    తదుపరి_due = తదుపరి_due_arg;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(పదం)
     {
-	if (term->tl_timer_set && !term->tl_normal_mode)
+	ఒకవేళ (పదం->tl_timer_సమితి && !పదం->tl_సాధారణ_బహుళకం)
 	{
-	    long    this_due = proftime_time_left(&term->tl_timer_due, now);
+	    దీర్ఘ    this_due = proftime_సమయం_ఎడమ(&పదం->tl_timer_due, now);
 
-	    if (this_due <= 1)
+	    ఒకవేళ (this_due <= 1)
 	    {
-		term->tl_timer_set = FALSE;
-		may_move_terminal_to_buffer(term, FALSE);
+		పదం->tl_timer_సమితి = FALSE;
+		may_move_terminal_గమ్యం_బఫరు(పదం, FALSE);
 	    }
-	    else if (next_due == -1 || next_due > this_due)
-		next_due = this_due;
+	    లేకపోతే ఒకవేళ (తదుపరి_due == -1 || తదుపరి_due > this_due)
+		తదుపరి_due = this_due;
 	}
     }
 
-    return next_due;
+    తిరిగి తదుపరి_due;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * When "normal_mode" is TRUE set the terminal to Terminal-Normal mode,
  * otherwise end it.
  */
-    static void
-set_terminal_mode(term_T *term, int normal_mode)
+    స్థిర శూన్య
+సమితి_terminal_బహుళకం(పదం_T *పదం, పూర్ణాంకం సాధారణ_బహుళకం)
 {
-    term->tl_normal_mode = normal_mode;
+    పదం->tl_సాధారణ_బహుళకం = సాధారణ_బహుళకం;
     may_trigger_modechanged();
-    if (!normal_mode)
-	handle_postponed_scrollback(term);
-    VIM_CLEAR(term->tl_status_text);
-    if (term->tl_buffer == curbuf)
+    ఒకవేళ (!సాధారణ_బహుళకం)
+	handle_postponed_scrollback(పదం);
+    VIM_CLEAR(పదం->tl_స్థితి_పాఠ్యం);
+    ఒకవేళ (పదం->tl_బఫరు == curbuf)
 	maketitle();
 }
 
@@ -2443,75 +2443,75 @@ set_terminal_mode(term_T *term, int normal_mode)
  * Called after the job is finished and Terminal mode is not active:
  * Move the vterm contents into the scrollback buffer and free the vterm.
  */
-    static void
-cleanup_vterm(term_T *term)
+    స్థిర శూన్య
+cleanup_vterm(పదం_T *పదం)
 {
-    set_terminal_mode(term, FALSE);
-    if (term->tl_finish != TL_FINISH_CLOSE)
-	may_move_terminal_to_buffer(term, TRUE);
-    term_free_vterm(term);
+    సమితి_terminal_బహుళకం(పదం, FALSE);
+    ఒకవేళ (పదం->tl_ముగింపు != TL_ముగింపు_CLOSE)
+	may_move_terminal_గమ్యం_బఫరు(పదం, TRUE);
+    పదం_free_vterm(పదం);
 }
 
 /*
  * Switch from Terminal-Job mode to Terminal-Normal mode.
  * Suspends updating the terminal window.
  */
-    static void
-term_enter_normal_mode(void)
+    స్థిర శూన్య
+పదం_enter_సాధారణ_బహుళకం(శూన్య)
 {
-    term_T     *term = curbuf->b_term;
+    పదం_T     *పదం = curbuf->b_పదం;
     linenr_T   lnum;
-    int        col;
+    పూర్ణాంకం        నిలువు;
 
-    set_terminal_mode(term, TRUE);
+    సమితి_terminal_బహుళకం(పదం, TRUE);
 
     // Append the current terminal contents to the buffer.
-    may_move_terminal_to_buffer(term, TRUE);
+    may_move_terminal_గమ్యం_బఫరు(పదం, TRUE);
 
     // Move the window cursor to the position of the cursor in the
     // terminal.
-    lnum = term->tl_buffer_scrolled + 1 + term->tl_cursor_pos.row;
-    col = term->tl_cursor_pos.col;
-    scrollbackline_pos_in_buf(term, term->tl_cursor_pos.row + term->tl_scrollback_scrolled, &lnum, &col, NULL);
+    lnum = పదం->tl_బఫరు_scrolled + 1 + పదం->tl_cursor_pos.అడ్డువరుస;
+    నిలువు = పదం->tl_cursor_pos.నిలువు;
+    scrollbackline_pos_లోపల_buf(పదం, పదం->tl_cursor_pos.అడ్డువరుస + పదం->tl_scrollback_scrolled, &lnum, &నిలువు, ఖాళీ);
 
     curwin->w_cursor.lnum = lnum;
     check_cursor();
-    if (coladvance(col) == FAIL)
+    ఒకవేళ (coladvance(నిలువు) == FAIL)
 	coladvance(MAXCOL);
-    curwin->w_set_curswant = true;
-    curwin->w_topline = term->tl_buffer_scrolled + 1;
+    curwin->w_సమితి_curswant = true;
+    curwin->w_topline = పదం->tl_బఫరు_scrolled + 1;
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are in
  * Terminal-Normal mode.
  */
-    int
-term_in_normal_mode(buf_T *buf)
+    పూర్ణాంకం
+పదం_లోపల_సాధారణ_బహుళకం(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    పదం_T *పదం = buf->b_పదం;
 
-    return term != NULL && term->tl_normal_mode;
+    తిరిగి పదం != ఖాళీ && పదం->tl_సాధారణ_బహుళకం;
 }
 
 /*
  * Switch from Terminal-Normal mode to Terminal-Job mode.
  * Restores updating the terminal window.
  */
-    void
-term_enter_job_mode(void)
+    శూన్య
+పదం_enter_పని_బహుళకం(శూన్య)
 {
-    term_T	*term = curbuf->b_term;
+    పదం_T	*పదం = curbuf->b_పదం;
 
-    set_terminal_mode(term, FALSE);
+    సమితి_terminal_బహుళకం(పదం, FALSE);
 
-    if (term->tl_channel_closed)
-	cleanup_vterm(term);
-    redraw_buf_and_status_later(curbuf, UPD_NOT_VALID);
-#ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(curwin))
+    ఒకవేళ (పదం->tl_channel_closed)
+	cleanup_vterm(పదం);
+    redraw_buf_and_స్థితి_later(curbuf, UPD_NOT_VALID);
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ఒకవేళ (WIN_IS_POPUP(curwin))
 	redraw_later(UPD_NOT_VALID);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -2520,43 +2520,43 @@ term_enter_job_mode(void)
  * vgetc().  Therefore vgetorpeek() will call check_no_reduce_keys() to update
  * "no_reduce_keys" before using it.
  */
-typedef enum {
+రకనిర్వచనం గణన {
     NRKS_NONE,	    // initial value
     NRKS_CHECK,	    // modify_other_keys was off before calling vgetc()
-    NRKS_SET,	    // no_reduce_keys was incremented in term_vgetc() or
+    NRKS_సమితి,	    // no_reduce_keys was incremented in term_vgetc() or
 		    // check_no_reduce_keys(), must be decremented.
-} reduce_key_state_T;
+} reduce_కీలకం_state_T;
 
-static reduce_key_state_T  no_reduce_key_state = NRKS_NONE;
+స్థిర reduce_కీలకం_state_T  no_reduce_కీలకం_state = NRKS_NONE;
 
 /*
  * Return TRUE if the term is using modifyOtherKeys level 2 or the kitty
  * keyboard protocol.
  */
-    static int
-vterm_using_key_protocol(void)
+    స్థిర పూర్ణాంకం
+vterm_using_కీలకం_protocol(శూన్య)
 {
-    return curbuf->b_term != NULL
-	&& curbuf->b_term->tl_vterm != NULL
-	&& (vterm_is_modify_other_keys(curbuf->b_term->tl_vterm)
-		|| vterm_is_kitty_keyboard(curbuf->b_term->tl_vterm));
+    తిరిగి curbuf->b_పదం != ఖాళీ
+	&& curbuf->b_పదం->tl_vterm != ఖాళీ
+	&& (vterm_is_modify_other_కీలకాలు(curbuf->b_పదం->tl_vterm)
+		|| vterm_is_kitty_keyboard(curbuf->b_పదం->tl_vterm));
 }
 
-    void
-check_no_reduce_keys(void)
+    శూన్య
+check_no_reduce_కీలకాలు(శూన్య)
 {
-    if (no_reduce_key_state != NRKS_CHECK
-	    || no_reduce_keys >= 1
-	    || curbuf->b_term == NULL
-	    || curbuf->b_term->tl_vterm == NULL)
-	return;
+    ఒకవేళ (no_reduce_కీలకం_state != NRKS_CHECK
+	    || no_reduce_కీలకాలు >= 1
+	    || curbuf->b_పదం == ఖాళీ
+	    || curbuf->b_పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
-    if (vterm_using_key_protocol())
+    ఒకవేళ (vterm_using_కీలకం_protocol())
     {
 	// "modify_other_keys" or kitty keyboard protocol was enabled while
 	// waiting.
-	no_reduce_key_state = NRKS_SET;
-	++no_reduce_keys;
+	no_reduce_కీలకం_state = NRKS_సమితి;
+	++no_reduce_కీలకాలు;
     }
 }
 
@@ -2565,207 +2565,207 @@ check_no_reduce_keys(void)
  * Note: while waiting a terminal may be closed and freed if the channel is
  * closed and ++close was used.  This may even happen before we get here.
  */
-    static int
-term_vgetc(void)
+    స్థిర పూర్ణాంకం
+పదం_vgetc(శూన్య)
 {
-    int c;
-    int save_State = State;
+    పూర్ణాంకం c;
+    పూర్ణాంకం save_State = State;
 
-    State = MODE_TERMINAL;
+    State = బహుళకం_TERMINAL;
     got_int = FALSE;
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     ctrl_break_was_pressed = FALSE;
-#endif
+#అయితే_ముగింపు
 
-    if (vterm_using_key_protocol())
+    ఒకవేళ (vterm_using_కీలకం_protocol())
     {
-	++no_reduce_keys;
-	no_reduce_key_state = NRKS_SET;
+	++no_reduce_కీలకాలు;
+	no_reduce_కీలకం_state = NRKS_సమితి;
     }
-    else
+    లేకపోతే
     {
-	no_reduce_key_state = NRKS_CHECK;
+	no_reduce_కీలకం_state = NRKS_CHECK;
     }
 
     c = vgetc();
     got_int = FALSE;
     State = save_State;
 
-    if (no_reduce_key_state == NRKS_SET)
-	--no_reduce_keys;
-    no_reduce_key_state = NRKS_NONE;
+    ఒకవేళ (no_reduce_కీలకం_state == NRKS_సమితి)
+	--no_reduce_కీలకాలు;
+    no_reduce_కీలకం_state = NRKS_NONE;
 
-    return c;
+    తిరిగి c;
 }
 
-static int	mouse_was_outside = FALSE;
+స్థిర పూర్ణాంకం	mouse_was_outside = FALSE;
 
 /*
  * Send key "c" with modifiers "modmask" to terminal.
  * Return FAIL when the key needs to be handled in Normal mode.
  * Return OK when the key was dropped or sent to the terminal.
  */
-    int
-send_keys_to_term(term_T *term, int c, int modmask, int typed)
+    పూర్ణాంకం
+send_కీలకాలు_గమ్యం_పదం(పదం_T *పదం, పూర్ణాంకం c, పూర్ణాంకం modmask, పూర్ణాంకం typed)
 {
-    char	msg[KEY_BUF_LEN];
+    అక్షరం	సందేశం[కీలకం_BUF_LEN];
     size_t	len;
-    int		dragging_outside = FALSE;
+    పూర్ణాంకం		dragging_outside = FALSE;
 
     // Catch keys that need to be handled as in Normal mode.
-    switch (c)
+    ఎంపిక (c)
     {
-	case NUL:
-	case K_ZERO:
-	    if (typed)
+	స్థితి NUL:
+	స్థితి K_ZERO:
+	    ఒకవేళ (typed)
 		stuffcharReadbuff(c);
-	    return FAIL;
+	    తిరిగి FAIL;
 
-	case K_TABLINE:
+	స్థితి K_TABLINE:
 	    stuffcharReadbuff(c);
-	    return FAIL;
+	    తిరిగి FAIL;
 
-	case K_IGNORE:
-	case K_CANCEL:  // used for :normal when running out of chars
-	    return FAIL;
+	స్థితి K_IGNORE:
+	స్థితి K_CANCEL:  // used for :normal when running out of chars
+	    తిరిగి FAIL;
 
-	case K_LEFTDRAG:
-	case K_MIDDLEDRAG:
-	case K_RIGHTDRAG:
-	case K_X1DRAG:
-	case K_X2DRAG:
+	స్థితి K_LEFTDRAG:
+	స్థితి K_MIDDLEDRAG:
+	స్థితి K_RIGHTDRAG:
+	స్థితి K_X1DRAG:
+	స్థితి K_X2DRAG:
 	    dragging_outside = mouse_was_outside;
 	    // FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTRELEASE:
-	case K_X1MOUSE:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2RELEASE:
+	స్థితి K_LEFTMOUSE:
+	స్థితి K_LEFTMOUSE_NM:
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_LEFTRELEASE_NM:
+	స్థితి K_MOUSEMOVE:
+	స్థితి K_MIDDLEMOUSE:
+	స్థితి K_MIDDLERELEASE:
+	స్థితి K_RIGHTMOUSE:
+	స్థితి K_RIGHTRELEASE:
+	స్థితి K_X1MOUSE:
+	స్థితి K_X1RELEASE:
+	స్థితి K_X2MOUSE:
+	స్థితి K_X2RELEASE:
 
-	case K_MOUSEUP:
-	case K_MOUSEDOWN:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
+	స్థితి K_MOUSEUP:
+	స్థితి K_MOUSEDOWN:
+	స్థితి K_MOUSELEFT:
+	స్థితి K_MOUSERIGHT:
 	    {
-		int	row = mouse_row;
-		int	col = mouse_col;
+		పూర్ణాంకం	అడ్డువరుస = mouse_అడ్డువరుస;
+		పూర్ణాంకం	నిలువు = mouse_నిలువు;
 
-#ifdef FEAT_PROP_POPUP
-		if (popup_is_popup(curwin))
+#నిర్వచితమైతే FEAT_PROP_POPUP
+		ఒకవేళ (popup_is_popup(curwin))
 		{
-		    row -= popup_top_extra(curwin);
-		    col -= popup_left_extra(curwin);
+		    అడ్డువరుస -= popup_శిఖరం_extra(curwin);
+		    నిలువు -= popup_ఎడమ_extra(curwin);
 		}
-#endif
-		if (row < W_WINROW(curwin)
-			|| row >= (W_WINROW(curwin) + curwin->w_height)
-			|| col < curwin->w_wincol
-			|| col >= W_ENDCOL(curwin)
+#అయితే_ముగింపు
+		ఒకవేళ (అడ్డువరుస < W_WINROW(curwin)
+			|| అడ్డువరుస >= (W_WINROW(curwin) + curwin->w_ఎత్తు)
+			|| నిలువు < curwin->w_wincol
+			|| నిలువు >= W_ENDCOL(curwin)
 			|| dragging_outside)
 		{
 		    // click or scroll outside the current window or on status
 		    // line or vertical separator
-		    if (typed)
+		    ఒకవేళ (typed)
 		    {
 			stuffcharReadbuff(c);
 			mouse_was_outside = TRUE;
 		    }
-		    return FAIL;
+		    తిరిగి FAIL;
 		}
 	    }
-	    break;
+	    ఆపు;
 
-	case K_COMMAND:
-	case K_SCRIPT_COMMAND:
-	    return do_cmdkey_command(c, 0);
+	స్థితి K_COMMAND:
+	స్థితి K_SCRIPT_COMMAND:
+	    తిరిగి do_cmdkey_command(c, 0);
     }
-    if (typed)
+    ఒకవేళ (typed)
 	mouse_was_outside = FALSE;
 
     // Convert the typed key to a sequence of bytes for the job.
-    len = term_convert_key(term, c, modmask, msg);
-    if (len > 0)
+    len = పదం_convert_కీలకం(పదం, c, modmask, సందేశం);
+    ఒకవేళ (len > 0)
 	// TODO: if FAIL is returned, stop?
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						(char_u *)msg, (int)len, NULL);
+	channel_send(పదం->tl_పని->jv_channel, get_tty_part(పదం),
+						(char_u *)సందేశం, (పూర్ణాంకం)len, ఖాళీ);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Handle CTRL-W "": send register contents to the job.
  */
-    static void
-term_paste_register(int prev_c UNUSED)
+    స్థిర శూన్య
+పదం_paste_రిజిస్టరు(పూర్ణాంకం prev_c వాడని)
 {
-    int		c;
+    పూర్ణాంకం		c;
     list_T	*l;
-    listitem_T	*item;
-    long	reglen = 0;
-    int		type;
+    listitem_T	*అంశం;
+    దీర్ఘ	reglen = 0;
+    పూర్ణాంకం		type;
 
-    if (add_to_showcmd(prev_c))
-    if (add_to_showcmd('"'))
-	out_flush();
+    ఒకవేళ (కూడు_గమ్యం_showcmd(prev_c))
+    ఒకవేళ (కూడు_గమ్యం_showcmd('"'))
+	బహిర్గతం_flush();
 
-    c = term_vgetc();
+    c = పదం_vgetc();
     clear_showcmd();
 
-    if (!term_use_loop())
+    ఒకవేళ (!పదం_use_loop())
 	// job finished while waiting for a character
-	return;
+	తిరిగి;
 
     // CTRL-W "= prompt for expression to evaluate.
-    if (c == '=' && get_expr_register() != '=')
-	return;
-    if (!term_use_loop())
+    ఒకవేళ (c == '=' && get_సమాసం_రిజిస్టరు() != '=')
+	తిరిగి;
+    ఒకవేళ (!పదం_use_loop())
 	// job finished while waiting for a character
-	return;
+	తిరిగి;
 
     l = (list_T *)get_reg_contents(c, GREG_LIST);
-    if (l == NULL)
-	return;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి;
 
     type = get_reg_type(c, &reglen);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_వస్తువులు(l, అంశం)
     {
-	char_u *s = tv_get_string(&item->li_tv);
-#ifdef MSWIN
+	char_u *s = tv_get_string(&అంశం->li_tv);
+#నిర్వచితమైతే MSWIN
 	char_u *tmp = s;
 
-	if (!enc_utf8 && enc_codepage > 0)
+	ఒకవేళ (!enc_utf8 && enc_codepage > 0)
 	{
-	    WCHAR   *ret = NULL;
-	    int	length = 0;
+	    WCHAR   *ret = ఖాళీ;
+	    పూర్ణాంకం	నిడివి = 0;
 
-	    MultiByteToWideChar_alloc(enc_codepage, 0, (char *)s,
-		    (int)STRLEN(s), &ret, &length);
-	    if (ret != NULL)
+	    Multi_Byte_గమ్యం_Wide_Char_alloc(enc_codepage, 0, (అక్షరం *)s,
+		    (పూర్ణాంకం)STRLEN(s), &ret, &నిడివి);
+	    ఒకవేళ (ret != ఖాళీ)
 	    {
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-			ret, length, (char **)&s, &length, 0, 0);
+		Wide_Char_గమ్యం_Multi_Byte_alloc(CP_UTF8, 0,
+			ret, నిడివి, (అక్షరం **)&s, &నిడివి, 0, 0);
 		vim_free(ret);
 	    }
 	}
-#endif
-	channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		s, (int)STRLEN(s), NULL);
-#ifdef MSWIN
-	if (tmp != s)
+#అయితే_ముగింపు
+	channel_send(curbuf->b_పదం->tl_పని->jv_channel, PART_లోపల,
+		s, (పూర్ణాంకం)STRLEN(s), ఖాళీ);
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (tmp != s)
 	    vim_free(s);
-#endif
+#అయితే_ముగింపు
 
-	if (item->li_next != NULL || type == MLINE)
-	    channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		    (char_u *)"\r", 1, NULL);
+	ఒకవేళ (అంశం->li_తదుపరి != ఖాళీ || type == MLINE)
+	    channel_send(curbuf->b_పదం->tl_పని->jv_channel, PART_లోపల,
+		    (char_u *)"\r", 1, ఖాళీ);
     }
     list_free(l);
 }
@@ -2774,114 +2774,114 @@ term_paste_register(int prev_c UNUSED)
  * Return TRUE when waiting for a character in the terminal, the cursor of the
  * terminal should be displayed.
  */
-    int
-terminal_is_active(void)
+    పూర్ణాంకం
+terminal_is_చురుకైన(శూన్య)
 {
-    return in_terminal_loop != NULL;
+    తిరిగి లోపల_terminal_loop != ఖాళీ;
 }
 
 /*
  * Return the highlight group ID for the terminal and the window.
  */
-    static int
-term_get_highlight_id(term_T *term, win_T *wp)
+    స్థిర పూర్ణాంకం
+పదం_get_highlight_id(పదం_T *పదం, win_T *wp)
 {
     char_u *name;
 
-    if (wp != NULL && wp->w_hlfwin_id != 0)
+    ఒకవేళ (wp != ఖాళీ && wp->w_hlfwin_id != 0)
 	name = syn_id2name(wp->w_hlfwin_id);
-    else if (term->tl_highlight_name != NULL)
-	name = term->tl_highlight_name;
-    else
+    లేకపోతే ఒకవేళ (పదం->tl_highlight_name != ఖాళీ)
+	name = పదం->tl_highlight_name;
+    లేకపోతే
 	name = (char_u*)"Terminal";
 
-    return syn_name2id(name);
+    తిరిగి syn_name2id(name);
 }
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
     cursorentry_T *
-term_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
+పదం_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
 {
-    term_T		 *term = in_terminal_loop;
-    static cursorentry_T entry;
-    int			 id;
-    guicolor_T		 term_fg = INVALCOLOR;
-    guicolor_T		 term_bg = INVALCOLOR;
+    పదం_T		 *పదం = లోపల_terminal_loop;
+    స్థిర cursorentry_T నమోదు_2;
+    పూర్ణాంకం			 id;
+    guicolor_T		 పదం_fg = INVALCOLOR;
+    guicolor_T		 పదం_bg = INVALCOLOR;
 
-    CLEAR_FIELD(entry);
-    entry.shape = entry.mshape =
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_LEFT ? SHAPE_VER :
-	SHAPE_BLOCK;
-    entry.percentage = 20;
-    if (term->tl_cursor_blink)
+    CLEAR_క్షేత్రం(నమోదు_2);
+    నమోదు_2.shape = నమోదు_2.mshape =
+	పదం->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
+	పదం->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_ఎడమ ? SHAPE_VER :
+	SHAPE_ఖండం;
+    నమోదు_2.percentage = 20;
+    ఒకవేళ (పదం->tl_cursor_blink)
     {
-	entry.blinkwait = 700;
-	entry.blinkon = 400;
-	entry.blinkoff = 250;
+	నమోదు_2.blinkwait = 700;
+	నమోదు_2.blinkon = 400;
+	నమోదు_2.blinkoff = 250;
     }
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, curwin);
-    if (id != 0)
-	syn_id2colors(id, &term_fg, &term_bg);
-    if (term_bg != INVALCOLOR)
-	*fg = term_bg;
-    else
-	*fg = gui.back_pixel;
+    id = పదం_get_highlight_id(పదం, curwin);
+    ఒకవేళ (id != 0)
+	syn_id2colors(id, &పదం_fg, &పదం_bg);
+    ఒకవేళ (పదం_bg != INVALCOLOR)
+	*fg = పదం_bg;
+    లేకపోతే
+	*fg = gui.వెనుక_pixel;
 
-    if (term->tl_cursor_color == NULL)
+    ఒకవేళ (పదం->tl_cursor_color == ఖాళీ)
     {
-	if (term_fg != INVALCOLOR)
-	    *bg = term_fg;
-	else
+	ఒకవేళ (పదం_fg != INVALCOLOR)
+	    *bg = పదం_fg;
+	లేకపోతే
 	    *bg = gui.norm_pixel;
     }
-    else
-	*bg = color_name2handle(term->tl_cursor_color);
-    entry.name = "n";
-    entry.used_for = SHAPE_CURSOR;
+    లేకపోతే
+	*bg = color_name2handle(పదం->tl_cursor_color);
+    నమోదు_2.name = "n";
+    నమోదు_2.వాడిన_for = SHAPE_CURSOR;
 
-    return &entry;
+    తిరిగి &నమోదు_2;
 }
-#endif
+#అయితే_ముగింపు
 
-    static void
-may_output_cursor_props(void)
+    స్థిర శూన్య
+may_output_cursor_props(శూన్య)
 {
-    if (!cursor_color_equal(last_set_cursor_color, desired_cursor_color)
-	    || last_set_cursor_shape != desired_cursor_shape
-	    || last_set_cursor_blink != desired_cursor_blink)
+    ఒకవేళ (!cursor_color_equal(చివరి_సమితి_cursor_color, desired_cursor_color)
+	    || చివరి_సమితి_cursor_shape != desired_cursor_shape
+	    || చివరి_సమితి_cursor_blink != desired_cursor_blink)
     {
-	cursor_color_copy(&last_set_cursor_color, desired_cursor_color);
-	last_set_cursor_shape = desired_cursor_shape;
-	last_set_cursor_blink = desired_cursor_blink;
-	term_cursor_color(cursor_color_get(desired_cursor_color));
-	if (desired_cursor_shape == -1 || desired_cursor_blink == -1)
+	cursor_color_copy(&చివరి_సమితి_cursor_color, desired_cursor_color);
+	చివరి_సమితి_cursor_shape = desired_cursor_shape;
+	చివరి_సమితి_cursor_blink = desired_cursor_blink;
+	పదం_cursor_color(cursor_color_get(desired_cursor_color));
+	ఒకవేళ (desired_cursor_shape == -1 || desired_cursor_blink == -1)
 	    // this will restore the initial cursor style, if possible
 	    ui_cursor_shape_forced(TRUE);
-	else
-	    term_cursor_shape(desired_cursor_shape, desired_cursor_blink);
+	లేకపోతే
+	    పదం_cursor_shape(desired_cursor_shape, desired_cursor_blink);
     }
 }
 
 /*
  * Set the cursor color and shape, if not last set to these.
  */
-    static void
-may_set_cursor_props(term_T *term)
+    స్థిర శూన్య
+may_సమితి_cursor_props(పదం_T *పదం)
 {
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // For the GUI the cursor properties are obtained with
     // term_get_cursor_shape().
-    if (gui.in_use)
-	return;
-#endif
-    if (in_terminal_loop == term)
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
+#అయితే_ముగింపు
+    ఒకవేళ (లోపల_terminal_loop == పదం)
     {
-	cursor_color_copy(&desired_cursor_color, term->tl_cursor_color);
-	desired_cursor_shape = term->tl_cursor_shape;
-	desired_cursor_blink = term->tl_cursor_blink;
+	cursor_color_copy(&desired_cursor_color, పదం->tl_cursor_color);
+	desired_cursor_shape = పదం->tl_cursor_shape;
+	desired_cursor_blink = పదం->tl_cursor_blink;
 	may_output_cursor_props();
     }
 }
@@ -2889,14 +2889,14 @@ may_set_cursor_props(term_T *term)
 /*
  * Reset the desired cursor properties and restore them when needed.
  */
-    static void
-prepare_restore_cursor_props(void)
+    స్థిర శూన్య
+prepare_restore_cursor_props(శూన్య)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	return;
-#endif
-    cursor_color_copy(&desired_cursor_color, NULL);
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
+	తిరిగి;
+#అయితే_ముగింపు
+    cursor_color_copy(&desired_cursor_color, ఖాళీ);
     desired_cursor_shape = -1;
     desired_cursor_blink = -1;
     may_output_cursor_props();
@@ -2907,78 +2907,78 @@ prepare_restore_cursor_props(void)
  * keys to the job.
  * If "check_job_status" is TRUE update the job status.
  */
-    static int
-term_use_loop_check(int check_job_status)
+    స్థిర పూర్ణాంకం
+పదం_use_loop_check(పూర్ణాంకం check_పని_స్థితి)
 {
-    term_T *term = curbuf->b_term;
+    పదం_T *పదం = curbuf->b_పదం;
 
-    return term != NULL
-	&& !term->tl_normal_mode
-	&& term->tl_vterm != NULL
-	&& term_job_running_check(term, check_job_status);
+    తిరిగి పదం != ఖాళీ
+	&& !పదం->tl_సాధారణ_బహుళకం
+	&& పదం->tl_vterm != ఖాళీ
+	&& పదం_పని_running_check(పదం, check_పని_స్థితి);
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are sending
  * keys to the job.
  */
-    int
-term_use_loop(void)
+    పూర్ణాంకం
+పదం_use_loop(శూన్య)
 {
-    return term_use_loop_check(FALSE);
+    తిరిగి పదం_use_loop_check(FALSE);
 }
 
 /*
  * Called when entering a window with the mouse.  If this is a terminal window
  * we may want to change state.
  */
-    void
-term_win_entered(void)
+    శూన్య
+పదం_win_entered(శూన్య)
 {
-    term_T *term = curbuf->b_term;
+    పదం_T *పదం = curbuf->b_పదం;
 
-    if (term == NULL)
-	return;
+    ఒకవేళ (పదం == ఖాళీ)
+	తిరిగి;
 
-    if (term_use_loop_check(TRUE))
+    ఒకవేళ (పదం_use_loop_check(TRUE))
     {
 	reset_VIsual_and_resel();
-	if (State & MODE_INSERT)
-	    stop_insert_mode = TRUE;
+	ఒకవేళ (State & బహుళకం_చొప్పించు)
+	    stop_చొప్పించు_బహుళకం = TRUE;
     }
     mouse_was_outside = FALSE;
-    enter_mouse_col = mouse_col;
-    enter_mouse_row = mouse_row;
+    enter_mouse_నిలువు = mouse_నిలువు;
+    enter_mouse_అడ్డువరుస = mouse_అడ్డువరుస;
 }
 
-    void
-term_focus_change(int in_focus)
+    శూన్య
+పదం_focus_change(పూర్ణాంకం లోపల_focus)
 {
-    term_T *term = curbuf->b_term;
+    పదం_T *పదం = curbuf->b_పదం;
 
-    if (term == NULL || term->tl_vterm == NULL)
-	return;
+    ఒకవేళ (పదం == ఖాళీ || పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
-    VTermState	*state = vterm_obtain_state(term->tl_vterm);
+    VTermState	*state = vterm_obtain_state(పదం->tl_vterm);
 
-    if (in_focus)
-	vterm_state_focus_in(state);
-    else
-	vterm_state_focus_out(state);
-    term_forward_output(term);
+    ఒకవేళ (లోపల_focus)
+	vterm_state_focus_లోపల(state);
+    లేకపోతే
+	vterm_state_focus_బహిర్గతం(state);
+    పదం_forward_output(పదం);
 }
 
 /*
  * vgetc() may not include CTRL in the key when modify_other_keys is set.
  * Return the Ctrl-key value in that case.
  */
-    static int
-raw_c_to_ctrl(int c)
+    స్థిర పూర్ణాంకం
+raw_c_గమ్యం_ctrl(పూర్ణాంకం c)
 {
-    if ((mod_mask & MOD_MASK_CTRL)
+    ఒకవేళ ((mod_ముసుగు & MOD_ముసుగు_CTRL)
 	    && ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_')))
-	return c & 0x1f;
-    return c;
+	తిరిగి c & 0x1f;
+    తిరిగి c;
 }
 
 /*
@@ -2986,15 +2986,15 @@ raw_c_to_ctrl(int c)
  * Also when the Kitty keyboard protocol is used.
  * May set "mod_mask".
  */
-    static int
-ctrl_to_raw_c(int c)
+    స్థిర పూర్ణాంకం
+ctrl_గమ్యం_raw_c(పూర్ణాంకం c)
 {
-    if (c < 0x20 && vterm_using_key_protocol())
+    ఒకవేళ (c < 0x20 && vterm_using_కీలకం_protocol())
     {
-	mod_mask |= MOD_MASK_CTRL;
-	return c + '@';
+	mod_ముసుగు |= MOD_ముసుగు_CTRL;
+	తిరిగి c + '@';
     }
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -3006,154 +3006,154 @@ ctrl_to_raw_c(int c)
  * Returns OK if a typed character is to be handled in Normal mode, FAIL if
  * the terminal was closed.
  */
-    int
-terminal_loop(int blocking)
+    పూర్ణాంకం
+terminal_loop(పూర్ణాంకం blocking)
 {
-    int		c;
-    int		raw_c;
-    int		termwinkey = 0;
-    int		ret;
-#ifdef UNIX
-    int		tty_fd = curbuf->b_term->tl_job->jv_channel
-				 ->ch_part[get_tty_part(curbuf->b_term)].ch_fd;
-#endif
-    int		restore_cursor = FALSE;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		raw_c;
+    పూర్ణాంకం		termwinkey = 0;
+    పూర్ణాంకం		ret;
+#నిర్వచితమైతే UNIX
+    పూర్ణాంకం		tty_fd = curbuf->b_పదం->tl_పని->jv_channel
+				 ->ch_part[get_tty_part(curbuf->b_పదం)].ch_fd;
+#అయితే_ముగింపు
+    పూర్ణాంకం		restore_cursor = FALSE;
 
     // Remember the terminal we are sending keys to.  However, the terminal
     // might be closed while waiting for a character, e.g. typing "exit" in a
     // shell and ++close was used.  Therefore use curbuf->b_term instead of a
     // stored reference.
-    in_terminal_loop = curbuf->b_term;
+    లోపల_terminal_loop = curbuf->b_పదం;
 
-    if (*curwin->w_p_twk != NUL)
+    ఒకవేళ (*curwin->w_p_twk != NUL)
     {
-	termwinkey = string_to_key(curwin->w_p_twk, TRUE);
-	if (termwinkey == Ctrl_W)
+	termwinkey = string_గమ్యం_కీలకం(curwin->w_p_twk, TRUE);
+	ఒకవేళ (termwinkey == Ctrl_W)
 	    termwinkey = 0;
     }
-    position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
-    may_set_cursor_props(curbuf->b_term);
+    position_cursor(curwin, &curbuf->b_పదం->tl_cursor_pos);
+    may_సమితి_cursor_props(curbuf->b_పదం);
 
-    while (blocking || vpeekc_nomap() != NUL)
+    అయితే (blocking || vpeekc_nomap() != NUL)
     {
-#ifdef FEAT_GUI
-	if (curbuf->b_term != NULL && !curbuf->b_term->tl_system)
-#endif
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (curbuf->b_పదం != ఖాళీ && !curbuf->b_పదం->tl_system)
+#అయితే_ముగింపు
 	    // TODO: skip screen update when handling a sequence of keys.
 	    // Repeat redrawing in case a message is received while redrawing.
-	    while (must_redraw != 0)
-		if (update_screen(0) == FAIL)
-		    break;
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	    అయితే (must_redraw != 0)
+		ఒకవేళ (update_screen(0) == FAIL)
+		    ఆపు;
+	ఒకవేళ (!పదం_use_loop_check(TRUE) || లోపల_terminal_loop != curbuf->b_పదం)
 	    // job finished while redrawing
-	    break;
+	    ఆపు;
 
-	update_cursor(curbuf->b_term, FALSE);
+	update_cursor(curbuf->b_పదం, FALSE);
 	restore_cursor = TRUE;
 
-	raw_c = term_vgetc();
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	raw_c = పదం_vgetc();
+	ఒకవేళ (!పదం_use_loop_check(TRUE) || లోపల_terminal_loop != curbuf->b_పదం)
 	{
 	    // Job finished while waiting for a character.  Push back the
 	    // received character.
-	    if (raw_c != K_IGNORE)
+	    ఒకవేళ (raw_c != K_IGNORE)
 		vungetc(raw_c);
-	    break;
+	    ఆపు;
 	}
-	if (raw_c == K_IGNORE)
-	    continue;
-	c = raw_c_to_ctrl(raw_c);
+	ఒకవేళ (raw_c == K_IGNORE)
+	    కొనసాగు;
+	c = raw_c_గమ్యం_ctrl(raw_c);
 
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 	/*
 	 * The shell or another program may change the tty settings.  Getting
 	 * them for every typed character is a bit of overhead, but it's needed
 	 * for the first character typed, e.g. when Vim starts in a shell.
 	 */
-	if (mch_isatty(tty_fd))
+	ఒకవేళ (mch_isatty(tty_fd))
 	{
 	    ttyinfo_T info;
 
 	    // Get the current backspace character of the pty.
-	    if (get_tty_info(tty_fd, &info) == OK)
-		term_backspace_char = info.backspace;
+	    ఒకవేళ (get_tty_info(tty_fd, &info) == OK)
+		పదం_backspace_char = info.backspace;
 	}
-#endif
+#అయితే_ముగింపు
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// On Windows winpty handles CTRL-C, don't send a CTRL_C_EVENT.
 	// Use CTRL-BREAK to kill the job.
-	if (ctrl_break_was_pressed)
-	    mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
-#endif
+	ఒకవేళ (ctrl_break_was_pressed)
+	    mch_signal_పని(curbuf->b_పదం->tl_పని, (char_u *)"kill");
+#అయితే_ముగింపు
 	// Was either CTRL-W (termwinkey) or CTRL-\ pressed?
 	// Not in a system terminal.
-	if ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
-#ifdef FEAT_GUI
-		&& !curbuf->b_term->tl_system
-#endif
+	ఒకవేళ ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
+#నిర్వచితమైతే FEAT_GUI
+		&& !curbuf->b_పదం->tl_system
+#అయితే_ముగింపు
 		)
 	{
-	    int	    prev_c = c;
-	    int	    prev_raw_c = raw_c;
-	    int	    prev_mod_mask = mod_mask;
+	    పూర్ణాంకం	    prev_c = c;
+	    పూర్ణాంకం	    prev_raw_c = raw_c;
+	    పూర్ణాంకం	    prev_mod_ముసుగు = mod_ముసుగు;
 
-	    if (add_to_showcmd(c))
-		out_flush();
+	    ఒకవేళ (కూడు_గమ్యం_showcmd(c))
+		బహిర్గతం_flush();
 
-	    raw_c = term_vgetc();
-	    c = raw_c_to_ctrl(raw_c);
+	    raw_c = పదం_vgetc();
+	    c = raw_c_గమ్యం_ctrl(raw_c);
 
 	    clear_showcmd();
 
-	    if (!term_use_loop_check(TRUE)
-					 || in_terminal_loop != curbuf->b_term)
+	    ఒకవేళ (!పదం_use_loop_check(TRUE)
+					 || లోపల_terminal_loop != curbuf->b_పదం)
 		// job finished while waiting for a character
-		break;
+		ఆపు;
 
-	    if (prev_c == Ctrl_BSL)
+	    ఒకవేళ (prev_c == Ctrl_BSL)
 	    {
-		if (c == Ctrl_N)
+		ఒకవేళ (c == Ctrl_N)
 		{
 		    // CTRL-\ CTRL-N : go to Terminal-Normal mode.
-		    term_enter_normal_mode();
+		    పదం_enter_సాధారణ_బహుళకం();
 		    ret = FAIL;
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 		// Send both keys to the terminal, first one here, second one
 		// below.
-		send_keys_to_term(curbuf->b_term, prev_raw_c, prev_mod_mask,
+		send_కీలకాలు_గమ్యం_పదం(curbuf->b_పదం, prev_raw_c, prev_mod_ముసుగు,
 									 TRUE);
 	    }
-	    else if (c == Ctrl_C)
+	    లేకపోతే ఒకవేళ (c == Ctrl_C)
 	    {
 		// "CTRL-W CTRL-C" or 'termwinkey' CTRL-C: end the job
-		mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
+		mch_signal_పని(curbuf->b_పదం->tl_పని, (char_u *)"kill");
 	    }
-	    else if (c == '.')
+	    లేకపోతే ఒకవేళ (c == '.')
 	    {
 		// "CTRL-W .": send CTRL-W to the job
 		// "'termwinkey' .": send 'termwinkey' to the job
-		raw_c = ctrl_to_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
+		raw_c = ctrl_గమ్యం_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
 	    }
-	    else if (c == Ctrl_BSL)
+	    లేకపోతే ఒకవేళ (c == Ctrl_BSL)
 	    {
 		// "CTRL-W CTRL-\": send CTRL-\ to the job
-		raw_c = ctrl_to_raw_c(Ctrl_BSL);
+		raw_c = ctrl_గమ్యం_raw_c(Ctrl_BSL);
 	    }
-	    else if (c == 'N')
+	    లేకపోతే ఒకవేళ (c == 'N')
 	    {
 		// CTRL-W N : go to Terminal-Normal mode.
-		term_enter_normal_mode();
+		పదం_enter_సాధారణ_బహుళకం();
 		ret = FAIL;
-		goto theend;
+		వెళ్ళు theend;
 	    }
-	    else if (c == '"')
+	    లేకపోతే ఒకవేళ (c == '"')
 	    {
-		term_paste_register(prev_c);
-		continue;
+		పదం_paste_రిజిస్టరు(prev_c);
+		కొనసాగు;
 	    }
-	    else if (termwinkey == 0 || c != termwinkey)
+	    లేకపోతే ఒకవేళ (termwinkey == 0 || c != termwinkey)
 	    {
 		// space for CTRL-W, modifier, multi-byte char and NUL
 		char_u buf[1 + 3 + MB_MAXBYTES + 1];
@@ -3161,59 +3161,59 @@ terminal_loop(int blocking)
 		// Put the command into the typeahead buffer, when using the
 		// stuff buffer KeyStuffed is set and 'langmap' won't be used.
 		buf[0] = Ctrl_W;
-		buf[special_to_buf(c, mod_mask, FALSE, buf + 1) + 1] = NUL;
+		buf[special_గమ్యం_buf(c, mod_ముసుగు, FALSE, buf + 1) + 1] = NUL;
 		ins_typebuf(buf, REMAP_NONE, 0, TRUE, FALSE);
 		ret = OK;
-		goto theend;
+		వెళ్ళు theend;
 	    }
 	}
-#ifdef MSWIN
-	if (!enc_utf8 && has_mbyte && raw_c >= 0x80)
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (!enc_utf8 && has_mbyte && raw_c >= 0x80)
 	{
 	    WCHAR   wc;
 	    char_u  mb[3];
 
-	    mb[0] = (unsigned)raw_c >> 8;
+	    mb[0] = (గుర్తులేని)raw_c >> 8;
 	    mb[1] = raw_c;
-	    if (MultiByteToWideChar(GetACP(), 0, (char*)mb, 2, &wc, 1) > 0)
+	    ఒకవేళ (Multi_Byte_గమ్యం_Wide_Char(GetACP(), 0, (అక్షరం*)mb, 2, &wc, 1) > 0)
 		raw_c = wc;
 	}
-#endif
-	if (send_keys_to_term(curbuf->b_term, raw_c, mod_mask, TRUE) != OK)
+#అయితే_ముగింపు
+	ఒకవేళ (send_కీలకాలు_గమ్యం_పదం(curbuf->b_పదం, raw_c, mod_ముసుగు, TRUE) != OK)
 	{
-	    if (raw_c == K_MOUSEMOVE)
+	    ఒకవేళ (raw_c == K_MOUSEMOVE)
 		// We are sure to come back here, don't reset the cursor color
 		// and shape to avoid flickering.
 		restore_cursor = FALSE;
 
 	    ret = OK;
-	    goto theend;
+	    వెళ్ళు theend;
 	}
     }
     ret = FAIL;
 
 theend:
-    in_terminal_loop = NULL;
-    if (restore_cursor)
+    లోపల_terminal_loop = ఖాళీ;
+    ఒకవేళ (restore_cursor)
 	prepare_restore_cursor_props();
 
     // Move a snapshot of the screen contents to the buffer, so that completion
     // works in other buffers.
-    if (curbuf->b_term != NULL && !curbuf->b_term->tl_normal_mode)
-	may_move_terminal_to_buffer(curbuf->b_term, FALSE);
+    ఒకవేళ (curbuf->b_పదం != ఖాళీ && !curbuf->b_పదం->tl_సాధారణ_బహుళకం)
+	may_move_terminal_గమ్యం_బఫరు(curbuf->b_పదం, FALSE);
 
-    return ret;
+    తిరిగి ret;
 }
 
-    static void
-may_toggle_cursor(term_T *term)
+    స్థిర శూన్య
+may_toggle_cursor(పదం_T *పదం)
 {
-    if (in_terminal_loop != term)
-	return;
+    ఒకవేళ (లోపల_terminal_loop != పదం)
+	తిరిగి;
 
-    if (term->tl_cursor_visible)
+    ఒకవేళ (పదం->tl_cursor_visible)
 	cursor_on();
-    else
+    లేకపోతే
 	cursor_off();
 }
 
@@ -3221,172 +3221,172 @@ may_toggle_cursor(term_T *term)
  * Reverse engineer the RGB value into a cterm color index.
  * First color is 1.  Return 0 if no match found (default color).
  */
-    static int
-color2index(VTermColor *color, int fg, int *boldp)
+    స్థిర పూర్ణాంకం
+color2index(VTermColor *color, పూర్ణాంకం fg, పూర్ణాంకం *boldp)
 {
-    int red = color->red;
-    int blue = color->blue;
-    int green = color->green;
+    పూర్ణాంకం red = color->red;
+    పూర్ణాంకం blue = color->blue;
+    పూర్ణాంకం green = color->green;
 
     *boldp = FALSE;
 
-    if (VTERM_COLOR_IS_INVALID(color))
-	return 0;
+    ఒకవేళ (VTERM_COLOR_IS_INVALID(color))
+	తిరిగి 0;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
+    ఒకవేళ (VTERM_COLOR_IS_సూచీకృత(color))
     {
 	// Use the color as-is if possible, give up otherwise.
-	if (color->index < t_colors)
+	ఒకవేళ (color->సూచీ < t_colors)
 	{
-	    uint8_t index = color->index;
-#ifdef MSWIN
+	    uint8_t సూచీ = color->సూచీ;
+#నిర్వచితమైతే MSWIN
 	    // Convert ANSI palette to cterm color index.
 	    // cterm_ansi_idx is a table for the reverse conversion from cterm
 	    // color index to ANSI palette. However, the current table can
 	    // be used for this conversion as well.
 	    // Note: If the contents of cterm_ansi_idx change in the future, a
 	    // different table may be needed for this purpose.
-	    if (index < 16)
-		index = cterm_ansi_idx[index];
-#endif
-	    return index + 1;
+	    ఒకవేళ (సూచీ < 16)
+		సూచీ = cterm_ansi_idx[సూచీ];
+#అయితే_ముగింపు
+	    తిరిగి సూచీ + 1;
 	}
 	// 8-color terminals can actually display twice as many colors by
 	// setting the high-intensity/bold bit.
-	else if (t_colors == 8 && fg && color->index < 16)
+	లేకపోతే ఒకవేళ (t_colors == 8 && fg && color->సూచీ < 16)
 	{
 	    *boldp = TRUE;
-	    return (color->index & 7) + 1;
+	    తిరిగి (color->సూచీ & 7) + 1;
 	}
-	return 0;
+	తిరిగి 0;
     }
 
-    if (t_colors >= 256)
+    ఒకవేళ (t_colors >= 256)
     {
-	if (red == blue && red == green)
+	ఒకవేళ (red == blue && red == green)
 	{
 	    // 24-color greyscale plus white and black
-	    static int cutoff[23] = {
+	    స్థిర పూర్ణాంకం cutoff[23] = {
 		    0x0D, 0x17, 0x21, 0x2B, 0x35, 0x3F, 0x49, 0x53, 0x5D, 0x67,
 		    0x71, 0x7B, 0x85, 0x8F, 0x99, 0xA3, 0xAD, 0xB7, 0xC1, 0xCB,
 		    0xD5, 0xDF, 0xE9};
-	    int i;
+	    పూర్ణాంకం i;
 
-	    if (red < 5)
-		return 17; // 00/00/00
-	    if (red > 245) // ff/ff/ff
-		return 232;
-	    for (i = 0; i < 23; ++i)
-		if (red < cutoff[i])
-		    return i + 233;
-	    return 256;
+	    ఒకవేళ (red < 5)
+		తిరిగి 17; // 00/00/00
+	    ఒకవేళ (red > 245) // ff/ff/ff
+		తిరిగి 232;
+	    కొరకు (i = 0; i < 23; ++i)
+		ఒకవేళ (red < cutoff[i])
+		    తిరిగి i + 233;
+	    తిరిగి 256;
 	}
 	{
-	    static int cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
-	    int ri, gi, bi;
+	    స్థిర పూర్ణాంకం cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
+	    పూర్ణాంకం ri, gi, bi;
 
 	    // 216-color cube
-	    for (ri = 0; ri < 5; ++ri)
-		if (red < cutoff[ri])
-		    break;
-	    for (gi = 0; gi < 5; ++gi)
-		if (green < cutoff[gi])
-		    break;
-	    for (bi = 0; bi < 5; ++bi)
-		if (blue < cutoff[bi])
-		    break;
-	    return 17 + ri * 36 + gi * 6 + bi;
+	    కొరకు (ri = 0; ri < 5; ++ri)
+		ఒకవేళ (red < cutoff[ri])
+		    ఆపు;
+	    కొరకు (gi = 0; gi < 5; ++gi)
+		ఒకవేళ (green < cutoff[gi])
+		    ఆపు;
+	    కొరకు (bi = 0; bi < 5; ++bi)
+		ఒకవేళ (blue < cutoff[bi])
+		    ఆపు;
+	    తిరిగి 17 + ri * 36 + gi * 6 + bi;
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * Convert Vterm attributes to highlight flags.
  */
-    static int
+    స్థిర పూర్ణాంకం
 vtermAttr2hl(VTermScreenCellAttrs *cellattrs)
 {
-    int attr = 0;
+    పూర్ణాంకం attr = 0;
 
-    if (cellattrs->bold)
+    ఒకవేళ (cellattrs->bold)
 	attr |= HL_BOLD;
-    if (cellattrs->underline)
+    ఒకవేళ (cellattrs->underline)
 	attr |= HL_UNDERLINE;
-    if (cellattrs->italic)
+    ఒకవేళ (cellattrs->italic)
 	attr |= HL_ITALIC;
-    if (cellattrs->strike)
+    ఒకవేళ (cellattrs->strike)
 	attr |= HL_STRIKETHROUGH;
-    if (cellattrs->reverse)
+    ఒకవేళ (cellattrs->తిరగేయి)
 	attr |= HL_INVERSE;
-    return attr;
+    తిరిగి attr;
 }
 
 /*
  * Store Vterm attributes in "cell" from highlight flags.
  */
-    static void
-hl2vtermAttr(int attr, cellattr_T *cell)
+    స్థిర శూన్య
+hl2vtermAttr(పూర్ణాంకం attr, cellattr_T *cell)
 {
-    CLEAR_FIELD(cell->attrs);
-    if (attr & HL_BOLD)
+    CLEAR_క్షేత్రం(cell->attrs);
+    ఒకవేళ (attr & HL_BOLD)
 	cell->attrs.bold = 1;
-    if (attr & HL_UNDERLINE)
+    ఒకవేళ (attr & HL_UNDERLINE)
 	cell->attrs.underline = 1;
-    if (attr & HL_ITALIC)
+    ఒకవేళ (attr & HL_ITALIC)
 	cell->attrs.italic = 1;
-    if (attr & HL_STRIKETHROUGH)
+    ఒకవేళ (attr & HL_STRIKETHROUGH)
 	cell->attrs.strike = 1;
-    if (attr & HL_INVERSE)
-	cell->attrs.reverse = 1;
+    ఒకవేళ (attr & HL_INVERSE)
+	cell->attrs.తిరగేయి = 1;
 }
 
 /*
  * Convert the attributes of a vterm cell into an attribute index.
  */
-    static int
+    స్థిర పూర్ణాంకం
 cell2attr(
-	term_T			*term,
+	పదం_T			*పదం,
 	win_T			*wp,
 	VTermScreenCellAttrs	*cellattrs,
 	VTermColor		*cellfg,
 	VTermColor		*cellbg)
 {
-    int attr = vtermAttr2hl(cellattrs);
+    పూర్ణాంకం attr = vtermAttr2hl(cellattrs);
     VTermColor *fg = cellfg;
     VTermColor *bg = cellbg;
-    int is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
-    int is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
+    పూర్ణాంకం is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
+    పూర్ణాంకం is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
 
-    if (is_default_fg || is_default_bg)
+    ఒకవేళ (is_default_fg || is_default_bg)
     {
-	if (wp != NULL && wp->w_hlfwin_id != 0)
+	ఒకవేళ (wp != ఖాళీ && wp->w_hlfwin_id != 0)
 	{
-	    if (is_default_fg)
-		fg = &wp->w_term_hlfwin.fg;
-	    if (is_default_bg)
-		bg = &wp->w_term_hlfwin.bg;
+	    ఒకవేళ (is_default_fg)
+		fg = &wp->w_పదం_hlfwin.fg;
+	    ఒకవేళ (is_default_bg)
+		bg = &wp->w_పదం_hlfwin.bg;
 	}
-	else
+	లేకపోతే
 	{
-	    if (is_default_fg)
-		fg = &term->tl_default_color.fg;
-	    if (is_default_bg)
-		bg = &term->tl_default_color.bg;
+	    ఒకవేళ (is_default_fg)
+		fg = &పదం->tl_default_color.fg;
+	    ఒకవేళ (is_default_bg)
+		bg = &పదం->tl_default_color.bg;
 	}
     }
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+    ఒకవేళ (gui.లోపల_use)
     {
 	guicolor_T guifg = gui_mch_get_rgb_color(fg->red, fg->green, fg->blue);
 	guicolor_T guibg = gui_mch_get_rgb_color(bg->red, bg->green, bg->blue);
-	return get_gui_attr_idx(attr, guifg, guibg);
+	తిరిగి get_gui_attr_idx(attr, guifg, guibg);
     }
-    else
-#endif
-#ifdef FEAT_TERMGUICOLORS
-    if (p_tgc)
+    లేకపోతే
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMGUICOLORS
+    ఒకవేళ (p_tgc)
     {
 	guicolor_T tgcfg = VTERM_COLOR_IS_INVALID(fg)
 	    ? INVALCOLOR
@@ -3394,258 +3394,258 @@ cell2attr(
 	guicolor_T tgcbg = VTERM_COLOR_IS_INVALID(bg)
 	    ? INVALCOLOR
 	    : gui_get_rgb_color_cmn(bg->red, bg->green, bg->blue);
-	return get_tgc_attr_idx(attr, tgcfg, tgcbg);
+	తిరిగి get_tgc_attr_idx(attr, tgcfg, tgcbg);
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	int bold = MAYBE;
-	int ctermfg = color2index(fg, TRUE, &bold);
-	int ctermbg = color2index(bg, FALSE, &bold);
+	పూర్ణాంకం bold = MAYBE;
+	పూర్ణాంకం ctermfg = color2index(fg, TRUE, &bold);
+	పూర్ణాంకం ctermbg = color2index(bg, FALSE, &bold);
 
 	// with 8 colors set the bold attribute to get a bright foreground
-	if (bold == TRUE)
+	ఒకవేళ (bold == TRUE)
 	    attr |= HL_BOLD;
 
-	return get_cterm_attr_idx(attr, ctermfg, ctermbg);
+	తిరిగి get_cterm_attr_idx(attr, ctermfg, ctermbg);
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static void
-set_dirty_snapshot(term_T *term)
+    స్థిర శూన్య
+సమితి_dirty_snapshot(పదం_T *పదం)
 {
-    term->tl_dirty_snapshot = TRUE;
-#ifdef FEAT_TIMERS
-    if (!term->tl_normal_mode)
+    పదం->tl_dirty_snapshot = TRUE;
+#నిర్వచితమైతే FEAT_TIMERS
+    ఒకవేళ (!పదం->tl_సాధారణ_బహుళకం)
     {
 	// Update the snapshot after 100 msec of not getting updates.
-	profile_setlimit(100L, &term->tl_timer_due);
-	term->tl_timer_set = TRUE;
+	profile_setlimit(100L, &పదం->tl_timer_due);
+	పదం->tl_timer_సమితి = TRUE;
     }
-#endif
+#అయితే_ముగింపు
 }
 
-    static int
-handle_damage(VTermRect rect, void *user)
+    స్థిర పూర్ణాంకం
+handle_damage(VTermRect rect, శూన్య *user)
 {
-    term_T *term = (term_T *)user;
+    పదం_T *పదం = (పదం_T *)user;
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, rect.start_row);
-    term->tl_dirty_row_end = MAX(term->tl_dirty_row_end, rect.end_row);
-    set_dirty_snapshot(term);
-    redraw_buf_later(term->tl_buffer, UPD_SOME_VALID);
-    return 1;
+    పదం->tl_dirty_అడ్డువరుస_ప్రారంభం = MIN(పదం->tl_dirty_అడ్డువరుస_ప్రారంభం, rect.ప్రారంభం_అడ్డువరుస);
+    పదం->tl_dirty_అడ్డువరుస_చివర = MAX(పదం->tl_dirty_అడ్డువరుస_చివర, rect.చివర_అడ్డువరుస);
+    సమితి_dirty_snapshot(పదం);
+    redraw_buf_later(పదం->tl_బఫరు, UPD_SOME_VALID);
+    తిరిగి 1;
 }
 
-    static void
-term_scroll_up(term_T *term, int start_row, int count)
+    స్థిర శూన్య
+పదం_scroll_పైకి(పదం_T *పదం, పూర్ణాంకం ప్రారంభం_అడ్డువరుస, పూర్ణాంకం లెక్క)
 {
-    win_T		 *wp = NULL;
-    int			 did_curwin = FALSE;
+    win_T		 *wp = ఖాళీ;
+    పూర్ణాంకం			 did_curwin = FALSE;
     VTermColor		 fg, bg;
     VTermScreenCellAttrs attr;
-    int			 clear_attr;
+    పూర్ణాంకం			 clear_attr;
 
-    CLEAR_FIELD(attr);
+    CLEAR_క్షేత్రం(attr);
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    అయితే (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
 	{
 	    // Set the color to clear lines with.
-	    vterm_state_get_default_colors(vterm_obtain_state(term->tl_vterm),
+	    vterm_state_get_default_colors(vterm_obtain_state(పదం->tl_vterm),
 								     &fg, &bg);
-	    clear_attr = cell2attr(term, wp, &attr, &fg, &bg);
-	    win_del_lines(wp, start_row, count, FALSE, FALSE, clear_attr);
+	    clear_attr = cell2attr(పదం, wp, &attr, &fg, &bg);
+	    win_del_పంక్తులు(wp, ప్రారంభం_అడ్డువరుస, లెక్క, FALSE, FALSE, clear_attr);
 	}
     }
 }
 
-    static int
-handle_moverect(VTermRect dest, VTermRect src, void *user)
+    స్థిర పూర్ణాంకం
+handle_moverect(VTermRect dest, VTermRect src, శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
-    int		count = src.start_row - dest.start_row;
+    పదం_T	*పదం = (పదం_T *)user;
+    పూర్ణాంకం		లెక్క = src.ప్రారంభం_అడ్డువరుస - dest.ప్రారంభం_అడ్డువరుస;
 
     // Scrolling up is done much more efficiently by deleting lines instead of
     // redrawing the text. But avoid doing this multiple times, postpone until
     // the redraw happens.
-    if (dest.start_col == src.start_col
-	    && dest.end_col == src.end_col
-	    && dest.start_row < src.start_row)
+    ఒకవేళ (dest.ప్రారంభం_నిలువు == src.ప్రారంభం_నిలువు
+	    && dest.చివర_నిలువు == src.చివర_నిలువు
+	    && dest.ప్రారంభం_అడ్డువరుస < src.ప్రారంభం_అడ్డువరుస)
     {
-	if (dest.start_row == 0)
-	    term->tl_postponed_scroll += count;
-	else
-	    term_scroll_up(term, dest.start_row, count);
+	ఒకవేళ (dest.ప్రారంభం_అడ్డువరుస == 0)
+	    పదం->tl_postponed_scroll += లెక్క;
+	లేకపోతే
+	    పదం_scroll_పైకి(పదం, dest.ప్రారంభం_అడ్డువరుస, లెక్క);
     }
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, dest.start_row);
-    term->tl_dirty_row_end = MIN(term->tl_dirty_row_end, dest.end_row);
-    set_dirty_snapshot(term);
+    పదం->tl_dirty_అడ్డువరుస_ప్రారంభం = MIN(పదం->tl_dirty_అడ్డువరుస_ప్రారంభం, dest.ప్రారంభం_అడ్డువరుస);
+    పదం->tl_dirty_అడ్డువరుస_చివర = MIN(పదం->tl_dirty_అడ్డువరుస_చివర, dest.చివర_అడ్డువరుస);
+    సమితి_dirty_snapshot(పదం);
 
     // Note sure if the scrolling will work correctly, let's do a complete
     // redraw later.
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
-    return 1;
+    redraw_buf_later(పదం->tl_బఫరు, UPD_NOT_VALID);
+    తిరిగి 1;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 handle_movecursor(
 	VTermPos pos,
-	VTermPos oldpos UNUSED,
-	int visible,
-	void *user)
+	VTermPos oldpos వాడని,
+	పూర్ణాంకం visible,
+	శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
-    win_T	*wp = NULL;
-    int		did_curwin = FALSE;
+    పదం_T	*పదం = (పదం_T *)user;
+    win_T	*wp = ఖాళీ;
+    పూర్ణాంకం		did_curwin = FALSE;
 
-    term->tl_cursor_pos = pos;
-    term->tl_cursor_visible = visible;
+    పదం->tl_cursor_pos = pos;
+    పదం->tl_cursor_visible = visible;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    అయితే (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
 	    position_cursor(wp, &pos);
     }
-    if (term->tl_buffer == curbuf && !term->tl_normal_mode)
+    ఒకవేళ (పదం->tl_బఫరు == curbuf && !పదం->tl_సాధారణ_బహుళకం)
 	// Don't redraw here, it will be done after
 	// vterm_input_write() is finished.
-	update_cursor(term, FALSE);
+	update_cursor(పదం, FALSE);
 
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 handle_settermprop(
 	VTermProp prop,
-	VTermValue *value,
-	void *user)
+	VTerm_విలువ *విలువ,
+	శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
-    char_u	*strval = NULL;
+    పదం_T	*పదం = (పదం_T *)user;
+    char_u	*strval = ఖాళీ;
 
-    switch (prop)
+    ఎంపిక (prop)
     {
-	case VTERM_PROP_TITLE:
-	    if (disable_vterm_title_for_testing)
-		break;
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    vim_free(term->tl_title);
+	స్థితి VTERM_PROP_TITLE:
+	    ఒకవేళ (disable_vterm_title_for_testing)
+		ఆపు;
+	    strval = vim_strnsave((char_u *)విలువ->string.str,
+							    విలువ->string.len);
+	    ఒకవేళ (strval == ఖాళీ)
+		ఆపు;
+	    vim_free(పదం->tl_title);
 	    // a blank title isn't useful, make it empty, so that "running" is
 	    // displayed
-	    if (*skipwhite(strval) == NUL)
-		term->tl_title = NULL;
+	    ఒకవేళ (*skipwhite(strval) == NUL)
+		పదం->tl_title = ఖాళీ;
 	    // Same as blank
-	    else if (term->tl_arg0_cmd != NULL
-		    && STRNCMP(term->tl_arg0_cmd, strval,
-					  (int)STRLEN(term->tl_arg0_cmd)) == 0)
-		term->tl_title = NULL;
+	    లేకపోతే ఒకవేళ (పదం->tl_arg0_cmd != ఖాళీ
+		    && STRNCMP(పదం->tl_arg0_cmd, strval,
+					  (పూర్ణాంకం)STRLEN(పదం->tl_arg0_cmd)) == 0)
+		పదం->tl_title = ఖాళీ;
 	    // Empty corrupted data of winpty
-	    else if (STRNCMP("  - ", strval, 4) == 0)
-		term->tl_title = NULL;
-#ifdef MSWIN
-	    else if (!enc_utf8 && enc_codepage > 0)
+	    లేకపోతే ఒకవేళ (STRNCMP("  - ", strval, 4) == 0)
+		పదం->tl_title = ఖాళీ;
+#నిర్వచితమైతే MSWIN
+	    లేకపోతే ఒకవేళ (!enc_utf8 && enc_codepage > 0)
 	    {
-		WCHAR   *ret = NULL;
-		int	length = 0;
+		WCHAR   *ret = ఖాళీ;
+		పూర్ణాంకం	నిడివి = 0;
 
-		MultiByteToWideChar_alloc(CP_UTF8, 0,
-			(char*)value->string.str,
-					(int)value->string.len, &ret, &length);
-		if (ret != NULL)
+		Multi_Byte_గమ్యం_Wide_Char_alloc(CP_UTF8, 0,
+			(అక్షరం*)విలువ->string.str,
+					(పూర్ణాంకం)విలువ->string.len, &ret, &నిడివి);
+		ఒకవేళ (ret != ఖాళీ)
 		{
-		    WideCharToMultiByte_alloc(enc_codepage, 0,
-					ret, length, (char**)&term->tl_title,
-					&length, 0, 0);
+		    Wide_Char_గమ్యం_Multi_Byte_alloc(enc_codepage, 0,
+					ret, నిడివి, (అక్షరం**)&పదం->tl_title,
+					&నిడివి, 0, 0);
 		    vim_free(ret);
 		}
 	    }
-#endif
-	    else
+#అయితే_ముగింపు
+	    లేకపోతే
 	    {
-		term->tl_title = strval;
-		strval = NULL;
+		పదం->tl_title = strval;
+		strval = ఖాళీ;
 	    }
-	    VIM_CLEAR(term->tl_status_text);
-	    if (term == curbuf->b_term)
+	    VIM_CLEAR(పదం->tl_స్థితి_పాఠ్యం);
+	    ఒకవేళ (పదం == curbuf->b_పదం)
 	    {
 		maketitle();
-		curwin->w_redr_status = true;
+		curwin->w_redr_స్థితి = true;
 	    }
-	    break;
+	    ఆపు;
 
-	case VTERM_PROP_CURSORVISIBLE:
-	    term->tl_cursor_visible = value->boolean;
-	    may_toggle_cursor(term);
-	    out_flush();
-	    break;
+	స్థితి VTERM_PROP_CURSORVISIBLE:
+	    పదం->tl_cursor_visible = విలువ->boolean;
+	    may_toggle_cursor(పదం);
+	    బహిర్గతం_flush();
+	    ఆపు;
 
-	case VTERM_PROP_CURSORBLINK:
-	    term->tl_cursor_blink = value->boolean;
-	    may_set_cursor_props(term);
-	    break;
+	స్థితి VTERM_PROP_CURSORBLINK:
+	    పదం->tl_cursor_blink = విలువ->boolean;
+	    may_సమితి_cursor_props(పదం);
+	    ఆపు;
 
-	case VTERM_PROP_CURSORSHAPE:
-	    term->tl_cursor_shape = value->number;
-	    may_set_cursor_props(term);
-	    break;
+	స్థితి VTERM_PROP_CURSORSHAPE:
+	    పదం->tl_cursor_shape = విలువ->సంఖ్య;
+	    may_సమితి_cursor_props(పదం);
+	    ఆపు;
 
-	case VTERM_PROP_CURSORCOLOR:
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    cursor_color_copy(&term->tl_cursor_color, strval);
-	    may_set_cursor_props(term);
-	    break;
+	స్థితి VTERM_PROP_CURSORCOLOR:
+	    strval = vim_strnsave((char_u *)విలువ->string.str,
+							    విలువ->string.len);
+	    ఒకవేళ (strval == ఖాళీ)
+		ఆపు;
+	    cursor_color_copy(&పదం->tl_cursor_color, strval);
+	    may_సమితి_cursor_props(పదం);
+	    ఆపు;
 
-	case VTERM_PROP_ALTSCREEN:
+	స్థితి VTERM_PROP_ALTSCREEN:
 	    // TODO: do anything else?
-	    term->tl_using_altscreen = value->boolean;
-	    break;
+	    పదం->tl_using_altscreen = విలువ->boolean;
+	    ఆపు;
 
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
     }
     vim_free(strval);
 
     // Always return 1, otherwise vterm doesn't store the value internally.
-    return 1;
+    తిరిగి 1;
 }
 
 /*
  * The job running in the terminal resized the terminal.
  */
-    static int
-handle_resize(int rows, int cols, void *user)
+    స్థిర పూర్ణాంకం
+handle_resize(పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య, శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
+    పదం_T	*పదం = (పదం_T *)user;
     win_T	*wp;
 
-    term->tl_rows = rows;
-    term->tl_cols = cols;
-    if (term->tl_vterm_size_changed)
+    పదం->tl_అడ్డువరుసలు = అడ్డువరుసలు_2;
+    పదం->tl_నిలువుల_సంఖ్య = నిలువుల_సంఖ్య;
+    ఒకవేళ (పదం->tl_vterm_కొలత_మారింది)
 	// Size was set by vterm_set_size(), don't set the window size.
-	term->tl_vterm_size_changed = FALSE;
-    else
+	పదం->tl_vterm_కొలత_మారింది = FALSE;
+    లేకపోతే
     {
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
 	    {
-		win_setheight_win(rows, wp);
-		win_setwidth_win(cols, wp);
+		win_setheight_win(అడ్డువరుసలు_2, wp);
+		win_setwidth_win(నిలువుల_సంఖ్య, wp);
 	    }
 	}
-	redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+	redraw_buf_later(పదం->tl_బఫరు, UPD_NOT_VALID);
     }
-    return 1;
+    తిరిగి 1;
 }
 
 /*
@@ -3654,46 +3654,46 @@ handle_resize(int rows, int cols, void *user)
  * "gap" points to tl_scrollback or tl_scrollback_postponed.
  * "update_buffer" is TRUE when the buffer should be updated.
  */
-    static void
-limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
+    స్థిర శూన్య
+హద్దు_scrollback(పదం_T *పదం, garray_T *gap, పూర్ణాంకం update_బఫరు)
 {
-    if (gap->ga_len < term->tl_buffer->b_p_twsl)
-	return;
+    ఒకవేళ (gap->ga_len < పదం->tl_బఫరు->b_p_twsl)
+	తిరిగి;
 
-    int	todo = MAX(term->tl_buffer->b_p_twsl / 10,
-				     gap->ga_len - term->tl_buffer->b_p_twsl);
-    int	i;
-    sb_line_T *sb_lines = (sb_line_T *)gap->ga_data;
+    పూర్ణాంకం	todo = MAX(పదం->tl_బఫరు->b_p_twsl / 10,
+				     gap->ga_len - పదం->tl_బఫరు->b_p_twsl);
+    పూర్ణాంకం	i;
+    sb_పంక్తి_T *sb_పంక్తులు = (sb_పంక్తి_T *)gap->ga_దత్తాంశం;
 
-    curbuf = term->tl_buffer;
-    for (i = 0; i < todo; ++i)
+    curbuf = పదం->tl_బఫరు;
+    కొరకు (i = 0; i < todo; ++i)
     {
-	if (update_buffer && (!sb_lines[i].continuation || !i))
+	ఒకవేళ (update_బఫరు && (!sb_పంక్తులు[i].continuation || !i))
 	{
 	    ml_delete(1);
-	    --term->tl_buffer_scrolled;
+	    --పదం->tl_బఫరు_scrolled;
 	}
-	vim_free(sb_lines[i].sb_cells);
+	vim_free(sb_పంక్తులు[i].sb_cells);
     }
     // Continue until end of wrapped line
-    for (; todo < gap->ga_len && sb_lines[todo].continuation; ++todo)
-	vim_free(sb_lines[todo].sb_cells);
-    curbuf = curwin->w_buffer;
+    కొరకు (; todo < gap->ga_len && sb_పంక్తులు[todo].continuation; ++todo)
+	vim_free(sb_పంక్తులు[todo].sb_cells);
+    curbuf = curwin->w_బఫరు;
 
     gap->ga_len -= todo;
-    mch_memmove(gap->ga_data,
-		(sb_line_T *)gap->ga_data + todo,
-		sizeof(sb_line_T) * gap->ga_len);
-    if (update_buffer)
+    mch_memmove(gap->ga_దత్తాంశం,
+		(sb_పంక్తి_T *)gap->ga_దత్తాంశం + todo,
+		పరిమాణం(sb_పంక్తి_T) * gap->ga_len);
+    ఒకవేళ (update_బఫరు)
     {
 	win_T *curwin_save = curwin;
-	win_T *wp = NULL;
+	win_T *wp = ఖాళీ;
 
-	term->tl_scrollback_scrolled -= todo;
+	పదం->tl_scrollback_scrolled -= todo;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
 	    {
 		curwin = wp;
 		check_cursor();
@@ -3707,181 +3707,181 @@ limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
 /*
  * Handle a line that is pushed off the top of the screen.
  */
-    static int
-handle_pushline(int cols, const VTermScreenCell *cells, int continuation, void *user)
+    స్థిర పూర్ణాంకం
+handle_pushline(పూర్ణాంకం నిలువుల_సంఖ్య, స్థిరరాశి VTermScreenCell *cells, పూర్ణాంకం continuation, శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
+    పదం_T	*పదం = (పదం_T *)user;
     garray_T	*gap;
-    int		update_buffer;
+    పూర్ణాంకం		update_బఫరు;
 
-    if (term->tl_normal_mode)
+    ఒకవేళ (పదం->tl_సాధారణ_బహుళకం)
     {
 	// In Terminal-Normal mode the user interacts with the buffer, thus we
 	// must not change it. Postpone adding the scrollback lines.
-	gap = &term->tl_scrollback_postponed;
-	update_buffer = FALSE;
+	gap = &పదం->tl_scrollback_postponed;
+	update_బఫరు = FALSE;
     }
-    else
+    లేకపోతే
     {
 	// First remove the lines that were appended before, the pushed line
 	// goes above it.
-	cleanup_scrollback(term);
-	gap = &term->tl_scrollback;
-	update_buffer = TRUE;
+	cleanup_scrollback(పదం);
+	gap = &పదం->tl_scrollback;
+	update_బఫరు = TRUE;
     }
 
-    limit_scrollback(term, gap, update_buffer);
+    హద్దు_scrollback(పదం, gap, update_బఫరు);
 
-    if (ga_grow(gap, 1) == FAIL)
-	return 0;
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి 0;
 
-    cellattr_T	*p = NULL;
-    int		len = 0;
-    int		i;
-    int		c;
-    int		col;
-    int		text_len;
-    char_u		*text;
-    sb_line_T	*line;
+    cellattr_T	*p = ఖాళీ;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		నిలువు;
+    పూర్ణాంకం		పాఠ్యం_len;
+    char_u		*పాఠ్యం;
+    sb_పంక్తి_T	*పంక్తి;
     garray_T	ga;
-    cellattr_T	fill_attr = term->tl_default_color;
+    cellattr_T	fill_attr = పదం->tl_default_color;
 
     // do not store empty cells at the end
-    for (i = 0; i < cols; ++i)
-	if (cells[i].chars[0] != 0)
+    కొరకు (i = 0; i < నిలువుల_సంఖ్య; ++i)
+	ఒకవేళ (cells[i].chars[0] != 0)
 	    len = i + 1;
-	else
+	లేకపోతే
 	    cell2cellattr(&cells[i], &fill_attr);
 
     ga_init2(&ga, 1, 100);
-    if (len > 0)
+    ఒకవేళ (len > 0)
 	p = ALLOC_MULT(cellattr_T, len);
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
     {
-	for (col = 0; col < len; col += cells[col].width)
+	కొరకు (నిలువు = 0; నిలువు < len; నిలువు += cells[నిలువు].వెడల్పు)
 	{
-	    if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 4) == FAIL)
+	    ఒకవేళ (ga_grow(&ga, VTERM_MAX_CHARS_చొప్పున_CELL * 4) == FAIL)
 	    {
 		ga.ga_len = 0;
-		break;
+		ఆపు;
 	    }
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
-		    ((c = cells[col].chars[i]) > 0 || i == 0); ++i)
+	    కొరకు (i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL &&
+		    ((c = cells[నిలువు].chars[i]) > 0 || i == 0); ++i)
 		ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-			(char_u *)ga.ga_data + ga.ga_len);
-	    cell2cellattr(&cells[col], &p[col]);
+			(char_u *)ga.ga_దత్తాంశం + ga.ga_len);
+	    cell2cellattr(&cells[నిలువు], &p[నిలువు]);
 	}
     }
-    if (ga_grow(&ga, 1) == FAIL)
+    ఒకవేళ (ga_grow(&ga, 1) == FAIL)
     {
-	if (update_buffer)
-	    text = (char_u *)"";
-	else
-	    text = vim_strsave((char_u *)"");
-	text_len = 0;
+	ఒకవేళ (update_బఫరు)
+	    పాఠ్యం = (char_u *)"";
+	లేకపోతే
+	    పాఠ్యం = vim_strsave((char_u *)"");
+	పాఠ్యం_len = 0;
     }
-    else
+    లేకపోతే
     {
-	text = ga.ga_data;
-	text_len = ga.ga_len;
-	*(text + text_len) = NUL;
+	పాఠ్యం = ga.ga_దత్తాంశం;
+	పాఠ్యం_len = ga.ga_len;
+	*(పాఠ్యం + పాఠ్యం_len) = NUL;
     }
-    if (update_buffer)
-	add_scrollback_line_to_buffer(term, text, text_len, continuation);
+    ఒకవేళ (update_బఫరు)
+	కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, పాఠ్యం, పాఠ్యం_len, continuation);
 
-    line = (sb_line_T *)gap->ga_data + gap->ga_len;
-    line->sb_cols = len;
-    line->sb_bytes = text_len;
-    line->sb_cells = p;
-    line->sb_fill_attr = fill_attr;
-    line->continuation = (char_u)continuation;
-    if (update_buffer)
+    పంక్తి = (sb_పంక్తి_T *)gap->ga_దత్తాంశం + gap->ga_len;
+    పంక్తి->sb_నిలువుల_సంఖ్య = len;
+    పంక్తి->sb_బైట్లు = పాఠ్యం_len;
+    పంక్తి->sb_cells = p;
+    పంక్తి->sb_fill_attr = fill_attr;
+    పంక్తి->continuation = (char_u)continuation;
+    ఒకవేళ (update_బఫరు)
     {
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	if (!continuation)
-	    ++term->tl_buffer_scrolled;
+	పంక్తి->sb_పాఠ్యం = ఖాళీ;
+	++పదం->tl_scrollback_scrolled;
+	ఒకవేళ (!continuation)
+	    ++పదం->tl_బఫరు_scrolled;
 	ga_clear(&ga);  // free the text
     }
-    else
+    లేకపోతే
     {
-	line->sb_text = text;
+	పంక్తి->sb_పాఠ్యం = పాఠ్యం;
 	ga_init(&ga);  // text is kept in tl_scrollback_postponed
     }
     ++gap->ga_len;
-    return 0; // ignored
+    తిరిగి 0; // ignored
 }
 
 /*
  * Called when leaving Terminal-Normal mode: deal with any scrollback that was
  * received and stored in tl_scrollback_postponed.
  */
-    static void
-handle_postponed_scrollback(term_T *term)
+    స్థిర శూన్య
+handle_postponed_scrollback(పదం_T *పదం)
 {
-    int i;
+    పూర్ణాంకం i;
 
-    if (term->tl_scrollback_postponed.ga_len == 0)
-	return;
-    ch_log(NULL, "Moving postponed scrollback to scrollback");
+    ఒకవేళ (పదం->tl_scrollback_postponed.ga_len == 0)
+	తిరిగి;
+    ch_log(ఖాళీ, "Moving postponed scrollback to scrollback");
 
     // First remove the lines that were appended before, the pushed lines go
     // above it.
-    cleanup_scrollback(term);
+    cleanup_scrollback(పదం);
 
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
+    కొరకు (i = 0; i < పదం->tl_scrollback_postponed.ga_len; ++i)
     {
-	char_u		*text;
-	sb_line_T	*pp_line;
-	sb_line_T	*line;
+	char_u		*పాఠ్యం;
+	sb_పంక్తి_T	*pp_పంక్తి;
+	sb_పంక్తి_T	*పంక్తి;
 
-	if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	    break;
-	pp_line = (sb_line_T *)term->tl_scrollback_postponed.ga_data + i;
+	ఒకవేళ (ga_grow(&పదం->tl_scrollback, 1) == FAIL)
+	    ఆపు;
+	pp_పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback_postponed.ga_దత్తాంశం + i;
 
-	text = pp_line->sb_text;
-	if (text == NULL)
-	    text = (char_u *)"";
-	add_scrollback_line_to_buffer(term, text, (int)STRLEN(text), pp_line->continuation);
-	vim_free(pp_line->sb_text);
+	పాఠ్యం = pp_పంక్తి->sb_పాఠ్యం;
+	ఒకవేళ (పాఠ్యం == ఖాళీ)
+	    పాఠ్యం = (char_u *)"";
+	కూడు_scrollback_పంక్తి_గమ్యం_బఫరు(పదం, పాఠ్యం, (పూర్ణాంకం)STRLEN(పాఠ్యం), pp_పంక్తి->continuation);
+	vim_free(pp_పంక్తి->sb_పాఠ్యం);
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data
-						 + term->tl_scrollback.ga_len;
-	line->sb_cols = pp_line->sb_cols;
-	line->sb_bytes = pp_line->sb_bytes;
-	line->sb_cells = pp_line->sb_cells;
-	line->sb_fill_attr = pp_line->sb_fill_attr;
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	++term->tl_scrollback.ga_len;
-	if (!pp_line->continuation)
-	    ++term->tl_buffer_scrolled;
+	పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం
+						 + పదం->tl_scrollback.ga_len;
+	పంక్తి->sb_నిలువుల_సంఖ్య = pp_పంక్తి->sb_నిలువుల_సంఖ్య;
+	పంక్తి->sb_బైట్లు = pp_పంక్తి->sb_బైట్లు;
+	పంక్తి->sb_cells = pp_పంక్తి->sb_cells;
+	పంక్తి->sb_fill_attr = pp_పంక్తి->sb_fill_attr;
+	పంక్తి->sb_పాఠ్యం = ఖాళీ;
+	++పదం->tl_scrollback_scrolled;
+	++పదం->tl_scrollback.ga_len;
+	ఒకవేళ (!pp_పంక్తి->continuation)
+	    ++పదం->tl_బఫరు_scrolled;
     }
 
-    ga_clear(&term->tl_scrollback_postponed);
-    limit_scrollback(term, &term->tl_scrollback, TRUE);
+    ga_clear(&పదం->tl_scrollback_postponed);
+    హద్దు_scrollback(పదం, &పదం->tl_scrollback, TRUE);
 }
 
 /*
  * Called when the terminal wants to ring the system bell.
  */
-    static int
-handle_bell(void *user UNUSED)
+    స్థిర పూర్ణాంకం
+handle_bell(శూన్య *user వాడని)
 {
-    vim_beep(BO_TERM);
-    return 0;
+    vim_beep(BO_పదం);
+    తిరిగి 0;
 }
 
-static VTermScreenCallbacks screen_callbacks = {
+స్థిర VTermScreenCallbacks screen_callbacks = {
     handle_damage,		// damage
     handle_moverect,		// moverect
     handle_movecursor,		// movecursor
     handle_settermprop,		// settermprop
     handle_bell,		// bell
     handle_resize,		// resize
-    NULL,			// sb_pushline
-    NULL,			// sb_popline
-    NULL,			// sb_clear
+    ఖాళీ,			// sb_pushline
+    ఖాళీ,			// sb_popline
+    ఖాళీ,			// sb_clear
     handle_pushline	// sb_pushline4
 };
 
@@ -3890,170 +3890,170 @@ static VTermScreenCallbacks screen_callbacks = {
  * Must be called only when updating_screen is FALSE.
  * Returns TRUE when a buffer was closed (list of terminals may have changed).
  */
-    static int
-term_after_channel_closed(term_T *term)
+    స్థిర పూర్ణాంకం
+పదం_after_channel_closed(పదం_T *పదం)
 {
     // Unless in Terminal-Normal mode: clear the vterm.
-    if (!term->tl_normal_mode)
+    ఒకవేళ (!పదం->tl_సాధారణ_బహుళకం)
     {
-	int	fnum = term->tl_buffer->b_fnum;
+	పూర్ణాంకం	fnum = పదం->tl_బఫరు->b_fnum;
 
-	cleanup_vterm(term);
+	cleanup_vterm(పదం);
 
-	if (term->tl_finish == TL_FINISH_CLOSE)
+	ఒకవేళ (పదం->tl_ముగింపు == TL_ముగింపు_CLOSE)
 	{
 	    aco_save_T	aco;
-	    int		do_set_w_locked = term->tl_buffer->b_nwindows == 0;
-#ifdef FEAT_PROP_POPUP
-	    win_T	*pwin = NULL;
+	    పూర్ణాంకం		do_సమితి_w_locked = పదం->tl_బఫరు->b_nwindows == 0;
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    win_T	*pwin = ఖాళీ;
 
 	    // If this was a terminal in a popup window, go back to the
 	    // previous window.
-	    if (popup_is_popup(curwin) && curbuf == term->tl_buffer)
+	    ఒకవేళ (popup_is_popup(curwin) && curbuf == పదం->tl_బఫరు)
 	    {
 		pwin = curwin;
-		if (win_valid(prevwin))
+		ఒకవేళ (win_valid(prevwin))
 		    win_enter(prevwin, FALSE);
 	    }
-	    else
-#endif
+	    లేకపోతే
+#అయితే_ముగింపు
 	    // If this is the last normal window: exit Vim.
-	    if (term->tl_buffer->b_nwindows > 0 && only_one_window())
+	    ఒకవేళ (పదం->tl_బఫరు->b_nwindows > 0 && only_one_కిటికీ())
 	    {
 		exarg_T ea;
 
-		CLEAR_FIELD(ea);
+		CLEAR_క్షేత్రం(ea);
 		ex_quit(&ea);
-		return TRUE;
+		తిరిగి TRUE;
 	    }
 
 	    // ++close or term_finish == "close"
-	    ch_log(NULL, "terminal job finished, closing window");
-	    aucmd_prepbuf(&aco, term->tl_buffer);
-	    if (curbuf == term->tl_buffer)
+	    ch_log(ఖాళీ, "terminal job finished, closing window");
+	    aucmd_prepbuf(&aco, పదం->tl_బఫరు);
+	    ఒకవేళ (curbuf == పదం->tl_బఫరు)
 	    {
 		win_T	*wp = curwin;
 
 		// Avoid closing the window if we temporarily use it.
-		if (is_aucmd_win(wp))
-		    do_set_w_locked = TRUE;
-		if (do_set_w_locked)
+		ఒకవేళ (is_aucmd_win(wp))
+		    do_సమితి_w_locked = TRUE;
+		ఒకవేళ (do_సమితి_w_locked)
 		    ++wp->w_locked;
 		do_bufdel(DOBUF_WIPE, (char_u *)"", 1, fnum, fnum, FALSE);
-		if (do_set_w_locked)
+		ఒకవేళ (do_సమితి_w_locked)
 		    --wp->w_locked;
 		aucmd_restbuf(&aco);
 	    }
-#ifdef FEAT_PROP_POPUP
-	    if (pwin != NULL)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	    ఒకవేళ (pwin != ఖాళీ)
 		popup_close_with_retval(pwin, 0);
-#endif
-	    return TRUE;
+#అయితే_ముగింపు
+	    తిరిగి TRUE;
 	}
-	if (term->tl_finish == TL_FINISH_OPEN
-				   && term->tl_buffer->b_nwindows == 0)
+	ఒకవేళ (పదం->tl_ముగింపు == TL_ముగింపు_OPEN
+				   && పదం->tl_బఫరు->b_nwindows == 0)
 	{
-	    char    *cmd = term->tl_opencmd == NULL
+	    అక్షరం    *cmd = పదం->tl_opencmd == ఖాళీ
 				? "botright sbuf %d"
-				: (char *)term->tl_opencmd;
-	    size_t  len = strlen(cmd) + 50;
-	    char    *buf = alloc(len);
+				: (అక్షరం *)పదం->tl_opencmd;
+	    size_t  len = అక్షరశ్రేణి_పొడవు(cmd) + 50;
+	    అక్షరం    *buf = alloc(len);
 
-	    if (buf != NULL)
+	    ఒకవేళ (buf != ఖాళీ)
 	    {
-		ch_log(NULL, "terminal job finished, opening window");
+		ch_log(ఖాళీ, "terminal job finished, opening window");
 		vim_snprintf(buf, len, cmd, fnum);
 		do_cmdline_cmd((char_u *)buf);
 		vim_free(buf);
 	    }
 	}
-	else
-	    ch_log(NULL, "terminal job finished");
+	లేకపోతే
+	    ch_log(ఖాళీ, "terminal job finished");
     }
 
-    redraw_buf_and_status_later(term->tl_buffer, UPD_NOT_VALID);
-    return FALSE;
+    redraw_buf_and_స్థితి_later(పదం->tl_బఫరు, UPD_NOT_VALID);
+    తిరిగి FALSE;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ఒకవేళ defined(FEAT_PROP_POPUP)
 /*
  * If the current window is a terminal in a popup window and the job has
  * finished, close the popup window and to back to the previous window.
  * Otherwise return FAIL.
  */
-    int
-may_close_term_popup(void)
+    పూర్ణాంకం
+may_close_పదం_popup(శూన్య)
 {
-    if (!popup_is_popup(curwin) || curbuf->b_term == NULL
-				 || term_job_running_not_none(curbuf->b_term))
-	return FAIL;
+    ఒకవేళ (!popup_is_popup(curwin) || curbuf->b_పదం == ఖాళీ
+				 || పదం_పని_running_not_none(curbuf->b_పదం))
+	తిరిగి FAIL;
 
     win_T *pwin = curwin;
 
-    if (win_valid(prevwin))
+    ఒకవేళ (win_valid(prevwin))
 	win_enter(prevwin, FALSE);
     popup_close_with_retval(pwin, 0);
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Called when a channel is going to be closed, before invoking the close
  * callback.
  */
-    void
-term_channel_closing(channel_T *ch)
+    శూన్య
+పదం_channel_closing(channel_T *ch)
 {
-    term_T *term;
+    పదం_T *పదం;
 
-    for (term = first_term; term != NULL; term = term->tl_next)
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
-	    term->tl_channel_closing = TRUE;
+    కొరకు (పదం = మొదటి_పదం; పదం != ఖాళీ; పదం = పదం->tl_తదుపరి)
+	ఒకవేళ (పదం->tl_పని == ch->ch_పని && !పదం->tl_channel_closed)
+	    పదం->tl_channel_closing = TRUE;
 }
 
 /*
  * Called when a channel has been closed.
  * If this was a channel for a terminal window then finish it up.
  */
-    void
-term_channel_closed(channel_T *ch)
+    శూన్య
+పదం_channel_closed(channel_T *ch)
 {
-    term_T *term;
-    term_T *next_term;
-    int	    did_one = FALSE;
+    పదం_T *పదం;
+    పదం_T *తదుపరి_పదం;
+    పూర్ణాంకం	    did_one = FALSE;
 
-    for (term = first_term; term != NULL; term = next_term)
+    కొరకు (పదం = మొదటి_పదం; పదం != ఖాళీ; పదం = తదుపరి_పదం)
     {
-	next_term = term->tl_next;
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
+	తదుపరి_పదం = పదం->tl_తదుపరి;
+	ఒకవేళ (పదం->tl_పని == ch->ch_పని && !పదం->tl_channel_closed)
 	{
-	    term->tl_channel_closed = TRUE;
+	    పదం->tl_channel_closed = TRUE;
 	    did_one = TRUE;
 
-	    VIM_CLEAR(term->tl_title);
-	    VIM_CLEAR(term->tl_status_text);
-#ifdef MSWIN
-	    if (term->tl_out_fd != NULL)
+	    VIM_CLEAR(పదం->tl_title);
+	    VIM_CLEAR(పదం->tl_స్థితి_పాఠ్యం);
+#నిర్వచితమైతే MSWIN
+	    ఒకవేళ (పదం->tl_బహిర్గతం_fd != ఖాళీ)
 	    {
-		fclose(term->tl_out_fd);
-		term->tl_out_fd = NULL;
+		fclose(పదం->tl_బహిర్గతం_fd);
+		పదం->tl_బహిర్గతం_fd = ఖాళీ;
 	    }
-#endif
+#అయితే_ముగింపు
 
-	    if (updating_screen)
+	    ఒకవేళ (updating_screen)
 	    {
 		// Cannot open or close windows now.  Can happen when
 		// 'lazyredraw' is set.
-		term->tl_channel_recently_closed = TRUE;
-		continue;
+		పదం->tl_channel_recently_closed = TRUE;
+		కొనసాగు;
 	    }
 
-	    if (term_after_channel_closed(term))
-		next_term = first_term;
+	    ఒకవేళ (పదం_after_channel_closed(పదం))
+		తదుపరి_పదం = మొదటి_పదం;
 	}
     }
 
-    if (did_one)
+    ఒకవేళ (did_one)
     {
 	redraw_statuslines();
 
@@ -4061,12 +4061,12 @@ term_channel_closed(channel_T *ch)
 	ins_char_typebuf(K_IGNORE, 0);
 	typebuf_was_filled = TRUE;
 
-	term = curbuf->b_term;
-	if (term != NULL)
+	పదం = curbuf->b_పదం;
+	ఒకవేళ (పదం != ఖాళీ)
 	{
-	    if (term->tl_job == ch->ch_job)
+	    ఒకవేళ (పదం->tl_పని == ch->ch_పని)
 		maketitle();
-	    update_cursor(term, term->tl_cursor_visible);
+	    update_cursor(పదం, పదం->tl_cursor_visible);
 	}
     }
 }
@@ -4075,21 +4075,21 @@ term_channel_closed(channel_T *ch)
  * To be called after resetting updating_screen: handle any terminal where the
  * channel was closed.
  */
-    void
-term_check_channel_closed_recently(void)
+    శూన్య
+పదం_check_channel_closed_recently(శూన్య)
 {
-    term_T *term;
-    term_T *next_term;
+    పదం_T *పదం;
+    పదం_T *తదుపరి_పదం;
 
-    for (term = first_term; term != NULL; term = next_term)
+    కొరకు (పదం = మొదటి_పదం; పదం != ఖాళీ; పదం = తదుపరి_పదం)
     {
-	next_term = term->tl_next;
-	if (term->tl_channel_recently_closed)
+	తదుపరి_పదం = పదం->tl_తదుపరి;
+	ఒకవేళ (పదం->tl_channel_recently_closed)
 	{
-	    term->tl_channel_recently_closed = FALSE;
-	    if (term_after_channel_closed(term))
+	    పదం->tl_channel_recently_closed = FALSE;
+	    ఒకవేళ (పదం_after_channel_closed(పదం))
 		// start over, the list may have changed
-		next_term = first_term;
+		తదుపరి_పదం = మొదటి_పదం;
 	}
     }
 }
@@ -4098,273 +4098,273 @@ term_check_channel_closed_recently(void)
  * Fill one screen line from a line of the terminal.
  * Advances "pos" to past the last column.
  */
-    static void
-term_line2screenline(
-	term_T		*term,
+    స్థిర శూన్య
+పదం_line2screenline(
+	పదం_T		*పదం,
 	win_T		*wp,
 	VTermScreen	*screen,
 	VTermPos	*pos,
-	int		max_col)
+	పూర్ణాంకం		max_నిలువు)
 {
-    int off = screen_get_current_line_off();
+    పూర్ణాంకం off = screen_get_current_పంక్తి_off();
 
-    for (pos->col = 0; pos->col < max_col; )
+    కొరకు (pos->నిలువు = 0; pos->నిలువు < max_నిలువు; )
     {
 	VTermScreenCell cell;
-	int		c;
+	పూర్ణాంకం		c;
 
-	if (vterm_screen_get_cell(screen, *pos, &cell) == 0)
-	    CLEAR_FIELD(cell);
+	ఒకవేళ (vterm_screen_get_cell(screen, *pos, &cell) == 0)
+	    CLEAR_క్షేత్రం(cell);
 
 	c = cell.chars[0];
-	if (c == NUL)
+	ఒకవేళ (c == NUL)
 	{
-	    ScreenLines[off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = NUL;
+	    Screen_పంక్తులు[off] = ' ';
+	    ఒకవేళ (enc_utf8)
+		Screen_పంక్తులు_UC[off] = NUL;
 	}
-	else
+	లేకపోతే
 	{
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		int i;
+		పూర్ణాంకం i;
 
 		// composing chars
-		for (i = 0; i < Screen_mco
-			      && i + 1 < VTERM_MAX_CHARS_PER_CELL; ++i)
+		కొరకు (i = 0; i < Screen_mco
+			      && i + 1 < VTERM_MAX_CHARS_చొప్పున_CELL; ++i)
 		{
-		    ScreenLinesC[i][off] = cell.chars[i + 1];
-		    if (cell.chars[i + 1] == 0)
-			break;
+		    Screen_పంక్తులు_C[i][off] = cell.chars[i + 1];
+		    ఒకవేళ (cell.chars[i + 1] == 0)
+			ఆపు;
 		}
-		if (c >= 0x80 || (Screen_mco > 0
-					 && ScreenLinesC[0][off] != 0))
+		ఒకవేళ (c >= 0x80 || (Screen_mco > 0
+					 && Screen_పంక్తులు_C[0][off] != 0))
 		{
-		    ScreenLines[off] = ' ';
-		    ScreenLinesUC[off] = c;
+		    Screen_పంక్తులు[off] = ' ';
+		    Screen_పంక్తులు_UC[off] = c;
 		}
-		else
+		లేకపోతే
 		{
-		    ScreenLines[off] = c;
-		    ScreenLinesUC[off] = NUL;
+		    Screen_పంక్తులు[off] = c;
+		    Screen_పంక్తులు_UC[off] = NUL;
 		}
 	    }
-#ifdef MSWIN
-	    else if (has_mbyte && c >= 0x80)
+#నిర్వచితమైతే MSWIN
+	    లేకపోతే ఒకవేళ (has_mbyte && c >= 0x80)
 	    {
 		char_u	mb[MB_MAXBYTES+1];
 		WCHAR	wc = c;
 
-		if (WideCharToMultiByte(GetACP(), 0, &wc, 1,
-					       (char*)mb, 2, 0, 0) > 1)
+		ఒకవేళ (Wide_Char_గమ్యం_Multi_Byte(GetACP(), 0, &wc, 1,
+					       (అక్షరం*)mb, 2, 0, 0) > 1)
 		{
-		    ScreenLines[off] = mb[0];
-		    ScreenLines[off + 1] = mb[1];
-		    cell.width = mb_ptr2cells(mb);
+		    Screen_పంక్తులు[off] = mb[0];
+		    Screen_పంక్తులు[off + 1] = mb[1];
+		    cell.వెడల్పు = mb_ptr2cells(mb);
 		}
-		else
-		    ScreenLines[off] = c;
+		లేకపోతే
+		    Screen_పంక్తులు[off] = c;
 	    }
-#endif
-	    else
+#అయితే_ముగింపు
+	    లేకపోతే
 		// This will only store the lower byte of "c".
-		ScreenLines[off] = c;
+		Screen_పంక్తులు[off] = c;
 	}
-	ScreenAttrs[off] = cell2attr(term, wp, &cell.attrs, &cell.fg,
+	ScreenAttrs[off] = cell2attr(పదం, wp, &cell.attrs, &cell.fg,
 								     &cell.bg);
 
-	++pos->col;
+	++pos->నిలువు;
 	++off;
-	if (cell.width == 2)
+	ఒకవేళ (cell.వెడల్పు == 2)
 	{
 	    // don't set the second byte to NUL for a DBCS encoding, it
 	    // has been set above
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		ScreenLinesUC[off] = NUL;
-		ScreenLines[off] = NUL;
+		Screen_పంక్తులు_UC[off] = NUL;
+		Screen_పంక్తులు[off] = NUL;
 	    }
-	    else if (!has_mbyte)
+	    లేకపోతే ఒకవేళ (!has_mbyte)
 	    {
 		// Can't show a double-width character with a single-byte
 		// 'encoding', just use a space.
-		ScreenLines[off] = ' ';
+		Screen_పంక్తులు[off] = ' ';
 		ScreenAttrs[off] = ScreenAttrs[off - 1];
 	    }
 
-	    ++pos->col;
+	    ++pos->నిలువు;
 	    ++off;
 	}
     }
 }
 
-#if defined(FEAT_GUI)
-    static void
-update_system_term(term_T *term)
+#ఒకవేళ defined(FEAT_GUI)
+    స్థిర శూన్య
+update_system_పదం(పదం_T *పదం)
 {
     VTermPos	    pos;
     VTermScreen	    *screen;
 
-    if (term->tl_vterm == NULL)
-	return;
-    screen = vterm_obtain_screen(term->tl_vterm);
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
+    screen = vterm_obtain_screen(పదం->tl_vterm);
 
     // Scroll up to make more room for terminal lines if needed.
     // Use the cursor position to determine how much to scroll, because
     // ConPTY may damage all rows on initialization even when most are
     // empty, which would cause unnecessary scrolling.
-    while (term->tl_toprow > 0
-		  && (Rows - term->tl_toprow) < term->tl_cursor_pos.row + 1)
+    అయితే (పదం->tl_toprow > 0
+		  && (అడ్డువరుసలు - పదం->tl_toprow) < పదం->tl_cursor_pos.అడ్డువరుస + 1)
     {
-	int save_p_more = p_more;
+	పూర్ణాంకం save_p_మరిన్ని = p_మరిన్ని;
 
-	p_more = FALSE;
-	msg_row = Rows - 1;
-	msg_puts("\n");
-	p_more = save_p_more;
-	--term->tl_toprow;
+	p_మరిన్ని = FALSE;
+	సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
+	సందేశం_puts("\n");
+	p_మరిన్ని = save_p_మరిన్ని;
+	--పదం->tl_toprow;
     }
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-						  && pos.row < Rows; ++pos.row)
+    కొరకు (pos.అడ్డువరుస = పదం->tl_dirty_అడ్డువరుస_ప్రారంభం; pos.అడ్డువరుస < పదం->tl_dirty_అడ్డువరుస_చివర
+						  && pos.అడ్డువరుస < అడ్డువరుసలు; ++pos.అడ్డువరుస)
     {
-	if (pos.row < term->tl_rows)
+	ఒకవేళ (pos.అడ్డువరుస < పదం->tl_అడ్డువరుసలు)
 	{
-	    int max_col = MIN(topframe->fr_width, term->tl_cols);
+	    పూర్ణాంకం max_నిలువు = MIN(topframe->fr_వెడల్పు, పదం->tl_నిలువుల_సంఖ్య);
 
-	    term_line2screenline(term, NULL, screen, &pos, max_col);
+	    పదం_line2screenline(పదం, ఖాళీ, screen, &pos, max_నిలువు);
 	}
-	else
-	    pos.col = 0;
+	లేకపోతే
+	    pos.నిలువు = 0;
 
-	screen_line(curwin, term->tl_toprow + pos.row,
-		firstwin->w_wincol, pos.col, topframe->fr_width, -1, 0);
+	screen_పంక్తి(curwin, పదం->tl_toprow + pos.అడ్డువరుస,
+		firstwin->w_wincol, pos.నిలువు, topframe->fr_వెడల్పు, -1, 0);
     }
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    పదం->tl_dirty_అడ్డువరుస_ప్రారంభం = MAX_అడ్డువరుస;
+    పదం->tl_dirty_అడ్డువరుస_చివర = 0;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if window "wp" is to be redrawn with term_update_window().
  * Returns FALSE when there is no terminal running in this window or it is in
  * Terminal-Normal mode.
  */
-    int
-term_do_update_window(win_T *wp)
+    పూర్ణాంకం
+పదం_do_update_కిటికీ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    పదం_T	*పదం = wp->w_బఫరు->b_పదం;
 
-    return term != NULL && term->tl_vterm != NULL && !term->tl_normal_mode;
+    తిరిగి పదం != ఖాళీ && పదం->tl_vterm != ఖాళీ && !పదం->tl_సాధారణ_బహుళకం;
 }
 
 /*
  * Called to update a window that contains an active terminal.
  */
-    void
-term_update_window(win_T *wp)
+    శూన్య
+పదం_update_కిటికీ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    పదం_T	*పదం = wp->w_బఫరు->b_పదం;
     VTerm	*vterm;
     VTermScreen *screen;
     VTermState	*state;
     VTermPos	pos;
-    int		rows, cols;
-    int		newrows, newcols;
-    int		minsize;
+    పూర్ణాంకం		అడ్డువరుసలు_2, నిలువుల_సంఖ్య;
+    పూర్ణాంకం		newrows, newcols;
+    పూర్ణాంకం		minsize;
     win_T	*twp;
 
-    vterm = term->tl_vterm;
+    vterm = పదం->tl_vterm;
     screen = vterm_obtain_screen(vterm);
     state = vterm_obtain_state(vterm);
 
     // We use UPD_NOT_VALID on a resize or scroll, redraw everything then.
     // With UPD_SOME_VALID only redraw what was marked dirty.
-    if (wp->w_redr_type > UPD_SOME_VALID)
+    ఒకవేళ (wp->w_redr_type > UPD_SOME_VALID)
     {
-	term->tl_dirty_row_start = 0;
-	term->tl_dirty_row_end = MAX_ROW;
+	పదం->tl_dirty_అడ్డువరుస_ప్రారంభం = 0;
+	పదం->tl_dirty_అడ్డువరుస_చివర = MAX_అడ్డువరుస;
 
-	if (term->tl_postponed_scroll > 0
-			      && term->tl_postponed_scroll < term->tl_rows / 3)
+	ఒకవేళ (పదం->tl_postponed_scroll > 0
+			      && పదం->tl_postponed_scroll < పదం->tl_అడ్డువరుసలు / 3)
 	    // Scrolling is usually faster than redrawing, when there are only
 	    // a few lines to scroll.
-	    term_scroll_up(term, 0, term->tl_postponed_scroll);
-	term->tl_postponed_scroll = 0;
+	    పదం_scroll_పైకి(పదం, 0, పదం->tl_postponed_scroll);
+	పదం->tl_postponed_scroll = 0;
     }
 
     /*
      * If the window was resized a redraw will be triggered and we get here.
      * Adjust the size of the vterm unless 'termwinsize' specifies a fixed size.
      */
-    minsize = parse_termwinsize(wp, &rows, &cols);
+    minsize = parse_termwinsize(wp, &అడ్డువరుసలు_2, &నిలువుల_సంఖ్య);
 
     newrows = 99999;
     newcols = 99999;
-    for (twp = firstwin; ; twp = twp->w_next)
+    కొరకు (twp = firstwin; ; twp = twp->w_తదుపరి)
     {
 	// Always use curwin, it may be a popup window.
-	win_T *wwp = twp == NULL ? curwin : twp;
+	win_T *wwp = twp == ఖాళీ ? curwin : twp;
 
 	// When more than one window shows the same terminal, use the
 	// smallest size.
-	if (wwp->w_buffer == term->tl_buffer)
+	ఒకవేళ (wwp->w_బఫరు == పదం->tl_బఫరు)
 	{
-	    newrows = MIN(newrows, wwp->w_height);
-	    newcols = MIN(newcols, wwp->w_width);
+	    newrows = MIN(newrows, wwp->w_ఎత్తు);
+	    newcols = MIN(newcols, wwp->w_వెడల్పు);
 	}
-	if (twp == NULL)
-	    break;
+	ఒకవేళ (twp == ఖాళీ)
+	    ఆపు;
     }
-    if (newrows == 99999 || newcols == 99999)
-	return; // safety exit
-    newrows = rows == 0 ? newrows : minsize ? MAX(rows, newrows) : rows;
-    newcols = cols == 0 ? newcols : minsize ? MAX(cols, newcols) : cols;
+    ఒకవేళ (newrows == 99999 || newcols == 99999)
+	తిరిగి; // safety exit
+    newrows = అడ్డువరుసలు_2 == 0 ? newrows : minsize ? MAX(అడ్డువరుసలు_2, newrows) : అడ్డువరుసలు_2;
+    newcols = నిలువుల_సంఖ్య == 0 ? newcols : minsize ? MAX(నిలువుల_సంఖ్య, newcols) : నిలువుల_సంఖ్య;
 
     // If no cell is visible there is no point in resizing.  Also, vterm can't
     // handle a zero height.
-    if (newrows == 0 || newcols == 0)
-	return;
+    ఒకవేళ (newrows == 0 || newcols == 0)
+	తిరిగి;
 
-    if (term->tl_rows != newrows || term->tl_cols != newcols)
+    ఒకవేళ (పదం->tl_అడ్డువరుసలు != newrows || పదం->tl_నిలువుల_సంఖ్య != newcols)
     {
-	term->tl_vterm_size_changed = TRUE;
-	vterm_set_size(vterm, newrows, newcols);
-	ch_log(term->tl_job->jv_channel, "Resizing terminal to %d lines",
+	పదం->tl_vterm_కొలత_మారింది = TRUE;
+	vterm_సమితి_కొలత(vterm, newrows, newcols);
+	ch_log(పదం->tl_పని->jv_channel, "Resizing terminal to %d lines",
 								      newrows);
-	term_report_winsize(term, newrows, newcols);
+	పదం_report_winsize(పదం, newrows, newcols);
 
 	// Updating the terminal size will cause the snapshot to be cleared.
 	// When not in terminal_loop() we need to restore it.
-	if (term != in_terminal_loop)
-	    may_move_terminal_to_buffer(term, FALSE);
+	ఒకవేళ (పదం != లోపల_terminal_loop)
+	    may_move_terminal_గమ్యం_బఫరు(పదం, FALSE);
     }
 
     // The cursor may have been moved when resizing.
     vterm_state_get_cursorpos(state, &pos);
     position_cursor(wp, &pos);
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-					  && pos.row < wp->w_height; ++pos.row)
+    కొరకు (pos.అడ్డువరుస = పదం->tl_dirty_అడ్డువరుస_ప్రారంభం; pos.అడ్డువరుస < పదం->tl_dirty_అడ్డువరుస_చివర
+					  && pos.అడ్డువరుస < wp->w_ఎత్తు; ++pos.అడ్డువరుస)
     {
-	if (pos.row < term->tl_rows)
+	ఒకవేళ (pos.అడ్డువరుస < పదం->tl_అడ్డువరుసలు)
 	{
-	    int max_col = MIN(wp->w_width, term->tl_cols);
+	    పూర్ణాంకం max_నిలువు = MIN(wp->w_వెడల్పు, పదం->tl_నిలువుల_సంఖ్య);
 
-	    term_line2screenline(term, wp, screen, &pos, max_col);
+	    పదం_line2screenline(పదం, wp, screen, &pos, max_నిలువు);
 	}
-	else
-	    pos.col = 0;
+	లేకపోతే
+	    pos.నిలువు = 0;
 
-	screen_line(wp, wp->w_winrow + pos.row
-#ifdef FEAT_MENU
-				+ winbar_height(wp)
-#endif
-				, wp->w_wincol, pos.col, wp->w_width, -1,
-#ifdef FEAT_PROP_POPUP
+	screen_పంక్తి(wp, wp->w_winrow + pos.అడ్డువరుస
+#నిర్వచితమైతే FEAT_MENU
+				+ winbar_ఎత్తు(wp)
+#అయితే_ముగింపు
+				, wp->w_wincol, pos.నిలువు, wp->w_వెడల్పు, -1,
+#నిర్వచితమైతే FEAT_PROP_POPUP
 				popup_is_popup(wp) ? SLF_POPUP :
-#endif
+#అయితే_ముగింపు
 				0);
     }
 }
@@ -4372,58 +4372,58 @@ term_update_window(win_T *wp)
 /*
  * Called after updating all windows: may reset dirty rows.
  */
-    void
-term_did_update_window(win_T *wp)
+    శూన్య
+పదం_did_update_కిటికీ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    పదం_T	*పదం = wp->w_బఫరు->b_పదం;
 
-    if (term == NULL || term->tl_vterm == NULL || term->tl_normal_mode
+    ఒకవేళ (పదం == ఖాళీ || పదం->tl_vterm == ఖాళీ || పదం->tl_సాధారణ_బహుళకం
 						|| wp->w_redr_type != 0)
-	return;
+	తిరిగి;
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    పదం->tl_dirty_అడ్డువరుస_ప్రారంభం = MAX_అడ్డువరుస;
+    పదం->tl_dirty_అడ్డువరుస_చివర = 0;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished.
  */
-    int
-term_is_finished(buf_T *buf)
+    పూర్ణాంకం
+పదం_is_ముగిసిన(buf_T *buf)
 {
-    return buf->b_term != NULL && buf->b_term->tl_vterm == NULL;
+    తిరిగి buf->b_పదం != ఖాళీ && buf->b_పదం->tl_vterm == ఖాళీ;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished or we
  * are in Terminal-Normal mode, thus we show the buffer contents.
  */
-    int
-term_show_buffer(buf_T *buf)
+    పూర్ణాంకం
+పదం_show_బఫరు(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    పదం_T *పదం = buf->b_పదం;
 
-    return term != NULL && (term->tl_vterm == NULL || term->tl_normal_mode);
+    తిరిగి పదం != ఖాళీ && (పదం->tl_vterm == ఖాళీ || పదం->tl_సాధారణ_బహుళకం);
 }
 
 /*
  * The current buffer is going to be changed.  If there is terminal
  * highlighting remove it now.
  */
-    void
-term_change_in_curbuf(void)
+    శూన్య
+పదం_change_లోపల_curbuf(శూన్య)
 {
-    term_T *term = curbuf->b_term;
+    పదం_T *పదం = curbuf->b_పదం;
 
-    if (!term_is_finished(curbuf) || term->tl_scrollback.ga_len <= 0)
-	return;
+    ఒకవేళ (!పదం_is_ముగిసిన(curbuf) || పదం->tl_scrollback.ga_len <= 0)
+	తిరిగి;
 
-    free_scrollback(term);
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+    free_scrollback(పదం);
+    redraw_buf_later(పదం->tl_బఫరు, UPD_NOT_VALID);
 
     // The buffer is now like a normal buffer, it cannot be easily
     // abandoned when changed.
-    set_string_option_direct((char_u *)"buftype", -1,
+    సమితి_string_option_ప్రత్యక్ష((char_u *)"buftype", -1,
 	    (char_u *)"", OPT_FREE|OPT_LOCAL, 0);
 }
 
@@ -4431,46 +4431,46 @@ term_change_in_curbuf(void)
  * Get the screen attribute for a position in the buffer.
  * Use a negative "col" to get the filler background color.
  */
-    int
-term_get_attr(win_T *wp, linenr_T lnum, int col)
+    పూర్ణాంకం
+పదం_get_attr(win_T *wp, linenr_T lnum, పూర్ణాంకం నిలువు)
 {
-    buf_T	*buf = wp->w_buffer;
-    term_T	*term = buf->b_term;
-    sb_line_T	*line;
+    buf_T	*buf = wp->w_బఫరు;
+    పదం_T	*పదం = buf->b_పదం;
+    sb_పంక్తి_T	*పంక్తి;
     cellattr_T	*cellattr;
-    int         sb_line = -1;
-    int         sb_col = col;
+    పూర్ణాంకం         sb_పంక్తి = -1;
+    పూర్ణాంకం         sb_నిలువు = నిలువు;
 
-    if (term->tl_scrollback.ga_len)
-	bufline_pos_in_scrollback(term, lnum, col, &sb_line, &sb_col);
+    ఒకవేళ (పదం->tl_scrollback.ga_len)
+	bufline_pos_లోపల_scrollback(పదం, lnum, నిలువు, &sb_పంక్తి, &sb_నిలువు);
 
-    if (sb_line < 0)
-	cellattr = &term->tl_default_color;
-    else
+    ఒకవేళ (sb_పంక్తి < 0)
+	cellattr = &పదం->tl_default_color;
+    లేకపోతే
     {
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_line;
-	if (sb_col < 0 || sb_col >= line->sb_cols)
-	    cellattr = &line->sb_fill_attr;
-	else
-	    cellattr = line->sb_cells + sb_col;
+	పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం + sb_పంక్తి;
+	ఒకవేళ (sb_నిలువు < 0 || sb_నిలువు >= పంక్తి->sb_నిలువుల_సంఖ్య)
+	    cellattr = &పంక్తి->sb_fill_attr;
+	లేకపోతే
+	    cellattr = పంక్తి->sb_cells + sb_నిలువు;
     }
-    return cell2attr(term, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
+    తిరిగి cell2attr(పదం, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
 }
 
 /*
  * Convert a cterm color number 0 - 255 to RGB.
  * This is compatible with xterm.
  */
-    static void
-cterm_color2vterm(int nr, VTermColor *rgb)
+    స్థిర శూన్య
+cterm_color2vterm(పూర్ణాంకం nr, VTermColor *rgb)
 {
-    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->index);
-    if (rgb->index == 0)
+    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->సూచీ);
+    ఒకవేళ (rgb->సూచీ == 0)
 	rgb->type = VTERM_COLOR_RGB;
-    else
+    లేకపోతే
     {
-	rgb->type = VTERM_COLOR_INDEXED;
-	--rgb->index;
+	rgb->type = VTERM_COLOR_సూచీకృత;
+	--rgb->సూచీ;
     }
 }
 
@@ -4479,14 +4479,14 @@ cterm_color2vterm(int nr, VTermColor *rgb)
  * Returns TRUE if color is set to "fg" and "bg".
  * Otherwise returns FALSE.
  */
-    static int
-get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
+    స్థిర పూర్ణాంకం
+get_vterm_color_from_synid(పూర్ణాంకం id, VTermColor *fg, VTermColor *bg)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Use the actual color for the GUI and when 'termguicolors' is set.
-    if (0
+    ఒకవేళ (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.లోపల_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
@@ -4500,122 +4500,122 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	guicolor_T fg_rgb = INVALCOLOR;
 	guicolor_T bg_rgb = INVALCOLOR;
 
-	if (id > 0)
+	ఒకవేళ (id > 0)
 	    syn_id2colors(id, &fg_rgb, &bg_rgb);
 
-	if (fg_rgb != INVALCOLOR)
+	ఒకవేళ (fg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(fg_rgb);
-	    fg->red = (unsigned)(rgb >> 16);
-	    fg->green = (unsigned)(rgb >> 8) & 255;
-	    fg->blue = (unsigned)rgb & 255;
+	    fg->red = (గుర్తులేని)(rgb >> 16);
+	    fg->green = (గుర్తులేని)(rgb >> 8) & 255;
+	    fg->blue = (గుర్తులేని)rgb & 255;
 	    fg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	లేకపోతే
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (bg_rgb != INVALCOLOR)
+	ఒకవేళ (bg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(bg_rgb);
-	    bg->red = (unsigned)(rgb >> 16);
-	    bg->green = (unsigned)(rgb >> 8) & 255;
-	    bg->blue = (unsigned)rgb & 255;
+	    bg->red = (గుర్తులేని)(rgb >> 16);
+	    bg->green = (గుర్తులేని)(rgb >> 8) & 255;
+	    bg->blue = (గుర్తులేని)rgb & 255;
 	    bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	లేకపోతే
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	తిరిగి TRUE;
     }
-    else
-#endif
-    if (t_colors >= 16)
+    లేకపోతే
+#అయితే_ముగింపు
+    ఒకవేళ (t_colors >= 16)
     {
-	int cterm_fg = -1;
-	int cterm_bg = -1;
+	పూర్ణాంకం cterm_fg = -1;
+	పూర్ణాంకం cterm_bg = -1;
 
-	if (id > 0)
+	ఒకవేళ (id > 0)
 	    syn_id2cterm_bg(id, &cterm_fg, &cterm_bg);
 
-	if (cterm_fg >= 0)
+	ఒకవేళ (cterm_fg >= 0)
 	{
 	    cterm_color2vterm(cterm_fg, fg);
 	    fg->type |= VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	లేకపోతే
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (cterm_bg >= 0)
+	ఒకవేళ (cterm_bg >= 0)
 	{
 	    cterm_color2vterm(cterm_bg, bg);
 	    bg->type |= VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	లేకపోతే
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	తిరిగి TRUE;
     }
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    void
-term_reset_hlfwin(win_T *wp)
+    శూన్య
+పదం_reset_hlfwin(win_T *wp)
 {
-    wp->w_term_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
-    wp->w_term_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
+    wp->w_పదం_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
+    wp->w_పదం_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
 /*
  * Cache the color of HLF_WIN.
  */
-    void
-term_update_hlfwin(win_T *wp)
+    శూన్య
+పదం_update_hlfwin(win_T *wp)
 {
-    int id = wp->w_hlfwin_id;
+    పూర్ణాంకం id = wp->w_hlfwin_id;
 
-    if (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
-		&wp->w_term_hlfwin.fg, &wp->w_term_hlfwin.bg))
-	term_reset_hlfwin(wp);
+    ఒకవేళ (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
+		&wp->w_పదం_hlfwin.fg, &wp->w_పదం_hlfwin.bg))
+	పదం_reset_hlfwin(wp);
 }
 
 /*
  * Called when option 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_hlfwin_all(void)
+    శూన్య
+పదం_update_hlfwin_all(శూన్య)
 {
-    win_T	 *wp = NULL;
-    int		 did_curwin = FALSE;
+    win_T	 *wp = ఖాళీ;
+    పూర్ణాంకం		 did_curwin = FALSE;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
-	term_update_hlfwin(wp);
+    అయితే (for_all_windows_and_curwin(&wp, &did_curwin))
+	పదం_update_hlfwin(wp);
 }
 
 /*
  * Initialize term->tl_default_color from the environment.
  */
-    void
-term_init_default_colors(term_T *term)
+    శూన్య
+పదం_init_default_colors(పదం_T *పదం)
 {
     VTermColor	    *fg, *bg;
-    int		    fgval, bgval;
-    int		    id;
+    పూర్ణాంకం		    fgval, bgval;
+    పూర్ణాంకం		    id;
 
-    CLEAR_FIELD(term->tl_default_color.attrs);
-    term->tl_default_color.width = 1;
-    fg = &term->tl_default_color.fg;
-    bg = &term->tl_default_color.bg;
+    CLEAR_క్షేత్రం(పదం->tl_default_color.attrs);
+    పదం->tl_default_color.వెడల్పు = 1;
+    fg = &పదం->tl_default_color.fg;
+    bg = &పదం->tl_default_color.bg;
 
     // Vterm uses a default black background.  Set it to white when
     // 'background' is "light".
-    if (*p_bg == 'l')
+    ఒకవేళ (*p_bg == 'l')
     {
 	fgval = 0;
 	bgval = 255;
     }
-    else
+    లేకపోతే
     {
 	fgval = 255;
 	bgval = 0;
@@ -4626,227 +4626,227 @@ term_init_default_colors(term_T *term)
     bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, NULL);
+    id = పదం_get_highlight_id(పదం, ఖాళీ);
 
-    if (!get_vterm_color_from_synid(id, fg, bg))
+    ఒకవేళ (!get_vterm_color_from_synid(id, fg, bg))
     {
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	int tmp;
-#endif
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	పూర్ణాంకం tmp;
+#అయితే_ముగింపు
 
 	// In an MS-Windows console we know the normal colors.
-	if (cterm_normal_fg_color > 0)
+	ఒకవేళ (cterm_సాధారణ_fg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_fg_color - 1, fg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_సాధారణ_fg_color - 1, fg);
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    ఒకవేళ (!gui.లోపల_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_fg_color(&fg->red, &fg->green, &fg->blue);
-#endif
+#నిర్వచితమైతే FEAT_TERMRESPONSE
+	లేకపోతే
+	    పదం_get_fg_color(&fg->red, &fg->green, &fg->blue);
+#అయితే_ముగింపు
 
-	if (cterm_normal_bg_color > 0)
+	ఒకవేళ (cterm_సాధారణ_bg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_bg_color - 1, bg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_సాధారణ_bg_color - 1, bg);
+#ఒకవేళ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    ఒకవేళ (!gui.లోపల_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_bg_color(&bg->red, &bg->green, &bg->blue);
-#endif
+#నిర్వచితమైతే FEAT_TERMRESPONSE
+	లేకపోతే
+	    పదం_get_bg_color(&bg->red, &bg->green, &bg->blue);
+#అయితే_ముగింపు
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if the user-defined palette (either g:terminal_ansi_colors or the
  * "ansi_colors" argument in term_start()) shall be applied.
  */
-    static int
-term_use_palette(void)
+    స్థిర పూర్ణాంకం
+పదం_use_palette(శూన్య)
 {
-    if (0
+    ఒకవేళ (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.లోపల_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
 # endif
        )
-	return TRUE;
-    return FALSE;
+	తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * Set the 16 ANSI colors from array of RGB values
  */
-    static void
-set_vterm_palette(VTerm *vterm, long_u *rgb)
+    స్థిర శూన్య
+సమితి_vterm_palette(VTerm *vterm, long_u *rgb)
 {
-    int		index = 0;
+    పూర్ణాంకం		సూచీ = 0;
     VTermState	*state = vterm_obtain_state(vterm);
 
-    for (; index < 16; index++)
+    కొరకు (; సూచీ < 16; సూచీ++)
     {
 	VTermColor	color;
 
 	color.type = VTERM_COLOR_RGB;
-	color.red = (unsigned)(rgb[index] >> 16);
-	color.green = (unsigned)(rgb[index] >> 8) & 255;
-	color.blue = (unsigned)rgb[index] & 255;
-	color.index = 0;
-	vterm_state_set_palette_color(state, index, &color);
+	color.red = (గుర్తులేని)(rgb[సూచీ] >> 16);
+	color.green = (గుర్తులేని)(rgb[సూచీ] >> 8) & 255;
+	color.blue = (గుర్తులేని)rgb[సూచీ] & 255;
+	color.సూచీ = 0;
+	vterm_state_సమితి_palette_color(state, సూచీ, &color);
     }
 }
 
 /*
  * Set the ANSI color palette from a list of colors
  */
-    static int
-set_ansi_colors_list(VTerm *vterm, list_T *list)
+    స్థిర పూర్ణాంకం
+సమితి_ansi_colors_list(VTerm *vterm, list_T *list)
 {
-    int		n = 0;
+    పూర్ణాంకం		n = 0;
     long_u	rgb[16];
     listitem_T	*li;
 
-    for (li = list->lv_first; li != NULL && n < 16; li = li->li_next, n++)
+    కొరకు (li = list->lv_మొదటి; li != ఖాళీ && n < 16; li = li->li_తదుపరి, n++)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return FAIL;
+	ఒకవేళ (color_name == ఖాళీ)
+	    తిరిగి FAIL;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
-	    return FAIL;
+	ఒకవేళ (guicolor == INVALCOLOR)
+	    తిరిగి FAIL;
 
 	rgb[n] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    if (n != 16 || li != NULL)
-	return FAIL;
+    ఒకవేళ (n != 16 || li != ఖాళీ)
+	తిరిగి FAIL;
 
-    set_vterm_palette(vterm, rgb);
+    సమితి_vterm_palette(vterm, rgb);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Initialize the ANSI color palette from g:terminal_ansi_colors[0:15]
  */
-    static void
+    స్థిర శూన్య
 init_vterm_ansi_colors(VTerm *vterm)
 {
-    dictitem_T	*var = find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE);
+    dictitem_T	*var = కనుగొను_var((char_u *)"g:terminal_ansi_colors", ఖాళీ, TRUE);
 
-    if (var == NULL)
-	return;
+    ఒకవేళ (var == ఖాళీ)
+	తిరిగి;
 
-    if (var->di_tv.v_type != VAR_LIST
-	    || var->di_tv.vval.v_list == NULL
-	    || var->di_tv.vval.v_list->lv_first == &range_list_item
-	    || set_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
-	semsg(_(e_invalid_argument_str), "g:terminal_ansi_colors");
+    ఒకవేళ (var->di_tv.v_type != VAR_LIST
+	    || var->di_tv.vval.v_list == ఖాళీ
+	    || var->di_tv.vval.v_list->lv_మొదటి == &range_list_అంశం
+	    || సమితి_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
+	semsg(_(e_invalid_వాదం_str), "g:terminal_ansi_colors");
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Handles a "drop" command from the job in the terminal.
  * "item" is the file name, "item->li_next" may have options.
  */
-    static void
-handle_drop_command(listitem_T *item)
+    స్థిర శూన్య
+handle_drop_command(listitem_T *అంశం)
 {
-    char_u	*fname = tv_get_string(&item->li_tv);
-    listitem_T	*opt_item = item->li_next;
-    int		bufnr;
+    char_u	*fname = tv_get_string(&అంశం->li_tv);
+    listitem_T	*opt_అంశం = అంశం->li_తదుపరి;
+    పూర్ణాంకం		bufnr;
     win_T	*wp;
     tabpage_T   *tp;
     exarg_T	ea;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ఖాళీ;
 
-    bufnr = buflist_add(fname, BLN_LISTED | BLN_NOOPT);
+    bufnr = buflist_కూడు(fname, BLN_LISTED | BLN_NOOPT);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer->b_fnum == bufnr)
+	ఒకవేళ (wp->w_బఫరు->b_fnum == bufnr)
 	{
 	    // buffer is in a window already, go there
 	    goto_tabpage_win(tp, wp);
-	    return;
+	    తిరిగి;
 	}
     }
 
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
 
-    if (opt_item != NULL && opt_item->li_tv.v_type == VAR_DICT
-					&& opt_item->li_tv.vval.v_dict != NULL)
+    ఒకవేళ (opt_అంశం != ఖాళీ && opt_అంశం->li_tv.v_type == VAR_DICT
+					&& opt_అంశం->li_tv.vval.v_dict != ఖాళీ)
     {
-	dict_T *dict = opt_item->li_tv.vval.v_dict;
+	dict_T *dict = opt_అంశం->li_tv.vval.v_dict;
 	char_u *p;
 
 	p = dict_get_string(dict, "ff", FALSE);
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	    p = dict_get_string(dict, "fileformat", FALSE);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
-	    if (check_ff_value(p) == FAIL)
-		ch_log(NULL, "Invalid ff argument to drop: %s", p);
-	    else
+	    ఒకవేళ (check_ff_విలువ(p) == FAIL)
+		ch_log(ఖాళీ, "Invalid ff argument to drop: %s", p);
+	    లేకపోతే
 		ea.force_ff = *p;
 	}
 	p = dict_get_string(dict, "enc", FALSE);
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	    p = dict_get_string(dict, "encoding", FALSE);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	{
 	    ea.cmd = alloc(STRLEN(p) + 12);
-	    if (ea.cmd != NULL)
+	    ఒకవేళ (ea.cmd != ఖాళీ)
 	    {
-		sprintf((char *)ea.cmd, "sbuf ++enc=%s", p);
+		sprintf((అక్షరం *)ea.cmd, "sbuf ++enc=%s", p);
 		ea.force_enc = 11;
 		tofree = ea.cmd;
 	    }
 	}
 
 	p = dict_get_string(dict, "bad", FALSE);
-	if (p != NULL)
+	ఒకవేళ (p != ఖాళీ)
 	    get_bad_opt(p, &ea);
 
-	if (dict_has_key(dict, "bin"))
+	ఒకవేళ (dict_has_కీలకం(dict, "bin"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "binary"))
+	ఒకవేళ (dict_has_కీలకం(dict, "binary"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "nobin"))
+	ఒకవేళ (dict_has_కీలకం(dict, "nobin"))
 	    ea.force_bin = FORCE_NOBIN;
-	if (dict_has_key(dict, "nobinary"))
+	ఒకవేళ (dict_has_కీలకం(dict, "nobinary"))
 	    ea.force_bin = FORCE_NOBIN;
     }
 
     // open in new window, like ":split fname"
-    if (ea.cmd == NULL)
+    ఒకవేళ (ea.cmd == ఖాళీ)
 	ea.cmd = (char_u *)"split";
     ea.arg = fname;
-    ea.cmdidx = CMD_split;
+    ea.cmdidx = CMD_విభజించు;
     ex_splitview(&ea);
 
     vim_free(tofree);
@@ -4855,50 +4855,50 @@ handle_drop_command(listitem_T *item)
 /*
  * Return TRUE if "func" starts with "pat" and "pat" isn't empty.
  */
-    static int
-is_permitted_term_api(char_u *func, char_u *pat)
+    స్థిర పూర్ణాంకం
+is_permitted_పదం_api(char_u *func, char_u *pat)
 {
-    return pat != NULL && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
+    తిరిగి pat != ఖాళీ && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
 }
 
 /*
  * Handles a function call from the job running in a terminal.
  * "item" is the function name, "item->li_next" has the arguments.
  */
-    static void
-handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
+    స్థిర శూన్య
+handle_call_command(పదం_T *పదం, channel_T *channel, listitem_T *అంశం)
 {
     char_u	*func;
     typval_T	argvars[2];
     typval_T	rettv;
     funcexe_T	funcexe;
 
-    if (item->li_next == NULL)
+    ఒకవేళ (అంశం->li_తదుపరి == ఖాళీ)
     {
 	ch_log(channel, "Missing function arguments for call");
-	return;
+	తిరిగి;
     }
-    func = tv_get_string(&item->li_tv);
+    func = tv_get_string(&అంశం->li_tv);
 
-    if (!is_permitted_term_api(func, term->tl_api))
+    ఒకవేళ (!is_permitted_పదం_api(func, పదం->tl_api))
     {
 	ch_log(channel, "Unpermitted function: %s", func);
-	return;
+	తిరిగి;
     }
 
-    argvars[0].v_type = VAR_NUMBER;
-    argvars[0].vval.v_number = term->tl_buffer->b_fnum;
-    argvars[1] = item->li_next->li_tv;
-    CLEAR_FIELD(funcexe);
+    argvars[0].v_type = VAR_సంఖ్య;
+    argvars[0].vval.v_సంఖ్య = పదం->tl_బఫరు->b_fnum;
+    argvars[1] = అంశం->li_తదుపరి->li_tv;
+    CLEAR_క్షేత్రం(funcexe);
     funcexe.fe_firstline = 1L;
     funcexe.fe_lastline = 1L;
     funcexe.fe_evaluate = TRUE;
-    if (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
+    ఒకవేళ (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
     {
 	clear_tv(&rettv);
 	ch_log(channel, "Function %s called", func);
     }
-    else
+    లేకపోతే
 	ch_log(channel, "Calling function %s failed", func);
 }
 
@@ -4910,20 +4910,20 @@ handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
  * UTF-8 bytes. Thus we don't need to deal with invalid UTF-8
  * encoding bytes like 0xfe, 0xff.
  */
-    static size_t
-url_decode(const char *src, const size_t len, char_u *dst)
+    స్థిర size_t
+url_decode(స్థిరరాశి అక్షరం *src, స్థిరరాశి size_t len, char_u *dst)
 {
     size_t i = 0, j = 0;
 
-    while (i < len)
+    అయితే (i < len)
     {
-	if (src[i] == '%' && i + 2 < len)
+	ఒకవేళ (src[i] == '%' && i + 2 < len)
 	{
 	    dst[j] = hexhex2nr((char_u *)&src[i + 1]);
 	    j++;
 	    i += 3;
 	}
-	else
+	లేకపోతే
 	{
 	    dst[j] = src[i];
 	    i++;
@@ -4931,7 +4931,7 @@ url_decode(const char *src, const size_t len, char_u *dst)
 	}
     }
     dst[j] = '\0';
-    return j;
+    తిరిగి j;
 }
 
 /*
@@ -4942,30 +4942,30 @@ url_decode(const char *src, const size_t len, char_u *dst)
  * and what VTerm provides via VTermStringFragment is
  * "file://HOSTNAME/CURRENT/DIR"
  */
-    static void
+    స్థిర శూన్య
 sync_shell_dir(garray_T *gap)
 {
-    int       offset = 7;  // len of "file://" is 7
-    char      *pos = (char *)gap->ga_data + offset;
+    పూర్ణాంకం       స్థానభ్రంశం = 7;  // len of "file://" is 7
+    అక్షరం      *pos = (అక్షరం *)gap->ga_దత్తాంశం + స్థానభ్రంశం;
     char_u    *new_dir;
 
     // remove HOSTNAME to get PWD
-    while (offset < (int)gap->ga_len && *pos != '/' )
+    అయితే (స్థానభ్రంశం < (పూర్ణాంకం)gap->ga_len && *pos != '/' )
     {
-	++offset;
+	++స్థానభ్రంశం;
 	++pos;
     }
 
-    if (offset >= (int)gap->ga_len)
+    ఒకవేళ (స్థానభ్రంశం >= (పూర్ణాంకం)gap->ga_len)
     {
-	semsg(_(e_failed_to_extract_pwd_from_str_check_your_shell_config),
-								 gap->ga_data);
-	return;
+	semsg(_(e_failed_గమ్యం_వెలికితీయి_pwd_from_str_check_your_shell_config),
+								 gap->ga_దత్తాంశం);
+	తిరిగి;
     }
 
-    new_dir = alloc(gap->ga_len - offset + 1);
-    url_decode(pos, gap->ga_len-offset, new_dir);
-    changedir_func(new_dir, TRUE, CDSCOPE_WINDOW);
+    new_dir = alloc(gap->ga_len - స్థానభ్రంశం + 1);
+    url_decode(pos, gap->ga_len-స్థానభ్రంశం, new_dir);
+    changedir_func(new_dir, TRUE, CDSCOPE_కిటికీ);
     vim_free(new_dir);
 }
 
@@ -4973,124 +4973,124 @@ sync_shell_dir(garray_T *gap)
  * Called by libvterm when it cannot recognize an OSC sequence.
  * We recognize a terminal API command.
  */
-    static int
-parse_osc(int command, VTermStringFragment frag, void *user)
+    స్థిర పూర్ణాంకం
+parse_osc(పూర్ణాంకం command, VTermStringFragment frag, శూన్య *user)
 {
-    term_T	*term = (term_T *)user;
+    పదం_T	*పదం = (పదం_T *)user;
     js_read_T	reader;
     typval_T	tv;
-    channel_T	*channel = term->tl_job == NULL ? NULL
-						    : term->tl_job->jv_channel;
-    garray_T	*gap = &term->tl_osc_buf;
+    channel_T	*channel = పదం->tl_పని == ఖాళీ ? ఖాళీ
+						    : పదం->tl_పని->jv_channel;
+    garray_T	*gap = &పదం->tl_osc_buf;
 
     // We recognize only OSC 5 1 ; {command} and OSC 7 ; {command}
-    if (command != 51 && (command != 7 || !p_asd))
-	return 0;
+    ఒకవేళ (command != 51 && (command != 7 || !p_asd))
+	తిరిగి 0;
 
     // Concatenate what was received until the final piece is found.
-    if (ga_grow(gap, (int)frag.len + 1) == FAIL)
+    ఒకవేళ (ga_grow(gap, (పూర్ణాంకం)frag.len + 1) == FAIL)
     {
 	ga_clear(gap);
-	return 1;
+	తిరిగి 1;
     }
-    mch_memmove((char *)gap->ga_data + gap->ga_len, frag.str, frag.len);
-    gap->ga_len += (int)frag.len;
-    if (!frag.final)
-	return 1;
+    mch_memmove((అక్షరం *)gap->ga_దత్తాంశం + gap->ga_len, frag.str, frag.len);
+    gap->ga_len += (పూర్ణాంకం)frag.len;
+    ఒకవేళ (!frag.final)
+	తిరిగి 1;
 
-    ((char *)gap->ga_data)[gap->ga_len] = 0;
+    ((అక్షరం *)gap->ga_దత్తాంశం)[gap->ga_len] = 0;
 
-    if (command == 7)
+    ఒకవేళ (command == 7)
     {
 	sync_shell_dir(gap);
 	ga_clear(gap);
-	return 1;
+	తిరిగి 1;
     }
 
-    reader.js_buf = gap->ga_data;
-    reader.js_fill = NULL;
-    reader.js_used = 0;
-    if (json_decode(&reader, &tv, 0) == OK
+    reader.js_buf = gap->ga_దత్తాంశం;
+    reader.js_fill = ఖాళీ;
+    reader.js_వాడిన = 0;
+    ఒకవేళ (json_decode(&reader, &tv, 0) == OK
 	    && tv.v_type == VAR_LIST
-	    && tv.vval.v_list != NULL)
+	    && tv.vval.v_list != ఖాళీ)
     {
-	listitem_T *item = tv.vval.v_list->lv_first;
+	listitem_T *అంశం = tv.vval.v_list->lv_మొదటి;
 
-	if (item == NULL)
+	ఒకవేళ (అంశం == ఖాళీ)
 	    ch_log(channel, "Missing command");
-	else
+	లేకపోతే
 	{
-	    char_u	*cmd = tv_get_string(&item->li_tv);
+	    char_u	*cmd = tv_get_string(&అంశం->li_tv);
 
 	    // Make sure an invoked command doesn't delete the buffer (and the
 	    // terminal) under our fingers.
-	    ++term->tl_buffer->b_locked;
+	    ++పదం->tl_బఫరు->b_locked;
 
-	    item = item->li_next;
-	    if (item == NULL)
+	    అంశం = అంశం->li_తదుపరి;
+	    ఒకవేళ (అంశం == ఖాళీ)
 		ch_log(channel, "Missing argument for %s", cmd);
-	    else if (STRCMP(cmd, "drop") == 0)
-		handle_drop_command(item);
-	    else if (STRCMP(cmd, "call") == 0)
-		handle_call_command(term, channel, item);
-	    else
+	    లేకపోతే ఒకవేళ (STRCMP(cmd, "drop") == 0)
+		handle_drop_command(అంశం);
+	    లేకపోతే ఒకవేళ (STRCMP(cmd, "call") == 0)
+		handle_call_command(పదం, channel, అంశం);
+	    లేకపోతే
 		ch_log(channel, "Invalid command received: %s", cmd);
-	    --term->tl_buffer->b_locked;
+	    --పదం->tl_బఫరు->b_locked;
 	}
     }
-    else
+    లేకపోతే
 	ch_log(channel, "Invalid JSON received");
 
     ga_clear(gap);
     clear_tv(&tv);
-    return 1;
+    తిరిగి 1;
 }
 
 /*
  * Called by libvterm when it cannot recognize a CSI sequence.
  * We recognize the window position report.
  */
-    static int
+    స్థిర పూర్ణాంకం
 parse_csi(
-	const char  *leader UNUSED,
-	const long  args[],
-	int	    argcount,
-	const char  *intermed UNUSED,
-	char	    command,
-	void	    *user)
+	స్థిరరాశి అక్షరం  *leader వాడని,
+	స్థిరరాశి దీర్ఘ  వాదనలు[],
+	పూర్ణాంకం	    argcount,
+	స్థిరరాశి అక్షరం  *intermed వాడని,
+	అక్షరం	    command,
+	శూన్య	    *user)
 {
-    term_T	*term = (term_T *)user;
-    char	buf[100];
-    int		len;
-    int		x = 0;
-    int		y = 0;
+    పదం_T	*పదం = (పదం_T *)user;
+    అక్షరం	buf[100];
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		x = 0;
+    పూర్ణాంకం		y = 0;
     win_T	*wp;
 
     // We recognize only CSI 13 t
-    if (command != 't' || argcount != 1 || args[0] != 13)
-	return 0; // not handled
+    ఒకవేళ (command != 't' || argcount != 1 || వాదనలు[0] != 13)
+	తిరిగి 0; // not handled
 
     // When getting the window position is not possible or it fails it results
     // in zero/zero.
-#if defined(FEAT_GUI) \
+#ఒకవేళ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
-    (void)ui_get_winpos(&x, &y, (varnumber_T)100);
-#endif
+    (శూన్య)ui_get_winpos(&x, &y, (varnumber_T)100);
+#అయితే_ముగింపు
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == term->tl_buffer)
-	    break;
-    if (wp != NULL)
+	ఒకవేళ (wp->w_బఫరు == పదం->tl_బఫరు)
+	    ఆపు;
+    ఒకవేళ (wp != ఖాళీ)
     {
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#నిర్వచితమైతే FEAT_GUI
+	ఒకవేళ (gui.లోపల_use)
 	{
-	    x += wp->w_wincol * gui.char_width;
-	    y += W_WINROW(wp) * gui.char_height;
+	    x += wp->w_wincol * gui.char_వెడల్పు;
+	    y += W_WINROW(wp) * gui.char_ఎత్తు;
 	}
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	{
 	    // We roughly estimate the position of the terminal window inside
 	    // the Vim window by assuming a 10 x 7 character cell.
@@ -5100,38 +5100,38 @@ parse_csi(
     }
 
     len = vim_snprintf(buf, 100, "\x1b[3;%d;%dt", x, y);
-    channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						     (char_u *)buf, len, NULL);
-    return 1;
+    channel_send(పదం->tl_పని->jv_channel, get_tty_part(పదం),
+						     (char_u *)buf, len, ఖాళీ);
+    తిరిగి 1;
 }
 
-static VTermStateFallbacks state_fallbacks = {
-    NULL,		// control
+స్థిర VTermStateFallbacks state_fallbacks = {
+    ఖాళీ,		// control
     parse_csi,		// csi
     parse_osc,		// osc
-    NULL,		// dcs
-    NULL,		// apc
-    NULL,		// pm
-    NULL		// sos
+    ఖాళీ,		// dcs
+    ఖాళీ,		// apc
+    ఖాళీ,		// pm
+    ఖాళీ		// sos
 };
 
 /*
  * Use Vim's allocation functions for vterm so profiling works.
  */
-    static void *
-vterm_malloc(size_t size, void *data UNUSED)
+    స్థిర శూన్య *
+vterm_malloc(size_t కొలత, శూన్య *దత్తాంశం వాడని)
 {
     // make sure that the length is not zero
-    return alloc_clear(size == 0 ? 1L : size);
+    తిరిగి alloc_clear(కొలత == 0 ? 1L : కొలత);
 }
 
-    static void
-vterm_memfree(void *ptr, void *data UNUSED)
+    స్థిర శూన్య
+vterm_memfree(శూన్య *ptr, శూన్య *దత్తాంశం వాడని)
 {
     vim_free(ptr);
 }
 
-static VTermAllocatorFunctions vterm_allocator = {
+స్థిర VTermAllocatorFunctions vterm_allocator = {
   &vterm_malloc,
   &vterm_memfree
 };
@@ -5140,45 +5140,45 @@ static VTermAllocatorFunctions vterm_allocator = {
  * Create a new vterm and initialize it.
  * Return FAIL when out of memory.
  */
-    static int
-create_vterm(term_T *term, int rows, int cols)
+    స్థిర పూర్ణాంకం
+create_vterm(పదం_T *పదం, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
     VTerm	    *vterm;
     VTermScreen	    *screen;
     VTermState	    *state;
-    VTermValue	    value;
+    VTerm_విలువ	    విలువ;
 
-    vterm = vterm_new_with_allocator(rows, cols, &vterm_allocator, NULL);
-    term->tl_vterm = vterm;
-    if (vterm == NULL)
-	return FAIL;
+    vterm = vterm_new_with_allocator(అడ్డువరుసలు_2, నిలువుల_సంఖ్య, &vterm_allocator, ఖాళీ);
+    పదం->tl_vterm = vterm;
+    ఒకవేళ (vterm == ఖాళీ)
+	తిరిగి FAIL;
 
     // Allocate screen and state here, so we can bail out if that fails.
     state = vterm_obtain_state(vterm);
     screen = vterm_obtain_screen(vterm);
-    if (state == NULL || screen == NULL)
+    ఒకవేళ (state == ఖాళీ || screen == ఖాళీ)
     {
 	vterm_free(vterm);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    vterm_screen_set_callbacks(screen, &screen_callbacks, term);
-    vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
+    vterm_screen_సమితి_callbacks(screen, &screen_callbacks, పదం);
+    vterm_screen_సమితి_damage_విలీనం(screen, VTERM_DAMAGE_SCROLL);
     vterm_screen_callbacks_has_pushline4(screen);
     // TODO: depends on 'encoding'.
-    vterm_set_utf8(vterm, 1);
+    vterm_సమితి_utf8(vterm, 1);
 
-    term_init_default_colors(term);
+    పదం_init_default_colors(పదం);
 
-    vterm_state_set_default_colors(
+    vterm_state_సమితి_default_colors(
 	    state,
-	    &term->tl_default_color.fg,
-	    &term->tl_default_color.bg);
+	    &పదం->tl_default_color.fg,
+	    &పదం->tl_default_color.bg);
 
-    if (t_colors < 16)
+    ఒకవేళ (t_colors < 16)
 	// Less than 16 colors: assume that bold means using a bright color for
 	// the foreground color.
-	vterm_state_set_bold_highbright(vterm_obtain_state(vterm), 1);
+	vterm_state_సమితి_bold_highbright(vterm_obtain_state(vterm), 1);
 
     // Required to initialize most things.
     vterm_screen_reset(screen, 1 /* hard */);
@@ -5189,75 +5189,75 @@ create_vterm(term_T *term, int rows, int cols)
     // For unix do not use a blinking cursor.  In an xterm this causes the
     // cursor to blink if it's blinking in the xterm.
     // For Windows we respect the system wide setting.
-#ifdef MSWIN
-    if (GetCaretBlinkTime() == INFINITE)
-	value.boolean = 0;
-    else
-	value.boolean = 1;
-#else
-    value.boolean = 0;
-#endif
-    vterm_state_set_termprop(state, VTERM_PROP_CURSORBLINK, &value);
-    vterm_state_set_unrecognised_fallbacks(state, &state_fallbacks, term);
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (Get_Caret_Blink_సమయం() == INFINITE)
+	విలువ.boolean = 0;
+    లేకపోతే
+	విలువ.boolean = 1;
+#లేకపోతే
+    విలువ.boolean = 0;
+#అయితే_ముగింపు
+    vterm_state_సమితి_termprop(state, VTERM_PROP_CURSORBLINK, &విలువ);
+    vterm_state_సమితి_unrecognised_fallbacks(state, &state_fallbacks, పదం);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Reset the terminal palette to its default value.
  */
-    static void
-term_reset_palette(VTerm *vterm)
+    స్థిర శూన్య
+పదం_reset_palette(VTerm *vterm)
 {
     VTermState	*state = vterm_obtain_state(vterm);
-    int		index;
+    పూర్ణాంకం		సూచీ;
 
-    for (index = 0; index < 16; index++)
+    కొరకు (సూచీ = 0; సూచీ < 16; సూచీ++)
     {
 	VTermColor	color;
 
-	color.type = VTERM_COLOR_INDEXED;
-	ansi_color2rgb(index, &color.red, &color.green, &color.blue,
-		&color.index);
+	color.type = VTERM_COLOR_సూచీకృత;
+	ansi_color2rgb(సూచీ, &color.red, &color.green, &color.blue,
+		&color.సూచీ);
 	// The first valid index starts at 1.
-	color.index -= 1;
+	color.సూచీ -= 1;
 
-	vterm_state_set_palette_color(state, index, &color);
+	vterm_state_సమితి_palette_color(state, సూచీ, &color);
     }
 }
 
-    static void
-term_update_palette(term_T *term)
+    స్థిర శూన్య
+పదం_update_palette(పదం_T *పదం)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette()
-	    && (term->tl_palette != NULL
-		|| find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE)
-								      != NULL))
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (పదం_use_palette()
+	    && (పదం->tl_palette != ఖాళీ
+		|| కనుగొను_var((char_u *)"g:terminal_ansi_colors", ఖాళీ, TRUE)
+								      != ఖాళీ))
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ఒకవేళ (పదం->tl_palette != ఖాళీ)
+	    సమితి_vterm_palette(పదం->tl_vterm, పదం->tl_palette);
+	లేకపోతే
+	    init_vterm_ansi_colors(పదం->tl_vterm);
     }
-    else
-#endif
-	term_reset_palette(term->tl_vterm);
+    లేకపోతే
+#అయితే_ముగింపు
+	పదం_reset_palette(పదం->tl_vterm);
 }
 
 /*
  * Called when option 'termguicolors' is changed.
  */
-    void
-term_update_palette_all(void)
+    శూన్య
+పదం_update_palette_all(శూన్య)
 {
-    term_T *term;
+    పదం_T *పదం;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(పదం)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_update_palette(term);
+	ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	    కొనసాగు;
+	పదం_update_palette(పదం);
     }
 }
 
@@ -5265,20 +5265,20 @@ term_update_palette_all(void)
  * Called when option 'background' or 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_colors_all(void)
+    శూన్య
+పదం_update_colors_all(శూన్య)
 {
-    term_T *term;
+    పదం_T *పదం;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(పదం)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_init_default_colors(term);
-	vterm_state_set_default_colors(
-		vterm_obtain_state(term->tl_vterm),
-		&term->tl_default_color.fg,
-		&term->tl_default_color.bg);
+	ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	    కొనసాగు;
+	పదం_init_default_colors(పదం);
+	vterm_state_సమితి_default_colors(
+		vterm_obtain_state(పదం->tl_vterm),
+		&పదం->tl_default_color.fg,
+		&పదం->tl_default_color.bg);
     }
 }
 
@@ -5286,66 +5286,66 @@ term_update_colors_all(void)
  * Return the text to show for the buffer name and status.
  */
     char_u *
-term_get_status_text(term_T *term)
+పదం_get_స్థితి_పాఠ్యం(పదం_T *పదం)
 {
-    if (term->tl_status_text != NULL)
-	return term->tl_status_text;
+    ఒకవేళ (పదం->tl_స్థితి_పాఠ్యం != ఖాళీ)
+	తిరిగి పదం->tl_స్థితి_పాఠ్యం;
 
     char_u *txt;
     size_t len;
     char_u *fname;
 
-    if (term->tl_normal_mode)
+    ఒకవేళ (పదం->tl_సాధారణ_బహుళకం)
     {
-	if (term_job_running(term))
+	ఒకవేళ (పదం_పని_running(పదం))
 	    txt = (char_u *)_("Terminal");
-	else
+	లేకపోతే
 	    txt = (char_u *)_("Terminal-finished");
     }
-    else if (term->tl_title != NULL)
-	txt = term->tl_title;
-    else if (term_none_open(term))
+    లేకపోతే ఒకవేళ (పదం->tl_title != ఖాళీ)
+	txt = పదం->tl_title;
+    లేకపోతే ఒకవేళ (పదం_none_open(పదం))
 	txt = (char_u *)_("active");
-    else if (term_job_running(term))
+    లేకపోతే ఒకవేళ (పదం_పని_running(పదం))
 	txt = (char_u *)_("running");
-    else
+    లేకపోతే
 	txt = (char_u *)_("finished");
-    fname = buf_get_fname(term->tl_buffer);
+    fname = buf_get_fname(పదం->tl_బఫరు);
     len = 9 + STRLEN(fname) + STRLEN(txt);
-    term->tl_status_text = alloc(len);
-    if (term->tl_status_text != NULL)
-	vim_snprintf((char *)term->tl_status_text, len, "%s [%s]",
+    పదం->tl_స్థితి_పాఠ్యం = alloc(len);
+    ఒకవేళ (పదం->tl_స్థితి_పాఠ్యం != ఖాళీ)
+	vim_snprintf((అక్షరం *)పదం->tl_స్థితి_పాఠ్యం, len, "%s [%s]",
 		fname, txt);
-    return term->tl_status_text;
+    తిరిగి పదం->tl_స్థితి_పాఠ్యం;
 }
 
 /*
  * Clear the cached value of the status text.
  */
-    void
-term_clear_status_text(term_T *term)
+    శూన్య
+పదం_clear_స్థితి_పాఠ్యం(పదం_T *పదం)
 {
-    VIM_CLEAR(term->tl_status_text);
+    VIM_CLEAR(పదం->tl_స్థితి_పాఠ్యం);
 }
 
 /*
  * Mark references in jobs of terminals.
  */
-    int
-set_ref_in_term(int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_పదం(పూర్ణాంకం copyID)
 {
-    int		abort = FALSE;
-    term_T	*term;
+    పూర్ణాంకం		abort = FALSE;
+    పదం_T	*పదం;
     typval_T	tv;
 
-    for (term = first_term; !abort && term != NULL; term = term->tl_next)
-	if (term->tl_job != NULL)
+    కొరకు (పదం = మొదటి_పదం; !abort && పదం != ఖాళీ; పదం = పదం->tl_తదుపరి)
+	ఒకవేళ (పదం->tl_పని != ఖాళీ)
 	{
-	    tv.v_type = VAR_JOB;
-	    tv.vval.v_job = term->tl_job;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    tv.v_type = VAR_పని;
+	    tv.vval.v_పని = పదం->tl_పని;
+	    abort = abort || సమితి_ref_లోపల_అంశం(&tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 	}
-    return abort;
+    తిరిగి abort;
 }
 
 /*
@@ -5353,47 +5353,47 @@ set_ref_in_term(int copyID)
  * Returns NULL when the buffer is not for a terminal window and logs a message
  * with "where".
  */
-    static buf_T *
-term_get_buf(typval_T *argvars, char *where)
+    స్థిర buf_T *
+పదం_get_buf(typval_T *argvars, అక్షరం *where)
 {
     buf_T *buf;
 
     ++emsg_off;
     buf = tv_get_buf(&argvars[0], FALSE);
     --emsg_off;
-    if (buf == NULL || buf->b_term == NULL)
+    ఒకవేళ (buf == ఖాళీ || buf->b_పదం == ఖాళీ)
     {
-	(void)tv_get_number(&argvars[0]);    // issue errmsg if type error
-	ch_log(NULL, "%s: invalid buffer argument", where);
-	return NULL;
+	(శూన్య)tv_get_సంఖ్య(&argvars[0]);    // issue errmsg if type error
+	ch_log(ఖాళీ, "%s: invalid buffer argument", where);
+	తిరిగి ఖాళీ;
     }
-    return buf;
+    తిరిగి buf;
 }
 
-    static void
+    స్థిర శూన్య
 clear_cell(VTermScreenCell *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_క్షేత్రం(*cell);
     cell->fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
-    static void
-dump_term_color(FILE *fd, VTermColor *color)
+    స్థిర శూన్య
+dump_పదం_color(FILE *fd, VTermColor *color)
 {
-    int index;
+    పూర్ణాంకం సూచీ;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
-	index = color->index + 1;
-    else if (color->type == 0)
+    ఒకవేళ (VTERM_COLOR_IS_సూచీకృత(color))
+	సూచీ = color->సూచీ + 1;
+    లేకపోతే ఒకవేళ (color->type == 0)
 	// use RGB values
-	index = 255;
-    else
+	సూచీ = 255;
+    లేకపోతే
 	// default color
-	index = 0;
+	సూచీ = 0;
     fprintf(fd, "%02x%02x%02x%d",
-	    (int)color->red, (int)color->green, (int)color->blue,
-	    index);
+	    (పూర్ణాంకం)color->red, (పూర్ణాంకం)color->green, (పూర్ణాంకం)color->blue,
+	    సూచీ);
 }
 
 /*
@@ -5418,14 +5418,14 @@ dump_term_color(FILE *fd, VTermColor *color)
  * Repeating the previous screen cell:
  *    @{count}
  */
-    void
-f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_dumpwrite(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     char_u	*fname;
-    int		max_height = 0;
-    int		max_width = 0;
+    పూర్ణాంకం		max_ఎత్తు_2 = 0;
+    పూర్ణాంకం		max_వెడల్పు_2 = 0;
     stat_T	st;
     FILE	*fd;
     VTermPos	pos;
@@ -5434,121 +5434,121 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
     VTermState	*state;
     VTermPos	cursor_pos;
 
-    if (check_restricted() || check_secure())
-	return;
+    ఒకవేళ (check_restricted() || check_secure())
+	తిరిగి;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_dumpwrite()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
+    buf = పదం_get_buf(argvars, "term_dumpwrite()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
     {
-	emsg(_(e_job_already_finished));
-	return;
+	emsg(_(e_పని_already_ముగిసిన));
+	తిరిగి;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return;
+	ఒకవేళ (check_for_dict_arg(argvars, 2) == FAIL)
+	    తిరిగి;
 	d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	ఒకవేళ (d != ఖాళీ)
 	{
-	    max_height = dict_get_number(d, "rows");
-	    max_width = dict_get_number(d, "columns");
+	    max_ఎత్తు_2 = dict_get_సంఖ్య(d, "rows");
+	    max_వెడల్పు_2 = dict_get_సంఖ్య(d, "columns");
 	}
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
-    if (mch_stat((char *)fname, &st) >= 0)
+    ఒకవేళ (fname == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (mch_stat((అక్షరం *)fname, &st) >= 0)
     {
 	semsg(_(e_file_exists_str), fname);
-	return;
+	తిరిగి;
     }
 
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, WRITEBIN)) == NULL)
+    ఒకవేళ (*fname == NUL || (fd = mch_fopen((అక్షరం *)fname, WRITEBIN)) == ఖాళీ)
     {
 	semsg(_(e_cant_create_file_str), *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	తిరిగి;
     }
 
     clear_cell(&prev_cell);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
+    screen = vterm_obtain_screen(పదం->tl_vterm);
+    state = vterm_obtain_state(పదం->tl_vterm);
     vterm_state_get_cursorpos(state, &cursor_pos);
 
-    for (pos.row = 0; (max_height == 0 || pos.row < max_height)
-					 && pos.row < term->tl_rows; ++pos.row)
+    కొరకు (pos.అడ్డువరుస = 0; (max_ఎత్తు_2 == 0 || pos.అడ్డువరుస < max_ఎత్తు_2)
+					 && pos.అడ్డువరుస < పదం->tl_అడ్డువరుసలు; ++pos.అడ్డువరుస)
     {
-	int		repeat = 0;
+	పూర్ణాంకం		repeat = 0;
 
-	for (pos.col = 0; (max_width == 0 || pos.col < max_width)
-					 && pos.col < term->tl_cols; ++pos.col)
+	కొరకు (pos.నిలువు = 0; (max_వెడల్పు_2 == 0 || pos.నిలువు < max_వెడల్పు_2)
+					 && pos.నిలువు < పదం->tl_నిలువుల_సంఖ్య; ++pos.నిలువు)
 	{
 	    VTermScreenCell cell;
-	    int		    same_attr;
-	    int		    same_chars = TRUE;
-	    int		    i;
-	    int		    is_cursor_pos = (pos.col == cursor_pos.col
-						 && pos.row == cursor_pos.row);
+	    పూర్ణాంకం		    same_attr;
+	    పూర్ణాంకం		    same_chars = TRUE;
+	    పూర్ణాంకం		    i;
+	    పూర్ణాంకం		    is_cursor_pos = (pos.నిలువు == cursor_pos.నిలువు
+						 && pos.అడ్డువరుస == cursor_pos.అడ్డువరుస);
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+	    ఒకవేళ (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		clear_cell(&cell);
 
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    కొరకు (i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL; ++i)
 	    {
-		int c = cell.chars[i];
-		int pc = prev_cell.chars[i];
-		int should_break = c == NUL || pc == NUL;
+		పూర్ణాంకం c = cell.chars[i];
+		పూర్ణాంకం pc = prev_cell.chars[i];
+		పూర్ణాంకం should_break = c == NUL || pc == NUL;
 
 		// For the first character NUL is the same as space.
-		if (i == 0)
+		ఒకవేళ (i == 0)
 		{
 		    c = (c == NUL) ? ' ' : c;
 		    pc = (pc == NUL) ? ' ' : pc;
 		}
-		if (c != pc)
+		ఒకవేళ (c != pc)
 		    same_chars = FALSE;
-		if (should_break)
-		    break;
+		ఒకవేళ (should_break)
+		    ఆపు;
 	    }
 	    same_attr = vtermAttr2hl(&cell.attrs)
 					      == vtermAttr2hl(&prev_cell.attrs)
 			&& vterm_color_is_equal(&cell.fg, &prev_cell.fg)
 			&& vterm_color_is_equal(&cell.bg, &prev_cell.bg);
-	    if (same_chars && cell.width == prev_cell.width && same_attr
+	    ఒకవేళ (same_chars && cell.వెడల్పు == prev_cell.వెడల్పు && same_attr
 							     && !is_cursor_pos)
 	    {
 		++repeat;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (repeat > 0)
+		ఒకవేళ (repeat > 0)
 		{
 		    fprintf(fd, "@%d", repeat);
 		    repeat = 0;
 		}
 		fputs(is_cursor_pos ? ">" : "|", fd);
 
-		if (cell.chars[0] == NUL)
+		ఒకవేళ (cell.chars[0] == NUL)
 		    fputs(" ", fd);
-		else
+		లేకపోతే
 		{
 		    char_u	charbuf[10];
-		    int		len;
+		    పూర్ణాంకం		len;
 
-		    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL
+		    కొరకు (i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL
 						  && cell.chars[i] != NUL; ++i)
 		    {
 			len = utf_char2bytes(cell.chars[i], charbuf);
@@ -5559,33 +5559,33 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		// When only the characters differ we don't write anything, the
 		// following "|", "@" or NL will indicate using the same
 		// attributes.
-		if (cell.width != prev_cell.width || !same_attr)
+		ఒకవేళ (cell.వెడల్పు != prev_cell.వెడల్పు || !same_attr)
 		{
-		    if (cell.width == 2)
+		    ఒకవేళ (cell.వెడల్పు == 2)
 			fputs("*", fd);
-		    else
+		    లేకపోతే
 			fputs("+", fd);
 
-		    if (same_attr)
+		    ఒకవేళ (same_attr)
 		    {
 			fputs("&", fd);
 		    }
-		    else
+		    లేకపోతే
 		    {
 			fprintf(fd, "%d", vtermAttr2hl(&cell.attrs));
-			if (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
+			ఒకవేళ (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
 			    fputs("&", fd);
-			else
+			లేకపోతే
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.fg);
+			    dump_పదం_color(fd, &cell.fg);
 			}
-			if (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
+			ఒకవేళ (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
 			    fputs("&", fd);
-			else
+			లేకపోతే
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.bg);
+			    dump_పదం_color(fd, &cell.bg);
 			}
 		    }
 		}
@@ -5593,10 +5593,10 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		prev_cell = cell;
 	    }
 
-	    if (cell.width == 2)
-		++pos.col;
+	    ఒకవేళ (cell.వెడల్పు == 2)
+		++pos.నిలువు;
 	}
-	if (repeat > 0)
+	ఒకవేళ (repeat > 0)
 	    fprintf(fd, "@%d", repeat);
 	fputs("\n", fd);
     }
@@ -5607,26 +5607,26 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * Called when a dump is corrupted.  Put a breakpoint here when debugging.
  */
-    static void
+    స్థిర శూన్య
 dump_is_corrupt(garray_T *gap)
 {
     GA_CONCAT_LITERAL(gap, "CORRUPT");
 }
 
-    static void
+    స్థిర శూన్య
 append_cell(garray_T *gap, cellattr_T *cell)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ఒకవేళ (ga_grow(gap, 1) == FAIL)
+	తిరిగి;
 
-    *(((cellattr_T *)gap->ga_data) + gap->ga_len) = *cell;
+    *(((cellattr_T *)gap->ga_దత్తాంశం) + gap->ga_len) = *cell;
     ++gap->ga_len;
 }
 
-    static void
+    స్థిర శూన్య
 clear_cellattr(cellattr_T *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_క్షేత్రం(*cell);
     cell->fg.type = VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_DEFAULT_BG;
 }
@@ -5635,125 +5635,125 @@ clear_cellattr(cellattr_T *cell)
  * Read the dump file from "fd" and append lines to the current buffer.
  * Return the cell width of the longest line.
  */
-    static int
+    స్థిర పూర్ణాంకం
 read_dump_file(FILE *fd, VTermPos *cursor_pos)
 {
-    int		    c;
-    garray_T	    ga_text;
+    పూర్ణాంకం		    c;
+    garray_T	    ga_పాఠ్యం;
     garray_T	    ga_cell;
-    string_T	    prev_char = {NULL, 0};
-    int		    attr = 0;
+    string_T	    prev_char = {ఖాళీ, 0};
+    పూర్ణాంకం		    attr = 0;
     cellattr_T	    cell;
-    cellattr_T	    empty_cell;
-    term_T	    *term = curbuf->b_term;
-    int		    max_cells = 0;
-    int		    start_row = term->tl_scrollback.ga_len;
+    cellattr_T	    ఖాళీలు_cell;
+    పదం_T	    *పదం = curbuf->b_పదం;
+    పూర్ణాంకం		    max_cells = 0;
+    పూర్ణాంకం		    ప్రారంభం_అడ్డువరుస = పదం->tl_scrollback.ga_len;
 
-    ga_init2(&ga_text, 1, 90);
-    ga_init2(&ga_cell, sizeof(cellattr_T), 90);
+    ga_init2(&ga_పాఠ్యం, 1, 90);
+    ga_init2(&ga_cell, పరిమాణం(cellattr_T), 90);
     clear_cellattr(&cell);
-    clear_cellattr(&empty_cell);
-    cursor_pos->row = -1;
-    cursor_pos->col = -1;
+    clear_cellattr(&ఖాళీలు_cell);
+    cursor_pos->అడ్డువరుస = -1;
+    cursor_pos->నిలువు = -1;
 
     c = fgetc(fd);
-    for (;;)
+    కొరకు (;;)
     {
-	if (c == EOF)
-	    break;
-	if (c == '\r')
+	ఒకవేళ (c == EOF)
+	    ఆపు;
+	ఒకవేళ (c == '\r')
 	{
 	    // DOS line endings?  Ignore.
 	    c = fgetc(fd);
 	}
-	else if (c == '\n')
+	లేకపోతే ఒకవేళ (c == '\n')
 	{
 	    // End of a line: append it to the buffer.
-	    if (ga_text.ga_data == NULL)
-		dump_is_corrupt(&ga_text);
-	    if (ga_grow(&term->tl_scrollback, 1) == OK)
+	    ఒకవేళ (ga_పాఠ్యం.ga_దత్తాంశం == ఖాళీ)
+		dump_is_corrupt(&ga_పాఠ్యం);
+	    ఒకవేళ (ga_grow(&పదం->tl_scrollback, 1) == OK)
 	    {
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		sb_పంక్తి_T   *పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం
+						  + పదం->tl_scrollback.ga_len;
 
-		if (max_cells < ga_cell.ga_len)
+		ఒకవేళ (max_cells < ga_cell.ga_len)
 		    max_cells = ga_cell.ga_len;
-		line->sb_cols = ga_cell.ga_len;
-		line->sb_bytes = ga_text.ga_len;
-		line->sb_cells = ga_cell.ga_data;
-		line->sb_fill_attr = term->tl_default_color;
-		line->continuation = 0;
-		++term->tl_scrollback.ga_len;
+		పంక్తి->sb_నిలువుల_సంఖ్య = ga_cell.ga_len;
+		పంక్తి->sb_బైట్లు = ga_పాఠ్యం.ga_len;
+		పంక్తి->sb_cells = ga_cell.ga_దత్తాంశం;
+		పంక్తి->sb_fill_attr = పదం->tl_default_color;
+		పంక్తి->continuation = 0;
+		++పదం->tl_scrollback.ga_len;
 		ga_init(&ga_cell);
 
-		ga_append(&ga_text, NUL);
-		ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+		ga_append(&ga_పాఠ్యం, NUL);
+		ml_append(curbuf->b_ml.ml_పంక్తి_లెక్క, ga_పాఠ్యం.ga_దత్తాంశం,
+							ga_పాఠ్యం.ga_len, FALSE);
 	    }
-	    else
+	    లేకపోతే
 		ga_clear(&ga_cell);
-	    ga_text.ga_len = 0;
+	    ga_పాఠ్యం.ga_len = 0;
 
 	    c = fgetc(fd);
 	}
-	else if (c == '|' || c == '>')
+	లేకపోతే ఒకవేళ (c == '|' || c == '>')
 	{
-	    int prev_len = ga_text.ga_len;
+	    పూర్ణాంకం prev_len = ga_పాఠ్యం.ga_len;
 
-	    if (c == '>')
+	    ఒకవేళ (c == '>')
 	    {
-		if (cursor_pos->row != -1)
-		    dump_is_corrupt(&ga_text);	// duplicate cursor
-		cursor_pos->row = term->tl_scrollback.ga_len - start_row;
-		cursor_pos->col = ga_cell.ga_len;
+		ఒకవేళ (cursor_pos->అడ్డువరుస != -1)
+		    dump_is_corrupt(&ga_పాఠ్యం);	// duplicate cursor
+		cursor_pos->అడ్డువరుస = పదం->tl_scrollback.ga_len - ప్రారంభం_అడ్డువరుస;
+		cursor_pos->నిలువు = ga_cell.ga_len;
 	    }
 
 	    // normal character(s) followed by "+", "*", "|", "@" or NL
 	    c = fgetc(fd);
-	    if (c != EOF)
-		ga_append(&ga_text, c);
-	    for (;;)
+	    ఒకవేళ (c != EOF)
+		ga_append(&ga_పాఠ్యం, c);
+	    కొరకు (;;)
 	    {
 		c = fgetc(fd);
-		if (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
+		ఒకవేళ (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
 						      || c == EOF || c == '\n')
-		    break;
-		ga_append(&ga_text, c);
+		    ఆపు;
+		ga_append(&ga_పాఠ్యం, c);
 	    }
 
 	    // save the character for repeating it
 	    VIM_CLEAR_STRING(prev_char);
-	    if (ga_text.ga_data != NULL)
+	    ఒకవేళ (ga_పాఠ్యం.ga_దత్తాంశం != ఖాళీ)
 	    {
-		prev_char.length = (size_t)(ga_text.ga_len - prev_len);
+		prev_char.నిడివి = (size_t)(ga_పాఠ్యం.ga_len - prev_len);
 		prev_char.string = vim_strnsave(
-		    ((char_u *)ga_text.ga_data) + prev_len,
-		    prev_char.length);
-		if (prev_char.string == NULL)
-		    prev_char.length = 0;
+		    ((char_u *)ga_పాఠ్యం.ga_దత్తాంశం) + prev_len,
+		    prev_char.నిడివి);
+		ఒకవేళ (prev_char.string == ఖాళీ)
+		    prev_char.నిడివి = 0;
 	    }
 
-	    if (c == '@' || c == '|' || c == '>' || c == '\n')
+	    ఒకవేళ (c == '@' || c == '|' || c == '>' || c == '\n')
 	    {
 		// use all attributes from previous cell
 	    }
-	    else if (c == '+' || c == '*')
+	    లేకపోతే ఒకవేళ (c == '+' || c == '*')
 	    {
-		int is_bg;
+		పూర్ణాంకం is_bg;
 
-		cell.width = c == '+' ? 1 : 2;
+		cell.వెడల్పు = c == '+' ? 1 : 2;
 
 		c = fgetc(fd);
-		if (c == '&')
+		ఒకవేళ (c == '&')
 		{
 		    // use same attr as previous cell
 		    c = fgetc(fd);
 		}
-		else if (SAFE_isdigit(c))
+		లేకపోతే ఒకవేళ (సురక్షిత_isdigit(c))
 		{
 		    // get the decimal attribute
 		    attr = 0;
-		    while (SAFE_isdigit(c))
+		    అయితే (సురక్షిత_isdigit(c))
 		    {
 			attr = attr * 10 + (c - '0');
 			c = fgetc(fd);
@@ -5761,16 +5761,16 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 		    hl2vtermAttr(attr, &cell);
 
 		    // is_bg == 0: fg, is_bg == 1: bg
-		    for (is_bg = 0; is_bg <= 1; ++is_bg)
+		    కొరకు (is_bg = 0; is_bg <= 1; ++is_bg)
 		    {
-			if (c == '&')
+			ఒకవేళ (c == '&')
 			{
 			    // use same color as previous cell
 			    c = fgetc(fd);
 			}
-			else if (c == '#')
+			లేకపోతే ఒకవేళ (c == '#')
 			{
-			    int red, green, blue, index = 0, type;
+			    పూర్ణాంకం red, green, blue, సూచీ = 0, type;
 
 			    c = fgetc(fd);
 			    red = hex2nr(c);
@@ -5785,409 +5785,409 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 			    c = fgetc(fd);
 			    blue = (blue << 4) + hex2nr(c);
 			    c = fgetc(fd);
-			    if (!SAFE_isdigit(c))
-				dump_is_corrupt(&ga_text);
-			    while (SAFE_isdigit(c))
+			    ఒకవేళ (!సురక్షిత_isdigit(c))
+				dump_is_corrupt(&ga_పాఠ్యం);
+			    అయితే (సురక్షిత_isdigit(c))
 			    {
-				index = index * 10 + (c - '0');
+				సూచీ = సూచీ * 10 + (c - '0');
 				c = fgetc(fd);
 			    }
-			    if (index == 0 || index == 255)
+			    ఒకవేళ (సూచీ == 0 || సూచీ == 255)
 			    {
 				type = VTERM_COLOR_RGB;
-				if (index == 0)
+				ఒకవేళ (సూచీ == 0)
 				{
-				    if (is_bg)
+				    ఒకవేళ (is_bg)
 					type |= VTERM_COLOR_DEFAULT_BG;
-				    else
+				    లేకపోతే
 					type |= VTERM_COLOR_DEFAULT_FG;
 				}
 			    }
-			    else
+			    లేకపోతే
 			    {
-				type = VTERM_COLOR_INDEXED;
-				index -= 1;
+				type = VTERM_COLOR_సూచీకృత;
+				సూచీ -= 1;
 			    }
-			    if (is_bg)
+			    ఒకవేళ (is_bg)
 			    {
 				cell.bg.type = type;
 				cell.bg.red = red;
 				cell.bg.green = green;
 				cell.bg.blue = blue;
-				cell.bg.index = index;
+				cell.bg.సూచీ = సూచీ;
 			    }
-			    else
+			    లేకపోతే
 			    {
 				cell.fg.type = type;
 				cell.fg.red = red;
 				cell.fg.green = green;
 				cell.fg.blue = blue;
-				cell.fg.index = index;
+				cell.fg.సూచీ = సూచీ;
 			    }
 			}
-			else
-			    dump_is_corrupt(&ga_text);
+			లేకపోతే
+			    dump_is_corrupt(&ga_పాఠ్యం);
 		    }
 		}
-		else
-		    dump_is_corrupt(&ga_text);
+		లేకపోతే
+		    dump_is_corrupt(&ga_పాఠ్యం);
 	    }
-	    else
-		dump_is_corrupt(&ga_text);
+	    లేకపోతే
+		dump_is_corrupt(&ga_పాఠ్యం);
 
 	    append_cell(&ga_cell, &cell);
-	    if (cell.width == 2)
-		append_cell(&ga_cell, &empty_cell);
+	    ఒకవేళ (cell.వెడల్పు == 2)
+		append_cell(&ga_cell, &ఖాళీలు_cell);
 	}
-	else if (c == '@')
+	లేకపోతే ఒకవేళ (c == '@')
 	{
-	    if (prev_char.string == NULL)
-		dump_is_corrupt(&ga_text);
-	    else
+	    ఒకవేళ (prev_char.string == ఖాళీ)
+		dump_is_corrupt(&ga_పాఠ్యం);
+	    లేకపోతే
 	    {
-		int count = 0;
+		పూర్ణాంకం లెక్క = 0;
 
 		// repeat previous character, get the count
-		for (;;)
+		కొరకు (;;)
 		{
 		    c = fgetc(fd);
-		    if (!SAFE_isdigit(c))
-			break;
-		    count = count * 10 + (c - '0');
+		    ఒకవేళ (!సురక్షిత_isdigit(c))
+			ఆపు;
+		    లెక్క = లెక్క * 10 + (c - '0');
 		}
 
-		while (count-- > 0)
+		అయితే (లెక్క-- > 0)
 		{
-		    ga_concat_len(&ga_text, prev_char.string, prev_char.length);
+		    ga_concat_len(&ga_పాఠ్యం, prev_char.string, prev_char.నిడివి);
 		    append_cell(&ga_cell, &cell);
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    dump_is_corrupt(&ga_text);
+	    dump_is_corrupt(&ga_పాఠ్యం);
 	    c = fgetc(fd);
 	}
     }
 
-    if (ga_text.ga_len > 0)
+    ఒకవేళ (ga_పాఠ్యం.ga_len > 0)
     {
 	// trailing characters after last NL
-	dump_is_corrupt(&ga_text);
-	ga_append(&ga_text, NUL);
-	ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+	dump_is_corrupt(&ga_పాఠ్యం);
+	ga_append(&ga_పాఠ్యం, NUL);
+	ml_append(curbuf->b_ml.ml_పంక్తి_లెక్క, ga_పాఠ్యం.ga_దత్తాంశం,
+							ga_పాఠ్యం.ga_len, FALSE);
     }
 
-    ga_clear(&ga_text);
+    ga_clear(&ga_పాఠ్యం);
     ga_clear(&ga_cell);
     vim_free(prev_char.string);
 
-    return max_cells;
+    తిరిగి max_cells;
 }
 
 /*
  * Return an allocated string with at least "text_width" "=" characters and
  * "fname" inserted in the middle.
  */
-    static char_u *
-get_separator(int text_width, char_u *fname)
+    స్థిర char_u *
+get_separator(పూర్ణాంకం పాఠ్యం_వెడల్పు, char_u *fname)
 {
-    int	    width = MAX(text_width, curwin->w_width);
+    పూర్ణాంకం	    వెడల్పు = MAX(పాఠ్యం_వెడల్పు, curwin->w_వెడల్పు);
     char_u  *textline;
-    int	    fname_size;
+    పూర్ణాంకం	    fname_కొలత;
     char_u  *p = fname;
-    int	    i;
+    పూర్ణాంకం	    i;
     size_t  off;
 
-    textline = alloc(width + STRLEN(fname) + 1);
-    if (textline == NULL)
-	return NULL;
+    textline = alloc(వెడల్పు + STRLEN(fname) + 1);
+    ఒకవేళ (textline == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    fname_size = vim_strsize(fname);
-    if (fname_size < width - 8)
+    fname_కొలత = vim_strsize(fname);
+    ఒకవేళ (fname_కొలత < వెడల్పు - 8)
     {
 	// enough room, don't use the full window width
-	width = MAX(text_width, fname_size + 8);
+	వెడల్పు = MAX(పాఠ్యం_వెడల్పు, fname_కొలత + 8);
     }
-    else if (fname_size > width - 8)
+    లేకపోతే ఒకవేళ (fname_కొలత > వెడల్పు - 8)
     {
 	// full name doesn't fit, use only the tail
 	p = gettail(fname);
-	fname_size = vim_strsize(p);
+	fname_కొలత = vim_strsize(p);
     }
     // skip characters until the name fits
-    while (fname_size > width - 8)
+    అయితే (fname_కొలత > వెడల్పు - 8)
     {
 	p += (*mb_ptr2len)(p);
-	fname_size = vim_strsize(p);
+	fname_కొలత = vim_strsize(p);
     }
 
-    for (i = 0; i < (width - fname_size) / 2 - 1; ++i)
+    కొరకు (i = 0; i < (వెడల్పు - fname_కొలత) / 2 - 1; ++i)
 	textline[i] = '=';
     textline[i++] = ' ';
 
     STRCPY(textline + i, p);
     off = STRLEN(textline);
     textline[off] = ' ';
-    for (i = 1; i < (width - fname_size) / 2; ++i)
+    కొరకు (i = 1; i < (వెడల్పు - fname_కొలత) / 2; ++i)
 	textline[off + i] = '=';
     textline[off + i] = NUL;
 
-    return textline;
+    తిరిగి textline;
 }
 
 /*
  * Common for "term_dumpdiff()" and "term_dumpload()".
  */
-    static void
-term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
+    స్థిర శూన్య
+పదం_ఎక్కించు_dump(typval_T *argvars, typval_T *rettv, పూర్ణాంకం do_diff)
 {
     jobopt_T	opt;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ఖాళీ;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*fname1;
-    char_u	*fname2 = NULL;
-    char_u	*fname_tofree = NULL;
+    char_u	*fname2 = ఖాళీ;
+    char_u	*fname_tofree = ఖాళీ;
     FILE	*fd1;
-    FILE	*fd2 = NULL;
-    char_u	*textline = NULL;
+    FILE	*fd2 = ఖాళీ;
+    char_u	*textline = ఖాళీ;
 
     // First open the files.  If this fails bail out.
     fname1 = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (do_diff)
+    ఒకవేళ (do_diff)
 	fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (fname1 == NULL || (do_diff && fname2 == NULL))
+    ఒకవేళ (fname1 == ఖాళీ || (do_diff && fname2 == ఖాళీ))
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_వాదం));
+	తిరిగి;
     }
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((అక్షరం *)fname1, READBIN);
+    ఒకవేళ (fd1 == ఖాళీ)
     {
 	semsg(_(e_cant_read_file_str), fname1);
-	return;
+	తిరిగి;
     }
-    if (do_diff)
+    ఒకవేళ (do_diff)
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((అక్షరం *)fname2, READBIN);
+	ఒకవేళ (fd2 == ఖాళీ)
 	{
 	    fclose(fd1);
 	    semsg(_(e_cant_read_file_str), fname2);
-	    return;
+	    తిరిగి;
 	}
     }
 
-    init_job_options(&opt);
-    if (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[do_diff ? 2 : 1], &opt, 0,
-		    JO2_TERM_NAME + JO2_TERM_COLS + JO2_TERM_ROWS
+    init_పని_options(&opt);
+    ఒకవేళ (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
+	    && get_పని_options(&argvars[do_diff ? 2 : 1], &opt, 0,
+		    JO2_పదం_NAME + JO2_పదం_నిలువుల_సంఖ్య + JO2_పదం_అడ్డువరుసలు
 		    + JO2_VERTICAL + JO2_CURWIN + JO2_NORESTORE) == FAIL)
-	goto theend;
+	వెళ్ళు theend;
 
-    if (opt.jo_term_name == NULL)
+    ఒకవేళ (opt.jo_పదం_name == ఖాళీ)
     {
 	size_t len = STRLEN(fname1) + 12;
 
 	fname_tofree = alloc(len);
-	if (fname_tofree != NULL)
+	ఒకవేళ (fname_tofree != ఖాళీ)
 	{
-	    vim_snprintf((char *)fname_tofree, len, "dump diff %s", fname1);
-	    opt.jo_term_name = fname_tofree;
+	    vim_snprintf((అక్షరం *)fname_tofree, len, "dump diff %s", fname1);
+	    opt.jo_పదం_name = fname_tofree;
 	}
     }
 
-    if (opt.jo_bufnr_buf != NULL)
+    ఒకవేళ (opt.jo_bufnr_buf != ఖాళీ)
     {
 	win_T *wp = buf_jump_open_win(opt.jo_bufnr_buf);
 
 	// With "bufnr" argument: enter the window with this buffer and make it
 	// empty.
-	if (wp == NULL)
-	    semsg(_(e_invalid_argument_str), "bufnr");
-	else
+	ఒకవేళ (wp == ఖాళీ)
+	    semsg(_(e_invalid_వాదం_str), "bufnr");
+	లేకపోతే
 	{
 	    buf = curbuf;
-	    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+	    అయితే (!(curbuf->b_ml.ml_flags & ML_ఖాళీలు))
 		ml_delete((linenr_T)1);
-	    free_scrollback(curbuf->b_term);
+	    free_scrollback(curbuf->b_పదం);
 	    redraw_later(UPD_NOT_VALID);
 	}
     }
-    else
+    లేకపోతే
 	// Create a new terminal window.
-	buf = term_start(&argvars[0], NULL, &opt, TERM_START_NOJOB);
+	buf = పదం_ప్రారంభం(&argvars[0], ఖాళీ, &opt, పదం_ప్రారంభం_NOJOB);
 
-    if (buf != NULL && buf->b_term != NULL)
+    ఒకవేళ (buf != ఖాళీ && buf->b_పదం != ఖాళీ)
     {
-	int		i;
+	పూర్ణాంకం		i;
 	linenr_T	bot_lnum;
 	linenr_T	lnum;
-	term_T		*term = buf->b_term;
-	int		width;
-	int		width2;
+	పదం_T		*పదం = buf->b_పదం;
+	పూర్ణాంకం		వెడల్పు;
+	పూర్ణాంకం		width2;
 	VTermPos	cursor_pos1;
 	VTermPos	cursor_pos2;
 
-	term_init_default_colors(term);
+	పదం_init_default_colors(పదం);
 
-	rettv->vval.v_number = buf->b_fnum;
+	rettv->vval.v_సంఖ్య = buf->b_fnum;
 
 	// read the files, fill the buffer with the diff
-	width = read_dump_file(fd1, &cursor_pos1);
+	వెడల్పు = read_dump_file(fd1, &cursor_pos1);
 
 	// position the cursor
-	if (cursor_pos1.row >= 0)
+	ఒకవేళ (cursor_pos1.అడ్డువరుస >= 0)
 	{
-	    curwin->w_cursor.lnum = cursor_pos1.row + 1;
-	    coladvance(cursor_pos1.col);
+	    curwin->w_cursor.lnum = cursor_pos1.అడ్డువరుస + 1;
+	    coladvance(cursor_pos1.నిలువు);
 	}
 
 	// Delete the empty line that was in the empty buffer.
 	ml_delete(1);
 
 	// For term_dumpload() we are done here.
-	if (!do_diff)
-	    goto theend;
+	ఒకవేళ (!do_diff)
+	    వెళ్ళు theend;
 
-	term->tl_top_diff_rows = curbuf->b_ml.ml_line_count;
+	పదం->tl_శిఖరం_diff_అడ్డువరుసలు = curbuf->b_ml.ml_పంక్తి_లెక్క;
 
-	textline = get_separator(width, fname1);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
+	textline = get_separator(వెడల్పు, fname1);
+	ఒకవేళ (textline == ఖాళీ)
+	    వెళ్ళు theend;
+	ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &పదం->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_పంక్తి_లెక్క, textline, 0, FALSE);
 	vim_free(textline);
 
-	textline = get_separator(width, fname2);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
-	textline[width] = NUL;
+	textline = get_separator(వెడల్పు, fname2);
+	ఒకవేళ (textline == ఖాళీ)
+	    వెళ్ళు theend;
+	ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &పదం->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_పంక్తి_లెక్క, textline, 0, FALSE);
+	textline[వెడల్పు] = NUL;
 
-	bot_lnum = curbuf->b_ml.ml_line_count;
+	bot_lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	width2 = read_dump_file(fd2, &cursor_pos2);
-	if (width2 > width)
+	ఒకవేళ (width2 > వెడల్పు)
 	{
 	    vim_free(textline);
 	    textline = alloc(width2 + 1);
-	    if (textline == NULL)
-		goto theend;
-	    width = width2;
-	    textline[width] = NUL;
+	    ఒకవేళ (textline == ఖాళీ)
+		వెళ్ళు theend;
+	    వెడల్పు = width2;
+	    textline[వెడల్పు] = NUL;
 	}
-	term->tl_bot_diff_rows = curbuf->b_ml.ml_line_count - bot_lnum;
+	పదం->tl_bot_diff_అడ్డువరుసలు = curbuf->b_ml.ml_పంక్తి_లెక్క - bot_lnum;
 
-	for (lnum = 1; lnum <= term->tl_top_diff_rows; ++lnum)
+	కొరకు (lnum = 1; lnum <= పదం->tl_శిఖరం_diff_అడ్డువరుసలు; ++lnum)
 	{
-	    if (lnum + bot_lnum > curbuf->b_ml.ml_line_count)
+	    ఒకవేళ (lnum + bot_lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	    {
 		// bottom part has fewer rows, fill with "-"
-		for (i = 0; i < width; ++i)
+		కొరకు (i = 0; i < వెడల్పు; ++i)
 		    textline[i] = '-';
 	    }
-	    else
+	    లేకపోతే
 	    {
 		char_u *line1;
 		char_u *line2;
 		char_u *p1;
 		char_u *p2;
-		int	col;
-		sb_line_T   *sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
-		cellattr_T *cellattr1 = (sb_line + lnum - 1)->sb_cells;
-		cellattr_T *cellattr2 = (sb_line + lnum + bot_lnum - 1)
+		పూర్ణాంకం	నిలువు;
+		sb_పంక్తి_T   *sb_పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం;
+		cellattr_T *cellattr1 = (sb_పంక్తి + lnum - 1)->sb_cells;
+		cellattr_T *cellattr2 = (sb_పంక్తి + lnum + bot_lnum - 1)
 								    ->sb_cells;
 
 		// Make a copy, getting the second line will invalidate it.
 		line1 = vim_strsave(ml_get(lnum));
-		if (line1 == NULL)
-		    break;
+		ఒకవేళ (line1 == ఖాళీ)
+		    ఆపు;
 		p1 = line1;
 
 		line2 = ml_get(lnum + bot_lnum);
 		p2 = line2;
-		for (col = 0; col < width && *p1 != NUL && *p2 != NUL; ++col)
+		కొరకు (నిలువు = 0; నిలువు < వెడల్పు && *p1 != NUL && *p2 != NUL; ++నిలువు)
 		{
-		    int len1 = utfc_ptr2len(p1);
-		    int len2 = utfc_ptr2len(p2);
+		    పూర్ణాంకం len1 = utfc_ptr2len(p1);
+		    పూర్ణాంకం len2 = utfc_ptr2len(p2);
 
-		    textline[col] = ' ';
-		    if (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
+		    textline[నిలువు] = ' ';
+		    ఒకవేళ (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
 			// text differs
-			textline[col] = 'X';
-		    else if (lnum == cursor_pos1.row + 1
-			    && col == cursor_pos1.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[నిలువు] = 'X';
+		    లేకపోతే ఒకవేళ (lnum == cursor_pos1.అడ్డువరుస + 1
+			    && నిలువు == cursor_pos1.నిలువు
+			    && (cursor_pos1.అడ్డువరుస != cursor_pos2.అడ్డువరుస
+					|| cursor_pos1.నిలువు != cursor_pos2.నిలువు))
 			// cursor in first but not in second
-			textline[col] = '>';
-		    else if (lnum == cursor_pos2.row + 1
-			    && col == cursor_pos2.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[నిలువు] = '>';
+		    లేకపోతే ఒకవేళ (lnum == cursor_pos2.అడ్డువరుస + 1
+			    && నిలువు == cursor_pos2.నిలువు
+			    && (cursor_pos1.అడ్డువరుస != cursor_pos2.అడ్డువరుస
+					|| cursor_pos1.నిలువు != cursor_pos2.నిలువు))
 			// cursor in second but not in first
-			textline[col] = '<';
-		    else if (cellattr1 != NULL && cellattr2 != NULL)
+			textline[నిలువు] = '<';
+		    లేకపోతే ఒకవేళ (cellattr1 != ఖాళీ && cellattr2 != ఖాళీ)
 		    {
-			if ((cellattr1 + col)->width
-						   != (cellattr2 + col)->width)
-			    textline[col] = 'w';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->fg,
-						   &(cellattr2 + col)->fg))
-			    textline[col] = 'f';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->bg,
-						   &(cellattr2 + col)->bg))
-			    textline[col] = 'b';
-			else if (vtermAttr2hl(&(cellattr1 + col)->attrs)
-				  != vtermAttr2hl(&((cellattr2 + col)->attrs)))
-			    textline[col] = 'a';
+			ఒకవేళ ((cellattr1 + నిలువు)->వెడల్పు
+						   != (cellattr2 + నిలువు)->వెడల్పు)
+			    textline[నిలువు] = 'w';
+			లేకపోతే ఒకవేళ (!vterm_color_is_equal(&(cellattr1 + నిలువు)->fg,
+						   &(cellattr2 + నిలువు)->fg))
+			    textline[నిలువు] = 'f';
+			లేకపోతే ఒకవేళ (!vterm_color_is_equal(&(cellattr1 + నిలువు)->bg,
+						   &(cellattr2 + నిలువు)->bg))
+			    textline[నిలువు] = 'b';
+			లేకపోతే ఒకవేళ (vtermAttr2hl(&(cellattr1 + నిలువు)->attrs)
+				  != vtermAttr2hl(&((cellattr2 + నిలువు)->attrs)))
+			    textline[నిలువు] = 'a';
 		    }
 		    p1 += len1;
 		    p2 += len2;
 		    // TODO: handle different width
 		}
 
-		while (col < width)
+		అయితే (నిలువు < వెడల్పు)
 		{
-		    if (*p1 == NUL && *p2 == NUL)
-			textline[col] = '?';
-		    else if (*p1 == NUL)
+		    ఒకవేళ (*p1 == NUL && *p2 == NUL)
+			textline[నిలువు] = '?';
+		    లేకపోతే ఒకవేళ (*p1 == NUL)
 		    {
-			textline[col] = '+';
+			textline[నిలువు] = '+';
 			p2 += utfc_ptr2len(p2);
 		    }
-		    else
+		    లేకపోతే
 		    {
-			textline[col] = '-';
+			textline[నిలువు] = '-';
 			p1 += utfc_ptr2len(p1);
 		    }
-		    ++col;
+		    ++నిలువు;
 		}
 
 		vim_free(line1);
 	    }
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &పదం->tl_default_color,
+						 పదం->tl_శిఖరం_diff_అడ్డువరుసలు) == OK)
+		ml_append(పదం->tl_శిఖరం_diff_అడ్డువరుసలు + lnum, textline, 0, FALSE);
 	    ++bot_lnum;
 	}
 
-	while (lnum + bot_lnum <= curbuf->b_ml.ml_line_count)
+	అయితే (lnum + bot_lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    // bottom part has more rows, fill with "+"
-	    for (i = 0; i < width; ++i)
+	    కొరకు (i = 0; i < వెడల్పు; ++i)
 		textline[i] = '+';
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    ఒకవేళ (కూడు_ఖాళీలు_scrollback(పదం, &పదం->tl_default_color,
+						 పదం->tl_శిఖరం_diff_అడ్డువరుసలు) == OK)
+		ml_append(పదం->tl_శిఖరం_diff_అడ్డువరుసలు + lnum, textline, 0, FALSE);
 	    ++lnum;
 	    ++bot_lnum;
 	}
 
-	term->tl_cols = width;
+	పదం->tl_నిలువుల_సంఖ్య = వెడల్పు;
 
 	// looks better without wrapping
 	curwin->w_p_wrap = 0;
@@ -6197,7 +6197,7 @@ theend:
     vim_free(textline);
     vim_free(fname_tofree);
     fclose(fd1);
-    if (fd2 != NULL)
+    ఒకవేళ (fd2 != ఖాళీ)
 	fclose(fd2);
 }
 
@@ -6206,169 +6206,169 @@ theend:
  * bottom files.
  * Return FAIL when this is not possible.
  */
-    int
-term_swap_diff(void)
+    పూర్ణాంకం
+పదం_మార్పిడి_diff(శూన్య)
 {
-    term_T	*term = curbuf->b_term;
-    linenr_T	line_count;
-    linenr_T	top_rows;
-    linenr_T	bot_rows;
-    linenr_T	bot_start;
+    పదం_T	*పదం = curbuf->b_పదం;
+    linenr_T	పంక్తి_లెక్క;
+    linenr_T	శిఖరం_అడ్డువరుసలు;
+    linenr_T	bot_అడ్డువరుసలు;
+    linenr_T	bot_ప్రారంభం;
     linenr_T	lnum;
     char_u	*p;
-    sb_line_T	*sb_line;
+    sb_పంక్తి_T	*sb_పంక్తి;
 
-    if (term == NULL
-	    || !term_is_finished(curbuf)
-	    || term->tl_top_diff_rows == 0
-	    || term->tl_scrollback.ga_len == 0)
-	return FAIL;
+    ఒకవేళ (పదం == ఖాళీ
+	    || !పదం_is_ముగిసిన(curbuf)
+	    || పదం->tl_శిఖరం_diff_అడ్డువరుసలు == 0
+	    || పదం->tl_scrollback.ga_len == 0)
+	తిరిగి FAIL;
 
-    line_count = curbuf->b_ml.ml_line_count;
-    top_rows = term->tl_top_diff_rows;
-    bot_rows = term->tl_bot_diff_rows;
-    bot_start = line_count - bot_rows;
-    sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
+    పంక్తి_లెక్క = curbuf->b_ml.ml_పంక్తి_లెక్క;
+    శిఖరం_అడ్డువరుసలు = పదం->tl_శిఖరం_diff_అడ్డువరుసలు;
+    bot_అడ్డువరుసలు = పదం->tl_bot_diff_అడ్డువరుసలు;
+    bot_ప్రారంభం = పంక్తి_లెక్క - bot_అడ్డువరుసలు;
+    sb_పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం;
 
     // move lines from top to above the bottom part
-    for (lnum = 1; lnum <= top_rows; ++lnum)
+    కొరకు (lnum = 1; lnum <= శిఖరం_అడ్డువరుసలు; ++lnum)
     {
 	p = vim_strsave(ml_get(1));
-	if (p == NULL)
-	    return OK;
-	ml_append(bot_start, p, 0, FALSE);
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి OK;
+	ml_append(bot_ప్రారంభం, p, 0, FALSE);
 	ml_delete(1);
 	vim_free(p);
     }
 
     // move lines from bottom to the top
-    for (lnum = 1; lnum <= bot_rows; ++lnum)
+    కొరకు (lnum = 1; lnum <= bot_అడ్డువరుసలు; ++lnum)
     {
-	p = vim_strsave(ml_get(bot_start + lnum));
-	if (p == NULL)
-	    return OK;
-	ml_delete(bot_start + lnum);
+	p = vim_strsave(ml_get(bot_ప్రారంభం + lnum));
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి OK;
+	ml_delete(bot_ప్రారంభం + lnum);
 	ml_append(lnum - 1, p, 0, FALSE);
 	vim_free(p);
     }
 
     // move top title to bottom
-    p = vim_strsave(ml_get(bot_rows + 1));
-    if (p == NULL)
-	return OK;
-    ml_append(line_count - top_rows - 1, p, 0, FALSE);
-    ml_delete(bot_rows + 1);
+    p = vim_strsave(ml_get(bot_అడ్డువరుసలు + 1));
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి OK;
+    ml_append(పంక్తి_లెక్క - శిఖరం_అడ్డువరుసలు - 1, p, 0, FALSE);
+    ml_delete(bot_అడ్డువరుసలు + 1);
     vim_free(p);
 
     // move bottom title to top
-    p = vim_strsave(ml_get(line_count - top_rows));
-    if (p == NULL)
-	return OK;
-    ml_delete(line_count - top_rows);
-    ml_append(bot_rows, p, 0, FALSE);
+    p = vim_strsave(ml_get(పంక్తి_లెక్క - శిఖరం_అడ్డువరుసలు));
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి OK;
+    ml_delete(పంక్తి_లెక్క - శిఖరం_అడ్డువరుసలు);
+    ml_append(bot_అడ్డువరుసలు, p, 0, FALSE);
     vim_free(p);
 
-    if (top_rows == bot_rows)
+    ఒకవేళ (శిఖరం_అడ్డువరుసలు == bot_అడ్డువరుసలు)
     {
 	// rows counts are equal, can swap cell properties
-	for (lnum = 0; lnum < top_rows; ++lnum)
+	కొరకు (lnum = 0; lnum < శిఖరం_అడ్డువరుసలు; ++lnum)
 	{
-	    sb_line_T	temp;
+	    sb_పంక్తి_T	తాత్కాలిక;
 
-	    temp = *(sb_line + lnum);
-	    *(sb_line + lnum) = *(sb_line + bot_start + lnum);
-	    *(sb_line + bot_start + lnum) = temp;
+	    తాత్కాలిక = *(sb_పంక్తి + lnum);
+	    *(sb_పంక్తి + lnum) = *(sb_పంక్తి + bot_ప్రారంభం + lnum);
+	    *(sb_పంక్తి + bot_ప్రారంభం + lnum) = తాత్కాలిక;
 	}
     }
-    else
+    లేకపోతే
     {
-	size_t		size = sizeof(sb_line_T) * term->tl_scrollback.ga_len;
-	sb_line_T	*temp = alloc(size);
+	size_t		కొలత = పరిమాణం(sb_పంక్తి_T) * పదం->tl_scrollback.ga_len;
+	sb_పంక్తి_T	*తాత్కాలిక = alloc(కొలత);
 
 	// need to copy cell properties into temp memory
-	if (temp != NULL)
+	ఒకవేళ (తాత్కాలిక != ఖాళీ)
 	{
-	    mch_memmove(temp, term->tl_scrollback.ga_data, size);
-	    mch_memmove(term->tl_scrollback.ga_data,
-		    temp + bot_start,
-		    sizeof(sb_line_T) * bot_rows);
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data + bot_rows,
-		    temp + top_rows,
-		    sizeof(sb_line_T) * (line_count - top_rows - bot_rows));
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data
-						       + line_count - top_rows,
-		    temp,
-		    sizeof(sb_line_T) * top_rows);
-	    vim_free(temp);
+	    mch_memmove(తాత్కాలిక, పదం->tl_scrollback.ga_దత్తాంశం, కొలత);
+	    mch_memmove(పదం->tl_scrollback.ga_దత్తాంశం,
+		    తాత్కాలిక + bot_ప్రారంభం,
+		    పరిమాణం(sb_పంక్తి_T) * bot_అడ్డువరుసలు);
+	    mch_memmove((sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం + bot_అడ్డువరుసలు,
+		    తాత్కాలిక + శిఖరం_అడ్డువరుసలు,
+		    పరిమాణం(sb_పంక్తి_T) * (పంక్తి_లెక్క - శిఖరం_అడ్డువరుసలు - bot_అడ్డువరుసలు));
+	    mch_memmove((sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం
+						       + పంక్తి_లెక్క - శిఖరం_అడ్డువరుసలు,
+		    తాత్కాలిక,
+		    పరిమాణం(sb_పంక్తి_T) * శిఖరం_అడ్డువరుసలు);
+	    vim_free(తాత్కాలిక);
 	}
     }
 
-    term->tl_top_diff_rows = bot_rows;
-    term->tl_bot_diff_rows = top_rows;
+    పదం->tl_శిఖరం_diff_అడ్డువరుసలు = bot_అడ్డువరుసలు;
+    పదం->tl_bot_diff_అడ్డువరుసలు = శిఖరం_అడ్డువరుసలు;
 
     update_screen(UPD_NOT_VALID);
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * "term_dumpdiff(filename, filename, options)" function
  */
-    void
-f_term_dumpdiff(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_dumpdiff(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
-    term_load_dump(argvars, rettv, TRUE);
+    పదం_ఎక్కించు_dump(argvars, rettv, TRUE);
 }
 
 /*
  * "term_dumpload(filename, options)" function
  */
-    void
-f_term_dumpload(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_dumpload(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    term_load_dump(argvars, rettv, FALSE);
+    పదం_ఎక్కించు_dump(argvars, rettv, FALSE);
 }
 
 /*
  * "term_getaltscreen(buf)" function
  */
-    void
-f_term_getaltscreen(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getaltscreen(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getaltscreen()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_using_altscreen;
+    buf = పదం_get_buf(argvars, "term_getaltscreen()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    rettv->vval.v_సంఖ్య = buf->b_పదం->tl_using_altscreen;
 }
 
 /*
  * "term_getattr(attr, name)" function
  */
-    void
-f_term_getattr(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getattr(typval_T *argvars, typval_T *rettv)
 {
-    int	    attr;
+    పూర్ణాంకం	    attr;
     size_t  i;
     char_u  *name;
 
-    static struct {
-	char	    *name;
-	int	    attr;
+    స్థిర నిర్మాణం {
+	అక్షరం	    *name;
+	పూర్ణాంకం	    attr;
     } attrs[] = {
 	{"bold",      HL_BOLD},
 	{"italic",    HL_ITALIC},
@@ -6377,278 +6377,278 @@ f_term_getattr(typval_T *argvars, typval_T *rettv)
 	{"reverse",   HL_INVERSE},
     };
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_సంఖ్య_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    attr = tv_get_number(&argvars[0]);
+    attr = tv_get_సంఖ్య(&argvars[0]);
     name = tv_get_string_chk(&argvars[1]);
-    if (name == NULL)
-	return;
+    ఒకవేళ (name == ఖాళీ)
+	తిరిగి;
 
-    if (attr > HL_ALL)
+    ఒకవేళ (attr > HL_ALL)
 	attr = syn_attr2attr(attr);
-    for (i = 0; i < ARRAY_LENGTH(attrs); ++i)
-	if (STRCMP(name, attrs[i].name) == 0)
+    కొరకు (i = 0; i < ARRAY_నిడివి(attrs); ++i)
+	ఒకవేళ (STRCMP(name, attrs[i].name) == 0)
 	{
-	    rettv->vval.v_number = (attr & attrs[i].attr) != 0 ? 1 : 0;
-	    break;
+	    rettv->vval.v_సంఖ్య = (attr & attrs[i].attr) != 0 ? 1 : 0;
+	    ఆపు;
 	}
 }
 
 /*
  * "term_getcursor(buf)" function
  */
-    void
-f_term_getcursor(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getcursor(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getcursor()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = పదం_get_buf(argvars, "term_getcursor()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
 
     l = rettv->vval.v_list;
-    list_append_number(l, term->tl_cursor_pos.row + 1);
-    list_append_number(l, term->tl_cursor_pos.col + 1);
+    list_append_సంఖ్య(l, పదం->tl_cursor_pos.అడ్డువరుస + 1);
+    list_append_సంఖ్య(l, పదం->tl_cursor_pos.నిలువు + 1);
 
     d = dict_alloc();
-    if (d == NULL)
-	return;
+    ఒకవేళ (d == ఖాళీ)
+	తిరిగి;
 
-    dict_add_number(d, "visible", term->tl_cursor_visible);
-    dict_add_number(d, "blink", blink_state_is_inverted()
-	    ? !term->tl_cursor_blink : term->tl_cursor_blink);
-    dict_add_number(d, "shape", term->tl_cursor_shape);
-    dict_add_string(d, "color", cursor_color_get(term->tl_cursor_color));
-    if (list_append_dict(l, d) == FAIL)
+    dict_కూడు_సంఖ్య(d, "visible", పదం->tl_cursor_visible);
+    dict_కూడు_సంఖ్య(d, "blink", blink_state_is_inverted()
+	    ? !పదం->tl_cursor_blink : పదం->tl_cursor_blink);
+    dict_కూడు_సంఖ్య(d, "shape", పదం->tl_cursor_shape);
+    dict_కూడు_string(d, "color", cursor_color_get(పదం->tl_cursor_color));
+    ఒకవేళ (list_append_dict(l, d) == FAIL)
 	dict_unref(d);
 }
 
 /*
  * "term_getjob(buf)" function
  */
-    void
-f_term_getjob(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getjob(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getjob()");
-    if (buf == NULL)
+    buf = పదం_get_buf(argvars, "term_getjob()");
+    ఒకవేళ (buf == ఖాళీ)
     {
-	if (in_vim9script())
+	ఒకవేళ (లోపల_vim9script())
 	{
-	    rettv->v_type = VAR_JOB;
-	    rettv->vval.v_job = NULL;
+	    rettv->v_type = VAR_పని;
+	    rettv->vval.v_పని = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
+	    rettv->vval.v_సంఖ్య = VVAL_NULL;
 	}
-	return;
+	తిరిగి;
     }
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = buf->b_term->tl_job;
-    if (rettv->vval.v_job != NULL)
-	++rettv->vval.v_job->jv_refcount;
+    rettv->v_type = VAR_పని;
+    rettv->vval.v_పని = buf->b_పదం->tl_పని;
+    ఒకవేళ (rettv->vval.v_పని != ఖాళీ)
+	++rettv->vval.v_పని->jv_refcount;
 }
 
-    static int
-get_row_number(typval_T *tv, term_T *term)
+    స్థిర పూర్ణాంకం
+get_అడ్డువరుస_సంఖ్య(typval_T *tv, పదం_T *పదం)
 {
-    if (tv->v_type == VAR_STRING
-	    && tv->vval.v_string != NULL
+    ఒకవేళ (tv->v_type == VAR_STRING
+	    && tv->vval.v_string != ఖాళీ
 	    && STRCMP(tv->vval.v_string, ".") == 0)
-	return term->tl_cursor_pos.row;
-    return (int)tv_get_number(tv) - 1;
+	తిరిగి పదం->tl_cursor_pos.అడ్డువరుస;
+    తిరిగి (పూర్ణాంకం)tv_get_సంఖ్య(tv) - 1;
 }
 
 /*
  * "term_getline(buf, row)" function
  */
-    void
-f_term_getline(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    term_T	    *term;
-    int		    row;
+    పదం_T	    *పదం;
+    పూర్ణాంకం		    అడ్డువరుస;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getline()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    row = get_row_number(&argvars[1], term);
+    buf = పదం_get_buf(argvars, "term_getline()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    అడ్డువరుస = get_అడ్డువరుస_సంఖ్య(&argvars[1], పదం);
 
-    if (term->tl_vterm == NULL)
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
     {
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
-	int	  sb_row = term->tl_scrollback_scrolled + row;
-	sb_line_T *line;
+	size_t	  స్థానభ్రంశం = 0;
+	పూర్ణాంకం	  sb_అడ్డువరుస = పదం->tl_scrollback_scrolled + అడ్డువరుస;
+	sb_పంక్తి_T *పంక్తి;
 
-	if (sb_row < 0 || sb_row >= term->tl_scrollback.ga_len)
-	    return;
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	ఒకవేళ (sb_అడ్డువరుస < 0 || sb_అడ్డువరుస >= పదం->tl_scrollback.ga_len)
+	    తిరిగి;
+	పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం + sb_అడ్డువరుస;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_లోపల_buf(పదం, sb_అడ్డువరుస, &lnum, ఖాళీ, &స్థానభ్రంశం);
 
 	// vterm is finished, get the text from the buffer
-	if (lnum > 0 && lnum <= buf->b_ml.ml_line_count)
+	ఒకవేళ (lnum > 0 && lnum <= buf->b_ml.ml_పంక్తి_లెక్క)
 	{
 	    char_u *p = ml_get_buf(buf, lnum, FALSE);
-	    if (STRLEN(p) >= offset + line->sb_bytes)
-		rettv->vval.v_string = vim_strnsave(p + offset, line->sb_bytes);
+	    ఒకవేళ (STRLEN(p) >= స్థానభ్రంశం + పంక్తి->sb_బైట్లు)
+		rettv->vval.v_string = vim_strnsave(p + స్థానభ్రంశం, పంక్తి->sb_బైట్లు);
 	}
     }
-    else
+    లేకపోతే
     {
-	VTermScreen	*screen = vterm_obtain_screen(term->tl_vterm);
+	VTermScreen	*screen = vterm_obtain_screen(పదం->tl_vterm);
 	VTermRect	rect;
-	int		len;
+	పూర్ణాంకం		len;
 	char_u		*p;
 
-	if (row < 0 || row >= term->tl_rows)
-	    return;
-	len = term->tl_cols * MB_MAXBYTES + 1;
+	ఒకవేళ (అడ్డువరుస < 0 || అడ్డువరుస >= పదం->tl_అడ్డువరుసలు)
+	    తిరిగి;
+	len = పదం->tl_నిలువుల_సంఖ్య * MB_MAXBYTES + 1;
 	p = alloc(len);
-	if (p == NULL)
-	    return;
+	ఒకవేళ (p == ఖాళీ)
+	    తిరిగి;
 	rettv->vval.v_string = p;
 
-	rect.start_col = 0;
-	rect.end_col = term->tl_cols;
-	rect.start_row = row;
-	rect.end_row = row + 1;
-	p[vterm_screen_get_text(screen, (char *)p, len, rect)] = NUL;
+	rect.ప్రారంభం_నిలువు = 0;
+	rect.చివర_నిలువు = పదం->tl_నిలువుల_సంఖ్య;
+	rect.ప్రారంభం_అడ్డువరుస = అడ్డువరుస;
+	rect.చివర_అడ్డువరుస = అడ్డువరుస + 1;
+	p[vterm_screen_get_పాఠ్యం(screen, (అక్షరం *)p, len, rect)] = NUL;
     }
 }
 
 /*
  * "term_getscrolled(buf)" function
  */
-    void
-f_term_getscrolled(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getscrolled(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getscrolled()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_buffer_scrolled;
+    buf = పదం_get_buf(argvars, "term_getscrolled()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    rettv->vval.v_సంఖ్య = buf->b_పదం->tl_బఫరు_scrolled;
 }
 
 /*
  * "term_getsize(buf)" function
  */
-    void
-f_term_getsize(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getsize(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getsize()");
-    if (buf == NULL)
-	return;
+    buf = పదం_get_buf(argvars, "term_getsize()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
     l = rettv->vval.v_list;
-    list_append_number(l, buf->b_term->tl_rows);
-    list_append_number(l, buf->b_term->tl_cols);
+    list_append_సంఖ్య(l, buf->b_పదం->tl_అడ్డువరుసలు);
+    list_append_సంఖ్య(l, buf->b_పదం->tl_నిలువుల_సంఖ్య);
 }
 
 /*
  * "term_setsize(buf, rows, cols)" function
  */
-    void
-f_term_setsize(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_setsize(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    term_T	*term;
-    varnumber_T rows, cols;
+    పదం_T	*పదం;
+    varnumber_T అడ్డువరుసలు_2, నిలువుల_సంఖ్య;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 2) == FAIL))
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_setsize()");
-    if (buf == NULL)
+    buf = పదం_get_buf(argvars, "term_setsize()");
+    ఒకవేళ (buf == ఖాళీ)
     {
-	emsg(_(e_not_terminal_buffer));
-	return;
+	emsg(_(e_not_terminal_బఫరు));
+	తిరిగి;
     }
-    if (buf->b_term->tl_vterm == NULL)
-	return;
-    term = buf->b_term;
-    rows = tv_get_number(&argvars[1]);
-    rows = rows <= 0 ? term->tl_rows : rows;
-    cols = tv_get_number(&argvars[2]);
-    cols = cols <= 0 ? term->tl_cols : cols;
-    vterm_set_size(term->tl_vterm, rows, cols);
+    ఒకవేళ (buf->b_పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    అడ్డువరుసలు_2 = tv_get_సంఖ్య(&argvars[1]);
+    అడ్డువరుసలు_2 = అడ్డువరుసలు_2 <= 0 ? పదం->tl_అడ్డువరుసలు : అడ్డువరుసలు_2;
+    నిలువుల_సంఖ్య = tv_get_సంఖ్య(&argvars[2]);
+    నిలువుల_సంఖ్య = నిలువుల_సంఖ్య <= 0 ? పదం->tl_నిలువుల_సంఖ్య : నిలువుల_సంఖ్య;
+    vterm_సమితి_కొలత(పదం->tl_vterm, అడ్డువరుసలు_2, నిలువుల_సంఖ్య);
     // handle_resize() will resize the windows
 
     // Get and remember the size we ended up with.  Update the pty.
-    vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-    term_report_winsize(term, term->tl_rows, term->tl_cols);
+    vterm_get_కొలత(పదం->tl_vterm, &పదం->tl_అడ్డువరుసలు, &పదం->tl_నిలువుల_సంఖ్య);
+    పదం_report_winsize(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య);
 }
 
 /*
  * "term_getstatus(buf)" function
  */
-    void
-f_term_getstatus(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getstatus(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     char_u	val[100];
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getstatus()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = పదం_get_buf(argvars, "term_getstatus()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
 
-    if (term_job_running(term))
+    ఒకవేళ (పదం_పని_running(పదం))
 	STRCPY(val, "running");
-    else
+    లేకపోతే
 	STRCPY(val, "finished");
-    if (term->tl_normal_mode)
+    ఒకవేళ (పదం->tl_సాధారణ_బహుళకం)
 	STRCAT(val, ",normal");
     rettv->vval.v_string = vim_strsave(val);
 }
@@ -6656,163 +6656,163 @@ f_term_getstatus(typval_T *argvars, typval_T *rettv)
 /*
  * "term_gettitle(buf)" function
  */
-    void
-f_term_gettitle(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_gettitle(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_gettitle()");
-    if (buf == NULL)
-	return;
+    buf = పదం_get_buf(argvars, "term_gettitle()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    if (buf->b_term->tl_title != NULL)
-	rettv->vval.v_string = vim_strsave(buf->b_term->tl_title);
+    ఒకవేళ (buf->b_పదం->tl_title != ఖాళీ)
+	rettv->vval.v_string = vim_strsave(buf->b_పదం->tl_title);
 }
 
 /*
  * "term_gettty(buf)" function
  */
-    void
-f_term_gettty(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_gettty(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    char_u	*p = NULL;
-    int		num = 0;
+    char_u	*p = ఖాళీ;
+    పూర్ణాంకం		అంకె = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
     rettv->v_type = VAR_STRING;
-    buf = term_get_buf(argvars, "term_gettty()");
-    if (buf == NULL)
-	return;
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	num = tv_get_bool(&argvars[1]);
+    buf = పదం_get_buf(argvars, "term_gettty()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
+	అంకె = tv_get_bool(&argvars[1]);
 
-    switch (num)
+    ఎంపిక (అంకె)
     {
-	case 0:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_out;
-	    break;
-	case 1:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_in;
-	    break;
-	default:
-	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	    return;
+	స్థితి 0:
+	    ఒకవేళ (buf->b_పదం->tl_పని != ఖాళీ)
+		p = buf->b_పదం->tl_పని->jv_tty_బహిర్గతం;
+	    ఆపు;
+	స్థితి 1:
+	    ఒకవేళ (buf->b_పదం->tl_పని != ఖాళీ)
+		p = buf->b_పదం->tl_పని->jv_tty_లోపల;
+	    ఆపు;
+	అప్రమేయ:
+	    semsg(_(e_invalid_వాదం_str), tv_get_string(&argvars[1]));
+	    తిరిగి;
     }
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
 	rettv->vval.v_string = vim_strsave(p);
 }
 
 /*
  * "term_list()" function
  */
-    void
-f_term_list(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_పదం_list(typval_T *argvars వాడని, typval_T *rettv)
 {
-    term_T	*tp;
+    పదం_T	*tp;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL || first_term == NULL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL || మొదటి_పదం == ఖాళీ)
+	తిరిగి;
 
     l = rettv->vval.v_list;
     FOR_ALL_TERMS(tp)
-	if (tp->tl_buffer != NULL)
-	    if (list_append_number(l,
-				   (varnumber_T)tp->tl_buffer->b_fnum) == FAIL)
-		return;
+	ఒకవేళ (tp->tl_బఫరు != ఖాళీ)
+	    ఒకవేళ (list_append_సంఖ్య(l,
+				   (varnumber_T)tp->tl_బఫరు->b_fnum) == FAIL)
+		తిరిగి;
 }
 
 /*
  * "term_scrape(buf, row)" function
  */
-    void
-f_term_scrape(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_scrape(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    VTermScreen	    *screen = NULL;
+    VTermScreen	    *screen = ఖాళీ;
     VTermPos	    pos;
     list_T	    *l;
-    term_T	    *term;
+    పదం_T	    *పదం;
     char_u	    *p;
-    sb_line_T	    *line;
+    sb_పంక్తి_T	    *పంక్తి;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_scrape()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = పదం_get_buf(argvars, "term_scrape()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
 
     l = rettv->vval.v_list;
-    pos.row = get_row_number(&argvars[1], term);
+    pos.అడ్డువరుస = get_అడ్డువరుస_సంఖ్య(&argvars[1], పదం);
 
-    if (term->tl_vterm != NULL)
+    ఒకవేళ (పదం->tl_vterm != ఖాళీ)
     {
-	screen = vterm_obtain_screen(term->tl_vterm);
-	if (screen == NULL)  // can't really happen
-	    return;
-	p = NULL;
-	line = NULL;
+	screen = vterm_obtain_screen(పదం->tl_vterm);
+	ఒకవేళ (screen == ఖాళీ)  // can't really happen
+	    తిరిగి;
+	p = ఖాళీ;
+	పంక్తి = ఖాళీ;
     }
-    else
+    లేకపోతే
     {
-	int	  sb_row = term->tl_scrollback_scrolled + pos.row;
+	పూర్ణాంకం	  sb_అడ్డువరుస = పదం->tl_scrollback_scrolled + pos.అడ్డువరుస;
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
+	size_t	  స్థానభ్రంశం = 0;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_లోపల_buf(పదం, sb_అడ్డువరుస, &lnum, ఖాళీ, &స్థానభ్రంశం);
 
-	if (sb_row >= term->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_line_count)
-	    return;
+	ఒకవేళ (sb_అడ్డువరుస >= పదం->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_పంక్తి_లెక్క)
+	    తిరిగి;
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	పంక్తి = (sb_పంక్తి_T *)పదం->tl_scrollback.ga_దత్తాంశం + sb_అడ్డువరుస;
 	p = ml_get_buf(buf, lnum, FALSE);
 
-	if (STRLEN(p) < offset + line->sb_bytes)
-	    return;
+	ఒకవేళ (STRLEN(p) < స్థానభ్రంశం + పంక్తి->sb_బైట్లు)
+	    తిరిగి;
 
-	p += offset;
+	p += స్థానభ్రంశం;
     }
 
-    for (pos.col = 0; pos.col < term->tl_cols; )
+    కొరకు (pos.నిలువు = 0; pos.నిలువు < పదం->tl_నిలువుల_సంఖ్య; )
     {
 	dict_T		*dcell;
-	int		width;
+	పూర్ణాంకం		వెడల్పు;
 	VTermScreenCellAttrs attrs;
 	VTermColor	fg, bg;
 	char_u		rgb[8];
 	size_t		rgblen;
-	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_PER_CELL + 1];
+	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_చొప్పున_CELL + 1];
 	size_t		mbslen;
-	int		i;
+	పూర్ణాంకం		i;
 
-	if (screen == NULL)
+	ఒకవేళ (screen == ఖాళీ)
 	{
 	    cellattr_T	*cellattr;
 
 	    // vterm has finished, get the cell from scrollback
-	    if (pos.col >= line->sb_cols)
-		break;
-	    cellattr = line->sb_cells + pos.col;
-	    width = cellattr->width;
+	    ఒకవేళ (pos.నిలువు >= పంక్తి->sb_నిలువుల_సంఖ్య)
+		ఆపు;
+	    cellattr = పంక్తి->sb_cells + pos.నిలువు;
+	    వెడల్పు = cellattr->వెడల్పు;
 	    attrs = cellattr->attrs;
 	    fg = cellattr->fg;
 	    bg = cellattr->bg;
@@ -6821,380 +6821,380 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 	    mbs[mbslen] = NUL;
 	    p += mbslen;
 	}
-	else
+	లేకపోతే
 	{
 	    VTermScreenCell cell;
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
-		break;
+	    ఒకవేళ (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		ఆపు;
 
 	    mbslen = 0;
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    కొరకు (i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL; ++i)
 	    {
-		if (cell.chars[i] == 0)
-		    break;
-		mbslen += (*utf_char2bytes)((int)cell.chars[i], mbs + mbslen);
+		ఒకవేళ (cell.chars[i] == 0)
+		    ఆపు;
+		mbslen += (*utf_char2bytes)((పూర్ణాంకం)cell.chars[i], mbs + mbslen);
 	    }
 	    mbs[mbslen] = NUL;
-	    width = cell.width;
+	    వెడల్పు = cell.వెడల్పు;
 	    attrs = cell.attrs;
 	    fg = cell.fg;
 	    bg = cell.bg;
 	}
 	dcell = dict_alloc();
-	if (dcell == NULL)
-	    break;
-	if (list_append_dict(l, dcell) == FAIL)
+	ఒకవేళ (dcell == ఖాళీ)
+	    ఆపు;
+	ఒకవేళ (list_append_dict(l, dcell) == FAIL)
 	{
 	    dict_unref(dcell);
-	    break;
+	    ఆపు;
 	}
 
-	dict_add_string_len(dcell, "chars", mbs, (int)mbslen);
+	dict_కూడు_string_len(dcell, "chars", mbs, (పూర్ణాంకం)mbslen);
 
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	rgblen = vim_snprintf_safelen((అక్షరం *)rgb, పరిమాణం(rgb),
 	    "#%02x%02x%02x", fg.red, fg.green, fg.blue);
-	dict_add_string_len(dcell, "fg", rgb, (int)rgblen);
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	dict_కూడు_string_len(dcell, "fg", rgb, (పూర్ణాంకం)rgblen);
+	rgblen = vim_snprintf_safelen((అక్షరం *)rgb, పరిమాణం(rgb),
 	    "#%02x%02x%02x", bg.red, bg.green, bg.blue);
-	dict_add_string_len(dcell, "bg", rgb, (int)rgblen);
+	dict_కూడు_string_len(dcell, "bg", rgb, (పూర్ణాంకం)rgblen);
 
-	dict_add_number(dcell, "attr",
-				      cell2attr(term, NULL, &attrs, &fg, &bg));
-	dict_add_number(dcell, "width", width);
+	dict_కూడు_సంఖ్య(dcell, "attr",
+				      cell2attr(పదం, ఖాళీ, &attrs, &fg, &bg));
+	dict_కూడు_సంఖ్య(dcell, "width", వెడల్పు);
 
-	++pos.col;
-	if (width == 2)
-	    ++pos.col;
+	++pos.నిలువు;
+	ఒకవేళ (వెడల్పు == 2)
+	    ++pos.నిలువు;
     }
 }
 
 /*
  * "term_sendkeys(buf, keys)" function
  */
-    void
-f_term_sendkeys(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_sendkeys(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    char_u	*msg;
-    term_T	*term;
+    char_u	*సందేశం;
+    పదం_T	*పదం;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_sendkeys()");
-    if (buf == NULL)
-	return;
+    buf = పదం_get_buf(argvars, "term_sendkeys()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    msg = tv_get_string_chk(&argvars[1]);
-    if (msg == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    సందేశం = tv_get_string_chk(&argvars[1]);
+    ఒకవేళ (సందేశం == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
-    while (*msg != NUL)
+    అయితే (*సందేశం != NUL)
     {
-	int c;
+	పూర్ణాంకం c;
 
-	if (*msg == K_SPECIAL && msg[1] != NUL && msg[2] != NUL)
+	ఒకవేళ (*సందేశం == K_SPECIAL && సందేశం[1] != NUL && సందేశం[2] != NUL)
 	{
-	    c = TO_SPECIAL(msg[1], msg[2]);
-	    msg += 3;
+	    c = గమ్యం_SPECIAL(సందేశం[1], సందేశం[2]);
+	    సందేశం += 3;
 	}
-	else
+	లేకపోతే
 	{
-	    c = PTR2CHAR(msg);
-	    msg += MB_CPTR2LEN(msg);
+	    c = PTR2CHAR(సందేశం);
+	    సందేశం += MB_CPTR2LEN(సందేశం);
 	}
-	send_keys_to_term(term, c, 0, FALSE);
+	send_కీలకాలు_గమ్యం_పదం(పదం, c, 0, FALSE);
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * "term_getansicolors(buf)" function
  */
-    void
-f_term_getansicolors(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_getansicolors(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     VTermState	*state;
     VTermColor  color;
     char_u	hexbuf[10];
-    int		index;
+    పూర్ణాంకం		సూచీ;
     list_T	*list;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_getansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = పదం_get_buf(argvars, "term_getansicolors()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
     list = rettv->vval.v_list;
-    state = vterm_obtain_state(term->tl_vterm);
-    for (index = 0; index < 16; index++)
+    state = vterm_obtain_state(పదం->tl_vterm);
+    కొరకు (సూచీ = 0; సూచీ < 16; సూచీ++)
     {
 	size_t	hexbuflen;
 
-	vterm_state_get_palette_color(state, index, &color);
-	hexbuflen = vim_snprintf_safelen((char *)hexbuf, sizeof(hexbuf),
+	vterm_state_get_palette_color(state, సూచీ, &color);
+	hexbuflen = vim_snprintf_safelen((అక్షరం *)hexbuf, పరిమాణం(hexbuf),
 	    "#%02x%02x%02x", color.red, color.green, color.blue);
-	if (list_append_string(list, hexbuf, (int)hexbuflen) == FAIL)
-	    return;
+	ఒకవేళ (list_append_string(list, hexbuf, (పూర్ణాంకం)hexbuflen) == FAIL)
+	    తిరిగి;
     }
 }
 
 /*
  * "term_setansicolors(buf, list)" function
  */
-    void
-f_term_setansicolors(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_setansicolors(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     listitem_T	*li;
-    int		n = 0;
+    పూర్ణాంకం		n = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_setansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = పదం_get_buf(argvars, "term_setansicolors()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    ఒకవేళ (పదం->tl_vterm == ఖాళీ)
+	తిరిగి;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    ఒకవేళ (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	తిరిగి;
 
-    if (argvars[1].vval.v_list->lv_first == &range_list_item
+    ఒకవేళ (argvars[1].vval.v_list->lv_మొదటి == &range_list_అంశం
 	    || argvars[1].vval.v_list->lv_len != 16)
     {
-	semsg(_(e_invalid_value_for_argument_str), "\"colors\"");
-	return;
+	semsg(_(e_invalid_విలువ_for_వాదం_str), "\"colors\"");
+	తిరిగి;
     }
 
-    if (term->tl_palette == NULL)
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-    if (term->tl_palette == NULL)
-	return;
+    ఒకవేళ (పదం->tl_palette == ఖాళీ)
+	పదం->tl_palette = ALLOC_MULT(long_u, 16);
+    ఒకవేళ (పదం->tl_palette == ఖాళీ)
+	తిరిగి;
 
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_వస్తువులు(argvars[1].vval.v_list, li)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return;
+	ఒకవేళ (color_name == ఖాళీ)
+	    తిరిగి;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
+	ఒకవేళ (guicolor == INVALCOLOR)
 	{
 	    semsg(_(e_cannot_allocate_color_str), color_name);
-	    return;
+	    తిరిగి;
 	}
 
-	term->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
+	పదం->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    term_update_palette(term);
+    పదం_update_palette(పదం);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * "term_setapi(buf, api)" function
  */
-    void
-f_term_setapi(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_setapi(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     char_u	*api;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_setapi()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_api);
+    buf = పదం_get_buf(argvars, "term_setapi()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    vim_free(పదం->tl_api);
     api = tv_get_string_chk(&argvars[1]);
-    if (api != NULL)
-	term->tl_api = vim_strsave(api);
-    else
-	term->tl_api = NULL;
+    ఒకవేళ (api != ఖాళీ)
+	పదం->tl_api = vim_strsave(api);
+    లేకపోతే
+	పదం->tl_api = ఖాళీ;
 }
 
 /*
  * "term_setrestore(buf, command)" function
  */
-    void
-f_term_setrestore(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_setrestore(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
-#if defined(FEAT_SESSION)
+#ఒకవేళ defined(FEAT_SESSION)
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     char_u	*cmd;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_setrestore()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_command);
+    buf = పదం_get_buf(argvars, "term_setrestore()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    vim_free(పదం->tl_command);
     cmd = tv_get_string_chk(&argvars[1]);
-    if (cmd != NULL)
-	term->tl_command = vim_strsave(cmd);
-    else
-	term->tl_command = NULL;
-#endif
+    ఒకవేళ (cmd != ఖాళీ)
+	పదం->tl_command = vim_strsave(cmd);
+    లేకపోతే
+	పదం->tl_command = ఖాళీ;
+#అయితే_ముగింపు
 }
 
 /*
  * "term_setkill(buf, how)" function
  */
-    void
-f_term_setkill(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_setkill(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
     buf_T	*buf;
-    term_T	*term;
+    పదం_T	*పదం;
     char_u	*how;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_setkill()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_kill);
+    buf = పదం_get_buf(argvars, "term_setkill()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    పదం = buf->b_పదం;
+    vim_free(పదం->tl_kill);
     how = tv_get_string_chk(&argvars[1]);
-    if (how != NULL)
-	term->tl_kill = vim_strsave(how);
-    else
-	term->tl_kill = NULL;
+    ఒకవేళ (how != ఖాళీ)
+	పదం->tl_kill = vim_strsave(how);
+    లేకపోతే
+	పదం->tl_kill = ఖాళీ;
 }
 
 /*
  * "term_start(command, options)" function
  */
-    void
-f_term_start(typval_T *argvars, typval_T *rettv)
+    శూన్య
+f_పదం_ప్రారంభం(typval_T *argvars, typval_T *rettv)
 {
     jobopt_T	opt;
     buf_T	*buf;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    init_job_options(&opt);
-    if (argvars[1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[1], &opt,
+    init_పని_options(&opt);
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN
+	    && get_పని_options(&argvars[1], &opt,
 		JO_TIMEOUT_ALL + JO_STOPONEXIT
-		    + JO_CALLBACK + JO_OUT_CALLBACK + JO_ERR_CALLBACK
-		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_OUT_IO,
-		JO2_TERM_NAME + JO2_TERM_FINISH + JO2_HIDDEN + JO2_TERM_OPENCMD
-		    + JO2_TERM_COLS + JO2_TERM_ROWS + JO2_VERTICAL + JO2_CURWIN
+		    + JO_CALLBACK + JO_బహిర్గతం_CALLBACK + JO_ERR_CALLBACK
+		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_బహిర్గతం_IO,
+		JO2_పదం_NAME + JO2_పదం_ముగింపు + JO2_HIDDEN + JO2_పదం_OPENCMD
+		    + JO2_పదం_నిలువుల_సంఖ్య + JO2_పదం_అడ్డువరుసలు + JO2_VERTICAL + JO2_CURWIN
 		    + JO2_CWD + JO2_ENV + JO2_EOF_CHARS
-		    + JO2_NORESTORE + JO2_TERM_KILL + JO2_TERM_HIGHLIGHT
-		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_TERM_API) == FAIL)
-	return;
+		    + JO2_NORESTORE + JO2_పదం_KILL + JO2_పదం_HIGHLIGHT
+		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_పదం_API) == FAIL)
+	తిరిగి;
 
-    buf = term_start(&argvars[0], NULL, &opt, 0);
+    buf = పదం_ప్రారంభం(&argvars[0], ఖాళీ, &opt, 0);
 
-    if (buf != NULL && buf->b_term != NULL)
-	rettv->vval.v_number = buf->b_fnum;
+    ఒకవేళ (buf != ఖాళీ && buf->b_పదం != ఖాళీ)
+	rettv->vval.v_సంఖ్య = buf->b_fnum;
 }
 
 /*
  * "term_wait" function
  */
-    void
-f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_పదం_wait(typval_T *argvars, typval_T *rettv వాడని)
 {
     buf_T	*buf;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+    ఒకవేళ (లోపల_vim9script()
+	    && (check_for_బఫరు_arg(argvars, 0) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
-    buf = term_get_buf(argvars, "term_wait()");
-    if (buf == NULL)
-	return;
-    if (buf->b_term->tl_job == NULL)
+    buf = పదం_get_buf(argvars, "term_wait()");
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (buf->b_పదం->tl_పని == ఖాళీ)
     {
-	ch_log(NULL, "term_wait(): no job to wait for");
-	return;
+	ch_log(ఖాళీ, "term_wait(): no job to wait for");
+	తిరిగి;
     }
-    if (buf->b_term->tl_job->jv_channel == NULL)
+    ఒకవేళ (buf->b_పదం->tl_పని->jv_channel == ఖాళీ)
 	// channel is closed, nothing to do
-	return;
+	తిరిగి;
 
     // Get the job status, this will detect a job that finished.
-    if (!buf->b_term->tl_job->jv_channel->ch_keep_open
-	    && STRCMP(job_status(buf->b_term->tl_job), "dead") == 0)
+    ఒకవేళ (!buf->b_పదం->tl_పని->jv_channel->ch_keep_open
+	    && STRCMP(పని_స్థితి(buf->b_పదం->tl_పని), "dead") == 0)
     {
 	// The job is dead, keep reading channel I/O until the channel is
 	// closed. buf->b_term may become NULL if the terminal was closed while
 	// waiting.
-	ch_log(NULL, "term_wait(): waiting for channel to close");
-	while (buf->b_term != NULL && !buf->b_term->tl_channel_closed)
+	ch_log(ఖాళీ, "term_wait(): waiting for channel to close");
+	అయితే (buf->b_పదం != ఖాళీ && !buf->b_పదం->tl_channel_closed)
 	{
-	    term_flush_messages();
+	    పదం_flush_messages();
 
 	    ui_delay(10L, FALSE);
-	    if (!buf_valid(buf))
+	    ఒకవేళ (!buf_valid(buf))
 		// If the terminal is closed when the channel is closed the
 		// buffer disappears.
-		break;
-	    if (buf->b_term == NULL || buf->b_term->tl_channel_closing)
+		ఆపు;
+	    ఒకవేళ (buf->b_పదం == ఖాళీ || buf->b_పదం->tl_channel_closing)
 		// came here from a close callback, only wait one time
-		break;
+		ఆపు;
 	}
 
-	term_flush_messages();
+	పదం_flush_messages();
     }
-    else
+    లేకపోతే
     {
-	long wait = 10L;
+	దీర్ఘ wait = 10L;
 
-	term_flush_messages();
+	పదం_flush_messages();
 
 	// Wait for some time for any channel I/O.
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    wait = tv_get_number(&argvars[1]);
+	ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
+	    wait = tv_get_సంఖ్య(&argvars[1]);
 	ui_delay(wait, TRUE);
 
 	// Flushing messages on channels is hopefully sufficient.
 	// TODO: is there a better way?
-	term_flush_messages();
+	పదం_flush_messages();
     }
 }
 
@@ -7202,37 +7202,37 @@ f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
  * Called when a channel has sent all the lines to a terminal.
  * Send a CTRL-D to mark the end of the text.
  */
-    void
-term_send_eof(channel_T *ch)
+    శూన్య
+పదం_send_eof(channel_T *ch)
 {
-    term_T	*term;
+    పదం_T	*పదం;
 
-    FOR_ALL_TERMS(term)
-	if (term->tl_job == ch->ch_job)
+    FOR_ALL_TERMS(పదం)
+	ఒకవేళ (పదం->tl_పని == ch->ch_పని)
 	{
-	    if (term->tl_eof_chars != NULL)
+	    ఒకవేళ (పదం->tl_eof_chars != ఖాళీ)
 	    {
-		channel_send(ch, PART_IN, term->tl_eof_chars,
-					(int)STRLEN(term->tl_eof_chars), NULL);
-		channel_send(ch, PART_IN, (char_u *)"\r", 1, NULL);
+		channel_send(ch, PART_లోపల, పదం->tl_eof_chars,
+					(పూర్ణాంకం)STRLEN(పదం->tl_eof_chars), ఖాళీ);
+		channel_send(ch, PART_లోపల, (char_u *)"\r", 1, ఖాళీ);
 	    }
-#ifdef MSWIN
-	    else
+#నిర్వచితమైతే MSWIN
+	    లేకపోతే
 		// Default: CTRL-D
-		channel_send(ch, PART_IN, (char_u *)"\004\r", 2, NULL);
-#endif
+		channel_send(ch, PART_లోపల, (char_u *)"\004\r", 2, ఖాళీ);
+#అయితే_ముగింపు
 	}
 }
 
-#if defined(FEAT_GUI)
-    job_T *
-term_getjob(term_T *term)
+#ఒకవేళ defined(FEAT_GUI)
+    పని_T *
+పదం_getjob(పదం_T *పదం)
 {
-    return term != NULL ? term->tl_job : NULL;
+    తిరిగి పదం != ఖాళీ ? పదం->tl_పని : ఖాళీ;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(MSWIN)
+#ఒకవేళ defined(MSWIN)
 
 ///////////////////////////////////////
 // 2. MS-Windows implementation.
@@ -7241,19 +7241,19 @@ HRESULT (WINAPI *pCreatePseudoConsole)(COORD, HANDLE, HANDLE, DWORD, HPCON*);
 HRESULT (WINAPI *pResizePseudoConsole)(HPCON, COORD);
 HRESULT (WINAPI *pClosePseudoConsole)(HPCON);
 BOOL (WINAPI *pInitializeProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD, PSIZE_T);
-BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, SIZE_T, PVOID, PSIZE_T);
-void (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
+BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, కొలత_T, PVOID, PSIZE_T);
+శూన్య (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
 
-    static int
-dyn_conpty_init(int verbose)
+    స్థిర పూర్ణాంకం
+dyn_conpty_init(పూర్ణాంకం verbose)
 {
-    static HMODULE	hKerneldll = NULL;
-    int			i;
-    static struct
+    స్థిర HMODULE	hKerneldll = ఖాళీ;
+    పూర్ణాంకం			i;
+    స్థిర నిర్మాణం
     {
-	char	*name;
+	అక్షరం	*name;
 	FARPROC	*ptr;
-    } conpty_entry[] =
+    } conpty_నమోదు[] =
     {
 	{"CreatePseudoConsole", (FARPROC*)&pCreatePseudoConsole},
 	{"ResizePseudoConsole", (FARPROC*)&pResizePseudoConsole},
@@ -7264,88 +7264,88 @@ dyn_conpty_init(int verbose)
 				(FARPROC*)&pUpdateProcThreadAttribute},
 	{"DeleteProcThreadAttributeList",
 				(FARPROC*)&pDeleteProcThreadAttributeList},
-	{NULL, NULL}
+	{ఖాళీ, ఖాళీ}
     };
 
-    if (!has_conpty_working())
+    ఒకవేళ (!has_conpty_working())
     {
-	if (verbose)
-	    emsg(_(e_conpty_is_not_available));
-	return FAIL;
+	ఒకవేళ (verbose)
+	    emsg(_(e_conpty_is_not_అందుబాటు));
+	తిరిగి FAIL;
     }
 
     // No need to initialize twice.
-    if (hKerneldll)
-	return OK;
+    ఒకవేళ (hKerneldll)
+	తిరిగి OK;
 
-    hKerneldll = vimLoadLib("kernel32.dll");
-    for (i = 0; conpty_entry[i].name != NULL
-					&& conpty_entry[i].ptr != NULL; ++i)
+    hKerneldll = vim_ఎక్కించు_Lib("kernel32.dll");
+    కొరకు (i = 0; conpty_నమోదు[i].name != ఖాళీ
+					&& conpty_నమోదు[i].ptr != ఖాళీ; ++i)
     {
-	if ((*conpty_entry[i].ptr = (FARPROC)GetProcAddress(hKerneldll,
-						conpty_entry[i].name)) == NULL)
+	ఒకవేళ ((*conpty_నమోదు[i].ptr = (FARPROC)Get_Proc_చిరునామా(hKerneldll,
+						conpty_నమోదు[i].name)) == ఖాళీ)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), conpty_entry[i].name);
-	    hKerneldll = NULL;
-	    return FAIL;
+	    ఒకవేళ (verbose)
+		semsg(_(e_could_not_ఎక్కించు_library_function_str), conpty_నమోదు[i].name);
+	    hKerneldll = ఖాళీ;
+	    తిరిగి FAIL;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-conpty_term_and_job_init(
-	term_T	    *term,
+    స్థిర పూర్ణాంకం
+conpty_పదం_and_పని_init(
+	పదం_T	    *పదం,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	అక్షరం	    **argv వాడని,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cmd_wchar_copy = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
-    HANDLE	    jo = NULL;
+    WCHAR	    *cmd_wchar = ఖాళీ;
+    WCHAR	    *cmd_wchar_copy = ఖాళీ;
+    WCHAR	    *cwd_wchar = ఖాళీ;
+    WCHAR	    *env_wchar = ఖాళీ;
+    channel_T	    *channel = ఖాళీ;
+    పని_T	    *పని = ఖాళీ;
+    HANDLE	    jo = ఖాళీ;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = ఖాళీ;
     HRESULT	    hr;
     COORD	    consize;
-    SIZE_T	    breq;
+    కొలత_T	    breq;
     PROCESS_INFORMATION proc_info;
-    HANDLE	    i_theirs = NULL;
-    HANDLE	    o_theirs = NULL;
-    HANDLE	    i_ours = NULL;
-    HANDLE	    o_ours = NULL;
-    char	    *errmsg = NULL;
+    HANDLE	    i_theirs = ఖాళీ;
+    HANDLE	    o_theirs = ఖాళీ;
+    HANDLE	    i_ours = ఖాళీ;
+    HANDLE	    o_ours = ఖాళీ;
+    అక్షరం	    *errmsg = ఖాళీ;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, పరిమాణం(అక్షరం*), 20);
+    ga_init2(&ga_env, పరిమాణం(అక్షరం*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    ఒకవేళ (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	ఒకవేళ (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    వెళ్ళు failed;
+	cmd = ga_cmd.ga_దత్తాంశం;
     }
-    if (cmd == NULL || *cmd == NUL)
+    ఒకవేళ (cmd == ఖాళీ || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_వాదం));
+	వెళ్ళు failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    పదం->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_గమ్యం_utf16(cmd, ఖాళీ);
 
-    if (cmd_wchar != NULL)
+    ఒకవేళ (cmd_wchar != ఖాళీ)
     {
 	// Request by CreateProcessW
 	breq = wcslen(cmd_wchar) + 1 + 1;	// Addition of NUL by API
@@ -7354,113 +7354,113 @@ conpty_term_and_job_init(
     }
 
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    ఒకవేళ (cmd_wchar == ఖాళీ)
+	వెళ్ళు failed;
+    ఒకవేళ (opt->jo_cwd != ఖాళీ)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_గమ్యం_utf16(opt->jo_cwd, ఖాళీ);
+	ఒకవేళ (cwd_wchar == ఖాళీ)
+	    వెళ్ళు failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_దత్తాంశం;
 
-    if (!CreatePipe(&i_theirs, &i_ours, NULL, 0))
-	goto failed;
-    if (!CreatePipe(&o_ours, &o_theirs, NULL, 0))
-	goto failed;
+    ఒకవేళ (!CreatePipe(&i_theirs, &i_ours, ఖాళీ, 0))
+	వెళ్ళు failed;
+    ఒకవేళ (!CreatePipe(&o_ours, &o_theirs, ఖాళీ, 0))
+	వెళ్ళు failed;
 
-    consize.X = term->tl_cols;
-    consize.Y = term->tl_rows;
+    consize.X = పదం->tl_నిలువుల_సంఖ్య;
+    consize.Y = పదం->tl_అడ్డువరుసలు;
     hr = pCreatePseudoConsole(consize, i_theirs, o_theirs, 0,
-							     &term->tl_conpty);
-    if (FAILED(hr))
-	goto failed;
+							     &పదం->tl_conpty);
+    ఒకవేళ (FAILED(hr))
+	వెళ్ళు failed;
 
-    term->tl_siex.StartupInfo.cb = sizeof(term->tl_siex);
+    పదం->tl_siex.StartupInfo.cb = పరిమాణం(పదం->tl_siex);
 
     // Explicitly invalidate std handles to prevent inheritance of
     // the debugger's stdout (e.g., in Visual Studio debugging sessions),
     // which could cause job output to go to the debugger instead of
     // the intended ConPTY, even with bInheritHandles set to FALSE in CreateProcess.
-    term->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-    term->tl_siex.StartupInfo.hStdInput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_VALUE;
+    పదం->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    పదం->tl_siex.StartupInfo.h_Std_ఆదానం = INVALID_HANDLE_విలువ;
+    పదం->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_విలువ;
+    పదం->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_విలువ;
 
     // Set up pipe inheritance safely: Vista or later.
-    pInitializeProcThreadAttributeList(NULL, 1, 0, &breq);
-    term->tl_siex.lpAttributeList = alloc(breq);
-    if (!term->tl_siex.lpAttributeList)
-	goto failed;
-    if (!pInitializeProcThreadAttributeList(term->tl_siex.lpAttributeList, 1,
+    pInitializeProcThreadAttributeList(ఖాళీ, 1, 0, &breq);
+    పదం->tl_siex.lpAttributeList = alloc(breq);
+    ఒకవేళ (!పదం->tl_siex.lpAttributeList)
+	వెళ్ళు failed;
+    ఒకవేళ (!pInitializeProcThreadAttributeList(పదం->tl_siex.lpAttributeList, 1,
 								     0, &breq))
-	goto failed;
-    if (!pUpdateProcThreadAttribute(
-	    term->tl_siex.lpAttributeList, 0,
-	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, term->tl_conpty,
-	    sizeof(HPCON), NULL, NULL))
-	goto failed;
+	వెళ్ళు failed;
+    ఒకవేళ (!pUpdateProcThreadAttribute(
+	    పదం->tl_siex.lpAttributeList, 0,
+	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, పదం->tl_conpty,
+	    పరిమాణం(HPCON), ఖాళీ, ఖాళీ))
+	వెళ్ళు failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
+	వెళ్ళు failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    పని = పని_alloc();
+    ఒకవేళ (పని == ఖాళీ)
+	వెళ్ళు failed;
+    ఒకవేళ (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	పూర్ణాంకం argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &పని->jv_argv, &argc);
     }
-    else
+    లేకపోతే
     {
-	int argc;
+	పూర్ణాంకం argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &పని->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    ఒకవేళ (opt->jo_సమితి & JO_లోపల_BUF)
+	పని->jv_లోపల_buf = buflist_findnr(opt->jo_io_buf[PART_లోపల]);
 
-    if (!CreateProcessW(NULL, cmd_wchar_copy, NULL, NULL, FALSE,
+    ఒకవేళ (!CreateProcessW(ఖాళీ, cmd_wchar_copy, ఖాళీ, ఖాళీ, FALSE,
 	    EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT
-	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_MODE,
+	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_బహుళకం,
 	    env_wchar, cwd_wchar,
-	    &term->tl_siex.StartupInfo, &proc_info))
+	    &పదం->tl_siex.StartupInfo, &proc_info))
     {
 	errmsg = GetWin32Error();
-	goto failed;
+	వెళ్ళు failed;
     }
 
     CloseHandle(i_theirs);
     CloseHandle(o_theirs);
 
-    channel_set_pipes(channel,
+    channel_సమితి_pipes(channel,
 	    (sock_T)i_ours,
 	    (sock_T)o_ours,
 	    (sock_T)o_ours);
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_పాఠ్యం_బహుళకం = TRUE;
 
     // Use to explicitly delete anonymous pipe handle.
     // In addition, it is used to prevent the pipe from being closed when input
     // from a buffer etc. is finished.
     channel->ch_anonymous_pipe = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_పని_Object(ఖాళీ, ఖాళీ);
+    ఒకవేళ (jo == ఖాళీ)
+	వెళ్ళు failed;
 
-    if (!AssignProcessToJobObject(jo, proc_info.hProcess))
+    ఒకవేళ (!కేటాయించు_Process_గమ్యం_పని_Object(jo, proc_info.hProcess))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ఖాళీ;
     }
 
     ResumeThread(proc_info.hThread);
@@ -7471,44 +7471,44 @@ conpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    ఒకవేళ (create_vterm(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య) == FAIL)
+	వెళ్ళు failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (పదం_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ఒకవేళ (పదం->tl_palette != ఖాళీ)
+	    సమితి_vterm_palette(పదం->tl_vterm, పదం->tl_palette);
+	లేకపోతే
+	    init_vterm_ansi_colors(పదం->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_సమితి_పని(channel, పని, opt);
+    పని_సమితి_options(పని, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info = proc_info;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_type = vim_strsave((char_u *)"conpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    పని->jv_channel = channel;
+    పని->jv_proc_info = proc_info;
+    పని->jv_పని_object = jo;
+    పని->jv_స్థితి = పని_STARTED;
+    పని->jv_tty_type = vim_strsave((char_u *)"conpty");
+    ++పని->jv_refcount;
+    పదం->tl_పని = పని;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    ఒకవేళ (orig_opt->jo_io[PART_బహిర్గతం] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_బహిర్గతం];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	పదం->tl_బహిర్గతం_fd = mch_fopen((అక్షరం *)fname, WRITEBIN);
+	ఒకవేళ (పదం->tl_బహిర్గతం_fd == ఖాళీ)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    తిరిగి OK;
 
 failed:
     ga_clear(&ga_cmd);
@@ -7516,112 +7516,112 @@ failed:
     vim_free(cmd_wchar);
     vim_free(cmd_wchar_copy);
     vim_free(cwd_wchar);
-    if (channel != NULL)
+    ఒకవేళ (channel != ఖాళీ)
 	channel_clear(channel);
-    if (job != NULL)
+    ఒకవేళ (పని != ఖాళీ)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	పని->jv_channel = ఖాళీ;
+	పని_cleanup(పని);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    పదం->tl_పని = ఖాళీ;
+    ఒకవేళ (jo != ఖాళీ)
 	CloseHandle(jo);
 
-    if (term->tl_siex.lpAttributeList != NULL)
+    ఒకవేళ (పదం->tl_siex.lpAttributeList != ఖాళీ)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(పదం->tl_siex.lpAttributeList);
+	vim_free(పదం->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (o_theirs != NULL)
+    పదం->tl_siex.lpAttributeList = ఖాళీ;
+    ఒకవేళ (o_theirs != ఖాళీ)
 	CloseHandle(o_theirs);
-    if (o_ours != NULL)
+    ఒకవేళ (o_ours != ఖాళీ)
 	CloseHandle(o_ours);
-    if (i_ours != NULL)
+    ఒకవేళ (i_ours != ఖాళీ)
 	CloseHandle(i_ours);
-    if (i_theirs != NULL)
+    ఒకవేళ (i_theirs != ఖాళీ)
 	CloseHandle(i_theirs);
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    ఒకవేళ (పదం->tl_conpty != ఖాళీ)
+	pClosePseudoConsole(పదం->tl_conpty);
+    పదం->tl_conpty = ఖాళీ;
     // Propagate errors that occur in CreateProcess
-    if (errmsg)
+    ఒకవేళ (errmsg)
 	semsg("CreateProcess failed: %s", errmsg);
-    return FAIL;
+    తిరిగి FAIL;
 }
 
-    static void
-conpty_term_report_winsize(term_T *term, int rows, int cols)
+    స్థిర శూన్య
+conpty_పదం_report_winsize(పదం_T *పదం, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
     COORD consize;
 
-    consize.X = cols;
-    consize.Y = rows;
-    pResizePseudoConsole(term->tl_conpty, consize);
+    consize.X = నిలువుల_సంఖ్య;
+    consize.Y = అడ్డువరుసలు_2;
+    pResizePseudoConsole(పదం->tl_conpty, consize);
 }
 
-    static void
-term_free_conpty(term_T *term)
+    స్థిర శూన్య
+పదం_free_conpty(పదం_T *పదం)
 {
-    if (term->tl_siex.lpAttributeList != NULL)
+    ఒకవేళ (పదం->tl_siex.lpAttributeList != ఖాళీ)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(పదం->tl_siex.lpAttributeList);
+	vim_free(పదం->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    పదం->tl_siex.lpAttributeList = ఖాళీ;
+    ఒకవేళ (పదం->tl_conpty != ఖాళీ)
+	pClosePseudoConsole(పదం->tl_conpty);
+    పదం->tl_conpty = ఖాళీ;
 }
 
-    int
-use_conpty(void)
+    పూర్ణాంకం
+use_conpty(శూన్య)
 {
-    return has_conpty;
+    తిరిగి has_conpty;
 }
 
 # define WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN 1ul
 # define WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN 2ull
-# define WINPTY_MOUSE_MODE_FORCE		2
+# define WINPTY_MOUSE_బహుళకం_FORCE		2
 
-void* (*winpty_config_new)(UINT64, void*);
-void* (*winpty_open)(void*, void*);
-void* (*winpty_spawn_config_new)(UINT64, void*, LPCWSTR, void*, void*, void*);
-BOOL (*winpty_spawn)(void*, void*, HANDLE*, HANDLE*, DWORD*, void*);
-void (*winpty_config_set_mouse_mode)(void*, int);
-void (*winpty_config_set_initial_size)(void*, int, int);
-LPCWSTR (*winpty_conin_name)(void*);
-LPCWSTR (*winpty_conout_name)(void*);
-LPCWSTR (*winpty_conerr_name)(void*);
-void (*winpty_free)(void*);
-void (*winpty_config_free)(void*);
-void (*winpty_spawn_config_free)(void*);
-void (*winpty_error_free)(void*);
-LPCWSTR (*winpty_error_msg)(void*);
-BOOL (*winpty_set_size)(void*, int, int, void*);
-HANDLE (*winpty_agent_process)(void*);
+శూన్య* (*winpty_config_new)(UINT64, శూన్య*);
+శూన్య* (*winpty_open)(శూన్య*, శూన్య*);
+శూన్య* (*winpty_spawn_config_new)(UINT64, శూన్య*, LPCWSTR, శూన్య*, శూన్య*, శూన్య*);
+BOOL (*winpty_spawn)(శూన్య*, శూన్య*, HANDLE*, HANDLE*, DWORD*, శూన్య*);
+శూన్య (*winpty_config_సమితి_mouse_బహుళకం)(శూన్య*, పూర్ణాంకం);
+శూన్య (*winpty_config_సమితి_initial_కొలత)(శూన్య*, పూర్ణాంకం, పూర్ణాంకం);
+LPCWSTR (*winpty_conin_name)(శూన్య*);
+LPCWSTR (*winpty_conout_name)(శూన్య*);
+LPCWSTR (*winpty_conerr_name)(శూన్య*);
+శూన్య (*winpty_free)(శూన్య*);
+శూన్య (*winpty_config_free)(శూన్య*);
+శూన్య (*winpty_spawn_config_free)(శూన్య*);
+శూన్య (*winpty_error_free)(శూన్య*);
+LPCWSTR (*winpty_error_సందేశం)(శూన్య*);
+BOOL (*winpty_సమితి_కొలత)(శూన్య*, పూర్ణాంకం, పూర్ణాంకం, శూన్య*);
+HANDLE (*winpty_agent_process)(శూన్య*);
 
 # define WINPTY_DLL "winpty.dll"
 
-static HINSTANCE hWinPtyDLL = NULL;
+స్థిర HINSTANCE hWinPtyDLL = ఖాళీ;
 
-    static int
-dyn_winpty_init(int verbose)
+    స్థిర పూర్ణాంకం
+dyn_winpty_init(పూర్ణాంకం verbose)
 {
-    int i;
-    static struct
+    పూర్ణాంకం i;
+    స్థిర నిర్మాణం
     {
-	char	    *name;
+	అక్షరం	    *name;
 	FARPROC	    *ptr;
-    } winpty_entry[] =
+    } winpty_నమోదు[] =
     {
 	{"winpty_conerr_name", (FARPROC*)&winpty_conerr_name},
 	{"winpty_config_free", (FARPROC*)&winpty_config_free},
 	{"winpty_config_new", (FARPROC*)&winpty_config_new},
 	{"winpty_config_set_mouse_mode",
-				      (FARPROC*)&winpty_config_set_mouse_mode},
+				      (FARPROC*)&winpty_config_సమితి_mouse_బహుళకం},
 	{"winpty_config_set_initial_size",
-				    (FARPROC*)&winpty_config_set_initial_size},
+				    (FARPROC*)&winpty_config_సమితి_initial_కొలత},
 	{"winpty_conin_name", (FARPROC*)&winpty_conin_name},
 	{"winpty_conout_name", (FARPROC*)&winpty_conout_name},
 	{"winpty_error_free", (FARPROC*)&winpty_error_free},
@@ -7630,178 +7630,178 @@ dyn_winpty_init(int verbose)
 	{"winpty_spawn", (FARPROC*)&winpty_spawn},
 	{"winpty_spawn_config_free", (FARPROC*)&winpty_spawn_config_free},
 	{"winpty_spawn_config_new", (FARPROC*)&winpty_spawn_config_new},
-	{"winpty_error_msg", (FARPROC*)&winpty_error_msg},
-	{"winpty_set_size", (FARPROC*)&winpty_set_size},
+	{"winpty_error_msg", (FARPROC*)&winpty_error_సందేశం},
+	{"winpty_set_size", (FARPROC*)&winpty_సమితి_కొలత},
 	{"winpty_agent_process", (FARPROC*)&winpty_agent_process},
-	{NULL, NULL}
+	{ఖాళీ, ఖాళీ}
     };
 
     // No need to initialize twice.
-    if (hWinPtyDLL)
-	return OK;
+    ఒకవేళ (hWinPtyDLL)
+	తిరిగి OK;
     // Load winpty.dll, prefer using the 'winptydll' option, fall back to just
     // winpty.dll.
-    if (*p_winptydll != NUL)
-	hWinPtyDLL = vimLoadLib((char *)p_winptydll);
-    if (!hWinPtyDLL)
-	hWinPtyDLL = vimLoadLib(WINPTY_DLL);
-    if (!hWinPtyDLL)
+    ఒకవేళ (*p_winptydll != NUL)
+	hWinPtyDLL = vim_ఎక్కించు_Lib((అక్షరం *)p_winptydll);
+    ఒకవేళ (!hWinPtyDLL)
+	hWinPtyDLL = vim_ఎక్కించు_Lib(WINPTY_DLL);
+    ఒకవేళ (!hWinPtyDLL)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str),
+	ఒకవేళ (verbose)
+	    semsg(_(e_could_not_ఎక్కించు_library_str_str),
 		    (*p_winptydll != NUL ? p_winptydll : (char_u *)WINPTY_DLL),
 		    GetWin32Error());
-	return FAIL;
+	తిరిగి FAIL;
     }
-    for (i = 0; winpty_entry[i].name != NULL
-					 && winpty_entry[i].ptr != NULL; ++i)
+    కొరకు (i = 0; winpty_నమోదు[i].name != ఖాళీ
+					 && winpty_నమోదు[i].ptr != ఖాళీ; ++i)
     {
-	if ((*winpty_entry[i].ptr = (FARPROC)GetProcAddress(hWinPtyDLL,
-					      winpty_entry[i].name)) == NULL)
+	ఒకవేళ ((*winpty_నమోదు[i].ptr = (FARPROC)Get_Proc_చిరునామా(hWinPtyDLL,
+					      winpty_నమోదు[i].name)) == ఖాళీ)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), winpty_entry[i].name);
-	    hWinPtyDLL = NULL;
-	    return FAIL;
+	    ఒకవేళ (verbose)
+		semsg(_(e_could_not_ఎక్కించు_library_function_str), winpty_నమోదు[i].name);
+	    hWinPtyDLL = ఖాళీ;
+	    తిరిగి FAIL;
 	}
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-winpty_term_and_job_init(
-	term_T	    *term,
+    స్థిర పూర్ణాంకం
+winpty_పదం_and_పని_init(
+	పదం_T	    *పదం,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	అక్షరం	    **argv వాడని,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
+    WCHAR	    *cmd_wchar = ఖాళీ;
+    WCHAR	    *cwd_wchar = ఖాళీ;
+    WCHAR	    *env_wchar = ఖాళీ;
+    channel_T	    *channel = ఖాళీ;
+    పని_T	    *పని = ఖాళీ;
     DWORD	    error;
-    HANDLE	    jo = NULL;
-    HANDLE	    child_process_handle;
-    HANDLE	    child_thread_handle;
-    void	    *winpty_err = NULL;
-    void	    *spawn_config = NULL;
+    HANDLE	    jo = ఖాళీ;
+    HANDLE	    బిడ్డ_process_handle;
+    HANDLE	    బిడ్డ_thread_handle;
+    శూన్య	    *winpty_err = ఖాళీ;
+    శూన్య	    *spawn_config = ఖాళీ;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = ఖాళీ;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, పరిమాణం(అక్షరం*), 20);
+    ga_init2(&ga_env, పరిమాణం(అక్షరం*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    ఒకవేళ (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    లేకపోతే ఒకవేళ (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	ఒకవేళ (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    వెళ్ళు failed;
+	cmd = ga_cmd.ga_దత్తాంశం;
     }
-    if (cmd == NULL || *cmd == NUL)
+    ఒకవేళ (cmd == ఖాళీ || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_వాదం));
+	వెళ్ళు failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    పదం->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_గమ్యం_utf16(cmd, ఖాళీ);
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    ఒకవేళ (cmd_wchar == ఖాళీ)
+	వెళ్ళు failed;
+    ఒకవేళ (opt->jo_cwd != ఖాళీ)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_గమ్యం_utf16(opt->jo_cwd, ఖాళీ);
+	ఒకవేళ (cwd_wchar == ఖాళీ)
+	    వెళ్ళు failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_దత్తాంశం;
 
-    term->tl_winpty_config = winpty_config_new(0, &winpty_err);
-    if (term->tl_winpty_config == NULL)
-	goto failed;
+    పదం->tl_winpty_config = winpty_config_new(0, &winpty_err);
+    ఒకవేళ (పదం->tl_winpty_config == ఖాళీ)
+	వెళ్ళు failed;
 
-    winpty_config_set_mouse_mode(term->tl_winpty_config,
-						    WINPTY_MOUSE_MODE_FORCE);
-    winpty_config_set_initial_size(term->tl_winpty_config,
-						 term->tl_cols, term->tl_rows);
-    term->tl_winpty = winpty_open(term->tl_winpty_config, &winpty_err);
-    if (term->tl_winpty == NULL)
-	goto failed;
+    winpty_config_సమితి_mouse_బహుళకం(పదం->tl_winpty_config,
+						    WINPTY_MOUSE_బహుళకం_FORCE);
+    winpty_config_సమితి_initial_కొలత(పదం->tl_winpty_config,
+						 పదం->tl_నిలువుల_సంఖ్య, పదం->tl_అడ్డువరుసలు);
+    పదం->tl_winpty = winpty_open(పదం->tl_winpty_config, &winpty_err);
+    ఒకవేళ (పదం->tl_winpty == ఖాళీ)
+	వెళ్ళు failed;
 
     spawn_config = winpty_spawn_config_new(
 	    WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN |
 		WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN,
-	    NULL,
+	    ఖాళీ,
 	    cmd_wchar,
 	    cwd_wchar,
 	    env_wchar,
 	    &winpty_err);
-    if (spawn_config == NULL)
-	goto failed;
+    ఒకవేళ (spawn_config == ఖాళీ)
+	వెళ్ళు failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
+	వెళ్ళు failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    పని = పని_alloc();
+    ఒకవేళ (పని == ఖాళీ)
+	వెళ్ళు failed;
+    ఒకవేళ (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	పూర్ణాంకం argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &పని->jv_argv, &argc);
     }
-    else
+    లేకపోతే
     {
-	int argc;
+	పూర్ణాంకం argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &పని->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    ఒకవేళ (opt->jo_సమితి & JO_లోపల_BUF)
+	పని->jv_లోపల_buf = buflist_findnr(opt->jo_io_buf[PART_లోపల]);
 
-    if (!winpty_spawn(term->tl_winpty, spawn_config, &child_process_handle,
-	    &child_thread_handle, &error, &winpty_err))
-	goto failed;
+    ఒకవేళ (!winpty_spawn(పదం->tl_winpty, spawn_config, &బిడ్డ_process_handle,
+	    &బిడ్డ_thread_handle, &error, &winpty_err))
+	వెళ్ళు failed;
 
-    channel_set_pipes(channel,
+    channel_సమితి_pipes(channel,
 	(sock_T)CreateFileW(
-	    winpty_conin_name(term->tl_winpty),
-	    GENERIC_WRITE, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conin_name(పదం->tl_winpty),
+	    GENERIC_WRITE, 0, ఖాళీ,
+	    OPEN_EXISTING, 0, ఖాళీ),
 	(sock_T)CreateFileW(
-	    winpty_conout_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conout_name(పదం->tl_winpty),
+	    GENERIC_READ, 0, ఖాళీ,
+	    OPEN_EXISTING, 0, ఖాళీ),
 	(sock_T)CreateFileW(
-	    winpty_conerr_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL));
+	    winpty_conerr_name(పదం->tl_winpty),
+	    GENERIC_READ, 0, ఖాళీ,
+	    OPEN_EXISTING, 0, ఖాళీ));
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_పాఠ్యం_బహుళకం = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_పని_Object(ఖాళీ, ఖాళీ);
+    ఒకవేళ (jo == ఖాళీ)
+	వెళ్ళు failed;
 
-    if (!AssignProcessToJobObject(jo, child_process_handle))
+    ఒకవేళ (!కేటాయించు_Process_గమ్యం_పని_Object(jo, బిడ్డ_process_handle))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ఖాళీ;
     }
 
     winpty_spawn_config_free(spawn_config);
@@ -7809,86 +7809,86 @@ winpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    ఒకవేళ (create_vterm(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య) == FAIL)
+	వెళ్ళు failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (పదం_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ఒకవేళ (పదం->tl_palette != ఖాళీ)
+	    సమితి_vterm_palette(పదం->tl_vterm, పదం->tl_palette);
+	లేకపోతే
+	    init_vterm_ansi_colors(పదం->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_సమితి_పని(channel, పని, opt);
+    పని_సమితి_options(పని, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info.hProcess = child_process_handle;
-    job->jv_proc_info.dwProcessId = GetProcessId(child_process_handle);
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_in = utf16_to_enc(
-	    (short_u *)winpty_conin_name(term->tl_winpty), NULL);
-    job->jv_tty_out = utf16_to_enc(
-	    (short_u *)winpty_conout_name(term->tl_winpty), NULL);
-    job->jv_tty_type = vim_strsave((char_u *)"winpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    పని->jv_channel = channel;
+    పని->jv_proc_info.hProcess = బిడ్డ_process_handle;
+    పని->jv_proc_info.dwProcessId = GetProcessId(బిడ్డ_process_handle);
+    పని->jv_పని_object = jo;
+    పని->jv_స్థితి = పని_STARTED;
+    పని->jv_tty_లోపల = utf16_గమ్యం_enc(
+	    (short_u *)winpty_conin_name(పదం->tl_winpty), ఖాళీ);
+    పని->jv_tty_బహిర్గతం = utf16_గమ్యం_enc(
+	    (short_u *)winpty_conout_name(పదం->tl_winpty), ఖాళీ);
+    పని->jv_tty_type = vim_strsave((char_u *)"winpty");
+    ++పని->jv_refcount;
+    పదం->tl_పని = పని;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    ఒకవేళ (orig_opt->jo_io[PART_బహిర్గతం] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_బహిర్గతం];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	పదం->tl_బహిర్గతం_fd = mch_fopen((అక్షరం *)fname, WRITEBIN);
+	ఒకవేళ (పదం->tl_బహిర్గతం_fd == ఖాళీ)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    తిరిగి OK;
 
 failed:
     ga_clear(&ga_cmd);
     ga_clear(&ga_env);
     vim_free(cmd_wchar);
     vim_free(cwd_wchar);
-    if (spawn_config != NULL)
+    ఒకవేళ (spawn_config != ఖాళీ)
 	winpty_spawn_config_free(spawn_config);
-    if (channel != NULL)
+    ఒకవేళ (channel != ఖాళీ)
 	channel_clear(channel);
-    if (job != NULL)
+    ఒకవేళ (పని != ఖాళీ)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	పని->jv_channel = ఖాళీ;
+	పని_cleanup(పని);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    పదం->tl_పని = ఖాళీ;
+    ఒకవేళ (jo != ఖాళీ)
 	CloseHandle(jo);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (winpty_err != NULL)
+    ఒకవేళ (పదం->tl_winpty != ఖాళీ)
+	winpty_free(పదం->tl_winpty);
+    పదం->tl_winpty = ఖాళీ;
+    ఒకవేళ (పదం->tl_winpty_config != ఖాళీ)
+	winpty_config_free(పదం->tl_winpty_config);
+    పదం->tl_winpty_config = ఖాళీ;
+    ఒకవేళ (winpty_err != ఖాళీ)
     {
-	char *msg = (char *)utf16_to_enc(
-				(short_u *)winpty_error_msg(winpty_err), NULL);
+	అక్షరం *సందేశం = (అక్షరం *)utf16_గమ్యం_enc(
+				(short_u *)winpty_error_సందేశం(winpty_err), ఖాళీ);
 
-	if (msg != NULL)
+	ఒకవేళ (సందేశం != ఖాళీ)
 	{
-	    emsg(msg);
-	    vim_free(msg);
+	    emsg(సందేశం);
+	    vim_free(సందేశం);
 	}
 	winpty_error_free(winpty_err);
     }
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
@@ -7896,164 +7896,164 @@ failed:
  * Store a reference in "term".
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    స్థిర పూర్ణాంకం
+పదం_and_పని_init(
+	పదం_T	    *పదం,
 	typval_T    *argvar,
-	char	    **argv,
+	అక్షరం	    **argv,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    int		    use_winpty = FALSE;
-    int		    use_conpty = FALSE;
-    int		    tty_type = *p_twt;
+    పూర్ణాంకం		    use_winpty = FALSE;
+    పూర్ణాంకం		    use_conpty = FALSE;
+    పూర్ణాంకం		    tty_type = *p_twt;
 
     has_winpty = dyn_winpty_init(FALSE) != FAIL ? TRUE : FALSE;
     has_conpty = dyn_conpty_init(FALSE) != FAIL ? TRUE : FALSE;
 
-    if (!has_winpty && !has_conpty)
+    ఒకవేళ (!has_winpty && !has_conpty)
 	// If neither is available give the errors for winpty, since when
 	// conpty is not available it can't be installed either.
-	return dyn_winpty_init(TRUE);
+	తిరిగి dyn_winpty_init(TRUE);
 
-    if (opt->jo_tty_type != NUL)
+    ఒకవేళ (opt->jo_tty_type != NUL)
 	tty_type = opt->jo_tty_type;
 
-    if (tty_type == NUL)
+    ఒకవేళ (tty_type == NUL)
     {
-	if (has_conpty && (is_conpty_stable() || !has_winpty))
+	ఒకవేళ (has_conpty && (is_conpty_stable() || !has_winpty))
 	    use_conpty = TRUE;
-	else if (has_winpty)
+	లేకపోతే ఒకవేళ (has_winpty)
 	    use_winpty = TRUE;
 	// else: error
     }
-    else if (tty_type == 'w')	// winpty
+    లేకపోతే ఒకవేళ (tty_type == 'w')	// winpty
     {
-	if (has_winpty)
+	ఒకవేళ (has_winpty)
 	    use_winpty = TRUE;
     }
-    else if (tty_type == 'c')	// conpty
+    లేకపోతే ఒకవేళ (tty_type == 'c')	// conpty
     {
-	if (has_conpty)
+	ఒకవేళ (has_conpty)
 	    use_conpty = TRUE;
-	else
-	    return dyn_conpty_init(TRUE);
+	లేకపోతే
+	    తిరిగి dyn_conpty_init(TRUE);
     }
 
-    if (use_conpty)
-	return conpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    ఒకవేళ (use_conpty)
+	తిరిగి conpty_పదం_and_పని_init(పదం, argvar, argv, opt, orig_opt);
 
-    if (use_winpty)
-	return winpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    ఒకవేళ (use_winpty)
+	తిరిగి winpty_పదం_and_పని_init(పదం, argvar, argv, opt, orig_opt);
 
     // error
-    return dyn_winpty_init(TRUE);
+    తిరిగి dyn_winpty_init(TRUE);
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *options)
+    స్థిర పూర్ణాంకం
+create_pty_only(పదం_T *పదం, jobopt_T *options)
 {
-    HANDLE	    hPipeIn = INVALID_HANDLE_VALUE;
-    HANDLE	    hPipeOut = INVALID_HANDLE_VALUE;
-    char	    in_name[80], out_name[80];
-    channel_T	    *channel = NULL;
+    HANDLE	    h_Pipe_లోపల = INVALID_HANDLE_విలువ;
+    HANDLE	    h_Pipe_బహిర్గతం = INVALID_HANDLE_విలువ;
+    అక్షరం	    లోపల_name[80], బహిర్గతం_name[80];
+    channel_T	    *channel = ఖాళీ;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ఒకవేళ (create_vterm(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య) == FAIL)
+	తిరిగి FAIL;
 
-    vim_snprintf(in_name, sizeof(in_name), "\\\\.\\pipe\\vim-%d-in-%d",
+    vim_snprintf(లోపల_name, పరిమాణం(లోపల_name), "\\\\.\\pipe\\vim-%d-in-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeIn = CreateNamedPipe(in_name, PIPE_ACCESS_OUTBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_లోపల = CreateNamedPipe(లోపల_name, PIPE_ACCESS_OUTBOUND,
+	    PIPE_TYPE_సందేశం | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, NMPWAIT_NOWAIT, NULL);
-    if (hPipeIn == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, NMPWAIT_NOWAIT, ఖాళీ);
+    ఒకవేళ (h_Pipe_లోపల == INVALID_HANDLE_విలువ)
+	వెళ్ళు failed;
 
-    vim_snprintf(out_name, sizeof(out_name), "\\\\.\\pipe\\vim-%d-out-%d",
+    vim_snprintf(బహిర్గతం_name, పరిమాణం(బహిర్గతం_name), "\\\\.\\pipe\\vim-%d-out-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeOut = CreateNamedPipe(out_name, PIPE_ACCESS_INBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_బహిర్గతం = CreateNamedPipe(బహిర్గతం_name, PIPE_ACCESS_INBOUND,
+	    PIPE_TYPE_సందేశం | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, 0, NULL);
-    if (hPipeOut == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, 0, ఖాళీ);
+    ఒకవేళ (h_Pipe_బహిర్గతం == INVALID_HANDLE_విలువ)
+	వెళ్ళు failed;
 
-    ConnectNamedPipe(hPipeIn, NULL);
-    ConnectNamedPipe(hPipeOut, NULL);
+    ConnectNamedPipe(h_Pipe_లోపల, ఖాళీ);
+    ConnectNamedPipe(h_Pipe_బహిర్గతం, ఖాళీ);
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	goto failed;
-    ++term->tl_job->jv_refcount;
+    పదం->tl_పని = పని_alloc();
+    ఒకవేళ (పదం->tl_పని == ఖాళీ)
+	వెళ్ళు failed;
+    ++పదం->tl_పని->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    పదం->tl_పని->jv_స్థితి = పని_ముగిసిన;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
-    term->tl_job->jv_channel = channel;
+    channel = కూడు_channel();
+    ఒకవేళ (channel == ఖాళీ)
+	వెళ్ళు failed;
+    పదం->tl_పని->jv_channel = channel;
     channel->ch_keep_open = TRUE;
     channel->ch_named_pipe = TRUE;
 
-    channel_set_pipes(channel,
-	(sock_T)hPipeIn,
-	(sock_T)hPipeOut,
-	(sock_T)hPipeOut);
-    channel_set_job(channel, term->tl_job, options);
-    term->tl_job->jv_tty_in = vim_strsave((char_u*)in_name);
-    term->tl_job->jv_tty_out = vim_strsave((char_u*)out_name);
+    channel_సమితి_pipes(channel,
+	(sock_T)h_Pipe_లోపల,
+	(sock_T)h_Pipe_బహిర్గతం,
+	(sock_T)h_Pipe_బహిర్గతం);
+    channel_సమితి_పని(channel, పదం->tl_పని, options);
+    పదం->tl_పని->jv_tty_లోపల = vim_strsave((char_u*)లోపల_name);
+    పదం->tl_పని->jv_tty_బహిర్గతం = vim_strsave((char_u*)బహిర్గతం_name);
 
-    return OK;
+    తిరిగి OK;
 
 failed:
-    if (hPipeIn != NULL)
-	CloseHandle(hPipeIn);
-    if (hPipeOut != NULL)
-	CloseHandle(hPipeOut);
-    return FAIL;
+    ఒకవేళ (h_Pipe_లోపల != ఖాళీ)
+	CloseHandle(h_Pipe_లోపల);
+    ఒకవేళ (h_Pipe_బహిర్గతం != ఖాళీ)
+	CloseHandle(h_Pipe_బహిర్గతం);
+    తిరిగి FAIL;
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    స్థిర శూన్య
+పదం_free_vterm(పదం_T *పదం)
 {
-    term_free_conpty(term);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    పదం_free_conpty(పదం);
+    ఒకవేళ (పదం->tl_winpty != ఖాళీ)
+	winpty_free(పదం->tl_winpty);
+    పదం->tl_winpty = ఖాళీ;
+    ఒకవేళ (పదం->tl_winpty_config != ఖాళీ)
+	winpty_config_free(పదం->tl_winpty_config);
+    పదం->tl_winpty_config = ఖాళీ;
+    ఒకవేళ (పదం->tl_vterm != ఖాళీ)
+	vterm_free(పదం->tl_vterm);
+    పదం->tl_vterm = ఖాళీ;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    స్థిర శూన్య
+పదం_report_winsize(పదం_T *పదం, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
-    if (term->tl_conpty)
-	conpty_term_report_winsize(term, rows, cols);
-    if (term->tl_winpty)
-	winpty_set_size(term->tl_winpty, cols, rows, NULL);
+    ఒకవేళ (పదం->tl_conpty)
+	conpty_పదం_report_winsize(పదం, అడ్డువరుసలు_2, నిలువుల_సంఖ్య);
+    ఒకవేళ (పదం->tl_winpty)
+	winpty_సమితి_కొలత(పదం->tl_winpty, నిలువుల_సంఖ్య, అడ్డువరుసలు_2, ఖాళీ);
 }
 
-    int
-terminal_enabled(void)
+    పూర్ణాంకం
+terminal_enabled(శూన్య)
 {
-    return dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
+    తిరిగి dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
 }
 
-#else
+#లేకపోతే
 
 ///////////////////////////////////////
 // 3. Unix-like implementation.
@@ -8065,90 +8065,90 @@ terminal_enabled(void)
  * When "argv" is not NULL then "argvar" is not used.
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    స్థిర పూర్ణాంకం
+పదం_and_పని_init(
+	పదం_T	    *పదం,
 	typval_T    *argvar,
-	char	    **argv,
+	అక్షరం	    **argv,
 	jobopt_T    *opt,
-	jobopt_T    *orig_opt UNUSED)
+	jobopt_T    *orig_opt వాడని)
 {
-    term->tl_arg0_cmd = NULL;
+    పదం->tl_arg0_cmd = ఖాళీ;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ఒకవేళ (create_vterm(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య) == FAIL)
+	తిరిగి FAIL;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ఒకవేళ (పదం_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ఒకవేళ (పదం->tl_palette != ఖాళీ)
+	    సమితి_vterm_palette(పదం->tl_vterm, పదం->tl_palette);
+	లేకపోతే
+	    init_vterm_ansi_colors(పదం->tl_vterm);
     }
 # endif
 
     // This may change a string in "argvar".
-    term->tl_job = job_start(argvar, argv, opt, &term->tl_job);
-    if (term->tl_job != NULL)
-	++term->tl_job->jv_refcount;
+    పదం->tl_పని = పని_ప్రారంభం(argvar, argv, opt, &పదం->tl_పని);
+    ఒకవేళ (పదం->tl_పని != ఖాళీ)
+	++పదం->tl_పని->jv_refcount;
 
-    return term->tl_job != NULL
-	&& term->tl_job->jv_channel != NULL
-	&& term->tl_job->jv_status != JOB_FAILED ? OK : FAIL;
+    తిరిగి పదం->tl_పని != ఖాళీ
+	&& పదం->tl_పని->jv_channel != ఖాళీ
+	&& పదం->tl_పని->jv_స్థితి != పని_FAILED ? OK : FAIL;
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *opt)
+    స్థిర పూర్ణాంకం
+create_pty_only(పదం_T *పదం, jobopt_T *opt)
 {
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ఒకవేళ (create_vterm(పదం, పదం->tl_అడ్డువరుసలు, పదం->tl_నిలువుల_సంఖ్య) == FAIL)
+	తిరిగి FAIL;
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	return FAIL;
-    ++term->tl_job->jv_refcount;
+    పదం->tl_పని = పని_alloc();
+    ఒకవేళ (పదం->tl_పని == ఖాళీ)
+	తిరిగి FAIL;
+    ++పదం->tl_పని->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    పదం->tl_పని->jv_స్థితి = పని_ముగిసిన;
 
-    return mch_create_pty_channel(term->tl_job, opt);
+    తిరిగి mch_create_pty_channel(పదం->tl_పని, opt);
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    స్థిర శూన్య
+పదం_free_vterm(పదం_T *పదం)
 {
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    ఒకవేళ (పదం->tl_vterm != ఖాళీ)
+	vterm_free(పదం->tl_vterm);
+    పదం->tl_vterm = ఖాళీ;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    స్థిర శూన్య
+పదం_report_winsize(పదం_T *పదం, పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య)
 {
     // Use an ioctl() to report the new window size to the job.
-    if (term->tl_job == NULL || term->tl_job->jv_channel == NULL)
-	return;
+    ఒకవేళ (పదం->tl_పని == ఖాళీ || పదం->tl_పని->jv_channel == ఖాళీ)
+	తిరిగి;
 
-    int fd = -1;
-    int part;
+    పూర్ణాంకం fd = -1;
+    పూర్ణాంకం part;
 
-    for (part = PART_OUT; part < PART_COUNT; ++part)
+    కొరకు (part = PART_బహిర్గతం; part < PART_లెక్క; ++part)
     {
-	fd = term->tl_job->jv_channel->ch_part[part].ch_fd;
-	if (mch_isatty(fd))
-	    break;
+	fd = పదం->tl_పని->jv_channel->ch_part[part].ch_fd;
+	ఒకవేళ (mch_isatty(fd))
+	    ఆపు;
     }
-    if (part < PART_COUNT && mch_report_winsize(fd, rows, cols) == OK)
-	mch_signal_job(term->tl_job, (char_u *)"winch");
+    ఒకవేళ (part < PART_లెక్క && mch_report_winsize(fd, అడ్డువరుసలు_2, నిలువుల_సంఖ్య) == OK)
+	mch_signal_పని(పదం->tl_పని, (char_u *)"winch");
 }
 
-#endif
+#అయితే_ముగింపు
 
-#endif // FEAT_TERMINAL
+#అయితే_ముగింపు // FEAT_TERMINAL

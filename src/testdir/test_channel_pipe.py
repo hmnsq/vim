@@ -4,73 +4,73 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import os
-import sys
-import time
+తః __future__ దిగుమతి print_function
+దిగుమతి os
+దిగుమతి sys
+దిగుమతి సమయం
 
-if __name__ == "__main__":
+ఒకవేళ __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
-            print(sys.argv[1], file=sys.stderr)
+    ఒకవేళ పొడవు(sys.argv) > 1:
+        ఒకవేళ sys.argv[1].startswith("err"):
+            ముద్రించు(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
-        elif sys.argv[1].startswith("incomplete"):
-            print(sys.argv[1], end='')
+        లేదావేళ sys.argv[1].startswith("incomplete"):
+            ముద్రించు(sys.argv[1], చివర='')
             sys.stdout.flush()
             sys.exit(0)
-        elif sys.argv[1].startswith("busy"):
-            time.sleep(100)
+        లేదావేళ sys.argv[1].startswith("busy"):
+            సమయం.సుషుప్తి(100)
             sys.exit(0)
-        else:
-            print(sys.argv[1])
+        లేకపోతే:
+            ముద్రించు(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            ఒకవేళ sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
-        try:
-            import thread_util
-            thread_util.set_high_priority()
-        except Exception:
-            pass
+    ఒకవేళ os.getenv('CI'):
+        ప్రయత్నించు:
+            దిగుమతి thread_util
+            thread_util.సమితి_ఎగువ_ప్రాధాన్యత()
+        మినహాయింపు Exception:
+            దాటు
 
-    while True:
+    అయితే నిజం:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
-            break
-        if typed.startswith("quit"):
-            print("Goodbye!")
+        ఒకవేళ typed == "":  # EOF -- stop
+            ఆపు
+        ఒకవేళ typed.startswith("quit"):
+            ముద్రించు("Goodbye!")
             sys.stdout.flush()
-            break
-        if typed.startswith("echo "):
-            print(typed[5:-1])
+            ఆపు
+        ఒకవేళ typed.startswith("echo "):
+            ముద్రించు(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
-                sys.stdout.write(part)
+        ఒకవేళ typed.startswith("echosplit "):
+            కొరకు part లో typed[10:-1].విభజించు('|'):
+                sys.stdout.లిఖ(part)
                 sys.stdout.flush()
-                time.sleep(0.05)
-        if typed.startswith("double "):
-            print(typed[7:-1] + "\nAND " + typed[7:-1])
+                సమయం.సుషుప్తి(0.05)
+        ఒకవేళ typed.startswith("double "):
+            ముద్రించు(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
-            print(typed[6:-1], end='')
+        ఒకవేళ typed.startswith("split "):
+            ముద్రించు(typed[6:-1], చివర='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1], end='')
+            సమయం.సుషుప్తి(0.05)
+            ముద్రించు(typed[6:-1], చివర='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1])
+            సమయం.సుషుప్తి(0.05)
+            ముద్రించు(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
-            print(typed[8:-1], file=sys.stderr)
+        ఒకవేళ typed.startswith("echoerr "):
+            ముద్రించు(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
-            print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
+        ఒకవేళ typed.startswith("doubleerr "):
+            ముద్రించు(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
-            print(typed, end='')
+        ఒకవేళ typed.startswith("XXX"):
+            ముద్రించు(typed, చివర='')
             sys.stderr.flush()
-            break
+            ఆపు
 

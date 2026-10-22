@@ -7,26 +7,26 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_TB_H
-#define GUI_GTK4_TB_H
+#నిర్వచితం_కాకపోతే GUI_GTK4_TB_H
+#నిర్వచించు GUI_GTK4_TB_H
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#నిర్వచితమైతే FEAT_TOOLBAR
 
 # include <gtk/gtk.h>
 
 # define VIM_TYPE_TOOLBAR (vim_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(VimToolbar, vim_toolbar, VIM, TOOLBAR, GtkWidget)
 
-typedef struct _VimToolbarItem VimToolbarItem;
+రకనిర్వచనం నిర్మాణం Vim_Toolbar_అంశం Vim_Toolbar_అంశం_2;
 
-GtkWidget *vim_toolbar_new(void);
-GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, int idx);
-GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, int idx);
-void vim_toolbar_set_style(VimToolbar *self, int style, int iconsize);
-void vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
+GtkWidget *vim_toolbar_new(శూన్య);
+GtkWidget *vim_toolbar_చొప్పించు_button(VimToolbar *self, GtkWidget *icon, స్థిరరాశి అక్షరం *పాఠ్యం, పూర్ణాంకం idx);
+GtkWidget *vim_toolbar_చొప్పించు_separator(VimToolbar *self, పూర్ణాంకం idx);
+శూన్య vim_toolbar_సమితి_style(VimToolbar *self, పూర్ణాంకం style, పూర్ణాంకం iconsize);
+శూన్య vim_toolbar_remove(VimToolbar *self, GtkWidget *అంశం);
 
-#endif
+#అయితే_ముగింపు
 
-#endif
+#అయితే_ముగింపు

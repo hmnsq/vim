@@ -10,186 +10,186 @@
  * Win32 machine-dependent things.
  */
 
-#include "os_dos.h"		// common MS-DOS and Win32 stuff
-#include <direct.h>		// for _mkdir()
+#అన్తర్భావ "os_dos.h"		// common MS-DOS and Win32 stuff
+#అన్తర్భావ <direct.h>		// for _mkdir()
 
-#define BINARY_FILE_IO
-#define USE_EXE_NAME		// use argv[0] for $VIM
-#define USE_TERM_CONSOLE
-#ifndef HAVE_STRING_H
+#నిర్వచించు ద్విమాన_FILE_IO
+#నిర్వచించు USE_EXE_NAME		// use argv[0] for $VIM
+#నిర్వచించు USE_పదం_CONSOLE
+#నిర్వచితం_కాకపోతే HAVE_STRING_H
 # define HAVE_STRING_H
-#endif
-#ifndef HAVE_MATH_H
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HAVE_MATH_H
 # define HAVE_MATH_H
-#endif
-#ifndef __GNUC__
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే __GNUC__
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
-#endif
-#ifndef HAVE_STRFTIME
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HAVE_STRFTIME
 # define HAVE_STRFTIME		// guessed
-#endif
-#ifndef HAVE_STRPTIME
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HAVE_STRPTIME
 # define HAVE_STRPTIME		// provided by src/strptime.c
-#endif
-#ifndef HAVE_TZSET
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HAVE_TZSET
 # define HAVE_TZSET		// CRT has tzset() / _tzset()
-#endif
-#define HAVE_MEMSET
-#ifndef HAVE_LOCALE_H
+#అయితే_ముగింపు
+#నిర్వచించు HAVE_MEMSET
+#నిర్వచితం_కాకపోతే HAVE_LOCALE_H
 # define HAVE_LOCALE_H 1
-#endif
-#ifndef HAVE_FCNTL_H
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే HAVE_FCNTL_H
 # define HAVE_FCNTL_H
-#endif
-#define HAVE_QSORT
-#define HAVE_ST_MODE		// have stat.st_mode
+#అయితే_ముగింపు
+#నిర్వచించు HAVE_QSORT
+#నిర్వచించు HAVE_ST_బహుళకం		// have stat.st_mode
 
-#define FEAT_SHORTCUT		// resolve shortcuts
+#నిర్వచించు FEAT_SHORTCUT		// resolve shortcuts
 
 // Access Control List (actually security info).
-#define HAVE_ACL
+#నిర్వచించు HAVE_ACL
 
-#define USE_FNAME_CASE		// adjust case of file names
-#if !defined(FEAT_CLIPBOARD)
+#నిర్వచించు USE_FNAME_CASE		// adjust case of file names
+#ఒకవేళ !defined(FEAT_CLIPBOARD)
 # define FEAT_CLIPBOARD		// include clipboard support
-#endif
-#if defined(__DATE__) && defined(__TIME__)
-# define HAVE_DATE_TIME
-#endif
-#ifndef FEAT_GUI_MSWIN		// GUI works different
+#అయితే_ముగింపు
+#ఒకవేళ defined(__DATE__) && defined(__TIME__)
+# define HAVE_DATE_సమయం
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే FEAT_GUI_MSWIN		// GUI works different
 # define BREAKCHECK_SKIP    1	// call mch_breakcheck() each time, it's fast
-#endif
+#అయితే_ముగింపు
 
-#define HAVE_TOTAL_MEM
+#నిర్వచించు HAVE_మొత్తం_MEM
 
-#define HAVE_PUTENV		// at least Bcc 5.2 and MSC have it
+#నిర్వచించు HAVE_PUTENV		// at least Bcc 5.2 and MSC have it
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#ఒకవేళ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define NO_CONSOLE		// don't include console-only code
-#endif
+#అయితే_ముగింపు
 
 // toupper() is not really broken, but it's very slow.	Probably because of
 // using Unicode characters on Windows NT
-#define BROKEN_TOUPPER
+#నిర్వచించు BROKEN_TOUPPER
 
-#define FNAME_ILLEGAL "\"*?><|" // illegal characters in a file name
+#నిర్వచించు FNAME_ILLEGAL "\"*?><|" // illegal characters in a file name
 
-#include <signal.h>
-#include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
+#అన్తర్భావ <signal.h>
+#అన్తర్భావ <stdlib.h>
+#అన్తర్భావ <time.h>
+#అన్తర్భావ <sys/types.h>
 
-#ifndef STRICT
+#నిర్వచితం_కాకపోతే STRICT
 # define STRICT
-#endif
-#ifndef COBJMACROS
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే COBJMACROS
 # define COBJMACROS	// For OLE: Enable "friendlier" access to objects
-#endif
+#అయితే_ముగింపు
 
 // Must include winsock2.h before windows.h since it conflicts with winsock.h
 // (included in windows.h).
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
+#అన్తర్భావ <winsock2.h>
+#అన్తర్భావ <ws2tcpip.h>
+#అన్తర్భావ <windows.h>
 
 // Weird: rpcndr.h defines "small" to "char", which causes trouble
-#undef small
+#నిర్వచనం_రద్దు small
 
-#ifndef SM_CXPADDEDBORDER
+#నిర్వచితం_కాకపోతే SM_CXPADDEDBORDER
 # define SM_CXPADDEDBORDER     92
-#endif
+#అయితే_ముగింపు
 
-typedef void (*sighandler_T)(int, int);
+రకనిర్వచనం శూన్య (*sighandler_T)(పూర్ణాంకం, పూర్ణాంకం);
 
 /*
  * Win32 has plenty of memory, use large buffers
  */
-#define CMDBUFFSIZE 1024	// size of the command processing buffer
+#నిర్వచించు CMDBUFFSIZE 1024	// size of the command processing buffer
 
 // _MAX_PATH is only 260 (stdlib.h), but we want more for the 'path' option,
 // thus use a larger number.
-#define MAXPATHL	1024
+#నిర్వచించు MAXPATHL	1024
 
-#ifndef BASENAMELEN
-# define BASENAMELEN	(_MAX_PATH - 5)	// length of base of file name
-#endif
+#నిర్వచితం_కాకపోతే BASENAMELEN
+# define BASENAMELEN	(MAX_మార్గం_2 - 5)	// length of base of file name
+#అయితే_ముగింపు
 
-#define TEMPNAMELEN	_MAX_PATH	// length of temp file name path
+#నిర్వచించు TEMPNAMELEN	MAX_మార్గం_2	// length of temp file name path
 
-#ifndef DFLT_MAXMEM
+#నిర్వచితం_కాకపోతే DFLT_MAXMEM
 # define DFLT_MAXMEM	(2*1024)    // use up to 2 Mbyte for a buffer
-#endif
+#అయితే_ముగింపు
 
-#ifndef DFLT_MAXMEMTOT
+#నిర్వచితం_కాకపోతే DFLT_MAXMEMTOT
 # define DFLT_MAXMEMTOT	(5*1024)    // use up to 5 Mbyte for Vim
-#endif
+#అయితే_ముగింపు
 
 /*
  * Reparse Point
  */
-#ifndef FILE_ATTRIBUTE_REPARSE_POINT
-# define FILE_ATTRIBUTE_REPARSE_POINT	0x00000400
-#endif
-#ifndef IO_REPARSE_TAG_MOUNT_POINT
-# define IO_REPARSE_TAG_MOUNT_POINT	0xA0000003
-#endif
-#ifndef IO_REPARSE_TAG_SYMLINK
-# define IO_REPARSE_TAG_SYMLINK		0xA000000C
-#endif
-#ifndef IO_REPARSE_TAG_APPEXECLINK
-# define IO_REPARSE_TAG_APPEXECLINK	0x8000001B
-#endif
+#నిర్వచితం_కాకపోతే FILE_ATTRIBUTE_REPARSE_బిందువు
+# define FILE_ATTRIBUTE_REPARSE_బిందువు	0x00000400
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే IO_REPARSE_ట్యాగ్_MOUNT_బిందువు
+# define IO_REPARSE_ట్యాగ్_MOUNT_బిందువు	0xA0000003
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే IO_REPARSE_ట్యాగ్_SYMLINK
+# define IO_REPARSE_ట్యాగ్_SYMLINK		0xA000000C
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే IO_REPARSE_ట్యాగ్_APPEXECLINK
+# define IO_REPARSE_ట్యాగ్_APPEXECLINK	0x8000001B
+#అయితే_ముగింపు
 
 /*
  * Definition of the reparse point buffer.
  * This is usually defined in the DDK, copy the definition here to avoid
  * adding it as a dependence only for a single structure.
  */
-typedef struct _REPARSE_DATA_BUFFER {
-    ULONG  ReparseTag;
-    USHORT ReparseDataLength;
+రకనిర్వచనం నిర్మాణం REPARSE_దత్తాంశం_బఫరు_2 {
+    ULONG  Reparse_ట్యాగ్;
+    USHORT Reparse_దత్తాంశం_నిడివి;
     USHORT Reserved;
-    union {
-	struct {
-	    USHORT SubstituteNameOffset;
-	    USHORT SubstituteNameLength;
-	    USHORT PrintNameOffset;
-	    USHORT PrintNameLength;
+    సంఘం {
+	నిర్మాణం {
+	    USHORT Substitute_Name_స్థానభ్రంశం;
+	    USHORT Substitute_Name_నిడివి;
+	    USHORT Print_Name_స్థానభ్రంశం;
+	    USHORT Print_Name_నిడివి;
 	    ULONG  Flags;
-	    WCHAR  PathBuffer[1];
-	} SymbolicLinkReparseBuffer;
-	struct {
-	    USHORT SubstituteNameOffset;
-	    USHORT SubstituteNameLength;
-	    USHORT PrintNameOffset;
-	    USHORT PrintNameLength;
-	    WCHAR  PathBuffer[1];
-	} MountPointReparseBuffer;
-	struct {
-	    UCHAR DataBuffer[1];
-	} GenericReparseBuffer;
-	struct
+	    WCHAR  మార్గం_బఫరు[1];
+	} Symbolic_Link_Reparse_బఫరు;
+	నిర్మాణం {
+	    USHORT Substitute_Name_స్థానభ్రంశం;
+	    USHORT Substitute_Name_నిడివి;
+	    USHORT Print_Name_స్థానభ్రంశం;
+	    USHORT Print_Name_నిడివి;
+	    WCHAR  మార్గం_బఫరు[1];
+	} Mount_బిందువు_Reparse_బఫరు;
+	నిర్మాణం {
+	    UCHAR దత్తాంశం_బఫరు[1];
+	} Generic_Reparse_బఫరు;
+	నిర్మాణం
 	{
-	    ULONG StringCount;
+	    ULONG String_లెక్క;
 	    WCHAR StringList[1];
-	} AppExecLinkReparseBuffer;
+	} App_Exec_Link_Reparse_బఫరు;
     } DUMMYUNIONNAME;
-} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+} REPARSE_దత్తాంశం_బఫరు, *PREPARSE_దత్తాంశం_బఫరు;
 
-#ifdef _MSC_VER
+#నిర్వచితమైతే _MSC_VER
     // Support for __try / __except.  All versions of MSVC are
     // expected to have this.  Any other compilers that support it?
 # define HAVE_TRY_EXCEPT 1
 # include <malloc.h>		// for _resetstkoflw()
-#endif
+#అయితే_ముగింపు
 
 /*
  * Some simple debugging macros that look and behave a lot like their
  * namesakes in MFC.
  */
 
-#ifdef _DEBUG
+#నిర్వచితమైతే _DEBUG
 
 # include <crtdbg.h>
 # define ASSERT(f) _ASSERT(f)
@@ -202,38 +202,38 @@ typedef struct _REPARSE_DATA_BUFFER {
 # define TRACE4(sz, p1, p2, p3, p4) Trace(_T(sz), p1, p2, p3, p4)
 
 // In debug version, writes trace messages to debug stream
-void __cdecl
-Trace(char *pszFormat, ...);
+శూన్య __cdecl
+Trace(అక్షరం *pszFormat, ...);
 
-#else // !_DEBUG
+#లేకపోతే // !_DEBUG
 
   // These macros should all compile away to nothing
-# define ASSERT(f)		((void)0)
-# define TRACE			1 ? (void)0 : (void)printf
+# define ASSERT(f)		((శూన్య)0)
+# define TRACE			1 ? (శూన్య)0 : (శూన్య)రాయి
 # define TRACE0(sz)
 # define TRACE1(sz, p1)
 # define TRACE2(sz, p1, p2)
 # define TRACE3(sz, p1, p2, p3)
 # define TRACE4(sz, p1, p2, p3, p4)
 
-#endif // !_DEBUG
+#అయితే_ముగింపు // !_DEBUG
 
 
-#define ASSERT_POINTER(p, type) \
-    ASSERT(((p) != NULL)  &&  IsValidAddress((p), sizeof(type), FALSE))
+#నిర్వచించు ASSERT_సూచిక(p, type) \
+    ASSERT(((p) != ఖాళీ)  &&  Is_Valid_చిరునామా((p), పరిమాణం(type), FALSE))
 
-#define ASSERT_NULL_OR_POINTER(p, type) \
-    ASSERT(((p) == NULL)  ||  IsValidAddress((p), sizeof(type), FALSE))
+#నిర్వచించు ASSERT_NULL_OR_సూచిక(p, type) \
+    ASSERT(((p) == ఖాళీ)  ||  Is_Valid_చిరునామా((p), పరిమాణం(type), FALSE))
 
-#ifndef HAVE_SETENV
+#నిర్వచితం_కాకపోతే HAVE_SETENV
 # define HAVE_SETENV
-#endif
-#define mch_getenv(x) (char_u *)getenv((char *)(x))
-#define vim_mkdir(x, y) mch_mkdir(x)
+#అయితే_ముగింపు
+#నిర్వచించు mch_getenv(x) (char_u *)getenv((అక్షరం *)(x))
+#నిర్వచించు vim_mkdir(x, y) mch_mkdir(x)
 
 // Windows Version
-#define MAKE_VER(major, minor, build) \
+#నిర్వచించు MAKE_VER(major, minor, build) \
     (((major) << 24) | ((minor) << 16) | (build))
 
 // The Windows CRT does not declare strptime(); Vim provides it in strptime.c.
-char *strptime(const char *buf, const char *fmt, struct tm *tm);
+అక్షరం *strptime(స్థిరరాశి అక్షరం *buf, స్థిరరాశి అక్షరం *fmt, నిర్మాణం tm *tm);

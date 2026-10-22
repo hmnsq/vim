@@ -20,15 +20,15 @@
  *
  */
 
-#if !defined(XPREPARE_H)
-#define XPREPARE_H
+#ఒకవేళ !defined(XPREPARE_H)
+#నిర్వచించు XPREPARE_H
 
 
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+పూర్ణాంకం xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t స్థిరరాశి *xpp,
 		    xdfenv_t *xe);
-void xdl_free_env(xdfenv_t *xe);
+శూన్య xdl_free_env(xdfenv_t *xe);
 
 
 
-#endif /* #if !defined(XPREPARE_H) */
+#అయితే_ముగింపు /* #if !defined(XPREPARE_H) */

@@ -11,80 +11,80 @@
  * indent.c: Indentation related functions
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_VARTABS)
+#ఒకవేళ defined(FEAT_VARTABS)
 
 /*
  * Set the integer values corresponding to the string setting of 'vartabstop'.
  * "array" will be set, caller must free it if needed.
  * Return FAIL for an error.
  */
-    int
-tabstop_set(char_u *var, int **array)
+    పూర్ణాంకం
+tabstop_సమితి(char_u *var, పూర్ణాంకం **array)
 {
-    int	    valcount = 1;
-    int	    t;
+    పూర్ణాంకం	    valcount = 1;
+    పూర్ణాంకం	    t;
     char_u  *cp;
 
-    if (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
+    ఒకవేళ (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
     {
-	*array = NULL;
-	return OK;
+	*array = ఖాళీ;
+	తిరిగి OK;
     }
 
-    for (cp = var; *cp != NUL; ++cp)
+    కొరకు (cp = var; *cp != NUL; ++cp)
     {
-	if (cp == var || cp[-1] == ',')
+	ఒకవేళ (cp == var || cp[-1] == ',')
 	{
-	    char_u *end;
+	    char_u *చివర;
 
-	    if (strtol((char *)cp, (char **)&end, 10) <= 0)
+	    ఒకవేళ (strtol((అక్షరం *)cp, (అక్షరం **)&చివర, 10) <= 0)
 	    {
-		if (cp != end)
-		    emsg(_(e_argument_must_be_positive));
-		else
-		    semsg(_(e_invalid_argument_str), cp);
-		return FAIL;
+		ఒకవేళ (cp != చివర)
+		    emsg(_(e_వాదం_must_be_ధనాత్మక));
+		లేకపోతే
+		    semsg(_(e_invalid_వాదం_str), cp);
+		తిరిగి FAIL;
 	    }
 	}
 
-	if (VIM_ISDIGIT(*cp))
-	    continue;
-	if (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
+	ఒకవేళ (VIM_ISDIGIT(*cp))
+	    కొనసాగు;
+	ఒకవేళ (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
 	{
 	    ++valcount;
-	    continue;
+	    కొనసాగు;
 	}
-	semsg(_(e_invalid_argument_str), var);
-	return FAIL;
+	semsg(_(e_invalid_వాదం_str), var);
+	తిరిగి FAIL;
     }
 
-    *array = ALLOC_MULT(int, valcount + 1);
-    if (*array == NULL)
-	return FAIL;
+    *array = ALLOC_MULT(పూర్ణాంకం, valcount + 1);
+    ఒకవేళ (*array == ఖాళీ)
+	తిరిగి FAIL;
     (*array)[0] = valcount;
 
     t = 1;
-    for (cp = var; *cp != NUL;)
+    కొరకు (cp = var; *cp != NUL;)
     {
-	int n = atoi((char *)cp);
+	పూర్ణాంకం n = atoi((అక్షరం *)cp);
 
 	// Catch negative values, overflow and ridiculous big values.
-	if (n <= 0 || n > TABSTOP_MAX)
+	ఒకవేళ (n <= 0 || n > TABSTOP_MAX)
 	{
-	    semsg(_(e_invalid_argument_str), cp);
+	    semsg(_(e_invalid_వాదం_str), cp);
 	    VIM_CLEAR(*array);
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
 	(*array)[t++] = n;
-	while (*cp != NUL && *cp != ',')
+	అయితే (*cp != NUL && *cp != ',')
 	    ++cp;
-	if (*cp != NUL)
+	ఒకవేళ (*cp != NUL)
 	    ++cp;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -92,33 +92,33 @@ tabstop_set(char_u *var, int **array)
  * If "vts" is set then the tab widths are taken from that array,
  * otherwise the value of ts is used.
  */
-    int
-tabstop_padding(colnr_T col, int ts_arg, int *vts)
+    పూర్ణాంకం
+tabstop_padding(colnr_T నిలువు, పూర్ణాంకం ts_arg, పూర్ణాంకం *vts)
 {
-    int		ts = ts_arg == 0 ? 8 : ts_arg;
-    int		tabcount;
+    పూర్ణాంకం		ts = ts_arg == 0 ? 8 : ts_arg;
+    పూర్ణాంకం		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		padding = 0;
+    పూర్ణాంకం		t;
+    పూర్ణాంకం		padding = 0;
 
-    if (vts == NULL || vts[0] == 0)
-	return ts - (col % ts);
+    ఒకవేళ (vts == ఖాళీ || vts[0] == 0)
+	తిరిగి ts - (నిలువు % ts);
 
     tabcount = vts[0];
 
-    for (t = 1; t <= tabcount; ++t)
+    కొరకు (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	ఒకవేళ (tabcol > నిలువు)
 	{
-	    padding = (int)(tabcol - col);
-	    break;
+	    padding = (పూర్ణాంకం)(tabcol - నిలువు);
+	    ఆపు;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((col - tabcol) % vts[tabcount]);
+    ఒకవేళ (t > tabcount)
+	padding = vts[tabcount] - (పూర్ణాంకం)((నిలువు - tabcol) % vts[tabcount]);
 
-    return padding;
+    తిరిగి padding;
 }
 
 /*
@@ -129,25 +129,25 @@ tabstop_padding(colnr_T col, int ts_arg, int *vts)
  * character in the line.  If the shift is to the left (left = TRUE), then
  * return the size of the tab interval to the left of the column.
  */
-    int
-tabstop_at(colnr_T col, int ts, int *vts, int left)
+    పూర్ణాంకం
+tabstop_at(colnr_T నిలువు, పూర్ణాంకం ts, పూర్ణాంకం *vts, పూర్ణాంకం ఎడమ_2)
 {
-    int		tabcount;	// Number of tab stops in the list of variable
+    పూర్ణాంకం		tabcount;	// Number of tab stops in the list of variable
 				// tab stops.
     colnr_T	tabcol = 0;	// Column of the tab stop under consideration.
-    int		t;		// Tabstop index in the list of variable tab
+    పూర్ణాంకం		t;		// Tabstop index in the list of variable tab
 				// stops.
-    int		tab_size = 0;	// Size of the tab stop interval to the right
+    పూర్ణాంకం		tab_కొలత = 0;	// Size of the tab stop interval to the right
 				// or left of the col.
 
-    if (vts == 0 || vts[0] == 0)
-	return ts;
+    ఒకవేళ (vts == 0 || vts[0] == 0)
+	తిరిగి ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    కొరకు (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	ఒకవేళ (tabcol > నిలువు)
 	{
 	    // If shifting left (left != 0), and if the column to the left of
 	    // the first first non-blank character (col) in the line is
@@ -155,74 +155,74 @@ tabstop_at(colnr_T col, int ts, int *vts, int left)
 	    // (tab_size) to just enough to shift the line to the left margin.
 	    // The value doesn't seem to matter as long as it is at least that
 	    // distance.
-	    if (left && (t == 1))
-		tab_size = col;
-	    else
-		tab_size = vts[t - (left ? 1 : 0)];
-	    break;
+	    ఒకవేళ (ఎడమ_2 && (t == 1))
+		tab_కొలత = నిలువు;
+	    లేకపోతే
+		tab_కొలత = vts[t - (ఎడమ_2 ? 1 : 0)];
+	    ఆపు;
 	}
     }
-    if (t > tabcount)		// If the value of the index t is beyond the
+    ఒకవేళ (t > tabcount)		// If the value of the index t is beyond the
 				// end of the list, use the tab stop value at
 				// the end of the list.
-	tab_size = vts[tabcount];
+	tab_కొలత = vts[tabcount];
 
-    return tab_size;
+    తిరిగి tab_కొలత;
 }
 
 /*
  * Find the column on which a tab starts.
  */
     colnr_T
-tabstop_start(colnr_T col, int ts, int *vts)
+tabstop_ప్రారంభం(colnr_T నిలువు, పూర్ణాంకం ts, పూర్ణాంకం *vts)
 {
-    int		tabcount;
+    పూర్ణాంకం		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		excess;
+    పూర్ణాంకం		t;
+    పూర్ణాంకం		excess;
 
-    if (vts == NULL || vts[0] == 0)
-	return col - col % ts;
+    ఒకవేళ (vts == ఖాళీ || vts[0] == 0)
+	తిరిగి నిలువు - నిలువు % ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    కొరకు (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
-	    return tabcol - vts[t];
+	ఒకవేళ (tabcol > నిలువు)
+	    తిరిగి tabcol - vts[t];
     }
 
     excess = tabcol % vts[tabcount];
-    return col - (col - excess) % vts[tabcount];
+    తిరిగి నిలువు - (నిలువు - excess) % vts[tabcount];
 }
 
 /*
  * Find the number of tabs and spaces necessary to get from one column
  * to another.
  */
-    void
+    శూన్య
 tabstop_fromto(
-	colnr_T start_col,
-	colnr_T end_col,
-	int	ts_arg,
-	int	*vts,
-	int	*ntabs,
-	int	*nspcs)
+	colnr_T ప్రారంభం_నిలువు,
+	colnr_T చివర_నిలువు,
+	పూర్ణాంకం	ts_arg,
+	పూర్ణాంకం	*vts,
+	పూర్ణాంకం	*ntabs,
+	పూర్ణాంకం	*nspcs)
 {
-    int		spaces = end_col - start_col;
+    పూర్ణాంకం		spaces = చివర_నిలువు - ప్రారంభం_నిలువు;
     colnr_T	tabcol = 0;
-    int		padding = 0;
-    int		tabcount;
-    int		t;
-    int		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
+    పూర్ణాంకం		padding = 0;
+    పూర్ణాంకం		tabcount;
+    పూర్ణాంకం		t;
+    పూర్ణాంకం		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
 
-    if (vts == NULL || vts[0] == 0)
+    ఒకవేళ (vts == ఖాళీ || vts[0] == 0)
     {
-	int tabs = 0;
-	int initspc = 0;
+	పూర్ణాంకం tabs = 0;
+	పూర్ణాంకం initspc = 0;
 
-	initspc = ts - (start_col % ts);
-	if (spaces >= initspc)
+	initspc = ts - (ప్రారంభం_నిలువు % ts);
+	ఒకవేళ (spaces >= initspc)
 	{
 	    spaces -= initspc;
 	    tabs++;
@@ -232,42 +232,42 @@ tabstop_fromto(
 
 	*ntabs = tabs;
 	*nspcs = spaces;
-	return;
+	తిరిగి;
     }
 
     // Find the padding needed to reach the next tabstop.
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    కొరకు (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > start_col)
+	ఒకవేళ (tabcol > ప్రారంభం_నిలువు)
 	{
-	    padding = (int)(tabcol - start_col);
-	    break;
+	    padding = (పూర్ణాంకం)(tabcol - ప్రారంభం_నిలువు);
+	    ఆపు;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((start_col - tabcol) % vts[tabcount]);
+    ఒకవేళ (t > tabcount)
+	padding = vts[tabcount] - (పూర్ణాంకం)((ప్రారంభం_నిలువు - tabcol) % vts[tabcount]);
 
     // If the space needed is less than the padding no tabs can be used.
-    if (spaces < padding)
+    ఒకవేళ (spaces < padding)
     {
 	*ntabs = 0;
 	*nspcs = spaces;
-	return;
+	తిరిగి;
     }
 
     *ntabs = 1;
     spaces -= padding;
 
     // At least one tab has been used. See if any more will fit.
-    while (spaces != 0 && ++t <= tabcount)
+    అయితే (spaces != 0 && ++t <= tabcount)
     {
 	padding = vts[t];
-	if (spaces < padding)
+	ఒకవేళ (spaces < padding)
 	{
 	    *nspcs = spaces;
-	    return;
+	    తిరిగి;
 	}
 	++*ntabs;
 	spaces -= padding;
@@ -280,228 +280,228 @@ tabstop_fromto(
 /*
  * See if two tabstop arrays contain the same values.
  */
-    static int
-tabstop_eq(int *ts1, int *ts2)
+    స్థిర పూర్ణాంకం
+tabstop_eq(పూర్ణాంకం *ts1, పూర్ణాంకం *ts2)
 {
-    int		t;
+    పూర్ణాంకం		t;
 
-    if ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
-	return FALSE;
-    if (ts1 == ts2)
-	return TRUE;
-    if (ts1[0] != ts2[0])
-	return FALSE;
+    ఒకవేళ ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
+	తిరిగి FALSE;
+    ఒకవేళ (ts1 == ts2)
+	తిరిగి TRUE;
+    ఒకవేళ (ts1[0] != ts2[0])
+	తిరిగి FALSE;
 
-    for (t = 1; t <= ts1[0]; ++t)
-	if (ts1[t] != ts2[t])
-	    return FALSE;
+    కొరకు (t = 1; t <= ts1[0]; ++t)
+	ఒకవేళ (ts1[t] != ts2[t])
+	    తిరిగి FALSE;
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-# if defined(FEAT_BEVAL)
+# ఒకవేళ defined(FEAT_BEVAL)
 /*
  * Copy a tabstop array, allocating space for the new array.
  */
-    int *
-tabstop_copy(int *oldts)
+    పూర్ణాంకం *
+tabstop_copy(పూర్ణాంకం *oldts)
 {
-    int		*newts;
-    int		t;
+    పూర్ణాంకం		*newts;
+    పూర్ణాంకం		t;
 
-    if (oldts == NULL)
-	return NULL;
-    newts = ALLOC_MULT(int, oldts[0] + 1);
-    if (newts != NULL)
-	for (t = 0; t <= oldts[0]; ++t)
+    ఒకవేళ (oldts == ఖాళీ)
+	తిరిగి ఖాళీ;
+    newts = ALLOC_MULT(పూర్ణాంకం, oldts[0] + 1);
+    ఒకవేళ (newts != ఖాళీ)
+	కొరకు (t = 0; t <= oldts[0]; ++t)
 	    newts[t] = oldts[t];
-    return newts;
+    తిరిగి newts;
 }
 # endif
 
 /*
  * Return a count of the number of tabstops.
  */
-    int
-tabstop_count(int *ts)
+    పూర్ణాంకం
+tabstop_లెక్క(పూర్ణాంకం *ts)
 {
-    return ts != NULL ? ts[0] : 0;
+    తిరిగి ts != ఖాళీ ? ts[0] : 0;
 }
 
 /*
  * Return the first tabstop, or 8 if there are no tabstops defined.
  */
-    int
-tabstop_first(int *ts)
+    పూర్ణాంకం
+tabstop_మొదటి(పూర్ణాంకం *ts)
 {
-    return ts != NULL ? ts[1] : 8;
+    తిరిగి ts != ఖాళీ ? ts[1] : 8;
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return the effective shiftwidth value for current buffer, using the
  * 'tabstop' value when 'shiftwidth' is zero.
  */
-    long
-get_sw_value(buf_T *buf)
+    దీర్ఘ
+get_sw_విలువ(buf_T *buf)
 {
-    return get_sw_value_col(buf, 0, FALSE);
+    తిరిగి get_sw_విలువ_నిలువు(buf, 0, FALSE);
 }
 
 /*
  * Idem, using "pos".
  */
-    static long
-get_sw_value_pos(buf_T *buf, pos_T *pos, int left)
+    స్థిర దీర్ఘ
+get_sw_విలువ_pos(buf_T *buf, pos_T *pos, పూర్ణాంకం ఎడమ_2)
 {
     pos_T save_cursor = curwin->w_cursor;
-    long sw_value;
+    దీర్ఘ sw_విలువ;
 
     curwin->w_cursor = *pos;
-    sw_value = get_sw_value_col(buf, get_nolist_virtcol(), left);
+    sw_విలువ = get_sw_విలువ_నిలువు(buf, get_nolist_virtcol(), ఎడమ_2);
     curwin->w_cursor = save_cursor;
-    return sw_value;
+    తిరిగి sw_విలువ;
 }
 
 /*
  * Idem, using the first non-black in the current line.
  */
-    long
-get_sw_value_indent(buf_T *buf, int left)
+    దీర్ఘ
+get_sw_విలువ_indent(buf_T *buf, పూర్ణాంకం ఎడమ_2)
 {
     pos_T pos = curwin->w_cursor;
 
-    pos.col = getwhitecols_curline();
-    return get_sw_value_pos(buf, &pos, left);
+    pos.నిలువు = getwhitecols_curline();
+    తిరిగి get_sw_విలువ_pos(buf, &pos, ఎడమ_2);
 }
 
 /*
  * Idem, using virtual column "col".
  */
-    long
-get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
+    దీర్ఘ
+get_sw_విలువ_నిలువు(buf_T *buf, colnr_T నిలువు వాడని, పూర్ణాంకం ఎడమ_2 వాడని)
 {
-    return buf->b_p_sw ? buf->b_p_sw :
-#ifdef FEAT_VARTABS
-	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, left);
-#else
+    తిరిగి buf->b_p_sw ? buf->b_p_sw :
+#నిర్వచితమైతే FEAT_VARTABS
+	tabstop_at(నిలువు, buf->b_p_ts, buf->b_p_vts_array, ఎడమ_2);
+#లేకపోతే
 	buf->b_p_ts;
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * Return the effective softtabstop value for the current buffer, using the
  * 'shiftwidth' value when 'softtabstop' is negative.
  */
-    long
-get_sts_value(void)
+    దీర్ఘ
+get_sts_విలువ(శూన్య)
 {
-    return curbuf->b_p_sts < 0 ? get_sw_value(curbuf) : curbuf->b_p_sts;
+    తిరిగి curbuf->b_p_sts < 0 ? get_sw_విలువ(curbuf) : curbuf->b_p_sts;
 }
 
 /*
  * Count the size (in window cells) of the indent in the current line.
  */
-    int
-get_indent(void)
+    పూర్ణాంకం
+get_indent(శూన్య)
 {
-#ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_curline(), (int)curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+    తిరిగి get_indent_str_vtab(ml_get_curline(), (పూర్ణాంకం)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get_curline(), (int)curbuf->b_p_ts, FALSE);
-#endif
+#లేకపోతే
+    తిరిగి get_indent_str(ml_get_curline(), (పూర్ణాంకం)curbuf->b_p_ts, FALSE);
+#అయితే_ముగింపు
 }
 
 /*
  * Count the size (in window cells) of the indent in line "lnum".
  */
-    int
+    పూర్ణాంకం
 get_indent_lnum(linenr_T lnum)
 {
-#ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get(lnum), (int)curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+    తిరిగి get_indent_str_vtab(ml_get(lnum), (పూర్ణాంకం)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get(lnum), (int)curbuf->b_p_ts, FALSE);
-#endif
+#లేకపోతే
+    తిరిగి get_indent_str(ml_get(lnum), (పూర్ణాంకం)curbuf->b_p_ts, FALSE);
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_FOLDING)
+#ఒకవేళ defined(FEAT_FOLDING)
 /*
  * Count the size (in window cells) of the indent in line "lnum" of buffer
  * "buf".
  */
-    int
+    పూర్ణాంకం
 get_indent_buf(buf_T *buf, linenr_T lnum)
 {
 # ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
-			       (int)buf->b_p_ts, buf->b_p_vts_array, FALSE);
-# else
-    return get_indent_str(ml_get_buf(buf, lnum, FALSE), (int)buf->b_p_ts, FALSE);
+    తిరిగి get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
+			       (పూర్ణాంకం)buf->b_p_ts, buf->b_p_vts_array, FALSE);
+# లేకపోతే
+    తిరిగి get_indent_str(ml_get_buf(buf, lnum, FALSE), (పూర్ణాంకం)buf->b_p_ts, FALSE);
 # endif
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * count the size (in window cells) of the indent in line "ptr", with
  * 'tabstop' at "ts"
  */
-    int
+    పూర్ణాంకం
 get_indent_str(
     char_u	*ptr,
-    int		ts,
-    int		no_ts) // if TRUE, count a tab as ^I
+    పూర్ణాంకం		ts,
+    పూర్ణాంకం		no_ts) // if TRUE, count a tab as ^I
 {
-    int		count = 0;
+    పూర్ణాంకం		లెక్క = 0;
 
-    for ( ; *ptr; ++ptr)
+    కొరకు ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	ఒకవేళ (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += ts - (count % ts);
-	    else
-		count += ptr2cells(ptr);
+	    ఒకవేళ (!no_ts)
+		లెక్క += ts - (లెక్క % ts);
+	    లేకపోతే
+		లెక్క += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	లేకపోతే ఒకవేళ (*ptr == ' ')
+	    ++లెక్క;		// count a space for one
+	లేకపోతే
+	    ఆపు;
     }
-    return count;
+    తిరిగి లెక్క;
 }
 
-#if defined(FEAT_VARTABS)
+#ఒకవేళ defined(FEAT_VARTABS)
 /*
  * Count the size (in window cells) of the indent in line "ptr", using
  * variable tabstops.
  * If "no_ts" is TRUE, count a tab as ^I.
  */
-    int
-get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
+    పూర్ణాంకం
+get_indent_str_vtab(char_u *ptr, పూర్ణాంకం ts, పూర్ణాంకం *vts, పూర్ణాంకం no_ts)
 {
-    int		count = 0;
+    పూర్ణాంకం		లెక్క = 0;
 
-    for ( ; *ptr; ++ptr)
+    కొరకు ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	ఒకవేళ (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += tabstop_padding(count, ts, vts);
-	    else
-		count += ptr2cells(ptr);
+	    ఒకవేళ (!no_ts)
+		లెక్క += tabstop_padding(లెక్క, ts, vts);
+	    లేకపోతే
+		లెక్క += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	లేకపోతే ఒకవేళ (*ptr == ' ')
+	    ++లెక్క;		// count a space for one
+	లేకపోతే
+	    ఆపు;
     }
-    return count;
+    తిరిగి లెక్క;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set the indent of the current line.
@@ -513,34 +513,34 @@ get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
  *	SIN_UNDO:	save line for undo before changing it.
  * Returns TRUE if the line was changed.
  */
-    int
-set_indent(
-    int		size,		    // measured in spaces
-    int		flags)
+    పూర్ణాంకం
+సమితి_indent(
+    పూర్ణాంకం		కొలత,		    // measured in spaces
+    పూర్ణాంకం		flags)
 {
     char_u	*p;
     char_u	*newline;
     char_u	*oldline;
     char_u	*s;
-    int		todo;
-    int		ind_len;	    // measured in characters
-    int		line_len;	    // size of the line (including the NUL)
-    int		doit = FALSE;
-    int		ind_done = 0;	    // measured in spaces
-#ifdef FEAT_VARTABS
-    int		ind_col = 0;
-#endif
-    int		tab_pad;
-    int		retval = FALSE;
-    int		orig_char_len = -1; // number of initial whitespace chars when
+    పూర్ణాంకం		todo;
+    పూర్ణాంకం		ind_len;	    // measured in characters
+    పూర్ణాంకం		పంక్తి_len;	    // size of the line (including the NUL)
+    పూర్ణాంకం		doit = FALSE;
+    పూర్ణాంకం		ind_పూర్తి = 0;	    // measured in spaces
+#నిర్వచితమైతే FEAT_VARTABS
+    పూర్ణాంకం		ind_నిలువు = 0;
+#అయితే_ముగింపు
+    పూర్ణాంకం		tab_pad;
+    పూర్ణాంకం		retval = FALSE;
+    పూర్ణాంకం		orig_char_len = -1; // number of initial whitespace chars when
 				    // 'et' and 'pi' are both set
 
     // First check if there is anything to do and compute the number of
     // characters needed for the indent.
-    todo = size;
+    todo = కొలత;
     ind_len = 0;
     p = oldline = ml_get_curline();
-    line_len = ml_get_curline_len() + 1;
+    పంక్తి_len = ml_get_curline_len() + 1;
 
     // Calculate the buffer size for the new indent, and check to see if it
     // isn't already set
@@ -548,105 +548,105 @@ set_indent(
     // if 'expandtab' isn't set: use TABs; if both 'expandtab' and
     // 'preserveindent' are set count the number of characters at the
     // beginning of the line to be copied
-    if (!curbuf->b_p_et || (!(flags & SIN_INSERT) && curbuf->b_p_pi))
+    ఒకవేళ (!curbuf->b_p_et || (!(flags & SIN_చొప్పించు) && curbuf->b_p_pi))
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	ఒకవేళ (!(flags & SIN_చొప్పించు) && curbuf->b_p_pi)
 	{
-	    ind_done = 0;
+	    ind_పూర్తి = 0;
 
 	    // count as many characters as we can use
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    అయితే (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		ఒకవేళ (*p == TAB)
 		{
-#ifdef FEAT_VARTABS
-		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+		    tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#లేకపోతే
+		    tab_pad = (పూర్ణాంకం)curbuf->b_p_ts
+					   - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    ఒకవేళ (todo < tab_pad)
+			ఆపు;
 		    todo -= tab_pad;
 		    ++ind_len;
-		    ind_done += tab_pad;
+		    ind_పూర్తి += tab_pad;
 		}
-		else
+		లేకపోతే
 		{
 		    --todo;
 		    ++ind_len;
-		    ++ind_done;
+		    ++ind_పూర్తి;
 		}
 		++p;
 	    }
 
-#ifdef FEAT_VARTABS
+#నిర్వచితమైతే FEAT_VARTABS
 	    // These diverge from this point.
-	    ind_col = ind_done;
-#endif
+	    ind_నిలువు = ind_పూర్తి;
+#అయితే_ముగింపు
 	    // Set initial number of whitespace chars to copy if we are
 	    // preserving indent but expandtab is set
-	    if (curbuf->b_p_et)
+	    ఒకవేళ (curbuf->b_p_et)
 		orig_char_len = ind_len;
 
 	    // Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+	    tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	    if (todo >= tab_pad && orig_char_len == -1)
+#లేకపోతే
+	    tab_pad = (పూర్ణాంకం)curbuf->b_p_ts - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
+	    ఒకవేళ (todo >= tab_pad && orig_char_len == -1)
 	    {
 		doit = TRUE;
 		todo -= tab_pad;
 		++ind_len;
 		// ind_done += tab_pad;
-#ifdef FEAT_VARTABS
-		ind_col += tab_pad;
-#endif
+#నిర్వచితమైతే FEAT_VARTABS
+		ind_నిలువు += tab_pad;
+#అయితే_ముగింపు
 	    }
 	}
 
 	// count tabs required for indent
-#ifdef FEAT_VARTABS
-	for (;;)
+#నిర్వచితమైతే FEAT_VARTABS
+	కొరకు (;;)
 	{
-	    tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
+	    tab_pad = tabstop_padding(ind_నిలువు, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
-	    if (*p != TAB)
+	    ఒకవేళ (todo < tab_pad)
+		ఆపు;
+	    ఒకవేళ (*p != TAB)
 		doit = TRUE;
-	    else
+	    లేకపోతే
 		++p;
 	    todo -= tab_pad;
 	    ++ind_len;
-	    ind_col += tab_pad;
+	    ind_నిలువు += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#లేకపోతే
+	అయితే (todo >= (పూర్ణాంకం)curbuf->b_p_ts)
 	{
-	    if (*p != TAB)
+	    ఒకవేళ (*p != TAB)
 		doit = TRUE;
-	    else
+	    లేకపోతే
 		++p;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (పూర్ణాంకం)curbuf->b_p_ts;
 	    ++ind_len;
 	    // ind_done += (int)curbuf->b_p_ts;
 	}
-#endif
+#అయితే_ముగింపు
     }
     // count spaces required for indent
-    while (todo > 0)
+    అయితే (todo > 0)
     {
-	if (*p != ' ')
+	ఒకవేళ (*p != ' ')
 	    doit = TRUE;
-	else
+	లేకపోతే
 	    ++p;
 	--todo;
 	++ind_len;
@@ -654,33 +654,33 @@ set_indent(
     }
 
     // Return if the indent is OK already.
-    if (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_INSERT))
-	return FALSE;
+    ఒకవేళ (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_చొప్పించు))
+	తిరిగి FALSE;
 
     // Allocate memory for the new line.
-    if (flags & SIN_INSERT)
+    ఒకవేళ (flags & SIN_చొప్పించు)
 	p = oldline;
-    else
+    లేకపోతే
     {
 	p = skipwhite(p);
-	line_len -= (int)(p - oldline);
+	పంక్తి_len -= (పూర్ణాంకం)(p - oldline);
     }
 
     // If 'preserveindent' and 'expandtab' are both set keep the original
     // characters and allocate accordingly.  We will fill the rest with spaces
     // after the if (!curbuf->b_p_et) below.
-    if (orig_char_len != -1)
+    ఒకవేళ (orig_char_len != -1)
     {
-	newline = alloc(orig_char_len + size - ind_done + line_len);
-	if (newline == NULL)
-	    return FALSE;
-	todo = size - ind_done;
+	newline = alloc(orig_char_len + కొలత - ind_పూర్తి + పంక్తి_len);
+	ఒకవేళ (newline == ఖాళీ)
+	    తిరిగి FALSE;
+	todo = కొలత - ind_పూర్తి;
 	ind_len = orig_char_len + todo;    // Set total length of indent in
 					   // characters, which may have been
 					   // undercounted until now
 	p = oldline;
 	s = newline;
-	while (orig_char_len > 0)
+	అయితే (orig_char_len > 0)
 	{
 	    *s++ = *p++;
 	    orig_char_len--;
@@ -688,143 +688,143 @@ set_indent(
 
 	// Skip over any additional white space (useful when newindent is less
 	// than old)
-	while (VIM_ISWHITE(*p))
+	అయితే (VIM_ISWHITE(*p))
 	    ++p;
 
     }
-    else
+    లేకపోతే
     {
-	todo = size;
-	newline = alloc(ind_len + line_len);
-	if (newline == NULL)
-	    return FALSE;
+	todo = కొలత;
+	newline = alloc(ind_len + పంక్తి_len);
+	ఒకవేళ (newline == ఖాళీ)
+	    తిరిగి FALSE;
 	s = newline;
     }
 
     // Put the characters in the new line.
     // if 'expandtab' isn't set: use TABs
-    if (!curbuf->b_p_et)
+    ఒకవేళ (!curbuf->b_p_et)
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	ఒకవేళ (!(flags & SIN_చొప్పించు) && curbuf->b_p_pi)
 	{
 	    p = oldline;
-	    ind_done = 0;
+	    ind_పూర్తి = 0;
 
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    అయితే (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		ఒకవేళ (*p == TAB)
 		{
-#ifdef FEAT_VARTABS
-		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+		    tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#లేకపోతే
+		    tab_pad = (పూర్ణాంకం)curbuf->b_p_ts
+					   - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    ఒకవేళ (todo < tab_pad)
+			ఆపు;
 		    todo -= tab_pad;
-		    ind_done += tab_pad;
+		    ind_పూర్తి += tab_pad;
 		}
-		else
+		లేకపోతే
 		{
 		    --todo;
-		    ++ind_done;
+		    ++ind_పూర్తి;
 		}
 		*s++ = *p++;
 	    }
 
 	    // Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+	    tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	    if (todo >= tab_pad)
+#లేకపోతే
+	    tab_pad = (పూర్ణాంకం)curbuf->b_p_ts - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
+	    ఒకవేళ (todo >= tab_pad)
 	    {
 		*s++ = TAB;
 		todo -= tab_pad;
-#ifdef FEAT_VARTABS
-		ind_done += tab_pad;
-#endif
+#నిర్వచితమైతే FEAT_VARTABS
+		ind_పూర్తి += tab_pad;
+#అయితే_ముగింపు
 	    }
 
 	    p = skipwhite(p);
 	}
 
-#ifdef FEAT_VARTABS
-	for (;;)
+#నిర్వచితమైతే FEAT_VARTABS
+	కొరకు (;;)
 	{
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+	    tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
+	    ఒకవేళ (todo < tab_pad)
+		ఆపు;
 	    *s++ = TAB;
 	    todo -= tab_pad;
-	    ind_done += tab_pad;
+	    ind_పూర్తి += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#లేకపోతే
+	అయితే (todo >= (పూర్ణాంకం)curbuf->b_p_ts)
 	{
 	    *s++ = TAB;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (పూర్ణాంకం)curbuf->b_p_ts;
 	}
-#endif
+#అయితే_ముగింపు
     }
-    while (todo > 0)
+    అయితే (todo > 0)
     {
 	*s++ = ' ';
 	--todo;
     }
-    mch_memmove(s, p, (size_t)line_len);
+    mch_memmove(s, p, (size_t)పంక్తి_len);
 
     // Replace the line (unless undo fails).
-    if (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
+    ఒకవేళ (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
     {
-	colnr_T old_offset = (colnr_T)(p - oldline);
-	colnr_T new_offset = (colnr_T)(s - newline);
+	colnr_T old_స్థానభ్రంశం = (colnr_T)(p - oldline);
+	colnr_T new_స్థానభ్రంశం = (colnr_T)(s - newline);
 
 	// this may free "newline"
 	ml_replace(curwin->w_cursor.lnum, newline, FALSE);
-	if (flags & SIN_CHANGED)
-	    changed_bytes(curwin->w_cursor.lnum, 0);
+	ఒకవేళ (flags & SIN_మారింది)
+	    మారింది_బైట్లు(curwin->w_cursor.lnum, 0);
 
 	// Correct saved cursor position if it is in this line.
-	if (saved_cursor.lnum == curwin->w_cursor.lnum)
+	ఒకవేళ (saved_cursor.lnum == curwin->w_cursor.lnum)
 	{
-	    if (saved_cursor.col >= old_offset)
+	    ఒకవేళ (saved_cursor.నిలువు >= old_స్థానభ్రంశం)
 		// cursor was after the indent, adjust for the number of
 		// bytes added/removed
-		saved_cursor.col += ind_len - old_offset;
-	    else if (saved_cursor.col >= new_offset)
+		saved_cursor.నిలువు += ind_len - old_స్థానభ్రంశం;
+	    లేకపోతే ఒకవేళ (saved_cursor.నిలువు >= new_స్థానభ్రంశం)
 		// cursor was in the indent, and is now after it, put it back
 		// at the start of the indent (replacing spaces with TAB)
-		saved_cursor.col = new_offset;
+		saved_cursor.నిలువు = new_స్థానభ్రంశం;
 	}
-#ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop)
+#నిర్వచితమైతే FEAT_PROP_POPUP
+	ఒకవేళ (curbuf->b_has_textprop)
 	{
-	    int added = ind_len - old_offset;
+	    పూర్ణాంకం added = ind_len - old_స్థానభ్రంశం;
 
 	    // When increasing indent this behaves like spaces were inserted at
 	    // the old indent, when decreasing indent it behaves like spaces
 	    // were deleted at the new indent.
 	    adjust_prop_columns(curwin->w_cursor.lnum,
-				  added > 0 ? old_offset : (colnr_T)ind_len,
+				  added > 0 ? old_స్థానభ్రంశం : (colnr_T)ind_len,
 				  added, APC_INDENT);
 	}
-#endif
+#అయితే_ముగింపు
 	retval = TRUE;
     }
-    else
+    లేకపోతే
 	vim_free(newline);
 
-    curwin->w_cursor.col = ind_len;
-    return retval;
+    curwin->w_cursor.నిలువు = ind_len;
+    తిరిగి retval;
 }
 
 /*
@@ -832,114 +832,114 @@ set_indent(
  * number was found.  Used for 'n' in 'formatoptions': numbered list.
  * Since a pattern is used it can actually handle more than numbers.
  */
-    int
-get_number_indent(linenr_T lnum)
+    పూర్ణాంకం
+get_సంఖ్య_indent(linenr_T lnum)
 {
-    colnr_T	col;
+    colnr_T	నిలువు;
     pos_T	pos;
 
     regmatch_T	regmatch;
-    int		lead_len = 0;	// length of comment leader
+    పూర్ణాంకం		lead_len = 0;	// length of comment leader
 
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return -1;
+    ఒకవేళ (lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	తిరిగి -1;
     pos.lnum = 0;
 
     // In format_lines() (i.e. not insert mode), fo+=q is needed too...
-    if ((State & MODE_INSERT) || has_format_option(FO_Q_COMS))
-	lead_len = get_leader_len(ml_get(lnum), NULL, FALSE, TRUE);
+    ఒకవేళ ((State & బహుళకం_చొప్పించు) || has_format_option(FO_Q_COMS))
+	lead_len = get_leader_len(ml_get(lnum), ఖాళీ, FALSE, TRUE);
 
     regmatch.regprog = vim_regcomp(curbuf->b_p_flp, RE_MAGIC);
-    if (regmatch.regprog != NULL)
+    ఒకవేళ (regmatch.regprog != ఖాళీ)
     {
 	regmatch.rm_ic = FALSE;
 
 	// vim_regexec() expects a pointer to a line.  This lets us
 	// start matching for the flp beyond any comment leader...
-	if (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
+	ఒకవేళ (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
 	{
 	    pos.lnum = lnum;
-	    pos.col = (colnr_T)(*regmatch.endp - ml_get(lnum));
+	    pos.నిలువు = (colnr_T)(*regmatch.endp - ml_get(lnum));
 	    pos.coladd = 0;
 	}
 	vim_regfree(regmatch.regprog);
     }
 
-    if (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
-	return -1;
-    getvcol(curwin, &pos, &col, NULL, NULL, 0);
-    return (int)col;
+    ఒకవేళ (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
+	తిరిగి -1;
+    getvcol(curwin, &pos, &నిలువు, ఖాళీ, ఖాళీ, 0);
+    తిరిగి (పూర్ణాంకం)నిలువు;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ఒకవేళ defined(FEAT_LINEBREAK)
 /*
  * Check "briopt" as 'breakindentopt' and update the members of "wp".
  * This is called when 'breakindentopt' is changed and when a window is
  * initialized.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 briopt_check(
     char_u	*briopt,	// when NULL: use "wp->w_p_briopt"
     win_T	*wp)		// when NULL: only check "briopt"
 {
     char_u	*p;
-    int		bri_shift = 0;
-    long	bri_min = 20;
-    int		bri_sbr = FALSE;
-    int		bri_list = 0;
-    int		bri_vcol = 0;
+    పూర్ణాంకం		bri_జరుపు = 0;
+    దీర్ఘ	bri_min = 20;
+    పూర్ణాంకం		bri_sbr = FALSE;
+    పూర్ణాంకం		bri_list = 0;
+    పూర్ణాంకం		bri_vcol = 0;
 
-    if (briopt != NULL)
+    ఒకవేళ (briopt != ఖాళీ)
 	p = briopt;
-    else
+    లేకపోతే
 	p = wp->w_p_briopt;
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
 	// Note: Keep this in sync with p_briopt_values
-	if (STRNCMP(p, "shift:", 6) == 0
+	ఒకవేళ (STRNCMP(p, "shift:", 6) == 0
 		 && ((p[6] == '-' && VIM_ISDIGIT(p[7])) || VIM_ISDIGIT(p[6])))
 	{
 	    p += 6;
-	    bri_shift = getdigits(&p);
+	    bri_జరుపు = getdigits(&p);
 	}
-	else if (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
+	లేకపోతే ఒకవేళ (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
 	{
 	    p += 4;
 	    bri_min = getdigits(&p);
 	}
-	else if (STRNCMP(p, "sbr", 3) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "sbr", 3) == 0)
 	{
 	    p += 3;
 	    bri_sbr = TRUE;
 	}
-	else if (STRNCMP(p, "list:", 5) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "list:", 5) == 0)
 	{
 	    p += 5;
 	    bri_list = getdigits(&p);
 	}
-	else if (STRNCMP(p, "column:", 7) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(p, "column:", 7) == 0)
 	{
 	    p += 7;
 	    bri_vcol = getdigits(&p);
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ఒకవేళ (*p != ',' && *p != NUL)
+	    తిరిగి FAIL;
+	ఒకవేళ (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
-	return OK;
+    ఒకవేళ (wp == ఖాళీ)
+	తిరిగి OK;
 
-    wp->w_briopt_shift = bri_shift;
+    wp->w_briopt_జరుపు = bri_జరుపు;
     wp->w_briopt_min   = bri_min;
     wp->w_briopt_sbr   = bri_sbr;
     wp->w_briopt_list  = bri_list;
     wp->w_briopt_vcol  = bri_vcol;
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -947,32 +947,32 @@ briopt_check(
  * parameters into account. Window must be specified, since it is not
  * necessarily always the current one.
  */
-    int
+    పూర్ణాంకం
 get_breakindent_win(
     win_T	*wp,
-    char_u	*line) // start of the line
+    char_u	*పంక్తి) // start of the line
 {
-    static int	    prev_indent = 0;	// cached indent value
-    static long	    prev_ts     = 0L;	// cached tabstop value
+    స్థిర పూర్ణాంకం	    prev_indent = 0;	// cached indent value
+    స్థిర దీర్ఘ	    prev_ts     = 0L;	// cached tabstop value
 # ifdef FEAT_VARTABS
-    static int      *prev_vts = NULL;   // cached vartabs values
+    స్థిర పూర్ణాంకం      *prev_vts = ఖాళీ;   // cached vartabs values
 # endif
-    static int	    prev_fnum   = 0;	// cached buffer number
-    static char_u   *prev_line  = NULL;	// cached copy of "line"
-    static varnumber_T prev_tick = 0;   // changedtick of cached value
-    static int      prev_list = 0;	// cached list indent
-    static int      prev_listopt = 0;	// cached w_p_briopt_list value
-    static int      prev_no_ts = FALSE;	// cached no_ts value
-    static unsigned prev_dy_uhex = 0;	// cached 'display' "uhex" value
+    స్థిర పూర్ణాంకం	    prev_fnum   = 0;	// cached buffer number
+    స్థిర char_u   *prev_పంక్తి  = ఖాళీ;	// cached copy of "line"
+    స్థిర varnumber_T prev_tick = 0;   // changedtick of cached value
+    స్థిర పూర్ణాంకం      prev_list = 0;	// cached list indent
+    స్థిర పూర్ణాంకం      prev_listopt = 0;	// cached w_p_briopt_list value
+    స్థిర పూర్ణాంకం      prev_no_ts = FALSE;	// cached no_ts value
+    స్థిర గుర్తులేని prev_dy_uhex = 0;	// cached 'display' "uhex" value
     // cached formatlistpat value
-    static char_u   *prev_flp = NULL;
-    int		    bri = 0;
+    స్థిర char_u   *prev_flp = ఖాళీ;
+    పూర్ణాంకం		    bri = 0;
     // window width minus window margin space, i.e. what rests for text
-    const int	    eff_wwidth = wp->w_width
-					  - win_col_off(wp) + win_col_off2(wp);
+    స్థిరరాశి పూర్ణాంకం	    eff_wwidth = wp->w_వెడల్పు
+					  - win_నిలువు_off(wp) + win_నిలువు_off2(wp);
 
     // In list mode, if 'listchars' "tab" isn't set, a TAB is displayed as ^I.
-    int no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
+    పూర్ణాంకం no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
 
     // Used cached indent, unless
     // - buffer changed, or
@@ -984,67 +984,67 @@ get_breakindent_win(
     // - 'display' "uhex" flag changed, or
     // - 'formatlistpat' changed, or
     // - line changed.
-    if (prev_fnum != wp->w_buffer->b_fnum
-	    || prev_ts != wp->w_buffer->b_p_ts
+    ఒకవేళ (prev_fnum != wp->w_బఫరు->b_fnum
+	    || prev_ts != wp->w_బఫరు->b_p_ts
 # ifdef FEAT_VARTABS
-	    || prev_vts != wp->w_buffer->b_p_vts_array
+	    || prev_vts != wp->w_బఫరు->b_p_vts_array
 # endif
-	    || prev_tick != CHANGEDTICK(wp->w_buffer)
+	    || prev_tick != CHANGEDTICK(wp->w_బఫరు)
 	    || prev_listopt != wp->w_briopt_list
 	    || prev_no_ts != no_ts
 	    || prev_dy_uhex != (dy_flags & DY_UHEX)
-	    || prev_flp == NULL
-	    || STRCMP(prev_flp, get_flp_value(wp->w_buffer)) != 0
-	    || prev_line == NULL || STRCMP(prev_line, line) != 0
+	    || prev_flp == ఖాళీ
+	    || STRCMP(prev_flp, get_flp_విలువ(wp->w_బఫరు)) != 0
+	    || prev_పంక్తి == ఖాళీ || STRCMP(prev_పంక్తి, పంక్తి) != 0
 	)
     {
-	prev_fnum = wp->w_buffer->b_fnum;
-	vim_free(prev_line);
-	prev_line = vim_strsave(line);
-	prev_ts = wp->w_buffer->b_p_ts;
+	prev_fnum = wp->w_బఫరు->b_fnum;
+	vim_free(prev_పంక్తి);
+	prev_పంక్తి = vim_strsave(పంక్తి);
+	prev_ts = wp->w_బఫరు->b_p_ts;
 # ifdef FEAT_VARTABS
-	prev_vts = wp->w_buffer->b_p_vts_array;
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str_vtab(line,
-				     (int)wp->w_buffer->b_p_ts,
-				      wp->w_buffer->b_p_vts_array, no_ts);
-# else
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str(line,
-					(int)wp->w_buffer->b_p_ts, no_ts);
+	prev_vts = wp->w_బఫరు->b_p_vts_array;
+	ఒకవేళ (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str_vtab(పంక్తి,
+				     (పూర్ణాంకం)wp->w_బఫరు->b_p_ts,
+				      wp->w_బఫరు->b_p_vts_array, no_ts);
+# లేకపోతే
+	ఒకవేళ (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str(పంక్తి,
+					(పూర్ణాంకం)wp->w_బఫరు->b_p_ts, no_ts);
 # endif
-	prev_tick = CHANGEDTICK(wp->w_buffer);
+	prev_tick = CHANGEDTICK(wp->w_బఫరు);
 	prev_listopt = wp->w_briopt_list;
 	prev_list = 0;
 	prev_no_ts = no_ts;
 	prev_dy_uhex = (dy_flags & DY_UHEX);
 	vim_free(prev_flp);
-	prev_flp = vim_strsave(get_flp_value(wp->w_buffer));
+	prev_flp = vim_strsave(get_flp_విలువ(wp->w_బఫరు));
 	// add additional indent for numbered lists
-	if (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
+	ఒకవేళ (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
 	{
 	    regmatch_T	    regmatch;
 
 	    regmatch.regprog = vim_regcomp(prev_flp,
 				   RE_MAGIC + RE_STRING + RE_AUTO + RE_STRICT);
 
-	    if (regmatch.regprog != NULL)
+	    ఒకవేళ (regmatch.regprog != ఖాళీ)
 	    {
 		regmatch.rm_ic = FALSE;
-		if (vim_regexec(&regmatch, line, 0))
+		ఒకవేళ (vim_regexec(&regmatch, పంక్తి, 0))
 		{
-		    if (wp->w_briopt_list > 0)
+		    ఒకవేళ (wp->w_briopt_list > 0)
 			prev_list = wp->w_briopt_list;
-		    else
+		    లేకపోతే
 		    {
 			char_u	*ptr = *regmatch.startp;
 			char_u	*end_ptr = *regmatch.endp;
-			int	indent = 0;
+			పూర్ణాంకం	indent = 0;
 
 			// Compute the width of the matched text.
 			// Use win_chartabsize() so that TAB size is correct,
 			// while wrapping is ignored.
-			while (ptr < end_ptr)
+			అయితే (ptr < end_ptr)
 			{
 			    indent += win_chartabsize(wp, ptr, indent);
 			    MB_PTR_ADV(ptr);
@@ -1056,40 +1056,40 @@ get_breakindent_win(
 	    }
 	}
     }
-    if (wp->w_briopt_vcol != 0)
+    ఒకవేళ (wp->w_briopt_vcol != 0)
     {
 	// column value has priority
 	bri = wp->w_briopt_vcol;
 	prev_list = 0;
     }
-    else
-	bri = prev_indent + wp->w_briopt_shift;
+    లేకపోతే
+	bri = prev_indent + wp->w_briopt_జరుపు;
 
     // Add offset for number column, if 'n' is in 'cpoptions'
-    bri += win_col_off2(wp);
+    bri += win_నిలువు_off2(wp);
 
     // add additional indent for numbered lists
-    if (wp->w_briopt_list > 0)
+    ఒకవేళ (wp->w_briopt_list > 0)
 	bri += prev_list;
 
     // indent minus the length of the showbreak string
-    if (wp->w_briopt_sbr)
-	bri -= vim_strsize(get_showbreak_value(wp));
+    ఒకవేళ (wp->w_briopt_sbr)
+	bri -= vim_strsize(get_showbreak_విలువ(wp));
 
 
     // never indent past left window margin
-    if (bri < 0)
+    ఒకవేళ (bri < 0)
 	bri = 0;
 
     // always leave at least bri_min characters on the left,
     // if text width is sufficient
-    else if (bri > eff_wwidth - wp->w_briopt_min)
+    లేకపోతే ఒకవేళ (bri > eff_wwidth - wp->w_briopt_min)
 	bri = (eff_wwidth - wp->w_briopt_min < 0)
 					   ? 0 : eff_wwidth - wp->w_briopt_min;
 
-    return bri;
+    తిరిగి bri;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * When extra == 0: Return TRUE if the cursor is before or on the first
@@ -1097,114 +1097,114 @@ get_breakindent_win(
  * When extra == 1: Return TRUE if the cursor is before the first non-blank in
  *		    the line.
  */
-    int
-inindent(int extra)
+    పూర్ణాంకం
+inindent(పూర్ణాంకం extra)
 {
     char_u	*ptr;
-    colnr_T	col;
+    colnr_T	నిలువు;
 
-    for (col = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++col)
+    కొరకు (నిలువు = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++నిలువు)
 	++ptr;
-    if (col >= curwin->w_cursor.col + extra)
-	return TRUE;
-    else
-	return FALSE;
+    ఒకవేళ (నిలువు >= curwin->w_cursor.నిలువు + extra)
+	తిరిగి TRUE;
+    లేకపోతే
+	తిరిగి FALSE;
 }
 
 /*
  * op_reindent - handle reindenting a block of lines.
  */
-    void
-op_reindent(oparg_T *oap, int (*how)(void))
+    శూన్య
+op_reindent(oparg_T *oap, పూర్ణాంకం (*how)(శూన్య))
 {
-    long	i = 0;
+    దీర్ఘ	i = 0;
     char_u	*l;
-    int		amount;
-    linenr_T	first_changed = 0;
-    linenr_T	last_changed = 0;
-    linenr_T	start_lnum = curwin->w_cursor.lnum;
+    పూర్ణాంకం		amount;
+    linenr_T	మొదటి_మారింది = 0;
+    linenr_T	చివరి_మారింది = 0;
+    linenr_T	ప్రారంభం_lnum = curwin->w_cursor.lnum;
 
     // Don't even try when 'modifiable' is off.
-    if (!curbuf->b_p_ma)
+    ఒకవేళ (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	తిరిగి;
     }
 
     // Save for undo.  Do this once for all lines, much faster than doing this
     // for each line separately, especially when undoing.
-    if (u_savecommon(start_lnum - 1, start_lnum + oap->line_count,
-				     start_lnum + oap->line_count, FALSE) == OK)
-	for (i = oap->line_count; --i >= 0 && !got_int; )
+    ఒకవేళ (u_savecommon(ప్రారంభం_lnum - 1, ప్రారంభం_lnum + oap->పంక్తి_లెక్క,
+				     ప్రారంభం_lnum + oap->పంక్తి_లెక్క, FALSE) == OK)
+	కొరకు (i = oap->పంక్తి_లెక్క; --i >= 0 && !got_int; )
 	{
 	    // it's a slow thing to do, so give feedback so there's no worry
 	    // that the computer's just hung.
 
-	    if (i > 1
-		    && (i % 50 == 0 || i == oap->line_count - 1)
-		    && oap->line_count > p_report)
+	    ఒకవేళ (i > 1
+		    && (i % 50 == 0 || i == oap->పంక్తి_లెక్క - 1)
+		    && oap->పంక్తి_లెక్క > p_report)
 		smsg(_("%ld lines to indent... "), i);
 
 	    // Be vi-compatible: For lisp indenting the first line is not
 	    // indented, unless there is only one line.
-	    if (i != oap->line_count - 1 || oap->line_count == 1
+	    ఒకవేళ (i != oap->పంక్తి_లెక్క - 1 || oap->పంక్తి_లెక్క == 1
 						     || how != get_lisp_indent)
 	    {
 		l = skipwhite(ml_get_curline());
-		if (*l == NUL)		    // empty or blank line
+		ఒకవేళ (*l == NUL)		    // empty or blank line
 		    amount = 0;
-		else
+		లేకపోతే
 		    amount = how();	    // get the indent for this line
 
-		if (amount >= 0 && set_indent(amount, 0))
+		ఒకవేళ (amount >= 0 && సమితి_indent(amount, 0))
 		{
 		    // did change the indent, call changed_lines() later
-		    if (first_changed == 0)
-			first_changed = curwin->w_cursor.lnum;
-		    last_changed = curwin->w_cursor.lnum;
+		    ఒకవేళ (మొదటి_మారింది == 0)
+			మొదటి_మారింది = curwin->w_cursor.lnum;
+		    చివరి_మారింది = curwin->w_cursor.lnum;
 		}
 	    }
 	    ++curwin->w_cursor.lnum;
-	    curwin->w_cursor.col = 0;  // make sure it's valid
+	    curwin->w_cursor.నిలువు = 0;  // make sure it's valid
 	}
 
     // put cursor on first non-blank of indented line
-    curwin->w_cursor.lnum = start_lnum;
+    curwin->w_cursor.lnum = ప్రారంభం_lnum;
     beginline(BL_SOL | BL_FIX);
 
     // Mark changed lines so that they will be redrawn.  When Visual
     // highlighting was present, need to continue until the last line.  When
     // there is no change still need to remove the Visual highlighting.
-    if (last_changed != 0)
-	changed_lines(first_changed, 0,
-		oap->is_VIsual ? start_lnum + oap->line_count :
-		last_changed + 1, 0L);
-    else if (oap->is_VIsual)
+    ఒకవేళ (చివరి_మారింది != 0)
+	మారింది_పంక్తులు(మొదటి_మారింది, 0,
+		oap->is_VIsual ? ప్రారంభం_lnum + oap->పంక్తి_లెక్క :
+		చివరి_మారింది + 1, 0L);
+    లేకపోతే ఒకవేళ (oap->is_VIsual)
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (oap->line_count > p_report)
+    ఒకవేళ (oap->పంక్తి_లెక్క > p_report)
     {
-	i = oap->line_count - (i + 1);
+	i = oap->పంక్తి_లెక్క - (i + 1);
 	smsg(NGETTEXT("%ld line indented ",
 						 "%ld lines indented ", i), i);
     }
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ఒకవేళ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// set '[ and '] marks
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
+	curbuf->b_op_ప్రారంభం = oap->ప్రారంభం;
+	curbuf->b_op_చివర = oap->చివర;
     }
 }
 
 /*
  * Return TRUE if lines starting with '#' should be left aligned.
  */
-    int
-preprocs_left(void)
+    పూర్ణాంకం
+preprocs_ఎడమ(శూన్య)
 {
-    return
+    తిరిగి
 	(curbuf->b_p_si && !curbuf->b_p_cin) ||
-	(curbuf->b_p_cin && in_cinkeys('#', ' ', TRUE)
+	(curbuf->b_p_cin && లోపల_cinkeys('#', ' ', TRUE)
 					   && curbuf->b_ind_hash_comment == 0)
 	;
 }
@@ -1212,14 +1212,14 @@ preprocs_left(void)
 /*
  * Return TRUE if the conditions are OK for smart indenting.
  */
-    int
-may_do_si(void)
+    పూర్ణాంకం
+may_do_si(శూన్య)
 {
-    return curbuf->b_p_si
+    తిరిగి curbuf->b_p_si
 	&& !curbuf->b_p_cin
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	&& *curbuf->b_p_inde == NUL
-#endif
+#అయితే_ముగింపు
 	&& !p_paste;
 }
 
@@ -1227,20 +1227,20 @@ may_do_si(void)
  * Try to do some very smart auto-indenting.
  * Used when inserting a "normal" character.
  */
-    void
-ins_try_si(int c)
+    శూన్య
+ins_try_si(పూర్ణాంకం c)
 {
     pos_T	*pos, old_pos;
     char_u	*ptr;
-    int		i;
-    int		temp;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		తాత్కాలిక;
 
     // do some very smart indenting when entering '{' or '}'
-    if (((did_si || can_si_back) && c == '{')
+    ఒకవేళ (((did_si || can_si_వెనుక) && c == '{')
 	    || (can_si && c == '}' && inindent(0)))
     {
 	// for '}' set indent equal to indent of line containing matching '{'
-	if (c == '}' && (pos = findmatch(NULL, '{')) != NULL)
+	ఒకవేళ (c == '}' && (pos = findmatch(ఖాళీ, '{')) != ఖాళీ)
 	{
 	    old_pos = curwin->w_cursor;
 	    // If the matching '{' has a ')' immediately before it (ignoring
@@ -1249,58 +1249,58 @@ ins_try_si(int c)
 	    // case where an "if (..\n..) {" statement continues over multiple
 	    // lines -- webb
 	    ptr = ml_get(pos->lnum);
-	    i = pos->col;
-	    if (i > 0)		// skip blanks before '{'
-		while (--i > 0 && VIM_ISWHITE(ptr[i]))
+	    i = pos->నిలువు;
+	    ఒకవేళ (i > 0)		// skip blanks before '{'
+		అయితే (--i > 0 && VIM_ISWHITE(ptr[i]))
 		    ;
 	    curwin->w_cursor.lnum = pos->lnum;
-	    curwin->w_cursor.col = i;
-	    if (ptr[i] == ')' && (pos = findmatch(NULL, '(')) != NULL)
+	    curwin->w_cursor.నిలువు = i;
+	    ఒకవేళ (ptr[i] == ')' && (pos = findmatch(ఖాళీ, '(')) != ఖాళీ)
 		curwin->w_cursor = *pos;
 	    i = get_indent();
 	    curwin->w_cursor = old_pos;
-	    if (State & VREPLACE_FLAG)
-		change_indent(INDENT_SET, i, FALSE, NUL, TRUE);
-	    else
-		(void)set_indent(i, SIN_CHANGED);
+	    ఒకవేళ (State & VREPLACE_FLAG)
+		change_indent(INDENT_సమితి, i, FALSE, NUL, TRUE);
+	    లేకపోతే
+		(శూన్య)సమితి_indent(i, SIN_మారింది);
 	}
-	else if (curwin->w_cursor.col > 0)
+	లేకపోతే ఒకవేళ (curwin->w_cursor.నిలువు > 0)
 	{
 	    // when inserting '{' after "O" reduce indent, but not
 	    // more than indent of previous line
-	    temp = TRUE;
-	    if (c == '{' && can_si_back && curwin->w_cursor.lnum > 1)
+	    తాత్కాలిక = TRUE;
+	    ఒకవేళ (c == '{' && can_si_వెనుక && curwin->w_cursor.lnum > 1)
 	    {
 		old_pos = curwin->w_cursor;
 		i = get_indent();
-		while (curwin->w_cursor.lnum > 1)
+		అయితే (curwin->w_cursor.lnum > 1)
 		{
 		    ptr = skipwhite(ml_get(--(curwin->w_cursor.lnum)));
 
 		    // ignore empty lines and lines starting with '#'.
-		    if (*ptr != '#' && *ptr != NUL)
-			break;
+		    ఒకవేళ (*ptr != '#' && *ptr != NUL)
+			ఆపు;
 		}
-		if (get_indent() >= i)
-		    temp = FALSE;
+		ఒకవేళ (get_indent() >= i)
+		    తాత్కాలిక = FALSE;
 		curwin->w_cursor = old_pos;
 	    }
-	    if (temp)
-		shift_line(TRUE, FALSE, 1, TRUE);
+	    ఒకవేళ (తాత్కాలిక)
+		జరుపు_పంక్తి(TRUE, FALSE, 1, TRUE);
 	}
     }
 
     // set indent of '#' always to 0
-    if (curwin->w_cursor.col > 0 && can_si && c == '#' && inindent(0))
+    ఒకవేళ (curwin->w_cursor.నిలువు > 0 && can_si && c == '#' && inindent(0))
     {
 	// remember current indent for next line
 	old_indent = get_indent();
-	(void)set_indent(0, SIN_CHANGED);
+	(శూన్య)సమితి_indent(0, SIN_మారింది);
     }
 
     // Adjust ai_col, the char at this position can be deleted.
-    if (ai_col > curwin->w_cursor.col)
-	ai_col = curwin->w_cursor.col;
+    ఒకవేళ (ai_నిలువు > curwin->w_cursor.నిలువు)
+	ai_నిలువు = curwin->w_cursor.నిలువు;
 }
 
 /*
@@ -1311,76 +1311,76 @@ ins_try_si(int c)
  * type == INDENT_SET	set indent to "amount"
  * if round is TRUE, round the indent to 'shiftwidth' (only with _INC and _Dec).
  */
-    void
+    శూన్య
 change_indent(
-    int		type,
-    int		amount,
-    int		round,
-    int		replaced,	// replaced character, put on replace stack
-    int		call_changed_bytes)	// call changed_bytes()
+    పూర్ణాంకం		type,
+    పూర్ణాంకం		amount,
+    పూర్ణాంకం		విడత,
+    పూర్ణాంకం		replaced,	// replaced character, put on replace stack
+    పూర్ణాంకం		call_మారింది_బైట్లు)	// call changed_bytes()
 {
-    int		vcol;
-    int		last_vcol;
-    int		insstart_less;		// reduction for Insstart.col
-    int		new_cursor_col;
-    int		i;
+    పూర్ణాంకం		vcol;
+    పూర్ణాంకం		చివరి_vcol;
+    పూర్ణాంకం		insstart_less;		// reduction for Insstart.col
+    పూర్ణాంకం		new_cursor_నిలువు;
+    పూర్ణాంకం		i;
     char_u	*ptr;
-    int		save_p_list;
-    int		start_col;
+    పూర్ణాంకం		save_p_list;
+    పూర్ణాంకం		ప్రారంభం_నిలువు;
     colnr_T	vc;
-    colnr_T	orig_col = 0;		// init for GCC
-    char_u	*new_line, *orig_line = NULL;	// init for GCC
+    colnr_T	orig_నిలువు = 0;		// init for GCC
+    char_u	*new_పంక్తి, *orig_పంక్తి = ఖాళీ;	// init for GCC
 
     // MODE_VREPLACE state needs to know what the line was like before changing
-    if (State & VREPLACE_FLAG)
+    ఒకవేళ (State & VREPLACE_FLAG)
     {
-	orig_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
-	orig_col = curwin->w_cursor.col;
+	orig_పంక్తి = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
+	orig_నిలువు = curwin->w_cursor.నిలువు;
     }
 
     // for the following tricks we don't want list mode
     save_p_list = curwin->w_p_list;
     curwin->w_p_list = FALSE;
-#ifdef FEAT_PROP_POPUP
-    ignore_text_props = TRUE;
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ignore_పాఠ్యం_props = TRUE;
+#అయితే_ముగింపు
     vc = getvcol_nolist(&curwin->w_cursor);
     vcol = vc;
 
     // For Replace mode we need to fix the replace stack later, which is only
     // possible when the cursor is in the indent.  Remember the number of
     // characters before the cursor if it's possible.
-    start_col = curwin->w_cursor.col;
+    ప్రారంభం_నిలువు = curwin->w_cursor.నిలువు;
 
     // determine offset from first non-blank
-    new_cursor_col = curwin->w_cursor.col;
+    new_cursor_నిలువు = curwin->w_cursor.నిలువు;
     beginline(BL_WHITE);
-    new_cursor_col -= curwin->w_cursor.col;
+    new_cursor_నిలువు -= curwin->w_cursor.నిలువు;
 
-    insstart_less = curwin->w_cursor.col;
+    insstart_less = curwin->w_cursor.నిలువు;
 
     // If the cursor is in the indent, compute how many screen columns the
     // cursor is to the left of the first non-blank.
-    if (new_cursor_col < 0)
+    ఒకవేళ (new_cursor_నిలువు < 0)
 	vcol = get_indent() - vcol;
 
-    if (new_cursor_col > 0)	    // can't fix replace stack
-	start_col = -1;
+    ఒకవేళ (new_cursor_నిలువు > 0)	    // can't fix replace stack
+	ప్రారంభం_నిలువు = -1;
 
     // Set the new indent.  The cursor will be put on the first non-blank.
-    if (type == INDENT_SET)
-	(void)set_indent(amount, call_changed_bytes ? SIN_CHANGED : 0);
-    else
+    ఒకవేళ (type == INDENT_సమితి)
+	(శూన్య)సమితి_indent(amount, call_మారింది_బైట్లు ? SIN_మారింది : 0);
+    లేకపోతే
     {
-	int	save_State = State;
+	పూర్ణాంకం	save_State = State;
 
 	// Avoid being called recursively.
-	if (State & VREPLACE_FLAG)
-	    State = MODE_INSERT;
-	shift_line(type == INDENT_DEC, round, 1, call_changed_bytes);
+	ఒకవేళ (State & VREPLACE_FLAG)
+	    State = బహుళకం_చొప్పించు;
+	జరుపు_పంక్తి(type == INDENT_DEC, విడత, 1, call_మారింది_బైట్లు);
 	State = save_State;
     }
-    insstart_less -= curwin->w_cursor.col;
+    insstart_less -= curwin->w_cursor.నిలువు;
 
     // Try to put cursor on same character.
     // If the cursor is at or after the first non-blank in the line,
@@ -1389,17 +1389,17 @@ change_indent(
     // If we are not in insert mode, leave the cursor on the first non-blank.
     // If the cursor is before the first non-blank, position it relative
     // to the first non-blank, counted in screen columns.
-    if (new_cursor_col >= 0)
+    ఒకవేళ (new_cursor_నిలువు >= 0)
     {
 	// When changing the indent while the cursor is touching it, reset
 	// Insstart_col to 0.
-	if (new_cursor_col == 0)
+	ఒకవేళ (new_cursor_నిలువు == 0)
 	    insstart_less = MAXCOL;
-	new_cursor_col += curwin->w_cursor.col;
+	new_cursor_నిలువు += curwin->w_cursor.నిలువు;
     }
-    else if (!(State & MODE_INSERT))
-	new_cursor_col = curwin->w_cursor.col;
-    else
+    లేకపోతే ఒకవేళ (!(State & బహుళకం_చొప్పించు))
+	new_cursor_నిలువు = curwin->w_cursor.నిలువు;
+    లేకపోతే
     {
 	chartabsize_T cts;
 
@@ -1408,36 +1408,36 @@ change_indent(
 	curwin->w_virtcol = (colnr_T)((vcol < 0) ? 0 : vcol);
 
 	// Advance the cursor until we reach the right screen column.
-	last_vcol = 0;
+	చివరి_vcol = 0;
 	ptr = ml_get_curline();
 	init_chartabsize_arg(&cts, curwin, 0, 0, ptr, ptr);
-	while (cts.cts_vcol <= (int)curwin->w_virtcol)
+	అయితే (cts.cts_vcol <= (పూర్ణాంకం)curwin->w_virtcol)
 	{
-	    last_vcol = cts.cts_vcol;
-	    if (cts.cts_vcol > 0)
+	    చివరి_vcol = cts.cts_vcol;
+	    ఒకవేళ (cts.cts_vcol > 0)
 		MB_PTR_ADV(cts.cts_ptr);
-	    if (*cts.cts_ptr == NUL)
-		break;
+	    ఒకవేళ (*cts.cts_ptr == NUL)
+		ఆపు;
 	    cts.cts_vcol += lbr_chartabsize(&cts);
 	}
-	vcol = last_vcol;
-	new_cursor_col = cts.cts_ptr - cts.cts_line;
+	vcol = చివరి_vcol;
+	new_cursor_నిలువు = cts.cts_ptr - cts.cts_పంక్తి;
 	clear_chartabsize_arg(&cts);
 
 	// May need to insert spaces to be able to position the cursor on
 	// the right screen column.
-	if (vcol != (int)curwin->w_virtcol)
+	ఒకవేళ (vcol != (పూర్ణాంకం)curwin->w_virtcol)
 	{
-	    curwin->w_cursor.col = (colnr_T)new_cursor_col;
-	    i = (int)curwin->w_virtcol - vcol;
+	    curwin->w_cursor.నిలువు = (colnr_T)new_cursor_నిలువు;
+	    i = (పూర్ణాంకం)curwin->w_virtcol - vcol;
 	    ptr = alloc(i + 1);
-	    if (ptr != NULL)
+	    ఒకవేళ (ptr != ఖాళీ)
 	    {
 		size_t ptrlen;
-		new_cursor_col += i;
+		new_cursor_నిలువు += i;
 		ptr[i] = NUL;
 		ptrlen = i;
-		while (--i >= 0)
+		అయితే (--i >= 0)
 		    ptr[i] = ' ';
 		ins_str(ptr, ptrlen);
 		vim_free(ptr);
@@ -1451,27 +1451,27 @@ change_indent(
 
     curwin->w_p_list = save_p_list;
 
-    if (new_cursor_col <= 0)
-	curwin->w_cursor.col = 0;
-    else
-	curwin->w_cursor.col = (colnr_T)new_cursor_col;
-    curwin->w_set_curswant = true;
-    changed_cline_bef_curs();
+    ఒకవేళ (new_cursor_నిలువు <= 0)
+	curwin->w_cursor.నిలువు = 0;
+    లేకపోతే
+	curwin->w_cursor.నిలువు = (colnr_T)new_cursor_నిలువు;
+    curwin->w_సమితి_curswant = true;
+    మారింది_cline_bef_curs();
 
     // May have to adjust the start of the insert.
-    if (State & MODE_INSERT)
+    ఒకవేళ (State & బహుళకం_చొప్పించు)
     {
-	if (curwin->w_cursor.lnum == Insstart.lnum && Insstart.col != 0)
+	ఒకవేళ (curwin->w_cursor.lnum == Insstart.lnum && Insstart.నిలువు != 0)
 	{
-	    if ((int)Insstart.col <= insstart_less)
-		Insstart.col = 0;
-	    else
-		Insstart.col -= insstart_less;
+	    ఒకవేళ ((పూర్ణాంకం)Insstart.నిలువు <= insstart_less)
+		Insstart.నిలువు = 0;
+	    లేకపోతే
+		Insstart.నిలువు -= insstart_less;
 	}
-	if ((int)ai_col <= insstart_less)
-	    ai_col = 0;
-	else
-	    ai_col -= insstart_less;
+	ఒకవేళ ((పూర్ణాంకం)ai_నిలువు <= insstart_less)
+	    ai_నిలువు = 0;
+	లేకపోతే
+	    ai_నిలువు -= insstart_less;
     }
 
     // For MODE_REPLACE state, may have to fix the replace stack, if it's
@@ -1479,60 +1479,60 @@ change_indent(
     // to pop a few characters from the replace stack.
     // If the number of characters before the cursor increased, need to push a
     // few NULs onto the replace stack.
-    if (REPLACE_NORMAL(State) && start_col >= 0)
+    ఒకవేళ (REPLACE_సాధారణ(State) && ప్రారంభం_నిలువు >= 0)
     {
-	while (start_col > (int)curwin->w_cursor.col)
+	అయితే (ప్రారంభం_నిలువు > (పూర్ణాంకం)curwin->w_cursor.నిలువు)
 	{
 	    replace_join(0);	    // remove a NUL from the replace stack
-	    --start_col;
+	    --ప్రారంభం_నిలువు;
 	}
-	while (start_col < (int)curwin->w_cursor.col || replaced)
+	అయితే (ప్రారంభం_నిలువు < (పూర్ణాంకం)curwin->w_cursor.నిలువు || replaced)
 	{
-	    replace_push(NUL);
-	    if (replaced)
+	    replace_నెట్టు(NUL);
+	    ఒకవేళ (replaced)
 	    {
-		replace_push(replaced);
+		replace_నెట్టు(replaced);
 		replaced = NUL;
 	    }
-	    ++start_col;
+	    ++ప్రారంభం_నిలువు;
 	}
     }
-#ifdef FEAT_PROP_POPUP
-    ignore_text_props = FALSE;
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    ignore_పాఠ్యం_props = FALSE;
+#అయితే_ముగింపు
 
     // For MODE_VREPLACE state, we also have to fix the replace stack.  In this
     // case it is always possible because we backspace over the whole line and
     // then put it back again the way we wanted it.
-    if (State & VREPLACE_FLAG)
+    ఒకవేళ (State & VREPLACE_FLAG)
     {
 	// If orig_line didn't allocate, just return.  At least we did the job,
 	// even if you can't backspace.
-	if (orig_line == NULL)
-	    return;
+	ఒకవేళ (orig_పంక్తి == ఖాళీ)
+	    తిరిగి;
 
 	// Save new line
-	new_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	if (new_line == NULL)
+	new_పంక్తి = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	ఒకవేళ (new_పంక్తి == ఖాళీ)
 	{
-	    vim_free(orig_line);
-	    return;
+	    vim_free(orig_పంక్తి);
+	    తిరిగి;
 	}
 
 	// We only put back the new line up to the cursor
-	new_line[curwin->w_cursor.col] = NUL;
+	new_పంక్తి[curwin->w_cursor.నిలువు] = NUL;
 
 	// Put back original line
-	ml_replace(curwin->w_cursor.lnum, orig_line, FALSE);
-	curwin->w_cursor.col = orig_col;
+	ml_replace(curwin->w_cursor.lnum, orig_పంక్తి, FALSE);
+	curwin->w_cursor.నిలువు = orig_నిలువు;
 
 	// Backspace from cursor to start of line
-	backspace_until_column(0);
+	backspace_until_స్తంభం(0);
 
 	// Insert new stuff into line again
-	ins_bytes(new_line);
+	ins_బైట్లు(new_పంక్తి);
 
-	vim_free(new_line);
+	vim_free(new_పంక్తి);
     }
 }
 
@@ -1541,428 +1541,428 @@ change_indent(
  * Leaves the cursor on the first non-blank in the line.
  * Returns TRUE if the line was changed.
  */
-    int
-copy_indent(int size, char_u *src)
+    పూర్ణాంకం
+copy_indent(పూర్ణాంకం కొలత, char_u *src)
 {
-    char_u	*p = NULL;
-    char_u	*line = NULL;
+    char_u	*p = ఖాళీ;
+    char_u	*పంక్తి = ఖాళీ;
     char_u	*s;
-    int		todo;
-    int		ind_len;
-    int		line_len = 0;
-    int		tab_pad;
-    int		ind_done;
-    int		round;
-#ifdef FEAT_VARTABS
-    int		ind_col;
-#endif
+    పూర్ణాంకం		todo;
+    పూర్ణాంకం		ind_len;
+    పూర్ణాంకం		పంక్తి_len = 0;
+    పూర్ణాంకం		tab_pad;
+    పూర్ణాంకం		ind_పూర్తి;
+    పూర్ణాంకం		విడత;
+#నిర్వచితమైతే FEAT_VARTABS
+    పూర్ణాంకం		ind_నిలువు;
+#అయితే_ముగింపు
 
     // Round 1: compute the number of characters needed for the indent
     // Round 2: copy the characters.
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
-	todo = size;
+	todo = కొలత;
 	ind_len = 0;
-	ind_done = 0;
-#ifdef FEAT_VARTABS
-	ind_col = 0;
-#endif
+	ind_పూర్తి = 0;
+#నిర్వచితమైతే FEAT_VARTABS
+	ind_నిలువు = 0;
+#అయితే_ముగింపు
 	s = src;
 
 	// Count/copy the usable portion of the source line
-	while (todo > 0 && VIM_ISWHITE(*s))
+	అయితే (todo > 0 && VIM_ISWHITE(*s))
 	{
-	    if (*s == TAB)
+	    ఒకవేళ (*s == TAB)
 	    {
-#ifdef FEAT_VARTABS
-		tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+		tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#లేకపోతే
+		tab_pad = (పూర్ణాంకం)curbuf->b_p_ts
+					   - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
 		// Stop if this tab will overshoot the target
-		if (todo < tab_pad)
-		    break;
+		ఒకవేళ (todo < tab_pad)
+		    ఆపు;
 		todo -= tab_pad;
-		ind_done += tab_pad;
-#ifdef FEAT_VARTABS
-		ind_col += tab_pad;
-#endif
+		ind_పూర్తి += tab_pad;
+#నిర్వచితమైతే FEAT_VARTABS
+		ind_నిలువు += tab_pad;
+#అయితే_ముగింపు
 	    }
-	    else
+	    లేకపోతే
 	    {
 		--todo;
-		++ind_done;
-#ifdef FEAT_VARTABS
-		++ind_col;
-#endif
+		++ind_పూర్తి;
+#నిర్వచితమైతే FEAT_VARTABS
+		++ind_నిలువు;
+#అయితే_ముగింపు
 	    }
 	    ++ind_len;
-	    if (p != NULL)
+	    ఒకవేళ (p != ఖాళీ)
 		*p++ = *s;
 	    ++s;
 	}
 
 	// Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#నిర్వచితమైతే FEAT_VARTABS
+	tab_pad = tabstop_padding(ind_పూర్తి, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-	tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	if (todo >= tab_pad && !curbuf->b_p_et)
+#లేకపోతే
+	tab_pad = (పూర్ణాంకం)curbuf->b_p_ts - (ind_పూర్తి % (పూర్ణాంకం)curbuf->b_p_ts);
+#అయితే_ముగింపు
+	ఒకవేళ (todo >= tab_pad && !curbuf->b_p_et)
 	{
 	    todo -= tab_pad;
 	    ++ind_len;
-#ifdef FEAT_VARTABS
-	    ind_col += tab_pad;
-#endif
-	    if (p != NULL)
+#నిర్వచితమైతే FEAT_VARTABS
+	    ind_నిలువు += tab_pad;
+#అయితే_ముగింపు
+	    ఒకవేళ (p != ఖాళీ)
 		*p++ = TAB;
 	}
 
 	// Add tabs required for indent
-	if (!curbuf->b_p_et)
+	ఒకవేళ (!curbuf->b_p_et)
 	{
-#ifdef FEAT_VARTABS
-	    for (;;)
+#నిర్వచితమైతే FEAT_VARTABS
+	    కొరకు (;;)
 	    {
-		tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
+		tab_pad = tabstop_padding(ind_నిలువు, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-		if (todo < tab_pad)
-		    break;
+		ఒకవేళ (todo < tab_pad)
+		    ఆపు;
 		todo -= tab_pad;
 		++ind_len;
-		ind_col += tab_pad;
-		if (p != NULL)
+		ind_నిలువు += tab_pad;
+		ఒకవేళ (p != ఖాళీ)
 		    *p++ = TAB;
 	    }
-#else
-	    while (todo >= (int)curbuf->b_p_ts)
+#లేకపోతే
+	    అయితే (todo >= (పూర్ణాంకం)curbuf->b_p_ts)
 	    {
-		todo -= (int)curbuf->b_p_ts;
+		todo -= (పూర్ణాంకం)curbuf->b_p_ts;
 		++ind_len;
-		if (p != NULL)
+		ఒకవేళ (p != ఖాళీ)
 		    *p++ = TAB;
 	    }
-#endif
+#అయితే_ముగింపు
 	}
 
 	// Count/add spaces required for indent
-	while (todo > 0)
+	అయితే (todo > 0)
 	{
 	    --todo;
 	    ++ind_len;
-	    if (p != NULL)
+	    ఒకవేళ (p != ఖాళీ)
 		*p++ = ' ';
 	}
 
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	{
 	    // Allocate memory for the result: the copied indent, new indent
 	    // and the rest of the line.
-	    line_len = ml_get_curline_len() + 1;
-	    line = alloc(ind_len + line_len);
-	    if (line == NULL)
-		return FALSE;
-	    p = line;
+	    పంక్తి_len = ml_get_curline_len() + 1;
+	    పంక్తి = alloc(ind_len + పంక్తి_len);
+	    ఒకవేళ (పంక్తి == ఖాళీ)
+		తిరిగి FALSE;
+	    p = పంక్తి;
 	}
     }
 
     // Append the original line
-    mch_memmove(p, ml_get_curline(), (size_t)line_len);
+    mch_memmove(p, ml_get_curline(), (size_t)పంక్తి_len);
 
     // Replace the line
-    ml_replace(curwin->w_cursor.lnum, line, FALSE);
+    ml_replace(curwin->w_cursor.lnum, పంక్తి, FALSE);
 
     // Put the cursor after the indent.
-    curwin->w_cursor.col = ind_len;
-    return TRUE;
+    curwin->w_cursor.నిలువు = ind_len;
+    తిరిగి TRUE;
 }
 
 /*
  * Give a "resulting text too long" error and maybe set got_int.
  */
-    static void
-emsg_text_too_long(void)
+    స్థిర శూన్య
+emsg_పాఠ్యం_too_long(శూన్య)
 {
-    emsg(_(e_resulting_text_too_long));
-#ifdef FEAT_EVAL
+    emsg(_(e_resulting_పాఠ్యం_too_long));
+#నిర్వచితమైతే FEAT_EVAL
     // when not inside a try/catch set got_int to break out of any loop
-    if (trylevel == 0)
-#endif
+    ఒకవేళ (trylevel == 0)
+#అయితే_ముగింపు
 	got_int = TRUE;
 }
 
 /*
  * ":retab".
  */
-    void
+    శూన్య
 ex_retab(exarg_T *eap)
 {
     linenr_T	lnum;
-    int		got_tab = FALSE;
-    long	num_spaces = 0;
-    long	num_tabs;
-    long	len;
-    long	col;
-    long	vcol;
-    long	start_col = 0;		// For start of white-space string
-    long	start_vcol = 0;		// For start of white-space string
-    long	old_len;
-    long	new_len;
+    పూర్ణాంకం		got_tab = FALSE;
+    దీర్ఘ	అంకె_spaces = 0;
+    దీర్ఘ	అంకె_tabs;
+    దీర్ఘ	len;
+    దీర్ఘ	నిలువు;
+    దీర్ఘ	vcol;
+    దీర్ఘ	ప్రారంభం_నిలువు = 0;		// For start of white-space string
+    దీర్ఘ	ప్రారంభం_vcol = 0;		// For start of white-space string
+    దీర్ఘ	old_len;
+    దీర్ఘ	new_len;
     char_u	*ptr;
-    char_u	*new_line = (char_u *)1; // init to non-NULL
-    int		did_undo;		// called u_save for current line
-#ifdef FEAT_VARTABS
-    int		*new_vts_array = NULL;
+    char_u	*new_పంక్తి = (char_u *)1; // init to non-NULL
+    పూర్ణాంకం		did_undo;		// called u_save for current line
+#నిర్వచితమైతే FEAT_VARTABS
+    పూర్ణాంకం		*new_vts_array = ఖాళీ;
     char_u	*new_ts_str;		// string value of tab argument
-#else
-    int		temp;
-    int		new_ts = 0;
-#endif
-    int		save_list;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// last changed line
-    int		is_indent_only = 0;	// Only process leading whitespace
+#లేకపోతే
+    పూర్ణాంకం		తాత్కాలిక;
+    పూర్ణాంకం		new_ts = 0;
+#అయితే_ముగింపు
+    పూర్ణాంకం		save_list;
+    linenr_T	మొదటి_పంక్తి = 0;		// first changed line
+    linenr_T	చివరి_పంక్తి = 0;		// last changed line
+    పూర్ణాంకం		is_indent_only = 0;	// Only process leading whitespace
 
     save_list = curwin->w_p_list;
     curwin->w_p_list = 0;	    // don't want list mode here
 
     ptr = eap->arg;
-    if (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
+    ఒకవేళ (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
     {
 	is_indent_only = 1;
 	ptr = skipwhite(ptr + 11);
     }
 
-#ifdef FEAT_VARTABS
+#నిర్వచితమైతే FEAT_VARTABS
     new_ts_str = ptr;
-    if (tabstop_set(ptr, &new_vts_array) == FAIL)
-	return;
-    while (vim_isdigit(*ptr) || *ptr == ',')
+    ఒకవేళ (tabstop_సమితి(ptr, &new_vts_array) == FAIL)
+	తిరిగి;
+    అయితే (vim_isdigit(*ptr) || *ptr == ',')
 	++ptr;
 
     // This ensures that either new_vts_array and new_ts_str are freshly
     // allocated, or new_vts_array points to an existing array and new_ts_str
     // is null.
-    if (new_vts_array == NULL)
+    ఒకవేళ (new_vts_array == ఖాళీ)
     {
 	new_vts_array = curbuf->b_p_vts_array;
-	new_ts_str = NULL;
+	new_ts_str = ఖాళీ;
     }
-    else
+    లేకపోతే
 	new_ts_str = vim_strnsave(new_ts_str, ptr - new_ts_str);
-#else
-    if (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
+#లేకపోతే
+    ఒకవేళ (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
     {
-	char_u	*end;
+	char_u	*చివర;
 
-	if (strtol((char *)ptr, (char **)&end, 10) <= 0)
+	ఒకవేళ (strtol((అక్షరం *)ptr, (అక్షరం **)&చివర, 10) <= 0)
 	{
-	    if (ptr != end)
-		emsg(_(e_argument_must_be_positive));
-	    else
-		semsg(_(e_invalid_argument_str), ptr);
-	    return;
+	    ఒకవేళ (ptr != చివర)
+		emsg(_(e_వాదం_must_be_ధనాత్మక));
+	    లేకపోతే
+		semsg(_(e_invalid_వాదం_str), ptr);
+	    తిరిగి;
 	}
 	new_ts = getdigits(&ptr);
-	if (new_ts < 0 || new_ts > TABSTOP_MAX)
+	ఒకవేళ (new_ts < 0 || new_ts > TABSTOP_MAX)
 	{
-	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    semsg(_(e_invalid_వాదం_str), eap->arg);
+	    తిరిగి;
 	}
     }
-    if (new_ts == 0)
+    ఒకవేళ (new_ts == 0)
 	new_ts = curbuf->b_p_ts;
-#endif
-    for (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
+#అయితే_ముగింపు
+    కొరకు (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
     {
 	ptr = ml_get(lnum);
 	old_len = ml_get_len(lnum);
-	col = 0;
+	నిలువు = 0;
 	vcol = 0;
 	did_undo = FALSE;
-	for (;;)
+	కొరకు (;;)
 	{
-	    if (VIM_ISWHITE(ptr[col]))
+	    ఒకవేళ (VIM_ISWHITE(ptr[నిలువు]))
 	    {
-		if (!got_tab && num_spaces == 0)
+		ఒకవేళ (!got_tab && అంకె_spaces == 0)
 		{
 		    // First consecutive white-space
-		    start_vcol = vcol;
-		    start_col = col;
+		    ప్రారంభం_vcol = vcol;
+		    ప్రారంభం_నిలువు = నిలువు;
 		}
-		if (ptr[col] == ' ')
-		    num_spaces++;
-		else
+		ఒకవేళ (ptr[నిలువు] == ' ')
+		    అంకె_spaces++;
+		లేకపోతే
 		    got_tab = TRUE;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		if (got_tab || (eap->forceit && num_spaces > 1))
+		ఒకవేళ (got_tab || (eap->forceit && అంకె_spaces > 1))
 		{
 		    // Retabulate this string of white-space
 
 		    // len is virtual length of white string
-		    len = num_spaces = vcol - start_vcol;
-		    num_tabs = 0;
-		    if (!curbuf->b_p_et)
+		    len = అంకె_spaces = vcol - ప్రారంభం_vcol;
+		    అంకె_tabs = 0;
+		    ఒకవేళ (!curbuf->b_p_et)
 		    {
-#ifdef FEAT_VARTABS
-			int t, s;
+#నిర్వచితమైతే FEAT_VARTABS
+			పూర్ణాంకం t, s;
 
-			tabstop_fromto(start_vcol, vcol,
+			tabstop_fromto(ప్రారంభం_vcol, vcol,
 					curbuf->b_p_ts, new_vts_array, &t, &s);
-			num_tabs = t;
-			num_spaces = s;
-#else
-			temp = new_ts - (start_vcol % new_ts);
-			if (num_spaces >= temp)
+			అంకె_tabs = t;
+			అంకె_spaces = s;
+#లేకపోతే
+			తాత్కాలిక = new_ts - (ప్రారంభం_vcol % new_ts);
+			ఒకవేళ (అంకె_spaces >= తాత్కాలిక)
 			{
-			    num_spaces -= temp;
-			    num_tabs++;
+			    అంకె_spaces -= తాత్కాలిక;
+			    అంకె_tabs++;
 			}
-			num_tabs += num_spaces / new_ts;
-			num_spaces -= (num_spaces / new_ts) * new_ts;
-#endif
+			అంకె_tabs += అంకె_spaces / new_ts;
+			అంకె_spaces -= (అంకె_spaces / new_ts) * new_ts;
+#అయితే_ముగింపు
 		    }
-		    if (curbuf->b_p_et || got_tab ||
-					(num_spaces + num_tabs < len))
+		    ఒకవేళ (curbuf->b_p_et || got_tab ||
+					(అంకె_spaces + అంకె_tabs < len))
 		    {
-			if (did_undo == FALSE)
+			ఒకవేళ (did_undo == FALSE)
 			{
 			    did_undo = TRUE;
-			    if (u_save((linenr_T)(lnum - 1),
+			    ఒకవేళ (u_save((linenr_T)(lnum - 1),
 						(linenr_T)(lnum + 1)) == FAIL)
 			    {
-				new_line = NULL;	// flag out-of-memory
-				break;
+				new_పంక్తి = ఖాళీ;	// flag out-of-memory
+				ఆపు;
 			    }
 			}
 
 			// len is actual number of white characters used
-			len = num_spaces + num_tabs;
-			new_len = old_len - col + start_col + len + 1;
-			if (new_len <= 0 || new_len >= MAXCOL)
+			len = అంకె_spaces + అంకె_tabs;
+			new_len = old_len - నిలువు + ప్రారంభం_నిలువు + len + 1;
+			ఒకవేళ (new_len <= 0 || new_len >= MAXCOL)
 			{
-			    emsg_text_too_long();
-			    break;
+			    emsg_పాఠ్యం_too_long();
+			    ఆపు;
 			}
-			new_line = alloc(new_len);
-			if (new_line == NULL)
-			    break;
-			if (start_col > 0)
-			    mch_memmove(new_line, ptr, (size_t)start_col);
-			mch_memmove(new_line + start_col + len,
-				      ptr + col, (size_t)(old_len - col + 1));
-			ptr = new_line + start_col;
-			for (col = 0; col < len; col++)
-			    ptr[col] = (col < num_tabs) ? '\t' : ' ';
-			if (ml_replace(lnum, new_line, FALSE) == OK)
+			new_పంక్తి = alloc(new_len);
+			ఒకవేళ (new_పంక్తి == ఖాళీ)
+			    ఆపు;
+			ఒకవేళ (ప్రారంభం_నిలువు > 0)
+			    mch_memmove(new_పంక్తి, ptr, (size_t)ప్రారంభం_నిలువు);
+			mch_memmove(new_పంక్తి + ప్రారంభం_నిలువు + len,
+				      ptr + నిలువు, (size_t)(old_len - నిలువు + 1));
+			ptr = new_పంక్తి + ప్రారంభం_నిలువు;
+			కొరకు (నిలువు = 0; నిలువు < len; నిలువు++)
+			    ptr[నిలువు] = (నిలువు < అంకె_tabs) ? '\t' : ' ';
+			ఒకవేళ (ml_replace(lnum, new_పంక్తి, FALSE) == OK)
 			    // "new_line" may have been copied
-			    new_line = curbuf->b_ml.ml_line_ptr;
-			if (first_line == 0)
-			    first_line = lnum;
-			last_line = lnum;
-			ptr = new_line;
+			    new_పంక్తి = curbuf->b_ml.ml_పంక్తి_ptr;
+			ఒకవేళ (మొదటి_పంక్తి == 0)
+			    మొదటి_పంక్తి = lnum;
+			చివరి_పంక్తి = lnum;
+			ptr = new_పంక్తి;
 			old_len = new_len - 1;
-			col = start_col + len;
+			నిలువు = ప్రారంభం_నిలువు + len;
 		    }
 		}
 		got_tab = FALSE;
-		num_spaces = 0;
+		అంకె_spaces = 0;
 
-		if (is_indent_only)
-		    break;
+		ఒకవేళ (is_indent_only)
+		    ఆపు;
 	    }
-	    if (ptr[col] == NUL)
-		break;
-	    vcol += chartabsize(ptr + col, (colnr_T)vcol);
-	    if (vcol >= MAXCOL)
+	    ఒకవేళ (ptr[నిలువు] == NUL)
+		ఆపు;
+	    vcol += chartabsize(ptr + నిలువు, (colnr_T)vcol);
+	    ఒకవేళ (vcol >= MAXCOL)
 	    {
-		emsg_text_too_long();
-		break;
+		emsg_పాఠ్యం_too_long();
+		ఆపు;
 	    }
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(ptr + col);
-	    else
-		++col;
+	    ఒకవేళ (has_mbyte)
+		నిలువు += (*mb_ptr2len)(ptr + నిలువు);
+	    లేకపోతే
+		++నిలువు;
 	}
-	if (new_line == NULL)		    // out of memory
-	    break;
-	line_breakcheck();
+	ఒకవేళ (new_పంక్తి == ఖాళీ)		    // out of memory
+	    ఆపు;
+	పంక్తి_breakcheck();
     }
-    if (got_int)
+    ఒకవేళ (got_int)
 	emsg(_(e_interrupted));
 
-#ifdef FEAT_VARTABS
+#నిర్వచితమైతే FEAT_VARTABS
     // If a single value was given then it can be considered equal to
     // either the value of 'tabstop' or the value of 'vartabstop'.
-    if (tabstop_count(curbuf->b_p_vts_array) == 0
-	&& tabstop_count(new_vts_array) == 1
-	&& curbuf->b_p_ts == tabstop_first(new_vts_array))
+    ఒకవేళ (tabstop_లెక్క(curbuf->b_p_vts_array) == 0
+	&& tabstop_లెక్క(new_vts_array) == 1
+	&& curbuf->b_p_ts == tabstop_మొదటి(new_vts_array))
 	; // not changed
-    else if (tabstop_count(curbuf->b_p_vts_array) > 0
+    లేకపోతే ఒకవేళ (tabstop_లెక్క(curbuf->b_p_vts_array) > 0
 	&& tabstop_eq(curbuf->b_p_vts_array, new_vts_array))
 	; // not changed
-    else
+    లేకపోతే
 	redraw_curbuf_later(UPD_NOT_VALID);
-#else
-    if (curbuf->b_p_ts != new_ts)
+#లేకపోతే
+    ఒకవేళ (curbuf->b_p_ts != new_ts)
 	redraw_curbuf_later(UPD_NOT_VALID);
-#endif
-    if (first_line != 0)
-	changed_lines(first_line, 0, last_line + 1, 0L);
+#అయితే_ముగింపు
+    ఒకవేళ (మొదటి_పంక్తి != 0)
+	మారింది_పంక్తులు(మొదటి_పంక్తి, 0, చివరి_పంక్తి + 1, 0L);
 
     curwin->w_p_list = save_list;	// restore 'list'
 
-#ifdef FEAT_VARTABS
-    if (new_ts_str != NULL)		// set the new tabstop
+#నిర్వచితమైతే FEAT_VARTABS
+    ఒకవేళ (new_ts_str != ఖాళీ)		// set the new tabstop
     {
 	// If 'vartabstop' is in use or if the value given to retab has more
 	// than one tabstop then update 'vartabstop'.
-	int *old_vts_ary = curbuf->b_p_vts_array;
+	పూర్ణాంకం *old_vts_ary = curbuf->b_p_vts_array;
 
-	if (tabstop_count(old_vts_ary) > 0 || tabstop_count(new_vts_array) > 1)
+	ఒకవేళ (tabstop_లెక్క(old_vts_ary) > 0 || tabstop_లెక్క(new_vts_array) > 1)
 	{
-	    set_string_option_direct((char_u *)"vts", -1, new_ts_str,
+	    సమితి_string_option_ప్రత్యక్ష((char_u *)"vts", -1, new_ts_str,
 							OPT_FREE|OPT_LOCAL, 0);
 	    curbuf->b_p_vts_array = new_vts_array;
 	    vim_free(old_vts_ary);
 	}
-	else
+	లేకపోతే
 	{
 	    // 'vartabstop' wasn't in use and a single value was given to
 	    // retab then update 'tabstop'.
-	    curbuf->b_p_ts = tabstop_first(new_vts_array);
+	    curbuf->b_p_ts = tabstop_మొదటి(new_vts_array);
 	    vim_free(new_vts_array);
 	}
 	vim_free(new_ts_str);
     }
-#else
+#లేకపోతే
     curbuf->b_p_ts = new_ts;
-#endif
+#అయితే_ముగింపు
     coladvance(curwin->w_curswant);
 
     u_clearline();
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Get indent level from 'indentexpr'.
  */
-    int
-get_expr_indent(void)
+    పూర్ణాంకం
+get_సమాసం_indent(శూన్య)
 {
-    int		indent = -1;
+    పూర్ణాంకం		indent = -1;
     char_u	*inde_copy;
     pos_T	save_pos;
     colnr_T	save_curswant;
-    int		save_set_curswant;
-    int		save_State;
-    int		use_sandbox = was_set_insecurely(curwin,
+    పూర్ణాంకం		save_సమితి_curswant;
+    పూర్ణాంకం		save_State;
+    పూర్ణాంకం		use_sandbox = was_సమితి_insecurely(curwin,
 					    (char_u *)"indentexpr", OPT_LOCAL);
     sctx_T	save_sctx = current_sctx;
 
@@ -1970,9 +1970,9 @@ get_expr_indent(void)
     // via :normal commands
     save_pos = curwin->w_cursor;
     save_curswant = curwin->w_curswant;
-    save_set_curswant = curwin->w_set_curswant;
-    set_vim_var_nr(VV_LNUM, curwin->w_cursor.lnum);
-    if (use_sandbox)
+    save_సమితి_curswant = curwin->w_సమితి_curswant;
+    సమితి_vim_var_nr(VV_LNUM, curwin->w_cursor.lnum);
+    ఒకవేళ (use_sandbox)
 	++sandbox;
     ++textlock;
     current_sctx = curbuf->b_p_script_ctx[BV_INDE];
@@ -1980,13 +1980,13 @@ get_expr_indent(void)
     // Need to make a copy, the 'indentexpr' option could be changed while
     // evaluating it.
     inde_copy = vim_strsave(curbuf->b_p_inde);
-    if (inde_copy != NULL)
+    ఒకవేళ (inde_copy != ఖాళీ)
     {
-	indent = (int)eval_to_number(inde_copy, TRUE);
+	indent = (పూర్ణాంకం)eval_గమ్యం_సంఖ్య(inde_copy, TRUE);
 	vim_free(inde_copy);
     }
 
-    if (use_sandbox)
+    ఒకవేళ (use_sandbox)
 	--sandbox;
     --textlock;
     current_sctx = save_sctx;
@@ -1995,42 +1995,42 @@ get_expr_indent(void)
     // Pretend to be in Insert mode, allow cursor past end of line for "o"
     // command.
     save_State = State;
-    State = MODE_INSERT;
+    State = బహుళకం_చొప్పించు;
     curwin->w_cursor = save_pos;
     curwin->w_curswant = save_curswant;
-    curwin->w_set_curswant = save_set_curswant;
+    curwin->w_సమితి_curswant = save_సమితి_curswant;
     check_cursor();
     State = save_State;
 
     // Reset did_throw, unless 'debug' has "throw" and inside a try/catch.
-    if (did_throw && (vim_strchr(p_debug, 't') == NULL || trylevel == 0))
+    ఒకవేళ (did_throw && (vim_strchr(p_debug, 't') == ఖాళీ || trylevel == 0))
     {
 	handle_did_throw();
 	did_throw = FALSE;
     }
 
     // If there is an error, just keep the current indent.
-    if (indent < 0)
+    ఒకవేళ (indent < 0)
 	indent = get_indent();
 
-    return indent;
+    తిరిగి indent;
 }
-#endif
+#అయితే_ముగింపు
 
-    static int
-lisp_match(char_u *p)
+    స్థిర పూర్ణాంకం
+lisp_సరిపోలిక(char_u *p)
 {
     char_u	buf[LSIZE];
-    int		len;
-    char_u	*word = *curbuf->b_p_lw != NUL ? curbuf->b_p_lw : p_lispwords;
+    పూర్ణాంకం		len;
+    char_u	*మాట = *curbuf->b_p_lw != NUL ? curbuf->b_p_lw : p_lispwords;
 
-    while (*word != NUL)
+    అయితే (*మాట != NUL)
     {
-	len = copy_option_part(&word, buf, LSIZE, ",");
-	if (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
-	    return TRUE;
+	len = copy_option_part(&మాట, buf, LSIZE, ",");
+	ఒకవేళ (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -2049,108 +2049,108 @@ lisp_match(char_u *p)
  * Update from Sergey Khorev:
  * I tried to fix the first two issues.
  */
-    int
-get_lisp_indent(void)
+    పూర్ణాంకం
+get_lisp_indent(శూన్య)
 {
     pos_T	*pos, realpos, paren;
-    int		amount;
+    పూర్ణాంకం		amount;
     char_u	*that;
-    colnr_T	col;
+    colnr_T	నిలువు;
     colnr_T	firsttry;
-    int		parencount, quotecount;
-    int		vi_lisp;
+    పూర్ణాంకం		parencount, quotecount;
+    పూర్ణాంకం		vi_lisp;
 
     // Set vi_lisp to use the vi-compatible method
-    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != NULL);
+    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != ఖాళీ);
 
     realpos = curwin->w_cursor;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.నిలువు = 0;
 
-    if ((pos = findmatch(NULL, '(')) == NULL)
-	pos = findmatch(NULL, '[');
-    else
+    ఒకవేళ ((pos = findmatch(ఖాళీ, '(')) == ఖాళీ)
+	pos = findmatch(ఖాళీ, '[');
+    లేకపోతే
     {
 	paren = *pos;
-	pos = findmatch(NULL, '[');
-	if (pos == NULL || LT_POSP(pos, &paren))
+	pos = findmatch(ఖాళీ, '[');
+	ఒకవేళ (pos == ఖాళీ || LT_POSP(pos, &paren))
 	    pos = &paren;
     }
-    if (pos != NULL)
+    ఒకవేళ (pos != ఖాళీ)
     {
 	// Extra trick: Take the indent of the first previous non-white
 	// line that is at the same () level.
 	amount = -1;
 	parencount = 0;
 
-	while (--curwin->w_cursor.lnum >= pos->lnum)
+	అయితే (--curwin->w_cursor.lnum >= pos->lnum)
 	{
-	    if (linewhite(curwin->w_cursor.lnum))
-		continue;
-	    for (that = ml_get_curline(); *that != NUL; ++that)
+	    ఒకవేళ (linewhite(curwin->w_cursor.lnum))
+		కొనసాగు;
+	    కొరకు (that = ml_get_curline(); *that != NUL; ++that)
 	    {
-		if (*that == ';')
+		ఒకవేళ (*that == ';')
 		{
-		    while (*(that + 1) != NUL)
+		    అయితే (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    కొనసాగు;
 		}
-		if (*that == '\\')
+		ఒకవేళ (*that == '\\')
 		{
-		    if (*(that + 1) != NUL)
+		    ఒకవేళ (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    కొనసాగు;
 		}
-		if (*that == '"' && *(that + 1) != NUL)
+		ఒకవేళ (*that == '"' && *(that + 1) != NUL)
 		{
-		    while (*++that && *that != '"')
+		    అయితే (*++that && *that != '"')
 		    {
 			// skipping escaped characters in the string
-			if (*that == '\\')
+			ఒకవేళ (*that == '\\')
 			{
-			    if (*++that == NUL)
-				break;
-			    if (that[1] == NUL)
+			    ఒకవేళ (*++that == NUL)
+				ఆపు;
+			    ఒకవేళ (that[1] == NUL)
 			    {
 				++that;
-				break;
+				ఆపు;
 			    }
 			}
 		    }
-		    if (*that == NUL)
-			break;
+		    ఒకవేళ (*that == NUL)
+			ఆపు;
 		}
-		if (*that == '(' || *that == '[')
+		ఒకవేళ (*that == '(' || *that == '[')
 		    ++parencount;
-		else if (*that == ')' || *that == ']')
+		లేకపోతే ఒకవేళ (*that == ')' || *that == ']')
 		    --parencount;
 	    }
-	    if (parencount == 0)
+	    ఒకవేళ (parencount == 0)
 	    {
 		amount = get_indent();
-		break;
+		ఆపు;
 	    }
 	}
 
-	if (amount == -1)
+	ఒకవేళ (amount == -1)
 	{
 	    curwin->w_cursor.lnum = pos->lnum;
-	    curwin->w_cursor.col = pos->col;
-	    col = pos->col;
+	    curwin->w_cursor.నిలువు = pos->నిలువు;
+	    నిలువు = pos->నిలువు;
 
 	    that = ml_get_curline();
 
-	    if (vi_lisp && get_indent() == 0)
+	    ఒకవేళ (vi_lisp && get_indent() == 0)
 		amount = 2;
-	    else
+	    లేకపోతే
 	    {
-		char_u		*line = that;
+		char_u		*పంక్తి = that;
 		chartabsize_T	cts;
 
-		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
-		while (*cts.cts_ptr != NUL && col > 0)
+		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, పంక్తి, పంక్తి);
+		అయితే (*cts.cts_ptr != NUL && నిలువు > 0)
 		{
 		    cts.cts_vcol += lbr_chartabsize_adv(&cts);
-		    col--;
+		    నిలువు--;
 		}
 		amount = cts.cts_vcol;
 		that = cts.cts_ptr;
@@ -2162,21 +2162,21 @@ get_lisp_indent(void)
 		// (let ((a 1))    instead    (let ((a 1))
 		//   (...))	      of	   (...))
 
-		if (!vi_lisp && (*that == '(' || *that == '[')
-						      && lisp_match(that + 1))
+		ఒకవేళ (!vi_lisp && (*that == '(' || *that == '[')
+						      && lisp_సరిపోలిక(that + 1))
 		    amount += 2;
-		else
+		లేకపోతే
 		{
-		    if (*that != NUL)
+		    ఒకవేళ (*that != NUL)
 		    {
 			that++;
 			amount++;
 		    }
 		    firsttry = amount;
 
-		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - line),
-							   amount, line, that);
-		    while (VIM_ISWHITE(*cts.cts_ptr))
+		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - పంక్తి),
+							   amount, పంక్తి, that);
+		    అయితే (VIM_ISWHITE(*cts.cts_ptr))
 		    {
 			cts.cts_vcol += lbr_chartabsize(&cts);
 			++cts.cts_ptr;
@@ -2185,25 +2185,25 @@ get_lisp_indent(void)
 		    amount = cts.cts_vcol;
 		    clear_chartabsize_arg(&cts);
 
-		    if (*that && *that != ';') // not a comment line
+		    ఒకవేళ (*that && *that != ';') // not a comment line
 		    {
 			// test *that != '(' to accommodate first let/do
 			// argument if it is more than one line
-			if (!vi_lisp && *that != '(' && *that != '[')
+			ఒకవేళ (!vi_lisp && *that != '(' && *that != '[')
 			    firsttry++;
 
 			parencount = 0;
 			quotecount = 0;
 
 			init_chartabsize_arg(&cts, curwin,
-				   (colnr_T)(that - line), amount, line, that);
-			if (vi_lisp
+				   (colnr_T)(that - పంక్తి), amount, పంక్తి, that);
+			ఒకవేళ (vi_lisp
 				|| (*that != '"'
 				    && *that != '\''
 				    && *that != '#'
 				    && (*that < '0' || *that > '9')))
 			{
-			    while (*cts.cts_ptr
+			    అయితే (*cts.cts_ptr
 				    && (!VIM_ISWHITE(*cts.cts_ptr)
 					|| quotecount
 					|| parencount)
@@ -2213,21 +2213,21 @@ get_lisp_indent(void)
 					    && !parencount
 					    && vi_lisp)))
 			    {
-				if (*cts.cts_ptr == '"')
+				ఒకవేళ (*cts.cts_ptr == '"')
 				    quotecount = !quotecount;
-				if ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
+				ఒకవేళ ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
 							       && !quotecount)
 				    ++parencount;
-				if ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
+				ఒకవేళ ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
 							       && !quotecount)
 				    --parencount;
-				if (*cts.cts_ptr == '\\'
+				ఒకవేళ (*cts.cts_ptr == '\\'
 						    && *(cts.cts_ptr+1) != NUL)
 				    cts.cts_vcol += lbr_chartabsize_adv(&cts);
 				cts.cts_vcol += lbr_chartabsize_adv(&cts);
 			    }
 			}
-			while (VIM_ISWHITE(*cts.cts_ptr))
+			అయితే (VIM_ISWHITE(*cts.cts_ptr))
 			{
 			    cts.cts_vcol += lbr_chartabsize(&cts);
 			    ++cts.cts_ptr;
@@ -2236,19 +2236,19 @@ get_lisp_indent(void)
 			amount = cts.cts_vcol;
 			clear_chartabsize_arg(&cts);
 
-			if (!*that || *that == ';')
+			ఒకవేళ (!*that || *that == ';')
 			    amount = firsttry;
 		    }
 		}
 	    }
 	}
     }
-    else
+    లేకపోతే
 	amount = 0;	// no matching '(' or '[' found, use zero indent
 
     curwin->w_cursor = realpos;
 
-    return amount;
+    తిరిగి amount;
 }
 
 /*
@@ -2258,16 +2258,16 @@ get_lisp_indent(void)
  * "get_the_indent" should be get_c_indent, get_expr_indent or get_lisp_indent.
  */
 
-    void
-fixthisline(int (*get_the_indent)(void))
+    శూన్య
+fixthisline(పూర్ణాంకం (*get_the_indent)(శూన్య))
 {
-    int amount = get_the_indent();
+    పూర్ణాంకం amount = get_the_indent();
 
-    if (amount < 0)
-	return;
+    ఒకవేళ (amount < 0)
+	తిరిగి;
 
-    change_indent(INDENT_SET, amount, FALSE, 0, TRUE);
-    if (linewhite(curwin->w_cursor.lnum))
+    change_indent(INDENT_సమితి, amount, FALSE, 0, TRUE);
+    ఒకవేళ (linewhite(curwin->w_cursor.lnum))
 	did_ai = TRUE;	// delete the indent if the line stays empty
 }
 
@@ -2275,83 +2275,83 @@ fixthisline(int (*get_the_indent)(void))
  * Return TRUE if 'indentexpr' should be used for Lisp indenting.
  * Caller may want to check 'autoindent'.
  */
-    int
-use_indentexpr_for_lisp(void)
+    పూర్ణాంకం
+use_indentexpr_for_lisp(శూన్య)
 {
-#ifdef FEAT_EVAL
-    return curbuf->b_p_lisp
+#నిర్వచితమైతే FEAT_EVAL
+    తిరిగి curbuf->b_p_lisp
 		&& *curbuf->b_p_inde != NUL
 		&& STRCMP(curbuf->b_p_lop, "expr:1") == 0;
-#else
-    return FALSE;
-#endif
+#లేకపోతే
+    తిరిగి FALSE;
+#అయితే_ముగింపు
 }
 
 /*
  * Fix indent for 'lisp' and 'cindent'.
  */
-    void
-fix_indent(void)
+    శూన్య
+fix_indent(శూన్య)
 {
-    if (p_paste)
-	return;  // no auto-indenting when 'paste' is set
-    if (curbuf->b_p_lisp && curbuf->b_p_ai)
+    ఒకవేళ (p_paste)
+	తిరిగి;  // no auto-indenting when 'paste' is set
+    ఒకవేళ (curbuf->b_p_lisp && curbuf->b_p_ai)
     {
-	if (use_indentexpr_for_lisp())
-	    do_c_expr_indent();
-	else
+	ఒకవేళ (use_indentexpr_for_lisp())
+	    do_c_సమాసం_indent();
+	లేకపోతే
 	    fixthisline(get_lisp_indent);
     }
-    else if (cindent_on())
-	do_c_expr_indent();
+    లేకపోతే ఒకవేళ (cindent_on())
+	do_c_సమాసం_indent();
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * "indent()" function
  */
-    void
+    శూన్య
 f_indent(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	rettv->vval.v_number = get_indent_lnum(lnum);
-    else
+    ఒకవేళ (lnum >= 1 && lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
+	rettv->vval.v_సంఖ్య = get_indent_lnum(lnum);
+    లేకపోతే
     {
-	if (in_vim9script())
-	    semsg(_(e_invalid_line_number_nr), lnum);
-	rettv->vval.v_number = -1;
+	ఒకవేళ (లోపల_vim9script())
+	    semsg(_(e_invalid_పంక్తి_సంఖ్య_nr), lnum);
+	rettv->vval.v_సంఖ్య = -1;
     }
 }
 
 /*
  * "lispindent(lnum)" function
  */
-    void
-f_lispindent(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_lispindent(typval_T *argvars వాడని, typval_T *rettv)
 {
     pos_T	pos;
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    ఒకవేళ (lnum >= 1 && lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_lisp_indent();
+	rettv->vval.v_సంఖ్య = get_lisp_indent();
 	curwin->w_cursor = pos;
     }
-    else if (in_vim9script())
-	semsg(_(e_invalid_line_number_nr), lnum);
-    else
-	rettv->vval.v_number = -1;
+    లేకపోతే ఒకవేళ (లోపల_vim9script())
+	semsg(_(e_invalid_పంక్తి_సంఖ్య_nr), lnum);
+    లేకపోతే
+	rettv->vval.v_సంఖ్య = -1;
 }
-#endif
+#అయితే_ముగింపు

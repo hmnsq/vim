@@ -11,28 +11,28 @@
  * gc.c: Garbage Collection
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+స్థిర పూర్ణాంకం current_copyID = 0;
 
-static int free_unref_items(int copyID);
+స్థిర పూర్ణాంకం free_unref_వస్తువులు(పూర్ణాంకం copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
-get_copyID(void)
+    పూర్ణాంకం
+get_copyID(శూన్య)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    తిరిగి current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    పూర్ణాంకం
+garbage_collect(పూర్ణాంకం testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    పూర్ణాంకం		copyID;
+    పూర్ణాంకం		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    పూర్ణాంకం		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    ఒకవేళ (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,26 +79,26 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    ఒకవేళ (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	పూర్ణాంకం	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	ఒకవేళ (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	ఒకవేళ (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
-	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    pp = vim_realloc(exestack.ga_దత్తాంశం, new_len);
+	    ఒకవేళ (pp == ఖాళీ)
+		తిరిగి FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
-	    exestack.ga_data = pp;
+	    exestack.ga_దత్తాంశం = pp;
 	}
     }
 
@@ -114,7 +114,7 @@ garbage_collect(int testing)
     // Don't free variables in the previous_funccal list unless they are only
     // referenced through previous_funccal.  This must be first, because if
     // the item is referenced elsewhere the funccal must not be freed.
-    abort = abort || set_ref_in_previous_funccal(copyID);
+    abort = abort || సమితి_ref_లోపల_మునుపటి_funccal(copyID);
 
     // script-local variables
     abort = abort || garbage_collect_scriptvars(copyID);
@@ -122,120 +122,120 @@ garbage_collect(int testing)
     // buffer-local variables
     FOR_ALL_BUFFERS(buf)
     {
-	abort = abort || set_ref_in_item(&buf->b_bufvar.di_tv, copyID,
-							NULL, NULL, NULL);
-	abort = abort || set_ref_in_list(buf->b_recorded_changes, copyID);
+	abort = abort || సమితి_ref_లోపల_అంశం(&buf->b_bufvar.di_tv, copyID,
+							ఖాళీ, ఖాళీ, ఖాళీ);
+	abort = abort || సమితి_ref_లోపల_list(buf->b_recorded_changes, copyID);
     }
 
     // window-local variables
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-							NULL, NULL, NULL);
+	abort = abort || సమితి_ref_లోపల_అంశం(&wp->w_winvar.di_tv, copyID,
+							ఖాళీ, ఖాళీ, ఖాళీ);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
-	    abort = abort || set_ref_in_item(
-		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
-#ifdef FEAT_PROP_POPUP
+    కొరకు (పూర్ణాంకం i = 0; i < AUCMD_WIN_లెక్క; ++i)
+	ఒకవేళ (aucmd_win[i].auc_win != ఖాళీ)
+	    abort = abort || సమితి_ref_లోపల_అంశం(
+		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
+#నిర్వచితమైతే FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
-	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+	abort = abort || సమితి_ref_లోపల_అంశం(&wp->w_winvar.di_tv, copyID,
+								  ఖాళీ, ఖాళీ, ఖాళీ);
     FOR_ALL_TABPAGES(tp)
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
-#endif
+	FOR_ALL_POPUPWINS_లోపల_TAB(tp, wp)
+		abort = abort || సమితి_ref_లోపల_అంశం(&wp->w_winvar.di_tv, copyID,
+								  ఖాళీ, ఖాళీ, ఖాళీ);
+#అయితే_ముగింపు
 
     // tabpage-local variables
     FOR_ALL_TABPAGES(tp)
-	abort = abort || set_ref_in_item(&tp->tp_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+	abort = abort || సమితి_ref_లోపల_అంశం(&tp->tp_winvar.di_tv, copyID,
+								  ఖాళీ, ఖాళీ, ఖాళీ);
     // global variables
     abort = abort || garbage_collect_globvars(copyID);
 
     // function-local variables
-    abort = abort || set_ref_in_call_stack(copyID);
+    abort = abort || సమితి_ref_లోపల_call_దొంతర(copyID);
 
     // named functions (matters for closures)
-    abort = abort || set_ref_in_functions(copyID);
+    abort = abort || సమితి_ref_లోపల_functions(copyID);
 
     // function call arguments, if v:testing is set.
-    abort = abort || set_ref_in_func_args(copyID);
+    abort = abort || సమితి_ref_లోపల_func_వాదనలు(copyID);
 
     // funcstacks keep variables for closures
-    abort = abort || set_ref_in_funcstacks(copyID);
+    abort = abort || సమితి_ref_లోపల_funcstacks(copyID);
 
     // loopvars keep variables for loop blocks
-    abort = abort || set_ref_in_loopvars(copyID);
+    abort = abort || సమితి_ref_లోపల_loopvars(copyID);
 
     // v: vars
     abort = abort || garbage_collect_vimvars(copyID);
 
     // callbacks in buffers
-    abort = abort || set_ref_in_buffers(copyID);
+    abort = abort || సమితి_ref_లోపల_buffers(copyID);
 
     // 'completefunc', 'omnifunc' and 'thesaurusfunc' callbacks
-    abort = abort || set_ref_in_insexpand_funcs(copyID);
+    abort = abort || సమితి_ref_లోపల_insexpand_funcs(copyID);
 
     // 'operatorfunc' callback
-    abort = abort || set_ref_in_opfunc(copyID);
+    abort = abort || సమితి_ref_లోపల_opfunc(copyID);
 
     // 'tagfunc' callback
-    abort = abort || set_ref_in_tagfunc(copyID);
+    abort = abort || సమితి_ref_లోపల_tagfunc(copyID);
 
     // 'imactivatefunc' and 'imstatusfunc' callbacks
-    abort = abort || set_ref_in_im_funcs(copyID);
+    abort = abort || సమితి_ref_లోపల_im_funcs(copyID);
 
     // 'findfunc' callback
-    abort = abort || set_ref_in_findfunc(copyID);
+    abort = abort || సమితి_ref_లోపల_findfunc(copyID);
 
-#ifdef FEAT_LUA
-    abort = abort || set_ref_in_lua(copyID);
-#endif
+#నిర్వచితమైతే FEAT_LUA
+    abort = abort || సమితి_ref_లోపల_lua(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_PYTHON
-    abort = abort || set_ref_in_python(copyID);
-#endif
+#నిర్వచితమైతే FEAT_PYTHON
+    abort = abort || సమితి_ref_లోపల_python(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_PYTHON3
-    abort = abort || set_ref_in_python3(copyID);
-#endif
+#నిర్వచితమైతే FEAT_PYTHON3
+    abort = abort || సమితి_ref_లోపల_python3(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_JOB_CHANNEL
-    abort = abort || set_ref_in_channel(copyID);
-    abort = abort || set_ref_in_job(copyID);
-#endif
-#ifdef FEAT_NETBEANS_INTG
-    abort = abort || set_ref_in_nb_channel(copyID);
-#endif
-#ifdef FEAT_SOCKETSERVER
-    abort = abort || set_ref_in_socketserver_channel(copyID);
-#endif
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+    abort = abort || సమితి_ref_లోపల_channel(copyID);
+    abort = abort || సమితి_ref_లోపల_పని(copyID);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
+    abort = abort || సమితి_ref_లోపల_nb_channel(copyID);
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_SOCKETSERVER
+    abort = abort || సమితి_ref_లోపల_socketserver_channel(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_TIMERS
-    abort = abort || set_ref_in_timer(copyID);
-#endif
+#నిర్వచితమైతే FEAT_TIMERS
+    abort = abort || సమితి_ref_లోపల_timer(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_QUICKFIX
-    abort = abort || set_ref_in_quickfix(copyID);
-#endif
+#నిర్వచితమైతే FEAT_QUICKFIX
+    abort = abort || సమితి_ref_లోపల_quickfix(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_TERMINAL
-    abort = abort || set_ref_in_term(copyID);
-#endif
+#నిర్వచితమైతే FEAT_TERMINAL
+    abort = abort || సమితి_ref_లోపల_పదం(copyID);
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROP_POPUP
-    abort = abort || set_ref_in_popups(copyID);
-#endif
+#నిర్వచితమైతే FEAT_PROP_POPUP
+    abort = abort || సమితి_ref_లోపల_popups(copyID);
+#అయితే_ముగింపు
 
-    abort = abort || set_ref_in_classes(copyID);
+    abort = abort || సమితి_ref_లోపల_classes(copyID);
 
-    if (!abort)
+    ఒకవేళ (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
 	 */
-	did_free = free_unref_items(copyID);
+	did_free = free_unref_వస్తువులు(copyID);
 
 	/*
 	 * 3. Check if any funccal can be freed now.
@@ -243,26 +243,26 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    లేకపోతే ఒకవేళ (p_verbose > 0)
     {
-	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
+	verb_సందేశం(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    తిరిగి did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    స్థిర పూర్ణాంకం
+free_unref_వస్తువులు(పూర్ణాంకం copyID)
 {
-    int		did_free = FALSE;
+    పూర్ణాంకం		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
     // do that here.
-    in_free_unref_items = TRUE;
+    లోపల_free_unref_వస్తువులు = TRUE;
 
     /*
      * PASS 1: free the contents of the items.  We don't free the items
@@ -284,37 +284,37 @@ free_unref_items(int copyID)
     // Go through the list of classes and free items without this copyID.
     did_free |= class_free_nonref(copyID);
 
-#ifdef FEAT_JOB_CHANNEL
+#నిర్వచితమైతే FEAT_పని_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
     // must happen before doing channels, because jobs refer to channels, but
     // the reference from the channel to the job isn't tracked.
-    did_free |= free_unused_jobs_contents(copyID, COPYID_MASK);
+    did_free |= free_వాడని_jobs_contents(copyID, COPYID_ముసుగు);
 
     // Go through the list of channels and free items without the copyID.
-    did_free |= free_unused_channels_contents(copyID, COPYID_MASK);
-#endif
+    did_free |= free_వాడని_channels_contents(copyID, COPYID_ముసుగు);
+#అయితే_ముగింపు
 
     /*
      * PASS 2: free the items themselves.
      */
-    object_free_items(copyID);
-    dict_free_items(copyID);
-    list_free_items(copyID);
-    tuple_free_items(copyID);
+    object_free_వస్తువులు(copyID);
+    dict_free_వస్తువులు(copyID);
+    list_free_వస్తువులు(copyID);
+    tuple_free_వస్తువులు(copyID);
 
-#ifdef FEAT_JOB_CHANNEL
+#నిర్వచితమైతే FEAT_పని_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
     // must happen before doing channels, because jobs refer to channels, but
     // the reference from the channel to the job isn't tracked.
-    free_unused_jobs(copyID, COPYID_MASK);
+    free_వాడని_jobs(copyID, COPYID_ముసుగు);
 
     // Go through the list of channels and free items without the copyID.
-    free_unused_channels(copyID, COPYID_MASK);
-#endif
+    free_వాడని_channels(copyID, COPYID_ముసుగు);
+#అయితే_ముగింపు
 
-    in_free_unref_items = FALSE;
+    లోపల_free_unref_వస్తువులు = FALSE;
 
-    return did_free;
+    తిరిగి did_free;
 }
 
 /*
@@ -323,82 +323,82 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_ht(
+    పూర్ణాంకం
+సమితి_ref_లోపల_ht(
     hashtab_T		*ht,
-    int			copyID,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    int		todo;
-    int		abort = FALSE;
+    పూర్ణాంకం		todo;
+    పూర్ణాంకం		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
-    ht_stack_T	*ht_stack = NULL;
-    ht_stack_T	*tempitem;
+    ht_దొంతర_T	*ht_దొంతర = ఖాళీ;
+    ht_దొంతర_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    కొరకు (;;)
     {
-	if (!abort)
+	ఒకవేళ (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (పూర్ణాంకం)cur_ht->ht_వాడిన;
+	    FOR_ALL_HASHTAB_వస్తువులు(cur_ht, hi, todo)
+		ఒకవేళ (!HASHITEM_ఖాళీలు(hi))
 		{
 		    --todo;
 		    abort = abort
-			|| set_ref_in_item(&HI2DI(hi)->di_tv, copyID,
-				       &ht_stack, list_stack, tuple_stack);
+			|| సమితి_ref_లోపల_అంశం(&HI2DI(hi)->di_tv, copyID,
+				       &ht_దొంతర, list_దొంతర, tuple_దొంతర);
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	ఒకవేళ (ht_దొంతర == ఖాళీ)
+	    ఆపు;
 
 	// take an item from the stack
-	cur_ht = ht_stack->ht;
-	tempitem = ht_stack;
-	ht_stack = ht_stack->prev;
-	free(tempitem);
+	cur_ht = ht_దొంతర->ht;
+	tempitem = ht_దొంతర;
+	ht_దొంతర = ht_దొంతర->prev;
+	విడుదల(tempitem);
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ఒకవేళ defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_dict(dict_T *d, పూర్ణాంకం copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    ఒకవేళ (d != ఖాళీ && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	తిరిగి సమితి_ref_లోపల_ht(&d->dv_hashtab, copyID, ఖాళీ, ఖాళీ);
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_list(list_T *ll, పూర్ణాంకం copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    ఒకవేళ (ll != ఖాళీ && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	తిరిగి సమితి_ref_లోపల_list_వస్తువులు(ll, copyID, ఖాళీ, ఖాళీ);
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -407,55 +407,55 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list_items(
+    పూర్ణాంకం
+సమితి_ref_లోపల_list_వస్తువులు(
     list_T		*l,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    పూర్ణాంకం		 abort = FALSE;
     list_T	 *cur_l;
-    list_stack_T *list_stack = NULL;
-    list_stack_T *tempitem;
+    list_దొంతర_T *list_దొంతర = ఖాళీ;
+    list_దొంతర_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    కొరకు (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	ఒకవేళ (!abort && cur_l->lv_మొదటి != &range_list_అంశం)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
-		abort = abort || set_ref_in_item(&li->li_tv, copyID,
-				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+	    కొరకు (li = cur_l->lv_మొదటి; !abort && li != ఖాళీ; li = li->li_తదుపరి)
+		abort = abort || సమితి_ref_లోపల_అంశం(&li->li_tv, copyID,
+				       ht_దొంతర, &list_దొంతర, tuple_దొంతర);
+	ఒకవేళ (list_దొంతర == ఖాళీ)
+	    ఆపు;
 
 	// take an item from the stack
-	cur_l = list_stack->list;
-	tempitem = list_stack;
-	list_stack = list_stack->prev;
-	free(tempitem);
+	cur_l = list_దొంతర->list;
+	tempitem = list_దొంతర;
+	list_దొంతర = list_దొంతర->prev;
+	విడుదల(tempitem);
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_tuple(tuple_T *tuple, పూర్ణాంకం copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    ఒకవేళ (tuple != ఖాళీ && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	తిరిగి సమితి_ref_లోపల_tuple_వస్తువులు(tuple, copyID, ఖాళీ, ఖాళీ);
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -464,356 +464,356 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple_items(
+    పూర్ణాంకం
+సమితి_ref_లోపల_tuple_వస్తువులు(
     tuple_T		*tuple,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర)
 {
-    int			abort = FALSE;
+    పూర్ణాంకం			abort = FALSE;
     tuple_T		*cur_t;
-    tuple_stack_T	*tuple_stack = NULL;
-    tuple_stack_T	*tempitem;
+    tuple_దొంతర_T	*tuple_దొంతర = ఖాళీ;
+    tuple_దొంతర_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    కొరకు (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	కొరకు (పూర్ణాంకం i = 0; i < cur_t->tv_వస్తువులు.ga_len; i++)
 	{
-	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
+	    typval_T *tv = ((typval_T *)cur_t->tv_వస్తువులు.ga_దత్తాంశం) + i;
 	    abort = abort
-		|| set_ref_in_item(tv, copyID,
-			ht_stack, list_stack, &tuple_stack);
+		|| సమితి_ref_లోపల_అంశం(tv, copyID,
+			ht_దొంతర, list_దొంతర, &tuple_దొంతర);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	ఒకవేళ (tuple_దొంతర == ఖాళీ)
+	    ఆపు;
 
 	// take an item from the stack
-	cur_t = tuple_stack->tuple;
-	tempitem = tuple_stack;
-	tuple_stack = tuple_stack->prev;
-	free(tempitem);
+	cur_t = tuple_దొంతర->tuple;
+	tempitem = tuple_దొంతర;
+	tuple_దొంతర = tuple_దొంతర->prev;
+	విడుదల(tempitem);
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    పూర్ణాంకం
+సమితి_ref_లోపల_callback(callback_T *cb, పూర్ణాంకం copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    ఒకవేళ (cb->cb_name == ఖాళీ || *cb->cb_name == NUL || cb->cb_partial == ఖాళీ)
+	తిరిగి FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    తిరిగి సమితి_ref_లోపల_అంశం(&tv, copyID, ఖాళీ, ఖాళీ, ఖాళీ);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_dict(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_dict(
     dict_T		*dd,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (dd == ఖాళీ || dd->dv_copyID == copyID)
+	తిరిగి FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    ఒకవేళ (ht_దొంతర == ఖాళీ)
+	తిరిగి సమితి_ref_లోపల_ht(&dd->dv_hashtab, copyID, list_దొంతర, tuple_దొంతర);
 
-    ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ht_దొంతర_T *newitem = ALLOC_ONE(ht_దొంతర_T);
+    ఒకవేళ (newitem == ఖాళీ)
+	తిరిగి TRUE;
 
     newitem->ht = &dd->dv_hashtab;
-    newitem->prev = *ht_stack;
-    *ht_stack = newitem;
+    newitem->prev = *ht_దొంతర;
+    *ht_దొంతర = newitem;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_list(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_list(
     list_T		*ll,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (ll == ఖాళీ || ll->lv_copyID == copyID)
+	తిరిగి FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    ఒకవేళ (list_దొంతర == ఖాళీ)
+	తిరిగి సమితి_ref_లోపల_list_వస్తువులు(ll, copyID, ht_దొంతర, tuple_దొంతర);
 
-    list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    list_దొంతర_T *newitem = ALLOC_ONE(list_దొంతర_T);
+    ఒకవేళ (newitem == ఖాళీ)
+	తిరిగి TRUE;
 
     newitem->list = ll;
-    newitem->prev = *list_stack;
-    *list_stack = newitem;
+    newitem->prev = *list_దొంతర;
+    *list_దొంతర = newitem;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_tuple(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_tuple(
     tuple_T		*tt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (tt == ఖాళీ || tt->tv_copyID == copyID)
+	తిరిగి FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    ఒకవేళ (tuple_దొంతర == ఖాళీ)
+	తిరిగి సమితి_ref_లోపల_tuple_వస్తువులు(tt, copyID, ht_దొంతర, list_దొంతర);
 
-    tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    tuple_దొంతర_T *newitem = ALLOC_ONE(tuple_దొంతర_T);
+    ఒకవేళ (newitem == ఖాళీ)
+	తిరిగి TRUE;
 
     newitem->tuple = tt;
-    newitem->prev = *tuple_stack;
-    *tuple_stack = newitem;
+    newitem->prev = *tuple_దొంతర;
+    *tuple_దొంతర = newitem;
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_partial(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_partial(
     partial_T		*pt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (pt == ఖాళీ || pt->pt_copyID == copyID)
+	తిరిగి FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    పూర్ణాంకం abort = సమితి_ref_లోపల_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    ఒకవేళ (pt->pt_dict != ఖాళీ)
     {
 	typval_T dtv;
 
 	dtv.v_type = VAR_DICT;
 	dtv.vval.v_dict = pt->pt_dict;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
 
-    if (pt->pt_obj != NULL)
+    ఒకవేళ (pt->pt_obj != ఖాళీ)
     {
 	typval_T objtv;
 
 	objtv.v_type = VAR_OBJECT;
 	objtv.vval.v_object = pt->pt_obj;
-	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
+	సమితి_ref_లోపల_అంశం(&objtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
-	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
-		ht_stack, list_stack, tuple_stack);
+    కొరకు (పూర్ణాంకం i = 0; i < pt->pt_argc; ++i)
+	abort = abort || సమితి_ref_లోపల_అంశం(&pt->pt_argv[i], copyID,
+		ht_దొంతర, list_దొంతర, tuple_దొంతర);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    తిరిగి abort;
 }
 
-#ifdef FEAT_JOB_CHANNEL
+#నిర్వచితమైతే FEAT_పని_CHANNEL
 /*
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_job(
-    job_T		*job,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_పని(
+    పని_T		*పని,
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (పని == ఖాళీ || పని->jv_copyID == copyID)
+	తిరిగి FALSE;
 
-    job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    పని->jv_copyID = copyID;
+    ఒకవేళ (పని->jv_channel != ఖాళీ)
     {
 	dtv.v_type = VAR_CHANNEL;
-	dtv.vval.v_channel = job->jv_channel;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	dtv.vval.v_channel = పని->jv_channel;
+	సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    ఒకవేళ (పని->jv_exit_cb.cb_partial != ఖాళీ)
     {
 	dtv.v_type = VAR_PARTIAL;
-	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	dtv.vval.v_partial = పని->jv_exit_cb.cb_partial;
+	సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
 
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_channel(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_channel(
     channel_T		*ch,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (ch == ఖాళీ || ch->ch_copyID == copyID)
+	తిరిగి FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    కొరకు (ch_part_T part = PART_SOCK; part < PART_లెక్క; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
-		jq != NULL; jq = jq->jq_next)
-	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
-		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	కొరకు (jsonq_T *jq = ch->ch_part[part].ch_json_తల.jq_తదుపరి;
+		jq != ఖాళీ; jq = jq->jq_తదుపరి)
+	    సమితి_ref_లోపల_అంశం(jq->jq_విలువ, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
+	కొరకు (cbq_T *cq = ch->ch_part[part].ch_cb_తల.cq_తదుపరి; cq != ఖాళీ;
+		cq = cq->cq_తదుపరి)
+	    ఒకవేళ (cq->cq_callback.cb_partial != ఖాళీ)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
-		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+		సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	ఒకవేళ (ch->ch_part[part].ch_callback.cb_partial != ఖాళీ)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
-	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	    సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    ఒకవేళ (ch->ch_callback.cb_partial != ఖాళీ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    ఒకవేళ (ch->ch_close_cb.cb_partial != ఖాళీ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	సమితి_ref_లోపల_అంశం(&dtv, copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
 
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
-set_ref_in_item_class(
+    పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_class(
     class_T		*cl,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    int abort = FALSE;
+    పూర్ణాంకం abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (cl == ఖాళీ || cl->class_copyID == copyID)
+	తిరిగి FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    ఒకవేళ (cl->class_members_tv != ఖాళీ)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
-	    abort = abort || set_ref_in_item(
+	కొరకు (పూర్ణాంకం i = 0; !abort && i < cl->class_class_member_లెక్క; ++i)
+	    abort = abort || సమితి_ref_లోపల_అంశం(
 		    &cl->class_members_tv[i],
-		    copyID, ht_stack, list_stack, tuple_stack);
+		    copyID, ht_దొంతర, list_దొంతర, tuple_దొంతర);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    కొరకు (పూర్ణాంకం i = 0; !abort && i < cl->class_class_function_లెక్క; ++i)
+	abort = abort || సమితి_ref_లోపల_func(ఖాళీ,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    కొరకు (పూర్ణాంకం i = 0; !abort && i < cl->class_obj_పద్ధతి_లెక్క; ++i)
+	abort = abort || సమితి_ref_లోపల_func(ఖాళీ,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    తిరిగి abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
-set_ref_in_item_object(
+    స్థిర పూర్ణాంకం
+సమితి_ref_లోపల_అంశం_object(
     object_T		*obj,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    పూర్ణాంకం			copyID,
+    ht_దొంతర_T		**ht_దొంతర,
+    list_దొంతర_T	**list_దొంతర,
+    tuple_దొంతర_T	**tuple_దొంతర)
 {
-    int abort = FALSE;
+    పూర్ణాంకం abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    ఒకవేళ (obj == ఖాళీ || obj->obj_copyID == copyID)
+	తిరిగి FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
-	    && i < obj->obj_class->class_obj_member_count; ++i)
-	abort = abort || set_ref_in_item(mtv + i, copyID,
-		ht_stack, list_stack, tuple_stack);
+    కొరకు (పూర్ణాంకం i = 0; !abort
+	    && i < obj->obj_class->class_obj_member_లెక్క; ++i)
+	abort = abort || సమితి_ref_లోపల_అంశం(mtv + i, copyID,
+		ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-    return abort;
+    తిరిగి abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_item(
+    పూర్ణాంకం
+సమితి_ref_లోపల_అంశం(
     typval_T	    *tv,
-    int		    copyID,
-    ht_stack_T	    **ht_stack,
-    list_stack_T    **list_stack,
-    tuple_stack_T   **tuple_stack)
+    పూర్ణాంకం		    copyID,
+    ht_దొంతర_T	    **ht_దొంతర,
+    list_దొంతర_T    **list_దొంతర,
+    tuple_దొంతర_T   **tuple_దొంతర)
 {
-    int		abort = FALSE;
+    పూర్ణాంకం		abort = FALSE;
 
-    switch (tv->v_type)
+    ఎంపిక (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	స్థితి VAR_DICT:
+	    తిరిగి సమితి_ref_లోపల_అంశం_dict(tv->vval.v_dict, copyID,
+					 ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	స్థితి VAR_LIST:
+	    తిరిగి సమితి_ref_లోపల_అంశం_list(tv->vval.v_list, copyID,
+					 ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
-					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	స్థితి VAR_TUPLE:
+	    తిరిగి సమితి_ref_లోపల_అంశం_tuple(tv->vval.v_tuple, copyID,
+					 ht_దొంతర, list_దొంతర, tuple_దొంతర);
+	స్థితి VAR_FUNC:
 	{
-	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    abort = సమితి_ref_లోపల_func(tv->vval.v_string, ఖాళీ, copyID);
+	    ఆపు;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
-					ht_stack, list_stack, tuple_stack);
+	స్థితి VAR_PARTIAL:
+	    తిరిగి సమితి_ref_లోపల_అంశం_partial(tv->vval.v_partial, copyID,
+					ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-	case VAR_JOB:
-#ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
-#endif
+	స్థితి VAR_పని:
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	    తిరిగి సమితి_ref_లోపల_అంశం_పని(tv->vval.v_పని, copyID,
+					ht_దొంతర, list_దొంతర, tuple_దొంతర);
+#లేకపోతే
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case VAR_CHANNEL:
-#ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
-#endif
+	స్థితి VAR_CHANNEL:
+#నిర్వచితమైతే FEAT_పని_CHANNEL
+	    తిరిగి సమితి_ref_లోపల_అంశం_channel(tv->vval.v_channel, copyID,
+					ht_దొంతర, list_దొంతర, tuple_దొంతర);
+#లేకపోతే
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
-					ht_stack, list_stack, tuple_stack);
+	స్థితి VAR_CLASS:
+	    తిరిగి సమితి_ref_లోపల_అంశం_class(tv->vval.v_class, copyID,
+					ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
-					ht_stack, list_stack, tuple_stack);
+	స్థితి VAR_OBJECT:
+	    తిరిగి సమితి_ref_లోపల_అంశం_object(tv->vval.v_object, copyID,
+					ht_దొంతర, list_దొంతర, tuple_దొంతర);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	స్థితి VAR_UNKNOWN:
+	స్థితి VAR_ANY:
+	స్థితి VAR_VOID:
+	స్థితి VAR_BOOL:
+	స్థితి VAR_SPECIAL:
+	స్థితి VAR_సంఖ్య:
+	స్థితి VAR_FLOAT:
+	స్థితి VAR_STRING:
+	స్థితి VAR_BLOB:
+	స్థితి VAR_TYPEALIAS:
+	స్థితి VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    ఆపు;
     }
 
-    return abort;
+    తిరిగి abort;
 }
 
-#endif
+#అయితే_ముగింపు

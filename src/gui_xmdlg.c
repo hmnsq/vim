@@ -16,40 +16,40 @@
  * when using a dynamic scrollbar policy.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/PushBG.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Label.h>
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/DialogS.h>
-#include <Xm/List.h>
-#include <Xm/RowColumn.h>
-#include <Xm/AtomMgr.h>
-#include <Xm/Protocols.h>
+#అన్తర్భావ <Xm/Form.h>
+#అన్తర్భావ <Xm/PushBG.h>
+#అన్తర్భావ <Xm/Text.h>
+#అన్తర్భావ <Xm/TextF.h>
+#అన్తర్భావ <Xm/Label.h>
+#అన్తర్భావ <Xm/Frame.h>
+#అన్తర్భావ <Xm/LabelG.h>
+#అన్తర్భావ <Xm/ToggleBG.h>
+#అన్తర్భావ <Xm/SeparatoG.h>
+#అన్తర్భావ <Xm/DialogS.h>
+#అన్తర్భావ <Xm/List.h>
+#అన్తర్భావ <Xm/RowColumn.h>
+#అన్తర్భావ <Xm/AtomMgr.h>
+#అన్తర్భావ <Xm/Protocols.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#అన్తర్భావ <X11/keysym.h>
+#అన్తర్భావ <X11/Xatom.h>
+#అన్తర్భావ <X11/StringDefs.h>
+#అన్తర్భావ <X11/Intrinsic.h>
 
-extern Widget vimShell;
+బాహ్య Widget vimShell;
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 # define apply_fontlist(w) gui_motif_menu_fontlist(w)
-#else
+#లేకపోతే
 # define apply_fontlist(w)
-#endif
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////////////////////
 // Font selection dialogue implementation.
 
-static char wild[3] = "*";
+స్థిర అక్షరం wild[3] = "*";
 
 /*
  * FIXME: This is a generic function, which should be used throughout the whole
@@ -60,41 +60,41 @@ static char wild[3] = "*";
  * WM_DELETE_WINDOW protocol request for the window.
  */
 
-    static void
-add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
+    స్థిర శూన్య
+కూడు_cancel_action(Widget shell, XtCallbackProc close_callback, శూన్య *arg)
 {
-    static Atom wmp_atom = 0;
-    static Atom dw_atom = 0;
+    స్థిర Atom wmp_atom = 0;
+    స్థిర Atom dw_atom = 0;
     Display *display = XtDisplay(shell);
 
     // deactivate the built-in delete response of killing the application
-    XtVaSetValues(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_సమితి_విలువలు(shell, XmNdeleteResponse, XmDO_NOTHING, ఖాళీ);
 
     // add a delete window protocol callback instead
-    if (!dw_atom)
+    ఒకవేళ (!dw_atom)
     {
 	wmp_atom = XmInternAtom(display, "WM_PROTOCOLS", True);
 	dw_atom = XmInternAtom(display, "WM_DELETE_WINDOW", True);
     }
-    XmAddProtocolCallback(shell, wmp_atom, dw_atom, close_callback, arg);
+    Xm_కూడు_Protocol_Callback(shell, wmp_atom, dw_atom, close_callback, arg);
 }
 
-#define MAX_FONTS			65535
-#define MAX_FONT_NAME_LEN		256
-#define MAX_ENTRIES_IN_LIST		5000
-#define MAX_DISPLAY_SIZE		150
-#define TEMP_BUF_SIZE			256
+#నిర్వచించు MAX_FONTS			65535
+#నిర్వచించు MAX_FONT_NAME_LEN		256
+#నిర్వచించు MAX_ENTRIES_లోపల_LIST		5000
+#నిర్వచించు MAX_DISPLAY_కొలత		150
+#నిర్వచించు తాత్కాలిక_BUF_కొలత			256
 
-enum ListSpecifier
+గణన ListSpecifier
 {
     ENCODING,
     NAME,
     STYLE,
-    SIZE,
+    కొలత_3,
     NONE
 };
 
-typedef struct _SharedFontSelData
+రకనిర్వచనం నిర్మాణం Shared_Font_Sel_దత్తాంశం
 {
     Widget	dialog;
     Widget	ok;
@@ -104,108 +104,108 @@ typedef struct _SharedFontSelData
     Widget	list[NONE];
     Widget	name;
     Widget	sample;
-    char	**names;	// font name array of arrays
-    int		num;		// number of font names
+    అక్షరం	**పేర్లు;	// font name array of arrays
+    పూర్ణాంకం		అంకె;		// number of font names
     String	sel[NONE];	// selection category
-    Boolean	in_pixels;	// toggle state - size in pixels
-    char	*font_name;	// current font name
+    Boolean	లోపల_pixels;	// toggle state - size in pixels
+    అక్షరం	*font_name;	// current font name
     XFontStruct	*old;		// font data structure for sample display
     XmFontList	old_list;	// font data structure for sample display
-    Boolean	exit;		// used for program exit control
-} SharedFontSelData;
+    Boolean	నిష్క్రమించు;		// used for program exit control
+} Shared_Font_Sel_దత్తాంశం_2;
 
 /*
  * Checking access to the font name array for validity.
  */
-    static char *
-fn(SharedFontSelData *data, int i)
+    స్థిర అక్షరం *
+fn(Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం, పూర్ణాంకం i)
 {
     // Assertion checks:
-    if (data->num < 0)
+    ఒకవేళ (దత్తాంశం->అంకె < 0)
 	abort();
-    if (i >= data->num)
-	i = data->num - 1;
-    if (i < 0)
+    ఒకవేళ (i >= దత్తాంశం->అంకె)
+	i = దత్తాంశం->అంకె - 1;
+    ఒకవేళ (i < 0)
 	i = 0;
 
-    return data->names[i];
+    తిరిగి దత్తాంశం->పేర్లు[i];
 }
 
 /*
  * Get a specific substring from a font name.
  */
-    static void
-get_part(char *in, int pos, char *out)
+    స్థిర శూన్య
+get_part(అక్షరం *లోపల, పూర్ణాంకం pos, అక్షరం *బహిర్గతం)
 {
-    int	i;
-    int j;
+    పూర్ణాంకం	i;
+    పూర్ణాంకం j;
 
-    *out = '\0';
+    *బహిర్గతం = '\0';
 
-    for (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
-	if (in[i] == '-')
+    కొరకు (i = 0; (pos > 0) && (లోపల[i] != '\0'); ++i)
+	ఒకవేళ (లోపల[i] == '-')
 	    pos--;
 
-    if (in[i] == '\0')
-	return;
+    ఒకవేళ (లోపల[i] == '\0')
+	తిరిగి;
 
-    for (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
-	out[j] = in[i];
-    out[j] = '\0';
+    కొరకు (j = 0; (లోపల[i] != '-') && (లోపల[i] != '\0'); ++i, ++j)
+	బహిర్గతం[j] = లోపల[i];
+    బహిర్గతం[j] = '\0';
 }
 
 /*
  * Given a font name this function returns the part used in the first
  * scroll list.
  */
-    static void
-name_part(char *font, char *buf)
+    స్థిర శూన్య
+name_part(అక్షరం *font, అక్షరం *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    అక్షరం    buf2[తాత్కాలిక_BUF_కొలత];
+    అక్షరం    buf3[తాత్కాలిక_BUF_కొలత];
 
     get_part(font, 2, buf2);
     get_part(font, 1, buf3);
 
-    if (*buf3 != NUL)
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s (%s)", buf2, buf3);
-    else
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s", buf2);
+    ఒకవేళ (*buf3 != NUL)
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s (%s)", buf2, buf3);
+    లేకపోతే
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s", buf2);
 }
 
 /*
  * Given a font name this function returns the part used in the second scroll list.
  */
-    static void
-style_part(char *font, char *buf)
+    స్థిర శూన్య
+style_part(అక్షరం *font, అక్షరం *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    అక్షరం    buf2[తాత్కాలిక_BUF_కొలత];
+    అక్షరం    buf3[తాత్కాలిక_BUF_కొలత];
 
     get_part(font, 3, buf3);
     get_part(font, 5, buf2);
 
-    if (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
+    ఒకవేళ (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
 						   && !strcmp(buf2, "NORMAL"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s %s", buf3, buf2);
-    else
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s %s", buf3, buf2);
+    లేకపోతే
 	strcpy(buf, buf3);
 
     get_part(font, 6, buf2);
 
-    if (buf2[0] != '\0')
-	vim_snprintf(buf3, TEMP_BUF_SIZE, "%s %s", buf, buf2);
-    else
+    ఒకవేళ (buf2[0] != '\0')
+	vim_snprintf(buf3, తాత్కాలిక_BUF_కొలత, "%s %s", buf, buf2);
+    లేకపోతే
 	strcpy(buf3, buf);
 
     get_part(font, 4, buf2);
 
-    if (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s oblique", buf3);
-    else if (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s italic", buf3);
+    ఒకవేళ (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s oblique", buf3);
+    లేకపోతే ఒకవేళ (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s italic", buf3);
 
-    if (!strcmp(buf, " "))
+    ఒకవేళ (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
@@ -213,35 +213,35 @@ style_part(char *font, char *buf)
  * Given a font name this function returns the part used in the third
  * scroll list.
  */
-    static void
-size_part(char *font, char *buf, int inPixels)
+    స్థిర శూన్య
+కొలత_part(అక్షరం *font, అక్షరం *buf, పూర్ణాంకం లోపల_Pixels)
 {
-    int	    size;
-    float   temp;
+    పూర్ణాంకం	    కొలత;
+    దశాంశం   తాత్కాలిక;
 
     *buf = '\0';
 
-    if (inPixels)
+    ఒకవేళ (లోపల_Pixels)
     {
 	get_part(font, 7, buf);
-	if (*buf != NUL)
+	ఒకవేళ (*buf != NUL)
 	{
-	    size = atoi(buf);
-	    sprintf(buf, "%3d", size);
+	    కొలత = atoi(buf);
+	    sprintf(buf, "%3d", కొలత);
 	}
     }
-    else
+    లేకపోతే
     {
 	get_part(font, 8, buf);
-	if (*buf != NUL)
+	ఒకవేళ (*buf != NUL)
 	{
-	    size = atoi(buf);
-	    temp = (float)size / 10.0;
-	    size = temp;
-	    if (buf[strlen(buf) - 1] == '0')
-		sprintf(buf, "%3d", size);
-	    else
-		sprintf(buf, "%4.1f", temp);
+	    కొలత = atoi(buf);
+	    తాత్కాలిక = (దశాంశం)కొలత / 10.0;
+	    కొలత = తాత్కాలిక;
+	    ఒకవేళ (buf[అక్షరశ్రేణి_పొడవు(buf) - 1] == '0')
+		sprintf(buf, "%3d", కొలత);
+	    లేకపోతే
+		sprintf(buf, "%4.1f", తాత్కాలిక);
 	}
     }
 }
@@ -249,178 +249,178 @@ size_part(char *font, char *buf, int inPixels)
 /*
  * Given a font name this function returns the part used in the choice menu.
  */
-    static void
-encoding_part(char *font, char *buf)
+    స్థిర శూన్య
+encoding_part(అక్షరం *font, అక్షరం *buf)
 {
-    char    buf1[TEMP_BUF_SIZE];
-    char    buf2[TEMP_BUF_SIZE];
+    అక్షరం    buf1[తాత్కాలిక_BUF_కొలత];
+    అక్షరం    buf2[తాత్కాలిక_BUF_కొలత];
 
     *buf = '\0';
 
     get_part(font, 13, buf1);
     get_part(font, 14, buf2);
 
-    if (*buf1 != NUL && *buf2 != NUL)
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s-%s", buf1, buf2);
-    if (!strcmp(buf, " "))
+    ఒకవేళ (*buf1 != NUL && *buf2 != NUL)
+	vim_snprintf(buf, తాత్కాలిక_BUF_కొలత, "%s-%s", buf1, buf2);
+    ఒకవేళ (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
 /*
  * Inserts a string into correct sorted position in a list.
  */
-    static void
-add_to_list(char **buf, char *item, int *count)
+    స్థిర శూన్య
+కూడు_గమ్యం_list(అక్షరం **buf, అక్షరం *అంశం, పూర్ణాంకం *లెక్క)
 {
-    int	i;
-    int j;
+    పూర్ణాంకం	i;
+    పూర్ణాంకం j;
 
-    if (*count == MAX_ENTRIES_IN_LIST)
-	return;
+    ఒకవేళ (*లెక్క == MAX_ENTRIES_లోపల_LIST)
+	తిరిగి;
 
     // avoid duplication
-    for (i = 0; i < *count; ++i)
+    కొరకు (i = 0; i < *లెక్క; ++i)
     {
-	if (!strcmp(buf[i], item))
-	    return;
+	ఒకవేళ (!strcmp(buf[i], అంశం))
+	    తిరిగి;
     }
 
     // find order place, but make sure that wild card comes first
-    if (!strcmp(item, wild))
+    ఒకవేళ (!strcmp(అంశం, wild))
 	i = 0;
-    else
-	for (i = 0; i < *count; ++i)
-	    if (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
-		break;
+    లేకపోతే
+	కొరకు (i = 0; i < *లెక్క; ++i)
+	    ఒకవేళ (strcmp(buf[i], అంశం) > 0 && strcmp(buf[i], wild))
+		ఆపు;
 
     // now insert the item
-    for (j = *count; j > i; --j)
+    కొరకు (j = *లెక్క; j > i; --j)
 	buf[j] = buf[j-1];
-    buf[i] = XtNewString(item);
+    buf[i] = XtNewString(అంశం);
 
-    ++(*count);
+    ++(*లెక్క);
 }
 
 /*
  * True if the font matches some field.
  */
-    static Boolean
-match(SharedFontSelData *data, enum ListSpecifier l, int i)
+    స్థిర Boolean
+సరిపోలిక(Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం, గణన ListSpecifier l, పూర్ణాంకం i)
 {
-    char buf[TEMP_BUF_SIZE];
+    అక్షరం buf[తాత్కాలిక_BUF_కొలత];
 
     // An empty selection or a wild card matches anything.
-    if (!data->sel[l] || !strcmp(data->sel[l], wild))
-	return True;
+    ఒకవేళ (!దత్తాంశం->sel[l] || !strcmp(దత్తాంశం->sel[l], wild))
+	తిరిగి True;
 
     // chunk out the desired part...
-    switch (l)
+    ఎంపిక (l)
     {
-	case ENCODING:
-	    encoding_part(fn(data, i), buf);
-	    break;
+	స్థితి ENCODING:
+	    encoding_part(fn(దత్తాంశం, i), buf);
+	    ఆపు;
 
-	case NAME:
-	    name_part(fn(data, i), buf);
-	    break;
+	స్థితి NAME:
+	    name_part(fn(దత్తాంశం, i), buf);
+	    ఆపు;
 
-	case STYLE:
-	    style_part(fn(data, i), buf);
-	    break;
+	స్థితి STYLE:
+	    style_part(fn(దత్తాంశం, i), buf);
+	    ఆపు;
 
-	case SIZE:
-	    size_part(fn(data, i), buf, data->in_pixels);
-	    break;
-	default:
+	స్థితి కొలత_3:
+	    కొలత_part(fn(దత్తాంశం, i), buf, దత్తాంశం->లోపల_pixels);
+	    ఆపు;
+	అప్రమేయ:
 	    ;
     }
 
     // ...and chew it now
 
-    return !strcmp(buf, data->sel[l]);
+    తిరిగి !strcmp(buf, దత్తాంశం->sel[l]);
 }
 
-    static Boolean
-proportional(char *font)
+    స్థిర Boolean
+proportional(అక్షరం *font)
 {
-    char buf[TEMP_BUF_SIZE];
+    అక్షరం buf[తాత్కాలిక_BUF_కొలత];
 
     get_part(font, 11, buf);
 
-    return !strcmp(buf, "p") || !strcmp(buf, "P");
+    తిరిగి !strcmp(buf, "p") || !strcmp(buf, "P");
 }
 
 
-static void encoding_callback(Widget w, SharedFontSelData *data,
-							     XtPointer dummy);
+స్థిర శూన్య encoding_callback(Widget w, Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+							     Xt_సూచిక dummy);
 
 /*
  * Parse through the fontlist data and set up the three scroll lists.  The fix
  * parameter can be used to exclude a list from any changes.  This is used for
  * updates after selections caused by the users actions.
  */
-    static void
-fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
+    స్థిర శూన్య
+fill_lists(గణన ListSpecifier fix, Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం)
 {
-    char	*list[NONE][MAX_ENTRIES_IN_LIST];
-    int		count[NONE];
-    char	buf[TEMP_BUF_SIZE];
-    XmString	items[MAX_ENTRIES_IN_LIST];
-    int		i;
-    int		idx;
+    అక్షరం	*list[NONE][MAX_ENTRIES_లోపల_LIST];
+    పూర్ణాంకం		లెక్క[NONE];
+    అక్షరం	buf[తాత్కాలిక_BUF_కొలత];
+    XmString	వస్తువులు[MAX_ENTRIES_లోపల_LIST];
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx;
 
-    for (idx = (int)ENCODING; idx < (int)NONE; ++idx)
-	count[idx] = 0;
+    కొరకు (idx = (పూర్ణాంకం)ENCODING; idx < (పూర్ణాంకం)NONE; ++idx)
+	లెక్క[idx] = 0;
 
     // First we insert the wild char into every single list.
-    if (fix != ENCODING)
-	add_to_list(list[ENCODING], wild, &count[ENCODING]);
-    if (fix != NAME)
-	add_to_list(list[NAME], wild, &count[NAME]);
-    if (fix != STYLE)
-	add_to_list(list[STYLE], wild, &count[STYLE]);
-    if (fix != SIZE)
-	add_to_list(list[SIZE], wild, &count[SIZE]);
+    ఒకవేళ (fix != ENCODING)
+	కూడు_గమ్యం_list(list[ENCODING], wild, &లెక్క[ENCODING]);
+    ఒకవేళ (fix != NAME)
+	కూడు_గమ్యం_list(list[NAME], wild, &లెక్క[NAME]);
+    ఒకవేళ (fix != STYLE)
+	కూడు_గమ్యం_list(list[STYLE], wild, &లెక్క[STYLE]);
+    ఒకవేళ (fix != కొలత_3)
+	కూడు_గమ్యం_list(list[కొలత_3], wild, &లెక్క[కొలత_3]);
 
-    for (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
+    కొరకు (i = 0; i < దత్తాంశం->అంకె && i < MAX_ENTRIES_లోపల_LIST; i++)
     {
-	if (proportional(fn(data, i)))
-	    continue;
+	ఒకవేళ (proportional(fn(దత్తాంశం, i)))
+	    కొనసాగు;
 
-	if (fix != ENCODING
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+	ఒకవేళ (fix != ENCODING
+		&& సరిపోలిక(దత్తాంశం, NAME, i)
+		&& సరిపోలిక(దత్తాంశం, STYLE, i)
+		&& సరిపోలిక(దత్తాంశం, కొలత_3, i))
 	{
-	    encoding_part(fn(data, i), buf);
-	    add_to_list(list[ENCODING], buf, &count[ENCODING]);
+	    encoding_part(fn(దత్తాంశం, i), buf);
+	    కూడు_గమ్యం_list(list[ENCODING], buf, &లెక్క[ENCODING]);
 	}
 
-	if (fix != NAME
-		&& match(data, ENCODING, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+	ఒకవేళ (fix != NAME
+		&& సరిపోలిక(దత్తాంశం, ENCODING, i)
+		&& సరిపోలిక(దత్తాంశం, STYLE, i)
+		&& సరిపోలిక(దత్తాంశం, కొలత_3, i))
 	{
-	    name_part(fn(data, i), buf);
-	    add_to_list(list[NAME], buf, &count[NAME]);
+	    name_part(fn(దత్తాంశం, i), buf);
+	    కూడు_గమ్యం_list(list[NAME], buf, &లెక్క[NAME]);
 	}
 
-	if (fix != STYLE
-		&& match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, SIZE, i))
+	ఒకవేళ (fix != STYLE
+		&& సరిపోలిక(దత్తాంశం, ENCODING, i)
+		&& సరిపోలిక(దత్తాంశం, NAME, i)
+		&& సరిపోలిక(దత్తాంశం, కొలత_3, i))
 	{
-	    style_part(fn(data, i), buf);
-	    add_to_list(list[STYLE], buf, &count[STYLE]);
+	    style_part(fn(దత్తాంశం, i), buf);
+	    కూడు_గమ్యం_list(list[STYLE], buf, &లెక్క[STYLE]);
 	}
 
-	if (fix != SIZE
-		&& match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i))
+	ఒకవేళ (fix != కొలత_3
+		&& సరిపోలిక(దత్తాంశం, ENCODING, i)
+		&& సరిపోలిక(దత్తాంశం, NAME, i)
+		&& సరిపోలిక(దత్తాంశం, STYLE, i))
 	{
-	    size_part(fn(data, i), buf, data->in_pixels);
-	    add_to_list(list[SIZE], buf, &count[SIZE]);
+	    కొలత_part(fn(దత్తాంశం, i), buf, దత్తాంశం->లోపల_pixels);
+	    కూడు_గమ్యం_list(list[కొలత_3], buf, &లెక్క[కొలత_3]);
 	}
     }
 
@@ -428,154 +428,154 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
      * And now do the preselection in all lists where there was one:
      */
 
-    if (fix != ENCODING)
+    ఒకవేళ (fix != ENCODING)
     {
-	Cardinal n_items;
+	Cardinal n_వస్తువులు;
 	WidgetList children;
 	Widget selected_button = 0;
 
 	// Get and update the current button list.
-	XtVaGetValues(data->encoding_pulldown,
+	Xt_Va_Get_విలువలు(దత్తాంశం->encoding_pulldown,
 		XmNchildren, &children,
-		XmNnumChildren, &n_items,
-		NULL);
+		XmNnumChildren, &n_వస్తువులు,
+		ఖాళీ);
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	కొరకు (i = 0; i < లెక్క[ENCODING]; ++i)
 	{
 	    Widget button;
 
-	    items[i] = XmStringCreateLocalized(list[ENCODING][i]);
+	    వస్తువులు[i] = XmStringCreateLocalized(list[ENCODING][i]);
 
-	    if (i < (int)n_items)
+	    ఒకవేళ (i < (పూర్ణాంకం)n_వస్తువులు)
 	    {
 		// recycle old button
-		XtVaSetValues(children[i],
-			XmNlabelString, items[i],
-			XmNuserData, i,
-			NULL);
+		Xt_Va_సమితి_విలువలు(children[i],
+			XmNlabelString, వస్తువులు[i],
+			Xm_Nuser_దత్తాంశం, i,
+			ఖాళీ);
 		button = children[i];
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// create a new button
 		button = XtVaCreateManagedWidget("button",
-			xmPushButtonGadgetClass,
-			data->encoding_pulldown,
-			XmNlabelString, items[i],
-			XmNuserData, i,
-			NULL);
-		XtAddCallback(button, XmNactivateCallback,
-			(XtCallbackProc) encoding_callback, (XtPointer) data);
-		XtManageChild(button);
+			xm_నెట్టు_Button_Gadget_Class,
+			దత్తాంశం->encoding_pulldown,
+			XmNlabelString, వస్తువులు[i],
+			Xm_Nuser_దత్తాంశం, i,
+			ఖాళీ);
+		Xt_కూడు_Callback(button, XmNactivateCallback,
+			(XtCallbackProc) encoding_callback, (Xt_సూచిక) దత్తాంశం);
+		Xt_Manage_బిడ్డ(button);
 	    }
 
-	    if (data->sel[ENCODING])
+	    ఒకవేళ (దత్తాంశం->sel[ENCODING])
 	    {
-		if (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
+		ఒకవేళ (!strcmp(దత్తాంశం->sel[ENCODING], list[ENCODING][i]))
 		    selected_button = button;
 	    }
 	    XtFree(list[ENCODING][i]);
 	}
 
 	// Destroy all the outstanding menu items.
-	for (i = count[ENCODING]; i < (int)n_items; ++i)
+	కొరకు (i = లెక్క[ENCODING]; i < (పూర్ణాంకం)n_వస్తువులు; ++i)
 	{
-	    XtUnmanageChild(children[i]);
+	    Xt_Unmanage_బిడ్డ(children[i]);
 	    XtDestroyWidget(children[i]);
 	}
 
 	// Preserve the current selection visually.
-	if (selected_button)
+	ఒకవేళ (selected_button)
 	{
-	    XtVaSetValues(data->encoding_menu,
+	    Xt_Va_సమితి_విలువలు(దత్తాంశం->encoding_menu,
 		    XmNmenuHistory, selected_button,
-		    NULL);
+		    ఖాళీ);
 	}
 
-	for (i = 0; i < count[ENCODING]; ++i)
-	    XmStringFree(items[i]);
+	కొరకు (i = 0; i < లెక్క[ENCODING]; ++i)
+	    XmStringFree(వస్తువులు[i]);
     }
 
     /*
      * Now loop through the remaining lists and set them up.
      */
-    for (idx = (int)NAME; idx < (int)NONE; ++idx)
+    కొరకు (idx = (పూర్ణాంకం)NAME; idx < (పూర్ణాంకం)NONE; ++idx)
     {
 	Widget w;
 
-	if (fix == (enum ListSpecifier)idx)
-	    continue;
+	ఒకవేళ (fix == (గణన ListSpecifier)idx)
+	    కొనసాగు;
 
-	switch ((enum ListSpecifier)idx)
+	ఎంపిక ((గణన ListSpecifier)idx)
 	{
-	    case NAME:
-		w = data->list[NAME];
-		break;
-	    case STYLE:
-		w = data->list[STYLE];
-		break;
-	    case SIZE:
-		w = data->list[SIZE];
-		break;
-	    default:
+	    స్థితి NAME:
+		w = దత్తాంశం->list[NAME];
+		ఆపు;
+	    స్థితి STYLE:
+		w = దత్తాంశం->list[STYLE];
+		ఆపు;
+	    స్థితి కొలత_3:
+		w = దత్తాంశం->list[కొలత_3];
+		ఆపు;
+	    అప్రమేయ:
 		w = (Widget)0;	// for lint
 	}
 
-	for (i = 0; i < count[idx]; ++i)
+	కొరకు (i = 0; i < లెక్క[idx]; ++i)
 	{
-	    items[i] = XmStringCreateLocalized(list[idx][i]);
+	    వస్తువులు[i] = XmStringCreateLocalized(list[idx][i]);
 	    XtFree(list[idx][i]);
 	}
-	XmListDeleteAllItems(w);
-	XmListAddItems(w, items, count[idx], 1);
-	if (data->sel[idx])
+	Xm_List_Delete_All_వస్తువులు(w);
+	Xm_List_కూడు_వస్తువులు(w, వస్తువులు, లెక్క[idx], 1);
+	ఒకవేళ (దత్తాంశం->sel[idx])
 	{
-	    XmStringFree(items[0]);
-	    items[0] = XmStringCreateLocalized(data->sel[idx]);
-	    XmListSelectItem(w, items[0], False);
-	    XmListSetBottomItem(w, items[0]);
+	    XmStringFree(వస్తువులు[0]);
+	    వస్తువులు[0] = XmStringCreateLocalized(దత్తాంశం->sel[idx]);
+	    Xm_List_Select_అంశం(w, వస్తువులు[0], False);
+	    Xm_List_సమితి_Bottom_అంశం(w, వస్తువులు[0]);
 	}
-	for (i = 0; i < count[idx]; ++i)
-	    XmStringFree(items[i]);
+	కొరకు (i = 0; i < లెక్క[idx]; ++i)
+	    XmStringFree(వస్తువులు[i]);
     }
 }
 
-    static void
-stoggle_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmToggleButtonCallbackStruct *call_data)
+    స్థిర శూన్య
+stoggle_callback(Widget w వాడని,
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmToggleButtonCallbackStruct *call_దత్తాంశం)
 {
-    int		i, do_sel;
-    char	newSize[TEMP_BUF_SIZE];
+    పూర్ణాంకం		i, do_sel;
+    అక్షరం	new_కొలత_2[తాత్కాలిక_BUF_కొలత];
     XmString	str;
 
-    if (call_data->reason != (int)XmCR_VALUE_CHANGED)
-	return;
+    ఒకవేళ (call_దత్తాంశం->reason != (పూర్ణాంకం)Xm_CR_విలువ_మారింది)
+	తిరిగి;
 
-    do_sel = (data->sel[SIZE] != NULL) && strcmp(data->sel[SIZE], wild);
+    do_sel = (దత్తాంశం->sel[కొలత_3] != ఖాళీ) && strcmp(దత్తాంశం->sel[కొలత_3], wild);
 
-    for (i = 0; do_sel && (i < data->num); i++)
-	if (match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+    కొరకు (i = 0; do_sel && (i < దత్తాంశం->అంకె); i++)
+	ఒకవేళ (సరిపోలిక(దత్తాంశం, ENCODING, i)
+		&& సరిపోలిక(దత్తాంశం, NAME, i)
+		&& సరిపోలిక(దత్తాంశం, STYLE, i)
+		&& సరిపోలిక(దత్తాంశం, కొలత_3, i))
 	{
-	    size_part(fn(data, i), newSize, !data->in_pixels);
-	    break;
+	    కొలత_part(fn(దత్తాంశం, i), new_కొలత_2, !దత్తాంశం->లోపల_pixels);
+	    ఆపు;
 	}
 
-    data->in_pixels = !data->in_pixels;
+    దత్తాంశం->లోపల_pixels = !దత్తాంశం->లోపల_pixels;
 
-    if (data->sel[SIZE])
-	XtFree(data->sel[SIZE]);
-    data->sel[SIZE] = NULL;
-    fill_lists(NONE, data);
+    ఒకవేళ (దత్తాంశం->sel[కొలత_3])
+	XtFree(దత్తాంశం->sel[కొలత_3]);
+    దత్తాంశం->sel[కొలత_3] = ఖాళీ;
+    fill_lists(NONE, దత్తాంశం);
 
-    if (do_sel)
+    ఒకవేళ (do_sel)
     {
-	str = XmStringCreateLocalized(newSize);
-	XmListSelectItem(data->list[SIZE], str, True);
-	XmListSetBottomItem(data->list[SIZE], str);
+	str = XmStringCreateLocalized(new_కొలత_2);
+	Xm_List_Select_అంశం(దత్తాంశం->list[కొలత_3], str, True);
+	Xm_List_సమితి_Bottom_అంశం(దత్తాంశం->list[కొలత_3], str);
 	XmStringFree(str);
     }
 }
@@ -583,262 +583,262 @@ stoggle_callback(Widget w UNUSED,
 /*
  * Show the currently selected font in the sample text label.
  */
-    static void
-display_sample(SharedFontSelData *data)
+    స్థిర శూన్య
+display_sample(Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం)
 {
-    Arg		    args[2];
-    int		    n;
+    Arg		    వాదనలు[2];
+    పూర్ణాంకం		    n;
     XFontStruct	*   font;
     XmFontList	    font_list;
     Display *	    display;
     XmString	    str;
 
-    display = XtDisplay(data->dialog);
-    font = XLoadQueryFont(display, data->font_name);
+    display = XtDisplay(దత్తాంశం->dialog);
+    font = XLoadQueryFont(display, దత్తాంశం->font_name);
     font_list = gui_motif_create_fontlist(font);
 
     n = 0;
     str = XmStringCreateLocalized("AaBbZzYy 0123456789");
-    XtSetArg(args[n], XmNlabelString, str); n++;
-    XtSetArg(args[n], XmNfontList, font_list); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, str); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNfontList, font_list); n++;
 
-    XtSetValues(data->sample, args, n);
+    Xt_సమితి_విలువలు(దత్తాంశం->sample, వాదనలు, n);
     XmStringFree(str);
 
-    if (data->old)
+    ఒకవేళ (దత్తాంశం->old)
     {
-	XFreeFont(display, data->old);
-	XmFontListFree(data->old_list);
+	XFreeFont(display, దత్తాంశం->old);
+	XmFontListFree(దత్తాంశం->old_list);
     }
-    data->old = font;
-    data->old_list = font_list;
+    దత్తాంశం->old = font;
+    దత్తాంశం->old_list = font_list;
 }
 
 
-    static Boolean
+    స్థిర Boolean
 do_choice(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data,
-	enum ListSpecifier which)
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmListCallbackStruct *call_దత్తాంశం,
+	గణన ListSpecifier which)
 {
-    char *sel;
+    అక్షరం *sel;
 
-    XmStringGetLtoR(call_data->item, XmSTRING_DEFAULT_CHARSET, &sel);
+    XmStringGetLtoR(call_దత్తాంశం->అంశం, XmSTRING_DEFAULT_CHARSET, &sel);
 
-    if (!data->sel[which])
-	data->sel[which] = XtNewString(sel);
-    else
+    ఒకవేళ (!దత్తాంశం->sel[which])
+	దత్తాంశం->sel[which] = XtNewString(sel);
+    లేకపోతే
     {
-	if (!strcmp(data->sel[which], sel))
+	ఒకవేళ (!strcmp(దత్తాంశం->sel[which], sel))
 	{
 	    // unselecting current selection
-	    XtFree(data->sel[which]);
-	    data->sel[which] = NULL;
-	    if (w)
-		XmListDeselectItem(w, call_data->item);
+	    XtFree(దత్తాంశం->sel[which]);
+	    దత్తాంశం->sel[which] = ఖాళీ;
+	    ఒకవేళ (w)
+		Xm_List_Deselect_అంశం(w, call_దత్తాంశం->అంశం);
 	}
-	else
+	లేకపోతే
 	{
-	    XtFree(data->sel[which]);
-	    data->sel[which] = XtNewString(sel);
+	    XtFree(దత్తాంశం->sel[which]);
+	    దత్తాంశం->sel[which] = XtNewString(sel);
 	}
     }
     XtFree(sel);
 
-    fill_lists(which, data);
+    fill_lists(which, దత్తాంశం);
 
     // If there is a font selection, we display it.
-    if (data->sel[ENCODING]
-	    && data->sel[NAME]
-	    && data->sel[STYLE]
-	    && data->sel[SIZE]
-	    && strcmp(data->sel[ENCODING], wild)
-	    && strcmp(data->sel[NAME], wild)
-	    && strcmp(data->sel[STYLE], wild)
-	    && strcmp(data->sel[SIZE], wild))
+    ఒకవేళ (దత్తాంశం->sel[ENCODING]
+	    && దత్తాంశం->sel[NAME]
+	    && దత్తాంశం->sel[STYLE]
+	    && దత్తాంశం->sel[కొలత_3]
+	    && strcmp(దత్తాంశం->sel[ENCODING], wild)
+	    && strcmp(దత్తాంశం->sel[NAME], wild)
+	    && strcmp(దత్తాంశం->sel[STYLE], wild)
+	    && strcmp(దత్తాంశం->sel[కొలత_3], wild))
     {
-	int i;
+	పూర్ణాంకం i;
 
-	if (data->font_name)
-	    XtFree(data->font_name);
-	data->font_name = NULL;
+	ఒకవేళ (దత్తాంశం->font_name)
+	    XtFree(దత్తాంశం->font_name);
+	దత్తాంశం->font_name = ఖాళీ;
 
-	for (i = 0; i < data->num; i++)
+	కొరకు (i = 0; i < దత్తాంశం->అంకె; i++)
 	{
-	    if (match(data, ENCODING, i)
-		    && match(data, NAME, i)
-		    && match(data, STYLE, i)
-		    && match(data, SIZE, i))
+	    ఒకవేళ (సరిపోలిక(దత్తాంశం, ENCODING, i)
+		    && సరిపోలిక(దత్తాంశం, NAME, i)
+		    && సరిపోలిక(దత్తాంశం, STYLE, i)
+		    && సరిపోలిక(దత్తాంశం, కొలత_3, i))
 	    {
-		data->font_name = XtNewString(fn(data, i));
-		break;
+		దత్తాంశం->font_name = XtNewString(fn(దత్తాంశం, i));
+		ఆపు;
 	    }
 	}
 
-	if (data->font_name)
+	ఒకవేళ (దత్తాంశం->font_name)
 	{
-	    XmTextSetString(data->name, data->font_name);
-	    display_sample(data);
+	    Xm_పాఠ్యం_సమితి_String(దత్తాంశం->name, దత్తాంశం->font_name);
+	    display_sample(దత్తాంశం);
 	}
-	else
+	లేకపోతే
 	    do_dialog(VIM_ERROR,
 		    (char_u *)_("Error"),
 		    (char_u *)_("Invalid font specification"),
-		    (char_u *)_("&Dismiss"), 1, NULL, FALSE);
+		    (char_u *)_("&Dismiss"), 1, ఖాళీ, FALSE);
 
-	return True;
+	తిరిగి True;
     }
-    else
+    లేకపోతే
     {
-	int	    n;
+	పూర్ణాంకం	    n;
 	XmString    str;
-	Arg	    args[4];
-	char	    *nomatch_msg = _("no specific match");
+	Arg	    వాదనలు[4];
+	అక్షరం	    *nomatch_సందేశం = _("no specific match");
 
 	n = 0;
-	str = XmStringCreateLocalized(nomatch_msg);
-	XtSetArg(args[n], XmNlabelString, str); ++n;
-	XtSetValues(data->sample, args, n);
-	apply_fontlist(data->sample);
-	XmTextSetString(data->name, nomatch_msg);
+	str = XmStringCreateLocalized(nomatch_సందేశం);
+	Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, str); ++n;
+	Xt_సమితి_విలువలు(దత్తాంశం->sample, వాదనలు, n);
+	apply_fontlist(దత్తాంశం->sample);
+	Xm_పాఠ్యం_సమితి_String(దత్తాంశం->name, nomatch_సందేశం);
 	XmStringFree(str);
 
-	return False;
+	తిరిగి False;
     }
 }
 
-    static void
+    స్థిర శూన్య
 encoding_callback(Widget w,
-	SharedFontSelData *data,
-	XtPointer dummy UNUSED)
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	Xt_సూచిక dummy వాడని)
 {
     XmString str;
-    XmListCallbackStruct fake_data;
+    XmListCallbackStruct fake_దత్తాంశం;
 
-    XtVaGetValues(w, XmNlabelString, &str, NULL);
+    Xt_Va_Get_విలువలు(w, XmNlabelString, &str, ఖాళీ);
 
-    if (!str)
-	return;
+    ఒకవేళ (!str)
+	తిరిగి;
 
-    fake_data.item = str;
+    fake_దత్తాంశం.అంశం = str;
 
-    do_choice(0, data, &fake_data, ENCODING);
+    do_choice(0, దత్తాంశం, &fake_దత్తాంశం, ENCODING);
 }
 
-    static void
+    స్థిర శూన్య
 name_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmListCallbackStruct *call_దత్తాంశం)
 {
-    do_choice(w, data, call_data, NAME);
+    do_choice(w, దత్తాంశం, call_దత్తాంశం, NAME);
 }
 
-    static void
+    స్థిర శూన్య
 style_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmListCallbackStruct *call_దత్తాంశం)
 {
-    do_choice(w, data, call_data, STYLE);
+    do_choice(w, దత్తాంశం, call_దత్తాంశం, STYLE);
 }
 
-    static void
-size_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+    స్థిర శూన్య
+కొలత_callback(Widget w,
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmListCallbackStruct *call_దత్తాంశం)
 {
-    do_choice(w, data, call_data, SIZE);
+    do_choice(w, దత్తాంశం, call_దత్తాంశం, కొలత_3);
 }
 
-    static void
-cancel_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data UNUSED)
+    స్థిర శూన్య
+cancel_callback(Widget w వాడని,
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	XmListCallbackStruct *call_దత్తాంశం వాడని)
 {
-    if (data->sel[ENCODING])
+    ఒకవేళ (దత్తాంశం->sel[ENCODING])
     {
-	XtFree(data->sel[ENCODING]);
-	data->sel[ENCODING] = NULL;
+	XtFree(దత్తాంశం->sel[ENCODING]);
+	దత్తాంశం->sel[ENCODING] = ఖాళీ;
     }
-    if (data->sel[NAME])
+    ఒకవేళ (దత్తాంశం->sel[NAME])
     {
-	XtFree(data->sel[NAME]);
-	data->sel[NAME] = NULL;
+	XtFree(దత్తాంశం->sel[NAME]);
+	దత్తాంశం->sel[NAME] = ఖాళీ;
     }
-    if (data->sel[STYLE])
+    ఒకవేళ (దత్తాంశం->sel[STYLE])
     {
-	XtFree(data->sel[STYLE]);
-	data->sel[STYLE] = NULL;
+	XtFree(దత్తాంశం->sel[STYLE]);
+	దత్తాంశం->sel[STYLE] = ఖాళీ;
     }
-    if (data->sel[SIZE])
+    ఒకవేళ (దత్తాంశం->sel[కొలత_3])
     {
-	XtFree(data->sel[SIZE]);
-	data->sel[SIZE] = NULL;
+	XtFree(దత్తాంశం->sel[కొలత_3]);
+	దత్తాంశం->sel[కొలత_3] = ఖాళీ;
     }
 
-    if (data->font_name)
-	XtFree(data->font_name);
-    data->font_name = NULL;
+    ఒకవేళ (దత్తాంశం->font_name)
+	XtFree(దత్తాంశం->font_name);
+    దత్తాంశం->font_name = ఖాళీ;
 
-    data->num = 0;
-    XFreeFontNames(data->names);
-    data->names = NULL;
-    data->exit = True;
+    దత్తాంశం->అంకె = 0;
+    XFree_Font_పేర్లు(దత్తాంశం->పేర్లు);
+    దత్తాంశం->పేర్లు = ఖాళీ;
+    దత్తాంశం->నిష్క్రమించు = True;
 }
 
-    static void
-ok_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmPushButtonCallbackStruct *call_data UNUSED)
+    స్థిర శూన్య
+ok_callback(Widget w వాడని,
+	Shared_Font_Sel_దత్తాంశం_2 *దత్తాంశం,
+	Xm_నెట్టు_Button_Callback_Struct *call_దత్తాంశం వాడని)
 {
-    char    *pattern;
-    char    **name;
-    int	    i;
+    అక్షరం    *నమూనా;
+    అక్షరం    **name;
+    పూర్ణాంకం	    i;
 
-    pattern = XmTextGetString(data->name);
-    name    = XListFonts(XtDisplay(data->dialog), pattern, 1, &i);
-    XtFree(pattern);
+    నమూనా = Xm_పాఠ్యం_Get_String(దత్తాంశం->name);
+    name    = XListFonts(XtDisplay(దత్తాంశం->dialog), నమూనా, 1, &i);
+    XtFree(నమూనా);
 
-    if (i != 1)
+    ఒకవేళ (i != 1)
     {
 	do_dialog(VIM_ERROR,
 		(char_u *)_("Error"),
 		(char_u *)_("Invalid font specification"),
-		(char_u *)_("&Dismiss"), 1, NULL, FALSE);
-	XFreeFontNames(name);
+		(char_u *)_("&Dismiss"), 1, ఖాళీ, FALSE);
+	XFree_Font_పేర్లు(name);
     }
-    else
+    లేకపోతే
     {
-	if (data->font_name)
-	    XtFree(data->font_name);
-	data->font_name = XtNewString(name[0]);
+	ఒకవేళ (దత్తాంశం->font_name)
+	    XtFree(దత్తాంశం->font_name);
+	దత్తాంశం->font_name = XtNewString(name[0]);
 
-	if (data->sel[ENCODING])
+	ఒకవేళ (దత్తాంశం->sel[ENCODING])
 	{
-	    XtFree(data->sel[ENCODING]);
-	    data->sel[ENCODING] = NULL;
+	    XtFree(దత్తాంశం->sel[ENCODING]);
+	    దత్తాంశం->sel[ENCODING] = ఖాళీ;
 	}
-	if (data->sel[NAME])
+	ఒకవేళ (దత్తాంశం->sel[NAME])
 	{
-	    XtFree(data->sel[NAME]);
-	    data->sel[NAME] = NULL;
+	    XtFree(దత్తాంశం->sel[NAME]);
+	    దత్తాంశం->sel[NAME] = ఖాళీ;
 	}
-	if (data->sel[STYLE])
+	ఒకవేళ (దత్తాంశం->sel[STYLE])
 	{
-	    XtFree(data->sel[STYLE]);
-	    data->sel[STYLE] = NULL;
+	    XtFree(దత్తాంశం->sel[STYLE]);
+	    దత్తాంశం->sel[STYLE] = ఖాళీ;
 	}
-	if (data->sel[SIZE])
+	ఒకవేళ (దత్తాంశం->sel[కొలత_3])
 	{
-	    XtFree(data->sel[SIZE]);
-	    data->sel[SIZE] = NULL;
+	    XtFree(దత్తాంశం->sel[కొలత_3]);
+	    దత్తాంశం->sel[కొలత_3] = ఖాళీ;
 	}
 
-	XFreeFontNames(name);
+	XFree_Font_పేర్లు(name);
 
-	data->num = 0;
-	XFreeFontNames(data->names);
-	data->names = NULL;
-	data->exit = True;
+	దత్తాంశం->అంకె = 0;
+	XFree_Font_పేర్లు(దత్తాంశం->పేర్లు);
+	దత్తాంశం->పేర్లు = ఖాళీ;
+	దత్తాంశం->నిష్క్రమించు = True;
     }
 }
 
@@ -850,27 +850,27 @@ ok_callback(Widget w UNUSED,
     char_u *
 gui_xm_select_font(char_u *current)
 {
-    static SharedFontSelData	_data;
+    స్థిర Shared_Font_Sel_దత్తాంశం_2	దత్తాంశం_3;
 
-    Widget		parent;
+    Widget		మాతృ;
     Widget		form;
     Widget		separator;
     Widget		sub_form;
-    Widget		size_toggle;
+    Widget		కొలత_toggle;
     Widget		name;
-    Widget		disp_frame;
-    Widget		frame;
-    Arg			args[64];
-    int			n;
+    Widget		disp_చట్రం;
+    Widget		చట్రం;
+    Arg			వాదనలు[64];
+    పూర్ణాంకం			n;
     XmString		str;
-    char		big_font[MAX_FONT_NAME_LEN];
-    SharedFontSelData	*data;
+    అక్షరం		big_font[MAX_FONT_NAME_LEN];
+    Shared_Font_Sel_దత్తాంశం_2	*దత్తాంశం;
 
-    data = &_data;
+    దత్తాంశం = &దత్తాంశం_3;
 
-    parent = vimShell;
-    data->names = XListFonts(XtDisplay(parent), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
-						       MAX_FONTS, &data->num);
+    మాతృ = vimShell;
+    దత్తాంశం->పేర్లు = XListFonts(XtDisplay(మాతృ), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
+						       MAX_FONTS, &దత్తాంశం->అంకె);
 
     /*
      * Find the name of the biggest font less than the given limit
@@ -879,171 +879,171 @@ gui_xm_select_font(char_u *current)
      */
 
     {
-	int	i;
-	int	max;
-	int	idx = 0;
-	int	size;
-	char	buf[128];
+	పూర్ణాంకం	i;
+	పూర్ణాంకం	max;
+	పూర్ణాంకం	idx = 0;
+	పూర్ణాంకం	కొలత;
+	అక్షరం	buf[128];
 
-	for (i = 0, max = 0; i < data->num; i++)
+	కొరకు (i = 0, max = 0; i < దత్తాంశం->అంకె; i++)
 	{
-	    get_part(fn(data, i), 7, buf);
-	    size = atoi(buf);
-	    if ((size > max) && (size < MAX_DISPLAY_SIZE))
+	    get_part(fn(దత్తాంశం, i), 7, buf);
+	    కొలత = atoi(buf);
+	    ఒకవేళ ((కొలత > max) && (కొలత < MAX_DISPLAY_కొలత))
 	    {
 		idx = i;
-		max = size;
+		max = కొలత;
 	    }
 	}
-	strcpy(big_font, fn(data, idx));
+	strcpy(big_font, fn(దత్తాంశం, idx));
     }
-    data->old = XLoadQueryFont(XtDisplay(parent), big_font);
-    data->old_list = gui_motif_create_fontlist(data->old);
+    దత్తాంశం->old = XLoadQueryFont(XtDisplay(మాతృ), big_font);
+    దత్తాంశం->old_list = gui_motif_create_fontlist(దత్తాంశం->old);
 
     // Set the title of the Dialog window.
-    data->dialog = XmCreateDialogShell(parent, "fontSelector", NULL, 0);
+    దత్తాంశం->dialog = XmCreateDialogShell(మాతృ, "fontSelector", ఖాళీ, 0);
     str = XmStringCreateLocalized(_("Vim - Font Selector"));
 
     // Create form popup dialog widget.
     form = XtVaCreateWidget("form",
-	    xmFormWidgetClass, data->dialog,
+	    xmFormWidgetClass, దత్తాంశం->dialog,
 	    XmNdialogTitle, str,
 	    XmNautoUnmanage, False,
-	    XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
-	    NULL);
+	    XmNdialogStyle, Xm_DIALOG_నిండిన_APPLICATION_MODAL,
+	    ఖాళీ);
     XmStringFree(str);
 
     sub_form = XtVaCreateManagedWidget("subForm",
 	    xmFormWidgetClass, form,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    ఖాళీ);
 
-    data->ok = XtVaCreateManagedWidget(_("OK"),
-	    xmPushButtonGadgetClass, sub_form,
+    దత్తాంశం->ok = XtVaCreateManagedWidget(_("OK"),
+	    xm_నెట్టు_Button_Gadget_Class, sub_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
-	    NULL);
-    apply_fontlist(data->ok);
+	    Xm_Ntop_స్థానభ్రంశం, 4,
+	    ఖాళీ);
+    apply_fontlist(దత్తాంశం->ok);
 
-    data->cancel = XtVaCreateManagedWidget(_("Cancel"),
-	    xmPushButtonGadgetClass, sub_form,
+    దత్తాంశం->cancel = XtVaCreateManagedWidget(_("Cancel"),
+	    xm_నెట్టు_Button_Gadget_Class, sub_form,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, data->ok,
-	    XmNtopOffset, 4,
+	    XmNtopWidget, దత్తాంశం->ok,
+	    Xm_Ntop_స్థానభ్రంశం, 4,
 	    XmNshowAsDefault, True,
-	    NULL);
-    apply_fontlist(data->cancel);
+	    ఖాళీ);
+    apply_fontlist(దత్తాంశం->cancel);
 
     // Create the separator for beauty.
     n = 0;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
-    XtSetArg(args[n], XmNrightWidget, sub_form); n++;
-    XtSetArg(args[n], XmNrightOffset, 4); n++;
-    separator = XmCreateSeparatorGadget(form, "separator", args, n);
-    XtManageChild(separator);
+    Xt_సమితి_Arg(వాదనలు[n], XmNorientation, XmVERTICAL); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightWidget, sub_form); n++;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nright_స్థానభ్రంశం, 4); n++;
+    separator = XmCreateSeparatorGadget(form, "separator", వాదనలు, n);
+    Xt_Manage_బిడ్డ(separator);
 
     // Create font name text widget and the corresponding label.
-    data->name = XtVaCreateManagedWidget("fontName",
-	    xmTextWidgetClass, form,
+    దత్తాంశం->name = XtVaCreateManagedWidget("fontName",
+	    xm_పాఠ్యం_Widget_Class, form,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNeditable, False,
-	    XmNeditMode, XmSINGLE_LINE_EDIT,
-	    XmNmaxLength, MAX_FONT_NAME_LEN,
+	    Xm_Nedit_బహుళకం, Xm_SINGLE_పంక్తి_EDIT,
+	    Xm_Nmax_నిడివి, MAX_FONT_NAME_LEN,
 	    XmNcolumns, 60,
-	    NULL);
+	    ఖాళీ);
 
     str = XmStringCreateLocalized(_("Name:"));
     name = XtVaCreateManagedWidget("fontNameLabel",
 	    xmLabelGadgetClass, form,
 	    XmNlabelString, str,
-	    XmNuserData, data->name,
+	    Xm_Nuser_దత్తాంశం, దత్తాంశం->name,
 	    XmNleftAttachment, XmATTACH_OPPOSITE_WIDGET,
-	    XmNleftWidget, data->name,
+	    XmNleftWidget, దత్తాంశం->name,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, data->name,
-	    XmNtopOffset, 1,
-	    NULL);
+	    XmNbottomWidget, దత్తాంశం->name,
+	    Xm_Ntop_స్థానభ్రంశం, 1,
+	    ఖాళీ);
     XmStringFree(str);
     apply_fontlist(name);
 
     // create sample display label widget
-    disp_frame = XtVaCreateManagedWidget("sampleFrame",
-	    xmFrameWidgetClass, form,
-	    XmNshadowType, XmSHADOW_ETCHED_IN,
+    disp_చట్రం = XtVaCreateManagedWidget("sampleFrame",
+	    xm_చట్రం_Widget_Class, form,
+	    XmNshadowType, Xm_SHADOW_ETCHED_లోపల,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
 	    XmNbottomWidget, name,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNalignment, XmALIGNMENT_BEGINNING,
-	    NULL);
+	    ఖాళీ);
 
-    data->sample = XtVaCreateManagedWidget("sampleLabel",
-	    xmLabelWidgetClass, disp_frame,
+    దత్తాంశం->sample = XtVaCreateManagedWidget("sampleLabel",
+	    xmLabelWidgetClass, disp_చట్రం,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNalignment, XmALIGNMENT_BEGINNING,
-	    XmNrecomputeSize, False,
-	    XmNfontList, data->old_list,
-	    NULL);
+	    Xm_Nrecompute_కొలత, False,
+	    XmNfontList, దత్తాంశం->old_list,
+	    ఖాళీ);
 
     // create toggle button
     str = XmStringCreateLocalized(_("Show size in Points"));
-    size_toggle = XtVaCreateManagedWidget("sizeToggle",
+    కొలత_toggle = XtVaCreateManagedWidget("sizeToggle",
 	    xmToggleButtonGadgetClass, form,
 	    XmNlabelString, str,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, disp_frame,
-	    XmNbottomOffset, 4,
-	    NULL);
+	    XmNbottomWidget, disp_చట్రం,
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
+	    ఖాళీ);
     XmStringFree(str);
-    apply_fontlist(size_toggle);
-    XtManageChild(size_toggle);
+    apply_fontlist(కొలత_toggle);
+    Xt_Manage_బిడ్డ(కొలత_toggle);
 
     // Encoding pulldown menu.
 
-    data->encoding_pulldown = XmCreatePulldownMenu(form,
-						 "encodingPulldown", NULL, 0);
+    దత్తాంశం->encoding_pulldown = XmCreatePulldownMenu(form,
+						 "encodingPulldown", ఖాళీ, 0);
     str = XmStringCreateLocalized(_("Encoding:"));
     n = 0;
-    XtSetArg(args[n], XmNsubMenuId, data->encoding_pulldown); ++n;
-    XtSetArg(args[n], XmNlabelString, str); ++n;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); ++n;
-    XtSetArg(args[n], XmNleftOffset, 4); ++n;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNbottomWidget, size_toggle); ++n;
-    XtSetArg(args[n], XmNbottomOffset, 4); ++n;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNrightWidget, separator); ++n;
-    XtSetArg(args[n], XmNrightOffset, 4); ++n;
-    data->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", args, n);
+    Xt_సమితి_Arg(వాదనలు[n], XmNsubMenuId, దత్తాంశం->encoding_pulldown); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNlabelString, str); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNleftAttachment, XmATTACH_FORM); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nleft_స్థానభ్రంశం, 4); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNbottomWidget, కొలత_toggle); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nbottom_స్థానభ్రంశం, 4); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNrightWidget, separator); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nright_స్థానభ్రంశం, 4); ++n;
+    దత్తాంశం->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", వాదనలు, n);
     XmStringFree(str);
-    XmAddTabGroup(data->encoding_menu);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->encoding_menu);
 
     /*
      * Create scroll list widgets in a separate subform used to manage the
@@ -1053,191 +1053,191 @@ gui_xm_select_font(char_u *current)
     sub_form = XtVaCreateManagedWidget("subForm",
 	    xmFormWidgetClass, form,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, data->encoding_menu,
-	    XmNbottomOffset, 4,
+	    XmNbottomWidget, దత్తాంశం->encoding_menu,
+	    Xm_Nbottom_స్థానభ్రంశం, 4,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_స్థానభ్రంశం, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 2,
+	    Xm_Ntop_స్థానభ్రంశం, 2,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    ఖాళీ);
 
     // font list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    చట్రం = XtVaCreateManagedWidget("frame", xm_చట్రం_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 50,
-	    NULL);
+	    ఖాళీ);
 
     str = XmStringCreateLocalized(_("Font:"));
-    name = XtVaCreateManagedWidget("nameListLabel", xmLabelGadgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("nameListLabel", xmLabelGadgetClass, చట్రం,
+	    XmNchildType, Xm_చట్రం_TITLE_బిడ్డ,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[NAME] = XmCreateScrolledList(frame, "fontList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[NAME], NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nvisible_అంశం_లెక్క, 8); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNresizable, True); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nlist_కొలత_Policy, XmCONSTANT); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#నిర్వచితమైతే LESSTIF_సంస్కరణ
+    Xt_సమితి_Arg(వాదనలు[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#అయితే_ముగింపు
+    దత్తాంశం->list[NAME] = XmCreateScrolledList(చట్రం, "fontList", వాదనలు, n);
+    Xt_Va_సమితి_విలువలు(name, Xm_Nuser_దత్తాంశం, దత్తాంశం->list[NAME], ఖాళీ);
 
     // style list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    చట్రం = XtVaCreateManagedWidget("frame", xm_చట్రం_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 50,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 80,
-	    NULL);
+	    ఖాళీ);
 
     str = XmStringCreateLocalized(_("Style:"));
-    name = XtVaCreateManagedWidget("styleListLabel", xmLabelWidgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("styleListLabel", xmLabelWidgetClass, చట్రం,
+	    XmNchildType, Xm_చట్రం_TITLE_బిడ్డ,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[STYLE] = XmCreateScrolledList(frame, "styleList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[STYLE], NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nvisible_అంశం_లెక్క, 8); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNresizable, True); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nlist_కొలత_Policy, XmCONSTANT); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#నిర్వచితమైతే LESSTIF_సంస్కరణ
+    Xt_సమితి_Arg(వాదనలు[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#అయితే_ముగింపు
+    దత్తాంశం->list[STYLE] = XmCreateScrolledList(చట్రం, "styleList", వాదనలు, n);
+    Xt_Va_సమితి_విలువలు(name, Xm_Nuser_దత్తాంశం, దత్తాంశం->list[STYLE], ఖాళీ);
 
     // size list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    చట్రం = XtVaCreateManagedWidget("frame", xm_చట్రం_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 80,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_స్థానభ్రంశం, 4,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    ఖాళీ);
 
     str = XmStringCreateLocalized(_("Size:"));
-    name = XtVaCreateManagedWidget("sizeListLabel", xmLabelGadgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("sizeListLabel", xmLabelGadgetClass, చట్రం,
+	    XmNchildType, Xm_చట్రం_TITLE_బిడ్డ,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ఖాళీ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[SIZE] = XmCreateScrolledList(frame, "sizeList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[SIZE], NULL);
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nvisible_అంశం_లెక్క, 8); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNresizable, True); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], Xm_Nlist_కొలత_Policy, XmCONSTANT); ++n;
+    Xt_సమితి_Arg(వాదనలు[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#నిర్వచితమైతే LESSTIF_సంస్కరణ
+    Xt_సమితి_Arg(వాదనలు[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#అయితే_ముగింపు
+    దత్తాంశం->list[కొలత_3] = XmCreateScrolledList(చట్రం, "sizeList", వాదనలు, n);
+    Xt_Va_సమితి_విలువలు(name, Xm_Nuser_దత్తాంశం, దత్తాంశం->list[కొలత_3], ఖాళీ);
 
     // update form widgets cancel button
-    XtVaSetValues(form, XmNcancelButton, data->cancel, NULL);
+    Xt_Va_సమితి_విలువలు(form, XmNcancelButton, దత్తాంశం->cancel, ఖాళీ);
 
-    XtAddCallback(size_toggle, XmNvalueChangedCallback,
-	    (XtCallbackProc)stoggle_callback, (XtPointer)data);
-    XtAddCallback(data->list[NAME], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)name_callback, (XtPointer)data);
-    XtAddCallback(data->list[STYLE], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)style_callback, (XtPointer)data);
-    XtAddCallback(data->list[SIZE], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)size_callback, (XtPointer)data);
-    XtAddCallback(data->ok, XmNactivateCallback,
-	    (XtCallbackProc)ok_callback, (XtPointer)data);
-    XtAddCallback(data->cancel, XmNactivateCallback,
-	    (XtCallbackProc)cancel_callback, (XtPointer)data);
+    Xt_కూడు_Callback(కొలత_toggle, Xm_Nvalue_మారింది_Callback,
+	    (XtCallbackProc)stoggle_callback, (Xt_సూచిక)దత్తాంశం);
+    Xt_కూడు_Callback(దత్తాంశం->list[NAME], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)name_callback, (Xt_సూచిక)దత్తాంశం);
+    Xt_కూడు_Callback(దత్తాంశం->list[STYLE], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)style_callback, (Xt_సూచిక)దత్తాంశం);
+    Xt_కూడు_Callback(దత్తాంశం->list[కొలత_3], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)కొలత_callback, (Xt_సూచిక)దత్తాంశం);
+    Xt_కూడు_Callback(దత్తాంశం->ok, XmNactivateCallback,
+	    (XtCallbackProc)ok_callback, (Xt_సూచిక)దత్తాంశం);
+    Xt_కూడు_Callback(దత్తాంశం->cancel, XmNactivateCallback,
+	    (XtCallbackProc)cancel_callback, (Xt_సూచిక)దత్తాంశం);
 
-    XmProcessTraversal(data->list[NAME], XmTRAVERSE_CURRENT);
+    XmProcessTraversal(దత్తాంశం->list[NAME], XmTRAVERSE_CURRENT);
 
     // setup tabgroups
 
-    XmAddTabGroup(data->list[NAME]);
-    XmAddTabGroup(data->list[STYLE]);
-    XmAddTabGroup(data->list[SIZE]);
-    XmAddTabGroup(size_toggle);
-    XmAddTabGroup(data->name);
-    XmAddTabGroup(data->ok);
-    XmAddTabGroup(data->cancel);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->list[NAME]);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->list[STYLE]);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->list[కొలత_3]);
+    Xm_కూడు_Tab_సమూహం(కొలత_toggle);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->name);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->ok);
+    Xm_కూడు_Tab_సమూహం(దత్తాంశం->cancel);
 
-    add_cancel_action(data->dialog, (XtCallbackProc)cancel_callback, data);
+    కూడు_cancel_action(దత్తాంశం->dialog, (XtCallbackProc)cancel_callback, దత్తాంశం);
 
     // Preset selection data.
 
-    data->exit = False;
-    data->in_pixels= True;
-    data->sel[ENCODING] = NULL;
-    data->sel[NAME] = NULL;
-    data->sel[STYLE] = NULL;
-    data->sel[SIZE] = NULL;
-    data->font_name = NULL;
+    దత్తాంశం->నిష్క్రమించు = False;
+    దత్తాంశం->లోపల_pixels= True;
+    దత్తాంశం->sel[ENCODING] = ఖాళీ;
+    దత్తాంశం->sel[NAME] = ఖాళీ;
+    దత్తాంశం->sel[STYLE] = ఖాళీ;
+    దత్తాంశం->sel[కొలత_3] = ఖాళీ;
+    దత్తాంశం->font_name = ఖాళీ;
 
     // set up current font parameters
-    if (current && current[0] != '\0')
+    ఒకవేళ (current && current[0] != '\0')
     {
-	int	    i;
-	char	    **names;
+	పూర్ణాంకం	    i;
+	అక్షరం	    **పేర్లు;
 
-	names = XListFonts(XtDisplay(form), (char *) current, 1, &i);
+	పేర్లు = XListFonts(XtDisplay(form), (అక్షరం *) current, 1, &i);
 
-	if (i != 0)
+	ఒకవేళ (i != 0)
 	{
-	    char namebuf[TEMP_BUF_SIZE];
-	    char stylebuf[TEMP_BUF_SIZE];
-	    char sizebuf[TEMP_BUF_SIZE];
-	    char encodingbuf[TEMP_BUF_SIZE];
-	    char *found;
+	    అక్షరం namebuf[తాత్కాలిక_BUF_కొలత];
+	    అక్షరం stylebuf[తాత్కాలిక_BUF_కొలత];
+	    అక్షరం sizebuf[తాత్కాలిక_BUF_కొలత];
+	    అక్షరం encodingbuf[తాత్కాలిక_BUF_కొలత];
+	    అక్షరం *దొరికింది;
 
-	    found = names[0];
+	    దొరికింది = పేర్లు[0];
 
-	    name_part(found, namebuf);
-	    style_part(found, stylebuf);
-	    size_part(found, sizebuf, data->in_pixels);
-	    encoding_part(found, encodingbuf);
+	    name_part(దొరికింది, namebuf);
+	    style_part(దొరికింది, stylebuf);
+	    కొలత_part(దొరికింది, sizebuf, దత్తాంశం->లోపల_pixels);
+	    encoding_part(దొరికింది, encodingbuf);
 
-	    if (*namebuf != NUL
+	    ఒకవేళ (*namebuf != NUL
 		    && *stylebuf != NUL
 		    && *sizebuf != NUL
 		    && *encodingbuf != NUL)
 	    {
-		data->sel[NAME] = XtNewString(namebuf);
-		data->sel[STYLE] = XtNewString(stylebuf);
-		data->sel[SIZE] = XtNewString(sizebuf);
-		data->sel[ENCODING] = XtNewString(encodingbuf);
-		data->font_name = XtNewString(names[0]);
-		display_sample(data);
-		XmTextSetString(data->name, data->font_name);
+		దత్తాంశం->sel[NAME] = XtNewString(namebuf);
+		దత్తాంశం->sel[STYLE] = XtNewString(stylebuf);
+		దత్తాంశం->sel[కొలత_3] = XtNewString(sizebuf);
+		దత్తాంశం->sel[ENCODING] = XtNewString(encodingbuf);
+		దత్తాంశం->font_name = XtNewString(పేర్లు[0]);
+		display_sample(దత్తాంశం);
+		Xm_పాఠ్యం_సమితి_String(దత్తాంశం->name, దత్తాంశం->font_name);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// We can't preset a symbolic name, which isn't a full font
 		// description. Therefore we just behave the same way as if the
@@ -1245,35 +1245,35 @@ gui_xm_select_font(char_u *current)
 		//
 		// Unfortunately there is no known way to expand an abbreviated
 		// font name.
-		data->font_name = NULL;
+		దత్తాంశం->font_name = ఖాళీ;
 	    }
 	}
-	XFreeFontNames(names);
+	XFree_Font_పేర్లు(పేర్లు);
     }
 
-    fill_lists(NONE, data);
+    fill_lists(NONE, దత్తాంశం);
 
     // Unfortunately LessTif doesn't align the list widget's properly.  I don't
     // have currently any idea how to fix this problem.
-    XtManageChild(data->list[NAME]);
-    XtManageChild(data->list[STYLE]);
-    XtManageChild(data->list[SIZE]);
-    XtManageChild(data->encoding_menu);
+    Xt_Manage_బిడ్డ(దత్తాంశం->list[NAME]);
+    Xt_Manage_బిడ్డ(దత్తాంశం->list[STYLE]);
+    Xt_Manage_బిడ్డ(దత్తాంశం->list[కొలత_3]);
+    Xt_Manage_బిడ్డ(దత్తాంశం->encoding_menu);
     manage_centered(form);
 
     // modal event loop
-    while (!data->exit)
-	XtAppProcessEvent(XtWidgetToApplicationContext(data->dialog),
-							(XtInputMask)XtIMAll);
+    అయితే (!దత్తాంశం->నిష్క్రమించు)
+	XtAppProcessEvent(Xt_Widget_గమ్యం_Application_Context(దత్తాంశం->dialog),
+							(Xt_ఆదానం_ముసుగు)XtIMAll);
 
-    if (data->old)
+    ఒకవేళ (దత్తాంశం->old)
     {
-	XFreeFont(XtDisplay(data->dialog),  data->old);
-	XmFontListFree(data->old_list);
+	XFreeFont(XtDisplay(దత్తాంశం->dialog),  దత్తాంశం->old);
+	XmFontListFree(దత్తాంశం->old_list);
     }
-    XtDestroyWidget(data->dialog);
+    XtDestroyWidget(దత్తాంశం->dialog);
 
     gui_motif_synch_fonts();
 
-    return (char_u *) data->font_name;
+    తిరిగి (char_u *) దత్తాంశం->font_name;
 }

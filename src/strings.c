@@ -11,8 +11,8 @@
  * strings.c: string manipulation functions
  */
 
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#నిర్వచించు USING_FLOAT_STUFF
+#అన్తర్భావ "vim.h"
 
 /*
  * Copy "string" into newly allocated memory.
@@ -25,9 +25,9 @@ vim_strsave(char_u *string)
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    ఒకవేళ (p != ఖాళీ)
 	mch_memmove(p, string, len);
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -42,12 +42,12 @@ vim_strnsave(char_u *string, size_t len)
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    తిరిగి p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    తిరిగి vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    పూర్ణాంకం		cc,
+    పూర్ణాంకం		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
-    unsigned	length;
-    int		l;
+    గుర్తులేని	నిడివి;
+    పూర్ణాంకం		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
-    length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    నిడివి = 1;				// count the trailing NUL
+    కొరకు (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    length += l;		// count a multibyte char
+	    నిడివి += l;		// count a multibyte char
 	    p += l - 1;
-	    continue;
+	    కొనసాగు;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
-	    ++length;			// count a backslash
-	++length;			// count an ordinary char
+	ఒకవేళ (vim_strchr(esc_chars, *p) != ఖాళీ || (bsl && rem_backslash(p)))
+	    ++నిడివి;			// count a backslash
+	++నిడివి;			// count an ordinary char
     }
-    escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    escaped_string = alloc(నిడివి);
+    ఒకవేళ (escaped_string == ఖాళీ)
+	తిరిగి ఖాళీ;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    కొరకు (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    mch_memmove(p2, p, (size_t)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
-	    continue;
+	    కొనసాగు;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	ఒకవేళ (vim_strchr(esc_chars, *p) != ఖాళీ || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    తిరిగి escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
-csh_like_shell(void)
+    పూర్ణాంకం
+csh_like_shell(శూన్య)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    తిరిగి (అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(p_sh), "csh") != ఖాళీ);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
-fish_like_shell(void)
+    స్థిర పూర్ణాంకం
+fish_like_shell(శూన్య)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    తిరిగి (అక్షరశ్రేణి_శోధన((అక్షరం *)gettail(p_sh), "fish") != ఖాళీ);
 }
 
 /*
@@ -145,20 +145,20 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, పూర్ణాంకం do_special, పూర్ణాంకం do_newline)
 {
-    unsigned	length;
+    గుర్తులేని	నిడివి;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
     size_t	l;
-    int		csh_like;
-    int		fish_like;
+    పూర్ణాంకం		csh_like;
+    పూర్ణాంకం		fish_like;
     char_u	*shname;
-    int		powershell;
-#ifdef MSWIN
-    int		double_quotes;
-#endif
+    పూర్ణాంకం		powershell;
+#నిర్వచితమైతే MSWIN
+    పూర్ణాంకం		double_quotes;
+#అయితే_ముగింపు
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
     // the like we must not put a backslash before it, it will be taken
@@ -172,85 +172,85 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
-#ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = అక్షరశ్రేణి_శోధన((అక్షరం *)shname, "pwsh") != ఖాళీ;
+#నిర్వచితమైతే MSWIN
+    powershell = powershell || అక్షరశ్రేణి_శోధన((అక్షరం *)shname, "powershell") != ఖాళీ;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
-#endif
+#అయితే_ముగింపు
 
     // First count the number of extra bytes required.
-    length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    నిడివి = (గుర్తులేని)STRLEN(string) + 3;  // two quotes and a trailing NUL
+    కొరకు (p = string; *p != NUL; MB_PTR_ADV(p))
     {
-#ifdef MSWIN
-	if (double_quotes)
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (double_quotes)
 	{
-	    if (*p == '"')
-		++length;		// " -> ""
+	    ఒకవేళ (*p == '"')
+		++నిడివి;		// " -> ""
 	}
-	else
-#endif
-	if (*p == '\'')
+	లేకపోతే
+#అయితే_ముగింపు
+	ఒకవేళ (*p == '\'')
 	{
-	    if (powershell)
-		length += 2;		// ' => ''
-	    else
-		length += 3;		// ' => '\''
+	    ఒకవేళ (powershell)
+		నిడివి += 2;		// ' => ''
+	    లేకపోతే
+		నిడివి += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	ఒకవేళ ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
-	    ++length;			// insert backslash
-	    if (csh_like && do_special)
-		++length;		// insert backslash
+	    ++నిడివి;			// insert backslash
+	    ఒకవేళ (csh_like && do_special)
+		++నిడివి;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	ఒకవేళ (do_special && కనుగొను_cmdline_var(p, &l) >= 0)
 	{
-	    ++length;			// insert backslash
+	    ++నిడివి;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
-	    ++length;			// insert backslash
+	ఒకవేళ (*p == '\\' && fish_like)
+	    ++నిడివి;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
-    escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    escaped_string = alloc(నిడివి);
+    ఒకవేళ (escaped_string != ఖాళీ)
     {
 	d = escaped_string;
 
 	// add opening quote
-#ifdef MSWIN
-	if (double_quotes)
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (double_quotes)
 	    *d++ = '"';
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	కొరకు (p = string; *p != NUL; )
 	{
-#ifdef MSWIN
-	    if (double_quotes)
+#నిర్వచితమైతే MSWIN
+	    ఒకవేళ (double_quotes)
 	    {
-		if (*p == '"')
+		ఒకవేళ (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
 		    ++p;
-		    continue;
+		    కొనసాగు;
 		}
 	    }
-	    else
-#endif
-	    if (*p == '\'')
+	    లేకపోతే
+#అయితే_ముగింపు
+	    ఒకవేళ (*p == '\'')
 	    {
-		if (powershell)
+		ఒకవేళ (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		లేకపోతే
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -258,46 +258,46 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    *d++ = '\'';
 		}
 		++p;
-		continue;
+		కొనసాగు;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    ఒకవేళ ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		ఒకవేళ (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
-		continue;
+		కొనసాగు;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    ఒకవేళ (do_special && కనుగొను_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
-		memcpy(d, p, l);	// copy the var
+		జ్ఞాపకం_నకలు(d, p, l);	// copy the var
 		d += l;
 		p += l;
-		continue;
+		కొనసాగు;
 	    }
-	    if (*p == '\\' && fish_like)
+	    ఒకవేళ (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
-		continue;
+		కొనసాగు;
 	    }
 
 	    MB_COPY_CHAR(p, d);
 	}
 
 	// add terminating quote and finish with a NUL
-#ifdef MSWIN
-	if (double_quotes)
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (double_quotes)
 	    *d++ = '"';
-	else
-#endif
+	లేకపోతే
+#అయితే_ముగింపు
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    తిరిగి escaped_string;
 }
 
 /*
@@ -305,13 +305,13 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
  * This uses ASCII lower-to-upper case translation, language independent.
  */
     char_u *
-vim_strsave_up(char_u *string)
+vim_strsave_పైకి(char_u *string)
 {
     char_u *p1;
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    తిరిగి p1;
 }
 
 /*
@@ -319,40 +319,40 @@ vim_strsave_up(char_u *string)
  * This uses ASCII lower-to-upper case translation, language independent.
  */
     char_u *
-vim_strnsave_up(char_u *string, size_t len)
+vim_strnsave_పైకి(char_u *string, size_t len)
 {
     char_u *p1;
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    తిరిగి p1;
 }
 
 /*
  * ASCII lower-to-upper case translation, language independent.
  */
-    void
+    శూన్య
 vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    పూర్ణాంకం	    c;
 
-    if (p == NULL)
-	return;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    అయితే ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
  * Returns NULL when out of memory.
  */
-    static char_u *
+    స్థిర char_u *
 strup_save(char_u *orig)
 {
     char_u	*p;
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    ఒకవేళ (res != ఖాళీ)
+	అయితే (*p != NUL)
 	{
-	    int		l;
+	    పూర్ణాంకం		l;
 
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		పూర్ణాంకం	c, uc;
+		పూర్ణాంకం	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		ఒకవేళ (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		ఒకవేళ (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    ఒకవేళ (s == ఖాళీ)
 		    {
 			vim_free(res);
-			return NULL;
+			తిరిగి ఖాళీ;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    లేకపోతే ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    లేకపోతే
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    తిరిగి res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    ఒకవేళ (res != ఖాళీ)
+	అయితే (*p != NUL)
 	{
-	    int		l;
+	    పూర్ణాంకం		l;
 
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		పూర్ణాంకం	c, lc;
+		పూర్ణాంకం	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		ఒకవేళ (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		ఒకవేళ (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    ఒకవేళ (s == ఖాళీ)
 		    {
 			vim_free(res);
-			return NULL;
+			తిరిగి ఖాళీ;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,29 +469,29 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    లేకపోతే ఒకవేళ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    లేకపోతే
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    తిరిగి res;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * delete spaces at the end of a string
  */
-    void
+    శూన్య
 del_trailing_spaces(char_u *ptr)
 {
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    అయితే (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -499,118 +499,118 @@ del_trailing_spaces(char_u *ptr)
  * Like strncpy(), but always terminate the result with one NUL.
  * "to" must be "len + 1" long!
  */
-    void
-vim_strncpy(char_u *to, char_u *from, size_t len)
+    శూన్య
+vim_strncpy(char_u *గమ్యం, char_u *from, size_t len)
 {
-    STRNCPY(to, from, len);
-    to[len] = NUL;
+    STRNCPY(గమ్యం, from, len);
+    గమ్యం[len] = NUL;
 }
 
 /*
  * Like strcat(), but make sure the result fits in "tosize" bytes and is
  * always NUL terminated. "from" and "to" may overlap.
  */
-    void
-vim_strcat(char_u *to, char_u *from, size_t tosize)
+    శూన్య
+vim_strcat(char_u *గమ్యం, char_u *from, size_t tosize)
 {
-    size_t tolen = STRLEN(to);
+    size_t tolen = STRLEN(గమ్యం);
     size_t fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    ఒకవేళ (tolen + fromlen + 1 > tosize)
     {
-	mch_memmove(to + tolen, from, tosize - tolen - 1);
-	to[tosize - 1] = NUL;
+	mch_memmove(గమ్యం + tolen, from, tosize - tolen - 1);
+	గమ్యం[tosize - 1] = NUL;
     }
-    else
-	mch_memmove(to + tolen, from, fromlen + 1);
+    లేకపోతే
+	mch_memmove(గమ్యం + tolen, from, fromlen + 1);
 }
 
 /*
  * A version of strlen() that has a maximum length.
  */
     size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+vim_strlen_maxlen(అక్షరం *s, size_t maxlen)
 {
     size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    కొరకు (i = 0; i < maxlen; ++i)
+	ఒకవేళ (s[i] == NUL)
+	    ఆపు;
+    తిరిగి i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#ఒకవేళ !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    పూర్ణాంకం
+vim_stricmp(అక్షరం *s1, అక్షరం *s2)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (;;)
+    కొరకు (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (పూర్ణాంకం)TOLOWER_LOC(*s1) - (పూర్ణాంకం)TOLOWER_LOC(*s2);
+	ఒకవేళ (i != 0)
+	    తిరిగి i;			    // this character different
+	ఒకవేళ (*s1 == NUL)
+	    ఆపు;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    తిరిగి 0;				    // strings match
 }
-#endif
+#అయితే_ముగింపు
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#ఒకవేళ !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    పూర్ణాంకం
+vim_strnicmp(అక్షరం *s1, అక్షరం *s2, size_t len)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    while (len > 0)
+    అయితే (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (పూర్ణాంకం)TOLOWER_LOC(*s1) - (పూర్ణాంకం)TOLOWER_LOC(*s2);
+	ఒకవేళ (i != 0)
+	    తిరిగి i;			    // this character different
+	ఒకవేళ (*s1 == NUL)
+	    ఆపు;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    తిరిగి 0;				    // strings match
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Compare two ASCII strings, for length "len", ignoring case, ignoring locale
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    పూర్ణాంకం
+vim_strnicmp_asc(అక్షరం *s1, అక్షరం *s2, size_t len)
 {
-    int                i = 0;
+    పూర్ణాంకం                i = 0;
 
-    while (len > 0)
+    అయితే (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	ఒకవేళ (i != 0)
+	    ఆపు;			// this character is different
+	ఒకవేళ (*s1 == NUL)
+	    ఆపు;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    తిరిగి i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, పూర్ణాంకం c)
 {
     char_u	*p;
-    int		b;
+    పూర్ణాంకం		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    ఒకవేళ (enc_utf8 && c > 0 && c < 0x80)
+	తిరిగి vim_strbyte(string, c);
+    ఒకవేళ (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	అయితే (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    పూర్ణాంకం l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    ఒకవేళ (utf_ptr2char(p) == c && l > 1)
+		తిరిగి p;
 	    p += l;
 	}
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (enc_dbcs != 0 && c > 255)
+    ఒకవేళ (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	పూర్ణాంకం	n2 = c & 0xff;
 
-	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	c = ((గుర్తులేని)c >> 8) & 0xff;
+	అయితే ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    ఒకవేళ (b == c && p[1] == n2)
+		తిరిగి p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	అయితే ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    ఒకవేళ (b == c)
+		తిరిగి p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    while ((b = *p) != NUL)
+    అయితే ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	ఒకవేళ (b == c)
+	    తిరిగి p;
 	++p;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, పూర్ణాంకం c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    ఒకవేళ (c <= 0 || c > 255)
+	తిరిగి ఖాళీ;
+    తిరిగి (char_u *)strchr((అక్షరం *)string, c);
 }
 
 /*
@@ -697,25 +697,25 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, పూర్ణాంకం c)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ఖాళీ;
     char_u	*p = string;
 
-    while (*p)
+    అయితే (*p)
     {
-	if (*p == c)
+	ఒకవేళ (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Vim's version of strpbrk(), in case it's missing.
  * Don't generate a prototype for this, causes problems when it's not used.
  */
-#ifndef PROTO
+#నిర్వచితం_కాకపోతే PROTO
 # ifndef HAVE_STRPBRK
 #  ifdef vim_strpbrk
 #   undef vim_strpbrk
@@ -723,53 +723,53 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    అయితే (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	ఒకవేళ (vim_strchr(charset, *s) != ఖాళీ)
+	    తిరిగి s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 # endif
-#endif
+#అయితే_ముగింపు
 
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+స్థిర పూర్ణాంకం క్రమీకరించు_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2);
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    స్థిర పూర్ణాంకం
+క్రమీకరించు_compare(స్థిరరాశి శూన్య *s1, స్థిరరాశి శూన్య *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    తిరిగి STRCMP(*(అక్షరం **)s1, *(అక్షరం **)s2);
 }
 
-    void
-sort_strings(
+    శూన్య
+క్రమీకరించు_అక్షరశ్రేణులు(
     char_u	**files,
-    int		count)
+    పూర్ణాంకం		లెక్క)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((శూన్య *)files, (size_t)లెక్క, పరిమాణం(char_u *), క్రమీకరించు_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#ఒకవేళ defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    పూర్ణాంకం
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    ఒకవేళ (s != ఖాళీ)
+	కొరకు (p = s; *p != NUL; ++p)
+	    ఒకవేళ (*p >= 128)
+		తిరిగి TRUE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Concatenate two strings and return the result in allocated memory.
@@ -779,212 +779,212 @@ has_non_ascii(char_u *s)
 concat_str(char_u *str1, char_u *str2)
 {
     char_u  *dest;
-    size_t  l = str1 == NULL ? 0 : STRLEN(str1);
+    size_t  l = str1 == ఖాళీ ? 0 : STRLEN(str1);
 
-    dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    dest = alloc(l + (str2 == ఖాళీ ? 0 : STRLEN(str2)) + 1L);
+    ఒకవేళ (dest == ఖాళీ)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (str1 == ఖాళీ)
 	*dest = NUL;
-    else
+    లేకపోతే
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    ఒకవేళ (str2 != ఖాళీ)
 	STRCPY(dest + l, str2);
-    return dest;
+    తిరిగి dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
  */
     char_u *
-reverse_text(char_u *s)
+తిరగేయి_పాఠ్యం(char_u *s)
 {
     size_t len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    ఒకవేళ (rev == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    కొరకు (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    పూర్ణాంకం mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	లేకపోతే
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    తిరిగి rev;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, పూర్ణాంకం function)
 {
-    unsigned	len;
+    గుర్తులేని	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    ఒకవేళ (str != ఖాళీ)
     {
-	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	len += (గుర్తులేని)STRLEN(str);
+	కొరకు (p = str; *p != NUL; MB_PTR_ADV(p))
+	    ఒకవేళ (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    ఒకవేళ (r == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (function)
+    ఒకవేళ (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    లేకపోతే
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    ఒకవేళ (str != ఖాళీ)
+	కొరకు (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    ఒకవేళ (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    ఒకవేళ (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    తిరిగి s;
 }
 
 /*
  * Count the number of times "needle" occurs in string "haystack". Case is
  * ignored if "ic" is TRUE.
  */
-    long
-string_count(char_u *haystack, char_u *needle, int ic)
+    దీర్ఘ
+string_లెక్క(char_u *haystack, char_u *needle, పూర్ణాంకం ic)
 {
-    long	n = 0;
+    దీర్ఘ	n = 0;
     char_u	*p = haystack;
-    char_u	*next;
+    char_u	*తదుపరి;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    ఒకవేళ (p == ఖాళీ || needle == ఖాళీ || *needle == NUL)
+	తిరిగి 0;
 
     size_t  needlelen = STRLEN(needle);
-    if (ic)
+    ఒకవేళ (ic)
     {
-	while (*p != NUL)
+	అయితే (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    ఒకవేళ (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    లేకపోతే
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    లేకపోతే
+	అయితే ((తదుపరి = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)p, (అక్షరం *)needle)) != ఖాళీ)
 	{
 	    ++n;
-	    p = next + needlelen;
+	    p = తదుపరి + needlelen;
 	}
 
-    return n;
+    తిరిగి n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+    స్థిర పూర్ణాంకం
+copy_మొదటి_char_గమ్యం_tv(char_u *ఆదానం, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    ఒకవేళ (ఆదానం == ఖాళీ || output == ఖాళీ)
+	తిరిగి -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(ఆదానం) : 1;
+    STRNCPY(buf, ఆదానం, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    తిరిగి output->vval.v_string == ఖాళీ ? -1 : len;
 }
 
 /*
  * Implementation of map() and filter() for a String. Apply "expr" to every
  * character in string "str" and return the result in "rettv".
  */
-    void
+    శూన్య
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*సమాసం,
 	typval_T	*rettv)
 {
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		idx = 0;
+    పూర్ణాంకం		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    సమితి_vim_var_type(VV_కీలకం, VAR_సంఖ్య);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_సమాసం_get_funccal(సమాసం, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, పరిమాణం(అక్షరం), 80);
+    కొరకు (p = str; *p != NUL; p += len)
     {
-	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	len = copy_మొదటి_char_గమ్యం_tv(p, &tv);
+	ఒకవేళ (len < 0)
+	    ఆపు;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	సమితి_vim_var_nr(VV_కీలకం, idx);
+	ఒకవేళ (filter_map_one(&tv, సమాసం, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    ఆపు;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	ఒకవేళ (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    ఒకవేళ (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		ఆపు;
 	    }
-	    else
+	    లేకపోతే
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	లేకపోతే ఒకవేళ (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -993,8 +993,8 @@ string_filter_map(
 	++idx;
     }
     ga_append(&ga, NUL);
-    rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    rettv->vval.v_string = ga.ga_దత్తాంశం;
+    ఒకవేళ (fc != ఖాళీ)
 	remove_funccal();
 }
 
@@ -1003,126 +1003,126 @@ string_filter_map(
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    శూన్య
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*సమాసం,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    పూర్ణాంకం		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    పూర్ణాంకం		r;
+    పూర్ణాంకం		called_emsg_ప్రారంభం = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	ఒకవేళ (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    semsg(_(e_reduce_యొక్క_an_ఖాళీలు_str_with_no_initial_విలువ), "String");
+	    తిరిగి;
 	}
-	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	len = copy_మొదటి_char_గమ్యం_tv(p, rettv);
+	ఒకవేళ (len < 0)
+	    తిరిగి;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    లేకపోతే ఒకవేళ (check_for_string_arg(argvars, 2) == FAIL)
+	తిరిగి;
+    లేకపోతే
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_సమాసం_get_funccal(సమాసం, rettv);
 
-    for ( ; *p != NUL; p += len)
+    కొరకు ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	len = copy_మొదటి_char_గమ్యం_tv(p, &argv[1]);
+	ఒకవేళ (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    ఆపు;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_సమాసం_typval(సమాసం, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ఒకవేళ (r == FAIL || called_emsg != called_emsg_ప్రారంభం)
+	    ఆపు;
     }
 
-    if (fc != NULL)
+    ఒకవేళ (fc != ఖాళీ)
 	remove_funccal();
 }
 
 /*
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
-    static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+    స్థిర శూన్య
+byteidx_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_సంఖ్య_chk(&argvars[1], ఖాళీ);
+    ఒకవేళ (str == ఖాళీ || idx < 0)
+	తిరిగి;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	పూర్ణాంకం error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	ఒకవేళ (error)
+	    తిరిగి;
+	ఒకవేళ (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    semsg(_(e_using_సంఖ్య_as_bool_nr), utf16idx);
+	    తిరిగి;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    పూర్ణాంకం (*ptr2len)(char_u *);
+    ఒకవేళ (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    లేకపోతే
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    కొరకు ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	ఒకవేళ (*t == NUL)		// EOL reached
+	    తిరిగి;
+	ఒకవేళ (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    పూర్ణాంకం clen = ptr2len(t);
+	    పూర్ణాంకం c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    ఒకవేళ (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    ఒకవేళ (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	లేకపోతే ఒకవేళ (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_సంఖ్య = (varnumber_T)(t - str);
 }
 
 /*
  * "byteidx()" function
  */
-    void
+    శూన్య
 f_byteidx(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, FALSE);
@@ -1131,7 +1131,7 @@ f_byteidx(typval_T *argvars, typval_T *rettv)
 /*
  * "byteidxcomp()" function
  */
-    void
+    శూన్య
 f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, TRUE);
@@ -1140,114 +1140,114 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 /*
  * "charidx()" function
  */
-    void
+    శూన్య
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	తిరిగి;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_సంఖ్య_chk(&argvars[1], ఖాళీ);
+    ఒకవేళ (str == ఖాళీ || idx < 0)
+	తిరిగి;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    పూర్ణాంకం (*ptr2len)(char_u *);
+    ఒకవేళ (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    లేకపోతే
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    పూర్ణాంకం		len;
+    కొరకు (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	ఒకవేళ (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    ఒకవేళ (utf16idx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_సంఖ్య = len;
+	    తిరిగి;
 	}
-	if (utf16idx)
+	ఒకవేళ (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    పూర్ణాంకం clen = ptr2len(p);
+	    పూర్ణాంకం c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    ఒకవేళ (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_సంఖ్య = len > 0 ? len - 1 : 0;
 }
 
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
-convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
+    స్థిర పూర్ణాంకం
+convert_string(string_T *str, char_u *from, char_u *గమ్యం, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    ఒకవేళ (convert_అమరిక(&vimconv, from, గమ్యం) == FAIL)
+	తిరిగి FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    ఒకవేళ (vimconv.vc_type == CONV_NONE)
     {
-	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
-	    ret->length = 0;
-	else
-	    ret->length = str->length;
+	ret->string = vim_strnsave(str->string, str->నిడివి);
+	ఒకవేళ (ret->string == ఖాళీ)
+	    ret->నిడివి = 0;
+	లేకపోతే
+	    ret->నిడివి = str->నిడివి;
     }
-    else
+    లేకపోతే
     {
-	int len = (int)str->length;
+	పూర్ణాంకం len = (పూర్ణాంకం)str->నిడివి;
 	ret->string = string_convert(&vimconv, str->string, &len);
-	ret->length = len;
+	ret->నిడివి = len;
     }
-    convert_setup(&vimconv, NULL, NULL);
+    convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    తిరిగి (ret->string == ఖాళీ) ? FAIL : OK;
 }
 
 /*
  * Add the bytes from "str" to "blob".
  */
-    static void
+    స్థిర శూన్య
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    పూర్ణాంకం	    len = (పూర్ణాంకం)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
-    dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
+    ఒకవేళ (len == 0)
+	తిరిగి;
+    ఒకవేళ (ga_grow(&blob->bv_ga, len) == FAIL)
+	తిరిగి;
+    dest = (char_u *)blob->bv_ga.ga_దత్తాంశం + blob->bv_ga.ga_len;
     mch_memmove(dest, str, (size_t)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    కొరకు (పూర్ణాంకం i = 0; i < len; ++i)
+	ఒకవేళ (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,45 +1260,45 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
-string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
+    స్థిర పూర్ణాంకం
+string_from_blob(blob_T *blob, దీర్ఘ *ప్రారంభం_idx, string_T *ret)
 {
-    long	blen = blob_len(blob);
-    long	start = *start_idx;
+    దీర్ఘ	blen = blob_len(blob);
+    దీర్ఘ	ప్రారంభం = *ప్రారంభం_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    దీర్ఘ	పంక్తి_len;
 
-    if (start >= blen)
+    ఒకవేళ (ప్రారంభం >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
-	ret->length = 0;
-	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	ret->నిడివి = 0;
+	*ప్రారంభం_idx = blen;
+	తిరిగి (ret->string == ఖాళీ) ? FAIL : OK;
     }
 
-    src = (char_u *)blob->bv_ga.ga_data + start;
-    nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    src = (char_u *)blob->bv_ga.ga_దత్తాంశం + ప్రారంభం;
+    nl = (char_u *)memchr(src, NL, (size_t)(blen - ప్రారంభం));
+    పంక్తి_len = (nl == ఖాళీ) ? (blen - ప్రారంభం) : (దీర్ఘ)(nl - src);
 
-    ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(పంక్తి_len + 1);
+    ఒకవేళ (ret->string == ఖాళీ)
     {
-	ret->length = 0;
-	return FAIL;
+	ret->నిడివి = 0;
+	తిరిగి FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    ఒకవేళ (పంక్తి_len > 0)
+	mch_memmove(ret->string, src, (size_t)పంక్తి_len);
+    ret->string[పంక్తి_len] = NUL;
+    ret->నిడివి = (size_t)పంక్తి_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    కొరకు (దీర్ఘ i = 0; i < పంక్తి_len; i++)
+	ఒకవేళ (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    *ప్రారంభం_idx = ప్రారంభం + పంక్తి_len + (nl != ఖాళీ ? 1 : 0);
+    తిరిగి OK;
 }
 
 /*
@@ -1306,22 +1306,22 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
  * For example: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
  * Returns allocated string or NULL on allocation failure.
  */
-    static char_u *
+    స్థిర char_u *
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    ఒకవేళ (from_encoding_raw == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    అయితే (*s != NUL)
     {
-	if (*s == '_')
+	ఒకవేళ (*s == '_')
 	    *pe++ = '-';
-	else
+	లేకపోతే
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    ఒకవేళ ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,117 +1337,117 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    తిరిగి from_encoding_raw;
 }
 
 /*
  * "blob2str()" function
  * Converts a blob to a string, ensuring valid UTF-8 encoding.
  */
-    static void
-append_converted_string_to_list(
+    స్థిర శూన్య
+append_converted_string_గమ్యం_list(
 	string_T *converted,
-	int validate_utf8,
+	పూర్ణాంకం validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    ఒకవేళ (converted->string != ఖాళీ)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
-	char_u *end = converted->string + converted->length;
-	while (p < end)
+	char_u *చివర = converted->string + converted->నిడివి;
+	అయితే (p < చివర)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	పంక్తి;
+	    char_u	*పంక్తి_ప్రారంభం = p;
 
-	    while (p < end && *p != NL)
+	    అయితే (p < చివర && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    పంక్తి.నిడివి = (size_t)(p - పంక్తి_ప్రారంభం);
+	    పంక్తి.string = vim_strnsave(పంక్తి_ప్రారంభం, పంక్తి.నిడివి);
+	    ఒకవేళ (పంక్తి.string != ఖాళీ)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		ఒకవేళ (validate_utf8 && !utf_valid_string(పంక్తి.string, ఖాళీ))
 		{
-		    vim_free(line.string);
+		    vim_free(పంక్తి.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    తిరిగి; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		ఒకవేళ (list_append_string(list, పంక్తి.string, (పూర్ణాంకం)పంక్తి.నిడివి) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(పంక్తి.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    తిరిగి; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(పంక్తి.string);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Allocation failure: report error and stop processing
-		emsg(_(e_out_of_memory));
+		emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 		vim_free(converted->string);
-		return;
+		తిరిగి;
 	    }
 
-	    if (*p == NL)
+	    ఒకవేళ (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    లేకపోతే
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    స్థిర పూర్ణాంకం
+append_validated_పంక్తి_గమ్యం_list(string_T *పంక్తి, పూర్ణాంకం validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    ఒకవేళ (validate_utf8 && !utf_valid_string(పంక్తి->string, ఖాళీ))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
-	return FAIL;
+	vim_free(పంక్తి->string);
+	తిరిగి FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
-    return ret;
+    పూర్ణాంకం ret = list_append_string(list, పంక్తి->string, (పూర్ణాంకం)పంక్తి->నిడివి);
+    vim_free(పంక్తి->string);
+    తిరిగి ret;
 }
 
-    void
+    శూన్య
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
-    long	idx;
-    int		validate_utf8 = FALSE;
+    పూర్ణాంకం		blen;
+    దీర్ఘ	idx;
+    పూర్ణాంకం		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	తిరిగి;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    ఒకవేళ (blob == ఖాళీ)
+	తిరిగి;
     blen = blob_len(blob);
 
-    char_u	*from_encoding = NULL;
-    char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*from_encoding = ఖాళీ;
+    char_u	*from_encoding_raw = ఖాళీ;  // Encoding name with endianness preserved for iconv
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	ఒకవేళ (d != ఖాళీ)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    ఒకవేళ (enc != ఖాళీ)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		ఒకవేళ (from_encoding_raw == ఖాళీ)
 		{
-		    emsg(_(e_out_of_memory));
+		    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    తిరిగి;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    ఒకవేళ (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    ఒకవేళ (from_encoding != ఖాళీ && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,23 +1476,23 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    పూర్ణాంకం from_prop = 0;
+    ఒకవేళ (from_encoding != ఖాళీ)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    ఒకవేళ (from_encoding != ఖాళీ && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2_మాట)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
-	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	పూర్ణాంకం nul_కొలత = (from_prop & ENC_4BYTE) ? 4 : 2;
+	ga_init2(&blob_ga, 1, blen + nul_కొలత);
+	ఒకవేళ (ga_grow(&blob_ga, blen + nul_కొలత) == OK)
 	{
-	    if (blen > 0)
-		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
+	    ఒకవేళ (blen > 0)
+		mch_memmove(blob_ga.ga_దత్తాంశం, blob->bv_ga.ga_దత్తాంశం, (size_t)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
-	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
-	    blob_ga.ga_len = blen + nul_size;
+	    vim_memset((char_u *)blob_ga.ga_దత్తాంశం + blen, 0, (size_t)nul_కొలత);
+	    blob_ga.ga_len = blen + nul_కొలత;
 	}
 
 	// Convert the entire blob at once
@@ -1500,63 +1500,63 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	ఒకవేళ (convert_అమరిక_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
-	    goto done;
+	    వెళ్ళు పూర్తి;
 	}
 	vimconv.vc_fail = TRUE;
 
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	పూర్ణాంకం len = blen;
 	converted.string =
-	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
-	converted.length = len;
-	convert_setup(&vimconv, NULL, NULL);
+	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_దత్తాంశం, &len, ఖాళీ);
+	converted.నిడివి = len;
+	convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
 	ga_clear(&blob_ga);
-	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
+	append_converted_string_గమ్యం_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    లేకపోతే
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	అయితే (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    ఒకవేళ (string_from_blob(blob, &idx, &str) != OK)
+		ఆపు;
 
-	    if (from_encoding != NULL)
+	    ఒకవేళ (from_encoding != ఖాళీ)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		పూర్ణాంకం	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		ఒకవేళ (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
-		    goto done;
+		    వెళ్ళు పూర్తి;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.నిడివి = converted.నిడివి;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
-		goto done;
+	    ఒకవేళ (append_validated_పంక్తి_గమ్యం_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+		వెళ్ళు పూర్తి;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    ఒకవేళ (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
-done:
+పూర్తి:
     vim_free(from_encoding);
     vim_free(from_encoding_raw);
 }
@@ -1564,47 +1564,47 @@ done:
 /*
  * "str2blob()" function
  */
-    void
+    శూన్య
 f_str2blob(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	తిరిగి;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_blob_alloc(rettv) == FAIL)
+	తిరిగి;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    ఒకవేళ (list == ఖాళీ)
+	తిరిగి;
 
-    char_u	*to_encoding = NULL;
-    char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*గమ్యం_encoding = ఖాళీ;
+    char_u	*గమ్యం_encoding_raw = ఖాళీ;  // Encoding name with endianness preserved for iconv
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	ఒకవేళ (d != ఖాళీ)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    ఒకవేళ (enc != ఖాళీ)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
-		to_encoding = enc_canonize(enc_skipped);
+		గమ్యం_encoding = enc_canonize(enc_skipped);
 
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
-		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		గమ్యం_encoding_raw = normalize_encoding_name(enc_skipped);
+		ఒకవేళ (గమ్యం_encoding_raw == ఖాళీ)
 		{
-		    emsg(_(e_out_of_memory));
-		    VIM_CLEAR(to_encoding);
-		    return;
+		    emsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం));
+		    VIM_CLEAR(గమ్యం_encoding);
+		    తిరిగి;
 		}
 	    }
 	}
@@ -1615,253 +1615,253 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
-	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    పూర్ణాంకం గమ్యం_prop = 0;
+    ఒకవేళ (గమ్యం_encoding != ఖాళీ)
+	గమ్యం_prop = enc_canon_props(గమ్యం_encoding);
+    ఒకవేళ (గమ్యం_encoding != ఖాళీ && (గమ్యం_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2_మాట)))
     {
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_వస్తువులు(list, li)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    ఒకవేళ (li->li_tv.v_type != VAR_STRING)
+		కొనసాగు;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    ఒకవేళ (li != list->lv_మొదటి)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    ఒకవేళ (s != ఖాళీ && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		పూర్ణాంకం slen = (పూర్ణాంకం)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		ఒకవేళ (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
-		    goto done;
+		    వెళ్ళు పూర్తి;
 		}
-		mch_memmove((char_u *)str_ga.ga_data + str_ga.ga_len, s,
+		mch_memmove((char_u *)str_ga.ga_దత్తాంశం + str_ga.ga_len, s,
 								(size_t)slen);
 		str_ga.ga_len += slen;
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	ఒకవేళ (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    ఒకవేళ (convert_అమరిక_ext(&vimconv, p_enc, FALSE, గమ్యం_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
-		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		semsg(_(e_str_encoding_గమ్యం_failed), గమ్యం_encoding);
+		వెళ్ళు పూర్తి;
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    పూర్ణాంకం		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
-				    (char_u *)str_ga.ga_data, &len, NULL);
-	    convert_setup(&vimconv, NULL, NULL);
+				    (char_u *)str_ga.ga_దత్తాంశం, &len, ఖాళీ);
+	    convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    ఒకవేళ (converted == ఖాళీ)
 	    {
-		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		semsg(_(e_str_encoding_గమ్యం_failed), గమ్యం_encoding);
+		వెళ్ళు పూర్తి;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    ఒకవేళ (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
-		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
+		mch_memmove((char_u *)blob->bv_ga.ga_దత్తాంశం + blob->bv_ga.ga_len,
 						    converted, (size_t)len);
 		blob->bv_ga.ga_len += len;
 	    }
 	    vim_free(converted);
 	}
-	else
+	లేకపోతే
 	    ga_clear(&str_ga);
     }
-    else
+    లేకపోతే
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_వస్తువులు(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    ఒకవేళ (li->li_tv.v_type != VAR_STRING)
+		కొనసాగు;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
-		STR_LITERAL_SET(str, "");
-	    else
-		str.length = STRLEN(str.string);
+	    ఒకవేళ (str.string == ఖాళీ)
+		STR_LITERAL_సమితి(str, "");
+	    లేకపోతే
+		str.నిడివి = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    ఒకవేళ (గమ్యం_encoding != ఖాళీ)
 	    {
-		int	    res;
+		పూర్ణాంకం	    res;
 		string_T    converted;
 
-		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		res = convert_string(&str, p_enc, గమ్యం_encoding, &converted);
+		ఒకవేళ (res != OK)
 		{
-		    semsg(_(e_str_encoding_to_failed), to_encoding);
-		    goto done;
+		    semsg(_(e_str_encoding_గమ్యం_failed), గమ్యం_encoding);
+		    వెళ్ళు పూర్తి;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.నిడివి = converted.నిడివి;
 	    }
 
-	    if (li != list->lv_first)
+	    ఒకవేళ (li != list->lv_మొదటి)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    ఒకవేళ (గమ్యం_encoding != ఖాళీ)
 		vim_free(str.string);
 	}
     }
 
-done:
-    if (to_encoding != NULL)
-	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
-	vim_free(to_encoding_raw);
+పూర్తి:
+    ఒకవేళ (గమ్యం_encoding != ఖాళీ)
+	vim_free(గమ్యం_encoding);
+    ఒకవేళ (గమ్యం_encoding_raw != ఖాళీ)
+	vim_free(గమ్యం_encoding_raw);
 }
 
 /*
  * "str2list()" function
  */
-    void
+    శూన్య
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    పూర్ణాంకం		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (పూర్ణాంకం)tv_get_bool_chk(&argvars[1], ఖాళీ);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    ఒకవేళ (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	పూర్ణాంకం (*ptr2len)(char_u *);
+	పూర్ణాంకం (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	ఒకవేళ (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	లేకపోతే
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	కొరకు ( ; *p != NUL; p += (*ptr2len)(p))
+	    list_append_సంఖ్య(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+    లేకపోతే
+	కొరకు ( ; *p != NUL; ++p)
+	    list_append_సంఖ్య(rettv->vval.v_list, *p);
 }
 
 /*
  * "str2nr()" function
  */
-    void
+    శూన్య
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    పూర్ణాంకం		పునాది = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    పూర్ణాంకం		what = 0;
+    పూర్ణాంకం		isneg;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	పునాది = (పూర్ణాంకం)tv_get_సంఖ్య(&argvars[1]);
+	ఒకవేళ (పునాది != 2 && పునాది != 8 && పునాది != 10 && పునాది != 16)
 	{
-	    emsg(_(e_invalid_argument));
-	    return;
+	    emsg(_(e_invalid_వాదం));
+	    తిరిగి;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    ఒకవేళ (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    switch (base)
+    ఎంపిక (పునాది)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	స్థితి 2: what |= STR2NR_BIN + STR2NR_FORCE; ఆపు;
+	స్థితి 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; ఆపు;
+	స్థితి 16: what |= STR2NR_HEX + STR2NR_FORCE; ఆపు;
     }
-    vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
+    vim_str2nr(p, ఖాళీ, ఖాళీ, what, &n, ఖాళీ, 0, FALSE, ఖాళీ);
     // Text after the number is silently ignored.
-    if (isneg)
-	rettv->vval.v_number = -n;
-    else
-	rettv->vval.v_number = n;
+    ఒకవేళ (isneg)
+	rettv->vval.v_సంఖ్య = -n;
+    లేకపోతే
+	rettv->vval.v_సంఖ్య = n;
 
 }
 
 /*
  * "strgetchar()" function
  */
-    void
+    శూన్య
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		error = FALSE;
+    పూర్ణాంకం		charidx;
+    పూర్ణాంకం		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి;
+    len = (పూర్ణాంకం)STRLEN(str);
+    charidx = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[1], &error);
+    ఒకవేళ (error)
+	తిరిగి;
 
-    while (charidx >= 0 && byteidx < len)
+    అయితే (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	ఒకవేళ (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    rettv->vval.v_సంఖ్య = mb_ptr2char(str + byteidx);
+	    ఆపు;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1871,7 +1871,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
 /*
  * "stridx()" function
  */
-    void
+    శూన్య
 f_stridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
@@ -1879,40 +1879,40 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    పూర్ణాంకం		ప్రారంభం_idx;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL))
+	తిరిగి;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_సంఖ్య = -1;
+    ఒకవేళ (needle == ఖాళీ || haystack == ఖాళీ)
+	తిరిగి;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	పూర్ణాంకం	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
-	    haystack += start_idx;
+	ప్రారంభం_idx = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[2], &error);
+	ఒకవేళ (error || ప్రారంభం_idx >= (పూర్ణాంకం)STRLEN(haystack))
+	    తిరిగి;
+	ఒకవేళ (ప్రారంభం_idx >= 0)
+	    haystack += ప్రారంభం_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+    pos	= (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)haystack, (అక్షరం *)needle);
+    ఒకవేళ (pos != ఖాళీ)
+	rettv->vval.v_సంఖ్య = (varnumber_T)(pos - save_haystack);
 }
 
 /*
  * "string()" function
  */
-    void
+    శూన్య
 f_string(typval_T *argvars, typval_T *rettv)
 {
     char_u	*tofree;
@@ -1922,49 +1922,49 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    ఒకవేళ (rettv->vval.v_string != ఖాళీ && tofree == ఖాళీ)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
 /*
  * "strlen()" function
  */
-    void
+    శూన్య
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script()
+	    && check_for_string_or_సంఖ్య_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_సంఖ్య = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
-    static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+    స్థిర శూన్య
+strchar_common(typval_T *argvars, typval_T *rettv, పూర్ణాంకం skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    పూర్ణాంకం			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    అయితే (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_సంఖ్య = len;
 }
 
 /*
  * "strcharlen()" function
  */
-    void
+    శూన్య
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script()
+	    && check_for_string_or_సంఖ్య_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1972,26 +1972,26 @@ f_strcharlen(typval_T *argvars, typval_T *rettv)
 /*
  * "strchars()" function
  */
-    void
+    శూన్య
 f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	పూర్ణాంకం error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	ఒకవేళ (error)
+	    తిరిగి;
+	ఒకవేళ (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    semsg(_(e_using_సంఖ్య_as_bool_nr), skipcc);
+	    తిరిగి;
 	}
     }
 
@@ -2001,161 +2001,161 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 /*
  * "strutf16len()" function
  */
-    void
+    శూన్య
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	తిరిగి;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    పూర్ణాంకం			(*func_mb_ptr2char_adv)(char_u **pp);
+    పూర్ణాంకం			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    అయితే (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	ఒకవేళ (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_సంఖ్య = len;
 }
 
 /*
  * "strdisplaywidth()" function
  */
-    void
+    శూన్య
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    పూర్ణాంకం		నిలువు = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL))
+	తిరిగి;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
+	నిలువు = (పూర్ణాంకం)tv_get_సంఖ్య(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_సంఖ్య = (varnumber_T)(linetabsize_నిలువు(నిలువు, s) - నిలువు);
 }
 
 /*
  * "strwidth()" function
  */
-    void
+    శూన్య
 f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_సంఖ్య = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
  * "strcharpart()" function
  */
-    void
+    శూన్య
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    పూర్ణాంకం		nchar;
+    పూర్ణాంకం		nbyte = 0;
+    పూర్ణాంకం		charlen;
+    పూర్ణాంకం		skipcc = FALSE;
+    పూర్ణాంకం		len = 0;
+    పూర్ణాంకం		slen;
+    పూర్ణాంకం		error = FALSE;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	తిరిగి;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (పూర్ణాంకం)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[1], &error);
+    ఒకవేళ (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    ఒకవేళ (error)
+		తిరిగి;
+	    ఒకవేళ (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		semsg(_(e_using_సంఖ్య_as_bool_nr), skipcc);
+		తిరిగి;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	ఒకవేళ (nchar > 0)
+	    అయితే (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		ఒకవేళ (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		లేకపోతే
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	లేకపోతే
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (పూర్ణాంకం)tv_get_సంఖ్య(&argvars[2]);
+	    అయితే (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		పూర్ణాంకం off = nbyte + len;
 
-		if (off < 0)
+		ఒకవేళ (off < 0)
 		    len += 1;
-		else
+		లేకపోతే
 		{
-		    if (skipcc)
+		    ఒకవేళ (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    లేకపోతే
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	లేకపోతే
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    ఒకవేళ (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    లేకపోతే ఒకవేళ (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    ఒకవేళ (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    లేకపోతే ఒకవేళ (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2165,54 +2165,54 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strpart()" function
  */
-    void
+    శూన్య
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		slen;
+    పూర్ణాంకం		error = FALSE;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_సంఖ్య_arg(argvars, 1) == FAIL
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	తిరిగి;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (పూర్ణాంకం)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[1], &error);
+    ఒకవేళ (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    లేకపోతే ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
+	len = (పూర్ణాంకం)tv_get_సంఖ్య(&argvars[2]);
+    లేకపోతే
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    ఒకవేళ (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    లేకపోతే ఒకవేళ (n > slen)
 	n = slen;
-    if (len < 0)
+    ఒకవేళ (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    లేకపోతే ఒకవేళ (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	పూర్ణాంకం off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	కొరకు (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2224,70 +2224,70 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strridx()" function
  */
-    void
+    శూన్య
 f_strridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*needle;
     char_u	*haystack;
     char_u	*rest;
-    char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    char_u	*lastmatch = ఖాళీ;
+    పూర్ణాంకం		haystack_len, చివర_idx;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL))
+	తిరిగి;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_సంఖ్య = -1;
+    ఒకవేళ (needle == ఖాళీ || haystack == ఖాళీ)
+	తిరిగి;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (పూర్ణాంకం)STRLEN(haystack);
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	చివర_idx = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[2], ఖాళీ);
+	ఒకవేళ (చివర_idx < 0)
+	    తిరిగి;	// can never find a match
     }
-    else
-	end_idx = haystack_len;
+    లేకపోతే
+	చివర_idx = haystack_len;
 
-    if (*needle == NUL)
+    ఒకవేళ (*needle == NUL)
     {
 	// Empty string matches past the end.
-	lastmatch = haystack + end_idx;
+	lastmatch = haystack + చివర_idx;
     }
-    else
+    లేకపోతే
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	కొరకు (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)అక్షరశ్రేణి_శోధన((అక్షరం *)rest, (అక్షరం *)needle);
+	    ఒకవేళ (rest == ఖాళీ || rest > haystack + చివర_idx)
+		ఆపు;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+    ఒకవేళ (lastmatch == ఖాళీ)
+	rettv->vval.v_సంఖ్య = -1;
+    లేకపోతే
+	rettv->vval.v_సంఖ్య = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
  * "strtrans()" function
  */
-    void
+    శూన్య
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2300,73 +2300,73 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
  * Converts a byte or character offset in a string to the corresponding UTF-16
  * code unit offset.
  */
-    void
+    శూన్య
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_సంఖ్య = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    తిరిగి;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_సంఖ్య_chk(&argvars[1], ఖాళీ);
+    ఒకవేళ (str == ఖాళీ || idx < 0)
+	తిరిగి;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    పూర్ణాంకం (*ptr2len)(char_u *);
+    ఒకవేళ (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    లేకపోతే
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		utf16idx = 0;
+    కొరకు (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	ఒకవేళ (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    ఒకవేళ (charidx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_సంఖ్య = len;
+	    తిరిగి;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	పూర్ణాంకం clen = ptr2len(p);
+	పూర్ణాంకం c = (clen > 1) ? utf_ptr2char(p) : *p;
+	ఒకవేళ (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	ఒకవేళ (charidx)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_సంఖ్య = utf16idx;
 }
 
 /*
  * "tolower(string)" function
  */
-    void
+    శూన్య
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2375,11 +2375,11 @@ f_tolower(typval_T *argvars, typval_T *rettv)
 /*
  * "toupper(string)" function
  */
-    void
+    శూన్య
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2388,225 +2388,225 @@ f_toupper(typval_T *argvars, typval_T *rettv)
 /*
  * "tr(string, fromstr, tostr)" function
  */
-    void
+    శూన్య
 f_tr(typval_T *argvars, typval_T *rettv)
 {
-    char_u	*in_str;
+    char_u	*లోపల_str;
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    పూర్ణాంకం		inlen;
+    పూర్ణాంకం		fromlen;
+    పూర్ణాంకం		tolen;
+    పూర్ణాంకం		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    పూర్ణాంకం		cplen;
+    పూర్ణాంకం		మొదటి = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
-    in_str = tv_get_string(&argvars[0]);
+    లోపల_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
     tostr = tv_get_string_buf_chk(&argvars[2], buf2);
 
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    rettv->vval.v_string = ఖాళీ;
+    ఒకవేళ (fromstr == ఖాళీ || tostr == ఖాళీ)
+	    తిరిగి;		// type error; errmsg already given
+    ga_init2(&ga, పరిమాణం(అక్షరం), 80);
 
-    if (!has_mbyte)
+    ఒకవేళ (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	ఒకవేళ (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
-	    semsg(_(e_invalid_argument_str), fromstr);
+	    semsg(_(e_invalid_వాదం_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    తిరిగి;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    అయితే (*లోపల_str != NUL)
     {
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    inlen = (*mb_ptr2len)(in_str);
-	    cpstr = in_str;
+	    inlen = (*mb_ptr2len)(లోపల_str);
+	    cpstr = లోపల_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    కొరకు (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		ఒకవేళ (fromlen == inlen && STRNCMP(లోపల_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    కొరకు (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			ఒకవేళ (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
-			goto error;
-		    break;
+		    ఒకవేళ (*p == NUL)	// tostr is shorter than fromstr
+			వెళ్ళు error;
+		    ఆపు;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    ఒకవేళ (మొదటి && cpstr == లోపల_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
-		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		మొదటి = FALSE;
+		కొరకు (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
-		    goto error;
+		ఒకవేళ (idx != 0)
+		    వెళ్ళు error;
 	    }
 
-	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    (శూన్య)ga_grow(&ga, cplen);
+	    mch_memmove((అక్షరం *)ga.ga_దత్తాంశం + ga.ga_len, cpstr, (size_t)cplen);
 	    ga.ga_len += cplen;
 
-	    in_str += inlen;
+	    లోపల_str += inlen;
 	}
-	else
+	లేకపోతే
 	{
 	    // When not using multi-byte chars we can do it faster.
-	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    p = vim_strchr(fromstr, *లోపల_str);
+	    ఒకవేళ (p != ఖాళీ)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
-		ga_append(&ga, *in_str);
-	    ++in_str;
+	    లేకపోతే
+		ga_append(&ga, *లోపల_str);
+	    ++లోపల_str;
 	}
     }
 
     // add a terminating NUL
-    (void)ga_grow(&ga, 1);
+    (శూన్య)ga_grow(&ga, 1);
     ga_append(&ga, NUL);
 
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_దత్తాంశం;
 }
 
 /*
  * "trim({expr})" function
  */
-    void
+    శూన్య
 f_trim(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*head;
-    char_u	*mask = NULL;
-    char_u	*tail;
+    char_u	*తల;
+    char_u	*ముసుగు = ఖాళీ;
+    char_u	*తోక;
     char_u	*prev;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    పూర్ణాంకం		c1;
+    పూర్ణాంకం		dir = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_సంఖ్య_arg(argvars, 2) == FAIL)))
+	తిరిగి;
 
-    head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    తల = tv_get_string_buf_chk(&argvars[0], buf1);
+    ఒకవేళ (తల == ఖాళీ)
+	తిరిగి;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    ఒకవేళ (check_for_opt_string_arg(argvars, 1) == FAIL)
+	తిరిగి;
 
-    if (argvars[1].v_type == VAR_STRING)
+    ఒకవేళ (argvars[1].v_type == VAR_STRING)
     {
-	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
-	    mask = NULL;
+	ముసుగు = tv_get_string_buf_chk(&argvars[1], buf2);
+	ఒకవేళ (*ముసుగు == NUL)
+	    ముసుగు = ఖాళీ;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    పూర్ణాంకం	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[2], &error);
+	    ఒకవేళ (error)
+		తిరిగి;
+	    ఒకవేళ (dir < 0 || dir > 2)
 	    {
-		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		semsg(_(e_invalid_వాదం_str), tv_get_string(&argvars[2]));
+		తిరిగి;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    ఒకవేళ (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	అయితే (*తల != NUL)
 	{
-	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    c1 = PTR2CHAR(తల);
+	    ఒకవేళ (ముసుగు == ఖాళీ)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		ఒకవేళ (c1 > ' ' && c1 != 0xa0)
+		    ఆపు;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		కొరకు (p = ముసుగు; *p != NUL; MB_PTR_ADV(p))
+		    ఒకవేళ (c1 == PTR2CHAR(p))
+			ఆపు;
+		ఒకవేళ (*p == NUL)
+		    ఆపు;
 	    }
-	    MB_PTR_ADV(head);
+	    MB_PTR_ADV(తల);
 	}
     }
 
-    tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    తోక = తల + STRLEN(తల);
+    ఒకవేళ (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	కొరకు (; తోక > తల; తోక = prev)
 	{
-	    prev = tail;
-	    MB_PTR_BACK(head, prev);
+	    prev = తోక;
+	    MB_PTR_వెనుక(తల, prev);
 	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    ఒకవేళ (ముసుగు == ఖాళీ)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		ఒకవేళ (c1 > ' ' && c1 != 0xa0)
+		    ఆపు;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		కొరకు (p = ముసుగు; *p != NUL; MB_PTR_ADV(p))
+		    ఒకవేళ (c1 == PTR2CHAR(p))
+			ఆపు;
+		ఒకవేళ (*p == NUL)
+		    ఆపు;
 	    }
 	}
     }
-    rettv->vval.v_string = vim_strnsave(head, tail - head);
+    rettv->vval.v_string = vim_strnsave(తల, తోక - తల);
 }
 
 /*
@@ -2625,69 +2625,69 @@ f_trim(typval_T *argvars, typval_T *rettv)
  *
  * Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    స్థిర char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     size_t len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    ఒకవేళ (!decoded)
+	తిరిగి ఖాళీ;
 
     char_u	*p = decoded;
     size_t	i = 0;
 
-    while (i < len)
+    అయితే (i < len)
     {
-	if (str[i] == '%')
+	ఒకవేళ (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    ఒకవేళ (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		ఒకవేళ (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    లేకపోతే
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		పూర్ణాంకం val = hexhex2nr(&str[i + 1]);
+		ఒకవేళ (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		లేకపోతే
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    కొరకు (పూర్ణాంకం j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	లేకపోతే
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    తిరిగి decoded;
 }
 
 /*
  * "uri_decode({str})" function
  */
-    void
+    శూన్య
 f_uridecode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2706,76 +2706,76 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
  *
  *   Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    స్థిర char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    ఒకవేళ (str == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     size_t len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    ఒకవేళ (encoded == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    కొరకు (size_t i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	ఒకవేళ (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	లేకపోతే
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    sprintf((అక్షరం *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    తిరిగి encoded;
 }
 
 /*
  * "uri_encode({str})" function
  */
-    void
+    శూన్య
 f_uriencode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+స్థిర అక్షరం *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+    స్థిర varnumber_T
+tv_nr(typval_T *tvs, పూర్ణాంకం *idxp)
 {
-    int		idx = *idxp - 1;
+    పూర్ణాంకం		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    పూర్ణాంకం		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ఒకవేళ (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    లేకపోతే
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	n = tv_get_సంఖ్య_chk(&tvs[idx], &err);
+	ఒకవేళ (err)
 	    n = 0;
     }
-    return n;
+    తిరిగి n;
 }
 
 /*
@@ -2786,72 +2786,72 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    స్థిర అక్షరం *
+tv_str(typval_T *tvs, పూర్ణాంకం *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
-    static char_u   numbuf[NUMBUFLEN];
+    పూర్ణాంకం		    idx = *idxp - 1;
+    అక్షరం	    *s = ఖాళీ;
+    స్థిర char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ఒకవేళ (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    లేకపోతే
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	ఒకవేళ (tofree != ఖాళీ)
+	    s = (అక్షరం *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	లేకపోతే
+	    s = (అక్షరం *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    తిరిగి s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    స్థిర ద్విగుణ
+tv_float(typval_T *tvs, పూర్ణాంకం *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    పూర్ణాంకం		idx = *idxp - 1;
+    ద్విగుణ	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ఒకవేళ (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    లేకపోతే
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	ఒకవేళ (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
-	    emsg(_(e_expected_float_argument_for_printf));
+	లేకపోతే ఒకవేళ (tvs[idx].v_type == VAR_సంఖ్య)
+	    f = (ద్విగుణ)tvs[idx].vval.v_సంఖ్య;
+	లేకపోతే
+	    emsg(_(e_expected_float_వాదం_for_printf));
     }
-    return f;
+    తిరిగి f;
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    స్థిర స్థిరరాశి అక్షరం *
+infinity_str(పూర్ణాంకం ధనాత్మక,
+	     అక్షరం fmt_spec,
+	     పూర్ణాంకం force_sign,
+	     పూర్ణాంకం space_for_ధనాత్మక)
 {
-    static const char *table[] =
+    స్థిర స్థిరరాశి అక్షరం *పట్టిక[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    పూర్ణాంకం idx = ధనాత్మక * (1 + force_sign + force_sign * space_for_ధనాత్మక);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    ఒకవేళ (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    తిరిగి పట్టిక[idx];
 }
 
 /*
@@ -2898,37 +2898,37 @@ infinity_str(int positive,
 
 // When generating prototypes all of this is skipped, cproto doesn't
 // understand this.
-#ifndef PROTO
+#నిర్వచితం_కాకపోతే PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    పూర్ణాంకం
+vim_snprintf_కూడు(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    పూర్ణాంకం		str_l;
     size_t	len = STRLEN(str);
     size_t	space;
 
-    if (str_m <= len)
+    ఒకవేళ (str_m <= len)
 	space = 0;
-    else
+    లేకపోతే
 	space = str_m - len;
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
     va_end(ap);
-    return str_l;
+    తిరిగి str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    పూర్ణాంకం
+vim_snprintf(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    పూర్ణాంకం		str_l;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
     va_end(ap);
-    return str_l;
+    తిరిగి str_l;
 }
 
 /*
@@ -2941,37 +2941,37 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * guarantees the returned length will never be greater than the destination length.
  */
     size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+vim_snprintf_safelen(అక్షరం *str, size_t str_m, స్థిరరాశి అక్షరం *fmt, ...)
 {
     va_list ap;
-    int	    str_l;
+    పూర్ణాంకం	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    ఒకవేళ (str_m == 0)
+	తిరిగి 0;
 
     va_start(ap, fmt);
-    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, ఖాళీ);
     va_end(ap);
 
-    if (str_l < 0)
+    ఒకవేళ (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	తిరిగి 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    తిరిగి ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
 }
 
-    int
+    పూర్ణాంకం
 vim_vsnprintf(
-    char	*str,
+    అక్షరం	*str,
     size_t	str_m,
-    const char	*fmt,
+    స్థిరరాశి అక్షరం	*fmt,
     va_list	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    తిరిగి vim_vsnprintf_typval(str, str_m, fmt, ap, ఖాళీ);
 }
 
-enum
+గణన
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2980,7 +2980,7 @@ enum
     TYPE_UNSIGNEDINT,
     TYPE_UNSIGNEDLONGINT,
     TYPE_UNSIGNEDLONGLONGINT,
-    TYPE_POINTER,
+    TYPE_సూచిక,
     TYPE_PERCENT,
     TYPE_CHAR,
     TYPE_STRING,
@@ -2989,330 +2989,330 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    స్థిర పూర్ణాంకం
 format_typeof(
-    const char	*type)
+    స్థిరరాశి అక్షరం	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    అక్షరం    నిడివి_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    అక్షరం    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    ఒకవేళ (*type == 'h' || *type == 'l')
     {
-	length_modifier = *type;
+	నిడివి_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	ఒకవేళ (నిడివి_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
-	    length_modifier = 'L';
+	    నిడివి_modifier = 'L';
 	    type++;
 	}
     }
     fmt_spec = *type;
 
     // common synonyms:
-    switch (fmt_spec)
+    ఎంపిక (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	స్థితి 'i': fmt_spec = 'd'; ఆపు;
+	స్థితి '*': fmt_spec = 'd'; నిడివి_modifier = 'h'; ఆపు;
+	స్థితి 'D': fmt_spec = 'd'; నిడివి_modifier = 'l'; ఆపు;
+	స్థితి 'U': fmt_spec = 'u'; నిడివి_modifier = 'l'; ఆపు;
+	స్థితి 'O': fmt_spec = 'o'; నిడివి_modifier = 'l'; ఆపు;
+	అప్రమేయ: ఆపు;
     }
 
     // get parameter value, do initial processing
-    switch (fmt_spec)
+    ఎంపిక (fmt_spec)
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    స్థితి '%':
+	తిరిగి TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    స్థితి 'c':
+	తిరిగి TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    స్థితి 's':
+    స్థితి 'S':
+	తిరిగి TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    స్థితి 'd': స్థితి 'u':
+    స్థితి 'b': స్థితి 'B':
+    స్థితి 'o':
+    స్థితి 'x': స్థితి 'X':
+    స్థితి 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //విలువ
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    ఒకవేళ (fmt_spec == 'p')
+		తిరిగి TYPE_సూచిక;
+	    లేకపోతే ఒకవేళ (fmt_spec == 'b' || fmt_spec == 'B')
+		తిరిగి TYPE_UNSIGNEDLONGLONGINT;
+	    లేకపోతే ఒకవేళ (fmt_spec == 'd')
 	    {
 		// signed
-		switch (length_modifier)
+		ఎంపిక (నిడివి_modifier)
 		{
-		case '\0':
-		case 'h':
+		స్థితి '\0':
+		స్థితి 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    తిరిగి TYPE_INT;
+		స్థితి 'l':
+		    తిరిగి TYPE_LONGINT;
+		స్థితి 'L':
+		    తిరిగి TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// unsigned
-		switch (length_modifier)
+		ఎంపిక (నిడివి_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    స్థితి '\0':
+		    స్థితి 'h':
+			తిరిగి TYPE_UNSIGNEDINT;
+		    స్థితి 'l':
+			తిరిగి TYPE_UNSIGNEDLONGINT;
+		    స్థితి 'L':
+			తిరిగి TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	ఆపు;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    స్థితి 'f':
+    స్థితి 'F':
+    స్థితి 'e':
+    స్థితి 'E':
+    స్థితి 'g':
+    స్థితి 'G':
+	తిరిగి TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    తిరిగి TYPE_UNKNOWN;
 }
 
-    static char *
+    స్థిర అక్షరం *
 format_typename(
-    const char  *type)
+    స్థిరరాశి అక్షరం  *type)
 {
-    switch (format_typeof(type))
+    ఎంపిక (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	స్థితి TYPE_INT:
+	    తిరిగి typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	స్థితి TYPE_LONGINT:
+	    తిరిగి typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	స్థితి TYPE_LONGLONGINT:
+	    తిరిగి typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	స్థితి TYPE_UNSIGNEDINT:
+	    తిరిగి typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	స్థితి TYPE_UNSIGNEDLONGINT:
+	    తిరిగి typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	స్థితి TYPE_UNSIGNEDLONGLONGINT:
+	    తిరిగి typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	స్థితి TYPE_సూచిక:
+	    తిరిగి _(typename_సూచిక);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	స్థితి TYPE_PERCENT:
+	    తిరిగి _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	స్థితి TYPE_CHAR:
+	    తిరిగి typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	స్థితి TYPE_STRING:
+	    తిరిగి _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	స్థితి TYPE_FLOAT:
+	    తిరిగి typename_float;
     }
 
-    return _(typename_unknown);
+    తిరిగి _(typename_unknown);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    స్థిరరాశి అక్షరం ***ap_types,
+    పూర్ణాంకం arg,
+    పూర్ణాంకం *అంకె_posarg,
+    స్థిరరాశి అక్షరం *type)
 {
-    if (arg <= 0)
+    ఒకవేళ (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    ఒకవేళ (*ap_types == ఖాళీ || *అంకె_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	పూర్ణాంకం	    idx;
+	స్థిరరాశి అక్షరం  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	ఒకవేళ (*ap_types == ఖాళీ)
+	    new_types = ALLOC_CLEAR_MULT(స్థిరరాశి అక్షరం *, arg);
+	లేకపోతే
+	    new_types = vim_realloc((అక్షరం **)*ap_types,
+						arg * పరిమాణం(స్థిరరాశి అక్షరం *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	ఒకవేళ (new_types == ఖాళీ)
+	    తిరిగి FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
-	    new_types[idx] = NULL;
+	కొరకు (idx = *అంకె_posarg; idx < arg; ++idx)
+	    new_types[idx] = ఖాళీ;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*అంకె_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    ఒకవేళ ((*ap_types)[arg - 1] != ఖాళీ)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	ఒకవేళ ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    స్థిరరాశి అక్షరం *pt = type;
+	    ఒకవేళ (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    ఒకవేళ (pt[0] != '*')
 	    {
-		switch (pt[0])
+		ఎంపిక (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
-		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+		    స్థితి 'd':
+		    స్థితి 'i': ఆపు;
+		    అప్రమేయ:
+			semsg(_(e_positional_అంకె_క్షేత్రం_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			తిరిగి FAIL;
 		}
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    ఒకవేళ (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		semsg(_( e_positional_arg_అంకె_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		తిరిగి FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static void
-format_overflow_error(const char *pstart)
+    స్థిర శూన్య
+format_అధికప్రవాహం_error(స్థిరరాశి అక్షరం *pstart)
 {
     size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    అక్షరం	*argcopy = ఖాళీ;
+    స్థిరరాశి అక్షరం	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    అయితే (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(అక్షరం, arglen + 1);
+    ఒకవేళ (argcopy != ఖాళీ)
     {
 	strncpy(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
-	free(argcopy);
+	విడుదల(argcopy);
     }
-    else
-	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
+    లేకపోతే
+	semsg(_(e_బహిర్గతం_యొక్క_జ్ఞాపకం_allocating_nr_బైట్లు), arglen);
 }
 
-# define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
+# define MAX_ALLOWED_STRING_వెడల్పు 1048576    // 1 MiB
 
-    static int
+    స్థిర పూర్ణాంకం
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    స్థిరరాశి అక్షరం *pstart,
+    స్థిరరాశి అక్షరం **p,
+    గుర్తులేని పూర్ణాంకం *uj,
+    పూర్ణాంకం అధికప్రవాహం_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    అయితే (VIM_ISDIGIT((పూర్ణాంకం)(**p)) && *uj < MAX_ALLOWED_STRING_వెడల్పు)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (గుర్తులేని పూర్ణాంకం)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    ఒకవేళ (*uj > MAX_ALLOWED_STRING_వెడల్పు)
     {
-	if (overflow_err)
+	ఒకవేళ (అధికప్రవాహం_err)
 	{
-	    format_overflow_error(pstart);
-	    return FAIL;
+	    format_అధికప్రవాహం_error(pstart);
+	    తిరిగి FAIL;
 	}
-	else
-	    *uj = MAX_ALLOWED_STRING_WIDTH;
+	లేకపోతే
+	    *uj = MAX_ALLOWED_STRING_వెడల్పు;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 
-    static int
+    స్థిర పూర్ణాంకం
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
-    typval_T	*tvs UNUSED
+    స్థిరరాశి అక్షరం  ***ap_types,
+    పూర్ణాంకం		*అంకె_posarg,
+    స్థిరరాశి అక్షరం  *fmt,
+    typval_T	*tvs వాడని
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    స్థిరరాశి అక్షరం	*p = fmt;
+    స్థిరరాశి అక్షరం	*arg = ఖాళీ;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    పూర్ణాంకం		any_pos = 0;
+    పూర్ణాంకం		any_arg = 0;
+    పూర్ణాంకం		arg_idx;
 
-# define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+# define CHECK_POS_ARG చేయి { \
+    ఒకవేళ (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
-	goto error; \
+	వెళ్ళు error; \
     } \
-} while (0);
+} అయితే (0);
 
-    if (p == NULL)
-	return OK;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి OK;
 
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	if (*p != '%')
+	ఒకవేళ (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    స్థిరరాశి అక్షరం    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ఖాళీ) ? STRLEN(p) : (size_t)(q - p);
 
 	    p += n;
 	}
-	else
+	లేకపోతే
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    అక్షరం	నిడివి_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    పూర్ణాంకం		pos_arg = -1;
+	    స్థిరరాశి అక్షరం	*ptype = ఖాళీ;
+	    స్థిరరాశి అక్షరం	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,23 +3320,23 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    అయితే (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    ఒకవేళ (*ptype == '$')
 	    {
-		if (*p == '0')
+		ఒకవేళ (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    వెళ్ళు error;
 		}
 
 		// Positional argument
-		unsigned int uj;
+		గుర్తులేని పూర్ణాంకం uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ఒకవేళ (get_unsigned_int(pstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+		    వెళ్ళు error;
 
 		pos_arg = uj;
 
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    అయితే (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		ఎంపిక (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    స్థితి '0': ఆపు;
+		    స్థితి '-': ఆపు;
+		    స్థితి '+': ఆపు;
+		    స్థితి ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      ఆపు;
+		    స్థితి '#': ఆపు;
+		    స్థితి '\'': ఆపు;
 		}
 		p++;
 	    }
@@ -3367,114 +3367,114 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    ఒకవేళ (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    గుర్తులేని పూర్ణాంకం uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ఒకవేళ (get_unsigned_int(arg + 1, &p, &uj, tvs != ఖాళీ) == FAIL)
+			వెళ్ళు error;
 
-		    if (*p != '$')
+		    ఒకవేళ (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			వెళ్ళు error;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-			    goto error;
+			ఒకవేళ (adjust_types(ap_types, uj, అంకె_posarg, arg) == FAIL)
+			    వెళ్ళు error;
 		    }
 		}
-		else
+		లేకపోతే
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    లేకపోతే ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		స్థిరరాశి అక్షరం *digstart = p;
+		గుర్తులేని పూర్ణాంకం uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+		    వెళ్ళు error;
 
-		if (*p == '$')
+		ఒకవేళ (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    వెళ్ళు error;
 		}
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    ఒకవేళ (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		ఒకవేళ (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			గుర్తులేని పూర్ణాంకం uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			ఒకవేళ (get_unsigned_int(arg + 1, &p, &uj, tvs != ఖాళీ) == FAIL)
+			    వెళ్ళు error;
 
-			if (*p == '$')
+			ఒకవేళ (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-				goto error;
+			    ఒకవేళ (adjust_types(ap_types, uj, అంకె_posarg, arg) == FAIL)
+				వెళ్ళు error;
 			}
-			else
+			లేకపోతే
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
-			    goto error;
+			    వెళ్ళు error;
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		లేకపోతే ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    స్థిరరాశి అక్షరం *digstart = p;
+		    గుర్తులేని పూర్ణాంకం uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+			వెళ్ళు error;
 
-		    if (*p == '$')
+		    ఒకవేళ (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			వెళ్ళు error;
 		    }
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    ఒకవేళ (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    ఒకవేళ (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		నిడివి_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		ఒకవేళ (నిడివి_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3495,172 +3495,172 @@ parse_fmt_types(
 		}
 	    }
 
-	    switch (*p)
+	    ఎంపిక (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		స్థితి 'i':
+		స్థితి '*':
+		స్థితి 'd':
+		స్థితి 'u':
+		స్థితి 'o':
+		స్థితి 'D':
+		స్థితి 'U':
+		స్థితి 'O':
+		స్థితి 'x':
+		స్థితి 'X':
+		స్థితి 'b':
+		స్థితి 'B':
+		స్థితి 'c':
+		స్థితి 's':
+		స్థితి 'S':
+		స్థితి 'p':
+		స్థితి 'f':
+		స్థితి 'F':
+		స్థితి 'e':
+		స్థితి 'E':
+		స్థితి 'g':
+		స్థితి 'G':
+		    ఒకవేళ (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
-			    goto error;
+			ఒకవేళ (adjust_types(ap_types, pos_arg, అంకె_posarg, ptype) == FAIL)
+			    వెళ్ళు error;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    ఆపు;
 
-		default:
-		    if (pos_arg != -1)
+		అప్రమేయ:
+		    ఒకవేళ (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
-			goto error;
+			వెళ్ళు error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    ఒకవేళ (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    కొరకు (arg_idx = 0; arg_idx < *అంకె_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	ఒకవేళ ((*ap_types)[arg_idx] == ఖాళీ)
 	{
-	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
-	    goto error;
+	    semsg(_(e_fmt_arg_nr_వాడని_str), arg_idx + 1, fmt);
+	    వెళ్ళు error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# ఒకవేళ defined(FEAT_EVAL)
+	ఒకవేళ (tvs != ఖాళీ && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
-	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
-	    goto error;
+	    semsg(_(e_positional_nr_బహిర్గతం_యొక్క_bounds_str), arg_idx + 1, fmt);
+	    వెళ్ళు error;
 	}
 # endif
     }
 
-    return OK;
+    తిరిగి OK;
 
 error:
-    vim_free((char**)*ap_types);
-    *ap_types = NULL;
-    *num_posarg = 0;
-    return FAIL;
+    vim_free((అక్షరం**)*ap_types);
+    *ap_types = ఖాళీ;
+    *అంకె_posarg = 0;
+    తిరిగి FAIL;
 }
 
-    static void
-skip_to_arg(
-    const char	**ap_types,
-    va_list	ap_start,
+    స్థిర శూన్య
+skip_గమ్యం_arg(
+    స్థిరరాశి అక్షరం	**ap_types,
+    va_list	ap_ప్రారంభం,
     va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    పూర్ణాంకం		*arg_idx,
+    పూర్ణాంకం		*arg_cur,
+    స్థిరరాశి అక్షరం	*fmt)
 {
-    int		arg_min = 0;
+    పూర్ణాంకం		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    ఒకవేళ (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	తిరిగి;
     }
 
-    if (*arg_cur >= *arg_idx)
+    ఒకవేళ (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
 	va_end(*ap);
-	va_copy(*ap, ap_start);
+	va_copy(*ap, ap_ప్రారంభం);
     }
-    else
+    లేకపోతే
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    కొరకు (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	స్థిరరాశి అక్షరం *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	ఒకవేళ (ap_types == ఖాళీ || ap_types[*arg_cur] == ఖాళీ)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    తిరిగి;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	పూర్ణాంకం fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
-	switch (fmt_type)
+	ఎంపిక (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	స్థితి TYPE_PERCENT:
+	స్థితి TYPE_UNKNOWN:
+	    ఆపు;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	స్థితి TYPE_CHAR:
+	    va_arg(*ap, పూర్ణాంకం);
+	    ఆపు;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	స్థితి TYPE_STRING:
+	    va_arg(*ap, అక్షరం *);
+	    ఆపు;
 
-	case TYPE_POINTER:
-	    va_arg(*ap, void *);
-	    break;
+	స్థితి TYPE_సూచిక:
+	    va_arg(*ap, శూన్య *);
+	    ఆపు;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	స్థితి TYPE_INT:
+	    va_arg(*ap, పూర్ణాంకం);
+	    ఆపు;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	స్థితి TYPE_LONGINT:
+	    va_arg(*ap, దీర్ఘ పూర్ణాంకం);
+	    ఆపు;
 
-	case TYPE_LONGLONGINT:
+	స్థితి TYPE_LONGLONGINT:
 	    va_arg(*ap, varnumber_T);
-	    break;
+	    ఆపు;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	స్థితి TYPE_UNSIGNEDINT:
+	    va_arg(*ap, గుర్తులేని పూర్ణాంకం);
+	    ఆపు;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	స్థితి TYPE_UNSIGNEDLONGINT:
+	    va_arg(*ap, గుర్తులేని దీర్ఘ పూర్ణాంకం);
+	    ఆపు;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
+	స్థితి TYPE_UNSIGNEDLONGLONGINT:
 	    va_arg(*ap, uvarnumber_T);
-	    break;
+	    ఆపు;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	స్థితి TYPE_FLOAT:
+	    va_arg(*ap, ద్విగుణ);
+	    ఆపు;
 	}
     }
 
@@ -3670,41 +3670,41 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    తిరిగి;
 }
 
-    int
+    పూర్ణాంకం
 vim_vsnprintf_typval(
-    char	*str,
+    అక్షరం	*str,
     size_t	str_m,
-    const char	*fmt,
-    va_list	ap_start,
+    స్థిరరాశి అక్షరం	*fmt,
+    va_list	ap_ప్రారంభం,
     typval_T	*tvs)
 {
     size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
+    స్థిరరాశి అక్షరం	*p = fmt;
+    పూర్ణాంకం		arg_cur = 0;
+    పూర్ణాంకం		అంకె_posarg = 0;
+    పూర్ణాంకం		arg_idx = 1;
     va_list	ap;
-    const char	**ap_types = NULL;
+    స్థిరరాశి అక్షరం	**ap_types = ఖాళీ;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    ఒకవేళ (parse_fmt_types(&ap_types, &అంకె_posarg, fmt, tvs) == FAIL)
+	తిరిగి 0;
 
-    va_copy(ap, ap_start);
+    va_copy(ap, ap_ప్రారంభం);
 
-    if (p == NULL)
+    ఒకవేళ (p == ఖాళీ)
 	p = "";
-    while (*p != NUL)
+    అయితే (*p != NUL)
     {
-	if (*p != '%')
+	ఒకవేళ (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    స్థిరరాశి అక్షరం    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ఖాళీ) ? STRLEN(p) : (size_t)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    ఒకవేళ (str_l < str_m)
 	    {
 		size_t avail = str_m - str_l;
 
@@ -3713,27 +3713,27 @@ vim_vsnprintf_typval(
 	    p += n;
 	    str_l += n;
 	}
-	else
+	లేకపోతే
 	{
-	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    size_t  min_క్షేత్రం_వెడల్పు = 0, precision = 0;
+	    పూర్ణాంకం	    zero_padding = 0, precision_specified = 0, justify_ఎడమ = 0;
+	    పూర్ణాంకం	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    పూర్ణాంకం	    space_for_ధనాత్మక = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    అక్షరం    నిడివి_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    అక్షరం    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    స్థిరరాశి అక్షరం  *str_arg = ఖాళీ;
 
 	    // natural field width of arg without padding and sign
 	    size_t  str_arg_l;
@@ -3741,24 +3741,24 @@ vim_vsnprintf_typval(
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    గుర్తులేని అక్షరం uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    size_t  సంఖ్య_యొక్క_zeros_గమ్యం_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
 	    size_t  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    అక్షరం    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
-	    char_u  *tofree = NULL;
+	    char_u  *tofree = ఖాళీ;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    పూర్ణాంకం	    pos_arg = -1;
+	    స్థిరరాశి అక్షరం	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,17 +3767,17 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    అయితే (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    ఒకవేళ (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		స్థిరరాశి అక్షరం *digstart = p;
+		గుర్తులేని పూర్ణాంకం uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+		    వెళ్ళు error;
 
 		pos_arg = uj;
 
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    అయితే (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		ఎంపిక (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    స్థితి '0': zero_padding = 1; ఆపు;
+		    స్థితి '-': justify_ఎడమ = 1; ఆపు;
+		    స్థితి '+': force_sign = 1; space_for_ధనాత్మక = 0; ఆపు;
+		    స్థితి ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      ఆపు;
+		    స్థితి '#': alternate_form = 1; ఆపు;
+		    స్థితి '\'': ఆపు;
 		}
 		p++;
 	    }
@@ -3806,20 +3806,20 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    ఒకవేళ (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		పూర్ణాంకం j;
+		స్థిరరాశి అక్షరం *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    గుర్తులేని పూర్ణాంకం uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+			వెళ్ళు error;
 
 		    arg_idx = uj;
 
@@ -3827,77 +3827,77 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
-		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+		    tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			va_arg(ap, పూర్ణాంకం));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		ఒకవేళ (j > MAX_ALLOWED_STRING_వెడల్పు)
 		{
-		    if (tvs != NULL)
+		    ఒకవేళ (tvs != ఖాళీ)
 		    {
-			format_overflow_error(digstart);
-			goto error;
+			format_అధికప్రవాహం_error(digstart);
+			వెళ్ళు error;
 		    }
-		    else
-			j = MAX_ALLOWED_STRING_WIDTH;
+		    లేకపోతే
+			j = MAX_ALLOWED_STRING_వెడల్పు;
 		}
 
-		if (j >= 0)
-		    min_field_width = j;
-		else
+		ఒకవేళ (j >= 0)
+		    min_క్షేత్రం_వెడల్పు = j;
+		లేకపోతే
 		{
-		    min_field_width = -j;
-		    justify_left = 1;
+		    min_క్షేత్రం_వెడల్పు = -j;
+		    justify_ఎడమ = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    లేకపోతే ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		స్థిరరాశి అక్షరం *digstart = p;
+		గుర్తులేని పూర్ణాంకం uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+		    వెళ్ళు error;
 
-		min_field_width = uj;
+		min_క్షేత్రం_వెడల్పు = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    ఒకవేళ (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    స్థిరరాశి అక్షరం *digstart = p;
+		    గుర్తులేని పూర్ణాంకం uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+			వెళ్ళు error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		లేకపోతే ఒకవేళ (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    పూర్ణాంకం j;
+		    స్థిరరాశి అక్షరం *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    ఒకవేళ (VIM_ISDIGIT((పూర్ణాంకం)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			గుర్తులేని పూర్ణాంకం uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			ఒకవేళ (get_unsigned_int(digstart, &p, &uj, tvs != ఖాళీ) == FAIL)
+			    వెళ్ళు error;
 
 			arg_idx = uj;
 
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+			tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    va_arg(ap, పూర్ణాంకం));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    ఒకవేళ (j > MAX_ALLOWED_STRING_వెడల్పు)
 		    {
-			if (tvs != NULL)
+			ఒకవేళ (tvs != ఖాళీ)
 			{
-			    format_overflow_error(digstart);
-			    goto error;
+			    format_అధికప్రవాహం_error(digstart);
+			    వెళ్ళు error;
 			}
-			else
-			    j = MAX_ALLOWED_STRING_WIDTH;
+			లేకపోతే
+			    j = MAX_ALLOWED_STRING_వెడల్పు;
 		    }
 
-		    if (j >= 0)
+		    ఒకవేళ (j >= 0)
 			precision = j;
-		    else
+		    లేకపోతే
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,157 +3934,157 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    ఒకవేళ (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		నిడివి_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		ఒకవేళ (నిడివి_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
-		    length_modifier = 'L';
+		    నిడివి_modifier = 'L';
 		    p++;
 		}
 	    }
 	    fmt_spec = *p;
 
 	    // common synonyms:
-	    switch (fmt_spec)
+	    ఎంపిక (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		స్థితి 'i': fmt_spec = 'd'; ఆపు;
+		స్థితి 'D': fmt_spec = 'd'; నిడివి_modifier = 'l'; ఆపు;
+		స్థితి 'U': fmt_spec = 'u'; నిడివి_modifier = 'l'; ఆపు;
+		స్థితి 'O': fmt_spec = 'o'; నిడివి_modifier = 'l'; ఆపు;
+		అప్రమేయ: ఆపు;
 	    }
 
-# if defined(FEAT_EVAL)
-	    switch (fmt_spec)
+# ఒకవేళ defined(FEAT_EVAL)
+	    ఎంపిక (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
-			length_modifier = 'L';
+		స్థితి 'd': స్థితి 'u': స్థితి 'o': స్థితి 'x': స్థితి 'X':
+		    ఒకవేళ (tvs != ఖాళీ && నిడివి_modifier == '\0')
+			నిడివి_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    ఒకవేళ (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
-	    switch (fmt_spec)
+	    ఎంపిక (fmt_spec)
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    స్థితి '%':
+	    స్థితి 'c':
+	    స్థితి 's':
+	    స్థితి 'S':
 		str_arg_l = 1;
-		switch (fmt_spec)
+		ఎంపిక (fmt_spec)
 		{
-		case '%':
+		స్థితి '%':
 		    str_arg = p;
-		    break;
+		    ఆపు;
 
-		case 'c':
+		స్థితి 'c':
 		    {
-			int j;
+			పూర్ణాంకం j;
 
 			j =
-# if defined(FEAT_EVAL)
-			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+			    tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+				(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				va_arg(ap, పూర్ణాంకం));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (గుర్తులేని అక్షరం)j;
+			str_arg = (అక్షరం *)&uchar_arg;
+			ఆపు;
 		    }
 
-		case 's':
-		case 'S':
+		స్థితి 's':
+		స్థితి 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
-				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
+# ఒకవేళ defined(FEAT_EVAL)
+				tvs != ఖాళీ ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
-				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+				    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    va_arg(ap, అక్షరం *));
 
-		    if (str_arg == NULL)
+		    ఒకవేళ (str_arg == ఖాళీ)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
-			str_arg_l = strlen(str_arg);
+		    లేకపోతే ఒకవేళ (!precision_specified)
+			str_arg_l = అక్షరశ్రేణి_పొడవు(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    లేకపోతే ఒకవేళ (precision == 0)
 			str_arg_l = 0;
-		    else
+		    లేకపోతే
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
+			స్థిరరాశి అక్షరం *q = memchr(str_arg, '\0',
 				  precision <= (size_t)0x7fffffffL ? precision
 						       : (size_t)0x7fffffffL);
 
-			str_arg_l = (q == NULL) ? precision
+			str_arg_l = (q == ఖాళీ) ? precision
 						      : (size_t)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    ఒకవేళ (fmt_spec == 'S')
 		    {
 			char_u	*p1;
 			size_t	i;
-			int	cell;
+			పూర్ణాంకం	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			కొరకు (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    ఒకవేళ (precision_specified && i + cell > precision)
+				ఆపు;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
-			    min_field_width += str_arg_l - i;
+			ఒకవేళ (min_క్షేత్రం_వెడల్పు != 0)
+			    min_క్షేత్రం_వెడల్పు += str_arg_l - i;
 		    }
-		    break;
+		    ఆపు;
 
-		default:
-		    break;
+		అప్రమేయ:
+		    ఆపు;
 		}
-		break;
+		ఆపు;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    స్థితి 'd': స్థితి 'u':
+	    స్థితి 'b': స్థితి 'B':
+	    స్థితి 'o':
+	    స్థితి 'x': స్థితి 'X':
+	    స్థితి 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //విలువ
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    పూర్ణాంకం arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    పూర్ణాంకం int_arg = 0;
+		    గుర్తులేని పూర్ణాంకం uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    దీర్ఘ పూర్ణాంకం long_arg = 0;
+		    గుర్తులేని దీర్ఘ పూర్ణాంకం ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4095,133 +4095,133 @@ vim_vsnprintf_typval(
 
 		    // pointer argument value -only defined for p
 		    // conversion
-		    void *ptr_arg = NULL;
+		    శూన్య *ptr_arg = ఖాళీ;
 
-		    if (fmt_spec == 'p')
+		    ఒకవేళ (fmt_spec == 'p')
 		    {
-			length_modifier = '\0';
+			నిడివి_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
-				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
-									NULL) :
+# ఒకవేళ defined(FEAT_EVAL)
+				 tvs != ఖాళీ ? (శూన్య *)tv_str(tvs, &arg_idx,
+									ఖాళీ) :
 # endif
-					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, void *));
+					va_arg(ap, శూన్య *));
 
-			if (ptr_arg != NULL)
+			ఒకవేళ (ptr_arg != ఖాళీ)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    లేకపోతే ఒకవేళ (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
-				    tvs != NULL ?
+# ఒకవేళ defined(FEAT_EVAL)
+				    tvs != ఖాళీ ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
-					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 						     &arg_cur, fmt),
 					va_arg(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			ఒకవేళ (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    లేకపోతే ఒకవేళ (fmt_spec == 'd')
 		    {
 			// signed
-			switch (length_modifier)
+			ఎంపిక (నిడివి_modifier)
 			{
-			case '\0':
-			case 'h':
+			స్థితి '\0':
+			స్థితి 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+					tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    va_arg(ap, పూర్ణాంకం));
 
-			    if (int_arg > 0)
+			    ఒకవేళ (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    లేకపోతే ఒకవేళ (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    ఆపు;
+			స్థితి 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+					tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    va_arg(ap, దీర్ఘ పూర్ణాంకం));
 
-			    if (long_arg > 0)
+			    ఒకవేళ (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    లేకపోతే ఒకవేళ (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    ఆపు;
+			స్థితి 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+					tvs != ఖాళీ ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							 &arg_cur, fmt),
 					    va_arg(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    ఒకవేళ (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    లేకపోతే ఒకవేళ (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    ఆపు;
 			}
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// unsigned
-			switch (length_modifier)
+			ఎంపిక (నిడివి_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    స్థితి '\0':
+			    స్థితి 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned)
+# ఒకవేళ defined(FEAT_EVAL)
+					    tvs != ఖాళీ ? (గుర్తులేని)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						va_arg(ap, గుర్తులేని పూర్ణాంకం));
 
-				if (uint_arg != 0)
+				ఒకవేళ (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				ఆపు;
+			    స్థితి 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned long)
+# ఒకవేళ defined(FEAT_EVAL)
+					    tvs != ఖాళీ ? (గుర్తులేని దీర్ఘ)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						va_arg(ap, గుర్తులేని దీర్ఘ పూర్ణాంకం));
 
-				if (ulong_arg != 0)
+				ఒకవేళ (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				ఆపు;
+			    స్థితి 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (uvarnumber_T)
+# ఒకవేళ defined(FEAT_EVAL)
+					    tvs != ఖాళీ ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 							     &arg_cur, fmt),
 						va_arg(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				ఒకవేళ (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				ఆపు;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    ఒకవేళ (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    ఒకవేళ (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
-			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
+			ఒకవేళ (force_sign && arg_sign >= 0)
+			    tmp[str_arg_l++] = space_for_ధనాత్మక ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    లేకపోతే ఒకవేళ (alternate_form)
 		    {
-			if (arg_sign != 0
+			ఒకవేళ (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    ఒకవేళ (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    ఒకవేళ (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    లేకపోతే
 		    {
-			char	f[6];
-			int	f_l = 0;
+			అక్షరం	f[6];
+			పూర్ణాంకం	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			ఒకవేళ (!నిడివి_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			లేకపోతే ఒకవేళ (నిడివి_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# లేకపోతే
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
-			    f[f_l++] = length_modifier;
+			లేకపోతే
+			    f[f_l++] = నిడివి_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
+			ఒకవేళ (fmt_spec == 'p')
 			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			లేకపోతే ఒకవేళ (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
+			    అక్షరం	    b[8 * పరిమాణం(uvarnumber_T)];
 			    size_t	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
-			    do
+			    చేయి
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[పరిమాణం(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    అయితే (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    జ్ఞాపకం_నకలు(tmp + str_arg_l, b + పరిమాణం(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			లేకపోతే ఒకవేళ (fmt_spec == 'd')
 			{
 			    // signed
-			    switch (length_modifier)
+			    ఎంపిక (నిడివి_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    స్థితి '\0': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       ఆపు;
+			    స్థితి 'h': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
-						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						 (పొట్టి)int_arg);
+				      ఆపు;
+			    స్థితి 'l': str_arg_l += sprintf(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      ఆపు;
+			    స్థితి 'L': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      ఆపు;
 			    }
 			}
-			else
+			లేకపోతే
 			{
 			    // unsigned
-			    switch (length_modifier)
+			    ఎంపిక (నిడివి_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    స్థితి '\0': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       ఆపు;
+			    స్థితి 'h': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
-						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						(గుర్తులేని పొట్టి)uint_arg);
+				      ఆపు;
+			    స్థితి 'l': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      ఆపు;
+			    స్థితి 'L': str_arg_l += sprintf(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      ఆపు;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			ఒకవేళ (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			ఒకవేళ (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4364,10 +4364,10 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			size_t అంకె_యొక్క_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			ఒకవేళ (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,84 +4375,84 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+			    ఒకవేళ (!precision_specified
+					     || precision < అంకె_యొక్క_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = అంకె_యొక్క_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			ఒకవేళ (అంకె_యొక్క_digits < precision)
+			    సంఖ్య_యొక్క_zeros_గమ్యం_pad = precision - అంకె_యొక్క_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    ఒకవేళ (!justify_ఎడమ && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
-			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			పూర్ణాంకం n = (పూర్ణాంకం)(min_క్షేత్రం_వెడల్పు - (str_arg_l
+						    + సంఖ్య_యొక్క_zeros_గమ్యం_pad));
+			ఒకవేళ (n > 0)
+			    సంఖ్య_యొక్క_zeros_గమ్యం_pad += n;
 		    }
-		    break;
+		    ఆపు;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    స్థితి 'f':
+	    స్థితి 'F':
+	    స్థితి 'e':
+	    స్థితి 'E':
+	    స్థితి 'g':
+	    స్థితి 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    ద్విగుణ	f;
+		    ద్విగుణ	abs_f;
+		    అక్షరం	format[40];
+		    పూర్ణాంకం		l;
+		    పూర్ణాంకం		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_float(tvs, &arg_idx) :
+# ఒకవేళ defined(FEAT_EVAL)
+			tvs != ఖాళీ ? tv_float(tvs, &arg_idx) :
 # endif
-			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			    (skip_గమ్యం_arg(ap_types, ap_ప్రారంభం, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    va_arg(ap, ద్విగుణ));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    ఒకవేళ (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			ఒకవేళ ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			లేకపోతే
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    ఒకవేళ ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# లేకపోతే
 			    abs_f > 1.0e307
 # endif
 			    )
 		    {
 			// Avoid a buffer overflow
 			STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
-					      force_sign, space_for_positive));
+					      force_sign, space_for_ధనాత్మక));
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    లేకపోతే
 		    {
-			if (isnan(f))
+			ఒకవేళ (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,32 +4460,32 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			లేకపోతే ఒకవేళ (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
-					      force_sign, space_for_positive));
+					      force_sign, space_for_ధనాత్మక));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			లేకపోతే
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
-				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    ఒకవేళ (force_sign)
+				format[l++] = space_for_ధనాత్మక ? ' ' : '+';
+			    ఒకవేళ (precision_specified)
 			    {
 				size_t max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				ఒకవేళ ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
 				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				ఒకవేళ (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += sprintf(format + l, ".%d", (పూర్ణాంకం)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
@@ -4493,30 +4493,30 @@ vim_vsnprintf_typval(
 			    str_arg_l = sprintf(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			ఒకవేళ (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    పూర్ణాంకం i;
+			    అక్షరం *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    ఒకవేళ (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    లేకపోతే
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (అక్షరం *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				ఒకవేళ (tp != ఖాళీ)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    ఒకవేళ (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    అయితే (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    ఒకవేళ (tp != ఖాళీ && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				అయితే (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			లేకపోతే
 			{
-			    char *tp;
+			    అక్షరం *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (అక్షరం *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    ఒకవేళ (tp != ఖాళీ && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,49 +4556,49 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    ఒకవేళ (zero_padding && min_క్షేత్రం_వెడల్పు > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			సంఖ్య_యొక్క_zeros_గమ్యం_pad = min_క్షేత్రం_వెడల్పు - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    ఆపు;
 		}
 
-	    default:
+	    అప్రమేయ:
 		// unrecognized conversion specifier, keep format string
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
-		min_field_width = 0;		    // reset flags
+		justify_ఎడమ = 1;
+		min_క్షేత్రం_వెడల్పు = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		ఒకవేళ (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		ఆపు;
 	    }
 
-	    if (*p != NUL)
+	    ఒకవేళ (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    ఒకవేళ (!justify_ఎడమ)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		పూర్ణాంకం pn = (పూర్ణాంకం)(min_క్షేత్రం_వెడల్పు - (str_arg_l + సంఖ్య_యొక్క_zeros_గమ్యం_pad));
 
-		if (pn > 0)
+		ఒకవేళ (pn > 0)
 		{
-		    if (str_l < str_m)
+		    ఒకవేళ (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4612,21 +4612,21 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    ఒకవేళ (సంఖ్య_యొక్క_zeros_గమ్యం_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		పూర్ణాంకం zn = (పూర్ణాంకం)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		ఒకవేళ (zn > 0)
 		{
-		    if (str_l < str_m)
+		    ఒకవేళ (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4639,10 +4639,10 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (పూర్ణాంకం)సంఖ్య_యొక్క_zeros_గమ్యం_pad;
+		ఒకవేళ (zn > 0)
 		{
-		    if (str_l < str_m)
+		    ఒకవేళ (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4657,11 +4657,11 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		పూర్ణాంకం sn = (పూర్ణాంకం)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		ఒకవేళ (sn > 0)
 		{
-		    if (str_l < str_m)
+		    ఒకవేళ (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4674,15 +4674,15 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    ఒకవేళ (justify_ఎడమ)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+		పూర్ణాంకం pn = (పూర్ణాంకం)(min_క్షేత్రం_వెడల్పు
+				      - (str_arg_l + సంఖ్య_యొక్క_zeros_గమ్యం_pad));
 
-		if (pn > 0)
+		ఒకవేళ (pn > 0)
 		{
-		    if (str_l < str_m)
+		    ఒకవేళ (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    ఒకవేళ (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
-	emsg(_(e_too_many_arguments_to_printf));
+    ఒకవేళ (tvs != ఖాళీ && tvs[అంకె_posarg != 0 ? అంకె_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+	emsg(_(e_too_many_arguments_గమ్యం_printf));
 
 error:
-    vim_free((char*)ap_types);
+    vim_free((అక్షరం*)ap_types);
     va_end(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    తిరిగి (పూర్ణాంకం)str_l;
 }
 
-#endif // PROTO
+#అయితే_ముగింపు // PROTO

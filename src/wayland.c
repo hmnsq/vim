@@ -24,11 +24,11 @@
  *	      used from the respective data device.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_WAYLAND
+#నిర్వచితమైతే FEAT_WAYLAND
 
-#include "wayland.h"
+#అన్తర్భావ "wayland.h"
 
 vwl_connection_T    *wayland_ct;
 bool		    is_reading = false;
@@ -37,205 +37,205 @@ bool		    is_reading = false;
  * Like wl_display_flush but always writes all the data in the buffer to the
  * display fd. Returns FAIL on failure and OK on success.
  */
-    int
+    పూర్ణాంకం
 vwl_connection_flush(vwl_connection_T *self)
 {
-#ifndef HAVE_SELECT
-    struct pollfd fds;
+#నిర్వచితం_కాకపోతే HAVE_SELECT
+    నిర్మాణం pollfd fds;
 
     fds.fd = self->display.fd;
     fds.events = POLLOUT;
-#else
+#లేకపోతే
     fd_set	    wfds;
-    struct timeval  tv;
+    నిర్మాణం timeval  tv;
 
     FD_ZERO(&wfds);
     FD_SET(self->display.fd, &wfds);
-#endif
+#అయితే_ముగింపు
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    ఒకవేళ (self->display.proxy == ఖాళీ)
+	తిరిగి FAIL;
 
     // Send the requests we have made to the compositor, until we have written
     // all the data. Poll in order to check if the display fd is writable, if
     // not, then wait until it is and continue writing or until we timeout.
-    while (true)
+    అయితే (true)
     {
-	int ret = wl_display_flush(self->display.proxy);
+	పూర్ణాంకం ret = wl_display_flush(self->display.proxy);
 
-	if (ret == -1 && errno == EAGAIN)
+	ఒకవేళ (ret == -1 && errno == EAGAIN)
 	{
-#ifndef HAVE_SELECT
-	    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+#నిర్వచితం_కాకపోతే HAVE_SELECT
+	    ఒకవేళ (poll(&fds, 1, p_wtm) <= 0)
+#లేకపోతే
 	    tv.tv_sec = p_wtm / 1000;
 	    tv.tv_usec = (p_wtm % 1000) * 1000;
-	    if (select(self->display.fd + 1, NULL, &wfds, NULL, &tv) <= 0)
-		return FAIL;
-#endif
+	    ఒకవేళ (select(self->display.fd + 1, ఖాళీ, &wfds, ఖాళీ, &tv) <= 0)
+		తిరిగి FAIL;
+#అయితే_ముగింపు
 	}
-	else if (ret == -1)
-	    return FAIL;
-	else
-	    break;
+	లేకపోతే ఒకవేళ (ret == -1)
+	    తిరిగి FAIL;
+	లేకపోతే
+	    ఆపు;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * number of events dispatched on success else -1 on failure.
  */
-    int
+    పూర్ణాంకం
 vwl_connection_dispatch(vwl_connection_T *self)
 {
-#ifndef HAVE_SELECT
-    struct pollfd   fds;
+#నిర్వచితం_కాకపోతే HAVE_SELECT
+    నిర్మాణం pollfd   fds;
 
     fds.fd = self->display.fd;
     fds.events = POLLIN;
-#else
+#లేకపోతే
     fd_set	    rfds;
-    struct timeval  tv;
+    నిర్మాణం timeval  tv;
 
     FD_ZERO(&rfds);
     FD_SET(self->display.fd, &rfds);
-#endif
+#అయితే_ముగింపు
 
-    if (self->display.proxy == NULL)
-	return -1;
+    ఒకవేళ (self->display.proxy == ఖాళీ)
+	తిరిగి -1;
 
-    while (wl_display_prepare_read(self->display.proxy) == -1)
+    అయితే (wl_display_prepare_read(self->display.proxy) == -1)
 	// Dispatch any queued events so that we can start reading
-	if (wl_display_dispatch_pending(self->display.proxy) == -1)
-	    return -1;
+	ఒకవేళ (wl_display_dispatch_pending(self->display.proxy) == -1)
+	    తిరిగి -1;
 
     // Send any requests before we starting blocking to read display fd
-    if (vwl_connection_flush(self) == FAIL)
+    ఒకవేళ (vwl_connection_flush(self) == FAIL)
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	తిరిగి -1;
     }
 
     // Poll until there is data to read from the display fd.
-#ifndef HAVE_SELECT
-    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+#నిర్వచితం_కాకపోతే HAVE_SELECT
+    ఒకవేళ (poll(&fds, 1, p_wtm) <= 0)
+#లేకపోతే
     tv.tv_sec = p_wtm / 1000;
     tv.tv_usec = (p_wtm % 1000) * 1000;
-    if (select(self->display.fd + 1, &rfds, NULL, NULL, &tv) <= 0)
-#endif
+    ఒకవేళ (select(self->display.fd + 1, &rfds, ఖాళీ, ఖాళీ, &tv) <= 0)
+#అయితే_ముగింపు
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	తిరిగి -1;
     }
 
     // Read events into the queue
-    if (wl_display_read_events(self->display.proxy) == -1)
+    ఒకవేళ (wl_display_read_events(self->display.proxy) == -1)
 	// No need to cancel
-	return -1;
+	తిరిగి -1;
 
     // Dispatch those events (call the handlers associated for each event)
-    return wl_display_dispatch_pending(self->display.proxy);
+    తిరిగి wl_display_dispatch_pending(self->display.proxy);
 }
 
 /*
  * Called when compositor is done processing requests/events.
  */
-    static void
-vwl_callback_event_done(void *data, struct wl_callback *callback,
-	uint32_t callback_data UNUSED)
+    స్థిర శూన్య
+vwl_callback_event_పూర్తి(శూన్య *దత్తాంశం, నిర్మాణం wl_callback *callback,
+	uint32_t callback_దత్తాంశం వాడని)
 {
-    *((bool*)data) = true;
+    *((bool*)దత్తాంశం) = true;
     wl_callback_destroy(callback);
 }
 
-static const struct wl_callback_listener vwl_callback_listener = {
-    .done = vwl_callback_event_done
+స్థిర స్థిరరాశి నిర్మాణం wl_callback_listener vwl_callback_listener = {
+    .పూర్తి = vwl_callback_event_పూర్తి
 };
 
 /*
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * FAIL on failure and OK on success.
  */
-    int
+    పూర్ణాంకం
 vwl_connection_roundtrip(vwl_connection_T *self)
 {
-    struct wl_callback	*callback;
-    int			ret;
-    bool		done = false;
-#ifdef ELAPSED_FUNC
-    elapsed_T		start_tv;
-#endif
+    నిర్మాణం wl_callback	*callback;
+    పూర్ణాంకం			ret;
+    bool		పూర్తి = false;
+#నిర్వచితమైతే ELAPSED_FUNC
+    elapsed_T		ప్రారంభం_tv;
+#అయితే_ముగింపు
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    ఒకవేళ (self->display.proxy == ఖాళీ)
+	తిరిగి FAIL;
 
     // Tell compositor to emit 'done' event after processing all requests we
     // have sent and handling events.
     callback = wl_display_sync(self->display.proxy);
 
-    if (callback == NULL)
-	return FAIL;
+    ఒకవేళ (callback == ఖాళీ)
+	తిరిగి FAIL;
 
-    wl_callback_add_listener(callback, &vwl_callback_listener, &done);
+    wl_callback_కూడు_listener(callback, &vwl_callback_listener, &పూర్తి);
 
-#ifdef ELAPSED_FUNC
-    ELAPSED_INIT(start_tv);
-#endif
+#నిర్వచితమైతే ELAPSED_FUNC
+    ELAPSED_INIT(ప్రారంభం_tv);
+#అయితే_ముగింపు
 
     // Wait till we get the done event (which will set `done` to TRUE), unless
     // we timeout
-    while (true)
+    అయితే (true)
     {
 	ret = vwl_connection_dispatch(self);
 
-	if (done || ret == -1)
-	    break;
+	ఒకవేళ (పూర్తి || ret == -1)
+	    ఆపు;
 
-#ifdef ELAPSED_FUNC
-	if (ELAPSED_FUNC(start_tv) >= p_wtm)
+#నిర్వచితమైతే ELAPSED_FUNC
+	ఒకవేళ (ELAPSED_FUNC(ప్రారంభం_tv) >= p_wtm)
 	{
 	    ret = -1;
-	    break;
+	    ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
 
-    if (ret == -1)
+    ఒకవేళ (ret == -1)
     {
-	if (!done)
+	ఒకవేళ (!పూర్తి)
 	    wl_callback_destroy(callback);
-	return FAIL;
+	తిరిగి FAIL;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Redirect libwayland logging to use ch_log + emsg instead.
  */
-    static void
-vwl_log_handler(const char *fmt, va_list args)
+    స్థిర శూన్య
+vwl_log_handler(స్థిరరాశి అక్షరం *fmt, va_list వాదనలు)
 {
     // 512 bytes should be big enough
-    char	*buf	= alloc(512);
-    char	*prefix = _("wayland protocol error -> ");
-    size_t	len	= STRLEN(prefix);
+    అక్షరం	*buf	= alloc(512);
+    అక్షరం	*ఉపసర్గ = _("wayland protocol error -> ");
+    size_t	len	= STRLEN(ఉపసర్గ);
 
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
-    vim_strncpy((char_u*)buf, (char_u*)prefix, len);
-    vim_vsnprintf(buf + len, 512 - len, fmt, args);
+    vim_strncpy((char_u*)buf, (char_u*)ఉపసర్గ, len);
+    vim_vsnprintf(buf + len, 512 - len, fmt, వాదనలు);
 
     // Remove newline that libwayland puts
     buf[STRLEN(buf) - 1] = NUL;
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "%s", buf);
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    ch_log(ఖాళీ, "%s", buf);
+#అయితే_ముగింపు
     emsg(buf);
 
     vim_free(buf);
@@ -244,93 +244,93 @@ vwl_log_handler(const char *fmt, va_list args)
 /*
  * Callback for seat text label/name
  */
-    static void
+    స్థిర శూన్య
 wl_seat_listener_event_name(
-	void		*data,
-	struct wl_seat	*seat_proxy UNUSED,
-	const char	*name)
+	శూన్య		*దత్తాంశం,
+	నిర్మాణం wl_seat	*seat_proxy వాడని,
+	స్థిరరాశి అక్షరం	*name)
 {
-    vwl_seat_T *seat = data;
+    vwl_seat_T *seat = దత్తాంశం;
 
-    seat->label = (char *)vim_strsave((char_u *)name);
+    seat->label = (అక్షరం *)vim_strsave((char_u *)name);
 }
 
 /*
  * Callback for seat capabilities
  */
-    static void
+    స్థిర శూన్య
 wl_seat_listener_event_capabilities(
-	void		*data,
-	struct wl_seat	*seat_proxy UNUSED,
+	శూన్య		*దత్తాంశం,
+	నిర్మాణం wl_seat	*seat_proxy వాడని,
 	uint32_t	capabilities)
 {
-    vwl_seat_T *seat = data;
+    vwl_seat_T *seat = దత్తాంశం;
 
     seat->capabilities = capabilities;
 }
 
-static const struct wl_seat_listener wl_seat_listener = {
+స్థిర స్థిరరాశి నిర్మాణం wl_seat_listener wl_seat_listener = {
     .name = wl_seat_listener_event_name,
     .capabilities = wl_seat_listener_event_capabilities
 };
 
-static void vwl_seat_destroy(vwl_seat_T *self);
+స్థిర శూన్య vwl_seat_destroy(vwl_seat_T *self);
 
 /*
  * Callback for global event, for each global interface the compositor supports.
  * Keep in sync with vwl_disconnect_display().
  */
-    static void
+    స్థిర శూన్య
 wl_registry_listener_event_global(
-	void		    *data,
-	struct wl_registry  *registry,
+	శూన్య		    *దత్తాంశం,
+	నిర్మాణం wl_registry  *registry,
 	uint32_t	    name,
-	const char	    *interface,
-	uint32_t	    version)
+	స్థిరరాశి అక్షరం	    *interface,
+	uint32_t	    సంస్కరణ_2)
 {
-    vwl_connection_T *ct = data;
+    vwl_connection_T *ct = దత్తాంశం;
 
-    if (STRCMP(interface, wl_seat_interface.name) == 0)
+    ఒకవేళ (STRCMP(interface, wl_seat_interface.name) == 0)
     {
-	struct wl_seat	*seat_proxy = wl_registry_bind(registry, name,
-		&wl_seat_interface, version > 5 ? 5 : version);
+	నిర్మాణం wl_seat	*seat_proxy = wl_registry_bind(registry, name,
+		&wl_seat_interface, సంస్కరణ_2 > 5 ? 5 : సంస్కరణ_2);
 	vwl_seat_T	*seat;
 
-	if (seat_proxy == NULL)
-	    return;
+	ఒకవేళ (seat_proxy == ఖాళీ)
+	    తిరిగి;
 
 	seat = ALLOC_CLEAR_ONE(vwl_seat_T);
 
-	if (seat == NULL || ga_grow(&ct->gobjects.seats, 1) == FAIL)
+	ఒకవేళ (seat == ఖాళీ || ga_grow(&ct->gobjects.seats, 1) == FAIL)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    తిరిగి;
 	}
 
 	seat->proxy = seat_proxy;
-	wl_seat_add_listener(seat_proxy, &wl_seat_listener, seat);
+	wl_seat_కూడు_listener(seat_proxy, &wl_seat_listener, seat);
 
-	if (vwl_connection_roundtrip(ct) == FAIL || seat->label == NULL)
+	ఒకవేళ (vwl_connection_roundtrip(ct) == FAIL || seat->label == ఖాళీ)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    తిరిగి;
 	}
 
-	((vwl_seat_T **)ct->gobjects.seats.ga_data)[ct->gobjects.seats.ga_len++]
+	((vwl_seat_T **)ct->gobjects.seats.ga_దత్తాంశం)[ct->gobjects.seats.ga_len++]
 	    = seat;
     }
-#ifdef FEAT_WAYLAND_CLIPBOARD
-    else if (STRCMP(interface, zwlr_data_control_manager_v1_interface.name) == 0)
-	ct->gobjects.zwlr_data_control_manager_v1 =
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
+    లేకపోతే ఒకవేళ (STRCMP(interface, zwlr_దత్తాంశం_control_manager_v1_interface.name) == 0)
+	ct->gobjects.zwlr_దత్తాంశం_control_manager_v1 =
 	    wl_registry_bind(registry, name,
-		    &zwlr_data_control_manager_v1_interface,
-		    version > 2 ? 2 : version);
+		    &zwlr_దత్తాంశం_control_manager_v1_interface,
+		    సంస్కరణ_2 > 2 ? 2 : సంస్కరణ_2);
 
-    else if (STRCMP(interface, ext_data_control_manager_v1_interface.name) == 0)
-	ct->gobjects.ext_data_control_manager_v1 =
+    లేకపోతే ఒకవేళ (STRCMP(interface, ext_దత్తాంశం_control_manager_v1_interface.name) == 0)
+	ct->gobjects.ext_దత్తాంశం_control_manager_v1 =
 	    wl_registry_bind(registry, name,
-		    &ext_data_control_manager_v1_interface, 1);
-#endif // FEAT_WAYLAND_CLIPBOARD
+		    &ext_దత్తాంశం_control_manager_v1_interface, 1);
+#అయితే_ముగింపు // FEAT_WAYLAND_CLIPBOARD
 
 }
 
@@ -340,102 +340,102 @@ wl_registry_listener_event_global(
  * the user call :wlrestore in order to reset everything. Requests to that
  * global will just be ignored on the compositor side.
  */
-    static void
+    స్థిర శూన్య
 wl_registry_listener_event_global_remove(
-	void		    *data UNUSED,
-	struct wl_registry  *registry UNUSED,
-	uint32_t	    name UNUSED)
+	శూన్య		    *దత్తాంశం వాడని,
+	నిర్మాణం wl_registry  *registry వాడని,
+	uint32_t	    name వాడని)
 {
 }
 
-static const struct wl_registry_listener wl_registry_listener = {
+స్థిర స్థిరరాశి నిర్మాణం wl_registry_listener wl_registry_listener = {
     .global = wl_registry_listener_event_global,
     .global_remove = wl_registry_listener_event_global_remove
 };
 
-static void vwl_connection_destroy(vwl_connection_T *self);
+స్థిర శూన్య vwl_connection_destroy(vwl_connection_T *self);
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 
 # define VWL_DESTROY_GOBJECT(ct, object) \
-    if (ct->gobjects.object != NULL) \
+    ఒకవేళ (ct->gobjects.object != ఖాళీ) \
     { \
 	object##_destroy(ct->gobjects.object); \
-	ct->gobjects.object = NULL; \
+	ct->gobjects.object = ఖాళీ; \
     }
 
-# define VWL_GOBJECT_AVAIL(ct, object) (ct->gobjects.object != NULL)
+# define VWL_GOBJECT_AVAIL(ct, object) (ct->gobjects.object != ఖాళీ)
 
-#endif
+#అయితే_ముగింపు
 
 // Make sure to call wayland_set_display(display);
-    static vwl_connection_T *
-vwl_connection_new(const char *display)
+    స్థిర vwl_connection_T *
+vwl_connection_new(స్థిరరాశి అక్షరం *display)
 {
     vwl_connection_T	*ct;
 
-    if (wayland_no_connect)
-	return NULL;
+    ఒకవేళ (wayland_no_connect)
+	తిరిగి ఖాళీ;
 
     // We will get an error if XDG_RUNTIME_DIR is not set.
-    if (mch_getenv("XDG_RUNTIME_DIR") == NULL)
-	return NULL;
+    ఒకవేళ (mch_getenv("XDG_RUNTIME_DIR") == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     ct = ALLOC_CLEAR_ONE(vwl_connection_T);
 
-    if (ct == NULL)
-	return NULL;
+    ఒకవేళ (ct == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Must set log handler before we connect display in order to work.
-    wl_log_set_handler_client(vwl_log_handler);
+    wl_log_సమితి_handler_client(vwl_log_handler);
 
     ct->display.proxy = wl_display_connect(display);
 
-    if (ct->display.proxy == NULL)
+    ఒకవేళ (ct->display.proxy == ఖాళీ)
     {
 	vim_free(ct);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
     ct->display.fd = wl_display_get_fd(ct->display.proxy);
     ct->registry.proxy = wl_display_get_registry(ct->display.proxy);
 
-    if (ct->registry.proxy == NULL)
+    ఒకవేళ (ct->registry.proxy == ఖాళీ)
     {
 	wl_display_disconnect(ct->display.proxy);
 	vim_free(ct);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    ga_init2(&ct->gobjects.seats, sizeof(vwl_seat_T *), 1);
+    ga_init2(&ct->gobjects.seats, పరిమాణం(vwl_seat_T *), 1);
 
-    wl_registry_add_listener(ct->registry.proxy, &wl_registry_listener, ct);
+    wl_registry_కూడు_listener(ct->registry.proxy, &wl_registry_listener, ct);
 
-    if (vwl_connection_roundtrip(ct) == FAIL)
+    ఒకవేళ (vwl_connection_roundtrip(ct) == FAIL)
     {
 	vwl_connection_destroy(ct);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return ct;
+    తిరిగి ct;
 }
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 
 /*
  * Destroy/free seat.
  */
-    static void
+    స్థిర శూన్య
 vwl_seat_destroy(vwl_seat_T *self)
 {
-    if (self == NULL)
-	return;
-    if (self->proxy != NULL)
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి;
+    ఒకవేళ (self->proxy != ఖాళీ)
     {
-	if (wl_seat_get_version(self->proxy) >= 5)
+	ఒకవేళ (wl_seat_get_సంస్కరణ(self->proxy) >= 5)
 	    // Helpful for the compositor
 	    wl_seat_release(self->proxy);
-	else
+	లేకపోతే
 	    wl_seat_destroy(self->proxy);
     }
     vim_free(self->label);
@@ -446,28 +446,28 @@ vwl_seat_destroy(vwl_seat_T *self)
  * Disconnects the display and frees up all resources, including all global
  * objects.
  */
-    static void
+    స్థిర శూన్య
 vwl_connection_destroy(vwl_connection_T *self)
 {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    VWL_DESTROY_GOBJECT(self, ext_data_control_manager_v1)
-    VWL_DESTROY_GOBJECT(self, zwlr_data_control_manager_v1)
+    VWL_DESTROY_GOBJECT(self, ext_దత్తాంశం_control_manager_v1)
+    VWL_DESTROY_GOBJECT(self, zwlr_దత్తాంశం_control_manager_v1)
 # endif
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
-	vwl_seat_destroy(((vwl_seat_T **)self->gobjects.seats.ga_data)[i]);
+    కొరకు (పూర్ణాంకం i = 0; i < self->gobjects.seats.ga_len; i++)
+	vwl_seat_destroy(((vwl_seat_T **)self->gobjects.seats.ga_దత్తాంశం)[i]);
     ga_clear(&self->gobjects.seats);
     self->gobjects.seats.ga_len = 0;
 
-    if (self->registry.proxy != NULL)
+    ఒకవేళ (self->registry.proxy != ఖాళీ)
     {
 	wl_registry_destroy(self->registry.proxy);
-	self->registry.proxy = NULL;
+	self->registry.proxy = ఖాళీ;
     }
-    if (self->display.proxy != NULL)
+    ఒకవేళ (self->display.proxy != ఖాళీ)
     {
 	wl_display_disconnect(self->display.proxy);
-	self->display.proxy = NULL;
+	self->display.proxy = ఖాళీ;
     }
     vim_free(self);
 }
@@ -478,53 +478,53 @@ vwl_connection_destroy(vwl_connection_T *self)
  * seat found is used.
  */
     vwl_seat_T *
-vwl_connection_get_seat(vwl_connection_T *self, const char *label)
+vwl_connection_get_seat(vwl_connection_T *self, స్థిరరాశి అక్షరం *label)
 {
-    if ((STRCMP(label, "") == 0 || label == NULL)
+    ఒకవేళ ((STRCMP(label, "") == 0 || label == ఖాళీ)
 	    && self->gobjects.seats.ga_len > 0)
-	return ((vwl_seat_T **)self->gobjects.seats.ga_data)[0];
+	తిరిగి ((vwl_seat_T **)self->gobjects.seats.ga_దత్తాంశం)[0];
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < self->gobjects.seats.ga_len; i++)
     {
-	vwl_seat_T *seat = ((vwl_seat_T **)self->gobjects.seats.ga_data)[i];
-	if (STRCMP(seat->label, label) == 0)
-	    return seat;
+	vwl_seat_T *seat = ((vwl_seat_T **)self->gobjects.seats.ga_దత్తాంశం)[i];
+	ఒకవేళ (STRCMP(seat->label, label) == 0)
+	    తిరిగి seat;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set wayland_display_name to display. Note that this allocate a copy of the
  * string, unless NULL is passed. If NULL is passed then v:wayland_display is
  * set to $WAYLAND_DISPLAY, but wayland_display_name is set to NULL.
  */
-    static void
-wayland_set_display(const char *display)
+    స్థిర శూన్య
+wayland_సమితి_display(స్థిరరాశి అక్షరం *display)
 {
-    if (display == NULL)
-	display = (char*)mch_getenv((char_u*)"WAYLAND_DISPLAY");
-    else if (display == wayland_display_name)
+    ఒకవేళ (display == ఖాళీ)
+	display = (అక్షరం*)mch_getenv((char_u*)"WAYLAND_DISPLAY");
+    లేకపోతే ఒకవేళ (display == wayland_display_name)
 	// Don't want to be freeing vwl_display_strname then trying to copy it
 	// after.
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
 
-    if (display == NULL)
+    ఒకవేళ (display == ఖాళీ)
 	// $WAYLAND_DISPLAY is not set
 	display = "";
 
     // Leave unchanged if display is empty (but not NULL)
-    if (STRCMP(display, "") != 0)
+    ఒకవేళ (STRCMP(display, "") != 0)
     {
 	vim_free(wayland_display_name);
-	wayland_display_name = (char*)vim_strsave((char_u*)display);
+	wayland_display_name = (అక్షరం*)vim_strsave((char_u*)display);
     }
 
-exit:
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_WAYLAND_DISPLAY, (char_u*)display, -1);
-#endif
+నిష్క్రమించు:
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_string(VV_WAYLAND_DISPLAY, (char_u*)display, -1);
+#అయితే_ముగింపు
 }
 
 /*
@@ -534,60 +534,60 @@ exit:
  * libwayland). Returns FAIL on failure and OK on
  * success
  */
-    int
-wayland_init_connection(const char *display)
+    పూర్ణాంకం
+wayland_init_connection(స్థిరరాశి అక్షరం *display)
 {
-    wayland_set_display(display);
+    wayland_సమితి_display(display);
 
     wayland_ct = vwl_connection_new(display);
 
-    if (wayland_ct == NULL)
-	goto fail;
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	వెళ్ళు fail;
 
-    return OK;
+    తిరిగి OK;
 fail:
     // Set v:wayland_display to empty string (but not wayland_display_name)
-    wayland_set_display("");
-    return FAIL;
+    wayland_సమితి_display("");
+    తిరిగి FAIL;
 }
 
 /*
  * Disconnect global Wayland connection and free up all resources used.
  */
-    void
-wayland_uninit_connection(void)
+    శూన్య
+wayland_uninit_connection(శూన్య)
 {
-    if (wayland_ct == NULL)
-	return;
-#ifdef FEAT_WAYLAND_CLIPBOARD
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి;
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
     clip_uninit_wayland();
-#endif
+#అయితే_ముగింపు
     vwl_connection_destroy(wayland_ct);
-    wayland_ct = NULL;
+    wayland_ct = ఖాళీ;
     is_reading = false;
-    wayland_set_display("");
+    wayland_సమితి_display("");
 }
 
-static int wayland_ct_restore_count = 0;
+స్థిర పూర్ణాంకం wayland_ct_restore_లెక్క = 0;
 
 /*
  * Attempts to restore the Wayland display connection.
  */
-    static void
-wayland_restore_connection(void)
+    స్థిర శూన్య
+wayland_restore_connection(శూన్య)
 {
     // No point in restoring the connection if we are exiting or dying.
-    if (exiting || v_dying || wayland_ct_restore_count <= 0)
-	wayland_set_display("");
+    ఒకవేళ (exiting || v_dying || wayland_ct_restore_లెక్క <= 0)
+	wayland_సమితి_display("");
 
-    --wayland_ct_restore_count;
+    --wayland_ct_restore_లెక్క;
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == OK)
+    ఒకవేళ (wayland_init_connection(wayland_display_name) == OK)
     {
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 	clip_init_wayland();
-#endif
+#అయితే_ముగింపు
     }
 }
 
@@ -595,595 +595,595 @@ wayland_restore_connection(void)
  * Should be called before polling (select or poll) the global Wayland
  * connection display fd. Returns fd on success and -1 on failure.
  */
-    int
-wayland_prepare_read(void)
+    పూర్ణాంకం
+wayland_prepare_read(శూన్య)
 {
-    if (wayland_ct == NULL)
-	return -1;
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి -1;
 
-    if (is_reading)
+    ఒకవేళ (is_reading)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
 	is_reading = false;
     }
 
-    while (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
+    అయితే (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
 	// Event queue not empty, dispatch the events
-	if (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
-	    return -1;
+	ఒకవేళ (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
+	    తిరిగి -1;
 
-    if (vwl_connection_flush(wayland_ct) < 0)
+    ఒకవేళ (vwl_connection_flush(wayland_ct) < 0)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return -1;
+	తిరిగి -1;
     }
 
     is_reading = true;
 
-    return wayland_ct->display.fd;
+    తిరిగి wayland_ct->display.fd;
 }
 
 /*
  * Catch up on any queued events
  */
-    int
-wayland_update(void)
+    పూర్ణాంకం
+wayland_update(శూన్య)
 {
-    if (wayland_ct == NULL)
-	return FAIL;
-    return vwl_connection_roundtrip(wayland_ct);
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి FAIL;
+    తిరిగి vwl_connection_roundtrip(wayland_ct);
 }
 
-#if !defined(HAVE_SELECT)
+#ఒకవేళ !defined(HAVE_SELECT)
 
-    void
-wayland_poll_check(int revents)
+    శూన్య
+wayland_poll_check(పూర్ణాంకం revents)
 {
-    if (wayland_ct == NULL)
-	return;
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి;
 
     is_reading = false;
-    if (revents & POLLIN)
+    ఒకవేళ (revents & POLLIN)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	ఒకవేళ (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	{
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	    return;
+	    తిరిగి;
 	}
     }
-    else if (revents & (POLLHUP | POLLERR))
+    లేకపోతే ఒకవేళ (revents & (POLLHUP | POLLERR))
 	wl_display_cancel_read(wayland_ct->display.proxy);
-    else
+    లేకపోతే
     {
 	// Nothing happened
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return;
+	తిరిగి;
     }
     wayland_restore_connection();
 }
 
-#endif
-#if defined(HAVE_SELECT)
+#అయితే_ముగింపు
+#ఒకవేళ defined(HAVE_SELECT)
 
-    void
-wayland_select_check(bool is_set)
+    శూన్య
+wayland_select_check(bool is_సమితి)
 {
-    if (wayland_ct == NULL)
-	return;
+    ఒకవేళ (wayland_ct == ఖాళీ)
+	తిరిగి;
 
     is_reading = false;
-    if (is_set)
+    ఒకవేళ (is_సమితి)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	ఒకవేళ (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	else
+	లేకపోతే
 	{
 	    wl_display_cancel_read(wayland_ct->display.proxy);
 	    wayland_restore_connection();
 	}
     }
-    else
+    లేకపోతే
 	wl_display_cancel_read(wayland_ct->display.proxy);
 }
 
-#endif
+#అయితే_ముగింపు
 
 /*
  * Disconnect then reconnect Wayland connection, and update clipmethod.
  */
-    void
+    శూన్య
 ex_wlrestore(exarg_T *eap)
 {
-    char *display;
+    అక్షరం *display;
 
-    if (eap->arg == NULL || STRLEN(eap->arg) == 0)
+    ఒకవేళ (eap->arg == ఖాళీ || STRLEN(eap->arg) == 0)
 	// Use current display name if none given
 	display = wayland_display_name;
-    else
-	display = (char*)eap->arg;
+    లేకపోతే
+	display = (అక్షరం*)eap->arg;
 
     // Return early if shebang is not passed, we are still connected, and if not
     // changing to a new Wayland display.
-    if (!eap->forceit && wayland_ct != NULL &&
+    ఒకవేళ (!eap->forceit && wayland_ct != ఖాళీ &&
 	    (display == wayland_display_name ||
-	     (wayland_display_name != NULL &&
+	     (wayland_display_name != ఖాళీ &&
 	      STRCMP(wayland_display_name, display) == 0)))
-	return;
+	తిరిగి;
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
+    ఒకవేళ (clipmethod == CLIPMETHOD_WAYLAND)
     {
 	// Lose any selections we own
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	ఒకవేళ (clip_నక్షత్రం.owned)
+	    clip_lose_selection(&clip_నక్షత్రం);
+	ఒకవేళ (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
-#endif
+#అయితే_ముగింపు
 
-    if (display != NULL)
-	display = (char*)vim_strsave((char_u*)display);
+    ఒకవేళ (display != ఖాళీ)
+	display = (అక్షరం*)vim_strsave((char_u*)display);
 
     // Will lose any selections we own
     wayland_uninit_connection();
 
     // Reset amount of available tries to reconnect the display to 5
-    wayland_ct_restore_count = 5;
+    wayland_ct_restore_లెక్క = 5;
 
-    if (wayland_init_connection(display) == OK)
+    ఒకవేళ (wayland_init_connection(display) == OK)
     {
 	smsg(_("restoring Wayland display %s"), wayland_display_name);
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#నిర్వచితమైతే FEAT_WAYLAND_CLIPBOARD
 	clip_init_wayland();
-#endif
+#అయితే_ముగింపు
     }
-    else
-	msg(_("failed restoring, lost connection to Wayland display"));
+    లేకపోతే
+	సందేశం(_("failed restoring, lost connection to Wayland display"));
 
     vim_free(display);
 
-    choose_clipmethod();
+    ఎంచుకో_clipmethod();
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#ఒకవేళ defined(FEAT_WAYLAND_CLIPBOARD)
 
 /*
  * Get a suitable data device manager from connection. "supported" should be
  * initialized to VWL_DATA_PROTOCOL_NONE beforehand. Returns NULL if there are
  * no data device manager available with the required selection.
  */
-    vwl_data_device_manager_T *
-vwl_connection_get_data_device_manager(
+    vwl_దత్తాంశం_device_manager_T *
+vwl_connection_get_దత్తాంశం_device_manager(
 	vwl_connection_T *self,
 	wayland_selection_T req_sel,
 	int_u *supported)
 {
-    vwl_data_device_manager_T *manager =
-	ALLOC_CLEAR_ONE(vwl_data_device_manager_T);
+    vwl_దత్తాంశం_device_manager_T *manager =
+	ALLOC_CLEAR_ONE(vwl_దత్తాంశం_device_manager_T);
 
     // Prioritize ext-data-control-v1 over wlr-data-control-unstable-v1 because
     // it is newer.
-    if (self->gobjects.ext_data_control_manager_v1 != NULL)
+    ఒకవేళ (self->gobjects.ext_దత్తాంశం_control_manager_v1 != ఖాళీ)
     {
-	manager->proxy = self->gobjects.ext_data_control_manager_v1;
-	manager->protocol = VWL_DATA_PROTOCOL_EXT;
+	manager->proxy = self->gobjects.ext_దత్తాంశం_control_manager_v1;
+	manager->protocol = VWL_దత్తాంశం_PROTOCOL_EXT;
 
 	*supported |= (WAYLAND_SELECTION_REGULAR | WAYLAND_SELECTION_PRIMARY);
     }
-    else if (self->gobjects.zwlr_data_control_manager_v1 != NULL)
+    లేకపోతే ఒకవేళ (self->gobjects.zwlr_దత్తాంశం_control_manager_v1 != ఖాళీ)
     {
-	manager->proxy = self->gobjects.zwlr_data_control_manager_v1;
-	manager->protocol = VWL_DATA_PROTOCOL_WLR;
+	manager->proxy = self->gobjects.zwlr_దత్తాంశం_control_manager_v1;
+	manager->protocol = VWL_దత్తాంశం_PROTOCOL_WLR;
 
 	*supported |= WAYLAND_SELECTION_REGULAR;
 
 	// Only version 2 or greater supports the primary selection
-	if (zwlr_data_control_manager_v1_get_version(manager->proxy) >= 2)
+	ఒకవేళ (zwlr_దత్తాంశం_control_manager_v1_get_సంస్కరణ(manager->proxy) >= 2)
 	    *supported |= WAYLAND_SELECTION_PRIMARY;
     }
 
-    if (!(*supported & req_sel))
+    ఒకవేళ (!(*supported & req_sel))
     {
 	vim_free(manager);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return manager;
+    తిరిగి manager;
 }
 
-    vwl_data_device_T *
-vwl_data_device_manager_get_data_device(
-	vwl_data_device_manager_T *self,
+    vwl_దత్తాంశం_device_T *
+vwl_దత్తాంశం_device_manager_get_దత్తాంశం_device(
+	vwl_దత్తాంశం_device_manager_T *self,
 	vwl_seat_T *seat)
 {
-    vwl_data_device_T *device = ALLOC_CLEAR_ONE(vwl_data_device_T);
+    vwl_దత్తాంశం_device_T *device = ALLOC_CLEAR_ONE(vwl_దత్తాంశం_device_T);
 
-    switch (self->protocol)
+    ఎంపిక (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    device->proxy = ext_data_control_manager_v1_get_data_device(
+	స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+	    device->proxy = ext_దత్తాంశం_control_manager_v1_get_దత్తాంశం_device(
 		    self->proxy, seat->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    device->proxy = zwlr_data_control_manager_v1_get_data_device(
+	    ఆపు;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+	    device->proxy = zwlr_దత్తాంశం_control_manager_v1_get_దత్తాంశం_device(
 		    self->proxy, seat->proxy);
-	    break;
-	default:
+	    ఆపు;
+	అప్రమేయ:
 	    vim_free(device);
-	    return NULL;
+	    తిరిగి ఖాళీ;
     }
     device->protocol = self->protocol;
 
-    return device;
+    తిరిగి device;
 }
 
-    vwl_data_source_T *
-vwl_data_device_manager_create_data_source(vwl_data_device_manager_T *self)
+    vwl_దత్తాంశం_ఆధారం_T *
+vwl_దత్తాంశం_device_manager_create_దత్తాంశం_ఆధారం(vwl_దత్తాంశం_device_manager_T *self)
 {
-    vwl_data_source_T *source = ALLOC_CLEAR_ONE(vwl_data_source_T);
+    vwl_దత్తాంశం_ఆధారం_T *ఆధారం = ALLOC_CLEAR_ONE(vwl_దత్తాంశం_ఆధారం_T);
 
-    switch (self->protocol)
+    ఎంపిక (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    source->proxy = ext_data_control_manager_v1_create_data_source(
+	స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+	    ఆధారం->proxy = ext_దత్తాంశం_control_manager_v1_create_దత్తాంశం_ఆధారం(
 		    self->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    source->proxy = zwlr_data_control_manager_v1_create_data_source(
+	    ఆపు;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+	    ఆధారం->proxy = zwlr_దత్తాంశం_control_manager_v1_create_దత్తాంశం_ఆధారం(
 		    self->proxy);
-	    break;
-	default:
-	    vim_free(source);
-	    return NULL;
+	    ఆపు;
+	అప్రమేయ:
+	    vim_free(ఆధారం);
+	    తిరిగి ఖాళీ;
     }
-    source->protocol = self->protocol;
+    ఆధారం->protocol = self->protocol;
 
-    return source;
+    తిరిగి ఆధారం;
 }
 
-    static vwl_data_offer_T *
-vwl_data_device_wrap_offer_proxy(vwl_data_device_T *self, void *proxy)
+    స్థిర vwl_దత్తాంశం_offer_T *
+vwl_దత్తాంశం_device_wrap_offer_proxy(vwl_దత్తాంశం_device_T *self, శూన్య *proxy)
 {
-    vwl_data_offer_T *offer = ALLOC_CLEAR_ONE(vwl_data_offer_T);
+    vwl_దత్తాంశం_offer_T *offer = ALLOC_CLEAR_ONE(vwl_దత్తాంశం_offer_T);
 
-    if (offer == NULL)
-	return NULL;
+    ఒకవేళ (offer == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     offer->proxy = proxy;
     offer->protocol = self->protocol;
-    offer->data = self->data;
-    ga_init2(&offer->mime_types, sizeof(char *), 10);
+    offer->దత్తాంశం = self->దత్తాంశం;
+    ga_init2(&offer->mime_types, పరిమాణం(అక్షరం *), 10);
 
     // Try pre allocating the array, 10 mime types seems to usually be the
     // maximum from experience.
     ga_grow(&offer->mime_types, 10);
 
-    return offer;
+    తిరిగి offer;
 }
 
-# define VWL_FUNC_DATA_PROXY_DESTROY(type) \
-	void \
-    vwl_data_##type##_destroy(vwl_data_##type##_T *self) \
+# define VWL_FUNC_దత్తాంశం_PROXY_DESTROY(type) \
+	శూన్య \
+    vwl_దత్తాంశం##type##_destroy(vwl_దత్తాంశం##type##_T *self) \
     { \
-	if (self == NULL) \
-	    return; \
-	switch (self->protocol) \
+	ఒకవేళ (self == ఖాళీ) \
+	    తిరిగి; \
+	ఎంపిక (self->protocol) \
 	{ \
-	    case VWL_DATA_PROTOCOL_EXT: \
-		ext_data_control_##type##_v1_destroy(self->proxy); \
-		break; \
-	    case VWL_DATA_PROTOCOL_WLR: \
-		zwlr_data_control_##type##_v1_destroy(self->proxy); \
-		break; \
-	    default: \
-		break; \
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_EXT: \
+		ext_దత్తాంశం_control##type##_v1_destroy(self->proxy); \
+		ఆపు; \
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_WLR: \
+		zwlr_దత్తాంశం_control##type##_v1_destroy(self->proxy); \
+		ఆపు; \
+	    అప్రమేయ: \
+		ఆపు; \
 	} \
 	vim_free(self); \
     }
 
-VWL_FUNC_DATA_PROXY_DESTROY(device)
-VWL_FUNC_DATA_PROXY_DESTROY(source)
+VWL_FUNC_దత్తాంశం_PROXY_DESTROY(device)
+VWL_FUNC_దత్తాంశం_PROXY_DESTROY(ఆధారం)
 
-    void
-vwl_data_offer_destroy(vwl_data_offer_T *self)
+    శూన్య
+vwl_దత్తాంశం_offer_destroy(vwl_దత్తాంశం_offer_T *self)
 {
-    if (self == NULL)
-	return;
-    switch (self->protocol)
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి;
+    ఎంపిక (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_offer_v1_destroy(self->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_offer_v1_destroy(self->proxy);
-	    break;
-	default:
-	    break;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+	    ext_దత్తాంశం_control_offer_v1_destroy(self->proxy);
+	    ఆపు;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+	    zwlr_దత్తాంశం_control_offer_v1_destroy(self->proxy);
+	    ఆపు;
+	అప్రమేయ:
+	    ఆపు;
     }
-    ga_clear_strings(&self->mime_types);
+    ga_clear_అక్షరశ్రేణులు(&self->mime_types);
     vim_free(self);
 }
 
 /*
  * Doesn't destroy the actual global object proxy, only frees the structure.
  */
-void
-vwl_data_device_manager_discard(vwl_data_device_manager_T *self)
+శూన్య
+vwl_దత్తాంశం_device_manager_discard(vwl_దత్తాంశం_device_manager_T *self)
 {
-    if (self == NULL)
-	return;
+    ఒకవేళ (self == ఖాళీ)
+	తిరిగి;
     vim_free(self);
 }
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_దత్తాంశం_DEVICE_EVENT_దత్తాంశం_OFFER(device_type, offer_type) \
+	స్థిర శూన్య \
     device_type##_listener_event_data_offer( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer) \
+	    శూన్య *దత్తాంశం, \
+	    నిర్మాణం device_type *device వాడని, \
+	    నిర్మాణం offer_type *offer) \
     { \
-	vwl_data_device_T *self = data; \
-	self->offer = vwl_data_device_wrap_offer_proxy(self, offer); \
-	self->listener->data_offer(self->data, self, self->offer); \
+	vwl_దత్తాంశం_device_T *self = దత్తాంశం; \
+	self->offer = vwl_దత్తాంశం_device_wrap_offer_proxy(self, offer); \
+	self->listener->దత్తాంశం_offer(self->దత్తాంశం, self, self->offer); \
     }
 
 // We want to set the offer to NULL after the selection callback, because the
 // callback may free the offer, and we don't want a dangling pointer.
-# define VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_దత్తాంశం_DEVICE_EVENT_SELECTION(device_type, offer_type) \
+	స్థిర శూన్య \
     device_type##_listener_event_selection( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer UNUSED) \
+	    శూన్య *దత్తాంశం, \
+	    నిర్మాణం device_type *device వాడని, \
+	    నిర్మాణం offer_type *offer వాడని) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->selection(self->data, self, self->offer, \
+	vwl_దత్తాంశం_device_T *self = దత్తాంశం; \
+	self->listener->selection(self->దత్తాంశం, self, self->offer, \
 		WAYLAND_SELECTION_REGULAR); \
-	self->offer = NULL; \
+	self->offer = ఖాళీ; \
     } \
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_దత్తాంశం_DEVICE_EVENT_PRIMARY_SELECTION(device_type, offer_type) \
+	స్థిర శూన్య \
     device_type##_listener_event_primary_selection( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer UNUSED) \
+	    శూన్య *దత్తాంశం, \
+	    నిర్మాణం device_type *device వాడని, \
+	    నిర్మాణం offer_type *offer వాడని) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->selection(self->data, self, self->offer, \
+	vwl_దత్తాంశం_device_T *self = దత్తాంశం; \
+	self->listener->selection(self->దత్తాంశం, self, self->offer, \
 		WAYLAND_SELECTION_PRIMARY); \
-	self->offer = NULL; \
+	self->offer = ఖాళీ; \
     }
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(device_type) \
-	static void \
+# define VWL_FUNC_దత్తాంశం_DEVICE_EVENT_ముగిసిన(device_type) \
+	స్థిర శూన్య \
     device_type##_listener_event_finished( \
-	    void *data, \
-	    struct device_type *device UNUSED) \
+	    శూన్య *దత్తాంశం, \
+	    నిర్మాణం device_type *device వాడని) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->finished(self->data, self); \
+	vwl_దత్తాంశం_device_T *self = దత్తాంశం; \
+	self->listener->ముగిసిన(self->దత్తాంశం, self); \
     }
 
-VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(
-    ext_data_control_device_v1, ext_data_control_offer_v1)
-VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1)
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_దత్తాంశం_OFFER(
+    ext_దత్తాంశం_control_device_v1, ext_దత్తాంశం_control_offer_v1)
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_దత్తాంశం_OFFER(
+    zwlr_దత్తాంశం_control_device_v1, zwlr_దత్తాంశం_control_offer_v1)
 
-VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(
-    ext_data_control_device_v1, ext_data_control_offer_v1
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_SELECTION(
+    ext_దత్తాంశం_control_device_v1, ext_దత్తాంశం_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_SELECTION(
+    zwlr_దత్తాంశం_control_device_v1, zwlr_దత్తాంశం_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(
-    ext_data_control_device_v1, ext_data_control_offer_v1
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_PRIMARY_SELECTION(
+    ext_దత్తాంశం_control_device_v1, ext_దత్తాంశం_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_PRIMARY_SELECTION(
+    zwlr_దత్తాంశం_control_device_v1, zwlr_దత్తాంశం_control_offer_v1
 )
 
-VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(ext_data_control_device_v1)
-VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(zwlr_data_control_device_v1)
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_ముగిసిన(ext_దత్తాంశం_control_device_v1)
+VWL_FUNC_దత్తాంశం_DEVICE_EVENT_ముగిసిన(zwlr_దత్తాంశం_control_device_v1)
 
-static struct ext_data_control_device_v1_listener
-    ext_data_control_device_v1_listener = {
-	.data_offer = ext_data_control_device_v1_listener_event_data_offer,
-	.selection = ext_data_control_device_v1_listener_event_selection,
+స్థిర నిర్మాణం ext_దత్తాంశం_control_device_v1_listener
+    ext_దత్తాంశం_control_device_v1_listener = {
+	.దత్తాంశం_offer = ext_దత్తాంశం_control_device_v1_listener_event_దత్తాంశం_offer,
+	.selection = ext_దత్తాంశం_control_device_v1_listener_event_selection,
 	.primary_selection =
-	    ext_data_control_device_v1_listener_event_primary_selection,
-	.finished = ext_data_control_device_v1_listener_event_finished
+	    ext_దత్తాంశం_control_device_v1_listener_event_primary_selection,
+	.ముగిసిన = ext_దత్తాంశం_control_device_v1_listener_event_ముగిసిన
 };
-static const struct zwlr_data_control_device_v1_listener
-    zwlr_data_control_device_v1_listener = {
-	.data_offer = zwlr_data_control_device_v1_listener_event_data_offer,
-	.selection = zwlr_data_control_device_v1_listener_event_selection,
+స్థిర స్థిరరాశి నిర్మాణం zwlr_దత్తాంశం_control_device_v1_listener
+    zwlr_దత్తాంశం_control_device_v1_listener = {
+	.దత్తాంశం_offer = zwlr_దత్తాంశం_control_device_v1_listener_event_దత్తాంశం_offer,
+	.selection = zwlr_దత్తాంశం_control_device_v1_listener_event_selection,
 	.primary_selection =
-	    zwlr_data_control_device_v1_listener_event_primary_selection,
-	.finished = zwlr_data_control_device_v1_listener_event_finished
+	    zwlr_దత్తాంశం_control_device_v1_listener_event_primary_selection,
+	.ముగిసిన = zwlr_దత్తాంశం_control_device_v1_listener_event_ముగిసిన
 };
 
-# define VWL_FUNC_DATA_SOURCE_EVENT_SEND(source_type) \
-	static void \
-    source_type##_listener_event_send( \
-	    void *data, struct source_type *source UNUSED, \
-	    const char *mime_type, int fd) \
+# define VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_SEND(ఆధారం_type) \
+	స్థిర శూన్య \
+    ఆధారం_type##_listener_event_send( \
+	    శూన్య *దత్తాంశం, నిర్మాణం ఆధారం_type *ఆధారం వాడని, \
+	    స్థిరరాశి అక్షరం *mime_type, పూర్ణాంకం fd) \
     { \
-	vwl_data_source_T *self = data; \
-	self->listener->send(self->data, self, mime_type, fd); \
+	vwl_దత్తాంశం_ఆధారం_T *self = దత్తాంశం; \
+	self->listener->send(self->దత్తాంశం, self, mime_type, fd); \
     }
 
-# define VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(source_type) \
-	static void \
-    source_type##_listener_event_cancelled( \
-	    void *data, struct source_type *source UNUSED) \
+# define VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_CANCELLED(ఆధారం_type) \
+	స్థిర శూన్య \
+    ఆధారం_type##_listener_event_cancelled( \
+	    శూన్య *దత్తాంశం, నిర్మాణం ఆధారం_type *ఆధారం వాడని) \
     { \
-	vwl_data_source_T *self = data; \
-	self->listener->cancelled(self->data, self); \
+	vwl_దత్తాంశం_ఆధారం_T *self = దత్తాంశం; \
+	self->listener->cancelled(self->దత్తాంశం, self); \
     }
 
-VWL_FUNC_DATA_SOURCE_EVENT_SEND(ext_data_control_source_v1)
-VWL_FUNC_DATA_SOURCE_EVENT_SEND(zwlr_data_control_source_v1)
+VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_SEND(ext_దత్తాంశం_control_ఆధారం_v1)
+VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_SEND(zwlr_దత్తాంశం_control_ఆధారం_v1)
 
-VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(ext_data_control_source_v1)
-VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(zwlr_data_control_source_v1)
+VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_CANCELLED(ext_దత్తాంశం_control_ఆధారం_v1)
+VWL_FUNC_దత్తాంశం_ఆధారం_EVENT_CANCELLED(zwlr_దత్తాంశం_control_ఆధారం_v1)
 
-static const struct ext_data_control_source_v1_listener
-    ext_data_control_source_v1_listener = {
-	.send = ext_data_control_source_v1_listener_event_send,
-	.cancelled = ext_data_control_source_v1_listener_event_cancelled
+స్థిర స్థిరరాశి నిర్మాణం ext_దత్తాంశం_control_ఆధారం_v1_listener
+    ext_దత్తాంశం_control_ఆధారం_v1_listener = {
+	.send = ext_దత్తాంశం_control_ఆధారం_v1_listener_event_send,
+	.cancelled = ext_దత్తాంశం_control_ఆధారం_v1_listener_event_cancelled
 };
-static const struct zwlr_data_control_source_v1_listener
-    zwlr_data_control_source_v1_listener = {
-	.send = zwlr_data_control_source_v1_listener_event_send,
-	.cancelled = zwlr_data_control_source_v1_listener_event_cancelled
+స్థిర స్థిరరాశి నిర్మాణం zwlr_దత్తాంశం_control_ఆధారం_v1_listener
+    zwlr_దత్తాంశం_control_ఆధారం_v1_listener = {
+	.send = zwlr_దత్తాంశం_control_ఆధారం_v1_listener_event_send,
+	.cancelled = zwlr_దత్తాంశం_control_ఆధారం_v1_listener_event_cancelled
 };
 
-# define VWL_FUNC_DATA_OFFER_EVENT_OFFER(offer_type) \
-	static void \
+# define VWL_FUNC_దత్తాంశం_OFFER_EVENT_OFFER(offer_type) \
+	స్థిర శూన్య \
     offer_type##_listener_event_offer( \
-	    void *data, \
-	    struct offer_type *offer UNUSED, \
-	    const char *mime_type) \
+	    శూన్య *దత్తాంశం, \
+	    నిర్మాణం offer_type *offer వాడని, \
+	    స్థిరరాశి అక్షరం *mime_type) \
     { \
-	vwl_data_offer_T *self = data; \
-	if (self->listener->offer(self->data, self, mime_type)) \
+	vwl_దత్తాంశం_offer_T *self = దత్తాంశం; \
+	ఒకవేళ (self->listener->offer(self->దత్తాంశం, self, mime_type)) \
 	{ \
-	    char *mime = (char *)vim_strsave((char_u *)mime_type); \
-	    if (ga_grow(&self->mime_types, 1) == FAIL) \
+	    అక్షరం *mime = (అక్షరం *)vim_strsave((char_u *)mime_type); \
+	    ఒకవేళ (ga_grow(&self->mime_types, 1) == FAIL) \
 		vim_free(mime); \
-	    else \
-		if (mime != NULL) \
-		    ((char **)self->mime_types.ga_data) \
+	    లేకపోతే \
+		ఒకవేళ (mime != ఖాళీ) \
+		    ((అక్షరం **)self->mime_types.ga_దత్తాంశం) \
 					[self->mime_types.ga_len++] = mime; \
 	} \
     }
 
-VWL_FUNC_DATA_OFFER_EVENT_OFFER(ext_data_control_offer_v1)
-VWL_FUNC_DATA_OFFER_EVENT_OFFER(zwlr_data_control_offer_v1)
+VWL_FUNC_దత్తాంశం_OFFER_EVENT_OFFER(ext_దత్తాంశం_control_offer_v1)
+VWL_FUNC_దత్తాంశం_OFFER_EVENT_OFFER(zwlr_దత్తాంశం_control_offer_v1)
 
-static const struct ext_data_control_offer_v1_listener
-    ext_data_control_offer_v1_listener = {
-	.offer = ext_data_control_offer_v1_listener_event_offer
+స్థిర స్థిరరాశి నిర్మాణం ext_దత్తాంశం_control_offer_v1_listener
+    ext_దత్తాంశం_control_offer_v1_listener = {
+	.offer = ext_దత్తాంశం_control_offer_v1_listener_event_offer
 };
-static const struct zwlr_data_control_offer_v1_listener
-    zwlr_data_control_offer_v1_listener = {
-	.offer = zwlr_data_control_offer_v1_listener_event_offer
+స్థిర స్థిరరాశి నిర్మాణం zwlr_దత్తాంశం_control_offer_v1_listener
+    zwlr_దత్తాంశం_control_offer_v1_listener = {
+	.offer = zwlr_దత్తాంశం_control_offer_v1_listener_event_offer
 };
 
-# define VWL_FUNC_DATA_PROXY_ADD_LISTENER(type) \
-	void \
-    vwl_data_##type##_add_listener( \
-	    vwl_data_##type##_T *self, \
-	    const vwl_data_##type##_listener_T *listener, \
-	    void *data) \
+# define VWL_FUNC_దత్తాంశం_PROXY_కూడు_LISTENER(type) \
+	శూన్య \
+    vwl_దత్తాంశం##type##_add_listener( \
+	    vwl_దత్తాంశం##type##_T *self, \
+	    స్థిరరాశి vwl_దత్తాంశం##type##_listener_T *listener, \
+	    శూన్య *దత్తాంశం) \
     { \
-	if (self == NULL) \
-	    return; \
-	self->data = data; \
+	ఒకవేళ (self == ఖాళీ) \
+	    తిరిగి; \
+	self->దత్తాంశం = దత్తాంశం; \
 	self->listener = listener; \
-	switch (self->protocol) \
+	ఎంపిక (self->protocol) \
 	{ \
-	    case VWL_DATA_PROTOCOL_EXT: \
-		ext_data_control_##type##_v1_add_listener(self->proxy, \
-			&ext_data_control_##type##_v1_listener, self); \
-		break; \
-	    case VWL_DATA_PROTOCOL_WLR: \
-		zwlr_data_control_##type##_v1_add_listener(self->proxy, \
-			&zwlr_data_control_##type##_v1_listener, self); \
-		break; \
-	    default: \
-		break; \
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_EXT: \
+		ext_దత్తాంశం_control##type##_v1_add_listener(self->proxy, \
+			&ext_దత్తాంశం_control##type##_v1_listener, self); \
+		ఆపు; \
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_WLR: \
+		zwlr_దత్తాంశం_control##type##_v1_add_listener(self->proxy, \
+			&zwlr_దత్తాంశం_control##type##_v1_listener, self); \
+		ఆపు; \
+	    అప్రమేయ: \
+		ఆపు; \
 	} \
     }
 
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(device)
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(source)
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(offer)
+VWL_FUNC_దత్తాంశం_PROXY_కూడు_LISTENER(device)
+VWL_FUNC_దత్తాంశం_PROXY_కూడు_LISTENER(ఆధారం)
+VWL_FUNC_దత్తాంశం_PROXY_కూడు_LISTENER(offer)
 /*
  * Set the given selection to source. If a data control protocol is being used,
  * "serial" is ignored.
  */
-    void
-vwl_data_device_set_selection(
-    vwl_data_device_T *self,
-    vwl_data_source_T *source,
-    uint32_t serial UNUSED,
+    శూన్య
+vwl_దత్తాంశం_device_సమితి_selection(
+    vwl_దత్తాంశం_device_T *self,
+    vwl_దత్తాంశం_ఆధారం_T *ఆధారం,
+    uint32_t serial వాడని,
     wayland_selection_T selection
 )
 {
-    void *proxy = source == NULL ? NULL : source->proxy;
+    శూన్య *proxy = ఆధారం == ఖాళీ ? ఖాళీ : ఆధారం->proxy;
 
-    if (selection == WAYLAND_SELECTION_REGULAR)
+    ఒకవేళ (selection == WAYLAND_SELECTION_REGULAR)
     {
-	switch (self->protocol)
+	ఎంపిక (self->protocol)
 	{
-	    case VWL_DATA_PROTOCOL_EXT:
-		ext_data_control_device_v1_set_selection(self->proxy, proxy);
-		break;
-	    case VWL_DATA_PROTOCOL_WLR:
-		zwlr_data_control_device_v1_set_selection(self->proxy, proxy);
-		break;
-	    default:
-		break;
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+		ext_దత్తాంశం_control_device_v1_సమితి_selection(self->proxy, proxy);
+		ఆపు;
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+		zwlr_దత్తాంశం_control_device_v1_సమితి_selection(self->proxy, proxy);
+		ఆపు;
+	    అప్రమేయ:
+		ఆపు;
 	}
     }
-    else if (selection == WAYLAND_SELECTION_PRIMARY)
+    లేకపోతే ఒకవేళ (selection == WAYLAND_SELECTION_PRIMARY)
     {
-	switch (self->protocol)
+	ఎంపిక (self->protocol)
 	{
-	    case VWL_DATA_PROTOCOL_EXT:
-		ext_data_control_device_v1_set_primary_selection(
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+		ext_దత్తాంశం_control_device_v1_సమితి_primary_selection(
 			self->proxy, proxy
 			);
-		break;
-	    case VWL_DATA_PROTOCOL_WLR:
-		zwlr_data_control_device_v1_set_primary_selection(
+		ఆపు;
+	    స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+		zwlr_దత్తాంశం_control_device_v1_సమితి_primary_selection(
 			self->proxy, proxy
 			);
-		break;
-	    default:
-		break;
+		ఆపు;
+	    అప్రమేయ:
+		ఆపు;
 	}
     }
 }
 
-    void
-vwl_data_source_offer(vwl_data_source_T *self, const char *mime_type)
+    శూన్య
+vwl_దత్తాంశం_ఆధారం_offer(vwl_దత్తాంశం_ఆధారం_T *self, స్థిరరాశి అక్షరం *mime_type)
 {
-    switch (self->protocol)
+    ఎంపిక (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_source_v1_offer(self->proxy, mime_type);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_source_v1_offer(self->proxy, mime_type);
-	    break;
-	default:
-	    break;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+	    ext_దత్తాంశం_control_ఆధారం_v1_offer(self->proxy, mime_type);
+	    ఆపు;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+	    zwlr_దత్తాంశం_control_ఆధారం_v1_offer(self->proxy, mime_type);
+	    ఆపు;
+	అప్రమేయ:
+	    ఆపు;
     }
 }
 
-    void
-vwl_data_offer_receive(
-	vwl_data_offer_T *self,
-	const char *mime_type,
+    శూన్య
+vwl_దత్తాంశం_offer_receive(
+	vwl_దత్తాంశం_offer_T *self,
+	స్థిరరాశి అక్షరం *mime_type,
 	int32_t fd)
 {
-    switch (self->protocol)
+    ఎంపిక (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_offer_v1_receive(self->proxy, mime_type, fd);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_offer_v1_receive(self->proxy, mime_type, fd);
-	    break;
-	default:
-	    break;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_EXT:
+	    ext_దత్తాంశం_control_offer_v1_receive(self->proxy, mime_type, fd);
+	    ఆపు;
+	స్థితి VWL_దత్తాంశం_PROTOCOL_WLR:
+	    zwlr_దత్తాంశం_control_offer_v1_receive(self->proxy, mime_type, fd);
+	    ఆపు;
+	అప్రమేయ:
+	    ఆపు;
     }
 }
 
-#endif // FEAT_WAYLAND_CLIPBOARD
+#అయితే_ముగింపు // FEAT_WAYLAND_CLIPBOARD
 
-#endif // FEAT_WAYLAND
+#అయితే_ముగింపు // FEAT_WAYLAND

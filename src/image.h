@@ -7,13 +7,13 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifdef FEAT_IMAGE
+#నిర్వచితమైతే FEAT_IMAGE
 
-#include <pixman.h>
+#అన్తర్భావ <pixman.h>
 
-#define PLACEMENT_ID_INC 1000
+#నిర్వచించు PLACEMENT_ID_INC 1000
 
-typedef enum
+రకనిర్వచనం గణన
 {
     IMAGE_BACKEND_NONE = -1,
     IMAGE_BACKEND_GUI = 0,
@@ -24,16 +24,16 @@ typedef enum
 /*
  * Enum value is the number of bytes a pixel takes up
  */
-typedef enum
+రకనిర్వచనం గణన
 {
     IMAGE_FORMAT_RGB = 3,
     IMAGE_FORMAT_RGBA = 4
 } image_format_T;
 
-typedef enum
+రకనిర్వచనం గణన
 {
-    IMAGE_STATE_PUBLIC,
-    IMAGE_STATE_PRIVATE
+    IMAGE_STATE_ప్రజా,
+    IMAGE_STATE_వ్యక్తిగత
 } image_state_T;
 
 /*
@@ -41,7 +41,7 @@ typedef enum
  * higher values will always be on top of other image placements with a lower
  * use that have the same zindex as the higher use image.
  */
-typedef enum
+రకనిర్వచనం గణన
 {
     // See find_next_popup() for why (global popups are always drawn first,
     // meaning they should be below local tab popups).
@@ -55,46 +55,46 @@ typedef enum
  * Represents image data, that can be referenced by multiple image placements,
  * each with a different view.
  */
-typedef struct image_S image_T;
-struct image_S
+రకనిర్వచనం నిర్మాణం image_S image_T;
+నిర్మాణం image_S
 {
     int_u id;
-    int refcount;
+    పూర్ణాంకం refcount;
 
     // If image state is public, then it can be modified using the builtin
     // functions.
     image_state_T state;
 
-    uint8_t	    *data; // If NULL, then image is invalid and should not be
+    uint8_t	    *దత్తాంశం; // If NULL, then image is invalid and should not be
 			   // used.
-    int		    width;  // In physical pixels
-    int		    height; // In physical pixels
+    పూర్ణాంకం		    వెడల్పు;  // In physical pixels
+    పూర్ణాంకం		    ఎత్తు; // In physical pixels
     image_format_T  fmt;
 
     // Incremented every time the image data changes.
     int_u	    ver;
 
     image_backend_T backend;
-    void	    *backend_data;
+    శూన్య	    *backend_దత్తాంశం;
 
-    image_T *next;
+    image_T *తదుపరి;
     image_T *prev;
 };
 
-#define IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
-#define IMAGEPF_HIDDEN 2    // If image should not be drawn
-#define IMAGEPF_FORCE 4     // If image backend should not use its cache
+#నిర్వచించు IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
+#నిర్వచించు IMAGEPF_HIDDEN 2    // If image should not be drawn
+#నిర్వచించు IMAGEPF_FORCE 4     // If image backend should not use its cache
 			    // (if any)
 
-#define IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
-#define IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
+#నిర్వచించు IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
+#నిర్వచించు IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
 				// redraws).
 
 /*
  * Represents an image placement, which is a visible view of an image.
  */
-typedef struct image_placement_S image_placement_T;
-struct image_placement_S
+రకనిర్వచనం నిర్మాణం image_placement_S image_placement_T;
+నిర్మాణం image_placement_S
 {
     int_u   id;
     int_u   gen;    // See image_placement_new(), note that "use" is prioritized
@@ -103,12 +103,12 @@ struct image_placement_S
 		    // (and the position + zindex).
 
     image_backend_T backend;
-    void	    *backend_data;
+    శూన్య	    *backend_దత్తాంశం;
 
     // Note that positioning uses the top left of the final cropped image
-    linenr_T	row;
-    colnr_T	col;
-    int		zindex;
+    linenr_T	అడ్డువరుస;
+    colnr_T	నిలువు;
+    పూర్ణాంకం		zindex;
 
     int_u flags;
 
@@ -130,28 +130,28 @@ struct image_placement_S
     int_u img_ver; // Current image version, if it is different from the image,
 		   // then must redraw the image.
 
-    int cell_width; // Cell dimensions used to draw this placement
-    int cell_height;
+    పూర్ణాంకం cell_వెడల్పు; // Cell dimensions used to draw this placement
+    పూర్ణాంకం cell_ఎత్తు;
 
-    int row_off;
+    పూర్ణాంకం అడ్డువరుస_off;
 
     image_placement_use_T use;
 
-    image_placement_T *next;
+    image_placement_T *తదుపరి;
     image_placement_T *prev;
 };
 
-#else
+#లేకపోతే
 
 // Dummy structs for .pro files when GUI Vim is compiled without image support
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int dummy;
+    పూర్ణాంకం dummy;
 } image_T;
 
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int dummy;
+    పూర్ణాంకం dummy;
 } image_placement_T;
 
-#endif // FEAT_IMAGE
+#అయితే_ముగింపు // FEAT_IMAGE

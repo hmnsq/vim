@@ -11,53 +11,53 @@
  * ex_getln.c: Functions for entering and editing an Ex command line.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 // Return value when handling keys in command-line mode.
-#define CMDLINE_NOT_CHANGED	1
-#define CMDLINE_CHANGED		2
-#define GOTO_NORMAL_MODE	3
-#define PROCESS_NEXT_KEY	4
+#నిర్వచించు CMDLINE_NOT_మారింది	1
+#నిర్వచించు CMDLINE_మారింది		2
+#నిర్వచించు GOTO_సాధారణ_బహుళకం	3
+#నిర్వచించు PROCESS_తదుపరి_కీలకం	4
 
 // The current cmdline_info.  It is initialized in getcmdline() and after that
 // used by other functions.  When invoking getcmdline() recursively it needs
 // to be saved with save_cmdline() and restored with restore_cmdline().
-static cmdline_info_T ccline;
+స్థిర cmdline_info_T ccline;
 
-#ifdef FEAT_EVAL
-static int	new_cmdpos;	// position set by set_cmdline_pos()
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర పూర్ణాంకం	new_cmdpos;	// position set by set_cmdline_pos()
+#అయితే_ముగింపు
 
-static int	extra_char = NUL;  // extra character to display when redrawing
+స్థిర పూర్ణాంకం	extra_char = NUL;  // extra character to display when redrawing
 				   // the command line
-static int	extra_char_shift;
+స్థిర పూర్ణాంకం	extra_char_జరుపు;
 
-#ifdef FEAT_RIGHTLEFT
-static int	cmd_hkmap = 0;	// Hebrew mapping during command line
-#endif
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+స్థిర పూర్ణాంకం	cmd_hkmap = 0;	// Hebrew mapping during command line
+#అయితే_ముగింపు
 
-static char_u	*getcmdline_int(int firstc, long count, int indent, int clear_ccline);
-static int	cmdline_charsize(int idx);
-static void	set_cmdspos(void);
-static void	set_cmdspos_cursor(void);
-static void	correct_cmdspos(int idx, int cells);
-static void	dealloc_cmdbuff(void);
-static void	alloc_cmdbuff(size_t len);
-static void	draw_cmdline(int start, int len);
-static void	save_cmdline(cmdline_info_T *ccp);
-static void	restore_cmdline(cmdline_info_T *ccp);
-static int	cmdline_paste(int regname, int literally, int remcr);
-static void	redrawcmdprompt(void);
-static int	ccheck_abbr(int);
-static int	open_cmdwin(void);
-#ifdef FEAT_SEARCH_EXTRA
-static int	empty_pattern_magic(char_u *pat, size_t len, magic_T magic_val);
-#endif
+స్థిర char_u	*getcmdline_int(పూర్ణాంకం firstc, దీర్ఘ లెక్క, పూర్ణాంకం indent, పూర్ణాంకం clear_ccline);
+స్థిర పూర్ణాంకం	cmdline_charsize(పూర్ణాంకం idx);
+స్థిర శూన్య	సమితి_cmdspos(శూన్య);
+స్థిర శూన్య	సమితి_cmdspos_cursor(శూన్య);
+స్థిర శూన్య	correct_cmdspos(పూర్ణాంకం idx, పూర్ణాంకం cells);
+స్థిర శూన్య	dealloc_cmdbuff(శూన్య);
+స్థిర శూన్య	alloc_cmdbuff(size_t len);
+స్థిర శూన్య	draw_cmdline(పూర్ణాంకం ప్రారంభం, పూర్ణాంకం len);
+స్థిర శూన్య	save_cmdline(cmdline_info_T *ccp);
+స్థిర శూన్య	restore_cmdline(cmdline_info_T *ccp);
+స్థిర పూర్ణాంకం	cmdline_paste(పూర్ణాంకం regname, పూర్ణాంకం literally, పూర్ణాంకం remcr);
+స్థిర శూన్య	redrawcmdprompt(శూన్య);
+స్థిర పూర్ణాంకం	ccheck_abbr(పూర్ణాంకం);
+స్థిర పూర్ణాంకం	open_cmdwin(శూన్య);
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+స్థిర పూర్ణాంకం	ఖాళీలు_నమూనా_magic(char_u *pat, size_t len, magic_T magic_val);
+#అయితే_ముగింపు
 
-static int	cedit_key = -1;	// key value of 'cedit' option
+స్థిర పూర్ణాంకం	cedit_కీలకం = -1;	// key value of 'cedit' option
 
-    static void
-trigger_cmd_autocmd(int typechar, int evt)
+    స్థిర శూన్య
+trigger_cmd_autocmd(పూర్ణాంకం typechar, పూర్ణాంకం evt)
 {
     char_u	typestr[2];
 
@@ -69,45 +69,45 @@ trigger_cmd_autocmd(int typechar, int evt)
 /*
  * Abandon the command line.
  */
-    static void
-abandon_cmdline(void)
+    స్థిర శూన్య
+abandon_cmdline(శూన్య)
 {
     dealloc_cmdbuff();
-    if (msg_scrolled == 0)
+    ఒకవేళ (సందేశం_scrolled == 0)
 	compute_cmdrow();
-    msg("");
+    సందేశం("");
     redraw_cmdline = TRUE;
 }
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 /*
  * Guess that the pattern matches everything.  Only finds specific cases, such
  * as a trailing \|, which can happen while typing a pattern.
  */
-    static int
-empty_pattern(char_u *p, size_t len, int delim)
+    స్థిర పూర్ణాంకం
+ఖాళీలు_నమూనా(char_u *p, size_t len, పూర్ణాంకం delim)
 {
     magic_T	magic_val = MAGIC_ON;
 
-    if (len > 0)
-	(void) skip_regexp_ex(p, delim, magic_isset(), NULL, NULL, &magic_val);
-    else
-	return TRUE;
+    ఒకవేళ (len > 0)
+	(శూన్య) skip_regexp_ex(p, delim, magic_isset(), ఖాళీ, ఖాళీ, &magic_val);
+    లేకపోతే
+	తిరిగి TRUE;
 
-    return empty_pattern_magic(p, len, magic_val);
+    తిరిగి ఖాళీలు_నమూనా_magic(p, len, magic_val);
 }
 
-    static int
-empty_pattern_magic(char_u *p, size_t len, magic_T magic_val)
+    స్థిర పూర్ణాంకం
+ఖాళీలు_నమూనా_magic(char_u *p, size_t len, magic_T magic_val)
 {
     // remove trailing \v and the like
-    while (len >= 2 && p[len - 2] == '\\'
-			&& vim_strchr((char_u *)"mMvVcCZ", p[len - 1]) != NULL)
+    అయితే (len >= 2 && p[len - 2] == '\\'
+			&& vim_strchr((char_u *)"mMvVcCZ", p[len - 1]) != ఖాళీ)
 	len -= 2;
 
     // true, if the pattern is empty, or the pattern ends with \| and magic is
     // set (or it ends with '|' and very magic is set)
-    return len == 0
+    తిరిగి len == 0
 	|| (
 	    len > 1 && p[len - 1] == '|'
 	    && (
@@ -118,19 +118,19 @@ empty_pattern_magic(char_u *p, size_t len, magic_T magic_val)
 }
 
 // Struct to store the viewstate during 'incsearch' highlighting.
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     colnr_T	vs_curswant;
     colnr_T	vs_leftcol;
     colnr_T	vs_skipcol;
     linenr_T	vs_topline;
 # ifdef FEAT_DIFF
-    int		vs_topfill;
+    పూర్ణాంకం		vs_topfill;
 # endif
     linenr_T	vs_botline;
-    linenr_T	vs_empty_rows;
+    linenr_T	vs_ఖాళీలు_అడ్డువరుసలు;
 } viewstate_T;
 
-    static void
+    స్థిర శూన్య
 save_viewstate(viewstate_T *vs)
 {
     vs->vs_curswant = curwin->w_curswant;
@@ -141,10 +141,10 @@ save_viewstate(viewstate_T *vs)
     vs->vs_topfill = curwin->w_topfill;
 # endif
     vs->vs_botline = curwin->w_botline;
-    vs->vs_empty_rows = curwin->w_empty_rows;
+    vs->vs_ఖాళీలు_అడ్డువరుసలు = curwin->w_ఖాళీలు_అడ్డువరుసలు;
 }
 
-    static void
+    స్థిర శూన్య
 restore_viewstate(viewstate_T *vs)
 {
     curwin->w_curswant = vs->vs_curswant;
@@ -155,34 +155,34 @@ restore_viewstate(viewstate_T *vs)
     curwin->w_topfill = vs->vs_topfill;
 # endif
     curwin->w_botline = vs->vs_botline;
-    curwin->w_empty_rows = vs->vs_empty_rows;
+    curwin->w_ఖాళీలు_అడ్డువరుసలు = vs->vs_ఖాళీలు_అడ్డువరుసలు;
 }
 
 // Struct to store the state of 'incsearch' highlighting.
-typedef struct {
-    pos_T	search_start;	// where 'incsearch' starts searching
+రకనిర్వచనం నిర్మాణం {
+    pos_T	శోధన_ప్రారంభం_2;	// where 'incsearch' starts searching
     pos_T	save_cursor;
-    int		winid;		// window where this state is valid
+    పూర్ణాంకం		winid;		// window where this state is valid
     viewstate_T	init_viewstate;
     viewstate_T	old_viewstate;
-    pos_T	match_start;
-    pos_T	match_end;
-    int		did_incsearch;
-    int		incsearch_postponed;
+    pos_T	సరిపోలిక_ప్రారంభం;
+    pos_T	సరిపోలిక_చివర;
+    పూర్ణాంకం		did_incsearch;
+    పూర్ణాంకం		incsearch_postponed;
     optmagic_T	magic_overruled_save;
 } incsearch_state_T;
 
-    static void
+    స్థిర శూన్య
 init_incsearch_state(incsearch_state_T *is_state)
 {
     is_state->winid = curwin->w_id;
-    is_state->match_start = curwin->w_cursor;
+    is_state->సరిపోలిక_ప్రారంభం = curwin->w_cursor;
     is_state->did_incsearch = FALSE;
     is_state->incsearch_postponed = FALSE;
     is_state->magic_overruled_save = magic_overruled;
-    CLEAR_POS(&is_state->match_end);
+    CLEAR_POS(&is_state->సరిపోలిక_చివర);
     is_state->save_cursor = curwin->w_cursor;  // may be restored later
-    is_state->search_start = curwin->w_cursor;
+    is_state->శోధన_ప్రారంభం_2 = curwin->w_cursor;
     save_viewstate(&is_state->init_viewstate);
     save_viewstate(&is_state->old_viewstate);
 }
@@ -191,14 +191,14 @@ init_incsearch_state(incsearch_state_T *is_state)
  * First move cursor to end of match, then to the start.  This
  * moves the whole match onto the screen when 'nowrap' is set.
  */
-    static void
-set_search_match(pos_T *t)
+    స్థిర శూన్య
+సమితి_శోధన_సరిపోలిక(pos_T *t)
 {
-    t->lnum += search_match_lines;
-    t->col = search_match_endcol;
-    if (t->lnum > curbuf->b_ml.ml_line_count)
+    t->lnum += శోధన_సరిపోలిక_పంక్తులు;
+    t->నిలువు = శోధన_సరిపోలిక_endcol;
+    ఒకవేళ (t->lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	t->lnum = curbuf->b_ml.ml_line_count;
+	t->lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
 	coladvance((colnr_T)MAXCOL);
     }
 }
@@ -209,136 +209,136 @@ set_search_match(pos_T *t)
  * Returns TRUE if pattern is valid.
  * Sets skiplen, patlen, search_first_line, and search_last_line.
  */
-    int
-parse_pattern_and_range(
-	pos_T	*incsearch_start,
-	int	*search_delim,
-	int	*skiplen,
-	int	*patlen)
+    పూర్ణాంకం
+parse_నమూనా_and_range(
+	pos_T	*incsearch_ప్రారంభం,
+	పూర్ణాంకం	*శోధన_delim,
+	పూర్ణాంకం	*skiplen,
+	పూర్ణాంకం	*patlen)
 {
-    char_u	*cmd, *p, *end;
+    char_u	*cmd, *p, *చివర;
     cmdmod_T	dummy_cmdmod;
     exarg_T	ea;
     pos_T	save_cursor;
-    int		delim_optional = FALSE;
-    int		delim;
-    int		use_last_pat;
+    పూర్ణాంకం		delim_optional = FALSE;
+    పూర్ణాంకం		delim;
+    పూర్ణాంకం		use_చివరి_pat;
     magic_T     magic = 0;
-    char	*dummy;
+    అక్షరం	*dummy;
 
     *skiplen = 0;
     *patlen = ccline.cmdlen;
 
     // Default range
-    search_first_line = 0;
-    search_last_line = MAXLNUM;
+    శోధన_మొదటి_పంక్తి = 0;
+    శోధన_చివరి_పంక్తి = MAXLNUM;
 
-    CLEAR_FIELD(ea);
+    CLEAR_క్షేత్రం(ea);
     ea.line1 = 1;
     ea.line2 = 1;
     ea.cmd = ccline.cmdbuff;
-    ea.addr_type = ADDR_LINES;
+    ea.addr_type = ADDR_పంక్తులు;
 
     // Skip over command modifiers
     parse_command_modifiers(&ea, &dummy, &dummy_cmdmod, TRUE);
 
     // Skip over the range to find the command.
-    cmd = skip_range(ea.cmd, TRUE, NULL);
+    cmd = skip_range(ea.cmd, TRUE, ఖాళీ);
 
-    if (vim_strchr((char_u *)"sgvlu", *cmd) == NULL)
-	return FALSE;
+    ఒకవేళ (vim_strchr((char_u *)"sgvlu", *cmd) == ఖాళీ)
+	తిరిగి FALSE;
 
     // Skip over command name to find pattern separator
-    for (p = cmd; ASCII_ISALPHA(*p); ++p)
+    కొరకు (p = cmd; ASCII_ISALPHA(*p); ++p)
 	;
-    if (*skipwhite(p) == NUL)
-	return FALSE;
+    ఒకవేళ (*skipwhite(p) == NUL)
+	తిరిగి FALSE;
 
-    if (STRNCMP(cmd, "substitute", p - cmd) == 0
+    ఒకవేళ (STRNCMP(cmd, "substitute", p - cmd) == 0
 	    || STRNCMP(cmd, "smagic", p - cmd) == 0
 	    || STRNCMP(cmd, "snomagic", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "vglobal", p - cmd) == 0)
     {
-	if (*cmd == 's' && cmd[1] == 'm')
+	ఒకవేళ (*cmd == 's' && cmd[1] == 'm')
 	    magic_overruled = OPTION_MAGIC_ON;
-	else if (*cmd == 's' && cmd[1] == 'n')
+	లేకపోతే ఒకవేళ (*cmd == 's' && cmd[1] == 'n')
 	    magic_overruled = OPTION_MAGIC_OFF;
     }
-    else if (STRNCMP(cmd, "sort", MAX(p - cmd, 3)) == 0
+    లేకపోతే ఒకవేళ (STRNCMP(cmd, "sort", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "uniq", MAX(p - cmd, 3)) == 0)
     {
 	// skip over ! and flags
-	if (*p == '!')
+	ఒకవేళ (*p == '!')
 	    p = skipwhite(p + 1);
-	while (ASCII_ISALPHA(*(p = skipwhite(p))))
+	అయితే (ASCII_ISALPHA(*(p = skipwhite(p))))
 	    ++p;
-	if (*p == NUL)
-	    return FALSE;
+	ఒకవేళ (*p == NUL)
+	    తిరిగి FALSE;
     }
-    else if (STRNCMP(cmd, "vimgrep", MAX(p - cmd, 3)) == 0
+    లేకపోతే ఒకవేళ (STRNCMP(cmd, "vimgrep", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "vimgrepadd", MAX(p - cmd, 8)) == 0
 	    || STRNCMP(cmd, "lvimgrep", MAX(p - cmd, 2)) == 0
 	    || STRNCMP(cmd, "lvimgrepadd", MAX(p - cmd, 9)) == 0
 	    || STRNCMP(cmd, "global", p - cmd) == 0)
     {
 	// skip optional "!"
-	if (*p == '!')
+	ఒకవేళ (*p == '!')
 	{
 	    p++;
-	    if (*skipwhite(p) == NUL)
-		return FALSE;
+	    ఒకవేళ (*skipwhite(p) == NUL)
+		తిరిగి FALSE;
 	}
-	if (*cmd != 'g')
+	ఒకవేళ (*cmd != 'g')
 	    delim_optional = TRUE;
     }
-    else
-	return FALSE;
+    లేకపోతే
+	తిరిగి FALSE;
 
     p = skipwhite(p);
     delim = (delim_optional && vim_isIDc(*p)) ? ' ' : *p++;
-    *search_delim = delim;
+    *శోధన_delim = delim;
 
-    end = skip_regexp_ex(p, delim, magic_isset(), NULL, NULL, &magic);
-    use_last_pat = end == p && *end == delim;
+    చివర = skip_regexp_ex(p, delim, magic_isset(), ఖాళీ, ఖాళీ, &magic);
+    use_చివరి_pat = చివర == p && *చివర == delim;
 
-    if (end == p && !use_last_pat)
-	return FALSE;
+    ఒకవేళ (చివర == p && !use_చివరి_pat)
+	తిరిగి FALSE;
 
     // Skip if the pattern matches everything (e.g., for 'hlsearch')
-    if (!use_last_pat)
+    ఒకవేళ (!use_చివరి_pat)
     {
-	char c = *end;
-	int empty;
+	అక్షరం c = *చివర;
+	పూర్ణాంకం ఖాళీలు_2;
 
-	*end = NUL;
-	empty = empty_pattern_magic(p, (size_t)(end - p), magic);
-	*end = c;
-	if (empty)
-	    return FALSE;
+	*చివర = NUL;
+	ఖాళీలు_2 = ఖాళీలు_నమూనా_magic(p, (size_t)(చివర - p), magic);
+	*చివర = c;
+	ఒకవేళ (ఖాళీలు_2)
+	    తిరిగి FALSE;
     }
 
     // Found a non-empty pattern or //
-    *skiplen = (int)(p - ccline.cmdbuff);
-    *patlen = (int)(end - p);
+    *skiplen = (పూర్ణాంకం)(p - ccline.cmdbuff);
+    *patlen = (పూర్ణాంకం)(చివర - p);
 
     // Parse the address range
     save_cursor = curwin->w_cursor;
-    curwin->w_cursor = *incsearch_start;
+    curwin->w_cursor = *incsearch_ప్రారంభం;
 
-    parse_cmd_address(&ea, &dummy, TRUE);
+    parse_cmd_చిరునామా(&ea, &dummy, TRUE);
 
-    if (ea.addr_count > 0)
+    ఒకవేళ (ea.addr_లెక్క > 0)
     {
-	int reverse_match = ea.line2 < ea.line1;
-	search_first_line = reverse_match ? ea.line2 : ea.line1;
-	search_last_line = reverse_match ? ea.line1 : ea.line2;
+	పూర్ణాంకం తిరగేయి_సరిపోలిక = ea.line2 < ea.line1;
+	శోధన_మొదటి_పంక్తి = తిరగేయి_సరిపోలిక ? ea.line2 : ea.line1;
+	శోధన_చివరి_పంక్తి = తిరగేయి_సరిపోలిక ? ea.line1 : ea.line2;
     }
-    else if (cmd[0] == 's' && cmd[1] != 'o')
+    లేకపోతే ఒకవేళ (cmd[0] == 's' && cmd[1] != 'o')
 	// :s defaults to the current line
-	search_first_line = search_last_line = curwin->w_cursor.lnum;
+	శోధన_మొదటి_పంక్తి = శోధన_చివరి_పంక్తి = curwin->w_cursor.lnum;
 
     curwin->w_cursor = save_cursor;
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -346,258 +346,258 @@ parse_pattern_and_range(
  * Sets search_first_line and search_last_line to the address range.
  * May change the last search pattern.
  */
-    static int
+    స్థిర పూర్ణాంకం
 do_incsearch_highlighting(
-	int		    firstc,
-	int		    *search_delim,
+	పూర్ణాంకం		    firstc,
+	పూర్ణాంకం		    *శోధన_delim,
 	incsearch_state_T   *is_state,
-	int		    *skiplen,
-	int		    *patlen)
+	పూర్ణాంకం		    *skiplen,
+	పూర్ణాంకం		    *patlen)
 {
-    int retval = FALSE;
+    పూర్ణాంకం retval = FALSE;
 
     *skiplen = 0;
     *patlen = ccline.cmdlen;
 
-    if (!p_is || cmd_silent)
-	return FALSE;
+    ఒకవేళ (!p_is || cmd_silent)
+	తిరిగి FALSE;
 
     // By default search all lines
-    search_first_line = 0;
-    search_last_line = MAXLNUM;
+    శోధన_మొదటి_పంక్తి = 0;
+    శోధన_చివరి_పంక్తి = MAXLNUM;
 
-    if (firstc == '/' || firstc == '?')
+    ఒకవేళ (firstc == '/' || firstc == '?')
     {
-	*search_delim = firstc;
-	return TRUE;
+	*శోధన_delim = firstc;
+	తిరిగి TRUE;
     }
 
-    if (firstc != ':')
-	return FALSE;
+    ఒకవేళ (firstc != ':')
+	తిరిగి FALSE;
 
     ++emsg_off;
-    retval = parse_pattern_and_range(&is_state->search_start, search_delim,
+    retval = parse_నమూనా_and_range(&is_state->శోధన_ప్రారంభం_2, శోధన_delim,
 	    skiplen, patlen);
     --emsg_off;
 
-    return retval;
+    తిరిగి retval;
 }
 
-    static void
-finish_incsearch_highlighting(
-	int gotesc,
+    స్థిర శూన్య
+ముగింపు_incsearch_highlighting(
+	పూర్ణాంకం gotesc,
 	incsearch_state_T *is_state,
-	int call_update_screen)
+	పూర్ణాంకం call_update_screen)
 {
-    if (!is_state->did_incsearch)
-	return;
+    ఒకవేళ (!is_state->did_incsearch)
+	తిరిగి;
 
     is_state->did_incsearch = FALSE;
-    if (gotesc)
+    ఒకవేళ (gotesc)
 	curwin->w_cursor = is_state->save_cursor;
-    else
+    లేకపోతే
     {
-	if (!EQUAL_POS(is_state->save_cursor, is_state->search_start))
+	ఒకవేళ (!EQUAL_POS(is_state->save_cursor, is_state->శోధన_ప్రారంభం_2))
 	{
 	    // put the '" mark at the original position
 	    curwin->w_cursor = is_state->save_cursor;
 	    setpcmark();
 	}
-	curwin->w_cursor = is_state->search_start;
+	curwin->w_cursor = is_state->శోధన_ప్రారంభం_2;
     }
     restore_viewstate(&is_state->old_viewstate);
-    highlight_match = FALSE;
+    highlight_సరిపోలిక = FALSE;
 
     // by default search all lines
-    search_first_line = 0;
-    search_last_line = MAXLNUM;
+    శోధన_మొదటి_పంక్తి = 0;
+    శోధన_చివరి_పంక్తి = MAXLNUM;
 
     magic_overruled = is_state->magic_overruled_save;
 
     validate_cursor();	// needed for TAB
-    status_redraw_all();
+    స్థితి_redraw_all();
     redraw_all_later(UPD_SOME_VALID);
-    if (call_update_screen)
+    ఒకవేళ (call_update_screen)
 	update_screen(UPD_SOME_VALID);
 }
 
 /*
  * Do 'incsearch' highlighting if desired.
  */
-    static void
+    స్థిర శూన్య
 may_do_incsearch_highlighting(
-	int		    firstc,
-	long		    count,
+	పూర్ణాంకం		    firstc,
+	దీర్ఘ		    లెక్క,
 	incsearch_state_T   *is_state)
 {
-    int		skiplen, patlen;
-    int		found;  // do_search() result
-    pos_T	end_pos;
+    పూర్ణాంకం		skiplen, patlen;
+    పూర్ణాంకం		దొరికింది;  // do_search() result
+    pos_T	చివర_pos;
 # ifdef FEAT_RELTIME
     searchit_arg_T sia;
 # endif
-    int		next_char;
-    int		use_last_pat;
-    int		did_do_incsearch = is_state->did_incsearch;
-    int		search_delim;
+    పూర్ణాంకం		తదుపరి_char;
+    పూర్ణాంకం		use_చివరి_pat;
+    పూర్ణాంకం		did_do_incsearch = is_state->did_incsearch;
+    పూర్ణాంకం		శోధన_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
-    save_last_search_pattern();
+    save_చివరి_శోధన_నమూనా();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ఒకవేళ (!do_incsearch_highlighting(firstc, &శోధన_delim, is_state,
 							    &skiplen, &patlen))
     {
-	restore_last_search_pattern();
-	finish_incsearch_highlighting(FALSE, is_state, TRUE);
-	if (did_do_incsearch && vpeekc() == NUL)
+	restore_చివరి_శోధన_నమూనా();
+	ముగింపు_incsearch_highlighting(FALSE, is_state, TRUE);
+	ఒకవేళ (did_do_incsearch && vpeekc() == NUL)
 	    // may have skipped a redraw, do it now
 	    redrawcmd();
-	return;
+	తిరిగి;
     }
 
     // If there is a character waiting, search and redraw later.
-    if (char_avail())
+    ఒకవేళ (char_avail())
     {
-	restore_last_search_pattern();
+	restore_చివరి_శోధన_నమూనా();
 	is_state->incsearch_postponed = TRUE;
-	return;
+	తిరిగి;
     }
     is_state->incsearch_postponed = FALSE;
 
-    if (search_first_line == 0)
+    ఒకవేళ (శోధన_మొదటి_పంక్తి == 0)
 	// start at the original cursor position
-	curwin->w_cursor = is_state->search_start;
-    else if (search_first_line > curbuf->b_ml.ml_line_count)
+	curwin->w_cursor = is_state->శోధన_ప్రారంభం_2;
+    లేకపోతే ఒకవేళ (శోధన_మొదటి_పంక్తి > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
 	// start after the last line
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	curwin->w_cursor.col = MAXCOL;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	curwin->w_cursor.నిలువు = MAXCOL;
     }
-    else
+    లేకపోతే
     {
 	// start at the first line in the range
-	curwin->w_cursor.lnum = search_first_line;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.lnum = శోధన_మొదటి_పంక్తి;
+	curwin->w_cursor.నిలువు = 0;
     }
 
     // Use the previous pattern for ":s//".
-    next_char = ccline.cmdbuff[skiplen + patlen];
-    use_last_pat = patlen == 0 && skiplen > 0
-				   && ccline.cmdbuff[skiplen - 1] == next_char;
+    తదుపరి_char = ccline.cmdbuff[skiplen + patlen];
+    use_చివరి_pat = patlen == 0 && skiplen > 0
+				   && ccline.cmdbuff[skiplen - 1] == తదుపరి_char;
 
     // If there is no pattern, don't do anything.
-    if (patlen == 0 && !use_last_pat)
+    ఒకవేళ (patlen == 0 && !use_చివరి_pat)
     {
-	found = 0;
-	set_no_hlsearch(TRUE); // turn off previous highlight
+	దొరికింది = 0;
+	సమితి_no_hlsearch(TRUE); // turn off previous highlight
 	redraw_all_later(UPD_SOME_VALID);
     }
-    else
+    లేకపోతే
     {
-	int search_flags = SEARCH_OPT + SEARCH_NOOF + SEARCH_PEEK;
+	పూర్ణాంకం శోధన_flags = శోధన_OPT + శోధన_NOOF + శోధన_PEEK;
 
 	cursor_off();	// so the user knows we're busy
-	out_flush();
+	బహిర్గతం_flush();
 	++emsg_off;	// so it doesn't beep if bad expr
-	if (!p_hls)
-	    search_flags += SEARCH_KEEP;
-	if (search_first_line != 0)
-	    search_flags += SEARCH_START;
+	ఒకవేళ (!p_hls)
+	    శోధన_flags += శోధన_KEEP;
+	ఒకవేళ (శోధన_మొదటి_పంక్తి != 0)
+	    శోధన_flags += శోధన_ప్రారంభం;
 	ccline.cmdbuff[skiplen + patlen] = NUL;
 # ifdef FEAT_RELTIME
-	CLEAR_FIELD(sia);
+	CLEAR_క్షేత్రం(sia);
 	// Set the time limit to half a second.
 	sia.sa_tm = 500;
 # endif
-	found = do_search(NULL, firstc == ':' ? '/' : firstc, search_delim,
-				 ccline.cmdbuff + skiplen, patlen, count, search_flags,
+	దొరికింది = do_శోధన(ఖాళీ, firstc == ':' ? '/' : firstc, శోధన_delim,
+				 ccline.cmdbuff + skiplen, patlen, లెక్క, శోధన_flags,
 # ifdef FEAT_RELTIME
 		&sia
-# else
-		NULL
+# లేకపోతే
+		ఖాళీ
 # endif
 		);
-	ccline.cmdbuff[skiplen + patlen] = next_char;
+	ccline.cmdbuff[skiplen + patlen] = తదుపరి_char;
 	--emsg_off;
 
-	if (curwin->w_cursor.lnum < search_first_line
-		|| curwin->w_cursor.lnum > search_last_line)
+	ఒకవేళ (curwin->w_cursor.lnum < శోధన_మొదటి_పంక్తి
+		|| curwin->w_cursor.lnum > శోధన_చివరి_పంక్తి)
 	{
 	    // match outside of address range
-	    found = 0;
-	    curwin->w_cursor = is_state->search_start;
+	    దొరికింది = 0;
+	    curwin->w_cursor = is_state->శోధన_ప్రారంభం_2;
 	}
 
 	// if interrupted while searching, behave like it failed
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
-	    (void)vpeekc();	// remove <C-C> from input stream
+	    (శూన్య)vpeekc();	// remove <C-C> from input stream
 	    got_int = FALSE;	// don't abandon the command line
-	    found = 0;
+	    దొరికింది = 0;
 	}
-	else if (char_avail())
+	లేకపోతే ఒకవేళ (char_avail())
 	    // cancelled searching because a char was typed
 	    is_state->incsearch_postponed = TRUE;
     }
-    if (found != 0)
-	highlight_match = TRUE;		// highlight position
-    else
-	highlight_match = FALSE;	// remove highlight
+    ఒకవేళ (దొరికింది != 0)
+	highlight_సరిపోలిక = TRUE;		// highlight position
+    లేకపోతే
+	highlight_సరిపోలిక = FALSE;	// remove highlight
 
     // First restore the old curwin values, so the screen is positioned in the
     // same way as the actual search command.
     restore_viewstate(&is_state->old_viewstate);
-    changed_cline_bef_curs();
+    మారింది_cline_bef_curs();
     update_topline();
 
-    if (found != 0)
+    ఒకవేళ (దొరికింది != 0)
     {
 	pos_T	    save_pos = curwin->w_cursor;
 
-	is_state->match_start = curwin->w_cursor;
-	set_search_match(&curwin->w_cursor);
+	is_state->సరిపోలిక_ప్రారంభం = curwin->w_cursor;
+	సమితి_శోధన_సరిపోలిక(&curwin->w_cursor);
 	validate_cursor();
-	end_pos = curwin->w_cursor;
-	is_state->match_end = end_pos;
+	చివర_pos = curwin->w_cursor;
+	is_state->సరిపోలిక_చివర = చివర_pos;
 	curwin->w_cursor = save_pos;
     }
-    else
-	end_pos = curwin->w_cursor; // shutup gcc 4
+    లేకపోతే
+	చివర_pos = curwin->w_cursor; // shutup gcc 4
 
     // Disable 'hlsearch' highlighting if the pattern matches everything.
     // Avoids a flash when typing "foo\|".
-    if (!use_last_pat)
+    ఒకవేళ (!use_చివరి_pat)
     {
-	next_char = ccline.cmdbuff[skiplen + patlen];
+	తదుపరి_char = ccline.cmdbuff[skiplen + patlen];
 	ccline.cmdbuff[skiplen + patlen] = NUL;
-	if (empty_pattern(ccline.cmdbuff + skiplen, (size_t)patlen, search_delim)
+	ఒకవేళ (ఖాళీలు_నమూనా(ccline.cmdbuff + skiplen, (size_t)patlen, శోధన_delim)
 							       && !no_hlsearch)
 	{
 	    redraw_all_later(UPD_SOME_VALID);
-	    set_no_hlsearch(TRUE);
+	    సమితి_no_hlsearch(TRUE);
 	}
-	ccline.cmdbuff[skiplen + patlen] = next_char;
+	ccline.cmdbuff[skiplen + patlen] = తదుపరి_char;
     }
 
     validate_cursor();
 
     // May redraw the status line to show the cursor position.
-    if (p_ru && curwin->w_status_height > 0)
-	curwin->w_redr_status = true;
+    ఒకవేళ (p_ru && curwin->w_స్థితి_ఎత్తు > 0)
+	curwin->w_redr_స్థితి = true;
 
     update_screen(UPD_SOME_VALID);
-    highlight_match = FALSE;
-    restore_last_search_pattern();
+    highlight_సరిపోలిక = FALSE;
+    restore_చివరి_శోధన_నమూనా();
 
     // Leave it at the end to make CTRL-R CTRL-W work.  But not when beyond the
     // end of the pattern, e.g. for ":s/pat/".
-    if (ccline.cmdbuff[skiplen + patlen] != NUL)
-	curwin->w_cursor = is_state->search_start;
-    else if (found != 0)
-	curwin->w_cursor = end_pos;
+    ఒకవేళ (ccline.cmdbuff[skiplen + patlen] != NUL)
+	curwin->w_cursor = is_state->శోధన_ప్రారంభం_2;
+    లేకపోతే ఒకవేళ (దొరికింది != 0)
+	curwin->w_cursor = చివర_pos;
 
-    msg_starthere();
+    సందేశం_starthere();
     redrawcmdline();
     is_state->did_incsearch = TRUE;
 }
@@ -607,40 +607,40 @@ may_do_incsearch_highlighting(
  * or previous match.
  * Returns FAIL when jumping to cmdline_not_changed;
  */
-    static int
+    స్థిర పూర్ణాంకం
 may_adjust_incsearch_highlighting(
-	int			firstc,
-	long			count,
+	పూర్ణాంకం			firstc,
+	దీర్ఘ			లెక్క,
 	incsearch_state_T	*is_state,
-	int			c)
+	పూర్ణాంకం			c)
 {
-    int		skiplen, patlen;
+    పూర్ణాంకం		skiplen, patlen;
     pos_T	t;
     char_u	*pat;
-    char_u	*dircp = NULL;
+    char_u	*dircp = ఖాళీ;
     char_u	*searchstr;
-    char_u	*strcopy = NULL;
+    char_u	*strcopy = ఖాళీ;
     size_t	searchstrlen;
     size_t	patlen_s;
-    soffset_T	offset;
-    int		search_flags = SEARCH_NOOF;
-    int		i;
-    int		search_delim;
+    soffset_T	స్థానభ్రంశం;
+    పూర్ణాంకం		శోధన_flags = శోధన_NOOF;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		శోధన_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
-    save_last_search_pattern();
+    save_చివరి_శోధన_నమూనా();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ఒకవేళ (!do_incsearch_highlighting(firstc, &శోధన_delim, is_state,
 							    &skiplen, &patlen))
     {
-	restore_last_search_pattern();
-	return OK;
+	restore_చివరి_శోధన_నమూనా();
+	తిరిగి OK;
     }
-    if (patlen == 0 && ccline.cmdbuff[skiplen] == NUL)
+    ఒకవేళ (patlen == 0 && ccline.cmdbuff[skiplen] == NUL)
     {
-	restore_last_search_pattern();
-	return FAIL;
+	restore_చివరి_శోధన_నమూనా();
+	తిరిగి FAIL;
     }
 
     pat = ccline.cmdbuff + skiplen;
@@ -650,102 +650,102 @@ may_adjust_incsearch_highlighting(
 
     // do not search for the search end delimiter,
     // unless it is part of the pattern
-    (void)parse_search_pattern_offset(&pat, &patlen_s, search_delim,
-				    SEARCH_OPT, &strcopy, &searchstr,
-				    &searchstrlen, &dircp, &offset);
+    (శూన్య)parse_శోధన_నమూనా_స్థానభ్రంశం(&pat, &patlen_s, శోధన_delim,
+				    శోధన_OPT, &strcopy, &searchstr,
+				    &searchstrlen, &dircp, &స్థానభ్రంశం);
 
     cursor_off();
-    out_flush();
-    if (c == Ctrl_G)
+    బహిర్గతం_flush();
+    ఒకవేళ (c == Ctrl_G)
     {
-	t = is_state->match_end;
-	if (LT_POS(is_state->match_start, is_state->match_end))
+	t = is_state->సరిపోలిక_చివర;
+	ఒకవేళ (LT_POS(is_state->సరిపోలిక_ప్రారంభం, is_state->సరిపోలిక_చివర))
 	    // Start searching at the end of the match not at the beginning of
 	    // the next column.
-	    (void)decl(&t);
-	search_flags += SEARCH_COL;
+	    (శూన్య)decl(&t);
+	శోధన_flags += శోధన_నిలువు;
     }
-    else
-	t = is_state->match_start;
-    if (!p_hls)
-	search_flags += SEARCH_KEEP;
+    లేకపోతే
+	t = is_state->సరిపోలిక_ప్రారంభం;
+    ఒకవేళ (!p_hls)
+	శోధన_flags += శోధన_KEEP;
     ++emsg_off;
-    i = searchit(curwin, curbuf, &t, NULL,
+    i = searchit(curwin, curbuf, &t, ఖాళీ,
 		 c == Ctrl_G ? FORWARD : BACKWARD,
-		 searchstr, searchstrlen, count, search_flags, RE_SEARCH, NULL);
+		 searchstr, searchstrlen, లెక్క, శోధన_flags, RE_శోధన, ఖాళీ);
     --emsg_off;
-    if (dircp != NULL)
-	*dircp = search_delim;
-    if (i)
+    ఒకవేళ (dircp != ఖాళీ)
+	*dircp = శోధన_delim;
+    ఒకవేళ (i)
     {
-	pos_T	match_start = is_state->match_start;
-	pos_T	match_end = is_state->match_end;
-	long	off = offset.off;
+	pos_T	సరిపోలిక_ప్రారంభం = is_state->సరిపోలిక_ప్రారంభం;
+	pos_T	సరిపోలిక_చివర = is_state->సరిపోలిక_చివర;
+	దీర్ఘ	off = స్థానభ్రంశం.off;
 
-	is_state->search_start = match_start;
-	if (!offset.line && (offset.end || off != 0))
+	is_state->శోధన_ప్రారంభం_2 = సరిపోలిక_ప్రారంభం;
+	ఒకవేళ (!స్థానభ్రంశం.పంక్తి && (స్థానభ్రంశం.చివర || off != 0))
 	{
-	    if (offset.end)
+	    ఒకవేళ (స్థానభ్రంశం.చివర)
 	    {
-		is_state->search_start = match_end;
-		(void)decl(&is_state->search_start);
+		is_state->శోధన_ప్రారంభం_2 = సరిపోలిక_చివర;
+		(శూన్య)decl(&is_state->శోధన_ప్రారంభం_2);
 	    }
-	    while (off > 0)
+	    అయితే (off > 0)
 	    {
-		if (incl(&is_state->search_start) == -1)
-		    break;
+		ఒకవేళ (incl(&is_state->శోధన_ప్రారంభం_2) == -1)
+		    ఆపు;
 		--off;
 	    }
-	    while (off < 0)
+	    అయితే (off < 0)
 	    {
-		if (decl(&is_state->search_start) == -1)
-		    break;
+		ఒకవేళ (decl(&is_state->శోధన_ప్రారంభం_2) == -1)
+		    ఆపు;
 		++off;
 	    }
 	}
-	is_state->match_end = t;
-	is_state->match_start = t;
-	if (c == Ctrl_T && firstc != '?')
+	is_state->సరిపోలిక_చివర = t;
+	is_state->సరిపోలిక_ప్రారంభం = t;
+	ఒకవేళ (c == Ctrl_T && firstc != '?')
 	{
 	    // Move just before the current match, so that when nv_search
 	    // finishes the cursor will be put back on the match.
-	    is_state->search_start = t;
-	    (void)decl(&is_state->search_start);
+	    is_state->శోధన_ప్రారంభం_2 = t;
+	    (శూన్య)decl(&is_state->శోధన_ప్రారంభం_2);
 	}
-	else if (c == Ctrl_G && firstc == '?')
+	లేకపోతే ఒకవేళ (c == Ctrl_G && firstc == '?')
 	{
 	    // Move just after the current match, so that when nv_search
 	    // finishes the cursor will be put back on the match.
-	    is_state->search_start = t;
-	    (void)incl(&is_state->search_start);
+	    is_state->శోధన_ప్రారంభం_2 = t;
+	    (శూన్య)incl(&is_state->శోధన_ప్రారంభం_2);
 	}
-	if (LT_POS(t, is_state->search_start) && c == Ctrl_G)
+	ఒకవేళ (LT_POS(t, is_state->శోధన_ప్రారంభం_2) && c == Ctrl_G)
 	{
 	    // wrap around
-	    is_state->search_start = t;
-	    if (firstc == '?')
-		(void)incl(&is_state->search_start);
-	    else
-		(void)decl(&is_state->search_start);
+	    is_state->శోధన_ప్రారంభం_2 = t;
+	    ఒకవేళ (firstc == '?')
+		(శూన్య)incl(&is_state->శోధన_ప్రారంభం_2);
+	    లేకపోతే
+		(శూన్య)decl(&is_state->శోధన_ప్రారంభం_2);
 	}
 
-	set_search_match(&is_state->match_end);
-	curwin->w_cursor = is_state->match_start;
-	changed_cline_bef_curs();
+	సమితి_శోధన_సరిపోలిక(&is_state->సరిపోలిక_చివర);
+	curwin->w_cursor = is_state->సరిపోలిక_ప్రారంభం;
+	మారింది_cline_bef_curs();
 	update_topline();
 	validate_cursor();
-	highlight_match = TRUE;
+	highlight_సరిపోలిక = TRUE;
 	save_viewstate(&is_state->old_viewstate);
 	update_screen(UPD_NOT_VALID);
-	highlight_match = FALSE;
+	highlight_సరిపోలిక = FALSE;
 	redrawcmdline();
-	curwin->w_cursor = is_state->match_end;
+	curwin->w_cursor = is_state->సరిపోలిక_చివర;
     }
-    else
+    లేకపోతే
 	vim_beep(BO_ERROR);
     vim_free(strcopy);
-    restore_last_search_pattern();
-    return FAIL;
+    restore_చివరి_శోధన_నమూనా();
+    తిరిగి FAIL;
 }
 
 /*
@@ -753,95 +753,95 @@ may_adjust_incsearch_highlighting(
  * May set "*c" to the added character.
  * Return OK when jumping to cmdline_not_changed.
  */
-    static int
-may_add_char_to_search(int firstc, int *c, incsearch_state_T *is_state)
+    స్థిర పూర్ణాంకం
+may_కూడు_char_గమ్యం_శోధన(పూర్ణాంకం firstc, పూర్ణాంకం *c, incsearch_state_T *is_state)
 {
-    int		skiplen, patlen, search_delim;
+    పూర్ణాంకం		skiplen, patlen, శోధన_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
-    save_last_search_pattern();
+    save_చివరి_శోధన_నమూనా();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ఒకవేళ (!do_incsearch_highlighting(firstc, &శోధన_delim, is_state,
 							    &skiplen, &patlen))
     {
-	restore_last_search_pattern();
-	return FAIL;
+	restore_చివరి_శోధన_నమూనా();
+	తిరిగి FAIL;
     }
-    restore_last_search_pattern();
+    restore_చివరి_శోధన_నమూనా();
 
     // Add a character from under the cursor for 'incsearch'.
-    if (is_state->did_incsearch)
+    ఒకవేళ (is_state->did_incsearch)
     {
-	curwin->w_cursor = is_state->match_end;
+	curwin->w_cursor = is_state->సరిపోలిక_చివర;
 	*c = gchar_cursor();
-	if (*c != NUL)
+	ఒకవేళ (*c != NUL)
 	{
 	    // If 'ignorecase' and 'smartcase' are set and the
 	    // command line has no uppercase characters, convert
 	    // the character to lowercase.
-	    if (p_ic && p_scs && !pat_has_uppercase(ccline.cmdbuff + skiplen))
+	    ఒకవేళ (p_ic && p_scs && !pat_has_uppercase(ccline.cmdbuff + skiplen))
 		*c = MB_TOLOWER(*c);
-	    if (*c == search_delim || vim_strchr((char_u *)(
-			     magic_isset() ? "\\~^$.*[" : "\\^$"), *c) != NULL)
+	    ఒకవేళ (*c == శోధన_delim || vim_strchr((char_u *)(
+			     magic_isset() ? "\\~^$.*[" : "\\^$"), *c) != ఖాళీ)
 	    {
 		// put a backslash before special characters
 		stuffcharReadbuff(*c);
 		*c = '\\';
 	    }
 	    // add any composing characters
-	    if (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
+	    ఒకవేళ (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
 	    {
-		int save_c = *c;
+		పూర్ణాంకం save_c = *c;
 
-		while (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
+		అయితే (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
 		{
-		    curwin->w_cursor.col += mb_char2len(*c);
+		    curwin->w_cursor.నిలువు += mb_char2len(*c);
 		    *c = gchar_cursor();
 		    stuffcharReadbuff(*c);
 		}
 		*c = save_c;
 	    }
-	    return FAIL;
+	    తిరిగి FAIL;
 	}
     }
-    return OK;
+    తిరిగి OK;
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_ARABIC
+#నిర్వచితమైతే FEAT_ARABIC
 /*
  * Return TRUE if the command line has an Arabic character at or after "start"
  * for "len" bytes.
  */
-    static int
-cmdline_has_arabic(int start, int len)
+    స్థిర పూర్ణాంకం
+cmdline_has_arabic(పూర్ణాంకం ప్రారంభం, పూర్ణాంకం len)
 {
-    int	    j;
-    int	    mb_l;
-    int	    u8c;
+    పూర్ణాంకం	    j;
+    పూర్ణాంకం	    mb_l;
+    పూర్ణాంకం	    u8c;
     char_u  *p;
-    int	    u8cc[MAX_MCO];
+    పూర్ణాంకం	    u8cc[MAX_MCO];
 
-    if (!enc_utf8)
-	return FALSE;
+    ఒకవేళ (!enc_utf8)
+	తిరిగి FALSE;
 
-    for (j = start; j < start + len; j += mb_l)
+    కొరకు (j = ప్రారంభం; j < ప్రారంభం + len; j += mb_l)
     {
 	p = ccline.cmdbuff + j;
-	u8c = utfc_ptr2char_len(p, u8cc, start + len - j);
-	mb_l = utfc_ptr2len_len(p, start + len - j);
-	if (ARABIC_CHAR(u8c))
-	    return TRUE;
+	u8c = utfc_ptr2char_len(p, u8cc, ప్రారంభం + len - j);
+	mb_l = utfc_ptr2len_len(p, ప్రారంభం + len - j);
+	ఒకవేళ (ARABIC_CHAR(u8c))
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
-    void
-cmdline_init(void)
+    శూన్య
+cmdline_init(శూన్య)
 {
-    CLEAR_FIELD(ccline);
+    CLEAR_క్షేత్రం(ccline);
 }
 
 /*
@@ -850,56 +850,56 @@ cmdline_init(void)
  * - CTRL-\ CTRL-G goes to Insert mode when 'insertmode' is set
  * - CTRL-\ e prompts for an expression.
  */
-    static int
-cmdline_handle_ctrl_bsl(int c, int *gotesc)
+    స్థిర పూర్ణాంకం
+cmdline_handle_ctrl_bsl(పూర్ణాంకం c, పూర్ణాంకం *gotesc)
 {
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_కీలకాలు;
 
     // CTRL-\ e doesn't work when obtaining an expression, unless it
     // is in a mapping.
-    if (c != Ctrl_N && c != Ctrl_G && (c != 'e'
-		|| (ccline.cmdfirstc == '=' && KeyTyped)
-#ifdef FEAT_EVAL
-		|| cmdline_star > 0
-#endif
+    ఒకవేళ (c != Ctrl_N && c != Ctrl_G && (c != 'e'
+		|| (ccline.cmdfirstc == '=' && కీలకం_Typed)
+#నిర్వచితమైతే FEAT_EVAL
+		|| cmdline_నక్షత్రం > 0
+#అయితే_ముగింపు
 		))
     {
 	vungetc(c);
-	return PROCESS_NEXT_KEY;
+	తిరిగి PROCESS_తదుపరి_కీలకం;
     }
 
-#ifdef FEAT_EVAL
-    if (c == 'e')
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (c == 'e')
     {
 	/*
 	 * Replace the command line with the result of an expression.
 	 * This will call getcmdline() recursively in get_expr_register().
 	 */
-	if (ccline.cmdpos == ccline.cmdlen)
+	ఒకవేళ (ccline.cmdpos == ccline.cmdlen)
 	    new_cmdpos = 99999;	// keep it at the end
-	else
+	లేకపోతే
 	    new_cmdpos = ccline.cmdpos;
 
-	c = get_expr_register();
-	if (c == '=')
+	c = get_సమాసం_రిజిస్టరు();
+	ఒకవేళ (c == '=')
 	{
-	    char_u	*p = NULL;
+	    char_u	*p = ఖాళీ;
 
 	    // Evaluate the expression.  Set "textlock" to avoid nasty things
 	    // like going to another buffer.
 	    ++textlock;
-	    p = get_expr_line();
+	    p = get_సమాసం_పంక్తి();
 	    --textlock;
 
-	    if (p != NULL)
+	    ఒకవేళ (p != ఖాళీ)
 	    {
-		int len = (int)STRLEN(p);
+		పూర్ణాంకం len = (పూర్ణాంకం)STRLEN(p);
 
-		if (realloc_cmdbuff(len + 1) == OK)
+		ఒకవేళ (realloc_cmdbuff(len + 1) == OK)
 		{
 		    ccline.cmdlen = len;
 		    STRCPY(ccline.cmdbuff, p);
@@ -907,14 +907,14 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 
 		    // Restore the cursor or use the position set with
 		    // set_cmdline_pos().
-		    if (new_cmdpos > ccline.cmdlen)
+		    ఒకవేళ (new_cmdpos > ccline.cmdlen)
 			ccline.cmdpos = ccline.cmdlen;
-		    else
+		    లేకపోతే
 			ccline.cmdpos = new_cmdpos;
 
-		    KeyTyped = FALSE;	// Don't do p_wc completion.
+		    కీలకం_Typed = FALSE;	// Don't do p_wc completion.
 		    redrawcmd();
-		    return CMDLINE_CHANGED;
+		    తిరిగి CMDLINE_మారింది;
 		}
 		vim_free(p);
 	    }
@@ -924,15 +924,15 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 	did_emsg = FALSE;
 	emsg_on_display = FALSE;
 	redrawcmd();
-	return CMDLINE_NOT_CHANGED;
+	తిరిగి CMDLINE_NOT_మారింది;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (c == Ctrl_G && p_im && restart_edit == 0)
+    ఒకవేళ (c == Ctrl_G && p_im && restart_edit == 0)
 	restart_edit = 'a';
     *gotesc = TRUE;	// will free ccline.cmdbuff after putting it
 			// in history
-    return GOTO_NORMAL_MODE;
+    తిరిగి GOTO_సాధారణ_బహుళకం;
 }
 
 /*
@@ -942,152 +942,152 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
  *   typed, not when it comes from a macro
  * Returns CMDLINE_CHANGED if command line is changed or CMDLINE_NOT_CHANGED.
  */
-    static int
+    స్థిర పూర్ణాంకం
 cmdline_wildchar_complete(
-	int		c,
-	int		escape,
-	int		*did_wild_list,
-	int		*wim_index_p,
+	పూర్ణాంకం		c,
+	పూర్ణాంకం		escape,
+	పూర్ణాంకం		*did_wild_list,
+	పూర్ణాంకం		*wim_సూచీ_p,
 	expand_T	*xp,
-	int		*gotesc,
-	int		redraw_if_menu_empty,
+	పూర్ణాంకం		*gotesc,
+	పూర్ణాంకం		redraw_if_menu_ఖాళీలు,
 	pos_T		*pre_incsearch_pos)
 {
-    int		wim_index = *wim_index_p;
-    int		res;
-    int		cmdpos_before;
-    int		options = WILD_NO_BEEP;
-    int		wim_noselect = p_wmnu && (wim_flags[0] & WIM_NOSELECT);
-    int		wim_noinsert = p_wmnu && (wim_flags[0] & WIM_NOINSERT);
+    పూర్ణాంకం		wim_సూచీ = *wim_సూచీ_p;
+    పూర్ణాంకం		res;
+    పూర్ణాంకం		cmdpos_before;
+    పూర్ణాంకం		options = WILD_NO_BEEP;
+    పూర్ణాంకం		wim_noselect = p_wmnu && (wim_flags[0] & WIM_NOSELECT);
+    పూర్ణాంకం		wim_noinsert = p_wmnu && (wim_flags[0] & WIM_NOINSERT);
 
-    if (wim_flags[wim_index] & WIM_BUFLASTUSED)
+    ఒకవేళ (wim_flags[wim_సూచీ] & WIM_BUFLASTUSED)
 	options |= WILD_BUFLASTUSED;
-    if (xp->xp_numfiles > 0)   // typed p_wc at least twice
+    ఒకవేళ (xp->xp_numfiles > 0)   // typed p_wc at least twice
     {
 	// If "list" is present, list matches unless already listed
-	if (xp->xp_numfiles > 1
+	ఒకవేళ (xp->xp_numfiles > 1
 		&& !*did_wild_list
-		&& (wim_flags[wim_index] & WIM_LIST))
+		&& (wim_flags[wim_సూచీ] & WIM_LIST))
 	{
-	    (void)showmatches(xp, FALSE, TRUE,
-		    p_wmnu ? wim_flags[wim_index] : 0);
+	    (శూన్య)showmatches(xp, FALSE, TRUE,
+		    p_wmnu ? wim_flags[wim_సూచీ] : 0);
 	    redrawcmd();
 	    *did_wild_list = TRUE;
 	}
-	if (wim_flags[wim_index] & WIM_LONGEST)
+	ఒకవేళ (wim_flags[wim_సూచీ] & WIM_LONGEST)
 	    res = nextwild(xp, WILD_LONGEST, options, escape);
-	else if (wim_flags[wim_index] & WIM_FULL)
-	    res = nextwild(xp, WILD_NEXT, options, escape);
-	else
+	లేకపోతే ఒకవేళ (wim_flags[wim_సూచీ] & WIM_నిండిన)
+	    res = nextwild(xp, WILD_తదుపరి, options, escape);
+	లేకపోతే
 	    res = OK;	    // don't insert 'wildchar' now
     }
-    else		    // typed p_wc first time
+    లేకపోతే		    // typed p_wc first time
     {
-	int wim_longest = (wim_flags[0] & WIM_LONGEST);
-	int wim_list = (wim_flags[0] & WIM_LIST);
-	int wim_full = (wim_flags[0] & WIM_FULL);
+	పూర్ణాంకం wim_longest = (wim_flags[0] & WIM_LONGEST);
+	పూర్ణాంకం wim_list = (wim_flags[0] & WIM_LIST);
+	పూర్ణాంకం wim_నిండిన = (wim_flags[0] & WIM_నిండిన);
 
-	wim_index = 0;
-	if (c == p_wc || c == p_wcm || c == K_WILD)
+	wim_సూచీ = 0;
+	ఒకవేళ (c == p_wc || c == p_wcm || c == K_WILD)
 	{
-	    options |= WILD_MAY_EXPAND_PATTERN;
-	    if (c == K_WILD)
+	    options |= WILD_MAY_EXPAND_నమూనా;
+	    ఒకవేళ (c == K_WILD)
 		options |= WILD_FUNC_TRIGGER;
-	    if (pre_incsearch_pos)
+	    ఒకవేళ (pre_incsearch_pos)
 		xp->xp_pre_incsearch_pos = *pre_incsearch_pos;
-	    else
+	    లేకపోతే
 		xp->xp_pre_incsearch_pos = curwin->w_cursor;
 	}
 	cmdpos_before = ccline.cmdpos;
 
 	// if 'wildmode' first contains "longest", get longest
 	// common part
-	if (wim_longest)
+	ఒకవేళ (wim_longest)
 	    res = nextwild(xp, WILD_LONGEST, options, escape);
-	else
+	లేకపోతే
 	{
-	    if (wim_noselect || (wim_list && !wim_full))
+	    ఒకవేళ (wim_noselect || (wim_list && !wim_నిండిన))
 		options |= WILD_NOSELECT;
-	    if (wim_noinsert)
+	    ఒకవేళ (wim_noinsert)
 		options |= WILD_NOINSERT;
 	    res = nextwild(xp, WILD_EXPAND_KEEP, options, escape);
 	}
 
 	// Remove popup window if no completion items are available
-	if (redraw_if_menu_empty && xp->xp_numfiles <= 0)
+	ఒకవేళ (redraw_if_menu_ఖాళీలు && xp->xp_numfiles <= 0)
 	{
 	    update_screen(0);
 	    redrawcmd();  // Ensure initial pasted text appears on cmdline
 	}
 
 	// if interrupted while completing, behave like it failed
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
-	    (void)vpeekc();	// remove <C-C> from input stream
+	    (శూన్య)vpeekc();	// remove <C-C> from input stream
 	    got_int = FALSE;	// don't abandon the command line
-	    (void)ExpandOne(xp, NULL, NULL, 0, WILD_FREE);
+	    (శూన్య)ExpandOne(xp, ఖాళీ, ఖాళీ, 0, WILD_FREE);
 	    xp->xp_context = EXPAND_NOTHING;
-	    *wim_index_p = wim_index;
-	    return CMDLINE_CHANGED;
+	    *wim_సూచీ_p = wim_సూచీ;
+	    తిరిగి CMDLINE_మారింది;
 	}
 
 	// Display matches
-	if (res == OK && xp->xp_numfiles > ((wim_noselect || wim_noinsert) ? 0 : 1))
+	ఒకవేళ (res == OK && xp->xp_numfiles > ((wim_noselect || wim_noinsert) ? 0 : 1))
 	{
-	    if (wim_longest)
+	    ఒకవేళ (wim_longest)
 	    {
-		int found_longest_prefix = (ccline.cmdpos != cmdpos_before);
-		int show_menu = p_wmnu && wim_full;
+		పూర్ణాంకం దొరికింది_longest_ఉపసర్గ = (ccline.cmdpos != cmdpos_before);
+		పూర్ణాంకం show_menu = p_wmnu && wim_నిండిన;
 
-		if (wim_list || show_menu)
-		    (void)showmatches(xp, show_menu, wim_list, WIM_NOSELECT);
-		else if (!found_longest_prefix)
+		ఒకవేళ (wim_list || show_menu)
+		    (శూన్య)showmatches(xp, show_menu, wim_list, WIM_NOSELECT);
+		లేకపోతే ఒకవేళ (!దొరికింది_longest_ఉపసర్గ)
 		{
-		    int wim_list_next = (wim_flags[1] & WIM_LIST);
-		    int wim_full_next = (wim_flags[1] & WIM_FULL);
-		    int wim_noselect_next = (wim_flags[1] & WIM_NOSELECT);
-		    int wim_noinsert_next = (wim_flags[1] & WIM_NOINSERT);
-		    if (wim_list_next || (p_wmnu && (wim_full_next
-				    || wim_noselect_next || wim_noinsert_next)))
+		    పూర్ణాంకం wim_list_తదుపరి = (wim_flags[1] & WIM_LIST);
+		    పూర్ణాంకం wim_నిండిన_తదుపరి = (wim_flags[1] & WIM_నిండిన);
+		    పూర్ణాంకం wim_noselect_తదుపరి = (wim_flags[1] & WIM_NOSELECT);
+		    పూర్ణాంకం wim_noinsert_తదుపరి = (wim_flags[1] & WIM_NOINSERT);
+		    ఒకవేళ (wim_list_తదుపరి || (p_wmnu && (wim_నిండిన_తదుపరి
+				    || wim_noselect_తదుపరి || wim_noinsert_తదుపరి)))
 		    {
-			if (wim_full_next && !wim_noselect_next && !wim_noinsert_next)
-			    nextwild(xp, WILD_NEXT, options, escape);
-			else
-			    (void)showmatches(xp, p_wmnu && (wim_noselect_next
-					|| wim_noinsert_next), wim_list_next,
+			ఒకవేళ (wim_నిండిన_తదుపరి && !wim_noselect_తదుపరి && !wim_noinsert_తదుపరి)
+			    nextwild(xp, WILD_తదుపరి, options, escape);
+			లేకపోతే
+			    (శూన్య)showmatches(xp, p_wmnu && (wim_noselect_తదుపరి
+					|| wim_noinsert_తదుపరి), wim_list_తదుపరి,
 				    p_wmnu ? wim_flags[1] : 0);
 
-			if (wim_list_next)
+			ఒకవేళ (wim_list_తదుపరి)
 			    *did_wild_list = TRUE;
 		    }
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
-		int show_menu = p_wmnu && (wim_full || wim_noselect
+		పూర్ణాంకం show_menu = p_wmnu && (wim_నిండిన || wim_noselect
 							    || wim_noinsert);
 
-		if (wim_list || show_menu)
-		    (void)showmatches(xp, show_menu, wim_list,
+		ఒకవేళ (wim_list || show_menu)
+		    (శూన్య)showmatches(xp, show_menu, wim_list,
 			    p_wmnu ? wim_flags[0] : 0);
-		else
+		లేకపోతే
 		    vim_beep(BO_WILD);
 	    }
 
 	    redrawcmd();
-	    if (wim_list)
+	    ఒకవేళ (wim_list)
 		*did_wild_list = TRUE;
 	}
-	else if (xp->xp_numfiles == -1)
+	లేకపోతే ఒకవేళ (xp->xp_numfiles == -1)
 	    xp->xp_context = EXPAND_NOTHING;
     }
-    if (wim_index < 3)
-	++wim_index;
-    if (c == ESC)
+    ఒకవేళ (wim_సూచీ < 3)
+	++wim_సూచీ;
+    ఒకవేళ (c == ESC)
 	*gotesc = TRUE;
 
-    *wim_index_p = wim_index;
-    return (res == OK) ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
+    *wim_సూచీ_p = wim_సూచీ;
+    తిరిగి (res == OK) ? CMDLINE_మారింది : CMDLINE_NOT_మారింది;
 }
 
 /*
@@ -1097,312 +1097,312 @@ cmdline_wildchar_complete(
  *  CMDLINE_CHANGED - if the command line is changed
  *  GOTO_NORMAL_MODE - go back to normal mode
  */
-    static int
+    స్థిర పూర్ణాంకం
 cmdline_erase_chars(
-	int c,
-	int indent
-#ifdef FEAT_SEARCH_EXTRA
+	పూర్ణాంకం c,
+	పూర్ణాంకం indent
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 	, incsearch_state_T *isp
-#endif
+#అయితే_ముగింపు
 	)
 {
-    int		i;
-    int		j;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
 
-    if (c == K_KDEL)
+    ఒకవేళ (c == K_KDEL)
 	c = K_DEL;
 
     /*
      * Delete current character is the same as backspace on next
      * character, except at end of line.
      */
-    if (c == K_DEL && ccline.cmdpos != ccline.cmdlen)
+    ఒకవేళ (c == K_DEL && ccline.cmdpos != ccline.cmdlen)
 	++ccline.cmdpos;
-    if (has_mbyte && c == K_DEL)
-	ccline.cmdpos += mb_off_next(ccline.cmdbuff,
+    ఒకవేళ (has_mbyte && c == K_DEL)
+	ccline.cmdpos += mb_off_తదుపరి(ccline.cmdbuff,
 		ccline.cmdbuff + ccline.cmdpos);
-    if (ccline.cmdpos > 0)
+    ఒకవేళ (ccline.cmdpos > 0)
     {
 	char_u *p;
 
 	j = ccline.cmdpos;
 	p = ccline.cmdbuff + j;
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
 	    p = mb_prevptr(ccline.cmdbuff, p);
-	    if (c == Ctrl_W)
+	    ఒకవేళ (c == Ctrl_W)
 	    {
-		while (p > ccline.cmdbuff && vim_isspace(*p))
+		అయితే (p > ccline.cmdbuff && vim_isspace(*p))
 		    p = mb_prevptr(ccline.cmdbuff, p);
 		i = mb_get_class(p);
-		while (p > ccline.cmdbuff && mb_get_class(p) == i)
+		అయితే (p > ccline.cmdbuff && mb_get_class(p) == i)
 		    p = mb_prevptr(ccline.cmdbuff, p);
-		if (mb_get_class(p) != i)
+		ఒకవేళ (mb_get_class(p) != i)
 		    p += (*mb_ptr2len)(p);
 	    }
 	}
-	else if (c == Ctrl_W)
+	లేకపోతే ఒకవేళ (c == Ctrl_W)
 	{
-	    while (p > ccline.cmdbuff && vim_isspace(p[-1]))
+	    అయితే (p > ccline.cmdbuff && vim_isspace(p[-1]))
 		--p;
-	    if (p > ccline.cmdbuff)
+	    ఒకవేళ (p > ccline.cmdbuff)
 	    {
 		i = vim_iswordc(p[-1]);
-		while (p > ccline.cmdbuff && !vim_isspace(p[-1])
+		అయితే (p > ccline.cmdbuff && !vim_isspace(p[-1])
 			&& vim_iswordc(p[-1]) == i)
 		    --p;
 	    }
 	}
-	else
+	లేకపోతే
 	    --p;
-	ccline.cmdpos = (int)(p - ccline.cmdbuff);
+	ccline.cmdpos = (పూర్ణాంకం)(p - ccline.cmdbuff);
 	ccline.cmdlen -= j - ccline.cmdpos;
 	i = ccline.cmdpos;
-	while (i < ccline.cmdlen)
+	అయితే (i < ccline.cmdlen)
 	    ccline.cmdbuff[i++] = ccline.cmdbuff[j++];
 
 	// Truncate at the end, required for multi-byte chars.
 	ccline.cmdbuff[ccline.cmdlen] = NUL;
-#ifdef FEAT_SEARCH_EXTRA
-	if (ccline.cmdlen == 0)
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+	ఒకవేళ (ccline.cmdlen == 0)
 	{
-	    isp->search_start = isp->save_cursor;
+	    isp->శోధన_ప్రారంభం_2 = isp->save_cursor;
 	    // save view settings, so that the screen
 	    // won't be restored at the wrong position
 	    isp->old_viewstate = isp->init_viewstate;
 	}
-#endif
+#అయితే_ముగింపు
 	redrawcmd();
     }
-    else if (ccline.cmdlen == 0 && c != Ctrl_W
-	    && ccline.cmdprompt == NULL && indent == 0)
+    లేకపోతే ఒకవేళ (ccline.cmdlen == 0 && c != Ctrl_W
+	    && ccline.cmdprompt == ఖాళీ && indent == 0)
     {
 	// In ex and debug mode it doesn't make sense to return.
-	if (exmode_active
-#ifdef FEAT_EVAL
+	ఒకవేళ (exmode_చురుకైన
+#నిర్వచితమైతే FEAT_EVAL
 		|| ccline.cmdfirstc == '>'
-#endif
+#అయితే_ముగింపు
 	   )
-	    return CMDLINE_NOT_CHANGED;
+	    తిరిగి CMDLINE_NOT_మారింది;
 
 	dealloc_cmdbuff();	// no commandline to return
 
-	if (!cmd_silent)
+	ఒకవేళ (!cmd_silent)
 	{
-#ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
-		msg_col = cmdline_width;
-	    else
-#endif
-		msg_col = 0;
-	    msg_putchar(' ');		// delete ':'
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	    ఒకవేళ (cmdmsg_rl)
+		సందేశం_నిలువు = cmdline_వెడల్పు;
+	    లేకపోతే
+#అయితే_ముగింపు
+		సందేశం_నిలువు = 0;
+	    సందేశం_putchar(' ');		// delete ':'
 	}
-#ifdef FEAT_SEARCH_EXTRA
-	isp->search_start = isp->save_cursor;
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+	isp->శోధన_ప్రారంభం_2 = isp->save_cursor;
+#అయితే_ముగింపు
 	redraw_cmdline = TRUE;
-	return GOTO_NORMAL_MODE;
+	తిరిగి GOTO_సాధారణ_బహుళకం;
     }
-    return CMDLINE_CHANGED;
+    తిరిగి CMDLINE_మారింది;
 }
 
 /*
  * Handle the CTRL-^ key in the command-line mode and toggle the use of the
  * language :lmap mappings and/or Input Method.
  */
-    static void
-cmdline_toggle_langmap(long *b_im_ptr)
+    స్థిర శూన్య
+cmdline_toggle_langmap(దీర్ఘ *b_im_ptr)
 {
-    if (map_to_exists_mode((char_u *)"", MODE_LANGMAP, FALSE))
+    ఒకవేళ (map_గమ్యం_exists_బహుళకం((char_u *)"", బహుళకం_LANGMAP, FALSE))
     {
 	// ":lmap" mappings exists, toggle use of mappings.
-	State ^= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
-	im_set_active(FALSE);	// Disable input method
-#endif
-	if (b_im_ptr != NULL)
+	State ^= బహుళకం_LANGMAP;
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+	im_సమితి_చురుకైన(FALSE);	// Disable input method
+#అయితే_ముగింపు
+	ఒకవేళ (b_im_ptr != ఖాళీ)
 	{
-	    if (State & MODE_LANGMAP)
+	    ఒకవేళ (State & బహుళకం_LANGMAP)
 		*b_im_ptr = B_IMODE_LMAP;
-	    else
+	    లేకపోతే
 		*b_im_ptr = B_IMODE_NONE;
 	}
     }
-#ifdef HAVE_INPUT_METHOD
-    else
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    లేకపోతే
     {
 	// There are no ":lmap" mappings, toggle IM.  When
 	// 'imdisable' is set don't try getting the status, it's
 	// always off.
-	if ((p_imdisable && b_im_ptr != NULL)
-		? *b_im_ptr == B_IMODE_IM : im_get_status())
+	ఒకవేళ ((p_imdisable && b_im_ptr != ఖాళీ)
+		? *b_im_ptr == B_IMODE_IM : im_get_స్థితి())
 	{
-	    im_set_active(FALSE);	// Disable input method
-	    if (b_im_ptr != NULL)
+	    im_సమితి_చురుకైన(FALSE);	// Disable input method
+	    ఒకవేళ (b_im_ptr != ఖాళీ)
 		*b_im_ptr = B_IMODE_NONE;
 	}
-	else
+	లేకపోతే
 	{
-	    im_set_active(TRUE);	// Enable input method
-	    if (b_im_ptr != NULL)
+	    im_సమితి_చురుకైన(TRUE);	// Enable input method
+	    ఒకవేళ (b_im_ptr != ఖాళీ)
 		*b_im_ptr = B_IMODE_IM;
 	}
     }
-#endif
-    if (b_im_ptr != NULL)
+#అయితే_ముగింపు
+    ఒకవేళ (b_im_ptr != ఖాళీ)
     {
-	if (b_im_ptr == &curbuf->b_p_iminsert)
-	    set_iminsert_global();
-	else
-	    set_imsearch_global();
+	ఒకవేళ (b_im_ptr == &curbuf->b_p_iminsert)
+	    సమితి_iminsert_global();
+	లేకపోతే
+	    సమితి_imsearch_global();
     }
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();	// may show different cursor shape
-#endif
-#if defined(FEAT_KEYMAP)
+#అయితే_ముగింపు
+#ఒకవేళ defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines later.
-    status_redraw_curbuf();
-#endif
+    స్థితి_redraw_curbuf();
+#అయితే_ముగింపు
 }
 
 /*
  * Handle the CTRL-R key in the command-line mode and insert the contents of a
  * numbered or named register.
  */
-    static int
-cmdline_insert_reg(int *gotesc UNUSED)
+    స్థిర పూర్ణాంకం
+cmdline_చొప్పించు_reg(పూర్ణాంకం *gotesc వాడని)
 {
-    int		i;
-    int		c;
-    int		literally = FALSE;
-#ifdef FEAT_EVAL
-    int		save_new_cmdpos = new_cmdpos;
-#endif
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		literally = FALSE;
+#నిర్వచితమైతే FEAT_EVAL
+    పూర్ణాంకం		save_new_cmdpos = new_cmdpos;
+#అయితే_ముగింపు
 
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
     dont_scroll = TRUE;	// disallow scrolling here
-#endif
+#అయితే_ముగింపు
     putcmdline('"', TRUE);
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
     i = c = plain_vgetc();	// CTRL-R <char>
-    if (i == Ctrl_O)
+    ఒకవేళ (i == Ctrl_O)
 	i = Ctrl_R;		// CTRL-R CTRL-O == CTRL-R CTRL-R
-    if (i == Ctrl_R)
+    ఒకవేళ (i == Ctrl_R)
 	c = plain_vgetc();	// CTRL-R CTRL-R <char>
     extra_char = NUL;
     --no_mapping;
-    --allow_keys;
-#ifdef FEAT_EVAL
+    --allow_కీలకాలు;
+#నిర్వచితమైతే FEAT_EVAL
     /*
      * Insert the result of an expression.
      */
     new_cmdpos = -1;
-    if (c == '=')
+    ఒకవేళ (c == '=')
     {
-	if (ccline.cmdfirstc == '='  // can't do this recursively
-		|| cmdline_star > 0) // or when typing a password
+	ఒకవేళ (ccline.cmdfirstc == '='  // can't do this recursively
+		|| cmdline_నక్షత్రం > 0) // or when typing a password
 	{
 	    beep_flush();
 	    c = ESC;
 	}
-	else
-	    c = get_expr_register();
+	లేకపోతే
+	    c = get_సమాసం_రిజిస్టరు();
     }
-#endif
-    if (c != ESC)	    // use ESC to cancel inserting register
+#అయితే_ముగింపు
+    ఒకవేళ (c != ESC)	    // use ESC to cancel inserting register
     {
 	literally = i == Ctrl_R
-#ifdef FEAT_CLIPBOARD
-			|| (clip_star.available && c == '*')
-			|| (clip_plus.available && c == '+')
-#endif
+#నిర్వచితమైతే FEAT_CLIPBOARD
+			|| (clip_నక్షత్రం.అందుబాటు && c == '*')
+			|| (clip_plus.అందుబాటు && c == '+')
+#అయితే_ముగింపు
 			;
 	cmdline_paste(c, literally, FALSE);
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
 	// When there was a serious error abort getting the
 	// command line.
-	if (aborting())
+	ఒకవేళ (aborting())
 	{
 	    *gotesc = TRUE;  // will free ccline.cmdbuff after
 	    // putting it in history
-	    return GOTO_NORMAL_MODE;
+	    తిరిగి GOTO_సాధారణ_బహుళకం;
 	}
-#endif
-	KeyTyped = FALSE;	// Don't do p_wc completion.
-#ifdef FEAT_EVAL
-	if (new_cmdpos >= 0)
+#అయితే_ముగింపు
+	కీలకం_Typed = FALSE;	// Don't do p_wc completion.
+#నిర్వచితమైతే FEAT_EVAL
+	ఒకవేళ (new_cmdpos >= 0)
 	{
 	    // set_cmdline_pos() was used
-	    if (new_cmdpos > ccline.cmdlen)
+	    ఒకవేళ (new_cmdpos > ccline.cmdlen)
 		ccline.cmdpos = ccline.cmdlen;
-	    else
+	    లేకపోతే
 		ccline.cmdpos = new_cmdpos;
 	}
-#endif
+#అయితే_ముగింపు
     }
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     new_cmdpos = save_new_cmdpos;
-#endif
+#అయితే_ముగింపు
 
     // remove the double quote
     redrawcmd();
 
     // With "literally": the command line has already changed.
     // Else: the text has been stuffed, but the command line didn't change yet.
-    return literally ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
+    తిరిగి literally ? CMDLINE_మారింది : CMDLINE_NOT_మారింది;
 }
 
 /*
  * Handle the Left and Right mouse clicks in the command-line mode.
  */
-    static void
-cmdline_left_right_mouse(int c, int *ignore_drag_release)
+    స్థిర శూన్య
+cmdline_ఎడమ_కుడి_mouse(పూర్ణాంకం c, పూర్ణాంకం *ignore_drag_release)
 {
-    if (c == K_LEFTRELEASE || c == K_RIGHTRELEASE)
+    ఒకవేళ (c == K_LEFTRELEASE || c == K_RIGHTRELEASE)
 	*ignore_drag_release = TRUE;
-    else
+    లేకపోతే
 	*ignore_drag_release = FALSE;
-#ifdef FEAT_GUI
+#నిర్వచితమైతే FEAT_GUI
     // When GUI is active, also move when 'mouse' is empty
-    if (!gui.in_use)
-#endif
-	if (!mouse_has(MOUSE_COMMAND))
-	    return;
-#ifdef FEAT_CLIPBOARD
-    if (mouse_row < cmdline_row && (clip_star.available || clip_plus.available))
+    ఒకవేళ (!gui.లోపల_use)
+#అయితే_ముగింపు
+	ఒకవేళ (!mouse_has(MOUSE_COMMAND))
+	    తిరిగి;
+#నిర్వచితమైతే FEAT_CLIPBOARD
+    ఒకవేళ (mouse_అడ్డువరుస < cmdline_అడ్డువరుస && (clip_నక్షత్రం.అందుబాటు || clip_plus.అందుబాటు))
     {
-	int	    button, is_click, is_drag;
+	పూర్ణాంకం	    button, is_click, is_drag;
 
 	/*
 	 * Handle modeless selection.
 	 */
 	button = get_mouse_button(KEY2TERMCAP1(c),
 		&is_click, &is_drag);
-	if (mouse_model_popup() && button == MOUSE_LEFT
-		&& (mod_mask & MOD_MASK_SHIFT))
+	ఒకవేళ (mouse_model_popup() && button == MOUSE_ఎడమ
+		&& (mod_ముసుగు & MOD_ముసుగు_జరుపు))
 	{
 	    // Translate shift-left to right button.
-	    button = MOUSE_RIGHT;
-	    mod_mask &= ~MOD_MASK_SHIFT;
+	    button = MOUSE_కుడి;
+	    mod_ముసుగు &= ~MOD_ముసుగు_జరుపు;
 	}
 	clip_modeless(button, is_click, is_drag);
-	return;
+	తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    set_cmdspos();
-    for (ccline.cmdpos = 0; ccline.cmdpos < ccline.cmdlen;
+    సమితి_cmdspos();
+    కొరకు (ccline.cmdpos = 0; ccline.cmdpos < ccline.cmdlen;
 	    ++ccline.cmdpos)
     {
-	int	i;
+	పూర్ణాంకం	i;
 
 	i = cmdline_charsize(ccline.cmdpos);
-	if (mouse_row <= cmdline_row + ccline.cmdspos / cmdline_width
-		&& mouse_col < ccline.cmdspos % cmdline_width + i)
-	    break;
-	if (has_mbyte)
+	ఒకవేళ (mouse_అడ్డువరుస <= cmdline_అడ్డువరుస + ccline.cmdspos / cmdline_వెడల్పు
+		&& mouse_నిలువు < ccline.cmdspos % cmdline_వెడల్పు + i)
+	    ఆపు;
+	ఒకవేళ (has_mbyte)
 	{
 	    // Count ">" for double-wide char that doesn't fit.
 	    correct_cmdspos(ccline.cmdpos, i);
@@ -1421,188 +1421,188 @@ cmdline_left_right_mouse(int c, int *ignore_drag_release)
  *  CMDLINE_CHANGED - if the command line is changed
  *  GOTO_NORMAL_MODE - go back to normal mode
  */
-    static int
+    స్థిర పూర్ణాంకం
 cmdline_browse_history(
-	int	c,
-	int	firstc,
+	పూర్ణాంకం	c,
+	పూర్ణాంకం	firstc,
 	char_u	**curcmdstr,
 	size_t	*curcmdstrlen,
-	int	histype,
-	int	*hiscnt_p,
+	పూర్ణాంకం	histype,
+	పూర్ణాంకం	*hiscnt_p,
 	expand_T *xp)
 {
-    int		orig_hiscnt;
-    int		hiscnt = orig_hiscnt = *hiscnt_p;
+    పూర్ణాంకం		orig_hiscnt;
+    పూర్ణాంకం		hiscnt = orig_hiscnt = *hiscnt_p;
     char_u	*lookfor = *curcmdstr;
     size_t	lookforlen = *curcmdstrlen;
-    int		res;
+    పూర్ణాంకం		res;
 
-    if (get_hislen() == 0 || firstc == NUL)	// no history
-	return CMDLINE_NOT_CHANGED;
+    ఒకవేళ (get_hislen() == 0 || firstc == NUL)	// no history
+	తిరిగి CMDLINE_NOT_మారింది;
 
     // save current command string so it can be restored later
-    if (lookfor == NULL)
+    ఒకవేళ (lookfor == ఖాళీ)
     {
-	if ((lookfor = vim_strnsave(ccline.cmdbuff, ccline.cmdlen)) == NULL)
-	    return CMDLINE_NOT_CHANGED;
+	ఒకవేళ ((lookfor = vim_strnsave(ccline.cmdbuff, ccline.cmdlen)) == ఖాళీ)
+	    తిరిగి CMDLINE_NOT_మారింది;
 	lookfor[ccline.cmdpos] = NUL;
 	lookforlen = ccline.cmdpos;
     }
 
-    for (;;)
+    కొరకు (;;)
     {
 	// one step backwards
-	if (c == K_UP || c == K_S_UP || c == Ctrl_P
+	ఒకవేళ (c == K_పైకి || c == K_S_పైకి || c == Ctrl_P
 		|| c == K_PAGEUP || c == K_KPAGEUP)
 	{
-	    if (hiscnt == get_hislen())	// first time
+	    ఒకవేళ (hiscnt == get_hislen())	// first time
 		hiscnt = *get_hisidx(histype);
-	    else if (hiscnt == 0 && *get_hisidx(histype)
+	    లేకపోతే ఒకవేళ (hiscnt == 0 && *get_hisidx(histype)
 		    != get_hislen() - 1)
 		hiscnt = get_hislen() - 1;
-	    else if (hiscnt != *get_hisidx(histype) + 1)
+	    లేకపోతే ఒకవేళ (hiscnt != *get_hisidx(histype) + 1)
 		--hiscnt;
-	    else			// at top of list
+	    లేకపోతే			// at top of list
 	    {
 		hiscnt = orig_hiscnt;
-		break;
+		ఆపు;
 	    }
 	}
-	else    // one step forwards
+	లేకపోతే    // one step forwards
 	{
 	    // on last entry, clear the line
-	    if (hiscnt == *get_hisidx(histype))
+	    ఒకవేళ (hiscnt == *get_hisidx(histype))
 	    {
 		hiscnt = get_hislen();
-		break;
+		ఆపు;
 	    }
 
 	    // not on a history line, nothing to do
-	    if (hiscnt == get_hislen())
-		break;
-	    if (hiscnt == get_hislen() - 1)   // wrap around
+	    ఒకవేళ (hiscnt == get_hislen())
+		ఆపు;
+	    ఒకవేళ (hiscnt == get_hislen() - 1)   // wrap around
 		hiscnt = 0;
-	    else
+	    లేకపోతే
 		++hiscnt;
 	}
-	if (hiscnt < 0 || get_histentry(histype)[hiscnt].hisstr
-		== NULL)
+	ఒకవేళ (hiscnt < 0 || get_histentry(histype)[hiscnt].hisstr
+		== ఖాళీ)
 	{
 	    hiscnt = orig_hiscnt;
-	    break;
+	    ఆపు;
 	}
-	if ((c != K_UP && c != K_DOWN)
+	ఒకవేళ ((c != K_పైకి && c != K_కిందికి)
 		|| hiscnt == orig_hiscnt
 		|| STRNCMP(get_histentry(histype)[hiscnt].hisstr,
 		    lookfor, lookforlen) == 0)
-	    break;
+	    ఆపు;
     }
 
-    if (hiscnt != orig_hiscnt)	// jumped to other entry
+    ఒకవేళ (hiscnt != orig_hiscnt)	// jumped to other entry
     {
 	char_u	*p;
 	size_t	plen;
-	int	old_firstc;
+	పూర్ణాంకం	old_firstc;
 
 	dealloc_cmdbuff();
 
 	xp->xp_context = EXPAND_NOTHING;
-	if (hiscnt == get_hislen())
+	ఒకవేళ (hiscnt == get_hislen())
 	{
 	    p = lookfor;	// back to the old one
 	    plen = lookforlen;
 	}
-	else
+	లేకపోతే
 	{
 	    p = get_histentry(histype)[hiscnt].hisstr;
 	    plen = get_histentry(histype)[hiscnt].hisstrlen;
 	}
 
-	if (histype == HIST_SEARCH
+	ఒకవేళ (histype == HIST_శోధన
 		&& p != lookfor
 		&& (old_firstc = p[plen + 1]) != firstc)
 	{
-	    int     i;
-	    int     j;
+	    పూర్ణాంకం     i;
+	    పూర్ణాంకం     j;
 	    size_t  len;
 
 	    // Correct for the separator character used when
 	    // adding the history entry vs the one used now.
 	    // First loop: count length.
 	    // Second loop: copy the characters.
-	    for (i = 0; i <= 1; ++i)
+	    కొరకు (i = 0; i <= 1; ++i)
 	    {
 		len = 0;
-		for (j = 0; p[j] != NUL; ++j)
+		కొరకు (j = 0; p[j] != NUL; ++j)
 		{
 		    // Replace old sep with new sep, unless it is
 		    // escaped.
-		    if (p[j] == old_firstc
+		    ఒకవేళ (p[j] == old_firstc
 			    && (j == 0 || p[j - 1] != '\\'))
 		    {
-			if (i > 0)
+			ఒకవేళ (i > 0)
 			    ccline.cmdbuff[len] = firstc;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			// Escape new sep, unless it is already
 			// escaped.
-			if (p[j] == firstc
+			ఒకవేళ (p[j] == firstc
 				&& (j == 0 || p[j - 1] != '\\'))
 			{
-			    if (i > 0)
+			    ఒకవేళ (i > 0)
 				ccline.cmdbuff[len] = '\\';
 			    ++len;
 			}
-			if (i > 0)
+			ఒకవేళ (i > 0)
 			    ccline.cmdbuff[len] = p[j];
 		    }
 		    ++len;
 		}
-		if (i == 0)
+		ఒకవేళ (i == 0)
 		{
 		    alloc_cmdbuff(len);
-		    if (ccline.cmdbuff == NULL)
+		    ఒకవేళ (ccline.cmdbuff == ఖాళీ)
 		    {
-			res = GOTO_NORMAL_MODE;
-			goto done;
+			res = GOTO_సాధారణ_బహుళకం;
+			వెళ్ళు పూర్తి;
 		    }
 		}
 	    }
 	    ccline.cmdbuff[len] = NUL;
-	    ccline.cmdpos = ccline.cmdlen = (int)len;
+	    ccline.cmdpos = ccline.cmdlen = (పూర్ణాంకం)len;
 	}
-	else
+	లేకపోతే
 	{
 	    alloc_cmdbuff(plen);
-	    if (ccline.cmdbuff == NULL)
+	    ఒకవేళ (ccline.cmdbuff == ఖాళీ)
 	    {
-		res = GOTO_NORMAL_MODE;
-		goto done;
+		res = GOTO_సాధారణ_బహుళకం;
+		వెళ్ళు పూర్తి;
 	    }
 	    STRCPY(ccline.cmdbuff, p);
-	    ccline.cmdpos = ccline.cmdlen = (int)plen;
+	    ccline.cmdpos = ccline.cmdlen = (పూర్ణాంకం)plen;
 	}
 
 	redrawcmd();
-	res = CMDLINE_CHANGED;
-	goto done;
+	res = CMDLINE_మారింది;
+	వెళ్ళు పూర్తి;
     }
     beep_flush();
-    res = CMDLINE_NOT_CHANGED;
+    res = CMDLINE_NOT_మారింది;
 
-done:
+పూర్తి:
     *curcmdstr = lookfor;
     *curcmdstrlen = lookforlen;
     *hiscnt_p = hiscnt;
-    return res;
+    తిరిగి res;
 }
 
 /*
  * Initialize the current command-line info.
  */
-    static int
-init_ccline(int firstc, int indent)
+    స్థిర పూర్ణాంకం
+init_ccline(పూర్ణాంకం firstc, పూర్ణాంకం indent)
 {
     ccline.overstrike = FALSE;		    // always start in insert mode
 
@@ -1615,16 +1615,16 @@ init_ccline(int firstc, int indent)
     // alloc initial ccline.cmdbuff
     alloc_cmdbuff(indent + 50);
     ccline.cmdlen = ccline.cmdpos = 0;
-    if (ccline.cmdbuff == NULL)
+    ఒకవేళ (ccline.cmdbuff == ఖాళీ)
     {
 	ccline.cmdbufflen = 0;
-	return FAIL;
+	తిరిగి FAIL;
     }
     ccline.cmdbuff[0] = NUL;
-    sb_text_start_cmdline();
+    sb_పాఠ్యం_ప్రారంభం_cmdline();
 
     // autoindent for :insert and :append
-    if (firstc <= 0)
+    ఒకవేళ (firstc <= 0)
     {
 	vim_memset(ccline.cmdbuff, ' ', indent);
 	ccline.cmdbuff[indent] = NUL;
@@ -1633,7 +1633,7 @@ init_ccline(int firstc, int indent)
 	ccline.cmdlen = indent;
     }
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1657,165 +1657,165 @@ init_ccline(int firstc, int indent)
  */
     char_u *
 getcmdline(
-    int		  firstc,
-    long	  count,	// only used for incremental search
-    int		  indent,	// indent for inside conditionals
-    getline_opt_T do_concat UNUSED)
+    పూర్ణాంకం		  firstc,
+    దీర్ఘ	  లెక్క,	// only used for incremental search
+    పూర్ణాంకం		  indent,	// indent for inside conditionals
+    getline_opt_T do_concat వాడని)
 {
-    return getcmdline_int(firstc, count, indent, TRUE);
+    తిరిగి getcmdline_int(firstc, లెక్క, indent, TRUE);
 }
 
-    static char_u *
+    స్థిర char_u *
 getcmdline_int(
-    int		firstc,
-    long	count UNUSED,	// only used for incremental search
-    int		indent,		// indent for inside conditionals
-    int		clear_ccline)	// clear ccline first
+    పూర్ణాంకం		firstc,
+    దీర్ఘ	లెక్క వాడని,	// only used for incremental search
+    పూర్ణాంకం		indent,		// indent for inside conditionals
+    పూర్ణాంకం		clear_ccline)	// clear ccline first
 {
-    static int	depth = 0;	    // call depth
-    int		c = 0;
-    int		i;
-    int		j;
-    int		gotesc = FALSE;		// TRUE when <ESC> just typed
-    int		do_abbr;		// when TRUE check for abbr.
-    char_u	*lookfor = NULL;	// string to match
+    స్థిర పూర్ణాంకం	లోతు = 0;	    // call depth
+    పూర్ణాంకం		c = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
+    పూర్ణాంకం		gotesc = FALSE;		// TRUE when <ESC> just typed
+    పూర్ణాంకం		do_abbr;		// when TRUE check for abbr.
+    char_u	*lookfor = ఖాళీ;	// string to match
     size_t	lookforlen = 0;
-    int		hiscnt;			// current history line in use
-    int		histype;		// history type to be used
-#ifdef FEAT_SEARCH_EXTRA
+    పూర్ణాంకం		hiscnt;			// current history line in use
+    పూర్ణాంకం		histype;		// history type to be used
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
     incsearch_state_T	is_state;
-#endif
-    int		did_wild_list = FALSE;	// did wild_list() recently
-    int		wim_index = 0;		// index in wim_flags[]
-    int		res;
-    int		save_msg_scroll = msg_scroll;
-    int		save_State = State;	// remember State when called
-    int		some_key_typed = FALSE;	// one of the keys was typed
+#అయితే_ముగింపు
+    పూర్ణాంకం		did_wild_list = FALSE;	// did wild_list() recently
+    పూర్ణాంకం		wim_సూచీ = 0;		// index in wim_flags[]
+    పూర్ణాంకం		res;
+    పూర్ణాంకం		save_సందేశం_scroll = సందేశం_scroll;
+    పూర్ణాంకం		save_State = State;	// remember State when called
+    పూర్ణాంకం		some_కీలకం_typed = FALSE;	// one of the keys was typed
     // mouse drag and release events are ignored, unless they are
     // preceded with a mouse down event
-    int		ignore_drag_release = TRUE;
-#ifdef FEAT_EVAL
-    int		break_ctrl_c = FALSE;
-#endif
+    పూర్ణాంకం		ignore_drag_release = TRUE;
+#నిర్వచితమైతే FEAT_EVAL
+    పూర్ణాంకం		break_ctrl_c = FALSE;
+#అయితే_ముగింపు
     expand_T	xpc;
-    long	*b_im_ptr = NULL;
-    buf_T	*b_im_ptr_buf = NULL;	// buffer where b_im_ptr is valid
+    దీర్ఘ	*b_im_ptr = ఖాళీ;
+    buf_T	*b_im_ptr_buf = ఖాళీ;	// buffer where b_im_ptr is valid
     cmdline_info_T save_ccline;
-    int		did_save_ccline = FALSE;
-    int		cmdline_type;
-    int		wild_type = 0;
-    int		event_cmdlineleavepre_triggered = FALSE;
-    char_u	*prev_cmdbuff = NULL;
-    int		did_hist_navigate = FALSE;
+    పూర్ణాంకం		did_save_ccline = FALSE;
+    పూర్ణాంకం		cmdline_type;
+    పూర్ణాంకం		wild_type = 0;
+    పూర్ణాంకం		event_cmdlineleavepre_triggered = FALSE;
+    char_u	*prev_cmdbuff = ఖాళీ;
+    పూర్ణాంకం		did_hist_navigate = FALSE;
 
     // one recursion level deeper
-    ++depth;
+    ++లోతు;
 
-    if (ccline.cmdbuff != NULL)
+    ఒకవేళ (ccline.cmdbuff != ఖాళీ)
     {
 	// Being called recursively.  Since ccline is global, we need to save
 	// the current buffer and restore it when returning.
 	save_cmdline(&save_ccline);
 	did_save_ccline = TRUE;
     }
-    if (clear_ccline)
-	CLEAR_FIELD(ccline);
+    ఒకవేళ (clear_ccline)
+	CLEAR_క్షేత్రం(ccline);
 
-#ifdef FEAT_EVAL
-    if (firstc == -1)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (firstc == -1)
     {
 	firstc = NUL;
 	break_ctrl_c = TRUE;
     }
-#endif
-#ifdef FEAT_RIGHTLEFT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     // start without Hebrew mapping for a command line
-    if (firstc == ':' || firstc == '=' || firstc == '>')
+    ఒకవేళ (firstc == ':' || firstc == '=' || firstc == '>')
 	cmd_hkmap = 0;
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
     init_incsearch_state(&is_state);
-#endif
+#అయితే_ముగింపు
 
-    if (init_ccline(firstc, indent) != OK)
-	goto theend;	// out of memory
+    ఒకవేళ (init_ccline(firstc, indent) != OK)
+	వెళ్ళు theend;	// out of memory
 
-    if (depth == 50)
+    ఒకవేళ (లోతు == 50)
     {
 	// Somehow got into a loop recursively calling getcmdline(), bail out.
 	emsg(_(e_command_too_recursive));
-	goto theend;
+	వెళ్ళు theend;
     }
 
     ExpandInit(&xpc);
     ccline.xpc = &xpc;
     clear_cmdline_orig();
 
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's'
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (curwin->w_p_rl && *curwin->w_p_rlc == 's'
 					  && (firstc == '/' || firstc == '?'))
 	cmdmsg_rl = TRUE;
-    else
+    లేకపోతే
 	cmdmsg_rl = FALSE;
-#endif
+#అయితే_ముగింపు
 
     redir_off = TRUE;		// don't redirect the typed command
-    if (!cmd_silent)
+    ఒకవేళ (!cmd_silent)
     {
-	i = msg_scrolled;
-	msg_scrolled = 0;		// avoid wait_return() message
+	i = సందేశం_scrolled;
+	సందేశం_scrolled = 0;		// avoid wait_return() message
 	gotocmdline(TRUE);
-	msg_scrolled += i;
+	సందేశం_scrolled += i;
 	redrawcmdprompt();		// draw prompt or indent
-	set_cmdspos();
+	సమితి_cmdspos();
     }
     xpc.xp_context = EXPAND_NOTHING;
     xpc.xp_backslash = XP_BS_NONE;
-#ifndef BACKSLASH_IN_FILENAME
+#నిర్వచితం_కాకపోతే BACKSLASH_లోపల_FILENAME
     xpc.xp_shell = FALSE;
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_EVAL)
-    if (ccline.input_fn)
+#ఒకవేళ defined(FEAT_EVAL)
+    ఒకవేళ (ccline.ఆదానం_fn)
     {
 	xpc.xp_context = ccline.xp_context;
-	xpc.xp_pattern = ccline.cmdbuff;
+	xpc.xp_నమూనా = ccline.cmdbuff;
 	xpc.xp_arg = ccline.xp_arg;
     }
-#endif
+#అయితే_ముగింపు
 
     /*
      * Avoid scrolling when called by a recursive do_cmdline(), e.g. when
      * doing ":@0" when register 0 doesn't contain a CR.
      */
-    msg_scroll = FALSE;
+    సందేశం_scroll = FALSE;
 
-    State = MODE_CMDLINE;
+    State = బహుళకం_CMDLINE;
 
-    if (firstc == '/' || firstc == '?' || firstc == '@')
+    ఒకవేళ (firstc == '/' || firstc == '?' || firstc == '@')
     {
 	// Use ":lmap" mappings for search pattern and input().
-	if (curbuf->b_p_imsearch == B_IMODE_USE_INSERT)
+	ఒకవేళ (curbuf->b_p_imsearch == B_IMODE_USE_చొప్పించు)
 	    b_im_ptr = &curbuf->b_p_iminsert;
-	else
+	లేకపోతే
 	    b_im_ptr = &curbuf->b_p_imsearch;
 	b_im_ptr_buf = curbuf;
-	if (*b_im_ptr == B_IMODE_LMAP)
-	    State |= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
-	im_set_active(*b_im_ptr == B_IMODE_IM);
-#endif
+	ఒకవేళ (*b_im_ptr == B_IMODE_LMAP)
+	    State |= బహుళకం_LANGMAP;
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+	im_సమితి_చురుకైన(*b_im_ptr == B_IMODE_IM);
+#అయితే_ముగింపు
     }
-#ifdef HAVE_INPUT_METHOD
-    else if (p_imcmdline)
-	im_set_active(TRUE);
-#endif
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    లేకపోతే ఒకవేళ (p_imcmdline)
+	im_సమితి_చురుకైన(TRUE);
+#అయితే_ముగింపు
 
     setmouse();
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 
     // When inside an autocommand for writing "exiting" may be set and
     // terminal mode set to cooked.  Need to set raw mode here then.
@@ -1824,49 +1824,49 @@ getcmdline_int(
     // Trigger CmdlineEnter autocommands.
     cmdline_type = firstc == NUL ? '-' : firstc;
     trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINEENTER);
-#ifdef FEAT_EVAL
-    if (!debug_mode)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (!debug_బహుళకం)
 	may_trigger_modechanged();
-#endif
+#అయితే_ముగింపు
 
     init_history();
     hiscnt = get_hislen();	// set hiscnt to impossible history value
     histype = hist_char2type(firstc);
 
-#ifdef FEAT_DIGRAPHS
+#నిర్వచితమైతే FEAT_DIGRAPHS
     do_digraph(-1);		// init digraph typeahead
-#endif
+#అయితే_ముగింపు
 
     // If something above caused an error, reset the flags, we do want to type
     // and execute commands. Display may be messed up a bit.
-    if (did_emsg)
+    ఒకవేళ (did_emsg)
 	redrawcmd();
 
-#ifdef FEAT_STL_OPT
+#నిర్వచితమైతే FEAT_STL_OPT
     // Redraw the statusline in case it uses the current mode using the mode()
     // function.
-    if (!cmd_silent && msg_scrolled == 0)
+    ఒకవేళ (!cmd_silent && సందేశం_scrolled == 0)
     {
-	int	found_one = FALSE;
+	పూర్ణాంకం	దొరికింది_one = FALSE;
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (*p_stl != NUL || *wp->w_p_stl != NUL)
+	    ఒకవేళ (*p_stl != NUL || *wp->w_p_stl != NUL)
 	    {
-		wp->w_redr_status = true;
-		found_one = TRUE;
+		wp->w_redr_స్థితి = true;
+		దొరికింది_one = TRUE;
 	    }
 
-	if (*p_tal != NUL)
+	ఒకవేళ (*p_tal != NUL)
 	{
 	    redraw_tabline = TRUE;
-	    found_one = TRUE;
+	    దొరికింది_one = TRUE;
 	}
 
-	if (found_one)
+	ఒకవేళ (దొరికింది_one)
 	    redraw_statuslines();
     }
-#endif
+#అయితే_ముగింపు
 
     did_emsg = FALSE;
     got_int = FALSE;
@@ -1874,116 +1874,116 @@ getcmdline_int(
     /*
      * Collect the command string, handling editing keys.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int	trigger_cmdlinechanged = TRUE;
-	int	end_wildmenu;
-	int	prev_cmdpos = ccline.cmdpos;
-	int	skip_pum_redraw = FALSE;
+	పూర్ణాంకం	trigger_cmdlinechanged = TRUE;
+	పూర్ణాంకం	చివర_wildmenu;
+	పూర్ణాంకం	prev_cmdpos = ccline.cmdpos;
+	పూర్ణాంకం	skip_pum_redraw = FALSE;
 
 	VIM_CLEAR(prev_cmdbuff);
 
 	redir_off = TRUE;	// Don't redirect the typed command.
 				// Repeated, because a ":redir" inside
 				// completion may switch it on.
-#ifdef USE_ON_FLY_SCROLL
+#నిర్వచితమైతే USE_ON_FLY_SCROLL
 	dont_scroll = FALSE;	// allow scrolling here
-#endif
-	quit_more = FALSE;	// reset after CTRL-D which had a more-prompt
+#అయితే_ముగింపు
+	quit_మరిన్ని = FALSE;	// reset after CTRL-D which had a more-prompt
 
 	did_emsg = FALSE;	// There can't really be a reason why an error
 				// that occurs while typing a command should
 				// cause the command not to be executed.
 
-	if (ex_normal_busy == 0 && stuff_empty() && typebuf.tb_len == 0)
+	ఒకవేళ (ex_సాధారణ_busy == 0 && stuff_ఖాళీలు() && typebuf.tb_len == 0)
 	    // There is no pending input from sources other than user input, so
 	    // Vim is going to wait for the user to type a key.  Consider the
 	    // command line typed even if next key will trigger a mapping.
-	    some_key_typed = TRUE;
+	    some_కీలకం_typed = TRUE;
 
 	// Trigger SafeState if nothing is pending.
 	may_trigger_safestate(xpc.xp_numfiles <= 0);
 
-	if (ccline.cmdbuff != NULL)
+	ఒకవేళ (ccline.cmdbuff != ఖాళీ)
 	{
 	    prev_cmdbuff = vim_strsave(ccline.cmdbuff);
-	    if (prev_cmdbuff == NULL)
-		goto returncmd;
+	    ఒకవేళ (prev_cmdbuff == ఖాళీ)
+		వెళ్ళు returncmd;
 	}
 
 	// Defer screen update to avoid pum flicker during wildtrigger()
-	if (c == K_WILD && firstc != '@')
+	ఒకవేళ (c == K_WILD && firstc != '@')
 	    skip_pum_redraw = TRUE;
 
 	// Get a character.  Ignore K_IGNORE and K_NOP, they should not do
 	// anything, such as stop completion.
-	do
+	చేయి
 	{
 	    cursorcmd();		// set the cursor on the right spot
-	    c = safe_vgetc();
-	} while (c == K_IGNORE || c == K_NOP);
+	    c = సురక్షిత_vgetc();
+	} అయితే (c == K_IGNORE || c == K_NOP);
 
 	// If the cmdline was replaced externally (e.g. by setcmdline()
 	// during an <expr> mapping), clean up the wildmenu completion
 	// state to avoid using stale completion data.
-	if (ccline.cmdbuff_replaced && xpc.xp_numfiles > 0)
+	ఒకవేళ (ccline.cmdbuff_replaced && xpc.xp_numfiles > 0)
 	{
-	    if (cmdline_pum_active())
+	    ఒకవేళ (cmdline_pum_చురుకైన())
 		cmdline_pum_remove(&ccline, FALSE);
-	    (void)ExpandOne(&xpc, NULL, NULL, 0, WILD_FREE);
+	    (శూన్య)ExpandOne(&xpc, ఖాళీ, ఖాళీ, 0, WILD_FREE);
 	    did_wild_list = FALSE;
 	    xpc.xp_context = EXPAND_NOTHING;
-	    wim_index = 0;
+	    wim_సూచీ = 0;
 	    wildmenu_cleanup(&ccline);
 	}
 	ccline.cmdbuff_replaced = FALSE;
 
 	// Skip wildmenu during history navigation via Up/Down keys
-	if (c == K_WILD && did_hist_navigate)
+	ఒకవేళ (c == K_WILD && did_hist_navigate)
 	{
 	    did_hist_navigate = FALSE;
-	    continue;
+	    కొనసాగు;
 	}
 
-	if (c == K_COMMAND || c == K_SCRIPT_COMMAND)
+	ఒకవేళ (c == K_COMMAND || c == K_SCRIPT_COMMAND)
 	{
-	    int	    clen = ccline.cmdlen;
-	    int	    cc_count = aucmd_cmdline_changed_count;
+	    పూర్ణాంకం	    clen = ccline.cmdlen;
+	    పూర్ణాంకం	    cc_లెక్క = aucmd_cmdline_మారింది_లెక్క;
 
-	    if (do_cmdkey_command(c, DOCMD_NOWAIT) == OK)
+	    ఒకవేళ (do_cmdkey_command(c, DOCMD_NOWAIT) == OK)
 	    {
 		// Do not trigger CmdlineChanged below if:
 		// - the length of the command line didn't change
 		// - the <Cmd> mapping already triggered the event
-		if (clen == ccline.cmdlen
-				    || cc_count != aucmd_cmdline_changed_count)
+		ఒకవేళ (clen == ccline.cmdlen
+				    || cc_లెక్క != aucmd_cmdline_మారింది_లెక్క)
 		    trigger_cmdlinechanged = FALSE;
-		goto cmdline_changed;
+		వెళ్ళు cmdline_మారింది;
 	    }
 	}
 
-	if (KeyTyped)
+	ఒకవేళ (కీలకం_Typed)
 	{
-	    some_key_typed = TRUE;
-#ifdef FEAT_RIGHTLEFT
-	    if (cmd_hkmap)
+	    some_కీలకం_typed = TRUE;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	    ఒకవేళ (cmd_hkmap)
 		c = hkmap(c);
-	    if (cmdmsg_rl && !KeyStuffed)
+	    ఒకవేళ (cmdmsg_rl && !కీలకం_Stuffed)
 	    {
 		// Invert horizontal movements and operations.  Only when
 		// typed by the user directly, not when the result of a
 		// mapping.
-		switch (c)
+		ఎంపిక (c)
 		{
-		    case K_RIGHT:   c = K_LEFT; break;
-		    case K_S_RIGHT: c = K_S_LEFT; break;
-		    case K_C_RIGHT: c = K_C_LEFT; break;
-		    case K_LEFT:    c = K_RIGHT; break;
-		    case K_S_LEFT:  c = K_S_RIGHT; break;
-		    case K_C_LEFT:  c = K_C_RIGHT; break;
+		    స్థితి K_కుడి:   c = K_ఎడమ; ఆపు;
+		    స్థితి K_S_కుడి: c = K_S_ఎడమ; ఆపు;
+		    స్థితి K_C_కుడి: c = K_C_ఎడమ; ఆపు;
+		    స్థితి K_ఎడమ:    c = K_కుడి; ఆపు;
+		    స్థితి K_S_ఎడమ:  c = K_S_కుడి; ఆపు;
+		    స్థితి K_C_ఎడమ:  c = K_C_కుడి; ఆపు;
 		}
 	    }
-#endif
+#అయితే_ముగింపు
 	}
 
 	/*
@@ -1992,29 +1992,29 @@ getcmdline_int(
 	 * ":g/pat/normal /pat" (without the <CR>).
 	 * Don't ignore it for the input() function.
 	 */
-	if ((c == Ctrl_C
-#ifdef UNIX
+	ఒకవేళ ((c == Ctrl_C
+#నిర్వచితమైతే UNIX
 		|| c == intr_char
-#endif
+#అయితే_ముగింపు
 				)
-#if defined(FEAT_EVAL) || defined(FEAT_CRYPT)
+#ఒకవేళ defined(FEAT_EVAL) || defined(FEAT_CRYPT)
 		&& firstc != '@'
-#endif
-#ifdef FEAT_EVAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_EVAL
 		// do clear got_int in Ex mode to avoid infinite Ctrl-C loop
-		&& (!break_ctrl_c || exmode_active)
-#endif
+		&& (!break_ctrl_c || exmode_చురుకైన)
+#అయితే_ముగింపు
 		&& !global_busy)
 	    got_int = FALSE;
 
 	// free old command line when finished moving around in the history
 	// list
-	if (lookfor != NULL
-		&& c != K_S_DOWN && c != K_S_UP
-		&& c != K_DOWN && c != K_UP
+	ఒకవేళ (lookfor != ఖాళీ
+		&& c != K_S_కిందికి && c != K_S_పైకి
+		&& c != K_కిందికి && c != K_పైకి
 		&& c != K_PAGEDOWN && c != K_PAGEUP
 		&& c != K_KPAGEDOWN && c != K_KPAGEUP
-		&& c != K_LEFT && c != K_RIGHT
+		&& c != K_ఎడమ && c != K_కుడి
 		&& (xpc.xp_numfiles > 0 || (c != Ctrl_P && c != Ctrl_N)))
 	{
 	    VIM_CLEAR(lookfor);
@@ -2025,44 +2025,44 @@ getcmdline_int(
 	 * When there are matching completions to select <S-Tab> works like
 	 * CTRL-P (unless 'wc' is <S-Tab>).
 	 */
-	if (c != p_wc && c == K_S_TAB && xpc.xp_numfiles > 0)
+	ఒకవేళ (c != p_wc && c == K_S_TAB && xpc.xp_numfiles > 0)
 	    c = Ctrl_P;
 
-	if (p_wmnu)
-	    c = wildmenu_translate_key(&ccline, c, &xpc, did_wild_list);
+	ఒకవేళ (p_wmnu)
+	    c = wildmenu_translate_కీలకం(&ccline, c, &xpc, did_wild_list);
 
-	int key_is_wc = (c == p_wc && KeyTyped) || c == p_wcm;
-	if ((cmdline_pum_active() || wild_menu_showing || did_wild_list)
-		&& !key_is_wc && xpc.xp_numfiles > 0)
+	పూర్ణాంకం కీలకం_is_wc = (c == p_wc && కీలకం_Typed) || c == p_wcm;
+	ఒకవేళ ((cmdline_pum_చురుకైన() || wild_menu_showing || did_wild_list)
+		&& !కీలకం_is_wc && xpc.xp_numfiles > 0)
 	{
 	    // Ctrl-Y: Accept the current selection and close the popup menu.
 	    // Ctrl-E: cancel the cmdline popup menu and return the original
 	    // text.
-	    if (c == Ctrl_E || c == Ctrl_Y)
+	    ఒకవేళ (c == Ctrl_E || c == Ctrl_Y)
 	    {
 		wild_type = (c == Ctrl_E) ? WILD_CANCEL : WILD_APPLY;
-		if (nextwild(&xpc, wild_type, WILD_NO_BEEP,
+		ఒకవేళ (nextwild(&xpc, wild_type, WILD_NO_BEEP,
 							firstc != '@') == FAIL)
-		    break;
+		    ఆపు;
 	    }
 	}
 
 	// Trigger CmdlineLeavePre autocommand
-	if (KeyTyped && (c == '\n' || c == '\r' || c == K_KENTER || c == ESC
-#ifdef UNIX
+	ఒకవేళ (కీలకం_Typed && (c == '\n' || c == '\r' || c == K_KENTER || c == ESC
+#నిర్వచితమైతే UNIX
 		    || c == intr_char
-#endif
+#అయితే_ముగింపు
 		    || c == Ctrl_C))
 	{
-#ifdef FEAT_EVAL
-	    set_vim_var_char(c);  // Set v:char
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	    సమితి_vim_var_char(c);  // Set v:char
+#అయితే_ముగింపు
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINELEAVEPRE);
 	    event_cmdlineleavepre_triggered = TRUE;
-#if defined(FEAT_SEARCH_EXTRA)
-	    if ((c == ESC || c == Ctrl_C) && (wim_flags[0] & WIM_LIST))
-		set_no_hlsearch(TRUE);
-#endif
+#ఒకవేళ defined(FEAT_శోధన_EXTRA)
+	    ఒకవేళ ((c == ESC || c == Ctrl_C) && (wim_flags[0] & WIM_LIST))
+		సమితి_no_hlsearch(TRUE);
+#అయితే_ముగింపు
 	}
 
 	// The wildmenu is cleared if the pressed key is not used for
@@ -2072,546 +2072,546 @@ getcmdline_int(
 	// also used to navigate the menu, the mouse scroll wheel keys scroll
 	// the info popup, and CTRL-SHIFT-<Up>/<Down> scroll it with the
 	// keyboard.
-	end_wildmenu = (!key_is_wc
+	చివర_wildmenu = (!కీలకం_is_wc
 		&& c != Ctrl_N && c != Ctrl_P && c != Ctrl_A && c != Ctrl_L);
-	end_wildmenu = end_wildmenu && (!cmdline_pum_active() ||
+	చివర_wildmenu = చివర_wildmenu && (!cmdline_pum_చురుకైన() ||
 			    (c != K_PAGEDOWN && c != K_PAGEUP
 			     && c != K_KPAGEDOWN && c != K_KPAGEUP
 			     && c != K_MOUSEDOWN && c != K_MOUSEUP
 			     && c != K_MOUSELEFT && c != K_MOUSERIGHT
-			     && !((c == K_S_UP || c == K_S_DOWN)
-				 && (mod_mask & MOD_MASK_CTRL))));
+			     && !((c == K_S_పైకి || c == K_S_కిందికి)
+				 && (mod_ముసుగు & MOD_ముసుగు_CTRL))));
 
 	// free expanded names when finished walking through matches
-	if (end_wildmenu)
+	ఒకవేళ (చివర_wildmenu)
 	{
-	    if (cmdline_pum_active())
+	    ఒకవేళ (cmdline_pum_చురుకైన())
 	    {
-		skip_pum_redraw = skip_pum_redraw && !key_is_wc
+		skip_pum_redraw = skip_pum_redraw && !కీలకం_is_wc
 		    && !VIM_ISWHITE(c)
 		    && (vim_isprintc(c)
 			|| c == K_BS || c == Ctrl_H || c == K_DEL
 			|| c == K_KDEL || c == Ctrl_W || c == Ctrl_U);
 		cmdline_pum_remove(&ccline, skip_pum_redraw);
 	    }
-	    if (xpc.xp_numfiles != -1)
-		(void)ExpandOne(&xpc, NULL, NULL, 0, WILD_FREE);
+	    ఒకవేళ (xpc.xp_numfiles != -1)
+		(శూన్య)ExpandOne(&xpc, ఖాళీ, ఖాళీ, 0, WILD_FREE);
 	    did_wild_list = FALSE;
-	    if (!p_wmnu || (c != K_UP && c != K_DOWN))
+	    ఒకవేళ (!p_wmnu || (c != K_పైకి && c != K_కిందికి))
 		xpc.xp_context = EXPAND_NOTHING;
-	    wim_index = 0;
+	    wim_సూచీ = 0;
 	    wildmenu_cleanup(&ccline);
 	}
 
-	if (p_wmnu)
-	    c = wildmenu_process_key(&ccline, c, &xpc);
+	ఒకవేళ (p_wmnu)
+	    c = wildmenu_process_కీలకం(&ccline, c, &xpc);
 
 	// CTRL-\ CTRL-N goes to Normal mode, CTRL-\ CTRL-G goes to Insert
 	// mode when 'insertmode' is set, CTRL-\ e prompts for an expression.
-	if (c == Ctrl_BSL)
+	ఒకవేళ (c == Ctrl_BSL)
 	{
 	    res = cmdline_handle_ctrl_bsl(c, &gotesc);
-	    if (res == CMDLINE_CHANGED)
-		goto cmdline_changed;
-	    else if (res == CMDLINE_NOT_CHANGED)
-		goto cmdline_not_changed;
-	    else if (res == GOTO_NORMAL_MODE)
-		goto returncmd;		// back to cmd mode
+	    ఒకవేళ (res == CMDLINE_మారింది)
+		వెళ్ళు cmdline_మారింది;
+	    లేకపోతే ఒకవేళ (res == CMDLINE_NOT_మారింది)
+		వెళ్ళు cmdline_not_మారింది;
+	    లేకపోతే ఒకవేళ (res == GOTO_సాధారణ_బహుళకం)
+		వెళ్ళు returncmd;		// back to cmd mode
 	    c = Ctrl_BSL;		// backslash key not processed by
 					// cmdline_handle_ctrl_bsl()
 	}
 
-	if (c == cedit_key || c == K_CMDWIN)
+	ఒకవేళ (c == cedit_కీలకం || c == K_CMDWIN)
 	{
 	    // TODO: why is ex_normal_busy checked here?
-	    if ((c == K_CMDWIN || ex_normal_busy == 0) && got_int == FALSE)
+	    ఒకవేళ ((c == K_CMDWIN || ex_సాధారణ_busy == 0) && got_int == FALSE)
 	    {
 		/*
 		 * Open a window to edit the command line (and history).
 		 */
 		c = open_cmdwin();
-		some_key_typed = TRUE;
+		some_కీలకం_typed = TRUE;
 	    }
 	}
-#ifdef FEAT_DIGRAPHS
-	else
+#నిర్వచితమైతే FEAT_DIGRAPHS
+	లేకపోతే
 	    c = do_digraph(c);
-#endif
+#అయితే_ముగింపు
 
-	if (c == '\n' || c == '\r' || c == K_KENTER || (c == ESC
-			&& (!KeyTyped || vim_strchr(p_cpo, CPO_ESC) != NULL)))
+	ఒకవేళ (c == '\n' || c == '\r' || c == K_KENTER || (c == ESC
+			&& (!కీలకం_Typed || vim_strchr(p_cpo, CPO_ESC) != ఖాళీ)))
 	{
 	    // In Ex mode a backslash escapes a newline.
-	    if (exmode_active
+	    ఒకవేళ (exmode_చురుకైన
 		    && c != ESC
 		    && ccline.cmdpos == ccline.cmdlen
 		    && ccline.cmdpos > 0
 		    && ccline.cmdbuff[ccline.cmdpos - 1] == '\\')
 	    {
-		if (c == K_KENTER)
+		ఒకవేళ (c == K_KENTER)
 		    c = '\n';
 	    }
-	    else
+	    లేకపోతే
 	    {
 		gotesc = FALSE;	// Might have typed ESC previously, don't
 				// truncate the cmdline now.
-		if (ccheck_abbr(c + ABBR_OFF))
-		    goto cmdline_changed;
-		if (!cmd_silent)
+		ఒకవేళ (ccheck_abbr(c + ABBR_OFF))
+		    వెళ్ళు cmdline_మారింది;
+		ఒకవేళ (!cmd_silent)
 		{
-		    windgoto(msg_row, cmdline_col_off);
-		    out_flush();
+		    windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off);
+		    బహిర్గతం_flush();
 		}
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Completion for 'wildchar', 'wildcharm', and wildtrigger()
-	if ((c == p_wc && !gotesc && KeyTyped) || c == p_wcm || c == K_WILD)
+	ఒకవేళ ((c == p_wc && !gotesc && కీలకం_Typed) || c == p_wcm || c == K_WILD)
 	{
-	    if (c == K_WILD)
+	    ఒకవేళ (c == K_WILD)
 		++emsg_silent;  // Silence the bell
 	    res = cmdline_wildchar_complete(c, firstc != '@', &did_wild_list,
-		    &wim_index, &xpc, &gotesc, c == K_WILD,
-#ifdef FEAT_SEARCH_EXTRA
-		    &is_state.search_start
-#else
-		    NULL
-#endif
+		    &wim_సూచీ, &xpc, &gotesc, c == K_WILD,
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+		    &is_state.శోధన_ప్రారంభం_2
+#లేకపోతే
+		    ఖాళీ
+#అయితే_ముగింపు
 		    );
-	    if (c == K_WILD)
+	    ఒకవేళ (c == K_WILD)
 		--emsg_silent;
-	    if (res == CMDLINE_CHANGED)
-		goto cmdline_changed;
-	    if (c == K_WILD)
-		goto cmdline_not_changed;
+	    ఒకవేళ (res == CMDLINE_మారింది)
+		వెళ్ళు cmdline_మారింది;
+	    ఒకవేళ (c == K_WILD)
+		వెళ్ళు cmdline_not_మారింది;
 	}
 
 	gotesc = FALSE;
 
 	// <S-Tab> goes to last match, in a clumsy way
-	if (c == K_S_TAB && KeyTyped)
+	ఒకవేళ (c == K_S_TAB && కీలకం_Typed)
 	{
-	    if (nextwild(&xpc, WILD_EXPAND_KEEP, 0, firstc != '@') == OK)
+	    ఒకవేళ (nextwild(&xpc, WILD_EXPAND_KEEP, 0, firstc != '@') == OK)
 	    {
-		if (xpc.xp_numfiles > 1
-		    && ((!did_wild_list && (wim_flags[wim_index] & WIM_LIST))
+		ఒకవేళ (xpc.xp_numfiles > 1
+		    && ((!did_wild_list && (wim_flags[wim_సూచీ] & WIM_LIST))
 			    || p_wmnu))
 		{
 		    // Trigger the popup menu when wildoptions=pum
-		    int list = wim_flags[wim_index] & WIM_LIST;
+		    పూర్ణాంకం list = wim_flags[wim_సూచీ] & WIM_LIST;
 
 		    showmatches(&xpc, p_wmnu && !list, list,
 			    p_wmnu ? wim_flags[0] : 0);
 		}
-		if (nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK
+		ఒకవేళ (nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK
 			&& nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK)
-		    goto cmdline_changed;
+		    వెళ్ళు cmdline_మారింది;
 	    }
 	}
 
-	if (c == NUL || c == K_ZERO)	    // NUL is stored as NL
+	ఒకవేళ (c == NUL || c == K_ZERO)	    // NUL is stored as NL
 	    c = NL;
 
 	do_abbr = TRUE;		// default: check for abbreviation
 
 	// If already used to cancel/accept wildmenu, don't process the key
 	// further.
-	if (wild_type == WILD_CANCEL || wild_type == WILD_APPLY)
+	ఒకవేళ (wild_type == WILD_CANCEL || wild_type == WILD_APPLY)
 	{
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 	    // Apply search highlighting
-	    if (is_state.winid != curwin->w_id)
+	    ఒకవేళ (is_state.winid != curwin->w_id)
 		init_incsearch_state(&is_state);
-	    if (KeyTyped || vpeekc() == NUL)
-		may_do_incsearch_highlighting(firstc, count, &is_state);
-#endif
+	    ఒకవేళ (కీలకం_Typed || vpeekc() == NUL)
+		may_do_incsearch_highlighting(firstc, లెక్క, &is_state);
+#అయితే_ముగింపు
 	    wild_type = 0;
-	    goto cmdline_not_changed;
+	    వెళ్ళు cmdline_not_మారింది;
 	}
 
 	/*
 	 * Big switch for a typed command line character.
 	 */
-	switch (c)
+	ఎంపిక (c)
 	{
-	case K_BS:
-	case Ctrl_H:
-	case K_DEL:
-	case K_KDEL:
-	case Ctrl_W:
+	స్థితి K_BS:
+	స్థితి Ctrl_H:
+	స్థితి K_DEL:
+	స్థితి K_KDEL:
+	స్థితి Ctrl_W:
 	    res = cmdline_erase_chars(c, indent
-#ifdef FEAT_SEARCH_EXTRA
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 		    , &is_state
-#endif
+#అయితే_ముగింపు
 		    );
-	    if (res == CMDLINE_NOT_CHANGED)
-		goto cmdline_not_changed;
-	    else if (res == GOTO_NORMAL_MODE)
-		goto returncmd;		// back to cmd mode
-	    goto cmdline_changed;
+	    ఒకవేళ (res == CMDLINE_NOT_మారింది)
+		వెళ్ళు cmdline_not_మారింది;
+	    లేకపోతే ఒకవేళ (res == GOTO_సాధారణ_బహుళకం)
+		వెళ్ళు returncmd;		// back to cmd mode
+	    వెళ్ళు cmdline_మారింది;
 
-	case K_INS:
-	case K_KINS:
+	స్థితి K_INS:
+	స్థితి K_KINS:
 		ccline.overstrike = !ccline.overstrike;
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
 		ui_cursor_shape();	// may show different cursor shape
-#endif
+#అయితే_ముగింపు
 		may_trigger_modechanged();
-		status_redraw_curbuf();
+		స్థితి_redraw_curbuf();
 		redraw_statuslines();
-		goto cmdline_not_changed;
+		వెళ్ళు cmdline_not_మారింది;
 
-	case Ctrl_HAT:
+	స్థితి Ctrl_HAT:
 		cmdline_toggle_langmap(
-				    buf_valid(b_im_ptr_buf) ? b_im_ptr : NULL);
-		goto cmdline_not_changed;
+				    buf_valid(b_im_ptr_buf) ? b_im_ptr : ఖాళీ);
+		వెళ్ళు cmdline_not_మారింది;
 
 //	case '@':   only in very old vi
-	case Ctrl_U:
+	స్థితి Ctrl_U:
 		// delete all characters left of the cursor
 		j = ccline.cmdpos;
 		ccline.cmdlen -= j;
 		i = ccline.cmdpos = 0;
-		while (i < ccline.cmdlen)
+		అయితే (i < ccline.cmdlen)
 		    ccline.cmdbuff[i++] = ccline.cmdbuff[j++];
 		// Truncate at the end, required for multi-byte chars.
 		ccline.cmdbuff[ccline.cmdlen] = NUL;
-#ifdef FEAT_SEARCH_EXTRA
-		if (ccline.cmdlen == 0)
-		    is_state.search_start = is_state.save_cursor;
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+		ఒకవేళ (ccline.cmdlen == 0)
+		    is_state.శోధన_ప్రారంభం_2 = is_state.save_cursor;
+#అయితే_ముగింపు
 		redrawcmd();
-		goto cmdline_changed;
+		వెళ్ళు cmdline_మారింది;
 
-#ifdef FEAT_CLIPBOARD
-	case Ctrl_Y:
+#నిర్వచితమైతే FEAT_CLIPBOARD
+	స్థితి Ctrl_Y:
 		// Copy the modeless selection, if there is one.
-		if (clip_star.state != SELECT_CLEARED)
+		ఒకవేళ (clip_నక్షత్రం.state != SELECT_CLEARED)
 		{
-		    if (clip_star.state == SELECT_DONE)
+		    ఒకవేళ (clip_నక్షత్రం.state == SELECT_పూర్తి)
 			clip_copy_modeless_selection(TRUE);
-		    goto cmdline_not_changed;
+		    వెళ్ళు cmdline_not_మారింది;
 		}
-		break;
-#endif
+		ఆపు;
+#అయితే_ముగింపు
 
-	case ESC:	// get here if p_wc != ESC or when ESC typed twice
-	case Ctrl_C:
+	స్థితి ESC:	// get here if p_wc != ESC or when ESC typed twice
+	స్థితి Ctrl_C:
 		// In exmode it doesn't make sense to return.  Except when
 		// ":normal" runs out of characters.
-		if (exmode_active
-			       && (ex_normal_busy == 0 || typebuf.tb_len > 0))
-		    goto cmdline_not_changed;
+		ఒకవేళ (exmode_చురుకైన
+			       && (ex_సాధారణ_busy == 0 || typebuf.tb_len > 0))
+		    వెళ్ళు cmdline_not_మారింది;
 
 		gotesc = TRUE;		// will free ccline.cmdbuff after
 					// putting it in history
-		goto returncmd;		// back to cmd mode
+		వెళ్ళు returncmd;		// back to cmd mode
 
-	case Ctrl_R:			// insert register
-		res = cmdline_insert_reg(&gotesc);
-		if (res == GOTO_NORMAL_MODE)
-		    goto returncmd;
-		if (res == CMDLINE_CHANGED)
-		    goto cmdline_changed;
-		goto cmdline_not_changed;
+	స్థితి Ctrl_R:			// insert register
+		res = cmdline_చొప్పించు_reg(&gotesc);
+		ఒకవేళ (res == GOTO_సాధారణ_బహుళకం)
+		    వెళ్ళు returncmd;
+		ఒకవేళ (res == CMDLINE_మారింది)
+		    వెళ్ళు cmdline_మారింది;
+		వెళ్ళు cmdline_not_మారింది;
 
-	case Ctrl_D:
-		if (showmatches(&xpc, FALSE, TRUE, p_wmnu ? wim_flags[0] : 0)
+	స్థితి Ctrl_D:
+		ఒకవేళ (showmatches(&xpc, FALSE, TRUE, p_wmnu ? wim_flags[0] : 0)
 			== EXPAND_NOTHING)
-		    break;	// Use ^D as normal char instead
+		    ఆపు;	// Use ^D as normal char instead
 
 		redrawcmd();
-		continue;	// don't do incremental search now
+		కొనసాగు;	// don't do incremental search now
 
-	case K_RIGHT:
-	case K_S_RIGHT:
-	case K_C_RIGHT:
-		do
+	స్థితి K_కుడి:
+	స్థితి K_S_కుడి:
+	స్థితి K_C_కుడి:
+		చేయి
 		{
-		    if (ccline.cmdpos >= ccline.cmdlen)
-			break;
+		    ఒకవేళ (ccline.cmdpos >= ccline.cmdlen)
+			ఆపు;
 		    i = cmdline_charsize(ccline.cmdpos);
-		    if (KeyTyped && ccline.cmdspos + i >= cmdline_width * Rows)
-			break;
+		    ఒకవేళ (కీలకం_Typed && ccline.cmdspos + i >= cmdline_వెడల్పు * అడ్డువరుసలు)
+			ఆపు;
 		    ccline.cmdspos += i;
-		    if (has_mbyte)
+		    ఒకవేళ (has_mbyte)
 			ccline.cmdpos += (*mb_ptr2len)(ccline.cmdbuff
 							     + ccline.cmdpos);
-		    else
+		    లేకపోతే
 			++ccline.cmdpos;
 		}
-		while ((c == K_S_RIGHT || c == K_C_RIGHT
-			       || (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL)))
+		అయితే ((c == K_S_కుడి || c == K_C_కుడి
+			       || (mod_ముసుగు & (MOD_ముసుగు_జరుపు|MOD_ముసుగు_CTRL)))
 			&& ccline.cmdbuff[ccline.cmdpos] != ' ');
-		if (has_mbyte)
-		    set_cmdspos_cursor();
-		goto cmdline_not_changed;
+		ఒకవేళ (has_mbyte)
+		    సమితి_cmdspos_cursor();
+		వెళ్ళు cmdline_not_మారింది;
 
-	case K_LEFT:
-	case K_S_LEFT:
-	case K_C_LEFT:
-		if (ccline.cmdpos == 0)
-		    goto cmdline_not_changed;
-		do
+	స్థితి K_ఎడమ:
+	స్థితి K_S_ఎడమ:
+	స్థితి K_C_ఎడమ:
+		ఒకవేళ (ccline.cmdpos == 0)
+		    వెళ్ళు cmdline_not_మారింది;
+		చేయి
 		{
 		    --ccline.cmdpos;
-		    if (has_mbyte)	// move to first byte of char
-			ccline.cmdpos -= (*mb_head_off)(ccline.cmdbuff,
+		    ఒకవేళ (has_mbyte)	// move to first byte of char
+			ccline.cmdpos -= (*mb_తల_off)(ccline.cmdbuff,
 					      ccline.cmdbuff + ccline.cmdpos);
 		    ccline.cmdspos -= cmdline_charsize(ccline.cmdpos);
 		}
-		while (ccline.cmdpos > 0
-			&& (c == K_S_LEFT || c == K_C_LEFT
-			       || (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL)))
+		అయితే (ccline.cmdpos > 0
+			&& (c == K_S_ఎడమ || c == K_C_ఎడమ
+			       || (mod_ముసుగు & (MOD_ముసుగు_జరుపు|MOD_ముసుగు_CTRL)))
 			&& ccline.cmdbuff[ccline.cmdpos - 1] != ' ');
-		if (has_mbyte)
-		    set_cmdspos_cursor();
-		goto cmdline_not_changed;
+		ఒకవేళ (has_mbyte)
+		    సమితి_cmdspos_cursor();
+		వెళ్ళు cmdline_not_మారింది;
 
-	case K_IGNORE:
+	స్థితి K_IGNORE:
 		// Ignore mouse event or open_cmdwin() result.
-		goto cmdline_not_changed;
+		వెళ్ళు cmdline_not_మారింది;
 
-#ifdef FEAT_GUI_MSWIN
+#నిర్వచితమైతే FEAT_GUI_MSWIN
 	    // On MS-Windows ignore <M-F4>, we get it when closing the window
 	    // was cancelled.
-	case K_F4:
-	    if (mod_mask == MOD_MASK_ALT)
+	స్థితి K_F4:
+	    ఒకవేళ (mod_ముసుగు == MOD_ముసుగు_ALT)
 	    {
 		redrawcmd();	    // somehow the cmdline is cleared
-		goto cmdline_not_changed;
+		వెళ్ళు cmdline_not_మారింది;
 	    }
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-		goto cmdline_not_changed;	// Ignore mouse
+	స్థితి K_MIDDLEDRAG:
+	స్థితి K_MIDDLERELEASE:
+		వెళ్ళు cmdline_not_మారింది;	// Ignore mouse
 
-	case K_MIDDLEMOUSE:
-#ifdef FEAT_GUI
+	స్థితి K_MIDDLEMOUSE:
+#నిర్వచితమైతే FEAT_GUI
 		// When GUI is active, also paste when 'mouse' is empty
-		if (!gui.in_use)
-#endif
-		    if (!mouse_has(MOUSE_COMMAND))
-			goto cmdline_not_changed;   // Ignore mouse
-#ifdef FEAT_CLIPBOARD
-		if (clip_star.available)
+		ఒకవేళ (!gui.లోపల_use)
+#అయితే_ముగింపు
+		    ఒకవేళ (!mouse_has(MOUSE_COMMAND))
+			వెళ్ళు cmdline_not_మారింది;   // Ignore mouse
+#నిర్వచితమైతే FEAT_CLIPBOARD
+		ఒకవేళ (clip_నక్షత్రం.అందుబాటు)
 		    cmdline_paste('*', TRUE, TRUE);
-		else
-#endif
+		లేకపోతే
+#అయితే_ముగింపు
 		    cmdline_paste(0, TRUE, TRUE);
 		redrawcmd();
-		goto cmdline_changed;
+		వెళ్ళు cmdline_మారింది;
 
-#ifdef FEAT_DND
-	case K_DROP:
+#నిర్వచితమైతే FEAT_DND
+	స్థితి K_DROP:
 		cmdline_paste('~', TRUE, FALSE);
 		redrawcmd();
-		goto cmdline_changed;
-#endif
+		వెళ్ళు cmdline_మారింది;
+#అయితే_ముగింపు
 
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	స్థితి K_LEFTDRAG:
+	స్థితి K_LEFTRELEASE:
+	స్థితి K_RIGHTDRAG:
+	స్థితి K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
-		    goto cmdline_not_changed;
+		ఒకవేళ (ignore_drag_release)
+		    వెళ్ళు cmdline_not_మారింది;
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
-		cmdline_left_right_mouse(c, &ignore_drag_release);
-		goto cmdline_not_changed;
+	స్థితి K_LEFTMOUSE:
+	స్థితి K_RIGHTMOUSE:
+		cmdline_ఎడమ_కుడి_mouse(c, &ignore_drag_release);
+		వెళ్ళు cmdline_not_మారింది;
 
 	// Mouse scroll wheel: scroll the completion info popup when the mouse
 	// is on top of it, otherwise ignored here.
-	case K_MOUSEDOWN:
-	case K_MOUSEUP:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
-#ifdef FEAT_PROP_POPUP
-		if (cmdline_pum_active())
-		    cmdline_mousescroll(c == K_MOUSEDOWN ? MSCR_DOWN
-				      : c == K_MOUSEUP ? MSCR_UP
-				      : c == K_MOUSELEFT ? MSCR_LEFT
-				      : MSCR_RIGHT);
-#endif
-		goto cmdline_not_changed;
+	స్థితి K_MOUSEDOWN:
+	స్థితి K_MOUSEUP:
+	స్థితి K_MOUSELEFT:
+	స్థితి K_MOUSERIGHT:
+#నిర్వచితమైతే FEAT_PROP_POPUP
+		ఒకవేళ (cmdline_pum_చురుకైన())
+		    cmdline_mousescroll(c == K_MOUSEDOWN ? MSCR_కిందికి
+				      : c == K_MOUSEUP ? MSCR_పైకి
+				      : c == K_MOUSELEFT ? MSCR_ఎడమ
+				      : MSCR_కుడి);
+#అయితే_ముగింపు
+		వెళ్ళు cmdline_not_మారింది;
 
 	// Alternate buttons ignored here
-	case K_X1MOUSE:
-	case K_X1DRAG:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2DRAG:
-	case K_X2RELEASE:
-	case K_MOUSEMOVE:
-		goto cmdline_not_changed;
+	స్థితి K_X1MOUSE:
+	స్థితి K_X1DRAG:
+	స్థితి K_X1RELEASE:
+	స్థితి K_X2MOUSE:
+	స్థితి K_X2DRAG:
+	స్థితి K_X2RELEASE:
+	స్థితి K_MOUSEMOVE:
+		వెళ్ళు cmdline_not_మారింది;
 
-#ifdef FEAT_GUI
-	case K_LEFTMOUSE_NM:	// mousefocus click, ignored
-	case K_LEFTRELEASE_NM:
-		goto cmdline_not_changed;
+#నిర్వచితమైతే FEAT_GUI
+	స్థితి K_LEFTMOUSE_NM:	// mousefocus click, ignored
+	స్థితి K_LEFTRELEASE_NM:
+		వెళ్ళు cmdline_not_మారింది;
 
-	case K_VER_SCROLLBAR:
-		if (msg_scrolled == 0)
+	స్థితి K_VER_SCROLLBAR:
+		ఒకవేళ (సందేశం_scrolled == 0)
 		{
 		    gui_do_scroll();
 		    redrawcmd();
 		}
-		goto cmdline_not_changed;
+		వెళ్ళు cmdline_not_మారింది;
 
-	case K_HOR_SCROLLBAR:
-		if (msg_scrolled == 0)
+	స్థితి K_HOR_SCROLLBAR:
+		ఒకవేళ (సందేశం_scrolled == 0)
 		{
-		    do_mousescroll_horiz(scrollbar_value);
+		    do_mousescroll_horiz(scrollbar_విలువ);
 		    redrawcmd();
 		}
-		goto cmdline_not_changed;
-#endif
-#ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:
-	case K_TABMENU:
+		వెళ్ళు cmdline_not_మారింది;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_GUI_TABLINE
+	స్థితి K_TABLINE:
+	స్థితి K_TABMENU:
 		// Don't want to change any tabs here.  Make sure the same tab
 		// is still selected.
-		if (gui_use_tabline())
-		    gui_mch_set_curtab(tabpage_index(curtab));
-		goto cmdline_not_changed;
-#endif
+		ఒకవేళ (gui_use_tabline())
+		    gui_mch_సమితి_curtab(tabpage_సూచీ(curtab));
+		వెళ్ళు cmdline_not_మారింది;
+#అయితే_ముగింపు
 
-	case K_SELECT:	    // end of Select mode mapping - ignore
-		goto cmdline_not_changed;
+	స్థితి K_SELECT:	    // end of Select mode mapping - ignore
+		వెళ్ళు cmdline_not_మారింది;
 
-	case Ctrl_B:	    // begin of command line
-	case K_HOME:
-	case K_KHOME:
-	case K_S_HOME:
-	case K_C_HOME:
+	స్థితి Ctrl_B:	    // begin of command line
+	స్థితి K_HOME:
+	స్థితి K_KHOME:
+	స్థితి K_S_HOME:
+	స్థితి K_C_HOME:
 		ccline.cmdpos = 0;
-		set_cmdspos();
-		goto cmdline_not_changed;
+		సమితి_cmdspos();
+		వెళ్ళు cmdline_not_మారింది;
 
-	case Ctrl_E:	    // end of command line
-	case K_END:
-	case K_KEND:
-	case K_S_END:
-	case K_C_END:
+	స్థితి Ctrl_E:	    // end of command line
+	స్థితి K_చివర:
+	స్థితి K_KEND:
+	స్థితి K_S_చివర:
+	స్థితి K_C_చివర:
 		ccline.cmdpos = ccline.cmdlen;
-		set_cmdspos_cursor();
-		goto cmdline_not_changed;
+		సమితి_cmdspos_cursor();
+		వెళ్ళు cmdline_not_మారింది;
 
-	case Ctrl_A:	    // all matches
-		if (cmdline_pum_active())
+	స్థితి Ctrl_A:	    // all matches
+		ఒకవేళ (cmdline_pum_చురుకైన())
 		    // As Ctrl-A completes all the matches, close the popup
 		    // menu (if present)
 		    cmdline_pum_cleanup(&ccline);
 
-		if (nextwild(&xpc, WILD_ALL, 0, firstc != '@') == FAIL)
-		    break;
+		ఒకవేళ (nextwild(&xpc, WILD_ALL, 0, firstc != '@') == FAIL)
+		    ఆపు;
 		xpc.xp_context = EXPAND_NOTHING;
 		did_wild_list = FALSE;
-		goto cmdline_changed;
+		వెళ్ళు cmdline_మారింది;
 
-	case Ctrl_L:
-#ifdef FEAT_SEARCH_EXTRA
-		if (may_add_char_to_search(firstc, &c, &is_state) == OK)
-		    goto cmdline_not_changed;
-#endif
+	స్థితి Ctrl_L:
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+		ఒకవేళ (may_కూడు_char_గమ్యం_శోధన(firstc, &c, &is_state) == OK)
+		    వెళ్ళు cmdline_not_మారింది;
+#అయితే_ముగింపు
 
 		// completion: longest common part
-		if (nextwild(&xpc, WILD_LONGEST, 0, firstc != '@') == FAIL)
-		    break;
-		goto cmdline_changed;
+		ఒకవేళ (nextwild(&xpc, WILD_LONGEST, 0, firstc != '@') == FAIL)
+		    ఆపు;
+		వెళ్ళు cmdline_మారింది;
 
-	case Ctrl_N:	    // next match
-	case Ctrl_P:	    // previous match
-#ifdef FEAT_PROP_POPUP
+	స్థితి Ctrl_N:	    // next match
+	స్థితి Ctrl_P:	    // previous match
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// CTRL-SHIFT-P/N scroll the info popup one line.
-		if (cmdline_pum_active() && (mod_mask & MOD_MASK_SHIFT))
+		ఒకవేళ (cmdline_pum_చురుకైన() && (mod_ముసుగు & MOD_ముసుగు_జరుపు))
 		{
-		    if (popup_scroll_info(c == Ctrl_P ? -1 : 1, false))
+		    ఒకవేళ (popup_scroll_info(c == Ctrl_P ? -1 : 1, false))
 			cmdline_pum_display();
-		    goto cmdline_not_changed;
+		    వెళ్ళు cmdline_not_మారింది;
 		}
-#endif
-		if (xpc.xp_numfiles > 0)
+#అయితే_ముగింపు
+		ఒకవేళ (xpc.xp_numfiles > 0)
 		{
-		    wild_type = (c == Ctrl_P) ? WILD_PREV : WILD_NEXT;
-		    if (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
-			break;
-		    goto cmdline_changed;
+		    wild_type = (c == Ctrl_P) ? WILD_PREV : WILD_తదుపరి;
+		    ఒకవేళ (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
+			ఆపు;
+		    వెళ్ళు cmdline_మారింది;
 		}
 		// FALLTHROUGH
-	case K_UP:
-	case K_DOWN:
-	case K_S_UP:
-	case K_S_DOWN:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-#ifdef FEAT_PROP_POPUP
+	స్థితి K_పైకి:
+	స్థితి K_కిందికి:
+	స్థితి K_S_పైకి:
+	స్థితి K_S_కిందికి:
+	స్థితి K_PAGEUP:
+	స్థితి K_KPAGEUP:
+	స్థితి K_PAGEDOWN:
+	స్థితి K_KPAGEDOWN:
+#నిర్వచితమైతే FEAT_PROP_POPUP
 		// CTRL-SHIFT-<Up>/<Down> scroll the info popup a line,
 		// CTRL-SHIFT-<PageUp>/<PageDown> a page.  Shift is folded into
 		// K_S_UP/K_S_DOWN but stays in mod_mask for the Page keys.
-		if (cmdline_pum_active()
-			&& ((c == K_S_UP || c == K_S_DOWN)
-			    ? (mod_mask & MOD_MASK_CTRL)
+		ఒకవేళ (cmdline_pum_చురుకైన()
+			&& ((c == K_S_పైకి || c == K_S_కిందికి)
+			    ? (mod_ముసుగు & MOD_ముసుగు_CTRL)
 			    : ((c == K_PAGEUP || c == K_KPAGEUP
 				    || c == K_PAGEDOWN || c == K_KPAGEDOWN)
-				&& (mod_mask & MOD_MASK_CTRL)
-				&& (mod_mask & MOD_MASK_SHIFT))))
+				&& (mod_ముసుగు & MOD_ముసుగు_CTRL)
+				&& (mod_ముసుగు & MOD_ముసుగు_జరుపు))))
 		{
-		    int	up = c == K_S_UP || c == K_PAGEUP
+		    పూర్ణాంకం	పైకి = c == K_S_పైకి || c == K_PAGEUP
 							|| c == K_KPAGEUP;
 
-		    if (popup_scroll_info(up ? -1 : 1,
-					     c != K_S_UP && c != K_S_DOWN))
+		    ఒకవేళ (popup_scroll_info(పైకి ? -1 : 1,
+					     c != K_S_పైకి && c != K_S_కిందికి))
 			cmdline_pum_display();
-		    goto cmdline_not_changed;
+		    వెళ్ళు cmdline_not_మారింది;
 		}
-#endif
-		if (cmdline_pum_active()
+#అయితే_ముగింపు
+		ఒకవేళ (cmdline_pum_చురుకైన()
 			&& (c == K_PAGEUP || c == K_PAGEDOWN ||
 			    c == K_KPAGEUP || c == K_KPAGEDOWN))
 		{
 		    // If the popup menu is displayed, then PageUp and PageDown
 		    // are used to scroll the menu.
 		    wild_type = WILD_PAGEUP;
-		    if (c == K_PAGEDOWN || c == K_KPAGEDOWN)
+		    ఒకవేళ (c == K_PAGEDOWN || c == K_KPAGEDOWN)
 			wild_type = WILD_PAGEDOWN;
-		    if (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
-			break;
-		    goto cmdline_changed;
+		    ఒకవేళ (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
+			ఆపు;
+		    వెళ్ళు cmdline_మారింది;
 		}
-		else
+		లేకపోతే
 		{
 		    res = cmdline_browse_history(c, firstc, &lookfor, &lookforlen, histype,
 			    &hiscnt, &xpc);
-		    if (res == CMDLINE_CHANGED)
+		    ఒకవేళ (res == CMDLINE_మారింది)
 		    {
 			did_hist_navigate = TRUE;
-			goto cmdline_changed;
+			వెళ్ళు cmdline_మారింది;
 		    }
-		    else if (res == GOTO_NORMAL_MODE)
-			goto returncmd;
+		    లేకపోతే ఒకవేళ (res == GOTO_సాధారణ_బహుళకం)
+			వెళ్ళు returncmd;
 		}
-		goto cmdline_not_changed;
+		వెళ్ళు cmdline_not_మారింది;
 
-#ifdef FEAT_SEARCH_EXTRA
-	case Ctrl_G:	    // next match
-	case Ctrl_T:	    // previous match
-		if (may_adjust_incsearch_highlighting(
-					  firstc, count, &is_state, c) == FAIL)
-		    goto cmdline_not_changed;
-		break;
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+	స్థితి Ctrl_G:	    // next match
+	స్థితి Ctrl_T:	    // previous match
+		ఒకవేళ (may_adjust_incsearch_highlighting(
+					  firstc, లెక్క, &is_state, c) == FAIL)
+		    వెళ్ళు cmdline_not_మారింది;
+		ఆపు;
+#అయితే_ముగింపు
 
-	case Ctrl_V:
-	case Ctrl_Q:
+	స్థితి Ctrl_V:
+	స్థితి Ctrl_Q:
 		{
 		    ignore_drag_release = TRUE;
 		    putcmdline('^', TRUE);
@@ -2619,24 +2619,24 @@ getcmdline_int(
 		    // Get next (two) character(s).  Do not change any
 		    // modifyOtherKeys ESC sequence to a normal key for
 		    // CTRL-SHIFT-V.
-		    c = get_literal(mod_mask & MOD_MASK_SHIFT);
+		    c = get_literal(mod_ముసుగు & MOD_ముసుగు_జరుపు);
 
 		    do_abbr = FALSE;	    // don't do abbreviation now
 		    extra_char = NUL;
 		    // may need to remove ^ when composing char was typed
-		    if (enc_utf8 && utf_iscomposing(c) && !cmd_silent)
+		    ఒకవేళ (enc_utf8 && utf_iscomposing(c) && !cmd_silent)
 		    {
 			draw_cmdline(ccline.cmdpos,
 						ccline.cmdlen - ccline.cmdpos);
-			msg_putchar(' ');
+			సందేశం_putchar(' ');
 			cursorcmd();
 		    }
 		}
 
-		break;
+		ఆపు;
 
-#ifdef FEAT_DIGRAPHS
-	case Ctrl_K:
+#నిర్వచితమైతే FEAT_DIGRAPHS
+	స్థితి Ctrl_K:
 		ignore_drag_release = TRUE;
 		putcmdline('?', TRUE);
 # ifdef USE_ON_FLY_SCROLL
@@ -2644,76 +2644,76 @@ getcmdline_int(
 # endif
 		c = get_digraph(TRUE);
 		extra_char = NUL;
-		if (c != NUL)
-		    break;
+		ఒకవేళ (c != NUL)
+		    ఆపు;
 
 		redrawcmd();
-		goto cmdline_not_changed;
-#endif // FEAT_DIGRAPHS
+		వెళ్ళు cmdline_not_మారింది;
+#అయితే_ముగింపు // FEAT_DIGRAPHS
 
-#ifdef FEAT_RIGHTLEFT
-	case Ctrl__:	    // CTRL-_: switch language mode
-		if (!p_ari)
-		    break;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	స్థితి Ctrl__:	    // CTRL-_: switch language mode
+		ఒకవేళ (!p_ari)
+		    ఆపు;
 		cmd_hkmap = !cmd_hkmap;
-		goto cmdline_not_changed;
-#endif
+		వెళ్ళు cmdline_not_మారింది;
+#అయితే_ముగింపు
 
-	case K_PS:
-		bracketed_paste(PASTE_CMDLINE, FALSE, NULL);
-		goto cmdline_changed;
+	స్థితి K_PS:
+		bracketed_paste(PASTE_CMDLINE, FALSE, ఖాళీ);
+		వెళ్ళు cmdline_మారింది;
 
-	default:
-#ifdef UNIX
-		if (c == intr_char)
+	అప్రమేయ:
+#నిర్వచితమైతే UNIX
+		ఒకవేళ (c == intr_char)
 		{
 		    gotesc = TRUE;	// will free ccline.cmdbuff after
 					// putting it in history
-		    goto returncmd;	// back to Normal mode
+		    వెళ్ళు returncmd;	// back to Normal mode
 		}
-#endif
+#అయితే_ముగింపు
 		/*
 		 * Normal character with no special meaning.  Just set mod_mask
 		 * to 0x0 so that typing Shift-Space in the GUI doesn't enter
 		 * the string <S-Space>.  This should only happen after ^V.
 		 */
-		if (!IS_SPECIAL(c))
-		    mod_mask = 0x0;
-		break;
+		ఒకవేళ (!IS_SPECIAL(c))
+		    mod_ముసుగు = 0x0;
+		ఆపు;
 	}
 	/*
 	 * End of switch on command line character.
 	 * We come here if we have a normal character.
 	 */
 
-	if (do_abbr && (IS_SPECIAL(c) || !vim_iswordc(c))
+	ఒకవేళ (do_abbr && (IS_SPECIAL(c) || !vim_iswordc(c))
 		&& (ccheck_abbr(
 			// Add ABBR_OFF for characters above 0x100, this is
 			// what check_abbr() expects.
 				(has_mbyte && c >= 0x100) ? (c + ABBR_OFF) : c)
 		    || c == Ctrl_RSB))
-	    goto cmdline_changed;
+	    వెళ్ళు cmdline_మారింది;
 
 	/*
 	 * put the character in the command line
 	 */
-	if (IS_SPECIAL(c) || mod_mask != 0)
-	    put_on_cmdline(get_special_key_name(c, mod_mask), -1, TRUE);
-	else
+	ఒకవేళ (IS_SPECIAL(c) || mod_ముసుగు != 0)
+	    put_on_cmdline(get_special_కీలకం_name(c, mod_ముసుగు), -1, TRUE);
+	లేకపోతే
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		j = (*mb_char2bytes)(c, IObuff);
 		IObuff[j] = NUL;	// exclude composing chars
 		put_on_cmdline(IObuff, j, TRUE);
 	    }
-	    else
+	    లేకపోతే
 	    {
 		IObuff[0] = c;
 		put_on_cmdline(IObuff, 1, TRUE);
 	    }
 	}
-	goto cmdline_changed;
+	వెళ్ళు cmdline_మారింది;
 
 /*
  * This part implements incremental searches for "/" and "?"
@@ -2723,50 +2723,50 @@ getcmdline_int(
  * Jump to cmdline_changed when the command line did change.
  * (Sorry for the goto's, I know it is ugly).
  */
-cmdline_not_changed:
+cmdline_not_మారింది:
 	// Trigger CursorMovedC autocommands.
-	if (ccline.cmdpos != prev_cmdpos)
+	ఒకవేళ (ccline.cmdpos != prev_cmdpos)
 	{
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CURSORMOVEDC);
 	    prev_cmdpos = ccline.cmdpos;
 	}
 
-#ifdef FEAT_SEARCH_EXTRA
-	if (!is_state.incsearch_postponed)
-	    continue;
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+	ఒకవేళ (!is_state.incsearch_postponed)
+	    కొనసాగు;
+#అయితే_ముగింపు
 
-cmdline_changed:
-#ifdef FEAT_SEARCH_EXTRA
+cmdline_మారింది:
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
 	// If the window changed incremental search state is not valid.
-	if (is_state.winid != curwin->w_id)
+	ఒకవేళ (is_state.winid != curwin->w_id)
 	    init_incsearch_state(&is_state);
-	if (xpc.xp_context == EXPAND_NOTHING && (KeyTyped || vpeekc() == NUL))
-	    may_do_incsearch_highlighting(firstc, count, &is_state);
-#endif
+	ఒకవేళ (xpc.xp_context == EXPAND_NOTHING && (కీలకం_Typed || vpeekc() == NUL))
+	    may_do_incsearch_highlighting(firstc, లెక్క, &is_state);
+#అయితే_ముగింపు
 	// Trigger CmdlineChanged autocommands.
-	if (trigger_cmdlinechanged
+	ఒకవేళ (trigger_cmdlinechanged
 		&& (ccline.cmdpos != prev_cmdpos
-		    || (prev_cmdbuff != NULL &&
+		    || (prev_cmdbuff != ఖాళీ &&
 			STRCMP(prev_cmdbuff, ccline.cmdbuff) != 0)))
 	{
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINECHANGED);
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	    // Show popup updates from the autocmd without a manual :redraw.
-	    if (popup_need_redraw())
+	    ఒకవేళ (popup_need_redraw())
 	    {
 		update_screen(0);
 		redrawcmd();
 	    }
-#endif
+#అయితే_ముగింపు
 	}
 
 	// Trigger CursorMovedC autocommands.
-	if (ccline.cmdpos != prev_cmdpos)
+	ఒకవేళ (ccline.cmdpos != prev_cmdpos)
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CURSORMOVEDC);
 
-#ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+	ఒకవేళ (cmdmsg_rl
 # ifdef FEAT_ARABIC
 		|| (p_arshape && !p_tbidi
 				       && cmdline_has_arabic(0, ccline.cmdlen))
@@ -2776,60 +2776,60 @@ cmdline_changed:
 	    // right-left typing.  Not efficient, but it works.
 	    // Do it only when there are no characters left to read
 	    // to avoid useless intermediate redraws.
-	    if (vpeekc() == NUL)
+	    ఒకవేళ (vpeekc() == NUL)
 		redrawcmd();
-#endif
+#అయితే_ముగింపు
     }
 
 returncmd:
     // Trigger CmdlineLeavePre autocommands if not already triggered.
-    if (!event_cmdlineleavepre_triggered)
+    ఒకవేళ (!event_cmdlineleavepre_triggered)
     {
-#ifdef FEAT_EVAL
-	set_vim_var_char(c);  // Set v:char
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+	సమితి_vim_var_char(c);  // Set v:char
+#అయితే_ముగింపు
 	trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINELEAVEPRE);
     }
 
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     cmdmsg_rl = FALSE;
-#endif
+#అయితే_ముగింపు
 
     // We could have reached here without having a chance to clean up wild menu
     // if certain special keys like <Esc> or <C-\> were used as wildchar. Make
     // sure to still clean up to avoid memory corruption.
-    if (cmdline_pum_active())
+    ఒకవేళ (cmdline_pum_చురుకైన())
 	cmdline_pum_remove(&ccline, FALSE);
     wildmenu_cleanup(&ccline);
     did_wild_list = FALSE;
-    wim_index = 0;
+    wim_సూచీ = 0;
 
     ExpandCleanup(&xpc);
-    ccline.xpc = NULL;
+    ccline.xpc = ఖాళీ;
     clear_cmdline_orig();
 
-#ifdef FEAT_SEARCH_EXTRA
-    finish_incsearch_highlighting(gotesc, &is_state, FALSE);
-#endif
+#నిర్వచితమైతే FEAT_శోధన_EXTRA
+    ముగింపు_incsearch_highlighting(gotesc, &is_state, FALSE);
+#అయితే_ముగింపు
 
-    if (ccline.cmdbuff != NULL)
+    ఒకవేళ (ccline.cmdbuff != ఖాళీ)
     {
 	/*
 	 * Put line in history buffer (":" and "=" only when it was typed).
 	 */
-	if (ccline.cmdlen && firstc != NUL
-		&& (some_key_typed || histype == HIST_SEARCH))
+	ఒకవేళ (ccline.cmdlen && firstc != NUL
+		&& (some_కీలకం_typed || histype == HIST_శోధన))
 	{
-	    add_to_history(histype, ccline.cmdbuff, ccline.cmdlen, TRUE,
-				       histype == HIST_SEARCH ? firstc : NUL);
-	    if (firstc == ':')
+	    కూడు_గమ్యం_history(histype, ccline.cmdbuff, ccline.cmdlen, TRUE,
+				       histype == HIST_శోధన ? firstc : NUL);
+	    ఒకవేళ (firstc == ':')
 	    {
-		vim_free(new_last_cmdline);
-		new_last_cmdline = vim_strnsave(ccline.cmdbuff, ccline.cmdlen);
+		vim_free(new_చివరి_cmdline);
+		new_చివరి_cmdline = vim_strnsave(ccline.cmdbuff, ccline.cmdlen);
 	    }
 	}
 
-	if (gotesc)
+	ఒకవేళ (gotesc)
 	    abandon_cmdline();
     }
 
@@ -2838,55 +2838,55 @@ returncmd:
      * If the line is too long, clear it, so ruler and shown command do
      * not get printed in the middle of it.
      */
-    msg_check();
-    msg_scroll = save_msg_scroll;
+    సందేశం_check();
+    సందేశం_scroll = save_సందేశం_scroll;
     redir_off = FALSE;
 
     // When the command line was typed, no need for a wait-return prompt.
-    if (some_key_typed)
+    ఒకవేళ (some_కీలకం_typed)
 	need_wait_return = FALSE;
 
     // Trigger CmdlineLeave autocommands.
-#ifdef FEAT_EVAL
-    set_vim_var_char(c);  // Set v:char
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    సమితి_vim_var_char(c);  // Set v:char
+#అయితే_ముగింపు
     trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINELEAVE);
 
     State = save_State;
 
-#ifdef FEAT_EVAL
-    if (!debug_mode)
+#నిర్వచితమైతే FEAT_EVAL
+    ఒకవేళ (!debug_బహుళకం)
 	may_trigger_modechanged();
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_INPUT_METHOD
-    if (b_im_ptr != NULL && buf_valid(b_im_ptr_buf)
+#నిర్వచితమైతే HAVE_ఆదానం_పద్ధతి
+    ఒకవేళ (b_im_ptr != ఖాళీ && buf_valid(b_im_ptr_buf)
 						  && *b_im_ptr != B_IMODE_LMAP)
-	im_save_status(b_im_ptr);
-    im_set_active(FALSE);
-#endif
+	im_save_స్థితి(b_im_ptr);
+    im_సమితి_చురుకైన(FALSE);
+#అయితే_ముగింపు
     setmouse();
-#ifdef CURSOR_SHAPE
+#నిర్వచితమైతే CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
-    sb_text_end_cmdline();
+#అయితే_ముగింపు
+    sb_పాఠ్యం_చివర_cmdline();
 
 theend:
     {
 	char_u *p = ccline.cmdbuff;
 
-	--depth;
-	if (did_save_ccline)
+	--లోతు;
+	ఒకవేళ (did_save_ccline)
 	    restore_cmdline(&save_ccline);
-	else
-	    ccline.cmdbuff = NULL;
+	లేకపోతే
+	    ccline.cmdbuff = ఖాళీ;
 
 	vim_free(prev_cmdbuff);
-	return p;
+	తిరిగి p;
     }
 }
 
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 /*
  * Get a command line with a prompt.
  * This is prepared to be called recursively from getcmdline() (e.g. by
@@ -2895,108 +2895,108 @@ theend:
  */
     char_u *
 getcmdline_prompt(
-    int		firstc,
+    పూర్ణాంకం		firstc,
     char_u	*prompt,	// command line prompt
-    int		attr,		// attributes for prompt
-    int		xp_context,	// type of expansion
+    పూర్ణాంకం		attr,		// attributes for prompt
+    పూర్ణాంకం		xp_context,	// type of expansion
     char_u	*xp_arg)	// user-defined expansion argument
 {
     char_u		*s;
     cmdline_info_T	save_ccline;
-    int			did_save_ccline = FALSE;
-    int			msg_col_save = msg_col;
-    int			msg_silent_save = msg_silent;
+    పూర్ణాంకం			did_save_ccline = FALSE;
+    పూర్ణాంకం			సందేశం_నిలువు_save = సందేశం_నిలువు;
+    పూర్ణాంకం			సందేశం_silent_save = సందేశం_silent;
 
-    if (ccline.cmdbuff != NULL)
+    ఒకవేళ (ccline.cmdbuff != ఖాళీ)
     {
 	// Save the values of the current cmdline and restore them below.
 	save_cmdline(&save_ccline);
 	did_save_ccline = TRUE;
     }
 
-    CLEAR_FIELD(ccline);
+    CLEAR_క్షేత్రం(ccline);
     ccline.cmdprompt = prompt;
     ccline.cmdattr = attr;
 # ifdef FEAT_EVAL
     ccline.xp_context = xp_context;
     ccline.xp_arg = xp_arg;
-    ccline.input_fn = (firstc == '@');
+    ccline.ఆదానం_fn = (firstc == '@');
 # endif
-    msg_silent = 0;
+    సందేశం_silent = 0;
     s = getcmdline_int(firstc, 1L, 0, FALSE);
 
-    if (did_save_ccline)
+    ఒకవేళ (did_save_ccline)
 	restore_cmdline(&save_ccline);
 
-    msg_silent = msg_silent_save;
+    సందేశం_silent = సందేశం_silent_save;
     // Restore msg_col, the prompt from input() may have changed it.
     // But only if called recursively and the commandline is therefore being
     // restored to an old one; if not, the input() prompt stays on the screen,
     // so we need its modified msg_col left intact.
-    if (ccline.cmdbuff != NULL)
-	msg_col = msg_col_save;
+    ఒకవేళ (ccline.cmdbuff != ఖాళీ)
+	సందేశం_నిలువు = సందేశం_నిలువు_save;
 
-    return s;
+    తిరిగి s;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Read the 'wildmode' option, fill wim_flags[].
  */
-    int
-check_opt_wim(void)
+    పూర్ణాంకం
+check_opt_wim(శూన్య)
 {
     char_u	new_wim_flags[4];
     char_u	*p;
-    int		i;
-    int		idx = 0;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx = 0;
 
-    for (i = 0; i < 4; ++i)
+    కొరకు (i = 0; i < 4; ++i)
 	new_wim_flags[i] = 0;
 
-    for (p = p_wim; *p; ++p)
+    కొరకు (p = p_wim; *p; ++p)
     {
 	// Note: Keep this in sync with p_wim_values.
-	for (i = 0; ASCII_ISALPHA(p[i]); ++i)
+	కొరకు (i = 0; ASCII_ISALPHA(p[i]); ++i)
 	    ;
-	if (p[i] != NUL && p[i] != ',' && p[i] != ':')
-	    return FAIL;
-	if (i == 7 && STRNCMP(p, "longest", 7) == 0)
+	ఒకవేళ (p[i] != NUL && p[i] != ',' && p[i] != ':')
+	    తిరిగి FAIL;
+	ఒకవేళ (i == 7 && STRNCMP(p, "longest", 7) == 0)
 	    new_wim_flags[idx] |= WIM_LONGEST;
-	else if (i == 4 && STRNCMP(p, "full", 4) == 0)
-	    new_wim_flags[idx] |= WIM_FULL;
-	else if (i == 4 && STRNCMP(p, "list", 4) == 0)
+	లేకపోతే ఒకవేళ (i == 4 && STRNCMP(p, "full", 4) == 0)
+	    new_wim_flags[idx] |= WIM_నిండిన;
+	లేకపోతే ఒకవేళ (i == 4 && STRNCMP(p, "list", 4) == 0)
 	    new_wim_flags[idx] |= WIM_LIST;
-	else if (i == 8 && STRNCMP(p, "lastused", 8) == 0)
+	లేకపోతే ఒకవేళ (i == 8 && STRNCMP(p, "lastused", 8) == 0)
 	    new_wim_flags[idx] |= WIM_BUFLASTUSED;
-	else if (i == 8 && STRNCMP(p, "noselect", 8) == 0)
+	లేకపోతే ఒకవేళ (i == 8 && STRNCMP(p, "noselect", 8) == 0)
 	    new_wim_flags[idx] |= WIM_NOSELECT;
-	else if (i == 8 && STRNCMP(p, "noinsert", 8) == 0)
+	లేకపోతే ఒకవేళ (i == 8 && STRNCMP(p, "noinsert", 8) == 0)
 	    new_wim_flags[idx] |= WIM_NOINSERT;
-	else
-	    return FAIL;
+	లేకపోతే
+	    తిరిగి FAIL;
 	p += i;
-	if (*p == NUL)
-	    break;
-	if (*p == ',')
+	ఒకవేళ (*p == NUL)
+	    ఆపు;
+	ఒకవేళ (*p == ',')
 	{
-	    if (idx == 3)
-		return FAIL;
+	    ఒకవేళ (idx == 3)
+		తిరిగి FAIL;
 	    ++idx;
 	}
     }
 
     // fill remaining entries with last flag
-    while (idx < 3)
+    అయితే (idx < 3)
     {
 	new_wim_flags[idx + 1] = new_wim_flags[idx];
 	++idx;
     }
 
     // only when there are no errors, wim_flags[] is changed
-    for (i = 0; i < 4; ++i)
+    కొరకు (i = 0; i < 4; ++i)
 	wim_flags[i] = new_wim_flags[i];
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -3004,131 +3004,131 @@ check_opt_wim(void)
  * another window or buffer.  TRUE when editing the command line, evaluating
  * 'balloonexpr', etc.
  */
-    int
-text_locked(void)
+    పూర్ణాంకం
+పాఠ్యం_locked(శూన్య)
 {
-    if (cmdwin_type != 0)
-	return TRUE;
-    return textlock != 0;
+    ఒకవేళ (cmdwin_type != 0)
+	తిరిగి TRUE;
+    తిరిగి textlock != 0;
 }
 
 /*
  * Give an error message for a command that isn't allowed while the cmdline
  * window is open or editing the cmdline in another way.
  */
-    void
-text_locked_msg(void)
+    శూన్య
+పాఠ్యం_locked_సందేశం(శూన్య)
 {
-    emsg(_(get_text_locked_msg()));
+    emsg(_(get_పాఠ్యం_locked_సందేశం()));
 }
 
-    char *
-get_text_locked_msg(void)
+    అక్షరం *
+get_పాఠ్యం_locked_సందేశం(శూన్య)
 {
-    if (cmdwin_type != 0)
-	return e_invalid_in_cmdline_window;
-    return e_not_allowed_to_change_text_or_change_window;
+    ఒకవేళ (cmdwin_type != 0)
+	తిరిగి e_invalid_లోపల_cmdline_కిటికీ;
+    తిరిగి e_not_allowed_గమ్యం_change_పాఠ్యం_or_change_కిటికీ;
 }
 
 /*
  * Check for text, window or buffer locked.
  * Give an error message and return TRUE if something is locked.
  */
-    int
-text_or_buf_locked(void)
+    పూర్ణాంకం
+పాఠ్యం_or_buf_locked(శూన్య)
 {
-    if (text_locked())
+    ఒకవేళ (పాఠ్యం_locked())
     {
-	text_locked_msg();
-	return TRUE;
+	పాఠ్యం_locked_సందేశం();
+	తిరిగి TRUE;
     }
-    return curbuf_locked();
+    తిరిగి curbuf_locked();
 }
 
 /*
  * Check if "curbuf_lock" or "allbuf_lock" is set and return TRUE when it is
  * and give an error message.
  */
-    int
-curbuf_locked(void)
+    పూర్ణాంకం
+curbuf_locked(శూన్య)
 {
-    if (curbuf_lock > 0)
+    ఒకవేళ (curbuf_తాళం > 0)
     {
-	emsg(_(e_not_allowed_to_edit_another_buffer_now));
-	return TRUE;
+	emsg(_(e_not_allowed_గమ్యం_edit_another_బఫరు_now));
+	తిరిగి TRUE;
     }
-    return allbuf_locked();
+    తిరిగి allbuf_locked();
 }
 
 /*
  * Check if "allbuf_lock" is set and return TRUE when it is and give an error
  * message.
  */
-    int
-allbuf_locked(void)
+    పూర్ణాంకం
+allbuf_locked(శూన్య)
 {
-    if (allbuf_lock > 0)
+    ఒకవేళ (allbuf_తాళం > 0)
     {
-	emsg(_(e_not_allowed_to_change_buffer_information_now));
-	return TRUE;
+	emsg(_(e_not_allowed_గమ్యం_change_బఫరు_information_now));
+	తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    static int
-cmdline_charsize(int idx)
+    స్థిర పూర్ణాంకం
+cmdline_charsize(పూర్ణాంకం idx)
 {
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-    if (cmdline_star > 0)	    // showing '*', always 1 position
-	return 1;
-#endif
-    return ptr2cells(ccline.cmdbuff + idx);
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+    ఒకవేళ (cmdline_నక్షత్రం > 0)	    // showing '*', always 1 position
+	తిరిగి 1;
+#అయితే_ముగింపు
+    తిరిగి ptr2cells(ccline.cmdbuff + idx);
 }
 
 /*
  * Compute the offset of the cursor on the command line for the prompt and
  * indent.
  */
-    static void
-set_cmdspos(void)
+    స్థిర శూన్య
+సమితి_cmdspos(శూన్య)
 {
-    if (ccline.cmdfirstc != NUL)
+    ఒకవేళ (ccline.cmdfirstc != NUL)
 	ccline.cmdspos = 1 + ccline.cmdindent;
-    else
+    లేకపోతే
 	ccline.cmdspos = 0 + ccline.cmdindent;
 }
 
 /*
  * Compute the screen position for the cursor on the command line.
  */
-    static void
-set_cmdspos_cursor(void)
+    స్థిర శూన్య
+సమితి_cmdspos_cursor(శూన్య)
 {
-    int		i, m, c;
+    పూర్ణాంకం		i, m, c;
 
-    set_cmdspos();
-    if (KeyTyped)
+    సమితి_cmdspos();
+    ఒకవేళ (కీలకం_Typed)
     {
-	m = cmdline_width * Rows;
-	if (m < 0)	// overflow, cmdline_width or Rows at weird value
+	m = cmdline_వెడల్పు * అడ్డువరుసలు;
+	ఒకవేళ (m < 0)	// overflow, cmdline_width or Rows at weird value
 	    m = MAXCOL;
     }
-    else
+    లేకపోతే
 	m = MAXCOL;
-    for (i = 0; i < ccline.cmdlen && i < ccline.cmdpos; ++i)
+    కొరకు (i = 0; i < ccline.cmdlen && i < ccline.cmdpos; ++i)
     {
 	c = cmdline_charsize(i);
 	// Count ">" for double-wide multi-byte char that doesn't fit.
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    correct_cmdspos(i, c);
 	// If the cmdline doesn't fit, show cursor on last visible char.
 	// Don't move the cursor itself, so we can still append.
-	if ((ccline.cmdspos += c) >= m)
+	ఒకవేళ ((ccline.cmdspos += c) >= m)
 	{
 	    ccline.cmdspos -= c;
-	    break;
+	    ఆపు;
 	}
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    i += (*mb_ptr2len)(ccline.cmdbuff + i) - 1;
     }
 }
@@ -3137,12 +3137,12 @@ set_cmdspos_cursor(void)
  * Check if the character at "idx", which is "cells" wide, is a multi-byte
  * character that doesn't fit, so that a ">" must be displayed.
  */
-    static void
-correct_cmdspos(int idx, int cells)
+    స్థిర శూన్య
+correct_cmdspos(పూర్ణాంకం idx, పూర్ణాంకం cells)
 {
-    if ((*mb_ptr2len)(ccline.cmdbuff + idx) > 1
+    ఒకవేళ ((*mb_ptr2len)(ccline.cmdbuff + idx) > 1
 		&& (*mb_ptr2cells)(ccline.cmdbuff + idx) > 1
-		&& ccline.cmdspos % cmdline_width + cells > cmdline_width)
+		&& ccline.cmdspos % cmdline_వెడల్పు + cells > cmdline_వెడల్పు)
 	ccline.cmdspos++;
 }
 
@@ -3151,15 +3151,15 @@ correct_cmdspos(int idx, int cells)
  */
     char_u *
 getexline(
-    int		c,		// normally ':', NUL for ":append"
-    void	*cookie UNUSED,
-    int		indent,		// indent for inside conditionals
+    పూర్ణాంకం		c,		// normally ':', NUL for ":append"
+    శూన్య	*cookie వాడని,
+    పూర్ణాంకం		indent,		// indent for inside conditionals
     getline_opt_T options)
 {
     // When executing a register, remove ':' that's in front of each line.
-    if (exec_from_reg && vpeekc() == ':')
-	(void)vgetc();
-    return getcmdline(c, 1L, indent, options);
+    ఒకవేళ (exec_from_reg && vpeekc() == ':')
+	(శూన్య)vgetc();
+    తిరిగి getcmdline(c, 1L, indent, options);
 }
 
 /*
@@ -3170,21 +3170,21 @@ getexline(
  */
     char_u *
 getexmodeline(
-    int		promptc,	// normally ':', NUL for ":append" and '?' for
+    పూర్ణాంకం		promptc,	// normally ':', NUL for ":append" and '?' for
 				// :s prompt
-    void	*cookie UNUSED,
-    int		indent,		// indent for inside conditionals
-    getline_opt_T options UNUSED)
+    శూన్య	*cookie వాడని,
+    పూర్ణాంకం		indent,		// indent for inside conditionals
+    getline_opt_T options వాడని)
 {
-    garray_T	line_ga;
+    garray_T	పంక్తి_ga;
     char_u	*pend;
-    int		startcol = 0;
-    int		c1 = 0;
-    int		escaped = FALSE;	// CTRL-V typed
-    int		vcol = 0;
+    పూర్ణాంకం		startcol = 0;
+    పూర్ణాంకం		c1 = 0;
+    పూర్ణాంకం		escaped = FALSE;	// CTRL-V typed
+    పూర్ణాంకం		vcol = 0;
     char_u	*p;
-    int		prev_char;
-    int		len;
+    పూర్ణాంకం		prev_char;
+    పూర్ణాంకం		len;
 
     // Switch cursor on now.  This avoids that it happens after the "\n", which
     // confuses the system function that computes tabstops.
@@ -3192,53 +3192,53 @@ getexmodeline(
 
     // always start in column 0; write a newline if necessary
     compute_cmdrow();
-    if ((msg_col || msg_didout) && promptc != '?')
-	msg_putchar('\n');
-    if (promptc == ':')
+    ఒకవేళ ((సందేశం_నిలువు || సందేశం_didout) && promptc != '?')
+	సందేశం_putchar('\n');
+    ఒకవేళ (promptc == ':')
     {
 	// indent that is only displayed, not in the line itself
-	if (p_prompt)
-	    msg_putchar(':');
-	while (indent-- > 0)
-	    msg_putchar(' ');
-	startcol = msg_col;
+	ఒకవేళ (p_prompt)
+	    సందేశం_putchar(':');
+	అయితే (indent-- > 0)
+	    సందేశం_putchar(' ');
+	startcol = సందేశం_నిలువు;
     }
 
-    ga_init2(&line_ga, 1, 30);
+    ga_init2(&పంక్తి_ga, 1, 30);
 
     // autoindent for :insert and :append is in the line itself
-    if (promptc <= 0)
+    ఒకవేళ (promptc <= 0)
     {
 	vcol = indent;
-	while (indent >= 8)
+	అయితే (indent >= 8)
 	{
-	    ga_append(&line_ga, TAB);
-	    msg_puts("        ");
+	    ga_append(&పంక్తి_ga, TAB);
+	    సందేశం_puts("        ");
 	    indent -= 8;
 	}
-	while (indent-- > 0)
+	అయితే (indent-- > 0)
 	{
-	    ga_append(&line_ga, ' ');
-	    msg_putchar(' ');
+	    ga_append(&పంక్తి_ga, ' ');
+	    సందేశం_putchar(' ');
 	}
     }
     ++no_mapping;
-    ++allow_keys;
+    ++allow_కీలకాలు;
 
     /*
      * Get the line, one character at a time.
      */
     got_int = FALSE;
-    while (!got_int)
+    అయితే (!got_int)
     {
-	long    sw;
+	దీర్ఘ    sw;
 	char_u *s;
 
 	// May request the keyboard protocol state now.
 	may_send_t_RK();
 
-	if (ga_grow(&line_ga, 40) == FAIL)
-	    break;
+	ఒకవేళ (ga_grow(&పంక్తి_ga, 40) == FAIL)
+	    ఆపు;
 
 	/*
 	 * Get one character at a time.
@@ -3246,9 +3246,9 @@ getexmodeline(
 	prev_char = c1;
 
 	// Check for a ":normal" command and no more characters left.
-	if (ex_normal_busy > 0 && typebuf.tb_len == 0)
+	ఒకవేళ (ex_సాధారణ_busy > 0 && typebuf.tb_len == 0)
 	    c1 = '\n';
-	else
+	లేకపోతే
 	    c1 = vgetc();
 
 	/*
@@ -3256,315 +3256,315 @@ getexmodeline(
 	 * Previously this was left to the system, putting the terminal in
 	 * cooked mode, but then CTRL-D and CTRL-T can't be used properly.
 	 */
-	if (got_int)
+	ఒకవేళ (got_int)
 	{
-	    msg_putchar('\n');
-	    break;
+	    సందేశం_putchar('\n');
+	    ఆపు;
 	}
 
-	if (c1 == K_PS)
+	ఒకవేళ (c1 == K_PS)
 	{
-	    bracketed_paste(PASTE_EX, FALSE, &line_ga);
-	    goto redraw;
+	    bracketed_paste(PASTE_EX, FALSE, &పంక్తి_ga);
+	    వెళ్ళు redraw;
 	}
 
-	if (!escaped)
+	ఒకవేళ (!escaped)
 	{
 	    // CR typed means "enter", which is NL
-	    if (c1 == '\r')
+	    ఒకవేళ (c1 == '\r')
 		c1 = '\n';
 
-	    if (c1 == BS || c1 == K_BS
+	    ఒకవేళ (c1 == BS || c1 == K_BS
 			  || c1 == DEL || c1 == K_DEL || c1 == K_KDEL)
 	    {
-		if (line_ga.ga_len > 0)
+		ఒకవేళ (పంక్తి_ga.ga_len > 0)
 		{
-		    if (has_mbyte)
+		    ఒకవేళ (has_mbyte)
 		    {
-			p = (char_u *)line_ga.ga_data;
-			p[line_ga.ga_len] = NUL;
-			len = (*mb_head_off)(p, p + line_ga.ga_len - 1) + 1;
-			line_ga.ga_len -= len;
+			p = (char_u *)పంక్తి_ga.ga_దత్తాంశం;
+			p[పంక్తి_ga.ga_len] = NUL;
+			len = (*mb_తల_off)(p, p + పంక్తి_ga.ga_len - 1) + 1;
+			పంక్తి_ga.ga_len -= len;
 		    }
-		    else
-			--line_ga.ga_len;
-		    goto redraw;
+		    లేకపోతే
+			--పంక్తి_ga.ga_len;
+		    వెళ్ళు redraw;
 		}
-		continue;
+		కొనసాగు;
 	    }
 
-	    if (c1 == Ctrl_U)
+	    ఒకవేళ (c1 == Ctrl_U)
 	    {
-		msg_col = startcol;
-		msg_clr_eos();
-		line_ga.ga_len = 0;
-		goto redraw;
+		సందేశం_నిలువు = startcol;
+		సందేశం_clr_eos();
+		పంక్తి_ga.ga_len = 0;
+		వెళ్ళు redraw;
 	    }
 
-	    if (c1 == Ctrl_T)
+	    ఒకవేళ (c1 == Ctrl_T)
 	    {
-		sw = get_sw_value(curbuf);
-		p = (char_u *)line_ga.ga_data;
-		p[line_ga.ga_len] = NUL;
+		sw = get_sw_విలువ(curbuf);
+		p = (char_u *)పంక్తి_ga.ga_దత్తాంశం;
+		p[పంక్తి_ga.ga_len] = NUL;
 		indent = get_indent_str(p, 8, FALSE);
 		indent += sw - indent % sw;
-add_indent:
-		while (get_indent_str(p, 8, FALSE) < indent)
+కూడు_indent:
+		అయితే (get_indent_str(p, 8, FALSE) < indent)
 		{
-		    (void)ga_grow(&line_ga, 2);  // one more for the NUL
-		    p = (char_u *)line_ga.ga_data;
+		    (శూన్య)ga_grow(&పంక్తి_ga, 2);  // one more for the NUL
+		    p = (char_u *)పంక్తి_ga.ga_దత్తాంశం;
 		    s = skipwhite(p);
-		    mch_memmove(s + 1, s, line_ga.ga_len - (s - p) + 1);
+		    mch_memmove(s + 1, s, పంక్తి_ga.ga_len - (s - p) + 1);
 		    *s = ' ';
-		    ++line_ga.ga_len;
+		    ++పంక్తి_ga.ga_len;
 		}
 redraw:
 		// redraw the line
-		msg_col = startcol;
+		సందేశం_నిలువు = startcol;
 		vcol = 0;
-		p = (char_u *)line_ga.ga_data;
-		p[line_ga.ga_len] = NUL;
-		while (p < (char_u *)line_ga.ga_data + line_ga.ga_len)
+		p = (char_u *)పంక్తి_ga.ga_దత్తాంశం;
+		p[పంక్తి_ga.ga_len] = NUL;
+		అయితే (p < (char_u *)పంక్తి_ga.ga_దత్తాంశం + పంక్తి_ga.ga_len)
 		{
-		    if (*p == TAB)
+		    ఒకవేళ (*p == TAB)
 		    {
-			do
-			    msg_putchar(' ');
-			while (++vcol % 8);
+			చేయి
+			    సందేశం_putchar(' ');
+			అయితే (++vcol % 8);
 			++p;
 		    }
-		    else
+		    లేకపోతే
 		    {
 			len = mb_ptr2len(p);
-			msg_outtrans_len(p, len);
+			సందేశం_outtrans_len(p, len);
 			vcol += ptr2cells(p);
 			p += len;
 		    }
 		}
-		msg_clr_eos();
-		windgoto(msg_row, cmdline_col_off + msg_col);
-		continue;
+		సందేశం_clr_eos();
+		windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
+		కొనసాగు;
 	    }
 
-	    if (c1 == Ctrl_D)
+	    ఒకవేళ (c1 == Ctrl_D)
 	    {
 		// Delete one shiftwidth.
-		p = (char_u *)line_ga.ga_data;
-		if (prev_char == '0' || prev_char == '^')
+		p = (char_u *)పంక్తి_ga.ga_దత్తాంశం;
+		ఒకవేళ (prev_char == '0' || prev_char == '^')
 		{
-		    if (prev_char == '^')
+		    ఒకవేళ (prev_char == '^')
 			ex_keep_indent = TRUE;
 		    indent = 0;
-		    p[--line_ga.ga_len] = NUL;
+		    p[--పంక్తి_ga.ga_len] = NUL;
 		}
-		else
+		లేకపోతే
 		{
-		    p[line_ga.ga_len] = NUL;
+		    p[పంక్తి_ga.ga_len] = NUL;
 		    indent = get_indent_str(p, 8, FALSE);
-		    if (indent > 0)
+		    ఒకవేళ (indent > 0)
 		    {
 			--indent;
-			indent -= indent % get_sw_value(curbuf);
+			indent -= indent % get_sw_విలువ(curbuf);
 		    }
 		}
-		while (get_indent_str(p, 8, FALSE) > indent)
+		అయితే (get_indent_str(p, 8, FALSE) > indent)
 		{
 		    s = skipwhite(p);
-		    mch_memmove(s - 1, s, line_ga.ga_len - (s - p) + 1);
-		    --line_ga.ga_len;
+		    mch_memmove(s - 1, s, పంక్తి_ga.ga_len - (s - p) + 1);
+		    --పంక్తి_ga.ga_len;
 		}
-		goto add_indent;
+		వెళ్ళు కూడు_indent;
 	    }
 
-	    if (c1 == Ctrl_V || c1 == Ctrl_Q)
+	    ఒకవేళ (c1 == Ctrl_V || c1 == Ctrl_Q)
 	    {
 		escaped = TRUE;
-		continue;
+		కొనసాగు;
 	    }
 
 	    // Ignore special key codes: mouse movement, K_IGNORE, etc.
-	    if (IS_SPECIAL(c1))
-		continue;
+	    ఒకవేళ (IS_SPECIAL(c1))
+		కొనసాగు;
 	}
 
-	if (IS_SPECIAL(c1))
+	ఒకవేళ (IS_SPECIAL(c1))
 	    c1 = '?';
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	    len = (*mb_char2bytes)(c1,
-				  (char_u *)line_ga.ga_data + line_ga.ga_len);
-	else
+				  (char_u *)పంక్తి_ga.ga_దత్తాంశం + పంక్తి_ga.ga_len);
+	లేకపోతే
 	{
 	    len = 1;
-	    ((char_u *)line_ga.ga_data)[line_ga.ga_len] = c1;
+	    ((char_u *)పంక్తి_ga.ga_దత్తాంశం)[పంక్తి_ga.ga_len] = c1;
 	}
-	if (c1 == '\n')
-	    msg_putchar('\n');
-	else if (c1 == TAB)
+	ఒకవేళ (c1 == '\n')
+	    సందేశం_putchar('\n');
+	లేకపోతే ఒకవేళ (c1 == TAB)
 	{
 	    // Don't use chartabsize(), 'ts' can be different
-	    do
-		msg_putchar(' ');
-	    while (++vcol % 8);
+	    చేయి
+		సందేశం_putchar(' ');
+	    అయితే (++vcol % 8);
 	}
-	else
+	లేకపోతే
 	{
-	    msg_outtrans_len(
-		     ((char_u *)line_ga.ga_data) + line_ga.ga_len, len);
+	    సందేశం_outtrans_len(
+		     ((char_u *)పంక్తి_ga.ga_దత్తాంశం) + పంక్తి_ga.ga_len, len);
 	    vcol += char2cells(c1);
 	}
-	line_ga.ga_len += len;
+	పంక్తి_ga.ga_len += len;
 	escaped = FALSE;
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
-	pend = (char_u *)(line_ga.ga_data) + line_ga.ga_len;
+	windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
+	pend = (char_u *)(పంక్తి_ga.ga_దత్తాంశం) + పంక్తి_ga.ga_len;
 
 	// We are done when a NL is entered, but not when it comes after a
 	// backslash in prompt mode.
-	if (line_ga.ga_len > 0 && pend[-1] == '\n'
-		&& (line_ga.ga_len <= 1 || pend[-2] != '\\' || !promptc))
+	ఒకవేళ (పంక్తి_ga.ga_len > 0 && pend[-1] == '\n'
+		&& (పంక్తి_ga.ga_len <= 1 || pend[-2] != '\\' || !promptc))
 	{
-	    --line_ga.ga_len;
+	    --పంక్తి_ga.ga_len;
 	    --pend;
 	    *pend = NUL;
-	    break;
+	    ఆపు;
 	}
     }
 
     --no_mapping;
-    --allow_keys;
+    --allow_కీలకాలు;
 
     // make following messages go to the next line
-    msg_didout = FALSE;
-    msg_col = 0;
-    if (msg_row < Rows - 1)
-	++msg_row;
+    సందేశం_didout = FALSE;
+    సందేశం_నిలువు = 0;
+    ఒకవేళ (సందేశం_అడ్డువరుస < అడ్డువరుసలు - 1)
+	++సందేశం_అడ్డువరుస;
     emsg_on_display = FALSE;		// don't want ui_delay()
 
-    if (got_int)
-	ga_clear(&line_ga);
+    ఒకవేళ (got_int)
+	ga_clear(&పంక్తి_ga);
 
-    return (char_u *)line_ga.ga_data;
+    తిరిగి (char_u *)పంక్తి_ga.ga_దత్తాంశం;
 }
 
 /*
  * Return TRUE if ccline.overstrike is on.
  */
-    int
-cmdline_overstrike(void)
+    పూర్ణాంకం
+cmdline_overstrike(శూన్య)
 {
-    return ccline.overstrike;
+    తిరిగి ccline.overstrike;
 }
 
-#if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) || defined(FEAT_MOUSESHAPE)
+#ఒకవేళ defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) || defined(FEAT_MOUSESHAPE)
 /*
  * Return TRUE if the cursor is at the end of the cmdline.
  */
-    int
-cmdline_at_end(void)
+    పూర్ణాంకం
+cmdline_at_చివర(శూన్య)
 {
-    return (ccline.cmdpos >= ccline.cmdlen);
+    తిరిగి (ccline.cmdpos >= ccline.cmdlen);
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_XIM) && (defined(FEAT_GUI_GTK))
+#ఒకవేళ defined(FEAT_XIM) && (defined(FEAT_GUI_GTK))
 /*
  * Return the virtual column number at the current cursor position.
  * This is used by the IM code to obtain the start of the preedit string.
  */
     colnr_T
-cmdline_getvcol_cursor(void)
+cmdline_getvcol_cursor(శూన్య)
 {
-    if (ccline.cmdbuff == NULL || ccline.cmdpos > ccline.cmdlen)
-	return MAXCOL;
+    ఒకవేళ (ccline.cmdbuff == ఖాళీ || ccline.cmdpos > ccline.cmdlen)
+	తిరిగి MAXCOL;
 
-    if (has_mbyte)
+    ఒకవేళ (has_mbyte)
     {
-	colnr_T	col;
-	int	i = 0;
+	colnr_T	నిలువు;
+	పూర్ణాంకం	i = 0;
 
-	for (col = 0; i < ccline.cmdpos; ++col)
+	కొరకు (నిలువు = 0; i < ccline.cmdpos; ++నిలువు)
 	    i += (*mb_ptr2len)(ccline.cmdbuff + i);
 
-	return col;
+	తిరిగి నిలువు;
     }
-    else
-	return ccline.cmdpos;
+    లేకపోతే
+	తిరిగి ccline.cmdpos;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * If part of the command line is an IM preedit string, redraw it with
  * IM feedback attributes.  The cursor position is restored after drawing.
  */
-    static void
-redrawcmd_preedit(void)
+    స్థిర శూన్య
+redrawcmd_preedit(శూన్య)
 {
-    if ((State & MODE_CMDLINE)
-	    && xic != NULL
+    ఒకవేళ ((State & బహుళకం_CMDLINE)
+	    && xic != ఖాళీ
 	    // && im_get_status()  doesn't work when using SCIM
 	    && !p_imdisable
 	    && im_is_preediting())
     {
-	int	cmdpos = 0;
-	int	cmdspos;
-	int	old_row;
-	int	old_col;
-	colnr_T	col;
+	పూర్ణాంకం	cmdpos = 0;
+	పూర్ణాంకం	cmdspos;
+	పూర్ణాంకం	old_అడ్డువరుస;
+	పూర్ణాంకం	old_నిలువు;
+	colnr_T	నిలువు;
 
-	old_row = msg_row;
-	old_col = msg_col;
+	old_అడ్డువరుస = సందేశం_అడ్డువరుస;
+	old_నిలువు = సందేశం_నిలువు;
 	cmdspos = ((ccline.cmdfirstc != NUL) ? 1 : 0) + ccline.cmdindent;
 
-	if (has_mbyte)
+	ఒకవేళ (has_mbyte)
 	{
-	    for (col = 0; col < preedit_start_col
-			  && cmdpos < ccline.cmdlen; ++col)
+	    కొరకు (నిలువు = 0; నిలువు < preedit_ప్రారంభం_నిలువు
+			  && cmdpos < ccline.cmdlen; ++నిలువు)
 	    {
 		cmdspos += (*mb_ptr2cells)(ccline.cmdbuff + cmdpos);
 		cmdpos  += (*mb_ptr2len)(ccline.cmdbuff + cmdpos);
 	    }
 	}
-	else
+	లేకపోతే
 	{
-	    cmdspos += preedit_start_col;
-	    cmdpos  += preedit_start_col;
+	    cmdspos += preedit_ప్రారంభం_నిలువు;
+	    cmdpos  += preedit_ప్రారంభం_నిలువు;
 	}
 
-	msg_row = cmdline_row + (cmdspos / cmdline_width);
-	msg_col = cmdspos % cmdline_width;
-	if (msg_row >= Rows)
-	    msg_row = Rows - 1;
+	సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస + (cmdspos / cmdline_వెడల్పు);
+	సందేశం_నిలువు = cmdspos % cmdline_వెడల్పు;
+	ఒకవేళ (సందేశం_అడ్డువరుస >= అడ్డువరుసలు)
+	    సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
 
-	for (col = 0; cmdpos < ccline.cmdlen; ++col)
+	కొరకు (నిలువు = 0; cmdpos < ccline.cmdlen; ++నిలువు)
 	{
-	    int char_len;
-	    int char_attr;
+	    పూర్ణాంకం char_len;
+	    పూర్ణాంకం char_attr;
 
-	    char_attr = im_get_feedback_attr(col);
-	    if (char_attr < 0)
-		break; // end of preedit string
+	    char_attr = im_get_feedback_attr(నిలువు);
+	    ఒకవేళ (char_attr < 0)
+		ఆపు; // end of preedit string
 
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		char_len = (*mb_ptr2len)(ccline.cmdbuff + cmdpos);
-	    else
+	    లేకపోతే
 		char_len = 1;
 
-	    msg_outtrans_len_attr(ccline.cmdbuff + cmdpos, char_len, char_attr);
+	    సందేశం_outtrans_len_attr(ccline.cmdbuff + cmdpos, char_len, char_attr);
 	    cmdpos += char_len;
 	}
 
-	msg_row = old_row;
-	msg_col = old_col;
+	సందేశం_అడ్డువరుస = old_అడ్డువరుస;
+	సందేశం_నిలువు = old_నిలువు;
     }
 }
-#endif // FEAT_XIM && FEAT_GUI_GTK
+#అయితే_ముగింపు // FEAT_XIM && FEAT_GUI_GTK
 
 /*
  * Deallocate a command line buffer, updating the buffer size and length.
  */
-    static void
-dealloc_cmdbuff(void)
+    స్థిర శూన్య
+dealloc_cmdbuff(శూన్య)
 {
     VIM_CLEAR(ccline.cmdbuff);
     ccline.cmdlen = ccline.cmdbufflen = 0;
@@ -3574,33 +3574,33 @@ dealloc_cmdbuff(void)
  * Allocate a new command line buffer.
  * Assigns the new buffer to ccline.cmdbuff and ccline.cmdbufflen.
  */
-    static void
+    స్థిర శూన్య
 alloc_cmdbuff(size_t len)
 {
     /*
      * give some extra space to avoid having to allocate all the time
      */
-    if (len < 80)
+    ఒకవేళ (len < 80)
 	len = 100;
-    else
+    లేకపోతే
 	len += 20;
 
     ccline.cmdbuff = alloc(len);    // caller should check for out-of-memory
-    ccline.cmdbufflen = (int)len;
+    ccline.cmdbufflen = (పూర్ణాంకం)len;
 }
 
 /*
  * Re-allocate the command line to length len + something extra.
  * return FAIL for failure, OK otherwise
  */
-    int
-realloc_cmdbuff(int len)
+    పూర్ణాంకం
+realloc_cmdbuff(పూర్ణాంకం len)
 {
     char_u	*p;
-    int		plen;
+    పూర్ణాంకం		plen;
 
-    if (len < ccline.cmdbufflen)
-	return OK;			// no need to resize
+    ఒకవేళ (len < ccline.cmdbufflen)
+	తిరిగి OK;			// no need to resize
 
     // Keep a copy of the original cmdbuff and it's size so
     // they can be restored/used later.
@@ -3608,151 +3608,151 @@ realloc_cmdbuff(int len)
     plen = ccline.cmdbufflen;
 
     alloc_cmdbuff(len);			// will get some more
-    if (ccline.cmdbuff == NULL)		// out of memory
+    ఒకవేళ (ccline.cmdbuff == ఖాళీ)		// out of memory
     {
 	ccline.cmdbuff = p;		// keep the old one
 	ccline.cmdbufflen = plen;
-	return FAIL;
+	తిరిగి FAIL;
     }
     // There isn't always a NUL after the command, but it may need to be
     // there, thus copy up to the NUL and add a NUL.
     mch_memmove(ccline.cmdbuff, p, (size_t)ccline.cmdlen);
     ccline.cmdbuff[ccline.cmdlen] = NUL;
 
-    if (ccline.xpc != NULL
-	    && ccline.xpc->xp_pattern != NULL
+    ఒకవేళ (ccline.xpc != ఖాళీ
+	    && ccline.xpc->xp_నమూనా != ఖాళీ
 	    && ccline.xpc->xp_context != EXPAND_NOTHING
 	    && ccline.xpc->xp_context != EXPAND_UNSUCCESSFUL)
     {
-	int i = (int)(ccline.xpc->xp_pattern - p);
+	పూర్ణాంకం i = (పూర్ణాంకం)(ccline.xpc->xp_నమూనా - p);
 
 	// If xp_pattern points inside the old cmdbuff it needs to be adjusted
 	// to point into the newly allocated memory.
-	if (i >= 0 && i <= ccline.cmdlen)
-	    ccline.xpc->xp_pattern = ccline.cmdbuff + i;
+	ఒకవేళ (i >= 0 && i <= ccline.cmdlen)
+	    ccline.xpc->xp_నమూనా = ccline.cmdbuff + i;
     }
 
     vim_free(p);
 
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_ARABIC)
-static char_u	*arshape_buf = NULL;
+#ఒకవేళ defined(FEAT_ARABIC)
+స్థిర char_u	*arshape_buf = ఖాళీ;
 
-# if defined(EXITFREE)
-    void
-free_arshape_buf(void)
+# ఒకవేళ defined(EXITFREE)
+    శూన్య
+free_arshape_buf(శూన్య)
 {
     vim_free(arshape_buf);
 }
 # endif
-#endif
+#అయితే_ముగింపు
 
 /*
  * Draw part of the cmdline at the current cursor position.  But draw stars
  * when cmdline_star is TRUE.
  */
-    static void
-draw_cmdline(int start, int len)
+    స్థిర శూన్య
+draw_cmdline(పూర్ణాంకం ప్రారంభం, పూర్ణాంకం len)
 {
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-    int		i;
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+    పూర్ణాంకం		i;
 
-    if (cmdline_star > 0)
-	for (i = 0; i < len; ++i)
+    ఒకవేళ (cmdline_నక్షత్రం > 0)
+	కొరకు (i = 0; i < len; ++i)
 	{
-	    msg_putchar('*');
-	    if (has_mbyte)
-		i += (*mb_ptr2len)(ccline.cmdbuff + start + i) - 1;
+	    సందేశం_putchar('*');
+	    ఒకవేళ (has_mbyte)
+		i += (*mb_ptr2len)(ccline.cmdbuff + ప్రారంభం + i) - 1;
 	}
-    else
-#endif
-#ifdef FEAT_ARABIC
-	if (p_arshape && !p_tbidi && cmdline_has_arabic(start, len))
+    లేకపోతే
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_ARABIC
+	ఒకవేళ (p_arshape && !p_tbidi && cmdline_has_arabic(ప్రారంభం, len))
     {
-	static int	buflen = 0;
+	స్థిర పూర్ణాంకం	buflen = 0;
 	char_u		*p;
-	int		j;
-	int		newlen = 0;
-	int		mb_l;
-	int		pc, pc1 = 0;
-	int		prev_c = 0;
-	int		prev_c1 = 0;
-	int		u8c;
-	int		u8cc[MAX_MCO];
-	int		nc = 0;
+	పూర్ణాంకం		j;
+	పూర్ణాంకం		newlen = 0;
+	పూర్ణాంకం		mb_l;
+	పూర్ణాంకం		pc, pc1 = 0;
+	పూర్ణాంకం		prev_c = 0;
+	పూర్ణాంకం		prev_c1 = 0;
+	పూర్ణాంకం		u8c;
+	పూర్ణాంకం		u8cc[MAX_MCO];
+	పూర్ణాంకం		nc = 0;
 
 	/*
 	 * Do arabic shaping into a temporary buffer.  This is very
 	 * inefficient!
 	 */
-	if (len * 2 + 2 > buflen)
+	ఒకవేళ (len * 2 + 2 > buflen)
 	{
 	    // Re-allocate the buffer.  We keep it around to avoid a lot of
 	    // alloc()/free() calls.
 	    vim_free(arshape_buf);
 	    buflen = len * 2 + 2;
 	    arshape_buf = alloc(buflen);
-	    if (arshape_buf == NULL)
-		return;	// out of memory
+	    ఒకవేళ (arshape_buf == ఖాళీ)
+		తిరిగి;	// out of memory
 	}
 
-	if (utf_iscomposing(utf_ptr2char(ccline.cmdbuff + start)))
+	ఒకవేళ (utf_iscomposing(utf_ptr2char(ccline.cmdbuff + ప్రారంభం)))
 	{
 	    // Prepend a space to draw the leading composing char on.
 	    arshape_buf[0] = ' ';
 	    newlen = 1;
 	}
 
-	for (j = start; j < start + len; j += mb_l)
+	కొరకు (j = ప్రారంభం; j < ప్రారంభం + len; j += mb_l)
 	{
 	    p = ccline.cmdbuff + j;
-	    u8c = utfc_ptr2char_len(p, u8cc, start + len - j);
-	    mb_l = utfc_ptr2len_len(p, start + len - j);
-	    if (ARABIC_CHAR(u8c))
+	    u8c = utfc_ptr2char_len(p, u8cc, ప్రారంభం + len - j);
+	    mb_l = utfc_ptr2len_len(p, ప్రారంభం + len - j);
+	    ఒకవేళ (ARABIC_CHAR(u8c))
 	    {
 		// Do Arabic shaping.
-		if (cmdmsg_rl)
+		ఒకవేళ (cmdmsg_rl)
 		{
 		    // displaying from right to left
 		    pc = prev_c;
 		    pc1 = prev_c1;
 		    prev_c1 = u8cc[0];
-		    if (j + mb_l >= start + len)
+		    ఒకవేళ (j + mb_l >= ప్రారంభం + len)
 			nc = NUL;
-		    else
+		    లేకపోతే
 			nc = utf_ptr2char(p + mb_l);
 		}
-		else
+		లేకపోతే
 		{
 		    // displaying from left to right
-		    if (j + mb_l >= start + len)
+		    ఒకవేళ (j + mb_l >= ప్రారంభం + len)
 			pc = NUL;
-		    else
+		    లేకపోతే
 		    {
-			int	pcc[MAX_MCO];
+			పూర్ణాంకం	pcc[MAX_MCO];
 
 			pc = utfc_ptr2char_len(p + mb_l, pcc,
-						      start + len - j - mb_l);
+						      ప్రారంభం + len - j - mb_l);
 			pc1 = pcc[0];
 		    }
 		    nc = prev_c;
 		}
 		prev_c = u8c;
 
-		u8c = arabic_shape(u8c, NULL, &u8cc[0], pc, pc1, nc);
+		u8c = arabic_shape(u8c, ఖాళీ, &u8cc[0], pc, pc1, nc);
 
 		newlen += (*mb_char2bytes)(u8c, arshape_buf + newlen);
-		if (u8cc[0] != 0)
+		ఒకవేళ (u8cc[0] != 0)
 		{
 		    newlen += (*mb_char2bytes)(u8cc[0], arshape_buf + newlen);
-		    if (u8cc[1] != 0)
+		    ఒకవేళ (u8cc[1] != 0)
 			newlen += (*mb_char2bytes)(u8cc[1],
 							arshape_buf + newlen);
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		prev_c = u8c;
 		mch_memmove(arshape_buf + newlen, p, mb_l);
@@ -3760,11 +3760,11 @@ draw_cmdline(int start, int len)
 	    }
 	}
 
-	msg_outtrans_len(arshape_buf, newlen);
+	సందేశం_outtrans_len(arshape_buf, newlen);
     }
-    else
-#endif
-	msg_outtrans_len(ccline.cmdbuff + start, len);
+    లేకపోతే
+#అయితే_ముగింపు
+	సందేశం_outtrans_len(ccline.cmdbuff + ప్రారంభం, len);
 }
 
 /*
@@ -3772,38 +3772,38 @@ draw_cmdline(int start, int len)
  * right when "shift" is TRUE.  Used for CTRL-V, CTRL-K, etc.
  * "c" must be printable (fit in one display cell)!
  */
-    void
-putcmdline(int c, int shift)
+    శూన్య
+putcmdline(పూర్ణాంకం c, పూర్ణాంకం జరుపు)
 {
-    if (cmd_silent)
-	return;
-    msg_no_more = TRUE;
-    msg_putchar(c);
-    if (shift)
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
+    సందేశం_no_మరిన్ని = TRUE;
+    సందేశం_putchar(c);
+    ఒకవేళ (జరుపు)
 	draw_cmdline(ccline.cmdpos, ccline.cmdlen - ccline.cmdpos);
-    msg_no_more = FALSE;
+    సందేశం_no_మరిన్ని = FALSE;
     cursorcmd();
     extra_char = c;
-    extra_char_shift = shift;
+    extra_char_జరుపు = జరుపు;
 }
 
 /*
  * Undo a putcmdline(c, FALSE).
  */
-    void
-unputcmdline(void)
+    శూన్య
+unputcmdline(శూన్య)
 {
-    if (cmd_silent)
-	return;
-    msg_no_more = TRUE;
-    if (ccline.cmdlen == ccline.cmdpos)
-	msg_putchar(' ');
-    else if (has_mbyte)
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
+    సందేశం_no_మరిన్ని = TRUE;
+    ఒకవేళ (ccline.cmdlen == ccline.cmdpos)
+	సందేశం_putchar(' ');
+    లేకపోతే ఒకవేళ (has_mbyte)
 	draw_cmdline(ccline.cmdpos,
 			       (*mb_ptr2len)(ccline.cmdbuff + ccline.cmdpos));
-    else
+    లేకపోతే
 	draw_cmdline(ccline.cmdpos, 1);
-    msg_no_more = FALSE;
+    సందేశం_no_మరిన్ని = FALSE;
     cursorcmd();
     extra_char = NUL;
 }
@@ -3816,138 +3816,138 @@ unputcmdline(void)
  * twice in a row, then 'redraw' should be FALSE and redrawcmd() should be
  * called afterwards.
  */
-    int
-put_on_cmdline(char_u *str, int len, int redraw)
+    పూర్ణాంకం
+put_on_cmdline(char_u *str, పూర్ణాంకం len, పూర్ణాంకం redraw)
 {
-    int		retval;
-    int		i;
-    int		m;
-    int		c;
+    పూర్ణాంకం		retval;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		m;
+    పూర్ణాంకం		c;
 
-    if (len < 0)
-	len = (int)STRLEN(str);
+    ఒకవేళ (len < 0)
+	len = (పూర్ణాంకం)STRLEN(str);
 
     // Check if ccline.cmdbuff needs to be longer
-    if (ccline.cmdlen + len + 1 >= ccline.cmdbufflen)
+    ఒకవేళ (ccline.cmdlen + len + 1 >= ccline.cmdbufflen)
 	retval = realloc_cmdbuff(ccline.cmdlen + len + 1);
-    else
+    లేకపోతే
 	retval = OK;
-    if (retval == OK)
+    ఒకవేళ (retval == OK)
     {
-	if (!ccline.overstrike)
+	ఒకవేళ (!ccline.overstrike)
 	{
 	    mch_memmove(ccline.cmdbuff + ccline.cmdpos + len,
 					       ccline.cmdbuff + ccline.cmdpos,
 				     (size_t)(ccline.cmdlen - ccline.cmdpos));
 	    ccline.cmdlen += len;
 	}
-	else
+	లేకపోతే
 	{
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		// Count nr of characters in the new string.
 		m = 0;
-		for (i = 0; i < len; i += (*mb_ptr2len)(str + i))
+		కొరకు (i = 0; i < len; i += (*mb_ptr2len)(str + i))
 		    ++m;
 		// Count nr of bytes in cmdline that are overwritten by these
 		// characters.
-		for (i = ccline.cmdpos; i < ccline.cmdlen && m > 0;
+		కొరకు (i = ccline.cmdpos; i < ccline.cmdlen && m > 0;
 				 i += (*mb_ptr2len)(ccline.cmdbuff + i))
 		    --m;
-		if (i < ccline.cmdlen)
+		ఒకవేళ (i < ccline.cmdlen)
 		{
 		    mch_memmove(ccline.cmdbuff + ccline.cmdpos + len,
 			    ccline.cmdbuff + i, (size_t)(ccline.cmdlen - i));
 		    ccline.cmdlen += ccline.cmdpos + len - i;
 		}
-		else
+		లేకపోతే
 		    ccline.cmdlen = ccline.cmdpos + len;
 	    }
-	    else if (ccline.cmdpos + len > ccline.cmdlen)
+	    లేకపోతే ఒకవేళ (ccline.cmdpos + len > ccline.cmdlen)
 		ccline.cmdlen = ccline.cmdpos + len;
 	}
 	mch_memmove(ccline.cmdbuff + ccline.cmdpos, str, (size_t)len);
 	ccline.cmdbuff[ccline.cmdlen] = NUL;
 
-	if (enc_utf8)
+	ఒకవేళ (enc_utf8)
 	{
 	    // When the inserted text starts with a composing character,
 	    // backup to the character before it.  There could be two of them.
 	    i = 0;
 	    c = utf_ptr2char(ccline.cmdbuff + ccline.cmdpos);
-	    while (ccline.cmdpos > 0 && utf_iscomposing(c))
+	    అయితే (ccline.cmdpos > 0 && utf_iscomposing(c))
 	    {
-		i = (*mb_head_off)(ccline.cmdbuff,
+		i = (*mb_తల_off)(ccline.cmdbuff,
 				      ccline.cmdbuff + ccline.cmdpos - 1) + 1;
 		ccline.cmdpos -= i;
 		len += i;
 		c = utf_ptr2char(ccline.cmdbuff + ccline.cmdpos);
 	    }
-#ifdef FEAT_ARABIC
-	    if (i == 0 && ccline.cmdpos > 0 && arabic_maycombine(c))
+#నిర్వచితమైతే FEAT_ARABIC
+	    ఒకవేళ (i == 0 && ccline.cmdpos > 0 && arabic_maycombine(c))
 	    {
 		// Check the previous character for Arabic combining pair.
-		i = (*mb_head_off)(ccline.cmdbuff,
+		i = (*mb_తల_off)(ccline.cmdbuff,
 				      ccline.cmdbuff + ccline.cmdpos - 1) + 1;
-		if (arabic_combine(utf_ptr2char(ccline.cmdbuff
+		ఒకవేళ (arabic_combine(utf_ptr2char(ccline.cmdbuff
 						     + ccline.cmdpos - i), c))
 		{
 		    ccline.cmdpos -= i;
 		    len += i;
 		}
-		else
+		లేకపోతే
 		    i = 0;
 	    }
-#endif
-	    if (i != 0)
+#అయితే_ముగింపు
+	    ఒకవేళ (i != 0)
 	    {
 		// Also backup the cursor position.
 		i = ptr2cells(ccline.cmdbuff + ccline.cmdpos);
 		ccline.cmdspos -= i;
-		msg_col -= i;
-		if (msg_col < 0)
+		సందేశం_నిలువు -= i;
+		ఒకవేళ (సందేశం_నిలువు < 0)
 		{
-		    msg_col += cmdline_width;
-		    --msg_row;
+		    సందేశం_నిలువు += cmdline_వెడల్పు;
+		    --సందేశం_అడ్డువరుస;
 		}
 	    }
 	}
 
-	if (redraw && !cmd_silent)
+	ఒకవేళ (redraw && !cmd_silent)
 	{
-	    msg_no_more = TRUE;
-	    i = cmdline_row;
+	    సందేశం_no_మరిన్ని = TRUE;
+	    i = cmdline_అడ్డువరుస;
 	    cursorcmd();
 	    draw_cmdline(ccline.cmdpos, ccline.cmdlen - ccline.cmdpos);
 	    // Avoid clearing the rest of the line too often.
-	    if (cmdline_row != i || ccline.overstrike)
-		msg_clr_eos();
-	    msg_no_more = FALSE;
+	    ఒకవేళ (cmdline_అడ్డువరుస != i || ccline.overstrike)
+		సందేశం_clr_eos();
+	    సందేశం_no_మరిన్ని = FALSE;
 	}
-	if (KeyTyped)
+	ఒకవేళ (కీలకం_Typed)
 	{
-	    m = cmdline_width * Rows;
-	    if (m < 0)	// overflow, cmdline_width or Rows at weird value
+	    m = cmdline_వెడల్పు * అడ్డువరుసలు;
+	    ఒకవేళ (m < 0)	// overflow, cmdline_width or Rows at weird value
 		m = MAXCOL;
 	}
-	else
+	లేకపోతే
 	    m = MAXCOL;
-	for (i = 0; i < len; ++i)
+	కొరకు (i = 0; i < len; ++i)
 	{
 	    c = cmdline_charsize(ccline.cmdpos);
 	    // count ">" for a double-wide char that doesn't fit.
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		correct_cmdspos(ccline.cmdpos, c);
 	    // Stop cursor at the end of the screen, but do increment the
 	    // insert position, so that entering a very long command
 	    // works, even though you can't see it.
-	    if (ccline.cmdspos + c < m)
+	    ఒకవేళ (ccline.cmdspos + c < m)
 		ccline.cmdspos += c;
 
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 	    {
 		c = (*mb_ptr2len)(ccline.cmdbuff + ccline.cmdpos) - 1;
-		if (c > len - i - 1)
+		ఒకవేళ (c > len - i - 1)
 		    c = len - i - 1;
 		ccline.cmdpos += c;
 		i += c;
@@ -3955,36 +3955,36 @@ put_on_cmdline(char_u *str, int len, int redraw)
 	    ++ccline.cmdpos;
 	}
     }
-    if (redraw)
-	msg_check();
-    return retval;
+    ఒకవేళ (redraw)
+	సందేశం_check();
+    తిరిగి retval;
 }
 
-static cmdline_info_T	prev_ccline;
-static int		prev_ccline_used = FALSE;
+స్థిర cmdline_info_T	prev_ccline;
+స్థిర పూర్ణాంకం		prev_ccline_వాడిన = FALSE;
 
 /*
  * Save ccline, because obtaining the "=" register may execute "normal :cmd"
  * and overwrite it.  But get_cmdline_str() may need it, thus make it
  * available globally in prev_ccline.
  */
-    static void
+    స్థిర శూన్య
 save_cmdline(cmdline_info_T *ccp)
 {
-    if (!prev_ccline_used)
+    ఒకవేళ (!prev_ccline_వాడిన)
     {
-	CLEAR_FIELD(prev_ccline);
-	prev_ccline_used = TRUE;
+	CLEAR_క్షేత్రం(prev_ccline);
+	prev_ccline_వాడిన = TRUE;
     }
     *ccp = prev_ccline;
     prev_ccline = ccline;
-    ccline.cmdbuff = NULL;  // signal that ccline is not in use
+    ccline.cmdbuff = ఖాళీ;  // signal that ccline is not in use
 }
 
 /*
  * Restore ccline after it has been saved with save_cmdline().
  */
-    static void
+    స్థిర శూన్య
 restore_cmdline(cmdline_info_T *ccp)
 {
     ccline = prev_ccline;
@@ -3999,33 +3999,33 @@ restore_cmdline(cmdline_info_T *ccp)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    static int
+    స్థిర పూర్ణాంకం
 cmdline_paste(
-    int regname,
-    int literally,	// Insert text literally instead of "as typed"
-    int remcr)		// remove trailing CR
+    పూర్ణాంకం regname,
+    పూర్ణాంకం literally,	// Insert text literally instead of "as typed"
+    పూర్ణాంకం remcr)		// remove trailing CR
 {
-    long		i;
+    దీర్ఘ		i;
     char_u		*arg;
     char_u		*p;
-    int			allocated;
+    పూర్ణాంకం			allocated;
 
     // check for valid regname; also accept special characters for CTRL-R in
     // the command line
-    if (regname != Ctrl_F && regname != Ctrl_P && regname != Ctrl_W
+    ఒకవేళ (regname != Ctrl_F && regname != Ctrl_P && regname != Ctrl_W
 	    && regname != Ctrl_A && regname != Ctrl_L
 	    && !valid_yank_reg(regname, FALSE))
-	return FAIL;
+	తిరిగి FAIL;
 
     // A register containing CTRL-R can cause an endless loop.  Allow using
     // CTRL-C to break the loop.
-    line_breakcheck();
-    if (got_int)
-	return FAIL;
+    పంక్తి_breakcheck();
+    ఒకవేళ (got_int)
+	తిరిగి FAIL;
 
-#ifdef FEAT_CLIPBOARD
+#నిర్వచితమైతే FEAT_CLIPBOARD
     regname = may_get_selection(regname);
-#endif
+#అయితే_ముగింపు
 
     // Need to set "textlock" to avoid nasty things like going to another
     // buffer when evaluating an expression.
@@ -4033,49 +4033,49 @@ cmdline_paste(
     i = get_spec_reg(regname, &arg, &allocated, TRUE);
     --textlock;
 
-    if (i)
+    ఒకవేళ (i)
     {
 	// Got the value of a special register in "arg".
-	if (arg == NULL)
-	    return FAIL;
+	ఒకవేళ (arg == ఖాళీ)
+	    తిరిగి FAIL;
 
 	// When 'incsearch' is set and CTRL-R CTRL-W used: skip the duplicate
 	// part of the word.
 	p = arg;
-	if (p_is && regname == Ctrl_W)
+	ఒకవేళ (p_is && regname == Ctrl_W)
 	{
 	    char_u  *w;
-	    int	    len;
+	    పూర్ణాంకం	    len;
 
 	    // Locate start of last word in the cmd buffer.
-	    for (w = ccline.cmdbuff + ccline.cmdpos; w > ccline.cmdbuff; )
+	    కొరకు (w = ccline.cmdbuff + ccline.cmdpos; w > ccline.cmdbuff; )
 	    {
-		if (has_mbyte)
+		ఒకవేళ (has_mbyte)
 		{
-		    len = (*mb_head_off)(ccline.cmdbuff, w - 1) + 1;
-		    if (!vim_iswordc(mb_ptr2char(w - len)))
-			break;
+		    len = (*mb_తల_off)(ccline.cmdbuff, w - 1) + 1;
+		    ఒకవేళ (!vim_iswordc(mb_ptr2char(w - len)))
+			ఆపు;
 		    w -= len;
 		}
-		else
+		లేకపోతే
 		{
-		    if (!vim_iswordc(w[-1]))
-			break;
+		    ఒకవేళ (!vim_iswordc(w[-1]))
+			ఆపు;
 		    --w;
 		}
 	    }
-	    len = (int)((ccline.cmdbuff + ccline.cmdpos) - w);
-	    if (p_ic ? STRNICMP(w, arg, len) == 0 : STRNCMP(w, arg, len) == 0)
+	    len = (పూర్ణాంకం)((ccline.cmdbuff + ccline.cmdpos) - w);
+	    ఒకవేళ (p_ic ? STRNICMP(w, arg, len) == 0 : STRNCMP(w, arg, len) == 0)
 		p += len;
 	}
 
 	cmdline_paste_str(p, literally);
-	if (allocated)
+	ఒకవేళ (allocated)
 	    vim_free(arg);
-	return OK;
+	తిరిగి OK;
     }
 
-    return cmdline_paste_reg(regname, literally, remcr);
+    తిరిగి cmdline_paste_reg(regname, literally, remcr);
 }
 
 /*
@@ -4084,28 +4084,28 @@ cmdline_paste(
  * When "literally" is FALSE, insert as typed, but don't leave the command
  * line.
  */
-    void
-cmdline_paste_str(char_u *s, int literally)
+    శూన్య
+cmdline_paste_str(char_u *s, పూర్ణాంకం literally)
 {
-    int		c, cv;
+    పూర్ణాంకం		c, cv;
 
-    if (literally)
+    ఒకవేళ (literally)
 	put_on_cmdline(s, -1, TRUE);
-    else
-	while (*s != NUL)
+    లేకపోతే
+	అయితే (*s != NUL)
 	{
 	    cv = *s;
-	    if (cv == Ctrl_V && s[1])
+	    ఒకవేళ (cv == Ctrl_V && s[1])
 		++s;
-	    if (has_mbyte)
+	    ఒకవేళ (has_mbyte)
 		c = mb_cptr2char_adv(&s);
-	    else
+	    లేకపోతే
 		c = *s++;
-	    if (cv == Ctrl_V || c == ESC || c == Ctrl_C
+	    ఒకవేళ (cv == Ctrl_V || c == ESC || c == Ctrl_C
 		    || c == CAR || c == NL || c == Ctrl_L
-#ifdef UNIX
+#నిర్వచితమైతే UNIX
 		    || c == intr_char
-#endif
+#అయితే_ముగింపు
 		    || (c == Ctrl_BSL && *s == Ctrl_N))
 		stuffcharReadbuff(Ctrl_V);
 	    stuffcharReadbuff(c);
@@ -4117,8 +4117,8 @@ cmdline_paste_str(char_u *s, int literally)
  * search and in other situations where the command line may have been
  * overwritten.
  */
-    void
-redrawcmdline(void)
+    శూన్య
+redrawcmdline(శూన్య)
 {
     redrawcmdline_ex(TRUE);
 }
@@ -4127,148 +4127,148 @@ redrawcmdline(void)
  * When "do_compute_cmdrow" is TRUE the command line is redrawn at the bottom.
  * If FALSE cmdline_row is used, which should redraw in the same place.
  */
-    void
-redrawcmdline_ex(int do_compute_cmdrow)
+    శూన్య
+redrawcmdline_ex(పూర్ణాంకం do_compute_cmdrow)
 {
-    if (cmd_silent)
-	return;
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
     need_wait_return = FALSE;
-    if (do_compute_cmdrow)
+    ఒకవేళ (do_compute_cmdrow)
 	compute_cmdrow();
     redrawcmd();
     cursorcmd();
 }
 
-    static void
-redrawcmdprompt(void)
+    స్థిర శూన్య
+redrawcmdprompt(శూన్య)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (cmd_silent)
-	return;
-    if (ccline.cmdfirstc != NUL)
-	msg_putchar(ccline.cmdfirstc);
-    if (ccline.cmdprompt != NULL)
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
+    ఒకవేళ (ccline.cmdfirstc != NUL)
+	సందేశం_putchar(ccline.cmdfirstc);
+    ఒకవేళ (ccline.cmdprompt != ఖాళీ)
     {
-	msg_puts_attr((char *)ccline.cmdprompt, ccline.cmdattr);
-	ccline.cmdindent = msg_col + (msg_row - cmdline_row) * cmdline_width;
+	సందేశం_puts_attr((అక్షరం *)ccline.cmdprompt, ccline.cmdattr);
+	ccline.cmdindent = సందేశం_నిలువు + (సందేశం_అడ్డువరుస - cmdline_అడ్డువరుస) * cmdline_వెడల్పు;
 	// do the reverse of set_cmdspos()
-	if (ccline.cmdfirstc != NUL)
+	ఒకవేళ (ccline.cmdfirstc != NUL)
 	    --ccline.cmdindent;
     }
-    else
-	for (i = ccline.cmdindent; i > 0; --i)
-	    msg_putchar(' ');
+    లేకపోతే
+	కొరకు (i = ccline.cmdindent; i > 0; --i)
+	    సందేశం_putchar(' ');
 }
 
 /*
  * Redraw what is currently on the command line.
  */
-    void
-redrawcmd(void)
+    శూన్య
+redrawcmd(శూన్య)
 {
-    int save_in_echowindow = in_echowindow;
+    పూర్ణాంకం save_లోపల_echowindow = లోపల_echowindow;
 
-    if (cmd_silent)
-	return;
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
 
     // when 'incsearch' is set there may be no command line while redrawing
-    if (ccline.cmdbuff == NULL)
+    ఒకవేళ (ccline.cmdbuff == ఖాళీ)
     {
-	windgoto(cmdline_row, cmdline_col_off);
-	msg_clr_eos();
-	return;
+	windgoto(cmdline_అడ్డువరుస, cmdline_నిలువు_off);
+	సందేశం_clr_eos();
+	తిరిగి;
     }
 
     // Do not put this in the message window.
-    in_echowindow = FALSE;
+    లోపల_echowindow = FALSE;
 
-    sb_text_restart_cmdline();
-    msg_start();
+    sb_పాఠ్యం_restart_cmdline();
+    సందేశం_ప్రారంభం();
     // Reset lines_left so a wrapped cmdline isn't truncated by msg_no_more.
-    msg_starthere();
+    సందేశం_starthere();
     redrawcmdprompt();
 
     // Don't use more prompt, truncate the cmdline if it doesn't fit.
-    msg_no_more = TRUE;
+    సందేశం_no_మరిన్ని = TRUE;
     draw_cmdline(0, ccline.cmdlen);
-    msg_clr_eos();
-    msg_no_more = FALSE;
+    సందేశం_clr_eos();
+    సందేశం_no_మరిన్ని = FALSE;
 
-    set_cmdspos_cursor();
-    if (extra_char != NUL)
-	putcmdline(extra_char, extra_char_shift);
+    సమితి_cmdspos_cursor();
+    ఒకవేళ (extra_char != NUL)
+	putcmdline(extra_char, extra_char_జరుపు);
 
     /*
      * An emsg() before may have set msg_scroll. This is used in normal mode,
      * in cmdline mode we can reset them now.
      */
-    msg_scroll = FALSE;		// next message overwrites cmdline
+    సందేశం_scroll = FALSE;		// next message overwrites cmdline
 
     // Typing ':' at the more prompt may set skip_redraw.  We don't want this
     // in cmdline mode
     skip_redraw = FALSE;
 
-    in_echowindow = save_in_echowindow;
+    లోపల_echowindow = save_లోపల_echowindow;
 }
 
-    void
-compute_cmdrow(void)
+    శూన్య
+compute_cmdrow(శూన్య)
 {
     // ignore "msg_scrolled" in update_screen(), it will be reset soon.
-    if (exmode_active || (msg_scrolled != 0 && !updating_screen))
-	cmdline_row = Rows - 1;
-    else
-	cmdline_row = W_WINROW(lastwin) + lastwin->w_height
-						    + lastwin->w_status_height;
+    ఒకవేళ (exmode_చురుకైన || (సందేశం_scrolled != 0 && !updating_screen))
+	cmdline_అడ్డువరుస = అడ్డువరుసలు - 1;
+    లేకపోతే
+	cmdline_అడ్డువరుస = W_WINROW(lastwin) + lastwin->w_ఎత్తు
+						    + lastwin->w_స్థితి_ఎత్తు;
 }
 
-    void
-cursorcmd(void)
+    శూన్య
+cursorcmd(శూన్య)
 {
-    if (cmd_silent)
-	return;
+    ఒకవేళ (cmd_silent)
+	తిరిగి;
 
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (cmdmsg_rl)
     {
-	msg_row = cmdline_row  + (ccline.cmdspos / (cmdline_width - 1));
-	msg_col = cmdline_width - (ccline.cmdspos % (cmdline_width - 1)) - 1;
-	if (msg_row <= 0)
-	    msg_row = Rows - 1;
+	సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస  + (ccline.cmdspos / (cmdline_వెడల్పు - 1));
+	సందేశం_నిలువు = cmdline_వెడల్పు - (ccline.cmdspos % (cmdline_వెడల్పు - 1)) - 1;
+	ఒకవేళ (సందేశం_అడ్డువరుస <= 0)
+	    సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-	msg_row = cmdline_row + (ccline.cmdspos / cmdline_width);
-	msg_col = ccline.cmdspos % cmdline_width;
-	if (msg_row >= Rows)
-	    msg_row = Rows - 1;
+	సందేశం_అడ్డువరుస = cmdline_అడ్డువరుస + (ccline.cmdspos / cmdline_వెడల్పు);
+	సందేశం_నిలువు = ccline.cmdspos % cmdline_వెడల్పు;
+	ఒకవేళ (సందేశం_అడ్డువరుస >= అడ్డువరుసలు)
+	    సందేశం_అడ్డువరుస = అడ్డువరుసలు - 1;
     }
 
-    windgoto(msg_row, cmdline_col_off + msg_col);
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    if (p_imst == IM_ON_THE_SPOT)
+    windgoto(సందేశం_అడ్డువరుస, cmdline_నిలువు_off + సందేశం_నిలువు);
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ఒకవేళ (p_imst == IM_ON_THE_SPOT)
 	redrawcmd_preedit();
-#endif
-#ifdef MCH_CURSOR_SHAPE
+#అయితే_ముగింపు
+#నిర్వచితమైతే MCH_CURSOR_SHAPE
     mch_update_cursor();
-#endif
+#అయితే_ముగింపు
 }
 
-    void
-gotocmdline(int clr)
+    శూన్య
+gotocmdline(పూర్ణాంకం clr)
 {
-    msg_start();
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
-	msg_col = cmdline_width - 1;
-    else
-#endif
-	msg_col = 0;	    // always start in column 0
-    if (clr)		    // clear the bottom line(s)
-	msg_clr_eos();	    // will reset clear_cmdline
-    windgoto(cmdline_row, cmdline_col_off);
+    సందేశం_ప్రారంభం();
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    ఒకవేళ (cmdmsg_rl)
+	సందేశం_నిలువు = cmdline_వెడల్పు - 1;
+    లేకపోతే
+#అయితే_ముగింపు
+	సందేశం_నిలువు = 0;	    // always start in column 0
+    ఒకవేళ (clr)		    // clear the bottom line(s)
+	సందేశం_clr_eos();	    // will reset clear_cmdline
+    windgoto(cmdline_అడ్డువరుస, cmdline_నిలువు_off);
 }
 
 /*
@@ -4277,28 +4277,28 @@ gotocmdline(int clr)
  * When an abbreviation is recognized it is removed from the text with
  * backspaces and the replacement string is inserted, followed by "c".
  */
-    static int
-ccheck_abbr(int c)
+    స్థిర పూర్ణాంకం
+ccheck_abbr(పూర్ణాంకం c)
 {
-    int spos = 0;
+    పూర్ణాంకం spos = 0;
 
-    if (p_paste || no_abbr)	    // no abbreviations or in paste mode
-	return FALSE;
+    ఒకవేళ (p_paste || no_abbr)	    // no abbreviations or in paste mode
+	తిరిగి FALSE;
 
     // Do not consider '<,'> be part of the mapping, skip leading whitespace.
     // Actually accepts any mark.
-    while (VIM_ISWHITE(ccline.cmdbuff[spos]) && spos < ccline.cmdlen)
+    అయితే (VIM_ISWHITE(ccline.cmdbuff[spos]) && spos < ccline.cmdlen)
 	spos++;
-    if (ccline.cmdlen - spos > 5
+    ఒకవేళ (ccline.cmdlen - spos > 5
 	    && ccline.cmdbuff[spos] == '\''
 	    && ccline.cmdbuff[spos + 2] == ','
 	    && ccline.cmdbuff[spos + 3] == '\'')
 	spos += 5;
-    else
+    లేకపోతే
 	// check abbreviation from the beginning of the commandline
 	spos = 0;
 
-    return check_abbr(c, ccline.cmdbuff, ccline.cmdpos, spos);
+    తిరిగి check_abbr(c, ccline.cmdbuff, ccline.cmdpos, spos);
 }
 
 /*
@@ -4309,25 +4309,25 @@ ccheck_abbr(int c)
  * Returns the result in allocated memory.
  */
     char_u *
-vim_strsave_fnameescape(char_u *fname, int what)
+vim_strsave_fnameescape(char_u *fname, పూర్ణాంకం what)
 {
     char_u	*p;
-#ifdef BACKSLASH_IN_FILENAME
+#నిర్వచితమైతే BACKSLASH_లోపల_FILENAME
     char_u	buf[20];
-    int		j = 0;
+    పూర్ణాంకం		j = 0;
 
     // Don't escape '[', '{' and '!' if they are in 'isfname' and for the
     // ":buffer" command.
-    for (p = what == VSE_BUFFER ? BUFFER_ESC_CHARS : PATH_ESC_CHARS;
+    కొరకు (p = what == VSE_బఫరు ? బఫరు_ESC_CHARS : మార్గం_ESC_CHARS;
 								*p != NUL; ++p)
-	if ((*p != '[' && *p != '{' && *p != '!') || !vim_isfilec(*p))
+	ఒకవేళ ((*p != '[' && *p != '{' && *p != '!') || !vim_isfilec(*p))
 	    buf[j++] = *p;
     buf[j] = NUL;
     p = vim_strsave_escaped(fname, buf);
-#else
+#లేకపోతే
     p = vim_strsave_escaped(fname, what == VSE_SHELL ? SHELL_ESC_CHARS
-		    : what == VSE_BUFFER ? BUFFER_ESC_CHARS : PATH_ESC_CHARS);
-    if (what == VSE_SHELL && csh_like_shell() && p != NULL)
+		    : what == VSE_బఫరు ? బఫరు_ESC_CHARS : మార్గం_ESC_CHARS);
+    ఒకవేళ (what == VSE_SHELL && csh_like_shell() && p != ఖాళీ)
     {
 	char_u	    *s;
 
@@ -4337,27 +4337,27 @@ vim_strsave_fnameescape(char_u *fname, int what)
 	vim_free(p);
 	p = s;
     }
-#endif
+#అయితే_ముగింపు
 
     // '>' and '+' are special at the start of some commands, e.g. ":edit" and
     // ":write".  "cd -" has a special meaning.
-    if (p != NULL && (*p == '>' || *p == '+' || (*p == '-' && p[1] == NUL)))
+    ఒకవేళ (p != ఖాళీ && (*p == '>' || *p == '+' || (*p == '-' && p[1] == NUL)))
 	escape_fname(&p);
 
-    return p;
+    తిరిగి p;
 }
 
 /*
  * Put a backslash before the file name in "pp", which is in allocated memory.
  */
-    void
+    శూన్య
 escape_fname(char_u **pp)
 {
     char_u	*p;
 
     p = alloc(STRLEN(*pp) + 2);
-    if (p == NULL)
-	return;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి;
 
     p[0] = '\\';
     STRCPY(p + 1, *pp);
@@ -4369,21 +4369,21 @@ escape_fname(char_u **pp)
  * For each file name in files[num_files]:
  * If 'orig_pat' starts with "~/", replace the home directory with "~".
  */
-    void
+    శూన్య
 tilde_replace(
     char_u  *orig_pat,
-    int	    num_files,
+    పూర్ణాంకం	    అంకె_files,
     char_u  **files)
 {
-    int	    i;
+    పూర్ణాంకం	    i;
     char_u  *p;
 
-    if (orig_pat[0] == '~' && vim_ispathsep(orig_pat[1]))
+    ఒకవేళ (orig_pat[0] == '~' && vim_ispathsep(orig_pat[1]))
     {
-	for (i = 0; i < num_files; ++i)
+	కొరకు (i = 0; i < అంకె_files; ++i)
 	{
-	    p = home_replace_save(NULL, files[i]);
-	    if (p != NULL)
+	    p = home_replace_save(ఖాళీ, files[i]);
+	    ఒకవేళ (p != ఖాళీ)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -4396,25 +4396,25 @@ tilde_replace(
  * Get a pointer to the current command line info.
  */
     cmdline_info_T *
-get_cmdline_info(void)
+get_cmdline_info(శూన్య)
 {
-    return &ccline;
+    తిరిగి &ccline;
 }
 
 /*
  * Get pointer to the command line info to use. save_cmdline() may clear
  * ccline and put the previous value in prev_ccline.
  */
-    static cmdline_info_T *
-get_ccline_ptr(void)
+    స్థిర cmdline_info_T *
+get_ccline_ptr(శూన్య)
 {
-    if ((State & MODE_CMDLINE) == 0)
-	return NULL;
-    if (ccline.cmdbuff != NULL)
-	return &ccline;
-    if (prev_ccline_used && prev_ccline.cmdbuff != NULL)
-	return &prev_ccline;
-    return NULL;
+    ఒకవేళ ((State & బహుళకం_CMDLINE) == 0)
+	తిరిగి ఖాళీ;
+    ఒకవేళ (ccline.cmdbuff != ఖాళీ)
+	తిరిగి &ccline;
+    ఒకవేళ (prev_ccline_వాడిన && prev_ccline.cmdbuff != ఖాళీ)
+	తిరిగి &prev_ccline;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -4423,119 +4423,119 @@ get_ccline_ptr(void)
  * Only works when the command line is being edited.
  * Returns NUL when something is wrong.
  */
-    static int
-get_cmdline_type(void)
+    స్థిర పూర్ణాంకం
+get_cmdline_type(శూన్య)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    if (p == NULL)
-	return NUL;
-    if (p->cmdfirstc == NUL)
-	return
-#ifdef FEAT_EVAL
-	    (p->input_fn) ? '@' :
-#endif
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి NUL;
+    ఒకవేళ (p->cmdfirstc == NUL)
+	తిరిగి
+#నిర్వచితమైతే FEAT_EVAL
+	    (p->ఆదానం_fn) ? '@' :
+#అయితే_ముగింపు
 	    '-';
-    return p->cmdfirstc;
+    తిరిగి p->cmdfirstc;
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * Get the current command line in allocated memory.
  * Only works when the command line is being edited.
  * Returns NULL when something is wrong.
  */
-    static char_u *
-get_cmdline_str(void)
+    స్థిర char_u *
+get_cmdline_str(శూన్య)
 {
     cmdline_info_T *p;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ఒకవేళ (cmdline_నక్షత్రం > 0)
+	తిరిగి ఖాళీ;
     p = get_ccline_ptr();
-    if (p == NULL)
-	return NULL;
-    return vim_strnsave(p->cmdbuff, p->cmdlen);
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి ఖాళీ;
+    తిరిగి vim_strnsave(p->cmdbuff, p->cmdlen);
 }
 
 /*
  * Get the current command-line completion pattern.
  */
-    static char_u *
-get_cmdline_completion_pattern(void)
+    స్థిర char_u *
+get_cmdline_completion_నమూనా(శూన్య)
 {
     cmdline_info_T *p;
-    int		xp_context;
+    పూర్ణాంకం		xp_context;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ఒకవేళ (cmdline_నక్షత్రం > 0)
+	తిరిగి ఖాళీ;
 
     p = get_ccline_ptr();
-    if (p == NULL || p->xpc == NULL)
-	return NULL;
+    ఒకవేళ (p == ఖాళీ || p->xpc == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     xp_context = p->xpc->xp_context;
-    if (xp_context == EXPAND_NOTHING)
+    ఒకవేళ (xp_context == EXPAND_NOTHING)
     {
-	set_expand_context(p->xpc);
+	సమితి_expand_context(p->xpc);
 	xp_context = p->xpc->xp_context;
 	p->xpc->xp_context = EXPAND_NOTHING;
     }
-    if (xp_context == EXPAND_UNSUCCESSFUL)
-	return NULL;
+    ఒకవేళ (xp_context == EXPAND_UNSUCCESSFUL)
+	తిరిగి ఖాళీ;
 
-    char_u *compl_pat = p->xpc->xp_pattern;
+    char_u *compl_pat = p->xpc->xp_నమూనా;
 
-    if (compl_pat == NULL)
-	return NULL;
+    ఒకవేళ (compl_pat == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    return vim_strsave(compl_pat);
+    తిరిగి vim_strsave(compl_pat);
 }
 
 /*
  * Get the command-line completion type.
  */
-    static char_u *
-get_cmdline_completion(void)
+    స్థిర char_u *
+get_cmdline_completion(శూన్య)
 {
     cmdline_info_T	*p;
-    int			xp_context;
+    పూర్ణాంకం			xp_context;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ఒకవేళ (cmdline_నక్షత్రం > 0)
+	తిరిగి ఖాళీ;
 
     p = get_ccline_ptr();
-    if (p == NULL || p->xpc == NULL)
-	return NULL;
+    ఒకవేళ (p == ఖాళీ || p->xpc == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     xp_context = p->xpc->xp_context;
-    if (xp_context == EXPAND_NOTHING)
+    ఒకవేళ (xp_context == EXPAND_NOTHING)
     {
-	set_expand_context(p->xpc);
+	సమితి_expand_context(p->xpc);
 	xp_context = p->xpc->xp_context;
 	p->xpc->xp_context = EXPAND_NOTHING;
     }
-    if (xp_context == EXPAND_UNSUCCESSFUL)
-	return NULL;
+    ఒకవేళ (xp_context == EXPAND_UNSUCCESSFUL)
+	తిరిగి ఖాళీ;
 
-    return cmdcomplete_type_to_str(xp_context, p->xpc->xp_arg);
+    తిరిగి cmdcomplete_type_గమ్యం_str(xp_context, p->xpc->xp_arg);
 }
 
 /*
  * "getcmdcomplpat()" function
  */
-    void
-f_getcmdcomplpat(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdcomplpat(typval_T *argvars వాడని, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = get_cmdline_completion_pattern();
+    rettv->vval.v_string = get_cmdline_completion_నమూనా();
 }
 
 /*
  * "getcmdcompltype()" function
  */
-    void
-f_getcmdcompltype(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdcompltype(typval_T *argvars వాడని, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = get_cmdline_completion();
@@ -4544,8 +4544,8 @@ f_getcmdcompltype(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getcmdline()" function
  */
-    void
-f_getcmdline(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdline(typval_T *argvars వాడని, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = get_cmdline_str();
@@ -4554,47 +4554,47 @@ f_getcmdline(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getcmdpos()" function
  */
-    void
-f_getcmdpos(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdpos(typval_T *argvars వాడని, typval_T *rettv)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    rettv->vval.v_number = p != NULL ? p->cmdpos + 1 : 0;
+    rettv->vval.v_సంఖ్య = p != ఖాళీ ? p->cmdpos + 1 : 0;
 }
 
 /*
  * "getcmdprompt()" function
  */
-    void
-f_getcmdprompt(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdprompt(typval_T *argvars వాడని, typval_T *rettv)
 {
     cmdline_info_T *p = get_ccline_ptr();
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = p != NULL && p->cmdprompt != NULL ?
-					    vim_strsave(p->cmdprompt) : NULL;
+    rettv->vval.v_string = p != ఖాళీ && p->cmdprompt != ఖాళీ ?
+					    vim_strsave(p->cmdprompt) : ఖాళీ;
 }
 
 /*
  * "getcmdscreenpos()" function
  */
-    void
-f_getcmdscreenpos(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdscreenpos(typval_T *argvars వాడని, typval_T *rettv)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    rettv->vval.v_number = p != NULL ? cmdline_col_off + p->cmdspos + 1 : 0;
+    rettv->vval.v_సంఖ్య = p != ఖాళీ ? cmdline_నిలువు_off + p->cmdspos + 1 : 0;
 }
 
 /*
  * "getcmdtype()" function
  */
-    void
-f_getcmdtype(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcmdtype(typval_T *argvars వాడని, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = alloc(2);
-    if (rettv->vval.v_string == NULL)
-	return;
+    ఒకవేళ (rettv->vval.v_string == ఖాళీ)
+	తిరిగి;
 
     rettv->vval.v_string[0] = get_cmdline_type();
     rettv->vval.v_string[1] = NUL;
@@ -4602,18 +4602,18 @@ f_getcmdtype(typval_T *argvars UNUSED, typval_T *rettv)
 
 // Set the command line str to "str".
 // Returns 1 when failed, 0 when OK.
-    static int
-set_cmdline_str(char_u *str, int pos)
+    స్థిర పూర్ణాంకం
+సమితి_cmdline_str(char_u *str, పూర్ణాంకం pos)
 {
     cmdline_info_T  *p = get_ccline_ptr();
-    int		    len;
+    పూర్ణాంకం		    len;
 
-    if (p == NULL)
-	return 1;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి 1;
 
-    len = (int)STRLEN(str);
-    if (realloc_cmdbuff(len + 1) != OK)
-	return 1;
+    len = (పూర్ణాంకం)STRLEN(str);
+    ఒకవేళ (realloc_cmdbuff(len + 1) != OK)
+	తిరిగి 1;
     p->cmdlen = len;
     STRCPY(p->cmdbuff, str);
 
@@ -4626,7 +4626,7 @@ set_cmdline_str(char_u *str, int pos)
     // Trigger CmdlineChanged autocommands.
     trigger_cmd_autocmd(get_cmdline_type(), EVENT_CMDLINECHANGED);
 
-    return 0;
+    తిరిగి 0;
 }
 
 /*
@@ -4634,77 +4634,77 @@ set_cmdline_str(char_u *str, int pos)
  * Only works when the command line is being edited.
  * Returns 1 when failed, 0 when OK.
  */
-    static int
-set_cmdline_pos(
-    int		pos)
+    స్థిర పూర్ణాంకం
+సమితి_cmdline_pos(
+    పూర్ణాంకం		pos)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    if (p == NULL)
-	return 1;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి 1;
 
     // The position is not set directly but after CTRL-\ e or CTRL-R = has
     // changed the command line.
-    if (pos < 0)
+    ఒకవేళ (pos < 0)
 	new_cmdpos = 0;
-    else
+    లేకపోతే
 	new_cmdpos = pos;
 
-    return 0;
+    తిరిగి 0;
 }
 
 // "setcmdline()" function
-    void
+    శూన్య
 f_setcmdline(typval_T *argvars, typval_T *rettv)
 {
-    int pos = -1;
+    పూర్ణాంకం pos = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL)
-	return;
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_సంఖ్య_arg(argvars, 1) == FAIL)
+	తిరిగి;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	పూర్ణాంకం error = FALSE;
 
-	pos = (int)tv_get_number_chk(&argvars[1], &error) - 1;
-	if (error)
-	    return;
-	if (pos < 0)
+	pos = (పూర్ణాంకం)tv_get_సంఖ్య_chk(&argvars[1], &error) - 1;
+	ఒకవేళ (error)
+	    తిరిగి;
+	ఒకవేళ (pos < 0)
 	{
-	    emsg(_(e_argument_must_be_positive));
-	    return;
+	    emsg(_(e_వాదం_must_be_ధనాత్మక));
+	    తిరిగి;
 	}
     }
 
     // Use tv_get_string() to handle a NULL string like an empty string.
-    rettv->vval.v_number = set_cmdline_str(tv_get_string(&argvars[0]), pos);
+    rettv->vval.v_సంఖ్య = సమితి_cmdline_str(tv_get_string(&argvars[0]), pos);
 }
 
 /*
  * "setcmdpos()" function
  */
-    void
+    శూన్య
 f_setcmdpos(typval_T *argvars, typval_T *rettv)
 {
-    int		pos;
+    పూర్ణాంకం		pos;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_సంఖ్య_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    pos = (int)tv_get_number(&argvars[0]) - 1;
-    if (pos >= 0)
-	rettv->vval.v_number = set_cmdline_pos(pos);
+    pos = (పూర్ణాంకం)tv_get_సంఖ్య(&argvars[0]) - 1;
+    ఒకవేళ (pos >= 0)
+	rettv->vval.v_సంఖ్య = సమితి_cmdline_pos(pos);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return the first character of the current command line.
  */
-    int
-get_cmdline_firstc(void)
+    పూర్ణాంకం
+get_cmdline_firstc(శూన్య)
 {
-    return ccline.cmdfirstc;
+    తిరిగి ccline.cmdfirstc;
 }
 
 /*
@@ -4712,66 +4712,66 @@ get_cmdline_firstc(void)
  * text lines in a buffer!) from a string.  Used for ":history" and ":clist".
  * Returns OK if parsed successfully, otherwise FAIL.
  */
-    int
-get_list_range(char_u **str, int *num1, int *num2)
+    పూర్ణాంకం
+get_list_range(char_u **str, పూర్ణాంకం *num1, పూర్ణాంకం *num2)
 {
-    int		len;
-    int		first = FALSE;
-    varnumber_T	num;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		మొదటి = FALSE;
+    varnumber_T	అంకె;
 
     *str = skipwhite(*str);
-    if (**str == '-' || vim_isdigit(**str))  // parse "from" part of range
+    ఒకవేళ (**str == '-' || vim_isdigit(**str))  // parse "from" part of range
     {
-	vim_str2nr(*str, NULL, &len, 0, &num, NULL, 0, FALSE, NULL);
+	vim_str2nr(*str, ఖాళీ, &len, 0, &అంకె, ఖాళీ, 0, FALSE, ఖాళీ);
 	*str += len;
-	// overflow
-	if (num > INT_MAX)
-	    return FAIL;
+	//అధికప్రవాహం
+	ఒకవేళ (అంకె > గరిష్ఠ_పూర్ణాంకం)
+	    తిరిగి FAIL;
 
-	*num1 = (int)num;
-	first = TRUE;
+	*num1 = (పూర్ణాంకం)అంకె;
+	మొదటి = TRUE;
     }
     *str = skipwhite(*str);
-    if (**str == ',')			// parse "to" part of range
+    ఒకవేళ (**str == ',')			// parse "to" part of range
     {
 	*str = skipwhite(*str + 1);
-	vim_str2nr(*str, NULL, &len, 0, &num, NULL, 0, FALSE, NULL);
-	if (len > 0)
+	vim_str2nr(*str, ఖాళీ, &len, 0, &అంకె, ఖాళీ, 0, FALSE, ఖాళీ);
+	ఒకవేళ (len > 0)
 	{
 	    *str = skipwhite(*str + len);
-	    // overflow
-	    if (num > INT_MAX)
-		return FAIL;
+	    //అధికప్రవాహం
+	    ఒకవేళ (అంకె > గరిష్ఠ_పూర్ణాంకం)
+		తిరిగి FAIL;
 
-	    *num2 = (int)num;
+	    *num2 = (పూర్ణాంకం)అంకె;
 	}
-	else if (!first)		// no number given at all
-	    return FAIL;
+	లేకపోతే ఒకవేళ (!మొదటి)		// no number given at all
+	    తిరిగి FAIL;
     }
-    else if (first)			// only one number given
+    లేకపోతే ఒకవేళ (మొదటి)			// only one number given
 	*num2 = *num1;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Check value of 'cedit' and set cedit_key.
  * Returns NULL if value is OK, error message otherwise.
  */
-    char *
-did_set_cedit(optset_T *args UNUSED)
+    అక్షరం *
+did_సమితి_cedit(optset_T *వాదనలు వాడని)
 {
-    int n;
+    పూర్ణాంకం n;
 
-    if (*p_cedit == NUL)
-	cedit_key = -1;
-    else
+    ఒకవేళ (*p_cedit == NUL)
+	cedit_కీలకం = -1;
+    లేకపోతే
     {
-	n = string_to_key(p_cedit, FALSE);
-	if (n == 0 || vim_isprintc(n))
-	    return e_invalid_argument;
-	cedit_key = n;
+	n = string_గమ్యం_కీలకం(p_cedit, FALSE);
+	ఒకవేళ (n == 0 || vim_isprintc(n))
+	    తిరిగి e_invalid_వాదం;
+	cedit_కీలకం = n;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -4782,45 +4782,45 @@ did_set_cedit(optset_T *args UNUSED)
  *	Ctrl_C	 if it is to be abandoned
  *	K_IGNORE if editing continues
  */
-    static int
-open_cmdwin(void)
+    స్థిర పూర్ణాంకం
+open_cmdwin(శూన్య)
 {
     bufref_T		old_curbuf;
     win_T		*old_curwin = curwin;
     bufref_T		bufref;
     win_T		*wp;
-    int			i;
+    పూర్ణాంకం			i;
     linenr_T		lnum;
-    int			histtype;
+    పూర్ణాంకం			histtype;
     garray_T		winsizes;
-    int			save_restart_edit = restart_edit;
-    int			save_State = State;
-    int			save_exmode = exmode_active;
-#ifdef FEAT_RIGHTLEFT
-    int			save_cmdmsg_rl = cmdmsg_rl;
-#endif
-#ifdef FEAT_FOLDING
-    int			save_KeyTyped;
-#endif
-    int			newbuf_status;
-    int			cmdwin_valid;
+    పూర్ణాంకం			save_restart_edit = restart_edit;
+    పూర్ణాంకం			save_State = State;
+    పూర్ణాంకం			save_exmode = exmode_చురుకైన;
+#నిర్వచితమైతే FEAT_RIGHTLEFT
+    పూర్ణాంకం			save_cmdmsg_rl = cmdmsg_rl;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_FOLDING
+    పూర్ణాంకం			save_కీలకం_Typed;
+#అయితే_ముగింపు
+    పూర్ణాంకం			newbuf_స్థితి;
+    పూర్ణాంకం			cmdwin_valid;
 
     // Can't do this when text or buffer is locked.
     // Can't do this recursively.  Can't do it when typing a password.
-    if (text_or_buf_locked()
+    ఒకవేళ (పాఠ్యం_or_buf_locked()
 	    || cmdwin_type != 0
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-	    || cmdline_star > 0
-#endif
+#ఒకవేళ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+	    || cmdline_నక్షత్రం > 0
+#అయితే_ముగింపు
 	    )
     {
 	beep_flush();
-	return K_IGNORE;
+	తిరిగి K_IGNORE;
     }
-    set_bufref(&old_curbuf, curbuf);
+    సమితి_bufref(&old_curbuf, curbuf);
 
     // Save current window sizes.
-    win_size_save(&winsizes);
+    win_కొలత_save(&winsizes);
 
     // When using completion in Insert mode with <C-R>=<C-F> one can open the
     // command line window, but we don't want the popup menu then.
@@ -4831,21 +4831,21 @@ open_cmdwin(void)
     cmdmod.cmod_flags |= CMOD_NOSWAPFILE;
 
     // Create a window for the command-line buffer.
-    if (win_split((int)p_cwh, WSP_BOT) == FAIL)
+    ఒకవేళ (win_విభజించు((పూర్ణాంకం)p_cwh, WSP_BOT) == FAIL)
     {
 	beep_flush();
 	ga_clear(&winsizes);
-	return K_IGNORE;
+	తిరిగి K_IGNORE;
     }
     // win_split() autocommands may have messed with the old window or buffer.
     // Treat it as abandoning this command-line.
-    if (!win_valid(old_curwin) || curwin == old_curwin
+    ఒకవేళ (!win_valid(old_curwin) || curwin == old_curwin
 	    || !bufref_valid(&old_curbuf)
-	    || old_curwin->w_buffer != old_curbuf.br_buf)
+	    || old_curwin->w_బఫరు != old_curbuf.br_buf)
     {
 	beep_flush();
 	ga_clear(&winsizes);
-	return Ctrl_C;
+	తిరిగి Ctrl_C;
     }
     // Don't let quitting the More prompt make this fail.
     got_int = FALSE;
@@ -4856,65 +4856,65 @@ open_cmdwin(void)
 
     // Create empty command-line buffer.  Be especially cautious of BufLeave
     // autocommands from do_ecmd(), as cmdwin restrictions do not apply to them!
-    newbuf_status = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, ECMD_HIDE,
-					NULL);
+    newbuf_స్థితి = do_ecmd(0, ఖాళీ, ఖాళీ, ఖాళీ, ECMD_ONE, ECMD_HIDE,
+					ఖాళీ);
     cmdwin_valid = win_valid(cmdwin_win);
-    if (newbuf_status == FAIL || !cmdwin_valid || curwin != cmdwin_win ||
+    ఒకవేళ (newbuf_స్థితి == FAIL || !cmdwin_valid || curwin != cmdwin_win ||
 	    !win_valid(old_curwin) || !bufref_valid(&old_curbuf) ||
-	    old_curwin->w_buffer != old_curbuf.br_buf)
+	    old_curwin->w_బఫరు != old_curbuf.br_buf)
     {
-	if (newbuf_status == OK)
-	    set_bufref(&bufref, curbuf);
-	if (cmdwin_valid && !last_window())
+	ఒకవేళ (newbuf_స్థితి == OK)
+	    సమితి_bufref(&bufref, curbuf);
+	ఒకవేళ (cmdwin_valid && !చివరి_కిటికీ())
 	    win_close(cmdwin_win, TRUE);
 
 	// win_close() autocommands may have already deleted the buffer.
-	if (newbuf_status == OK && bufref_valid(&bufref) &&
+	ఒకవేళ (newbuf_స్థితి == OK && bufref_valid(&bufref) &&
 		bufref.br_buf != curbuf)
-	    close_buffer(NULL, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	    close_బఫరు(ఖాళీ, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 
 	cmdwin_type = 0;
-	cmdwin_win = NULL;
+	cmdwin_win = ఖాళీ;
 	beep_flush();
 	ga_clear(&winsizes);
-	return Ctrl_C;
+	తిరిగి Ctrl_C;
     }
     cmdwin_buf = curbuf;
 
-    set_option_value_give_err((char_u *)"bt",
+    సమితి_option_విలువ_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
     curbuf->b_p_ma = TRUE;
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     curwin->w_p_fen = FALSE;
-#endif
-#ifdef FEAT_RIGHTLEFT
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     curwin->w_p_rl = cmdmsg_rl;
     cmdmsg_rl = FALSE;
-#endif
+#అయితే_ముగింపు
     RESET_BINDING(curwin);
 
     // Don't allow switching to another buffer.
-    ++curbuf_lock;
+    ++curbuf_తాళం;
 
     // Showing the prompt may have set need_wait_return, reset it.
     need_wait_return = FALSE;
 
     histtype = hist_char2type(cmdwin_type);
-    if (histtype == HIST_CMD || histtype == HIST_DEBUG)
+    ఒకవేళ (histtype == HIST_CMD || histtype == HIST_DEBUG)
     {
-	if (p_wc == TAB)
+	ఒకవేళ (p_wc == TAB)
 	{
 	    // Make Tab start command-line completion: CTRL-X CTRL-V
-	    add_map((char_u *)"<buffer> <Tab> <C-X><C-V>", MODE_INSERT, TRUE);
-	    add_map((char_u *)"<buffer> <Tab> a<C-X><C-V>", MODE_NORMAL, TRUE);
+	    కూడు_map((char_u *)"<buffer> <Tab> <C-X><C-V>", బహుళకం_చొప్పించు, TRUE);
+	    కూడు_map((char_u *)"<buffer> <Tab> a<C-X><C-V>", బహుళకం_సాధారణ, TRUE);
 
 	    // Make S-Tab work like CTRL-P in command-line completion
-	    add_map((char_u *)"<buffer> <S-Tab> <C-P>", MODE_INSERT, TRUE);
+	    కూడు_map((char_u *)"<buffer> <S-Tab> <C-P>", బహుళకం_చొప్పించు, TRUE);
 	}
-	set_option_value_give_err((char_u *)"ft",
+	సమితి_option_విలువ_give_err((char_u *)"ft",
 					       0L, (char_u *)"vim", OPT_LOCAL);
     }
-    --curbuf_lock;
+    --curbuf_తాళం;
 
     // Reset 'textwidth' after setting 'filetype' (the Vim filetype plugin
     // sets 'textwidth' to 78).
@@ -4922,50 +4922,50 @@ open_cmdwin(void)
 
     // Fill the buffer with the history.
     init_history();
-    if (get_hislen() > 0)
+    ఒకవేళ (get_hislen() > 0)
     {
 	i = *get_hisidx(histtype);
-	if (i >= 0)
+	ఒకవేళ (i >= 0)
 	{
 	    lnum = 0;
-	    do
+	    చేయి
 	    {
-		if (++i == get_hislen())
+		ఒకవేళ (++i == get_hislen())
 		    i = 0;
-		if (get_histentry(histtype)[i].hisstr != NULL)
+		ఒకవేళ (get_histentry(histtype)[i].hisstr != ఖాళీ)
 		    ml_append(lnum++, get_histentry(histtype)[i].hisstr,
 							   (colnr_T)0, FALSE);
 	    }
-	    while (i != *get_hisidx(histtype));
+	    అయితే (i != *get_hisidx(histtype));
 	}
     }
 
     // Replace the empty last line with the current command-line and put the
     // cursor there.
-    ml_replace(curbuf->b_ml.ml_line_count, ccline.cmdbuff, TRUE);
-    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-    curwin->w_cursor.col = ccline.cmdpos;
-    changed_line_abv_curs();
+    ml_replace(curbuf->b_ml.ml_పంక్తి_లెక్క, ccline.cmdbuff, TRUE);
+    curwin->w_cursor.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+    curwin->w_cursor.నిలువు = ccline.cmdpos;
+    మారింది_పంక్తి_abv_curs();
     invalidate_botline();
     redraw_later(UPD_SOME_VALID);
 
     // No Ex mode here!
-    exmode_active = 0;
+    exmode_చురుకైన = 0;
 
-    State = MODE_NORMAL;
+    State = బహుళకం_సాధారణ;
     check_cursor();
     setmouse();
     clear_showcmd();
 
     // Reset here so it can be set by a CmdwinEnter autocommand.
-    cmdwin_result = 0;
+    cmdwin_ఫలితం = 0;
 
     // Trigger CmdwinEnter autocommands.
     trigger_cmd_autocmd(cmdwin_type, EVENT_CMDWINENTER);
-    if (restart_edit != 0)	// autocmd with ":startinsert"
+    ఒకవేళ (restart_edit != 0)	// autocmd with ":startinsert"
 	stuffcharReadbuff(K_NOP);
 
-    int save_RedrawingDisabled = RedrawingDisabled;
+    పూర్ణాంకం save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
     /*
@@ -4975,61 +4975,61 @@ open_cmdwin(void)
 
     RedrawingDisabled = save_RedrawingDisabled;
 
-#ifdef FEAT_FOLDING
-    save_KeyTyped = KeyTyped;
-#endif
+#నిర్వచితమైతే FEAT_FOLDING
+    save_కీలకం_Typed = కీలకం_Typed;
+#అయితే_ముగింపు
 
     // Trigger CmdwinLeave autocommands.
     trigger_cmd_autocmd(cmdwin_type, EVENT_CMDWINLEAVE);
 
-#ifdef FEAT_FOLDING
+#నిర్వచితమైతే FEAT_FOLDING
     // Restore KeyTyped in case it is modified by autocommands
-    KeyTyped = save_KeyTyped;
-#endif
+    కీలకం_Typed = save_కీలకం_Typed;
+#అయితే_ముగింపు
 
     cmdwin_type = 0;
-    cmdwin_buf = NULL;
-    cmdwin_win = NULL;
-    exmode_active = save_exmode;
+    cmdwin_buf = ఖాళీ;
+    cmdwin_win = ఖాళీ;
+    exmode_చురుకైన = save_exmode;
 
     // Safety check: The old window or buffer was changed or deleted: It's a bug
     // when this happens!
-    if (!win_valid(old_curwin) || !bufref_valid(&old_curbuf)
-	    || old_curwin->w_buffer != old_curbuf.br_buf)
+    ఒకవేళ (!win_valid(old_curwin) || !bufref_valid(&old_curbuf)
+	    || old_curwin->w_బఫరు != old_curbuf.br_buf)
     {
-	cmdwin_result = Ctrl_C;
-	emsg(_(e_active_window_or_buffer_changed_or_deleted));
+	cmdwin_ఫలితం = Ctrl_C;
+	emsg(_(e_చురుకైన_కిటికీ_or_బఫరు_మారింది_or_deleted));
     }
-    else
+    లేకపోతే
     {
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 	// autocmds may abort script processing
-	if (aborting() && cmdwin_result != K_IGNORE)
-	    cmdwin_result = Ctrl_C;
-#endif
+	ఒకవేళ (aborting() && cmdwin_ఫలితం != K_IGNORE)
+	    cmdwin_ఫలితం = Ctrl_C;
+#అయితే_ముగింపు
 	// Set the new command line from the cmdline buffer.
 	dealloc_cmdbuff();
 
-	if (cmdwin_result == K_XF1 || cmdwin_result == K_XF2) // :qa[!] typed
+	ఒకవేళ (cmdwin_ఫలితం == K_XF1 || cmdwin_ఫలితం == K_XF2) // :qa[!] typed
 	{
 	    char_u  *p = (char_u *)"qa";	    // assume cmdwin_result == K_XF2
 	    size_t  plen = 2;
 
-	    if (cmdwin_result == K_XF1)
+	    ఒకవేళ (cmdwin_ఫలితం == K_XF1)
 	    {
 		p = (char_u *)"qa!";
 		plen = 3;
 	    }
 
-	    if (histtype == HIST_CMD)
+	    ఒకవేళ (histtype == HIST_CMD)
 	    {
 		// Execute the command directly.
 		ccline.cmdbuff = vim_strnsave(p, plen);
-		ccline.cmdlen = (int)plen;
-		ccline.cmdbufflen = (int)(plen + 1);
-		cmdwin_result = CAR;
+		ccline.cmdlen = (పూర్ణాంకం)plen;
+		ccline.cmdbufflen = (పూర్ణాంకం)(plen + 1);
+		cmdwin_ఫలితం = CAR;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// First need to cancel what we were doing.
 		stuffcharReadbuff(':');
@@ -5037,92 +5037,92 @@ open_cmdwin(void)
 		stuffcharReadbuff(CAR);
 	    }
 	}
-	else if (cmdwin_result == Ctrl_C)
+	లేకపోతే ఒకవేళ (cmdwin_ఫలితం == Ctrl_C)
 	{
 	    // :q or :close, don't execute any command
 	    // and don't modify the cmd window.
-	    ccline.cmdbuff = NULL;
+	    ccline.cmdbuff = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
 	    ccline.cmdlen = ml_get_curline_len();
 	    ccline.cmdbufflen = ccline.cmdlen + 1;
 	    ccline.cmdbuff = vim_strnsave(ml_get_curline(), ccline.cmdlen);
 	}
 
-	if (ccline.cmdbuff == NULL)
+	ఒకవేళ (ccline.cmdbuff == ఖాళీ)
 	{
 	    ccline.cmdbuff = vim_strnsave((char_u *)"", 0);
 	    ccline.cmdlen = 0;
 	    ccline.cmdbufflen = 1;
 	    ccline.cmdpos = 0;
-	    cmdwin_result = Ctrl_C;
+	    cmdwin_ఫలితం = Ctrl_C;
 	}
-	else
+	లేకపోతే
 	{
-	    ccline.cmdpos = curwin->w_cursor.col;
+	    ccline.cmdpos = curwin->w_cursor.నిలువు;
 	    // If the cursor is on the last character, it probably should be
 	    // after it.
-	    if (ccline.cmdpos == ccline.cmdlen - 1
+	    ఒకవేళ (ccline.cmdpos == ccline.cmdlen - 1
 		    || ccline.cmdpos > ccline.cmdlen)
 		ccline.cmdpos = ccline.cmdlen;
 	}
 
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
 	// Avoid command-line window first character being concealed.
 	curwin->w_p_cole = 0;
-#endif
+#అయితే_ముగింపు
 	// First go back to the original window.
 	wp = curwin;
-	set_bufref(&bufref, curbuf);
+	సమితి_bufref(&bufref, curbuf);
 
 	skip_win_fix_cursor = TRUE;
 	win_goto(old_curwin);
 
 	// win_goto() may trigger an autocommand that already closes the
 	// cmdline window.
-	if (win_valid(wp) && wp != curwin)
+	ఒకవేళ (win_valid(wp) && wp != curwin)
 	    win_close(wp, TRUE);
 
 	// win_close() may have already wiped the buffer when 'bh' is
 	// set to 'wipe', autocommands may have closed other windows
-	if (bufref_valid(&bufref) && bufref.br_buf != curbuf)
-	    close_buffer(NULL, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	ఒకవేళ (bufref_valid(&bufref) && bufref.br_buf != curbuf)
+	    close_బఫరు(ఖాళీ, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 
 	// Restore window sizes.
-	win_size_restore(&winsizes);
+	win_కొలత_restore(&winsizes);
 	skip_win_fix_cursor = FALSE;
 
-	if (cmdwin_result == K_IGNORE)
+	ఒకవేళ (cmdwin_ఫలితం == K_IGNORE)
 	{
 	    // It can be confusing that the cmdwin still shows, redraw the
 	    // screen.
 	    update_screen(UPD_VALID);
-	    set_cmdspos_cursor();
+	    సమితి_cmdspos_cursor();
 	    redrawcmd();
 	}
     }
 
     ga_clear(&winsizes);
     restart_edit = save_restart_edit;
-#ifdef FEAT_RIGHTLEFT
+#నిర్వచితమైతే FEAT_RIGHTLEFT
     cmdmsg_rl = save_cmdmsg_rl;
-#endif
+#అయితే_ముగింపు
 
     State = save_State;
     may_trigger_modechanged();
     setmouse();
 
-    return cmdwin_result;
+    తిరిగి cmdwin_ఫలితం;
 }
 
 /*
  * Return TRUE if in the cmdwin, not editing the command line.
  */
-    int
-is_in_cmdwin(void)
+    పూర్ణాంకం
+is_లోపల_cmdwin(శూన్య)
 {
-    return cmdwin_type != 0 && get_cmdline_type() == NUL;
+    తిరిగి cmdwin_type != 0 && get_cmdline_type() == NUL;
 }
 
 /*
@@ -5133,25 +5133,25 @@ is_in_cmdwin(void)
  * Returns a pointer to allocated memory with {script} or NULL.
  */
     char_u *
-script_get(exarg_T *eap UNUSED, char_u *cmd UNUSED)
+script_get(exarg_T *eap వాడని, char_u *cmd వాడని)
 {
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     list_T	*l;
     listitem_T	*li;
     char_u	*s;
     garray_T	ga;
 
-    if (cmd[0] != '<' || cmd[1] != '<' || eap->ea_getline == NULL)
-	return NULL;
+    ఒకవేళ (cmd[0] != '<' || cmd[1] != '<' || eap->ea_getline == ఖాళీ)
+	తిరిగి ఖాళీ;
     cmd += 2;
 
     l = heredoc_get(eap, cmd, TRUE, FALSE);
-    if (l == NULL)
-	return NULL;
+    ఒకవేళ (l == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     ga_init2(&ga, 1, 0x400);
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
 	s = tv_get_string(&li->li_tv);
 	ga_concat(&ga, s);
@@ -5160,122 +5160,122 @@ script_get(exarg_T *eap UNUSED, char_u *cmd UNUSED)
     ga_append(&ga, NUL);
 
     list_free(l);
-    return (char_u *)ga.ga_data;
-#else
-    return NULL;
-#endif
+    తిరిగి (char_u *)ga.ga_దత్తాంశం;
+#లేకపోతే
+    తిరిగి ఖాళీ;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * This function is used by f_input() and f_inputdialog() functions. The third
  * argument to f_input() specifies the type of completion to use at the
  * prompt. The third argument to f_inputdialog() specifies the value to return
  * when the user cancels the prompt.
  */
-    void
-get_user_input(
+    శూన్య
+get_user_ఆదానం(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		inputdialog,
-    int		secret)
+    పూర్ణాంకం		inputdialog,
+    పూర్ణాంకం		secret)
 {
     char_u	*prompt;
-    char_u	*p = NULL;
-    int		c;
+    char_u	*p = ఖాళీ;
+    పూర్ణాంకం		c;
     char_u	buf[NUMBUFLEN];
-    int		cmd_silent_save = cmd_silent;
+    పూర్ణాంకం		cmd_silent_save = cmd_silent;
     char_u	*defstr = (char_u *)"";
-    int		xp_type = EXPAND_NOTHING;
-    char_u	*xp_arg = NULL;
+    పూర్ణాంకం		xp_type = EXPAND_NOTHING;
+    char_u	*xp_arg = ఖాళీ;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (input_busy)
-	return;  // this doesn't work recursively.
+    rettv->vval.v_string = ఖాళీ;
+    ఒకవేళ (ఆదానం_busy)
+	తిరిగి;  // this doesn't work recursively.
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_string_arg(argvars, 2) == FAIL)))
-	return;
+	తిరిగి;
 
     prompt = tv_get_string_chk(&argvars[0]);
 
-# ifdef NO_CONSOLE_INPUT
+# ifdef NO_CONSOLE_ఆదానం
     // While starting up, there is no place to enter text. When running tests
     // with --not-a-term we assume feedkeys() will be used.
-    if (no_console_input() && !is_not_a_term())
-	return;
+    ఒకవేళ (no_console_ఆదానం() && !is_not_a_పదం())
+	తిరిగి;
 # endif
 
     cmd_silent = FALSE;		// Want to see the prompt.
-    if (prompt != NULL)
+    ఒకవేళ (prompt != ఖాళీ)
     {
 	// Only the part of the message after the last NL is considered as
 	// prompt for the command line
 	p = vim_strrchr(prompt, '\n');
-	if (p == NULL)
+	ఒకవేళ (p == ఖాళీ)
 	    p = prompt;
-	else
+	లేకపోతే
 	{
 	    ++p;
 	    c = *p;
 	    *p = NUL;
-	    msg_start();
-	    msg_clr_eos();
-	    msg_puts_attr((char *)prompt, get_echo_attr());
-	    msg_didout = FALSE;
-	    msg_starthere();
+	    సందేశం_ప్రారంభం();
+	    సందేశం_clr_eos();
+	    సందేశం_puts_attr((అక్షరం *)prompt, get_echo_attr());
+	    సందేశం_didout = FALSE;
+	    సందేశం_starthere();
 	    *p = c;
 	}
-	cmdline_row = msg_row;
+	cmdline_అడ్డువరుస = సందేశం_అడ్డువరుస;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	ఒకవేళ (argvars[1].v_type != VAR_UNKNOWN)
 	{
 	    defstr = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (defstr != NULL)
+	    ఒకవేళ (defstr != ఖాళీ)
 		stuffReadbuffSpec(defstr);
 
-	    if (!inputdialog && argvars[2].v_type != VAR_UNKNOWN)
+	    ఒకవేళ (!inputdialog && argvars[2].v_type != VAR_UNKNOWN)
 	    {
 		char_u	*xp_name;
-		int	xp_namelen;
-		long	argt = 0;
+		పూర్ణాంకం	xp_namelen;
+		దీర్ఘ	argt = 0;
 
 		// input() with a third argument: completion
-		rettv->vval.v_string = NULL;
+		rettv->vval.v_string = ఖాళీ;
 
 		xp_name = tv_get_string_buf_chk(&argvars[2], buf);
-		if (xp_name == NULL)
-		    return;
+		ఒకవేళ (xp_name == ఖాళీ)
+		    తిరిగి;
 
-		xp_namelen = (int)STRLEN(xp_name);
+		xp_namelen = (పూర్ణాంకం)STRLEN(xp_name);
 
-		if (parse_compl_arg(xp_name, xp_namelen, &xp_type, &argt,
+		ఒకవేళ (parse_compl_arg(xp_name, xp_namelen, &xp_type, &argt,
 							     &xp_arg) == FAIL)
-		    return;
+		    తిరిగి;
 	    }
 	}
 
-	if (defstr != NULL)
+	ఒకవేళ (defstr != ఖాళీ)
 	{
-	    int save_ex_normal_busy = ex_normal_busy;
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_input_busy = input_busy;
+	    పూర్ణాంకం save_ex_సాధారణ_busy = ex_సాధారణ_busy;
+	    పూర్ణాంకం save_vgetc_busy = vgetc_busy;
+	    పూర్ణాంకం save_ఆదానం_busy = ఆదానం_busy;
 
-	    input_busy |= vgetc_busy;
-	    ex_normal_busy = 0;
+	    ఆదానం_busy |= vgetc_busy;
+	    ex_సాధారణ_busy = 0;
 	    vgetc_busy = 0;
 	    rettv->vval.v_string =
 		getcmdline_prompt(secret ? NUL : '@', p, get_echo_attr(),
 							      xp_type, xp_arg);
-	    ex_normal_busy = save_ex_normal_busy;
+	    ex_సాధారణ_busy = save_ex_సాధారణ_busy;
 	    vgetc_busy = save_vgetc_busy;
-	    input_busy = save_input_busy;
+	    ఆదానం_busy = save_ఆదానం_busy;
 	}
-	if (inputdialog && rettv->vval.v_string == NULL
+	ఒకవేళ (inputdialog && rettv->vval.v_string == ఖాళీ
 		&& argvars[1].v_type != VAR_UNKNOWN
 		&& argvars[2].v_type != VAR_UNKNOWN)
 	    rettv->vval.v_string = vim_strsave(tv_get_string_buf(
@@ -5285,35 +5285,35 @@ get_user_input(
 
 	// since the user typed this, no need to wait for return
 	need_wait_return = FALSE;
-	msg_didout = FALSE;
+	సందేశం_didout = FALSE;
     }
     cmd_silent = cmd_silent_save;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * "wildtrigger()" function
  */
-    void
-f_wildtrigger(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    శూన్య
+f_wildtrigger(typval_T *argvars వాడని, typval_T *rettv వాడని)
 {
-    if (!(State & MODE_CMDLINE) || char_avail() || wild_menu_showing
-	    || cmdline_pum_active())
-	return;
+    ఒకవేళ (!(State & బహుళకం_CMDLINE) || char_avail() || wild_menu_showing
+	    || cmdline_pum_చురుకైన())
+	తిరిగి;
 
-    int cmd_type = get_cmdline_type();
+    పూర్ణాంకం cmd_type = get_cmdline_type();
 
-    if (cmd_type == ':' || cmd_type == '/' || cmd_type == '?')
+    ఒకవేళ (cmd_type == ':' || cmd_type == '/' || cmd_type == '?')
     {
 	// Add K_WILD as a single special key
-	char_u	key_string[4];
+	char_u	కీలకం_string[4];
 
-	key_string[0] = K_SPECIAL;
-	key_string[1] = KS_EXTRA;
-	key_string[2] = KE_WILD;
-	key_string[3] = NUL;
+	కీలకం_string[0] = K_SPECIAL;
+	కీలకం_string[1] = KS_EXTRA;
+	కీలకం_string[2] = KE_WILD;
+	కీలకం_string[3] = NUL;
 
 	// Insert it into the typeahead buffer
-	ins_typebuf(key_string, REMAP_NONE, 0, TRUE, FALSE);
+	ins_typebuf(కీలకం_string, REMAP_NONE, 0, TRUE, FALSE);
     }
 }

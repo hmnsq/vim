@@ -13,20 +13,20 @@
  * Amiga system-dependent routines.
  */
 
-#include "vim.h"
-#include "version.h"
+#అన్తర్భావ "vim.h"
+#అన్తర్భావ "version.h"
 
-#ifdef Window
-# undef Window	// Amiga has its own Window definition
-#endif
+#నిర్వచితమైతే కిటికీ
+# undef కిటికీ	// Amiga has its own Window definition
+#అయితే_ముగింపు
 
-#undef TRUE		// will be redefined by exec/types.h
-#undef FALSE
+#నిర్వచనం_రద్దు TRUE		// will be redefined by exec/types.h
+#నిర్వచనం_రద్దు FALSE
 
-#ifndef LATTICE
+#నిర్వచితం_కాకపోతే LATTICE
 # include <exec/exec.h>
 # include <intuition/intuition.h>
-#endif
+#అయితే_ముగింపు
 
 // XXX These are included from os_amiga.h
 // #include <exec/types.h>
@@ -36,23 +36,23 @@
 // #include <proto/dos.h>
 // #include <proto/intuition.h>
 
-#include <exec/memory.h>
+#అన్తర్భావ <exec/memory.h>
 
-#include <dos/dostags.h>	    // for 2.0 functions
-#include <dos/dosasl.h>
+#అన్తర్భావ <dos/dostags.h>	    // for 2.0 functions
+#అన్తర్భావ <dos/dosasl.h>
 
 // From version 4 of AmigaOS, several system structures must be allocated
 // and freed using system functions. "struct AnchorPath" is one.
-#ifdef __amigaos4__
+#నిర్వచితమైతే __amigaos4__
 # include <dos/anchorpath.h>
 # define	free_fib(x) FreeDosObject(DOS_FIB, x)
-#else
+#లేకపోతే
 # define	free_fib(x) vim_free(fib)
-#endif
+#అయితే_ముగింపు
 
-#if defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
+#ఒకవేళ defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
 # include <libraries/arp_pragmas.h>
-#endif
+#అయితే_ముగింపు
 
 /*
  * Set stack size on startup.  1 MiB on NG systems (OS4, AROS, MorphOS)
@@ -60,31 +60,31 @@
  * highlighting and Vim9 execution but conservative for systems with as
  * little as 2 MiB of Fast RAM.
  */
-#if defined(__amigaos4__)
-static const char* __attribute__((used)) stackcookie = "$STACK: 1048576";
-#elif defined(__AROS__) || defined(__MORPHOS__)
-unsigned long __stack = 1048576;
-#elif defined(__GNUC__) && defined(AMIGA)
-unsigned long __stack = 262144;
-#endif
+#ఒకవేళ defined(__amigaos4__)
+స్థిర స్థిరరాశి అక్షరం* __attribute__((వాడిన)) stackcookie = "$STACK: 1048576";
+#లేదావేళ defined(__AROS__) || defined(__MORPHOS__)
+గుర్తులేని దీర్ఘ __stack = 1048576;
+#లేదావేళ defined(__GNUC__) && defined(AMIGA)
+గుర్తులేని దీర్ఘ __stack = 262144;
+#అయితే_ముగింపు
 
 /*
  * At this point TRUE and FALSE are defined as 1L and 0L, but we want 1 and 0.
  */
-#undef	TRUE
-#define TRUE (1)
-#undef	FALSE
-#define FALSE (0)
+#నిర్వచనం_రద్దు	TRUE
+#నిర్వచించు TRUE (1)
+#నిర్వచనం_రద్దు	FALSE
+#నిర్వచించు FALSE (0)
 
-#ifdef __amigaos4__
+#నిర్వచితమైతే __amigaos4__
 # define	dos_packet(a, b, c)   DoPkt(a, b, c, 0, 0, 0, 0)
-#elif !defined(AZTEC_C) && !defined(__AROS__)
-static long dos_packet(struct MsgPort *, long, long);
-#endif
-static int lock2name(BPTR lock, char_u *buf, long   len);
-static void out_num(long n);
-static struct FileInfoBlock *get_fib(char_u *);
-static int sortcmp(const void *a, const void *b);
+#లేదావేళ !defined(AZTEC_C) && !defined(__AROS__)
+స్థిర దీర్ఘ dos_packet(నిర్మాణం సందేశం_పోర్టు *, దీర్ఘ, దీర్ఘ);
+#అయితే_ముగింపు
+స్థిర పూర్ణాంకం lock2name(BPTR తాళం, char_u *buf, దీర్ఘ   len);
+స్థిర శూన్య బహిర్గతం_అంకె(దీర్ఘ n);
+స్థిర నిర్మాణం File_Info_ఖండం *get_fib(char_u *);
+స్థిర పూర్ణాంకం sortcmp(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b);
 
 /*
  * Lock() wrapper that suppresses "Please insert volume" system requesters.
@@ -93,44 +93,44 @@ static int sortcmp(const void *a, const void *b);
  * request).  Setting pr_WindowPtr to -1 suppresses the requester and makes
  * Lock() return NULL immediately.  See dos.library/ErrorReport.
  */
-    static BPTR
-safe_Lock(UBYTE *name, long mode)
+    స్థిర BPTR
+సురక్షిత_తాళం(UBYTE *name, దీర్ఘ బహుళకం)
 {
-    struct Process *me = (struct Process *)FindTask(NULL);
-    APTR oldwin = me->pr_WindowPtr;
+    నిర్మాణం Process *me = (నిర్మాణం Process *)కనుగొను_Task(ఖాళీ);
+    APTR oldwin = me->pr_కిటికీ_Ptr;
     BPTR flock;
 
-    me->pr_WindowPtr = (APTR)-1L;
-    flock = Lock(name, mode);
-    me->pr_WindowPtr = oldwin;
-    return flock;
+    me->pr_కిటికీ_Ptr = (APTR)-1L;
+    flock = తాళం_2(name, బహుళకం);
+    me->pr_కిటికీ_Ptr = oldwin;
+    తిరిగి flock;
 }
 
-static BPTR		raw_in = (BPTR)NULL;
-static BPTR		raw_out = (BPTR)NULL;
-static int		close_win = FALSE;  // set if Vim opened the window
+స్థిర BPTR		raw_లోపల = (BPTR)ఖాళీ;
+స్థిర BPTR		raw_బహిర్గతం = (BPTR)ఖాళీ;
+స్థిర పూర్ణాంకం		close_win = FALSE;  // set if Vim opened the window
 
 /* Use autoopen for AmigaOS4, AROS and MorphOS */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-struct IntuitionBase	*IntuitionBase = NULL;
-#endif
-#ifdef FEAT_ARP
-struct ArpBase		*ArpBase = NULL;
-#endif
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+నిర్మాణం Intuition_పునాది	*Intuition_పునాది = ఖాళీ;
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_ARP
+నిర్మాణం Arp_పునాది		*Arp_పునాది = ఖాళీ;
+#అయితే_ముగింపు
 
-static struct Window	*wb_window;
-static char_u		*oldwindowtitle = NULL;
+స్థిర నిర్మాణం కిటికీ	*wb_కిటికీ;
+స్థిర char_u		*oldwindowtitle = ఖాళీ;
 
-#ifdef FEAT_ARP
-int			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
-#endif
-int			size_set = FALSE;   // set to TRUE if window size was set
+#నిర్వచితమైతే FEAT_ARP
+పూర్ణాంకం			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
+#అయితే_ముగింపు
+పూర్ణాంకం			కొలత_సమితి = FALSE;   // set to TRUE if window size was set
 
-#ifdef __GNUC__
-static char version[] __attribute__((used)) =
+#నిర్వచితమైతే __GNUC__
+స్థిర అక్షరం సంస్కరణ_2[] __attribute__((వాడిన)) =
     "\0$VER: Vim "
-    VIM_VERSION_MAJOR_STR "."
-    VIM_VERSION_MINOR_STR
+    VIM_సంస్కరణ_MAJOR_STR "."
+    VIM_సంస్కరణ_MINOR_STR
 # ifdef PATCHLEVEL
     "." PATCHLEVEL
 # endif
@@ -138,24 +138,24 @@ static char version[] __attribute__((used)) =
     " (" BUILDDATE ")"
 # endif
     ;
-#endif
+#అయితే_ముగింపు
 
-    void
-win_resize_on(void)
+    శూన్య
+win_resize_on(శూన్య)
 {
-    OUT_STR_NF("\033[12{");
+    బహిర్గతం_STR_NF("\033[12{");
 }
 
-    void
-win_resize_off(void)
+    శూన్య
+win_resize_off(శూన్య)
 {
-    OUT_STR_NF("\033[12}");
+    బహిర్గతం_STR_NF("\033[12}");
 }
 
-    void
-mch_write(char_u *p, int len)
+    శూన్య
+mch_write(char_u *p, పూర్ణాంకం len)
 {
-    Write(raw_out, (char *)p, (long)len);
+    Write(raw_బహిర్గతం, (అక్షరం *)p, (దీర్ఘ)len);
 }
 
 /*
@@ -167,54 +167,54 @@ mch_write(char_u *p, int len)
  *
  * Return number of characters read.
  */
-    int
+    పూర్ణాంకం
 mch_inchar(
     char_u  *buf,
-    int	    maxlen,
-    long    time,		// milliseconds
-    int	    tb_change_cnt UNUSED)
+    పూర్ణాంకం	    maxlen,
+    దీర్ఘ    సమయం,		// milliseconds
+    పూర్ణాంకం	    tb_change_cnt వాడని)
 {
-    int	    len;
-    long    utime;
+    పూర్ణాంకం	    len;
+    దీర్ఘ    utime;
 
-    if (time >= 0)
+    ఒకవేళ (సమయం >= 0)
     {
-	if (time == 0)
+	ఒకవేళ (సమయం == 0)
 	    utime = 100L;	    // time = 0 causes problems in DOS 1.2
-	else
-	    utime = time * 1000L;   // convert from milli to micro secs
-	if (WaitForChar(raw_in, utime) == 0)	// no character available
-	    return 0;
+	లేకపోతే
+	    utime = సమయం * 1000L;   // convert from milli to micro secs
+	ఒకవేళ (WaitForChar(raw_లోపల, utime) == 0)	// no character available
+	    తిరిగి 0;
     }
-    else    // time == -1
+    లేకపోతే    // time == -1
     {
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (WaitForChar(raw_in, p_ut * 1000L) == 0)
+	ఒకవేళ (WaitForChar(raw_లోపల, p_ut * 1000L) == 0)
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    ఒకవేళ (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (పూర్ణాంకం)KE_CURSORHOLD;
+		తిరిగి 3;
 	    }
 	    before_blocking();
 	}
     }
 
-    for (;;)	    // repeat until we got a character
+    కొరకు (;;)	    // repeat until we got a character
     {
-	len = Read(raw_in, (char *)buf, (long)maxlen / input_conv.vc_factor);
-	if (len > 0)
+	len = Read(raw_లోపల, (అక్షరం *)buf, (దీర్ఘ)maxlen / ఆదానం_conv.vc_గుణకం);
+	ఒకవేళ (len > 0)
 	{
 	    // Convert from 'termencoding' to 'encoding'.
-	    if (input_conv.vc_type != CONV_NONE)
-		len = convert_input(buf, len, maxlen);
-	    return len;
+	    ఒకవేళ (ఆదానం_conv.vc_type != CONV_NONE)
+		len = convert_ఆదానం(buf, len, maxlen);
+	    తిరిగి len;
 	}
     }
 }
@@ -222,70 +222,70 @@ mch_inchar(
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    పూర్ణాంకం
+mch_char_avail(శూన్య)
 {
-    return (WaitForChar(raw_in, 100L) != 0);
+    తిరిగి (WaitForChar(raw_లోపల, 100L) != 0);
 }
 
 /*
  * Return amount of memory still available in Kbyte.
  */
     long_u
-mch_avail_mem(int special)
+mch_avail_mem(పూర్ణాంకం special)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    return (long_u)AvailMem(MEMF_ANY) >> 10;
-#else
-    return (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
-#endif
+#ఒకవేళ defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    తిరిగి (long_u)AvailMem(MEMF_ANY) >> 10;
+#లేకపోతే
+    తిరిగి (long_u)(AvailMem(special ? (దీర్ఘ)MEMF_CHIP : (దీర్ఘ)MEMF_ANY)) >> 10;
+#అయితే_ముగింపు
 }
 
 /*
  * Waits a specified amount of time, or until input arrives if
  * flags does not have MCH_DELAY_IGNOREINPUT.
  */
-    void
-mch_delay(long msec, int flags)
+    శూన్య
+mch_delay(దీర్ఘ msec, పూర్ణాంకం flags)
 {
     // Delay() is declared in <proto/dos.h> for GCC; the local prototype is
     // only needed for the LATTICE/SAS toolchains.
-#ifdef LATTICE
-    void	    Delay(long);
-#endif
+#నిర్వచితమైతే LATTICE
+    శూన్య	    Delay(దీర్ఘ);
+#అయితే_ముగింపు
 
-    if (msec <= 0)
-	return;
+    ఒకవేళ (msec <= 0)
+	తిరిగి;
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ఒకవేళ (flags & MCH_DELAY_IGNOREINPUT)
 	Delay(msec / 20L);	    // Delay works with 20 msec intervals
-    else
-	WaitForChar(raw_in, msec * 1000L);
+    లేకపోతే
+	WaitForChar(raw_లోపల, msec * 1000L);
 }
 
 /*
  * We have no job control, fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    శూన్య
+mch_suspend(శూన్య)
 {
     suspend_shell();
 }
 
-#ifndef DOS_LIBRARY
+#నిర్వచితం_కాకపోతే DOS_LIBRARY
 # define DOS_LIBRARY	((UBYTE *)"dos.library")
-#endif
+#అయితే_ముగింపు
 
-    void
-mch_init(void)
+    శూన్య
+mch_init(శూన్య)
 {
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    static char	    intlibname[] = "intuition.library";
-#endif
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    స్థిర అక్షరం	    intlibname[] = "intuition.library";
+#అయితే_ముగింపు
 
-#ifdef AZTEC_C
+#నిర్వచితమైతే AZTEC_C
     Enable_Abort = 0;		// disallow vim to be aborted
-#endif
+#అయితే_ముగింపు
 
     // Suppress "Please insert volume" system requesters.  Vim probes many
     // paths at startup ($VIM, $VIMRUNTIME, defaults.vim, vimrc, etc.) and
@@ -293,47 +293,47 @@ mch_init(void)
     // AmigaDOS (and from the C runtime library which calls Lock() internally).
     // A CLI editor should handle missing files gracefully, not pop up dialogs.
     {
-	struct Process *me = (struct Process *)FindTask(NULL);
-	me->pr_WindowPtr = (APTR)-1L;
+	నిర్మాణం Process *me = (నిర్మాణం Process *)కనుగొను_Task(ఖాళీ);
+	me->pr_కిటికీ_Ptr = (APTR)-1L;
     }
 
     Columns = 80;
-    Rows = 24;
+    అడ్డువరుసలు = 24;
 
     /*
      * Set input and output channels, unless we have opened our own window
      */
-    if (raw_in == (BPTR)NULL)
+    ఒకవేళ (raw_లోపల == (BPTR)ఖాళీ)
     {
-	raw_in = Input();
-	raw_out = Output();
+	raw_లోపల = ఆదానం_3();
+	raw_బహిర్గతం = Output();
 	/*
 	 * If Input() is not interactive, then Output() will be (because of
 	 * check in mch_check_win()).  Used for "Vim -".
 	 * Also check the other way around, for "Vim -h | more".
 	 */
-	if (!IsInteractive(raw_in))
-	    raw_in = raw_out;
-	else if (!IsInteractive(raw_out))
-	    raw_out = raw_in;
+	ఒకవేళ (!IsInteractive(raw_లోపల))
+	    raw_లోపల = raw_బహిర్గతం;
+	లేకపోతే ఒకవేళ (!IsInteractive(raw_బహిర్గతం))
+	    raw_బహిర్గతం = raw_లోపల;
     }
 
-    out_flush();
+    బహిర్గతం_flush();
 
-    wb_window = NULL;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    if ((IntuitionBase = (struct IntuitionBase *)
-				OpenLibrary((UBYTE *)intlibname, 0L)) == NULL)
+    wb_కిటికీ = ఖాళీ;
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ఒకవేళ ((Intuition_పునాది = (నిర్మాణం Intuition_పునాది *)
+				OpenLibrary((UBYTE *)intlibname, 0L)) == ఖాళీ)
     {
 	mch_errmsg(_("cannot open "));
 	mch_errmsg(intlibname);
 	mch_errmsg("!?\n");
 	mch_exit(3);
     }
-#endif
+#అయితే_ముగింపు
 }
 
-#include <workbench/startup.h>
+#అన్తర్భావ <workbench/startup.h>
 
 /*
  * Check_win checks whether we have an interactive window.
@@ -346,79 +346,79 @@ mch_init(void)
  * For the -f option (foreground mode) we open our own window and disable :sh.
  * Otherwise the calling program would never know when editing is finished.
  */
-#define BUF2SIZE 320	    // length of buffer for argument with complete path
+#నిర్వచించు BUF2_కొలత 320	    // length of buffer for argument with complete path
 
-    int
-mch_check_win(int argc, char **argv)
+    పూర్ణాంకం
+mch_check_win(పూర్ణాంకం argc, అక్షరం **argv)
 {
-    int		    i;
+    పూర్ణాంకం		    i;
     BPTR	    nilfh, fh;
     char_u	    buf1[24];
-    char_u	    buf2[BUF2SIZE];
-    static char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
+    char_u	    buf2[BUF2_కొలత];
+    స్థిర char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
 					(char_u *)"con:0/0/640/200/",
 					(char_u *)"con:0/0/320/200/"};
-    static char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
-    struct WBArg    *argp;
-    int		    ac;
-    char	    *av;
-    char_u	    *device = NULL;
-    int		    exitval = 4;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    struct Library  *DosBase;
-#endif
-    int		    usewin = FALSE;
+    స్థిర char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
+    నిర్మాణం WBArg    *argp;
+    పూర్ణాంకం		    ac;
+    అక్షరం	    *av;
+    char_u	    *device = ఖాళీ;
+    పూర్ణాంకం		    exitval = 4;
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    నిర్మాణం Library  *Dos_పునాది;
+#అయితే_ముగింపు
+    పూర్ణాంకం		    usewin = FALSE;
 
 /*
  * check if we are running under DOS 2.0x or higher
  */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    DosBase = OpenLibrary(DOS_LIBRARY, 37L);
-    if (DosBase != NULL)
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    Dos_పునాది = OpenLibrary(DOS_LIBRARY, 37L);
+    ఒకవేళ (Dos_పునాది != ఖాళీ)
     // if (((struct Library *)DOSBase)->lib_Version >= 37)
     {
-	CloseLibrary(DosBase);
+	CloseLibrary(Dos_పునాది);
 # ifdef FEAT_ARP
 	dos2 = TRUE;
 # endif
     }
-    else	    // without arp functions we NEED 2.0
+    లేకపోతే	    // without arp functions we NEED 2.0
     {
 # ifndef FEAT_ARP
 	mch_errmsg(_("Need Amigados version 2.04 or later\n"));
-	exit(3);
-# else
+	నిష్క్రమించు(3);
+# లేకపోతే
 		    // need arp functions for dos 1.x
-	if (!(ArpBase = (struct ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
+	ఒకవేళ (!(Arp_పునాది = (నిర్మాణం Arp_పునాది *) OpenLibrary((UBYTE *)ArpName, Arp_సంస్కరణ)))
 	{
-	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, ArpVersion);
-	    exit(3);
+	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, Arp_సంస్కరణ);
+	    నిష్క్రమించు(3);
 	}
 # endif
     }
-#endif	/* __amigaos4__ __AROS__ __MORPHOS__ */
+#అయితే_ముగింపు	/* __amigaos4__ __AROS__ __MORPHOS__ */
 
     /*
      * scan argv[] for the "-f" and "-d" arguments
      */
-    for (i = 1; i < argc; ++i)
-	if (argv[i][0] == '-')
+    కొరకు (i = 1; i < argc; ++i)
+	ఒకవేళ (argv[i][0] == '-')
 	{
-	    switch (argv[i][1])
+	    ఎంపిక (argv[i][1])
 	    {
-	    case 'f':
+	    స్థితి 'f':
 		usewin = TRUE;
-		break;
+		ఆపు;
 
-	    case 'd':
-		if (i < argc - 1
-#ifdef FEAT_DIFF
+	    స్థితి 'd':
+		ఒకవేళ (i < argc - 1
+#నిర్వచితమైతే FEAT_DIFF
 			// require using "-dev", "-d" means diff mode
 			&& argv[i][2] == 'e' && argv[i][3] == 'v'
-#endif
+#అయితే_ముగింపు
 		   )
 		    device = (char_u *)argv[i + 1];
-		break;
+		ఆపు;
 	    }
 	}
 
@@ -427,45 +427,45 @@ mch_check_win(int argc, char **argv)
  * argument and we have been started with an interactive window, use that
  * window.
  */
-    if (argc != 0
-	    && device == NULL
-	    && (IsInteractive(Input()) || IsInteractive(Output())))
-	return OK;
+    ఒకవేళ (argc != 0
+	    && device == ఖాళీ
+	    && (IsInteractive(ఆదానం_3()) || IsInteractive(Output())))
+	తిరిగి OK;
 
 /*
  * When given the "-f" argument, we open our own window. We can't use the
  * newcli trick below, because the calling program (mail, rn, etc.) would not
  * know when we are finished.
  */
-    if (usewin)
+    ఒకవేళ (usewin)
     {
 	/*
 	 * Try to open a window. First try the specified device.
 	 * Then try a 24 line 80 column window.
 	 * If that fails, try two smaller ones.
 	 */
-	for (i = -1; i < 3; ++i)
+	కొరకు (i = -1; i < 3; ++i)
 	{
-	    if (i >= 0)
+	    ఒకవేళ (i >= 0)
 		device = constrings[i];
-	    if (device != NULL && (raw_in = Open((UBYTE *)device,
-					   (long)MODE_NEWFILE)) != (BPTR)NULL)
-		break;
+	    ఒకవేళ (device != ఖాళీ && (raw_లోపల = Open((UBYTE *)device,
+					   (దీర్ఘ)బహుళకం_NEWFILE)) != (BPTR)ఖాళీ)
+		ఆపు;
 	}
-	if (raw_in == (BPTR)NULL)	// all three failed
+	ఒకవేళ (raw_లోపల == (BPTR)ఖాళీ)	// all three failed
 	{
 	    mch_errmsg(_(winerr));
-	    goto exit;
+	    వెళ్ళు నిష్క్రమించు;
 	}
-	raw_out = raw_in;
+	raw_బహిర్గతం = raw_లోపల;
 	close_win = TRUE;
-	return OK;
+	తిరిగి OK;
     }
 
-    if ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)NULL)
+    ఒకవేళ ((nilfh = Open((UBYTE *)"NIL:", (దీర్ఘ)బహుళకం_NEWFILE)) == (BPTR)ఖాళీ)
     {
 	mch_errmsg(_("Cannot open NIL:\n"));
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
 
     /*
@@ -475,61 +475,61 @@ mch_check_win(int argc, char **argv)
      * we use a pointer to the current task instead. This should be a
      * shared structure and thus globally unique.
      */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    sprintf((char *)buf1, "t:nc%p", FindTask(0));
-#else
-    sprintf((char *)buf1, "t:nc%ld", (long)buf1);
-#endif
-    if ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)NULL)
+#ఒకవేళ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    sprintf((అక్షరం *)buf1, "t:nc%p", కనుగొను_Task(0));
+#లేకపోతే
+    sprintf((అక్షరం *)buf1, "t:nc%ld", (దీర్ఘ)buf1);
+#అయితే_ముగింపు
+    ఒకవేళ ((fh = Open((UBYTE *)buf1, (దీర్ఘ)బహుళకం_NEWFILE)) == (BPTR)ఖాళీ)
     {
 	mch_errmsg(_("Cannot create "));
-	mch_errmsg((char *)buf1);
+	mch_errmsg((అక్షరం *)buf1);
 	mch_errmsg("\n");
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
     /*
      * Write the command into the file, put quotes around the arguments that
      * have a space in them.
      */
-    if (argc == 0)	// run from workbench
-	ac = ((struct WBStartup *)argv)->sm_NumArgs;
-    else
+    ఒకవేళ (argc == 0)	// run from workbench
+	ac = ((నిర్మాణం WBStartup *)argv)->sm_అంకె_వాదనలు;
+    లేకపోతే
 	ac = argc;
-    for (i = 0; i < ac; ++i)
+    కొరకు (i = 0; i < ac; ++i)
     {
-	if (argc == 0)
+	ఒకవేళ (argc == 0)
 	{
 	    *buf2 = NUL;
-	    argp = &(((struct WBStartup *)argv)->sm_ArgList[i]);
-	    if (argp->wa_Lock)
-		(void)lock2name(argp->wa_Lock, buf2, (long)(BUF2SIZE - 1));
-#ifdef FEAT_ARP
-	    if (dos2)	    // use 2.0 function
-#endif
-		AddPart((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (long)(BUF2SIZE - 1));
-#ifdef FEAT_ARP
-	    else	    // use arp function
-		TackOn((char *)buf2, argp->wa_Name);
-#endif
-	    av = (char *)buf2;
+	    argp = &(((నిర్మాణం WBStartup *)argv)->sm_ArgList[i]);
+	    ఒకవేళ (argp->wa_తాళం)
+		(శూన్య)lock2name(argp->wa_తాళం, buf2, (దీర్ఘ)(BUF2_కొలత - 1));
+#నిర్వచితమైతే FEAT_ARP
+	    ఒకవేళ (dos2)	    // use 2.0 function
+#అయితే_ముగింపు
+		కూడు_Part((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (దీర్ఘ)(BUF2_కొలత - 1));
+#నిర్వచితమైతే FEAT_ARP
+	    లేకపోతే	    // use arp function
+		TackOn((అక్షరం *)buf2, argp->wa_Name);
+#అయితే_ముగింపు
+	    av = (అక్షరం *)buf2;
 	}
-	else
+	లేకపోతే
 	    av = argv[i];
 
 	// skip '-d' or "-dev" option
-	if (av[0] == '-' && av[1] == 'd'
-#ifdef FEAT_DIFF
+	ఒకవేళ (av[0] == '-' && av[1] == 'd'
+#నిర్వచితమైతే FEAT_DIFF
 		&& av[2] == 'e' && av[3] == 'v'
-#endif
+#అయితే_ముగింపు
 		)
 	{
 	    ++i;
-	    continue;
+	    కొనసాగు;
 	}
-	if (vim_strchr((char_u *)av, ' '))
+	ఒకవేళ (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
-	Write(fh, av, (long)strlen(av));
-	if (vim_strchr((char_u *)av, ' '))
+	Write(fh, av, (దీర్ఘ)అక్షరశ్రేణి_పొడవు(av));
+	ఒకవేళ (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, " ", 1L);
     }
@@ -541,56 +541,56 @@ mch_check_win(int argc, char **argv)
  * to open the specified device. Then try a 24 line 80 column window.  If that
  * fails, try two smaller ones.
  */
-    for (i = -1; i < 3; ++i)
+    కొరకు (i = -1; i < 3; ++i)
     {
-	if (i >= 0)
+	ఒకవేళ (i >= 0)
 	    device = constrings[i];
-	else if (device == NULL)
-	    continue;
-	sprintf((char *)buf2, "newcli <nil: >nil: %s from %s", (char *)device, (char *)buf1);
-#ifdef FEAT_ARP
-	if (dos2)
+	లేకపోతే ఒకవేళ (device == ఖాళీ)
+	    కొనసాగు;
+	sprintf((అక్షరం *)buf2, "newcli <nil: >nil: %s from %s", (అక్షరం *)device, (అక్షరం *)buf1);
+#నిర్వచితమైతే FEAT_ARP
+	ఒకవేళ (dos2)
 	{
-#endif
-	    if (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
-		break;
-#ifdef FEAT_ARP
+#అయితే_ముగింపు
+	    ఒకవేళ (!System_ట్యాగులు((UBYTE *)buf2, SYS_UserShell, TRUE, ట్యాగ్_పూర్తి))
+		ఆపు;
+#నిర్వచితమైతే FEAT_ARP
 	}
-	else
+	లేకపోతే
 	{
-	    if (Execute((UBYTE *)buf2, nilfh, nilfh))
-		break;
+	    ఒకవేళ (Execute((UBYTE *)buf2, nilfh, nilfh))
+		ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
-    if (i == 3)	    // all three failed
+    ఒకవేళ (i == 3)	    // all three failed
     {
 	DeleteFile((UBYTE *)buf1);
 	mch_errmsg(_(winerr));
-	goto exit;
+	వెళ్ళు నిష్క్రమించు;
     }
     exitval = 0;    // The Execute succeeded: exit this program
 
-exit:
-    if (nilfh)
+నిష్క్రమించు:
+    ఒకవేళ (nilfh)
 	Close(nilfh);
-#ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
-#endif
-    exit(exitval);
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (Arp_పునాది)
+	CloseLibrary((నిర్మాణం Library *) Arp_పునాది);
+#అయితే_ముగింపు
+    నిష్క్రమించు(exitval);
     // NOTREACHED
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  * We fake there is a window, because we can always open one!
  */
-    int
-mch_input_isatty(void)
+    పూర్ణాంకం
+mch_ఆదానం_isatty(శూన్య)
 {
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
@@ -599,25 +599,25 @@ mch_input_isatty(void)
  *		 if the file system ignores, but preserves case.
  */
 //ARGSUSED
-    void
+    శూన్య
 fname_case(
     char_u	*name,
-    int		len UNUSED)		// buffer size, ignored here
+    పూర్ణాంకం		len వాడని)		// buffer size, ignored here
 {
-    struct FileInfoBlock    *fib;
+    నిర్మాణం File_Info_ఖండం    *fib;
     size_t		    flen;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return;
+    ఒకవేళ (fib == ఖాళీ)
+	తిరిగి;
 
     flen = STRLEN(name);
     // TODO: Check if this fix applies to AmigaOS < 4 too.
-#ifdef __amigaos4__
-    if (fib->fib_DirEntryType == ST_ROOT)
+#నిర్వచితమైతే __amigaos4__
+    ఒకవేళ (fib->fib_Dir_నమోదు_Type == ST_మూలం)
 	strcat(fib->fib_FileName, ":");
-#endif
-    if (flen == strlen(fib->fib_FileName))	// safety check
+#అయితే_ముగింపు
+    ఒకవేళ (flen == అక్షరశ్రేణి_పొడవు(fib->fib_FileName))	// safety check
 	mch_memmove(name, fib->fib_FileName, flen);
     free_fib(fib);
 }
@@ -627,42 +627,42 @@ fname_case(
  * The returned structure has to be free()d.
  * Returns NULL on error.
  */
-    static struct FileInfoBlock *
+    స్థిర నిర్మాణం File_Info_ఖండం *
 get_fib(char_u *fname)
 {
     BPTR		    flock;
-    struct FileInfoBlock    *fib;
+    నిర్మాణం File_Info_ఖండం    *fib;
 
-    if (fname == NULL)	    // safety check
-	return NULL;
-#ifdef __amigaos4__
+    ఒకవేళ (fname == ఖాళీ)	    // safety check
+	తిరిగి ఖాళీ;
+#నిర్వచితమైతే __amigaos4__
     fib = AllocDosObject(DOS_FIB,0);
-#else
-    fib = ALLOC_ONE(struct FileInfoBlock);
-#endif
-    if (fib == NULL)
-	return;
+#లేకపోతే
+    fib = ALLOC_ONE(నిర్మాణం File_Info_ఖండం);
+#అయితే_ముగింపు
+    ఒకవేళ (fib == ఖాళీ)
+	తిరిగి;
 
-    flock = safe_Lock((UBYTE *)fname, (long)ACCESS_READ);
-    if (flock == (BPTR)NULL || !Examine(flock, fib))
+    flock = సురక్షిత_తాళం((UBYTE *)fname, (దీర్ఘ)ACCESS_READ);
+    ఒకవేళ (flock == (BPTR)ఖాళీ || !Examine(flock, fib))
     {
 	free_fib(fib);  // in case of an error the memory is freed here
-	fib = NULL;
+	fib = ఖాళీ;
     }
-    if (flock)
-	UnLock(flock);
-    return fib;
+    ఒకవేళ (flock)
+	Un_తాళం(flock);
+    తిరిగి fib;
 }
 
 /*
  * set the title of our window
  * icon name is not set
  */
-    void
+    శూన్య
 mch_settitle(char_u *title, char_u *icon)
 {
-    if (wb_window != NULL && title != NULL)
-	SetWindowTitles(wb_window, (UBYTE *)title, (UBYTE *)-1L);
+    ఒకవేళ (wb_కిటికీ != ఖాళీ && title != ఖాళీ)
+	సమితి_కిటికీ_Titles(wb_కిటికీ, (UBYTE *)title, (UBYTE *)-1L);
 }
 
 /*
@@ -672,27 +672,27 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_ICON   Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH   Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which)
+    శూన్య
+mch_restore_title(పూర్ణాంకం which)
 {
-    if (which & SAVE_RESTORE_TITLE)
-	mch_settitle(oldwindowtitle, NULL);
+    ఒకవేళ (which & SAVE_RESTORE_TITLE)
+	mch_settitle(oldwindowtitle, ఖాళీ);
 }
 
-    int
-mch_can_restore_title(void)
+    పూర్ణాంకం
+mch_can_restore_title(శూన్య)
 {
-    return (wb_window != NULL);
+    తిరిగి (wb_కిటికీ != ఖాళీ);
 }
 
-    int
-mch_can_restore_icon(void)
+    పూర్ణాంకం
+mch_can_restore_icon(శూన్య)
 {
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    void
-mch_setmouse(int on UNUSED)
+    శూన్య
+mch_setmouse(పూర్ణాంకం on వాడని)
 {
     // TODO: implement
 }
@@ -700,61 +700,61 @@ mch_setmouse(int on UNUSED)
 /*
  * Insert user name in s[len].
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    పూర్ణాంకం
+mch_get_user_name(char_u *s, పూర్ణాంకం len)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    struct passwd   *pwd = getpwuid(getuid());
+#ఒకవేళ defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    నిర్మాణం passwd   *pwd = getpwuid(getuid());
 
-    if (pwd != NULL && pwd->pw_name && len > 0)
+    ఒకవేళ (pwd != ఖాళీ && pwd->pw_name && len > 0)
     {
 	vim_strncpy(s, (char_u *)pwd->pw_name, len - 1);
-	return OK;
+	తిరిగి OK;
     }
-#endif
+#అయితే_ముగింపు
     *s = NUL;
-    return FAIL;
+    తిరిగి FAIL;
 }
 
 /*
  * Insert host name is s[len].
  */
-    void
-mch_get_host_name(char_u *s, int len)
+    శూన్య
+mch_get_host_name(char_u *s, పూర్ణాంకం len)
 {
-#if defined(__amigaos4__) || defined(__MORPHOS__)
-    gethostname((char *)s, len);
-#else
+#ఒకవేళ defined(__amigaos4__) || defined(__MORPHOS__)
+    gethostname((అక్షరం *)s, len);
+#లేకపోతే
     // AROS and classic OS 3 (libnix) do not have gethostname().
     vim_strncpy(s, (char_u *)"amiga", len - 1);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    దీర్ఘ
+mch_get_pid(శూన్య)
 {
-#if defined(__amigaos4__)
-    return (long) getpid();
-#elif defined(__AROS__) || defined(__MORPHOS__)
+#ఒకవేళ defined(__amigaos4__)
+    తిరిగి (దీర్ఘ) getpid();
+#లేదావేళ defined(__AROS__) || defined(__MORPHOS__)
     // This is as close to a pid as we can come. We could use CLI numbers also,
     // but then we would have two different types of process identifiers.
-    return((long)FindTask(0));
-#else
-    return (long)0;
-#endif
+    తిరిగి((దీర్ఘ)కనుగొను_Task(0));
+#లేకపోతే
+    తిరిగి (దీర్ఘ)0;
+#అయితే_ముగింపు
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    పూర్ణాంకం
+mch_dirname(char_u *buf, పూర్ణాంకం len)
 {
-    return mch_FullName((char_u *)"", buf, len, FALSE);
+    తిరిగి mch_నిండిన_Name((char_u *)"", buf, len, FALSE);
 }
 
 /*
@@ -762,59 +762,59 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_FullName(
+    పూర్ణాంకం
+mch_నిండిన_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		force)
 {
     BPTR	l;
-    int		retval = FAIL;
-    int		i;
+    పూర్ణాంకం		retval = FAIL;
+    పూర్ణాంకం		i;
 
     // Lock the file.  If it exists, we can get the exact name.
-    if ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
+    ఒకవేళ ((l = సురక్షిత_తాళం((UBYTE *)fname, (దీర్ఘ)ACCESS_READ)) != (BPTR)0)
     {
-	retval = lock2name(l, buf, (long)len - 1);
-	UnLock(l);
+	retval = lock2name(l, buf, (దీర్ఘ)len - 1);
+	Un_తాళం(l);
     }
-    else if (force || !mch_isFullName(fname))	    // not a full path yet
+    లేకపోతే ఒకవేళ (force || !mch_is_నిండిన_Name(fname))	    // not a full path yet
     {
 	/*
 	 * If the file cannot be locked (doesn't exist), try to lock the
 	 * current directory and concatenate the file name.
 	 */
-	if ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)NULL)
+	ఒకవేళ ((l = తాళం_2((UBYTE *)"", (దీర్ఘ)ACCESS_READ)) != (BPTR)ఖాళీ)
 	{
-	    retval = lock2name(l, buf, (long)len);
-	    UnLock(l);
-	    if (retval == OK)
+	    retval = lock2name(l, buf, (దీర్ఘ)len);
+	    Un_తాళం(l);
+	    ఒకవేళ (retval == OK)
 	    {
 		i = STRLEN(buf);
 		// Concatenate the fname to the directory.  Don't add a slash
 		// if fname is empty, but do change "" to "/".
-		if (i == 0 || *fname != NUL)
+		ఒకవేళ (i == 0 || *fname != NUL)
 		{
-		    if (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
+		    ఒకవేళ (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
 			buf[i++] = '/';
 		    vim_strncpy(buf + i, fname, len - i - 1);
 		}
 	    }
 	}
     }
-    if (*buf == 0 || *buf == ':')
+    ఒకవేళ (*buf == 0 || *buf == ':')
 	retval = FAIL;	// something failed; use the file name
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    పూర్ణాంకం
+mch_is_నిండిన_Name(char_u *fname)
 {
-    return (vim_strchr(fname, ':') != NULL && *fname != ':');
+    తిరిగి (vim_strchr(fname, ':') != ఖాళీ && *fname != ':');
 }
 
 /*
@@ -823,36 +823,36 @@ mch_isFullName(char_u *fname)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-lock2name(BPTR lock, char_u *buf, long len)
+    స్థిర పూర్ణాంకం
+lock2name(BPTR తాళం, char_u *buf, దీర్ఘ len)
 {
-#ifdef FEAT_ARP
-    if (dos2)		    // use 2.0 function
-#endif
-	return ((int)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
-#ifdef FEAT_ARP
-    else		// use arp function
-	return ((int)PathName(lock, (char *)buf, (long)(len/32)) ? OK : FAIL);
-#endif
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (dos2)		    // use 2.0 function
+#అయితే_ముగింపు
+	తిరిగి ((పూర్ణాంకం)Name_From_తాళం(తాళం, (UBYTE *)buf, len) ? OK : FAIL);
+#నిర్వచితమైతే FEAT_ARP
+    లేకపోతే		// use arp function
+	తిరిగి ((పూర్ణాంకం)మార్గం_Name(తాళం, (అక్షరం *)buf, (దీర్ఘ)(len/32)) ? OK : FAIL);
+#అయితే_ముగింపు
 }
 
 /*
  * get file permissions for 'name'
  * Returns -1 when it doesn't exist.
  */
-    long
+    దీర్ఘ
 mch_getperm(char_u *name)
 {
-    struct FileInfoBlock    *fib;
-    long		    retval = -1;
+    నిర్మాణం File_Info_ఖండం    *fib;
+    దీర్ఘ		    retval = -1;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return -1;
+    ఒకవేళ (fib == ఖాళీ)
+	తిరిగి -1;
 
     retval = fib->fib_Protection;
     free_fib(fib);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -860,18 +860,18 @@ mch_getperm(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_setperm(char_u *name, long perm)
+    పూర్ణాంకం
+mch_setperm(char_u *name, దీర్ఘ perm)
 {
     perm &= ~FIBF_ARCHIVE;		// reset archived bit
-    return (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
+    తిరిగి (సమితి_Protection((UBYTE *)name, (దీర్ఘ)perm) ? OK : FAIL);
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
-mch_hide(char_u *name UNUSED)
+    శూన్య
+mch_hide(char_u *name వాడని)
 {
     // can't hide a file
 }
@@ -881,39 +881,39 @@ mch_hide(char_u *name UNUSED)
  * return TRUE if "name" is a directory.
  * return FALSE for error.
  */
-    int
+    పూర్ణాంకం
 mch_isdir(char_u *name)
 {
-    struct FileInfoBlock    *fib;
-    int			    retval = FALSE;
+    నిర్మాణం File_Info_ఖండం    *fib;
+    పూర్ణాంకం			    retval = FALSE;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return FALSE;
+    ఒకవేళ (fib == ఖాళీ)
+	తిరిగి FALSE;
 
-#ifdef __amigaos4__
+#నిర్వచితమైతే __amigaos4__
     retval = (FIB_IS_DRAWER(fib)) ? TRUE : FALSE;
-#else
-    retval = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
-#endif
+#లేకపోతే
+    retval = ((fib->fib_Dir_నమోదు_Type >= 0) ? TRUE : FALSE);
+#అయితే_ముగింపు
     free_fib(fib);
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Create directory "name".
  */
-    int
+    పూర్ణాంకం
 mch_mkdir(char_u *name)
 {
-    BPTR	lock;
+    BPTR	తాళం;
 
-    lock = CreateDir(name);
-    if (lock == NULL)
-	return -1;
+    తాళం = CreateDir(name);
+    ఒకవేళ (తాళం == ఖాళీ)
+	తిరిగి -1;
 
-    UnLock(lock);
-    return 0;
+    Un_తాళం(తాళం);
+    తిరిగి 0;
 }
 
 /*
@@ -921,51 +921,51 @@ mch_mkdir(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
+    పూర్ణాంకం
+mch_can_exe(char_u *name, char_u **మార్గం వాడని, పూర్ణాంకం use_మార్గం)
 {
-    int exe = -1;
-#ifdef __amigaos4__
+    పూర్ణాంకం exe = -1;
+#నిర్వచితమైతే __amigaos4__
     // Load file sections using elf.library or hunk.library.
-    BPTR seg = LoadSeg(name);
+    BPTR seg = ఎక్కించు_Seg(name);
 
-    if (seg && GetSegListInfoTags(seg, GSLI_Native, NULL, TAG_DONE) !=
-	    GetSegListInfoTags(seg, GSLI_68KHUNK, NULL, TAG_DONE))
+    ఒకవేళ (seg && Get_Seg_List_Info_ట్యాగులు(seg, GSLI_Native, ఖాళీ, ట్యాగ్_పూర్తి) !=
+	    Get_Seg_List_Info_ట్యాగులు(seg, GSLI_68KHUNK, ఖాళీ, ట్యాగ్_పూర్తి))
     {
 	// Test if file permissions allow execution.
-	struct ExamineData *exd = ExamineObjectTags(EX_StringNameInput, name);
+	నిర్మాణం Examine_దత్తాంశం *exd = Examine_Object_ట్యాగులు(EX_String_Name_ఆదానం, name);
 
 	exe = (exd && !(exd->Protection & EXDF_NO_EXECUTE)) ? 1 : 0;
 	FreeDosObject(DOS_EXAMINEDATA, exd);
     }
-    else
+    లేకపోతే
     {
 	exe = 0;
     }
 
-    UnLoadSeg(seg);
+    Un_ఎక్కించు_Seg(seg);
 
     // Search for executable in path if applicable.
-    if (!exe && use_path)
+    ఒకవేళ (!exe && use_మార్గం)
     {
 	// Save current working dir.
 	BPTR cwd = GetCurrentDir();
-	struct PathNode *head = DupCmdPathList(NULL);
+	నిర్మాణం మార్గం_కణుపు *తల = Dup_Cmd_మార్గం_List(ఖాళీ);
 
 	// For each entry, recur to check for executable.
-	for (struct PathNode *tail = head; !exe && tail;
-			       tail = (struct PathNode *) BADDR(tail->pn_Next))
+	కొరకు (నిర్మాణం మార్గం_కణుపు *తోక = తల; !exe && తోక;
+			       తోక = (నిర్మాణం మార్గం_కణుపు *) BADDR(తోక->pn_తదుపరి))
 	{
-	    SetCurrentDir(tail->pn_Lock);
-	    exe = mch_can_exe(name, path, 0);
+	    సమితి_Current_Dir(తోక->pn_తాళం);
+	    exe = mch_can_exe(name, మార్గం, 0);
 	}
 
 	// Go back to where we were.
-	FreeCmdPathList(head);
-	SetCurrentDir(cwd);
+	Free_Cmd_మార్గం_List(తల);
+	సమితి_Current_Dir(cwd);
     }
-#endif
-    return exe;
+#అయితే_ముగింపు
+    తిరిగి exe;
 }
 
 /*
@@ -974,56 +974,56 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
-mch_nodetype(char_u *name UNUSED)
+    పూర్ణాంకం
+mch_nodetype(char_u *name వాడని)
 {
     // TODO
-    return NODE_NORMAL;
+    తిరిగి కణుపు_సాధారణ;
 }
 
-    void
-mch_early_init(void)
+    శూన్య
+mch_early_init(శూన్య)
 {
 }
 
 /*
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit(int r)
+    శూన్య
+mch_exit(పూర్ణాంకం r)
 {
     exiting = TRUE;
 
-    if (raw_in)			    // put terminal in 'normal' mode
+    ఒకవేళ (raw_లోపల)			    // put terminal in 'normal' mode
     {
 	settmode(TMODE_COOK);
 	stoptermcap();
     }
-    out_char('\n');
-    if (raw_out)
+    బహిర్గతం_char('\n');
+    ఒకవేళ (raw_బహిర్గతం)
     {
-	if (term_console)
+	ఒకవేళ (పదం_console)
 	{
 	    win_resize_off();	    // window resize events de-activated
-	    if (size_set)
-		OUT_STR("\233t\233u");	// reset window size (CSI t CSI u)
+	    ఒకవేళ (కొలత_సమితి)
+		బహిర్గతం_STR("\233t\233u");	// reset window size (CSI t CSI u)
 	}
-	out_flush();
+	బహిర్గతం_flush();
     }
 
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window title
 
     ml_close_all(TRUE);		    // remove all memfiles
 
-#ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
-#endif
-    if (close_win)
-	Close(raw_in);
-    if (r)
-	printf(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
-    exit(r);
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (Arp_పునాది)
+	CloseLibrary((నిర్మాణం Library *) Arp_పునాది);
+#అయితే_ముగింపు
+    ఒకవేళ (close_win)
+	Close(raw_లోపల);
+    ఒకవేళ (r)
+	రాయి(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
+    నిష్క్రమించు(r);
 }
 
 /*
@@ -1034,7 +1034,7 @@ mch_exit(int r)
  * Written : 18-Jun-87 By Chuck McManis.
  */
 
-#define MP(xx)	((struct MsgPort *)((struct FileHandle *) (BADDR(xx)))->fh_Type)
+#నిర్వచించు MP(xx)	((నిర్మాణం సందేశం_పోర్టు *)((నిర్మాణం FileHandle *) (BADDR(xx)))->fh_Type)
 
 /*
  * Function mch_settmode() - Convert the specified file pointer to 'raw' or
@@ -1048,15 +1048,15 @@ mch_exit(int r)
  *	wait for a <CR> mode. This is exactly like raw() except that
  *	it sends a 0 to the console to make it back into a CON: from a RAW:
  */
-    void
+    శూన్య
 mch_settmode(tmode_T tmode)
 {
-#if defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
-    if (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
-#else
-    if (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
+#ఒకవేళ defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
+    ఒకవేళ (!సమితి_బహుళకం_2(raw_లోపల, tmode == TMODE_RAW ? 1 : 0))
+#లేకపోతే
+    ఒకవేళ (dos_packet(MP(raw_లోపల), (దీర్ఘ)ACTION_SCREEN_బహుళకం,
 					  tmode == TMODE_RAW ? -1L : 0L) == 0)
-#endif
+#అయితే_ముగింపు
 	mch_errmsg(_("cannot change console mode ?!\n"));
 }
 
@@ -1072,43 +1072,43 @@ mch_settmode(tmode_T tmode)
  * Heavely modified by mool.
  */
 
-#include <devices/conunit.h>
+#అన్తర్భావ <devices/conunit.h>
 
 /*
  * Get console size in a system friendly way on AROS and MorphOS.
  * Return FAIL for failure, OK otherwise
  */
-#if defined(__AROS__) || defined(__MORPHOS__)
-    int
-mch_get_shellsize(void)
+#ఒకవేళ defined(__AROS__) || defined(__MORPHOS__)
+    పూర్ణాంకం
+mch_get_shellsize(శూన్య)
 {
-    if (!term_console)
-	return FAIL;
+    ఒకవేళ (!పదం_console)
+	తిరిగి FAIL;
 
-    if (raw_in && raw_out)
+    ఒకవేళ (raw_లోపల && raw_బహిర్గతం)
     {
 	// Save current console mode.
-	int old_tmode = cur_tmode;
-	char ctrl[] = "\x9b""0 q";
+	పూర్ణాంకం old_tmode = cur_tmode;
+	అక్షరం ctrl[] = "\x9b""0 q";
 
 	// Set RAW mode.
 	mch_settmode(TMODE_RAW);
 
 	// Write control sequence to console.
-	if (Write(raw_out, ctrl, sizeof(ctrl)) == sizeof(ctrl))
+	ఒకవేళ (Write(raw_బహిర్గతం, ctrl, పరిమాణం(ctrl)) == పరిమాణం(ctrl))
 	{
-	    char scan[] = "\x9b""1;1;%d;%d r",
-		 answ[sizeof(scan) + 8] = { '\0' };
+	    అక్షరం పరిశీలన[] = "\x9b""1;1;%d;%d r",
+		 answ[పరిమాణం(పరిశీలన) + 8] = { '\0' };
 
 	    // Read return sequence from input.
-	    if (Read(raw_in, answ, sizeof(answ) - 1) > 0)
+	    ఒకవేళ (Read(raw_లోపల, answ, పరిమాణం(answ) - 1) > 0)
 	    {
 		// Parse result and set Vim globals.
-		if (sscanf(answ, scan, &Rows, &Columns) == 2)
+		ఒకవేళ (అక్షరశ్రేణి_చదువు(answ, పరిశీలన, &అడ్డువరుసలు, &Columns) == 2)
 		{
 		    // Restore console mode.
 		    mch_settmode(old_tmode);
-		    return OK;
+		    తిరిగి OK;
 		}
 	    }
 	}
@@ -1118,35 +1118,35 @@ mch_get_shellsize(void)
     }
 
     // I/O error. Default size fallback.
-    term_console = FALSE;
+    పదం_console = FALSE;
     Columns = 80;
-    Rows = 24;
+    అడ్డువరుసలు = 24;
 
-    return FAIL;
+    తిరిగి FAIL;
 }
-#else
+#లేకపోతే
 /*
  * Try to get the real window size,
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_get_shellsize(void)
+    పూర్ణాంకం
+mch_get_shellsize(శూన్య)
 {
-    struct ConUnit  *conUnit;
+    నిర్మాణం ConUnit  *conUnit;
 # ifndef __amigaos4__
-    char	    id_a[sizeof(struct InfoData) + 3];
+    అక్షరం	    id_a[పరిమాణం(నిర్మాణం Info_దత్తాంశం) + 3];
 # endif
-    struct InfoData *id=0;
+    నిర్మాణం Info_దత్తాంశం *id=0;
 
-    if (!term_console)	// not an amiga window
-	goto out;
+    ఒకవేళ (!పదం_console)	// not an amiga window
+	వెళ్ళు బహిర్గతం;
 
     // insure longword alignment
 # ifdef __amigaos4__
-    if (!(id = AllocDosObject(DOS_INFODATA, 0)))
-	goto out;
-# else
-    id = (struct InfoData *)(((long)id_a + 3L) & ~3L);
+    ఒకవేళ (!(id = AllocDosObject(DOS_INFODATA, 0)))
+	వెళ్ళు బహిర్గతం;
+# లేకపోతే
+    id = (నిర్మాణం Info_దత్తాంశం *)(((దీర్ఘ)id_a + 3L) & ~3L);
 # endif
 
     /*
@@ -1154,72 +1154,72 @@ mch_get_shellsize(void)
      * Unfortunately, under DOS 2.0x this redraws the window and it
      * is rarely needed, so we skip it now, unless we changed the size.
      */
-    if (size_set)
-	OUT_STR("\233t\233u");	// CSI t CSI u
-    out_flush();
+    ఒకవేళ (కొలత_సమితి)
+	బహిర్గతం_STR("\233t\233u");	// CSI t CSI u
+    బహిర్గతం_flush();
 
-    if (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
-	    || (wb_window = (struct Window *)id->id_VolumeNode) == NULL)
+    ఒకవేళ (dos_packet(MP(raw_బహిర్గతం), (దీర్ఘ)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
+	    || (wb_కిటికీ = (నిర్మాణం కిటికీ *)id->id_Volume_కణుపు) == ఖాళీ)
     {
 	// it's not an amiga window, maybe aux device
 	// terminal type should be set
-	term_console = FALSE;
-	goto out;
+	పదం_console = FALSE;
+	వెళ్ళు బహిర్గతం;
     }
-    if (oldwindowtitle == NULL)
-	oldwindowtitle = (char_u *)wb_window->Title;
-    if (id->id_InUse == (BPTR)NULL)
+    ఒకవేళ (oldwindowtitle == ఖాళీ)
+	oldwindowtitle = (char_u *)wb_కిటికీ->Title;
+    ఒకవేళ (id->id_లోపల_Use == (BPTR)ఖాళీ)
     {
 	mch_errmsg(_("mch_get_shellsize: not a console??\n"));
-	return FAIL;
+	తిరిగి FAIL;
     }
-    conUnit = (struct ConUnit *) ((struct IOStdReq *) id->id_InUse)->io_Unit;
+    conUnit = (నిర్మాణం ConUnit *) ((నిర్మాణం IOStdReq *) id->id_లోపల_Use)->io_Unit;
 
     // get window size
-    Rows = conUnit->cu_YMax + 1;
+    అడ్డువరుసలు = conUnit->cu_YMax + 1;
     Columns = conUnit->cu_XMax + 1;
-    if (Rows < 0 || Rows > 200)	    // cannot be an amiga window
+    ఒకవేళ (అడ్డువరుసలు < 0 || అడ్డువరుసలు > 200)	    // cannot be an amiga window
     {
 	Columns = 80;
-	Rows = 24;
-	term_console = FALSE;
-	return FAIL;
+	అడ్డువరుసలు = 24;
+	పదం_console = FALSE;
+	తిరిగి FAIL;
     }
 
-    return OK;
-out:
+    తిరిగి OK;
+బహిర్గతం:
 # ifdef __amigaos4__
     FreeDosObject(DOS_INFODATA, id); // Safe to pass NULL
 # endif
 
-    return FAIL;
+    తిరిగి FAIL;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Try to set the real window size to Rows and Columns.
  */
-    void
-mch_set_shellsize(void)
+    శూన్య
+mch_సమితి_shellsize(శూన్య)
 {
-    if (!term_console)
-	return;
+    ఒకవేళ (!పదం_console)
+	తిరిగి;
 
-    size_set = TRUE;
-    out_char(CSI);
-    out_num((long)Rows);
-    out_char('t');
-    out_char(CSI);
-    out_num((long)Columns);
-    out_char('u');
-    out_flush();
+    కొలత_సమితి = TRUE;
+    బహిర్గతం_char(CSI);
+    బహిర్గతం_అంకె((దీర్ఘ)అడ్డువరుసలు);
+    బహిర్గతం_char('t');
+    బహిర్గతం_char(CSI);
+    బహిర్గతం_అంకె((దీర్ఘ)Columns);
+    బహిర్గతం_char('u');
+    బహిర్గతం_flush();
 }
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    శూన్య
+mch_new_shellsize(శూన్య)
 {
     // Nothing to do.
 }
@@ -1227,13 +1227,13 @@ mch_new_shellsize(void)
 /*
  * out_num - output a (big) number fast
  */
-    static void
-out_num(long n)
+    స్థిర శూన్య
+బహిర్గతం_అంకె(దీర్ఘ n)
 {
-    OUT_STR_NF(tltoa((unsigned long)n));
+    బహిర్గతం_STR_NF(tltoa((గుర్తులేని దీర్ఘ)n));
 }
 
-#if !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
+#ఒకవేళ !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
 /*
  * Sendpacket.c
  *
@@ -1255,263 +1255,263 @@ out_num(long n)
  * Port supplied.
  */
 
-    static long
+    స్థిర దీర్ఘ
 dos_packet(
-    struct MsgPort *pid,    // process identifier ... (handlers message port)
-    long	    action, // packet type ... (what you want handler to do)
-    long	    arg)    // single argument
+    నిర్మాణం సందేశం_పోర్టు *pid,    // process identifier ... (handlers message port)
+    దీర్ఘ	    action, // packet type ... (what you want handler to do)
+    దీర్ఘ	    arg)    // single argument
 {
 # ifdef FEAT_ARP
-    struct MsgPort	    *replyport;
-    struct StandardPacket   *packet;
-    long		    res1;
+    నిర్మాణం సందేశం_పోర్టు	    *replyport;
+    నిర్మాణం StandardPacket   *packet;
+    దీర్ఘ		    res1;
 
-    if (dos2)
+    ఒకవేళ (dos2)
 # endif
-	return DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
+	తిరిగి DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
 # ifdef FEAT_ARP
 
-    replyport = (struct MsgPort *) CreatePort(NULL, 0);	// use arp function
-    if (!replyport)
-	return (0);
+    replyport = (నిర్మాణం సందేశం_పోర్టు *) Create_పోర్టు(ఖాళీ, 0);	// use arp function
+    ఒకవేళ (!replyport)
+	తిరిగి (0);
 
     // Allocate space for a packet, make it public and clear it
-    packet = (struct StandardPacket *)
-	AllocMem((long) sizeof(struct StandardPacket), MEMF_PUBLIC | MEMF_CLEAR);
-    if (!packet)
+    packet = (నిర్మాణం StandardPacket *)
+	AllocMem((దీర్ఘ) పరిమాణం(నిర్మాణం StandardPacket), MEMF_ప్రజా | MEMF_CLEAR);
+    ఒకవేళ (!packet)
     {
-	DeletePort(replyport);
-	return (0);
+	Delete_పోర్టు(replyport);
+	తిరిగి (0);
     }
-    packet->sp_Msg.mn_Node.ln_Name = (char *) &(packet->sp_Pkt);
-    packet->sp_Pkt.dp_Link = &(packet->sp_Msg);
-    packet->sp_Pkt.dp_Port = replyport;
+    packet->sp_సందేశం.mn_కణుపు.ln_Name = (అక్షరం *) &(packet->sp_Pkt);
+    packet->sp_Pkt.dp_Link = &(packet->sp_సందేశం);
+    packet->sp_Pkt.dp_పోర్టు = replyport;
     packet->sp_Pkt.dp_Type = action;
     packet->sp_Pkt.dp_Arg1 = arg;
 
-    PutMsg(pid, (struct Message *)packet);	// send packet
+    Put_సందేశం(pid, (నిర్మాణం సందేశం_4 *)packet);	// send packet
 
-    WaitPort(replyport);
-    GetMsg(replyport);
+    Wait_పోర్టు(replyport);
+    Get_సందేశం(replyport);
 
     res1 = packet->sp_Pkt.dp_Res1;
 
-    FreeMem(packet, (long) sizeof(struct StandardPacket));
-    DeletePort(replyport);
+    FreeMem(packet, (దీర్ఘ) పరిమాణం(నిర్మాణం StandardPacket));
+    Delete_పోర్టు(replyport);
 
-    return (res1);
+    తిరిగి (res1);
 # endif
 }
-#endif // !defined(AZTEC_C) && !defined(__AROS__)
+#అయితే_ముగింపు // !defined(AZTEC_C) && !defined(__AROS__)
 
 /*
  * Call shell.
  * Return error number for failure, 0 otherwise
  */
-    int
+    పూర్ణాంకం
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    పూర్ణాంకం		options)	// SHELL_*, see vim.h
 {
     BPTR	mydir;
-    int		x;
-    int		tmode = cur_tmode;
-#ifdef AZTEC_C
-    int		use_execute;
-    char_u	*shellcmd = NULL;
+    పూర్ణాంకం		x;
+    పూర్ణాంకం		tmode = cur_tmode;
+#నిర్వచితమైతే AZTEC_C
+    పూర్ణాంకం		use_execute;
+    char_u	*shellcmd = ఖాళీ;
     char_u	*shellarg;
-#endif
-    int		retval = 0;
+#అయితే_ముగింపు
+    పూర్ణాంకం		retval = 0;
 
-    if (close_win)
+    ఒకవేళ (close_win)
     {
 	// if Vim opened a window: Executing a shell may cause crashes
 	emsg(_(e_cannot_execute_shell_with_f_option));
-	return -1;
+	తిరిగి -1;
     }
 
-    if (term_console)
+    ఒకవేళ (పదం_console)
 	win_resize_off();	    // window resize events de-activated
-    out_flush();
+    బహిర్గతం_flush();
 
-    if (options & SHELL_COOKED)
+    ఒకవేళ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
-    mydir = Lock((UBYTE *)"", (long)ACCESS_READ);   // remember current dir
+    mydir = తాళం_2((UBYTE *)"", (దీర్ఘ)ACCESS_READ);   // remember current dir
 
-#if !defined(AZTEC_C)		    // not tested very much
-    if (cmd == NULL)
+#ఒకవేళ !defined(AZTEC_C)		    // not tested very much
+    ఒకవేళ (cmd == ఖాళీ)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ఒకవేళ (dos2)
 # endif
-	    x = SystemTags(p_sh, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ట్యాగులు(p_sh, SYS_UserShell, TRUE, ట్యాగ్_పూర్తి);
 # ifdef FEAT_ARP
-	else
-	    x = Execute(p_sh, raw_in, raw_out);
+	లేకపోతే
+	    x = Execute(p_sh, raw_లోపల, raw_బహిర్గతం);
 # endif
     }
-    else
+    లేకపోతే
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ఒకవేళ (dos2)
 # endif
-	    x = SystemTags((char *)cmd, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ట్యాగులు((అక్షరం *)cmd, SYS_UserShell, TRUE, ట్యాగ్_పూర్తి);
 # ifdef FEAT_ARP
-	else
-	    x = Execute((char *)cmd, 0L, raw_out);
+	లేకపోతే
+	    x = Execute((అక్షరం *)cmd, 0L, raw_బహిర్గతం);
 # endif
     }
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && !x))
-# else
-    if (x < 0)
+    ఒకవేళ ((dos2 && x < 0) || (!dos2 && !x))
+# లేకపోతే
+    ఒకవేళ (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (cmd == NULL)
+	సందేశం_puts(_("Cannot execute "));
+	ఒకవేళ (cmd == ఖాళీ)
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(p_sh);
+	    సందేశం_puts(_("shell "));
+	    సందేశం_outtrans(p_sh);
 	}
-	else
-	    msg_outtrans(cmd);
-	msg_putchar('\n');
+	లేకపోతే
+	    సందేశం_outtrans(cmd);
+	సందేశం_putchar('\n');
 	retval = -1;
     }
 # ifdef FEAT_ARP
-    else if (!dos2 || x)
-# else
-    else if (x)
+    లేకపోతే ఒకవేళ (!dos2 || x)
+# లేకపోతే
+    లేకపోతే ఒకవేళ (x)
 # endif
     {
-	if ((x = IoErr()) != 0)
+	ఒకవేళ ((x = IoErr()) != 0)
 	{
-	    if (!(options & SHELL_SILENT))
+	    ఒకవేళ (!(options & SHELL_SILENT))
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		సందేశం_putchar('\n');
+		సందేశం_outnum((దీర్ఘ)x);
+		సందేశం_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
     }
-#else	// else part is for AZTEC_C
-    if (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
+#లేకపోతే	// else part is for AZTEC_C
+    ఒకవేళ (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
 	use_execute = 1;
-    else
+    లేకపోతే
 	use_execute = 0;
-    if (!use_execute)
+    ఒకవేళ (!use_execute)
     {
 	/*
 	 * separate shell name from argument
 	 */
 	shellcmd = vim_strsave(p_sh);
-	if (shellcmd == NULL)	    // out of memory, use Execute
+	ఒకవేళ (shellcmd == ఖాళీ)	    // out of memory, use Execute
 	    use_execute = 1;
-	else
+	లేకపోతే
 	{
 	    shellarg = skiptowhite(shellcmd);	// find start of arguments
-	    if (*shellarg != NUL)
+	    ఒకవేళ (*shellarg != NUL)
 	    {
 		*shellarg++ = NUL;
 		shellarg = skipwhite(shellarg);
 	    }
 	}
     }
-    if (cmd == NULL)
+    ఒకవేళ (cmd == ఖాళీ)
     {
-	if (use_execute)
+	ఒకవేళ (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (dos2)
+	    ఒకవేళ (dos2)
 # endif
-		x = SystemTags((UBYTE *)p_sh, SYS_UserShell, TRUE, TAG_DONE);
+		x = System_ట్యాగులు((UBYTE *)p_sh, SYS_UserShell, TRUE, ట్యాగ్_పూర్తి);
 # ifdef FEAT_ARP
-	    else
-		x = !Execute((UBYTE *)p_sh, raw_in, raw_out);
+	    లేకపోతే
+		x = !Execute((UBYTE *)p_sh, raw_లోపల, raw_బహిర్గతం);
 # endif
 	}
-	else
-	    x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg, NULL);
+	లేకపోతే
+	    x = fexecl((అక్షరం *)shellcmd, (అక్షరం *)shellcmd, (అక్షరం *)shellarg, ఖాళీ);
     }
-    else if (use_execute)
+    లేకపోతే ఒకవేళ (use_execute)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ఒకవేళ (dos2)
 # endif
-	    x = SystemTags((UBYTE *)cmd, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ట్యాగులు((UBYTE *)cmd, SYS_UserShell, TRUE, ట్యాగ్_పూర్తి);
 # ifdef FEAT_ARP
-	else
-	    x = !Execute((UBYTE *)cmd, 0L, raw_out);
+	లేకపోతే
+	    x = !Execute((UBYTE *)cmd, 0L, raw_బహిర్గతం);
 # endif
     }
-    else if (p_st & 1)
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-							   (char *)cmd, NULL);
-    else
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-					   (char *)p_shcf, (char *)cmd, NULL);
+    లేకపోతే ఒకవేళ (p_st & 1)
+	x = fexecl((అక్షరం *)shellcmd, (అక్షరం *)shellcmd, (అక్షరం *)shellarg,
+							   (అక్షరం *)cmd, ఖాళీ);
+    లేకపోతే
+	x = fexecl((అక్షరం *)shellcmd, (అక్షరం *)shellcmd, (అక్షరం *)shellarg,
+					   (అక్షరం *)p_shcf, (అక్షరం *)cmd, ఖాళీ);
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && x))
-# else
-    if (x < 0)
+    ఒకవేళ ((dos2 && x < 0) || (!dos2 && x))
+# లేకపోతే
+    ఒకవేళ (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (use_execute)
+	సందేశం_puts(_("Cannot execute "));
+	ఒకవేళ (use_execute)
 	{
-	    if (cmd == NULL)
-		msg_outtrans(p_sh);
-	    else
-		msg_outtrans(cmd);
+	    ఒకవేళ (cmd == ఖాళీ)
+		సందేశం_outtrans(p_sh);
+	    లేకపోతే
+		సందేశం_outtrans(cmd);
 	}
-	else
+	లేకపోతే
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(shellcmd);
+	    సందేశం_puts(_("shell "));
+	    సందేశం_outtrans(shellcmd);
 	}
-	msg_putchar('\n');
+	సందేశం_putchar('\n');
 	retval = -1;
     }
-    else
+    లేకపోతే
     {
-	if (use_execute)
+	ఒకవేళ (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (!dos2 || x)
-# else
-	    if (x)
+	    ఒకవేళ (!dos2 || x)
+# లేకపోతే
+	    ఒకవేళ (x)
 # endif
 		x = IoErr();
 	}
-	else
+	లేకపోతే
 	    x = wait();
-	if (x)
+	ఒకవేళ (x)
 	{
-	    if (!(options & SHELL_SILENT) && !emsg_silent)
+	    ఒకవేళ (!(options & SHELL_SILENT) && !emsg_silent)
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		సందేశం_putchar('\n');
+		సందేశం_outnum((దీర్ఘ)x);
+		సందేశం_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
     }
     vim_free(shellcmd);
-#endif	// AZTEC_C
+#అయితే_ముగింపు	// AZTEC_C
 
-    if ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
-	UnLock(mydir);
-    if (tmode == TMODE_RAW)
+    ఒకవేళ ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
+	Un_తాళం(mydir);
+    ఒకవేళ (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);		// set to raw mode
     }
     resettitle();
-    if (term_console)
+    ఒకవేళ (పదం_console)
 	win_resize_on();		// window resize events activated
-    return retval;
+    తిరిగి retval;
 }
 
 /*
@@ -1519,10 +1519,10 @@ mch_call_shell(
  * We only react to a CTRL-C, but also clear the other break signals to avoid
  * trouble with lattice-c programs.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    శూన్య
+mch_breakcheck(పూర్ణాంకం force వాడని)
 {
-   if (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
+   ఒకవేళ (సమితి_Signal(0L, (దీర్ఘ)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
 	got_int = TRUE;
 }
 
@@ -1530,23 +1530,23 @@ mch_breakcheck(int force UNUSED)
 // otherwise it resets our ^C when doing any I/O (even when Enable_Abort
 // is zero).  Since we want to check for our own ^C's
 
-#ifdef _DCC
+#నిర్వచితమైతే _DCC
 # define Chk_Abort chkabort
-#endif
+#అయితే_ముగింపు
 
-#ifdef LATTICE
-void __regargs __chkabort(void);
+#నిర్వచితమైతే LATTICE
+శూన్య __regargs __chkabort(శూన్య);
 
-void __regargs __chkabort(void)
+శూన్య __regargs __chkabort(శూన్య)
 {}
 
-#else
-    long
-Chk_Abort(void)
+#లేకపోతే
+    దీర్ఘ
+Chk_Abort(శూన్య)
 {
-    return(0L);
+    తిరిగి(0L);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * mch_expandpath() - this code does wild-card pattern matching using the arp
@@ -1561,172 +1561,172 @@ Chk_Abort(void)
  *	Use and abuse as you please.
  */
 
-#ifdef __amigaos4__
-# define	ANCHOR_BUF_SIZE	1024
-#else
-# define ANCHOR_BUF_SIZE (512)
-# define ANCHOR_SIZE (sizeof(struct AnchorPath) + ANCHOR_BUF_SIZE)
-#endif
+#నిర్వచితమైతే __amigaos4__
+# define	ANCHOR_BUF_కొలత	1024
+#లేకపోతే
+# define ANCHOR_BUF_కొలత (512)
+# define ANCHOR_కొలత (పరిమాణం(నిర్మాణం Anchor_మార్గం) + ANCHOR_BUF_కొలత)
+#అయితే_ముగింపు
 
-    int
+    పూర్ణాంకం
 mch_expandpath(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)		// EW_* flags
+    పూర్ణాంకం		flags)		// EW_* flags
 {
-    struct AnchorPath	*Anchor;
-    LONG		Result;
+    నిర్మాణం Anchor_మార్గం	*Anchor;
+    LONG		ఫలితం_2;
     char_u		*starbuf, *sp, *dp;
-    int			start_len;
-    int			matches;
-#ifdef __amigaos4__
-    struct TagItem	AnchorTags[] = {
-	{ADO_Strlen, ANCHOR_BUF_SIZE},
+    పూర్ణాంకం			ప్రారంభం_len;
+    పూర్ణాంకం			matches;
+#నిర్వచితమైతే __amigaos4__
+    నిర్మాణం ట్యాగ్_అంశం	Anchor_ట్యాగులు[] = {
+	{ADO_Strlen, ANCHOR_BUF_కొలత},
 	{ADO_Flags, APF_DODOT|APF_DOWILD|APF_MultiAssigns},
-	{TAG_DONE, 0L}
+	{ట్యాగ్_పూర్తి, 0L}
     };
-#endif
+#అయితే_ముగింపు
 
-    start_len = gap->ga_len;
+    ప్రారంభం_len = gap->ga_len;
 
     // Get our AnchorBase
-#ifdef __amigaos4__
-    Anchor = AllocDosObject(DOS_ANCHORPATH, AnchorTags);
-#else
-    Anchor = alloc_clear(ANCHOR_SIZE);
-#endif
-    if (Anchor == NULL)
-	return 0;
+#నిర్వచితమైతే __amigaos4__
+    Anchor = AllocDosObject(DOS_ANCHORPATH, Anchor_ట్యాగులు);
+#లేకపోతే
+    Anchor = alloc_clear(ANCHOR_కొలత);
+#అయితే_ముగింపు
+    ఒకవేళ (Anchor == ఖాళీ)
+	తిరిగి 0;
 
-#ifndef __amigaos4__
-    Anchor->ap_Strlen = ANCHOR_BUF_SIZE;  // ap_Length not supported anymore
+#నిర్వచితం_కాకపోతే __amigaos4__
+    Anchor->ap_Strlen = ANCHOR_BUF_కొలత;  // ap_Length not supported anymore
 # ifdef APF_DODOT
     Anchor->ap_Flags = APF_DODOT | APF_DOWILD;	// allow '.' for current dir
-# else
+# లేకపోతే
     Anchor->ap_Flags = APF_DoDot | APF_DoWild;	// allow '.' for current dir
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_ARP
-    if (dos2)
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (dos2)
     {
-#endif
+#అయితే_ముగింపు
 	// hack to replace '*' by '#?'
 	starbuf = alloc(2 * STRLEN(pat) + 1);
-	if (starbuf == NULL)
-	    goto Return;
-	for (sp = pat, dp = starbuf; *sp; ++sp)
+	ఒకవేళ (starbuf == ఖాళీ)
+	    వెళ్ళు Return;
+	కొరకు (sp = pat, dp = starbuf; *sp; ++sp)
 	{
-	    if (*sp == '*')
+	    ఒకవేళ (*sp == '*')
 	    {
 		*dp++ = '#';
 		*dp++ = '?';
 	    }
-	    else
+	    లేకపోతే
 		*dp++ = *sp;
 	}
 	*dp = NUL;
-	Result = MatchFirst((UBYTE *)starbuf, Anchor);
+	ఫలితం_2 = సరిపోలిక_మొదటి((UBYTE *)starbuf, Anchor);
 	vim_free(starbuf);
-#ifdef FEAT_ARP
+#నిర్వచితమైతే FEAT_ARP
     }
-    else
-	Result = FindFirst((char *)pat, Anchor);
-#endif
+    లేకపోతే
+	ఫలితం_2 = కనుగొను_మొదటి((అక్షరం *)pat, Anchor);
+#అయితే_ముగింపు
 
     /*
      * Loop to get all matches.
      */
-    while (Result == 0)
+    అయితే (ఫలితం_2 == 0)
     {
-#ifdef __amigaos4__
-	addfile(gap, (char_u *)Anchor->ap_Buffer, flags);
-#else
+#నిర్వచితమైతే __amigaos4__
+	addfile(gap, (char_u *)Anchor->ap_బఫరు, flags);
+#లేకపోతే
 	addfile(gap, (char_u *)Anchor->ap_Buf, flags);
-#endif
-#ifdef FEAT_ARP
-	if (dos2)
-#endif
-	    Result = MatchNext(Anchor);
-#ifdef FEAT_ARP
-	else
-	    Result = FindNext(Anchor);
-#endif
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_ARP
+	ఒకవేళ (dos2)
+#అయితే_ముగింపు
+	    ఫలితం_2 = సరిపోలిక_తదుపరి_2(Anchor);
+#నిర్వచితమైతే FEAT_ARP
+	లేకపోతే
+	    ఫలితం_2 = కనుగొను_తదుపరి(Anchor);
+#అయితే_ముగింపు
     }
-    matches = gap->ga_len - start_len;
+    matches = gap->ga_len - ప్రారంభం_len;
 
-    if (Result == ERROR_BUFFER_OVERFLOW)
+    ఒకవేళ (ఫలితం_2 == ERROR_బఫరు_అధికప్రవాహం)
 	emsg(_("ANCHOR_BUF_SIZE too small."));
-    else if (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
-			  && Result != ERROR_DEVICE_NOT_MOUNTED
-			  && Result != ERROR_NO_MORE_ENTRIES)
+    లేకపోతే ఒకవేళ (matches == 0 && ఫలితం_2 != ERROR_OBJECT_NOT_దొరికింది
+			  && ఫలితం_2 != ERROR_DEVICE_NOT_MOUNTED
+			  && ఫలితం_2 != ERROR_NO_మరిన్ని_ENTRIES)
 	emsg(_("I/O ERROR"));
 
     /*
      * Sort the files for this pattern.
      */
-    if (matches)
-	qsort((void *)(((char_u **)gap->ga_data) + start_len),
-				  (size_t)matches, sizeof(char_u *), sortcmp);
+    ఒకవేళ (matches)
+	qsort((శూన్య *)(((char_u **)gap->ga_దత్తాంశం) + ప్రారంభం_len),
+				  (size_t)matches, పరిమాణం(char_u *), sortcmp);
 
     // Free the wildcard stuff
-#ifdef FEAT_ARP
-    if (dos2)
-#endif
-	MatchEnd(Anchor);
-#ifdef FEAT_ARP
-    else
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (dos2)
+#అయితే_ముగింపు
+	సరిపోలిక_చివర_3(Anchor);
+#నిర్వచితమైతే FEAT_ARP
+    లేకపోతే
 	FreeAnchorChain(Anchor);
-#endif
+#అయితే_ముగింపు
 
 Return:
-#ifdef __amigaos4__
+#నిర్వచితమైతే __amigaos4__
     FreeDosObject(DOS_ANCHORPATH, Anchor);
-#else
+#లేకపోతే
     vim_free(Anchor);
-#endif
+#అయితే_ముగింపు
 
-    return matches;
+    తిరిగి matches;
 }
 
-    static int
-sortcmp(const void *a, const void *b)
+    స్థిర పూర్ణాంకం
+sortcmp(స్థిరరాశి శూన్య *a, స్థిరరాశి శూన్య *b)
 {
-    char *s = *(char **)a;
-    char *t = *(char **)b;
+    అక్షరం *s = *(అక్షరం **)a;
+    అక్షరం *t = *(అక్షరం **)b;
 
-    return pathcmp(s, t, -1);
+    తిరిగి pathcmp(s, t, -1);
 }
 
 /*
  * Return TRUE if "p" has wildcards that can be expanded by mch_expandpath().
  */
-    int
+    పూర్ణాంకం
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    కొరకు ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ఒకవేళ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)"*?[(#", *p) != NULL)
-	    return TRUE;
+	లేకపోతే ఒకవేళ (vim_strchr((char_u *)"*?[(#", *p) != ఖాళీ)
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
-    int
+    పూర్ణాంకం
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    కొరకు ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ఒకవేళ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)"*?[(#$`", *p) != NULL
+	లేకపోతే
+	    ఒకవేళ (vim_strchr((char_u *)"*?[(#$`", *p) != ఖాళీ
 		    || (*p == '~' && p[1] != NUL))
-		return TRUE;
+		తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 /*
@@ -1739,26 +1739,26 @@ mch_has_wildcard(char_u *p)
     char_u *
 mch_getenv(char_u *var)
 {
-    int		    len;
+    పూర్ణాంకం		    len;
     UBYTE	    *buf;		// buffer to expand in
     char_u	    *retval;		// return value
-    static char_u   *alloced = NULL;	// allocated memory
+    స్థిర char_u   *alloced = ఖాళీ;	// allocated memory
 
-#ifdef FEAT_ARP
-    if (!dos2)
-	retval = (char_u *)getenv((char *)var);
-    else
-#endif
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (!dos2)
+	retval = (char_u *)getenv((అక్షరం *)var);
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	VIM_CLEAR(alloced);
-	retval = NULL;
+	retval = ఖాళీ;
 
 	buf = alloc(IOSIZE);
-	if (buf == NULL)
-	    return NULL;
+	ఒకవేళ (buf == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
-	len = GetVar((UBYTE *)var, buf, (long)(IOSIZE - 1), (long)0);
-	if (len >= 0)
+	len = GetVar((UBYTE *)var, buf, (దీర్ఘ)(IOSIZE - 1), (దీర్ఘ)0);
+	ఒకవేళ (len >= 0)
 	{
 	    retval = vim_strsave((char_u *)buf);
 	    alloced = retval;
@@ -1768,53 +1768,53 @@ mch_getenv(char_u *var)
     }
 
     // if $VIM is not defined, use "vim:" instead
-    if (retval == NULL && STRCMP(var, "VIM") == 0)
+    ఒకవేళ (retval == ఖాళీ && STRCMP(var, "VIM") == 0)
 	retval = (char_u *)"vim:";
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Amiga version of setenv() with AmigaDOS 2.0 support.
  */
 // ARGSUSED
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    పూర్ణాంకం
+mch_setenv(అక్షరం *var, అక్షరం *విలువ, పూర్ణాంకం x వాడని)
 {
-#ifdef FEAT_ARP
-    if (!dos2)
-	return setenv(var, value);
-#endif
+#నిర్వచితమైతే FEAT_ARP
+    ఒకవేళ (!dos2)
+	తిరిగి setenv(var, విలువ);
+#అయితే_ముగింపు
 
-    if (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
-	return 0;   // success
-    return -1;	    // failure
+    ఒకవేళ (సమితి_Var((UBYTE *)var, (UBYTE *)విలువ, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
+	తిరిగి 0;   // success
+    తిరిగి -1;	    // failure
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if RANDOM: is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    పూర్ణాంకం
+mch_get_random(char_u *buf, పూర్ణాంకం len)
 {
-    struct Process *proc = (struct Process *) FindTask(0L);
-    APTR win = proc->pr_WindowPtr;
+    నిర్మాణం Process *proc = (నిర్మాణం Process *) కనుగొను_Task(0L);
+    APTR win = proc->pr_కిటికీ_Ptr;
 
     // Don't show requester if RANDOM: doesn't exist
-    proc->pr_WindowPtr = (APTR) -1L;
+    proc->pr_కిటికీ_Ptr = (APTR) -1L;
 
-    BPTR fh = Open("RANDOM:", MODE_OLDFILE);
+    BPTR fh = Open("RANDOM:", బహుళకం_OLDFILE);
 
-    proc->pr_WindowPtr = win;
+    proc->pr_కిటికీ_Ptr = win;
 
-    int status;
+    పూర్ణాంకం స్థితి_2;
 
-    if (!fh || Read(fh, buf, len) != len)
-	status = FAIL;
-    else
-	status = OK;
+    ఒకవేళ (!fh || Read(fh, buf, len) != len)
+	స్థితి_2 = FAIL;
+    లేకపోతే
+	స్థితి_2 = OK;
 
     Close(fh);
-    return status;
+    తిరిగి స్థితి_2;
 }

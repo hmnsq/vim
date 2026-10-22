@@ -2,134 +2,134 @@
 
 # Used by Test_channel_dap_mode in test_channel.vim to test DAP functionality.
 
-import json
-import socket
-import threading
-import time
+దిగుమతి json
+దిగుమతి socket
+దిగుమతి threading
+దిగుమతి సమయం
 
-try:
-    import socketserver
-except ImportError:
-    import SocketServer as socketserver
+ప్రయత్నించు:
+    దిగుమతి socketserver
+మినహాయింపు ImportError:
+    దిగుమతి SocketServer ఇవ socketserver
 
-def make_dap_message(obj):
+నిర్వచనం make_dap_సందేశం(obj):
     payload = json.dumps(obj).encode("utf-8")
-    header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    శీర్షిక = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
+    తిరిగి శీర్షిక + payload
 
 
-def parse_messages(buffer):
+నిర్వచనం parse_messages(బఫరు):
     messages = []
 
-    while True:
-        hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+    అయితే నిజం:
+        hdr_చివర = బఫరు.కనుగొను(b"\r\n\r\n")
+        ఒకవేళ hdr_చివర == -1:
+            ఆపు
 
-        header = buffer[:hdr_end].decode("ascii", errors="ignore")
-        content_length = None
+        శీర్షిక = బఫరు[:hdr_చివర].decode("ascii", errors="ignore")
+        content_నిడివి = ఏమీలేదు
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        కొరకు పంక్తి లో శీర్షిక.విభజించు("\r\n"):
+            ఒకవేళ పంక్తి.క్రింది().startswith("content-length:"):
+                content_నిడివి = పూర్ణాంకం(పంక్తి.విభజించు(":")[1].strip())
 
-        if content_length is None:
-            break
+        ఒకవేళ content_నిడివి అయిన ఏమీలేదు:
+            ఆపు
 
-        total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        మొత్తం_len = hdr_చివర + 4 + content_నిడివి
+        ఒకవేళ పొడవు(బఫరు) < మొత్తం_len:
+            ఆపు  # partial
 
-        body = buffer[hdr_end + 4:total_len]
+        body = బఫరు[hdr_చివర + 4:మొత్తం_len]
         messages.append(json.loads(body.decode("utf-8")))
-        buffer = buffer[total_len:]
+        బఫరు = బఫరు[మొత్తం_len:]
 
-    return messages, buffer
+    తిరిగి messages, బఫరు
 
 
-class DAPHandler(socketserver.BaseRequestHandler):
+తరగతి DAPHandler(socketserver.పునాది_Request_Handler):
 
-    def setup(self):
+    నిర్వచనం అమరిక(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.seq = 1  # server sequence counter
 
-    def send(self, obj):
+    నిర్వచనం send(self, obj):
         obj["seq"] = self.seq
         self.seq += 1
-        self.request.sendall(make_dap_message(obj))
+        self.request.sendall(make_dap_సందేశం(obj))
 
-    def send_response(self, request, body=None, success=True):
+    నిర్వచనం send_response(self, request, body=ఏమీలేదు, success=నిజం):
         self.send({
             "type": "response",
             "request_seq": request["seq"],
             "success": success,
             "command": request["command"],
-            "body": body or {}
+            "body": body లేదా {}
         })
 
-    def send_event(self, event, body=None):
+    నిర్వచనం send_event(self, event, body=ఏమీలేదు):
         self.send({
             "type": "event",
             "event": event,
-            "body": body or {}
+            "body": body లేదా {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    నిర్వచనం handle_request(self, సందేశం):
+        cmd = సందేశం.get("command")
 
-        if cmd == "initialize":
-            self.send_response(msg, {
-                "supportsConfigurationDoneRequest": True
+        ఒకవేళ cmd == "initialize":
+            self.send_response(సందేశం, {
+                "supportsConfigurationDoneRequest": నిజం
             })
             self.send_event("initialized")
-        else:
-            self.send_response(msg)
+        లేకపోతే:
+            self.send_response(సందేశం)
 
-        return True
+        తిరిగి నిజం
 
-    def handle(self):
-        buffer = b""
+    నిర్వచనం handle(self):
+        బఫరు = b""
 
-        while True:
-            data = self.request.recv(4096)
-            if not data:
-                break
+        అయితే నిజం:
+            దత్తాంశం = self.request.recv(4096)
+            ఒకవేళ కాదు దత్తాంశం:
+                ఆపు
 
-            buffer += data
-            messages, buffer = parse_messages(buffer)
+            బఫరు += దత్తాంశం
+            messages, బఫరు = parse_messages(బఫరు)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            కొరకు సందేశం లో messages:
+                ఒకవేళ సందేశం.get("type") == "request":
+                    ఒకవేళ కాదు self.handle_request(సందేశం):
+                        తిరిగి
 
 
-class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
+తరగతి ThreadedDAPServer(socketserver.Threading_Mix_లోపల, socketserver.TCPServer):
+    allow_reuse_చిరునామా = నిజం
 
-def write_port_to_file(port, filename="Xportnr"):
-    with open(filename, "w") as f:
-        f.write(str(port))
+నిర్వచనం write_పోర్టు_గమ్యం_file(పోర్టు, filename="Xportnr"):
+    తోడుగా open(filename, "w") ఇవ f:
+        f.లిఖ(str(పోర్టు))
 
-def main():
+నిర్వచనం ప్రధాన():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
 
     # Get the actual assigned port
-    ip, assigned_port = server.server_address
+    ip, assigned_పోర్టు = server.server_చిరునామా
 
     # Write port so client/test can read it
-    write_port_to_file(assigned_port)
+    write_పోర్టు_గమ్యం_file(assigned_పోర్టు)
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    thread = threading.తంతువు(లక్ష్యం=server.serve_forever)
+    thread.daemon = నిజం
+    thread.ప్రారంభం()
 
-    try:
-        while thread.is_alive():
+    ప్రయత్నించు:
+        అయితే thread.is_alive():
             thread.join(1)
-    except KeyboardInterrupt:
+    మినహాయింపు Keyboard_అంతరాయం:
         server.shutdown()
 
-if __name__ == "__main__":
-    main()
+ఒకవేళ __name__ == "__main__":
+    ప్రధాన()
 

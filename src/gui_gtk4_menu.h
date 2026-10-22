@@ -7,55 +7,55 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_MENU_H
-#define GUI_GTK4_MENU_H
+#నిర్వచితం_కాకపోతే GUI_GTK4_MENU_H
+#నిర్వచించు GUI_GTK4_MENU_H
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef FEAT_MENU
+#నిర్వచితమైతే FEAT_MENU
 
 # include <gtk/gtk.h>
 
-# define VIM_TYPE_MENU_BAR_ITEM (vim_menu_bar_item_get_type())
-G_DECLARE_FINAL_TYPE(VimMenuBarItem, vim_menu_bar_item, VIM, MENU_BAR_ITEM, GtkButton)
+# define VIM_TYPE_MENU_BAR_అంశం (vim_menu_bar_అంశం_get_type())
+G_DECLARE_FINAL_TYPE(Vim_Menu_Bar_అంశం_2, vim_menu_bar_అంశం, VIM, MENU_BAR_అంశం, GtkButton)
 
 # define VIM_TYPE_MENU_BAR (vim_menu_bar_get_type())
 G_DECLARE_FINAL_TYPE(VimMenuBar, vim_menu_bar, VIM, MENU_BAR, GtkWidget)
 
-# define VIM_TYPE_MENU_ITEM (vim_menu_item_get_type())
-G_DECLARE_FINAL_TYPE(VimMenuItem, vim_menu_item, VIM, MENU_ITEM, GtkButton)
+# define VIM_TYPE_MENU_అంశం (vim_menu_అంశం_get_type())
+G_DECLARE_FINAL_TYPE(Vim_Menu_అంశం, vim_menu_అంశం, VIM, MENU_అంశం, GtkButton)
 
 # define VIM_TYPE_MENU (vim_menu_get_type())
 G_DECLARE_FINAL_TYPE(VimMenu, vim_menu, VIM, MENU, GtkPopover)
 
-typedef enum
+రకనిర్వచనం గణన
 {
-    VIM_MENU_ITEM_CLICKED,
-    VIM_MENU_ITEM_SELECTED
-} VimMenuItemEvent;
+    VIM_MENU_అంశం_CLICKED,
+    VIM_MENU_అంశం_SELECTED
+} Vim_Menu_అంశం_Event;
 
-typedef void (*VimMenuItemFunc)(VimMenuItem *item, VimMenuItemEvent event, void *udata);
+రకనిర్వచనం శూన్య (*Vim_Menu_అంశం_Func)(Vim_Menu_అంశం *అంశం, Vim_Menu_అంశం_Event event, శూన్య *udata);
 
-GtkWidget *vim_menu_bar_item_new(const char *text, VimMenu *menu);
-void vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text);
+GtkWidget *vim_menu_bar_అంశం_new(స్థిరరాశి అక్షరం *పాఠ్యం, VimMenu *menu);
+శూన్య vim_menu_bar_అంశం_సమితి_పాఠ్యం(Vim_Menu_Bar_అంశం_2 *self, స్థిరరాశి అక్షరం *పాఠ్యం);
 
-GtkWidget *vim_menu_bar_new(void);
-GtkWidget *vim_menu_bar_to_menu(VimMenuBar *self);
-void vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx);
-void vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item);
-void vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item);
+GtkWidget *vim_menu_bar_new(శూన్య);
+GtkWidget *vim_menu_bar_గమ్యం_menu(VimMenuBar *self);
+శూన్య vim_menu_bar_చొప్పించు_అంశం(VimMenuBar *self, Vim_Menu_Bar_అంశం_2 *అంశం, పూర్ణాంకం idx);
+శూన్య vim_menu_bar_remove(VimMenuBar *self, GtkWidget *అంశం);
+శూన్య vim_menu_bar_show(VimMenuBar *self, Vim_Menu_Bar_అంశం_2 *అంశం);
 
-GtkWidget *vim_menu_item_new(const char *text, VimMenuItemFunc func, void *udata);
-void vim_menu_item_set_text(VimMenuItem *self, const char *text);
-void vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text);
-void vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu);
+GtkWidget *vim_menu_అంశం_new(స్థిరరాశి అక్షరం *పాఠ్యం, Vim_Menu_అంశం_Func func, శూన్య *udata);
+శూన్య vim_menu_అంశం_సమితి_పాఠ్యం(Vim_Menu_అంశం *self, స్థిరరాశి అక్షరం *పాఠ్యం);
+శూన్య vim_menu_అంశం_సమితి_accel(Vim_Menu_అంశం *self, స్థిరరాశి అక్షరం *accel_పాఠ్యం);
+శూన్య vim_menu_అంశం_సమితి_submenu(Vim_Menu_అంశం *self, VimMenu *submenu);
 
-GtkWidget *vim_menu_new(void);
-void vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx);
-GtkWidget *vim_menu_insert_separator(VimMenu *self, int idx);
-void vim_menu_remove(VimMenu *self, GtkWidget *item);
+GtkWidget *vim_menu_new(శూన్య);
+శూన్య vim_menu_చొప్పించు_అంశం(VimMenu *self, Vim_Menu_అంశం *అంశం, పూర్ణాంకం idx);
+GtkWidget *vim_menu_చొప్పించు_separator(VimMenu *self, పూర్ణాంకం idx);
+శూన్య vim_menu_remove(VimMenu *self, GtkWidget *అంశం);
 GtkWidget *vim_menu_copy(VimMenu *self);
 
-#endif
+#అయితే_ముగింపు
 
-#endif
+#అయితే_ముగింపు

@@ -1,296 +1,296 @@
-#include "vterm.h"
-#include "../src/vterm_internal.h" // We pull in some internal bits too
+#అన్తర్భావ "vterm.h"
+#అన్తర్భావ "../src/vterm_internal.h" // We pull in some internal bits too
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#అన్తర్భావ <assert.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <string.h>
 
-#define streq(a,b) (!strcmp(a,b))
-#define strstartswith(a,b) (!strncmp(a,b,strlen(b)))
+#నిర్వచించు streq(a,b) (!strcmp(a,b))
+#నిర్వచించు strstartswith(a,b) (!అక్షరశ్రేణి_పోలిక(a,b,అక్షరశ్రేణి_పొడవు(b)))
 
-static size_t inplace_hex2bytes(char *s)
+స్థిర size_t inplace_hex2bytes(అక్షరం *s)
 {
-  char *inpos = s, *outpos = s;
+  అక్షరం *inpos = s, *outpos = s;
 
-  while(*inpos) {
-    unsigned int ch;
-    if(sscanf(inpos, "%2x", &ch) < 1)
-      break;
+  అయితే(*inpos) {
+    గుర్తులేని పూర్ణాంకం ch;
+    ఒకవేళ(అక్షరశ్రేణి_చదువు(inpos, "%2x", &ch) < 1)
+      ఆపు;
     *outpos = ch;
     outpos += 1; inpos += 2;
   }
 
-  return outpos - s;
+  తిరిగి outpos - s;
 }
 
-static VTermModifier strpe_modifiers(char **strp)
+స్థిర VTermModifier strpe_modifiers(అక్షరం **strp)
 {
   VTermModifier state = 0;
 
-  while((*strp)[0]) {
-    switch(((*strp)++)[0]) {
-      case 'S': state |= VTERM_MOD_SHIFT; break;
-      case 'C': state |= VTERM_MOD_CTRL;  break;
-      case 'A': state |= VTERM_MOD_ALT;   break;
-      default: return state;
+  అయితే((*strp)[0]) {
+    ఎంపిక(((*strp)++)[0]) {
+      స్థితి 'S': state |= VTERM_MOD_జరుపు; ఆపు;
+      స్థితి 'C': state |= VTERM_MOD_CTRL;  ఆపు;
+      స్థితి 'A': state |= VTERM_MOD_ALT;   ఆపు;
+      అప్రమేయ: తిరిగి state;
     }
   }
 
-  return state;
+  తిరిగి state;
 }
 
-static VTermKey strp_key(char *str)
+స్థిర VTerm_కీలకం strp_కీలకం(అక్షరం *str)
 {
-  static struct {
-    char *name;
-    VTermKey key;
-  } keys[] = {
-    { "Up",    VTERM_KEY_UP },
-    { "Tab",   VTERM_KEY_TAB },
-    { "Enter", VTERM_KEY_ENTER },
-    { "KP0",   VTERM_KEY_KP_0 },
-    { "F1",    VTERM_KEY_FUNCTION(1) },
-    { NULL,    VTERM_KEY_NONE },
+  స్థిర నిర్మాణం {
+    అక్షరం *name;
+    VTerm_కీలకం కీలకం;
+  } కీలకాలు[] = {
+    { "Up",    VTERM_కీలకం_పైకి },
+    { "Tab",   VTERM_కీలకం_TAB },
+    { "Enter", VTERM_కీలకం_ENTER },
+    { "KP0",   VTERM_కీలకం_KP_0 },
+    { "F1",    VTERM_కీలకం_FUNCTION(1) },
+    { ఖాళీ,    VTERM_కీలకం_NONE },
   };
-  int i;
+  పూర్ణాంకం i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  కొరకు(i = 0; కీలకాలు[i].name; i++) {
+    ఒకవేళ(streq(str, కీలకాలు[i].name))
+      తిరిగి కీలకాలు[i].కీలకం;
   }
 
-  return VTERM_KEY_NONE;
+  తిరిగి VTERM_కీలకం_NONE;
 }
 
-static void print_color(const VTermColor *col)
+స్థిర శూన్య print_color(స్థిరరాశి VTermColor *నిలువు)
 {
-  if (VTERM_COLOR_IS_RGB(col)) {
-    printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
+  ఒకవేళ (VTERM_COLOR_IS_RGB(నిలువు)) {
+    రాయి("rgb(%d,%d,%d", నిలువు->red, నిలువు->green, నిలువు->blue);
   }
-  else if (VTERM_COLOR_IS_INDEXED(col)) {
-    printf("idx(%d", col->index);
+  లేకపోతే ఒకవేళ (VTERM_COLOR_IS_సూచీకృత(నిలువు)) {
+    రాయి("idx(%d", నిలువు->సూచీ);
   }
-  else {
-    printf("invalid(%d", col->type);
+  లేకపోతే {
+    రాయి("invalid(%d", నిలువు->type);
   }
-  if (VTERM_COLOR_IS_DEFAULT_FG(col)) {
-    printf(",is_default_fg");
+  ఒకవేళ (VTERM_COLOR_IS_DEFAULT_FG(నిలువు)) {
+    రాయి(",is_default_fg");
   }
-  if (VTERM_COLOR_IS_DEFAULT_BG(col)) {
-    printf(",is_default_bg");
+  ఒకవేళ (VTERM_COLOR_IS_DEFAULT_BG(నిలువు)) {
+    రాయి(",is_default_bg");
   }
-  printf(")");
+  రాయి(")");
 }
 
-static VTermColor strpe_color(char **strp)
+స్థిర VTermColor strpe_color(అక్షరం **strp)
 {
   uint8_t r, g, b, idx;
-  int len = 0;
-  VTermColor col;
+  పూర్ణాంకం len = 0;
+  VTermColor నిలువు;
 
-  if(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
+  ఒకవేళ(అక్షరశ్రేణి_చదువు(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
     *strp += len;
-    vterm_color_rgb(&col, r, g, b);
+    vterm_color_rgb(&నిలువు, r, g, b);
   }
-  else if(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
+  లేకపోతే ఒకవేళ(అక్షరశ్రేణి_చదువు(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
     *strp += len;
-    vterm_color_indexed(&col, idx);
+    vterm_color_సూచీకృత(&నిలువు, idx);
   }
-  else
-    vterm_color_rgb(&col, 127, 127, 127);
+  లేకపోతే
+    vterm_color_rgb(&నిలువు, 127, 127, 127);
 
-  return col;
+  తిరిగి నిలువు;
 }
 
-static VTerm *vt;
-static VTermState *state;
-static VTermScreen *screen;
+స్థిర VTerm *vt;
+స్థిర VTermState *state;
+స్థిర VTermScreen *screen;
 
-static VTermEncodingInstance encoding;
+స్థిర VTermEncodingInstance encoding;
 
-static void term_output(const char *s, size_t len, void *user UNUSED)
+స్థిర శూన్య పదం_output(స్థిరరాశి అక్షరం *s, size_t len, శూన్య *user వాడని)
 {
   size_t i;
 
-  printf("output ");
-  for(i = 0; i < len; i++)
-    printf("%x%s", (unsigned char)s[i], i < len-1 ? "," : "\n");
+  రాయి("output ");
+  కొరకు(i = 0; i < len; i++)
+    రాయి("%x%s", (గుర్తులేని అక్షరం)s[i], i < len-1 ? "," : "\n");
 }
 
-static void printhex(const char *s, size_t len)
+స్థిర శూన్య printhex(స్థిరరాశి అక్షరం *s, size_t len)
 {
-  while(len--)
-    printf("%02x", (uint8_t)(s++)[0]);
+  అయితే(len--)
+    రాయి("%02x", (uint8_t)(s++)[0]);
 }
 
-static int parser_text(const char bytes[], size_t len, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_పాఠ్యం(స్థిరరాశి అక్షరం బైట్లు[], size_t len, శూన్య *user వాడని)
 {
   size_t i;
 
-  printf("text ");
-  for(i = 0; i < len; i++) {
-    unsigned char b = bytes[i];
-    if(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
-      break;
-    printf(i ? ",%x" : "%x", b);
+  రాయి("text ");
+  కొరకు(i = 0; i < len; i++) {
+    గుర్తులేని అక్షరం b = బైట్లు[i];
+    ఒకవేళ(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
+      ఆపు;
+    రాయి(i ? ",%x" : "%x", b);
   }
-  printf("\n");
+  రాయి("\n");
 
-  return i;
+  తిరిగి i;
 }
 
-static int parser_control(unsigned char control, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_control(గుర్తులేని అక్షరం control, శూన్య *user వాడని)
 {
-  printf("control %02x\n", control);
+  రాయి("control %02x\n", control);
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_escape(స్థిరరాశి అక్షరం బైట్లు[], size_t len, శూన్య *user వాడని)
 {
-  if(bytes[0] >= 0x20 && bytes[0] < 0x30) {
-    if(len < 2)
-      return -1;
+  ఒకవేళ(బైట్లు[0] >= 0x20 && బైట్లు[0] < 0x30) {
+    ఒకవేళ(len < 2)
+      తిరిగి -1;
     len = 2;
   }
-  else {
+  లేకపోతే {
     len = 1;
   }
 
-  printf("escape ");
-  printhex(bytes, len);
-  printf("\n");
+  రాయి("escape ");
+  printhex(బైట్లు, len);
+  రాయి("\n");
 
-  return len;
+  తిరిగి len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_csi(స్థిరరాశి అక్షరం *leader, స్థిరరాశి దీర్ఘ వాదనలు[], పూర్ణాంకం argcount, స్థిరరాశి అక్షరం *intermed, అక్షరం command, శూన్య *user వాడని)
 {
-  int i;
-  printf("csi %02x", command);
+  పూర్ణాంకం i;
+  రాయి("csi %02x", command);
 
-  if(leader && leader[0]) {
-    printf(" L=");
-    for(i = 0; leader[i]; i++)
-      printf("%02x", leader[i]);
+  ఒకవేళ(leader && leader[0]) {
+    రాయి(" L=");
+    కొరకు(i = 0; leader[i]; i++)
+      రాయి("%02x", leader[i]);
   }
 
-  for(i = 0; i < argcount; i++) {
-    char sep = i ? ',' : ' ';
+  కొరకు(i = 0; i < argcount; i++) {
+    అక్షరం sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
-      printf("%c*", sep);
-    else
-      printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
+    ఒకవేళ(వాదనలు[i] == CSI_ARG_MISSING)
+      రాయి("%c*", sep);
+    లేకపోతే
+      రాయి("%c%ld%s", sep, CSI_ARG(వాదనలు[i]), CSI_ARG_HAS_మరిన్ని(వాదనలు[i]) ? "+" : "");
   }
 
-  if(intermed && intermed[0]) {
-    printf(" I=");
-    for(i = 0; intermed[i]; i++)
-      printf("%02x", intermed[i]);
+  ఒకవేళ(intermed && intermed[0]) {
+    రాయి(" I=");
+    కొరకు(i = 0; intermed[i]; i++)
+      రాయి("%02x", intermed[i]);
   }
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_osc(int command, VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_osc(పూర్ణాంకం command, VTermStringFragment frag, శూన్య *user వాడని)
 {
 
-  printf("osc ");
+  రాయి("osc ");
 
-  if(frag.initial) {
-    if(command == -1)
-      printf("[");
-    else
-      printf("[%d;", command);
+  ఒకవేళ(frag.initial) {
+    ఒకవేళ(command == -1)
+      రాయి("[");
+    లేకపోతే
+      రాయి("[%d;", command);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  ఒకవేళ(frag.final)
+    రాయి("]");
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_dcs(స్థిరరాశి అక్షరం *command, size_t commandlen, VTermStringFragment frag, శూన్య *user వాడని)
 {
-  printf("dcs ");
+  రాయి("dcs ");
 
-  if(frag.initial) {
+  ఒకవేళ(frag.initial) {
     size_t i;
-    printf("[");
-    for(i = 0; i < commandlen; i++)
-      printf("%02x", command[i]);
+    రాయి("[");
+    కొరకు(i = 0; i < commandlen; i++)
+      రాయి("%02x", command[i]);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  ఒకవేళ(frag.final)
+    రాయి("]");
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_apc(VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_apc(VTermStringFragment frag, శూన్య *user వాడని)
 {
-  printf("apc ");
+  రాయి("apc ");
 
-  if(frag.initial)
-    printf("[");
+  ఒకవేళ(frag.initial)
+    రాయి("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  ఒకవేళ(frag.final)
+    రాయి("]");
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_pm(VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_pm(VTermStringFragment frag, శూన్య *user వాడని)
 {
-  printf("pm ");
+  రాయి("pm ");
 
-  if(frag.initial)
-    printf("[");
+  ఒకవేళ(frag.initial)
+    రాయి("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  ఒకవేళ(frag.final)
+    రాయి("]");
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int parser_sos(VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం parser_sos(VTermStringFragment frag, శూన్య *user వాడని)
 {
-  printf("sos ");
+  రాయి("sos ");
 
-  if(frag.initial)
-    printf("[");
+  ఒకవేళ(frag.initial)
+    రాయి("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  ఒకవేళ(frag.final)
+    రాయి("]");
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static VTermParserCallbacks parser_cbs = {
-  parser_text, // text
+స్థిర VTermParserCallbacks parser_cbs = {
+  parser_పాఠ్యం, //పాఠ్యం
   parser_control, // control
   parser_escape, // escape
   parser_csi, // csi
@@ -299,10 +299,10 @@ static VTermParserCallbacks parser_cbs = {
   parser_apc, // apc
   parser_pm, // pm
   parser_sos, // sos
-  NULL // resize
+  ఖాళీ // resize
 };
 
-static VTermStateFallbacks fallbacks = {
+స్థిర VTermStateFallbacks fallbacks = {
   parser_control, // control
   parser_csi, // csi
   parser_osc, // osc
@@ -314,198 +314,198 @@ static VTermStateFallbacks fallbacks = {
 
 /* These callbacks are shared by State and Screen */
 
-static int want_movecursor = 0;
-static VTermPos state_pos;
-static int movecursor(VTermPos pos, VTermPos oldpos UNUSED, int visible UNUSED, void *user UNUSED)
+స్థిర పూర్ణాంకం want_movecursor = 0;
+స్థిర VTermPos state_pos;
+స్థిర పూర్ణాంకం movecursor(VTermPos pos, VTermPos oldpos వాడని, పూర్ణాంకం visible వాడని, శూన్య *user వాడని)
 {
   state_pos = pos;
 
-  if(want_movecursor)
-    printf("movecursor %d,%d\n", pos.row, pos.col);
+  ఒకవేళ(want_movecursor)
+    రాయి("movecursor %d,%d\n", pos.అడ్డువరుస, pos.నిలువు);
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_premove = 0;
-static int premove(VTermRect rect, void *user UNUSED)
+స్థిర పూర్ణాంకం want_premove = 0;
+స్థిర పూర్ణాంకం premove(VTermRect rect, శూన్య *user వాడని)
 {
-  if(!want_premove)
-    return 0;
+  ఒకవేళ(!want_premove)
+    తిరిగి 0;
 
-  printf("premove %d..%d,%d..%d\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col);
+  రాయి("premove %d..%d,%d..%d\n",
+      rect.ప్రారంభం_అడ్డువరుస, rect.చివర_అడ్డువరుస, rect.ప్రారంభం_నిలువు, rect.చివర_నిలువు);
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_scrollrect = 0;
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user UNUSED)
+స్థిర పూర్ణాంకం want_scrollrect = 0;
+స్థిర పూర్ణాంకం scrollrect(VTermRect rect, పూర్ణాంకం downward, పూర్ణాంకం rightward, శూన్య *user వాడని)
 {
-  if(!want_scrollrect)
-    return 0;
+  ఒకవేళ(!want_scrollrect)
+    తిరిగి 0;
 
-  printf("scrollrect %d..%d,%d..%d => %+d,%+d\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col,
+  రాయి("scrollrect %d..%d,%d..%d => %+d,%+d\n",
+      rect.ప్రారంభం_అడ్డువరుస, rect.చివర_అడ్డువరుస, rect.ప్రారంభం_నిలువు, rect.చివర_నిలువు,
       downward, rightward);
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_moverect = 0;
-static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
+స్థిర పూర్ణాంకం want_moverect = 0;
+స్థిర పూర్ణాంకం moverect(VTermRect dest, VTermRect src, శూన్య *user వాడని)
 {
-  if(!want_moverect)
-    return 0;
+  ఒకవేళ(!want_moverect)
+    తిరిగి 0;
 
-  printf("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
-      src.start_row,  src.end_row,  src.start_col,  src.end_col,
-      dest.start_row, dest.end_row, dest.start_col, dest.end_col);
+  రాయి("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
+      src.ప్రారంభం_అడ్డువరుస,  src.చివర_అడ్డువరుస,  src.ప్రారంభం_నిలువు,  src.చివర_నిలువు,
+      dest.ప్రారంభం_అడ్డువరుస, dest.చివర_అడ్డువరుస, dest.ప్రారంభం_నిలువు, dest.చివర_నిలువు);
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+స్థిర పూర్ణాంకం want_settermprop = 0;
+స్థిర పూర్ణాంకం settermprop(VTermProp prop, VTerm_విలువ *val, శూన్య *user వాడని)
 {
-  VTermValueType type;
-  if(!want_settermprop)
-    return 1;
+  VTerm_విలువ_Type type;
+  ఒకవేళ(!want_settermprop)
+    తిరిగి 1;
 
   type = vterm_get_prop_type(prop);
-  switch(type) {
-  case VTERM_VALUETYPE_BOOL:
-    printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
-    return 1;
-  case VTERM_VALUETYPE_INT:
-    printf("settermprop %d %d\n", prop, val->number);
-    return 1;
-  case VTERM_VALUETYPE_STRING:
-    printf("settermprop %d %s\"%.*s\"%s\n", prop,
+  ఎంపిక(type) {
+  స్థితి VTERM_VALUETYPE_BOOL:
+    రాయి("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
+    తిరిగి 1;
+  స్థితి VTERM_VALUETYPE_INT:
+    రాయి("settermprop %d %d\n", prop, val->సంఖ్య);
+    తిరిగి 1;
+  స్థితి VTERM_VALUETYPE_STRING:
+    రాయి("settermprop %d %s\"%.*s\"%s\n", prop,
         val->string.initial ? "[" : "", val->string.len, val->string.str, val->string.final ? "]" : "");
-    return 1;
-  case VTERM_VALUETYPE_COLOR:
-    printf("settermprop %d ", prop);
+    తిరిగి 1;
+  స్థితి VTERM_VALUETYPE_COLOR:
+    రాయి("settermprop %d ", prop);
     print_color(&val->color);
-    printf("\n");
-    return 1;
+    రాయి("\n");
+    తిరిగి 1;
 
-  case VTERM_N_VALUETYPES:
-    return 0;
+  స్థితి VTERM_N_VALUETYPES:
+    తిరిగి 0;
   }
 
-  return 0;
+  తిరిగి 0;
 }
 
 // These callbacks are for State
 
-static int want_state_putglyph = 0;
-static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
+స్థిర పూర్ణాంకం want_state_putglyph = 0;
+స్థిర పూర్ణాంకం state_putglyph(VTermGlyphInfo *info, VTermPos pos, శూన్య *user వాడని)
 {
-  int i;
-  if(!want_state_putglyph)
-    return 1;
+  పూర్ణాంకం i;
+  ఒకవేళ(!want_state_putglyph)
+    తిరిగి 1;
 
-  printf("putglyph ");
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
-    printf(i ? ",%x" : "%x", info->chars[i]);
-  printf(" %d %d,%d", info->width, pos.row, pos.col);
-  if(info->protected_cell)
-    printf(" prot");
-  if(info->dwl)
-    printf(" dwl");
-  if(info->dhl)
-    printf(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
-  printf("\n");
+  రాయి("putglyph ");
+  కొరకు(i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL && info->chars[i]; i++)
+    రాయి(i ? ",%x" : "%x", info->chars[i]);
+  రాయి(" %d %d,%d", info->వెడల్పు, pos.అడ్డువరుస, pos.నిలువు);
+  ఒకవేళ(info->protected_cell)
+    రాయి(" prot");
+  ఒకవేళ(info->dwl)
+    రాయి(" dwl");
+  ఒకవేళ(info->dhl)
+    రాయి(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_state_erase = 0;
-static int state_erase(VTermRect rect, int selective, void *user UNUSED)
+స్థిర పూర్ణాంకం want_state_erase = 0;
+స్థిర పూర్ణాంకం state_erase(VTermRect rect, పూర్ణాంకం selective, శూన్య *user వాడని)
 {
-  if(!want_state_erase)
-    return 1;
+  ఒకవేళ(!want_state_erase)
+    తిరిగి 1;
 
-  printf("erase %d..%d,%d..%d%s\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col,
+  రాయి("erase %d..%d,%d..%d%s\n",
+      rect.ప్రారంభం_అడ్డువరుస, rect.చివర_అడ్డువరుస, rect.ప్రారంభం_నిలువు, rect.చివర_నిలువు,
       selective ? " selective" : "");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static struct {
-  int bold;
-  int underline;
-  int italic;
-  int blink;
-  int reverse;
-  int conceal;
-  int strike;
-  int font;
-  int small;
-  int baseline;
+స్థిర నిర్మాణం {
+  పూర్ణాంకం bold;
+  పూర్ణాంకం underline;
+  పూర్ణాంకం italic;
+  పూర్ణాంకం blink;
+  పూర్ణాంకం తిరగేయి;
+  పూర్ణాంకం conceal;
+  పూర్ణాంకం strike;
+  పూర్ణాంకం font;
+  పూర్ణాంకం small;
+  పూర్ణాంకం baseline;
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+స్థిర పూర్ణాంకం state_setpenattr(VTermAttr attr, VTerm_విలువ *val, శూన్య *user వాడని)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  ఎంపిక(attr) {
+  స్థితి VTERM_ATTR_BOLD:
     state_pen.bold = val->boolean;
-    break;
-  case VTERM_ATTR_UNDERLINE:
-    state_pen.underline = val->number;
-    break;
-  case VTERM_ATTR_ITALIC:
+    ఆపు;
+  స్థితి VTERM_ATTR_UNDERLINE:
+    state_pen.underline = val->సంఖ్య;
+    ఆపు;
+  స్థితి VTERM_ATTR_ITALIC:
     state_pen.italic = val->boolean;
-    break;
-  case VTERM_ATTR_BLINK:
+    ఆపు;
+  స్థితి VTERM_ATTR_BLINK:
     state_pen.blink = val->boolean;
-    break;
-  case VTERM_ATTR_REVERSE:
-    state_pen.reverse = val->boolean;
-    break;
-  case VTERM_ATTR_CONCEAL:
+    ఆపు;
+  స్థితి VTERM_ATTR_తిరగేయి:
+    state_pen.తిరగేయి = val->boolean;
+    ఆపు;
+  స్థితి VTERM_ATTR_CONCEAL:
     state_pen.conceal = val->boolean;
-    break;
-  case VTERM_ATTR_STRIKE:
+    ఆపు;
+  స్థితి VTERM_ATTR_STRIKE:
     state_pen.strike = val->boolean;
-    break;
-  case VTERM_ATTR_FONT:
-    state_pen.font = val->number;
-    break;
-  case VTERM_ATTR_SMALL:
+    ఆపు;
+  స్థితి VTERM_ATTR_FONT:
+    state_pen.font = val->సంఖ్య;
+    ఆపు;
+  స్థితి VTERM_ATTR_SMALL:
     state_pen.small = val->boolean;
-    break;
-  case VTERM_ATTR_BASELINE:
-    state_pen.baseline = val->number;
-    break;
-  case VTERM_ATTR_FOREGROUND:
+    ఆపు;
+  స్థితి VTERM_ATTR_BASELINE:
+    state_pen.baseline = val->సంఖ్య;
+    ఆపు;
+  స్థితి VTERM_ATTR_FOREGROUND:
     state_pen.foreground = val->color;
-    break;
-  case VTERM_ATTR_BACKGROUND:
+    ఆపు;
+  స్థితి VTERM_ATTR_BACKGROUND:
     state_pen.background = val->color;
-    break;
+    ఆపు;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  స్థితి VTERM_N_ATTRS:
+    తిరిగి 0;
   }
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+స్థిర పూర్ణాంకం state_setlineinfo(పూర్ణాంకం అడ్డువరుస వాడని, స్థిరరాశి VTerm_పంక్తి_Info *newinfo వాడని, స్థిరరాశి VTerm_పంక్తి_Info *oldinfo వాడని, శూన్య *user వాడని)
 {
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_state_scrollback = 0;
-static int state_sb_clear(void *user UNUSED) {
-  if(!want_state_scrollback)
-    return 1;
+స్థిర పూర్ణాంకం want_state_scrollback = 0;
+స్థిర పూర్ణాంకం state_sb_clear(శూన్య *user వాడని) {
+  ఒకవేళ(!want_state_scrollback)
+    తిరిగి 1;
 
-  printf("sb_clear\n");
-  return 0;
+  రాయి("sb_clear\n");
+  తిరిగి 0;
 }
 
 VTermStateCallbacks state_cbs = {
@@ -514,143 +514,143 @@ VTermStateCallbacks state_cbs = {
   scrollrect, // scrollrect
   moverect, // moverect
   state_erase, // erase
-  NULL, // initpen
+  ఖాళీ, // initpen
   state_setpenattr, // setpenattr
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
+  ఖాళీ, // bell
+  ఖాళీ, // resize
   state_setlineinfo, // setlineinfo
   state_sb_clear, // sb_clear
   premove, // premove
 };
 
-static int selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
+స్థిర పూర్ణాంకం selection_సమితి(VTerm_Selection_ముసుగు ముసుగు, VTermStringFragment frag, శూన్య *user వాడని)
 {
-  printf("selection-set mask=%04X ", mask);
-  if(frag.initial)
-    printf("[");
+  రాయి("selection-set mask=%04X ", ముసుగు);
+  ఒకవేళ(frag.initial)
+    రాయి("[");
   printhex(frag.str, frag.len);
-  if(frag.final)
-    printf("]");
-  printf("\n");
+  ఒకవేళ(frag.final)
+    రాయి("]");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int selection_query(VTermSelectionMask mask, void *user UNUSED)
+స్థిర పూర్ణాంకం selection_query(VTerm_Selection_ముసుగు ముసుగు, శూన్య *user వాడని)
 {
-  printf("selection-query mask=%04X\n", mask);
+  రాయి("selection-query mask=%04X\n", ముసుగు);
 
-  return 1;
+  తిరిగి 1;
 }
 
 VTermSelectionCallbacks selection_cbs = {
-  .set   = selection_set,
+  .సమితి_2   = selection_సమితి,
   .query = selection_query,
 };
 
-static int want_screen_damage = 0;
-static int want_screen_damage_cells = 0;
-static int screen_damage(VTermRect rect, void *user UNUSED)
+స్థిర పూర్ణాంకం want_screen_damage = 0;
+స్థిర పూర్ణాంకం want_screen_damage_cells = 0;
+స్థిర పూర్ణాంకం screen_damage(VTermRect rect, శూన్య *user వాడని)
 {
-  if(!want_screen_damage)
-    return 1;
+  ఒకవేళ(!want_screen_damage)
+    తిరిగి 1;
 
-  printf("damage %d..%d,%d..%d",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col);
+  రాయి("damage %d..%d,%d..%d",
+      rect.ప్రారంభం_అడ్డువరుస, rect.చివర_అడ్డువరుస, rect.ప్రారంభం_నిలువు, rect.చివర_నిలువు);
 
-  if(want_screen_damage_cells) {
-    int equals = FALSE;
-    int row;
-    int col;
+  ఒకవేళ(want_screen_damage_cells) {
+    పూర్ణాంకం equals = FALSE;
+    పూర్ణాంకం అడ్డువరుస;
+    పూర్ణాంకం నిలువు;
 
-    for(row = rect.start_row; row < rect.end_row; row++) {
-      int eol = rect.end_col;
-      while(eol > rect.start_col) {
+    కొరకు(అడ్డువరుస = rect.ప్రారంభం_అడ్డువరుస; అడ్డువరుస < rect.చివర_అడ్డువరుస; అడ్డువరుస++) {
+      పూర్ణాంకం eol = rect.చివర_నిలువు;
+      అయితే(eol > rect.ప్రారంభం_నిలువు) {
         VTermScreenCell cell;
 	VTermPos pos;
-	pos.row = row;
-	pos.col = eol-1;
+	pos.అడ్డువరుస = అడ్డువరుస;
+	pos.నిలువు = eol-1;
         vterm_screen_get_cell(screen, pos, &cell);
-        if(cell.chars[0])
-          break;
+        ఒకవేళ(cell.chars[0])
+          ఆపు;
 
         eol--;
       }
 
-      if(eol == rect.start_col)
-        break;
+      ఒకవేళ(eol == rect.ప్రారంభం_నిలువు)
+        ఆపు;
 
-      if(!equals)
-        printf(" ="), equals = TRUE;
+      ఒకవేళ(!equals)
+        రాయి(" ="), equals = TRUE;
 
-      printf(" %d<", row);
-      for(col = rect.start_col; col < eol; col++) {
+      రాయి(" %d<", అడ్డువరుస);
+      కొరకు(నిలువు = rect.ప్రారంభం_నిలువు; నిలువు < eol; నిలువు++) {
         VTermScreenCell cell;
 	VTermPos pos;
-	pos.row = row;
-	pos.col = col;
+	pos.అడ్డువరుస = అడ్డువరుస;
+	pos.నిలువు = నిలువు;
         vterm_screen_get_cell(screen, pos, &cell);
-        printf(col == rect.start_col ? "%02X" : " %02X", cell.chars[0]);
+        రాయి(నిలువు == rect.ప్రారంభం_నిలువు ? "%02X" : " %02X", cell.chars[0]);
       }
-      printf(">");
+      రాయి(">");
     }
   }
 
-  printf("\n");
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int want_screen_scrollback = 0;
-static int screen_sb_pushline4(int cols, const VTermScreenCell *cells, int continuation, void *user UNUSED)
+స్థిర పూర్ణాంకం want_screen_scrollback = 0;
+స్థిర పూర్ణాంకం screen_sb_pushline4(పూర్ణాంకం నిలువుల_సంఖ్య, స్థిరరాశి VTermScreenCell *cells, పూర్ణాంకం continuation, శూన్య *user వాడని)
 {
-  int eol;
-  int c;
+  పూర్ణాంకం eol;
+  పూర్ణాంకం c;
 
-  if(!want_screen_scrollback)
-    return 1;
+  ఒకవేళ(!want_screen_scrollback)
+    తిరిగి 1;
 
-  eol = cols;
-  while(eol && !cells[eol-1].chars[0])
+  eol = నిలువుల_సంఖ్య;
+  అయితే(eol && !cells[eol-1].chars[0])
     eol--;
 
-  printf("sb_pushline %d%s =", cols, continuation ? " cont" : "");
-  for(c = 0; c < eol; c++)
-    printf(" %02X", cells[c].chars[0]);
-  printf("\n");
+  రాయి("sb_pushline %d%s =", నిలువుల_సంఖ్య, continuation ? " cont" : "");
+  కొరకు(c = 0; c < eol; c++)
+    రాయి(" %02X", cells[c].chars[0]);
+  రాయి("\n");
 
-  return 1;
+  తిరిగి 1;
 }
 
-static int screen_sb_popline(int cols, VTermScreenCell *cells, void *user UNUSED)
+స్థిర పూర్ణాంకం screen_sb_popline(పూర్ణాంకం నిలువుల_సంఖ్య, VTermScreenCell *cells, శూన్య *user వాడని)
 {
-  int col;
+  పూర్ణాంకం నిలువు;
 
-  if(!want_screen_scrollback)
-    return 0;
+  ఒకవేళ(!want_screen_scrollback)
+    తిరిగి 0;
 
   // All lines of scrollback contain "ABCDE"
-  for(col = 0; col < cols; col++) {
-    if(col < 5)
-      cells[col].chars[0] = 'A' + col;
-    else
-      cells[col].chars[0] = 0;
+  కొరకు(నిలువు = 0; నిలువు < నిలువుల_సంఖ్య; నిలువు++) {
+    ఒకవేళ(నిలువు < 5)
+      cells[నిలువు].chars[0] = 'A' + నిలువు;
+    లేకపోతే
+      cells[నిలువు].chars[0] = 0;
 
-    cells[col].width = 1;
+    cells[నిలువు].వెడల్పు = 1;
   }
 
-  printf("sb_popline %d\n", cols);
-  return 1;
+  రాయి("sb_popline %d\n", నిలువుల_సంఖ్య);
+  తిరిగి 1;
 }
 
-static int screen_sb_clear(void *user UNUSED)
+స్థిర పూర్ణాంకం screen_sb_clear(శూన్య *user వాడని)
 {
-  if(!want_screen_scrollback)
-    return 1;
+  ఒకవేళ(!want_screen_scrollback)
+    తిరిగి 1;
 
-  printf("sb_clear\n");
-  return 0;
+  రాయి("sb_clear\n");
+  తిరిగి 0;
 }
 
 VTermScreenCallbacks screen_cbs = {
@@ -658,635 +658,635 @@ VTermScreenCallbacks screen_cbs = {
   moverect, // moverect
   movecursor, // movecursor
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
-  NULL, // sb_pushline
+  ఖాళీ, // bell
+  ఖాళీ, // resize
+  ఖాళీ, // sb_pushline
   screen_sb_popline, // sb_popline
   screen_sb_clear, // sb_clear
   screen_sb_pushline4, // sb_pushline4
 };
 
-int main(int argc UNUSED, char **argv UNUSED)
+పూర్ణాంకం ప్రధాన(పూర్ణాంకం argc వాడని, అక్షరం **argv వాడని)
 {
-  char line[1024] = {0};
-  int flag;
+  అక్షరం పంక్తి[1024] = {0};
+  పూర్ణాంకం flag;
 
-  int err;
+  పూర్ణాంకం err;
 
-  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stdout, ఖాళీ, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
-    char *nl;
+  అయితే(fgets(పంక్తి, పరిమాణం పంక్తి, stdin)) {
+    అక్షరం *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    ఒకవేళ((nl = strchr(పంక్తి, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
-      if(!vt)
+    ఒకవేళ(streq(పంక్తి, "INIT")) {
+      ఒకవేళ(!vt)
         vt = vterm_new(25, 80);
 
       // Somehow this makes tests fail
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
-      assert(vt);
-      vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
+    లేకపోతే ఒకవేళ(streq(పంక్తి, "WANTPARSER")) {
+      ప్రతిజ్ఞా(vt);
+      vterm_parser_సమితి_callbacks(vt, &parser_cbs, ఖాళీ);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
-      int i = 9;
-      int sense = 1;
-      assert(vt);
-      if(!state) {
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "WANTSTATE") && (పంక్తి[9] == '\0' || పంక్తి[9] == ' ')) {
+      పూర్ణాంకం i = 9;
+      పూర్ణాంకం sense = 1;
+      ప్రతిజ్ఞా(vt);
+      ఒకవేళ(!state) {
         state = vterm_obtain_state(vt);
-        vterm_state_set_callbacks(state, &state_cbs, NULL);
+        vterm_state_సమితి_callbacks(state, &state_cbs, ఖాళీ);
         vterm_state_callbacks_has_premove(state);
         /* In some tests we want to check the behaviour of overflowing the
          * buffer, so make it nicely small
          */
-        vterm_state_set_selection_callbacks(state, &selection_cbs, NULL, NULL, 16);
-        vterm_state_set_bold_highbright(state, 1);
+        vterm_state_సమితి_selection_callbacks(state, &selection_cbs, ఖాళీ, ఖాళీ, 16);
+        vterm_state_సమితి_bold_highbright(state, 1);
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      అయితే(పంక్తి[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '+':
+      కొరకు( ; పంక్తి[i]; i++)
+        ఎంపిక(పంక్తి[i]) {
+        స్థితి '+':
           sense = 1;
-          break;
-        case '-':
+          ఆపు;
+        స్థితి '-':
           sense = 0;
-          break;
-        case 'g':
+          ఆపు;
+        స్థితి 'g':
           want_state_putglyph = sense;
-          break;
-        case 's':
+          ఆపు;
+        స్థితి 's':
           want_scrollrect = sense;
-          break;
-        case 'P':
+          ఆపు;
+        స్థితి 'P':
           want_premove = sense;
-          break;
-        case 'm':
+          ఆపు;
+        స్థితి 'm':
           want_moverect = sense;
-          break;
-        case 'e':
+          ఆపు;
+        స్థితి 'e':
           want_state_erase = sense;
-          break;
-        case 'p':
+          ఆపు;
+        స్థితి 'p':
           want_settermprop = sense;
-          break;
-        case 'f':
-          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : NULL, NULL);
-          break;
-        case 'b':
+          ఆపు;
+        స్థితి 'f':
+          vterm_state_సమితి_unrecognised_fallbacks(state, sense ? &fallbacks : ఖాళీ, ఖాళీ);
+          ఆపు;
+        స్థితి 'b':
           want_state_scrollback = sense;
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", line[i]);
+          ఆపు;
+        అప్రమేయ:
+          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", పంక్తి[i]);
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
-      int i = 10;
-      int sense = 1;
-      assert(vt);
-      if(!screen)
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "WANTSCREEN") && (పంక్తి[10] == '\0' || పంక్తి[10] == ' ')) {
+      పూర్ణాంకం i = 10;
+      పూర్ణాంకం sense = 1;
+      ప్రతిజ్ఞా(vt);
+      ఒకవేళ(!screen)
         screen = vterm_obtain_screen(vt);
-      vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
+      vterm_screen_సమితి_callbacks(screen, &screen_cbs, ఖాళీ);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      అయితే(పంక్తి[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '-':
+      కొరకు( ; పంక్తి[i]; i++)
+        ఎంపిక(పంక్తి[i]) {
+        స్థితి '-':
           sense = 0;
-          break;
-        case 'a':
+          ఆపు;
+        స్థితి 'a':
           vterm_screen_enable_altscreen(screen, 1);
-          break;
-        case 'd':
+          ఆపు;
+        స్థితి 'd':
           want_screen_damage = sense;
-          break;
-        case 'D':
+          ఆపు;
+        స్థితి 'D':
           want_screen_damage = sense;
           want_screen_damage_cells = sense;
-          break;
-        case 'm':
+          ఆపు;
+        స్థితి 'm':
           want_moverect = sense;
-          break;
-        case 'c':
+          ఆపు;
+        స్థితి 'c':
           want_movecursor = sense;
-          break;
-        case 'p':
+          ఆపు;
+        స్థితి 'p':
           want_settermprop = 1;
-          break;
-        case 'b':
+          ఆపు;
+        స్థితి 'b':
           want_screen_scrollback = sense;
-          break;
-        case 'r':
+          ఆపు;
+        స్థితి 'r':
           vterm_screen_enable_reflow(screen, sense);
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", line[i]);
+          ఆపు;
+        అప్రమేయ:
+          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", పంక్తి[i]);
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
-      vterm_set_utf8(vt, flag);
+    లేకపోతే ఒకవేళ(అక్షరశ్రేణి_చదువు(పంక్తి, "UTF8 %d", &flag)) {
+      vterm_సమితి_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
-      if(state) {
+    లేకపోతే ఒకవేళ(streq(పంక్తి, "RESET")) {
+      ఒకవేళ(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
       }
-      if(screen) {
+      ఒకవేళ(screen) {
         vterm_screen_reset(screen, 1);
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
-      int rows, cols;
-      char *linep = line + 7;
-      while(linep[0] == ' ')
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "RESIZE ")) {
+      పూర్ణాంకం అడ్డువరుసలు_2, నిలువుల_సంఖ్య;
+      అక్షరం *linep = పంక్తి + 7;
+      అయితే(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%d, %d", &rows, &cols);
-      vterm_set_size(vt, rows, cols);
+      అక్షరశ్రేణి_చదువు(linep, "%d, %d", &అడ్డువరుసలు_2, &నిలువుల_సంఖ్య);
+      vterm_సమితి_కొలత(vt, అడ్డువరుసలు_2, నిలువుల_సంఖ్య);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
-      char *bytes = line + 5;
-      size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "PUSH ")) {
+      అక్షరం *బైట్లు = పంక్తి + 5;
+      size_t len = inplace_hex2bytes(బైట్లు);
+      ప్రతిజ్ఞా(len);
 
-      size_t written = vterm_input_write(vt, bytes, len);
-      if(written < len)
+      size_t written = vterm_ఆదానం_write(vt, బైట్లు, len);
+      ఒకవేళ(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    లేకపోతే ఒకవేళ(streq(పంక్తి, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-      if(encoding.enc->init)
-        (*encoding.enc->init)(encoding.enc, encoding.data);
+      ఒకవేళ(encoding.enc->init)
+        (*encoding.enc->init)(encoding.enc, encoding.దత్తాంశం);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
-      char *bytes = line + 6;
-      size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "ENCIN ")) {
+      అక్షరం *బైట్లు = పంక్తి + 6;
+      size_t len = inplace_hex2bytes(బైట్లు);
+      ప్రతిజ్ఞా(len);
 
       uint32_t cp[1024];
-      int cpi = 0;
+      పూర్ణాంకం cpi = 0;
       size_t pos = 0;
 
-      (*encoding.enc->decode)(encoding.enc, encoding.data,
-          cp, &cpi, len, bytes, &pos, len);
+      (*encoding.enc->decode)(encoding.enc, encoding.దత్తాంశం,
+          cp, &cpi, len, బైట్లు, &pos, len);
 
-      if(cpi > 0) {
-	int i;
-        printf("encout ");
-        for(i = 0; i < cpi; i++) {
-          printf(i ? ",%x" : "%x", cp[i]);
+      ఒకవేళ(cpi > 0) {
+	పూర్ణాంకం i;
+        రాయి("encout ");
+        కొరకు(i = 0; i < cpi; i++) {
+          రాయి(i ? ",%x" : "%x", cp[i]);
         }
-        printf("\n");
+        రాయి("\n");
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
-      char *linep = line + 7;
-      unsigned int c = 0;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "INCHAR ")) {
+      అక్షరం *linep = పంక్తి + 7;
+      గుర్తులేని పూర్ణాంకం c = 0;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      sscanf(linep, " %x", &c);
+      అక్షరశ్రేణి_చదువు(linep, " %x", &c);
 
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "INKEY ")) {
       VTermModifier mod;
-      VTermKey key;
-      char *linep = line + 6;
-      while(linep[0] == ' ')
+      VTerm_కీలకం కీలకం;
+      అక్షరం *linep = పంక్తి + 6;
+      అయితే(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
-      key = strp_key(linep);
+      కీలకం = strp_కీలకం(linep);
 
-      vterm_keyboard_key(vt, key, mod);
+      vterm_keyboard_కీలకం(vt, కీలకం, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
-      char *linep = line + 6;
-      if(streq(linep, "START"))
-        vterm_keyboard_start_paste(vt);
-      else if(streq(linep, "END"))
-        vterm_keyboard_end_paste(vt);
-      else
-        goto abort_line;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "PASTE ")) {
+      అక్షరం *linep = పంక్తి + 6;
+      ఒకవేళ(streq(linep, "START"))
+        vterm_keyboard_ప్రారంభం_paste(vt);
+      లేకపోతే ఒకవేళ(streq(linep, "END"))
+        vterm_keyboard_చివర_paste(vt);
+      లేకపోతే
+        వెళ్ళు abort_పంక్తి;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
-      assert(state);
-      char *linep = line + 6;
-      if(streq(linep, "IN"))
-        vterm_state_focus_in(state);
-      else if(streq(linep, "OUT"))
-        vterm_state_focus_out(state);
-      else
-        goto abort_line;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "FOCUS ")) {
+      ప్రతిజ్ఞా(state);
+      అక్షరం *linep = పంక్తి + 6;
+      ఒకవేళ(streq(linep, "IN"))
+        vterm_state_focus_లోపల(state);
+      లేకపోతే ఒకవేళ(streq(linep, "OUT"))
+        vterm_state_focus_బహిర్గతం(state);
+      లేకపోతే
+        వెళ్ళు abort_పంక్తి;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
-      char *linep = line + 10;
-      int row, col, len;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "MOUSEMOVE ")) {
+      అక్షరం *linep = పంక్తి + 10;
+      పూర్ణాంకం అడ్డువరుస, నిలువు, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%d,%d%n", &row, &col, &len);
+      అక్షరశ్రేణి_చదువు(linep, "%d,%d%n", &అడ్డువరుస, &నిలువు, &len);
       linep += len;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      vterm_mouse_move(vt, row, col, mod);
+      vterm_mouse_move(vt, అడ్డువరుస, నిలువు, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
-      char *linep = line + 9;
-      char press;
-      int button, len;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "MOUSEBTN ")) {
+      అక్షరం *linep = పంక్తి + 9;
+      అక్షరం press;
+      పూర్ణాంకం button, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%c %d%n", &press, &button, &len);
+      అక్షరశ్రేణి_చదువు(linep, "%c %d%n", &press, &button, &len);
       linep += len;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
-      char *linep = line + 10;
-      unsigned int mask;
-      int len;
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "SELECTION ")) {
+      అక్షరం *linep = పంక్తి + 10;
+      గుర్తులేని పూర్ణాంకం ముసుగు;
+      పూర్ణాంకం len;
       VTermStringFragment frag = { 0 };
-      sscanf(linep, "%x%n", &mask, &len);
+      అక్షరశ్రేణి_చదువు(linep, "%x%n", &ముసుగు, &len);
       linep += len;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
-      if(linep[0] == '[') {
+      ఒకవేళ(linep[0] == '[') {
         frag.initial = TRUE;
         linep++;
-        while(linep[0] == ' ')
+        అయితే(linep[0] == ' ')
           linep++;
       }
       frag.len = inplace_hex2bytes(linep);
       frag.str = linep;
-      assert(frag.len);
+      ప్రతిజ్ఞా(frag.len);
 
       linep += frag.len * 2;
-      while(linep[0] == ' ')
+      అయితే(linep[0] == ' ')
         linep++;
-      if(linep[0] == ']') {
+      ఒకవేళ(linep[0] == ']') {
         frag.final = TRUE;
       }
-      vterm_state_send_selection(state, mask, frag);
+      vterm_state_send_selection(state, ముసుగు, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
-      assert(screen);
-      char *linep = line + 12;
-      while(linep[0] == ' ')
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "DAMAGEMERGE ")) {
+      ప్రతిజ్ఞా(screen);
+      అక్షరం *linep = పంక్తి + 12;
+      అయితే(linep[0] == ' ')
         linep++;
-      if(streq(linep, "CELL"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_CELL);
-      else if(streq(linep, "ROW"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_ROW);
-      else if(streq(linep, "SCREEN"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCREEN);
-      else if(streq(linep, "SCROLL"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
+      ఒకవేళ(streq(linep, "CELL"))
+        vterm_screen_సమితి_damage_విలీనం(screen, VTERM_DAMAGE_CELL);
+      లేకపోతే ఒకవేళ(streq(linep, "ROW"))
+        vterm_screen_సమితి_damage_విలీనం(screen, VTERM_DAMAGE_అడ్డువరుస);
+      లేకపోతే ఒకవేళ(streq(linep, "SCREEN"))
+        vterm_screen_సమితి_damage_విలీనం(screen, VTERM_DAMAGE_SCREEN);
+      లేకపోతే ఒకవేళ(streq(linep, "SCROLL"))
+        vterm_screen_సమితి_damage_విలీనం(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
-      assert(screen);
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "DAMAGEFLUSH")) {
+      ప్రతిజ్ఞా(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
-      assert(screen);
-      char *linep = line + 14;
-      while(linep[0] == ' ')
+    లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "SETDEFAULTCOL ")) {
+      ప్రతిజ్ఞా(screen);
+      అక్షరం *linep = పంక్తి + 14;
+      అయితే(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
-      if(linep[0]) {
-        while(linep[0] == ' ')
+      ఒకవేళ(linep[0]) {
+        అయితే(linep[0] == ' ')
           linep++;
         VTermColor bg = strpe_color(&linep);
 
-        vterm_screen_set_default_colors(screen, &fg, &bg);
+        vterm_screen_సమితి_default_colors(screen, &fg, &bg);
       }
-      else
-        vterm_screen_set_default_colors(screen, &fg, NULL);
+      లేకపోతే
+        vterm_screen_సమితి_default_colors(screen, &fg, ఖాళీ);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
-        assert(state);
+    లేకపోతే ఒకవేళ(పంక్తి[0] == '?') {
+      ఒకవేళ(streq(పంక్తి, "?cursor")) {
+        ప్రతిజ్ఞా(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
-        if(pos.row != state_pos.row)
-          printf("! row mismatch: state=%d,%d event=%d,%d\n",
-              pos.row, pos.col, state_pos.row, state_pos.col);
-        else if(pos.col != state_pos.col)
-          printf("! col mismatch: state=%d,%d event=%d,%d\n",
-              pos.row, pos.col, state_pos.row, state_pos.col);
-        else
-          printf("%d,%d\n", state_pos.row, state_pos.col);
+        ఒకవేళ(pos.అడ్డువరుస != state_pos.అడ్డువరుస)
+          రాయి("! row mismatch: state=%d,%d event=%d,%d\n",
+              pos.అడ్డువరుస, pos.నిలువు, state_pos.అడ్డువరుస, state_pos.నిలువు);
+        లేకపోతే ఒకవేళ(pos.నిలువు != state_pos.నిలువు)
+          రాయి("! col mismatch: state=%d,%d event=%d,%d\n",
+              pos.అడ్డువరుస, pos.నిలువు, state_pos.అడ్డువరుస, state_pos.నిలువు);
+        లేకపోతే
+          రాయి("%d,%d\n", state_pos.అడ్డువరుస, state_pos.నిలువు);
       }
-      else if(strstartswith(line, "?pen ")) {
-        assert(state);
-        VTermValue val;
-        char *linep = line + 5;
-        while(linep[0] == ' ')
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?pen ")) {
+        ప్రతిజ్ఞా(state);
+        VTerm_విలువ val;
+        అక్షరం *linep = పంక్తి + 5;
+        అయితే(linep[0] == ' ')
           linep++;
 
-#define BOOLSTR(v) ((v) ? "on" : "off")
+#నిర్వచించు BOOLSTR(v) ((v) ? "on" : "off")
 
-        if(streq(linep, "bold")) {
+        ఒకవేళ(streq(linep, "bold")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BOLD, &val);
-          if(val.boolean != state_pen.bold)
-            printf("! pen bold mismatch; state=%s, event=%s\n",
+          ఒకవేళ(val.boolean != state_pen.bold)
+            రాయి("! pen bold mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.bold));
-          else
-            printf("%s\n", BOOLSTR(state_pen.bold));
+          లేకపోతే
+            రాయి("%s\n", BOOLSTR(state_pen.bold));
         }
-        else if(streq(linep, "underline")) {
+        లేకపోతే ఒకవేళ(streq(linep, "underline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_UNDERLINE, &val);
-          if(val.boolean != state_pen.underline)
-            printf("! pen underline mismatch; state=%d, event=%d\n",
+          ఒకవేళ(val.boolean != state_pen.underline)
+            రాయి("! pen underline mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.underline);
-          else
-            printf("%d\n", state_pen.underline);
+          లేకపోతే
+            రాయి("%d\n", state_pen.underline);
         }
-        else if(streq(linep, "italic")) {
+        లేకపోతే ఒకవేళ(streq(linep, "italic")) {
           vterm_state_get_penattr(state, VTERM_ATTR_ITALIC, &val);
-          if(val.boolean != state_pen.italic)
-            printf("! pen italic mismatch; state=%s, event=%s\n",
+          ఒకవేళ(val.boolean != state_pen.italic)
+            రాయి("! pen italic mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.italic));
-          else
-            printf("%s\n", BOOLSTR(state_pen.italic));
+          లేకపోతే
+            రాయి("%s\n", BOOLSTR(state_pen.italic));
         }
-        else if(streq(linep, "blink")) {
+        లేకపోతే ఒకవేళ(streq(linep, "blink")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BLINK, &val);
-          if(val.boolean != state_pen.blink)
-            printf("! pen blink mismatch; state=%s, event=%s\n",
+          ఒకవేళ(val.boolean != state_pen.blink)
+            రాయి("! pen blink mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.blink));
-          else
-            printf("%s\n", BOOLSTR(state_pen.blink));
+          లేకపోతే
+            రాయి("%s\n", BOOLSTR(state_pen.blink));
         }
-        else if(streq(linep, "reverse")) {
-          vterm_state_get_penattr(state, VTERM_ATTR_REVERSE, &val);
-          if(val.boolean != state_pen.reverse)
-            printf("! pen reverse mismatch; state=%s, event=%s\n",
-                BOOLSTR(val.boolean), BOOLSTR(state_pen.reverse));
-          else
-            printf("%s\n", BOOLSTR(state_pen.reverse));
+        లేకపోతే ఒకవేళ(streq(linep, "reverse")) {
+          vterm_state_get_penattr(state, VTERM_ATTR_తిరగేయి, &val);
+          ఒకవేళ(val.boolean != state_pen.తిరగేయి)
+            రాయి("! pen reverse mismatch; state=%s, event=%s\n",
+                BOOLSTR(val.boolean), BOOLSTR(state_pen.తిరగేయి));
+          లేకపోతే
+            రాయి("%s\n", BOOLSTR(state_pen.తిరగేయి));
         }
-        else if(streq(linep, "font")) {
+        లేకపోతే ఒకవేళ(streq(linep, "font")) {
           vterm_state_get_penattr(state, VTERM_ATTR_FONT, &val);
-          if(val.boolean != state_pen.font)
-            printf("! pen font mismatch; state=%d, event=%d\n",
+          ఒకవేళ(val.boolean != state_pen.font)
+            రాయి("! pen font mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.font);
-          else
-            printf("%d\n", state_pen.font);
+          లేకపోతే
+            రాయి("%d\n", state_pen.font);
         }
-        else if(streq(linep, "small")) {
+        లేకపోతే ఒకవేళ(streq(linep, "small")) {
           vterm_state_get_penattr(state, VTERM_ATTR_SMALL, &val);
-          if(val.boolean != state_pen.small)
-            printf("! pen small mismatch; state=%s, event=%s\n",
+          ఒకవేళ(val.boolean != state_pen.small)
+            రాయి("! pen small mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.small));
-          else
-            printf("%s\n", BOOLSTR(state_pen.small));
+          లేకపోతే
+            రాయి("%s\n", BOOLSTR(state_pen.small));
         }
-        else if(streq(linep, "baseline")) {
+        లేకపోతే ఒకవేళ(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
-            printf("! pen baseline mismatch: state=%d, event=%d\n",
-                val.number, state_pen.baseline);
-          else
-            printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
-                         : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
+          ఒకవేళ(val.సంఖ్య != state_pen.baseline)
+            రాయి("! pen baseline mismatch: state=%d, event=%d\n",
+                val.సంఖ్య, state_pen.baseline);
+          లేకపోతే
+            రాయి("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
+                         : state_pen.baseline == VTERM_BASELINE_క్రింది ? "lower"
                          : "normal");
         }
-        else if(streq(linep, "foreground")) {
+        లేకపోతే ఒకవేళ(streq(linep, "foreground")) {
           print_color(&state_pen.foreground);
-          printf("\n");
+          రాయి("\n");
         }
-        else if(streq(linep, "background")) {
+        లేకపోతే ఒకవేళ(streq(linep, "background")) {
           print_color(&state_pen.background);
-          printf("\n");
+          రాయి("\n");
         }
-        else
-          printf("?\n");
+        లేకపోతే
+          రాయి("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
-        assert(state);
-        char *linep = line + 10;
-        int row;
-        const VTermLineInfo *info;
-        while(linep[0] == ' ')
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?lineinfo ")) {
+        ప్రతిజ్ఞా(state);
+        అక్షరం *linep = పంక్తి + 10;
+        పూర్ణాంకం అడ్డువరుస;
+        స్థిరరాశి VTerm_పంక్తి_Info *info;
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d", &row) < 1) {
-          printf("! lineinfo unrecognised input\n");
-          goto abort_line;
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d", &అడ్డువరుస) < 1) {
+          రాయి("! lineinfo unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        info = vterm_state_get_lineinfo(state, row);
-        if(info->doublewidth)
-          printf("dwl ");
-        if(info->doubleheight)
-          printf("dhl ");
-        if(info->continuation)
-          printf("cont ");
-        printf("\n");
+        info = vterm_state_get_lineinfo(state, అడ్డువరుస);
+        ఒకవేళ(info->doublewidth)
+          రాయి("dwl ");
+        ఒకవేళ(info->doubleheight)
+          రాయి("dhl ");
+        ఒకవేళ(info->continuation)
+          రాయి("cont ");
+        రాయి("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
-        assert(screen);
-        char *linep = line + 13;
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?screen_chars ")) {
+        ప్రతిజ్ఞా(screen);
+        అక్షరం *linep = పంక్తి + 13;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d,%d,%d,%d", &rect.ప్రారంభం_అడ్డువరుస, &rect.ప్రారంభం_నిలువు, &rect.చివర_అడ్డువరుస, &rect.చివర_నిలువు) == 4)
           ; // fine
-        else if(sscanf(linep, "%d", &rect.start_row) == 1) {
-          rect.end_row = rect.start_row + 1;
-          rect.start_col = 0;
-          vterm_get_size(vt, NULL, &rect.end_col);
+        లేకపోతే ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d", &rect.ప్రారంభం_అడ్డువరుస) == 1) {
+          rect.చివర_అడ్డువరుస = rect.ప్రారంభం_అడ్డువరుస + 1;
+          rect.ప్రారంభం_నిలువు = 0;
+          vterm_get_కొలత(vt, ఖాళీ, &rect.చివర_నిలువు);
         }
-        else {
-          printf("! screen_chars unrecognised input\n");
-          goto abort_line;
+        లేకపోతే {
+          రాయి("! screen_chars unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        len = vterm_screen_get_chars(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
-          printf("! screen_chars error\n");
-        else if(len == 0)
-          printf("\n");
-        else {
-          uint32_t *chars = malloc(sizeof(uint32_t) * len);
+        len = vterm_screen_get_chars(screen, ఖాళీ, 0, rect);
+        ఒకవేళ(len == (size_t)-1)
+          రాయి("! screen_chars error\n");
+        లేకపోతే ఒకవేళ(len == 0)
+          రాయి("\n");
+        లేకపోతే {
+          uint32_t *chars = జ్ఞాపకం_ఇవ్వు(పరిమాణం(uint32_t) * len);
           size_t i;
           vterm_screen_get_chars(screen, chars, len, rect);
-          for(i = 0; i < len; i++) {
-            printf("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
+          కొరకు(i = 0; i < len; i++) {
+            రాయి("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
           }
-          free(chars);
+          విడుదల(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
-        assert(screen);
-        char *linep = line + 12;
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?screen_text ")) {
+        ప్రతిజ్ఞా(screen);
+        అక్షరం *linep = పంక్తి + 12;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
-          printf("! screen_text unrecognised input\n");
-          goto abort_line;
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d,%d,%d,%d", &rect.ప్రారంభం_అడ్డువరుస, &rect.ప్రారంభం_నిలువు, &rect.చివర_అడ్డువరుస, &rect.చివర_నిలువు) < 4) {
+          రాయి("! screen_text unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        len = vterm_screen_get_text(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
-          printf("! screen_text error\n");
-        else if(len == 0)
-          printf("\n");
-        else {
+        len = vterm_screen_get_పాఠ్యం(screen, ఖాళీ, 0, rect);
+        ఒకవేళ(len == (size_t)-1)
+          రాయి("! screen_text error\n");
+        లేకపోతే ఒకవేళ(len == 0)
+          రాయి("\n");
+        లేకపోతే {
           // Put an overwrite guard at both ends of the buffer
-          unsigned char *buffer = malloc(len + 4);
-          unsigned char *text = buffer + 2;
-          text[-2] = 0x55; text[-1] = 0xAA;
-          text[len] = 0x55; text[len+1] = 0xAA;
+          గుర్తులేని అక్షరం *బఫరు = జ్ఞాపకం_ఇవ్వు(len + 4);
+          గుర్తులేని అక్షరం *పాఠ్యం = బఫరు + 2;
+          పాఠ్యం[-2] = 0x55; పాఠ్యం[-1] = 0xAA;
+          పాఠ్యం[len] = 0x55; పాఠ్యం[len+1] = 0xAA;
 
-          vterm_screen_get_text(screen, (char *)text, len, rect);
+          vterm_screen_get_పాఠ్యం(screen, (అక్షరం *)పాఠ్యం, len, rect);
 
-          if(text[-2] != 0x55 || text[-1] != 0xAA)
-            printf("! screen_get_text buffer overrun left [%02x,%02x]\n", text[-2], text[-1]);
-          else if(text[len] != 0x55 || text[len+1] != 0xAA)
-            printf("! screen_get_text buffer overrun right [%02x,%02x]\n", text[len], text[len+1]);
-          else
+          ఒకవేళ(పాఠ్యం[-2] != 0x55 || పాఠ్యం[-1] != 0xAA)
+            రాయి("! screen_get_text buffer overrun left [%02x,%02x]\n", పాఠ్యం[-2], పాఠ్యం[-1]);
+          లేకపోతే ఒకవేళ(పాఠ్యం[len] != 0x55 || పాఠ్యం[len+1] != 0xAA)
+            రాయి("! screen_get_text buffer overrun right [%02x,%02x]\n", పాఠ్యం[len], పాఠ్యం[len+1]);
+          లేకపోతే
 	  {
 	    size_t i;
-            for(i = 0; i < len; i++) {
-              printf("0x%02x%s", text[i], i < len-1 ? "," : "\n");
+            కొరకు(i = 0; i < len; i++) {
+              రాయి("0x%02x%s", పాఠ్యం[i], i < len-1 ? "," : "\n");
             }
 	  }
 
-          free(buffer);
+          విడుదల(బఫరు);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
-        assert(screen);
-        char *linep = line + 12;
-	int i;
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?screen_cell ")) {
+        ప్రతిజ్ఞా(screen);
+        అక్షరం *linep = పంక్తి + 12;
+	పూర్ణాంకం i;
         VTermPos pos;
         VTermScreenCell cell;
-        while(linep[0] == ' ')
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_cell unrecognised input\n");
-          goto abort_line;
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d,%d\n", &pos.అడ్డువరుస, &pos.నిలువు) < 2) {
+          రాయి("! screen_cell unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        if(!vterm_screen_get_cell(screen, pos, &cell))
-          goto abort_line;
-        printf("{");
-        for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
-          printf("%s0x%x", i ? "," : "", cell.chars[i]);
+        ఒకవేళ(!vterm_screen_get_cell(screen, pos, &cell))
+          వెళ్ళు abort_పంక్తి;
+        రాయి("{");
+        కొరకు(i = 0; i < VTERM_MAX_CHARS_చొప్పున_CELL && cell.chars[i]; i++) {
+          రాయి("%s0x%x", i ? "," : "", cell.chars[i]);
         }
-        printf("} width=%d attrs={", cell.width);
-        if(cell.attrs.bold)      printf("B");
-        if(cell.attrs.underline) printf("U%d", cell.attrs.underline);
-        if(cell.attrs.italic)    printf("I");
-        if(cell.attrs.blink)     printf("K");
-        if(cell.attrs.reverse)   printf("R");
-        if(cell.attrs.font)      printf("F%d", cell.attrs.font);
-        if(cell.attrs.small)     printf("S");
-        if(cell.attrs.baseline)  printf(
+        రాయి("} width=%d attrs={", cell.వెడల్పు);
+        ఒకవేళ(cell.attrs.bold)      రాయి("B");
+        ఒకవేళ(cell.attrs.underline) రాయి("U%d", cell.attrs.underline);
+        ఒకవేళ(cell.attrs.italic)    రాయి("I");
+        ఒకవేళ(cell.attrs.blink)     రాయి("K");
+        ఒకవేళ(cell.attrs.తిరగేయి)   రాయి("R");
+        ఒకవేళ(cell.attrs.font)      రాయి("F%d", cell.attrs.font);
+        ఒకవేళ(cell.attrs.small)     రాయి("S");
+        ఒకవేళ(cell.attrs.baseline)  రాయి(
             cell.attrs.baseline == VTERM_BASELINE_RAISE ? "^" :
                                                           "_");
-        printf("} ");
-        if(cell.attrs.dwl)       printf("dwl ");
-        if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
-        printf("fg=");
-        vterm_screen_convert_color_to_rgb(screen, &cell.fg);
+        రాయి("} ");
+        ఒకవేళ(cell.attrs.dwl)       రాయి("dwl ");
+        ఒకవేళ(cell.attrs.dhl)       రాయి("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
+        రాయి("fg=");
+        vterm_screen_convert_color_గమ్యం_rgb(screen, &cell.fg);
         print_color(&cell.fg);
-        printf(" bg=");
-        vterm_screen_convert_color_to_rgb(screen, &cell.bg);
+        రాయి(" bg=");
+        vterm_screen_convert_color_గమ్యం_rgb(screen, &cell.bg);
         print_color(&cell.bg);
-        printf("\n");
+        రాయి("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
-        assert(screen);
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?screen_eol ")) {
+        ప్రతిజ్ఞా(screen);
         VTermPos pos;
-        char *linep = line + 12;
-        while(linep[0] == ' ')
+        అక్షరం *linep = పంక్తి + 12;
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_eol unrecognised input\n");
-          goto abort_line;
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d,%d\n", &pos.అడ్డువరుస, &pos.నిలువు) < 2) {
+          రాయి("! screen_eol unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        printf("%d\n", vterm_screen_is_eol(screen, pos));
+        రాయి("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
-        assert(screen);
+      లేకపోతే ఒకవేళ(strstartswith(పంక్తి, "?screen_attrs_extent ")) {
+        ప్రతిజ్ఞా(screen);
         VTermPos pos;
         VTermRect rect;
-        char *linep = line + 21;
-        while(linep[0] == ' ')
+        అక్షరం *linep = పంక్తి + 21;
+        అయితే(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_attrs_extent unrecognised input\n");
-          goto abort_line;
+        ఒకవేళ(అక్షరశ్రేణి_చదువు(linep, "%d,%d\n", &pos.అడ్డువరుస, &pos.నిలువు) < 2) {
+          రాయి("! screen_attrs_extent unrecognised input\n");
+          వెళ్ళు abort_పంక్తి;
         }
-	rect.start_col = 0;
-	rect.end_col   = -1;
-        if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
-          printf("! screen_attrs_extent failed\n");
-          goto abort_line;
+	rect.ప్రారంభం_నిలువు = 0;
+	rect.చివర_నిలువు   = -1;
+        ఒకవేళ(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
+          రాయి("! screen_attrs_extent failed\n");
+          వెళ్ళు abort_పంక్తి;
         }
-        printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
+        రాయి("%d,%d-%d,%d\n", rect.ప్రారంభం_అడ్డువరుస, rect.ప్రారంభం_నిలువు, rect.చివర_అడ్డువరుస, rect.చివర_నిలువు);
       }
-      else
-        printf("?\n");
+      లేకపోతే
+        రాయి("?\n");
 
-      memset(line, 0, sizeof line);
-      continue;
+      memset(పంక్తి, 0, పరిమాణం పంక్తి);
+      కొనసాగు;
     }
 
-    else
-      abort_line: err = 1;
+    లేకపోతే
+      abort_పంక్తి: err = 1;
 
-    outlen = vterm_output_get_buffer_current(vt);
-    if(outlen > 0) {
-      char outbuff[1024];
+    outlen = vterm_output_get_బఫరు_current(vt);
+    ఒకవేళ(outlen > 0) {
+      అక్షరం outbuff[1024];
       vterm_output_read(vt, outbuff, outlen);
 
-      term_output(outbuff, outlen, NULL);
+      పదం_output(outbuff, outlen, ఖాళీ);
     }
 
-    printf(err ? "?\n" : "DONE\n");
+    రాయి(err ? "?\n" : "DONE\n");
   }
 
   vterm_free(vt);
 
-  return 0;
+  తిరిగి 0;
 }

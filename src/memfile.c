@@ -32,61 +32,61 @@
  * file is opened.
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 /*
  * Some systems have the page size in statfs.f_bsize, some in stat.st_blksize
  */
-#ifdef HAVE_ST_BLKSIZE
+#నిర్వచితమైతే HAVE_ST_BLKSIZE
 # define STATFS stat
 # define F_BSIZE st_blksize
 # define fstatfs(fd, buf, len, nul) mch_fstat((fd), (buf))
-#else
+#లేకపోతే
 # ifdef HAVE_SYS_STATFS_H
 #  include <sys/statfs.h>
 #  define STATFS statfs
 #  define F_BSIZE f_bsize
 # endif
-#endif
+#అయితే_ముగింపు
 
 /*
  * for Amiga Dos 2.0x we use Flush
  */
-#ifdef AMIGA
+#నిర్వచితమైతే AMIGA
 # ifdef FEAT_ARP
-extern int dos2;			// this is in os_amiga.c
+బాహ్య పూర్ణాంకం dos2;			// this is in os_amiga.c
 # endif
 # ifdef SASC
 #  include <ios1.h>			// for chkufb()
 # endif
-#endif
+#అయితే_ముగింపు
 
-#define MEMFILE_PAGE_SIZE 4096		// default page size
+#నిర్వచించు MEMFILE_పుట_కొలత 4096		// default page size
 
-static long_u	total_mem_used = 0;	// total memory used for memfiles
+స్థిర long_u	మొత్తం_mem_వాడిన = 0;	// total memory used for memfiles
 
-static void mf_ins_hash(memfile_T *, bhdr_T *);
-static void mf_rem_hash(memfile_T *, bhdr_T *);
-static bhdr_T *mf_find_hash(memfile_T *, blocknr_T);
-static void mf_ins_used(memfile_T *, bhdr_T *);
-static void mf_rem_used(memfile_T *, bhdr_T *);
-static bhdr_T *mf_release(memfile_T *, int);
-static bhdr_T *mf_alloc_bhdr(memfile_T *, int);
-static void mf_free_bhdr(bhdr_T *);
-static void mf_ins_free(memfile_T *, bhdr_T *);
-static bhdr_T *mf_rem_free(memfile_T *);
-static int  mf_read(memfile_T *, bhdr_T *);
-static int  mf_write(memfile_T *, bhdr_T *);
-static int  mf_write_block(memfile_T *mfp, bhdr_T *hp, off_T offset, unsigned size);
-static int  mf_trans_add(memfile_T *, bhdr_T *);
-static void mf_do_open(memfile_T *, char_u *, int);
-static void mf_hash_init(mf_hashtab_T *);
-static void mf_hash_free(mf_hashtab_T *);
-static void mf_hash_free_all(mf_hashtab_T *);
-static mf_hashitem_T *mf_hash_find(mf_hashtab_T *, blocknr_T);
-static void mf_hash_add_item(mf_hashtab_T *, mf_hashitem_T *);
-static void mf_hash_rem_item(mf_hashtab_T *, mf_hashitem_T *);
-static int mf_hash_grow(mf_hashtab_T *);
+స్థిర శూన్య mf_ins_hash(memfile_T *, bhdr_T *);
+స్థిర శూన్య mf_rem_hash(memfile_T *, bhdr_T *);
+స్థిర bhdr_T *mf_కనుగొను_hash(memfile_T *, blocknr_T);
+స్థిర శూన్య mf_ins_వాడిన(memfile_T *, bhdr_T *);
+స్థిర శూన్య mf_rem_వాడిన(memfile_T *, bhdr_T *);
+స్థిర bhdr_T *mf_release(memfile_T *, పూర్ణాంకం);
+స్థిర bhdr_T *mf_alloc_bhdr(memfile_T *, పూర్ణాంకం);
+స్థిర శూన్య mf_free_bhdr(bhdr_T *);
+స్థిర శూన్య mf_ins_free(memfile_T *, bhdr_T *);
+స్థిర bhdr_T *mf_rem_free(memfile_T *);
+స్థిర పూర్ణాంకం  mf_read(memfile_T *, bhdr_T *);
+స్థిర పూర్ణాంకం  mf_write(memfile_T *, bhdr_T *);
+స్థిర పూర్ణాంకం  mf_write_ఖండం(memfile_T *mfp, bhdr_T *hp, off_T స్థానభ్రంశం, గుర్తులేని కొలత);
+స్థిర పూర్ణాంకం  mf_trans_కూడు(memfile_T *, bhdr_T *);
+స్థిర శూన్య mf_do_open(memfile_T *, char_u *, పూర్ణాంకం);
+స్థిర శూన్య mf_hash_init(mf_hashtab_T *);
+స్థిర శూన్య mf_hash_free(mf_hashtab_T *);
+స్థిర శూన్య mf_hash_free_all(mf_hashtab_T *);
+స్థిర mf_hashitem_T *mf_hash_కనుగొను(mf_hashtab_T *, blocknr_T);
+స్థిర శూన్య mf_hash_కూడు_అంశం(mf_hashtab_T *, mf_hashitem_T *);
+స్థిర శూన్య mf_hash_rem_అంశం(mf_hashtab_T *, mf_hashitem_T *);
+స్థిర పూర్ణాంకం mf_hash_grow(mf_hashtab_T *);
 
 /*
  * The functions for using a memfile:
@@ -117,49 +117,49 @@ static int mf_hash_grow(mf_hashtab_T *);
  * return value: identifier for this memory block file.
  */
     memfile_T *
-mf_open(char_u *fname, int flags)
+mf_open(char_u *fname, పూర్ణాంకం flags)
 {
     memfile_T		*mfp;
-    off_T		size;
-#if defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
+    off_T		కొలత;
+#ఒకవేళ defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
 # define USE_FSTATFS
-    struct STATFS	stf;
-#endif
+    నిర్మాణం STATFS	stf;
+#అయితే_ముగింపు
 
-    if ((mfp = ALLOC_ONE(memfile_T)) == NULL)
-	return NULL;
+    ఒకవేళ ((mfp = ALLOC_ONE(memfile_T)) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (fname == NULL)	    // no file for this memfile, use memory only
+    ఒకవేళ (fname == ఖాళీ)	    // no file for this memfile, use memory only
     {
-	mfp->mf_fname = NULL;
-	mfp->mf_ffname = NULL;
+	mfp->mf_fname = ఖాళీ;
+	mfp->mf_ffname = ఖాళీ;
 	mfp->mf_fd = -1;
     }
-    else
+    లేకపోతే
     {
 	mf_do_open(mfp, fname, flags);	// try to open the file
 
 	// if the file cannot be opened, return here
-	if (mfp->mf_fd < 0)
+	ఒకవేళ (mfp->mf_fd < 0)
 	{
 	    vim_free(mfp);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
 
-    mfp->mf_free_first = NULL;		// free list is empty
-    mfp->mf_used_first = NULL;		// used list is empty
-    mfp->mf_used_last = NULL;
+    mfp->mf_free_మొదటి = ఖాళీ;		// free list is empty
+    mfp->mf_వాడిన_మొదటి = ఖాళీ;		// used list is empty
+    mfp->mf_వాడిన_చివరి = ఖాళీ;
     mfp->mf_dirty = MF_DIRTY_NO;
-    mfp->mf_used_count = 0;
+    mfp->mf_వాడిన_లెక్క = 0;
     mf_hash_init(&mfp->mf_hash);
     mf_hash_init(&mfp->mf_trans);
-    mfp->mf_page_size = MEMFILE_PAGE_SIZE;
-#ifdef FEAT_CRYPT
-    mfp->mf_old_key = NULL;
-#endif
+    mfp->mf_పుట_కొలత = MEMFILE_పుట_కొలత;
+#నిర్వచితమైతే FEAT_CRYPT
+    mfp->mf_old_కీలకం = ఖాళీ;
+#అయితే_ముగింపు
 
-#ifdef USE_FSTATFS
+#నిర్వచితమైతే USE_FSTATFS
     /*
      * Try to set the page size equal to the block size of the device.
      * Speeds up I/O a lot.
@@ -167,22 +167,22 @@ mf_open(char_u *fname, int flags)
      * in ml_recover().  The size used here may be wrong, therefore
      * mf_blocknr_max must be rounded up.
      */
-    if (mfp->mf_fd >= 0
-	    && fstatfs(mfp->mf_fd, &stf, sizeof(struct statfs), 0) == 0
-	    && stf.F_BSIZE >= MIN_SWAP_PAGE_SIZE
-	    && stf.F_BSIZE <= MAX_SWAP_PAGE_SIZE)
-	mfp->mf_page_size = stf.F_BSIZE;
-#endif
+    ఒకవేళ (mfp->mf_fd >= 0
+	    && fstatfs(mfp->mf_fd, &stf, పరిమాణం(నిర్మాణం statfs), 0) == 0
+	    && stf.F_BSIZE >= MIN_మార్పిడి_పుట_కొలత
+	    && stf.F_BSIZE <= MAX_మార్పిడి_పుట_కొలత)
+	mfp->mf_పుట_కొలత = stf.F_BSIZE;
+#అయితే_ముగింపు
 
-    if (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
-		  || (size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
+    ఒకవేళ (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
+		  || (కొలత = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	mfp->mf_blocknr_max = 0;	// no file or empty file
-    else
-	mfp->mf_blocknr_max = (blocknr_T)((size + mfp->mf_page_size - 1)
-							 / mfp->mf_page_size);
+    లేకపోతే
+	mfp->mf_blocknr_max = (blocknr_T)((కొలత + mfp->mf_పుట_కొలత - 1)
+							 / mfp->mf_పుట_కొలత);
     mfp->mf_blocknr_min = -1;
-    mfp->mf_neg_count = 0;
-    mfp->mf_infile_count = mfp->mf_blocknr_max;
+    mfp->mf_neg_లెక్క = 0;
+    mfp->mf_infile_లెక్క = mfp->mf_blocknr_max;
 
     /*
      * Compute maximum number of pages ('maxmem' is in Kbyte):
@@ -190,20 +190,20 @@ mf_open(char_u *fname, int flags)
      * Avoid overflow by first reducing page size as much as possible.
      */
     {
-	int	    shift = 10;
-	unsigned    page_size = mfp->mf_page_size;
+	పూర్ణాంకం	    జరుపు = 10;
+	గుర్తులేని    పుట_కొలత = mfp->mf_పుట_కొలత;
 
-	while (shift > 0 && (page_size & 1) == 0)
+	అయితే (జరుపు > 0 && (పుట_కొలత & 1) == 0)
 	{
-	    page_size = page_size >> 1;
-	    --shift;
+	    పుట_కొలత = పుట_కొలత >> 1;
+	    --జరుపు;
 	}
-	mfp->mf_used_count_max = (p_mm << shift) / page_size;
-	if (mfp->mf_used_count_max < 10)
-	    mfp->mf_used_count_max = 10;
+	mfp->mf_వాడిన_లెక్క_max = (p_mm << జరుపు) / పుట_కొలత;
+	ఒకవేళ (mfp->mf_వాడిన_లెక్క_max < 10)
+	    mfp->mf_వాడిన_లెక్క_max = 10;
     }
 
-    return mfp;
+    తిరిగి mfp;
 }
 
 /*
@@ -216,43 +216,43 @@ mf_open(char_u *fname, int flags)
  *
  * return value: FAIL if file could not be opened, OK otherwise
  */
-    int
+    పూర్ణాంకం
 mf_open_file(memfile_T *mfp, char_u *fname)
 {
     mf_do_open(mfp, fname, O_RDWR|O_CREAT|O_EXCL); // try to open the file
 
-    if (mfp->mf_fd < 0)
-	return FAIL;
+    ఒకవేళ (mfp->mf_fd < 0)
+	తిరిగి FAIL;
 
     mfp->mf_dirty = MF_DIRTY_YES;
-    return OK;
+    తిరిగి OK;
 }
 
 /*
  * Close a memory file and delete the associated file if 'del_file' is TRUE.
  */
-    void
-mf_close(memfile_T *mfp, int del_file)
+    శూన్య
+mf_close(memfile_T *mfp, పూర్ణాంకం del_file)
 {
     bhdr_T	*hp, *nextp;
 
-    if (mfp == NULL)		    // safety check
-	return;
-    if (mfp->mf_fd >= 0)
+    ఒకవేళ (mfp == ఖాళీ)		    // safety check
+	తిరిగి;
+    ఒకవేళ (mfp->mf_fd >= 0)
     {
-	if (close(mfp->mf_fd) < 0)
-	    emsg(_(e_close_error_on_swap_file));
+	ఒకవేళ (close(mfp->mf_fd) < 0)
+	    emsg(_(e_close_error_on_మార్పిడి_file));
     }
-    if (del_file && mfp->mf_fname != NULL)
+    ఒకవేళ (del_file && mfp->mf_fname != ఖాళీ)
 	mch_remove(mfp->mf_fname);
 					    // free entries in used list
-    for (hp = mfp->mf_used_first; hp != NULL; hp = nextp)
+    కొరకు (hp = mfp->mf_వాడిన_మొదటి; hp != ఖాళీ; hp = nextp)
     {
-	total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
-	nextp = hp->bh_next;
+	మొత్తం_mem_వాడిన -= (long_u)hp->bh_పుట_లెక్క * mfp->mf_పుట_కొలత;
+	nextp = hp->bh_తదుపరి;
 	mf_free_bhdr(hp);
     }
-    while (mfp->mf_free_first != NULL)	    // free entries in free list
+    అయితే (mfp->mf_free_మొదటి != ఖాళీ)	    // free entries in free list
 	vim_free(mf_rem_free(mfp));
     mf_hash_free(&mfp->mf_hash);
     mf_hash_free_all(&mfp->mf_trans);	    // free hashtable and its items
@@ -264,33 +264,33 @@ mf_close(memfile_T *mfp, int del_file)
 /*
  * Close the swap file for a memfile.  Used when 'swapfile' is reset.
  */
-    void
+    శూన్య
 mf_close_file(
     buf_T	*buf,
-    int		getlines)	// get all lines into memory?
+    పూర్ణాంకం		getlines)	// get all lines into memory?
 {
     memfile_T	*mfp;
     linenr_T	lnum;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd < 0)		// nothing to close
-	return;
+    ఒకవేళ (mfp == ఖాళీ || mfp->mf_fd < 0)		// nothing to close
+	తిరిగి;
 
-    if (getlines)
+    ఒకవేళ (getlines)
     {
 	// get all blocks in memory by accessing all lines (clumsy!)
 	mf_dont_release = TRUE;
-	for (lnum = 1; lnum <= buf->b_ml.ml_line_count; ++lnum)
-	    (void)ml_get_buf(buf, lnum, FALSE);
+	కొరకు (lnum = 1; lnum <= buf->b_ml.ml_పంక్తి_లెక్క; ++lnum)
+	    (శూన్య)ml_get_buf(buf, lnum, FALSE);
 	mf_dont_release = FALSE;
 	// TODO: should check if all blocks are really in core
     }
 
-    if (close(mfp->mf_fd) < 0)			// close the file
-	emsg(_(e_close_error_on_swap_file));
+    ఒకవేళ (close(mfp->mf_fd) < 0)			// close the file
+	emsg(_(e_close_error_on_మార్పిడి_file));
     mfp->mf_fd = -1;
 
-    if (mfp->mf_fname != NULL)
+    ఒకవేళ (mfp->mf_fname != ఖాళీ)
     {
 	mch_remove(mfp->mf_fname);		// delete the swap file
 	VIM_CLEAR(mfp->mf_fname);
@@ -302,13 +302,13 @@ mf_close_file(
  * Set new size for a memfile.  Used when block 0 of a swapfile has been read
  * and the size it indicates differs from what was guessed.
  */
-    void
-mf_new_page_size(memfile_T *mfp, unsigned new_size)
+    శూన్య
+mf_new_పుట_కొలత(memfile_T *mfp, గుర్తులేని new_కొలత)
 {
     // Correct the memory used for block 0 to the new size, because it will be
     // freed with that size later on.
-    total_mem_used += new_size - mfp->mf_page_size;
-    mfp->mf_page_size = new_size;
+    మొత్తం_mem_వాడిన += new_కొలత - mfp->mf_పుట_కొలత;
+    mfp->mf_పుట_కొలత = new_కొలత;
 }
 
 /*
@@ -317,7 +317,7 @@ mf_new_page_size(memfile_T *mfp, unsigned new_size)
  *   negative: TRUE if negative block number desired (data block)
  */
     bhdr_T *
-mf_new(memfile_T *mfp, int negative, int page_count)
+mf_new(memfile_T *mfp, పూర్ణాంకం negative, పూర్ణాంకం పుట_లెక్క)
 {
     bhdr_T	*hp;	// new bhdr_T
     bhdr_T	*freep;	// first block in free list
@@ -327,7 +327,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * If we reached the maximum size for the used memory blocks, release one
      * If a bhdr_T is returned, use it and adjust the page_count if necessary.
      */
-    hp = mf_release(mfp, page_count);
+    hp = mf_release(mfp, పుట_లెక్క);
 
 /*
  * Decide on the number to use:
@@ -335,8 +335,8 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Otherwise use mf_block_min for a negative number, mf_block_max for
  * a positive number.
  */
-    freep = mfp->mf_free_first;
-    if (!negative && freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_మొదటి;
+    ఒకవేళ (!negative && freep != ఖాళీ && freep->bh_పుట_లెక్క >= పుట_లెక్క)
     {
 	/*
 	 * If the block in the free list has more pages, take only the number
@@ -348,57 +348,57 @@ mf_new(memfile_T *mfp, int negative, int page_count)
 	 * If the number of pages matches and mf_release() returned a bhdr_T,
 	 * just use the number and free the bhdr_T from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	ఒకవేళ (freep->bh_పుట_లెక్క > పుట_లెక్క)
 	{
-	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-		return NULL;
+	    ఒకవేళ (hp == ఖాళీ && (hp = mf_alloc_bhdr(mfp, పుట_లెక్క)) == ఖాళీ)
+		తిరిగి ఖాళీ;
 	    hp->bh_bnum = freep->bh_bnum;
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += పుట_లెక్క;
+	    freep->bh_పుట_లెక్క -= పుట_లెక్క;
 	}
-	else if (hp == NULL)	    // need to allocate memory for this block
+	లేకపోతే ఒకవేళ (hp == ఖాళీ)	    // need to allocate memory for this block
 	{
-	    if ((p = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
-		return NULL;
+	    ఒకవేళ ((p = alloc((size_t)mfp->mf_పుట_కొలత * పుట_లెక్క)) == ఖాళీ)
+		తిరిగి ఖాళీ;
 	    hp = mf_rem_free(mfp);
-	    hp->bh_data = p;
+	    hp->bh_దత్తాంశం = p;
 	}
-	else		    // use the number, remove entry from free list
+	లేకపోతే		    // use the number, remove entry from free list
 	{
 	    freep = mf_rem_free(mfp);
 	    hp->bh_bnum = freep->bh_bnum;
 	    vim_free(freep);
 	}
     }
-    else	// get a new number
+    లేకపోతే	// get a new number
     {
-	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-	    return NULL;
-	if (negative)
+	ఒకవేళ (hp == ఖాళీ && (hp = mf_alloc_bhdr(mfp, పుట_లెక్క)) == ఖాళీ)
+	    తిరిగి ఖాళీ;
+	ఒకవేళ (negative)
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_min--;
-	    mfp->mf_neg_count++;
+	    mfp->mf_neg_లెక్క++;
 	}
-	else
+	లేకపోతే
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_max;
-	    mfp->mf_blocknr_max += page_count;
+	    mfp->mf_blocknr_max += పుట_లెక్క;
 	}
     }
     hp->bh_flags = BH_LOCKED | BH_DIRTY;	// new block is always dirty
     mfp->mf_dirty = MF_DIRTY_YES;
-    hp->bh_page_count = page_count;
-    mf_ins_used(mfp, hp);
+    hp->bh_పుట_లెక్క = పుట_లెక్క;
+    mf_ins_వాడిన(mfp, hp);
     mf_ins_hash(mfp, hp);
 
     /*
      * Init the data to all zero, to avoid reading uninitialized data.
      * This also avoids that the passwd file ends up in the swap file!
      */
-    (void)vim_memset((char *)(hp->bh_data), 0,
-				      (size_t)mfp->mf_page_size * page_count);
+    (శూన్య)vim_memset((అక్షరం *)(hp->bh_దత్తాంశం), 0,
+				      (size_t)mfp->mf_పుట_కొలత * పుట_లెక్క);
 
-    return hp;
+    తిరిగి hp;
 }
 
 /*
@@ -407,21 +407,21 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Note: The caller should first check a negative nr with mf_trans_del()
  */
     bhdr_T *
-mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
+mf_get(memfile_T *mfp, blocknr_T nr, పూర్ణాంకం పుట_లెక్క)
 {
     bhdr_T    *hp;
 						// doesn't exist
-    if (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
-	return NULL;
+    ఒకవేళ (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
+	తిరిగి ఖాళీ;
 
     /*
      * see if it is in the cache
      */
-    hp = mf_find_hash(mfp, nr);
-    if (hp == NULL)	// not in the hash list
+    hp = mf_కనుగొను_hash(mfp, nr);
+    ఒకవేళ (hp == ఖాళీ)	// not in the hash list
     {
-	if (nr < 0 || nr >= mfp->mf_infile_count)   // can't be in the file
-	    return NULL;
+	ఒకవేళ (nr < 0 || nr >= mfp->mf_infile_లెక్క)   // can't be in the file
+	    తిరిగి ఖాళీ;
 
 	// could check here if the block is in the free list
 
@@ -430,32 +430,32 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
 	 * If so, use that block.
 	 * If not, allocate a new block.
 	 */
-	hp = mf_release(mfp, page_count);
-	if (hp == NULL && page_count > 0)
-	    hp = mf_alloc_bhdr(mfp, page_count);
-	if (hp == NULL)
-	    return NULL;
+	hp = mf_release(mfp, పుట_లెక్క);
+	ఒకవేళ (hp == ఖాళీ && పుట_లెక్క > 0)
+	    hp = mf_alloc_bhdr(mfp, పుట_లెక్క);
+	ఒకవేళ (hp == ఖాళీ)
+	    తిరిగి ఖాళీ;
 
 	hp->bh_bnum = nr;
 	hp->bh_flags = 0;
-	hp->bh_page_count = page_count;
-	if (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
+	hp->bh_పుట_లెక్క = పుట_లెక్క;
+	ఒకవేళ (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
 	{
 	    mf_free_bhdr(hp);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    else
+    లేకపోతే
     {
-	mf_rem_used(mfp, hp);	// remove from list, insert in front below
+	mf_rem_వాడిన(mfp, hp);	// remove from list, insert in front below
 	mf_rem_hash(mfp, hp);
     }
 
     hp->bh_flags |= BH_LOCKED;
-    mf_ins_used(mfp, hp);	// put in front of used list
+    mf_ins_వాడిన(mfp, hp);	// put in front of used list
     mf_ins_hash(mfp, hp);	// put in front of hash list
 
-    return hp;
+    తిరిగి hp;
 }
 
 /*
@@ -466,46 +466,46 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
  *
  *  no return value, function cannot fail
  */
-    void
+    శూన్య
 mf_put(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    int		dirty,
-    int		infile)
+    పూర్ణాంకం		dirty,
+    పూర్ణాంకం		infile)
 {
-    int		flags;
+    పూర్ణాంకం		flags;
 
     flags = hp->bh_flags;
 
-    if ((flags & BH_LOCKED) == 0)
-	iemsg(e_block_was_not_locked);
+    ఒకవేళ ((flags & BH_LOCKED) == 0)
+	iemsg(e_ఖండం_was_not_locked);
     flags &= ~BH_LOCKED;
-    if (dirty)
+    ఒకవేళ (dirty)
     {
 	flags |= BH_DIRTY;
-	if (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
+	ఒకవేళ (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
 	    mfp->mf_dirty = MF_DIRTY_YES;
     }
     hp->bh_flags = flags;
-    if (infile)
-	mf_trans_add(mfp, hp);	    // may translate negative in positive nr
+    ఒకవేళ (infile)
+	mf_trans_కూడు(mfp, hp);	    // may translate negative in positive nr
 }
 
 /*
  * block *hp is no longer in used, may put it in the free list of memfile *mfp
  */
-    void
+    శూన్య
 mf_free(memfile_T *mfp, bhdr_T *hp)
 {
-    vim_free(hp->bh_data);	// free the memory
+    vim_free(hp->bh_దత్తాంశం);	// free the memory
     mf_rem_hash(mfp, hp);	// get *hp out of the hash list
-    mf_rem_used(mfp, hp);	// get *hp out of the used list
-    if (hp->bh_bnum < 0)
+    mf_rem_వాడిన(mfp, hp);	// get *hp out of the used list
+    ఒకవేళ (hp->bh_bnum < 0)
     {
 	vim_free(hp);		// don't want negative numbers in free list
-	mfp->mf_neg_count--;
+	mfp->mf_neg_లెక్క--;
     }
-    else
+    లేకపోతే
 	mf_ins_free(mfp, hp);	// put *hp in the free list
 }
 
@@ -522,18 +522,18 @@ mf_free(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    int
-mf_sync(memfile_T *mfp, int flags)
+    పూర్ణాంకం
+mf_sync(memfile_T *mfp, పూర్ణాంకం flags)
 {
-    int		status;
+    పూర్ణాంకం		స్థితి_2;
     bhdr_T	*hp;
-    int		got_int_save = got_int;
+    పూర్ణాంకం		got_int_save = got_int;
 
-    if (mfp->mf_fd < 0)
+    ఒకవేళ (mfp->mf_fd < 0)
     {
 	// there is no file, nothing to do
 	mfp->mf_dirty = MF_DIRTY_NO;
-	return FAIL;
+	తిరిగి FAIL;
     }
 
     // Only a CTRL-C while writing will break us here, not one typed
@@ -546,119 +546,119 @@ mf_sync(memfile_T *mfp, int flags)
      * Then we only try to write blocks within the existing file. If that also
      * fails then we give up.
      */
-    status = OK;
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (((flags & MFS_ALL) || hp->bh_bnum >= 0)
+    స్థితి_2 = OK;
+    కొరకు (hp = mfp->mf_వాడిన_చివరి; hp != ఖాళీ; hp = hp->bh_prev)
+	ఒకవేళ (((flags & MFS_ALL) || hp->bh_bnum >= 0)
 		&& (hp->bh_flags & BH_DIRTY)
-		&& (status == OK || (hp->bh_bnum >= 0
-		    && hp->bh_bnum < mfp->mf_infile_count)))
+		&& (స్థితి_2 == OK || (hp->bh_bnum >= 0
+		    && hp->bh_bnum < mfp->mf_infile_లెక్క)))
 	{
-	    if ((flags & MFS_ZERO) && hp->bh_bnum != 0)
-		continue;
-	    if (mf_write(mfp, hp) == FAIL)
+	    ఒకవేళ ((flags & MFS_ZERO) && hp->bh_bnum != 0)
+		కొనసాగు;
+	    ఒకవేళ (mf_write(mfp, hp) == FAIL)
 	    {
-		if (status == FAIL)	// double error: quit syncing
-		    break;
-		status = FAIL;
+		ఒకవేళ (స్థితి_2 == FAIL)	// double error: quit syncing
+		    ఆపు;
+		స్థితి_2 = FAIL;
 	    }
-	    if (flags & MFS_STOP)
+	    ఒకవేళ (flags & MFS_STOP)
 	    {
 		// Stop when char available now.
-		if (ui_char_avail())
-		    break;
+		ఒకవేళ (ui_char_avail())
+		    ఆపు;
 	    }
-	    else
+	    లేకపోతే
 		ui_breakcheck();
-	    if (got_int)
-		break;
+	    ఒకవేళ (got_int)
+		ఆపు;
 	}
 
     /*
      * If the whole list is flushed, the memfile is not dirty anymore.
      * In case of an error this flag is also set, to avoid trying all the time.
      */
-    if (hp == NULL || status == FAIL)
+    ఒకవేళ (hp == ఖాళీ || స్థితి_2 == FAIL)
 	mfp->mf_dirty = MF_DIRTY_NO;
 
-    if ((flags & MFS_FLUSH) && *p_sws != NUL)
+    ఒకవేళ ((flags & MFS_FLUSH) && *p_sws != NUL)
     {
-#if defined(UNIX)
+#ఒకవేళ defined(UNIX)
 # ifdef HAVE_FSYNC
 	/*
 	 * most Unixes have the very useful fsync() function, just what we need.
 	 */
-	if (STRCMP(p_sws, "fsync") == 0)
+	ఒకవేళ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    ఒకవేళ (vim_fsync(mfp->mf_fd))
+		స్థితి_2 = FAIL;
 	}
-	else
+	లేకపోతే
 # endif
 # ifdef HAVE_SYNC
 	    sync();
-# else
-	    fflush(NULL);
+# లేకపోతే
+	    fflush(ఖాళీ);
 # endif
-#endif
-#ifdef VMS
-	if (STRCMP(p_sws, "fsync") == 0)
+#అయితే_ముగింపు
+#నిర్వచితమైతే VMS
+	ఒకవేళ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    ఒకవేళ (vim_fsync(mfp->mf_fd))
+		స్థితి_2 = FAIL;
 	}
-#endif
-#ifdef MSWIN
-	if (_commit(mfp->mf_fd))
-	    status = FAIL;
-#endif
-#ifdef AMIGA
-# if defined(__AROS__) || defined(__amigaos4__)
-	if (vim_fsync(mfp->mf_fd) != 0)
-	    status = FAIL;
-# else
+#అయితే_ముగింపు
+#నిర్వచితమైతే MSWIN
+	ఒకవేళ (_commit(mfp->mf_fd))
+	    స్థితి_2 = FAIL;
+#అయితే_ముగింపు
+#నిర్వచితమైతే AMIGA
+# ఒకవేళ defined(__AROS__) || defined(__amigaos4__)
+	ఒకవేళ (vim_fsync(mfp->mf_fd) != 0)
+	    స్థితి_2 = FAIL;
+# లేకపోతే
 	/*
 	 * Flush() only exists for AmigaDos 2.0.
 	 * For 1.3 it should be done with close() + open(), but then the risk
 	 * is that the open() may fail and lose the file....
 	 */
 #  ifdef FEAT_ARP
-	if (dos2)
+	ఒకవేళ (dos2)
 #  endif
 #  ifdef SASC
 	{
-	    struct UFB *fp = chkufb(mfp->mf_fd);
+	    నిర్మాణం UFB *fp = chkufb(mfp->mf_fd);
 
-	    if (fp != NULL)
+	    ఒకవేళ (fp != ఖాళీ)
 		Flush(fp->ufbfh);
 	}
-#  else
-#   if defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
+#  లేకపోతే
+#   ఒకవేళ defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
 	{
-#    if defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
+#    ఒకవేళ defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
 	    // Have function (in libnix at least),
 	    // but ain't got no prototype anywhere.
-	    extern unsigned long fdtofh(int filedescriptor);
+	    బాహ్య గుర్తులేని దీర్ఘ fdtofh(పూర్ణాంకం filedescriptor);
 #    endif
-#    if !defined(__libnix__)
-	    fflush(NULL);
-#    else
+#    ఒకవేళ !defined(__libnix__)
+	    fflush(ఖాళీ);
+#    లేకపోతే
 	    BPTR fh = (BPTR)fdtofh(mfp->mf_fd);
 
-	    if (fh != 0)
+	    ఒకవేళ (fh != 0)
 		Flush(fh);
 #    endif
 	}
-#   else // assume Manx
+#   లేకపోతే // assume Manx
 	    Flush(_devtab[mfp->mf_fd].fd);
 #   endif
 #  endif
 # endif
-#endif // AMIGA
+#అయితే_ముగింపు // AMIGA
     }
 
     got_int |= got_int_save;
 
-    return status;
+    తిరిగి స్థితి_2;
 }
 
 /*
@@ -666,13 +666,13 @@ mf_sync(memfile_T *mfp, int flags)
  * the dirty flag.  These are blocks that need to be written to a newly
  * created swapfile.
  */
-    void
-mf_set_dirty(memfile_T *mfp)
+    శూన్య
+mf_సమితి_dirty(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (hp->bh_bnum > 0)
+    కొరకు (hp = mfp->mf_వాడిన_చివరి; hp != ఖాళీ; hp = hp->bh_prev)
+	ఒకవేళ (hp->bh_bnum > 0)
 	    hp->bh_flags |= BH_DIRTY;
     mfp->mf_dirty = MF_DIRTY_YES;
 }
@@ -680,63 +680,63 @@ mf_set_dirty(memfile_T *mfp)
 /*
  * insert block *hp in front of hashlist of memfile *mfp
  */
-    static void
+    స్థిర శూన్య
 mf_ins_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_add_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_కూడు_అంశం(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * remove block *hp from hashlist of memfile list *mfp
  */
-    static void
+    స్థిర శూన్య
 mf_rem_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_rem_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_rem_అంశం(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * look in hash lists of memfile *mfp for block header with number 'nr'
  */
-    static bhdr_T *
-mf_find_hash(memfile_T *mfp, blocknr_T nr)
+    స్థిర bhdr_T *
+mf_కనుగొను_hash(memfile_T *mfp, blocknr_T nr)
 {
-    return (bhdr_T *)mf_hash_find(&mfp->mf_hash, nr);
+    తిరిగి (bhdr_T *)mf_hash_కనుగొను(&mfp->mf_hash, nr);
 }
 
 /*
  * insert block *hp in front of used list of memfile *mfp
  */
-    static void
-mf_ins_used(memfile_T *mfp, bhdr_T *hp)
+    స్థిర శూన్య
+mf_ins_వాడిన(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_used_first;
-    mfp->mf_used_first = hp;
-    hp->bh_prev = NULL;
-    if (hp->bh_next == NULL)	    // list was empty, adjust last pointer
-	mfp->mf_used_last = hp;
-    else
-	hp->bh_next->bh_prev = hp;
-    mfp->mf_used_count += hp->bh_page_count;
-    total_mem_used += (long_u)hp->bh_page_count * mfp->mf_page_size;
+    hp->bh_తదుపరి = mfp->mf_వాడిన_మొదటి;
+    mfp->mf_వాడిన_మొదటి = hp;
+    hp->bh_prev = ఖాళీ;
+    ఒకవేళ (hp->bh_తదుపరి == ఖాళీ)	    // list was empty, adjust last pointer
+	mfp->mf_వాడిన_చివరి = hp;
+    లేకపోతే
+	hp->bh_తదుపరి->bh_prev = hp;
+    mfp->mf_వాడిన_లెక్క += hp->bh_పుట_లెక్క;
+    మొత్తం_mem_వాడిన += (long_u)hp->bh_పుట_లెక్క * mfp->mf_పుట_కొలత;
 }
 
 /*
  * remove block *hp from used list of memfile *mfp
  */
-    static void
-mf_rem_used(memfile_T *mfp, bhdr_T *hp)
+    స్థిర శూన్య
+mf_rem_వాడిన(memfile_T *mfp, bhdr_T *hp)
 {
-    if (hp->bh_next == NULL)	    // last block in used list
-	mfp->mf_used_last = hp->bh_prev;
-    else
-	hp->bh_next->bh_prev = hp->bh_prev;
-    if (hp->bh_prev == NULL)	    // first block in used list
-	mfp->mf_used_first = hp->bh_next;
-    else
-	hp->bh_prev->bh_next = hp->bh_next;
-    mfp->mf_used_count -= hp->bh_page_count;
-    total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+    ఒకవేళ (hp->bh_తదుపరి == ఖాళీ)	    // last block in used list
+	mfp->mf_వాడిన_చివరి = hp->bh_prev;
+    లేకపోతే
+	hp->bh_తదుపరి->bh_prev = hp->bh_prev;
+    ఒకవేళ (hp->bh_prev == ఖాళీ)	    // first block in used list
+	mfp->mf_వాడిన_మొదటి = hp->bh_తదుపరి;
+    లేకపోతే
+	hp->bh_prev->bh_తదుపరి = hp->bh_తదుపరి;
+    mfp->mf_వాడిన_లెక్క -= hp->bh_పుట_లెక్క;
+    మొత్తం_mem_వాడిన -= (long_u)hp->bh_పుట_లెక్క * mfp->mf_పుట_కొలత;
 }
 
 /*
@@ -748,35 +748,35 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
  *
  * Returns NULL if no block is released.
  */
-    static bhdr_T *
-mf_release(memfile_T *mfp, int page_count)
+    స్థిర bhdr_T *
+mf_release(memfile_T *mfp, పూర్ణాంకం పుట_లెక్క)
 {
     bhdr_T	*hp;
-    int		need_release;
+    పూర్ణాంకం		need_release;
     buf_T	*buf;
 
     // don't release while in mf_close_file()
-    if (mf_dont_release)
-	return NULL;
+    ఒకవేళ (mf_dont_release)
+	తిరిగి ఖాళీ;
 
     /*
      * Need to release a block if the number of blocks for this memfile is
      * higher than the maximum or total memory used is over 'maxmemtot'
      */
-    need_release = ((mfp->mf_used_count >= mfp->mf_used_count_max)
-				  || (total_mem_used >> 10) >= (long_u)p_mmt);
+    need_release = ((mfp->mf_వాడిన_లెక్క >= mfp->mf_వాడిన_లెక్క_max)
+				  || (మొత్తం_mem_వాడిన >> 10) >= (long_u)p_mmt);
 
     /*
      * Try to create a swap file if the amount of memory used is getting too
      * high.
      */
-    if (mfp->mf_fd < 0 && need_release && p_uc)
+    ఒకవేళ (mfp->mf_fd < 0 && need_release && p_uc)
     {
 	// find for which buffer this memfile is
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp == mfp)
-		break;
-	if (buf != NULL && buf->b_may_swap)
+	    ఒకవేళ (buf->b_ml.ml_mfp == mfp)
+		ఆపు;
+	ఒకవేళ (buf != ఖాళీ && buf->b_may_మార్పిడి)
 	    ml_open_file(buf);
     }
 
@@ -788,42 +788,42 @@ mf_release(memfile_T *mfp, int page_count)
      *	  and
      *	total memory used is not up to 'maxmemtot'
      */
-    if (mfp->mf_fd < 0 || !need_release)
-	return NULL;
+    ఒకవేళ (mfp->mf_fd < 0 || !need_release)
+	తిరిగి ఖాళీ;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (!(hp->bh_flags & BH_LOCKED))
-	    break;
-    if (hp == NULL)	// not a single one that can be released
-	return NULL;
+    కొరకు (hp = mfp->mf_వాడిన_చివరి; hp != ఖాళీ; hp = hp->bh_prev)
+	ఒకవేళ (!(hp->bh_flags & BH_LOCKED))
+	    ఆపు;
+    ఒకవేళ (hp == ఖాళీ)	// not a single one that can be released
+	తిరిగి ఖాళీ;
 
     /*
      * If the block is dirty, write it.
      * If the write fails we don't free it.
      */
-    if ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
-	return NULL;
+    ఒకవేళ ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
+	తిరిగి ఖాళీ;
 
-    mf_rem_used(mfp, hp);
+    mf_rem_వాడిన(mfp, hp);
     mf_rem_hash(mfp, hp);
 
     /*
      * If a bhdr_T is returned, make sure that the page_count of bh_data is
      * right
      */
-    if (hp->bh_page_count != page_count)
+    ఒకవేళ (hp->bh_పుట_లెక్క != పుట_లెక్క)
     {
-	VIM_CLEAR(hp->bh_data);
-	if (page_count > 0)
-	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count);
-	if (hp->bh_data == NULL)
+	VIM_CLEAR(hp->bh_దత్తాంశం);
+	ఒకవేళ (పుట_లెక్క > 0)
+	    hp->bh_దత్తాంశం = alloc((size_t)mfp->mf_పుట_కొలత * పుట_లెక్క);
+	ఒకవేళ (hp->bh_దత్తాంశం == ఖాళీ)
 	{
 	    vim_free(hp);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	hp->bh_page_count = page_count;
+	hp->bh_పుట_లెక్క = పుట_లెక్క;
     }
-    return hp;
+    తిరిగి hp;
 }
 
 /*
@@ -832,99 +832,99 @@ mf_release(memfile_T *mfp, int page_count)
  *
  * return TRUE if any memory was released
  */
-    int
-mf_release_all(void)
+    పూర్ణాంకం
+mf_release_all(శూన్య)
 {
     buf_T	*buf;
     memfile_T	*mfp;
     bhdr_T	*hp;
-    int		retval = FALSE;
+    పూర్ణాంకం		retval = FALSE;
 
     FOR_ALL_BUFFERS(buf)
     {
 	mfp = buf->b_ml.ml_mfp;
-	if (mfp != NULL)
+	ఒకవేళ (mfp != ఖాళీ)
 	{
 	    // If no swap file yet, may open one
-	    if (mfp->mf_fd < 0 && buf->b_may_swap)
+	    ఒకవేళ (mfp->mf_fd < 0 && buf->b_may_మార్పిడి)
 		ml_open_file(buf);
 
 	    // only if there is a swapfile
-	    if (mfp->mf_fd >= 0)
+	    ఒకవేళ (mfp->mf_fd >= 0)
 	    {
-		for (hp = mfp->mf_used_last; hp != NULL; )
+		కొరకు (hp = mfp->mf_వాడిన_చివరి; hp != ఖాళీ; )
 		{
-		    if (!(hp->bh_flags & BH_LOCKED)
+		    ఒకవేళ (!(hp->bh_flags & BH_LOCKED)
 			    && (!(hp->bh_flags & BH_DIRTY)
 				|| mf_write(mfp, hp) != FAIL))
 		    {
-			mf_rem_used(mfp, hp);
+			mf_rem_వాడిన(mfp, hp);
 			mf_rem_hash(mfp, hp);
 			mf_free_bhdr(hp);
-			hp = mfp->mf_used_last;	// re-start, list was changed
+			hp = mfp->mf_వాడిన_చివరి;	// re-start, list was changed
 			retval = TRUE;
 		    }
-		    else
+		    లేకపోతే
 			hp = hp->bh_prev;
 		}
 	    }
 	}
     }
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Allocate a block header and a block of memory for it.
  */
-    static bhdr_T *
-mf_alloc_bhdr(memfile_T *mfp, int page_count)
+    స్థిర bhdr_T *
+mf_alloc_bhdr(memfile_T *mfp, పూర్ణాంకం పుట_లెక్క)
 {
     bhdr_T	*hp;
 
-    if ((hp = ALLOC_ONE(bhdr_T)) == NULL)
-	return NULL;
+    ఒకవేళ ((hp = ALLOC_ONE(bhdr_T)) == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+    ఒకవేళ ((hp->bh_దత్తాంశం = alloc((size_t)mfp->mf_పుట_కొలత * పుట_లెక్క)) == ఖాళీ)
     {
 	vim_free(hp);	    // not enough memory
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    hp->bh_page_count = page_count;
-    return hp;
+    hp->bh_పుట_లెక్క = పుట_లెక్క;
+    తిరిగి hp;
 }
 
 /*
  * Free a block header and the block of memory for it.
  */
-    static void
+    స్థిర శూన్య
 mf_free_bhdr(bhdr_T *hp)
 {
-    vim_free(hp->bh_data);
+    vim_free(hp->bh_దత్తాంశం);
     vim_free(hp);
 }
 
 /*
  * Insert entry *hp in the free list.
  */
-    static void
+    స్థిర శూన్య
 mf_ins_free(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_free_first;
-    mfp->mf_free_first = hp;
+    hp->bh_తదుపరి = mfp->mf_free_మొదటి;
+    mfp->mf_free_మొదటి = hp;
 }
 
 /*
  * remove the first entry from the free list and return a pointer to it
  * Note: caller must check that mfp->mf_free_first is not NULL!
  */
-    static bhdr_T *
+    స్థిర bhdr_T *
 mf_rem_free(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    hp = mfp->mf_free_first;
-    mfp->mf_free_first = hp->bh_next;
-    return hp;
+    hp = mfp->mf_free_మొదటి;
+    mfp->mf_free_మొదటి = hp->bh_తదుపరి;
+    తిరిగి hp;
 }
 
 /*
@@ -932,38 +932,38 @@ mf_rem_free(memfile_T *mfp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    స్థిర పూర్ణాంకం
 mf_read(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;
-    unsigned	page_size;
-    unsigned	size;
+    off_T	స్థానభ్రంశం;
+    గుర్తులేని	పుట_కొలత;
+    గుర్తులేని	కొలత;
 
-    if (mfp->mf_fd < 0)	    // there is no file, can't read
-	return FAIL;
+    ఒకవేళ (mfp->mf_fd < 0)	    // there is no file, can't read
+	తిరిగి FAIL;
 
-    page_size = mfp->mf_page_size;
-    offset = (off_T)page_size * hp->bh_bnum;
-    size = page_size * hp->bh_page_count;
-    if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+    పుట_కొలత = mfp->mf_పుట_కొలత;
+    స్థానభ్రంశం = (off_T)పుట_కొలత * hp->bh_bnum;
+    కొలత = పుట_కొలత * hp->bh_పుట_లెక్క;
+    ఒకవేళ (vim_lseek(mfp->mf_fd, స్థానభ్రంశం, SEEK_SET) != స్థానభ్రంశం)
     {
-	PERROR(_(e_seek_error_in_swap_file_read));
-	return FAIL;
+	PERROR(_(e_seek_error_లోపల_మార్పిడి_file_read));
+	తిరిగి FAIL;
     }
-    if ((unsigned)read_eintr(mfp->mf_fd, hp->bh_data, size) != size)
+    ఒకవేళ ((గుర్తులేని)read_eintr(mfp->mf_fd, hp->bh_దత్తాంశం, కొలత) != కొలత)
     {
-	PERROR(_(e_read_error_in_swap_file));
-	return FAIL;
+	PERROR(_(e_read_error_లోపల_మార్పిడి_file));
+	తిరిగి FAIL;
     }
 
-#ifdef FEAT_CRYPT
+#నిర్వచితమైతే FEAT_CRYPT
     // Decrypt if 'key' is set and this is a data block. And when changing the
     // key.
-    if (*mfp->mf_buffer->b_p_key != NUL || mfp->mf_old_key != NULL)
-	ml_decrypt_data(mfp, hp->bh_data, offset, size);
-#endif
+    ఒకవేళ (*mfp->mf_బఫరు->b_p_కీలకం != NUL || mfp->mf_old_కీలకం != ఖాళీ)
+	ml_decrypt_దత్తాంశం(mfp, hp->bh_దత్తాంశం, స్థానభ్రంశం, కొలత);
+#అయితే_ముగింపు
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -971,25 +971,25 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    స్థిర పూర్ణాంకం
 mf_write(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;	    // offset in the file
+    off_T	స్థానభ్రంశం;	    // offset in the file
     blocknr_T	nr;	    // block nr which is being written
     bhdr_T	*hp2;
-    unsigned	page_size;  // number of bytes in a page
-    unsigned	page_count; // number of pages written
-    unsigned	size;	    // number of bytes written
+    గుర్తులేని	పుట_కొలత;  // number of bytes in a page
+    గుర్తులేని	పుట_లెక్క; // number of pages written
+    గుర్తులేని	కొలత;	    // number of bytes written
 
-    if (mfp->mf_fd < 0 && !mfp->mf_reopen)
+    ఒకవేళ (mfp->mf_fd < 0 && !mfp->mf_reopen)
 	// there is no file and there was no file, can't write
-	return FAIL;
+	తిరిగి FAIL;
 
-    if (hp->bh_bnum < 0)	// must assign file block number
-	if (mf_trans_add(mfp, hp) == FAIL)
-	    return FAIL;
+    ఒకవేళ (hp->bh_bnum < 0)	// must assign file block number
+	ఒకవేళ (mf_trans_కూడు(mfp, hp) == FAIL)
+	    తిరిగి FAIL;
 
-    page_size = mfp->mf_page_size;
+    పుట_కొలత = mfp->mf_పుట_కొలత;
 
     /*
      * We don't want gaps in the file. Write the blocks in front of *hp
@@ -997,73 +997,73 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
      * If block 'mf_infile_count' is not in the hash list, it has been
      * freed. Fill the space in the file with data from the current block.
      */
-    for (;;)
+    కొరకు (;;)
     {
-	int attempt;
+	పూర్ణాంకం attempt;
 
 	nr = hp->bh_bnum;
-	if (nr > mfp->mf_infile_count)		// beyond end of file
+	ఒకవేళ (nr > mfp->mf_infile_లెక్క)		// beyond end of file
 	{
-	    nr = mfp->mf_infile_count;
-	    hp2 = mf_find_hash(mfp, nr);	// NULL caught below
+	    nr = mfp->mf_infile_లెక్క;
+	    hp2 = mf_కనుగొను_hash(mfp, nr);	// NULL caught below
 	}
-	else
+	లేకపోతే
 	    hp2 = hp;
 
-	offset = (off_T)page_size * nr;
-	if (hp2 == NULL)	    // freed block, fill with dummy data
-	    page_count = 1;
-	else
-	    page_count = hp2->bh_page_count;
-	size = page_size * page_count;
+	స్థానభ్రంశం = (off_T)పుట_కొలత * nr;
+	ఒకవేళ (hp2 == ఖాళీ)	    // freed block, fill with dummy data
+	    పుట_లెక్క = 1;
+	లేకపోతే
+	    పుట_లెక్క = hp2->bh_పుట_లెక్క;
+	కొలత = పుట_కొలత * పుట_లెక్క;
 
-	for (attempt = 1; attempt <= 2; ++attempt)
+	కొరకు (attempt = 1; attempt <= 2; ++attempt)
 	{
-	    if (mfp->mf_fd >= 0)
+	    ఒకవేళ (mfp->mf_fd >= 0)
 	    {
-		if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+		ఒకవేళ (vim_lseek(mfp->mf_fd, స్థానభ్రంశం, SEEK_SET) != స్థానభ్రంశం)
 		{
-		    PERROR(_(e_seek_error_in_swap_file_write));
-		    return FAIL;
+		    PERROR(_(e_seek_error_లోపల_మార్పిడి_file_write));
+		    తిరిగి FAIL;
 		}
-		if (mf_write_block(mfp,
-				   hp2 == NULL ? hp : hp2, offset, size) == OK)
-		    break;
+		ఒకవేళ (mf_write_ఖండం(mfp,
+				   hp2 == ఖాళీ ? hp : hp2, స్థానభ్రంశం, కొలత) == OK)
+		    ఆపు;
 	    }
 
-	    if (attempt == 1)
+	    ఒకవేళ (attempt == 1)
 	    {
 		// If the swap file is on a network drive, and the network
 		// gets disconnected and then re-connected, we can maybe fix it
 		// by closing and then re-opening the file.
-		if (mfp->mf_fd >= 0)
+		ఒకవేళ (mfp->mf_fd >= 0)
 		    close(mfp->mf_fd);
-		mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, mfp->mf_flags);
+		mfp->mf_fd = mch_open_rw((అక్షరం *)mfp->mf_fname, mfp->mf_flags);
 		mfp->mf_reopen = (mfp->mf_fd < 0);
 	    }
-	    if (attempt == 2 || mfp->mf_fd < 0)
+	    ఒకవేళ (attempt == 2 || mfp->mf_fd < 0)
 	    {
 		// Avoid repeating the error message, this mostly happens when
 		// the disk is full. We give the message again only after a
 		// successful write or when hitting a key. We keep on trying,
 		// in case some space becomes available.
-		if (!did_swapwrite_msg)
-		    emsg(_(e_write_error_in_swap_file));
-		did_swapwrite_msg = TRUE;
-		return FAIL;
+		ఒకవేళ (!did_swapwrite_సందేశం)
+		    emsg(_(e_write_error_లోపల_మార్పిడి_file));
+		did_swapwrite_సందేశం = TRUE;
+		తిరిగి FAIL;
 	    }
 	}
 
-	did_swapwrite_msg = FALSE;
-	if (hp2 != NULL)		    // written a non-dummy block
+	did_swapwrite_సందేశం = FALSE;
+	ఒకవేళ (hp2 != ఖాళీ)		    // written a non-dummy block
 	    hp2->bh_flags &= ~BH_DIRTY;
 					    // appended to the file
-	if (nr + (blocknr_T)page_count > mfp->mf_infile_count)
-	    mfp->mf_infile_count = nr + page_count;
-	if (nr == hp->bh_bnum)		    // written the desired block
-	    break;
+	ఒకవేళ (nr + (blocknr_T)పుట_లెక్క > mfp->mf_infile_లెక్క)
+	    mfp->mf_infile_లెక్క = nr + పుట_లెక్క;
+	ఒకవేళ (nr == hp->bh_bnum)		    // written the desired block
+	    ఆపు;
     }
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1071,35 +1071,35 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
  * Takes care of encryption.
  * Return FAIL or OK.
  */
-    static int
-mf_write_block(
+    స్థిర పూర్ణాంకం
+mf_write_ఖండం(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    off_T	offset UNUSED,
-    unsigned	size)
+    off_T	స్థానభ్రంశం వాడని,
+    గుర్తులేని	కొలత)
 {
-    char_u	*data = hp->bh_data;
-    int		result = OK;
+    char_u	*దత్తాంశం = hp->bh_దత్తాంశం;
+    పూర్ణాంకం		ఫలితం = OK;
 
-#ifdef FEAT_CRYPT
+#నిర్వచితమైతే FEAT_CRYPT
     // Encrypt if 'key' is set and this is a data block.
-    if (*mfp->mf_buffer->b_p_key != NUL)
+    ఒకవేళ (*mfp->mf_బఫరు->b_p_కీలకం != NUL)
     {
-	data = ml_encrypt_data(mfp, data, offset, size);
-	if (data == NULL)
-	    return FAIL;
+	దత్తాంశం = ml_encrypt_దత్తాంశం(mfp, దత్తాంశం, స్థానభ్రంశం, కొలత);
+	ఒకవేళ (దత్తాంశం == ఖాళీ)
+	    తిరిగి FAIL;
     }
-#endif
+#అయితే_ముగింపు
 
-    if ((unsigned)write_eintr(mfp->mf_fd, data, size) != size)
-	result = FAIL;
+    ఒకవేళ ((గుర్తులేని)write_eintr(mfp->mf_fd, దత్తాంశం, కొలత) != కొలత)
+	ఫలితం = FAIL;
 
-#ifdef FEAT_CRYPT
-    if (data != hp->bh_data)
-	vim_free(data);
-#endif
+#నిర్వచితమైతే FEAT_CRYPT
+    ఒకవేళ (దత్తాంశం != hp->bh_దత్తాంశం)
+	vim_free(దత్తాంశం);
+#అయితే_ముగింపు
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /*
@@ -1107,49 +1107,49 @@ mf_write_block(
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
-mf_trans_add(memfile_T *mfp, bhdr_T *hp)
+    స్థిర పూర్ణాంకం
+mf_trans_కూడు(memfile_T *mfp, bhdr_T *hp)
 {
     bhdr_T	*freep;
     blocknr_T	new_bnum;
     NR_TRANS	*np;
-    int		page_count;
+    పూర్ణాంకం		పుట_లెక్క;
 
-    if (hp->bh_bnum >= 0)		    // it's already positive
-	return OK;
+    ఒకవేళ (hp->bh_bnum >= 0)		    // it's already positive
+	తిరిగి OK;
 
-    if ((np = ALLOC_ONE(NR_TRANS)) == NULL)
-	return FAIL;
+    ఒకవేళ ((np = ALLOC_ONE(NR_TRANS)) == ఖాళీ)
+	తిరిగి FAIL;
 
 /*
  * Get a new number for the block.
  * If the first item in the free list has sufficient pages, use its number
  * Otherwise use mf_blocknr_max.
  */
-    freep = mfp->mf_free_first;
-    page_count = hp->bh_page_count;
-    if (freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_మొదటి;
+    పుట_లెక్క = hp->bh_పుట_లెక్క;
+    ఒకవేళ (freep != ఖాళీ && freep->bh_పుట_లెక్క >= పుట_లెక్క)
     {
 	new_bnum = freep->bh_bnum;
 	/*
 	 * If the page count of the free block was larger, reduce it.
 	 * If the page count matches, remove the block from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	ఒకవేళ (freep->bh_పుట_లెక్క > పుట_లెక్క)
 	{
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += పుట_లెక్క;
+	    freep->bh_పుట_లెక్క -= పుట_లెక్క;
 	}
-	else
+	లేకపోతే
 	{
 	    freep = mf_rem_free(mfp);
 	    vim_free(freep);
 	}
     }
-    else
+    లేకపోతే
     {
 	new_bnum = mfp->mf_blocknr_max;
-	mfp->mf_blocknr_max += page_count;
+	mfp->mf_blocknr_max += పుట_లెక్క;
     }
 
     np->nt_old_bnum = hp->bh_bnum;	    // adjust number
@@ -1160,9 +1160,9 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     mf_ins_hash(mfp, hp);		    // insert in new hash list
 
     // Insert "np" into "mf_trans" hashtable with key "np->nt_old_bnum"
-    mf_hash_add_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_కూడు_అంశం(&mfp->mf_trans, (mf_hashitem_T *)np);
 
-    return OK;
+    తిరిగి OK;
 }
 
 /*
@@ -1176,20 +1176,20 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
     NR_TRANS	*np;
     blocknr_T	new_bnum;
 
-    np = (NR_TRANS *)mf_hash_find(&mfp->mf_trans, old_nr);
+    np = (NR_TRANS *)mf_hash_కనుగొను(&mfp->mf_trans, old_nr);
 
-    if (np == NULL)		// not found
-	return old_nr;
+    ఒకవేళ (np == ఖాళీ)		// not found
+	తిరిగి old_nr;
 
-    mfp->mf_neg_count--;
+    mfp->mf_neg_లెక్క--;
     new_bnum = np->nt_new_bnum;
 
     // remove entry from the trans list
-    mf_hash_rem_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_rem_అంశం(&mfp->mf_trans, (mf_hashitem_T *)np);
 
     vim_free(np);
 
-    return new_bnum;
+    తిరిగి new_bnum;
 }
 
 /*
@@ -1197,34 +1197,34 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
  * Only called when creating or renaming the swapfile.	Either way it's a new
  * name so we must work out the full path name.
  */
-    void
-mf_set_ffname(memfile_T *mfp)
+    శూన్య
+mf_సమితి_ffname(memfile_T *mfp)
 {
-    mfp->mf_ffname = FullName_save(mfp->mf_fname, FALSE);
+    mfp->mf_ffname = నిండిన_Name_save(mfp->mf_fname, FALSE);
 }
 
 /*
  * Make the name of the file used for the memfile a full path.
  * Used before doing a :cd
  */
-    void
+    శూన్య
 mf_fullname(memfile_T *mfp)
 {
-    if (mfp == NULL || mfp->mf_fname == NULL || mfp->mf_ffname == NULL)
-	return;
+    ఒకవేళ (mfp == ఖాళీ || mfp->mf_fname == ఖాళీ || mfp->mf_ffname == ఖాళీ)
+	తిరిగి;
 
     vim_free(mfp->mf_fname);
     mfp->mf_fname = mfp->mf_ffname;
-    mfp->mf_ffname = NULL;
+    mfp->mf_ffname = ఖాళీ;
 }
 
 /*
  * return TRUE if there are any translations pending for 'mfp'
  */
-    int
+    పూర్ణాంకం
 mf_need_trans(memfile_T *mfp)
 {
-    return (mfp->mf_fname != NULL && mfp->mf_neg_count > 0);
+    తిరిగి (mfp->mf_fname != ఖాళీ && mfp->mf_neg_లెక్క > 0);
 }
 
 /*
@@ -1232,15 +1232,15 @@ mf_need_trans(memfile_T *mfp)
  * The "fname" must be in allocated memory, and is consumed (also when an
  * error occurs).
  */
-    static void
+    స్థిర శూన్య
 mf_do_open(
     memfile_T	*mfp,
     char_u	*fname,
-    int		flags)		// flags for open()
+    పూర్ణాంకం		flags)		// flags for open()
 {
-#ifdef HAVE_LSTAT
+#నిర్వచితమైతే HAVE_LSTAT
     stat_T	sb;
-#endif
+#అయితే_ముగింపు
 
     mfp->mf_fname = fname;
 
@@ -1249,60 +1249,60 @@ mf_do_open(
      * not possible after the open on the Amiga.
      * fname cannot be NameBuff, because it must have been allocated.
      */
-    mf_set_ffname(mfp);
-#if defined(MSWIN)
+    mf_సమితి_ffname(mfp);
+#ఒకవేళ defined(MSWIN)
     /*
      * A ":!cd e:xxx" may change the directory without us knowing, use the
      * full pathname always.  Careful: This frees fname!
      */
     mf_fullname(mfp);
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_LSTAT
+#నిర్వచితమైతే HAVE_LSTAT
     /*
      * Extra security check: When creating a swap file it really shouldn't
      * exist yet.  If there is a symbolic link, this is most likely an attack.
      */
-    if ((flags & O_CREAT) && mch_lstat((char *)mfp->mf_fname, &sb) >= 0)
+    ఒకవేళ ((flags & O_CREAT) && mch_lstat((అక్షరం *)mfp->mf_fname, &sb) >= 0)
     {
 	mfp->mf_fd = -1;
-	emsg(_(e_swap_file_already_exists_symlink_attack));
+	emsg(_(e_మార్పిడి_file_already_exists_symlink_attack));
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
 	/*
 	 * try to open the file
 	 */
 	flags |= O_EXTRA | O_NOFOLLOW;
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// Prevent handle inheritance that cause problems with Cscope
 	// (swap file may not be deleted if cscope connection was open after
 	// the file)
 	flags |= O_NOINHERIT;
-#endif
+#అయితే_ముగింపు
 	mfp->mf_flags = flags;
-	mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, flags);
+	mfp->mf_fd = mch_open_rw((అక్షరం *)mfp->mf_fname, flags);
     }
 
     /*
      * If the file cannot be opened, use memory only
      */
-    if (mfp->mf_fd < 0)
+    ఒకవేళ (mfp->mf_fd < 0)
     {
 	VIM_CLEAR(mfp->mf_fname);
 	VIM_CLEAR(mfp->mf_ffname);
     }
-    else
+    లేకపోతే
     {
-#ifdef HAVE_FD_CLOEXEC
-	int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+#నిర్వచితమైతే HAVE_FD_CLOEXEC
+	పూర్ణాంకం fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	ఒకవేళ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (శూన్య)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+#అయితే_ముగింపు
+#ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	mch_copy_sec(fname, mfp->mf_fname);
-#endif
+#అయితే_ముగింపు
 	mch_hide(mfp->mf_fname);    // try setting the 'hidden' flag
     }
 }
@@ -1316,45 +1316,45 @@ mf_do_open(
  * MHT_GROWTH_FACTOR when the average number of items per bucket
  * exceeds 2 ^ MHT_LOG_LOAD_FACTOR.
  */
-#define MHT_LOG_LOAD_FACTOR 6
-#define MHT_GROWTH_FACTOR   2   // must be a power of two
+#నిర్వచించు MHT_LOG_ఎక్కించు_గుణకం 6
+#నిర్వచించు MHT_GROWTH_గుణకం   2   // must be a power of two
 
 /*
  * Initialize an empty hash table.
  */
-    static void
+    స్థిర శూన్య
 mf_hash_init(mf_hashtab_T *mht)
 {
-    CLEAR_POINTER(mht);
+    CLEAR_సూచిక(mht);
     mht->mht_buckets = mht->mht_small_buckets;
-    mht->mht_mask = MHT_INIT_SIZE - 1;
+    mht->mht_ముసుగు = MHT_INIT_కొలత - 1;
 }
 
 /*
  * Free the array of a hash table.  Does not free the items it contains!
  * The hash table must not be used again without another mf_hash_init() call.
  */
-    static void
+    స్థిర శూన్య
 mf_hash_free(mf_hashtab_T *mht)
 {
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    ఒకవేళ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 }
 
 /*
  * Free the array of a hash table and all the items it contains.
  */
-    static void
+    స్థిర శూన్య
 mf_hash_free_all(mf_hashtab_T *mht)
 {
     long_u	    idx;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *next;
+    mf_hashitem_T   *తదుపరి;
 
-    for (idx = 0; idx <= mht->mht_mask; idx++)
-	for (mhi = mht->mht_buckets[idx]; mhi != NULL; mhi = next)
+    కొరకు (idx = 0; idx <= mht->mht_ముసుగు; idx++)
+	కొరకు (mhi = mht->mht_buckets[idx]; mhi != ఖాళీ; mhi = తదుపరి)
 	{
-	    next = mhi->mhi_next;
+	    తదుపరి = mhi->mhi_తదుపరి;
 	    vim_free(mhi);
 	}
 
@@ -1365,44 +1365,44 @@ mf_hash_free_all(mf_hashtab_T *mht)
  * Find "key" in hashtable "mht".
  * Returns a pointer to a mf_hashitem_T or NULL if the item was not found.
  */
-    static mf_hashitem_T *
-mf_hash_find(mf_hashtab_T *mht, blocknr_T key)
+    స్థిర mf_hashitem_T *
+mf_hash_కనుగొను(mf_hashtab_T *mht, blocknr_T కీలకం)
 {
     mf_hashitem_T   *mhi;
 
-    mhi = mht->mht_buckets[key & mht->mht_mask];
-    while (mhi != NULL && mhi->mhi_key != key)
-	mhi = mhi->mhi_next;
+    mhi = mht->mht_buckets[కీలకం & mht->mht_ముసుగు];
+    అయితే (mhi != ఖాళీ && mhi->mhi_కీలకం != కీలకం)
+	mhi = mhi->mhi_తదుపరి;
 
-    return mhi;
+    తిరిగి mhi;
 }
 
 /*
  * Add item "mhi" to hashtable "mht".
  * "mhi" must not be NULL.
  */
-    static void
-mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    స్థిర శూన్య
+mf_hash_కూడు_అంశం(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     long_u	    idx;
 
-    idx = mhi->mhi_key & mht->mht_mask;
-    mhi->mhi_next = mht->mht_buckets[idx];
-    mhi->mhi_prev = NULL;
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi;
+    idx = mhi->mhi_కీలకం & mht->mht_ముసుగు;
+    mhi->mhi_తదుపరి = mht->mht_buckets[idx];
+    mhi->mhi_prev = ఖాళీ;
+    ఒకవేళ (mhi->mhi_తదుపరి != ఖాళీ)
+	mhi->mhi_తదుపరి->mhi_prev = mhi;
     mht->mht_buckets[idx] = mhi;
 
-    mht->mht_count++;
+    mht->mht_లెక్క++;
 
     /*
      * Grow hashtable when we have more thank 2^MHT_LOG_LOAD_FACTOR
      * items per bucket on average
      */
-    if (mht->mht_fixed == 0
-	&& (mht->mht_count >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
+    ఒకవేళ (mht->mht_fixed == 0
+	&& (mht->mht_లెక్క >> MHT_LOG_ఎక్కించు_గుణకం) > mht->mht_ముసుగు)
     {
-	if (mf_hash_grow(mht) == FAIL)
+	ఒకవేళ (mf_hash_grow(mht) == FAIL)
 	{
 	    // stop trying to grow after first failure to allocate memory
 	    mht->mht_fixed = 1;
@@ -1414,18 +1414,18 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * Remove item "mhi" from hashtable "mht".
  * "mhi" must not be NULL and must have been inserted into "mht".
  */
-    static void
-mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    స్థిర శూన్య
+mf_hash_rem_అంశం(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
-    if (mhi->mhi_prev == NULL)
-	mht->mht_buckets[mhi->mhi_key & mht->mht_mask] = mhi->mhi_next;
-    else
-	mhi->mhi_prev->mhi_next = mhi->mhi_next;
+    ఒకవేళ (mhi->mhi_prev == ఖాళీ)
+	mht->mht_buckets[mhi->mhi_కీలకం & mht->mht_ముసుగు] = mhi->mhi_తదుపరి;
+    లేకపోతే
+	mhi->mhi_prev->mhi_తదుపరి = mhi->mhi_తదుపరి;
 
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi->mhi_prev;
+    ఒకవేళ (mhi->mhi_తదుపరి != ఖాళీ)
+	mhi->mhi_తదుపరి->mhi_prev = mhi->mhi_prev;
 
-    mht->mht_count--;
+    mht->mht_లెక్క--;
 
     // We could shrink the table here, but it typically takes little memory,
     // so why bother?
@@ -1436,26 +1436,26 @@ mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * rehash items.
  * Returns FAIL when out of memory.
  */
-    static int
+    స్థిర పూర్ణాంకం
 mf_hash_grow(mf_hashtab_T *mht)
 {
     long_u	    i, j;
-    int		    shift;
+    పూర్ణాంకం		    జరుపు;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *tails[MHT_GROWTH_FACTOR];
+    mf_hashitem_T   *tails[MHT_GROWTH_గుణకం];
     mf_hashitem_T   **buckets;
-    size_t	    size;
+    size_t	    కొలత;
 
-    size = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR * sizeof(void *);
-    buckets = lalloc_clear(size, FALSE);
-    if (buckets == NULL)
-	return FAIL;
+    కొలత = (mht->mht_ముసుగు + 1) * MHT_GROWTH_గుణకం * పరిమాణం(శూన్య *);
+    buckets = lalloc_clear(కొలత, FALSE);
+    ఒకవేళ (buckets == ఖాళీ)
+	తిరిగి FAIL;
 
-    shift = 0;
-    while ((mht->mht_mask >> shift) != 0)
-	shift++;
+    జరుపు = 0;
+    అయితే ((mht->mht_ముసుగు >> జరుపు) != 0)
+	జరుపు++;
 
-    for (i = 0; i <= mht->mht_mask; i++)
+    కొరకు (i = 0; i <= mht->mht_ముసుగు; i++)
     {
 	/*
 	 * Traverse the items in the i-th original bucket and move them into
@@ -1468,35 +1468,35 @@ mf_hash_grow(mf_hashtab_T *mht)
 	 * a power of two.
 	 */
 
-	CLEAR_FIELD(tails);
+	CLEAR_క్షేత్రం(tails);
 
-	for (mhi = mht->mht_buckets[i]; mhi != NULL; mhi = mhi->mhi_next)
+	కొరకు (mhi = mht->mht_buckets[i]; mhi != ఖాళీ; mhi = mhi->mhi_తదుపరి)
 	{
-	    j = (mhi->mhi_key >> shift) & (MHT_GROWTH_FACTOR - 1);
-	    if (tails[j] == NULL)
+	    j = (mhi->mhi_కీలకం >> జరుపు) & (MHT_GROWTH_గుణకం - 1);
+	    ఒకవేళ (tails[j] == ఖాళీ)
 	    {
-		buckets[i + (j << shift)] = mhi;
+		buckets[i + (j << జరుపు)] = mhi;
 		tails[j] = mhi;
-		mhi->mhi_prev = NULL;
+		mhi->mhi_prev = ఖాళీ;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		tails[j]->mhi_next = mhi;
+		tails[j]->mhi_తదుపరి = mhi;
 		mhi->mhi_prev = tails[j];
 		tails[j] = mhi;
 	    }
 	}
 
-	for (j = 0; j < MHT_GROWTH_FACTOR; j++)
-	    if (tails[j] != NULL)
-		tails[j]->mhi_next = NULL;
+	కొరకు (j = 0; j < MHT_GROWTH_గుణకం; j++)
+	    ఒకవేళ (tails[j] != ఖాళీ)
+		tails[j]->mhi_తదుపరి = ఖాళీ;
     }
 
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    ఒకవేళ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 
     mht->mht_buckets = buckets;
-    mht->mht_mask = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR - 1;
+    mht->mht_ముసుగు = (mht->mht_ముసుగు + 1) * MHT_GROWTH_గుణకం - 1;
 
-    return OK;
+    తిరిగి OK;
 }

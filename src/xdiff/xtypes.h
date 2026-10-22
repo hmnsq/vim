@@ -20,43 +20,43 @@
  *
  */
 
-#if !defined(XTYPES_H)
-#define XTYPES_H
+#ఒకవేళ !defined(XTYPES_H)
+#నిర్వచించు XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
+రకనిర్వచనం నిర్మాణం s_chanode {
+	నిర్మాణం s_chanode *తదుపరి;
+	దీర్ఘ icurr;
 } chanode_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
-	long isize, nsize;
+రకనిర్వచనం నిర్మాణం s_chastore {
+	chanode_t *తల, *తోక;
+	దీర్ఘ isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
-	long scurr;
+	దీర్ఘ scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
-	unsigned long ha;
+రకనిర్వచనం నిర్మాణం s_xrecord {
+	అక్షరం స్థిరరాశి *ptr;
+	దీర్ఘ కొలత;
+	గుర్తులేని దీర్ఘ ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+రకనిర్వచనం నిర్మాణం s_xdfile {
 	xrecord_t *recs;
-	long nrec;
-	long dstart, dend;
-	bool *changed;
-	long *rindex;
-	long nreff;
+	దీర్ఘ nrec;
+	దీర్ఘ dstart, dend;
+	bool *మారింది;
+	దీర్ఘ *rindex;
+	దీర్ఘ nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+రకనిర్వచనం నిర్మాణం s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 
 
 
-#endif /* #if !defined(XTYPES_H) */
+#అయితే_ముగింపు /* #if !defined(XTYPES_H) */

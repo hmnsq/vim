@@ -6,9 +6,9 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifdef PROTO
+#నిర్వచితమైతే PROTO
 
 # define WINAPI
 
-#endif
+#అయితే_ముగింపు
 

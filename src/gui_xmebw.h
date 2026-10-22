@@ -17,56 +17,56 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef EnhancedB_H
-#define EnhancedB_H
+#నిర్వచితం_కాకపోతే EnhancedB_H
+#నిర్వచించు EnhancedB_H
 
 /*
  * New resources for the Extended Pushbutton widget
  */
 
-#ifndef XmNshift
+#నిర్వచితం_కాకపోతే XmNshift
 # define XmNshift		"shift"
-#endif
-#ifndef XmCShift
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే XmCShift
 # define XmCShift		"Shift"
-#endif
+#అయితే_ముగింపు
 
-#ifndef XmNlabelLocation
+#నిర్వచితం_కాకపోతే XmNlabelLocation
 # define XmNlabelLocation	"labelLocation"
-#endif
-#ifndef XmCLocation
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే XmCLocation
 # define XmCLocation		"Location"
-#endif
+#అయితే_ముగింపు
 
-#ifndef XmNpixmapData
-# define XmNpixmapData		"pixmapData"
-#endif
+#నిర్వచితం_కాకపోతే Xm_Npixmap_దత్తాంశం
+# define Xm_Npixmap_దత్తాంశం		"pixmapData"
+#అయితే_ముగింపు
 
-#ifndef XmNpixmapFile
+#నిర్వచితం_కాకపోతే XmNpixmapFile
 # define XmNpixmapFile		"pixmapFile"
-#endif
+#అయితే_ముగింపు
 
 /*
  * Constants for labelLocation.
  */
-#ifdef HAVE_XM_JOINSIDET_H
+#నిర్వచితమైతే HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+#లేకపోతే
+# define Xm_ఎడమ	    1
+# define Xm_కుడి    2
+# define Xm_శిఖరం	    3
 # define XmBOTTOM   4
-#endif
+#అయితే_ముగింపు
 
-#define XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
+#నిర్వచించు XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
 
 /*
  * Convenience creation function.
  */
-extern Widget XgCreateEPushButtonWidget(Widget, char *, ArgList, Cardinal);
+బాహ్య Widget XgCreateEPushButtonWidget(Widget, అక్షరం *, ArgList, Cardinal);
 
-extern WidgetClass xmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonRec *XmEnhancedButtonWidget;
+బాహ్య WidgetClass xmEnhancedButtonWidgetClass;
+రకనిర్వచనం నిర్మాణం _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
+రకనిర్వచనం నిర్మాణం _XmEnhancedButtonRec *XmEnhancedButtonWidget;
 
-#endif
+#అయితే_ముగింపు

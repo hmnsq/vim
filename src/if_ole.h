@@ -7,51 +7,51 @@
 //  Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 //  error checks: none
 //@@MIDL_FILE_HEADING(  )
-#include "rpc.h"
-#include "rpcndr.h"
-#ifndef COM_NO_WINDOWS_H
-#include "windows.h"
-#include "ole2.h"
-#endif //COM_NO_WINDOWS_H
+#అన్తర్భావ "rpc.h"
+#అన్తర్భావ "rpcndr.h"
+#నిర్వచితం_కాకపోతే COM_NO_WINDOWS_H
+#అన్తర్భావ "windows.h"
+#అన్తర్భావ "ole2.h"
+#అయితే_ముగింపు //COM_NO_WINDOWS_H
 
-#ifndef __if_ole_h__
-#define __if_ole_h__
+#నిర్వచితం_కాకపోతే __if_ole_h__
+#నిర్వచించు __if_ole_h__
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#నిర్వచితమైతే __cplusplus
+బాహ్య "C"{
+#అయితే_ముగింపు
 
 // Forward Declarations
 
-#ifndef __IVim_FWD_DEFINED__
-#define __IVim_FWD_DEFINED__
-typedef interface IVim IVim;
-#endif	// __IVim_FWD_DEFINED__
+#నిర్వచితం_కాకపోతే __IVim_FWD_DEFINED__
+#నిర్వచించు __IVim_FWD_DEFINED__
+రకనిర్వచనం interface IVim IVim;
+#అయితే_ముగింపు	// __IVim_FWD_DEFINED__
 
 
-#ifndef __Vim_FWD_DEFINED__
-#define __Vim_FWD_DEFINED__
+#నిర్వచితం_కాకపోతే __Vim_FWD_DEFINED__
+#నిర్వచించు __Vim_FWD_DEFINED__
 
-#ifdef __cplusplus
-typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
-#endif // __cplusplus
+#నిర్వచితమైతే __cplusplus
+రకనిర్వచనం class Vim Vim;
+#లేకపోతే
+రకనిర్వచనం నిర్మాణం Vim Vim;
+#అయితే_ముగింపు // __cplusplus
 
-#endif	// __Vim_FWD_DEFINED__
+#అయితే_ముగింపు	// __Vim_FWD_DEFINED__
 
 
 // header files for imported files
-#include "oaidl.h"
+#అన్తర్భావ "oaidl.h"
 
-#ifndef __MIDL_user_allocate_free_DEFINED__
-#define __MIDL_user_allocate_free_DEFINED__
-    void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-    void __RPC_USER MIDL_user_free( void __RPC_FAR * );
-#endif
+#నిర్వచితం_కాకపోతే __MIDL_user_allocate_free_DEFINED__
+#నిర్వచించు __MIDL_user_allocate_free_DEFINED__
+    శూన్య __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+    శూన్య __RPC_USER MIDL_user_free( శూన్య __RPC_FAR * );
+#అయితే_ముగింపు
 
-#ifndef __IVim_INTERFACE_DEFINED__
-#define __IVim_INTERFACE_DEFINED__
+#నిర్వచితం_కాకపోతే __IVim_INTERFACE_DEFINED__
+#నిర్వచించు __IVim_INTERFACE_DEFINED__
 
 //***************************************
 // Generated header for interface: IVim
@@ -62,46 +62,46 @@ typedef struct Vim Vim;
 
 
 
-EXTERN_C const IID IID_IVim;
+EXTERN_C స్థిరరాశి IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#ఒకవేళ defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
-    IVim : public IDispatch
+    IVim : బహిరంగ IDispatch
     {
-    public:
-	virtual HRESULT STDMETHODCALLTYPE SendKeys(
-	    /* [in] */ BSTR keys) = 0;
+    బహిరంగ:
+	మాయా HRESULT STDMETHODCALLTYPE Send_కీలకాలు(
+	    /* [in] */ BSTR కీలకాలు) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE Eval(
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
+	మాయా HRESULT STDMETHODCALLTYPE Eval(
+	    /* [in] */ BSTR సమాసం,
+	    /* [retval][out] */ BSTR __RPC_FAR *ఫలితం) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
+	మాయా HRESULT STDMETHODCALLTYPE సమితి_Foreground( శూన్య) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE GetHwnd(
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result) = 0;
+	మాయా HRESULT STDMETHODCALLTYPE GetHwnd(
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *ఫలితం) = 0;
 
     };
 
-#else	// C style interface
+#లేకపోతే	// C style interface
 
-    typedef struct IVimVtbl
+    రకనిర్వచనం నిర్మాణం IVimVtbl
     {
 	BEGIN_INTERFACE
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+	    /* [iid_is][out] */ శూన్య __RPC_FAR *__RPC_FAR *ppvObject);
 
-	ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
+	ULONG ( STDMETHODCALLTYPE __RPC_FAR *కూడు_Ref )(
 	    IVim __RPC_FAR * This);
 
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
 	    IVim __RPC_FAR * This);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetTypeInfoCount )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_Type_Info_లెక్క )(
 	    IVim __RPC_FAR * This,
 	    /* [out] */ UINT __RPC_FAR *pctinfo);
 
@@ -111,11 +111,11 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ LCID lcid,
 	    /* [out] */ ITypeInfo __RPC_FAR *__RPC_FAR *ppTInfo);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetIDsOfNames )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_IDs_యొక్క_పేర్లు )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgszNames,
-	    /* [in] */ UINT cNames,
+	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgsz_పేర్లు,
+	    /* [in] */ UINT c_పేర్లు,
 	    /* [in] */ LCID lcid,
 	    /* [size_is][out] */ DISPID __RPC_FAR *rgDispId);
 
@@ -124,136 +124,136 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ DISPID dispIdMember,
 	    /* [in] */ REFIID riid,
 	    /* [in] */ LCID lcid,
-	    /* [in] */ WORD wFlags,
+	    /* [in] */ మాట_2 wFlags,
 	    /* [out][in] */ DISPPARAMS __RPC_FAR *pDispParams,
-	    /* [out] */ VARIANT __RPC_FAR *pVarResult,
+	    /* [out] */ VARIANT __RPC_FAR *p_Var_ఫలితం,
 	    /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
 	    /* [out] */ UINT __RPC_FAR *puArgErr);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SendKeys )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Send_కీలకాలు )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR keys);
+	    /* [in] */ BSTR కీలకాలు);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Eval )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result);
+	    /* [in] */ BSTR సమాసం,
+	    /* [retval][out] */ BSTR __RPC_FAR *ఫలితం);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SetForeground )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *సమితి_Foreground )(
 	    IVim __RPC_FAR * This);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetHwnd )(
 	    IVim __RPC_FAR * This,
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *ఫలితం);
 
-	END_INTERFACE
+	చివర_INTERFACE
     } IVimVtbl;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL నిర్మాణం IVimVtbl __RPC_FAR *lpVtbl;
     };
 
-#ifdef COBJMACROS
+#నిర్వచితమైతే COBJMACROS
 
 
-#define IVim_QueryInterface(This,riid,ppvObject)	\
+#నిర్వచించు IVim_QueryInterface(This,riid,ppvObject)	\
     (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
 
-#define IVim_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+#నిర్వచించు IVim_కూడు_Ref(This)	\
+    (This)->lpVtbl -> కూడు_Ref(This)
 
-#define IVim_Release(This)	\
+#నిర్వచించు IVim_Release(This)	\
     (This)->lpVtbl -> Release(This)
 
 
-#define IVim_GetTypeInfoCount(This,pctinfo)	\
-    (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
+#నిర్వచించు IVim_Get_Type_Info_లెక్క(This,pctinfo)	\
+    (This)->lpVtbl -> Get_Type_Info_లెక్క(This,pctinfo)
 
-#define IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+#నిర్వచించు IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
 
-#define IVim_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
-    (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)
+#నిర్వచించు IVim_Get_IDs_యొక్క_పేర్లు(This,riid,rgsz_పేర్లు,c_పేర్లు,lcid,rgDispId)	\
+    (This)->lpVtbl -> Get_IDs_యొక్క_పేర్లు(This,riid,rgsz_పేర్లు,c_పేర్లు,lcid,rgDispId)
 
-#define IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
-    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
-
-
-#define IVim_SendKeys(This,keys)	\
-    (This)->lpVtbl -> SendKeys(This,keys)
-
-#define IVim_Eval(This,expr,result)	\
-    (This)->lpVtbl -> Eval(This,expr,result)
-
-#define IVim_SetForeground(This)	\
-    (This)->lpVtbl -> SetForeground(This)
-
-#define IVim_GetHwnd(This,result)	\
-    (This)->lpVtbl -> GetHwnd(This,result)
-
-#endif // COBJMACROS
+#నిర్వచించు IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_ఫలితం,pExcepInfo,puArgErr)	\
+    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_ఫలితం,pExcepInfo,puArgErr)
 
 
-#endif	// C style interface
+#నిర్వచించు IVim_Send_కీలకాలు(This,కీలకాలు)	\
+    (This)->lpVtbl -> Send_కీలకాలు(This,కీలకాలు)
+
+#నిర్వచించు IVim_Eval(This,సమాసం,ఫలితం)	\
+    (This)->lpVtbl -> Eval(This,సమాసం,ఫలితం)
+
+#నిర్వచించు IVim_సమితి_Foreground(This)	\
+    (This)->lpVtbl -> సమితి_Foreground(This)
+
+#నిర్వచించు IVim_GetHwnd(This,ఫలితం)	\
+    (This)->lpVtbl -> GetHwnd(This,ఫలితం)
+
+#అయితే_ముగింపు // COBJMACROS
+
+
+#అయితే_ముగింపు	// C style interface
 
 
 
-HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_Send_కీలకాలు_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR keys);
+    /* [in] */ BSTR కీలకాలు);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+శూన్య __RPC_STUB IVim_Send_కీలకాలు_Stub(
+    IRpc_Stub_బఫరు *This,
+    IRpc_Channel_బఫరు *p_Rpc_Channel_బఫరు,
+    PRPC_సందేశం p_Rpc_సందేశం,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR expr,
-    /* [retval][out] */ BSTR __RPC_FAR *result);
+    /* [in] */ BSTR సమాసం,
+    /* [retval][out] */ BSTR __RPC_FAR *ఫలితం);
 
 
-void __RPC_STUB IVim_Eval_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+శూన్య __RPC_STUB IVim_Eval_Stub(
+    IRpc_Stub_బఫరు *This,
+    IRpc_Channel_బఫరు *p_Rpc_Channel_బఫరు,
+    PRPC_సందేశం p_Rpc_సందేశం,
     DWORD *_pdwStubPhase);
 
 
-HRESULT STDMETHODCALLTYPE IVim_SetForeground_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_సమితి_Foreground_Proxy(
     IVim __RPC_FAR * This);
 
 
-void __RPC_STUB IVim_SetForeground_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+శూన్య __RPC_STUB IVim_సమితి_Foreground_Stub(
+    IRpc_Stub_బఫరు *This,
+    IRpc_Channel_బఫరు *p_Rpc_Channel_బఫరు,
+    PRPC_సందేశం p_Rpc_సందేశం,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_GetHwnd_Proxy(
     IVim __RPC_FAR * This,
-    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+    /* [retval][out] */ UINT_PTR __RPC_FAR *ఫలితం);
 
 
-void __RPC_STUB IVim_GetHwnd_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+శూన్య __RPC_STUB IVim_GetHwnd_Stub(
+    IRpc_Stub_బఫరు *This,
+    IRpc_Channel_బఫరు *p_Rpc_Channel_బఫరు,
+    PRPC_సందేశం p_Rpc_సందేశం,
     DWORD *_pdwStubPhase);
 
 
 
-#endif	// __IVim_INTERFACE_DEFINED__
+#అయితే_ముగింపు	// __IVim_INTERFACE_DEFINED__
 
 
 
-#ifndef __Vim_LIBRARY_DEFINED__
-#define __Vim_LIBRARY_DEFINED__
+#నిర్వచితం_కాకపోతే __Vim_LIBRARY_DEFINED__
+#నిర్వచించు __Vim_LIBRARY_DEFINED__
 
 //***************************************
 // Generated header for library: Vim
@@ -264,27 +264,27 @@ void __RPC_STUB IVim_GetHwnd_Stub(
 
 
 
-EXTERN_C const IID LIBID_Vim;
+EXTERN_C స్థిరరాశి IID LIBID_Vim;
 
-#ifdef __cplusplus
-EXTERN_C const CLSID CLSID_Vim;
+#నిర్వచితమైతే __cplusplus
+EXTERN_C స్థిరరాశి CLSID CLSID_Vim;
 
 class DECLSPEC_UUID("0F0BFAE1-4C90-11d1-82D7-0004AC368519")
 Vim;
-#endif
-#endif // __Vim_LIBRARY_DEFINED__
+#అయితే_ముగింపు
+#అయితే_ముగింపు // __Vim_LIBRARY_DEFINED__
 
 // Additional Prototypes for ALL interfaces
 
-unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
+గుర్తులేని దీర్ఘ		  __RPC_USER  BSTR_User_కొలత(	 గుర్తులేని దీర్ఘ __RPC_FAR *, గుర్తులేని దీర్ఘ	     , BSTR __RPC_FAR * );
+గుర్తులేని అక్షరం __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  గుర్తులేని దీర్ఘ __RPC_FAR *, గుర్తులేని అక్షరం __RPC_FAR *, BSTR __RPC_FAR * );
+గుర్తులేని అక్షరం __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(గుర్తులేని దీర్ఘ __RPC_FAR *, గుర్తులేని అక్షరం __RPC_FAR *, BSTR __RPC_FAR * );
+శూన్య			  __RPC_USER  BSTR_UserFree(	 గుర్తులేని దీర్ఘ __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes
 
-#ifdef __cplusplus
+#నిర్వచితమైతే __cplusplus
 }
-#endif
+#అయితే_ముగింపు
 
-#endif
+#అయితే_ముగింపు

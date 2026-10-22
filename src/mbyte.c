@@ -77,64 +77,64 @@
  * some commands, like ":menutrans"
  */
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
-#ifdef WIN32UNIX
-# ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
+#నిర్వచితమైతే WIN32UNIX
+# ifndef WIN32_LEAN_AND_సగటు
+#  define WIN32_LEAN_AND_సగటు
 # endif
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# ఒకవేళ defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 #  ifdef __CYGWIN__
     // ControlMask from <X11/X.h> (included in "vim.h") is conflicting with
     // <w32api/windows.h> (included in <X11/Xwindows.h>).
-#   undef ControlMask
+#   undef Control_ముసుగు
 #  endif
 #  include <X11/Xwindows.h>
 #  define WINBYTE wBYTE
-# else
+# లేకపోతే
 #  include <windows.h>
 #  define WINBYTE BYTE
 # endif
 # ifdef WIN32
 #  undef WIN32	    // Some windows.h define WIN32, we don't want that here.
 # endif
-#else
+#లేకపోతే
 # define WINBYTE BYTE
-#endif
+#అయితే_ముగింపు
 
-#if defined(MSWIN) || defined(WIN32UNIX)
+#ఒకవేళ defined(MSWIN) || defined(WIN32UNIX)
 # include <winnls.h>
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_GUI_X11
+#నిర్వచితమైతే FEAT_GUI_X11
 # include <X11/Intrinsic.h>
-#endif
-#ifdef X_LOCALE
+#అయితే_ముగింపు
+#నిర్వచితమైతే X_LOCALE
 # include <X11/Xlocale.h>
-# if !defined(HAVE_MBLEN) && !defined(mblen)
+# ఒకవేళ !defined(HAVE_MBLEN) && !defined(mblen)
 #  define mblen _Xmblen
 # endif
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_WCHAR_H
+#నిర్వచితమైతే HAVE_WCHAR_H
 # include <wchar.h>
-#endif
+#అయితే_ముగింపు
 
-static int dbcs_char2len(int c);
-static int dbcs_char2bytes(int c, char_u *buf);
-static int dbcs_ptr2len(char_u *p);
-static int dbcs_ptr2len_len(char_u *p, int size);
-static int utf_ptr2cells_len(char_u *p, int size);
-static int dbcs_char2cells(int c);
-static int dbcs_ptr2cells_len(char_u *p, int size);
-static int dbcs_ptr2char(char_u *p);
-static int dbcs_head_off(char_u *base, char_u *p);
-static inline int utf_ptr2char_and_len(char_u *p, int *lenp);
-static inline int utf_ptr2char_and_len_len(char_u *p, int size, int *lenp);
-static inline int utf_iscomposinglike_char(int c1, int c2);
-#ifdef FEAT_EVAL
-static int cw_value(int c);
-#endif
+స్థిర పూర్ణాంకం dbcs_char2len(పూర్ణాంకం c);
+స్థిర పూర్ణాంకం dbcs_char2bytes(పూర్ణాంకం c, char_u *buf);
+స్థిర పూర్ణాంకం dbcs_ptr2len(char_u *p);
+స్థిర పూర్ణాంకం dbcs_ptr2len_len(char_u *p, పూర్ణాంకం కొలత);
+స్థిర పూర్ణాంకం utf_ptr2cells_len(char_u *p, పూర్ణాంకం కొలత);
+స్థిర పూర్ణాంకం dbcs_char2cells(పూర్ణాంకం c);
+స్థిర పూర్ణాంకం dbcs_ptr2cells_len(char_u *p, పూర్ణాంకం కొలత);
+స్థిర పూర్ణాంకం dbcs_ptr2char(char_u *p);
+స్థిర పూర్ణాంకం dbcs_తల_off(char_u *పునాది, char_u *p);
+స్థిర అంతఃవరుస పూర్ణాంకం utf_ptr2char_and_len(char_u *p, పూర్ణాంకం *lenp);
+స్థిర అంతఃవరుస పూర్ణాంకం utf_ptr2char_and_len_len(char_u *p, పూర్ణాంకం కొలత, పూర్ణాంకం *lenp);
+స్థిర అంతఃవరుస పూర్ణాంకం utf_iscomposinglike_char(పూర్ణాంకం c1, పూర్ణాంకం c2);
+#నిర్వచితమైతే FEAT_EVAL
+స్థిర పూర్ణాంకం cw_విలువ(పూర్ణాంకం c);
+#అయితే_ముగింపు
 
 /*
  * Lookup table to quickly get the length in bytes of a UTF-8 character from
@@ -142,7 +142,7 @@ static int cw_value(int c);
  * Bytes which are illegal when used as the first byte have a 1.
  * The NUL byte has length 1.
  */
-static char utf8len_tab[256] =
+స్థిర అక్షరం utf8len_tab[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -157,7 +157,7 @@ static char utf8len_tab[256] =
 /*
  * Like utf8len_tab above, but using a zero for illegal lead bytes.
  */
-static char utf8len_tab_zero[256] =
+స్థిర అక్షరం utf8len_tab_zero[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -174,149 +174,149 @@ static char utf8len_tab_zero[256] =
  * Canonical encoding names and their properties.
  * "iso-8859-n" is handled by enc_canonize() directly.
  */
-static struct
-{   char *name;		int prop;		int codepage;}
-enc_canon_table[] =
+స్థిర నిర్మాణం
+{   అక్షరం *name;		పూర్ణాంకం prop;		పూర్ణాంకం codepage;}
+enc_canon_పట్టిక[] =
 {
-#define IDX_LATIN_1	0
-    {"latin1",		ENC_8BIT + ENC_LATIN1,	1252},
-#define IDX_ISO_2	1
-    {"iso-8859-2",	ENC_8BIT,		0},
-#define IDX_ISO_3	2
-    {"iso-8859-3",	ENC_8BIT,		0},
-#define IDX_ISO_4	3
-    {"iso-8859-4",	ENC_8BIT,		0},
-#define IDX_ISO_5	4
-    {"iso-8859-5",	ENC_8BIT,		0},
-#define IDX_ISO_6	5
-    {"iso-8859-6",	ENC_8BIT,		0},
-#define IDX_ISO_7	6
-    {"iso-8859-7",	ENC_8BIT,		0},
-#define IDX_ISO_8	7
-    {"iso-8859-8",	ENC_8BIT,		0},
-#define IDX_ISO_9	8
-    {"iso-8859-9",	ENC_8BIT,		0},
-#define IDX_ISO_10	9
-    {"iso-8859-10",	ENC_8BIT,		0},
-#define IDX_ISO_11	10
-    {"iso-8859-11",	ENC_8BIT,		0},
-#define IDX_ISO_13	11
-    {"iso-8859-13",	ENC_8BIT,		0},
-#define IDX_ISO_14	12
-    {"iso-8859-14",	ENC_8BIT,		0},
-#define IDX_ISO_15	13
-    {"iso-8859-15",	ENC_8BIT + ENC_LATIN9,	0},
-#define IDX_KOI8_R	14
-    {"koi8-r",		ENC_8BIT,		0},
-#define IDX_KOI8_U	15
-    {"koi8-u",		ENC_8BIT,		0},
-#define IDX_UTF8	16
+#నిర్వచించు IDX_LATIN_1	0
+    {"latin1",		ENC_8_బిట్టు + ENC_LATIN1,	1252},
+#నిర్వచించు IDX_ISO_2	1
+    {"iso-8859-2",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_3	2
+    {"iso-8859-3",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_4	3
+    {"iso-8859-4",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_5	4
+    {"iso-8859-5",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_6	5
+    {"iso-8859-6",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_7	6
+    {"iso-8859-7",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_8	7
+    {"iso-8859-8",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_9	8
+    {"iso-8859-9",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_10	9
+    {"iso-8859-10",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_11	10
+    {"iso-8859-11",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_13	11
+    {"iso-8859-13",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_14	12
+    {"iso-8859-14",	ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_ISO_15	13
+    {"iso-8859-15",	ENC_8_బిట్టు + ENC_LATIN9,	0},
+#నిర్వచించు IDX_KOI8_R	14
+    {"koi8-r",		ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_KOI8_U	15
+    {"koi8-u",		ENC_8_బిట్టు,		0},
+#నిర్వచించు IDX_UTF8	16
     {"utf-8",		ENC_UNICODE,		0},
-#define IDX_UCS2	17
+#నిర్వచించు IDX_UCS2	17
     {"ucs-2",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2BYTE, 0},
-#define IDX_UCS2LE	18
+#నిర్వచించు IDX_UCS2LE	18
     {"ucs-2le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_2BYTE, 0},
-#define IDX_UTF16	19
-    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16BE	20
-    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16LE	21
-    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2WORD, 0},
-#define IDX_UCS4	22
+#నిర్వచించు IDX_UTF16	19
+    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_మాట, 0},
+#నిర్వచించు IDX_UTF16BE	20
+    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_మాట, 0},
+#నిర్వచించు IDX_UTF16LE	21
+    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2_మాట, 0},
+#నిర్వచించు IDX_UCS4	22
     {"ucs-4",		ENC_UNICODE + ENC_ENDIAN_B + ENC_4BYTE, 0},
-#define IDX_UCS4LE	23
+#నిర్వచించు IDX_UCS4LE	23
     {"ucs-4le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_4BYTE, 0},
 
     // For debugging DBCS encoding on Unix.
-#define IDX_DEBUG	24
+#నిర్వచించు IDX_DEBUG	24
     {"debug",		ENC_DBCS,		DBCS_DEBUG},
-#define IDX_EUC_JP	25
+#నిర్వచించు IDX_EUC_JP	25
     {"euc-jp",		ENC_DBCS,		DBCS_JPNU},
-#define IDX_SJIS	26
+#నిర్వచించు IDX_SJIS	26
     {"sjis",		ENC_DBCS,		DBCS_JPN},
-#define IDX_EUC_KR	27
+#నిర్వచించు IDX_EUC_KR	27
     {"euc-kr",		ENC_DBCS,		DBCS_KORU},
-#define IDX_EUC_CN	28
+#నిర్వచించు IDX_EUC_CN	28
     {"euc-cn",		ENC_DBCS,		DBCS_CHSU},
-#define IDX_EUC_TW	29
+#నిర్వచించు IDX_EUC_TW	29
     {"euc-tw",		ENC_DBCS,		DBCS_CHTU},
-#define IDX_BIG5	30
+#నిర్వచించు IDX_BIG5	30
     {"big5",		ENC_DBCS,		DBCS_CHT},
 
     // MS-DOS and MS-Windows codepages are included here, so that they can be
     // used on Unix too.  Most of them are similar to ISO-8859 encodings, but
     // not exactly the same.
-#define IDX_CP437	31
-    {"cp437",		ENC_8BIT,		437}, // like iso-8859-1
-#define IDX_CP737	32
-    {"cp737",		ENC_8BIT,		737}, // like iso-8859-7
-#define IDX_CP775	33
-    {"cp775",		ENC_8BIT,		775}, // Baltic
-#define IDX_CP850	34
-    {"cp850",		ENC_8BIT,		850}, // like iso-8859-4
-#define IDX_CP852	35
-    {"cp852",		ENC_8BIT,		852}, // like iso-8859-1
-#define IDX_CP855	36
-    {"cp855",		ENC_8BIT,		855}, // like iso-8859-2
-#define IDX_CP857	37
-    {"cp857",		ENC_8BIT,		857}, // like iso-8859-5
-#define IDX_CP860	38
-    {"cp860",		ENC_8BIT,		860}, // like iso-8859-9
-#define IDX_CP861	39
-    {"cp861",		ENC_8BIT,		861}, // like iso-8859-1
-#define IDX_CP862	40
-    {"cp862",		ENC_8BIT,		862}, // like iso-8859-1
-#define IDX_CP863	41
-    {"cp863",		ENC_8BIT,		863}, // like iso-8859-8
-#define IDX_CP865	42
-    {"cp865",		ENC_8BIT,		865}, // like iso-8859-1
-#define IDX_CP866	43
-    {"cp866",		ENC_8BIT,		866}, // like iso-8859-5
-#define IDX_CP869	44
-    {"cp869",		ENC_8BIT,		869}, // like iso-8859-7
-#define IDX_CP874	45
-    {"cp874",		ENC_8BIT,		874}, // Thai
-#define IDX_CP932	46
+#నిర్వచించు IDX_CP437	31
+    {"cp437",		ENC_8_బిట్టు,		437}, // like iso-8859-1
+#నిర్వచించు IDX_CP737	32
+    {"cp737",		ENC_8_బిట్టు,		737}, // like iso-8859-7
+#నిర్వచించు IDX_CP775	33
+    {"cp775",		ENC_8_బిట్టు,		775}, // Baltic
+#నిర్వచించు IDX_CP850	34
+    {"cp850",		ENC_8_బిట్టు,		850}, // like iso-8859-4
+#నిర్వచించు IDX_CP852	35
+    {"cp852",		ENC_8_బిట్టు,		852}, // like iso-8859-1
+#నిర్వచించు IDX_CP855	36
+    {"cp855",		ENC_8_బిట్టు,		855}, // like iso-8859-2
+#నిర్వచించు IDX_CP857	37
+    {"cp857",		ENC_8_బిట్టు,		857}, // like iso-8859-5
+#నిర్వచించు IDX_CP860	38
+    {"cp860",		ENC_8_బిట్టు,		860}, // like iso-8859-9
+#నిర్వచించు IDX_CP861	39
+    {"cp861",		ENC_8_బిట్టు,		861}, // like iso-8859-1
+#నిర్వచించు IDX_CP862	40
+    {"cp862",		ENC_8_బిట్టు,		862}, // like iso-8859-1
+#నిర్వచించు IDX_CP863	41
+    {"cp863",		ENC_8_బిట్టు,		863}, // like iso-8859-8
+#నిర్వచించు IDX_CP865	42
+    {"cp865",		ENC_8_బిట్టు,		865}, // like iso-8859-1
+#నిర్వచించు IDX_CP866	43
+    {"cp866",		ENC_8_బిట్టు,		866}, // like iso-8859-5
+#నిర్వచించు IDX_CP869	44
+    {"cp869",		ENC_8_బిట్టు,		869}, // like iso-8859-7
+#నిర్వచించు IDX_CP874	45
+    {"cp874",		ENC_8_బిట్టు,		874}, // Thai
+#నిర్వచించు IDX_CP932	46
     {"cp932",		ENC_DBCS,		DBCS_JPN},
-#define IDX_CP936	47
+#నిర్వచించు IDX_CP936	47
     {"cp936",		ENC_DBCS,		DBCS_CHS},
-#define IDX_CP949	48
+#నిర్వచించు IDX_CP949	48
     {"cp949",		ENC_DBCS,		DBCS_KOR},
-#define IDX_CP950	49
+#నిర్వచించు IDX_CP950	49
     {"cp950",		ENC_DBCS,		DBCS_CHT},
-#define IDX_CP1250	50
-    {"cp1250",		ENC_8BIT,		1250}, // Czech, Polish, etc.
-#define IDX_CP1251	51
-    {"cp1251",		ENC_8BIT,		1251}, // Cyrillic
+#నిర్వచించు IDX_CP1250	50
+    {"cp1250",		ENC_8_బిట్టు,		1250}, // Czech, Polish, etc.
+#నిర్వచించు IDX_CP1251	51
+    {"cp1251",		ENC_8_బిట్టు,		1251}, // Cyrillic
     // cp1252 is considered to be equal to latin1
-#define IDX_CP1253	52
-    {"cp1253",		ENC_8BIT,		1253}, // Greek
-#define IDX_CP1254	53
-    {"cp1254",		ENC_8BIT,		1254}, // Turkish
-#define IDX_CP1255	54
-    {"cp1255",		ENC_8BIT,		1255}, // Hebrew
-#define IDX_CP1256	55
-    {"cp1256",		ENC_8BIT,		1256}, // Arabic
-#define IDX_CP1257	56
-    {"cp1257",		ENC_8BIT,		1257}, // Baltic
-#define IDX_CP1258	57
-    {"cp1258",		ENC_8BIT,		1258}, // Vietnamese
+#నిర్వచించు IDX_CP1253	52
+    {"cp1253",		ENC_8_బిట్టు,		1253}, // Greek
+#నిర్వచించు IDX_CP1254	53
+    {"cp1254",		ENC_8_బిట్టు,		1254}, // Turkish
+#నిర్వచించు IDX_CP1255	54
+    {"cp1255",		ENC_8_బిట్టు,		1255}, // Hebrew
+#నిర్వచించు IDX_CP1256	55
+    {"cp1256",		ENC_8_బిట్టు,		1256}, // Arabic
+#నిర్వచించు IDX_CP1257	56
+    {"cp1257",		ENC_8_బిట్టు,		1257}, // Baltic
+#నిర్వచించు IDX_CP1258	57
+    {"cp1258",		ENC_8_బిట్టు,		1258}, // Vietnamese
 
-#define IDX_MACROMAN	58
-    {"macroman",	ENC_8BIT + ENC_MACROMAN, 0},	// Mac OS
-#define IDX_DECMCS	59
-    {"dec-mcs",		ENC_8BIT,		0},	// DEC MCS
-#define IDX_HPROMAN8	60
-    {"hp-roman8",	ENC_8BIT,		0},	// HP Roman8
-#define IDX_COUNT	61
+#నిర్వచించు IDX_MACROMAN	58
+    {"macroman",	ENC_8_బిట్టు + ENC_MACROMAN, 0},	// Mac OS
+#నిర్వచించు IDX_DECMCS	59
+    {"dec-mcs",		ENC_8_బిట్టు,		0},	// DEC MCS
+#నిర్వచించు IDX_HPROMAN8	60
+    {"hp-roman8",	ENC_8_బిట్టు,		0},	// HP Roman8
+#నిర్వచించు IDX_లెక్క	61
 };
 
 /*
  * Aliases for encoding names.
  */
-static struct
-{   char *name;		int canon;}
-enc_alias_table[] =
+స్థిర నిర్మాణం
+{   అక్షరం *name;		పూర్ణాంకం canon;}
+enc_alias_పట్టిక[] =
 {
     {"ansi",		IDX_LATIN_1},
     {"iso-8859-1",	IDX_LATIN_1},
@@ -327,11 +327,11 @@ enc_alias_table[] =
     {"cyrillic",	IDX_ISO_5},
     {"arabic",		IDX_ISO_6},
     {"greek",		IDX_ISO_7},
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     {"hebrew",		IDX_CP1255},
-#else
+#లేకపోతే
     {"hebrew",		IDX_ISO_8},
-#endif
+#అయితే_ముగింపు
     {"latin5",		IDX_ISO_9},
     {"turkish",		IDX_ISO_9}, // ?
     {"latin6",		IDX_ISO_10},
@@ -375,14 +375,14 @@ enc_alias_table[] =
     {"euccn",		IDX_EUC_CN},
     {"gb2312",		IDX_EUC_CN},
     {"euctw",		IDX_EUC_TW},
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#ఒకవేళ defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
     {"japan",		IDX_CP932},
     {"korea",		IDX_CP949},
     {"prc",		IDX_CP936},
     {"chinese",		IDX_CP936},
     {"taiwan",		IDX_CP950},
     {"big5",		IDX_CP950},
-#else
+#లేకపోతే
     {"japan",		IDX_EUC_JP},
     {"korea",		IDX_EUC_KR},
     {"prc",		IDX_EUC_CN},
@@ -390,29 +390,29 @@ enc_alias_table[] =
     {"taiwan",		IDX_EUC_TW},
     {"cp950",		IDX_BIG5},
     {"950",		IDX_BIG5},
-#endif
+#అయితే_ముగింపు
     {"mac",		IDX_MACROMAN},
     {"mac-roman",	IDX_MACROMAN},
-    {NULL,		0}
+    {ఖాళీ,		0}
 };
 
-#ifndef CP_UTF8
+#నిర్వచితం_కాకపోతే CP_UTF8
 # define CP_UTF8 65001	// magic number from winnls.h
-#endif
+#అయితే_ముగింపు
 
 /*
  * Find encoding "name" in the list of canonical encoding names.
  * Returns -1 if not found.
  */
-    static int
-enc_canon_search(char_u *name)
+    స్థిర పూర్ణాంకం
+enc_canon_శోధన(char_u *name)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; i < IDX_COUNT; ++i)
-	if (STRCMP(name, enc_canon_table[i].name) == 0)
-	    return i;
-    return -1;
+    కొరకు (i = 0; i < IDX_లెక్క; ++i)
+	ఒకవేళ (STRCMP(name, enc_canon_పట్టిక[i].name) == 0)
+	    తిరిగి i;
+    తిరిగి -1;
 }
 
 
@@ -420,37 +420,37 @@ enc_canon_search(char_u *name)
  * Find canonical encoding "name" in the list and return its properties.
  * Returns 0 if not found.
  */
-    int
+    పూర్ణాంకం
 enc_canon_props(char_u *name)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    i = enc_canon_search(name);
-    if (i >= 0)
-	return enc_canon_table[i].prop;
-#ifdef MSWIN
-    if (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
+    i = enc_canon_శోధన(name);
+    ఒకవేళ (i >= 0)
+	తిరిగి enc_canon_పట్టిక[i].prop;
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)name + 2), &cpinfo) != 0)
+	ఒకవేళ (GetCPInfo(atoi((అక్షరం *)name + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1) // some single-byte encoding
-		return ENC_8BIT;
-	    if (cpinfo.MaxCharSize == 2
+	    ఒకవేళ (cpinfo.Max_Char_కొలత == 1) // some single-byte encoding
+		తిరిగి ENC_8_బిట్టు;
+	    ఒకవేళ (cpinfo.Max_Char_కొలత == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 		// must be a DBCS encoding
-		return ENC_DBCS;
+		తిరిగి ENC_DBCS;
 	}
-	return 0;
+	తిరిగి 0;
     }
-#endif
-    if (STRNCMP(name, "2byte-", 6) == 0)
-	return ENC_DBCS;
-    if (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
-	return ENC_8BIT;
-    return 0;
+#అయితే_ముగింపు
+    ఒకవేళ (STRNCMP(name, "2byte-", 6) == 0)
+	తిరిగి ENC_DBCS;
+    ఒకవేళ (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
+	తిరిగి ENC_8_బిట్టు;
+    తిరిగి 0;
 }
 
 /*
@@ -465,126 +465,126 @@ enc_canon_props(char_u *name)
  * When there is something wrong: Returns an error message and doesn't change
  * anything.
  */
-    char *
-mb_init(void)
+    అక్షరం *
+mb_init(శూన్య)
 {
-    int		i;
-    int		idx;
-    int		n;
-    int		enc_dbcs_new = 0;
-#if defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		idx;
+    పూర్ణాంకం		n;
+    పూర్ణాంకం		enc_dbcs_new = 0;
+#ఒకవేళ defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
 	&& !defined(MACOS_CONVERT)
 # define LEN_FROM_CONV
     vimconv_T	vimconv;
     char_u	*p;
-#endif
+#అయితే_ముగింపు
 
-    if (p_enc == NULL)
+    ఒకవేళ (p_enc == ఖాళీ)
     {
 	// Just starting up: set the whole table to one's.
-	for (i = 0; i < 256; ++i)
+	కొరకు (i = 0; i < 256; ++i)
 	    mb_bytelen_tab[i] = 1;
-	input_conv.vc_type = CONV_NONE;
-	input_conv.vc_factor = 1;
+	ఆదానం_conv.vc_type = CONV_NONE;
+	ఆదానం_conv.vc_గుణకం = 1;
 	output_conv.vc_type = CONV_NONE;
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-#ifdef MSWIN
-    if (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
+#నిర్వచితమైతే MSWIN
+    ఒకవేళ (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)p_enc + 2), &cpinfo) != 0)
+	ఒకవేళ (GetCPInfo(atoi((అక్షరం *)p_enc + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1)
+	    ఒకవేళ (cpinfo.Max_Char_కొలత == 1)
 	    {
 		// some single-byte encoding
 		enc_unicode = 0;
 		enc_utf8 = FALSE;
 	    }
-	    else if (cpinfo.MaxCharSize == 2
+	    లేకపోతే ఒకవేళ (cpinfo.Max_Char_కొలత == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 	    {
 		// must be a DBCS encoding, check below
-		enc_dbcs_new = atoi((char *)p_enc + 2);
+		enc_dbcs_new = atoi((అక్షరం *)p_enc + 2);
 	    }
-	    else
-		goto codepage_invalid;
+	    లేకపోతే
+		వెళ్ళు codepage_invalid;
 	}
-	else if (GetLastError() == ERROR_INVALID_PARAMETER)
+	లేకపోతే ఒకవేళ (Get_చివరి_Error() == ERROR_INVALID_PARAMETER)
 	{
 codepage_invalid:
-	    return N_(e_not_valid_codepage);
+	    తిరిగి N_(e_not_valid_codepage);
 	}
     }
-#endif
-    else if (STRNCMP(p_enc, "8bit-", 5) == 0
+#అయితే_ముగింపు
+    లేకపోతే ఒకవేళ (STRNCMP(p_enc, "8bit-", 5) == 0
 	    || STRNCMP(p_enc, "iso-8859-", 9) == 0)
     {
 	// Accept any "8bit-" or "iso-8859-" name.
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(p_enc, "2byte-", 6) == 0)
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// Windows: accept only valid codepage numbers, check below.
-	if (p_enc[6] != 'c' || p_enc[7] != 'p'
-			      || (enc_dbcs_new = atoi((char *)p_enc + 8)) == 0)
-	    return e_invalid_argument;
-#else
+	ఒకవేళ (p_enc[6] != 'c' || p_enc[7] != 'p'
+			      || (enc_dbcs_new = atoi((అక్షరం *)p_enc + 8)) == 0)
+	    తిరిగి e_invalid_వాదం;
+#లేకపోతే
 	// Unix: accept any "2byte-" name, assume current locale.
 	enc_dbcs_new = DBCS_2BYTE;
-#endif
+#అయితే_ముగింపు
     }
-    else if ((idx = enc_canon_search(p_enc)) >= 0)
+    లేకపోతే ఒకవేళ ((idx = enc_canon_శోధన(p_enc)) >= 0)
     {
-	i = enc_canon_table[idx].prop;
-	if (i & ENC_UNICODE)
+	i = enc_canon_పట్టిక[idx].prop;
+	ఒకవేళ (i & ENC_UNICODE)
 	{
 	    // Unicode
 	    enc_utf8 = TRUE;
-	    if (i & (ENC_2BYTE | ENC_2WORD))
+	    ఒకవేళ (i & (ENC_2BYTE | ENC_2_మాట))
 		enc_unicode = 2;
-	    else if (i & ENC_4BYTE)
+	    లేకపోతే ఒకవేళ (i & ENC_4BYTE)
 		enc_unicode = 4;
-	    else
+	    లేకపోతే
 		enc_unicode = 0;
 	}
-	else if (i & ENC_DBCS)
+	లేకపోతే ఒకవేళ (i & ENC_DBCS)
 	{
 	    // 2byte, handle below
-	    enc_dbcs_new = enc_canon_table[idx].codepage;
+	    enc_dbcs_new = enc_canon_పట్టిక[idx].codepage;
 	}
-	else
+	లేకపోతే
 	{
 	    // Must be 8-bit.
 	    enc_unicode = 0;
 	    enc_utf8 = FALSE;
 	}
     }
-    else    // Don't know what encoding this is, reject it.
-	return e_invalid_argument;
+    లేకపోతే    // Don't know what encoding this is, reject it.
+	తిరిగి e_invalid_వాదం;
 
-    if (enc_dbcs_new != 0)
+    ఒకవేళ (enc_dbcs_new != 0)
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// Check if the DBCS code page is OK.
-	if (!IsValidCodePage(enc_dbcs_new))
-	    goto codepage_invalid;
-#endif
+	ఒకవేళ (!Is_Valid_సంకేతం_పుట(enc_dbcs_new))
+	    వెళ్ళు codepage_invalid;
+#అయితే_ముగింపు
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
     enc_dbcs = enc_dbcs_new;
     has_mbyte = (enc_dbcs != 0 || enc_utf8);
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#ఒకవేళ defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     enc_codepage = encname2codepage(p_enc);
     enc_latin9 = (STRCMP(p_enc, "iso-8859-15") == 0);
-#endif
+#అయితే_ముగింపు
 
     // Detect an encoding that uses latin1 characters.
     enc_latin1like = (enc_utf8 || STRCMP(p_enc, "latin1") == 0
@@ -593,7 +593,7 @@ codepage_invalid:
     /*
      * Set the function pointers.
      */
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
 	mb_ptr2len = utfc_ptr2len;
 	mb_ptr2len_len = utfc_ptr2len_len;
@@ -604,9 +604,9 @@ codepage_invalid:
 	mb_char2cells = utf_char2cells;
 	mb_off2cells = utf_off2cells;
 	mb_ptr2char = utf_ptr2char;
-	mb_head_off = utf_head_off;
+	mb_తల_off = utf_తల_off;
     }
-    else if (enc_dbcs != 0)
+    లేకపోతే ఒకవేళ (enc_dbcs != 0)
     {
 	mb_ptr2len = dbcs_ptr2len;
 	mb_ptr2len_len = dbcs_ptr2len_len;
@@ -617,9 +617,9 @@ codepage_invalid:
 	mb_char2cells = dbcs_char2cells;
 	mb_off2cells = dbcs_off2cells;
 	mb_ptr2char = dbcs_ptr2char;
-	mb_head_off = dbcs_head_off;
+	mb_తల_off = dbcs_తల_off;
     }
-    else
+    లేకపోతే
     {
 	mb_ptr2len = latin_ptr2len;
 	mb_ptr2len_len = latin_ptr2len_len;
@@ -630,45 +630,45 @@ codepage_invalid:
 	mb_char2cells = latin_char2cells;
 	mb_off2cells = latin_off2cells;
 	mb_ptr2char = latin_ptr2char;
-	mb_head_off = latin_head_off;
+	mb_తల_off = latin_తల_off;
     }
 
     /*
      * Fill the mb_bytelen_tab[] for MB_BYTE2LEN().
      */
-#ifdef LEN_FROM_CONV
+#నిర్వచితమైతే LEN_FROM_CONV
     // When 'encoding' is different from the current locale mblen() won't
     // work.  Use conversion to "utf-8" instead.
     vimconv.vc_type = CONV_NONE;
-    if (enc_dbcs)
+    ఒకవేళ (enc_dbcs)
     {
 	p = enc_locale();
-	if (p == NULL || STRCMP(p, p_enc) != 0)
+	ఒకవేళ (p == ఖాళీ || STRCMP(p, p_enc) != 0)
 	{
-	    convert_setup(&vimconv, p_enc, (char_u *)"utf-8");
+	    convert_అమరిక(&vimconv, p_enc, (char_u *)"utf-8");
 	    vimconv.vc_fail = TRUE;
 	}
 	vim_free(p);
     }
-#endif
+#అయితే_ముగింపు
 
-    for (i = 0; i < 256; ++i)
+    కొరకు (i = 0; i < 256; ++i)
     {
 	// Our own function to reliably check the length of UTF-8 characters,
 	// independent of mblen().
-	if (enc_utf8)
+	ఒకవేళ (enc_utf8)
 	    n = utf8len_tab[i];
-	else if (enc_dbcs == 0)
+	లేకపోతే ఒకవేళ (enc_dbcs == 0)
 	    n = 1;
-	else
+	లేకపోతే
 	{
-#if defined(MSWIN) || defined(WIN32UNIX)
+#ఒకవేళ defined(MSWIN) || defined(WIN32UNIX)
 	    // enc_dbcs is set by setting 'fileencoding'.  It becomes a Windows
 	    // CodePage identifier, which we can pass directly in to Windows
 	    // API
 	    n = IsDBCSLeadByteEx(enc_dbcs, (WINBYTE)i) ? 2 : 1;
-#else
-# if defined(__amigaos4__) || defined(__ANDROID__) || \
+#లేకపోతే
+# ఒకవేళ defined(__amigaos4__) || defined(__ANDROID__) || \
 				   !(defined(HAVE_MBLEN) || defined(X_LOCALE))
 	    /*
 	     * if mblen() is not available, character which MSB is turned on
@@ -676,32 +676,32 @@ codepage_invalid:
 	     * is not always true.)
 	     */
 	    n = (i & 0x80) ? 2 : 1;
-# else
-	    char buf[MB_MAXBYTES + 1];
+# లేకపోతే
+	    అక్షరం buf[MB_MAXBYTES + 1];
 
-	    if (i == NUL)	// just in case mblen() can't handle ""
+	    ఒకవేళ (i == NUL)	// just in case mblen() can't handle ""
 		n = 1;
-	    else
+	    లేకపోతే
 	    {
 		buf[0] = i;
 		buf[1] = 0;
 #  ifdef LEN_FROM_CONV
-		if (vimconv.vc_type != CONV_NONE)
+		ఒకవేళ (vimconv.vc_type != CONV_NONE)
 		{
 		    /*
 		     * string_convert() should fail when converting the first
 		     * byte of a double-byte character.
 		     */
-		    p = string_convert(&vimconv, (char_u *)buf, NULL);
-		    if (p != NULL)
+		    p = string_convert(&vimconv, (char_u *)buf, ఖాళీ);
+		    ఒకవేళ (p != ఖాళీ)
 		    {
 			vim_free(p);
 			n = 1;
 		    }
-		    else
+		    లేకపోతే
 			n = 2;
 		}
-		else
+		లేకపోతే
 #  endif
 		{
 		    /*
@@ -710,58 +710,58 @@ codepage_invalid:
 		     * where mblen() returns 0 for invalid character.
 		     * Therefore, following condition includes 0.
 		     */
-		    vim_ignored = mblen(NULL, 0);  // First reset the state.
-		    if (mblen(buf, (size_t)1) <= 0)
+		    vim_ignored = mblen(ఖాళీ, 0);  // First reset the state.
+		    ఒకవేళ (mblen(buf, (size_t)1) <= 0)
 			n = 2;
-		    else
+		    లేకపోతే
 			n = 1;
 		}
 	    }
 # endif
-#endif
+#అయితే_ముగింపు
 	}
 
 	mb_bytelen_tab[i] = n;
     }
 
-#ifdef LEN_FROM_CONV
-    convert_setup(&vimconv, NULL, NULL);
-#endif
+#నిర్వచితమైతే LEN_FROM_CONV
+    convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
+#అయితే_ముగింపు
 
     // The cell width depends on the type of multi-byte characters.
-    (void)init_chartab();
+    (శూన్య)init_chartab();
 
     // When enc_utf8 is set or reset, (de)allocate ScreenLinesUC[]
     screenalloc(FALSE);
 
     // When using Unicode, set default for 'fileencodings'.
-    if (enc_utf8 && !option_was_set((char_u *)"fencs"))
-	set_fencs_unicode();
+    ఒకవేళ (enc_utf8 && !option_was_సమితి((char_u *)"fencs"))
+	సమితి_fencs_unicode();
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
+#ఒకవేళ defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
     // GNU gettext 0.10.37 supports this feature: set the codeset used for
     // translated messages independently from the current locale.
-    (void)bind_textdomain_codeset(VIMPACKAGE,
-					  enc_utf8 ? "utf-8" : (char *)p_enc);
-#endif
+    (శూన్య)bind_textdomain_codeset(VIMPACKAGE,
+					  enc_utf8 ? "utf-8" : (అక్షరం *)p_enc);
+#అయితే_ముగింపు
 
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     // When changing 'encoding' while starting up, then convert the command
     // line arguments from the active codepage to 'encoding'.
-    if (starting != 0)
+    ఒకవేళ (starting != 0)
 	fix_arg_enc();
-#endif
+#అయితే_ముగింపు
 
     // Fire an autocommand to let people do custom font setup. This must be
     // after Vim has been setup for the new encoding.
-    apply_autocmds(EVENT_ENCODINGCHANGED, NULL, (char_u *)"", FALSE, curbuf);
+    apply_autocmds(EVENT_ENCODINGCHANGED, ఖాళీ, (char_u *)"", FALSE, curbuf);
 
-#ifdef FEAT_SPELL
+#నిర్వచితమైతే FEAT_SPELL
     // Need to reload spell dictionaries
     spell_reload();
-#endif
+#అయితే_ముగింపు
 
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -771,55 +771,55 @@ codepage_invalid:
  * 4 - UCS-4 BOM
  * 3 - UTF-8 BOM
  */
-    int
-bomb_size(void)
+    పూర్ణాంకం
+bomb_కొలత(శూన్య)
 {
-    int n = 0;
+    పూర్ణాంకం n = 0;
 
-    if (curbuf->b_p_bomb && !curbuf->b_p_bin)
+    ఒకవేళ (curbuf->b_p_bomb && !curbuf->b_p_bin)
     {
-	if (*curbuf->b_p_fenc == NUL)
+	ఒకవేళ (*curbuf->b_p_fenc == NUL)
 	{
-	    if (enc_utf8)
+	    ఒకవేళ (enc_utf8)
 	    {
-		if (enc_unicode != 0)
+		ఒకవేళ (enc_unicode != 0)
 		    n = enc_unicode;
-		else
+		లేకపోతే
 		    n = 3;
 	    }
 	}
-	else if (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
+	లేకపోతే ఒకవేళ (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
 	    n = 3;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
+	లేకపోతే ఒకవేళ (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
 		|| STRNCMP(curbuf->b_p_fenc, "utf-16", 6) == 0)
 	    n = 2;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
+	లేకపోతే ఒకవేళ (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
 	    n = 4;
     }
-    return n;
+    తిరిగి n;
 }
 
-#if defined(FEAT_QUICKFIX)
+#ఒకవేళ defined(FEAT_QUICKFIX)
 /*
  * Remove all BOM from "s" by moving remaining text.
  */
-    void
+    శూన్య
 remove_bom(char_u *s)
 {
-    if (!enc_utf8)
-	return;
+    ఒకవేళ (!enc_utf8)
+	తిరిగి;
 
     char_u *p = s;
 
-    while ((p = vim_strbyte(p, 0xef)) != NULL)
+    అయితే ((p = vim_strbyte(p, 0xef)) != ఖాళీ)
     {
-	if (p[1] == 0xbb && p[2] == 0xbf)
+	ఒకవేళ (p[1] == 0xbb && p[2] == 0xbf)
 	    STRMOVE(p, p + 3);
-	else
+	లేకపోతే
 	    ++p;
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get class of pointer:
@@ -828,65 +828,65 @@ remove_bom(char_u *s)
  * 2 for an alphanumeric word character
  * >2 for other word characters, including CJK and emoji
  */
-    int
+    పూర్ణాంకం
 mb_get_class(char_u *p)
 {
-    return mb_get_class_buf(p, curbuf);
+    తిరిగి mb_get_class_buf(p, curbuf);
 }
 
-    int
+    పూర్ణాంకం
 mb_get_class_buf(char_u *p, buf_T *buf)
 {
-    if (MB_BYTE2LEN(p[0]) == 1)
+    ఒకవేళ (MB_BYTE2LEN(p[0]) == 1)
     {
-	if (p[0] == NUL || VIM_ISWHITE(p[0]))
-	    return 0;
-	if (vim_iswordc_buf(p[0], buf))
-	    return 2;
-	return 1;
+	ఒకవేళ (p[0] == NUL || VIM_ISWHITE(p[0]))
+	    తిరిగి 0;
+	ఒకవేళ (vim_iswordc_buf(p[0], buf))
+	    తిరిగి 2;
+	తిరిగి 1;
     }
-    if (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
-	return dbcs_class(p[0], p[1]);
-    if (enc_utf8)
-	return utf_class_buf(utf_ptr2char(p), buf);
-    return 0;
+    ఒకవేళ (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
+	తిరిగి dbcs_class(p[0], p[1]);
+    ఒకవేళ (enc_utf8)
+	తిరిగి utf_class_buf(utf_ptr2char(p), buf);
+    తిరిగి 0;
 }
 
 /*
  * Get class of a double-byte character.  This always returns 3 or bigger.
  * TODO: Should return 1 for punctuation.
  */
-    int
-dbcs_class(unsigned lead, unsigned trail)
+    పూర్ణాంకం
+dbcs_class(గుర్తులేని lead, గుర్తులేని trail)
 {
-    switch (enc_dbcs)
+    ఎంపిక (enc_dbcs)
     {
 	// please add classify routine for your language in here
 
-	case DBCS_JPNU:	// ?
-	case DBCS_JPN:
+	స్థితి DBCS_JPNU:	// ?
+	స్థితి DBCS_JPN:
 	    {
 		// JIS code classification
-		unsigned char lb = lead;
-		unsigned char tb = trail;
+		గుర్తులేని అక్షరం lb = lead;
+		గుర్తులేని అక్షరం tb = trail;
 
 		// convert process code to JIS
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#ఒకవేళ defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
 		// process code is SJIS
-		if (lb <= 0x9f)
+		ఒకవేళ (lb <= 0x9f)
 		    lb = (lb - 0x81) * 2 + 0x21;
-		else
+		లేకపోతే
 		    lb = (lb - 0xc1) * 2 + 0x21;
-		if (tb <= 0x7e)
+		ఒకవేళ (tb <= 0x7e)
 		    tb -= 0x1f;
-		else if (tb <= 0x9e)
+		లేకపోతే ఒకవేళ (tb <= 0x9e)
 		    tb -= 0x20;
-		else
+		లేకపోతే
 		{
 		    tb -= 0x7e;
 		    lb += 1;
 		}
-#else
+#లేకపోతే
 		/*
 		 * XXX: Code page identification can not use with all
 		 *	    system! So, some other encoding information
@@ -899,57 +899,57 @@ dbcs_class(unsigned lead, unsigned trail)
 		// assume process code is JAPANESE-EUC
 		lb &= 0x7f;
 		tb &= 0x7f;
-#endif
+#అయితే_ముగింపు
 		// exceptions
-		switch (lb << 8 | tb)
+		ఎంపిక (lb << 8 | tb)
 		{
-		    case 0x2121: // ZENKAKU space
-			return 0;
-		    case 0x2122: // TOU-TEN (Japanese comma)
-		    case 0x2123: // KU-TEN (Japanese period)
-		    case 0x2124: // ZENKAKU comma
-		    case 0x2125: // ZENKAKU period
-			return 1;
-		    case 0x213c: // prolongedsound handled as KATAKANA
-			return 13;
+		    స్థితి 0x2121: // ZENKAKU space
+			తిరిగి 0;
+		    స్థితి 0x2122: // TOU-TEN (Japanese comma)
+		    స్థితి 0x2123: // KU-TEN (Japanese period)
+		    స్థితి 0x2124: // ZENKAKU comma
+		    స్థితి 0x2125: // ZENKAKU period
+			తిరిగి 1;
+		    స్థితి 0x213c: // prolongedsound handled as KATAKANA
+			తిరిగి 13;
 		}
 		// sieved by KU code
-		switch (lb)
+		ఎంపిక (lb)
 		{
-		    case 0x21:
-		    case 0x22:
+		    స్థితి 0x21:
+		    స్థితి 0x22:
 			// special symbols
-			return 10;
-		    case 0x23:
+			తిరిగి 10;
+		    స్థితి 0x23:
 			// alphanumeric
-			return 11;
-		    case 0x24:
+			తిరిగి 11;
+		    స్థితి 0x24:
 			// hiragana
-			return 12;
-		    case 0x25:
+			తిరిగి 12;
+		    స్థితి 0x25:
 			// katakana
-			return 13;
-		    case 0x26:
+			తిరిగి 13;
+		    స్థితి 0x26:
 			// greek
-			return 14;
-		    case 0x27:
+			తిరిగి 14;
+		    స్థితి 0x27:
 			// russian
-			return 15;
-		    case 0x28:
-			// lines
-			return 16;
-		    default:
+			తిరిగి 15;
+		    స్థితి 0x28:
+			//పంక్తులు
+			తిరిగి 16;
+		    అప్రమేయ:
 			// kanji
-			return 17;
+			తిరిగి 17;
 		}
 	    }
 
-	case DBCS_KORU:	// ?
-	case DBCS_KOR:
+	స్థితి DBCS_KORU:	// ?
+	స్థితి DBCS_KOR:
 	    {
 		// KS code classification
-		unsigned char c1 = lead;
-		unsigned char c2 = trail;
+		గుర్తులేని అక్షరం c1 = lead;
+		గుర్తులేని అక్షరం c2 = trail;
 
 		/*
 		 * 20 : Hangul
@@ -965,63 +965,63 @@ dbcs_class(unsigned lead, unsigned trail)
 		 * 30 : Cyrillic Letter
 		 */
 
-		if (c1 >= 0xB0 && c1 <= 0xC8)
+		ఒకవేళ (c1 >= 0xB0 && c1 <= 0xC8)
 		    // Hangul
-		    return 20;
-#if defined(MSWIN) || defined(WIN32UNIX)
-		else if (c1 <= 0xA0 || c2 <= 0xA0)
+		    తిరిగి 20;
+#ఒకవేళ defined(MSWIN) || defined(WIN32UNIX)
+		లేకపోతే ఒకవేళ (c1 <= 0xA0 || c2 <= 0xA0)
 		    // Extended Hangul Region : MS UHC(Unified Hangul Code)
 		    // c1: 0x81-0xA0 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xFE
 		    // c1: 0xA1-0xC6 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xA0
-		    return 20;
-#endif
+		    తిరిగి 20;
+#అయితే_ముగింపు
 
-		else if (c1 >= 0xCA && c1 <= 0xFD)
+		లేకపోతే ఒకవేళ (c1 >= 0xCA && c1 <= 0xFD)
 		    // Hanja
-		    return 21;
-		else switch (c1)
+		    తిరిగి 21;
+		లేకపోతే ఎంపిక (c1)
 		{
-		    case 0xA1:
-		    case 0xA2:
+		    స్థితి 0xA1:
+		    స్థితి 0xA2:
 			// Symbols
-			return 22;
-		    case 0xA3:
+			తిరిగి 22;
+		    స్థితి 0xA3:
 			// Alphanumeric
-			return 23;
-		    case 0xA4:
+			తిరిగి 23;
+		    స్థితి 0xA4:
 			// Hangul Letter(Alphabet)
-			return 24;
-		    case 0xA5:
+			తిరిగి 24;
+		    స్థితి 0xA5:
 			// Roman Numeral/Greek Letter
-			return 25;
-		    case 0xA6:
+			తిరిగి 25;
+		    స్థితి 0xA6:
 			// Box Drawings
-			return 26;
-		    case 0xA7:
+			తిరిగి 26;
+		    స్థితి 0xA7:
 			// Unit Symbols
-			return 27;
-		    case 0xA8:
-		    case 0xA9:
-			if (c2 <= 0xAF)
-			    return 25;  // Roman Letter
-			else if (c2 >= 0xF6)
-			    return 22;  // Symbols
-			else
+			తిరిగి 27;
+		    స్థితి 0xA8:
+		    స్థితి 0xA9:
+			ఒకవేళ (c2 <= 0xAF)
+			    తిరిగి 25;  // Roman Letter
+			లేకపోతే ఒకవేళ (c2 >= 0xF6)
+			    తిరిగి 22;  // Symbols
+			లేకపోతే
 			    // Circled/Parenthesized Letter
-			    return 28;
-		    case 0xAA:
-		    case 0xAB:
+			    తిరిగి 28;
+		    స్థితి 0xAA:
+		    స్థితి 0xAB:
 			// Hiragana/Katakana
-			return 29;
-		    case 0xAC:
+			తిరిగి 29;
+		    స్థితి 0xAC:
 			// Cyrillic Letter
-			return 30;
+			తిరిగి 30;
 		}
 	    }
-	default:
-	    break;
+	అప్రమేయ:
+	    ఆపు;
     }
-    return 3;
+    తిరిగి 3;
 }
 
 /*
@@ -1029,19 +1029,19 @@ dbcs_class(unsigned lead, unsigned trail)
  * Return length in bytes of character "c".
  * Returns 1 for a single-byte character.
  */
-    int
-latin_char2len(int c UNUSED)
+    పూర్ణాంకం
+latin_char2len(పూర్ణాంకం c వాడని)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 dbcs_char2len(
-    int		c)
+    పూర్ణాంకం		c)
 {
-    if (c >= 0x100)
-	return 2;
-    return 1;
+    ఒకవేళ (c >= 0x100)
+	తిరిగి 2;
+    తిరిగి 1;
 }
 
 /*
@@ -1049,57 +1049,57 @@ dbcs_char2len(
  * Convert a character to its bytes.
  * Returns the length in bytes.
  */
-    int
-latin_char2bytes(int c, char_u *buf)
+    పూర్ణాంకం
+latin_char2bytes(పూర్ణాంకం c, char_u *buf)
 {
     buf[0] = c;
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
-dbcs_char2bytes(int c, char_u *buf)
+    స్థిర పూర్ణాంకం
+dbcs_char2bytes(పూర్ణాంకం c, char_u *buf)
 {
-    if (c >= 0x100)
+    ఒకవేళ (c >= 0x100)
     {
-	buf[0] = (unsigned)c >> 8;
+	buf[0] = (గుర్తులేని)c >> 8;
 	buf[1] = c;
 	// Never use a NUL byte, it causes lots of trouble.  It's an invalid
 	// character anyway.
-	if (buf[1] == NUL)
+	ఒకవేళ (buf[1] == NUL)
 	    buf[1] = '\n';
-	return 2;
+	తిరిగి 2;
     }
     buf[0] = c;
-    return 1;
+    తిరిగి 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' latin.
  */
-    int
+    పూర్ణాంకం
 latin_ptr2len(char_u *p)
 {
-    return *p == NUL ? 0 : 1;
+    తిరిగి *p == NUL ? 0 : 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' DBCS.
  */
-    static int
+    స్థిర పూర్ణాంకం
 dbcs_ptr2len(char_u *p)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (*p == NUL)
-	return 0;
+    ఒకవేళ (*p == NUL)
+	తిరిగి 0;
 
     // if the second byte is missing the length is 1
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    ఒకవేళ (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -1108,67 +1108,67 @@ dbcs_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-latin_ptr2len_len(char_u *p, int size)
+    పూర్ణాంకం
+latin_ptr2len_len(char_u *p, పూర్ణాంకం కొలత)
 {
-    if (size < 1 || *p == NUL)
-	return 0;
-    return 1;
+    ఒకవేళ (కొలత < 1 || *p == NUL)
+	తిరిగి 0;
+    తిరిగి 1;
 }
 
-    static int
-dbcs_ptr2len_len(char_u *p, int size)
+    స్థిర పూర్ణాంకం
+dbcs_ptr2len_len(char_u *p, పూర్ణాంకం కొలత)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (size == 1)
-	return 1;
+    ఒకవేళ (కొలత < 1 || *p == NUL)
+	తిరిగి 0;
+    ఒకవేళ (కొలత == 1)
+	తిరిగి 1;
     // Check that second byte is not missing.
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    ఒకవేళ (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    తిరిగి len;
 }
 
-struct interval
+నిర్మాణం interval
 {
-    long first;
-    long last;
+    దీర్ఘ మొదటి;
+    దీర్ఘ చివరి;
 };
 
 /*
  * Return TRUE if "c" is in "table[size / sizeof(struct interval)]".
  */
-    static int
-intable(struct interval *table, size_t size, int c)
+    స్థిర పూర్ణాంకం
+intable(నిర్మాణం interval *పట్టిక, size_t కొలత, పూర్ణాంకం c)
 {
-    int mid, bot, top;
+    పూర్ణాంకం mid, bot, శిఖరం;
 
     // first quick check for Latin1 etc. characters
-    if (c < table[0].first)
-	return FALSE;
+    ఒకవేళ (c < పట్టిక[0].మొదటి)
+	తిరిగి FALSE;
 
     // binary search in table
     bot = 0;
-    top = (int)(size / sizeof(struct interval) - 1);
-    while (top >= bot)
+    శిఖరం = (పూర్ణాంకం)(కొలత / పరిమాణం(నిర్మాణం interval) - 1);
+    అయితే (శిఖరం >= bot)
     {
-	mid = (bot + top) / 2;
-	if (table[mid].last < c)
+	mid = (bot + శిఖరం) / 2;
+	ఒకవేళ (పట్టిక[mid].చివరి < c)
 	    bot = mid + 1;
-	else if (table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return TRUE;
+	లేకపోతే ఒకవేళ (పట్టిక[mid].మొదటి > c)
+	    శిఖరం = mid - 1;
+	లేకపోతే
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
 
 // Sorted list of non-overlapping intervals of East Asian Ambiguous
 // characters, generated with ../runtime/tools/unicode.vim.
-static struct interval ambiguous[] =
+స్థిర నిర్మాణం interval ambiguous[] =
 {
     {0x00a1, 0x00a1},
     {0x00a4, 0x00a4},
@@ -1351,18 +1351,18 @@ static struct interval ambiguous[] =
     {0x100000, 0x10fffd}
 };
 
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 /*
  * utf_char2cells() with different argument type for libvterm.
  */
-    int
+    పూర్ణాంకం
 utf_uint2cells(UINT32_T c)
 {
-    if (c >= 0x100 && utf_iscomposing((int)c))
-	return 0;
-    return utf_char2cells((int)c);
+    ఒకవేళ (c >= 0x100 && utf_iscomposing((పూర్ణాంకం)c))
+	తిరిగి 0;
+    తిరిగి utf_char2cells((పూర్ణాంకం)c);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * For UTF-8 character "c" return 2 for a double-width character, 1 for others.
@@ -1371,12 +1371,12 @@ utf_uint2cells(UINT32_T c)
  * When p_ambw is "double", return 2 for a character with East Asian Width
  * class 'A'(mbiguous).
  */
-    int
-utf_char2cells(int c)
+    పూర్ణాంకం
+utf_char2cells(పూర్ణాంకం c)
 {
     // Sorted list of non-overlapping intervals of East Asian double width
     // characters, generated with ../runtime/tools/unicode.vim.
-    static struct interval doublewidth[] =
+    స్థిర నిర్మాణం interval doublewidth[] =
     {
 	{0x1100, 0x115f},
 	{0x231a, 0x231b},
@@ -1505,7 +1505,7 @@ utf_char2cells(int c)
     // Sorted list of non-overlapping intervals of Emoji characters that don't
     // have ambiguous or double width,
     // based on http://unicode.org/emoji/charts/emoji-list.html
-    static struct interval emoji_wide[] =
+    స్థిర నిర్మాణం interval emoji_wide[] =
     {
 	{0x23ed, 0x23ef},
 	{0x23f1, 0x23f2},
@@ -1562,7 +1562,7 @@ utf_char2cells(int c)
 	{0x1f6f0, 0x1f6f0},
 	{0x1f6f3, 0x1f6f3}
 
-#ifdef MACOS_X
+#నిర్వచితమైతే MACOS_X
 	// Include SF Symbols 4 characters, which should be rendered as
 	// double-width.  SF Symbols is an Apple-specific set of symbols and
 	// icons for use in Apple operating systems.  They are included as
@@ -1584,38 +1584,38 @@ utf_char2cells(int c)
 	//
 	// Also see https://en.wikipedia.org/wiki/San_Francisco_(sans-serif_typeface)#SF_Symbols
 	, {0x100000, 0x1018c7}
-#endif
+#అయితే_ముగింపు
     };
 
-#ifdef FEAT_EVAL
+#నిర్వచితమైతే FEAT_EVAL
     // Use the value from setcellwidths() at 0x80 and higher, unless the
     // character is not printable.
-    if (c >= 0x80 && vim_isprintc(c))
+    ఒకవేళ (c >= 0x80 && vim_isprintc(c))
     {
-	int n = cw_value(c);
-	if (n != 0)
-	    return n;
+	పూర్ణాంకం n = cw_విలువ(c);
+	ఒకవేళ (n != 0)
+	    తిరిగి n;
     }
-#endif
+#అయితే_ముగింపు
 
-    if (c >= 0x100)
+    ఒకవేళ (c >= 0x100)
     {
-	if (!utf_printable(c))
-	    return 6;		// unprintable, displays <xxxx>
-	if (intable(doublewidth, sizeof(doublewidth), c))
-	    return 2;
-	if (p_emoji && intable(emoji_wide, sizeof(emoji_wide), c))
-	    return 2;
+	ఒకవేళ (!utf_printable(c))
+	    తిరిగి 6;		// unprintable, displays <xxxx>
+	ఒకవేళ (intable(doublewidth, పరిమాణం(doublewidth), c))
+	    తిరిగి 2;
+	ఒకవేళ (p_emoji && intable(emoji_wide, పరిమాణం(emoji_wide), c))
+	    తిరిగి 2;
     }
 
     // Characters below 0x100 are influenced by 'isprint' option
-    else if (c >= 0x80 && !vim_isprintc(c))
-	return 4;		// unprintable, displays <xx>
+    లేకపోతే ఒకవేళ (c >= 0x80 && !vim_isprintc(c))
+	తిరిగి 4;		// unprintable, displays <xx>
 
-    if (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, sizeof(ambiguous), c))
-	return 2;
+    ఒకవేళ (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, పరిమాణం(ambiguous), c))
+	తిరిగి 2;
 
-    return 1;
+    తిరిగి 1;
 }
 
 /*
@@ -1623,42 +1623,42 @@ utf_char2cells(int c)
  * Return the number of display cells character at "*p" occupies.
  * This doesn't take care of unprintable characters, use ptr2cells() for that.
  */
-    int
-latin_ptr2cells(char_u *p UNUSED)
+    పూర్ణాంకం
+latin_ptr2cells(char_u *p వాడని)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-    int
+    పూర్ణాంకం
 utf_ptr2cells(
     char_u	*p)
 {
-    int		c;
-    int		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		len;
 
     // Need to convert to a character number.
-    if (*p >= 0x80)
+    ఒకవేళ (*p >= 0x80)
     {
 	c = utf_ptr2char_and_len(p, &len);
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	ఒకవేళ (len == 1 || c == NUL)
+	    తిరిగి 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	ఒకవేళ (c < 0x80)
+	    తిరిగి vim_isprintc(c) ? char2cells(c) : 4;
+	తిరిగి utf_char2cells(c);
     }
-    return 1;
+    తిరిగి 1;
 }
 
-    int
+    పూర్ణాంకం
 dbcs_ptr2cells(char_u *p)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && *p == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(*p);
+    ఒకవేళ (enc_dbcs == DBCS_JPNU && *p == 0x8e)
+	తిరిగి 1;
+    తిరిగి MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1666,43 +1666,43 @@ dbcs_ptr2cells(char_u *p)
  * Like mb_ptr2cells(), but limit string length to "size".
  * For an empty string or truncated character returns 1.
  */
-    int
-latin_ptr2cells_len(char_u *p UNUSED, int size UNUSED)
+    పూర్ణాంకం
+latin_ptr2cells_len(char_u *p వాడని, పూర్ణాంకం కొలత వాడని)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
-utf_ptr2cells_len(char_u *p, int size)
+    స్థిర పూర్ణాంకం
+utf_ptr2cells_len(char_u *p, పూర్ణాంకం కొలత)
 {
-    int		c;
-    int		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		len;
 
     // Need to convert to a wide character.
-    if (size > 0 && *p >= 0x80)
+    ఒకవేళ (కొలత > 0 && *p >= 0x80)
     {
-	c = utf_ptr2char_and_len_len(p, size, &len);
-	if (len > size)
-	    return 4;  // truncated, display as illegal byte
+	c = utf_ptr2char_and_len_len(p, కొలత, &len);
+	ఒకవేళ (len > కొలత)
+	    తిరిగి 4;  // truncated, display as illegal byte
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	ఒకవేళ (len == 1 || c == NUL)
+	    తిరిగి 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	ఒకవేళ (c < 0x80)
+	    తిరిగి vim_isprintc(c) ? char2cells(c) : 4;
+	తిరిగి utf_char2cells(c);
     }
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
-dbcs_ptr2cells_len(char_u *p, int size)
+    స్థిర పూర్ణాంకం
+dbcs_ptr2cells_len(char_u *p, పూర్ణాంకం కొలత)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (size <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
-	return 1;
-    return MB_BYTE2LEN(*p);
+    ఒకవేళ (కొలత <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
+	తిరిగి 1;
+    తిరిగి MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1710,36 +1710,36 @@ dbcs_ptr2cells_len(char_u *p, int size)
  * Return the number of display cells character "c" occupies.
  * Only takes care of multi-byte chars, not "^C" and such.
  */
-    int
-latin_char2cells(int c UNUSED)
+    పూర్ణాంకం
+latin_char2cells(పూర్ణాంకం c వాడని)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-    static int
-dbcs_char2cells(int c)
+    స్థిర పూర్ణాంకం
+dbcs_char2cells(పూర్ణాంకం c)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
-	return 1;
+    ఒకవేళ (enc_dbcs == DBCS_JPNU && ((గుర్తులేని)c >> 8) == 0x8e)
+	తిరిగి 1;
     // use the first byte
-    return MB_BYTE2LEN((unsigned)c >> 8);
+    తిరిగి MB_BYTE2LEN((గుర్తులేని)c >> 8);
 }
 
 /*
  * Return the number of cells occupied by string "p".
  * Stop at a NUL character.  When "len" >= 0 stop at character "p[len]".
  */
-    int
-mb_string2cells(char_u *p, int len)
+    పూర్ణాంకం
+mb_string2cells(char_u *p, పూర్ణాంకం len)
 {
-    int i;
-    int clen = 0;
+    పూర్ణాంకం i;
+    పూర్ణాంకం clen = 0;
 
-    for (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
+    కొరకు (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
 	clen += (*mb_ptr2cells)(p + i);
-    return clen;
+    తిరిగి clen;
 }
 
 /*
@@ -1747,48 +1747,48 @@ mb_string2cells(char_u *p, int len)
  * Return number of display cells for char at ScreenLines[off].
  * We make sure that the offset used is less than "max_off".
  */
-    int
-latin_off2cells(unsigned off UNUSED, unsigned max_off UNUSED)
+    పూర్ణాంకం
+latin_off2cells(గుర్తులేని off వాడని, గుర్తులేని max_off వాడని)
 {
-    return 1;
+    తిరిగి 1;
 }
 
-    int
-dbcs_off2cells(unsigned off, unsigned max_off)
+    పూర్ణాంకం
+dbcs_off2cells(గుర్తులేని off, గుర్తులేని max_off)
 {
     // never check beyond end of the line
-    if (off >= max_off)
-	return 1;
+    ఒకవేళ (off >= max_off)
+	తిరిగి 1;
 
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(ScreenLines[off]);
+    ఒకవేళ (enc_dbcs == DBCS_JPNU && Screen_పంక్తులు[off] == 0x8e)
+	తిరిగి 1;
+    తిరిగి MB_BYTE2LEN(Screen_పంక్తులు[off]);
 }
 
-    int
-utf_off2cells(unsigned off, unsigned max_off)
+    పూర్ణాంకం
+utf_off2cells(గుర్తులేని off, గుర్తులేని max_off)
 {
-    return (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
+    తిరిగి (off + 1 < max_off && Screen_పంక్తులు[off + 1] == 0) ? 2 : 1;
 }
 
 /*
  * mb_ptr2char() function pointer.
  * Convert a byte sequence into a character.
  */
-    int
+    పూర్ణాంకం
 latin_ptr2char(char_u *p)
 {
-    return *p;
+    తిరిగి *p;
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 dbcs_ptr2char(char_u *p)
 {
-    if (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
-	return (p[0] << 8) + p[1];
-    return *p;
+    ఒకవేళ (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
+	తిరిగి (p[0] << 8) + p[1];
+    తిరిగి *p;
 }
 
 /*
@@ -1796,78 +1796,78 @@ dbcs_ptr2char(char_u *p)
  * Returns the character and sets "*lenp" to its byte length.
  * Illegal bytes are returned as-is with a length of one.
  */
-    static inline int
-utf_ptr2char_and_len(char_u *p, int *lenp)
+    స్థిర అంతఃవరుస పూర్ణాంకం
+utf_ptr2char_and_len(char_u *p, పూర్ణాంకం *lenp)
 {
-    int		len;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
 
-    if (p[0] < 0x80)
+    ఒకవేళ (p[0] < 0x80)
     {
 	*lenp = p[0] == NUL ? 0 : 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1 || (p[1] & 0xc0) != 0x80)
+    ఒకవేళ (len <= 1 || (p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    ఒకవేళ (len == 2)
     {
 	*lenp = 2;
-	return c;
+	తిరిగి c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    ఒకవేళ ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    ఒకవేళ (len == 3)
     {
 	*lenp = 3;
-	return c;
+	తిరిగి c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    ఒకవేళ ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    ఒకవేళ (len == 4)
     {
 	*lenp = 4;
-	return c;
+	తిరిగి c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    ఒకవేళ ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    ఒకవేళ (len == 5)
     {
 	*lenp = 5;
-	return c;
+	తిరిగి c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    ఒకవేళ ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    తిరిగి ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
@@ -1877,120 +1877,120 @@ utf_ptr2char_and_len(char_u *p, int *lenp)
  * Like utf_ptr2char_and_len(), but never reads beyond "size" bytes.
  * For an incomplete sequence "*lenp" is set to the expected length.
  */
-    static inline int
-utf_ptr2char_and_len_len(char_u *p, int size, int *lenp)
+    స్థిర అంతఃవరుస పూర్ణాంకం
+utf_ptr2char_and_len_len(char_u *p, పూర్ణాంకం కొలత, పూర్ణాంకం *lenp)
 {
-    int		len;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
 
-    if (size < 1)
+    ఒకవేళ (కొలత < 1)
     {
 	*lenp = 1;
-	return NUL;
+	తిరిగి NUL;
     }
-    if (p[0] < 0x80)
+    ఒకవేళ (p[0] < 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1)
+    ఒకవేళ (len <= 1)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
-    if (len > size)
+    ఒకవేళ (len > కొలత)
     {
-	int		i;
+	పూర్ణాంకం		i;
 
 	// Incomplete sequence: validate continuation bytes within range.
-	for (i = 1; i < size; ++i)
-	    if ((p[i] & 0xc0) != 0x80)
+	కొరకు (i = 1; i < కొలత; ++i)
+	    ఒకవేళ ((p[i] & 0xc0) != 0x80)
 	    {
 		*lenp = 1;
-		return p[0];
+		తిరిగి p[0];
 	    }
 	*lenp = len;
-	return p[0];
+	తిరిగి p[0];
     }
-    if ((p[1] & 0xc0) != 0x80)
+    ఒకవేళ ((p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    ఒకవేళ (len == 2)
     {
 	*lenp = 2;
-	return c;
+	తిరిగి c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    ఒకవేళ ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    ఒకవేళ (len == 3)
     {
 	*lenp = 3;
-	return c;
+	తిరిగి c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    ఒకవేళ ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    ఒకవేళ (len == 4)
     {
 	*lenp = 4;
-	return c;
+	తిరిగి c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    ఒకవేళ ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    ఒకవేళ (len == 5)
     {
 	*lenp = 5;
-	return c;
+	తిరిగి c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    ఒకవేళ ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	తిరిగి p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    తిరిగి ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
 }
 
-    static inline int
-utf_iscomposinglike_char(int c1, int c2)
+    స్థిర అంతఃవరుస పూర్ణాంకం
+utf_iscomposinglike_char(పూర్ణాంకం c1, పూర్ణాంకం c2)
 {
-    if (utf_iscomposing(c2))
-	return TRUE;
-#ifdef FEAT_ARABIC
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(c1, c2);
-#else
-    (void)c1;
-    return FALSE;
-#endif
+    ఒకవేళ (utf_iscomposing(c2))
+	తిరిగి TRUE;
+#నిర్వచితమైతే FEAT_ARABIC
+    ఒకవేళ (!arabic_maycombine(c2))
+	తిరిగి FALSE;
+    తిరిగి arabic_combine(c1, c2);
+#లేకపోతే
+    (శూన్య)c1;
+    తిరిగి FALSE;
+#అయితే_ముగింపు
 }
 
 /*
@@ -2000,12 +2000,12 @@ utf_iscomposinglike_char(int c1, int c2)
  * For an overlong sequence this may return zero.
  * Does not include composing characters, of course.
  */
-    int
+    పూర్ణాంకం
 utf_ptr2char(char_u *p)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    return utf_ptr2char_and_len(p, &len);
+    తిరిగి utf_ptr2char_and_len(p, &len);
 }
 
 /*
@@ -2024,24 +2024,24 @@ utf_ptr2char(char_u *p)
  * If byte sequence is illegal or incomplete, returns -1 and does not advance
  * "s".
  */
-    static int
-utf_safe_read_char_adv(char_u **s, size_t *n)
+    స్థిర పూర్ణాంకం
+utf_సురక్షిత_read_char_adv(char_u **s, size_t *n)
 {
-    int		c, k;
+    పూర్ణాంకం		c, k;
 
-    if (*n == 0) // end of buffer
-	return 0;
+    ఒకవేళ (*n == 0) // end of buffer
+	తిరిగి 0;
 
     k = utf8len_tab_zero[**s];
 
-    if (k == 1)
+    ఒకవేళ (k == 1)
     {
 	// ASCII character or NUL
 	(*n)--;
-	return *(*s)++;
+	తిరిగి *(*s)++;
     }
 
-    if ((size_t)k <= *n)
+    ఒకవేళ ((size_t)k <= *n)
     {
 	// We have a multibyte sequence and it isn't truncated by buffer
 	// limits so utf_ptr2char() is safe to use. Or the first byte is
@@ -2053,156 +2053,156 @@ utf_safe_read_char_adv(char_u **s, size_t *n)
 	// which equals the first byte of its own UTF-8 representation is
 	// U+00C3 (UTF-8: 0xC3 0x83), so need to check that special case too.
 	// It's safe even if n=1, else we would have k=2 > n.
-	if (c != (int)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
+	ఒకవేళ (c != (పూర్ణాంకం)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
 	{
 	    // byte sequence was successfully decoded
 	    *s += k;
 	    *n -= k;
-	    return c;
+	    తిరిగి c;
 	}
     }
 
     // byte sequence is incomplete or illegal
-    return -1;
+    తిరిగి -1;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are skipped!
  */
-    int
+    పూర్ణాంకం
 mb_ptr2char_adv(char_u **pp)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
     c = (*mb_ptr2char)(*pp);
     *pp += (*mb_ptr2len)(*pp);
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are returned as separate characters.
  */
-    int
+    పూర్ణాంకం
 mb_cptr2char_adv(char_u **pp)
 {
-    int		c;
+    పూర్ణాంకం		c;
 
     c = (*mb_ptr2char)(*pp);
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
 	*pp += utf_ptr2len(*pp);
-    else
+    లేకపోతే
 	*pp += (*mb_ptr2len)(*pp);
-    return c;
+    తిరిగి c;
 }
 
-#if defined(FEAT_ARABIC)
+#ఒకవేళ defined(FEAT_ARABIC)
 /*
  * Check if the character pointed to by "p2" is a composing character when it
  * comes after "p1".  For Arabic sometimes "ab" is replaced with "c", which
  * behaves like a composing character.
  */
-    int
+    పూర్ణాంకం
 utf_composinglike(char_u *p1, char_u *p2)
 {
-    int		c2;
+    పూర్ణాంకం		c2;
 
     c2 = utf_ptr2char(p2);
-    if (utf_iscomposing(c2))
-	return TRUE;
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(utf_ptr2char(p1), c2);
+    ఒకవేళ (utf_iscomposing(c2))
+	తిరిగి TRUE;
+    ఒకవేళ (!arabic_maycombine(c2))
+	తిరిగి FALSE;
+    తిరిగి arabic_combine(utf_ptr2char(p1), c2);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.
  */
-    int
+    పూర్ణాంకం
 utfc_ptr2char(
     char_u	*p,
-    int		*pcc)	// return: composing chars, last one is 0
+    పూర్ణాంకం		*pcc)	// return: composing chars, last one is 0
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		cc_len;
+    పూర్ణాంకం		i = 0;
 
     c = utf_ptr2char_and_len(p, &len);
 
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && p[len] >= 0x80)
+    ఒకవేళ ((len > 1 || *p < 0x80) && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (utf_iscomposinglike_char(c, cc))
+	ఒకవేళ (utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    కొరకు (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		ఒకవేళ (i == MAX_MCO)
+		    ఆపు;
 		len += cc_len;
-		if (p[len] < 0x80)
-		    break;
+		ఒకవేళ (p[len] < 0x80)
+		    ఆపు;
 		cc = utf_ptr2char_and_len(p + len, &cc_len);
-		if (!utf_iscomposing(cc))
-		    break;
+		ఒకవేళ (!utf_iscomposing(cc))
+		    ఆపు;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    ఒకవేళ (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    తిరిగి c;
 }
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.  Use no more than p[maxlen].
  */
-    int
+    పూర్ణాంకం
 utfc_ptr2char_len(
     char_u	*p,
-    int		*pcc,	// return: composing chars, last one is 0
-    int		maxlen)
+    పూర్ణాంకం		*pcc,	// return: composing chars, last one is 0
+    పూర్ణాంకం		maxlen)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		cc_len;
+    పూర్ణాంకం		i = 0;
 
     c = utf_ptr2char_and_len_len(p, maxlen, &len);
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
+    ఒకవేళ ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-	if (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
+	ఒకవేళ (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    కొరకు (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		ఒకవేళ (i == MAX_MCO)
+		    ఆపు;
 		len += cc_len;
-		if (len >= maxlen || p[len] < 0x80)
-		    break;
+		ఒకవేళ (len >= maxlen || p[len] < 0x80)
+		    ఆపు;
 		cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-		if (cc_len > maxlen - len || !utf_iscomposing(cc))
-		    break;
+		ఒకవేళ (cc_len > maxlen - len || !utf_iscomposing(cc))
+		    ఆపు;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    ఒకవేళ (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    తిరిగి c;
 }
 
 /*
@@ -2212,20 +2212,20 @@ utfc_ptr2char_len(
  * Only to be used when ScreenLinesUC[off] != 0.
  * Returns the produced number of bytes.
  */
-    int
-utfc_char2bytes(int off, char_u *buf)
+    పూర్ణాంకం
+utfc_char2bytes(పూర్ణాంకం off, char_u *buf)
 {
-    int		len;
-    int		i;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
 
-    len = utf_char2bytes(ScreenLinesUC[off], buf);
-    for (i = 0; i < Screen_mco; ++i)
+    len = utf_char2bytes(Screen_పంక్తులు_UC[off], buf);
+    కొరకు (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] == 0)
-	    break;
-	len += utf_char2bytes(ScreenLinesC[i][off], buf + len);
+	ఒకవేళ (Screen_పంక్తులు_C[i][off] == 0)
+	    ఆపు;
+	len += utf_char2bytes(Screen_పంక్తులు_C[i][off], buf + len);
     }
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -2234,13 +2234,13 @@ utfc_char2bytes(int off, char_u *buf)
  * Returns 0 for "".
  * Returns 1 for an illegal byte sequence.
  */
-    int
+    పూర్ణాంకం
 utf_ptr2len(char_u *p)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
     utf_ptr2char_and_len(p, &len);
-    return len;
+    తిరిగి len;
 }
 
 /*
@@ -2248,10 +2248,10 @@ utf_ptr2len(char_u *p)
  * "b" must be between 0 and 255!
  * Returns 1 for an invalid first byte value.
  */
-    int
-utf_byte2len(int b)
+    పూర్ణాంకం
+utf_byte2len(పూర్ణాంకం b)
 {
-    return utf8len_tab[b];
+    తిరిగి utf8len_tab[b];
 }
 
 /*
@@ -2259,10 +2259,10 @@ utf_byte2len(int b)
  * "b" must be between 0 and 255!
  * Returns 0 for an invalid first byte value.
  */
-    int
-utf_byte2len_zero(int b)
+    పూర్ణాంకం
+utf_byte2len_zero(పూర్ణాంకం b)
 {
-    return utf8len_tab_zero[b];
+    తిరిగి utf8len_tab_zero[b];
 }
 
 /*
@@ -2273,13 +2273,13 @@ utf_byte2len_zero(int b)
  * Returns number > "size" for an incomplete byte sequence.
  * Never returns zero.
  */
-    int
-utf_ptr2len_len(char_u *p, int size)
+    పూర్ణాంకం
+utf_ptr2len_len(char_u *p, పూర్ణాంకం కొలత)
 {
-    int		len;
+    పూర్ణాంకం		len;
 
-    utf_ptr2char_and_len_len(p, size, &len);
-    return len;
+    utf_ptr2char_and_len_len(p, కొలత, &len);
+    తిరిగి len;
 }
 
 /*
@@ -2287,47 +2287,47 @@ utf_ptr2len_len(char_u *p, int size)
  * This includes following composing characters.
  * Returns zero for NUL.
  */
-    int
+    పూర్ణాంకం
 utfc_ptr2len(char_u *p)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		b0 = *p;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		cc_len;
+    పూర్ణాంకం		b0 = *p;
 
-    if (b0 == NUL)
-	return 0;
-    if (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
-	return 1;
+    ఒకవేళ (b0 == NUL)
+	తిరిగి 0;
+    ఒకవేళ (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
+	తిరిగి 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
     c = utf_ptr2char_and_len(p, &len);
 
     // Check for illegal byte.
-    if (len == 1 && b0 >= 0x80)
-	return 1;
+    ఒకవేళ (len == 1 && b0 >= 0x80)
+	తిరిగి 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (p[len] < 0x80)
-	return len;
+    ఒకవేళ (p[len] < 0x80)
+	తిరిగి len;
 
     cc = utf_ptr2char_and_len(p + len, &cc_len);
-    if (!utf_iscomposinglike_char(c, cc))
-	return len;
+    ఒకవేళ (!utf_iscomposinglike_char(c, cc))
+	తిరిగి len;
 
-    for (;;)
+    కొరకు (;;)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (p[len] < 0x80)
-	    return len;
+	ఒకవేళ (p[len] < 0x80)
+	    తిరిగి len;
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (!utf_iscomposing(cc))
-	    return len;
+	ఒకవేళ (!utf_iscomposing(cc))
+	    తిరిగి len;
     }
 }
 
@@ -2337,146 +2337,146 @@ utfc_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-utfc_ptr2len_len(char_u *p, int size)
+    పూర్ణాంకం
+utfc_ptr2len_len(char_u *p, పూర్ణాంకం కొలత)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		cc;
+    పూర్ణాంకం		cc_len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (p[0] < 0x80 && (size == 1 || p[1] < 0x80)) // be quick for ASCII
-	return 1;
+    ఒకవేళ (కొలత < 1 || *p == NUL)
+	తిరిగి 0;
+    ఒకవేళ (p[0] < 0x80 && (కొలత == 1 || p[1] < 0x80)) // be quick for ASCII
+	తిరిగి 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
-    c = utf_ptr2char_and_len_len(p, size, &len);
+    c = utf_ptr2char_and_len_len(p, కొలత, &len);
 
     // Check for illegal byte and incomplete byte sequence.
-    if ((len == 1 && p[0] >= 0x80) || len > size)
-	return 1;
+    ఒకవేళ ((len == 1 && p[0] >= 0x80) || len > కొలత)
+	తిరిగి 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (len >= size || p[len] < 0x80)
-	return len;
+    ఒకవేళ (len >= కొలత || p[len] < 0x80)
+	తిరిగి len;
 
-    cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-    if (cc_len > size - len || !utf_iscomposinglike_char(c, cc))
-	return len;
+    cc = utf_ptr2char_and_len_len(p + len, కొలత - len, &cc_len);
+    ఒకవేళ (cc_len > కొలత - len || !utf_iscomposinglike_char(c, cc))
+	తిరిగి len;
 
-    while (len < size)
+    అయితే (len < కొలత)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (len >= size || p[len] < 0x80)
-	    break;
-	cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-	if (cc_len > size - len)
-	    break;
-	if (!utf_iscomposing(cc))
-	    break;
+	ఒకవేళ (len >= కొలత || p[len] < 0x80)
+	    ఆపు;
+	cc = utf_ptr2char_and_len_len(p + len, కొలత - len, &cc_len);
+	ఒకవేళ (cc_len > కొలత - len)
+	    ఆపు;
+	ఒకవేళ (!utf_iscomposing(cc))
+	    ఆపు;
     }
-    return len;
+    తిరిగి len;
 }
 
 /*
  * Return the number of bytes the UTF-8 encoding of character "c" takes.
  * This does not include composing characters.
  */
-    int
-utf_char2len(int c)
+    పూర్ణాంకం
+utf_char2len(పూర్ణాంకం c)
 {
-    if (c < 0x80)
-	return 1;
-    if (c < 0x800)
-	return 2;
-    if (c < 0x10000)
-	return 3;
-    if (c < 0x200000)
-	return 4;
-    if (c < 0x4000000)
-	return 5;
-    return 6;
+    ఒకవేళ (c < 0x80)
+	తిరిగి 1;
+    ఒకవేళ (c < 0x800)
+	తిరిగి 2;
+    ఒకవేళ (c < 0x10000)
+	తిరిగి 3;
+    ఒకవేళ (c < 0x200000)
+	తిరిగి 4;
+    ఒకవేళ (c < 0x4000000)
+	తిరిగి 5;
+    తిరిగి 6;
 }
 
 /*
  * Convert Unicode character "c" to UTF-8 string in "buf[]".
  * Returns the number of bytes.
  */
-    int
-utf_char2bytes(int c, char_u *buf)
+    పూర్ణాంకం
+utf_char2bytes(పూర్ణాంకం c, char_u *buf)
 {
-    if (c < 0x80)		// 7 bits
+    ఒకవేళ (c < 0x80)		// 7 bits
     {
 	buf[0] = c;
-	return 1;
+	తిరిగి 1;
     }
-    if (c < 0x800)		// 11 bits
+    ఒకవేళ (c < 0x800)		// 11 bits
     {
-	buf[0] = 0xc0 + ((unsigned)c >> 6);
+	buf[0] = 0xc0 + ((గుర్తులేని)c >> 6);
 	buf[1] = 0x80 + (c & 0x3f);
-	return 2;
+	తిరిగి 2;
     }
-    if (c < 0x10000)		// 16 bits
+    ఒకవేళ (c < 0x10000)		// 16 bits
     {
-	buf[0] = 0xe0 + ((unsigned)c >> 12);
-	buf[1] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xe0 + ((గుర్తులేని)c >> 12);
+	buf[1] = 0x80 + (((గుర్తులేని)c >> 6) & 0x3f);
 	buf[2] = 0x80 + (c & 0x3f);
-	return 3;
+	తిరిగి 3;
     }
-    if (c < 0x200000)		// 21 bits
+    ఒకవేళ (c < 0x200000)		// 21 bits
     {
-	buf[0] = 0xf0 + ((unsigned)c >> 18);
-	buf[1] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf0 + ((గుర్తులేని)c >> 18);
+	buf[1] = 0x80 + (((గుర్తులేని)c >> 12) & 0x3f);
+	buf[2] = 0x80 + (((గుర్తులేని)c >> 6) & 0x3f);
 	buf[3] = 0x80 + (c & 0x3f);
-	return 4;
+	తిరిగి 4;
     }
-    if (c < 0x4000000)		// 26 bits
+    ఒకవేళ (c < 0x4000000)		// 26 bits
     {
-	buf[0] = 0xf8 + ((unsigned)c >> 24);
-	buf[1] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[3] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf8 + ((గుర్తులేని)c >> 24);
+	buf[1] = 0x80 + (((గుర్తులేని)c >> 18) & 0x3f);
+	buf[2] = 0x80 + (((గుర్తులేని)c >> 12) & 0x3f);
+	buf[3] = 0x80 + (((గుర్తులేని)c >> 6) & 0x3f);
 	buf[4] = 0x80 + (c & 0x3f);
-	return 5;
+	తిరిగి 5;
     }
 				// 31 bits
-    buf[0] = 0xfc + ((unsigned)c >> 30);
-    buf[1] = 0x80 + (((unsigned)c >> 24) & 0x3f);
-    buf[2] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-    buf[3] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-    buf[4] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+    buf[0] = 0xfc + ((గుర్తులేని)c >> 30);
+    buf[1] = 0x80 + (((గుర్తులేని)c >> 24) & 0x3f);
+    buf[2] = 0x80 + (((గుర్తులేని)c >> 18) & 0x3f);
+    buf[3] = 0x80 + (((గుర్తులేని)c >> 12) & 0x3f);
+    buf[4] = 0x80 + (((గుర్తులేని)c >> 6) & 0x3f);
     buf[5] = 0x80 + (c & 0x3f);
-    return 6;
+    తిరిగి 6;
 }
 
-#if defined(FEAT_TERMINAL)
+#ఒకవేళ defined(FEAT_TERMINAL)
 /*
  * utf_iscomposing() with different argument type for libvterm.
  */
-    int
+    పూర్ణాంకం
 utf_iscomposing_uint(UINT32_T c)
 {
-    return utf_iscomposing((int)c);
+    తిరిగి utf_iscomposing((పూర్ణాంకం)c);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Return TRUE if "c" is a composing UTF-8 character.  This means it will be
  * drawn on top of the preceding character.
  * Based on code from Markus Kuhn.
  */
-    int
-utf_iscomposing(int c)
+    పూర్ణాంకం
+utf_iscomposing(పూర్ణాంకం c)
 {
     // Sorted list of non-overlapping intervals.
     // Generated by ../runtime/tools/unicode.vim.
-    static struct interval combining[] =
+    స్థిర నిర్మాణం interval combining[] =
     {
 	{0x0300, 0x036f},
 	{0x0483, 0x0489},
@@ -2834,33 +2834,33 @@ utf_iscomposing(int c)
 	{0xe0100, 0xe01ef}
     };
 
-    return intable(combining, sizeof(combining), c);
+    తిరిగి intable(combining, పరిమాణం(combining), c);
 }
 
 /*
  * Return TRUE for characters that can be displayed in a normal way.
  * Only for characters of 0x100 and above!
  */
-    int
-utf_printable(int c)
+    పూర్ణాంకం
+utf_printable(పూర్ణాంకం c)
 {
     // Sorted list of non-overlapping intervals.
     // 0xd800-0xdfff is reserved for UTF-16, actually illegal.
-    static struct interval nonprint[] =
+    స్థిర నిర్మాణం interval nonprint[] =
     {
 	{0x070f, 0x070f}, {0x180b, 0x180e}, {0x200b, 0x200f}, {0x202a, 0x202e},
 	{0x2060, 0x206f}, {0xd800, 0xdfff}, {0xfeff, 0xfeff}, {0xfff9, 0xfffb},
 	{0xfffe, 0xffff}
     };
 
-    return !intable(nonprint, sizeof(nonprint), c);
+    తిరిగి !intable(nonprint, పరిమాణం(nonprint), c);
 }
 
 // Sorted list of non-overlapping intervals of all Emoji characters,
 // based on http://unicode.org/emoji/charts/emoji-list.html
 // Generated by ../runtime/tools/unicode.vim.
 // Excludes 0x00a9 and 0x00ae because they are considered latin1.
-static struct interval emoji_all[] =
+స్థిర నిర్మాణం interval emoji_all[] =
 {
     {0x203c, 0x203c},
     {0x2049, 0x2049},
@@ -3016,21 +3016,21 @@ static struct interval emoji_all[] =
  * 1: punctuation
  * 2 or bigger: some class of word character.
  */
-    int
-utf_class(int c)
+    పూర్ణాంకం
+utf_class(పూర్ణాంకం c)
 {
-    return utf_class_buf(c, curbuf);
+    తిరిగి utf_class_buf(c, curbuf);
 }
 
-    int
-utf_class_buf(int c, buf_T *buf)
+    పూర్ణాంకం
+utf_class_buf(పూర్ణాంకం c, buf_T *buf)
 {
     // sorted list of non-overlapping intervals
-    static struct clinterval
+    స్థిర నిర్మాణం clinterval
     {
-	unsigned int first;
-	unsigned int last;
-	unsigned int class;
+	గుర్తులేని పూర్ణాంకం మొదటి;
+	గుర్తులేని పూర్ణాంకం చివరి;
+	గుర్తులేని పూర్ణాంకం class;
     } classes[] =
     {
 	{0x037e, 0x037e, 1},		// Greek question mark
@@ -3106,45 +3106,45 @@ utf_class_buf(int c, buf_T *buf)
 	{0x2f800, 0x2fa1f, 0x4e00},	// CJK Ideographs
     };
 
-    int bot = 0;
-    int top = ARRAY_LENGTH(classes) - 1;
-    int mid;
+    పూర్ణాంకం bot = 0;
+    పూర్ణాంకం శిఖరం = ARRAY_నిడివి(classes) - 1;
+    పూర్ణాంకం mid;
 
     // First quick check for Latin1 characters, use 'iskeyword'.
-    if (c < 0x100)
+    ఒకవేళ (c < 0x100)
     {
-	if (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
-	    return 0;	    // blank
-	if (vim_iswordc_buf(c, buf))
-	    return 2;	    // word character
-	return 1;	    // punctuation
+	ఒకవేళ (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
+	    తిరిగి 0;	    // blank
+	ఒకవేళ (vim_iswordc_buf(c, buf))
+	    తిరిగి 2;	    // word character
+	తిరిగి 1;	    // punctuation
     }
 
     // emoji
-    if (intable(emoji_all, sizeof(emoji_all), c))
-	return 3;
+    ఒకవేళ (intable(emoji_all, పరిమాణం(emoji_all), c))
+	తిరిగి 3;
 
     // binary search in table
-    while (top >= bot)
+    అయితే (శిఖరం >= bot)
     {
-	mid = (bot + top) / 2;
-	if (classes[mid].last < (unsigned int)c)
+	mid = (bot + శిఖరం) / 2;
+	ఒకవేళ (classes[mid].చివరి < (గుర్తులేని పూర్ణాంకం)c)
 	    bot = mid + 1;
-	else if (classes[mid].first > (unsigned int)c)
-	    top = mid - 1;
-	else
-	    return (int)classes[mid].class;
+	లేకపోతే ఒకవేళ (classes[mid].మొదటి > (గుర్తులేని పూర్ణాంకం)c)
+	    శిఖరం = mid - 1;
+	లేకపోతే
+	    తిరిగి (పూర్ణాంకం)classes[mid].class;
     }
 
     // most other characters are "word" characters
-    return 2;
+    తిరిగి 2;
 }
 
-    int
-utf_ambiguous_width(int c)
+    పూర్ణాంకం
+utf_ambiguous_వెడల్పు(పూర్ణాంకం c)
 {
-    return c >= 0x80 && (intable(ambiguous, sizeof(ambiguous), c)
-	    || intable(emoji_all, sizeof(emoji_all), c));
+    తిరిగి c >= 0x80 && (intable(ambiguous, పరిమాణం(ambiguous), c)
+	    || intable(emoji_all, పరిమాణం(emoji_all), c));
 }
 
 /*
@@ -3161,15 +3161,15 @@ utf_ambiguous_width(int c)
  * range from 0x41 to 0x5a inclusive, stepping by 1, are changed to
  * folded/upper/lower by adding 32.
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    int rangeStart;
-    int rangeEnd;
-    int step;
-    int offset;
+    పూర్ణాంకం range_ప్రారంభం_2;
+    పూర్ణాంకం range_చివర_2;
+    పూర్ణాంకం అడుగు;
+    పూర్ణాంకం స్థానభ్రంశం;
 } convertStruct;
 
-static convertStruct foldCase[] =
+స్థిర convertStruct foldCase[] =
 {
 	{0x41,0x5a,1,32},
 	{0xb5,0xb5,-1,775},
@@ -3384,49 +3384,49 @@ static convertStruct foldCase[] =
  * Return the converted equivalent of "a", which is a UCS-4 character.  Use
  * the given conversion "table".  Uses binary search on "table".
  */
-    static int
+    స్థిర పూర్ణాంకం
 utf_convert(
-    int			a,
-    convertStruct	table[],
-    int			tableSize)
+    పూర్ణాంకం			a,
+    convertStruct	పట్టిక[],
+    పూర్ణాంకం			పట్టిక_కొలత_3)
 {
-    int start, mid, end; // indices into table
-    int entries = tableSize / sizeof(convertStruct);
+    పూర్ణాంకం ప్రారంభం, mid, చివర; // indices into table
+    పూర్ణాంకం entries = పట్టిక_కొలత_3 / పరిమాణం(convertStruct);
 
-    start = 0;
-    end = entries;
-    while (start < end)
+    ప్రారంభం = 0;
+    చివర = entries;
+    అయితే (ప్రారంభం < చివర)
     {
 	// need to search further
-	mid = (end + start) / 2;
-	if (table[mid].rangeEnd < a)
-	    start = mid + 1;
-	else
-	    end = mid;
+	mid = (చివర + ప్రారంభం) / 2;
+	ఒకవేళ (పట్టిక[mid].range_చివర_2 < a)
+	    ప్రారంభం = mid + 1;
+	లేకపోతే
+	    చివర = mid;
     }
-    if (start < entries
-	    && table[start].rangeStart <= a
-	    && a <= table[start].rangeEnd
-	    && (a - table[start].rangeStart) % table[start].step == 0)
-	return (a + table[start].offset);
-    else
-	return a;
+    ఒకవేళ (ప్రారంభం < entries
+	    && పట్టిక[ప్రారంభం].range_ప్రారంభం_2 <= a
+	    && a <= పట్టిక[ప్రారంభం].range_చివర_2
+	    && (a - పట్టిక[ప్రారంభం].range_ప్రారంభం_2) % పట్టిక[ప్రారంభం].అడుగు == 0)
+	తిరిగి (a + పట్టిక[ప్రారంభం].స్థానభ్రంశం);
+    లేకపోతే
+	తిరిగి a;
 }
 
 /*
  * Return the folded-case equivalent of "a", which is a UCS-4 character.  Uses
  * simple case folding.
  */
-    int
-utf_fold(int a)
+    పూర్ణాంకం
+utf_fold(పూర్ణాంకం a)
 {
-    if (a < 0x80)
+    ఒకవేళ (a < 0x80)
 	// be fast for ASCII
-	return a >= 0x41 && a <= 0x5a ? a + 32 : a;
-    return utf_convert(a, foldCase, (int)sizeof(foldCase));
+	తిరిగి a >= 0x41 && a <= 0x5a ? a + 32 : a;
+    తిరిగి utf_convert(a, foldCase, (పూర్ణాంకం)పరిమాణం(foldCase));
 }
 
-static convertStruct toLower[] =
+స్థిర convertStruct గమ్యం_క్రింది[] =
 {
 	{0x41,0x5a,1,32},
 	{0xc0,0xd6,1,32},
@@ -3615,7 +3615,7 @@ static convertStruct toLower[] =
 
 // Note: UnicodeData.txt does not define U+1E9E as being the corresponding upper
 // case letter for U+00DF (ß), however it is part of the toLower table
-static convertStruct toUpper[] =
+స్థిర convertStruct గమ్యం_పై[] =
 {
 	{0x61,0x7a,1,-32},
 	{0xb5,0xb5,-1,743},
@@ -3821,99 +3821,99 @@ static convertStruct toUpper[] =
  * Return the upper-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_toupper(int a)
+    పూర్ణాంకం
+utf_toupper(పూర్ణాంకం a)
 {
     // If 'casemap' contains "keepascii" use ASCII style toupper().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOUPPER_ASC(a);
+    ఒకవేళ (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	తిరిగి TOUPPER_ASC(a);
 
-#if defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
+#ఒకవేళ defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
     // If towupper() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towupper(a);
-#endif
+    ఒకవేళ (!(cmp_flags & CMP_అంతర్గత))
+	తిరిగి towupper(a);
+#అయితే_ముగింపు
 
     // For characters below 128 use locale sensitive toupper().
-    if (a < 128)
-	return TOUPPER_LOC(a);
+    ఒకవేళ (a < 128)
+	తిరిగి TOUPPER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toUpper, (int)sizeof(toUpper));
+    తిరిగి utf_convert(a, గమ్యం_పై, (పూర్ణాంకం)పరిమాణం(గమ్యం_పై));
 }
 
-    int
-utf_islower(int a)
+    పూర్ణాంకం
+utf_islower(పూర్ణాంకం a)
 {
     // German sharp s is lower case but has no upper case equivalent.
-    return (utf_toupper(a) != a) || a == 0xdf;
+    తిరిగి (utf_toupper(a) != a) || a == 0xdf;
 }
 
 /*
  * Return the lower-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_tolower(int a)
+    పూర్ణాంకం
+utf_tolower(పూర్ణాంకం a)
 {
     // If 'casemap' contains "keepascii" use ASCII style tolower().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOLOWER_ASC(a);
+    ఒకవేళ (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	తిరిగి TOLOWER_ASC(a);
 
-#if defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
+#ఒకవేళ defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
     // If towlower() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towlower(a);
-#endif
+    ఒకవేళ (!(cmp_flags & CMP_అంతర్గత))
+	తిరిగి towlower(a);
+#అయితే_ముగింపు
 
     // For characters below 128 use locale sensitive tolower().
-    if (a < 128)
-	return TOLOWER_LOC(a);
+    ఒకవేళ (a < 128)
+	తిరిగి TOLOWER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toLower, (int)sizeof(toLower));
+    తిరిగి utf_convert(a, గమ్యం_క్రింది, (పూర్ణాంకం)పరిమాణం(గమ్యం_క్రింది));
 }
 
-    int
-utf_isupper(int a)
+    పూర్ణాంకం
+utf_isupper(పూర్ణాంకం a)
 {
-    return (utf_tolower(a) != a);
+    తిరిగి (utf_tolower(a) != a);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 utf_strnicmp(
     char_u      *s1,
     char_u      *s2,
     size_t      n1,
     size_t      n2)
 {
-    int		c1, c2, cdiff;
-    char_u	buffer[6];
+    పూర్ణాంకం		c1, c2, cdiff;
+    char_u	బఫరు[6];
 
-    for (;;)
+    కొరకు (;;)
     {
-	c1 = utf_safe_read_char_adv(&s1, &n1);
-	c2 = utf_safe_read_char_adv(&s2, &n2);
+	c1 = utf_సురక్షిత_read_char_adv(&s1, &n1);
+	c2 = utf_సురక్షిత_read_char_adv(&s2, &n2);
 
-	if (c1 <= 0 || c2 <= 0)
-	    break;
+	ఒకవేళ (c1 <= 0 || c2 <= 0)
+	    ఆపు;
 
-	if (c1 == c2)
-	    continue;
+	ఒకవేళ (c1 == c2)
+	    కొనసాగు;
 
 	cdiff = utf_fold(c1) - utf_fold(c2);
-	if (cdiff != 0)
-	    return cdiff;
+	ఒకవేళ (cdiff != 0)
+	    తిరిగి cdiff;
     }
 
     // some string ended or has an incomplete/illegal character sequence
 
-    if (c1 == 0 || c2 == 0)
+    ఒకవేళ (c1 == 0 || c2 == 0)
     {
 	// some string ended. shorter string is smaller
-	if (c1 == 0 && c2 == 0)
-	    return 0;
-	return c1 == 0 ? -1 : 1;
+	ఒకవేళ (c1 == 0 && c2 == 0)
+	    తిరిగి 0;
+	తిరిగి c1 == 0 ? -1 : 1;
     }
 
     // Continue with bytewise comparison to produce some result that
@@ -3923,22 +3923,22 @@ utf_strnicmp(
     // folded version of the other string. In this case it is enough
     // to fold just one character to determine the result of comparison.
 
-    if (c1 != -1 && c2 == -1)
+    ఒకవేళ (c1 != -1 && c2 == -1)
     {
-	n1 = utf_char2bytes(utf_fold(c1), buffer);
-	s1 = buffer;
+	n1 = utf_char2bytes(utf_fold(c1), బఫరు);
+	s1 = బఫరు;
     }
-    else if (c2 != -1 && c1 == -1)
+    లేకపోతే ఒకవేళ (c2 != -1 && c1 == -1)
     {
-	n2 = utf_char2bytes(utf_fold(c2), buffer);
-	s2 = buffer;
+	n2 = utf_char2bytes(utf_fold(c2), బఫరు);
+	s2 = బఫరు;
     }
 
-    while (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
+    అయితే (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
     {
-	cdiff = (int)(*s1) - (int)(*s2);
-	if (cdiff != 0)
-	    return cdiff;
+	cdiff = (పూర్ణాంకం)(*s1) - (పూర్ణాంకం)(*s2);
+	ఒకవేళ (cdiff != 0)
+	    తిరిగి cdiff;
 
 	s1++;
 	s2++;
@@ -3946,14 +3946,14 @@ utf_strnicmp(
 	n2--;
     }
 
-    if (n1 > 0 && *s1 == NUL)
+    ఒకవేళ (n1 > 0 && *s1 == NUL)
 	n1 = 0;
-    if (n2 > 0 && *s2 == NUL)
+    ఒకవేళ (n2 > 0 && *s2 == NUL)
 	n2 = 0;
 
-    if (n1 == 0 && n2 == 0)
-	return 0;
-    return n1 == 0 ? -1 : 1;
+    ఒకవేళ (n1 == 0 && n2 == 0)
+	తిరిగి 0;
+    తిరిగి n1 == 0 ? -1 : 1;
 }
 
 /*
@@ -3964,103 +3964,103 @@ utf_strnicmp(
  * Returns zero if s1 and s2 are equal (ignoring case), the difference between
  * two characters otherwise.
  */
-    int
+    పూర్ణాంకం
 mb_strnicmp2(char_u *s1, char_u *s2, size_t n1, size_t n2)
 {
-    if (n1 == n2 || !enc_utf8)
-	return mb_strnicmp(s1, s2, n1);
-    else
-	return utf_strnicmp(s1, s2, n1, n2);
+    ఒకవేళ (n1 == n2 || !enc_utf8)
+	తిరిగి mb_strnicmp(s1, s2, n1);
+    లేకపోతే
+	తిరిగి utf_strnicmp(s1, s2, n1, n2);
 }
 
-    int
+    పూర్ణాంకం
 mb_strnicmp(char_u *s1, char_u *s2, size_t nn)
 {
-    int		i, l;
-    int		cdiff;
-    int		n = (int)nn;
+    పూర్ణాంకం		i, l;
+    పూర్ణాంకం		cdiff;
+    పూర్ణాంకం		n = (పూర్ణాంకం)nn;
 
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
-	return utf_strnicmp(s1, s2, nn, nn);
+	తిరిగి utf_strnicmp(s1, s2, nn, nn);
     }
-    else
+    లేకపోతే
     {
-	for (i = 0; i < n; i += l)
+	కొరకు (i = 0; i < n; i += l)
 	{
-	    if (s1[i] == NUL && s2[i] == NUL)	// both strings end
-		return 0;
+	    ఒకవేళ (s1[i] == NUL && s2[i] == NUL)	// both strings end
+		తిరిగి 0;
 
 	    l = (*mb_ptr2len)(s1 + i);
-	    if (l <= 1)
+	    ఒకవేళ (l <= 1)
 	    {
 		// Single byte: first check normally, then with ignore case.
-		if (s1[i] != s2[i])
+		ఒకవేళ (s1[i] != s2[i])
 		{
 		    cdiff = MB_TOLOWER(s1[i]) - MB_TOLOWER(s2[i]);
-		    if (cdiff != 0)
-			return cdiff;
+		    ఒకవేళ (cdiff != 0)
+			తిరిగి cdiff;
 		}
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// For non-Unicode multi-byte don't ignore case.
-		if (l > n - i)
+		ఒకవేళ (l > n - i)
 		    l = n - i;
 		cdiff = STRNCMP(s1 + i, s2 + i, l);
-		if (cdiff != 0)
-		    return cdiff;
+		ఒకవేళ (cdiff != 0)
+		    తిరిగి cdiff;
 	    }
 	}
     }
-    return 0;
+    తిరిగి 0;
 }
 
 /*
  * "g8": show bytes of the UTF-8 char under the cursor.  Doesn't matter what
  * 'encoding' has been set to.
  */
-    void
-show_utf8(void)
+    శూన్య
+show_utf8(శూన్య)
 {
-    int		len;
-    int		rlen = 0;
-    char_u	*line;
-    int		clen;
-    int		i;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		rlen = 0;
+    char_u	*పంక్తి;
+    పూర్ణాంకం		clen;
+    పూర్ణాంకం		i;
 
     // Get the byte length of the char under the cursor, including composing
     // characters.
-    line = ml_get_cursor();
-    len = utfc_ptr2len(line);
-    if (len == 0)
+    పంక్తి = ml_get_cursor();
+    len = utfc_ptr2len(పంక్తి);
+    ఒకవేళ (len == 0)
     {
-	msg("NUL");
-	return;
+	సందేశం("NUL");
+	తిరిగి;
     }
 
     clen = 0;
-    for (i = 0; i < len; ++i)
+    కొరకు (i = 0; i < len; ++i)
     {
-	if (clen == 0)
+	ఒకవేళ (clen == 0)
 	{
 	    // start of (composing) character, get its length
-	    if (i > 0)
+	    ఒకవేళ (i > 0)
 	    {
 		STRCPY(IObuff + rlen, "+ ");
 		rlen += 2;
 	    }
-	    clen = utf_ptr2len(line + i);
+	    clen = utf_ptr2len(పంక్తి + i);
 	}
-	sprintf((char *)IObuff + rlen, "%02x ",
-		(line[i] == NL) ? NUL : line[i]);  // NUL is stored as NL
+	sprintf((అక్షరం *)IObuff + rlen, "%02x ",
+		(పంక్తి[i] == NL) ? NUL : పంక్తి[i]);  // NUL is stored as NL
 	--clen;
-	rlen += (int)STRLEN(IObuff + rlen);
-	if (rlen > IOSIZE - 20)
-	    break;
+	rlen += (పూర్ణాంకం)STRLEN(IObuff + rlen);
+	ఒకవేళ (rlen > IOSIZE - 20)
+	    ఆపు;
     }
 
-    msg((char *)IObuff);
+    సందేశం((అక్షరం *)IObuff);
 }
 
 /*
@@ -4069,36 +4069,36 @@ show_utf8(void)
  * If "p" points to the NUL at the end of the string return 0.
  * Returns 0 when already at the first byte of a character.
  */
-    int
-latin_head_off(char_u *base UNUSED, char_u *p UNUSED)
+    పూర్ణాంకం
+latin_తల_off(char_u *పునాది వాడని, char_u *p వాడని)
 {
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-dbcs_head_off(char_u *base, char_u *p)
+    స్థిర పూర్ణాంకం
+dbcs_తల_off(char_u *పునాది, char_u *p)
 {
     char_u	*q;
 
     // It can't be a trailing byte when not using DBCS, at the start of the
     // string or the previous byte can't start a double-byte.
-    if (p <= base || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
-	return 0;
+    ఒకవేళ (p <= పునాది || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
+	తిరిగి 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
-    q = base;
-    while (q < p)
+    q = పునాది;
+    అయితే (q < p)
 	q += dbcs_ptr2len(q);
-    return (q == p) ? 0 : 1;
+    తిరిగి (q == p) ? 0 : 1;
 }
 
 /*
  * Special version of dbcs_head_off() that works for ScreenLines[], where
  * single-width DBCS_JPNU characters are stored separately.
  */
-    int
-dbcs_screen_head_off(char_u *base, char_u *p)
+    పూర్ణాంకం
+dbcs_screen_తల_off(char_u *పునాది, char_u *p)
 {
     char_u	*q;
 
@@ -4106,25 +4106,25 @@ dbcs_screen_head_off(char_u *base, char_u *p)
     // string or the previous byte can't start a double-byte.
     // For euc-jp an 0x8e byte in the previous cell always means we have a
     // lead byte in the current cell.
-    if (p <= base
+    ఒకవేళ (p <= పునాది
 	    || (enc_dbcs == DBCS_JPNU && p[-1] == 0x8e)
 	    || MB_BYTE2LEN(p[-1]) == 1
 	    || *p == NUL)
-	return 0;
+	తిరిగి 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
     // For DBCS_JPNU look out for 0x8e, which means the second byte is not
     // stored as the next byte.
-    q = base;
-    while (q < p)
+    q = పునాది;
+    అయితే (q < p)
     {
-	if (enc_dbcs == DBCS_JPNU && *q == 0x8e)
+	ఒకవేళ (enc_dbcs == DBCS_JPNU && *q == 0x8e)
 	    ++q;
-	else
+	లేకపోతే
 	    q += dbcs_ptr2len(q);
     }
-    return (q == p) ? 0 : 1;
+    తిరిగి (q == p) ? 0 : 1;
 }
 
 /*
@@ -4132,69 +4132,69 @@ dbcs_screen_head_off(char_u *base, char_u *p)
  * characters.  "base" must be the start of the string, which must be NUL
  * terminated.
  */
-    int
-utf_head_off(char_u *base, char_u *p)
+    పూర్ణాంకం
+utf_తల_off(char_u *పునాది, char_u *p)
 {
     char_u	*q;
     char_u	*s;
-    int		c;
-    int		len;
-#ifdef FEAT_ARABIC
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		len;
+#నిర్వచితమైతే FEAT_ARABIC
     char_u	*j;
-#endif
+#అయితే_ముగింపు
 
-    if (*p < 0x80)		// be quick for ASCII
-	return 0;
+    ఒకవేళ (*p < 0x80)		// be quick for ASCII
+	తిరిగి 0;
 
     // Skip backwards over trailing bytes: 10xx.xxxx
     // Skip backwards again if on a composing char.
-    for (q = p; ; --q)
+    కొరకు (q = p; ; --q)
     {
 	// Move s to the last byte of this char.
-	for (s = q; (s[1] & 0xc0) == 0x80; ++s)
+	కొరకు (s = q; (s[1] & 0xc0) == 0x80; ++s)
 	    ;
 	// Move q to the first byte of this char.
-	while (q > base && (*q & 0xc0) == 0x80)
+	అయితే (q > పునాది && (*q & 0xc0) == 0x80)
 	    --q;
 	// Check for illegal sequence. Do allow an illegal byte after where we
 	// started.
 	len = utf8len_tab[*q];
-	if (len != (int)(s - q + 1) && len != (int)(p - q + 1))
-	    return 0;
+	ఒకవేళ (len != (పూర్ణాంకం)(s - q + 1) && len != (పూర్ణాంకం)(p - q + 1))
+	    తిరిగి 0;
 
-	if (q <= base)
-	    break;
+	ఒకవేళ (q <= పునాది)
+	    ఆపు;
 
 	c = utf_ptr2char(q);
-	if (utf_iscomposing(c))
-	    continue;
+	ఒకవేళ (utf_iscomposing(c))
+	    కొనసాగు;
 
-#ifdef FEAT_ARABIC
-	if (arabic_maycombine(c))
+#నిర్వచితమైతే FEAT_ARABIC
+	ఒకవేళ (arabic_maycombine(c))
 	{
 	    // Advance to get a sneak-peak at the next char
 	    j = q;
 	    --j;
 	    // Move j to the first byte of this char.
-	    while (j > base && (*j & 0xc0) == 0x80)
+	    అయితే (j > పునాది && (*j & 0xc0) == 0x80)
 		--j;
-	    if (arabic_combine(utf_ptr2char(j), c))
-		continue;
+	    ఒకవేళ (arabic_combine(utf_ptr2char(j), c))
+		కొనసాగు;
 	}
-#endif
-	break;
+#అయితే_ముగింపు
+	ఆపు;
     }
 
-    return (int)(p - q);
+    తిరిగి (పూర్ణాంకం)(p - q);
 }
 
 /*
  * Whether space is NOT allowed before/after 'c'.
  */
-    int
-utf_eat_space(int cc)
+    పూర్ణాంకం
+utf_eat_space(పూర్ణాంకం cc)
 {
-    return ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
+    తిరిగి ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
 	 || (cc >= 0x2e00 && cc <= 0x2e7f)	// Supplemental punctuations
 	 || (cc >= 0x3000 && cc <= 0x303f)	// CJK symbols and punctuations
 	 || (cc >= 0xff01 && cc <= 0xff0f)	// Full width ASCII punctuations
@@ -4206,10 +4206,10 @@ utf_eat_space(int cc)
 /*
  * Whether line break is allowed before "cc".
  */
-    int
-utf_allow_break_before(int cc)
+    పూర్ణాంకం
+utf_allow_break_before(పూర్ణాంకం cc)
 {
-    static const int BOL_prohibition_punct[] =
+    స్థిర స్థిరరాశి పూర్ణాంకం BOL_prohibition_punct[] =
     {
 	'!',
 	'%',
@@ -4256,32 +4256,32 @@ utf_allow_break_before(int cc)
 	0xff5d, // ｝ fullwidth right curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(BOL_prohibition_punct) - 1;
-    int mid   = 0;
+    పూర్ణాంకం మొదటి = 0;
+    పూర్ణాంకం చివరి  = ARRAY_నిడివి(BOL_prohibition_punct) - 1;
+    పూర్ణాంకం mid   = 0;
 
-    while (first < last)
+    అయితే (మొదటి < చివరి)
     {
-	mid = (first + last)/2;
+	mid = (మొదటి + చివరి)/2;
 
-	if (cc == BOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > BOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	ఒకవేళ (cc == BOL_prohibition_punct[mid])
+	    తిరిగి FALSE;
+	లేకపోతే ఒకవేళ (cc > BOL_prohibition_punct[mid])
+	    మొదటి = mid + 1;
+	లేకపోతే
+	    చివరి = mid - 1;
     }
 
-    return cc != BOL_prohibition_punct[first];
+    తిరిగి cc != BOL_prohibition_punct[మొదటి];
 }
 
 /*
  * Whether line break is allowed after "cc".
  */
-    static int
-utf_allow_break_after(int cc)
+    స్థిర పూర్ణాంకం
+utf_allow_break_after(పూర్ణాంకం cc)
 {
-    static const int EOL_prohibition_punct[] =
+    స్థిర స్థిరరాశి పూర్ణాంకం EOL_prohibition_punct[] =
     {
 	'(',
 	'<',
@@ -4306,47 +4306,47 @@ utf_allow_break_after(int cc)
 	0xff5b, // ｛ fullwidth left curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(EOL_prohibition_punct) - 1;
-    int mid   = 0;
+    పూర్ణాంకం మొదటి = 0;
+    పూర్ణాంకం చివరి  = ARRAY_నిడివి(EOL_prohibition_punct) - 1;
+    పూర్ణాంకం mid   = 0;
 
-    while (first < last)
+    అయితే (మొదటి < చివరి)
     {
-	mid = (first + last)/2;
+	mid = (మొదటి + చివరి)/2;
 
-	if (cc == EOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > EOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	ఒకవేళ (cc == EOL_prohibition_punct[mid])
+	    తిరిగి FALSE;
+	లేకపోతే ఒకవేళ (cc > EOL_prohibition_punct[mid])
+	    మొదటి = mid + 1;
+	లేకపోతే
+	    చివరి = mid - 1;
     }
 
-    return cc != EOL_prohibition_punct[first];
+    తిరిగి cc != EOL_prohibition_punct[మొదటి];
 }
 
 /*
  * Whether line break is allowed between "cc" and "ncc".
  */
-    int
-utf_allow_break(int cc, int ncc)
+    పూర్ణాంకం
+utf_allow_break(పూర్ణాంకం cc, పూర్ణాంకం ncc)
 {
     // don't break between two-letter punctuations
-    if (cc == ncc
+    ఒకవేళ (cc == ncc
 	    && (cc == 0x2014 // em dash
 		|| cc == 0x2026)) // horizontal ellipsis
-	return FALSE;
+	తిరిగి FALSE;
 
-    return utf_allow_break_after(cc) && utf_allow_break_before(ncc);
+    తిరిగి utf_allow_break_after(cc) && utf_allow_break_before(ncc);
 }
 
 /*
  * Copy a character from "*fp" to "*tp" and advance the pointers.
  */
-    void
+    శూన్య
 mb_copy_char(char_u **fp, char_u **tp)
 {
-    int	    l = (*mb_ptr2len)(*fp);
+    పూర్ణాంకం	    l = (*mb_ptr2len)(*fp);
 
     mch_memmove(*tp, *fp, (size_t)l);
     *tp += l;
@@ -4358,15 +4358,15 @@ mb_copy_char(char_u **fp, char_u **tp)
  * at the start of a character 0 is returned, otherwise the offset to the next
  * character.  Can start anywhere in a stream of bytes.
  */
-    int
-mb_off_next(char_u *base, char_u *p)
+    పూర్ణాంకం
+mb_off_తదుపరి(char_u *పునాది, char_u *p)
 {
-    int		head_off = (*mb_head_off)(base, p);
+    పూర్ణాంకం		తల_off = (*mb_తల_off)(పునాది, p);
 
-    if (head_off == 0)
-	return 0;
+    ఒకవేళ (తల_off == 0)
+	తిరిగి 0;
 
-    return (*mb_ptr2len)(p - head_off) - head_off;
+    తిరిగి (*mb_ptr2len)(p - తల_off) - తల_off;
 }
 
 /*
@@ -4374,102 +4374,102 @@ mb_off_next(char_u *base, char_u *p)
  * into.  Can start anywhere in a stream of bytes.
  * Composing characters are not included.
  */
-    int
-mb_tail_off(char_u *base, char_u *p)
+    పూర్ణాంకం
+mb_తోక_off(char_u *పునాది, char_u *p)
 {
-    int		i;
-    int		j;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		j;
 
-    if (*p == NUL)
-	return 0;
+    ఒకవేళ (*p == NUL)
+	తిరిగి 0;
 
-    if (enc_utf8)
+    ఒకవేళ (enc_utf8)
     {
 	// Find the last character that is 10xx.xxxx
-	for (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
+	కొరకు (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
 	    ;
 	// Check for illegal sequence.
-	for (j = 0; p - j > base; ++j)
-	    if ((p[-j] & 0xc0) != 0x80)
-		break;
-	if (utf8len_tab[p[-j]] != i + j + 1)
-	    return 0;
-	return i;
+	కొరకు (j = 0; p - j > పునాది; ++j)
+	    ఒకవేళ ((p[-j] & 0xc0) != 0x80)
+		ఆపు;
+	ఒకవేళ (utf8len_tab[p[-j]] != i + j + 1)
+	    తిరిగి 0;
+	తిరిగి i;
     }
 
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
-    if (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
-	return 0;
+    ఒకవేళ (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
+	తిరిగి 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_head_off(base, p);
+    తిరిగి 1 - dbcs_తల_off(పునాది, p);
 }
 
 /*
  * Find the next illegal byte sequence.
  */
-    void
-utf_find_illegal(void)
+    శూన్య
+utf_కనుగొను_illegal(శూన్య)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*p;
-    int		len;
+    పూర్ణాంకం		len;
     vimconv_T	vimconv;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ఖాళీ;
 
     vimconv.vc_type = CONV_NONE;
-    if (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
+    ఒకవేళ (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8_బిట్టు))
     {
 	// 'encoding' is "utf-8" but we are editing a 8-bit encoded file,
 	// possibly a utf-8 file with illegal bytes.  Setup for conversion
 	// from utf-8 to 'fileencoding'.
-	convert_setup(&vimconv, p_enc, curbuf->b_p_fenc);
+	convert_అమరిక(&vimconv, p_enc, curbuf->b_p_fenc);
     }
 
     curwin->w_cursor.coladd = 0;
-    for (;;)
+    కొరకు (;;)
     {
 	p = ml_get_cursor();
-	if (vimconv.vc_type != CONV_NONE)
+	ఒకవేళ (vimconv.vc_type != CONV_NONE)
 	{
 	    vim_free(tofree);
-	    tofree = string_convert(&vimconv, p, NULL);
-	    if (tofree == NULL)
-		break;
+	    tofree = string_convert(&vimconv, p, ఖాళీ);
+	    ఒకవేళ (tofree == ఖాళీ)
+		ఆపు;
 	    p = tofree;
 	}
 
-	while (*p != NUL)
+	అయితే (*p != NUL)
 	{
 	    // Illegal means that there are not enough trail bytes (checked by
 	    // utf_ptr2len()) or too many of them (overlong sequence).
 	    len = utf_ptr2len(p);
-	    if (*p >= 0x80 && (len == 1
+	    ఒకవేళ (*p >= 0x80 && (len == 1
 				     || utf_char2len(utf_ptr2char(p)) != len))
 	    {
-		if (vimconv.vc_type == CONV_NONE)
-		    curwin->w_cursor.col += (colnr_T)(p - ml_get_cursor());
-		else
+		ఒకవేళ (vimconv.vc_type == CONV_NONE)
+		    curwin->w_cursor.నిలువు += (colnr_T)(p - ml_get_cursor());
+		లేకపోతే
 		{
-		    int	    l;
+		    పూర్ణాంకం	    l;
 
-		    len = (int)(p - tofree);
-		    for (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
+		    len = (పూర్ణాంకం)(p - tofree);
+		    కొరకు (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
 		    {
 			l = utf_ptr2len(p);
-			curwin->w_cursor.col += l;
+			curwin->w_cursor.నిలువు += l;
 		    }
 		}
-		curwin->w_set_curswant = TRUE;
-		goto theend;
+		curwin->w_సమితి_curswant = TRUE;
+		వెళ్ళు theend;
 	    }
 	    p += len;
 	}
-	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
-	    break;
+	ఒకవేళ (curwin->w_cursor.lnum == curbuf->b_ml.ml_పంక్తి_లెక్క)
+	    ఆపు;
 	++curwin->w_cursor.lnum;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.నిలువు = 0;
     }
 
     // didn't find it: don't move and beep
@@ -4478,64 +4478,64 @@ utf_find_illegal(void)
 
 theend:
     vim_free(tofree);
-    convert_setup(&vimconv, NULL, NULL);
+    convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
 /*
  * Return TRUE if string "s" is a valid utf-8 string.
  * When "end" is NULL stop at the first NUL.  Otherwise stop at "end".
  */
-    int
-utf_valid_string(char_u *s, char_u *end)
+    పూర్ణాంకం
+utf_valid_string(char_u *s, char_u *చివర)
 {
-    int		l;
+    పూర్ణాంకం		l;
     char_u	*p = s;
 
-    while (end == NULL ? *p != NUL : p < end)
+    అయితే (చివర == ఖాళీ ? *p != NUL : p < చివర)
     {
 	l = utf8len_tab_zero[*p];
-	if (l == 0)
-	    return FALSE;	// invalid lead byte
-	if (end != NULL && p + l > end)
-	    return FALSE;	// incomplete byte sequence
+	ఒకవేళ (l == 0)
+	    తిరిగి FALSE;	// invalid lead byte
+	ఒకవేళ (చివర != ఖాళీ && p + l > చివర)
+	    తిరిగి FALSE;	// incomplete byte sequence
 	++p;
-	while (--l > 0)
-	    if ((*p++ & 0xc0) != 0x80)
-		return FALSE;	// invalid trail byte
+	అయితే (--l > 0)
+	    ఒకవేళ ((*p++ & 0xc0) != 0x80)
+		తిరిగి FALSE;	// invalid trail byte
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(FEAT_GUI)
+#ఒకవేళ defined(FEAT_GUI)
 /*
  * Special version of mb_tail_off() for use in ScreenLines[].
  */
-    int
-dbcs_screen_tail_off(char_u *base, char_u *p)
+    పూర్ణాంకం
+dbcs_screen_తోక_off(char_u *పునాది, char_u *p)
 {
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
     // For euc-jp an 0x8e byte always means we have a lead byte in the current
     // cell.
-    if (*p == NUL || p[1] == NUL
+    ఒకవేళ (*p == NUL || p[1] == NUL
 	    || (enc_dbcs == DBCS_JPNU && *p == 0x8e)
 	    || MB_BYTE2LEN(*p) == 1)
-	return 0;
+	తిరిగి 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_screen_head_off(base, p);
+    తిరిగి 1 - dbcs_screen_తల_off(పునాది, p);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * If the cursor moves on an trail byte, set the cursor on the lead byte.
  * Thus it moves left if necessary.
  * Return TRUE when the cursor was adjusted.
  */
-    void
-mb_adjust_cursor(void)
+    శూన్య
+mb_adjust_cursor(శూన్య)
 {
     mb_adjustpos(curbuf, &curwin->w_cursor);
 }
@@ -4544,24 +4544,24 @@ mb_adjust_cursor(void)
  * Adjust position "*lp" to point to the first byte of a multi-byte character.
  * If it points to a tail byte it's moved backwards to the head byte.
  */
-    void
+    శూన్య
 mb_adjustpos(buf_T *buf, pos_T *lp)
 {
     char_u	*p;
 
-    if (lp->col > 0 || lp->coladd > 1)
+    ఒకవేళ (lp->నిలువు > 0 || lp->coladd > 1)
     {
 	p = ml_get_buf(buf, lp->lnum, FALSE);
-	if (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->col)
-	    lp->col = 0;
-	else
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
+	ఒకవేళ (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->నిలువు)
+	    lp->నిలువు = 0;
+	లేకపోతే
+	    lp->నిలువు -= (*mb_తల_off)(p, p + lp->నిలువు);
 	// Reset "coladd" when the cursor would be on the right half of a
 	// double-wide character.
-	if (lp->coladd == 1
-		&& p[lp->col] != TAB
-		&& vim_isprintc((*mb_ptr2char)(p + lp->col))
-		&& ptr2cells(p + lp->col) > 1)
+	ఒకవేళ (lp->coladd == 1
+		&& p[lp->నిలువు] != TAB
+		&& vim_isprintc((*mb_ptr2char)(p + lp->నిలువు))
+		&& ptr2cells(p + lp->నిలువు) > 1)
 	    lp->coladd = 0;
     }
 }
@@ -4571,46 +4571,46 @@ mb_adjustpos(buf_T *buf, pos_T *lp)
  */
     char_u *
 mb_prevptr(
-    char_u *line,	// start of the string
+    char_u *పంక్తి,	// start of the string
     char_u *p)
 {
-    if (p > line)
-	MB_PTR_BACK(line, p);
-    return p;
+    ఒకవేళ (p > పంక్తి)
+	MB_PTR_వెనుక(పంక్తి, p);
+    తిరిగి p;
 }
 
 /*
  * Return the character length of "str".  Each multi-byte character (with
  * following composing characters) counts as one.
  */
-    int
+    పూర్ణాంకం
 mb_charlen(char_u *str)
 {
     char_u	*p = str;
-    int		count;
+    పూర్ణాంకం		లెక్క;
 
-    if (p == NULL)
-	return 0;
+    ఒకవేళ (p == ఖాళీ)
+	తిరిగి 0;
 
-    for (count = 0; *p != NUL; count++)
+    కొరకు (లెక్క = 0; *p != NUL; లెక్క++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    తిరిగి లెక్క;
 }
 
 /*
  * Like mb_charlen() but for a string with specified length.
  */
-    int
-mb_charlen_len(char_u *str, int len)
+    పూర్ణాంకం
+mb_charlen_len(char_u *str, పూర్ణాంకం len)
 {
     char_u	*p = str;
-    int		count;
+    పూర్ణాంకం		లెక్క;
 
-    for (count = 0; *p != NUL && p < str + len; count++)
+    కొరకు (లెక్క = 0; *p != NUL && p < str + len; లెక్క++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    తిరిగి లెక్క;
 }
 
 /*
@@ -4623,57 +4623,57 @@ mb_charlen_len(char_u *str, int len)
     char_u *
 mb_unescape(char_u **pp)
 {
-    static char_u	buf[6];
-    int			n;
-    int			m = 0;
+    స్థిర char_u	buf[6];
+    పూర్ణాంకం			n;
+    పూర్ణాంకం			m = 0;
     char_u		*str = *pp;
 
     // Must translate K_SPECIAL KS_SPECIAL KE_FILLER to K_SPECIAL and CSI
     // KS_EXTRA KE_CSI to CSI.
     // Maximum length of a utf-8 character is 4 bytes.
-    for (n = 0; str[n] != NUL && m < 4; ++n)
+    కొరకు (n = 0; str[n] != NUL && m < 4; ++n)
     {
-	if (str[n] == K_SPECIAL
+	ఒకవేళ (str[n] == K_SPECIAL
 		&& str[n + 1] == KS_SPECIAL
 		&& str[n + 2] == KE_FILLER)
 	{
 	    buf[m++] = K_SPECIAL;
 	    n += 2;
 	}
-	else if ((str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	లేకపోతే ఒకవేళ ((str[n] == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		    || str[n] == CSI
-#endif
+#అయితే_ముగింపు
 		 )
 		&& str[n + 1] == KS_EXTRA
-		&& str[n + 2] == (int)KE_CSI)
+		&& str[n + 2] == (పూర్ణాంకం)KE_CSI)
 	{
 	    buf[m++] = CSI;
 	    n += 2;
 	}
-	else if (str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	లేకపోతే ఒకవేళ (str[n] == K_SPECIAL
+#నిర్వచితమైతే FEAT_GUI
 		|| str[n] == CSI
-#endif
+#అయితే_ముగింపు
 		)
-	    break;		// a special key can't be a multibyte char
-	else
+	    ఆపు;		// a special key can't be a multibyte char
+	లేకపోతే
 	    buf[m++] = str[n];
 	buf[m] = NUL;
 
 	// Return a multi-byte character if it's found.  An illegal sequence
 	// will result in a 1 here.
-	if ((*mb_ptr2len)(buf) > 1)
+	ఒకవేళ ((*mb_ptr2len)(buf) > 1)
 	{
 	    *pp = str + n + 1;
-	    return buf;
+	    తిరిగి buf;
 	}
 
 	// Bail out quickly for ASCII.
-	if (buf[0] < 128)
-	    break;
+	ఒకవేళ (buf[0] < 128)
+	    ఆపు;
     }
-    return NULL;
+    తిరిగి ఖాళీ;
 }
 
 /*
@@ -4681,37 +4681,37 @@ mb_unescape(char_u **pp)
  * of a double-width character.
  * Caller must make sure "row" and "col" are not invalid!
  */
-    int
-mb_lefthalve(int row, int col)
+    పూర్ణాంకం
+mb_lefthalve(పూర్ణాంకం అడ్డువరుస, పూర్ణాంకం నిలువు)
 {
-    return (*mb_off2cells)(LineOffset[row] + col,
-					LineOffset[row] + screen_Columns) > 1;
+    తిరిగి (*mb_off2cells)(పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు,
+					పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + screen_Columns) > 1;
 }
 
 /*
  * Correct a position on the screen, if it's the right half of a double-wide
  * char move it to the left half.  Returns the corrected column.
  */
-    int
-mb_fix_col(int col, int row)
+    పూర్ణాంకం
+mb_fix_నిలువు(పూర్ణాంకం నిలువు, పూర్ణాంకం అడ్డువరుస)
 {
-    int off;
+    పూర్ణాంకం off;
 
-    col = check_col(col);
-    row = check_row(row);
-    off = LineOffset[row] + col;
-    if (has_mbyte && ScreenLines != NULL && col > 0
+    నిలువు = check_నిలువు(నిలువు);
+    అడ్డువరుస = check_అడ్డువరుస(అడ్డువరుస);
+    off = పంక్తి_స్థానభ్రంశం[అడ్డువరుస] + నిలువు;
+    ఒకవేళ (has_mbyte && Screen_పంక్తులు != ఖాళీ && నిలువు > 0
 	    && ((enc_dbcs
-		    && ScreenLines[off] != NUL
-		    && dbcs_screen_head_off(ScreenLines + LineOffset[row],
-					 ScreenLines + off))
-		|| (enc_utf8 && ScreenLines[off] == 0
-						  && ScreenLinesUC[off] == 0)))
-	return col - 1;
-    return col;
+		    && Screen_పంక్తులు[off] != NUL
+		    && dbcs_screen_తల_off(Screen_పంక్తులు + పంక్తి_స్థానభ్రంశం[అడ్డువరుస],
+					 Screen_పంక్తులు + off))
+		|| (enc_utf8 && Screen_పంక్తులు[off] == 0
+						  && Screen_పంక్తులు_UC[off] == 0)))
+	తిరిగి నిలువు - 1;
+    తిరిగి నిలువు;
 }
 
-static int enc_alias_search(char_u *name);
+స్థిర పూర్ణాంకం enc_alias_శోధన(char_u *name);
 
 /*
  * Skip the Vim specific head of a 'encoding' name.
@@ -4719,11 +4719,11 @@ static int enc_alias_search(char_u *name);
     char_u *
 enc_skip(char_u *p)
 {
-    if (STRNCMP(p, "2byte-", 6) == 0)
-	return p + 6;
-    if (STRNCMP(p, "8bit-", 5) == 0)
-	return p + 5;
-    return p;
+    ఒకవేళ (STRNCMP(p, "2byte-", 6) == 0)
+	తిరిగి p + 6;
+    ఒకవేళ (STRNCMP(p, "8bit-", 5) == 0)
+	తిరిగి p + 5;
+    తిరిగి p;
 }
 
 /*
@@ -4737,34 +4737,34 @@ enc_canonize(char_u *enc)
 {
     char_u	*r;
     char_u	*p, *s;
-    int		i;
+    పూర్ణాంకం		i;
 
-    if (STRCMP(enc, "default") == 0)
+    ఒకవేళ (STRCMP(enc, "default") == 0)
     {
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
 	// Use the system encoding, the default is always utf-8.
 	r = enc_locale();
-#else
+#లేకపోతే
 	// Use the default encoding as it's found by set_init_1().
 	r = get_encoding_default();
-#endif
-	if (r == NULL)
+#అయితే_ముగింపు
+	ఒకవేళ (r == ఖాళీ)
 	    r = (char_u *)ENC_DFLT;
-	return vim_strsave(r);
+	తిరిగి vim_strsave(r);
     }
 
     // copy "enc" to allocated memory, with room for two '-'
     r = alloc(STRLEN(enc) + 3);
-    if (r == NULL)
-	return NULL;
+    ఒకవేళ (r == ఖాళీ)
+	తిరిగి ఖాళీ;
 
     // Make it all lower case and replace '_' with '-'.
     p = r;
-    for (s = enc; *s != NUL; ++s)
+    కొరకు (s = enc; *s != NUL; ++s)
     {
-	if (*s == '_')
+	ఒకవేళ (*s == '_')
 	    *p++ = '-';
-	else
+	లేకపోతే
 	    *p++ = TOLOWER_ASC(*s);
     }
     *p = NUL;
@@ -4773,83 +4773,83 @@ enc_canonize(char_u *enc)
     p = enc_skip(r);
 
     // Change "microsoft-cp" to "cp".  Used in some spell files.
-    if (STRNCMP(p, "microsoft-cp", 12) == 0)
+    ఒకవేళ (STRNCMP(p, "microsoft-cp", 12) == 0)
 	STRMOVE(p, p + 10);
 
     // "iso8859" -> "iso-8859"
-    if (STRNCMP(p, "iso8859", 7) == 0)
+    ఒకవేళ (STRNCMP(p, "iso8859", 7) == 0)
     {
 	STRMOVE(p + 4, p + 3);
 	p[3] = '-';
     }
 
     // "iso-8859n" -> "iso-8859-n"
-    if (STRNCMP(p, "iso-8859", 8) == 0 && SAFE_isdigit(p[8]))
+    ఒకవేళ (STRNCMP(p, "iso-8859", 8) == 0 && సురక్షిత_isdigit(p[8]))
     {
 	STRMOVE(p + 9, p + 8);
 	p[8] = '-';
     }
 
     // "latin-N" -> "latinN"
-    if (STRNCMP(p, "latin-", 6) == 0)
+    ఒకవేళ (STRNCMP(p, "latin-", 6) == 0)
 	STRMOVE(p + 5, p + 6);
 
-    if (enc_canon_search(p) >= 0)
+    ఒకవేళ (enc_canon_శోధన(p) >= 0)
     {
 	// canonical name can be used unmodified
-	if (p != r)
+	ఒకవేళ (p != r)
 	    STRMOVE(r, p);
     }
-    else if ((i = enc_alias_search(p)) >= 0)
+    లేకపోతే ఒకవేళ ((i = enc_alias_శోధన(p)) >= 0)
     {
 	// alias recognized, get canonical name
 	vim_free(r);
-	r = vim_strsave((char_u *)enc_canon_table[i].name);
+	r = vim_strsave((char_u *)enc_canon_పట్టిక[i].name);
     }
-    return r;
+    తిరిగి r;
 }
 
 /*
  * Search for an encoding alias of "name".
  * Returns -1 when not found.
  */
-    static int
-enc_alias_search(char_u *name)
+    స్థిర పూర్ణాంకం
+enc_alias_శోధన(char_u *name)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    for (i = 0; enc_alias_table[i].name != NULL; ++i)
-	if (STRCMP(name, enc_alias_table[i].name) == 0)
-	    return enc_alias_table[i].canon;
-    return -1;
+    కొరకు (i = 0; enc_alias_పట్టిక[i].name != ఖాళీ; ++i)
+	ఒకవేళ (STRCMP(name, enc_alias_పట్టిక[i].name) == 0)
+	    తిరిగి enc_alias_పట్టిక[i].canon;
+    తిరిగి -1;
 }
 
 
-#ifdef HAVE_LANGINFO_H
+#నిర్వచితమైతే HAVE_LANGINFO_H
 # include <langinfo.h>
-#endif
+#అయితే_ముగింపు
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ఒకవేళ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Get the canonicalized encoding from the specified locale string "locale"
  * or from the environment variables LC_ALL, LC_CTYPE and LANG.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale_env(char *locale)
+enc_locale_env(అక్షరం *locale)
 {
-    char	*s = locale;
-    char	*p;
-    int		i;
-    char	buf[50];
+    అక్షరం	*s = locale;
+    అక్షరం	*p;
+    పూర్ణాంకం		i;
+    అక్షరం	buf[50];
 
-    if (s == NULL || *s == NUL)
-	if ((s = getenv("LC_ALL")) == NULL || *s == NUL)
-	    if ((s = getenv("LC_CTYPE")) == NULL || *s == NUL)
+    ఒకవేళ (s == ఖాళీ || *s == NUL)
+	ఒకవేళ ((s = getenv("LC_ALL")) == ఖాళీ || *s == NUL)
+	    ఒకవేళ ((s = getenv("LC_CTYPE")) == ఖాళీ || *s == NUL)
 		s = getenv("LANG");
 
-    if (s == NULL || *s == NUL)
-	return NULL;
+    ఒకవేళ (s == ఖాళీ || *s == NUL)
+	తిరిగి ఖాళీ;
 
     // The most generic locale format is:
     // language[_territory][.codeset][@modifier][+special][,[sponsor][_revision]]
@@ -4858,10 +4858,10 @@ enc_locale_env(char *locale)
     // Make the name lowercase and replace '_' with '-'.
     // Exception: "ja_JP.EUC" == "euc-jp", "zh_CN.EUC" = "euc-cn",
     // "ko_KR.EUC" == "euc-kr"
-    if ((p = (char *)vim_strchr((char_u *)s, '.')) != NULL)
+    ఒకవేళ ((p = (అక్షరం *)vim_strchr((char_u *)s, '.')) != ఖాళీ)
     {
-	if (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
-			&& !SAFE_isalnum((int)p[4]) && p[4] != '-' && p[-3] == '_')
+	ఒకవేళ (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
+			&& !సురక్షిత_isalnum((పూర్ణాంకం)p[4]) && p[4] != '-' && p[-3] == '_')
 	{
 	    // copy "XY.EUC" to "euc-XY" to buf[10]
 	    STRCPY(buf + 10, "euc-");
@@ -4870,90 +4870,90 @@ enc_locale_env(char *locale)
 	    buf[16] = 0;
 	    s = buf + 10;
 	}
-	else
+	లేకపోతే
 	    s = p + 1;
     }
-    for (i = 0; i < (int)sizeof(buf) - 1 && s[i] != NUL; ++i)
+    కొరకు (i = 0; i < (పూర్ణాంకం)పరిమాణం(buf) - 1 && s[i] != NUL; ++i)
     {
-	if (s[i] == '_' || s[i] == '-')
+	ఒకవేళ (s[i] == '_' || s[i] == '-')
 	    buf[i] = '-';
-	else if (SAFE_isalnum(s[i]))
+	లేకపోతే ఒకవేళ (సురక్షిత_isalnum(s[i]))
 	    buf[i] = TOLOWER_ASC(s[i]);
-	else
-	    break;
+	లేకపోతే
+	    ఆపు;
     }
     buf[i] = NUL;
 
-    return enc_canonize((char_u *)buf);
+    తిరిగి enc_canonize((char_u *)buf);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Get the canonicalized encoding of the current locale.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale(void)
+enc_locale(శూన్య)
 {
-#ifdef MSWIN
-    char	buf[50];
-    long	acp = GetACP();
+#నిర్వచితమైతే MSWIN
+    అక్షరం	buf[50];
+    దీర్ఘ	acp = GetACP();
 
-    if (acp == 1200)
+    ఒకవేళ (acp == 1200)
 	STRCPY(buf, "ucs-2le");
-    else if (acp == 1252)	    // cp1252 is used as latin1
+    లేకపోతే ఒకవేళ (acp == 1252)	    // cp1252 is used as latin1
 	STRCPY(buf, "latin1");
-    else if (acp == 65001)
+    లేకపోతే ఒకవేళ (acp == 65001)
 	STRCPY(buf, "utf-8");
-    else
+    లేకపోతే
 	sprintf(buf, "cp%ld", acp);
 
-    return enc_canonize((char_u *)buf);
-#else
-    char	*s;
+    తిరిగి enc_canonize((char_u *)buf);
+#లేకపోతే
+    అక్షరం	*s;
 
 # ifdef HAVE_NL_LANGINFO_CODESET
-    if ((s = nl_langinfo(CODESET)) == NULL || *s == NUL)
+    ఒకవేళ ((s = nl_langinfo(CODESET)) == ఖాళీ || *s == NUL)
 # endif
-# if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	if ((s = setlocale(LC_CTYPE, NULL)) == NULL || *s == NUL)
+# ఒకవేళ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	ఒకవేళ ((s = setlocale(LC_CTYPE, ఖాళీ)) == ఖాళీ || *s == NUL)
 # endif
-	    s = NULL;
+	    s = ఖాళీ;
 
-    return enc_locale_env(s);
-#endif
+    తిరిగి enc_locale_env(s);
+#అయితే_ముగింపు
 }
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#ఒకవేళ defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
 /*
  * Convert an encoding name to an MS-Windows codepage.
  * Returns zero if no codepage can be figured out.
  */
-    int
+    పూర్ణాంకం
 encname2codepage(char_u *name)
 {
-    int		cp;
+    పూర్ణాంకం		cp;
     char_u	*p = name;
-    int		idx;
+    పూర్ణాంకం		idx;
 
-    if (STRNCMP(p, "8bit-", 5) == 0)
+    ఒకవేళ (STRNCMP(p, "8bit-", 5) == 0)
 	p += 5;
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    లేకపోతే ఒకవేళ (STRNCMP(p_enc, "2byte-", 6) == 0)
 	p += 6;
 
-    if (p[0] == 'c' && p[1] == 'p')
-	cp = atoi((char *)p + 2);
-    else if ((idx = enc_canon_search(p)) >= 0)
-	cp = enc_canon_table[idx].codepage;
-    else
-	return 0;
-    if (IsValidCodePage(cp))
-	return cp;
-    return 0;
+    ఒకవేళ (p[0] == 'c' && p[1] == 'p')
+	cp = atoi((అక్షరం *)p + 2);
+    లేకపోతే ఒకవేళ ((idx = enc_canon_శోధన(p)) >= 0)
+	cp = enc_canon_పట్టిక[idx].codepage;
+    లేకపోతే
+	తిరిగి 0;
+    ఒకవేళ (Is_Valid_సంకేతం_పుట(cp))
+	తిరిగి cp;
+    తిరిగి 0;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(USE_ICONV)
+#ఒకవేళ defined(USE_ICONV)
 
 /*
  * Call iconv_open() with a check if iconv() works properly (there are broken
@@ -4961,28 +4961,28 @@ encname2codepage(char_u *name)
  * Returns (void *)-1 if failed.
  * (should return iconv_t, but that causes problems with prototypes).
  */
-    void *
-my_iconv_open(char_u *to, char_u *from)
+    శూన్య *
+my_iconv_open(char_u *గమ్యం, char_u *from)
 {
     iconv_t	fd;
 # define ICONV_TESTLEN 400
     char_u	tobuf[ICONV_TESTLEN];
-    char	*p;
+    అక్షరం	*p;
     size_t	tolen;
-    static int	iconv_ok = -1;
+    స్థిర పూర్ణాంకం	iconv_ok = -1;
 
-    if (iconv_ok == FALSE)
-	return (void *)-1;	// detected a broken iconv() previously
+    ఒకవేళ (iconv_ok == FALSE)
+	తిరిగి (శూన్య *)-1;	// detected a broken iconv() previously
 
 # ifdef DYNAMIC_ICONV
     // Check if the iconv.dll can be found.
-    if (!iconv_enabled(TRUE))
-	return (void *)-1;
+    ఒకవేళ (!iconv_enabled(TRUE))
+	తిరిగి (శూన్య *)-1;
 # endif
 
-    fd = iconv_open((char *)enc_skip(to), (char *)enc_skip(from));
+    fd = iconv_open((అక్షరం *)enc_skip(గమ్యం), (అక్షరం *)enc_skip(from));
 
-    if (fd != (iconv_t)-1 && iconv_ok == -1)
+    ఒకవేళ (fd != (iconv_t)-1 && iconv_ok == -1)
     {
 	/*
 	 * Do a dummy iconv() call to check if it actually works.  There is a
@@ -4991,20 +4991,20 @@ my_iconv_open(char_u *to, char_u *from)
 	 * the initial shift state the "to" pointer is NULL and conversion
 	 * stops for no apparent reason after about 8160 characters.
 	 */
-	p = (char *)tobuf;
+	p = (అక్షరం *)tobuf;
 	tolen = ICONV_TESTLEN;
-	(void)iconv(fd, NULL, NULL, &p, &tolen);
-	if (p == NULL)
+	(శూన్య)iconv(fd, ఖాళీ, ఖాళీ, &p, &tolen);
+	ఒకవేళ (p == ఖాళీ)
 	{
 	    iconv_ok = FALSE;
 	    iconv_close(fd);
 	    fd = (iconv_t)-1;
 	}
-	else
+	లేకపోతే
 	    iconv_ok = TRUE;
     }
 
-    return (void *)fd;
+    తిరిగి (శూన్య *)fd;
 }
 
 /*
@@ -5014,113 +5014,113 @@ my_iconv_open(char_u *to, char_u *from)
  * Returns the converted string in allocated memory.  NULL for an error.
  * If resultlenp is not NULL, sets it to the result length in bytes.
  */
-    static char_u *
+    స్థిర char_u *
 iconv_string(
     vimconv_T	*vcp,
     char_u	*str,
-    int		slen,
-    int		*unconvlenp,
-    int		*resultlenp)
+    పూర్ణాంకం		slen,
+    పూర్ణాంకం		*unconvlenp,
+    పూర్ణాంకం		*resultlenp)
 {
-    const char	*from;
+    స్థిరరాశి అక్షరం	*from;
     size_t	fromlen;
-    char	*to;
+    అక్షరం	*గమ్యం;
     size_t	tolen;
     size_t	len = 0;
-    size_t	done = 0;
-    char_u	*result = NULL;
+    size_t	పూర్తి = 0;
+    char_u	*ఫలితం = ఖాళీ;
     char_u	*p;
-    int		l;
+    పూర్ణాంకం		l;
 
-    from = (char *)str;
+    from = (అక్షరం *)str;
     fromlen = slen;
-    for (;;)
+    కొరకు (;;)
     {
-	if (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
+	ఒకవేళ (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
 	{
 	    // Allocate enough room for most conversions.  When re-allocating
 	    // increase the buffer size.
 	    len = len + fromlen * 2 + 40;
 	    p = alloc(len);
-	    if (p != NULL && done > 0)
-		mch_memmove(p, result, done);
-	    vim_free(result);
-	    result = p;
-	    if (result == NULL)	// out of memory
-		break;
+	    ఒకవేళ (p != ఖాళీ && పూర్తి > 0)
+		mch_memmove(p, ఫలితం, పూర్తి);
+	    vim_free(ఫలితం);
+	    ఫలితం = p;
+	    ఒకవేళ (ఫలితం == ఖాళీ)	// out of memory
+		ఆపు;
 	}
 
-	to = (char *)result + done;
-	tolen = len - done - 2;
+	గమ్యం = (అక్షరం *)ఫలితం + పూర్తి;
+	tolen = len - పూర్తి - 2;
 	// Avoid a warning for systems with a wrong iconv() prototype by
 	// casting the second argument to void *.
-	if (iconv(vcp->vc_fd, (void *)&from, &fromlen, &to, &tolen)
+	ఒకవేళ (iconv(vcp->vc_fd, (శూన్య *)&from, &fromlen, &గమ్యం, &tolen)
 								!= (size_t)-1)
 	{
 	    // Finished, append a NUL.
-	    *to = NUL;
-	    break;
+	    *గమ్యం = NUL;
+	    ఆపు;
 	}
 
 	// Check both ICONV_EINVAL and EINVAL, because the dynamically loaded
 	// iconv library may use one of them.
-	if (!vcp->vc_fail && unconvlenp != NULL
+	ఒకవేళ (!vcp->vc_fail && unconvlenp != ఖాళీ
 		&& (ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Handle an incomplete sequence at the end.
-	    *to = NUL;
-	    *unconvlenp = (int)fromlen;
-	    break;
+	    *గమ్యం = NUL;
+	    *unconvlenp = (పూర్ణాంకం)fromlen;
+	    ఆపు;
 	}
 
 	// Check both ICONV_EILSEQ and EILSEQ, because the dynamically loaded
 	// iconv library may use one of them.
-	else if (!vcp->vc_fail
+	లేకపోతే ఒకవేళ (!vcp->vc_fail
 		&& (ICONV_ERRNO == ICONV_EILSEQ || ICONV_ERRNO == EILSEQ
 		    || ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Can't convert: insert a '?' and skip a character.  This assumes
 	    // conversion from 'encoding' to something else.  In other
 	    // situations we don't know what to skip anyway.
-	    *to++ = '?';
-	    if ((*mb_ptr2cells)((char_u *)from) > 1)
-		*to++ = '?';
-	    if (enc_utf8)
-		l = utfc_ptr2len_len((char_u *)from, (int)fromlen);
-	    else
+	    *గమ్యం++ = '?';
+	    ఒకవేళ ((*mb_ptr2cells)((char_u *)from) > 1)
+		*గమ్యం++ = '?';
+	    ఒకవేళ (enc_utf8)
+		l = utfc_ptr2len_len((char_u *)from, (పూర్ణాంకం)fromlen);
+	    లేకపోతే
 	    {
 		l = (*mb_ptr2len)((char_u *)from);
-		if (l > (int)fromlen)
-		    l = (int)fromlen;
+		ఒకవేళ (l > (పూర్ణాంకం)fromlen)
+		    l = (పూర్ణాంకం)fromlen;
 	    }
 	    from += l;
 	    fromlen -= l;
 	}
-	else if (ICONV_ERRNO != ICONV_E2BIG)
+	లేకపోతే ఒకవేళ (ICONV_ERRNO != ICONV_E2BIG)
 	{
 	    // conversion failed
-	    VIM_CLEAR(result);
-	    break;
+	    VIM_CLEAR(ఫలితం);
+	    ఆపు;
 	}
 	// Not enough room or skipping illegal sequence.
-	done = to - (char *)result;
+	పూర్తి = గమ్యం - (అక్షరం *)ఫలితం;
     }
 
-    if (resultlenp != NULL && result != NULL)
-	*resultlenp = (int)(to - (char *)result);
-    return result;
+    ఒకవేళ (resultlenp != ఖాళీ && ఫలితం != ఖాళీ)
+	*resultlenp = (పూర్ణాంకం)(గమ్యం - (అక్షరం *)ఫలితం);
+    తిరిగి ఫలితం;
 }
 
-# if defined(DYNAMIC_ICONV)
+# ఒకవేళ defined(DYNAMIC_ICONV)
 /*
  * Dynamically load the "iconv.dll" on Win32.
  */
 
 #  ifndef DYNAMIC_ICONV	    // must be generating prototypes
-#   define HINSTANCE int
+#   define HINSTANCE పూర్ణాంకం
 #  endif
-static HINSTANCE hIconvDLL = 0;
-static HINSTANCE hMsvcrtDLL = 0;
+స్థిర HINSTANCE hIconvDLL = 0;
+స్థిర HINSTANCE hMsvcrtDLL = 0;
 
 #  ifndef DYNAMIC_ICONV_DLL
 #   define DYNAMIC_ICONV_DLL "iconv.dll"
@@ -5135,142 +5135,142 @@ static HINSTANCE hMsvcrtDLL = 0;
 /*
  * Try opening the iconv.dll and return TRUE if iconv() can be used.
  */
-    int
-iconv_enabled(int verbose)
+    పూర్ణాంకం
+iconv_enabled(పూర్ణాంకం verbose)
 {
-    if (hIconvDLL != 0 && hMsvcrtDLL != 0)
-	return TRUE;
+    ఒకవేళ (hIconvDLL != 0 && hMsvcrtDLL != 0)
+	తిరిగి TRUE;
 
     // The iconv DLL file goes under different names, try them all.
     // Do the "2" version first, it's newer.
 #  ifdef DYNAMIC_ICONV_DLL_ALT2
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT2);
+    ఒకవేళ (hIconvDLL == 0)
+	hIconvDLL = vim_ఎక్కించు_Lib(DYNAMIC_ICONV_DLL_ALT2);
 #  endif
 #  ifdef DYNAMIC_ICONV_DLL_ALT3
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT3);
+    ఒకవేళ (hIconvDLL == 0)
+	hIconvDLL = vim_ఎక్కించు_Lib(DYNAMIC_ICONV_DLL_ALT3);
 #  endif
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL);
+    ఒకవేళ (hIconvDLL == 0)
+	hIconvDLL = vim_ఎక్కించు_Lib(DYNAMIC_ICONV_DLL);
 #  ifdef DYNAMIC_ICONV_DLL_ALT1
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT1);
+    ఒకవేళ (hIconvDLL == 0)
+	hIconvDLL = vim_ఎక్కించు_Lib(DYNAMIC_ICONV_DLL_ALT1);
 #  endif
 
-    if (hIconvDLL != 0)
-	hMsvcrtDLL = vimLoadLib(DYNAMIC_MSVCRT_DLL);
-    if (hIconvDLL == 0 || hMsvcrtDLL == 0)
+    ఒకవేళ (hIconvDLL != 0)
+	hMsvcrtDLL = vim_ఎక్కించు_Lib(DYNAMIC_MSVCRT_DLL);
+    ఒకవేళ (hIconvDLL == 0 || hMsvcrtDLL == 0)
     {
 	// Only give the message when 'verbose' is set, otherwise it might be
 	// done whenever a conversion is attempted.
-	if (verbose && p_verbose > 0)
+	ఒకవేళ (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str),
+	    semsg(_(e_could_not_ఎక్కించు_library_str_str),
 		    hIconvDLL == 0 ? DYNAMIC_ICONV_DLL : DYNAMIC_MSVCRT_DLL,
 		    GetWin32Error());
 	    verbose_leave();
 	}
-	iconv_end();
-	return FALSE;
+	iconv_చివర();
+	తిరిగి FALSE;
     }
 
-    iconv	= (size_t (*)(iconv_t, const char **,
-			size_t *, char **, size_t *))
-				GetProcAddress(hIconvDLL, "libiconv");
-    iconv_open	= (iconv_t (*)(const char *, const char *))
-				GetProcAddress(hIconvDLL, "libiconv_open");
-    iconv_close	= (int (*)(iconv_t))
-				GetProcAddress(hIconvDLL, "libiconv_close");
-    iconvctl	= (int (*)(iconv_t, int, void *))
-				GetProcAddress(hIconvDLL, "libiconvctl");
-    iconv_errno	= (int *(*)(void))get_dll_import_func(hIconvDLL, "_errno");
-    if (iconv_errno == NULL)
-	iconv_errno = (int *(*)(void))GetProcAddress(hMsvcrtDLL, "_errno");
-    if (iconv == NULL || iconv_open == NULL || iconv_close == NULL
-	    || iconvctl == NULL || iconv_errno == NULL)
+    iconv	= (size_t (*)(iconv_t, స్థిరరాశి అక్షరం **,
+			size_t *, అక్షరం **, size_t *))
+				Get_Proc_చిరునామా(hIconvDLL, "libiconv");
+    iconv_open	= (iconv_t (*)(స్థిరరాశి అక్షరం *, స్థిరరాశి అక్షరం *))
+				Get_Proc_చిరునామా(hIconvDLL, "libiconv_open");
+    iconv_close	= (పూర్ణాంకం (*)(iconv_t))
+				Get_Proc_చిరునామా(hIconvDLL, "libiconv_close");
+    iconvctl	= (పూర్ణాంకం (*)(iconv_t, పూర్ణాంకం, శూన్య *))
+				Get_Proc_చిరునామా(hIconvDLL, "libiconvctl");
+    iconv_errno	= (పూర్ణాంకం *(*)(శూన్య))get_dll_import_func(hIconvDLL, "_errno");
+    ఒకవేళ (iconv_errno == ఖాళీ)
+	iconv_errno = (పూర్ణాంకం *(*)(శూన్య))Get_Proc_చిరునామా(hMsvcrtDLL, "_errno");
+    ఒకవేళ (iconv == ఖాళీ || iconv_open == ఖాళీ || iconv_close == ఖాళీ
+	    || iconvctl == ఖాళీ || iconv_errno == ఖాళీ)
     {
-	iconv_end();
-	if (verbose && p_verbose > 0)
+	iconv_చివర();
+	ఒకవేళ (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_function_str), "for libiconv");
+	    semsg(_(e_could_not_ఎక్కించు_library_function_str), "for libiconv");
 	    verbose_leave();
 	}
-	return FALSE;
+	తిరిగి FALSE;
     }
-    return TRUE;
+    తిరిగి TRUE;
 }
 
-    void
-iconv_end(void)
+    శూన్య
+iconv_చివర(శూన్య)
 {
     // Don't use iconv() when inputting or outputting characters.
-    if (input_conv.vc_type == CONV_ICONV)
-	convert_setup(&input_conv, NULL, NULL);
-    if (output_conv.vc_type == CONV_ICONV)
-	convert_setup(&output_conv, NULL, NULL);
+    ఒకవేళ (ఆదానం_conv.vc_type == CONV_ICONV)
+	convert_అమరిక(&ఆదానం_conv, ఖాళీ, ఖాళీ);
+    ఒకవేళ (output_conv.vc_type == CONV_ICONV)
+	convert_అమరిక(&output_conv, ఖాళీ, ఖాళీ);
 
-    if (hIconvDLL != 0)
+    ఒకవేళ (hIconvDLL != 0)
 	FreeLibrary(hIconvDLL);
-    if (hMsvcrtDLL != 0)
+    ఒకవేళ (hMsvcrtDLL != 0)
 	FreeLibrary(hMsvcrtDLL);
     hIconvDLL = 0;
     hMsvcrtDLL = 0;
 }
 # endif // DYNAMIC_ICONV
-#endif // USE_ICONV
+#అయితే_ముగింపు // USE_ICONV
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 /*
  * "getimstatus()" function
  */
-    void
-f_getimstatus(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getimstatus(typval_T *argvars వాడని, typval_T *rettv)
 {
-# if defined(HAVE_INPUT_METHOD)
-    rettv->vval.v_number = im_get_status();
+# ఒకవేళ defined(HAVE_ఆదానం_పద్ధతి)
+    rettv->vval.v_సంఖ్య = im_get_స్థితి();
 # endif
 }
 
 /*
  * iconv() function
  */
-    void
-f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_iconv(typval_T *argvars వాడని, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*from, *to, *str;
+    char_u	*from, *గమ్యం, *str;
     vimconv_T	vimconv;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ఖాళీ;
 
-    if (in_vim9script()
+    ఒకవేళ (లోపల_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	తిరిగి;
 
     str = tv_get_string(&argvars[0]);
     from = enc_canonize(enc_skip(tv_get_string_buf(&argvars[1], buf1)));
-    to = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
+    గమ్యం = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
     vimconv.vc_type = CONV_NONE;
-    convert_setup(&vimconv, from, to);
+    convert_అమరిక(&vimconv, from, గమ్యం);
 
     // If the encodings are equal, no conversion needed.
-    if (vimconv.vc_type == CONV_NONE)
+    ఒకవేళ (vimconv.vc_type == CONV_NONE)
 	rettv->vval.v_string = vim_strsave(str);
-    else
-	rettv->vval.v_string = string_convert(&vimconv, str, NULL);
+    లేకపోతే
+	rettv->vval.v_string = string_convert(&vimconv, str, ఖాళీ);
 
-    convert_setup(&vimconv, NULL, NULL);
+    convert_అమరిక(&vimconv, ఖాళీ, ఖాళీ);
     vim_free(from);
-    vim_free(to);
+    vim_free(గమ్యం);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Setup "vcp" for conversion from "from" to "to".
@@ -5281,179 +5281,179 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
  * Afterwards invoke with "from" and "to" equal to NULL to cleanup.
  * Return FAIL when conversion is not supported, OK otherwise.
  */
-    int
-convert_setup(vimconv_T *vcp, char_u *from, char_u *to)
+    పూర్ణాంకం
+convert_అమరిక(vimconv_T *vcp, char_u *from, char_u *గమ్యం)
 {
-    return convert_setup_ext(vcp, from, TRUE, to, TRUE);
+    తిరిగి convert_అమరిక_ext(vcp, from, TRUE, గమ్యం, TRUE);
 }
 
 /*
  * As convert_setup(), but only when from_unicode_is_utf8 is TRUE will all
  * "from" unicode charsets be considered utf-8.  Same for "to".
  */
-    int
-convert_setup_ext(
+    పూర్ణాంకం
+convert_అమరిక_ext(
     vimconv_T	*vcp,
     char_u	*from,
-    int		from_unicode_is_utf8,
-    char_u	*to,
-    int		to_unicode_is_utf8)
+    పూర్ణాంకం		from_unicode_is_utf8,
+    char_u	*గమ్యం,
+    పూర్ణాంకం		గమ్యం_unicode_is_utf8)
 {
-    int		from_prop;
-    int		to_prop;
-    int		from_is_utf8;
-    int		to_is_utf8;
+    పూర్ణాంకం		from_prop;
+    పూర్ణాంకం		గమ్యం_prop;
+    పూర్ణాంకం		from_is_utf8;
+    పూర్ణాంకం		గమ్యం_is_utf8;
 
     // Reset to no conversion.
-#ifdef USE_ICONV
-    if (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
+#నిర్వచితమైతే USE_ICONV
+    ఒకవేళ (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
 	iconv_close(vcp->vc_fd);
-#endif
+#అయితే_ముగింపు
     vcp->vc_type = CONV_NONE;
-    vcp->vc_factor = 1;
+    vcp->vc_గుణకం = 1;
     vcp->vc_fail = FALSE;
 
     // No conversion when one of the names is empty or they are equal.
-    if (from == NULL || *from == NUL || to == NULL || *to == NUL
-						     || STRCMP(from, to) == 0)
-	return OK;
+    ఒకవేళ (from == ఖాళీ || *from == NUL || గమ్యం == ఖాళీ || *గమ్యం == NUL
+						     || STRCMP(from, గమ్యం) == 0)
+	తిరిగి OK;
 
     from_prop = enc_canon_props(from);
-    to_prop = enc_canon_props(to);
-    if (from_unicode_is_utf8)
+    గమ్యం_prop = enc_canon_props(గమ్యం);
+    ఒకవేళ (from_unicode_is_utf8)
 	from_is_utf8 = from_prop & ENC_UNICODE;
-    else
+    లేకపోతే
 	from_is_utf8 = from_prop == ENC_UNICODE;
-    if (to_unicode_is_utf8)
-	to_is_utf8 = to_prop & ENC_UNICODE;
-    else
-	to_is_utf8 = to_prop == ENC_UNICODE;
+    ఒకవేళ (గమ్యం_unicode_is_utf8)
+	గమ్యం_is_utf8 = గమ్యం_prop & ENC_UNICODE;
+    లేకపోతే
+	గమ్యం_is_utf8 = గమ్యం_prop == ENC_UNICODE;
 
-    if ((from_prop & ENC_LATIN1) && to_is_utf8)
+    ఒకవేళ ((from_prop & ENC_LATIN1) && గమ్యం_is_utf8)
     {
 	// Internal latin1 -> utf-8 conversion.
-	vcp->vc_type = CONV_TO_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_type = CONV_గమ్యం_UTF8;
+	vcp->vc_గుణకం = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN9) && to_is_utf8)
+    లేకపోతే ఒకవేళ ((from_prop & ENC_LATIN9) && గమ్యం_is_utf8)
     {
 	// Internal latin9 -> utf-8 conversion.
-	vcp->vc_type = CONV_9_TO_UTF8;
-	vcp->vc_factor = 3;	// up to three as long (euro sign)
+	vcp->vc_type = CONV_9_గమ్యం_UTF8;
+	vcp->vc_గుణకం = 3;	// up to three as long (euro sign)
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN1))
+    లేకపోతే ఒకవేళ (from_is_utf8 && (గమ్యం_prop & ENC_LATIN1))
     {
 	// Internal utf-8 -> latin1 conversion.
-	vcp->vc_type = CONV_TO_LATIN1;
+	vcp->vc_type = CONV_గమ్యం_LATIN1;
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN9))
+    లేకపోతే ఒకవేళ (from_is_utf8 && (గమ్యం_prop & ENC_LATIN9))
     {
 	// Internal utf-8 -> latin9 conversion.
-	vcp->vc_type = CONV_TO_LATIN9;
+	vcp->vc_type = CONV_గమ్యం_LATIN9;
     }
-#ifdef MSWIN
+#నిర్వచితమైతే MSWIN
     // Win32-specific codepage <-> codepage conversion without iconv.
-    else if ((from_is_utf8 || encname2codepage(from) > 0)
-	    && (to_is_utf8 || encname2codepage(to) > 0))
+    లేకపోతే ఒకవేళ ((from_is_utf8 || encname2codepage(from) > 0)
+	    && (గమ్యం_is_utf8 || encname2codepage(గమ్యం) > 0))
     {
 	vcp->vc_type = CONV_CODEPAGE;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_గుణకం = 2;	// up to twice as long
 	vcp->vc_cpfrom = from_is_utf8 ? 0 : encname2codepage(from);
-	vcp->vc_cpto = to_is_utf8 ? 0 : encname2codepage(to);
+	vcp->vc_cpto = గమ్యం_is_utf8 ? 0 : encname2codepage(గమ్యం);
     }
-#endif
-#ifdef MACOS_CONVERT
-    else if ((from_prop & ENC_MACROMAN) && (to_prop & ENC_LATIN1))
+#అయితే_ముగింపు
+#నిర్వచితమైతే MACOS_CONVERT
+    లేకపోతే ఒకవేళ ((from_prop & ENC_MACROMAN) && (గమ్యం_prop & ENC_LATIN1))
     {
 	vcp->vc_type = CONV_MAC_LATIN1;
     }
-    else if ((from_prop & ENC_MACROMAN) && to_is_utf8)
+    లేకపోతే ఒకవేళ ((from_prop & ENC_MACROMAN) && గమ్యం_is_utf8)
     {
 	vcp->vc_type = CONV_MAC_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_గుణకం = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN1) && (to_prop & ENC_MACROMAN))
+    లేకపోతే ఒకవేళ ((from_prop & ENC_LATIN1) && (గమ్యం_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_LATIN1_MAC;
     }
-    else if (from_is_utf8 && (to_prop & ENC_MACROMAN))
+    లేకపోతే ఒకవేళ (from_is_utf8 && (గమ్యం_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_UTF8_MAC;
     }
-#endif
-#ifdef USE_ICONV
-    else
+#అయితే_ముగింపు
+#నిర్వచితమైతే USE_ICONV
+    లేకపోతే
     {
 	// Use iconv() for conversion.
 	vcp->vc_fd = (iconv_t)my_iconv_open(
-		to_is_utf8 ? (char_u *)"utf-8" : to,
+		గమ్యం_is_utf8 ? (char_u *)"utf-8" : గమ్యం,
 		from_is_utf8 ? (char_u *)"utf-8" : from);
-	if (vcp->vc_fd != (iconv_t)-1)
+	ఒకవేళ (vcp->vc_fd != (iconv_t)-1)
 	{
 	    vcp->vc_type = CONV_ICONV;
-	    vcp->vc_factor = 4;	// could be longer too...
+	    vcp->vc_గుణకం = 4;	// could be longer too...
 	}
     }
-#endif
-    if (vcp->vc_type == CONV_NONE)
-	return FAIL;
+#అయితే_ముగింపు
+    ఒకవేళ (vcp->vc_type == CONV_NONE)
+	తిరిగి FAIL;
 
-    return OK;
+    తిరిగి OK;
 }
 
-#if defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
+#ఒకవేళ defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
 /*
  * Do conversion on typed input characters in-place.
  * The input and output are not NUL terminated!
  * Returns the length after conversion.
  */
-    int
-convert_input(char_u *ptr, int len, int maxlen)
+    పూర్ణాంకం
+convert_ఆదానం(char_u *ptr, పూర్ణాంకం len, పూర్ణాంకం maxlen)
 {
-    return convert_input_safe(ptr, len, maxlen, NULL, NULL);
+    తిరిగి convert_ఆదానం_సురక్షిత(ptr, len, maxlen, ఖాళీ, ఖాళీ);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Like convert_input(), but when there is an incomplete byte sequence at the
  * end return that as an allocated string in "restp" and set "*restlenp" to
  * the length.  If "restp" is NULL it is not used.
  */
-    int
-convert_input_safe(
+    పూర్ణాంకం
+convert_ఆదానం_సురక్షిత(
     char_u	*ptr,
-    int		len,
-    int		maxlen,
+    పూర్ణాంకం		len,
+    పూర్ణాంకం		maxlen,
     char_u	**restp,
-    int		*restlenp)
+    పూర్ణాంకం		*restlenp)
 {
     char_u	*d;
-    int		dlen = len;
-    int		unconvertlen = 0;
+    పూర్ణాంకం		dlen = len;
+    పూర్ణాంకం		unconvertlen = 0;
 
-    d = string_convert_ext(&input_conv, ptr, &dlen,
-					restp == NULL ? NULL : &unconvertlen);
-    if (d == NULL)
-	return dlen;
+    d = string_convert_ext(&ఆదానం_conv, ptr, &dlen,
+					restp == ఖాళీ ? ఖాళీ : &unconvertlen);
+    ఒకవేళ (d == ఖాళీ)
+	తిరిగి dlen;
 
-    if (dlen <= maxlen)
+    ఒకవేళ (dlen <= maxlen)
     {
-	if (unconvertlen > 0)
+	ఒకవేళ (unconvertlen > 0)
 	{
 	    // Move the unconverted characters to allocated memory.
 	    *restp = alloc(unconvertlen);
-	    if (*restp != NULL)
+	    ఒకవేళ (*restp != ఖాళీ)
 		mch_memmove(*restp, ptr + len - unconvertlen, unconvertlen);
 	    *restlenp = unconvertlen;
 	}
 	mch_memmove(ptr, d, dlen);
     }
-    else
+    లేకపోతే
 	// result is too long, keep the unconverted text (the caller must
 	// have done something wrong!)
 	dlen = len;
     vim_free(d);
-    return dlen;
+    తిరిగి dlen;
 }
 
 /*
@@ -5467,9 +5467,9 @@ convert_input_safe(
 string_convert(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp)
+    పూర్ణాంకం		*lenp)
 {
-    return string_convert_ext(vcp, ptr, lenp, NULL);
+    తిరిగి string_convert_ext(vcp, ptr, lenp, ఖాళీ);
 }
 
 /*
@@ -5481,137 +5481,137 @@ string_convert(
 string_convert_ext(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp,
-    int		*unconvlenp)
+    పూర్ణాంకం		*lenp,
+    పూర్ణాంకం		*unconvlenp)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ఖాళీ;
     char_u	*d;
-    int		len;
-    int		i;
-    int		l;
-    int		c;
+    పూర్ణాంకం		len;
+    పూర్ణాంకం		i;
+    పూర్ణాంకం		l;
+    పూర్ణాంకం		c;
 
-    if (lenp == NULL)
-	len = (int)STRLEN(ptr);
-    else
+    ఒకవేళ (lenp == ఖాళీ)
+	len = (పూర్ణాంకం)STRLEN(ptr);
+    లేకపోతే
 	len = *lenp;
-    if (len == 0)
-	return vim_strsave((char_u *)"");
+    ఒకవేళ (len == 0)
+	తిరిగి vim_strsave((char_u *)"");
 
-    switch (vcp->vc_type)
+    ఎంపిక (vcp->vc_type)
     {
-	case CONV_TO_UTF8:	// latin1 to utf-8 conversion
+	స్థితి CONV_గమ్యం_UTF8:	// latin1 to utf-8 conversion
 	    retval = alloc(len * 2 + 1);
-	    if (retval == NULL)
-		break;
+	    ఒకవేళ (retval == ఖాళీ)
+		ఆపు;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    కొరకు (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		if (c < 0x80)
+		ఒకవేళ (c < 0x80)
 		    *d++ = c;
-		else
+		లేకపోతే
 		{
-		    *d++ = 0xc0 + ((unsigned)c >> 6);
+		    *d++ = 0xc0 + ((గుర్తులేని)c >> 6);
 		    *d++ = 0x80 + (c & 0x3f);
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ఒకవేళ (lenp != ఖాళీ)
+		*lenp = (పూర్ణాంకం)(d - retval);
+	    ఆపు;
 
-	case CONV_9_TO_UTF8:	// latin9 to utf-8 conversion
+	స్థితి CONV_9_గమ్యం_UTF8:	// latin9 to utf-8 conversion
 	    retval = alloc(len * 3 + 1);
-	    if (retval == NULL)
-		break;
+	    ఒకవేళ (retval == ఖాళీ)
+		ఆపు;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    కొరకు (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		switch (c)
+		ఎంపిక (c)
 		{
-		    case 0xa4: c = 0x20ac; break;   // euro
-		    case 0xa6: c = 0x0160; break;   // S hat
-		    case 0xa8: c = 0x0161; break;   // S -hat
-		    case 0xb4: c = 0x017d; break;   // Z hat
-		    case 0xb8: c = 0x017e; break;   // Z -hat
-		    case 0xbc: c = 0x0152; break;   // OE
-		    case 0xbd: c = 0x0153; break;   // oe
-		    case 0xbe: c = 0x0178; break;   // Y
+		    స్థితి 0xa4: c = 0x20ac; ఆపు;   // euro
+		    స్థితి 0xa6: c = 0x0160; ఆపు;   // S hat
+		    స్థితి 0xa8: c = 0x0161; ఆపు;   // S -hat
+		    స్థితి 0xb4: c = 0x017d; ఆపు;   // Z hat
+		    స్థితి 0xb8: c = 0x017e; ఆపు;   // Z -hat
+		    స్థితి 0xbc: c = 0x0152; ఆపు;   // OE
+		    స్థితి 0xbd: c = 0x0153; ఆపు;   // oe
+		    స్థితి 0xbe: c = 0x0178; ఆపు;   // Y
 		}
 		d += utf_char2bytes(c, d);
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ఒకవేళ (lenp != ఖాళీ)
+		*lenp = (పూర్ణాంకం)(d - retval);
+	    ఆపు;
 
-	case CONV_TO_LATIN1:	// utf-8 to latin1 conversion
-	case CONV_TO_LATIN9:	// utf-8 to latin9 conversion
+	స్థితి CONV_గమ్యం_LATIN1:	// utf-8 to latin1 conversion
+	స్థితి CONV_గమ్యం_LATIN9:	// utf-8 to latin9 conversion
 	    retval = alloc(len + 1);
-	    if (retval == NULL)
-		break;
+	    ఒకవేళ (retval == ఖాళీ)
+		ఆపు;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    కొరకు (i = 0; i < len; ++i)
 	    {
 		l = utf_ptr2len_len(ptr + i, len - i);
-		if (l == 0)
+		ఒకవేళ (l == 0)
 		    *d++ = NUL;
-		else if (l == 1)
+		లేకపోతే ఒకవేళ (l == 1)
 		{
-		    int l_w = utf8len_tab_zero[ptr[i]];
+		    పూర్ణాంకం l_w = utf8len_tab_zero[ptr[i]];
 
-		    if (l_w == 0)
+		    ఒకవేళ (l_w == 0)
 		    {
 			// Illegal utf-8 byte cannot be converted
 			vim_free(retval);
-			return NULL;
+			తిరిగి ఖాళీ;
 		    }
-		    if (unconvlenp != NULL && l_w > len - i)
+		    ఒకవేళ (unconvlenp != ఖాళీ && l_w > len - i)
 		    {
 			// Incomplete sequence at the end.
 			*unconvlenp = len - i;
-			break;
+			ఆపు;
 		    }
 		    *d++ = ptr[i];
 		}
-		else
+		లేకపోతే
 		{
 		    c = utf_ptr2char(ptr + i);
-		    if (vcp->vc_type == CONV_TO_LATIN9)
-			switch (c)
+		    ఒకవేళ (vcp->vc_type == CONV_గమ్యం_LATIN9)
+			ఎంపిక (c)
 			{
-			    case 0x20ac: c = 0xa4; break;   // euro
-			    case 0x0160: c = 0xa6; break;   // S hat
-			    case 0x0161: c = 0xa8; break;   // S -hat
-			    case 0x017d: c = 0xb4; break;   // Z hat
-			    case 0x017e: c = 0xb8; break;   // Z -hat
-			    case 0x0152: c = 0xbc; break;   // OE
-			    case 0x0153: c = 0xbd; break;   // oe
-			    case 0x0178: c = 0xbe; break;   // Y
-			    case 0xa4:
-			    case 0xa6:
-			    case 0xa8:
-			    case 0xb4:
-			    case 0xb8:
-			    case 0xbc:
-			    case 0xbd:
-			    case 0xbe: c = 0x100; break; // not in latin9
+			    స్థితి 0x20ac: c = 0xa4; ఆపు;   // euro
+			    స్థితి 0x0160: c = 0xa6; ఆపు;   // S hat
+			    స్థితి 0x0161: c = 0xa8; ఆపు;   // S -hat
+			    స్థితి 0x017d: c = 0xb4; ఆపు;   // Z hat
+			    స్థితి 0x017e: c = 0xb8; ఆపు;   // Z -hat
+			    స్థితి 0x0152: c = 0xbc; ఆపు;   // OE
+			    స్థితి 0x0153: c = 0xbd; ఆపు;   // oe
+			    స్థితి 0x0178: c = 0xbe; ఆపు;   // Y
+			    స్థితి 0xa4:
+			    స్థితి 0xa6:
+			    స్థితి 0xa8:
+			    స్థితి 0xb4:
+			    స్థితి 0xb8:
+			    స్థితి 0xbc:
+			    స్థితి 0xbd:
+			    స్థితి 0xbe: c = 0x100; ఆపు; // not in latin9
 			}
-		    if (!utf_iscomposing(c))	// skip composing chars
+		    ఒకవేళ (!utf_iscomposing(c))	// skip composing chars
 		    {
-			if (c < 0x100)
+			ఒకవేళ (c < 0x100)
 			    *d++ = c;
-			else if (vcp->vc_fail)
+			లేకపోతే ఒకవేళ (vcp->vc_fail)
 			{
 			    vim_free(retval);
-			    return NULL;
+			    తిరిగి ఖాళీ;
 			}
-			else
+			లేకపోతే
 			{
 			    *d++ = 0xbf;
-			    if (utf_char2cells(c) > 1)
+			    ఒకవేళ (utf_char2cells(c) > 1)
 				*d++ = '?';
 			}
 		    }
@@ -5619,351 +5619,351 @@ string_convert_ext(
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ఒకవేళ (lenp != ఖాళీ)
+		*lenp = (పూర్ణాంకం)(d - retval);
+	    ఆపు;
 
-#ifdef MACOS_CONVERT
-	case CONV_MAC_LATIN1:
+#నిర్వచితమైతే MACOS_CONVERT
+	స్థితి CONV_MAC_LATIN1:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'l', unconvlenp);
-	    break;
+	    ఆపు;
 
-	case CONV_LATIN1_MAC:
+	స్థితి CONV_LATIN1_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'l', 'm', unconvlenp);
-	    break;
+	    ఆపు;
 
-	case CONV_MAC_UTF8:
+	స్థితి CONV_MAC_UTF8:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'u', unconvlenp);
-	    break;
+	    ఆపు;
 
-	case CONV_UTF8_MAC:
+	స్థితి CONV_UTF8_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'u', 'm', unconvlenp);
-	    break;
-#endif
+	    ఆపు;
+#అయితే_ముగింపు
 
-#ifdef USE_ICONV
-	case CONV_ICONV:	// conversion with output_conv.vc_fd
+#నిర్వచితమైతే USE_ICONV
+	స్థితి CONV_ICONV:	// conversion with output_conv.vc_fd
 	    retval = iconv_string(vcp, ptr, len, unconvlenp, lenp);
-	    break;
-#endif
-#ifdef MSWIN
-	case CONV_CODEPAGE:		// codepage -> codepage
+	    ఆపు;
+#అయితే_ముగింపు
+#నిర్వచితమైతే MSWIN
+	స్థితి CONV_CODEPAGE:		// codepage -> codepage
 	{
-	    int		retlen;
-	    int		tmp_len;
+	    పూర్ణాంకం		retlen;
+	    పూర్ణాంకం		tmp_len;
 	    short_u	*tmp;
 
 	    // 1. codepage/UTF-8  ->  ucs-2.
-	    if (vcp->vc_cpfrom == 0)
-		tmp_len = utf8_to_utf16(ptr, len, NULL, NULL);
-	    else
+	    ఒకవేళ (vcp->vc_cpfrom == 0)
+		tmp_len = utf8_గమ్యం_utf16(ptr, len, ఖాళీ, ఖాళీ);
+	    లేకపోతే
 	    {
-		tmp_len = MultiByteToWideChar(vcp->vc_cpfrom,
+		tmp_len = Multi_Byte_గమ్యం_Wide_Char(vcp->vc_cpfrom,
 					unconvlenp ? MB_ERR_INVALID_CHARS : 0,
-					(char *)ptr, len, 0, 0);
-		if (tmp_len == 0
-			&& GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+					(అక్షరం *)ptr, len, 0, 0);
+		ఒకవేళ (tmp_len == 0
+			&& Get_చివరి_Error() == ERROR_NO_UNICODE_TRANSLATION)
 		{
-		    if (lenp != NULL)
+		    ఒకవేళ (lenp != ఖాళీ)
 			*lenp = 0;
-		    if (unconvlenp != NULL)
+		    ఒకవేళ (unconvlenp != ఖాళీ)
 			*unconvlenp = len;
 		    retval = alloc(1);
-		    if (retval)
+		    ఒకవేళ (retval)
 			retval[0] = NUL;
-		    return retval;
+		    తిరిగి retval;
 		}
 	    }
 	    tmp = ALLOC_MULT(short_u, tmp_len);
-	    if (tmp == NULL)
-		break;
-	    if (vcp->vc_cpfrom == 0)
-		utf8_to_utf16(ptr, len, tmp, unconvlenp);
-	    else
-		MultiByteToWideChar(vcp->vc_cpfrom, 0,
-			(char *)ptr, len, tmp, tmp_len);
+	    ఒకవేళ (tmp == ఖాళీ)
+		ఆపు;
+	    ఒకవేళ (vcp->vc_cpfrom == 0)
+		utf8_గమ్యం_utf16(ptr, len, tmp, unconvlenp);
+	    లేకపోతే
+		Multi_Byte_గమ్యం_Wide_Char(vcp->vc_cpfrom, 0,
+			(అక్షరం *)ptr, len, tmp, tmp_len);
 
 	    // 2. ucs-2  ->  codepage/UTF-8.
-	    if (vcp->vc_cpto == 0)
-		retlen = utf16_to_utf8(tmp, tmp_len, NULL);
-	    else
-		retlen = WideCharToMultiByte(vcp->vc_cpto, 0,
+	    ఒకవేళ (vcp->vc_cpto == 0)
+		retlen = utf16_గమ్యం_utf8(tmp, tmp_len, ఖాళీ);
+	    లేకపోతే
+		retlen = Wide_Char_గమ్యం_Multi_Byte(vcp->vc_cpto, 0,
 						    tmp, tmp_len, 0, 0, 0, 0);
 	    retval = alloc(retlen + 1);
-	    if (retval != NULL)
+	    ఒకవేళ (retval != ఖాళీ)
 	    {
-		if (vcp->vc_cpto == 0)
-		    utf16_to_utf8(tmp, tmp_len, retval);
-		else
-		    WideCharToMultiByte(vcp->vc_cpto, 0,
+		ఒకవేళ (vcp->vc_cpto == 0)
+		    utf16_గమ్యం_utf8(tmp, tmp_len, retval);
+		లేకపోతే
+		    Wide_Char_గమ్యం_Multi_Byte(vcp->vc_cpto, 0,
 					  tmp, tmp_len,
-					  (char *)retval, retlen, 0, 0);
+					  (అక్షరం *)retval, retlen, 0, 0);
 		retval[retlen] = NUL;
-		if (lenp != NULL)
+		ఒకవేళ (lenp != ఖాళీ)
 		    *lenp = retlen;
 	    }
 	    vim_free(tmp);
-	    break;
+	    ఆపు;
 	}
-#endif
+#అయితే_ముగింపు
     }
 
-    return retval;
+    తిరిగి retval;
 }
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    int
-get_cellwidth(int c UNUSED)
+    పూర్ణాంకం
+get_cellwidth(పూర్ణాంకం c వాడని)
 {
-#ifdef FEAT_EVAL
-    return cw_value(c);
-#else
-    return 0;
-#endif
+#నిర్వచితమైతే FEAT_EVAL
+    తిరిగి cw_విలువ(c);
+#లేకపోతే
+    తిరిగి 0;
+#అయితే_ముగింపు
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * Table set by setcellwidths().
  */
-typedef struct
+రకనిర్వచనం నిర్మాణం
 {
-    long    first;
-    long    last;
-    char    width;
+    దీర్ఘ    మొదటి;
+    దీర్ఘ    చివరి;
+    అక్షరం    వెడల్పు;
 } cw_interval_T;
 
-static cw_interval_T	*cw_table = NULL;
-static size_t		cw_table_size = 0;
+స్థిర cw_interval_T	*cw_పట్టిక = ఖాళీ;
+స్థిర size_t		cw_పట్టిక_కొలత = 0;
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    static int
-cw_value(int c)
+    స్థిర పూర్ణాంకం
+cw_విలువ(పూర్ణాంకం c)
 {
-    int mid, bot, top;
+    పూర్ణాంకం mid, bot, శిఖరం;
 
-    if (cw_table == NULL)
-	return 0;
+    ఒకవేళ (cw_పట్టిక == ఖాళీ)
+	తిరిగి 0;
 
     // first quick check for Latin1 etc. characters
-    if (c < cw_table[0].first)
-	return 0;
+    ఒకవేళ (c < cw_పట్టిక[0].మొదటి)
+	తిరిగి 0;
 
     // binary search in table
     bot = 0;
-    top = (int)cw_table_size - 1;
-    while (top >= bot)
+    శిఖరం = (పూర్ణాంకం)cw_పట్టిక_కొలత - 1;
+    అయితే (శిఖరం >= bot)
     {
-	mid = (bot + top) / 2;
-	if (cw_table[mid].last < c)
+	mid = (bot + శిఖరం) / 2;
+	ఒకవేళ (cw_పట్టిక[mid].చివరి < c)
 	    bot = mid + 1;
-	else if (cw_table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return cw_table[mid].width;
+	లేకపోతే ఒకవేళ (cw_పట్టిక[mid].మొదటి > c)
+	    శిఖరం = mid - 1;
+	లేకపోతే
+	    తిరిగి cw_పట్టిక[mid].వెడల్పు;
     }
-    return 0;
+    తిరిగి 0;
 }
 
-    static int
-tv_nr_compare(const void *a1, const void *a2)
+    స్థిర పూర్ణాంకం
+tv_nr_compare(స్థిరరాశి శూన్య *a1, స్థిరరాశి శూన్య *a2)
 {
     listitem_T *li1 = *(listitem_T **)a1;
     listitem_T *li2 = *(listitem_T **)a2;
 
-    return li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
-	li1->li_tv.vval.v_number > li2->li_tv.vval.v_number ? 1 : -1;
+    తిరిగి li1->li_tv.vval.v_సంఖ్య == li2->li_tv.vval.v_సంఖ్య ? 0 :
+	li1->li_tv.vval.v_సంఖ్య > li2->li_tv.vval.v_సంఖ్య ? 1 : -1;
 }
 
-    void
-f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_setcellwidths(typval_T *argvars, typval_T *rettv వాడని)
 {
     list_T	    *l;
     listitem_T	    *li;
-    int		    item;
-    int		    i;
+    పూర్ణాంకం		    అంశం;
+    పూర్ణాంకం		    i;
     listitem_T	    **ptrs;
-    cw_interval_T   *table = NULL;
-    size_t	    table_size;
-    cw_interval_T   *cw_table_save;
-    size_t	    cw_table_size_save;
-    char	    *error = NULL;
+    cw_interval_T   *పట్టిక = ఖాళీ;
+    size_t	    పట్టిక_కొలత_2;
+    cw_interval_T   *cw_పట్టిక_save;
+    size_t	    cw_పట్టిక_కొలత_save;
+    అక్షరం	    *error = ఖాళీ;
 
-    if (check_for_nonnull_list_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (check_for_nonnull_list_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     l = argvars[0].vval.v_list;
-    table_size = (size_t)l->lv_len;
-    if (table_size == 0)
+    పట్టిక_కొలత_2 = (size_t)l->lv_len;
+    ఒకవేళ (పట్టిక_కొలత_2 == 0)
 	// Clearing the table.
-	goto update;
+	వెళ్ళు update;
 
-    ptrs = ALLOC_MULT(listitem_T *, table_size);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(listitem_T *, పట్టిక_కొలత_2);
+    ఒకవేళ (ptrs == ఖాళీ)
+	తిరిగి;
 
     // Check that all entries are a list with three numbers, the range is
     // valid and the cell width is valid.
-    item = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    అంశం = 0;
+    FOR_ALL_LIST_వస్తువులు(l, li)
     {
 	listitem_T *lili;
 	varnumber_T n1;
 
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	ఒకవేళ (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == ఖాళీ)
 	{
-	    semsg(_(e_list_item_nr_is_not_list), item);
+	    semsg(_(e_list_అంశం_nr_is_not_list), అంశం);
 	    vim_free(ptrs);
-	    return;
+	    తిరిగి;
 	}
 
-	lili = li->li_tv.vval.v_list->lv_first;
-	ptrs[item] = lili;
-	for (i = 0; lili != NULL; lili = lili->li_next, ++i)
+	lili = li->li_tv.vval.v_list->lv_మొదటి;
+	ptrs[అంశం] = lili;
+	కొరకు (i = 0; lili != ఖాళీ; lili = lili->li_తదుపరి, ++i)
 	{
-	    if (lili->li_tv.v_type != VAR_NUMBER)
-		break;
-	    if (i == 0)
+	    ఒకవేళ (lili->li_tv.v_type != VAR_సంఖ్య)
+		ఆపు;
+	    ఒకవేళ (i == 0)
 	    {
-		n1 = lili->li_tv.vval.v_number;
-		if (n1 < 0x80)
+		n1 = lili->li_tv.vval.v_సంఖ్య;
+		ఒకవేళ (n1 < 0x80)
 		{
-		    emsg(_(e_only_values_of_0x80_and_higher_supported));
+		    emsg(_(e_only_విలువలు_యొక్క_0x80_and_higher_supported));
 		    vim_free(ptrs);
-		    return;
+		    తిరిగి;
 		}
 	    }
-	    else if (i == 1 && lili->li_tv.vval.v_number < n1)
+	    లేకపోతే ఒకవేళ (i == 1 && lili->li_tv.vval.v_సంఖ్య < n1)
 	    {
-		semsg(_(e_list_item_nr_range_invalid), item);
+		semsg(_(e_list_అంశం_nr_range_invalid), అంశం);
 		vim_free(ptrs);
-		return;
+		తిరిగి;
 	    }
-	    else if (i == 2 && (lili->li_tv.vval.v_number < 1
-					     || lili->li_tv.vval.v_number > 2))
+	    లేకపోతే ఒకవేళ (i == 2 && (lili->li_tv.vval.v_సంఖ్య < 1
+					     || lili->li_tv.vval.v_సంఖ్య > 2))
 	    {
-		semsg(_(e_list_item_nr_cell_width_invalid), item);
+		semsg(_(e_list_అంశం_nr_cell_వెడల్పు_invalid), అంశం);
 		vim_free(ptrs);
-		return;
+		తిరిగి;
 	    }
 	}
-	if (i != 3)
+	ఒకవేళ (i != 3)
 	{
-	    semsg(_(e_list_item_nr_does_not_contain_3_numbers), item);
+	    semsg(_(e_list_అంశం_nr_does_not_contain_3_numbers), అంశం);
 	    vim_free(ptrs);
-	    return;
+	    తిరిగి;
 	}
-	++item;
+	++అంశం;
     }
 
     // Sort the list on the first number.
-    qsort((void *)ptrs, table_size, sizeof(listitem_T *), tv_nr_compare);
+    qsort((శూన్య *)ptrs, పట్టిక_కొలత_2, పరిమాణం(listitem_T *), tv_nr_compare);
 
-    table = ALLOC_MULT(cw_interval_T, table_size);
-    if (table == NULL)
+    పట్టిక = ALLOC_MULT(cw_interval_T, పట్టిక_కొలత_2);
+    ఒకవేళ (పట్టిక == ఖాళీ)
     {
 	vim_free(ptrs);
-	return;
+	తిరిగి;
     }
 
     // Store the items in the new table.
-    for (item = 0; (size_t)item < table_size; ++item)
+    కొరకు (అంశం = 0; (size_t)అంశం < పట్టిక_కొలత_2; ++అంశం)
     {
-	listitem_T	*lili = ptrs[item];
+	listitem_T	*lili = ptrs[అంశం];
 	varnumber_T	n1;
 
-	n1 = lili->li_tv.vval.v_number;
-	if (item > 0 && n1 <= table[item - 1].last)
+	n1 = lili->li_tv.vval.v_సంఖ్య;
+	ఒకవేళ (అంశం > 0 && n1 <= పట్టిక[అంశం - 1].చివరి)
 	{
-	    semsg(_(e_overlapping_ranges_for_nr), (long)n1);
+	    semsg(_(e_overlapping_ranges_for_nr), (దీర్ఘ)n1);
 	    vim_free(ptrs);
-	    vim_free(table);
-	    return;
+	    vim_free(పట్టిక);
+	    తిరిగి;
 	}
-	table[item].first = n1;
-	lili = lili->li_next;
-	table[item].last = lili->li_tv.vval.v_number;
-	lili = lili->li_next;
-	table[item].width = lili->li_tv.vval.v_number;
+	పట్టిక[అంశం].మొదటి = n1;
+	lili = lili->li_తదుపరి;
+	పట్టిక[అంశం].చివరి = lili->li_tv.vval.v_సంఖ్య;
+	lili = lili->li_తదుపరి;
+	పట్టిక[అంశం].వెడల్పు = lili->li_tv.vval.v_సంఖ్య;
     }
 
     vim_free(ptrs);
 
 update:
-    cw_table_save = cw_table;
-    cw_table_size_save = cw_table_size;
-    cw_table = table;
-    cw_table_size = table_size;
+    cw_పట్టిక_save = cw_పట్టిక;
+    cw_పట్టిక_కొలత_save = cw_పట్టిక_కొలత;
+    cw_పట్టిక = పట్టిక;
+    cw_పట్టిక_కొలత = పట్టిక_కొలత_2;
 
     // Check that the new value does not conflict with 'listchars' or
     // 'fillchars'.
     error = check_chars_options();
-    if (error != NULL)
+    ఒకవేళ (error != ఖాళీ)
     {
 	emsg(_(error));
-	cw_table = cw_table_save;
-	cw_table_size = cw_table_size_save;
-	vim_free(table);
-	return;
+	cw_పట్టిక = cw_పట్టిక_save;
+	cw_పట్టిక_కొలత = cw_పట్టిక_కొలత_save;
+	vim_free(పట్టిక);
+	తిరిగి;
     }
 
-    vim_free(cw_table_save);
-    changed_window_setting_all();
+    vim_free(cw_పట్టిక_save);
+    మారింది_కిటికీ_setting_all();
     redraw_all_later(UPD_CLEAR);
 }
 
-    void
-f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
+    శూన్య
+f_getcellwidths(typval_T *argvars వాడని, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_list_alloc(rettv) == FAIL)
+	తిరిగి;
 
-    for (size_t i = 0; i < cw_table_size; i++)
+    కొరకు (size_t i = 0; i < cw_పట్టిక_కొలత; i++)
     {
-	list_T *entry = list_alloc();
-	if (entry == NULL)
-	    break;
-	if (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].last) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].width) == FAIL
-	   || list_append_list(rettv->vval.v_list, entry) == FAIL)
+	list_T *నమోదు_2 = list_alloc();
+	ఒకవేళ (నమోదు_2 == ఖాళీ)
+	    ఆపు;
+	ఒకవేళ (list_append_సంఖ్య(నమోదు_2, (varnumber_T)cw_పట్టిక[i].మొదటి) == FAIL
+	   || list_append_సంఖ్య(నమోదు_2, (varnumber_T)cw_పట్టిక[i].చివరి) == FAIL
+	   || list_append_సంఖ్య(నమోదు_2, (varnumber_T)cw_పట్టిక[i].వెడల్పు) == FAIL
+	   || list_append_list(rettv->vval.v_list, నమోదు_2) == FAIL)
 	{
-	    list_free(entry);
-	    break;
+	    list_free(నమోదు_2);
+	    ఆపు;
 	}
     }
 }
 
-    void
-f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
+    శూన్య
+f_charclass(typval_T *argvars, typval_T *rettv వాడని)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || argvars[0].vval.v_string == NULL)
-	return;
-    rettv->vval.v_number = mb_get_class(argvars[0].vval.v_string);
+    ఒకవేళ (check_for_string_arg(argvars, 0) == FAIL
+	    || argvars[0].vval.v_string == ఖాళీ)
+	తిరిగి;
+    rettv->vval.v_సంఖ్య = mb_get_class(argvars[0].vval.v_string);
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * encoding options.
  */
     char_u *
-get_encoding_name(expand_T *xp UNUSED, int idx)
+get_encoding_name(expand_T *xp వాడని, పూర్ణాంకం idx)
 {
-    if (idx >= (int)(sizeof(enc_canon_table) / sizeof(enc_canon_table[0])))
-	return NULL;
+    ఒకవేళ (idx >= (పూర్ణాంకం)(పరిమాణం(enc_canon_పట్టిక) / పరిమాణం(enc_canon_పట్టిక[0])))
+	తిరిగి ఖాళీ;
 
-    return (char_u*)enc_canon_table[idx].name;
+    తిరిగి (char_u*)enc_canon_పట్టిక[idx].name;
 }

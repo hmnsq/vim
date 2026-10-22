@@ -23,52 +23,52 @@
 // The following includes come from Vim:
 
 // defines HAVE_ATTRIBUTE_UNUSED
-#ifdef HAVE_CONFIG_H
+#నిర్వచితమైతే HAVE_CONFIG_H
 # ifdef VMS
 #  include "config.h"
-# else
+# లేకపోతే
 #  include "../auto/config.h"
 # endif
-#endif
+#అయితే_ముగింపు
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
-#if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#ఒకవేళ defined(HAVE_ATTRIBUTE_వాడని) || defined(__MINGW32__)
+# define వాడని __attribute__((వాడని_2))
+#లేకపోతే
+# define వాడని
+#అయితే_ముగింపు
 
-#if defined(_MSC_VER)
-# define inline __inline
-#endif
+#ఒకవేళ defined(_MSC_VER)
+# define అంతఃవరుస __inline
+#అయితే_ముగింపు
 
 // Vim replacement for BUG()
-void xdl_bug(const char *msg);
+శూన్య xdl_bug(స్థిరరాశి అక్షరం *సందేశం);
 
-#if !defined(XINCLUDE_H)
-#define XINCLUDE_H
+#ఒకవేళ !defined(XINCLUDE_H)
+#నిర్వచించు XINCLUDE_H
 
 // This effectively re-verts b46054b3746271d23feab0 from git
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#if !defined(_WIN32)
-#include <unistd.h>
-#endif
-#include <string.h>
-#include <limits.h>
+#అన్తర్భావ <ctype.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <stdlib.h>
+#ఒకవేళ !defined(_WIN32)
+#అన్తర్భావ <unistd.h>
+#అయితే_ముగింపు
+#అన్తర్భావ <string.h>
+#అన్తర్భావ <limits.h>
 // This include comes from git, so uncomment it
-#if 0
-#include "git-compat-util.h"
-#endif
-#include "xmacros.h"
-#include "xdiff.h"
-#include "xtypes.h"
-#include "xutils.h"
-#include "xprepare.h"
-#include "xdiffi.h"
-#include "xemit.h"
+#ఒకవేళ 0
+#అన్తర్భావ "git-compat-util.h"
+#అయితే_ముగింపు
+#అన్తర్భావ "xmacros.h"
+#అన్తర్భావ "xdiff.h"
+#అన్తర్భావ "xtypes.h"
+#అన్తర్భావ "xutils.h"
+#అన్తర్భావ "xprepare.h"
+#అన్తర్భావ "xdiffi.h"
+#అన్తర్భావ "xemit.h"
 
 
-#endif /* #if !defined(XINCLUDE_H) */
+#అయితే_ముగింపు /* #if !defined(XINCLUDE_H) */

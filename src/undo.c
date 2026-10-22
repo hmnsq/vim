@@ -78,108 +78,108 @@
 // Uncomment the next line for including the u_check() function.  This warns
 // for errors in the debug information.
 // #define U_DEBUG 1
-#define UH_MAGIC 0x18dade	// value for uh_magic when in use
-#define UE_MAGIC 0xabc123	// value for ue_magic when in use
+#నిర్వచించు UH_MAGIC 0x18dade	// value for uh_magic when in use
+#నిర్వచించు UE_MAGIC 0xabc123	// value for ue_magic when in use
 
 // Size of buffer used for encryption.
-#define CRYPT_BUF_SIZE 8192
+#నిర్వచించు CRYPT_BUF_కొలత 8192
 
-#include "vim.h"
+#అన్తర్భావ "vim.h"
 
 // Structure passed around between functions.
 // Avoids passing cryptstate_T when encryption not available.
-typedef struct {
+రకనిర్వచనం నిర్మాణం {
     buf_T	*bi_buf;
     FILE	*bi_fp;
-#ifdef FEAT_CRYPT
+#నిర్వచితమైతే FEAT_CRYPT
     cryptstate_T *bi_state;
-    char_u	*bi_buffer; // CRYPT_BUF_SIZE, NULL when not buffering
-    size_t	bi_used;    // bytes written to/read from bi_buffer
+    char_u	*bi_బఫరు; // CRYPT_BUF_SIZE, NULL when not buffering
+    size_t	bi_వాడిన;    // bytes written to/read from bi_buffer
     size_t	bi_avail;   // bytes available in bi_buffer
-#endif
+#అయితే_ముగింపు
 } bufinfo_T;
 
 
-static void u_unch_branch(u_header_T *uhp);
-static u_entry_T *u_get_headentry(void);
-static void u_getbot(void);
-static void u_doit(int count);
-static void u_undoredo(int undo);
-static void u_undo_end(int did_undo, int absolute);
-static void u_freeheader(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freebranch(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freeentries(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freeentry(u_entry_T *, long);
-#ifdef FEAT_PERSISTENT_UNDO
+స్థిర శూన్య u_unch_branch(u_శీర్షిక_T *uhp);
+స్థిర u_నమోదు_T *u_get_headentry(శూన్య);
+స్థిర శూన్య u_getbot(శూన్య);
+స్థిర శూన్య u_doit(పూర్ణాంకం లెక్క);
+స్థిర శూన్య u_undoredo(పూర్ణాంకం undo);
+స్థిర శూన్య u_undo_చివర(పూర్ణాంకం did_undo, పూర్ణాంకం absolute);
+స్థిర శూన్య u_freeheader(buf_T *buf, u_శీర్షిక_T *uhp, u_శీర్షిక_T **uhpp);
+స్థిర శూన్య u_freebranch(buf_T *buf, u_శీర్షిక_T *uhp, u_శీర్షిక_T **uhpp);
+స్థిర శూన్య u_freeentries(buf_T *buf, u_శీర్షిక_T *uhp, u_శీర్షిక_T **uhpp);
+స్థిర శూన్య u_freeentry(u_నమోదు_T *, దీర్ఘ);
+#నిర్వచితమైతే FEAT_PERSISTENT_UNDO
 # ifdef FEAT_CRYPT
-static int undo_flush(bufinfo_T *bi);
+స్థిర పూర్ణాంకం undo_flush(bufinfo_T *bi);
 # endif
-static int undo_read(bufinfo_T *bi, char_u *buffer, size_t size);
-static int serialize_uep(bufinfo_T *bi, u_entry_T *uep);
-static u_entry_T *unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name);
-static void serialize_pos(bufinfo_T *bi, pos_T pos);
-static void unserialize_pos(bufinfo_T *bi, pos_T *pos);
-static void serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
-static void unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
-#endif
-static void u_saveline(linenr_T lnum);
-static void u_blockfree(buf_T *buf);
+స్థిర పూర్ణాంకం undo_read(bufinfo_T *bi, char_u *బఫరు, size_t కొలత);
+స్థిర పూర్ణాంకం serialize_uep(bufinfo_T *bi, u_నమోదు_T *uep);
+స్థిర u_నమోదు_T *unserialize_uep(bufinfo_T *bi, పూర్ణాంకం *error, char_u *file_name);
+స్థిర శూన్య serialize_pos(bufinfo_T *bi, pos_T pos);
+స్థిర శూన్య unserialize_pos(bufinfo_T *bi, pos_T *pos);
+స్థిర శూన్య serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
+స్థిర శూన్య unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
+#అయితే_ముగింపు
+స్థిర శూన్య u_saveline(linenr_T lnum);
+స్థిర శూన్య u_blockfree(buf_T *buf);
 
-#define U_ALLOC_LINE(size) lalloc(size, FALSE)
+#నిర్వచించు U_ALLOC_పంక్తి(కొలత) lalloc(కొలత, FALSE)
 
 // used in undo_end() to report number of added and deleted lines
-static long	u_newcount, u_oldcount;
+స్థిర దీర్ఘ	u_newcount, u_oldcount;
 
 /*
  * When 'u' flag included in 'cpoptions', we behave like vi.  Need to remember
  * the action that "u" should do.
  */
-static int	undo_undoes = FALSE;
+స్థిర పూర్ణాంకం	undo_undoes = FALSE;
 
-static int	lastmark = 0;
+స్థిర పూర్ణాంకం	lastmark = 0;
 
-#if defined(U_DEBUG)
+#ఒకవేళ defined(U_DEBUG)
 /*
  * Check the undo structures for being valid.  Print a warning when something
  * looks wrong.
  */
-static int seen_b_u_curhead;
-static int seen_b_u_newhead;
-static int header_count;
+స్థిర పూర్ణాంకం చూసిన_b_u_curhead;
+స్థిర పూర్ణాంకం చూసిన_b_u_newhead;
+స్థిర పూర్ణాంకం శీర్షిక_లెక్క;
 
-    static void
-u_check_tree(u_header_T *uhp,
-	u_header_T *exp_uh_next,
-	u_header_T *exp_uh_alt_prev)
+    స్థిర శూన్య
+u_check_వృక్షం(u_శీర్షిక_T *uhp,
+	u_శీర్షిక_T *exp_uh_తదుపరి,
+	u_శీర్షిక_T *exp_uh_alt_prev)
 {
-    u_entry_T *uep;
+    u_నమోదు_T *uep;
 
-    if (uhp == NULL)
-	return;
-    ++header_count;
-    if (uhp == curbuf->b_u_curhead && ++seen_b_u_curhead > 1)
+    ఒకవేళ (uhp == ఖాళీ)
+	తిరిగి;
+    ++శీర్షిక_లెక్క;
+    ఒకవేళ (uhp == curbuf->b_u_curhead && ++చూసిన_b_u_curhead > 1)
     {
 	emsg("b_u_curhead found twice (looping?)");
-	return;
+	తిరిగి;
     }
-    if (uhp == curbuf->b_u_newhead && ++seen_b_u_newhead > 1)
+    ఒకవేళ (uhp == curbuf->b_u_newhead && ++చూసిన_b_u_newhead > 1)
     {
 	emsg("b_u_newhead found twice (looping?)");
-	return;
+	తిరిగి;
     }
 
-    if (uhp->uh_magic != UH_MAGIC)
+    ఒకవేళ (uhp->uh_magic != UH_MAGIC)
 	emsg("uh_magic wrong (may be using freed memory)");
-    else
+    లేకపోతే
     {
 	// Check pointers back are correct.
-	if (uhp->uh_next.ptr != exp_uh_next)
+	ఒకవేళ (uhp->uh_తదుపరి.ptr != exp_uh_తదుపరి)
 	{
 	    emsg("uh_next wrong");
 	    smsg("expected: 0x%x, actual: 0x%x",
-					       exp_uh_next, uhp->uh_next.ptr);
+					       exp_uh_తదుపరి, uhp->uh_తదుపరి.ptr);
 	}
-	if (uhp->uh_alt_prev.ptr != exp_uh_alt_prev)
+	ఒకవేళ (uhp->uh_alt_prev.ptr != exp_uh_alt_prev)
 	{
 	    emsg("uh_alt_prev wrong");
 	    smsg("expected: 0x%x, actual: 0x%x",
@@ -187,55 +187,55 @@ u_check_tree(u_header_T *uhp,
 	}
 
 	// Check the undo tree at this header.
-	for (uep = uhp->uh_entry; uep != NULL; uep = uep->ue_next)
+	కొరకు (uep = uhp->uh_నమోదు; uep != ఖాళీ; uep = uep->ue_తదుపరి)
 	{
-	    if (uep->ue_magic != UE_MAGIC)
+	    ఒకవేళ (uep->ue_magic != UE_MAGIC)
 	    {
 		emsg("ue_magic wrong (may be using freed memory)");
-		break;
+		ఆపు;
 	    }
 	}
 
 	// Check the next alt tree.
-	u_check_tree(uhp->uh_alt_next.ptr, uhp->uh_next.ptr, uhp);
+	u_check_వృక్షం(uhp->uh_alt_తదుపరి.ptr, uhp->uh_తదుపరి.ptr, uhp);
 
 	// Check the next header in this branch.
-	u_check_tree(uhp->uh_prev.ptr, uhp, NULL);
+	u_check_వృక్షం(uhp->uh_prev.ptr, uhp, ఖాళీ);
     }
 }
 
-    static void
-u_check(int newhead_may_be_NULL)
+    స్థిర శూన్య
+u_check(పూర్ణాంకం newhead_may_be_NULL)
 {
-    seen_b_u_newhead = 0;
-    seen_b_u_curhead = 0;
-    header_count = 0;
+    చూసిన_b_u_newhead = 0;
+    చూసిన_b_u_curhead = 0;
+    శీర్షిక_లెక్క = 0;
 
-    u_check_tree(curbuf->b_u_oldhead, NULL, NULL);
+    u_check_వృక్షం(curbuf->b_u_oldhead, ఖాళీ, ఖాళీ);
 
-    if (seen_b_u_newhead == 0 && curbuf->b_u_oldhead != NULL
-	    && !(newhead_may_be_NULL && curbuf->b_u_newhead == NULL))
+    ఒకవేళ (చూసిన_b_u_newhead == 0 && curbuf->b_u_oldhead != ఖాళీ
+	    && !(newhead_may_be_NULL && curbuf->b_u_newhead == ఖాళీ))
 	semsg("b_u_newhead invalid: 0x%x", curbuf->b_u_newhead);
-    if (curbuf->b_u_curhead != NULL && seen_b_u_curhead == 0)
+    ఒకవేళ (curbuf->b_u_curhead != ఖాళీ && చూసిన_b_u_curhead == 0)
 	semsg("b_u_curhead invalid: 0x%x", curbuf->b_u_curhead);
-    if (header_count != curbuf->b_u_numhead)
+    ఒకవేళ (శీర్షిక_లెక్క != curbuf->b_u_numhead)
     {
 	emsg("b_u_numhead invalid");
 	smsg("expected: %ld, actual: %ld",
-			       (long)header_count, (long)curbuf->b_u_numhead);
+			       (దీర్ఘ)శీర్షిక_లెక్క, (దీర్ఘ)curbuf->b_u_numhead);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Save the current line for both the "u" and "U" command.
  * Careful: may trigger autocommands that reload the buffer.
  * Returns OK or FAIL.
  */
-    int
-u_save_cursor(void)
+    పూర్ణాంకం
+u_save_cursor(శూన్య)
 {
-    return (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+    తిరిగి (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
 				      (linenr_T)(curwin->w_cursor.lnum + 1)));
 }
 
@@ -245,19 +245,19 @@ u_save_cursor(void)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
-u_save(linenr_T top, linenr_T bot)
+    పూర్ణాంకం
+u_save(linenr_T శిఖరం, linenr_T bot)
 {
-    if (undo_off)
-	return OK;
+    ఒకవేళ (undo_off)
+	తిరిగి OK;
 
-    if (top >= bot || bot > curbuf->b_ml.ml_line_count + 1)
-	return FAIL;	// rely on caller to give an error message
+    ఒకవేళ (శిఖరం >= bot || bot > curbuf->b_ml.ml_పంక్తి_లెక్క + 1)
+	తిరిగి FAIL;	// rely on caller to give an error message
 
-    if (top + 2 == bot)
-	u_saveline((linenr_T)(top + 1));
+    ఒకవేళ (శిఖరం + 2 == bot)
+	u_saveline((linenr_T)(శిఖరం + 1));
 
-    return (u_savecommon(top, bot, (linenr_T)0, FALSE));
+    తిరిగి (u_savecommon(శిఖరం, bot, (linenr_T)0, FALSE));
 }
 
 /*
@@ -266,13 +266,13 @@ u_save(linenr_T top, linenr_T bot)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 u_savesub(linenr_T lnum)
 {
-    if (undo_off)
-	return OK;
+    ఒకవేళ (undo_off)
+	తిరిగి OK;
 
-    return (u_savecommon(lnum - 1, lnum + 1, lnum + 1, FALSE));
+    తిరిగి (u_savecommon(lnum - 1, lnum + 1, lnum + 1, FALSE));
 }
 
 /*
@@ -281,13 +281,13 @@ u_savesub(linenr_T lnum)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 u_inssub(linenr_T lnum)
 {
-    if (undo_off)
-	return OK;
+    ఒకవేళ (undo_off)
+	తిరిగి OK;
 
-    return (u_savecommon(lnum - 1, lnum, lnum + 1, FALSE));
+    తిరిగి (u_savecommon(lnum - 1, lnum, lnum + 1, FALSE));
 }
 
 /*
@@ -297,108 +297,108 @@ u_inssub(linenr_T lnum)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
-u_savedel(linenr_T lnum, long nlines)
+    పూర్ణాంకం
+u_savedel(linenr_T lnum, దీర్ఘ nlines)
 {
-    if (undo_off)
-	return OK;
+    ఒకవేళ (undo_off)
+	తిరిగి OK;
 
-    return (u_savecommon(lnum - 1, lnum + nlines,
-		     nlines == curbuf->b_ml.ml_line_count ? 2 : lnum, FALSE));
+    తిరిగి (u_savecommon(lnum - 1, lnum + nlines,
+		     nlines == curbuf->b_ml.ml_పంక్తి_లెక్క ? 2 : lnum, FALSE));
 }
 
 /*
  * Return TRUE when undo is allowed.  Otherwise give an error message and
  * return FALSE.
  */
-    int
-undo_allowed(void)
+    పూర్ణాంకం
+undo_allowed(శూన్య)
 {
     // Don't allow changes when 'modifiable' is off.
-    if (!curbuf->b_p_ma)
+    ఒకవేళ (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return FALSE;
+	తిరిగి FALSE;
     }
 
-#ifdef HAVE_SANDBOX
+#నిర్వచితమైతే HAVE_SANDBOX
     // In the sandbox it's not allowed to change the text.
-    if (sandbox != 0)
+    ఒకవేళ (sandbox != 0)
     {
-	emsg(_(e_not_allowed_in_sandbox));
-	return FALSE;
+	emsg(_(e_not_allowed_లోపల_sandbox));
+	తిరిగి FALSE;
     }
-#endif
+#అయితే_ముగింపు
 
     // Don't allow changes in the buffer while editing the cmdline.  The
     // caller of getcmdline() may get confused.
-    if (textlock != 0)
+    ఒకవేళ (textlock != 0)
     {
-	emsg(_(e_not_allowed_to_change_text_or_change_window));
-	return FALSE;
+	emsg(_(e_not_allowed_గమ్యం_change_పాఠ్యం_or_change_కిటికీ));
+	తిరిగి FALSE;
     }
 
-    return TRUE;
+    తిరిగి TRUE;
 }
 
 /*
  * Get the undolevel value for the current buffer.
  */
-    static long
-get_undolevel(void)
+    స్థిర దీర్ఘ
+get_undolevel(శూన్య)
 {
-    if (curbuf->b_p_ul == NO_LOCAL_UNDOLEVEL)
-	return p_ul;
-    return curbuf->b_p_ul;
+    ఒకవేళ (curbuf->b_p_ul == NO_LOCAL_UNDOLEVEL)
+	తిరిగి p_ul;
+    తిరిగి curbuf->b_p_ul;
 }
 
 /*
  * u_save_line(): save an allocated copy of line "lnum" into "ul".
  * Returns FAIL when out of memory.
  */
-    static int
-u_save_line(undoline_T *ul, linenr_T lnum)
+    స్థిర పూర్ణాంకం
+u_save_పంక్తి(undoline_T *ul, linenr_T lnum)
 {
-    char_u *line = ml_get(lnum);
+    char_u *పంక్తి = ml_get(lnum);
 
     ul->ul_textlen = ml_get_len(lnum);
-    if (curbuf->b_ml.ml_line_len == 0)
+    ఒకవేళ (curbuf->b_ml.ml_పంక్తి_len == 0)
     {
 	ul->ul_len = 1;
-	ul->ul_line = vim_strsave((char_u *)"");
+	ul->ul_పంక్తి = vim_strsave((char_u *)"");
     }
-    else
+    లేకపోతే
     {
 	// This uses the length in the memline, thus text properties are
 	// included.
-	ul->ul_len = curbuf->b_ml.ml_line_len;
-	ul->ul_line = vim_memsave(line, ul->ul_len);
+	ul->ul_len = curbuf->b_ml.ml_పంక్తి_len;
+	ul->ul_పంక్తి = vim_memsave(పంక్తి, ul->ul_len);
     }
-    return ul->ul_line == NULL ? FAIL : OK;
+    తిరిగి ul->ul_పంక్తి == ఖాళీ ? FAIL : OK;
 }
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 /*
  * return TRUE if line "lnum" has text property "flags".
  */
-    static int
-has_prop_w_flags(linenr_T lnum, int flags)
+    స్థిర పూర్ణాంకం
+has_prop_w_flags(linenr_T lnum, పూర్ణాంకం flags)
 {
     char_u  *props;
-    int	    i;
-    int	    proplen = get_text_props(curbuf, lnum, &props, FALSE);
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    proplen = get_పాఠ్యం_props(curbuf, lnum, &props, FALSE);
 
-    for (i = 0; i < proplen; ++i)
+    కొరకు (i = 0; i < proplen; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, props + i * sizeof prop, sizeof prop);
-	if (prop.tp_flags & flags)
-	    return TRUE;
+	mch_memmove(&prop, props + i * పరిమాణం prop, పరిమాణం prop);
+	ఒకవేళ (prop.tp_flags & flags)
+	    తిరిగి TRUE;
     }
-    return FALSE;
+    తిరిగి FALSE;
 }
-#endif
+#అయితే_ముగింపు
 
 /*
  * Common code for various ways to save text before a change.
@@ -409,51 +409,51 @@ has_prop_w_flags(linenr_T lnum, int flags)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    పూర్ణాంకం
 u_savecommon(
-    linenr_T	top,
+    linenr_T	శిఖరం,
     linenr_T	bot,
     linenr_T	newbot,
-    int		reload)
+    పూర్ణాంకం		reload)
 {
     linenr_T	lnum;
-    long	i;
-    u_header_T	*uhp;
-    u_header_T	*old_curhead;
-    u_entry_T	*uep;
-    u_entry_T	*prev_uep;
-    long	size;
+    దీర్ఘ	i;
+    u_శీర్షిక_T	*uhp;
+    u_శీర్షిక_T	*old_curhead;
+    u_నమోదు_T	*uep;
+    u_నమోదు_T	*prev_uep;
+    దీర్ఘ	కొలత;
 
-    if (!reload)
+    ఒకవేళ (!reload)
     {
 	// When making changes is not allowed return FAIL.  It's a crude way
 	// to make all change commands fail.
-	if (!undo_allowed())
-	    return FAIL;
+	ఒకవేళ (!undo_allowed())
+	    తిరిగి FAIL;
 
-#ifdef FEAT_NETBEANS_INTG
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
 	/*
 	 * Netbeans defines areas that cannot be modified.  Bail out here when
 	 * trying to change text in a guarded area.
 	 */
-	if (netbeans_active())
+	ఒకవేళ (netbeans_చురుకైన())
 	{
-	    if (netbeans_is_guarded(top, bot))
+	    ఒకవేళ (netbeans_is_guarded(శిఖరం, bot))
 	    {
 		emsg(_(e_region_is_guarded_cannot_modify));
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    if (curbuf->b_p_ro)
+	    ఒకవేళ (curbuf->b_p_ro)
 	    {
-		emsg(_(e_netbeans_does_not_allow_changes_in_read_only_files));
-		return FAIL;
+		emsg(_(e_netbeans_does_not_allow_changes_లోపల_read_only_files));
+		తిరిగి FAIL;
 	    }
 	}
-#endif
-#ifdef FEAT_TERMINAL
+#అయితే_ముగింపు
+#నిర్వచితమైతే FEAT_TERMINAL
 	// A change in a terminal buffer removes the highlighting.
-	term_change_in_curbuf();
-#endif
+	పదం_change_లోపల_curbuf();
+#అయితే_ముగింపు
 
 	/*
 	 * Saving text for undo means we are going to make a change.  Give a
@@ -462,156 +462,156 @@ u_savecommon(
 	 * (e.g., obtained from a source control system).
 	 */
 	change_warning(0);
-	if (bot > curbuf->b_ml.ml_line_count + 1)
+	ఒకవేళ (bot > curbuf->b_ml.ml_పంక్తి_లెక్క + 1)
 	{
 	    // This happens when the FileChangedRO autocommand changes the
 	    // file in a way it becomes shorter.
-	    emsg(_(e_line_count_changed_unexpectedly));
-	    return FAIL;
+	    emsg(_(e_పంక్తి_లెక్క_మారింది_unexpectedly));
+	    తిరిగి FAIL;
 	}
     }
 
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
     u_check(FALSE);
-#endif
+#అయితే_ముగింపు
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     // Include the line above if a text property continues from it.
     // Include the line below if a text property continues to it.
-    if (bot - top > 1)
+    ఒకవేళ (bot - శిఖరం > 1)
     {
-	if (top > 0 && has_prop_w_flags(top + 1, TP_FLAG_CONT_PREV))
-	    --top;
-	if (bot <= curbuf->b_ml.ml_line_count
-			       && has_prop_w_flags(bot - 1, TP_FLAG_CONT_NEXT))
+	ఒకవేళ (శిఖరం > 0 && has_prop_w_flags(శిఖరం + 1, TP_FLAG_CONT_PREV))
+	    --శిఖరం;
+	ఒకవేళ (bot <= curbuf->b_ml.ml_పంక్తి_లెక్క
+			       && has_prop_w_flags(bot - 1, TP_FLAG_CONT_తదుపరి))
 	{
 	    ++bot;
-	    if (newbot != 0)
+	    ఒకవేళ (newbot != 0)
 		++newbot;
 	}
     }
-#endif
+#అయితే_ముగింపు
 
-    size = bot - top - 1;
+    కొలత = bot - శిఖరం - 1;
 
     /*
      * If curbuf->b_u_synced is true make a new header.
      */
-    if (curbuf->b_u_synced)
+    ఒకవేళ (curbuf->b_u_synced)
     {
 	// Need to create new entry in b_changelist.
 	curbuf->b_new_change = true;
 
-	if (get_undolevel() >= 0)
+	ఒకవేళ (get_undolevel() >= 0)
 	{
 	    /*
 	     * Make a new header entry.  Do this first so that we don't mess
 	     * up the undo info when out of memory.
 	     */
-	    uhp = U_ALLOC_LINE(sizeof(u_header_T));
-	    if (uhp == NULL)
-		goto nomem;
-#ifdef U_DEBUG
+	    uhp = U_ALLOC_పంక్తి(పరిమాణం(u_శీర్షిక_T));
+	    ఒకవేళ (uhp == ఖాళీ)
+		వెళ్ళు nomem;
+#నిర్వచితమైతే U_DEBUG
 	    uhp->uh_magic = UH_MAGIC;
-#endif
+#అయితే_ముగింపు
 	}
-	else
-	    uhp = NULL;
+	లేకపోతే
+	    uhp = ఖాళీ;
 
 	/*
 	 * If we undid more than we redid, move the entry lists before and
 	 * including curbuf->b_u_curhead to an alternate branch.
 	 */
 	old_curhead = curbuf->b_u_curhead;
-	if (old_curhead != NULL)
+	ఒకవేళ (old_curhead != ఖాళీ)
 	{
-	    curbuf->b_u_newhead = old_curhead->uh_next.ptr;
-	    curbuf->b_u_curhead = NULL;
+	    curbuf->b_u_newhead = old_curhead->uh_తదుపరి.ptr;
+	    curbuf->b_u_curhead = ఖాళీ;
 	}
 
 	/*
 	 * free headers to keep the size right
 	 */
-	while (curbuf->b_u_numhead > get_undolevel()
-					       && curbuf->b_u_oldhead != NULL)
+	అయితే (curbuf->b_u_numhead > get_undolevel()
+					       && curbuf->b_u_oldhead != ఖాళీ)
 	{
-	    u_header_T	    *uhfree = curbuf->b_u_oldhead;
+	    u_శీర్షిక_T	    *uhfree = curbuf->b_u_oldhead;
 
-	    if (uhfree == old_curhead)
+	    ఒకవేళ (uhfree == old_curhead)
 		// Can't reconnect the branch, delete all of it.
 		u_freebranch(curbuf, uhfree, &old_curhead);
-	    else if (uhfree->uh_alt_next.ptr == NULL)
+	    లేకపోతే ఒకవేళ (uhfree->uh_alt_తదుపరి.ptr == ఖాళీ)
 		// There is no branch, only free one header.
 		u_freeheader(curbuf, uhfree, &old_curhead);
-	    else
+	    లేకపోతే
 	    {
 		// Free the oldest alternate branch as a whole.
-		while (uhfree->uh_alt_next.ptr != NULL)
-		    uhfree = uhfree->uh_alt_next.ptr;
+		అయితే (uhfree->uh_alt_తదుపరి.ptr != ఖాళీ)
+		    uhfree = uhfree->uh_alt_తదుపరి.ptr;
 		u_freebranch(curbuf, uhfree, &old_curhead);
 	    }
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
 	    u_check(TRUE);
-#endif
+#అయితే_ముగింపు
 	}
 
-	if (uhp == NULL)		// no undo at all
+	ఒకవేళ (uhp == ఖాళీ)		// no undo at all
 	{
-	    if (old_curhead != NULL)
-		u_freebranch(curbuf, old_curhead, NULL);
+	    ఒకవేళ (old_curhead != ఖాళీ)
+		u_freebranch(curbuf, old_curhead, ఖాళీ);
 	    curbuf->b_u_synced = false;
-	    return OK;
+	    తిరిగి OK;
 	}
 
-	uhp->uh_prev.ptr = NULL;
-	uhp->uh_next.ptr = curbuf->b_u_newhead;
-	uhp->uh_alt_next.ptr = old_curhead;
-	if (old_curhead != NULL)
+	uhp->uh_prev.ptr = ఖాళీ;
+	uhp->uh_తదుపరి.ptr = curbuf->b_u_newhead;
+	uhp->uh_alt_తదుపరి.ptr = old_curhead;
+	ఒకవేళ (old_curhead != ఖాళీ)
 	{
 	    uhp->uh_alt_prev.ptr = old_curhead->uh_alt_prev.ptr;
-	    if (uhp->uh_alt_prev.ptr != NULL)
-		uhp->uh_alt_prev.ptr->uh_alt_next.ptr = uhp;
+	    ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
+		uhp->uh_alt_prev.ptr->uh_alt_తదుపరి.ptr = uhp;
 	    old_curhead->uh_alt_prev.ptr = uhp;
-	    if (curbuf->b_u_oldhead == old_curhead)
+	    ఒకవేళ (curbuf->b_u_oldhead == old_curhead)
 		curbuf->b_u_oldhead = uhp;
 	}
-	else
-	    uhp->uh_alt_prev.ptr = NULL;
-	if (curbuf->b_u_newhead != NULL)
+	లేకపోతే
+	    uhp->uh_alt_prev.ptr = ఖాళీ;
+	ఒకవేళ (curbuf->b_u_newhead != ఖాళీ)
 	    curbuf->b_u_newhead->uh_prev.ptr = uhp;
 
-	uhp->uh_seq = ++curbuf->b_u_seq_last;
+	uhp->uh_seq = ++curbuf->b_u_seq_చివరి;
 	curbuf->b_u_seq_cur = uhp->uh_seq;
-	uhp->uh_time = vim_time();
+	uhp->uh_సమయం = vim_సమయం();
 	uhp->uh_save_nr = 0;
-	curbuf->b_u_time_cur = uhp->uh_time + 1;
+	curbuf->b_u_సమయం_cur = uhp->uh_సమయం + 1;
 
 	uhp->uh_walk = 0;
-	uhp->uh_entry = NULL;
-	uhp->uh_getbot_entry = NULL;
+	uhp->uh_నమోదు = ఖాళీ;
+	uhp->uh_getbot_నమోదు = ఖాళీ;
 	uhp->uh_cursor = curwin->w_cursor;	// save cursor pos. for undo
-	if (virtual_active() && curwin->w_cursor.coladd > 0)
+	ఒకవేళ (virtual_చురుకైన() && curwin->w_cursor.coladd > 0)
 	    uhp->uh_cursor_vcol = getviscol();
-	else
+	లేకపోతే
 	    uhp->uh_cursor_vcol = -1;
 
 	// save changed and buffer empty flag for undo
-	uhp->uh_flags = (curbuf->b_changed ? UH_CHANGED : 0) +
-		       ((curbuf->b_ml.ml_flags & ML_EMPTY) ? UH_EMPTYBUF : 0);
+	uhp->uh_flags = (curbuf->b_మారింది ? UH_మారింది : 0) +
+		       ((curbuf->b_ml.ml_flags & ML_ఖాళీలు) ? UH_EMPTYBUF : 0);
 
 	// save named marks and Visual marks for undo
-	mch_memmove(uhp->uh_namedm, curbuf->b_namedm, sizeof(pos_T) * NMARKS);
+	mch_memmove(uhp->uh_namedm, curbuf->b_namedm, పరిమాణం(pos_T) * NMARKS);
 	uhp->uh_visual = curbuf->b_visual;
 
 	curbuf->b_u_newhead = uhp;
-	if (curbuf->b_u_oldhead == NULL)
+	ఒకవేళ (curbuf->b_u_oldhead == ఖాళీ)
 	    curbuf->b_u_oldhead = uhp;
 	++curbuf->b_u_numhead;
     }
-    else
+    లేకపోతే
     {
-	if (get_undolevel() < 0)	// no undo at all
-	    return OK;
+	ఒకవేళ (get_undolevel() < 0)	// no undo at all
+	    తిరిగి OK;
 
 	/*
 	 * When saving a single line, and it has been saved just before, it
@@ -622,32 +622,32 @@ u_savecommon(
 	 * Check the ten last changes.  More doesn't make sense and takes too
 	 * long.
 	 */
-	if (size == 1)
+	ఒకవేళ (కొలత == 1)
 	{
 	    uep = u_get_headentry();
-	    prev_uep = NULL;
-	    for (i = 0; i < 10; ++i)
+	    prev_uep = ఖాళీ;
+	    కొరకు (i = 0; i < 10; ++i)
 	    {
-		if (uep == NULL)
-		    break;
+		ఒకవేళ (uep == ఖాళీ)
+		    ఆపు;
 
 		// If lines have been inserted/deleted we give up.
 		// Also when the line was included in a multi-line save.
-		if ((curbuf->b_u_newhead->uh_getbot_entry != uep
-			    ? (uep->ue_top + uep->ue_size + 1
+		ఒకవేళ ((curbuf->b_u_newhead->uh_getbot_నమోదు != uep
+			    ? (uep->ue_శిఖరం + uep->ue_కొలత + 1
 				!= (uep->ue_bot == 0
-				    ? curbuf->b_ml.ml_line_count + 1
+				    ? curbuf->b_ml.ml_పంక్తి_లెక్క + 1
 				    : uep->ue_bot))
-			    : uep->ue_lcount != curbuf->b_ml.ml_line_count)
-			|| (uep->ue_size > 1
-			    && top >= uep->ue_top
-			    && top + 2 <= uep->ue_top + uep->ue_size + 1))
-		    break;
+			    : uep->ue_lcount != curbuf->b_ml.ml_పంక్తి_లెక్క)
+			|| (uep->ue_కొలత > 1
+			    && శిఖరం >= uep->ue_శిఖరం
+			    && శిఖరం + 2 <= uep->ue_శిఖరం + uep->ue_కొలత + 1))
+		    ఆపు;
 
 		// If it's the same line we can skip saving it again.
-		if (uep->ue_size == 1 && uep->ue_top == top)
+		ఒకవేళ (uep->ue_కొలత == 1 && uep->ue_శిఖరం == శిఖరం)
 		{
-		    if (i > 0)
+		    ఒకవేళ (i > 0)
 		    {
 			// It's not the last entry: get ue_bot for the last
 			// entry now.  Following deleted/inserted lines go to
@@ -661,25 +661,25 @@ u_savecommon(
 			// count and don't include this line.  It does matter
 			// for the found entry if the line count is changed by
 			// the executed command.
-			prev_uep->ue_next = uep->ue_next;
-			uep->ue_next = curbuf->b_u_newhead->uh_entry;
-			curbuf->b_u_newhead->uh_entry = uep;
+			prev_uep->ue_తదుపరి = uep->ue_తదుపరి;
+			uep->ue_తదుపరి = curbuf->b_u_newhead->uh_నమోదు;
+			curbuf->b_u_newhead->uh_నమోదు = uep;
 		    }
 
 		    // The executed command may change the line count.
-		    if (newbot != 0)
+		    ఒకవేళ (newbot != 0)
 			uep->ue_bot = newbot;
-		    else if (bot > curbuf->b_ml.ml_line_count)
+		    లేకపోతే ఒకవేళ (bot > curbuf->b_ml.ml_పంక్తి_లెక్క)
 			uep->ue_bot = 0;
-		    else
+		    లేకపోతే
 		    {
-			uep->ue_lcount = curbuf->b_ml.ml_line_count;
-			curbuf->b_u_newhead->uh_getbot_entry = uep;
+			uep->ue_lcount = curbuf->b_ml.ml_పంక్తి_లెక్క;
+			curbuf->b_u_newhead->uh_getbot_నమోదు = uep;
 		    }
-		    return OK;
+		    తిరిగి OK;
 		}
 		prev_uep = uep;
-		uep = uep->ue_next;
+		uep = uep->ue_తదుపరి;
 	    }
 	}
 
@@ -690,89 +690,89 @@ u_savecommon(
     /*
      * add lines in front of entry list
      */
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
-    if (uep == NULL)
-	goto nomem;
-    CLEAR_POINTER(uep);
-#ifdef U_DEBUG
+    uep = U_ALLOC_పంక్తి(పరిమాణం(u_నమోదు_T));
+    ఒకవేళ (uep == ఖాళీ)
+	వెళ్ళు nomem;
+    CLEAR_సూచిక(uep);
+#నిర్వచితమైతే U_DEBUG
     uep->ue_magic = UE_MAGIC;
-#endif
+#అయితే_ముగింపు
 
-    uep->ue_size = size;
-    uep->ue_top = top;
-    if (newbot != 0)
+    uep->ue_కొలత = కొలత;
+    uep->ue_శిఖరం = శిఖరం;
+    ఒకవేళ (newbot != 0)
 	uep->ue_bot = newbot;
     /*
      * Use 0 for ue_bot if bot is below last line.
      * Otherwise we have to compute ue_bot later.
      */
-    else if (bot > curbuf->b_ml.ml_line_count)
+    లేకపోతే ఒకవేళ (bot > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	uep->ue_bot = 0;
-    else
+    లేకపోతే
     {
-	uep->ue_lcount = curbuf->b_ml.ml_line_count;
-	curbuf->b_u_newhead->uh_getbot_entry = uep;
+	uep->ue_lcount = curbuf->b_ml.ml_పంక్తి_లెక్క;
+	curbuf->b_u_newhead->uh_getbot_నమోదు = uep;
     }
 
-    if (size > 0)
+    ఒకవేళ (కొలత > 0)
     {
-	if ((uep->ue_array = U_ALLOC_LINE(sizeof(undoline_T) * size)) == NULL)
+	ఒకవేళ ((uep->ue_array = U_ALLOC_పంక్తి(పరిమాణం(undoline_T) * కొలత)) == ఖాళీ)
 	{
 	    u_freeentry(uep, 0L);
-	    goto nomem;
+	    వెళ్ళు nomem;
 	}
-	for (i = 0, lnum = top + 1; i < size; ++i)
+	కొరకు (i = 0, lnum = శిఖరం + 1; i < కొలత; ++i)
 	{
 	    fast_breakcheck();
-	    if (got_int)
+	    ఒకవేళ (got_int)
 	    {
 		u_freeentry(uep, i);
-		return FAIL;
+		తిరిగి FAIL;
 	    }
-	    if (u_save_line(&uep->ue_array[i], lnum++) == FAIL)
+	    ఒకవేళ (u_save_పంక్తి(&uep->ue_array[i], lnum++) == FAIL)
 	    {
 		u_freeentry(uep, i);
-		goto nomem;
+		వెళ్ళు nomem;
 	    }
 	}
     }
-    else
-	uep->ue_array = NULL;
-    uep->ue_next = curbuf->b_u_newhead->uh_entry;
-    curbuf->b_u_newhead->uh_entry = uep;
+    లేకపోతే
+	uep->ue_array = ఖాళీ;
+    uep->ue_తదుపరి = curbuf->b_u_newhead->uh_నమోదు;
+    curbuf->b_u_newhead->uh_నమోదు = uep;
     curbuf->b_u_synced = false;
     undo_undoes = FALSE;
 
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
     u_check(FALSE);
-#endif
-    return OK;
+#అయితే_ముగింపు
+    తిరిగి OK;
 
 nomem:
-    msg_silent = 0;	// must display the prompt
-    if (ask_yesno((char_u *)_("No undo possible; continue anyway"), TRUE)
+    సందేశం_silent = 0;	// must display the prompt
+    ఒకవేళ (ask_yesno((char_u *)_("No undo possible; continue anyway"), TRUE)
 								       == 'y')
     {
 	undo_off = TRUE;	    // will be reset when character typed
-	return OK;
+	తిరిగి OK;
     }
-    do_outofmem_msg((long_u)0);
-    return FAIL;
+    do_outofmem_సందేశం((long_u)0);
+    తిరిగి FAIL;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#ఒకవేళ defined(FEAT_PERSISTENT_UNDO)
 
-# define UF_START_MAGIC	    "Vim\237UnDo\345"  // magic at start of undofile
-# define UF_START_MAGIC_LEN	9
-# define UF_HEADER_MAGIC	0x5fd0	// magic at start of header
-# define UF_HEADER_END_MAGIC	0xe7aa	// magic after last header
-# define UF_ENTRY_MAGIC		0xf518	// magic at start of entry
-# define UF_ENTRY_END_MAGIC	0x3581	// magic after last entry
-# define UF_VERSION		2	// 2-byte undofile version number
-# define UF_VERSION_CRYPT	0x8002	// idem, encrypted
+# define UF_ప్రారంభం_MAGIC	    "Vim\237UnDo\345"  // magic at start of undofile
+# define UF_ప్రారంభం_MAGIC_LEN	9
+# define UF_శీర్షిక_MAGIC	0x5fd0	// magic at start of header
+# define UF_శీర్షిక_చివర_MAGIC	0xe7aa	// magic after last header
+# define UF_నమోదు_MAGIC		0xf518	// magic at start of entry
+# define UF_నమోదు_చివర_MAGIC	0x3581	// magic after last entry
+# define UF_సంస్కరణ		2	// 2-byte undofile version number
+# define UF_సంస్కరణ_CRYPT	0x8002	// idem, encrypted
 
 // extra fields for header
-# define UF_LAST_SAVE_NR	1
+# define UF_చివరి_SAVE_NR	1
 
 // extra fields for uhp
 # define UHP_SAVE_NR		1
@@ -780,16 +780,16 @@ nomem:
 /*
  * Compute the hash for the current buffer text into hash[UNDO_HASH_SIZE].
  */
-    void
+    శూన్య
 u_compute_hash(char_u *hash)
 {
     context_sha256_T	ctx;
     linenr_T		lnum;
 
-    sha256_start(&ctx);
-    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+    sha256_ప్రారంభం(&ctx);
+    కొరకు (lnum = 1; lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క; ++lnum)
 	sha256_update(&ctx, ml_get(lnum), (UINT32_T)(ml_get_len(lnum) + 1));
-    sha256_finish(&ctx, hash);
+    sha256_ముగింపు(&ctx, hash);
 }
 
 /*
@@ -799,14 +799,14 @@ u_compute_hash(char_u *hash)
  * When "reading" is FALSE use the first name where the directory exists.
  * Returns NULL when there is no place to write or no file to read.
  */
-    static char_u *
-u_get_undo_file_name(char_u *buf_ffname, int reading)
+    స్థిర char_u *
+u_get_undo_file_name(char_u *buf_ffname, పూర్ణాంకం reading)
 {
     char_u	*dirp;
     char_u	dir_name[IOSIZE + 1];
-    string_T	munged_name = {NULL, 0};
-    char_u	*undo_file_name = NULL;
-    int		dir_len;
+    string_T	munged_name = {ఖాళీ, 0};
+    char_u	*undo_file_name = ఖాళీ;
+    పూర్ణాంకం		dir_len;
     char_u	*p;
     size_t	plen;
     stat_T	st;
@@ -816,13 +816,13 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
     char_u	fname_buf[MAXPATHL];
 # endif
 
-    if (ffname == NULL)
-	return NULL;
+    ఒకవేళ (ffname == ఖాళీ)
+	తిరిగి ఖాళీ;
 
 # ifdef HAVE_READLINK
     // Expand symlink in the file name, so that we put the undo file with the
     // actual file instead of with the symlink.
-    if (resolve_symlink(ffname, fname_buf) == OK)
+    ఒకవేళ (resolve_symlink(ffname, fname_buf) == OK)
 	ffname = fname_buf;
 # endif
 
@@ -830,16 +830,16 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
     // Loop over 'undodir'.  When reading find the first file that exists.
     // When not reading use the first directory that exists or ".".
     dirp = p_udir;
-    while (*dirp != NUL)
+    అయితే (*dirp != NUL)
     {
 	dir_len = copy_option_part(&dirp, dir_name, IOSIZE, ",");
-	if (dir_len == 1 && dir_name[0] == '.')
+	ఒకవేళ (dir_len == 1 && dir_name[0] == '.')
 	{
 	    // Use same directory as the ffname,
 	    // "dir/name" -> "dir/.name.un~"
 	    undo_file_name = vim_strnsave(ffname, ffnamelen + 5);
-	    if (undo_file_name == NULL)
-		break;
+	    ఒకవేళ (undo_file_name == ఖాళీ)
+		ఆపు;
 	    p = gettail(undo_file_name);
 	    plen = (size_t)(ffnamelen - (p - undo_file_name));
 # ifdef VMS
@@ -849,7 +849,7 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
 	    mch_memmove(p + 4,  p, plen + 1);
 	    mch_memmove(p, "_un_", 4);
 
-# else
+# లేకపోతే
 	    // Use same directory as the ffname,
 	    // "dir/name" -> "dir/.name.un~"
 	    mch_memmove(p + 1, p, plen + 1);
@@ -857,56 +857,56 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
 	    STRCPY(p + plen + 1, ".un~");
 # endif
 	}
-	else
+	లేకపోతే
 	{
 	    dir_name[dir_len] = NUL;
-	    if (mch_isdir(dir_name))
+	    ఒకవేళ (mch_isdir(dir_name))
 	    {
 		string_T    ret;
 
-		if (munged_name.string == NULL)
+		ఒకవేళ (munged_name.string == ఖాళీ)
 		{
 		    munged_name.string = vim_strnsave(ffname, ffnamelen);
-		    if (munged_name.string == NULL)
-			return NULL;
-		    munged_name.length = ffnamelen;
-		    for (p = munged_name.string; *p != NUL; MB_PTR_ADV(p))
-			if (vim_ispathsep(*p))
+		    ఒకవేళ (munged_name.string == ఖాళీ)
+			తిరిగి ఖాళీ;
+		    munged_name.నిడివి = ffnamelen;
+		    కొరకు (p = munged_name.string; *p != NUL; MB_PTR_ADV(p))
+			ఒకవేళ (vim_ispathsep(*p))
 			    *p = '%';
 		}
 		undo_file_name = concat_fnames(dir_name, (size_t)dir_len,
-		    munged_name.string, munged_name.length, TRUE, &ret);
+		    munged_name.string, munged_name.నిడివి, TRUE, &ret);
 	    }
 	}
 
 	// When reading check if the file exists.
-	if (undo_file_name != NULL && (!reading
-			       || mch_stat((char *)undo_file_name, &st) >= 0))
-	    break;
+	ఒకవేళ (undo_file_name != ఖాళీ && (!reading
+			       || mch_stat((అక్షరం *)undo_file_name, &st) >= 0))
+	    ఆపు;
 	VIM_CLEAR(undo_file_name);
     }
 
     vim_free(munged_name.string);
-    return undo_file_name;
+    తిరిగి undo_file_name;
 }
 
-    static void
-corruption_error(char *mesg, char_u *file_name)
+    స్థిర శూన్య
+corruption_error(అక్షరం *mesg, char_u *file_name)
 {
     semsg(_(e_corrupted_undo_file_str_str), mesg, file_name);
 }
 
-    static void
-u_free_uhp(u_header_T *uhp)
+    స్థిర శూన్య
+u_free_uhp(u_శీర్షిక_T *uhp)
 {
-    u_entry_T	*nuep;
-    u_entry_T	*uep;
+    u_నమోదు_T	*nuep;
+    u_నమోదు_T	*uep;
 
-    uep = uhp->uh_entry;
-    while (uep != NULL)
+    uep = uhp->uh_నమోదు;
+    అయితే (uep != ఖాళీ)
     {
-	nuep = uep->ue_next;
-	u_freeentry(uep, uep->ue_size);
+	nuep = uep->ue_తదుపరి;
+	u_freeentry(uep, uep->ue_కొలత);
 	uep = nuep;
     }
     vim_free(uhp);
@@ -917,53 +917,53 @@ u_free_uhp(u_header_T *uhp)
  * Buffers and encrypts as needed.
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 undo_write(bufinfo_T *bi, char_u *ptr, size_t len)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
 	size_t	len_todo = len;
 	char_u  *p = ptr;
 
-	while (bi->bi_used + len_todo >= CRYPT_BUF_SIZE)
+	అయితే (bi->bi_వాడిన + len_todo >= CRYPT_BUF_కొలత)
 	{
-	    size_t	n = CRYPT_BUF_SIZE - bi->bi_used;
+	    size_t	n = CRYPT_BUF_కొలత - bi->bi_వాడిన;
 
-	    mch_memmove(bi->bi_buffer + bi->bi_used, p, n);
+	    mch_memmove(bi->bi_బఫరు + bi->bi_వాడిన, p, n);
 	    len_todo -= n;
 	    p += n;
-	    bi->bi_used = CRYPT_BUF_SIZE;
-	    if (undo_flush(bi) == FAIL)
-		return FAIL;
+	    bi->bi_వాడిన = CRYPT_BUF_కొలత;
+	    ఒకవేళ (undo_flush(bi) == FAIL)
+		తిరిగి FAIL;
 	}
-	if (len_todo > 0)
+	ఒకవేళ (len_todo > 0)
 	{
-	    mch_memmove(bi->bi_buffer + bi->bi_used, p, len_todo);
-	    bi->bi_used += len_todo;
+	    mch_memmove(bi->bi_బఫరు + bi->bi_వాడిన, p, len_todo);
+	    bi->bi_వాడిన += len_todo;
 	}
-	return OK;
+	తిరిగి OK;
     }
 # endif
-    if (fwrite(ptr, len, (size_t)1, bi->bi_fp) != 1)
-	return FAIL;
-    return OK;
+    ఒకవేళ (fwrite(ptr, len, (size_t)1, bi->bi_fp) != 1)
+	తిరిగి FAIL;
+    తిరిగి OK;
 }
 
 # ifdef FEAT_CRYPT
-    static int
+    స్థిర పూర్ణాంకం
 undo_flush(bufinfo_T *bi)
 {
-    if (bi->bi_buffer != NULL && bi->bi_state != NULL && bi->bi_used > 0)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ && bi->bi_state != ఖాళీ && bi->bi_వాడిన > 0)
     {
 	// Last parameter is only used for sodium encryption and that
 	// explicitly disables encryption of undofiles.
-	crypt_encode_inplace(bi->bi_state, bi->bi_buffer, bi->bi_used, FALSE);
-	if (fwrite(bi->bi_buffer, bi->bi_used, (size_t)1, bi->bi_fp) != 1)
-	    return FAIL;
-	bi->bi_used = 0;
+	crypt_encode_inplace(bi->bi_state, bi->bi_బఫరు, bi->bi_వాడిన, FALSE);
+	ఒకవేళ (fwrite(bi->bi_బఫరు, bi->bi_వాడిన, (size_t)1, bi->bi_fp) != 1)
+	    తిరిగి FAIL;
+	bi->bi_వాడిన = 0;
     }
-    return OK;
+    తిరిగి OK;
 }
 # endif
 
@@ -971,7 +971,7 @@ undo_flush(bufinfo_T *bi)
  * Write "ptr[len]" and crypt the bytes when needed.
  * Returns OK or FAIL.
  */
-    static int
+    స్థిర పూర్ణాంకం
 fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
 {
 # ifdef FEAT_CRYPT
@@ -979,27 +979,27 @@ fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
     char_u  small_buf[100];
     size_t  i;
 
-    if (bi->bi_state != NULL && bi->bi_buffer == NULL)
+    ఒకవేళ (bi->bi_state != ఖాళీ && bi->bi_బఫరు == ఖాళీ)
     {
 	// crypting every piece of text separately
-	if (len < 100)
+	ఒకవేళ (len < 100)
 	    copy = small_buf;  // no malloc()/free() for short strings
-	else
+	లేకపోతే
 	{
 	    copy = lalloc(len, FALSE);
-	    if (copy == NULL)
-		return 0;
+	    ఒకవేళ (copy == ఖాళీ)
+		తిరిగి 0;
 	}
 	// Last parameter is only used for sodium encryption and that
 	// explicitly disables encryption of undofiles.
 	crypt_encode(bi->bi_state, ptr, len, copy, TRUE);
 	i = fwrite(copy, len, (size_t)1, bi->bi_fp);
-	if (copy != small_buf)
+	ఒకవేళ (copy != small_buf)
 	    vim_free(copy);
-	return i == 1 ? OK : FAIL;
+	తిరిగి i == 1 ? OK : FAIL;
     }
 # endif
-    return undo_write(bi, ptr, len);
+    తిరిగి undo_write(bi, ptr, len);
 }
 
 /*
@@ -1007,146 +1007,146 @@ fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
  * Must match with undo_read_?c() functions.
  * Returns OK or FAIL.
  */
-    static int
-undo_write_bytes(bufinfo_T *bi, long_u nr, int len)
+    స్థిర పూర్ణాంకం
+undo_write_బైట్లు(bufinfo_T *bi, long_u nr, పూర్ణాంకం len)
 {
     char_u  buf[8];
-    int	    i;
-    int	    bufi = 0;
+    పూర్ణాంకం	    i;
+    పూర్ణాంకం	    bufi = 0;
 
-    for (i = len - 1; i >= 0; --i)
+    కొరకు (i = len - 1; i >= 0; --i)
 	buf[bufi++] = (char_u)(nr >> (i * 8));
-    return undo_write(bi, buf, (size_t)len);
+    తిరిగి undo_write(bi, buf, (size_t)len);
 }
 
 /*
  * Write the pointer to an undo header.  Instead of writing the pointer itself
  * we use the sequence number of the header.  This is converted back to
  * pointers when reading. */
-    static void
-put_header_ptr(bufinfo_T *bi, u_header_T *uhp)
+    స్థిర శూన్య
+put_శీర్షిక_ptr(bufinfo_T *bi, u_శీర్షిక_T *uhp)
 {
-    undo_write_bytes(bi, (long_u)(uhp != NULL ? uhp->uh_seq : 0), 4);
+    undo_write_బైట్లు(bi, (long_u)(uhp != ఖాళీ ? uhp->uh_seq : 0), 4);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 undo_read_4c(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
 	char_u  buf[4];
-	int	n;
+	పూర్ణాంకం	n;
 
 	undo_read(bi, buf, (size_t)4);
-	n = ((unsigned)buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3];
-	return n;
+	n = ((గుర్తులేని)buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3];
+	తిరిగి n;
     }
 # endif
-    return get4c(bi->bi_fp);
+    తిరిగి get4c(bi->bi_fp);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 undo_read_2c(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
 	char_u  buf[2];
-	int	n;
+	పూర్ణాంకం	n;
 
 	undo_read(bi, buf, (size_t)2);
 	n = (buf[0] << 8) + buf[1];
-	return n;
+	తిరిగి n;
     }
 # endif
-    return get2c(bi->bi_fp);
+    తిరిగి get2c(bi->bi_fp);
 }
 
-    static int
+    స్థిర పూర్ణాంకం
 undo_read_byte(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
 	char_u  buf[1];
 
 	undo_read(bi, buf, (size_t)1);
-	return buf[0];
+	తిరిగి buf[0];
     }
 # endif
-    return getc(bi->bi_fp);
+    తిరిగి getc(bi->bi_fp);
 }
 
-    static time_t
-undo_read_time(bufinfo_T *bi)
+    స్థిర time_t
+undo_read_సమయం(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
 	char_u  buf[8];
 	time_t	n = 0;
-	int	i;
+	పూర్ణాంకం	i;
 
 	undo_read(bi, buf, (size_t)8);
-	for (i = 0; i < 8; ++i)
+	కొరకు (i = 0; i < 8; ++i)
 	    n = (n << 8) + buf[i];
-	return n;
+	తిరిగి n;
     }
 # endif
-    return get8ctime(bi->bi_fp);
+    తిరిగి get8ctime(bi->bi_fp);
 }
 
 /*
  * Read "buffer[size]" from the undo file.
  * Return OK or FAIL.
  */
-    static int
-undo_read(bufinfo_T *bi, char_u *buffer, size_t size)
+    స్థిర పూర్ణాంకం
+undo_read(bufinfo_T *bi, char_u *బఫరు, size_t కొలత)
 {
-    int retval = OK;
+    పూర్ణాంకం retval = OK;
 
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    ఒకవేళ (bi->bi_బఫరు != ఖాళీ)
     {
-	int	size_todo = (int)size;
-	char_u	*p = buffer;
+	పూర్ణాంకం	కొలత_todo = (పూర్ణాంకం)కొలత;
+	char_u	*p = బఫరు;
 
-	while (size_todo > 0)
+	అయితే (కొలత_todo > 0)
 	{
 	    size_t n;
 
-	    if (bi->bi_used >= bi->bi_avail)
+	    ఒకవేళ (bi->bi_వాడిన >= bi->bi_avail)
 	    {
-		n = fread(bi->bi_buffer, 1, (size_t)CRYPT_BUF_SIZE, bi->bi_fp);
-		if (n == 0)
+		n = fread(bi->bi_బఫరు, 1, (size_t)CRYPT_BUF_కొలత, bi->bi_fp);
+		ఒకవేళ (n == 0)
 		{
 		    retval = FAIL;
-		    break;
+		    ఆపు;
 		}
 		bi->bi_avail = n;
-		bi->bi_used = 0;
-		crypt_decode_inplace(bi->bi_state, bi->bi_buffer, bi->bi_avail, FALSE);
+		bi->bi_వాడిన = 0;
+		crypt_decode_inplace(bi->bi_state, bi->bi_బఫరు, bi->bi_avail, FALSE);
 	    }
-	    n = size_todo;
-	    if (n > bi->bi_avail - bi->bi_used)
-		n = bi->bi_avail - bi->bi_used;
-	    mch_memmove(p, bi->bi_buffer + bi->bi_used, n);
-	    bi->bi_used += n;
-	    size_todo -= (int)n;
+	    n = కొలత_todo;
+	    ఒకవేళ (n > bi->bi_avail - bi->bi_వాడిన)
+		n = bi->bi_avail - bi->bi_వాడిన;
+	    mch_memmove(p, bi->bi_బఫరు + bi->bi_వాడిన, n);
+	    bi->bi_వాడిన += n;
+	    కొలత_todo -= (పూర్ణాంకం)n;
 	    p += n;
 	}
     }
-    else
+    లేకపోతే
 # endif
-    if (fread(buffer, size, 1, bi->bi_fp) != 1)
+    ఒకవేళ (fread(బఫరు, కొలత, 1, bi->bi_fp) != 1)
 	retval = FAIL;
 
-    if (retval == FAIL)
+    ఒకవేళ (retval == FAIL)
 	// Error may be checked for only later.  Fill with zeros,
 	// so that the reader won't use garbage.
-	vim_memset(buffer, 0, size);
-    return retval;
+	vim_memset(బఫరు, 0, కొలత);
+    తిరిగి retval;
 }
 
 /*
@@ -1156,381 +1156,381 @@ undo_read(bufinfo_T *bi, char_u *buffer, size_t size)
  * Append a NUL.
  * Returns a pointer to allocated memory or NULL for failure.
  */
-    static char_u *
-read_string_decrypt(bufinfo_T *bi, int len)
+    స్థిర char_u *
+read_string_decrypt(bufinfo_T *bi, పూర్ణాంకం len)
 {
     char_u  *ptr = alloc(len + 1);
 
-    if (ptr == NULL)
-	return NULL;
+    ఒకవేళ (ptr == ఖాళీ)
+	తిరిగి ఖాళీ;
 
-    if (len > 0 && undo_read(bi, ptr, len) == FAIL)
+    ఒకవేళ (len > 0 && undo_read(bi, ptr, len) == FAIL)
     {
 	vim_free(ptr);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     // In case there are text properties there already is a NUL, but
     // checking for that is more expensive than just adding a dummy byte.
     ptr[len] = NUL;
 # ifdef FEAT_CRYPT
-    if (bi->bi_state != NULL && bi->bi_buffer == NULL)
+    ఒకవేళ (bi->bi_state != ఖాళీ && bi->bi_బఫరు == ఖాళీ)
 	crypt_decode_inplace(bi->bi_state, ptr, len, FALSE);
 # endif
-    return ptr;
+    తిరిగి ptr;
 }
 
 /*
  * Writes the (not encrypted) header and initializes encryption if needed.
  */
-    static int
-serialize_header(bufinfo_T *bi, char_u *hash)
+    స్థిర పూర్ణాంకం
+serialize_శీర్షిక(bufinfo_T *bi, char_u *hash)
 {
     buf_T	*buf = bi->bi_buf;
     FILE	*fp = bi->bi_fp;
-    char_u	time_buf[8];
+    char_u	సమయం_buf[8];
 
     // Start writing, first the magic marker and undo info version.
-    if (fwrite(UF_START_MAGIC, (size_t)UF_START_MAGIC_LEN, (size_t)1, fp) != 1)
-	return FAIL;
+    ఒకవేళ (fwrite(UF_ప్రారంభం_MAGIC, (size_t)UF_ప్రారంభం_MAGIC_LEN, (size_t)1, fp) != 1)
+	తిరిగి FAIL;
 
     // If the buffer is encrypted then all text bytes following will be
     // encrypted.  Numbers and other info is not crypted.
 # ifdef FEAT_CRYPT
-    if (*buf->b_p_key != NUL)
+    ఒకవేళ (*buf->b_p_కీలకం != NUL)
     {
-	char_u *header;
-	int    header_len;
-	long	len;
+	char_u *శీర్షిక;
+	పూర్ణాంకం    శీర్షిక_len;
+	దీర్ఘ	len;
 
-	undo_write_bytes(bi, (long_u)UF_VERSION_CRYPT, 2);
-	bi->bi_state = crypt_create_for_writing(crypt_get_method_nr(buf),
-					  buf->b_p_key, &header, &header_len);
-	if (bi->bi_state == NULL)
-	    return FAIL;
-	len = (long)fwrite(header, (size_t)header_len, (size_t)1, fp);
-	vim_free(header);
-	if (len != 1)
+	undo_write_బైట్లు(bi, (long_u)UF_సంస్కరణ_CRYPT, 2);
+	bi->bi_state = crypt_create_for_writing(crypt_get_పద్ధతి_nr(buf),
+					  buf->b_p_కీలకం, &శీర్షిక, &శీర్షిక_len);
+	ఒకవేళ (bi->bi_state == ఖాళీ)
+	    తిరిగి FAIL;
+	len = (దీర్ఘ)fwrite(శీర్షిక, (size_t)శీర్షిక_len, (size_t)1, fp);
+	vim_free(శీర్షిక);
+	ఒకవేళ (len != 1)
 	{
 	    crypt_free_state(bi->bi_state);
-	    bi->bi_state = NULL;
-	    return FAIL;
+	    bi->bi_state = ఖాళీ;
+	    తిరిగి FAIL;
 	}
 
-	if (crypt_whole_undofile(crypt_get_method_nr(buf)))
+	ఒకవేళ (crypt_సంపూర్ణ_undofile(crypt_get_పద్ధతి_nr(buf)))
 	{
-	    bi->bi_buffer = alloc(CRYPT_BUF_SIZE);
-	    if (bi->bi_buffer == NULL)
+	    bi->bi_బఫరు = alloc(CRYPT_BUF_కొలత);
+	    ఒకవేళ (bi->bi_బఫరు == ఖాళీ)
 	    {
 		crypt_free_state(bi->bi_state);
-		bi->bi_state = NULL;
-		return FAIL;
+		bi->bi_state = ఖాళీ;
+		తిరిగి FAIL;
 	    }
-	    bi->bi_used = 0;
+	    bi->bi_వాడిన = 0;
 	}
     }
-    else
+    లేకపోతే
 # endif
-	undo_write_bytes(bi, (long_u)UF_VERSION, 2);
+	undo_write_బైట్లు(bi, (long_u)UF_సంస్కరణ, 2);
 
 
     // Write a hash of the buffer text, so that we can verify it is still the
     // same when reading the buffer text.
-    if (undo_write(bi, hash, (size_t)UNDO_HASH_SIZE) == FAIL)
-	return FAIL;
+    ఒకవేళ (undo_write(bi, hash, (size_t)UNDO_HASH_కొలత) == FAIL)
+	తిరిగి FAIL;
 
     // buffer-specific data
-    undo_write_bytes(bi, (long_u)buf->b_ml.ml_line_count, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_ptr.ul_textlen, 4);
-    if (buf->b_u_line_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_line_ptr.ul_line,
-			(size_t)buf->b_u_line_ptr.ul_textlen) == FAIL)
-	return FAIL;
-    undo_write_bytes(bi, (long_u)buf->b_u_line_lnum, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_colnr, 4);
+    undo_write_బైట్లు(bi, (long_u)buf->b_ml.ml_పంక్తి_లెక్క, 4);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_పంక్తి_ptr.ul_textlen, 4);
+    ఒకవేళ (buf->b_u_పంక్తి_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_పంక్తి_ptr.ul_పంక్తి,
+			(size_t)buf->b_u_పంక్తి_ptr.ul_textlen) == FAIL)
+	తిరిగి FAIL;
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_పంక్తి_lnum, 4);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_పంక్తి_colnr, 4);
 
     // Undo structures header data
-    put_header_ptr(bi, buf->b_u_oldhead);
-    put_header_ptr(bi, buf->b_u_newhead);
-    put_header_ptr(bi, buf->b_u_curhead);
+    put_శీర్షిక_ptr(bi, buf->b_u_oldhead);
+    put_శీర్షిక_ptr(bi, buf->b_u_newhead);
+    put_శీర్షిక_ptr(bi, buf->b_u_curhead);
 
-    undo_write_bytes(bi, (long_u)buf->b_u_numhead, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_seq_last, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_seq_cur, 4);
-    time_to_bytes(buf->b_u_time_cur, time_buf);
-    undo_write(bi, time_buf, 8);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_numhead, 4);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_seq_చివరి, 4);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_seq_cur, 4);
+    సమయం_గమ్యం_బైట్లు(buf->b_u_సమయం_cur, సమయం_buf);
+    undo_write(bi, సమయం_buf, 8);
 
     // Optional fields.
-    undo_write_bytes(bi, 4, 1);
-    undo_write_bytes(bi, UF_LAST_SAVE_NR, 1);
-    undo_write_bytes(bi, (long_u)buf->b_u_save_nr_last, 4);
+    undo_write_బైట్లు(bi, 4, 1);
+    undo_write_బైట్లు(bi, UF_చివరి_SAVE_NR, 1);
+    undo_write_బైట్లు(bi, (long_u)buf->b_u_save_nr_చివరి, 4);
 
-    undo_write_bytes(bi, 0, 1);  // end marker
+    undo_write_బైట్లు(bi, 0, 1);  // end marker
 
-    return OK;
+    తిరిగి OK;
 }
 
-    static int
-serialize_uhp(bufinfo_T *bi, u_header_T *uhp)
+    స్థిర పూర్ణాంకం
+serialize_uhp(bufinfo_T *bi, u_శీర్షిక_T *uhp)
 {
-    int		i;
-    u_entry_T	*uep;
-    char_u	time_buf[8];
+    పూర్ణాంకం		i;
+    u_నమోదు_T	*uep;
+    char_u	సమయం_buf[8];
 
-    if (undo_write_bytes(bi, (long_u)UF_HEADER_MAGIC, 2) == FAIL)
-	return FAIL;
+    ఒకవేళ (undo_write_బైట్లు(bi, (long_u)UF_శీర్షిక_MAGIC, 2) == FAIL)
+	తిరిగి FAIL;
 
-    put_header_ptr(bi, uhp->uh_next.ptr);
-    put_header_ptr(bi, uhp->uh_prev.ptr);
-    put_header_ptr(bi, uhp->uh_alt_next.ptr);
-    put_header_ptr(bi, uhp->uh_alt_prev.ptr);
-    undo_write_bytes(bi, uhp->uh_seq, 4);
+    put_శీర్షిక_ptr(bi, uhp->uh_తదుపరి.ptr);
+    put_శీర్షిక_ptr(bi, uhp->uh_prev.ptr);
+    put_శీర్షిక_ptr(bi, uhp->uh_alt_తదుపరి.ptr);
+    put_శీర్షిక_ptr(bi, uhp->uh_alt_prev.ptr);
+    undo_write_బైట్లు(bi, uhp->uh_seq, 4);
     serialize_pos(bi, uhp->uh_cursor);
-    undo_write_bytes(bi, (long_u)uhp->uh_cursor_vcol, 4);
-    undo_write_bytes(bi, (long_u)uhp->uh_flags, 2);
+    undo_write_బైట్లు(bi, (long_u)uhp->uh_cursor_vcol, 4);
+    undo_write_బైట్లు(bi, (long_u)uhp->uh_flags, 2);
     // Assume NMARKS will stay the same.
-    for (i = 0; i < NMARKS; ++i)
+    కొరకు (i = 0; i < NMARKS; ++i)
 	serialize_pos(bi, uhp->uh_namedm[i]);
     serialize_visualinfo(bi, &uhp->uh_visual);
-    time_to_bytes(uhp->uh_time, time_buf);
-    undo_write(bi, time_buf, 8);
+    సమయం_గమ్యం_బైట్లు(uhp->uh_సమయం, సమయం_buf);
+    undo_write(bi, సమయం_buf, 8);
 
     // Optional fields.
-    undo_write_bytes(bi, 4, 1);
-    undo_write_bytes(bi, UHP_SAVE_NR, 1);
-    undo_write_bytes(bi, (long_u)uhp->uh_save_nr, 4);
+    undo_write_బైట్లు(bi, 4, 1);
+    undo_write_బైట్లు(bi, UHP_SAVE_NR, 1);
+    undo_write_బైట్లు(bi, (long_u)uhp->uh_save_nr, 4);
 
-    undo_write_bytes(bi, 0, 1);  // end marker
+    undo_write_బైట్లు(bi, 0, 1);  // end marker
 
     // Write all the entries.
-    for (uep = uhp->uh_entry; uep != NULL; uep = uep->ue_next)
+    కొరకు (uep = uhp->uh_నమోదు; uep != ఖాళీ; uep = uep->ue_తదుపరి)
     {
-	undo_write_bytes(bi, (long_u)UF_ENTRY_MAGIC, 2);
-	if (serialize_uep(bi, uep) == FAIL)
-	    return FAIL;
+	undo_write_బైట్లు(bi, (long_u)UF_నమోదు_MAGIC, 2);
+	ఒకవేళ (serialize_uep(bi, uep) == FAIL)
+	    తిరిగి FAIL;
     }
-    undo_write_bytes(bi, (long_u)UF_ENTRY_END_MAGIC, 2);
-    return OK;
+    undo_write_బైట్లు(bi, (long_u)UF_నమోదు_చివర_MAGIC, 2);
+    తిరిగి OK;
 }
 
-    static u_header_T *
+    స్థిర u_శీర్షిక_T *
 unserialize_uhp(bufinfo_T *bi, char_u *file_name)
 {
-    u_header_T	*uhp;
-    int		i;
-    u_entry_T	*uep, *last_uep;
-    int		c;
-    int		error;
+    u_శీర్షిక_T	*uhp;
+    పూర్ణాంకం		i;
+    u_నమోదు_T	*uep, *చివరి_uep;
+    పూర్ణాంకం		c;
+    పూర్ణాంకం		error;
 
-    uhp = U_ALLOC_LINE(sizeof(u_header_T));
-    if (uhp == NULL)
-	return NULL;
-    CLEAR_POINTER(uhp);
+    uhp = U_ALLOC_పంక్తి(పరిమాణం(u_శీర్షిక_T));
+    ఒకవేళ (uhp == ఖాళీ)
+	తిరిగి ఖాళీ;
+    CLEAR_సూచిక(uhp);
 # ifdef U_DEBUG
     uhp->uh_magic = UH_MAGIC;
 # endif
-    uhp->uh_next.seq = undo_read_4c(bi);
+    uhp->uh_తదుపరి.seq = undo_read_4c(bi);
     uhp->uh_prev.seq = undo_read_4c(bi);
-    uhp->uh_alt_next.seq = undo_read_4c(bi);
+    uhp->uh_alt_తదుపరి.seq = undo_read_4c(bi);
     uhp->uh_alt_prev.seq = undo_read_4c(bi);
     uhp->uh_seq = undo_read_4c(bi);
-    if (uhp->uh_seq <= 0)
+    ఒకవేళ (uhp->uh_seq <= 0)
     {
 	corruption_error("uh_seq", file_name);
 	vim_free(uhp);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
     unserialize_pos(bi, &uhp->uh_cursor);
     uhp->uh_cursor_vcol = undo_read_4c(bi);
     uhp->uh_flags = undo_read_2c(bi);
-    for (i = 0; i < NMARKS; ++i)
+    కొరకు (i = 0; i < NMARKS; ++i)
 	unserialize_pos(bi, &uhp->uh_namedm[i]);
     unserialize_visualinfo(bi, &uhp->uh_visual);
-    uhp->uh_time = undo_read_time(bi);
+    uhp->uh_సమయం = undo_read_సమయం(bi);
 
     // Optional fields.
-    for (;;)
+    కొరకు (;;)
     {
-	int len = undo_read_byte(bi);
-	int what;
+	పూర్ణాంకం len = undo_read_byte(bi);
+	పూర్ణాంకం what;
 
-	if (len == EOF)
+	ఒకవేళ (len == EOF)
 	{
 	    corruption_error("truncated", file_name);
 	    u_free_uhp(uhp);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
-	if (len == 0)
-	    break;
+	ఒకవేళ (len == 0)
+	    ఆపు;
 	what = undo_read_byte(bi);
-	switch (what)
+	ఎంపిక (what)
 	{
-	    case UHP_SAVE_NR:
+	    స్థితి UHP_SAVE_NR:
 		uhp->uh_save_nr = undo_read_4c(bi);
-		break;
-	    default:
+		ఆపు;
+	    అప్రమేయ:
 		// field not supported, skip
-		while (--len >= 0)
-		    (void)undo_read_byte(bi);
+		అయితే (--len >= 0)
+		    (శూన్య)undo_read_byte(bi);
 	}
     }
 
     // Unserialize the uep list.
-    last_uep = NULL;
-    while ((c = undo_read_2c(bi)) == UF_ENTRY_MAGIC)
+    చివరి_uep = ఖాళీ;
+    అయితే ((c = undo_read_2c(bi)) == UF_నమోదు_MAGIC)
     {
 	error = FALSE;
 	uep = unserialize_uep(bi, &error, file_name);
-	if (last_uep == NULL)
-	    uhp->uh_entry = uep;
-	else
-	    last_uep->ue_next = uep;
-	last_uep = uep;
-	if (uep == NULL || error)
+	ఒకవేళ (చివరి_uep == ఖాళీ)
+	    uhp->uh_నమోదు = uep;
+	లేకపోతే
+	    చివరి_uep->ue_తదుపరి = uep;
+	చివరి_uep = uep;
+	ఒకవేళ (uep == ఖాళీ || error)
 	{
 	    u_free_uhp(uhp);
-	    return NULL;
+	    తిరిగి ఖాళీ;
 	}
     }
-    if (c != UF_ENTRY_END_MAGIC)
+    ఒకవేళ (c != UF_నమోదు_చివర_MAGIC)
     {
 	corruption_error("entry end", file_name);
 	u_free_uhp(uhp);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
 
-    return uhp;
+    తిరిగి uhp;
 }
 
 /*
  * Serialize "uep".
  */
-    static int
+    స్థిర పూర్ణాంకం
 serialize_uep(
     bufinfo_T	*bi,
-    u_entry_T	*uep)
+    u_నమోదు_T	*uep)
 {
-    int		i;
+    పూర్ణాంకం		i;
 
-    undo_write_bytes(bi, (long_u)uep->ue_top, 4);
-    undo_write_bytes(bi, (long_u)uep->ue_bot, 4);
-    undo_write_bytes(bi, (long_u)uep->ue_lcount, 4);
-    undo_write_bytes(bi, (long_u)uep->ue_size, 4);
-    for (i = 0; i < uep->ue_size; ++i)
+    undo_write_బైట్లు(bi, (long_u)uep->ue_శిఖరం, 4);
+    undo_write_బైట్లు(bi, (long_u)uep->ue_bot, 4);
+    undo_write_బైట్లు(bi, (long_u)uep->ue_lcount, 4);
+    undo_write_బైట్లు(bi, (long_u)uep->ue_కొలత, 4);
+    కొరకు (i = 0; i < uep->ue_కొలత; ++i)
     {
 	// Text is written without the text properties, since we cannot restore
 	// the text property types.
-	if (undo_write_bytes(bi, (long_u)uep->ue_array[i].ul_textlen, 4) == FAIL)
-	    return FAIL;
-	if (uep->ue_array[i].ul_textlen > 0
-		&& fwrite_crypt(bi, uep->ue_array[i].ul_line, uep->ue_array[i].ul_textlen) == FAIL)
-	    return FAIL;
+	ఒకవేళ (undo_write_బైట్లు(bi, (long_u)uep->ue_array[i].ul_textlen, 4) == FAIL)
+	    తిరిగి FAIL;
+	ఒకవేళ (uep->ue_array[i].ul_textlen > 0
+		&& fwrite_crypt(bi, uep->ue_array[i].ul_పంక్తి, uep->ue_array[i].ul_textlen) == FAIL)
+	    తిరిగి FAIL;
     }
-    return OK;
+    తిరిగి OK;
 }
 
-    static u_entry_T *
-unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name)
+    స్థిర u_నమోదు_T *
+unserialize_uep(bufinfo_T *bi, పూర్ణాంకం *error, char_u *file_name)
 {
-    int		i;
-    u_entry_T	*uep;
-    undoline_T	*array = NULL;
-    char_u	*line;
-    int		line_len;
+    పూర్ణాంకం		i;
+    u_నమోదు_T	*uep;
+    undoline_T	*array = ఖాళీ;
+    char_u	*పంక్తి;
+    పూర్ణాంకం		పంక్తి_len;
 
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
-    if (uep == NULL)
-	return NULL;
-    CLEAR_POINTER(uep);
+    uep = U_ALLOC_పంక్తి(పరిమాణం(u_నమోదు_T));
+    ఒకవేళ (uep == ఖాళీ)
+	తిరిగి ఖాళీ;
+    CLEAR_సూచిక(uep);
 # ifdef U_DEBUG
     uep->ue_magic = UE_MAGIC;
 # endif
-    uep->ue_top = undo_read_4c(bi);
+    uep->ue_శిఖరం = undo_read_4c(bi);
     uep->ue_bot = undo_read_4c(bi);
     uep->ue_lcount = undo_read_4c(bi);
-    uep->ue_size = undo_read_4c(bi);
-    if (uep->ue_size > 0)
+    uep->ue_కొలత = undo_read_4c(bi);
+    ఒకవేళ (uep->ue_కొలత > 0)
     {
-	if (uep->ue_size < LONG_MAX / (long)sizeof(undoline_T))
-	    array = U_ALLOC_LINE(sizeof(undoline_T) * uep->ue_size);
-	if (array == NULL)
+	ఒకవేళ (uep->ue_కొలత < LONG_MAX / (దీర్ఘ)పరిమాణం(undoline_T))
+	    array = U_ALLOC_పంక్తి(పరిమాణం(undoline_T) * uep->ue_కొలత);
+	ఒకవేళ (array == ఖాళీ)
 	{
 	    *error = TRUE;
-	    return uep;
+	    తిరిగి uep;
 	}
-	vim_memset(array, 0, sizeof(undoline_T) * uep->ue_size);
+	vim_memset(array, 0, పరిమాణం(undoline_T) * uep->ue_కొలత);
     }
     uep->ue_array = array;
 
-    for (i = 0; i < uep->ue_size; ++i)
+    కొరకు (i = 0; i < uep->ue_కొలత; ++i)
     {
-	line_len = undo_read_4c(bi);
-	if (line_len >= 0)
-	    line = read_string_decrypt(bi, line_len);
-	else
+	పంక్తి_len = undo_read_4c(bi);
+	ఒకవేళ (పంక్తి_len >= 0)
+	    పంక్తి = read_string_decrypt(bi, పంక్తి_len);
+	లేకపోతే
 	{
-	    line = NULL;
+	    పంక్తి = ఖాళీ;
 	    corruption_error("line length", file_name);
 	}
-	if (line == NULL)
+	ఒకవేళ (పంక్తి == ఖాళీ)
 	{
 	    *error = TRUE;
-	    return uep;
+	    తిరిగి uep;
 	}
-	array[i].ul_line = line;
-	array[i].ul_len = line_len + 1;
-	array[i].ul_textlen = line_len;
+	array[i].ul_పంక్తి = పంక్తి;
+	array[i].ul_len = పంక్తి_len + 1;
+	array[i].ul_textlen = పంక్తి_len;
     }
-    return uep;
+    తిరిగి uep;
 }
 
 /*
  * Serialize "pos".
  */
-    static void
+    స్థిర శూన్య
 serialize_pos(bufinfo_T *bi, pos_T pos)
 {
-    undo_write_bytes(bi, (long_u)pos.lnum, 4);
-    undo_write_bytes(bi, (long_u)pos.col, 4);
-    undo_write_bytes(bi, (long_u)pos.coladd, 4);
+    undo_write_బైట్లు(bi, (long_u)pos.lnum, 4);
+    undo_write_బైట్లు(bi, (long_u)pos.నిలువు, 4);
+    undo_write_బైట్లు(bi, (long_u)pos.coladd, 4);
 }
 
 /*
  * Unserialize the pos_T at the current position.
  */
-    static void
+    స్థిర శూన్య
 unserialize_pos(bufinfo_T *bi, pos_T *pos)
 {
     pos->lnum = undo_read_4c(bi);
-    if (pos->lnum < 0)
+    ఒకవేళ (pos->lnum < 0)
 	pos->lnum = 0;
-    pos->col = undo_read_4c(bi);
-    if (pos->col < 0)
-	pos->col = 0;
+    pos->నిలువు = undo_read_4c(bi);
+    ఒకవేళ (pos->నిలువు < 0)
+	pos->నిలువు = 0;
     pos->coladd = undo_read_4c(bi);
-    if (pos->coladd < 0)
+    ఒకవేళ (pos->coladd < 0)
 	pos->coladd = 0;
 }
 
 /*
  * Serialize "info".
  */
-    static void
+    స్థిర శూన్య
 serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
 {
-    serialize_pos(bi, info->vi_start);
-    serialize_pos(bi, info->vi_end);
-    undo_write_bytes(bi, (long_u)info->vi_mode, 4);
-    undo_write_bytes(bi, (long_u)info->vi_curswant, 4);
+    serialize_pos(bi, info->vi_ప్రారంభం);
+    serialize_pos(bi, info->vi_చివర);
+    undo_write_బైట్లు(bi, (long_u)info->vi_బహుళకం, 4);
+    undo_write_బైట్లు(bi, (long_u)info->vi_curswant, 4);
 }
 
 /*
  * Unserialize the visualinfo_T at the current position.
  */
-    static void
+    స్థిర శూన్య
 unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
 {
-    unserialize_pos(bi, &info->vi_start);
-    unserialize_pos(bi, &info->vi_end);
-    info->vi_mode = undo_read_4c(bi);
+    unserialize_pos(bi, &info->vi_ప్రారంభం);
+    unserialize_pos(bi, &info->vi_చివర);
+    info->vi_బహుళకం = undo_read_4c(bi);
     info->vi_curswant = undo_read_4c(bi);
 }
 
@@ -1543,48 +1543,48 @@ unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
  * "forceit" is TRUE for ":wundo!", FALSE otherwise.
  * "hash[UNDO_HASH_SIZE]" must be the hash value of the buffer text.
  */
-    void
+    శూన్య
 u_write_undo(
     char_u	*name,
-    int		forceit,
+    పూర్ణాంకం		forceit,
     buf_T	*buf,
     char_u	*hash)
 {
-    u_header_T	*uhp;
+    u_శీర్షిక_T	*uhp;
     char_u	*file_name;
-    int		mark;
+    పూర్ణాంకం		mark;
 # ifdef U_DEBUG
-    int		headers_written = 0;
+    పూర్ణాంకం		శీర్షికలు_written = 0;
 # endif
-    int		fd;
-    FILE	*fp = NULL;
-    int		perm;
-    int		write_ok = FALSE;
+    పూర్ణాంకం		fd;
+    FILE	*fp = ఖాళీ;
+    పూర్ణాంకం		perm;
+    పూర్ణాంకం		write_ok = FALSE;
 # ifdef UNIX
-    int		st_old_valid = FALSE;
+    పూర్ణాంకం		st_old_valid = FALSE;
     stat_T	st_old;
     stat_T	st_new;
 # endif
     bufinfo_T	bi;
 
-    CLEAR_FIELD(bi);
+    CLEAR_క్షేత్రం(bi);
 
-    if (name == NULL)
+    ఒకవేళ (name == ఖాళీ)
     {
 	file_name = u_get_undo_file_name(buf->b_ffname, FALSE);
-	if (file_name == NULL)
+	ఒకవేళ (file_name == ఖాళీ)
 	{
-	    if (p_verbose > 0)
+	    ఒకవేళ (p_verbose > 0)
 	    {
 		verbose_enter();
 		smsg(
 		   _("Cannot write undo file in any directory in 'undodir'"));
 		verbose_leave();
 	    }
-	    return;
+	    తిరిగి;
 	}
     }
-    else
+    లేకపోతే
 	file_name = name;
 
     /*
@@ -1593,17 +1593,17 @@ u_write_undo(
      * allow the user to access the undo file.
      */
     perm = 0600;
-    if (buf->b_ffname != NULL)
+    ఒకవేళ (buf->b_ffname != ఖాళీ)
     {
 # ifdef UNIX
-	if (mch_stat((char *)buf->b_ffname, &st_old) >= 0)
+	ఒకవేళ (mch_stat((అక్షరం *)buf->b_ffname, &st_old) >= 0)
 	{
-	    perm = st_old.st_mode;
+	    perm = st_old.st_బహుళకం;
 	    st_old_valid = TRUE;
 	}
-# else
+# లేకపోతే
 	perm = mch_getperm(buf->b_ffname);
-	if (perm < 0)
+	ఒకవేళ (perm < 0)
 	    perm = 0600;
 # endif
     }
@@ -1613,47 +1613,47 @@ u_write_undo(
 
     // If the undo file already exists, verify that it actually is an undo
     // file, and delete it.
-    if (mch_getperm(file_name) >= 0)
+    ఒకవేళ (mch_getperm(file_name) >= 0)
     {
-	if (name == NULL || !forceit)
+	ఒకవేళ (name == ఖాళీ || !forceit)
 	{
 	    // Check we can read it and it's an undo file.
-	    fd = mch_open((char *)file_name, O_RDONLY|O_EXTRA, 0);
-	    if (fd < 0)
+	    fd = mch_open((అక్షరం *)file_name, O_RDONLY|O_EXTRA, 0);
+	    ఒకవేళ (fd < 0)
 	    {
-		if (name != NULL || p_verbose > 0)
+		ఒకవేళ (name != ఖాళీ || p_verbose > 0)
 		{
-		    if (name == NULL)
+		    ఒకవేళ (name == ఖాళీ)
 			verbose_enter();
 		    smsg(
 		      _("Will not overwrite with undo file, cannot read: %s"),
 								   file_name);
-		    if (name == NULL)
+		    ఒకవేళ (name == ఖాళీ)
 			verbose_leave();
 		}
-		goto theend;
+		వెళ్ళు theend;
 	    }
-	    else
+	    లేకపోతే
 	    {
-		char_u	mbuf[UF_START_MAGIC_LEN];
-		int	len;
+		char_u	mbuf[UF_ప్రారంభం_MAGIC_LEN];
+		పూర్ణాంకం	len;
 
-		len = read_eintr(fd, mbuf, UF_START_MAGIC_LEN);
+		len = read_eintr(fd, mbuf, UF_ప్రారంభం_MAGIC_LEN);
 		close(fd);
-		if (len < UF_START_MAGIC_LEN
-		      || memcmp(mbuf, UF_START_MAGIC, UF_START_MAGIC_LEN) != 0)
+		ఒకవేళ (len < UF_ప్రారంభం_MAGIC_LEN
+		      || memcmp(mbuf, UF_ప్రారంభం_MAGIC, UF_ప్రారంభం_MAGIC_LEN) != 0)
 		{
-		    if (name != NULL || p_verbose > 0)
+		    ఒకవేళ (name != ఖాళీ || p_verbose > 0)
 		    {
-			if (name == NULL)
+			ఒకవేళ (name == ఖాళీ)
 			    verbose_enter();
 			smsg(
 			_("Will not overwrite, this is not an undo file: %s"),
 								   file_name);
-			if (name == NULL)
+			ఒకవేళ (name == ఖాళీ)
 			    verbose_leave();
 		    }
-		    goto theend;
+		    వెళ్ళు theend;
 		}
 	    }
 	}
@@ -1662,22 +1662,22 @@ u_write_undo(
 
     // If there is no undo information at all, quit here after deleting any
     // existing undo file.
-    if (buf->b_u_numhead == 0 && buf->b_u_line_ptr.ul_line == NULL)
+    ఒకవేళ (buf->b_u_numhead == 0 && buf->b_u_పంక్తి_ptr.ul_పంక్తి == ఖాళీ)
     {
-	if (p_verbose > 0)
-	    verb_msg(_("Skipping undo file write, nothing to undo"));
-	goto theend;
+	ఒకవేళ (p_verbose > 0)
+	    verb_సందేశం(_("Skipping undo file write, nothing to undo"));
+	వెళ్ళు theend;
     }
 
-    fd = mch_open((char *)file_name,
+    fd = mch_open((అక్షరం *)file_name,
 			    O_CREAT|O_EXTRA|O_WRONLY|O_EXCL|O_NOFOLLOW, perm);
-    if (fd < 0)
+    ఒకవేళ (fd < 0)
     {
 	semsg(_(e_cannot_open_undo_file_for_writing_str), file_name);
-	goto theend;
+	వెళ్ళు theend;
     }
-    (void)mch_setperm(file_name, perm);
-    if (p_verbose > 0)
+    (శూన్య)mch_setperm(file_name, perm);
+    ఒకవేళ (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Writing undo file: %s"), file_name);
@@ -1695,27 +1695,27 @@ u_write_undo(
      * this fails, set the protection bits for the group same as the
      * protection bits for others.
      */
-    if (st_old_valid
-	    && mch_stat((char *)file_name, &st_new) >= 0
+    ఒకవేళ (st_old_valid
+	    && mch_stat((అక్షరం *)file_name, &st_new) >= 0
 	    && st_new.st_gid != st_old.st_gid
 #  ifdef HAVE_FCHOWN  // sequent-ptx lacks fchown()
 	    && fchown(fd, (uid_t)-1, st_old.st_gid) != 0
 #  endif
        )
 	mch_setperm(file_name, (perm & 0707) | ((perm & 07) << 3));
-#  if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
-    if (buf->b_ffname != NULL)
+#  ఒకవేళ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+    ఒకవేళ (buf->b_ffname != ఖాళీ)
 	mch_copy_sec(buf->b_ffname, file_name);
 #  endif
 # endif
 
     fp = fdopen(fd, "w");
-    if (fp == NULL)
+    ఒకవేళ (fp == ఖాళీ)
     {
 	semsg(_(e_cannot_open_undo_file_for_writing_str), file_name);
 	close(fd);
 	mch_remove(file_name);
-	goto theend;
+	వెళ్ళు theend;
     }
 
     // Undo must be synced.
@@ -1726,106 +1726,106 @@ u_write_undo(
      */
     bi.bi_buf = buf;
     bi.bi_fp = fp;
-    if (serialize_header(&bi, hash) == FAIL)
-	goto write_error;
+    ఒకవేళ (serialize_శీర్షిక(&bi, hash) == FAIL)
+	వెళ్ళు write_error;
 
     /*
      * Iteratively serialize UHPs and their UEPs from the top down.
      */
     mark = ++lastmark;
     uhp = buf->b_u_oldhead;
-    while (uhp != NULL)
+    అయితే (uhp != ఖాళీ)
     {
 	// Serialize current UHP if we haven't seen it
-	if (uhp->uh_walk != mark)
+	ఒకవేళ (uhp->uh_walk != mark)
 	{
 	    uhp->uh_walk = mark;
 # ifdef U_DEBUG
-	    ++headers_written;
+	    ++శీర్షికలు_written;
 # endif
-	    if (serialize_uhp(&bi, uhp) == FAIL)
-		goto write_error;
+	    ఒకవేళ (serialize_uhp(&bi, uhp) == FAIL)
+		వెళ్ళు write_error;
 	}
 
 	// Now walk through the tree - algorithm from undo_time().
-	if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != mark)
+	ఒకవేళ (uhp->uh_prev.ptr != ఖాళీ && uhp->uh_prev.ptr->uh_walk != mark)
 	    uhp = uhp->uh_prev.ptr;
-	else if (uhp->uh_alt_next.ptr != NULL
-				     && uhp->uh_alt_next.ptr->uh_walk != mark)
-	    uhp = uhp->uh_alt_next.ptr;
-	else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
-					 && uhp->uh_next.ptr->uh_walk != mark)
-	    uhp = uhp->uh_next.ptr;
-	else if (uhp->uh_alt_prev.ptr != NULL)
+	లేకపోతే ఒకవేళ (uhp->uh_alt_తదుపరి.ptr != ఖాళీ
+				     && uhp->uh_alt_తదుపరి.ptr->uh_walk != mark)
+	    uhp = uhp->uh_alt_తదుపరి.ptr;
+	లేకపోతే ఒకవేళ (uhp->uh_తదుపరి.ptr != ఖాళీ && uhp->uh_alt_prev.ptr == ఖాళీ
+					 && uhp->uh_తదుపరి.ptr->uh_walk != mark)
+	    uhp = uhp->uh_తదుపరి.ptr;
+	లేకపోతే ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
 	    uhp = uhp->uh_alt_prev.ptr;
-	else
-	    uhp = uhp->uh_next.ptr;
+	లేకపోతే
+	    uhp = uhp->uh_తదుపరి.ptr;
     }
 
-    if (undo_write_bytes(&bi, (long_u)UF_HEADER_END_MAGIC, 2) == OK)
+    ఒకవేళ (undo_write_బైట్లు(&bi, (long_u)UF_శీర్షిక_చివర_MAGIC, 2) == OK)
 	write_ok = TRUE;
 # ifdef U_DEBUG
-    if (headers_written != buf->b_u_numhead)
+    ఒకవేళ (శీర్షికలు_written != buf->b_u_numhead)
     {
-	semsg("Written %ld headers, ...", headers_written);
+	semsg("Written %ld headers, ...", శీర్షికలు_written);
 	semsg("... but numhead is %ld", buf->b_u_numhead);
     }
 # endif
 
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL && undo_flush(&bi) == FAIL)
+    ఒకవేళ (bi.bi_state != ఖాళీ && undo_flush(&bi) == FAIL)
 	write_ok = FALSE;
 # endif
 
-# if defined(UNIX) && defined(HAVE_FSYNC)
-    if ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && fflush(fp) == 0
+# ఒకవేళ defined(UNIX) && defined(HAVE_FSYNC)
+    ఒకవేళ ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && fflush(fp) == 0
 	    && vim_fsync(fd) != 0)
 	write_ok = FALSE;
 # endif
 
 write_error:
     fclose(fp);
-    if (!write_ok)
-	semsg(_(e_write_error_in_undo_file_str), file_name);
+    ఒకవేళ (!write_ok)
+	semsg(_(e_write_error_లోపల_undo_file_str), file_name);
 
-# if defined(MSWIN)
+# ఒకవేళ defined(MSWIN)
     // Copy file attributes; for systems where this can only be done after
     // closing the file.
-    if (buf->b_ffname != NULL)
-	(void)mch_copy_file_attribute(buf->b_ffname, file_name);
+    ఒకవేళ (buf->b_ffname != ఖాళీ)
+	(శూన్య)mch_copy_file_attribute(buf->b_ffname, file_name);
 # endif
 # ifdef HAVE_ACL
-    if (buf->b_ffname != NULL)
+    ఒకవేళ (buf->b_ffname != ఖాళీ)
     {
 	vim_acl_T	    acl;
 
 	// For systems that support ACL: get the ACL from the original file.
 	acl = mch_get_acl(buf->b_ffname);
-	mch_set_acl(file_name, acl);
+	mch_సమితి_acl(file_name, acl);
 	mch_free_acl(acl);
     }
 # endif
 
 theend:
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL)
+    ఒకవేళ (bi.bi_state != ఖాళీ)
 	crypt_free_state(bi.bi_state);
-    vim_free(bi.bi_buffer);
+    vim_free(bi.bi_బఫరు);
 # endif
-    if (file_name != name)
+    ఒకవేళ (file_name != name)
 	vim_free(file_name);
 }
 
 /*
  * Compare undo headers on the sequence number, for sorting uhp_table.
  */
-    static int
-uhp_seq_cmp(const void *v1, const void *v2)
+    స్థిర పూర్ణాంకం
+uhp_seq_cmp(స్థిరరాశి శూన్య *v1, స్థిరరాశి శూన్య *v2)
 {
-    const u_header_T *u1 = *(u_header_T **)v1;
-    const u_header_T *u2 = *(u_header_T **)v2;
+    స్థిరరాశి u_శీర్షిక_T *u1 = *(u_శీర్షిక_T **)v1;
+    స్థిరరాశి u_శీర్షిక_T *u2 = *(u_శీర్షిక_T **)v2;
 
-    return u1->uh_seq == u2->uh_seq ? 0 : u1->uh_seq > u2->uh_seq ? 1 : -1;
+    తిరిగి u1->uh_seq == u2->uh_seq ? 0 : u1->uh_seq > u2->uh_seq ? 1 : -1;
 }
 
 /*
@@ -1833,24 +1833,24 @@ uhp_seq_cmp(const void *v1, const void *v2)
  * "num_head" entries and is sorted on uh_seq.
  * Return the table index of the header or -1 when not found.
  */
-    static long
-uhp_table_find(u_header_T **uhp_table, long num_head, long seq)
+    స్థిర దీర్ఘ
+uhp_పట్టిక_కనుగొను(u_శీర్షిక_T **uhp_పట్టిక, దీర్ఘ అంకె_తల, దీర్ఘ seq)
 {
-    long    lo = 0;
-    long    hi = num_head - 1;
+    దీర్ఘ    lo = 0;
+    దీర్ఘ    hi = అంకె_తల - 1;
 
-    while (lo <= hi)
+    అయితే (lo <= hi)
     {
-	long mid = lo + (hi - lo) / 2;
+	దీర్ఘ mid = lo + (hi - lo) / 2;
 
-	if (uhp_table[mid]->uh_seq < seq)
+	ఒకవేళ (uhp_పట్టిక[mid]->uh_seq < seq)
 	    lo = mid + 1;
-	else if (uhp_table[mid]->uh_seq > seq)
+	లేకపోతే ఒకవేళ (uhp_పట్టిక[mid]->uh_seq > seq)
 	    hi = mid - 1;
-	else
-	    return mid;
+	లేకపోతే
+	    తిరిగి mid;
     }
-    return -1;
+    తిరిగి -1;
 }
 
 /*
@@ -1860,31 +1860,31 @@ uhp_table_find(u_header_T **uhp_table, long num_head, long seq)
  * Otherwise use curbuf->b_ffname to generate the undo file name.
  * "hash[UNDO_HASH_SIZE]" must be the hash value of the buffer text.
  */
-    void
-u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
+    శూన్య
+u_read_undo(char_u *name, char_u *hash, char_u *orig_name వాడని)
 {
     char_u	*file_name;
     FILE	*fp;
-    long	version, str_len;
-    undoline_T	line_ptr;
-    linenr_T	line_lnum;
-    colnr_T	line_colnr;
-    linenr_T	line_count;
-    long	num_head = 0;
-    long	old_header_seq, new_header_seq, cur_header_seq;
-    long	seq_last, seq_cur;
-    long	last_save_nr = 0;
-    long	old_idx = -1, new_idx = -1, cur_idx = -1;
-    long	num_read_uhps = 0;
-    time_t	seq_time;
-    long	i;
-    int		c;
-    u_header_T	*uhp;
-    u_header_T	**uhp_table = NULL;
-    char_u	read_hash[UNDO_HASH_SIZE];
-    char_u	magic_buf[UF_START_MAGIC_LEN];
+    దీర్ఘ	సంస్కరణ_2, str_len;
+    undoline_T	పంక్తి_ptr;
+    linenr_T	పంక్తి_lnum;
+    colnr_T	పంక్తి_colnr;
+    linenr_T	పంక్తి_లెక్క;
+    దీర్ఘ	అంకె_తల = 0;
+    దీర్ఘ	old_శీర్షిక_seq, new_శీర్షిక_seq, cur_శీర్షిక_seq;
+    దీర్ఘ	seq_చివరి, seq_cur;
+    దీర్ఘ	చివరి_save_nr = 0;
+    దీర్ఘ	old_idx = -1, new_idx = -1, cur_idx = -1;
+    దీర్ఘ	అంకె_read_uhps = 0;
+    time_t	seq_సమయం;
+    దీర్ఘ	i;
+    పూర్ణాంకం		c;
+    u_శీర్షిక_T	*uhp;
+    u_శీర్షిక_T	**uhp_పట్టిక = ఖాళీ;
+    char_u	read_hash[UNDO_HASH_కొలత];
+    char_u	magic_buf[UF_ప్రారంభం_MAGIC_LEN];
 # ifdef U_DEBUG
-    int		*uhp_table_used;
+    పూర్ణాంకం		*uhp_పట్టిక_వాడిన;
 # endif
 # ifdef UNIX
     stat_T	st_orig;
@@ -1892,26 +1892,26 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 # endif
     bufinfo_T	bi;
 
-    CLEAR_FIELD(bi);
-    line_ptr.ul_len = 0;
-    line_ptr.ul_textlen = 0;
-    line_ptr.ul_line = NULL;
+    CLEAR_క్షేత్రం(bi);
+    పంక్తి_ptr.ul_len = 0;
+    పంక్తి_ptr.ul_textlen = 0;
+    పంక్తి_ptr.ul_పంక్తి = ఖాళీ;
 
-    if (name == NULL)
+    ఒకవేళ (name == ఖాళీ)
     {
 	file_name = u_get_undo_file_name(curbuf->b_ffname, TRUE);
-	if (file_name == NULL)
-	    return;
+	ఒకవేళ (file_name == ఖాళీ)
+	    తిరిగి;
 
 # ifdef UNIX
 	// For safety we only read an undo file if the owner is equal to the
 	// owner of the text file or equal to the current user.
-	if (mch_stat((char *)orig_name, &st_orig) >= 0
-		&& mch_stat((char *)file_name, &st_undo) >= 0
+	ఒకవేళ (mch_stat((అక్షరం *)orig_name, &st_orig) >= 0
+		&& mch_stat((అక్షరం *)file_name, &st_undo) >= 0
 		&& st_orig.st_uid != st_undo.st_uid
 		&& st_undo.st_uid != getuid())
 	{
-	    if (p_verbose > 0)
+	    ఒకవేళ (p_verbose > 0)
 	    {
 		verbose_enter();
 		smsg(_("Not reading undo file, owner differs: %s"),
@@ -1919,26 +1919,26 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 		verbose_leave();
 	    }
 	    vim_free(file_name);
-	    return;
+	    తిరిగి;
 	}
 # endif
     }
-    else
+    లేకపోతే
 	file_name = name;
 
-    if (p_verbose > 0)
+    ఒకవేళ (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Reading undo file: %s"), file_name);
 	verbose_leave();
     }
 
-    fp = mch_fopen((char *)file_name, "r");
-    if (fp == NULL)
+    fp = mch_fopen((అక్షరం *)file_name, "r");
+    ఒకవేళ (fp == ఖాళీ)
     {
-	if (name != NULL || p_verbose > 0)
+	ఒకవేళ (name != ఖాళీ || p_verbose > 0)
 	    semsg(_(e_cannot_open_undo_file_for_reading_str), file_name);
-	goto error;
+	వెళ్ళు error;
     }
     bi.bi_buf = curbuf;
     bi.bi_fp = fp;
@@ -1946,117 +1946,117 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     /*
      * Read the undo file header.
      */
-    if (fread(magic_buf, UF_START_MAGIC_LEN, 1, fp) != 1
-		|| memcmp(magic_buf, UF_START_MAGIC, UF_START_MAGIC_LEN) != 0)
+    ఒకవేళ (fread(magic_buf, UF_ప్రారంభం_MAGIC_LEN, 1, fp) != 1
+		|| memcmp(magic_buf, UF_ప్రారంభం_MAGIC, UF_ప్రారంభం_MAGIC_LEN) != 0)
     {
 	semsg(_(e_not_an_undo_file_str), file_name);
-	goto error;
+	వెళ్ళు error;
     }
-    version = get2c(fp);
-    if (version == UF_VERSION_CRYPT)
+    సంస్కరణ_2 = get2c(fp);
+    ఒకవేళ (సంస్కరణ_2 == UF_సంస్కరణ_CRYPT)
     {
 # ifdef FEAT_CRYPT
-	if (*curbuf->b_p_key == NUL)
+	ఒకవేళ (*curbuf->b_p_కీలకం == NUL)
 	{
 	    semsg(_(e_non_encrypted_file_has_encrypted_undo_file_str),
 								    file_name);
-	    goto error;
+	    వెళ్ళు error;
 	}
-	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_key);
-	if (bi.bi_state == NULL)
+	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_కీలకం);
+	ఒకవేళ (bi.bi_state == ఖాళీ)
 	{
 	    semsg(_(e_undo_file_decryption_failed), file_name);
-	    goto error;
+	    వెళ్ళు error;
 	}
-	if (crypt_whole_undofile(bi.bi_state->method_nr))
+	ఒకవేళ (crypt_సంపూర్ణ_undofile(bi.bi_state->పద్ధతి_nr))
 	{
-	    bi.bi_buffer = alloc(CRYPT_BUF_SIZE);
-	    if (bi.bi_buffer == NULL)
+	    bi.bi_బఫరు = alloc(CRYPT_BUF_కొలత);
+	    ఒకవేళ (bi.bi_బఫరు == ఖాళీ)
 	    {
 		crypt_free_state(bi.bi_state);
-		bi.bi_state = NULL;
-		goto error;
+		bi.bi_state = ఖాళీ;
+		వెళ్ళు error;
 	    }
 	    bi.bi_avail = 0;
-	    bi.bi_used = 0;
+	    bi.bi_వాడిన = 0;
 	}
-# else
+# లేకపోతే
 	semsg(_(e_undo_file_is_encrypted_str), file_name);
-	goto error;
+	వెళ్ళు error;
 # endif
     }
-    else if (version != UF_VERSION)
+    లేకపోతే ఒకవేళ (సంస్కరణ_2 != UF_సంస్కరణ)
     {
 	semsg(_(e_incompatible_undo_file_str), file_name);
-	goto error;
+	వెళ్ళు error;
     }
 
-    if (undo_read(&bi, read_hash, (size_t)UNDO_HASH_SIZE) == FAIL)
+    ఒకవేళ (undo_read(&bi, read_hash, (size_t)UNDO_HASH_కొలత) == FAIL)
     {
 	corruption_error("hash", file_name);
-	goto error;
+	వెళ్ళు error;
     }
-    line_count = (linenr_T)undo_read_4c(&bi);
-    if (memcmp(hash, read_hash, UNDO_HASH_SIZE) != 0
-				  || line_count != curbuf->b_ml.ml_line_count)
+    పంక్తి_లెక్క = (linenr_T)undo_read_4c(&bi);
+    ఒకవేళ (memcmp(hash, read_hash, UNDO_HASH_కొలత) != 0
+				  || పంక్తి_లెక్క != curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	if (p_verbose > 0 || name != NULL)
+	ఒకవేళ (p_verbose > 0 || name != ఖాళీ)
 	{
-	    if (name == NULL)
+	    ఒకవేళ (name == ఖాళీ)
 		verbose_enter();
 	    give_warning((char_u *)
 		      _("File contents changed, cannot use undo info"), TRUE);
-	    if (name == NULL)
+	    ఒకవేళ (name == ఖాళీ)
 		verbose_leave();
 	}
-	goto error;
+	వెళ్ళు error;
     }
 
     // Read undo data for "U" command.
     str_len = undo_read_4c(&bi);
-    if (str_len < 0)
-	goto error;
-    if (str_len > 0)
+    ఒకవేళ (str_len < 0)
+	వెళ్ళు error;
+    ఒకవేళ (str_len > 0)
     {
-	line_ptr.ul_line = read_string_decrypt(&bi, str_len);
-	line_ptr.ul_len = str_len + 1;
-	line_ptr.ul_textlen = str_len;
+	పంక్తి_ptr.ul_పంక్తి = read_string_decrypt(&bi, str_len);
+	పంక్తి_ptr.ul_len = str_len + 1;
+	పంక్తి_ptr.ul_textlen = str_len;
     }
-    line_lnum = (linenr_T)undo_read_4c(&bi);
-    line_colnr = (colnr_T)undo_read_4c(&bi);
-    if (line_lnum < 0 || line_colnr < 0)
+    పంక్తి_lnum = (linenr_T)undo_read_4c(&bi);
+    పంక్తి_colnr = (colnr_T)undo_read_4c(&bi);
+    ఒకవేళ (పంక్తి_lnum < 0 || పంక్తి_colnr < 0)
     {
 	corruption_error("line lnum/col", file_name);
-	goto error;
+	వెళ్ళు error;
     }
 
     // Begin general undo data
-    old_header_seq = undo_read_4c(&bi);
-    new_header_seq = undo_read_4c(&bi);
-    cur_header_seq = undo_read_4c(&bi);
-    num_head = undo_read_4c(&bi);
-    seq_last = undo_read_4c(&bi);
+    old_శీర్షిక_seq = undo_read_4c(&bi);
+    new_శీర్షిక_seq = undo_read_4c(&bi);
+    cur_శీర్షిక_seq = undo_read_4c(&bi);
+    అంకె_తల = undo_read_4c(&bi);
+    seq_చివరి = undo_read_4c(&bi);
     seq_cur = undo_read_4c(&bi);
-    seq_time = undo_read_time(&bi);
+    seq_సమయం = undo_read_సమయం(&bi);
 
     // Optional header fields.
-    for (;;)
+    కొరకు (;;)
     {
-	int len = undo_read_byte(&bi);
-	int what;
+	పూర్ణాంకం len = undo_read_byte(&bi);
+	పూర్ణాంకం what;
 
-	if (len == 0 || len == EOF)
-	    break;
+	ఒకవేళ (len == 0 || len == EOF)
+	    ఆపు;
 	what = undo_read_byte(&bi);
-	switch (what)
+	ఎంపిక (what)
 	{
-	    case UF_LAST_SAVE_NR:
-		last_save_nr = undo_read_4c(&bi);
-		break;
-	    default:
+	    స్థితి UF_చివరి_SAVE_NR:
+		చివరి_save_nr = undo_read_4c(&bi);
+		ఆపు;
+	    అప్రమేయ:
 		// field not supported, skip
-		while (--len >= 0)
-		    (void)undo_read_byte(&bi);
+		అయితే (--len >= 0)
+		    (శూన్య)undo_read_byte(&bi);
 	}
     }
 
@@ -2064,60 +2064,60 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // until we insert them into curbuf. The table remains sorted by the
     // sequence numbers of the headers.
     // When there are no headers uhp_table is NULL.
-    if (num_head > 0)
+    ఒకవేళ (అంకె_తల > 0)
     {
-	if (num_head < LONG_MAX / (long)sizeof(u_header_T *))
-	    uhp_table = U_ALLOC_LINE(num_head * sizeof(u_header_T *));
-	if (uhp_table == NULL)
-	    goto error;
+	ఒకవేళ (అంకె_తల < LONG_MAX / (దీర్ఘ)పరిమాణం(u_శీర్షిక_T *))
+	    uhp_పట్టిక = U_ALLOC_పంక్తి(అంకె_తల * పరిమాణం(u_శీర్షిక_T *));
+	ఒకవేళ (uhp_పట్టిక == ఖాళీ)
+	    వెళ్ళు error;
     }
 
-    while ((c = undo_read_2c(&bi)) == UF_HEADER_MAGIC)
+    అయితే ((c = undo_read_2c(&bi)) == UF_శీర్షిక_MAGIC)
     {
-	if (num_read_uhps >= num_head)
+	ఒకవేళ (అంకె_read_uhps >= అంకె_తల)
 	{
 	    corruption_error("num_head too small", file_name);
-	    goto error;
+	    వెళ్ళు error;
 	}
 
 	uhp = unserialize_uhp(&bi, file_name);
-	if (uhp == NULL)
-	    goto error;
-	uhp_table[num_read_uhps++] = uhp;
+	ఒకవేళ (uhp == ఖాళీ)
+	    వెళ్ళు error;
+	uhp_పట్టిక[అంకె_read_uhps++] = uhp;
     }
 
-    if (num_read_uhps != num_head)
+    ఒకవేళ (అంకె_read_uhps != అంకె_తల)
     {
 	corruption_error("num_head", file_name);
-	goto error;
+	వెళ్ళు error;
     }
-    if (c != UF_HEADER_END_MAGIC)
+    ఒకవేళ (c != UF_శీర్షిక_చివర_MAGIC)
     {
 	corruption_error("end marker", file_name);
-	goto error;
+	వెళ్ళు error;
     }
 
 # ifdef U_DEBUG
-    uhp_table_used = alloc_clear(sizeof(int) * num_head + 1);
-#  define SET_FLAG(j) ++uhp_table_used[j]
-# else
-#  define SET_FLAG(j)
+    uhp_పట్టిక_వాడిన = alloc_clear(పరిమాణం(పూర్ణాంకం) * అంకె_తల + 1);
+#  define సమితి_FLAG(j) ++uhp_పట్టిక_వాడిన[j]
+# లేకపోతే
+#  define సమితి_FLAG(j)
 # endif
 
     // We have put all of the headers into a table.  Each header stores the
     // sequence numbers of the headers it links to; resolve those into
     // pointers.  Every entry is non-NULL: a header that failed to
     // unserialize or a count mismatch was an error above.
-    if (num_head > 0)
-	qsort(uhp_table, (size_t)num_head, sizeof(u_header_T *), uhp_seq_cmp);
+    ఒకవేళ (అంకె_తల > 0)
+	qsort(uhp_పట్టిక, (size_t)అంకె_తల, పరిమాణం(u_శీర్షిక_T *), uhp_seq_cmp);
 
     // In the sorted table two headers with the same uh_seq are neighbours.
-    for (i = 0; i < num_head - 1; i++)
+    కొరకు (i = 0; i < అంకె_తల - 1; i++)
     {
-	if (uhp_table[i]->uh_seq == uhp_table[i + 1]->uh_seq)
+	ఒకవేళ (uhp_పట్టిక[i]->uh_seq == uhp_పట్టిక[i + 1]->uh_seq)
 	{
 	    corruption_error("duplicate uh_seq", file_name);
-	    goto error;
+	    వెళ్ళు error;
 	}
     }
 
@@ -2126,39 +2126,39 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // zero (written for a NULL pointer) and the own sequence number of the
     // header "hidx", resolves to NULL.
 # define SWIZZLE_SEQ(link, hidx) \
-    do { \
-	long fidx = uhp_table_find(uhp_table, num_head, (link).seq); \
+    చేయి { \
+	దీర్ఘ fidx = uhp_పట్టిక_కనుగొను(uhp_పట్టిక, అంకె_తల, (link).seq); \
 	\
-	if (fidx >= 0 && fidx != (hidx)) \
+	ఒకవేళ (fidx >= 0 && fidx != (hidx)) \
 	{ \
-	    (link).ptr = uhp_table[fidx]; \
-	    SET_FLAG(fidx); \
+	    (link).ptr = uhp_పట్టిక[fidx]; \
+	    సమితి_FLAG(fidx); \
 	} \
-	else \
-	    (link).ptr = NULL; \
-    } while (0)
+	లేకపోతే \
+	    (link).ptr = ఖాళీ; \
+    } అయితే (0)
 
-    for (i = 0; i < num_head; i++)
+    కొరకు (i = 0; i < అంకె_తల; i++)
     {
-	uhp = uhp_table[i];
-	SWIZZLE_SEQ(uhp->uh_next, i);
+	uhp = uhp_పట్టిక[i];
+	SWIZZLE_SEQ(uhp->uh_తదుపరి, i);
 	SWIZZLE_SEQ(uhp->uh_prev, i);
-	SWIZZLE_SEQ(uhp->uh_alt_next, i);
+	SWIZZLE_SEQ(uhp->uh_alt_తదుపరి, i);
 	SWIZZLE_SEQ(uhp->uh_alt_prev, i);
-	if (old_header_seq > 0 && old_idx < 0 && uhp->uh_seq == old_header_seq)
+	ఒకవేళ (old_శీర్షిక_seq > 0 && old_idx < 0 && uhp->uh_seq == old_శీర్షిక_seq)
 	{
 	    old_idx = i;
-	    SET_FLAG(i);
+	    సమితి_FLAG(i);
 	}
-	if (new_header_seq > 0 && new_idx < 0 && uhp->uh_seq == new_header_seq)
+	ఒకవేళ (new_శీర్షిక_seq > 0 && new_idx < 0 && uhp->uh_seq == new_శీర్షిక_seq)
 	{
 	    new_idx = i;
-	    SET_FLAG(i);
+	    సమితి_FLAG(i);
 	}
-	if (cur_header_seq > 0 && cur_idx < 0 && uhp->uh_seq == cur_header_seq)
+	ఒకవేళ (cur_శీర్షిక_seq > 0 && cur_idx < 0 && uhp->uh_seq == cur_శీర్షిక_seq)
 	{
 	    cur_idx = i;
-	    SET_FLAG(i);
+	    సమితి_FLAG(i);
 	}
     }
 # undef SWIZZLE_SEQ
@@ -2166,113 +2166,113 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // Now that we have read the undo info successfully, free the current undo
     // info and use the info from the file.
     u_blockfree(curbuf);
-    curbuf->b_u_oldhead = old_idx < 0 ? NULL : uhp_table[old_idx];
-    curbuf->b_u_newhead = new_idx < 0 ? NULL : uhp_table[new_idx];
-    curbuf->b_u_curhead = cur_idx < 0 ? NULL : uhp_table[cur_idx];
-    curbuf->b_u_line_ptr = line_ptr;
-    curbuf->b_u_line_lnum = line_lnum;
-    curbuf->b_u_line_colnr = line_colnr;
-    curbuf->b_u_numhead = num_head;
-    curbuf->b_u_seq_last = seq_last;
+    curbuf->b_u_oldhead = old_idx < 0 ? ఖాళీ : uhp_పట్టిక[old_idx];
+    curbuf->b_u_newhead = new_idx < 0 ? ఖాళీ : uhp_పట్టిక[new_idx];
+    curbuf->b_u_curhead = cur_idx < 0 ? ఖాళీ : uhp_పట్టిక[cur_idx];
+    curbuf->b_u_పంక్తి_ptr = పంక్తి_ptr;
+    curbuf->b_u_పంక్తి_lnum = పంక్తి_lnum;
+    curbuf->b_u_పంక్తి_colnr = పంక్తి_colnr;
+    curbuf->b_u_numhead = అంకె_తల;
+    curbuf->b_u_seq_చివరి = seq_చివరి;
     curbuf->b_u_seq_cur = seq_cur;
-    curbuf->b_u_time_cur = seq_time;
-    curbuf->b_u_save_nr_last = last_save_nr;
-    curbuf->b_u_save_nr_cur = last_save_nr;
+    curbuf->b_u_సమయం_cur = seq_సమయం;
+    curbuf->b_u_save_nr_చివరి = చివరి_save_nr;
+    curbuf->b_u_save_nr_cur = చివరి_save_nr;
 
     curbuf->b_u_synced = true;
-    vim_free(uhp_table);
+    vim_free(uhp_పట్టిక);
 
 # ifdef U_DEBUG
-    for (i = 0; i < num_head; ++i)
-	if (uhp_table_used[i] == 0)
+    కొరకు (i = 0; i < అంకె_తల; ++i)
+	ఒకవేళ (uhp_పట్టిక_వాడిన[i] == 0)
 	    semsg("uhp_table entry %ld not used, leaking memory", i);
-    vim_free(uhp_table_used);
+    vim_free(uhp_పట్టిక_వాడిన);
     u_check(TRUE);
 # endif
 
-    if (name != NULL)
+    ఒకవేళ (name != ఖాళీ)
 	smsg(_("Finished reading undo file %s"), file_name);
-    goto theend;
+    వెళ్ళు theend;
 
 error:
-    vim_free(line_ptr.ul_line);
-    if (uhp_table != NULL)
+    vim_free(పంక్తి_ptr.ul_పంక్తి);
+    ఒకవేళ (uhp_పట్టిక != ఖాళీ)
     {
-	for (i = 0; i < num_read_uhps; i++)
-	    if (uhp_table[i] != NULL)
-		u_free_uhp(uhp_table[i]);
-	vim_free(uhp_table);
+	కొరకు (i = 0; i < అంకె_read_uhps; i++)
+	    ఒకవేళ (uhp_పట్టిక[i] != ఖాళీ)
+		u_free_uhp(uhp_పట్టిక[i]);
+	vim_free(uhp_పట్టిక);
     }
 
 theend:
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL)
+    ఒకవేళ (bi.bi_state != ఖాళీ)
 	crypt_free_state(bi.bi_state);
-    vim_free(bi.bi_buffer);
+    vim_free(bi.bi_బఫరు);
 # endif
-    if (fp != NULL)
+    ఒకవేళ (fp != ఖాళీ)
 	fclose(fp);
-    if (file_name != name)
+    ఒకవేళ (file_name != name)
 	vim_free(file_name);
-    return;
+    తిరిగి;
 }
 
-#endif // FEAT_PERSISTENT_UNDO
+#అయితే_ముగింపు // FEAT_PERSISTENT_UNDO
 
 
 /*
  * If 'cpoptions' contains 'u': Undo the previous undo or redo (vi compatible).
  * If 'cpoptions' does not contain 'u': Always undo.
  */
-    void
-u_undo(int count)
+    శూన్య
+u_undo(పూర్ణాంకం లెక్క)
 {
     /*
      * If we get an undo command while executing a macro, we behave like the
      * original vi. If this happens twice in one macro the result will not
      * be compatible.
      */
-    if (!curbuf->b_u_synced)
+    ఒకవేళ (!curbuf->b_u_synced)
     {
 	u_sync(TRUE);
-	count = 1;
+	లెక్క = 1;
     }
 
-    if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
+    ఒకవేళ (vim_strchr(p_cpo, CPO_UNDO) == ఖాళీ)
 	undo_undoes = TRUE;
-    else
+    లేకపోతే
 	undo_undoes = !undo_undoes;
-    u_doit(count);
+    u_doit(లెక్క);
 }
 
 /*
  * If 'cpoptions' contains 'u': Repeat the previous undo or redo.
  * If 'cpoptions' does not contain 'u': Always redo.
  */
-    void
-u_redo(int count)
+    శూన్య
+u_redo(పూర్ణాంకం లెక్క)
 {
-    if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
+    ఒకవేళ (vim_strchr(p_cpo, CPO_UNDO) == ఖాళీ)
 	undo_undoes = FALSE;
-    u_doit(count);
+    u_doit(లెక్క);
 }
 
 /*
  * Undo or redo, depending on 'undo_undoes', 'count' times.
  */
-    static void
-u_doit(int startcount)
+    స్థిర శూన్య
+u_doit(పూర్ణాంకం startcount)
 {
-    int count = startcount;
+    పూర్ణాంకం లెక్క = startcount;
 
-    if (!undo_allowed())
-	return;
+    ఒకవేళ (!undo_allowed())
+	తిరిగి;
 
     u_newcount = 0;
     u_oldcount = 0;
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
 	u_oldcount = -1;
-    while (count--)
+    అయితే (లెక్క--)
     {
 	// Do the change warning now, so that it triggers FileChangedRO when
 	// needed.  This may cause the file to be reloaded, that must happen
@@ -2280,54 +2280,54 @@ u_doit(int startcount)
 	// and more.
 	change_warning(0);
 
-	if (undo_undoes)
+	ఒకవేళ (undo_undoes)
 	{
-	    if (curbuf->b_u_curhead == NULL)		// first undo
+	    ఒకవేళ (curbuf->b_u_curhead == ఖాళీ)		// first undo
 		curbuf->b_u_curhead = curbuf->b_u_newhead;
-	    else if (get_undolevel() > 0)		// multi level undo
+	    లేకపోతే ఒకవేళ (get_undolevel() > 0)		// multi level undo
 		// get next undo
-		curbuf->b_u_curhead = curbuf->b_u_curhead->uh_next.ptr;
+		curbuf->b_u_curhead = curbuf->b_u_curhead->uh_తదుపరి.ptr;
 	    // nothing to undo
-	    if (curbuf->b_u_numhead == 0 || curbuf->b_u_curhead == NULL)
+	    ఒకవేళ (curbuf->b_u_numhead == 0 || curbuf->b_u_curhead == ఖాళీ)
 	    {
 		// stick curbuf->b_u_curhead at end
 		curbuf->b_u_curhead = curbuf->b_u_oldhead;
 		beep_flush();
-		if (count == startcount - 1)
+		ఒకవేళ (లెక్క == startcount - 1)
 		{
-		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at oldest change"));
-		    return;
+		    ఒకవేళ (!shortmess(SHM_UNDO))
+			సందేశం(_("Already at oldest change"));
+		    తిరిగి;
 		}
-		break;
+		ఆపు;
 	    }
 
 	    u_undoredo(TRUE);
 	}
-	else
+	లేకపోతే
 	{
-	    if (curbuf->b_u_curhead == NULL || get_undolevel() <= 0)
+	    ఒకవేళ (curbuf->b_u_curhead == ఖాళీ || get_undolevel() <= 0)
 	    {
 		beep_flush();	// nothing to redo
-		if (count == startcount - 1)
+		ఒకవేళ (లెక్క == startcount - 1)
 		{
-		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at newest change"));
-		    return;
+		    ఒకవేళ (!shortmess(SHM_UNDO))
+			సందేశం(_("Already at newest change"));
+		    తిరిగి;
 		}
-		break;
+		ఆపు;
 	    }
 
 	    u_undoredo(FALSE);
 
 	    // Advance for next redo.  Set "newhead" when at the end of the
 	    // redoable changes.
-	    if (curbuf->b_u_curhead->uh_prev.ptr == NULL)
+	    ఒకవేళ (curbuf->b_u_curhead->uh_prev.ptr == ఖాళీ)
 		curbuf->b_u_newhead = curbuf->b_u_curhead;
 	    curbuf->b_u_curhead = curbuf->b_u_curhead->uh_prev.ptr;
 	}
     }
-    u_undo_end(undo_undoes, FALSE);
+    u_undo_చివర(undo_undoes, FALSE);
 }
 
 /*
@@ -2339,119 +2339,119 @@ u_doit(int startcount)
  * When "absolute" is TRUE use "step" as the sequence number to jump to.
  * "sec" must be FALSE then.
  */
-    void
-undo_time(
-    long	step,
-    int		sec,
-    int		file,
-    int		absolute)
+    శూన్య
+undo_సమయం(
+    దీర్ఘ	అడుగు,
+    పూర్ణాంకం		sec,
+    పూర్ణాంకం		file,
+    పూర్ణాంకం		absolute)
 {
-    long	    target;
-    long	    closest;
-    long	    closest_start;
-    long	    closest_seq = 0;
-    long	    val;
-    u_header_T	    *uhp = NULL;
-    u_header_T	    *last;
-    int		    mark;
-    int		    nomark = 0;  // shut up compiler
-    int		    round;
-    int		    dosec = sec;
-    int		    dofile = file;
-    int		    above = FALSE;
-    int		    did_undo = TRUE;
+    దీర్ఘ	    లక్ష్యం;
+    దీర్ఘ	    closest;
+    దీర్ఘ	    closest_ప్రారంభం;
+    దీర్ఘ	    closest_seq = 0;
+    దీర్ఘ	    val;
+    u_శీర్షిక_T	    *uhp = ఖాళీ;
+    u_శీర్షిక_T	    *చివరి;
+    పూర్ణాంకం		    mark;
+    పూర్ణాంకం		    nomark = 0;  // shut up compiler
+    పూర్ణాంకం		    విడత;
+    పూర్ణాంకం		    dosec = sec;
+    పూర్ణాంకం		    dofile = file;
+    పూర్ణాంకం		    above = FALSE;
+    పూర్ణాంకం		    did_undo = TRUE;
 
-    if (text_locked())
+    ఒకవేళ (పాఠ్యం_locked())
     {
-	text_locked_msg();
-	return;
+	పాఠ్యం_locked_సందేశం();
+	తిరిగి;
     }
 
     // First make sure the current undoable change is synced.
-    if (!curbuf->b_u_synced)
+    ఒకవేళ (!curbuf->b_u_synced)
 	u_sync(TRUE);
 
     u_newcount = 0;
     u_oldcount = 0;
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
 	u_oldcount = -1;
 
     // "target" is the node below which we want to be.
     // Init "closest" to a value we can't reach.
-    if (absolute)
+    ఒకవేళ (absolute)
     {
-	target = step;
+	లక్ష్యం = అడుగు;
 	closest = -1;
     }
-    else
+    లేకపోతే
     {
-	if (dosec)
-	    target = (long)(curbuf->b_u_time_cur) + step;
-	else if (dofile)
+	ఒకవేళ (dosec)
+	    లక్ష్యం = (దీర్ఘ)(curbuf->b_u_సమయం_cur) + అడుగు;
+	లేకపోతే ఒకవేళ (dofile)
 	{
-	    if (step < 0)
+	    ఒకవేళ (అడుగు < 0)
 	    {
 		// Going back to a previous write. If there were changes after
 		// the last write, count that as moving one file-write, so
 		// that ":earlier 1f" undoes all changes since the last save.
 		uhp = curbuf->b_u_curhead;
-		if (uhp != NULL)
-		    uhp = uhp->uh_next.ptr;
-		else
+		ఒకవేళ (uhp != ఖాళీ)
+		    uhp = uhp->uh_తదుపరి.ptr;
+		లేకపోతే
 		    uhp = curbuf->b_u_newhead;
-		if (uhp != NULL && uhp->uh_save_nr != 0)
+		ఒకవేళ (uhp != ఖాళీ && uhp->uh_save_nr != 0)
 		    // "uh_save_nr" was set in the last block, that means
 		    // there were no changes since the last write
-		    target = curbuf->b_u_save_nr_cur + step;
-		else
+		    లక్ష్యం = curbuf->b_u_save_nr_cur + అడుగు;
+		లేకపోతే
 		    // count the changes since the last write as one step
-		    target = curbuf->b_u_save_nr_cur + step + 1;
-		if (target <= 0)
+		    లక్ష్యం = curbuf->b_u_save_nr_cur + అడుగు + 1;
+		ఒకవేళ (లక్ష్యం <= 0)
 		    // Go to before first write: before the oldest change. Use
 		    // the sequence number for that.
 		    dofile = FALSE;
 	    }
-	    else
+	    లేకపోతే
 	    {
 		// Moving forward to a newer write.
-		target = curbuf->b_u_save_nr_cur + step;
-		if (target > curbuf->b_u_save_nr_last)
+		లక్ష్యం = curbuf->b_u_save_nr_cur + అడుగు;
+		ఒకవేళ (లక్ష్యం > curbuf->b_u_save_nr_చివరి)
 		{
 		    // Go to after last write: after the latest change. Use
 		    // the sequence number for that.
-		    target = curbuf->b_u_seq_last + 1;
+		    లక్ష్యం = curbuf->b_u_seq_చివరి + 1;
 		    dofile = FALSE;
 		}
 	    }
 	}
-	else
-	    target = curbuf->b_u_seq_cur + step;
-	if (step < 0)
+	లేకపోతే
+	    లక్ష్యం = curbuf->b_u_seq_cur + అడుగు;
+	ఒకవేళ (అడుగు < 0)
 	{
-	    if (target < 0)
-		target = 0;
+	    ఒకవేళ (లక్ష్యం < 0)
+		లక్ష్యం = 0;
 	    closest = -1;
 	}
-	else
+	లేకపోతే
 	{
-	    if (dosec)
-		closest = (long)(vim_time() + 1);
-	    else if (dofile)
-		closest = curbuf->b_u_save_nr_last + 2;
-	    else
-		closest = curbuf->b_u_seq_last + 2;
-	    if (target >= closest)
-		target = closest - 1;
+	    ఒకవేళ (dosec)
+		closest = (దీర్ఘ)(vim_సమయం() + 1);
+	    లేకపోతే ఒకవేళ (dofile)
+		closest = curbuf->b_u_save_nr_చివరి + 2;
+	    లేకపోతే
+		closest = curbuf->b_u_seq_చివరి + 2;
+	    ఒకవేళ (లక్ష్యం >= closest)
+		లక్ష్యం = closest - 1;
 	}
     }
-    closest_start = closest;
+    closest_ప్రారంభం = closest;
     closest_seq = curbuf->b_u_seq_cur;
 
     // When "target" is 0; Back to origin.
-    if (target == 0)
+    ఒకవేళ (లక్ష్యం == 0)
     {
 	mark = lastmark;  // avoid that GCC complains
-	goto target_zero;
+	వెళ్ళు లక్ష్యం_zero;
     }
 
     /*
@@ -2462,7 +2462,7 @@ undo_time(
      * When using the closest time we use the sequence number in the second
      * round, because there may be several entries with the same time.
      */
-    for (round = 1; round <= 2; ++round)
+    కొరకు (విడత = 1; విడత <= 2; ++విడత)
     {
 	// Find the path from the current state to where we want to go.  The
 	// desired state can be anywhere in the undo tree, need to go all over
@@ -2471,41 +2471,41 @@ undo_time(
 	mark = ++lastmark;
 	nomark = ++lastmark;
 
-	if (curbuf->b_u_curhead == NULL)	// at leaf of the tree
+	ఒకవేళ (curbuf->b_u_curhead == ఖాళీ)	// at leaf of the tree
 	    uhp = curbuf->b_u_newhead;
-	else
+	లేకపోతే
 	    uhp = curbuf->b_u_curhead;
 
-	while (uhp != NULL)
+	అయితే (uhp != ఖాళీ)
 	{
 	    uhp->uh_walk = mark;
-	    if (dosec)
-		val = (long)(uhp->uh_time);
-	    else if (dofile)
+	    ఒకవేళ (dosec)
+		val = (దీర్ఘ)(uhp->uh_సమయం);
+	    లేకపోతే ఒకవేళ (dofile)
 		val = uhp->uh_save_nr;
-	    else
+	    లేకపోతే
 		val = uhp->uh_seq;
 
-	    if (round == 1 && !(dofile && val == 0))
+	    ఒకవేళ (విడత == 1 && !(dofile && val == 0))
 	    {
 		// Remember the header that is closest to the target.
 		// It must be at least in the right direction (checked with
 		// "b_u_seq_cur").  When the timestamp is equal find the
 		// highest/lowest sequence number.
-		if ((step < 0 ? uhp->uh_seq <= curbuf->b_u_seq_cur
+		ఒకవేళ ((అడుగు < 0 ? uhp->uh_seq <= curbuf->b_u_seq_cur
 			      : uhp->uh_seq > curbuf->b_u_seq_cur)
 			&& ((dosec && val == closest)
-			    ? (step < 0
+			    ? (అడుగు < 0
 				? uhp->uh_seq < closest_seq
 				: uhp->uh_seq > closest_seq)
-			    : closest == closest_start
-				|| (val > target
-				    ? (closest > target
-					? val - target <= closest - target
-					: val - target <= target - closest)
-				    : (closest > target
-					? target - val <= closest - target
-					: target - val <= target - closest))))
+			    : closest == closest_ప్రారంభం
+				|| (val > లక్ష్యం
+				    ? (closest > లక్ష్యం
+					? val - లక్ష్యం <= closest - లక్ష్యం
+					: val - లక్ష్యం <= లక్ష్యం - closest)
+				    : (closest > లక్ష్యం
+					? లక్ష్యం - val <= closest - లక్ష్యం
+					: లక్ష్యం - val <= లక్ష్యం - closest))))
 		{
 		    closest = val;
 		    closest_seq = uhp->uh_seq;
@@ -2514,182 +2514,182 @@ undo_time(
 
 	    // Quit searching when we found a match.  But when searching for a
 	    // time we need to continue looking for the best uh_seq.
-	    if (target == val && !dosec)
+	    ఒకవేళ (లక్ష్యం == val && !dosec)
 	    {
-		target = uhp->uh_seq;
-		break;
+		లక్ష్యం = uhp->uh_seq;
+		ఆపు;
 	    }
 
 	    // go down in the tree if we haven't been there
-	    if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != nomark
+	    ఒకవేళ (uhp->uh_prev.ptr != ఖాళీ && uhp->uh_prev.ptr->uh_walk != nomark
 					 && uhp->uh_prev.ptr->uh_walk != mark)
 		uhp = uhp->uh_prev.ptr;
 
 	    // go to alternate branch if we haven't been there
-	    else if (uhp->uh_alt_next.ptr != NULL
-		    && uhp->uh_alt_next.ptr->uh_walk != nomark
-		    && uhp->uh_alt_next.ptr->uh_walk != mark)
-		uhp = uhp->uh_alt_next.ptr;
+	    లేకపోతే ఒకవేళ (uhp->uh_alt_తదుపరి.ptr != ఖాళీ
+		    && uhp->uh_alt_తదుపరి.ptr->uh_walk != nomark
+		    && uhp->uh_alt_తదుపరి.ptr->uh_walk != mark)
+		uhp = uhp->uh_alt_తదుపరి.ptr;
 
 	    // go up in the tree if we haven't been there and we are at the
 	    // start of alternate branches
-	    else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
-		    && uhp->uh_next.ptr->uh_walk != nomark
-		    && uhp->uh_next.ptr->uh_walk != mark)
+	    లేకపోతే ఒకవేళ (uhp->uh_తదుపరి.ptr != ఖాళీ && uhp->uh_alt_prev.ptr == ఖాళీ
+		    && uhp->uh_తదుపరి.ptr->uh_walk != nomark
+		    && uhp->uh_తదుపరి.ptr->uh_walk != mark)
 	    {
 		// If still at the start we don't go through this change.
-		if (uhp == curbuf->b_u_curhead)
+		ఒకవేళ (uhp == curbuf->b_u_curhead)
 		    uhp->uh_walk = nomark;
-		uhp = uhp->uh_next.ptr;
+		uhp = uhp->uh_తదుపరి.ptr;
 	    }
 
-	    else
+	    లేకపోతే
 	    {
 		// need to backtrack; mark this node as useless
 		uhp->uh_walk = nomark;
-		if (uhp->uh_alt_prev.ptr != NULL)
+		ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
 		    uhp = uhp->uh_alt_prev.ptr;
-		else
-		    uhp = uhp->uh_next.ptr;
+		లేకపోతే
+		    uhp = uhp->uh_తదుపరి.ptr;
 	    }
 	}
 
-	if (uhp != NULL)    // found it
-	    break;
+	ఒకవేళ (uhp != ఖాళీ)    // found it
+	    ఆపు;
 
-	if (absolute)
+	ఒకవేళ (absolute)
 	{
-	    semsg(_(e_undo_number_nr_not_found), step);
-	    return;
+	    semsg(_(e_undo_సంఖ్య_nr_not_దొరికింది), అడుగు);
+	    తిరిగి;
 	}
 
-	if (closest == closest_start)
+	ఒకవేళ (closest == closest_ప్రారంభం)
 	{
-	    if (!shortmess(SHM_UNDO))
+	    ఒకవేళ (!shortmess(SHM_UNDO))
 	    {
-		if (step < 0)
-		    msg(_("Already at oldest change"));
-		else
-		    msg(_("Already at newest change"));
+		ఒకవేళ (అడుగు < 0)
+		    సందేశం(_("Already at oldest change"));
+		లేకపోతే
+		    సందేశం(_("Already at newest change"));
 	    }
-	    return;
+	    తిరిగి;
 	}
 
-	target = closest_seq;
+	లక్ష్యం = closest_seq;
 	dosec = FALSE;
 	dofile = FALSE;
-	if (step < 0)
+	ఒకవేళ (అడుగు < 0)
 	    above = TRUE;	// stop above the header
     }
 
-target_zero:
+లక్ష్యం_zero:
     // If we found it: Follow the path to go to where we want to be.
-    if (uhp != NULL || target == 0)
+    ఒకవేళ (uhp != ఖాళీ || లక్ష్యం == 0)
     {
 	/*
 	 * First go up the tree as much as needed.
 	 */
-	while (!got_int)
+	అయితే (!got_int)
 	{
 	    // Do the change warning now, for the same reason as above.
 	    change_warning(0);
 
 	    uhp = curbuf->b_u_curhead;
-	    if (uhp == NULL)
+	    ఒకవేళ (uhp == ఖాళీ)
 		uhp = curbuf->b_u_newhead;
-	    else
-		uhp = uhp->uh_next.ptr;
-	    if (uhp == NULL || (target > 0 && uhp->uh_walk != mark)
-					 || (uhp->uh_seq == target && !above))
-		break;
+	    లేకపోతే
+		uhp = uhp->uh_తదుపరి.ptr;
+	    ఒకవేళ (uhp == ఖాళీ || (లక్ష్యం > 0 && uhp->uh_walk != mark)
+					 || (uhp->uh_seq == లక్ష్యం && !above))
+		ఆపు;
 	    curbuf->b_u_curhead = uhp;
 	    u_undoredo(TRUE);
-	    if (target > 0)
+	    ఒకవేళ (లక్ష్యం > 0)
 		uhp->uh_walk = nomark;	// don't go back down here
 	}
 
 	// When back to origin, redo is not needed.
-	if (target > 0)
+	ఒకవేళ (లక్ష్యం > 0)
 	{
 	    /*
 	     * And now go down the tree (redo), branching off where needed.
 	     */
-	    while (!got_int)
+	    అయితే (!got_int)
 	    {
 		// Do the change warning now, for the same reason as above.
 		change_warning(0);
 
 		uhp = curbuf->b_u_curhead;
-		if (uhp == NULL)
-		    break;
+		ఒకవేళ (uhp == ఖాళీ)
+		    ఆపు;
 
 		// Go back to the first branch with a mark.
-		while (uhp->uh_alt_prev.ptr != NULL
+		అయితే (uhp->uh_alt_prev.ptr != ఖాళీ
 				     && uhp->uh_alt_prev.ptr->uh_walk == mark)
 		    uhp = uhp->uh_alt_prev.ptr;
 
 		// Find the last branch with a mark, that's the one.
-		last = uhp;
-		while (last->uh_alt_next.ptr != NULL
-				    && last->uh_alt_next.ptr->uh_walk == mark)
-		    last = last->uh_alt_next.ptr;
-		if (last != uhp)
+		చివరి = uhp;
+		అయితే (చివరి->uh_alt_తదుపరి.ptr != ఖాళీ
+				    && చివరి->uh_alt_తదుపరి.ptr->uh_walk == mark)
+		    చివరి = చివరి->uh_alt_తదుపరి.ptr;
+		ఒకవేళ (చివరి != uhp)
 		{
 		    // Make the used branch the first entry in the list of
 		    // alternatives to make "u" and CTRL-R take this branch.
-		    while (uhp->uh_alt_prev.ptr != NULL)
+		    అయితే (uhp->uh_alt_prev.ptr != ఖాళీ)
 			uhp = uhp->uh_alt_prev.ptr;
-		    if (last->uh_alt_next.ptr != NULL)
-			last->uh_alt_next.ptr->uh_alt_prev.ptr =
-							last->uh_alt_prev.ptr;
-		    last->uh_alt_prev.ptr->uh_alt_next.ptr =
-							last->uh_alt_next.ptr;
-		    last->uh_alt_prev.ptr = NULL;
-		    last->uh_alt_next.ptr = uhp;
-		    uhp->uh_alt_prev.ptr = last;
+		    ఒకవేళ (చివరి->uh_alt_తదుపరి.ptr != ఖాళీ)
+			చివరి->uh_alt_తదుపరి.ptr->uh_alt_prev.ptr =
+							చివరి->uh_alt_prev.ptr;
+		    చివరి->uh_alt_prev.ptr->uh_alt_తదుపరి.ptr =
+							చివరి->uh_alt_తదుపరి.ptr;
+		    చివరి->uh_alt_prev.ptr = ఖాళీ;
+		    చివరి->uh_alt_తదుపరి.ptr = uhp;
+		    uhp->uh_alt_prev.ptr = చివరి;
 
-		    if (curbuf->b_u_oldhead == uhp)
-			curbuf->b_u_oldhead = last;
-		    uhp = last;
-		    if (uhp->uh_next.ptr != NULL)
-			uhp->uh_next.ptr->uh_prev.ptr = uhp;
+		    ఒకవేళ (curbuf->b_u_oldhead == uhp)
+			curbuf->b_u_oldhead = చివరి;
+		    uhp = చివరి;
+		    ఒకవేళ (uhp->uh_తదుపరి.ptr != ఖాళీ)
+			uhp->uh_తదుపరి.ptr->uh_prev.ptr = uhp;
 		}
 		curbuf->b_u_curhead = uhp;
 
-		if (uhp->uh_walk != mark)
-		    break;	    // must have reached the target
+		ఒకవేళ (uhp->uh_walk != mark)
+		    ఆపు;	    // must have reached the target
 
 		// Stop when going backwards in time and didn't find the exact
 		// header we were looking for.
-		if (uhp->uh_seq == target && above)
+		ఒకవేళ (uhp->uh_seq == లక్ష్యం && above)
 		{
-		    curbuf->b_u_seq_cur = target - 1;
-		    break;
+		    curbuf->b_u_seq_cur = లక్ష్యం - 1;
+		    ఆపు;
 		}
 
 		u_undoredo(FALSE);
 
 		// Advance "curhead" to below the header we last used.  If it
 		// becomes NULL then we need to set "newhead" to this leaf.
-		if (uhp->uh_prev.ptr == NULL)
+		ఒకవేళ (uhp->uh_prev.ptr == ఖాళీ)
 		    curbuf->b_u_newhead = uhp;
 		curbuf->b_u_curhead = uhp->uh_prev.ptr;
 		did_undo = FALSE;
 
-		if (uhp->uh_seq == target)	// found it!
-		    break;
+		ఒకవేళ (uhp->uh_seq == లక్ష్యం)	// found it!
+		    ఆపు;
 
 		uhp = uhp->uh_prev.ptr;
-		if (uhp == NULL || uhp->uh_walk != mark)
+		ఒకవేళ (uhp == ఖాళీ || uhp->uh_walk != mark)
 		{
 		    // Need to redo more but can't find it...
-		    internal_error("undo_time()");
-		    break;
+		    అంతర్గత_error("undo_time()");
+		    ఆపు;
 		}
 	    }
 	}
     }
-    u_undo_end(did_undo, absolute);
+    u_undo_చివర(did_undo, absolute);
 }
 
 /*
@@ -2701,65 +2701,65 @@ target_zero:
  *
  * When "undo" is TRUE we go up in the tree, when FALSE we go down.
  */
-    static void
-u_undoredo(int undo)
+    స్థిర శూన్య
+u_undoredo(పూర్ణాంకం undo)
 {
-    undoline_T	*newarray = NULL;
+    undoline_T	*newarray = ఖాళీ;
     linenr_T	oldsize;
     linenr_T	newsize;
-    linenr_T	top, bot;
+    linenr_T	శిఖరం, bot;
     linenr_T	lnum;
     linenr_T	newlnum = MAXLNUM;
     pos_T	new_curpos = curwin->w_cursor;
-    long	i;
-    u_entry_T	*uep, *nuep;
-    u_entry_T	*newlist = NULL;
-    int		old_flags;
-    int		new_flags;
+    దీర్ఘ	i;
+    u_నమోదు_T	*uep, *nuep;
+    u_నమోదు_T	*newlist = ఖాళీ;
+    పూర్ణాంకం		old_flags;
+    పూర్ణాంకం		new_flags;
     pos_T	namedm[NMARKS];
     visualinfo_T visualinfo;
-    int		empty_buffer;		    // buffer became empty
-    u_header_T	*curhead = curbuf->b_u_curhead;
+    పూర్ణాంకం		ఖాళీలు_బఫరు;		    // buffer became empty
+    u_శీర్షిక_T	*curhead = curbuf->b_u_curhead;
 
     // Don't want autocommands using the undo structures here, they are
     // invalid till the end.
-    block_autocmds();
+    ఖండం_autocmds();
 
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
     u_check(FALSE);
-#endif
+#అయితే_ముగింపు
     old_flags = curhead->uh_flags;
-    new_flags = (curbuf->b_changed ? UH_CHANGED : 0) +
-	       ((curbuf->b_ml.ml_flags & ML_EMPTY) ? UH_EMPTYBUF : 0);
+    new_flags = (curbuf->b_మారింది ? UH_మారింది : 0) +
+	       ((curbuf->b_ml.ml_flags & ML_ఖాళీలు) ? UH_EMPTYBUF : 0);
     setpcmark();
 
     /*
      * save marks before undo/redo
      */
-    mch_memmove(namedm, curbuf->b_namedm, sizeof(pos_T) * NMARKS);
+    mch_memmove(namedm, curbuf->b_namedm, పరిమాణం(pos_T) * NMARKS);
     visualinfo = curbuf->b_visual;
-    curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
-    curbuf->b_op_start.col = 0;
-    curbuf->b_op_end.lnum = 0;
-    curbuf->b_op_end.col = 0;
+    curbuf->b_op_ప్రారంభం.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+    curbuf->b_op_ప్రారంభం.నిలువు = 0;
+    curbuf->b_op_చివర.lnum = 0;
+    curbuf->b_op_చివర.నిలువు = 0;
 
-    for (uep = curhead->uh_entry; uep != NULL; uep = nuep)
+    కొరకు (uep = curhead->uh_నమోదు; uep != ఖాళీ; uep = nuep)
     {
-	top = uep->ue_top;
+	శిఖరం = uep->ue_శిఖరం;
 	bot = uep->ue_bot;
-	if (bot == 0)
-	    bot = curbuf->b_ml.ml_line_count + 1;
-	if (top > curbuf->b_ml.ml_line_count || top >= bot
-				      || bot > curbuf->b_ml.ml_line_count + 1)
+	ఒకవేళ (bot == 0)
+	    bot = curbuf->b_ml.ml_పంక్తి_లెక్క + 1;
+	ఒకవేళ (శిఖరం > curbuf->b_ml.ml_పంక్తి_లెక్క || శిఖరం >= bot
+				      || bot > curbuf->b_ml.ml_పంక్తి_లెక్క + 1)
 	{
 	    unblock_autocmds();
-	    iemsg(e_u_undo_line_numbers_wrong);
-	    changed();		// don't want UNCHANGED now
-	    return;
+	    iemsg(e_u_undo_పంక్తి_numbers_wrong);
+	    మారింది();		// don't want UNCHANGED now
+	    తిరిగి;
 	}
 
-	oldsize = bot - top - 1;    // number of lines before undo
-	newsize = uep->ue_size;	    // number of lines after undo
+	oldsize = bot - శిఖరం - 1;    // number of lines before undo
+	newsize = uep->ue_కొలత;	    // number of lines after undo
 
 	// Decide about the cursor position, depending on what text changed.
 	// Don't set it yet, it may be invalid if lines are going to be added.
@@ -2768,7 +2768,7 @@ u_undoredo(int undo)
 	    // the remembered position.  Makes "gwap" put the cursor back
 	    // where it was.
 	    lnum = curhead->uh_cursor.lnum;
-	    if (lnum >= top && lnum <= top + newsize + 1)
+	    ఒకవేళ (lnum >= శిఖరం && lnum <= శిఖరం + newsize + 1)
 	    {
 		new_curpos = curhead->uh_cursor;
 
@@ -2776,69 +2776,69 @@ u_undoredo(int undo)
 		// position.
 		newlnum = -1;
 	    }
-	    else if (top < newlnum)
+	    లేకపోతే ఒకవేళ (శిఖరం < newlnum)
 	    {
 		// Use the first line that actually changed.  Avoids that
 		// undoing auto-formatting puts the cursor in the previous
 		// line.
-		for (i = 0; i < newsize && i < oldsize; ++i)
+		కొరకు (i = 0; i < newsize && i < oldsize; ++i)
 		{
-		    char_u *p = ml_get(top + 1 + i);
+		    char_u *p = ml_get(శిఖరం + 1 + i);
 
-		    if (curbuf->b_ml.ml_line_len != uep->ue_array[i].ul_len
-			    || memcmp(uep->ue_array[i].ul_line, p,
-						curbuf->b_ml.ml_line_len) != 0)
-			break;
+		    ఒకవేళ (curbuf->b_ml.ml_పంక్తి_len != uep->ue_array[i].ul_len
+			    || memcmp(uep->ue_array[i].ul_పంక్తి, p,
+						curbuf->b_ml.ml_పంక్తి_len) != 0)
+			ఆపు;
 		}
-		if (i == newsize && newlnum == MAXLNUM && uep->ue_next == NULL)
+		ఒకవేళ (i == newsize && newlnum == MAXLNUM && uep->ue_తదుపరి == ఖాళీ)
 		{
-		    newlnum = top;
+		    newlnum = శిఖరం;
 		    new_curpos.lnum = newlnum + 1;
 		}
-		else if (i < newsize)
+		లేకపోతే ఒకవేళ (i < newsize)
 		{
-		    newlnum = top + i;
+		    newlnum = శిఖరం + i;
 		    new_curpos.lnum = newlnum + 1;
 		}
 	    }
 	}
 
-	empty_buffer = FALSE;
+	ఖాళీలు_బఫరు = FALSE;
 
 	/*
 	 * Delete the lines between top and bot and save them in newarray.
 	 */
-	if (oldsize > 0)
+	ఒకవేళ (oldsize > 0)
 	{
-	    if ((newarray = U_ALLOC_LINE(sizeof(undoline_T) * oldsize)) == NULL)
+	    ఒకవేళ ((newarray = U_ALLOC_పంక్తి(పరిమాణం(undoline_T) * oldsize)) == ఖాళీ)
 	    {
-		do_outofmem_msg((long_u)(sizeof(undoline_T) * oldsize));
+		do_outofmem_సందేశం((long_u)(పరిమాణం(undoline_T) * oldsize));
 
 		// We have messed up the entry list, repair is impossible.
 		// we have to free the rest of the list.
-		while (uep != NULL)
+		అయితే (uep != ఖాళీ)
 		{
-		    nuep = uep->ue_next;
-		    u_freeentry(uep, uep->ue_size);
+		    nuep = uep->ue_తదుపరి;
+		    u_freeentry(uep, uep->ue_కొలత);
 		    uep = nuep;
 		}
-		break;
+		ఆపు;
 	    }
 	    // delete backwards, it goes faster in most cases
-	    for (lnum = bot - 1, i = oldsize; --i >= 0; --lnum)
+	    కొరకు (lnum = bot - 1, i = oldsize; --i >= 0; --lnum)
 	    {
 		// what can we do when we run out of memory?
-		if (u_save_line(&newarray[i], lnum) == FAIL)
-		    do_outofmem_msg((long_u)0);
+		ఒకవేళ (u_save_పంక్తి(&newarray[i], lnum) == FAIL)
+		    do_outofmem_సందేశం((long_u)0);
 		// remember we deleted the last line in the buffer, and a
 		// dummy empty line will be inserted
-		if (curbuf->b_ml.ml_line_count == 1)
-		    empty_buffer = TRUE;
+		ఒకవేళ (curbuf->b_ml.ml_పంక్తి_లెక్క == 1)
+		    ఖాళీలు_బఫరు = TRUE;
 		ml_delete_flags(lnum, ML_DEL_UNDO);
 	    }
 	}
-	else
-	    newarray = NULL;
+	లేకపోతే
+	    newarray = ఖాళీ;
 
 	// make sure the cursor is on a valid line after the deletions
 	check_cursor_lnum();
@@ -2846,120 +2846,120 @@ u_undoredo(int undo)
 	/*
 	 * Insert the lines in u_array between top and bot.
 	 */
-	if (newsize)
+	ఒకవేళ (newsize)
 	{
-	    for (lnum = top, i = 0; i < newsize; ++i, ++lnum)
+	    కొరకు (lnum = శిఖరం, i = 0; i < newsize; ++i, ++lnum)
 	    {
 		// If the file is empty, there is an empty line 1 that we
 		// should get rid of, by replacing it with the new line.
-		if (empty_buffer && lnum == 0)
-		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_line,
+		ఒకవేళ (ఖాళీలు_బఫరు && lnum == 0)
+		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_పంక్తి,
 					  uep->ue_array[i].ul_len, TRUE, TRUE);
-		else
-		    ml_append_flags(lnum, uep->ue_array[i].ul_line,
+		లేకపోతే
+		    ml_append_flags(lnum, uep->ue_array[i].ul_పంక్తి,
 			     (colnr_T)uep->ue_array[i].ul_len, ML_APPEND_UNDO);
-		vim_free(uep->ue_array[i].ul_line);
+		vim_free(uep->ue_array[i].ul_పంక్తి);
 	    }
 	    vim_free((char_u *)uep->ue_array);
 	}
 
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
 	// A property may have been added or removed across the edges of the
 	// restored lines after they were saved.  What was cleared on the lines
 	// around them the last time is given back first, so that undoing and
 	// redoing again joins what it split.
-	restore_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE);
-	restore_props_for_undo(curbuf, top + newsize + 1, &uep->ue_props,
-								UNDOPROP_BELOW);
+	restore_props_for_undo(curbuf, శిఖరం, &uep->ue_props, UNDOPROP_ABOVE);
+	restore_props_for_undo(curbuf, శిఖరం + newsize + 1, &uep->ue_props,
+								UNDOPROP_క్రింద);
 	ga_clear(&uep->ue_props);
-	adjust_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE,
-			      newsize > 0 ? UNDOPROP_NONE : UNDOPROP_BELOW);
-	if (newsize > 0)
-	    adjust_props_for_undo(curbuf, top + newsize, &uep->ue_props,
-						  UNDOPROP_NONE, UNDOPROP_BELOW);
-#endif
+	adjust_props_for_undo(curbuf, శిఖరం, &uep->ue_props, UNDOPROP_ABOVE,
+			      newsize > 0 ? UNDOPROP_NONE : UNDOPROP_క్రింద);
+	ఒకవేళ (newsize > 0)
+	    adjust_props_for_undo(curbuf, శిఖరం + newsize, &uep->ue_props,
+						  UNDOPROP_NONE, UNDOPROP_క్రింద);
+#అయితే_ముగింపు
 
 	// adjust marks
-	if (oldsize != newsize)
+	ఒకవేళ (oldsize != newsize)
 	{
-	    mark_adjust(top + 1, top + oldsize, (long)MAXLNUM,
-					       (long)newsize - (long)oldsize);
-	    if (curbuf->b_op_start.lnum > top + oldsize)
-		curbuf->b_op_start.lnum += newsize - oldsize;
-	    if (curbuf->b_op_end.lnum > top + oldsize)
-		curbuf->b_op_end.lnum += newsize - oldsize;
+	    mark_adjust(శిఖరం + 1, శిఖరం + oldsize, (దీర్ఘ)MAXLNUM,
+					       (దీర్ఘ)newsize - (దీర్ఘ)oldsize);
+	    ఒకవేళ (curbuf->b_op_ప్రారంభం.lnum > శిఖరం + oldsize)
+		curbuf->b_op_ప్రారంభం.lnum += newsize - oldsize;
+	    ఒకవేళ (curbuf->b_op_చివర.lnum > శిఖరం + oldsize)
+		curbuf->b_op_చివర.lnum += newsize - oldsize;
 	}
-	if (oldsize > 0 || newsize > 0)
+	ఒకవేళ (oldsize > 0 || newsize > 0)
 	{
-	    changed_lines(top + 1, 0, bot, newsize - oldsize);
-#ifdef FEAT_SPELL
+	    మారింది_పంక్తులు(శిఖరం + 1, 0, bot, newsize - oldsize);
+#నిర్వచితమైతే FEAT_SPELL
 	    // When text has been changed, possibly the start of the next line
 	    // may have SpellCap that should be removed or it needs to be
 	    // displayed.  Schedule the next line for redrawing just in case.
-	    if (spell_check_window(curwin) && bot <= curbuf->b_ml.ml_line_count)
+	    ఒకవేళ (spell_check_కిటికీ(curwin) && bot <= curbuf->b_ml.ml_పంక్తి_లెక్క)
 		redrawWinline(curwin, bot);
-#endif
+#అయితే_ముగింపు
 	}
 
 	// Set the '[ mark.
-	if (top + 1 < curbuf->b_op_start.lnum)
-	    curbuf->b_op_start.lnum = top + 1;
+	ఒకవేళ (శిఖరం + 1 < curbuf->b_op_ప్రారంభం.lnum)
+	    curbuf->b_op_ప్రారంభం.lnum = శిఖరం + 1;
 	// Set the '] mark.
-	if (newsize == 0 && top + 1 > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + 1;
-	else if (top + newsize > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + newsize;
+	ఒకవేళ (newsize == 0 && శిఖరం + 1 > curbuf->b_op_చివర.lnum)
+	    curbuf->b_op_చివర.lnum = శిఖరం + 1;
+	లేకపోతే ఒకవేళ (శిఖరం + newsize > curbuf->b_op_చివర.lnum)
+	    curbuf->b_op_చివర.lnum = శిఖరం + newsize;
 
 	u_newcount += newsize;
 	u_oldcount += oldsize;
-	uep->ue_size = oldsize;
+	uep->ue_కొలత = oldsize;
 	uep->ue_array = newarray;
-	uep->ue_bot = top + newsize + 1;
+	uep->ue_bot = శిఖరం + newsize + 1;
 
 	/*
 	 * insert this entry in front of the new entry list
 	 */
-	nuep = uep->ue_next;
-	uep->ue_next = newlist;
+	nuep = uep->ue_తదుపరి;
+	uep->ue_తదుపరి = newlist;
 	newlist = uep;
     }
 
     // Ensure the '[ and '] marks are within bounds.
-    if (curbuf->b_op_start.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
-    if (curbuf->b_op_end.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_end.lnum = curbuf->b_ml.ml_line_count;
+    ఒకవేళ (curbuf->b_op_ప్రారంభం.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	 curbuf->b_op_ప్రారంభం.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
+    ఒకవేళ (curbuf->b_op_చివర.lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
+	 curbuf->b_op_చివర.lnum = curbuf->b_ml.ml_పంక్తి_లెక్క;
 
     // Set the cursor to the desired position.  Check that the line is valid.
     curwin->w_cursor = new_curpos;
     check_cursor_lnum();
 
-    curhead->uh_entry = newlist;
+    curhead->uh_నమోదు = newlist;
     curhead->uh_flags = new_flags;
-    if ((old_flags & UH_EMPTYBUF) && BUFEMPTY())
-	curbuf->b_ml.ml_flags |= ML_EMPTY;
-    if (old_flags & UH_CHANGED)
-	changed();
-    else
-#ifdef FEAT_NETBEANS_INTG
+    ఒకవేళ ((old_flags & UH_EMPTYBUF) && BUFEMPTY())
+	curbuf->b_ml.ml_flags |= ML_ఖాళీలు;
+    ఒకవేళ (old_flags & UH_మారింది)
+	మారింది();
+    లేకపోతే
+#నిర్వచితమైతే FEAT_NETBEANS_INTG
 	// per netbeans undo rules, keep it as modified
-	if (!isNetbeansModified(curbuf))
-#endif
+	ఒకవేళ (!isNetbeansModified(curbuf))
+#అయితే_ముగింపు
 	unchanged(curbuf, FALSE, TRUE);
 
     /*
      * restore marks from before undo/redo
      */
-    for (i = 0; i < NMARKS; ++i)
+    కొరకు (i = 0; i < NMARKS; ++i)
     {
-	if (curhead->uh_namedm[i].lnum != 0)
+	ఒకవేళ (curhead->uh_namedm[i].lnum != 0)
 	    curbuf->b_namedm[i] = curhead->uh_namedm[i];
-	if (namedm[i].lnum != 0)
+	ఒకవేళ (namedm[i].lnum != 0)
 	    curhead->uh_namedm[i] = namedm[i];
-	else
+	లేకపోతే
 	    curhead->uh_namedm[i].lnum = 0;
     }
-    if (curhead->uh_visual.vi_start.lnum != 0)
+    ఒకవేళ (curhead->uh_visual.vi_ప్రారంభం.lnum != 0)
     {
 	curbuf->b_visual = curhead->uh_visual;
 	curhead->uh_visual = visualinfo;
@@ -2970,29 +2970,29 @@ u_undoredo(int undo)
      * before starting the change (for the "o" command).
      * Otherwise the cursor should go to the first undone line.
      */
-    if (curhead->uh_cursor.lnum + 1 == curwin->w_cursor.lnum
+    ఒకవేళ (curhead->uh_cursor.lnum + 1 == curwin->w_cursor.lnum
 						 && curwin->w_cursor.lnum > 1)
 	--curwin->w_cursor.lnum;
-    if (curwin->w_cursor.lnum <= curbuf->b_ml.ml_line_count)
+    ఒకవేళ (curwin->w_cursor.lnum <= curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
-	if (curhead->uh_cursor.lnum == curwin->w_cursor.lnum)
+	ఒకవేళ (curhead->uh_cursor.lnum == curwin->w_cursor.lnum)
 	{
-	    curwin->w_cursor.col = curhead->uh_cursor.col;
-	    if (virtual_active() && curhead->uh_cursor_vcol >= 0)
+	    curwin->w_cursor.నిలువు = curhead->uh_cursor.నిలువు;
+	    ఒకవేళ (virtual_చురుకైన() && curhead->uh_cursor_vcol >= 0)
 		coladvance((colnr_T)curhead->uh_cursor_vcol);
-	    else
+	    లేకపోతే
 		curwin->w_cursor.coladd = 0;
 	}
-	else
+	లేకపోతే
 	    beginline(BL_SOL | BL_FIX);
     }
-    else
+    లేకపోతే
     {
 	// We get here with the current cursor line being past the end (eg
 	// after adding lines at the end of the file, and then undoing it).
 	// check_cursor() will move the cursor to the last line.  Move it to
 	// the first column here.
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.నిలువు = 0;
 	curwin->w_cursor.coladd = 0;
     }
 
@@ -3001,33 +3001,33 @@ u_undoredo(int undo)
 
     // Remember where we are for "g-" and ":earlier 10s".
     curbuf->b_u_seq_cur = curhead->uh_seq;
-    if (undo)
+    ఒకవేళ (undo)
     {
 	// We are below the previous undo.  However, to make ":earlier 1s"
 	// work we compute this as being just above the just undone change.
-	if (curhead->uh_next.ptr != NULL)
-	    curbuf->b_u_seq_cur = curhead->uh_next.ptr->uh_seq;
-	else
+	ఒకవేళ (curhead->uh_తదుపరి.ptr != ఖాళీ)
+	    curbuf->b_u_seq_cur = curhead->uh_తదుపరి.ptr->uh_seq;
+	లేకపోతే
 	    curbuf->b_u_seq_cur = 0;
     }
 
     // Remember where we are for ":earlier 1f" and ":later 1f".
-    if (curhead->uh_save_nr != 0)
+    ఒకవేళ (curhead->uh_save_nr != 0)
     {
-	if (undo)
+	ఒకవేళ (undo)
 	    curbuf->b_u_save_nr_cur = curhead->uh_save_nr - 1;
-	else
+	లేకపోతే
 	    curbuf->b_u_save_nr_cur = curhead->uh_save_nr;
     }
 
     // The timestamp can be the same for multiple changes, just use the one of
     // the undone/redone change.
-    curbuf->b_u_time_cur = curhead->uh_time;
+    curbuf->b_u_సమయం_cur = curhead->uh_సమయం;
 
     unblock_autocmds();
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
     u_check(FALSE);
-#endif
+#అయితే_ముగింపు
 }
 
 /*
@@ -3035,124 +3035,124 @@ u_undoredo(int undo)
  * Otherwise, report the number of changes (this may be incorrect
  * in some cases, but it's better than nothing).
  */
-    static void
-u_undo_end(
-    int		did_undo,	// just did an undo
-    int		absolute)	// used ":undo N"
+    స్థిర శూన్య
+u_undo_చివర(
+    పూర్ణాంకం		did_undo,	// just did an undo
+    పూర్ణాంకం		absolute)	// used ":undo N"
 {
-    char	*msgstr;
-    u_header_T	*uhp;
+    అక్షరం	*msgstr;
+    u_శీర్షిక_T	*uhp;
     char_u	msgbuf[80];
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_UNDO) && KeyTyped)
+#నిర్వచితమైతే FEAT_FOLDING
+    ఒకవేళ ((fdo_flags & FDO_UNDO) && కీలకం_Typed)
 	foldOpenCursor();
-#endif
+#అయితే_ముగింపు
 
-    if (global_busy	    // no messages now, wait until global is finished
+    ఒకవేళ (global_busy	    // no messages now, wait until global is finished
 	    || !messaging() // 'lazyredraw' set, don't do messages now
 	    || shortmess(SHM_UNDO))
-	return;
+	తిరిగి;
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    ఒకవేళ (curbuf->b_ml.ml_flags & ML_ఖాళీలు)
 	--u_newcount;
 
     u_oldcount -= u_newcount;
-    if (u_oldcount == -1)
+    ఒకవేళ (u_oldcount == -1)
 	msgstr = N_("more line");
-    else if (u_oldcount < 0)
+    లేకపోతే ఒకవేళ (u_oldcount < 0)
 	msgstr = N_("more lines");
-    else if (u_oldcount == 1)
+    లేకపోతే ఒకవేళ (u_oldcount == 1)
 	msgstr = N_("line less");
-    else if (u_oldcount > 1)
+    లేకపోతే ఒకవేళ (u_oldcount > 1)
 	msgstr = N_("fewer lines");
-    else
+    లేకపోతే
     {
 	u_oldcount = u_newcount;
-	if (u_newcount == 1)
+	ఒకవేళ (u_newcount == 1)
 	    msgstr = N_("change");
-	else
+	లేకపోతే
 	    msgstr = N_("changes");
     }
 
-    if (curbuf->b_u_curhead != NULL)
+    ఒకవేళ (curbuf->b_u_curhead != ఖాళీ)
     {
 	// For ":undo N" we prefer a "after #N" message.
-	if (absolute && curbuf->b_u_curhead->uh_next.ptr != NULL)
+	ఒకవేళ (absolute && curbuf->b_u_curhead->uh_తదుపరి.ptr != ఖాళీ)
 	{
-	    uhp = curbuf->b_u_curhead->uh_next.ptr;
+	    uhp = curbuf->b_u_curhead->uh_తదుపరి.ptr;
 	    did_undo = FALSE;
 	}
-	else if (did_undo)
+	లేకపోతే ఒకవేళ (did_undo)
 	    uhp = curbuf->b_u_curhead;
-	else
-	    uhp = curbuf->b_u_curhead->uh_next.ptr;
+	లేకపోతే
+	    uhp = curbuf->b_u_curhead->uh_తదుపరి.ptr;
     }
-    else
+    లేకపోతే
 	uhp = curbuf->b_u_newhead;
 
-    if (uhp == NULL)
+    ఒకవేళ (uhp == ఖాళీ)
 	*msgbuf = NUL;
-    else
-	add_time(msgbuf, sizeof(msgbuf), uhp->uh_time);
+    లేకపోతే
+	కూడు_సమయం(msgbuf, పరిమాణం(msgbuf), uhp->uh_సమయం);
 
-#ifdef FEAT_CONCEAL
+#నిర్వచితమైతే FEAT_CONCEAL
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == curbuf && wp->w_p_cole > 0)
+	    ఒకవేళ (wp->w_బఫరు == curbuf && wp->w_p_cole > 0)
 		redraw_win_later(wp, UPD_NOT_VALID);
 	}
     }
-#endif
-    if (VIsual_active)
+#అయితే_ముగింపు
+    ఒకవేళ (VIsual_చురుకైన)
 	check_pos(curbuf, &VIsual);
 
     smsg_attr_keep(0, _("%ld %s; %s #%ld  %s"),
 	    u_oldcount < 0 ? -u_oldcount : u_oldcount,
 	    _(msgstr),
 	    did_undo ? _("before") : _("after"),
-	    uhp == NULL ? 0L : uhp->uh_seq,
+	    uhp == ఖాళీ ? 0L : uhp->uh_seq,
 	    msgbuf);
 }
 
 /*
  * u_sync: stop adding to the current entry list
  */
-    void
+    శూన్య
 u_sync(
-    int	    force)	// Also sync when no_u_sync is set.
+    పూర్ణాంకం	    force)	// Also sync when no_u_sync is set.
 {
     // Skip it when already synced or syncing is disabled.
-    if (curbuf->b_u_synced || (!force && no_u_sync > 0))
-	return;
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    if (p_imst == IM_ON_THE_SPOT && im_is_preediting())
-	return;		    // XIM is busy, don't break an undo sequence
-#endif
-    if (get_undolevel() < 0)
+    ఒకవేళ (curbuf->b_u_synced || (!force && no_u_sync > 0))
+	తిరిగి;
+#ఒకవేళ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ఒకవేళ (p_imst == IM_ON_THE_SPOT && im_is_preediting())
+	తిరిగి;		    // XIM is busy, don't break an undo sequence
+#అయితే_ముగింపు
+    ఒకవేళ (get_undolevel() < 0)
 	curbuf->b_u_synced = true;  // no entries, nothing to do
-    else
+    లేకపోతే
     {
 	u_getbot();		    // compute ue_bot of previous u_save
-	curbuf->b_u_curhead = NULL;
+	curbuf->b_u_curhead = ఖాళీ;
     }
 }
 
 /*
  * ":undolist": List the leafs of the undo tree
  */
-    void
-ex_undolist(exarg_T *eap UNUSED)
+    శూన్య
+ex_undolist(exarg_T *eap వాడని)
 {
     garray_T	ga;
-    u_header_T	*uhp;
-    int		mark;
-    int		nomark;
-    int		changes = 1;
-    int		len;
+    u_శీర్షిక_T	*uhp;
+    పూర్ణాంకం		mark;
+    పూర్ణాంకం		nomark;
+    పూర్ణాంకం		changes = 1;
+    పూర్ణాంకం		len;
 
     /*
      * 1: walk the tree to find all leafs, put the info in "ga".
@@ -3161,36 +3161,36 @@ ex_undolist(exarg_T *eap UNUSED)
      */
     mark = ++lastmark;
     nomark = ++lastmark;
-    ga_init2(&ga, sizeof(char *), 20);
+    ga_init2(&ga, పరిమాణం(అక్షరం *), 20);
 
     uhp = curbuf->b_u_oldhead;
-    while (uhp != NULL)
+    అయితే (uhp != ఖాళీ)
     {
-	if (uhp->uh_prev.ptr == NULL && uhp->uh_walk != nomark
+	ఒకవేళ (uhp->uh_prev.ptr == ఖాళీ && uhp->uh_walk != nomark
 						      && uhp->uh_walk != mark)
 	{
-	    if (ga_grow(&ga, 1) == FAIL)
-		break;
-	    len = vim_snprintf((char *)IObuff, IOSIZE, "%6ld %7d  ",
+	    ఒకవేళ (ga_grow(&ga, 1) == FAIL)
+		ఆపు;
+	    len = vim_snprintf((అక్షరం *)IObuff, IOSIZE, "%6ld %7d  ",
 							uhp->uh_seq, changes);
-	    add_time(IObuff + len, IOSIZE - len, uhp->uh_time);
+	    కూడు_సమయం(IObuff + len, IOSIZE - len, uhp->uh_సమయం);
 
 	    // we have to call STRLEN() here because add_time() does not report
 	    // the number of characters added.
-	    len += (int)STRLEN(IObuff + len);
-	    if (uhp->uh_save_nr > 0)
+	    len += (పూర్ణాంకం)STRLEN(IObuff + len);
+	    ఒకవేళ (uhp->uh_save_nr > 0)
 	    {
-		int n = (len >= 33) ? 0 : 33 - len;
+		పూర్ణాంకం n = (len >= 33) ? 0 : 33 - len;
 
-		len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%*.*s  %3ld", n, n, " ", uhp->uh_save_nr);
+		len += vim_snprintf((అక్షరం *)IObuff + len, IOSIZE - len, "%*.*s  %3ld", n, n, " ", uhp->uh_save_nr);
 	    }
-	    ((char_u **)(ga.ga_data))[ga.ga_len++] = vim_strnsave(IObuff, len);
+	    ((char_u **)(ga.ga_దత్తాంశం))[ga.ga_len++] = vim_strnsave(IObuff, len);
 	}
 
 	uhp->uh_walk = mark;
 
 	// go down in the tree if we haven't been there
-	if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != nomark
+	ఒకవేళ (uhp->uh_prev.ptr != ఖాళీ && uhp->uh_prev.ptr->uh_walk != nomark
 					 && uhp->uh_prev.ptr->uh_walk != mark)
 	{
 	    uhp = uhp->uh_prev.ptr;
@@ -3198,77 +3198,77 @@ ex_undolist(exarg_T *eap UNUSED)
 	}
 
 	// go to alternate branch if we haven't been there
-	else if (uhp->uh_alt_next.ptr != NULL
-		&& uhp->uh_alt_next.ptr->uh_walk != nomark
-		&& uhp->uh_alt_next.ptr->uh_walk != mark)
-	    uhp = uhp->uh_alt_next.ptr;
+	లేకపోతే ఒకవేళ (uhp->uh_alt_తదుపరి.ptr != ఖాళీ
+		&& uhp->uh_alt_తదుపరి.ptr->uh_walk != nomark
+		&& uhp->uh_alt_తదుపరి.ptr->uh_walk != mark)
+	    uhp = uhp->uh_alt_తదుపరి.ptr;
 
 	// go up in the tree if we haven't been there and we are at the
 	// start of alternate branches
-	else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
-		&& uhp->uh_next.ptr->uh_walk != nomark
-		&& uhp->uh_next.ptr->uh_walk != mark)
+	లేకపోతే ఒకవేళ (uhp->uh_తదుపరి.ptr != ఖాళీ && uhp->uh_alt_prev.ptr == ఖాళీ
+		&& uhp->uh_తదుపరి.ptr->uh_walk != nomark
+		&& uhp->uh_తదుపరి.ptr->uh_walk != mark)
 	{
-	    uhp = uhp->uh_next.ptr;
+	    uhp = uhp->uh_తదుపరి.ptr;
 	    --changes;
 	}
 
-	else
+	లేకపోతే
 	{
 	    // need to backtrack; mark this node as done
 	    uhp->uh_walk = nomark;
-	    if (uhp->uh_alt_prev.ptr != NULL)
+	    ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
 		uhp = uhp->uh_alt_prev.ptr;
-	    else
+	    లేకపోతే
 	    {
-		uhp = uhp->uh_next.ptr;
+		uhp = uhp->uh_తదుపరి.ptr;
 		--changes;
 	    }
 	}
     }
 
-    if (ga.ga_len == 0)
-	msg(_("Nothing to undo"));
-    else
+    ఒకవేళ (ga.ga_len == 0)
+	సందేశం(_("Nothing to undo"));
+    లేకపోతే
     {
-	int		i;
+	పూర్ణాంకం		i;
 
-	sort_strings((char_u **)ga.ga_data, ga.ga_len);
+	క్రమీకరించు_అక్షరశ్రేణులు((char_u **)ga.ga_దత్తాంశం, ga.ga_len);
 
-	msg_start();
-	msg_puts_attr(_("number changes  when               saved"),
+	సందేశం_ప్రారంభం();
+	సందేశం_puts_attr(_("number changes  when               saved"),
 							      HL_ATTR(HLF_T));
-	for (i = 0; i < ga.ga_len && !got_int; ++i)
+	కొరకు (i = 0; i < ga.ga_len && !got_int; ++i)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
-	    msg_puts(((char **)ga.ga_data)[i]);
+	    సందేశం_putchar('\n');
+	    ఒకవేళ (got_int)
+		ఆపు;
+	    సందేశం_puts(((అక్షరం **)ga.ga_దత్తాంశం)[i]);
 	}
-	msg_end();
+	సందేశం_చివర();
 
-	ga_clear_strings(&ga);
+	ga_clear_అక్షరశ్రేణులు(&ga);
     }
 }
 
 /*
  * ":undojoin": continue adding to the last entry list
  */
-    void
-ex_undojoin(exarg_T *eap UNUSED)
+    శూన్య
+ex_undojoin(exarg_T *eap వాడని)
 {
-    if (curbuf->b_u_newhead == NULL)
-	return;		    // nothing changed before
-    if (curbuf->b_u_curhead != NULL)
+    ఒకవేళ (curbuf->b_u_newhead == ఖాళీ)
+	తిరిగి;		    // nothing changed before
+    ఒకవేళ (curbuf->b_u_curhead != ఖాళీ)
     {
 	emsg(_(e_undojoin_is_not_allowed_after_undo));
-	return;
+	తిరిగి;
     }
-    if (!curbuf->b_u_synced)
-	return;		    // already unsynced
-    if (get_undolevel() < 0)
-	return;		    // no entries, nothing to do
-    else
+    ఒకవేళ (!curbuf->b_u_synced)
+	తిరిగి;		    // already unsynced
+    ఒకవేళ (get_undolevel() < 0)
+	తిరిగి;		    // no entries, nothing to do
+    లేకపోతే
 	// Append next change to the last entry
 	curbuf->b_u_synced = false;
 }
@@ -3277,7 +3277,7 @@ ex_undojoin(exarg_T *eap UNUSED)
  * Called after writing or reloading the file and setting b_changed to FALSE.
  * Now an undo means that the buffer is modified.
  */
-    void
+    శూన్య
 u_unchanged(buf_T *buf)
 {
     u_unch_branch(buf->b_u_oldhead);
@@ -3288,35 +3288,35 @@ u_unchanged(buf_T *buf)
  * After reloading a buffer which was saved for 'undoreload': Find the first
  * line that was changed and set the cursor there.
  */
-    void
-u_find_first_changed(void)
+    శూన్య
+u_కనుగొను_మొదటి_మారింది(శూన్య)
 {
-    u_header_T	*uhp = curbuf->b_u_newhead;
-    u_entry_T   *uep;
+    u_శీర్షిక_T	*uhp = curbuf->b_u_newhead;
+    u_నమోదు_T   *uep;
     linenr_T	lnum;
 
-    if (curbuf->b_u_curhead != NULL || uhp == NULL)
-	return;  // undid something in an autocmd?
+    ఒకవేళ (curbuf->b_u_curhead != ఖాళీ || uhp == ఖాళీ)
+	తిరిగి;  // undid something in an autocmd?
 
     // Check that the last undo block was for the whole file.
-    uep = uhp->uh_entry;
-    if (uep->ue_top != 0 || uep->ue_bot != 0)
-	return;
+    uep = uhp->uh_నమోదు;
+    ఒకవేళ (uep->ue_శిఖరం != 0 || uep->ue_bot != 0)
+	తిరిగి;
 
-    for (lnum = 1; lnum < curbuf->b_ml.ml_line_count
-					      && lnum <= uep->ue_size; ++lnum)
+    కొరకు (lnum = 1; lnum < curbuf->b_ml.ml_పంక్తి_లెక్క
+					      && lnum <= uep->ue_కొలత; ++lnum)
     {
 	char_u *p = ml_get_buf(curbuf, lnum, FALSE);
 
-	if (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_line_len
-		|| memcmp(p, uep->ue_array[lnum - 1].ul_line, uep->ue_array[lnum - 1].ul_len) != 0)
+	ఒకవేళ (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_పంక్తి_len
+		|| memcmp(p, uep->ue_array[lnum - 1].ul_పంక్తి, uep->ue_array[lnum - 1].ul_len) != 0)
 	{
 	    CLEAR_POS(&(uhp->uh_cursor));
 	    uhp->uh_cursor.lnum = lnum;
-	    return;
+	    తిరిగి;
 	}
     }
-    if (curbuf->b_ml.ml_line_count != uep->ue_size)
+    ఒకవేళ (curbuf->b_ml.ml_పంక్తి_లెక్క != uep->ue_కొలత)
     {
 	// lines added or deleted at the end, put the cursor there
 	CLEAR_POS(&(uhp->uh_cursor));
@@ -3328,32 +3328,32 @@ u_find_first_changed(void)
  * Increase the write count, store it in the last undo header, what would be
  * used for "u".
  */
-    void
+    శూన్య
 u_update_save_nr(buf_T *buf)
 {
-    u_header_T	*uhp;
+    u_శీర్షిక_T	*uhp;
 
-    ++buf->b_u_save_nr_last;
-    buf->b_u_save_nr_cur = buf->b_u_save_nr_last;
+    ++buf->b_u_save_nr_చివరి;
+    buf->b_u_save_nr_cur = buf->b_u_save_nr_చివరి;
     uhp = buf->b_u_curhead;
-    if (uhp != NULL)
-	uhp = uhp->uh_next.ptr;
-    else
+    ఒకవేళ (uhp != ఖాళీ)
+	uhp = uhp->uh_తదుపరి.ptr;
+    లేకపోతే
 	uhp = buf->b_u_newhead;
-    if (uhp != NULL)
-	uhp->uh_save_nr = buf->b_u_save_nr_last;
+    ఒకవేళ (uhp != ఖాళీ)
+	uhp->uh_save_nr = buf->b_u_save_nr_చివరి;
 }
 
-    static void
-u_unch_branch(u_header_T *uhp)
+    స్థిర శూన్య
+u_unch_branch(u_శీర్షిక_T *uhp)
 {
-    u_header_T	*uh;
+    u_శీర్షిక_T	*uh;
 
-    for (uh = uhp; uh != NULL; uh = uh->uh_prev.ptr)
+    కొరకు (uh = uhp; uh != ఖాళీ; uh = uh->uh_prev.ptr)
     {
-	uh->uh_flags |= UH_CHANGED;
-	if (uh->uh_alt_next.ptr != NULL)
-	    u_unch_branch(uh->uh_alt_next.ptr);	    // recursive
+	uh->uh_flags |= UH_మారింది;
+	ఒకవేళ (uh->uh_alt_తదుపరి.ptr != ఖాళీ)
+	    u_unch_branch(uh->uh_alt_తదుపరి.ptr);	    // recursive
     }
 }
 
@@ -3361,51 +3361,51 @@ u_unch_branch(u_header_T *uhp)
  * Get pointer to last added entry.
  * If it's not valid, give an error message and return NULL.
  */
-    static u_entry_T *
-u_get_headentry(void)
+    స్థిర u_నమోదు_T *
+u_get_headentry(శూన్య)
 {
-    if (curbuf->b_u_newhead == NULL || curbuf->b_u_newhead->uh_entry == NULL)
+    ఒకవేళ (curbuf->b_u_newhead == ఖాళీ || curbuf->b_u_newhead->uh_నమోదు == ఖాళీ)
     {
 	iemsg(e_undo_list_corrupt);
-	return NULL;
+	తిరిగి ఖాళీ;
     }
-    return curbuf->b_u_newhead->uh_entry;
+    తిరిగి curbuf->b_u_newhead->uh_నమోదు;
 }
 
 /*
  * u_getbot(): compute the line number of the previous u_save
  *		It is called only when b_u_synced is false.
  */
-    static void
-u_getbot(void)
+    స్థిర శూన్య
+u_getbot(శూన్య)
 {
-    u_entry_T	*uep;
+    u_నమోదు_T	*uep;
     linenr_T	extra;
 
     uep = u_get_headentry();	// check for corrupt undo list
-    if (uep == NULL)
-	return;
+    ఒకవేళ (uep == ఖాళీ)
+	తిరిగి;
 
-    uep = curbuf->b_u_newhead->uh_getbot_entry;
-    if (uep != NULL)
+    uep = curbuf->b_u_newhead->uh_getbot_నమోదు;
+    ఒకవేళ (uep != ఖాళీ)
     {
 	/*
 	 * the new ue_bot is computed from the number of lines that has been
 	 * inserted (0 - deleted) since calling u_save. This is equal to the
 	 * old line count subtracted from the current line count.
 	 */
-	extra = curbuf->b_ml.ml_line_count - uep->ue_lcount;
-	uep->ue_bot = uep->ue_top + uep->ue_size + 1 + extra;
-	if (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_line_count)
+	extra = curbuf->b_ml.ml_పంక్తి_లెక్క - uep->ue_lcount;
+	uep->ue_bot = uep->ue_శిఖరం + uep->ue_కొలత + 1 + extra;
+	ఒకవేళ (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_పంక్తి_లెక్క)
 	{
-	    iemsg(e_undo_line_missing);
-	    uep->ue_bot = uep->ue_top + 1;  // assume all lines deleted, will
+	    iemsg(e_undo_పంక్తి_missing);
+	    uep->ue_bot = uep->ue_శిఖరం + 1;  // assume all lines deleted, will
 					    // get all the old lines back
 					    // without deleting the current
 					    // ones
 	}
 
-	curbuf->b_u_newhead->uh_getbot_entry = NULL;
+	curbuf->b_u_newhead->uh_getbot_నమోదు = ఖాళీ;
     }
 
     curbuf->b_u_synced = true;
@@ -3414,34 +3414,34 @@ u_getbot(void)
 /*
  * Free one header "uhp" and its entry list and adjust the pointers.
  */
-    static void
+    స్థిర శూన్య
 u_freeheader(
     buf_T	    *buf,
-    u_header_T	    *uhp,
-    u_header_T	    **uhpp)	// if not NULL reset when freeing this header
+    u_శీర్షిక_T	    *uhp,
+    u_శీర్షిక_T	    **uhpp)	// if not NULL reset when freeing this header
 {
-    u_header_T	    *uhap;
+    u_శీర్షిక_T	    *uhap;
 
     // When there is an alternate redo list free that branch completely,
     // because we can never go there.
-    if (uhp->uh_alt_next.ptr != NULL)
-	u_freebranch(buf, uhp->uh_alt_next.ptr, uhpp);
+    ఒకవేళ (uhp->uh_alt_తదుపరి.ptr != ఖాళీ)
+	u_freebranch(buf, uhp->uh_alt_తదుపరి.ptr, uhpp);
 
-    if (uhp->uh_alt_prev.ptr != NULL)
-	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = NULL;
+    ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
+	uhp->uh_alt_prev.ptr->uh_alt_తదుపరి.ptr = ఖాళీ;
 
     // Update the links in the list to remove the header.
-    if (uhp->uh_next.ptr == NULL)
+    ఒకవేళ (uhp->uh_తదుపరి.ptr == ఖాళీ)
 	buf->b_u_oldhead = uhp->uh_prev.ptr;
-    else
-	uhp->uh_next.ptr->uh_prev.ptr = uhp->uh_prev.ptr;
+    లేకపోతే
+	uhp->uh_తదుపరి.ptr->uh_prev.ptr = uhp->uh_prev.ptr;
 
-    if (uhp->uh_prev.ptr == NULL)
-	buf->b_u_newhead = uhp->uh_next.ptr;
-    else
-	for (uhap = uhp->uh_prev.ptr; uhap != NULL;
-						 uhap = uhap->uh_alt_next.ptr)
-	    uhap->uh_next.ptr = uhp->uh_next.ptr;
+    ఒకవేళ (uhp->uh_prev.ptr == ఖాళీ)
+	buf->b_u_newhead = uhp->uh_తదుపరి.ptr;
+    లేకపోతే
+	కొరకు (uhap = uhp->uh_prev.ptr; uhap != ఖాళీ;
+						 uhap = uhap->uh_alt_తదుపరి.ptr)
+	    uhap->uh_తదుపరి.ptr = uhp->uh_తదుపరి.ptr;
 
     u_freeentries(buf, uhp, uhpp);
 }
@@ -3449,33 +3449,33 @@ u_freeheader(
 /*
  * Free an alternate branch and any following alternate branches.
  */
-    static void
+    స్థిర శూన్య
 u_freebranch(
     buf_T	    *buf,
-    u_header_T	    *uhp,
-    u_header_T	    **uhpp)	// if not NULL reset when freeing this header
+    u_శీర్షిక_T	    *uhp,
+    u_శీర్షిక_T	    **uhpp)	// if not NULL reset when freeing this header
 {
-    u_header_T	    *tofree, *next;
+    u_శీర్షిక_T	    *tofree, *తదుపరి;
 
     // If this is the top branch we may need to use u_freeheader() to update
     // all the pointers.
-    if (uhp == buf->b_u_oldhead)
+    ఒకవేళ (uhp == buf->b_u_oldhead)
     {
-	while (buf->b_u_oldhead != NULL)
+	అయితే (buf->b_u_oldhead != ఖాళీ)
 	    u_freeheader(buf, buf->b_u_oldhead, uhpp);
-	return;
+	తిరిగి;
     }
 
-    if (uhp->uh_alt_prev.ptr != NULL)
-	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = NULL;
+    ఒకవేళ (uhp->uh_alt_prev.ptr != ఖాళీ)
+	uhp->uh_alt_prev.ptr->uh_alt_తదుపరి.ptr = ఖాళీ;
 
-    next = uhp;
-    while (next != NULL)
+    తదుపరి = uhp;
+    అయితే (తదుపరి != ఖాళీ)
     {
-	tofree = next;
-	if (tofree->uh_alt_next.ptr != NULL)
-	    u_freebranch(buf, tofree->uh_alt_next.ptr, uhpp);   // recursive
-	next = tofree->uh_prev.ptr;
+	tofree = తదుపరి;
+	ఒకవేళ (tofree->uh_alt_తదుపరి.ptr != ఖాళీ)
+	    u_freebranch(buf, tofree->uh_alt_తదుపరి.ptr, uhpp);   // recursive
+	తదుపరి = tofree->uh_prev.ptr;
 	u_freeentries(buf, tofree, uhpp);
     }
 }
@@ -3484,31 +3484,31 @@ u_freebranch(
  * Free all the undo entries for one header and the header itself.
  * This means that "uhp" is invalid when returning.
  */
-    static void
+    స్థిర శూన్య
 u_freeentries(
     buf_T	    *buf,
-    u_header_T	    *uhp,
-    u_header_T	    **uhpp)	// if not NULL reset when freeing this header
+    u_శీర్షిక_T	    *uhp,
+    u_శీర్షిక_T	    **uhpp)	// if not NULL reset when freeing this header
 {
-    u_entry_T	    *uep, *nuep;
+    u_నమోదు_T	    *uep, *nuep;
 
     // Check for pointers to the header that become invalid now.
-    if (buf->b_u_curhead == uhp)
-	buf->b_u_curhead = NULL;
-    if (buf->b_u_newhead == uhp)
-	buf->b_u_newhead = NULL;  // freeing the newest entry
-    if (uhpp != NULL && uhp == *uhpp)
-	*uhpp = NULL;
+    ఒకవేళ (buf->b_u_curhead == uhp)
+	buf->b_u_curhead = ఖాళీ;
+    ఒకవేళ (buf->b_u_newhead == uhp)
+	buf->b_u_newhead = ఖాళీ;  // freeing the newest entry
+    ఒకవేళ (uhpp != ఖాళీ && uhp == *uhpp)
+	*uhpp = ఖాళీ;
 
-    for (uep = uhp->uh_entry; uep != NULL; uep = nuep)
+    కొరకు (uep = uhp->uh_నమోదు; uep != ఖాళీ; uep = nuep)
     {
-	nuep = uep->ue_next;
-	u_freeentry(uep, uep->ue_size);
+	nuep = uep->ue_తదుపరి;
+	u_freeentry(uep, uep->ue_కొలత);
     }
 
-#ifdef U_DEBUG
+#నిర్వచితమైతే U_DEBUG
     uhp->uh_magic = 0;
-#endif
+#అయితే_ముగింపు
     vim_free((char_u *)uhp);
     --buf->b_u_numhead;
 }
@@ -3516,52 +3516,52 @@ u_freeentries(
 /*
  * free entry 'uep' and 'n' lines in uep->ue_array[]
  */
-    static void
-u_freeentry(u_entry_T *uep, long n)
+    స్థిర శూన్య
+u_freeentry(u_నమోదు_T *uep, దీర్ఘ n)
 {
-    while (n > 0)
-	vim_free(uep->ue_array[--n].ul_line);
+    అయితే (n > 0)
+	vim_free(uep->ue_array[--n].ul_పంక్తి);
     vim_free((char_u *)uep->ue_array);
-#ifdef FEAT_PROP_POPUP
+#నిర్వచితమైతే FEAT_PROP_POPUP
     ga_clear(&uep->ue_props);
-#endif
-#ifdef U_DEBUG
+#అయితే_ముగింపు
+#నిర్వచితమైతే U_DEBUG
     uep->ue_magic = 0;
-#endif
+#అయితే_ముగింపు
     vim_free((char_u *)uep);
 }
 
 /*
  * invalidate the undo buffer; called when storage has already been released
  */
-    static void
+    స్థిర శూన్య
 u_clearall(buf_T *buf)
 {
-    buf->b_u_newhead = buf->b_u_oldhead = buf->b_u_curhead = NULL;
+    buf->b_u_newhead = buf->b_u_oldhead = buf->b_u_curhead = ఖాళీ;
     buf->b_u_synced = true;
     buf->b_u_numhead = 0;
-    buf->b_u_line_ptr.ul_line = NULL;
-    buf->b_u_line_ptr.ul_len = 0;
-    buf->b_u_line_ptr.ul_textlen = 0;
-    buf->b_u_line_lnum = 0;
+    buf->b_u_పంక్తి_ptr.ul_పంక్తి = ఖాళీ;
+    buf->b_u_పంక్తి_ptr.ul_len = 0;
+    buf->b_u_పంక్తి_ptr.ul_textlen = 0;
+    buf->b_u_పంక్తి_lnum = 0;
 }
 
 /*
  * Free all allocated memory blocks for the buffer 'buf'.
  */
-    static void
+    స్థిర శూన్య
 u_blockfree(buf_T *buf)
 {
-    while (buf->b_u_oldhead != NULL)
-	u_freeheader(buf, buf->b_u_oldhead, NULL);
-    vim_free(buf->b_u_line_ptr.ul_line);
+    అయితే (buf->b_u_oldhead != ఖాళీ)
+	u_freeheader(buf, buf->b_u_oldhead, ఖాళీ);
+    vim_free(buf->b_u_పంక్తి_ptr.ul_పంక్తి);
 }
 
 /*
  * Free all allocated memory blocks for the buffer 'buf'.
  * and invalidate the undo buffer
  */
-    void
+    శూన్య
 u_clearallandblockfree(buf_T *buf)
 {
     u_blockfree(buf);
@@ -3573,37 +3573,37 @@ u_clearallandblockfree(buf_T *buf)
 /*
  * Save the line "lnum" for the "U" command.
  */
-    static void
+    స్థిర శూన్య
 u_saveline(linenr_T lnum)
 {
-    if (lnum == curbuf->b_u_line_lnum)	    // line is already saved
-	return;
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count) // should never happen
-	return;
+    ఒకవేళ (lnum == curbuf->b_u_పంక్తి_lnum)	    // line is already saved
+	తిరిగి;
+    ఒకవేళ (lnum < 1 || lnum > curbuf->b_ml.ml_పంక్తి_లెక్క) // should never happen
+	తిరిగి;
     u_clearline();
-    curbuf->b_u_line_lnum = lnum;
-    if (curwin->w_cursor.lnum == lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
-    else
-	curbuf->b_u_line_colnr = 0;
-    if (u_save_line(&curbuf->b_u_line_ptr, lnum) == FAIL)
-	do_outofmem_msg((long_u)0);
+    curbuf->b_u_పంక్తి_lnum = lnum;
+    ఒకవేళ (curwin->w_cursor.lnum == lnum)
+	curbuf->b_u_పంక్తి_colnr = curwin->w_cursor.నిలువు;
+    లేకపోతే
+	curbuf->b_u_పంక్తి_colnr = 0;
+    ఒకవేళ (u_save_పంక్తి(&curbuf->b_u_పంక్తి_ptr, lnum) == FAIL)
+	do_outofmem_సందేశం((long_u)0);
 }
 
 /*
  * clear the line saved for the "U" command
  * (this is used externally for crossing a line while in insert mode)
  */
-    void
-u_clearline(void)
+    శూన్య
+u_clearline(శూన్య)
 {
-    if (curbuf->b_u_line_ptr.ul_line == NULL)
-	return;
+    ఒకవేళ (curbuf->b_u_పంక్తి_ptr.ul_పంక్తి == ఖాళీ)
+	తిరిగి;
 
-    VIM_CLEAR(curbuf->b_u_line_ptr.ul_line);
-    curbuf->b_u_line_ptr.ul_len = 0;
-    curbuf->b_u_line_ptr.ul_textlen = 0;
-    curbuf->b_u_line_lnum = 0;
+    VIM_CLEAR(curbuf->b_u_పంక్తి_ptr.ul_పంక్తి);
+    curbuf->b_u_పంక్తి_ptr.ul_len = 0;
+    curbuf->b_u_పంక్తి_ptr.ul_textlen = 0;
+    curbuf->b_u_పంక్తి_lnum = 0;
 }
 
 /*
@@ -3612,42 +3612,42 @@ u_clearline(void)
  * We also allow the cursor to be in another line.
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-u_undoline(void)
+    శూన్య
+u_undoline(శూన్య)
 {
     colnr_T	t;
     undoline_T  oldp;
 
-    if (undo_off)
-	return;
+    ఒకవేళ (undo_off)
+	తిరిగి;
 
-    if (curbuf->b_u_line_ptr.ul_line == NULL
-			|| curbuf->b_u_line_lnum > curbuf->b_ml.ml_line_count)
+    ఒకవేళ (curbuf->b_u_పంక్తి_ptr.ul_పంక్తి == ఖాళీ
+			|| curbuf->b_u_పంక్తి_lnum > curbuf->b_ml.ml_పంక్తి_లెక్క)
     {
 	beep_flush();
-	return;
+	తిరిగి;
     }
 
     // first save the line for the 'u' command
-    if (u_savecommon(curbuf->b_u_line_lnum - 1,
-		       curbuf->b_u_line_lnum + 1, (linenr_T)0, FALSE) == FAIL)
-	return;
-    if (u_save_line(&oldp, curbuf->b_u_line_lnum) == FAIL)
+    ఒకవేళ (u_savecommon(curbuf->b_u_పంక్తి_lnum - 1,
+		       curbuf->b_u_పంక్తి_lnum + 1, (linenr_T)0, FALSE) == FAIL)
+	తిరిగి;
+    ఒకవేళ (u_save_పంక్తి(&oldp, curbuf->b_u_పంక్తి_lnum) == FAIL)
     {
-	do_outofmem_msg((long_u)0);
-	return;
+	do_outofmem_సందేశం((long_u)0);
+	తిరిగి;
     }
-    ml_replace_len(curbuf->b_u_line_lnum, curbuf->b_u_line_ptr.ul_line,
-				     curbuf->b_u_line_ptr.ul_len, TRUE, FALSE);
-    changed_bytes(curbuf->b_u_line_lnum, 0);
-    curbuf->b_u_line_ptr = oldp;
+    ml_replace_len(curbuf->b_u_పంక్తి_lnum, curbuf->b_u_పంక్తి_ptr.ul_పంక్తి,
+				     curbuf->b_u_పంక్తి_ptr.ul_len, TRUE, FALSE);
+    మారింది_బైట్లు(curbuf->b_u_పంక్తి_lnum, 0);
+    curbuf->b_u_పంక్తి_ptr = oldp;
 
-    t = curbuf->b_u_line_colnr;
-    if (curwin->w_cursor.lnum == curbuf->b_u_line_lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
-    curwin->w_cursor.col = t;
-    curwin->w_cursor.lnum = curbuf->b_u_line_lnum;
-    check_cursor_col();
+    t = curbuf->b_u_పంక్తి_colnr;
+    ఒకవేళ (curwin->w_cursor.lnum == curbuf->b_u_పంక్తి_lnum)
+	curbuf->b_u_పంక్తి_colnr = curwin->w_cursor.నిలువు;
+    curwin->w_cursor.నిలువు = t;
+    curwin->w_cursor.lnum = curbuf->b_u_పంక్తి_lnum;
+    check_cursor_నిలువు();
 }
 
 /*
@@ -3657,83 +3657,83 @@ u_undoline(void)
  * Also considers a buffer changed when a terminal window contains a running
  * job.
  */
-    int
-bufIsChanged(buf_T *buf)
+    పూర్ణాంకం
+buf_Is_మారింది(buf_T *buf)
 {
-#ifdef FEAT_TERMINAL
-    if (term_job_running_not_none(buf->b_term))
-	return TRUE;
-#endif
-    return bufIsChangedNotTerm(buf);
+#నిర్వచితమైతే FEAT_TERMINAL
+    ఒకవేళ (పదం_పని_running_not_none(buf->b_పదం))
+	తిరిగి TRUE;
+#అయితే_ముగింపు
+    తిరిగి buf_Is_మారింది_Not_పదం(buf);
 }
 
 /*
  * Return TRUE if any buffer has changes.  Also buffers that are not written.
  */
-    int
-anyBufIsChanged(void)
+    పూర్ణాంకం
+any_Buf_Is_మారింది(శూన్య)
 {
     buf_T *buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (bufIsChanged(buf))
-	    return TRUE;
-    return FALSE;
+	ఒకవేళ (buf_Is_మారింది(buf))
+	    తిరిగి TRUE;
+    తిరిగి FALSE;
 }
 
 /*
  * Like bufIsChanged() but ignoring a terminal window.
  */
-    int
-bufIsChangedNotTerm(buf_T *buf)
+    పూర్ణాంకం
+buf_Is_మారింది_Not_పదం(buf_T *buf)
 {
     // In a "prompt" buffer we do respect 'modified', so that we can control
     // closing the window by setting or resetting that option.
-    return (!bt_dontwrite(buf) || bt_prompt(buf))
-	&& (buf->b_changed || file_ff_differs(buf, TRUE));
+    తిరిగి (!bt_dontwrite(buf) || bt_prompt(buf))
+	&& (buf->b_మారింది || file_ff_differs(buf, TRUE));
 }
 
-    int
-curbufIsChanged(void)
+    పూర్ణాంకం
+curbuf_Is_మారింది(శూన్య)
 {
-    return bufIsChanged(curbuf);
+    తిరిగి buf_Is_మారింది(curbuf);
 }
 
-#if defined(FEAT_EVAL)
+#ఒకవేళ defined(FEAT_EVAL)
 
 /*
  * For undotree(): Append the list of undo blocks at "first_uhp" to "list".
  * Recursive.
  */
-    static void
-u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
+    స్థిర శూన్య
+u_eval_వృక్షం(buf_T *buf, u_శీర్షిక_T *మొదటి_uhp, list_T *list)
 {
-    u_header_T  *uhp = first_uhp;
+    u_శీర్షిక_T  *uhp = మొదటి_uhp;
     dict_T	*dict;
 
-    while (uhp != NULL)
+    అయితే (uhp != ఖాళీ)
     {
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
-	dict_add_number(dict, "seq", uhp->uh_seq);
-	dict_add_number(dict, "time", (long)uhp->uh_time);
-	if (uhp == buf->b_u_newhead)
-	    dict_add_number(dict, "newhead", 1);
-	if (uhp == buf->b_u_curhead)
-	    dict_add_number(dict, "curhead", 1);
-	if (uhp->uh_save_nr > 0)
-	    dict_add_number(dict, "save", uhp->uh_save_nr);
+	ఒకవేళ (dict == ఖాళీ)
+	    తిరిగి;
+	dict_కూడు_సంఖ్య(dict, "seq", uhp->uh_seq);
+	dict_కూడు_సంఖ్య(dict, "time", (దీర్ఘ)uhp->uh_సమయం);
+	ఒకవేళ (uhp == buf->b_u_newhead)
+	    dict_కూడు_సంఖ్య(dict, "newhead", 1);
+	ఒకవేళ (uhp == buf->b_u_curhead)
+	    dict_కూడు_సంఖ్య(dict, "curhead", 1);
+	ఒకవేళ (uhp->uh_save_nr > 0)
+	    dict_కూడు_సంఖ్య(dict, "save", uhp->uh_save_nr);
 
-	if (uhp->uh_alt_next.ptr != NULL)
+	ఒకవేళ (uhp->uh_alt_తదుపరి.ptr != ఖాళీ)
 	{
 	    list_T	*alt_list = list_alloc();
 
-	    if (alt_list != NULL)
+	    ఒకవేళ (alt_list != ఖాళీ)
 	    {
 		// Recursive call to add alternate undo tree.
-		u_eval_tree(buf, uhp->uh_alt_next.ptr, alt_list);
-		dict_add_list(dict, "alt", alt_list);
+		u_eval_వృక్షం(buf, uhp->uh_alt_తదుపరి.ptr, alt_list);
+		dict_కూడు_list(dict, "alt", alt_list);
 	    }
 	}
 
@@ -3745,90 +3745,90 @@ u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
 /*
  * "undofile(name)" function
  */
-    void
+    శూన్య
 f_undofile(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
     rettv->v_type = VAR_STRING;
 # ifdef FEAT_PERSISTENT_UNDO
     {
 	char_u *fname = tv_get_string(&argvars[0]);
 
-	if (*fname == NUL)
+	ఒకవేళ (*fname == NUL)
 	{
 	    // If there is no file name there will be no undo file.
-	    rettv->vval.v_string = NULL;
+	    rettv->vval.v_string = ఖాళీ;
 	}
-	else
+	లేకపోతే
 	{
-	    char_u *ffname = FullName_save(fname, TRUE);
+	    char_u *ffname = నిండిన_Name_save(fname, TRUE);
 
-	    if (ffname != NULL)
+	    ఒకవేళ (ffname != ఖాళీ)
 		rettv->vval.v_string = u_get_undo_file_name(ffname, FALSE);
 	    vim_free(ffname);
 	}
     }
-# else
-    rettv->vval.v_string = NULL;
+# లేకపోతే
+    rettv->vval.v_string = ఖాళీ;
 # endif
 }
 # ifdef FEAT_PERSISTENT_UNDO
 /*
  * Reset undofile option and delete the undofile
  */
-    void
+    శూన్య
 u_undofile_reset_and_delete(buf_T *buf)
 {
     char_u *file_name;
 
-    if (!buf->b_p_udf)
-	return;
+    ఒకవేళ (!buf->b_p_udf)
+	తిరిగి;
 
     file_name = u_get_undo_file_name(buf->b_ffname, TRUE);
-    if (file_name != NULL)
+    ఒకవేళ (file_name != ఖాళీ)
     {
 	mch_remove(file_name);
 	vim_free(file_name);
     }
 
-    set_option_value_give_err((char_u *)"undofile", 0L, NULL, OPT_LOCAL);
+    సమితి_option_విలువ_give_err((char_u *)"undofile", 0L, ఖాళీ, OPT_LOCAL);
 }
 # endif
 
 /*
  * "undotree(expr)" function
  */
-    void
+    శూన్య
 f_undotree(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ఒకవేళ (లోపల_vim9script() && check_for_opt_బఫరు_arg(argvars, 0) == FAIL)
+	తిరిగి;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ఒకవేళ (rettv_dict_alloc(rettv) == FAIL)
+	తిరిగి;
 
     typval_T	*tv = &argvars[0];
     buf_T	*buf = tv->v_type == VAR_UNKNOWN ? curbuf : get_buf_arg(tv);
-    if (buf == NULL)
-	return;
+    ఒకవేళ (buf == ఖాళీ)
+	తిరిగి;
 
     dict_T *dict = rettv->vval.v_dict;
 
-    dict_add_number(dict, "synced", (long)buf->b_u_synced);
-    dict_add_number(dict, "seq_last", buf->b_u_seq_last);
-    dict_add_number(dict, "save_last", buf->b_u_save_nr_last);
-    dict_add_number(dict, "seq_cur", buf->b_u_seq_cur);
-    dict_add_number(dict, "time_cur", (long)buf->b_u_time_cur);
-    dict_add_number(dict, "save_cur", buf->b_u_save_nr_cur);
+    dict_కూడు_సంఖ్య(dict, "synced", (దీర్ఘ)buf->b_u_synced);
+    dict_కూడు_సంఖ్య(dict, "seq_last", buf->b_u_seq_చివరి);
+    dict_కూడు_సంఖ్య(dict, "save_last", buf->b_u_save_nr_చివరి);
+    dict_కూడు_సంఖ్య(dict, "seq_cur", buf->b_u_seq_cur);
+    dict_కూడు_సంఖ్య(dict, "time_cur", (దీర్ఘ)buf->b_u_సమయం_cur);
+    dict_కూడు_సంఖ్య(dict, "save_cur", buf->b_u_save_nr_cur);
 
     list_T *list = list_alloc();
-    if (list != NULL)
+    ఒకవేళ (list != ఖాళీ)
     {
-	u_eval_tree(buf, buf->b_u_oldhead, list);
-	dict_add_list(dict, "entries", list);
+	u_eval_వృక్షం(buf, buf->b_u_oldhead, list);
+	dict_కూడు_list(dict, "entries", list);
     }
 }
 
-#endif
+#అయితే_ముగింపు

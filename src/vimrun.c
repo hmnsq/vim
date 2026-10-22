@@ -15,73 +15,73 @@
  *	      console kills Vim.  Now it only kills vimrun.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#అన్తర్భావ <stdio.h>
+#అన్తర్భావ <stdlib.h>
+#అన్తర్భావ <conio.h>
+#నిర్వచితం_కాకపోతే WIN32_LEAN_AND_సగటు
+# define WIN32_LEAN_AND_సగటు
+#అయితే_ముగింపు
+#అన్తర్భావ <windows.h>
 
-    int
-main(void)
+    పూర్ణాంకం
+ప్రధాన(శూన్య)
 {
-    const wchar_t   *p;
+    స్థిరరాశి wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    పూర్ణాంకం		    retval;
+    పూర్ణాంకం		    inquote = 0;
+    పూర్ణాంకం		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
-    p = (const wchar_t *)GetCommandLineW();
+    p = (స్థిరరాశి wchar_t *)Get_Command_పంక్తి_W();
 
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    అయితే (*p)
     {
-	if (*p == L'"')
+	ఒకవేళ (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	లేకపోతే ఒకవేళ (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    ఆపు;
 	}
 	++p;
     }
-    while (*p == L' ')
+    అయితే (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    ఒకవేళ (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	అయితే (*p == L' ')
 	    ++p;
     }
 
     // Print the command, including quotes and redirection.
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    WriteConsoleW(hstdout, p, wcslen(p), &written, NULL);
-    WriteConsoleW(hstdout, L"\r\n", 2, &written, NULL);
+    WriteConsoleW(hstdout, p, wcslen(p), &written, ఖాళీ);
+    WriteConsoleW(hstdout, L"\r\n", 2, &written, ఖాళీ);
 
     // If the command starts and ends with double quotes,
     // Enclose the command in parentheses.
-    cmd = NULL;
+    cmd = ఖాళీ;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    ఒకవేళ (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = జ్ఞాపకం_ఇవ్వు(cmdlen * పరిమాణం(wchar_t));
+	ఒకవేళ (cmd == ఖాళీ)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    తిరిగి -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
-	free(cmd);
+    ఒకవేళ (cmd)
+	విడుదల(cmd);
 
-    if (retval == -1)
+    ఒకవేళ (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
-	printf("shell returned %d\n", retval);
+    లేకపోతే ఒకవేళ (retval != 0)
+	రాయి("shell returned %d\n", retval);
 
-    if (!silent)
+    ఒకవేళ (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
-	    (void)_getch();
-	(void)_getch();
+	అయితే (_kbhit())
+	    (శూన్య)_getch();
+	(శూన్య)_getch();
     }
 
-    return retval;
+    తిరిగి retval;
 }
